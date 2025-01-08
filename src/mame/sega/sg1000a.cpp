@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
 /*********************************************************
-Sega hardware based on their SG-1000 console
-Driver by Tomasz Slanina
 
+Sega arcade hardware based on their SG-1000 console
+Driver by Tomasz Slanina
 
 Supported games :
 - Champion Boxing
@@ -285,10 +285,11 @@ namespace {
 class sg1000a_state : public driver_device
 {
 public:
-	sg1000a_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	sg1000a_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
+		m_decrypted_opcodes(*this, "decrypted_opcodes")
+	{ }
 
 	void sderbys(machine_config &config);
 	void sderby2s(machine_config &config);
@@ -301,10 +302,10 @@ private:
 	void sg1000a_coin_counter_w(uint8_t data);
 	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
-	void decrypted_opcodes_map(address_map &map);
-	void io_map(address_map &map);
-	void program_map(address_map &map);
-	void sderby_io_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void program_map(address_map &map) ATTR_COLD;
+	void sderby_io_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -521,6 +522,7 @@ void sg1000a_state::sderbys(machine_config &config)
 	sderby2s(config);
 	m_maincpu->set_addrmap(AS_OPCODES, &sg1000a_state::decrypted_opcodes_map);
 }
+
 /*************************************
  *
  *  ROM definitions

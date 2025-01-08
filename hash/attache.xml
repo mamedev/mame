@@ -3,7 +3,7 @@
 <!--
 license:CC0-1.0
 -->
-<softwarelist name="attache" description="Otrona Attache disk images">
+<softwarelist name="attache" description="Otrona Attaché disk images">
 
 	<software name="cpm">
 		<description>CP/M 2.2.5</description>

@@ -37,12 +37,12 @@ private:
 	void terak_fdc_data_w(uint16_t data);
 	uint32_t screen_update_terak(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_unit = 0;
 	uint8_t m_cmd = 0;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	required_device<t11_device> m_maincpu;
 };
 

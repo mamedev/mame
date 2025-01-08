@@ -37,7 +37,7 @@ static INPUT_PORTS_START( spinveti )
 	PORT_CONFSETTING(0x60, "Hardest")
 
 	PORT_START("RS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Reset") PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, microtan_kbd_spinveti, trigger_reset, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Reset") PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(microtan_kbd_spinveti::trigger_reset), 0)
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER(microtan_kbd_spinveti::trigger_reset)

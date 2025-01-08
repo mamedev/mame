@@ -81,7 +81,7 @@ public:
 		m_maincpu(*this, "maincpu")
 	{ }
 
-	void baoqingt(machine_config &config) ATTR_COLD;;
+	void baoqingt(machine_config &config) ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -223,4 +223,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1995, baoqingt, 0, baoqingt, baoqingt, ticz80_state, empty_init, ROT0, "TIC", "Bao Qing Tian", MACHINE_IS_SKELETON )
+GAME( 1995, baoqingt, 0, baoqingt, baoqingt, ticz80_state, empty_init, ROT0, "TIC", "Bao Qing Tian", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

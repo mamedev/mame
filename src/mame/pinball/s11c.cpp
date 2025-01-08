@@ -129,8 +129,8 @@ static INPUT_PORTS_START( s11c )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("INP64")
 
 	PORT_START("DIAGS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Audio Diag") PORT_CODE(KEYCODE_9_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, s11b_state, audio_nmi, 1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Main Diag") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, s11b_state, main_nmi, 1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Audio Diag") PORT_CODE(KEYCODE_9_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(s11b_state::audio_nmi), 1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Main Diag") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(s11b_state::main_nmi), 1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Advance") PORT_CODE(KEYCODE_1_PAD)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Up/Down") PORT_CODE(KEYCODE_2_PAD) PORT_TOGGLE
 	PORT_CONFNAME( 0x10, 0x10, "Language" )
@@ -810,4 +810,4 @@ GAME(1990,  gs_lu4,     0,          s11c,   s11c, s11c_state, init_s11c,  ROT0, 
 GAME(1990,  gs_lu3,     gs_lu4,     s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "The Bally Game Show (LU-3) Europe",            MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1990,  gs_la3,     gs_lu4,     s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "The Bally Game Show (LA-3)",                   MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1990,  gs_lg6,     gs_lu4,     s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "The Bally Game Show (LG-6) Germany",           MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1990,  strax_p7,   0,          s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Krell Development",    "Star Trax (domestic prototype)",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  strax_p7,   0,          s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Krell Development",    "Star Trax (domestic prototype)",               MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )

@@ -29,7 +29,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	static constexpr uint8_t BMU_SLAVE_ADDRESS = 0xa2;

@@ -52,7 +52,7 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	// configuration
@@ -122,7 +122,7 @@ public:
 
 protected:
 	// devicedevice_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	using card_vector = std::vector<std::reference_wrapper<device_wangpcbus_card_interface> >;

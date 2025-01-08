@@ -9,8 +9,8 @@
 
 ******************************************************************************/
 
-#ifndef MAME_VIDEO_PPU_VT03_H
-#define MAME_VIDEO_PPU_VT03_H
+#ifndef MAME_VIDEO_PPU2C0X_VT_H
+#define MAME_VIDEO_PPU2C0X_VT_H
 
 #pragma once
 
@@ -54,8 +54,8 @@ public:
 	virtual void draw_sprite_pixel(int sprite_xpos, int color, int pixel, uint8_t pixel_data, bitmap_rgb32 &bitmap) override;
 	virtual void read_extra_sprite_bits(int sprite_index) override;
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	void set_201x_reg(int reg, uint8_t data);
 	uint8_t get_201x_reg(int reg);
@@ -100,6 +100,6 @@ public:
 };
 
 DECLARE_DEVICE_TYPE(PPU_VT03,    ppu_vt03_device)
-DECLARE_DEVICE_TYPE(PPU_VT03PAL,    ppu_vt03pal_device)
+DECLARE_DEVICE_TYPE(PPU_VT03PAL, ppu_vt03pal_device)
 
-#endif // MAME_VIDEO_PPU_VT03_H
+#endif // MAME_VIDEO_PPU2C0X_VT_H

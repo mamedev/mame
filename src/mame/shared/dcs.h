@@ -104,7 +104,6 @@ protected:
 	optional_region_ptr<uint16_t> m_bootrom;
 	optional_shared_ptr<uint32_t> m_internal_program_ram;
 	optional_shared_ptr<uint32_t> m_external_program_ram;
-	optional_shared_ptr<uint32_t> m_internal_data_ram;
 	optional_shared_ptr<uint16_t> m_iram;
 
 	optional_memory_bank    m_data_bank;

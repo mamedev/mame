@@ -41,8 +41,8 @@ private:
 	u8 switches_r(offs_t offset);
 	void leds_w(u8 data);
 
-	void jx8p_assigner_map(address_map &map);
-	void superjx_assigner_map(address_map &map);
+	void jx8p_assigner_map(address_map &map) ATTR_COLD;
+	void superjx_assigner_map(address_map &map) ATTR_COLD;
 
 	required_device<hd6303r_cpu_device> m_assignercpu;
 	required_ioport_array<8> m_sw_scan;
@@ -441,7 +441,7 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1985, jx8p,  0,    0, jx8p,  jx8p,  roland_jx8p_state, empty_init, "Roland", "JX-8P Polyphonic Synthesizer (Ver. 3.x)", MACHINE_IS_SKELETON)
-SYST(1985, jx8po, jx8p, 0, jx8po, jx8p,  roland_jx8p_state, empty_init, "Roland", "JX-8P Polyphonic Synthesizer (Ver. 2.x)", MACHINE_IS_SKELETON)
-SYST(1986, jx10,  0,    0, jx10,  jx10,  roland_jx8p_state, empty_init, "Roland", "JX-10 Super JX Polyphonic Synthesizer", MACHINE_IS_SKELETON)
-SYST(1987, mks70, jx10, 0, mks70, mks70, roland_jx8p_state, empty_init, "Roland", "MKS-70 Super JX Polyphonic Synthesizer", MACHINE_IS_SKELETON)
+SYST(1985, jx8p,  0,    0, jx8p,  jx8p,  roland_jx8p_state, empty_init, "Roland", "JX-8P Polyphonic Synthesizer (Ver. 3.x)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1985, jx8po, jx8p, 0, jx8po, jx8p,  roland_jx8p_state, empty_init, "Roland", "JX-8P Polyphonic Synthesizer (Ver. 2.x)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1986, jx10,  0,    0, jx10,  jx10,  roland_jx8p_state, empty_init, "Roland", "JX-10 Super JX Polyphonic Synthesizer", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1987, mks70, jx10, 0, mks70, mks70, roland_jx8p_state, empty_init, "Roland", "MKS-70 Super JX Polyphonic Synthesizer", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

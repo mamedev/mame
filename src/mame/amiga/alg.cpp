@@ -51,7 +51,6 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/ldp1450.h"
 #include "machine/nvram.h"
-#include "machine/amigafdc.h"
 #include "speaker.h"
 
 
@@ -70,7 +69,7 @@ public:
 		, m_triggers(*this, "TRIGGERS")
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(lightgun_pos_r);
+	ioport_value lightgun_pos_r();
 	int lightgun_trigger_r();
 	int lightgun_holster_r();
 
@@ -103,11 +102,11 @@ private:
 
 	DECLARE_VIDEO_START(alg);
 
-	void a500_mem(address_map &map);
-	void main_map_picmatic(address_map &map);
-	void main_map_r1(address_map &map);
-	void main_map_r2(address_map &map);
-	void overlay_512kb_map(address_map &map);
+	void a500_mem(address_map &map) ATTR_COLD;
+	void main_map_picmatic(address_map &map) ATTR_COLD;
+	void main_map_r1(address_map &map) ATTR_COLD;
+	void main_map_r2(address_map &map) ATTR_COLD;
+	void overlay_512kb_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -167,7 +166,7 @@ void alg_state::potgo_w(uint16_t data)
 }
 
 
-CUSTOM_INPUT_MEMBER(alg_state::lightgun_pos_r)
+ioport_value alg_state::lightgun_pos_r()
 {
 	int x = 0, y = 0;
 
@@ -251,11 +250,11 @@ void alg_state::main_map_picmatic(address_map &map)
 
 static INPUT_PORTS_START( alg )
 	PORT_START("joy_0_dat")   // Read by Amiga core
-	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(alg_state, amiga_joystick_convert<0>)
+	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(alg_state::amiga_joystick_convert<0>))
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("joy_1_dat")   // Read by Amiga core
-	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(alg_state, amiga_joystick_convert<1>)
+	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(alg_state::amiga_joystick_convert<1>))
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("potgo")     // Read by Amiga core
@@ -266,7 +265,7 @@ static INPUT_PORTS_START( alg )
 	PORT_BIT( 0xaaff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("HVPOS")     // Read by Amiga core
-	PORT_BIT( 0x1ffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(alg_state, lightgun_pos_r)
+	PORT_BIT( 0x1ffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(alg_state::lightgun_pos_r))
 
 	PORT_START("FIRE")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
@@ -297,13 +296,13 @@ static INPUT_PORTS_START( alg_2p )
 
 	PORT_MODIFY("potgo")
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(alg_state, lightgun_trigger_r)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(alg_state::lightgun_trigger_r))
 
 	PORT_MODIFY("FIRE")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("p2_joy")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(alg_state, lightgun_holster_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(alg_state::lightgun_holster_r))
 
 	PORT_START("GUN2X")     // Referenced by lightgun_pos_r
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
@@ -341,7 +340,7 @@ void alg_state::alg_r1(machine_config &config)
 	// Video hardware
 	ntsc_video(config);
 
-	AMIGA_COPPER(config, m_copper, amiga_state::CLK_7M_NTSC);
+	AGNUS_COPPER(config, m_copper, amiga_state::CLK_7M_NTSC);
 	m_copper->set_host_cpu_tag(m_maincpu);
 	m_copper->mem_read_cb().set(FUNC(amiga_state::chip_ram_r));
 	m_copper->set_ecs_mode(false);
@@ -380,7 +379,7 @@ void alg_state::alg_r1(machine_config &config)
 	MOS8520(config, m_cia_1, amiga_state::CLK_E_NTSC);
 	m_cia_1->irq_wr_callback().set(FUNC(amiga_state::cia_1_irq));
 
-	AMIGA_FDC(config, m_fdc, amiga_state::CLK_7M_NTSC);
+	PAULA_FDC(config, m_fdc, amiga_state::CLK_7M_NTSC);
 	m_fdc->index_callback().set("cia_1", FUNC(mos8520_device::flag_w));
 	m_fdc->read_dma_callback().set(FUNC(amiga_state::chip_ram_r));
 	m_fdc->write_dma_callback().set(FUNC(amiga_state::chip_ram_w));

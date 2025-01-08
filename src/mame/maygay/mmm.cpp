@@ -36,8 +36,8 @@ private:
 	u8 ctc_r(offs_t offset);
 	void ctc_w(offs_t offset, u8 data);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
@@ -213,4 +213,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 198?,  mmm_ldip,  0,  mmm,  mmm, mmm_state, empty_init, ROT0,  "Maygay",    "Lucky Dip (Maygay)",    MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 198?,  mmm_ldip,  0,  mmm,  mmm, mmm_state, empty_init, ROT0,  "Maygay",    "Lucky Dip (Maygay)",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)

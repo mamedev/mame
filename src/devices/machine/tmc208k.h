@@ -10,8 +10,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_TMC208K_TMC208K_H
-#define MAME_MACHINE_TMC208K_TMC208K_H
+#ifndef MAME_MACHINE_TMC208K_H
+#define MAME_MACHINE_TMC208K_H
 
 #pragma once
 
@@ -46,8 +46,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	void clock_a();
 	virtual void clock_b();
@@ -99,4 +99,4 @@ protected:
 DECLARE_DEVICE_TYPE(TMC208K, tmc208k_device)
 DECLARE_DEVICE_TYPE(TMC28KU, tmc28ku_device)
 
-#endif // MAME_MACHINE_TMC208K_TMC208K_H
+#endif // MAME_MACHINE_TMC208K_H

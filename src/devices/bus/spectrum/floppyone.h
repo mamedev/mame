@@ -6,14 +6,16 @@
     (c) 1984/5 R.P.Gush
 
 *********************************************************************/
-#ifndef MAME_BUS_SPECTRUM_FLPONE_H
-#define MAME_BUS_SPECTRUM_FLPONE_H
+#ifndef MAME_BUS_SPECTRUM_FLOPPYONE_H
+#define MAME_BUS_SPECTRUM_FLOPPYONE_H
 
 #include "exp.h"
-#include "imagedev/floppy.h"
-#include "machine/wd_fdc.h"
+
 #include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
+#include "imagedev/floppy.h"
+#include "machine/wd_fdc.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -33,14 +35,14 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	virtual void post_opcode_fetch(offs_t offset) override;
 	virtual uint8_t mreq_r(offs_t offset) override;
@@ -76,5 +78,4 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(SPECTRUM_FLPONE, spectrum_flpone_device)
 
-
-#endif // MAME_BUS_SPECTRUM_FLPONE_H
+#endif // MAME_BUS_SPECTRUM_FLOPPYONE_H

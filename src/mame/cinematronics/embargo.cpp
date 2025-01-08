@@ -26,8 +26,8 @@ public:
 	void embargo(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -42,9 +42,9 @@ private:
 	void input_select_w(uint8_t data);
 	uint32_t screen_update_embargo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void main_data_map(address_map &map);
-	void main_io_map(address_map &map);
-	void main_map(address_map &map);
+	void main_data_map(address_map &map) ATTR_COLD;
+	void main_io_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_dial_enable_1 = 0;
 	uint8_t m_dial_enable_2 = 0;

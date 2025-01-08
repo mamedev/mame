@@ -26,8 +26,8 @@ class wozfdc_device:
 {
 public:
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
@@ -36,8 +36,8 @@ protected:
 	// construction/destruction
 	wozfdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(generic_tick);
 	TIMER_CALLBACK_MEMBER(delayed_tick);
@@ -87,7 +87,7 @@ public:
 	void set_floppies(floppy_connector *f0, floppy_connector *f1);
 
 protected:
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 class appleiii_fdc_device : public wozfdc_device
@@ -101,7 +101,7 @@ public:
 	void write_c0dx(uint8_t offset, uint8_t data);
 
 protected:
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	void control_dx(int offset);

@@ -1556,6 +1556,10 @@ void tilemap_t::draw_debug(screen_device &screen, bitmap_rgb32 &dest, u32 scroll
 void tilemap_t::get_info_debug(u32 col, u32 row, u8 &gfxnum, u32 &code, u32 &color)
 {
 	// first map to the memory index
+	if (m_attributes & TILEMAP_FLIPX)
+		col = (m_cols - 1) - col;
+	if (m_attributes & TILEMAP_FLIPY)
+		row = (m_rows - 1) - row;
 	tilemap_memory_index memindex = memory_index(col, row);
 
 	// next invoke the get info callback

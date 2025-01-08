@@ -317,6 +317,7 @@ public:
 
 	virtual void reset() override
 	{
+		rawinput_device::reset();
 		m_pause_pressed = std::chrono::steady_clock::time_point::min();
 		memset(&m_keyboard, 0, sizeof(m_keyboard));
 		m_e1 = 0xffff;
@@ -325,7 +326,6 @@ public:
 	virtual void poll(bool relative_reset) override
 	{
 		rawinput_device::poll(relative_reset);
-
 		if (m_keyboard.state[0x80 | 0x45] && (std::chrono::steady_clock::now() > (m_pause_pressed + std::chrono::milliseconds(30))))
 			m_keyboard.state[0x80 | 0x45] = 0x00;
 	}
@@ -452,6 +452,7 @@ public:
 
 	virtual void reset() override
 	{
+		rawinput_device::reset();
 		memset(&m_mouse, 0, sizeof(m_mouse));
 		m_x = m_y = m_v = m_h = 0;
 	}
@@ -498,11 +499,9 @@ public:
 
 	virtual void process_event(RAWINPUT const &rawinput) override
 	{
-
 		// If this data was intended for a rawinput mouse
 		if (rawinput.data.mouse.usFlags == MOUSE_MOVE_RELATIVE)
 		{
-
 			m_x += rawinput.data.mouse.lLastX * input_device::RELATIVE_PER_PIXEL;
 			m_y += rawinput.data.mouse.lLastY * input_device::RELATIVE_PER_PIXEL;
 
@@ -559,6 +558,7 @@ public:
 
 	virtual void reset() override
 	{
+		rawinput_device::reset();
 		memset(&m_lightgun, 0, sizeof(m_lightgun));
 		m_v = 0;
 		m_h = 0;
@@ -608,7 +608,6 @@ public:
 		// If this data was intended for a rawinput lightgun
 		if (rawinput.data.mouse.usFlags & MOUSE_MOVE_ABSOLUTE)
 		{
-
 			// update the X/Y positions
 			m_lightgun.lX = normalize_absolute_axis(rawinput.data.mouse.lLastX, 0, input_device::ABSOLUTE_MAX);
 			m_lightgun.lY = normalize_absolute_axis(rawinput.data.mouse.lLastY, 0, input_device::ABSOLUTE_MAX);
@@ -703,9 +702,7 @@ public:
 		RAWINPUTDEVICE registration;
 		registration.usUsagePage = usagepage();
 		registration.usUsage = usage();
-		registration.dwFlags = RIDEV_DEVNOTIFY;
-		if (background_input())
-			registration.dwFlags |= RIDEV_INPUTSINK;
+		registration.dwFlags = RIDEV_DEVNOTIFY | RIDEV_INPUTSINK;
 		registration.hwndTarget = dynamic_cast<win_window_info &>(*osd_common_t::window_list().front()).platform_window();
 
 		// register the device

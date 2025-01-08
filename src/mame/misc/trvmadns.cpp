@@ -113,7 +113,7 @@ public:
 	void trvmadns(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -126,14 +126,12 @@ private:
 	required_shared_ptr<uint8_t> m_tileram;
 	required_shared_ptr<uint8_t> m_paletteram;
 
-	void cpu_map(address_map &map);
-	void romboard_map(address_map &map);
-	void io_map(address_map &map);
+	void cpu_map(address_map &map) ATTR_COLD;
+	void romboard_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	void unknown_w(uint8_t data);
 	void lamps_w(uint8_t data);
-
-	void postload();
 
 	void gfxram_w(offs_t offset, uint8_t data);
 	void palette_w(offs_t offset, uint8_t data);
@@ -299,13 +297,7 @@ void trvmadns_state::lamps_w(uint8_t data)
 
 void trvmadns_state::machine_start()
 {
-	machine().save().register_postload(save_prepost_delegate(FUNC(trvmadns_state::postload), this));
 	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(trvmadns_state::tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-}
-
-void trvmadns_state::postload()
-{
-	m_gfxdecode->gfx(0)->mark_all_dirty();
 }
 
 

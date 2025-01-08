@@ -45,7 +45,7 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void program_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -138,5 +138,5 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 200?, thecastle, 0,         smd2144c, smd2144c, smd2144c_state, empty_init, ROT0, "<unknown>", "The Castle", MACHINE_IS_SKELETON )
-GAME( 200?, therock,   thecastle, smd2144c, smd2144c, smd2144c_state, empty_init, ROT0, "<unknown>", "The Rock",   MACHINE_IS_SKELETON )
+GAME( 200?, thecastle, 0,         smd2144c, smd2144c, smd2144c_state, empty_init, ROT0, "<unknown>", "The Castle", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, therock,   thecastle, smd2144c, smd2144c, smd2144c_state, empty_init, ROT0, "<unknown>", "The Rock",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

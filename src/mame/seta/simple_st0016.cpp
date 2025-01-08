@@ -53,7 +53,7 @@ public:
 	void init_renju();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	uint8_t m_mux_port;
@@ -80,11 +80,11 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
-	void renju_mem(address_map &map);
-	void st0016_io(address_map &map);
-	void st0016_m2_io(address_map &map);
-	void st0016_mem(address_map &map);
-	void v810_mem(address_map &map);
+	void renju_mem(address_map &map) ATTR_COLD;
+	void st0016_io(address_map &map) ATTR_COLD;
+	void st0016_m2_io(address_map &map) ATTR_COLD;
+	void st0016_mem(address_map &map) ATTR_COLD;
+	void v810_mem(address_map &map) ATTR_COLD;
 };
 
 

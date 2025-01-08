@@ -4,7 +4,8 @@
 
   Hitachi HMCS40 MCU family disassembler
 
-  NOTE: start offset(basepc) is $3F, not 0
+  NOTE: start offset(basepc) is $3F, not 0. In other words, if you want a full
+  disasm from MAME's debugger: dasm x.asm,3f,1000
 
 */
 
@@ -16,7 +17,7 @@
 hmcs40_disassembler::hmcs40_disassembler()
 {
 	// init lfsr pc lut
-	for (u32 i = 0, pc = 0; i < 0x40; i++)
+	for (u32 i = 0, pc = 0x3f; i < 0x40; i++)
 	{
 		m_l2r[i] = pc;
 		m_r2l[pc] = i;
@@ -33,6 +34,10 @@ hmcs40_disassembler::hmcs40_disassembler()
 
 		pc = (pc & ~mask) | ((pc << 1 | fb) & mask);
 	}
+}
+
+hmcs40_disassembler::~hmcs40_disassembler()
+{
 }
 
 
@@ -231,11 +236,7 @@ offs_t hmcs40_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 			}
 
 			param &= ((1 << bits) - 1);
-
-			if (bits > 5)
-				util::stream_format(stream, "$%02X", param);
-			else
-				util::stream_format(stream, "%d", param);
+			util::stream_format(stream, (bits > 4) ? "$%02X" : (param < 10) ? "%d" : "$%X", param);
 		}
 	}
 

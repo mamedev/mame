@@ -106,8 +106,8 @@ public:
 	void mrflea(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// memory pointers
@@ -133,10 +133,10 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(slave_interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void master_io_map(address_map &map);
-	void master_map(address_map &map);
-	void slave_io_map(address_map &map);
-	void slave_map(address_map &map);
+	void master_io_map(address_map &map) ATTR_COLD;
+	void master_map(address_map &map) ATTR_COLD;
+	void slave_io_map(address_map &map) ATTR_COLD;
+	void slave_map(address_map &map) ATTR_COLD;
 };
 
 

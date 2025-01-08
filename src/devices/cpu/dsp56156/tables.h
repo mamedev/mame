@@ -1,16 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrew Gardner
-#ifndef DSP56156_TABLES_H
-#define DSP56156_TABLES_H
+#ifndef MAME_CPU_DSP56156_TABLES_H
+#define MAME_CPU_DSP56156_TABLES_H
+
+#pragma once
+
+#include "dsp56156.h"
 
 #include <cstdio>
 #include <cstdlib>
 
-#include "dsp56156.h"
-
-namespace DSP_56156
-{
-#define BITSn(CUR,MASK) (dsp56156_op_maskn(CUR,MASK))
+namespace DSP_56156 {
 
 enum bitsModified {BM_NONE = 0x0, BM_LOW = 0x1, BM_MIDDLE = 0x2, BM_HIGH = 0x4};
 
@@ -77,6 +77,7 @@ int8_t get_6_bit_signed_value(uint16_t bits);
 
 // Helpers
 uint16_t dsp56156_op_maskn(uint16_t cur, uint16_t mask);
+inline uint16_t BITSn(uint16_t cur, uint16_t mask) { return dsp56156_op_maskn(cur, mask); }
 
 bool registerOverlap(const reg_id& r0, const size_t bmd, const reg_id& r1);
 
@@ -88,6 +89,6 @@ std::string opMnemonicAsString(const op_mnem& mnem);
 reg_id stringAsRegID(const std::string& str);
 uint8_t regIDAsNum(const reg_id& regId);
 
+} // namespace DSP_56156
 
-}
-#endif
+#endif // MAME_CPU_DSP56156_TABLES_H

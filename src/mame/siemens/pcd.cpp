@@ -80,13 +80,13 @@ private:
 	void write_scsi_msg(int state);
 	void write_scsi_req(int state);
 
-	void pcd_io(address_map &map);
-	void pcd_map(address_map &map);
-	void pcx_io(address_map &map);
+	void pcd_io(address_map &map) ATTR_COLD;
+	void pcd_map(address_map &map) ATTR_COLD;
+	void pcx_io(address_map &map) ATTR_COLD;
 
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<i80186_cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic1;

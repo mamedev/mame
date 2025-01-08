@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="tvdear" description="TV Dear Illust-Cassette cartridges">
+	<!--
+
+	Known undumped carts:
+
+	Illust-Cassette No. 1 - Pochacco
+	Illust-Cassette No. 2 - Bad Badtz-Maru
+
+	There is also a Memory Cassette that may not contain any ROM.
+
+	-->
+
+	<software name="shoujo" supported="no">
+		<description>Shoujo Manga Collection</description>
+		<year>1996</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="少女マンガコレクション"/>
+		<part name="cart" interface="tvdear_cart">
+			<dataarea name="rom" size="0x20000">
+				<rom name="lc371100.u15" size="0x20000" crc="f70696d1" sha1="21da45720a48e18fd6173f2482bd7db4988d1548"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

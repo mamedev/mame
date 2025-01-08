@@ -162,7 +162,7 @@ private:
 	} decfunct_t;
 
 	void    device_start() override;
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 	// Wait state creation
 	bool    m_have_waitstate;
@@ -264,7 +264,7 @@ public:
 	auto ready_cb() { return m_ready.bind(); }
 
 private:
-	void device_start() override;
+	void device_start() override ATTR_COLD;
 	void set_ready();
 
 	// Pins
@@ -305,7 +305,7 @@ public:
 	void sndready_in(int state);
 
 private:
-	void device_start() override;
+	void device_start() override ATTR_COLD;
 
 	// Emulation-specific: Is the debugger active?
 	bool    m_debug;

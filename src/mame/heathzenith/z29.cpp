@@ -37,7 +37,7 @@ public:
 	void z29(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void keyin_w(int state);
@@ -47,8 +47,8 @@ private:
 	void crtc_w(offs_t offset, u8 data);
 	void latch_12k_w(u8 data);
 
-	void prg_map(address_map &map);
-	void ext_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
+	void ext_map(address_map &map) ATTR_COLD;
 
 	required_device<mcs51_cpu_device> m_maincpu;
 	required_device<z29_keyboard_port_device> m_keyboard;
@@ -74,11 +74,30 @@ void z29_state::keyin_w(int state)
 	m_keyin = state;
 }
 
+/**
+ * Port 1 (based on ROM listing)
+ *
+ * bit 0 - KB output line
+ * bit 1 - KB input line
+ * bit 2 - 0 = normal video       1 = suppressed
+ * bit 3 - 0 = setup mode locked  1 = normal
+ * bit 4 - Data Terminal Ready
+ * bit 5 - Ready to Send
+ * bit 6 - Expansion socket
+ * bit 7 - Clock run for CRT controller
+ */
 u8 z29_state::p1_r()
 {
 	return m_keyin ? 0xfd : 0xff;
 }
 
+/**
+ * Port 3 (based on ROM listing)
+ *
+ * bit 1 - predefined serial port transmit pin
+ * bit 4 - 0 = clear memory  1 = DMA CRTC
+ * bit 5 - Clear to Send
+ */
 void z29_state::p3_w(u8 data)
 {
 	m_dmatype = BIT(data, 4);
@@ -177,4 +196,4 @@ ROM_END
 } // anonymous namespace
 
 //    year  name   parent compat  machine  input class      init        company                fullname          flags
-COMP( 1983, z29,   0,     0,      z29,     z29,  z29_state, empty_init, "Zenith Data Systems", "Z-29 Terminal",  MACHINE_IS_SKELETON)
+COMP( 1983, z29,   0,     0,      z29,     z29,  z29_state, empty_init, "Zenith Data Systems", "Z-29 Terminal",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

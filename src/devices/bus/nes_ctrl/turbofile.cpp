@@ -31,7 +31,7 @@ INPUT_CHANGED_MEMBER( nes_turbofile_device::lock_changed )
 
 static INPUT_PORTS_START( nes_turbofile )
 	PORT_START("LOCK")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Protect Switch") PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, nes_turbofile_device, lock_changed, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Protect Switch") PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nes_turbofile_device::lock_changed), 0)
 INPUT_PORTS_END
 
 //-------------------------------------------------

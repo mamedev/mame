@@ -39,12 +39,12 @@ public:
 	uint16_t megaphx_0x050002_r(offs_t offset, uint16_t mem_mask = ~0);
 	void megaphx_0x050000_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	void sound_io(address_map &map);
-	void sound_map(address_map &map);
+	void sound_io(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	required_device<z80_device> m_audiocpu;

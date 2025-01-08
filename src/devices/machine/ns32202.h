@@ -20,12 +20,12 @@ public:
 	template <unsigned Number> void ir_w(int state);
 	template <unsigned Number> void g_w(int state);
 
-	template <unsigned ST1> void map(address_map &map);
+	template <unsigned ST1> void map(address_map &map) ATTR_COLD;
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	void set_int(bool int_state);
 	void set_cout(bool cout_state);

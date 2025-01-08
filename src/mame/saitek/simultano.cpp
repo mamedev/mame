@@ -31,8 +31,8 @@ TODO:
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
-#include "cpu/m6502/m65c02.h"
 #include "cpu/m6502/r65c02.h"
+#include "cpu/m6502/w65c02.h"
 #include "machine/nvram.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
@@ -71,8 +71,8 @@ public:
 	void cc2150(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -90,8 +90,8 @@ private:
 	u8 m_select = 0;
 	u8 m_control = 0;
 
-	void simultano_map(address_map &map);
-	void cc2150_map(address_map &map);
+	void simultano_map(address_map &map) ATTR_COLD;
+	void cc2150_map(address_map &map) ATTR_COLD;
 
 	void power_off();
 	void lcd_pwm_w(offs_t offset, u8 data);
@@ -298,7 +298,7 @@ static INPUT_PORTS_START( simultano )
 	PORT_CONFSETTING(    0x01, DEF_STR( Normal ) )
 
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CHANGED_MEMBER(DEVICE_SELF, simultano_state, go_button, 0) PORT_NAME("Go")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(simultano_state::go_button), 0) PORT_NAME("Go")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cc2150 )
@@ -352,7 +352,7 @@ void simultano_state::simultano(machine_config &config)
 	cc2150(config);
 
 	// basic machine hardware
-	M65C02(config.replace(), m_maincpu, 5_MHz_XTAL);
+	W65C02(config.replace(), m_maincpu, 5_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &simultano_state::simultano_map);
 	m_maincpu->set_periodic_int(FUNC(simultano_state::irq0_line_hold), attotime::from_hz(76)); // approximation
 

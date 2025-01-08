@@ -37,7 +37,7 @@ public:
 	void tactcian(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// memory pointers
@@ -123,9 +123,9 @@ private:
 	void jungler_draw_bullets( bitmap_ind16 &bitmap, const rectangle &cliprect, bool transpen );
 	void locomotn_draw_bullets( bitmap_ind16 &bitmap, const rectangle &cliprect, bool transpen );
 
-	void io_map(address_map &map);
-	void jungler_map(address_map &map);
-	void rallyx_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void jungler_map(address_map &map) ATTR_COLD;
+	void rallyx_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_NAMCO_RALLYX_H

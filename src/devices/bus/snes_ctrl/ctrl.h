@@ -76,7 +76,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	onscreen_delegate m_onscreen_cb;
 	gunlatch_delegate m_gunlatch_cb;

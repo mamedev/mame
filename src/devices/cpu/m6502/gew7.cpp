@@ -19,7 +19,7 @@
 DEFINE_DEVICE_TYPE(GEW7, gew7_device, "gew7", "Yamaha YMW270-F (GEW7)")
 
 gew7_device::gew7_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: m6502_mcu_device_base<m65c02_device>(mconfig, GEW7, tag, owner, clock)
+	: m6502_mcu_device_base<w65c02_device>(mconfig, GEW7, tag, owner, clock)
 	, device_mixer_interface(mconfig, *this, 2)
 	, m_in_cb(*this, 0xff), m_out_cb(*this)
 	, m_rom(*this, DEVICE_SELF)
@@ -43,7 +43,7 @@ void gew7_device::device_add_mconfig(machine_config &config)
 
 void gew7_device::device_start()
 {
-	m6502_mcu_device_base<m65c02_device>::device_start();
+	m6502_mcu_device_base<w65c02_device>::device_start();
 
 	m_bank_mask = device_generic_cart_interface::map_non_power_of_two(
 			unsigned(m_rom->bytes() >> 14),
@@ -68,7 +68,7 @@ void gew7_device::device_start()
 
 void gew7_device::device_reset()
 {
-	m6502_mcu_device_base<m65c02_device>::device_reset();
+	m6502_mcu_device_base<w65c02_device>::device_reset();
 
 	internal_update();
 	m_timer_stat = m_timer_en = 0;
@@ -117,7 +117,7 @@ void gew7_device::timer_stat_w(u8 data)
 	m_timer_stat &= ~data;
 
 	if (!(m_timer_stat & 3))
-		set_input_line(M65C02_IRQ_LINE, CLEAR_LINE);
+		set_input_line(W65C02_IRQ_LINE, CLEAR_LINE);
 	internal_update();
 }
 
@@ -165,7 +165,7 @@ u64 gew7_device::timer_update(int num, u64 current_time)
 	if (elapsed > m_timer_count[num])
 	{
 		m_timer_stat |= (1 << num);
-		set_input_line(M65C02_IRQ_LINE, ASSERT_LINE);
+		set_input_line(W65C02_IRQ_LINE, ASSERT_LINE);
 	}
 
 	m_timer_count[num] -= elapsed;

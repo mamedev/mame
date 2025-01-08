@@ -216,7 +216,10 @@ void lh5801_cpu_device::execute_run()
 		check_irq();
 
 		if (m_idle)
+		{
+			debugger_wait_hook();
 			m_icount = 0;
+		}
 		else
 		{
 			m_oldpc = P;

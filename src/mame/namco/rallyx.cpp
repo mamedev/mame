@@ -163,9 +163,6 @@ Notes:
 
 - there are also 1-pixel sprite and bullet placement differences from game to game.
 
-- cottong is a bootleg of a very different version of locomotn, possibly a
-  prototype.
-
 - commsega:
   Due to a bug at 0x1259, bit 3 of DSW1 also affects the "Bonus Life" value:
      - when bit 3 is OFF, you get an extra life at 30000 points
@@ -1376,6 +1373,31 @@ ROM_END
 
 ROM_START( gutangtn )
 	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bimm_001.r1",  0x0000, 0x1000, CRC(dfa2089c) SHA1(ef2280578c33589d2831b21e22b0786f23eea881) )
+	ROM_LOAD( "bimm_002.r2",  0x1000, 0x1000, CRC(1de5e6a0) SHA1(8bb3408a510662ff3b9b7201d2d06fe70685bf7f) )
+	ROM_LOAD( "bimm_003.r3",  0x2000, 0x1000, CRC(01f909fe) SHA1(c80295e9f91ce25bfd28e72823b20ee6f6524a5c) )
+	ROM_LOAD( "bimm_004.r4",  0x3000, 0x1000, CRC(a89eb3e3) SHA1(058928ade909faba06f177750f914cf1dabaefc3) )
+
+	ROM_REGION( 0x10000, "timeplt_audio:tpsound", 0 )
+	ROM_LOAD( "bimm_007.b1",  0x0000, 0x1000, CRC(3d83f6d3) SHA1(e10ed6b6ce7280697c1bc9dbe6c6e6018e1d8be4) )
+	ROM_LOAD( "bimm_008.c1",  0x1000, 0x1000, CRC(323e1937) SHA1(75499d6c8a9032fac090a13cd4f36bd350f52dab) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "bimm_005.r9",  0x0000, 0x1000, CRC(992d079c) SHA1(b5acd30f2e8700cc4cd852b190bd1f4163b137e8) )
+	ROM_LOAD( "bimm_006.r10", 0x1000, 0x1000, CRC(f0414f1d) SHA1(c7795184e2c1701eddb914d7134bf2830c4a3781) )
+
+	ROM_REGION( 0x0100, "gfx2", 0 )
+	ROM_LOAD( "5.bpr",        0x0000, 0x0100, CRC(21fb583f) SHA1(b8c65fbdd5d8b70bf51341cd60fc2efeaab8bb82) ) // dots
+
+	ROM_REGION( 0x0160, "proms", 0 )
+	ROM_LOAD( "2.bpr",        0x0000, 0x0020, CRC(26f42e6f) SHA1(f51578216a5d588c4d0143ce7a23d695a15a3914) ) // palette
+	ROM_LOAD( "3.bpr",        0x0020, 0x0100, CRC(4aecc0c8) SHA1(3c1086a598d84b4bcb277556b716fd18c76c4364) ) // lookup table
+	ROM_LOAD( "7a.bpr",       0x0120, 0x0020, CRC(48c8f094) SHA1(61592209720fddc8991751edf08b6950388af42e) ) // video layout (not used)
+	ROM_LOAD( "10a.bpr",      0x0140, 0x0020, CRC(b8861096) SHA1(26fad384ed7a1a1e0ba719b5578e2dbb09334a25) ) // video timing (not used)
+ROM_END
+
+ROM_START( gutangtns )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "3d_1.bin",     0x0000, 0x1000, CRC(e9757395) SHA1(78e2f8988ed39d2ecfe1f874be370f603d5eecc1) )
 	ROM_LOAD( "3e_2.bin",     0x1000, 0x1000, CRC(11d21d2e) SHA1(fd17dd481bb7bb39234fa7e9946b1cb4fa18109e) )
 	ROM_LOAD( "3f_3.bin",     0x2000, 0x1000, CRC(4d80f895) SHA1(7d83f4ee34226636012a84f46af01991a28b96f6) )
@@ -1399,19 +1421,19 @@ ROM_START( gutangtn )
 	ROM_LOAD( "10a.bpr",      0x0140, 0x0020, CRC(b8861096) SHA1(26fad384ed7a1a1e0ba719b5578e2dbb09334a25) ) // video timing (not used)
 ROM_END
 
-ROM_START( cottong )
+ROM_START( cottong ) // bootleg based on gutangtn set
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "c1",           0x0000, 0x1000, CRC(2c256fe6) SHA1(115594c616497eec998e4e3255ec6ab6299346fa) )
-	ROM_LOAD( "c2",           0x1000, 0x1000, CRC(1de5e6a0) SHA1(8bb3408a510662ff3b9b7201d2d06fe70685bf7f) )
-	ROM_LOAD( "c3",           0x2000, 0x1000, CRC(01f909fe) SHA1(c80295e9f91ce25bfd28e72823b20ee6f6524a5c) )
-	ROM_LOAD( "c4",           0x3000, 0x1000, CRC(a89eb3e3) SHA1(058928ade909faba06f177750f914cf1dabaefc3) )
+	ROM_LOAD( "c2",           0x1000, 0x1000, CRC(1de5e6a0) SHA1(8bb3408a510662ff3b9b7201d2d06fe70685bf7f) ) // == bimm_002.r2
+	ROM_LOAD( "c3",           0x2000, 0x1000, CRC(01f909fe) SHA1(c80295e9f91ce25bfd28e72823b20ee6f6524a5c) ) // == bimm_003.r3
+	ROM_LOAD( "c4",           0x3000, 0x1000, CRC(a89eb3e3) SHA1(058928ade909faba06f177750f914cf1dabaefc3) ) // == bimm_004.r4
 
 	ROM_REGION( 0x10000, "timeplt_audio:tpsound", 0 )
-	ROM_LOAD( "c7",           0x0000, 0x1000, CRC(3d83f6d3) SHA1(e10ed6b6ce7280697c1bc9dbe6c6e6018e1d8be4) )
-	ROM_LOAD( "c8",           0x1000, 0x1000, CRC(323e1937) SHA1(75499d6c8a9032fac090a13cd4f36bd350f52dab) )
+	ROM_LOAD( "c7",           0x0000, 0x1000, CRC(3d83f6d3) SHA1(e10ed6b6ce7280697c1bc9dbe6c6e6018e1d8be4) ) // == bimm_007.b1
+	ROM_LOAD( "c8",           0x1000, 0x1000, CRC(323e1937) SHA1(75499d6c8a9032fac090a13cd4f36bd350f52dab) ) // == bimm_008.c1
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "c5",           0x0000, 0x1000, CRC(992d079c) SHA1(b5acd30f2e8700cc4cd852b190bd1f4163b137e8) )
+	ROM_LOAD( "c5",           0x0000, 0x1000, CRC(992d079c) SHA1(b5acd30f2e8700cc4cd852b190bd1f4163b137e8) ) // == bimm_005.r9
 	ROM_LOAD( "c6",           0x1000, 0x1000, CRC(0149ef46) SHA1(58f684a9b7b9410236b3c54ea6c0fa9853a078c5) )
 
 	ROM_REGION( 0x0100, "gfx2", 0 )
@@ -1503,7 +1525,8 @@ GAME( 1982, savanna,   jungler,  jungler,  jungler,  rallyx_state, empty_init, R
 GAME( 1982, tactcian,  0,        tactcian, tactcian, rallyx_state, empty_init, ROT90, "Konami (Sega license)",              "Tactician (set 1)",                 MACHINE_SUPPORTS_SAVE )
 GAME( 1981, tactcian2, tactcian, tactcian, tactcian, rallyx_state, empty_init, ROT90, "Konami (Sega license)",              "Tactician (set 2)",                 MACHINE_SUPPORTS_SAVE )
 GAME( 1982, locomotn,  0,        locomotn, locomotn, rallyx_state, empty_init, ROT90, "Konami (Centuri license)",           "Loco-Motion",                       MACHINE_SUPPORTS_SAVE )
-GAME( 1982, gutangtn,  locomotn, locomotn, locomotn, rallyx_state, empty_init, ROT90, "Konami (Sega license)",              "Guttang Gottong",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1982, gutangtn,  locomotn, locomotn, locomotn, rallyx_state, empty_init, ROT90, "Konami",                             "Guttang Gottong",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1982, gutangtns, locomotn, locomotn, locomotn, rallyx_state, empty_init, ROT90, "Konami (Sega license)",              "Guttang Gottong (Sega license)",    MACHINE_SUPPORTS_SAVE )
 GAME( 1982, cottong,   locomotn, locomotn, locomotn, rallyx_state, empty_init, ROT90, "bootleg",                            "Cotocoto Cottong",                  MACHINE_SUPPORTS_SAVE )
 GAME( 1982, locoboot,  locomotn, locomotn, locomotn, rallyx_state, empty_init, ROT90, "bootleg",                            "Loco-Motion (bootleg)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1983, commsega,  0,        commsega, commsega, rallyx_state, empty_init, ROT90, "Sega",                               "Commando (Sega)",                   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

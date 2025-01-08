@@ -228,7 +228,7 @@ void kc82_device::data_write(u16 addr, u8 value)
 
 u8 kc82_device::opcode_read()
 {
-	u32 pc = m_pc.w.l + m_mmu_base[m_pc.b.h >> 2];
+	u32 pc = m_pc.w + m_mmu_base[m_pc.b.h >> 2];
 	// no refresh
 	return m_opcodes.read_byte(pc);
 }
@@ -240,6 +240,6 @@ u8 kc82_device::opcode_read()
 
 u8 kc82_device::arg_read()
 {
-	u32 pc = m_pc.w.l + m_mmu_base[m_pc.b.h >> 2];
+	u32 pc = m_pc.w + m_mmu_base[m_pc.b.h >> 2];
 	return m_args.read_byte(pc);
 }

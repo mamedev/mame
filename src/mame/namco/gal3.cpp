@@ -160,8 +160,8 @@ public:
 	void gal3(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device_array<namco_c355spr_device, 2> m_c355spr;
@@ -189,11 +189,11 @@ private:
 	// using ind16 for now because namco_c355spr_device::zdrawgfxzoom does not support rgb32, will probably need to be improved for LD use
 	uint32_t screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void cpu_mst_map(address_map &map);
-	void cpu_slv_map(address_map &map);
-	void psn_b1_cpu_map(address_map &map);
-	void rs_cpu_map(address_map &map);
-	void sound_cpu_map(address_map &map);
+	void cpu_mst_map(address_map &map) ATTR_COLD;
+	void cpu_slv_map(address_map &map) ATTR_COLD;
+	void psn_b1_cpu_map(address_map &map) ATTR_COLD;
+	void rs_cpu_map(address_map &map) ATTR_COLD;
+	void sound_cpu_map(address_map &map) ATTR_COLD;
 };
 
 

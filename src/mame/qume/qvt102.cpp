@@ -79,8 +79,8 @@ public:
 	void qvt102(machine_config &config);
 
 protected:
-	void machine_start() override;
-	void machine_reset() override;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<m6800_cpu_device> m_maincpu;
@@ -101,7 +101,7 @@ private:
 	required_shared_ptr<uint8_t> m_vram;
 	required_region_ptr<u8> m_char_rom;
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 

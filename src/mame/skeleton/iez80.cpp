@@ -50,8 +50,8 @@ public:
 	void iez80(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<z80_device> m_maincpu;
@@ -60,8 +60,8 @@ private:
 	required_region_ptr<uint8_t> m_chargen;
 	required_shared_ptr<uint8_t> m_vram;
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
@@ -229,4 +229,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                FULLNAME                FLAGS
-COMP( 1983, iez80, 0,      0,      iez80,   iez80, iez80_state, empty_init, "Insight Enterprises", "Z80 SBC (prototype?)", MACHINE_IS_SKELETON )
+COMP( 1983, iez80, 0,      0,      iez80,   iez80, iez80_state, empty_init, "Insight Enterprises", "Z80 SBC (prototype?)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

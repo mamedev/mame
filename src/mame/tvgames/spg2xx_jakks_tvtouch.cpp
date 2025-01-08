@@ -17,8 +17,8 @@ public:
 	void tvtouch(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint16_t porta_r(offs_t offset, uint16_t mem_mask = ~0);
 	uint16_t portb_r(offs_t offset, uint16_t mem_mask = ~0);

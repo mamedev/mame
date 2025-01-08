@@ -25,10 +25,10 @@ public:
 	void intlc8(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 };
@@ -81,4 +81,4 @@ ROM_END
 } // Anonymous namespace
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY     FULLNAME         FLAGS
-COMP( 1973, intlc8,   0,      0,      intlc8, intlc8,     intlc8_state,   empty_init, "Intel", "Intellec 8 MCS", MACHINE_IS_SKELETON )
+COMP( 1973, intlc8,   0,      0,      intlc8, intlc8,     intlc8_state,   empty_init, "Intel", "Intellec 8 MCS", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

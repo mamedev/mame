@@ -10,7 +10,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/f2mc16/mb9061x.h"
+#include "cpu/f2mc16/mb90640a.h"
 #include "machine/nvram.h"
 #include "video/hd44780.h"
 #include "emupal.h"
@@ -32,16 +32,16 @@ public:
 	void dpsv55(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	HD44780_PIXEL_UPDATE(pixel_update);
 	u8 p5_r();
 	void p5_w(u8 data);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<mb90641a_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
 
 	u8 m_p5;
@@ -75,9 +75,6 @@ void dpsv55_state::p5_w(u8 data)
 
 void dpsv55_state::mem_map(address_map &map)
 {
-	map(0x000001, 0x000001).rw(m_lcdc, FUNC(hd44780_device::db_r), FUNC(hd44780_device::db_w));
-	map(0x000005, 0x000005).rw(FUNC(dpsv55_state::p5_r), FUNC(dpsv55_state::p5_w));
-	map(0x000023, 0x000023).nopr();
 	map(0xfc0000, 0xfc7fff).mirror(0x18000).ram().share("nvram"); // CS1
 	map(0xfe0000, 0xffffff).rom().region("eprom", 0); // CS0
 }
@@ -90,6 +87,10 @@ void dpsv55_state::dpsv55(machine_config &config)
 {
 	MB90641A(config, m_maincpu, 4_MHz_XTAL); // MB90641APF-G-105BND
 	m_maincpu->set_addrmap(AS_PROGRAM, &dpsv55_state::mem_map);
+	m_maincpu->port<1>().read().set(m_lcdc, FUNC(hd44780_device::db_r));
+	m_maincpu->port<1>().write().set(m_lcdc, FUNC(hd44780_device::db_w));
+	m_maincpu->port<5>().read().set(FUNC(dpsv55_state::p5_r));
+	m_maincpu->port<5>().write().set(FUNC(dpsv55_state::p5_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // CY62256LL-70SNC-T2 + 3V lithium battery + M62021FP-600C reset generator + M5239L voltage detector
 
@@ -130,10 +131,10 @@ Sony Corporation (c)1998
 */
 
 ROM_START(dpsv55)
-	ROM_REGION(0x20000, "eprom", 0)
+	ROM_REGION16_LE(0x20000, "eprom", 0)
 	ROM_LOAD("dps-v55_m__ver.1.02__759-499-74.ic704", 0x00000, 0x20000, CRC(138c2fe0) SHA1(0916ccb1d7567639b382a19240a56274c5c2fa4a))
 ROM_END
 
 } // anonymous namespace
 
-SYST(1998, dpsv55, 0, 0, dpsv55, dpsv55, dpsv55_state, empty_init, "Sony", "DPS-V55 Multi-Effect Processor", MACHINE_IS_SKELETON)
+SYST(1998, dpsv55, 0, 0, dpsv55, dpsv55, dpsv55_state, empty_init, "Sony", "DPS-V55 Multi-Effect Processor", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

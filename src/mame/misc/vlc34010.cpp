@@ -70,7 +70,7 @@ public:
 	void base(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void switch_w(u8 data);
@@ -87,8 +87,8 @@ private:
 	required_device_array<mc68681_device, 3> m_duart;
 	memory_view m_boot_view;
 
-	void main_map(address_map &map);
-	void tms_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void tms_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -229,5 +229,5 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1997, beezerk, 0, base, beezerk, vlc34010_state, empty_init, ROT0, "VLT Inc.", "Bee-Zerk",              MACHINE_IS_SKELETON ) // copyright in ROM is VLT instead of VLC, dump came as BeeZerk, but probably a multigame
-GAME( 2000, vlcunk,  0, base, beezerk, vlc34010_state, empty_init, ROT0, "VLC Inc.", "unknown VLC multigame", MACHINE_IS_SKELETON )
+GAME( 1997, beezerk, 0, base, beezerk, vlc34010_state, empty_init, ROT0, "VLT Inc.", "Bee-Zerk",              MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // copyright in ROM is VLT instead of VLC, dump came as BeeZerk, but probably a multigame
+GAME( 2000, vlcunk,  0, base, beezerk, vlc34010_state, empty_init, ROT0, "VLC Inc.", "unknown VLC multigame", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

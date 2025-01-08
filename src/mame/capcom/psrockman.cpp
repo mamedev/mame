@@ -52,8 +52,8 @@ public:
 	void psrockman(machine_config &config);
 
 private:
-	void io_map(address_map &map);
-	void prg_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void prg_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -139,4 +139,4 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1992, psrockmn, 0, psrockman, psrockman, psrockman_state, empty_init, ROT0, "Capcom", "Panic Shot Rockman", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1992, psrockmn, 0, psrockman, psrockman, psrockman_state, empty_init, ROT0, "Capcom", "Panic Shot Rockman", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

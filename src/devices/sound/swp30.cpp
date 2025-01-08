@@ -1233,11 +1233,6 @@ uint32_t swp30_device::execute_max_cycles() const noexcept
 	return 1;
 }
 
-uint32_t swp30_device::execute_input_lines() const noexcept
-{
-	return 0;
-}
-
 
 void swp30_device::meg_prg_map(address_map &map)
 {

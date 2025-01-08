@@ -27,8 +27,8 @@ public:
 	void drumsta(machine_config &config);
 
 private:
-	void drumsta_prog(address_map &map);
-	void drumsta_data(address_map &map);
+	void drumsta_prog(address_map &map) ATTR_COLD;
+	void drumsta_data(address_map &map) ATTR_COLD;
 
 	required_device<mn1880_device> m_maincpu;
 	required_device<adsp2181_device> m_dsp;
@@ -75,4 +75,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1995, drumsta, 0, 0, drumsta, drumsta, drumsta_state, empty_init, "Novation", "Drum Station", MACHINE_IS_SKELETON)
+SYST(1995, drumsta, 0, 0, drumsta, drumsta, drumsta_state, empty_init, "Novation", "Drum Station", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

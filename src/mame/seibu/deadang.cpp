@@ -90,7 +90,7 @@ public:
 	void init_ghunter();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	required_shared_ptr<uint16_t> m_scroll_ram;
 	required_shared_ptr<uint16_t> m_videoram;
@@ -133,11 +133,11 @@ protected:
 	TIMER_DEVICE_CALLBACK_MEMBER(main_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(sub_scanline);
 
-	void main_map(address_map &map);
-	void ghunter_main_map(address_map &map);
-	void sound_decrypted_opcodes_map(address_map &map);
-	void sound_map(address_map &map);
-	void sub_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void ghunter_main_map(address_map &map) ATTR_COLD;
+	void sound_decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
 };
 
 class popnrun_state : public deadang_state
@@ -150,14 +150,14 @@ public:
 	void popnrun(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 	void text_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void main_map(address_map &map);
-	void sub_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -338,7 +338,7 @@ uint32_t deadang_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	    0x01: Background playfield disable
 	    0x02: Middle playfield disable
 	    0x04: Top playfield disable
-	    0x08: ?  Toggles at start of game
+	    0x08: Text layer disable
 	    0x10: Sprite disable
 	    0x20: Unused?
 	    0x40: Flipscreen
@@ -347,6 +347,7 @@ uint32_t deadang_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	m_pf_layer[2]->enable(!(m_scroll_ram[0x34] & 1));
 	m_pf_layer[0]->enable(!(m_scroll_ram[0x34] & 2));
 	m_pf_layer[1]->enable(!(m_scroll_ram[0x34] & 4));
+	m_text_layer->enable(!(m_scroll_ram[0x34] & 8));
 	flip_screen_set(m_scroll_ram[0x34] & 0x40);
 
 	bitmap.fill(m_palette->black_pen(), cliprect);

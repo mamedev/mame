@@ -160,9 +160,9 @@ public:
 	void init_fghtbskt();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_shared_ptr<uint8_t> m_spriteram;
@@ -221,10 +221,10 @@ private:
 	INTERRUPT_GEN_MEMBER(snd_irq);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void fghtbskt_map(address_map &map);
-	void i8039_map(address_map &map);
-	void i8039_port_map(address_map &map);
-	void m63_map(address_map &map);
+	void fghtbskt_map(address_map &map) ATTR_COLD;
+	void i8039_map(address_map &map) ATTR_COLD;
+	void i8039_port_map(address_map &map) ATTR_COLD;
+	void m63_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -277,7 +277,7 @@ void m63_state::m63_palette(palette_device &palette) const
 		// blue component
 		bit0 = BIT(color_prom[i], 6);
 		bit1 = BIT(color_prom[i], 7);
-		int const b = 0x4f * bit0 + 0xa8 * bit1;
+		int const b = 0x52 * bit0 + 0xad * bit1;
 
 		palette.set_pen_color(i + 256, rgb_t(r, g, b));
 	}

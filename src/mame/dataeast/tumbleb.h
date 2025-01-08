@@ -70,7 +70,7 @@ public:
 	void init_magipur();
 	void init_carket();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(suprtrio_prot_latch_r);
+	ioport_value suprtrio_prot_latch_r();
 
 protected:
 	/* memory pointers */
@@ -173,18 +173,18 @@ protected:
 	void suprtrio_decrypt_code();
 	void suprtrio_decrypt_gfx();
 
-	void unico_base_map(address_map &map);
-	void fncywld_main_map(address_map &map);
-	void magipur_main_map(address_map &map);
-	void htchctch_main_map(address_map &map);
-	void jumpkids_main_map(address_map &map);
-	void jumpkids_sound_map(address_map &map);
-	void pangpang_main_map(address_map &map);
-	void semicom_sound_map(address_map &map);
-	void suprtrio_main_map(address_map &map);
-	void suprtrio_sound_map(address_map &map);
-	void tumblepopb_main_map(address_map &map);
-	void tumblepopba_main_map(address_map &map);
+	void unico_base_map(address_map &map) ATTR_COLD;
+	void fncywld_main_map(address_map &map) ATTR_COLD;
+	void magipur_main_map(address_map &map) ATTR_COLD;
+	void htchctch_main_map(address_map &map) ATTR_COLD;
+	void jumpkids_main_map(address_map &map) ATTR_COLD;
+	void jumpkids_sound_map(address_map &map) ATTR_COLD;
+	void pangpang_main_map(address_map &map) ATTR_COLD;
+	void semicom_sound_map(address_map &map) ATTR_COLD;
+	void suprtrio_main_map(address_map &map) ATTR_COLD;
+	void suprtrio_sound_map(address_map &map) ATTR_COLD;
+	void tumblepopb_main_map(address_map &map) ATTR_COLD;
+	void tumblepopba_main_map(address_map &map) ATTR_COLD;
 
 	u8 m_suprtrio_prot_latch = 0;
 };
@@ -208,8 +208,8 @@ private:
 	void pic_data_w(uint8_t data);
 	void pic_ctrl_w(uint8_t data);
 
-	void funkyjetb_map(address_map &map);
-	void funkyjetb_oki_map(address_map &map);
+	void funkyjetb_map(address_map &map) ATTR_COLD;
+	void funkyjetb_oki_map(address_map &map) ATTR_COLD;
 
 	required_memory_bank m_okibank;
 

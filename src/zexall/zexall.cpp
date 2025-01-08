@@ -30,7 +30,7 @@ public:
 	void output_req_w(uint8_t data);
 	void output_data_w(uint8_t data);
 
-	void z80_mem(address_map &map);
+	void z80_mem(address_map &map) ATTR_COLD;
 	void zexall(machine_config &config);
 
 private:
@@ -42,7 +42,7 @@ private:
 	uint8_t m_out_ack; // byte written to 0xFFFC
 	std::string terminate_string;
 
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 };
 
 

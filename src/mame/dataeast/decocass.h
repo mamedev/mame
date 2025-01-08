@@ -74,8 +74,8 @@ protected:
 
 	optional_region_ptr<uint8_t> m_donglerom;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	int32_t     m_firsttime = 0U;
 	uint8_t     m_latch1 = 0U;
@@ -151,7 +151,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg_l_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_r_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	void decocass_palette(palette_device &palette) const;
 
 	uint32_t screen_update_decocass(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -216,9 +216,9 @@ private:
 	uint8_t cdsteljn_input_r(offs_t offset);
 	void cdsteljn_mux_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(decocass_audio_nmi_gen);
-	void decocass_map(address_map &map);
-	void decocrom_map(address_map &map);
-	void decocass_sound_map(address_map &map);
+	void decocass_map(address_map &map) ATTR_COLD;
+	void decocrom_map(address_map &map) ATTR_COLD;
+	void decocass_sound_map(address_map &map) ATTR_COLD;
 
 	void draw_edge(bitmap_ind16 &bitmap, const rectangle &cliprect, int which, bool opaque);
 	void draw_special_priority(bitmap_ind16 &bitmap, bitmap_ind8 &priority, const rectangle &cliprect);
@@ -283,8 +283,8 @@ private:
 	DECLARE_MACHINE_RESET(clocknchj); /* 11 */
 	DECLARE_MACHINE_RESET(cnebula);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t decocass_type1_r(offs_t offset);
 
@@ -304,8 +304,8 @@ public:
 	}
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t decocass_type2_r(offs_t offset);
 	void decocass_type2_w(offs_t offset, uint8_t data);
@@ -357,8 +357,8 @@ private:
 	DECLARE_MACHINE_RESET(cppicf);
 	DECLARE_MACHINE_RESET(cfghtice);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t decocass_type3_r(offs_t offset);
 	void decocass_type3_w(offs_t offset, uint8_t data);
@@ -382,8 +382,8 @@ public:
 
 private:
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t decocass_type4_r(offs_t offset);
 	void decocass_type4_w(offs_t offset, uint8_t data);
@@ -404,8 +404,8 @@ public:
 
 private:
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t decocass_type5_r(offs_t offset);
 	void decocass_type5_w(offs_t offset, uint8_t data);
@@ -425,8 +425,8 @@ public:
 
 private:
 
-	//virtual void machine_start() override;
-	virtual void machine_reset() override;
+	//virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t decocass_nodong_r(offs_t offset);
 };
@@ -442,8 +442,8 @@ public:
 
 private:
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t decocass_widel_r(offs_t offset);
 	void decocass_widel_w(offs_t offset, uint8_t data);
@@ -462,8 +462,8 @@ public:
 	}
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint8_t decocass_darksoft_r(offs_t offset);

@@ -48,8 +48,8 @@ public:
 	void lckydraw(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 	void p1_w(u8);
 	void p2_w(u8);
 	u8 bus_r(offs_t);
@@ -60,8 +60,8 @@ private:
 	u8 m_segment[3]{};
 	u8 m_p1 = 0U;
 	u8 m_p2 = 0U;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	required_device<i8035_device> m_maincpu;
 	required_ioport_array<4> m_io_dips;
 	required_ioport_array<8> m_io_keyboard;

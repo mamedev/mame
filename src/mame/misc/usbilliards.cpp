@@ -58,10 +58,10 @@ private:
 	required_device<fixedfreq_device> m_video;
 
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 };
 
 
@@ -140,4 +140,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1975, sharkusb,    0,       usbilliards, 0, usbilliards_state, empty_init, ROT0, "US Billiards Inc.", "Shark (US Billiards)", MACHINE_IS_SKELETON )
+GAME( 1975, sharkusb,    0,       usbilliards, 0, usbilliards_state, empty_init, ROT0, "US Billiards Inc.", "Shark (US Billiards)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

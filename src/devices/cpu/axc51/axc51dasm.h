@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Steve Ellenoff, David Haywood
 
-#ifndef MAME_CPU_SFR_AXC51DASM_H
-#define MAME_CPU_SFR_AXC51DASM_H
+#ifndef MAME_CPU_AXC51_AXC51DASM_H
+#define MAME_CPU_AXC51_AXC51DASM_H
 
 #pragma once
 
@@ -90,5 +90,4 @@ protected:
 	virtual void disassemble_op_lcall(std::ostream& stream, unsigned &PC, const data_buffer& params) override;
 };
 
-
-#endif
+#endif // MAME_CPU_AXC51_AXC51DASM_H

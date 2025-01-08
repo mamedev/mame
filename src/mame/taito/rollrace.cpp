@@ -54,8 +54,8 @@ public:
 	void rollace(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -111,8 +111,8 @@ private:
 
 	void vblank_irq(int state);
 	INTERRUPT_GEN_MEMBER(sound_timer_irq);
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -447,7 +447,7 @@ static INPUT_PORTS_START( rollace )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( 1C_6C ) )
 
-//  PORT_BIT( 0x40, IP_ACTIVE_HIGH , IPT_CUSTOM ) PORT_VBLANK("screen")  freezes frame, could be vblank ?
+//  PORT_BIT( 0x40, IP_ACTIVE_HIGH , IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))  freezes frame, could be vblank ?
 	PORT_DIPNAME( 0x40, 0x00, "Freeze" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )

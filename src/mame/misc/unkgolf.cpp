@@ -270,4 +270,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 19??, unkgolf, 0, unkgolf, unkgolf, unkgolf_state, empty_init, ROT0, "<unknown>", "unknown golf game", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 19??, unkgolf, 0, unkgolf, unkgolf, unkgolf_state, empty_init, ROT0, "<unknown>", "unknown golf game", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

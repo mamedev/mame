@@ -17,8 +17,8 @@ public:
 	void skns_sprite_kludge(int x, int y);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	static constexpr unsigned SUPRNOVA_DECODE_BUFFER_SIZE = 0x2000;

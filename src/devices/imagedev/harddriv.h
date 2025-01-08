@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_DEVICES_IMAGEDEV_HARDDRIV_H
-#define MAME_DEVICES_IMAGEDEV_HARDDRIV_H
+#ifndef MAME_IMAGEDEV_HARDDRIV_H
+#define MAME_IMAGEDEV_HARDDRIV_H
 
 #include "softlist_dev.h"
 
@@ -89,8 +89,8 @@ protected:
 
 	// device_t implementation
 	virtual void device_config_complete() override;
-	virtual void device_start() override;
-	virtual void device_stop() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
 
 	// device_image_interface implementation
 	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
@@ -111,4 +111,4 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(HARDDISK, harddisk_image_device)
 
-#endif // MAME_DEVICES_IMAGEDEV_HARDDRIV_H
+#endif // MAME_IMAGEDEV_HARDDRIV_H

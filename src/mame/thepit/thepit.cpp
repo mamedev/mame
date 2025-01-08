@@ -749,13 +749,15 @@ GFXDECODE_END
 void thepit_state::thepit(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, PIXEL_CLOCK/2);     /* 3.072 MHz */
+	Z80(config, m_maincpu, PIXEL_CLOCK/2); // 3.072 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &thepit_state::thepit_main_map);
 
-	Z80(config, m_audiocpu, SOUND_CLOCK/4);     /* 2.5 MHz */
+	Z80(config, m_audiocpu, SOUND_CLOCK/4); // 2.5 MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &thepit_state::audio_map);
 	m_audiocpu->set_addrmap(AS_IO, &thepit_state::audio_io_map);
 	m_audiocpu->set_irq_acknowledge_callback(FUNC(thepit_state::vsync_int_ack));
+
+	config.set_maximum_quantum(attotime::from_hz(3000));
 
 	LS259(config, m_mainlatch); // IC42
 	m_mainlatch->q_out_cb<0>().set(FUNC(thepit_state::nmi_mask_w));

@@ -63,10 +63,10 @@ private:
 	required_device<fixedfreq_device> m_video;
 
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 };
 
 
@@ -145,5 +145,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1975, avenger, 0, electra, 0, electra_state, empty_init, ROT0, "Electra", "Avenger",         MACHINE_IS_SKELETON )
-GAME( 1976, flyingf, 0, electra, 0, electra_state, empty_init, ROT0, "Electra", "Flying Fortress", MACHINE_IS_SKELETON )
+GAME( 1975, avenger, 0, electra, 0, electra_state, empty_init, ROT0, "Electra", "Avenger",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1976, flyingf, 0, electra, 0, electra_state, empty_init, ROT0, "Electra", "Flying Fortress", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

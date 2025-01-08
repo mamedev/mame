@@ -29,7 +29,7 @@ protected:
 	aquarius_ram_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock, uint16_t size);
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_aquarius_cartridge_interface overrides
 	virtual uint8_t mreq_r(offs_t offset) override;
@@ -81,7 +81,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_aquarius_cartridge_interface overrides
 	virtual uint8_t mreq_ce_r(offs_t offset) override;

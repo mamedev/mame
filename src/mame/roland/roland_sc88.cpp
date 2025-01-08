@@ -26,7 +26,7 @@ public:
 	void sc88vl(machine_config &config);
 
 private:
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	required_device<h8510_device> m_maincpu;
 };
@@ -68,4 +68,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1995, sc88vl, 0, 0, sc88vl, sc88vl, roland_sc88_state, empty_init, "Roland", "SoundCanvas SC-88VL", MACHINE_IS_SKELETON)
+SYST(1995, sc88vl, 0, 0, sc88vl, sc88vl, roland_sc88_state, empty_init, "Roland", "SoundCanvas SC-88VL", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

@@ -15,10 +15,10 @@ protected:
 	h8534_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 	h8534_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor map);
 
-	void register_field_map(address_map &map);
+	void register_field_map(address_map &map) ATTR_COLD;
 
 private:
-	void internal_map(address_map &map);
+	void internal_map(address_map &map) ATTR_COLD;
 };
 
 class hd6435348_device : public h8534_device
@@ -41,7 +41,7 @@ protected:
 	h8536_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 private:
-	void internal_map(address_map &map);
+	void internal_map(address_map &map) ATTR_COLD;
 };
 
 class hd6435368_device : public h8536_device

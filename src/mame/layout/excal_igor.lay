@@ -366,10 +366,6 @@ authors:hap
 		]]></data></image>
 	</element>
 
-	<element name="hlb" defstate="0">
-		<rect state="1"><color red="0" green="0" blue="0" /></rect>
-	</element>
-
 	<element name="but" defstate="0">
 		<rect>
 			<bounds xc="0" yc="0" width="6.5" height="1.7" />
@@ -378,6 +374,10 @@ authors:hap
 		<rect>
 			<bounds xc="0" yc="0" width="6" height="1.2" />
 			<color red="0.1" green="0.5" blue="0.7" />
+		</rect>
+		<rect state="1">
+			<bounds xc="0" yc="0" width="6.5" height="1.7" />
+			<color red="0" green="0" blue="0" alpha="0.18" />
 		</rect>
 	</element>
 
@@ -413,41 +413,23 @@ authors:hap
 
 		<element ref="cwhite" blend="multiply"><bounds xc="14.75" y="2" width="19" height="47" /><orientation rotate="90" /></element>
 
-		<element ref="but"><bounds xc="10" y="5.0"  width="6.5" height="1.7" /></element>
-		<element ref="but"><bounds xc="10" y="10.5" width="6.5" height="1.7" /></element>
-		<element ref="but"><bounds xc="10" y="16.0" width="6.5" height="1.7" /></element>
-		<element ref="but"><bounds xc="10" y="21.5" width="6.5" height="1.7" /></element>
-		<element ref="but"><bounds xc="10" y="27.0" width="6.5" height="1.7" /></element>
-		<element ref="but"><bounds xc="10" y="32.5" width="6.5" height="1.7" /></element>
-		<element ref="but"><bounds xc="10" y="38.0" width="6.5" height="1.7" /></element>
-		<element ref="but"><bounds xc="10" y="43.5" width="6.5" height="1.7" /></element>
+		<element ref="but" inputtag="IN.1" inputmask="0x10"><bounds xc="10" y="5.0"  width="6.5" height="1.7" /></element>
+		<element ref="but" inputtag="IN.1" inputmask="0x08"><bounds xc="10" y="10.5" width="6.5" height="1.7" /></element>
+		<element ref="but" inputtag="IN.1" inputmask="0x02"><bounds xc="10" y="16.0" width="6.5" height="1.7" /></element>
+		<element ref="but" inputtag="IN.0" inputmask="0x04"><bounds xc="10" y="21.5" width="6.5" height="1.7" /></element>
+		<element ref="but" inputtag="IN.1" inputmask="0x04"><bounds xc="10" y="27.0" width="6.5" height="1.7" /></element>
+		<element ref="but" inputtag="IN.1" inputmask="0x80"><bounds xc="10" y="32.5" width="6.5" height="1.7" /></element>
+		<element ref="but" inputtag="IN.1" inputmask="0x40"><bounds xc="10" y="38.0" width="6.5" height="1.7" /></element>
+		<element ref="but" inputtag="IN.1" inputmask="0x20"><bounds xc="10" y="43.5" width="6.5" height="1.7" /></element>
 
-		<element ref="but"><bounds xc="19.5" y="5.0"  width="6.5" height="1.7" /></element>
-		<element ref="but"><bounds xc="19.5" y="10.5" width="6.5" height="1.7" /></element>
-		<element ref="but"><bounds xc="19.5" y="16.0" width="6.5" height="1.7" /></element>
-		<element ref="but"><bounds xc="19.5" y="21.5" width="6.5" height="1.7" /></element>
-		<element ref="but"><bounds xc="19.5" y="27.0" width="6.5" height="1.7" /></element>
-		<element ref="but"><bounds xc="19.5" y="32.5" width="6.5" height="1.7" /></element>
-		<element ref="but"><bounds xc="19.5" y="38.0" width="6.5" height="1.7" /></element>
-		<element ref="but"><bounds xc="19.5" y="43.5" width="6.5" height="1.7" /></element>
-
-		<element ref="hlb" inputtag="IN.1" inputmask="0x10"><bounds xc="10" y="5.0"  width="6.5" height="1.7" /><color alpha="0.18" /></element>
-		<element ref="hlb" inputtag="IN.1" inputmask="0x08"><bounds xc="10" y="10.5" width="6.5" height="1.7" /><color alpha="0.18" /></element>
-		<element ref="hlb" inputtag="IN.1" inputmask="0x02"><bounds xc="10" y="16.0" width="6.5" height="1.7" /><color alpha="0.18" /></element>
-		<element ref="hlb" inputtag="IN.0" inputmask="0x04"><bounds xc="10" y="21.5" width="6.5" height="1.7" /><color alpha="0.18" /></element>
-		<element ref="hlb" inputtag="IN.1" inputmask="0x04"><bounds xc="10" y="27.0" width="6.5" height="1.7" /><color alpha="0.18" /></element>
-		<element ref="hlb" inputtag="IN.1" inputmask="0x80"><bounds xc="10" y="32.5" width="6.5" height="1.7" /><color alpha="0.18" /></element>
-		<element ref="hlb" inputtag="IN.1" inputmask="0x40"><bounds xc="10" y="38.0" width="6.5" height="1.7" /><color alpha="0.18" /></element>
-		<element ref="hlb" inputtag="IN.1" inputmask="0x20"><bounds xc="10" y="43.5" width="6.5" height="1.7" /><color alpha="0.18" /></element>
-
-		<element ref="hlb" inputtag="IN.0" inputmask="0x10"><bounds xc="19.5" y="5.0"  width="6.5" height="1.7" /><color alpha="0.18" /></element>
-		<element ref="hlb" inputtag="IN.0" inputmask="0x08"><bounds xc="19.5" y="10.5" width="6.5" height="1.7" /><color alpha="0.18" /></element>
-		<element ref="hlb" inputtag="IN.0" inputmask="0x02"><bounds xc="19.5" y="16.0" width="6.5" height="1.7" /><color alpha="0.18" /></element>
-		<element ref="hlb" inputtag="IN.0" inputmask="0x20"><bounds xc="19.5" y="21.5" width="6.5" height="1.7" /><color alpha="0.18" /></element>
-		<element ref="hlb" inputtag="IN.0" inputmask="0x40"><bounds xc="19.5" y="27.0" width="6.5" height="1.7" /><color alpha="0.18" /></element>
-		<element ref="hlb" inputtag="IN.0" inputmask="0x80"><bounds xc="19.5" y="32.5" width="6.5" height="1.7" /><color alpha="0.18" /></element>
-		<element ref="hlb" inputtag="IN.0" inputmask="0x01"><bounds xc="19.5" y="38.0" width="6.5" height="1.7" /><color alpha="0.18" /></element>
-		<element ref="hlb" inputtag="IN.1" inputmask="0x01"><bounds xc="19.5" y="43.5" width="6.5" height="1.7" /><color alpha="0.18" /></element>
+		<element ref="but" inputtag="IN.0" inputmask="0x10"><bounds xc="19.5" y="5.0"  width="6.5" height="1.7" /></element>
+		<element ref="but" inputtag="IN.0" inputmask="0x08"><bounds xc="19.5" y="10.5" width="6.5" height="1.7" /></element>
+		<element ref="but" inputtag="IN.0" inputmask="0x02"><bounds xc="19.5" y="16.0" width="6.5" height="1.7" /></element>
+		<element ref="but" inputtag="IN.0" inputmask="0x20"><bounds xc="19.5" y="21.5" width="6.5" height="1.7" /></element>
+		<element ref="but" inputtag="IN.0" inputmask="0x40"><bounds xc="19.5" y="27.0" width="6.5" height="1.7" /></element>
+		<element ref="but" inputtag="IN.0" inputmask="0x80"><bounds xc="19.5" y="32.5" width="6.5" height="1.7" /></element>
+		<element ref="but" inputtag="IN.0" inputmask="0x01"><bounds xc="19.5" y="38.0" width="6.5" height="1.7" /></element>
+		<element ref="but" inputtag="IN.1" inputmask="0x01"><bounds xc="19.5" y="43.5" width="6.5" height="1.7" /></element>
 	</group>
 
 

@@ -30,6 +30,7 @@ TODO:
 
 #include "cpu/m6502/m6502.h"
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "video/resnet.h"
@@ -61,8 +62,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -89,7 +90,7 @@ private:
 	void control_w(uint8_t data);
 	void flipscreen_w(uint8_t data);
 
-	INTERRUPT_GEN_MEMBER(sound_timer_irq);
+	TIMER_DEVICE_CALLBACK_MEMBER(v8_timer_irq);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
@@ -97,8 +98,8 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -330,8 +331,8 @@ static INPUT_PORTS_START( bigprowr )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, tagteam_state, coin_inserted, 0)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, tagteam_state, coin_inserted, 0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tagteam_state::coin_inserted), 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tagteam_state::coin_inserted), 0)
 
 	PORT_START("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL PORT_8WAY
@@ -362,7 +363,7 @@ static INPUT_PORTS_START( bigprowr )
 	PORT_DIPSETTING(    0x40, "Upright, Dual Controls" )
 	PORT_DIPSETTING(    0x20, "Cocktail, Single Controls" ) // IMPOSSIBLE !
 	PORT_DIPSETTING(    0x60, DEF_STR( Cocktail ) )     // "Cocktail, Dual Controls"
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_VBLANK("screen")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:1")
@@ -427,30 +428,29 @@ static GFXDECODE_START( gfx_tagteam )
 GFXDECODE_END
 
 
-INTERRUPT_GEN_MEMBER(tagteam_state::sound_timer_irq)
+TIMER_DEVICE_CALLBACK_MEMBER(tagteam_state::v8_timer_irq)
 {
+	// same source for both interrupts
+	m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
 	if (m_sound_nmi_mask)
-		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
 void tagteam_state::tagteam(machine_config &config)
 {
 	// basic machine hardware
-	M6502(config, m_maincpu, XTAL(12'000'000) / 8);
+	M6502(config, m_maincpu, 12_MHz_XTAL / 8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tagteam_state::main_map);
-	m_maincpu->set_periodic_int(FUNC(tagteam_state::irq0_line_assert), attotime::from_hz(272 / 16 * 57)); // connected to bit 4 of vcount (basically once every 16 scanlines)
 
-	M6502(config, m_audiocpu, XTAL(12'000'000) / 2 / 6); // daughterboard gets 12mhz / 2 from mainboard, but how it's divided further is a guess
+	M6502(config, m_audiocpu, 12_MHz_XTAL / 2 / 6); // daughterboard gets 12mhz / 2 from mainboard, but how it's divided further is a guess
 	m_audiocpu->set_addrmap(AS_PROGRAM, &tagteam_state::sound_map);
-	m_audiocpu->set_periodic_int(FUNC(tagteam_state::sound_timer_irq), attotime::from_hz(272 / 16 * 57)); // same source as maincpu IRQ
+
+	TIMER(config, "v8").configure_scanline(FUNC(tagteam_state::v8_timer_irq), "screen", 8, 16); // connected to bit 4 of vcount (basically once every 16 scanlines)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(57); // measured?
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(3072));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	screen.set_raw(12_MHz_XTAL / 2, 384, 0, 256, 272, 8, 248); // confirmed from schematics; 57 Hz measured?
 	screen.set_screen_update(FUNC(tagteam_state::screen_update));
 	screen.set_palette(m_palette);
 
@@ -463,8 +463,8 @@ void tagteam_state::tagteam(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, M6502_IRQ_LINE);
 
-	AY8910(config, "ay1", XTAL(12'000'000) / 8).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	AY8910(config, "ay2", XTAL(12'000'000) / 8).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	AY8910(config, "ay1", 12_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	AY8910(config, "ay2", 12_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
 }

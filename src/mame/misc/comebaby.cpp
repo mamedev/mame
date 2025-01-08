@@ -230,7 +230,7 @@ private:
 	// optional for making the compile switch to work
 	optional_device<voodoo_3_pci_device> m_voodoo3;
 
-	void comebaby_map(address_map &map);
+	void comebaby_map(address_map &map) ATTR_COLD;
 
 	static void superio_config(device_t *device);
 };
@@ -333,4 +333,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2000, comebaby, 0, comebaby, comebaby, comebaby_state, empty_init, ROT0, "ExPotato", "Come On Baby", MACHINE_IS_SKELETON )
+GAME( 2000, comebaby, 0, comebaby, comebaby, comebaby_state, empty_init, ROT0, "ExPotato", "Come On Baby", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

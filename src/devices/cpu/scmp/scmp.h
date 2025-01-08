@@ -29,13 +29,12 @@ protected:
 	scmp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return 5; }
 	virtual uint32_t execute_max_cycles() const noexcept override { return 23+8; } // max opcode + interrupt
-	virtual uint32_t execute_input_lines() const noexcept override { return 0; }
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
@@ -54,13 +53,14 @@ private:
 	PAIR    m_P1;
 	PAIR    m_P2;
 	PAIR    m_P3;
-	uint8_t   m_AC;
-	uint8_t   m_ER;
-	uint8_t   m_SR;
+	uint8_t m_AC;
+	uint8_t m_ER;
+	uint8_t m_SR;
 
 	memory_access<16, 0, 0, ENDIANNESS_BIG>::cache m_cache;
 	memory_access<16, 0, 0, ENDIANNESS_BIG>::specific m_program;
-	int                 m_icount;
+
+	int                m_icount;
 
 	devcb_write8       m_flag_out_func;
 	devcb_write_line   m_sout_func;

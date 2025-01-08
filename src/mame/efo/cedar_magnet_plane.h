@@ -26,11 +26,11 @@ public:
 
 	u32 draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int palbase);
 
-	void cedar_magnet_plane_io(address_map &map);
-	void cedar_magnet_plane_map(address_map &map);
+	void cedar_magnet_plane_io(address_map &map) ATTR_COLD;
+	void cedar_magnet_plane_map(address_map &map) ATTR_COLD;
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	std::unique_ptr<u8[]> m_framebuffer;

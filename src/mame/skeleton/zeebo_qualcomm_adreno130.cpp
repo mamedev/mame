@@ -56,12 +56,12 @@ public:
 	void zeebo(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void zeebo_arm11_map(address_map &map);
+	void zeebo_arm11_map(address_map &map) ATTR_COLD;
 
 	void copy_block(int i, int blocksize, int blocksize_stripped, uint8_t* nandrom, int dest);
 	void bootstrap();
@@ -144,4 +144,4 @@ ROM_END
 } // anonymous namespace
 
 
-CONS( 2009, zeebo,      0,       0,      zeebo, zeebo, zeebo_game_state, empty_init, "Zeebo Inc.", "Zeebo (Brazil)", MACHINE_IS_SKELETON )
+CONS( 2009, zeebo,      0,       0,      zeebo, zeebo, zeebo_game_state, empty_init, "Zeebo Inc.", "Zeebo (Brazil)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

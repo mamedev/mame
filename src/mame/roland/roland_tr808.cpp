@@ -33,7 +33,7 @@ public:
 	void tr808(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<ucom4_cpu_device> m_maincpu;
@@ -91,4 +91,4 @@ ROM_END
     Drivers
 ***************************************************************************/
 
-SYST( 1980, tr808, 0, 0, tr808, tr808, tr808_state, empty_init, "Roland", "TR-808 Rhythm Composer", MACHINE_IS_SKELETON )
+SYST( 1980, tr808, 0, 0, tr808, tr808, tr808_state, empty_init, "Roland", "TR-808 Rhythm Composer", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

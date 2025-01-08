@@ -54,7 +54,7 @@ public:
 	void summit(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -65,7 +65,7 @@ private:
 
 	output_finder<16> m_lamps;
 
-	void mainmap(address_map &map);
+	void mainmap(address_map &map) ATTR_COLD;
 
 	void sound_w(uint8_t data);
 	void out2_w(uint8_t data);

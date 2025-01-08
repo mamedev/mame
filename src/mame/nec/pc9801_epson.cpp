@@ -346,6 +346,15 @@ void pc98_epson_state::pc286vs(machine_config &config)
 	// TODO: DMA type & clock
 }
 
+void pc98_epson_state::pc286u(machine_config &config)
+{
+	pc9801vm(config);
+	config_base_epson(config);
+
+	// TODO: DMA type & clock
+}
+
+
 void pc98_epson_state::pc386m(machine_config &config)
 {
 	pc9801rs(config);
@@ -437,6 +446,32 @@ ROM_START( pc286vs )
 	LOAD_IDE_ROM
 ROM_END
 
+
+/*
+Epson PC-286U
+μPD70116 (V30) @ 10/8 MHz
+640 KB conventional memory + 8.6 MB
+3.5"2DD/2HDx2
+CBus: 2 internal slots + 2 external slots
+
+NOTE: was mislabeled as pc9801vm11, this is a best guess
+(contains Epson strings in place of KBCRT identifier, at ipl address $23270)
+
+*/
+
+ROM_START( pc286u )
+	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
+	ROM_LOAD( "itf.rom",     0x10000, 0x08000, NO_DUMP )
+	ROM_LOAD( "bios_vm.rom", 0x18000, 0x18000, CRC(2e2d7cee) SHA1(159549f845dc70bf61955f9469d2281a0131b47f) )
+
+	ROM_REGION( 0x80000, "chargen", 0 )
+	ROM_LOAD( "font_vm.rom",     0x000000, 0x046800, BAD_DUMP CRC(456d9fc7) SHA1(78ba9960f135372825ab7244b5e4e73a810002ff) )
+
+	LOAD_KANJI_ROMS
+//  LOAD_IDE_ROM
+ROM_END
+
+
 /*
 Epson PC-386M
 
@@ -525,6 +560,8 @@ ROM_END
 COMP( 1989, pc286vs,     0,       0, pc286vs,    pc386m, pc98_epson_state, init_pc9801_kanji, "Epson", "PC-286VS", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // PC-286U (same as above except running on V30)
+COMP( 1987, pc286u,     0,        0, pc286u,     pc386m, pc98_epson_state, init_pc9801_kanji, "Epson", "PC-286U", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // Revised BIOS 1988
+
 // PC-286C "PC Club" (same as PC-286?)
 // ...
 

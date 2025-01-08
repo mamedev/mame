@@ -48,10 +48,10 @@ public:
 private:
 	u16 m_sense;
 
-	void pwrmacg3_map(address_map &map);
+	void pwrmacg3_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	u16 read_sense();
 	void write_sense(u16 data);

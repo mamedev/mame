@@ -129,15 +129,15 @@ private:
 	uint8_t unmapped_r(offs_t offset);
 	void unmapped_w(offs_t offset, uint8_t data);
 
-	void flex_dc5_piaide_mem(address_map &map);
-	void flex_dmaf2_mem(address_map &map);
-	void mp09_mem(address_map &map);
-	void uniflex_dmaf2_mem(address_map &map);
-	void uniflex_dmaf3_mem(address_map &map);
-	void os9_mem(address_map &map);
+	void flex_dc5_piaide_mem(address_map &map) ATTR_COLD;
+	void flex_dmaf2_mem(address_map &map) ATTR_COLD;
+	void mp09_mem(address_map &map) ATTR_COLD;
+	void uniflex_dmaf2_mem(address_map &map) ATTR_COLD;
+	void uniflex_dmaf3_mem(address_map &map) ATTR_COLD;
+	void os9_mem(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void swtpc09_irq_handler(uint8_t peripheral, uint8_t state);
 

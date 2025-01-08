@@ -508,7 +508,7 @@ authors:hap
 		<group ref="sb_board"><bounds x="10" y="10" width="80" height="80" /></group>
 		<group ref="sb_ui"><bounds x="-4.5" y="10" width="10" height="80" /></group>
 
-		<!-- leds -->
+		<!-- chessboard leds -->
 		<repeat count="8">
 			<param name="x" start="14.25" increment="10" />
 			<param name="i" start="0" increment="1" />

@@ -234,10 +234,10 @@ private:
 	void counters_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void gluck2_map(address_map &map);
+	void gluck2_map(address_map &map) ATTR_COLD;
 };
 
 

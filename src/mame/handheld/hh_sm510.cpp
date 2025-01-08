@@ -36,7 +36,7 @@ TODO:
   gnw_mariocmt, gnw_mariocmta, gnw_mariotj, gnw_mbaway, gnw_mmousep,
   gnw_pinball, gnw_popeyep, gnw_sbuster, gnw_snoopyp, gnw_zelda
 
-********************************************************************************
+================================================================================
 
 Misc Nintendo Game & Watch notes:
 
@@ -121,7 +121,7 @@ The "Game Watch" wristwatches are by Nelsonic, not Nintendo.
 Bassmate Computer (BM-501) is on identical hardware as G&W Multi Screen,
 but it's not part of the game series.
 
-********************************************************************************
+================================================================================
 
 Regarding Электроника (Elektronika, translated: Electronics): It is not
 actually a company. It was a USSR brand name for consumer electronics,
@@ -164,7 +164,7 @@ The MCUs used were not imported from Sharp, but cloned by USSR, renamed to
 
 void hh_sm510_state::machine_start()
 {
-	// resolve handlers
+	// resolve outputs
 	m_out_x.resolve();
 
 	// determine number of input lines (set it in the subclass constructor if different)
@@ -4860,11 +4860,12 @@ ROM_END
   * Sharp SM510 under epoxy (die label CMS54C, KMS584)
   * lcd screen with custom segments, 1-bit sound
 
-  BTANB: At the basket, the ball goes missing sometimes for 1 frame, or
-  may show 2 balls at the same time. It's the same on the real handheld.
-  BTANB: players flicker (increasing LCD delay won't improve it much)
-  Another BTANB? If a period is over at the same time a defender on the
-  2nd column grabs the ball, his arm won't be erased until it's redrawn.
+  BTANB:
+  - At the basket, the ball goes missing sometimes for 1 frame, or may show 2 balls
+    at the same time. It's the same on the real handheld.
+  - players flicker (increasing LCD delay won't improve it much)
+  - If a period is over at the same time a defender on the 2nd column grabs the ball,
+    his arm won't be erased until it's redrawn (BTANB not verified).
 
 *******************************************************************************/
 
@@ -6873,7 +6874,7 @@ public:
 	void tgaiden(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// R2 connects to a single LED behind the screen
@@ -9996,6 +9997,13 @@ ROM_END
   * Sharp SM510 under epoxy (die label MJ1)
   * lcd screen with custom segments, 1-bit sound
 
+  BTANB: Energy and weapon power bars are the wrong way around. The manual does
+  show them correctly, but it appears to be a doctored picture.
+
+  There's also a newer version called Project Alien, presumed to be the same ROM.
+  The LCD is different (no Xenomorph aliens). The background inlay is different
+  too, and this time the weapon/energy labels are placed correctly.
+
 *******************************************************************************/
 
 class topaliens_state : public hh_sm510_state
@@ -11843,7 +11851,7 @@ SYST( 1993, tsddragon,    0,           0,      tsddragon,    tsddragon,    tsddr
 SYST( 1993, tdennis,      0,           0,      tdennis,      tdennis,      tdennis_state,      empty_init, "Tiger Electronics", "Dennis the Menace (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1993, tnmarebc,     0,           0,      tnmarebc,     tnmarebc,     tnmarebc_state,     empty_init, "Tiger Electronics", "Nightmare Before Christmas (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK ) // note: title has no "The"
 SYST( 1993, ttransf2,     0,           0,      ttransf2,     ttransf2,     ttransf2_state,     empty_init, "Tiger Electronics", "Transformers: Generation 2 (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1993, topaliens,    0,           0,      topaliens,    topaliens,    topaliens_state,    empty_init, "Tiger Electronics", "Operation: Aliens (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1994, topaliens,    0,           0,      topaliens,    topaliens,    topaliens_state,    empty_init, "Tiger Electronics", "Operation: Aliens (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1993, tmkombat,     0,           0,      tmkombat,     tmkombat,     tmkombat_state,     empty_init, "Tiger Electronics", "Mortal Kombat (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1994, tshadow,      0,           0,      tshadow,      tshadow,      tshadow_state,      empty_init, "Tiger Electronics", "The Shadow (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1994, tskelwarr,    0,           0,      tskelwarr,    tskelwarr,    tskelwarr_state,    empty_init, "Tiger Electronics", "Skeleton Warriors: The Dark Crusade (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )

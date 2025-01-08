@@ -219,10 +219,10 @@
 #define MFPS_M(d)   int dreg, result, ea; result = PSW; CLR_NZV; SETB_NZ; PUT_DB_##d(result)
 /* MOV: dst = src */
 #define MOV_R(s,d)  int sreg, dreg, source, result;     GET_SW_##s; CLR_NZV; result = source; SETW_NZ; PUT_DW_##d(result)
-#define MOV_M(s,d)  int sreg, dreg, source, result, ea; GET_SW_##s; CLR_NZV; result = source; SETW_NZ; PUT_DWT_##d(result)
+#define MOV_M(s,d)  int sreg, dreg, source, result, ea; GET_SW_##s; CLR_NZV; result = source; SETW_NZ; if (c_insn_set & IS_VM1) { PUT_DW_##d(result); } else { PUT_DWT_##d(result); }
 #define MOVB_R(s,d) int sreg, dreg, source, result;     GET_SB_##s; CLR_NZV; result = source; SETB_NZ; PUT_DW_##d((signed char)result)
 #define MOVB_X(s,d) int sreg, dreg, source, result, ea; GET_SB_##s; CLR_NZV; result = source; SETB_NZ; PUT_DW_##d((signed char)result)
-#define MOVB_M(s,d) int sreg, dreg, source, result, ea; GET_SB_##s; CLR_NZV; result = source; SETB_NZ; PUT_DBT_##d(result)
+#define MOVB_M(s,d) int sreg, dreg, source, result, ea; GET_SB_##s; CLR_NZV; result = source; SETB_NZ; if (c_insn_set & IS_VM1) { PUT_DB_##d(result); } else { PUT_DBT_##d(result); }
 /* MTPS: flags = src */
 #define MTPS_R(d)   int dreg, dest;     GET_DB_##d; PSW = (PSW & ~0xef) | (dest & 0xef); m_check_irqs = true
 #define MTPS_M(d)   int dreg, dest, ea; GET_DB_##d; PSW = (PSW & ~0xef) | (dest & 0xef); m_check_irqs = true
@@ -352,13 +352,13 @@ void t11_device::halt(uint16_t op)
 void t11_device::illegal(uint16_t op)
 {
 	m_icount -= 48;
-	trap_to(0x08);
+	trap_to(T11_ILLINST);
 }
 
 void t11_device::illegal4(uint16_t op)
 {
 	m_icount -= 48;
-	trap_to(0x04);
+	trap_to(T11_TIMEOUT);
 }
 
 void t11_device::mark(uint16_t op)
@@ -963,13 +963,13 @@ void t11_device::bcs(uint16_t op)           { m_icount -= 12; { BR( GET_C); } }
 void t11_device::emt(uint16_t op)
 {
 	m_icount -= 48;
-	trap_to(0x18);
+	trap_to(T11_EMT);
 }
 
 void t11_device::trap(uint16_t op)
 {
 	m_icount -= 48;
-	trap_to(0x1c);
+	trap_to(T11_TRAP);
 }
 
 void t11_device::clrb_rg(uint16_t op)       { m_icount -= 12; { CLRB_R(RG);  } }

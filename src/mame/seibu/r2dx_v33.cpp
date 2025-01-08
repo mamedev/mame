@@ -94,8 +94,8 @@ public:
 	void init_zerotm2k();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void angle_w(offs_t offset, u16 data, u16 mem_mask);
 	void dx_w(offs_t offset, u16 data, u16 mem_mask);
@@ -120,9 +120,9 @@ protected:
 	void tilemapdma_w(address_space &space, u16 data);
 	void paldma_w(address_space &space, u16 data);
 
-	void nzerotea_map(address_map &map);
-	void nzeroteam_base_map(address_map &map);
-	void zerotm2k_map(address_map &map);
+	void nzerotea_map(address_map &map) ATTR_COLD;
+	void nzeroteam_base_map(address_map &map) ATTR_COLD;
+	void zerotm2k_map(address_map &map) ATTR_COLD;
 
 	u16 m_dx = 0, m_dy = 0, m_angle = 0;
 	u32 m_sdist = 0;
@@ -152,8 +152,8 @@ public:
 	void init_rdx_v33();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void tile_bank_w(u8 data);
@@ -162,8 +162,8 @@ private:
 
 	u16 r2dx_debug_r();
 
-	void r2dx_oki_map(address_map &map);
-	void rdx_v33_map(address_map &map);
+	void r2dx_oki_map(address_map &map) ATTR_COLD;
+	void rdx_v33_map(address_map &map) ATTR_COLD;
 
 	void r2dx_setbanking();
 
@@ -561,7 +561,7 @@ static INPUT_PORTS_START( rdx_v33 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE2 )
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE_DIPLOC(  0x0040, IP_ACTIVE_LOW, "SW1:7" )
 	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:8")
@@ -707,7 +707,7 @@ static INPUT_PORTS_START( zerotm2k )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 
 	PORT_START("P3_P4")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)

@@ -267,9 +267,9 @@ public:
 	void init_prot_val_40();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	/* memory pointers */
@@ -306,11 +306,11 @@ private:
 	void oki_banking_w(uint8_t data);
 	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void nmg5_map(address_map &map);
-	void nmg5_sound_map(address_map &map);
-	void pclubys_map(address_map &map);
-	void pclubys_sound_map(address_map &map);
-	void sound_io_map(address_map &map);
+	void nmg5_map(address_map &map) ATTR_COLD;
+	void nmg5_sound_map(address_map &map) ATTR_COLD;
+	void pclubys_map(address_map &map) ATTR_COLD;
+	void pclubys_sound_map(address_map &map) ATTR_COLD;
+	void sound_io_map(address_map &map) ATTR_COLD;
 };
 
 

@@ -169,9 +169,9 @@ protected:
 	u16 bloodstm_video_r(offs_t offset);
 	void pia_portb_out(u8 data);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	void init_program_rom();
 	void init_sftm_common(int prot_addr);
 	void init_shuffle_bowl_common(int prot_addr);
@@ -197,12 +197,12 @@ protected:
 	virtual void shiftreg_clear(u16 *base, u16 *zbase);
 	void handle_video_command();
 	virtual void update_interrupts(int vint, int xint, int qint);
-	void bloodstm_map(address_map &map);
-	void itech020_map(address_map &map);
-	void sound_020_map(address_map &map);
-	void sound_map(address_map &map);
-	void timekill_map(address_map &map);
-	void pubball_map(address_map &map);
+	void bloodstm_map(address_map &map) ATTR_COLD;
+	void itech020_map(address_map &map) ATTR_COLD;
+	void sound_020_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void timekill_map(address_map &map) ATTR_COLD;
+	void pubball_map(address_map &map) ATTR_COLD;
 };
 
 class drivedge_state : public itech32_state
@@ -224,8 +224,8 @@ public:
 
 protected:
 	virtual void driver_start() override;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u16 steering_r();
@@ -252,9 +252,9 @@ private:
 	void portb_out(u8 data);
 	void turbo_light(int state);
 
-	void main_map(address_map &map);
-	void tms1_map(address_map &map);
-	void tms2_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void tms1_map(address_map &map) ATTR_COLD;
+	void tms2_map(address_map &map) ATTR_COLD;
 	virtual void nvram_init(nvram_device &nvram, void *base, size_t length) override;
 
 	virtual void logblit(const char *tag) override;
@@ -294,11 +294,11 @@ public:
 
 private:
 	virtual void driver_start() override;
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	void update_interrupts(int vint, int xint, int qint) override;
 
-	void shoottv_map(address_map &map);
+	void shoottv_map(address_map &map) ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(gun_interrupt);
 

@@ -26,8 +26,8 @@ public:
 	void set_flip_screen(bool flip) { m_flip_screen = flip; }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	colpri_cb_delegate m_colpri_cb;

@@ -30,8 +30,6 @@ namespace bus::amiga::zorro {
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> a2232_device
-
 class a2232_device : public device_t, public device_zorro2_card_interface, public amiga_autoconfig
 {
 public:
@@ -50,7 +48,7 @@ public:
 	uint16_t reset_high_r(offs_t offset, uint16_t mem_mask = ~0);
 	void reset_high_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	void iocpu_map(address_map &map);
+	void iocpu_map(address_map &map) ATTR_COLD;
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -108,7 +106,7 @@ private:
 
 } // namespace bus::amiga::zorro
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE_NS(ZORRO_A2232, bus::amiga::zorro, a2232_device)
 
 #endif // MAME_BUS_AMIGA_ZORRO_A2232_H

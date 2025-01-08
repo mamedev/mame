@@ -81,7 +81,7 @@ public:
 	void init_tosh1000();
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void romdos_bank_w(uint8_t data);
@@ -90,9 +90,9 @@ private:
 	uint8_t bram_r(offs_t offset);
 
 	static void cfg_fdc_35(device_t *device);
-	void tosh1000_io(address_map &map);
-	void tosh1000_map(address_map &map);
-	void tosh1000_romdos(address_map &map);
+	void tosh1000_io(address_map &map) ATTR_COLD;
+	void tosh1000_map(address_map &map) ATTR_COLD;
+	void tosh1000_romdos(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<address_map_bank_device> m_bankdev;
@@ -314,4 +314,4 @@ ROM_END
 
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT  CLASS           INIT           COMPANY    FULLNAME         FLAGS
-COMP( 1987, tosh1000, ibm5150, 0,      tosh1000, 0,     tosh1000_state, init_tosh1000, "Toshiba", "Toshiba T1000", MACHINE_IS_SKELETON )
+COMP( 1987, tosh1000, ibm5150, 0,      tosh1000, 0,     tosh1000_state, init_tosh1000, "Toshiba", "Toshiba T1000", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

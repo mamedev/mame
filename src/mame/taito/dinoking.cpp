@@ -60,7 +60,7 @@ private:
 	void status_w(offs_t offset, u8 data);
 	u8 status_r(offs_t offset);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
@@ -196,5 +196,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2004, dkkids,   0, dinoking, dinoking, dinoking_state, empty_init, ROT0, "Taito Corporation", "Dinoking Kids",   MACHINE_IS_SKELETON )
-GAME( 2005, dkbattle, 0, dinoking, dinoking, dinoking_state, empty_init, ROT0, "Taito Corporation", "Dinoking Battle", MACHINE_IS_SKELETON )
+GAME( 2004, dkkids,   0, dinoking, dinoking, dinoking_state, empty_init, ROT0, "Taito Corporation", "Dinoking Kids",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2005, dkbattle, 0, dinoking, dinoking, dinoking_state, empty_init, ROT0, "Taito Corporation", "Dinoking Battle", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

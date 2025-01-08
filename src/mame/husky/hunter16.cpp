@@ -43,9 +43,9 @@ public:
 protected:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void mem_map(address_map &map);
-	void io_16_map(address_map &map);
-	void io_1680_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_16_map(address_map &map) ATTR_COLD;
+	void io_1680_map(address_map &map) ATTR_COLD;
 
 	required_device<v25_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -274,6 +274,6 @@ ROM_END
 
 
 /*    YEAR  NAME        PARENT    COMPAT  MACHINE     INPUT     CLASS           INIT        COMPANY                FULLNAME              FLAGS */
-COMP( 1989, hunter16,   0,        0,      hunter16,   hunter16, hunter16_state, empty_init, "Husky Computers Ltd", "Husky Hunter 16",    MACHINE_IS_SKELETON )
-COMP( 1990, hunter216,  hunter16, 0,      hunter16,   hunter2,  hunter16_state, empty_init, "Husky Computers Ltd", "Husky Hunter 2/16",  MACHINE_IS_SKELETON )
-COMP( 1989, hunter1680, hunter16, 0,      hunter1680, hunter16, hunter16_state, empty_init, "Husky Computers Ltd", "Husky Hunter 16/80", MACHINE_IS_SKELETON )
+COMP( 1989, hunter16,   0,        0,      hunter16,   hunter16, hunter16_state, empty_init, "Husky Computers Ltd", "Husky Hunter 16",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 1990, hunter216,  hunter16, 0,      hunter16,   hunter2,  hunter16_state, empty_init, "Husky Computers Ltd", "Husky Hunter 2/16",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 1989, hunter1680, hunter16, 0,      hunter1680, hunter16, hunter16_state, empty_init, "Husky Computers Ltd", "Husky Hunter 16/80", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

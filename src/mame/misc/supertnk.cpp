@@ -128,8 +128,8 @@ public:
 	void init_supertnk();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void bankswitch_0_w(int state);
@@ -142,8 +142,8 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void vblank_interrupt(int state);
 
-	void io_map(address_map &map);
-	void prg_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void prg_map(address_map &map) ATTR_COLD;
 
 	// the color PROM is 32 bytes, but it is repeating every 8 bytes
 	static constexpr uint8_t NUM_PENS = 8;

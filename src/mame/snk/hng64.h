@@ -131,7 +131,7 @@ public:
 	void lamps_w(offs_t offset, uint8_t data) { m_lamps_out_cb[offset](data); }
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	devcb_write8::array<8> m_lamps_out_cb;
@@ -439,9 +439,9 @@ private:
 	TILE_GET_INFO_MEMBER(get_hng64_tile2_16x16_info);
 	TILE_GET_INFO_MEMBER(get_hng64_tile3_8x8_info);
 	TILE_GET_INFO_MEMBER(get_hng64_tile3_16x16_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update_hng64(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_vblank_hng64(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(hng64_irq);
@@ -529,11 +529,11 @@ private:
 	uint16_t sound_latch[2]{};
 	void hng64_audio(machine_config &config);
 	void hng64_network(machine_config &config);
-	void hng_comm_io_map(address_map &map);
-	void hng_comm_map(address_map &map);
-	void hng_map(address_map &map);
-	void hng_sound_io(address_map &map);
-	void hng_sound_map(address_map &map);
+	void hng_comm_io_map(address_map &map) ATTR_COLD;
+	void hng_comm_map(address_map &map) ATTR_COLD;
+	void hng_map(address_map &map) ATTR_COLD;
+	void hng_sound_io(address_map &map) ATTR_COLD;
+	void hng_sound_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_SNK_HNG64_H

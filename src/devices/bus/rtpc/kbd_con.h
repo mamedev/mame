@@ -37,7 +37,7 @@ public:
 
 protected:
 	virtual void device_config_complete() override;
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	void update_clock_state(bool fromkb);
 	void update_data_state(bool fromkb);

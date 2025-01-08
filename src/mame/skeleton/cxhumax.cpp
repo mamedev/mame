@@ -95,7 +95,7 @@ void cxhumax_state::cx_gxa_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 			if((m_intctrl_regs[INTREG(INTGROUP2, INTIRQ)] & m_intctrl_regs[INTREG(INTGROUP2, INTENABLE)])
 				|| (m_intctrl_regs[INTREG(INTGROUP1, INTIRQ)] & m_intctrl_regs[INTREG(INTGROUP1, INTENABLE)]))
-					m_maincpu->set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
+					m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, ASSERT_LINE);
 
 			break;
 		default:
@@ -298,7 +298,7 @@ TIMER_CALLBACK_MEMBER(cxhumax_state::timer_tick)
 
 			/* Interrupt if Timer interrupt is not masked in ITC_INTENABLE_REG */
 			if (m_intctrl_regs[INTREG(INTGROUP2, INTENABLE)] & INT_TIMER_BIT)
-				m_maincpu->set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
+				m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, ASSERT_LINE);
 		}
 	}
 	attotime period = attotime::from_hz(XTAL(54'000'000))*m_timer_regs.timer[param].timebase;
@@ -394,7 +394,7 @@ void cxhumax_state::cx_uart2_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 					/* If INT is enabled at INT Ctrl raise it */
 					if(m_intctrl_regs[INTREG(INTGROUP1, INTENABLE)]&INT_UART2_BIT) {
-						m_maincpu->set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
+						m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, ASSERT_LINE);
 					}
 				}
 			}
@@ -525,9 +525,9 @@ void cxhumax_state::cx_intctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask
 	/* check if */
 	if((m_intctrl_regs[INTREG(INTGROUP2, INTIRQ)] & m_intctrl_regs[INTREG(INTGROUP2, INTENABLE)])
 		|| (m_intctrl_regs[INTREG(INTGROUP1, INTIRQ)] & m_intctrl_regs[INTREG(INTGROUP1, INTENABLE)]))
-		m_maincpu->set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
+		m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, ASSERT_LINE);
 	else
-		m_maincpu->set_input_line(ARM7_IRQ_LINE, CLEAR_LINE);
+		m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, CLEAR_LINE);
 
 }
 
@@ -711,7 +711,7 @@ void cxhumax_state::cx_i2c1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			m_intctrl_regs[INTREG(INTGROUP1, INTSTATSET)] |= 1<<7;
 			if (m_intctrl_regs[INTREG(INTGROUP1, INTENABLE)] & (1<<7)) {
 					LOG("%s: (I2C1) Int\n",  machine().describe_context());
-					m_maincpu->set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
+					m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, ASSERT_LINE);
 			}
 			break;
 		case I2C_STAT_REG:

@@ -17,6 +17,7 @@
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "sound/gb.h"
+
 #include "softlist_dev.h"
 #include "speaker.h"
 
@@ -148,8 +149,8 @@ void gba_state::request_irq(uint32_t int_type)
 		// master enable?
 		if (IME & 1)
 		{
-			m_maincpu->set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
-			m_maincpu->set_input_line(ARM7_IRQ_LINE, CLEAR_LINE);
+			m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, ASSERT_LINE);
+			m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, CLEAR_LINE);
 		}
 	}
 }
@@ -1182,12 +1183,12 @@ uint32_t gba_state::gba_10000000_r(offs_t offset, uint32_t mem_mask)
 {
 	auto &mspace = m_maincpu->space(AS_PROGRAM);
 	uint32_t data;
-	uint32_t pc = m_maincpu->state_int(ARM7_PC);
+	uint32_t pc = m_maincpu->state_int(arm7_cpu_device::ARM7_PC);
 	if (pc >= 0x10000000)
 	{
 		return 0;
 	}
-	uint32_t cpsr = m_maincpu->state_int(ARM7_CPSR);
+	uint32_t cpsr = m_maincpu->state_int(arm7_cpu_device::ARM7_CPSR);
 	if (T_IS_SET( cpsr))
 	{
 		data = mspace.read_dword(pc + 8);

@@ -27,7 +27,7 @@ public:
 	// public because the cinemat driver accesses A/P/X/Y through state interace - should there be a proper public interface to read registers?
 	enum
 	{
-		CCPU_PC=1,
+		CCPU_PC = 1,
 		CCPU_FLAGS,
 		CCPU_A,
 		CCPU_B,
@@ -50,17 +50,16 @@ public:
 	template <typename... T> void set_vector_func(T &&... args) { m_vector_callback.set(std::forward<T>(args)...); }
 
 	uint8_t read_jmi();
-	void wdt_timer_trigger();
+	void wdt_trigger(int state);
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
 	virtual uint32_t execute_max_cycles() const noexcept override { return 1; }
-	virtual uint32_t execute_input_lines() const noexcept override { return 0; }
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
@@ -76,27 +75,27 @@ protected:
 	address_space_config m_data_config;
 	address_space_config m_io_config;
 
-	uint16_t              m_PC;
-	uint16_t              m_A;
-	uint16_t              m_B;
-	uint8_t               m_I;
-	uint16_t              m_J;
-	uint8_t               m_P;
-	uint16_t              m_X;
-	uint16_t              m_Y;
-	uint16_t              m_T;
-	uint16_t *            m_acc;
+	uint16_t            m_PC;
+	uint16_t            m_A;
+	uint16_t            m_B;
+	uint8_t             m_I;
+	uint16_t            m_J;
+	uint8_t             m_P;
+	uint16_t            m_X;
+	uint16_t            m_Y;
+	uint16_t            m_T;
+	uint16_t *          m_acc;
 
-	uint16_t              m_a0flag, m_ncflag, m_cmpacc, m_cmpval;
-	uint16_t              m_miflag, m_nextmiflag, m_nextnextmiflag;
-	uint16_t              m_drflag;
+	uint16_t            m_a0flag, m_ncflag, m_cmpacc, m_cmpval;
+	uint16_t            m_miflag, m_nextmiflag, m_nextnextmiflag;
+	uint16_t            m_drflag;
 
-	devcb_read8        m_external_input;
-	vector_delegate m_vector_callback;
+	devcb_read8         m_external_input;
+	vector_delegate     m_vector_callback;
 
-	uint8_t               m_waiting;
-	uint8_t               m_watchdog;
-	uint8_t               m_extinput;
+	uint8_t             m_waiting;
+	uint8_t             m_watchdog;
+	uint8_t             m_extinput;
 
 	int                 m_icount;
 

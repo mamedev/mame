@@ -66,10 +66,10 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(nmi_button);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 	std::unique_ptr<u8[]> m_ram;
 	required_device<cpu_device> m_maincpu;
 	required_device<via6522_device> m_via;
@@ -109,7 +109,7 @@ void ultim809_state::mem_map(address_map &map)
 
 static INPUT_PORTS_START( ultim809 )
 	PORT_START("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Interrupt") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, ultim809_state, nmi_button, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Interrupt") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ultim809_state::nmi_button), 0)
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER(ultim809_state::nmi_button)
@@ -180,4 +180,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT         COMPANY            FULLNAME     FLAGS
-COMP( 2010, ultim809, 0,      0,      ultim809, ultim809, ultim809_state, empty_init, "Matthew Sarnoff", "Ultim809", MACHINE_IS_INCOMPLETE | MACHINE_IS_SKELETON | MACHINE_SUPPORTS_SAVE )
+COMP( 2010, ultim809, 0,      0,      ultim809, ultim809, ultim809_state, empty_init, "Matthew Sarnoff", "Ultim809", MACHINE_IS_INCOMPLETE | MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

@@ -19,6 +19,10 @@ Excluding resellers with same title, this MCU was used in:
 - SciSys Chess Partner 3000
 - SciSys Chess Partner 4000
 
+MCU clock is via a resistor, this less accurate than with an XTAL, so the speed
+may vary. Graduate Chess appears to have a 62K resistor between the OSC pins,
+which would make it around 500kHz?
+
 On CP3000/4000 they added a level slider. This will oscillate the level switch
 input pin, so the highest level setting is the same as level 2 on Mini Chess.
 It works on the old A34 MCU because the game keeps reading D0 while computing.
@@ -56,7 +60,7 @@ public:
 	void smchess(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -72,7 +76,7 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(computing) { m_computing = 1; }
 
-	void update_display();
+	void update_lcd();
 	template<int N> void seg_w(u8 data);
 	void mux_w(u16 data);
 	u16 input_r();
@@ -94,7 +98,7 @@ void mini_state::machine_start()
     I/O
 *******************************************************************************/
 
-void mini_state::update_display()
+void mini_state::update_lcd()
 {
 	u8 data = (m_lcd_select & 1) ? (m_lcd_data ^ 0xff) : m_lcd_data;
 	data = bitswap<8>(data,2,4,6,7,5,1,0,3);
@@ -104,9 +108,10 @@ void mini_state::update_display()
 template<int N>
 void mini_state::seg_w(u8 data)
 {
-	// R2x,R3x: lcd segment data
-	m_lcd_data = (m_lcd_data & ~(0xf << (N*4))) | (data << (N*4));
-	update_display();
+	// R2x,R3x: LCD segment data
+	const u8 shift = N * 4;
+	m_lcd_data = (m_lcd_data & ~(0xf << shift)) | (data << shift);
+	update_lcd();
 }
 
 void mini_state::mux_w(u16 data)
@@ -125,7 +130,7 @@ void mini_state::mux_w(u16 data)
 	}
 
 	m_lcd_select = sel;
-	update_display();
+	update_lcd();
 }
 
 u16 mini_state::input_r()
@@ -182,7 +187,7 @@ INPUT_PORTS_END
 void mini_state::smchess(machine_config &config)
 {
 	// basic machine hardware
-	HD44801(config, m_maincpu, 400'000);
+	HD44801(config, m_maincpu, 400'000); // approximation
 	m_maincpu->write_r<2>().set(FUNC(mini_state::seg_w<0>));
 	m_maincpu->write_r<3>().set(FUNC(mini_state::seg_w<1>));
 	m_maincpu->write_d().set(FUNC(mini_state::mux_w));
@@ -192,6 +197,7 @@ void mini_state::smchess(machine_config &config)
 	PWM_DISPLAY(config, m_display).set_size(4, 8);
 	m_display->set_segmask(0xf, 0x7f);
 	m_display->set_refresh(attotime::from_hz(30));
+
 	config.set_default_layout(layout_saitek_minichess);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
@@ -210,7 +216,7 @@ void mini_state::smchess(machine_config &config)
 
 ROM_START( smchess )
 	ROM_REGION( 0x2000, "maincpu", 0 )
-	ROM_LOAD("44801a34_proj_t", 0x0000, 0x2000, CRC(be71f1c0) SHA1(6b4d5c8f8491c82bdec1938bd83c14e826ff3e30) )
+	ROM_LOAD("44801a34_scisys-w_ltd_proj_t", 0x0000, 0x2000, CRC(be71f1c0) SHA1(6b4d5c8f8491c82bdec1938bd83c14e826ff3e30) )
 
 	ROM_REGION( 48645, "screen", 0 )
 	ROM_LOAD("smchess.svg", 0, 48645, CRC(19beaa99) SHA1(2d738bd6953dfd7a2c8c37814badd0aac2960c8c) )
@@ -225,4 +231,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS       INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1981, smchess, 0,      0,      smchess, smchess, mini_state, empty_init, "SciSys", "Mini Chess", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+SYST( 1981, smchess, 0,      0,      smchess, smchess, mini_state, empty_init, "SciSys / Philidor Software", "Mini Chess", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

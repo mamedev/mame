@@ -47,7 +47,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	device_sg1000_expansion_slot_interface *m_device;

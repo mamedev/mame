@@ -272,8 +272,8 @@ public:
 	void init_lazercmd();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<s2650_device> m_maincpu;
@@ -316,10 +316,10 @@ private:
 	int vert_scale(int data);
 	void plot_pattern(bitmap_ind16 &bitmap, int x, int y);
 
-	void bbonk_map(address_map &map);
-	void lazercmd_map(address_map &map);
-	void medlanes_map(address_map &map);
-	void portmap(address_map &map);
+	void bbonk_map(address_map &map) ATTR_COLD;
+	void lazercmd_map(address_map &map) ATTR_COLD;
+	void medlanes_map(address_map &map) ATTR_COLD;
+	void portmap(address_map &map) ATTR_COLD;
 };
 
 

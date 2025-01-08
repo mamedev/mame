@@ -43,8 +43,8 @@ public:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	void iskr1031_io(address_map &map);
-	void iskr1031_map(address_map &map);
+	void iskr1031_io(address_map &map) ATTR_COLD;
+	void iskr1031_map(address_map &map) ATTR_COLD;
 };
 
 void iskr103x_state::iskr1031_map(address_map &map)

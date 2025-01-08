@@ -84,9 +84,9 @@ private:
 	required_device<address_map_bank_device> m_soundrom;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	void galspanic_ms_palette(palette_device &palette) const;
 
 	uint32_t screen_update_backgrounds(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -94,9 +94,9 @@ private:
 
 	// comad
 	uint16_t comad_timer_r();
-	void newquiz_map(address_map &map);
-	void sound_map(address_map &map);
-	void soundrom_map(address_map &map);
+	void newquiz_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void soundrom_map(address_map &map) ATTR_COLD;
 
 	uint8_t unk_r()
 	{

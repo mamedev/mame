@@ -294,8 +294,8 @@ protected:
 	void m6809_data_irq(int state);
 	void data_acia_tx_w(int state);
 	void write_acia_clock(int state);
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update_bfcobra(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(timer_irq);
 	INTERRUPT_GEN_MEMBER(vblank_gen);
@@ -308,10 +308,10 @@ protected:
 	inline uint8_t* blitter_get_addr(uint32_t addr);
 	inline void z80_bank(int num, int data);
 
-	void m6809_prog_map(address_map &map);
-	void ramdac_map(address_map &map);
-	void z80_io_map(address_map &map);
-	void z80_prog_map(address_map &map);
+	void m6809_prog_map(address_map &map) ATTR_COLD;
+	void ramdac_map(address_map &map) ATTR_COLD;
+	void z80_io_map(address_map &map) ATTR_COLD;
+	void z80_prog_map(address_map &map) ATTR_COLD;
 
 private:
 	uint8_t m_bank_data[4]{};
@@ -1751,9 +1751,9 @@ public:
 	void bfcobjam_with_dmd(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	uint8_t m_bank_data[4]{};
@@ -1820,9 +1820,9 @@ private:
 	inline uint8_t* blitter_get_addr(uint32_t addr);
 	inline void z8s180_bank(int num, int data);
 
-	void ramdac_map(address_map &map);
-	void z8s180_io_map(address_map &map);
-	void z8s180_prog_map(address_map &map);
+	void ramdac_map(address_map &map) ATTR_COLD;
+	void z8s180_io_map(address_map &map) ATTR_COLD;
+	void z8s180_prog_map(address_map &map) ATTR_COLD;
 };
 
 void bfcobjam_state::init_bfcobjam()

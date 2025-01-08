@@ -35,17 +35,19 @@ namespace {
 // simple class to match codes to strings
 struct code_string_table
 {
+	static inline constexpr u32 SENTINEL = ~u32(0);
+
 	u32 operator[](std::string_view string) const
 	{
-		for (const code_string_table *current = this; current->m_code != ~0; current++)
+		for (const code_string_table *current = this; current->m_code != SENTINEL; current++)
 			if (current->m_string == string)
 				return current->m_code;
-		return ~0;
+		return SENTINEL;
 	}
 
 	const char *operator[](u32 code) const
 	{
-		for (const code_string_table *current = this; current->m_code != ~0; current++)
+		for (const code_string_table *current = this; current->m_code != SENTINEL; current++)
 			if (current->m_code == code)
 				return current->m_string;
 		return nullptr;
@@ -64,56 +66,56 @@ struct code_string_table
 // token strings for device classes
 const code_string_table devclass_token_table[] =
 {
-	{ DEVICE_CLASS_KEYBOARD, "KEYCODE" },
-	{ DEVICE_CLASS_MOUSE,    "MOUSECODE" },
-	{ DEVICE_CLASS_LIGHTGUN, "GUNCODE" },
-	{ DEVICE_CLASS_JOYSTICK, "JOYCODE" },
-	{ ~0U,                   "UNKCODE" }
+	{ DEVICE_CLASS_KEYBOARD,       "KEYCODE" },
+	{ DEVICE_CLASS_MOUSE,          "MOUSECODE" },
+	{ DEVICE_CLASS_LIGHTGUN,       "GUNCODE" },
+	{ DEVICE_CLASS_JOYSTICK,       "JOYCODE" },
+	{ code_string_table::SENTINEL, "UNKCODE" }
 };
 
 // friendly strings for device classes
 const code_string_table devclass_string_table[] =
 {
-	{ DEVICE_CLASS_KEYBOARD, "Kbd" },
-	{ DEVICE_CLASS_MOUSE,    "Mouse" },
-	{ DEVICE_CLASS_LIGHTGUN, "Gun" },
-	{ DEVICE_CLASS_JOYSTICK, "Joy" },
-	{ ~0U,                   "Unk" }
+	{ DEVICE_CLASS_KEYBOARD,       "Kbd" },
+	{ DEVICE_CLASS_MOUSE,          "Mouse" },
+	{ DEVICE_CLASS_LIGHTGUN,       "Gun" },
+	{ DEVICE_CLASS_JOYSTICK,       "Joy" },
+	{ code_string_table::SENTINEL, "Unk" }
 };
 
 // token strings for item modifiers
 const code_string_table modifier_token_table[] =
 {
-	{ ITEM_MODIFIER_REVERSE, "REVERSE" },
-	{ ITEM_MODIFIER_POS,     "POS" },
-	{ ITEM_MODIFIER_NEG,     "NEG" },
-	{ ITEM_MODIFIER_LEFT,    "LEFT" },
-	{ ITEM_MODIFIER_RIGHT,   "RIGHT" },
-	{ ITEM_MODIFIER_UP,      "UP" },
-	{ ITEM_MODIFIER_DOWN,    "DOWN" },
-	{ ~0U,                   "" }
+	{ ITEM_MODIFIER_REVERSE,       "REVERSE" },
+	{ ITEM_MODIFIER_POS,           "POS" },
+	{ ITEM_MODIFIER_NEG,           "NEG" },
+	{ ITEM_MODIFIER_LEFT,          "LEFT" },
+	{ ITEM_MODIFIER_RIGHT,         "RIGHT" },
+	{ ITEM_MODIFIER_UP,            "UP" },
+	{ ITEM_MODIFIER_DOWN,          "DOWN" },
+	{ code_string_table::SENTINEL, "" }
 };
 
 // friendly strings for item modifiers
 const code_string_table modifier_string_table[] =
 {
-	{ ITEM_MODIFIER_REVERSE, "Reverse" },
-	{ ITEM_MODIFIER_POS,     "+" },
-	{ ITEM_MODIFIER_NEG,     "-" },
-	{ ITEM_MODIFIER_LEFT,    "Left" },
-	{ ITEM_MODIFIER_RIGHT,   "Right" },
-	{ ITEM_MODIFIER_UP,      "Up" },
-	{ ITEM_MODIFIER_DOWN,    "Down" },
-	{ ~0U,                   "" }
+	{ ITEM_MODIFIER_REVERSE,       "Reverse" },
+	{ ITEM_MODIFIER_POS,           "+" },
+	{ ITEM_MODIFIER_NEG,           "-" },
+	{ ITEM_MODIFIER_LEFT,          "Left" },
+	{ ITEM_MODIFIER_RIGHT,         "Right" },
+	{ ITEM_MODIFIER_UP,            "Up" },
+	{ ITEM_MODIFIER_DOWN,          "Down" },
+	{ code_string_table::SENTINEL, "" }
 };
 
 // token strings for item classes
 const code_string_table itemclass_token_table[] =
 {
-	{ ITEM_CLASS_SWITCH,     "SWITCH" },
-	{ ITEM_CLASS_ABSOLUTE,   "ABSOLUTE" },
-	{ ITEM_CLASS_RELATIVE,   "RELATIVE" },
-	{ ~0U,                   "" }
+	{ ITEM_CLASS_SWITCH,           "SWITCH" },
+	{ ITEM_CLASS_ABSOLUTE,         "ABSOLUTE" },
+	{ ITEM_CLASS_RELATIVE,         "RELATIVE" },
+	{ code_string_table::SENTINEL, "" }
 };
 
 // token strings for standard item ids
@@ -351,7 +353,7 @@ const code_string_table itemid_token_table[] =
 	{ ITEM_ID_ADD_RELATIVE15,"ADDREL15" },
 	{ ITEM_ID_ADD_RELATIVE16,"ADDREL16" },
 
-	{ ~0U,                   nullptr }
+	{ code_string_table::SENTINEL, nullptr }
 };
 
 
@@ -696,7 +698,7 @@ std::string input_manager::code_to_token(input_code code) const
 
 	// determine the devclass part
 	const char *devclass = (*devclass_token_table)[code.device_class()];
-	if (devclass == nullptr)
+	if (!devclass)
 		return "INVALID";
 
 	// determine the devindex part; keyboard 0 doesn't show an index
@@ -754,8 +756,8 @@ input_code input_manager::code_from_token(std::string_view _token)
 
 	// first token should be the devclass
 	int curtok = 0;
-	input_device_class devclass = input_device_class((*devclass_token_table)[token[curtok++]]);
-	if (devclass == ~input_device_class(0))
+	input_device_class const devclass = input_device_class((*devclass_token_table)[token[curtok++]]);
+	if (devclass == input_device_class(code_string_table::SENTINEL))
 		return INPUT_CODE_INVALID;
 
 	// second token might be index; look for number
@@ -770,26 +772,28 @@ input_code input_manager::code_from_token(std::string_view _token)
 
 	// next token is the item ID
 	input_item_id itemid = input_item_id((*itemid_token_table)[token[curtok]]);
-	bool standard = (itemid != ~input_item_id(0));
+	bool const standard = (itemid != input_item_id(code_string_table::SENTINEL));
 
-	// if we're a standard code, default the itemclass based on it
 	input_item_class itemclass = ITEM_CLASS_INVALID;
 	if (standard)
+	{
+		// if we're a standard code, default the itemclass based on it
 		itemclass = m_class[devclass]->standard_item_class(itemid);
-
-	// otherwise, keep parsing
+	}
 	else
 	{
+		// otherwise, keep parsing
+
 		// if this is an invalid device, we have nothing to look up
 		input_device *device = m_class[devclass]->device(devindex);
-		if (device == nullptr)
+		if (!device)
 			return INPUT_CODE_INVALID;
 
 		// if not a standard code, look it up in the device specific codes
 		for (itemid = ITEM_ID_FIRST_VALID; itemid <= device->maxitem(); ++itemid)
 		{
 			input_device_item *item = device->item(itemid);
-			if (item != nullptr && token[curtok].compare(item->token()) == 0)
+			if (item && !token[curtok].compare(item->token()))
 			{
 				// take the itemclass from the item
 				itemclass = item->itemclass();
@@ -808,7 +812,7 @@ input_code input_manager::code_from_token(std::string_view _token)
 	if (curtok < numtokens)
 	{
 		modifier = input_item_modifier((*modifier_token_table)[token[curtok]]);
-		if (modifier != ~input_item_modifier(0))
+		if (modifier != input_item_modifier(code_string_table::SENTINEL))
 			curtok++;
 		else
 			modifier = ITEM_MODIFIER_NONE;
@@ -817,8 +821,8 @@ input_code input_manager::code_from_token(std::string_view _token)
 	// if we have another token, it is the item class
 	if (curtok < numtokens)
 	{
-		u32 temp = (*itemclass_token_table)[token[curtok]];
-		if (temp != ~0)
+		u32 const temp = (*itemclass_token_table)[token[curtok]];
+		if (temp != code_string_table::SENTINEL)
 		{
 			curtok++;
 			itemclass = input_item_class(temp);
@@ -841,7 +845,7 @@ input_code input_manager::code_from_token(std::string_view _token)
 
 const char *input_manager::standard_token(input_item_id itemid) const
 {
-	return itemid <= ITEM_ID_MAXIMUM ? (*itemid_token_table)[itemid] : nullptr;
+	return (itemid <= ITEM_ID_MAXIMUM) ? (*itemid_token_table)[itemid] : nullptr;
 }
 
 
@@ -1209,8 +1213,8 @@ bool input_manager::map_device_to_controller(const devicemap_table &table)
 			return false;
 
 		// first token should be the devclass
-		input_device_class devclass = input_device_class((*devclass_token_table)[strmakeupper(token[0])]);
-		if (devclass == ~input_device_class(0))
+		input_device_class const devclass = input_device_class((*devclass_token_table)[strmakeupper(token[0])]);
+		if (devclass == input_device_class(code_string_table::SENTINEL))
 			return false;
 
 		// second token should be the devindex

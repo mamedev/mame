@@ -33,8 +33,8 @@ public:
 	void konmedalppc(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<ppc_device> m_maincpu;
@@ -44,8 +44,8 @@ private:
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void main_map(address_map &map);
-	void ymz280b_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void ymz280b_map(address_map &map) ATTR_COLD;
 
 	u16 ata_r(offs_t offset, u16 mem_mask);
 	void ata_w(offs_t offset, u16 data, u16 mem_mask);

@@ -34,7 +34,6 @@ public:
 	auto virq_wr_callback() { return m_write_virq.bind(); }
 	auto keydown_wr_callback() { return m_write_keydown.bind(); }
 	auto halt_wr_callback() { return m_write_halt.bind(); }
-	auto data_wr_callback() { return m_write_data.bind(); }
 
 	uint16_t read(offs_t offset);
 	void write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -43,9 +42,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// device_z80daisy_interface overrides
 	virtual int z80daisy_irq_state() override;
@@ -61,7 +60,6 @@ private:
 	devcb_write_line m_write_virq;
 	devcb_write_line m_write_keydown;
 	devcb_write_line m_write_halt;
-	devcb_write8 m_write_data;
 
 	uint8_t m_rxrdy;
 

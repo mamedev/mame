@@ -4,7 +4,8 @@
 license:CC0-1.0
 -->
 <softwarelist name="psion1" description="Psion Organiser I Datapack">
-	<software name="financep" supported="no">
+
+	<software name="finance" supported="no">
 		<description>Finance Pack</description>
 		<year>1984</year>
 		<publisher>Psion</publisher>
@@ -16,7 +17,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="linkup" supported="no">
-		<description>Link Up Pack</description>
+		<description>Link-Up Pack</description>
 		<year>1984</year>
 		<publisher>Psion</publisher>
 		<part name="cart" interface="psion_pack">
@@ -26,7 +27,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="mathspac" supported="no">
+	<software name="maths" supported="no">
 		<description>Maths Pack</description>
 		<year>198?</year>
 		<publisher>Psion</publisher>
@@ -37,7 +38,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="sciencep" supported="no">
+	<software name="science" supported="no">
 		<description>Science Pack</description>
 		<year>1984</year>
 		<publisher>Psion</publisher>
@@ -46,14 +47,20 @@ license:CC0-1.0
 				<rom name="science1.op1" size="16390" crc="374728d0" sha1="55f1e1517640d694e05102d72dd01f2dcb852664" />
 			</dataarea>
 		</part>
-		<part name="cart2" interface="psion_pack">
+	</software>
+
+	<software name="sciencea" cloneof="science" supported="no">
+		<description>Science Pack (alt)</description>
+		<year>1984</year>
+		<publisher>Psion</publisher>
+		<part name="cart1" interface="psion_pack">
 			<dataarea name="rom" size="16390">
 				<rom name="science2.op1" size="16390" crc="6f9a3006" sha1="0f33b5f413fc658dc5c33623845e8236374cea0f" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="softpack" supported="no">
+	<software name="software" supported="no">
 		<description>Software Pack</description>
 		<year>198?</year>
 		<publisher>Psion</publisher>
@@ -64,7 +71,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="utilityp" supported="no">
+	<software name="utility" supported="no">
 		<description>Utility Pack</description>
 		<year>1984</year>
 		<publisher>Psion</publisher>
@@ -73,7 +80,13 @@ license:CC0-1.0
 				<rom name="utility1.op1" size="8198" crc="62460a38" sha1="ca299aebdafa5d80d6e6f838e0d4de5900db511d" />
 			</dataarea>
 		</part>
-		<part name="cart2" interface="psion_pack">
+	</software>
+
+	<software name="utilitya" cloneof="utility" supported="no">
+		<description>Utility Pack (alt)</description>
+		<year>1984</year>
+		<publisher>Psion</publisher>
+		<part name="cart1" interface="psion_pack">
 			<dataarea name="rom" size="8105">
 				<rom name="utility2.op1" size="8105" crc="5fded4c4" sha1="65f44d0ce0885fbbb219b3cdc2f48269a997b4f5" />
 			</dataarea>

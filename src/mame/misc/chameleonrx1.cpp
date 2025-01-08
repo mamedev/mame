@@ -34,7 +34,7 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 
-	void chameleonrx1_map(address_map &map);
+	void chameleonrx1_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -76,4 +76,4 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 2003, chamrx1,  0,   chameleonrx1, chameleonrx1, chameleonrx1_state, empty_init, ROT0, "Digital Sunnil (Covielsa license)", "Chameleon RX-1",  MACHINE_IS_SKELETON )
+GAME( 2003, chamrx1,  0,   chameleonrx1, chameleonrx1, chameleonrx1_state, empty_init, ROT0, "Digital Sunnil (Covielsa license)", "Chameleon RX-1",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

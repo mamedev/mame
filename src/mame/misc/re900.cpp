@@ -119,8 +119,8 @@ private:
 	void re_mux_port_A_w(uint8_t data);
 	void re_mux_port_B_w(uint8_t data);
 
-	void mem_io(address_map &map);
-	void mem_prg(address_map &map);
+	void mem_io(address_map &map) ATTR_COLD;
+	void mem_prg(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 

@@ -58,7 +58,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	device_neogeo_control_port_interface *m_device;
 };
@@ -105,7 +105,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	device_neogeo_ctrl_edge_interface *m_device;
 };

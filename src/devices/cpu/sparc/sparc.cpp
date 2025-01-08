@@ -1211,17 +1211,6 @@ uint32_t sparc_base_device::execute_max_cycles() const noexcept
 
 
 //-------------------------------------------------
-//  execute_input_lines - return the number of
-//  input/interrupt lines
-//-------------------------------------------------
-
-uint32_t sparc_base_device::execute_input_lines() const noexcept
-{
-	return 16;
-}
-
-
-//-------------------------------------------------
 //  execute_set_input - set the state of an input
 //  line during execution
 //-------------------------------------------------
@@ -4291,13 +4280,13 @@ void sparcv8_device::execute_mul(uint32_t op)
 	uint32_t result = 0;
 	if (UMUL || UMULCC)
 	{
-		uint64_t dresult = (uint64_t)RS1REG * (uint64_t)operand2;
+		uint64_t dresult = mulu_32x32(RS1REG, operand2);
 		Y = (uint32_t)(dresult >> 32);
 		result = (uint32_t)dresult;
 	}
 	else if (SMUL || SMULCC)
 	{
-		int64_t dresult = (int64_t)(int32_t)RS1REG * (int64_t)(int32_t)operand2;
+		int64_t dresult = mul_32x32(RS1REG, operand2);
 		Y = (uint32_t)(dresult >> 32);
 		result = (uint32_t)dresult;
 	}
@@ -4482,19 +4471,22 @@ void sparc_base_device::run_loop()
 		    continue;
 		}*/
 
-		if (CHECK_DEBUG)
-			debugger_instruction_hook(PC);
-
 		if (MODE == MODE_RESET)
 		{
+			if (CHECK_DEBUG)
+				debugger_wait_hook();
 			reset_step();
 		}
 		else if (MODE == MODE_ERROR)
 		{
+			if (CHECK_DEBUG)
+				debugger_wait_hook();
 			error_step();
 		}
 		else if (MODE == MODE_EXECUTE)
 		{
+			if (CHECK_DEBUG)
+				debugger_instruction_hook(PC);
 			execute_step();
 		}
 

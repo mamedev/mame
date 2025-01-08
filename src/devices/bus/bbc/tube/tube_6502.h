@@ -12,12 +12,14 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_BBC_TUBE_TUBE_6502_H
+#define MAME_BUS_BBC_TUBE_TUBE_6502_H
 
-#ifndef MAME_BUS_BBC_TUBE_6502_H
-#define MAME_BUS_BBC_TUBE_6502_H
+#pragma once
 
 #include "tube.h"
-#include "cpu/m6502/m65sc02.h"
+#include "cpu/m6502/g65sc02.h"
+#include "cpu/m6502/r65c02.h"
 #include "machine/ram.h"
 #include "machine/tube.h"
 
@@ -39,14 +41,14 @@ protected:
 	bbc_tube_6502_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
-	void tube_6502_mem(address_map &map);
+	void tube_6502_mem(address_map &map) ATTR_COLD;
 
 	virtual uint8_t host_r(offs_t offset) override;
 	virtual void host_w(offs_t offset, uint8_t data) override;
@@ -71,11 +73,11 @@ public:
 
 protected:
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual const tiny_rom_entry* device_rom_region() const override;
 
 private:
-	void tube_6502p_mem(address_map& map);
+	void tube_6502p_mem(address_map &map) ATTR_COLD;
 };
 
 
@@ -86,14 +88,14 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 private:
-	void tube_6502e_mem(address_map &map);
+	void tube_6502e_mem(address_map &map) ATTR_COLD;
 
 	uint8_t ram_r(offs_t offset);
 	void ram_w(offs_t offset, uint8_t data);
@@ -111,8 +113,8 @@ public:
 
 protected:
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
 
@@ -122,5 +124,4 @@ DECLARE_DEVICE_TYPE(BBC_TUBE_6502P, bbc_tube_6502p_device)
 DECLARE_DEVICE_TYPE(BBC_TUBE_6502E, bbc_tube_6502e_device)
 DECLARE_DEVICE_TYPE(BBC_TUBE_65C102, bbc_tube_65c102_device)
 
-
-#endif /* MAME_BUS_BBC_TUBE_6502_H */
+#endif // MAME_BUS_BBC_TUBE_TUBE_6502_H

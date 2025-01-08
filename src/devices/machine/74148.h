@@ -40,8 +40,8 @@
 
 *****************************************************************************/
 
-#ifndef MAME_DEVICES_MACHINE_74148_H
-#define MAME_DEVICES_MACHINE_74148_H
+#ifndef MAME_MACHINE_74148_H
+#define MAME_MACHINE_74148_H
 
 #pragma once
 
@@ -64,8 +64,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 private:
 	// internal state
 	devcb_write8 m_output_cb;

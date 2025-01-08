@@ -79,18 +79,19 @@ TODO:
  *   - Super Mario Fushigi No JanJanLand (c) 2005
 
     Medalusion 2:
- !   - Doko Demo Issho Toro's Fishing (c) 2006
+ *!  - Doko Demo Issho Toro's Fishing (c) 2006
  *   - Pingu's Ice Block (c) 2005
-     - Geki Makaimura (c) 2005
- !   - Won! Tertainment Happy Channel (c) 2008 note: main board is different, uses Yamaha YMZ770C
+ !   - Geki Makaimura (c) 2005
+ *!  - Won! Tertainment Happy Channel (c) 2008 note: main board is different, uses Yamaha YMZ770C
                                                      instead of YMZ770B
     Not medal machines:
      - Rockman EXE Battle Chip Stadium (c) 2006
      - Rockman EXE Battle Chip Stadium Ver.2 (c) 2006
 *    - Rockman EXE Battle Chip Stadium Ver.3.00 (c) 2006
 
- * - dumped
- ! - CF card dumped, boot roms missing
+ *  - dumped
+ *! - CF card dumped, boot roms missing
+ !  - Boot ROMs dumped, CF card missing
 
 **************************************************************************************************/
 
@@ -143,8 +144,8 @@ private:
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void alien_map(address_map &map);
-	void masmario2_map(address_map &map);
+	void alien_map(address_map &map) ATTR_COLD;
+	void masmario2_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<sh4_device> m_maincpu;
@@ -158,8 +159,8 @@ private:
 	required_ioport m_io_in0;
 	required_ioport m_io_in1;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	template <unsigned N> void gpu_irq_w(int state);
 	INTERRUPT_GEN_MEMBER(sio_irq_w);
@@ -622,8 +623,8 @@ ROM_END
 // CF card only dumped, boot ROMs is missing
 ROM_START( dokodemo )
 	ROM_REGION32_LE( 0x1000000, "maincpu", 0 ) // BIOS code
-	ROM_LOAD32_WORD( "ic30", 0x000000, 0x400000, BAD_DUMP CRC(6b2d2ef1) SHA1(0db6490b40c5716c1271b7f99608e8c7ad916516) ) //
-	ROM_LOAD32_WORD( "ic33", 0x000002, 0x400000, BAD_DUMP CRC(64049fc3) SHA1(b373b2c8cb4d66b9c700e0542bd26444484fae40) ) // modified boot roms from dkbanans
+	ROM_LOAD32_WORD( "ic30", 0x000000, 0x400000, BAD_DUMP CRC(74687757) SHA1(96b6e3725bcf16e92c6966f9b9ce93cfdd7ba641) ) // needs verification if this game really use same boot ROMs as pingu/gekimaka
+	ROM_LOAD32_WORD( "ic33", 0x000002, 0x400000, BAD_DUMP CRC(ba2e6716) SHA1(49c5abb9d96e3f4a78ed4dced7a9f052a96b186d) ) //
 
 	ROM_REGION( 0x800100, "ymz770_flash1", ROMREGION_ERASEFF ) //sound samples flash rom, not really needed, programmed by boot loader
 	ROM_LOAD16_WORD_SWAP( "flash1", 0x000000, 0x800000, BAD_DUMP CRC(dda4879f) SHA1(4aa06247ca674e86be6c111db7f6abf1ed6e121d) )
@@ -633,6 +634,24 @@ ROM_START( dokodemo )
 
 	DISK_REGION( "ata:0:cfcard" )
 	DISK_IMAGE( "dokodemo", 0, SHA1(0c786b6857a29b26971578abe1c8439fe43d94b5) )
+ROM_END
+
+// only boot loader ROMs dumped, actual game CF card is missing
+ROM_START( gekimaka )
+	ROM_REGION32_LE( 0x1000000, "maincpu", 0 ) // BIOS code
+	ROM_LOAD32_WORD( "stm_04.ic30", 0x000000, 0x400000, CRC(74687757) SHA1(96b6e3725bcf16e92c6966f9b9ce93cfdd7ba641) )
+	ROM_LOAD32_WORD( "stm_05.ic33", 0x000002, 0x400000, CRC(ba2e6716) SHA1(49c5abb9d96e3f4a78ed4dced7a9f052a96b186d) )
+
+	ROM_REGION( 0x800100, "ymz770_flash1", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x800000, "ymz770", 0 )
+	ROM_COPY( "ymz770_flash1", 0, 0, 0x800000 )
+
+	ROM_REGION( 0x8000, "m48t35", 0 )
+	ROM_LOAD( "ic26", 0x000000, 0x008000, CRC(da921265) SHA1(c4a2d79d834c0333218c7a4853a8e4167036955a) )
+
+	DISK_REGION( "ata:0:cfcard" )
+	DISK_IMAGE( "gekimaka", 0, NO_DUMP )
 ROM_END
 
 ROM_START( pingu )
@@ -653,8 +672,8 @@ ROM_END
 // CF card only dumped, boot ROMs is missing
 ROM_START( wontame )
 	ROM_REGION32_LE( 0x1000000, "maincpu", 0 ) // BIOS code
-	ROM_LOAD32_WORD( "ic30", 0x000000, 0x400000, BAD_DUMP CRC(6b2d2ef1) SHA1(0db6490b40c5716c1271b7f99608e8c7ad916516) ) //
-	ROM_LOAD32_WORD( "ic33", 0x000002, 0x400000, BAD_DUMP CRC(64049fc3) SHA1(b373b2c8cb4d66b9c700e0542bd26444484fae40) ) // modified boot roms from dkbanans
+	ROM_LOAD32_WORD( "ic30", 0x000000, 0x400000, BAD_DUMP CRC(74687757) SHA1(96b6e3725bcf16e92c6966f9b9ce93cfdd7ba641) ) // needs verification if this game really use same boot ROMs as pingu/gekimaka
+	ROM_LOAD32_WORD( "ic33", 0x000002, 0x400000, BAD_DUMP CRC(ba2e6716) SHA1(49c5abb9d96e3f4a78ed4dced7a9f052a96b186d) ) //
 
 	ROM_REGION( 0x800100, "ymz770_flash1", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "flash1", 0x000000, 0x800000, BAD_DUMP CRC(056e982e) SHA1(4b29218b00d7023c0b748aae13752f0c12539750) )
@@ -698,6 +717,7 @@ GAME( 2004, mmaruchana,mmaruchan,alien,     alien,   alien_state, empty_init,   
 GAME( 2005, rockmanmdl,0,        alien,     alien,   alien_state, empty_init,    ROT0, "Capcom",               "Rockman EXE The Medal Operation", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 // Medalusion 2
 GAME( 2006, dokodemo,  0,        alien,     alien,   alien_state, empty_init,    ROT0, "Sony / Capcom",        "Doko Demo Issho: Toro's Fishing (Ver.1.00, 2006/06/07)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2005, gekimaka,  0,        alien,     alien,   alien_state, empty_init,    ROT0, "Capcom",               "Geki Makaimura", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2006, pingu,     0,        alien,     alien,   alien_state, empty_init,    ROT0, "Pygos Group / Capcom", "Pingu's Ice Block (Ver.1.00 2006/01/27)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2008, wontame,   0,        alien,     wontame, alien_state, empty_init,    ROT0, "Capcom / Tomy",        "Won! Tertainment Happy Channel (Ver.1.00E 2008/02/21)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 // not medal machines

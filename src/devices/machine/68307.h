@@ -36,9 +36,9 @@ protected:
 	class m68307_mbus;
 	class m68307_timer;
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	void reset_peripherals(int state);
@@ -69,8 +69,8 @@ private:
 	uint8_t m68307_internal_mbus_r(offs_t offset);
 	void m68307_internal_mbus_w(offs_t offset, uint8_t data);
 
-	void internal_map(address_map &map);
-	void cpu_space_map(address_map &map);
+	void internal_map(address_map &map) ATTR_COLD;
+	void cpu_space_map(address_map &map) ATTR_COLD;
 
 	devcb_write_line m_write_irq, m_write_a_tx, m_write_b_tx;
 	devcb_read8 m_read_inport;

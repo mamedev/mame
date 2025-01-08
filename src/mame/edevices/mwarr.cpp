@@ -80,15 +80,15 @@ private:
 
 	void oki1_bank_w(uint16_t data);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	uint32_t screen_update_mwarr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<edevices_device> m_video;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void mwarr_map(address_map &map);
-	void oki2_map(address_map &map);
+	void mwarr_map(address_map &map) ATTR_COLD;
+	void oki2_map(address_map &map) ATTR_COLD;
 };
 
 /*************************************
@@ -169,7 +169,7 @@ static INPUT_PORTS_START( mwarr )
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_CUSTOM ) // otherwise it doesn't boot (is service switch on stlforce)
 	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -415,4 +415,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 199?, mwarr, 0, mwarr, mwarr, mwarr_state, empty_init, ROT0,  "Elettronica Video-Games S.R.L.", "Mighty Warriors (24/1)", MACHINE_SUPPORTS_SAVE )
+GAME( 199?, mwarr, 0, mwarr, mwarr, mwarr_state, empty_init, ROT0,  "Elettronica Video-Games", "Mighty Warriors (24/1)", MACHINE_SUPPORTS_SAVE )

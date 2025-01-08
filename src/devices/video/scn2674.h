@@ -42,8 +42,8 @@ public:
 protected:
 	scn2674_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool extend_addressing);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual space_config_vector memory_space_config() const override;
 
@@ -124,7 +124,7 @@ protected:
 
 	void recompute_parameters();
 
-	void scn2674_vram(address_map &map);
+	void scn2674_vram(address_map &map) ATTR_COLD;
 
 	draw_character_delegate m_display_cb;
 	emu_timer *m_scanline_timer;

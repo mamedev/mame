@@ -219,6 +219,7 @@ void ps2_fdc_device::set_mode(mode_t _mode)
 void upd765_family_device::device_start()
 {
 	save_item(NAME(selected_drive));
+	save_item(NAME(drive_busy));
 
 	for(int i=0; i != 4; i++) {
 		char name[2];
@@ -505,11 +506,12 @@ uint8_t upd765_family_device::msr_r()
 		msr |= MSR_RQM|MSR_DIO|MSR_CB;
 		break;
 	}
-	for(int i=0; i<4; i++)
+	for(int i=0; i<4; i++) {
 		if(flopi[i].main_state == RECALIBRATE || flopi[i].main_state == SEEK) {
 			msr |= 1<<i;
 			//msr |= MSR_CB;
 		}
+	}
 	msr |= get_drive_busy();
 
 	return msr;
@@ -712,7 +714,7 @@ uint8_t upd765_family_device::fifo_pop(bool internal)
 	if(!fifo_write && !fifo_pos)
 		disable_transfer();
 	int thr = fifocfg & FIF_THR;
-	if(fifo_write && fifo_expected && (fifo_pos <= thr || (fifocfg & FIF_DIS)))
+	if(fifo_write && fifo_expected && (fifo_pos <= thr || (fifocfg & FIF_DIS)) && !tc_done)
 		enable_transfer();
 	return r;
 }
@@ -1585,8 +1587,10 @@ void upd765_family_device::command_end(floppy_info &fi, bool data_completion)
 	LOGDONE("command done (%s) - %s\n", data_completion ? "data" : "seek", results());
 	fi.main_state = fi.sub_state = IDLE;
 	irq = true;
-	if(!data_completion)
+	if(!data_completion) {
 		fi.st0_filled = true;
+		drive_busy |= (1 << fi.id);
+	}
 	check_irq();
 }
 
@@ -1611,8 +1615,13 @@ void upd765_family_device::recalibrate_start(floppy_info &fi)
 	fi.dir = 1;
 	fi.counter = recalibrate_steps;
 	fi.ready = get_ready(command[1] & 3);
-	fi.st0 = (fi.ready ? 0 : ST0_NR);
-	seek_continue(fi);
+	fi.st0 = command[1] & 7;
+	if(fi.ready) {
+		seek_continue(fi);
+	} else {
+		fi.st0 |= ST0_NR | ST0_FAIL | ST0_SE;
+		command_end(fi, false);
+	}
 }
 
 void upd765_family_device::seek_start(floppy_info &fi)
@@ -1622,8 +1631,13 @@ void upd765_family_device::seek_start(floppy_info &fi)
 	fi.sub_state = SEEK_WAIT_STEP_TIME_DONE;
 	fi.dir = fi.pcn > command[2] ? 1 : 0;
 	fi.ready = get_ready(command[1] & 3);
-	fi.st0 = (fi.ready ? 0 : ST0_NR);
-	seek_continue(fi);
+	fi.st0 = command[1] & 7;
+	if(fi.ready) {
+		seek_continue(fi);
+	} else {
+		fi.st0 |= ST0_NR | ST0_FAIL | ST0_SE;
+		command_end(fi, false);
+	}
 }
 
 void upd765_family_device::delay_cycles(floppy_info &fi, int cycles)
@@ -1858,12 +1872,6 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 
 		case SCAN_ID:
 			LOGSTATE("SCAN_ID\n");
-			if(cur_live.crc) {
-				fi.st0 |= ST0_FAIL;
-				st1 |= ST1_DE|ST1_ND;
-				fi.sub_state = COMMAND_DONE;
-				break;
-			}
 			// MZ: This st1 handling ensures that both HX5102 floppy and the
 			// Speedlock protection scheme are properly working.
 			// a) HX5102 requires that the ND flag not be set when no address
@@ -1884,6 +1892,13 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 				LOGSTATE("SEARCH_ADDRESS_MARK_HEADER\n");
 				live_start(fi, SEARCH_ADDRESS_MARK_HEADER);
 				return;
+			}
+			if(cur_live.crc) {
+				fi.st0 |= ST0_FAIL;
+				st1 |= ST1_DE;
+				st1 &= ~ST1_ND;
+				fi.sub_state = COMMAND_DONE;
+				break;
 			}
 			st1 &= ~ST1_ND;
 			st2 &= ~ST2_WC;
@@ -2563,7 +2578,7 @@ TIMER_CALLBACK_MEMBER(upd765_family_device::run_drive_ready_polling)
 			LOGCOMMAND("polled %d : %d -> %d\n", fid, flopi[fid].ready, ready);
 			flopi[fid].ready = ready;
 			if(!flopi[fid].st0_filled) {
-				flopi[fid].st0 = ST0_ABRT | fid;
+				flopi[fid].st0 = ST0_ABRT | fid | (ready ? 0 : ST0_NR);
 				flopi[fid].st0_filled = true;
 				irq = true;
 			}
@@ -2811,7 +2826,6 @@ void i82072_device::device_start()
 	save_item(NAME(motorcfg));
 	save_item(NAME(motor_off_counter));
 	save_item(NAME(motor_on_counter));
-	save_item(NAME(drive_busy));
 	save_item(NAME(delayed_command));
 }
 
@@ -2975,31 +2989,16 @@ void i82072_device::execute_command(int cmd)
 	}
 }
 
-/*
- * The Intel datasheet says that the drive busy bits in the MSR are supposed to remain
- * set after a seek or recalibrate until a sense interrupt status status command is
- * executed. The InterPro 2000 diagnostic routine goes further, and tests the drive
- * status bits before and after the first sense interrupt status result byte is read,
- * and expects the drive busy bit to clear only after.
- *
- * The Amstrad CPC6128 uses a upd765a and seems to expect the busy bits to be cleared
- * immediately after the seek/recalibrate interrupt is generated.
- *
- * Special casing the i82072 here seems the only way to reconcile this apparently
- * different behaviour for now.
- */
 void i82072_device::command_end(floppy_info &fi, bool data_completion)
 {
-	if(!data_completion)
-		drive_busy |= (1 << fi.id);
-
 	// set motor off counter
 	if(motorcfg)
 		motor_off_counter = (2 + ((motorcfg & MOFF) >> 4)) << (motorcfg & HSDA ? 1 : 0);
 
 	// clear existing interrupt sense data
-	for(floppy_info &fi : flopi)
+	for(floppy_info &fi : flopi) {
 		fi.st0_filled = false;
+	}
 
 	upd765_family_device::command_end(fi, data_completion);
 }

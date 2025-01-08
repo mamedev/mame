@@ -31,10 +31,10 @@ private:
 	void asn_w(u8 data);
 	void g_w(u8 data);
 
-	void master_prog(address_map &map);
-	void master_ext(address_map &map);
-	void slave_prog(address_map &map);
-	void slave_ext(address_map &map);
+	void master_prog(address_map &map) ATTR_COLD;
+	void master_ext(address_map &map) ATTR_COLD;
+	void slave_prog(address_map &map) ATTR_COLD;
+	void slave_ext(address_map &map) ATTR_COLD;
 
 	required_device<mcs51_cpu_device> m_master;
 	required_device<mcs51_cpu_device> m_slave;
@@ -141,4 +141,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1984, sx240, 0, 0, sx240, sx240, kawai_sx240_state, empty_init, "Kawai Musical Instrument Manufacturing", "SX-240 8-Voice Programmable Polyphonic Synthesizer", MACHINE_IS_SKELETON)
+SYST(1984, sx240, 0, 0, sx240, sx240, kawai_sx240_state, empty_init, "Kawai Musical Instrument Manufacturing", "SX-240 8-Voice Programmable Polyphonic Synthesizer", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

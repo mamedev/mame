@@ -116,8 +116,8 @@ protected:
 
 	h8_timer16_channel_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	void update_counter(u64 cur_time = 0);
 	void recalc_event(u64 cur_time = 0);
@@ -158,8 +158,8 @@ protected:
 	virtual void isr_update(u8 value) override;
 	virtual u8 isr_to_sr() const override;
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	u8 m_tcsr;
@@ -271,7 +271,7 @@ protected:
 	u8 m_default_tstr;
 	u8 m_tstr;
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset_after_children() override;
 };
 

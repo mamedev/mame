@@ -60,12 +60,12 @@ public:
 protected:
 	virtual tiny_rom_entry const *device_rom_region() const override { return ROM_NAME(sms_diy_paddle); }
 	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(sms_diy_paddle); }
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 private:
-	void program_map(address_map &map);
-	void data_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
+	void data_map(address_map &map) ATTR_COLD;
 
 	u8 portb_in();
 	u8 portc_in();

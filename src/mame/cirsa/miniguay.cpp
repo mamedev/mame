@@ -90,7 +90,7 @@ public:
 	void miniguay(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void psg_control_w(u8 data);
@@ -100,7 +100,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ay8910_device> m_psg;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	u8 m_psg_control;
 	u8 m_psg_data;
@@ -216,4 +216,4 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1986, miniguay, 0, miniguay, miniguay, miniguay_state, empty_init, ROT0, "Cirsa", "Mini Guay VD", MACHINE_IS_SKELETON_MECHANICAL ) // VD stands for "Version Displays".
+GAME( 1986, miniguay, 0, miniguay, miniguay, miniguay_state, empty_init, ROT0, "Cirsa", "Mini Guay VD", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // VD stands for "Version Displays".

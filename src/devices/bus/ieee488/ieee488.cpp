@@ -421,11 +421,13 @@ void cbm_ieee488_devices(device_slot_interface &device)
 
 // slot devices
 #include "hp9122c.h"
+#include "hp9133.h"
 #include "hp9895.h"
 
 void hp_ieee488_devices(device_slot_interface &device)
 {
 	device.option_add("hp9122c", HP9122C);
+	device.option_add("hp9133", HP9133);
 	device.option_add("hp9895", HP9895);
 }
 

@@ -61,8 +61,8 @@ public:
 	void jeutel(machine_config &config);
 
 private:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	u8 portb_r();
 	void porta_w(u8 data);
 	void ppi0a_w(u8 data) { m_row = data; }
@@ -79,10 +79,10 @@ private:
 	void tminc_w(u8);
 	u8 tmdata_r();
 	void clock_w(int state);
-	void cpu2_map(address_map &map);
-	void audio_main_map(address_map &map);
-	void audio_io_map(address_map &map);
-	void main_map(address_map &map);
+	void cpu2_map(address_map &map) ATTR_COLD;
+	void audio_main_map(address_map &map) ATTR_COLD;
+	void audio_io_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 
 	u8 m_sndcmd = 0U;
 	u8 m_digit = 0U;
@@ -534,5 +534,5 @@ ROM_START(olympic)
 ROM_END
 
 
-GAME( 1983, leking,  0, jeutel, jeutel, jeutel_state, empty_init, ROT0, "Jeutel", "Le King",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, olympic, 0, jeutel, jeutel, jeutel_state, empty_init, ROT0, "Jeutel", "Olympic Games", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, leking,  0, jeutel, jeutel, jeutel_state, empty_init, ROT0, "Jeutel", "Le King",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, olympic, 0, jeutel, jeutel, jeutel_state, empty_init, ROT0, "Jeutel", "Olympic Games", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )

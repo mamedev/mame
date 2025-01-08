@@ -207,7 +207,7 @@ authors:hap
 		<!-- leds -->
 		<repeat count="8">
 			<param name="y" start="8.3" increment="10" />
-			<param name="i2" start="15" increment="-1" />
+			<param name="i2" start="8" increment="1" />
 
 			<repeat count="8">
 				<param name="x" start="0.2" increment="10" />
@@ -450,7 +450,7 @@ authors:hap
 
 		<repeat count="7">
 			<param name="y" start="20.5" increment="8.75" />
-			<param name="mask" start="0x40" rshift="1" />
+			<param name="mask" start="0x02" lshift="1" />
 			<element ref="hlb" inputtag="IN.0" inputmask="~mask~"><bounds x="87" y="~y~" width="8" height="4" /><color alpha="0.4" /></element>
 		</repeat>
 
@@ -458,7 +458,7 @@ authors:hap
 		<element ref="white"><bounds x="87.3" y="9.3" width="7.4" height="3.4" /></element>
 		<element ref="text_t81"><bounds x="87.5" y="9.5" width="7.0" height="1.5" /></element>
 		<element ref="text_t82"><bounds x="87.5" y="11" width="7.0" height="1.5" /></element>
-		<element ref="hlb" inputtag="IN.0" inputmask="0x80"><bounds x="87" y="9" width="8" height="4" /><color alpha="0.4" /></element>
+		<element ref="hlb" inputtag="IN.0" inputmask="0x01"><bounds x="87" y="9" width="8" height="4" /><color alpha="0.4" /></element>
 
 	</view>
 </mamelayout>

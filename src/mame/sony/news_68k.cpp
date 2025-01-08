@@ -82,12 +82,12 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// address maps
-	void cpu_map(address_map &map);
-	void cpu_autovector_map(address_map &map);
+	void cpu_map(address_map &map) ATTR_COLD;
+	void cpu_autovector_map(address_map &map) ATTR_COLD;
 
 	// machine config
 	void common(machine_config &config);
@@ -425,6 +425,8 @@ void news_68k_state::common(machine_config &config)
 	m_vram->set_default_size("1MiB");
 	m_vram->set_default_value(0);
 #endif
+
+	SOFTWARE_LIST(config, "software_list").set_original("sony_news").set_filter("CISC");
 }
 
 void news_68k_state::nws1580(machine_config &config)

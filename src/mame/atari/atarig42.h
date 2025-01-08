@@ -34,8 +34,8 @@ public:
 	{ }
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	void video_int_ack_w(uint16_t data = 0);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_update);
 	void a2d_select_w(offs_t offset, uint8_t data);
@@ -45,9 +45,9 @@ protected:
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	TILEMAP_MAPPER_MEMBER(atarig42_playfield_scan);
-	uint32_t screen_update_atarig42(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void atarig42(machine_config &config);
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	required_device<atari_jsa_iii_device> m_jsa;
 
@@ -57,6 +57,8 @@ protected:
 	required_device<asic65_device> m_asic65;
 	optional_device<adc0808_device> m_adc;
 
+	required_shared_ptr<uint16_t> m_mo_command;
+
 	uint16_t          m_playfield_base = 0;
 
 	uint16_t          m_current_control = 0;
@@ -65,12 +67,10 @@ protected:
 	uint16_t          m_playfield_xscroll = 0;
 	uint16_t          m_playfield_yscroll = 0;
 
-	required_shared_ptr<uint16_t> m_mo_command;
-
-	int             m_sloop_bank = 0;
-	int             m_sloop_next_bank = 0;
-	int             m_sloop_offset = 0;
-	int             m_sloop_state = 0;
+	int32_t           m_sloop_bank = 0;
+	int32_t           m_sloop_next_bank = 0;
+	int32_t           m_sloop_offset = 0;
+	int32_t           m_sloop_state = 0;
 	uint16_t *        m_sloop_base = nullptr;
 
 	uint32_t          m_last_accesses[8]{};

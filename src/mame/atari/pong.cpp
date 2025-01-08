@@ -336,7 +336,7 @@ static INPUT_PORTS_START( pong )
 	PORT_START("IN0") /* fake as well */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )     NETLIST_LOGIC_PORT_CHANGED("maincpu", "coinsw")
 
-	PORT_DIPNAME( 0x06, 0x00, "Game Won" )          PORT_DIPLOCATION("SW1A:1,SW1B:1") PORT_CHANGED_MEMBER(DEVICE_SELF, pong_state, input_changed, IC_SWITCH)
+	PORT_DIPNAME( 0x06, 0x00, "Game Won" )          PORT_DIPLOCATION("SW1A:1,SW1B:1") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(pong_state::input_changed), IC_SWITCH)
 	PORT_DIPSETTING(    0x00, "11" )
 	PORT_DIPSETTING(    0x06, "15" )
 
@@ -367,7 +367,7 @@ static INPUT_PORTS_START( pongd )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 )     NETLIST_LOGIC_PORT_CHANGED("maincpu", "startsw")
 
 #if 0
-	PORT_DIPNAME( 0x06, 0x00, "Game Won" )          PORT_DIPLOCATION("SW1A:1,SW1B:1") PORT_CHANGED_MEMBER(DEVICE_SELF, pong_state, input_changed, IC_SWITCH)
+	PORT_DIPNAME( 0x06, 0x00, "Game Won" )          PORT_DIPLOCATION("SW1A:1,SW1B:1") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(pong_state::input_changed), IC_SWITCH)
 	PORT_DIPSETTING(    0x00, "11" )
 	PORT_DIPSETTING(    0x06, "15" )
 
@@ -407,7 +407,7 @@ static INPUT_PORTS_START( breakout )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW2:1") NETLIST_LOGIC_PORT_CHANGED("maincpu", "sw2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Upright ) )
-	PORT_DIPNAME( 0xf0, 0x00, DEF_STR( Free_Play ) )    PORT_DIPLOCATION("SW1:1,2,3,4") PORT_CHANGED_MEMBER(DEVICE_SELF, breakout_state, cb_free_play, 0)
+	PORT_DIPNAME( 0xf0, 0x00, DEF_STR( Free_Play ) )    PORT_DIPLOCATION("SW1:1,2,3,4") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(breakout_state::cb_free_play), 0)
 	PORT_DIPSETTING(    0x00, "No Free Play" )
 	PORT_DIPSETTING(    0x10, "100" )
 	PORT_DIPSETTING(    0x20, "200" )
@@ -434,7 +434,7 @@ static INPUT_PORTS_START( rebound )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE )  PORT_NAME("Antenna") NETLIST_LOGIC_PORT_CHANGED("maincpu", "antenna")
 
 	PORT_START("DIPS")
-	PORT_DIPNAME( 0x03, 0x00, "Game Won" )          PORT_DIPLOCATION("SW1A:1,SW1A:2") PORT_CHANGED_MEMBER(DEVICE_SELF, rebound_state, input_changed, IC_SWITCH)
+	PORT_DIPNAME( 0x03, 0x00, "Game Won" )          PORT_DIPLOCATION("SW1A:1,SW1A:2") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(rebound_state::input_changed), IC_SWITCH)
 	PORT_DIPSETTING(    0x00, "11" )
 	PORT_DIPSETTING(    0x03, "15" )
 
@@ -682,8 +682,8 @@ GAMEL( 1974, rebound,   0, rebound,  rebound,   rebound_state,  empty_init, ROT0
 GAMEL( 1976, breakout,  0, breakout, breakout,  breakout_state, empty_init, ROT90, "Atari", "Breakout", MACHINE_SUPPORTS_SAVE, layout_breakout)
 
 // 100% TTL
-//GAMEL(1974, spike,      rebound,  rebound,  rebound,  rebound_state,  empty_init, ROT0,  "Atari/Kee", "Spike", MACHINE_IS_SKELETON)
-//GAMEL(1974, volleyball, rebound,  rebound,  rebound,  rebound_state,  empty_init, ROT0,  "Atari", "Volleyball", MACHINE_IS_SKELETON)
+//GAMEL(1974, spike,      rebound,  rebound,  rebound,  rebound_state,  empty_init, ROT0,  "Atari/Kee", "Spike", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+//GAMEL(1974, volleyball, rebound,  rebound,  rebound,  rebound_state,  empty_init, ROT0,  "Atari", "Volleyball", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 //GAME( 1973, coupedav,   pongd,    pongd,    pongd,    pong_state,     empty_init, ROT0,  "Atari France", "Coupe Davis", MACHINE_SUPPORTS_SAVE)
 //GAME( 1973, pongbarl,   pong,     pong,     pong,     pong_state,     empty_init, ROT0,  "Atari", "Pong In-A-Barrel", MACHINE_SUPPORTS_SAVE)
 //GAME( 1974, cktpong,    pong,     pong,     pong,     pong_state,     empty_init, ROT0,  "Atari / National Entertainment Co.", "Cocktail Pong", MACHINE_SUPPORTS_SAVE)

@@ -45,7 +45,7 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 uint32_t truesys_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -115,4 +115,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 200?, unkts, 0, unkts, unkts, truesys_state, empty_init, ROT0, "<unknown>", "unknown game on TrueSys hardware", MACHINE_IS_SKELETON )
+GAME( 200?, unkts, 0, unkts, unkts, truesys_state, empty_init, ROT0, "<unknown>", "unknown game on TrueSys hardware", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

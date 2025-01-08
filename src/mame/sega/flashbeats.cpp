@@ -46,14 +46,14 @@ public:
 	}
 
 	void flashbeats(machine_config &config);
-	void flashbeats_map(address_map &map);
-	void main_scsp_map(address_map &map);
-	void scsp_mem(address_map &map);
+	void flashbeats_map(address_map &map) ATTR_COLD;
+	void main_scsp_map(address_map &map) ATTR_COLD;
+	void scsp_mem(address_map &map) ATTR_COLD;
 
 	[[maybe_unused]] uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 private:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void scsp_irq(offs_t offset, uint8_t data);
 	uint8_t p6_r();

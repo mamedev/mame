@@ -145,8 +145,8 @@ private:
 	void sp_bank_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	uint16_t m_sp_bank = 0;
 
-	void onchip_port(address_map &map);
-	void segasp_map(address_map &map);
+	void onchip_port(address_map &map) ATTR_COLD;
+	void segasp_map(address_map &map) ATTR_COLD;
 };
 
 uint64_t segasp_state::sp_bank_r(offs_t offset, uint64_t mem_mask)

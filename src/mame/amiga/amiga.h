@@ -22,13 +22,15 @@ Ernesto Corvi & Mariusz Wojcieszek
 #include "bus/rs232/rs232.h"
 #include "bus/centronics/ctronics.h"
 #include "machine/mos6526.h"
-#include "machine/amigafdc.h"
-#include "machine/amiga_copper.h"
 #include "machine/msm6242.h"
-#include "machine/akiko.h"
 #include "machine/i2cmem.h"
-#include "machine/8364_paula.h"
+
+#include "agnus_copper.h"
+#include "akiko.h"
 #include "amigaaga.h"
+#include "paula.h"
+#include "paulafdc.h"
+
 #include "emupal.h"
 #include "screen.h"
 
@@ -305,8 +307,6 @@ Ernesto Corvi & Mariusz Wojcieszek
 #define INTENA_INTEN    0x4000
 #define INTENA_SETCLR   0x8000
 
-#define MAX_PLANES 6 /* 0 to 6, inclusive ( but we count from 0 to 5 ) */
-
 
 class amiga_state : public driver_device
 {
@@ -407,7 +407,6 @@ public:
 	uint16_t m_copper_waitmask = 0;
 	uint16_t m_copper_pending_offset = 0;
 	uint16_t m_copper_pending_data = 0;
-	int m_wait_offset = 0;
 
 	/* playfield states */
 	int m_last_scanline = 0;
@@ -442,8 +441,8 @@ public:
 	TIMER_CALLBACK_MEMBER( blitter_process_callback );
 	void update_irqs();
 
-	template <int P> DECLARE_CUSTOM_INPUT_MEMBER( amiga_joystick_convert );
-	DECLARE_CUSTOM_INPUT_MEMBER( floppy_drive_status );
+	template <int P> ioport_value amiga_joystick_convert();
+	ioport_value floppy_drive_status();
 
 	void m68k_reset(int state);
 	void kbreset_w(int state);
@@ -493,12 +492,15 @@ public:
 	// screen layout
 	enum
 	{
-		SCREEN_WIDTH = 910,
+		// standard htotal is $e3 x 2 -> 908
+		// https://videogameperfection.com/forums/topic/advanced-timing-settings-for-amiga/
+		SCREEN_WIDTH = 908,
 		SCREEN_HEIGHT_PAL = 625,
 		SCREEN_HEIGHT_NTSC = 525,
 		VBLANK_PAL = 58, // 52
 		VBLANK_NTSC = 42,
-		HBLANK = 186
+		// first possible diw is $5c x 2 -> 184
+		HBLANK = 184
 	};
 
 	emu_timer *m_blitter_timer = nullptr;
@@ -511,11 +513,11 @@ public:
 	void amiga_base(machine_config &config);
 	void pal_video(machine_config &config);
 	void ntsc_video(machine_config &config);
-	void overlay_1mb_map(address_map &map);
-	void overlay_1mb_map32(address_map &map);
-	void overlay_2mb_map16(address_map &map);
-	void overlay_2mb_map32(address_map &map);
-	void overlay_512kb_map(address_map &map);
+	void overlay_1mb_map(address_map &map) ATTR_COLD;
+	void overlay_1mb_map32(address_map &map) ATTR_COLD;
+	void overlay_2mb_map16(address_map &map) ATTR_COLD;
+	void overlay_2mb_map32(address_map &map) ATTR_COLD;
+	void overlay_512kb_map(address_map &map) ATTR_COLD;
 protected:
 	// A bit of a trick here: some registers are 32-bit. In order to efficiently
 	// read them on both big-endian and little-endian systems, we store the custom
@@ -554,8 +556,8 @@ protected:
 	bool IS_AGA() const { return m_denise_id == 0xf8; }
 
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void custom_chip_reset();
 
@@ -583,9 +585,9 @@ protected:
 	required_device<mos8520_device> m_cia_1;
 	optional_device<rs232_port_device> m_rs232;
 	optional_device<centronics_device> m_centronics;
-	required_device<amiga_copper_device> m_copper;
-	required_device<paula_8364_device> m_paula;
-	optional_device<amiga_fdc_device> m_fdc;
+	required_device<agnus_copper_device> m_copper;
+	required_device<paula_device> m_paula;
+	optional_device<paula_fdc_device> m_fdc;
 	required_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
 	required_device<address_map_bank_device> m_overlay;
@@ -615,9 +617,9 @@ protected:
 	uint16_t m_custom_regs[256]{};
 	static const char *const s_custom_reg_names[0x100];
 
-	void ocs_map(address_map &map);
-	void ecs_map(address_map &map);
-	void aga_map(address_map &map);
+	void ocs_map(address_map &map) ATTR_COLD;
+	void ecs_map(address_map &map) ATTR_COLD;
+	void aga_map(address_map &map) ATTR_COLD;
 
 	// TODO: move to Agnus/Alice
 	u16 vposr_r();
@@ -639,7 +641,7 @@ private:
 	void sprite_dma_reset(int which);
 	void sprite_enable_comparitor(int which, int enable);
 	void fetch_sprite_data(int scanline, int sprite);
-	void update_sprite_dma(int scanline);
+	void update_sprite_dma(int scanline, int num);
 	uint32_t interleave_sprite_data(uint16_t lobits, uint16_t hibits);
 	int get_sprite_pixel(int x);
 	uint8_t assemble_odd_bitplanes(int planes, int ebitoffs);
@@ -653,7 +655,7 @@ private:
 	void aga_palette_write(int color_reg, uint16_t data);
 	void aga_fetch_sprite_data(int scanline, int sprite);
 	void aga_render_scanline(bitmap_rgb32 &bitmap, int scanline);
-	void aga_update_sprite_dma(int scanline);
+	void aga_update_sprite_dma(int scanline, int num);
 	int aga_get_sprite_pixel(int x);
 	uint8_t aga_assemble_odd_bitplanes(int planes, int obitoffs);
 	uint8_t aga_assemble_even_bitplanes(int planes, int ebitoffs);

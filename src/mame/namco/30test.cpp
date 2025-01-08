@@ -67,7 +67,7 @@ public:
 	void namco_30test(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<mc68hc11_cpu_device> m_maincpu;
@@ -76,7 +76,7 @@ private:
 	output_finder<72> m_digits;
 	output_finder<8> m_lamps;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	void output_digit(int i, u8 data);
 	void led_w(offs_t offset, u8 data);

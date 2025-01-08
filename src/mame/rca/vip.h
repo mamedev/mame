@@ -88,11 +88,11 @@ private:
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
-	void vip_io(address_map &map);
-	void vip_mem(address_map &map);
+	void vip_io(address_map &map) ATTR_COLD;
+	void vip_mem(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<cosmac_device> m_maincpu;
 	required_device<cdp1861_device> m_vdc;

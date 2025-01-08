@@ -24,16 +24,16 @@ public:
 	virtual void midi_rx(int state) override;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	required_device<h83002_device> m_cpu;
 	required_device<dspv_device> m_dspv;
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 };
 
 plg100_vl_device::plg100_vl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :

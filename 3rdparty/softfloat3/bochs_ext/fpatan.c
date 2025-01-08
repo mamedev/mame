@@ -324,3 +324,8 @@ extFloat80_t extFloat80_68katan(extFloat80_t a)
 {
 	return extFloat80_atan(a, floatx80_one);
 }
+
+int extFloat80_is_nan(extFloat80_t a)
+{
+	return ((a.signExp & 0x7FFF) == 0x7FFF) && (int64_t)(a.signif << 1);
+}

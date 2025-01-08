@@ -97,12 +97,12 @@ private:
 	void eeprom_w(u8 data);
 	void port0_w(u8 data);
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void banked_video_map(address_map &map);
-	void hotblock_io(address_map &map);
-	void hotblock_map(address_map &map);
+	void banked_video_map(address_map &map) ATTR_COLD;
+	void hotblock_io(address_map &map) ATTR_COLD;
+	void hotblock_map(address_map &map) ATTR_COLD;
 };
 
 u8 hotblock_state::eeprom_r()

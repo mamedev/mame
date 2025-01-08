@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef MAME_BUS_ASTROCADE_EXP_H
-#define MAME_BUS_ASTROCADE_EXP_H
+#ifndef MAME_BUS_ASTROCDE_EXP_H
+#define MAME_BUS_ASTROCDE_EXP_H
 
 // ======================> device_astrocade_exp_interface
 
@@ -41,7 +41,7 @@ public:
 	virtual ~astrocade_exp_device();
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	bool get_card_mounted() { return m_card_mounted; }
 
@@ -59,4 +59,4 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(ASTROCADE_EXP_SLOT, astrocade_exp_device)
 
-#endif // MAME_BUS_ASTROCADE_EXP_H
+#endif // MAME_BUS_ASTROCDE_EXP_H

@@ -11,7 +11,7 @@ license:CC0-1.0
 	<software name="boris25">
 		<description>Boris 2.5 / Sargon 2.5</description>
 		<year>1980</year>
-		<publisher>Applied Concepts</publisher>
+		<publisher>Applied Concepts / Chafitz</publisher>
 		<part name="cart" interface="ggm">
 			<feature name="overlay" value="0x01" />
 			<dataarea name="rom" size="0x8000">

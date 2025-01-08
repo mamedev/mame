@@ -34,8 +34,8 @@ public:
 private:
 	SCN2672_DRAW_CHARACTER_MEMBER(draw_character);
 
-	void mem_map(address_map &map);
-	void char_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void char_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<scn2672_device> m_pvtc;
@@ -101,4 +101,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1984, tv924, 0, 0, tv924, tv924, tv924_state, empty_init, "TeleVideo Systems", "TeleVideo 924 Video Display Terminal", MACHINE_IS_SKELETON)
+COMP(1984, tv924, 0, 0, tv924, tv924, tv924_state, empty_init, "TeleVideo Systems", "TeleVideo 924 Video Display Terminal", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

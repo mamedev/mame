@@ -29,7 +29,7 @@ public:
 
 	void mightyframe(machine_config &config);
 private:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 	//  required_device<cpu_device> m_maincpu;
 };
 
@@ -55,4 +55,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 1985?, mightyframe, 0, 0, mightyframe, mightyframe, mightyframe_state, empty_init, "Convergent Technologies", "Mightyframe", MACHINE_IS_SKELETON )
+COMP( 1985?, mightyframe, 0, 0, mightyframe, mightyframe, mightyframe_state, empty_init, "Convergent Technologies", "Mightyframe", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

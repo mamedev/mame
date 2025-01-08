@@ -33,11 +33,11 @@ public:
 //  auto nrts2() { return m_nrts2_callback.bind(); }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual space_config_vector memory_space_config() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	const address_space_config m_space_config;
@@ -80,7 +80,7 @@ private:
 	u8 cr26_r();
 	void cr26_w(offs_t offset, u8 data);
 
-	void config_map(address_map &map);
+	void config_map(address_map &map) ATTR_COLD;
 
 	void logical_device_select_w(offs_t offset, u8 data);
 	template <unsigned N> u8 activate_r(offs_t offset);

@@ -98,12 +98,12 @@ public:
 	void homelab2(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	u32 screen2_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 private:
 	INTERRUPT_GEN_MEMBER(homelab_frame);
-	void homelab2_mem(address_map &map);
+	void homelab2_mem(address_map &map) ATTR_COLD;
 	u8 cass2_r();
 	u8 mem3800_r();
 	void mem3800_w(offs_t offset, u8 data);
@@ -138,17 +138,17 @@ public:
 	int cass3_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u8 exxx_r(offs_t offset);
 	void port7f_w(u8 data);
 	void portff_w(u8 data);
-	void homelab3_io(address_map &map);
-	void homelab3_mem(address_map &map);
-	void brailab4_io(address_map &map);
-	void brailab4_mem(address_map &map);
+	void homelab3_io(address_map &map) ATTR_COLD;
+	void homelab3_mem(address_map &map) ATTR_COLD;
+	void brailab4_io(address_map &map) ATTR_COLD;
+	void brailab4_mem(address_map &map) ATTR_COLD;
 
 	std::unique_ptr<u8[]> m_ram;
 };
@@ -251,10 +251,10 @@ u8 homelab2_state::memE000_r(offs_t offset)
 		u8 gfx;
 		if (m_screenshadow_is_text_mode)
 		{
-			const int vramRelIndex0 = offset % 0x400;     // Character address in video ram First character in 0x001
-			const int row8_index0 = (offset - 1) / 0x400; // Row index in char [0-7]
-			u8 const chr = m_vram[vramRelIndex0];         // get char in videoram
-			gfx = m_p_chargen[chr | (row8_index0 << 8)];  // get dot pattern in chargen
+			const int vramRelIndex0 = offset & 0x3ff; // Character address in video ram First character in 0x001
+			const int row8_index0 = ((offset - 1) & 0x1c00) >> 10; // Row index in char [0-7]
+			u8 const chr = m_vram[vramRelIndex0]; // get char in videoram
+			gfx = m_p_chargen[chr | (row8_index0 << 8)]; // get dot pattern in chargen
 		}
 		else
 		{
@@ -537,14 +537,14 @@ INPUT_PORTS_END
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("X2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_VBLANK("screen")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Left Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Right Shift") PORT_CODE(KEYCODE_RSHIFT)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ALT") PORT_CODE(KEYCODE_CAPSLOCK)
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("X3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(homelab3_state, cass3_r)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(homelab3_state::cass3_r))
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F2") PORT_CODE(KEYCODE_F2)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F1") PORT_CODE(KEYCODE_F1)
 	PORT_BIT(0xf8, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -650,14 +650,14 @@ static INPUT_PORTS_START(brailab4) // F4 to F8 are foreign characters
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("X2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_VBLANK("screen")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Left Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Right Shift") PORT_CODE(KEYCODE_RSHIFT)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ALT") PORT_CODE(KEYCODE_CAPSLOCK)
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("X3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(homelab3_state, cass3_r)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(homelab3_state::cass3_r))
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F2") PORT_CODE(KEYCODE_F2)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F1") PORT_CODE(KEYCODE_F1)
 	PORT_BIT(0xf8, IP_ACTIVE_LOW, IPT_UNUSED)

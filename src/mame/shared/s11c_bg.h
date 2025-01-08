@@ -38,16 +38,16 @@ public:
 	void extra_w(int state); // external write to board CB2 (J4 pin 12), does anything actually do this?
 	void ctrl_w(int state); // external write to board CB1 (J4 pin 13)
 	void data_w(uint8_t data); // external write to board data bus (J4 pins 3 thru 10 for D0-D7)
-	virtual void device_reset() override; // power up reset
+	virtual void device_reset() override ATTR_COLD; // power up reset
 	void resetq_w(int state); // external write to board /RESET (J4 pin 18)
 
 	// callbacks
 	auto cb2_cb() { return m_cb2_cb.bind(); }
 	auto pb_cb() { return m_pb_cb.bind(); }
 
-	void s11c_bg_map(address_map &map);
-	void s11c_bgm_map(address_map &map);
-	void s11c_bgs_map(address_map &map);
+	void s11c_bg_map(address_map &map) ATTR_COLD;
+	void s11c_bgm_map(address_map &map) ATTR_COLD;
+	void s11c_bgs_map(address_map &map) ATTR_COLD;
 
 	//mc6809e_device *get_cpu() { return m_cpu; }
 protected:
@@ -55,8 +55,8 @@ protected:
 	s11c_bg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// overrides
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(deferred_cb2_w);
 	TIMER_CALLBACK_MEMBER(deferred_pb_w);
@@ -89,7 +89,7 @@ class s11_bg_device : public s11c_bg_device
 public:
 	s11_bg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 class s11_obg_device : public s11c_bg_device
@@ -97,7 +97,7 @@ class s11_obg_device : public s11c_bg_device
 public:
 	s11_obg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 class s11_bgm_device : public s11c_bg_device
@@ -105,7 +105,7 @@ class s11_bgm_device : public s11c_bg_device
 public:
 	s11_bgm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 class s11_bgs_device : public s11c_bg_device
@@ -113,7 +113,7 @@ class s11_bgs_device : public s11c_bg_device
 public:
 	s11_bgs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(S11C_BG, s11c_bg_device)

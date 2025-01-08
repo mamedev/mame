@@ -16,7 +16,7 @@
 #include "cpu/mcs96/i8x9x.h"
 #include "cpu/mcs96/i8xc196.h"
 #include "machine/timer.h"
-#include "sound/rolandpcm.h"
+#include "sound/roland_lp.h"
 #include "video/t6963c.h"
 
 #include "emupal.h"
@@ -32,13 +32,15 @@
 namespace {
 
 // unscramble address: ROM dump offset -> proper (descrambled) offset
-#define UNSCRAMBLE_ADDR_INT(_offset) \
-	bitswap<19>(_offset, 18, 17, 15, 14, 16, 12, 11, 7, 9, 13, 10, 8, 3, 2, 1, 6, 4, 5, 0)
+template <typename T> constexpr auto UNSCRAMBLE_ADDR_INT(T offset) {
+	return bitswap<19>(offset, 18, 17, 15, 14, 16, 12, 11, 7, 9, 13, 10, 8, 3, 2, 1, 6, 4, 5, 0);
+}
 // scramble address: proper offset -> ROM dump offset
-#define SCRAMBLE_ADDR_INT(_offset) \
-	bitswap<19>(_offset, 18, 17, 14, 16, 15, 9, 13, 12, 8, 10, 7, 11, 3, 1, 2, 6, 5, 4, 0)
+template <typename T> constexpr auto SCRAMBLE_ADDR_INT(T offset) {
+	return bitswap<19>(offset, 18, 17, 14, 16, 15, 9, 13, 12, 8, 10, 7, 11, 3, 1, 2, 6, 5, 4, 0);
+}
 
-#define UNSCRAMBLE_DATA(_data) bitswap<8>(_data, 1, 2, 7, 3, 5, 0, 4, 6)
+constexpr u8 UNSCRAMBLE_DATA(u8 data) { return bitswap<8>(data, 1, 2, 7, 3, 5, 0, 4, 6); }
 
 // Bitmasks for the display board interface via PORT1
 static constexpr u8 CONT_MASK = 0b10000000;
@@ -132,7 +134,8 @@ static INPUT_PORTS_START(d70)
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Effect/Ctrl") PORT_CODE(KEYCODE_M)
 INPUT_PORTS_END
 
-class roland_d70_state : public driver_device {
+class roland_d70_state : public driver_device
+{
 public:
 	roland_d70_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
@@ -157,15 +160,15 @@ public:
 	{
 	}
 
-	void d70(machine_config &config);
-	void init_d70();
+	void d70(machine_config &config) ATTR_COLD;
+	void init_d70() ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	void lcd_map(address_map &map);
-	void lcd_palette(palette_device &palette) const;
+	void lcd_map(address_map &map) ATTR_COLD;
+	void lcd_palette(palette_device &palette) const ATTR_COLD;
 
 	void bank_w(u8 data);
 	u8 ksga_io_r(offs_t offset);
@@ -191,10 +194,10 @@ private:
 
 	void midi_in_w(int state);
 
-	void d70_map(address_map &map);
+	void d70_map(address_map &map) ATTR_COLD;
 
-	void descramble_rom_internal(u8 *dst, const u8 *src);
-	void descramble_rom_external(u8 *dst, const u8 *src);
+	void descramble_rom_internal(u8 *dst, const u8 *src) ATTR_COLD;
+	void descramble_rom_external(u8 *dst, const u8 *src) ATTR_COLD;
 
 	memory_view m_bank_view;
 	memory_share_creator<u16> m_ram;
@@ -352,12 +355,12 @@ void roland_d70_state::dsp_io_w(offs_t offset, u8 data) {
 }
 
 u8 roland_d70_state::tvf_io_r(offs_t offset) {
-	logerror("tvf read %x\n", offset);
+	logerror("tvf read %04x\n", offset);
 	return 0;
 }
 
 void roland_d70_state::tvf_io_w(offs_t offset, u8 data) {
-	logerror("twf write $x= %x\n", offset, data);
+	logerror("tvf write %04x= %02x\n", offset, data);
 }
 
 u8 roland_d70_state::snd_io_r(offs_t offset) {
@@ -422,8 +425,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(roland_d70_state::samples_timer_cb) {
 }
 
 void roland_d70_state::lcd_palette(palette_device &palette) const {
-	palette.set_pen_color(0, rgb_t(138, 146, 148));
-	palette.set_pen_color(1, rgb_t(69, 62, 66));
+	palette.set_pen_color(0, rgb_t(0x9f, 0xb4, 0x86));
+	palette.set_pen_color(1, rgb_t(0x5e, 0x5f, 0x71));
 }
 
 void roland_d70_state::d70_map(address_map &map) {
@@ -494,11 +497,11 @@ void roland_d70_state::init_d70() {
 	u8 *dst = reinterpret_cast<u8 *>(memregion("pcm")->base());
 	// descramble internal ROMs
 	descramble_rom_internal(&dst[0x000000], &src[0x000000]);
+	descramble_rom_internal(&dst[0x080000], &src[0x080000]);
 	descramble_rom_internal(&dst[0x100000], &src[0x100000]);
+	descramble_rom_internal(&dst[0x180000], &src[0x180000]);
 	descramble_rom_internal(&dst[0x200000], &src[0x200000]);
 	descramble_rom_internal(&dst[0x300000], &src[0x300000]);
-	descramble_rom_internal(&dst[0x400000], &src[0x400000]);
-	descramble_rom_internal(&dst[0x500000], &src[0x500000]);
 }
 
 void roland_d70_state::descramble_rom_internal(u8 *dst, const u8 *src) {
@@ -510,16 +513,41 @@ void roland_d70_state::descramble_rom_internal(u8 *dst, const u8 *src) {
 
 ROM_START(d70)
 	ROM_REGION(0x20000, "maincpu", 0)
-	ROM_SYSTEM_BIOS(0, "v203", "Version 2.03")
-	ROMX_LOAD("roland_d70_v110_combined.bin", 0x00000, 0x20000, CRC(52deab1e) SHA1(87d7196888edec65c9feddd16d4c715f6992abc7), ROM_BIOS(0))
+	ROM_DEFAULT_BIOS("v119")
+	ROM_SYSTEM_BIOS( 0, "v119", "Version 1.19 - March 9, 1993" )
+	ROM_SYSTEM_BIOS( 1, "v116", "Version 1.16 - January 28, 1991" )
+	ROM_SYSTEM_BIOS( 2, "v114", "Version 1.14 - September 20, 1990" )
+	ROM_SYSTEM_BIOS( 3, "v112", "Version 1.12 - August 8, 1990" )
+	ROM_SYSTEM_BIOS( 4, "v110", "Version 1.10 - April 19, 1990" )
+	ROM_SYSTEM_BIOS( 5, "v100", "Version 1.00 - March 10, 1990" )
+
+	ROMX_LOAD("roland_d70_v1.19_a_even.ic4", 0, 0x10000, CRC(95fcf250) SHA1(174962eb42f56aaf936aeca4db77228bf19ec97a), ROM_BIOS(0) | ROM_SKIP(1) )
+	ROMX_LOAD("roland_d70_v1.19_b_odd.ic9",  1, 0x10000, CRC(a14f0ce1) SHA1(9ef2d62b1be5c38b9fa0072a5889b8ab0e47623e), ROM_BIOS(0) | ROM_SKIP(1) )
+
+	ROMX_LOAD("roland_d70_v1.16_a_even.ic4", 0, 0x10000, CRC(761f6eac) SHA1(18bd2c8390d67f1000fae652f51a03322bb088cd), ROM_BIOS(1) | ROM_SKIP(1) )
+	ROMX_LOAD("roland_d70_v1.16_b_odd.ic9",  1, 0x10000, CRC(103a1f07) SHA1(530408a8ae8d74786cb8179892b7e3a24db93000), ROM_BIOS(1) | ROM_SKIP(1) )
+
+	ROMX_LOAD("roland_d70_v1.14_a_even.ic4", 0, 0x10000, CRC(651e7cd5) SHA1(73ad2d897f51449111064e92b515a4118fee4dad), ROM_BIOS(2) | ROM_SKIP(1) )
+	ROMX_LOAD("roland_d70_v1.14_b_odd.ic9",  1, 0x10000, CRC(b3533278) SHA1(8c2019c20b60d4fbb5f5956bce672a84f515215b), ROM_BIOS(2) | ROM_SKIP(1) )
+
+	ROMX_LOAD("roland_d70_v1.12_a_even.ic4", 0, 0x10000, CRC(86032879) SHA1(07e7545c2dae93311f7b5d77b65c548e56391748), ROM_BIOS(3) | ROM_SKIP(1) )
+	ROMX_LOAD("roland_d70_v1.12_b_odd.ic9",  1, 0x10000, CRC(910cf30e) SHA1(15cb5ecb956205dc9d6254822178139a228790d8), ROM_BIOS(3) | ROM_SKIP(1) )
+
+	ROMX_LOAD("roland_d70_v1.10_a_even.ic4", 0, 0x10000, CRC(5f7374c5) SHA1(15d9249c35c3db6a7d1df6a4f4e42f0ce99f11a5), ROM_BIOS(4) | ROM_SKIP(1) )
+	ROMX_LOAD("roland_d70_v1.10_b_odd.ic9",  1, 0x10000, CRC(f024220e) SHA1(cde358c1ec205f446114f478b43269b01b8be048), ROM_BIOS(4) | ROM_SKIP(1) )
+
+	// Seen at https://www.youtube.com/watch?v=9zGcHzpz7zo
+	ROMX_LOAD("roland_d70_v1.00_a_even.ic4", 0, 0x10000, NO_DUMP, ROM_BIOS(5) | ROM_SKIP(1) )
+	ROMX_LOAD("roland_d70_v1.00_b_odd.ic9",  1, 0x10000, NO_DUMP, ROM_BIOS(5) | ROM_SKIP(1) )
+
 
 	ROM_REGION(0x600000, "pcmorg", 0) // ROMs before descrambling
 	ROM_LOAD("roland_d70_waverom-a.bin", 0x000000, 0x80000, CRC(8e53b2a3) SHA1(4872530870d5079776e80e477febe425dc0ec1df))
+	ROM_LOAD("roland_d70_waverom-e.bin", 0x080000, 0x80000, CRC(d46cc7a4) SHA1(d378ac89a5963e37f7c157b3c8e71892c334fd7b))
 	ROM_LOAD("roland_d70_waverom-b.bin", 0x100000, 0x80000, CRC(c8220761) SHA1(49e55fa672020f95fd9c858ceaae94d6db93df7d))
+	ROM_LOAD("roland_d70_waverom-f.bin", 0x180000, 0x80000, CRC(d4b01f5e) SHA1(acd867d68e49e5f59f1006ed14a7ca197b6dc4af))
 	ROM_LOAD("roland_d70_waverom-c.bin", 0x200000, 0x80000, CRC(733c4054) SHA1(9b6b59ab74e5bf838702abb087c408aaa85b7b1f))
 	ROM_LOAD("roland_d70_waverom-d.bin", 0x300000, 0x80000, CRC(b6c662d2) SHA1(3fcbcfd0d8d0fa419c710304c12482e2f79a907f))
-	ROM_LOAD("roland_d70_waverom-e.bin", 0x400000, 0x80000, CRC(d46cc7a4) SHA1(d378ac89a5963e37f7c157b3c8e71892c334fd7b))
-	ROM_LOAD("roland_d70_waverom-f.bin", 0x500000, 0x80000, CRC(d4b01f5e) SHA1(acd867d68e49e5f59f1006ed14a7ca197b6dc4af))
 	ROM_REGION(0x600000, "pcm", ROMREGION_ERASEFF) // ROMs after descrambling
 
 	ROM_REGION(0x400, "lcd:cgrom", 0)

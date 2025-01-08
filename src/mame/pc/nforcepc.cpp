@@ -1090,14 +1090,14 @@ public:
 	nforcepc_state(const machine_config &mconfig, device_type type, const char *tag);
 
 private:
-	void nforce_map(address_map &map);
-	void nforce_map_io(address_map &map);
+	void nforce_map(address_map &map) ATTR_COLD;
+	void nforce_map_io(address_map &map) ATTR_COLD;
 	void boot_state_award_w(uint8_t data);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 	void maincpu_interrupt(int state);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mcpx_isalpc_device> isalpc;
@@ -1280,4 +1280,4 @@ ROM_END
 static INPUT_PORTS_START(nforcepc)
 INPUT_PORTS_END
 
-COMP(2002, nforcepc, 0, 0, nforcepc, nforcepc, nforcepc_state, empty_init, "Nvidia", "Nvidia nForce PC (CRUSH11/12)", MACHINE_IS_SKELETON)
+COMP(2002, nforcepc, 0, 0, nforcepc, nforcepc, nforcepc_state, empty_init, "Nvidia", "Nvidia nForce PC (CRUSH11/12)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

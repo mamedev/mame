@@ -817,6 +817,7 @@ void tms3203x_device::check_irqs()
 	if (!m_delayed)
 	{
 		uint16_t intmask = 1 << (whichtrap - 1);
+		standard_irq_callback(whichtrap - 1, m_pc);
 
 		// bit in IF is cleared when interrupt is taken
 		IREG(TMR_IF) &= ~intmask;
@@ -851,17 +852,6 @@ uint32_t tms3203x_device::execute_min_cycles() const noexcept
 uint32_t tms3203x_device::execute_max_cycles() const noexcept
 {
 	return 5 * 16; // max opcode cycle * low power operation mode
-}
-
-
-//-------------------------------------------------
-//  execute_input_lines - return the number of
-//  input/interrupt lines
-//-------------------------------------------------
-
-uint32_t tms3203x_device::execute_input_lines() const noexcept
-{
-	return 14;
 }
 
 
@@ -965,6 +955,7 @@ void tms3203x_device::execute_run()
 	// if we're idling, just eat the cycles
 	if (m_is_idling)
 	{
+		debugger_wait_hook();
 		m_icount = 0;
 		return;
 	}

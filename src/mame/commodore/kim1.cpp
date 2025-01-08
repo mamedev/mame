@@ -120,8 +120,8 @@ public:
 	void kim1(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<m6502_device> m_maincpu;
@@ -139,8 +139,8 @@ private:
 	uint8_t m_311_output = 0;
 	uint32_t m_cassette_high_count = 0;
 
-	void mem_map(address_map &map);
-	void sync_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void sync_map(address_map &map) ATTR_COLD;
 
 	uint8_t sync_r(offs_t offset);
 	void sync_w(int state);
@@ -348,8 +348,8 @@ static INPUT_PORTS_START( kim1 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_TOGGLE PORT_NAME("TTY")
 
 	PORT_START("SPECIAL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('S') PORT_NAME("ST") PORT_CHANGED_MEMBER(DEVICE_SELF, kim1_state, trigger_nmi, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CHAR('R') PORT_NAME("RS") PORT_CHANGED_MEMBER(DEVICE_SELF, kim1_state, trigger_reset, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('S') PORT_NAME("ST") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(kim1_state::trigger_nmi), 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CHAR('R') PORT_NAME("RS") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(kim1_state::trigger_reset), 0)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F1) PORT_TOGGLE PORT_NAME("SST")
 INPUT_PORTS_END
 

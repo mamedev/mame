@@ -31,7 +31,7 @@ private:
 
 	u8 novram_recall_r();
 	u8 novram_store_r();
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<x2210_device> m_novram;
@@ -119,4 +119,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 1986, d461, 0, 0, d461, d461, d400_state, empty_init, "Data General", "Dasher D461", MACHINE_IS_SKELETON )
+COMP( 1986, d461, 0, 0, d461, d461, d400_state, empty_init, "Data General", "Dasher D461", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -36,8 +36,8 @@ public:
 	void pcfx(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -59,8 +59,8 @@ private:
 	[[maybe_unused]] void irq15_w(int state);
 	template <int Pad> TIMER_CALLBACK_MEMBER(pad_func);
 
-	void pcfx_io(address_map &map);
-	void pcfx_mem(address_map &map);
+	void pcfx_io(address_map &map) ATTR_COLD;
+	void pcfx_mem(address_map &map) ATTR_COLD;
 
 	// Interrupt controller (component unknown)
 	uint16_t m_irq_mask = 0;

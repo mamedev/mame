@@ -31,7 +31,7 @@ public:
 private:
 	HD44780_PIXEL_UPDATE(pixel_update);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<hd6303x_cpu_device> m_maincpu;
 	required_device<ym2154_device> m_ryp4;
@@ -106,4 +106,4 @@ ROM_END
 
 } // anonymous namespace
 
-SYST(1984, rx15, 0, 0, rx15, rx15, rx15_state, empty_init, "Yamaha", "RX15 Digital Rhythm Programmer", MACHINE_IS_SKELETON)
+SYST(1984, rx15, 0, 0, rx15, rx15, rx15_state, empty_init, "Yamaha", "RX15 Digital Rhythm Programmer", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

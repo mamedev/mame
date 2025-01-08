@@ -167,8 +167,8 @@ private:
 	void irq_timer_sync();
 	void irq_timer_start(int old_tmode);
 	void cnt1(int state);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer_clear_cb);
@@ -184,21 +184,21 @@ private:
 	optional_ioport m_paddle;
 	optional_ioport_array<8> m_mj_inputs;
 
-	void common_map(address_map &map);
-	void cpu1_map(address_map &map);
-	void cpu2_map(address_map &map);
-	void decrypted_opcodes_map(address_map &map);
-	void hotrod_common_map(address_map &map);
-	void hotrod_cpu1_map(address_map &map);
-	void hotrod_cpu2_map(address_map &map);
-	void rombd_common_map(address_map &map);
-	void rombd_cpu1_map(address_map &map);
-	void rombd_cpu2_map(address_map &map);
-	void roughrac_common_map(address_map &map);
-	void roughrac_cpu1_map(address_map &map);
-	void roughrac_cpu2_map(address_map &map);
-	void dcclubj_cpu1_map(address_map &map);
-	void dcclubj_cpu2_map(address_map &map);
+	void common_map(address_map &map) ATTR_COLD;
+	void cpu1_map(address_map &map) ATTR_COLD;
+	void cpu2_map(address_map &map) ATTR_COLD;
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void hotrod_common_map(address_map &map) ATTR_COLD;
+	void hotrod_cpu1_map(address_map &map) ATTR_COLD;
+	void hotrod_cpu2_map(address_map &map) ATTR_COLD;
+	void rombd_common_map(address_map &map) ATTR_COLD;
+	void rombd_cpu1_map(address_map &map) ATTR_COLD;
+	void rombd_cpu2_map(address_map &map) ATTR_COLD;
+	void roughrac_common_map(address_map &map) ATTR_COLD;
+	void roughrac_cpu1_map(address_map &map) ATTR_COLD;
+	void roughrac_cpu2_map(address_map &map) ATTR_COLD;
+	void dcclubj_cpu1_map(address_map &map) ATTR_COLD;
+	void dcclubj_cpu2_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_SEGA_SEGAS24_H

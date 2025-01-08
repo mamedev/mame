@@ -17,8 +17,8 @@ public:
 	s100_vector_dualmode_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	void device_start() override;
-	void device_reset() override;
+	void device_start() override ATTR_COLD;
+	void device_reset() override ATTR_COLD;
 	void device_add_mconfig(machine_config &config) override;
 
 	uint8_t s100_sinp_r(offs_t offset) override;
@@ -26,26 +26,25 @@ protected:
 
 private:
 	TIMER_CALLBACK_MEMBER(motor_off);
-	TIMER_CALLBACK_MEMBER(sector_cb);
 	TIMER_CALLBACK_MEMBER(byte_cb);
 	bool hdd_selected();
 	bool get_next_bit(attotime &tm, const attotime &limit);
+	void floppy_index_cb(floppy_image_device *floppy, int state);
+	void start_of_sector();
 
 	required_device_array<floppy_connector, 4> m_floppy;
 	uint8_t m_ram[512];
 	uint16_t m_cmar;
 	uint8_t m_drive;
 	uint8_t m_sector;
+	uint8_t m_fdd_sector_counter;
 	bool m_read;
+	bool m_busy;
 	emu_timer *m_motor_on_timer;
+	attotime m_last_sector_pulse; // fdd
 
-	enum sector_timer_state {
-		SECTOR_START,
-		SECTOR_END,
-	};
 	fdc_pll_t m_pll;
 	emu_timer *m_byte_timer;
-	emu_timer *m_sector_timer;
 	uint16_t m_pending_byte;
 	uint8_t m_pending_size;
 };

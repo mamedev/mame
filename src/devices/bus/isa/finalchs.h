@@ -12,7 +12,7 @@
 #pragma once
 
 #include "isa.h"
-#include "cpu/m6502/m65sc02.h"
+#include "cpu/m6502/g65sc02.h"
 #include "machine/gen_latch.h"
 
 
@@ -26,16 +26,16 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 private:
-	required_device<m65sc02_device> m_maincpu;
+	required_device<g65sc02_device> m_maincpu;
 	required_device<generic_latch_8_device> m_mainlatch;
 	required_device<generic_latch_8_device> m_sublatch;
 
@@ -44,7 +44,7 @@ private:
 	uint8_t finalchs_r(offs_t offset);
 	void finalchs_w(offs_t offset, uint8_t data);
 
-	void finalchs_mem(address_map &map);
+	void finalchs_mem(address_map &map) ATTR_COLD;
 };
 
 

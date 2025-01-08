@@ -50,8 +50,8 @@ public:
 	u8 ppi_r() { return 0x20; }
 
 private:
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
@@ -100,4 +100,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY            FULLNAME     FLAGS
-COMP( 1988, tnshc08, 0,      0,      tnshc08, tnshc08, tnshc08_state, empty_init, u8"JZD Slušovice", "TNS HC-08", MACHINE_IS_SKELETON)
+COMP( 1988, tnshc08, 0,      0,      tnshc08, tnshc08, tnshc08_state, empty_init, u8"JZD Slušovice", "TNS HC-08", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

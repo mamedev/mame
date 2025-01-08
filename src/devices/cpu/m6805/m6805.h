@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders:Aaron Giles, Vas Crabb
 /*** m6805: Portable 6805 emulator ******************************************/
 #ifndef MAME_CPU_M6805_M6805_H
 #define MAME_CPU_M6805_M6805_H
@@ -11,11 +11,7 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// device type definition
 DECLARE_DEVICE_TYPE(M68HC05EG, m68hc05eg_device)
-DECLARE_DEVICE_TYPE(HD6305V0,  hd6305v0_device)
-DECLARE_DEVICE_TYPE(HD6305Y2,  hd6305y2_device)
-DECLARE_DEVICE_TYPE(HD63705Z0, hd63705z0_device)
 
 // ======================> m6805_base_device
 
@@ -107,6 +103,8 @@ protected:
 	static cycle_count_table s_hmos_cycles;
 	static cycle_count_table s_cmos_cycles;
 	static cycle_count_table s_hc_cycles;
+	static cycle_count_table s_hd6305_cycles;
+	static cycle_count_table s_hd63705_cycles;
 
 	// construction/destruction
 	m6805_base_device(
@@ -126,13 +124,12 @@ protected:
 			address_map_constructor internal_map);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override;
 	virtual uint32_t execute_max_cycles() const noexcept override;
-	virtual uint32_t execute_input_lines() const noexcept override;
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override;
@@ -319,74 +316,13 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void interrupt_vector() override;
 
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override;
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override;
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
-};
-
-// ======================> hd6305_device
-
-class hd6305_device : public m6805_base_device
-{
-protected:
-	// construction/destruction
-	hd6305_device(
-			machine_config const &mconfig,
-			char const *tag,
-			device_t *owner,
-			uint32_t clock,
-			device_type const type,
-			configuration_params const &params,
-			address_map_constructor internal_map);
-
-	// device-level overrides
-	virtual void device_reset() override;
-
-	virtual void execute_set_input(int inputnum, int state) override;
-	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == INPUT_LINE_NMI; }
-
-	virtual void interrupt_vector() override;
-	virtual bool test_il() override { return m_nmi_state != CLEAR_LINE; }
-};
-
-// ======================> hd6305v0_device
-
-class hd6305v0_device : public hd6305_device
-{
-public:
-	// construction/destruction
-	hd6305v0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-private:
-	void internal_map(address_map &map);
-};
-
-// ======================> hd6305y2_device
-
-class hd6305y2_device : public hd6305_device
-{
-public:
-	// construction/destruction
-	hd6305y2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-private:
-	void internal_map(address_map &map);
-};
-
-// ======================> hd63705z0_device
-
-class hd63705z0_device : public hd6305_device
-{
-public:
-	// construction/destruction
-	hd63705z0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-private:
-	void internal_map(address_map &map);
 };
 
 #define M6805_IRQ_LINE      0
@@ -398,31 +334,5 @@ private:
 #define M68HC05EG_INT_IRQ   (M6805_IRQ_LINE)
 #define M68HC05EG_INT_TIMER (M6805_IRQ_LINE+1)
 #define M68HC05EG_INT_CPI   (M6805_IRQ_LINE+2)
-
-/****************************************************************************
- * HD63705 section
- ****************************************************************************/
-
-#define HD63705_A                   M6805_A
-#define HD63705_PC                  M6805_PC
-#define HD63705_S                   M6805_S
-#define HD63705_X                   M6805_X
-#define HD63705_CC                  M6805_CC
-#define HD63705_NMI_STATE           M6805_IRQ_STATE
-#define HD63705_IRQ1_STATE          M6805_IRQ_STATE+1
-#define HD63705_IRQ2_STATE          M6805_IRQ_STATE+2
-#define HD63705_ADCONV_STATE        M6805_IRQ_STATE+3
-
-#define HD63705_INT_MASK            0x1ff
-
-#define HD63705_INT_IRQ1            0x00
-#define HD63705_INT_IRQ2            0x01
-#define HD63705_INT_TIMER1          0x02
-#define HD63705_INT_TIMER2          0x03
-#define HD63705_INT_TIMER3          0x04
-#define HD63705_INT_PCI             0x05
-#define HD63705_INT_SCI             0x06
-#define HD63705_INT_ADCONV          0x07
-#define HD63705_INT_NMI             0x08
 
 #endif // MAME_CPU_M6805_M6805_H

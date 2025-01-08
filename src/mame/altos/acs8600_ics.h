@@ -18,19 +18,19 @@ public:
 	auto irq1_callback() { return m_out_irq1_func.bind(); }
 	auto irq2_callback() { return m_out_irq2_func.bind(); }
 	template <typename T> void set_host_space(T &&tag, int index) { m_host_space.set_tag(std::forward<T>(tag), index); }
-	const tiny_rom_entry *device_rom_region() const override;
+	const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	void hiaddr_w(u8 data);
 	void ctrl_w(u8 data);
 	u8 hostram_r(offs_t offset);
 	void hostram_w(offs_t offset, u8 data);
 
-	void ics_io(address_map &map);
-	void ics_mem(address_map &map);
+	void ics_io(address_map &map) ATTR_COLD;
+	void ics_mem(address_map &map) ATTR_COLD;
 
 private:
 	required_device<z80_device> m_icscpu;

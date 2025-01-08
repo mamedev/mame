@@ -4,12 +4,12 @@
 
     ldv4200hle.h
 
-    Pioneer LD-V4200 laserdisc player simulation.
+    Pioneer LD-V4200 LaserDisc player simulation.
 
 *************************************************************************/
 
-#ifndef MAME_MACHINE_LDV4200_H
-#define MAME_MACHINE_LDV4200_H
+#ifndef MAME_MACHINE_LDV4200HLE_H
+#define MAME_MACHINE_LDV4200HLE_H
 
 #pragma once
 
@@ -52,8 +52,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// laserdisc overrides
 	virtual void player_vsync(const vbi_metadata &vbi, int fieldnum, const attotime &curtime) override;
@@ -209,4 +209,4 @@ private:
 	uint32_t            m_curr_frame;
 };
 
-#endif // MAME_MACHINE_LDV4200_H
+#endif // MAME_MACHINE_LDV4200HLE_H

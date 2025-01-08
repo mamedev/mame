@@ -7,7 +7,8 @@
     Preliminary driver by R. Belmont and O. Galibert
 
     The successor to the mu80, with the swp20/meg/eq combo remplaced by an all-in-one swp30.
-    Exists in rackable (mu90r) version but we don't have that firmware variant.
+    Exists in rackable (mu90r) version but we don't have that firmware variant and in
+    screenless version (mu90b).
 
     Sound roms are a subset of the mu100's.
 
@@ -67,11 +68,12 @@ public:
 	{ }
 
 	void mu90(machine_config &config);
+	void mu90b(machine_config &config);
 
 private:
 	required_device<h83002_device> m_maincpu;
 	required_device<swp30_device> m_swp30;
-	required_device<mulcd_device> m_lcd;
+	optional_device<mulcd_device> m_lcd;
 	required_ioport m_ioport_p7;
 	required_ioport m_ioport_p8;
 
@@ -87,10 +89,10 @@ private:
 	void pb_w(u8 data);
 	u8 pb_r();
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	void mu90_map(address_map &map);
-	void swp30_map(address_map &map);
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	void mu90_map(address_map &map) ATTR_COLD;
+	void swp30_map(address_map &map) ATTR_COLD;
 };
 
 void mu90_state::machine_start()
@@ -148,7 +150,7 @@ void mu90_state::pb_w(u8 data)
 u8 mu90_state::pb_r()
 {
 	u8 res = 0xff;
-	if((cur_pa & 0x20)) {
+	if(m_lcd && (cur_pa & 0x20)) {
 		if(cur_pa & 0x40) {
 			if(cur_pa & 0x02)
 				res &= m_lcd->data_read();
@@ -170,12 +172,13 @@ u8 mu90_state::pb_r()
 void mu90_state::pa_w(u8 data)
 {
 	if(!(cur_pa & 0x01) && (data & 0x01)) {
-		m_lcd->set_contrast(cur_pb & 7);
+		if(m_lcd)
+			m_lcd->set_contrast(cur_pb & 7);
 		logerror("ad1 input level %s\n", cur_pb & 0x80 ? "line" : "mic");
 		logerror("ad2 input level %s\n", cur_pb & 0x40 ? "line" : "mic");
 	}
 
-	if((cur_pa & 0x20) && !(data & 0x20)) {
+	if(m_lcd && (cur_pa & 0x20) && !(data & 0x20)) {
 		if(!(cur_pa & 0x40)) {
 			if(cur_pa & 0x02)
 				m_lcd->data_write(cur_pb);
@@ -185,14 +188,15 @@ void mu90_state::pa_w(u8 data)
 	}
 
 	if(!(cur_pa & 0x08) && (data & 0x08)) {
-		m_lcd->set_leds((cur_pb & 0x1f) | ((cur_pb & 0x80) >> 2));
+		if(m_lcd)
+			m_lcd->set_leds((cur_pb & 0x1f) | ((cur_pb & 0x80) >> 2));
 		cur_ic34 = cur_pb;
 	}
 
 	cur_pa = data;
 }
 
-void mu90_state::mu90(machine_config &config)
+void mu90_state::mu90b(machine_config &config)
 {
 	H83002(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mu90_state::mu90_map);
@@ -208,8 +212,6 @@ void mu90_state::mu90(machine_config &config)
 	m_maincpu->write_porta().set(FUNC(mu90_state::pa_w));
 	m_maincpu->read_portb().set(FUNC(mu90_state::pb_r));
 	m_maincpu->write_portb().set(FUNC(mu90_state::pb_w));
-
-	MULCD(config, m_lcd);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -232,6 +234,13 @@ void mu90_state::mu90(machine_config &config)
 	m_maincpu->write_sci_tx<0>().set(mdout, FUNC(midi_port_device::write_txd));
 }
 
+void mu90_state::mu90(machine_config &config)
+{
+	mu90b(config);
+
+	MULCD(config, m_lcd);
+}
+
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
 		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios))
 
@@ -246,7 +255,19 @@ ROM_START( mu90 )
 	ROM_LOAD32_WORD( "xs743a0.ic23", 0x0000002, 0x400000, CRC(a9109a6c) SHA1(a67bb49378a38a2d809bd717d286e18bc6496db0) )
 ROM_END
 
+ROM_START( mu90b )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_DEFAULT_BIOS("v101")
+	ROM_SYSTEM_BIOS( 0, "v101", "xt040c0 (v1.01, Dec. 26, 2005)" )
+	ROM_LOAD16_WORD_SWAP_BIOS( 0, "xt040c0.ic9", 0x000000, 0x100000, CRC(66fe5896) SHA1(811a8c7f0e8aac7a8807922d5add0fbfc07e1cfd) )
+
+	ROM_REGION32_LE( 0x800000, "swp30", ROMREGION_ERASE00 )
+	ROM_LOAD32_WORD( "xs518a0.ic22", 0x0000000, 0x400000, CRC(2550d44f) SHA1(fd3cce228c7d389a2fde25c808a5b26080588cba) )
+	ROM_LOAD32_WORD( "xs743a0.ic23", 0x0000002, 0x400000, CRC(a9109a6c) SHA1(a67bb49378a38a2d809bd717d286e18bc6496db0) )
+ROM_END
+
 } // anonymous namespace
 
 
-SYST( 1996, mu90, 0, 0, mu90, mu90, mu90_state, empty_init, "Yamaha", "MU90", MACHINE_NOT_WORKING )
+SYST( 1996, mu90,     0, 0, mu90,  mu90, mu90_state, empty_init, "Yamaha", "MU90",  MACHINE_NOT_WORKING )
+SYST( 2005, mu90b, mu90, 0, mu90b, mu90, mu90_state, empty_init, "Yamaha", "MU90B", MACHINE_NOT_WORKING )

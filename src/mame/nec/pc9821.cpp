@@ -45,45 +45,58 @@
 #include "emu.h"
 #include "pc9821.h"
 
+// TODO: remove me, cfr. pc9801.cpp; verify that 9801 clocks are correct for 9821 series as well
+#define BASE_CLOCK      XTAL(31'948'800)    // verified for PC-9801RS/FA
+#define MAIN_CLOCK_X1   (BASE_CLOCK / 16)   // 1.9968 MHz
+#define MAIN_CLOCK_X2   (BASE_CLOCK / 13)   // 2.4576 MHz
+
 uint32_t pc9821_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	if(m_video_ff[DISPLAY_REG] != 0)
 	{
-		// PEGC 256 mode is linear VRAM picked from a specific VRAM buffer.
-		// It doesn't latch values from GDC, it runs on its own renderer instead.
-		// Is the DAC really merging two pixels not unlike VGA correlated Mode 13h?
-		// https://github.com/joncampbell123/dosbox-x/issues/1289#issuecomment-543025016
-		// TODO: getter cliprect from bitmap GDC
 		if (m_ex_video_ff[ANALOG_256_MODE])
 		{
 			rgb_t const *const palette = m_palette->palette()->entry_list_raw();
-			u16 *ext_gvram = (u16 *)m_ext_gvram.target();
+			u8 *ext_gvram = (u8 *)m_ext_gvram.target();
 			int base_y = cliprect.min_y;
+			u32 base_address;
+			u16 pitch;
+			u8 im;
+			// 0x68: VRAM 800/480 line mode (os2warp3)
+			const u32 vram_base = BIT(m_ex_video_ff[0x68 >> 1], 0) ? 0 : m_vram_disp * 0x40000;
 
 			for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 			{
+				const int rel_y = y - base_y;
+
+				std::tie(base_address, pitch, im) = m_hgdc[1]->get_area_partition_props(rel_y);
+				// aitd sets PITCH=40 (320), guess: assume im == 0 doing the trick
+				const u8 pitch_shift = im ^ 1;
+
 				for (int x = cliprect.min_x; x <= cliprect.max_x; x += 8)
 				{
-					u32 address = (y - base_y) * (640 / 8) + (x / 8);
-					for(int xi = 0; xi < 8; xi += 2)
+					// Mask is confirmed by flashb:
+					// does double buffering at SAD $38fc and $fffc, except when
+					// it goes single on title, drawing on current bank displayed.
+					u32 address = (((base_address << 1) + (rel_y) * (pitch << pitch_shift) + (x >> 3)) & 0xffff) << 3;
+					for(int xi = 0; xi < 8; xi ++)
 					{
 						int res_x = x + xi;
 						int res_y = y;
 
-						u16 pen = ext_gvram[(address << 2) + (xi >> 1) + (m_vram_disp * 0x20000)];
+						u16 pen = ext_gvram[((address + xi) + vram_base) & 0x7ffff];
 
-						bitmap.pix(res_y, res_x + 0) = palette[(pen & 0xff) + 0x20];
-						bitmap.pix(res_y, res_x + 1) = palette[(pen >> 8) + 0x20];
+						bitmap.pix(res_y, res_x) = palette[(pen & 0xff) + 0x20];
 					}
 				}
 			}
 		}
 		else
 			m_hgdc[1]->screen_update(screen, bitmap, cliprect);
+		m_hgdc[0]->screen_update(screen, bitmap, cliprect);
 	}
-	m_hgdc[0]->screen_update(screen, bitmap, cliprect);
 
 	return 0;
 }
@@ -129,8 +142,13 @@ void pc9821_state::pc9821_video_ff_w(offs_t offset, uint8_t data)
 			return;
 		m_ex_video_ff[(data & 0xfe) >> 1] = data & 1;
 
-		//if((data & 0xfe) == 0x20)
-		//  logerror("%02x\n",data & 1);
+		if((data & 0xfe) == 0x20)
+		{
+			if (data & 1)
+				m_pegc_mmio_view.select(0);
+			else
+				m_pegc_mmio_view.disable();
+		}
 	}
 
 	/* Intentional fall-through */
@@ -171,17 +189,17 @@ void pc9821_state::pc9821_a0_w(offs_t offset, uint8_t data)
 	{
 		switch(offset)
 		{
-			case 0x08: m_analog256.pal_entry = data & 0xff; break;
-			case 0x0a: m_analog256.g[m_analog256.pal_entry] = data & 0xff; break;
-			case 0x0c: m_analog256.r[m_analog256.pal_entry] = data & 0xff; break;
-			case 0x0e: m_analog256.b[m_analog256.pal_entry] = data & 0xff; break;
+			case 0x08: m_pegc.pal_entry = data & 0xff; break;
+			case 0x0a: m_pegc.g[m_pegc.pal_entry] = data & 0xff; break;
+			case 0x0c: m_pegc.r[m_pegc.pal_entry] = data & 0xff; break;
+			case 0x0e: m_pegc.b[m_pegc.pal_entry] = data & 0xff; break;
 		}
 
 		m_palette->set_pen_color(
-			m_analog256.pal_entry + 0x20,
-			m_analog256.r[m_analog256.pal_entry],
-			m_analog256.g[m_analog256.pal_entry],
-			m_analog256.b[m_analog256.pal_entry]
+			m_pegc.pal_entry + 0x20,
+			m_pegc.r[m_pegc.pal_entry],
+			m_pegc.g[m_pegc.pal_entry],
+			m_pegc.b[m_pegc.pal_entry]
 		);
 		return;
 	}
@@ -273,7 +291,7 @@ uint16_t pc9821_state::pc9821_grcg_gvram_r(offs_t offset, uint16_t mem_mask)
 		u16 *ext_gvram = (u16 *)m_ext_gvram.target();
 		int bank = offset >> 14;
 		if(bank <= 1)
-			return ext_gvram[((m_analog256.bank[bank])*0x4000) + (offset & 0x3fff)];
+			return ext_gvram[((m_pegc.bank[bank])*0x4000) + (offset & 0x3fff)];
 		return 0xffff;
 	}
 
@@ -287,46 +305,118 @@ void pc9821_state::pc9821_grcg_gvram_w(offs_t offset, uint16_t data, uint16_t me
 		u16 *ext_gvram = (u16 *)m_ext_gvram.target();
 		int bank = offset >> 14;
 		if(bank <= 1)
-			COMBINE_DATA(&ext_gvram[((m_analog256.bank[bank])*0x4000) + (offset & 0x3fff)]);
+			COMBINE_DATA(&ext_gvram[((m_pegc.bank[bank])*0x4000) + (offset & 0x3fff)]);
 		return;
 	}
 
 	grcg_gvram_w(offset,data,mem_mask);
 }
 
-uint16_t pc9821_state::pc9821_grcg_gvram0_r(offs_t offset, uint16_t mem_mask)
+
+void pc9821_state::pc9821_mode_ff_w(u8 data)
 {
-	if(m_ex_video_ff[ANALOG_256_MODE])
+	const u8 mode_ff = data & 0xfe;
+	const u8 setting = BIT(data, 0);
+	// 24/31 kHz Monitor setting
+	// BA / BX / PC-H98 / PC-9821 / 98NOTE uses this f/f in place of 15/24 kHz switch
+	// TODO: better compose
+	// TODO: both frequencies needs to be verified
+	// TODO: os2warp3 still runs at wrong clock, why?
+	// 31 kHz from standard VGA clock (flashb)
+	if (mode_ff == 0x20)
 	{
-		switch(offset*2)
-		{
-			case 4: return m_analog256.bank[0];
-			case 6: return m_analog256.bank[1];
-		}
+		const XTAL screen_clock = (setting ? XTAL(25'175'000) : XTAL(21'052'600)) / 8;
 
-		//return 0;
+		m_hgdc[0]->set_unscaled_clock(screen_clock);
+		m_hgdc[1]->set_unscaled_clock(screen_clock);
 	}
-
-	return grcg_gvram0_r(offset, mem_mask);
+	else
+		logerror("Mode f/f $0068: [%02x] -> %02x\n", mode_ff, setting);
 }
 
-void pc9821_state::pc9821_grcg_gvram0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+// $e0000 base
+void pc9821_state::pegc_mmio_map(address_map &map)
 {
-	if(m_ex_video_ff[ANALOG_256_MODE])
+	map(0x0004, 0x0004).select(2).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_pegc.bank[offset];
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_pegc.bank[offset] = data & 0xf;
+		})
+	);
+	map(0x100, 0x100).lw8(
+		NAME([this] (u8 data) {
+			m_pegc.packed_mode = bool(BIT(data, 0));
+			logerror("$e0100 packed mode %02x\n", data);
+		})
+	);
+//  map(0x102, 0x102) enable pegc linear VRAM at upper addresses
+	// $4a0 alias
+	map(0x104, 0x104).lw8(
+		NAME([this] (u8 data) {
+			pc9821_egc_w(0x0 / 2, data, 0x00ff);
+		})
+	);
+	// $4a4 alias
+	map(0x108, 0x109).lw16(
+		NAME([this] (u16 data, u16 mem_mask) {
+			pc9821_egc_w(0x4 / 2, data, mem_mask);
+		})
+	);
+//  map(0x10a, 0x10a) enable color comparator when reading VRAM
+	// $4a8 alias (mask)
+	// TODO: verify what happens on 32-bit accesses
+	map(0x10c, 0x10d).lw16(
+		NAME([this] (u16 data, u16 mem_mask) {
+			pc9821_egc_w(0x8 / 2, data, mem_mask);
+		})
+	);
+	// $4ae alias (block transfer)
+	map(0x110, 0x111).lw16(
+		NAME([this] (u16 data, u16 mem_mask) {
+			pc9821_egc_w(0xe / 2, data, mem_mask);
+		})
+	);
+	// $4ac alias (shift reg)
+	map(0x112, 0x113).lw16(
+		NAME([this] (u16 data, u16 mem_mask) {
+			pc9821_egc_w(0xc / 2, data, mem_mask);
+		})
+	);
+	// $4a6 alias (foreground color)
+	map(0x114, 0x114).lw8(
+		NAME([this] (u8 data) {
+			pc9821_egc_w(0x6 / 2, data, 0xff);
+		})
+	);
+	// $4aa alias (background color)
+	map(0x118, 0x118).lw8(
+		NAME([this] (u8 data) {
+			pc9821_egc_w(0xa / 2, data, 0xff);
+		})
+	);
+//  map(0x120, 0x19f) pattern register (image_xfer? relates to bit 15 of $108)
+}
+
+// make sure the latch read doesn't occur mid cycle, 8253 needs this?
+void pc9821_state::pit_latch_delay(offs_t offset, uint8_t data)
+{
+	if((offset == 3) && !(data & 0x30))
 	{
-		//printf("%08x %08x\n",offset*2,data);
-		if(mem_mask & 0xff)
-		{
-			switch(offset*2)
-			{
-				case 4: m_analog256.bank[0] = data & 0xf; break;
-				case 6: m_analog256.bank[1] = data & 0xf; break;
-			}
-		}
+
+		m_pit_delay->adjust(attotime::from_hz(MAIN_CLOCK_X1/2));
+		m_maincpu->spin_until_time(attotime::from_hz(MAIN_CLOCK_X1/2));
+		m_maincpu->abort_timeslice();
+		m_pit_latch_cmd = data;
 		return;
 	}
+	m_pit->write(offset, data);
+}
 
-	grcg_gvram0_w(offset,data,mem_mask);
+TIMER_CALLBACK_MEMBER(pc9821_state::pit_delay)
+{
+	m_pit->write(3, m_pit_latch_cmd);
 }
 
 void pc9821_state::pc9821_map(address_map &map)
@@ -336,7 +426,9 @@ void pc9821_state::pc9821_map(address_map &map)
 //  map(0x000cc000, 0x000cffff).rom().region("sound_bios", 0); //sound BIOS
 //  map(0x000d8000, 0x000d9fff).rom().region("ide",0)
 //  map(0x000da000, 0x000dbfff).ram(); // ide ram
-	map(0x000e0000, 0x000e7fff).rw(FUNC(pc9821_state::pc9821_grcg_gvram0_r), FUNC(pc9821_state::pc9821_grcg_gvram0_w));
+	map(0x000e0000, 0x000e7fff).rw(FUNC(pc9821_state::grcg_gvram0_r), FUNC(pc9821_state::grcg_gvram0_w));
+	map(0x000e0000, 0x000e7fff).view(m_pegc_mmio_view);
+	m_pegc_mmio_view[0](0x000e0000, 0x000e7fff).m(*this, FUNC(pc9821_state::pegc_mmio_map));
 	map(0x00f00000, 0x00f9ffff).ram().share("ext_gvram");
 	map(0xfff00000, 0xfff9ffff).ram().share("ext_gvram");
 }
@@ -352,14 +444,18 @@ void pc9821_state::pc9821_io(address_map &map)
 	map(0x0020, 0x002f).w(FUNC(pc9821_state::dmapg8_w)).umask32(0xff00ff00);
 	map(0x0030, 0x0037).rw(m_ppi_sys, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask32(0xff00ff00); //i8251 RS232c / i8255 system port
 	map(0x0040, 0x0047).rw(m_ppi_prn, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask32(0x00ff00ff);
-	map(0x0040, 0x0047).rw(m_keyb, FUNC(pc9801_kbd_device::rx_r), FUNC(pc9801_kbd_device::tx_w)).umask32(0xff00ff00); //i8255 printer port / i8251 keyboard
+	map(0x0040, 0x0043).rw(m_sio_kbd, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0xff00); //i8255 printer port / i8251 keyboard
 //  map(0x0050, 0x0053).w(FUNC(pc9821_state::nmi_ctrl_w)).umask32(0x00ff00ff);
 //  map(0x005c, 0x005f).r(FUNC(pc9821_state::timestamp_r)).nopw(); // artic
+	map(0x005c, 0x005f).lw8([this](offs_t o) { m_maincpu->spin_until_time(attotime::from_hz(MAIN_CLOCK_X1/3)); m_maincpu->abort_timeslice();}, "bus delay"); // simulate bus delay
 //  map(0x0060, 0x0063).rw(m_hgdc[0], FUNC(upd7220_device::read), FUNC(upd7220_device::write)).umask32(0x00ff00ff); //upd7220 character ports / <undefined>
 //  map(0x0060, 0x0063).r(FUNC(pc9821_state::unk_r)).umask32(0xff00ff00); // mouse related (unmapped checking for AT keyb controller\PS/2 mouse?)
 //  map(0x0064, 0x0064).w(FUNC(pc9821_state::vrtc_clear_w));
 	map(0x0068, 0x006b).w(FUNC(pc9821_state::pc9821_video_ff_w)).umask32(0x00ff00ff); //mode FF / <undefined>
-//  map(0x0070, 0x007f).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask32(0xff00ff00);
+	map(0x006c, 0x006d).w(FUNC(pc9821_state::border_color_w)).umask16(0x00ff);
+	map(0x006e, 0x006f).w(FUNC(pc9821_state::pc9821_mode_ff_w)).umask16(0x00ff);
+	map(0x0070, 0x007f).r(m_pit, FUNC(pit8253_device::read)).umask16(0xff00);
+	map(0x0070, 0x007f).w(FUNC(pc9821_state::pit_latch_delay)).umask16(0xff00);
 //  map(0x0070, 0x007f).rw(FUNC(pc9821_state::grcg_r), FUNC(pc9821_state::grcg_w)).umask32(0x00ff00ff); //display registers "GRCG" / i8253 pit
 	map(0x0090, 0x0093).m(m_fdc_2hd, FUNC(upd765a_device::map)).umask32(0x00ff00ff);
 	map(0x0094, 0x0094).rw(FUNC(pc9821_state::fdc_2hd_ctrl_r), FUNC(pc9821_state::fdc_2hd_ctrl_w));
@@ -392,11 +488,13 @@ void pc9821_state::pc9821_io(address_map &map)
 //  map(0x0c24, 0x0c24) cs4231 PCM board register control
 //  map(0x0c2b, 0x0c2b) cs4231 PCM board low byte control
 //  map(0x0c2d, 0x0c2d) cs4231 PCM board hi byte control
+	map(0x0ca0, 0x0ca0).lr8(NAME([] () { return 0xff; })); // high reso detection
 //  map(0x0cc0, 0x0cc7) SCSI interface / <undefined>
 //  map(0x0cfc, 0x0cff) PCI bus
 	map(0x1e8c, 0x1e8f).noprw(); // IDE RAM switch
 	map(0x2ed0, 0x2edf).lr8(NAME([] (address_space &s, offs_t o, u8 mm) { return 0xff; })).umask32(0xffffffff); // unknown sound related
-//  map(0x3fd8, 0x3fdf).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask32(0xff00ff00); // <undefined> / pit mirror ports
+	map(0x3fd8, 0x3fdf).r(m_pit, FUNC(pit8253_device::read)).umask16(0xff00);
+	map(0x3fd8, 0x3fdf).w(FUNC(pc9821_state::pit_latch_delay)).umask16(0xff00);
 //  map(0x7fd8, 0x7fdf).rw(m_ppi_mouse, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask32(0xff00ff00);
 //  map(0x841c, 0x8f1f).rw(FUNC(pc9821_state::sdip_r<0x0>), FUNC(pc9821_state::sdip_w<0x0>));
 //  map(0xa460, 0xa46f) cs4231 PCM extended port / <undefined>
@@ -651,6 +749,7 @@ INPUT_PORTS_END
 
 MACHINE_START_MEMBER(pc9821_state,pc9821)
 {
+	m_pit_delay = timer_alloc(FUNC(pc9821_state::pit_delay), this);
 	MACHINE_START_CALL_MEMBER(pc9801bx2);
 
 	// ...
@@ -675,14 +774,10 @@ MACHINE_RESET_MEMBER(pc9821_state,pc9821)
 	MACHINE_RESET_CALL_MEMBER(pc9801rs);
 
 	m_pc9821_window_bank = 0x08;
+	m_pegc_mmio_view.disable();
 }
 
 // TODO: setter for DMAC clock should follow up whatever is the CPU clock
-
-// TODO: remove me, cfr. pc9801.cpp; verify that 9801 clocks are correct for 9821 series as well
-#define BASE_CLOCK      XTAL(31'948'800)    // verified for PC-9801RS/FA
-#define MAIN_CLOCK_X1   (BASE_CLOCK / 16)   // 1.9968 MHz
-#define MAIN_CLOCK_X2   (BASE_CLOCK / 13)   // 2.4576 MHz
 
 void pc9821_state::pc9821(machine_config &config)
 {
@@ -735,7 +830,7 @@ void pc9821_mate_a_state::pc9821ap2(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &pc9821_mate_a_state::pc9821_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	pit_clock_config(config, xtal / 4); // unknown, fixes timer error at POST
+	//pit_clock_config(config, xtal / 4); // unknown, fixes timer error at POST
 
 	MCFG_MACHINE_START_OVERRIDE(pc9821_mate_a_state, pc9821ap2)
 }
@@ -749,7 +844,7 @@ void pc9821_canbe_state::pc9821ce2(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &pc9821_canbe_state::pc9821_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	pit_clock_config(config, xtal / 4); // unknown, fixes timer error at POST
+	//pit_clock_config(config, xtal / 4); // unknown, fixes timer error at POST
 
 	m_cbus[0]->set_default_option("pc9801_118");
 
@@ -765,7 +860,7 @@ void pc9821_canbe_state::pc9821cx3(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &pc9821_canbe_state::pc9821cx3_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	pit_clock_config(config, xtal / 4); // unknown, fixes timer error at POST
+	//pit_clock_config(config, xtal / 4); // unknown, fixes timer error at POST
 
 //  m_cbus[0]->set_default_option(nullptr);
 	m_cbus[0]->set_default_option("pc9801_118");

@@ -814,7 +814,7 @@ void pc8801_state::palram_w(offs_t offset, uint8_t data)
 	// p8suite Analog RGB test cross bars (reportedly works in 24 kHz / 80 column only)
 	// NB: it uses a bunch of non-waitstate related opcodes to cycle time it right,
 	// implying a stress-test for Z80 opcode cycles.
-//  m_screen->update_partial(m_screen->vpos());
+	m_screen->update_partial(m_screen->vpos());
 }
 
 
@@ -1286,8 +1286,8 @@ static INPUT_PORTS_START( pc8801 )
 	PORT_DIPNAME( 0x08, 0x00, "Auto-boot floppy at start-up" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-//  PORT_BIT( 0x10, IP_ACTIVE_HIGH,IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("upd1990a", upd1990a_device, data_out_r)
-//  PORT_BIT( 0x20, IP_ACTIVE_HIGH,IPT_CUSTOM ) PORT_VBLANK("screen")
+//  PORT_BIT( 0x10, IP_ACTIVE_HIGH,IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("upd1990a", FUNC(upd1990a_device::data_out_r))
+//  PORT_BIT( 0x20, IP_ACTIVE_HIGH,IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	// TODO: Coming from the old legacy driver as "EXSWITCH", where this maps?

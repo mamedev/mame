@@ -51,10 +51,10 @@ private:
 	void palette_init(palette_device &palette);
 	void scsihd(machine_config &config);
 
-	void emax_periphs(address_map &map);
-	void emax_map(address_map &map);
-	void emaxp_map(address_map &map);
-	void emax2_map(address_map &map);
+	void emax_periphs(address_map &map) ATTR_COLD;
+	void emax_map(address_map &map) ATTR_COLD;
+	void emaxp_map(address_map &map) ATTR_COLD;
+	void emax2_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pit8254_device> m_ctc;
@@ -308,6 +308,6 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1986, emax,  0,    0, emax,  emax,  emax_state, empty_init, "E-mu Systems", "Emax Digital Sampling Keyboard", MACHINE_IS_SKELETON)
-SYST(198?, emaxp, emax, 0, emaxp, emax,  emax_state, empty_init, "E-mu Systems", "Emax Plus Digital Sampling Keyboard", MACHINE_IS_SKELETON)
-SYST(1989, emax2, 0,    0, emax2, emax2, emax_state, empty_init, "E-mu Systems", "Emax II 16-Bit Digital Sound System", MACHINE_IS_SKELETON)
+SYST(1986, emax,  0,    0, emax,  emax,  emax_state, empty_init, "E-mu Systems", "Emax Digital Sampling Keyboard", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(198?, emaxp, emax, 0, emaxp, emax,  emax_state, empty_init, "E-mu Systems", "Emax Plus Digital Sampling Keyboard", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1989, emax2, 0,    0, emax2, emax2, emax_state, empty_init, "E-mu Systems", "Emax II 16-Bit Digital Sound System", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

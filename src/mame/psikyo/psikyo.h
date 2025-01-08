@@ -129,8 +129,8 @@ private:
 
 	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 	template<int Layer> TILEMAP_MAPPER_MEMBER(tile_scan);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	DECLARE_VIDEO_START(sngkace);
 	DECLARE_VIDEO_START(psikyo);
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -153,18 +153,18 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<buffered_spriteram32_device> m_spriteram;
 
-	void gunbird_map(address_map &map);
-	void gunbird_sound_io_map(address_map &map);
-	void gunbird_sound_map(address_map &map);
-	void psikyo_bootleg_map(address_map &map);
-	void psikyo_map(address_map &map);
-	void s1945_map(address_map &map);
-	void s1945_sound_io_map(address_map &map);
-	void s1945bl_oki_map(address_map &map);
-	void s1945n_map(address_map &map);
-	void sngkace_map(address_map &map);
-	void sngkace_sound_io_map(address_map &map);
-	void sngkace_sound_map(address_map &map);
+	void gunbird_map(address_map &map) ATTR_COLD;
+	void gunbird_sound_io_map(address_map &map) ATTR_COLD;
+	void gunbird_sound_map(address_map &map) ATTR_COLD;
+	void psikyo_bootleg_map(address_map &map) ATTR_COLD;
+	void psikyo_map(address_map &map) ATTR_COLD;
+	void s1945_map(address_map &map) ATTR_COLD;
+	void s1945_sound_io_map(address_map &map) ATTR_COLD;
+	void s1945bl_oki_map(address_map &map) ATTR_COLD;
+	void s1945n_map(address_map &map) ATTR_COLD;
+	void sngkace_map(address_map &map) ATTR_COLD;
+	void sngkace_sound_io_map(address_map &map) ATTR_COLD;
+	void sngkace_sound_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_PSIKYO_PSIKYO_H

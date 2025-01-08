@@ -170,7 +170,7 @@ public:
 	void init_coinmstr();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_shared_ptr<uint8_t> m_videoram;
@@ -195,14 +195,14 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void coinmstr_map(address_map &map);
-	void jpcoin_io_map(address_map &map);
-	void jpcoin_map(address_map &map);
-	void jpjcoin_io_map(address_map &map);
-	void pokeroul_io_map(address_map &map);
-	void quizmstr_io_map(address_map &map);
-	void supnudg2_io_map(address_map &map);
-	void trailblz_io_map(address_map &map);
+	void coinmstr_map(address_map &map) ATTR_COLD;
+	void jpcoin_io_map(address_map &map) ATTR_COLD;
+	void jpcoin_map(address_map &map) ATTR_COLD;
+	void jpjcoin_io_map(address_map &map) ATTR_COLD;
+	void pokeroul_io_map(address_map &map) ATTR_COLD;
+	void quizmstr_io_map(address_map &map) ATTR_COLD;
+	void supnudg2_io_map(address_map &map) ATTR_COLD;
+	void trailblz_io_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -1627,11 +1627,11 @@ void coinmstr_state::init_coinmstr()
 *      Game Drivers      *
 *************************/
 
-//    YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT           ROT   COMPANY                  FULLNAME                                    FLAGS
-GAME( 1985, quizmstr, 0,        quizmstr, quizmstr, coinmstr_state, init_coinmstr, ROT0, "Loewen Spielautomaten", "Quizmaster (German)",                      MACHINE_UNEMULATED_PROTECTION )
-GAME( 1987, trailblz, 0,        trailblz, trailblz, coinmstr_state, init_coinmstr, ROT0, "Coinmaster",            "Trail Blazer",                             MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // or Trail Blazer 2 ?
-GAME( 1989, supnudg2, 0,        supnudg2, supnudg2, coinmstr_state, init_coinmstr, ROT0, "Coinmaster",            "Super Nudger II - P173 (Version 5.21)",    MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1990, pokeroul, 0,        pokeroul, pokeroul, coinmstr_state, empty_init,    ROT0, "Coinmaster",            "Poker Roulette (Version 8.22)",            MACHINE_NOT_WORKING )
-GAME( 1985, jpcoin,   0,        jpcoin,   jpcoin,   coinmstr_state, empty_init,    ROT0, "Coinmaster",            "Joker Poker (Coinmaster set 1)",           0 )
-GAME( 1990, jpcoin2,  0,        jpcoin,   jpcoin,   coinmstr_state, empty_init,    ROT0, "Coinmaster",            "Joker Poker (Coinmaster, Amusement Only)", 0 )
-GAME( 1988, jpjcoin, 0,         jpjcoin,  jpcoin,   coinmstr_state, empty_init,    ROT0, "<unknown>",             "Jackpot Joker Poker (Version 88V 01)",     0 )
+//    YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT           ROT   COMPANY                   FULLNAME                                    FLAGS
+GAME( 1985, quizmstr, 0,        quizmstr, quizmstr, coinmstr_state, init_coinmstr, ROT0, u8"Löwen Spielautomaten", "Quizmaster (German)",                      MACHINE_UNEMULATED_PROTECTION )
+GAME( 1987, trailblz, 0,        trailblz, trailblz, coinmstr_state, init_coinmstr, ROT0, "Coinmaster",             "Trail Blazer",                             MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // or Trail Blazer 2 ?
+GAME( 1989, supnudg2, 0,        supnudg2, supnudg2, coinmstr_state, init_coinmstr, ROT0, "Coinmaster",             "Super Nudger II - P173 (Version 5.21)",    MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1990, pokeroul, 0,        pokeroul, pokeroul, coinmstr_state, empty_init,    ROT0, "Coinmaster",             "Poker Roulette (Version 8.22)",            MACHINE_NOT_WORKING )
+GAME( 1985, jpcoin,   0,        jpcoin,   jpcoin,   coinmstr_state, empty_init,    ROT0, "Coinmaster",             "Joker Poker (Coinmaster set 1)",           0 )
+GAME( 1990, jpcoin2,  0,        jpcoin,   jpcoin,   coinmstr_state, empty_init,    ROT0, "Coinmaster",             "Joker Poker (Coinmaster, Amusement Only)", 0 )
+GAME( 1988, jpjcoin, 0,         jpjcoin,  jpcoin,   coinmstr_state, empty_init,    ROT0, "<unknown>",              "Jackpot Joker Poker (Version 88V 01)",     0 )

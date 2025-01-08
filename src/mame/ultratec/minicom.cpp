@@ -75,8 +75,8 @@ private:
 	uint8_t m_p[4]{};
 	uint16_t m_display_data = 0;
 	int m_digit_index = 0;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	required_device<i87c52_device> m_maincpu;
 	output_finder<20> m_digits;
 };

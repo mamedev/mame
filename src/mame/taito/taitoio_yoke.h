@@ -34,12 +34,12 @@ public:
 	int handle_down_r();
 
 protected:
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// device-level overrides
 //  virtual void device_validity_check(validity_checker &valid) const;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	required_ioport m_stick_x;

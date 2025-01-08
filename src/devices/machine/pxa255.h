@@ -9,16 +9,15 @@
  *
  **************************************************************************/
 
-#ifndef MAME_MACHINE_PXA255
-#define MAME_MACHINE_PXA255
+#ifndef MAME_MACHINE_PXA255_H
+#define MAME_MACHINE_PXA255_H
 
 #pragma once
 
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 #include "sound/dmadac.h"
 #include "emupal.h"
-
+#include "screen.h"
 
 class pxa255_periphs_device : public device_t
 {
@@ -35,14 +34,14 @@ public:
 	template <int Bit> auto gpio_out() { return m_gpio_w[Bit].bind(); }
 	template <int Bit> void gpio_in(int state);
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	// gpio_bit_w
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	static constexpr u32 INTERNAL_OSC = 3686400;
 
@@ -470,6 +469,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device_array<dmadac_sound_device, 2> m_dmadac;
 	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
 
 	std::unique_ptr<u32[]> m_lcd_palette; // 0x100
 	std::unique_ptr<u8[]> m_lcd_framebuffer; // 0x100000
@@ -478,4 +478,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(PXA255_PERIPHERALS, pxa255_periphs_device)
 
-#endif // MAME_MACHINE_PXA255
+#endif // MAME_MACHINE_PXA255_H

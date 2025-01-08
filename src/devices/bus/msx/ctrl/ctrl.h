@@ -72,7 +72,7 @@ public:
 	bool exists() const { return m_device != nullptr; }
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	device_msx_general_purpose_port_interface *m_device;
 };

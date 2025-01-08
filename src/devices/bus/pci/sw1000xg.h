@@ -17,17 +17,17 @@ public:
 	sw1000xg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	required_device<h83002_device> m_maincpu;
 	required_device<swp30_device> m_swp30;
 
-	void h8_map(address_map &map);
-	void swp30_map(address_map &map);
+	void h8_map(address_map &map) ATTR_COLD;
+	void swp30_map(address_map &map) ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(SW1000XG, sw1000xg_device)

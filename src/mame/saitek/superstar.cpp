@@ -28,8 +28,9 @@ Superstar 36K:
 - 32KB ROM (custom label, same program as tstar432), extension ROM slot
 - piezo is very low pitch, this is normal
 
-There are 2 versions of Turbostar 432, the 2nd one has a lighter shade and
-the top-right is gray instead of red. It came with the KSO ROM included.
+There are 2 versions of Turbostar 432, the 2nd Kasparov brand version has
+a lighter shade and the top-right is gray instead of red. It came with the
+KSO ROM included.
 
 I.C.D. (a reseller in USA, NY) also sold a version overclocked to 5.53MHz,
 and named it Turbostar 540+. The ROM is unmodified, so the internal chess
@@ -83,7 +84,7 @@ public:
 	void tstar432(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -97,8 +98,8 @@ private:
 	u8 m_inp_mux = 0;
 
 	// address maps
-	void sstar28k_map(address_map &map);
-	void tstar432_map(address_map &map);
+	void sstar28k_map(address_map &map) ATTR_COLD;
+	void tstar432_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void control_w(u8 data);
@@ -210,7 +211,7 @@ static INPUT_PORTS_START( tstar432 )
 	PORT_INCLUDE( sstar28k )
 
 	PORT_START("CPU")
-	PORT_CONFNAME( 0x03, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, star_state, change_cpu_freq, 0) // factory set
+	PORT_CONFNAME( 0x03, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(star_state::change_cpu_freq), 0) // factory set
 	PORT_CONFSETTING(    0x00, "2MHz (Superstar 36K)" )
 	PORT_CONFSETTING(    0x01, "4MHz (Turbostar 432)" )
 	PORT_CONFSETTING(    0x02, "5.53MHz (Turbostar 540+)" )

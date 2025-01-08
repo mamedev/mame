@@ -36,7 +36,7 @@ public:
 	}
 
 	void hmxpro(machine_config &config);
-	void hmxpro_map(address_map &map);
+	void hmxpro_map(address_map &map) ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -44,7 +44,7 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank);
 
 private:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;

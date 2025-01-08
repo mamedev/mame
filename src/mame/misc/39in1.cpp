@@ -45,7 +45,6 @@
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 #include "machine/eepromser.h"
 #include "machine/pxa255.h"
 
@@ -81,6 +80,7 @@ public:
 	// I.A.M. slots
 	void init_fruitwld();
 	void init_jumanji();
+	void init_jumanjia();
 	void init_plutus();
 	void init_pokrwild();
 
@@ -89,7 +89,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(set_hiscore_dip);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u32 m_seed;
@@ -108,8 +108,8 @@ private:
 	void cpld_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	u32 prot_cheater_r();
 
-	void _39in1_map(address_map &map);
-	void base_map(address_map &map);
+	void _39in1_map(address_map &map) ATTR_COLD;
+	void base_map(address_map &map) ATTR_COLD;
 
 	void decrypt(u8 xor00, u8 xor02, u8 xor04, u8 xor08, u8 xor10, u8 xor20, u8 xor40, u8 xor80, u8 bit7, u8 bit6, u8 bit5, u8 bit4, u8 bit3, u8 bit2, u8 bit1, u8 bit0);
 	void further_decrypt(u8 xor400, u8 xor800, u8 xor1000, u8 xor2000, u8 xor4000, u8 xor8000);
@@ -268,13 +268,13 @@ static INPUT_PORTS_START( 39in1 )
 //  The following dips apply to 39in1 and 48in1. 60in1 is the same but the last unused dipsw#4 is test mode off/on.
 
 	PORT_START("DSW")      // 1x 4-position DIP switch labelled SW3
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )    PORT_DIPLOCATION("SW3:1") PORT_CHANGED_MEMBER(DEVICE_SELF, _39in1_state, set_flip_dip, 0)
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )    PORT_DIPLOCATION("SW3:1") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(_39in1_state::set_flip_dip), 0)
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "Display Mode" )            PORT_DIPLOCATION("SW3:2") PORT_CHANGED_MEMBER(DEVICE_SELF, _39in1_state, set_res_dip, 0)
+	PORT_DIPNAME( 0x02, 0x00, "Display Mode" )            PORT_DIPLOCATION("SW3:2") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(_39in1_state::set_res_dip), 0)
 	PORT_DIPSETTING(    0x02, "VGA 31.5kHz" )
 	PORT_DIPSETTING(    0x00, "CGA 15.75kHz" )
-	PORT_DIPNAME( 0x04, 0x04, "High Score Saver" )        PORT_DIPLOCATION("SW3:3") PORT_CHANGED_MEMBER(DEVICE_SELF, _39in1_state, set_hiscore_dip, 0)
+	PORT_DIPNAME( 0x04, 0x04, "High Score Saver" )        PORT_DIPLOCATION("SW3:3") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(_39in1_state::set_hiscore_dip), 0)
 	PORT_DIPSETTING(    0x04, "Disabled" )
 	PORT_DIPSETTING(    0x00, "Enabled" )
 INPUT_PORTS_END
@@ -354,7 +354,8 @@ void _39in1_state::init_60in1()  { decrypt(0x00, 0x00, 0x00, 0x40, 0x10, 0x80, 0
 // I.A.M. slots
 void _39in1_state::init_fruitwld()  { decrypt(0x0a, 0x00, 0x00, 0x20, 0x80, 0x00, 0x00, 0x00, 5, 1, 7, 4, 3, 2, 0, 6); /* further_decrypt(0x00, 0x00, 0x00, 0x00, 0x00, 0x00); m_mcu_ipt_pc = 0x00000; */ } // TODO: >= 0x4000 XORs unverified
 void _39in1_state::init_jumanji()   { decrypt(0x00, 0x00, 0x00, 0x02, 0x00, 0x40, 0x08, 0x00, 1, 0, 6, 2, 5, 3, 4, 7); further_decrypt(0x00, 0x08, 0x10, 0x40, 0x00, 0x00); /* m_mcu_ipt_pc = 0x00000; */ } // TODO: >= 0x4000 XORs unverified
-void _39in1_state::init_plutus()    { decrypt(0x00, 0x40, 0x08, 0x01, 0x00, 0x04, 0x80, 0x02, 6, 4, 0, 5, 7, 3, 2, 1); further_decrypt(0x00, 0x00, 0x10, 0x00, 0x00, 0x00); /* m_mcu_ipt_pc = 0x00000; */ } // TODO:  >= 0x4000 XORs unverified
+void _39in1_state::init_jumanjia()  { decrypt(0x00, 0x00, 0x00, 0x40, 0x10, 0x08, 0x04, 0x00, 3, 5, 1, 4, 7, 6, 2, 0); /* further_decrypt(0x00, 0x00, 0x00, 0x00, 0x00, 0x00); m_mcu_ipt_pc = 0x00000; */ } // TODO: >= 0x4000 XORs unverified
+void _39in1_state::init_plutus()    { decrypt(0x00, 0x40, 0x08, 0x01, 0x00, 0x04, 0x80, 0x02, 6, 4, 0, 5, 7, 3, 2, 1); further_decrypt(0x00, 0x00, 0x10, 0x00, 0x00, 0x00); /* m_mcu_ipt_pc = 0x00000; */ } // TODO: >= 0x4000 XORs unverified
 void _39in1_state::init_pokrwild()  { decrypt(0x20, 0x00, 0x00, 0x40, 0x08, 0x00, 0x00, 0x00, 6, 5, 3, 1, 0, 7, 2, 4); /* further_decrypt(0x00, 0x00, 0x00, 0x00, 0x00, 0x00); m_mcu_ipt_pc = 0x00000; */ } // TODO: >= 0x4000 XORs unverified
 
 void _39in1_state::base(machine_config &config)
@@ -557,6 +558,17 @@ ROM_START( jumanji ) // PCB383 - CHZ FP100 sticker on RAM under the lid. Dump wa
 	ROM_LOAD( "93c66.u32", 0x000, 0x200, NO_DUMP )
 ROM_END
 
+ROM_START( jumanjia ) // PCB383 - Jumanji FP101 sticker on RAM under the lid.
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "jumanji_113_fp101.u2", 0x00000, 0x80000, CRC(40a66c50) SHA1(8909db087a8527af8ce229b03e2f7f16160db6f0) )
+
+	ROM_REGION32_LE( 0x400000, "data", 0 )
+	ROM_LOAD( "m5m29gt320.u19", 0x000000, 0x400000, CRC(4cd694fe) SHA1(723c0ed2af994cc584654dbf0d779e1c90827c7b) )
+
+	ROM_REGION16_BE( 0x200, "eeprom", 0 )
+	ROM_LOAD( "at93c66.u32", 0x000, 0x200, CRC(60930a27) SHA1(9222b23d64d85f664037ba180f79045c108fed9c) )
+ROM_END
+
 ROM_START( plutus ) // PCB451 - PLUTUS FP100 sticker on PCB outside the lid
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "plutus v100.u2", 0x00000, 0x80000, CRC(3ac49895) SHA1(6de3dcac42afc4d9f927c9c9accf592b3d974fd3) )
@@ -597,5 +609,6 @@ GAME(2005, rodent,    0,        base,   39in1, _39in1_state, init_rodent,   ROT0
 GAME(2008, fruitwld,  0,        base,   39in1, _39in1_state, init_fruitwld, ROT0,  "I.A.M.",  "Fruit World (V111)",                                   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // FRUIT_V111.BIN 2008-04-30 15:59:21
 GAME(2007, fruitwlda, fruitwld, base,   39in1, _39in1_state, init_fruitwld, ROT0,  "I.A.M.",  "Fruit World (V110)",                                   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // FRUIT_V110.BIN 2007-07-26 13:46:30
 GAME(2007, jumanji,   0,        base,   39in1, _39in1_state, init_jumanji,  ROT0,  "I.A.M.",  "Jumanji (V502)",                                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // CHZ_V502.BIN 2007-07-26 13:49:35 in clear text at the end of the main CPU ROM
+GAME(2007, jumanjia,  jumanji,  base,   39in1, _39in1_state, init_jumanjia, ROT0,  "I.A.M.",  "Jumanji (V113)",                                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // JUMANJI_V113.BIN 2007-07-25 10:54:33
 GAME(200?, plutus,    0,        base,   39in1, _39in1_state, init_plutus,   ROT0,  "I.A.M.",  "Plutus (V100)",                                        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // no string
 GAME(200?, pokrwild,  0,        base,   39in1, _39in1_state, init_pokrwild, ROT0,  "I.A.M.",  "Poker's Wild (V117)",                                  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // no string

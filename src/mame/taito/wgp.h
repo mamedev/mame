@@ -47,9 +47,9 @@ public:
 	void init_wgp2();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	virtual void device_post_load() override;
 
 	TIMER_CALLBACK_MEMBER(trigger_cpu_b_int6);
@@ -73,9 +73,9 @@ private:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(cpub_interrupt);
 
-	void cpu2_map(address_map &map);
-	void main_map(address_map &map);
-	void z80_sound_map(address_map &map);
+	void cpu2_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void z80_sound_map(address_map &map) ATTR_COLD;
 
 	template<unsigned Offset> TILE_GET_INFO_MEMBER(get_piv_tile_info);
 

@@ -26,23 +26,13 @@
 class midi_module
 {
 public:
-	struct port_info
-	{
-		std::string name;
-		bool input;
-		bool output;
-		bool default_input;
-		bool default_output;
-	};
-	using port_info_vector = std::vector<port_info>;
-
 	virtual ~midi_module() = default;
 
 	// specific routines
 
 	virtual std::unique_ptr<osd::midi_input_port> create_input(std::string_view name) = 0;
 	virtual std::unique_ptr<osd::midi_output_port> create_output(std::string_view name) = 0;
-	virtual port_info_vector list_midi_ports() = 0;
+	virtual std::vector<osd::midi_port_info> list_midi_ports() = 0;
 };
 
 #endif // MAME_OSD_MODULES_MIDI_MIDI_MODULE_H

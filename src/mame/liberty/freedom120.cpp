@@ -56,14 +56,14 @@ public:
 	void freedom120(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<z80_device> m_maincpu;
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -151,4 +151,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE     INPUT  CLASS             INIT        COMPANY                FULLNAME                  FLAGS
-COMP( 1993, free120, 0,      0,      freedom120, 0,     freedom120_state, empty_init, "Liberty Electronics", "Freedom 120/Aspect 100", MACHINE_IS_SKELETON )
+COMP( 1993, free120, 0,      0,      freedom120, 0,     freedom120_state, empty_init, "Liberty Electronics", "Freedom 120/Aspect 100", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

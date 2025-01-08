@@ -28,16 +28,16 @@ public:
 	void sbasssta(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void input_select_w(u8 data);
 	u8 input_r();
 
-	void bassstr_prog(address_map &map);
-	void sbasssta_prog(address_map &map);
-	void bassstr_data(address_map &map);
-	void sbasssta_data(address_map &map);
+	void bassstr_prog(address_map &map) ATTR_COLD;
+	void sbasssta_prog(address_map &map) ATTR_COLD;
+	void bassstr_data(address_map &map) ATTR_COLD;
+	void sbasssta_data(address_map &map) ATTR_COLD;
 
 	required_device<mn1880_device> m_maincpu;
 	required_ioport_array<4> m_inputs;
@@ -183,5 +183,5 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1995, bassstr, 0, 0,  bassstr,  basssta, basssta_state, empty_init, "Novation", "BassStation Rack Analogue Synthesizer Module", MACHINE_IS_SKELETON)
-SYST(1997, sbasssta, 0, 0, sbasssta, basssta, basssta_state, empty_init, "Novation", "Super Bass Station", MACHINE_IS_SKELETON)
+SYST(1995, bassstr, 0, 0,  bassstr,  basssta, basssta_state, empty_init, "Novation", "BassStation Rack Analogue Synthesizer Module", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1997, sbasssta, 0, 0, sbasssta, basssta, basssta_state, empty_init, "Novation", "Super Bass Station", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

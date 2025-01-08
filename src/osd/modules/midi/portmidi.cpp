@@ -41,7 +41,7 @@ public:
 
 	virtual std::unique_ptr<midi_input_port> create_input(std::string_view name) override;
 	virtual std::unique_ptr<midi_output_port> create_output(std::string_view name) override;
-	virtual port_info_vector list_midi_ports() override;
+	virtual std::vector<osd::midi_port_info> list_midi_ports() override;
 };
 
 
@@ -177,17 +177,17 @@ std::unique_ptr<midi_output_port> pm_module::create_output(std::string_view name
 	}
 }
 
-midi_module::port_info_vector pm_module::list_midi_ports()
+std::vector<osd::midi_port_info> pm_module::list_midi_ports()
 {
 	int const num_devs = Pm_CountDevices();
 	int const def_input = Pm_GetDefaultInputDeviceID();
 	int const def_output = Pm_GetDefaultOutputDeviceID();
-	port_info_vector result;
+	std::vector<osd::midi_port_info> result;
 	result.reserve(num_devs);
 	for (int i = 0; num_devs > i; ++i)
 	{
 		auto const pm_info = Pm_GetDeviceInfo(i);
-		result.emplace_back(port_info{
+		result.emplace_back(osd::midi_port_info{
 				pm_info->name,
 				0 != pm_info->input,
 				0 != pm_info->output,

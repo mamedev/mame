@@ -12,6 +12,7 @@
 
 DEFINE_DEVICE_TYPE(HEATH_INTR_CNTRL, heath_intr_cntrl, "heath_intr_cntrl", "Heath H/Z-89 Interrupt Controller");
 DEFINE_DEVICE_TYPE(HEATH_Z37_INTR_CNTRL, z37_intr_cntrl, "heath_z37_intr_cntrl", "Heath H/Z-89 with Z-37 Interrupt Controller");
+DEFINE_DEVICE_TYPE(HEATH_MMS_INTR_CNTRL, mms_intr_cntrl, "heath_mms_intr_cntrl", "Heath H/Z-89 with MMS Interrupt Controller");
 
 DEFINE_DEVICE_TYPE(HEATH_INTR_SOCKET, heath_intr_socket, "heath_intr_socket", "Heath Interrupt Socket");
 
@@ -107,6 +108,43 @@ u8 heath_intr_cntrl::get_instruction()
 	return 0xc7 | ((level & 0x7) << 3);
 }
 
+
+/**
+ * Base interrupt controller for soft-sectored controller.
+ *
+ */
+ss_intr_cntrl::ss_intr_cntrl(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock):
+	heath_intr_cntrl(mconfig, type, tag, owner, clock)
+{
+}
+
+void ss_intr_cntrl::set_drq(int state)
+{
+	m_drq_raised = bool(state);
+
+	update_intr_line();
+}
+
+
+void ss_intr_cntrl::set_irq(int state)
+{
+	m_irq_raised = bool(state);
+
+	update_intr_line();
+}
+
+void ss_intr_cntrl::device_start()
+{
+	heath_intr_cntrl::device_start();
+
+	save_item(NAME(m_drq_raised));
+	save_item(NAME(m_irq_raised));
+
+	m_drq_raised   = false;
+	m_irq_raised   = false;
+}
+
+
 /**
  * Interrupt controller for the Z37 soft-sectored controller.
  *
@@ -114,7 +152,7 @@ u8 heath_intr_cntrl::get_instruction()
  * interrupts while it is waiting for Z37 events.
  */
 z37_intr_cntrl::z37_intr_cntrl(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock):
-	heath_intr_cntrl(mconfig, HEATH_Z37_INTR_CNTRL, tag, owner, clock)
+	ss_intr_cntrl(mconfig, HEATH_Z37_INTR_CNTRL, tag, owner, clock)
 {
 }
 
@@ -150,32 +188,13 @@ u8 z37_intr_cntrl::get_instruction()
 	return 0x00;
 }
 
-void z37_intr_cntrl::set_drq(int state)
-{
-	m_drq_raised = bool(state);
-
-	update_intr_line();
-}
-
-
-void z37_intr_cntrl::set_irq(int state)
-{
-	m_irq_raised = bool(state);
-
-	update_intr_line();
-}
-
 void z37_intr_cntrl::device_start()
 {
-	heath_intr_cntrl::device_start();
+	ss_intr_cntrl::device_start();
 
 	save_item(NAME(m_intr_blocked));
-	save_item(NAME(m_drq_raised));
-	save_item(NAME(m_irq_raised));
 
 	m_intr_blocked = false;
-	m_drq_raised   = false;
-	m_irq_raised   = false;
 }
 
 void z37_intr_cntrl::block_interrupts(u8 data)
@@ -183,6 +202,43 @@ void z37_intr_cntrl::block_interrupts(u8 data)
 	m_intr_blocked = bool(data);
 
 	update_intr_line();
+}
+
+
+/**
+ * Interrupt controller for the mms 77316 soft-sectored controller.
+ *
+ */
+mms_intr_cntrl::mms_intr_cntrl(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock):
+	ss_intr_cntrl(mconfig, HEATH_MMS_INTR_CNTRL, tag, owner, clock)
+{
+}
+
+void mms_intr_cntrl::update_intr_line()
+{
+	m_socket->raise_irq((m_irq_raised || m_drq_raised || (m_intr_lines != 0)) ? 1 : 0);
+}
+
+u8 mms_intr_cntrl::get_instruction()
+{
+	if (m_irq_raised)
+	{
+		// RST 30H (Interrupt 6)
+		return 0xf7;
+	}
+
+	if (m_drq_raised)
+	{
+		// EI
+		return 0xfb;
+	}
+
+	return heath_intr_cntrl::get_instruction();
+}
+
+void mms_intr_cntrl::device_start()
+{
+	ss_intr_cntrl::device_start();
 }
 
 

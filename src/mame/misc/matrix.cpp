@@ -61,7 +61,7 @@ private:
 	required_device<ds1287_device> m_rtc;
 	required_device<kbdc8042_device> m_kbdc;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 

@@ -47,8 +47,8 @@ public:
 	void altos5(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
@@ -66,8 +66,8 @@ private:
 	void busreq_w(int state);
 	void fdc_intrq_w(int state);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_port08 = 0U;
 	uint8_t m_port09 = 0U;
@@ -224,9 +224,7 @@ void altos5_state::io_write_byte(offs_t offset, uint8_t data)
 
 void altos5_state::busreq_w(int state)
 {
-// since our Z80 has no support for BUSACK, we assume it is granted immediately
 	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
-	m_dma->bai_w(state); // tell dma that bus has been granted
 	setup_banks(state); // adjust banking for dma or cpu
 }
 
@@ -304,37 +302,38 @@ void  altos5_state::port09_w(uint8_t data)
 
 QUICKLOAD_LOAD_MEMBER(altos5_state::quickload_cb)
 {
-	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
-
-	if (image.length() >= 0xfd00)
-		return std::make_pair(image_error::INVALIDLENGTH, std::string());
-
 	setup_banks(2);
 
-	/* Avoid loading a program if CP/M-80 is not in memory */
+	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
+
+	// Avoid loading a program if CP/M-80 is not in memory
 	if ((prog_space.read_byte(0) != 0xc3) || (prog_space.read_byte(5) != 0xc3))
 	{
 		machine_reset();
-		return std::make_pair(image_error::UNSUPPORTED, std::string());
+		return std::make_pair(image_error::UNSUPPORTED, "CP/M must already be running");
 	}
 
-	/* Load image to the TPA (Transient Program Area) */
+	const int mem_avail = 256 * prog_space.read_byte(7) + prog_space.read_byte(6) - 512;
+	if (mem_avail < image.length())
+		return std::make_pair(image_error::UNSPECIFIED, "Insufficient memory available");
+
+	// Load image to the TPA (Transient Program Area)
 	uint16_t quickload_size = image.length();
 	for (uint16_t i = 0; i < quickload_size; i++)
 	{
 		uint8_t data;
-
-		if (image.fread( &data, 1) != 1)
-			return std::make_pair(image_error::UNSPECIFIED, std::string());
-		prog_space.write_byte(i+0x100, data);
+		if (image.fread(&data, 1) != 1)
+			return std::make_pair(image_error::UNSPECIFIED, "Problem reading the image at offset " + std::to_string(i));
+		prog_space.write_byte(i + 0x100, data);
 	}
 
-	/* clear out command tail */
-	prog_space.write_byte(0x80, 0);   prog_space.write_byte(0x81, 0);
+	// clear out command tail
+	prog_space.write_byte(0x80, 0);
+	prog_space.write_byte(0x81, 0);
 
-	/* Roughly set SP basing on the BDOS position */
-	m_maincpu->set_state_int(Z80_SP, 256 * prog_space.read_byte(7) - 300);
-	m_maincpu->set_pc(0x100);       // start program
+	// Roughly set SP basing on the BDOS position
+	m_maincpu->set_state_int(Z80_SP, mem_avail + 384);
+	m_maincpu->set_pc(0x100); // start program
 
 	return std::make_pair(std::error_condition(), std::string());
 }
@@ -387,6 +386,7 @@ void altos5_state::altos5(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &altos5_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &altos5_state::io_map);
 	m_maincpu->set_daisy_config(daisy_chain_intf);
+	m_maincpu->busack_cb().set(m_dma, FUNC(z80dma_device::bai_w));
 
 	/* devices */
 	Z80DMA(config, m_dma, 8_MHz_XTAL / 2);

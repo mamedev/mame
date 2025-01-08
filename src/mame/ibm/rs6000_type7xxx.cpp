@@ -38,7 +38,7 @@ public:
 private:
 	required_device<ppc_device> m_maincpu;
 
-	void type7009_map(address_map &map);
+	void type7009_map(address_map &map) ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };

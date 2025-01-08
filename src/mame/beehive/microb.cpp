@@ -50,7 +50,7 @@ public:
 	void microb(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void dmac_hrq_w(int state);
@@ -61,8 +61,8 @@ private:
 	u8 ppi2_pa_r();
 	void ppi2_pc_w(u8 data);
 
-	void microb_io(address_map &map);
-	void microb_mem(address_map &map);
+	void microb_io(address_map &map) ATTR_COLD;
+	void microb_mem(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8257_device> m_dmac;
@@ -257,7 +257,7 @@ static INPUT_PORTS_START( microb )
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RShift") PORT_CODE(KEYCODE_RSHIFT)
 		PORT_BIT(0x83, IP_ACTIVE_LOW, IPT_UNUSED)
 
-		// assumed to be dipswitches, purpose unknown, see code from 12D
+	// assumed to be dipswitches, purpose unknown, see code from 12D
 	PORT_START("DIPS")
 	PORT_DIPNAME( 0x01, 0x01, "Switch A") PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR(Off))
@@ -388,5 +388,5 @@ ROM_END
 
 } // Anonymous namespace
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE INPU    CLASS         INIT        COMPANY                  FULLNAME                               FLAGS
+//    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   CLASS         INIT        COMPANY                  FULLNAME                               FLAGS
 COMP( 1982, dm3270, 0,      0,      microb, microb, microb_state, empty_init, "Beehive International", "DM3270 Control Unit Display Station", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

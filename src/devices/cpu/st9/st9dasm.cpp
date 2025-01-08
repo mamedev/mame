@@ -1186,7 +1186,7 @@ offs_t st9_disassembler::disassemble(std::ostream &stream, offs_t pc, const st9_
 	case 0x9f:
 	{
 		const u8 byte1 = opcodes.r8(pc + 1);
-		util::stream_format(stream, "%-8sr%d,(rr%d),", BIT(byte1, 4) ? "cpjt" : "cpjf", byte1 & 0x0f, (byte1 & 0xe0) >> 4);
+		util::stream_format(stream, "%-8sr%d,(rr%d),", BIT(byte1, 4) ? "cpjti" : "cpjfi", byte1 & 0x0f, (byte1 & 0xe0) >> 4);
 		format_label(stream, pc + 3 + s8(opcodes.r8(pc + 2)));
 		return 3 | STEP_COND | SUPPORTED;
 	}
@@ -1222,9 +1222,9 @@ offs_t st9_disassembler::disassemble(std::ostream &stream, offs_t pc, const st9_
 	{
 		const u8 byte1 = opcodes.r8(pc + 1);
 		if (BIT(byte1, 0))
-			util::stream_format(stream, "%-8sr%d,(rr%d)", "ld", byte1 >> 4, byte1 & 0x0e);
-		else
 			util::stream_format(stream, "%-8s(rr%d),r%d", "ld", byte1 & 0x0e, byte1 >> 4);
+		else
+			util::stream_format(stream, "%-8sr%d,(rr%d)", "ld", byte1 >> 4, byte1 & 0x0e);
 		return 2 | SUPPORTED;
 	}
 

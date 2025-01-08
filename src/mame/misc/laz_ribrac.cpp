@@ -42,7 +42,7 @@ public:
 	void ribrac(machine_config &config);
 
 private:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	void sound_data_w(u8 data);
 	void sound_control_w(u8 data);
@@ -52,8 +52,8 @@ private:
 	void led_w(u8 data);
 	void extra_w(u8 data);
 
-	void prog_map(address_map &map);
-	void ext_map(address_map &map);
+	void prog_map(address_map &map) ATTR_COLD;
+	void ext_map(address_map &map) ATTR_COLD;
 
 	required_device<mcs51_cpu_device> m_maincpu;
 	required_device_array<okim6295_device, 2> m_oki;
@@ -360,5 +360,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1993, ribrac, 0, ribrac, ribrac, ribrac_state, empty_init, ROT0, "Lazer-Tron", "Ribbit Racin (Lazer-Tron)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1993, ribrac, 0, ribrac, ribrac, ribrac_state, empty_init, ROT0, "Lazer-Tron", "Ribbit Racin (Lazer-Tron)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
 GAME( 19??, awetoss, 0, ribrac, awetoss, ribrac_state, empty_init, ROT0, "Lazer-Tron", "Awesome Toss 'Em (Lazer-Tron)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL )

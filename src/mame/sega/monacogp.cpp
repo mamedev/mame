@@ -152,10 +152,10 @@ private:
 	required_device<fixedfreq_device> m_video;
 
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 };
 
 
@@ -272,5 +272,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1980, monacogp,  0,         monacogp, 0, monacogp_state, empty_init, ROT0, "Sega", "Monaco GP (set 1)", MACHINE_IS_SKELETON )
-GAME( 1980, monacogpa, monacogp,  monacogp, 0, monacogp_state, empty_init, ROT0, "Sega", "Monaco GP (set 2)", MACHINE_IS_SKELETON )
+GAME( 1980, monacogp,  0,         monacogp, 0, monacogp_state, empty_init, ROT0, "Sega", "Monaco GP (set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1980, monacogpa, monacogp,  monacogp, 0, monacogp_state, empty_init, ROT0, "Sega", "Monaco GP (set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

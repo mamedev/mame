@@ -125,10 +125,10 @@ public:
 	uint32_t screen_update_lependu(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	void lependu_videoram_w(offs_t offset, uint8_t data);
 	void lependu_colorram_w(offs_t offset, uint8_t data);
@@ -143,7 +143,7 @@ protected:
 private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void lependu_palette(palette_device &palette) const;
-	void lependu_map(address_map &map);
+	void lependu_map(address_map &map) ATTR_COLD;
 
 	uint8_t lependu_mux_port_r();
 

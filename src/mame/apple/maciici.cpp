@@ -17,6 +17,7 @@
 
 #include "emu.h"
 
+#include "adbmodem.h"
 #include "egret.h"
 #include "macadb.h"
 #include "macrtc.h"
@@ -58,6 +59,7 @@ public:
 		m_rbv(*this, "rbv"),
 		m_macadb(*this, "macadb"),
 		m_ram(*this, RAM_TAG),
+		m_adbmodem(*this, "adbmodem"),
 		m_asc(*this, "asc"),
 		m_scsibus1(*this, "scsi"),
 		m_ncr5380(*this, "scsi:7:ncr5380"),
@@ -66,16 +68,18 @@ public:
 		m_floppy(*this, "fdc:%d", 0U),
 		m_scc(*this, "scc"),
 		m_rtc(*this, "rtc"),
-		m_egret(*this, "egret")
+		m_egret(*this, "egret"),
+		m_config(*this, "config")
 	{
 	}
 
+	void maciixi_base(machine_config &config);
 	void maciici(machine_config &config);
 	void maciisi(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<m68030_device> m_maincpu;
@@ -83,6 +87,7 @@ private:
 	required_device<rbv_device> m_rbv;
 	required_device<macadb_device> m_macadb;
 	required_device<ram_device> m_ram;
+	optional_device<adbmodem_device> m_adbmodem;
 	required_device<asc_device> m_asc;
 	required_device<nscsi_bus_device> m_scsibus1;
 	required_device<ncr5380_device> m_ncr5380;
@@ -92,6 +97,7 @@ private:
 	required_device<z80scc_device> m_scc;
 	optional_device<rtc3430042_device> m_rtc;
 	optional_device<egret_device> m_egret;
+	optional_ioport m_config;
 
 	void set_via2_interrupt(int value);
 	void field_interrupts();
@@ -120,7 +126,7 @@ private:
 
 	uint32_t rom_switch_r(offs_t offset);
 
-	void maciici_map(address_map &map);
+	void maciici_map(address_map &map) ATTR_COLD;
 
 	u16 scc_r(offs_t offset)
 	{
@@ -171,14 +177,6 @@ private:
 		else
 			m_fdc->write((offset >> 8) & 0xf, data >> 8);
 	}
-
-	void write_6015(int state)
-	{
-		if (state)
-		{
-			m_macadb->adb_vblank();
-		}
-	}
 };
 
 void maciici_state::machine_start()
@@ -197,6 +195,11 @@ void maciici_state::machine_reset()
 	if (m_egret)
 	{
 		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	}
+
+	if (m_config)
+	{
+		m_maincpu->set_fpu_enable(BIT(m_config->read(), 0));
 	}
 
 	// put ROM mirror at 0
@@ -340,14 +343,12 @@ uint8_t maciici_state::via_in_a_iisi()
 
 uint8_t maciici_state::via_in_b()
 {
-	u8 val = m_macadb->get_adb_state() << 4;
+	u8 val = m_rtc->data_r();
 
 	if (!m_adb_irq_pending)
 	{
 		val |= 0x08;
 	}
-
-	val |= m_rtc->data_r();
 
 	return val;
 }
@@ -373,9 +374,9 @@ void maciici_state::via_out_a(uint8_t data)
 void maciici_state::via_out_b(uint8_t data)
 {
 	//  printf("%s VIA1 OUT B: %02x\n", machine().describe_context().c_str(), data);
-	m_macadb->mac_adb_newaction((data & 0x30) >> 4);
+	m_adbmodem->set_via_state((data & 0x30) >> 4);
 
-	m_rtc->ce_w(BIT(data, 2));
+m_rtc->ce_w(BIT(data, 2));
 	m_rtc->data_w(BIT(data, 0));
 	m_rtc->clk_w(BIT(data, 1));
 }
@@ -388,7 +389,7 @@ void maciici_state::via_out_b_iisi(uint8_t data)
 
 void maciici_state::via_out_cb2(int state)
 {
-	m_macadb->adb_data_w(state);
+//  m_macadb->adb_data_w(state);
 }
 
 void maciici_state::via_out_cb2_iisi(int state)
@@ -500,10 +501,17 @@ void maciici_state::devsel_w(uint8_t devsel)
 static INPUT_PORTS_START(maciici)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START(maciisi)
+	PORT_START("config")
+	PORT_CONFNAME(0x01, 0x00, "FPU")
+	PORT_CONFSETTING(0x00, "No FPU")
+	PORT_CONFSETTING(0x01, "FPU Present")
+INPUT_PORTS_END
+
 /***************************************************************************
     MACHINE DRIVERS
 ***************************************************************************/
-void maciici_state::maciici(machine_config &config)
+void maciici_state::maciixi_base(machine_config &config)
 {
 	M68030(config, m_maincpu, 25000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &maciici_state::maciici_map);
@@ -591,7 +599,6 @@ void maciici_state::maciici(machine_config &config)
 
 	RBV(config, m_rbv, C15M);
 	m_rbv->via6015_callback().set(m_via1, FUNC(via6522_device::write_ca1));
-	m_rbv->via6015_callback().append(FUNC(maciici_state::write_6015));
 	m_rbv->irq_callback().set(FUNC(maciici_state::set_via2_interrupt));
 
 	/* internal ram */
@@ -610,28 +617,38 @@ void maciici_state::maciici(machine_config &config)
 	NUBUS_SLOT(config, "nbc", "nubus", mac_nubus_cards, nullptr);
 	NUBUS_SLOT(config, "nbd", "nubus", mac_nubus_cards, nullptr);
 	NUBUS_SLOT(config, "nbe", "nubus", mac_nubus_cards, nullptr);
+}
+
+void maciici_state::maciici(machine_config &config)
+{
+	maciixi_base(config);
+
+	ADBMODEM(config, m_adbmodem, C7M);
+	m_adbmodem->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));
+	m_adbmodem->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
+	m_adbmodem->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
+	m_adbmodem->irq_callback().set(FUNC(maciici_state::adb_irq_w));
+	m_via1->cb2_handler().set(m_adbmodem, FUNC(adbmodem_device::set_via_data));
+	config.set_perfect_quantum(m_maincpu);
 
 	MACADB(config, m_macadb, C15M);
-	m_macadb->set_mcu_mode(false);
-	m_macadb->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));
-	m_macadb->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
-	m_macadb->adb_irq_callback().set(FUNC(maciici_state::adb_irq_w));
+	m_macadb->adb_data_callback().set(m_adbmodem, FUNC(adbmodem_device::set_adb_line));
 }
 
 void maciici_state::maciisi(machine_config &config)
 {
-	maciici(config);
+	maciixi_base(config);
 
 	M68030(config.replace(), m_maincpu, 20000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &maciici_state::maciici_map);
 	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
-	MACADB(config.replace(), m_macadb, C15M);
-
 	m_via1->readpa_handler().set(FUNC(maciici_state::via_in_a_iisi));
 	m_via1->readpb_handler().set(FUNC(maciici_state::via_in_b_iisi));
 	m_via1->writepb_handler().set(FUNC(maciici_state::via_out_b_iisi));
 	m_via1->cb2_handler().set(FUNC(maciici_state::via_out_cb2_iisi));
+
+	MACADB(config, m_macadb, C15M);
 
 	EGRET(config, m_egret, XTAL(32'768));
 	m_egret->set_default_bios_tag("344s0100");
@@ -675,4 +692,4 @@ ROM_END
 } // anonymous namespace
 
 COMP(1989, maciici, 0, 0, maciici, maciici, maciici_state, empty_init, "Apple Computer", "Macintosh IIci", MACHINE_SUPPORTS_SAVE)
-COMP(1990, maciisi, 0, 0, maciisi, maciici, maciici_state, empty_init, "Apple Computer", "Macintosh IIsi", MACHINE_SUPPORTS_SAVE)
+COMP(1990, maciisi, 0, 0, maciisi, maciisi, maciici_state, empty_init, "Apple Computer", "Macintosh IIsi", MACHINE_SUPPORTS_SAVE)

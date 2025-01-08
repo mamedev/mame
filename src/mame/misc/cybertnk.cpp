@@ -209,7 +209,7 @@ public:
 	void cybertnk(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -246,9 +246,9 @@ private:
 	uint32_t update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int screen_shift);
 	uint32_t screen_update_cybertnk_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cybertnk_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void master_mem(address_map &map);
-	void slave_mem(address_map &map);
-	void sound_mem(address_map &map);
+	void master_mem(address_map &map) ATTR_COLD;
+	void slave_mem(address_map &map) ATTR_COLD;
+	void sound_mem(address_map &map) ATTR_COLD;
 };
 
 /* tile format

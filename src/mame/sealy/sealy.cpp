@@ -59,7 +59,7 @@ private:
 	// screen updates
 	void sealy_palette(palette_device &palette) const;
 	uint32_t screen_update_sealy(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void sealy_map(address_map &map);
+	void sealy_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -145,4 +145,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2004?, crzyddz,  0, sealy, sealy, sealy_state, empty_init, ROT0, "Sealy", "Crazy Dou Di Zhu", MACHINE_IS_SKELETON )
+GAME( 2004?, crzyddz,  0, sealy, sealy, sealy_state, empty_init, ROT0, "Sealy", "Crazy Dou Di Zhu", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

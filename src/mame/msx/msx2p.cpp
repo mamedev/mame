@@ -53,9 +53,6 @@ public:
 	void phc35j(machine_config &config);
 	void hbf1xdj(machine_config &config);
 	void hbf1xv(machine_config &config);
-
-	void fsa1gt(machine_config &config);
-	void fsa1st(machine_config &config);
 };
 
 /********************************  MSX 2+ **********************************/
@@ -638,94 +635,6 @@ void msx2p_state::hbf1xv(machine_config &config)
 	msx2plus(SND_YM2149, config, layout_msx_jp_1fdd);
 }
 
-/* MSX Turbo-R - Panasonic FS-A1GT */
-
-ROM_START(fsa1gt)
-	ROM_REGION(0x46c000, "maincpu", 0)
-	ROM_LOAD("a1gtbios.rom",  0x0000,   0x8000, CRC(937c8dbb) SHA1(242e73d8284a012b275c0a266844ebbc4269d787))
-	ROM_LOAD("a1gtext.rom",   0x8000,   0x4000, CRC(70aea0fe) SHA1(018d7a5222f28514908fb1b1513286a6558a6d05))
-	ROM_LOAD("a1gtdos.rom",   0xc000,  0x10000, CRC(bb2a0eae) SHA1(4880bf34f1c86fff5456ec2b4cf70d02339e2caa))
-	ROM_LOAD("a1gtkdr.rom",  0x1c000,   0x8000, CRC(eaf0d125) SHA1(5b39c1ccd3a213b78e02927f56a9abc72cd8c28d))
-	ROM_LOAD("a1gtmus.rom",  0x24000,   0x4000, CRC(f5f93437) SHA1(6aea1aef5ec31c1826c22edf580525f93baad425))
-	ROM_LOAD("a1gtopt.rom",  0x28000,   0x4000, CRC(50d11f60) SHA1(b4433a3975c57dd440d6bf12dbd28b2ac1b90ef4))
-	ROM_LOAD("a1gtkfn.rom",  0x2c000,  0x40000, CRC(1f6406fb) SHA1(5aff2d9b6efc723bc395b0f96f0adfa83cc54a49))
-	ROM_LOAD("a1gtfirm.rom", 0x6c000, 0x400000, CRC(feefeadc) SHA1(e779c338eb91a7dea3ff75f3fde76b8af22c4a3a))
-ROM_END
-
-void msx2p_state::fsa1gt(machine_config &config)
-{
-	// AY8910 (in T9769)
-	// FDC: tc8566af, 1 3.5" DSDD drive
-	// 2 Cartridge slots
-	// T9769C + S1990
-	// FM built-in
-	// Microphone
-	// MIDI-in
-	// MIDI-out
-	// firmware switch
-	// pause button
-	// ren-sha turbo slider
-
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu");
-	add_internal_slot(config, MSX_SLOT_MUSIC, "mus", 0, 2, 1, 1, "maincpu", 0x24000).set_ym2413_tag(m_ym2413);
-	add_internal_slot(config, MSX_SLOT_ROM, "opt", 0, 3, 1, 1, "maincpu", 0x28000);
-	add_cartridge_slot<1>(config, 1);
-	add_cartridge_slot<2>(config, 2);
-	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 0, 0, 4).set_total_size(0x20000);   // 128KB?? Mapper RAM
-	add_internal_slot(config, MSX_SLOT_ROM, "ext", 3, 1, 0, 1, "maincpu", 0x8000);
-	add_internal_slot(config, MSX_SLOT_ROM, "kdr", 3, 1, 1, 2, "maincpu", 0x1c000);
-	add_internal_disk(config, MSX_SLOT_DISK4_TC8566, "dos", 3, 2, 1, 3, "maincpu", 0xc000);
-	add_internal_slot(config, MSX_SLOT_ROM, "firm", 3, 3, 0, 4, "maincpu", 0x6c000);
-	MSX_SYSTEMFLAGS(config, "sysflags", m_maincpu, 0x00);
-
-	msx_ym2413(config);
-
-	turbor(SND_AY8910, config, layout_msx_jp_1fdd);
-}
-
-/* MSX Turbo-R - Panasonic FS-A1ST */
-
-ROM_START(fsa1st)
-	ROM_REGION(0x46c000, "maincpu", 0)
-	ROM_LOAD("a1stbios.rom",  0x0000,   0x8000, CRC(77b94ae0) SHA1(f078b5ec56884bfb81481d45c7151418770bff5a))
-	ROM_LOAD("a1stext.rom",   0x8000,   0x4000, CRC(2c2c77a4) SHA1(373412f9c32762de1c3a7e27fc3d80614e0a0c8e))
-	ROM_LOAD("a1stdos.rom",   0xc000,  0x10000, CRC(1fc71407) SHA1(5d2186658adcf4ce0c2d3232384b5712341108e5))
-	ROM_LOAD("a1stkdr.rom",  0x1c000,   0x8000, CRC(eaf0d125) SHA1(5b39c1ccd3a213b78e02927f56a9abc72cd8c28d))
-	ROM_LOAD("a1stmus.rom",  0x24000,   0x4000, CRC(fd7dec41) SHA1(e002a9b426732e6c2d31e548c40cf7c122348ce3))
-	ROM_LOAD("a1stopt.rom",  0x28000,   0x4000, CRC(c6a4a2a1) SHA1(cb06dea7b025745f9d2b87dcf03ded615287ead3))
-	ROM_LOAD("a1stkfn.rom",  0x2c000,  0x40000, CRC(1f6406fb) SHA1(5aff2d9b6efc723bc395b0f96f0adfa83cc54a49))
-	ROM_LOAD("a1stfirm.rom", 0x6c000, 0x400000, CRC(139ac99c) SHA1(c212b11fda13f83dafed688c54d098e7e47ab225))
-ROM_END
-
-void msx2p_state::fsa1st(machine_config &config)
-{
-	// AY8910 (in T9769)
-	// FDC: tc8566af, 1 3.5" DSDD drive
-	// T9769C + S1990
-	// 2 Cartridge slots
-	// FM built-in
-	// microphone
-	// firmware switch
-	// pause button
-	// ren-sha turbo slider
-
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu");
-	add_internal_slot(config, MSX_SLOT_MUSIC, "mus", 0, 2, 1, 1, "maincpu", 0x24000).set_ym2413_tag(m_ym2413);
-	add_internal_slot(config, MSX_SLOT_ROM, "opt", 0, 3, 1, 1, "maincpu", 0x28000);
-	add_cartridge_slot<1>(config, 1);
-	add_cartridge_slot<2>(config, 2);
-	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 0, 0, 4).set_total_size(0x20000);   // 128KB?? Mapper RAM
-	add_internal_slot(config, MSX_SLOT_ROM, "ext", 3, 1, 0, 1, "maincpu", 0x8000);
-	add_internal_slot(config, MSX_SLOT_ROM, "kdr", 3, 1, 1, 2, "maincpu", 0x1c000);
-	add_internal_disk(config, MSX_SLOT_DISK4_TC8566, "dos", 3, 2, 1, 3, "maincpu", 0xc000);
-	add_internal_slot(config, MSX_SLOT_ROM, "firm", 3, 3, 0, 4, "maincpu", 0x6c000);
-	MSX_SYSTEMFLAGS(config, "sysflags", m_maincpu, 0x00);
-
-	msx_ym2413(config);
-
-	turbor(SND_AY8910, config, layout_msx_jp_1fdd);
-}
-
 } // anonymous namespace
 
 COMP(19??, expert3i,   0,        0,     expert3i,   msx2,     msx2p_state, empty_init, "Ciel", "Expert 3 IDE (MSX2+, Brazil)", MACHINE_NOT_WORKING) // Some hardware not emulated
@@ -741,8 +650,3 @@ COMP(1989, phc70fd2,   0,        0,     phc70fd2,   msx2jp,   msx2p_state, empty
 COMP(1989, phc35j,     0,        0,     phc35j,     msx2jp,   msx2p_state, empty_init, "Sanyo", "PHC-35J / Wavy35 (MSX2+, Japan)", 0)
 COMP(1988, hbf1xdj,    0,        0,     hbf1xdj,    msx2jp,   msx2p_state, empty_init, "Sony", "HB-F1XDJ (MSX2+, Japan)", 0)
 COMP(1989, hbf1xv,     0,        0,     hbf1xv,     msx2jp,   msx2p_state, empty_init, "Sony", "HB-F1XV (MSX2+, Japan)", 0)
-
-/* MSX Turbo-R */
-/* Temporary placeholders, Turbo-R hardware is not supported yet */
-COMP(1991, fsa1gt,     0,        0,     fsa1gt,     msx2jp,   msx2p_state, empty_init, "Panasonic", "FS-A1GT (MSX Turbo-R, Japan)", MACHINE_NOT_WORKING)
-COMP(1991, fsa1st,     0,        0,     fsa1st,     msx2jp,   msx2p_state, empty_init, "Panasonic", "FS-A1ST (MSX Turbo-R, Japan)", MACHINE_NOT_WORKING)

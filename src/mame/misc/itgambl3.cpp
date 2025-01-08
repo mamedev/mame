@@ -65,8 +65,8 @@ public:
 	void itgambl3(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	int m_test_x = 0;
@@ -77,7 +77,7 @@ private:
 
 	void itgambl3_palette(palette_device &palette) const;
 	uint32_t screen_update_itgambl3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void itgambl3_map(address_map &map);
+	void itgambl3_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -523,9 +523,9 @@ ROM_END
 *************************/
 
 //    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT        ROT   COMPANY                  FULLNAME                          FLAGS
-GAME( 200?, ejollyx5, 0,      itgambl3, itgambl3, itgambl3_state, empty_init, ROT0, "Solar Games",           "Euro Jolly X5",                  MACHINE_IS_SKELETON )
-GAME( 200?, grandprx, 0,      itgambl3, itgambl3, itgambl3_state, empty_init, ROT0, "4fun",                  "Grand Prix",                     MACHINE_IS_SKELETON )
-GAME( 200?, supjolly, 0,      itgambl3, itgambl3, itgambl3_state, empty_init, ROT0, "<unknown>",             "Super Jolly",                    MACHINE_IS_SKELETON )
-GAME( 200?, x5jokers, 0,      itgambl3, itgambl3, itgambl3_state, empty_init, ROT0, "Electronic Projects",   "X Five Jokers (Version 1.12)",   MACHINE_IS_SKELETON )
-GAME( 200?, queenotg, 0,      itgambl3, itgambl3, itgambl3_state, empty_init, ROT0, "<unknown>",             "Queen of the Games",             MACHINE_IS_SKELETON )
-GAME( 200?, ejollyx9, 0,      itgambl3, itgambl3, itgambl3_state, empty_init, ROT0, "Solar Games",           "Euro Jolly X9",                  MACHINE_IS_SKELETON )
+GAME( 200?, ejollyx5, 0,      itgambl3, itgambl3, itgambl3_state, empty_init, ROT0, "Solar Games",           "Euro Jolly X5",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, grandprx, 0,      itgambl3, itgambl3, itgambl3_state, empty_init, ROT0, "4fun",                  "Grand Prix",                     MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, supjolly, 0,      itgambl3, itgambl3, itgambl3_state, empty_init, ROT0, "<unknown>",             "Super Jolly",                    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, x5jokers, 0,      itgambl3, itgambl3, itgambl3_state, empty_init, ROT0, "Electronic Projects",   "X Five Jokers (Version 1.12)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, queenotg, 0,      itgambl3, itgambl3, itgambl3_state, empty_init, ROT0, "<unknown>",             "Queen of the Games",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, ejollyx9, 0,      itgambl3, itgambl3, itgambl3_state, empty_init, ROT0, "Solar Games",           "Euro Jolly X9",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

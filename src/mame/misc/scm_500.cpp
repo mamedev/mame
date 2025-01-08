@@ -28,10 +28,10 @@ public:
 	void scm_500(machine_config &config);
 
 private:
-	void prog_map(address_map &map);
+	void prog_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<mcs51_cpu_device> m_maincpu;
 };
@@ -99,5 +99,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1987, scm_500,  0,    scm_500, scm_500, scm_500_state, empty_init, ROT0, "Standard Change-Makers", "Standard Change-Makers System 500 / 500E", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1987, scm_500,  0,    scm_500, scm_500, scm_500_state, empty_init, ROT0, "Standard Change-Makers", "Standard Change-Makers System 500 / 500E", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
 // 1995 - 500E - same basic hw?

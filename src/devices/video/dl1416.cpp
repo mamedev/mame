@@ -194,6 +194,10 @@ dl1414_device::dl1414_device(
 {
 }
 
+dl1414_device::~dl1414_device()
+{
+}
+
 dl1416_device::dl1416_device(
 		machine_config const &mconfig,
 		device_type type,
@@ -205,6 +209,10 @@ dl1416_device::dl1416_device(
 	, m_ce_latch(true)
 	, m_cu_in(true)
 	, m_addr_latch(0x00)
+{
+}
+
+dl1416_device::~dl1416_device()
 {
 }
 

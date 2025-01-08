@@ -53,11 +53,11 @@ public:
 	void lancelot(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
-	void audio_map(address_map &map);
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void audio_map(address_map &map) ATTR_COLD;
 	void p3_w(u8) { }
 	void p4_w(u8) { }
 	void p6_w(u8) { }
@@ -214,5 +214,5 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME( 1994, lancelot, 0, lancelot, lancelot, lancelot_state, empty_init, ROT0, "Peyper", "Sir Lancelot", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1994, lancelot, 0, lancelot, lancelot, lancelot_state, empty_init, ROT0, "Peyper", "Sir Lancelot", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
 

@@ -2,15 +2,15 @@
 // copyright-holders:Angelo Salese
 /************************************************************************************************
 
-    Sharp X1Twin = Sharp X1 + NEC PC Engine All-in-One
+Sharp X1Twin = Sharp X1 + NEC PC Engine All-in-One
 
-    Both systems don't interact at all, according to info on the net they just share the
-    same "house". It doesn't even do super-imposing, not even with the in-built X1 feature apparently
+Both systems don't interact at all, according to info on the net they just share the
+same "house". It doesn't even do super-imposing, not even with the in-built X1 feature apparently
 
-    TODO:
-    - Find 100% trusted info about it.
-    - inherit pce_state into x1twin_state
-    - Needs video mods
+TODO:
+- Find 100% trusted info about it.
+- Work out this to really be a middleground for both pce_state & x1twin_state
+- Needs video mods
 
 ************************************************************************************************/
 
@@ -46,10 +46,10 @@ public:
 
 private:
 	uint32_t screen_update_x1pce(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void pce_io(address_map &map);
-	void pce_mem(address_map &map);
-	void x1_io(address_map &map);
-	void x1_mem(address_map &map);
+	void pce_io(address_map &map) ATTR_COLD;
+	void pce_mem(address_map &map) ATTR_COLD;
+	void x1_io(address_map &map) ATTR_COLD;
+	void x1_mem(address_map &map) ATTR_COLD;
 };
 
 
@@ -115,8 +115,8 @@ INPUT_CHANGED_MEMBER(x1twin_state::nmi_reset)
 
 INPUT_PORTS_START( x1twin )
 	PORT_START("FP_SYS") //front panel buttons, hard-wired with the soft reset/NMI lines
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, x1twin_state, ipl_reset,0) PORT_NAME("IPL reset")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, x1twin_state, nmi_reset,0) PORT_NAME("NMI reset")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(x1twin_state::ipl_reset), 0) PORT_NAME("IPL reset")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(x1twin_state::nmi_reset), 0) PORT_NAME("NMI reset")
 
 	PORT_START("SOUND_SW") //FIXME: this is X1Turbo specific
 	PORT_DIPNAME( 0x80, 0x80, "OPM Sound Setting?" )
@@ -443,8 +443,6 @@ void x1twin_state::x1twin(machine_config &config)
 	ppi.out_pa_callback().set(FUNC(x1_state::x1_porta_w));
 	ppi.out_pb_callback().set(FUNC(x1_state::x1_portb_w));
 	ppi.out_pc_callback().set(FUNC(x1_state::x1_portc_w));
-
-	MCFG_MACHINE_RESET_OVERRIDE(x1twin_state,x1)
 
 	#if 0
 	H6280(config, m_maincpu, PCE_MAIN_CLOCK/3);

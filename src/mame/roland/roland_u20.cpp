@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "cpu/mcs96/i8x9x.h"
-#include "sound/rolandpcm.h"
+#include "sound/roland_lp.h"
 #include "speaker.h"
 
 
@@ -28,7 +28,7 @@ public:
 	void u220(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<i8x9x_device> m_maincpu;
 	required_device<mb87419_mb87420_device> m_pcm;
@@ -104,5 +104,5 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1989, u20,  0, 0, u20,  u20, roland_u20_state, empty_init, "Roland", "U-20 RS-PCM Keyboard", MACHINE_IS_SKELETON)
-SYST(1989, u220, 0, 0, u220, u20, roland_u20_state, empty_init, "Roland", "U-220 RS-PCM Sound Module", MACHINE_IS_SKELETON)
+SYST(1989, u20,  0, 0, u20,  u20, roland_u20_state, empty_init, "Roland", "U-20 RS-PCM Keyboard", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1989, u220, 0, 0, u220, u20, roland_u20_state, empty_init, "Roland", "U-220 RS-PCM Sound Module", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

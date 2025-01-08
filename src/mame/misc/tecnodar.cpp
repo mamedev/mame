@@ -67,7 +67,7 @@ public:
 	void tecnodar(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void bank_w(offs_t offset, u8 data);
@@ -78,8 +78,8 @@ private:
 	void ppi_pb_w(u8 data);
 	void ppi_pc_w(u8 data);
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
 	required_device<i8255_device> m_ppi;

@@ -92,21 +92,21 @@ void SCSPDSP::Step()
 		//if (!IPtr[0] && !IPtr[1] && !IPtr[2] && !IPtr[3])
 			//break;
 
-		u32 const TRA   = (IPtr[0] >>  8) & 0x7F;
+		u32 const TRA   = (IPtr[0] >>  8) & 0x7f;
 		u32 const TWT   = (IPtr[0] >>  7) & 0x01;
-		u32 const TWA   = (IPtr[0] >>  0) & 0x7F;
+		u32 const TWA   = (IPtr[0] >>  0) & 0x7f;
 
 		u32 const XSEL  = (IPtr[1] >> 15) & 0x01;
 		u32 const YSEL  = (IPtr[1] >> 13) & 0x03;
-		u32 const IRA   = (IPtr[1] >>  6) & 0x3F;
+		u32 const IRA   = (IPtr[1] >>  6) & 0x3f;
 		u32 const IWT   = (IPtr[1] >>  5) & 0x01;
-		u32 const IWA   = (IPtr[1] >>  0) & 0x1F;
+		u32 const IWA   = (IPtr[1] >>  0) & 0x1f;
 
 		u32 const TABLE = (IPtr[2] >> 15) & 0x01;
 		u32 const MWT   = (IPtr[2] >> 14) & 0x01;
 		u32 const MRD   = (IPtr[2] >> 13) & 0x01;
 		u32 const EWT   = (IPtr[2] >> 12) & 0x01;
-		u32 const EWA   = (IPtr[2] >>  8) & 0x0F;
+		u32 const EWA   = (IPtr[2] >>  8) & 0x0f;
 		u32 const ADRL  = (IPtr[2] >>  7) & 0x01;
 		u32 const FRCL  = (IPtr[2] >>  6) & 0x01;
 		u32 const SHIFT = (IPtr[2] >>  4) & 0x03;
@@ -164,10 +164,7 @@ void SCSPDSP::Step()
 		else
 			return;
 
-		INPUTS <<= 8;
-		INPUTS >>= 8;
-		//if(INPUTS & 0x00800000)
-			//INPUTS |= 0xFF000000;
+		INPUTS = util::sext(INPUTS, 24);
 
 		if (IWT)
 		{
@@ -183,13 +180,7 @@ void SCSPDSP::Step()
 			if (BSEL)
 				B = ACC;
 			else
-			{
-				B = TEMP[(TRA + DEC) & 0x7F];
-				B <<= 8;
-				B >>= 8;
-				//if (B & 0x00800000)
-					//B |= 0xFF000000;  //Sign extend
-			}
+				B = util::sext(TEMP[(TRA + DEC) & 0x7f], 24);
 			if (NEGB)
 				B = 0 - B;
 		}
@@ -200,13 +191,7 @@ void SCSPDSP::Step()
 		if (XSEL)
 			X = INPUTS;
 		else
-		{
-			X = TEMP[(TRA + DEC) & 0x7F];
-			X <<= 8;
-			X >>= 8;
-			//if (X & 0x00800000)
-				//X |= 0xFF000000;
-		}
+			X = util::sext(TEMP[(TRA + DEC) & 0x7f], 24);
 
 		s32 Y = 0;  //13 bit
 		if (YSEL == 0)
@@ -214,9 +199,9 @@ void SCSPDSP::Step()
 		else if (YSEL == 1)
 			Y = this->COEF[COEF] >> 3;   //COEF is 16 bits
 		else if (YSEL == 2)
-			Y = (Y_REG >> 11) & 0x1FFF;
+			Y = (Y_REG >> 11) & 0x1fff;
 		else if (YSEL == 3)
-			Y = (Y_REG >> 4) & 0x0FFF;
+			Y = (Y_REG >> 4) & 0x0fff;
 
 		if (YRL)
 			Y_REG = INPUTS;
@@ -224,46 +209,29 @@ void SCSPDSP::Step()
 		//Shifter
 		s32 SHIFTED = 0;    //24 bit
 		if (SHIFT == 0)
-			SHIFTED = std::clamp<s32>(ACC, -0x00800000, 0x007FFFFF);
+			SHIFTED = std::clamp<s32>(ACC, -0x00800000, 0x007fffff);
 		else if (SHIFT == 1)
-			SHIFTED = std::clamp<s32>(ACC * 2, -0x00800000, 0x007FFFFF);
+			SHIFTED = std::clamp<s32>(ACC * 2, -0x00800000, 0x007fffff);
 		else if (SHIFT == 2)
-		{
-			SHIFTED = ACC * 2;
-			SHIFTED <<= 8;
-			SHIFTED >>= 8;
-			//SHIFTED &= 0x00FFFFFF;
-			//if (SHIFTED & 0x00800000)
-				//SHIFTED |= 0xFF000000;
-		}
+			SHIFTED = util::sext(ACC * 2, 24);
 		else if (SHIFT == 3)
-		{
-			SHIFTED = ACC;
-			SHIFTED <<= 8;
-			SHIFTED >>= 8;
-			//SHIFTED &= 0x00FFFFFF;
-			//if (SHIFTED & 0x00800000)
-				//SHIFTED |= 0xFF000000;
-		}
+			SHIFTED = util::sext(ACC, 24);
 
 		//ACCUM
-		Y <<= 19;
-		Y >>= 19;
-		//if (Y & 0x1000)
-			//Y |= 0xFFFFF000;
+		Y = util::sext(Y, 13);
 
-		int64_t const v = (int64_t(X) * int64_t(Y)) >> 12;
+		s64 const v = (s64(X) * s64(Y)) >> 12;
 		ACC = int(v + B);
 
 		if (TWT)
-			TEMP[(TWA + DEC) & 0x7F] = SHIFTED;
+			TEMP[(TWA + DEC) & 0x7f] = SHIFTED;
 
 		if (FRCL)
 		{
 			if (SHIFT == 3)
-				FRC_REG = SHIFTED & 0x0FFF;
+				FRC_REG = SHIFTED & 0x0fff;
 			else
-				FRC_REG = (SHIFTED >> 11) & 0x1FFF;
+				FRC_REG = (SHIFTED >> 11) & 0x1fff;
 		}
 
 		if (MRD || MWT)
@@ -279,7 +247,7 @@ void SCSPDSP::Step()
 			if (!TABLE)
 				ADDR &= RBL - 1;
 			else
-				ADDR &= 0xFFFF;
+				ADDR &= 0xffff;
 			ADDR += RBP << 12;
 			ADDR <<= 1;
 			if (MRD && (step & 1)) //memory only allowed on odd? DoA inserts NOPs on even
@@ -301,7 +269,7 @@ void SCSPDSP::Step()
 		if (ADRL)
 		{
 			if (SHIFT == 3)
-				ADRS_REG = (SHIFTED >> 12) & 0xFFF;
+				ADRS_REG = (SHIFTED >> 12) & 0xfff;
 			else
 				ADRS_REG = INPUTS >> 16;
 		}

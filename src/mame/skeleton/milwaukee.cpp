@@ -41,7 +41,7 @@ public:
 	void milwaukee(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 };
 void milwaukee_state::mem_map(address_map &map)
@@ -98,4 +98,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 1980, mc1200, 0, 0, milwaukee, milwaukee, milwaukee_state, empty_init, "Milwaukee Computers", "MC-1200", MACHINE_IS_SKELETON )
+COMP( 1980, mc1200, 0, 0, milwaukee, milwaukee, milwaukee_state, empty_init, "Milwaukee Computers", "MC-1200", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

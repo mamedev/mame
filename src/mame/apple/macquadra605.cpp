@@ -64,9 +64,9 @@ public:
 	void maclc475(machine_config &config);
 	void maclc575(machine_config &config);
 
-	void quadra605_map(address_map &map);
-	void lc475_map(address_map &map);
-	void lc575_map(address_map &map);
+	void quadra605_map(address_map &map) ATTR_COLD;
+	void lc475_map(address_map &map) ATTR_COLD;
+	void lc575_map(address_map &map) ATTR_COLD;
 
 	void init_macqd605();
 
@@ -81,8 +81,8 @@ private:
 	required_device<nscsi_bus_device> m_scsibus;
 	required_device<ncr53c96_device> m_ncr1;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	u16 mac_scc_r(offs_t offset)
 	{
@@ -213,7 +213,9 @@ void quadra605_state::macqd605(machine_config &config)
 	m_cuda->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
 	m_cuda->via_clock_callback().set(m_primetime, FUNC(primetime_device::cb1_w));
 	m_cuda->via_data_callback().set(m_primetime, FUNC(primetime_device::cb2_w));
+	m_cuda->nmi_callback().set_inputline(m_maincpu, M68K_IRQ_7);
 	m_macadb->adb_data_callback().set(m_cuda, FUNC(cuda_device::set_adb_line));
+	m_macadb->adb_power_callback().set(m_cuda, FUNC(cuda_device::set_adb_power));
 	config.set_perfect_quantum(m_maincpu);
 
 	m_primetime->pb3_callback().set(m_cuda, FUNC(cuda_device::get_treq));

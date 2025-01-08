@@ -93,7 +93,7 @@ private:
 	void vblank_irq(int state);
 	INTERRUPT_GEN_MEMBER(sound_timer_irq);
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	void fastfred_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(imago);
 	DECLARE_VIDEO_START(fastfred);
@@ -102,10 +102,10 @@ private:
 	uint32_t screen_update_fastfred(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_imago(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void fastfred_map(address_map &map);
-	void imago_map(address_map &map);
-	void jumpcoas_map(address_map &map);
-	void sound_map(address_map &map);
+	void fastfred_map(address_map &map) ATTR_COLD;
+	void imago_map(address_map &map) ATTR_COLD;
+	void jumpcoas_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_GALAXIAN_FASTFRED_H

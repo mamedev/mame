@@ -277,9 +277,9 @@ public:
 	void saiyugoub2(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// for Sai Yu Gou Ma Roku
@@ -311,12 +311,12 @@ private:
 	int saiyugoub1_m5205_irq_r();
 	void saiyugoub1_m5205_irq_w(int state);
 
-	void i8748_map(address_map &map);
-	void main_map(address_map &map);
-	void saiyugoub1_sound_map(address_map &map);
-	void sound_map(address_map &map);
-	void sub_map(address_map &map);
-	void ym2203c_sound_map(address_map &map);
+	void i8748_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void saiyugoub1_sound_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
+	void ym2203c_sound_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -608,7 +608,7 @@ void chinagat_state::i8748_map(address_map &map)
 
 static INPUT_PORTS_START( chinagat )
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN3 )

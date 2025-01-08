@@ -63,7 +63,7 @@ protected:
 	// construction/destruction
 	midtunit_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(dma_done);
 
@@ -148,8 +148,8 @@ protected:
 	devcb_write_line m_dma_irq_cb;
 
 #if DEBUG_MIDTUNIT_BLITTER
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	uint32_t debug_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -200,7 +200,7 @@ protected:
 	midwunit_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 #if DEBUG_MIDTUNIT_BLITTER
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 #endif
 };
 
@@ -223,7 +223,7 @@ public:
 	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_update);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(MIDTUNIT_VIDEO, midtunit_video_device)

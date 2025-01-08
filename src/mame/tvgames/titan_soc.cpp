@@ -64,7 +64,6 @@
 #include "emu.h"
 
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -86,15 +85,15 @@ public:
 	void init_titan_soc();
 
 protected:
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_shared_ptr<uint32_t> m_mainram;
 	required_device<cpu_device> m_maincpu;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 };
 
 
@@ -171,6 +170,6 @@ void titan_soc_state::init_titan_soc()
 } // anonymous namespace
 
 
-CONS( 2009, megadri4,  0,        0, titan_soc, titan_soc, titan_soc_state, init_titan_soc, "Tectoy (licensed from Sega)", "Mega Drive 4 / Guitar Idol (set 1)",      MACHINE_IS_SKELETON )
-CONS( 2009, megadri4a, megadri4, 0, titan_soc, titan_soc, titan_soc_state, init_titan_soc, "Tectoy (licensed from Sega)", "Mega Drive 4 / Guitar Idol (set 2)",      MACHINE_IS_SKELETON )
-CONS( 2004, colecofl,  0,        0, titan_soc, titan_soc, titan_soc_state, empty_init,     "AtGames",                     "Colecovision Flashback",                  MACHINE_IS_SKELETON )
+CONS( 2009, megadri4,  0,        0, titan_soc, titan_soc, titan_soc_state, init_titan_soc, "Tectoy (licensed from Sega)", "Mega Drive 4 / Guitar Idol (set 1)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2009, megadri4a, megadri4, 0, titan_soc, titan_soc, titan_soc_state, init_titan_soc, "Tectoy (licensed from Sega)", "Mega Drive 4 / Guitar Idol (set 2)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2004, colecofl,  0,        0, titan_soc, titan_soc, titan_soc_state, empty_init,     "AtGames",                     "Colecovision Flashback",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

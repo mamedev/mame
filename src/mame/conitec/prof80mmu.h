@@ -23,15 +23,15 @@ class prof80_mmu_device : public device_t, public device_memory_interface
 public:
 	prof80_mmu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void z80_program_map(address_map &map);
+	virtual void z80_program_map(address_map &map) ATTR_COLD;
 
 	void par_w(offs_t offset, uint8_t data);
 	void mme_w(int state);
 
-	void program_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;

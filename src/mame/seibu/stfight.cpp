@@ -312,8 +312,8 @@ public:
 	void init_stfight();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -365,11 +365,11 @@ private:
 	void _68705_port_b_w(uint8_t data);
 	void _68705_port_c_w(uint8_t data);
 
-	void cpu1_map(address_map &map);
-	void cpu2_map(address_map &map);
-	void cshooter_cpu1_map(address_map &map);
-	void decrypted_opcodes_map(address_map &map);
-	void stfight_cpu1_map(address_map &map);
+	void cpu1_map(address_map &map) ATTR_COLD;
+	void cpu2_map(address_map &map) ATTR_COLD;
+	void cshooter_cpu1_map(address_map &map) ATTR_COLD;
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void stfight_cpu1_map(address_map &map) ATTR_COLD;
 };
 
 

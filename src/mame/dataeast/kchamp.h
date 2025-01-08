@@ -10,11 +10,13 @@
 
 #pragma once
 
+#include "cpu/z80/z80.h"
 #include "machine/74157.h"
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
 #include "sound/dac.h"
+
 #include "emupal.h"
 #include "tilemap.h"
 
@@ -61,8 +63,8 @@ private:
 	bool       m_msm_play_lo_nibble = false;
 
 	/* devices */
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
+	required_device<z80_device> m_maincpu;
+	required_device<z80_device> m_audiocpu;
 	required_device_array<ay8910_device, 2> m_ay;
 	optional_device<ls157_device> m_adpcm_select;
 	optional_device<msm5205_device> m_msm;
@@ -79,28 +81,27 @@ private:
 	void kchamp_colorram_w(offs_t offset, uint8_t data);
 	void sound_control_w(u8 data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	void kchamp_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(kchampvs);
 	DECLARE_MACHINE_START(kchamp);
 	uint32_t screen_update_kchampvs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_kchamp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vblank_irq(int state);
-	INTERRUPT_GEN_MEMBER(sound_int);
-	void kchamp_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void kchampvs_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(sound_nmi);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int dx, int dy);
 	void decrypt_code();
 	void msmint(int state);
-	void decrypted_opcodes_map(address_map &map);
-	void kchamp_io_map(address_map &map);
-	void kchamp_map(address_map &map);
-	void kchamp_sound_io_map(address_map &map);
-	void kchamp_sound_map(address_map &map);
-	void kchampvs_io_map(address_map &map);
-	void kchampvs_map(address_map &map);
-	void kchampvs_sound_io_map(address_map &map);
-	void kchampvs_sound_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void kchamp_io_map(address_map &map) ATTR_COLD;
+	void kchamp_map(address_map &map) ATTR_COLD;
+	void kchamp_sound_io_map(address_map &map) ATTR_COLD;
+	void kchamp_sound_map(address_map &map) ATTR_COLD;
+	void kchampvs_io_map(address_map &map) ATTR_COLD;
+	void kchampvs_map(address_map &map) ATTR_COLD;
+	void kchampvs_sound_io_map(address_map &map) ATTR_COLD;
+	void kchampvs_sound_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_DATAEAST_KCHAMP_H

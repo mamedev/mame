@@ -25,8 +25,8 @@ public:
 	void gx700(machine_config &config);
 
 private:
-	void sx700_map(address_map &map);
-	void gx700_map(address_map &map);
+	void sx700_map(address_map &map) ATTR_COLD;
+	void gx700_map(address_map &map) ATTR_COLD;
 
 	required_device<h83002_device> m_maincpu;
 };
@@ -81,5 +81,5 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1996, sx700, 0, 0, sx700, sx700, boss_sx700_state, empty_init, "Roland", "Boss SX-700 Studio Effects Processor", MACHINE_IS_SKELETON)
-SYST(1996, gx700, 0, 0, gx700, sx700, boss_sx700_state, empty_init, "Roland", "Boss GX-700 Guitar Effects Processor", MACHINE_IS_SKELETON)
+SYST(1996, sx700, 0, 0, sx700, sx700, boss_sx700_state, empty_init, "Roland", "Boss SX-700 Studio Effects Processor", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1996, gx700, 0, 0, gx700, sx700, boss_sx700_state, empty_init, "Roland", "Boss GX-700 Guitar Effects Processor", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

@@ -59,9 +59,9 @@ public:
 	int subcpu_bus_free_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
@@ -108,7 +108,7 @@ protected:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void base_map(address_map &map);
+	void base_map(address_map &map) ATTR_COLD;
 
 private:
 	// devices
@@ -137,16 +137,16 @@ private:
 	uint8_t ddragon_adpcm_status_r();
 	void ddragonbla_port_w(uint8_t data);
 
-	void ddragon2_main_map(address_map &map);
-	void ddragon2_sound_map(address_map &map);
-	void ddragon2_sub_map(address_map &map);
-	void ddragon_main_map(address_map &map);
-	void ddragonbla_sub_map(address_map &map);
-	void ddragon_sound_map(address_map &map);
-	void ddragon6809_sound_map(address_map &map);
-	void ddragon_sub_map(address_map &map);
-	void sub_6309_map(address_map &map);
-	void sub_6809_map(address_map &map);
+	void ddragon2_main_map(address_map &map) ATTR_COLD;
+	void ddragon2_sound_map(address_map &map) ATTR_COLD;
+	void ddragon2_sub_map(address_map &map) ATTR_COLD;
+	void ddragon_main_map(address_map &map) ATTR_COLD;
+	void ddragonbla_sub_map(address_map &map) ATTR_COLD;
+	void ddragon_sound_map(address_map &map) ATTR_COLD;
+	void ddragon6809_sound_map(address_map &map) ATTR_COLD;
+	void ddragon_sub_map(address_map &map) ATTR_COLD;
+	void sub_6309_map(address_map &map) ATTR_COLD;
+	void sub_6809_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -172,8 +172,8 @@ private:
 	void bankswitch_w(uint8_t data);
 	void mcu_port_a_w(offs_t offset, uint8_t data);
 
-	void main_map(address_map &map);
-	void banked_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void banked_map(address_map &map) ATTR_COLD;
 
 	required_device<m68705p_device> m_mcu;
 	required_device<address_map_bank_device> m_bank;
@@ -198,7 +198,7 @@ public:
 private:
 	void bankswitch_w(uint8_t data);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_TECHNOS_DDRAGON_H

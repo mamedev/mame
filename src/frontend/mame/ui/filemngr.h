@@ -13,9 +13,11 @@
 #pragma once
 
 #include "ui/menu.h"
+#include "ui/text.h"
 
 #include "notifier.h"
 
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -25,14 +27,14 @@ namespace ui {
 class menu_file_manager : public menu
 {
 public:
-	static void force_file_manager(mame_ui_manager &mui, render_container &container, const char *warnings);
+	static void force_file_manager(mame_ui_manager &mui, render_container &container, std::string &&warnings);
 
-	menu_file_manager(mame_ui_manager &mui, render_container &container, const char *warnings);
+	menu_file_manager(mame_ui_manager &mui, render_container &container, std::string &&warnings);
 	virtual ~menu_file_manager();
 
 protected:
 	virtual void recompute_metrics(uint32_t width, uint32_t height, float aspect) override;
-	virtual void custom_render(uint32_t flags, void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
+	virtual void custom_render(uint32_t flags, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2) override;
 
 private:
 	virtual void populate() override;
@@ -42,6 +44,7 @@ private:
 
 	std::string const m_warnings;
 	std::vector<util::notifier_subscription> m_notifiers;
+	std::optional<text_layout> m_warnings_layout;
 	device_image_interface *m_selected_device;
 };
 

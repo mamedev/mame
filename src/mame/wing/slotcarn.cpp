@@ -62,11 +62,11 @@ private:
 	void hsync_changed(int state);
 	MC6845_BEGIN_UPDATE(crtc_begin_update);
 	MC6845_UPDATE_ROW(crtc_update_row);
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
-	void slotcarn_map(address_map &map);
-	void spielbud_io_map(address_map &map);
+	void slotcarn_map(address_map &map) ATTR_COLD;
+	void spielbud_io_map(address_map &map) ATTR_COLD;
 };
 
 

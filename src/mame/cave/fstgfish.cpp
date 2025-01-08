@@ -95,8 +95,8 @@ public:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	void main_io(address_map &map);
-	void main_map(address_map &map);
+	void main_io(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 /*****************************************************************************/
@@ -147,4 +147,4 @@ ROM_END
 
 /*****************************************************************************/
 
-GAME(2008, fstgfish, 0, fstgfish, fstgfish, fstgfish_state, empty_init, ROT0, "Cave", "Festival: Goldfish Scoop", MACHINE_IS_SKELETON )
+GAME(2008, fstgfish, 0, fstgfish, fstgfish, fstgfish_state, empty_init, ROT0, "Cave", "Festival: Goldfish Scoop", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

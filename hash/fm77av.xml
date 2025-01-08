@@ -60,7 +60,7 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<software name="9gyokudna" cloneof="9gyokudn">
-		<description>Ku Gyoku Den (Alt Disk 1)</description>
+		<description>Ku Gyoku Den (alt Disk 1)</description>
 		<year>1986</year>
 		<publisher>テクノソフト (TecnoSoft)</publisher>
 		<info name="serial" value="FUTJ-19002"/>
@@ -230,7 +230,7 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<software name="dbustera" cloneof="dbuster">
-		<description>Dragon Buster (Alt)</description>
+		<description>Dragon Buster (alt)</description>
 		<year>1987</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<info name="serial" value="DP-3301212"/>
@@ -251,18 +251,6 @@ Titles, serial #s, publishers and release dates taken from:
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="druaga.d77" size="348848" crc="2d5e1a08" sha1="c6cdcf38ca98514c96dab84eed22ed8cb277c54b"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- doesn't boot, loads first sector, and jumps into the text at the beginning of it -->
-	<software name="dsenraku" supported="no">
-		<description>Dsenryaku</description>
-		<year>19??</year>
-		<publisher>&lt;Unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="dsenryaku.d77" size="348848" crc="35f02f75" sha1="f590c7f2d3d1b602274bef5e1992babf4acfebc3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -397,7 +385,7 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<software name="laydocka" cloneof="laydock">
-		<description>Laydock (Alt)</description>
+		<description>Laydock (alt)</description>
 		<year>1986</year>
 		<publisher>T&amp;E Soft</publisher>
 		<info name="serial" value="TEM-66"/>
@@ -416,7 +404,7 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<software name="laydockb" cloneof="laydock">
-		<description>Laydock (Alt 2)</description>
+		<description>Laydock (alt 2)</description>
 		<year>1986</year>
 		<publisher>T&amp;E Soft</publisher>
 		<info name="serial" value="TEM-66"/>
@@ -532,7 +520,7 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<software name="mightmaga" cloneof="mightmag">
-		<description>Might and Magic (Alt Disk 1)</description>
+		<description>Might and Magic (alt Disk 1)</description>
 		<year>1987</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<info name="release" value="198712xx"/>
@@ -560,7 +548,7 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<software name="mightmagb" cloneof="mightmag">
-		<description>Might and Magic (Alt 2)</description>
+		<description>Might and Magic (alt 2)</description>
 		<year>1987</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<info name="release" value="198712xx"/>
@@ -698,7 +686,7 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<software name="psyoblada" cloneof="psyoblad">
-		<description>Psy-O-Blade (Alt)</description>
+		<description>Psy-O-Blade (alt)</description>
 		<year>1988</year>
 		<publisher>T&amp;E Soft</publisher>
 		<info name="release" value="198812xx"/>
@@ -771,7 +759,7 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<software name="selesa" cloneof="seles">
-		<description>Seles (Alt Disk 2)</description>
+		<description>Seles (alt Disk 2)</description>
 		<year>1990</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="alt_title" value="セレス"/>
@@ -829,7 +817,7 @@ Titles, serial #s, publishers and release dates taken from:
 
 <!-- Disk 1 only differs in the d77 header -->
 	<software name="silpheeda" cloneof="silpheed">
-		<description>Silpheed (Alt Disk 2)</description>
+		<description>Silpheed (alt Disk 2)</description>
 		<year>1988</year>
 		<publisher>ゲームアーツ (Game Arts)</publisher>
 		<info name="serial" value="GA8CF3"/>
@@ -887,7 +875,7 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<software name="tetrisa" cloneof="tetris">
-		<description>Tetris (Alt)</description>
+		<description>Tetris (alt)</description>
 		<year>1988</year>
 		<publisher>B·P·S (Bullet-Proof Software)</publisher>
 		<info name="release" value="198811xx"/>
@@ -1145,7 +1133,7 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<software name="avdemoa" cloneof="avdemo" supported="no">
-		<description>FM-77AV Demo (Alt?)</description>
+		<description>FM-77AV Demo (alt?)</description>
 		<year>19??</year>
 		<publisher>富士通 (Fujitsu)</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1300,7 +1288,7 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<software name="hfe8a" cloneof="hfe">
-		<description>The File Master FM - Hot File Express (19870210, Alt?)</description>
+		<description>The File Master FM - Hot File Express (19870210, alt?)</description>
 		<year>1987</year>
 		<publisher>Kyoto Media</publisher>
 		<part name="flop1" interface="floppy_5_25">

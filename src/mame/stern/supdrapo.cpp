@@ -110,13 +110,13 @@ private:
 	void ay8910_outputa_w(uint8_t data);
 	void ay8910_outputb_w(uint8_t data);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	void supdrapo_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void sdpoker_mem(address_map &map);
+	void sdpoker_mem(address_map &map) ATTR_COLD;
 };
 
 
@@ -518,6 +518,9 @@ ROM_START( supdrapo )
 	ROM_REGION( 0x00200, "proms", 0 )
 	ROM_LOAD( "a1-9n",  0x0000, 0x0100, CRC(e62529e3) SHA1(176f2069b0c06c1d088909e81658652af06c8eec) )
 	ROM_LOAD( "a1-9p",  0x0100, 0x0100, CRC(a0547746) SHA1(747c8aef5afa26124fe0763e7f96c4ff6be31863) )
+
+	ROM_REGION (0x104, "plds", 0)
+	ROM_LOAD( "pal16r6.1p", 0x000, 0x104, CRC(13f14bbf) SHA1(b8c4ddf61609465f3a3699dd42796f15a7b17979) )
 ROM_END
 
 /*

@@ -456,7 +456,7 @@ public:
 	void avt(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void avt_6845_address_w(uint8_t data);
@@ -470,8 +470,8 @@ private:
 	void avt_palette(palette_device &palette) const;
 	uint32_t screen_update_avt(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void avt_map(address_map &map);
-	void avt_portmap(address_map &map);
+	void avt_map(address_map &map) ATTR_COLD;
+	void avt_portmap(address_map &map) ATTR_COLD;
 
 	tilemap_t *m_bg_tilemap = nullptr;
 	uint8_t m_crtc_vreg[0x100]{}, m_crtc_index = 0;

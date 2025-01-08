@@ -45,12 +45,12 @@ public:
 private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return 0; }
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
-	void pvtc_char_map(address_map &map);
-	void pvtc_attr_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void pvtc_char_map(address_map &map) ATTR_COLD;
+	void pvtc_attr_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -168,4 +168,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 1982, v550, 0, 0, v550, v550, v550_state, empty_init, "Visual Technology", "Visual 550", MACHINE_IS_SKELETON )
+COMP( 1982, v550, 0, 0, v550, v550, v550_state, empty_init, "Visual Technology", "Visual 550", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

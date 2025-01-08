@@ -25,8 +25,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
@@ -58,12 +58,9 @@ private:
 		int16_t output_cutoff_delta;
 
 		int32_t emphasis_filter_state;
-
 		int32_t output_filter_state;
 
-		// Attenuation for output channels
-		uint8_t output_gain[4];
-
+		uint8_t output_gain[4]; // Attenuation for output channels
 		int16_t samples[5]; // +1 history
 	};
 

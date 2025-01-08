@@ -37,8 +37,8 @@ private:
 	void duart_output_w(uint8_t data);
 	void ay8910_portb_w(uint8_t data);
 
-	void mem_map(address_map &map);
-	void fc7_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void fc7_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -126,5 +126,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME(199?,  st_ohla,   0,  stellafr,  stellafr, stellafr_state, empty_init, ROT0, "Stella", "Oh La La (Stella)",    MACHINE_IS_SKELETON_MECHANICAL )
-GAME(199?,  st_vulkn,  0,  stellafr,  stellafr, stellafr_state, empty_init, ROT0, "Stella", "Vulkan (Stella)",      MACHINE_IS_SKELETON_MECHANICAL )
+GAME(199?,  st_ohla,   0,  stellafr,  stellafr, stellafr_state, empty_init, ROT0, "Stella", "Oh La La (Stella)",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME(199?,  st_vulkn,  0,  stellafr,  stellafr, stellafr_state, empty_init, ROT0, "Stella", "Vulkan (Stella)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

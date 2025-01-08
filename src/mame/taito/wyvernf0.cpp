@@ -69,9 +69,9 @@ public:
 	void wyvernf0(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// memory pointers
@@ -115,8 +115,8 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	void sound_map(address_map &map);
-	void wyvernf0_map(address_map &map);
+	void sound_map(address_map &map) ATTR_COLD;
+	void wyvernf0_map(address_map &map) ATTR_COLD;
 };
 
 

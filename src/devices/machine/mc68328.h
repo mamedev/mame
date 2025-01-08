@@ -134,9 +134,9 @@ protected:
 	mc68328_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device_t implementation
-	virtual void device_resolve_objects() override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_resolve_objects() override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	enum : u8
 	{
@@ -822,8 +822,8 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	enum : u8
@@ -1010,8 +1010,8 @@ private:
 	u8  m_lotcr;        // Octet Terminal Count Register
 	u16 m_lgpmr;        // Gray Palette Mapping Register
 
-	void internal_map(address_map &map);
-	void cpu_space_map(address_map &map);
+	void internal_map(address_map &map) ATTR_COLD;
+	void cpu_space_map(address_map &map) ATTR_COLD;
 
 	// internal state
 	virtual void register_state_save() override;
@@ -1055,8 +1055,8 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	enum : u8
@@ -1213,8 +1213,8 @@ private:
 	u16  m_dayalarm;    // RTC Day Alarm Register
 	u8   m_sam_cnt;     // RTC Sample Timer Counter (internal, not readable)
 
-	void internal_map(address_map &map);
-	void cpu_space_map(address_map &map);
+	void internal_map(address_map &map) ATTR_COLD;
+	void cpu_space_map(address_map &map) ATTR_COLD;
 
 	// internal state
 	virtual void register_state_save() override;

@@ -48,8 +48,8 @@ public:
 	void set_revspritetile() { m_revspritetile = 3; }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// mixer shifts
 	int m_sprpri_shift;

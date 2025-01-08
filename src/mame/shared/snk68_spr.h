@@ -32,8 +32,8 @@ public:
 	void set_flip(bool flip);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	tile_indirection_delegate m_newtilecb;

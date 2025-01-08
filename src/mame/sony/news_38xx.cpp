@@ -76,13 +76,13 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// address maps
-	[[maybe_unused]] void cpu_map(address_map &map);
-	void iop_map(address_map &map);
-	void iop_vector_map(address_map &map);
+	[[maybe_unused]] void cpu_map(address_map &map) ATTR_COLD;
+	void iop_map(address_map &map) ATTR_COLD;
+	void iop_vector_map(address_map &map) ATTR_COLD;
 
 	// machine config
 	void common(machine_config &config);
@@ -425,6 +425,8 @@ void news_38xx_state::common(machine_config &config)
 	NEWS_HID_HLE(config, m_hid);
 	m_hid->irq_out<news_hid_hle_device::KEYBOARD>().set(m_serial_irq, FUNC(input_merger_device::in_w<0>));
 	m_hid->irq_out<news_hid_hle_device::MOUSE>().set(m_serial_irq, FUNC(input_merger_device::in_w<1>));
+
+	SOFTWARE_LIST(config, "software_list").set_original("sony_news").set_filter("RISC");
 }
 
 void news_38xx_state::nws3860(machine_config &config)
@@ -469,4 +471,4 @@ INPUT_PORTS_END
 
 
 /*   YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS            INIT         COMPANY  FULLNAME    FLAGS */
-COMP(1989, nws3860, 0,      0,      nws3860, nws3860, news_38xx_state, init_common, "Sony",  "NWS-3860", MACHINE_IS_SKELETON)
+COMP(1989, nws3860, 0,      0,      nws3860, nws3860, news_38xx_state, init_common, "Sony",  "NWS-3860", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

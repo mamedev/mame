@@ -43,11 +43,11 @@ public:
 	void cp1(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	void cp1_io(address_map &map);
+	void cp1_io(address_map &map) ATTR_COLD;
 
 	uint8_t port1_r();
 	uint8_t port2_r();

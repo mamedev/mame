@@ -1,9 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Karl Stenerud
+#ifndef MAME_CPU_SPC700_SPC700DS_H
+#define MAME_CPU_SPC700_SPC700DS_H
+
 #pragma once
 
-#ifndef __SPC700DS_H__
-#define __SPC700DS_H__
 /* ======================================================================== */
 /* =============================== COPYRIGHT ============================== */
 /* ======================================================================== */
@@ -62,4 +63,4 @@ private:
 };
 
 
-#endif /* __SPC700DS_H__ */
+#endif // MAME_CPU_SPC700_SPC700DS_H

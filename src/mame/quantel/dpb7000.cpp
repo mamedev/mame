@@ -142,20 +142,20 @@ public:
 	//DECLARE_INPUT_CHANGED_MEMBER(pen_prox_changed);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	template <int StoreNum> uint32_t store_debug_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t stencil_debug_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t brush_debug_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t combined_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void main_map(address_map &map);
-	void fddcpu_map(address_map &map);
-	void keybcpu_map(address_map &map);
-	void tds_cpu_map(address_map &map);
-	void tablet_program_map(address_map &map);
-	void tablet_data_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void fddcpu_map(address_map &map) ATTR_COLD;
+	void keybcpu_map(address_map &map) ATTR_COLD;
+	void tds_cpu_map(address_map &map) ATTR_COLD;
+	void tablet_program_map(address_map &map) ATTR_COLD;
+	void tablet_data_map(address_map &map) ATTR_COLD;
 
 	void csr_w(uint8_t data);
 	uint8_t csr_r();

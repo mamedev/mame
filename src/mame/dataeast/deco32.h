@@ -52,10 +52,10 @@ public:
 	void sound_bankswitch_w(u8 data);
 
 protected:
-	void h6280_sound_custom_latch_map(address_map &map);
-	void h6280_sound_map(address_map &map);
-	void z80_sound_io(address_map &map);
-	void z80_sound_map(address_map &map);
+	void h6280_sound_custom_latch_map(address_map &map) ATTR_COLD;
+	void h6280_sound_map(address_map &map) ATTR_COLD;
+	void z80_sound_io(address_map &map) ATTR_COLD;
+	void z80_sound_map(address_map &map) ATTR_COLD;
 
 	// common
 	u16 ioprot_r(offs_t offset);
@@ -95,7 +95,7 @@ protected:
 	void allocate_buffered_palette();
 	void allocate_rowscroll(int size1, int size2, int size3, int size4);
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	std::unique_ptr<u8[]> m_dirty_palette{}; // all but captaven
 	int m_pri = 0; // all but dragngun
@@ -122,7 +122,7 @@ public:
 	void init_captaven();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_ioport_array<3> m_io_dsw;
@@ -135,7 +135,7 @@ private:
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	DECOSPR_PRIORITY_CB_MEMBER(captaven_pri_callback);
 
-	void captaven_map(address_map &map);
+	void captaven_map(address_map &map) ATTR_COLD;
 };
 
 class fghthist_state : public deco32_state
@@ -153,7 +153,7 @@ public:
 	void init_fghthist();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_ioport_array<2> m_io_in;
@@ -165,8 +165,8 @@ private:
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	DECOSPR_PRIORITY_CB_MEMBER(fghthist_pri_callback);
 
-	void fghthist_map(address_map &map);
-	void fghthsta_memmap(address_map &map);
+	void fghthist_map(address_map &map) ATTR_COLD;
+	void fghthsta_memmap(address_map &map) ATTR_COLD;
 private:
 };
 
@@ -185,7 +185,7 @@ public:
 	void init_nslasher();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<deco_ace_device> m_deco_ace;
 
@@ -199,7 +199,7 @@ protected:
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	u16 mix_callback(u16 p, u16 p2);
 
-	void nslasher_map(address_map &map);
+	void nslasher_map(address_map &map) ATTR_COLD;
 
 	void mix_nslasher(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx0, gfx_element *gfx1, int mixAlphaTilemap);
 
@@ -229,7 +229,7 @@ private:
 
 	u16 port_b_tattass();
 
-	void tattass_map(address_map &map);
+	void tattass_map(address_map &map) ATTR_COLD;
 
 	void mix_tattass(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx0, gfx_element *gfx1, int mixAlphaTilemap);
 
@@ -272,7 +272,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(lockload_gun_trigger);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<namco_c355spr_device> m_sprgenzoom;
@@ -330,12 +330,12 @@ private:
 
 	void namco_sprites(machine_config &config);
 
-	void namcosprite_map(address_map &map);
-	void dragngun_map(address_map &map);
-	void lockload_map(address_map &map);
-	void lockloadu_map(address_map &map);
-	void lockload_sound_map(address_map &map);
-	void lockloadu_sound_map(address_map &map);
+	void namcosprite_map(address_map &map) ATTR_COLD;
+	void dragngun_map(address_map &map) ATTR_COLD;
+	void lockload_map(address_map &map) ATTR_COLD;
+	void lockloadu_map(address_map &map) ATTR_COLD;
+	void lockload_sound_map(address_map &map) ATTR_COLD;
+	void lockloadu_sound_map(address_map &map) ATTR_COLD;
 	bool m_gun_speaker_disabled;
 };
 

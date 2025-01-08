@@ -90,9 +90,9 @@ public:
 	void pimps(machine_config &config);
 
 private:
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
-	virtual void machine_reset() override;
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	memory_passthrough_handler m_rom_shadow_tap;
 	required_device<cpu_device> m_maincpu;

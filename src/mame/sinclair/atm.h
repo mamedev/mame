@@ -37,13 +37,13 @@ protected:
 	static constexpr u16 PEN_RAMNROM_MASK = 1 << 14; // 1-RAM, 0-ROM
 	static constexpr u16 PEN_DOS7FFD_MASK = 1 << 15;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
-	void atm_io(address_map &map);
-	void atm_mem(address_map &map);
-	void atm_switch(address_map &map);
+	void atm_io(address_map &map) ATTR_COLD;
+	void atm_mem(address_map &map) ATTR_COLD;
+	void atm_switch(address_map &map) ATTR_COLD;
 	template <u8 Bank> void atm_ram_w(offs_t offset, u8 data);
 
 	u8 beta_neutral_r(offs_t offset);
@@ -102,7 +102,7 @@ protected:
 	bool m_pen2;          // palette selector
 	u8 m_rg = 0b011;      // 0:320x200lo, 2:640:200hi, 3:256x192zx, 6:80x25txt
 	u8 m_br3;
-	std::vector<u8> m_palette_data;
+	u8 m_palette_data[16];
 	u8 m_ata_data_latch;
 	u8 m_beta_drive_selected;
 };

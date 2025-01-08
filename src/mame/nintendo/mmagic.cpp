@@ -90,7 +90,7 @@ public:
 	void mmagic(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -103,8 +103,8 @@ private:
 	required_device<samples_device> m_samples;
 	required_region_ptr<uint8_t> m_tile_colors;
 
-	void mem_map(address_map& map);
-	void io_map(address_map& map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	uint8_t paddle_r();
 	uint8_t buttons_r();

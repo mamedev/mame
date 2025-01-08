@@ -23,8 +23,8 @@ public:
 	u8 decode_byte(u32 addr, u8 data) const noexcept;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	// Operation mode - in practice, only LSB is used.

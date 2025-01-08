@@ -56,19 +56,19 @@ uint32_t badlandsbl_state::screen_update_badlandsbl(screen_device &screen, bitma
 	{
 		gfx_element *gfx = m_gfxdecode->gfx(1);
 
-		for(int count=0;count<(0x100-0x10)/2;count+=4)
+		for(int count = 0; count < (0x100-0x10) / 2; count+=4)
 		{
-			if((m_spriteram[count+3] & 0xff) == 0xff)
+			if((m_spriteram[count + 3] & 0xff) == 0xff)
 				return 0;
 
-			uint16_t tile = m_spriteram[count];
-			int y = (511 - 14) - (m_spriteram[count+1] & 0x1ff);
-			int x = (m_spriteram[count+2] >> 7) - 7;
-			int color = (m_spriteram[count+3] >> 8) & 7;
-			int h = (m_spriteram[count+3] & 0xf) + 1;
+			const u16 tile = m_spriteram[count];
+			const int y = (511 - 14) - (m_spriteram[count+1] & 0x1ff);
+			const int x = (m_spriteram[count+2] >> 7) - 7;
+			const u8 color = (m_spriteram[count+3] >> 8) & 7;
+			const u8 height = (m_spriteram[count+3] & 0xf) + 1;
 
-			for(int yi=0;yi<h;yi++)
-				gfx->transpen(bitmap,cliprect,tile+yi,color,0,0,x,y+yi*8,0);
+			for(int yi = 0; yi < height; yi++)
+				gfx->transpen(bitmap, cliprect, tile + yi, color, 0, 0, x, y + yi*8, 0);
 		}
 	}
 
@@ -81,7 +81,7 @@ uint16_t badlandsbl_state::badlandsb_unk_r()
 	return 0xffff;
 }
 
-// TODO: this prolly mimics audio_io_r/_w in original version
+// TODO: this probably mimics audio_io_r/_w in original version
 uint8_t badlandsbl_state::bootleg_shared_r(offs_t offset)
 {
 	return m_b_sharedram[offset];
@@ -94,7 +94,8 @@ void badlandsbl_state::bootleg_shared_w(offs_t offset, uint8_t data)
 
 uint8_t badlandsbl_state::sound_response_r()
 {
-	m_maincpu->set_input_line(2, CLEAR_LINE);
+	if (!machine().side_effects_disabled())
+		m_maincpu->set_input_line(2, CLEAR_LINE);
 	return m_sound_response;
 }
 
@@ -105,7 +106,7 @@ void badlandsbl_state::bootleg_map(address_map &map)
 	map(0x400000, 0x400005).rw(FUNC(badlandsbl_state::bootleg_shared_r), FUNC(badlandsbl_state::bootleg_shared_w));
 	map(0x400006, 0x400006).r(FUNC(badlandsbl_state::sound_response_r));
 	map(0x400008, 0x40000f).ram(); // breaks tilemap gfxs otherwise?
-	map(0x400010, 0x4000ff).ram().share("spriteram");
+	map(0x400010, 0x4000ff).ram().share(m_spriteram);
 
 	// sound comms?
 	map(0xfc0000, 0xfc0001).r(FUNC(badlandsbl_state::badlandsb_unk_r)).nopw();
@@ -136,7 +137,7 @@ void badlandsbl_state::bootleg_main_irq_w(uint8_t data)
 void badlandsbl_state::bootleg_audio_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom().region("audiorom", 0);
-	map(0x2000, 0x2005).ram().share("b_sharedram");
+	map(0x2000, 0x2005).ram().share(m_b_sharedram);
 	map(0x2006, 0x3fff).ram();
 	map(0x4000, 0xcfff).rom().region("audiorom", 0x4000);
 	map(0xd400, 0xd400).w(FUNC(badlandsbl_state::bootleg_main_irq_w));
@@ -174,13 +175,13 @@ INPUT_PORTS_END
 static const gfx_layout pflayout_bootleg =
 {
 	8,8,
-	RGN_FRAC(1,4),
+	RGN_FRAC(1, 4),
 	4,
-	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },
+	{ RGN_FRAC(0, 4), RGN_FRAC(1, 4), RGN_FRAC(2, 4), RGN_FRAC(3, 4) },
 //  TODO: service mode and (most of) in-game uses this arrangement
 //  { RGN_FRAC(1,4), RGN_FRAC(3,4), RGN_FRAC(0,4), RGN_FRAC(2,4) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	{ STEP8(0, 1) },
+	{ STEP8(0, 8) },
 	8*8
 };
 
@@ -190,14 +191,14 @@ static const gfx_layout badlands_molayout =
 	RGN_FRAC(1,1),
 	4,
 	{ 0, 1, 2, 3 },
-	{ 0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60 },
-	{ 0*8, 8*8, 16*8, 24*8, 32*8, 40*8, 48*8, 56*8 },
+	{ STEP16(0, 4) },
+	{ STEP8(0, 8 * 8) },
 	64*8
 };
 
 static GFXDECODE_START( gfx_badlandsb )
-	GFXDECODE_ENTRY( "gfx1", 0, pflayout_bootleg,    0, 8 )
-	GFXDECODE_ENTRY( "gfx2", 0, badlands_molayout,  128, 8 )
+	GFXDECODE_ENTRY( "tiles",   0, pflayout_bootleg,    0, 8 )
+	GFXDECODE_ENTRY( "sprites", 0, badlands_molayout,  128, 8 )
 GFXDECODE_END
 
 
@@ -221,11 +222,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(badlandsbl_state::bootleg_sound_scanline)
 void badlandsbl_state::badlandsb(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(28'000'000)/4);   /* Divisor estimated */
+	M68000(config, m_maincpu, XTAL(28'000'000) / 4);   // Divisor guessed
 	m_maincpu->set_addrmap(AS_PROGRAM, &badlandsbl_state::bootleg_map);
 	m_maincpu->set_vblank_int("screen", FUNC(badlandsbl_state::irq1_line_hold)); //vblank_int)
 
-	Z80(config, m_audiocpu, XTAL(20'000'000)/12);    /* Divisor estimated */
+	Z80(config, m_audiocpu, XTAL(20'000'000) / 12);    // Divisor guessed
 	m_audiocpu->set_addrmap(AS_PROGRAM, &badlandsbl_state::bootleg_audio_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(badlandsbl_state::bootleg_sound_scanline), "screen", 0, 1);
 
@@ -255,7 +256,7 @@ void badlandsbl_state::badlandsb(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	YM2151(config, "ymsnd", XTAL(20'000'000)/8).add_route(0, "mono", 0.30).add_route(1, "mono", 0.30); /* Divisor estimated */
+	YM2151(config, "ymsnd", XTAL(20'000'000) / 8).add_route(0, "mono", 0.30).add_route(1, "mono", 0.30); // Divisor guessed
 }
 
 
@@ -274,7 +275,7 @@ ROM_START( badlandsb )
 	ROM_LOAD( "blb26.ic27", 0x00000, 0x10000, CRC(59503ab4) SHA1(ea5686ee28f6125c1394d687cc35c6322c8f900c) )
 
 	/* the 2nd half of 122,123,124 and 125 is identical to the first half and not used */
-	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_REGION( 0x80000, "tiles", 0 )
 	ROM_LOAD( "13.ic123",     0x000000, 0x10000, CRC(55fac198) SHA1(055938f38cb7fc02ecaf35446b2598f7808baa1c) ) // alt set replaced bad rom
 	ROM_LOAD( "blb37.ic92",   0x008000, 0x10000, CRC(9188db9f) SHA1(8f7dc2c4c0dec9a80b6214a2efaa0de0858de84c) )
 	ROM_LOAD( "blb38.ic125",  0x020000, 0x10000, CRC(4839dd54) SHA1(031efbc144e5e088be0f3576aa514c7c2b775f6d) )
@@ -285,7 +286,7 @@ ROM_START( badlandsb )
 	ROM_LOAD( "blb29.ic88",   0x068000, 0x10000, CRC(a9f280e5) SHA1(daff021d14f17da8c4469270a1e50e5a01d05d49) )
 
 	/* the 1st half of 67 & 68 are empty and not used */
-	ROM_REGION( 0x40000, "gfx2", 0 )
+	ROM_REGION( 0x40000, "sprites", 0 )
 	ROM_LOAD16_BYTE( "blb33.ic67", 0x10001, 0x10000, CRC(aebf9938) SHA1(3778aacbde07e5a5d010e41ab62d5b0db8632ad8) )
 	ROM_LOAD16_BYTE( "blb34.ic34", 0x00001, 0x10000, CRC(3eac30a5) SHA1(deefc668185bf30ad3eeba73853f97ce12b85293) )
 	ROM_LOAD16_BYTE( "blb39.ic68", 0x10000, 0x10000, CRC(f398f2d7) SHA1(1eef64680101888425490eb4d5b86072e59753cf) )
@@ -306,7 +307,7 @@ ROM_START( badlandsb2 )
 	ROM_LOAD( "3.ic27", 0x00000, 0x10000, CRC(08850eb5) SHA1(be169e8ccee275b72bcfca66cd126cc27af7a1d6) )  // only rom that differs from badlandsb
 
 	/* the 2nd half of 122,123,124 and 125 is identical to the first half and not used */
-	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_REGION( 0x80000, "tiles", 0 )
 	ROM_LOAD( "13.ic123",  0x000000, 0x10000, CRC(55fac198) SHA1(055938f38cb7fc02ecaf35446b2598f7808baa1c) )
 	ROM_LOAD( "14.ic92",   0x008000, 0x10000, CRC(9188db9f) SHA1(8f7dc2c4c0dec9a80b6214a2efaa0de0858de84c) )
 	ROM_LOAD( "15.ic125",  0x020000, 0x10000, CRC(4839dd54) SHA1(031efbc144e5e088be0f3576aa514c7c2b775f6d) )
@@ -317,7 +318,7 @@ ROM_START( badlandsb2 )
 	ROM_LOAD( "6.ic88",    0x068000, 0x10000, CRC(a9f280e5) SHA1(daff021d14f17da8c4469270a1e50e5a01d05d49) )
 
 	/* the 1st half of 67 & 68 are empty and not used */
-	ROM_REGION( 0x40000, "gfx2", 0 )
+	ROM_REGION( 0x40000, "sprites", 0 )
 	ROM_LOAD16_BYTE( "10.ic67", 0x10001, 0x10000, CRC(aebf9938) SHA1(3778aacbde07e5a5d010e41ab62d5b0db8632ad8) )
 	ROM_LOAD16_BYTE( "11.ic34", 0x00001, 0x10000, CRC(3eac30a5) SHA1(deefc668185bf30ad3eeba73853f97ce12b85293) )
 	ROM_LOAD16_BYTE( "16.ic68", 0x10000, 0x10000, CRC(f398f2d7) SHA1(1eef64680101888425490eb4d5b86072e59753cf) )
@@ -326,5 +327,5 @@ ROM_END
 
 
 
-GAME( 1989, badlandsb,  badlands, badlandsb, badlandsb, badlandsbl_state, empty_init, ROT0, "bootleg (Playmark)", "Bad Lands (bootleg)", MACHINE_NOT_WORKING )
-GAME( 1989, badlandsb2, badlands, badlandsb, badlandsb, badlandsbl_state, empty_init, ROT0, "bootleg (Playmark)", "Bad Lands (bootleg, alternate)", MACHINE_NOT_WORKING )
+GAME( 1989, badlandsb,  badlands, badlandsb, badlandsb, badlandsbl_state, empty_init, ROT0, "bootleg (Playmark)", "Bad Lands (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1989, badlandsb2, badlands, badlandsb, badlandsb, badlandsbl_state, empty_init, ROT0, "bootleg (Playmark)", "Bad Lands (bootleg, alternate)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

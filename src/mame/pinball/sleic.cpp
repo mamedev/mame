@@ -73,12 +73,12 @@ public:
 	void sleic(machine_config &config);
 
 private:
-	void main_map(address_map &map);
-	void cpu2_map(address_map &map);
-	void cpu2_io(address_map &map);
-	void cpu3_map(address_map &map);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	void main_map(address_map &map) ATTR_COLD;
+	void cpu2_map(address_map &map) ATTR_COLD;
+	void cpu2_io(address_map &map) ATTR_COLD;
+	void cpu3_map(address_map &map) ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	u8 cpu2_in00() { return 0; }   // communications + handshake
 	u8 cpu2_in01() { return 0; }   // communications + handshake
 	u8 cpu2_in02() { u8 data = 0U; for (u8 i = 0; i < 6; i++) if (BIT(m_row, i)) data |= m_io_keyboard[i]->read(); return data; }   // contactors
@@ -372,7 +372,7 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME(1992,  bikerace,  0,         sleic,  sleic, sleic_state, empty_init, ROT0, "Sleic", "Bike Race",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1992,  bikerace2, bikerace,  sleic,  sleic, sleic_state, empty_init, ROT0, "Sleic", "Bike Race (2-ball play)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1993,  sleicpin,  0,         sleic,  sleic, sleic_state, empty_init, ROT0, "Sleic", "Sleic Pin Ball",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  iomoon,    0,         sleic,  sleic, sleic_state, empty_init, ROT0, "Sleic", "Io Moon",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1992,  bikerace,  0,         sleic,  sleic, sleic_state, empty_init, ROT0, "Sleic", "Bike Race",               MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1992,  bikerace2, bikerace,  sleic,  sleic, sleic_state, empty_init, ROT0, "Sleic", "Bike Race (2-ball play)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1993,  sleicpin,  0,         sleic,  sleic, sleic_state, empty_init, ROT0, "Sleic", "Sleic Pin Ball",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  iomoon,    0,         sleic,  sleic, sleic_state, empty_init, ROT0, "Sleic", "Io Moon",                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )

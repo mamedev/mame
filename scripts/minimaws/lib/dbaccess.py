@@ -1,13 +1,10 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 ##
 ## license:BSD-3-Clause
 ## copyright-holders:Vas Crabb
 
 import sqlite3
-import sys
-
-if sys.version_info >= (3, 4):
-    import urllib.request
+import urllib.request
 
 
 class SchemaQueries(object):
@@ -574,7 +571,7 @@ class UpdateQueries(object):
 
 class QueryCursor(object):
     def __init__(self, dbconn, **kwargs):
-        super(QueryCursor, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.dbcurs = dbconn.cursor()
 
     def close(self):
@@ -916,7 +913,7 @@ class QueryCursor(object):
 
 class UpdateCursor(object):
     def __init__(self, dbconn, **kwargs):
-        super(UpdateCursor, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.dbcurs = dbconn.cursor()
 
     def close(self):
@@ -1066,11 +1063,8 @@ class UpdateCursor(object):
 
 class QueryConnection(object):
     def __init__(self, database, **kwargs):
-        super(QueryConnection, self).__init__(**kwargs)
-        if sys.version_info >= (3, 4):
-            self.dbconn = sqlite3.connect('file:' + urllib.request.pathname2url(database) + '?mode=ro', uri=True, check_same_thread=False)
-        else:
-            self.dbconn = sqlite3.connect(database, check_same_thread=False)
+        super().__init__(**kwargs)
+        self.dbconn = sqlite3.connect('file:' + urllib.request.pathname2url(database) + '?mode=ro', uri=True, check_same_thread=False)
         self.dbconn.row_factory = sqlite3.Row
         self.dbconn.execute('PRAGMA foreign_keys = ON')
 
@@ -1083,7 +1077,7 @@ class QueryConnection(object):
 
 class UpdateConnection(object):
     def __init__(self, database, **kwargs):
-        super(UpdateConnection, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.dbconn = sqlite3.connect(database)
         self.dbconn.execute('PRAGMA page_size = 4096')
         self.dbconn.execute('PRAGMA foreign_keys = ON')

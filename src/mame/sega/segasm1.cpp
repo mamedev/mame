@@ -85,16 +85,16 @@ public:
 	void m1comm(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void mem_map(address_map &map);
-	void mem_comm_map(address_map &map);
-	void z80_map(address_map &map);
-	void z80_io_map(address_map &map);
-	void comm_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void mem_comm_map(address_map &map) ATTR_COLD;
+	void z80_map(address_map &map) ATTR_COLD;
+	void z80_io_map(address_map &map) ATTR_COLD;
+	void comm_map(address_map &map) ATTR_COLD;
 
 	required_device<m68000_device> m_maincpu;
 	required_device<z80_device> m_soundcpu;

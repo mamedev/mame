@@ -17,6 +17,7 @@
         * What is the main CPU clock?  11.2Mhz / 16 goes through
           a MC4044 and a MC4024 analog chips before going to the EXTAL
           pin of the M6809
+        * Stars are blinking too fast.
 
     Notes:
         * The Sigma set has Japanese voice samples, while the Gottlieb
@@ -85,15 +86,6 @@
 
 namespace {
 
-#define MAIN_CPU_MASTER_CLOCK       XTAL(11'200'000)
-#define PIXEL_CLOCK                 (MAIN_CPU_MASTER_CLOCK / 2)
-#define CRTC_CLOCK                  (MAIN_CPU_MASTER_CLOCK / 16)
-#define AUDIO_1_MASTER_CLOCK        XTAL(4'000'000)
-#define AUDIO_CPU_1_CLOCK           AUDIO_1_MASTER_CLOCK
-#define AUDIO_2_MASTER_CLOCK        XTAL(4'000'000)
-#define AUDIO_CPU_2_CLOCK           AUDIO_2_MASTER_CLOCK
-
-
 class nyny_state : public driver_device
 {
 public:
@@ -111,10 +103,15 @@ public:
 		m_pia2(*this, "pia2"),
 		m_soundlatch(*this, "soundlatch"),
 		m_soundlatch2(*this, "soundlatch2"),
-		m_soundlatch3(*this, "soundlatch3")
+		m_soundlatch3(*this, "soundlatch3"),
+		m_dac(*this, "dac")
 	{ }
 
 	void nyny(machine_config &config);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	/* memory pointers */
@@ -122,11 +119,13 @@ private:
 	required_shared_ptr_array<uint8_t, 2> m_colorram;
 
 	/* video-related */
-	bool     m_flipscreen = false;
-	bool     m_flipchars = false;
-	uint8_t    m_star_enable = 0;
-	uint16_t   m_star_delay_counter = 0;
-	uint16_t   m_star_shift_reg = 0;
+	bool m_flipscreen = false;
+	bool m_flipchars = false;
+	bool m_dac_enable = false;
+	uint8_t m_dac_data = 0;
+	bool m_star_enable = false;
+	uint16_t m_star_delay_counter = 0;
+	uint16_t m_star_shift_reg = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -140,6 +139,7 @@ private:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<generic_latch_8_device> m_soundlatch2;
 	required_device<generic_latch_8_device> m_soundlatch3;
+	required_device<dac_8bit_r2r_device> m_dac;
 
 	void audio_1_command_w(uint8_t data);
 	void audio_1_answer_w(uint8_t data);
@@ -152,19 +152,18 @@ private:
 	void pia_2_port_b_w(uint8_t data);
 	void flipscreen_w(int state);
 	void flipchars_w(int state);
-	void nyny_ay8910_37_port_a_w(uint8_t data);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	void ay8910_37_port_a_w(uint8_t data);
+	void ay8910_37_port_b_w(uint8_t data);
+	void update_dac();
 	INTERRUPT_GEN_MEMBER(update_pia_1);
-	void ic48_1_74123_output_changed(int state);
-	inline void shift_star_generator(  );
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_END_UPDATE(crtc_end_update);
-	void audio_1_map(address_map &map);
-	void audio_2_map(address_map &map);
-	void main_map(address_map &map);
+	void audio_1_map(address_map &map) ATTR_COLD;
+	void audio_2_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 };
+
 
 
 /*************************************
@@ -211,6 +210,7 @@ INTERRUPT_GEN_MEMBER(nyny_state::update_pia_1)
 }
 
 
+
 /*************************************
  *
  *  PIA2
@@ -229,36 +229,19 @@ void nyny_state::pia_2_port_b_w(uint8_t data)
 	m_star_delay_counter = (m_star_delay_counter & 0x00ff) | ((data & 0x0f) << 8);
 
 	/* bit 4 is star field enable */
-	m_star_enable = data & 0x10;
+	m_star_enable = bool(data & 0x10);
 
 	/* bits 5-7 go to the music board connector */
 	audio_2_command_w(data & 0xe0);
 }
 
 
-/*************************************
- *
- *  IC48 #1 - 74123
- *
- *  This timer is responsible for
- *  delaying the setting of PIA2's
- *  CA1 line.  This delay ensures that
- *  CA1 is only changed in the VBLANK
- *  region, but not in HBLANK
- *
- *************************************/
-
-void nyny_state::ic48_1_74123_output_changed(int state)
-{
-	m_pia2->ca1_w(state);
-}
 
 /*************************************
  *
  *  Video system
  *
  *************************************/
-
 
 void nyny_state::flipscreen_w(int state)
 {
@@ -279,9 +262,7 @@ MC6845_UPDATE_ROW( nyny_state::crtc_update_row )
 	for (uint8_t cx = 0; cx < x_count; cx++)
 	{
 		/* the memory is hooked up to the MA, RA lines this way */
-		offs_t offs = ((ma << 3) & 0x3f00) |
-						((ra << 5) & 0x00e0) |
-						((ma << 0) & 0x001f);
+		offs_t offs = ((ma << 3) & 0x3f00) | ((ra << 5) & 0x00e0) | ((ma << 0) & 0x001f);
 
 		if (m_flipscreen)
 			offs ^= 0x3fff;
@@ -324,12 +305,6 @@ MC6845_UPDATE_ROW( nyny_state::crtc_update_row )
 }
 
 
-void nyny_state::shift_star_generator(  )
-{
-	m_star_shift_reg = (m_star_shift_reg << 1) | (((~m_star_shift_reg >> 15) & 0x01) ^ ((m_star_shift_reg >> 2) & 0x01));
-}
-
-
 MC6845_END_UPDATE( nyny_state::crtc_end_update )
 {
 	/* draw the star field into the bitmap */
@@ -340,21 +315,22 @@ MC6845_END_UPDATE( nyny_state::crtc_end_update )
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			/* check if the star status */
-			if (m_star_enable && (bitmap.pix(y, x) == m_palette->pen_color(0)) &&
-				((m_star_shift_reg & 0x80ff) == 0x00ff) &&
-				(((y & 0x01) ^ m_flipscreen) ^ (((x & 0x08) >> 3) ^ m_flipscreen)))
+			const bool enabled = m_star_enable && (bitmap.pix(y, x) == m_palette->pen_color(0));
+			const int flip = m_flipscreen ? 1 : 0;
+
+			if (enabled && ((m_star_shift_reg & 0x80ff) == 0x00ff) && (((y & 0x01) ^ flip) ^ (((x & 0x08) >> 3) ^ flip)))
 			{
-				uint8_t color = ((m_star_shift_reg & 0x0100) >>  8) |  /* R */
-								((m_star_shift_reg & 0x0400) >>  9) |    /* G */
-								((m_star_shift_reg & 0x1000) >> 10);     /* B */
+				uint8_t color = ((m_star_shift_reg & 0x0100) >>  8) | /* R */
+						((m_star_shift_reg & 0x0400) >>  9) | /* G */
+						((m_star_shift_reg & 0x1000) >> 10);  /* B */
 
 				bitmap.pix(y, x) = m_palette->pen_color(color);
 			}
 
 			if (delay_counter == 0)
-				shift_star_generator();
+				m_star_shift_reg = (m_star_shift_reg << 1) | (((~m_star_shift_reg >> 15) & 0x01) ^ ((m_star_shift_reg >> 2) & 0x01));
 			else
-				delay_counter = delay_counter - 1;
+				delay_counter--;
 		}
 	}
 }
@@ -381,12 +357,30 @@ void nyny_state::audio_1_answer_w(uint8_t data)
 }
 
 
-void nyny_state::nyny_ay8910_37_port_a_w(uint8_t data)
+void nyny_state::update_dac()
 {
-	/* not sure what this does */
-
-	/*logerror("%s PORT A write %x at  Y=%x X=%x\n", machine().describe_context(), data, m_screen->vpos(), m_screen->hpos());*/
+	m_dac->write(m_dac_enable ? m_dac_data : 0x80);
 }
+
+
+void nyny_state::ay8910_37_port_a_w(uint8_t data)
+{
+	/* bit 0-2: AY1 channel A volume filter? */
+
+	/* bit 3: enable DAC output */
+	m_dac_enable = !BIT(data, 3);
+	update_dac();
+}
+
+
+void nyny_state::ay8910_37_port_b_w(uint8_t data)
+{
+	/* DAC data, also AY1 channel A filter? */
+	m_dac_data = data;
+	update_dac();
+}
+
+
 
 /*************************************
  *
@@ -413,8 +407,10 @@ uint8_t nyny_state::nyny_pia_1_2_r(offs_t offset)
 	uint8_t ret = 0;
 
 	/* the address bits are directly connected to the chip selects */
-	if (BIT(offset, 2))  ret = m_pia1->read(offset & 0x03);
-	if (BIT(offset, 3))  ret = m_pia2->read_alt(offset & 0x03);
+	if (BIT(offset, 2))
+		ret = m_pia1->read(offset & 0x03);
+	if (BIT(offset, 3))
+		ret = m_pia2->read_alt(offset & 0x03);
 
 	return ret;
 }
@@ -423,8 +419,10 @@ uint8_t nyny_state::nyny_pia_1_2_r(offs_t offset)
 void nyny_state::nyny_pia_1_2_w(offs_t offset, uint8_t data)
 {
 	/* the address bits are directly connected to the chip selects */
-	if (BIT(offset, 2))  m_pia1->write(offset & 0x03, data);
-	if (BIT(offset, 3))  m_pia2->write_alt(offset & 0x03, data);
+	if (BIT(offset, 2))
+		m_pia1->write(offset & 0x03, data);
+	if (BIT(offset, 3))
+		m_pia2->write_alt(offset & 0x03, data);
 }
 
 
@@ -558,7 +556,6 @@ static INPUT_PORTS_START( nyny )
 
 	PORT_START("CROSS")     /* connected to PIA1 CB1 input */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PS1 (Crosshatch)") PORT_CODE(KEYCODE_F1)
-
 INPUT_PORTS_END
 
 
@@ -571,12 +568,11 @@ INPUT_PORTS_END
 
 void nyny_state::machine_start()
 {
-	m_flipscreen = false;
-	m_flipchars = false;
-
 	/* setup for save states */
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_flipchars));
+	save_item(NAME(m_dac_enable));
+	save_item(NAME(m_dac_data));
 	save_item(NAME(m_star_enable));
 	save_item(NAME(m_star_delay_counter));
 	save_item(NAME(m_star_shift_reg));
@@ -584,10 +580,12 @@ void nyny_state::machine_start()
 
 void nyny_state::machine_reset()
 {
-	m_star_enable = 0;
+	m_star_enable = false;
 	m_star_delay_counter = 0;
 	m_star_shift_reg = 0;
 }
+
+
 
 /*************************************
  *
@@ -597,27 +595,28 @@ void nyny_state::machine_reset()
 
 void nyny_state::nyny(machine_config &config)
 {
-	/* basic machine hardware */
-	MC6809(config, m_maincpu, 5600000); /* 1.40 MHz? The clock signal is generated by analog chips */
+	// basic machine hardware
+	MC6809(config, m_maincpu, 5'600'000); // 5.6 MHz? The clock signal is generated by analog chips
 	m_maincpu->set_addrmap(AS_PROGRAM, &nyny_state::main_map);
 	m_maincpu->set_periodic_int(FUNC(nyny_state::update_pia_1), attotime::from_hz(25));
 
-	M6802(config, m_audiocpu, AUDIO_CPU_1_CLOCK);
+	M6802(config, m_audiocpu, 4_MHz_XTAL);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nyny_state::audio_1_map);
 
-	M6802(config, m_audiocpu2, AUDIO_CPU_2_CLOCK);
+	M6802(config, m_audiocpu2, 4_MHz_XTAL); // physically a different XTAL
 	m_audiocpu2->set_addrmap(AS_PROGRAM, &nyny_state::audio_2_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(PIXEL_CLOCK, 360, 0, 256, 276, 0, 224);
+	screen.set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	screen.set_raw(11.2_MHz_XTAL / 2, 360, 0, 256, 276, 0, 224);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	PALETTE(config, m_palette, palette_device::RGB_3BIT);
 
-	MC6845(config, m_mc6845, CRTC_CLOCK); // HD46505P
+	MC6845(config, m_mc6845, 11.2_MHz_XTAL / 16); // HD46505P
 	m_mc6845->set_screen("screen");
 	m_mc6845->set_show_border_area(false);
 	m_mc6845->set_char_width(8);
@@ -625,15 +624,16 @@ void nyny_state::nyny(machine_config &config)
 	m_mc6845->set_end_update_callback(FUNC(nyny_state::crtc_end_update));
 	m_mc6845->out_de_callback().set(m_ic48_1, FUNC(ttl74123_device::a_w));
 
-	/* 74LS123 */
+	// 74LS123: This timer is responsible for delaying the setting of PIA2's CA1 line.
+	// This delay ensures that CA1 is only changed in the VBLANK region, but not in HBLANK.
 	TTL74123(config, m_ic48_1, 0);
-	m_ic48_1->set_connection_type(TTL74123_GROUNDED);   /* the hook up type */
-	m_ic48_1->set_resistor_value(RES_K(22));            /* resistor connected to RCext */
-	m_ic48_1->set_capacitor_value(CAP_U(0.01));         /* capacitor connected to Cext and RCext */
-	m_ic48_1->set_a_pin_value(1);                       /* A pin - driven by the CRTC */
-	m_ic48_1->set_b_pin_value(1);                       /* B pin - pulled high */
-	m_ic48_1->set_clear_pin_value(1);                   /* Clear pin - pulled high */
-	m_ic48_1->out_cb().set(FUNC(nyny_state::ic48_1_74123_output_changed));
+	m_ic48_1->set_connection_type(TTL74123_GROUNDED); // the hook up type
+	m_ic48_1->set_resistor_value(RES_K(22));          // resistor connected to RCext
+	m_ic48_1->set_capacitor_value(CAP_U(0.01));       // capacitor connected to Cext and RCext
+	m_ic48_1->set_a_pin_value(1);                     // A pin - driven by the CRTC
+	m_ic48_1->set_b_pin_value(1);                     // B pin - pulled high
+	m_ic48_1->set_clear_pin_value(1);                 // Clear pin - pulled high
+	m_ic48_1->out_cb().set(m_pia2, FUNC(pia6821_device::ca1_w));
 
 	PIA6821(config, m_pia1);
 	m_pia1->readpa_handler().set_ioport("IN0");
@@ -649,24 +649,24 @@ void nyny_state::nyny(machine_config &config)
 	m_pia2->irqa_handler().set(FUNC(nyny_state::main_cpu_firq));
 	m_pia2->irqb_handler().set(FUNC(nyny_state::main_cpu_irq));
 
-	/* audio hardware */
+	// audio hardware
 	SPEAKER(config, "speaker").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	GENERIC_LATCH_8(config, m_soundlatch2);
 	GENERIC_LATCH_8(config, m_soundlatch3);
 
-	ay8910_device &ay1(AY8910(config, "ay1", AUDIO_CPU_1_CLOCK));
-	ay1.port_a_write_callback().set(FUNC(nyny_state::nyny_ay8910_37_port_a_w));
-	ay1.port_b_write_callback().set("dac", FUNC(dac_byte_interface::data_w));
+	ay8910_device &ay1(AY8910(config, "ay1", 4_MHz_XTAL / 4));
+	ay1.port_a_write_callback().set(FUNC(nyny_state::ay8910_37_port_a_w));
+	ay1.port_b_write_callback().set(FUNC(nyny_state::ay8910_37_port_b_w));
 	ay1.add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	ay8910_device &ay2(AY8910(config, "ay2", AUDIO_CPU_1_CLOCK));
+	ay8910_device &ay2(AY8910(config, "ay2", 4_MHz_XTAL / 4));
 	ay2.port_a_read_callback().set_ioport("SW2");
 	ay2.port_b_read_callback().set_ioport("SW1");
 	ay2.add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	AY8910(config, "ay3", AUDIO_CPU_2_CLOCK).add_route(ALL_OUTPUTS, "speaker", 0.03);
+	AY8910(config, "ay3", 4_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "speaker", 0.1);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
 }
@@ -743,12 +743,13 @@ ROM_END
 } // anonymous namespace
 
 
+
 /*************************************
  *
  *  Game drivers
  *
  *************************************/
 
-GAME( 1980, nyny,    0,    nyny, nyny, nyny_state, empty_init, ROT270, "Sigma Enterprises Inc.", "New York! New York!", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, nynyg,   nyny, nyny, nyny, nyny_state, empty_init, ROT270, "Sigma Enterprises Inc. (Gottlieb license)", "New York! New York! (Gottlieb)", MACHINE_IMPERFECT_SOUND  | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, warcadia,nyny, nyny, nyny, nyny_state, empty_init, ROT270, "Sigma Enterprises Inc.", "Waga Seishun no Arcadia", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, nyny,     0,    nyny, nyny, nyny_state, empty_init, ROT270, "Sigma Enterprises Inc.", "New York! New York!", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, nynyg,    nyny, nyny, nyny, nyny_state, empty_init, ROT270, "Sigma Enterprises Inc. (Gottlieb license)", "New York! New York! (Gottlieb)", MACHINE_IMPERFECT_SOUND  | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, warcadia, nyny, nyny, nyny, nyny_state, empty_init, ROT270, "Sigma Enterprises Inc.", "Waga Seishun no Arcadia", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

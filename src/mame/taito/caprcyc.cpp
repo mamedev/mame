@@ -31,7 +31,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	void caprcyc(machine_config &config);
-	void caprcyc_map(address_map &map);
+	void caprcyc_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -99,4 +99,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1999, caprcyc, 0, caprcyc, caprcyc, caprcyc_state, empty_init, ROT0, "Taito", "Capriccio Cyclone", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1999, caprcyc, 0, caprcyc, caprcyc, caprcyc_state, empty_init, ROT0, "Taito", "Capriccio Cyclone", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

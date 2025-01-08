@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
-#ifndef MAME_MACHINE_ATAFLASH_H
-#define MAME_MACHINE_ATAFLASH_H
+#ifndef MAME_BUS_PCCARD_ATAFLASH_H
+#define MAME_BUS_PCCARD_ATAFLASH_H
 
 #pragma once
 
@@ -22,8 +22,8 @@ protected:
 	ata_flash_pccard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	// ata_hle_device_base implementation
@@ -48,8 +48,8 @@ public:
 	virtual void write_reg(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void process_command() override;
 	virtual bool is_ready() override;
 
@@ -64,8 +64,8 @@ public:
 	taito_pccard2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void process_command() override;
 	virtual void process_buffer() override;
 	virtual bool is_ready() override;
@@ -84,8 +84,8 @@ public:
 	taito_compact_flash_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void process_command() override;
 	virtual bool is_ready() override;
 
@@ -101,4 +101,4 @@ DECLARE_DEVICE_TYPE(TAITO_PCCARD2, taito_pccard2_device)
 DECLARE_DEVICE_TYPE(TAITO_COMPACT_FLASH, taito_compact_flash_device)
 DECLARE_DEVICE_TYPE(ATA_FLASH_PCCARD, ata_flash_pccard_device)
 
-#endif // MAME_MACHINE_ATAFLASH_H
+#endif // MAME_BUS_PCCARD_ATAFLASH_H

@@ -110,9 +110,9 @@ public:
 	void gundealrbl(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// memory pointers
@@ -144,10 +144,10 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
-	void base_map(address_map &map);
-	void gundealr_main_map(address_map &map);
-	void main_portmap(address_map &map);
-	void yamyam_main_map(address_map &map);
+	void base_map(address_map &map) ATTR_COLD;
+	void gundealr_main_map(address_map &map) ATTR_COLD;
+	void main_portmap(address_map &map) ATTR_COLD;
+	void yamyam_main_map(address_map &map) ATTR_COLD;
 };
 
 class yamyam_mcu_state : public gundealr_state

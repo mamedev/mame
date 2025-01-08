@@ -17,16 +17,13 @@
 
 
 // /INH special addresses
-#define INH_START_INVALID   0xffff
-#define INH_END_INVALID     0x0000
+static constexpr uint16_t INH_START_INVALID = 0xffff;
+static constexpr uint16_t INH_END_INVALID   = 0x0000;
 
 // /INH types
-#define INH_NONE            0x00
-#define INH_READ            0x01
-#define INH_WRITE           0x02
-
-// 7M = XTAL(14'318'181) / 2 or XTAL(28'636'363) / 4 (for IIgs)
-static constexpr uint32_t A2BUS_7M_CLOCK = 7159090;
+static constexpr int INH_NONE  = 0x00;
+static constexpr int INH_READ  = 0x01;
+static constexpr int INH_WRITE = 0x02;
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -40,11 +37,6 @@ class a2bus_slot_device : public device_t, public device_single_card_slot_interf
 public:
 	// construction/destruction
 	template <typename T, typename U>
-	a2bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&a2bus_tag, U &&opts, const char *dflt)
-		: a2bus_slot_device(mconfig, tag, owner, A2BUS_7M_CLOCK, std::forward<T>(a2bus_tag), std::forward<U>(opts), dflt)
-	{
-	}
-	template <typename T, typename U>
 	a2bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&a2bus_tag, U &&opts, const char *dflt)
 		: a2bus_slot_device(mconfig, tag, owner, clock)
 	{
@@ -54,14 +46,14 @@ public:
 		set_fixed(false);
 		m_a2bus.set_tag(std::forward<T>(a2bus_tag));
 	}
-	a2bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = A2BUS_7M_CLOCK);
+	a2bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	a2bus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_t implementation
-	virtual void device_resolve_objects() override;
-	virtual void device_start() override;
+	virtual void device_resolve_objects() override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 	// configuration
 	required_device<a2bus_device> m_a2bus;
@@ -107,8 +99,8 @@ protected:
 	a2bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// internal state
 	required_address_space m_maincpu_space;

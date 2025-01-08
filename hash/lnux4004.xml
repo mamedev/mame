@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+
+<softwarelist name="lnux4004" description="Linux/4004 SD Card images">
+
+	<software name="linux">
+		<description>Debian GNU/Linux 7 (Linux uMIPS 4.4.292+)</description>
+		<year>2024</year>
+		<publisher>Dmitry Grinberg</publisher>
+		<part name="linux4004" interface="sdcard">
+			<diskarea name="harddriv">
+				<disk name="linux4004" sha1="6458018636d21845c95e1076b81c615e16a97975" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>

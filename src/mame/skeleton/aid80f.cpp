@@ -43,16 +43,16 @@ public:
 	void aid80f(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u8 ram_r(offs_t offset);
 	void ram_w(offs_t offset, u8 data);
 	u8 monitor_r(offs_t offset);
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -145,4 +145,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1978, aid80f, 0, 0, aid80f, aid80f, aid80f_state, empty_init, "Mostek", "AID-80F Development System", MACHINE_IS_SKELETON)
+COMP(1978, aid80f, 0, 0, aid80f, aid80f, aid80f_state, empty_init, "Mostek", "AID-80F Development System", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

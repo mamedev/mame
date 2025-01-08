@@ -19,12 +19,12 @@ public:
 protected:
 	sis6236_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	virtual void io_3cx_map(address_map &map) override;
+	virtual void io_3cx_map(address_map &map) override ATTR_COLD;
 
-	virtual void sequencer_map(address_map &map) override;
+	virtual void sequencer_map(address_map &map) override ATTR_COLD;
 
 	virtual uint16_t offset() override;
 	virtual void recompute_params() override;
@@ -52,11 +52,11 @@ public:
 	sis630_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-//  virtual void device_start() override;
-//  virtual void device_reset() override;
+//  virtual void device_start() override ATTR_COLD;
+//  virtual void device_reset() override ATTR_COLD;
 
-	virtual void crtc_map(address_map &map) override;
-	virtual void sequencer_map(address_map &map) override;
+	virtual void crtc_map(address_map &map) override ATTR_COLD;
+	virtual void sequencer_map(address_map &map) override ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(SIS6236_VGA, sis6236_vga_device)

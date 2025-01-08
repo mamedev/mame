@@ -14,6 +14,7 @@
 #include "mvme181.h"
 #include "mvme187.h"
 #include "mvme327a.h"
+#include "mvme328.h"
 #include "mvme350.h"
 #include "mzr8105.h"
 #include "mzr8300.h"
@@ -23,6 +24,7 @@
 #include "sys68k_cpu30.h"
 #include "sys68k_iscsi.h"
 #include "sys68k_isio.h"
+#include "tp880v.h"
 #include "tp881v.h"
 
 void vme_cards(device_slot_interface &device)
@@ -40,6 +42,7 @@ void vme_cards(device_slot_interface &device)
 	device.option_add("mvme181",          VME_MVME181);
 	device.option_add("mvme187",          VME_MVME187);
 	device.option_add("mvme327a",         VME_MVME327A);
+	device.option_add("mvme328",          VME_MVME328);
 	device.option_add("mvme350",          VME_MVME350);
 	device.option_add("mzr8105",          VME_MZR8105);
 	device.option_add("mzr8300",          VME_MZR8300);
@@ -61,5 +64,6 @@ void vme_cards(device_slot_interface &device)
 	device.option_add("sys68k_cpu33",     VME_SYS68K_CPU33);
 	device.option_add("sys68k_iscsi1",    VME_SYS68K_ISCSI1),
 	device.option_add("sys68k_isio1",     VME_SYS68K_ISIO1),
+	device.option_add("tp880v",           VME_TP880V);
 	device.option_add("tp881v",           VME_TP881V);
 }

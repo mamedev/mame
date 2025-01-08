@@ -55,7 +55,7 @@ static void bbc_floppies_525(device_slot_interface &device)
 
 INPUT_PORTS_START( stldfdc )
 	PORT_START("DFDC")
-	PORT_CONFNAME(0x01, 0x00, "Dual FDC Select") PORT_CHANGED_MEMBER(DEVICE_SELF, bbc_stlfdc_device, fdc_changed, 0)
+	PORT_CONFNAME(0x01, 0x00, "Dual FDC Select") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(bbc_stlfdc_device::fdc_changed), 0)
 	PORT_CONFSETTING(0x00, "8271")
 	PORT_CONFSETTING(0x01, "1770")
 INPUT_PORTS_END

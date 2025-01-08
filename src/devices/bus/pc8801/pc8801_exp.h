@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
 
-#ifndef MAME_BUS_PC8801_EXP_H
-#define MAME_BUS_PC8801_EXP_H
+#ifndef MAME_BUS_PC8801_PC8801_EXP_H
+#define MAME_BUS_PC8801_PC8801_EXP_H
 
 #pragma once
 
@@ -39,7 +39,7 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	required_address_space m_iospace;
@@ -80,8 +80,8 @@ public:
 
 
 protected:
-//  virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+//  virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 
 };
@@ -91,4 +91,4 @@ DECLARE_DEVICE_TYPE(PC8801_EXP_SLOT, pc8801_exp_slot_device)
 
 void pc8801_exp_devices(device_slot_interface &device);
 
-#endif // MAME_MACHINE_PC8801_EXP_H
+#endif // MAME_MACHINE_PC8801_PC8801_EXP_H

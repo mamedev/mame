@@ -1112,6 +1112,7 @@ void bullet_state::bullet(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &bullet_state::bullet_mem);
 	m_maincpu->set_addrmap(AS_IO, &bullet_state::bullet_io);
 	m_maincpu->set_daisy_config(daisy_chain);
+	m_maincpu->busack_cb().set(m_dmac, FUNC(z80dma_device::bai_w));
 
 	// devices
 	Z80CTC(config, m_ctc, 16_MHz_XTAL / 4);
@@ -1134,7 +1135,7 @@ void bullet_state::bullet(machine_config &config)
 	m_dart->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	Z80DMA(config, m_dmac, 16_MHz_XTAL / 4);
-	m_dmac->out_busreq_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	m_dmac->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
 	m_dmac->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_dmac->in_mreq_callback().set(FUNC(bullet_state::dma_mreq_r));
 	m_dmac->out_mreq_callback().set(FUNC(bullet_state::dma_mreq_w));
@@ -1193,6 +1194,7 @@ void bulletf_state::bulletf(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &bulletf_state::bulletf_mem);
 	m_maincpu->set_addrmap(AS_IO, &bulletf_state::bulletf_io);
 	m_maincpu->set_daisy_config(daisy_chain);
+	m_maincpu->busack_cb().set(m_dmac, FUNC(z80dma_device::bai_w));
 
 	// devices
 	Z80CTC(config, m_ctc, 16_MHz_XTAL / 4);
@@ -1215,7 +1217,7 @@ void bulletf_state::bulletf(machine_config &config)
 	m_dart->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	Z80DMA(config, m_dmac, 16_MHz_XTAL / 4);
-	m_dmac->out_busreq_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	m_dmac->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
 	m_dmac->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_dmac->in_mreq_callback().set(FUNC(bullet_state::dma_mreq_r));
 	m_dmac->out_mreq_callback().set(FUNC(bullet_state::dma_mreq_w));

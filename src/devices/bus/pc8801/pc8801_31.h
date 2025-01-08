@@ -6,8 +6,8 @@
 
 **************************************************************************************************/
 
-#ifndef MAME_BUS_PC8801_31_H
-#define MAME_BUS_PC8801_31_H
+#ifndef MAME_BUS_PC8801_PC8801_31_H
+#define MAME_BUS_PC8801_PC8801_31_H
 
 #pragma once
 
@@ -29,13 +29,13 @@ public:
 	auto rom_bank_cb() { return m_rom_bank_cb.bind(); }
 
 	// I/O operations
-	void amap(address_map &map);
+	void amap(address_map &map) ATTR_COLD;
 
 protected:
 	// device_t implementation
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(select_off);
 
@@ -63,4 +63,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(PC8801_31, pc8801_31_device)
 
-#endif // MAME_BUS_PC8801_31_H
+#endif // MAME_BUS_PC8801_PC8801_31_H

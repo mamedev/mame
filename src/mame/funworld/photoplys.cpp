@@ -34,7 +34,7 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 
-	void photoplays_map(address_map &map);
+	void photoplays_map(address_map &map) ATTR_COLD;
 };
 
 void photoplays_state::photoplays_map(address_map &map)
@@ -75,4 +75,4 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 2001, photoply2k1sp, 0, photoplays, photoplays, photoplays_state, empty_init, ROT0, "Funworld", "Photo Play 2001 (Spanish)", MACHINE_IS_SKELETON )
+GAME( 2001, photoply2k1sp, 0, photoplays, photoplays, photoplays_state, empty_init, ROT0, "Funworld", "Photo Play 2001 (Spanish)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

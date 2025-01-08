@@ -75,7 +75,7 @@ public:
 	void datacast(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	uint8_t keypad_r();
@@ -83,8 +83,8 @@ private:
 	uint8_t i2c_r();
 	void i2c_w(uint8_t data);
 
-	void mem_map(address_map &map);
-	void saa5240_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void saa5240_map(address_map &map) ATTR_COLD;
 
 	required_device<i80186_cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;

@@ -8431,9 +8431,9 @@ void saturn_state::stv_vdp2_state_save_postload()
 
 	}
 
-	memset( &stv_rbg_cache_data, 0, sizeof(stv_rbg_cache_data));
+	stv_rbg_cache_data = _stv_rbg_cache_data();
 	stv_rbg_cache_data.is_cache_dirty = 3;
-	memset( &stv_vdp2_layer_data_placement, 0, sizeof(stv_vdp2_layer_data_placement));
+	stv_vdp2_layer_data_placement = _stv_vdp2_layer_data_placement();
 
 	refresh_palette_data();
 }
@@ -8456,9 +8456,9 @@ int saturn_state::stv_vdp2_start()
 //  m_gfxdecode->gfx(0)->granularity()=4;
 //  m_gfxdecode->gfx(1)->granularity()=4;
 
-	memset( &stv_rbg_cache_data, 0, sizeof(stv_rbg_cache_data));
+	stv_rbg_cache_data = _stv_rbg_cache_data();
 	stv_rbg_cache_data.is_cache_dirty = 3;
-	memset( &stv_vdp2_layer_data_placement, 0, sizeof(stv_vdp2_layer_data_placement));
+	stv_vdp2_layer_data_placement = _stv_vdp2_layer_data_placement();
 
 	save_pointer(NAME(m_vdp2_regs), 0x040000/2);
 	save_pointer(NAME(m_vdp2_vram), 0x100000/4);

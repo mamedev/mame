@@ -37,8 +37,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void port80_debug_write(uint8_t value) override;
 
 	uint32_t pci_isa_r(device_t *busdevice, int offset, uint32_t mem_mask);

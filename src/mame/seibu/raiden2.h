@@ -64,6 +64,9 @@ public:
 	void init_raiden2();
 
 protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+
 	void sprite_prot_x_w(u16 data);
 	void sprite_prot_y_w(u16 data);
 	void sprite_prot_src_seg_w(u16 data);
@@ -78,7 +81,6 @@ protected:
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 	void common_save_state();
-	virtual void video_start() override;
 
 	void tilemap_enable_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void tile_scroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -103,7 +105,7 @@ protected:
 
 	void init_blending(const u16 *table);
 
-	void zeroteam_sound_map(address_map &map);
+	void zeroteam_sound_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<buffered_spriteram16_device> m_spriteram;
@@ -164,7 +166,7 @@ private:
 	void sprcpt_flags_1_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void sprcpt_flags_2_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	virtual void machine_start() override;
+
 	DECLARE_MACHINE_RESET(raiden2);
 	DECLARE_MACHINE_RESET(zeroteam);
 	DECLARE_MACHINE_RESET(xsedae);
@@ -172,12 +174,12 @@ private:
 
 	void combine32(u32 *val, offs_t offset, u16 data, u16 mem_mask);
 	void sprcpt_init();
-	void raiden2_cop_mem(address_map &map);
-	void raiden2_mem(address_map &map);
-	void raiden2_sound_map(address_map &map);
-	void raidendx_mem(address_map &map);
-	void xsedae_mem(address_map &map);
-	void zeroteam_mem(address_map &map);
+	void raiden2_cop_mem(address_map &map) ATTR_COLD;
+	void raiden2_mem(address_map &map) ATTR_COLD;
+	void raiden2_sound_map(address_map &map) ATTR_COLD;
+	void raidendx_mem(address_map &map) ATTR_COLD;
+	void xsedae_mem(address_map &map) ATTR_COLD;
+	void zeroteam_mem(address_map &map) ATTR_COLD;
 
 	// misc
 	u8 m_prg_bank;
@@ -189,7 +191,6 @@ private:
 	u32 m_sprcpt_val[2]{}, m_sprcpt_flags1 = 0;
 	u16 m_sprcpt_flags2 = 0;
 	u32 m_sprcpt_data_1[0x100]{}, m_sprcpt_data_2[0x40]{}, m_sprcpt_data_3[6]{}, m_sprcpt_data_4[4]{};
-
 };
 
 #endif // MAME_SEIBU_RAIDEN2_H

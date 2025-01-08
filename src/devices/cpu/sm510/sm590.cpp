@@ -172,7 +172,7 @@ void sm590_device::execute_one()
 			}
 			break; // 0xfc
 
-	} // big switch
+	} // 0xf0
 }
 
 bool sm590_device::op_argument()

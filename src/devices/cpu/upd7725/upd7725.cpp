@@ -269,17 +269,6 @@ uint32_t necdsp_device::execute_max_cycles() const noexcept
 
 
 //-------------------------------------------------
-//  execute_input_lines - return the number of
-//  input/interrupt lines
-//-------------------------------------------------
-
-uint32_t necdsp_device::execute_input_lines() const noexcept
-{
-	return 3; // TODO: there should be 11: INT, SCK, /SIEN, /SOEN, SI, and /DACK, plus SO, /SORQ and DRQ; for now, just INT, P0, and P1 are enough.
-}
-
-
-//-------------------------------------------------
 //  execute_set_input -
 //-------------------------------------------------
 

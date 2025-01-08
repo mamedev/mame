@@ -27,7 +27,7 @@ Academy hardware. Much unused data remains, and the TRAIN button doesn't work.
 #include "mmboard.h"
 #include "mmdisplay2.h"
 
-#include "cpu/m6502/m65c02.h"
+#include "cpu/m6502/w65c02.h"
 #include "machine/74259.h"
 #include "machine/nvram.h"
 #include "video/pwm.h"
@@ -59,7 +59,7 @@ private:
 	required_device<hc259_device> m_outlatch;
 	required_ioport m_keys;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	void led_w(u8 data);
 	u8 input_r();
@@ -130,7 +130,7 @@ INPUT_PORTS_END
 void academy_state::academy(machine_config &config)
 {
 	// basic machine hardware
-	M65C02(config, m_maincpu, 4.9152_MHz_XTAL);
+	W65C02(config, m_maincpu, 4.9152_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &academy_state::main_map);
 
 	const attotime nmi_period = attotime::from_hz(4.9152_MHz_XTAL / 0x2000);
@@ -139,7 +139,7 @@ void academy_state::academy(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	HC259(config, m_outlatch); // SN74HC259N
-	m_outlatch->parallel_out_cb().set("display:dac", FUNC(speaker_sound_device::level_w)).rshift(2).mask(0x03);
+	m_outlatch->parallel_out_cb().set("display:dac", FUNC(dac_2bit_ones_complement_device::write)).rshift(2).mask(0x03);
 
 	MEPHISTO_SENSORS_BOARD(config, "board"); // internal
 	MEPHISTO_DISPLAY_MODULE2(config, "display"); // internal

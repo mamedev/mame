@@ -29,7 +29,6 @@ DEFINE_DEVICE_TYPE(PC9801_26, pc9801_26_device, "pc9801_26", "NEC PC-9801-26")
 
 void pc9801_26_device::sound_irq(int state)
 {
-	// TODO: sometimes misfired irq causes sound or even host hang
 	m_bus->int_w<5>(state);
 }
 
@@ -47,7 +46,13 @@ void pc9801_26_device::device_add_mconfig(machine_config &config)
 	//m_opn->port_b_read_callback().set(FUNC(pc8801_state::opn_portb_r));
 	//m_opn->port_a_write_callback().set(FUNC(pc8801_state::opn_porta_w));
 	m_opn->port_b_write_callback().set(FUNC(pc9801_26_device::opn_portb_w));
-	m_opn->add_route(ALL_OUTPUTS, "mono", 1.00);
+	// TODO: verify mixing on HW
+	// emerald stage 1 BGM uses ch. 3 for bassline, which sounds way more prominent
+	// than the others combined (0.25 1/4 ratio even?)
+	m_opn->add_route(0, "mono", 0.50);
+	m_opn->add_route(1, "mono", 0.50);
+	m_opn->add_route(2, "mono", 0.50);
+	m_opn->add_route(3, "mono", 1.00);
 }
 
 // to load a different bios for slots:

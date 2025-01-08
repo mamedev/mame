@@ -72,13 +72,13 @@ public:
 	void pentevo(machine_config &config);
 
 protected:
-	void machine_start() override;
-	void machine_reset() override;
-	void video_start() override;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
+	void video_start() override ATTR_COLD;
 
 private:
 	void init_mem_write();
-	void pentevo_io(address_map &map);
+	void pentevo_io(address_map &map) ATTR_COLD;
 
 	void atm_port_ff_w(offs_t offset, u8 data) override;
 	void pentevo_port_7f7_w(offs_t offset, u8 data);
@@ -121,7 +121,7 @@ private:
 	memory_view m_io_dos_view;
 
 	required_device<glukrs_device> m_glukrs;
-	required_device<spi_sdcard_sdhc_device> m_sdcard;
+	required_device<spi_sdcard_device> m_sdcard;
 	required_device<at_keyboard_device> m_keyboard;
 	required_ioport_array<3> m_io_mouse;
 	required_device_array<ym2149_device, 2> m_ay;
@@ -194,7 +194,7 @@ void pentevo_state::atm_port_ff_w(offs_t offset, u8 data)
 {
 	if (BIT(m_port_bf_data, 5) && !m_pen2)
 	{
-		u8 pen = get_border_color(m_screen->hpos(), m_screen->vpos());
+		u8 pen = 0x0f & get_border_color(m_screen->hpos(), m_screen->vpos());
 		m_palette_data[pen] = data;
 		m_palette->set_pen_color(pen,
 			(BIT(~data, 1) * 0x88) | (BIT(~data, 6) * 0x44) | (BIT(~offset,  9) * 0x22) | (BIT(~offset, 14) * 0x11),
@@ -765,6 +765,7 @@ void pentevo_state::pentevo(machine_config &config)
 
 	GLUKRS(config, m_glukrs);
 	SPI_SDCARD(config, m_sdcard, 0);
+	m_sdcard->set_prefer_sdhc();
 	m_sdcard->spi_miso_callback().set(FUNC(pentevo_state::spi_miso_w));
 
 	SPEAKER(config, "lspeaker").front_left();
@@ -792,7 +793,7 @@ void pentevo_state::pentevo(machine_config &config)
 
 ROM_START( pentevo )
 	ROM_REGION(0x090000, "maincpu", ROMREGION_ERASEFF)
-	ROM_DEFAULT_BIOS("v0.59.13fe")
+	ROM_DEFAULT_BIOS("v0.59.13")
 
 	// http://svn.zxevo.ru/revision.php?repname=pentevo&path=%2From%2Fzxevo_fe.rom
 	ROM_SYSTEM_BIOS(0, "v0.59.02fe", "ERS v0.59.02 (FE), NEO-DOS v0.53")

@@ -6,7 +6,6 @@
 #define MAME_NINTENDO_NDS_H
 
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 #include "machine/bankdev.h"
 #include "machine/timer.h"
 
@@ -26,8 +25,8 @@ public:
 	void nds(machine_config &config);
 
 private:
-	void machine_start() override;
-	void machine_reset() override;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 
 	// ARM7
 	uint32_t arm7_io_r(offs_t offset, uint32_t mem_mask = ~0);
@@ -44,10 +43,10 @@ private:
 	uint32_t wram_arm7mirror_r(offs_t offset);
 	void wram_arm7mirror_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	void nds7_wram_map(address_map &map);
-	void nds9_wram_map(address_map &map);
-	void nds_arm7_map(address_map &map);
-	void nds_arm9_map(address_map &map);
+	void nds7_wram_map(address_map &map) ATTR_COLD;
+	void nds9_wram_map(address_map &map) ATTR_COLD;
+	void nds_arm7_map(address_map &map) ATTR_COLD;
+	void nds_arm9_map(address_map &map) ATTR_COLD;
 
 	required_device<arm7_cpu_device> m_arm7;
 	required_device<arm946es_cpu_device> m_arm9;

@@ -39,8 +39,8 @@ protected:
 	virtual memory_region *get_cart_memregion() override { return m_eprom; }
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	virtual u8 cts_read(offs_t offset) override;
 	virtual u8 scs_read(offs_t offset) override;

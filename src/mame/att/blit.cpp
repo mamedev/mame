@@ -80,11 +80,11 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void blit(machine_config &config);
-	void blit_mem(address_map &map);
+	void blit_mem(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -291,4 +291,4 @@ ROM_END
 
 /* Driver */
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS        INIT           COMPANY  FULLNAME     FLAGS
-COMP( 1981, blit,     0,      0,      blit,     blit,     blit_state,  empty_init,    "AT&T",  "Blit",      MACHINE_IS_SKELETON )
+COMP( 1981, blit,     0,      0,      blit,     blit,     blit_state,  empty_init,    "AT&T",  "Blit",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

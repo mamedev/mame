@@ -24,14 +24,14 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
-	void io_isa_map(address_map &map);
+	void io_isa_map(address_map &map) ATTR_COLD;
 
 private:
 	required_device<cirrus_gd5430_vga_device> m_vga;
@@ -50,14 +50,14 @@ public:
 	virtual void remap(int space_id, offs_t start, offs_t end) override;
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
-	void io_isa_map(address_map &map);
+	void io_isa_map(address_map &map) ATTR_COLD;
 
 private:
 	required_device<cirrus_gd5428_vga_device> m_vga;

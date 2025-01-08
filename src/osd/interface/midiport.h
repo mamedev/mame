@@ -13,6 +13,7 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
 
 
 namespace osd {
@@ -33,6 +34,15 @@ public:
 	virtual ~midi_output_port() = default;
 
 	virtual void write(uint8_t data) = 0;
+};
+
+struct midi_port_info
+{
+	std::string name;
+	bool input;
+	bool output;
+	bool default_input;
+	bool default_output;
 };
 
 } // namespace osd

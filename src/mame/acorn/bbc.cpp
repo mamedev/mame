@@ -155,7 +155,7 @@ void bbc_state::bbc_base(address_map &map)
 	map(0xfe01, 0xfe01).mirror(0x06).rw(m_hd6845, FUNC(hd6845s_device::register_r), FUNC(hd6845s_device::register_w));
 	map(0xfe08, 0xfe0f).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));                        //    fe08-fe0f  6850 ACIA      Serial controller
 	map(0xfe10, 0xfe17).w(FUNC(bbc_state::serial_ula_w));                                                             //    fe10-fe17  Serial ULA     Serial system chip
-	map(0xfe18, 0xfe1f).portr("STATID");                                                                              //    fe18-fe1f  INTOFF/STATID  ECONET Interrupt Off / ID No.
+	map(0xfe18, 0xfe1f).portr(m_statid);                                                                              //    fe18-fe1f  INTOFF/STATID  ECONET Interrupt Off / ID No.
 	map(0xfe20, 0xfe2f).w(FUNC(bbc_state::video_ula_w));                                                              // W: fe20-fe2f  Video ULA      Video system chip
 	map(0xfe40, 0xfe5f).m(m_via6522_0, FUNC(via6522_device::map));                                                    //    fe40-fe5f  6522 VIA       SYSTEM VIA
 	map(0xfe60, 0xfe7f).m(m_via6522_1, FUNC(via6522_device::map));                                                    //    fe60-fe7f  6522 VIA       USER VIA
@@ -456,7 +456,7 @@ static INPUT_PORTS_START(bbc_keyboard)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_RIGHT)           PORT_CODE(KEYCODE_RIGHT)        PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 
 	PORT_START("BRK")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("BREAK")              PORT_CODE(KEYCODE_F12)          PORT_CHAR(UCHAR_MAMEKEY(F12)) PORT_CHANGED_MEMBER(DEVICE_SELF, bbc_state, trigger_reset, 0)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("BREAK")              PORT_CODE(KEYCODE_F12)          PORT_CHAR(UCHAR_MAMEKEY(F12)) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(bbc_state::trigger_reset), 0)
 
 	/* Keyboard columns 10 -> 12 are reserved for BBC Master */
 	PORT_START("COL10")
@@ -791,7 +791,7 @@ static INPUT_PORTS_START(torchi_keyboard)
 	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("BRK")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("BREAK")              PORT_CODE(KEYCODE_F12)          PORT_CHAR(UCHAR_MAMEKEY(F12)) PORT_CHANGED_MEMBER(DEVICE_SELF, bbc_state, trigger_reset, 0)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("BREAK")              PORT_CODE(KEYCODE_F12)          PORT_CHAR(UCHAR_MAMEKEY(F12)) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(bbc_state::trigger_reset), 0)
 INPUT_PORTS_END
 
 
@@ -966,7 +966,7 @@ INPUT_CHANGED_MEMBER(bbc_state::reset_palette)
 
 static INPUT_PORTS_START(bbc_config)
 	PORT_START("BBCCONFIG")
-	PORT_CONFNAME( 0x03, 0x00, "Monitor") PORT_CHANGED_MEMBER(DEVICE_SELF, bbc_state, reset_palette, 0) PORT_CONDITION("BBCCONFIG", 0x08, EQUALS, 0x00)
+	PORT_CONFNAME( 0x03, 0x00, "Monitor") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(bbc_state::reset_palette), 0) PORT_CONDITION("BBCCONFIG", 0x08, EQUALS, 0x00)
 	PORT_CONFSETTING(    0x00, "Colour")
 	PORT_CONFSETTING(    0x01, "B&W")
 	PORT_CONFSETTING(    0x02, "Green")
@@ -974,7 +974,7 @@ static INPUT_PORTS_START(bbc_config)
 	PORT_CONFNAME( 0x04, 0x00, "Econet")
 	PORT_CONFSETTING(    0x00, DEF_STR( No ))
 	PORT_CONFSETTING(    0x04, DEF_STR( Yes ))
-	PORT_CONFNAME( 0x08, 0x00, "VideoNuLA") PORT_CHANGED_MEMBER(DEVICE_SELF, bbc_state, reset_palette, 0)
+	PORT_CONFNAME( 0x08, 0x00, "VideoNuLA") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(bbc_state::reset_palette), 0)
 	PORT_CONFSETTING(    0x00, DEF_STR( No ))
 	PORT_CONFSETTING(    0x08, DEF_STR( Yes ))
 INPUT_PORTS_END
@@ -1624,7 +1624,7 @@ void bbcbp_state::econx25(machine_config &config)
 void bbcm_state::bbcm(machine_config &config)
 {
 	/* basic machine hardware */
-	M65SC02(config, m_maincpu, 16_MHz_XTAL / 8);
+	G65SC12(config, m_maincpu, 16_MHz_XTAL / 8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &bbcm_state::bbcm_mem);
 	m_maincpu->set_addrmap(AS_OPCODES, &bbcm_state::bbcm_fetch);
 	m_maincpu->set_periodic_int(FUNC(bbc_state::bbcb_keyscan), attotime::from_hz(1000)); /* scan keyboard */

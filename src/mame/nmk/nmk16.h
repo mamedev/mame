@@ -12,6 +12,7 @@
 
 #include "seibusound.h"
 
+#include "cpu/m6805/m68705.h"
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "sound/okim6295.h"
@@ -44,6 +45,7 @@ public:
 		m_tilemap_rom(*this, "tilerom"),
 		m_audiobank(*this, "audiobank"),
 		m_okibank(*this, "okibank%u", 1U),
+		m_vtiming_prom(*this, "vtiming"),
 		m_dsw_io(*this, "DSW%u", 1U),
 		m_in_io(*this, "IN%u", 0U),
 		m_sprdma_base(0x8000)
@@ -61,6 +63,7 @@ public:
 	void gunnailb(machine_config &config);
 	void hachamf(machine_config &config);
 	void bjtwin(machine_config &config);
+	void cactus(machine_config &config);
 	void ssmissin(machine_config &config);
 	void bioship(machine_config &config);
 	void macross2(machine_config &config);
@@ -77,27 +80,30 @@ public:
 	void mustangb3(machine_config &config);
 	void twinactn(machine_config &config);
 	void vandykeb(machine_config &config);
+	void powerins(machine_config &config);
+	void powerinsj(machine_config &config);
+	void powerinspu(machine_config &config);
+	void powerinspj(machine_config &config);
+	void powerinsa(machine_config &config);
+	void powerinsb(machine_config &config);
+	void powerinsc(machine_config &config);
 
 	void init_nmk();
 	void init_tharrier();
 	void init_vandykeb();
 	void init_tdragonb();
+	void init_tdragonb2();
 	void init_ssmissin();
 	void init_twinactn();
 	void init_banked_audiocpu();
 	void init_gunnailb();
 	void init_bjtwin();
+	void init_powerinsa();
 	void init_acrobatmbl();
 
 protected:
-	TIMER_DEVICE_CALLBACK_MEMBER(nmk16_scanline);
-	u32 screen_update_macross(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	void txvideoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void flipscreen_w(u8 data);
-	void tilebank_w(u8 data);
-
-	void macross2_sound_bank_w(u8 data);
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
@@ -119,35 +125,37 @@ protected:
 	optional_region_ptr<u16> m_tilemap_rom;
 	optional_memory_bank m_audiobank;
 	optional_memory_bank_array<2> m_okibank;
+	optional_memory_region m_vtiming_prom;
 
 	optional_ioport_array<2> m_dsw_io;
 	optional_ioport_array<3> m_in_io;
 
-	emu_timer *m_dma_timer = nullptr;
-	int m_tilerambank = 0;
+	u32 m_tilerambank = 0;
 	int m_sprdma_base = 0;
-	int mask[4*2]{};
 	std::unique_ptr<u16[]> m_spriteram_old;
 	std::unique_ptr<u16[]> m_spriteram_old2;
-	int m_bgbank = 0;
-	int m_bioship_background_bank = 0;
+	u8 m_bgbank = 0;
+	u8 m_bioship_background_bank = 0;
 	tilemap_t *m_bg_tilemap[2]{};
 	tilemap_t *m_tx_tilemap = nullptr;
-	int m_mustang_bg_xscroll = 0;
+	s32 m_mustang_bg_xscroll = 0;
 	u8 m_scroll[2][4]{};
 	u16 m_vscroll[4]{};
-	int m_prot_count = 0;
+	u8 m_prot_count = 0;
+	u8 m_vtiming_val = 0;
 
 	void mainram_strange_w(offs_t offset, u16 data/*, u16 mem_mask = ~0*/);
 	u16 mainram_swapped_r(offs_t offset);
 	void mainram_swapped_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void ssmissin_soundbank_w(u8 data);
 	void tharrier_mcu_control_w(u16 data);
 	u16 tharrier_mcu_r(offs_t offset, u16 mem_mask = ~0);
-	void macross2_sound_reset_w(u16 data);
-	template<unsigned Chip> void tharrier_oki_bankswitch_w(u8 data);
 	u16 vandykeb_r();
 	u16 tdragonb_prot_r();
+
+	void flipscreen_w(u8 data);
+	void vandyke_flipscreen_w(u8 data);
+
+	void txvideoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	template<unsigned Layer> void bgvideoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void mustang_scroll_w(u16 data);
 	void raphero_scroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -156,32 +164,53 @@ protected:
 	void vandyke_scroll_w(offs_t offset, u16 data);
 	void vandykeb_scroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void manybloc_scroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void tilebank_w(u8 data);
 	void bioship_bank_w(u8 data);
 	void nmk004_x0016_w(u16 data);
 	void nmk004_bioship_x0016_w(u16 data);
 
+	void macross2_sound_reset_w(u16 data);
+	void macross2_audiobank_w(u8 data);
+	void ssmissin_okibank_w(u8 data);
+	void powerinsa_okibank_w(u8 data);
+	template<unsigned Chip> void tharrier_okibank_w(u8 data);
+	u8 powerins_bootleg_fake_ym2203_r();
+
+	void set_interrupt_timing(machine_config &config);
 	void set_hacky_interrupt_timing(machine_config &config);
-	void set_hacky_screen_lowres(machine_config &config);
-	void set_hacky_screen_hires(machine_config &config);
+	void set_screen_lowres(machine_config &config);
+	void set_screen_midres(machine_config &config);
+	void set_screen_hires(machine_config &config);
+
+	void configure_nmk004(machine_config &config);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(nmk16_scanline);
+	TIMER_DEVICE_CALLBACK_MEMBER(nmk16_hacky_scanline);
 
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_pages);
 	template<unsigned Layer, unsigned Gfx> TILE_GET_INFO_MEMBER(common_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(common_get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(bioship_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(bjtwin_get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(powerins_get_bg_tile_info);
 	DECLARE_VIDEO_START(macross);
 	DECLARE_VIDEO_START(bioship);
 	DECLARE_VIDEO_START(strahl);
 	DECLARE_VIDEO_START(macross2);
 	DECLARE_VIDEO_START(gunnail);
 	DECLARE_VIDEO_START(bjtwin);
+	DECLARE_VIDEO_START(powerins);
 	void get_colour_4bit(u32 &colour, u32 &pri_mask);
 	void get_colour_5bit(u32 &colour, u32 &pri_mask);
+	void get_colour_6bit(u32 &colour, u32 &pri_mask);
 	void get_sprite_flip(u16 attr, int &flipx, int &flipy, int &code);
+	void get_flip_extcode_powerins(u16 attr, int &flipx, int &flipy, int &code);
+	u32 screen_update_macross(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_tharrier(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_strahl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_bjtwin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(dma_callback);
+	void screen_vblank_powerins_bootleg(int state);
+	void sprite_dma();
 	TIMER_DEVICE_CALLBACK_MEMBER(manybloc_scanline);
 	void video_init();
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u16 *src);
@@ -195,45 +224,51 @@ protected:
 	void decode_tdragonb();
 	void decode_ssmissin();
 
-	void acrobatm_map(address_map &map);
-	void acrobatmbl_map(address_map &map);
-	void bioship_map(address_map &map);
-	void bjtwin_map(address_map &map);
-	void gunnail_map(address_map &map);
-	void gunnailb_map(address_map &map);
-	void gunnailb_sound_map(address_map &map);
-	void gunnailb_sound_io_map(address_map &map);
-	void hachamf_map(address_map &map);
-	void macross2_map(address_map &map);
-	void macross2_sound_io_map(address_map &map);
-	void macross2_sound_map(address_map &map);
-	void macross_map(address_map &map);
-	void manybloc_map(address_map &map);
-	void mustang_map(address_map &map);
-	void mustangb_map(address_map &map);
-	void mustangb3_map(address_map &map);
-	void mustangb3_sound_map(address_map &map);
-	void oki1_map(address_map &map);
-	void oki2_map(address_map &map);
-	void raphero_map(address_map &map);
-	void raphero_sound_mem_map(address_map &map);
-	void ssmissin_map(address_map &map);
-	void ssmissin_sound_map(address_map &map);
-	void strahl_map(address_map &map);
-	void strahljbl_map(address_map &map);
-	void tdragon2_map(address_map &map);
-	void tdragon3h_map(address_map &map);
-	void tdragon3h_sound_io_map(address_map &map);
-	void tdragon_map(address_map &map);
-	void tdragonb_map(address_map &map);
-	void tdragonb2_map(address_map &map);
-	void tdragonb3_map(address_map &map);
-	void tharrier_map(address_map &map);
-	void tharrier_sound_io_map(address_map &map);
-	void tharrier_sound_map(address_map &map);
-	void twinactn_map(address_map &map);
-	void vandyke_map(address_map &map);
-	void vandykeb_map(address_map &map);
+	void acrobatm_map(address_map &map) ATTR_COLD;
+	void acrobatmbl_map(address_map &map) ATTR_COLD;
+	void bioship_map(address_map &map) ATTR_COLD;
+	void bjtwin_map(address_map &map) ATTR_COLD;
+	void gunnail_map(address_map &map) ATTR_COLD;
+	void gunnailb_map(address_map &map) ATTR_COLD;
+	void gunnailb_sound_map(address_map &map) ATTR_COLD;
+	void gunnailb_sound_io_map(address_map &map) ATTR_COLD;
+	void hachamf_map(address_map &map) ATTR_COLD;
+	void macross2_map(address_map &map) ATTR_COLD;
+	void macross2_sound_io_map(address_map &map) ATTR_COLD;
+	void macross2_sound_map(address_map &map) ATTR_COLD;
+	void macross_map(address_map &map) ATTR_COLD;
+	void manybloc_map(address_map &map) ATTR_COLD;
+	void mustang_map(address_map &map) ATTR_COLD;
+	void mustangb_map(address_map &map) ATTR_COLD;
+	void mustangb3_map(address_map &map) ATTR_COLD;
+	void mustangb3_sound_map(address_map &map) ATTR_COLD;
+	void oki1_map(address_map &map) ATTR_COLD;
+	void oki2_map(address_map &map) ATTR_COLD;
+	void powerins_map(address_map &map) ATTR_COLD;
+	void powerins_sound_map(address_map &map) ATTR_COLD;
+	void powerins_bootleg_audio_io_map(address_map &map) ATTR_COLD;
+	void powerinsa_map(address_map &map) ATTR_COLD;
+	void powerinsa_oki_map(address_map &map) ATTR_COLD;
+	void raphero_map(address_map &map) ATTR_COLD;
+	void raphero_sound_mem_map(address_map &map) ATTR_COLD;
+	void ssmissin_map(address_map &map) ATTR_COLD;
+	void ssmissin_sound_map(address_map &map) ATTR_COLD;
+	void strahl_map(address_map &map) ATTR_COLD;
+	void strahljbl_map(address_map &map) ATTR_COLD;
+	void tdragon2_map(address_map &map) ATTR_COLD;
+	void tdragon3h_map(address_map &map) ATTR_COLD;
+	void tdragon3h_sound_io_map(address_map &map) ATTR_COLD;
+	void tdragon_map(address_map &map) ATTR_COLD;
+	void tdragonb_map(address_map &map) ATTR_COLD;
+	void tdragonb2_map(address_map &map) ATTR_COLD;
+	void tdragonb2_oki_map(address_map &map) ATTR_COLD;
+	void tdragonb3_map(address_map &map) ATTR_COLD;
+	void tharrier_map(address_map &map) ATTR_COLD;
+	void tharrier_sound_io_map(address_map &map) ATTR_COLD;
+	void tharrier_sound_map(address_map &map) ATTR_COLD;
+	void twinactn_map(address_map &map) ATTR_COLD;
+	void vandyke_map(address_map &map) ATTR_COLD;
+	void vandykeb_map(address_map &map) ATTR_COLD;
 };
 
 class tdragon_prot_state : public nmk16_state
@@ -249,19 +284,18 @@ public:
 	void hachamf_prot(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	optional_device<tlcs90_device> m_protcpu;
 
-	void tdragon_prot_map(address_map &map);
+	void tdragon_prot_map(address_map &map) ATTR_COLD;
 
 	void mcu_side_shared_w(offs_t offset, u8 data);
 	u8 mcu_side_shared_r(offs_t offset);
 	void mcu_port6_w(u8 data);
 	u8 mcu_port5_r();
 	u8 mcu_port6_r();
-	u8 mcu_port7_r(); // NMK-113 uses this
 
 	u8 m_bus_status;
 };
@@ -285,7 +319,7 @@ public:
 
 protected:
 	virtual void device_post_load() override;
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void base_nmk214_215(machine_config &config);
@@ -348,10 +382,10 @@ private:
 	void video_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int dsw_flipscreen, int xoffset, int yoffset, int attr_mask);
 	void redhawki_video_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void afega_map(address_map &map);
-	void afega_sound_cpu(address_map &map);
-	void firehawk_map(address_map &map);
-	void firehawk_sound_cpu(address_map &map);
+	void afega_map(address_map &map) ATTR_COLD;
+	void afega_sound_map(address_map &map) ATTR_COLD;
+	void firehawk_map(address_map &map) ATTR_COLD;
+	void firehawk_sound_map(address_map &map) ATTR_COLD;
 };
 
 class nmk16_tomagic_state : public nmk16_state
@@ -366,9 +400,49 @@ public:
 	void init_tomagic();
 
 private:
-	void tomagic_map(address_map &map);
-	void tomagic_sound_map(address_map &map);
-	void tomagic_sound_io_map(address_map &map);
+	void tomagic_map(address_map &map) ATTR_COLD;
+	void tomagic_sound_map(address_map &map) ATTR_COLD;
+	void tomagic_sound_io_map(address_map &map) ATTR_COLD;
+};
+
+class tharrierb_state : public nmk16_state
+{
+public:
+	tharrierb_state(const machine_config &mconfig, device_type type, const char *tag) :
+		nmk16_state(mconfig, type, tag),
+		m_mcu(*this, "mcu"),
+		m_inputs(*this, { "DSW1", "DSW2", "BUTTONS", "P1", "P2" })
+	{}
+
+	void tharrierb(machine_config &config);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
+private:
+	required_device<m68705r_device> m_mcu;
+	required_ioport_array<5> m_inputs;
+
+	u8 m_mcu_out_latch_msb = 0;
+	u8 m_mcu_out_latch_lsb = 0;
+	u8 m_mcu_in_latch = 0;
+
+	u8 m_mcu_portc = 0;
+
+	void tharrierb_map(address_map &map) ATTR_COLD;
+
+	// maincpu access
+	u16 mcu_status_r(offs_t offset, u16 mem_mask);
+	u16 mcu_data_r(offs_t offset, u16 mem_mask);
+	void mcu_control_w(offs_t offset, u16 data, u16 mem_mask);
+	void mcu_data_w(offs_t offset, u16 data, u16 mem_mask);
+
+	// 68705 mcu access
+	void mcu_porta_w(u8 data);
+	u8 mcu_portb_r();
+	void mcu_portb_w(u8 data);
+	void mcu_portc_w(u8 data);
+	u8 mcu_portd_r();
 };
 
 #endif //MAME_NMK_NMK16_H

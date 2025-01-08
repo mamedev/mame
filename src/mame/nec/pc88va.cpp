@@ -256,7 +256,7 @@ void pc88va_state::sys_port5_w(u8 data)
 
 u8 pc88va_state::sys_port5_r()
 {
-	return m_rstmd | 8;
+	return (m_rstmd ? 1 : 0) | 8;
 }
 
 uint8_t pc88va_state::hdd_status_r()
@@ -713,7 +713,7 @@ INPUT_CHANGED_MEMBER(pc88va_state::key_stroke)
 }
 
 #define VA_PORT_SCAN(_scancode_) \
-	PORT_CHANGED_MEMBER(DEVICE_SELF, pc88va_state, key_stroke, _scancode_)
+	PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(pc88va_state::key_stroke), _scancode_)
 
 static INPUT_PORTS_START( pc88va )
 	PORT_START("KEY0")
@@ -952,8 +952,8 @@ static const gfx_layout pc88va_kanji_16x16 =
 static GFXDECODE_START( gfx_pc88va )
 	GFXDECODE_ENTRY( "kanji",   0x00000, pc88va_chars_8x8,    0, 16 )
 	GFXDECODE_ENTRY( "kanji",   0x00000, pc88va_chars_16x16,  0, 16 )
-	GFXDECODE_ENTRY( nullptr,   0x00000, pc88va_kanji_8x8,    0, 16 )
-	GFXDECODE_ENTRY( nullptr,   0x00000, pc88va_kanji_16x16,  0, 16 )
+	GFXDECODE_RAM(   nullptr,   0x00000, pc88va_kanji_8x8,    0, 16 )
+	GFXDECODE_RAM(   nullptr,   0x00000, pc88va_kanji_16x16,  0, 16 )
 GFXDECODE_END
 
 

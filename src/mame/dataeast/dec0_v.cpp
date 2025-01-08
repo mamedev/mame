@@ -12,8 +12,6 @@
 
 /******************************************************************************/
 
-/******************************************************************************/
-
 void dec0_state::hbarrel_colpri_cb(u32 &colour, u32 &pri_mask)
 {
 	pri_mask = GFX_PMASK_4; // above background, foreground
@@ -49,6 +47,7 @@ uint32_t dec0_state::screen_update_hbarrel(screen_device &screen, bitmap_ind16 &
 	return 0;
 }
 
+
 /******************************************************************************/
 
 void dec0_state::baddudes_tile_cb(tile_data &tileinfo, u32 &tile, u32 &colour, u32 &flags)
@@ -81,6 +80,7 @@ uint32_t dec0_state::screen_update_baddudes(screen_device &screen, bitmap_ind16 
 	m_tilegen[0]->deco_bac06_pf_draw(screen,bitmap,cliprect,0, 0);
 	return 0;
 }
+
 
 /******************************************************************************/
 
@@ -129,7 +129,7 @@ uint32_t dec0_state::screen_update_robocop(screen_device &screen, bitmap_ind16 &
 	return 0;
 }
 
-uint32_t dec0_automat_state::screen_update_automat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t automat_state::screen_update_automat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0,cliprect);
 
@@ -177,6 +177,7 @@ uint32_t dec0_automat_state::screen_update_automat(screen_device &screen, bitmap
 	return 0;
 }
 
+
 /******************************************************************************/
 
 uint32_t dec0_state::screen_update_birdtry(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -194,6 +195,7 @@ uint32_t dec0_state::screen_update_birdtry(screen_device &screen, bitmap_ind16 &
 	m_tilegen[0]->deco_bac06_pf_draw(screen,bitmap,cliprect,0, 0);
 	return 0;
 }
+
 
 /******************************************************************************/
 
@@ -218,7 +220,7 @@ uint32_t slyspy_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-uint32_t dec0_automat_state::screen_update_secretab(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t automat_state::screen_update_secretab(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// layer enables seem different... where are they?
 
@@ -267,6 +269,7 @@ uint32_t dec0_automat_state::screen_update_secretab(screen_device &screen, bitma
 	return 0;
 }
 
+
 /******************************************************************************/
 
 void dec0_state::priority_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -307,5 +310,3 @@ VIDEO_START_MEMBER(dec0_state,slyspy)
 	m_tilegen[1]->set_transmask(0, 0xffff, 0x0001);
 	m_tilegen[1]->set_transmask(1, 0x00ff, 0xff01);
 }
-
-/******************************************************************************/

@@ -52,7 +52,7 @@ public:
 	void cardline(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void vram_w(offs_t offset, uint8_t data);
@@ -72,8 +72,8 @@ private:
 	MC6845_BEGIN_UPDATE(crtc_begin_update);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void mem_io(address_map &map);
-	void mem_prg(address_map &map);
+	void mem_io(address_map &map) ATTR_COLD;
+	void mem_prg(address_map &map) ATTR_COLD;
 
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
@@ -277,7 +277,7 @@ static INPUT_PORTS_START( cardline )
 	PORT_BIT( 0xf5, IP_ACTIVE_HIGH, IPT_CUSTOM ) // h/w status bits
 
 	PORT_START("VBLANK")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen") // VBLANK_Q
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank)) // VBLANK_Q
 	PORT_BIT( 0xef, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 INPUT_PORTS_END

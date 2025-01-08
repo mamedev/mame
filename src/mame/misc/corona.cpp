@@ -358,7 +358,7 @@ public:
 
 protected:
 	virtual void machine_start() override { m_lamps.resolve(); }
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void blitter_y_w(uint8_t data);
@@ -377,22 +377,22 @@ private:
 	void corona_palette(palette_device &palette) const;
 	uint32_t screen_update_winner(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_luckyrlt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void luckyrlt_cpu_io_map(address_map &map);
-	void luckyrlt_map(address_map &map);
-	void luckyrlt_sound_cpu_io_map(address_map &map);
-	void luckyrlt_sound_map(address_map &map);
-	void re800_cpu_io_map(address_map &map);
-	void re800_map(address_map &map);
-	void re800_sound_cpu_io_map(address_map &map);
-	void re800_sound_map(address_map &map);
-	void winner81_cpu_io_map(address_map &map);
-	void winner81_map(address_map &map);
-	void winner81_sound_cpu_io_map(address_map &map);
-	void winner81_sound_map(address_map &map);
-	void winner82_cpu_io_map(address_map &map);
-	void winner82_map(address_map &map);
-	void winner82_sound_cpu_io_map(address_map &map);
-	void winner82_sound_map(address_map &map);
+	void luckyrlt_cpu_io_map(address_map &map) ATTR_COLD;
+	void luckyrlt_map(address_map &map) ATTR_COLD;
+	void luckyrlt_sound_cpu_io_map(address_map &map) ATTR_COLD;
+	void luckyrlt_sound_map(address_map &map) ATTR_COLD;
+	void re800_cpu_io_map(address_map &map) ATTR_COLD;
+	void re800_map(address_map &map) ATTR_COLD;
+	void re800_sound_cpu_io_map(address_map &map) ATTR_COLD;
+	void re800_sound_map(address_map &map) ATTR_COLD;
+	void winner81_cpu_io_map(address_map &map) ATTR_COLD;
+	void winner81_map(address_map &map) ATTR_COLD;
+	void winner81_sound_cpu_io_map(address_map &map) ATTR_COLD;
+	void winner81_sound_map(address_map &map) ATTR_COLD;
+	void winner82_cpu_io_map(address_map &map) ATTR_COLD;
+	void winner82_map(address_map &map) ATTR_COLD;
+	void winner82_sound_cpu_io_map(address_map &map) ATTR_COLD;
+	void winner82_sound_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_blitter_x_reg = 0;
 	uint8_t m_blitter_y_reg = 0;

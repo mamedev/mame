@@ -48,8 +48,8 @@ public:
 	void super6(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t fdc_r();
 	void fdc_w(uint8_t data);
@@ -63,8 +63,8 @@ private:
 	uint8_t io_read_byte(offs_t offset);
 	void io_write_byte(offs_t offset, uint8_t data);
 
-	void super6_io(address_map &map);
-	void super6_mem(address_map &map);
+	void super6_io(address_map &map) ATTR_COLD;
+	void super6_mem(address_map &map) ATTR_COLD;
 
 	void bankswitch();
 
@@ -79,6 +79,8 @@ private:
 	required_device_array<floppy_connector, 2> m_floppy;
 	required_region_ptr<uint8_t> m_rom;
 	required_ioport m_j7;
+
+	bool m_z80_wait = false;
 
 	// memory state
 	uint8_t m_s100 = 0;

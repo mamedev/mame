@@ -505,18 +505,25 @@ void memory_view::register_state()
 {
 	m_device.machine().save().save_item(&m_device, "view", m_device.subtag(m_name).c_str(), 0, NAME(m_cur_slot));
 	m_device.machine().save().save_item(&m_device, "view", m_device.subtag(m_name).c_str(), 0, NAME(m_cur_id));
-	m_device.machine().save().register_postload(save_prepost_delegate(NAME([this]() { m_handler_read->select_a(m_cur_id); m_handler_write->select_a(m_cur_id); })));
+	m_device.machine().save().register_postload(save_prepost_delegate(FUNC(memory_view::refresh_id), this));
+}
+
+void memory_view::refresh_id()
+{
+	if (m_handler_read) {
+		m_handler_read->select_a(m_cur_id);
+		m_handler_write->select_a(m_cur_id);
+	}
+
+	if (m_space)
+		m_space->invalidate_caches(read_or_write::READWRITE);
 }
 
 void memory_view::disable()
 {
 	m_cur_slot = -1;
 	m_cur_id = -1;
-	m_handler_read->select_a(-1);
-	m_handler_write->select_a(-1);
-
-	if(m_space)
-		m_space->invalidate_caches(read_or_write::READWRITE);
+	refresh_id();
 }
 
 void memory_view::select(int slot)
@@ -527,11 +534,7 @@ void memory_view::select(int slot)
 
 	m_cur_slot = slot;
 	m_cur_id = i->second;
-	m_handler_read->select_a(m_cur_id);
-	m_handler_write->select_a(m_cur_id);
-
-	if(m_space)
-		m_space->invalidate_caches(read_or_write::READWRITE);
+	refresh_id();
 }
 
 int memory_view::id_to_slot(int id) const

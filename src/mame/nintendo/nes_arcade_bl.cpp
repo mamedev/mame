@@ -70,8 +70,8 @@ public:
 	void smb3bl(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<rp2a03_device> m_maincpu;
@@ -94,10 +94,10 @@ private:
 	void in0_w(u8 data);
 	void set_mirroring(int mirroring);
 	void reg_w(offs_t offset, u8 data);
-	void nes_cpu_map(address_map &map);
-	void nes_ppu_map(address_map &map);
-	void timer_prg_map(address_map &map);
-	void timer_io_map(address_map &map);
+	void nes_cpu_map(address_map &map) ATTR_COLD;
+	void nes_ppu_map(address_map &map) ATTR_COLD;
+	void timer_prg_map(address_map &map) ATTR_COLD;
+	void timer_io_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -328,6 +328,9 @@ ROM_START( smb3bl )
 	ROM_LOAD( "mario_3-6.bin", 0x10000, 0x10000, CRC(a88664e0) SHA1(327d246f198713f20adc7764ee539d18eb0b82ad) ) // hvc-um-0 chr [2/2]      IDENTICAL
 
 	ROM_REGION( 0x8000, "timercpu", 0 )
+	/* 2KiB content repeated 8 times to fill the upper half of the ROM (lower half is empty).
+	   Also seen using a 27C128 (16K*8) with the 2KiB content repeated 8 times to fill the entire ROM, with CRC(986fb6b3) and
+	   SHA1(fa205601adf15947bb073afd5fbd57cd971bff7d) */
 	ROM_LOAD( "nes_jamma_base.bin", 0x0000, 0x4000, CRC(ea276bdd) SHA1(1cd5916e9a6ea9e40526a4fe55b846ca1818fd5f) ) // BADADDR x-xxxxxxxxxxxxx
 	ROM_CONTINUE(                   0x0000, 0x4000 )
 ROM_END

@@ -47,7 +47,7 @@ public:
 
 protected:
 	// device_t implementation
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// vsmile_pad_device implementation
 	virtual void tx_complete() override;

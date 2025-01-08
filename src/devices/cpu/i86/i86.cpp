@@ -211,6 +211,7 @@ void i8086_cpu_device::execute_run()
 
 			if(m_halt)
 			{
+				debugger_wait_hook();
 				m_icount = 0;
 				return;
 			}
@@ -366,7 +367,6 @@ i8086_common_cpu_device::i8086_common_cpu_device(const machine_config &mconfig, 
 	, m_int_vector(0)
 	, m_pending_irq(0)
 	, m_nmi_state(0)
-	, m_irq_state(0)
 	, m_test_state(1)
 	, m_pc(0)
 	, m_lock(false)
@@ -488,7 +488,6 @@ void i8086_common_cpu_device::device_start()
 	save_item(NAME(m_int_vector));
 	save_item(NAME(m_pending_irq));
 	save_item(NAME(m_nmi_state));
-	save_item(NAME(m_irq_state));
 	save_item(NAME(m_AuxVal));
 	save_item(NAME(m_OverVal));
 	save_item(NAME(m_ZeroVal));
@@ -554,9 +553,7 @@ void i8086_common_cpu_device::device_reset()
 	m_NT = 1; // 8086 NT always 1
 	m_MF = 1; // 8086 MF always 1, 80286 always 0
 	m_int_vector = 0;
-	m_pending_irq = 0;
-	m_nmi_state = 0;
-	m_irq_state = 0;
+	m_pending_irq &= INT_IRQ;
 	m_no_interrupt = 0;
 	m_fire_trap = 0;
 	m_prefix_seg = 0;
@@ -576,7 +573,7 @@ void i8086_common_cpu_device::device_reset()
 
 void i8086_common_cpu_device::interrupt(int int_num, int trap)
 {
-	PUSH( CompressFlags() );
+	PUSH(CompressFlags());
 	m_TF = m_IF = 0;
 
 	if (int_num == -1)
@@ -598,15 +595,11 @@ void i8086_common_cpu_device::execute_set_input( int inptnum, int state )
 {
 	if (inptnum == INPUT_LINE_NMI)
 	{
-		if ( m_nmi_state == state )
-		{
-			return;
-		}
-		m_nmi_state = state;
-		if (state != CLEAR_LINE)
+		if (!m_nmi_state && state)
 		{
 			m_pending_irq |= NMI_IRQ;
 		}
+		m_nmi_state = state;
 	}
 	else if (inptnum == INPUT_LINE_TEST)
 	{
@@ -614,7 +607,6 @@ void i8086_common_cpu_device::execute_set_input( int inptnum, int state )
 	}
 	else
 	{
-		m_irq_state = state;
 		if (state == CLEAR_LINE)
 		{
 			m_pending_irq &= ~INT_IRQ;
@@ -669,6 +661,14 @@ uint16_t i8086_common_cpu_device::read_port_word(uint16_t port)
 void i8086_common_cpu_device::write_port_byte(uint16_t port, uint8_t data)
 {
 	m_io->write_byte(port, data);
+}
+
+void i8086_common_cpu_device::write_port_byte_al(uint16_t port)
+{
+	if (port & 1)
+		m_io->write_word(port-1, swapendian_int16(m_regs.w[AX]), 0xff00);
+	else
+		m_io->write_word(port, m_regs.w[AX], 0x00ff);
 }
 
 void i8086_common_cpu_device::write_port_word(uint16_t port, uint16_t data)
@@ -2068,7 +2068,7 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 			break;
 
 		case 0xe6: // i_outal
-			write_port_byte( fetch(), m_regs.b[AL]);
+			write_port_byte_al(fetch());
 			CLK(OUT_IMM8);
 			break;
 
@@ -2139,7 +2139,7 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 			break;
 
 		case 0xee: // i_outdxal
-			write_port_byte(m_regs.w[DX], m_regs.b[AL]);
+			write_port_byte_al(m_regs.w[DX]);
 			CLK(OUT_DX8);
 			break;
 

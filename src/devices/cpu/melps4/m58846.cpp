@@ -200,5 +200,5 @@ void m58846_device::execute_one()
 			}
 			break; // 0x1fc
 
-	} // big switch
+	} // 0x1f0
 }

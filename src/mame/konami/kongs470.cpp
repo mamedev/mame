@@ -39,10 +39,10 @@ public:
 	void kongs470(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 };
@@ -98,4 +98,4 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1995, tdbingo,  0, kongs470, tdbingo, kongs470_state, empty_init, ROT0, "Konami", "Trio de Bingo", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1995, tdbingo,  0, kongs470, tdbingo, kongs470_state, empty_init, ROT0, "Konami", "Trio de Bingo", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

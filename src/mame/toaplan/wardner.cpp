@@ -154,7 +154,7 @@ public:
 
 protected:
 	virtual void driver_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	memory_view m_rom_ram_view;
@@ -165,13 +165,13 @@ private:
 	void wardner_vblank_irq(int state);
 	void int_enable_w(int state);
 
-	void dsp_io_map(address_map &map);
-	void dsp_program_map(address_map &map);
-	void main_bank_map(address_map &map);
-	void main_io_map(address_map &map);
-	void main_program_map(address_map &map);
-	void sound_io_map(address_map &map);
-	void sound_program_map(address_map &map);
+	void dsp_io_map(address_map &map) ATTR_COLD;
+	void dsp_program_map(address_map &map) ATTR_COLD;
+	void main_bank_map(address_map &map) ATTR_COLD;
+	void main_io_map(address_map &map) ATTR_COLD;
+	void main_program_map(address_map &map) ATTR_COLD;
+	void sound_io_map(address_map &map) ATTR_COLD;
+	void sound_program_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -289,7 +289,7 @@ static INPUT_PORTS_START( wardner_generic )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")            // "V-BLANKING" in "test mode"
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))            // "V-BLANKING" in "test mode"
 
 	PORT_START("DSWA")
 	TOAPLAN_MACHINE_COCKTAIL_LOC(SW1)

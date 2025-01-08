@@ -77,7 +77,7 @@ protected:
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void klax_map(address_map &map);
+	void klax_map(address_map &map) ATTR_COLD;
 };
 
 class klax_bootleg_state : public klax_state
@@ -94,13 +94,13 @@ public:
 	void klax5bl(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void m5205_int1(int state);
 
-	void bootleg_sound_map(address_map &map);
-	void klax5bl_map(address_map &map);
+	void bootleg_sound_map(address_map &map) ATTR_COLD;
+	void klax5bl_map(address_map &map) ATTR_COLD;
 
 	u16 audio_ram_r(offs_t offset);
 	void audio_ram_w(offs_t offset, u16 data);
@@ -152,7 +152,6 @@ const atari_motion_objects_config klax_state::s_mob_config =
 	0,                  // maximum number of links to visit/scanline (0=all)
 
 	0x000,              // base palette entry
-	0x100,              // maximum number of colors
 	0,                  // transparent pen index
 
 	{{ 0x00ff,0,0,0 }}, // mask for the link
@@ -332,7 +331,7 @@ static INPUT_PORTS_START( klax )
 	PORT_BIT( 0x00fc, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0600, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(1)
@@ -396,7 +395,7 @@ void klax_state::klax_base(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_klax);
 	PALETTE(config, "palette").set_format(palette_device::IRGB_1555, 512).set_membits(8);
 
-	TILEMAP(config, m_playfield_tilemap, m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_COLS, 64, 32);
+	TILEMAP(config, m_playfield_tilemap, m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_COLS, 60, 32);
 	m_playfield_tilemap->set_info_callback(FUNC(klax_state::get_playfield_tile_info));
 
 	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, klax_state::s_mob_config);

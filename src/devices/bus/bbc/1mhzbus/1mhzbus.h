@@ -117,7 +117,7 @@ public:
 
 protected:
 	// device_t overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	device_bbc_1mhzbus_interface *m_card;
 

@@ -47,12 +47,12 @@ protected:
 	void p2000t_port_8c90_w(uint8_t data);
 	void p2000t_port_9494_w(uint8_t data);
 	uint8_t videoram_r(offs_t offset);
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	INTERRUPT_GEN_MEMBER(p2000_interrupt);
 
-	void p2000t_mem(address_map &map);
-	void p2000t_io(address_map &map);
+	void p2000t_mem(address_map &map) ATTR_COLD;
+	void p2000t_io(address_map &map) ATTR_COLD;
 
 	required_shared_ptr<uint8_t> m_videoram;
 
@@ -83,11 +83,11 @@ public:
 	void p2000m(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	void p2000m_palette(palette_device &palette) const;
 	uint32_t screen_update_p2000m(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void p2000m_mem(address_map &map);
+	void p2000m_mem(address_map &map) ATTR_COLD;
 
 private:
 	required_device<gfxdecode_device> m_gfxdecode;

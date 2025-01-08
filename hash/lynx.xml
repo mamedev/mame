@@ -405,7 +405,7 @@ Known undumped prototypes:
 
 	<!-- ROM found on a set of floppy disks -->
 	<software name="eyebehol">
-		<description>Eye of the Beholder (USA, prototype)</description>
+		<description>Advanced Dungeons &amp; Dragons - Eye of the Beholder (USA, prototype)</description>
 		<year>199?</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -417,7 +417,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="eyebehola" cloneof="eyebehol">
-		<description>Eye of the Beholder (USA, prototype, early)</description>
+		<description>Advanced Dungeons &amp; Dragons - Eye of the Beholder (USA, prototype, early)</description>
 		<year>199?</year>
 		<publisher>NuFX</publisher>
 		<part name="cart" interface="lynx_cart">

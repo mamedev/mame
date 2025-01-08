@@ -77,7 +77,8 @@ public:
 		, m_ram(*this, RAM_TAG)
 		, m_rom(*this, "maincpu")
 		, m_bank_rom(*this, "bank_rom")
-		, m_bank_ram(*this, "bank_ram")
+		, m_bank_ram0(*this, "bank_ram0")
+		, m_bank_ram1(*this, "bank_ram1")
 		, m_view(*this, "view")
 		, m_dac(*this, "dac%u", 0U)
 		, m_sdcard(*this, "sdcard")
@@ -86,27 +87,28 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
-	void neogsmap(address_map &map);
+	void neogsmap(address_map &map) ATTR_COLD;
 
 	INTERRUPT_GEN_MEMBER(irq0_line_assert);
 
-	void map_memory(address_map &map);
-	void map_io(address_map &map);
+	void map_memory(address_map &map) ATTR_COLD;
+	void map_io(address_map &map) ATTR_COLD;
 	void update_config();
 
 	required_device<z80_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_region_ptr<u8> m_rom;
 	memory_bank_creator m_bank_rom;
-	memory_bank_creator m_bank_ram;
+	memory_bank_creator m_bank_ram0;
+	memory_bank_creator m_bank_ram1;
 	memory_view m_view;
 	required_device_array<dac_word_interface, 2> m_dac;
-	required_device<spi_sdcard_sdhc_device> m_sdcard;
+	required_device<spi_sdcard_device> m_sdcard;
 	output_finder<> m_neogs_led;
 
 private:
@@ -153,12 +155,18 @@ private:
 
 void neogs_device::update_config()
 {
-	if (m_gscfg0 & 4) // EXPAG
-		;
-
 	if (m_gscfg0 & 1) // NOROM
 	{
-		m_bank_ram->set_entry(m_mpag % (m_ram->size() / 0x8000));
+		if (BIT(m_gscfg0, 3)) // EXPAG
+		{
+			m_bank_ram0->set_entry(((m_mpag << 1) | BIT(m_mpag, 7))% (m_ram->size() / 0x4000));
+			m_bank_ram1->set_entry(((m_mpagx << 1) | BIT(m_mpagx, 7)) % (m_ram->size() / 0x4000));
+		}
+		else
+		{
+			m_bank_ram0->set_entry(((m_mpag << 1) | 0) % (m_ram->size() / 0x4000));
+			m_bank_ram1->set_entry(((m_mpag << 1) | 1) % (m_ram->size() / 0x4000));
+		}
 		m_view.select(BIT(m_gscfg0, 1)); // RAMRO
 	}
 	else
@@ -302,7 +310,9 @@ void neogs_device::dac_flush()
 			right += out;
 
 		if (BIT(m_gscfg0, 2) && BIT(m_gscfg0, 6)) // PAN4CH
-			;
+		{
+			// TODO
+		}
 	}
 	m_dac[0]->data_w(left);
 	m_dac[1]->data_w(right);
@@ -348,9 +358,11 @@ void neogs_device::map_memory(address_map &map)
 
 	map(0x0000, 0xffff).view(m_view);
 	m_view[0](0x0000, 0x3fff).rw(FUNC(neogs_device::ram_bank_r<0>), FUNC(neogs_device::ram_bank_w<0>));
-	m_view[0](0x8000, 0xffff).bankrw(m_bank_ram);
+	m_view[0](0x8000, 0xbfff).bankrw(m_bank_ram0);
+	m_view[0](0xc000, 0xffff).bankrw(m_bank_ram1);
 	m_view[1](0x0000, 0x3fff).r(FUNC(neogs_device::ram_bank_r<0>));
-	m_view[1](0x8000, 0xffff).bankrw(m_bank_ram);
+	m_view[1](0x8000, 0xbfff).bankrw(m_bank_ram0);
+	m_view[1](0xc000, 0xffff).bankrw(m_bank_ram1);
 }
 
 void neogs_device::map_io(address_map &map)
@@ -411,6 +423,7 @@ void neogs_device::device_add_mconfig(machine_config &config)
 	m_maincpu->irqack_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ0, CLEAR_LINE);
 
 	SPI_SDCARD(config, m_sdcard, 0);
+	m_sdcard->set_prefer_sdhc();
 	m_sdcard->spi_miso_callback().set([this](int state) { m_spi_data_in_latch <<= 1; m_spi_data_in_latch |= state; });
 
 	SPEAKER(config, "lspeaker").front_left();
@@ -440,7 +453,8 @@ void neogs_device::device_start()
 	m_spi_clock = timer_alloc(FUNC(neogs_device::spi_clock), this);
 
 	m_bank_rom->configure_entries(0, m_rom.bytes() / 0x8000,  &m_rom[0], 0x8000);
-	m_bank_ram->configure_entries(0, m_ram->size() / 0x8000, m_ram->pointer(), 0x8000);
+	m_bank_ram0->configure_entries(0, m_ram->size() / 0x4000, m_ram->pointer(), 0x4000);
+	m_bank_ram1->configure_entries(0, m_ram->size() / 0x4000, m_ram->pointer(), 0x4000);
 
 	m_maincpu->space(AS_PROGRAM).install_read_tap(0x6000, 0x7fff, "dac_w",
 			[this](offs_t offset, u8 &data, u8 mem_mask)
@@ -455,6 +469,21 @@ void neogs_device::device_start()
 	m_zxbus->install_device(0x0000, 0xffff, *this, &neogs_device::neogsmap);
 
 	m_neogs_led.resolve();
+
+	save_item(NAME(m_data_in));
+	save_item(NAME(m_data_out));
+	save_item(NAME(m_command_in));
+	save_item(NAME(m_status));
+	save_item(NAME(m_spi_ctrl));
+	save_item(NAME(m_spi_data_out));
+	save_item(NAME(m_spi_data_in_latch));
+	save_item(NAME(m_spi_clock_cycles));
+	save_item(NAME(m_spi_clock_state));
+	save_item(NAME(m_mpag));
+	save_item(NAME(m_mpagx));
+	save_item(NAME(m_gscfg0));
+	save_pointer(NAME(m_vol), 6);
+	save_pointer(NAME(m_sample), 6);
 }
 
 void neogs_device::device_reset()

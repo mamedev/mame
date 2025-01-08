@@ -71,8 +71,8 @@ public:
 	void vl1(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<tmp68301_device> m_maincpu, m_subcpu1, m_subcpu2;
@@ -83,9 +83,9 @@ private:
 	required_shared_ptr<u16> m_mem_s1, m_mem_s2;
 	u16 m_led, m_main_ctrl, m_sub1_ctrl, m_sub2_ctrl;
 
-	void maincpu_map(address_map &map);
-	void subcpu1_map(address_map &map);
-	void subcpu2_map(address_map &map);
+	void maincpu_map(address_map &map) ATTR_COLD;
+	void subcpu1_map(address_map &map) ATTR_COLD;
+	void subcpu2_map(address_map &map) ATTR_COLD;
 
 	u16 main_r();
 	void main_w(u16 data);

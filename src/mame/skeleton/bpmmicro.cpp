@@ -186,10 +186,10 @@ public:
 	void unknown_84018_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void unknown_8401a_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void eeprom_8401c_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	void bpmmicro(machine_config &config);
-	void i286_io(address_map &map);
-	void i286_mem(address_map &map);
+	void i286_io(address_map &map) ATTR_COLD;
+	void i286_mem(address_map &map) ATTR_COLD;
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom_u38;

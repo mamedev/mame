@@ -22,9 +22,9 @@ public:
 	sys68k_cpu30_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, uint8_t board_id);
 
 protected:
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	void sys68k_cpu30(machine_config &config, XTAL clock, char const *const ram_default, char const *const ram_options);
 
@@ -35,7 +35,7 @@ protected:
 	uint8_t slot1_status_r();
 
 	/* Interrupt  support */
-	void cpu_space_map(address_map &map);
+	void cpu_space_map(address_map &map) ATTR_COLD;
 	void fga_irq_callback(int state);
 	uint8_t fga_irq_state = 0;
 	//  int fga_irq_vector = 0;
@@ -59,7 +59,7 @@ protected:
 	//uint16_t vme_a16_r();
 	//void vme_a16_w(uint16_t data);
 
-	void cpu30_mem(address_map &map);
+	void cpu30_mem(address_map &map) ATTR_COLD;
 
 	required_device<m68000_musashi_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -88,8 +88,8 @@ public:
 	vme_sys68k_cpu30_card_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 class vme_sys68k_cpu30x_card_device : public sys68k_cpu30_device_base
 {
@@ -97,8 +97,8 @@ public:
 	vme_sys68k_cpu30x_card_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 class vme_sys68k_cpu30xa_card_device : public sys68k_cpu30_device_base
 {
@@ -106,8 +106,8 @@ public:
 	vme_sys68k_cpu30xa_card_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 class vme_sys68k_cpu30za_card_device : public sys68k_cpu30_device_base
 {
@@ -115,8 +115,8 @@ public:
 	vme_sys68k_cpu30za_card_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 class vme_sys68k_cpu30be_card_device : public sys68k_cpu30_device_base
 {
@@ -124,8 +124,8 @@ public:
 	vme_sys68k_cpu30be_card_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 class vme_sys68k_cpu30lite_card_device : public sys68k_cpu30_device_base
 {
@@ -133,8 +133,8 @@ public:
 	vme_sys68k_cpu30lite_card_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 class vme_sys68k_cpu33_card_device : public sys68k_cpu30_device_base
 {
@@ -142,8 +142,8 @@ public:
 	vme_sys68k_cpu33_card_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(VME_SYS68K_CPU30,        vme_sys68k_cpu30_card_device)

@@ -45,7 +45,7 @@ public:
 	void musclem(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -67,7 +67,7 @@ private:
 	void oki1_bank_w(uint16_t data);
 	void lamps_w(uint16_t data);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 

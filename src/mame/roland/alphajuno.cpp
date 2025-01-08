@@ -36,17 +36,17 @@ public:
 	void mks50(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
 
 	void lcd_w(offs_t offset, u8 data);
 
-	void prog_map(address_map &map);
-	void ajuno1_ext_map(address_map &map);
-	void ajuno2_ext_map(address_map &map);
-	void mks50_ext_map(address_map &map);
+	void prog_map(address_map &map) ATTR_COLD;
+	void ajuno1_ext_map(address_map &map) ATTR_COLD;
+	void ajuno2_ext_map(address_map &map) ATTR_COLD;
+	void mks50_ext_map(address_map &map) ATTR_COLD;
 
 	void palette_init(palette_device &palette);
 
@@ -218,8 +218,8 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1985, ajuno1, 0, 0, ajuno1, ajuno1, alphajuno_state, empty_init, "Roland", "Alpha Juno-1 (JU-1) Programmable Polyphonic Synthesizer", MACHINE_IS_SKELETON)
-//SYST(1985, hs10, ajuno1, 0, ajuno1, ajuno1, alphajuno_state, empty_init, "Roland", "SynthPlus 10 (HS-10) Programmable Polyphonic Synthesizer", MACHINE_IS_SKELETON)
-SYST(1986, ajuno2, 0, 0, ajuno2, ajuno2, alphajuno_state, empty_init, "Roland", "Alpha Juno-2 (JU-2) Programmable Polyphonic Synthesizer", MACHINE_IS_SKELETON)
-SYST(1986, hs80, ajuno2, 0, ajuno2, ajuno2, alphajuno_state, empty_init, "Roland", "HS-80 Programmable Polyphonic Synthesizer", MACHINE_IS_SKELETON)
-SYST(1987, mks50, 0, 0, mks50, mks50, alphajuno_state, empty_init, "Roland", "MKS-50 Synthesizer Module", MACHINE_IS_SKELETON)
+SYST(1985, ajuno1, 0, 0, ajuno1, ajuno1, alphajuno_state, empty_init, "Roland", "Alpha Juno-1 (JU-1) Programmable Polyphonic Synthesizer", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+//SYST(1985, hs10, ajuno1, 0, ajuno1, ajuno1, alphajuno_state, empty_init, "Roland", "SynthPlus 10 (HS-10) Programmable Polyphonic Synthesizer", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1986, ajuno2, 0, 0, ajuno2, ajuno2, alphajuno_state, empty_init, "Roland", "Alpha Juno-2 (JU-2) Programmable Polyphonic Synthesizer", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1986, hs80, ajuno2, 0, ajuno2, ajuno2, alphajuno_state, empty_init, "Roland", "HS-80 Programmable Polyphonic Synthesizer", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1987, mks50, 0, 0, mks50, mks50, alphajuno_state, empty_init, "Roland", "MKS-50 Synthesizer Module", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

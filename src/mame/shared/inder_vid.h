@@ -33,13 +33,13 @@ public:
 		m_bpp_mode = bpp;
 	}
 
-	void megaphx_tms_map(address_map &map);
-	void ramdac_map(address_map &map);
+	void megaphx_tms_map(address_map &map) ATTR_COLD;
+	void ramdac_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	required_shared_ptr<uint16_t> m_vram;

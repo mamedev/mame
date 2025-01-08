@@ -70,11 +70,11 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(color);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void device_post_load() override;
 
-	void tv990_mem(address_map &map);
+	void tv990_mem(address_map &map) ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(trigger_row_irq);
 
@@ -331,7 +331,7 @@ void tv990_state::tv990_mem(address_map &map)
 /* Input ports */
 static INPUT_PORTS_START( tv990 )
 	PORT_START("Screen")
-	PORT_CONFNAME( 0x30, 0x00, "Color") PORT_CHANGED_MEMBER(DEVICE_SELF, tv990_state, color, 0)
+	PORT_CONFNAME( 0x30, 0x00, "Color") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tv990_state::color), 0)
 	PORT_CONFSETTING(    0x00, "Green")
 	PORT_CONFSETTING(    0x10, "Amber")
 	PORT_CONFSETTING(    0x20, "White")

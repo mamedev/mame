@@ -16,6 +16,11 @@
 #include "a590.h"
 #include "action_replay.h"
 #include "buddha.h"
+#include "merlin.h"
+#include "picasso2.h"
+#include "rainbow2.h"
+#include "ripple.h"
+#include "toccata.h"
 
 
 void a1000_expansion_cards(device_slot_interface &device)
@@ -45,6 +50,12 @@ void zorro2_cards(device_slot_interface &device)
 	device.option_add("a2091", ZORRO_A2091);
 	device.option_add("a2232", ZORRO_A2232);
 	device.option_add("buddha", ZORRO_BUDDHA);
+	device.option_add("merlin", ZORRO_MERLIN);
+	device.option_add("picasso2p", ZORRO_PICASSO2P);
+	device.option_add("rainbow2", ZORRO_RAINBOW2);
+	device.option_add("framemaster", ZORRO_FRAMEMASTER);
+	device.option_add("ripple", ZORRO_RIPPLE);
+	device.option_add("toccata", ZORRO_TOCCATA);
 }
 
 void zorro3_cards(device_slot_interface &device)
@@ -55,4 +66,10 @@ void zorro3_cards(device_slot_interface &device)
 	device.option_add("a2091", ZORRO_A2091);
 	device.option_add("a2232", ZORRO_A2232);
 	device.option_add("buddha", ZORRO_BUDDHA);
+	device.option_add("merlin", ZORRO_MERLIN);
+	device.option_add("picasso2p", ZORRO_PICASSO2P);
+	device.option_add("rainbow2", ZORRO_RAINBOW2);
+	device.option_add("framemaster", ZORRO_FRAMEMASTER);
+	device.option_add("ripple", ZORRO_RIPPLE);
+	device.option_add("toccata", ZORRO_TOCCATA);
 }

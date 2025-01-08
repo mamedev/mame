@@ -171,8 +171,8 @@ private:
 		} pmu;
 	} m_vg230;
 
-	void machine_reset() override;
-	void machine_start() override;
+	void machine_reset() override ATTR_COLD;
+	void machine_start() override ATTR_COLD;
 
 	uint32_t screen_update_pasogo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(pasogo_interrupt);
@@ -181,9 +181,9 @@ private:
 	memory_region *m_cart_rom = nullptr;
 	uint8_t m_ems_index = 0;
 	uint16_t m_ems_bank[28]{};
-	void emsbank_map(address_map &map);
-	void pasogo_io(address_map &map);
-	void pasogo_mem(address_map &map);
+	void emsbank_map(address_map &map) ATTR_COLD;
+	void pasogo_io(address_map &map) ATTR_COLD;
+	void pasogo_mem(address_map &map) ATTR_COLD;
 };
 
 
@@ -285,11 +285,12 @@ uint8_t pasogo_state::vg230_io_r(offs_t offset)
 				break;
 
 			case 0x79:
-				/*rtc status*/
+				// rtc mode
 				log = false;
 				break;
 
 			case 0x7a:
+				// rtc status
 				data &= ~3;
 				if (m_vg230.rtc.alarm_interrupt_request)
 					data |= 1<<1;
@@ -363,7 +364,7 @@ void pasogo_state::vg230_io_w(offs_t offset, uint8_t data)
 				break;
 
 			case 0x78:
-				m_vg230.rtc.days = data & 0x1f;
+				m_vg230.rtc.alarm_days = data & 0x1f;
 				break;
 
 			case 0x79:
@@ -484,7 +485,7 @@ static INPUT_PORTS_START( pasogo )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("a") PORT_CODE(KEYCODE_A)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("b") PORT_CODE(KEYCODE_B)
 	PORT_START("COLOR")
-	PORT_CONFNAME(0x01, 0x01, "Contrast") PORT_CHANGED_MEMBER(DEVICE_SELF, pasogo_state, contrast, 0)
+	PORT_CONFNAME(0x01, 0x01, "Contrast") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(pasogo_state::contrast), 0)
 	PORT_CONFSETTING(0x00, "Actual")
 	PORT_CONFSETTING(0x01, "Enhanced")
 INPUT_PORTS_END

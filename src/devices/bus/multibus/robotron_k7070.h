@@ -25,14 +25,14 @@ public:
 	robotron_k7070_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
-	void cpu_mem(address_map &map);
-	virtual void cpu_pio(address_map &map);
+	void cpu_mem(address_map &map) ATTR_COLD;
+	virtual void cpu_pio(address_map &map) ATTR_COLD;
 
 private:
 	required_device<z80_device> m_cpu;
@@ -68,8 +68,8 @@ private:
 	uint16_t io_r(offs_t offset, uint16_t mem_mask);
 	void io_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 
-	void k7070_cpu_io(address_map &map);
-	void k7070_cpu_mem(address_map &map);
+	void k7070_cpu_io(address_map &map) ATTR_COLD;
+	void k7070_cpu_mem(address_map &map) ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(ROBOTRON_K7070, robotron_k7070_device)

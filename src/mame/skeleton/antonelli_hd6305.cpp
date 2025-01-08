@@ -7,7 +7,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6805/m6805.h"
+#include "cpu/m6805/hd6305.h"
 #include "machine/6850acia.h"
 
 namespace {
@@ -24,7 +24,7 @@ public:
 	void antonelli(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 };
@@ -59,5 +59,5 @@ ROM_END
 
 } // anonymous namespace
 
-SYST(198?, anto2495, 0, 0, antonelli, antonelli, antonelli_hd6305_state, empty_init, "Antonelli", "Antonelli 2495", MACHINE_IS_SKELETON)
-SYST(198?, anto2614, 0, 0, antonelli, antonelli, antonelli_hd6305_state, empty_init, "Antonelli", "Antonelli 2614", MACHINE_IS_SKELETON) // stereo version
+SYST(198?, anto2495, 0, 0, antonelli, antonelli, antonelli_hd6305_state, empty_init, "Antonelli", "Antonelli 2495", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(198?, anto2614, 0, 0, antonelli, antonelli, antonelli_hd6305_state, empty_init, "Antonelli", "Antonelli 2614", MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // stereo version

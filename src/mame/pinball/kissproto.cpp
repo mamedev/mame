@@ -27,14 +27,14 @@ public:
 	void init_kissp();
 
 private:
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
 
 	// driver_device overrides
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 };
 
 
@@ -89,5 +89,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1979, kissp,  kiss, kissp, kissp, kissp_state, init_kissp, ROT0, "Bally", "Kiss (prototype)",     MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1979, kissp2, kiss, kissp, kissp, kissp_state, init_kissp, ROT0, "Bally", "Kiss (prototype v.2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1979, kissp,  kiss, kissp, kissp, kissp_state, init_kissp, ROT0, "Bally", "Kiss (prototype)",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1979, kissp2, kiss, kissp, kissp, kissp_state, init_kissp, ROT0, "Bally", "Kiss (prototype v.2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

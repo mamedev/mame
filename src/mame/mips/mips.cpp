@@ -283,15 +283,15 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// address maps
-	void rx2030_map(address_map &map);
-	void rs2030_map(address_map &map);
+	void rx2030_map(address_map &map) ATTR_COLD;
+	void rs2030_map(address_map &map) ATTR_COLD;
 
-	void iop_program_map(address_map &map);
-	void iop_io_map(address_map &map);
+	void iop_program_map(address_map &map) ATTR_COLD;
+	void iop_io_map(address_map &map) ATTR_COLD;
 
 	u16 mmu_r(offs_t offset, u16 mem_mask = 0xffff);
 	void mmu_w(offs_t offset, u16 data, u16 mem_mask = 0xffff);
@@ -376,12 +376,12 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// address maps
-	void rx3230_map(address_map &map);
-	void rs3230_map(address_map &map);
+	void rx3230_map(address_map &map) ATTR_COLD;
+	void rs3230_map(address_map &map) ATTR_COLD;
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect);
 

@@ -157,14 +157,14 @@ const hcd62121_disassembler::dasm hcd62121_disassembler::ops[256] =
 	{ "movb",    ARG_REG,    ARG_CS   }, { "movb",    ARG_REG,    ARG_SS   },
 
 	/* 0xf0 */
-	{ "movb",       ARG_OPT,    ARG_REG  }, { "unF1?",          ARG_I8,     ARG_NONE },
-	{ "movb",       ARG_PORT,   ARG_REG  }, { "unF3?",          ARG_I8,     ARG_NONE },
-	{ "unF4?",      ARG_I8,     ARG_NONE }, { "unF5?",          ARG_I8,     ARG_NONE },
-	{ "unF6?",      ARG_I8,     ARG_NONE }, { "timer_ctrl",     ARG_I8,     ARG_NONE },
-	{ "unF8?",      ARG_NONE,   ARG_NONE }, { "unF9?",          ARG_NONE,   ARG_NONE },
-	{ "unFA?",      ARG_NONE,   ARG_NONE }, { "unFb?",          ARG_NONE,   ARG_NONE },
-	{ "unFC?",      ARG_NONE,   ARG_NONE }, { "timer_wait_low", ARG_NONE,   ARG_NONE },
-	{ "timer_wait", ARG_NONE,   ARG_NONE }, { "nop",            ARG_NONE,   ARG_NONE }
+	{ "movb",        ARG_OPT,    ARG_REG  }, { "unF1?",          ARG_I8,     ARG_NONE },
+	{ "movb",        ARG_PORT,   ARG_REG  }, { "unF3?",          ARG_I8,     ARG_NONE },
+	{ "unF4?",       ARG_I8,     ARG_NONE }, { "unF5?",          ARG_I8,     ARG_NONE },
+	{ "unF6?",       ARG_I8,     ARG_NONE }, { "timer_ctrl",     ARG_I8,     ARG_NONE },
+	{ "unF8?",       ARG_I8,     ARG_NONE }, { "unF9?",          ARG_NONE,   ARG_NONE },
+	{ "unFA?",       ARG_NONE,   ARG_NONE }, { "unFb?",          ARG_NONE,   ARG_NONE },
+	{ "timer_clear", ARG_NONE,   ARG_NONE }, { "timer_wait_low", ARG_NONE,   ARG_NONE },
+	{ "timer_wait",  ARG_NONE,   ARG_NONE }, { "nop",            ARG_NONE,   ARG_NONE }
 };
 
 u32 hcd62121_disassembler::opcode_alignment() const

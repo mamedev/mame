@@ -678,11 +678,16 @@ u32 k056832_device::k_6bpp_rom_long_r(offs_t offset, u32 mem_mask)
 
 u8 k056832_device::konmedal_rom_r(offs_t offset)
 {
-	uint32_t addr = (((m_regs[0x1a] << 9) & 0x60000) | ((m_regs[0x1b] << 15) & 0x18000) | ((m_regs[0x1a] << 3) & 0x06000)) + offset;
-
+	const uint32_t addr = (((m_regs[0x1a] << 9) & 0x60000) | ((m_regs[0x1b] << 15) & 0x18000) | ((m_regs[0x1a] << 3) & 0x06000)) + offset;
 	return m_rombase[addr];
 }
 
+u8 k056832_device::chusenoh_rom_r(offs_t offset)
+{
+	const uint32_t bank = (m_regs[0x1b] << 17) | (m_regs[0x1a] << 5);
+	const uint32_t addr = bank + offset;
+	return m_rombase[addr];
+}
 
 u16 k056832_device::piratesh_rom_r(offs_t offset)
 {

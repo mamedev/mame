@@ -231,8 +231,8 @@ public:
 	void namcond1(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -252,9 +252,9 @@ private:
 	uint16_t printer_r();
 
 	INTERRUPT_GEN_MEMBER(mcu_interrupt);
-	void abcheck_main_map(address_map &map);
-	void main_map(address_map &map);
-	void h8rwmap(address_map &map);
+	void abcheck_main_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void h8rwmap(address_map &map) ATTR_COLD;
 };
 
 

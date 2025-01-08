@@ -193,8 +193,8 @@ public:
 	void skattva(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<microtouch_device> m_microtouch;
@@ -216,16 +216,16 @@ private:
 	//INTERRUPT_GEN_MEMBER(adp_int);
 	void skattva_nvram_init(nvram_device &nvram, void *base, size_t size);
 
-	void adp_hd63484_map(address_map &map);
-	void fc7_map(address_map &map);
-	void fashiong_hd63484_map(address_map &map);
-	void fstation_hd63484_map(address_map &map);
-	void fstation_mem(address_map &map);
-	void funland_mem(address_map &map);
-	void quickjac_mem(address_map &map);
-	void ramdac_map(address_map &map);
-	void skattv_mem(address_map &map);
-	void skattva_mem(address_map &map);
+	void adp_hd63484_map(address_map &map) ATTR_COLD;
+	void fc7_map(address_map &map) ATTR_COLD;
+	void fashiong_hd63484_map(address_map &map) ATTR_COLD;
+	void fstation_hd63484_map(address_map &map) ATTR_COLD;
+	void fstation_mem(address_map &map) ATTR_COLD;
+	void funland_mem(address_map &map) ATTR_COLD;
+	void quickjac_mem(address_map &map) ATTR_COLD;
+	void ramdac_map(address_map &map) ATTR_COLD;
+	void skattv_mem(address_map &map) ATTR_COLD;
+	void skattva_mem(address_map &map) ATTR_COLD;
 };
 
 void adp_state::skattva_nvram_init(nvram_device &nvram, void *base, size_t size)
@@ -315,7 +315,7 @@ void adp_state::skattva_mem(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x400000, 0x40001f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write)).umask16(0x00ff);
 	map(0x800080, 0x800083).rw(m_acrtc, FUNC(hd63484_device::read16), FUNC(hd63484_device::write16));
-	map(0x800100, 0x800101).portr("IN0");
+	map(0x800100, 0x800101).portr(m_in0);
 	map(0x800140, 0x800143).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w)).umask16(0x00ff); //18b too
 	map(0x800180, 0x80019f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
 	map(0xffc000, 0xffffff).ram().share("nvram");
@@ -326,7 +326,7 @@ void adp_state::quickjac_mem(address_map &map)
 	map(0x000000, 0x01ffff).rom();
 	map(0x400000, 0x40001f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write)).umask16(0x00ff);
 	map(0x800080, 0x800083).rw(m_acrtc, FUNC(hd63484_device::read16), FUNC(hd63484_device::write16)); // bad
-	map(0x800100, 0x800101).portr("IN0");
+	map(0x800100, 0x800101).portr(m_in0);
 	map(0x800140, 0x800143).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w)).umask16(0x00ff); //18b too
 	map(0x800180, 0x80019f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
 	map(0xff0000, 0xffffff).ram().share("nvram");
@@ -340,7 +340,7 @@ void adp_state::funland_mem(address_map &map)
 	map(0x800089, 0x800089).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x80008b, 0x80008b).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x80008d, 0x80008d).w("ramdac", FUNC(ramdac_device::mask_w));
-	map(0x800100, 0x800101).portr("IN0");
+	map(0x800100, 0x800101).portr(m_in0);
 	map(0x800140, 0x800143).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w)).umask16(0x00ff); //18b too
 	map(0x800180, 0x80019f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
 	map(0xfc0000, 0xffffff).ram().share("nvram");
@@ -384,8 +384,8 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( skattv )
 	PORT_START("PA")
 	PORT_BIT( 0x9f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_HBLANK("screen")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::hblank))
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	PORT_START("DSW1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_COIN5    )
@@ -437,8 +437,8 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( skattva )
 	PORT_START("PA")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_HBLANK("screen")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::hblank))
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x9e, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN0")
@@ -463,8 +463,8 @@ static INPUT_PORTS_START( fstation )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_HBLANK("screen")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::hblank))
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW1")

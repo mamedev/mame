@@ -41,8 +41,8 @@ private:
 	uint8_t dev4_r();
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
-	void mem_io(address_map &map);
-	void mem_prg(address_map &map);
+	void mem_io(address_map &map) ATTR_COLD;
+	void mem_prg(address_map &map) ATTR_COLD;
 };
 
 uint8_t daruma_state::dev0_r()

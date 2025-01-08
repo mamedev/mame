@@ -85,9 +85,9 @@ public:
 	void dday(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_shared_ptr<uint8_t> m_textvideoram;
@@ -129,7 +129,7 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(countdown_timer_callback);
 	void start_countdown_timer();
-	void program_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -632,7 +632,6 @@ void dday_state::dday(machine_config &config)
 	// basic machine hardware
 	Z80(config, m_maincpu, 2'000'000);     // 2 MHz ?
 	m_maincpu->set_addrmap(AS_PROGRAM, &dday_state::program_map);
-
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

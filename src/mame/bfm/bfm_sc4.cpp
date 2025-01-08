@@ -35778,22 +35778,22 @@ INPUT_PORTS_START( sc4dnd35 )
 INPUT_PORTS_END
 
 // PR1927 AWP DEAL OR NO DEAL S4         PR1907 DEAL OR NO DEAL SOUNDS11
-GAMEL( 200?, sc4dnd,  0,      sc4, sc4dnd25, sc4_state, init_sc4dnd, ROT0, "BFM", "Deal Or No Deal (Bellfruit) (Scorpion 4) (DONL016, set 1)", MACHINE_FLAGS, layout_sc4dnd ) // DONL 016
-GAMEL( 200?, sc4dndb, sc4dnd, sc4, sc4dnd25, sc4_state, init_sc4dnd, ROT0, "BFM", "Deal Or No Deal (Bellfruit) (Scorpion 4) (DONL016, set 2)", MACHINE_FLAGS, layout_sc4dnd  ) // DONL 016
-GAMEL( 200?, sc4dnde, sc4dnd, sc4, sc4dnd25, sc4_state, init_sc4dnd, ROT0, "BFM", "Deal Or No Deal (Bellfruit) (Scorpion 4) (DONL017, set 1)", MACHINE_FLAGS, layout_sc4dnd  ) // DONL 017
-GAMEL( 200?, sc4dndh, sc4dnd, sc4, sc4dnd25, sc4_state, init_sc4dnd, ROT0, "BFM", "Deal Or No Deal (Bellfruit) (Scorpion 4) (DONL017, set 2)", MACHINE_FLAGS, layout_sc4dnd  ) // DONL 017
-GAMEL( 200?, sc4dndf, sc4dnd, sc4, sc4dnd25, sc4_state, init_sc4dnd, ROT0, "BFM", "Deal Or No Deal (Bellfruit) (Scorpion 4) (DONL018, set 1)", MACHINE_FLAGS, layout_sc4dnd  ) // DONL 018
-GAMEL( 200?, sc4dndi, sc4dnd, sc4, sc4dnd25, sc4_state, init_sc4dnd, ROT0, "BFM", "Deal Or No Deal (Bellfruit) (Scorpion 4) (DONL018, set 2)", MACHINE_FLAGS, layout_sc4dnd  )// DONL 018
-GAMEL( 200?, sc4dndd, sc4dnd, sc4, sc4dnd35, sc4_state, init_sc4dnd, ROT0, "BFM", "Deal Or No Deal (Bellfruit) (Scorpion 4) (DONL402, set 1)", MACHINE_FLAGS, layout_sc4dnd  ) // DONL 402
-GAMEL( 200?, sc4dndg, sc4dnd, sc4, sc4dnd35, sc4_state, init_sc4dnd, ROT0, "BFM", "Deal Or No Deal (Bellfruit) (Scorpion 4) (DONL402, set 2)", MACHINE_FLAGS, layout_sc4dnd  ) // DONL 402
-GAMEL( 200?, sc4dndj, sc4dnd, sc4, sc4dnd35, sc4_state, init_sc4dnd, ROT0, "BFM", "Deal Or No Deal (Bellfruit) (Scorpion 4) (DONL406, set 1)", MACHINE_FLAGS, layout_sc4dnd  )// DONL 406
-GAMEL( 200?, sc4dndl, sc4dnd, sc4, sc4dnd35, sc4_state, init_sc4dnd, ROT0, "BFM", "Deal Or No Deal (Bellfruit) (Scorpion 4) (DONL406, set 2)", MACHINE_FLAGS, layout_sc4dnd  )// DONL 406
-GAMEL( 200?, sc4dndc, sc4dnd, sc4, sc4dnd35, sc4_state, init_sc4dnd, ROT0, "BFM", "Deal Or No Deal (Bellfruit) (Scorpion 4) (DONL422, set 1)", MACHINE_FLAGS, layout_sc4dnd  ) // DONL 422
-GAMEL( 200?, sc4dnda, sc4dnd, sc4, sc4dnd35, sc4_state, init_sc4dnd, ROT0, "BFM", "Deal Or No Deal (Bellfruit) (Scorpion 4) (DONL422, set 2)", MACHINE_FLAGS, layout_sc4dnd  ) // DONL 422, incomplete pairing
-GAMEL( 200?, sc4dndn, sc4dnd, sc4, sc4dnd35, sc4_state, init_sc4dnd, ROT0, "BFM", "Deal Or No Deal (Bellfruit) (Scorpion 4) (DONL424, set 1)", MACHINE_FLAGS, layout_sc4dnd  )// DONL 424
-GAMEL( 200?, sc4dndo, sc4dnd, sc4, sc4dnd35, sc4_state, init_sc4dnd, ROT0, "BFM", "Deal Or No Deal (Bellfruit) (Scorpion 4) (DONL424, set 2)", MACHINE_FLAGS, layout_sc4dnd  )// DONL 424
-GAMEL( 200?, sc4dndk, sc4dnd, sc4, sc4dnd35, sc4_state, init_sc4dnd, ROT0, "BFM", "Deal Or No Deal (Bellfruit) (Scorpion 4) (DONL428, set 1)", MACHINE_FLAGS, layout_sc4dnd  )// DONL 428
-GAMEL( 200?, sc4dndm, sc4dnd, sc4, sc4dnd35, sc4_state, init_sc4dnd, ROT0, "BFM", "Deal Or No Deal (Bellfruit) (Scorpion 4) (DONL428, set 2)", MACHINE_FLAGS, layout_sc4dnd  )// DONL 428
+GAMEL( 200?, sc4dnd,  0,      sc4, sc4dnd25, sc4_state, init_sc4dnd, ROT0, "BFM", "Deal or No Deal (Bellfruit) (Scorpion 4) (DONL016, set 1)", MACHINE_FLAGS, layout_sc4dnd ) // DONL 016
+GAMEL( 200?, sc4dndb, sc4dnd, sc4, sc4dnd25, sc4_state, init_sc4dnd, ROT0, "BFM", "Deal or No Deal (Bellfruit) (Scorpion 4) (DONL016, set 2)", MACHINE_FLAGS, layout_sc4dnd  ) // DONL 016
+GAMEL( 200?, sc4dnde, sc4dnd, sc4, sc4dnd25, sc4_state, init_sc4dnd, ROT0, "BFM", "Deal or No Deal (Bellfruit) (Scorpion 4) (DONL017, set 1)", MACHINE_FLAGS, layout_sc4dnd  ) // DONL 017
+GAMEL( 200?, sc4dndh, sc4dnd, sc4, sc4dnd25, sc4_state, init_sc4dnd, ROT0, "BFM", "Deal or No Deal (Bellfruit) (Scorpion 4) (DONL017, set 2)", MACHINE_FLAGS, layout_sc4dnd  ) // DONL 017
+GAMEL( 200?, sc4dndf, sc4dnd, sc4, sc4dnd25, sc4_state, init_sc4dnd, ROT0, "BFM", "Deal or No Deal (Bellfruit) (Scorpion 4) (DONL018, set 1)", MACHINE_FLAGS, layout_sc4dnd  ) // DONL 018
+GAMEL( 200?, sc4dndi, sc4dnd, sc4, sc4dnd25, sc4_state, init_sc4dnd, ROT0, "BFM", "Deal or No Deal (Bellfruit) (Scorpion 4) (DONL018, set 2)", MACHINE_FLAGS, layout_sc4dnd  )// DONL 018
+GAMEL( 200?, sc4dndd, sc4dnd, sc4, sc4dnd35, sc4_state, init_sc4dnd, ROT0, "BFM", "Deal or No Deal (Bellfruit) (Scorpion 4) (DONL402, set 1)", MACHINE_FLAGS, layout_sc4dnd  ) // DONL 402
+GAMEL( 200?, sc4dndg, sc4dnd, sc4, sc4dnd35, sc4_state, init_sc4dnd, ROT0, "BFM", "Deal or No Deal (Bellfruit) (Scorpion 4) (DONL402, set 2)", MACHINE_FLAGS, layout_sc4dnd  ) // DONL 402
+GAMEL( 200?, sc4dndj, sc4dnd, sc4, sc4dnd35, sc4_state, init_sc4dnd, ROT0, "BFM", "Deal or No Deal (Bellfruit) (Scorpion 4) (DONL406, set 1)", MACHINE_FLAGS, layout_sc4dnd  )// DONL 406
+GAMEL( 200?, sc4dndl, sc4dnd, sc4, sc4dnd35, sc4_state, init_sc4dnd, ROT0, "BFM", "Deal or No Deal (Bellfruit) (Scorpion 4) (DONL406, set 2)", MACHINE_FLAGS, layout_sc4dnd  )// DONL 406
+GAMEL( 200?, sc4dndc, sc4dnd, sc4, sc4dnd35, sc4_state, init_sc4dnd, ROT0, "BFM", "Deal or No Deal (Bellfruit) (Scorpion 4) (DONL422, set 1)", MACHINE_FLAGS, layout_sc4dnd  ) // DONL 422
+GAMEL( 200?, sc4dnda, sc4dnd, sc4, sc4dnd35, sc4_state, init_sc4dnd, ROT0, "BFM", "Deal or No Deal (Bellfruit) (Scorpion 4) (DONL422, set 2)", MACHINE_FLAGS, layout_sc4dnd  ) // DONL 422, incomplete pairing
+GAMEL( 200?, sc4dndn, sc4dnd, sc4, sc4dnd35, sc4_state, init_sc4dnd, ROT0, "BFM", "Deal or No Deal (Bellfruit) (Scorpion 4) (DONL424, set 1)", MACHINE_FLAGS, layout_sc4dnd  )// DONL 424
+GAMEL( 200?, sc4dndo, sc4dnd, sc4, sc4dnd35, sc4_state, init_sc4dnd, ROT0, "BFM", "Deal or No Deal (Bellfruit) (Scorpion 4) (DONL424, set 2)", MACHINE_FLAGS, layout_sc4dnd  )// DONL 424
+GAMEL( 200?, sc4dndk, sc4dnd, sc4, sc4dnd35, sc4_state, init_sc4dnd, ROT0, "BFM", "Deal or No Deal (Bellfruit) (Scorpion 4) (DONL428, set 1)", MACHINE_FLAGS, layout_sc4dnd  )// DONL 428
+GAMEL( 200?, sc4dndm, sc4dnd, sc4, sc4dnd35, sc4_state, init_sc4dnd, ROT0, "BFM", "Deal or No Deal (Bellfruit) (Scorpion 4) (DONL428, set 2)", MACHINE_FLAGS, layout_sc4dnd  )// DONL 428
 
 
 void sc4_state::init_sc4dndcs()
@@ -35871,12 +35871,12 @@ INPUT_PORTS_START( sc4dndcs5 )
 INPUT_PORTS_END
 
 // PR1967 AWP CLASSIC DEAL OR NO DEAL S4         PR1907 DEAL OR NO DEAL SOUNDS11
-GAMEL( 200?, sc4dndcs,  0,        sc4, sc4dndcs5, sc4_state, init_sc4dndcs, ROT0, "BFM", "Deal Or No Deal Classic (Bellfruit) (Scorpion 4) (CLDD211, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // CLDD 211
-GAMEL( 200?, sc4dndcsb, sc4dndcs, sc4, sc4dndcs5, sc4_state, init_sc4dndcs, ROT0, "BFM", "Deal Or No Deal Classic (Bellfruit) (Scorpion 4) (CLDD211, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // CLDD 211
-GAMEL( 200?, sc4dndcsa, sc4dndcs, sc4, sc4dndcs5, sc4_state, init_sc4dndcs, ROT0, "BFM", "Deal Or No Deal Classic (Bellfruit) (Scorpion 4) (CLDD212, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // CLDD 212
-GAMEL( 200?, sc4dndcsc, sc4dndcs, sc4, sc4dndcs5, sc4_state, init_sc4dndcs, ROT0, "BFM", "Deal Or No Deal Classic (Bellfruit) (Scorpion 4) (CLDD212, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // CLDD 212
-GAMEL( 200?, sc4dndcsd, sc4dndcs, sc4, sc4dndcs5, sc4_state, init_sc4dndcs, ROT0, "BFM", "Deal Or No Deal Classic (Bellfruit) (Scorpion 4) (CLDD215, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // CLDD 215
-GAMEL( 200?, sc4dndcse, sc4dndcs, sc4, sc4dndcs5, sc4_state, init_sc4dndcs, ROT0, "BFM", "Deal Or No Deal Classic (Bellfruit) (Scorpion 4) (CLDD215, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // CLDD 215
+GAMEL( 200?, sc4dndcs,  0,        sc4, sc4dndcs5, sc4_state, init_sc4dndcs, ROT0, "BFM", "Deal or No Deal Classic (Bellfruit) (Scorpion 4) (CLDD211, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // CLDD 211
+GAMEL( 200?, sc4dndcsb, sc4dndcs, sc4, sc4dndcs5, sc4_state, init_sc4dndcs, ROT0, "BFM", "Deal or No Deal Classic (Bellfruit) (Scorpion 4) (CLDD211, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // CLDD 211
+GAMEL( 200?, sc4dndcsa, sc4dndcs, sc4, sc4dndcs5, sc4_state, init_sc4dndcs, ROT0, "BFM", "Deal or No Deal Classic (Bellfruit) (Scorpion 4) (CLDD212, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // CLDD 212
+GAMEL( 200?, sc4dndcsc, sc4dndcs, sc4, sc4dndcs5, sc4_state, init_sc4dndcs, ROT0, "BFM", "Deal or No Deal Classic (Bellfruit) (Scorpion 4) (CLDD212, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // CLDD 212
+GAMEL( 200?, sc4dndcsd, sc4dndcs, sc4, sc4dndcs5, sc4_state, init_sc4dndcs, ROT0, "BFM", "Deal or No Deal Classic (Bellfruit) (Scorpion 4) (CLDD215, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // CLDD 215
+GAMEL( 200?, sc4dndcse, sc4dndcs, sc4, sc4dndcs5, sc4_state, init_sc4dndcs, ROT0, "BFM", "Deal or No Deal Classic (Bellfruit) (Scorpion 4) (CLDD215, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // CLDD 215
 
 
 void sc4_state::init_sc4dndbb()
@@ -35969,16 +35969,16 @@ INPUT_PORTS_END
 
 
 // PR3229 AWP DEAL OR NO DEAL BREAK THE BANK SCORP4         PR3209 BREAK THE BANK SOUNDS11
-GAMEL( 200?, sc4dndbb,  0,        sc4_5reel_alt, sc4dndbb35, sc4_state, init_sc4dndbb, ROT0, "BFM", "Deal Or No Deal Break The Bank (Bellfruit) (Scorpion 4) (CRBE471, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // CRBE 471
-GAMEL( 200?, sc4dndbbb, sc4dndbb, sc4_5reel_alt, sc4dndbb35, sc4_state, init_sc4dndbb, ROT0, "BFM", "Deal Or No Deal Break The Bank (Bellfruit) (Scorpion 4) (CRBE471, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // CRBE 471
-GAMEL( 200?, sc4dndbba, sc4dndbb, sc4_5reel_alt, sc4dndbb35, sc4_state, init_sc4dndbb, ROT0, "BFM", "Deal Or No Deal Break The Bank (Bellfruit) (Scorpion 4) (CRBE472, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // CRBE 472
-GAMEL( 200?, sc4dndbbc, sc4dndbb, sc4_5reel_alt, sc4dndbb35, sc4_state, init_sc4dndbb, ROT0, "BFM", "Deal Or No Deal Break The Bank (Bellfruit) (Scorpion 4) (CRBE472, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // CRBE 472
-GAMEL( 200?, sc4dndbbd, sc4dndbb, sc4_5reel_alt, sc4dndbb35, sc4_state, init_sc4dndbb, ROT0, "BFM", "Deal Or No Deal Break The Bank (Bellfruit) (Scorpion 4) (CRBE473, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // CRBE 473
-GAMEL( 200?, sc4dndbbg, sc4dndbb, sc4_5reel_alt, sc4dndbb35, sc4_state, init_sc4dndbb, ROT0, "BFM", "Deal Or No Deal Break The Bank (Bellfruit) (Scorpion 4) (CRBE473, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // CRBE 473
-GAMEL( 200?, sc4dndbbe, sc4dndbb, sc4_5reel_alt, sc4dndbb70, sc4_state, init_sc4dndbb, ROT0, "BFM", "Deal Or No Deal Break The Bank (Bellfruit) (Scorpion 4) (CRBE571, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // CRBE 571
-GAMEL( 200?, sc4dndbbh, sc4dndbb, sc4_5reel_alt, sc4dndbb70, sc4_state, init_sc4dndbb, ROT0, "BFM", "Deal Or No Deal Break The Bank (Bellfruit) (Scorpion 4) (CRBE571, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // CRBE 571
-GAMEL( 200?, sc4dndbbf, sc4dndbb, sc4_5reel_alt, sc4dndbb70, sc4_state, init_sc4dndbb, ROT0, "BFM", "Deal Or No Deal Break The Bank (Bellfruit) (Scorpion 4) (CRBE572, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // CRBE 572
-GAMEL( 200?, sc4dndbbi, sc4dndbb, sc4_5reel_alt, sc4dndbb70, sc4_state, init_sc4dndbb, ROT0, "BFM", "Deal Or No Deal Break The Bank (Bellfruit) (Scorpion 4) (CRBE572, set 2)", MACHINE_FLAGS, layout_bfm_sc4 )// CRBE 572
+GAMEL( 200?, sc4dndbb,  0,        sc4_5reel_alt, sc4dndbb35, sc4_state, init_sc4dndbb, ROT0, "BFM", "Deal or No Deal Break The Bank (Bellfruit) (Scorpion 4) (CRBE471, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // CRBE 471
+GAMEL( 200?, sc4dndbbb, sc4dndbb, sc4_5reel_alt, sc4dndbb35, sc4_state, init_sc4dndbb, ROT0, "BFM", "Deal or No Deal Break The Bank (Bellfruit) (Scorpion 4) (CRBE471, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // CRBE 471
+GAMEL( 200?, sc4dndbba, sc4dndbb, sc4_5reel_alt, sc4dndbb35, sc4_state, init_sc4dndbb, ROT0, "BFM", "Deal or No Deal Break The Bank (Bellfruit) (Scorpion 4) (CRBE472, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // CRBE 472
+GAMEL( 200?, sc4dndbbc, sc4dndbb, sc4_5reel_alt, sc4dndbb35, sc4_state, init_sc4dndbb, ROT0, "BFM", "Deal or No Deal Break The Bank (Bellfruit) (Scorpion 4) (CRBE472, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // CRBE 472
+GAMEL( 200?, sc4dndbbd, sc4dndbb, sc4_5reel_alt, sc4dndbb35, sc4_state, init_sc4dndbb, ROT0, "BFM", "Deal or No Deal Break The Bank (Bellfruit) (Scorpion 4) (CRBE473, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // CRBE 473
+GAMEL( 200?, sc4dndbbg, sc4dndbb, sc4_5reel_alt, sc4dndbb35, sc4_state, init_sc4dndbb, ROT0, "BFM", "Deal or No Deal Break The Bank (Bellfruit) (Scorpion 4) (CRBE473, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // CRBE 473
+GAMEL( 200?, sc4dndbbe, sc4dndbb, sc4_5reel_alt, sc4dndbb70, sc4_state, init_sc4dndbb, ROT0, "BFM", "Deal or No Deal Break The Bank (Bellfruit) (Scorpion 4) (CRBE571, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // CRBE 571
+GAMEL( 200?, sc4dndbbh, sc4dndbb, sc4_5reel_alt, sc4dndbb70, sc4_state, init_sc4dndbb, ROT0, "BFM", "Deal or No Deal Break The Bank (Bellfruit) (Scorpion 4) (CRBE571, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // CRBE 571
+GAMEL( 200?, sc4dndbbf, sc4dndbb, sc4_5reel_alt, sc4dndbb70, sc4_state, init_sc4dndbb, ROT0, "BFM", "Deal or No Deal Break The Bank (Bellfruit) (Scorpion 4) (CRBE572, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // CRBE 572
+GAMEL( 200?, sc4dndbbi, sc4dndbb, sc4_5reel_alt, sc4dndbb70, sc4_state, init_sc4dndbb, ROT0, "BFM", "Deal or No Deal Break The Bank (Bellfruit) (Scorpion 4) (CRBE572, set 2)", MACHINE_FLAGS, layout_bfm_sc4 )// CRBE 572
 
 
 
@@ -36062,14 +36062,14 @@ INPUT_PORTS_START( sc4dndcl500 )
 INPUT_PORTS_END
 
 // PR1949 CLUB DEAL OR NO DEAL         DEAL OR NO DEAL CLUB  PR1949 DEAL O N D SOUNDS11
-GAMEL( 200?, sc4dndclc, sc4dndcl, sc4, sc4dndcl,    sc4_state, init_sc4dndcl, ROT0, "BFM", "Deal Or No Deal Club (Bellfruit) (Scorpion 4) (DNDL181, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // DNDL 181 CLUB $500 (no key req?)
-GAMEL( 200?, sc4dndclg, sc4dndcl, sc4, sc4dndcl,    sc4_state, init_sc4dndcl, ROT0, "BFM", "Deal Or No Deal Club (Bellfruit) (Scorpion 4) (DNDL181, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // DNDL 181 CLUB $500 (no key req?)
-GAMEL( 200?, sc4dndcla, sc4dndcl, sc4, sc4dndcl500, sc4_state, init_sc4dndcl, ROT0, "BFM", "Deal Or No Deal Club (Bellfruit) (Scorpion 4) (DNDL212, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // DNDL 212 CLUB ?500
-GAMEL( 200?, sc4dndcle, sc4dndcl, sc4, sc4dndcl500, sc4_state, init_sc4dndcl, ROT0, "BFM", "Deal Or No Deal Club (Bellfruit) (Scorpion 4) (DNDL212, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // DNDL 212 CLUB ?500
-GAMEL( 200?, sc4dndcl,  0,        sc4, sc4dndcl250, sc4_state, init_sc4dndcl, ROT0, "BFM", "Deal Or No Deal Club (Bellfruit) (Scorpion 4) (DNDL313, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // DNDL 313 CLUB ?250
-GAMEL( 200?, sc4dndcld, sc4dndcl, sc4, sc4dndcl250, sc4_state, init_sc4dndcl, ROT0, "BFM", "Deal Or No Deal Club (Bellfruit) (Scorpion 4) (DNDL313, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // DNDL 313 CLUB ?250
-GAMEL( 200?, sc4dndclb, sc4dndcl, sc4, sc4dndcl250, sc4_state, init_sc4dndcl, ROT0, "BFM", "Deal Or No Deal Club (Bellfruit) (Scorpion 4) (DNDL391, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // DNDL 391 CLUB ?250
-GAMEL( 200?, sc4dndclf, sc4dndcl, sc4, sc4dndcl250, sc4_state, init_sc4dndcl, ROT0, "BFM", "Deal Or No Deal Club (Bellfruit) (Scorpion 4) (DNDL391, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // DNDL 391 CLUB ?250
+GAMEL( 200?, sc4dndclc, sc4dndcl, sc4, sc4dndcl,    sc4_state, init_sc4dndcl, ROT0, "BFM", "Deal or No Deal Club (Bellfruit) (Scorpion 4) (DNDL181, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // DNDL 181 CLUB $500 (no key req?)
+GAMEL( 200?, sc4dndclg, sc4dndcl, sc4, sc4dndcl,    sc4_state, init_sc4dndcl, ROT0, "BFM", "Deal or No Deal Club (Bellfruit) (Scorpion 4) (DNDL181, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // DNDL 181 CLUB $500 (no key req?)
+GAMEL( 200?, sc4dndcla, sc4dndcl, sc4, sc4dndcl500, sc4_state, init_sc4dndcl, ROT0, "BFM", "Deal or No Deal Club (Bellfruit) (Scorpion 4) (DNDL212, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // DNDL 212 CLUB ?500
+GAMEL( 200?, sc4dndcle, sc4dndcl, sc4, sc4dndcl500, sc4_state, init_sc4dndcl, ROT0, "BFM", "Deal or No Deal Club (Bellfruit) (Scorpion 4) (DNDL212, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // DNDL 212 CLUB ?500
+GAMEL( 200?, sc4dndcl,  0,        sc4, sc4dndcl250, sc4_state, init_sc4dndcl, ROT0, "BFM", "Deal or No Deal Club (Bellfruit) (Scorpion 4) (DNDL313, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // DNDL 313 CLUB ?250
+GAMEL( 200?, sc4dndcld, sc4dndcl, sc4, sc4dndcl250, sc4_state, init_sc4dndcl, ROT0, "BFM", "Deal or No Deal Club (Bellfruit) (Scorpion 4) (DNDL313, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // DNDL 313 CLUB ?250
+GAMEL( 200?, sc4dndclb, sc4dndcl, sc4, sc4dndcl250, sc4_state, init_sc4dndcl, ROT0, "BFM", "Deal or No Deal Club (Bellfruit) (Scorpion 4) (DNDL391, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // DNDL 391 CLUB ?250
+GAMEL( 200?, sc4dndclf, sc4dndcl, sc4, sc4dndcl250, sc4_state, init_sc4dndcl, ROT0, "BFM", "Deal or No Deal Club (Bellfruit) (Scorpion 4) (DNDL391, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // DNDL 391 CLUB ?250
 
 
 void sc4_state::init_sc4dnddd()
@@ -36156,14 +36156,14 @@ INPUT_PORTS_END
 
 
 // PR3235 AWP DEAL OR NO DEAL DOUBLE S4         PR3215 DOND DOUBLE SOUNDS11       DOUBLE DOND S.SITE
-GAMEL( 200?, sc4dnddd,  0,        sc4_5reel_alt, sc4dnddd35, sc4_state, init_sc4dnddd, ROT0, "BFM", "Deal Or No Deal Double Deal Or No Deal (Bellfruit) (Scorpion 4) (DDNO471, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // DDNO 471
-GAMEL( 200?, sc4dndddd, sc4dnddd, sc4_5reel_alt, sc4dnddd35, sc4_state, init_sc4dnddd, ROT0, "BFM", "Deal Or No Deal Double Deal Or No Deal (Bellfruit) (Scorpion 4) (DDNO471, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // DDNO 471
-GAMEL( 200?, sc4dnddda, sc4dnddd, sc4_5reel_alt, sc4dnddd70, sc4_state, init_sc4dnddd, ROT0, "BFM", "Deal Or No Deal Double Deal Or No Deal (Bellfruit) (Scorpion 4) (DDNO571, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // DDNO 571
-GAMEL( 200?, sc4dnddde, sc4dnddd, sc4_5reel_alt, sc4dnddd70, sc4_state, init_sc4dnddd, ROT0, "BFM", "Deal Or No Deal Double Deal Or No Deal (Bellfruit) (Scorpion 4) (DDNO571, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // DDNO 571
-GAMEL( 200?, sc4dndddb, sc4dnddd, sc4_5reel_alt, sc4dnddd70, sc4_state, init_sc4dnddd, ROT0, "BFM", "Deal Or No Deal Double Deal Or No Deal (Bellfruit) (Scorpion 4) (DDNO572, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // DDNO 572
-GAMEL( 200?, sc4dndddf, sc4dnddd, sc4_5reel_alt, sc4dnddd70, sc4_state, init_sc4dnddd, ROT0, "BFM", "Deal Or No Deal Double Deal Or No Deal (Bellfruit) (Scorpion 4) (DDNO572, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // DDNO 572
-GAMEL( 200?, sc4dndddc, sc4dnddd, sc4_5reel_alt, sc4dnddd70, sc4_state, init_sc4dnddd, ROT0, "BFM", "Deal Or No Deal Double Deal Or No Deal (Bellfruit) (Scorpion 4) (DDNO573, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // DDNO 573
-GAMEL( 200?, sc4dndddg, sc4dnddd, sc4_5reel_alt, sc4dnddd70, sc4_state, init_sc4dnddd, ROT0, "BFM", "Deal Or No Deal Double Deal Or No Deal (Bellfruit) (Scorpion 4) (DDNO573, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // DDNO 573
+GAMEL( 200?, sc4dnddd,  0,        sc4_5reel_alt, sc4dnddd35, sc4_state, init_sc4dnddd, ROT0, "BFM", "Deal or No Deal Double Deal or No Deal (Bellfruit) (Scorpion 4) (DDNO471, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // DDNO 471
+GAMEL( 200?, sc4dndddd, sc4dnddd, sc4_5reel_alt, sc4dnddd35, sc4_state, init_sc4dnddd, ROT0, "BFM", "Deal or No Deal Double Deal or No Deal (Bellfruit) (Scorpion 4) (DDNO471, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // DDNO 471
+GAMEL( 200?, sc4dnddda, sc4dnddd, sc4_5reel_alt, sc4dnddd70, sc4_state, init_sc4dnddd, ROT0, "BFM", "Deal or No Deal Double Deal or No Deal (Bellfruit) (Scorpion 4) (DDNO571, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // DDNO 571
+GAMEL( 200?, sc4dnddde, sc4dnddd, sc4_5reel_alt, sc4dnddd70, sc4_state, init_sc4dnddd, ROT0, "BFM", "Deal or No Deal Double Deal or No Deal (Bellfruit) (Scorpion 4) (DDNO571, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // DDNO 571
+GAMEL( 200?, sc4dndddb, sc4dnddd, sc4_5reel_alt, sc4dnddd70, sc4_state, init_sc4dnddd, ROT0, "BFM", "Deal or No Deal Double Deal or No Deal (Bellfruit) (Scorpion 4) (DDNO572, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // DDNO 572
+GAMEL( 200?, sc4dndddf, sc4dnddd, sc4_5reel_alt, sc4dnddd70, sc4_state, init_sc4dnddd, ROT0, "BFM", "Deal or No Deal Double Deal or No Deal (Bellfruit) (Scorpion 4) (DDNO572, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // DDNO 572
+GAMEL( 200?, sc4dndddc, sc4dnddd, sc4_5reel_alt, sc4dnddd70, sc4_state, init_sc4dnddd, ROT0, "BFM", "Deal or No Deal Double Deal or No Deal (Bellfruit) (Scorpion 4) (DDNO573, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // DDNO 573
+GAMEL( 200?, sc4dndddg, sc4dnddd, sc4_5reel_alt, sc4dnddd70, sc4_state, init_sc4dnddd, ROT0, "BFM", "Deal or No Deal Double Deal or No Deal (Bellfruit) (Scorpion 4) (DDNO573, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // DDNO 573
 
 
 
@@ -36251,19 +36251,19 @@ INPUT_PORTS_START( sc4dndhf70 )
 INPUT_PORTS_END
 
 // PR3038 DEAL OR NO DEAL HALL OF FAME SCORP4         PR3008 HALL OF FAME SOUNDS11      HALL OF FAME  S.SITE
-GAMEL( 200?, sc4dndhff, sc4dndhf, sc4_5reel_alt, sc4dndhf35, sc4_state, init_sc4dndhf, ROT0, "BFM", "Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (DNHA471, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // DNHA 471
-GAMEL( 200?, sc4dndhfh, sc4dndhf, sc4_5reel_alt, sc4dndhf35, sc4_state, init_sc4dndhf, ROT0, "BFM", "Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (DNHA471, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // DNHA 471
-GAMEL( 200?, sc4dndhfg, sc4dndhf, sc4_5reel_alt, sc4dndhf35, sc4_state, init_sc4dndhf, ROT0, "BFM", "Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (DNHA472, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // DNHA 472
-GAMEL( 200?, sc4dndhfi, sc4dndhf, sc4_5reel_alt, sc4dndhf35, sc4_state, init_sc4dndhf, ROT0, "BFM", "Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (DNHA472, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // DNHA 472
-GAMEL( 200?, sc4dndhf,  0,        sc4_5reel_alt, sc4dndhf35, sc4_state, init_sc4dndhf, ROT0, "BFM", "Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (DNHA473, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // DNHA 473
-GAMEL( 200?, sc4dndhfa, sc4dndhf, sc4_5reel_alt, sc4dndhf35, sc4_state, init_sc4dndhf, ROT0, "BFM", "Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (DNHA473, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // DNHA 473
-GAMEL( 200?, sc4dndhfj, sc4dndhf, sc4_5reel_alt, sc4dndhf35, sc4_state, init_sc4dndhf, ROT0, "BFM", "Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (DNHA476)",        MACHINE_FLAGS, layout_bfm_sc4 ) // DNHA 476
-GAMEL( 200?, sc4dndhfb, sc4dndhf, sc4_5reel_alt, sc4dndhf35, sc4_state, init_sc4dndhf, ROT0, "BFM", "Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (DNHA477, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // DNHA 477
-GAMEL( 200?, sc4dndhfd, sc4dndhf, sc4_5reel_alt, sc4dndhf35, sc4_state, init_sc4dndhf, ROT0, "BFM", "Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (DNHA477, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // DNHA 477
-GAMEL( 200?, sc4dndhfc, sc4dndhf, sc4_5reel_alt, sc4dndhf70, sc4_state, init_sc4dndhf, ROT0, "BFM", "Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (DNHA571, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // DNHA 571
-GAMEL( 200?, sc4dndhfe, sc4dndhf, sc4_5reel_alt, sc4dndhf70, sc4_state, init_sc4dndhf, ROT0, "BFM", "Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (DNHA571, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // DNHA 571
-GAMEL( 200?, sc4dndhfk, sc4dndhf, sc4_5reel_alt, sc4dndhf70, sc4_state, init_sc4dndhf, ROT0, "BFM", "Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (DNHA572, set 1, bad?)", MACHINE_FLAGS, layout_bfm_sc4 ) // error 51 (bad rom?)
-GAMEL( 200?, sc4dndhfl, sc4dndhf, sc4_5reel_alt, sc4dndhf70, sc4_state, init_sc4dndhf, ROT0, "BFM", "Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (DNHA572, set 2, bad?)", MACHINE_FLAGS, layout_bfm_sc4 ) // error 51 (bad rom?)
+GAMEL( 200?, sc4dndhff, sc4dndhf, sc4_5reel_alt, sc4dndhf35, sc4_state, init_sc4dndhf, ROT0, "BFM", "Deal or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (DNHA471, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // DNHA 471
+GAMEL( 200?, sc4dndhfh, sc4dndhf, sc4_5reel_alt, sc4dndhf35, sc4_state, init_sc4dndhf, ROT0, "BFM", "Deal or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (DNHA471, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // DNHA 471
+GAMEL( 200?, sc4dndhfg, sc4dndhf, sc4_5reel_alt, sc4dndhf35, sc4_state, init_sc4dndhf, ROT0, "BFM", "Deal or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (DNHA472, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // DNHA 472
+GAMEL( 200?, sc4dndhfi, sc4dndhf, sc4_5reel_alt, sc4dndhf35, sc4_state, init_sc4dndhf, ROT0, "BFM", "Deal or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (DNHA472, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // DNHA 472
+GAMEL( 200?, sc4dndhf,  0,        sc4_5reel_alt, sc4dndhf35, sc4_state, init_sc4dndhf, ROT0, "BFM", "Deal or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (DNHA473, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // DNHA 473
+GAMEL( 200?, sc4dndhfa, sc4dndhf, sc4_5reel_alt, sc4dndhf35, sc4_state, init_sc4dndhf, ROT0, "BFM", "Deal or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (DNHA473, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // DNHA 473
+GAMEL( 200?, sc4dndhfj, sc4dndhf, sc4_5reel_alt, sc4dndhf35, sc4_state, init_sc4dndhf, ROT0, "BFM", "Deal or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (DNHA476)",        MACHINE_FLAGS, layout_bfm_sc4 ) // DNHA 476
+GAMEL( 200?, sc4dndhfb, sc4dndhf, sc4_5reel_alt, sc4dndhf35, sc4_state, init_sc4dndhf, ROT0, "BFM", "Deal or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (DNHA477, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // DNHA 477
+GAMEL( 200?, sc4dndhfd, sc4dndhf, sc4_5reel_alt, sc4dndhf35, sc4_state, init_sc4dndhf, ROT0, "BFM", "Deal or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (DNHA477, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // DNHA 477
+GAMEL( 200?, sc4dndhfc, sc4dndhf, sc4_5reel_alt, sc4dndhf70, sc4_state, init_sc4dndhf, ROT0, "BFM", "Deal or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (DNHA571, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // DNHA 571
+GAMEL( 200?, sc4dndhfe, sc4dndhf, sc4_5reel_alt, sc4dndhf70, sc4_state, init_sc4dndhf, ROT0, "BFM", "Deal or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (DNHA571, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // DNHA 571
+GAMEL( 200?, sc4dndhfk, sc4dndhf, sc4_5reel_alt, sc4dndhf70, sc4_state, init_sc4dndhf, ROT0, "BFM", "Deal or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (DNHA572, set 1, bad?)", MACHINE_FLAGS, layout_bfm_sc4 ) // error 51 (bad rom?)
+GAMEL( 200?, sc4dndhfl, sc4dndhf, sc4_5reel_alt, sc4dndhf70, sc4_state, init_sc4dndhf, ROT0, "BFM", "Deal or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (DNHA572, set 2, bad?)", MACHINE_FLAGS, layout_bfm_sc4 ) // error 51 (bad rom?)
 
 void sc4_state::init_sc4dndys()
 {
@@ -36360,10 +36360,10 @@ INPUT_PORTS_END
 
 
 // PR3227 AWP DEAL OR NO DEAL ITS YOUR SHOW SCORP4         PR3207 ITS YOUR SHOW SOUNDS11     ITS YOUR SHOW S.SITE
-GAMEL( 200?, sc4dndys,  0,        sc4_200_5rc, sc4dndys70, sc4_state, init_sc4dndys, ROT0, "BFM", "Deal Or No Deal It's Your Show (Bellfruit) (Scorpion 4) (DOBO571, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // DOBO 571
-GAMEL( 200?, sc4dndysb, sc4dndys, sc4_200_5rc, sc4dndys70, sc4_state, init_sc4dndys, ROT0, "BFM", "Deal Or No Deal It's Your Show (Bellfruit) (Scorpion 4) (DOBO571, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // DOBO 571
-GAMEL( 200?, sc4dndysa, sc4dndys, sc4_200_5rc, sc4dndys35, sc4_state, init_sc4dndys, ROT0, "BFM", "Deal Or No Deal It's Your Show (Bellfruit) (Scorpion 4) (DOBO474, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // DOBO 474
-GAMEL( 200?, sc4dndysc, sc4dndys, sc4_200_5rc, sc4dndys35, sc4_state, init_sc4dndys, ROT0, "BFM", "Deal Or No Deal It's Your Show (Bellfruit) (Scorpion 4) (DOBO474, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // DOBO 474
+GAMEL( 200?, sc4dndys,  0,        sc4_200_5rc, sc4dndys70, sc4_state, init_sc4dndys, ROT0, "BFM", "Deal or No Deal It's Your Show (Bellfruit) (Scorpion 4) (DOBO571, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // DOBO 571
+GAMEL( 200?, sc4dndysb, sc4dndys, sc4_200_5rc, sc4dndys70, sc4_state, init_sc4dndys, ROT0, "BFM", "Deal or No Deal It's Your Show (Bellfruit) (Scorpion 4) (DOBO571, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // DOBO 571
+GAMEL( 200?, sc4dndysa, sc4dndys, sc4_200_5rc, sc4dndys35, sc4_state, init_sc4dndys, ROT0, "BFM", "Deal or No Deal It's Your Show (Bellfruit) (Scorpion 4) (DOBO474, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // DOBO 474
+GAMEL( 200?, sc4dndysc, sc4dndys, sc4_200_5rc, sc4dndys35, sc4_state, init_sc4dndys, ROT0, "BFM", "Deal or No Deal It's Your Show (Bellfruit) (Scorpion 4) (DOBO474, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // DOBO 474
 
 void sc4_state::init_sc4dndlp()
 {
@@ -36452,12 +36452,12 @@ INPUT_PORTS_END
 
 
 // PR3212 AWP DEAL OR NO DEAL LETS PLAY DEAL OR NO DEAL SCORP4         PR3212 LETS PLAY DOND SOUNDS11    LETS PLAY DOND  S.SITE
-GAMEL( 200?, sc4dndlp,  0,        sc4_5reel, sc4dndlp70, sc4_state, init_sc4dndlp, ROT0, "BFM", "Deal Or No Deal Let's Play Deal Or No Deal (Bellfruit) (Scorpion 4) (LPDN571, set 1)", MACHINE_FLAGS, layout_bfm_sc4 )// LPDN 571
-GAMEL( 200?, sc4dndlpc, sc4dndlp, sc4_5reel, sc4dndlp70, sc4_state, init_sc4dndlp, ROT0, "BFM", "Deal Or No Deal Let's Play Deal Or No Deal (Bellfruit) (Scorpion 4) (LPDN571, set 2)", MACHINE_FLAGS, layout_bfm_sc4 )// LPDN 571
-GAMEL( 200?, sc4dndlpa, sc4dndlp, sc4_5reel, sc4dndlp70, sc4_state, init_sc4dndlp, ROT0, "BFM", "Deal Or No Deal Let's Play Deal Or No Deal (Bellfruit) (Scorpion 4) (LPDN572, set 1)", MACHINE_FLAGS, layout_bfm_sc4 )// LPDN 572
-GAMEL( 200?, sc4dndlpd, sc4dndlp, sc4_5reel, sc4dndlp70, sc4_state, init_sc4dndlp, ROT0, "BFM", "Deal Or No Deal Let's Play Deal Or No Deal (Bellfruit) (Scorpion 4) (LPDN572, set 2)", MACHINE_FLAGS, layout_bfm_sc4 )// LPDN 572
-GAMEL( 200?, sc4dndlpb, sc4dndlp, sc4_5reel, sc4dndlp70, sc4_state, init_sc4dndlp, ROT0, "BFM", "Deal Or No Deal Let's Play Deal Or No Deal (Bellfruit) (Scorpion 4) (LPDN573, set 1)", MACHINE_FLAGS, layout_bfm_sc4 )// LPDN 573
-GAMEL( 200?, sc4dndlpe, sc4dndlp, sc4_5reel, sc4dndlp70, sc4_state, init_sc4dndlp, ROT0, "BFM", "Deal Or No Deal Let's Play Deal Or No Deal (Bellfruit) (Scorpion 4) (LPDN573, set 2)", MACHINE_FLAGS, layout_bfm_sc4 )// LPDN 573
+GAMEL( 200?, sc4dndlp,  0,        sc4_5reel, sc4dndlp70, sc4_state, init_sc4dndlp, ROT0, "BFM", "Deal or No Deal Let's Play Deal or No Deal (Bellfruit) (Scorpion 4) (LPDN571, set 1)", MACHINE_FLAGS, layout_bfm_sc4 )// LPDN 571
+GAMEL( 200?, sc4dndlpc, sc4dndlp, sc4_5reel, sc4dndlp70, sc4_state, init_sc4dndlp, ROT0, "BFM", "Deal or No Deal Let's Play Deal or No Deal (Bellfruit) (Scorpion 4) (LPDN571, set 2)", MACHINE_FLAGS, layout_bfm_sc4 )// LPDN 571
+GAMEL( 200?, sc4dndlpa, sc4dndlp, sc4_5reel, sc4dndlp70, sc4_state, init_sc4dndlp, ROT0, "BFM", "Deal or No Deal Let's Play Deal or No Deal (Bellfruit) (Scorpion 4) (LPDN572, set 1)", MACHINE_FLAGS, layout_bfm_sc4 )// LPDN 572
+GAMEL( 200?, sc4dndlpd, sc4dndlp, sc4_5reel, sc4dndlp70, sc4_state, init_sc4dndlp, ROT0, "BFM", "Deal or No Deal Let's Play Deal or No Deal (Bellfruit) (Scorpion 4) (LPDN572, set 2)", MACHINE_FLAGS, layout_bfm_sc4 )// LPDN 572
+GAMEL( 200?, sc4dndlpb, sc4dndlp, sc4_5reel, sc4dndlp70, sc4_state, init_sc4dndlp, ROT0, "BFM", "Deal or No Deal Let's Play Deal or No Deal (Bellfruit) (Scorpion 4) (LPDN573, set 1)", MACHINE_FLAGS, layout_bfm_sc4 )// LPDN 573
+GAMEL( 200?, sc4dndlpe, sc4dndlp, sc4_5reel, sc4dndlp70, sc4_state, init_sc4dndlp, ROT0, "BFM", "Deal or No Deal Let's Play Deal or No Deal (Bellfruit) (Scorpion 4) (LPDN573, set 2)", MACHINE_FLAGS, layout_bfm_sc4 )// LPDN 573
 
 void sc4_state::init_sc4dndra()
 {
@@ -36545,12 +36545,12 @@ INPUT_PORTS_START( sc4dndra70 )
 INPUT_PORTS_END
 
 // PR3221 AWP DEAL OR NO DEAL RED ALERT SCORP4         PR3201 DOND RED ALERT SOUNDS11    RED ALERT S.SITE
-GAMEL( 200?, sc4dndra,  0,        sc4_5reel_alt, sc4dndra35, sc4_state, init_sc4dndra, ROT0, "BFM", "Deal Or No Deal Red Alert (Bellfruit) (Scorpion 4) (REDT471, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // REDT 471
-GAMEL( 200?, sc4dndraa, sc4dndra, sc4_5reel_alt, sc4dndra35, sc4_state, init_sc4dndra, ROT0, "BFM", "Deal Or No Deal Red Alert (Bellfruit) (Scorpion 4) (REDT471, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // REDT 471
-GAMEL( 200?, sc4dndrab, sc4dndra, sc4_5reel_alt, sc4dndra35, sc4_state, init_sc4dndra, ROT0, "BFM", "Deal Or No Deal Red Alert (Bellfruit) (Scorpion 4) (REDT474, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // REDT 474
-GAMEL( 200?, sc4dndrad, sc4dndra, sc4_5reel_alt, sc4dndra35, sc4_state, init_sc4dndra, ROT0, "BFM", "Deal Or No Deal Red Alert (Bellfruit) (Scorpion 4) (REDT474, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // REDT 474
-GAMEL( 200?, sc4dndrac, sc4dndra, sc4_5reel_alt, sc4dndra70, sc4_state, init_sc4dndra, ROT0, "BFM", "Deal Or No Deal Red Alert (Bellfruit) (Scorpion 4) (REDT572, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // REDT 572
-GAMEL( 200?, sc4dndrae, sc4dndra, sc4_5reel_alt, sc4dndra70, sc4_state, init_sc4dndra, ROT0, "BFM", "Deal Or No Deal Red Alert (Bellfruit) (Scorpion 4) (REDT572, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // REDT 572
+GAMEL( 200?, sc4dndra,  0,        sc4_5reel_alt, sc4dndra35, sc4_state, init_sc4dndra, ROT0, "BFM", "Deal or No Deal Red Alert (Bellfruit) (Scorpion 4) (REDT471, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // REDT 471
+GAMEL( 200?, sc4dndraa, sc4dndra, sc4_5reel_alt, sc4dndra35, sc4_state, init_sc4dndra, ROT0, "BFM", "Deal or No Deal Red Alert (Bellfruit) (Scorpion 4) (REDT471, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // REDT 471
+GAMEL( 200?, sc4dndrab, sc4dndra, sc4_5reel_alt, sc4dndra35, sc4_state, init_sc4dndra, ROT0, "BFM", "Deal or No Deal Red Alert (Bellfruit) (Scorpion 4) (REDT474, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // REDT 474
+GAMEL( 200?, sc4dndrad, sc4dndra, sc4_5reel_alt, sc4dndra35, sc4_state, init_sc4dndra, ROT0, "BFM", "Deal or No Deal Red Alert (Bellfruit) (Scorpion 4) (REDT474, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // REDT 474
+GAMEL( 200?, sc4dndrac, sc4dndra, sc4_5reel_alt, sc4dndra70, sc4_state, init_sc4dndra, ROT0, "BFM", "Deal or No Deal Red Alert (Bellfruit) (Scorpion 4) (REDT572, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // REDT 572
+GAMEL( 200?, sc4dndrae, sc4dndra, sc4_5reel_alt, sc4dndra70, sc4_state, init_sc4dndra, ROT0, "BFM", "Deal or No Deal Red Alert (Bellfruit) (Scorpion 4) (REDT572, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // REDT 572
 
 
 void sc4_state::init_sc4dndbd()
@@ -36643,12 +36643,12 @@ INPUT_PORTS_END
 
 
 // PR3230 AWP DEAL OR NO DEAL THE BIG DEAL SCORP4         PR3210 THE BIG DEAL SOUNDS11      THE BIG DEAL  S.SITE
-GAMEL( 200?, sc4dndbd,  0,        sc4_5reel, sc4dndbd35, sc4_state, init_sc4dndbd, ROT0, "BFM", "Deal Or No Deal The Big Deal (Bellfruit) (Scorpion 4) (BGDA471, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // BGDA 471
-GAMEL( 200?, sc4dndbda, sc4dndbd, sc4_5reel, sc4dndbd35, sc4_state, init_sc4dndbd, ROT0, "BFM", "Deal Or No Deal The Big Deal (Bellfruit) (Scorpion 4) (BGDA471, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // BGDA 471
-GAMEL( 200?, sc4dndbdb, sc4dndbd, sc4_5reel, sc4dndbd35, sc4_state, init_sc4dndbd, ROT0, "BFM", "Deal Or No Deal The Big Deal (Bellfruit) (Scorpion 4) (BGDA472, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // BGDA 472
-GAMEL( 200?, sc4dndbdd, sc4dndbd, sc4_5reel, sc4dndbd35, sc4_state, init_sc4dndbd, ROT0, "BFM", "Deal Or No Deal The Big Deal (Bellfruit) (Scorpion 4) (BGDA472, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // BGDA 472
-GAMEL( 200?, sc4dndbdc, sc4dndbd, sc4_5reel, sc4dndbd70, sc4_state, init_sc4dndbd, ROT0, "BFM", "Deal Or No Deal The Big Deal (Bellfruit) (Scorpion 4) (BGDA571, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // BGDA 571
-GAMEL( 200?, sc4dndbde, sc4dndbd, sc4_5reel, sc4dndbd70, sc4_state, init_sc4dndbd, ROT0, "BFM", "Deal Or No Deal The Big Deal (Bellfruit) (Scorpion 4) (BGDA571, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // BGDA 571
+GAMEL( 200?, sc4dndbd,  0,        sc4_5reel, sc4dndbd35, sc4_state, init_sc4dndbd, ROT0, "BFM", "Deal or No Deal The Big Deal (Bellfruit) (Scorpion 4) (BGDA471, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // BGDA 471
+GAMEL( 200?, sc4dndbda, sc4dndbd, sc4_5reel, sc4dndbd35, sc4_state, init_sc4dndbd, ROT0, "BFM", "Deal or No Deal The Big Deal (Bellfruit) (Scorpion 4) (BGDA471, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // BGDA 471
+GAMEL( 200?, sc4dndbdb, sc4dndbd, sc4_5reel, sc4dndbd35, sc4_state, init_sc4dndbd, ROT0, "BFM", "Deal or No Deal The Big Deal (Bellfruit) (Scorpion 4) (BGDA472, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // BGDA 472
+GAMEL( 200?, sc4dndbdd, sc4dndbd, sc4_5reel, sc4dndbd35, sc4_state, init_sc4dndbd, ROT0, "BFM", "Deal or No Deal The Big Deal (Bellfruit) (Scorpion 4) (BGDA472, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // BGDA 472
+GAMEL( 200?, sc4dndbdc, sc4dndbd, sc4_5reel, sc4dndbd70, sc4_state, init_sc4dndbd, ROT0, "BFM", "Deal or No Deal The Big Deal (Bellfruit) (Scorpion 4) (BGDA571, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // BGDA 571
+GAMEL( 200?, sc4dndbde, sc4dndbd, sc4_5reel, sc4dndbd70, sc4_state, init_sc4dndbd, ROT0, "BFM", "Deal or No Deal The Big Deal (Bellfruit) (Scorpion 4) (BGDA571, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // BGDA 571
 
 
 void sc4_state::init_sc4dndbr()
@@ -36736,14 +36736,14 @@ INPUT_PORTS_END
 
 
 // PR3041 AWP DEAL OR NO DEAL THE BIG REDS S4         PR3011 THE BIG REDS SOUNDS11      THE BIG REDS  S.SITE
-GAMEL( 200?, sc4dndbr,  0,        sc4_5reel_alt, sc4dndbr35, sc4_state, init_sc4dndbr, ROT0, "BFM", "Deal Or No Deal The Big Reds (Bellfruit) (Scorpion 4) (BIGD471, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // BIGD 471
-GAMEL( 200?, sc4dndbrb, sc4dndbr, sc4_5reel_alt, sc4dndbr35, sc4_state, init_sc4dndbr, ROT0, "BFM", "Deal Or No Deal The Big Reds (Bellfruit) (Scorpion 4) (BIGD471, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // BIGD 471
-GAMEL( 200?, sc4dndbra, sc4dndbr, sc4_5reel_alt, sc4dndbr35, sc4_state, init_sc4dndbr, ROT0, "BFM", "Deal Or No Deal The Big Reds (Bellfruit) (Scorpion 4) (BIGD472, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // BIGD 472
-GAMEL( 200?, sc4dndbrc, sc4dndbr, sc4_5reel_alt, sc4dndbr35, sc4_state, init_sc4dndbr, ROT0, "BFM", "Deal Or No Deal The Big Reds (Bellfruit) (Scorpion 4) (BIGD472, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // BIGD 472
-GAMEL( 200?, sc4dndbrd, sc4dndbr, sc4_5reel_alt, sc4dndbr35, sc4_state, init_sc4dndbr, ROT0, "BFM", "Deal Or No Deal The Big Reds (Bellfruit) (Scorpion 4) (BIGD475, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // BIGD 475
-GAMEL( 200?, sc4dndbrf, sc4dndbr, sc4_5reel_alt, sc4dndbr35, sc4_state, init_sc4dndbr, ROT0, "BFM", "Deal Or No Deal The Big Reds (Bellfruit) (Scorpion 4) (BIGD475, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // BIGD 475
-GAMEL( 200?, sc4dndbre, sc4dndbr, sc4_5reel_alt, sc4dndbr70, sc4_state, init_sc4dndbr, ROT0, "BFM", "Deal Or No Deal The Big Reds (Bellfruit) (Scorpion 4) (BIGD571, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // BIGD 571
-GAMEL( 200?, sc4dndbrg, sc4dndbr, sc4_5reel_alt, sc4dndbr70, sc4_state, init_sc4dndbr, ROT0, "BFM", "Deal Or No Deal The Big Reds (Bellfruit) (Scorpion 4) (BIGD571, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // BIGD 571
+GAMEL( 200?, sc4dndbr,  0,        sc4_5reel_alt, sc4dndbr35, sc4_state, init_sc4dndbr, ROT0, "BFM", "Deal or No Deal The Big Reds (Bellfruit) (Scorpion 4) (BIGD471, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // BIGD 471
+GAMEL( 200?, sc4dndbrb, sc4dndbr, sc4_5reel_alt, sc4dndbr35, sc4_state, init_sc4dndbr, ROT0, "BFM", "Deal or No Deal The Big Reds (Bellfruit) (Scorpion 4) (BIGD471, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // BIGD 471
+GAMEL( 200?, sc4dndbra, sc4dndbr, sc4_5reel_alt, sc4dndbr35, sc4_state, init_sc4dndbr, ROT0, "BFM", "Deal or No Deal The Big Reds (Bellfruit) (Scorpion 4) (BIGD472, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // BIGD 472
+GAMEL( 200?, sc4dndbrc, sc4dndbr, sc4_5reel_alt, sc4dndbr35, sc4_state, init_sc4dndbr, ROT0, "BFM", "Deal or No Deal The Big Reds (Bellfruit) (Scorpion 4) (BIGD472, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // BIGD 472
+GAMEL( 200?, sc4dndbrd, sc4dndbr, sc4_5reel_alt, sc4dndbr35, sc4_state, init_sc4dndbr, ROT0, "BFM", "Deal or No Deal The Big Reds (Bellfruit) (Scorpion 4) (BIGD475, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // BIGD 475
+GAMEL( 200?, sc4dndbrf, sc4dndbr, sc4_5reel_alt, sc4dndbr35, sc4_state, init_sc4dndbr, ROT0, "BFM", "Deal or No Deal The Big Reds (Bellfruit) (Scorpion 4) (BIGD475, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // BIGD 475
+GAMEL( 200?, sc4dndbre, sc4dndbr, sc4_5reel_alt, sc4dndbr70, sc4_state, init_sc4dndbr, ROT0, "BFM", "Deal or No Deal The Big Reds (Bellfruit) (Scorpion 4) (BIGD571, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // BIGD 571
+GAMEL( 200?, sc4dndbrg, sc4dndbr, sc4_5reel_alt, sc4dndbr70, sc4_state, init_sc4dndbr, ROT0, "BFM", "Deal or No Deal The Big Reds (Bellfruit) (Scorpion 4) (BIGD571, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // BIGD 571
 
 
 void sc4_state::init_sc4dndcc()
@@ -36836,13 +36836,13 @@ INPUT_PORTS_END
 
 
 // PR3047 AWP DEAL OR NO DEAL THE CRAZY CHAIR SCORP4         PR3017 CRAZY CHAIR SOUNDS11       CRAZY CHAIR S.SITE
-GAMEL( 200?, sc4dndcc,  0,        sc4_5reel, sc4dndcc35, sc4_state, init_sc4dndcc, ROT0, "BFM", "Deal Or No Deal The Crazy Chair (Bellfruit) (Scorpion 4) (CRZR471, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // CRZR 471
-GAMEL( 200?, sc4dndccb, sc4dndcc, sc4_5reel, sc4dndcc35, sc4_state, init_sc4dndcc, ROT0, "BFM", "Deal Or No Deal The Crazy Chair (Bellfruit) (Scorpion 4) (CRZR471, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // CRZR 471, incomplete pairing
-GAMEL( 200?, sc4dndcca, sc4dndcc, sc4_5reel, sc4dndcc35, sc4_state, init_sc4dndcc, ROT0, "BFM", "Deal Or No Deal The Crazy Chair (Bellfruit) (Scorpion 4) (CRZR474)",        MACHINE_FLAGS, layout_bfm_sc4 ) // CRZR 474
-GAMEL( 200?, sc4dndccc, sc4dndcc, sc4_5reel, sc4dndcc35, sc4_state, init_sc4dndcc, ROT0, "BFM", "Deal Or No Deal The Crazy Chair (Bellfruit) (Scorpion 4) (CRZR475, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // CRZR 475
-GAMEL( 200?, sc4dndcce, sc4dndcc, sc4_5reel, sc4dndcc35, sc4_state, init_sc4dndcc, ROT0, "BFM", "Deal Or No Deal The Crazy Chair (Bellfruit) (Scorpion 4) (CRZR475, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // CRZR 475
-GAMEL( 200?, sc4dndccd, sc4dndcc, sc4_5reel, sc4dndcc70, sc4_state, init_sc4dndcc, ROT0, "BFM", "Deal Or No Deal The Crazy Chair (Bellfruit) (Scorpion 4) (CRZR571, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // CRZR 571
-GAMEL( 200?, sc4dndccf, sc4dndcc, sc4_5reel, sc4dndcc70, sc4_state, init_sc4dndcc, ROT0, "BFM", "Deal Or No Deal The Crazy Chair (Bellfruit) (Scorpion 4) (CRZR571, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // CRZR 571
+GAMEL( 200?, sc4dndcc,  0,        sc4_5reel, sc4dndcc35, sc4_state, init_sc4dndcc, ROT0, "BFM", "Deal or No Deal The Crazy Chair (Bellfruit) (Scorpion 4) (CRZR471, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // CRZR 471
+GAMEL( 200?, sc4dndccb, sc4dndcc, sc4_5reel, sc4dndcc35, sc4_state, init_sc4dndcc, ROT0, "BFM", "Deal or No Deal The Crazy Chair (Bellfruit) (Scorpion 4) (CRZR471, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // CRZR 471, incomplete pairing
+GAMEL( 200?, sc4dndcca, sc4dndcc, sc4_5reel, sc4dndcc35, sc4_state, init_sc4dndcc, ROT0, "BFM", "Deal or No Deal The Crazy Chair (Bellfruit) (Scorpion 4) (CRZR474)",        MACHINE_FLAGS, layout_bfm_sc4 ) // CRZR 474
+GAMEL( 200?, sc4dndccc, sc4dndcc, sc4_5reel, sc4dndcc35, sc4_state, init_sc4dndcc, ROT0, "BFM", "Deal or No Deal The Crazy Chair (Bellfruit) (Scorpion 4) (CRZR475, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // CRZR 475
+GAMEL( 200?, sc4dndcce, sc4dndcc, sc4_5reel, sc4dndcc35, sc4_state, init_sc4dndcc, ROT0, "BFM", "Deal or No Deal The Crazy Chair (Bellfruit) (Scorpion 4) (CRZR475, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // CRZR 475
+GAMEL( 200?, sc4dndccd, sc4dndcc, sc4_5reel, sc4dndcc70, sc4_state, init_sc4dndcc, ROT0, "BFM", "Deal or No Deal The Crazy Chair (Bellfruit) (Scorpion 4) (CRZR571, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // CRZR 571
+GAMEL( 200?, sc4dndccf, sc4dndcc, sc4_5reel, sc4dndcc70, sc4_state, init_sc4dndcc, ROT0, "BFM", "Deal or No Deal The Crazy Chair (Bellfruit) (Scorpion 4) (CRZR571, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // CRZR 571
 
 void sc4_state::init_sc4dnddw()
 {
@@ -36931,14 +36931,14 @@ INPUT_PORTS_START( sc4dnddw70 )
 INPUT_PORTS_END
 
 // PR3043 AWP THE DEAL WHEEL S4         PR3202 THE DEAL WHEEL SOUNDS11    THE DEAL WHEEL  S.SITE
-GAMEL( 200?, sc4dnddw,  0,        sc4_200_5ra, sc4dnddw35, sc4_state, init_sc4dnddw, ROT0, "BFM", "Deal Or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (DOFN471, set 1)", MACHINE_FLAGS, layout_sc4dnddw ) // DOFN 471
-GAMEL( 200?, sc4dnddwb, sc4dnddw, sc4_200_5ra, sc4dnddw35, sc4_state, init_sc4dnddw, ROT0, "BFM", "Deal Or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (DOFN471, set 2)", MACHINE_FLAGS, layout_sc4dnddw ) // DOFN 471
-GAMEL( 200?, sc4dnddwa, sc4dnddw, sc4_200_5ra, sc4dnddw35, sc4_state, init_sc4dnddw, ROT0, "BFM", "Deal Or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (DOFN473, set 1)", MACHINE_FLAGS, layout_sc4dnddw ) // DOFN 473
-GAMEL( 200?, sc4dnddwc, sc4dnddw, sc4_200_5ra, sc4dnddw35, sc4_state, init_sc4dnddw, ROT0, "BFM", "Deal Or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (DOFN473, set 2)", MACHINE_FLAGS, layout_sc4dnddw ) // DOFN 473
-GAMEL( 200?, sc4dnddwd, sc4dnddw, sc4_200_5ra, sc4dnddw35, sc4_state, init_sc4dnddw, ROT0, "BFM", "Deal Or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (DOFN475, set 1)", MACHINE_FLAGS, layout_sc4dnddw ) // DOFN 475
-GAMEL( 200?, sc4dnddwf, sc4dnddw, sc4_200_5ra, sc4dnddw35, sc4_state, init_sc4dnddw, ROT0, "BFM", "Deal Or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (DOFN475, set 2)", MACHINE_FLAGS, layout_sc4dnddw ) // DOFN 475
-GAMEL( 200?, sc4dnddwe, sc4dnddw, sc4_200_5ra, sc4dnddw70, sc4_state, init_sc4dnddw, ROT0, "BFM", "Deal Or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (DOFN572, set 1)", MACHINE_FLAGS, layout_sc4dnddw ) // DOFN 572
-GAMEL( 200?, sc4dnddwg, sc4dnddw, sc4_200_5ra, sc4dnddw70, sc4_state, init_sc4dnddw, ROT0, "BFM", "Deal Or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (DOFN572, set 2)", MACHINE_FLAGS, layout_sc4dnddw ) // DOFN 572
+GAMEL( 200?, sc4dnddw,  0,        sc4_200_5ra, sc4dnddw35, sc4_state, init_sc4dnddw, ROT0, "BFM", "Deal or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (DOFN471, set 1)", MACHINE_FLAGS, layout_sc4dnddw ) // DOFN 471
+GAMEL( 200?, sc4dnddwb, sc4dnddw, sc4_200_5ra, sc4dnddw35, sc4_state, init_sc4dnddw, ROT0, "BFM", "Deal or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (DOFN471, set 2)", MACHINE_FLAGS, layout_sc4dnddw ) // DOFN 471
+GAMEL( 200?, sc4dnddwa, sc4dnddw, sc4_200_5ra, sc4dnddw35, sc4_state, init_sc4dnddw, ROT0, "BFM", "Deal or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (DOFN473, set 1)", MACHINE_FLAGS, layout_sc4dnddw ) // DOFN 473
+GAMEL( 200?, sc4dnddwc, sc4dnddw, sc4_200_5ra, sc4dnddw35, sc4_state, init_sc4dnddw, ROT0, "BFM", "Deal or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (DOFN473, set 2)", MACHINE_FLAGS, layout_sc4dnddw ) // DOFN 473
+GAMEL( 200?, sc4dnddwd, sc4dnddw, sc4_200_5ra, sc4dnddw35, sc4_state, init_sc4dnddw, ROT0, "BFM", "Deal or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (DOFN475, set 1)", MACHINE_FLAGS, layout_sc4dnddw ) // DOFN 475
+GAMEL( 200?, sc4dnddwf, sc4dnddw, sc4_200_5ra, sc4dnddw35, sc4_state, init_sc4dnddw, ROT0, "BFM", "Deal or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (DOFN475, set 2)", MACHINE_FLAGS, layout_sc4dnddw ) // DOFN 475
+GAMEL( 200?, sc4dnddwe, sc4dnddw, sc4_200_5ra, sc4dnddw70, sc4_state, init_sc4dnddw, ROT0, "BFM", "Deal or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (DOFN572, set 1)", MACHINE_FLAGS, layout_sc4dnddw ) // DOFN 572
+GAMEL( 200?, sc4dnddwg, sc4dnddw, sc4_200_5ra, sc4dnddw70, sc4_state, init_sc4dnddw, ROT0, "BFM", "Deal or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (DOFN572, set 2)", MACHINE_FLAGS, layout_sc4dnddw ) // DOFN 572
 
 void sc4_state::init_sc4dnddf()
 {
@@ -37024,12 +37024,12 @@ INPUT_PORTS_START( sc4dnddf70 )
 INPUT_PORTS_END
 
 // PR3044 AWP DEAL OR NO DEAL THE DREAM FACTORY SCORP4         PR3014 DREAM FACTORY SOUNDS11     DREAM FACTORY S.SITE
-GAMEL( 200?, sc4dnddf,  0,        sc4_200_alt, sc4dnddf35, sc4_state, init_sc4dnddf, ROT0, "BFM", "Deal Or No Deal The Dream Factory (Bellfruit) (Scorpion 4) (TDFC471, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // TDFC 471
-GAMEL( 200?, sc4dnddfa, sc4dnddf, sc4_200_alt, sc4dnddf35, sc4_state, init_sc4dnddf, ROT0, "BFM", "Deal Or No Deal The Dream Factory (Bellfruit) (Scorpion 4) (TDFC471, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // TDFC 471, incomplete pairing
-GAMEL( 200?, sc4dnddfb, sc4dnddf, sc4_200_alt, sc4dnddf35, sc4_state, init_sc4dnddf, ROT0, "BFM", "Deal Or No Deal The Dream Factory (Bellfruit) (Scorpion 4) (TDFC475, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // TDFC 475
-GAMEL( 200?, sc4dnddfd, sc4dnddf, sc4_200_alt, sc4dnddf35, sc4_state, init_sc4dnddf, ROT0, "BFM", "Deal Or No Deal The Dream Factory (Bellfruit) (Scorpion 4) (TDFC475, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // TDFC 475
-GAMEL( 200?, sc4dnddfc, sc4dnddf, sc4_200_alt, sc4dnddf70, sc4_state, init_sc4dnddf, ROT0, "BFM", "Deal Or No Deal The Dream Factory (Bellfruit) (Scorpion 4) (TDFC571, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // TDFC 571
-GAMEL( 200?, sc4dnddfe, sc4dnddf, sc4_200_alt, sc4dnddf70, sc4_state, init_sc4dnddf, ROT0, "BFM", "Deal Or No Deal The Dream Factory (Bellfruit) (Scorpion 4) (TDFC571, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // TDFC 571
+GAMEL( 200?, sc4dnddf,  0,        sc4_200_alt, sc4dnddf35, sc4_state, init_sc4dnddf, ROT0, "BFM", "Deal or No Deal The Dream Factory (Bellfruit) (Scorpion 4) (TDFC471, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // TDFC 471
+GAMEL( 200?, sc4dnddfa, sc4dnddf, sc4_200_alt, sc4dnddf35, sc4_state, init_sc4dnddf, ROT0, "BFM", "Deal or No Deal The Dream Factory (Bellfruit) (Scorpion 4) (TDFC471, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // TDFC 471, incomplete pairing
+GAMEL( 200?, sc4dnddfb, sc4dnddf, sc4_200_alt, sc4dnddf35, sc4_state, init_sc4dnddf, ROT0, "BFM", "Deal or No Deal The Dream Factory (Bellfruit) (Scorpion 4) (TDFC475, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // TDFC 475
+GAMEL( 200?, sc4dnddfd, sc4dnddf, sc4_200_alt, sc4dnddf35, sc4_state, init_sc4dnddf, ROT0, "BFM", "Deal or No Deal The Dream Factory (Bellfruit) (Scorpion 4) (TDFC475, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // TDFC 475
+GAMEL( 200?, sc4dnddfc, sc4dnddf, sc4_200_alt, sc4dnddf70, sc4_state, init_sc4dnddf, ROT0, "BFM", "Deal or No Deal The Dream Factory (Bellfruit) (Scorpion 4) (TDFC571, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // TDFC 571
+GAMEL( 200?, sc4dnddfe, sc4dnddf, sc4_200_alt, sc4dnddf70, sc4_state, init_sc4dnddf, ROT0, "BFM", "Deal or No Deal The Dream Factory (Bellfruit) (Scorpion 4) (TDFC571, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // TDFC 571
 
 
 void sc4_state::init_sc4dndpg()
@@ -37122,12 +37122,12 @@ INPUT_PORTS_END
 
 
 // PR3240 AWP DEAL OR NO DEAL THE PERFECT GAME SCORP4         PR3220 DOND PERFECT SOUNDS11      THE PERFECT GAME  S.SITE
-GAMEL( 200?, sc4dndpg,  0,        sc4_5reel, sc4dndpg35, sc4_state, init_sc4dndpg, ROT0, "BFM", "Deal Or No Deal The Perfect Game (Bellfruit) (Scorpion 4) (TPBG471, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // TPGB 471
-GAMEL( 200?, sc4dndpgc, sc4dndpg, sc4_5reel, sc4dndpg35, sc4_state, init_sc4dndpg, ROT0, "BFM", "Deal Or No Deal The Perfect Game (Bellfruit) (Scorpion 4) (TPBG471, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // TPBG 471
-GAMEL( 200?, sc4dndpga, sc4dndpg, sc4_5reel, sc4dndpg70, sc4_state, init_sc4dndpg, ROT0, "BFM", "Deal Or No Deal The Perfect Game (Bellfruit) (Scorpion 4) (TPBG571, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // TPGB 571
-GAMEL( 200?, sc4dndpgd, sc4dndpg, sc4_5reel, sc4dndpg70, sc4_state, init_sc4dndpg, ROT0, "BFM", "Deal Or No Deal The Perfect Game (Bellfruit) (Scorpion 4) (TPGB571, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // TPGB 571
-GAMEL( 200?, sc4dndpgb, sc4dndpg, sc4_5reel, sc4dndpg70, sc4_state, init_sc4dndpg, ROT0, "BFM", "Deal Or No Deal The Perfect Game (Bellfruit) (Scorpion 4) (TPBG572, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // TPGB 572
-GAMEL( 200?, sc4dndpge, sc4dndpg, sc4_5reel, sc4dndpg70, sc4_state, init_sc4dndpg, ROT0, "BFM", "Deal Or No Deal The Perfect Game (Bellfruit) (Scorpion 4) (TPGB572, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // TPGB 572
+GAMEL( 200?, sc4dndpg,  0,        sc4_5reel, sc4dndpg35, sc4_state, init_sc4dndpg, ROT0, "BFM", "Deal or No Deal The Perfect Game (Bellfruit) (Scorpion 4) (TPBG471, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // TPGB 471
+GAMEL( 200?, sc4dndpgc, sc4dndpg, sc4_5reel, sc4dndpg35, sc4_state, init_sc4dndpg, ROT0, "BFM", "Deal or No Deal The Perfect Game (Bellfruit) (Scorpion 4) (TPBG471, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // TPBG 471
+GAMEL( 200?, sc4dndpga, sc4dndpg, sc4_5reel, sc4dndpg70, sc4_state, init_sc4dndpg, ROT0, "BFM", "Deal or No Deal The Perfect Game (Bellfruit) (Scorpion 4) (TPBG571, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // TPGB 571
+GAMEL( 200?, sc4dndpgd, sc4dndpg, sc4_5reel, sc4dndpg70, sc4_state, init_sc4dndpg, ROT0, "BFM", "Deal or No Deal The Perfect Game (Bellfruit) (Scorpion 4) (TPGB571, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // TPGB 571
+GAMEL( 200?, sc4dndpgb, sc4dndpg, sc4_5reel, sc4dndpg70, sc4_state, init_sc4dndpg, ROT0, "BFM", "Deal or No Deal The Perfect Game (Bellfruit) (Scorpion 4) (TPBG572, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // TPGB 572
+GAMEL( 200?, sc4dndpge, sc4dndpg, sc4_5reel, sc4dndpg70, sc4_state, init_sc4dndpg, ROT0, "BFM", "Deal or No Deal The Perfect Game (Bellfruit) (Scorpion 4) (TPGB572, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // TPGB 572
 
 
 void sc4_state::init_sc4dndtp()
@@ -37204,20 +37204,20 @@ INPUT_PORTS_START( sc4dndtp35 )
 INPUT_PORTS_END
 
 // PR3033 AWP DOND THE POWER 5 SCORP4         PR3033 POWER FIVE SOUNDS11        DOND THE POWER 5  S.SITE
-GAMEL( 200?, sc4dndtp,  0,        sc4_5reel, sc4dndtp35, sc4_state, init_sc4dndtp, ROT0, "BFM", "Deal Or No Deal The Power 5 (Bellfruit) (Scorpion 4) (TPRV411, set 1)", MACHINE_FLAGS, layout_sc4dndtp ) // TPRV 411
-GAMEL( 200?, sc4dndtpe, sc4dndtp, sc4_5reel, sc4dndtp35, sc4_state, init_sc4dndtp, ROT0, "BFM", "Deal Or No Deal The Power 5 (Bellfruit) (Scorpion 4) (TPRV411, set 2)", MACHINE_FLAGS, layout_sc4dndtp ) // TPRV 411
-GAMEL( 200?, sc4dndtpa, sc4dndtp, sc4_5reel, sc4dndtp35, sc4_state, init_sc4dndtp, ROT0, "BFM", "Deal Or No Deal The Power 5 (Bellfruit) (Scorpion 4) (TPRV412, set 1)", MACHINE_FLAGS, layout_sc4dndtp ) // TPRV 412
-GAMEL( 200?, sc4dndtpf, sc4dndtp, sc4_5reel, sc4dndtp35, sc4_state, init_sc4dndtp, ROT0, "BFM", "Deal Or No Deal The Power 5 (Bellfruit) (Scorpion 4) (TPRV412, set 2)", MACHINE_FLAGS, layout_sc4dndtp ) // TPRV 412
-GAMEL( 200?, sc4dndtpb, sc4dndtp, sc4_5reel, sc4dndtp35, sc4_state, init_sc4dndtp, ROT0, "BFM", "Deal Or No Deal The Power 5 (Bellfruit) (Scorpion 4) (TPRV413, set 1)", MACHINE_FLAGS, layout_sc4dndtp ) // TPRV 413
-GAMEL( 200?, sc4dndtpg, sc4dndtp, sc4_5reel, sc4dndtp35, sc4_state, init_sc4dndtp, ROT0, "BFM", "Deal Or No Deal The Power 5 (Bellfruit) (Scorpion 4) (TPRV413, set 2)", MACHINE_FLAGS, layout_sc4dndtp ) // TPRV 413
-GAMEL( 200?, sc4dndtpc, sc4dndtp, sc4_5reel, sc4dndtp35, sc4_state, init_sc4dndtp, ROT0, "BFM", "Deal Or No Deal The Power 5 (Bellfruit) (Scorpion 4) (TPRV414, set 1, bad)", MACHINE_FLAGS, layout_sc4dndtp ) // TPRV 414 EEPROM error (bad rom?) (botched release?)
-GAMEL( 200?, sc4dndtph, sc4dndtp, sc4_5reel, sc4dndtp35, sc4_state, init_sc4dndtp, ROT0, "BFM", "Deal Or No Deal The Power 5 (Bellfruit) (Scorpion 4) (TPRV414, set 2, bad)", MACHINE_FLAGS, layout_sc4dndtp ) // TPRV 414 EEPROM error (bad rom?) (botched release?)
-GAMEL( 200?, sc4dndtpd, sc4dndtp, sc4_5reel, sc4dndtp35, sc4_state, init_sc4dndtp, ROT0, "BFM", "Deal Or No Deal The Power 5 (Bellfruit) (Scorpion 4) (TPRV415, set 1)", MACHINE_FLAGS, layout_sc4dndtp ) // TPRV 415
-GAMEL( 200?, sc4dndtpi, sc4dndtp, sc4_5reel, sc4dndtp35, sc4_state, init_sc4dndtp, ROT0, "BFM", "Deal Or No Deal The Power 5 (Bellfruit) (Scorpion 4) (TPRV415, set 2)", MACHINE_FLAGS, layout_sc4dndtp )// TPRV 415
-GAMEL( 200?, sc4dndtpl, sc4dndtp, sc4_5reel, sc4dndtp35, sc4_state, init_sc4dndtp, ROT0, "BFM", "Deal Or No Deal The Power 5 (Bellfruit) (Scorpion 4) (TPRV416, set 1)", MACHINE_FLAGS, layout_sc4dndtp )// TPRV 416
-GAMEL( 200?, sc4dndtpm, sc4dndtp, sc4_5reel, sc4dndtp35, sc4_state, init_sc4dndtp, ROT0, "BFM", "Deal Or No Deal The Power 5 (Bellfruit) (Scorpion 4) (TPRV416, set 2)", MACHINE_FLAGS, layout_sc4dndtp )// TPRV 416
-GAMEL( 200?, sc4dndtpj, sc4dndtp, sc4_5reel, sc4dndtp35, sc4_state, init_sc4dndtp, ROT0, "BFM", "Deal Or No Deal The Power 5 (Bellfruit) (Scorpion 4) (TPRV41A, set 1)", MACHINE_FLAGS, layout_sc4dndtp )// TPRV 41A
-GAMEL( 200?, sc4dndtpk, sc4dndtp, sc4_5reel, sc4dndtp35, sc4_state, init_sc4dndtp, ROT0, "BFM", "Deal Or No Deal The Power 5 (Bellfruit) (Scorpion 4) (TPRV41A, set 2)", MACHINE_FLAGS, layout_sc4dndtp )// TPRV 41A
+GAMEL( 200?, sc4dndtp,  0,        sc4_5reel, sc4dndtp35, sc4_state, init_sc4dndtp, ROT0, "BFM", "Deal or No Deal The Power 5 (Bellfruit) (Scorpion 4) (TPRV411, set 1)", MACHINE_FLAGS, layout_sc4dndtp ) // TPRV 411
+GAMEL( 200?, sc4dndtpe, sc4dndtp, sc4_5reel, sc4dndtp35, sc4_state, init_sc4dndtp, ROT0, "BFM", "Deal or No Deal The Power 5 (Bellfruit) (Scorpion 4) (TPRV411, set 2)", MACHINE_FLAGS, layout_sc4dndtp ) // TPRV 411
+GAMEL( 200?, sc4dndtpa, sc4dndtp, sc4_5reel, sc4dndtp35, sc4_state, init_sc4dndtp, ROT0, "BFM", "Deal or No Deal The Power 5 (Bellfruit) (Scorpion 4) (TPRV412, set 1)", MACHINE_FLAGS, layout_sc4dndtp ) // TPRV 412
+GAMEL( 200?, sc4dndtpf, sc4dndtp, sc4_5reel, sc4dndtp35, sc4_state, init_sc4dndtp, ROT0, "BFM", "Deal or No Deal The Power 5 (Bellfruit) (Scorpion 4) (TPRV412, set 2)", MACHINE_FLAGS, layout_sc4dndtp ) // TPRV 412
+GAMEL( 200?, sc4dndtpb, sc4dndtp, sc4_5reel, sc4dndtp35, sc4_state, init_sc4dndtp, ROT0, "BFM", "Deal or No Deal The Power 5 (Bellfruit) (Scorpion 4) (TPRV413, set 1)", MACHINE_FLAGS, layout_sc4dndtp ) // TPRV 413
+GAMEL( 200?, sc4dndtpg, sc4dndtp, sc4_5reel, sc4dndtp35, sc4_state, init_sc4dndtp, ROT0, "BFM", "Deal or No Deal The Power 5 (Bellfruit) (Scorpion 4) (TPRV413, set 2)", MACHINE_FLAGS, layout_sc4dndtp ) // TPRV 413
+GAMEL( 200?, sc4dndtpc, sc4dndtp, sc4_5reel, sc4dndtp35, sc4_state, init_sc4dndtp, ROT0, "BFM", "Deal or No Deal The Power 5 (Bellfruit) (Scorpion 4) (TPRV414, set 1, bad)", MACHINE_FLAGS, layout_sc4dndtp ) // TPRV 414 EEPROM error (bad rom?) (botched release?)
+GAMEL( 200?, sc4dndtph, sc4dndtp, sc4_5reel, sc4dndtp35, sc4_state, init_sc4dndtp, ROT0, "BFM", "Deal or No Deal The Power 5 (Bellfruit) (Scorpion 4) (TPRV414, set 2, bad)", MACHINE_FLAGS, layout_sc4dndtp ) // TPRV 414 EEPROM error (bad rom?) (botched release?)
+GAMEL( 200?, sc4dndtpd, sc4dndtp, sc4_5reel, sc4dndtp35, sc4_state, init_sc4dndtp, ROT0, "BFM", "Deal or No Deal The Power 5 (Bellfruit) (Scorpion 4) (TPRV415, set 1)", MACHINE_FLAGS, layout_sc4dndtp ) // TPRV 415
+GAMEL( 200?, sc4dndtpi, sc4dndtp, sc4_5reel, sc4dndtp35, sc4_state, init_sc4dndtp, ROT0, "BFM", "Deal or No Deal The Power 5 (Bellfruit) (Scorpion 4) (TPRV415, set 2)", MACHINE_FLAGS, layout_sc4dndtp )// TPRV 415
+GAMEL( 200?, sc4dndtpl, sc4dndtp, sc4_5reel, sc4dndtp35, sc4_state, init_sc4dndtp, ROT0, "BFM", "Deal or No Deal The Power 5 (Bellfruit) (Scorpion 4) (TPRV416, set 1)", MACHINE_FLAGS, layout_sc4dndtp )// TPRV 416
+GAMEL( 200?, sc4dndtpm, sc4dndtp, sc4_5reel, sc4dndtp35, sc4_state, init_sc4dndtp, ROT0, "BFM", "Deal or No Deal The Power 5 (Bellfruit) (Scorpion 4) (TPRV416, set 2)", MACHINE_FLAGS, layout_sc4dndtp )// TPRV 416
+GAMEL( 200?, sc4dndtpj, sc4dndtp, sc4_5reel, sc4dndtp35, sc4_state, init_sc4dndtp, ROT0, "BFM", "Deal or No Deal The Power 5 (Bellfruit) (Scorpion 4) (TPRV41A, set 1)", MACHINE_FLAGS, layout_sc4dndtp )// TPRV 41A
+GAMEL( 200?, sc4dndtpk, sc4dndtp, sc4_5reel, sc4dndtp35, sc4_state, init_sc4dndtp, ROT0, "BFM", "Deal or No Deal The Power 5 (Bellfruit) (Scorpion 4) (TPRV41A, set 2)", MACHINE_FLAGS, layout_sc4dndtp )// TPRV 41A
 
 
 
@@ -37305,12 +37305,12 @@ INPUT_PORTS_END
 
 
 // PR3006 AWP DEAL OR NO DEAL THE WALK OF WEALTH SCORP4         PR3006 WALK OF WEALTH SOUNDS11    WALK OF WEALTH  S.SITE
-GAMEL( 200?, sc4dndww,  0,        sc4, sc4dndww35, sc4_state, init_sc4dndww, ROT0, "BFM", "Deal Or No Deal The Walk Of Wealth (Bellfruit) (Scorpion 4) (TWOH411, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // TWOH 411
-GAMEL( 200?, sc4dndwwb, sc4dndww, sc4, sc4dndww35, sc4_state, init_sc4dndww, ROT0, "BFM", "Deal Or No Deal The Walk Of Wealth (Bellfruit) (Scorpion 4) (TWOH411, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // TWOH 411
-GAMEL( 200?, sc4dndwwa, sc4dndww, sc4, sc4dndww35, sc4_state, init_sc4dndww, ROT0, "BFM", "Deal Or No Deal The Walk Of Wealth (Bellfruit) (Scorpion 4) (TWOH412, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // TWOH 412
-GAMEL( 200?, sc4dndwwe, sc4dndww, sc4, sc4dndww35, sc4_state, init_sc4dndww, ROT0, "BFM", "Deal Or No Deal The Walk Of Wealth (Bellfruit) (Scorpion 4) (TWOH412, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // TWOH 412
-GAMEL( 200?, sc4dndwwc, sc4dndww, sc4, sc4dndww35, sc4_state, init_sc4dndww, ROT0, "BFM", "Deal Or No Deal The Walk Of Wealth (Bellfruit) (Scorpion 4) (TWOH415, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // TWOH 415
-GAMEL( 200?, sc4dndwwd, sc4dndww, sc4, sc4dndww35, sc4_state, init_sc4dndww, ROT0, "BFM", "Deal Or No Deal The Walk Of Wealth (Bellfruit) (Scorpion 4) (TWOH415, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // TWOH 415
+GAMEL( 200?, sc4dndww,  0,        sc4, sc4dndww35, sc4_state, init_sc4dndww, ROT0, "BFM", "Deal or No Deal The Walk Of Wealth (Bellfruit) (Scorpion 4) (TWOH411, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // TWOH 411
+GAMEL( 200?, sc4dndwwb, sc4dndww, sc4, sc4dndww35, sc4_state, init_sc4dndww, ROT0, "BFM", "Deal or No Deal The Walk Of Wealth (Bellfruit) (Scorpion 4) (TWOH411, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // TWOH 411
+GAMEL( 200?, sc4dndwwa, sc4dndww, sc4, sc4dndww35, sc4_state, init_sc4dndww, ROT0, "BFM", "Deal or No Deal The Walk Of Wealth (Bellfruit) (Scorpion 4) (TWOH412, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // TWOH 412
+GAMEL( 200?, sc4dndwwe, sc4dndww, sc4, sc4dndww35, sc4_state, init_sc4dndww, ROT0, "BFM", "Deal or No Deal The Walk Of Wealth (Bellfruit) (Scorpion 4) (TWOH412, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // TWOH 412
+GAMEL( 200?, sc4dndwwc, sc4dndww, sc4, sc4dndww35, sc4_state, init_sc4dndww, ROT0, "BFM", "Deal or No Deal The Walk Of Wealth (Bellfruit) (Scorpion 4) (TWOH415, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // TWOH 415
+GAMEL( 200?, sc4dndwwd, sc4dndww, sc4, sc4dndww35, sc4_state, init_sc4dndww, ROT0, "BFM", "Deal or No Deal The Walk Of Wealth (Bellfruit) (Scorpion 4) (TWOH415, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // TWOH 415
 
 void sc4_state::init_sc4dndcw()
 {
@@ -37395,10 +37395,10 @@ INPUT_PORTS_END
 
 
 // PR3027 AWP CLASSIC DEAL OR NO DEAL THE WALK OF WEALTH SCORP4         PR3006 WALK OF WEALTH SOUNDS11    WALK OF WEALTH  S.SITE
-GAMEL( 200?, sc4dndcw,  0,        sc4, sc4dndcw5, sc4_state, init_sc4dndcw, ROT0, "BFM", "Deal Or No Deal The Walk Of Wealth Classic (Bellfruit) (Scorpion 4) (CWOH271, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // CWOH 271
-GAMEL( 200?, sc4dndcwb, sc4dndcw, sc4, sc4dndcw5, sc4_state, init_sc4dndcw, ROT0, "BFM", "Deal Or No Deal The Walk Of Wealth Classic (Bellfruit) (Scorpion 4) (CWOH271, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // CWOH 271
-GAMEL( 200?, sc4dndcwa, sc4dndcw, sc4, sc4dndcw5, sc4_state, init_sc4dndcw, ROT0, "BFM", "Deal Or No Deal The Walk Of Wealth Classic (Bellfruit) (Scorpion 4) (CWOH272, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // CWOH 272
-GAMEL( 200?, sc4dndcwc, sc4dndcw, sc4, sc4dndcw5, sc4_state, init_sc4dndcw, ROT0, "BFM", "Deal Or No Deal The Walk Of Wealth Classic (Bellfruit) (Scorpion 4) (CWOH272, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // CWOH 272
+GAMEL( 200?, sc4dndcw,  0,        sc4, sc4dndcw5, sc4_state, init_sc4dndcw, ROT0, "BFM", "Deal or No Deal The Walk Of Wealth Classic (Bellfruit) (Scorpion 4) (CWOH271, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // CWOH 271
+GAMEL( 200?, sc4dndcwb, sc4dndcw, sc4, sc4dndcw5, sc4_state, init_sc4dndcw, ROT0, "BFM", "Deal or No Deal The Walk Of Wealth Classic (Bellfruit) (Scorpion 4) (CWOH271, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // CWOH 271
+GAMEL( 200?, sc4dndcwa, sc4dndcw, sc4, sc4dndcw5, sc4_state, init_sc4dndcw, ROT0, "BFM", "Deal or No Deal The Walk Of Wealth Classic (Bellfruit) (Scorpion 4) (CWOH272, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // CWOH 272
+GAMEL( 200?, sc4dndcwc, sc4dndcw, sc4, sc4dndcw5, sc4_state, init_sc4dndcw, ROT0, "BFM", "Deal or No Deal The Walk Of Wealth Classic (Bellfruit) (Scorpion 4) (CWOH272, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // CWOH 272
 
 
 void sc4_state::init_sc4dndtr()
@@ -37479,8 +37479,8 @@ INPUT_PORTS_END
 
 
 // PR3329 DOND THINK RED S4         PR3304 THINK RED SOUNDS11         THINK RED S.SITE
-GAMEL( 200?, sc4dndtr,  0,        sc4_5reel_alt, sc4dndtr70, sc4_state, init_sc4dndtr, ROT0, "BFM", "Deal Or No Deal Think Red (Bellfruit) (Scorpion 4) (THRE571, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // THRE 571
-GAMEL( 200?, sc4dndtra, sc4dndtr, sc4_5reel_alt, sc4dndtr70, sc4_state, init_sc4dndtr, ROT0, "BFM", "Deal Or No Deal Think Red (Bellfruit) (Scorpion 4) (THRE571, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // THRE 571
+GAMEL( 200?, sc4dndtr,  0,        sc4_5reel_alt, sc4dndtr70, sc4_state, init_sc4dndtr, ROT0, "BFM", "Deal or No Deal Think Red (Bellfruit) (Scorpion 4) (THRE571, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // THRE 571
+GAMEL( 200?, sc4dndtra, sc4dndtr, sc4_5reel_alt, sc4dndtr70, sc4_state, init_sc4dndtr, ROT0, "BFM", "Deal or No Deal Think Red (Bellfruit) (Scorpion 4) (THRE571, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // THRE 571
 
 void sc4_state::init_sc4dndwb()
 {
@@ -37565,14 +37565,14 @@ INPUT_PORTS_START( sc4dndwb35 )
 INPUT_PORTS_END
 
 // PR1982 AWP DEAL OR NO DEAL WHATS IN YOUR BOX SCORP4         PR1962 WHATS IN Y BOX SOUNDS11    WHATS IN YOUR BX  S.SITE
-GAMEL( 200?, sc4dndwb,  0,        sc4_200_5ra, sc4dndwb35, sc4_state, init_sc4dndwb, ROT0, "BFM", "Deal Or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (WIYX412, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // WIYX 412
-GAMEL( 200?, sc4dndwbb, sc4dndwb, sc4_200_5ra, sc4dndwb35, sc4_state, init_sc4dndwb, ROT0, "BFM", "Deal Or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (WIYX412, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // WIYX 412
-GAMEL( 200?, sc4dndwba, sc4dndwb, sc4_200_5ra, sc4dndwb35, sc4_state, init_sc4dndwb, ROT0, "BFM", "Deal Or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (WIYX414, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // WIYX 414
-GAMEL( 200?, sc4dndwbc, sc4dndwb, sc4_200_5ra, sc4dndwb35, sc4_state, init_sc4dndwb, ROT0, "BFM", "Deal Or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (WIYX414, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // WIYX 414
-GAMEL( 200?, sc4dndwbd, sc4dndwb, sc4_200_5ra, sc4dndwb35, sc4_state, init_sc4dndwb, ROT0, "BFM", "Deal Or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (WIYX415, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // WIYX 415
-GAMEL( 200?, sc4dndwbe, sc4dndwb, sc4_200_5ra, sc4dndwb35, sc4_state, init_sc4dndwb, ROT0, "BFM", "Deal Or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (WIYX415, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // WIYX 415
-GAMEL( 200?, sc4dndwbf, sc4dndwb, sc4_200_5ra, sc4dndwb35, sc4_state, init_sc4dndwb, ROT0, "BFM", "Deal Or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (WIYX419, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // WIYX 419
-GAMEL( 200?, sc4dndwbg, sc4dndwb, sc4_200_5ra, sc4dndwb35, sc4_state, init_sc4dndwb, ROT0, "BFM", "Deal Or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (WIYX419, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // WIYX 419
+GAMEL( 200?, sc4dndwb,  0,        sc4_200_5ra, sc4dndwb35, sc4_state, init_sc4dndwb, ROT0, "BFM", "Deal or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (WIYX412, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // WIYX 412
+GAMEL( 200?, sc4dndwbb, sc4dndwb, sc4_200_5ra, sc4dndwb35, sc4_state, init_sc4dndwb, ROT0, "BFM", "Deal or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (WIYX412, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // WIYX 412
+GAMEL( 200?, sc4dndwba, sc4dndwb, sc4_200_5ra, sc4dndwb35, sc4_state, init_sc4dndwb, ROT0, "BFM", "Deal or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (WIYX414, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // WIYX 414
+GAMEL( 200?, sc4dndwbc, sc4dndwb, sc4_200_5ra, sc4dndwb35, sc4_state, init_sc4dndwb, ROT0, "BFM", "Deal or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (WIYX414, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // WIYX 414
+GAMEL( 200?, sc4dndwbd, sc4dndwb, sc4_200_5ra, sc4dndwb35, sc4_state, init_sc4dndwb, ROT0, "BFM", "Deal or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (WIYX415, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // WIYX 415
+GAMEL( 200?, sc4dndwbe, sc4dndwb, sc4_200_5ra, sc4dndwb35, sc4_state, init_sc4dndwb, ROT0, "BFM", "Deal or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (WIYX415, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // WIYX 415
+GAMEL( 200?, sc4dndwbf, sc4dndwb, sc4_200_5ra, sc4dndwb35, sc4_state, init_sc4dndwb, ROT0, "BFM", "Deal or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (WIYX419, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // WIYX 419
+GAMEL( 200?, sc4dndwbg, sc4dndwb, sc4_200_5ra, sc4dndwb35, sc4_state, init_sc4dndwb, ROT0, "BFM", "Deal or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (WIYX419, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // WIYX 419
 
 void sc4_state::init_sc4dndbe()
 {
@@ -37657,20 +37657,20 @@ INPUT_PORTS_START( sc4dndbe35 )
 INPUT_PORTS_END
 
 // PR1935 AWP DEAL OR NO DEAL BEAT THE BANKER S4         PR1915 BEAT THE BANKER SOUNDS11   BEAT THE BANKER S.SITE
-GAMEL( 200?, sc4dndbe,  0,        sc4_5reel_alt, sc4dndbe25, sc4_state, init_sc4dndbe, ROT0, "BFM", "Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (DBTK012, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // DBTK 012
-GAMEL( 200?, sc4dndbec, sc4dndbe, sc4_5reel_alt, sc4dndbe25, sc4_state, init_sc4dndbe, ROT0, "BFM", "Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (DBTK012, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // DBTK 012
-GAMEL( 200?, sc4dndbeg, sc4dndbe, sc4_5reel_alt, sc4dndbe25, sc4_state, init_sc4dndbe, ROT0, "BFM", "Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (DBTK013, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // DBTK 013
-GAMEL( 200?, sc4dndbek, sc4dndbe, sc4_5reel_alt, sc4dndbe25, sc4_state, init_sc4dndbe, ROT0, "BFM", "Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (DBTK013, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // DBTK 013
-GAMEL( 200?, sc4dndbeh, sc4dndbe, sc4_5reel_alt, sc4dndbe25, sc4_state, init_sc4dndbe, ROT0, "BFM", "Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (DBTK014, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // DBTK 014
-GAMEL( 200?, sc4dndbel, sc4dndbe, sc4_5reel_alt, sc4dndbe25, sc4_state, init_sc4dndbe, ROT0, "BFM", "Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (DBTK014, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // DBTK 014
-GAMEL( 200?, sc4dndbeb, sc4dndbe, sc4_5reel_alt, sc4dndbe35, sc4_state, init_sc4dndbe, ROT0, "BFM", "Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (DBTK422, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // DBTK 422
-GAMEL( 200?, sc4dndbed, sc4dndbe, sc4_5reel_alt, sc4dndbe35, sc4_state, init_sc4dndbe, ROT0, "BFM", "Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (DBTK422, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // DBTK 422
-GAMEL( 200?, sc4dndbee, sc4dndbe, sc4_5reel_alt, sc4dndbe35, sc4_state, init_sc4dndbe, ROT0, "BFM", "Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (DBTK423, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // DBTK 423
-GAMEL( 200?, sc4dndbei, sc4dndbe, sc4_5reel_alt, sc4dndbe35, sc4_state, init_sc4dndbe, ROT0, "BFM", "Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (DBTK423, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // DBTK 423
-GAMEL( 200?, sc4dndbef, sc4dndbe, sc4_5reel_alt, sc4dndbe35, sc4_state, init_sc4dndbe, ROT0, "BFM", "Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (DBTK425, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // DBTK 425
-GAMEL( 200?, sc4dndbej, sc4dndbe, sc4_5reel_alt, sc4dndbe35, sc4_state, init_sc4dndbe, ROT0, "BFM", "Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (DBTK425, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // DBTK 425
-GAMEL( 200?, sc4dndbem, sc4dndbe, sc4_5reel_alt, sc4dndbe35, sc4_state, init_sc4dndbe, ROT0, "BFM", "Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (DBTK426, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // DBTK 426
-GAMEL( 200?, sc4dndben, sc4dndbe, sc4_5reel_alt, sc4dndbe35, sc4_state, init_sc4dndbe, ROT0, "BFM", "Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (DBTK426, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // DBTK 426
+GAMEL( 200?, sc4dndbe,  0,        sc4_5reel_alt, sc4dndbe25, sc4_state, init_sc4dndbe, ROT0, "BFM", "Deal or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (DBTK012, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // DBTK 012
+GAMEL( 200?, sc4dndbec, sc4dndbe, sc4_5reel_alt, sc4dndbe25, sc4_state, init_sc4dndbe, ROT0, "BFM", "Deal or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (DBTK012, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // DBTK 012
+GAMEL( 200?, sc4dndbeg, sc4dndbe, sc4_5reel_alt, sc4dndbe25, sc4_state, init_sc4dndbe, ROT0, "BFM", "Deal or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (DBTK013, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // DBTK 013
+GAMEL( 200?, sc4dndbek, sc4dndbe, sc4_5reel_alt, sc4dndbe25, sc4_state, init_sc4dndbe, ROT0, "BFM", "Deal or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (DBTK013, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // DBTK 013
+GAMEL( 200?, sc4dndbeh, sc4dndbe, sc4_5reel_alt, sc4dndbe25, sc4_state, init_sc4dndbe, ROT0, "BFM", "Deal or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (DBTK014, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // DBTK 014
+GAMEL( 200?, sc4dndbel, sc4dndbe, sc4_5reel_alt, sc4dndbe25, sc4_state, init_sc4dndbe, ROT0, "BFM", "Deal or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (DBTK014, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // DBTK 014
+GAMEL( 200?, sc4dndbeb, sc4dndbe, sc4_5reel_alt, sc4dndbe35, sc4_state, init_sc4dndbe, ROT0, "BFM", "Deal or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (DBTK422, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // DBTK 422
+GAMEL( 200?, sc4dndbed, sc4dndbe, sc4_5reel_alt, sc4dndbe35, sc4_state, init_sc4dndbe, ROT0, "BFM", "Deal or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (DBTK422, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // DBTK 422
+GAMEL( 200?, sc4dndbee, sc4dndbe, sc4_5reel_alt, sc4dndbe35, sc4_state, init_sc4dndbe, ROT0, "BFM", "Deal or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (DBTK423, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // DBTK 423
+GAMEL( 200?, sc4dndbei, sc4dndbe, sc4_5reel_alt, sc4dndbe35, sc4_state, init_sc4dndbe, ROT0, "BFM", "Deal or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (DBTK423, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // DBTK 423
+GAMEL( 200?, sc4dndbef, sc4dndbe, sc4_5reel_alt, sc4dndbe35, sc4_state, init_sc4dndbe, ROT0, "BFM", "Deal or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (DBTK425, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // DBTK 425
+GAMEL( 200?, sc4dndbej, sc4dndbe, sc4_5reel_alt, sc4dndbe35, sc4_state, init_sc4dndbe, ROT0, "BFM", "Deal or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (DBTK425, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // DBTK 425
+GAMEL( 200?, sc4dndbem, sc4dndbe, sc4_5reel_alt, sc4dndbe35, sc4_state, init_sc4dndbe, ROT0, "BFM", "Deal or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (DBTK426, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // DBTK 426
+GAMEL( 200?, sc4dndben, sc4dndbe, sc4_5reel_alt, sc4dndbe35, sc4_state, init_sc4dndbe, ROT0, "BFM", "Deal or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (DBTK426, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // DBTK 426
 
 
 void sc4_state::init_sc4dndbc()
@@ -37757,8 +37757,8 @@ INPUT_PORTS_END
 
 
 // PR3337 AWP DEAL OR NO DEAL BOX CLEVER SCORP4         PR3312 DOND BOXCLEVER SOUNDS11    BOX CLEVER  S.SITE
-GAMEL( 200?, sc4dndbc,  0,        sc4_5reel, sc4dndbc70, sc4_state, init_sc4dndbc, ROT0, "BFM", "Deal Or No Deal Box Clever (Bellfruit) (Scorpion 4) (BOXR571, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // BOXR 571
-GAMEL( 200?, sc4dndbca, sc4dndbc, sc4_5reel, sc4dndbc70, sc4_state, init_sc4dndbc, ROT0, "BFM", "Deal Or No Deal Box Clever (Bellfruit) (Scorpion 4) (BOXR571, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // BOXR 571
+GAMEL( 200?, sc4dndbc,  0,        sc4_5reel, sc4dndbc70, sc4_state, init_sc4dndbc, ROT0, "BFM", "Deal or No Deal Box Clever (Bellfruit) (Scorpion 4) (BOXR571, set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // BOXR 571
+GAMEL( 200?, sc4dndbca, sc4dndbc, sc4_5reel, sc4dndbc70, sc4_state, init_sc4dndbc, ROT0, "BFM", "Deal or No Deal Box Clever (Bellfruit) (Scorpion 4) (BOXR571, set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // BOXR 571
 
 
 void sc4_state::init_sc4dmine()

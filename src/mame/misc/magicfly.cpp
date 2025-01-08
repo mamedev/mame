@@ -475,7 +475,7 @@ public:
 	void _7mezzo(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_shared_ptr<uint8_t> m_videoram;
@@ -496,7 +496,7 @@ private:
 	void bchance_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(7mezzo);
 	uint32_t screen_update_magicfly(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void magicfly_map(address_map &map);
+	void magicfly_map(address_map &map) ATTR_COLD;
 };
 
 

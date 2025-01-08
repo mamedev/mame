@@ -2287,14 +2287,14 @@ void sa1110_periphs_device::update_interrupts()
 	m_intc_regs.icfp = (m_intc_regs.icpr & m_intc_regs.icmr) & m_intc_regs.iclr;
 	if (old_fiq != m_intc_regs.icfp)
 	{
-		m_maincpu->set_input_line(ARM7_FIRQ_LINE, m_intc_regs.icfp ? ASSERT_LINE : CLEAR_LINE);
+		m_maincpu->set_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, m_intc_regs.icfp ? ASSERT_LINE : CLEAR_LINE);
 	}
 
 	const u32 old_irq = m_intc_regs.icip;
 	m_intc_regs.icip = (m_intc_regs.icpr & m_intc_regs.icmr) & (~m_intc_regs.iclr);
 	if (old_irq != m_intc_regs.icip)
 	{
-		m_maincpu->set_input_line(ARM7_IRQ_LINE, m_intc_regs.icip ? ASSERT_LINE : CLEAR_LINE);
+		m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, m_intc_regs.icip ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 

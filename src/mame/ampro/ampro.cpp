@@ -63,11 +63,11 @@ private:
 	uint8_t dart_r(offs_t offset);
 	void ctc_w(offs_t offset, uint8_t data);
 	void dart_w(offs_t offset, uint8_t data);
-	void machine_reset() override;
-	void machine_start() override;
+	void machine_reset() override ATTR_COLD;
+	void machine_start() override ATTR_COLD;
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_rom;

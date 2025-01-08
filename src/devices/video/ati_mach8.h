@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Barry Rodewald
 
-#ifndef MAME_VIDEO_MACH8_H
-#define MAME_VIDEO_MACH8_H
+#ifndef MAME_VIDEO_ATI_MACH8_H
+#define MAME_VIDEO_ATI_MACH8_H
 
 #pragma once
 
@@ -58,7 +58,7 @@ public:
 
 protected:
 	mach8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	struct
 	{
 		uint16_t scratch0;
@@ -82,4 +82,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(MACH8, mach8_device)
 
-#endif // MAME_VIDEO_MACH8_H
+#endif // MAME_VIDEO_ATI_MACH8_H

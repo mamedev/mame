@@ -38,6 +38,7 @@ void vrt_vt1682_timer_device::device_reset()
 	m_timer_preload_7_0 = 0;
 	m_timer_preload_15_8 = 0;
 	m_timer_enable = 0;
+	m_timer->adjust(attotime::never);
 }
 
 

@@ -42,17 +42,17 @@ public:
 
 protected:
 	void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	void mvme12x_base_mem(address_map &map);
-	void mvme120_mem(address_map &map);
-	void mvme121_mem(address_map &map);
-	void mvme122_mem(address_map &map);
-	void mvme123_mem(address_map &map);
+	void mvme12x_base_mem(address_map &map) ATTR_COLD;
+	void mvme120_mem(address_map &map) ATTR_COLD;
+	void mvme121_mem(address_map &map) ATTR_COLD;
+	void mvme122_mem(address_map &map) ATTR_COLD;
+	void mvme123_mem(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 
@@ -103,7 +103,7 @@ protected:
 	{ }
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 class vme_mvme121_card_device : public vme_mvme120_device
@@ -117,7 +117,7 @@ protected:
 	{ }
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 
@@ -132,7 +132,7 @@ protected:
 	{ }
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 
@@ -147,7 +147,7 @@ protected:
 	{ }
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 #endif // MAME_BUS_VME_MVME120_H

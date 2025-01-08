@@ -45,7 +45,7 @@ public:
 	void config_w(offs_t offset, uint32_t data);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	static constexpr unsigned  IDE_CONFIG_REGISTERS= 0x10;

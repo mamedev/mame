@@ -7,8 +7,8 @@
  *
  */
 
-#ifndef MAME_BUS_ISA_S3VIRGE_H
-#define MAME_BUS_ISA_S3VIRGE_H
+#ifndef MAME_VIDEO_S3VIRGE_H
+#define MAME_VIDEO_S3VIRGE_H
 
 #pragma once
 
@@ -34,9 +34,9 @@ public:
 	uint32_t s3d_func_ctrl_r();
 //  void s3d_func_ctrl_w(offs_t offset, uint32_t data, u32 mem_mask = ~0);
 
-	void s3d_register_map(address_map &map);
+	void s3d_register_map(address_map &map) ATTR_COLD;
 
-	void streams_control_map(address_map &map);
+	void streams_control_map(address_map &map) ATTR_COLD;
 
 	void image_xfer(offs_t offset, uint32_t data, uint32_t mem_mask)
 	{
@@ -62,11 +62,11 @@ protected:
 	s3virge_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual uint16_t offset() override;
 
-	virtual void crtc_map(address_map &map) override;
+	virtual void crtc_map(address_map &map) override ATTR_COLD;
 
 	enum
 	{
@@ -207,8 +207,8 @@ protected:
 	s3virgedx_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 // ======================> s3virgedx_vga_device
@@ -221,8 +221,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 // device type definition
@@ -230,4 +230,4 @@ DECLARE_DEVICE_TYPE(S3VIRGE,    s3virge_vga_device)
 DECLARE_DEVICE_TYPE(S3VIRGEDX,  s3virgedx_vga_device)
 DECLARE_DEVICE_TYPE(S3VIRGEDX1, s3virgedx_rev1_vga_device)
 
-#endif // MAME_BUS_ISA_S3VIRGE_H
+#endif // MAME_VIDEO_S3VIRGE_H

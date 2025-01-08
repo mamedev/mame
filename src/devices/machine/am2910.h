@@ -7,8 +7,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_AM2910_AM2910_H
-#define MAME_MACHINE_AM2910_AM2910_H
+#ifndef MAME_MACHINE_AM2910_H
+#define MAME_MACHINE_AM2910_H
 
 #pragma once
 
@@ -40,8 +40,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(clock_tick);
 
@@ -79,4 +79,4 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(AM2910, am2910_device)
 
-#endif // MAME_MACHINE_AM2910_AM2910_H
+#endif // MAME_MACHINE_AM2910_H

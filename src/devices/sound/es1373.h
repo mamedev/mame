@@ -22,9 +22,9 @@ public:
 	void reg_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_post_load() override;
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
@@ -58,7 +58,7 @@ private:
 	address_space *m_memory_space;
 	devcb_write_line m_irq_handler;
 	int m_irq_num;
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 	uint16_t m_ac97_regs[0x80];
 	uint32_t m_es_regs[0x10];
 	uint32_t m_sound_cache[0x40];

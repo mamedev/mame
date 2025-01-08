@@ -87,8 +87,8 @@ public:
 	void kamikaze(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device_array<i8255_device, 2>  m_ppi8255;
 	uint8_t m_flip_yoffs = 32; // the flip screen logic adds 32 to the Y after flipping
@@ -103,8 +103,8 @@ private:
 	TIMER_CALLBACK_MEMBER(int_off);
 	TIMER_CALLBACK_MEMBER(int_gen);
 
-	void prg_map(address_map &map);
-	void port_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
+	void port_map(address_map &map) ATTR_COLD;
 
 	emu_timer *m_int_timer = nullptr;
 	emu_timer *m_int_off_timer = nullptr;
@@ -120,7 +120,7 @@ public:
 	void spcking2(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void sound1_w(uint8_t data);
@@ -145,8 +145,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void color_latch_w(uint8_t data);
@@ -154,8 +154,8 @@ private:
 	void sound1_w(uint8_t data);
 	void sound2_w(uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void prg_map(address_map &map);
-	void port_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
+	void port_map(address_map &map) ATTR_COLD;
 
 	memory_share_creator<uint8_t> m_colorram;
 	uint8_t m_color_latch = 0;
@@ -560,7 +560,7 @@ static INPUT_PORTS_START( kamikaze )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("CABINET")
@@ -628,7 +628,7 @@ static INPUT_PORTS_START( spaceint )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, spaceint_state, coin_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(spaceint_state::coin_inserted), 0)
 
 	PORT_START("CABINET")
 	PORT_DIPNAME( 0xff, 0x00, DEF_STR( Cabinet ) )
@@ -857,8 +857,8 @@ ROM_END
  *
  *************************************/
 
-GAME( 1980,  kamikaze,  0,        kamikaze, kamikaze,  kamikaze_state, empty_init, ROT270, "Leijac Corporation", "Kamikaze", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980,  astinvad,  kamikaze, kamikaze, astinvad,  kamikaze_state, empty_init, ROT270, "Leijac Corporation (Stern Electronics license)", "Astro Invader", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980,  kamikaze,  0,        kamikaze, kamikaze,  kamikaze_state, empty_init, ROT270, "Konami (Leijac Corporation license)", "Kamikaze", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980,  astinvad,  kamikaze, kamikaze, astinvad,  kamikaze_state, empty_init, ROT270, "Konami (Stern Electronics license)", "Astro Invader", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980?, kosmokil,  kamikaze, kamikaze, kamikaze,  kamikaze_state, empty_init, ROT270, "bootleg (BEM)", "Kosmo Killer", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // says >BEM< Mi Italy but it looks hacked in, different revision of game tho.
 GAME( 1980?, betafrce,  kamikaze, kamikaze, kamikaze,  kamikaze_state, empty_init, ROT270, "bootleg (Omni)", "Beta Force", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979,  spcking2,  0,        spcking2, spcking2,  spcking2_state, empty_init, ROT270, "Konami", "Space King 2", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

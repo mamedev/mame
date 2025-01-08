@@ -68,8 +68,8 @@ public:
 protected:
 	ttl741745_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void init();
 	virtual void tick();
@@ -105,7 +105,7 @@ public:
 	void d6_w(int state);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual void init() override;
 	virtual void tick() override;
@@ -132,7 +132,7 @@ public:
 	auto not_q4_cb() { return m_not_q4_func.bind(); }
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual void tick() override;
 

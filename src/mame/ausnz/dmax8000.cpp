@@ -52,16 +52,16 @@ public:
 	void dmax8000(machine_config &config);
 
 private:
-	void machine_reset() override;
-	void machine_start() override;
+	void machine_reset() override ATTR_COLD;
+	void machine_start() override ATTR_COLD;
 	void port0c_w(u8 data);
 	void port0d_w(u8 data);
 	void port14_w(u8 data);
 	void port40_w(u8 data);
 	void fdc_drq_w(int state);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_rom;

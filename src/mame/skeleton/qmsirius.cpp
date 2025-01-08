@@ -28,8 +28,8 @@ public:
 private:
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
 
-	void prog_map(address_map &map);
-	void ext_map(address_map &map);
+	void prog_map(address_map &map) ATTR_COLD;
+	void ext_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 };
@@ -91,5 +91,5 @@ ROM_END
 
 } // anonymous namespace
 
-SYST(1998, qmsirius, 0, 0, qmsirius, qmsirius, qmsirius_state, empty_init, "Quasimidi Musikelektronik GmbH", "Quasimidi Sirius",  MACHINE_IS_SKELETON)
-SYST(1996, qmrave,   0, 0, qmsirius, qmsirius, qmsirius_state, empty_init, "Quasimidi Musikelektronik GmbH", "Rave-O-Lution 309", MACHINE_IS_SKELETON)
+SYST(1998, qmsirius, 0, 0, qmsirius, qmsirius, qmsirius_state, empty_init, "Quasimidi Musikelektronik GmbH", "Quasimidi Sirius",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1996, qmrave,   0, 0, qmsirius, qmsirius, qmsirius_state, empty_init, "Quasimidi Musikelektronik GmbH", "Rave-O-Lution 309", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

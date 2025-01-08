@@ -20,8 +20,8 @@ public:
 	void swap(uint8_t* ymrom, uint32_t ymsize, int value);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 #endif // MAME_BUS_NEOGEO_PROT_PCM2_H

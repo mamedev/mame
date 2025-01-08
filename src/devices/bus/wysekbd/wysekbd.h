@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_BUS_WYSEKBD_KEYBOARD_H
-#define MAME_BUS_WYSEKBD_KEYBOARD_H
+#ifndef MAME_BUS_WYSEKBD_WYSEKBD_H
+#define MAME_BUS_WYSEKBD_WYSEKBD_H
 
 #pragma once
 
@@ -43,7 +43,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_config_complete() override;
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	// selected keyboard
@@ -69,6 +69,8 @@ protected:
 DECLARE_DEVICE_TYPE(WYSE_KEYBOARD, wyse_keyboard_port_device)
 
 // standard options
+extern void wy85_keyboards(device_slot_interface &slot);
+extern void wy30_keyboards(device_slot_interface &slot);
 extern void wy60_keyboards(device_slot_interface &slot);
 
 //**************************************************************************
@@ -89,4 +91,4 @@ inline int wyse_keyboard_port_device::data_r()
 		return 1;
 }
 
-#endif // MAME_BUS_WYSEKBD_KEYBOARD_H
+#endif // MAME_BUS_WYSEKBD_WYSEKBD_H

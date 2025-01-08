@@ -340,8 +340,8 @@ public:
 	void pc8500(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -389,12 +389,12 @@ private:
 	uint8_t m_key_latch = 0;
 	bool m_key_irq_enable = false;
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_tick);
-	void pc8401a_lcdc(address_map &map);
-	void pc8401a_mem(address_map &map);
-	void pc8500_io(address_map &map);
+	void pc8401a_lcdc(address_map &map) ATTR_COLD;
+	void pc8401a_mem(address_map &map) ATTR_COLD;
+	void pc8500_io(address_map &map) ATTR_COLD;
 
-	void bankdev0_map(address_map &map);
-	void bankdev8_map(address_map &map);
+	void bankdev0_map(address_map &map) ATTR_COLD;
+	void bankdev8_map(address_map &map) ATTR_COLD;
 
 	template <unsigned StartBase> uint8_t ram_r(address_space &space, offs_t offset)
 	{

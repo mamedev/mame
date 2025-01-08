@@ -63,7 +63,7 @@ public:
 	int start2_r();
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 
@@ -88,8 +88,8 @@ private:
 
 	uint32_t screen_update_megplay(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void megaplay_bios_io_map(address_map &map);
-	void megaplay_bios_map(address_map &map);
+	void megaplay_bios_io_map(address_map &map) ATTR_COLD;
+	void megaplay_bios_map(address_map &map) ATTR_COLD;
 
 	uint32_t m_bios_mode = 0;  // determines whether ROM banks or Game data is to read from 0x8000-0xffff
 
@@ -138,10 +138,10 @@ static INPUT_PORTS_START ( megaplay )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_MODIFY("PAD1") // P1 Start input processed through BIOS
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, mplay_state, start1_r)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(mplay_state::start1_r))
 
 	PORT_MODIFY("PAD2") // P2 Start input processed through BIOS
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, mplay_state, start2_r)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(mplay_state::start2_r))
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x0f, 0x0f, "Coin slot 1" ) PORT_DIPLOCATION("SW1:1,2,3,4")

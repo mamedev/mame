@@ -190,7 +190,7 @@ Missing dumps:
 		</part>
 	</software>
 
-	<software name="vwrit128">
+	<software name="vwrit128" supported="no">
 		<description>VizaWrite 128</description>
 		<year>1985</year>
 		<publisher>Viza</publisher>

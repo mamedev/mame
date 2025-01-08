@@ -37,7 +37,6 @@ const uint8_t segas32_v25_state::ga2_opcode_table[256] = {
 
 void segas32_v25_state::decrypt_protrom()
 {
-	int i;
 	uint8_t *rom = memregion("mcu")->base();
 	std::vector<uint8_t> temp(0x100000);
 
@@ -45,7 +44,7 @@ void segas32_v25_state::decrypt_protrom()
 	memcpy(&temp[0], rom, 0x10000);
 
 	// unscramble the address lines
-	for(i = 0; i < 0x10000; i++)
+	for (int i = 0; i < 0x10000; i++)
 		rom[i] = temp[bitswap<16>(i, 14, 11, 15, 12, 13, 4, 3, 7, 5, 10, 2, 8, 9, 6, 1, 0)];
 }
 
@@ -87,31 +86,32 @@ uint16_t segas32_state::ga2_wakeup_protection_r(offs_t offset)
 // arcade revision C, allowing the game to run correctly.
 #define CLEARED_LEVELS          0xE5C4
 #define CURRENT_LEVEL           0xF06E
-#define CURRENT_LEVEL_STATUS        0xF0BC
+#define CURRENT_LEVEL_STATUS    0xF0BC
 #define LEVEL_ORDER_ARRAY       0x263A
 
 void segas32_state::sonic_level_load_protection(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t level;
-//Perform write
+
+	// Perform write
 	COMBINE_DATA(&m_system32_workram[CLEARED_LEVELS / 2]);
 
-//Refresh current level
-		if (m_system32_workram[CLEARED_LEVELS / 2] == 0)
-		{
-			level = 0x0007;
-		}
-		else
-		{
-			const uint8_t *ROM = m_maincpu_region->base();
-			level =  *((ROM + LEVEL_ORDER_ARRAY) + (m_system32_workram[CLEARED_LEVELS / 2] * 2) - 1);
-			level |= *((ROM + LEVEL_ORDER_ARRAY) + (m_system32_workram[CLEARED_LEVELS / 2] * 2) - 2) << 8;
-		}
-		m_system32_workram[CURRENT_LEVEL / 2] = level;
+	// Refresh current level
+	if (m_system32_workram[CLEARED_LEVELS / 2] == 0)
+	{
+		level = 0x0007;
+	}
+	else
+	{
+		const uint8_t *ROM = m_maincpu_region->base();
+		level =  *((ROM + LEVEL_ORDER_ARRAY) + (m_system32_workram[CLEARED_LEVELS / 2] * 2) - 1);
+		level |= *((ROM + LEVEL_ORDER_ARRAY) + (m_system32_workram[CLEARED_LEVELS / 2] * 2) - 2) << 8;
+	}
+	m_system32_workram[CURRENT_LEVEL / 2] = level;
 
-//Reset level status
-		m_system32_workram[CURRENT_LEVEL_STATUS / 2] = 0x0000;
-		m_system32_workram[(CURRENT_LEVEL_STATUS + 2) / 2] = 0x0000;
+	// Reset level status
+	m_system32_workram[CURRENT_LEVEL_STATUS / 2] = 0x0000;
+	m_system32_workram[(CURRENT_LEVEL_STATUS + 2) / 2] = 0x0000;
 }
 
 
@@ -202,11 +202,11 @@ void segas32_state::darkedge_fd1149_vblank()
 	space.write_word(0x20f072, 0);
 	space.write_word(0x20f082, 0);
 
-	if( space.read_byte(0x20a12c) != 0 )
+	if (space.read_byte(0x20a12c) != 0)
 	{
-		space.write_byte(0x20a12c, space.read_byte(0x20a12c)-1 );
+		space.write_byte(0x20a12c, space.read_byte(0x20a12c)-1);
 
-		if( space.read_byte(0x20a12c) == 0 )
+		if (space.read_byte(0x20a12c) == 0)
 			space.write_byte(0x20a12e, 1);
 	}
 }
@@ -235,12 +235,12 @@ void segas32_state::f1lap_fd1149_vblank()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	space.write_byte(0x20F7C6, 0);
+	space.write_byte(0x20f7c6, 0);
 
 	// needed to start a game
-	uint8_t val = space.read_byte(0x20EE81);
-	if (val == 0xff)  space.write_byte(0x20EE81,0);
-
+	uint8_t val = space.read_byte(0x20ee81);
+	if (val == 0xff)
+		space.write_byte(0x20ee81,0);
 }
 
 
@@ -253,7 +253,7 @@ void segas32_state::f1lap_fd1149_vblank()
 
 void segas32_state::dbzvrvs_protection_w(address_space &space, uint16_t data)
 {
-	space.write_word( 0x2080c8, space.read_word( 0x200044 ) );
+	space.write_word(0x2080c8, space.read_word(0x200044));
 }
 
 
@@ -333,19 +333,19 @@ uint16_t segas32_state::arf_wakeup_protection_r(offs_t offset)
  ******************************************************************************/
 void segas32_state::jleague_protection_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	COMBINE_DATA( &m_system32_workram[0xf700/2 + offset ] );
+	COMBINE_DATA(&m_system32_workram[0xf700/2 + offset]);
 
-	switch( offset )
+	switch (offset)
 	{
 		// Map team browser selection to opponent browser selection
 		// using same lookup table that V60 uses for sound sample mapping.
 		case 0:
-			space.write_byte( 0x20f708, space.read_word( 0x7bbc0 + data*2 ) );
+			space.write_byte(0x20f708, space.read_word(0x7bbc0 + data*2));
 			break;
 
 		// move on to team browser
 		case 4/2:
-			space.write_byte( 0x200016, data & 0xff );
+			space.write_byte(0x200016, data & 0xff);
 			break;
 
 		default:
@@ -376,9 +376,9 @@ void segas32_state::jleague_protection_w(address_space &space, offs_t offset, ui
 
 uint16_t segas32_state::arescue_dsp_r(offs_t offset)
 {
-	if( offset == 4/2 )
+	if (offset == 4/2)
 	{
-		switch( m_arescue_dsp_io[0] )
+		switch (m_arescue_dsp_io[0])
 		{
 			case 0:
 			case 1:
@@ -395,7 +395,7 @@ uint16_t segas32_state::arescue_dsp_r(offs_t offset)
 				break;
 
 			default:
-				logerror("Unhandled DSP cmd %04x (%04x).\n", m_arescue_dsp_io[0], m_arescue_dsp_io[1] );
+				logerror("Unhandled DSP cmd %04x (%04x).\n", m_arescue_dsp_io[0], m_arescue_dsp_io[1]);
 				break;
 		}
 	}

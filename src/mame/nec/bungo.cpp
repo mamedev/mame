@@ -2,20 +2,20 @@
 // copyright-holders:Angelo Salese
 /**************************************************************************************************
 
-    NEC 文豪 / "Bungo" Word Processors (laptop family)
+NEC 文豪 / "Bungo" Word Processors (laptop family)
 
-    TODO:
-    - needs list of components, no documentation available from the net except for bare specs here:
-      https://museum.ipsj.or.jp/en/computer/word/0058.html
-    - Needs an actual dump of the kanji ROM;
-    - Garbled message tells user to reset machine and hold SHIFT+MENU while having the
-      auxiliary disk in
-      https://www.leadedsolder.com/2022/10/15/pwp50sx-nec-mini5-psu-repair-pickup.html
-      NB: MENU key doesn't exist with current PC98 keyboard device, also note that the usual
-      I/O at $41-$43 is not polled (either expects an irq or perhaps they relocated)
-    - Verify what exactly the handwritten “Function 2 + F2 = Floppy.” printed on aux disk
-      means.
-    - Verify how much of PC-98 this really uses if anything at all.
+TODO:
+- needs list of components, no documentation available from the net except for bare specs here:
+  https://museum.ipsj.or.jp/en/computer/word/0058.html
+- Needs an actual dump of the kanji ROM;
+- Garbled message tells user to reset machine and hold SHIFT+MENU while having the
+  auxiliary disk in
+  https://www.leadedsolder.com/2022/10/15/pwp50sx-nec-mini5-psu-repair-pickup.html
+  NB: MENU key doesn't exist with current PC98 keyboard device, also note that the usual
+  I/O at $41-$43 is not polled (either expects an irq or perhaps they relocated)
+- Verify what exactly the handwritten “Function 2 + F2 = Floppy.” printed on aux disk
+  means.
+- Verify how much of PC-98 this really uses if anything at all.
 
 **************************************************************************************************/
 
@@ -127,14 +127,26 @@ void bungo_mini5sx_state::mini5sx_config(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &bungo_mini5sx_state::mini5sx_io);
 //  m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	PC9801_KBD(config, m_keyb, 53);
-//  m_keyb->irq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ1);
+	I8251(config, m_sio_kbd, 0);
+//  m_sio_kbd->txd_handler().set("keyb", FUNC(pc9801_kbd_device::input_txd));
+//  m_sio_kbd->rxrdy_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ1);
+
+//  clock_device &kbd_clock(CLOCK(config, "kbd_clock", 19'200));
+//  kbd_clock.signal_handler().set(m_sio_kbd, FUNC(i8251_device::write_rxc));
+//  kbd_clock.signal_handler().append(m_sio_kbd, FUNC(i8251_device::write_txc));
+
+	// TODO: should be PC-98 based with no numpad and some extra keys.
+	PC9801_KBD(config, m_keyb, 0);
+//  m_keyb->rxd_callback().set("sio_kbd", FUNC(i8251_device::write_rxd));
 
 	I8255(config, m_ppi_sys, 0);
 //  m_ppi_sys->in_pa_callback().set(m_ppi_sys, FUNC(i8255_device::pa_r));
 //  m_ppi_sys->in_pb_callback().set_ioport("SYSB");
 //  m_ppi_sys->in_pc_callback().set_constant(0xa0); // 0x80 cpu triple fault reset flag?
 //  m_ppi_sys->out_pc_callback().set(FUNC(pc98lt_state::ppi_sys_beep_portc_w));
+
+	// TODO: unverified, known to have a 8-pin "sheet feeder" port
+	pc9801_serial(config);
 
 	I8255(config, m_ppi_prn, 0);
 //  m_ppi_prn->in_pb_callback().set_ioport("PRNB");

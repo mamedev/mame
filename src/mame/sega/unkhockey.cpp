@@ -57,7 +57,7 @@ private:
 	required_device<m68000_base_device> m_maincpu;
 	required_device<upd7759_device> m_upd7759;
 
-	void program_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -153,4 +153,4 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME( 199?, unkhockey, 0, unkhockey, unkhockey, unkhockey_state, empty_init, ROT0, "Sega", "unknown Sega air hockey game", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, unkhockey, 0, unkhockey, unkhockey, unkhockey_state, empty_init, ROT0, "Sega", "unknown Sega air hockey game", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

@@ -5,8 +5,11 @@
 
 #pragma once
 
+#include "emupal.h"
 #include "screen.h"
+#include "speaker.h"
 #include "bus/nscsi/devices.h"
+#include "bus/rs232/rs232.h"
 #include "bus/scsi/s1410.h"
 #include "bus/scsi/scsihd.h"
 #include "cpu/i86/i186.h"
@@ -21,6 +24,7 @@
 #include "machine/upd765.h"
 #include "machine/z80sio.h"
 #include "machine/x2212.h"
+#include "sound/spkrdev.h"
 #include "video/crt9007.h"
 #include "video/crt9212.h"
 
@@ -44,13 +48,19 @@ public:
 		m_sio(*this, "i8251"),
 		m_dmac(*this, "am9517a"),
 		m_fdc(*this, UPD765_TAG),
-		m_sasi(*this, "sasi:7:scsicb")
+		m_floppy(*this, UPD765_TAG ":%u:525qd", 0U),
+		m_speaker(*this, "speaker"),
+		m_sasi(*this, "sasi:7:scsicb"),
+		m_rs232a(*this, "rs232a"),
+		m_rs232b(*this, "rs232b"),
+		m_palette(*this, "palette")
 	{ }
 
 	void mm2(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<i80186_cpu_device> m_maincpu;
@@ -64,19 +74,81 @@ private:
 	required_device<i8251_device> m_sio;
 	required_device<am9517a_device> m_dmac;
 	required_device<upd765a_device> m_fdc;
+	optional_device_array<floppy_image_device, 2> m_floppy;
+	required_device<speaker_sound_device> m_speaker;
 	required_device<nscsi_callback_device> m_sasi;
+	required_device<rs232_port_device> m_rs232a;
+	required_device<rs232_port_device> m_rs232b;
+	required_device<palette_device> m_palette;
 
-	void mm2_map(address_map &map);
-	void mm2_io_map(address_map &map);
-	void vpac_mem(address_map &map);
+	void mm2_map(address_map &map) ATTR_COLD;
+	void mm2_io_map(address_map &map) ATTR_COLD;
+	void vpac_mem(address_map &map) ATTR_COLD;
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void palette(palette_device &palette) const;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	static void floppy_formats(format_registration &fr);
 
+	void diag_w(offs_t offset, uint8_t data) { popmessage("%02x", data); }
 	void novram_store(offs_t offset, uint8_t data);
 	void novram_recall(offs_t offset, uint8_t data);
 	uint8_t videoram_r(offs_t offset);
+
+	bool m_vpac_int;
+	bool m_sio_rxrdy;
+	bool m_sio_txrdy;
+	int m_cls;
+	bool m_ir0;
+
+	void update_pic_ir0() { m_pic->ir0_w(m_ir0); }
+	void ir0_w(int state) { if (state) { m_ir0 = ASSERT_LINE; update_pic_ir0(); } }
+	void tcl_w(offs_t offset, uint8_t data) { m_ir0 = CLEAR_LINE; update_pic_ir0(); }
+
+	void update_pic_ir5() { m_pic->ir5_w(m_vpac_int || m_sio_rxrdy || m_sio_txrdy); }
+	void vpac_int_w(int state) { m_vpac_int = state; update_pic_ir5(); }
+	void sio_rxrdy_w(int state) { m_sio_rxrdy = state; update_pic_ir5(); }
+	void sio_txrdy_w(int state) { m_sio_txrdy = state; update_pic_ir5(); }
+	void dtra_w(offs_t offset, uint8_t data) { m_rs232a->write_txd(!BIT(data, 0)); }
+	void dtrb_w(offs_t offset, uint8_t data) { m_rs232b->write_txd(!BIT(data, 0)); }
+	uint8_t status_r(offs_t offset);
+	void cls0_w(offs_t offset, uint8_t data) { m_cls = (m_cls & 0x2) | BIT(data, 0); }
+	void cls1_w(offs_t offset, uint8_t data) { m_cls = (BIT(data, 0) << 1) | (m_cls & 0x1); }
+	void tmrout0_w(int state) { if (m_cls == 0) { m_mpsc->rxca_w(state); m_mpsc->txca_w(state); } };
+	void tmrout1_w(int state) { if (m_cls == 1) { m_mpsc->rxca_w(state); m_mpsc->txca_w(state); } };
+
+	uint8_t m_dma_hi;
+	uint8_t m_sasi_data;
+
+	uint8_t dmac_mem_r(offs_t offset);
+	void dmac_mem_w(offs_t offset, uint8_t data);
+
+	void dma_hi_w(offs_t offset, uint8_t data) { m_dma_hi = data & 0x0f; }
+	uint8_t sasi_status_r(offs_t offset);
+	void sasi_cmd_w(offs_t offset, uint8_t data);
+	uint8_t sasi_data_r(offs_t offset);
+	void sasi_data_w(offs_t offset, uint8_t data);
+	void sasi_bsy_w(int state);
+	void sasi_req_w(int state);
+	void sasi_io_w(int state);
+	void fdc_reset_w(offs_t offset, uint8_t data) { m_fdc->reset_w(BIT(data, 0)); }
+	void motor_on_w(offs_t offset, uint8_t data) { m_floppy[0]->mon_w(BIT(data, 0)); }
+
+	bool m_cpl;
+	bool m_blc;
+	bool m_mode;
+	bool m_modeg;
+	bool m_c70_50;
+	bool m_cru;
+	bool m_crb;
+
+	void cpl_w(offs_t offset, uint16_t data, uint16_t mem_mask) { m_cpl = BIT(data, 0); }
+	void blc_w(offs_t offset, uint16_t data, uint16_t mem_mask) { m_blc = BIT(data, 0); }
+	void mode_w(offs_t offset, uint16_t data, uint16_t mem_mask) { m_mode = BIT(data, 0); }
+	void modeg_w(offs_t offset, uint16_t data, uint16_t mem_mask) { m_modeg = BIT(data, 0); }
+	void c70_50_w(offs_t offset, uint16_t data, uint16_t mem_mask) { m_c70_50 = BIT(data, 0); }
+	void cru_w(offs_t offset, uint16_t data, uint16_t mem_mask) { m_cru = BIT(data, 0); }
+	void crb_w(offs_t offset, uint16_t data, uint16_t mem_mask) { m_crb = BIT(data, 0); }
 };
 
 #endif // MAME_NOKIA_MIKROMIKKO2_H

@@ -185,7 +185,7 @@ TODO: split Alice 4k tapes into their own softlist
 	</software>
 
 	<software name="dessinea" cloneof="dessine">
-		<description>Dessine-moi (Alt)</description>
+		<description>Dessine-moi (alt)</description>
 		<year>1985</year>
 		<publisher>Matra Datasysteme</publisher>
 
@@ -375,7 +375,7 @@ TODO: split Alice 4k tapes into their own softlist
 	</software>
 
 	<software name="damesa" cloneof="dames">
-		<description>Jeu de Dames (Alt)</description>
+		<description>Jeu de Dames (alt)</description>
 		<year>1984</year>
 		<publisher>Ediciel</publisher>
 
@@ -589,7 +589,7 @@ TODO: split Alice 4k tapes into their own softlist
 <!-- The Micro Games tapes below have been fixed to work on Alice 32 and 90, as the original MC-10 versions do not work on them -->
 
 	<software name="breakout">
-		<description>Micro Games - Breakout (Fixed for Alice 32 and 90)</description>
+		<description>Micro Games - Breakout (fixed for Alice 32 and 90)</description>
 		<year>????</year>
 		<publisher>&lt;hack&gt;</publisher>
 
@@ -601,7 +601,7 @@ TODO: split Alice 4k tapes into their own softlist
 	</software>
 
 	<software name="eggcatch">
-		<description>Micro Games - Egg Catch (Fixed for Alice 32 and 90)</description>
+		<description>Micro Games - Egg Catch (fixed for Alice 32 and 90)</description>
 		<year>????</year>
 		<publisher>&lt;hack&gt;</publisher>
 
@@ -613,7 +613,7 @@ TODO: split Alice 4k tapes into their own softlist
 	</software>
 
 	<software name="horserac">
-		<description>Micro Games - Horse Race (Fixed for Alice 32 and 90)</description>
+		<description>Micro Games - Horse Race (fixed for Alice 32 and 90)</description>
 		<year>????</year>
 		<publisher>&lt;hack&gt;</publisher>
 
@@ -625,7 +625,7 @@ TODO: split Alice 4k tapes into their own softlist
 	</software>
 
 	<software name="lunland">
-		<description>Micro Games - Lunar Lander (Fixed for Alice 32 and 90)</description>
+		<description>Micro Games - Lunar Lander (fixed for Alice 32 and 90)</description>
 		<year>????</year>
 		<publisher>&lt;hack&gt;</publisher>
 
@@ -637,7 +637,7 @@ TODO: split Alice 4k tapes into their own softlist
 	</software>
 
 	<software name="pong">
-		<description>Micro Games - Pong (Fixed for Alice 32 and 90)</description>
+		<description>Micro Games - Pong (fixed for Alice 32 and 90)</description>
 		<year>????</year>
 		<publisher>&lt;hack&gt;</publisher>
 

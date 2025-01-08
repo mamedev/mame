@@ -114,9 +114,9 @@ public:
 	void init_archrivlb();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	optional_device<midway_sounds_good_device> m_sounds_good;
@@ -164,9 +164,9 @@ private:
 	std::unique_ptr<uint8_t[]> m_srcdata0;
 	std::unique_ptr<uint8_t[]> m_srcdata2;
 
-	void mcr68_map(address_map &map);
-	void pigskin_map(address_map &map);
-	void trisport_map(address_map &map);
+	void mcr68_map(address_map &map) ATTR_COLD;
+	void pigskin_map(address_map &map) ATTR_COLD;
+	void trisport_map(address_map &map) ATTR_COLD;
 };
 
 

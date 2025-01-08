@@ -74,12 +74,12 @@ public:
 	required_device<ram_device> m_ram;
 
 private:
-	void pippin_map(address_map &map);
-	void cdmcu_mem(address_map &map);
-	void cdmcu_data(address_map &map);
+	void pippin_map(address_map &map) ATTR_COLD;
+	void cdmcu_mem(address_map &map) ATTR_COLD;
+	void cdmcu_data(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void cuda_reset_w(int state)
 	{

@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+	<view name="Default Layout">
+		<screen index="1">
+			<bounds x="0" y="0" width="768" height="128" />
+		</screen>
+		<screen index="0">
+			<bounds x="0" y="128" width="768" height="576" />
+		</screen>
+	</view>
+</mamelayout>

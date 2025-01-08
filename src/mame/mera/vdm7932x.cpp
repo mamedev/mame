@@ -30,16 +30,16 @@ public:
 	void vdm7932x(machine_config &config);
 
 private:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	void scan_w(offs_t offset, u8 data);
 	u8 i8031_p3_r();
 	void ppi1_pc_w(u8 data);
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
-	void sub_map(address_map &map);
-	void subx_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
+	void subx_map(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
 	required_device<i8031_device> m_subcpu;
@@ -145,4 +145,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1992, vdm79322, 0, 0, vdm7932x, vdm7932x, vdm7932x_state, empty_init, "Mera-Elzab", "VDM 79322/CM 7233", MACHINE_IS_SKELETON)
+COMP(1992, vdm79322, 0, 0, vdm7932x, vdm7932x, vdm7932x_state, empty_init, "Mera-Elzab", "VDM 79322/CM 7233", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

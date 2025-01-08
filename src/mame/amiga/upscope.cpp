@@ -29,7 +29,6 @@
 #include "amiga.h"
 
 #include "cpu/m68000/m68000.h"
-#include "machine/amigafdc.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
 
@@ -73,11 +72,11 @@ private:
 	void coin_counter_w(uint8_t data);
 
 
-	void a500_mem(address_map &map);
-	void main_map(address_map &map);
-	void overlay_512kb_map(address_map &map);
+	void a500_mem(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void overlay_512kb_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<i8255_device> m_ppi;
 };
@@ -274,7 +273,7 @@ void upscope_state::upscope(machine_config &config)
 	ADDRESS_MAP_BANK(config, m_overlay).set_map(&upscope_state::overlay_512kb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
 	ADDRESS_MAP_BANK(config, m_chipset).set_map(&upscope_state::ocs_map).set_options(ENDIANNESS_BIG, 16, 9, 0x200);
 
-	AMIGA_COPPER(config, m_copper, amiga_state::CLK_7M_NTSC);
+	AGNUS_COPPER(config, m_copper, amiga_state::CLK_7M_NTSC);
 	m_copper->set_host_cpu_tag(m_maincpu);
 	m_copper->mem_read_cb().set(FUNC(amiga_state::chip_ram_r));
 	m_copper->set_ecs_mode(false);
@@ -313,7 +312,7 @@ void upscope_state::upscope(machine_config &config)
 	m_cia_1->pa_wr_callback().set(FUNC(upscope_state::upscope_cia_1_porta_w));
 
 	/* fdc */
-	AMIGA_FDC(config, m_fdc, amiga_state::CLK_7M_NTSC);
+	PAULA_FDC(config, m_fdc, amiga_state::CLK_7M_NTSC);
 	m_fdc->index_callback().set("cia_1", FUNC(mos8520_device::flag_w));
 	m_fdc->read_dma_callback().set(FUNC(amiga_state::chip_ram_r));
 	m_fdc->write_dma_callback().set(FUNC(amiga_state::chip_ram_w));

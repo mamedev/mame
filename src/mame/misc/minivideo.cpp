@@ -45,9 +45,9 @@ public:
 	void minivideo(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -147,5 +147,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1995?, fiches,        0, minivideo, minivideo, minivideo_state, empty_init, ROT0, "Minivideo", "Les Fiches (ver 1.3)", MACHINE_IS_SKELETON )
-GAME( 1995?, fiches12, fiches, minivideo, minivideo, minivideo_state, empty_init, ROT0, "Minivideo", "Les Fiches (ver 1.2)", MACHINE_IS_SKELETON )
+GAME( 1995?, fiches,        0, minivideo, minivideo, minivideo_state, empty_init, ROT0, "Minivideo", "Les Fiches (ver 1.3)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1995?, fiches12, fiches, minivideo, minivideo, minivideo_state, empty_init, ROT0, "Minivideo", "Les Fiches (ver 1.2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Philip Bennett, Carl
+#ifndef MAME_MACHINE_I8087_H
+#define MAME_MACHINE_I8087_H
+
+#pragma once
 
 // SoftFloat 2 lacks an include guard
 #ifndef softfloat2_h
@@ -24,8 +28,8 @@ public:
 
 protected:
 	i8087_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(release_busy);
 
@@ -223,3 +227,5 @@ private:
 	void build_opcode_table();
 
 };
+
+#endif // MAME_MACHINE_I8087_H

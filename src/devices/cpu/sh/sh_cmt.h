@@ -58,8 +58,8 @@ protected:
 	std::array<u16, 2> m_cnt;
 	std::array<u16, 2> m_cor;
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	void csr_w(int reg, u16 data, u16 mem_mask);
 	void cnt_w(int reg, u16 data, u16 mem_mask);

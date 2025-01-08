@@ -14,11 +14,11 @@ public:
 	opti_82c861_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	opti_82c861_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	void map_extra(u64 memory_window_start, u64 memory_window_end, u64 memory_offset, address_space *memory_space,
 				   u64 io_window_start, u64 io_window_end, u64 io_offset, address_space *io_space) override;

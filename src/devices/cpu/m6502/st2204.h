@@ -37,8 +37,8 @@ public:
 protected:
 	st2204_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor int_map);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual u16 st2xxx_ireq_mask() const override { return 0x0f7f; }
 	virtual const char *st2xxx_irq_name(int i) const override;
@@ -59,7 +59,7 @@ protected:
 	virtual u8 st2xxx_uctr_mask() const override { return 0x0f; }
 	virtual u8 st2xxx_bctr_mask() const override { return 0x87; }
 
-	void common_map(address_map &map);
+	void common_map(address_map &map) ATTR_COLD;
 
 private:
 	class mi_st2204 : public mi_st2xxx {
@@ -126,7 +126,7 @@ private:
 	u8 dmem_r(offs_t offset);
 	void dmem_w(offs_t offset, u8 data);
 
-	void int_map(address_map &map);
+	void int_map(address_map &map) ATTR_COLD;
 
 	devcb_write8 m_dac_callback;
 
@@ -154,7 +154,7 @@ protected:
 	virtual u8 st2xxx_lctr_mask() const override { return 0xe0; }
 
 private:
-	void int_map(address_map &map);
+	void int_map(address_map &map) ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(ST2202, st2202_device)

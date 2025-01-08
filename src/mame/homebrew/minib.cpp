@@ -51,15 +51,15 @@ public:
 	void minib(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<m6502_device> m_maincpu;
 	required_memory_bank m_rombank;
 	required_device<pc_kbdc_device> m_kbd;
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	//uint8_t pa_r();
 	void pa_w(uint8_t data);

@@ -10,7 +10,6 @@
 
 NETLIST_START(gamemachine)
 {
-
 	/* Standard stuff */
 
 	SOLVER(Solver, 48000)
@@ -87,6 +86,4 @@ NETLIST_START(gamemachine)
 	NET_C(Q1.C, SPK1.2)
 
 	NET_C(C8.1, R1.1, R3.2, IC1.5)
-
 }
-

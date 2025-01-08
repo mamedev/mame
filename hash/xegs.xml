@@ -112,7 +112,7 @@ Title screen doesn't draw player sprite properly the first time around [GTIA]
 	</software>
 
 	<software name="brucelee">
-		<description>Bruce Lee (Reproduction)</description>
+		<description>Bruce Lee (reproduction)</description>
 		<year>1984</year>
 		<publisher>Video 61 / Datasoft</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -195,7 +195,7 @@ Requires unsupported [Atari XG-1 light gun]
 	</software>
 
 	<software name="commando">
-		<description>Commando (Prototype)</description>
+		<description>Commando (prototype)</description>
 		<year>1988</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -283,7 +283,7 @@ Requires unsupported [Atari XG-1 light gun]
 	</software>
 
 	<software name="deflektr">
-		<description>Deflektor (Prototype)</description>
+		<description>Deflektor (prototype)</description>
 		<year>1988</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -343,7 +343,7 @@ Doesn't accept any [keyboard] input when prompted to select monitor type
 	</software>
 
 	<software name="fsim2d" cloneof="fsim2">
-		<description>Flight Simulator 2 (Demo Cartridge)</description>
+		<description>Flight Simulator 2 (demo cartridge)</description>
 		<year>1987</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CA400201" />
@@ -453,7 +453,7 @@ Crashes during attract
 	</software>
 
 	<software name="mean18">
-		<description>Mean 18 (Prototype)</description>
+		<description>Mean 18 (prototype)</description>
 		<year>1988</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -482,7 +482,7 @@ Multiplayer game requiring [XM301], [SX212], [850] or direct connection with ano
 	</software>
 
 	<software name="midimazep" cloneof="midimaze" supported="partial">
-		<description>MIDI Maze (Prototype)</description>
+		<description>MIDI Maze (prototype)</description>
 		<year>1988</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
@@ -536,7 +536,7 @@ Multiplayer game requiring [XM301], [SX212], [850] or direct connection with ano
 	</software>
 
 	<software name="sinistar">
-		<description>Sinistar (Reproduction)</description>
+		<description>Sinistar (reproduction)</description>
 		<year>199?</year>
 		<publisher>Video 61 / Atari</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -574,7 +574,7 @@ Multiplayer game requiring [XM301], [SX212], [850] or direct connection with ano
 	</software>
 
 	<software name="tapper">
-		<description>Tapper (Reproduction)</description>
+		<description>Tapper (reproduction)</description>
 		<year>20??</year>
 		<publisher>Video 61 / Bally Midway</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -602,7 +602,7 @@ Status bar flickers during gameplay
 	</software>
 
 	<software name="towertop">
-		<description>Tower Toppler (Prototype)</description>
+		<description>Tower Toppler (prototype)</description>
 		<year>1988</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -614,7 +614,7 @@ Status bar flickers during gameplay
 	</software>
 
 	<software name="vanguard">
-		<description>Vanguard (5200 Conversion)</description>
+		<description>Vanguard (5200 conversion)</description>
 		<year>199?</year>
 		<publisher>Video 61 / Atari</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -627,7 +627,7 @@ Status bar flickers during gameplay
 
 
 	<software name="xenophob">
-		<description>Xenophobe (Reproduction)</description>
+		<description>Xenophobe (reproduction)</description>
 		<year>2010</year>
 		<publisher>Video 61 / Atari</publisher>
 		<part name="cart" interface="a8bit_cart">

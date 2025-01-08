@@ -92,13 +92,13 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// address maps
-	template <unsigned ST> void cpu_map(address_map &map);
-	void iop_map(address_map &map);
-	void dma_map(address_map &map);
+	template <unsigned ST> void cpu_map(address_map &map) ATTR_COLD;
+	void iop_map(address_map &map) ATTR_COLD;
+	void dma_map(address_map &map) ATTR_COLD;
 
 private:
 	MC6845_UPDATE_ROW(update_row);

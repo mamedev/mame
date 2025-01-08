@@ -162,12 +162,12 @@ private:
 	void dsp_to_8086_p0_w(int state);
 	void dsp_to_8086_p1_w(int state);
 
-	void dsp_data_map(address_map &map);
-	void dsp_prg_map(address_map &map);
-	void i8086_io(address_map &map);
-	void i8086_mem(address_map &map);
+	void dsp_data_map(address_map &map) ATTR_COLD;
+	void dsp_prg_map(address_map &map) ATTR_COLD;
+	void i8086_io(address_map &map) ATTR_COLD;
+	void i8086_mem(address_map &map) ATTR_COLD;
 
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<upd7725_device> m_dsp;

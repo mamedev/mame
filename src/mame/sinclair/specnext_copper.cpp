@@ -1,4 +1,5 @@
 // license:BSD-3-Clause
+// copyright-holders:Andrei I. Holub
 /**********************************************************************
     Spectrum Next Copper
 Refs:

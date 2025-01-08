@@ -114,8 +114,8 @@ protected:
 	void copcr_w(u8 data);
 	void copr_w(u8 data);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void execute_set_input(int inputnum, int state) override;
 	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override;
@@ -204,9 +204,9 @@ public:
 	m68hc05c4_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 protected:
-	void c4_map(address_map &map);
+	void c4_map(address_map &map) ATTR_COLD;
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
@@ -220,9 +220,9 @@ public:
 	m68hc05c8_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 protected:
-	void c8_map(address_map &map);
+	void c8_map(address_map &map) ATTR_COLD;
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
@@ -236,12 +236,12 @@ public:
 	m68hc705c4a_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 protected:
-	void c4a_map(address_map &map);
+	void c4a_map(address_map &map) ATTR_COLD;
 
-	virtual tiny_rom_entry const *device_rom_region() const override;
+	virtual tiny_rom_entry const *device_rom_region() const override ATTR_COLD;
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
@@ -260,12 +260,12 @@ public:
 	m68hc705c8a_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 protected:
-	void c8a_map(address_map &map);
+	void c8a_map(address_map &map) ATTR_COLD;
 
-	virtual tiny_rom_entry const *device_rom_region() const override;
+	virtual tiny_rom_entry const *device_rom_region() const override ATTR_COLD;
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
@@ -290,10 +290,10 @@ public:
 	m68hc705j1a_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 protected:
-	void j1a_map(address_map &map);
+	void j1a_map(address_map &map) ATTR_COLD;
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
@@ -307,9 +307,9 @@ public:
 	m68hc05l9_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 protected:
-	void l9_map(address_map &map);
+	void l9_map(address_map &map) ATTR_COLD;
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
@@ -323,9 +323,9 @@ public:
 	m68hc05l11_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 protected:
-	void l11_map(address_map &map);
+	void l11_map(address_map &map) ATTR_COLD;
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };

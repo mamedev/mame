@@ -33,8 +33,8 @@ private:
 	u8 busy_r();
 	void misc_control_w(u8 data);
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5832_device> m_rtc;
@@ -114,4 +114,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1988, lms46, 0, 0, lms46, lms46, lms46_state, empty_init, "Litek Information Systems", "LMS46-V9", MACHINE_IS_SKELETON)
+COMP(1988, lms46, 0, 0, lms46, lms46, lms46_state, empty_init, "Litek Information Systems", "LMS46-V9", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

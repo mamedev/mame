@@ -12,12 +12,30 @@ license:CC0-1.0
 		<publisher>Nokia Data</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
+			<!--
+			KÄYTTÖJÄRJESTELMÄLEVYKE
+
+			Nokia MS*-DOS 2.00 Versio 2.21
+
+			Sarjanro    1/2 CRTC  00010111
+			*Microsoft Corp. tavaramerkki
+			             toimpvm  85-10-14
+			-->
 			<dataarea name="flop" size="537770">
 				<rom name="12.imd" size="537770" crc="30d62aa0" sha1="887f433133439731baf7617292bcdcb29090075f"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
+			<!--
+			KÄYTTÖJÄRJESTELMÄLEVYKE
+
+			Nokia MS*-DOS 2.00 Versio 2.21
+
+			Sarjanro    2/2 CRTC  00000000
+			*Microsoft Corp. tavaramerkki
+			             toimpvm  85-10-14
+			-->
 			<dataarea name="flop" size="451922">
 				<rom name="13.imd" size="451922" crc="2efba243" sha1="341f44c2b204d74f729bf3f68ec77aa313c8ea9f"/>
 			</dataarea>

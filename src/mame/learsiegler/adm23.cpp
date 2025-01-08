@@ -29,7 +29,7 @@ private:
 	MC6845_UPDATE_ROW(update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(addr_changed);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_region_ptr<u8> m_chargen;
 };
@@ -88,4 +88,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1982, adm23, 0, 0, adm23, adm23, adm23_state, empty_init, "Lear Siegler", "ADM 23 Smart Terminal", MACHINE_IS_SKELETON)
+COMP(1982, adm23, 0, 0, adm23, adm23, adm23_state, empty_init, "Lear Siegler", "ADM 23 Smart Terminal", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

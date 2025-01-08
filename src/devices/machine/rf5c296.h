@@ -23,7 +23,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	void reg_w(uint8_t reg, uint8_t data);

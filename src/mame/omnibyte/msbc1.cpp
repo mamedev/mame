@@ -74,8 +74,8 @@ public:
 	void msbc1(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
-	virtual void machine_reset() override;
+	void mem_map(address_map &map) ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 };
 

@@ -25,8 +25,8 @@ public:
 	void k5(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
-	void lcd_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void lcd_map(address_map &map) ATTR_COLD;
 
 	required_device<v40_device> m_maincpu;
 };
@@ -81,5 +81,5 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1987, k5,  0,  0, k5, k5, kawai_k5_state, empty_init, "Kawai Musical Instrument Manufacturing", "K5 Digital Multi-Dimensional Synthesizer",         MACHINE_IS_SKELETON)
-SYST(1987, k5m, k5, 0, k5, k5, kawai_k5_state, empty_init, "Kawai Musical Instrument Manufacturing", "K5m Digital Multi-Dimensional Synthesizer Module", MACHINE_IS_SKELETON)
+SYST(1987, k5,  0,  0, k5, k5, kawai_k5_state, empty_init, "Kawai Musical Instrument Manufacturing", "K5 Digital Multi-Dimensional Synthesizer",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1987, k5m, k5, 0, k5, k5, kawai_k5_state, empty_init, "Kawai Musical Instrument Manufacturing", "K5m Digital Multi-Dimensional Synthesizer Module", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

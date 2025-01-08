@@ -20,8 +20,8 @@ public:
 	u8 read();
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	optional_ioport_array<38> m_keys;

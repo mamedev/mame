@@ -258,7 +258,7 @@ void menu_sliders::recompute_metrics(uint32_t width, uint32_t height, float aspe
 //  custom_render - perform our special rendering
 //-------------------------------------------------
 
-void menu_sliders::custom_render(uint32_t flags, void *selectedref, float top, float bottom, float x1, float y1, float x2, float y2)
+void menu_sliders::custom_render(uint32_t flags, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	const slider_state *curslider = (const slider_state *)selectedref;
 	if (curslider != nullptr)
@@ -280,10 +280,10 @@ void menu_sliders::custom_render(uint32_t flags, void *selectedref, float top, f
 		tempstring.insert(0, " ").insert(0, curslider->description);
 
 		// move us to the bottom of the screen, and expand to full width
-		y2 = 1.0f - tb_border();
-		y1 = y2 - bottom;
-		x1 = lr_border();
-		x2 = 1.0f - lr_border();
+		float y2 = 1.0f - tb_border();
+		float y1 = y2 - bottom;
+		float x1 = lr_border();
+		float x2 = 1.0f - lr_border();
 
 		// draw extra menu area
 		ui().draw_outlined_box(container(), x1, y1, x2, y2, ui().colors().background_color());

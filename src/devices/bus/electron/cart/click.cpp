@@ -36,7 +36,7 @@ void electron_click_device::device_add_mconfig(machine_config &config)
 
 INPUT_PORTS_START(click)
 	PORT_START("BUTTON")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Click") PORT_CODE(KEYCODE_HOME) PORT_CHANGED_MEMBER(DEVICE_SELF, electron_click_device, click_button, 0)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Click") PORT_CODE(KEYCODE_HOME) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(electron_click_device::click_button), 0)
 INPUT_PORTS_END
 
 

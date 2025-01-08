@@ -24,8 +24,8 @@
 
 *******************************************************************************/
 
-#ifndef MAME_BUS_SAITEKOSA_EXPANSION_H
-#define MAME_BUS_SAITEKOSA_EXPANSION_H
+#ifndef MAME_BUS_SAITEK_OSA_EXPANSION_H
+#define MAME_BUS_SAITEK_OSA_EXPANSION_H
 
 #pragma once
 
@@ -81,8 +81,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	devcb_write_line m_stb_handler;
@@ -123,5 +123,4 @@ protected:
 
 void saitekosa_expansion_modules(device_slot_interface &device);
 
-
-#endif // MAME_BUS_SAITEKOSA_EXPANSION_H
+#endif // MAME_BUS_SAITEK_OSA_EXPANSION_H

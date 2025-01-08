@@ -51,9 +51,9 @@ public:
 	void ddribble(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// memory pointers
@@ -94,10 +94,10 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vblank_irq(int state);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* source, int lenght, int gfxset, int flipscreen);
-	void maincpu_map(address_map &map);
-	void subcpu_map(address_map &map);
-	void audiocpu_map(address_map &map);
-	void vlm_map(address_map &map);
+	void maincpu_map(address_map &map) ATTR_COLD;
+	void subcpu_map(address_map &map) ATTR_COLD;
+	void audiocpu_map(address_map &map) ATTR_COLD;
+	void vlm_map(address_map &map) ATTR_COLD;
 };
 
 

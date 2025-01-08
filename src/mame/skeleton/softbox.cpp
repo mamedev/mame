@@ -148,11 +148,11 @@ private:
 		LED_READY
 	};
 
-	void softbox_io(address_map &map);
-	void softbox_mem(address_map &map);
+	void softbox_io(address_map &map) ATTR_COLD;
+	void softbox_mem(address_map &map) ATTR_COLD;
 	int m_ifc = 0;  // Tracks previous state of IEEE-488 IFC line
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	virtual void device_reset_after_children() override;
 
 	required_device<cpu_device> m_maincpu;

@@ -30,10 +30,10 @@ public:
 protected:
 	// device-level overrides
 	void device_resolve_objects() override;
-	void device_start() override;
+	void device_start() override ATTR_COLD;
 	ioport_constructor device_input_ports() const override;
-	void device_add_mconfig(machine_config &config) override;
-	const tiny_rom_entry *device_rom_region() const override;
+	void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 private:
 	// MCU handlers
@@ -42,8 +42,8 @@ private:
 	void leds_w(uint8_t data);
 
 	// address maps
-	void prog_map(address_map &map);
-	void ext_map(address_map &map);
+	void prog_map(address_map &map) ATTR_COLD;
+	void ext_map(address_map &map) ATTR_COLD;
 
 	// object finders
 	required_device<mcs48_cpu_device> m_mcu;

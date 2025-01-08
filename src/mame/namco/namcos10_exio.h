@@ -30,7 +30,7 @@ public:
 protected:
 	namcos10_exio_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t ident_code);
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	const uint8_t m_ident_code;
 };
@@ -54,12 +54,12 @@ public:
 	virtual void ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset_after_children() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	template <int Port> uint8_t port_read(offs_t offset);
 	template <int Port> void port_write(offs_t offset, uint8_t data);
@@ -109,12 +109,12 @@ public:
 	virtual void ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset_after_children() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	template <int Port> uint8_t port_r();
 	template <int Port> void port_w(uint8_t data);

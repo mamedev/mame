@@ -88,7 +88,7 @@ public:
 	void cc_bvd2_w(int state);
 	void cc_wp_w(int state);
 
-	void register_map(address_map &map);
+	void register_map(address_map &map) ATTR_COLD;
 	uint16_t gayle_id_r(offs_t offset, uint16_t mem_mask = ~0);
 	void gayle_id_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
@@ -96,8 +96,8 @@ public:
 	void set_id(uint8_t id) { m_gayle_id = id; }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	void dump_register();

@@ -170,13 +170,13 @@ public:
 	void second_mcu_run();
 	void jalmah(machine_config &config);
 	void jalmahv1(machine_config &config);
-	void jalmah_map(address_map &map);
-	void jalmahv1_map(address_map &map);
-	void oki_map(address_map &map);
+	void jalmah_map(address_map &map) ATTR_COLD;
+	void jalmahv1_map(address_map &map) ATTR_COLD;
+	void oki_map(address_map &map) ATTR_COLD;
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
@@ -252,14 +252,14 @@ public:
 	template<int TileChip> TILE_GET_INFO_MEMBER(get_tile_info_urashima);
 
 	void urashima(machine_config &config);
-	void urashima_map(address_map &map);
+	void urashima_map(address_map &map) ATTR_COLD;
 
 	uint32_t screen_update_urashima(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void urashima_bank_w(uint8_t data);
 
 protected:
-	virtual void video_start() override;
-	virtual void machine_reset() override;
+	virtual void video_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_shared_ptr_array<uint16_t, 2> m_videoram;

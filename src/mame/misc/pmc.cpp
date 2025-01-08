@@ -43,10 +43,10 @@ public:
 	void pmc(machine_config &config);
 
 private:
-	void rom_map(address_map &map);
-	void rom_ports_map(address_map &map);
-	void ram_map(address_map &map);
-	void ram_status_map(address_map &map);
+	void rom_map(address_map &map) ATTR_COLD;
+	void rom_ports_map(address_map &map) ATTR_COLD;
+	void ram_map(address_map &map) ATTR_COLD;
+	void ram_status_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -105,4 +105,4 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1975?, unkpmc, 0, pmc, 0, pmc_state, empty_init, ROT0, "PMC", "unknown PMC game", MACHINE_IS_SKELETON ) // might be Aztec Princess
+GAME( 1975?, unkpmc, 0, pmc, 0, pmc_state, empty_init, ROT0, "PMC", "unknown PMC game", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // might be Aztec Princess

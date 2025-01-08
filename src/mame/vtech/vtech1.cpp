@@ -84,10 +84,10 @@ public:
 
 	void vtech1(machine_config &config);
 
-	void laser110_mem(address_map &map);
-	void laser210_mem(address_map &map);
-	void laser310_mem(address_map &map);
-	void vtech1_io(address_map &map);
+	void laser110_mem(address_map &map) ATTR_COLD;
+	void laser210_mem(address_map &map) ATTR_COLD;
+	void laser310_mem(address_map &map) ATTR_COLD;
+	void vtech1_io(address_map &map) ATTR_COLD;
 
 protected:
 	required_device<cpu_device> m_maincpu;
@@ -123,7 +123,7 @@ public:
 	void laser210(machine_config &config);
 
 protected:
-	void machine_start() override;
+	void machine_start() override ATTR_COLD;
 
 private:
 	memory_share_creator<uint8_t> m_vram;
@@ -142,7 +142,7 @@ public:
 	void laser310h(machine_config &config);
 
 protected:
-	void machine_start() override;
+	void machine_start() override ATTR_COLD;
 
 private:
 	memory_share_creator<uint8_t> m_vram;
@@ -151,8 +151,8 @@ private:
 	void video_bank_w(uint8_t data);
 	uint8_t mc6847_videoram_r(offs_t offset);
 
-	void vtech1_shrg_mem(address_map &map);
-	void vtech1_shrg_io(address_map &map);
+	void vtech1_shrg_mem(address_map &map) ATTR_COLD;
+	void vtech1_shrg_io(address_map &map) ATTR_COLD;
 };
 
 

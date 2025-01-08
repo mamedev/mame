@@ -32,11 +32,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	required_device<z80_device> m_maincpu;
@@ -45,11 +45,11 @@ private:
 	required_memory_bank m_gfxbank;
 	required_memory_bank m_soundbank;
 
-	void main_mem_map(address_map &map);
-	void main_io_map(address_map &map);
-	void sound_mem_map(address_map &map);
-	void sound_io_map(address_map &map);
-	void pcm_map(address_map &map);
+	void main_mem_map(address_map &map) ATTR_COLD;
+	void main_io_map(address_map &map) ATTR_COLD;
+	void sound_mem_map(address_map &map) ATTR_COLD;
+	void sound_io_map(address_map &map) ATTR_COLD;
+	void pcm_map(address_map &map) ATTR_COLD;
 
 	IRQ_CALLBACK_MEMBER(soundcpu_irq_ack);
 	void output_w(offs_t offset, uint8_t data);

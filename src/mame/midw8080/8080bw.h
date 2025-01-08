@@ -32,9 +32,9 @@
 class invaders_clone_state : public invaders_state
 {
 public:
-	DECLARE_CUSTOM_INPUT_MEMBER(sicv_in2_control_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(invadpt2_in1_control_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(invadpt2_in2_control_r);
+	ioport_value sicv_in2_control_r();
+	ioport_value invadpt2_in1_control_r();
+	ioport_value invadpt2_in2_control_r();
 
 protected:
 	invaders_clone_state(const machine_config &mconfig, device_type type, const char *tag) :
@@ -216,31 +216,31 @@ private:
 
 	void schaser_reinit_555_time_remain();
 
-	void astropal_io_map(address_map &map);
-	void attackfc_io_map(address_map &map);
-	void attackfcu_io_map(address_map &map);
-	void ballbomb_io_map(address_map &map);
-	void cosmicmo_io_map(address_map &map);
-	void cosmo_io_map(address_map &map);
-	void cosmo_map(address_map &map);
-	void crashrd_io_map(address_map &map);
-	void escmars_map(address_map &map);
-	void indianbt_io_map(address_map &map);
-	void indianbtbr_io_map(address_map &map);
-	void invadpt2_io_map(address_map &map);
-	void lrescue_io_map(address_map &map);
-	void lrescuem2_io_map(address_map &map);
-	void lupin3_io_map(address_map &map);
-	void polaris_io_map(address_map &map);
-	void schaser_io_map(address_map &map);
-	void schaser_map(address_map &map);
-	void schasercv_io_map(address_map &map);
-	void sflush_map(address_map &map);
-	void spacerng_io_map(address_map &map);
-	void spcewarla_io_map(address_map &map);
-	void spcewars_io_map(address_map &map);
-	void starw1_io_map(address_map &map);
-	void steelwkr_io_map(address_map &map);
+	void astropal_io_map(address_map &map) ATTR_COLD;
+	void attackfc_io_map(address_map &map) ATTR_COLD;
+	void attackfcu_io_map(address_map &map) ATTR_COLD;
+	void ballbomb_io_map(address_map &map) ATTR_COLD;
+	void cosmicmo_io_map(address_map &map) ATTR_COLD;
+	void cosmo_io_map(address_map &map) ATTR_COLD;
+	void cosmo_map(address_map &map) ATTR_COLD;
+	void crashrd_io_map(address_map &map) ATTR_COLD;
+	void escmars_map(address_map &map) ATTR_COLD;
+	void indianbt_io_map(address_map &map) ATTR_COLD;
+	void indianbtbr_io_map(address_map &map) ATTR_COLD;
+	void invadpt2_io_map(address_map &map) ATTR_COLD;
+	void lrescue_io_map(address_map &map) ATTR_COLD;
+	void lrescuem2_io_map(address_map &map) ATTR_COLD;
+	void lupin3_io_map(address_map &map) ATTR_COLD;
+	void polaris_io_map(address_map &map) ATTR_COLD;
+	void schaser_io_map(address_map &map) ATTR_COLD;
+	void schaser_map(address_map &map) ATTR_COLD;
+	void schasercv_io_map(address_map &map) ATTR_COLD;
+	void sflush_map(address_map &map) ATTR_COLD;
+	void spacerng_io_map(address_map &map) ATTR_COLD;
+	void spcewarla_io_map(address_map &map) ATTR_COLD;
+	void spcewars_io_map(address_map &map) ATTR_COLD;
+	void starw1_io_map(address_map &map) ATTR_COLD;
+	void steelwkr_io_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -269,7 +269,7 @@ public:
 	void invasion(machine_config &config);
 
 private:
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -288,16 +288,16 @@ public:
 	void darthvdr(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void darthvdr_00_w(uint8_t data);
 	void darthvdr_08_w(uint8_t data);
 	IRQ_CALLBACK_MEMBER(darthvdr_interrupt_vector);
 
-	void main_map(address_map &map);
-	void io_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_port_1_last = 0;
 	uint8_t m_fleet_step = 0;
@@ -324,8 +324,8 @@ public:
 private:
 	uint32_t screen_update_spacecom(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void main_map(address_map &map);
-	void io_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<palette_device> m_palette;
 };
@@ -349,7 +349,7 @@ public:
 	void init_invrvnge();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void port03_w(uint8_t data);
@@ -357,8 +357,8 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_timer);
 
-	void io_map(address_map &map);
-	void sound_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_audiocpu;
 
@@ -386,7 +386,7 @@ public:
 private:
 	uint32_t screen_update_vortex(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -404,10 +404,10 @@ public:
 
 	void rollingc(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(game_select_r);
+	ioport_value game_select_r();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void rollingc_sh_port_w(uint8_t data);
@@ -421,8 +421,8 @@ private:
 
 	uint32_t screen_update_rollingc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void main_map(address_map &map);
-	void io_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	std::unique_ptr<uint8_t []> m_scattered_colorram;
 	std::unique_ptr<uint8_t []> m_scattered_colorram2;
@@ -449,7 +449,7 @@ private:
 	void ozmawars_port03_w(uint8_t data);
 	void ozmawars_port04_w(uint8_t data);
 	void ozmawars_port05_w(uint8_t data);
-	void ozmawars_io_map(address_map &map);
+	void ozmawars_io_map(address_map &map) ATTR_COLD;
 	uint8_t m_port03 = 0;
 	uint8_t m_port05 = 0;
 	bool m_sound_enable = 0;
@@ -471,14 +471,14 @@ public:
 	void yosakdon(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void sh_port_1_w(uint8_t data);
 	void sh_port_2_w(uint8_t data);
 
-	void main_map(address_map &map);
-	void io_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_port_1_last;
 	uint8_t m_port_2_last;
@@ -503,7 +503,7 @@ public:
 	void shuttlei(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	uint8_t port_ff_r();
@@ -513,8 +513,8 @@ private:
 
 	uint32_t screen_update_shuttlei(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void main_map(address_map &map);
-	void io_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_ioport m_inputs;
 	required_ioport m_p2;
@@ -546,14 +546,14 @@ public:
 	int gun_on_r();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	uint8_t gun_lo_r();
 	uint8_t gun_hi_r();
 	TIMER_DEVICE_CALLBACK_MEMBER(gun_callback);
 
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_ioport m_gunx;
 	required_ioport m_guny;
@@ -582,8 +582,8 @@ protected:
 	void cane_unknown_port0_w(uint8_t data);
 
 private:
-	void cane_io_map(address_map &map);
-	void cane_map(address_map &map);
+	void cane_io_map(address_map &map) ATTR_COLD;
+	void cane_map(address_map &map) ATTR_COLD;
 };
 
 DISCRETE_SOUND_EXTERN( cane_discrete );
@@ -605,14 +605,14 @@ public:
 	void orbite(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	uint8_t orbite_scattered_colorram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void orbite_scattered_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 private:
-	void orbite_io_map(address_map &map);
-	void orbite_map(address_map &map);
+	void orbite_io_map(address_map &map) ATTR_COLD;
+	void orbite_map(address_map &map) ATTR_COLD;
 
 	u32 screen_update_orbite(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -640,14 +640,14 @@ public:
 	void init_invmulti();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	uint8_t eeprom_r();
 	void eeprom_w(uint8_t data);
 	void bank_w(uint8_t data);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	required_memory_bank_array<2> m_banks;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;

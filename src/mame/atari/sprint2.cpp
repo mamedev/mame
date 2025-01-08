@@ -73,8 +73,8 @@ public:
 	void init_dominos4();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_shared_ptr<uint8_t> m_video_ram;
@@ -120,7 +120,7 @@ private:
 	inline int get_sprite_y(int n);
 	uint8_t service_mode();
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 

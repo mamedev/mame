@@ -6,8 +6,8 @@
 
 */
 
-#ifndef MAME_FIDELITY_FIDEL_CLOCKDIV_H
-#define MAME_FIDELITY_FIDEL_CLOCKDIV_H
+#ifndef MAME_FIDELITY_CLOCKDIV_H
+#define MAME_FIDELITY_CLOCKDIV_H
 
 #pragma once
 
@@ -23,7 +23,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(div_changed) { div_refresh(newval); }
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override { div_refresh(); }
 	virtual void device_post_load() override { div_refresh(); }
 
@@ -49,4 +49,4 @@ private:
 INPUT_PORTS_EXTERN( fidel_clockdiv_2 );
 INPUT_PORTS_EXTERN( fidel_clockdiv_4 );
 
-#endif // MAME_FIDELITY_FIDEL_CLOCKDIV_H
+#endif // MAME_FIDELITY_CLOCKDIV_H

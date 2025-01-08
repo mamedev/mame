@@ -47,7 +47,7 @@ public:
 
 	void duet16(machine_config &config);
 protected:
-	void machine_reset() override;
+	void machine_reset() override ATTR_COLD;
 private:
 	u8 pic_r(offs_t offset);
 	void pic_w(offs_t offset, u8 data);
@@ -71,8 +71,8 @@ private:
 	void rtc_busy_w(int state);
 	void rtc_irq_reset();
 	MC6845_UPDATE_ROW(crtc_update_row);
-	void duet16_io(address_map &map);
-	void duet16_mem(address_map &map);
+	void duet16_io(address_map &map) ATTR_COLD;
+	void duet16_mem(address_map &map) ATTR_COLD;
 	required_device<i8086_cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic;
 	required_device<upd765a_device> m_fdc;

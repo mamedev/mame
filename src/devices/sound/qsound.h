@@ -19,6 +19,7 @@ class qsound_device : public device_t, public device_sound_interface, public dev
 public:
 	// default 60MHz clock (divided by 2 for DSP core clock, and then by 1248 for sample rate)
 	qsound_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 60'000'000);
+	virtual ~qsound_device();
 
 	void qsound_w(offs_t offset, u8 data);
 	u8 qsound_r();
@@ -26,10 +27,10 @@ public:
 protected:
 	// device_t implementation
 	tiny_rom_entry const *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_clock_changed() override;
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_sound_interface implementation
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
@@ -37,7 +38,7 @@ protected:
 	// device_rom_interface implementation
 	virtual void rom_bank_post_change() override;
 
-	void dsp_io_map(address_map &map);
+	void dsp_io_map(address_map &map) ATTR_COLD;
 
 private:
 	// DSP ROM access

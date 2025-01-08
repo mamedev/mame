@@ -168,6 +168,10 @@ micom_xe_1a_device::micom_xe_1a_device(
 {
 }
 
+micom_xe_1a_device::~micom_xe_1a_device()
+{
+}
+
 
 u8 micom_xe_1a_device::out_r()
 {

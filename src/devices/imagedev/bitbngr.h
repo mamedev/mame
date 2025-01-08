@@ -6,8 +6,10 @@
 
 *********************************************************************/
 
-#ifndef MAME_DEVICES_IMAGEDEV_BITBNGR_H
-#define MAME_DEVICES_IMAGEDEV_BITBNGR_H
+#ifndef MAME_IMAGEDEV_BITBNGR_H
+#define MAME_IMAGEDEV_BITBNGR_H
+
+#pragma once
 
 class bitbanger_device : public device_t,
 	public device_image_interface
@@ -39,7 +41,7 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_image_interface implementation
 	virtual software_list_loader const &get_software_list_loader() const override;
@@ -53,4 +55,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(BITBANGER, bitbanger_device)
 
-#endif // MAME_DEVICES_IMAGEDEV_BITBNGR_H
+#endif // MAME_IMAGEDEV_BITBNGR_H

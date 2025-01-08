@@ -797,7 +797,7 @@ void menu_select_launch::recompute_metrics(uint32_t width, uint32_t height, floa
 //  perform our special rendering
 //-------------------------------------------------
 
-void menu_select_launch::custom_render(u32 flags, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
+void menu_select_launch::custom_render(uint32_t flags, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	std::string tempbuf[4];
 
@@ -874,11 +874,11 @@ void menu_select_launch::custom_render(u32 flags, void *selectedref, float top, 
 		// next line is overall driver status
 		system_flags const &flags(get_system_flags(driver));
 		if (flags.machine_flags() & machine_flags::NOT_WORKING)
-			tempbuf[2] = _("Overall: NOT WORKING");
+			tempbuf[2] = _("Status: NOT WORKING");
 		else if ((flags.unemulated_features() | flags.imperfect_features()) & device_t::feature::PROTECTION)
-			tempbuf[2] = _("Overall: Unemulated Protection");
+			tempbuf[2] = _("Status: Unemulated Protection");
 		else
-			tempbuf[2] = _("Overall: Working");
+			tempbuf[2] = _("Status: Working");
 
 		// next line is graphics, sound status
 		if (flags.unemulated_features() & device_t::feature::GRAPHICS)
@@ -1361,10 +1361,10 @@ bool menu_select_launch::scale_icon(bitmap_argb32 &&src, texture_and_bitmap &dst
 	assert(dst.texture);
 	if (src.valid())
 	{
-		// reduce the source bitmap if it's too big
+		// scale the source bitmap
 		bitmap_argb32 tmp;
-		float const ratio((std::min)({ float(m_icon_height) / src.height(), float(m_icon_width) / src.width(), 1.0F }));
-		if (1.0F > ratio)
+		float const ratio((std::min)(float(m_icon_height) / src.height(), float(m_icon_width) / src.width()));
+		if ((1.0F > ratio) || (1.2F < ratio))
 		{
 			float const pix_height(std::ceil(src.height() * ratio));
 			float const pix_width(std::ceil(src.width() * ratio));
@@ -1733,7 +1733,7 @@ bool menu_select_launch::handle_events(u32 flags, event &ev)
 
 		// text input goes to the search field unless there's an error message displayed
 		case ui_event::type::IME_CHAR:
-			if (!pointer_idle())
+			if (have_pointer() && !pointer_idle())
 				break;
 
 			if (exclusive_input_pressed(ev.iptkey, IPT_UI_FOCUS_NEXT, 0) || exclusive_input_pressed(ev.iptkey, IPT_UI_FOCUS_PREV, 0))
@@ -1918,7 +1918,11 @@ bool menu_select_launch::handle_keys(u32 flags, int &iptkey)
 
 	if (exclusive_input_pressed(iptkey, IPT_UI_CANCEL, 0))
 	{
-		if (!m_search.empty())
+		if (m_ui_error)
+		{
+			// dismiss error
+		}
+		else if (!m_search.empty())
 		{
 			// escape pressed with non-empty search text clears it
 			m_search.clear();
@@ -1940,7 +1944,12 @@ bool menu_select_launch::handle_keys(u32 flags, int &iptkey)
 	// accept left/right keys as-is with repeat
 	if (exclusive_input_pressed(iptkey, IPT_UI_LEFT, (flags & PROCESS_LR_REPEAT) ? 6 : 0))
 	{
-		if (m_focus == focused_menu::RIGHTTOP)
+		if (m_ui_error)
+		{
+			// dismiss error
+			return false;
+		}
+		else if (m_focus == focused_menu::RIGHTTOP)
 		{
 			// Swap the right panel and swallow it
 			iptkey = IPT_INVALID;
@@ -1971,7 +1980,12 @@ bool menu_select_launch::handle_keys(u32 flags, int &iptkey)
 	// swallow left/right keys if they are not appropriate
 	if (exclusive_input_pressed(iptkey, IPT_UI_RIGHT, (flags & PROCESS_LR_REPEAT) ? 6 : 0))
 	{
-		if (m_focus == focused_menu::RIGHTTOP)
+		if (m_ui_error)
+		{
+			// dismiss error
+			return false;
+		}
+		else if (m_focus == focused_menu::RIGHTTOP)
 		{
 			// Swap the right panel and swallow it
 			iptkey = IPT_INVALID;
@@ -2598,7 +2612,7 @@ std::tuple<int, bool, bool> menu_select_launch::handle_middle_down(bool changed,
 		{
 			// left panel
 			assert(show_left_panel());
-			if ((get_focus() == focused_menu::MAIN) && (selected_index() <= m_available_items))
+			if ((get_focus() == focused_menu::MAIN) && (selected_index() < m_available_items))
 				m_prev_selected = get_selection_ref();
 			set_focus(focused_menu::LEFT);
 			return std::make_tuple(IPT_INVALID, true, true);
@@ -2607,7 +2621,7 @@ std::tuple<int, bool, bool> menu_select_launch::handle_middle_down(bool changed,
 		{
 			// right panel
 			assert(show_right_panel());
-			if ((get_focus() == focused_menu::MAIN) && (selected_index() <= m_available_items))
+			if ((get_focus() == focused_menu::MAIN) && (selected_index() < m_available_items))
 				m_prev_selected = get_selection_ref();
 			set_focus((y < m_right_tabs_bottom) ? focused_menu::RIGHTTOP : focused_menu::RIGHTBOTTOM);
 			return std::make_tuple(IPT_INVALID, true, true);
@@ -3157,7 +3171,7 @@ bool menu_select_launch::main_force_visible_selection()
 			return true;
 		}
 	}
-	else
+	else if (m_prev_selected)
 	{
 		int selection(0);
 		while ((m_available_items > selection) && (item(selection).ref() != m_prev_selected))
@@ -3366,8 +3380,6 @@ void menu_select_launch::draw(u32 flags)
 		// work out colours
 		rgb_t fgcolor = ui().colors().text_color();
 		rgb_t bgcolor = ui().colors().text_bg_color();
-		bool const hovered(is_selectable(pitem) && pointer_in_rect(m_primary_items_hbounds.first, linetop, m_primary_items_hbounds.second, linebottom));
-		bool const pointerline((pointer_action::MAIN_TRACK_LINE == m_pointer_action) && ((m_primary_lines + linenum) == m_clicked_line));
 		if (is_selected(itemnum) && (get_focus() == focused_menu::MAIN))
 		{
 			// if we're selected, draw with a different background
@@ -3379,19 +3391,24 @@ void menu_select_launch::draw(u32 flags)
 					bgcolor, rgb_t(43, 43, 43),
 					hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(1));
 		}
-		else if (pointerline && hovered)
+		else if (is_selectable(pitem))
 		{
-			// draw selected highlight for tracked item
-			fgcolor = ui().colors().selected_color();
-			bgcolor = ui().colors().selected_bg_color();
-			highlight(m_primary_items_hbounds.first, linetop, m_primary_items_hbounds.second, linebottom, bgcolor);
-		}
-		else if (pointerline || (!m_ui_error && !(flags & PROCESS_NOINPUT) && hovered && pointer_idle()))
-		{
-			// draw hover highlight when hovered over or dragged off
-			fgcolor = ui().colors().mouseover_color();
-			bgcolor = ui().colors().mouseover_bg_color();
-			highlight(m_primary_items_hbounds.first, linetop, m_primary_items_hbounds.second, linebottom, bgcolor);
+			bool const hovered(pointer_in_rect(m_primary_items_hbounds.first, linetop, m_primary_items_hbounds.second, linebottom));
+			bool const pointerline((pointer_action::MAIN_TRACK_LINE == m_pointer_action) && ((m_primary_lines + linenum) == m_clicked_line));
+			if (pointerline && hovered)
+			{
+				// draw selected highlight for tracked item
+				fgcolor = ui().colors().selected_color();
+				bgcolor = ui().colors().selected_bg_color();
+				highlight(m_primary_items_hbounds.first, linetop, m_primary_items_hbounds.second, linebottom, bgcolor);
+			}
+			else if (pointerline || (!m_ui_error && !(flags & PROCESS_NOINPUT) && hovered && pointer_idle()))
+			{
+				// draw hover highlight when hovered over or dragged off
+				fgcolor = ui().colors().mouseover_color();
+				bgcolor = ui().colors().mouseover_bg_color();
+				highlight(m_primary_items_hbounds.first, linetop, m_primary_items_hbounds.second, linebottom, bgcolor);
+			}
 		}
 
 		if (pitem.type() == menu_item_type::SEPARATOR)

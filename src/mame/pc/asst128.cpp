@@ -24,7 +24,7 @@ public:
 		: ibm5150_mb_device(mconfig, ASST128_MOTHERBOARD, tag, owner, clock)
 	{ }
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 };
 
 void asst128_mb_device::map(address_map &map)
@@ -60,9 +60,9 @@ private:
 	static void asst128_formats(format_registration &fr);
 	void asst128_fdc_dor_w(uint8_t data);
 
-	void machine_start() override;
-	void asst128_io(address_map &map);
-	void asst128_map(address_map &map);
+	void machine_start() override ATTR_COLD;
+	void asst128_io(address_map &map) ATTR_COLD;
+	void asst128_map(address_map &map) ATTR_COLD;
 };
 
 void asst128_state::machine_start()

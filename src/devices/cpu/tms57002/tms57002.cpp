@@ -925,7 +925,7 @@ void tms57002_device::sound_stream_update(sound_stream &stream, std::vector<read
 	assert(inputs[0].samples() == 1);
 	assert(outputs[0].samples() == 1);
 
-	stream_buffer::sample_t in_scale = 32768.0 * ((st0 & ST0_SIM) ? 256.0 : 1.0);
+	stream_buffer::sample_t in_scale = 32767.0 * ((st0 & ST0_SIM) ? 256.0 : 1.0);
 	si[0] = s32(inputs[0].get(0) * in_scale) & 0xffffff;
 	si[1] = s32(inputs[1].get(0) * in_scale) & 0xffffff;
 	si[2] = s32(inputs[2].get(0) * in_scale) & 0xffffff;
@@ -1021,11 +1021,6 @@ u32 tms57002_device::execute_min_cycles() const noexcept
 u32 tms57002_device::execute_max_cycles() const noexcept
 {
 	return 3;
-}
-
-u32 tms57002_device::execute_input_lines() const noexcept
-{
-	return 0;
 }
 
 device_memory_interface::space_config_vector tms57002_device::memory_space_config() const

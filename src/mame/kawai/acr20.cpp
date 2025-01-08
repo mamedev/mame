@@ -23,7 +23,7 @@ public:
 	void acr20(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<tmp96c141_device> m_maincpu;
 };
@@ -57,4 +57,4 @@ ROM_END
 
 } // anonymous namespace
 
-SYST(199?, acr20, 0, 0, acr20, acr20, acr20_state, empty_init, "Kawai Musical Instruments Manufacturing", "ACR-20 Digital Accompaniment Center", MACHINE_IS_SKELETON)
+SYST(199?, acr20, 0, 0, acr20, acr20, acr20_state, empty_init, "Kawai Musical Instruments Manufacturing", "ACR-20 Digital Accompaniment Center", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

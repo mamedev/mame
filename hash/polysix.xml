@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="polysix" description="Korg Polysix tapes">
+
+	<software name="presets" supported="yes">
+		<description>Factory presets</description>
+		<year>1981</year>
+		<publisher>Korg</publisher>
+		<part name="a" interface="polysix">
+			<feature name="part_id" value="Bank A"/>
+			<dataarea name="tape" size="42706">
+				<rom name="Polysix factory sounds a 8bit 11kHz.wav" size="42706" crc="4ff23b82" sha1="d3b5b17f7aab0fe24ce05fcd4e85dfeb3fadca00"/>
+			</dataarea>
+		</part>
+		<part name="b" interface="polysix">
+			<feature name="part_id" value="Bank B"/>
+			<dataarea name="tape" size="42896">
+				<rom name="Polysix factory sounds b 8bit 11kHz.wav" size="42896" crc="d19be09b" sha1="587816939c558a91cb058a6e54ffb36c82a39f42"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

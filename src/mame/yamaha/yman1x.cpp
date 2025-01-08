@@ -13,7 +13,7 @@
 #include "emu.h"
 //#include "bus/midi/midi.h"
 #include "cpu/h8/h83002.h"
-#include "cpu/m6805/m6805.h"
+#include "cpu/m6805/hd6305.h"
 #include "mulcd.h"
 #include "machine/nvram.h"
 #include "sound/meg.h"
@@ -35,7 +35,7 @@ public:
 	void an1x(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<h83002_device> m_maincpu;
 	required_device<cpu_device> m_pks;

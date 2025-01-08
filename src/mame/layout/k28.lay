@@ -7,64 +7,28 @@ authors:hap
 
 <!-- define elements -->
 
+	<element name="lcd_bg"><rect><color red="0.54" green="0.57" blue="0.58" /></rect></element>
+
 	<element name="digit" defstate="0">
-		<led14seg><color red="0.2" green="1.0" blue="0.85" /></led14seg>
-	</element>
-
-<!-- add our own for DP(display point) and the CT(comma tail) segments -->
-<!-- MAME led16segsc won't do, since this one has them on the left side -->
-
-	<element name="lamp_dp" defstate="0">
-		<disk state="0"><color red="0.0235" green="0.1255" blue="0.1059" /></disk>
-		<disk state="1"><color red="0.2" green="1.0" blue="0.85" /></disk>
-	</element>
-	<element name="lamp_ct" defstate="0">
-		<rect state="0"><color red="0.0235" green="0.1255" blue="0.1059" /></rect>
-		<rect state="1"><color red="0.2" green="1.0" blue="0.85" /></rect>
+		<led14seg><color red="0.2" green="0.16" blue="0.16" /></led14seg>
 	</element>
 
 
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="-1.5" right="99" top="0" bottom="15" />
+		<bounds left="0" right="80" top="0" bottom="15" />
 
-		<!-- 9 digits -->
+		<element ref="lcd_bg"><bounds x="0" y="0" width="80" height="15" /></element>
+
 		<element name="digit0" ref="digit"><bounds x="0" y="0" width="10" height="15" /></element>
-		<element name="0.14" ref="lamp_dp"><bounds x="-1.5" y="11" width="1.5" height="1.5" /></element>
-		<element name="0.15" ref="lamp_ct"><bounds x="-0.8" y="13.5" width="0.75" height="1.5" /></element>
-
-		<element name="digit1" ref="digit"><bounds x="11" y="0" width="10" height="15" /></element>
-		<element name="1.14" ref="lamp_dp"><bounds x="9.5" y="11" width="1.5" height="1.5" /></element>
-		<element name="1.15" ref="lamp_ct"><bounds x="10.2" y="13.5" width="0.75" height="1.5" /></element>
-
-		<element name="digit2" ref="digit"><bounds x="22" y="0" width="10" height="15" /></element>
-		<element name="2.14" ref="lamp_dp"><bounds x="20.5" y="11" width="1.5" height="1.5" /></element>
-		<element name="2.15" ref="lamp_ct"><bounds x="21.2" y="13.5" width="0.75" height="1.5" /></element>
-
-		<element name="digit3" ref="digit"><bounds x="33" y="0" width="10" height="15" /></element>
-		<element name="3.14" ref="lamp_dp"><bounds x="31.5" y="11" width="1.5" height="1.5" /></element>
-		<element name="3.15" ref="lamp_ct"><bounds x="32.2" y="13.5" width="0.75" height="1.5" /></element>
-
-		<element name="digit4" ref="digit"><bounds x="44" y="0" width="10" height="15" /></element>
-		<element name="4.14" ref="lamp_dp"><bounds x="42.5" y="11" width="1.5" height="1.5" /></element>
-		<element name="4.15" ref="lamp_ct"><bounds x="43.2" y="13.5" width="0.75" height="1.5" /></element>
-
-		<element name="digit5" ref="digit"><bounds x="55" y="0" width="10" height="15" /></element>
-		<element name="5.14" ref="lamp_dp"><bounds x="53.5" y="11" width="1.5" height="1.5" /></element>
-		<element name="5.15" ref="lamp_ct"><bounds x="54.2" y="13.5" width="0.75" height="1.5" /></element>
-
-		<element name="digit6" ref="digit"><bounds x="66" y="0" width="10" height="15" /></element>
-		<element name="6.14" ref="lamp_dp"><bounds x="64.5" y="11" width="1.5" height="1.5" /></element>
-		<element name="6.15" ref="lamp_ct"><bounds x="65.2" y="13.5" width="0.75" height="1.5" /></element>
-
-		<element name="digit7" ref="digit"><bounds x="77" y="0" width="10" height="15" /></element>
-		<element name="7.14" ref="lamp_dp"><bounds x="75.5" y="11" width="1.5" height="1.5" /></element>
-		<element name="7.15" ref="lamp_ct"><bounds x="76.2" y="13.5" width="0.75" height="1.5" /></element>
-
-		<element name="digit8" ref="digit"><bounds x="88" y="0" width="10" height="15" /></element>
-		<element name="8.14" ref="lamp_dp"><bounds x="86.5" y="11" width="1.5" height="1.5" /></element>
-		<element name="8.15" ref="lamp_ct"><bounds x="87.2" y="13.5" width="0.75" height="1.5" /></element>
+		<element name="digit1" ref="digit"><bounds x="10" y="0" width="10" height="15" /></element>
+		<element name="digit2" ref="digit"><bounds x="20" y="0" width="10" height="15" /></element>
+		<element name="digit3" ref="digit"><bounds x="30" y="0" width="10" height="15" /></element>
+		<element name="digit4" ref="digit"><bounds x="40" y="0" width="10" height="15" /></element>
+		<element name="digit5" ref="digit"><bounds x="50" y="0" width="10" height="15" /></element>
+		<element name="digit6" ref="digit"><bounds x="60" y="0" width="10" height="15" /></element>
+		<element name="digit7" ref="digit"><bounds x="70" y="0" width="10" height="15" /></element>
 
 	</view>
 </mamelayout>

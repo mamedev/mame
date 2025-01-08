@@ -72,11 +72,11 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// address maps
-	void cpu_map(address_map &map);
+	void cpu_map(address_map &map) ATTR_COLD;
 
 	void pit_timer(s32 param) { LOG("pit_timer<%d> expired\n", param); }
 
@@ -300,4 +300,4 @@ ROM_END
 } // anonymous namespace
 
 /*   YEAR   NAME         PARENT  COMPAT  MACHINE      INPUT  CLASS            INIT  COMPANY         FULLNAME       FLAGS */
-COMP(1991,  aviion_4600, 0,      0,      aviion_4600, 0,     aviion88k_state, init, "Data General", "AViiON 4600", MACHINE_IS_SKELETON)
+COMP(1991,  aviion_4600, 0,      0,      aviion_4600, 0,     aviion88k_state, init, "Data General", "AViiON 4600", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

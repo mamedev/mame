@@ -53,15 +53,15 @@ public:
 	void stmpc(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	SCN2674_DRAW_CHARACTER_MEMBER(draw_character);
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
-	void char_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void char_map(address_map &map) ATTR_COLD;
 
 	required_device<i80186_cpu_device> m_maincpu;
 	required_device<scn2674_device> m_avdc;
@@ -225,5 +225,5 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY            FULLNAME               FLAGS
-COMP( 1984, stmpc,  0,      0,      stmpc,   stmpc, stmpc_state, empty_init, "STM Electronics", "STM PC",              MACHINE_IS_SKELETON )
-COMP( 1984, stmpcp, stmpc,  0,      stmpc,   stmpc, stmpc_state, empty_init, "STM Electronics", "STM PC (prototype?)", MACHINE_IS_SKELETON )
+COMP( 1984, stmpc,  0,      0,      stmpc,   stmpc, stmpc_state, empty_init, "STM Electronics", "STM PC",              MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 1984, stmpcp, stmpc,  0,      stmpc,   stmpc, stmpc_state, empty_init, "STM Electronics", "STM PC (prototype?)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -10,7 +10,7 @@
     controller, which has a 10 MB hard limit on RAM (8MB in the Mac TV).
 
     Mac TV video input chips:
-    TEA63330T - Sound fader control unit for car stereos
+    TEA6330T - Sound fader control unit for car stereos
         I2C: address 1000000x
     TDA8708BT - Video analog input interface
     SAA7197 T - Clock signal generator circuit for desktop video systems
@@ -24,6 +24,7 @@
 #include "emu.h"
 
 #include "cuda.h"
+#include "dfac.h"
 #include "egret.h"
 #include "macadb.h"
 #include "macscsi.h"
@@ -48,7 +49,7 @@
 #include "emupal.h"
 #include "screen.h"
 #include "softlist_dev.h"
-
+#include "speaker.h"
 namespace {
 
 #define C32M    (31.3344_MHz_XTAL)
@@ -64,6 +65,7 @@ public:
 		m_macadb(*this, "macadb"),
 		m_ram(*this, RAM_TAG),
 		m_v8(*this, "v8"),
+		m_dfac(*this, "dfac"),
 		m_fdc(*this, "fdc"),
 		m_floppy(*this, "fdc:%d", 0U),
 		m_scsibus1(*this, "scsi"),
@@ -72,6 +74,7 @@ public:
 		m_scc(*this, "scc"),
 		m_egret(*this, "egret"),
 		m_cuda(*this, "cuda"),
+		m_config(*this, "config"),
 		m_cur_floppy(nullptr),
 		m_hdsel(0)
 	{
@@ -83,14 +86,15 @@ public:
 	void macclas2(machine_config &config);
 	void maccclas(machine_config &config);
 	void mactv(machine_config &config);
-	void maclc_map(address_map &map);
-	void maccclassic_map(address_map &map);
+	void maclc_map(address_map &map) ATTR_COLD;
+	void maccclassic_map(address_map &map) ATTR_COLD;
 
 private:
 	required_device<m68000_musashi_device> m_maincpu;
 	required_device<macadb_device> m_macadb;
 	required_device<ram_device> m_ram;
 	required_device<v8_device> m_v8;
+	optional_device<dfac_device> m_dfac;
 	optional_device<applefdintf_device> m_fdc;
 	optional_device_array<floppy_connector, 2> m_floppy;
 	required_device<nscsi_bus_device> m_scsibus1;
@@ -99,8 +103,10 @@ private:
 	required_device<z80scc_device> m_scc;
 	optional_device<egret_device> m_egret;
 	optional_device<cuda_device> m_cuda;
+	optional_ioport m_config;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	u16 scc_r(offs_t offset)
 	{
@@ -154,6 +160,14 @@ void maclc_state::machine_start()
 	m_v8->set_ram_info((u32 *) m_ram->pointer(), m_ram->size());
 
 	save_item(NAME(m_hdsel));
+}
+
+void maclc_state::machine_reset()
+{
+	if (m_config)
+	{
+		m_maincpu->set_fpu_enable(BIT(m_config->read(), 0));
+	}
 }
 
 /***************************************************************************
@@ -303,6 +317,14 @@ void maclc_state::hdsel_w(int state)
 ***************************************************************************/
 
 static INPUT_PORTS_START( maclc )
+	PORT_START("config")
+	PORT_CONFNAME(0x01, 0x00, "FPU")
+	PORT_CONFSETTING(0x00, "No FPU")
+	PORT_CONFSETTING(0x01, "FPU Present")
+INPUT_PORTS_END
+
+// mactv doesn't have a way to add an FPU
+static INPUT_PORTS_START( mactv )
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -324,8 +346,8 @@ void maclc_state::maclc_base(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config(
 		[](device_t *device)
 		{
-			device->subdevice<cdda_device>("cdda")->add_route(0, "^^v8:lspeaker", 1.0);
-			device->subdevice<cdda_device>("cdda")->add_route(1, "^^v8:rspeaker", 1.0);
+			device->subdevice<cdda_device>("cdda")->add_route(0, "^^lspeaker", 1.0);
+			device->subdevice<cdda_device>("cdda")->add_route(1, "^^rspeaker", 1.0);
 		});
 	NSCSI_CONNECTOR(config, "scsi:4", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", mac_scsi_devices, nullptr);
@@ -364,24 +386,36 @@ void maclc_state::maclc_base(machine_config &config)
 	rs232b.dcd_handler().set(m_scc, FUNC(z80scc_device::dcdb_w));
 	rs232b.cts_handler().set(m_scc, FUNC(z80scc_device::ctsb_w));
 
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	APPLE_DFAC(config, m_dfac, 22257);
+	m_dfac->add_route(0, "lspeaker", 1.0);
+	m_dfac->add_route(1, "rspeaker", 1.0);
+
 	V8(config, m_v8, C15M);
 	m_v8->set_maincpu_tag("maincpu");
 	m_v8->set_rom_tag("bootrom");
 	m_v8->hdsel_callback().set(FUNC(maclc_state::hdsel_w));
 	m_v8->hmmu_enable_callback().set(FUNC(maclc_state::set_hmmu));
+	m_v8->add_route(0, m_dfac, 1.0);
+	m_v8->add_route(1, m_dfac, 1.0);
 
 	nubus_device &nubus(NUBUS(config, "pds", 0));
 	nubus.set_space(m_maincpu, AS_PROGRAM);
 	nubus.set_address_mask(0x80ffffff);
 	// V8 supports interrupts for slots $C, $D, and $E, but the LC, LC II, and Color Classic
-	// only hook the slot $E IRQ up to the PDS slot.
-	nubus.out_irqe_callback().set(m_v8, FUNC(v8_device::slot_irq_w<0x20>));
+	// only hook the slot $E IRQ up to the PDS slot.  ($C/$D/$E are 0/1/2 on the schematics).
+	nubus.out_irqe_callback().set(m_v8, FUNC(v8_device::slot2_irq_w));
 
 	MACADB(config, m_macadb, C15M);
 
 	EGRET(config, m_egret, XTAL(32'768));
 	m_egret->set_default_bios_tag("341s0850");
 	m_egret->reset_callback().set(FUNC(maclc_state::egret_reset_w));
+	m_egret->dfac_scl_callback().set(m_dfac, FUNC(dfac_device::clock_write));
+	m_egret->dfac_sda_callback().set(m_dfac, FUNC(dfac_device::data_write));
+	m_egret->dfac_latch_callback().set(m_dfac, FUNC(dfac_device::latch_write));
 	m_egret->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
 	m_egret->via_clock_callback().set(m_v8, FUNC(v8_device::cb1_w));
 	m_egret->via_data_callback().set(m_v8, FUNC(v8_device::cb2_w));
@@ -441,12 +475,14 @@ void maclc_state::maccclas(machine_config &config)
 	config.device_remove("fdc");
 
 	CUDA_V2XX(config, m_cuda, XTAL(32'768));
-	m_cuda->set_default_bios_tag("341s0788");
+	m_cuda->set_default_bios_tag("341s0417");
 	m_cuda->reset_callback().set(FUNC(maclc_state::egret_reset_w));
 	m_cuda->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
 	m_cuda->via_clock_callback().set(m_v8, FUNC(v8_device::cb1_w));
 	m_cuda->via_data_callback().set(m_v8, FUNC(v8_device::cb2_w));
+	m_cuda->nmi_callback().set_inputline(m_maincpu, M68K_IRQ_7);
 	m_macadb->adb_data_callback().set(m_cuda, FUNC(cuda_device::set_adb_line));
+	m_macadb->adb_power_callback().set(m_cuda, FUNC(cuda_device::set_adb_power));
 	config.set_perfect_quantum(m_maincpu);
 
 	SPICE(config.replace(), m_v8, C15M);
@@ -457,6 +493,10 @@ void maclc_state::maccclas(machine_config &config)
 	m_v8->pb4_callback().set(m_cuda, FUNC(cuda_device::set_byteack));
 	m_v8->pb5_callback().set(m_cuda, FUNC(cuda_device::set_tip));
 	m_v8->cb2_callback().set(m_cuda, FUNC(cuda_device::set_via_data));
+	m_v8->add_route(0, "lspeaker", 1.0);
+	m_v8->add_route(1, "rspeaker", 1.0);
+
+	config.device_remove("dfac");
 
 	NUBUS_SLOT(config, "lcpds", "pds", mac_pdslc_cards, nullptr);
 
@@ -472,6 +512,7 @@ void maclc_state::mactv(machine_config &config)
 	maclc_base(config);
 
 	M68030(config.replace(), m_maincpu, C32M);
+	m_maincpu->set_fpu_enable(false);   // this machine has no FPU and no ability to add one
 	m_maincpu->set_addrmap(AS_PROGRAM, &maclc_state::maccclassic_map);
 	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
@@ -479,12 +520,14 @@ void maclc_state::mactv(machine_config &config)
 	config.device_remove("fdc");
 
 	CUDA_V2XX(config, m_cuda, XTAL(32'768));
-	m_cuda->set_default_bios_tag("341s0788");
+	m_cuda->set_default_bios_tag("341s0789");
 	m_cuda->reset_callback().set(FUNC(maclc_state::egret_reset_w));
 	m_cuda->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
 	m_cuda->via_clock_callback().set(m_v8, FUNC(v8_device::cb1_w));
 	m_cuda->via_data_callback().set(m_v8, FUNC(v8_device::cb2_w));
+	m_cuda->nmi_callback().set_inputline(m_maincpu, M68K_IRQ_7);
 	m_macadb->adb_data_callback().set(m_cuda, FUNC(cuda_device::set_adb_line));
+	m_macadb->adb_power_callback().set(m_cuda, FUNC(cuda_device::set_adb_power));
 	config.set_perfect_quantum(m_maincpu);
 
 	TINKERBELL(config.replace(), m_v8, C15M);
@@ -495,6 +538,10 @@ void maclc_state::mactv(machine_config &config)
 	m_v8->pb4_callback().set(m_cuda, FUNC(cuda_device::set_byteack));
 	m_v8->pb5_callback().set(m_cuda, FUNC(cuda_device::set_tip));
 	m_v8->cb2_callback().set(m_cuda, FUNC(cuda_device::set_via_data));
+	m_v8->add_route(0, "lspeaker", 1.0);
+	m_v8->add_route(1, "rspeaker", 1.0);
+
+	config.device_remove("dfac");
 
 	// Mac TV doesn't have an LC PDS
 	config.device_remove("pds");
@@ -522,6 +569,8 @@ void maclc_state::macclas2(machine_config &config)
 	m_v8->pb4_callback().set(m_egret, FUNC(egret_device::set_via_full));
 	m_v8->pb5_callback().set(m_egret, FUNC(egret_device::set_sys_session));
 	m_v8->cb2_callback().set(m_egret, FUNC(egret_device::set_via_data));
+	m_v8->add_route(0, m_dfac, 1.0);
+	m_v8->add_route(1, m_dfac, 1.0);
 
 	// Classic II doesn't have an LC PDS slot (and its ROM has the Slot Manager disabled)
 	config.device_remove("pds");
@@ -570,4 +619,4 @@ COMP(1990, maclc,  0, 0, maclc,  maclc, maclc_state, empty_init, "Apple Computer
 COMP(1991, maclc2, 0, 0, maclc2, maclc, maclc_state, empty_init, "Apple Computer", "Macintosh LC II", MACHINE_SUPPORTS_SAVE)
 COMP(1991, macclas2, 0, 0, macclas2, maclc, maclc_state, empty_init, "Apple Computer", "Macintosh Classic II", MACHINE_SUPPORTS_SAVE)
 COMP(1993, maccclas, 0, 0, maccclas, maclc, maclc_state, empty_init, "Apple Computer", "Macintosh Color Classic", MACHINE_SUPPORTS_SAVE)
-COMP(1994, mactv, 0, 0, mactv, maclc, maclc_state, empty_init, "Apple Computer", "Macintosh TV", MACHINE_SUPPORTS_SAVE)
+COMP(1994, mactv, 0, 0, mactv, mactv, maclc_state, empty_init, "Apple Computer", "Macintosh TV", MACHINE_SUPPORTS_SAVE)

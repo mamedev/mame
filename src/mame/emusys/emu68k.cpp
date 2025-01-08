@@ -32,7 +32,7 @@ public:
 	void proteusxr(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void add_lcd(machine_config &config);
@@ -40,11 +40,11 @@ private:
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
 	void palette_init(palette_device &palette);
 
-	void proteus1_map(address_map &map);
-	void proteusxr_map(address_map &map);
-	void vintkeys_map(address_map &map);
-	void phatt_map(address_map &map);
-	void fc7_map(address_map &map);
+	void proteus1_map(address_map &map) ATTR_COLD;
+	void proteusxr_map(address_map &map) ATTR_COLD;
+	void vintkeys_map(address_map &map) ATTR_COLD;
+	void phatt_map(address_map &map) ATTR_COLD;
+	void fc7_map(address_map &map) ATTR_COLD;
 
 	required_device<m68000_base_device> m_maincpu;
 	required_device<mc68901_device> m_mfp;
@@ -240,10 +240,10 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1989, proteus1,  0, 0, proteus1,  proteus1,  emu68k_state, empty_init, "E-mu Systems", "Proteus/1 16-Bit Multi-Timbral Digital Sound Module", MACHINE_IS_SKELETON)
-SYST(1989, proteusxr, 0, 0, proteusxr, proteus1,  emu68k_state, empty_init, "E-mu Systems", "Proteus/1 XR 16-Bit Multi-Timbral Digital Sound Module", MACHINE_IS_SKELETON)
-SYST(1991, procuss,   0, 0, proteusxr, procuss,   emu68k_state, empty_init, "E-mu Systems", "Pro/Cussion Maximum Percussion Module", MACHINE_IS_SKELETON)
-SYST(1993, vintkeys,  0, 0, vintkeys,  vintkeys,  emu68k_state, empty_init, "E-mu Systems", "Vintage Keys Classic Analog Keyboards", MACHINE_IS_SKELETON)
-SYST(1996, orbit9090, 0, 0, phatt,     orbit9090, emu68k_state, empty_init, "E-mu Systems", "Orbit 9090 - The Dance Planet", MACHINE_IS_SKELETON)
-SYST(1997, phatt,     0, 0, phatt,     phatt,     emu68k_state, empty_init, "E-mu Systems", "Planet Phatt - The Swing System", MACHINE_IS_SKELETON)
-SYST(1997, carnaval,  0, 0, phatt,     carnaval,  emu68k_state, empty_init, "E-mu Systems", "Carnaval - Jugando con Fuego", MACHINE_IS_SKELETON)
+SYST(1989, proteus1,  0, 0, proteus1,  proteus1,  emu68k_state, empty_init, "E-mu Systems", "Proteus/1 16-Bit Multi-Timbral Digital Sound Module", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1989, proteusxr, 0, 0, proteusxr, proteus1,  emu68k_state, empty_init, "E-mu Systems", "Proteus/1 XR 16-Bit Multi-Timbral Digital Sound Module", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1991, procuss,   0, 0, proteusxr, procuss,   emu68k_state, empty_init, "E-mu Systems", "Pro/Cussion Maximum Percussion Module", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1993, vintkeys,  0, 0, vintkeys,  vintkeys,  emu68k_state, empty_init, "E-mu Systems", "Vintage Keys Classic Analog Keyboards", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1996, orbit9090, 0, 0, phatt,     orbit9090, emu68k_state, empty_init, "E-mu Systems", "Orbit 9090 - The Dance Planet", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1997, phatt,     0, 0, phatt,     phatt,     emu68k_state, empty_init, "E-mu Systems", "Planet Phatt - The Swing System", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1997, carnaval,  0, 0, phatt,     carnaval,  emu68k_state, empty_init, "E-mu Systems", "Carnaval - Jugando con Fuego", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

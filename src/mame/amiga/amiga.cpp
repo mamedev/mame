@@ -27,7 +27,6 @@
 #include "machine/dmac.h"
 #include "machine/nvram.h"
 #include "machine/i2cmem.h"
-#include "machine/amigafdc.h"
 #include "machine/cr511b.h"
 #include "machine/rp5c01.h"
 #include "softlist.h"
@@ -241,13 +240,13 @@ public:
 
 	void a1000(machine_config &config);
 	void a1000n(machine_config &config);
-	void a1000_bootrom_map(address_map &map);
-	void a1000_mem(address_map &map);
-	void a1000_overlay_map(address_map &map);
+	void a1000_bootrom_map(address_map &map) ATTR_COLD;
+	void a1000_mem(address_map &map) ATTR_COLD;
+	void a1000_overlay_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<address_map_bank_device> m_bootrom;
@@ -277,10 +276,10 @@ public:
 
 	void a2000(machine_config &config);
 	void a2000n(machine_config &config);
-	void a2000_mem(address_map &map);
+	void a2000_mem(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// amiga_state overrides
 	virtual bool int2_pending() override;
@@ -314,10 +313,10 @@ public:
 
 	void a500n(machine_config &config);
 	void a500(machine_config &config);
-	void a500_mem(address_map &map);
+	void a500_mem(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// amiga_state overrides
 	virtual bool int2_pending() override;
@@ -360,12 +359,12 @@ public:
 
 	void cdtv(machine_config &config);
 	void cdtvn(machine_config &config);
-	void cdtv_mem(address_map &map);
-	void cdtv_rc_mem(address_map &map);
+	void cdtv_mem(address_map &map) ATTR_COLD;
+	void cdtv_rc_mem(address_map &map) ATTR_COLD;
 
 protected:
 	// driver_device overrides
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	// amiga_state overrides
 	virtual bool int2_pending() override;
@@ -400,7 +399,7 @@ public:
 
 	void a3000(machine_config &config);
 	void a3000n(machine_config &config);
-	void a3000_mem(address_map &map);
+	void a3000_mem(address_map &map) ATTR_COLD;
 
 protected:
 
@@ -426,10 +425,10 @@ public:
 
 	void a500pn(machine_config &config);
 	void a500p(machine_config &config);
-	void a500p_mem(address_map &map);
+	void a500p_mem(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// amiga_state overrides
 	virtual bool int2_pending() override;
@@ -465,7 +464,7 @@ public:
 
 	void a600n(machine_config &config);
 	void a600(machine_config &config);
-	void a600_mem(address_map &map);
+	void a600_mem(address_map &map) ATTR_COLD;
 
 protected:
 	// amiga_state overrides
@@ -500,7 +499,7 @@ public:
 
 	void a1200(machine_config &config);
 	void a1200n(machine_config &config);
-	void a1200_mem(address_map &map);
+	void a1200_mem(address_map &map) ATTR_COLD;
 
 protected:
 	// amiga_state overrides
@@ -545,9 +544,9 @@ public:
 	void a4000n(machine_config &config);
 	void a4000(machine_config &config);
 	void a400030(machine_config &config);
-	void a400030_mem(address_map &map);
-	void a4000_mem(address_map &map);
-	void a4000t_mem(address_map &map);
+	void a400030_mem(address_map &map) ATTR_COLD;
+	void a4000_mem(address_map &map) ATTR_COLD;
+	void a4000t_mem(address_map &map) ATTR_COLD;
 
 protected:
 
@@ -576,7 +575,7 @@ public:
 	void handle_joystick_cia(u8 pra, u8 dra);
 	u16 handle_joystick_potgor(u16 potgor);
 
-	DECLARE_CUSTOM_INPUT_MEMBER( cd32_input );
+	ioport_value cd32_input();
 	template <int P> int cd32_sel_mirror_input();
 
 	void init_pal();
@@ -590,7 +589,7 @@ public:
 
 	void cd32n(machine_config &config);
 	void cd32(machine_config &config);
-	void cd32_mem(address_map &map);
+	void cd32_mem(address_map &map) ATTR_COLD;
 
 protected:
 	// amiga_state overrides
@@ -838,7 +837,8 @@ void a2000_state::machine_reset()
 	amiga_state::machine_reset();
 
 	// reset zorro devices
-	m_zorro->reset();
+	m_zorro->busrst_w(0);
+	m_zorro->busrst_w(1);
 }
 
 void a2000_state::zorro2_int2_w(int state)
@@ -1165,7 +1165,7 @@ u16 cd32_state::handle_joystick_potgor(u16 potgor)
 	return potgor;
 }
 
-CUSTOM_INPUT_MEMBER( cd32_state::cd32_input )
+ioport_value cd32_state::cd32_input()
 {
 	return handle_joystick_potgor(m_potgo_value) >> 8;
 }
@@ -1495,7 +1495,7 @@ void a4000_state::a4000t_mem(address_map &map)
 //**************************************************************************
 
 template <int P>
-CUSTOM_INPUT_MEMBER( amiga_state::amiga_joystick_convert )
+ioport_value amiga_state::amiga_joystick_convert()
 {
 	uint8_t bits = m_joy_ports[P].read_safe(0xff);
 
@@ -1520,16 +1520,16 @@ static INPUT_PORTS_START( amiga )
 	PORT_CONFSETTING(0x20, DEF_STR(Joystick) )
 
 	PORT_START("cia_0_port_a")
-	PORT_BIT(0x3f, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(amiga_state, floppy_drive_status)
+	PORT_BIT(0x3f, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(amiga_state::floppy_drive_status))
 	PORT_BIT(0x40, IP_ACTIVE_LOW,  IPT_BUTTON1) PORT_PLAYER(1)
 	PORT_BIT(0x80, IP_ACTIVE_LOW,  IPT_BUTTON1) PORT_PLAYER(2)
 
 	PORT_START("joy_0_dat")
-	PORT_BIT(0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(amiga_state, amiga_joystick_convert<0>)
+	PORT_BIT(0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(amiga_state::amiga_joystick_convert<0>))
 	PORT_BIT(0xfcfc, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("joy_1_dat")
-	PORT_BIT(0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(amiga_state, amiga_joystick_convert<1>)
+	PORT_BIT(0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(amiga_state::amiga_joystick_convert<1>))
 	PORT_BIT(0xfcfc, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("potgo")
@@ -1570,19 +1570,19 @@ INPUT_PORTS_START( cd32 )
 	PORT_MODIFY("cia_0_port_a")
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_CUSTOM )
 	// this is the regular port for reading a single button joystick on the Amiga, many CD32 games require this to mirror the pad start button!
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(cd32_state, cd32_sel_mirror_input<0>)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(cd32_state, cd32_sel_mirror_input<1>)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(cd32_state::cd32_sel_mirror_input<0>))
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(cd32_state::cd32_sel_mirror_input<1>))
 
 	PORT_MODIFY("joy_0_dat")
-	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(amiga_state, amiga_joystick_convert<0>)
+	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(amiga_state::amiga_joystick_convert<0>))
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("joy_1_dat")
-	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(amiga_state, amiga_joystick_convert<1>)
+	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(amiga_state::amiga_joystick_convert<1>))
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("potgo")
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(cd32_state, cd32_input)
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(cd32_state::cd32_input))
 	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	// CD32 '11' button pad (4 dpad directions + 7 buttons), not read directly
@@ -1647,7 +1647,7 @@ void amiga_state::amiga_base(machine_config &config)
 	m_cia_1->irq_wr_callback().set(FUNC(amiga_state::cia_1_irq));
 	m_cia_1->pa_rd_callback().set(FUNC(amiga_state::cia_1_port_a_read));
 	m_cia_1->pa_wr_callback().set(FUNC(amiga_state::cia_1_port_a_write));
-	m_cia_1->pb_wr_callback().set(m_fdc, FUNC(amiga_fdc_device::ciaaprb_w));
+	m_cia_1->pb_wr_callback().set(m_fdc, FUNC(paula_fdc_device::ciaaprb_w));
 
 	// audio
 	SPEAKER(config, "lspeaker").front_left();
@@ -1661,20 +1661,20 @@ void amiga_state::amiga_base(machine_config &config)
 	m_paula->int_cb().set(FUNC(amiga_state::paula_int_w));
 
 	// floppy drives
-	AMIGA_FDC(config, m_fdc, amiga_state::CLK_7M_PAL);
+	PAULA_FDC(config, m_fdc, amiga_state::CLK_7M_PAL);
 	m_fdc->index_callback().set(m_cia_1, FUNC(mos8520_device::flag_w));
 	m_fdc->read_dma_callback().set(FUNC(amiga_state::chip_ram_r));
 	m_fdc->write_dma_callback().set(FUNC(amiga_state::chip_ram_w));
 	m_fdc->dskblk_callback().set(FUNC(amiga_state::fdc_dskblk_w));
 	m_fdc->dsksyn_callback().set(FUNC(amiga_state::fdc_dsksyn_w));
-	FLOPPY_CONNECTOR(config, "fdc:0", amiga_floppies, "35dd", amiga_fdc_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", amiga_floppies, nullptr, amiga_fdc_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:2", amiga_floppies, nullptr, amiga_fdc_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:3", amiga_floppies, nullptr, amiga_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", amiga_floppies, "35dd", paula_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", amiga_floppies, nullptr, paula_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:2", amiga_floppies, nullptr, paula_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:3", amiga_floppies, nullptr, paula_fdc_device::floppy_formats).enable_sound(true);
 
 	// TODO: shouldn't have a clock
 	// (finite state machine, controlled by Agnus beams)
-	AMIGA_COPPER(config, m_copper, amiga_state::CLK_7M_PAL);
+	AGNUS_COPPER(config, m_copper, amiga_state::CLK_7M_PAL);
 	m_copper->set_host_cpu_tag(m_maincpu);
 	m_copper->mem_read_cb().set(FUNC(amiga_state::chip_ram_r));
 	m_copper->set_ecs_mode(false);
@@ -1704,6 +1704,7 @@ void amiga_state::amiga_base(machine_config &config)
 	SOFTWARE_LIST(config, "flop_list").set_original("amiga_flop");
 	SOFTWARE_LIST(config, "ocs_list").set_original("amigaocs_flop");
 	SOFTWARE_LIST(config, "demos_list").set_original("amiga_demos");
+	SOFTWARE_LIST(config, "amigacd_list").set_original("amiga_cd");
 }
 
 void a1000_state::a1000(machine_config &config)
@@ -2239,7 +2240,7 @@ void cd32_state::cd32(machine_config &config)
 	m_cia_0->sp_wr_callback().set_nop();
 
 	SOFTWARE_LIST(config, "cd32_list").set_original("cd32");
-	SOFTWARE_LIST(config, "cd_list").set_original("cdtv");
+	SOFTWARE_LIST(config, "cd_list").set_compatible("cdtv");
 }
 
 void cd32_state::cd32n(machine_config &config)
@@ -2331,6 +2332,14 @@ ROM_START( a2000 )
 	ROMX_LOAD("kick40063.u2", 0x00000, 0x80000, CRC(fc24ae0d) SHA1(3b7f1493b27e212830f989f26ca76c02049f09ca), ROM_GROUPWORD | ROM_BIOS(3))
 	ROM_SYSTEM_BIOS(4, "logica2", "Logica Diagnostic 2.0")
 	ROMX_LOAD("logica2.u2",   0x00000, 0x80000, CRC(8484f426) SHA1(ba10d16166b2e2d6177c979c99edf8462b21651e), ROM_GROUPWORD | ROM_BIOS(4))
+#if 0 // not enabled yet, kickstart 3.2 is new and actively sold
+	ROM_SYSTEM_BIOS(5, "kick32",  "Kickstart 3.2 (47.96)")
+	ROMX_LOAD("kick47096.u2", 0x00000, 0x80000, CRC(8173d7b6) SHA1(b88e364daf23c9c9920e548b0d3d944e65b1031d), ROM_GROUPWORD | ROM_BIOS(5))
+	ROM_SYSTEM_BIOS(6, "kick321", "Kickstart 3.2 (47.102)")
+	ROMX_LOAD("kick47102.u2", 0x00000, 0x80000, CRC(4f078456) SHA1(8f64ada68a7f128ba782e8dc9fa583344171590a), ROM_GROUPWORD | ROM_BIOS(6))
+	ROM_SYSTEM_BIOS(7, "kick322", "Kickstart 3.2 (47.111)")
+	ROMX_LOAD("kick47111.u2", 0x00000, 0x80000, CRC(e4458462) SHA1(7d5ebe686b69d59a863cc77a36b2cd60359a9ed2), ROM_GROUPWORD | ROM_BIOS(7))
+#endif
 ROM_END
 
 // Amiga 2000CR chip location: U500

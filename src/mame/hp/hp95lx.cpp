@@ -123,8 +123,8 @@ public:
 	void hp95lx(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<address_map_bank_device> m_bankdev_c000;
@@ -156,9 +156,9 @@ private:
 	void video_register_w(uint8_t data);
 	[[maybe_unused]] void debug_w(offs_t offset, uint8_t data);
 
-	void hp95lx_io(address_map &map);
-	void hp95lx_map(address_map &map);
-	void hp95lx_romdos(address_map &map);
+	void hp95lx_io(address_map &map) ATTR_COLD;
+	void hp95lx_map(address_map &map) ATTR_COLD;
+	void hp95lx_romdos(address_map &map) ATTR_COLD;
 
 	required_shared_ptr<u8> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;

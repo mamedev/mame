@@ -38,14 +38,14 @@ public:
 	void dealem(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	DECLARE_MACHINE_RESET(dealem_vid);
 	void dealem_palette(palette_device &palette) const;
 	uint32_t screen_update_dealem(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void dealem_memmap(address_map &map);
+	void dealem_memmap(address_map &map) ATTR_COLD;
 	TILE_GET_INFO_MEMBER(tile_info);
 
 	optional_shared_ptr<uint8_t> m_dealem_videoram;

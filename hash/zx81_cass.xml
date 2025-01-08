@@ -17,16 +17,6 @@ Due to the way the ZX81 saves to tape, different recordings of identical data (s
 might be stored along with a few different bytes in them. Additional dumps of the same releases should match those differences.
 TZX files for ZX81 are just the .P dumps with an additional header on top, so they may not be the cleanest format for archival.
 
-Known dumps not yet added (as of 2023-06-14):
-- Accounts [zx81stuff.org.uk]
-- Adventure (G Barker) [zx81stuff.org.uk]
-- Nowotnik Puzzle [Mr. Strudwick, zx81stuff.org.uk]
-- Purchases [zx81stuff.org.uk]
-- RacehorseTrainer [zx81stuff.org.uk]
-- Star Trek and 3D Os and Xs [zx81stuff.org.uk]
-- Tutor (French) [zx81stuff.org.uk]
-- Zor [zx81stuff.org.uk]
-
 -->
 
 <softwarelist name="zx81_cass" description="Sinclair ZX81 cassettes">
@@ -34,7 +24,7 @@ Known dumps not yet added (as of 2023-06-14):
 	<software name="10games">
 		<description>10 Games for 1K</description>
 		<year>1981</year>
-		<publisher>J.K.Greye Software</publisher>
+		<publisher>J.K. Greye Software</publisher>
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="7636">
 				<rom name="10Games.tzx" size="7636" crc="141cddd1" sha1="3a776f7dbf4fd169572aad5b775b4ca27c61222a"/>
@@ -43,7 +33,7 @@ Known dumps not yet added (as of 2023-06-14):
 	</software>
 
 	<software name="1kgames">
-		<description>1K Games Pack</description>
+		<description>1K Games Pack (Artic)</description>
 		<year>198?</year>
 		<publisher>Artic</publisher>
 		<info name="author" value="Adam Waring" />
@@ -61,6 +51,32 @@ Known dumps not yet added (as of 2023-06-14):
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="8576">
 				<rom name="1KGames.tzx" size="8576" crc="2648f563" sha1="11562494bb40cef9bcea606b1bd2ad375f47ef75"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="1kgmpack" supported="no">
+		<description>1K Games Pack (Crystal)</description>
+		<year>1982</year>
+		<publisher>Crystal Computing</publisher>
+		<notes><![CDATA[
+ASTRAVOID       LOAD "A"
+BOMBER          LOAD "B"
+SUPER SLALOM    LOAD "SS"
+DUNGEON QUEST   LOAD "DQ"
+SPACE INVADERS  LOAD "SI"
+
+When the program has loaded in enter one of the following corresponding to the game you have chosen:
+RAND USR A
+RAND USR B
+RAND USR SS
+RAND USR DQ
+RAND USR 16530
+]]></notes>
+		<info name="usage" value="1K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="4073">
+				<rom name="1K Games Pack (Crystal).tzx" size="4073" crc="f3022143" sha1="e56cf8be5c3265786a366de9821abb0e0445ef6f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -119,7 +135,7 @@ Known dumps not yet added (as of 2023-06-14):
 	<software name="3ddefend">
 		<description>3D Defender</description>
 		<year>1981</year>
-		<publisher>J.K.Greye Software</publisher>
+		<publisher>J.K. Greye Software</publisher>
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="12095">
 				<rom name="3DDefender.tzx" size="12095" crc="a9e69d1c" sha1="7c6b0a1fdef5c43aeed21f9d98f4e0c9837214cf"/>
@@ -134,6 +150,27 @@ Known dumps not yet added (as of 2023-06-14):
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="12095">
 				<rom name="3DDefender(NGS).tzx" size="12095" crc="0df02e27" sha1="6aa9a12e6256bc2657326361c636571faf2cfb83"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3dform1">
+		<description>3D Formule 1</description>
+		<year>1984</year>
+		<publisher>ERE Informatique</publisher>
+		<info name="developer" value="Marc Lachevrie" />
+		<info name="language" value="French" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="A - 3D Formule 1"/>
+			<dataarea name="cass" size="7686">
+				<rom name="3D Formule 1 - Side 1.tzx" size="7686" crc="225298aa" sha1="fba16cb4e6290f9c48237514cc25cf67eefae711"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="B - Construisez votre route"/>
+			<dataarea name="cass" size="10009">
+				<rom name="3D Formule 1 - Side 2.tzx" size="10009" crc="e512fee0" sha1="c7dcf1371e88b5eaebd289caf27167fb8ae49b80"/>
 			</dataarea>
 		</part>
 	</software>
@@ -156,10 +193,12 @@ Known dumps not yet added (as of 2023-06-14):
 		</part>
 	</software>
 
-	<software name="3dmonmaze">
+	<software name="3dmonmaz">
 		<description>3D Monster Maze</description>
 		<year>1981</year>
-		<publisher>J.K.Greye Software</publisher>
+		<publisher>J.K. Greye Software</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="10798">
 				<rom name="3DMonsterMaze.tzx" size="10798" crc="436d8b0e" sha1="c6c141057d870b114d8844bb7578040ad8c5b151"/>
@@ -167,13 +206,87 @@ Known dumps not yet added (as of 2023-06-14):
 		</part>
 	</software>
 
-	<software name="3dmonmazen" cloneof="3dmonmaze">
+	<software name="3dmonmaz_ngs" cloneof="3dmonmaz">
 		<description>3D Monster Maze (New Generation)</description>
 		<year>1982</year>
 		<publisher>New Generation Software</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="10798">
 				<rom name="3DMonsterMaze(NGS).tzx" size="10798" crc="38dbcc52" sha1="2b0e9cd691979154c2d75ac76f93be076aab3423"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3dmonmaz_aac" cloneof="3dmonmaz">
+		<description>3D Monster Maze (Aackosoft)</description>
+		<year>1982</year>
+		<publisher>Aackosoft</publisher>
+		<info name="usage" value="16K" />
+		<info name="language" value="Dutch" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="10840">
+				<rom name="Monster Maze - Side 1 (Aackosoft).tzx" size="10840" crc="d451c9ae" sha1="76610067447ae7837df1cbba00979fd44273a6ed"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="10840">
+				<rom name="Monster Maze - Side 2 (Aackosoft).tzx" size="10840" crc="6f44f333" sha1="f196f6c98709ae1ef2b77b1c812fb478100b715d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3dmonmaz_zxd" cloneof="3dmonmaz">
+		<description>3D Monster Maze (ZX Data)</description>
+		<year>1982</year>
+		<publisher>ZX Data</publisher>
+		<info name="language" value="Danish" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="10867">
+				<rom name="3DMonsterMaze(ZXData).tzx" size="10867" crc="c9b935d9" sha1="2832c68cba5811bbb94d98b0240e9a6e42e9b18e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mdtrevas" cloneof="3dmonmaz">
+		<description>Monstro das Trevas</description>
+		<year>1982</year>
+		<publisher>Microdigital</publisher>
+		<info name="language" value="Portuguese (Brazil)" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="10553">
+				<rom name="mt.p" size="10553" crc="564cc99a" sha1="6578bb34b001f88a6324473dbdeb92eb63f04de7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3d3d">
+		<description>3D 3D!</description>
+		<year>1981</year>
+		<publisher>dK'Tronics</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K; type RUN after loading the tape" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="12366">
+				<rom name="3D-3D.p" size="12366" crc="572b34bb" sha1="738ad81449bfa32fd05bc0da3a7035f7c9a9728d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3d3d_kay" cloneof="3d3d">
+		<description>3D 3D! (Kayde)</description>
+		<year>198?</year>
+		<publisher>Kayde Software</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K; type RUN after loading the tape" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="12191">
+				<rom name="3D3D (Kayde).tzx" size="12191" crc="0062ab18" sha1="e7c989deebc141c96e02f0570363431cd7cdc654"/>
 			</dataarea>
 		</part>
 	</software>
@@ -266,6 +379,18 @@ Known dumps not yet added (as of 2023-06-14):
 		</part>
 	</software>
 
+	<software name="accounts">
+		<description>Accounts</description>
+		<year>1982</year>
+		<publisher>Hestacrest</publisher>
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="16091">
+				<rom name="accounts.tzx" size="16091" crc="2de97707" sha1="1b6b4a8743548be28680bddae616b39155909837"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="adgrafspee">
 		<description>Admiral Graf Spee</description>
 		<year>198?</year>
@@ -300,12 +425,24 @@ Known dumps not yet added (as of 2023-06-14):
 	</software>
 
 	<software name="advent">
-		<description>Adventure</description>
+		<description>Adventure (Bug Byte)</description>
 		<year>1982</year>
-		<publisher>Bug Byte</publisher>
+		<publisher>Bug-Byte</publisher>
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="16017">
 				<rom name="Adventure.tzx" size="16017" crc="35d4be2a" sha1="c5fb1e4aa356ec4a406a2da76495d9f9b368d058"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="adventgb">
+		<description>Adventure (Gavin Baker)</description>
+		<year>1984</year>
+		<publisher>Gavin Baker</publisher>
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="48948">
+				<rom name="Adventure(GBarker).tzx" size="48948" crc="61fea9c8" sha1="f09791d6c0d836302ec3d42568e92d9620163bd6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -354,6 +491,19 @@ Known dumps not yet added (as of 2023-06-14):
 		</part>
 	</software>
 
+	<software name="airtraff">
+		<description>Air Traffic Control</description>
+		<year>1984</year>
+		<publisher>Hama Systems</publisher>
+		<info name="alt_title" value="A.T.C. - Air Traffic Controller" /> <!-- in game title -->
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="12057">
+				<rom name="Air Traffic Control (Hama Systems).tzx" size="12057" crc="1f64205e" sha1="84fd42c3d18b13265abcaa7430de5dd2ae640294"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="airline">
 		<description>Airline</description>
 		<year>1982</year>
@@ -394,6 +544,23 @@ Known dumps not yet added (as of 2023-06-14):
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="6429">
 				<rom name="AlienAttack.tzx" size="6429" crc="e6ce2fa6" sha1="f52df2571903d9aae931b359eabb67e2bbd6fc41"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alieninv">
+		<description>Alien Invaders</description>
+		<year>1983</year>
+		<publisher>Real Time Software</publisher>
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="15383">
+				<rom name="Alien Invaders - Side 1.tzx" size="15383" crc="4a3ae570" sha1="b8b5b2529051284900fbd52ffd88aed921112a99"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<dataarea name="cass" size="15383">
+				<rom name="Alien Invaders - Side 2.tzx" size="15383" crc="2cd6b41e" sha1="33fb3083bd96941f8705209098a4698ee316cf7a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -457,6 +624,31 @@ Known dumps not yet added (as of 2023-06-14):
 		</part>
 	</software>
 
+	<software name="aeri">
+		<description>AERI - Análise de Estruturas Recticuladas Isostácticas</description>
+		<year>1982</year>
+		<publisher>Landry</publisher>
+		<info name="language" value="Portuguese" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Catálogo"/>
+			<dataarea name="cass" size="1446">
+				<rom name="Cat.p" size="1446" crc="1ca9842f" sha1="0c39806d7f2ec5560c3c8cb529bd42a075d2b193" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="AERI (sem impressão)"/>
+			<dataarea name="cass" size="13552">
+				<rom name="Aeri.p" size="13552" crc="aef0320a" sha1="fac683452bfbec910e8b445d42c7e3860e4c2b2c" />
+			</dataarea>
+		</part>
+		<part name="cass3" interface="zx81_cass">
+			<feature name="part_id" value="AERI.I (com impressão)"/>
+			<dataarea name="cass" size="13968">
+				<rom name="Aeri.I (com impressao).p" size="13968" crc="0d049b02" sha1="e2e37a760b26b246af8ce5a4fd2b8001f643e362" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="arcadeact">
 		<description>Arcade Action</description>
 		<year>198?</year>
@@ -464,6 +656,20 @@ Known dumps not yet added (as of 2023-06-14):
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="4651">
 				<rom name="ArcadeAction.tzx" size="4651" crc="5cb215e3" sha1="04fc1ffa34592f093f1c0eae9d54b3ff31eb3e86"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="argolath">
+		<description>Argolath</description>
+		<year>1984</year>
+		<publisher>Loriciels</publisher>
+		<info name="language" value="French" />
+		<info name="notice" value="COPYRIGHT LORICIELS Avril 1984" /><!-- "(C) LORICIELS JUIN 1984" on title screen -->
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="15927">
+				<rom name="Argolath.tzx" size="15927" crc="27e2182c" sha1="5911ea1030c19e0d1fba8706b502df335cd711e6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -498,12 +704,25 @@ Known dumps not yet added (as of 2023-06-14):
 	</software>
 
 	<software name="astroids">
-		<description>Asteroids</description>
+		<description>Asteroids (Silversoft)</description>
 		<year>1982</year>
 		<publisher>Silversoft</publisher>
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="3776">
 				<rom name="Asteroids.tzx" size="3776" crc="939e50e5" sha1="85047ab187bfcd02195f00150419cee1bfc07a5f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="astroidsdk">
+		<description>Asteroids (dK'tronics)</description>
+		<year>1982</year>
+		<publisher>dK'tronics</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="7323">
+				<rom name="Asteroids - Black Inlay (DK'Tronics).tzx" size="7323" crc="3c37b22d" sha1="d1952c5a1f779d5cb3a8958ccda2fba46558bc1e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -515,6 +734,19 @@ Known dumps not yet added (as of 2023-06-14):
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="8594">
 				<rom name="Asteroids(SF).tzx" size="8594" crc="8b6f8743" sha1="d56d7e03a545b99607174faec186c42e64618189"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="astralcv">
+		<description>Astral Convoy</description>
+		<year>1983</year>
+		<publisher>Vortex Software</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="9012">
+				<rom name="Astral Convoy.tzx" size="9012" crc="18ab8759" sha1="d8ada2aa851d2a101f8332b60e755fdc7a31825b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -606,6 +838,19 @@ Known dumps not yet added (as of 2023-06-14):
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="6798">
 				<rom name="BankRobber.tzx" size="6798" crc="f9a7ab7d" sha1="40d0fcc8faaf73b0082d4f1937ef16626d289f66"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="barbilla">
+		<description>Bar Billards</description>
+		<year>1983</year>
+		<publisher>Meow Micros</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="7435">
+				<rom name="BarBilliards.tzx" size="7435" crc="f345216d" sha1="dc1d8a22a6231aac73555c8b8edb246d469aa8a7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -722,7 +967,7 @@ Known dumps not yet added (as of 2023-06-14):
 	<software name="blkcrystl">
 		<description>Black Crystal</description>
 		<year>1982</year>
-		<publisher>Carnell</publisher>
+		<publisher>Carnell Software</publisher>
 		<part name="cass1" interface="zx81_cass">
 			<feature name="part_id" value="Test/Map 1"/>
 			<dataarea name="cass" size="17518">
@@ -750,9 +995,9 @@ Known dumps not yet added (as of 2023-06-14):
 	</software>
 
 	<software name="blkcrystlc" cloneof="blkcrystl">
-		<description>Black Crystal (Clam Shell)</description>
+		<description>Black Crystal (clam shell)</description>
 		<year>1982</year>
-		<publisher>Carnell</publisher>
+		<publisher>Carnell Software</publisher>
 		<part name="cass1" interface="zx81_cass">
 			<feature name="part_id" value="Test"/>
 			<dataarea name="cass" size="1241">
@@ -804,9 +1049,9 @@ Known dumps not yet added (as of 2023-06-14):
 	</software>
 
 	<software name="blkcrystls" cloneof="blkcrystl">
-		<description>Black Crystal (Single Sided)</description>
+		<description>Black Crystal (single sided)</description>
 		<year>1982</year>
-		<publisher>Carnell</publisher>
+		<publisher>Carnell Software</publisher>
 		<part name="cass1" interface="zx81_cass">
 			<feature name="part_id" value="Test/Map 1/Map 2/Map 3"/>
 			<dataarea name="cass" size="50136">
@@ -832,6 +1077,19 @@ Known dumps not yet added (as of 2023-06-14):
 		</part>
 	</software>
 
+	<software name="blitzbal">
+		<description>Blitz Balle</description>
+		<year>1984</year>
+		<publisher>Sprites</publisher>
+		<info name="language" value="French" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="15948">
+				<rom name="Blitz Ball.tzx" size="15948" crc="59d59871" sha1="57b861e01f0ced40a947e823c2fbd793b122efee"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bomber">
 		<description>Bomber</description>
 		<year>1982</year>
@@ -851,7 +1109,7 @@ Known dumps not yet added (as of 2023-06-14):
 	</software>
 
 	<software name="bomberm" cloneof="bomber">
-		<description>Bomber (MikroGen)</description>
+		<description>Bomber (Mikro-Gen)</description>
 		<year>198?</year>
 		<publisher>Mikro-Gen</publisher>
 		<part name="cass1" interface="zx81_cass">
@@ -891,9 +1149,9 @@ Known dumps not yet added (as of 2023-06-14):
 	</software>
 
 	<software name="breakoutj">
-		<description>Breakout (JKG)</description>
+		<description>Breakout (J.K.G.)</description>
 		<year>1981</year>
-		<publisher>J.K.Greye Software</publisher>
+		<publisher>J.K. Greye Software</publisher>
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="948">
 				<rom name="Breakout(JKG).tzx" size="948" crc="e3f0284a" sha1="c8138f8960aedf4d848c65b676d76bf717ec9154"/>
@@ -902,7 +1160,7 @@ Known dumps not yet added (as of 2023-06-14):
 	</software>
 
 	<software name="breakoutn">
-		<description>Breakout (NGS)</description>
+		<description>Breakout (N.G.S.)</description>
 		<year>1982</year>
 		<publisher>New Generation Software</publisher>
 		<part name="cass1" interface="zx81_cass">
@@ -945,6 +1203,18 @@ Known dumps not yet added (as of 2023-06-14):
 		</part>
 	</software>
 
+	<software name="bridgehed">
+		<description>Bridgehead</description>
+		<year>1984</year>
+		<publisher>Gavin Barker</publisher>
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="17462">
+				<rom name="Bridgehead.tzx" size="17462" crc="ba08e53a" sha1="dd59f5192f001f3c48fe64b79a1b71900d18ffd6"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bubblbug">
 		<description>Bubble Bugs</description>
 		<year>1983</year>
@@ -952,6 +1222,32 @@ Known dumps not yet added (as of 2023-06-14):
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="6647">
 				<rom name="BubbleBugs.tzx" size="6647" crc="368c6f68" sha1="e52ddab32b1183910d1c74ae04999a8fb92dc158"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="budgetfa">
+		<description>Budget Familial</description>
+		<year>1984</year>
+		<publisher>ERE Informatique</publisher>
+		<info name="language" value="French" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="16305">
+				<rom name="BudgetFamilial.tzx" size="16305" crc="b18f734a" sha1="61e4c35c8fa43283e142f84188a2fee27b844492"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="budgetfa_a" cloneof="budgetfa">
+		<description>Budget Familial (alt)</description>
+		<year>1984</year>
+		<publisher>ERE Informatique</publisher>
+		<info name="language" value="French" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="13053">
+				<rom name="BudgetFamilial_2.tzx" size="13053" crc="652027b5" sha1="c0becf556c865df27215bd87a4804b7cec5dc37d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1009,11 +1305,26 @@ Known dumps not yet added (as of 2023-06-14):
 
 	<software name="canworms">
 		<description>Can of Worms</description>
-		<year>198?</year>
-		<publisher>Automata Cartography</publisher>
+		<year>1981</year>
+		<publisher>Automata</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="1K" />
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="7150">
 				<rom name="CanOfWorms.tzx" size="7150" crc="b2e6fa12" sha1="9bb651b39206913bbe74600997114fcbcd70747c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="canworms_a" cloneof="canworms">
+		<description>Can of Worms (alt)</description>
+		<year>1981</year>
+		<publisher>Automata</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="1K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="7198">
+				<rom name="Can of Worms (alt).tzx" size="7198" crc="e3c5ac30" sha1="74f151c8f3c73f89acabb2feff5f11109e7fed2f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1177,6 +1488,26 @@ Known dumps not yet added (as of 2023-06-14):
 		</part>
 	</software>
 
+	<software name="casspend">
+		<description>Casse-briques + Pendu</description>
+		<year>1984</year>
+		<publisher>ERE Informatique</publisher>
+		<info name="language" value="French" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="A - LOAD &quot;BRIQUES&quot; - LOAD &quot;BRIQUES-C&quot;"/>
+			<dataarea name="cass" size="7487">
+				<rom name="Casse-briques - Pendu - Side 1.tzx" size="7487" crc="6a53082f" sha1="2faa0bd7c4d8bc5f54755bd4d3c358d694ec50a5"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="B -  LOAD &quot;PENDU&quot;"/>
+			<dataarea name="cass" size="12780">
+				<rom name="Casse-briques - Pendu - Side 2.tzx" size="12780" crc="b94c7e1d" sha1="f8f20bd0d9048298e0f4bcf67fa94b54b6d94a3e"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="castle">
 		<description>Castle</description>
 		<year>1982</year>
@@ -1191,7 +1522,7 @@ Known dumps not yet added (as of 2023-06-14):
 	<software name="catacomb">
 		<description>Catacombs</description>
 		<year>1981</year>
-		<publisher>J.K.Greye Software</publisher>
+		<publisher>J.K. Greye Software</publisher>
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="12740">
 				<rom name="Catacombs.tzx" size="12740" crc="f8d6aee6" sha1="c872d07e278df997df9a66185852f580fd851151"/>
@@ -1221,8 +1552,8 @@ Known dumps not yet added (as of 2023-06-14):
 		</part>
 	</software>
 
-	<software name="centipededk" cloneof="centipede">
-		<description>Centipede (dk)</description>
+	<software name="centipede_dk" cloneof="centipede">
+		<description>Centipede (dK'tronics)</description>
 		<year>1982</year>
 		<publisher>dK'tronics</publisher>
 		<part name="cass1" interface="zx81_cass">
@@ -1232,13 +1563,24 @@ Known dumps not yet added (as of 2023-06-14):
 		</part>
 	</software>
 
-	<software name="centipedeg" cloneof="centipede">
-		<description>Centipede (Green Cover)</description>
+	<software name="centipede_dkg" cloneof="centipede">
+		<description>Centipede (dK'tronics, green cover)</description>
 		<year>198?</year>
 		<publisher>dK'tronics</publisher>
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="9967">
 				<rom name="Centipede(Green).tzx" size="9967" crc="0ed972cd" sha1="1bf47ef2651d5d09a6971ce9eb931aa41ed846cb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="centipede_kay" cloneof="centipede">
+		<description>Centipede (Kayde)</description>
+		<year>1982</year>
+		<publisher>Kayde Software</publisher>
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="9971">
+				<rom name="Centipede (Kayde).tzx" size="9971" crc="9426685b" sha1="ba69bd88281af24d70bfe15195bd9737b736e4b5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1276,6 +1618,21 @@ Known dumps not yet added (as of 2023-06-14):
 		</part>
 	</software>
 
+	<software name="chateauh">
+		<description>Le Chateau Hanté</description>
+		<year>1984</year>
+		<publisher>Sprites</publisher>
+		<info name="author" value="Christian &amp; Frederic Moussaly" />
+		<info name="language" value="French" />
+		<info name="serial" value="ZX 005" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="16283">
+				<rom name="Le Chateau Hante.tzx" size="16283" crc="bee7abb4" sha1="d9b198ba094373b29cb18d2e93cd58ed3dfd193e"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cbookmgr">
 		<description>The Checkbook Manager</description>
 		<year>1982</year>
@@ -1291,6 +1648,7 @@ Known dumps not yet added (as of 2023-06-14):
 		<description>Chess also Chess-Clock</description>
 		<year>1981</year>
 		<publisher>Sinclair Research</publisher>
+		<info name="usage" value="16K" />
 		<part name="cass1" interface="zx81_cass">
 			<feature name="part_id" value="Chess"/>
 			<dataarea name="cass" size="8529">
@@ -1306,9 +1664,10 @@ Known dumps not yet added (as of 2023-06-14):
 	</software>
 
 	<software name="chessmg" cloneof="chess">
-		<description>Chess (MikroGen)</description>
+		<description>Chess (Mikro-Gen)</description>
 		<year>1982</year>
 		<publisher>Mikro-Gen</publisher>
+		<info name="usage" value="16K" />
 		<part name="cass1" interface="zx81_cass">
 			<feature name="part_id" value="Chess"/>
 			<dataarea name="cass" size="8529">
@@ -1323,10 +1682,11 @@ Known dumps not yet added (as of 2023-06-14):
 		</part>
 	</software>
 
-	<software name="chessp" cloneof="chess">
-		<description>Chess (Psion)</description>
+	<software name="chessmgo" cloneof="chess">
+		<description>Chess (Mikro-Gen, orange cover)</description>
 		<year>1981</year>
-		<publisher>Psion</publisher>
+		<publisher>Mikro-Gen</publisher>
+		<info name="usage" value="16K" />
 		<part name="cass1" interface="zx81_cass">
 			<feature name="part_id" value="Chess"/>
 			<dataarea name="cass" size="8529">
@@ -1341,7 +1701,7 @@ Known dumps not yet added (as of 2023-06-14):
 		</part>
 	</software>
 
-	<software name="chesst" cloneof="chess">
+	<software name="chesstx" cloneof="chess">
 		<description>Chess (Timex)</description>
 		<year>1982</year>
 		<publisher>Timex</publisher>
@@ -1352,8 +1712,28 @@ Known dumps not yet added (as of 2023-06-14):
 		</part>
 	</software>
 
-	<software name="chessty" cloneof="chess">
-		<description>Chess (Typed)</description>
+	<software name="xadrez" cloneof="chess">
+		<description>Xadrez (Timex Portugal)</description>
+		<year>1983</year>
+		<publisher>Timex Portugal</publisher>
+		<info name="language" value="Portuguese" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Face A - Xadrez"/>
+			<dataarea name="cass" size="13003">
+				<rom name="Xadrez.tzx" size="13003" crc="527d449b" sha1="f4278c768fcbbe9488836aabd7f61de43c71ec88"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="Face B - Relogio"/>
+			<dataarea name="cass" size="13003">
+				<rom name="Xadrez_B.tzx" size="13003" crc="a97ce30f" sha1="abb3d091b9c3397eaff4ab6795a4b2d9321ff6ed"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chesstyp" cloneof="chess">
+		<description>Chess (typed)</description>
 		<year>1981</year>
 		<publisher>Mikro-Gen</publisher>
 		<part name="cass1" interface="zx81_cass">
@@ -1384,6 +1764,26 @@ Known dumps not yet added (as of 2023-06-14):
 			<feature name="part_id" value="Business Relationships"/>
 			<dataarea name="cass" size="10812">
 				<rom name="ChineseAstrology.B.BusinessRelationships.tzx" size="10812" crc="a08a524e" sha1="2b833b77f200fd6a721650c700addf20823facda"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chiroman">
+		<description>Chiromancie</description>
+		<year>1983</year>
+		<publisher>ERE Informatique</publisher>
+		<info name="language" value="French" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="A - Chiromesure"/>
+			<dataarea name="cass" size="4623">
+				<rom name="Chiromancie.p" size="4623" crc="a81a7f08" sha1="4dd5ca5fff0cfa989c25e8bfdea6475af9e300a4"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="B - Chirologie"/>
+			<dataarea name="cass" size="15964">
+				<rom name="Chiromancie_2.p" size="15964" crc="3101eedc" sha1="25eb66fa027fbab2e31126206eae1b5b77665f10"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1531,12 +1931,32 @@ Known dumps not yet added (as of 2023-06-14):
 	</software>
 
 	<software name="compshar">
-		<description>Comp-u-Share</description>
+		<description>Comp-U-Share</description>
 		<year>198?</year>
 		<publisher>Micromega</publisher>
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="17652">
 				<rom name="CompuShare.tzx" size="17652" crc="f62ae771" sha1="043e56d73eeb16b8c286fd282d94cf5aa17427ff"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="computax">
+		<description>Comp-U-Tax/82</description>
+		<year>1982</year>
+		<publisher>Micromega</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="1K/16K" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Comp-U-Tax/82 - 1K RAM"/>
+			<dataarea name="cass" size="19646">
+				<rom name="Comp-U-Tax 82 - Side 1.tzx" size="19646" crc="fa634a14" sha1="539227295bed4e649b68fec7ea7825d26c0cd22d"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="Comp-U-Tax/82 - 16K RAM"/>
+			<dataarea name="cass" size="15315">
+				<rom name="Comp-U-Tax 82 - Side 2.tzx" size="15315" crc="fb644dfa" sha1="d696a8fb9d622980f109a8f1d550ba0124f2bc0c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1590,8 +2010,10 @@ Known dumps not yet added (as of 2023-06-14):
 
 	<software name="constell">
 		<description>Constellation</description>
-		<year>198?</year>
-		<publisher>Bug Byte</publisher>
+		<year>1982</year>
+		<publisher>Bug-Byte</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="12611">
 				<rom name="Constellation.tzx" size="12611" crc="a0146b49" sha1="fb8bbc99988812c5ef372a7358a36ceadb53ae73"/>
@@ -1599,10 +2021,25 @@ Known dumps not yet added (as of 2023-06-14):
 		</part>
 	</software>
 
-	<software name="constellg" cloneof="constell">
+	<software name="constell_rli" cloneof="constell">
+		<description>Constellation (red logo inlay)</description>
+		<year>1982</year>
+		<publisher>Bug-Byte</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="15662">
+				<rom name="Constellation - Red Logo Inlay.tzx" size="15662" crc="8313a37b" sha1="507acdeb8eaff8c3628ed33661e5684c1171a20d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="constell_gls" cloneof="constell">
 		<description>Constellation (Gladstone)</description>
 		<year>198?</year>
 		<publisher>Gladstone Electronics</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K; type RUN after loading the program" />
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="15694">
 				<rom name="Constellation(GE).tzx" size="15694" crc="89092de9" sha1="69da2b7f7a1f311a73858f4787f05c31460e7172"/>
@@ -1718,6 +2155,8 @@ Known dumps not yet added (as of 2023-06-14):
 		<description>Dallas (French)</description>
 		<year>1983</year>
 		<publisher>Cases Computer Simulations</publisher>
+		<info name="language" value="French" />
+		<info name="usage" value="16K" />
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="16379">
 				<rom name="Dallas(French).tzx" size="16379" crc="4a65562e" sha1="499bee247f3bdc37eca67e95eee1624de11ec5d6"/>
@@ -1746,10 +2185,25 @@ Known dumps not yet added (as of 2023-06-14):
 	<software name="damslbst">
 		<description>The Damsel and the Beast</description>
 		<year>1981</year>
-		<publisher>Bug Byte</publisher>
+		<publisher>Bug-Byte</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K; type RUN after loading the program" />
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="10464">
 				<rom name="DamselAndTheBeastThe.tzx" size="10464" crc="b34252c8" sha1="574392a27b8328ec82121e1c666e2c3411f34342"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="damslbst_rli" cloneof="damslbst">
+		<description>The Damsel and the Beast (red logo inlay)</description>
+		<year>1982</year>
+		<publisher>Bug-Byte</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K; type RUN after loading the program" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="11264">
+				<rom name="The Damsel and the Beast - Red Logo Inlay.tzx" size="11264" crc="791ca848" sha1="764325157a49a18b5fb6ace57627b28500512b12"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1765,13 +2219,82 @@ Known dumps not yet added (as of 2023-06-14):
 		</part>
 	</software>
 
+	<software name="deflexx" supported="no">
+		<description>Deflexx</description>
+		<year>1981</year>
+		<publisher>dK'tronics</publisher>
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="13498">
+				<rom name="Deflexx - Green Inlay (DK Tronics).tzx" size="13498" crc="0a8a287f" sha1="0a37170275e3956ed5e78cd4a42f4beea6acf5b8"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dictator">
 		<description>Dictator</description>
 		<year>1982</year>
-		<publisher>Bug Byte</publisher>
+		<publisher>Bug-Byte</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="16306">
 				<rom name="Dictator.tzx" size="16306" crc="b01e01a7" sha1="c14608ecc904b6ad8141d64bb4eed66c43b6316d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dictator_rli" cloneof="dictator">
+		<description>Dictator (red logo inlay)</description>
+		<year>1982</year>
+		<publisher>Bug-Byte</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="16306">
+				<rom name="Dictator - Red Logo Inlay - Side 1.tzx" size="16306" crc="11ba837c" sha1="c7041589c86095601836fe31c7e63d9fd0a73ea9"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="16307">
+				<rom name="Dictator - Red Logo Inlay - Side 2.tzx" size="16307" crc="7f994bc0" sha1="7b7fc54d6be93f7a2e3d51b275e1b78d036b9c63"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="colunas">
+		<description>Colunas - Dimensionamento de Colunas Montantes de Edifícios</description>
+		<year>1982</year>
+		<publisher>Landry</publisher>
+		<info name="language" value="Portuguese" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Catálogo"/>
+			<dataarea name="cass" size="1436">
+				<rom name="Cat.p" size="1436" crc="0e6995c9" sha1="ca0971e18e3d2a28df561fb805c764c46208c781"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="Colunas (sem impressão)"/>
+			<dataarea name="cass" size="15922">
+				<rom name="Colunas (sem impressao).p" size="15922" crc="ccebc148" sha1="5443a70eeb17d19a73edf18bfbcd905466ce44ac"/>
+			</dataarea>
+		</part>
+		<part name="cass3" interface="zx81_cass">
+			<feature name="part_id" value="Colunas (com impressão)"/>
+			<dataarea name="cass" size="16335">
+				<rom name="Colunas.I (com impressao).p" size="16335" crc="a789c970" sha1="92ede76b9441ce1dd2f89399db05ef48e8a7c615"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="disacsem">
+		<description>Dis-ACSem</description>
+		<year>1981</year>
+		<publisher>ACS Software</publisher>
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="7207">
+				<rom name="DIS-ACSem.p" size="7207" crc="7ee68cb6" sha1="9f429fc51d814e262f23ecb4f7e67cc31a4a5060"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1795,7 +2318,7 @@ Known dumps not yet added (as of 2023-06-14):
 	</software>
 
 	<software name="dodgcon4b" cloneof="dodgcon4">
-		<description>Dodgems and Connect 4 (Brown Inlay)</description>
+		<description>Dodgems and Connect 4 (brown inlay)</description>
 		<year>1982</year>
 		<publisher>CDS Micro Systems</publisher>
 		<part name="cass1" interface="zx81_cass">
@@ -1853,6 +2376,7 @@ Known dumps not yet added (as of 2023-06-14):
 		<description>Dungeons of Doom</description>
 		<year>1982</year>
 		<publisher>Temptation Software</publisher>
+		<info name="usage" value="16K" />
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="15074">
 				<rom name="DungeonsOfDoom.tzx" size="15074" crc="d5034066" sha1="b2884c73af5da39e4c32d9a11206769e006f456f"/>
@@ -1904,6 +2428,20 @@ Known dumps not yet added (as of 2023-06-14):
 		</part>
 	</software>
 
+	<software name="buscates">
+		<description>Em Busca dos Tesouros</description>
+		<year>1986</year>
+		<publisher>Micro Sistemas</publisher>
+		<info name="developer" value="Tadeu Curinga da Silva" />
+		<info name="language" value="Portuguese (Brazil)" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="15818">
+				<rom name="ebdt.p" size="15818" crc="e38b5ac7" sha1="79ba7b0a21839100ec7597eae945ae0870f6479a"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="encounter">
 		<description>Encounter</description>
 		<year>1982</year>
@@ -1934,9 +2472,9 @@ Known dumps not yet added (as of 2023-06-14):
 	</software>
 
 	<software name="englit1w" cloneof="englit1">
-		<description>English Literature 1 (WHSmith)</description>
+		<description>English Literature 1 (W.H. Smith)</description>
 		<year>1982</year>
-		<publisher>W.H.Smith</publisher>
+		<publisher>W.H. Smith</publisher>
 		<part name="cass1" interface="zx81_cass">
 			<feature name="part_id" value="Novelists"/>
 			<dataarea name="cass" size="11359">
@@ -1970,9 +2508,9 @@ Known dumps not yet added (as of 2023-06-14):
 	</software>
 
 	<software name="englit2w" cloneof="englit2">
-		<description>English Literature 2 (WHSmith)</description>
+		<description>English Literature 2 (W.H. Smith)</description>
 		<year>1982</year>
-		<publisher>W.H.Smith</publisher>
+		<publisher>W.H. Smith</publisher>
 		<part name="cass1" interface="zx81_cass">
 			<feature name="part_id" value="Poets and Playwrights"/>
 			<dataarea name="cass" size="11815">
@@ -2181,7 +2719,7 @@ Known dumps not yet added (as of 2023-06-14):
 	</software>
 
 	<software name="fastoneg" cloneof="fastone">
-		<description>The Fast One (Green Inlay)</description>
+		<description>The Fast One (green inlay)</description>
 		<year>198?</year>
 		<publisher>Campbell Systems</publisher>
 		<part name="cass1" interface="zx81_cass">
@@ -2227,10 +2765,13 @@ Known dumps not yet added (as of 2023-06-14):
 		</part>
 	</software>
 
+	<!-- Also distributed by Timex in the US market -->
 	<software name="flsimul">
 		<description>Flight Simulation</description>
 		<year>1982</year>
 		<publisher>Sinclair Research</publisher>
+		<info name="alt_title" value="Flug-Simulation" />
+		<info name="usage" value="16K" />
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="13855">
 				<rom name="FlightSimulation.tzx" size="13855" crc="945da3c1" sha1="de020d7531c0904a8a152193e7b3d5203e5c1017"/>
@@ -2238,24 +2779,15 @@ Known dumps not yet added (as of 2023-06-14):
 		</part>
 	</software>
 
-	<software name="flsimult" cloneof="flsimul">
-		<description>The Flight Simulator</description>
+	<software name="simulvoo" cloneof="flsimul">
+		<description>Simulador de Voo (Timex Portugal)</description>
 		<year>1982</year>
-		<publisher>Timex</publisher>
+		<publisher>Timex Portugal</publisher>
+		<info name="language" value="Portuguese" />
+		<info name="usage" value="16K" />
 		<part name="cass1" interface="zx81_cass">
-			<dataarea name="cass" size="13855">
-				<rom name="FlightSimulation.tzx" size="13855" crc="945da3c1" sha1="de020d7531c0904a8a152193e7b3d5203e5c1017"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="flugsim" cloneof="flsimul">
-		<description>Flug-Simulation</description>
-		<year>1982</year>
-		<publisher>Sinclair Research</publisher>
-		<part name="cass1" interface="zx81_cass">
-			<dataarea name="cass" size="13855">
-				<rom name="FlightSimulation.tzx" size="13855" crc="945da3c1" sha1="de020d7531c0904a8a152193e7b3d5203e5c1017"/>
+			<dataarea name="cass" size="14147">
+				<rom name="Simulador de Voo.p" size="14147" crc="2c939eb0" sha1="6cb872b899e13b8c2e18c1d8bb027049a2779f0d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2375,7 +2907,7 @@ Known dumps not yet added (as of 2023-06-14):
 
 	<software name="frogger">
 		<description>Frogger</description>
-		<year>198?</year>
+		<year>1982</year>
 		<publisher>DJL Software</publisher>
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="13723">
@@ -2413,6 +2945,26 @@ Known dumps not yet added (as of 2023-06-14):
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="4453">
 				<rom name="Frogs.tzx" size="4453" crc="efd0f05e" sha1="899d5cdf74208e30d17c5d34f5733d207222daaa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frogsaac">
+		<description>Frogs (Aackosoft)</description>
+		<year>198?</year>
+		<publisher>Aackosoft</publisher>
+		<info name="usage" value="16K" />
+		<info name="language" value="English" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="3301">
+				<rom name="Frogs - Side 1 (Aackosoft).tzx" size="3301" crc="16e401a3" sha1="40de9572430198fa3256f22a6bcb30221270a165"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="3301">
+				<rom name="Frogs - Side 2 (Aackosoft).tzx" size="3301" crc="0af21e56" sha1="4732b6f93fa5b78f033d6a077b40b076de4108f2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2591,6 +3143,18 @@ Known dumps not yet added (as of 2023-06-14):
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="19202">
 				<rom name="GamblerThe.tzx" size="19202" crc="e05a3062" sha1="61da0728b3850a4235d13b1a71e7bb0e339fac63"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="gamelife">
+		<description>Game of Life</description>
+		<year>1981</year>
+		<publisher>Individual Software Service</publisher>
+		<info name="language" value="German" />
+		<info name="usage" value="16K, after loading the program type RUN, when the ORDER message appears then type INFO" />
+		<part name="cass" interface="zx81_cass">
+			<dataarea name="cass" size="15522">
+				<rom name="Game of Life.tzx" size="15522" crc="a17b7d0c" sha1="8ecee3de7d30e28da262e3a6d77b4f2cb748425d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2836,7 +3400,7 @@ Known dumps not yet added (as of 2023-06-14):
 	<software name="gametap2">
 		<description>Games Tape 2</description>
 		<year>1981</year>
-		<publisher>J.K.Greye Software</publisher>
+		<publisher>J.K. Greye Software</publisher>
 		<part name="cass1" interface="zx81_cass">
 			<feature name="part_id" value="Starfighter"/>
 			<dataarea name="cass" size="5982">
@@ -2858,9 +3422,9 @@ Known dumps not yet added (as of 2023-06-14):
 	</software>
 
 	<software name="gametap2t" cloneof="gametap2">
-		<description>Games Tape 2 (Typed)</description>
+		<description>Games Tape 2 (typed)</description>
 		<year>1981</year>
-		<publisher>J.K.Greye Software</publisher>
+		<publisher>J.K. Greye Software</publisher>
 		<part name="cass1" interface="zx81_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="10696">
@@ -2871,6 +3435,19 @@ Known dumps not yet added (as of 2023-06-14):
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="4284">
 				<rom name="GamesTape2(Typed).B.Artist.tzx" size="4284" crc="ab7c5b15" sha1="e732416e758e02540659b77f53afb683cae4cd1f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gamespac">
+		<description>Gamespack</description>
+		<year>1982</year>
+		<publisher>Mikro-Gen</publisher>
+		<info name="usage" value="1K" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="'Impact' 'Target' 'Deathray'"/>
+			<dataarea name="cass" size="2765">
+				<rom name="Gamespack.tzx" size="2765" crc="ac29e717" sha1="b958c8aa31610e87102fa449727c5b5e2e7b2bc3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2956,9 +3533,9 @@ Known dumps not yet added (as of 2023-06-14):
 	</software>
 
 	<software name="geog1w" cloneof="geog1">
-		<description>Geography 1 (WHSmith)</description>
+		<description>Geography 1 (W.H. Smith)</description>
 		<year>1982</year>
-		<publisher>W.H.Smith</publisher>
+		<publisher>W.H. Smith</publisher>
 		<part name="cass1" interface="zx81_cass">
 			<feature name="part_id" value="Towns"/>
 			<dataarea name="cass" size="8019">
@@ -2977,9 +3554,30 @@ Known dumps not yet added (as of 2023-06-14):
 		<description>Geometry 1</description>
 		<year>1982</year>
 		<publisher>Timex</publisher>
+		<info name="language" value="English" />
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="5483">
 				<rom name="Geometry1.tzx" size="5483" crc="80dad6c4" sha1="be9373f6519a369e7d2dba40a14319f4751b1b78"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="geomtria" cloneof="geometr1">
+		<description>Geometria I</description>
+		<year>1982</year>
+		<publisher>Timex Portugal</publisher>
+		<info name="language" value="Portuguese" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Face A - Load &quot;Area&quot; ou Load &quot;Triangulo&quot; ou Load &quot;Vector&quot; ou Load &quot;Graus&quot;"/>
+			<dataarea name="cass" size="8566">
+				<rom name="Geometria I_A.tzx" size="8566" crc="5144043f" sha1="e9fcd585bf5d301e1ee4b08a7e4b18c29cb1ec97"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="Face B - Load &quot;Area&quot; ou Load &quot;Triangulo&quot; ou Load &quot;Vector&quot; ou Load &quot;Graus&quot;"/>
+			<dataarea name="cass" size="8566">
+				<rom name="Geometria I_B.tzx" size="8566" crc="46cf2ea8" sha1="d4f24c319550b26aa14389c38a232dac54b2446f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3040,6 +3638,19 @@ Known dumps not yet added (as of 2023-06-14):
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="9468">
 				<rom name="Golf.tzx" size="9468" crc="1b658fab" sha1="3177bea82297a86a2c5c541cde8426fff95cc052"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grandprx">
+		<description>Grand Prix</description>
+		<year>198?</year>
+		<publisher>Indescomp</publisher>
+		<info name="developer" value="Jeff Minter" />
+		<info name="language" value="Spanish" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="2780">
+				<rom name="Grand Prix.p" size="2780" crc="2f6120e1" sha1="c45163e37d61d5cb321d710d53322bc80ba8a645"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3110,7 +3721,7 @@ Known dumps not yet added (as of 2023-06-14):
 	</software>
 
 	<software name="graphtkitc" cloneof="graphkit">
-		<description>Graphics Toolkit (Colour Inlay)</description>
+		<description>Graphics Toolkit (colour inlay)</description>
 		<year>1982</year>
 		<publisher>JRS Software</publisher>
 		<part name="cass1" interface="zx81_cass">
@@ -3190,12 +3801,40 @@ Known dumps not yet added (as of 2023-06-14):
 	</software>
 
 	<software name="gulp2">
-		<description>Gulp 2</description>
+		<description>Gulp II</description>
 		<year>1982</year>
 		<publisher>Campbell Systems</publisher>
+		<info name="usage" value="16K" />
+		<info name="language" value="English" />
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="6342">
 				<rom name="Gulp2.tzx" size="6342" crc="b041f1bf" sha1="aa0fadd80146c2dab98dab49c88f52ba4852c861"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gulp2_aac" cloneof="gulp2">
+		<description>Gulp II (Aackosoft)</description>
+		<year>1982</year>
+		<publisher>Aackosoft</publisher>
+		<info name="usage" value="16K" />
+		<info name="language" value="English" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="12559">
+				<rom name="Gulp II (Aackosoft).tzx" size="12559" crc="57f70999" sha1="53c30dc45a103580a5a1497f05187d9a75a99937"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gulp2_zxd" cloneof="gulp2">
+		<description>Gulp II (ZX Data)</description>
+		<year>1982</year>
+		<publisher>ZX Data</publisher>
+		<info name="usage" value="16K" />
+		<info name="language" value="Danish" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="6163">
+				<rom name="Gulp2(ZXData).tzx" size="6163" crc="62cd572d" sha1="7339da368f5ec79b73bdb1d0a64443019c124061"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3359,9 +3998,9 @@ Known dumps not yet added (as of 2023-06-14):
 	</software>
 
 	<software name="history1w" cloneof="history1">
-		<description>History 1 (WHSmith)</description>
+		<description>History 1 (W.H. Smith)</description>
 		<year>1982</year>
-		<publisher>W.H.Smith</publisher>
+		<publisher>W.H. Smith</publisher>
 		<part name="cass1" interface="zx81_cass">
 			<feature name="part_id" value="Events"/>
 			<dataarea name="cass" size="10763">
@@ -3428,7 +4067,7 @@ Known dumps not yet added (as of 2023-06-14):
 	</software>
 
 	<software name="hoppert" cloneof="hopper">
-		<description>Hopper (Truck)</description>
+		<description>Hopper (truck cover)</description>
 		<year>1981</year>
 		<publisher>PSS</publisher>
 		<part name="cass1" interface="zx81_cass">
@@ -3445,6 +4084,19 @@ Known dumps not yet added (as of 2023-06-14):
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="15289">
 				<rom name="HouseOfDeath.tzx" size="15289" crc="e78272e3" sha1="80ee47dd77a43c051c600a38def525950a110119"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hognomes">
+		<description>House of Gnomes</description>
+		<year>198?</year>
+		<publisher>Bug-Byte</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K; type RUN after loading the program" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="14984">
+				<rom name="House of Gnomes.tzx" size="14984" crc="86598645" sha1="67d1f51c74bd9afca17c3bebb72189d00ed8eaea"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3486,6 +4138,7 @@ Known dumps not yet added (as of 2023-06-14):
 		<description>Intercepteur Cobalt</description>
 		<year>1984</year>
 		<publisher>ERE Informatique</publisher>
+		<info name="language" value="French" />
 		<part name="cass1" interface="zx81_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="17755">
@@ -3568,7 +4221,7 @@ Known dumps not yet added (as of 2023-06-14):
 	<software name="invaders">
 		<description>Invaders</description>
 		<year>1982</year>
-		<publisher>Bug Byte</publisher>
+		<publisher>Bug-Byte</publisher>
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="2605">
 				<rom name="Invaders.tzx" size="2605" crc="93d1d5d7" sha1="bb79a0ea9ff54e882d45a7ca94dc71762488b2cd"/>
@@ -3588,9 +4241,9 @@ Known dumps not yet added (as of 2023-06-14):
 	</software>
 
 	<software name="invaderb" cloneof="invaders">
-		<description>Invaders (Re-release)</description>
+		<description>Invaders (re-release)</description>
 		<year>1982</year>
-		<publisher>Bug Byte</publisher>
+		<publisher>Bug-Byte</publisher>
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="2605">
 				<rom name="Invaders(Alt).tzx" size="2605" crc="e2b37050" sha1="c5a9f1683d2730eaf40a879c0f5c676b5f718e03"/>
@@ -3610,9 +4263,9 @@ Known dumps not yet added (as of 2023-06-14):
 	</software>
 
 	<software name="invaderm" cloneof="invaders">
-		<description>Invaders (Monochrome)</description>
+		<description>Invaders (monochrome)</description>
 		<year>198?</year>
-		<publisher>Bug Byte</publisher>
+		<publisher>Bug-Byte</publisher>
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="2605">
 				<rom name="Invaders(Mono).tzx" size="2605" crc="80e827f0" sha1="3aeb0fa4a5c458ace0affc01f528d4b15ee047b8"/>
@@ -3621,9 +4274,9 @@ Known dumps not yet added (as of 2023-06-14):
 	</software>
 
 	<software name="invadert" cloneof="invaders">
-		<description>Invaders (Typed Inlay)</description>
+		<description>Invaders (typed inlay)</description>
 		<year>1981</year>
-		<publisher>Bug Byte</publisher>
+		<publisher>Bug-Byte</publisher>
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="2605">
 				<rom name="Invaders(Typed).tzx" size="2605" crc="4647c030" sha1="a3669f5ce7897e144314b0a4ea5e3e1b79cff5ef"/>
@@ -3642,10 +4295,10 @@ Known dumps not yet added (as of 2023-06-14):
 		</part>
 	</software>
 
-	<software name="invforcei" cloneof="invforce">
-		<description>Invasion Force (IPS)</description>
-		<year>1983</year>
-		<publisher>International Publishing &amp; Software Inc.</publisher>
+	<software name="invforce_ips" cloneof="invforce">
+		<description>Invasion Force (I.P.S.)</description>
+		<year>1982</year>
+		<publisher>International Publishing &amp; Software</publisher>
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="7890">
 				<rom name="InvasionForce(IPS).tzx" size="7890" crc="c7842b97" sha1="3b59f5a004f92d081181834aa59073ba74b47909"/>
@@ -3653,6 +4306,26 @@ Known dumps not yet added (as of 2023-06-14):
 		</part>
 	</software>
 
+	<software name="invforce_aac" cloneof="invforce">
+		<description>Invasion Force (Aackosoft)</description>
+		<year>1982</year>
+		<publisher>Aackosoft</publisher>
+		<info name="usage" value="16K" />
+		<info name="language" value="English" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="7872">
+				<rom name="Invasion Force - Side 1 (Aackosoft).tzx" size="7872" crc="a8fb7710" sha1="52dcd3f7e1e99c6bae53d53c04a61177d68fcce0"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="7872">
+				<rom name="Invasion Force - Side 2 (Aackosoft).tzx" size="7872" crc="13038f11" sha1="3085edb3278129d7187dbd7958ab38a7271e210d"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="invent1">
 		<description>Inventions 1</description>
 		<year>1982</year>
@@ -3672,9 +4345,9 @@ Known dumps not yet added (as of 2023-06-14):
 	</software>
 
 	<software name="invent1w" cloneof="invent1">
-		<description>Inventions 1 (WHSmith)</description>
+		<description>Inventions 1 (W.H. Smith)</description>
 		<year>1982</year>
-		<publisher>W.H.Smith</publisher>
+		<publisher>W.H. Smith</publisher>
 		<part name="cass1" interface="zx81_cass">
 			<feature name="part_id" value="Before 1850"/>
 			<dataarea name="cass" size="11515">
@@ -3736,6 +4409,88 @@ Known dumps not yet added (as of 2023-06-14):
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="8782">
 				<rom name="JDArcades.tzx" size="8782" crc="6fb5f451" sha1="08c17dc95d0a7e8a68fb9b534398d45656e25ea5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jogos3">
+		<description>Jogos 3</description>
+		<year>1982</year>
+		<publisher>LOG</publisher>
+		<info name="language" value="Portuguese" />
+		<info name="usage" value="48K" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Bowling"/>
+			<dataarea name="cass" size="7408">
+				<rom name="Bowling.p" size="7408" crc="d66bcb62" sha1="3163d05c05bc9ad1b8258e836aa1d73a88518428"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="Samurai"/>
+			<dataarea name="cass" size="3254">
+				<rom name="Samurai.p" size="3254" crc="67c994ad" sha1="7694507c410109369b0bae871f0244bbcf70abab"/>
+			</dataarea>
+		</part>
+		<part name="cass3" interface="zx81_cass">
+			<feature name="part_id" value="Puzzle"/>
+			<dataarea name="cass" size="5213">
+				<rom name="Puzzle.p" size="5213" crc="c99117eb" sha1="ac5be3076b3eb73a1dcc33bfd69d9b66865ab653"/>
+			</dataarea>
+		</part>
+		<part name="cass4" interface="zx81_cass">
+			<feature name="part_id" value="Torres"/>
+			<dataarea name="cass" size="6064">
+				<rom name="Torres.p" size="6064" crc="2598fd22" sha1="4b810ffe306ccbb95d52b386cfb6335543dd4f91"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jogos80_19" supported="partial">
+		<description>Jogos 80 - Ano 12 - Número 19 (Julho 2018) (cover tape)</description>
+		<year>2018</year>
+		<publisher>Revista Jogos 80</publisher>
+		<notes><![CDATA[
+Columbia: not working
+Defender: not working
+]]></notes>
+
+		<info name="developer" value="Manuel Fragas / Luiz Carlos Capanema" />
+		<info name="language" value="Portuguese (Brazil)" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Lunar Rescue"/>
+			<dataarea name="cass" size="7232">
+				<rom name="LunarRescue_v10.p" size="7232" crc="719cb336" sha1="33cd02483b9c48ccbd59025f53d2cc1bc8536564"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="Sexy Game"/>
+			<dataarea name="cass" size="9364">
+				<rom name="SexyGame_v10.p" size="9364" crc="f453cccf" sha1="87753aabaa3311670bdb7d68d5f72791db808ee2"/>
+			</dataarea>
+		</part>
+		<part name="cass3" interface="zx81_cass">
+			<feature name="part_id" value="Atlantida"/>
+			<dataarea name="cass" size="15707">
+				<rom name="Atlantida_v11.p" size="15707" crc="eb136294" sha1="d824ee865c79df1db1f0e4703856b9a270686894"/>
+			</dataarea>
+		</part>
+		<part name="cass4" interface="zx81_cass">
+			<feature name="part_id" value="Desafio Fatal"/>
+			<dataarea name="cass" size="15926">
+				<rom name="DesafioFatal_v10.p" size="15926" crc="01fd750f" sha1="194d7fad2bd460f9e606ea0cd0d74b8f63152d6f"/>
+			</dataarea>
+		</part>
+		<part name="cass5" interface="zx81_cass">
+			<feature name="part_id" value="Columbia"/>
+			<dataarea name="cass" size="14962">
+				<rom name="Columbia_UDG_v10.p" size="14962" crc="9b5144a8" sha1="7390f5890d4f78ce3ab495fa2133efaad238037d"/>
+			</dataarea>
+		</part>
+		<part name="cass6" interface="zx81_cass">
+			<feature name="part_id" value="Defender"/>
+			<dataarea name="cass" size="15462">
+				<rom name="Defender_UDG_v10.p" size="15462" crc="c5a3f07e" sha1="3fe8b9957bd55d92aee0a7bc0d38faa66ef9bc43"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4215,6 +4970,29 @@ Known dumps not yet added (as of 2023-06-14):
 		</part>
 	</software>
 
+	<software name="lemonade" supported="no">
+		<description>Lemonade</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="14657">
+				<rom name="Lemonade.tzx" size="14657" crc="1e38efc7" sha1="6d42e26c5d3f5865a110265c0499d8f0197f2c2a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="letterht">
+		<description>Letter Hunt</description>
+		<year>198?</year>
+		<publisher>EdZX Educational Software</publisher>
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="4053">
+				<rom name="Letter Hunt.p" size="4053" crc="e2223d5f" sha1="f93bac5abc2de384c1b5eae4edd920f4c09d310b"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="listmngr">
 		<description>The List Manager</description>
 		<year>1982</year>
@@ -4244,6 +5022,19 @@ Known dumps not yet added (as of 2023-06-14):
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="15766">
 				<rom name="LostIsland.tzx" size="15766" crc="b0682ddb" sha1="b1bed07dd568166c87352c1700c8e3fb81a43a7b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lovedeat">
+		<description>Love and Death</description>
+		<year>1982</year>
+		<publisher>Automata</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="1K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="7342">
+				<rom name="Love and Death.tzx" size="7342" crc="71e08163" sha1="4946b4d146881fc850955e0fbb5efeb389db050b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4291,6 +5082,18 @@ Known dumps not yet added (as of 2023-06-14):
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="4885">
 				<rom name="LunarRescue.tzx" size="4885" crc="b63d952a" sha1="620f51472b3313aa14bee80521e5654c05b4c5b6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="inherita">
+		<description>Inheritance</description>
+		<year>198?</year>
+		<publisher>Simon W. Hessel Software</publisher>
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="14863">
+				<rom name="Inheritance.tzx" size="14863" crc="e7204db9" sha1="98fe80398de226167020d7818ab3c00785f21b72"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4347,9 +5150,9 @@ Known dumps not yet added (as of 2023-06-14):
 	</software>
 
 	<software name="maths1w" cloneof="maths1">
-		<description>Mathematics 1 (WHSmith)</description>
+		<description>Mathematics 1 (W.H. Smith)</description>
 		<year>1982</year>
-		<publisher>W.H.Smith</publisher>
+		<publisher>W.H. Smith</publisher>
 		<part name="cass1" interface="zx81_cass">
 			<feature name="part_id" value="Addition/Subtraction"/>
 			<dataarea name="cass" size="3835">
@@ -4422,10 +5225,23 @@ Known dumps not yet added (as of 2023-06-14):
 		</part>
 	</software>
 
+	<software name="mazeman">
+		<description>Mazeman</description>
+		<year>1982</year>
+		<publisher>Ambersoft</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="5953">
+				<rom name="Mazeman (Abersoft).tzx" size="5953" crc="b48fd496" sha1="07864893429d85ebeb4ff4c777f0d0814dcee518"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mazogs">
 		<description>Mazogs</description>
 		<year>1981</year>
-		<publisher>Bug Byte</publisher>
+		<publisher>Bug-Byte</publisher>
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="13059">
 				<rom name="Mazogs.tzx" size="13059" crc="4cb450b8" sha1="edee5d84ed22c2cffa6b605a4caa998a8510da17"/>
@@ -4505,7 +5321,7 @@ Known dumps not yet added (as of 2023-06-14):
 	</software>
 
 	<software name="metstormf" cloneof="metstorm">
-		<description>Meteor Storm (FastMaster)</description>
+		<description>Meteor Storm (fast master)</description>
 		<year>1982</year>
 		<publisher>dK'tronics</publisher>
 		<part name="cass1" interface="zx81_cass">
@@ -4522,6 +5338,84 @@ Known dumps not yet added (as of 2023-06-14):
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="8713">
 				<rom name="MicroMouse.tzx" size="8713" crc="db8110b5" sha1="012a444ac366224d63daf2bc242ca30b58a0e33a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcacador">
+		<description>MicroGame: Caçadores do Tesouro</description>
+		<year>1984</year>
+		<publisher>Engesoft</publisher>
+		<info name="language" value="Portuguese (Brazil)" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Caçadores do Tesouro"/>
+			<dataarea name="cass" size="12768">
+				<rom name="cacadores.p" size="12768" crc="cee8f4a8" sha1="3ce0cf0ffff00d971fe0f2d0c0d70580ddd3d93a"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="Mongo"/>
+			<dataarea name="cass" size="9475">
+				<rom name="mongo.p" size="9475" crc="2de6d3f5" sha1="354531632fa4aacf476fc2ed7eed6bee1728d974"/>
+			</dataarea>
+		</part>
+		<part name="cass3" interface="zx81_cass">
+			<feature name="part_id" value="Glutton"/>
+			<dataarea name="cass" size="9577">
+				<rom name="glutton.p" size="9577" crc="619e7402" sha1="b515a9b225396bd69f636d6d164b7ed057c7716d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mchalleng">
+		<description>MicroGame: Challenger</description>
+		<year>1984</year>
+		<publisher>Engesoft</publisher>
+		<info name="language" value="Portuguese (Brazil)" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Challenger"/>
+			<dataarea name="cass" size="7849">
+				<rom name="challenger.p" size="7849" crc="c469db40" sha1="52ec54d9e13960d5faba1c425d736ecb1bf93594"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="Zorbax"/>
+			<dataarea name="cass" size="3679">
+				<rom name="zorbax.p" size="3679" crc="6daf724a" sha1="fa9c487e6282be16acad4c64a0f6b4712b10f869"/>
+			</dataarea>
+		</part>
+		<part name="cass3" interface="zx81_cass">
+			<feature name="part_id" value="Combate Aéreo"/>
+			<dataarea name="cass" size="4855">
+				<rom name="combate.p" size="4855" crc="d5f493f3" sha1="efd8c710140f36d621484ec7d680fbf58c416fcc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mpinbwiz">
+		<description>MicroGame: Pinball Wizard</description>
+		<year>1984</year>
+		<publisher>Engesoft</publisher>
+		<info name="language" value="Portuguese (Brazil)" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Pinball"/>
+			<dataarea name="cass" size="4751">
+				<rom name="pinball.p" size="4751" crc="9b41a40f" sha1="5e9bb513e7b446563b1f6faeb4913bc66a171b6a"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="Brick Buster"/>
+			<dataarea name="cass" size="2925">
+				<rom name="brickbuster.p" size="2925" crc="111c2b02" sha1="fb805109dc5faacdbf90e0e5dedaed602b6692a0"/>
+			</dataarea>
+		</part>
+		<part name="cass3" interface="zx81_cass">
+			<feature name="part_id" value="Blockade"/>
+			<dataarea name="cass" size="2357">
+				<rom name="blockade.p" size="2357" crc="9c224a70" sha1="24ba78d09644d426517ed694ae3c693b61042191"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4649,6 +5543,17 @@ Known dumps not yet added (as of 2023-06-14):
 		</part>
 	</software>
 
+	<software name="monitdis">
+		<description>Monitor and Disassembler</description>
+		<year>1982</year>
+		<publisher>Crystal Computing</publisher>
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="6129">
+				<rom name="Monitor and Disassembler (Crystal).tzx" size="6129" crc="824135a2" sha1="2c2e3b1e2a6cbf5c3c5dc18b7b650a60f6bea539"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mondesas">
 		<description>Moniteur Desassembleur</description>
 		<year>1982</year>
@@ -4667,6 +5572,19 @@ Known dumps not yet added (as of 2023-06-14):
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="11048">
 				<rom name="MonsterMine.tzx" size="11048" crc="ac4bec18" sha1="bcbf2d46f2c8b547600f979882968d4a57c5b524"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="morsedec">
+		<description>Morse Decoder</description>
+		<year>198?</year>
+		<publisher>Catra Software</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="3583">
+				<rom name="Morse Decoder (Catra Software).tzx" size="3583" crc="a7469d50" sha1="3e12b0409829cd9c1a454b52db8ebf289dd43f02"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4708,9 +5626,24 @@ Known dumps not yet added (as of 2023-06-14):
 		<description>Multifile (Gladstone)</description>
 		<year>1981</year>
 		<publisher>Gladstone Electronics</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K; After loading the program type Z and type X" />
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="5783">
 				<rom name="Multifile(GE).tzx" size="5783" crc="18343751" sha1="d72de512a1adc62cf2de299c2e1ff64ed630316b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="multfile_bb" cloneof="multfile">
+		<description>Multifile (Bug-Byte)</description>
+		<year>1981</year>
+		<publisher>Bug-Byte</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K; After loading the program type Z and type X" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="5740">
+				<rom name="Multifile.tzx" size="5740" crc="d364b82b" sha1="e5f6ec4dc314a37da2512d58fcd3dd3ce7ff14c9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4789,9 +5722,9 @@ Known dumps not yet added (as of 2023-06-14):
 	</software>
 
 	<software name="music1w" cloneof="music1">
-		<description>Music 1 (WHSmith)</description>
+		<description>Music 1 (W.H. Smith)</description>
 		<year>1982</year>
-		<publisher>W.H.Smith</publisher>
+		<publisher>W.H. Smith</publisher>
 		<part name="cass1" interface="zx81_cass">
 			<feature name="part_id" value="Composers"/>
 			<dataarea name="cass" size="11982">
@@ -4862,12 +5795,34 @@ Known dumps not yet added (as of 2023-06-14):
 	</software>
 
 	<software name="nightmpk">
-		<description>Nightmare Park</description>
+		<description>ZX Nightmare Park</description>
 		<year>1981</year>
 		<publisher>Macronics</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K; type RUN after loading the program" />
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="11879">
 				<rom name="NightmarePark.tzx" size="11879" crc="53965b76" sha1="86dbca70ae32e736a89c161c7e260e43576da971"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nightmpk_aac" cloneof="nightmpk">
+		<description>ZX Nightmare Park (Aackosoft)</description>
+		<year>1981</year>
+		<publisher>Aackosoft</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="11772">
+				<rom name="ZX Nightmare Park - Side 1 (Aackosoft).tzx" size="11772" crc="571dd19b" sha1="8b2c75bf08f61fba3030403af326115b6affcbf9"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="11772">
+				<rom name="ZX Nightmare Park - Side 2 (Aackosoft).tzx" size="11772" crc="664b3ff0" sha1="aa2350699f8b5038bcaa900f1b53242bbe0f93bc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4886,6 +5841,39 @@ Known dumps not yet added (as of 2023-06-14):
 			<feature name="part_id" value="Music Plus"/>
 			<dataarea name="cass" size="2057">
 				<rom name="NightmareParkAndMusicPlus.B.MusicPlus.tzx" size="2057" crc="5923e5d3" sha1="7f199e73c33247d227662bb0b76406b8e2ed756d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nowotnik">
+		<description>The Nowotnik Puzzle &amp; Other Diversions</description>
+		<year>1982</year>
+		<publisher>Phipps Associates</publisher>
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="1.Puzzle 2.Demolition 3.Tenpin"/>
+			<dataarea name="cass" size="20711">
+				<rom name="NowotnikPuzzle.tzx" size="20711" crc="fd11e293" sha1="bafa4197d4ba285fd31f9147ccd47eed9cfc514a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nyteknik">
+		<description>Ny Teknik - 7 Program till din Sinclair ZX 81</description>
+		<year>1982</year>
+		<publisher>Ny Teknik</publisher>
+		<info name="language" value="Swedish" />
+		<info name="usage" value="16K; type RUN after loading the program" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="3123">
+				<rom name="Ny Teknik - Side 1.tzx" size="3123" crc="4a72fce2" sha1="a128a5649c8bba1715ef817d2034a7160f922279"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="2668">
+				<rom name="Ny Teknik - Side 2.tzx" size="2668" crc="7050380e" sha1="1cf1a00ad542f9ec4a79362d5707b726d0521a47"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4931,9 +5919,11 @@ Known dumps not yet added (as of 2023-06-14):
 	</software>
 
 	<software name="oraclcave">
-		<description>The Oracles Cave</description>
+		<description>The Oracle's Cave</description>
 		<year>1981</year>
 		<publisher>Doric Computer Systems</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K; type GOTO 1 after loading the tape" />
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="16181">
 				<rom name="OraclesCaveThe.tzx" size="16181" crc="dea5489a" sha1="752bb718f14e0a7e9da87fa958ccd0e366813a34"/>
@@ -5008,6 +5998,26 @@ Known dumps not yet added (as of 2023-06-14):
 		</part>
 	</software>
 
+	<software name="panique">
+		<description>Panique</description>
+		<year>1983</year>
+		<publisher>ERE Informatique</publisher>
+		<info name="language" value="French" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="10442">
+				<rom name="Panique - Side A.tzx" size="10442" crc="d35b9d2d" sha1="7c0c96249c38ebd2174849846f0dbe8c637a065d"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="9951">
+				<rom name="Panique - Side B.tzx" size="9951" crc="22e7c98f" sha1="5303ef13479064390f45d63478161f48c6dc94ad"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="partygms">
 		<description>Party Games</description>
 		<year>1982</year>
@@ -5027,7 +6037,7 @@ Known dumps not yet added (as of 2023-06-14):
 	</software>
 
 	<software name="patrouil">
-		<description>Patrouille De L'Espace</description>
+		<description>Patrouille de l'Espace</description>
 		<year>1981</year>
 		<publisher>Sinclair Research</publisher>
 		<part name="cass1" interface="zx81_cass">
@@ -5210,7 +6220,7 @@ Known dumps not yet added (as of 2023-06-14):
 	</software>
 
 	<software name="pilotn" cloneof="pilot">
-		<description>Pilot (New)</description>
+		<description>Pilot (newer)</description>
 		<year>1982</year>
 		<publisher>Hewson Consultants</publisher>
 		<part name="cass1" interface="zx81_cass">
@@ -5421,7 +6431,7 @@ Known dumps not yet added (as of 2023-06-14):
 	<software name="progpak4">
 		<description>Program Pack 4</description>
 		<year>1981</year>
-		<publisher>Bug Byte</publisher>
+		<publisher>Bug-Byte</publisher>
 		<part name="cass1" interface="zx81_cass">
 			<feature name="part_id" value="Breakout"/>
 			<dataarea name="cass" size="781">
@@ -5454,6 +6464,18 @@ Known dumps not yet added (as of 2023-06-14):
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="10765">
 				<rom name="Puckman.tzx" size="10765" crc="2678c742" sha1="c382093f64ac43318766c4c884854150a1775f2f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="purchases">
+		<description>Purchases</description>
+		<year>1982</year>
+		<publisher>Hestacrest</publisher>
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="16274">
+				<rom name="purchases.tzx" size="16274" crc="0c373fb0" sha1="9f5fa0daffc6e84b17e1d23793a16206bacc88cc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5495,7 +6517,7 @@ Known dumps not yet added (as of 2023-06-14):
 	</software>
 
 	<software name="qsasteroa" cloneof="qsastero">
-		<description>QS Asteroids (Alt)</description>
+		<description>QS Asteroids (alt)</description>
 		<year>1982</year>
 		<publisher>Quicksilva</publisher>
 		<part name="cass1" interface="zx81_cass">
@@ -5520,6 +6542,7 @@ Known dumps not yet added (as of 2023-06-14):
 		<description>Q Save</description>
 		<year>198?</year>
 		<publisher>PSS</publisher>
+		<info name="usage" value="16K" />
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="1773">
 				<rom name="QSave.Alt2.tzx" size="1773" crc="87eac4a3" sha1="322992018a0a7848fb97dad488d2238d0ed8b413"/>
@@ -5533,9 +6556,10 @@ Known dumps not yet added (as of 2023-06-14):
 	</software>
 
 	<software name="qsavei" cloneof="qsave">
-		<description>Q Save (Inter)</description>
+		<description>Q Save (Intercomputer)</description>
 		<year>1982</year>
 		<publisher>Intercomputer Inc</publisher>
+		<info name="usage" value="16K" />
 		<part name="cass1" interface="zx81_cass">
 			<feature name="part_id" value="Q Save 16K"/>
 			<dataarea name="cass" size="1857">
@@ -5551,9 +6575,10 @@ Known dumps not yet added (as of 2023-06-14):
 	</software>
 
 	<software name="qsaver" cloneof="qsave">
-		<description>Q Save (Red)</description>
+		<description>Q Save (red cover)</description>
 		<year>198?</year>
 		<publisher>PSS</publisher>
+		<info name="usage" value="16K" />
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="1693">
 				<rom name="QSave(Red).tzx" size="1693" crc="28bcfd44" sha1="173946ba09a7b0f085b975d25ddfe6f431541186"/>
@@ -5624,12 +6649,24 @@ Known dumps not yet added (as of 2023-06-14):
 	</software>
 
 	<software name="qsscramba" cloneof="qsscramb">
-		<description>QS Scramble (Alt)</description>
+		<description>QS Scramble (alt)</description>
 		<year>1982</year>
 		<publisher>Quicksilva</publisher>
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="6320">
 				<rom name="QSScramble(Alt).tzx" size="6320" crc="30847836" sha1="7ee4b859c49ee81a670bd629e05ac27177dddb7d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="racehors">
+		<description>Racehorse Trainer</description>
+		<year>1984</year>
+		<publisher>Gavin Barker</publisher>
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="17083">
+				<rom name="RacehorseTrainer.tzx" size="17083" crc="c25b4909" sha1="7b970f528e90da9faf7093204bf9bf940124c7d0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5726,7 +6763,7 @@ Known dumps not yet added (as of 2023-06-14):
 	<software name="renum">
 		<description>RENUM Renumbering Program</description>
 		<year>1982</year>
-		<publisher>Bug Byte</publisher>
+		<publisher>Bug-Byte</publisher>
 		<part name="cass1" interface="zx81_cass">
 			<feature name="part_id" value="Renum 1"/>
 			<dataarea name="cass" size="3224">
@@ -5759,6 +6796,19 @@ Known dumps not yet added (as of 2023-06-14):
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="14952">
 				<rom name="Reversi(Artic).tzx" size="14952" crc="d5796e37" sha1="516f08ceefe2997e183e6f47e774fda4b81d7be3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rigel">
+		<description>Rigel</description>
+		<year>1984</year>
+		<publisher>ERE Informatique</publisher>
+		<info name="language" value="French" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="15820">
+				<rom name="Rigel.p" size="15820" crc="033b8038" sha1="edc2f6a8e680df5bfe9e6b49209554323ff3a482"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5808,7 +6858,7 @@ Known dumps not yet added (as of 2023-06-14):
 	</software>
 
 	<software name="rubikca">
-		<description>Rubik Cube (Alt)</description>
+		<description>Rubik Cube (alt)</description>
 		<year>1982</year>
 		<publisher>CDS Micro Systems</publisher>
 		<part name="cass1" interface="zx81_cass">
@@ -5819,7 +6869,7 @@ Known dumps not yet added (as of 2023-06-14):
 	</software>
 
 	<software name="rubikcb">
-		<description>Rubik Cube (Brown Inlay)</description>
+		<description>Rubik Cube (brown inlay)</description>
 		<year>1982</year>
 		<publisher>CDS Micro Systems</publisher>
 		<part name="cass1" interface="zx81_cass">
@@ -5833,9 +6883,24 @@ Known dumps not yet added (as of 2023-06-14):
 		<description>Sabotage</description>
 		<year>1982</year>
 		<publisher>Sinclair Research</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="9070">
 				<rom name="Sabotage.tzx" size="9070" crc="0120fe03" sha1="4d123b512a757fe2e0bfd7ddee111322d8238d9f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sabotagm" cloneof="sabotage">
+		<description>Sabotagem (Timex Portugal)</description>
+		<year>1983</year>
+		<publisher>Timex Portugal</publisher>
+		<info name="language" value="Portuguese" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="8322">
+				<rom name="Sabotagem.p" size="8322" crc="e14edcf0" sha1="d2a69107daeb9583f096daf4745da0c95df1c517"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5858,6 +6923,27 @@ Known dumps not yet added (as of 2023-06-14):
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="15481">
 				<rom name="SamuraiWarrior.tzx" size="15481" crc="68f13fb0" sha1="a6d7b88718f8ef85e300cb1ba696544a6cb1efcf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scorpiru">
+		<description>Scorpirus</description>
+		<year>1984</year>
+		<publisher>ERE Informatique</publisher>
+		<info name="developer" value="P. Ridard" />
+		<info name="language" value="French" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="A - Scorpirus"/>
+			<dataarea name="cass" size="15396">
+				<rom name="Scorpirus - Side A.tzx" size="15396" crc="a08ae728" sha1="73c543bc7adf82d971b1925255165e1cac15ec3a"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="B - Scorpirus (carte graphique)"/>
+			<dataarea name="cass" size="17575">
+				<rom name="Scorpirus - Side B.tzx" size="17575" crc="f849f579" sha1="3e5b2d9a671716d09a1cb213a9972970164eb977"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5890,7 +6976,7 @@ Known dumps not yet added (as of 2023-06-14):
 	</software>
 
 	<software name="scramblec" cloneof="scramble">
-		<description>Scramble (Colour Inlay)</description>
+		<description>Scramble (colour inlay)</description>
 		<year>198?</year>
 		<publisher>Mikro-Gen</publisher>
 		<part name="cass1" interface="zx81_cass">
@@ -5922,8 +7008,21 @@ Known dumps not yet added (as of 2023-06-14):
 		</part>
 	</software>
 
+	<software name="serpents">
+		<description>Serpents Tomb</description>
+		<year>1983</year>
+		<publisher>Vortex Software</publisher>
+		<info name="alt_title" value="Serpent's Tomb" /> <!-- cassette and in game title -->
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="24375">
+				<rom name="Serpents Tomb.tzx" size="24375" crc="a7c78853" sha1="24bdf3f4d021b67836d007b729de41e4eeb0bfbb"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="seawolfn" cloneof="seawolf">
-		<description>Sea Wolf (Newer)</description>
+		<description>Sea Wolf (newer)</description>
 		<year>1983</year>
 		<publisher>Stephen Hartley Computing</publisher>
 		<part name="cass1" interface="zx81_cass">
@@ -5996,7 +7095,7 @@ Known dumps not yet added (as of 2023-06-14):
 	</software>
 
 	<software name="spaceinv">
-		<description>Space Invaders</description>
+		<description>Space Invaders (Mikro-Gen)</description>
 		<year>198?</year>
 		<publisher>Mikro-Gen</publisher>
 		<part name="cass1" interface="zx81_cass">
@@ -6007,12 +7106,24 @@ Known dumps not yet added (as of 2023-06-14):
 	</software>
 
 	<software name="spaceinvd">
-		<description>Space Invaders (dk)</description>
+		<description>Space Invaders (dK'tronics)</description>
 		<year>1981</year>
 		<publisher>dK'tronics</publisher>
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="6889">
 				<rom name="SpaceInvaders(dk).tzx" size="6889" crc="720bf20c" sha1="e9d543b4f96bbda648c1488a06d2538ed3da3001"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spaceinvd_kay" cloneof="spaceinvd" supported="no">
+		<description>Space Invaders (Kayde)</description>
+		<year>1982</year>
+		<publisher>Kayde Software</publisher>
+		<notes>After the title screen, the game comes back to the prompt</notes>
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="17408">
+				<rom name="Space Invaders (Kayde).tzx" size="17408" crc="e55e71df" sha1="e2b5ea538d48aa35d20047d187119efd479dc5f6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6151,9 +7262,9 @@ Known dumps not yet added (as of 2023-06-14):
 	</software>
 
 	<software name="spellin1w" cloneof="spellin1">
-		<description>Spelling 1 (WHSmith)</description>
+		<description>Spelling 1 (W.H. Smith)</description>
 		<year>1982</year>
-		<publisher>W.H.Smith</publisher>
+		<publisher>W.H. Smith</publisher>
 		<part name="cass1" interface="zx81_cass">
 			<feature name="part_id" value="Series A1 to A15"/>
 			<dataarea name="cass" size="10860">
@@ -6274,7 +7385,7 @@ Known dumps not yet added (as of 2023-06-14):
 	<software name="startrek">
 		<description>Star Trek</description>
 		<year>1982</year>
-		<publisher>Bug Byte</publisher>
+		<publisher>Bug-Byte</publisher>
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="10250">
 				<rom name="StarTrek.tzx" size="10250" crc="c8107516" sha1="3e0f7d137f9572f756ba9edc5c6835fa9367be81"/>
@@ -6305,9 +7416,9 @@ Known dumps not yet added (as of 2023-06-14):
 	</software>
 
 	<software name="startrekt" cloneof="startrek">
-		<description>Star Trek (Typed Inlay)</description>
+		<description>Star Trek (typed inlay)</description>
 		<year>1981</year>
-		<publisher>Bug Byte</publisher>
+		<publisher>Bug-Byte</publisher>
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="10250">
 				<rom name="StarTrek(Typed).tzx" size="10250" crc="4c595448" sha1="d6286120a5acc82d974f76e381f3382fe0c55be8"/>
@@ -6351,8 +7462,27 @@ Known dumps not yet added (as of 2023-06-14):
 		</part>
 	</software>
 
+	<software name="startrox">
+		<description>Star Trek + 3D O's and X's</description>
+		<year>1981</year>
+		<publisher>Macronics</publisher>
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Side A - Star Trek"/>
+			<dataarea name="cass" size="14586">
+				<rom name="StarTrekAnd3DOsAndXs.A.tzx" size="14586" crc="b9a844e7" sha1="7094c5142b1cea501d8c2c1ba556436c9794e2d3"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="Side B - 3D O's and X's"/>
+			<dataarea name="cass" size="8633">
+				<rom name="StarTrekAnd3DOsAndXs.B.tzx" size="8633" crc="4152bf8c" sha1="57585dcd38584c66ca2c6bc6bac13c08deca894b"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="statecap">
-		<description>States And Capitals</description>
+		<description>States and Capitals</description>
 		<year>1982</year>
 		<publisher>Timex</publisher>
 		<part name="cass1" interface="zx81_cass">
@@ -6388,9 +7518,24 @@ Known dumps not yet added (as of 2023-06-14):
 		<description>Stock Car</description>
 		<year>1984</year>
 		<publisher>Informatique Service</publisher>
+		<info name="language" value="French" />
+		<info name="usage" value="16K" />
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="8450">
 				<rom name="StockCar.tzx" size="8450" crc="fedbbc78" sha1="3604d2ff3b9de27e45cb691131b98be09ba3c65b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stockcar_a" cloneof="stockcar">
+		<description>Stock Car (alt)</description>
+		<year>1984</year>
+		<publisher>Informatique Service</publisher>
+		<info name="language" value="French" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="8432">
+				<rom name="Stock Car - Release 1.tzx" size="8432" crc="9d9157d7" sha1="e0660060af579851e66fdb81721813782c657e8e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7348,6 +8493,7 @@ Known dumps not yet added (as of 2023-06-14):
 		<description>Traffic</description>
 		<year>1984</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Juillet 1984" />
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="7030">
 				<rom name="Traffic.tzx" size="7030" crc="be09c247" sha1="44626d460f9c918c4bc9e0611737b50215c73a3c"/>
@@ -7373,10 +8519,23 @@ Known dumps not yet added (as of 2023-06-14):
 		</part>
 	</software>
 
-	<software name="tgerman">
-		<description>Tutor German</description>
+	<software name="tfrench">
+		<description>Tutor (French)</description>
 		<year>1983</year>
 		<publisher>Artic</publisher>
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="14983">
+				<rom name="TutorFrench.tzx" size="14983" crc="14382005" sha1="1c68b4a7ba9a1f822f8283b5d9210e9659251e51"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tgerman">
+		<description>Tutor (German)</description>
+		<year>1983</year>
+		<publisher>Artic</publisher>
+		<info name="usage" value="16K" />
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="13869">
 				<rom name="TutorGerman.tzx" size="13869" crc="44ddecba" sha1="058f24ef7be7494a90cd9799cd68b07e78169b95"/>
@@ -7385,9 +8544,10 @@ Known dumps not yet added (as of 2023-06-14):
 	</software>
 
 	<software name="tspanish">
-		<description>Tutor Spanish</description>
+		<description>Tutor (Spanish)</description>
 		<year>1983</year>
 		<publisher>Artic</publisher>
+		<info name="usage" value="16K" />
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="15219">
 				<rom name="TutorSpanish.tzx" size="15219" crc="4d62869a" sha1="e12aabea86ff2542821bd04cdf6e2868f1d3f5d7"/>
@@ -7395,10 +8555,12 @@ Known dumps not yet added (as of 2023-06-14):
 		</part>
 	</software>
 
-	<software name="trex">
+	<software name="trex" cloneof="3dmonmaz">
 		<description>Tyrannosaure Rex</description>
 		<year>1982</year>
 		<publisher>Informatique Service</publisher>
+		<info name="language" value="French" />
+		<info name="usage" value="16K" />
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="11728">
 				<rom name="TyrannosaureRex.tzx" size="11728" crc="5300e4d1" sha1="cb0caa82180a19407cd5e850ca88ca33e12b8efc"/>
@@ -7527,10 +8689,21 @@ Known dumps not yet added (as of 2023-06-14):
 		</part>
 	</software>
 
+	<software name="videogph">
+		<description>Videograph</description>
+		<year>1981</year>
+		<publisher>Bug-Byte</publisher>
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="11833">
+				<rom name="Videograph.tzx" size="11833" crc="a2b3f4bc" sha1="687784d7a0f04683a161526a62a135ee5156f5ca"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="viewtext">
 		<description>Viewtext (US)</description>
 		<year>1981</year>
-		<publisher>Bug Byte</publisher>
+		<publisher>Bug-Byte</publisher>
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="12767">
 				<rom name="Viewtext(US).tzx" size="12767" crc="83f14397" sha1="eb0996ddb294a42c133b0c301958bdaa3b5f4a1a"/>
@@ -7559,7 +8732,7 @@ Known dumps not yet added (as of 2023-06-14):
 	<software name="volcdung">
 		<description>Volcanic Dungeon</description>
 		<year>1982</year>
-		<publisher>Carnell</publisher>
+		<publisher>Carnell Software</publisher>
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="16482">
 				<rom name="VolcanicDungeon.tzx" size="16482" crc="c6f44894" sha1="6275899b3b7849a97ca8ea869d2bc5806522ae9a"/>
@@ -7627,8 +8800,9 @@ Known dumps not yet added (as of 2023-06-14):
 
 	<software name="warlord">
 		<description>Warlord</description>
-		<year>1982</year>
-		<publisher>Lothlorien</publisher>
+		<year>1983</year>
+		<publisher>M.C. Lothlorien</publisher>
+		<info name="usage" value="16K" />
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="15879">
 				<rom name="Warlord.tzx" size="15879" crc="9bff8537" sha1="dee7757fc095d4de68efcd4147777e0cbbad8424"/>
@@ -7875,6 +9049,18 @@ Known dumps not yet added (as of 2023-06-14):
 		</part>
 	</software>
 
+	<software name="zedspace">
+		<description>Zedman + Spacers</description>
+		<year>1982</year>
+		<publisher>Babtech</publisher>
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="10267">
+				<rom name="Zedman + Spacers.tzx" size="10267" crc="fc8bae5a" sha1="dc20e69bf9a0ed34f25f1368a05d14b663a04044"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="zombies">
 		<description>Zombies/Sword of Peace</description>
 		<year>198?</year>
@@ -7882,6 +9068,18 @@ Known dumps not yet added (as of 2023-06-14):
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="12404">
 				<rom name="ZombiesSwordOfPeace.tzx" size="12404" crc="45500520" sha1="519d3115b5ceb75b61dff442a927be851fb0ca96"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zor">
+		<description>Zor</description>
+		<year>1982</year>
+		<publisher>International Publishing &amp; Software</publisher>
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="17561">
+				<rom name="Zor.tzx" size="17561" crc="981a342e" sha1="9ca9f0ea3ff878174bbdbeec1864759e2f142a6a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7898,7 +9096,7 @@ Known dumps not yet added (as of 2023-06-14):
 	</software>
 
 	<software name="zuckmanb" cloneof="zuckman">
-		<description>Zuckman (Black Inlay)</description>
+		<description>Zuckman (black inlay)</description>
 		<year>1982</year>
 		<publisher>DJL Software</publisher>
 		<part name="cass1" interface="zx81_cass">
@@ -8132,7 +9330,7 @@ Known dumps not yet added (as of 2023-06-14):
 	<software name="zxas">
 		<description>ZXAS Assembler</description>
 		<year>1982</year>
-		<publisher>Bug Byte</publisher>
+		<publisher>Bug-Byte</publisher>
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="5843">
 				<rom name="ZXAS.tzx" size="5843" crc="fa15514c" sha1="0422f7eca685e2ee3981c86e44624b8ff0ff8aca"/>
@@ -8195,6 +9393,32 @@ Known dumps not yet added (as of 2023-06-14):
 		</part>
 	</software>
 
+	<software name="zxbrkout">
+		<description>ZX Breakout</description>
+		<year>198?</year>
+		<publisher>Mikro-Gen</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="2424">
+				<rom name="ZXBreakout.tzx" size="2424" crc="b97827f5" sha1="7a14d121a8ce9484fb1ccd219dfdb5e68e7a34f1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zxbrkout_pi" cloneof="zxbrkout">
+		<description>ZX Breakout (pink inlay)</description>
+		<year>198?</year>
+		<publisher>Mikro-Gen</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="2438">
+				<rom name="ZX Breakout - Pink Inlay.tzx" size="2438" crc="2ed2a46a" sha1="56507e42de7d8a5c6afd1955d06e350f1ddf9ee7"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="zxbug">
 		<description>ZX Bug</description>
 		<year>1981</year>
@@ -8239,8 +9463,8 @@ Known dumps not yet added (as of 2023-06-14):
 		</part>
 	</software>
 
-	<software name="zxchess2im" cloneof="zxchess2">
-		<description>ZX Chess II (Improved)</description>
+	<software name="zxchess2_imp" cloneof="zxchess2">
+		<description>ZX Chess II (improved)</description>
 		<year>1981</year>
 		<publisher>Artic</publisher>
 		<part name="cass1" interface="zx81_cass">
@@ -8250,8 +9474,8 @@ Known dumps not yet added (as of 2023-06-14):
 		</part>
 	</software>
 
-	<software name="zxchess2i" cloneof="zxchess2">
-		<description>ZX Chess II (IPS)</description>
+	<software name="zxchess2_ips" cloneof="zxchess2">
+		<description>ZX Chess II (I.P.S.)</description>
 		<year>1982</year>
 		<publisher>International Publishing &amp; Software Inc.</publisher>
 		<part name="cass1" interface="zx81_cass">
@@ -8261,10 +9485,24 @@ Known dumps not yet added (as of 2023-06-14):
 		</part>
 	</software>
 
+	<software name="skak" cloneof="zxchess2">
+		<description>Skak</description>
+		<year>198?</year>
+		<publisher>ZX Data</publisher>
+		<info name="alt_title" value="ZXskak-II" />
+		<info name="language" value="Danish" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="14860">
+				<rom name="Skak.tzx" size="14860" crc="e0eef0b3" sha1="f2c7b614831f341ff3e79193f34ccdae783154dd"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="zxcompen">
 		<description>ZX Compendium</description>
 		<year>1983</year>
-		<publisher>Carnell</publisher>
+		<publisher>Carnell Software</publisher>
 		<part name="cass1" interface="zx81_cass">
 			<feature name="part_id" value="Load Test"/>
 			<dataarea name="cass" size="1241">
@@ -8329,10 +9567,21 @@ Known dumps not yet added (as of 2023-06-14):
 	<software name="zxdb">
 		<description>ZXDB Disassembler/Debugger</description>
 		<year>1982</year>
-		<publisher>Bug Byte</publisher>
+		<publisher>Bug-Byte</publisher>
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="6081">
 				<rom name="ZXDB.tzx" size="6081" crc="f4bd2dc5" sha1="33604f3874337c4a579b9d1c6fb0d56887d2a128"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zxed" supported="no">
+		<description>ZXED</description>
+		<year>1982</year>
+		<publisher>dK'Tronics</publisher>
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="5743">
+				<rom name="ZXED - Black Inlay (DK'Tronics).tzx" size="5743" crc="ce91463f" sha1="66021944de8db8e4a3f6cbaa510d40709d247054"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8349,7 +9598,7 @@ Known dumps not yet added (as of 2023-06-14):
 	</software>
 
 	<software name="zxforthi" cloneof="zxforth">
-		<description>ZX Forth (IPS)</description>
+		<description>ZX Forth (I.P.S.)</description>
 		<year>1982</year>
 		<publisher>International Publishing &amp; Software Inc.</publisher>
 		<part name="cass1" interface="zx81_cass">
@@ -8406,7 +9655,7 @@ Known dumps not yet added (as of 2023-06-14):
 	<software name="zxtk">
 		<description>ZXTK</description>
 		<year>1982</year>
-		<publisher>Bug Byte</publisher>
+		<publisher>Bug-Byte</publisher>
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="2837">
 				<rom name="ZXTK.tzx" size="2837" crc="4f4182c4" sha1="fd398501a5e72ef51c0fd817085e77300807fb57"/>
@@ -8426,6 +9675,497 @@ Known dumps not yet added (as of 2023-06-14):
 		<part name="cass2" interface="zx81_cass">
 			<dataarea name="cass" size="8141">
 				<rom name="ZXTri.B.tzx" size="8141" crc="646bf81d" sha1="12fbf74c7cf04fe63c868ac34b3504ea2444a4d2"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+<!-- Homebrews -->
+
+	<software name="aerial">
+		<description>Aerial</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K, type RUN after loading the tape" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="9543">
+				<rom name="aerial.p" size="9543" crc="b6b6d09f" sha1="68cbace1d64816f672be5beca57fda8b68cd09e7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="antattac">
+		<description>Ant Attack</description>
+		<year>2013</year>
+		<publisher>Bob's Stuff</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="16167">
+				<rom name="AntAttack.p" size="16167" crc="2e30a8cf" sha1="1b4fc9eb5cd3373a9986fcd395d0117c6b3c4718"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="antiair">
+		<description>AntiAir</description>
+		<year>2024</year>
+		<publisher>Inufuto</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K, type RUN after loading the tape" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="5996">
+				<rom name="antiair.p" size="5996" crc="994f8c5e" sha1="7ca7e07e90215ac9537e0eda7982e1bec2c78195"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ascend">
+		<description>Ascend</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K, type RUN after loading the tape" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="7522">
+				<rom name="ascend.p" size="7522" crc="2ad9aa6b" sha1="0b4d0a4a11e3372f5eed964013c8ef95613c47be"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="avalanch">
+		<description>Avalanche</description>
+		<year>2011</year>
+		<publisher>Revival Studios</publisher>
+		<info name="developer" value="Martijn Wenting" />
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="15433">
+				<rom name="Avalanche (2011) - Full Version.p" size="15433" crc="2702a73c" sha1="aed759d4dbcadf89bd24769a5e1c2e3d19074bad"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="battlot">
+		<description>Battlot</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K, type RUN after loading the tape" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="9224">
+				<rom name="battlot.p" size="9224" crc="342a5182" sha1="6ef6dc287bd70a58376c1cce093d795223adfeb2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bootskel">
+		<description>Bootskell</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K, type RUN after loading the tape" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="8067">
+				<rom name="bootskell.p" size="8067" crc="af3e2142" sha1="4a152bd318a4c587393a886057cf5587878a8922"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="boulderl">
+		<description>Boulder Logic</description>
+		<year>2011</year>
+		<publisher>Bob's Stuff</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="16240">
+				<rom name="BoulderL.p" size="16240" crc="23cc342f" sha1="3c74569ef70327ecf17db982ef92b4557c17b538"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="biggoil">
+		<description>Bigg Oil</description>
+		<year>2018</year>
+		<publisher>Charlie Robson</publisher>
+		<info name="developer" value="Charlie Robson" />
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="15563">
+				<rom name="BiggOil.p" size="15563" crc="faf5d317" sha1="8e0aa5ff930b678b0cf2be34c3da9cffd0bf1304"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cacorm">
+		<description>Cacorm</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K, type RUN after loading the tape" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="7225">
+				<rom name="cacorm.p" size="7225" crc="c45b7e70" sha1="17032d1bdc87ed9dc899be0b0ca4335eae751756"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cracky">
+		<description>Cracky</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K, type RUN after loading the tape" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="6274">
+				<rom name="cracky.p" size="6274" crc="577d4d5f" sha1="9bb15478a89197496fb5c89abe06a08b2b5b92eb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crozxyrd">
+		<description>Crozxy Road</description>
+		<year>2015</year>
+		<publisher>Bob's Stuff</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="16058">
+				<rom name="CrozxyRoad.p" size="16058" crc="38885a68" sha1="98ef4e7a24f87c9d253da0dc68698850dcd2752f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="domin8tr">
+		<description>Domin8tr1s</description>
+		<year>2010</year>
+		<publisher>Bob's Stuff</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="6581">
+				<rom name="Domin8tr1s.p" size="6581" crc="96911e31" sha1="8e8ee9c4fc589f386596ef3b3e8fab9b9ee799ef"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="down">
+		<description>Down!</description>
+		<year>2012</year>
+		<publisher>Revival Studios</publisher>
+		<info name="developer" value="Martijn Wenting" />
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="16189">
+				<rom name="Down (2012) - Full Version.p" size="16189" crc="11b509f9" sha1="e048c10af990ff2ef9086962b89801911e1e8106"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="guntus">
+		<description>Guntus</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K, type RUN after loading the tape" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="9792">
+				<rom name="guntus.p" size="9792" crc="fe57f648" sha1="6bdf439fc664f6a5951ac643aef4e28e6ff05463"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hopman">
+		<description>Hopman</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K, type RUN after loading the tape" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="7506">
+				<rom name="hopman.p" size="7506" crc="292d4417" sha1="5e00eef12abfb8472f4af8dc8c75558714bed4f2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="impact">
+		<description>Impact</description>
+		<year>2012</year>
+		<publisher>Bob's Stuff</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="16154">
+				<rom name="Impact.p" size="16154" crc="d6e106b8" sha1="11c5fe8d44763d94a3eedf597b6daf0438364e22"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lift">
+		<description>Lift</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K, type RUN after loading the tape" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="6873">
+				<rom name="lift.p" size="6873" crc="9c199911" sha1="d722d48004b63168b0d3159f6c7b8f0cb60bc359"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mayhem">
+		<description>Mayhem</description>
+		<year>2011</year>
+		<publisher>Revival Studios</publisher>
+		<info name="developer" value="Martijn Wenting" />
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="15580">
+				<rom name="Mayhem (2011) - Full Version.p" size="15580" crc="df06cb6d" sha1="ba54287b132a40b02e14b1a5bac085588410edb6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mazy">
+		<description>Mazy</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K, type RUN after loading the tape" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="7786">
+				<rom name="mazy.p" size="7786" crc="6332b815" sha1="ad28a2e73f9be1a2948afcb6772bc478396e6571"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="minerman">
+		<description>Miner Man</description>
+		<year>2011</year>
+		<publisher>Bob's Stuff</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="17282">
+				<rom name="MinerMan.tzx" size="17282" crc="e9e151c5" sha1="73b76ddcda52cc081b18e40c6186d90dd847cf60"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="neuras">
+		<description>Neuras</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K, type RUN after loading the tape" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="7518">
+				<rom name="neuras.p" size="7518" crc="7bdeb060" sha1="88ea2158d8c9e6ebe6e241bf0c753145e9382af8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="noirshap">
+		<description>Noir Shapes</description>
+		<year>2012</year>
+		<publisher>Bob's Stuff</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="16414">
+				<rom name="NoirShapes.tzx" size="16414" crc="d2cd1aad" sha1="32be2ea837e8618898312ec58526d4e9c30e542c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oneghost">
+		<description>One Little Ghost</description>
+		<year>2012</year>
+		<publisher>Bob's Stuff</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="15884">
+				<rom name="OneLG.p" size="15884" crc="c6b562c2" sha1="7bd65421239915dad4137206c0c7572f31c6ac5a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="osotos">
+		<description>Osotos</description>
+		<year>2024</year>
+		<publisher>Inufuto</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K, type RUN after loading the tape" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="8198">
+				<rom name="osotos.p" size="8198" crc="c7398636" sha1="6e794b589f992d5f3fb08988dde4be47e9308e3f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pandemic">
+		<description>Pandemic</description>
+		<year>2014</year>
+		<publisher>Bob's Stuff</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="15934">
+				<rom name="Pandemic.p" size="15934" crc="273220fa" sha1="28afa426e660186a1c1c56d74251b604e25bb2a1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="quack">
+		<description>Quack!</description>
+		<year>2014</year>
+		<publisher>Bob's Stuff</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="8383">
+				<rom name="quack.p" size="8383" crc="01e8d775" sha1="d7e40348cc9181d2033c63e17e8fe07589e90c64"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rebound">
+		<description>Rebound</description>
+		<year>2014</year>
+		<publisher>Bob's Stuff</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="13897">
+				<rom name="Rebound.p" size="13897" crc="00721ae3" sha1="6abc2d4de5bb40aac8f3703e5c33a9ce3a31be75"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ruptus">
+		<description>Ruptus</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K, type RUN after loading the tape" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="11280">
+				<rom name="ruptus.p" size="11280" crc="40bf45c7" sha1="f9c6bf9adf4c6d7f110eeb453da7436746e87f07"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shrooms">
+		<description>Shrooms</description>
+		<year>2021</year>
+		<publisher>Bob's Stuff</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<info name="version" value="v1.02" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="11717">
+				<rom name="Shrooms.p" size="11717" crc="c97ebb83" sha1="34534b51909ae9c45aaf691ad3c57f9f9d10e9fe"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stairrun">
+		<description>Stairrunner</description>
+		<year>2012</year>
+		<publisher>Revival Studios</publisher>
+		<info name="developer" value="Martijn Wenting" />
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="16080">
+				<rom name="Stairrunner (2012) - Full Version.p" size="16080" crc="f4edfff5" sha1="bf8a7636d20017c83e7caf8b6a819f0cef7392f3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="steps">
+		<description>Steps</description>
+		<year>2021</year>
+		<publisher>Bob's Stuff</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="11196">
+				<rom name="Steps.p" size="11196" crc="6570ef01" sha1="d94e8be7f6ea500ca052421c03b9b5aee9f984e6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tuttut">
+		<description>Tut-Tut</description>
+		<year>2019</year>
+		<publisher>ZX81 Keyboard Adventure</publisher>
+		<info name="developer" value="David A. Stephenson" />
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="15746">
+				<rom name="tut-tut.p" size="15746" crc="3af8b76f" sha1="228b11560f2937d7dfed0edc4b120fada36335f8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ubend">
+		<description>U-Bend</description>
+		<year>2015</year>
+		<publisher>Bob's Stuff</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="14905">
+				<rom name="UBend.p" size="14905" crc="c537e261" sha1="17c49e4ac9179ed0d08c18c671f3db5343bad3cc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="virus">
+		<description>Virus</description>
+		<year>2010</year>
+		<publisher>Bob's Stuff</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="17579">
+				<rom name="Virus.tzx" size="17579" crc="f3d316c2" sha1="7be46275f1048dc26216f9ded649e2c2f88083d3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yewdow">
+		<description>Yewdow</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K, type RUN after loading the tape" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="7909">
+				<rom name="yewdow.p" size="7909" crc="7c5b686b" sha1="88ef9ea679b414296eb01ed5a4dbe875b8ae1a90"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zxagon">
+		<description>ZXagon</description>
+		<year>2014</year>
+		<publisher>Bob's Stuff</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="15336">
+				<rom name="ZXagon.p" size="15336" crc="d6784677" sha1="59dae098079f00c3e72ec4647ccbd2ed99b979f1"/>
 			</dataarea>
 		</part>
 	</software>

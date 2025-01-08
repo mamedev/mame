@@ -885,7 +885,7 @@ u8 hotsmash_state::hotsmash_z80_mcu_r()
 	return m_from_mcu;
 }
 
-CUSTOM_INPUT_MEMBER(hotsmash_state::pbillian_semaphore_input_r)
+ioport_value hotsmash_state::pbillian_semaphore_input_r()
 {
 	ioport_value res = 0;
 	// bit 0x40 is PROBABLY latch 1 on 74ls74.7c, is high if m_z80_has_written is clear
@@ -1096,7 +1096,7 @@ static INPUT_PORTS_START( pbillian )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) // hblank?
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	PORT_START("BUTTONS") // ay port A (register E)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )     // N/C
@@ -1105,7 +1105,7 @@ static INPUT_PORTS_START( pbillian )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL  // P2 fire (M powerup) + high score initials
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(hotsmash_state, pbillian_semaphore_input_r)  // Z80 and MCU Semaphores
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(hotsmash_state::pbillian_semaphore_input_r))  // Z80 and MCU Semaphores
 
 	PORT_START("PLUNGER1")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
@@ -1187,7 +1187,7 @@ static INPUT_PORTS_START( pbillianb )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) // hblank?
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	PORT_START("CONTROLS") // 0xc06: both players in upright, player 1 in cocktail
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
@@ -1278,7 +1278,7 @@ static INPUT_PORTS_START( hotsmash )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )//$49c
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )//$42d
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) // hblank?
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	PORT_START("BUTTONS") // ay port A (register E)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1287,7 +1287,7 @@ static INPUT_PORTS_START( hotsmash )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL  // p2 button 2, unused on this game?
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(hotsmash_state, pbillian_semaphore_input_r)  // Z80 and MCU Semaphores
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(hotsmash_state::pbillian_semaphore_input_r))  // Z80 and MCU Semaphores
 
 	PORT_START("PLUNGER1")  // plunger isn't present on hotsmash though the pins exist for it
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_PLAYER(1)
@@ -1365,7 +1365,7 @@ static INPUT_PORTS_START( superqix )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 ) // JAMMA #R ("Service")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_TILT ) // JAMMA #S ("Tilt")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 ) // JAMMA #15 ("Test")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(superqix_state, fromz80_semaphore_input_r)  // 74ls74 @C2 pin 8 (/Q2), this is the z80->mcu semaphore
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(superqix_state::fromz80_semaphore_input_r))  // 74ls74 @C2 pin 8 (/Q2), this is the z80->mcu semaphore
 
 	PORT_START("P1") /* AY-3-8910 #1 @3P Port A */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY // JAMMA #18
@@ -1374,7 +1374,7 @@ static INPUT_PORTS_START( superqix )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY // JAMMA #21
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) // JAMMA #22
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) // JAMMA #23
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")   /* ??? where does this come from?  */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))   /* ??? where does this come from?  */
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW ) // ??? where does this come from?
 
 	PORT_START("P2") /* AY-3-8910 #1 @3P Port B */
@@ -1384,8 +1384,8 @@ static INPUT_PORTS_START( superqix )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL // JAMMA #Y
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL // JAMMA #Z
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL // JAMMA #a
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(superqix_state, frommcu_semaphore_input_r) // 74ls174 @1J pin 5 (Q1), this is the mcu->z80 semaphore
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(superqix_state, fromz80_semaphore_input_r) // 74ls74 @C2 pin 8 (/Q2), this is the z80->mcu semaphore
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(superqix_state::frommcu_semaphore_input_r)) // 74ls174 @1J pin 5 (Q1), this is the mcu->z80 semaphore
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(superqix_state::fromz80_semaphore_input_r)) // 74ls74 @C2 pin 8 (/Q2), this is the z80->mcu semaphore
 
 INPUT_PORTS_END
 

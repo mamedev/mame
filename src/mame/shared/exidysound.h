@@ -46,8 +46,8 @@ protected:
 	exidy_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	void common_sh_start();
 	void common_sh_reset();
@@ -101,8 +101,8 @@ protected:
 	exidy_sh8253_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual s32 generate_music_sample() override;
 
@@ -137,9 +137,9 @@ protected:
 	venture_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_t implementation
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
-	void venture_audio_map(address_map &map);
+	void venture_audio_map(address_map &map) ATTR_COLD;
 
 private:
 	void filter_w(uint8_t data);
@@ -167,8 +167,8 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	required_device<timer_device> m_cvsd_timer;
@@ -185,8 +185,8 @@ private:
 	uint8_t m_cvsd_data;
 	uint8_t m_cvsd_clk;
 
-	void cvsd_map(address_map &map);
-	void cvsd_iomap(address_map &map);
+	void cvsd_map(address_map &map) ATTR_COLD;
+	void cvsd_iomap(address_map &map) ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(EXIDY_MTRAP, mtrap_sound_device)
@@ -204,9 +204,9 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	required_device<tms5220_device> m_tms;
@@ -214,7 +214,7 @@ private:
 	void irq_clear_w(int state);
 	void main_ack_w(int state);
 
-	void victory_audio_map(address_map &map);
+	void victory_audio_map(address_map &map) ATTR_COLD;
 
 	// internal state
 	uint8_t m_sound_response_ack_clk; // 7474 @ F4

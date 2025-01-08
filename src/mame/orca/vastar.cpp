@@ -144,7 +144,7 @@ public:
 	void common(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -156,9 +156,9 @@ protected:
 	void nmi_mask_w(int state);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 
-	void cpu2_map(address_map &map);
-	void cpu2_port_map(address_map &map);
-	void main_port_map(address_map &map);
+	void cpu2_map(address_map &map) ATTR_COLD;
+	void cpu2_port_map(address_map &map) ATTR_COLD;
+	void main_port_map(address_map &map) ATTR_COLD;
 };
 
 class vastar_state : public vastar_common_state
@@ -172,12 +172,12 @@ public:
 	void vastar(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<vastar_video_device> m_vasvid;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 class dogfightp_state : public vastar_common_state
@@ -190,7 +190,7 @@ public:
 	void dogfightp(machine_config &config);
 
 private:
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -700,7 +700,7 @@ ROM_START( dogfightp ) // all 2732
 	ROM_LOAD( "10.7p",     0x1800, 0x1000, CRC(2cb51793) SHA1(d90177ef28730774202a04a0846281537a1883df) )
 
 	ROM_REGION( 0x0040, "videopcb:proms", 0 ) // on ORCA OVG-40c sub board
-	ROM_LOAD( "blue.2a.82s123", 0x0000, 0x0020, CRC(aa839a24) SHA1(9b8217e1c257d24e873888fd083c099fc93c7878) ) //doesn't match parent
+	ROM_LOAD( "blue.2a.82s123", 0x0000, 0x0020, CRC(aa839a24) SHA1(9b8217e1c257d24e873888fd083c099fc93c7878) ) // doesn't match parent
 	ROM_LOAD( "pink.2b.82s123", 0x0020, 0x0020, CRC(596ae457) SHA1(1c1a3130d88c5fd5c66ce9f91d97a09c0a0b535f) )
 ROM_END
 

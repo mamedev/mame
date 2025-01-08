@@ -44,8 +44,8 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
 
 private:
@@ -57,8 +57,8 @@ private:
 	uint8_t mb_vcu_paletteram_r(offs_t offset);
 	void mb_vcu_paletteram_w(offs_t offset, uint8_t data);
 
-	void mb_vcu_pal_ram(address_map &map);
-	void mb_vcu_vram(address_map &map);
+	void mb_vcu_pal_ram(address_map &map) ATTR_COLD;
+	void mb_vcu_vram(address_map &map) ATTR_COLD;
 
 	const address_space_config      m_videoram_space_config;
 	const address_space_config      m_paletteram_space_config;

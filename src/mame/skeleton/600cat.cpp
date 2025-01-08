@@ -35,7 +35,7 @@ public:
 	void _600cat(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
 
@@ -157,4 +157,4 @@ ROM_END
 } // anonymous namespace
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY    FULLNAME                              FLAGS
-COMP( 199?, 600cat, 0,      0,      _600cat, _600cat, _600cat_state, empty_init, "Wavetek", "600 Cellular Activation Tester", MACHINE_IS_SKELETON )
+COMP( 199?, 600cat, 0,      0,      _600cat, _600cat, _600cat_state, empty_init, "Wavetek", "600 Cellular Activation Tester", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

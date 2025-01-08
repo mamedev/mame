@@ -75,8 +75,8 @@ public:
 	void init_musicbal();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -107,10 +107,10 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void main_cpu_io_map(address_map &map);
-	void main_cpu_map(address_map &map);
-	void sound_cpu_io_map(address_map &map);
-	void sound_cpu_map(address_map &map);
+	void main_cpu_io_map(address_map &map) ATTR_COLD;
+	void main_cpu_map(address_map &map) ATTR_COLD;
+	void sound_cpu_io_map(address_map &map) ATTR_COLD;
+	void sound_cpu_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -606,6 +606,6 @@ void speedbal_state::init_musicbal()
 } // anonymous namespace
 
 
-GAMEL( 1987, speedbal,         0, speedbal, speedbal, speedbal_state, init_speedbal, ROT270, "Tecfri / Desystem S.A.", "Speed Ball (set 1)", MACHINE_SUPPORTS_SAVE, layout_speedbal )
+GAMEL( 1987, speedbal,  0,        speedbal, speedbal, speedbal_state, init_speedbal, ROT270, "Tecfri / Desystem S.A.", "Speed Ball (set 1)", MACHINE_SUPPORTS_SAVE, layout_speedbal )
 GAMEL( 1987, speedbala, speedbal, speedbal, speedbal, speedbal_state, init_speedbal, ROT270, "Tecfri / Desystem S.A.", "Speed Ball (set 2)", MACHINE_SUPPORTS_SAVE, layout_speedbal )
-GAMEL( 1988, musicbal,         0, speedbal, musicbal, speedbal_state, init_musicbal, ROT270, "Tecfri / Desystem S.A.", "Music Ball",         MACHINE_SUPPORTS_SAVE, layout_speedbal )
+GAMEL( 1988, musicbal,  0,        speedbal, musicbal, speedbal_state, init_musicbal, ROT270, "Tecfri / Desystem S.A.", "Music Ball",         MACHINE_SUPPORTS_SAVE, layout_speedbal )

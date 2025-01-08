@@ -33,11 +33,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	// device_s100_card_interface overrides
 	virtual u8 s100_sinp_r(offs_t offset) override;
@@ -53,7 +53,7 @@ private:
 	void int_w(offs_t offset, u8 data);
 
 	// address map
-	void z80_map(address_map &map);
+	void z80_map(address_map &map) ATTR_COLD;
 
 	// object finders
 	required_device<z80_device> m_z80;

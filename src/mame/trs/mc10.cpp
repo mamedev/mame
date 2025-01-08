@@ -79,7 +79,7 @@ protected:
 	mc10cart_slot_device &mc10cart() { return *m_mc10cart; }
 
 private:
-	void mc10_mem(address_map &map);
+	void mc10_mem(address_map &map) ATTR_COLD;
 
 	optional_device<mc6847_base_device> m_mc6847;
 	required_device<dac_bit_interface> m_dac;
@@ -109,8 +109,8 @@ protected:
 	required_device<ef9345_device> m_ef9345;
 
 private:
-	void alice32_mem(address_map &map);
-	void alice90_mem(address_map &map);
+	void alice32_mem(address_map &map) ATTR_COLD;
+	void alice90_mem(address_map &map) ATTR_COLD;
 };
 
 /***************************************************************************

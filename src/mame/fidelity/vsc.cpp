@@ -7,7 +7,7 @@ Fidelity Voice Sensory Chess Challenger (VSC)
 RE notes by Kevin Horton
 
 The display/button/LED/speech technology is identical to Fidelity CSC.
-Only the CPU board was changed.  As such, it works the same but is interfaced
+Only the CPU board was changed. As such, it works the same but is interfaced
 to different port chips this time.
 
 Hardware:
@@ -19,11 +19,11 @@ I/O is composed of an 8255 triple port adaptor, and a Z80A PIO parallel I/O
 interface.
 
 There's the usual TSI S14001A speech synth with its requisite 4K ROM which is the
-same as on the other talking chess boards.  The TSI chip is running at 26.37KHz.
+same as on the other talking chess boards. The TSI chip is running at 26.37KHz.
 It uses a 470K resistor and a 100pf capacitor.
 
 The "perfect" clock would be 1/RC most likely (actually this will be skewed a tad by
-duty cycle of the oscillator) which with those parts values gives 21.27KHz.  The
+duty cycle of the oscillator) which with those parts values gives 21.27KHz. The
 formula is probably more likely to be 1/1.2RC or so.
 
 Rounding out the hardware are three driver chips for the LEDs, a 7404 inverter to
@@ -59,13 +59,13 @@ So to enable only the 8255, you'd write/read to 08-0Bh for example
 To enable only the PIO, you'd write/read to 04-07h for example.
 
 writing to 00-03h will enable and write to BOTH chips, and reading 00-03h
-will return data from BOTH chips (and cause a bus conflict).  The code probably
+will return data from BOTH chips (and cause a bus conflict). The code probably
 never does either of these things.
 
 Likewise, writing/reading to 0Ch-0Fh will result in open bus, because neither chip's
 enable line will be low.
 
-This sequence repeats every 16 addresses.  So to recap:
+This sequence repeats every 16 addresses. So to recap:
 
 00-03: both chips enabled (probably not used)
 04-07: PIO enabled
@@ -75,7 +75,7 @@ This sequence repeats every 16 addresses.  So to recap:
 10-FF: mirrors of 00-0F.
 
 Refer to the Sensory Champ. Chess Chall. for explanations of the below
-I/O names and labels.  It's the same.
+I/O names and labels. It's the same.
 
 8255:
 -----
@@ -123,25 +123,25 @@ PB.2 - hi/lo TSI speaker volume
 PB.3 - violet wire to printer port?
 PB.4 - white wire to printer port? (and TSI BUSY line)
 PB.5 - selection jumper input (see below)
-PB.6 - TSI start line
+PB.6 - TSI START line
 PB.7 - TSI ROM A12 line
 
-selection jumpers:
+Selection jumpers:
 ------------------
-These act like another row of buttons.  It is composed of two diode locations,
-so there's up to 4 possible configurations.  My board does not have either diode
-stuffed, so this most likely is "English".  I suspect it selects which language to use
-for the speech synth.  Of course you need the other speech ROMs for this to function
-properly.
+These act like another row of buttons. It is composed of two diode locations,
+so there's up to 4 possible configurations. My board does not have either diode
+stuffed, so this most likely is "English". I suspect it selects which language
+to use for the speech synth. Of course you need the other speech ROMs for this
+to function properly.
 
 Anyways, the two jumpers are connected to button columns A and B and the common
-connects to Z80A PIO PB.5, which basically makes a 10th button row.  I would
+connects to Z80A PIO PB.5, which basically makes a 10th button row. I would
 expect that the software reads these once on startup only.
 
-printer:
+Printer:
 --------
-This is the 1st Fidelity chess computer with a printer port. Many later Fidelity chess
-computers also have support for it. Two models were released:
+This is the 1st Fidelity chess computer with a printer port. Many later Fidelity
+chess computers also have support for it. Two models were released:
 FP: Challenger Printer - thermal printer, MCU=D8048C243
 IFP: Impact Printer - also compatible with C64 apparently.
 
@@ -176,7 +176,6 @@ public:
 		m_board(*this, "board"),
 		m_display(*this, "display"),
 		m_speech(*this, "speech"),
-		m_speech_rom(*this, "speech"),
 		m_language(*this, "language"),
 		m_inputs(*this, "IN.%u", 0)
 	{ }
@@ -185,7 +184,7 @@ public:
 	void vsc(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -195,7 +194,6 @@ private:
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
 	required_device<s14001a_device> m_speech;
-	required_region_ptr<u8> m_speech_rom;
 	required_region_ptr<u8> m_language;
 	required_ioport_array<2> m_inputs;
 
@@ -203,18 +201,15 @@ private:
 	u8 m_7seg_data = 0;
 	u8 m_cb_mux = 0;
 	u8 m_kp_mux = 0;
-	bool m_lan_switch = false;
-	u8 m_speech_bank = 0;
 
 	// address maps
-	void main_map(address_map &map);
-	void main_io(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void main_io(address_map &map) ATTR_COLD;
 	u8 main_io_trampoline_r(offs_t offset);
 	void main_io_trampoline_w(offs_t offset, u8 data);
 
 	// I/O handlers
 	void update_display();
-	u8 speech_r(offs_t offset);
 	void ppi_porta_w(u8 data);
 	void ppi_portb_w(u8 data);
 	void ppi_portc_w(u8 data);
@@ -230,8 +225,6 @@ void vsc_state::machine_start()
 	save_item(NAME(m_7seg_data));
 	save_item(NAME(m_cb_mux));
 	save_item(NAME(m_kp_mux));
-	save_item(NAME(m_lan_switch));
-	save_item(NAME(m_speech_bank));
 }
 
 
@@ -240,7 +233,7 @@ void vsc_state::machine_start()
     I/O
 *******************************************************************************/
 
-// misc handlers
+// I8255 PPI
 
 void vsc_state::update_display()
 {
@@ -248,17 +241,9 @@ void vsc_state::update_display()
 	m_display->matrix(m_cb_mux, m_led_data << 8 | m_7seg_data);
 }
 
-u8 vsc_state::speech_r(offs_t offset)
-{
-	return m_speech_rom[m_speech_bank << 12 | offset];
-}
-
-
-// I8255 PPI
-
 void vsc_state::ppi_porta_w(u8 data)
 {
-	// d0-d5: TSI C0-C5
+	// d0-d5: S14001A C0-C5
 	m_speech->data_w(data & 0x3f);
 
 	// d0-d7: data for the 4 7seg leds, bits are HGCBAFED (H is extra led)
@@ -299,8 +284,8 @@ u8 vsc_state::pio_porta_r()
 		if (BIT(m_kp_mux, i))
 			data |= m_inputs[i]->read();
 
-	// also language switches(hardwired with 2 diodes)
-	if (m_lan_switch)
+	// also language jumpers (hardwired with 2 diodes)
+	if (m_kp_mux & 0x20)
 		data |= *m_language;
 
 	return data;
@@ -308,29 +293,23 @@ u8 vsc_state::pio_porta_r()
 
 u8 vsc_state::pio_portb_r()
 {
-	u8 data = 0;
-
-	// d4: TSI BUSY line
-	data |= (m_speech->busy_r()) ? 0 : 0x10;
-
-	return data;
+	// d4: S14001A busy pin
+	return (m_speech->busy_r()) ? 0 : 0x10;
 }
 
 void vsc_state::pio_portb_w(u8 data)
 {
 	// d0,d1: keypad input mux
-	// d5: enable language switch
-	m_kp_mux = data & 3;
-	m_lan_switch = bool(data & 0x20);
+	// d5: enable language jumpers
+	m_kp_mux = data;
 
-	// d7: TSI ROM A12
-	m_speech->force_update(); // update stream to now
-	m_speech_bank = data >> 7 & 1;
+	// d7: speech ROM A12
+	m_speech->set_rom_bank(BIT(data, 7));
 
-	// d6: TSI START line
-	m_speech->start_w(data >> 6 & 1);
+	// d6: S14001A start pin
+	m_speech->start_w(BIT(data, 6));
 
-	// d2: lower TSI volume
+	// d2: lower S14001A volume
 	m_speech->set_output_gain(0, (data & 4) ? 0.25 : 1.0);
 }
 
@@ -388,8 +367,8 @@ static INPUT_PORTS_START( vsc )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Bishop")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Queen")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("King")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_NAME("CL")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("RE")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("CL")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_N) PORT_NAME("RE")
 
 	PORT_START("IN.1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("TM")
@@ -440,7 +419,6 @@ void vsc_state::vsc(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	S14001A(config, m_speech, 25000); // R/C circuit, around 25khz
-	m_speech->ext_read().set(FUNC(vsc_state::speech_r));
 	m_speech->add_route(ALL_OUTPUTS, "speaker", 0.75);
 }
 

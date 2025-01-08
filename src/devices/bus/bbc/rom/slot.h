@@ -56,7 +56,7 @@ protected:
 	bbc_romslot_device(const machine_config &mconfig, device_type type, char const *tag, device_t *owner, uint32_t clock);
 
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	uint32_t m_slot_size;
 

@@ -69,8 +69,8 @@ public:
 	void klaxp(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -86,7 +86,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint16_t> m_paletteram;
 	uint8_t m_screen_intensity = 0U;
-	uint8_t m_video_disable = 0U;
+	bool m_video_disable = false;
 	static const atari_motion_objects_config s_mob_config;
 	static const atari_motion_objects_config s_guts_mob_config;
 
@@ -101,9 +101,9 @@ private:
 	uint32_t screen_update_eprom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_guts(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void update_palette();
-	void extra_map(address_map &map);
-	void guts_map(address_map &map);
-	void main_map(address_map &map);
+	void extra_map(address_map &map) ATTR_COLD;
+	void guts_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -196,7 +196,6 @@ const atari_motion_objects_config eprom_state::s_mob_config =
 	0,                  // maximum number of links to visit/scanline (0=all)
 
 	0x100,              // base palette entry
-	0x100,              // maximum number of colors
 	0,                  // transparent pen index
 
 	{{ 0x03ff,0,0,0 }}, // mask for the link
@@ -223,7 +222,7 @@ void eprom_state::video_start()
 	save_item(NAME(m_video_disable));
 
 	m_screen_intensity = 0;
-	m_video_disable = 0;
+	m_video_disable = false;
 }
 
 
@@ -241,7 +240,6 @@ const atari_motion_objects_config eprom_state::s_guts_mob_config =
 	0,                  // maximum number of links to visit/scanline (0=all)
 
 	0x100,              // base palette entry
-	0x100,              // maximum number of colors
 	0,                  // transparent pen index
 
 	{{ 0x03ff,0,0,0 }}, // mask for the link
@@ -537,7 +535,7 @@ uint8_t eprom_state::adc_r(offs_t offset)
 	if (!m_adc.found())
 		return 0xff;
 
-	uint8_t result = m_adc->data_r();
+	uint8_t const result = m_adc->data_r();
 	if (!machine().side_effects_disabled())
 		m_adc->address_offset_start_w(offset, 0);
 	return result;
@@ -556,7 +554,7 @@ void eprom_state::eprom_latch_w(uint8_t data)
 	if (m_extra.found())
 	{
 		// bit 0: reset extra CPU
-		if (data & 1)
+		if (BIT(data, 0))
 			m_extra->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 		else
 			m_extra->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
@@ -565,7 +563,7 @@ void eprom_state::eprom_latch_w(uint8_t data)
 		m_screen_intensity = (data & 0x1e) >> 1;
 
 		// bit 5: video disable
-		m_video_disable = (data & 0x20);
+		m_video_disable = BIT(data, 5);
 	}
 }
 
@@ -579,9 +577,9 @@ void eprom_state::eprom_latch_w(uint8_t data)
 
 template<bool maincpu> void eprom_state::sync_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	u16 oldword = m_shared_ram[0xcc00 / 2];
+	u16 const oldword = m_shared_ram[0xcc00 / 2];
 	COMBINE_DATA(&m_shared_ram[0xcc00 / 2]);
-	u16 newword = m_shared_ram[0xcc00 / 2];
+	u16 const newword = m_shared_ram[0xcc00 / 2];
 
 	if ((oldword & 0xff00) != (newword & 0xff00))
 		(maincpu ? m_maincpu->yield() : m_extra->yield());
@@ -686,11 +684,11 @@ static INPUT_PORTS_START( eprom )
 	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("260010")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_SERVICE( 0x0002, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_SOUND_TO_MAIN_READY("jsa") // Input buffer full (@260030)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_MAIN_TO_SOUND_READY("jsa") // Output buffer full (@360030)
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("adc", adc0808_device, eoc_r)
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("adc", FUNC(adc0808_device::eoc_r))
 	PORT_BIT( 0x00e0, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
@@ -725,7 +723,7 @@ static INPUT_PORTS_START( klaxp )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 
 	PORT_START("260010")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_SERVICE( 0x0002, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_SOUND_TO_MAIN_READY("jsa") // Input buffer full (@260030)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_MAIN_TO_SOUND_READY("jsa") // Output buffer full (@360030)
@@ -752,11 +750,11 @@ static INPUT_PORTS_START( guts )
 	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("260010")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_SERVICE( 0x0002, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_SOUND_TO_MAIN_READY("jsa") // Input buffer full (@260030)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_MAIN_TO_SOUND_READY("jsa") // Output buffer full (@360030)
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("adc", adc0808_device, eoc_r)
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("adc", FUNC(adc0808_device::eoc_r))
 	PORT_BIT( 0x00e0, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
@@ -857,7 +855,7 @@ void eprom_state::eprom(machine_config &config)
 	PALETTE(config, m_palette).set_entries(2048);
 
 	TILEMAP(config, m_playfield_tilemap, m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64).set_info_callback(FUNC(eprom_state::get_playfield_tile_info));
-	TILEMAP(config, m_alpha_tilemap, m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_ROWS, 64, 32, 0).set_info_callback(FUNC(eprom_state::get_alpha_tile_info));
+	TILEMAP(config, m_alpha_tilemap, m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_ROWS, 64, 31, 0).set_info_callback(FUNC(eprom_state::get_alpha_tile_info));
 
 	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, eprom_state::s_mob_config);
 	m_mob->set_gfxdecode(m_gfxdecode);
@@ -902,7 +900,7 @@ void eprom_state::klaxp(machine_config &config)
 	PALETTE(config, m_palette).set_entries(2048);
 
 	TILEMAP(config, m_playfield_tilemap, m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64).set_info_callback(FUNC(eprom_state::get_playfield_tile_info));
-	TILEMAP(config, m_alpha_tilemap, m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_ROWS, 64, 32, 0).set_info_callback(FUNC(eprom_state::get_alpha_tile_info));
+	TILEMAP(config, m_alpha_tilemap, m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_ROWS, 64, 31, 0).set_info_callback(FUNC(eprom_state::get_alpha_tile_info));
 
 	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, eprom_state::s_mob_config);
 	m_mob->set_gfxdecode(m_gfxdecode);
@@ -951,7 +949,7 @@ void eprom_state::guts(machine_config &config)
 	PALETTE(config, m_palette).set_entries(2048);
 
 	TILEMAP(config, m_playfield_tilemap, m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64).set_info_callback(FUNC(eprom_state::guts_get_playfield_tile_info));
-	TILEMAP(config, m_alpha_tilemap, m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_ROWS, 64, 32, 0).set_info_callback(FUNC(eprom_state::get_alpha_tile_info));
+	TILEMAP(config, m_alpha_tilemap, m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_ROWS, 64, 31, 0).set_info_callback(FUNC(eprom_state::get_alpha_tile_info));
 
 	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, eprom_state::s_guts_mob_config);
 	m_mob->set_gfxdecode(m_gfxdecode);

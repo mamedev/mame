@@ -105,19 +105,19 @@ public:
 	void hyperscan(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<score7_cpu_device> m_maincpu;
 private:
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	uint32_t spg290_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_hyper_exe);
 
-	void spg290_mem(address_map &map);
-	void spg290_bios_mem(address_map &map);
+	void spg290_mem(address_map &map) ATTR_COLD;
+	void spg290_bios_mem(address_map &map) ATTR_COLD;
 
 	void space_byte_w(offs_t offset, uint8_t data) { return m_maincpu->space(AS_PROGRAM).write_byte(offset, data); }
 	uint32_t space_dword_r(offs_t offset)          { return m_maincpu->space(AS_PROGRAM).read_dword(offset); }
@@ -156,7 +156,7 @@ public:
 	void nand_jak_bbsf();
 
 protected:
-	void machine_reset() override;
+	void machine_reset() override ATTR_COLD;
 
 	std::vector<uint8_t> m_strippedrom;
 
@@ -174,7 +174,7 @@ public:
 	void nand_zonefamf();
 
 protected:
-	void machine_reset() override;
+	void machine_reset() override ATTR_COLD;
 
 private:
 };

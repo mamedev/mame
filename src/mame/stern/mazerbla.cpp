@@ -173,19 +173,19 @@ private:
 	TIMER_CALLBACK_MEMBER(deferred_ls670_0_w);
 	TIMER_CALLBACK_MEMBER(deferred_ls670_1_w);
 	IRQ_CALLBACK_MEMBER(irq_callback);
-	void greatgun_cpu3_io_map(address_map &map);
-	void greatgun_io_map(address_map &map);
-	void greatgun_sound_map(address_map &map);
-	void mazerbla_cpu2_io_map(address_map &map);
-	void mazerbla_cpu2_map(address_map &map);
-	void mazerbla_cpu3_io_map(address_map &map);
-	void mazerbla_cpu3_map(address_map &map);
-	void mazerbla_io_map(address_map &map);
-	void mazerbla_map(address_map &map);
+	void greatgun_cpu3_io_map(address_map &map) ATTR_COLD;
+	void greatgun_io_map(address_map &map) ATTR_COLD;
+	void greatgun_sound_map(address_map &map) ATTR_COLD;
+	void mazerbla_cpu2_io_map(address_map &map) ATTR_COLD;
+	void mazerbla_cpu2_map(address_map &map) ATTR_COLD;
+	void mazerbla_cpu3_io_map(address_map &map) ATTR_COLD;
+	void mazerbla_cpu3_map(address_map &map) ATTR_COLD;
+	void mazerbla_io_map(address_map &map) ATTR_COLD;
+	void mazerbla_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

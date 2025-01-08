@@ -151,7 +151,8 @@
 
     The ROMs contain a stripped-down version of TI BASIC, but without
     the specific graphics subprograms. Programs written on the 99/2 should
-    run on the 99/4A, but the opposite is not true.
+    run on the 99/4A, but the opposite is not true. The 24K version is
+    buggy and incomplete: OPEN and SAVE cause the CPU to restart itself.
 
     Original implementation: Raphael Nabet; December 1999, 2000
 
@@ -224,8 +225,8 @@ private:
 
 	void rombank_set(int state);
 
-	void crumap(address_map &map);
-	void memmap(address_map &map);
+	void crumap(address_map &map) ATTR_COLD;
+	void memmap(address_map &map) ATTR_COLD;
 
 	required_device<tms9995_device> m_maincpu;
 	required_device<bus::ti99::internal::video992_device> m_videoctrl;

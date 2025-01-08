@@ -55,8 +55,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_res );
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -76,8 +76,8 @@ private:
 
 	void lcd_palette(palette_device &palette) const;
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	uint8_t ipd_port_r();
 	void opd_port1_w(uint8_t data);
@@ -215,7 +215,7 @@ static INPUT_PORTS_START( mpf1_88 )
 	PORT_BIT( 0xdf, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("RESET")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F3) PORT_NAME("RESET") PORT_CHANGED_MEMBER(DEVICE_SELF, mpf1_88_state, trigger_res, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F3) PORT_NAME("RESET") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mpf1_88_state::trigger_res), 0)
 INPUT_PORTS_END
 
 

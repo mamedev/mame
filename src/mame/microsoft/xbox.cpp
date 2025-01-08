@@ -38,12 +38,12 @@ public:
 
 	void xbox(machine_config &config);
 protected:
-	void xbox_map(address_map &map);
+	void xbox_map(address_map &map) ATTR_COLD;
 
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	virtual void hack_eeprom() override;
 
@@ -218,4 +218,4 @@ ROM_END
 } // anonymous namespace
 
 
-CONS( 2001, xbox, 0, 0, xbox,  xbox, xbox_state, empty_init, "Microsoft", "XBOX", MACHINE_IS_SKELETON )
+CONS( 2001, xbox, 0, 0, xbox,  xbox, xbox_state, empty_init, "Microsoft", "XBOX", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

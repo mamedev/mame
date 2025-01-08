@@ -29,14 +29,14 @@ public:
 	{ }
 
 	void by68701(machine_config &config);
-	void by68701_map(address_map &map);
+	void by68701_map(address_map &map) ATTR_COLD;
 protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
 
 	// driver_device overrides
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 public:
 	void init_by68701();
 };
@@ -151,9 +151,9 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1981, flashgdnp1, flashgdn, by68701, by68701, by68701_state, init_by68701, ROT0, "Bally", "Flash Gordon (prototype rev. 1)",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, flashgdnp2, flashgdn, by68701, by68701, by68701_state, init_by68701, ROT0, "Bally", "Flash Gordon (prototype rev. 2)",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, eballdlxp1, eballdlx, by68701, by68701, by68701_state, init_by68701, ROT0, "Bally", "Eight Ball Deluxe (prototype rev. 1)",  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, eballdlxp2, eballdlx, by68701, by68701, by68701_state, init_by68701, ROT0, "Bally", "Eight Ball Deluxe (prototype rev. 2)",  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, eballdlxp3, eballdlx, by68701, by68701, by68701_state, init_by68701, ROT0, "Bally", "Eight Ball Deluxe (prototype rev. 3)",  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, eballdlxp4, eballdlx, by68701, by68701, by68701_state, init_by68701, ROT0, "Bally", "Eight Ball Deluxe (prototype rev. 4)",  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, flashgdnp1, flashgdn, by68701, by68701, by68701_state, init_by68701, ROT0, "Bally", "Flash Gordon (prototype rev. 1)",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, flashgdnp2, flashgdn, by68701, by68701, by68701_state, init_by68701, ROT0, "Bally", "Flash Gordon (prototype rev. 2)",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, eballdlxp1, eballdlx, by68701, by68701, by68701_state, init_by68701, ROT0, "Bally", "Eight Ball Deluxe (prototype rev. 1)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, eballdlxp2, eballdlx, by68701, by68701, by68701_state, init_by68701, ROT0, "Bally", "Eight Ball Deluxe (prototype rev. 2)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, eballdlxp3, eballdlx, by68701, by68701, by68701_state, init_by68701, ROT0, "Bally", "Eight Ball Deluxe (prototype rev. 3)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, eballdlxp4, eballdlx, by68701, by68701, by68701_state, init_by68701, ROT0, "Bally", "Eight Ball Deluxe (prototype rev. 4)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )

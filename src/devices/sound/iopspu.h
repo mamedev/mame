@@ -9,8 +9,8 @@
 *
 */
 
-#ifndef MAME_MACHINE_IOPSPU_H
-#define MAME_MACHINE_IOPSPU_H
+#ifndef MAME_SOUND_IOPSPU_H
+#define MAME_SOUND_IOPSPU_H
 
 #pragma once
 
@@ -44,8 +44,8 @@ public:
 	void dma_done(int bank);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
@@ -98,4 +98,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(SONYIOP_SPU, iop_spu_device)
 
-#endif // MAME_MACHINE_IOPSPU_H
+#endif // MAME_SOUND_IOPSPU_H

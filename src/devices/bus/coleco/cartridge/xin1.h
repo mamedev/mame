@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_BUS_COLECO_XIN1_H
-#define MAME_BUS_COLECO_XIN1_H
+#ifndef MAME_BUS_COLECO_CARTRIDGE_XIN1_H
+#define MAME_BUS_COLECO_CARTRIDGE_XIN1_H
 
 #pragma once
 
@@ -30,8 +30,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_colecovision_expansion_card_interface overrides
 	virtual uint8_t read(offs_t offset, int _8000, int _a000, int _c000, int _e000) override;
@@ -44,5 +44,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(COLECOVISION_XIN1, colecovision_xin1_cartridge_device)
 
-
-#endif // MAME_BUS_COLECO_XIN1_H
+#endif // MAME_BUS_COLECO_CARTRIDGE_XIN1_H

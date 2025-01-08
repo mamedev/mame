@@ -46,7 +46,7 @@ public:
 
 protected:
 	virtual void device_start() override { }
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	required_device<wd33c93a_device> m_wd33c93a;
@@ -114,8 +114,8 @@ public:
 
 protected:
 	virtual void device_start() override { }
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	static constexpr size_t BANK_SIZE = 0x2000;

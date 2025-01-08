@@ -26,8 +26,6 @@ public:
 		m_screen.set_tag(std::forward<T>(screen_tag));
 	}
 
-	void set_video_irq_spidman(bool is_spiderman) { m_is_spiderman = is_spiderman; }
-
 	auto porta_out() { return m_porta_out.bind(); }
 	auto portb_out() { return m_portb_out.bind(); }
 	auto portc_out() { return m_portc_out.bind(); }
@@ -45,11 +43,11 @@ public:
 protected:
 	spg110_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal);
 
-	void internal_map(address_map &map);
+	void internal_map(address_map &map) ATTR_COLD;
 
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	required_device<screen_device> m_screen;
@@ -79,6 +77,9 @@ private:
 	void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { m_portb_out(offset, data, mem_mask); }
 	void portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { m_portc_out(offset, data, mem_mask); }
 
+	void timerirq_w(int state);
+	void uartirq_w(int state);
+	void extirq_w(int state);
 	void ffreq1_w(int state);
 	void ffreq2_w(int state);
 
@@ -88,7 +89,6 @@ private:
 	void configure_spg_io(spg2xx_io_device* io);
 
 	void videoirq_w(int state);
-	bool m_is_spiderman;
 };
 
 DECLARE_DEVICE_TYPE(SPG110, spg110_device)

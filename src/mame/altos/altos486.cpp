@@ -38,10 +38,10 @@ private:
 	void mmu_ram_w(offs_t offset, uint16_t data);
 	void mmu_io_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	void altos486_io(address_map &map);
-	void altos486_mem(address_map &map);
-	void altos486_z80_io(address_map &map);
-	void altos486_z80_mem(address_map &map);
+	void altos486_io(address_map &map) ATTR_COLD;
+	void altos486_mem(address_map &map) ATTR_COLD;
+	void altos486_z80_io(address_map &map) ATTR_COLD;
+	void altos486_z80_mem(address_map &map) ATTR_COLD;
 
 	required_device<i80186_cpu_device> m_maincpu;
 	required_shared_ptr<uint16_t> m_ram;

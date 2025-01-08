@@ -65,7 +65,7 @@ public:
 	void init_speeddrv();
 
 private:
-	void speeddrv_map(address_map &map);
+	void speeddrv_map(address_map &map) ATTR_COLD;
 
 	required_device<mediagx_device> m_maincpu;
 };
@@ -126,5 +126,5 @@ void speeddrv_state::init_speeddrv()
 } // anonymous namespace
 
 
-GAME( 2004, speeddrv, 0, speeddrv, speeddrv, speeddrv_state, init_speeddrv, ROT0, "IGS", "Speed Driver",          MACHINE_IS_SKELETON )
-GAME( 200?, eztouch,  0, speeddrv, speeddrv, speeddrv_state, init_speeddrv, ROT0, "IGS", "EZ Touch (v116 China)", MACHINE_IS_SKELETON )
+GAME( 2004, speeddrv, 0, speeddrv, speeddrv, speeddrv_state, init_speeddrv, ROT0, "IGS", "Speed Driver",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, eztouch,  0, speeddrv, speeddrv, speeddrv_state, init_speeddrv, ROT0, "IGS", "EZ Touch (v116 China)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

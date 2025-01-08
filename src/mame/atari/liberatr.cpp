@@ -177,9 +177,9 @@ public:
 	void liberatr(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// vector and early raster EAROM interface
@@ -262,8 +262,8 @@ private:
 	void earom_w(offs_t offset, uint8_t data);
 	void earom_control_w(uint8_t data);
 
-	void liberatp_map(address_map &map);
-	void liberatr_map(address_map &map);
+	void liberatp_map(address_map &map) ATTR_COLD;
+	void liberatr_map(address_map &map) ATTR_COLD;
 
 	void init_planet(planet &liberatr_planet, uint8_t *planet_rom);
 	void get_pens(pen_t *pens);
@@ -754,7 +754,7 @@ static INPUT_PORTS_START( liberatr )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH,IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH,IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	PORT_START("DSW1")          // IN2  -  Game Option switches DSW @ D4 on PCB
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )

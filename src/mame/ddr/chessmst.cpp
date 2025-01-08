@@ -64,7 +64,7 @@ public:
 	void chessmsta(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<z80_device> m_maincpu;
@@ -77,8 +77,8 @@ private:
 	u16 m_matrix = 0;
 	u8 m_led_data[2] = { 0, 0 };
 
-	void chessmst_io(address_map &map);
-	void chessmst_mem(address_map &map);
+	void chessmst_io(address_map &map) ATTR_COLD;
+	void chessmst_mem(address_map &map) ATTR_COLD;
 
 	void pio1_port_a_w(u8 data);
 	void pio1_port_b_w(u8 data);
@@ -204,8 +204,8 @@ static INPUT_PORTS_START( chessmst )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("New Game / 0 / Pawn")   PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_CODE(KEYCODE_N)
 
 	PORT_START("IN.1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Halt")  PORT_CODE(KEYCODE_F2) PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, halt_button, 0)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, reset_button, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Halt")  PORT_CODE(KEYCODE_F2) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(chessmst_state::halt_button), 0)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(chessmst_state::reset_button), 0)
 INPUT_PORTS_END
 
 

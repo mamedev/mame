@@ -46,11 +46,11 @@ public:
 	void pbo(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void main_map(address_map &map);
-	void net_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void net_map(address_map &map) ATTR_COLD;
 
 	required_device<m68010_device> m_maincpu;
 	required_device<m68010_device> m_netcpu;
@@ -268,4 +268,4 @@ ROM_END
 
 } // Anonymous namespace
 
-COMP( 1987, pbo,      0,      0,      pbo,      pbo,      pbo_state, empty_init, "Philips",    "BO (Videosynthesizer Prototype)", MACHINE_IS_SKELETON )
+COMP( 1987, pbo,      0,      0,      pbo,      pbo,      pbo_state, empty_init, "Philips",    "BO (Videosynthesizer Prototype)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

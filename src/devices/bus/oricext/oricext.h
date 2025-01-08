@@ -44,7 +44,7 @@ public:
 	void map_rom();
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	devcb_write_line irq_handler;
 	devcb_write_line reset_handler;

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_DATAEAST_DECO222
-#define MAME_DATAEAST_DECO222
+#ifndef MAME_DATAEAST_DECO222_H
+#define MAME_DATAEAST_DECO222_H
 
 #pragma once
 
@@ -29,8 +29,8 @@ protected:
 		virtual u8 decrypt8(u8 value, offs_t pc, bool opcode) const override;
 	};
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
 
@@ -58,8 +58,8 @@ protected:
 		virtual u8 decrypt8(u8 value, offs_t pc, bool opcode) const override;
 	};
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
 
@@ -67,4 +67,4 @@ protected:
 DECLARE_DEVICE_TYPE(DECO_222, deco_222_device)
 DECLARE_DEVICE_TYPE(DECO_C10707, deco_c10707_device)
 
-#endif // MAME_DATAEAST_DECO222
+#endif // MAME_DATAEAST_DECO222_H

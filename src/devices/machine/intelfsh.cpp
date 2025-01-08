@@ -37,6 +37,8 @@ enum
 	FM_ERASEAMD3,   // part 3 of AMD erase sequence
 	FM_ERASEAMD4,   // part 4 of AMD erase sequence
 	FM_BYTEPROGRAM,
+	FM_WORDPROGRAM1,
+	FM_WORDPROGRAM2,
 	FM_BANKSELECT,
 	FM_WRITEPAGEATMEL,
 	FM_WRITEBUFFER1, // part 1 of write to buffer sequence
@@ -86,6 +88,7 @@ DEFINE_DEVICE_TYPE(INTEL_28F016S5,           intel_28f016s5_device,           "i
 DEFINE_DEVICE_TYPE(SHARP_LH28F016S,          sharp_lh28f016s_device,          "sharp_lh28f016s",          "Sharp LH28F016S Flash")
 DEFINE_DEVICE_TYPE(SHARP_LH28F016S_16BIT,    sharp_lh28f016s_16bit_device,    "sharp_lh28f016s_16bit",    "Sharp LH28F016S Flash (16-bit)")
 DEFINE_DEVICE_TYPE(ATMEL_29C010,             atmel_29c010_device,             "atmel_29c010",             "Atmel 29C010 Flash")
+DEFINE_DEVICE_TYPE(ATMEL_29C020,             atmel_29c020_device,             "atmel_29c020",             "Atmel 29C020 Flash")
 DEFINE_DEVICE_TYPE(AMD_29F010,               amd_29f010_device,               "amd_29f010",               "AMD 29F010 Flash")
 DEFINE_DEVICE_TYPE(AMD_29F040,               amd_29f040_device,               "amd_29f040",               "AMD 29F040 Flash")
 DEFINE_DEVICE_TYPE(AMD_29F080,               amd_29f080_device,               "amd_29f080",               "AMD 29F080 Flash")
@@ -105,11 +108,13 @@ DEFINE_DEVICE_TYPE(MACRONIX_29F1610MC,       macronix_29f1610mc_device,       "m
 DEFINE_DEVICE_TYPE(MACRONIX_29F1610MC_16BIT, macronix_29f1610mc_16bit_device, "macronix_29f1610mc_16bit", "Macronix 29F1610MC Flash (16-bit)")
 DEFINE_DEVICE_TYPE(MACRONIX_29L001MC,        macronix_29l001mc_device,        "macronix_29l001mc",        "Macronix 29L001MC Flash")
 DEFINE_DEVICE_TYPE(MACRONIX_29LV160TMC,      macronix_29lv160tmc_device,      "macronix_29lv160tmc",      "Macronix 29LV160TMC Flash")
+DEFINE_DEVICE_TYPE(ST_M29W640GB,             st_m29w640gb_device,             "st_m29w640gb",             "ST M29W640GB Flash")
 DEFINE_DEVICE_TYPE(TMS_29F040,               tms_29f040_device,               "tms_29f040",               "Texas Instruments 29F040 Flash")
 
 DEFINE_DEVICE_TYPE(PANASONIC_MN63F805MNP,    panasonic_mn63f805mnp_device,    "panasonic_mn63f805mnp",    "Panasonic MN63F805MNP Flash")
 DEFINE_DEVICE_TYPE(SANYO_LE26FV10N1TS,       sanyo_le26fv10n1ts_device,       "sanyo_le26fv10n1ts",       "Sanyo LE26FV10N1TS Flash")
 DEFINE_DEVICE_TYPE(SST_28SF040,              sst_28sf040_device,              "sst_28sf040",              "SST 28SF040 Flash")
+DEFINE_DEVICE_TYPE(SST_39SF010,              sst_39sf010_device,              "sst_39sf010",              "SST 39SF010 Flash")
 DEFINE_DEVICE_TYPE(SST_39SF040,              sst_39sf040_device,              "sst_39sf040",              "SST 39SF040 Flash")
 DEFINE_DEVICE_TYPE(SST_39VF020,              sst_39vf020_device,              "sst_39vf020",              "SST 39VF020 Flash")
 DEFINE_DEVICE_TYPE(SST_49LF020,              sst_49lf020_device,              "sst_49lf020",              "SST 49LF020 Flash")
@@ -151,6 +156,8 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 		m_bits(bits),
 		m_addrmask(0),
 		m_device_id(device_id),
+		m_device_id2(0),
+		m_device_id3(0),
 		m_maker_id(maker_id),
 		m_sector_is_4k(false),
 		m_sector_is_16k(false),
@@ -205,6 +212,9 @@ sharp_lh28f016s_16bit_device::sharp_lh28f016s_16bit_device(const machine_config 
 atmel_29c010_device::atmel_29c010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh8_device(mconfig, ATMEL_29C010, tag, owner, clock, 0x20000, MFG_ATMEL, 0xd5) { m_page_size = 0x80; }
 
+atmel_29c020_device::atmel_29c020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: intelfsh8_device(mconfig, ATMEL_29C020, tag, owner, clock, 0x40000, MFG_ATMEL, 0xda) { m_page_size = 0x100; }
+
 atmel_49f4096_device::atmel_49f4096_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh16_device(mconfig, ATMEL_49F4096, tag, owner, clock, 0x80000, MFG_ATMEL, 0x92) { m_sector_is_16k = true; }
 
@@ -250,6 +260,9 @@ macronix_29l001mc_device::macronix_29l001mc_device(const machine_config &mconfig
 macronix_29lv160tmc_device::macronix_29lv160tmc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh8_device(mconfig, MACRONIX_29LV160TMC, tag, owner, clock, 0x20000, MFG_MACRONIX, 0x49) { m_sector_is_16k = true; }
 
+st_m29w640gb_device::st_m29w640gb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: intelfsh8_device(mconfig, ST_M29W640GB, tag, owner, clock, 0x800000, MFG_ST, 0x227e) { m_bot_boot_sector = true; m_device_id2 = 0x2210; m_device_id3 = 0x2200; }
+
 panasonic_mn63f805mnp_device::panasonic_mn63f805mnp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh8_device(mconfig, PANASONIC_MN63F805MNP, tag, owner, clock, 0x10000, MFG_PANASONIC, 0x1b) { m_sector_is_4k = true; }
 
@@ -258,6 +271,9 @@ sanyo_le26fv10n1ts_device::sanyo_le26fv10n1ts_device(const machine_config &mconf
 
 sst_28sf040_device::sst_28sf040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh8_device(mconfig, SST_28SF040, tag, owner, clock, 0x80000, MFG_SST, 0x04) { }
+
+sst_39sf010_device::sst_39sf010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: intelfsh8_device(mconfig, SST_39SF010, tag, owner, clock, 0x20000, MFG_SST, 0xb5) { m_addrmask = 0x7fff; }
 
 sst_39sf040_device::sst_39sf040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh8_device(mconfig, SST_39SF040, tag, owner, clock, 0x80000, MFG_SST, 0xb7) { m_addrmask = 0x7fff; }
@@ -326,8 +342,15 @@ void intelfsh_device::device_start()
 	m_timer = timer_alloc(FUNC(intelfsh_device::delay_tick), this);
 
 	save_item( NAME(m_status) );
+	save_item( NAME(m_erase_sector) );
 	save_item( NAME(m_flash_mode) );
 	save_item( NAME(m_flash_master_lock) );
+	save_item( NAME(m_bank) );
+	save_item( NAME(m_byte_count) );
+	save_item( NAME(m_sdp) );
+	save_item( NAME(m_write_buffer) );
+	save_item( NAME(m_write_buffer_start_address) );
+	save_item( NAME(m_write_buffer_count) );
 	save_item( NAME(m_fast_mode) );
 	save_pointer( &m_data[0], "m_data", m_size);
 }
@@ -463,6 +486,18 @@ uint32_t intelfsh_device::read_full(uint32_t address)
 				case 4: data = 0; break;
 			}
 		}
+		else if (m_maker_id == MFG_ST)
+		{
+			switch (address & 0xff)
+			{
+				case 0x00: data = m_maker_id; break;
+				case 0x02: data = m_device_id; break;
+				case 0x04: logerror("Block Protection Status not implemented.\n"); break;
+				case 0x06: logerror("Extended Memory Block Verify Code not implemented.\n"); break;
+				case 0x1c: data = m_device_id2; break;
+				case 0x1e: data = m_device_id3; break;
+			}
+		}
 		else
 		{
 			switch (address & 0xff)
@@ -574,8 +609,10 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 			m_flash_mode = FM_WRITEPART1;
 			break;
 		case 0x50:  // clear status reg
-			if ((m_maker_id == MFG_SST && m_device_id == 0x61) && (m_flash_mode == FM_NORMAL))
+			if (((m_maker_id == MFG_SST && m_device_id == 0x61) || (m_maker_id == MFG_AMD && m_device_id == 0x20)) && (m_flash_mode == FM_NORMAL))
 				logerror("Invalid flash mode byte %x\n", data & 0xff);
+			else if (m_maker_id == MFG_ST && (address & 0xfff) == 0xaaa)
+				m_flash_mode = FM_WORDPROGRAM1;
 			else
 			{
 				m_status = 0x80;
@@ -677,8 +714,9 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 		}
 		else if( ( address & 0xffff ) == 0x5555 && ( data & 0xff ) == 0xa0 )
 		{
-			if (m_maker_id == MFG_ATMEL && m_device_id == 0xd5)
+			if (m_maker_id == MFG_ATMEL && (m_device_id == 0xd5 || m_device_id == 0xda))
 			{
+				m_sdp = true;
 				m_flash_mode = FM_WRITEPAGEATMEL;
 				m_byte_count = 0;
 			}
@@ -764,6 +802,10 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 		{
 			m_flash_mode = FM_ERASEAMD3;
 		}
+		else if( ( address & m_addrmask ) == 0x2aaa && ( data & 0xff ) == 0x55 && m_addrmask )
+		{
+			m_flash_mode = FM_ERASEAMD3;
+		}
 		else
 		{
 			logerror( "unexpected %08x=%02x in FM_ERASEAMD2\n", address, data & 0xff );
@@ -839,7 +881,13 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 			}
 			else if(m_bot_boot_sector && address < (64*1024))
 			{
-				if (address < (16*1024))
+				if (m_maker_id == MFG_ST)
+				{
+					memset(&m_data[base & ~0x1fff], 0xff, 8 * 1024);
+					m_erase_sector = address & ((m_bits == 16) ? ~0xfff : ~0x1fff);
+					m_timer->adjust(attotime::from_msec(250));
+				}
+				else if (address < (16*1024))
 				{
 					memset(&m_data[base & ~0x3fff], 0xff, 16 * 1024);
 					m_erase_sector = address & ((m_bits == 16) ? ~0x1fff : ~0x3fff);
@@ -885,6 +933,12 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 			m_status = 1 << 3;
 			m_flash_mode = FM_ERASEAMD4;
 		}
+		else if ((data & 0xff) == 0x20 && m_maker_id == MFG_ATMEL && (m_device_id == 0xd5 || m_device_id == 0xda))
+		{
+			m_sdp = false;
+			m_flash_mode = FM_WRITEPAGEATMEL;
+			m_byte_count = 0;
+		}
 		else
 		{
 			logerror( "unexpected %08x=%02x in FM_ERASEAMD3\n", address, data & 0xff );
@@ -912,6 +966,40 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 		}
 		m_flash_mode = FM_NORMAL;
 		break;
+	case FM_WORDPROGRAM1:
+		switch(m_bits)
+		{
+		case 8:
+			m_data[address] = data;
+			break;
+		case 16:  // 16bit mode not tested
+			logerror("16-bit mode word programming not tested.\n");
+			m_data[address*2] = data >> 8;
+			m_data[address*2+1] = data;
+			break;
+		default:
+			logerror("FM_WORDPROGRAM not supported when m_bits == %d (address %08x data %04x)\n", m_bits, address, data);
+			break;
+		}
+		m_flash_mode = FM_WORDPROGRAM2;
+		break;
+	case FM_WORDPROGRAM2:
+		switch(m_bits)
+		{
+		case 8:
+			m_data[address] = data;
+			break;
+		case 16:
+			logerror("16-bit mode word programming not tested.\n");
+			m_data[address*2] = data >> 8;
+			m_data[address*2+1] = data;
+			break;
+		default:
+			logerror("FM_WORDPROGRAM not supported when m_bits == %d (address %08x data %04x)\n", m_bits, address, data);
+			break;
+		}
+		m_flash_mode = FM_NORMAL;
+		break;
 	case FM_WRITEPART1:
 		switch( m_bits )
 		{
@@ -933,25 +1021,35 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 			m_flash_mode = FM_READSTATUS;
 		break;
 	case FM_WRITEPAGEATMEL:
-		switch( m_bits )
+		if (m_byte_count == 0 && !m_sdp && (address & 0xfff) == 0x555 && (data & 0xff) == 0xaa)
 		{
-		case 8:
-			m_data[address] = data;
-			break;
-		case 16:
-			m_data[address*2] = data >> 8;
-			m_data[address*2+1] = data;
-			break;
-		default:
-			logerror( "FM_WRITEPAGEATMEL not supported when m_bits == %d\n", m_bits );
-			break;
+			m_flash_mode = FM_READAMDID1;
 		}
-
-		m_byte_count++;
-
-		if (m_byte_count == m_page_size)
+		else
 		{
-			m_flash_mode = FM_NORMAL;
+			switch( m_bits )
+			{
+			case 8:
+				m_data[address] = data;
+				break;
+			case 16:
+				m_data[address*2] = data >> 8;
+				m_data[address*2+1] = data;
+				break;
+			default:
+				logerror( "FM_WRITEPAGEATMEL not supported when m_bits == %d\n", m_bits );
+				break;
+			}
+
+			m_byte_count++;
+
+			if (m_byte_count == m_page_size)
+			{
+				if (m_sdp)
+					m_flash_mode = FM_NORMAL;
+
+				m_byte_count = 0;
+			}
 		}
 		break;
 	case FM_CLEARPART1:

@@ -239,13 +239,18 @@ void ata_hle_device_base::finished_command()
 	}
 }
 
+void ata_hle_device_base::clear_dma_modes()
+{
+	m_identify_buffer[62] &= 0xff;
+	m_identify_buffer[63] &= 0xff;
+	m_identify_buffer[88] &= 0xff;
+}
+
 bool ata_hle_device_base::set_dma_mode(int word)
 {
 	if ((m_identify_buffer[word] >> (m_sector_count & 7)) & 1)
 	{
-		m_identify_buffer[62] &= 0xff;
-		m_identify_buffer[63] &= 0xff;
-		m_identify_buffer[88] &= 0xff;
+		clear_dma_modes();
 
 		m_identify_buffer[word] |= 0x100 << (m_sector_count & 7);
 		return true;
@@ -285,6 +290,7 @@ bool ata_hle_device_base::set_features()
 			default:
 				if ((m_identify_buffer[64] >> ((m_sector_count & 7) - 3)) & 1)
 				{
+					clear_dma_modes();
 					return true;
 				}
 			}
@@ -541,7 +547,8 @@ uint16_t ata_hle_device_base::command_r(offs_t offset)
 	{
 		if (m_dmack)
 		{
-			logerror( "%s: %s dev %d read_cs0 %04x ignored (DMACK)\n", machine().describe_context(), tag(), dev(), offset );
+			if (!machine().side_effects_disabled())
+				logerror( "%s: %s dev %d read_cs0 %04x ignored (DMACK)\n", machine().describe_context(), tag(), dev(), offset );
 		}
 		else if ((m_status & IDE_STATUS_BSY) && offset != IDE_CS0_STATUS_R)
 		{
@@ -552,7 +559,8 @@ uint16_t ata_hle_device_base::command_r(offs_t offset)
 				switch (offset)
 				{
 					case IDE_CS0_DATA_RW:
-						logerror( "%s: %s dev %d read_cs0 %04x ignored (BSY)\n", machine().describe_context(), tag(), dev(), offset );
+						if (!machine().side_effects_disabled())
+							logerror( "%s: %s dev %d read_cs0 %04x ignored (BSY)\n", machine().describe_context(), tag(), dev(), offset );
 						break;
 
 					default:
@@ -575,11 +583,15 @@ uint16_t ata_hle_device_base::command_r(offs_t offset)
 					{
 						if (!(m_status & IDE_STATUS_DRQ))
 						{
-							logerror( "%s: %s dev %d read_cs0 ignored (!DRQ)\n", machine().describe_context(), tag(), dev() );
+							if (!machine().side_effects_disabled())
+								logerror( "%s: %s dev %d read_cs0 ignored (!DRQ)\n", machine().describe_context(), tag(), dev() );
 						}
 						else
 						{
-							result = read_data();
+							if (!machine().side_effects_disabled())
+								result = read_data();
+							else
+								result = 0;
 						}
 					}
 					else
@@ -637,7 +649,8 @@ uint16_t ata_hle_device_base::command_r(offs_t offset)
 
 				/* log anything else */
 				default:
-					logerror("%s:unknown IDE cs0 read at %03X\n", machine().describe_context(), offset);
+					if (!machine().side_effects_disabled())
+						logerror("%s:unknown IDE cs0 read at %03X\n", machine().describe_context(), offset);
 					break;
 			}
 		}
@@ -645,6 +658,7 @@ uint16_t ata_hle_device_base::command_r(offs_t offset)
 
 	/* logit */
 //  if (offset != IDE_CS0_DATA_RW && offset != IDE_CS0_STATUS_R)
+	if (!machine().side_effects_disabled())
 		LOG(("%s:IDE cs0 read %X at %X (err: %X)\n", machine().describe_context(), result, offset, m_error));
 
 	/* return the result */
@@ -656,6 +670,7 @@ uint16_t ata_hle_device_base::control_r(offs_t offset)
 {
 	/* logit */
 //  if (offset != IDE_CS1_ALTERNATE_STATUS_R)
+	if (!machine().side_effects_disabled())
 		LOG(("%s:IDE cs1 read at %X\n", machine().describe_context(), offset));
 
 	uint16_t result = 0xffff;
@@ -664,7 +679,8 @@ uint16_t ata_hle_device_base::control_r(offs_t offset)
 	{
 		if (m_dmack)
 		{
-			logerror( "%s: %s dev %d read_cs1 %04x ignored (DMACK)\n", machine().describe_context(), tag(), dev(), offset );
+			if (!machine().side_effects_disabled())
+				logerror( "%s: %s dev %d read_cs1 %04x ignored (DMACK)\n", machine().describe_context(), tag(), dev(), offset );
 		}
 		else
 		{
@@ -708,7 +724,8 @@ uint16_t ata_hle_device_base::control_r(offs_t offset)
 
 				/* log anything else */
 				default:
-					logerror("%s:unknown IDE cs1 read at %03X\n", machine().describe_context(), offset);
+					if (!machine().side_effects_disabled())
+						logerror("%s:unknown IDE cs1 read at %03X\n", machine().describe_context(), offset);
 					break;
 			}
 		}

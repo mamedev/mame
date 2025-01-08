@@ -48,7 +48,7 @@ public:
 
 protected:
 	// device_t overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_sound_interface overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
@@ -159,14 +159,14 @@ public:
 	void motogonki(machine_config &config);
 
 	template <int ID> int collision_r();
-	DECLARE_CUSTOM_INPUT_MEMBER(coin_r);
+	ioport_value coin_r();
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inc);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void istrebiteli_palette(palette_device &palette) const;
@@ -203,10 +203,10 @@ private:
 	uint8_t m_tileram[16]{};
 	uint8_t m_road_scroll = 0;
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
-	void moto_io_map(address_map &map);
-	void moto_mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
+	void moto_io_map(address_map &map) ATTR_COLD;
+	void moto_mem_map(address_map &map) ATTR_COLD;
 };
 
 void istrebiteli_state::machine_start()
@@ -482,7 +482,7 @@ int istrebiteli_state::collision_r()
 	return m_spr_collision[ID];
 }
 
-CUSTOM_INPUT_MEMBER(istrebiteli_state::coin_r)
+ioport_value istrebiteli_state::coin_r()
 {
 	return coin_count;
 }
@@ -500,7 +500,7 @@ static INPUT_PORTS_START( istreb )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_PLAYER(1)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_PLAYER(1)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(1)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(istrebiteli_state, collision_r<1>)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(istrebiteli_state::collision_r<1>))
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
@@ -510,19 +510,19 @@ static INPUT_PORTS_START( istreb )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_PLAYER(2)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_PLAYER(2)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(2)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(istrebiteli_state, collision_r<0>)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(istrebiteli_state::collision_r<0>))
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("IN2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_START1)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_START2)
-	PORT_BIT(0x3c, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(istrebiteli_state, coin_r)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_HBLANK("screen")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_VBLANK("screen")
+	PORT_BIT(0x3c, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(istrebiteli_state::coin_r))
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::hblank))
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, istrebiteli_state,coin_inc, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(istrebiteli_state::coin_inc), 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( moto )
@@ -539,8 +539,8 @@ static INPUT_PORTS_START( moto )
 	PORT_START("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_START1)  // coin, TODO check why it is locked
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON5) // collision ?
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_HBLANK("screen") // guess, seems unused
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_VBLANK("screen")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::hblank)) // guess, seems unused
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 INPUT_PORTS_END
 
 static const gfx_layout char_layout =

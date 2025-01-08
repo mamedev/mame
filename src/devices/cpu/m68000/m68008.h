@@ -27,7 +27,7 @@ public:
 	void set_current_mmu(mmu8 *m);
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 protected:
 	// Typed constructor
@@ -67,7 +67,7 @@ public:
 	virtual u32 execute_max_cycles() const noexcept override { return 158; }
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(M68008, m68008_device)

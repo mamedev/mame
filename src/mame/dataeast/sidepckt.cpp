@@ -166,10 +166,10 @@ public:
 	void sidepcktb(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
-	void bootleg_main_map(address_map &map);
+	void bootleg_main_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 
@@ -199,7 +199,7 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 
-	void sound_map(address_map &map);
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 class sidepckt_mcu_state : public sidepckt_state
@@ -213,7 +213,7 @@ public:
 	void sidepckt(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<i8751_device> m_mcu;
@@ -229,7 +229,7 @@ private:
 	uint8_t mcu_p2_r();
 	void mcu_p3_w(uint8_t data);
 
-	void original_main_map(address_map &map);
+	void original_main_map(address_map &map) ATTR_COLD;
 };
 
 

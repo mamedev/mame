@@ -34,13 +34,13 @@ protected:
 
 	void tunit_core(machine_config &config);
 
-	void machine_start() override;
+	void machine_start() override ATTR_COLD;
 
 	void cmos_enable_w(uint16_t data);
 	void cmos_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t cmos_r(offs_t offset);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	required_device<tms340x0_device> m_maincpu;
 	required_device<midtunit_video_device> m_video;
@@ -69,8 +69,8 @@ public:
 	void init_jdreddp();
 
 protected:
-	void machine_start() override;
-	void machine_reset() override;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 
 private:
 	uint16_t sound_state_r();
@@ -87,7 +87,7 @@ private:
 
 	void init_nbajam_common(int te_protection);
 
-	void main_adpcm_map(address_map &map);
+	void main_adpcm_map(address_map &map) ATTR_COLD;
 
 	required_device<williams_adpcm_sound_device> m_adpcm_sound;
 
@@ -120,8 +120,8 @@ public:
 	void init_mk2();
 
 protected:
-	void machine_start() override;
-	void machine_reset() override;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 
 private:
 	uint16_t dcs_state_r();
@@ -133,7 +133,7 @@ private:
 	uint16_t mk2_prot_shift_r();
 	void mk2_prot_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	void mk2_map(address_map &map);
+	void mk2_map(address_map &map) ATTR_COLD;
 
 	required_device<dcs_audio_device> m_dcs;
 

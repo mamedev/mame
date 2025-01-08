@@ -58,6 +58,7 @@ const options_entry osd_options::s_option_entries[] =
 
 	{ nullptr,                                   nullptr,          core_options::option_type::HEADER,    "OSD DEBUGGING OPTIONS" },
 	{ OSDOPTION_DEBUGGER,                        OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "debugger used: " },
+	{ OSDOPTION_DEBUGGER_HOST,                   "localhost",      core_options::option_type::STRING,    "address to bind to for gdbstub debugger" },
 	{ OSDOPTION_DEBUGGER_PORT,                   "23946",          core_options::option_type::INTEGER,   "port to use for gdbstub debugger" },
 	{ OSDOPTION_DEBUGGER_FONT ";dfont",          OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "font to use for debugger views" },
 	{ OSDOPTION_DEBUGGER_FONT_SIZE ";dfontsize", "0",              core_options::option_type::FLOAT,     "font size to use for debugger views" },
@@ -781,3 +782,9 @@ std::unique_ptr<osd::midi_output_port> osd_common_t::create_midi_output(std::str
 {
 	return m_midi->create_output(name);
 }
+
+std::vector<osd::midi_port_info> osd_common_t::list_midi_ports()
+{
+	return m_midi->list_midi_ports();
+}
+

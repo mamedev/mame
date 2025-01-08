@@ -361,11 +361,11 @@ void simple_menu_select_game::custom_render(uint32_t flags, void *selectedref, f
 
 			// next line is overall driver status
 			if (m_cached_flags & machine_flags::NOT_WORKING)
-				tempbuf[3] = _("Overall: NOT WORKING");
+				tempbuf[3] = _("Status: NOT WORKING");
 			else if ((m_cached_unemulated | m_cached_imperfect) & device_t::feature::PROTECTION)
-				tempbuf[3] = _("Overall: Unemulated Protection");
+				tempbuf[3] = _("Status: Unemulated Protection");
 			else
-				tempbuf[3] = _("Overall: Working");
+				tempbuf[3] = _("Status: Working");
 
 			// next line is graphics, sound status
 			if (m_cached_unemulated & device_t::feature::GRAPHICS)

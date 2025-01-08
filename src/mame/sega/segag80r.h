@@ -158,8 +158,8 @@ private:
 	TILE_GET_INFO_MEMBER(spaceod_get_tile_info);
 	TILEMAP_MAPPER_MEMBER(spaceod_scan_rows);
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update_segag80r(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(segag80r_vblank_start);
 	IRQ_CALLBACK_MEMBER(segag80r_irq_ack);
@@ -179,13 +179,13 @@ private:
 	inline uint8_t demangle(uint8_t d7d6, uint8_t d5d4, uint8_t d3d2, uint8_t d1d0);
 	void monsterb_expand_gfx(const char *region);
 
-	void g80r_opcodes_map(address_map &map);
-	void main_map(address_map &map);
-	void main_portmap(address_map &map);
-	void main_ppi8255_portmap(address_map &map);
-	void sega_315_opcodes_map(address_map &map);
-	void sindbadm_portmap(address_map &map);
-	void sindbadm_sound_map(address_map &map);
+	void g80r_opcodes_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void main_portmap(address_map &map) ATTR_COLD;
+	void main_ppi8255_portmap(address_map &map) ATTR_COLD;
+	void sega_315_opcodes_map(address_map &map) ATTR_COLD;
+	void sindbadm_portmap(address_map &map) ATTR_COLD;
+	void sindbadm_sound_map(address_map &map) ATTR_COLD;
 
 	emu_timer *m_vblank_latch_clear_timer = nullptr;
 };
@@ -205,7 +205,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;

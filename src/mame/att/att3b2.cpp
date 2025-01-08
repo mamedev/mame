@@ -30,8 +30,8 @@ public:
 	void att3b2v3(machine_config &config);
 
 private:
-	void mem_map_300(address_map &map);
-	void mem_map_600(address_map &map);
+	void mem_map_300(address_map &map) ATTR_COLD;
+	void mem_map_600(address_map &map) ATTR_COLD;
 
 	required_device<we32100_device> m_maincpu;
 };
@@ -136,7 +136,7 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1984, 3b2_300, 0,       0, att3b2v2, att3b2, att3b2_state, empty_init, "AT&T", "3B2/300", MACHINE_IS_SKELETON)
-COMP(1985, 3b2_310, 3b2_300, 0, att3b2v2, att3b2, att3b2_state, empty_init, "AT&T", "3B2/310", MACHINE_IS_SKELETON)
-COMP(1985, 3b2_400, 3b2_300, 0, att3b2v2, att3b2, att3b2_state, empty_init, "AT&T", "3B2/400", MACHINE_IS_SKELETON)
-COMP(1987, 3b2_600, 0,       0, att3b2v3, att3b2, att3b2_state, empty_init, "AT&T", "3B2/600", MACHINE_IS_SKELETON)
+COMP(1984, 3b2_300, 0,       0, att3b2v2, att3b2, att3b2_state, empty_init, "AT&T", "3B2/300", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP(1985, 3b2_310, 3b2_300, 0, att3b2v2, att3b2, att3b2_state, empty_init, "AT&T", "3B2/310", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP(1985, 3b2_400, 3b2_300, 0, att3b2v2, att3b2, att3b2_state, empty_init, "AT&T", "3B2/400", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP(1987, 3b2_600, 0,       0, att3b2v3, att3b2, att3b2_state, empty_init, "AT&T", "3B2/600", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

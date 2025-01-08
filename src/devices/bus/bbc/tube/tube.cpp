@@ -10,7 +10,6 @@
 #include "tube.h"
 
 
-
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
@@ -42,12 +41,12 @@ device_bbc_tube_interface::device_bbc_tube_interface(const machine_config &mconf
 //  bbc_tube_slot_device - constructor
 //-------------------------------------------------
 
-bbc_tube_slot_device::bbc_tube_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, BBC_TUBE_SLOT, tag, owner, clock),
-	device_single_card_slot_interface<device_bbc_tube_interface>(mconfig, *this),
-	m_card(nullptr),
-	m_irq_handler(*this),
-	m_insert_rom(true)
+bbc_tube_slot_device::bbc_tube_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, BBC_TUBE_SLOT, tag, owner, clock)
+	, device_single_card_slot_interface<device_bbc_tube_interface>(mconfig, *this)
+	, m_card(nullptr)
+	, m_irq_handler(*this)
+	, m_insert_rom(true)
 {
 }
 
@@ -84,6 +83,28 @@ void bbc_tube_slot_device::host_w(offs_t offset, uint8_t data)
 		m_card->host_w(offset, data);
 }
 
+//-------------------------------------------------
+//  jim_r
+//-------------------------------------------------
+
+uint8_t bbc_tube_slot_device::jim_r(offs_t offset)
+{
+	if (m_card)
+		return m_card->jim_r(offset);
+	else
+		return 0xff;
+}
+
+//-------------------------------------------------
+//  jim_w
+//-------------------------------------------------
+
+void bbc_tube_slot_device::jim_w(offs_t offset, uint8_t data)
+{
+	if (m_card)
+		m_card->jim_w(offset, data);
+}
+
 
 // slot devices
 #include "tube_32016.h"
@@ -95,6 +116,7 @@ void bbc_tube_slot_device::host_w(offs_t offset, uint8_t data)
 #include "tube_arm7.h"
 #include "tube_casper.h"
 #include "tube_cms6809.h"
+#include "tube_matchbox.h"
 //#include "tube_pmsb2p.h"
 #include "tube_rc6502.h"
 #include "tube_x25.h"
@@ -123,6 +145,7 @@ void bbc_tube_devices(device_slot_interface &device)
 	device.option_add("casper", BBC_TUBE_CASPER);  /* Casper 68000 2nd Processor */
 	//device.option_add("cms6502", BBC_TUBE_CMS6502); /* CMS 6502 2nd processor */
 	device.option_add("cms6809", BBC_TUBE_CMS6809); /* CMS 6809 2nd processor */
+	device.option_add("matchbox", BBC_TUBE_MATCHBOX); /* Matchbox Co-Processor */
 	//device.option_add("pmsb2p", BBC_TUBE_PMSB2P);  /* PMS B2P-6502 */
 	device.option_add("pcplus", BBC_TUBE_PCPLUS);  /* Solidisk PC-Plus co-processor */
 	device.option_add("x25",    BBC_TUBE_X25);     /* Econet X25 Gateway */
@@ -153,6 +176,7 @@ void bbc_extube_devices(device_slot_interface &device)
 	device.option_add("32016l", BBC_TUBE_32016L);   /* Acorn Large 32016 2nd processor */
 	device.option_add("arm",    BBC_TUBE_ARM);      /* Acorn ANC13 ARM Evaluation System */
 	device.option_add("80286",  BBC_TUBE_80286);    /* Acorn 80286 2nd Processor */
+	device.option_add("matchbox", BBC_TUBE_MATCHBOX); /* Matchbox Co-Processor */
 	device.option_add("pcplus", BBC_TUBE_PCPLUS);   /* Solidisk PC-Plus co-processor */
 	device.option_add("a500",   BBC_TUBE_A500);     /* Acorn A500 2nd Processor */
 	device.option_add("a500d",  BBC_TUBE_A500D);    /* Acorn A500 (Dual MEMC) 2nd Processor */
@@ -198,6 +222,7 @@ void electron_tube_devices(device_slot_interface &device)
 	device.option_add("80186",  BBC_TUBE_80186);   /* Acorn ADC08 80186 co-processor */
 	device.option_add("a500",   BBC_TUBE_A500);    /* Acorn A500 2nd Processor */
 	device.option_add("a500d",  BBC_TUBE_A500D);   /* Acorn A500 (Dual MEMC) 2nd Processor */
+	device.option_add("matchbox", BBC_TUBE_MATCHBOX); /* Matchbox Co-Processor */
 	device.option_add("pcplus", BBC_TUBE_PCPLUS);  /* Solidisk PC-Plus co-processor */
 	device.option_add("arm7",   BBC_TUBE_ARM7);    /* Sprow ARM7 co-processor */
 	device.option_add("rc6502", BBC_TUBE_RC6502);  /* ReCo6502 (6502) */

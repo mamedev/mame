@@ -50,8 +50,8 @@ public:
 	void chaos(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u8 port1e_r();
@@ -59,9 +59,9 @@ private:
 	u8 port90_r();
 	u8 port91_r();
 	void kbd_put(u8 data);
-	void data_map(address_map &map);
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void data_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 	u8 m_term_data = 0U;
 	required_device<generic_terminal_device> m_terminal;
 	required_shared_ptr<u8> m_p_ram;

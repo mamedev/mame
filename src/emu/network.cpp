@@ -88,9 +88,10 @@ void network_manager::config_save(config_type cfg_type, util::xml::data_node *pa
 				node->set_attribute("tag", network.device().tag());
 				node->set_attribute_int("interface", network.get_interface());
 				const std::array<u8, 6> &mac = network.get_mac();
-				char mac_addr[6 * 3];
-				sprintf(mac_addr, "%02x:%02x:%02x:%02x:%02x:%02x", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
-				node->set_attribute("mac", mac_addr);
+				const std::string mac_addr = util::string_format(
+						"%02x:%02x:%02x:%02x:%02x:%02x",
+						mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+				node->set_attribute("mac", mac_addr.c_str());
 			}
 		}
 	}

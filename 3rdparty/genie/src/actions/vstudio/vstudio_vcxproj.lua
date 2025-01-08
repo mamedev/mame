@@ -66,13 +66,6 @@
 		else
 			_p(2, '<Keyword>Win32Proj</Keyword>')
 		end
-		if _ACTION:sub(3) == "2015" or _ACTION:sub(3) == "2017" or _ACTION:sub(3) == "2019" or _ACTION:sub(3) == "llvm" then
-			_p(2,'<PreferredToolArchitecture>x64</PreferredToolArchitecture>')
-		end
-		if (_ACTION:sub(3) == "2017" or _ACTION:sub(3) == "llvm")
-		and os.isdir(path.join(os.getenv("VSINSTALLDIR"), "VC/Tools/MSVC/14.14.26428")) then
-			_p(2,'<VCToolsVersion>14.14.26428</VCToolsVersion>')
-		end
 
 		if not vstudio.xpwarning then
 			_p(2, '<XPDeprecationWarning>false</XPDeprecationWarning>')
@@ -123,7 +116,8 @@
 			, premake.esc(cfginfo.name))
 
 		local is2019 = premake.action.current() == premake.action.get("vs2019")
-		if is2019 then
+		local is2022 = premake.action.current() == premake.action.get("vs2022")
+		if is2019 or is2022 then
 		    _p(2, '<VCProjectVersion>%s</VCProjectVersion>', action.vstudio.toolsVersion)
 			if cfg.flags.UnitySupport then
 			    _p(2, '<EnableUnitySupport>true</EnableUnitySupport>')
@@ -135,14 +129,6 @@
 
 		if os.is64bit() then
 			_p(2, '<PreferredToolArchitecture>x64</PreferredToolArchitecture>')
-		end
-
-		if cfg.flags.MFC then
-			_p(2,'<UseOfMfc>%s</UseOfMfc>', iif(cfg.flags.StaticRuntime, "Static", "Dynamic"))
-		end
-
-		if cfg.flags.ATL or cfg.flags.StaticATL then
-			_p(2,'<UseOfAtl>%s</UseOfAtl>', iif(cfg.flags.StaticATL, "Static", "Dynamic"))
 		end
 
 		if cfg.flags.Unicode then
@@ -201,7 +187,8 @@
 			if #cfg.propertysheets > 0 then
 				local dirs = cfg.propertysheets
 				for _, dir in ipairs(dirs) do
-					_p(2,'<Import Project="%s" />', path.translate(dir))
+					local translated = path.translate(dir)
+					_p(2,'<Import Project="%s" Condition="exists(\'%s\')" />', translated, translated)
 				end
 			end
 
@@ -245,6 +232,14 @@
 				_p(2,'<IgnoreImportLibrary>%s</IgnoreImportLibrary>', tostring(ignore))
 			end
 
+			if cfg.platform == "NX32" or cfg.platform == "NX64" then
+				if cfg.flags.Cpp17 then
+					_p(2,'<CppLanguageStandard>Gnu++17</CppLanguageStandard>')
+				elseif cfg.flags.Cpp20 then
+					_p(2,'<CppLanguageStandard>Gnu++20</CppLanguageStandard>')
+				end
+			end
+
 			if cfg.platform == "Durango" then
 				_p(2, '<ReferencePath>$(Console_SdkLibPath);$(Console_SdkWindowsMetadataPath)</ReferencePath>')
 				_p(2, '<LibraryPath>$(Console_SdkLibPath)</LibraryPath>')
@@ -264,6 +259,19 @@
 
 				_p(2, '<LayoutExtensionFilter>*.pdb;*.ilk;*.exp;*.lib;*.winmd;*.appxrecipe;*.pri;*.idb</LayoutExtensionFilter>')
 				_p(2, '<IsolateConfigurationsOnDeploy>true</IsolateConfigurationsOnDeploy>')
+			end
+
+			if vstudio.isgdkconsole(cfg) then
+				_p(2, '<ExecutablePath>$(Console_SdkRoot)bin;$(Console_SdkToolPath);$(ExecutablePath)</ExecutablePath>')
+				_p(2, '<IncludePath>$(Console_SdkIncludeRoot)</IncludePath>')
+				_p(2, '<ReferencePath>$(Console_SdkLibPath);$(Console_SdkWindowsMetadataPath)</ReferencePath>')
+				_p(2, '<LibraryPath>$(Console_SdkLibPath)</LibraryPath>')
+				_p(2, '<LibraryWPath>$(Console_SdkLibPath);$(Console_SdkWindowsMetadataPath)</LibraryWPath>')
+			end
+
+			if vstudio.isgdkdesktop(cfg) then
+				_p(2, '<IncludePath>$(Console_SdkIncludeRoot);$(IncludePath)</IncludePath>')
+				_p(2, '<LibraryPath>$(Console_SdkLibPath);$(LibraryPath)</LibraryPath>')
 			end
 
 			if cfg.kind ~= "StaticLib" then
@@ -333,6 +341,13 @@
 		end
 	end
 
+	local function include_resdirs(indent,cfg)
+		if #cfg.resincludedirs> 0 then
+			_p(indent,'<AdditionalIncludeDirectories>%s;%%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>'
+					,premake.esc(path.translate(table.concat(cfg.resincludedirs, ";"), '\\')))
+		end
+	end
+
 	local function using_dirs(indent,cfg)
 		if #cfg.usingdirs > 0 then
 			_p(indent,'<AdditionalUsingDirectories>%s;%%(AdditionalUsingDirectories)</AdditionalUsingDirectories>'
@@ -343,15 +358,17 @@
 	local function resource_compile(cfg)
 		_p(2,'<ResourceCompile>')
 			preprocessor(3,cfg,true)
-			include_dirs(3,cfg)
+			include_resdirs(3,cfg)
 		_p(2,'</ResourceCompile>')
 
 	end
 
-	local function cppstandard_vs2017_or_2019(cfg)
+	local function cppstandard(cfg)
 		if cfg.flags.CppLatest then
 			_p(3, '<LanguageStandard>stdcpplatest</LanguageStandard>')
 			_p(3, '<EnableModules>true</EnableModules>')
+		elseif cfg.flags.Cpp20 then
+			_p(3, '<LanguageStandard>stdcpp20</LanguageStandard>')
 		elseif cfg.flags.Cpp17 then
 			_p(3, '<LanguageStandard>stdcpp17</LanguageStandard>')
 		elseif cfg.flags.Cpp14 then
@@ -367,6 +384,12 @@
 		elseif cfg.platform == "TegraAndroid" then
 			if cfg.flags.NoExceptions then
 				_p(3, '<GccExceptionHandling>false</GccExceptionHandling>')
+			end
+		elseif cfg.platform == "NX32" or cfg.platform == "NX64" then
+			if cfg.flags.NoExceptions then
+				_p(3, '<CppExceptions>false</CppExceptions>')
+			else
+				_p(3, '<CppExceptions>true</CppExceptions>')
 			end
 		else
 			if cfg.flags.NoExceptions then
@@ -419,6 +442,10 @@
 			end
 		elseif cfg.platform == "TegraAndroid" then
 			-- TODO: tegra setting
+		elseif cfg.platform == "NX32" or cfg.platform == "NX64" then
+			if cfg.flags.FloatFast then
+				_p(3, '<FastMath>true</FastMath>')
+			end
 		else
 			if cfg.flags.FloatFast then
 				_p(3,'<FloatingPointModel>Fast</FloatingPointModel>')
@@ -487,6 +514,11 @@
 			_p(3,'<GenerateDebugInformation>%s</GenerateDebugInformation>', tostring(cfg.flags.Symbols ~= nil))
 		end
 
+		if cfg.platform == "NX32" or cfg.platform == "NX64" then
+			unsignedChar = "-funsigned-char ";
+			_p(3,'<GenerateDebugInformation>%s</GenerateDebugInformation>', tostring(cfg.flags.Symbols ~= nil))
+		end
+
 		if cfg.language == "C" and not cfg.options.ForceCPP then
 			buildoptions = table.join(buildoptions, cfg.buildoptions_c)
 		else
@@ -518,6 +550,17 @@
 				_p(3,'<OptimizationLevel>Level2</OptimizationLevel>')
 			end
 		elseif cfg.platform == "TegraAndroid" then
+			local opt = optimisation(cfg)
+			if opt == "Disabled" then
+				_p(3,'<OptimizationLevel>O0</OptimizationLevel>')
+			elseif opt == "MinSpace" then
+				_p(3,'<OptimizationLevel>Os</OptimizationLevel>')
+			elseif opt == "MaxSpeed" then
+				_p(3,'<OptimizationLevel>O3</OptimizationLevel>')
+			else
+				_p(3,'<OptimizationLevel>O2</OptimizationLevel>')
+			end
+		elseif cfg.platform == "NX32" or cfg.platform == "NX64" then
 			local opt = optimisation(cfg)
 			if opt == "Disabled" then
 				_p(3,'<OptimizationLevel>O0</OptimizationLevel>')
@@ -613,6 +656,23 @@
 			if cfg.flags.FatalWarnings then
 				_p(3, '<WarningsAsErrors>true</WarningsAsErrors>')
 			end
+		elseif cfg.platform == "NX32" or cfg.platform == "NX64" then
+			if cfg.flags.PedanticWarnings then
+				_p(3, '<Warnings>MoreWarnings</Warnings>')
+				_p(3, '<ExtraWarnings>true</ExtraWarnings>')
+			elseif cfg.flags.ExtraWarnings then
+				_p(3, '<Warnings>NormalWarnings</Warnings>')
+				_p(3, '<ExtraWarnings>true</ExtraWarnings>')
+			elseif cfg.flags.MinimumWarnings then
+				_p(3, '<Warnings>WarningsOff</Warnings>')
+				_p(3, '<ExtraWarnings>false</ExtraWarnings>')
+			else
+				_p(3, '<Warnings>NormalWarnings</Warnings>')
+				_p(3, '<ExtraWarnings>false</ExtraWarnings>')
+			end
+			if cfg.flags.FatalWarnings then
+				_p(3, '<WarningsAsErrors>true</WarningsAsErrors>')
+			end
 		else
 			if cfg.flags.PedanticWarnings then
 				_p(3, '<WarningLevel>EnableAllWarnings</WarningLevel>')
@@ -630,8 +690,9 @@
 		end
 
 		if premake.action.current() == premake.action.get("vs2017") or
-		   premake.action.current() == premake.action.get("vs2019") then
-			cppstandard_vs2017_or_2019(cfg)
+		   premake.action.current() == premake.action.get("vs2019") or
+		   premake.action.current() == premake.action.get("vs2022") then
+			cppstandard(cfg)
 		end
 
 		exceptions(cfg)
@@ -641,10 +702,6 @@
 		sse(cfg)
 		floating_point(cfg)
 		debug_info(cfg)
-
-		if _ACTION:sub(3) == "llvm" then
-			_p(3,'<SupportJustMyCode>false</SupportJustMyCode>')
-		end
 
 		if cfg.flags.Symbols then
 			-- The compiler pdb should be different than the linker pdb, and
@@ -727,16 +784,13 @@
 		end
 	end
 
-	local function item_def_lib(prj, cfg)
+	local function item_def_lib(cfg)
 		-- The Xbox360 project files are stored in another place in the project file.
 		if cfg.kind == 'StaticLib' and cfg.platform ~= "Xbox360" then
 			_p(1,'<Lib>')
 				_p(2,'<OutputFile>$(OutDir)%s</OutputFile>',cfg.buildtarget.name)
 				additional_options(2,cfg)
 				link_target_machine(2,cfg)
-				if _ACTION:sub(3) == "llvm" and prj.name == "portaudio" then -- MSVC-LLVM needs special help
-					_p(2,'<AdditionalDependencies>ksuser.lib;%%(AdditionalDependencies)</AdditionalDependencies>')
-				end
 			_p(1,'</Lib>')
 		end
 	end
@@ -833,7 +887,7 @@
 			-- _WIN64:  For 64-bit platforms
 			-- _EXPORT: `EXPORT` for shared libraries, empty for other project kinds
 			table.insertflat(defines, iif(premake.config.isdebugbuild(cfg), "_DEBUG", {}))
-			table.insert(defines, iif(cfg.platform == "x64", "_WIN64", "_WIN32"))
+			table.insert(defines, iif(cfg.platform == "x64" or cfg.platform == "ARM64", "_WIN64", "_WIN32"))
 			table.insert(defines, iif(prj.kind == "SharedLib", "_EXPORT=EXPORT", "_EXPORT="))
 
 			_p(3, '<PreprocessorDefinitions>%s;%%(PreprocessorDefinitions)</PreprocessorDefinitions>'
@@ -878,12 +932,12 @@
 	function vc2010.link(cfg)
 		local vs2017OrLater = premake.action.current() == premake.action.get("vs2017") or
 		    premake.action.current() == premake.action.get("vs2019")
-		local vsllvm = premake.action.current() == premake.action.get("vsllvm")
 		local links  = getcfglinks(cfg)
 
 		_p(2,'<Link>')
 		_p(3,'<SubSystem>%s</SubSystem>', iif(cfg.kind == "ConsoleApp", "Console", "Windows"))
-		if (vs2017OrLater or vsllvm) and cfg.flags.FullSymbols then
+
+		if vs2017OrLater and cfg.flags.FullSymbols then
 			_p(3,'<GenerateDebugInformation>DebugFull</GenerateDebugInformation>')
 		else
 			_p(3,'<GenerateDebugInformation>%s</GenerateDebugInformation>', tostring(cfg.flags.Symbols ~= nil))
@@ -1019,15 +1073,18 @@
 				deps = "-Wl,--start-group;" .. deps .. ";-Wl,--end-group"
 			end
 
-			_p(tab, '<AdditionalDependencies>%s;%s</AdditionalDependencies>'
-				, deps
-				, iif(cfg.platform == "Durango"
-					, '%(XboxExtensionsDependencies)'
-					, '%(AdditionalDependencies)'
-					)
-				)
+			local adddeps =
+				  iif(cfg.platform == "Durango",       '%(XboxExtensionsDependencies)'
+				, iif(vstudio.isgdkconsole(cfg),       '$(Console_Libs);%(XboxExtensionsDependencies);%(AdditionalDependencies)'
+				, iif(vstudio.isgdkdesktop(cfg),       '$(Console_Libs);%(AdditionalDependencies)'
+				,                                      '%(AdditionalDependencies)')))
+			_p(tab, '<AdditionalDependencies>%s;%s</AdditionalDependencies>', deps, adddeps)
 		elseif cfg.platform == "Durango" then
 			_p(tab, '<AdditionalDependencies>%%(XboxExtensionsDependencies)</AdditionalDependencies>')
+		elseif vstudio.isgdkconsole(cfg) then
+			_p(tab, '<AdditionalDependencies>$(Console_Libs);%%(XboxExtensionsDependencies);%%(AdditionalDependencies)</AdditionalDependencies>')
+		elseif vstudio.isgdkdesktop(cfg) then
+			_p(tab, '<AdditionalDependencies>$(Console_Libs);%%(AdditionalDependencies)</AdditionalDependencies>')
 		end
 	end
 
@@ -1082,7 +1139,7 @@
 					,premake.esc(cfginfo.name))
 				vs10_clcompile(cfg)
 				resource_compile(cfg)
-				item_def_lib(prj, cfg)
+				item_def_lib(cfg)
 				vc2010.link(cfg)
 				ant_build(prj, cfg)
 				event_hooks(cfg)
@@ -1091,7 +1148,6 @@
 			_p(1,'</ItemDefinitionGroup>')
 		end
 	end
-
 
 --
 -- Retrieve a list of files for a particular build group, like
