@@ -708,7 +708,10 @@ ROM_START( epo_doka )
 	ROM_LOAD("doka.u1", 0x000000, 0x400000, CRC(853266d2) SHA1(d4121b89ee464088951898282404e5a2b788dd69) )
 ROM_END
 
-
+ROM_START( ban_bkgj )
+	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("bkgj.u2", 0x000000, 0x400000, CRC(a59ce23c) SHA1(d2a6be9e46f3cfc3cf798bf1f76732eee909c93b) )
+ROM_END
 
 ROM_START( udance )
 	ROM_REGION(0x800000, "bios", ROMREGION_ERASE00)
@@ -830,6 +833,9 @@ CONS( 2004, maxheart, 0, 0, superxavix_i2c_24c04_4mb,    xavix_i2c,   superxavix
 
 // どこでもドラえもん 日本旅行ゲームDX体感！どこドラグランプリ！
 CONS( 2004, epo_doka, 0, 0, xavix2002_4mb,               xavix,      superxavix_state,     init_xavix, "Epoch / SSD Company LTD",  "Doraemon anywhere - Japan travel game DX experience! Where is the Dragon Grand Prix! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// Let's!TVプレイ なりきり体感 ボウケンジャー 走れ！撃て！ミッションスタート！！
+CONS( 2006, ban_bkgj, 0, 0, xavix2002_4mb,               xavix,      superxavix_state,     init_xavix, "Bandai / SSD Company LTD",  "Let's! TV Play Narikiri Experience Boukenger Run! Shoot! Mission starts!! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // それいけトーマス ソドー島のなかまたち
 CONS( 2005, tmy_thom, 0, 0, superxavix_i2c_24c04,    xavix_i2c,  superxavix_i2c_state, init_xavix, "Tomy / SSD Company LTD",   "Soreike Thomas - Sodor Tou no Nakamatachi / Thomas & Friends on the Island of Sodor (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
