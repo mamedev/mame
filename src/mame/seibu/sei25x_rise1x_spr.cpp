@@ -6,7 +6,7 @@
     Used by Seibu Kaihatsu at 1993 onward, these are has encryption function.
 
     SEI25x and RISE1x has compatible sprite format, but RISE1x has
-	expanded per-line sprite limit and different encryption method.
+    expanded per-line sprite limit and different encryption method.
     Other chip differences are still unknown.
 
     Used in:
