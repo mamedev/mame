@@ -306,6 +306,8 @@ INPUT_PORTS_END
 ROM_START( jak_spmm )
 	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP("amazingspiderman.bin", 0x000000, 0x400000, CRC(00d2a62c) SHA1(6a08760dc6dabc2aea32e6eb8b1f98e7edf60791) )
+
+	// has a HT24LC04 to store settings
 ROM_END
 
 ROM_START( smartfp )
