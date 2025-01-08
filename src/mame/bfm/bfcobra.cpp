@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Philip Bennett, Anonymous
+// copyright-holders:Philip Bennett, Paul Arnold
 /******************************************************************************
 
     Bell-Fruit Cobra I/II and Viper Hardware
@@ -2809,43 +2809,47 @@ void bfcobjam_state::bfcobjam_with_dmd(machine_config &config)
 
   Note: Two different versions of each 6809 ROM exist: standard and protocol
   It appears sets can be a combination of disk images, 6809 and Z80 ROMs!
-  
-  I have just dumped the roms from a board with the labels "95760002" and "viper".
-  The "viper" rom is the same as 9576002.bin below and 95760002 is the same
-  as inqvypp2!
-  The labels are original and don't appear to have been removed from the
-  chips before.
-  I'm unsure where 7 digit prom numbering would've come from. BFM always
-  used 8 digit numbers.
 
 ***************************************************************************/
 
+// Version 1.2
 ROM_START( inquiztr )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "inq6809", 0x08000, 0x08000, CRC(ae996600) SHA1(f360399e77b81399d910770fa8106c196f04363c) )
 
-	// 9576002.bin is Version 1.2.
-	// inqvypp2 is the attract mode rom.
 	ROM_REGION( 0x20000, "user1", 0 )
-	ROM_LOAD( "9576002.bin", 0x00000, 0x10000, CRC(5b8c8a04) SHA1(af5328fee79c370f45bff36f534aaf50964b6900) )
-	ROM_LOAD( "inqvypp2", 0x10000, 0x010000, CRC(f9cd196c) SHA1(0ac31d87462cbee6f41e19aefe740d876910bdf5) )
-
-	// 9576028.bin also identifies as Version 1.2.
-	// inqvypp2 is the attract mode rom.
-	ROM_REGION( 0x20000, "altuser1", 0 )
-	ROM_LOAD( "9576028.bin", 0x00000, 0x10000, CRC(2d85682c) SHA1(baec47bff4b8beef5afbb737dc57b22bf93ebcf8) )
-	ROM_LOAD( "inqvypp2", 0x10000, 0x010000, CRC(f9cd196c) SHA1(0ac31d87462cbee6f41e19aefe740d876910bdf5) )
-
-	// inqvypp1.bin is Version 1.1 but fails the rom check so appears to be corrupt :(
-	// inqvypp2 is the attract mode rom.
-	ROM_LOAD( "inqvypp1", 0x00000, 0x010000, CRC(9bac8c6e) SHA1(15e24d60c2f3997e637694f60daa552b22628766) )
-	ROM_LOAD( "inqvypp2", 0x10000, 0x010000, CRC(f9cd196c) SHA1(0ac31d87462cbee6f41e19aefe740d876910bdf5) )
+	ROM_LOAD( "inqvypp2", 0x00000, 0x10000, CRC(5b8c8a04) SHA1(af5328fee79c370f45bff36f534aaf50964b6900) )
+	ROM_LOAD( "9576002.bin", 0x10000, 0x010000, CRC(f9cd196c) SHA1(0ac31d87462cbee6f41e19aefe740d876910bdf5) )
 
 	ROM_REGION( 0x1c2000, "user2", 0 )
 	ROM_LOAD( "inqdisk.img", 0x000000, 0x1c2000, NO_DUMP )
 ROM_END
 
+// Alternate Version 1.2 
+ROM_START( inquiztra )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "inq6809", 0x08000, 0x08000, CRC(ae996600) SHA1(f360399e77b81399d910770fa8106c196f04363c) )
 
+	ROM_REGION( 0x20000, "user1", 0 )
+	ROM_LOAD( "9576028.bin", 0x00000, 0x10000, CRC(2d85682c) SHA1(baec47bff4b8beef5afbb737dc57b22bf93ebcf8) )
+	ROM_LOAD( "9576002.bin", 0x10000, 0x010000, CRC(f9cd196c) SHA1(0ac31d87462cbee6f41e19aefe740d876910bdf5) )
+
+	ROM_REGION( 0x1c2000, "user2", 0 )
+	ROM_LOAD( "inqdisk.img", 0x000000, 0x1c2000, NO_DUMP )
+ROM_END
+
+// Version 1.1
+ROM_START( inquiztrb )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "inq6809", 0x08000, 0x08000, CRC(ae996600) SHA1(f360399e77b81399d910770fa8106c196f04363c) )
+
+	ROM_REGION( 0x20000, "user1", 0 )
+	ROM_LOAD( "95760001.bin", 0x00000, 0x010000, CRC(314aa59e) SHA1(b65daa58465a789274d542b3ffd5e2f9129f24f9) )
+	ROM_LOAD( "9576002.bin", 0x10000, 0x010000, CRC(f9cd196c) SHA1(0ac31d87462cbee6f41e19aefe740d876910bdf5) )
+
+	ROM_REGION( 0x1c2000, "user2", 0 )
+	ROM_LOAD( "inqdisk.img", 0x000000, 0x1c2000, NO_DUMP )
+ROM_END
 
 
 ROM_START( escounts )
@@ -2993,12 +2997,14 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1989, inquiztr, 0,   bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "Inquizitor",                              MACHINE_NOT_WORKING )
-GAME( 1990, escounts, 0,   bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "Every Second Counts (39-360-053)",        MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1991, trebltop, 0,   bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "Treble Top (39-360-070)",                 MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1991, beeline,  0,   bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "Beeline (39-360-075)",                    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1991, quizvadr, 0,   bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "Quizvaders (39-360-078)",                 MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, qos,      0,   bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "A Question of Sport (set 1, 39-960-107)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, qosa,     qos, bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "A Question of Sport (set 2, 39-960-099)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, qosb,     qos, bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "A Question of Sport (set 3, 39-960-089)", MACHINE_IMPERFECT_GRAPHICS )
-GAMEL(1994, brkball,  0,   bfcobjam_with_dmd,brkball, bfcobjam_state,init_bfcobjam,ROT0, "BFM/ATOD", "Break Ball",                              MACHINE_IMPERFECT_GRAPHICS, layout_brkball )
+GAME( 1989, inquiztr,  0,          bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "Inquizitor (V1.2)",                       MACHINE_NOT_WORKING )
+GAME( 1989, inquiztra, inquiztr,   bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "Inquizitor (Alternate V1.2)",             MACHINE_NOT_WORKING )
+GAME( 1989, inquiztrb, inquiztr,   bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "Inquizitor (V1.1)",                       MACHINE_NOT_WORKING )
+GAME( 1990, escounts,  0,          bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "Every Second Counts (39-360-053)",        MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, trebltop,  0,          bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "Treble Top (39-360-070)",                 MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, beeline,   0,          bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "Beeline (39-360-075)",                    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, quizvadr,  0,          bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "Quizvaders (39-360-078)",                 MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, qos,       0,          bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "A Question of Sport (set 1, 39-960-107)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, qosa,      qos,        bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "A Question of Sport (set 2, 39-960-099)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, qosb,      qos,        bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "A Question of Sport (set 3, 39-960-089)", MACHINE_IMPERFECT_GRAPHICS )
+GAMEL(1994, brkball,   0,          bfcobjam_with_dmd,brkball, bfcobjam_state,init_bfcobjam,ROT0, "BFM/ATOD", "Break Ball",                              MACHINE_IMPERFECT_GRAPHICS, layout_brkball )
