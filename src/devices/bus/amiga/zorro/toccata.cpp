@@ -94,10 +94,6 @@ void toccata_device::device_start()
 	save_item(NAME(m_control));
 }
 
-void toccata_device::device_reset()
-{
-}
-
 void toccata_device::update_interrupts()
 {
 	if ((BIT(m_control, 7) && BIT(m_status, 3)) || (BIT(m_control, 6) && BIT(m_status, 2)))

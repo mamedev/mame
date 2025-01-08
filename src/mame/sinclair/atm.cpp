@@ -183,10 +183,10 @@ void atm_state::atm_update_video_mode()
 {
 	bool zx_scale = m_rg & 1;
 	bool double_width = BIT(m_rg, 1) && !zx_scale;
-	u8 border_x = (40 - (32 * !zx_scale)) << double_width;
+	u8 border_x = (40 - (32 * !zx_scale)) << (double_width ? 1 : 0);
 	u8 border_y = (40 - (4 * !zx_scale));
 	rectangle scr = get_screen_area();
-	m_screen->configure(448 << double_width, m_screen->height(), {scr.left() - border_x, scr.right() + border_x, scr.top() - border_y, scr.bottom() + border_y}, m_screen->frame_period().as_attoseconds());
+	m_screen->configure(448 << (double_width ? 1 : 0), m_screen->height(), {scr.left() - border_x, scr.right() + border_x, scr.top() - border_y, scr.bottom() + border_y}, m_screen->frame_period().as_attoseconds());
 	LOGVIDEO("Video mode: %d\n", m_rg);
 
 	//spectrum_palette(m_palette);

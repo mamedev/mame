@@ -182,7 +182,7 @@ uint16_t rungun_state::sysregs_r(offs_t offset, uint16_t mem_mask)
 			*/
 			{
 				uint8_t field_bit = m_screen->frame_number() & 1;
-				if (m_single_screen_mode == true)
+				if (m_single_screen_mode)
 					field_bit = 1;
 				return (m_system->read() & 0xfdff) | (field_bit << 9);
 			}
@@ -419,10 +419,10 @@ uint32_t rungun_state::screen_update_rng(screen_device &screen, bitmap_ind16 &bi
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	screen.priority().fill(0, cliprect);
 	m_current_display_bank = m_screen->frame_number() & 1;
-	if (m_single_screen_mode == true)
+	if (m_single_screen_mode)
 		m_current_display_bank = 0;
 
-	if (m_video_priority_mode == false)
+	if (!m_video_priority_mode)
 	{
 		m_k053936->zoom_draw(screen, bitmap, cliprect, m_936_tilemap[m_current_display_bank], 0, 0, 1);
 		m_k055673->k053247_sprites_draw(bitmap, cliprect);
@@ -463,7 +463,7 @@ void rungun_state::sprite_dma_trigger(void)
 {
 	uint32_t src_address;
 
-	if (m_single_screen_mode == true)
+	if (m_single_screen_mode)
 		src_address = 1*0x2000;
 	else
 		src_address = m_current_display_bank*0x2000;

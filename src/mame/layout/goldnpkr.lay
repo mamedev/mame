@@ -75,6 +75,42 @@ license:CC0-1.0
 		</text>
 	</element>
 
+	<element name="HE1" defstate="0">
+		<rect state="1"><color red="0.0" green="0.5" blue="0.0" /></rect>
+		<rect state="0"><color red="0.5" green="0.0" blue="0.0" /></rect>
+		<text string="Hopper Ena.1">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.1" y="0.15" width="0.8" height="0.7" />
+		</text>
+	</element>
+
+	<element name="HE2" defstate="0">
+		<rect state="1"><color red="0.0" green="0.5" blue="0.0" /></rect>
+		<rect state="0"><color red="0.5" green="0.0" blue="0.0" /></rect>
+		<text string="Hopper Ena.2">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.1" y="0.15" width="0.8" height="0.7" />
+		</text>
+	</element>
+
+	<element name="DIV" defstate="0">
+		<rect state="1"><color red="0.0" green="0.5" blue="0.0" /></rect>
+		<rect state="0"><color red="0.5" green="0.0" blue="0.0" /></rect>
+		<text string="Diverter">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.1" y="0.15" width="0.8" height="0.7" />
+		</text>
+	</element>
+
+	<element name="COL" defstate="0">
+		<rect state="1"><color red="0.0" green="0.5" blue="0.0" /></rect>
+		<rect state="0"><color red="0.5" green="0.0" blue="0.0" /></rect>
+		<text string="Coin Lock">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.1" y="0.15" width="0.8" height="0.7" />
+		</text>
+	</element>
+
 	<view name="Button Lamps">
 		<screen index="0">
 			<bounds left="0" top="0" right="4" bottom="3" />
@@ -116,6 +152,19 @@ license:CC0-1.0
 		</element>
 		<element name="lamp1" ref="DEAL" inputtag="IN0-0" inputmask="0x08">
 			<bounds x="3.25" y="3.45" width="0.50" height="0.24" />
+		</element>
+	
+		<element name="lamp5" ref="HE1">
+			<bounds x="0.25" y="3.77" width="0.5" height="0.12" />
+		</element>
+		<element name="lamp6" ref="HE2">
+			<bounds x="0.85" y="3.77" width="0.5" height="0.12" />
+		</element>
+		<element name="lamp7" ref="DIV">
+			<bounds x="2.05" y="3.77" width="0.5" height="0.12" />
+		</element>
+		<element name="lamp8" ref="COL">
+			<bounds x="3.25" y="3.77" width="0.5" height="0.12" />
 		</element>
 	</view>
 </mamelayout>

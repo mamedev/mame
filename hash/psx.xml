@@ -29,21 +29,23 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 
 -->
 
-	<!-- boot OK -->
+
 	<software name="007rcng">
 		<!--
-		Original images (Redump)
+		redump.org/disc/633
 		<rom name="007 Racing (USA).cue" size="82" crc="5c58d484" sha1="f74c52098f149c91f066b17e9000d5a059ec4405"/>
 		<rom name="007 Racing (USA).bin" size="565011552" crc="5a39ae64" sha1="91c0c4b5c888f074a777f891be5432064678070e"/>
 		-->
 		<description>007 Racing (USA)</description>
 		<year>2000</year>
 		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Eutechnyx"/>
+		<info name="language" value="English"/>
 		<info name="serial" value="SLUS-01300, SLUS-01300CE"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="007 racing (usa)" sha1="b0d5e1641367d45c6f187c5c6249371c95636e5a"/>
+				<disk name="007 Racing (USA)" sha1="c0fffd6939c403a0b7a179b472ae768c06c05c26"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1783,8 +1785,9 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		</part>
 	</software>
 
-	<software name="atrain">
-		<!-- Original images (Redump)
+	<software name="atrain" cloneof="a4evolgl">
+		<!--
+		redump.org/disc/13165
 		<rom name="A-Train - Trains, Power, Money (USA) (En,Ja,Fr,De).cue" size="990" crc="672ea3e6" sha1="2385b6ed3d6b31a7bd3a080295e4391361216835"/>
 		<rom name="A-Train - Trains, Power, Money (USA) (En,Ja,Fr,De) (Track 1).bin" size="46277952" crc="6daf2c73" sha1="eb1576521dd8d3860112a9170a595555c8055b1e"/>
 		<rom name="A-Train - Trains, Power, Money (USA) (En,Ja,Fr,De) (Track 2).bin" size="2718912" crc="6aa850d0" sha1="c1b327ef0e3cf88a620799c224b1e769d414d075"/>
@@ -1797,11 +1800,13 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<description>A-Train - Trains, Power, Money (USA)</description>
 		<year>1996</year>
 		<publisher>Maxis</publisher>
+		<info name="developer" value="Artdink" />
+		<info name="language" value="English/French/German/Japanese" />
 		<info name="serial" value="SLUS-00003"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="a-train - trains, power, money (usa) (en,ja,fr,de)" sha1="0cc12ffc310cc903016dbc8aebb7501fc9b32af8"/>
+				<disk name="A-Train - Trains, Power, Money (USA) (En,Ja,Fr,De)" sha1="21eac61b3966fe28ab404933aa616a51a29b5133"/>
 			</diskarea>
 		</part>
 	</software>
@@ -9466,7 +9471,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		</part>
 	</software>
 
-	<software name="foxglf99">
+	<software name="foxglf99" cloneof="actgolf2">
 		<!-- Original images (Redump)
 		<rom name="FOX Sports Golf '99 (USA).cue" size="339" crc="3e72d5d3" sha1="c99fdfc7cef583241d2710b278e0ad0b4930a929"/>
 		<rom name="FOX Sports Golf '99 (USA) (Track 1).bin" size="376625760" crc="acb66a4b" sha1="d4d91c9dc8d01ca1068911ae2bf73542b0cb42e2"/>
@@ -29417,7 +29422,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		</part>
 	</software>
 
-	<software name="vrgolf97">
+	<software name="vrgolf97" cloneof="actgolf">
 		<!-- Original images (Redump)
 		<rom name="VR Golf '97 (USA) (En,Fr).cue" size="220" crc="e6a642cf" sha1="7322e93eba9c9ec24429e75cb4a7335df7ed51dc"/>
 		<rom name="VR Golf '97 (USA) (En,Fr) (Track 1).bin" size="419105232" crc="c816e736" sha1="8aa5f26c1af3b3fe10ee1ed9273fc62a26c31818"/>
@@ -37249,6 +37254,80 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<software name="aressh4" cloneof="a4evolgl">
+		<!--
+		redump.org/disc/8493
+		<rom name="A Ressha de Ikou 4 - Evolution Global (Japan) (En,Ja,Fr,De).cue" size="1053" crc="38e1543b" sha1="74b73ce187e809cbad379c07a17932a79dd078f5"/>
+		<rom name="A Ressha de Ikou 4 - Evolution Global (Japan) (En,Ja,Fr,De) (Track 1).bin" size="44107056" crc="37f6f723" sha1="4df18857c44f340a215bbabc42e12ce4396a2c98"/>
+		<rom name="A Ressha de Ikou 4 - Evolution Global (Japan) (En,Ja,Fr,De) (Track 2).bin" size="7888608" crc="7b223ddf" sha1="9ef79a55725bea41827258083fbfc4de0e825d58"/>
+		<rom name="A Ressha de Ikou 4 - Evolution Global (Japan) (En,Ja,Fr,De) (Track 3).bin" size="1921584" crc="19dbfa70" sha1="fe0b2b01e8b73c44025dede31b69f87c8838295c"/>
+		<rom name="A Ressha de Ikou 4 - Evolution Global (Japan) (En,Ja,Fr,De) (Track 4).bin" size="1900416" crc="f00fa27e" sha1="5e87626933fe6f4cf8f4d4c270daf1dc58e3c033"/>
+		<rom name="A Ressha de Ikou 4 - Evolution Global (Japan) (En,Ja,Fr,De) (Track 5).bin" size="2733024" crc="c1df5352" sha1="a2ea3e3bcd10c1eeeacbf69394c04aed3573dcda"/>
+		<rom name="A Ressha de Ikou 4 - Evolution Global (Japan) (En,Ja,Fr,De) (Track 6).bin" size="2737728" crc="c4a8d40a" sha1="d76522940b195ba6260918e0b1eff9172a085499"/>
+		<rom name="A Ressha de Ikou 4 - Evolution Global (Japan) (En,Ja,Fr,De) (Track 7).bin" size="37874256" crc="5de84afb" sha1="d510836a6eae9902405fc73a284231a72b051407"/>
+		-->
+		<description>A Ressha de Ikou 4 - Evolution Global (Japan)</description>
+		<year>1995</year>
+		<publisher>Artdink</publisher>
+		<info name="developer" value="Artdink" />
+		<info name="language" value="English/French/German/Japanese" />
+		<info name="serial" value="SLPS-00125" />
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="A Ressha de Ikou 4 - Evolution Global (Japan) (En,Ja,Fr,De)" sha1="816d8e0e9b0c478e38a83c786a2a2ee938c6dd67"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="aressh4pb" cloneof="a4evolgl">
+		<!--
+		redump.org/disc/8444
+		<rom name="A Ressha de Ikou 4 - Evolution Global (Japan) (En,Ja,Fr,De) (PlayStation the Best).cue" size="1214" crc="21cade5a" sha1="11130d6957e03d01660d6cde6c0a773841386271"/>
+		<rom name="A Ressha de Ikou 4 - Evolution Global (Japan) (En,Ja,Fr,De) (PlayStation the Best) (Track 1).bin" size="91422240" crc="0f783082" sha1="2bfc122a3a9f0b662ee84fa5bffc36ce124d1932"/>
+		<rom name="A Ressha de Ikou 4 - Evolution Global (Japan) (En,Ja,Fr,De) (PlayStation the Best) (Track 2).bin" size="2606016" crc="8691e800" sha1="46983681565b3f698abe8a172b3792ee67fddcfa"/>
+		<rom name="A Ressha de Ikou 4 - Evolution Global (Japan) (En,Ja,Fr,De) (PlayStation the Best) (Track 3).bin" size="1881600" crc="4d66301b" sha1="29139b6a2785bb596dac96e929202449f25feb47"/>
+		<rom name="A Ressha de Ikou 4 - Evolution Global (Japan) (En,Ja,Fr,De) (PlayStation the Best) (Track 4).bin" size="1841616" crc="1c17c78e" sha1="c539153f7d57216b3f72f5b0cddbc2dbddbd6c12"/>
+		<rom name="A Ressha de Ikou 4 - Evolution Global (Japan) (En,Ja,Fr,De) (PlayStation the Best) (Track 5).bin" size="2634240" crc="bc7030a7" sha1="330b8ed76aca9ad566e1c46f814f3dc4460346a0"/>
+		<rom name="A Ressha de Ikou 4 - Evolution Global (Japan) (En,Ja,Fr,De) (PlayStation the Best) (Track 6).bin" size="2725968" crc="ea4b3a4f" sha1="4725220b27cb4bc82bee0a75bd877a8b82918125"/>
+		<rom name="A Ressha de Ikou 4 - Evolution Global (Japan) (En,Ja,Fr,De) (PlayStation the Best) (Track 7).bin" size="37777824" crc="8dad9514" sha1="8bac1847399d12808ddcc2b39b8c8d2eafe18870"/>
+		-->
+		<description>A Ressha de Ikou 4 - Evolution Global (Japan) (PlayStation the Best)</description>
+		<year>1997</year>
+		<publisher>Artdink</publisher>
+		<info name="developer" value="Artdink" />
+		<info name="language" value="English/French/German/Japanese" />
+		<info name="serial" value="SLPS-91019" />
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="A Ressha de Ikou 4 - Evolution Global (Japan) (En,Ja,Fr,De) (PlayStation the Best)" sha1="7aca811cde075c9f20f53aef7b1e909387ce0fae"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="actgolf_jp" cloneof="actgolf">
+		<!--
+		redump.org/disc/32490
+		<rom name="Actua Golf (Japan).cue" size="206" crc="f0a253e7" sha1="f3bde627da77561a7c62730d20da50724bff737c"/>
+		<rom name="Actua Golf (Japan) (Track 1).bin" size="227861760" crc="20765b8d" sha1="03009357cb1b3756fa3effebd5490a1c97563006"/>
+		<rom name="Actua Golf (Japan) (Track 2).bin" size="34350960" crc="4c9d46fe" sha1="75b6ded9f51980c306ca2f3a40dcd640c0101745"/>
+		-->
+		<description>Actua Golf (Japan)</description>
+		<year>1996</year>
+		<publisher>Naxat Soft</publisher>
+		<info name="developer" value="Gremlin Interactive"/>
+		<info name="language" value="English" />
+		<info name="serial" value="SLPS-00298" />
+		<info name="speech" value="Japanese" />
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Actua Golf (Japan)" sha1="6e74c663af2d33f71ad08b686ebb90663554b9a9"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- http://redump.org/disc/38429/ http://redump.org/disc/38430/ -->
 	<software name="crshock">
 		<description>Creature Shock (Japan)</description>
@@ -39800,7 +39879,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		-->
 		<description>Block Kuzushi 2 (Japan)</description>
 		<year>2000</year>
-		<publisher>Marvelous Entertaiment</publisher>
+		<publisher>Marvelous Entertainment</publisher>
 		<info name="serial" value="SLPS-02578" />
 		<info name="release" value="20000203" />
 		<info name="alt_title" value="ブロックくずし2"/>
@@ -59620,6 +59699,158 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="007 - The World Is Not Enough (Sweden)" sha1="3e7f2b632ef1c5db17d8c17cc26ff75cada9382d"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="007rcng_eu" cloneof="007rcng">
+		<!--
+		redump.org/disc/6858
+		<rom name="007 Racing (Europe).cue" size="85" crc="74722fc6" sha1="db19e66b47df3b885c8a43d177524eb72cbbb9e8"/>
+		<rom name="007 Racing (Europe).bin" size="565672464" crc="2693623a" sha1="2b6802f8a7dcc28840d4e5e1369a5bd2e90fb5ae"/>
+		-->
+		<description>007 Racing (Europe)</description>
+		<year>2000</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Eutechnyx"/>
+		<info name="language" value="English"/>
+		<info name="serial" value="SLES-03355, SLES-03355-P"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="007 Racing (Europe)" sha1="ac3cd9c8e4e733c271977d479a4691f06dd27b48"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="007rcng_fr" cloneof="007rcng">
+		<!--
+		redump.org/disc/18697
+		<rom name="007 Racing (France).cue" size="85" crc="527a9ec3" sha1="6566b324e064957a31c7aacaeda10dc13957a626"/>
+		<rom name="007 Racing (France).bin" size="547510320" crc="f8500248" sha1="ca37e0995412d40cecec47c16db5bebf5e6e1b14"/>
+		-->
+		<description>007 Racing (France)</description>
+		<year>2000</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Eutechnyx"/>
+		<info name="language" value="French" />
+		<info name="serial" value="SLES-03356, SLES-03356-P"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="007 Racing (France)" sha1="abd3135dadc605c0f73ae50f81dacc8ae795d999"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="007rcng_de" cloneof="007rcng">
+		<!--
+		redump.org/disc/17273
+		<rom name="007 Racing (Germany).cue" size="86" crc="66c0c70d" sha1="b8f87935e390d87227779bac72443d20eb2fe5ed"/>
+		<rom name="007 Racing (Germany).bin" size="552463632" crc="bbe6471e" sha1="f440f37ab90c78b022cdb3d8e73575b6f720ce69"/>
+		-->
+		<description>007 Racing (Germany)</description>
+		<year>2000</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Eutechnyx"/>
+		<info name="language" value="German" />
+		<info name="serial" value="SLES-03357"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="007 Racing (Germany)" sha1="44587b1a0cef32efab55ae12cedba3c6d2d90f84"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="actgolf">
+		<!--
+		redump.org/disc/26887
+		<rom name="Actua Golf (Europe) (En,Fr,De).cue" size="230" crc="dc8424ff" sha1="19c094f28be0dbd45913de4997498a6e5b9f469e"/>
+		<rom name="Actua Golf (Europe) (En,Fr,De) (Track 1).bin" size="489281856" crc="49825417" sha1="fcac9c694177ff7077ae79d5693b88d32e92fe92"/>
+		<rom name="Actua Golf (Europe) (En,Fr,De) (Track 2).bin" size="34350960" crc="4c9d46fe" sha1="75b6ded9f51980c306ca2f3a40dcd640c0101745"/>
+		-->
+		<description>Actua Golf (Europe)</description>
+		<year>1996</year>
+		<publisher>Gremlin Interactive</publisher>
+		<info name="developer" value="Gremlin Interactive"/>
+		<info name="language" value="English/French/German" />
+		<info name="serial" value="SLES-00015"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Actua Golf (Europe) (En,Fr,De)" sha1="3f4818413b409ef3ef2cb55274793457a2c4db95"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="actgolf2">
+		<!--
+		redump.org/disc/25391
+		<rom name="Actua Golf 2 (Europe).cue" size="327" crc="fc7af053" sha1="9841a45e0f2b97b5c1790174c663eab72abd29a1"/>
+		<rom name="Actua Golf 2 (Europe) (Track 1).bin" size="376538736" crc="b1330c67" sha1="1bd438534b63fc0ee498f92602be16d467a251e6"/>
+		<rom name="Actua Golf 2 (Europe) (Track 2).bin" size="31248672" crc="9ee267d5" sha1="3fb66132c709bd012e578f45e638410ffe76ba2c"/>
+		<rom name="Actua Golf 2 (Europe) (Track 3).bin" size="44742096" crc="305d867b" sha1="27de9f1b4dbb893ee994c6fef00c8ff29eeca325"/>
+		-->
+		<description>Actua Golf 2 (Europe)</description>
+		<year>1997</year>
+		<publisher>Gremlin Graphics</publisher>
+		<info name="developer" value="Gremlin Graphics"/>
+		<info name="language" value="English" />
+		<info name="serial" value="SLES-00044"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Actua Golf 2 (Europe)" sha1="356be2129a8aface3ca5a31e674d5642343431ae"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="actgolf3" supported="partial">
+		<!--
+		redump.org/disc/1240
+		<rom name="Actua Golf 3 (Europe).cue" size="327" crc="f649a1db" sha1="a5f55882b69566e13bd2899c94b810421c0b7ac6"/>
+		<rom name="Actua Golf 3 (Europe) (Track 1).bin" size="524987568" crc="73317df6" sha1="e263ff68a25402ce834771c3de9e8fb20c015643"/>
+		<rom name="Actua Golf 3 (Europe) (Track 2).bin" size="30971136" crc="73a866cc" sha1="06d166e9aff4ad151031bd3307e1b1d6a89f856a"/>
+		<rom name="Actua Golf 3 (Europe) (Track 3).bin" size="33003264" crc="c88e041e" sha1="b6bafa8d15d29dc311554dce550230632bc58eba"/>
+		-->
+		<description>Actua Golf 3 (Europe)</description>
+		<year>1998</year>
+		<publisher>Gremlin Graphics</publisher>
+		<notes>Scrambled graphics when shooting the ball</notes>
+		<info name="developer" value="Gremlin Graphics"/>
+		<info name="language" value="English" />
+		<info name="serial" value="SLES-01042"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Actua Golf 3 (Europe)" sha1="4081d7f5dfdfc9c319ecdb34fdaf132dbbca2f0c"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="a4evolgl">
+		<!--
+		redump.org/disc/25901
+		<rom name="A.IV - Evolution Global (Europe) (En,Ja,Fr,De).cue" size="962" crc="e4b052e4" sha1="24aabd7b6daf83154f012d532ce30534391a175e"/>
+		<rom name="A.IV - Evolution Global (Europe) (En,Ja,Fr,De) (Track 1).bin" size="57621648" crc="7c89428c" sha1="56035d31d27b732eed956bb1736a5502f8b326b9"/>
+		<rom name="A.IV - Evolution Global (Europe) (En,Ja,Fr,De) (Track 2).bin" size="4958016" crc="5a4bdaa9" sha1="b3aad8076cd6dce6b3d8fd0bc76b5f7bc54fe8f9"/>
+		<rom name="A.IV - Evolution Global (Europe) (En,Ja,Fr,De) (Track 3).bin" size="1921584" crc="19dbfa70" sha1="fe0b2b01e8b73c44025dede31b69f87c8838295c"/>
+		<rom name="A.IV - Evolution Global (Europe) (En,Ja,Fr,De) (Track 4).bin" size="1900416" crc="f00fa27e" sha1="5e87626933fe6f4cf8f4d4c270daf1dc58e3c033"/>
+		<rom name="A.IV - Evolution Global (Europe) (En,Ja,Fr,De) (Track 5).bin" size="2733024" crc="c1df5352" sha1="a2ea3e3bcd10c1eeeacbf69394c04aed3573dcda"/>
+		<rom name="A.IV - Evolution Global (Europe) (En,Ja,Fr,De) (Track 6).bin" size="2737728" crc="c4a8d40a" sha1="d76522940b195ba6260918e0b1eff9172a085499"/>
+		<rom name="A.IV - Evolution Global (Europe) (En,Ja,Fr,De) (Track 7).bin" size="37874256" crc="5de84afb" sha1="d510836a6eae9902405fc73a284231a72b051407"/>
+		-->
+		<description>A.IV - Evolution Global (Europe)</description>
+		<year>1996</year>
+		<publisher>Sony Computer Entertainment Europe</publisher>
+		<info name="developer" value="Artdink"/>
+		<info name="language" value="English/French/German/Japanese" />
+		<info name="serial" value="SCES-00290"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="A.IV - Evolution Global (Europe) (En,Ja,Fr,De)" sha1="b2bbc457e6567bf388e2c6644c949b3580287532"/>
 			</diskarea>
 		</part>
 	</software>

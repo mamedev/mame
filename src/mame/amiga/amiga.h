@@ -641,7 +641,7 @@ private:
 	void sprite_dma_reset(int which);
 	void sprite_enable_comparitor(int which, int enable);
 	void fetch_sprite_data(int scanline, int sprite);
-	void update_sprite_dma(int scanline);
+	void update_sprite_dma(int scanline, int num);
 	uint32_t interleave_sprite_data(uint16_t lobits, uint16_t hibits);
 	int get_sprite_pixel(int x);
 	uint8_t assemble_odd_bitplanes(int planes, int ebitoffs);
@@ -655,7 +655,7 @@ private:
 	void aga_palette_write(int color_reg, uint16_t data);
 	void aga_fetch_sprite_data(int scanline, int sprite);
 	void aga_render_scanline(bitmap_rgb32 &bitmap, int scanline);
-	void aga_update_sprite_dma(int scanline);
+	void aga_update_sprite_dma(int scanline, int num);
 	int aga_get_sprite_pixel(int x);
 	uint8_t aga_assemble_odd_bitplanes(int planes, int obitoffs);
 	uint8_t aga_assemble_even_bitplanes(int planes, int ebitoffs);

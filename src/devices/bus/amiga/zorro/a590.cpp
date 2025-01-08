@@ -269,14 +269,6 @@ void a2091_device::device_start()
 	m_dmac->set_rom(memregion("bootrom")->base());
 }
 
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void dmac_hdc_device_base::device_reset()
-{
-}
-
 void dmac_hdc_device_base::resize_ram(int config)
 {
 	// allocate space for RAM
@@ -301,16 +293,6 @@ void dmac_hdc_device_base::resize_ram(int config)
 	}
 
 	m_dmac->set_ram(&m_ram[0]);
-}
-
-void a590_device::device_reset()
-{
-	dmac_hdc_device_base::device_reset();
-}
-
-void a2091_device::device_reset()
-{
-	dmac_hdc_device_base::device_reset();
 }
 
 

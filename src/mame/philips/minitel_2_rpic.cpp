@@ -22,11 +22,7 @@
     - Keyboard
     - 24C02 EPROM
     - Modem serial interface.
-
-    What is implemented but not working :
-
-    - The rear serial port.(Prise péri-informatique)
-     (Internal 8051 serial port emulation missing).
+    - The rear serial port (prise péri-informatique).
 
     What is not yet implemented :
 
@@ -55,6 +51,10 @@
     Example : Command line options to use to create a TCP socket linked to
     the modem port : "-modem null_modem -bitb socket.127.0.0.1:20000"
     Once mame started you can then send vdt files with netcat to this socket.
+
+    Example 2 : Connecting the modem and periinfo ports to different TCP
+    sockets : "-modem null_modem -bitb1 socket.127.0.0.1:20000
+               -periinfo null_modem -bitb2 socket.127.0.0.1:20001"
 
 ****************************************************************************/
 
@@ -511,10 +511,10 @@ static DEVICE_INPUT_DEFAULTS_START( m_modem )
 DEVICE_INPUT_DEFAULTS_END
 
 static DEVICE_INPUT_DEFAULTS_START( m_serport )
-	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
-	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
-	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
-	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_1200 )
+	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_1200 )
+	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_7 )
+	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_EVEN )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
@@ -538,10 +538,12 @@ void minitel_state::minitel2(machine_config &config)
 
 	RS232_PORT(config, m_modem, default_rs232_devices, nullptr);
 	m_modem->rxd_handler().set_inputline(m_maincpu, MCS51_INT1_LINE).invert();
+	m_modem->set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(m_modem));
 	m_modem->set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(m_modem));
 
 	RS232_PORT(config, m_serport, default_rs232_devices, nullptr);
 	m_serport->rxd_handler().set(FUNC(minitel_state::serial_rxd));
+	m_serport->set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(m_serport));
 	m_serport->set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(m_serport));
 
 	lineconnected = 0;

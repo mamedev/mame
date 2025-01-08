@@ -79,9 +79,18 @@ enum
 	PPC_R30,
 	PPC_R31,
 	PPC_CR,
+	PPC_MQ,
 	PPC_LR,
 	PPC_CTR,
 	PPC_XER,
+	PPC_BAT0U,
+	PPC_BAT0L,
+	PPC_BAT1U,
+	PPC_BAT1L,
+	PPC_BAT2U,
+	PPC_BAT2L,
+	PPC_BAT3U,
+	PPC_BAT3L,
 
 	PPC_F0,
 	PPC_F1,
@@ -150,7 +159,6 @@ enum
 	PPC_SR14,
 	PPC_SR15
 };
-
 
 /* compiler-specific options */
 #define PPCDRC_STRICT_VERIFY        0x0001          /* verify all instructions */
@@ -515,6 +523,7 @@ protected:
 	uint32_t          m_serial_clock;
 	uint64_t          m_tb_zero_cycles;
 	uint64_t          m_dec_zero_cycles;
+	uint64_t          m_rtc_zero_cycles;
 	emu_timer *     m_decrementer_int_timer;
 
 

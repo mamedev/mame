@@ -1816,6 +1816,60 @@ void heath_igc_tlb_device::device_reset()
 	m_window_address = 0x0000;
 }
 
+void heath_igc_tlb_device::sigma_w(u8 offset, u8 data)
+{
+	switch (offset)
+	{
+	case 0:
+		sigma_video_mem_w(data);
+		break;
+	case 1:
+		sigma_io_lo_addr_w(data);
+		break;
+	case 2:
+		sigma_io_hi_addr_w(data);
+		break;
+	case 3:
+		sigma_window_lo_addr_w(data);
+		break;
+	case 4:
+		sigma_window_hi_addr_w(data);
+		break;
+	case 5:
+		sigma_ctrl_w(data);
+		break;
+	}
+}
+
+u8 heath_igc_tlb_device::sigma_r(u8 offset)
+{
+	u8 val = 0;
+
+	switch (offset)
+	{
+	case 0:
+		val = sigma_video_mem_r();
+		break;
+	case 1:
+		// TODO - Low pen address
+		break;
+	case 2:
+		// TODO - High pen address
+		break;
+	case 3:
+		// TODO - Left input device
+		break;
+	case 4:
+		// TODO - Right input device
+		break;
+	case 5:
+		val = sigma_ctrl_r();
+		break;
+	}
+
+	return val;
+}
+
 void heath_igc_tlb_device::sigma_ctrl_w(u8 data)
 {
 	LOGREG("%s: data: %02x\n", FUNCNAME, data);

@@ -15961,7 +15961,7 @@ gngprot                         // Capcom/Romstar Proto
 gngt                            // 9/1985 (c) 1985
 makaimur                        // 9/1985 (c) 1985
 makaimurb                       // 9/1985 (c) 1985
-makaimurba                      // 9/1985 (c) 1985
+makaimurbbl                     // bootleg
 makaimurc                       // 9/1985 (c) 1985
 makaimurg                       // 9/1985 (c) 1985
 
@@ -19634,7 +19634,6 @@ h89                             // Heath H89 (WH89)
 h88                             // Heath H88 (with cassette tape)
 h89_cdr                         // Heath H89 with CDR Systems hardware
 h89_mms                         // Heath H89 with Magnolia MicroSystems(MMS) hardware
-h89_sigmasoft                   // H89 with the SigmaSoft IGC card
 z90                             // Zenith Z-90
 
 @source:heathzenith/mdt60.cpp
@@ -20167,6 +20166,7 @@ cb3d                            // (c) 199? Dyna Electronics
 cb3e                            // 199? bootleg
 cb3f                            // 199? bootleg
 cb3g                            // (c) 199? Dyna Electronics
+cb3h                            // (c) 199? Dyna Electronics
 cherry96                        // bootleg
 chry10                          // bootleg
 chryangl                        // (c) 199? Dyna Electronics
@@ -20180,6 +20180,7 @@ cmast91                         // (c) 1991 Dyna Electronics
 cmast92                         // (c) 1992 Dyna Electronics
 cmast92a                        // (c) 1992 Dyna Electronics
 cmast97                         // (c) 1996 Dyna Electronics
+cmast97a                        // (c) 1996 Dyna Electronics
 cmast97i                        // (c) 1996 Dyna Electronics
 cmast99                         // (c) 1999 Dyna Electronics
 cmast99b                        // bootleg
@@ -20195,6 +20196,7 @@ cmasterh                        // (c) 1991 Dyna Electronics
 cmasteri                        // (c) 1991 Dyna Electronics
 cmasterj                        // (c) 1991 Dyna Electronics
 cmasterk                        // (c) 1991 Dyna Electronics
+cmasterl                        // (c) 1991 Dyna Electronics
 cmezspin                        // (c) 1991 Dyna Electronics
 cmfb55                          // bootleg
 cmfun                           // (c) 1995 Dyna Electronics
@@ -20216,10 +20218,12 @@ cmwm                            // (c) 199? Dyna Electronics
 crazybon                        // (c) 199? Sang Ho
 crazybona                       // (c) 199? Sang Ho
 crazybonb                       // (c) 199? unknown
+cutyline                        //
 eldoradd                        // (c) 1991 Dyna Electronics
 eldoraddo                       // (c) 1991 Dyna Electronics
 eldoraddoa                      // (c) 1991 Dyna Electronics
 eldoraddob                      // (c) 1991 Dyna Electronics
+eldoraddoc                      // (c) 1991 Dyna Electronics
 fb2010                          // (c) 2009 Amcoe
 fl7_3121                        // (c) 199? Cyberdyne Systems, Inc.
 fl7_50                          // (c) 199? Cyberdyne Systems, Inc.
@@ -20230,6 +20234,7 @@ fl7_tw                          // Taiwanese Hardware.
 goldfrui                        // bootleg
 goldstar                        // (c) 198? IGS
 goldstbl                        // (c) 198? IGS
+gregular                        // Playmark
 halltsk                         //
 hamhouse                        // bootleg
 hamhouse9                       // bootleg
@@ -20484,13 +20489,18 @@ cjdh2a                          // (c) 200?
 cjdh2b                          // (c) 200?
 cjdh2c                          // (c) 200?
 igsm312                         // (c) 200?
+jhzb                            // (c) 200?
+jxry                            // (c) 200?
 lhfy                            // (c) 2010
 lhtb                            // (c) 2009
 lhzb3in1                        // (c) 200?
 lhzbgqb                         // (c) 2010
 mghammer                        // (c) 2015
 qhzb                            // (c) 2007
+slqzsp                          // (c) 200?
 super70s                        // (c) 200?
+sydh                            // (c) 200?
+xyddz                           // (c) 200?
 
 @source:igs/igspoker.cpp
 chleague                        // (c) 199? IGS
@@ -20718,11 +20728,11 @@ jbell                           // (c) 1997 IGS
 jinhulu2                        // (c) 1995 IGS
 spk100                          // (c) 1996 IGS
 spk102ua                        // (c) 1996 IGS
-spk114it                        // (c) 199? IGS
-spk115it                        // (c) 199? IGS
-spk116it                        // (c) 199? IGS
-spk116itmx                      // (c) 199? IGS
-spk120in                        // (c) 199? IGS
+spk114it                        // (c) 1996 IGS
+spk115it                        // (c) 1996 IGS
+spk116it                        // (c) 1996 IGS
+spk116itmx                      // (c) 1996 IGS
+spk120in                        // (c) 1996 IGS
 spk200ua                        // (c) 1996 IGS
 spk201ua                        // (c) 1996 IGS
 spk203us                        // (c) 1996 IGS
@@ -29316,6 +29326,7 @@ texasrls                        // (c) 1998 Cadillac Jack
 
 @source:misc/blocktax.cpp
 blocktax                        // (c)2002 TAX / Game Revival
+unktax
 
 @source:misc/bntyhunt.cpp
 bntyhunt                        // (c) 200? GCTech Co., LTD
@@ -29401,10 +29412,12 @@ castrev                         // Revolution
 cb2001                          // (c) 2000 Dyna Electronics
 cb4                             // (c) 1997 Dyna Electronics
 cb5                             // (c) 1997 Dyna Electronics
+cb5_11                          // (c) 1997 Dyna Electronics
 crzybell                        // (c) 1995 Dyna Electronics
 dynastye                        // (c) 2002 Dyna Electronics
 mystjb                          // (c) 1998 Dyna Electronics
 ndongmul2                       // (c) 1999 Dyna Electronics
+nmondop                         // (c) 1998 Dyna Electronics
 scherrym                        // (c) 1993 Dyna Electronics
 scherrym12                      // (c) 1993 Dyna Electronics
 scherrymp                       // (c) 1997 Dyna Electronics
@@ -30947,7 +30960,9 @@ istellar                        // (c) 1983 Funai / Gakken
 istellar2                       // (c) 1984 Funai / Gakken
 
 @source:misc/itgambl2.cpp
+7gold                           // (c) 200? unknown
 btorneo                         // (c) 200? unknown
+ch3001r                         // (c) 200? unknown
 cmagica                         // (c) 200? unknown
 granfrat                        // (c) 200? unknown
 mcard_h8                        // (c) 200? unknown
@@ -30960,6 +30975,8 @@ mdrink                          // (c) 2001 unknown
 millsun                         // (c) 200? unknown
 mnumitg                         // (c) 200? unknown
 ntcash                          // (c) 1999 unknown
+ntcasha                         // (c) 1999 unknown
+pairsh8                         // (c) 200? unknown
 pirati                          // (c) 2001 Cin
 smcard                          // (c) 200? unknown
 sspac2k1                        // (c) 200? unknown
@@ -30970,6 +30987,7 @@ toptcash                        // (c) 2002 VideoIdea
 trstar2k                        // (c) 1999 A.M.
 unkh8gam                        // (c) 200? unknown
 wizard                          // (c) 1999 A.A.
+zupapah8                        // (c) 200? unknown
 
 @source:misc/itgambl3.cpp
 ejollyx5                        // (c) 200? Solar Games
@@ -30990,6 +31008,7 @@ capunc                          // (c) 2000 Nazionale Elettronica
 euro2k2                         // (c) 2001 Nazionale Elettronica
 euro2k2a                        // (c) 2001 Nazionale Elettronica
 euro2k2s                        // (c) 2002 Nazionale Elettronica
+gnumber                         // (c) 200? M.M. - B.R.L.
 labrinth                        // (c) 2001 Nazionale Elettronica
 laperla                         // (c) 2002 Nazionale Elettronica
 laperlag                        // (c) 2001 Nazionale Elettronica
@@ -34482,6 +34501,7 @@ vipclub                         // (c) 1988 Daiichi Denshi
 
 @source:nichibutsu/nbmj8891.cpp
 abunai                          // (c) 1989
+avmjts                          // (c) 1990
 bananadr                        // (c) 1989 DIGITAL SOFT
 chinmoku                        // (c) 1990
 club90s                         // (c) 1990
@@ -35447,6 +35467,7 @@ constjr
 diablo68
 diablo68a
 diablo68b
+diablo68c
 scorpio68
 
 @source:novag/diamond.cpp
@@ -35516,6 +35537,9 @@ sbasssta                        //
 
 @source:novation/drumsta.cpp
 drumsta                         //
+
+@source:oberheim/dmx.cpp
+obdmx                           // Oberheim DMX
 
 @source:olivetti/m20.cpp
 m20                             //
@@ -38800,6 +38824,7 @@ croupiera                       // (c) 1997 Playmark
 croupierb                       // (c) 1997 Playmark
 luckboom                        //
 magictch                        //
+magictcha                       //
 sderby                          // (c) 1996
 sderbya                         // (c) 1996
 shinygld                        //
@@ -41780,6 +41805,7 @@ deerhunte                       // (c) 2000 Sammy USA Corporation
 deerhuntj                       // (c) 2000 Sammy USA Corporation
 endrichs                        // (c) 1999 E.N.Tiger
 endrichsa                       // (c) 1999 E.N.Tiger
+endrichsb                       // (c) 1999 E.N.Tiger
 funcube                         // (c) 2000 Namco
 funcube2                        // (c) 2001 Namco
 funcube3                        // (c) 2001 Namco
