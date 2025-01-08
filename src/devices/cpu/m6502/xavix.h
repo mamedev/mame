@@ -215,6 +215,9 @@ private:
 	// Some original XaviX games seemed to suggest that the extra byte of the far calls went to a different
 	// stack, but dblmouse on suprtvpc does direct stack manipulation which challenges this assumption.
 	// It could be a SuperXaviX vs XaviX differences however, so currently leaving this as a toggle for testing.
+	//
+	// pausing in rad_hnt2 (press shift when on the map) is broken with this logic as the stack becomes too big
+	// with the extra bytes
 	static constexpr bool USE_SPECIAL_STACK = false;
 };
 
