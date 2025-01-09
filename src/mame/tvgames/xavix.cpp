@@ -460,7 +460,7 @@ void superxavix_state::superxavix_lowbus_map(address_map &map)
 	map(0x6c00, 0x6cff).ram().w(FUNC(superxavix_state::bmp_palram_sh_w)).share("bmp_palram_sh");
 	map(0x6d00, 0x6dff).ram().w(FUNC(superxavix_state::bmp_palram_l_w)).share("bmp_palram_l");
 
-	// map(0x6a40, 0x6a7f).ram().share("ext_segment_regs"); // 16x32 extended segment regs
+	map(0x6a40, 0x6a7f).ram().w(FUNC(superxavix_state::ext_segment_regs_w)).share("ext_segment_regs"); // 16x32 extended segment regs
 
 	 // bitmap plotter(!) (with auto-inc?) - used by super pc tv units
 	map(0x6f60, 0x6f60).w(FUNC(superxavix_state::superxavix_plt_flush_w)); // writes here to flush plotter FIFO

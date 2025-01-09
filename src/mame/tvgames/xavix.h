@@ -104,6 +104,7 @@ public:
 		m_posirq_x(*this, "posirq_x"),
 		m_posirq_y(*this, "posirq_y"),
 		m_segment_regs(*this, "segment_regs"),
+		m_ext_segment_regs(*this, "ext_segment_regs"),
 		m_palette(*this, "palette"),
 		m_region(*this, "REGION"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -557,6 +558,7 @@ protected:
 	required_shared_ptr<uint8_t> m_posirq_y;
 
 	required_shared_ptr<uint8_t> m_segment_regs;
+	optional_shared_ptr<uint8_t> m_ext_segment_regs;
 
 	required_device<palette_device> m_palette;
 
@@ -662,6 +664,7 @@ protected:
 	virtual void get_tile_pixel_dat(uint8_t &dat, int bpp) override;
 
 private:
+	void ext_segment_regs_w(offs_t offset, uint8_t data);
 	void superxavix_plt_flush_w(uint8_t data);
 	uint8_t superxavix_plt_dat_r();
 	void superxavix_plt_dat_w(uint8_t data);
