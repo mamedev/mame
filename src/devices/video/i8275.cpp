@@ -27,7 +27,6 @@
     TODO:
 
     - double spaced rows
-    - preset counters - how it affects DMA and HRTC?
 
 */
 
@@ -418,6 +417,7 @@ std::pair<uint8_t, uint8_t> i8275_device::char_from_buffer(int n, int sx, int rc
 		{
 			// simply blank the attribute character itself
 			attr = FAC_B;
+			attr |= (data & FAC_GG); // add the GG attributes
 		}
 	}
 	else if (data >= 0xf0 || BIT(end_of_row, n))

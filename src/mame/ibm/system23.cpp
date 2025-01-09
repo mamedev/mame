@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders: Jaume López
 
+#define VERBOSE 1
+
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255.h"
@@ -8,7 +10,6 @@
 #include "video/i8275.h"
 #include "machine/ram.h"
 #include "screen.h"
-#include "emupal.h"
 #include "logmacro.h"
 
 #include "ibmsystem23.lh"
@@ -26,12 +27,12 @@ namespace
 				m_ppi_settings(*this, "ppi_settings"),
 				m_dmac(*this,"dma"),
 				m_crtc(*this, "crtc"),
-				m_palette(*this, "palette"),
 				m_chargen(*this, "chargen"),
 				m_ram(*this, RAM_TAG),
 				m_screen(*this, "screen"),
 				m_language(*this,"lang"),
 				m_cedip(*this,"ce"),
+				m_j1(*this,"j1"),
 				m_diag_digits(*this, "digit%u", 0U)
 
 			{
@@ -51,12 +52,12 @@ namespace
 			required_device<i8255_device> m_ppi_settings;
 			required_device<i8257_device> m_dmac;
 			required_device<i8275_device> m_crtc;
-			required_device<palette_device> m_palette;
 			required_region_ptr<uint8_t> m_chargen;
 			required_device<ram_device> m_ram;
 			required_device<screen_device> m_screen;
 			required_ioport m_language;
 			required_ioport m_cedip;
+			required_ioport m_j1;
 			output_finder<2> m_diag_digits;
 
 			uint8_t m_bus_test_register = 0;
@@ -147,7 +148,7 @@ namespace
 
 	I8275_DRAW_CHARACTER_MEMBER( system23_state::display_pixels )
 	{
-		const rgb_t *palette = m_palette->palette()->entry_list_raw();
+		//const rgb_t *palette = m_palette->palette()->entry_list_raw();
 		uint8_t gfx = 0;
 
 		using namespace i8275_attributes;
@@ -161,6 +162,7 @@ namespace
 		if (BIT(attrcode, RVV))
 			gfx ^= 0xff;
 
+		//if (BIT(attrcode, GPA0) || BIT(attrcode, GPA1)) printf("GPA0: %u GPA1: %u\n", BIT(attrcode, GPA0), BIT(attrcode, GPA1));
 		if (BIT(attrcode, GPA0) && BIT(attrcode, GPA1))
 		{
 			m_crtc->lpen_w(ASSERT_LINE);				//hack to test the light pen at test 05
@@ -171,14 +173,16 @@ namespace
 			m_crtc->lpen_w(CLEAR_LINE);
 		}
 
+		LOG("x=%x y=%x attrcode=%x\n",x,y,attrcode);
+
 		// Highlight not used
 		bitmap.pix(y, x++) = BIT(gfx, 1) ? 1 : 0;
-		bitmap.pix(y, x++) = BIT(gfx, 2) ? palette[1] : palette[0];
-		bitmap.pix(y, x++) = BIT(gfx, 3) ? palette[1] : palette[0];
-		bitmap.pix(y, x++) = BIT(gfx, 4) ? palette[1] : palette[0];
-		bitmap.pix(y, x++) = BIT(gfx, 5) ? palette[1] : palette[0];
-		bitmap.pix(y, x++) = BIT(gfx, 6) ? palette[1] : palette[0];
-		bitmap.pix(y, x++) = BIT(gfx, 7) ? palette[1] : palette[0];
+		bitmap.pix(y, x++) = BIT(gfx, 2) ? 1 : 0;
+		bitmap.pix(y, x++) = BIT(gfx, 3) ? 1 : 0;
+		bitmap.pix(y, x++) = BIT(gfx, 4) ? 1 : 0;
+		bitmap.pix(y, x++) = BIT(gfx, 5) ? 1 : 0;
+		bitmap.pix(y, x++) = BIT(gfx, 6) ? 1 : 0;
+		bitmap.pix(y, x++) = BIT(gfx, 7) ? 1 : 0;
 	}
 
 	//This routine describes the computer's I/O map
@@ -231,19 +235,16 @@ namespace
 		m_dmac->out_iow_cb<2>().set(m_crtc, FUNC(i8275_device::dack_w));
 		m_dmac->out_hrq_cb().set(FUNC(system23_state::dmac_hrq_w));
 
-		PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
-
 		SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::green());
 		m_screen->set_raw(18'432'000, 800, 0, 640, 324, 0, 300);
 		m_screen->set_screen_update(m_crtc, FUNC(i8275_device::screen_update));
-		m_screen->set_palette(m_palette);
 
 		I8275(config, m_crtc, (18'432'000 / 8));
 		m_crtc->set_character_width(8);
 		m_crtc->set_screen(m_screen);
 		m_crtc->set_display_callback(FUNC(system23_state::display_pixels));
 		m_crtc->drq_wr_callback().set(m_dmac, FUNC(i8257_device::dreq2_w));
-		//m_crtc->irq_wr_callback().set_inputline(m_maincpu, I8085_RST55_LINE); // Only when jumper J1 is bridged
+		m_crtc->irq_wr_callback().set_inputline(m_maincpu, I8085_RST55_LINE); // Only when jumper J1 is bridged
 
 
 		RAM(config, m_ram).set_default_size("16k");
@@ -263,6 +264,11 @@ namespace
 	}
 
 	static INPUT_PORTS_START(system23)
+		PORT_START("j1")
+			PORT_DIPNAME(0x01, 0x00, "J1")
+			PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+			PORT_DIPSETTING(    0x01, DEF_STR( On ))
+
 		PORT_START("ce")
 			PORT_DIPNAME( 0x01, 0x00, "A1")
 			PORT_DIPSETTING(    0x01, DEF_STR( Off ))
