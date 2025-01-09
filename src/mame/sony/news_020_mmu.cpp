@@ -8,7 +8,7 @@
 #define LOG_DATA      (1U << 2)
 #define LOG_MAP_ERROR (1U << 3)
 
-// #define VERBOSE (LOG_ENTRY|LOG_DATA|LOG_MAP_ERROR|LOG_GENERAL)
+#define VERBOSE (LOG_ENTRY|LOG_MAP_ERROR|LOG_GENERAL)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(NEWS_020_MMU, news_020_mmu_device, "news_020_mmu", "Sony NEWS 68020 MMU")
@@ -145,7 +145,7 @@ void news_020_mmu_device::mmu_entry_w(offs_t offset, uint32_t data, uint32_t mem
 uint32_t news_020_mmu_device::hyperbus_r(offs_t offset, uint32_t mem_mask, bool is_supervisor)
 {
 	uint32_t result = 0;
-	if (!m_enabled || offset >= (0xc0000000 >> 2)) // TODO: second check is jank af, is it legit?
+	if (!m_enabled || offset >= (0xc0000000 >> 2)) // TODO: second check is jank af, is it legit? Seems like a possible protection violation issue
 	{
 		// TODO: What is the actual physical address width? The 0x1 part might also be an MMU control bit
 		offset = offset & (0x1fffffff >> 2);
@@ -227,7 +227,6 @@ void news_020_mmu_device::hyperbus_w(offs_t offset, uint32_t data, uint32_t mem_
 			// TODO: update below log message
 			LOGMASKED(LOG_MAP_ERROR, "(%s) mmu w 0x%08x (pg 0x%08x) -> tag mismatch 0x%x != 0x%x\n", machine().describe_context(), offset, vpgnum, vpgnum % MMU_ENTRY_COUNT, tag, vpgnum);
 			m_bus_error(offset, mem_mask, true, TAG_MISMATCH); // should M be set here too?
-
 		}
 		// TODO: order of operations between checking valid and access bits?
 		else if ((!system && !(pte & 0x10000000)) && !is_supervisor) // user memory protection violation
