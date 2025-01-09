@@ -261,8 +261,8 @@ namespace
         std::unique_ptr<u16[]> m_net_ram;
 
         // IOP IRQ state
-        uint8_t m_iop_intst = 0;
-        uint8_t m_iop_inten = iop_nmi_mask;
+        uint32_t m_iop_intst = 0;
+        uint32_t m_iop_inten = iop_nmi_mask;
         std::map<int, bool> m_iop_int_state = {
             {INPUT_LINE_IRQ1, false},
             {INPUT_LINE_IRQ2, false},
@@ -275,8 +275,8 @@ namespace
 
         // CPU IRQ state
         bool m_ast = false;
-        uint8_t m_cpu_intst = 0;
-        uint8_t m_cpu_inten = 0;
+        uint32_t m_cpu_intst = 0;
+        uint32_t m_cpu_inten = 0;
         std::map<int, bool> m_cpu_int_state = {
             {INPUT_LINE_IRQ1, false},
             {INPUT_LINE_IRQ2, false},
