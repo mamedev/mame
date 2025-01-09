@@ -1185,6 +1185,20 @@ void xavix_state::draw_sprites_line(screen_device &screen, bitmap_rgb32 &bitmap,
 					int gfxbase = (m_segment_regs[1] << 16) | (m_segment_regs[0] << 8); // always use segment 0
 					tile += gfxbase;
 
+					// ban_bkgj is in sprite mode 0x01 but seems to expect the extended SuperXaviX registers to apply too?
+					//
+					// Is the register being set correctly? I'd expect it to be a different value to enable this. It does
+					// briefly set mode 4 and 5 on the startup logos, where it *doesn't* need this logic
+					if (m_ext_segment_regs)
+					{
+						int gfxbase = (m_ext_segment_regs[3] << 24) |
+									  (m_ext_segment_regs[2] << 16) |
+									  (m_ext_segment_regs[1] << 8) |
+									  (m_ext_segment_regs[0] << 0);
+						tile += gfxbase;
+					}
+
+
 				}
 				else if (alt_addressing == 2)
 				{
