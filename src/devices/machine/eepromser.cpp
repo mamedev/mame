@@ -2,8 +2,6 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    eepromser.c
-
     Serial EEPROM devices.
 
 ****************************************************************************
@@ -155,24 +153,24 @@ ALLOW_SAVE_TYPE(eeprom_serial_base_device::eeprom_state);
 //  eeprom_serial_base_device - constructor
 //-------------------------------------------------
 
-eeprom_serial_base_device::eeprom_serial_base_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, eeprom_serial_streaming enable_streaming)
-	: eeprom_base_device(mconfig, devtype, tag, owner),
-		m_command_address_bits(0),
-		m_streaming_enabled(bool(enable_streaming)),
-		m_output_on_falling_clock_enabled(false),
-		m_do_cb(*this),
-		m_state(STATE_IN_RESET),
-		m_cs_state(CLEAR_LINE),
-		m_last_cs_rising_edge_time(attotime::zero),
-		m_oe_state(CLEAR_LINE),
-		m_clk_state(CLEAR_LINE),
-		m_di_state(CLEAR_LINE),
-		m_locked(true),
-		m_bits_accum(0),
-		m_command_address_accum(0),
-		m_command(COMMAND_INVALID),
-		m_address(0),
-		m_shift_register(0)
+eeprom_serial_base_device::eeprom_serial_base_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, eeprom_serial_streaming enable_streaming) :
+	eeprom_base_device(mconfig, devtype, tag, owner),
+	m_command_address_bits(0),
+	m_streaming_enabled(bool(enable_streaming)),
+	m_output_on_falling_clock_enabled(false),
+	m_do_cb(*this),
+	m_state(STATE_IN_RESET),
+	m_cs_state(CLEAR_LINE),
+	m_last_cs_rising_edge_time(attotime::zero),
+	m_oe_state(CLEAR_LINE),
+	m_clk_state(CLEAR_LINE),
+	m_di_state(CLEAR_LINE),
+	m_locked(true),
+	m_bits_accum(0),
+	m_command_address_accum(0),
+	m_command(COMMAND_INVALID),
+	m_address(0),
+	m_shift_register(0)
 {
 }
 
@@ -193,6 +191,7 @@ void eeprom_serial_base_device::device_start()
 	// save the current state
 	save_item(NAME(m_state));
 	save_item(NAME(m_cs_state));
+	save_item(NAME(m_last_cs_rising_edge_time));
 	save_item(NAME(m_oe_state));
 	save_item(NAME(m_clk_state));
 	save_item(NAME(m_di_state));
