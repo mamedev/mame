@@ -5,16 +5,10 @@
     Triumph-Adler Alphatronic Px series
     ===================================
 
-    The Px series was an OEM design by SKS (Steinmetz-Krischke Systemtechnik), like the ITT3030 and the SKS Nano 2500,
+    The Px series was designed by SKS (Steinmetz-Krischke Systemtechnik), like the ITT3030 and the SKS Nano,
     the boards are closely related.
-	
-	The series originated in the SKS KISS series of computers which were shipped in a bright orange case, typical for
-	SKS' lineup of computers. SKS had a strong foothold in the typesetting business, as seen in the last of the SKS KISS
-	descentants, the Hell DS 2069 typesetting terminal.
 
-    SKS KISS
-	========
-	OEM version of the Alphatronic P1 (see below), of which a few were sold independently starting in 1979. 
+    Keyboard and floppy stuff was copypasted from ITT3030 and adapted to the best of knowledge.
 
     P1, P2 and P2S: no paging
     Lower 16K for P1, P2 and P2 S:
@@ -29,7 +23,7 @@
     ==
     Upper 32K:
     0x4000 - 0x400a reserved
-    0x4010 - 0xc000 32K RAM 
+    0x4010 - 0xc000 32K RAM
     1x 160K, single sided, 40 tracks, 16 sectors/track, 256 bytes/sector floppy disk drive
 
     P2, P2S
@@ -65,10 +59,6 @@
     ===========
     Those were P3 and P4's with an additional 8088 card, a 128K RAM card (some with an extra 32K graphics extension) to support MS-DOS.
 
-	Keyboard and floppy stuff was copypasted from ITT3030, which is an evolution of the SKS KISS design, as is the SKS Nano 2500 portable and the Hell DS 2069
-	typesetting terminal. 
-	
-	SKS information at https://www.homecomputermuseum.de/historie/mittlere-datentechnik/steinmetz-krischke-systemtechnik-sks
 
     comments, testing, modification: rfka01, helwie44
 
