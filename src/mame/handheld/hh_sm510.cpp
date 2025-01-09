@@ -11585,6 +11585,72 @@ ROM_END
 
 /*******************************************************************************
 
+  Tronica: Diver's Adventure (model DA-37)
+  * PCB labels: DA-37 260383 32-541-1
+  * Sharp SM510 label 0029 235D TRONICA (no decap)
+  * lcd screen with custom segments, 1-bit sound
+
+  ROM data is identical with Tronica Clever Chicken (CC-38V).
+
+*******************************************************************************/
+
+class trdivadv_state : public hh_sm510_state
+{
+public:
+	trdivadv_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void trdivadv(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( trdivadv )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+// config
+
+void trdivadv_state::trdivadv(machine_config &config)
+{
+	sm510_common(config, 1520, 1080);
+}
+
+// roms
+
+ROM_START( trdivadv )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "0029_235d", 0x0000, 0x1000, CRC(8977a1cf) SHA1(9ac413efedcff8b53b859420c0575c66e7be6e73) )
+
+	ROM_REGION( 165418, "screen", 0)
+	ROM_LOAD( "trdivadv.svg", 0, 165418, CRC(727040f1) SHA1(2318d6973a165eedcd369bd11342eca7efd24c39) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
   VTech Electronic Number Muncher
   * Sharp SM511 under epoxy (die label 772)
   * lcd screen with custom segments(no background), 1-bit sound
@@ -11877,6 +11943,7 @@ SYST( 1983, trthuball,    trsrescue,   0,      trthuball,    trsrescue,    trsre
 SYST( 1983, trsgkeep,     0,           0,      trsgkeep,     trsgkeep,     trsgkeep_state,     empty_init, "Tronica", "Super Goal Keeper", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1982, trspacmis,    0,           0,      trspacmis,    trspacmis,    trspacmis_state,    empty_init, "Tronica", "Space Mission (Tronica)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1982, trspider,     trspacmis,   0,      trspider,     trspacmis,    trspacmis_state,    empty_init, "Tronica", "Spider (Tronica)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1983, trdivadv,     0,           0,      trdivadv,     trdivadv,     trdivadv_state,     empty_init, "Tronica", "Diver's Adventure", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 // misc
 SYST( 1989, nummunch,     0,           0,      nummunch,     nummunch,     nummunch_state,     empty_init, "VTech", "Electronic Number Muncher", MACHINE_SUPPORTS_SAVE )
