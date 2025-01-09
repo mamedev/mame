@@ -49337,7 +49337,7 @@ ATK test: OK
 		<publisher>Team 17</publisher>
 		<notes><![CDATA[
 Red screen [FDC] dsksync (fixed?)
-a500: no main sprite (works with a500p, a1200)
+Main sprite randomly don't show up, [Copper]?
 [Copper] cuts bottom part of screen badly during gameplay, may use SKIP
 ATK test: failed
 ]]></notes>
