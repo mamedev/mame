@@ -244,8 +244,6 @@ void undrfire_state::shared_ram_w(offs_t offset, u16 data, u16 mem_mask)
 
 u32 undrfire_state::undrfire_lightgun_r(offs_t offset)
 {
-	int x,y;
-
 	switch (offset)
 	{
 		/* NB we are raising the raw inputs by an arbitrary amount,
@@ -256,8 +254,8 @@ u32 undrfire_state::undrfire_lightgun_r(offs_t offset)
 		case 0x00:  /* P1 */
 		case 0x01:  /* P2 */
 		{
-			x = m_in_gunx[offset & 1]->read() << 6;
-			y = m_in_guny[offset & 1]->read() << 6;
+			int x = m_in_gunx[offset & 1]->read() << 6;
+			int y = m_in_guny[offset & 1]->read() << 6;
 
 			return ((x << 24) &0xff000000) | ((x << 8) &0xff0000)
 					| ((y << 8) &0xff00) | ((y >> 8) &0xff) ;
@@ -421,7 +419,6 @@ static INPUT_PORTS_START( undrfire )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	/* Gun inputs (real range is 0-0xffff: we use standard 0-255 and shift later) */
-
 	PORT_START("GUNX1")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, -1.0, 0.0, 0) PORT_SENSITIVITY(20) PORT_KEYDELTA(25) PORT_REVERSE PORT_PLAYER(1)
 
@@ -433,11 +430,6 @@ static INPUT_PORTS_START( undrfire )
 
 	PORT_START("GUNY2")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(20) PORT_KEYDELTA(25) PORT_PLAYER(2)
-
-	PORT_START("FAKE")
-	PORT_DIPNAME( 0x01, 0x00, "Show gun target" ) PORT_CODE(KEYCODE_F1) PORT_TOGGLE
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
 
@@ -506,6 +498,7 @@ static const gfx_layout tile16x16_layout =
 static GFXDECODE_START( gfx_undrfire )
 	GFXDECODE_ENTRY( "sprites", 0x0, tile16x16_layout, 0, 512 )
 GFXDECODE_END
+
 
 /***********************************************************
                  MACHINE DRIVERS

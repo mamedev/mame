@@ -10,14 +10,13 @@
     - Tseng Labs ET4000W32
     - 1, 2 (maximum in Zorro-II mode) or 4 MB RAM
     - 33 MHz and 14.31818 MHz XTAL
-    - BT482 RAMDAC
+    - BT482KPJ85 RAMDAC
     - Serial EEPROM with stored serial number (unknown type)
     - DG894 (video switcher)
     - Optional video module: X-Calibur (S-VHS/Composite input/output)
 
     TODO:
     - Skeleton
-    - RAMDAC
 
 ***************************************************************************/
 
@@ -42,6 +41,7 @@ merlin_device::merlin_device(const machine_config &mconfig, const char *tag, dev
 	device_t(mconfig, ZORRO_MERLIN, tag, owner, clock),
 	device_zorro2_card_interface(mconfig, *this),
 	m_vga(*this, "vga"),
+	m_ramdac(*this, "ramdac"),
 	m_autoconfig_memory_done(false)
 {
 }
@@ -54,7 +54,7 @@ merlin_device::merlin_device(const machine_config &mconfig, const char *tag, dev
 void merlin_device::mmio_map(address_map &map)
 {
 	map(0x0000, 0xffff).unmaprw();
-	//map(0x0000, 0x001f) RAMDAC
+	map(0x0000, 0x001f).m(m_ramdac, FUNC(bt482_device::map)).umask32(0x00ff0000); // TODO: 16-bit
 	map(0x03b0, 0x03df).m(m_vga, FUNC(et4kw32i_vga_device::io_map));
 	//map(0x0401, 0x0401) monitor switch
 	map(0x210a, 0x210a).mirror(0x70).rw(m_vga, FUNC(et4kw32i_vga_device::acl_index_r), FUNC(et4kw32i_vga_device::acl_index_w));
@@ -70,12 +70,14 @@ void merlin_device::device_add_mconfig(machine_config &config)
 {
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(33_MHz_XTAL, 900, 0, 640, 526, 0, 480); // TODO
-	screen.set_screen_update(m_vga, FUNC(et4kw32i_vga_device::screen_update));
+	screen.set_screen_update(FUNC(merlin_device::screen_update));
 
 	ET4KW32I_VGA(config, m_vga, 0); // should be ET4000W32
 	m_vga->set_screen("screen");
 	m_vga->set_vram_size(0x200000);
 	m_vga->vsync_cb().set([this](int state) { m_slot->int6_w(state); });
+
+	BT482(config, m_ramdac, 0);
 }
 
 
@@ -91,6 +93,14 @@ void merlin_device::busrst_w(int state)
 {
 	if (state == 0)
 		m_autoconfig_memory_done = false;
+}
+
+uint32_t merlin_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	m_vga->screen_update(screen, bitmap, cliprect);
+	m_ramdac->screen_update(screen, bitmap, cliprect);
+
+	return 0;
 }
 
 

@@ -62,12 +62,13 @@ private:
 	memory_share_creator<u8> m_nvram;
 	required_shared_ptr<u32> m_ram;
 
-	output_finder<5> m_leds;
+	output_finder<6> m_leds;
 
 	// machine registers
 	u16 m_cpucfg;
-	u16 m_dmalo;
-	u16 m_dmahi;
+	u16 m_dma_lo;
+	u16 m_dma_hi[16];
+	u8 m_dma_page;
 	u8 m_lio_isr;
 	u8 m_vme_isr;
 	u8 m_vme_imr;
