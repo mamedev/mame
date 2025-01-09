@@ -553,7 +553,7 @@ ROM_START( ncv1 )
 	ROM_LOAD( "nc1sub.1c",          0x00000, 0x80000, CRC(48ea0de2) SHA1(33e57c8d084a960ccbda462d18e355de44ec7ad9) )
 
 	ROM_REGION( 0x800000, "ygv608", 0 )    // 2MB character generator
-	ROM_LOAD( "nc1cg0.10c",         0x000000, 0x200000, CRC(355e7f29) SHA1(47d92c4e28c3610a620d3c9b3be558199477f6d8) )
+	ROM_LOAD( "nc1cg0.10c",         0x000000, 0x200000, CRC(d4383199) SHA1(3263874ba838651631ad6d11afb150206de760bb) )
 	ROM_RELOAD(                     0x200000, 0x200000 )
 	ROM_RELOAD(                     0x400000, 0x200000 )
 	ROM_RELOAD(                     0x600000, 0x200000 )
@@ -571,7 +571,7 @@ ROM_START( ncv1j )
 	ROM_LOAD( "nc1sub.1c",          0x00000, 0x80000, CRC(48ea0de2) SHA1(33e57c8d084a960ccbda462d18e355de44ec7ad9) )
 
 	ROM_REGION( 0x800000, "ygv608", 0 )    // 2MB character generator
-	ROM_LOAD( "nc1cg0.10c",         0x000000, 0x200000, CRC(355e7f29) SHA1(47d92c4e28c3610a620d3c9b3be558199477f6d8) )
+	ROM_LOAD( "nc1cg0.10c",         0x000000, 0x200000, CRC(d4383199) SHA1(3263874ba838651631ad6d11afb150206de760bb) )
 	ROM_RELOAD(                     0x200000, 0x200000 )
 	ROM_RELOAD(                     0x400000, 0x200000 )
 	ROM_RELOAD(                     0x600000, 0x200000 )
@@ -589,7 +589,7 @@ ROM_START( ncv1j2 )
 	ROM_LOAD( "nc1sub.1c",          0x00000, 0x80000, CRC(48ea0de2) SHA1(33e57c8d084a960ccbda462d18e355de44ec7ad9) )
 
 	ROM_REGION( 0x800000, "ygv608", 0 )    // 2MB character generator
-	ROM_LOAD( "nc1cg0.10c",         0x000000, 0x200000, CRC(355e7f29) SHA1(47d92c4e28c3610a620d3c9b3be558199477f6d8) )
+	ROM_LOAD( "nc1cg0.10c",         0x000000, 0x200000, CRC(d4383199) SHA1(3263874ba838651631ad6d11afb150206de760bb) )
 	ROM_RELOAD(                     0x200000, 0x200000 )
 	ROM_RELOAD(                     0x400000, 0x200000 )
 	ROM_RELOAD(                     0x600000, 0x200000 )
