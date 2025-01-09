@@ -309,22 +309,14 @@ int agnus_copper_device::execute_next(int xpos, int ypos, bool is_blitter_busy, 
 		word0 = (word0 >> 1) & 0xff;
 		if (word0 >= m_cdang_setting)
 		{
-			if (delay[word0] == 0)
-			{
-				//LOGCHIPSET("%02X.%02X: Write to %s = %04x\n", ypos, xpos / 2, s_custom_reg_names[word0 & 0xff], word1);
-				LOGCHIPSET("%02X.%02X: MOVE $dff%03x = %04x\n",
-					ypos,
-					xpos / 2,
-					word0 << 1,
-					word1
-				);
-				m_host_space->write_word(0xdff000 | (word0 << 1), word1);
-			}
-			else    // additional 2 cycles needed for non-Agnus registers
-			{
-				m_pending_offset = word0;
-				m_pending_data = word1;
-			}
+			// delay write to the next available DMA slot if not in blanking area
+			// - bchvolly (title), suprfrog & abreed (bottom playfield rows)
+			const bool horizontal_blank = xpos < 0x47;
+			const int move_offset = horizontal_blank ? 0 : std::max(num_planes - 4, 0);
+
+			m_pending_offset = word0;
+			m_pending_data = word1;
+			xpos += COPPER_CYCLES_TO_PIXELS(move_offset);
 		}
 
 		/* illegal writes suspend until next frame */
@@ -351,7 +343,8 @@ int agnus_copper_device::execute_next(int xpos, int ypos, bool is_blitter_busy, 
 		/* handle a wait */
 		if ((word1 & 1) == 0)
 		{
-			const int wait_offset = std::max(num_planes - 4, 0) + 1;
+			const bool horizontal_blank = xpos < 0x47;
+			const int wait_offset = horizontal_blank ? 0 : std::max(num_planes - 4, 0) + 1;
 
 			LOGINST("  WAIT %04x & %04x (currently %04x, num planes %d +%d)\n",
 				m_waitval,
@@ -383,6 +376,8 @@ int agnus_copper_device::execute_next(int xpos, int ypos, bool is_blitter_busy, 
 				LOGINST("  Skipped\n");
 
 				/* count the cycles it out have taken to fetch the next instruction */
+				// TODO: look ahead, check if next instruction is a valid MOVE
+				// SKIP/WAIT and illegal instructions aren't skipped.
 				m_pc += 4;
 				xpos += COPPER_CYCLES_TO_PIXELS(2);
 			}

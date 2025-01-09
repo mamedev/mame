@@ -35,13 +35,15 @@ public:
 		, m_cassette(*this, "cassette")
 		, m_ram(*this, RAM_TAG)
 		, m_special(*this, "SPECIAL")
-		, m_7segs(*this, "digit%u", 0U)
 		, m_led(*this, "led0")
 	{ }
 
 	void elf2(machine_config &config);
 
-	DECLARE_INPUT_CHANGED_MEMBER( input_w );
+	DECLARE_INPUT_CHANGED_MEMBER(input_w);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	uint8_t dispon_r();
@@ -55,13 +57,10 @@ private:
 	uint8_t dma_r();
 	void sc_w(uint8_t data);
 	void da_w(int state);
-	template <unsigned N> void digit_w(uint8_t data) { m_7segs[N] = data; }
 
-	DECLARE_QUICKLOAD_LOAD_MEMBER( quickload_cb );
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	void elf2_io(address_map &map) ATTR_COLD;
 	void elf2_mem(address_map &map) ATTR_COLD;
-
-	virtual void machine_start() override ATTR_COLD;
 
 	required_device<cosmac_device> m_maincpu;
 	required_device<cdp1861_device> m_vdc;
@@ -71,7 +70,6 @@ private:
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
 	required_ioport m_special;
-	output_finder<2> m_7segs;
 	output_finder<> m_led;
 
 	// display state
