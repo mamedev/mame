@@ -13331,6 +13331,74 @@ ROM_START( cutyline ) // Dyna D9001 PCB, DYNA QL-1 V1.01 string in ROM
 	ROM_LOAD( "9.9e", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
 ROM_END
 
+ROM_START( cutylinea ) // bootleg PCB, DYNA QL-1 V8.05C string in ROM
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "rom9.16f", 0x0000, 0x1000, CRC(8a16515f) SHA1(411f1286c25905150e77f002d940b7a6de329b25) )
+	ROM_CONTINUE(         0x4000, 0x1000 )
+	ROM_CONTINUE(         0x3000, 0x1000 )
+	ROM_CONTINUE(         0x7000, 0x1000 )
+	ROM_CONTINUE(         0x1000, 0x1000 )
+	ROM_CONTINUE(         0x6000, 0x1000 )
+	ROM_CONTINUE(         0x2000, 0x1000 )
+	ROM_CONTINUE(         0x5000, 0x1000 )
+	ROM_CONTINUE(         0x8000, 0x8000 )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "rom7.3e", 0x00000, 0x8000, CRC(1fa8d85e) SHA1(963570178dfb359c6ef4c322791de8f08306eb0c) )
+	ROM_LOAD( "rom6.2e", 0x08000, 0x8000, CRC(36dfbbcb) SHA1(8dee44f4b007a41b67e2d4eb75b88b02b9118be0) )
+	ROM_LOAD( "rom5.1e", 0x10000, 0x8000, CRC(2350e482) SHA1(03c4a83fb5b544d061378db319ff652a2c053062) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "rom4.3f", 0x0000, 0x2000, CRC(2d044e6b) SHA1(7ca60cca8de2c368ca43f1ce54a5140a3dd1ee37) )
+	ROM_LOAD( "rom3.2f", 0x2000, 0x2000, CRC(e7e300c2) SHA1(b21926d41aa9d27c78fbf28efd86ac070891a7bb) )
+	ROM_LOAD( "rom2.3h", 0x4000, 0x2000, CRC(955d0517) SHA1(3662f97996f80ef9093936dfe0a73de5f6850294) )
+	ROM_LOAD( "rom1.2h", 0x6000, 0x2000, CRC(188fc72b) SHA1(501afe548dc279c5f77d9827d0a073875fa7a64f) )
+
+	ROM_REGION( 0x10000, "user1", 0 ) // girl bitmaps
+	ROM_LOAD( "rom8.10c", 0x0000, 0x10000, BAD_DUMP CRC(e92443d3) SHA1(4b6ca4521841610054165f085ae05510e77af191) ) // dump not included, but present on PCB pic
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "b12.16c", 0x0000, 0x0100, BAD_DUMP CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) ) // dump not included, but present on PCB pic
+	ROM_LOAD( "b12.15c", 0x0100, 0x0100, BAD_DUMP CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) ) // dump not included, but present on PCB pic
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "b11.9e", 0x0000, 0x0100, BAD_DUMP CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) ) // dump not included, but present on PCB pic
+ROM_END
+
+ROM_START( cutylineb ) // bootleg PCB, DYNA QL-1 V7C.14 string in ROM
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "rom9.16f", 0x0000, 0x1000, CRC(90b700aa) SHA1(9abdedf144f631f21853e7df8f533a5b0d4bf43e) )
+	ROM_CONTINUE(         0x4000, 0x1000 )
+	ROM_CONTINUE(         0x3000, 0x1000 )
+	ROM_CONTINUE(         0x7000, 0x1000 )
+	ROM_CONTINUE(         0x1000, 0x1000 )
+	ROM_CONTINUE(         0x6000, 0x1000 )
+	ROM_CONTINUE(         0x2000, 0x1000 )
+	ROM_CONTINUE(         0x5000, 0x1000 )
+	ROM_CONTINUE(         0x8000, 0x8000 )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "rom7.3e", 0x00000, 0x8000, CRC(1fa8d85e) SHA1(963570178dfb359c6ef4c322791de8f08306eb0c) )
+	ROM_LOAD( "rom6.2e", 0x08000, 0x8000, CRC(36dfbbcb) SHA1(8dee44f4b007a41b67e2d4eb75b88b02b9118be0) )
+	ROM_LOAD( "rom5.1e", 0x10000, 0x8000, CRC(2350e482) SHA1(03c4a83fb5b544d061378db319ff652a2c053062) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "rom4.3f", 0x0000, 0x2000, CRC(2d044e6b) SHA1(7ca60cca8de2c368ca43f1ce54a5140a3dd1ee37) )
+	ROM_LOAD( "rom3.2f", 0x2000, 0x2000, CRC(e7e300c2) SHA1(b21926d41aa9d27c78fbf28efd86ac070891a7bb) )
+	ROM_LOAD( "rom2.3h", 0x4000, 0x2000, CRC(955d0517) SHA1(3662f97996f80ef9093936dfe0a73de5f6850294) )
+	ROM_LOAD( "rom1.2h", 0x6000, 0x2000, CRC(188fc72b) SHA1(501afe548dc279c5f77d9827d0a073875fa7a64f) )
+
+	ROM_REGION( 0x10000, "user1", 0 ) // girl bitmaps
+	ROM_LOAD( "rom8.10c", 0x0000, 0x10000, BAD_DUMP CRC(e92443d3) SHA1(4b6ca4521841610054165f085ae05510e77af191) ) // dump not included, but present on PCB pic
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "b12.16c", 0x0000, 0x0100, BAD_DUMP CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) ) // dump not included, but present on PCB pic
+	ROM_LOAD( "b12.15c", 0x0100, 0x0100, BAD_DUMP CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) ) // dump not included, but present on PCB pic
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "b11.9e", 0x0000, 0x0100, BAD_DUMP CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) ) // dump not included, but present on PCB pic
+ROM_END
+
 ROM_START( srmagic )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "real magic.u81", 0x00000, 0x10000, CRC(93ef9f6a) SHA1(ad482b5df9de02a245567642d20f51da2ec2dfed) )
@@ -15246,6 +15314,36 @@ ROM_START( ns8linesa )
 	ROM_LOAD( "u1.bin", 0x0000, 0x0020, BAD_DUMP CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
 ROM_END
 
+
+ROM_START( f16s8l)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "f17.b14", 0x0000, 0x8000, CRC(5384e190) SHA1(9ef9b44206b258f5850d05c1b6aa738131842a50) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "5.bin", 0x00000, 0x8000, CRC(994a9894) SHA1(4063c2c5e111f24a85df1665fd3f9fbb20fda4da) )
+	ROM_LOAD( "6.bin", 0x08000, 0x8000, CRC(80888d64) SHA1(91ec96709df77c534d381e391839984a88aeb1e0) )
+	ROM_LOAD( "7.bin", 0x10000, 0x8000, CRC(255d5860) SHA1(f171fde3d542594132b38b44300f750d45fb67a2) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "1.bin", 0x0000, 0x2000, CRC(b45f41e2) SHA1(890c94c802f5ada97bc73f5a7a09e69c3207966c) )
+	ROM_LOAD( "2.bin", 0x2000, 0x2000, CRC(0463413a) SHA1(061b8335fdd44767e8c1832f5b5101276ad0f689) )
+	ROM_LOAD( "3.bin", 0x4000, 0x2000, CRC(6be213c8) SHA1(bf5a002961b0827581cbab4249321ae5b51316f0) )
+	ROM_LOAD( "4.bin", 0x6000, 0x2000, CRC(0a25964b) SHA1(d41eda201bb01229fb6e2ff437196dd65eebe577) )
+
+	// PROMs weren't provided for this set, taken from other set with same GFX ROMs, so should be good
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "2.13g", 0x0000, 0x0100, CRC(23e81049) SHA1(78071dae70fad870e972d944642fb3a2374be5e4) )
+	ROM_LOAD( "1.14g", 0x0100, 0x0100, CRC(526cf9d3) SHA1(eb779d70f2507d0f26d225ac8f5de8f2243599ca) )
+
+	ROM_REGION( 0x20, "proms2", 0 )
+	ROM_LOAD( "4.13d", 0x0000, 0x0020, CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "3.3f",  0x0000, 0x0100, CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
+
+	ROM_REGION( 0x20, "unkprom2", 0 )
+	ROM_LOAD( "5.12d", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+ROM_END
 
 /*
   Super 97-2
@@ -22710,6 +22808,8 @@ GAMEL( 1991, cmasterj,   cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4
 GAMEL( 1991, cmasterk,   cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 11, TAKE stops all)", 0,          layout_cmasterb )
 GAMEL( 1991, cmasterl,   cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 12)",          0,                 layout_cmasterb )
 GAMEL( 1991, cutyline,   0,        cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cuty Line (ver.1.01)",                        0,                 layout_cmasterb )
+GAMEL( 1991, cutylinea,  cutyline, cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Cuty Line (LC-88 bootleg, ver.8.05C)",        MACHINE_NOT_WORKING, layout_cmasterb ) // needs correct memory map
+GAMEL( 1991, cutylineb,  cutyline, cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Cuty Line (LC-88 bootleg, ver.7C.14)",        MACHINE_NOT_WORKING, layout_cmasterb ) // needs correct memory map
 GAMEL( 199?, super7,     cmaster,  super7,   cmaster,  cmaster_state,  init_super7,    ROT0, "bootleg",           "Super Seven",                                 MACHINE_NOT_WORKING, layout_cmasterb ) // bad palette, no reels, decryption might be missing something, too
 GAME ( 199?, wcat3a,     wcat3,    chryangl, cmaster,  cmaster_state,  init_wcat3a,    ROT0, "E.A.I.",            "Wild Cat 3 (CMV4 hardware)",                  MACHINE_NOT_WORKING ) // does not boot. Wrong decryption, wrong machine or wrong what?
 GAMEL( 199?, ll3,        cmaster,  cm,       cmasterb, cmaster_state,  init_ll3,       ROT0, "bootleg",           "Lucky Line III",                              MACHINE_NOT_WORKING, layout_cmasterb )  // not looked at yet
@@ -22767,6 +22867,7 @@ GAMEL( 198?, ns8lines,   0,        lucky8,   lucky8b,  wingco_state,   empty_ini
 GAMEL( 1985, ns8linesa,  ns8lines, lucky8,   lucky8b,  wingco_state,   empty_init,     ROT0, "Yamate (bootleg)",  "New Lucky 8 Lines / New Super 8 Lines (W-4, Lucky97 HW)",  0,                     layout_lucky8p1 )  // only 1 control set...
 GAMEL( 198?, ns8linew,   ns8lines, lucky8,   ns8linew, wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (F-5, Witch Bonus)", 0,                     layout_lucky8 )    // 2 control sets...
 GAMEL( 198?, ns8linewa,  ns8lines, lucky8,   ns8linwa, wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (W-4, Witch Bonus)", 0,                     layout_lucky8p1 )  // only 1 control set...
+GAMEL( 1989, f16s8l,     lucky8,   lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "Leisure Ent",       "F-16 Super 8 Lines",                                       MACHINE_NOT_WORKING,   layout_lucky8 ) // needs I/O check, seems mostly playable
 GAMEL( 1991, nd8lines,   lucky8,   nd8lines, nd8lines, wingco_state,   init_nd8lines,  ROT0, "Yamate (bootleg)",  "New Draw 8 Lines (Version 2.1)",                           MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND, layout_lucky8 ) // PROM decode wrong, SN emits terrible sound, inputs not done yet
 GAMEL( 198?, super972,   ns8lines, super972, ns8linwa, wingco_state,   init_super972,  ROT0, "<unknown>",         "Super 97-2 (Witch Bonus)",                                 MACHINE_NOT_WORKING,   layout_lucky8p1 )  // decrypted, needs correct inputs
 GAME(  198?, luckybar,   0,        lucky8,   ns8linew, wingco_state,   empty_init,     ROT0, "<unknown>",         "Lucky Bar (W-4 with mc68705 MCU)",                         MACHINE_NOT_WORKING )  // MC68705 MCU
