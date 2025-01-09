@@ -92,7 +92,7 @@ void elf2_state::elf2_io(address_map &map)
 
 /* Input Ports */
 
-INPUT_CHANGED_MEMBER( elf2_state::input_w )
+INPUT_CHANGED_MEMBER(elf2_state::input_w)
 {
 	if (newval)
 	{
@@ -206,11 +206,6 @@ void elf2_state::machine_start()
 
 	m_led.resolve();
 
-	/* initialize LED displays */
-	m_7segs.resolve();
-	m_led_l->rbi_w(1);
-	m_led_h->rbi_w(1);
-
 	/* setup memory banking */
 	program.install_rom(0x0000, 0x00ff, m_ram->pointer());
 	program.install_write_handler(0x0000, 0x00ff, write8sm_delegate(*this, FUNC(elf2_state::memory_w)));
@@ -268,8 +263,8 @@ void elf2_state::elf2(machine_config &config)
 	m_kb->x3_rd_callback().set_ioport("X3");
 	m_kb->x4_rd_callback().set_ioport("X4");
 
-	DM9368(config, m_led_h, 0).update_cb().set(FUNC(elf2_state::digit_w<0>));
-	DM9368(config, m_led_l, 0).update_cb().set(FUNC(elf2_state::digit_w<1>));
+	DM9368(config, m_led_h).update_cb().set_output("digit0");
+	DM9368(config, m_led_l).update_cb().set_output("digit1");
 
 	SPEAKER(config, "mono").front_center();
 
@@ -292,4 +287,4 @@ ROM_END
 /* System Drivers */
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY      FULLNAME  FLAGS
-COMP( 1978, elf2, 0,      0,      elf2,    elf2,  elf2_state, empty_init, "Netronics", "Elf II", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND)
+COMP( 1978, elf2, 0,      0,      elf2,    elf2,  elf2_state, empty_init, "Netronics", "Elf II", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
