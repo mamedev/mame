@@ -13,9 +13,9 @@
 #include "spec128.h"
 
 #include "glukrs.h"
+#include "tsconf_beta.h"
 #include "tsconfdma.h"
 
-#include "beta_m.h"
 #include "machine/pckeybrd.h"
 #include "machine/spi_sdcard.h"
 #include "sound/ay8910.h"
@@ -28,10 +28,11 @@ class tsconf_state : public spectrum_128_state
 public:
 	tsconf_state(const machine_config &mconfig, device_type type, const char *tag)
 		: spectrum_128_state(mconfig, type, tag)
+		, m_bankio(*this, "bankio")
 		, m_bank0_rom(*this, "bank0_rom")
 		, m_keyboard(*this, "pc_keyboard")
 		, m_io_mouse(*this, "mouse_input%u", 1U)
-		, m_beta(*this, BETA_DISK_TAG)
+		, m_beta(*this, "beta")
 		, m_dma(*this, "dma")
 		, m_sdcard(*this, "sdcard")
 		, m_glukrs(*this, "glukrs")
@@ -155,6 +156,7 @@ private:
 	INTERRUPT_GEN_MEMBER(tsconf_vblank_interrupt);
 	IRQ_CALLBACK_MEMBER(irq_vector);
 	u8 m_int_mask;
+	bool m_update_on_m1;
 
 	DECLARE_VIDEO_START(tsconf);
 	TILE_GET_INFO_MEMBER(get_tile_info_txt);
@@ -193,6 +195,7 @@ private:
 	u8 beta_disable_r(offs_t offset);
 
 	void tsconf_io(address_map &map) ATTR_COLD;
+	void tsconf_ioext(address_map &map) ATTR_COLD;
 	void tsconf_mem(address_map &map) ATTR_COLD;
 	void tsconf_switch(address_map &map) ATTR_COLD;
 
@@ -213,12 +216,14 @@ private:
 	u8 m_regs[0x100];
 
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
+	memory_access<17, 0, 0, ENDIANNESS_LITTLE>::specific m_ioext;
+	required_device<address_map_bank_device> m_bankio;
 	memory_view m_bank0_rom;
 
 	required_device<at_keyboard_device> m_keyboard;
 	required_ioport_array<3> m_io_mouse;
 
-	required_device<beta_disk_device> m_beta;
+	required_device<tsconf_beta_device> m_beta;
 	required_device<tsconfdma_device> m_dma;
 	required_device<spi_sdcard_device> m_sdcard;
 	u8 m_zctl_di = 0;
