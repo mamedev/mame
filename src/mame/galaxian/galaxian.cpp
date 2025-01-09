@@ -10761,11 +10761,11 @@ ROM_START( rocktcnvy )
 	ROM_LOAD( "center_5.bin", 0x4000, 0x1000, CRC(c986ff34) SHA1(bf5e50a08a4401d09ff6c8f505062dffd900d066) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "center_c1.a9", 0x0000, 0x0800, CRC(a59a9f3f) SHA1(9564f1d013d566dc0b19762aec66119e2ece0b49) )
-	ROM_LOAD( "center_c2.a7", 0x0800, 0x0800, CRC(9b75b40a) SHA1(4ad94db3f1d6b45a3de1ed9b51d361f20c6706e4) )
+	ROM_LOAD( "center_c1.9a", 0x0000, 0x0800, CRC(a59a9f3f) SHA1(9564f1d013d566dc0b19762aec66119e2ece0b49) )
+	ROM_LOAD( "center_c2.7a", 0x0800, 0x0800, CRC(9b75b40a) SHA1(4ad94db3f1d6b45a3de1ed9b51d361f20c6706e4) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "prom.d10",     0x0000, 0x0020, BAD_DUMP CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) ) // Not dumped, borrowed from spactrai
+	ROM_LOAD( "mmi6331.7f",   0x0000, 0x0020, BAD_DUMP CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) ) // Not dumped, borrowed from spactrai
 
 	ROM_REGION( 0x0100, "proms2", 0 ) // PROMs on the CPU daughterboard
 	ROM_LOAD( "tbp28l22n.1",  0x0000, 0x0100, NO_DUMP )
