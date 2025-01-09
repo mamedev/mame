@@ -211,14 +211,16 @@ protected:
 	uint8_t read_zeropage(uint32_t addr);
 	void write_zeropage(uint32_t addr, uint8_t val);
 
-private:
 	// Some original XaviX games seemed to suggest that the extra byte of the far calls went to a different
 	// stack, but dblmouse on suprtvpc does direct stack manipulation which challenges this assumption.
 	// It could be a SuperXaviX vs XaviX differences however, so currently leaving this as a toggle for testing.
 	//
-	// pausing in rad_hnt2 (press shift when on the map) is broken with this logic as the stack becomes too big
-	// with the extra bytes
-	static constexpr bool USE_SPECIAL_STACK = false;
+	// pausing in rad_hnt2 (press shift when on the map) is broken without this logic as the stack becomes too
+	// big with the extra bytes
+	//
+	// we currently use the private stack for regular XaviX but not for the later CPUs, however the root cause
+	// of needing it for regular XaviX could be somewhere else
+	bool m_use_private_stack_for_extra_callf_byte = true;
 };
 
 enum {

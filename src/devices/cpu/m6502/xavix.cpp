@@ -108,7 +108,7 @@ xavix_device::mi_xavix::mi_xavix(xavix_device *_base)
 
 void xavix_device::write_special_stack(uint32_t addr, uint8_t data)
 {
-	if (USE_SPECIAL_STACK)
+	if (m_use_private_stack_for_extra_callf_byte)
 	{
 		m_special_stack[m_special_stackpos & 0xff] = data;
 	}
@@ -120,7 +120,7 @@ void xavix_device::write_special_stack(uint32_t addr, uint8_t data)
 
 void xavix_device::dec_special_stack()
 {
-	if (USE_SPECIAL_STACK)
+	if (m_use_private_stack_for_extra_callf_byte)
 	{
 		m_special_stackpos--;
 	}
@@ -132,7 +132,7 @@ void xavix_device::dec_special_stack()
 
 void xavix_device::inc_special_stack()
 {
-	if (USE_SPECIAL_STACK)
+	if (m_use_private_stack_for_extra_callf_byte)
 	{
 		m_special_stackpos++;
 	}
@@ -144,7 +144,7 @@ void xavix_device::inc_special_stack()
 
 uint8_t xavix_device::read_special_stack(uint32_t addr)
 {
-	if (USE_SPECIAL_STACK)
+	if (m_use_private_stack_for_extra_callf_byte)
 	{
 		return m_special_stack[m_special_stackpos & 0xff];
 	}
