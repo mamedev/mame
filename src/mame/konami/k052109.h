@@ -64,7 +64,7 @@ protected:
 
 private:
 	// internal state
-	std::unique_ptr<uint8_t[]>   m_ram;
+	std::unique_ptr<uint8_t[]> m_ram;
 	uint8_t    *m_videoram_F;
 	uint8_t    *m_videoram_A;
 	uint8_t    *m_videoram_B;
@@ -76,7 +76,7 @@ private:
 	uint8_t    *m_colorram_B;
 
 	tilemap_t  *m_tilemap[3];
-	int      m_tileflip_enable;
+	uint8_t    m_tileflip_enable;
 	uint8_t    m_charrombank[4];
 	uint8_t    m_charrombank_2[4];
 	uint8_t    m_has_extra_video_ram;

@@ -172,8 +172,8 @@ GFXDECODE_MEMBER( k052109_device::gfxinfo_ram )
 GFXDECODE_END
 
 
-k052109_device::k052109_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, K052109, tag, owner, clock),
+k052109_device::k052109_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, K052109, tag, owner, clock),
 	device_gfx_interface(mconfig, *this, gfxinfo),
 	device_video_interface(mconfig, *this, false),
 	m_ram(nullptr),
@@ -265,14 +265,15 @@ void k052109_device::device_start()
 	m_tilemap[2]->set_scrolldy(m_dy, m_dy);
 
 	save_pointer(NAME(m_ram), 0x6000);
-	save_item(NAME(m_rmrd_line));
-	save_item(NAME(m_romsubbank));
-	save_item(NAME(m_scrollctrl));
-	save_item(NAME(m_irq_enabled));
+	save_item(NAME(m_tileflip_enable));
 	save_item(NAME(m_charrombank));
 	save_item(NAME(m_charrombank_2));
-	save_item(NAME(m_addrmap));
 	save_item(NAME(m_has_extra_video_ram));
+	save_item(NAME(m_rmrd_line));
+	save_item(NAME(m_irq_enabled));
+	save_item(NAME(m_romsubbank));
+	save_item(NAME(m_scrollctrl));
+	save_item(NAME(m_addrmap));
 }
 
 //-------------------------------------------------
