@@ -63,6 +63,12 @@ namespace
 			uint8_t m_bus_test_register = 0;
 			uint8_t hex_seven_segment[16] = {0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71};
 
+			uint8_t lpen_ct = 0;
+
+			uint8_t m_hrtc = 0;
+			uint8_t m_vrtc = 0;
+			uint8_t m_pixel = 0;
+
 			void diag_digits_w(uint8_t data);
 
 			void cpu_test_register_w(uint8_t data);
@@ -80,6 +86,9 @@ namespace
 
 			void crtc_dack_w(offs_t offset, uint8_t data);
 			I8275_DRAW_CHARACTER_MEMBER(display_pixels);
+			uint8_t crtc_test_vars_r();
+			void hrtc_r(uint8_t data);
+			void vrtc_r(uint8_t data);
 
 			void system23_io(address_map &map) ATTR_COLD;
 			void system23_mem(address_map &map) ATTR_COLD;
@@ -156,33 +165,57 @@ namespace
 		if (!BIT(attrcode, VSP))
 			gfx = m_chargen[(linecount & 15) | (charcode << 4)];
 
-		if (BIT(attrcode, LTEN))
-			gfx = 0xff;
+		// if (BIT(attrcode, LTEN))
+		// 	gfx = 0xff;
 
 		if (BIT(attrcode, RVV))
 			gfx ^= 0xff;
 
 		//if (BIT(attrcode, GPA0) || BIT(attrcode, GPA1)) printf("GPA0: %u GPA1: %u\n", BIT(attrcode, GPA0), BIT(attrcode, GPA1));
-		if (BIT(attrcode, GPA0) && BIT(attrcode, GPA1))
+		if (BIT(attrcode, GPA0) && BIT(attrcode, GPA1) && !lpen_ct)
 		{
-			m_crtc->lpen_w(ASSERT_LINE);				//hack to test the light pen at test 05
 			LOG("Sytem/23: Light pen asserted\n");
+			lpen_ct = 1;
+		}
+		else if(lpen_ct == 1)
+		{
+			m_crtc->lpen_w(ASSERT_LINE);
+			lpen_ct = 0;
 		}
 		else
 		{
 			m_crtc->lpen_w(CLEAR_LINE);
 		}
 
-		LOG("x=%x y=%x attrcode=%x\n",x,y,attrcode);
+		//Pixel reference saved for test 06 usage
+		m_pixel = BIT(gfx, 1);
+		//LOG("x=%x y=%x attrcode=%x\n",x,y,attrcode);
 
 		// Highlight not used
-		bitmap.pix(y, x++) = BIT(gfx, 1) ? 1 : 0;
-		bitmap.pix(y, x++) = BIT(gfx, 2) ? 1 : 0;
-		bitmap.pix(y, x++) = BIT(gfx, 3) ? 1 : 0;
-		bitmap.pix(y, x++) = BIT(gfx, 4) ? 1 : 0;
-		bitmap.pix(y, x++) = BIT(gfx, 5) ? 1 : 0;
-		bitmap.pix(y, x++) = BIT(gfx, 6) ? 1 : 0;
-		bitmap.pix(y, x++) = BIT(gfx, 7) ? 1 : 0;
+		bitmap.pix(y, x++) = (BIT(gfx, 7)? rgb_t::green() : rgb_t::black());
+		bitmap.pix(y, x++) = (BIT(gfx, 6)? rgb_t::green() : rgb_t::black());
+		bitmap.pix(y, x++) = (BIT(gfx, 5)? rgb_t::green() : rgb_t::black());
+		bitmap.pix(y, x++) = (BIT(gfx, 4)? rgb_t::green() : rgb_t::black());
+		bitmap.pix(y, x++) = (BIT(gfx, 3)? rgb_t::green() : rgb_t::black());
+		bitmap.pix(y, x++) = (BIT(gfx, 2)? rgb_t::green() : rgb_t::black());
+		bitmap.pix(y, x++) = (BIT(gfx, 1)? rgb_t::green() : rgb_t::black());
+		bitmap.pix(y, x++) = (BIT(gfx, 0)? rgb_t::green() : rgb_t::black());
+	}
+
+	//This routine compiles the retraces and pixel data from the CRTC into a single byte
+	uint8_t system23_state::crtc_test_vars_r()
+	{
+		return m_hrtc << 4 | m_vrtc << 3 | m_pixel << 2;
+	}
+
+	void system23_state::hrtc_r(uint8_t data)
+	{
+		m_hrtc = data;
+	}
+
+	void system23_state::vrtc_r(uint8_t data)
+	{
+		m_vrtc = data;
 	}
 
 	//This routine describes the computer's I/O map
@@ -220,6 +253,7 @@ namespace
 		I8255(config, m_ppi_kbd);
 		m_ppi_kbd->in_pa_callback().set(FUNC(system23_state::cpu_test_register_r));
 		m_ppi_kbd->out_pa_callback().set(FUNC(system23_state::cpu_test_register_w));
+		m_ppi_kbd->in_pb_callback().set(FUNC(system23_state::crtc_test_vars_r));
 
 		I8255(config, m_ppi_diag);
 		m_ppi_diag->out_pb_callback().set(FUNC(system23_state::diag_digits_w));
@@ -244,7 +278,9 @@ namespace
 		m_crtc->set_screen(m_screen);
 		m_crtc->set_display_callback(FUNC(system23_state::display_pixels));
 		m_crtc->drq_wr_callback().set(m_dmac, FUNC(i8257_device::dreq2_w));
-		m_crtc->irq_wr_callback().set_inputline(m_maincpu, I8085_RST55_LINE); // Only when jumper J1 is bridged
+		//m_crtc->irq_wr_callback().set_inputline(m_maincpu, I8085_RST55_LINE); // Only when jumper J1 is bridged
+		m_crtc->hrtc_wr_callback().set(FUNC(system23_state::hrtc_r));
+		m_crtc->vrtc_wr_callback().set(FUNC(system23_state::vrtc_r));
 
 
 		RAM(config, m_ram).set_default_size("16k");

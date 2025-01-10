@@ -35,7 +35,7 @@
 
 #include "screen.h"
 
-//#define VERBOSE 1
+#define VERBOSE 1
 #include "logmacro.h"
 
 
@@ -95,6 +95,7 @@ i8275_device::i8275_device(const machine_config &mconfig, device_type type, cons
 	m_buffer_dma(0),
 	m_lpen(0),
 	m_scanline(0),
+	m_column(0),
 	m_dma_stop(false),
 	m_end_of_screen(false),
 	m_preset(false),
@@ -167,6 +168,7 @@ void i8275_device::device_start()
 	save_item(NAME(m_buffer_dma));
 	save_item(NAME(m_lpen));
 	save_item(NAME(m_scanline));
+	save_item(NAME(m_column));
 	save_item(NAME(m_irq_scanline));
 	save_item(NAME(m_vrtc_scanline));
 	save_item(NAME(m_vrtc_drq_scanline));
@@ -365,6 +367,7 @@ TIMER_CALLBACK_MEMBER(i8275_device::scanline_tick)
 				auto [data, attr] = crtc->char_from_buffer(n, sx, rc, lc, end_of_row, blank_row);
 				charcode |= uint32_t(data) << (n * 8);
 				attrcode |= uint32_t(attr) << (n * 8);
+				crtc->m_column = sx;
 			}
 
 			m_display_cb(m_bitmap,
@@ -724,8 +727,8 @@ void i8275_device::lpen_w(int state)
 {
 	if (!m_lpen && state)
 	{
-		m_param[REG_LPEN_COL] = screen().hpos() / m_hpixels_per_column;
-		m_param[REG_LPEN_ROW] = screen().vpos() / scanlines_per_row();
+		m_param[REG_LPEN_COL] = m_column + 3; //According to the datasheet the column is at least three positions off
+		m_param[REG_LPEN_ROW] = m_scanline / scanlines_per_row();
 
 		m_status |= ST_LP;
 	}
