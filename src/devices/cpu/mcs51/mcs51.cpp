@@ -2330,27 +2330,33 @@ void mcs51_cpu_device::device_start()
 	/* Save states */
 	save_item(NAME(m_ppc));
 	save_item(NAME(m_pc));
+	save_item(NAME(m_rwm));
+	save_item(NAME(m_recalc_parity));
+	save_item(NAME(m_last_line_state));
+	save_item(NAME(m_t0_cnt));
+	save_item(NAME(m_t1_cnt));
+	save_item(NAME(m_t2_cnt));
+	save_item(NAME(m_t2ex_cnt));
+	save_item(NAME(m_cur_irq_prio));
+	save_item(NAME(m_irq_active));
+	save_item(NAME(m_irq_prio));
 	save_item(NAME(m_last_op));
 	save_item(NAME(m_last_bit));
-	save_item(NAME(m_rwm) );
-	save_item(NAME(m_cur_irq_prio) );
-	save_item(NAME(m_last_line_state) );
-	save_item(NAME(m_t0_cnt) );
-	save_item(NAME(m_t1_cnt) );
-	save_item(NAME(m_t2_cnt) );
-	save_item(NAME(m_t2ex_cnt) );
-	save_item(NAME(m_recalc_parity) );
-	save_item(NAME(m_irq_prio) );
-	save_item(NAME(m_irq_active) );
-	save_item(NAME(m_ds5002fp.previous_ta) );
-	save_item(NAME(m_ds5002fp.ta_window) );
-	save_item(NAME(m_ds5002fp.rnr_delay) );
-	save_item(NAME(m_ds5002fp.range) );
+
 	save_item(NAME(m_uart.data_out));
 	save_item(NAME(m_uart.data_in));
+	save_item(NAME(m_uart.txbit));
+	save_item(NAME(m_uart.txd));
+	save_item(NAME(m_uart.rxbit));
+	save_item(NAME(m_uart.rxb8));
 	save_item(NAME(m_uart.smod_div));
 	save_item(NAME(m_uart.rx_clk));
 	save_item(NAME(m_uart.tx_clk));
+
+	save_item(NAME(m_ds5002fp.previous_ta));
+	save_item(NAME(m_ds5002fp.ta_window));
+	save_item(NAME(m_ds5002fp.range));
+	save_item(NAME(m_ds5002fp.rnr_delay));
 
 	state_add( MCS51_PC,  "PC", m_pc).formatstr("%04X");
 	state_add( MCS51_SP,  "SP", SP).formatstr("%02X");
@@ -2383,8 +2389,8 @@ void mcs51_cpu_device::device_start()
 	state_add( MCS51_TL1,  "TL1",  TL1).formatstr("%02X");
 	state_add( MCS51_TH1,  "TH1",  TH1).formatstr("%02X");
 
-	state_add( STATE_GENPC, "GENPC", m_pc ).noshow();
-	state_add( STATE_GENPCBASE, "CURPC", m_pc ).noshow();
+	state_add( STATE_GENPC, "GENPC", m_pc).noshow();
+	state_add( STATE_GENPCBASE, "CURPC", m_pc).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_rtemp).formatstr("%8s").noshow();
 
 	set_icountptr(m_icount);

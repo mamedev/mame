@@ -27,6 +27,7 @@
 #include "emu.h"
 #include "micro3d.h"
 #include "micro3d_a.h"
+
 #include "cpu/am29000/am29000.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
@@ -80,7 +81,7 @@ static INPUT_PORTS_START( micro3d )
 	PORT_DIPSETTING(    0x0000, DEF_STR(On) )
 
 	PORT_START("SOUND_SW")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Sound PCB Test SW") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Sound PCB Test SW") PORT_CODE(KEYCODE_F1)
 
 	PORT_START("VOLUME")
 	PORT_ADJUSTER(100, "Volume")
@@ -108,10 +109,10 @@ static INPUT_PORTS_START( f15se )
 	PORT_BIT( 0xfff, 0x000, IPT_AD_STICK_X ) PORT_MINMAX(0xf5a, 0x0a6) PORT_SENSITIVITY(25) PORT_KEYDELTA(50) PORT_REVERSE
 
 	PORT_START("JOYSTICK_Y")
-	PORT_BIT(0xfff, 0x000, IPT_AD_STICK_Y ) PORT_MINMAX(0xf5a, 0x0a6) PORT_SENSITIVITY(25) PORT_KEYDELTA(50)
+	PORT_BIT( 0xfff, 0x000, IPT_AD_STICK_Y ) PORT_MINMAX(0xf5a, 0x0a6) PORT_SENSITIVITY(25) PORT_KEYDELTA(50)
 
 	PORT_START("THROTTLE")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Z ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_NAME("Throttle")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Z ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_REVERSE PORT_NAME("Throttle")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( botss )
@@ -135,10 +136,10 @@ static INPUT_PORTS_START( botss )
 	PORT_BIT( 0xfff, 0x000, IPT_AD_STICK_X ) PORT_MINMAX(0xf5a, 0x0a6) PORT_SENSITIVITY(25) PORT_KEYDELTA(50) PORT_REVERSE
 
 	PORT_START("JOYSTICK_Y")
-	PORT_BIT(0xfff, 0x000, IPT_AD_STICK_Y ) PORT_MINMAX(0xf5a, 0x0a6) PORT_SENSITIVITY(25) PORT_KEYDELTA(50)
+	PORT_BIT( 0xfff, 0x000, IPT_AD_STICK_Y ) PORT_MINMAX(0xf5a, 0x0a6) PORT_SENSITIVITY(25) PORT_KEYDELTA(50)
 
 	PORT_START("THROTTLE")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Z ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_NAME("Throttle")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Z ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_REVERSE PORT_NAME("Throttle")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( botss11 )
@@ -154,8 +155,8 @@ static INPUT_PORTS_START( botss11 )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 
 	PORT_START("INPUTS_C_D")
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Throttle up")
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Throttle down")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Throttle Up")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Throttle Down")
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Trigger")
@@ -215,7 +216,7 @@ void micro3d_state::hostmem(address_map &map)
 	map(0x960000, 0x960001).w(FUNC(micro3d_state::reset_w));
 	map(0x980001, 0x980001).rw("adc", FUNC(adc0844_device::read), FUNC(adc0844_device::write));
 	map(0x9a0000, 0x9a0007).rw(m_vgb, FUNC(tms34010_device::host_r), FUNC(tms34010_device::host_w));
-	map(0x9c0000, 0x9c0001).noprw();                 // Lamps
+	map(0x9c0000, 0x9c0001).noprw(); // Lamps
 	map(0x9e0000, 0x9e002f).rw("mfp", FUNC(mc68901_device::read), FUNC(mc68901_device::write)).umask16(0xff00);
 	map(0xa00000, 0xa0003f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0xff00);
 	map(0xa20000, 0xa20001).r(FUNC(micro3d_state::encoder_h_r));
@@ -271,6 +272,7 @@ void micro3d_state::drmath_data(address_map &map)
 	map(0x01800000, 0x01800003).w(FUNC(micro3d_state::alt_fifo_w));
 	map(0x03fffff0, 0x03ffffff).rw("scc", FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask32(0x000000ff);
 }
+
 
 /*************************************
  *
