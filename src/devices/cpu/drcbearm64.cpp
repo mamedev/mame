@@ -82,16 +82,14 @@ static const a64::Gp::Id int_register_map[REG_I_COUNT] =
 
 static const a64::Gp::Id float_register_map[REG_F_COUNT] =
 {
-	a64::Gp::Id(a64::d19.id()),
-	a64::Gp::Id(a64::d20.id()),
-	a64::Gp::Id(a64::d21.id()),
-	a64::Gp::Id(a64::d22.id()),
-	a64::Gp::Id(a64::d23.id()),
-	a64::Gp::Id(a64::d24.id()),
-	a64::Gp::Id(a64::d25.id()),
-	a64::Gp::Id(a64::d26.id()),
-	a64::Gp::Id(a64::d27.id()),
-	a64::Gp::Id(a64::d28.id()),
+	a64::Gp::Id(a64::d8.id()),
+	a64::Gp::Id(a64::d9.id()),
+	a64::Gp::Id(a64::d10.id()),
+	a64::Gp::Id(a64::d11.id()),
+	a64::Gp::Id(a64::d12.id()),
+	a64::Gp::Id(a64::d13.id()),
+	a64::Gp::Id(a64::d14.id()),
+	a64::Gp::Id(a64::d15.id()),
 };
 
 // condition mapping table
@@ -268,13 +266,13 @@ drcbe_arm64::be_parameter::be_parameter(drcbe_arm64 &drcbe, const parameter &par
 a64::Vec drcbe_arm64::be_parameter::get_register_float(uint32_t regsize) const
 {
 	assert(m_type == PTYPE_FLOAT_REGISTER);
-	return a64::Vec::fromTypeAndId(regsize == 4 ? RegType::kARM_VecS : RegType::kARM_VecD, m_value);
+	return a64::Vec::fromTypeAndId((regsize == 4) ? RegType::kARM_VecS : RegType::kARM_VecD, m_value);
 }
 
 a64::Gp drcbe_arm64::be_parameter::get_register_int(uint32_t regsize) const
 {
 	assert(m_type == PTYPE_INT_REGISTER);
-	return a64::Gp::fromTypeAndId(regsize == 4 ? RegType::kARM_GpW : RegType::kARM_GpX, m_value);
+	return a64::Gp::fromTypeAndId((regsize == 4) ? RegType::kARM_GpW : RegType::kARM_GpX, m_value);
 }
 
 a64::Vec drcbe_arm64::be_parameter::select_register(a64::Vec const &reg, uint32_t regsize) const
@@ -309,7 +307,7 @@ a64::Gp drcbe_arm64::select_register(a64::Gp const &reg, uint32_t regsize) const
 	return reg.x();
 }
 
-const bool drcbe_arm64::is_valid_immediate_mask(uint64_t val, size_t bytes) const
+bool drcbe_arm64::is_valid_immediate_mask(uint64_t val, size_t bytes)
 {
 	const auto start_bits = bytes * 8 - 1;
 
@@ -331,16 +329,15 @@ const bool drcbe_arm64::is_valid_immediate_mask(uint64_t val, size_t bytes) cons
 	return val == 1;
 }
 
-const bool drcbe_arm64::is_valid_immediate(uint64_t val, size_t bits) const
+bool drcbe_arm64::is_valid_immediate(uint64_t val, size_t bits)
 {
-	return val >= 0 && val < (uint64_t(1) << bits);
+	assert(bits < 64);
+	return val < (uint64_t(1) << bits);
 }
 
-const bool drcbe_arm64::is_valid_immediate_signed(int64_t val, size_t bits) const
+bool drcbe_arm64::is_valid_immediate_signed(int64_t val, size_t bits)
 {
-	const int64_t top = (int64_t(1) << (bits - 1)) - 1;
-	const int64_t bottom = -top - 1;
-	return val >= bottom && val <= top;
+	return util::sext(val, bits) == val;
 }
 
 arm::Mem drcbe_arm64::get_mem_absolute(a64::Assembler &a, const void *ptr) const
@@ -425,7 +422,7 @@ void drcbe_arm64::emit_ldr_str_base_mem(a64::Assembler &a, a64::Inst::Id opcode,
 		else if (opcode == a64::Inst::kIdLdrsw)
 			max_shift = 2;
 		else
-			max_shift = reg.isGpW() || reg.isVecS() ? 2 : 3;
+			max_shift = (reg.isGpW() || reg.isVecS()) ? 2 : 3;
 
 		for (int i = 0; i < 64 && max_shift > 0; i++)
 		{
@@ -762,13 +759,12 @@ void drcbe_arm64::calculate_carry_shift_left(a64::Assembler &a, const a64::Gp &r
 	a.cbz(shift, skip);
 
 	const a64::Gp scratch = select_register(SCRATCH_REG1, reg.isGpW() ? 4 : 8);
-	const a64::Gp scratch2 = select_register(SCRATCH_REG2, reg.isGpW() ? 4 : 8);
 
-	// carry = ((PARAM1 << (s	hift - 1)) >> maxBits) & 1
-	a.sub(scratch, shift, 1);
-	a.lsl(scratch2, reg, scratch);
-	a.lsr(scratch2, scratch2, maxBits);
-	store_carry_reg(a, scratch2);
+	// carry = ((PARAM1 << (shift - 1)) >> maxBits) & 1
+	a.movz(scratch, maxBits + 1);
+	a.sub(scratch, scratch, shift);
+	a.lsr(scratch, reg, scratch);
+	store_carry_reg(a, scratch);
 
 	a.bind(skip);
 }
@@ -781,8 +777,7 @@ void drcbe_arm64::calculate_carry_shift_left_imm(a64::Assembler &a, const a64::G
 	const a64::Gp scratch = select_register(SCRATCH_REG1, reg.isGpW() ? 4 : 8);
 
 	// carry = ((PARAM1 << (shift - 1)) >> maxBits) & 1
-	a.lsl(scratch, reg, shift - 1);
-	a.lsr(scratch, scratch, maxBits);
+	a.lsr(scratch, reg, maxBits + 1 - shift);
 	store_carry_reg(a, scratch);
 }
 
@@ -792,12 +787,11 @@ void drcbe_arm64::calculate_carry_shift_right(a64::Assembler &a, const a64::Gp &
 	a.cbz(shift, skip);
 
 	const a64::Gp scratch = select_register(SCRATCH_REG1, reg.isGpW() ? 4 : 8);
-	const a64::Gp scratch2 = select_register(SCRATCH_REG2, reg.isGpW() ? 4 : 8);
 
 	// carry = (PARAM1 >> (shift - 1)) & 1
 	a.sub(scratch, shift, 1);
-	a.lsr(scratch2, reg, scratch);
-	store_carry_reg(a, scratch2.x());
+	a.lsr(scratch, reg, scratch);
+	store_carry_reg(a, scratch);
 
 	a.bind(skip);
 }
@@ -811,7 +805,7 @@ void drcbe_arm64::calculate_carry_shift_right_imm(a64::Assembler &a, const a64::
 
 	// carry = (PARAM1 >> (shift - 1)) & 1
 	a.lsr(scratch, reg, shift - 1);
-	store_carry_reg(a, scratch.x());
+	store_carry_reg(a, scratch);
 }
 
 drcbe_arm64::drcbe_arm64(drcuml_state &drcuml, device_t &device, drc_cache &cache, uint32_t flags, int modes, int addrbits, int ignorebits)

@@ -170,9 +170,9 @@ private:
 	asmjit::a64::Vec select_register(asmjit::a64::Vec const &reg, uint32_t regsize) const;
 	asmjit::a64::Gp select_register(asmjit::a64::Gp const &reg, uint32_t regsize) const;
 
-	const bool is_valid_immediate(uint64_t val, size_t bits) const;
-	const bool is_valid_immediate_signed(int64_t val, size_t bits) const;
-	const bool is_valid_immediate_mask(uint64_t val, size_t bytes) const;
+	static bool is_valid_immediate(uint64_t val, size_t bits);
+	static bool is_valid_immediate_signed(int64_t val, size_t bits);
+	static bool is_valid_immediate_mask(uint64_t val, size_t bytes);
 
 	asmjit::arm::Mem get_mem_absolute(asmjit::a64::Assembler &a, const void *ptr) const;
 	void get_imm_relative(asmjit::a64::Assembler &a, const asmjit::a64::Gp &reg, const uint64_t ptr) const;
