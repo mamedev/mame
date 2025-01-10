@@ -2,11 +2,11 @@
 // copyright-holders:giulioz
 
 /*
-	Emulator for the gate arrays found in the Roland CPU-B board of SA-synthesis digital pianos.
-	Reverse engineering done from silicon images.
-	- IC19 R06-0001 (Fujitsu MB60VH142)
-	- IC9  R06-0002 (Fujitsu MB60V141)
-	- IC8  R06-0003 (Fujitsu MB61V125)
+    Emulator for the gate arrays found in the Roland CPU-B board of SA-synthesis digital pianos.
+    Reverse engineering done from silicon images.
+    - IC19 R06-0001 (Fujitsu MB60VH142)
+    - IC9  R06-0002 (Fujitsu MB60V141)
+    - IC8  R06-0003 (Fujitsu MB61V125)
 
     The system is essentially a sample player, which can play 16 voices, each one with 10 sample parts.
 
@@ -71,25 +71,25 @@ uint16_t addr_table[] = {0x1e0, 0x080, 0x060, 0x04d, 0x040, 0x036, 0x02d, 0x026,
                          0x020, 0x01b, 0x016, 0x011, 0x00d, 0x00a, 0x006, 0x003};
 
 roland_sa_device::roland_sa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ROLAND_SA, tag, owner, clock)
-	, device_sound_interface(mconfig, *this)
-	, m_int_callback(*this)
-	, m_stream(nullptr)
+    : device_t(mconfig, ROLAND_SA, tag, owner, clock)
+    , device_sound_interface(mconfig, *this)
+    , m_int_callback(*this)
+    , m_stream(nullptr)
 {
 }
 
 void roland_sa_device::device_start()
 {
-	m_stream = stream_alloc(0, 2, 20000, STREAM_SYNCHRONOUS);
+    m_stream = stream_alloc(0, 2, 20000, STREAM_SYNCHRONOUS);
 }
 
 void roland_sa_device::device_reset()
 {
-	m_int_callback(CLEAR_LINE);
+    m_int_callback(CLEAR_LINE);
 
-	m_irq_id = 0;
+    m_irq_id = 0;
     m_irq_triggered = false;
-	memset(m_parts, 0, sizeof(m_parts));
+    memset(m_parts, 0, sizeof(m_parts));
 }
 
 void roland_sa_device::set_sr_mode(bool mode)
@@ -265,8 +265,8 @@ void roland_sa_device::load_roms(uint8_t *ic5, uint8_t *ic6, uint8_t *ic7)
 
 u8 roland_sa_device::read(offs_t offset)
 {
-	if (!machine().side_effects_disabled())
-	    return m_irq_id;
+    if (!machine().side_effects_disabled())
+        return m_irq_id;
 
     return m_ctrl_mem[offset];
 }
@@ -288,10 +288,10 @@ void roland_sa_device::sound_stream_update(sound_stream &stream, std::vector<rea
         int_buffer[i] = 0;
 
     for (size_t voiceI = 0; voiceI < NUM_VOICES; voiceI++)
-	{
-		for (size_t partI = 0; partI < PARTS_PER_VOICE; partI++)
-		{
-			SA_Part &part = m_parts[voiceI][partI];
+    {
+        for (size_t partI = 0; partI < PARTS_PER_VOICE; partI++)
+        {
+            SA_Part &part = m_parts[voiceI][partI];
             size_t mem_offset = voiceI * 0x100 + partI * 0x10;
             uint32_t pitch_lut_i     = m_ctrl_mem[mem_offset + 1] | (m_ctrl_mem[mem_offset + 0] << 8);
             uint32_t wave_addr_loop  = m_ctrl_mem[mem_offset + 2];
@@ -420,8 +420,8 @@ void roland_sa_device::sound_stream_update(sound_stream &stream, std::vector<rea
                 m_int_callback(ASSERT_LINE);
                 m_irq_triggered = true;
             }
-		}
-	}
+        }
+    }
 
     for (size_t i = 0; i < outputs[0].samples(); i++)
         outputs[0].put_int(i, int_buffer[i], 0xffff);
