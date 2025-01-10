@@ -879,15 +879,15 @@ template<int GROUP> void dmx_state::gen_trigger_w(u8 data)
 		if (BIT(data, i))
 		{
 			const int trig_index = TRIGGER_MAPPINGS[GROUP][i];
-			triggers.at(trig_index) = true;
+			triggers[trig_index] = true;
 			LOGMASKED(LOG_TRIGGERS, "Trigerred TR%d\n", trig_index);
 		}
 	}
 
 	for (int i = 0; i < NUM_VOICE_CARDS; ++i)
 	{
-		const bool tr0 = triggers.at(2 * i);
-		const bool tr1 = triggers.at(2 * i + 1);
+		const bool tr0 = triggers[2 * i];
+		const bool tr1 = triggers[2 * i + 1];
 		if (tr0 || tr1)
 			m_voices[i]->trigger(tr0, tr1);
 	}
