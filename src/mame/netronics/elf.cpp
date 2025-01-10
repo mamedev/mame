@@ -236,7 +236,7 @@ void elf2_state::elf2(machine_config &config)
 	CDP1802(config, m_maincpu, XTAL(3'579'545)/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &elf2_state::elf2_mem);
 	m_maincpu->set_addrmap(AS_IO, &elf2_state::elf2_io);
-	m_maincpu->wait_cb().set(FUNC(elf2_state::wait_r));
+	m_maincpu->wait_cb().set(FUNC(elf2_state::wait_r)).invert();
 	m_maincpu->clear_cb().set(FUNC(elf2_state::clear_r));
 	m_maincpu->ef4_cb().set(FUNC(elf2_state::ef4_r));
 	m_maincpu->q_cb().set(FUNC(elf2_state::q_w));
