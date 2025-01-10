@@ -63,6 +63,7 @@ private:
 
 	// internal state
 	bool m_state_waiting;
+	bool m_state_skipping;
 	bool m_state_waitblit;
 	u16 m_waitval;
 	u16 m_waitmask;

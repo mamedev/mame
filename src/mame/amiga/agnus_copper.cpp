@@ -92,6 +92,7 @@ void agnus_copper_device::device_start()
 	save_item(NAME(m_pc));
 	save_item(NAME(m_state_waiting));
 	save_item(NAME(m_state_waitblit));
+	save_item(NAME(m_state_skipping));
 	save_item(NAME(m_waitval));
 	save_item(NAME(m_waitmask));
 	save_item(NAME(m_pending_data));
@@ -202,6 +203,7 @@ inline void agnus_copper_device::set_pc(u8 ch, bool is_sync)
 {
 	m_pc = m_lc[ch];
 	m_state_waiting = false;
+	m_state_skipping = false;
 	LOGPC("%s: COPJMP%d new PC = %08x%s\n"
 		, machine().describe_context()
 		, ch + 1
@@ -309,6 +311,17 @@ int agnus_copper_device::execute_next(int xpos, int ypos, bool is_blitter_busy, 
 		word0 = (word0 >> 1) & 0xff;
 		if (word0 >= m_cdang_setting)
 		{
+			// SKIP applies to valid MOVEs only
+			// - apocalyps (gameplay)
+			if (m_state_skipping)
+			{
+				LOGINST("  (Ignored)\n");
+				m_state_skipping = false;
+				// TODO: verify timings
+                // may depend on num of planes enabled (move_offset) or opcode fetch above is enough.
+				xpos += COPPER_CYCLES_TO_PIXELS(2);
+				return xpos;
+			}
 			// delay write to the next available DMA slot if not in blanking area
 			// - bchvolly (title), suprfrog & abreed (bottom playfield rows)
 			const bool horizontal_blank = xpos < 0x47;
@@ -328,6 +341,7 @@ int agnus_copper_device::execute_next(int xpos, int ypos, bool is_blitter_busy, 
 			m_waitmask = 0xffff;
 			m_state_waitblit = false;
 			m_state_waiting = true;
+			m_state_skipping = false;
 
 			return 511;
 		}
@@ -354,6 +368,7 @@ int agnus_copper_device::execute_next(int xpos, int ypos, bool is_blitter_busy, 
 				wait_offset
 			);
 
+			m_state_skipping = false;
 			m_state_waiting = true;
 			xpos += COPPER_CYCLES_TO_PIXELS(wait_offset);
 		}
@@ -362,25 +377,15 @@ int agnus_copper_device::execute_next(int xpos, int ypos, bool is_blitter_busy, 
 		else
 		{
 			int curpos = (ypos << 8) | (xpos >> 1);
+			m_state_skipping = ((curpos & m_waitmask) >= (m_waitval & m_waitmask)
+				&& (!m_state_waitblit || !(is_blitter_busy)));
 
-			LOGINST("  SKIP %04x & %04x (currently %04x)\n",
+			LOGINST("  SKIP %04x & %04x (currently %04x) - %s\n",
 				m_waitval,
 				m_waitmask,
-				(ypos << 8) | (xpos >> 1)
+				(ypos << 8) | (xpos >> 1),
+				m_state_skipping ? "Skipping" : "Not skipped"
 			);
-
-			/* if we're past the wait time, stop it and hold up 2 cycles */
-			if ((curpos & m_waitmask) >= (m_waitval & m_waitmask) &&
-				(!m_state_waitblit || !(is_blitter_busy)))
-			{
-				LOGINST("  Skipped\n");
-
-				/* count the cycles it out have taken to fetch the next instruction */
-				// TODO: look ahead, check if next instruction is a valid MOVE
-				// SKIP/WAIT and illegal instructions aren't skipped.
-				m_pc += 4;
-				xpos += COPPER_CYCLES_TO_PIXELS(2);
-			}
 		}
 	}
 
