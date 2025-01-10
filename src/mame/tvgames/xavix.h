@@ -465,12 +465,12 @@ protected:
 		else if (offset < 0x300)
 		{
 			offset &= 0xff;
-			return ((~offset >> 4) | (offset << 4));
+			return (((~offset >> 4) & 0x0f) | (offset << 4));
 		}
 		else if (offset < 0x400)
 		{
 			offset &= 0xff;
-			return ((~offset >> 4) | (~offset << 4));
+			return (((~offset >> 4) & 0x0f) | (~offset << 4));
 		}
 		else if (offset < 0x800)
 		{
