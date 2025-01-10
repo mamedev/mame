@@ -539,7 +539,7 @@ u8 tsconf_state::tsconf_port_xxaf_r(offs_t port)
 	return data;
 }
 
-static void copy_tiles_to_raw(const u8 *tiles_src, u8 *raw_target)
+void tsconf_state::copy_tiles_to_raw(const u8 *tiles_src, u8 *raw_target)
 {
 	for(u32 ln = 0; ln < PAGE4K(8); ln += 4)
 	{

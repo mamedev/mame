@@ -173,6 +173,7 @@ private:
 	void tsconf_draw_gfx(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void tsconf_update_video_mode();
+	void copy_tiles_to_raw(const u8 *tiles_src, u8 *raw_target);
 
 	u8 tsconf_port_xx1f_r(offs_t offset);
 	void tsconf_port_7ffd_w(u8 data);

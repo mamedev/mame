@@ -238,6 +238,9 @@ void tsconf_state::device_post_load()
 {
 	spectrum_128_state::device_post_load();
 	m_sprites_cache.clear();
+	copy_tiles_to_raw(m_ram->pointer() + ((m_regs[SG_PAGE] & 0xf8) << 14), m_sprites_raw.target());
+	copy_tiles_to_raw(m_ram->pointer() + ((m_regs[T0_G_PAGE] & 0xf8) << 14), m_sprites_raw.target());
+	copy_tiles_to_raw(m_ram->pointer() + ((m_regs[T1_G_PAGE] & 0xf8) << 14), m_sprites_raw.target());
 }
 
 INPUT_PORTS_START( tsconf )
