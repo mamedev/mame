@@ -1700,6 +1700,9 @@ void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 			{
 				CUSTOM_REG(REG_BEAMCON0) = data;
 				update_screenmode();
+				// TODO: variable beam counter, disables hard display stops, enables HTOTAL/VTOTAL programming
+				if (BIT(data, 7))
+					popmessage("BEAMCON0: VARBEAMEN enabled");
 			}
 			break;
 

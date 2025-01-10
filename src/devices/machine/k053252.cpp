@@ -105,9 +105,7 @@ void k053252_device::device_start()
 
 void k053252_device::device_reset()
 {
-	int i;
-
-	for (i = 0; i < 16; i++)
+	for (int i = 0; i < 16; i++)
 		m_regs[i] = 0;
 
 	m_regs[0x08] = 1; // Xexex apparently does a wrong assignment for VC (sets up the INT enable register instead)
@@ -117,14 +115,14 @@ void k053252_device::device_reset()
 
 void k053252_device::reset_internal_state()
 {
-	m_hc=0;
-	m_hfp=0;
-	m_hbp=0;
-	m_vc=0;
-	m_vfp=0;
-	m_vbp=0;
-	m_vsw=0;
-	m_hsw=0;
+	m_hc = 0;
+	m_hfp = 0;
+	m_hbp = 0;
+	m_vc = 0;
+	m_vfp = 0;
+	m_vbp = 0;
+	m_vsw = 0;
+	m_hsw = 0;
 }
 
 /*****************************************************************************
@@ -139,9 +137,9 @@ uint8_t k053252_device::read(offs_t offset)
 		/* VCT read-back */
 		// TODO: correct?
 		case 0x0e:
-			return ((screen().vpos()-m_vc) >> 8) & 1;
+			return ((screen().vpos() - m_vc) >> 8) & 1;
 		case 0x0f:
-			return (screen().vpos()-m_vc) & 0xff;
+			return (screen().vpos() - m_vc) & 0xff;
 		default:
 			//popmessage("Warning: k053252 read %02x, contact MAMEdev",offset);
 			break;

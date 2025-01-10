@@ -53,7 +53,7 @@ protected:
 private:
 	required_device<mips1_device_base> m_cpu;
 	required_device<ds1215_device> m_rtc;
-	required_device<pit8254_device> m_pit;
+	required_device<pit8253_device> m_pit;
 	required_device<wd33c9x_base_device> m_scsi;
 	required_device_array<scn2681_device, 3> m_duart;
 	required_device_array<rs232_port_device, 4> m_serial;

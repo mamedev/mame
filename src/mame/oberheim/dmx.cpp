@@ -6,80 +6,580 @@ The Oberheim DMX is a digital drum machine.
 
 The firmware, running on a Z80, implements the drum machine functionality (e.g.
 sequencer), controls the UI (scans for button presses, drives the display),
-triggers voices, and controls voice variations. All harware functionality is
+triggers voices, and controls voice variations. All hardware functionality is
 mapped to I/O ports. Only ROM and RAM are mapped to memory.
 
-There are 8 voice cards (though the CYMBAL voice consists of 2 physical cards),
-each of which can produce 3 different variations, for a total of 24 sounds. The
-8 voice cards can play back simultaneously, but only 1 variation per card can be
-active at a time, for a total of 8 voices of polyphony.
+There are 8 voice cards, each of which can produce 3 variations, for a total of
+24 sounds. The 8 voice cards can play back simultaneously, but only 1 variation
+per card can be active at a time, for a total of 8 voices of polyphony.
 
 The drum sounds are samples stored in ROMs. During playback, they are
 post-processed by an analog VCA, which is modulated by a Release envelope
 genereator. Pitch and volume variations for each voice are also controlled by
 analog circuitry.
 
-Currently, this driver emulates the early version of the DMX. A later hardware
-revision added additional memory, while the final hardware revision added MIDI.
-These 2 subsequent revisions are not yet emulated.
+With the exception of the Cymbal voice, the bare voice PCBs are identical.
+Other than having different ROMs, the voice cards are further configured by
+multiple jumpers and differing component values. This configuration controls
+nominal pitch, variation type (pitch, volume, decay, sample), and the
+frequency response of the reconstruction filter.
 
-The driver is based on the DMX's service manual and schematics. It is intended
-as an educational tool.
+The Cymbal voice consists of 2 voice cards. One implements most of the circuit
+found in the other voice cards, while the other holds the 8 2732 ROMS.
+
+Currently, this driver emulates the early version of the DMX. A later hardware
+revision added additional memory, and the final hardware revision added MIDI.
+Furthermore, later versions shipped with the "Mark II" voice cards.
+These subsequent hardware revisions and the Mark II voice cards are not yet
+emulated.
+
+The driver is based on the DMX's service manual, DMX schematics, and
+http://www.electrongate.com/dmxfiles/dmxcards.html. It is intended as an
+educational tool.
 
 PCBoards:
 - Processor Board (includes the power supply and connectors)
 - Switch Board (buttons, faders and display)
-- Voice Card - Bass
-- Voice Card - Snare
-- Voice Card - Hi-hat
-- Voice Card - Tom 1
-- Voice Card - Tom 2
-- Voice Card - Perc 1
-- Voice Card - Perc 2
-- Voice Card - Cymbal #1
-- Voice Card - Cymbal #2
-Cymbal #1 and #2 implement a single voice, but occupy two voice card slots.
+- 7 x voice cards: Bass, Snare, Hi-hat, Tom 1, Tom 2, Perc 1, Perc 2.
+- 2 x cymbal cards: A single voice that occupies two card slots.
+
+Known audio inaccuracies (reasons for MACHINE_IMPERFECT_SOUND):
+- No anti-aliasing filters (coming soon).
+- No voice tuning (coming soon).
+- Closed and Accent hi-hat volume variations might be wrong. See comments in
+  HIHAT_CONFIG (to be researched soon).
+- No metronome yet.
+- Linear- instead of audio-taper faders.
+- The DMX stereo output uses fixed panning for each voice. Not yet emulated.
+- Envelope decay ignores diodes in capacitor discharge path. Given the quick
+  decay, and that the error is larger at low volumes, this might not be
+  noticeable.
+- Simplified diode model in pitch control. Very unlikely to be noticeable.
+  Error is within component tolerance margins.
+- Simplified diode model in volume control. Very unlikely to be noticeable.
+  Error is within component tolerance margins. It is very small at high volumes,
+  and approaches component tolerance extremes at low volumes.
 
 Usage notes:
-- No audio support (coming very soon).
-- An interactive, clickable layout is included.
-- This driver is marked as "not working", due to the lack of audio support. But
-  the UI is otherwise functional.
+- Interactive layout included.
 - The mixer faders can be controlled with the mouse, or from the "Sliders" menu.
 - The drum keys are mapped to the keyboard, starting at "Q". Specifically:
   Q - Bass 1, W - Snare 1, ...
   A - Bass 2, S - Snare 2, ...
   Z - Bass 3, X - Snare 3, ...
 - The number buttons on the layout are mapped to the numeric keypad.
+- Can run with a high sample rate: ./mame -window obdmx -samplerate 96000
 */
 
 #include "emu.h"
-
-#include "attotime.h"
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 #include "machine/output_latch.h"
+#include "machine/rescap.h"
 #include "machine/timer.h"
+#include "sound/dac76.h"
+#include "sound/mixer.h"
 #include "video/dl1416.h"
+#include "speaker.h"
 
 #include "oberheim_dmx.lh"
 
 #define LOG_TRIGGERS  (1U << 1)
 #define LOG_INT_TIMER (1U << 2)
+#define LOG_FADERS    (1U << 3)
+#define LOG_SOUND     (1U << 4)
+#define LOG_PITCH     (1U << 5)
+#define LOG_VOLUME    (1U << 6)
+#define LOG_SAMPLES   (1U << 7)
 
-#define VERBOSE (LOG_GENERAL | LOG_TRIGGERS | LOG_INT_TIMER)
+#define VERBOSE (LOG_GENERAL)
 //#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
+
+// Voice card configuration. Captures jumper configuration and component values.
+struct dmx_voice_card_config
+{
+	const float c2;  // Pitch control capacitor. In Farads.
+	const float c3;  // EG capacitor. In Farads. 0 if unused.
+
+	// R12 and R17 control how the different trigger modes affect pitch (for
+	// voices wired for pitch control), or volume and decay (for voices wired
+	// for volume control).
+	// The values of R12 and R17 in the 1981 service manual are flipped compared
+	// to the values in the 1983 schematics and in
+	// http://www.electrongate.com/dmxfiles/dmxcards.html. The values in the
+	// 1983 schematic (and electrongate.com) are most probably the right ones,
+	// since they create more variation, especially for volume. Using those.
+	const float r12;
+	const float r17;
+
+	// ROM contains 2 different samples.
+	const bool split_rom;
+
+	// Contains 8 ROMs instead of 1. Used for Cymbal voice cards.
+	const bool multi_rom;
+
+	// Triggers control pitch variations (rather than volume variations).
+	const bool pitch_control;
+
+	enum class decay_mode : s8  // Controlled by jumper Z on voice card.
+	{
+		DISABLED,  // 4.7K resistor connected to position 1 (+5V).
+		ENABLED,  // Jumper disconnected.
+		ENABLED_ON_TR12,  // 4.7K resistor connected to position 2 (/Q of U1B).
+		                  // Decay enabled when trigger mode is 1 or 2.
+	};
+	const decay_mode decay;
+
+	// This jumper won't make a difference when `decay` is `DISABLED`.
+	enum class early_decay_mode : s8  // Controlled by jumper S on voice card.
+	{
+		ENABLED,  // Jumper connected to position 2 (+5V).
+		ENABLED_ON_TR1,  // Jumper connected to position 1 (Q of U1A).
+		                 // Early decay enabled when trigger mode is 1.
+	};
+	const early_decay_mode early_decay;
+};
+
+// Emulates the original DMX voice cards, including the cymbal card. Later
+// DMX models shipped with the "Mark II" voice cards for the Tom voices.
+// The Mark II cards are not yet emulated.
+class dmx_voice_card : public device_t, public device_sound_interface
+{
+public:
+	dmx_voice_card(const machine_config &mconfig, const char *tag, device_t *owner, const dmx_voice_card_config &config, required_memory_region *sample_rom) ATTR_COLD;
+	dmx_voice_card(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0) ATTR_COLD;
+
+	void trigger(bool tr0, bool tr1);
+
+protected:
+	void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	void device_start() override ATTR_COLD;
+	void device_reset() override ATTR_COLD;
+	void sound_stream_update(sound_stream &stream, const std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs) override;
+
+private:
+	void reset_counter();
+	void configure_pitch();
+	void configure_volume();
+
+	bool is_decay_enabled() const;
+	bool is_early_decay_enabled() const;
+	TIMER_DEVICE_CALLBACK_MEMBER(clock_callback);
+
+	sound_stream *m_stream = nullptr;
+
+	required_device<timer_device> m_timer;  // 555, U5.
+	required_device<dac76_device> m_dac;  // AM6070, U8. Compatible with DAC76.
+
+	const dmx_voice_card_config m_config;
+	required_memory_region *m_sample_rom = nullptr;
+
+	bool m_counting = false;
+	u16 m_counter = 0;  // 4040 counter.
+	u8 m_trigger_mode = 0;  // Valid modes: 1-3.
+	float m_volume = 0;  // Volume attenuation: 0-1.
+
+	bool m_decaying = false;
+	attotime m_decay_start_time;
+
+	static constexpr const float VCC = 5;
+	static constexpr const float R8 = RES_K(2.7);
+	static constexpr const float R9 = RES_K(5.6);
+};
+
+DEFINE_DEVICE_TYPE(DMX_VOICE_CARD, dmx_voice_card, "dmx_voice_card", "DMX Voice Card");
+
+dmx_voice_card::dmx_voice_card(
+		const machine_config &mconfig,
+		const char *tag, device_t *owner,
+		const dmx_voice_card_config &config,
+		required_memory_region *sample_rom)
+	: device_t(mconfig, DMX_VOICE_CARD, tag, owner, 0)
+	, device_sound_interface(mconfig, *this)
+	, m_timer(*this, "555_u5")
+	, m_dac(*this, "dac_u8")
+	, m_config(config)
+	, m_sample_rom(sample_rom)
+{
+}
+
+dmx_voice_card::dmx_voice_card(
+		const machine_config &mconfig, const char *tag, device_t *owner,
+		uint32_t clock)
+	: device_t(mconfig, DMX_VOICE_CARD, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+	, m_timer(*this, "555_u5")
+	, m_dac(*this, "dac_u8")
+	, m_config(dmx_voice_card_config{})
+{
+}
+
+void dmx_voice_card::trigger(bool tr0, bool tr1)
+{
+	assert(tr0 || tr1);
+	if (tr1 && tr0)
+		m_trigger_mode = 3;
+	else if (tr1)
+		m_trigger_mode = 2;
+	else if (tr0)
+		m_trigger_mode = 1;
+	else
+		return
+
+	m_stream->update();
+	m_counter = 0;
+	m_counting = true;
+	m_volume = 1;
+	m_decaying = false;
+
+	if (m_config.pitch_control)
+		configure_pitch();
+	else
+		configure_volume();
+
+	LOGMASKED(LOG_SOUND, "Trigger: (%d, %d) %d %f\n",
+	          tr0, tr1, m_trigger_mode, m_volume);
+}
+
+void dmx_voice_card::device_add_mconfig(machine_config &config)
+{
+	TIMER(config, m_timer).configure_generic(FUNC(dmx_voice_card::clock_callback));
+	DAC76(config, m_dac, 0U).add_route(ALL_OUTPUTS, *this, 1.0);
+}
+
+void dmx_voice_card::device_start()
+{
+	m_stream = stream_alloc(1, 1, machine().sample_rate());
+
+	save_item(NAME(m_counting));
+	save_item(NAME(m_counter));
+	save_item(NAME(m_trigger_mode));
+	save_item(NAME(m_volume));
+	save_item(NAME(m_decaying));
+	save_item(NAME(m_decay_start_time));
+}
+
+void dmx_voice_card::device_reset()
+{
+	m_trigger_mode = 0;
+	reset_counter();
+	configure_pitch();
+	configure_volume();
+}
+
+void dmx_voice_card::sound_stream_update(
+	sound_stream &stream,
+	const std::vector<read_stream_view> &inputs,
+	std::vector<write_stream_view> &outputs)
+{
+	const read_stream_view &in = inputs[0];
+	write_stream_view &out = outputs[0];
+
+	float rc_inv = 0;
+	if (m_decaying)
+	{
+		float r_lower = R9;
+		if (m_trigger_mode == 1)
+			r_lower = RES_3_PARALLEL(R9, m_config.r12, m_config.r17);
+		else if (m_trigger_mode == 2)
+			r_lower = RES_2_PARALLEL(R9, m_config.r12);
+		rc_inv = 1.0F / ((R8 + r_lower) * m_config.c3);
+	}
+
+	const int n = in.samples();
+	attotime t = in.start_time() - m_decay_start_time;
+	for (int i = 0; i < n; ++i, t += in.sample_period())
+	{
+		const float decay = m_decaying ? expf(-t.as_double() * rc_inv) : 1.0F;
+		out.put(i, decay * m_volume * in.get(i));
+		if (m_counting && i == 0)
+		{
+			LOGMASKED(LOG_SAMPLES, "Sample: %d, %d, %f, %d, %f, %f\n",
+			          i, m_counter, m_volume, m_decaying, t.as_double(), decay);
+		}
+	}
+}
+
+void dmx_voice_card::reset_counter()
+{
+	m_counter = 0;
+	m_counting = false;
+}
+
+void dmx_voice_card::configure_pitch()
+{
+	// TODO: A lot of the computations below can be cached at object
+	// construction time for all 3 trigger modes.
+
+	// Pitch variations are accomplished by changing the playback sample rate.
+	// This is done by changing the control voltage (CV) on the 555 timer that
+	// generates the sampling clock.
+
+	// *** Compute CV input (pin 5) of the 555.
+
+	// The CV equations were derived from Kirchhoff analysis and verified with
+	// simulations: https://tinyurl.com/26x8oq75
+
+	// Diode drop for pitch circuit. The value is based on simulations with the
+	// various pitch configurations, instead of picking the typical 0.6V. This
+	// should help with accuracy.
+	static constexpr const float VD = 0.48F;
+	static constexpr const float R_555 = RES_K(5);
+	static constexpr const float R3 = RES_K(1);
+	static constexpr const float R4 = RES_K(10);
+	static constexpr const float R5 = RES_K(3.3);
+	static constexpr const float T1 = RES_K(6);  // TODO: 10K potentiometer.
+
+	float cv = VCC * 2 / 3;  // The 555 default, if the CV pin is not connected.
+	const float r12 = m_config.r12;
+	if (m_trigger_mode == 1)
+	{
+		const float alpha = 1.0 + r12 / m_config.r17;
+		cv = (alpha * R5 + r12) * (2 * VCC - 3 * VD) /
+		     (3 * alpha * R5 + 3 * r12 + 2 * alpha * R_555) + VD;
+	}
+	else if (m_trigger_mode == 2)
+	{
+		cv = (R5 + r12) * (2 * VCC - 3 * VD) /
+		     (3 * R5 + 3 * r12 + 2 * R_555) + VD;
+	}
+	const float cv_norm = cv / VCC;
+	LOGMASKED(LOG_PITCH, "S555 CV: %f\n", cv);
+
+	// *** Compute sampling rate.
+
+	// Compute time for which the output is high.
+	// TODO: T1 will not be a constant once tuning is supported.
+	const float r_charge = T1 + R4;
+	const float t_high =
+		-r_charge * m_config.c2 * logf((2 * cv_norm - 2) / (cv_norm - 2));
+	assert(t_high > 0);
+
+	// Compute time for which the output is low.
+	const float target_v_fraction = RES_VOLTAGE_DIVIDER(r_charge, R3);
+	const float effective_r = RES_2_PARALLEL(r_charge, R3);
+	const float t_low =
+		-effective_r * m_config.c2 * logf((cv_norm - 2 * target_v_fraction) /
+		(2 * (cv_norm - target_v_fraction)));
+	assert(t_low > 0);
+
+	const attotime period = attotime::from_double(t_high + t_low);
+	m_timer->adjust(period, 0, period);
+	LOGMASKED(LOG_PITCH, "Sampling frequency: %f\n", 1.0 / period.as_double());
+}
+
+void dmx_voice_card::configure_volume()
+{
+	// The equations below were derived from Kirchhoff analysis and verified
+	// with simulations: https://tinyurl.com/22wxwh8h
+
+	static constexpr const float VD = 0.6;  // Diode drop.
+	static constexpr const float MAX_IREF = 5.0 / (R8 + R9);
+
+	const float r12 = m_config.r12;
+	const float r17 = m_config.r17;
+
+	float i_ref = MAX_IREF;
+	if (m_trigger_mode == 1)
+	{
+		i_ref = (r12 * r17 * VCC + R8 * r12 * VD + R8 * r17 * VD) /
+		        ((R8 * r12 * r17) + (r12 * r17 * R9) + (R8 * r17 * R9) + (R8 * r12 * R9));
+	}
+	else if (m_trigger_mode == 2)
+	{
+		i_ref = (r12 * VCC + R8 * VD) / (r12 * R8 + R8 * R9 + r12 * R9);
+	}
+
+	m_volume = i_ref / MAX_IREF;
+	LOGMASKED(LOG_VOLUME, "Volume %d, Iref: %f uA\n", m_volume, i_ref * 1e6f);
+}
+
+bool dmx_voice_card::is_decay_enabled() const
+{
+	switch (m_config.decay)
+	{
+		case dmx_voice_card_config::decay_mode::ENABLED:
+			return true;
+		case dmx_voice_card_config::decay_mode::ENABLED_ON_TR12:
+			return m_trigger_mode == 1 || m_trigger_mode == 2;
+		case dmx_voice_card_config::decay_mode::DISABLED:
+			return false;
+	}
+	return false;
+}
+
+bool dmx_voice_card::is_early_decay_enabled() const
+{
+	switch (m_config.early_decay)
+	{
+		case dmx_voice_card_config::early_decay_mode::ENABLED:
+			return true;
+		case dmx_voice_card_config::early_decay_mode::ENABLED_ON_TR1:
+			return m_trigger_mode == 1;
+	}
+	return false;
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(dmx_voice_card::clock_callback)
+{
+	if (!m_counting)
+		return;
+
+	++m_counter;
+
+	const u16 rom_size = m_config.multi_rom ? 8 * 0x1000 : 0x1000;
+	const u16 max_count = m_config.split_rom ? rom_size / 2 : rom_size;
+	if (m_counter >= max_count)
+	{
+		reset_counter();
+		LOGMASKED(LOG_SOUND, "Done counting %d\n\n", m_config.split_rom);
+	}
+
+	const u16 offset = (m_config.split_rom && m_trigger_mode != 3) ? max_count : 0;
+	const u8 sample = (*m_sample_rom)->as_u8(m_counter + offset);
+	m_dac->update();
+	m_dac->sb_w(BIT(sample, 7));
+	m_dac->b1_w(BIT(sample, 6));
+	m_dac->b2_w(BIT(sample, 5));
+	m_dac->b3_w(BIT(sample, 4));
+	m_dac->b4_w(BIT(sample, 3));
+	m_dac->b5_w(BIT(sample, 2));
+	m_dac->b6_w(BIT(sample, 1));
+	m_dac->b7_w(BIT(sample, 0));
+
+	// Early decay starts when the counter's bit 6 transitions to 1.
+	static constexpr const u16 EARLY_DECAY_START = 1 << 6;
+	// If early decay is not enabled, but decay is enabled, it will start when
+	// the counter's bit 10 transitions to 1.
+	static constexpr const u16 LATE_DECAY_START = 1 << 10;
+
+	if (!m_decaying && is_decay_enabled())
+	{
+		if ((is_early_decay_enabled() && m_counter >= EARLY_DECAY_START) ||
+		    m_counter >= LATE_DECAY_START)
+		{
+			m_stream->update();
+			m_decaying = true;
+			m_decay_start_time = machine().time();
+		}
+	}
+}
 
 namespace {
 
 constexpr const char MAINCPU_TAG[] = "z80";
 constexpr const char NVRAM_TAG[] = "nvram";
 
+// Voice card configurations below reverse R12 and R17 compared to the 1981
+// schematics. See comments in dmx_voice_card_config for more on this.
+
+constexpr const dmx_voice_card_config BASS_CONFIG =
+{
+	.c2 = CAP_U(0.0033),
+	.c3 = CAP_U(3.3),
+	.r12 = RES_R(750),
+	.r17 = RES_R(47),
+	.split_rom = false,
+	.multi_rom = false,
+	.pitch_control = false,
+	.decay = dmx_voice_card_config::decay_mode::ENABLED,
+	.early_decay = dmx_voice_card_config::early_decay_mode::ENABLED,
+};
+
+constexpr const dmx_voice_card_config SNARE_CONFIG =
+{
+	.c2 = CAP_U(0.0022),
+	.c3 = 0,
+	.r12 = RES_K(1.5),
+	.r17 = RES_R(15),
+	.split_rom = false,
+	.multi_rom = false,
+	.pitch_control = false,
+	.decay = dmx_voice_card_config::decay_mode::DISABLED,
+	.early_decay = dmx_voice_card_config::early_decay_mode::ENABLED_ON_TR1,
+};
+
+// Some component values in HIHAT_CONFIG might be wrong.
+// The 1981 schematic shows 6.8uF for c3. electrongate.com reports 2.2uF. The
+// service manual states that c3 can be changed, and offers a useful range of
+// 2uF - 10uF.
+// Similarly, resistor values in electrongate.com disagree with schematics.
+// - electrongate.com: R12 = 6.8K, R17 not installed.
+// - schematics: R12 = 1.5K, R17 = 15.
+constexpr const dmx_voice_card_config HIHAT_CONFIG =
+{
+	.c2 = CAP_U(0.0033),
+	.c3 = CAP_U(6.8),
+	.r12 = RES_K(1.5),
+	.r17 = RES_R(15),
+	.split_rom = false,
+	.multi_rom = false,
+	.pitch_control = false,
+	.decay = dmx_voice_card_config::decay_mode::ENABLED_ON_TR12,
+	.early_decay = dmx_voice_card_config::early_decay_mode::ENABLED_ON_TR1,
+};
+
+constexpr const dmx_voice_card_config TOM_CONFIG =
+{
+	.c2 = CAP_U(0.0033),
+	.c3 = CAP_U(6.8),
+	.r12 = RES_K(33),
+	.r17 = RES_K(18),
+	.split_rom = false,
+	.multi_rom = false,
+	.pitch_control = true,
+	.decay = dmx_voice_card_config::decay_mode::ENABLED,
+	.early_decay = dmx_voice_card_config::early_decay_mode::ENABLED,
+};
+
+constexpr dmx_voice_card_config PERC_CONFIG(float c2)
+{
+	return
+	{
+		.c2 = c2,
+		.c3 = 0,
+		.r12 = RES_K(1.5),
+		.r17 = RES_R(30),
+		.split_rom = true,
+		.multi_rom = false,
+		.pitch_control = false,
+		.decay = dmx_voice_card_config::decay_mode::DISABLED,
+		.early_decay = dmx_voice_card_config::early_decay_mode::ENABLED_ON_TR1,
+	};
+}
+
+constexpr const dmx_voice_card_config CYMBAL_CONFIG =
+{
+	.c2 = CAP_U(0.0033),
+	.c3 = 0,
+	.r12 = RES_R(680),
+	.r17 = RES_R(100),
+	.split_rom = true,
+	.multi_rom = true,
+	.pitch_control = false,
+	.decay = dmx_voice_card_config::decay_mode::DISABLED,
+	.early_decay = dmx_voice_card_config::early_decay_mode::ENABLED_ON_TR1,
+};
+
+
 class dmx_state : public driver_device
 {
 public:
+	enum voice_card_indices
+	{
+		VC_BASS = 0,
+		VC_SNARE,
+		VC_HIHAT,
+		VC_SMALL_TOMS,
+		VC_LARGE_TOMS,
+		VC_PERC1,
+		VC_PERC2,
+		VC_CYMBAL,
+		NUM_VOICE_CARDS
+	};
+
 	dmx_state(const machine_config &mconfig, device_type type, const char *tag) ATTR_COLD
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, MAINCPU_TAG)
@@ -93,12 +593,18 @@ public:
 		, m_clk_out_tip(*this, "CLK_OUT_tip")
 		, m_metronome_mix(*this, "METRONOME_MIX")
 		, m_metronome(*this, "METRONOME")
+		, m_mixer(*this, "mixer")
+		, m_voices(*this, "voice_%d", 0)
+		, m_samples(*this, "sample_%d", 0)
 	{
 	}
 
 	void dmx(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(clk_in_changed);
+	DECLARE_INPUT_CHANGED_MEMBER(voice_volume_changed);
+	DECLARE_INPUT_CHANGED_MEMBER(metronome_volume_changed);
+	DECLARE_INPUT_CHANGED_MEMBER(master_volume_changed);
 
 protected:
 	void machine_start() override ATTR_COLD;
@@ -136,6 +642,10 @@ private:
 	output_finder<> m_metronome_mix;
 	output_finder<> m_metronome;
 
+	required_device<mixer_device> m_mixer;
+	required_device_array<dmx_voice_card, 8> m_voices;
+	required_memory_region_array<8> m_samples;
+
 	// 40103 timer (U11 in Processor Board)
 	u8 m_int_timer_preset = 0xff;
 	bool m_int_timer_enabled = true;
@@ -151,6 +661,20 @@ private:
 	static constexpr const XTAL CPU_CLOCK = 4.9152_MHz_XTAL / 2;
 	// Divided by U34, 74LS393.
 	static constexpr const XTAL INT_TIMER_CLOCK = CPU_CLOCK / 256;
+
+	// Configuration for each voice needs to appear in the index specified by
+	// the voice_card_indices enum for that voice.
+	static constexpr const dmx_voice_card_config VOICE_CONFIGS[NUM_VOICE_CARDS] =
+	{
+		BASS_CONFIG,    // VC_BASS
+		SNARE_CONFIG,   // VC_SNARE
+		HIHAT_CONFIG,   // VC_HIHAT
+		TOM_CONFIG,     // VC_SMALL_TOMS
+		TOM_CONFIG,     // VC_LARGE_TOMS
+		PERC_CONFIG(CAP_U(0.0033)),  // VC_PERC1
+		PERC_CONFIG(CAP_U(0.0047)),  // VC_PERC2
+		CYMBAL_CONFIG,  // VC_CYMBAL
+	};
 };
 
 void dmx_state::refresh_int_flipflop()
@@ -340,7 +864,6 @@ template<int GROUP> void dmx_state::gen_trigger_w(u8 data)
 	// normally pulled low.
 
 	static_assert(GROUP >= 0 && GROUP <= 1);
-	static constexpr const int NUM_VOICE_CARDS = 8;
 	static constexpr const int TRIGGER_MAPPINGS[2][NUM_VOICE_CARDS] =
 	{
 		{0, 2, 4, 6, 1, 3, 5, 7},
@@ -352,18 +875,21 @@ template<int GROUP> void dmx_state::gen_trigger_w(u8 data)
 
 	std::vector<bool> triggers(2 * NUM_VOICE_CARDS, false);
 	for (int i = 0; i < NUM_VOICE_CARDS; ++i)
+	{
 		if (BIT(data, i))
-			triggers[TRIGGER_MAPPINGS[GROUP][i]] = true;
+		{
+			const int trig_index = TRIGGER_MAPPINGS[GROUP][i];
+			triggers[trig_index] = true;
+			LOGMASKED(LOG_TRIGGERS, "Trigerred TR%d\n", trig_index);
+		}
+	}
 
 	for (int i = 0; i < NUM_VOICE_CARDS; ++i)
 	{
 		const bool tr0 = triggers[2 * i];
 		const bool tr1 = triggers[2 * i + 1];
 		if (tr0 || tr1)
-		{
-			LOGMASKED(LOG_TRIGGERS, "Triggered Voice: %d, tr0: %d, tr1: %d\n",
-			          i, tr0, tr1);
-		}
+			m_voices[i]->trigger(tr0, tr1);
 	}
 }
 
@@ -446,11 +972,40 @@ void dmx_state::dmx(machine_config &config)
 	cas_latch.bit_handler<3>().set_output("CLK_OUT_ring").invert();
 	cas_latch.bit_handler<4>().set_output("LVI");
 	// Bit 5 not connected.
+
+	MIXER(config, m_mixer);
+	for (int i = 0; i < NUM_VOICE_CARDS; ++i)
+	{
+		DMX_VOICE_CARD(config, m_voices[i], VOICE_CONFIGS[i], &m_samples[i]);
+		m_voices[i]->add_route(ALL_OUTPUTS, m_mixer, 1.0);
+	}
+
+	SPEAKER(config, "mono").front_center();
+	m_mixer->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 DECLARE_INPUT_CHANGED_MEMBER(dmx_state::clk_in_changed)
 {
 	refresh_int_flipflop();
+}
+
+DECLARE_INPUT_CHANGED_MEMBER(dmx_state::voice_volume_changed)
+{
+	const s32 voice = param;
+	m_mixer->set_input_gain(voice, newval / 100.0F);
+	LOGMASKED(LOG_FADERS, "Voice %d volume changed: %d\n", voice, newval);
+}
+
+DECLARE_INPUT_CHANGED_MEMBER(dmx_state::metronome_volume_changed)
+{
+	// TODO: Implement once metronome is emulated.
+	LOGMASKED(LOG_FADERS, "Metronome volume changed: %d\n", newval);
+}
+
+DECLARE_INPUT_CHANGED_MEMBER(dmx_state::master_volume_changed)
+{
+	m_mixer->set_output_gain(0, newval / 100.0F);
+	LOGMASKED(LOG_FADERS, "Master volume changed: %d\n", newval);
 }
 
 INPUT_PORTS_START(dmx)
@@ -476,13 +1031,13 @@ INPUT_PORTS_START(dmx)
 
 	PORT_START("buttons_2")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("RECORD") PORT_CODE(KEYCODE_ENTER)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("ERASE") PORT_CODE(KEYCODE_DEL)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("COPY") PORT_CODE(KEYCODE_END)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("LENGTH") PORT_CODE(KEYCODE_L)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("ERASE") PORT_CODE(KEYCODE_BACKSLASH)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("COPY") PORT_CODE(KEYCODE_DEL)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("LENGTH") PORT_CODE(KEYCODE_END)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PLAY") PORT_CODE(KEYCODE_SPACE)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("TEMPO") PORT_CODE(KEYCODE_OPENBRACE)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("QUANT") PORT_CODE(KEYCODE_BACKSLASH)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("SIGN") PORT_CODE(KEYCODE_CLOSEBRACE)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("TEMPO") PORT_CODE(KEYCODE_L)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("QUANT") PORT_CODE(KEYCODE_QUOTE)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("SIGN") PORT_CODE(KEYCODE_COLON)
 
 	PORT_START("buttons_3")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("BASS 3") PORT_CODE(KEYCODE_Z)
@@ -537,26 +1092,46 @@ INPUT_PORTS_START(dmx)
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::clk_in_changed), 0)
 
 	// Fader potentiometers. P1-P10 on the Switch Board.
+
 	PORT_START("fader_p1")
 	PORT_ADJUSTER(100, "BASS")
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::voice_volume_changed), dmx_state::VC_BASS)
+
 	PORT_START("fader_p2")
 	PORT_ADJUSTER(100, "SNARE")
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::voice_volume_changed), dmx_state::VC_SNARE)
+
 	PORT_START("fader_p3")
 	PORT_ADJUSTER(100, "HI-HAT")
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::voice_volume_changed), dmx_state::VC_HIHAT)
+
 	PORT_START("fader_p4")
 	PORT_ADJUSTER(100, "TOM1")
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::voice_volume_changed), dmx_state::VC_SMALL_TOMS)
+
 	PORT_START("fader_p5")
 	PORT_ADJUSTER(100, "TOM2")
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::voice_volume_changed), dmx_state::VC_LARGE_TOMS)
+
 	PORT_START("fader_p6")
 	PORT_ADJUSTER(100, "CYMBAL")
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::voice_volume_changed), dmx_state::VC_CYMBAL)
+
 	PORT_START("fader_p7")
 	PORT_ADJUSTER(100, "PERC1")
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::voice_volume_changed), dmx_state::VC_PERC1)
+
 	PORT_START("fader_p8")
 	PORT_ADJUSTER(100, "PERC2")
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::voice_volume_changed), dmx_state::VC_PERC2)
+
 	PORT_START("fader_p9")
 	PORT_ADJUSTER(100, "MET")
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::metronome_volume_changed), 0)
+
 	PORT_START("fader_p10")
 	PORT_ADJUSTER(100, "VOLUME")
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::master_volume_changed), 0)
 INPUT_PORTS_END
 
 ROM_START(obdmx)
@@ -574,9 +1149,43 @@ ROM_START(obdmx)
 	ROM_SYSTEM_BIOS(2, "rev_f", "DMX 2.21 (Revision F), 1982")
 	ROMX_LOAD("dmx_f0.u18", 0x000000, 0x001000, CRC(a01e5e7d) SHA1(74faf9c056c7e3eb89ed7657d8b64b1d3fe0ec22), ROM_BIOS(2))
 	ROMX_LOAD("dmx_f1.u17", 0x001000, 0x001000, CRC(b24d4040) SHA1(74e7ae87cdcf9442cf76b696970c0efe52a30262), ROM_BIOS(2))
+
+	// Sample ROMs. The number appended to "sample_" needs to match the
+	// corresponding voice in the dmx_state::voice_card_indices enum.
+
+	ROM_REGION(0x1000, "sample_0", 0)  // Bass (dmx_state::VC_BASS).
+	ROM_LOAD("21kick.u7", 0x000000, 0x001000, CRC(3ab63275) SHA1(83b0e61e42c9d277f205f4ff5dfcb796c05084b8))
+
+	ROM_REGION(0x1000, "sample_1", 0)  // Snare (dmx_state::VC_SNARE).
+	ROM_LOAD("snare6.u7", 0x000000, 0x001000, CRC(eca57ad7) SHA1(f65dcae905e0f7db9bf9324153ddd16a33dbdc8b))
+
+	ROM_REGION(0x1000, "sample_2", 0)  // Hi-Hat (dmx_state::VC_HIHAT).
+	ROM_LOAD("hat1a.u7", 0x000000, 0x001000, CRC(36e934f9) SHA1(e97d65bfb2d98cbf463a92d12e2ab91938757d37))
+
+	ROM_REGION(0x1000, "sample_3", 0)  // Small Toms (dmx_state::VC_SMALL_TOMS).
+	ROM_LOAD("stom5.u7", 0x000000, 0x001000, CRC(e8022d72) SHA1(61a14da4d96db12b040ab9529208b165212b3693))
+
+	ROM_REGION(0x1000, "sample_4", 0)  // Large Toms (dmx_state::VC_LARGE_TOMS).
+	ROM_LOAD("sfltom2.u7", 0x000000, 0x001000, CRC(f5b48db0) SHA1(a85e72a9f87838c26538e5873f6938e51a517c90))
+
+	ROM_REGION(0x1000, "sample_5", 0)  // Perc 1: Tambourine / Rimshot (dmx_state::VC_PERC1).
+	ROM_LOAD("stik.u7", 0x000000, 0x001000, CRC(61af39e3) SHA1(5648674854a8db80656bf729c4f353b75d101d7b))
+
+	ROM_REGION(0x1000, "sample_6", 0)  // Perc 2: Shaker / Claps (dmx_state::VC_PERC2).
+	ROM_LOAD("shake6.u7", 0x000000, 0x001000, CRC(00549f07) SHA1(d41c3357d486c398f882774130789c9756dfb9af))
+
+	ROM_REGION(0x8000, "sample_7", 0)  // Cymbal: Ride / Crash (dmx_state::VC_CYMBAL).
+	ROM_LOAD("crash1.u12", 0x000000, 0x001000, CRC(40d584af) SHA1(98702946e80892eb834433268164404fab3b0e28))
+	ROM_LOAD("crash2.u11", 0x001000, 0x001000, CRC(8daf2447) SHA1(59c0af6c46c04ccd0eff90070de4fe08c5a47b42))
+	ROM_LOAD("crash3.u10", 0x002000, 0x001000, CRC(4a41c86d) SHA1(baffb30659bb628d4fd9a382dc851683aad92b88))
+	ROM_LOAD("crash4.u9", 0x003000, 0x001000, CRC(b30876a9) SHA1(fe9f906f38ad9354d043794d6c22d07c78672261))
+	ROM_LOAD("ride2a1.u8", 0x004000, 0x001000, CRC(17c960e8) SHA1(5f4681979c6339ff1c38dc90257d14a0a7516c52))
+	ROM_LOAD("ride2a2.u7", 0x005000, 0x001000, CRC(5b2198d0) SHA1(5e008c76f949a6357c1160e00d43631585702d45))
+	ROM_LOAD("ride2a3.u6", 0x006000, 0x001000, CRC(4f67cacb) SHA1(8abc2c6769bd315c489969486de02b567348ea94))
+	ROM_LOAD("ride2a4.u5", 0x007000, 0x001000, CRC(25656751) SHA1(46e5f70da82f8845dd820cbcf942bd0e7e328d56))
 ROM_END
 
 }  // anonymous namespace
 
-SYST(1980, obdmx, 0, 0, dmx, dmx, dmx_state, empty_init, "Oberheim", "DMX", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+SYST(1980, obdmx, 0, 0, dmx, dmx, dmx_state, empty_init, "Oberheim", "DMX", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND)
 

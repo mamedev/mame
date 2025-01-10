@@ -31,7 +31,6 @@ The sprite RAM format is very similar to the 053245.
 ???-??? R  reads data from the gfx ROMs (16 bits in total). The address of the
            data is determined by the registers above
 
-
 */
 
 #include "emu.h"
@@ -47,7 +46,6 @@ The sprite RAM format is very similar to the 053245.
 /*****************************************************************************
     DEVICE HANDLERS
 *****************************************************************************/
-
 
 void k053247_device::clear_all()
 {
@@ -135,7 +133,7 @@ u16 k053247_device::k055673_5bpp_rom_word_r(offs_t offset) // 5bpp
 	int size4 = (m_gfxrom.length() / (1024 * 1024)) / 5;
 	int romofs;
 
-	size4 *= 4 * 1024 * 1024;   // get offset to 5th bit
+	size4 *= 4 * 1024 * 1024; // get offset to 5th bit
 	ROM8 += size4;
 
 	romofs = m_kx46_regs[6] << 16 | m_kx46_regs[7] << 8 | m_kx46_regs[4];
@@ -452,14 +450,14 @@ void k053247_device::zdrawgfxzoom32GP(
 #define FPENT  0
 
 	// inner loop
-	const u8  *src_ptr;
+	const u8 *src_ptr;
 	int src_x;
 	int eax, ecx;
 	int src_fx, src_fdx;
 	int shdpen;
-	u8  z8 = 0, p8 = 0;
-	u8  *ozbuf_ptr;
-	u8  *szbuf_ptr;
+	u8 z8 = 0, p8 = 0;
+	u8 *ozbuf_ptr;
+	u8 *szbuf_ptr;
 	const pen_t *pal_base;
 	const pen_t *shd_base;
 	u32 *dst_ptr;
@@ -922,7 +920,7 @@ void k055673_device::device_start()
 	int gfx_index = 0;
 	u32 total;
 
-	static const gfx_layout spritelayout =  /* System GX sprite layout */
+	static const gfx_layout spritelayout = /* System GX sprite layout */
 	{
 		16,16,
 		0,
@@ -994,7 +992,7 @@ void k055673_device::device_start()
 			d = (u8 *)alt_k055673_rom;
 			// now combine the graphics together to form 5bpp
 			s1 = (u8 *)&m_gfxrom[0]; // 4bpp area
-			s2 = s1 + (size4);   // 1bpp area
+			s2 = s1 + (size4); // 1bpp area
 			for (i = 0; i < size4; i+= 4)
 			{
 				*d++ = *s1++;
@@ -1040,7 +1038,7 @@ void k055673_device::device_start()
 	m_objcha_line = CLEAR_LINE;
 	m_ram = std::make_unique<u16[]>(0x4000/2);
 
-	memset(m_ram.get(),  0, 0x4000);
+	memset(m_ram.get(), 0, 0x4000);
 	std::fill(std::begin(m_kx46_regs), std::end(m_kx46_regs), 0);
 	std::fill(std::begin(m_kx47_regs), std::end(m_kx47_regs), 0);
 

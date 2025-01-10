@@ -57,8 +57,8 @@ private:
 	devcb_write_line m_sh2_cb;
 
 	// configuration
-	sound_stream *  m_stream;
-	emu_timer   *m_timer;
+	sound_stream *m_stream;
+	emu_timer    *m_timer;
 
 	// live state
 	u8           m_portdata[4];

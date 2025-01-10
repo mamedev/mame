@@ -1042,14 +1042,18 @@ void mcs51_cpu_device::do_sub_flags(uint8_t a, uint8_t data, uint8_t c)
 
 void mcs51_cpu_device::transmit(int state)
 {
-	if (BIT(SFR_A(ADDR_P3), 1) != state)
+	if (m_uart.txd != state)
 	{
-		if (state)
-			SFR_A(ADDR_P3) |= 1U << 1;
-		else
-			SFR_A(ADDR_P3) &= ~(1U << 1);
+		m_uart.txd = state;
 
-		m_port_out_cb[3](SFR_A(ADDR_P3));
+		// P3.1 = SFR(P3) & TxD
+		if (BIT(SFR_A(ADDR_P3), 1))
+		{
+			if (state)
+				m_port_out_cb[3](SFR_A(ADDR_P3));
+			else
+				m_port_out_cb[3](SFR_A(ADDR_P3) & ~0x02);
+		}
 	}
 }
 
@@ -2230,7 +2234,13 @@ void mcs51_cpu_device::sfr_write(size_t offset, uint8_t data)
 		case ADDR_P0:   m_port_out_cb[0](data);             break;
 		case ADDR_P1:   m_port_out_cb[1](data);             break;
 		case ADDR_P2:   m_port_out_cb[2](data);             break;
-		case ADDR_P3:   m_port_out_cb[3](data);             break;
+		case ADDR_P3:
+			// P3.1 = SFR(P3) & TxD
+			if (!m_uart.txd)
+				m_port_out_cb[3](data & ~0x02);
+			else
+				m_port_out_cb[3](data);
+			break;
 		case ADDR_SBUF:
 			LOGMASKED(LOG_TX, "tx byte 0x%02x\n", data);
 			m_uart.data_out = data;
@@ -2320,27 +2330,33 @@ void mcs51_cpu_device::device_start()
 	/* Save states */
 	save_item(NAME(m_ppc));
 	save_item(NAME(m_pc));
+	save_item(NAME(m_rwm));
+	save_item(NAME(m_recalc_parity));
+	save_item(NAME(m_last_line_state));
+	save_item(NAME(m_t0_cnt));
+	save_item(NAME(m_t1_cnt));
+	save_item(NAME(m_t2_cnt));
+	save_item(NAME(m_t2ex_cnt));
+	save_item(NAME(m_cur_irq_prio));
+	save_item(NAME(m_irq_active));
+	save_item(NAME(m_irq_prio));
 	save_item(NAME(m_last_op));
 	save_item(NAME(m_last_bit));
-	save_item(NAME(m_rwm) );
-	save_item(NAME(m_cur_irq_prio) );
-	save_item(NAME(m_last_line_state) );
-	save_item(NAME(m_t0_cnt) );
-	save_item(NAME(m_t1_cnt) );
-	save_item(NAME(m_t2_cnt) );
-	save_item(NAME(m_t2ex_cnt) );
-	save_item(NAME(m_recalc_parity) );
-	save_item(NAME(m_irq_prio) );
-	save_item(NAME(m_irq_active) );
-	save_item(NAME(m_ds5002fp.previous_ta) );
-	save_item(NAME(m_ds5002fp.ta_window) );
-	save_item(NAME(m_ds5002fp.rnr_delay) );
-	save_item(NAME(m_ds5002fp.range) );
+
 	save_item(NAME(m_uart.data_out));
 	save_item(NAME(m_uart.data_in));
+	save_item(NAME(m_uart.txbit));
+	save_item(NAME(m_uart.txd));
+	save_item(NAME(m_uart.rxbit));
+	save_item(NAME(m_uart.rxb8));
 	save_item(NAME(m_uart.smod_div));
 	save_item(NAME(m_uart.rx_clk));
 	save_item(NAME(m_uart.tx_clk));
+
+	save_item(NAME(m_ds5002fp.previous_ta));
+	save_item(NAME(m_ds5002fp.ta_window));
+	save_item(NAME(m_ds5002fp.range));
+	save_item(NAME(m_ds5002fp.rnr_delay));
 
 	state_add( MCS51_PC,  "PC", m_pc).formatstr("%04X");
 	state_add( MCS51_SP,  "SP", SP).formatstr("%02X");
@@ -2373,8 +2389,8 @@ void mcs51_cpu_device::device_start()
 	state_add( MCS51_TL1,  "TL1",  TL1).formatstr("%02X");
 	state_add( MCS51_TH1,  "TH1",  TH1).formatstr("%02X");
 
-	state_add( STATE_GENPC, "GENPC", m_pc ).noshow();
-	state_add( STATE_GENPCBASE, "CURPC", m_pc ).noshow();
+	state_add( STATE_GENPC, "GENPC", m_pc).noshow();
+	state_add( STATE_GENPCBASE, "CURPC", m_pc).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_rtemp).formatstr("%8s").noshow();
 
 	set_icountptr(m_icount);
@@ -2486,6 +2502,7 @@ void mcs51_cpu_device::device_reset()
 	m_uart.rx_clk = 0;
 	m_uart.tx_clk = 0;
 	m_uart.txbit = SIO_IDLE;
+	m_uart.txd = 0;
 	m_uart.rxbit = SIO_IDLE;
 	m_uart.rxb8 = 0;
 	m_uart.smod_div = 0;
