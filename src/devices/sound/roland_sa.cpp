@@ -27,7 +27,7 @@
 DEFINE_DEVICE_TYPE(ROLAND_SA, roland_sa_device, "roland_sa", "Roland SA CPU-B Sound Generator")
 
 // LUT for the address speed
-static constexpr uint32_t env_table[] = {
+const uint32_t roland_sa_device::env_table[] = {
     0x000000, 0x000023, 0x000026, 0x000029, 0x00002d, 0x000031, 0x000036,
     0x00003b, 0x000040, 0x000046, 0x00004c, 0x000052, 0x00005a, 0x000062,
     0x00006c, 0x000076, 0x000080, 0x00008c, 0x000098, 0x0000a4, 0x0000b4,
@@ -67,8 +67,8 @@ static constexpr uint32_t env_table[] = {
     0x097fff, 0x077fff, 0x04ffff, 0x027fff};
 
 // LUT for bits 5/6/7/8 of the subphase
-static constexpr uint16_t addr_table[] = {0x1e0, 0x080, 0x060, 0x04d, 0x040, 0x036, 0x02d, 0x026,
-                                          0x020, 0x01b, 0x016, 0x011, 0x00d, 0x00a, 0x006, 0x003};
+const uint16_t roland_sa_device::addr_table[] = {0x1e0, 0x080, 0x060, 0x04d, 0x040, 0x036, 0x02d, 0x026,
+                                                 0x020, 0x01b, 0x016, 0x011, 0x00d, 0x00a, 0x006, 0x003};
 
 roland_sa_device::roland_sa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
     : device_t(mconfig, ROLAND_SA, tag, owner, clock)

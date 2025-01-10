@@ -30,6 +30,9 @@ private:
   static constexpr unsigned NUM_VOICES = 16;
   static constexpr unsigned PARTS_PER_VOICE = 10;
 
+  static const uint32_t env_table[];
+  static const uint16_t addr_table[];
+
   uint16_t samples_exp[0x20000];
   bool samples_exp_sign[0x20000];
   uint16_t samples_delta[0x20000];
