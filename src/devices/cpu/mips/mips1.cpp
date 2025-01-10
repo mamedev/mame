@@ -178,7 +178,7 @@ enum cp1_fcr31_mask : u32
 	FCR31_CV = 0x00010000, // invalid operation cause
 	FCR31_CE = 0x00020000, // unimplemented operation cause
 
-	FCR31_C = 0x00800000, // condition
+	FCR31_C  = 0x00800000, // condition
 
 	FCR31_FM = 0x0000007c, // flag mask
 	FCR31_EM = 0x00000f80, // enable mask

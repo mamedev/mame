@@ -9,6 +9,7 @@
  *
  * TODO:
  *  - skeleton only
+ *  - wip failures due to pit outputs, interrupts?
  */
 
 #include "emu.h"
@@ -19,6 +20,12 @@
 
 #define VERBOSE 0
 #include "logmacro.h"
+
+enum int_mask : u8
+{
+	INT_SCSI = 0x04,
+	INT_PIT  = 0xe1, // 0x1110'0001
+};
 
 DEFINE_DEVICE_TYPE(VME_MVME327A, vme_mvme327a_device, "mvme327a", "Motorola MVME327A")
 
@@ -90,12 +97,19 @@ void vme_mvme327a_device::device_add_mconfig(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:5", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:6", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:7").option_set("wd33c93a", WD33C93A).machine_config(
-			[] (device_t *device)
+			[this] (device_t *device)
 			{
 				wd33c9x_base_device &wd33c93(downcast<wd33c9x_base_device &>(*device));
 
 				wd33c93.set_clock(10000000);
-				//wd33c93.irq_cb().set(*this, ...);
+				wd33c93.irq_cb().set(
+					[this](int state)
+					{
+						if (state)
+							m_int |= INT_SCSI;
+						else
+							m_int &= ~INT_SCSI;
+					});
 				//wd33c93.drq_cb().set(*this, ...);
 			});
 }
@@ -106,8 +120,12 @@ void vme_mvme327a_device::cpu_mem(address_map &map)
 	m_boot[0](0x00'0000, 0x01'ffff).rom().region("eprom", 0);
 	m_boot[1](0x00'0000, 0x01'ffff).ram();
 
-	//map(0x04'0000, 0x04'0001).rw(m_scsi, FUNC(wd33c93a_device))
-	//map(0x07'0000, 0x07'0003).m(m_fdc, &wd37c65c_device::map).umask16(0x00ff);
+	map(0x03'0001, 0x03'0001).lr8([this]() { return m_int; }, "int_r"); // interrupt register?
+	map(0x04'0000, 0x04'0003).rw(m_scsi, FUNC(wd33c93a_device::indir_r), FUNC(wd33c93a_device::indir_w)).umask16(0x00ff);
+	map(0x07'0000, 0x07'0003).m(m_fdc, FUNC(wd37c65c_device::map)).umask16(0x00ff);
+	// 0x07'0005 w
+	// 0x07'0007 r/w
+	//map(0x09'0000, 0x09'0003); // ???
 	map(0x0b'0000, 0x0b'003f).rw(m_pit, FUNC(pit68230_device::read), FUNC(pit68230_device::write)).mirror(0xffc0).umask16(0x00ff);
 	map(0x0c'0000, 0x0c'000f).rw(m_bim, FUNC(bim68153_device::read), FUNC(bim68153_device::write)).mirror(0xfff0).umask16(0x00ff);
 

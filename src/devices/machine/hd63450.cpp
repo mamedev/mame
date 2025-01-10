@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "hd63450.h"
 
-//#define VERBOSE 1
+#define VERBOSE 1
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(HD63450, hd63450_device, "hd63450", "Hitachi HD63450 DMAC")
@@ -306,7 +306,7 @@ void hd63450_device::dma_transfer_start(int channel)
 	else if ((m_reg[channel].ocr & 3) == 2)
 		m_timer[channel]->adjust(attotime::never, channel, attotime::never);
 
-	m_transfer_size[channel] = m_reg[channel].mtc;
+	m_transfer_size[channel] = m_reg[channel].mtc * 2;
 
 	LOG("DMA: Transfer begins: size=0x%08x\n",m_transfer_size[channel]);
 }
@@ -366,8 +366,6 @@ void hd63450_device::single_transfer(int x)
 		if (!m_dma_read[x].isunset())
 		{
 			data = m_dma_read[x](m_reg[x].mar);
-			if (data == -1)
-				return;  // not ready to receive data
 			space.write_byte(m_reg[x].mar,data);
 			datasize = 1;
 		}
@@ -447,8 +445,8 @@ void hd63450_device::single_transfer(int x)
 	}
 
 	// decrease memory transfer counter
-	if (m_reg[x].mtc > 0)
-		m_reg[x].mtc--;
+	if (m_transfer_size[x] > 0)
+		m_transfer_size[x] -= datasize;
 
 	// handle change of memory and device addresses
 	if ((m_reg[x].scr & 0x03) == 0x01)
@@ -461,7 +459,7 @@ void hd63450_device::single_transfer(int x)
 	else if ((m_reg[x].scr & 0x0c) == 0x08)
 		m_reg[x].mar-=datasize;
 
-	if (m_reg[x].mtc <= 0)
+	if (m_transfer_size[x] <= 0)
 	{
 		// End of transfer
 		LOG("DMA#%i: End of transfer\n",x);

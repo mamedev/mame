@@ -41,6 +41,8 @@ private:
 	required_device<wd33c93a_device> m_scsi;
 
 	memory_view m_boot;
+
+	u8 m_int;
 };
 
 DECLARE_DEVICE_TYPE(VME_MVME327A, vme_mvme327a_device)
