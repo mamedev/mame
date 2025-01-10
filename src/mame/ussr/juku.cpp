@@ -725,30 +725,26 @@ void juku_state::juku(machine_config &config)
 	m_pit[0]->out_handler<0>().set(m_pit[1], FUNC(pit8253_device::write_clk0));
 	m_pit[0]->out_handler<0>().append(m_pit[0], FUNC(pit8253_device::write_gate1));
 	m_pit[0]->out_handler<0>().append(m_pit[0], FUNC(pit8253_device::write_gate2));
-	//m_pit[0]->out_handler<1>().set(, ); // HOR RTR
-	//m_pit[0]->out_handler<1>().append(, ); // HOR RTR
+	//m_pit[0]->out_handler<1>().set(?, ?); // HOR RTR
 
 	// КР580ВИ53 #2
 	PIT8253(config, m_pit[1], 0);
-	m_pit[0]->out_handler<2>().set(m_pit[1], FUNC(pit8253_device::write_clk1)); // H SYNC DSL
+	m_pit[0]->out_handler<2>().set(m_pit[1], FUNC(pit8253_device::write_clk1)); // HOR SYNC DSL
 	m_pit[0]->out_handler<2>().append(m_pit[1], FUNC(pit8253_device::write_clk2));
 	m_pit[1]->out_handler<0>().append(m_pit[1], FUNC(pit8253_device::write_gate1));
 	m_pit[1]->out_handler<0>().append(m_pit[1], FUNC(pit8253_device::write_gate2));
 	m_pit[1]->out_handler<1>().set(m_pic, FUNC(pic8259_device::ir5_w)); // VER RTR / FRAME INT
-
-	//m_pit[1]->out_handler<2>().append(m_pit[1], FUNC(pit8253_device::write_clk1)); // VERT SYNC DSL
+	//m_pit[1]->out_handler<2>().set(m_pit[1], FUNC(pit8253_device::write_clk1)); // VERT SYNC DSL
 	//m_pit[1]->out_handler<2>().append(m_pit[1], FUNC(pit8253_device::write_clk2));
 
 	// КР580ВИ53 #3
 	PIT8253(config, m_pit[2], 0);
-
 	m_pit[2]->set_clk<0>(16_MHz_XTAL/13); // 1.23 MHz
 	m_pit[2]->set_clk<1>(16_MHz_XTAL/8); // 2 MHz
-	m_pit[2]->set_clk<2>(16_MHz_XTAL/13); // 1.23 MHz
-
-	//m_pit[1]->out_handler<0>().append(...); // BAUD RATE
+	m_pit[1]->out_handler<1>().append(m_pit[2], FUNC(pit8253_device::write_clk2)); // ~49.92 Hz
+	//m_pit[2]->out_handler<0>().set(?, ?); // BAUD RATE
 	m_pit[2]->out_handler<1>().append(FUNC(juku_state::speaker_w)); // SOUND
-	//m_pit[1]->out_handler<2>().append(...); // SYNC BAUD RATE
+	//m_pit[2]->out_handler<2>().set(?, ?); // SYNC BAUD RATE
 
 	// КР580ВВ55A #1 (=КР580ИК55)
 	I8255A(config, m_pio[0]);

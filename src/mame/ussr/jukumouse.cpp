@@ -9,6 +9,7 @@
 
 #include "logmacro.h"
 
+// measured avg in heavy use 442-520, max ~1400Hz
 static constexpr int MOUSE_RATE_HZ = 600;
 
 DEFINE_DEVICE_TYPE(JUKU_MOUSE, juku_mouse_device, "juku_mouse", "Juku E510x mouse")
