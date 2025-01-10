@@ -668,6 +668,12 @@ void k052109_device::tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap, 
 	m_tilemap[tmap_num]->draw(screen, bitmap, cliprect, flags, priority);
 }
 
+void k052109_device::mark_tilemap_dirty( uint8_t tmap_num )
+{
+	assert(tmap_num <= 2);
+	m_tilemap[tmap_num]->mark_all_dirty();
+}
+
 
 /***************************************************************************
 
