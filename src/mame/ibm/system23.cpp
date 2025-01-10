@@ -22,6 +22,7 @@ namespace
 			system23_state(const machine_config &mconfig, device_type type, const char *tag)
 				: driver_device(mconfig, type, tag),
 				m_maincpu(*this, "maincpu"),
+				m_ros(*this, "ros"),
 				m_ppi_kbd(*this, "ppi_kbd"),
 				m_ppi_diag(*this, "ppi_diag"),
 				m_ppi_settings(*this, "ppi_settings"),
@@ -47,6 +48,7 @@ namespace
 
 		private:
 			required_device<i8085a_cpu_device> m_maincpu;
+			required_memory_bank m_ros;
 			required_device<i8255_device> m_ppi_kbd;
 			required_device<i8255_device> m_ppi_diag;
 			required_device<i8255_device> m_ppi_settings;
@@ -69,6 +71,11 @@ namespace
 			uint8_t m_vrtc = 0;
 			uint8_t m_pixel = 0;
 
+			uint8_t m_ros_page;
+			uint8_t m_ram_r_page;
+			uint8_t m_ram_w_page;
+			uint8_t m_dma_page;
+
 			void diag_digits_w(uint8_t data);
 
 			void cpu_test_register_w(uint8_t data);
@@ -89,6 +96,15 @@ namespace
 			uint8_t crtc_test_vars_r();
 			void hrtc_r(uint8_t data);
 			void vrtc_r(uint8_t data);
+
+			uint8_t ros_page_r();
+			void ros_page_w(uint8_t data);
+			uint8_t ram_read_page_r();
+			void ram_read_page_w(uint8_t data);
+			uint8_t ram_write_page_r();
+			void ram_write_page_w(uint8_t data);
+			uint8_t dma_page_r();
+			void dma_page_w(uint8_t data);
 
 			void system23_io(address_map &map) ATTR_COLD;
 			void system23_mem(address_map &map) ATTR_COLD;
@@ -165,8 +181,8 @@ namespace
 		if (!BIT(attrcode, VSP))
 			gfx = m_chargen[(linecount & 15) | (charcode << 4)];
 
-		// if (BIT(attrcode, LTEN))
-		// 	gfx = 0xff;
+		if (BIT(attrcode, LTEN))
+		 	gfx = 0xff;
 
 		if (BIT(attrcode, RVV))
 			gfx ^= 0xff;
@@ -218,12 +234,58 @@ namespace
 		m_vrtc = data;
 	}
 
+	uint8_t system23_state::ros_page_r()
+	{
+		return m_ros_page;
+	}
+
+	void system23_state::ros_page_w(uint8_t data)
+	{
+		m_ros_page = data;
+		m_ros->set_entry(data & 0xf);
+	}
+
+
+	uint8_t system23_state::ram_read_page_r()
+	{
+		return m_ram_r_page;
+	}
+
+	void system23_state::ram_read_page_w(uint8_t data)
+	{
+		m_ram_r_page = data;
+	}
+
+	uint8_t system23_state::ram_write_page_r()
+	{
+		return m_ram_w_page;
+	}
+
+	void system23_state::ram_write_page_w(uint8_t data)
+	{
+		m_ram_w_page = data;
+	}
+
+	uint8_t system23_state::dma_page_r()
+	{
+		return m_dma_page;
+	}
+
+	void system23_state::dma_page_w(uint8_t data)
+	{
+		m_dma_page = data;
+	}
+
 	//This routine describes the computer's I/O map
 
 	void system23_state::system23_io(address_map &map)
 	{
 		map.unmap_value_high();
 		map(0x00, 0x08).rw(m_dmac, FUNC(i8257_device::read), FUNC(i8257_device::write));
+		map(0x20, 0x20).rw(FUNC(system23_state::ram_read_page_r),FUNC(system23_state::ram_read_page_w));
+		map(0x21, 0x21).rw(FUNC(system23_state::ram_write_page_r),FUNC(system23_state::ram_write_page_w));
+		map(0x22, 0x22).rw(FUNC(system23_state::dma_page_r),FUNC(system23_state::dma_page_w));
+		map(0x23, 0x23).rw(FUNC(system23_state::ros_page_r),FUNC(system23_state::ros_page_w));
 		map(0x2c, 0x2f).rw(m_ppi_settings, FUNC(i8255_device::read), FUNC(i8255_device::write));
 		map(0x40, 0x43).rw(m_ppi_diag, FUNC(i8255_device::read), FUNC(i8255_device::write));
 		map(0x44, 0x45).rw(m_crtc, FUNC(i8275_device::read), FUNC(i8275_device::write));
@@ -236,6 +298,7 @@ namespace
 	{
 		map.unmap_value_high();
 		map(0x0000, 0x3fff).rom();
+		map(0x4000, 0x7fff).bankr(m_ros);
 		map(0x8000, 0xbfff).ram();
 
 	}
@@ -315,6 +378,21 @@ namespace
 			PORT_DIPNAME( 0x04, 0x00, "A3")
 			PORT_DIPSETTING(    0x04, DEF_STR( Off ))
 			PORT_DIPSETTING(    0x00, DEF_STR( On ))
+			PORT_DIPNAME( 0x08, 0x00, "A4")
+			PORT_DIPSETTING(    0x08, DEF_STR( Off ))
+			PORT_DIPSETTING(    0x00, DEF_STR( On ))
+			PORT_DIPNAME( 0x10, 0x00, "A5")
+			PORT_DIPSETTING(    0x10, DEF_STR( Off ))
+			PORT_DIPSETTING(    0x00, DEF_STR( On ))
+			PORT_DIPNAME( 0x20, 0x00, "A6")
+			PORT_DIPSETTING(    0x20, DEF_STR( Off ))
+			PORT_DIPSETTING(    0x00, DEF_STR( On ))
+			PORT_DIPNAME( 0x40, 0x40, "A7")
+			PORT_DIPSETTING(    0x08, DEF_STR( Off ))
+			PORT_DIPSETTING(    0x00, DEF_STR( On ))
+			PORT_DIPNAME( 0x80, 0x00, "A8")
+			PORT_DIPSETTING(    0x80, DEF_STR( Off ))
+			PORT_DIPSETTING(    0x00, DEF_STR( On ))
 
 		PORT_START("lang")
 			PORT_DIPNAME( 0x01, 0x00, "B1")
@@ -339,12 +417,26 @@ namespace
 		ROM_SYSTEM_BIOS(0, "r_set", "\"R\" Set - 1982?")
 		ROM_SYSTEM_BIOS(1, "tm_set", "\"TM\" Set - 1981?")
 
-		ROM_REGION(0x4000, "maincpu", 0)
-		ROMX_LOAD("02_61c9866a_4481186.bin", 0x0000, 0x2000, CRC(61c9866a) SHA1(43f2bed5cc2374c7fde4632948329062e57e994b),ROM_BIOS(0))
-		ROMX_LOAD("09_07843020_8493747.bin", 0x2000, 0x2000, CRC(07843020) SHA1(828ca0199af1246f6caf58bcb785f791c3a7e34e),ROM_BIOS(0))
+		ROM_REGION(0x48000, "maincpu", 0)
+		//"R" Set (1982?)
+		ROMX_LOAD("02_61c9866a_4481186.bin", 0x00000, 0x2000, CRC(61c9866a) SHA1(43f2bed5cc2374c7fde4632948329062e57e994b), ROM_BIOS(0))
+		ROMX_LOAD("09_07843020_8493747.bin", 0x02000, 0x2000, CRC(07843020) SHA1(828ca0199af1246f6caf58bcb785f791c3a7e34e), ROM_BIOS(0))
 
-		ROMX_LOAD("02_765abd93_8493746.bin", 0x0000, 0x2000, CRC(765abd93) SHA1(1ec489f1d2f72bf7e9ddc5ef642a8336b3ff67e3),ROM_BIOS(1))
-		ROMX_LOAD("09_07843020_8493747.bin", 0x2000, 0x2000, CRC(07843020) SHA1(828ca0199af1246f6caf58bcb785f791c3a7e34e),ROM_BIOS(1))
+		ROMX_LOAD("0a_b9569153_8519402.bin", 0x04000, 0x2000, CRC(b9569153) SHA1(92ccf91766557bc565ad36fc131396aff28b8999), ROM_BIOS(0))
+		ROMX_LOAD("0b_4f631183_8519404.bin", 0x06000, 0x2000, CRC(4f631183) SHA1(5f7b011129616bae46c70133309a70c29cc0f127), ROM_BIOS(0))
+		ROMX_LOAD("0c_48646293_8519403.bin", 0x14000, 0x2000, CRC(48646293) SHA1(3d7eaf2c143499757681fbedbc3716829ef9bd25), ROM_BIOS(0))
+		ROMX_LOAD("0d_bea5a812_8519405.bin", 0x16000, 0x2000, CRC(bea5a812) SHA1(5da3a9231c5d456fa7a26ab36b9d5380e096af59), ROM_BIOS(0))
+		//ROM E is empty
+		//ROM F is empty
+		ROMX_LOAD("10_41e6c232_8519411.bin", 0x34000, 0x2000, CRC(41e6c232) SHA1(6711000a0c6836a411997de15274b990dd2c0ed0), ROM_BIOS(0))
+		ROMX_LOAD("11_b17f5c6e_8519407.bin", 0x36000, 0x2000, CRC(b17f5c6e) SHA1(1d5c2f33de6d1efa2b27b7c43b30268946ef5920), ROM_BIOS(0))
+		ROMX_LOAD("12_04dcc52f_8519408.bin", 0x44000, 0x2000, CRC(04dcc52f) SHA1(feba4f189a8bb442c241dadb1fa1f2cb4f344fa3), ROM_BIOS(0))
+		ROMX_LOAD("13_9a3f70c7_8519414.bin", 0x46000, 0x2000, CRC(9a3f70c7) SHA1(2dc509b8fa0f84a12df2ee6e91e5fbb29ce7c541), ROM_BIOS(0))
+
+
+		//"TM" Set (1981?)
+		ROMX_LOAD("02_765abd93_8493746.bin", 0x00000, 0x2000, CRC(765abd93) SHA1(1ec489f1d2f72bf7e9ddc5ef642a8336b3ff67e3),ROM_BIOS(1))
+		ROMX_LOAD("09_07843020_8493747.bin", 0x02000, 0x2000, CRC(07843020) SHA1(828ca0199af1246f6caf58bcb785f791c3a7e34e),ROM_BIOS(1))
 
 		ROM_REGION(0x2000, "chargen", 0)
 		ROMX_LOAD("chr_73783bc7_8519412.bin", 0x0000, 0x2000, CRC(73783bc7) SHA1(45ee2a9acbb577b281ad8181b7ec0c5ef05c346a),ROM_BIOS(0))
