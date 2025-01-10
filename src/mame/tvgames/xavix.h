@@ -613,6 +613,7 @@ protected:
 
 	bool m_disable_memory_bypass = false;
 	bool m_disable_sprite_yflip = false;
+	bool m_disable_tile_regs_flip = false;
 	int m_video_hres_multiplier;
 };
 
@@ -650,6 +651,8 @@ public:
 
 	void xavix2002(machine_config &config);
 	void xavix2002_4mb(machine_config &config);
+
+	void init_epo_doka();
 
 protected:
 	virtual void machine_start() override ATTR_COLD;

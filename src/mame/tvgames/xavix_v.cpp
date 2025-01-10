@@ -857,6 +857,16 @@ void xavix_state::draw_tilemap_line(screen_device &screen, bitmap_rgb32 &bitmap,
 		int basereg;
 		int flipx = (tileregs[0x03]&0x40)>>6;
 		int flipy = (tileregs[0x03]&0x80)>>7;
+
+		// epo_doka explicitly sets these registers on the XaviX logo
+		// but expects no flipping.  Is code being executed out of order or
+		// is this further evidence that they don't work as expected on SuperXaviX
+		// hardware (see other hack for xavmusic needing sprite flip disabled)
+		if (m_disable_tile_regs_flip)
+		{
+			flipx = flipy = 0;
+		}
+
 		int gfxbase;
 
 		// tile 0 is always skipped, doesn't even point to valid data packets in alt mode
