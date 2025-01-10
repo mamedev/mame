@@ -309,24 +309,20 @@ a64::Gp drcbe_arm64::select_register(a64::Gp const &reg, uint32_t regsize) const
 
 bool drcbe_arm64::is_valid_immediate_mask(uint64_t val, size_t bytes)
 {
-	const auto start_bits = bytes * 8 - 1;
-
-	if (val == 0)
-		return true;
-
-	// asmjit seems to interpret masks with the msb set as negative and errors out
-	if (val & (uint64_t(1) << start_bits))
+	// all zeros and all ones aren't allowed, and disallow any value with bits outside of the max bit range
+	if (val == 0 || val == make_bitmask<uint64_t>(bytes * 8))
 		return false;
 
-	for (int i = start_bits; i > 0; i--)
+	uint32_t head = 64 - count_leading_zeros_64(val);
+	uint32_t tail = 0;
+	while (tail < head)
 	{
-		const uint64_t mask = (uint64_t(1) << i) - 1;
-
-		if (val == mask || val == (mask & ~1) || val == (mask + 1))
-			return true;
+		if (BIT(val, tail))
+			break;
+		tail++;
 	}
 
-	return val == 1;
+	return population_count_64(val) == head - tail;
 }
 
 bool drcbe_arm64::is_valid_immediate(uint64_t val, size_t bits)
