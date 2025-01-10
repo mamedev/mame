@@ -85,23 +85,23 @@ void tsconf_state::tsconf_io(address_map &map)
 void tsconf_state::tsconf_ioext(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x0000).mirror(0x17ffd).w(FUNC(tsconf_state::tsconf_port_7ffd_w));
-	map(0x001f, 0x001f).mirror(0x0ff00).r(FUNC(tsconf_state::tsconf_port_xx1f_r));
-	map(0x0057, 0x0057).mirror(0x1ff00).rw(FUNC(tsconf_state::tsconf_port_57_zctr_r), FUNC(tsconf_state::tsconf_port_57_zctr_w)); // spi config
-	map(0x0077, 0x0077).mirror(0x1ff00).rw(FUNC(tsconf_state::tsconf_port_77_zctr_r), FUNC(tsconf_state::tsconf_port_77_zctr_w)); // spi data
-	map(0x00fe, 0x00fe).select(0x1ff00).rw(FUNC(tsconf_state::spectrum_ula_r), FUNC(tsconf_state::tsconf_ula_w));
-	map(0x00af, 0x00af).select(0x1ff00).rw(FUNC(tsconf_state::tsconf_port_xxaf_r), FUNC(tsconf_state::tsconf_port_xxaf_w));
-	map(0xfadf, 0xfadf).mirror(0x10000).lr8(NAME([this]() -> u8 { return 0x80 | (m_io_mouse[2]->read() & 0x07); }));
-	map(0xfbdf, 0xfbdf).mirror(0x10000).lr8(NAME([this]() -> u8 { return  m_io_mouse[0]->read(); }));
-	map(0xffdf, 0xffdf).mirror(0x10000).lr8(NAME([this]() -> u8 { return ~m_io_mouse[1]->read(); }));
-	map(0x8ff7, 0x8ff7).select(0x17000).w(FUNC(tsconf_state::tsconf_port_f7_w)); // 3:bff7 5:dff7 6:eff7
-	map(0xbff7, 0xbff7).mirror(0x10000).r(FUNC(tsconf_state::tsconf_port_f7_r));
-	map(0x00fb, 0x00fb).mirror(0x1ff00).w(m_dac, FUNC(dac_byte_interface::data_w));
-	map(0x80fd, 0x80fd).mirror(0x13f00).lw8(NAME([this](u8 data) { return m_ay[m_ay_selected]->data_w(data); }));
-	map(0xc0fd, 0xc0fd).mirror(0x13f00).lr8(NAME([this]() { return m_ay[m_ay_selected]->data_r(); }))
+	map(0x00000, 0x00000).mirror(0x17ffd).w(FUNC(tsconf_state::tsconf_port_7ffd_w));
+	map(0x0001f, 0x0001f).mirror(0x0ff00).r(FUNC(tsconf_state::tsconf_port_xx1f_r));
+	map(0x00057, 0x00057).mirror(0x1ff00).rw(FUNC(tsconf_state::tsconf_port_57_zctr_r), FUNC(tsconf_state::tsconf_port_57_zctr_w)); // spi config
+	map(0x00077, 0x00077).mirror(0x1ff00).rw(FUNC(tsconf_state::tsconf_port_77_zctr_r), FUNC(tsconf_state::tsconf_port_77_zctr_w)); // spi data
+	map(0x000fe, 0x000fe).select(0x1ff00).rw(FUNC(tsconf_state::spectrum_ula_r), FUNC(tsconf_state::tsconf_ula_w));
+	map(0x000af, 0x000af).select(0x1ff00).rw(FUNC(tsconf_state::tsconf_port_xxaf_r), FUNC(tsconf_state::tsconf_port_xxaf_w));
+	map(0x0fadf, 0x0fadf).mirror(0x10000).lr8(NAME([this]() -> u8 { return 0x80 | (m_io_mouse[2]->read() & 0x07); }));
+	map(0x0fbdf, 0x0fbdf).mirror(0x10000).lr8(NAME([this]() -> u8 { return  m_io_mouse[0]->read(); }));
+	map(0x0ffdf, 0x0ffdf).mirror(0x10000).lr8(NAME([this]() -> u8 { return ~m_io_mouse[1]->read(); }));
+	map(0x08ff7, 0x08ff7).select(0x17000).w(FUNC(tsconf_state::tsconf_port_f7_w)); // 3:bff7 5:dff7 6:eff7
+	map(0x0bff7, 0x0bff7).mirror(0x10000).r(FUNC(tsconf_state::tsconf_port_f7_r));
+	map(0x000fb, 0x000fb).mirror(0x1ff00).w(m_dac, FUNC(dac_byte_interface::data_w));
+	map(0x080fd, 0x080fd).mirror(0x13f00).lw8(NAME([this](u8 data) { return m_ay[m_ay_selected]->data_w(data); }));
+	map(0x0c0fd, 0x0c0fd).mirror(0x13f00).lr8(NAME([this]() { return m_ay[m_ay_selected]->data_r(); }))
 		.w(FUNC(tsconf_state::tsconf_ay_address_w));
 
-	tsconf_beta_device::beta_ioext(m_beta, map);
+	map(0x00000, 0x1ffff).m(m_beta, FUNC(tsconf_beta_device::tsconf_beta_ioext));
 }
 
 void tsconf_state::tsconf_switch(address_map &map)

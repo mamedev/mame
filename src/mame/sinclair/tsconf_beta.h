@@ -5,13 +5,16 @@
 
 #pragma once
 
-#include "machine/wd_fdc.h"
 #include "imagedev/floppy.h"
+#include "machine/wd_fdc.h"
+
 
 class tsconf_beta_device : public device_t
 {
 public:
 	tsconf_beta_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	void tsconf_beta_ioext(address_map &map) ATTR_COLD;
 
 	auto out_dos_callback() { return m_out_dos_cb.bind(); }
 	auto out_vdos_m1_callback() { return m_out_vdos_m1_cb.bind(); }
@@ -29,14 +32,13 @@ public:
 	void data_w(u8 data);
 	void turbo_w(int state);
 
-    static void beta_ioext(const device_finder<tsconf_beta_device, true> &finder, address_map &map);
-    void on_m1_w();
-    bool dos_r() { return m_dos; }
-    bool vdos_r() { return m_vdos; }
-    bool dos_io_r() { return m_dos || m_io_forced; }
-    void enable_w(bool state);
-    void fddvirt_w(u8 fddvirt);
-    void io_forced_w(bool io_forced);
+	void on_m1_w();
+	bool dos_r() { return m_dos; }
+	bool vdos_r() { return m_vdos; }
+	bool dos_io_r() { return m_dos || m_io_forced; }
+	void enable_w(bool state);
+	void fddvirt_w(u8 fddvirt);
+	void io_forced_w(bool io_forced);
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -55,15 +57,13 @@ private:
 	u8 m_control;
 	bool m_motor_active;
 
-	static void floppy_formats(format_registration &fr);
+	bool m_dos;
+	bool m_vdos;
+	bool m_io_forced;
+	u8 m_fddvirt;
 
-    bool m_dos;
-    bool m_vdos;
-    bool m_io_forced;
-    u8 m_fddvirt;
-
-    bool pre_vg_in_check();
-    bool pre_vg_out_check(bool is_port_match);
+	bool pre_vg_in_check();
+	bool pre_vg_out_check(bool is_port_match);
 };
 
 
