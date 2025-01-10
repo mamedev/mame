@@ -192,6 +192,7 @@ void tsconf_state::machine_start()
 	m_bank_ram[0]->configure_entries(0, m_ram->size() / 0x4000, m_ram->pointer(), 0x4000);
 
 	save_item(NAME(m_int_mask));
+	save_item(NAME(m_update_on_m1));
 	save_pointer(NAME(m_regs), 0x100);
 	save_item(NAME(m_zctl_di));
 	save_item(NAME(m_zctl_cs));
