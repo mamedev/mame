@@ -637,22 +637,8 @@ void drcbe_arm64::mov_float_param_param(a64::Assembler &a, uint32_t regsize, con
 	}
 }
 
-void drcbe_arm64::call_arm(a64::Assembler &a, const a64::Gp &reg, bool naked) const
-{
-	if (!naked)
-		a.stp(a64::x29, a64::x30, arm::Mem(a64::sp, -16).pre());
-
-	a.blr(reg);
-
-	if (!naked)
-		a.ldp(a64::x29, a64::x30, arm::Mem(a64::sp).post(16));
-}
-
 void drcbe_arm64::call_arm_addr(a64::Assembler &a, const void *offs, bool naked) const
 {
-	if (!naked)
-		a.stp(a64::x29, a64::x30, arm::Mem(a64::sp, -16).pre());
-
 	const uint64_t codeoffs = a.code()->baseAddress() + a.offset();
 	const int64_t reloffs = codeoffs - (int64_t)offs;
 	if (is_valid_immediate_signed(reloffs, 26))
@@ -664,9 +650,6 @@ void drcbe_arm64::call_arm_addr(a64::Assembler &a, const void *offs, bool naked)
 		get_imm_relative(a, SCRATCH_REG1, uintptr_t(offs));
 		a.blr(SCRATCH_REG1);
 	}
-
-	if (!naked)
-		a.ldp(a64::x29, a64::x30, arm::Mem(a64::sp).post(16));
 }
 
 void drcbe_arm64::check_unordered_condition(a64::Assembler &a, uml::condition_t cond, Label condition_met, bool not_equal) const
@@ -947,8 +930,6 @@ void drcbe_arm64::reset()
 
 	a.ldr(BASE_REG, get_mem_absolute(a, &m_baseptr));
 	emit_ldr_mem(a, FLAGS_REG.w(), &m_near.emulated_flags);
-	a.mov(SCRATCH_REG1, a64::sp);
-	emit_str_mem(a, SCRATCH_REG1, &m_near.stackpointer);
 	emit_str_mem(a, a64::wzr, &m_near.calldepth);
 	emit_str_mem(a, a64::xzr, &m_near.hashstacksave);
 
@@ -960,8 +941,7 @@ void drcbe_arm64::reset()
 	m_exit = dst + a.offset();
 	a.bind(a.newNamedLabel("exit_point"));
 
-	emit_ldr_mem(a, SCRATCH_REG1, &m_near.stackpointer);
-	a.mov(a64::sp, SCRATCH_REG1);
+	a.mov(a64::sp, a64::x29);
 
 	a.emitEpilog(frame);
 	a.ret(a64::x30);
@@ -969,7 +949,7 @@ void drcbe_arm64::reset()
 	// generate a no code point
 	m_nocode = dst + a.offset();
 	a.bind(a.newNamedLabel("nocode_point"));
-	a.ret(a64::x30);
+	a.br(REG_PARAM1);
 
 	// emit the generated code
 	emit(ch);
@@ -1071,6 +1051,8 @@ void drcbe_arm64::op_handle(a64::Assembler &a, const uml::instruction &inst)
 	// register the current pointer for the handle
 	inst.param(0).handle().set_codeptr(drccodeptr(a.code()->baseAddress() + a.offset()));
 
+	// the handle points to prolog code that creates a minimal non-leaf frame
+	a.stp(a64::x29, a64::x30, arm::Mem(a64::sp, -16).pre());
 	a.bind(skip);
 }
 
@@ -1162,7 +1144,7 @@ void drcbe_arm64::op_debug(a64::Assembler &a, const uml::instruction &inst)
 		mov_reg_param(a, 4, REG_PARAM2, pcp);
 
 		emit_ldr_mem(a, TEMP_REG2, &m_near.debug_cpu_instruction_hook);
-		call_arm(a, TEMP_REG2, false);
+		a.blr(TEMP_REG2);
 
 		a.bind(skip);
 	}
@@ -1207,6 +1189,7 @@ void drcbe_arm64::op_hashjmp(a64::Assembler &a, const uml::instruction &inst)
 	assert(exp.is_code_handle());
 
 	emit_str_mem(a, a64::wzr, &m_near.calldepth);
+	a.mov(a64::sp, a64::x29);
 
 	if (modep.is_immediate() && m_hash.is_mode_populated(modep.immediate()))
 	{
@@ -1286,26 +1269,27 @@ void drcbe_arm64::op_hashjmp(a64::Assembler &a, const uml::instruction &inst)
 		}
 	}
 
-	call_arm(a, TEMP_REG1);
-
 	Label lab = a.newLabel();
+	a.adr(REG_PARAM1, lab);
+	a.br(TEMP_REG1);
+
 	a.bind(lab);
-	a.adr(SCRATCH_REG1, lab);
 	emit_str_mem(a, SCRATCH_REG1, &m_near.hashstacksave);
+
 	a.mov(SCRATCH_REG1, 1);
 	emit_str_mem(a, SCRATCH_REG1.w(), &m_near.calldepth);
 
 	mov_mem_param(a, 4, &m_state.exp, pcp);
 
-	const drccodeptr *targetptr = exp.handle().codeptr_addr();
-	if (targetptr != nullptr && exp.handle().codeptr() != nullptr)
+	drccodeptr *const targetptr = exp.handle().codeptr_addr();
+	if (*targetptr != nullptr)
 	{
-		call_arm_addr(a, exp.handle().codeptr(), true);
+		call_arm_addr(a, *targetptr);
 	}
 	else
 	{
-		emit_ldr_mem(a, SCRATCH_REG1, (void*)targetptr);
-		call_arm(a, SCRATCH_REG1);
+		emit_ldr_mem(a, SCRATCH_REG1, targetptr);
+		a.blr(SCRATCH_REG1);
 	}
 }
 
@@ -1370,15 +1354,15 @@ void drcbe_arm64::op_exh(a64::Assembler &a, const uml::instruction &inst)
 
 	mov_mem_param(a, 4, &m_state.exp, exp);
 
-	const drccodeptr *targetptr = handp.handle().codeptr_addr();
-	if (targetptr != nullptr && handp.handle().codeptr() != nullptr)
+	drccodeptr *const targetptr = handp.handle().codeptr_addr();
+	if (*targetptr != nullptr)
 	{
-		call_arm_addr(a, handp.handle().codeptr(), true);
+		call_arm_addr(a, *targetptr);
 	}
 	else
 	{
-		emit_ldr_mem(a, SCRATCH_REG1, (void*)targetptr);
-		call_arm(a, SCRATCH_REG1, true);
+		emit_ldr_mem(a, SCRATCH_REG1, targetptr);
+		a.blr(SCRATCH_REG1);
 	}
 
 	if (inst.condition() != uml::COND_ALWAYS)
@@ -1415,15 +1399,15 @@ void drcbe_arm64::op_callh(a64::Assembler &a, const uml::instruction &inst)
 	a.add(SCRATCH_REG1, SCRATCH_REG1, 1);
 	emit_str_mem(a, SCRATCH_REG1.w(), &m_near.calldepth);
 
-	const drccodeptr *targetptr = handp.handle().codeptr_addr();
-	if (targetptr != nullptr && handp.handle().codeptr() != nullptr)
+	drccodeptr *const targetptr = handp.handle().codeptr_addr();
+	if (*targetptr != nullptr)
 	{
-		call_arm_addr(a, handp.handle().codeptr(), false);
+		call_arm_addr(a, *targetptr);
 	}
 	else
 	{
-		emit_ldr_mem(a, SCRATCH_REG1, (void*)targetptr);
-		call_arm(a, SCRATCH_REG1, false);
+		emit_ldr_mem(a, SCRATCH_REG1, targetptr);
+		a.blr(SCRATCH_REG1);
 	}
 
 	if (inst.condition() != uml::COND_ALWAYS)
@@ -1456,6 +1440,7 @@ void drcbe_arm64::op_ret(a64::Assembler &a, const uml::instruction &inst)
 	emit_str_mem(a, SCRATCH_REG1.w(), &m_near.calldepth);
 	a.bind(lab);
 
+	a.ldp(a64::x29, a64::x30, arm::Mem(a64::sp).post(16));
 	a.ret(a64::x30);
 
 	if (inst.condition() != uml::COND_ALWAYS)
@@ -1488,7 +1473,7 @@ void drcbe_arm64::op_callc(a64::Assembler &a, const uml::instruction &inst)
 
 	get_imm_relative(a, REG_PARAM1, (uintptr_t)paramp.memory());
 	get_imm_relative(a, TEMP_REG1, (uintptr_t)funcp.cfunc());
-	call_arm(a, TEMP_REG1, false);
+	a.blr(TEMP_REG1);
 
 	emit_ldr_mem(a, FLAGS_REG.w(), &m_near.emulated_flags);
 
@@ -1510,7 +1495,7 @@ void drcbe_arm64::op_recover(a64::Assembler &a, const uml::instruction &inst)
 
 	emit_ldr_mem(a, TEMP_REG1, &m_near.drcmap_get_value);
 
-	call_arm(a, TEMP_REG1, false);
+	a.blr(TEMP_REG1);
 
 	mov_param_reg(a, inst.size(), dstp, REG_PARAM1);
 }
@@ -1969,7 +1954,7 @@ void drcbe_arm64::op_read(a64::Assembler &a, const uml::instruction &inst)
 		{
 			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
 			emit_ldr_mem(a, TEMP_REG1, &trampolines.read_byte);
-			call_arm(a, TEMP_REG1, false);
+			a.blr(TEMP_REG1);
 		}
 	}
 	else if (spacesizep.size() == SIZE_WORD)
@@ -1983,7 +1968,7 @@ void drcbe_arm64::op_read(a64::Assembler &a, const uml::instruction &inst)
 		{
 			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
 			emit_ldr_mem(a, TEMP_REG1, &trampolines.read_word);
-			call_arm(a, TEMP_REG1, false);
+			a.blr(TEMP_REG1);
 		}
 	}
 	else if (spacesizep.size() == SIZE_DWORD)
@@ -1997,7 +1982,7 @@ void drcbe_arm64::op_read(a64::Assembler &a, const uml::instruction &inst)
 		{
 			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
 			emit_ldr_mem(a, TEMP_REG1, &trampolines.read_dword);
-			call_arm(a, TEMP_REG1, false);
+			a.blr(TEMP_REG1);
 		}
 	}
 	else if (spacesizep.size() == SIZE_QWORD)
@@ -2011,7 +1996,7 @@ void drcbe_arm64::op_read(a64::Assembler &a, const uml::instruction &inst)
 		{
 			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
 			emit_ldr_mem(a, TEMP_REG1, &trampolines.read_qword);
-			call_arm(a, TEMP_REG1, false);
+			a.blr(TEMP_REG1);
 		}
 	}
 
@@ -2047,7 +2032,7 @@ void drcbe_arm64::op_readm(a64::Assembler &a, const uml::instruction &inst)
 		{
 			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
 			emit_ldr_mem(a, TEMP_REG1, &trampolines.read_word_masked);
-			call_arm(a, TEMP_REG1, false);
+			a.blr(TEMP_REG1);
 		}
 	}
 	else if (spacesizep.size() == SIZE_DWORD)
@@ -2061,7 +2046,7 @@ void drcbe_arm64::op_readm(a64::Assembler &a, const uml::instruction &inst)
 		{
 			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
 			emit_ldr_mem(a, TEMP_REG1, &trampolines.read_dword_masked);
-			call_arm(a, TEMP_REG1, false);
+			a.blr(TEMP_REG1);
 		}
 	}
 	else if (spacesizep.size() == SIZE_QWORD)
@@ -2075,7 +2060,7 @@ void drcbe_arm64::op_readm(a64::Assembler &a, const uml::instruction &inst)
 		{
 			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
 			emit_ldr_mem(a, TEMP_REG1, &trampolines.read_qword_masked);
-			call_arm(a, TEMP_REG1, false);
+			a.blr(TEMP_REG1);
 		}
 	}
 
@@ -2110,7 +2095,7 @@ void drcbe_arm64::op_write(a64::Assembler &a, const uml::instruction &inst)
 		{
 			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
 			emit_ldr_mem(a, TEMP_REG1, &trampolines.write_byte);
-			call_arm(a, TEMP_REG1, false);
+			a.blr(TEMP_REG1);
 		}
 	}
 	else if (spacesizep.size() == SIZE_WORD)
@@ -2124,7 +2109,7 @@ void drcbe_arm64::op_write(a64::Assembler &a, const uml::instruction &inst)
 		{
 			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
 			emit_ldr_mem(a, TEMP_REG1, &trampolines.write_word);
-			call_arm(a, TEMP_REG1, false);
+			a.blr(TEMP_REG1);
 		}
 	}
 	else if (spacesizep.size() == SIZE_DWORD)
@@ -2138,7 +2123,7 @@ void drcbe_arm64::op_write(a64::Assembler &a, const uml::instruction &inst)
 		{
 			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
 			emit_ldr_mem(a, TEMP_REG1, &trampolines.write_dword);
-			call_arm(a, TEMP_REG1, false);
+			a.blr(TEMP_REG1);
 		}
 	}
 	else if (spacesizep.size() == SIZE_QWORD)
@@ -2152,7 +2137,7 @@ void drcbe_arm64::op_write(a64::Assembler &a, const uml::instruction &inst)
 		{
 			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
 			emit_ldr_mem(a, TEMP_REG1, &trampolines.write_qword);
-			call_arm(a, TEMP_REG1, false);
+			a.blr(TEMP_REG1);
 		}
 	}
 }
@@ -2188,7 +2173,7 @@ void drcbe_arm64::op_writem(a64::Assembler &a, const uml::instruction &inst)
 		{
 			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
 			emit_ldr_mem(a, TEMP_REG1, &trampolines.write_word_masked);
-			call_arm(a, TEMP_REG1, false);
+			a.blr(TEMP_REG1);
 		}
 	}
 	else if (spacesizep.size() == SIZE_DWORD)
@@ -2202,7 +2187,7 @@ void drcbe_arm64::op_writem(a64::Assembler &a, const uml::instruction &inst)
 		{
 			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
 			emit_ldr_mem(a, TEMP_REG1, &trampolines.write_dword_masked);
-			call_arm(a, TEMP_REG1, false);
+			a.blr(TEMP_REG1);
 		}
 	}
 	else if (spacesizep.size() == SIZE_QWORD)
@@ -2216,7 +2201,7 @@ void drcbe_arm64::op_writem(a64::Assembler &a, const uml::instruction &inst)
 		{
 			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
 			emit_ldr_mem(a, TEMP_REG1, &trampolines.write_qword_masked);
-			call_arm(a, TEMP_REG1, false);
+			a.blr(TEMP_REG1);
 		}
 	}
 }
@@ -3571,7 +3556,7 @@ void drcbe_arm64::op_fread(a64::Assembler &a, const uml::instruction &inst)
 		{
 			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
 			emit_ldr_mem(a, TEMP_REG1, &trampolines.read_dword);
-			call_arm(a, TEMP_REG1, false);
+			a.blr(TEMP_REG1);
 		}
 
 		mov_float_param_int_reg(a, inst.size(), dstp, REG_PARAM1.w());
@@ -3587,7 +3572,7 @@ void drcbe_arm64::op_fread(a64::Assembler &a, const uml::instruction &inst)
 		{
 			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
 			emit_ldr_mem(a, TEMP_REG1, &trampolines.read_qword);
-			call_arm(a, TEMP_REG1, false);
+			a.blr(TEMP_REG1);
 		}
 
 		mov_float_param_int_reg(a, inst.size(), dstp, REG_PARAM1);
@@ -3625,7 +3610,7 @@ void drcbe_arm64::op_fwrite(a64::Assembler &a, const uml::instruction &inst)
 		{
 			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
 			emit_ldr_mem(a, TEMP_REG1, &trampolines.write_dword);
-			call_arm(a, TEMP_REG1, false);
+			a.blr(TEMP_REG1);
 		}
 	}
 	else if (inst.size() == 8)
@@ -3639,7 +3624,7 @@ void drcbe_arm64::op_fwrite(a64::Assembler &a, const uml::instruction &inst)
 		{
 			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
 			emit_ldr_mem(a, TEMP_REG1, &trampolines.write_qword);
-			call_arm(a, TEMP_REG1, false);
+			a.blr(TEMP_REG1);
 		}
 	}
 }
