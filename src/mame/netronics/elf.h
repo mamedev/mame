@@ -35,7 +35,6 @@ public:
 		, m_cassette(*this, "cassette")
 		, m_ram(*this, RAM_TAG)
 		, m_special(*this, "SPECIAL")
-		, m_led(*this, "led0")
 	{ }
 
 	void elf2(machine_config &config);
@@ -53,7 +52,6 @@ private:
 	int wait_r();
 	int clear_r();
 	int ef4_r();
-	void q_w(int state);
 	uint8_t dma_r();
 	void sc_w(uint8_t data);
 	void da_w(int state);
@@ -70,7 +68,6 @@ private:
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
 	required_ioport m_special;
-	output_finder<> m_led;
 
 	// display state
 	uint8_t m_data = 0;
