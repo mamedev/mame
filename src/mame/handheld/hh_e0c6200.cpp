@@ -3,12 +3,15 @@
 // thanks-to:digshadow, Segher, azya
 /*******************************************************************************
 
-Seiko Epson E0C6S46 / E0C6S48 handhelds, mostly electronic keychain toys from
-the late-1990s. The first Tamagotchi games are on this MCU.
+Seiko Epson E0C6200-based handhelds, mostly electronic keychain toys from the
+late-1990s. The first Tamagotchi games are on this MCU.
 
 These were meant to stay on 24/7, so make sure to use save states if you want
-to play the games for a longer time. For the drivers that don't have an SVG
-screen, use -prescale or -nofilter to disable bilinear filtering.
+to play the games for a longer time or remember high scores.
+
+For most of the games, external artwork is required for the background inlays.
+For the drivers that don't have an SVG screen, use -prescale or -nofilter to
+disable bilinear filtering.
 
 TODO:
 - in stackch, you can still move around when the game is paused, maybe BTANB?
@@ -33,15 +36,15 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
-#include "hh_e0c6x_lcd.lh"
+#include "hh_e0c6200_lcd.lh"
 
 
 namespace {
 
-class hh_e0c6x_state : public driver_device
+class hh_e0c6200_state : public driver_device
 {
 public:
-	hh_e0c6x_state(const machine_config &mconfig, device_type type, const char *tag) :
+	hh_e0c6200_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_out_x(*this, "%u.%u", 0U, 0U)
@@ -59,7 +62,7 @@ protected:
 	output_finder<16, 51> m_out_x; // max 16 * 51
 };
 
-void hh_e0c6x_state::machine_start()
+void hh_e0c6200_state::machine_start()
 {
 	m_out_x.resolve();
 }
@@ -75,15 +78,15 @@ void hh_e0c6x_state::machine_start()
 // generic input handlers
 
 #define PORT_CHANGED_CB(x) \
-	PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hh_e0c6x_state::input_changed), E0C6S46_LINE_K00 + x)
+	PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hh_e0c6200_state::input_changed), E0C6S46_LINE_K00 + x)
 
-INPUT_CHANGED_MEMBER(hh_e0c6x_state::input_changed)
+INPUT_CHANGED_MEMBER(hh_e0c6200_state::input_changed)
 {
 	// inputs are hooked up backwards here, because MCU input ports are all tied to its interrupt controller
 	m_maincpu->set_input_line(param, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
-INPUT_CHANGED_MEMBER(hh_e0c6x_state::reset_button)
+INPUT_CHANGED_MEMBER(hh_e0c6200_state::reset_button)
 {
 	// when an input is directly wired to MCU RESET pin
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
@@ -109,11 +112,11 @@ INPUT_CHANGED_MEMBER(hh_e0c6x_state::reset_button)
 
 *******************************************************************************/
 
-class tama_state : public hh_e0c6x_state
+class tama_state : public hh_e0c6200_state
 {
 public:
 	tama_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_e0c6x_state(mconfig, type, tag)
+		hh_e0c6200_state(mconfig, type, tag)
 	{ }
 
 	void tama(machine_config &config);
@@ -144,7 +147,7 @@ void tama_state::tama(machine_config &config)
 	screen.set_size(1119, 1080);
 	screen.set_visarea_full();
 
-	config.set_default_layout(layout_hh_e0c6x_lcd);
+	config.set_default_layout(layout_hh_e0c6200_lcd);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -187,11 +190,11 @@ ROM_END
 
 *******************************************************************************/
 
-class tamaang_state : public hh_e0c6x_state
+class tamaang_state : public hh_e0c6200_state
 {
 public:
 	tamaang_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_e0c6x_state(mconfig, type, tag)
+		hh_e0c6200_state(mconfig, type, tag)
 	{ }
 
 	void tamaang(machine_config &config);
@@ -222,7 +225,7 @@ void tamaang_state::tamaang(machine_config &config)
 	screen.set_size(1119, 1080);
 	screen.set_visarea_full();
 
-	config.set_default_layout(layout_hh_e0c6x_lcd);
+	config.set_default_layout(layout_hh_e0c6200_lcd);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -256,23 +259,40 @@ ROM_END
   Bandai Digital Monster (retroactively called Ver. 1)
   * PCB label: TDM-1, 00-83830-001
   * Seiko Epson E0C6S48 MCU under epoxy
-  * external port on P20, for connecting to another Digimon handheld
+  * external port, for connecting to another Digimon handheld
   * 32*16 LCD screen + 8 custom segments, 1-bit sound
 
   The sequels (Ver. 2 to Ver. 4) are on the same hardware, and are compatible
-  with eachother for battle mode.
+  with each other for battle mode.
 
 *******************************************************************************/
 
-class digimon_state : public hh_e0c6x_state
+class digimon_state : public hh_e0c6200_state
 {
 public:
 	digimon_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_e0c6x_state(mconfig, type, tag)
+		hh_e0c6200_state(mconfig, type, tag)
 	{ }
 
 	void digimon(machine_config &config);
+
+private:
+	u8 extport_r();
+	void extport_w(u8 data);
 };
+
+// handlers
+
+u8 digimon_state::extport_r()
+{
+	// P20: external port data from linked digimon
+	return 0xf;
+}
+
+void digimon_state::extport_w(u8 data)
+{
+	// P20: external port data to linked digimon
+}
 
 // inputs
 
@@ -290,6 +310,8 @@ void digimon_state::digimon(machine_config &config)
 	// basic machine hardware
 	E0C6S48(config, m_maincpu, 32.768_kHz_XTAL);
 	m_maincpu->set_osc3(1'000'000);
+	m_maincpu->read_p<2>().set(FUNC(digimon_state::extport_r));
+	m_maincpu->write_p<2>().set(FUNC(digimon_state::extport_w));
 	m_maincpu->write_r<4>().set("speaker", FUNC(speaker_sound_device::level_w)).bit(3);
 	m_maincpu->write_segs().set(FUNC(digimon_state::lcd_segment_w));
 
@@ -299,7 +321,7 @@ void digimon_state::digimon(machine_config &config)
 	screen.set_size(1113, 1080);
 	screen.set_visarea_full();
 
-	config.set_default_layout(layout_hh_e0c6x_lcd);
+	config.set_default_layout(layout_hh_e0c6200_lcd);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -346,11 +368,11 @@ ROM_END
 
 *******************************************************************************/
 
-class alienfev_state : public hh_e0c6x_state
+class alienfev_state : public hh_e0c6200_state
 {
 public:
 	alienfev_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_e0c6x_state(mconfig, type, tag)
+		hh_e0c6200_state(mconfig, type, tag)
 	{ }
 
 	void alienfev(machine_config &config);
@@ -386,7 +408,7 @@ void alienfev_state::alienfev(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
 
-	config.set_default_layout(layout_hh_e0c6x_lcd);
+	config.set_default_layout(layout_hh_e0c6200_lcd);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -412,16 +434,17 @@ ROM_END
 
 *******************************************************************************/
 
-class venusdm_state : public hh_e0c6x_state
+class venusdm_state : public hh_e0c6200_state
 {
 public:
 	venusdm_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_e0c6x_state(mconfig, type, tag)
+		hh_e0c6200_state(mconfig, type, tag)
 	{ }
 
 	void venusdm(machine_config &config);
 
 private:
+	// reorder pixel coordinates
 	void pixel_callback(int &dx, int &dy) { int x = dx; dx = dy | (dx / 20) << 4; dy = x % 20; }
 };
 
@@ -455,7 +478,7 @@ void venusdm_state::venusdm(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
 
-	config.set_default_layout(layout_hh_e0c6x_lcd);
+	config.set_default_layout(layout_hh_e0c6200_lcd);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -489,11 +512,11 @@ ROM_END
 
 *******************************************************************************/
 
-class stackch_state : public hh_e0c6x_state
+class stackch_state : public hh_e0c6200_state
 {
 public:
 	stackch_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_e0c6x_state(mconfig, type, tag)
+		hh_e0c6200_state(mconfig, type, tag)
 	{ }
 
 	void stackch(machine_config &config);
@@ -531,7 +554,7 @@ void stackch_state::stackch(machine_config &config)
 	screen.set_size(856, 1080);
 	screen.set_visarea_full();
 
-	config.set_default_layout(layout_hh_e0c6x_lcd);
+	config.set_default_layout(layout_hh_e0c6200_lcd);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

@@ -119,6 +119,16 @@ bool ppc_device::frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 				desc.cycles = 2;    // ???
 			return true;
 
+		case 0x09:  // DOZI (POWER)
+			if (!(m_ppc.m_cap & PPCCAP_LEGACY_POWER))
+			{
+				return false;
+			}
+
+			GPR_USED_OR_ZERO(desc, G_RA(op));
+			GPR_MODIFIED(desc, G_RD(op));
+			return true;
+
 		case 0x0e:  // ADDI
 		case 0x0f:  // ADDIS
 			GPR_USED_OR_ZERO(desc, G_RA(op));
@@ -1155,6 +1165,81 @@ bool ppc_device::frontend::describe_1f(uint32_t op, opcode_desc &desc, const opc
 			if (!is_602_class())
 				return false;
 			desc.flags |= OPFLAG_CAN_CHANGE_MODES | OPFLAG_CAN_CAUSE_EXCEPTION | OPFLAG_END_SEQUENCE;
+			return true;
+
+		case 0x14b: // DIV (POWER)
+		case 0x16b: // DIVS (POWER)
+			if (!(m_ppc.m_cap & PPCCAP_LEGACY_POWER))
+			{
+				return false;
+			}
+
+			GPR_USED(desc, G_RA(op));
+			GPR_USED(desc, G_RB(op));
+			GPR_MODIFIED(desc, G_RD(op));
+			XER_OV_MODIFIED(desc);
+			XER_SO_MODIFIED(desc);
+			if (op & M_RC)
+				CR_MODIFIED(desc, 0);
+			return true;
+
+		case 0x6b: // MUL (POWER)
+			if (!(m_ppc.m_cap & PPCCAP_LEGACY_POWER))
+			{
+				return false;
+			}
+
+			GPR_USED(desc, G_RA(op));
+			GPR_USED(desc, G_RB(op));
+			GPR_MODIFIED(desc, G_RD(op));
+			XER_OV_MODIFIED(desc);
+			XER_SO_MODIFIED(desc);
+			if (op & M_RC)
+				CR_MODIFIED(desc, 0);
+			return true;
+
+		case 0x108: // DOZ (POWER)
+			if (!(m_ppc.m_cap & PPCCAP_LEGACY_POWER))
+			{
+				return false;
+			}
+
+			GPR_USED(desc, G_RA(op));
+			GPR_USED(desc, G_RB(op));
+			GPR_MODIFIED(desc, G_RD(op));
+			XER_OV_MODIFIED(desc);
+			XER_SO_MODIFIED(desc);
+			if (op & M_RC)
+				CR_MODIFIED(desc, 0);
+			return true;
+
+		case 0x168: // ABS (POWER)
+		case 0x1e8: // NABS (POWER)
+			if (!(m_ppc.m_cap & PPCCAP_LEGACY_POWER))
+			{
+				return false;
+			}
+
+			GPR_USED(desc, G_RA(op));
+			GPR_USED(desc, G_RB(op));
+			GPR_MODIFIED(desc, G_RD(op));
+			XER_OV_MODIFIED(desc);
+			XER_SO_MODIFIED(desc);
+			if (op & M_RC)
+				CR_MODIFIED(desc, 0);
+			return true;
+
+		case 0x21d: // MASKIR (POWER)
+			if (!(m_ppc.m_cap & PPCCAP_LEGACY_POWER))
+			{
+				return false;
+			}
+
+			GPR_USED(desc, G_RS(op));
+			GPR_USED(desc, G_RB(op));
+			GPR_MODIFIED(desc, G_RA(op));
+			if (op & M_RC)
+				CR_MODIFIED(desc, 0);
 			return true;
 	}
 

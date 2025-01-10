@@ -1739,10 +1739,10 @@ static const gfx_layout spritelayout =
 
 
 static GFXDECODE_START( gfx_taitosj )
-	GFXDECODE_ENTRY( nullptr, 0x9000, charlayout,   0, 8 )    // the game dynamically modifies this
-	GFXDECODE_ENTRY( nullptr, 0x9000, spritelayout, 0, 8 )    // the game dynamically modifies this
-	GFXDECODE_ENTRY( nullptr, 0xa800, charlayout,   0, 8 )    // the game dynamically modifies this
-	GFXDECODE_ENTRY( nullptr, 0xa800, spritelayout, 0, 8 )    // the game dynamically modifies this
+	GFXDECODE_RAM( nullptr, 0x9000, charlayout,   0, 8 )
+	GFXDECODE_RAM( nullptr, 0x9000, spritelayout, 0, 8 )
+	GFXDECODE_RAM( nullptr, 0xa800, charlayout,   0, 8 )
+	GFXDECODE_RAM( nullptr, 0xa800, spritelayout, 0, 8 )
 GFXDECODE_END
 
 static const discrete_dac_r1_ladder taitosj_dacvol_ladder =

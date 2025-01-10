@@ -146,7 +146,7 @@ void marblmd2_state::latch_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_latch_data);
 
-	if (m_latch_data & 0x0010)
+	if (BIT(m_latch_data, 4))
 		m_jsa->soundcpu().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 	else
 		m_jsa->soundcpu().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
@@ -274,8 +274,8 @@ static const gfx_layout molayout =
 
 
 static GFXDECODE_START( gfx_mm2 )
-	GFXDECODE_ENTRY( "gfx1", 0, pflayout,   0x0, 1  )
-	GFXDECODE_ENTRY( "gfx2", 0, molayout,   0x0, 0x10  )
+	GFXDECODE_ENTRY( "tiles",   0, pflayout,   0x0, 1  )
+	GFXDECODE_ENTRY( "sprites", 0, molayout,   0x0, 0x10  )
 GFXDECODE_END
 
 
@@ -293,7 +293,6 @@ const atari_motion_objects_config marblmd2_state::s_mob_config =
 	0,                  // maximum number of links to visit/scanline (0=all)
 
 	0x000,              // base palette entry
-	0x100,              // maximum number of colors
 	0,                  // transparent pen index
 
 	{{ 0x03ff,0,0,0 }}, // mask for the link
@@ -365,7 +364,7 @@ ROM_START( marblmd2 )
 	ROM_REGION( 0x10000, "jsa:cpu", 0 ) // 6502 code
 	ROM_LOAD( "aud0.12c",  0x00000, 0x10000, CRC(89a8d90a) SHA1(cd73483d0bcfe2c8134d005c4417975f9a2cb658) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_REGION( 0x100000, "tiles", 0 )
 	ROM_LOAD( "pf0l.3p",  0x00000, 0x20000, CRC(a4fe377a) SHA1(a8a1a8027da778e5ad406a65814eec999b0f81af) )
 	ROM_LOAD( "pf1l.3m",  0x20000, 0x20000, CRC(5dc7aaa8) SHA1(4fb815e9bcf6bcdf1b7976a3dea2b6d1dd6a8f6b) )
 	ROM_LOAD( "pf2l.3k",  0x40000, 0x20000, CRC(0c7c5f74) SHA1(26f1d36f70f4e8354537d0d67764a1c9be35e8f7) )
@@ -375,7 +374,7 @@ ROM_START( marblmd2 )
 	ROM_LOAD( "pf2h.1k",  0xc0000, 0x20000, CRC(18323df9) SHA1(9c4add4733bcfe7202b53d86f1bca4b9d207e22a) )
 	ROM_LOAD( "pf3h.1j",  0xe0000, 0x20000, CRC(05d86ef8) SHA1(47eefd7112a3a3be16f0b4496cf034c8f7a69b1b) )
 
-	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_REGION( 0x80000, "sprites", 0 )
 	ROM_LOAD( "mo0l.7p",  0x00000, 0x20000, CRC(950d95a3) SHA1(3f38da7b6eeaa87cc84b98c9d535468b0c060f6d) )
 	ROM_LOAD( "mo1l.10p", 0x20000, 0x20000, CRC(b62b6ebf) SHA1(3781cd81780c10cd245871bb8f7b6260f7bb53b7) )
 	ROM_LOAD( "mo0h.12p", 0x40000, 0x20000, CRC(e47d92b0) SHA1(7953e8342450c02408e4d90f132144d55de2f491) )

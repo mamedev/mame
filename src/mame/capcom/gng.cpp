@@ -558,7 +558,7 @@ void gng_state::machine_reset()
 
 	/* TODO: PCB reference clearly shows that the POST has random/filled data on the paletteram.
 	         For now let's fill everything with white colors until we have better info about it */
-	for(int i = 0 ; i < 0x100; i += 4)
+	for (int i = 0 ; i < 0x100; i += 4)
 	{
 		m_palette->basemem().write8(i, 0x00); m_palette->extmem().write8(i, 0x00);
 		m_palette->basemem().write8(i + 1, 0x55); m_palette->extmem().write8(i + 1, 0x55);
@@ -947,11 +947,11 @@ ROM_START( makaimurb ) // 85606-A-3/85606-B-3
 ROM_END
 
 /*
-  Makaimura
+  Makaimura bootleg
   Program is the same as set makaimurb, but different sized/arranged ROMs.
-  Some GFX ROMs are different.
+  Sprite ROMs are the same as gng, so it has the shield instead of cross.
 */
-ROM_START( makaimurba )
+ROM_START( makaimurbbl )
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "gg5.bin",      0x04000, 0x4000, CRC(f8bda78f) SHA1(ed5d67996475504cdf7b9fa356f6e160cbbcfa77) ) // 4000-5fff is page 4
 	ROM_LOAD( "gg4.bin",      0x08000, 0x4000, CRC(ac0b25fb) SHA1(81b349b969e1ea4f90e8e523ec05a93b62252433) )
@@ -1085,16 +1085,16 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1985, gng,        0,   gng,     gng,      gng_state, empty_init, ROT0, "Capcom",   "Ghosts'n Goblins (World? set 1)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1985, gnga,       gng, gng,     gng,      gng_state, empty_init, ROT0, "Capcom",   "Ghosts'n Goblins (World? set 2)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1985, gngbl,      gng, gng,     gng,      gng_state, empty_init, ROT0, "bootleg",  "Ghosts'n Goblins (bootleg with Cross)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1985, gngprot,    gng, gng,     gng,      gng_state, empty_init, ROT0, "Capcom",   "Ghosts'n Goblins (prototype)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1985, gngblita,   gng, gng,     gng,      gng_state, empty_init, ROT0, "bootleg",  "Ghosts'n Goblins (Italian bootleg, harder)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, gngc,       gng, gng,     gng,      gng_state, empty_init, ROT0, "Capcom",   "Ghosts'n Goblins (World? set 3)",            MACHINE_SUPPORTS_SAVE ) // rev c?
-GAME( 1985, gngt,       gng, gng,     gng,      gng_state, empty_init, ROT0, "Capcom (Taito America license)", "Ghosts'n Goblins (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, makaimur,   gng, gng,     makaimur, gng_state, empty_init, ROT0, "Capcom",   "Makaimura (Japan)",                          MACHINE_SUPPORTS_SAVE )
-GAME( 1985, makaimurb,  gng, gng,     makaimur, gng_state, empty_init, ROT0, "Capcom",   "Makaimura (Japan Revision B)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1985, makaimurba, gng, gng,     makaimur, gng_state, empty_init, ROT0, "Capcom",   "Makaimura (Japan Revision B, alt GFX)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1985, makaimurc,  gng, gng,     makaimur, gng_state, empty_init, ROT0, "Capcom",   "Makaimura (Japan Revision C)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1985, makaimurg,  gng, gng,     makaimur, gng_state, empty_init, ROT0, "Capcom",   "Makaimura (Japan Revision G)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1989, diamrun,    0,   diamrun, diamrun,  gng_state, empty_init, ROT0, "KH Video", "Diamond Run",                                MACHINE_SUPPORTS_SAVE ) // Kyle Hodgetts
+GAME( 1985, gng,         0,   gng,     gng,      gng_state, empty_init, ROT0, "Capcom",   "Ghosts'n Goblins (World? set 1)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1985, gnga,        gng, gng,     gng,      gng_state, empty_init, ROT0, "Capcom",   "Ghosts'n Goblins (World? set 2)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1985, gngbl,       gng, gng,     gng,      gng_state, empty_init, ROT0, "bootleg",  "Ghosts'n Goblins (bootleg with Cross)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1985, gngprot,     gng, gng,     gng,      gng_state, empty_init, ROT0, "Capcom",   "Ghosts'n Goblins (prototype)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1985, gngblita,    gng, gng,     gng,      gng_state, empty_init, ROT0, "bootleg",  "Ghosts'n Goblins (Italian bootleg, harder)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1985, gngc,        gng, gng,     gng,      gng_state, empty_init, ROT0, "Capcom",   "Ghosts'n Goblins (World? set 3)",             MACHINE_SUPPORTS_SAVE ) // rev c?
+GAME( 1985, gngt,        gng, gng,     gng,      gng_state, empty_init, ROT0, "Capcom (Taito America license)", "Ghosts'n Goblins (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, makaimur,    gng, gng,     makaimur, gng_state, empty_init, ROT0, "Capcom",   "Makaimura (Japan)",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1985, makaimurb,   gng, gng,     makaimur, gng_state, empty_init, ROT0, "Capcom",   "Makaimura (Japan revision B)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1985, makaimurbbl, gng, gng,     makaimur, gng_state, empty_init, ROT0, "bootleg",  "Makaimura (Japan revision B bootleg)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1985, makaimurc,   gng, gng,     makaimur, gng_state, empty_init, ROT0, "Capcom",   "Makaimura (Japan revision C)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1985, makaimurg,   gng, gng,     makaimur, gng_state, empty_init, ROT0, "Capcom",   "Makaimura (Japan revision G)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1989, diamrun,     0,   diamrun, diamrun,  gng_state, empty_init, ROT0, "KH Video", "Diamond Run",                                 MACHINE_SUPPORTS_SAVE ) // Kyle Hodgetts

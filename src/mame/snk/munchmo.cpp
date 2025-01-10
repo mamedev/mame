@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino
-/***************************************************************************
+/*******************************************************************************
+
   Munch Mobile
   (C) 1983 SNK
 
@@ -9,8 +10,8 @@
   15 MHz crystal
 
   Known Issues:
-    - it's unclear if mirroring the videoram chunks is correct behavior
-    - several unmapped registers
+  - it's unclear if mirroring the videoram chunks is correct behavior
+  - several unmapped registers
 
 Stephh's notes (based on the game Z80 code and some tests) :
 
@@ -23,7 +24,7 @@ Stephh's notes (based on the game Z80 code and some tests) :
 
 - DIPs are now verified from Munch Mobile manual and playtesting.
 
-***************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -119,6 +120,12 @@ private:
 };
 
 
+/*************************************
+ *
+ *  Video hardware
+ *
+ *************************************/
+
 void munchmo_state::palette(palette_device &palette) const
 {
 	u8 const *const color_prom = memregion("proms")->base();
@@ -185,19 +192,18 @@ void munchmo_state::draw_status(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 		for (int sy = 0; sy < 256; sy += 8)
 		{
-				gfx->opaque(bitmap, cliprect,
-				*source++,
-				0, // color
-				0, 0, // no flip
-				sx, sy);
+			gfx->opaque(bitmap, cliprect,
+					*source++,
+					0, // color
+					0, 0, // no flip
+					sx, sy);
 		}
 	}
 }
 
 void munchmo_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-// ROM B1.2C contains 256 tilemaps defining 4x4 configurations of the tiles in ROM B2.2B
-
+	// ROM B1.2C contains 256 tilemaps defining 4x4 configurations of the tiles in ROM B2.2B
 	gfx_element *const gfx = m_gfxdecode->gfx(1);
 
 	for (int offs = 0; offs < 0x100; offs++)
@@ -210,11 +216,11 @@ void munchmo_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clipr
 		{
 			for (int col = 0; col < 4; col++)
 			{
-					gfx->opaque(*m_tmpbitmap, m_tmpbitmap->cliprect(),
-					m_tiles_rom[col + tile_number * 4 + row * 0x400],
-					m_palette_bank,
-					0, 0, // flip
-					sx + col * 8, sy + row * 8);
+				gfx->opaque(*m_tmpbitmap, m_tmpbitmap->cliprect(),
+						m_tiles_rom[col + tile_number * 4 + row * 0x400],
+						m_palette_bank,
+						0, 0, // flip
+						sx + col * 8, sy + row * 8);
 			}
 		}
 	}
@@ -234,6 +240,7 @@ void munchmo_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 	gfx_element *const gfx = m_gfxdecode->gfx(2 + bank);
 	int const color_base = m_palette_bank * 4 + 3;
 	int const firstsprite = m_vreg[0] & 0x3f;
+
 	for (int i = firstsprite; i < firstsprite + 0x40; i++)
 	{
 		for (int j = 0; j < 8; j++)
@@ -244,15 +251,17 @@ void munchmo_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 			int sx = m_sprite_xpos[offs];                   //   XXXXXXX?
 			int sy = (offs >> 6) << 5;                      // Y YY------
 			sy += (attributes >> 2) & 0x1f;
+
 			if (attributes & 0x80)
 			{
 				sx = (sx >> 1) | (tile_number & 0x80);
-				sx = 2 * ((- 32 - scroll - sx) & 0xff) + xadjust;
-					gfx->transpen(bitmap, cliprect,
-					0x7f - (tile_number & 0x7f),
-					color_base - (attributes & 0x03),
-					0, 0,                                   // no flip
-					sx, sy, 7);
+				sx = 2 * ((-32 - scroll - sx) & 0xff) + xadjust;
+
+				gfx->transpen(bitmap, cliprect,
+						0x7f - (tile_number & 0x7f),
+						color_base - (attributes & 0x03),
+						0, 0,                               // no flip
+						sx, sy, 7);
 			}
 		}
 	}
@@ -310,9 +319,11 @@ void munchmo_state::sound_nmi_ack_w(u8 data)
 template <u8 Which>
 u8 munchmo_state::ayreset_r()
 {
-	m_ay8910[Which]->reset_w();
+	if (!machine().side_effects_disabled())
+		m_ay8910[Which]->reset_w();
 	return 0;
 }
+
 
 /*************************************
  *
@@ -393,7 +404,7 @@ static INPUT_PORTS_START( mnchmobl )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
-		// See notes about this DIP
+	// See notes about this DIP
 	PORT_DIPNAME( 0x01, 0x00, "Continue after Game Over (Cheat)" ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
@@ -416,7 +427,6 @@ static INPUT_PORTS_START( mnchmobl )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_8C ) )
-
 
 	PORT_DIPNAME( 0xe0, 0x00, "1st Bonus" ) PORT_DIPLOCATION("SW1:6,7,8")
 	PORT_DIPSETTING(    0x00, "10000" )
@@ -452,6 +462,7 @@ static INPUT_PORTS_START( mnchmobl )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
 INPUT_PORTS_END
+
 
 /*************************************
  *
@@ -493,8 +504,8 @@ static const gfx_layout sprite_layout1 =
 		0x8000+3,0x8000+3,0x8000+2,0x8000+2,0x8000+1,0x8000+1,0x8000+0,0x8000+0
 	},
 	{
-			0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-			8*8, 9*8,10*8,11*8,12*8,13*8,14*8,15*8,
+		0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
+		8*8, 9*8, 10*8,11*8,12*8,13*8,14*8,15*8,
 		16*8,17*8,18*8,19*8,20*8,21*8,22*8,23*8,
 		24*8,25*8,26*8,27*8,28*8,29*8,30*8,31*8
 	},
@@ -513,8 +524,8 @@ static const gfx_layout sprite_layout2 =
 		0x8000+3,0x8000+3,0x8000+2,0x8000+2,0x8000+1,0x8000+1,0x8000+0,0x8000+0
 	},
 	{
-			0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-			8*8, 9*8,10*8,11*8,12*8,13*8,14*8,15*8,
+		0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
+		8*8, 9*8, 10*8,11*8,12*8,13*8,14*8,15*8,
 		16*8,17*8,18*8,19*8,20*8,21*8,22*8,23*8,
 		24*8,25*8,26*8,27*8,28*8,29*8,30*8,31*8
 	},
@@ -522,11 +533,12 @@ static const gfx_layout sprite_layout2 =
 };
 
 static GFXDECODE_START( gfx_mnchmobl )
-	GFXDECODE_ENTRY( "chars",              0,  char_layout,      0,  4 )  // colors   0- 63
-	GFXDECODE_ENTRY( "tiles",         0x1000,  tile_layout,     64,  4 )  // colors  64-127
-	GFXDECODE_ENTRY( "sprites",            0,  sprite_layout1, 128, 16 )  // colors 128-255
-	GFXDECODE_ENTRY( "monochrome_sprites", 0,  sprite_layout2, 128, 16 )  // colors 128-255
+	GFXDECODE_ENTRY( "chars",              0,  char_layout,      0,  4 ) // colors   0- 63
+	GFXDECODE_ENTRY( "tiles",         0x1000,  tile_layout,     64,  4 ) // colors  64-127
+	GFXDECODE_ENTRY( "sprites",            0,  sprite_layout1, 128, 16 ) // colors 128-255
+	GFXDECODE_ENTRY( "monochrome_sprites", 0,  sprite_layout2, 128, 16 ) // colors 128-255
 GFXDECODE_END
+
 
 /*************************************
  *

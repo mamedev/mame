@@ -65,21 +65,6 @@ namespace {
 class pickytlk_base_state : public driver_device
 {
 public:
-	pickytlk_base_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_display_ram(*this, "display_ram")
-		, m_maincpu(*this, "maincpu")
-		, m_io_buttons(*this, "BUTTONS")
-		, m_io_pen_x(*this, "PEN_X")
-		, m_io_pen_y(*this, "PEN_Y")
-		, m_io_pen_y_rescale(*this, "PEN_Y_RESCALE")
-		, m_ko(0)
-		, m_port(0)
-		, m_opt(0)
-	{ }
-
-	void pickytlk(machine_config &config);
-
 	DECLARE_CROSSHAIR_MAPPER_MEMBER(pen_y_mapper);
 	ioport_value pen_y_rescale_r();
 	ioport_value pen_target_r();
@@ -98,8 +83,23 @@ protected:
 		PEN_HOLD = 2,
 	};
 
+	pickytlk_base_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_display_ram(*this, "display_ram")
+		, m_maincpu(*this, "maincpu")
+		, m_io_buttons(*this, "BUTTONS")
+		, m_io_pen_x(*this, "PEN_X")
+		, m_io_pen_y(*this, "PEN_Y")
+		, m_io_pen_y_rescale(*this, "PEN_Y_RESCALE")
+		, m_ko(0)
+		, m_port(0)
+		, m_opt(0)
+	{ }
+
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+
+	void pickytlk(machine_config &config) ATTR_COLD;
 
 	void kol_w(u8 data);
 	void koh_w(u8 data);
@@ -112,10 +112,9 @@ protected:
 	TIMER_CALLBACK_MEMBER(io_timer_tick);
 	u8 io_pen_x_read();
 	u8 io_pen_y_read();
-	virtual u8 tablet_read(offs_t offset);
+	virtual u8 tablet_read(offs_t offset) = 0;
 	void tablet_write(offs_t offset, u8 data);
 
-	virtual void pickytlk_layout(machine_config &config);
 	void update_crosshair(screen_device &screen);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -231,12 +230,6 @@ u8 pickytlk_base_state::io_pen_y_read()
 		: rescale(io_pen_y_pos, io_pen_y_min, io_pen_y_max, 0xa0, 0xf0);
 }
 
-u8 pickytlk_base_state::tablet_read(offs_t offset)
-{
-	// Default (overriden by each system)
-	return 0;
-}
-
 void pickytlk_base_state::tablet_write(offs_t offset, u8 data)
 {
 	LOGMASKED(LOG_TABLET, "%s: tablet_write [%02x] = %02x\n", machine().describe_context(), offset, data);
@@ -286,7 +279,7 @@ u8 pickytlk_base_state::ki_r()
 		m_io_timer->reset(attotime::never);
 	}
 
-	return m_pen_state == PEN_PRESS ? 0x80 : 0;
+	return (m_pen_state == PEN_PRESS) ? 0x80 : 0;
 }
 
 u8 pickytlk_base_state::in0_r()
@@ -303,12 +296,7 @@ u8 pickytlk_base_state::in0_r()
 
 u8 pickytlk_base_state::input_flag_read()
 {
-	return m_pen_state == PEN_PRESS || m_pen_state == PEN_HOLD ? 0 : 1;
-}
-
-void pickytlk_base_state::pickytlk_layout(machine_config &config)
-{
-	// Nothing (overriden by each system)
+	return (m_pen_state == PEN_PRESS || m_pen_state == PEN_HOLD) ? 0 : 1;
 }
 
 void pickytlk_base_state::update_crosshair(screen_device &screen)
@@ -384,8 +372,6 @@ void pickytlk_base_state::pickytlk(machine_config &config)
 	screen.set_visarea(0, 126, 0, 63);
 	screen.set_screen_update(FUNC(pickytlk_base_state::screen_update));
 	screen.set_palette("palette");
-
-	pickytlk_layout(config);
 }
 
 
@@ -396,19 +382,13 @@ public:
 		: pickytlk_base_state(mconfig, type, tag)
 	{ }
 
-	void pickytlk_monocolor(machine_config &config);
+	void pickytlk_monocolor(machine_config &config) ATTR_COLD;
 
 private:
 	virtual u8 tablet_read(offs_t offset) override;
-	virtual void pickytlk_layout(machine_config &config) override;
-	void pickytlk_mem(address_map &map);
-	void pickytlk_palette(palette_device &palette) const;
+	void pickytlk_mem(address_map &map) ATTR_COLD;
+	void pickytlk_palette(palette_device &palette) const ATTR_COLD;
 };
-
-void pickytlk_monocolor_state::pickytlk_layout(machine_config &config)
-{
-	config.set_default_layout(layout_pickytlk);
-}
 
 u8 pickytlk_monocolor_state::tablet_read(offs_t offset)
 {
@@ -460,6 +440,8 @@ void pickytlk_monocolor_state::pickytlk_monocolor(machine_config &config)
 
 	// TODO: Verify palette. Colors can be changed by changing the contrast.
 	PALETTE(config, "palette", FUNC(pickytlk_monocolor_state::pickytlk_palette), 4);
+
+	config.set_default_layout(layout_pickytlk);
 }
 
 
@@ -470,19 +452,14 @@ public:
 		: pickytlk_base_state(mconfig, type, tag)
 	{ }
 
-	void pickytlk_multicolor(machine_config &config);
+	void plets(machine_config &config) ATTR_COLD;
+	void pickytlk_multicolor(machine_config &config) ATTR_COLD;
 
 private:
 	virtual u8 tablet_read(offs_t offset) override;
-	virtual void pickytlk_layout(machine_config &config) override;
-	void pickytlk_mem(address_map &map);
-	void pickytlk_palette(palette_device &palette) const;
+	void pickytlk_mem(address_map &map) ATTR_COLD;
+	void pickytlk_palette(palette_device &palette) const ATTR_COLD;
 };
-
-void pickytlk_multicolor_state::pickytlk_layout(machine_config &config)
-{
-	config.set_default_layout(layout_pickytlk);
-}
 
 u8 pickytlk_multicolor_state::tablet_read(offs_t offset)
 {
@@ -545,7 +522,7 @@ void pickytlk_multicolor_state::pickytlk_palette(palette_device &palette) const
 	palette.set_pen_color(3, 0xee, 0x77, 0x33);
 }
 
-void pickytlk_multicolor_state::pickytlk_multicolor(machine_config &config)
+void pickytlk_multicolor_state::plets(machine_config &config)
 {
 	pickytlk_base_state::pickytlk(config);
 
@@ -555,21 +532,11 @@ void pickytlk_multicolor_state::pickytlk_multicolor(machine_config &config)
 	PALETTE(config, "palette", FUNC(pickytlk_multicolor_state::pickytlk_palette), 4);
 }
 
-
-class plets_state : public pickytlk_multicolor_state
+void pickytlk_multicolor_state::pickytlk_multicolor(machine_config &config)
 {
-public:
-	plets_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pickytlk_multicolor_state(mconfig, type, tag)
-	{ }
+	plets(config);
 
-private:
-	virtual void pickytlk_layout(machine_config &config) override;
-};
-
-void plets_state::pickytlk_layout(machine_config &config)
-{
-	// Nothing
+	config.set_default_layout(layout_pickytlk);
 }
 
 
@@ -617,14 +584,14 @@ ROM_START(pickytlk)
 	ROM_LOAD("d23c8000xgx-c64.lsi5", 0x00000, 0x100000, CRC(6ed6feae) SHA1(f9a63db3d048da0954cab052690deb01ec384b22))
 ROM_END
 
-ROM_START(mk300)
+ROM_START(plets300)
 	CPU_ROM_MULTICOLOR
 
 	ROM_REGION(0x100000, "mask_rom", 0)
 	ROM_LOAD("d23c8000xgx-c77.lsi5", 0x00000, 0x100000, CRC(50ecb853) SHA1(5f2564ccb6ff7e0e5a21064ca32626f35dc81506))
 ROM_END
 
-ROM_START(mk350)
+ROM_START(plets350)
 	CPU_ROM_MULTICOLOR
 
 	ROM_REGION(0x100000, "mask_rom", 0)
@@ -650,7 +617,7 @@ COMP(1997?, jd368, 0, 0, pickytlk_multicolor, pickytlk, pickytlk_multicolor_stat
 COMP(1998, pickytlk, 0, 0, pickytlk_multicolor, pickytlk, pickytlk_multicolor_state, empty_init, "Casio", "Super Picky Talk - Forest of Gurutan", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // Release date 1999-09 from "Casio Game Perfect Catalogue"
-COMP(1999, mk300, 0, 0, pickytlk_multicolor, pickytlk, plets_state, empty_init, "Casio", "Plet's (MK-300)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP(1999, plets300, 0, 0, plets, pickytlk, pickytlk_multicolor_state, empty_init, "Casio", "Plet's (MK-300)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // ROM date 0019K7001
-COMP(2000?, mk350, 0, 0, pickytlk_multicolor, pickytlk, plets_state, empty_init, "Casio", "Plet's (MK-350)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP(2000?, plets350, 0, 0, plets, pickytlk, pickytlk_multicolor_state, empty_init, "Casio", "Plet's (MK-350)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

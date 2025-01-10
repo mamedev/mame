@@ -137,7 +137,6 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
 
-	void postload();
 	void main_map(address_map &map) ATTR_COLD;
 };
 
@@ -188,11 +187,6 @@ template <unsigned N> TILE_GET_INFO_MEMBER(popobear_state::get_tile_info)
 	tileinfo.set(0, tileno & 0x3fff, 0, TILE_FLIPYX(flipyx));
 }
 
-void popobear_state::postload()
-{
-	m_gfxdecode->gfx(0)->mark_all_dirty();
-}
-
 void popobear_state::video_start()
 {
 	m_vram_rearranged.resize(0x100000 / 2);
@@ -210,7 +204,6 @@ void popobear_state::video_start()
 	m_bg_tilemap[3]->set_transparent_pen(0);
 
 	save_item(NAME(m_vram_rearranged));
-	machine().save().register_postload(save_prepost_delegate(FUNC(popobear_state::postload), this));
 }
 
 

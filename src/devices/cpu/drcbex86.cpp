@@ -1020,6 +1020,7 @@ void drcbe_x86::emit_mov_p32_r32(Assembler &a, be_parameter const &param, Gp con
 	{
 		if (reg.id() != param.ireg())
 			a.mov(Gpd(param.ireg()), reg);                                              // mov   param,reg
+		a.mov(MABS(m_reghi[param.ireg()], 4), 0);
 	}
 }
 
@@ -3170,7 +3171,12 @@ void drcbe_x86::op_loads(Assembler &a, const instruction &inst)
 	// 64-bit form stores upper 32 bits
 	if (inst.size() == 8)
 	{
-		a.cdq();                                                                        // cdq
+		if (size != SIZE_QWORD)
+		{
+			if (dstreg.id() != eax.id())
+				a.mov(eax, dstreg);
+			a.cdq();                                                                    // cdq
+		}
 		if (dstp.is_memory())
 			a.mov(MABS(dstp.memory(4)), edx);                                           // mov   [dstp+4],edx
 		else if (dstp.is_int_register())
@@ -5839,9 +5845,9 @@ void drcbe_x86::op_fload(Assembler &a, const instruction &inst)
 	// immediate index
 	if (indp.is_immediate())
 	{
-		a.mov(eax, MABS(basep.memory(4*indp.immediate())));                             // mov   eax,[basep + 4*indp]
+		a.mov(eax, MABS(basep.memory(inst.size()*indp.immediate())));
 		if (inst.size() == 8)
-			a.mov(edx, MABS(basep.memory(4 + 4*indp.immediate())));                     // mov   edx,[basep + 4*indp + 4]
+			a.mov(edx, MABS(basep.memory(4 + inst.size()*indp.immediate())));
 	}
 
 	// other index
@@ -5849,15 +5855,15 @@ void drcbe_x86::op_fload(Assembler &a, const instruction &inst)
 	{
 		Gp const indreg = indp.select_register(ecx);
 		emit_mov_r32_p32(a, indreg, indp);
-		a.mov(eax, ptr(u64(basep.memory(0)), indreg, 2));                               // mov   eax,[basep + 4*indp]
+		a.mov(eax, ptr(u64(basep.memory(0)), indreg, (inst.size() == 8) ? 3 : 2));
 		if (inst.size() == 8)
-			a.mov(edx, ptr(u64(basep.memory(4)), indreg, 2));                           // mov   edx,[basep + 4*indp + 4]
+			a.mov(edx, ptr(u64(basep.memory(4)), indreg, (inst.size() == 8) ? 3 : 2));
 	}
 
 	// general case
-	a.mov(MABS(dstp.memory(0)), eax);                                                   // mov   [dstp],eax
+	a.mov(MABS(dstp.memory(0)), eax);
 	if (inst.size() == 8)
-		a.mov(MABS(dstp.memory(4)), edx);                                               // mov   [dstp + 4],edx
+		a.mov(MABS(dstp.memory(4)), edx);
 }
 
 
@@ -5878,16 +5884,16 @@ void drcbe_x86::op_fstore(Assembler &a, const instruction &inst)
 	be_parameter srcp(*this, inst.param(2), PTYPE_MF);
 
 	// general case
-	a.mov(eax, MABS(srcp.memory(0)));                                                   // mov   eax,[srcp]
+	a.mov(eax, MABS(srcp.memory(0)));
 	if (inst.size() == 8)
-		a.mov(edx, MABS(srcp.memory(4)));                                               // mov   edx,[srcp + 4]
+		a.mov(edx, MABS(srcp.memory(4)));
 
 	// immediate index
 	if (indp.is_immediate())
 	{
-		a.mov(MABS(basep.memory(4*indp.immediate())), eax);                             // mov   [basep + 4*indp],eax
+		a.mov(MABS(basep.memory(inst.size()*indp.immediate())), eax);
 		if (inst.size() == 8)
-			a.mov(MABS(basep.memory(4 + 4*indp.immediate())), edx);                     // mov   [basep + 4*indp + 4],edx
+			a.mov(MABS(basep.memory(4 + inst.size()*indp.immediate())), edx);
 	}
 
 	// other index
@@ -5895,9 +5901,9 @@ void drcbe_x86::op_fstore(Assembler &a, const instruction &inst)
 	{
 		Gp const indreg = indp.select_register(ecx);
 		emit_mov_r32_p32(a, indreg, indp);
-		a.mov(ptr(u64(basep.memory(0)), indreg, 2), eax);                               // mov   [basep + 4*indp],eax
+		a.mov(ptr(u64(basep.memory(0)), indreg, (inst.size() == 8) ? 3 : 2), eax);
 		if (inst.size() == 8)
-			a.mov(ptr(u64(basep.memory(4)), indreg, 2), edx);                           // mov   [basep + 4*indp + 4],edx
+			a.mov(ptr(u64(basep.memory(4)), indreg, (inst.size() == 8) ? 3 : 2), edx);
 	}
 }
 

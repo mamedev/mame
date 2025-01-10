@@ -25,7 +25,7 @@
 **************************************************************************************************/
 
 #include "emu.h"
-#include "amiga_copper.h"
+#include "agnus_copper.h"
 
 #define LOG_WARN    (1U << 1)   // Show warnings
 #define LOG_COPINS  (1U << 2)   // Show instruction fetches thru COPINS
@@ -54,7 +54,7 @@
 
 
 // device type definition
-DEFINE_DEVICE_TYPE(AMIGA_COPPER, amiga_copper_device, "amiga_copper", "Amiga Copper")
+DEFINE_DEVICE_TYPE(AGNUS_COPPER, agnus_copper_device, "agnus_copper", "Amiga Agnus Copper")
 
 
 //**************************************************************************
@@ -63,12 +63,12 @@ DEFINE_DEVICE_TYPE(AMIGA_COPPER, amiga_copper_device, "amiga_copper", "Amiga Cop
 
 
 //-------------------------------------------------
-//  amiga_copper_device - constructor
+//  agnus_copper_device - constructor
 //-------------------------------------------------
 
 
-amiga_copper_device::amiga_copper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, AMIGA_COPPER, tag, owner, clock)
+agnus_copper_device::agnus_copper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, AGNUS_COPPER, tag, owner, clock)
 	, m_host_cpu(*this, finder_base::DUMMY_TAG)
 	, m_chipmem_r(*this, 0)
 {
@@ -80,7 +80,7 @@ amiga_copper_device::amiga_copper_device(const machine_config &mconfig, const ch
 //-------------------------------------------------
 
 
-void amiga_copper_device::device_start()
+void agnus_copper_device::device_start()
 {
 	m_host_space = &m_host_cpu->space(AS_PROGRAM);
 
@@ -92,9 +92,9 @@ void amiga_copper_device::device_start()
 	save_item(NAME(m_pc));
 	save_item(NAME(m_state_waiting));
 	save_item(NAME(m_state_waitblit));
+	save_item(NAME(m_state_skipping));
 	save_item(NAME(m_waitval));
 	save_item(NAME(m_waitmask));
-//  save_item(NAME(m_wait_offset));
 	save_item(NAME(m_pending_data));
 	save_item(NAME(m_pending_offset));
 }
@@ -105,7 +105,7 @@ void amiga_copper_device::device_start()
 //-------------------------------------------------
 
 
-void amiga_copper_device::device_reset()
+void agnus_copper_device::device_reset()
 {
 	m_cdang_setting = 0x40;
 	m_dma_master_enable = false;
@@ -119,19 +119,19 @@ void amiga_copper_device::device_reset()
 //**************************************************************************
 
 // $dff080-8d memory map
-void amiga_copper_device::regs_map(address_map &map)
+void agnus_copper_device::regs_map(address_map &map)
 {
 	// TODO: location addresses belongs to Agnus
-	map(0x00, 0x01).w(FUNC(amiga_copper_device::copxlch_w<0>));
-	map(0x02, 0x03).w(FUNC(amiga_copper_device::copxlcl_w<0>));
-	map(0x04, 0x05).w(FUNC(amiga_copper_device::copxlch_w<1>));
-	map(0x06, 0x07).w(FUNC(amiga_copper_device::copxlcl_w<1>));
-	map(0x08, 0x09).rw(FUNC(amiga_copper_device::copjmpx_r<0>), FUNC(amiga_copper_device::copjmpx_w<0>));
-	map(0x0a, 0x0b).rw(FUNC(amiga_copper_device::copjmpx_r<1>), FUNC(amiga_copper_device::copjmpx_w<1>));
-//  map(0x0c, 0x0d).w(FUNC(amiga_copper_device::copins_w));
+	map(0x00, 0x01).w(FUNC(agnus_copper_device::copxlch_w<0>));
+	map(0x02, 0x03).w(FUNC(agnus_copper_device::copxlcl_w<0>));
+	map(0x04, 0x05).w(FUNC(agnus_copper_device::copxlch_w<1>));
+	map(0x06, 0x07).w(FUNC(agnus_copper_device::copxlcl_w<1>));
+	map(0x08, 0x09).rw(FUNC(agnus_copper_device::copjmpx_r<0>), FUNC(agnus_copper_device::copjmpx_w<0>));
+	map(0x0a, 0x0b).rw(FUNC(agnus_copper_device::copjmpx_r<1>), FUNC(agnus_copper_device::copjmpx_w<1>));
+//  map(0x0c, 0x0d).w(FUNC(agnus_copper_device::copins_w));
 }
 
-void amiga_copper_device::dmacon_set(u16 data)
+void agnus_copper_device::dmacon_set(u16 data)
 {
 	m_dma_master_enable = bool(BIT(data, 9));
 	m_dma_copen = bool(BIT(data, 7));
@@ -155,7 +155,7 @@ void amiga_copper_device::dmacon_set(u16 data)
  *       sense to write via Copper).
  *
  */
-void amiga_copper_device::copcon_w(u16 data)
+void agnus_copper_device::copcon_w(u16 data)
 {
 	bool cdang = bool(BIT(data, 1));
 
@@ -167,13 +167,13 @@ void amiga_copper_device::copcon_w(u16 data)
 		LOGWARN("%s: COPCON undocumented setting write %04x\n", machine().describe_context(), data);
 }
 
-template <u8 ch> void amiga_copper_device::copxlch_w(u16 data)
+template <u8 ch> void agnus_copper_device::copxlch_w(u16 data)
 {
 	// TODO: chipmem mask
 	m_lc[ch] = (m_lc[ch] & 0x0000ffff) | ((data & 0x001f) << 16);
 }
 
-template <u8 ch> void amiga_copper_device::copxlcl_w(u16 data)
+template <u8 ch> void agnus_copper_device::copxlcl_w(u16 data)
 {
 	m_lc[ch] = (m_lc[ch] & 0xffff0000) | ((data & 0xfffe) <<  0);
 }
@@ -187,22 +187,23 @@ template <u8 ch> void amiga_copper_device::copxlcl_w(u16 data)
  *     do conditional branching by clever use of the skip opcode.
  *
  */
-template <u8 ch> void amiga_copper_device::copjmpx_w(u16 data)
+template <u8 ch> void agnus_copper_device::copjmpx_w(u16 data)
 {
 	set_pc(ch, false);
 }
 
-template <u8 ch> u16 amiga_copper_device::copjmpx_r()
+template <u8 ch> u16 agnus_copper_device::copjmpx_r()
 {
 	if (!machine().side_effects_disabled())
 		set_pc(ch, false);
 	return m_host_space->unmap();
 }
 
-inline void amiga_copper_device::set_pc(u8 ch, bool is_sync)
+inline void agnus_copper_device::set_pc(u8 ch, bool is_sync)
 {
 	m_pc = m_lc[ch];
 	m_state_waiting = false;
+	m_state_skipping = false;
 	LOGPC("%s: COPJMP%d new PC = %08x%s\n"
 		, machine().describe_context()
 		, ch + 1
@@ -221,7 +222,7 @@ inline void amiga_copper_device::set_pc(u8 ch, bool is_sync)
  * (such as our debugger ;=).
  *
  */
-void amiga_copper_device::copins_w(u16 data)
+void agnus_copper_device::copins_w(u16 data)
 {
 	LOGCOPINS("%s: COPINS %04x\n", machine().describe_context(), data);
 }
@@ -231,12 +232,13 @@ void amiga_copper_device::copins_w(u16 data)
 //**************************************************************************
 
 // executed on scanline == 0
-void amiga_copper_device::vblank_sync()
+void agnus_copper_device::vblank_sync()
 {
 	set_pc(0, true);
 }
 
-int amiga_copper_device::execute_next(int xpos, int ypos, bool is_blitter_busy)
+// TODO: h/vblank checks against xpos/vpos
+int agnus_copper_device::execute_next(int xpos, int ypos, bool is_blitter_busy, int num_planes)
 {
 	int word0, word1;
 
@@ -268,11 +270,7 @@ int amiga_copper_device::execute_next(int xpos, int ypos, bool is_blitter_busy)
 			(!m_state_waitblit || !(is_blitter_busy)))
 		{
 			m_state_waiting = false;
-//#if GUESS_COPPER_OFFSET
-//          return xpos + COPPER_CYCLES_TO_PIXELS(1 + m_wait_offset);
-//#else
-			return xpos + COPPER_CYCLES_TO_PIXELS(1 + 3);
-//#endif
+			return xpos + COPPER_CYCLES_TO_PIXELS(1);
 		}
 
 		/* otherwise, see if this line is even a possibility; if not, punt */
@@ -313,22 +311,25 @@ int amiga_copper_device::execute_next(int xpos, int ypos, bool is_blitter_busy)
 		word0 = (word0 >> 1) & 0xff;
 		if (word0 >= m_cdang_setting)
 		{
-			if (delay[word0] == 0)
+			// SKIP applies to valid MOVEs only
+			// - apocalyps (gameplay)
+			if (m_state_skipping)
 			{
-				//LOGCHIPSET("%02X.%02X: Write to %s = %04x\n", ypos, xpos / 2, s_custom_reg_names[word0 & 0xff], word1);
-				LOGCHIPSET("%02X.%02X: MOVE $dff%03x = %04x\n",
-					ypos,
-					xpos / 2,
-					word0 << 1,
-					word1
-				);
-				m_host_space->write_word(0xdff000 | (word0 << 1), word1);
+				LOGINST("  (Ignored)\n");
+				m_state_skipping = false;
+				// TODO: verify timings
+                // may depend on num of planes enabled (move_offset) or opcode fetch above is enough.
+				xpos += COPPER_CYCLES_TO_PIXELS(2);
+				return xpos;
 			}
-			else    // additional 2 cycles needed for non-Agnus registers
-			{
-				m_pending_offset = word0;
-				m_pending_data = word1;
-			}
+			// delay write to the next available DMA slot if not in blanking area
+			// - bchvolly (title), suprfrog & abreed (bottom playfield rows)
+			const bool horizontal_blank = xpos < 0x47;
+			const int move_offset = horizontal_blank ? 0 : std::max(num_planes - 4, 0);
+
+			m_pending_offset = word0;
+			m_pending_data = word1;
+			xpos += COPPER_CYCLES_TO_PIXELS(move_offset);
 		}
 
 		/* illegal writes suspend until next frame */
@@ -340,6 +341,7 @@ int amiga_copper_device::execute_next(int xpos, int ypos, bool is_blitter_busy)
 			m_waitmask = 0xffff;
 			m_state_waitblit = false;
 			m_state_waiting = true;
+			m_state_skipping = false;
 
 			return 511;
 		}
@@ -355,36 +357,35 @@ int amiga_copper_device::execute_next(int xpos, int ypos, bool is_blitter_busy)
 		/* handle a wait */
 		if ((word1 & 1) == 0)
 		{
-			LOGINST("  WAIT %04x & %04x (currently %04x)\n",
+			const bool horizontal_blank = xpos < 0x47;
+			const int wait_offset = horizontal_blank ? 0 : std::max(num_planes - 4, 0) + 1;
+
+			LOGINST("  WAIT %04x & %04x (currently %04x, num planes %d +%d)\n",
 				m_waitval,
 				m_waitmask,
-				(ypos << 8) | (xpos >> 1)
+				(ypos << 8) | (xpos >> 1),
+				num_planes,
+				wait_offset
 			);
 
+			m_state_skipping = false;
 			m_state_waiting = true;
+			xpos += COPPER_CYCLES_TO_PIXELS(wait_offset);
 		}
 
 		/* handle a skip */
 		else
 		{
 			int curpos = (ypos << 8) | (xpos >> 1);
+			m_state_skipping = ((curpos & m_waitmask) >= (m_waitval & m_waitmask)
+				&& (!m_state_waitblit || !(is_blitter_busy)));
 
-			LOGINST("  SKIP %04x & %04x (currently %04x)\n",
+			LOGINST("  SKIP %04x & %04x (currently %04x) - %s\n",
 				m_waitval,
 				m_waitmask,
-				(ypos << 8) | (xpos >> 1)
+				(ypos << 8) | (xpos >> 1),
+				m_state_skipping ? "Skipping" : "Not skipped"
 			);
-
-			/* if we're past the wait time, stop it and hold up 2 cycles */
-			if ((curpos & m_waitmask) >= (m_waitval & m_waitmask) &&
-				(!m_state_waitblit || !(is_blitter_busy)))
-			{
-				LOGINST("  Skipped\n");
-
-				/* count the cycles it out have taken to fetch the next instruction */
-				m_pc += 4;
-				xpos += COPPER_CYCLES_TO_PIXELS(2);
-			}
 		}
 	}
 

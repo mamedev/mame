@@ -161,14 +161,6 @@ void taitosj_state::compute_draw_order()
 	}
 }
 
-void taitosj_state::device_post_load()
-{
-	m_gfxdecode->gfx(0)->mark_all_dirty();
-	m_gfxdecode->gfx(1)->mark_all_dirty();
-	m_gfxdecode->gfx(2)->mark_all_dirty();
-	m_gfxdecode->gfx(3)->mark_all_dirty();
-}
-
 void taitosj_state::video_start()
 {
 	m_sprite_layer_collbitmap1.allocate(16, 16);

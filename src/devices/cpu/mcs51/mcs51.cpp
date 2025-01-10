@@ -1042,14 +1042,18 @@ void mcs51_cpu_device::do_sub_flags(uint8_t a, uint8_t data, uint8_t c)
 
 void mcs51_cpu_device::transmit(int state)
 {
-	if (BIT(SFR_A(ADDR_P3), 1) != state)
+	if (m_uart.txd != state)
 	{
-		if (state)
-			SFR_A(ADDR_P3) |= 1U << 1;
-		else
-			SFR_A(ADDR_P3) &= ~(1U << 1);
+		m_uart.txd = state;
 
-		m_port_out_cb[3](SFR_A(ADDR_P3));
+		// P3.1 = SFR(P3) & TxD
+		if (BIT(SFR_A(ADDR_P3), 1))
+		{
+			if (state)
+				m_port_out_cb[3](SFR_A(ADDR_P3));
+			else
+				m_port_out_cb[3](SFR_A(ADDR_P3) & ~0x02);
+		}
 	}
 }
 
@@ -2230,7 +2234,13 @@ void mcs51_cpu_device::sfr_write(size_t offset, uint8_t data)
 		case ADDR_P0:   m_port_out_cb[0](data);             break;
 		case ADDR_P1:   m_port_out_cb[1](data);             break;
 		case ADDR_P2:   m_port_out_cb[2](data);             break;
-		case ADDR_P3:   m_port_out_cb[3](data);             break;
+		case ADDR_P3:
+			// P3.1 = SFR(P3) & TxD
+			if (!m_uart.txd)
+				m_port_out_cb[3](data & ~0x02);
+			else
+				m_port_out_cb[3](data);
+			break;
 		case ADDR_SBUF:
 			LOGMASKED(LOG_TX, "tx byte 0x%02x\n", data);
 			m_uart.data_out = data;
@@ -2486,6 +2496,7 @@ void mcs51_cpu_device::device_reset()
 	m_uart.rx_clk = 0;
 	m_uart.tx_clk = 0;
 	m_uart.txbit = SIO_IDLE;
+	m_uart.txd = 0;
 	m_uart.rxbit = SIO_IDLE;
 	m_uart.rxb8 = 0;
 	m_uart.smod_div = 0;

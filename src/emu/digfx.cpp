@@ -99,6 +99,24 @@ void device_gfx_interface::interface_post_start()
 
 
 //-------------------------------------------------
+//  interface_post_load - mark RAM-based entries
+//  dirty after loading save state
+//-------------------------------------------------
+
+void device_gfx_interface::interface_post_load()
+{
+	if (!m_gfxdecodeinfo)
+		return;
+
+	for (int curgfx = 0; curgfx < MAX_GFX_ELEMENTS && m_gfxdecodeinfo[curgfx].gfxlayout != nullptr; curgfx++)
+	{
+		if (GFXENTRY_ISRAM(m_gfxdecodeinfo[curgfx].flags))
+			m_gfx[curgfx]->mark_all_dirty();
+	}
+}
+
+
+//-------------------------------------------------
 //  decode_gfx - parse gfx decode info and
 //  create gfx elements
 //-------------------------------------------------
@@ -106,7 +124,7 @@ void device_gfx_interface::interface_post_start()
 void device_gfx_interface::decode_gfx(const gfx_decode_entry *gfxdecodeinfo)
 {
 	// skip if nothing to do
-	if (gfxdecodeinfo == nullptr)
+	if (!gfxdecodeinfo)
 		return;
 
 	// local variables to hold mutable copies of gfx layout data
@@ -298,9 +316,9 @@ void device_gfx_interface::interface_validity_check(validity_checker &valid) con
 		return;
 
 	// validate graphics decoding entries
-	for (int gfxnum = 0; gfxnum < MAX_GFX_ELEMENTS && m_gfxdecodeinfo[gfxnum].gfxlayout != nullptr; gfxnum++)
+	for (int curgfx = 0; curgfx < MAX_GFX_ELEMENTS && m_gfxdecodeinfo[curgfx].gfxlayout != nullptr; curgfx++)
 	{
-		const gfx_decode_entry &gfx = m_gfxdecodeinfo[gfxnum];
+		const gfx_decode_entry &gfx = m_gfxdecodeinfo[curgfx];
 		const gfx_layout &layout = *gfx.gfxlayout;
 
 		// currently we are unable to validate RAM-based entries
@@ -316,7 +334,7 @@ void device_gfx_interface::interface_validity_check(validity_checker &valid) con
 
 			u32 region_length = valid.region_length(gfxregion.c_str());
 			if (region_length == 0)
-				osd_printf_error("gfx[%d] references nonexistent region '%s'\n", gfxnum, gfxregion);
+				osd_printf_error("gfx[%d] references nonexistent region '%s'\n", curgfx, gfxregion);
 
 			// if we have a valid region, and we're not using auto-sizing, check the decode against the region length
 			else if (!IS_FRAC(layout.total))
@@ -336,7 +354,7 @@ void device_gfx_interface::interface_validity_check(validity_checker &valid) con
 
 				// if not, this is an error
 				if ((start + len) / 8 > avail)
-					osd_printf_error("gfx[%d] extends past allocated memory of region '%s'\n", gfxnum, region);
+					osd_printf_error("gfx[%d] extends past allocated memory of region '%s'\n", curgfx, region);
 			}
 		}
 
@@ -347,9 +365,9 @@ void device_gfx_interface::interface_validity_check(validity_checker &valid) con
 		if (layout.planeoffset[0] == GFX_RAW)
 		{
 			if (layout.total != RGN_FRAC(1,1))
-				osd_printf_error("gfx[%d] RAW layouts can only be RGN_FRAC(1,1)\n", gfxnum);
+				osd_printf_error("gfx[%d] RAW layouts can only be RGN_FRAC(1,1)\n", curgfx);
 			if (xscale != 1 || yscale != 1)
-				osd_printf_error("gfx[%d] RAW layouts do not support xscale/yscale\n", gfxnum);
+				osd_printf_error("gfx[%d] RAW layouts do not support xscale/yscale\n", curgfx);
 		}
 
 		// verify traditional decode doesn't have too many planes,
@@ -357,11 +375,11 @@ void device_gfx_interface::interface_validity_check(validity_checker &valid) con
 		else
 		{
 			if (layout.planes > MAX_GFX_PLANES)
-				osd_printf_error("gfx[%d] planes > %d\n", gfxnum, MAX_GFX_PLANES);
+				osd_printf_error("gfx[%d] planes > %d\n", curgfx, MAX_GFX_PLANES);
 			if (layout.width > MAX_GFX_SIZE && layout.extxoffs == nullptr)
-				osd_printf_error("gfx[%d] width > %d but missing extended xoffset info\n", gfxnum, MAX_GFX_SIZE);
+				osd_printf_error("gfx[%d] width > %d but missing extended xoffset info\n", curgfx, MAX_GFX_SIZE);
 			if (layout.height > MAX_GFX_SIZE && layout.extyoffs == nullptr)
-				osd_printf_error("gfx[%d] height > %d but missing extended yoffset info\n", gfxnum, MAX_GFX_SIZE);
+				osd_printf_error("gfx[%d] height > %d but missing extended yoffset info\n", curgfx, MAX_GFX_SIZE);
 		}
 	}
 }

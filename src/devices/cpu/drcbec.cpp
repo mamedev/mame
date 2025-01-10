@@ -324,19 +324,39 @@ void drcbe_c::reset()
 
 void drcbe_c::generate(drcuml_block &block, const instruction *instlist, uint32_t numinst)
 {
+	// Calculate the max possible number of register clears required
+	uint32_t regclears = 0;
+
+	for (int inum = 0; inum < numinst; inum++)
+	{
+		const instruction &inst = instlist[inum];
+
+		if (inst.size() != 4)
+			continue;
+
+		for (int pnum = 0; pnum < inst.numparams(); pnum++)
+		{
+			if (inst.is_param_out(pnum) && inst.param(pnum).is_int_register())
+				regclears++;
+		}
+	}
+
 	// tell all of our utility objects that a block is beginning
-	m_hash.block_begin(block, instlist, numinst);
+	m_hash.block_begin(block, instlist, numinst + regclears);
 	m_labels.block_begin(block);
 	m_map.block_begin(block);
 
 	// begin codegen; fail if we can't
-	drccodeptr *cachetop = m_cache.begin_codegen(numinst * sizeof(drcbec_instruction) * 4);
+	drccodeptr *cachetop = m_cache.begin_codegen((numinst + regclears) * sizeof(drcbec_instruction) * 4);
 	if (cachetop == nullptr)
 		block.abort();
 
 	// compute the base by aligning the cache top to an even multiple of drcbec_instruction
 	drcbec_instruction *base = (drcbec_instruction *)(((uintptr_t)*cachetop + sizeof(drcbec_instruction) - 1) & ~(sizeof(drcbec_instruction) - 1));
 	drcbec_instruction *dst = base;
+
+	bool ireg_needs_clearing[REG_I_COUNT];
+	std::fill(std::begin(ireg_needs_clearing), std::end(ireg_needs_clearing), true);
 
 	// generate code by copying the instructions and extracting immediates
 	for (int inum = 0; inum < numinst; inum++)
@@ -391,10 +411,14 @@ void drcbe_c::generate(drcuml_block &block, const instruction *instlist, uint32_
 					psize[2] = 4;
 				if (opcode == OP_STORE || opcode == OP_FSTORE)
 					psize[1] = 4;
-				if (opcode == OP_READ || opcode == OP_READM || opcode == OP_FREAD)
+				if (opcode == OP_READ || opcode == OP_FREAD)
 					psize[1] = psize[2] = 4;
-				if (opcode == OP_WRITE || opcode == OP_WRITEM || opcode == OP_FWRITE)
+				if (opcode == OP_WRITE || opcode == OP_FWRITE)
 					psize[0] = psize[2] = 4;
+				if (opcode == OP_READM)
+					psize[1] = psize[3] = 4;
+				if (opcode == OP_WRITEM)
+					psize[0] = psize[3] = 4;
 				if (opcode == OP_SEXT && inst.param(2).size() != SIZE_QWORD)
 					psize[1] = 4;
 				if (opcode == OP_FTOINT)
@@ -449,6 +473,41 @@ void drcbe_c::generate(drcuml_block &block, const instruction *instlist, uint32_
 
 				// point past the end of the immediates
 				dst += immedwords;
+
+				// Keep track of which registers had an 8 byte write and clear it the next time it's written
+				if (inst.size() == 4)
+				{
+					for (int pnum = 0; pnum < inst.numparams(); pnum++)
+					{
+						if (inst.is_param_out(pnum) && inst.param(pnum).is_int_register() && ireg_needs_clearing[inst.param(pnum).ireg() - REG_I0])
+						{
+							immedwords = (8 + sizeof(drcbec_instruction) - 1) / sizeof(drcbec_instruction);
+
+							(dst++)->i = MAKE_OPCODE_FULL(OP_AND, 8, 0, 0, 3 + immedwords);
+
+							immed = dst + 3;
+
+							output_parameter(&dst, &immed, 8, inst.param(pnum));
+							output_parameter(&dst, &immed, 8, inst.param(pnum));
+							output_parameter(&dst, &immed, 8, 0xffffffff);
+
+							dst += immedwords;
+
+							ireg_needs_clearing[inst.param(pnum).ireg() - REG_I0] = false;
+						}
+					}
+				}
+				else if (inst.size() == 8)
+				{
+					for (int pnum = 0; pnum < inst.numparams(); pnum++)
+					{
+						if (inst.is_param_out(pnum) && inst.param(pnum).is_int_register())
+						{
+							ireg_needs_clearing[inst.param(pnum).ireg() - REG_I0] = true;
+						}
+					}
+				}
+
 				break;
 		}
 	}
@@ -1455,20 +1514,20 @@ int drcbe_c::execute(code_handle &entry)
 				DPARAM0 = m_space[PARAM2]->read_dword(PARAM1);
 				break;
 
-			case MAKE_OPCODE_SHORT(OP_READ8, 8, 0):     // DREAD   dst,src1,space_QOWRD
+			case MAKE_OPCODE_SHORT(OP_READ8, 8, 0):     // DREAD   dst,src1,space_QWORD
 				DPARAM0 = m_space[PARAM2]->read_qword(PARAM1);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_READM2, 8, 0):    // DREADM  dst,src1,mask,space_WORD
-				DPARAM0 = m_space[PARAM3]->read_word(PARAM1, PARAM2);
+				DPARAM0 = m_space[PARAM3]->read_word(PARAM1, DPARAM2);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_READM4, 8, 0):    // DREADM  dst,src1,mask,space_DWORD
-				DPARAM0 = m_space[PARAM3]->read_dword(PARAM1, PARAM2);
+				DPARAM0 = m_space[PARAM3]->read_dword(PARAM1, DPARAM2);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_READM8, 8, 0):    // DREADM  dst,src1,mask,space_QWORD
-				DPARAM0 = m_space[PARAM3]->read_qword(PARAM1, PARAM2);
+				DPARAM0 = m_space[PARAM3]->read_qword(PARAM1, DPARAM2);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_WRITE1, 8, 0):    // DWRITE  dst,src1,space_BYTE

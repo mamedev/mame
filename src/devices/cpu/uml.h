@@ -398,6 +398,8 @@ namespace uml
 		// construction/destruction
 		constexpr instruction() : m_param{ } { }
 
+		bool is_param_out(int paramnum) const { assert(m_opcode < OP_MAX); assert(paramnum < m_numparams); return (s_opcode_info_table[m_opcode].param[paramnum].output & 0x02) != 0; }
+
 		// getters
 		constexpr opcode_t opcode() const { return m_opcode; }
 		constexpr condition_t condition() const { return m_condition; }

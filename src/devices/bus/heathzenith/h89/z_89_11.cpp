@@ -207,12 +207,6 @@ void z_89_11_device::aux_int(int data)
 
 void z_89_11_device::device_start()
 {
-	save_item(NAME(m_lp_enabled));
-	save_item(NAME(m_lp_int_idx));
-	save_item(NAME(m_aux_enabled));
-	save_item(NAME(m_aux_int_idx));
-	save_item(NAME(m_modem_enabled));
-	save_item(NAME(m_modem_int_idx));
 	save_item(NAME(m_lp_intr));
 	save_item(NAME(m_aux_intr));
 	save_item(NAME(m_modem_intr));

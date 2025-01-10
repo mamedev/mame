@@ -217,7 +217,7 @@ K052109_CB_MEMBER(vendetta_state::esckids_tile_callback)
 
 K053246_CB_MEMBER(vendetta_state::sprite_callback)
 {
-	int pri = (*color & 0x03e0) >> 4;   // ???????
+	int pri = (*color & 0x03e0) >> 4; // ???????
 	if (pri <= m_layerpri[2])
 		*priority_mask = 0;
 	else if (pri > m_layerpri[2] && pri <= m_layerpri[1])
@@ -434,6 +434,7 @@ void vendetta_state::sound_map(address_map &map)
 	map(0xfc00, 0xfc2f).rw("k053260", FUNC(k053260_device::read), FUNC(k053260_device::write));
 }
 
+
 /***************************************************************************
 
     Input Ports
@@ -540,6 +541,7 @@ static INPUT_PORTS_START( esckids2p )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+
 /***************************************************************************
 
     Machine Driver
@@ -640,7 +642,7 @@ void vendetta_state::vendetta(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "lspeaker", 0.5).add_route(1, "rspeaker", 0.5);  // verified with PCB
+	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "lspeaker", 0.5).add_route(1, "rspeaker", 0.5); // verified with PCB
 
 	k053260_device &k053260(K053260(config, "k053260", XTAL(3'579'545))); // verified with PCB
 	k053260.add_route(0, "lspeaker", 0.75);

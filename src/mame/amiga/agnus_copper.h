@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_AMIGA_COPPER_H
-#define MAME_MACHINE_AMIGA_COPPER_H
+#ifndef MAME_AMIGA_AGNUS_COPPER_H
+#define MAME_AMIGA_AGNUS_COPPER_H
 
 #pragma once
 
@@ -15,11 +15,11 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class amiga_copper_device : public device_t
+class agnus_copper_device : public device_t
 {
 public:
 	// construction/destruction
-	amiga_copper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	agnus_copper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// config
 	template<class T> void set_host_cpu_tag(T &&tag) { m_host_cpu.set_tag(std::forward<T>(tag)); }
@@ -33,7 +33,7 @@ public:
 
 	// getters/setters
 	void vblank_sync();
-	int execute_next(int xpos, int ypos, bool is_blitter_busy);
+	int execute_next(int xpos, int ypos, bool is_blitter_busy, int num_planes);
 
 protected:
 	// device-level overrides
@@ -63,40 +63,16 @@ private:
 
 	// internal state
 	bool m_state_waiting;
+	bool m_state_skipping;
 	bool m_state_waitblit;
 	u16 m_waitval;
 	u16 m_waitmask;
 	u16 m_pending_offset;
 	u16 m_pending_data;
-//  int m_wait_offset;
-
-	// waitstate delays for copper
-	// basically anything that doesn't belong to Angus has a penalty for Copper
-	static constexpr u16 delay[256] =
-	{
-		1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,1,1,1,1,0,0,0,0,0,0,0,0,    /* 0x000 - 0x03e */
-		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,                        /* 0x040 - 0x05e */
-		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,                        /* 0x060 - 0x07e */
-		0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,                        /* 0x080 - 0x09e */
-		1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,    /* 0x0a0 - 0x0de */
-		/* BPLxPTH/BPLxPTL */
-		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,                        /* 0x0e0 - 0x0fe */
-		/* BPLCON0-3,BPLMOD1-2 */
-		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,                        /* 0x100 - 0x11e */
-		/* SPRxPTH/SPRxPTL */
-		1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,                        /* 0x120 - 0x13e */
-		/* SPRxPOS/SPRxCTL/SPRxDATA/SPRxDATB */
-		1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,    /* 0x140 - 0x17e */
-		/* COLORxx */
-		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,    /* 0x180 - 0x1be */
-		/* RESERVED */
-		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 /* 0x1c0 - 0x1fe */
-	};
-
 };
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(AMIGA_COPPER, amiga_copper_device)
+DECLARE_DEVICE_TYPE(AGNUS_COPPER, agnus_copper_device)
 
-#endif // MAME_MACHINE_AMIGA_COPPER_H
+#endif // MAME_AMIGA_AGNUS_COPPER_H

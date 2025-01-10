@@ -275,7 +275,6 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
-	virtual void device_post_load() override;
 
 	void namcos22_textram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	u16 namcos22_tilemapattr_r(offs_t offset);

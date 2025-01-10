@@ -1190,7 +1190,7 @@ u32 cps3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 
 			if (ysize2 == 0)
 			{
-				//  logerror("invalid sprite ysize of 0 tiles\n");
+				//logerror("invalid sprite ysize of 0 tiles\n");
 				continue;
 			}
 
@@ -2341,7 +2341,7 @@ void cps3_state::copy_from_nvram()
 
 		data = ((m_simm[0][0]->read_raw(i/4)<<24) | (m_simm[0][1]->read_raw(i/4)<<16) | (m_simm[0][2]->read_raw(i/4)<<8) | (m_simm[0][3]->read_raw(i/4)<<0));
 
-	//  logerror("%08x %08x %08x %08x\n",romdata[i/4],data, romdata2[i/4], data ^ cps3_mask(i+0x6000000, m_key1, m_key2));
+		//logerror("%08x %08x %08x %08x\n",romdata[i/4],data, romdata2[i/4], data ^ cps3_mask(i+0x6000000, m_key1, m_key2));
 		romdata[i/4] = data;
 		romdata2[i/4] = data ^ cps3_mask(i+0x6000000, m_key1, m_key2);
 
@@ -2357,7 +2357,7 @@ void cps3_state::copy_from_nvram()
 
 			data = ((m_simm[1][0]->read_raw(i/4)<<24) | (m_simm[1][1]->read_raw(i/4)<<16) | (m_simm[1][2]->read_raw(i/4)<<8) | (m_simm[1][3]->read_raw(i/4)<<0));
 
-		//  logerror("%08x %08x %08x %08x\n",romdata[i/4],data, romdata2[i/4],  data ^ cps3_mask(i+0x6800000, m_key1, m_key2) );
+			//logerror("%08x %08x %08x %08x\n",romdata[i/4],data, romdata2[i/4],  data ^ cps3_mask(i+0x6800000, m_key1, m_key2) );
 			romdata[i/4] = data;
 			romdata2[i/4] = data ^ cps3_mask(i+0x6800000, m_key1, m_key2);
 		}
@@ -2371,7 +2371,7 @@ void cps3_state::copy_from_nvram()
 		romdata = (u32*)m_user5;
 		for (u32 thebase = 0; thebase < len/2; thebase += 0x200000)
 		{
-		//  logerror("flashnums %d. %d\n",flashnum, flashnum+1);
+			//logerror("flashnums %d. %d\n",flashnum, flashnum+1);
 
 			fujitsu_29f016a_device *flash0 = m_simm[2 + flashnum/8][flashnum % 8 + 0];
 			fujitsu_29f016a_device *flash1 = m_simm[2 + flashnum/8][flashnum % 8 + 1];

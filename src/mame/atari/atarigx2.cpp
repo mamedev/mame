@@ -56,14 +56,14 @@ void atarigx2_state::video_int_ack_w(uint32_t data)
 
 uint32_t atarigx2_state::special_port2_r()
 {
-	int temp = ioport("SERVICE")->read();
+	int const temp = m_io_service->read();
 	return (temp << 16) | temp;
 }
 
 
 uint32_t atarigx2_state::special_port3_r()
 {
-	int temp = ioport("SPECIAL")->read();
+	int const temp = m_io_special->read();
 	return (temp << 16) | temp;
 }
 
@@ -71,7 +71,7 @@ uint32_t atarigx2_state::special_port3_r()
 
 uint8_t atarigx2_state::a2d_data_r(offs_t offset)
 {
-	uint8_t result = m_adc->data_r();
+	uint8_t const result = m_adc->data_r();
 	if (!machine().side_effects_disabled())
 		m_adc->address_offset_start_w(offset, 0);
 	return result;
@@ -102,7 +102,7 @@ void atarigx2_state::latch_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 	/* lower byte */
 	if (ACCESSING_BITS_16_23)
-		m_jsa->soundcpu().set_input_line(INPUT_LINE_RESET, (data & 0x100000) ? CLEAR_LINE : ASSERT_LINE);
+		m_jsa->soundcpu().set_input_line(INPUT_LINE_RESET, BIT(data, 20) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -110,7 +110,7 @@ void atarigx2_state::mo_command_w(offs_t offset, uint32_t data, uint32_t mem_mas
 {
 	COMBINE_DATA(m_mo_command);
 	if (ACCESSING_BITS_0_15)
-		m_rle->command_write(((data & 0xffff) == 2) ? ATARIRLE_COMMAND_CHECKSUM : ATARIRLE_COMMAND_DRAW);
+		m_rle->command_write(((data & 0xffff) == 2) ? atari_rle_objects_device::COMMAND_CHECKSUM : atari_rle_objects_device::COMMAND_DRAW);
 }
 
 
@@ -126,7 +126,7 @@ void atarigx2_state::mo_command_w(offs_t offset, uint32_t data, uint32_t mem_mas
 void atarigx2_state::atarigx2_protection_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	{
-		int pc = m_maincpu->pcbase();
+		int const pc = m_maincpu->pcbase();
 //      if (pc == 0x11cbe || pc == 0x11c30)
 //          logerror("%06X:Protection W@%04X = %04X  (result to %06X)\n", pc, offset, data, m_maincpu->state_int(M68K_A2));
 //      else
@@ -1137,7 +1137,7 @@ uint32_t atarigx2_state::atarigx2_protection_r(offs_t offset, uint32_t mem_mask)
 		result |= 0x80000000;
 	if (offset == 0x3f0)
 	{
-		uint32_t tag = (m_last_write_offset << 17) | m_last_write;
+		uint32_t const tag = (m_last_write_offset << 17) | m_last_write;
 		int i = 0;
 
 		while (lookup_table[i][0] != 0xffffffff)
@@ -1156,14 +1156,18 @@ uint32_t atarigx2_state::atarigx2_protection_r(offs_t offset, uint32_t mem_mask)
 				result = machine().rand() << 16;
 			else
 				result = 0xffff << 16;
-			logerror("%06X:Unhandled protection R@%04X = %04X\n", m_maincpu->pcbase(), offset, result);
+			if (!machine().side_effects_disabled())
+				logerror("%06X:Unhandled protection R@%04X = %04X\n", m_maincpu->pcbase(), offset, result);
 		}
 	}
 
-	if (ACCESSING_BITS_16_31)
-		logerror("%06X:Protection R@%04X = %04X\n", m_maincpu->pcbase(), offset * 4, result >> 16);
-	else
-		logerror("%06X:Protection R@%04X = %04X\n", m_maincpu->pcbase(), offset * 4 + 2, result);
+	if (!machine().side_effects_disabled())
+	{
+		if (ACCESSING_BITS_16_31)
+			logerror("%06X:Protection R@%04X = %04X\n", m_maincpu->pcbase(), offset * 4, result >> 16);
+		else
+			logerror("%06X:Protection R@%04X = %04X\n", m_maincpu->pcbase(), offset * 4 + 2, result);
+	}
 	return result;
 }
 
@@ -1194,7 +1198,7 @@ void atarigx2_state::main_map(address_map &map)
 	map(0xd77000, 0xd77fff).ram();
 	map(0xd78000, 0xd78fff).ram().share("rle");
 	map(0xd79000, 0xd7a1ff).ram();
-	map(0xd7a200, 0xd7a203).ram().w(FUNC(atarigx2_state::mo_command_w)).share("mo_command");
+	map(0xd7a200, 0xd7a203).ram().w(FUNC(atarigx2_state::mo_command_w)).share(m_mo_command);
 	map(0xd7a204, 0xd7ffff).ram();
 	map(0xd80000, 0xd9ffff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write32));
 	map(0xe06000, 0xe06000).w(m_jsa, FUNC(atari_jsa_iiis_device::main_command_w));
@@ -1423,21 +1427,10 @@ static const gfx_layout pftoplayout =
 	16*8
 };
 
-static const gfx_layout anlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 0, 4, 8, 12, 16, 20, 24, 28 },
-	{ 0*8, 4*8, 8*8, 12*8, 16*8, 20*8, 24*8, 28*8 },
-	32*8
-};
-
 static GFXDECODE_START( gfx_atarigx2 )
-	GFXDECODE_ENTRY( "gfx1", 0, pflayout, 0x000, 64 )
-	GFXDECODE_ENTRY( "gfx2", 0, anlayout, 0x000, 16 )
-	GFXDECODE_ENTRY( "gfx1", 0, pftoplayout, 0x000, 64 )
+	GFXDECODE_ENTRY( "tiles", 0, pflayout,             0x000, 64 )
+	GFXDECODE_ENTRY( "chars", 0, gfx_8x8x4_packed_msb, 0x000, 16 )
+	GFXDECODE_ENTRY( "tiles", 0, pftoplayout,          0x000, 64 )
 GFXDECODE_END
 
 static const atari_rle_objects_config modesc_0x200 =
@@ -1516,7 +1509,7 @@ void atarigx2_state::atarigx2(machine_config &config)
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a pair of GALs to determine H and V parameters */
 	m_screen->set_raw(14.318181_MHz_XTAL/2, 456, 0, 336, 262, 0, 240);
-	m_screen->set_screen_update(FUNC(atarigx2_state::screen_update_atarigx2));
+	m_screen->set_screen_update(FUNC(atarigx2_state::screen_update));
 	m_screen->set_palette("palette");
 	m_screen->screen_vblank().set_inputline(m_maincpu, M68K_IRQ_4, ASSERT_LINE);
 
@@ -1563,12 +1556,12 @@ ROM_START( spclords )
 	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "136095.80a", 0x00000, 0x10000, CRC(33bc0ede) SHA1(2ee30d9125057cdfbdb83e4dbf28306c35a9c233) )
 
-	ROM_REGION( 0x60000, "gfx1", 0 )
+	ROM_REGION( 0x60000, "tiles", 0 )
 	ROM_LOAD( "136095.30a", 0x00000, 0x20000, CRC(27e0cfec) SHA1(03df57757d091f9a0b8c8d98d091dd759f570788) ) /* playfield, planes 0-1 */
 	ROM_LOAD( "136095.31a", 0x20000, 0x20000, CRC(5529cdc7) SHA1(8aff8a42fb2a86b7e4666940da4c1ee19dab6281) ) /* playfield, planes 2-3 */
 	ROM_FILL(               0x40000, 0x20000, 0x00 )          /* playfield, planes 4-5 */
 
-	ROM_REGION( 0x020000, "gfx2", 0 )
+	ROM_REGION( 0x020000, "chars", 0 )
 	ROM_LOAD( "136095.25a", 0x000000, 0x20000, CRC(1669496e) SHA1(005deaafd6156505e3a27966123e58928837ad9f) ) /* alphanumerics */
 
 	ROM_REGION16_BE( 0x600000, "rle", 0 )
@@ -1608,12 +1601,12 @@ ROM_START( spclordsb )
 	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "136095.80a", 0x00000, 0x10000, CRC(33bc0ede) SHA1(2ee30d9125057cdfbdb83e4dbf28306c35a9c233) )
 
-	ROM_REGION( 0x60000, "gfx1", 0 )
+	ROM_REGION( 0x60000, "tiles", 0 )
 	ROM_LOAD( "136095.30a", 0x00000, 0x20000, CRC(27e0cfec) SHA1(03df57757d091f9a0b8c8d98d091dd759f570788) ) /* playfield, planes 0-1 */
 	ROM_LOAD( "136095.31a", 0x20000, 0x20000, CRC(5529cdc7) SHA1(8aff8a42fb2a86b7e4666940da4c1ee19dab6281) ) /* playfield, planes 2-3 */
 	ROM_FILL(               0x40000, 0x20000, 0x00 )          /* playfield, planes 4-5 */
 
-	ROM_REGION( 0x020000, "gfx2", 0 )
+	ROM_REGION( 0x020000, "chars", 0 )
 	ROM_LOAD( "136095.25a", 0x000000, 0x20000, CRC(1669496e) SHA1(005deaafd6156505e3a27966123e58928837ad9f) ) /* alphanumerics */
 
 	ROM_REGION16_BE( 0x600000, "rle", 0 )
@@ -1653,12 +1646,12 @@ ROM_START( spclordsg )
 	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "136095.80a", 0x00000, 0x10000, CRC(33bc0ede) SHA1(2ee30d9125057cdfbdb83e4dbf28306c35a9c233) )
 
-	ROM_REGION( 0x60000, "gfx1", 0 )
+	ROM_REGION( 0x60000, "tiles", 0 )
 	ROM_LOAD( "136095.30a", 0x00000, 0x20000, CRC(27e0cfec) SHA1(03df57757d091f9a0b8c8d98d091dd759f570788) ) /* playfield, planes 0-1 */
 	ROM_LOAD( "136095.31a", 0x20000, 0x20000, CRC(5529cdc7) SHA1(8aff8a42fb2a86b7e4666940da4c1ee19dab6281) ) /* playfield, planes 2-3 */
 	ROM_FILL(               0x40000, 0x20000, 0x00 )          /* playfield, planes 4-5 */
 
-	ROM_REGION( 0x020000, "gfx2", 0 )
+	ROM_REGION( 0x020000, "chars", 0 )
 	ROM_LOAD( "136095.25a", 0x000000, 0x20000, CRC(1669496e) SHA1(005deaafd6156505e3a27966123e58928837ad9f) ) /* alphanumerics */
 
 	ROM_REGION16_BE( 0x600000, "rle", 0 )
@@ -1698,12 +1691,12 @@ ROM_START( spclordsa )
 	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "136095.80a", 0x00000, 0x10000, CRC(33bc0ede) SHA1(2ee30d9125057cdfbdb83e4dbf28306c35a9c233) )
 
-	ROM_REGION( 0x60000, "gfx1", 0 )
+	ROM_REGION( 0x60000, "tiles", 0 )
 	ROM_LOAD( "136095.30a", 0x00000, 0x20000, CRC(27e0cfec) SHA1(03df57757d091f9a0b8c8d98d091dd759f570788) ) /* playfield, planes 0-1 */
 	ROM_LOAD( "136095.31a", 0x20000, 0x20000, CRC(5529cdc7) SHA1(8aff8a42fb2a86b7e4666940da4c1ee19dab6281) ) /* playfield, planes 2-3 */
 	ROM_FILL(               0x40000, 0x20000, 0x00 )          /* playfield, planes 4-5 */
 
-	ROM_REGION( 0x020000, "gfx2", 0 )
+	ROM_REGION( 0x020000, "chars", 0 )
 	ROM_LOAD( "136095.25a", 0x000000, 0x20000, CRC(1669496e) SHA1(005deaafd6156505e3a27966123e58928837ad9f) ) /* alphanumerics */
 
 	ROM_REGION16_BE( 0x600000, "rle", 0 )
@@ -1743,12 +1736,12 @@ ROM_START( motofren )
 	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "136094-0080a.12c", 0x00000, 0x10000, CRC(0b1e565c) SHA1(03bdeafd8cf680f76bbd1f9aba6efac27f19a93c) )
 
-	ROM_REGION( 0x180000, "gfx1", 0 )
+	ROM_REGION( 0x180000, "tiles", 0 )
 	ROM_LOAD( "136094-0036a.2d", 0x000000, 0x80000, CRC(1b63b493) SHA1(980141fec011fa2b5cb020eeecb4784d31679dba) ) /* playfield, planes 0-1 */
 	ROM_LOAD( "136094-0037a.5d", 0x080000, 0x80000, CRC(6d290056) SHA1(fa32dbe5ac5e735d700d086353461eaa2c1dee55) ) /* playfield, planes 2-3 */
 	ROM_LOAD( "136094-0038a.8d", 0x100000, 0x80000, CRC(38197c88) SHA1(dc5d4d878759503b8500e8e3a032f499bfeedcb1) ) /* playfield, planes 4-5 */
 
-	ROM_REGION( 0x020000, "gfx2", 0 )
+	ROM_REGION( 0x020000, "chars", 0 )
 	ROM_LOAD( "136094-0025a.13n", 0x000000, 0x20000, CRC(6ab762ad) SHA1(c52dd207ff5adaffa458e020e7d452a1d1e65194) ) /* alphanumerics */
 
 	ROM_REGION16_BE( 0x700000, "rle", 0 )
@@ -1790,12 +1783,12 @@ ROM_START( motofrenmd )
 	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "136094-0080b.12c", 0x00000, 0x10000, CRC(5e542608) SHA1(8a10b5fac6ac120c7aae2edaa12413c9b8345d87) )
 
-	ROM_REGION( 0x180000, "gfx1", 0 ) /* Although verified, the manual states the label codes as 136094-0030 through 136094-0032 */
+	ROM_REGION( 0x180000, "tiles", 0 ) /* Although verified, the manual states the label codes as 136094-0030 through 136094-0032 */
 	ROM_LOAD( "136094-0036a.2d", 0x000000, 0x80000, CRC(1b63b493) SHA1(980141fec011fa2b5cb020eeecb4784d31679dba) ) /* playfield, planes 0-1 */
 	ROM_LOAD( "136094-0037a.5d", 0x080000, 0x80000, CRC(6d290056) SHA1(fa32dbe5ac5e735d700d086353461eaa2c1dee55) ) /* playfield, planes 2-3 */
 	ROM_LOAD( "136094-0038a.8d", 0x100000, 0x80000, CRC(38197c88) SHA1(dc5d4d878759503b8500e8e3a032f499bfeedcb1) ) /* playfield, planes 4-5 */
 
-	ROM_REGION( 0x020000, "gfx2", 0 )
+	ROM_REGION( 0x020000, "chars", 0 )
 	ROM_LOAD( "136094-0025a.13n", 0x000000, 0x20000, CRC(6ab762ad) SHA1(c52dd207ff5adaffa458e020e7d452a1d1e65194) ) /* alphanumerics */
 
 	ROM_REGION16_BE( 0x700000, "rle", 0 )
@@ -1841,12 +1834,12 @@ ROM_START( motofrei )
 	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "136094-0080a.12c", 0x00000, 0x10000, CRC(0b1e565c) SHA1(03bdeafd8cf680f76bbd1f9aba6efac27f19a93c) )
 
-	ROM_REGION( 0x180000, "gfx1", 0 )
+	ROM_REGION( 0x180000, "tiles", 0 )
 	ROM_LOAD( "136094-0036a.2d", 0x000000, 0x80000, CRC(1b63b493) SHA1(980141fec011fa2b5cb020eeecb4784d31679dba) ) /* playfield, planes 0-1 */
 	ROM_LOAD( "136094-0037a.5d", 0x080000, 0x80000, CRC(6d290056) SHA1(fa32dbe5ac5e735d700d086353461eaa2c1dee55) ) /* playfield, planes 2-3 */
 	ROM_LOAD( "136094-0038a.8d", 0x100000, 0x80000, CRC(38197c88) SHA1(dc5d4d878759503b8500e8e3a032f499bfeedcb1) ) /* playfield, planes 4-5 */
 
-	ROM_REGION( 0x020000, "gfx2", 0 )
+	ROM_REGION( 0x020000, "chars", 0 )
 	ROM_LOAD( "136094-0025a.13n", 0x000000, 0x20000, CRC(6ab762ad) SHA1(c52dd207ff5adaffa458e020e7d452a1d1e65194) ) /* alphanumerics */
 
 	ROM_REGION16_BE( 0x700000, "rle", 0 )
@@ -1889,12 +1882,12 @@ ROM_START( motofreg )
 	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "136094-0080a.12c", 0x00000, 0x10000, CRC(0b1e565c) SHA1(03bdeafd8cf680f76bbd1f9aba6efac27f19a93c) )
 
-	ROM_REGION( 0x180000, "gfx1", 0 )
+	ROM_REGION( 0x180000, "tiles", 0 )
 	ROM_LOAD( "136094-0036a.2d", 0x000000, 0x80000, CRC(1b63b493) SHA1(980141fec011fa2b5cb020eeecb4784d31679dba) ) /* playfield, planes 0-1 */
 	ROM_LOAD( "136094-0037a.5d", 0x080000, 0x80000, CRC(6d290056) SHA1(fa32dbe5ac5e735d700d086353461eaa2c1dee55) ) /* playfield, planes 2-3 */
 	ROM_LOAD( "136094-0038a.8d", 0x100000, 0x80000, CRC(38197c88) SHA1(dc5d4d878759503b8500e8e3a032f499bfeedcb1) ) /* playfield, planes 4-5 */
 
-	ROM_REGION( 0x020000, "gfx2", 0 )
+	ROM_REGION( 0x020000, "chars", 0 )
 	ROM_LOAD( "136094-0025a.13n", 0x000000, 0x20000, CRC(6ab762ad) SHA1(c52dd207ff5adaffa458e020e7d452a1d1e65194) ) /* alphanumerics */
 
 	ROM_REGION16_BE( 0x700000, "rle", 0 )
@@ -1937,12 +1930,12 @@ ROM_START( motofmdg )
 	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "136094-0080a.12c", 0x00000, 0x10000, CRC(0b1e565c) SHA1(03bdeafd8cf680f76bbd1f9aba6efac27f19a93c) )
 
-	ROM_REGION( 0x180000, "gfx1", 0 )
+	ROM_REGION( 0x180000, "tiles", 0 )
 	ROM_LOAD( "136094-0036a.2d", 0x000000, 0x80000, CRC(1b63b493) SHA1(980141fec011fa2b5cb020eeecb4784d31679dba) ) /* playfield, planes 0-1 */
 	ROM_LOAD( "136094-0037a.5d", 0x080000, 0x80000, CRC(6d290056) SHA1(fa32dbe5ac5e735d700d086353461eaa2c1dee55) ) /* playfield, planes 2-3 */
 	ROM_LOAD( "136094-0038a.8d", 0x100000, 0x80000, CRC(38197c88) SHA1(dc5d4d878759503b8500e8e3a032f499bfeedcb1) ) /* playfield, planes 4-5 */
 
-	ROM_REGION( 0x020000, "gfx2", 0 )
+	ROM_REGION( 0x020000, "chars", 0 )
 	ROM_LOAD( "136094-0025a.13n", 0x000000, 0x20000, CRC(6ab762ad) SHA1(c52dd207ff5adaffa458e020e7d452a1d1e65194) ) /* alphanumerics */
 
 	ROM_REGION16_BE( 0x700000, "rle", 0 )
@@ -1984,12 +1977,12 @@ ROM_START( motofrenft )
 	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "136094-0080a.12c", 0x00000, 0x10000, CRC(0b1e565c) SHA1(03bdeafd8cf680f76bbd1f9aba6efac27f19a93c) )
 
-	ROM_REGION( 0x180000, "gfx1", 0 )
+	ROM_REGION( 0x180000, "tiles", 0 )
 	ROM_LOAD( "136094-0036a.2d", 0x000000, 0x80000, CRC(1b63b493) SHA1(980141fec011fa2b5cb020eeecb4784d31679dba) ) /* playfield, planes 0-1 */
 	ROM_LOAD( "136094-0037a.5d", 0x080000, 0x80000, CRC(6d290056) SHA1(fa32dbe5ac5e735d700d086353461eaa2c1dee55) ) /* playfield, planes 2-3 */
 	ROM_LOAD( "136094-0038a.8d", 0x100000, 0x80000, CRC(38197c88) SHA1(dc5d4d878759503b8500e8e3a032f499bfeedcb1) ) /* playfield, planes 4-5 */
 
-	ROM_REGION( 0x020000, "gfx2", 0 )
+	ROM_REGION( 0x020000, "chars", 0 )
 	ROM_LOAD( "136094-0025a.13n", 0x000000, 0x20000, CRC(6ab762ad) SHA1(c52dd207ff5adaffa458e020e7d452a1d1e65194) ) /* alphanumerics */
 
 	ROM_REGION16_BE( 0x700000, "rle", 0 )
@@ -2031,12 +2024,12 @@ ROM_START( motofrenmf )
 	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "136094-0080a.12c", 0x00000, 0x10000, CRC(0b1e565c) SHA1(03bdeafd8cf680f76bbd1f9aba6efac27f19a93c) )
 
-	ROM_REGION( 0x180000, "gfx1", 0 )
+	ROM_REGION( 0x180000, "tiles", 0 )
 	ROM_LOAD( "136094-0036a.2d", 0x000000, 0x80000, CRC(1b63b493) SHA1(980141fec011fa2b5cb020eeecb4784d31679dba) ) /* playfield, planes 0-1 */
 	ROM_LOAD( "136094-0037a.5d", 0x080000, 0x80000, CRC(6d290056) SHA1(fa32dbe5ac5e735d700d086353461eaa2c1dee55) ) /* playfield, planes 2-3 */
 	ROM_LOAD( "136094-0038a.8d", 0x100000, 0x80000, CRC(38197c88) SHA1(dc5d4d878759503b8500e8e3a032f499bfeedcb1) ) /* playfield, planes 4-5 */
 
-	ROM_REGION( 0x020000, "gfx2", 0 )
+	ROM_REGION( 0x020000, "chars", 0 )
 	ROM_LOAD( "136094-0025a.13n", 0x000000, 0x20000, CRC(6ab762ad) SHA1(c52dd207ff5adaffa458e020e7d452a1d1e65194) ) /* alphanumerics */
 
 	ROM_REGION16_BE( 0x700000, "rle", 0 )
@@ -2075,12 +2068,12 @@ ROM_START( rrreveng )
 	ROM_LOAD32_BYTE( "revenge.37e", 0x00002, 0x20000, CRC(b5e2a3e2) SHA1(b6ad6d03120ad6699af31d09474b82979ead65bb) )
 	ROM_LOAD32_BYTE( "revenge.37j", 0x00003, 0x20000, CRC(6c7f114b) SHA1(2b9a627ec0a211da8080ea33a5486367b043952a) )
 
-	ROM_REGION( 0x180000, "gfx1", 0 )
+	ROM_REGION( 0x180000, "tiles", 0 )
 	ROM_LOAD( "rralpl.2d", 0x000000, 0x80000, CRC(00488dad) SHA1(604f08a219db0438dcbf21337ebd497f353bd812) ) /* playfield, planes 0-1 */
 	ROM_LOAD( "rralpm.5d", 0x080000, 0x80000, CRC(ade27447) SHA1(641fdca97a4b08251e111425d8467e4640433df7) ) /* playfield, planes 2-3 */
 	ROM_LOAD( "rralph.8d", 0x100000, 0x80000, CRC(ef04f04e) SHA1(e518133096978c4a0152253231625c385a84530f) ) /* playfield, planes 4-5 */
 
-	ROM_REGION( 0x020000, "gfx2", 0 )
+	ROM_REGION( 0x020000, "chars", 0 )
 	ROM_LOAD( "alpha.13n", 0x000000, 0x20000, CRC(f2efbd66) SHA1(d5339f0b3de7a102d659f7459b5f4800cab31829) ) /* alphanumerics */
 
 	ROM_REGION16_BE( 0x500000, "rle", 0 )
@@ -2139,12 +2132,12 @@ ROM_START( rrrevenga ) /* Same program roms as the set below, but shares more ro
 	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "rr65snd.bin", 0x00000, 0x10000, CRC(d78429da) SHA1(a4d36d74986f08c793f15f2e67cb97a8c91c5e90) )
 
-	ROM_REGION( 0x180000, "gfx1", 0 )
+	ROM_REGION( 0x180000, "tiles", 0 )
 	ROM_LOAD( "rralpl.2d", 0x000000, 0x80000, CRC(00488dad) SHA1(604f08a219db0438dcbf21337ebd497f353bd812) ) /* playfield, planes 0-1 */
 	ROM_LOAD( "rralpm.5d", 0x080000, 0x80000, CRC(ade27447) SHA1(641fdca97a4b08251e111425d8467e4640433df7) ) /* playfield, planes 2-3 */
 	ROM_LOAD( "rralph.8d", 0x100000, 0x80000, CRC(ef04f04e) SHA1(e518133096978c4a0152253231625c385a84530f) ) /* playfield, planes 4-5 */
 
-	ROM_REGION( 0x020000, "gfx2", 0 )
+	ROM_REGION( 0x020000, "chars", 0 )
 	ROM_LOAD( "alpha.13n", 0x000000, 0x20000, CRC(f2efbd66) SHA1(d5339f0b3de7a102d659f7459b5f4800cab31829) ) /* alphanumerics */
 
 	ROM_REGION16_BE( 0x500000, "rle", 0 )
@@ -2198,12 +2191,12 @@ ROM_START( rrrevengb )
 	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "rr65snd.bin", 0x00000, 0x10000, CRC(d78429da) SHA1(a4d36d74986f08c793f15f2e67cb97a8c91c5e90) )
 
-	ROM_REGION( 0x180000, "gfx1", 0 )
+	ROM_REGION( 0x180000, "tiles", 0 )
 	ROM_LOAD( "rralpl.2d", 0x000000, 0x80000, CRC(00488dad) SHA1(604f08a219db0438dcbf21337ebd497f353bd812) ) /* playfield, planes 0-1 */
 	ROM_LOAD( "rralpm.5d", 0x080000, 0x80000, CRC(ade27447) SHA1(641fdca97a4b08251e111425d8467e4640433df7) ) /* playfield, planes 2-3 */
 	ROM_LOAD( "rralph.8d", 0x100000, 0x80000, CRC(ef04f04e) SHA1(e518133096978c4a0152253231625c385a84530f) ) /* playfield, planes 4-5 */
 
-	ROM_REGION( 0x020000, "gfx2", 0 )
+	ROM_REGION( 0x020000, "chars", 0 )
 	ROM_LOAD( "rralalph.13n", 0x000000, 0x20000, CRC(7ca93790) SHA1(5e2f069be4b15d63f418c8693e8550eb0ae22381) ) /* alphanumerics */
 
 	ROM_REGION16_BE( 0x500000, "rle", 0 )

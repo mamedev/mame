@@ -2,12 +2,7 @@
 // copyright-holders: Aaron Giles, Dirk Best
 /***************************************************************************
 
-    Commodore 8364 "Paula"
-
-    Multi-purpose chip that is part of the Amiga chipset. The name "Paula"
-    is derived from "Ports, Audio, UART and Logic". It features 4-channel
-    DMA driven audio, the floppy controller, a serial receiver/transmitter,
-    analog inputs and contains the interrupt controller.
+    MOS Technology/Commodore 8364 "Paula"
 
                 ____ ____
         D8   1 |*   u    | 48  D9
@@ -37,8 +32,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_8364_PAULA_H
-#define MAME_MACHINE_8364_PAULA_H
+#ifndef MAME_AMIGA_PAULA_H
+#define MAME_AMIGA_PAULA_H
 
 #pragma once
 
@@ -47,12 +42,12 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> paula_8364_device
+// ======================> paula_device
 
-class paula_8364_device : public device_t, public device_sound_interface
+class paula_device : public device_t, public device_sound_interface
 {
 public:
-	paula_8364_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	paula_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
 	auto mem_read_cb() { return m_chipmem_r.bind(); }
@@ -120,6 +115,6 @@ private:
 };
 
 // device type definition
-DECLARE_DEVICE_TYPE(PAULA_8364, paula_8364_device)
+DECLARE_DEVICE_TYPE(PAULA_8364, paula_device)
 
-#endif // MAME_DEVICES_MACHINE_8364_PAULA_H
+#endif // MAME_AMIGA_PAULA_H

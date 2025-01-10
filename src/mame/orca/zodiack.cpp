@@ -26,7 +26,7 @@ Notes:
 
 TODO:
 - improve video emulation (especially moguchan colors)
-- where do the sound related irqs come from exactly?
+- where do the sound NMIs come from exactly?
 - can eventually be merged with orca/espial.cpp
 
 ============================================================================
@@ -117,11 +117,12 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_soundlatch(*this, "soundlatch%u", 0)
+		m_screen(*this, "screen"),
+		m_soundlatch(*this, "soundlatch%u", 0),
+		m_aysnd(*this, "aysnd")
 	{ }
 
 	void zodiack(machine_config &config);
-	void dogfight(machine_config &config);
 	void percuss(machine_config &config);
 
 protected:
@@ -133,24 +134,62 @@ private:
 	void irq_mask_w(uint8_t data);
 	void sound_nmi_enable_w(uint8_t data);
 	void control_w(uint8_t data);
+	void porta_w(offs_t offset, uint8_t data, uint8_t mem_mask);
 
 	// devices
 	required_device<z80_device> m_maincpu;
 	required_device<z80_device> m_audiocpu;
+	required_device<screen_device> m_screen;
 	required_device_array<generic_latch_8_device, 2> m_soundlatch;
+	required_device<ay8910_device> m_aysnd;
 
 	// state
 	uint8_t m_main_nmi_enabled = 0;
 	uint8_t m_main_irq_enabled = 0;
 	uint8_t m_sound_nmi_enabled = 0;
+	uint8_t m_sound_nmi_freq = 0;
+	emu_timer *m_sound_nmi_timer;
 
-	INTERRUPT_GEN_MEMBER(sound_nmi_gen);
+	TIMER_CALLBACK_MEMBER(sound_nmi_gen);
 	void vblank(int state);
 
 	void io_map(address_map &map) ATTR_COLD;
 	void main_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
 };
+
+
+
+/*************************************
+ *
+ *  Machine initialization
+ *
+ *************************************/
+
+void zodiack_state::machine_start()
+{
+	save_item(NAME(m_main_nmi_enabled));
+	save_item(NAME(m_main_irq_enabled));
+	save_item(NAME(m_sound_nmi_enabled));
+	save_item(NAME(m_sound_nmi_freq));
+
+	m_sound_nmi_timer = timer_alloc(FUNC(zodiack_state::sound_nmi_gen), this);
+}
+
+void zodiack_state::machine_reset()
+{
+	m_main_nmi_enabled = 0;
+	m_main_irq_enabled = 0;
+	m_sound_nmi_enabled = 0;
+}
+
+
+
+/*************************************
+ *
+ *  Memory handlers
+ *
+ *************************************/
 
 void zodiack_state::nmi_mask_w(uint8_t data)
 {
@@ -176,7 +215,7 @@ void zodiack_state::vblank(int state)
 		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(zodiack_state::sound_nmi_gen)
+TIMER_CALLBACK_MEMBER(zodiack_state::sound_nmi_gen)
 {
 	if (m_sound_nmi_enabled)
 		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
@@ -190,6 +229,46 @@ void zodiack_state::control_w(uint8_t data)
 	// Bit 2 - ????
 }
 
+void zodiack_state::porta_w(offs_t offset, uint8_t data, uint8_t mem_mask)
+{
+	if (mem_mask && data != m_sound_nmi_freq)
+	{
+		// sound NMI frequency
+		m_sound_nmi_freq = data;
+		attotime period;
+
+		// dogfight writes 0xc0 and expects 4 NMIs per frame
+		// others write 0xe0 and expect 8 NMIs per frame
+		switch (data)
+		{
+			case 0:
+				period = attotime::never;
+				break;
+
+			case 0xc0:
+				period = m_screen->frame_period() / 4;
+				break;
+
+			case 0xe0:
+				period = m_screen->frame_period() / 8;
+				break;
+
+			default:
+				logerror("%s: unknown sound NMI frequency %02X", machine().describe_context(), data);
+				return;
+		}
+
+		m_sound_nmi_timer->adjust(period, 0, period);
+	}
+}
+
+
+
+/*************************************
+ *
+ *  Address maps
+ *
+ *************************************/
 
 void zodiack_state::main_map(address_map &map)
 {
@@ -224,10 +303,16 @@ void zodiack_state::sound_map(address_map &map)
 void zodiack_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0x00, 0x01).w(m_aysnd, FUNC(ay8910_device::address_data_w));
 }
 
 
+
+/*************************************
+ *
+ *  Input ports
+ *
+ *************************************/
 
 static INPUT_PORTS_START( zodiack )
 	PORT_START("DSW0") // never read in this game
@@ -540,39 +625,30 @@ static INPUT_PORTS_START( bounty )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
 INPUT_PORTS_END
 
-void zodiack_state::machine_start()
-{
-	save_item(NAME(m_main_nmi_enabled));
-	save_item(NAME(m_main_irq_enabled));
-	save_item(NAME(m_sound_nmi_enabled));
-}
-
-void zodiack_state::machine_reset()
-{
-	m_main_nmi_enabled = 0;
-	m_main_irq_enabled = 0;
-	m_sound_nmi_enabled = 0;
-}
 
 
+/*************************************
+ *
+ *  Machine configs
+ *
+ *************************************/
 
 void zodiack_state::zodiack(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, XTAL(18'432'000) / 6);
+	Z80(config, m_maincpu, 18.432_MHz_XTAL / 6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &zodiack_state::main_map);
 
-	Z80(config, m_audiocpu, XTAL(18'432'000) / 6);
+	Z80(config, m_audiocpu, 18.432_MHz_XTAL / 6);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &zodiack_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &zodiack_state::io_map);
-	m_audiocpu->set_periodic_int(FUNC(zodiack_state::sound_nmi_gen), attotime::from_hz(8 * 60)); // sound tempo - unknown source, timing is guessed
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER).screen_vblank().set(FUNC(zodiack_state::vblank));
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER).screen_vblank().set(FUNC(zodiack_state::vblank));
 
 	orca_ovg_40c_device &videopcb(ORCA_OVG_40C(config, "videopcb", 0));
 	videopcb.set_screen("screen");
@@ -585,7 +661,8 @@ void zodiack_state::zodiack(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
-	AY8910(config, "aysnd", XTAL(18'432'000) / 12).add_route(ALL_OUTPUTS, "mono", 0.50);
+	AY8910(config, m_aysnd, 18.432_MHz_XTAL / 12).add_route(ALL_OUTPUTS, "mono", 0.50);
+	m_aysnd->port_a_write_callback().set(FUNC(zodiack_state::porta_w));
 }
 
 void zodiack_state::percuss(machine_config &config)
@@ -596,19 +673,13 @@ void zodiack_state::percuss(machine_config &config)
 	videopcb.set_percuss_hardware(true);
 }
 
-void zodiack_state::dogfight(machine_config &config)
-{
-	zodiack(config);
-
-	m_audiocpu->set_periodic_int(FUNC(zodiack_state::sound_nmi_gen), attotime::from_hz(4 * 60)); // 4 interrupts per frame
-}
 
 
-/***************************************************************************
-
-  Game driver(s)
-
-***************************************************************************/
+/*************************************
+ *
+ *  ROM definitions
+ *
+ *************************************/
 
 ROM_START( zodiack )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -735,9 +806,16 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1983, zodiack,  0,      zodiack,  zodiack,  zodiack_state, empty_init, ROT270, "Orca (Esco Trading Co., Inc. license)", "Zodiack",                 MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // bullet color needs to be verified
-GAME( 1983, dogfight, 0,      dogfight, dogfight, zodiack_state, empty_init, ROT270, "Orca / Thunderbolt",                    "Dog Fight (Thunderbolt)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, moguchan, 0,      percuss,  moguchan, zodiack_state, empty_init, ROT270, "Orca (Eastern Commerce Inc. license)",  "Mogu Chan (bootleg?)",    MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // license copyright taken from ROM string at $0b5c
-GAME( 1981, percuss,  0,      percuss,  percuss,  zodiack_state, empty_init, ROT270, "Orca",                                  "The Percussor",           MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bounty,   0,      percuss,  bounty,   zodiack_state, empty_init, ROT180, "Orca",                                  "The Bounty (set 1)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bounty2,  bounty, percuss,  bounty,   zodiack_state, empty_init, ROT180, "Orca",                                  "The Bounty (set 2)",      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // seems to use a different memory map
+
+/*************************************
+ *
+ *  Game driver(s)
+ *
+ *************************************/
+
+GAME( 1983, zodiack,  0,      zodiack, zodiack,  zodiack_state, empty_init, ROT270, "Orca (Esco Trading Co., Inc. license)", "Zodiack",                 MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // bullet color needs to be verified
+GAME( 1983, dogfight, 0,      zodiack, dogfight, zodiack_state, empty_init, ROT270, "Orca / Thunderbolt",                    "Dog Fight (Thunderbolt)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, moguchan, 0,      percuss, moguchan, zodiack_state, empty_init, ROT270, "Orca (Eastern Commerce Inc. license)",  "Mogu Chan (bootleg?)",    MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // license copyright taken from ROM string at $0b5c
+GAME( 1981, percuss,  0,      percuss, percuss,  zodiack_state, empty_init, ROT270, "Orca",                                  "The Percussor",           MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bounty,   0,      percuss, bounty,   zodiack_state, empty_init, ROT180, "Orca",                                  "The Bounty (set 1)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bounty2,  bounty, percuss, bounty,   zodiack_state, empty_init, ROT180, "Orca",                                  "The Bounty (set 2)",      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // seems to use a different memory map

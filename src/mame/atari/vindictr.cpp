@@ -135,7 +135,6 @@ const atari_motion_objects_config vindictr_state::s_mob_config =
 	0,                  // maximum number of links to visit/scanline (0=all)
 
 	0x100,              // base palette entry
-	0x100,              // maximum number of colors
 	0,                  // transparent pen index
 
 	{{ 0,0,0,0x03ff }}, // mask for the link
@@ -525,7 +524,7 @@ void vindictr_state::vindictr(machine_config &config)
 	PALETTE(config, m_palette).set_entries(2048*8);
 
 	TILEMAP(config, m_playfield_tilemap, m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64).set_info_callback(FUNC(vindictr_state::get_playfield_tile_info));
-	TILEMAP(config, m_alpha_tilemap, m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_ROWS, 64, 32, 0).set_info_callback(FUNC(vindictr_state::get_alpha_tile_info));
+	TILEMAP(config, m_alpha_tilemap, m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_ROWS, 64, 31, 0).set_info_callback(FUNC(vindictr_state::get_alpha_tile_info));
 
 	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, vindictr_state::s_mob_config);
 	m_mob->set_gfxdecode(m_gfxdecode);

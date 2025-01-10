@@ -20,9 +20,9 @@
 
 TILE_GET_INFO_MEMBER(badlands_state::get_playfield_tile_info)
 {
-	uint16_t data = m_playfield_tilemap->basemem_read(tile_index);
-	int code = (data & 0x1fff) + ((data & 0x1000) ? (m_playfield_tile_bank << 12) : 0);
-	int color = (data >> 13) & 0x07;
+	uint16_t const data = m_playfield_tilemap->basemem_read(tile_index);
+	int const code = (data & 0x1fff) + (BIT(data, 12) ? (m_playfield_tile_bank << 12) : 0);
+	int const color = (data >> 13) & 0x07;
 	tileinfo.set(0, code, color, 0);
 }
 
@@ -48,7 +48,6 @@ const atari_motion_objects_config badlands_state::s_mob_config =
 	0,                  /* maximum number of links to visit/scanline (0=all) */
 
 	0x80,               /* base palette entry */
-	0x80,               /* maximum number of colors */
 	0,                  /* transparent pen index */
 
 	{{ 0x003f }},         /* mask for the link */
@@ -85,10 +84,10 @@ void badlands_state::video_start()
 void badlands_state::badlands_pf_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
-		if (m_playfield_tile_bank != (data & 1))
+		if (m_playfield_tile_bank != BIT(data, 0))
 		{
 			m_screen->update_partial(m_screen->vpos());
-			m_playfield_tile_bank = data & 1;
+			m_playfield_tile_bank = BIT(data, 0);
 			m_playfield_tilemap->mark_all_dirty();
 		}
 }

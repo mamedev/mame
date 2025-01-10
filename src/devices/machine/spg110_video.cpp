@@ -38,17 +38,12 @@ void spg110_video_device::draw(const rectangle &cliprect, uint32_t line, uint32_
 
 	uint32_t nc = (bpp + 1) << 1;
 
-	switch (bpp)
-	{
-	case 0x03: pal = 0; break; // 8 bpp
-	case 0x02: pal &=0x03; break; // 6 bpp
-	case 0x01: break; // 4 bpp
-	case 0x00: break; // 2 bpp
-	}
-
 	uint32_t palette_offset = pal;
 
-	palette_offset <<= nc;
+	if (bpp == 3)
+		palette_offset = 0;
+
+	palette_offset <<= 4;
 
 	uint32_t bits_per_row = nc * w / 16;
 	uint32_t words_per_tile = bits_per_row * h;
@@ -81,7 +76,7 @@ void spg110_video_device::draw(const rectangle &cliprect, uint32_t line, uint32_
 		}
 		nbits -= nc;
 
-		uint32_t pal = palette_offset + (bits >> 16);
+		uint8_t pennum = (palette_offset + (bits >> 16));
 		bits &= 0xffff;
 
 		xx &= 0x01ff;
@@ -92,14 +87,14 @@ void spg110_video_device::draw(const rectangle &cliprect, uint32_t line, uint32_
 		{
 			int pix_index = xx + y_index;
 			const pen_t *pens = m_palette->pens();
-			uint32_t paldata = pens[pal];
+			uint32_t paldata = pens[pennum];
 
-			int transmap = m_palctrlram[(pal & 0xf0)>>4];
+			int transmap = m_palctrlram[(pennum & 0xf0)>>4];
 
 			bool trans = false;
 
 			if (transmap & 0x10) // maybe values other than 0x010 have other meanings, like blending?
-				if ((pal & 0x0f) == (transmap & 0xf))
+				if ((pennum & 0x0f) == (transmap & 0xf))
 					trans = true;
 
 			if (!trans)
@@ -129,11 +124,12 @@ void spg110_video_device::draw_page(const rectangle &cliprect, uint32_t scanline
 //  {
 //      return;
 //  }
-
-	uint8_t bpp = attr & 0x03;
-
-	uint32_t tile_h = 8 << ((attr & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
-	uint32_t tile_w = 8 << ((attr & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
+	uint8_t bpp = (attr & 0x0003);
+	// flip               0x000c
+	uint32_t tile_w = 8 << ((attr & 0x0030) >> PAGE_TILE_WIDTH_SHIFT);
+	uint32_t tile_h = 8 << ((attr & 0x00c0) >> PAGE_TILE_HEIGHT_SHIFT);
+	uint8_t pal = (attr & 0x0f00)>>8;
+	uint8_t pri = (attr & 0x3000)>>12;
 
 	uint32_t tile_count_x = 512 / tile_w;
 
@@ -151,9 +147,8 @@ void spg110_video_device::draw_page(const rectangle &cliprect, uint32_t scanline
 		if (!tile)
 			continue;
 
-		uint8_t pal = 0x000;
-		uint8_t pri = 0x00;
 		bool flip_x = false;
+		bool flip_y = false;
 
 		if (!(ctrl & 0x0002)) // 'regset'
 		{
@@ -167,15 +162,17 @@ void spg110_video_device::draw_page(const rectangle &cliprect, uint32_t scanline
 			pal = extra_attribute & 0x0f;
 			pri = (extra_attribute & 0x30) >> 4;
 			flip_x = extra_attribute & 0x40;
+			flip_y = extra_attribute & 0x80;
 		}
+
+		const uint32_t yflipmask = flip_y ? tile_h - 1 : 0;
 
 		if (pri == priority)
 		{
-
 			if (flip_x)
-				draw<FlipXOn>(cliprect, tile_scanline, xx, yy, ctrl, bitmap_addr, tile, 0, pal, tile_h, tile_w, bpp);
+				draw<FlipXOn>(cliprect, tile_scanline, xx, yy, ctrl, bitmap_addr, tile, yflipmask, pal, tile_h, tile_w, bpp);
 			else
-				draw<FlipXOff>(cliprect, tile_scanline, xx, yy, ctrl, bitmap_addr, tile, 0, pal, tile_h, tile_w, bpp);
+				draw<FlipXOff>(cliprect, tile_scanline, xx, yy, ctrl, bitmap_addr, tile, yflipmask, pal, tile_h, tile_w, bpp);
 		}
 
 	}
@@ -184,7 +181,6 @@ void spg110_video_device::draw_page(const rectangle &cliprect, uint32_t scanline
 
 void spg110_video_device::draw_sprite(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t base_addr)
 {
-
 	// m_sprtileno  tttt tttt tttt tttt    t =  tile number (all bits?)
 	// m_sprattr1   xxxx xxxx yyyy yyyy    x = low x bits, y = low y bits
 	// m_sprattr2   YXzz pppp hhww fFbb    X = high x bit, z = priority, p = palette, h = height, w = width, f = flipy,  F = flipx, b = bpp, Y = high y bit
@@ -196,7 +192,7 @@ void spg110_video_device::draw_sprite(const rectangle &cliprect, uint32_t scanli
 		return;
 	}
 
-	uint32_t bitmap_addr = 0x40 * m_tilebase;
+	uint32_t bitmap_addr = 0x40 * m_tilebase[0];
 	uint16_t attr1 = m_sprattr1[base_addr];
 	uint16_t attr2 = m_sprattr2[base_addr];
 
@@ -212,8 +208,8 @@ void spg110_video_device::draw_sprite(const rectangle &cliprect, uint32_t scanli
 	if (!(attr2 & 0x8000))
 		y+= 0x100;
 
-	const uint32_t h = 8 << ((attr2 & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
-	const uint32_t w = 8 << ((attr2 & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
+	const uint32_t h = 8 << ((attr2 & 0x00c0) >> PAGE_TILE_HEIGHT_SHIFT);
+	const uint32_t w = 8 << ((attr2 & 0x0030) >> PAGE_TILE_WIDTH_SHIFT);
 
 //  if (!(m_video_regs[0x42] & SPRITE_COORD_TL_MASK))
 //  {
@@ -243,7 +239,7 @@ void spg110_video_device::draw_sprite(const rectangle &cliprect, uint32_t scanli
 	//bool blend = (attr & 0x4000);
 	const uint8_t bpp = attr2 & 0x0003;
 	const uint32_t yflipmask = flip_y ? h - 1 : 0;
-	const uint32_t palette_offset = (attr2 & 0x0f00) >> 8;
+	uint32_t palette_offset = (attr2 & 0x0f00) >> 8;
 
 	if (pri == priority)
 	{
@@ -341,87 +337,213 @@ device_memory_interface::space_config_vector spg110_video_device::memory_space_c
 }
 
 
-// irq source or similar?
+/* 0x2063 P_DMA_control 
+despite the name this address is more IRQ control than DMA, although there are some DMA flags in here
+
+bit15     bit14     bit13     bit12     bit11     bit10     bit9    bit8    bit7    bit6      bit5          bit4        bit3          bit2        bit1          bit0
+(unused)  (unused)  (unused)  (unused)  DMA_Busy  wrtS      readS   testmd  extsrc  (unused)  VDO_IRQ_Flag  VDO_IRQ_EN  BLK_IRQ_Flag  BLK_IRQ_EN  DMA_IRQ_Flag  DMA_IRQ_EN
+
+DMA_Busy - 0 = free, 1 = busy
+wrtS - used when writing 0x2065
+readS - used when reading 0x2065
+testmd - memory dump mode, causes data from dma_dst to be read in 0x2065?
+extsrc - 0 = work RAM, 1 = External Memory
+VDO_IRQ_Flag (aka TMc or VDO_IRQ) - Positional IRQ Status / Clear IRQ on write
+VDO_IRQ_EN (aka Tme) - Positional IRQ Enable
+BLK_IRQ_Flag - VBlank IRQ Status / Clear IRQ on write
+BLK_IRQ_EN - VBlank IRQ Enable
+DMA_IRQ_Flag - DMA IRQ Status / Clear IRQ on write (can also be cleared by starting a new DMA)
+DMA_IRQ_EN - DMA IRQ Enable
+
+NOTE: if an IRQ flag is active when the IRQ Enable is turned on the IRQ will be taken
+      writing 0 to IRQ enable does not clear IRQ flag
+
+by default:
+BLK IRQ is asserted during the Vblank period, and deasserted when it ends
+DMA IRQ is asserted at the end of a DMA, and deasserted when a new one starts
+VDO IRQ is asserted when screen position in 2036 / 2037 is hit (has to be manually deasserted?)
+
+*/
+
 uint16_t spg110_video_device::spg110_2063_r()
 {
-	// checks for bits 0x20 and 0x08 in the IRQ function (all IRQs point to the same place)
+	// TODO these need to be handled properly
+	uint8_t readS = 1;
+	uint8_t wrtS = 1;
+	uint8_t testmd = 0;
+	uint8_t extsrc = 0;
 
-	// HACK! jak_spdo checks for 0x400 or 0x200 starting some of the games
-	return m_video_irq_status | 0x0600; /* | 0x0002; */
+	uint16_t ret = 0;
+
+	ret |= m_dma_irq_enable ? 0x0001 : 0x0000;
+	ret |= m_dma_irq_flag ? 0x0002 : 0x0000;
+	ret |= m_blk_irq_enable ? 0x0004 : 0x0000;
+	ret |= m_blk_irq_flag ? 0x0008 : 0x0000;
+	ret |= m_vdo_irq_enable ? 0x0010 : 0x0000;
+	ret |= m_vdo_irq_flag ? 0x0020 : 0x0000;
+	// 0x0040 unused
+	ret |= extsrc ? 0x0080 : 0x0000;
+	ret |= testmd ? 0x0100 : 0x0000;
+	ret |= readS ? 0x0200 : 0x0000;
+	ret |= wrtS ? 0x0400 : 0x0000;
+	ret |= m_dma_busy ? 0x0800 : 0x0000;
+	// 0x1000 unused
+	// 0x2000 unused
+	// 0x4000 unused
+	// 0x8000 unused
+
+	return ret;
 }
 
 void spg110_video_device::spg110_2063_w(uint16_t data)
 {
-	// writes 0x28, probably clears the IRQ / IRQ sources? 0x63 is the same offset for this in spg2xx but bits used seem to be different
-	const uint16_t old = m_video_irq_enable & m_video_irq_status;
-	m_video_irq_status &= ~data;
-	const uint16_t changed = old ^ (m_video_irq_enable & m_video_irq_status);
-	if (changed)
-		check_video_irq();
+	m_dma_irq_enable = data & 0x01;
+	m_blk_irq_enable = data & 0x04;
+	m_vdo_irq_enable = data & 0x10;
+
+	if (data & 0x02)
+		m_dma_irq_flag = 0;
+
+	if (data & 0x08)
+		m_blk_irq_flag = 0;
+
+	if (data & 0x20)
+		m_vdo_irq_flag = 0;
+
+	// still need to handle wrtS, readS, testmd, extsrc
+
+	update_video_irqs();
 }
 
 
-void spg110_video_device::spg110_201c_w(uint16_t data) { logerror("%s: 201c: %04x\n", machine().describe_context(), data); } // during startup text only
-void spg110_video_device::spg110_2020_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_tilebase); logerror("%s: 2020: %04x\n", machine().describe_context(), data); } // confirmed as tile base, seems to apply to both layers and sprites, unlike spg2xx which has separate registers
+void spg110_video_device::update_video_irqs()
+{
+	bool irq_on = false;
 
-void spg110_video_device::spg110_2028_w(uint16_t data) { logerror("%s: 2028: %04x\n", machine().describe_context(), data); } // startup
-uint16_t spg110_video_device::spg110_2028_r() { return 0x0000; }
+	if ((m_blk_irq_enable) && (m_blk_irq_flag))
+		irq_on = true;
 
-void spg110_video_device::spg110_2029_w(uint16_t data) { logerror("%s: 2029: %04x\n", machine().describe_context(), data); } // 0006, 0008 on startup
-uint16_t spg110_video_device::spg110_2029_r() { return 0x0000; }
+	if ((m_dma_irq_enable) && (m_dma_irq_flag))
+		irq_on = true;
 
-void spg110_video_device::spg110_2031_w(uint16_t data) { logerror("%s: 2031: %04x\n", machine().describe_context(), data); } // 014a or 0000 when ball is in trap
-void spg110_video_device::spg110_2032_w(uint16_t data) { logerror("%s: 2032: %04x\n", machine().describe_context(), data); } // 014a most of the time, 0000 very rarely
-void spg110_video_device::spg110_2033_w(uint16_t data) { logerror("%s: 2033: %04x\n", machine().describe_context(), data); } // changes, situational, eg when pausing
-void spg110_video_device::spg110_2034_w(uint16_t data) { logerror("%s: 2034: %04x\n", machine().describe_context(), data); } // 0141 on every scene transition
-void spg110_video_device::spg110_2035_w(uint16_t data) { logerror("%s: 2035: %04x\n", machine().describe_context(), data); } // 0141 on every scene transition
-void spg110_video_device::spg110_2036_w(offs_t offset, uint16_t data, uint16_t mem_mask) { logerror("%s: 2036: %04x\n", machine().describe_context(), data); COMBINE_DATA(&m_2036_scroll); } // seems related to ball y position, not scrolling (possibly shadow sprite related?)
+	if ((m_vdo_irq_enable) && (m_vdo_irq_flag))
+		irq_on = true;
 
-uint16_t spg110_video_device::spg110_2037_r() { return 0x0000; } // added to something from the PRNG
-void spg110_video_device::spg110_2037_w(uint16_t data) { logerror("%s: 2037: %04x\n", machine().describe_context(), data); } // 0126 (always?)
-
-void spg110_video_device::spg110_2039_w(uint16_t data) { logerror("%s: 2039: %04x\n", machine().describe_context(), data); } // 0803 on every scene transition
-
-void spg110_video_device::spg110_203c_w(uint16_t data) { logerror("%s: 203c: %04x\n", machine().describe_context(), data); } // 0006 on startup, twice
-
-void spg110_video_device::spg110_203d_w(uint16_t data) { logerror("%s: 203d: %04x\n", machine().describe_context(), data); } // changes, usually between scenes
-
-uint16_t spg110_video_device::spg110_2042_r() { return 0x0000; }
-void spg110_video_device::spg110_2042_w(uint16_t data) { logerror("%s: 2042: %04x\n", machine().describe_context(), data);  } // sets bit 0x0004, masks with 0xfffb etc.
-
-void spg110_video_device::spg110_2045_w(uint16_t data) { logerror("%s: 2045: %04x\n", machine().describe_context(), data);  } // 0006 on startup, once
+	m_video_irq_cb(irq_on ? ASSERT_LINE : CLEAR_LINE);
+}
 
 
-void spg110_video_device::spg110_205x_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+
+void spg110_video_device::vcomp_val_201c_w(uint16_t data) { logerror("%s: vcomp_val_201c_w: %04x\n", machine().describe_context(), data); } // during startup text only
+void spg110_video_device::segment_202x_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_tilebase[offset]); logerror("%s: segment/tilebase write: %02x %04x\n", machine().describe_context(), offset, data); } // confirmed as tile base, seems to apply to both layers and sprites, unlike spg2xx which has separate registers
+
+void spg110_video_device::adr_mode_2028_w(uint16_t data) { logerror("%s: adr_mode_2028_w: %04x\n", machine().describe_context(), data); } // startup
+uint16_t spg110_video_device::adr_mode_2028_r() { return 0x0000; }
+
+void spg110_video_device::ext_bus_2029_w(uint16_t data) { logerror("%s: ext_bus_2029_w: %04x\n", machine().describe_context(), data); } // 0006, 0008 on startup
+uint16_t spg110_video_device::ext_bus_2029_r() { return 0x0000; }
+
+void spg110_video_device::win_mask_1_2031_w(uint16_t data) { logerror("%s: win_mask_1_2031_w: %04x\n", machine().describe_context(), data); } // 014a or 0000 when ball is in trap
+void spg110_video_device::win_mask_2_2032_w(uint16_t data) { logerror("%s: win_mask_2_2032_w: %04x\n", machine().describe_context(), data); } // 014a most of the time, 0000 very rarely
+void spg110_video_device::win_attribute_w(uint16_t data) { logerror("%s: win_attribute_w: %04x\n", machine().describe_context(), data); } // changes, situational, eg when pausing
+void spg110_video_device::win_mask_3_2034_w(uint16_t data) { logerror("%s: win_mask_3_2034_w: %04x\n", machine().describe_context(), data); } // 0141 on every scene transition
+void spg110_video_device::win_mask_4_2035_w(uint16_t data) { logerror("%s: win_mask_4_2035_w: %04x\n", machine().describe_context(), data); } // 0141 on every scene transition
+
+void spg110_video_device::irq_tm_v_2036_w(uint16_t data)
+{
+	// used for scanline raster effects, including ball shadow in capb
+	m_tm_v_2036 = data & 0x1ff;
+	update_raster_interrupt_timer();
+}
+
+uint16_t spg110_video_device::irq_tm_h_2037_r()
+{
+	// added to value from the PRNG for some random number generation cases
+	// should this return the *current* horizontal position? or the register value written?
+	return m_screen->hpos();
+} 
+
+void spg110_video_device::irq_tm_h_2037_w(uint16_t data)
+{
+	// horizontal position for the scanline IRQ
+	m_tm_h_2037 = data & 0x1ff;
+	update_raster_interrupt_timer();
+}
+
+void spg110_video_device::effect_control_2039_w(uint16_t data)
+{
+	// 0803 on every scene transition
+	logerror("%s: effect_control_2039_w: %04x\n", machine().describe_context(), data);
+} 
+
+void spg110_video_device::huereference_203c_w(uint16_t data)
+{
+	// 0006 on startup, twice
+	logerror("%s: huereference_203c_w: %04x\n", machine().describe_context(), data);
+} 
+
+void spg110_video_device::lum_adjust_203d_w(uint16_t data)
+{
+	// changes, usually between scenes (brightness)
+	logerror("%s: lum_adjust_203d_w: %04x\n", machine().describe_context(), data);
+}
+
+uint16_t spg110_video_device::sp_control_2042_r()
+{
+	return 0x0000;
+}
+
+void spg110_video_device::sp_control_2042_w(uint16_t data)
+{
+	// sets bit 0x0004, masks with 0xfffb etc.
+	logerror("%s: sp_control_2042_w: %04x\n", machine().describe_context(), data);
+} 
+
+void spg110_video_device::spg110_2045_w(uint16_t data)
+{
+	// 0006 on startup, once
+	logerror("%s: spg110_2045_w: %04x\n", machine().describe_context(), data);
+}
+
+void spg110_video_device::transparent_color_205x_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_palctrlram[offset]);
 }
 
+void spg110_video_device::dma_dst_seg_2061_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_dma_dst_seg); }
+void spg110_video_device::dma_dst_step_2064_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_dma_dst_step); }
+void spg110_video_device::dma_source_seg_2067_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_dma_src_seg); }
+void spg110_video_device::dma_src_step_2068_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_dma_src_step); }
+uint16_t spg110_video_device::dma_src_step_2068_r(offs_t offset, uint16_t mem_mask) { return m_dma_src_step; }
 
-void spg110_video_device::dma_unk_2061_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_dma_unk_2061); }
-void spg110_video_device::dma_dst_step_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_dma_dst_step); }
-void spg110_video_device::dma_unk_2067_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_dma_src_high); }
-void spg110_video_device::dma_src_step_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_dma_src_step); }
+void spg110_video_device::dma_dst_2060_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_dma_dst); }
+void spg110_video_device::dma_source_2066_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_dma_src); }
 
-void spg110_video_device::dma_dst_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_dma_dst); }
-void spg110_video_device::dma_src_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_dma_src); }
-
-void spg110_video_device::dma_len_trigger_w(uint16_t data)
+void spg110_video_device::dma_len_trigger_2062_w(uint16_t data)
 {
 	int length = data & 0x1fff;
+	m_dma_irq_flag = 0;
+	m_dma_busy = 1;
+	update_video_irqs();
 
 	// this is presumably a counter that underflows to 0x1fff, because that's what the wait loop waits for?
-	logerror("%s: (trigger len) %04x with values (unk) %04x (dststep) %04x (srchigh) %04x (src step) %04x | (dst) %04x (src) %04x\n", machine().describe_context(), data, m_dma_unk_2061, m_dma_dst_step, m_dma_src_high, m_dma_src_step, m_dma_dst, m_dma_src);
+	logerror("%s: (trigger len) %04x with values (dstseg) %04x (dststep) %04x (srchigh) %04x (src step) %04x | (dst) %04x (src) %04x\n", machine().describe_context(), data, m_dma_dst_seg, m_dma_dst_step, m_dma_src_seg, m_dma_src_step, m_dma_dst, m_dma_src);
 
 	/*
-	if (m_dma_unk_2061 != 0x0000)
+	if (m_dma_dst_seg != 0x0000)
 	{
 	    logerror("unknown DMA params are not zero!\n");
 	}
 	*/
 
-	int source = m_dma_src | m_dma_src_high << 16;
+	int source = m_dma_src | m_dma_src_seg << 16;
 	int dest = m_dma_dst;
+
+	// bits 0xc000 are 'DMABANK'
+	// the use of other bits change slightly depending on them, for example
+	// palette tranfsers only use the bottom 8 bits of dest, jak_bobb relies on this or bridge pieces have no palette
+	if ((m_dma_dst & 0xc000) == 0x4000)
+		dest &= 0x40ff;
 
 	for (int i = 0; i < length; i++)
 	{
@@ -435,38 +557,28 @@ void spg110_video_device::dma_len_trigger_w(uint16_t data)
 	}
 
 	// not sure, spiderman would suggest that some of these need to reset (unless a missing IRQ clears them)
-	m_dma_unk_2061 = 0;
+	m_dma_dst_seg = 0;
 	//m_dma_dst_step = 0; // conyteni says no
-	m_dma_src_high = 0;
+	m_dma_src_seg = 0;
 	//m_dma_src_step = 0; // conyteni says no
-	m_dma_dst = 0;
-	m_dma_src = 0;
+	m_dma_dst = dest;
+	m_dma_src = source;
 
-	// HACK: it really seems this interrupt status is related to the DMA, but jak_capb doesn't ack it, so must also be a way to disable it?
-	if (m_is_spiderman)
-	{
-		const int i = 0x0002;
-
-		if (m_video_irq_enable & 1)
-		{
-			m_video_irq_status |= i;
-			check_video_irq();
-		}
-	}
+	m_dma_timer->adjust(attotime::from_usec(20));
 }
 
-void spg110_video_device::dma_manual_w(uint16_t data)
+void spg110_video_device::dma_manual_2065_w(uint16_t data)
 {
 	this->space(0).write_word(m_dma_dst * 2, data, 0xffff);
 }
 
-uint16_t spg110_video_device::dma_manual_r()
+uint16_t spg110_video_device::dma_manual_2065_r()
 {
 	uint16_t val = this->space(0).read_word(m_dma_dst * 2);
 	return val;
 }
 
-uint16_t spg110_video_device::dma_len_status_r()
+uint16_t spg110_video_device::dma_len_status_2062_r()
 {
 	return 0x1fff; // DMA related?
 }
@@ -490,8 +602,6 @@ void spg110_video_device::tilemap_write_regs(int which, uint16_t* regs, int regn
 		break;
 
 	case 0x2: // Page Attributes
-		// 'priority' can't be priority here as it is on spg2xx, or the scores in attract will be behind the table, it really seems to be per attribute bit instead
-
 		logerror("video_w: Page %d Attributes = %04x (Priority:%d, Palette:%d, VSize:%d, HSize:%d, FlipY:%d, FlipX:%d, BPP:%d)\n", which, data
 			, (data >> 12) & 3, (data >> 8) & 15, 8 << ((data >> 6) & 3), 8 << ((data >> 4) & 3), BIT(data, 3), BIT(data, 2), 2 * ((data & 3) + 1));
 		regs[regno] = data;
@@ -530,14 +640,13 @@ void spg110_video_device::tmap1_regs_w(offs_t offset, uint16_t data)
 // this seems to be a different, non-cpu mapped space only accessible via the DMA?
 void spg110_video_device::map_video(address_map &map)
 {
-	// are these addresses hardcoded, or can they move (in which case tilemap system isn't really suitable)
-	map(0x00000, 0x03fff).ram(); // 2fff?
+	map(0x00000, 0x02fff).ram();
 
-	map(0x04000, 0x041ff).ram().share("sprtileno"); // seems to be 3 blocks, almost certainly spritelist
+	map(0x04000, 0x041ff).ram().share("sprtileno");
 	map(0x04200, 0x043ff).ram().share("sprattr1");
 	map(0x04400, 0x045ff).ram().share("sprattr2");
 
-	map(0x08000, 0x081ff).ram().w(FUNC(spg110_video_device::palette_w)).share("palram"); // palette format unknown
+	map(0x08000, 0x081ff).ram().w(FUNC(spg110_video_device::palette_w)).share("palram");
 }
 
 // Not used, for reference
@@ -690,26 +799,43 @@ void spg110_video_device::device_start()
 {
 	save_item(NAME(m_dma_src_step));
 	save_item(NAME(m_dma_dst_step));
-	save_item(NAME(m_dma_unk_2061));
-	save_item(NAME(m_dma_src_high));
+	save_item(NAME(m_dma_dst_seg));
+	save_item(NAME(m_dma_src_seg));
 	save_item(NAME(m_dma_dst));
 	save_item(NAME(m_dma_src));
 	save_item(NAME(m_bg_scrollx));
 	save_item(NAME(m_bg_scrolly));
-	save_item(NAME(m_2036_scroll));
+	save_item(NAME(m_tm_v_2036));
+	save_item(NAME(m_tm_h_2037));
+
+	save_item(NAME(m_blk_irq_enable));
+	save_item(NAME(m_blk_irq_flag));
+	save_item(NAME(m_dma_irq_enable));
+	save_item(NAME(m_dma_irq_flag));
+	save_item(NAME(m_vdo_irq_enable));
+	save_item(NAME(m_vdo_irq_flag));
+
+	save_item(NAME(m_dma_busy));
+
+	m_screenpos_timer = timer_alloc(FUNC(spg110_video_device::screenpos_hit), this);
+	m_screenpos_timer->adjust(attotime::never);
+
+	m_dma_timer = timer_alloc(FUNC(spg110_video_device::dma_done), this);
+	m_dma_timer->adjust(attotime::never);
 }
 
 void spg110_video_device::device_reset()
 {
 	m_dma_src_step = 0;
 	m_dma_dst_step = 0;
-	m_dma_unk_2061 = 0;
-	m_dma_src_high = 0;
+	m_dma_dst_seg = 0;
+	m_dma_src_seg = 0;
 	m_dma_dst = 0;
 	m_dma_src = 0;
 	m_bg_scrollx = 0;
 	m_bg_scrolly = 0;
-	m_2036_scroll = 0;
+	m_tm_v_2036 = 0xffff;
+	m_tm_h_2037 = 0xffff;
 
 	std::fill(std::begin(tmap0_regs), std::end(tmap0_regs), 0);
 	std::fill(std::begin(tmap1_regs), std::end(tmap1_regs), 0);
@@ -717,6 +843,45 @@ void spg110_video_device::device_reset()
 	// is there actually an enable register here?
 	m_video_irq_enable = 0xffff;
 	m_video_irq_status = 0x0000;
+
+	m_blk_irq_enable = 0;
+	m_blk_irq_flag = 0;
+	m_dma_irq_enable = 0;
+	m_dma_irq_flag = 0;
+	m_vdo_irq_enable = 0;
+	m_vdo_irq_flag = 0;
+
+	m_dma_busy = 0;
+}
+
+TIMER_CALLBACK_MEMBER(spg110_video_device::dma_done)
+{
+	m_dma_irq_flag = 1;
+	m_dma_busy = 0;
+	update_video_irqs();
+	m_dma_timer->adjust(attotime::never);
+}
+
+void spg110_video_device::update_raster_interrupt_timer()
+{
+	if (m_tm_h_2037 < 320 && m_tm_v_2036 < 240)
+	{
+		m_screenpos_timer->adjust(m_screen->time_until_pos(m_tm_v_2036, m_tm_h_2037));
+
+	}
+	else
+		m_screenpos_timer->adjust(attotime::never);
+}
+
+TIMER_CALLBACK_MEMBER(spg110_video_device::screenpos_hit)
+{
+	m_vdo_irq_flag = 1;
+	update_video_irqs();
+
+	m_screen->update_partial(m_screen->vpos());
+
+	// fire again (based on spg2xx logic)
+	m_screenpos_timer->adjust(m_screen->time_until_pos(m_tm_v_2036, m_tm_h_2037));
 }
 
 void spg110_video_device::palette_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -727,27 +892,27 @@ void spg110_video_device::palette_w(offs_t offset, uint16_t data, uint16_t mem_m
 
 uint32_t spg110_video_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	memset(&m_screenbuf[320 * cliprect.min_y], 0, 4 * 320 * ((cliprect.max_y - cliprect.min_y) + 1));
-
-	const uint32_t page1_addr = 0x40 * m_tilebase;//0x40 * m_video_regs[0x20];
-	const uint32_t page2_addr = 0x40 * m_tilebase;//0x40 * m_video_regs[0x21];
-	uint16_t *page1_regs = tmap0_regs;
-	uint16_t *page2_regs = tmap1_regs;
+	const pen_t *pens = m_palette->pens();
+	const uint32_t page1_addr = 0x40 * m_tilebase[0];
+	const uint32_t page2_addr = 0x40 * m_tilebase[0];
 
 	for (uint32_t scanline = (uint32_t)cliprect.min_y; scanline <= (uint32_t)cliprect.max_y; scanline++)
 	{
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+			m_screenbuf[(320 * scanline) + x] = pens[0];
+
 		for (int i = 0; i < 4; i++)
 		{
-			draw_page(cliprect, scanline, i, page2_addr, page2_regs);
-			draw_page(cliprect, scanline, i, page1_addr, page1_regs);
+			draw_page(cliprect, scanline, i, page1_addr, tmap0_regs);
+			draw_page(cliprect, scanline, i, page2_addr, tmap1_regs);
 			draw_sprites(cliprect, scanline, i);
 		}
 	}
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		uint32_t *dest = &bitmap.pix(y, cliprect.min_x);
-		const uint32_t *src = &m_screenbuf[cliprect.min_x + 320 * y];
+		uint32_t* dest = &bitmap.pix(y, cliprect.min_x);
+		const uint32_t* src = &m_screenbuf[cliprect.min_x + 320 * y];
 		std::copy_n(src, cliprect.width(), dest);
 	}
 
@@ -756,23 +921,6 @@ uint32_t spg110_video_device::screen_update(screen_device &screen, bitmap_rgb32 
 
 void spg110_video_device::vblank(int state)
 {
-	const int i = 0x0008;
-
-	if (!state)
-	{
-		m_video_irq_status &= ~i;
-		check_video_irq();
-		return;
-	}
-
-	if (m_video_irq_enable & 1)
-	{
-		m_video_irq_status |= i;
-		check_video_irq();
-	}
-}
-
-void spg110_video_device::check_video_irq()
-{
-	m_video_irq_cb((m_video_irq_status & m_video_irq_enable) ? ASSERT_LINE : CLEAR_LINE);
+	m_blk_irq_flag = state;
+	update_video_irqs();
 }
