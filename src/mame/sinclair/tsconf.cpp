@@ -52,10 +52,10 @@ TILE_GET_INFO_MEMBER(tsconf_state::get_tile_info_txt)
 template <u8 Layer>
 TILE_GET_INFO_MEMBER(tsconf_state::get_tile_info_16c)
 {
-	u8 col_offset = (tile_index % tilemap.cols() + Layer * 64) << 1;
-	u16 row_offset = (tile_index / tilemap.cols() * 64 * 2) << 1;
+	const u8 col_offset = (tile_index & 0x03f) << 1;
+	const u16 row_offset = (tile_index & 0xfc0) << 2;
 
-	u8 *tile_info_addr = &m_ram->pointer()[(m_regs[T_MAP_PAGE] << 14) + row_offset + col_offset];
+	u8 *tile_info_addr = &m_ram->pointer()[(m_regs[T_MAP_PAGE] << 14) | row_offset | (Layer ? 0x80 : 0x00) | col_offset];
 	u8 hi = tile_info_addr[1];
 
 	u16 tile = ((u16(hi) & 0x0f) << 8) | tile_info_addr[0];
