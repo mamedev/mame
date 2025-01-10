@@ -130,6 +130,7 @@ protected:
 		uint8_t   data_out;       //Data to send out
 		uint8_t   data_in;
 		uint8_t   txbit;
+		uint8_t   txd;
 		uint8_t   rxbit;
 		uint8_t   rxb8;
 
