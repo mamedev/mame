@@ -386,11 +386,7 @@ void tsconf_state::ram_bank_write(u8 bank, offs_t offset, u8 data)
 
 static int tiles_offset_to_raw(int t_offset)
 {
-	const int x = (t_offset / 4) % 64;
-	const int y = (t_offset / 0x100) / 8;
-	const int dx = t_offset % 4;
-	const int dy = (t_offset / 0x100) % 8;
-	return ((y * 64 + x) * 64) + (dy * 8) + (dx * 2);
+	return bitswap<17>(t_offset, 16, 15, 14, 13, 12, 11, 7, 6, 5, 4, 3, 2, 10, 9, 8, 1, 0) << 1;
 }
 
 void tsconf_state::ram_page_write(u8 page, offs_t offset, u8 data)
