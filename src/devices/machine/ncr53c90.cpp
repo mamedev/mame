@@ -14,7 +14,7 @@
 #define LOG_FIFO    (1U << 2)
 #define LOG_COMMAND (1U << 3)
 
-#define VERBOSE (LOG_GENERAL|LOG_COMMAND|LOG_FIFO)
+#define VERBOSE (0)
 #include "logmacro.h"
 
 #define DELAY_HACK

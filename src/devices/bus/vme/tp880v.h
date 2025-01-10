@@ -35,7 +35,6 @@ protected:
 private:
 	void cpu_mem(address_map &map) ATTR_COLD;
 	void ios_mem(address_map &map) ATTR_COLD;
-	void ios_ack(address_map &map) ATTR_COLD;
 
 	required_device<mc88100_device> m_cpu;
 	required_device_array<mc88200_device, 2> m_mmu;
@@ -49,10 +48,8 @@ private:
 
 	required_device_array<rs232_port_device, 2> m_serial;
 
-	required_shared_ptr<u32> m_ram_88k;
+	required_shared_ptr<u32> m_ram;
 	util::endian_cast<u32, u16, util::endianness::big> m_ram_68k;
-
-	u8 m_pb;
 };
 
 DECLARE_DEVICE_TYPE(VME_TP880V, vme_tp880v_card_device)

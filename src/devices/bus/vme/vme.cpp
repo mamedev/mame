@@ -78,7 +78,7 @@
 #include "emu.h"
 #include "vme.h"
 
-#define VERBOSE (LOG_GENERAL)
+#define VERBOSE 0
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(VME, vme_bus_device, "vme", "VME bus")

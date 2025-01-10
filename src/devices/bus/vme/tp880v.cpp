@@ -37,7 +37,7 @@ vme_tp880v_card_device::vme_tp880v_card_device(machine_config const &mconfig, ch
 	, m_scsi(*this, "scsi:7:ncr53c90")
 	, m_duart(*this, "duart")
 	, m_serial(*this, "serial%u", 0U)
-	, m_ram_88k(*this, "ram")
+	, m_ram(*this, "ram")
 	, m_ram_68k(nullptr)
 {
 }
@@ -63,8 +63,7 @@ ioport_constructor vme_tp880v_card_device::device_input_ports() const
 
 void vme_tp880v_card_device::device_start()
 {
-	m_ram_68k = util::big_endian_cast<u16>(m_ram_88k.target());
-	m_pb = 0;
+	m_ram_68k = util::big_endian_cast<u16>(m_ram.target());
 }
 
 void vme_tp880v_card_device::device_reset()
@@ -90,36 +89,19 @@ void vme_tp880v_card_device::device_add_mconfig(machine_config &config)
 
 	M68000(config, m_ios, 10'000'000);
 	m_ios->set_addrmap(AS_PROGRAM, &vme_tp880v_card_device::ios_mem);
-	m_ios->set_addrmap(m68000_base_device::AS_CPU_SPACE, &vme_tp880v_card_device::ios_ack);
 
 	Z8036(config, m_cio[0], 4'000'000); // Z0803606VSC
-	m_cio[0]->pb_rd_cb().set([this]() { return ~m_pb; });
-	m_cio[0]->pa_wr_cb().set(
-		[this](u8 data)
-		{
-			logerror("pa 0x%02x (%s)\n", data, machine().describe_context());
-			m_cpu->set_input_line(INPUT_LINE_IRQ0, BIT(data, 4));
-			m_ios->set_input_line(INPUT_LINE_IRQ4, !BIT(data, 3));
-		});
-	// pb0..2 are outputs
-	m_cio[0]->pb_wr_cb().set(
-		[this](u8 data)
-		{
-			// 0x0d 1101
-			// 0x01 0001 on host 1 test
-			logerror("pb 0x%02x (%s)\n", data, machine().describe_context());
-			if (!BIT(data, 2))
-				m_ios->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
-		});
+	m_cio[0]->irq_wr_cb().set_inputline(m_ios, INPUT_LINE_IRQ4); // ?
 	Z8036(config, m_cio[1], 4'000'000); // Z0803606VSC
+	m_cio[0]->irq_wr_cb().set_inputline(m_ios, INPUT_LINE_IRQ1); // ?
 
 	// TODO: MC68440 is function and pin compatible with MC68450/HD63450, but
 	// has only two DMA channels instead of four.
 	HD63450(config, m_dma, 10'000'000); // MC68440FN10
 	m_dma->set_cpu_tag(m_ios);
 	m_dma->irq_callback().set_inputline(m_ios, INPUT_LINE_IRQ3);
-	//m_dma->dma_read<0>().set(m_scsi, FUNC(ncr53c90_device::dma_r));
-	//m_dma->dma_write<0>().set(m_scsi, FUNC(ncr53c90_device::dma_w));
+	m_dma->dma_read<0>().set(m_scsi, FUNC(ncr53c90_device::dma_r));
+	m_dma->dma_write<0>().set(m_scsi, FUNC(ncr53c90_device::dma_w));
 
 	M48T02(config, m_rtc, 0); // MK40T02B-25
 
@@ -143,19 +125,7 @@ void vme_tp880v_card_device::device_add_mconfig(machine_config &config)
 
 	SCN2681(config, m_duart, 3.6864_MHz_XTAL);
 	m_duart->irq_cb().set_inputline(m_ios, INPUT_LINE_IRQ6);
-	m_duart->outport_cb().set(
-		[this](u8 data)
-		{
-			logerror("op 0x%02x (%s)\n", data, machine().describe_context());
-			if (!BIT(data, 3))
-				m_pb |= 0x40;
-			else
-				m_pb &= ~0x40;
-			m_cpu->set_input_line(INPUT_LINE_IRQ0, BIT(data, 3));
-			if (!BIT(data, 4))
-				m_ios->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
-			m_cpu->set_input_line(INPUT_LINE_RESET, BIT(data, 5));
-		});
+	m_duart->outport_cb().set([this](int state) { m_cpu->set_input_line(INPUT_LINE_RESET, state); }).bit(5);
 
 	RS232_PORT(config, m_serial[0], default_rs232_devices, "terminal");
 	RS232_PORT(config, m_serial[1], default_rs232_devices, nullptr);
@@ -195,16 +165,4 @@ void vme_tp880v_card_device::ios_mem(address_map &map)
 	map(0x80'0000, 0xbf'ffff).lrw16(
 		[this](offs_t offset, u16 mem_mask) { return m_ram_68k[offset]; }, "ram_68k_r",
 		[this](offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_ram_68k[offset]); }, "ram_68k_w");
-}
-
-void vme_tp880v_card_device::ios_ack(address_map &map)
-{
-	map(0xff'fff3, 0xff'fff3).lr8(NAME([]() { return m68000_base_device::autovector(1); }));
-	map(0xff'fff5, 0xff'fff5).lr8(NAME([]() { return m68000_base_device::autovector(2); }));
-	//map(0xff'fff7, 0xff'fff7).lr8(NAME([this]() { return m_dma->iack(); }));
-	map(0xff'fff7, 0xff'fff7).lr8(NAME([]() { return m68000_base_device::autovector(3); }));
-	map(0xff'fff9, 0xff'fff9).lr8(NAME([]() { return m68000_base_device::autovector(4); }));
-	map(0xff'fffb, 0xff'fffb).lr8(NAME([]() { return m68000_base_device::autovector(5); }));
-	map(0xff'fffd, 0xff'fffd).lr8(NAME([]() { return m68000_base_device::autovector(6); }));
-	map(0xff'ffff, 0xff'ffff).lr8(NAME([]() { return m68000_base_device::autovector(7); }));
 }
