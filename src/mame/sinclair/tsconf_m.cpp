@@ -391,7 +391,7 @@ void tsconf_state::ram_bank_write(u8 bank, offs_t offset, u8 data)
 		}
 	}
 
-	if (bank > 0 || (W0_WE && W0_RAM))
+	if (bank > 0 || W0_WE)
 		ram_page_write(m_regs[PAGE0 + bank], offset, data);
 	else if (!bank && m_beta->vdos_r())
 		ram_page_write(0xff, offset, data);
