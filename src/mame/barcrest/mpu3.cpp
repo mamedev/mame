@@ -745,7 +745,7 @@ void mpu3_state::machine_start()
 	m_lamp.resolve();
 }
 
-/* generate a 50 Hz signal (some components rely on this for external sync) */
+/* generate a 100 Hz signal (some components rely on this for external sync) */
 TIMER_DEVICE_CALLBACK_MEMBER(mpu3_state::gen_100hz)
 {
 	/* Although reported as a '50Hz' signal, the fact that both rising and
