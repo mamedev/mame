@@ -53,8 +53,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_GAYLE_H
-#define MAME_MACHINE_GAYLE_H
+#ifndef MAME_AMIGA_GAYLE_H
+#define MAME_AMIGA_GAYLE_H
 
 #pragma once
 
@@ -155,4 +155,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(GAYLE, gayle_device)
 
-#endif // MAME_MACHINE_GAYLE_H
+#endif // MAME_AMIGA_GAYLE_H
