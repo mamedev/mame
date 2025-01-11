@@ -4,8 +4,7 @@
 /* Notes 17/07/11 DH
  added most other MPU3 sets
 
- most fail to boot, giving the CPU a 'WAIT' instruction then sitting there
- some complain about Characterizer (protection) and then do the same
+ some complain about Characterizer (protection)
  a few boot to show light displays with no LED text
  some display misaligned LED text
  many run VERY slowly, even when the CPU is inactive (inefficient MAME timer system overhead?)
@@ -227,7 +226,7 @@ private:
 	void pia_ic6_porta_w(uint8_t data);
 	void pia_ic6_portb_w(uint8_t data);
 	TIMER_CALLBACK_MEMBER(ic21_timeout);
-	TIMER_DEVICE_CALLBACK_MEMBER(gen_50hz);
+	TIMER_DEVICE_CALLBACK_MEMBER(gen_100hz);
 	TIMER_DEVICE_CALLBACK_MEMBER(ic10_callback);
 	void update_triacs();
 	void ic11_update();
@@ -258,7 +257,7 @@ private:
 	int m_input_strobe = 0;   /* IC11 74LS138 A = CA2 IC3, B = CA2 IC4, C = CA2 IC5 */
 	uint8_t m_lamp_strobe = 0;
 	uint8_t m_led_strobe = 0;
-	int m_signal_50hz = 0;
+	int m_signal_100hz = 0;
 
 	int m_optic_pattern = 0;
 
@@ -451,7 +450,7 @@ uint8_t mpu3_state::pia_ic3_porta_r()
 			break;
 		}
 	}
-	if (m_signal_50hz)
+	if (m_signal_100hz)
 	{
 		data |= 0x02;
 	}
@@ -747,14 +746,14 @@ void mpu3_state::machine_start()
 }
 
 /* generate a 50 Hz signal (some components rely on this for external sync) */
-TIMER_DEVICE_CALLBACK_MEMBER(mpu3_state::gen_50hz)
+TIMER_DEVICE_CALLBACK_MEMBER(mpu3_state::gen_100hz)
 {
 	/* Although reported as a '50Hz' signal, the fact that both rising and
 	falling edges of the pulse are used means the timer actually gives a 100Hz
 	oscillating signal.*/
-	m_signal_50hz = m_signal_50hz?0:1;
-	m_ptm2->set_c1(m_signal_50hz);
-	m_pia3->cb1_w(~m_signal_50hz);
+	m_signal_100hz = m_signal_100hz?0:1;
+	m_ptm2->set_c1(m_signal_100hz);
+	m_pia3->cb1_w(m_signal_100hz);
 	update_triacs();
 }
 
@@ -810,7 +809,7 @@ void mpu3_state::mpu3base(machine_config &config)
 
 	MSC1937(config, m_vfd);
 
-	TIMER(config, "50hz").configure_periodic(FUNC(mpu3_state::gen_50hz), attotime::from_hz(100));
+	TIMER(config, "100hz").configure_periodic(FUNC(mpu3_state::gen_100hz), attotime::from_hz(200));
 	TIMER(config, "555_ic10").configure_periodic(FUNC(mpu3_state::ic10_callback), PERIOD_OF_555_ASTABLE(10000,1000,0.0000001));
 
 	/* 6840 PTM */
@@ -1689,10 +1688,9 @@ GAME(  198?, m3topsht,   0,          mpu3_chr_c000, mpu3, mpu3_chr_state, init_m
 // doesn't boot, does nothing?
 GAMEL( 198?, m3supnud,   0,          mpu3base, mpu3, mpu3_state, init_mpu3, ROT0, "Barcrest","Super Nudges Unlimited (Barcrest) (MPU3)", GAME_FLAGS, layout_m3supnud )
 
-// doesn't boot, does nothing?
 GAME(  198?, m3supser,   0,          mpu3base, mpu3, mpu3_state, init_mpu3, ROT0, "Barcrest","Super Series (Barcrest) (MPU3)",GAME_FLAGS )
 
-// doesn't boot, does nothing?
+// boots without initialising reels
 GAMEL( 198?, m3circle,   0,          mpu3base, mpu3, mpu3_state, init_mpu3, ROT0, "Barcrest","Special Circle Club (Barcrest) (MPU3, set 1)", GAME_FLAGS, layout_m3circle )
 GAMEL( 198?, m3circlea,  m3circle,   mpu3base, mpu3, mpu3_state, init_mpu3, ROT0, "Barcrest","Special Circle Club (Barcrest) (MPU3, set 2, bad)", GAME_FLAGS, layout_m3circle )
 GAMEL( 198?, m3circleb,  m3circle,   mpu3base, mpu3, mpu3_state, init_mpu3, ROT0, "Barcrest","Special Circle Club (Barcrest) (MPU3, set 3)", GAME_FLAGS, layout_m3circle )
