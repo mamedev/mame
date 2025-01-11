@@ -69,8 +69,9 @@ private:
 	required_device<ram_device> m_ram;
 	required_ioport m_special;
 
-	// display state
+	// internal state
 	uint8_t m_data = 0;
+	uint8_t m_sc = 0;
 };
 
 #endif // MAME_NETRONICS_ELF_H

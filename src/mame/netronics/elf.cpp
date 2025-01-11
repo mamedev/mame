@@ -9,8 +9,9 @@
 /*
 
     TODO:
-    - problem with DMA: open MAME debugger to see RAM, set LOAD, input a value,
-      and it will write twice
+    - Problem with DMA: open MAME debugger to see RAM, set LOAD, input a value,
+      and it will write twice. It is because set_input_line is delayed until
+      the CPU finished execute_run after sc_w.
     - proper layout
 
 */
@@ -95,7 +96,7 @@ void elf2_state::elf2_io(address_map &map)
 
 INPUT_CHANGED_MEMBER(elf2_state::input_w)
 {
-	if (newval)
+	if (newval && ~m_sc & 2)
 	{
 		/* assert DMAIN */
 		m_maincpu->set_input_line(COSMAC_INPUT_LINE_DMAIN, ASSERT_LINE);
@@ -142,7 +143,7 @@ INPUT_PORTS_END
 
 int elf2_state::wait_r()
 {
-	return LOAD;
+	return !LOAD;
 }
 
 int elf2_state::clear_r()
@@ -162,17 +163,11 @@ uint8_t elf2_state::dma_r()
 
 void elf2_state::sc_w(uint8_t data)
 {
-	switch (data)
-	{
-	case COSMAC_STATE_CODE_S2_DMA:
-	case COSMAC_STATE_CODE_S3_INTERRUPT:
-		/* clear DMAIN */
+	/* DMAIN is reset while SC1 is high */
+	if (data & 2)
 		m_maincpu->set_input_line(COSMAC_INPUT_LINE_DMAIN, CLEAR_LINE);
-		break;
 
-	default:
-		break;
-	}
+	m_sc = data;
 }
 
 /* MM74C923 Interface */
@@ -206,6 +201,7 @@ void elf2_state::machine_start()
 
 	/* register for state saving */
 	save_item(NAME(m_data));
+	save_item(NAME(m_sc));
 }
 
 /* Machine Driver */
@@ -230,7 +226,7 @@ void elf2_state::elf2(machine_config &config)
 	CDP1802(config, m_maincpu, XTAL(3'579'545)/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &elf2_state::elf2_mem);
 	m_maincpu->set_addrmap(AS_IO, &elf2_state::elf2_io);
-	m_maincpu->wait_cb().set(FUNC(elf2_state::wait_r)).invert();
+	m_maincpu->wait_cb().set(FUNC(elf2_state::wait_r));
 	m_maincpu->clear_cb().set(FUNC(elf2_state::clear_r));
 	m_maincpu->ef4_cb().set(FUNC(elf2_state::ef4_r));
 	m_maincpu->q_cb().set_output("led0");
