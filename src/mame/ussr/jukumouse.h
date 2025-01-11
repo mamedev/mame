@@ -1,8 +1,8 @@
 // license: BSD-3-Clause
 // copyright-holders:Märt Põder
 
-#ifndef MAME_USSR_JUKU_H
-#define MAME_USSR_JUKU_H
+#ifndef MAME_USSR_JUKUMOUSE_H
+#define MAME_USSR_JUKUMOUSE_H
 
 #pragma once
 
@@ -27,4 +27,4 @@ private:
 
 DECLARE_DEVICE_TYPE(JUKU_MOUSE, juku_mouse_device)
 
-#endif // MAME_USSR_JUKU_H
+#endif // MAME_USSR_JUKUMOUSE_H
