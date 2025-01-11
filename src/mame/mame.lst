@@ -20155,7 +20155,7 @@ aplan                           // bootleg (WeaShing)
 bingowng                        // (c) 1993 Wing Co. Ltd
 bingownga                       // (c) 1993 Wing Co. Ltd
 bonusch                         // (c) 1990 Wing Co. Ltd
-feverch                         // (c) 1990 Wing Co. Ltd
+bonuscha                        // (c) 1990 Wing Co. Ltd
 carb2002                        // bootleg
 carb2003                        // bootleg
 cb3                             // (c) 199? Dyna Electronics
@@ -20219,12 +20219,18 @@ crazybon                        // (c) 199? Sang Ho
 crazybona                       // (c) 199? Sang Ho
 crazybonb                       // (c) 199? unknown
 cutyline                        //
+cutylinea                       //
+cutylineb                       //
 eldoradd                        // (c) 1991 Dyna Electronics
 eldoraddo                       // (c) 1991 Dyna Electronics
 eldoraddoa                      // (c) 1991 Dyna Electronics
 eldoraddob                      // (c) 1991 Dyna Electronics
 eldoraddoc                      // (c) 1991 Dyna Electronics
+f16s8l                          //
 fb2010                          // (c) 2009 Amcoe
+feverch                         // (c) 1986 Wing Co. Ltd
+fevercha                        // (c) 1986 Wing Co. Ltd
+feverchtw                       // (c) 1986 Wing Co. Ltd
 fl7_3121                        // (c) 199? Cyberdyne Systems, Inc.
 fl7_50                          // (c) 199? Cyberdyne Systems, Inc.
 fl7_500                         // (c) 199? Cyberdyne Systems, Inc.
@@ -20441,6 +20447,7 @@ jking02                         // (c) 2001
 klxyj                           // (c) 200?
 lhdmg                           // (c) 1999
 lhdmgp                          // (c) 1999
+lhdmgp200c3m                    // (c) 1999
 lhzb3                           // (c) 1999
 lhzb3106c5m                     // (c) 1999
 lhzb3sjb                        // (c) 1999
@@ -24893,9 +24900,10 @@ rungunad                        // GX247 (c) 1993 (World)
 rungunb                         // GX247 (c) 1993 (World)
 rungunbd                        // GX247 (c) 1993 (World)
 rungund                         // GX247 (c) 1993 (World)
-rungunua                        // GX247 (c) 1993 (US)
-rungunuad                       // GX247 (c) 1993 (US)
-rungunud                        // GX247 (c) 1993 (US)
+rungunuaad                      // GX247 (c) 1993 (US)
+rungunuabd                      // GX247 (c) 1993 (US)
+rungunuba                       // GX247 (c) 1993 (US)
+rungunubad                      // GX247 (c) 1993 (US)
 slmdunkj                        // GX247 (c) 1993 (Japan)
 slmdunkjd                       // GX247 (c) 1993 (Japan)
 
@@ -30701,6 +30709,7 @@ bsuertev                        // 1991, Unknown
 caspoker                        // 1988, PM / Beck Elektronik.
 caspokera                       // 1987, PM / Beck Elektronik.
 caspokerb                       // 1986, PM / Beck Elektronik.
+codemagik                       // (c) 198? Voyageur de L'Espace Inc.
 falcnwld                        // 1991, TVG
 falcnwlda                       // (c) 1990, Video Klein
 falcnwldb                       // (c) 1990, Video Klein

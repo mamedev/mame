@@ -580,7 +580,7 @@ void alibaba_state::mystery_tick(int state)
 
 uint8_t alibaba_state::mystery_1_r()
 {
-	// the return value determines what the mystery item is, each bit corresponds to a question mark
+	// the return value determines what the mystery item is
 	return machine().rand() & 0x0f;
 }
 

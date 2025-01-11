@@ -351,7 +351,7 @@ ROM_START( ntcasha )
 	ROM_LOAD( "ntcasha_hd64f3337cp16.mcu", 0x0000, 0xf000, NO_DUMP )
 
 	ROM_REGION( 0x200000, "blitter", 0 ) // weirdly no GFX ROM matches the other set, and they also seem to be in different order
-	ROM_LOAD( "1.bin", 0x000000, 0x80000, BAD_DUMP CRC(52179ce7) SHA1(ef2141d9db6a99f5c459f02473d4b7b6f488e27e) ) // FIXED BITS (xxxxx1xx), almost surely bad
+	ROM_LOAD( "1.bin", 0x000000, 0x80000, CRC(78c0af7f) SHA1(d5424eb35167c991e1b63760bbabbb80a744e718) )
 	ROM_LOAD( "2.bin", 0x080000, 0x80000, CRC(47029306) SHA1(37e7dd25ee3e91568775934971f76fbc07e31672) )
 	ROM_LOAD( "3.bin", 0x100000, 0x80000, CRC(31d11573) SHA1(8b156fcd41f7ff58465b2cc56a7ebe7be0b392b1) )
 	ROM_LOAD( "4.bin", 0x180000, 0x80000, CRC(574a6938) SHA1(3ce0fb090da00b3098b04f367842b031ed4767ef) )

@@ -988,7 +988,7 @@ ROM_START( rungunbd ) // same as above set, but with demux adapter connected
 	ROM_LOAD( "runguna.nv", 0x0000, 0x080, CRC(7bbf0e3c) SHA1(0fd3c9400e9b97a06517e0c8620f773a383100fd) )
 ROM_END
 
-ROM_START( rungunua )
+ROM_START( rungunuba )
 	/* main program US Version BA 1993 10.8 */
 	ROM_REGION( 0x300000, "maincpu", 0)
 	ROM_LOAD16_BYTE( "247uba03.bin", 0x000000, 0x80000, CRC(c24d7500) SHA1(38e6ae9fc00bf8f85549be4733992336c46fe1f3) )
@@ -1030,7 +1030,7 @@ ROM_START( rungunua )
 ROM_END
 
 
-ROM_START( rungunuad )  // same as above set, but with demux adapter connected
+ROM_START( rungunubad )  // same as above set, but with demux adapter connected
 	/* main program US Version BA 1993 10.8 */
 	ROM_REGION( 0x300000, "maincpu", 0)
 	ROM_LOAD16_BYTE( "247uba03.bin", 0x000000, 0x80000, CRC(c24d7500) SHA1(38e6ae9fc00bf8f85549be4733992336c46fe1f3) )
@@ -1157,11 +1157,51 @@ ROM_END
 
 
 
-ROM_START( rungunud ) // dual cabinet setup ONLY
+ROM_START( rungunuabd ) // dual cabinet setup ONLY
 	/* main program US Version AB 1993 10.12 */
 	ROM_REGION( 0x300000, "maincpu", 0)
 	ROM_LOAD16_BYTE( "247uab03.bin", 0x000000, 0x80000, CRC(f259fd11) SHA1(60381a3fa7f78022dcb3e2f3d13ea32a10e4e36e) )
 	ROM_LOAD16_BYTE( "247uab04.bin", 0x000001, 0x80000, CRC(b918cf5a) SHA1(4314c611ef600ec081f409c78218de1639f8b463) )
+
+	/* data */
+	ROM_LOAD16_BYTE( "247a01", 0x100000, 0x80000, CRC(8341cf7d) SHA1(372c147c4a5d54aed2a16b0ed258247e65dda563) )
+	ROM_LOAD16_BYTE( "247a02", 0x100001, 0x80000, CRC(f5ef3f45) SHA1(2e1d8f672c130dbfac4365dc1301b47beee10161) )
+
+	/* sound program */
+	ROM_REGION( 0x030000, "soundcpu", 0 )
+	ROM_LOAD("247a05", 0x000000, 0x20000, CRC(64e85430) SHA1(542919c3be257c8f118fc21d3835d7b6426a22ed) )
+	ROM_RELOAD(        0x010000, 0x20000 )
+
+	/* '936 tiles */
+	ROM_REGION( 0x400000, "gfx1", 0)
+	ROM_LOAD( "247a13", 0x000000, 0x200000, CRC(c5a8ef29) SHA1(23938b8093bc0b9eef91f6d38127ca7acbdc06a6) )
+
+	/* sprites */
+	ROM_REGION( 0x800000, "k055673", 0)
+	ROM_LOAD64_WORD( "247-a11", 0x000000, 0x200000, CRC(c3f60854) SHA1(cbee7178ab9e5aa6a5aeed0511e370e29001fb01) )  // 5y
+	ROM_LOAD64_WORD( "247-a08", 0x000002, 0x200000, CRC(3e315eef) SHA1(898bc4d5ad244e5f91cbc87820b5d0be99ef6662) )  // 2u
+	ROM_LOAD64_WORD( "247-a09", 0x000004, 0x200000, CRC(5ca7bc06) SHA1(83c793c68227399f93bd1ed167dc9ed2aaac4167) )  // 2y
+	ROM_LOAD64_WORD( "247-a10", 0x000006, 0x200000, CRC(a5ccd243) SHA1(860b88ade1a69f8b6c5b8206424814b386343571) )  // 5u
+
+	/* TTL text plane ("fix layer") */
+	ROM_REGION( 0x20000, "gfx3", 0)
+	ROM_LOAD( "247-a12", 0x000000, 0x20000, CRC(57a8d26e) SHA1(0431d10b76d77c26a1f6f2b55d9dbcfa959e1cd0) )
+
+	/* sound data */
+	ROM_REGION( 0x400000, "k054539", 0)
+	ROM_LOAD( "247-a06", 0x000000, 0x200000, CRC(b8b2a67e) SHA1(a873d32f4b178c714743664fa53c0dca29cb3ce4) )
+	ROM_LOAD( "247-a07", 0x200000, 0x200000, CRC(0108142d) SHA1(4dc6a36d976dad9c0da5a5b1f01f2eb3b369c99d) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_LOAD( "rungunu.nv", 0x0000, 0x080, CRC(d501f579) SHA1(9e01d9a6a8cdc782dd2a92fbf2295e8df732f892) )
+ROM_END
+
+
+ROM_START( rungunuaad ) // dual cabinet setup ONLY
+	/* main program US Version AB 1993  9.10 (note program ROMs have UA A labels, but it shows VER.UAB on-screen) */
+	ROM_REGION( 0x300000, "maincpu", 0)
+	ROM_LOAD16_BYTE( "247uaa03.bin", 0x000000, 0x80000, CRC(a05f4cd0) SHA1(1ec8941293a173c659b8503837617ce098390ccd) )
+	ROM_LOAD16_BYTE( "247uaa04.bin", 0x000001, 0x80000, CRC(ebb11bef) SHA1(587c97659fa59c3895886a7b98cd9c91b21f0ed4) )
 
 	/* data */
 	ROM_LOAD16_BYTE( "247a01", 0x100000, 0x80000, CRC(8341cf7d) SHA1(372c147c4a5d54aed2a16b0ed258247e65dda563) )
@@ -1208,15 +1248,16 @@ ROM_END
 GAME( 1993, rungun,   0,      rng, rng, rungun_state, empty_init, ROT0, "Konami", "Run and Gun (ver EAA 1993 10.8)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND )
 GAME( 1993, runguna,  rungun, rng, rng, rungun_state, empty_init, ROT0, "Konami", "Run and Gun (ver EAA 1993 10.4)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND )
 GAME( 1993, rungunb,  rungun, rng, rng, rungun_state, empty_init, ROT0, "Konami", "Run and Gun (ver EAA 1993 9.10, prototype?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND )
-GAME( 1993, rungunua, rungun, rng, rng, rungun_state, empty_init, ROT0, "Konami", "Run and Gun (ver UBA 1993 10.8)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND )
+GAME( 1993, rungunuba,rungun, rng, rng, rungun_state, empty_init, ROT0, "Konami", "Run and Gun (ver UBA 1993 10.8)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND )
 GAME( 1993, slmdunkj, rungun, rng, rng, rungun_state, empty_init, ROT0, "Konami", "Slam Dunk (ver JAA 1993 10.8)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND )
 
 // these sets have the demux adapter connected, and output to 2 screens (as the adapter represents a physical hardware difference, albeit a minor one, use clone sets)
-GAMEL( 1993, rungund,  rungun, rng_dual, rng_dual, rungun_state, empty_init, ROT0, "Konami", "Run and Gun (ver EAA 1993 10.8) (dual screen with demux adapter)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND, layout_rungun_dual )
-GAMEL( 1993, rungunad, rungun, rng_dual, rng_dual, rungun_state, empty_init, ROT0, "Konami", "Run and Gun (ver EAA 1993 10.4) (dual screen with demux adapter)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND, layout_rungun_dual )
-GAMEL( 1993, rungunbd, rungun, rng_dual, rng_dual, rungun_state, empty_init, ROT0, "Konami", "Run and Gun (ver EAA 1993 9.10, prototype?) (dual screen with demux adapter)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND, layout_rungun_dual )
-GAMEL( 1993, rungunuad,rungun, rng_dual, rng_dual, rungun_state, empty_init, ROT0, "Konami", "Run and Gun (ver UBA 1993 10.8) (dual screen with demux adapter)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND, layout_rungun_dual )
-GAMEL( 1993, slmdunkjd,rungun, rng_dual, rng_dual, rungun_state, empty_init, ROT0, "Konami", "Slam Dunk (ver JAA 1993 10.8) (dual screen with demux adapter)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND, layout_rungun_dual )
+GAMEL( 1993, rungund,   rungun, rng_dual, rng_dual, rungun_state, empty_init, ROT0, "Konami", "Run and Gun (ver EAA 1993 10.8) (dual screen with demux adapter)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND, layout_rungun_dual )
+GAMEL( 1993, rungunad,  rungun, rng_dual, rng_dual, rungun_state, empty_init, ROT0, "Konami", "Run and Gun (ver EAA 1993 10.4) (dual screen with demux adapter)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND, layout_rungun_dual )
+GAMEL( 1993, rungunbd,  rungun, rng_dual, rng_dual, rungun_state, empty_init, ROT0, "Konami", "Run and Gun (ver EAA 1993 9.10, prototype?) (dual screen with demux adapter)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND, layout_rungun_dual )
+GAMEL( 1993, rungunubad,rungun, rng_dual, rng_dual, rungun_state, empty_init, ROT0, "Konami", "Run and Gun (ver UBA 1993 10.8) (dual screen with demux adapter)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND, layout_rungun_dual )
+GAMEL( 1993, slmdunkjd, rungun, rng_dual, rng_dual, rungun_state, empty_init, ROT0, "Konami", "Slam Dunk (ver JAA 1993 10.8) (dual screen with demux adapter)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND, layout_rungun_dual )
 
-// this set has no dipswitches to select single screen mode (they're not even displayed in test menu) it's twin cabinet ONLY
-GAMEL( 1993, rungunud, rungun, rng_dual, rng_nodip, rungun_state, empty_init, ROT0, "Konami", "Run and Gun (ver UAB 1993 10.12, dedicated twin cabinet)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND, layout_rungun_dual )
+// these sets have no DIP switches to select single screen mode (they're not even displayed in test menu) they're twin cabinet ONLY
+GAMEL( 1993, rungunuabd,rungun, rng_dual, rng_nodip, rungun_state, empty_init, ROT0, "Konami", "Run and Gun (ver UAB 1993 10.12, dedicated twin cabinet)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND, layout_rungun_dual )
+GAMEL( 1993, rungunuaad,rungun, rng_dual, rng_nodip, rungun_state, empty_init, ROT0, "Konami", "Run and Gun (ver UAB 1993  9.10, dedicated twin cabinet)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND, layout_rungun_dual )

@@ -623,10 +623,13 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 
 		if ((raw_scanline & 1) == 0)
 		{
+   			const int min_x = 0x18 << 1;
+			const int max_x = 0x34 << 1;
+
 			// TODO: refine, merge with OCS version
-			if (x >= 0x18 && x <= 0x34 && (x & 3) == 0)
+			if (x >= min_x && x <= max_x && (x & 7) == 0)
 			{
-				int num = (x - 0x18) >> 2;
+				int num = (x - min_x) >> 3;
 				//printf("%d %02x\n", num, x);
 				aga_update_sprite_dma(raw_scanline >> 1, num);
 			}

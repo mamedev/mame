@@ -3136,7 +3136,7 @@ ROM_START( avmjts ) // GH1701 PCB + VCR tape controller PCB
 	// 8k socketed but no ROM, everything else not populated
 
 	ROM_REGION( 0x40000, "protection", 0 )
-	ROM_LOAD( "mask.f2", 0x00000, 0x40000, BAD_DUMP CRC(2199e3e9) SHA1(965af4a29db4ff909dbeeebab1b828eb4f23f57e) ) // not dumped yet
+	ROM_LOAD( "mask.f2", 0x00000, 0x40000, CRC(2199e3e9) SHA1(965af4a29db4ff909dbeeebab1b828eb4f23f57e) )
 
 	DISK_REGION( "vhs" ) /* Video Home System tape */
 	DISK_IMAGE_READONLY( "avmjts", 0, NO_DUMP )

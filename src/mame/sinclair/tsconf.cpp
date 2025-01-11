@@ -41,6 +41,10 @@ TODO:
 #include "sound/ay8910.h"
 #include "speaker.h"
 
+
+ALLOW_SAVE_TYPE(tsconf_state::gluk_ext);
+
+
 TILE_GET_INFO_MEMBER(tsconf_state::get_tile_info_txt)
 {
 	u8 *m_row_location = &m_ram->pointer()[get_vpage_offset() + (tile_index / tilemap.cols() * 256)];
@@ -177,13 +181,18 @@ void tsconf_state::machine_start()
 	spectrum_128_state::machine_start();
 	m_maincpu->space(AS_PROGRAM).specific(m_program);
 
-	save_item(NAME(m_regs));
-	// TODO save'm'all!
-
 	// reconfigure ROMs
 	memory_region *rom = memregion("maincpu");
 	m_bank_rom[0]->configure_entries(0, rom->bytes() / 0x4000, rom->base(), 0x4000);
 	m_bank_ram[0]->configure_entries(0, m_ram->size() / 0x4000, m_ram->pointer(), 0x4000);
+
+	save_item(NAME(m_int_mask));
+	save_pointer(NAME(m_regs), 0x100);
+	save_item(NAME(m_zctl_di));
+	save_item(NAME(m_zctl_cs));
+	save_item(NAME(m_port_f7_ext));
+	save_item(NAME(m_gfx_y_frame_offset));
+	save_item(NAME(m_ay_selected));
 }
 
 void tsconf_state::machine_reset()
@@ -341,4 +350,4 @@ ROM_START(tsconf)
 ROM_END
 
 //    YEAR  NAME    PARENT      COMPAT  MACHINE     INPUT       CLASS           INIT        COMPANY             FULLNAME                            FLAGS
-COMP( 2011, tsconf, spec128,    0,      tsconf,     tsconf,     tsconf_state,   empty_init, "NedoPC, TS-Labs",  "ZX Evolution: TS-Configuration",   0)
+COMP( 2011, tsconf, spec128,    0,      tsconf,     tsconf,     tsconf_state,   empty_init, "NedoPC, TS-Labs",  "ZX Evolution: TS-Configuration",   MACHINE_SUPPORTS_SAVE)

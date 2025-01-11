@@ -35,7 +35,7 @@
  *         Intel 82358               EISA Bus Controller
  *         Intel 82357               EISA Integrated System Peripheral (ISP)
  *         Intel 82352 x 2           EISA Bus Buffer (EBB)
- *         Emulex FAS216             SCSI controller
+ *         Emulex FAS216             SCSI controller (similar to NCR 53CF94-2)
  *         27C01                     128k EPROM
  *         28F020                    256k flash memory
  *         NEC μPD31432              ARC address path ASIC
@@ -155,7 +155,7 @@ protected:
 	required_device<ram_device> m_vram;
 	required_device<mct_adr_device> m_mct_adr;
 	required_device<nscsi_bus_device> m_scsibus;
-	required_device<ncr53c94_device> m_scsi;
+	required_device<ncr53cf94_device> m_scsi;
 	required_device<n82077aa_device> m_fdc;
 	required_device<mc146818_device> m_rtc;
 	required_device<nvram_device> m_nvram;
@@ -220,7 +220,7 @@ void jazz_state::mct_map(address_map &map)
 	map(0x80000000, 0x80000fff).m(m_mct_adr, FUNC(mct_adr_device::map));
 
 	map(0x80001000, 0x800010ff).m(m_net, FUNC(dp83932c_device::map)).umask32(0x0000ffff);
-	map(0x80002000, 0x8000200f).m(m_scsi, FUNC(ncr53c94_device::map));
+	map(0x80002000, 0x8000200f).m(m_scsi, FUNC(ncr53cf94_device::map));
 	map(0x80003000, 0x8000300f).m(m_fdc, FUNC(n82077aa_device::map));
 
 	// LE: only reads 4000
@@ -310,17 +310,16 @@ void jazz_state::jazz(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:6", jazz_scsi_devices, "cdrom");
 
 	// scsi host adapter
-	// FIXME: refuses to POST with correct NCR53CF94 device
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr53cf94", NCR53C94).clock(24_MHz_XTAL).machine_config(
+	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr53cf94", NCR53CF94).clock(40000000).machine_config(
 		[this] (device_t *device)
 		{
-			ncr53c94_device &adapter = downcast<ncr53c94_device &>(*device);
+			ncr53cf94_device &adapter = downcast<ncr53cf94_device &>(*device);
 
 			adapter.irq_handler_cb().set(m_mct_adr, FUNC(mct_adr_device::irq<5>));
 			adapter.drq_handler_cb().set(m_mct_adr, FUNC(mct_adr_device::drq<0>));
 
-			subdevice<mct_adr_device>(":mct_adr")->dma_r_cb<0>().set(adapter, FUNC(ncr53c94_device::dma_r));
-			subdevice<mct_adr_device>(":mct_adr")->dma_w_cb<0>().set(adapter, FUNC(ncr53c94_device::dma_w));
+			subdevice<mct_adr_device>(":mct_adr")->dma_r_cb<0>().set(adapter, FUNC(ncr53cf94_device::dma_r));
+			subdevice<mct_adr_device>(":mct_adr")->dma_w_cb<0>().set(adapter, FUNC(ncr53cf94_device::dma_w));
 		});
 
 	// floppy controller and drive
