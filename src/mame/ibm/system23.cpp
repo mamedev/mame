@@ -5,11 +5,16 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "machine/i8251.h"
+#include "machine/pit8253.h"
 #include "machine/i8255.h"
 #include "machine/i8257.h"
+#include "machine/pic8259.h"
 #include "video/i8275.h"
 #include "machine/ram.h"
+#include "sound/beep.h"
 #include "screen.h"
+#include "speaker.h"
 #include "logmacro.h"
 
 #include "ibmsystem23.lh"
@@ -28,9 +33,14 @@ namespace
 				m_ppi_settings(*this, "ppi_settings"),
 				m_dmac(*this,"dma"),
 				m_crtc(*this, "crtc"),
+				m_pit(*this, "pit"),
+				m_pic(*this, "pic"),
+				m_usart(*this, "usart"),
 				m_chargen(*this, "chargen"),
 				m_ram(*this, RAM_TAG),
+				m_paged_ram(*this, "paged_ram"),
 				m_screen(*this, "screen"),
+				m_beep(*this, "beeper"),
 				m_language(*this,"lang"),
 				m_cedip(*this,"ce"),
 				m_j1(*this,"j1"),
@@ -54,9 +64,14 @@ namespace
 			required_device<i8255_device> m_ppi_settings;
 			required_device<i8257_device> m_dmac;
 			required_device<i8275_device> m_crtc;
+			required_device<pit8253_device> m_pit;
+			required_device<pic8259_device> m_pic;
+			required_device<i8251_device> m_usart;
 			required_region_ptr<uint8_t> m_chargen;
 			required_device<ram_device> m_ram;
+			required_device<ram_device> m_paged_ram;
 			required_device<screen_device> m_screen;
+			required_device<beep_device> m_beep;
 			required_ioport m_language;
 			required_ioport m_cedip;
 			required_ioport m_j1;
@@ -281,14 +296,17 @@ namespace
 	void system23_state::system23_io(address_map &map)
 	{
 		map.unmap_value_high();
-		map(0x00, 0x08).rw(m_dmac, FUNC(i8257_device::read), FUNC(i8257_device::write));
+		map(0x00, 0x0f).rw(m_dmac, FUNC(i8257_device::read), FUNC(i8257_device::write));
 		map(0x20, 0x20).rw(FUNC(system23_state::ram_read_page_r),FUNC(system23_state::ram_read_page_w));
 		map(0x21, 0x21).rw(FUNC(system23_state::ram_write_page_r),FUNC(system23_state::ram_write_page_w));
 		map(0x22, 0x22).rw(FUNC(system23_state::dma_page_r),FUNC(system23_state::dma_page_w));
 		map(0x23, 0x23).rw(FUNC(system23_state::ros_page_r),FUNC(system23_state::ros_page_w));
+		map(0x24, 0x27).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+		map(0x28, 0x2b).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 		map(0x2c, 0x2f).rw(m_ppi_settings, FUNC(i8255_device::read), FUNC(i8255_device::write));
 		map(0x40, 0x43).rw(m_ppi_diag, FUNC(i8255_device::read), FUNC(i8255_device::write));
 		map(0x44, 0x45).rw(m_crtc, FUNC(i8275_device::read), FUNC(i8275_device::write));
+		map(0x48,0x49).rw(m_usart, FUNC(i8251_device::read), FUNC(i8251_device::write));
 		map(0x4c, 0x4f).rw(m_ppi_kbd, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	}
 
@@ -300,6 +318,7 @@ namespace
 		map(0x0000, 0x3fff).rom();
 		map(0x4000, 0x7fff).bankr(m_ros);
 		map(0x8000, 0xbfff).ram();
+		map(0xc000, 0xffff).ram();
 
 	}
 
@@ -345,21 +364,42 @@ namespace
 		m_crtc->hrtc_wr_callback().set(FUNC(system23_state::hrtc_r));
 		m_crtc->vrtc_wr_callback().set(FUNC(system23_state::vrtc_r));
 
+		I8251(config, m_usart, 0);
+		SPEAKER(config, "mono").front_center();
+		BEEP(config, m_beep, 1000).add_route(ALL_OUTPUTS, "mono", 0.50);
+
+		PIT8253(config, m_pit, 0);
+		m_pit->set_clk<0>(18'432'000 / 6);
+		m_pit->set_clk<1>(18'432'000 / 6);
+		m_pit->set_clk<2>(18'432'000 / 6);
+		//m_pit->out_handler<0>().set(m_usart, FUNC(i8251_device::clock));
+		//m_pit->out_handler<1>().set(FUNC(system23_state::update_beeper));
+		m_pit->out_handler<2>().set_inputline(m_maincpu, I8085_RST75_LINE);
+
+		PIC8259(config, m_pic, 0);
+		//m_maincpu->set_irq_acknowledge_callback(m_pic, pic8259_device::inta_cb);
+
+
 
 		RAM(config, m_ram).set_default_size("16k");
+		RAM(config, m_paged_ram).set_default_size("16k").set_extra_options("16k,48k,96k");
 
 		config.set_perfect_quantum(m_maincpu);
 		config.set_default_layout(layout_ibmsystem23);
+
+
 	}
 
 	void system23_state::machine_start()
 	{
 		m_diag_digits.resolve();
+		m_ros->configure_entries(0, 16, memregion("maincpu")->base() + 0x4000, 0x4000);
 	}
 
 	void system23_state::machine_reset()
 	{
-
+		m_beep->set_state(1);
+		m_beep->set_clock(0);
 	}
 
 	static INPUT_PORTS_START(system23)
@@ -387,8 +427,8 @@ namespace
 			PORT_DIPNAME( 0x20, 0x00, "A6")
 			PORT_DIPSETTING(    0x20, DEF_STR( Off ))
 			PORT_DIPSETTING(    0x00, DEF_STR( On ))
-			PORT_DIPNAME( 0x40, 0x40, "A7")
-			PORT_DIPSETTING(    0x08, DEF_STR( Off ))
+			PORT_DIPNAME( 0x40, 0x00, "A7")//Needs to be closed in order for the PIT to be detected!
+			PORT_DIPSETTING(    0x40, DEF_STR( Off ))
 			PORT_DIPSETTING(    0x00, DEF_STR( On ))
 			PORT_DIPNAME( 0x80, 0x00, "A8")
 			PORT_DIPSETTING(    0x80, DEF_STR( Off ))
@@ -415,28 +455,48 @@ namespace
 
 	ROM_START( system23 )
 		ROM_SYSTEM_BIOS(0, "r_set", "\"R\" Set - 1982?")
-		ROM_SYSTEM_BIOS(1, "tm_set", "\"TM\" Set - 1981?")
+		ROM_SYSTEM_BIOS(1, "pp_set", "\"PP\" Set - 1980")
 
-		ROM_REGION(0x48000, "maincpu", 0)
+		ROM_REGION(0x24000, "maincpu", 0)
 		//"R" Set (1982?)
 		ROMX_LOAD("02_61c9866a_4481186.bin", 0x00000, 0x2000, CRC(61c9866a) SHA1(43f2bed5cc2374c7fde4632948329062e57e994b), ROM_BIOS(0))
 		ROMX_LOAD("09_07843020_8493747.bin", 0x02000, 0x2000, CRC(07843020) SHA1(828ca0199af1246f6caf58bcb785f791c3a7e34e), ROM_BIOS(0))
-
 		ROMX_LOAD("0a_b9569153_8519402.bin", 0x04000, 0x2000, CRC(b9569153) SHA1(92ccf91766557bc565ad36fc131396aff28b8999), ROM_BIOS(0))
 		ROMX_LOAD("0b_4f631183_8519404.bin", 0x06000, 0x2000, CRC(4f631183) SHA1(5f7b011129616bae46c70133309a70c29cc0f127), ROM_BIOS(0))
-		ROMX_LOAD("0c_48646293_8519403.bin", 0x14000, 0x2000, CRC(48646293) SHA1(3d7eaf2c143499757681fbedbc3716829ef9bd25), ROM_BIOS(0))
-		ROMX_LOAD("0d_bea5a812_8519405.bin", 0x16000, 0x2000, CRC(bea5a812) SHA1(5da3a9231c5d456fa7a26ab36b9d5380e096af59), ROM_BIOS(0))
+		ROMX_LOAD("0c_48646293_8519403.bin", 0x08000, 0x2000, CRC(48646293) SHA1(3d7eaf2c143499757681fbedbc3716829ef9bd25), ROM_BIOS(0))
+		ROMX_LOAD("0d_bea5a812_8519405.bin", 0x0a000, 0x2000, CRC(bea5a812) SHA1(5da3a9231c5d456fa7a26ab36b9d5380e096af59), ROM_BIOS(0))
 		//ROM E is empty
 		//ROM F is empty
-		ROMX_LOAD("10_41e6c232_8519411.bin", 0x34000, 0x2000, CRC(41e6c232) SHA1(6711000a0c6836a411997de15274b990dd2c0ed0), ROM_BIOS(0))
-		ROMX_LOAD("11_b17f5c6e_8519407.bin", 0x36000, 0x2000, CRC(b17f5c6e) SHA1(1d5c2f33de6d1efa2b27b7c43b30268946ef5920), ROM_BIOS(0))
-		ROMX_LOAD("12_04dcc52f_8519408.bin", 0x44000, 0x2000, CRC(04dcc52f) SHA1(feba4f189a8bb442c241dadb1fa1f2cb4f344fa3), ROM_BIOS(0))
-		ROMX_LOAD("13_9a3f70c7_8519414.bin", 0x46000, 0x2000, CRC(9a3f70c7) SHA1(2dc509b8fa0f84a12df2ee6e91e5fbb29ce7c541), ROM_BIOS(0))
+		ROMX_LOAD("10_41e6c232_8519411.bin", 0x10000, 0x2000, CRC(41e6c232) SHA1(6711000a0c6836a411997de15274b990dd2c0ed0), ROM_BIOS(0))
+		ROMX_LOAD("11_b17f5c6e_8519407.bin", 0x12000, 0x2000, CRC(b17f5c6e) SHA1(1d5c2f33de6d1efa2b27b7c43b30268946ef5920), ROM_BIOS(0))
+		ROMX_LOAD("12_04dcc52f_8519408.bin", 0x14000, 0x2000, CRC(04dcc52f) SHA1(feba4f189a8bb442c241dadb1fa1f2cb4f344fa3), ROM_BIOS(0))
+		ROMX_LOAD("13_9a3f70c7_8519414.bin", 0x16000, 0x2000, CRC(9a3f70c7) SHA1(2dc509b8fa0f84a12df2ee6e91e5fbb29ce7c541), ROM_BIOS(0))
+		ROMX_LOAD("14_91b2969e_8519406.bin", 0x18000, 0x2000, CRC(91b2969e) SHA1(dedac0b9b3e607bcb03bc16653c2c002eb67b633), ROM_BIOS(0))
+		ROMX_LOAD("15_0f9a99fa_8519416.bin", 0x1a000, 0x2000, CRC(0f9a99fa) SHA1(ba174188167482997694b84f68b9d45e55187212), ROM_BIOS(0))
+		ROMX_LOAD("16_e451a5e2_8519409.bin", 0x1c000, 0x2000, CRC(e451a5e2) SHA1(f41d2493f696387a2c729420ad8beafac96e604d), ROM_BIOS(0))
+		ROMX_LOAD("17_b9fb8bf1_8519410.bin", 0x1e000, 0x2000, CRC(b9fb8bf1) SHA1(e5de770db73ac4c30fad5c03445b5239c133d84a), ROM_BIOS(0))
+		ROMX_LOAD("18_22cb6de4_8519417.bin", 0x20000, 0x2000, CRC(22cb6de4) SHA1(ae050de1dd20afc25fe97012f6b088be0ae47878), ROM_BIOS(0))
+		ROMX_LOAD("19_2e665945_4481711.bin", 0x22000, 0x2000, CRC(2e665945) SHA1(4ae61c13786b44b28a02055c104ef63355a629b9), ROM_BIOS(0))
 
-
-		//"TM" Set (1981?)
-		ROMX_LOAD("02_765abd93_8493746.bin", 0x00000, 0x2000, CRC(765abd93) SHA1(1ec489f1d2f72bf7e9ddc5ef642a8336b3ff67e3),ROM_BIOS(1))
-		ROMX_LOAD("09_07843020_8493747.bin", 0x02000, 0x2000, CRC(07843020) SHA1(828ca0199af1246f6caf58bcb785f791c3a7e34e),ROM_BIOS(1))
+		//"PP" Set (1980)
+		ROMX_LOAD("02_765abd93_8493746.bin", 0x00000, 0x2000, CRC(765abd93) SHA1(1ec489f1d2f72bf7e9ddc5ef642a8336b3ff67e3), ROM_BIOS(1))
+		ROMX_LOAD("09_07843020_8493747.bin", 0x02000, 0x2000, CRC(07843020) SHA1(828ca0199af1246f6caf58bcb785f791c3a7e34e), ROM_BIOS(1))
+		ROMX_LOAD("0a_b9569153_8493748.bin", 0x04000, 0x2000, CRC(b9569153) SHA1(92ccf91766557bc565ad36fc131396aff28b8999), ROM_BIOS(1))
+		ROMX_LOAD("0b_4f631183_8493754.bin", 0x06000, 0x2000, CRC(4f631183) SHA1(5f7b011129616bae46c70133309a70c29cc0f127), ROM_BIOS(1))
+		ROMX_LOAD("0c_48646293_8493749.bin", 0x08000, 0x2000, CRC(48646293) SHA1(3d7eaf2c143499757681fbedbc3716829ef9bd25), ROM_BIOS(1))
+		ROMX_LOAD("0d_bea5a812_8493755.bin", 0x0a000, 0x2000, CRC(bea5a812) SHA1(5da3a9231c5d456fa7a26ab36b9d5380e096af59), ROM_BIOS(1))
+		//ROM E is empty
+		//ROM F is empty
+		//ROM 10 is empty
+		//ROM 11 is empty
+		ROMX_LOAD("12_04dcc52f_8493760.bin", 0x14000, 0x2000, CRC(04dcc52f) SHA1(feba4f189a8bb442c241dadb1fa1f2cb4f344fa3), ROM_BIOS(1))
+		ROMX_LOAD("13_26869666_8493761.bin", 0x16000, 0x2000, CRC(26869666) SHA1(9fae28fe3613218a6f8d7fb7a88bbc29a3f75a0f), ROM_BIOS(1))
+		ROMX_LOAD("14_91b2969e_8493756.bin", 0x18000, 0x2000, CRC(91b2969e) SHA1(dedac0b9b3e607bcb03bc16653c2c002eb67b633), ROM_BIOS(1))
+		ROMX_LOAD("15_269db39d_8493762.bin", 0x1a000, 0x2000, CRC(269db39d) SHA1(f32c3754cff5a8bbfc76fc23040731cb7ff343fa), ROM_BIOS(1))
+		ROMX_LOAD("16_e451a5e2_8493763.bin", 0x1c000, 0x2000, CRC(e451a5e2) SHA1(f41d2493f696387a2c729420ad8beafac96e604d), ROM_BIOS(1))
+		ROMX_LOAD("17_b9fb8bf1_8493764.bin", 0x1e000, 0x2000, CRC(b9fb8bf1) SHA1(e5de770db73ac4c30fad5c03445b5239c133d84a), ROM_BIOS(1))
+		ROMX_LOAD("18_41e6c232_8493765.bin", 0x20000, 0x2000, CRC(41e6c232) SHA1(6711000a0c6836a411997de15274b990dd2c0ed0), ROM_BIOS(1))
+		ROMX_LOAD("19_73aeeb56_8493727.bin", 0x22000, 0x2000, CRC(73aeeb56) SHA1(abfce66d49662731d9e41e06c54c63cd40f9caac), ROM_BIOS(1))
 
 		ROM_REGION(0x2000, "chargen", 0)
 		ROMX_LOAD("chr_73783bc7_8519412.bin", 0x0000, 0x2000, CRC(73783bc7) SHA1(45ee2a9acbb577b281ad8181b7ec0c5ef05c346a),ROM_BIOS(0))
