@@ -751,7 +751,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mpu3_state::gen_100hz)
 	/* Although reported as a '50Hz' signal, the fact that both rising and
 	falling edges of the pulse are used means the timer actually gives a 100Hz
 	oscillating signal.*/
-	m_signal_100hz = m_signal_100hz?0:1;
+	m_signal_100hz = m_signal_100hz^=1;
 	m_ptm2->set_c1(m_signal_100hz);
 	m_pia3->cb1_w(m_signal_100hz);
 	update_triacs();
