@@ -347,18 +347,17 @@ arm::Mem drcbe_arm64::get_mem_absolute(a64::Assembler &a, const void *ptr) const
 	}
 
 	const uint64_t pagebase = codeoffs & ~make_bitmask<uint64_t>(12);
-	const int64_t pagerel = (int64_t)ptr - pagebase;
-	if (is_valid_immediate(abs(pagerel), 12) || ((abs(pagerel) & 0xfff) == 0 && is_valid_immediate(abs(pagerel) >> 12, 12)))
+	const int64_t pagerel = pagebase - (int64_t)ptr;
+	if (is_valid_immediate_signed(pagerel, 33))
 	{
-		a.brk(1);
+		const uint64_t targetpage = (uint64_t)ptr & ~make_bitmask<uint64_t>(12);
+		const uint64_t pageoffs = (uint64_t)ptr & util::make_bitmask<uint64_t>(12);
 
-		a.adrp(MEM_SCRATCH_REG, pagebase);
+		a.adrp(MEM_SCRATCH_REG, targetpage);
 
-		if (is_valid_immediate_signed(pagerel, 9))
-			return arm::Mem(MEM_SCRATCH_REG, pagerel);
-		else if (pagerel > 0 && emit_add_optimized(a, MEM_SCRATCH_REG, MEM_SCRATCH_REG, pagerel))
-			return arm::Mem(MEM_SCRATCH_REG);
-		else if (pagerel < 0 && emit_sub_optimized(a, MEM_SCRATCH_REG, MEM_SCRATCH_REG, pagerel))
+		if (is_valid_immediate_signed(pageoffs, 9))
+			return arm::Mem(MEM_SCRATCH_REG, pageoffs);
+		else if (emit_add_optimized(a, MEM_SCRATCH_REG, MEM_SCRATCH_REG, pageoffs))
 			return arm::Mem(MEM_SCRATCH_REG);
 	}
 
@@ -492,22 +491,20 @@ void drcbe_arm64::emit_ldr_str_base_mem(a64::Assembler &a, a64::Inst::Id opcode,
 	}
 
 	const uint64_t pagebase = codeoffs & ~make_bitmask<uint64_t>(12);
-	const int64_t pagerel = (int64_t)ptr - pagebase;
-	if (is_valid_immediate(abs(pagerel), 12) || ((abs(pagerel) & 0xfff) == 0 && is_valid_immediate(abs(pagerel) >> 12, 12)))
+	const int64_t pagerel = pagebase - (int64_t)ptr;
+	if (is_valid_immediate_signed(pagerel, 33))
 	{
-		a.adrp(MEM_SCRATCH_REG, pagebase);
+		const uint64_t targetpage = (uint64_t)ptr & ~make_bitmask<uint64_t>(12);
+		const uint64_t pageoffs = (uint64_t)ptr & util::make_bitmask<uint64_t>(12);
 
-		if (is_valid_immediate_signed(pagerel, 9))
+		a.adrp(MEM_SCRATCH_REG, targetpage);
+
+		if (is_valid_immediate_signed(pageoffs, 9))
 		{
-			a.emit(opcode, reg, arm::Mem(MEM_SCRATCH_REG, pagerel));
+			a.emit(opcode, reg, arm::Mem(MEM_SCRATCH_REG, pageoffs));
 			return;
 		}
-		else if (pagerel > 0 && emit_add_optimized(a, MEM_SCRATCH_REG, MEM_SCRATCH_REG, pagerel))
-		{
-			a.emit(opcode, reg, arm::Mem(MEM_SCRATCH_REG));
-			return;
-		}
-		else if (pagerel < 0 && emit_sub_optimized(a, MEM_SCRATCH_REG, MEM_SCRATCH_REG, pagerel))
+		else if (emit_add_optimized(a, MEM_SCRATCH_REG, MEM_SCRATCH_REG, pageoffs))
 		{
 			a.emit(opcode, reg, arm::Mem(MEM_SCRATCH_REG));
 			return;
