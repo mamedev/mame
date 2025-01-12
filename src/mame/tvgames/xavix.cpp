@@ -35,10 +35,8 @@
     year        name                                                                                            PCB ID      ROM width       TSOP pads   ROM size        SEEPROM             die markings            extra components / notes
 
     2006      Hello Kitty カードでおままごと　あいうおえ図鑑 / エポック社 / 日本       Hello Kitty Play House with Cards Aiuoe Illustrated Book / Epochsha / Japan
-              ドラえもん 体感タケコプター! 空とぶ大冒険 / エポック社 / 日本      Doraemon Experience Takecopter! Great Flying Adventure / Epoch Publishing / Japan
               スーパーテレビパソコンLink / エポック社 / 日本   Super TV PC Link / Epoch / Japan
               Let's!TVプレイ ふしぎ星のふたご姫Gyu! ドレスチェンジでキュートにダンス / バンダイ / 日本   Let's!TV Play Gyu, the Twin Princess of the Mysterious Planet! Dance cutely with a dress change / Bandai / Japan
-              Let's!TVプレイ 体感キャストオフ 仮面ライダーカブト クロックアップ＆ライダーキック / バンダイ / 日本  Let's!TV Play Experience Cast Off Kamen Rider Kabuto Clock Up & Rider Kick / Bandai / Japan
               Let's!TVプレイ なりきりファイト ウルトラマン 撃て！必殺光線！！ / タカラトミー / 日本   Let's!TV Play Narikiri Fight Ultraman Shoot! Deadly ray! ! / Takara Tomy / Japan
               Jala Jaland /atlus/Japan (arcade version)                                                       -           -               -           -               -                   -                       -
     2004      Printer for TV computer /EPOCH/Japan                                                            -           -               -           -               -                   -                       -
@@ -64,7 +62,8 @@
     2005      Let's!TVプレイ ドラゴンボ－ルＺ バトル体感かめはめ波～ おめぇとフュージョン / バンダイ / 日本          Let's!TV Play Dragon Ball Z Battle Experience Kamehameha ~ Ometo Fusion / Bandai / Japan
 
     dumped: either here, xavix_2000.cpp, or xavix_2002.cpp
-	          Let's!TVプレイ なりきり体感 ボウケンジャー 走れ！撃て！ミッションスタート！！ / バンダイ / 日本   Let's! TV Play Narikiri Experience Boukenger Run! Shoot! Mission starts! ! / Bandai / Japan
+	          Let's!TVプレイ 体感キャストオフ 仮面ライダーカブト クロックアップ＆ライダーキック / バンダイ / 日本  Let's!TV Play Experience Cast Off Kamen Rider Kabuto Clock Up & Rider Kick / Bandai / Japan
+			  Let's!TVプレイ なりきり体感 ボウケンジャー 走れ！撃て！ミッションスタート！！ / バンダイ / 日本   Let's! TV Play Narikiri Experience Boukenger Run! Shoot! Mission starts! ! / Bandai / Japan
 			  Webdiver Gradion /TAKARA/Japan                                                                  -           -               -           -               -                   -                       -
 			  Let's!TVプレイ 魔法戦隊マジレンジャー マジマットでダンス＆バトル / バンダイ / 日本        Let's!TV Play Mahou Sentai Magiranger Dance & Battle at Magimat / Bandai / Japan
 			  anpan-man pyon-pyon ikunou mat /JoyPalette/Japan                                                -           -               -           -               -                   -                       -
@@ -200,6 +199,7 @@
     2006      Let's!TVプレイ　ＮＡＲＵＴＯ－ナルト－ 忍者体感～だってばよ～ / バンダイ / 日本            Let's!TV Play NARUTO Ninja Experience ~Dattebayo~ / Bandai / Japan
     2006      テレビであそぼう！まなぼう！超能力あいうえお図鑑 / エポック社 / 日本   Let's play on TV! Learn! Superpower Aiueo Illustrated Book / Epochsha / Japan
     2006      Let's!TVプレイ　ドラゴンボールＺ　バトル体感かめはめ波２～オッスおめぇ悟空 天下一武道会～ / バンダイ / 日本         Let's!TV Play Dragon Ball Z Battle Experience Kamehameha 2 ~Ossu Ome Goku Tenkaichi Budokai~ / Bandai / Japan
+    2006      ドラえもん 体感タケコプター! 空とぶ大冒険 / エポック社 / 日本      Doraemon Experience Takecopter! Great Flying Adventure / Epoch Publishing / Japan
 
 
 

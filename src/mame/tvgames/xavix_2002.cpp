@@ -715,6 +715,13 @@ ROM_START( epo_doka )
 	ROM_LOAD("doka.u1", 0x000000, 0x400000, CRC(853266d2) SHA1(d4121b89ee464088951898282404e5a2b788dd69) )
 ROM_END
 
+ROM_START( ban_utmj )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("utmj.u7", 0x000000, 0x800000, CRC(0ac2bcd9) SHA1(ca7c82e2015c86bb37bd66016c33343d174e9965) )
+
+	// SEEPROM is HT24LC02 at u3
+ROM_END
+
 ROM_START( ban_bkgj )
 	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("bkgj.u2", 0x000000, 0x400000, CRC(a59ce23c) SHA1(d2a6be9e46f3cfc3cf798bf1f76732eee909c93b) )
@@ -858,6 +865,9 @@ CONS( 2004, epo_doka, 0, 0, xavix2002_4mb,               xavix,      superxavix_
 
 // Let's!TVプレイ なりきり体感 ボウケンジャー 走れ！撃て！ミッションスタート！！
 CONS( 2006, ban_bkgj, 0, 0, superxavix_i2c_24c04_4mb,xavix_i2c,  superxavix_i2c_state, init_xavix, "Bandai / SSD Company LTD",  "Let's! TV Play GoGo Sentai Boukanger Run! Shoot! Mission Starts!! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// Let's!TV プレイ 体感キャストオフ 仮面ライダーカブト クロックアップ＆ライダーキック
+CONS( 2006, ban_utmj, 0, 0, superxavix_i2c_24c02,    xavix_i2c,  superxavix_i2c_state, init_xavix, "Bandai / SSD Company LTD",  "Let's! TV Play Experience Cast Off Kamen Rider Kabuto Clock Up & Rider Kick (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // それいけトーマス ソドー島のなかまたち
 CONS( 2005, tmy_thom, 0, 0, superxavix_i2c_24c04,    xavix_i2c,  superxavix_i2c_state, init_xavix, "Tomy / SSD Company LTD",   "Soreike Thomas - Sodor Tou no Nakamatachi / Thomas & Friends on the Island of Sodor (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
