@@ -347,9 +347,11 @@ arm::Mem drcbe_arm64::get_mem_absolute(a64::Assembler &a, const void *ptr) const
 	}
 
 	const uint64_t pagebase = codeoffs & ~make_bitmask<uint64_t>(12);
-	const int64_t pagerel = pagebase - (int64_t)ptr;
+	const int64_t pagerel = (int64_t)ptr - pagebase;
 	if (is_valid_immediate(abs(pagerel), 12) || ((abs(pagerel) & 0xfff) == 0 && is_valid_immediate(abs(pagerel) >> 12, 12)))
 	{
+		a.brk(1);
+
 		a.adrp(MEM_SCRATCH_REG, pagebase);
 
 		if (is_valid_immediate_signed(pagerel, 9))
@@ -490,7 +492,7 @@ void drcbe_arm64::emit_ldr_str_base_mem(a64::Assembler &a, a64::Inst::Id opcode,
 	}
 
 	const uint64_t pagebase = codeoffs & ~make_bitmask<uint64_t>(12);
-	const int64_t pagerel = pagebase - (int64_t)ptr;
+	const int64_t pagerel = (int64_t)ptr - pagebase;
 	if (is_valid_immediate(abs(pagerel), 12) || ((abs(pagerel) & 0xfff) == 0 && is_valid_immediate(abs(pagerel) >> 12, 12)))
 	{
 		a.adrp(MEM_SCRATCH_REG, pagebase);
