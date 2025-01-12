@@ -45,7 +45,6 @@ PCBoards:
 
 Known audio inaccuracies (reasons for MACHINE_IMPERFECT_SOUND):
 - No anti-aliasing filters (coming soon).
-- No voice tuning (coming soon).
 - Closed and Accent hi-hat volume variations might be wrong. See comments in
   HIHAT_CONFIG (to be researched soon).
 - No metronome yet.
@@ -62,7 +61,9 @@ Known audio inaccuracies (reasons for MACHINE_IMPERFECT_SOUND):
 
 Usage notes:
 - Interactive layout included.
-- The mixer faders can be controlled with the mouse, or from the "Sliders" menu.
+- The mixer faders can be controlled with the mouse, or from the "Slider
+  Controls" menu.
+- Voices can be tuned using the "Sider Controls" menu.
 - The drum keys are mapped to the keyboard, starting at "Q". Specifically:
   Q - Bass 1, W - Snare 1, ...
   A - Bass 2, S - Snare 2, ...
@@ -148,10 +149,14 @@ struct dmx_voice_card_config
 class dmx_voice_card : public device_t, public device_sound_interface
 {
 public:
+	// Default value of pitch adjustment trimpot.
+	static constexpr const s32 T1_DEFAULT_PERCENT = 50;
+
 	dmx_voice_card(const machine_config &mconfig, const char *tag, device_t *owner, const dmx_voice_card_config &config, required_memory_region *sample_rom) ATTR_COLD;
 	dmx_voice_card(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0) ATTR_COLD;
 
 	void trigger(bool tr0, bool tr1);
+	void set_pitch_adj(s32 t1_percent);  // Valid values: 0-100.
 
 protected:
 	void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -161,7 +166,9 @@ protected:
 
 private:
 	void reset_counter();
-	void configure_pitch();
+	void init_pitch() ATTR_COLD;
+	void compute_pitch_variations();
+	void select_pitch();
 	void configure_volume();
 
 	bool is_decay_enabled() const;
@@ -173,8 +180,14 @@ private:
 	required_device<timer_device> m_timer;  // 555, U5.
 	required_device<dac76_device> m_dac;  // AM6070, U8. Compatible with DAC76.
 
+	// Configuration. Do not include in save state.
 	const dmx_voice_card_config m_config;
 	required_memory_region *m_sample_rom = nullptr;
+	std::vector<float> m_cv;  // 555 CV (pin 5) voltage variations.
+	std::vector<attotime> m_sample_t;  // Sample period variations.
+	s32 m_t1_percent = T1_DEFAULT_PERCENT;
+
+	// Device state.
 
 	bool m_counting = false;
 	u16 m_counter = 0;  // 4040 counter.
@@ -203,6 +216,7 @@ dmx_voice_card::dmx_voice_card(
 	, m_config(config)
 	, m_sample_rom(sample_rom)
 {
+	init_pitch();
 }
 
 dmx_voice_card::dmx_voice_card(
@@ -235,12 +249,19 @@ void dmx_voice_card::trigger(bool tr0, bool tr1)
 	m_decaying = false;
 
 	if (m_config.pitch_control)
-		configure_pitch();
+		select_pitch();
 	else
 		configure_volume();
 
 	LOGMASKED(LOG_SOUND, "Trigger: (%d, %d) %d %f\n",
 	          tr0, tr1, m_trigger_mode, m_volume);
+}
+
+void dmx_voice_card::set_pitch_adj(s32 t1_percent)
+{
+	m_stream->update();
+	m_t1_percent = t1_percent;
+	compute_pitch_variations();
 }
 
 void dmx_voice_card::device_add_mconfig(machine_config &config)
@@ -265,7 +286,7 @@ void dmx_voice_card::device_reset()
 {
 	m_trigger_mode = 0;
 	reset_counter();
-	configure_pitch();
+	compute_pitch_variations();
 	configure_volume();
 }
 
@@ -304,20 +325,14 @@ void dmx_voice_card::sound_stream_update(
 
 void dmx_voice_card::reset_counter()
 {
+	m_stream->update();
 	m_counter = 0;
 	m_counting = false;
 }
 
-void dmx_voice_card::configure_pitch()
+void dmx_voice_card::init_pitch()
 {
-	// TODO: A lot of the computations below can be cached at object
-	// construction time for all 3 trigger modes.
-
-	// Pitch variations are accomplished by changing the playback sample rate.
-	// This is done by changing the control voltage (CV) on the 555 timer that
-	// generates the sampling clock.
-
-	// *** Compute CV input (pin 5) of the 555.
+	// Precompute all variations of CV (pin 5 of 555 timer).
 
 	// The CV equations were derived from Kirchhoff analysis and verified with
 	// simulations: https://tinyurl.com/26x8oq75
@@ -327,47 +342,113 @@ void dmx_voice_card::configure_pitch()
 	// should help with accuracy.
 	static constexpr const float VD = 0.48F;
 	static constexpr const float R_555 = RES_K(5);
+	static constexpr const float R5 = RES_K(3.3);
+
+	m_cv.clear();
+	m_cv.push_back(VCC * 2 / 3); // The 555 default, if pin 5 is floating.
+
+	if (m_config.pitch_control)
+	{
+		const float r12 = m_config.r12;
+
+		// For trigger mode 1.
+		const float alpha = 1.0F + r12 / m_config.r17;
+		m_cv.push_back((alpha * R5 + r12) * (2 * VCC - 3 * VD) /
+		               (3 * alpha * R5 + 3 * r12 + 2 * alpha * R_555) + VD);
+
+		// For trigger mode 2.
+		m_cv.push_back((R5 + r12) * (2 * VCC - 3 * VD) /
+		               (3 * R5 + 3 * r12 + 2 * R_555) + VD);
+
+		// For trigger mode 3.
+		m_cv.push_back(m_cv[0]);
+	}
+
+	for (int i = 0; i < m_cv.size(); ++i)
+		LOGMASKED(LOG_PITCH, "%s 555 CV %d: %f\n", tag(), i, m_cv[i]);
+
+	// m_sample_t will be populated by subsequent calls to configure_pitch().
+	m_sample_t.clear();
+	m_sample_t.resize(m_cv.size());
+}
+
+void dmx_voice_card::compute_pitch_variations()
+{
 	static constexpr const float R3 = RES_K(1);
 	static constexpr const float R4 = RES_K(10);
-	static constexpr const float R5 = RES_K(3.3);
-	static constexpr const float T1 = RES_K(6);  // TODO: 10K potentiometer.
+	static constexpr const float T1_MAX = RES_K(10);
 
-	float cv = VCC * 2 / 3;  // The 555 default, if the CV pin is not connected.
-	const float r12 = m_config.r12;
-	if (m_trigger_mode == 1)
+	// The baseline pitch (and sampling rate) for all voice cards is controlled
+	// by a 555 timer (U5). Users can adjust the pitch with a trimpot (T1).
+
+	// For voice cards configured for pitch control (m_config.pitch_control is
+	// true), pitch variations are accomplished by changing the Control Voltage
+	// (pin 5) of the 555 (see init_pitch()).
+
+	// Computing the timer period is a bit involved, because of the use of CV,
+	// and because the 555 is not configured in the typical astable mode.
+	// For an RC circuit, V(t) = Vstart + (Vend - Vstart) * (1 - exp(-t / RC)).
+	// Solving for t: t = -RC * log( (Vend - V) / (Vend - Vstart) ).
+	// Let t_high be the time interval for which the 555 output is high. This is
+	// the time it takes for the capacitor to charge from CV/2 to CV.
+	// Let t_low be the time interval for which the 555 output is low. This is
+	// the time it takes for the capacitor to discharge from CV to CV/2.
+	// The timer period is then: t_high + t_low. t_* can be computed by
+	// substituting appropriate values in the function for `t`, keeping in mind
+	// that RC, Vstart, Vend and V are different for charging and discharging.
+
+	// Compute RC time constant for charging.
+	assert(m_t1_percent >= 0 && m_t1_percent <= 100);
+	const float r_charge = m_t1_percent * T1_MAX / 100 + R4;
+	const float rc_charge = r_charge * m_config.c2;
+
+	// Compute Vend and RC time constant for discharging, taking into account
+	// the atypical 555 configuration.
+	const float rc_discharge = RES_2_PARALLEL(r_charge, R3) * m_config.c2;
+	const float ve_discharge = VCC * RES_VOLTAGE_DIVIDER(r_charge, R3);
+
+	// Optimization: when m_config.pitch_control is true,
+	// m_sample_t[0] = m_sample_t[3]. So skip index 0 and copy after the loop.
+	const int start_i = m_config.pitch_control ? 1 : 0;
+
+	for (int i = start_i; i < m_sample_t.size(); ++i)
 	{
-		const float alpha = 1.0 + r12 / m_config.r17;
-		cv = (alpha * R5 + r12) * (2 * VCC - 3 * VD) /
-		     (3 * alpha * R5 + 3 * r12 + 2 * alpha * R_555) + VD;
+		const float cv = m_cv[i];
+		const float half_cv = 0.5F * cv;
+
+		// Time for C2 to charge from CV/2 (Vstart) to CV (V). Vend = VCC
+		const float t_high = -rc_charge * logf((VCC - cv) / (VCC - half_cv));
+		assert(t_high > 0);
+
+		// Time for C2 to discharge from CV (Vstart) to CV/2 (V).
+		const float t_low = -rc_discharge * logf((ve_discharge - half_cv) / (ve_discharge - cv));
+		assert(t_low > 0);
+
+		m_sample_t[i] = attotime::from_double(t_high + t_low);
+		LOGMASKED(LOG_PITCH, "%s Pitch variation %d: %f (%f, %f)\n",
+		          tag(), i, 1.0 / m_sample_t[i].as_double(), t_high, t_low);
 	}
-	else if (m_trigger_mode == 2)
-	{
-		cv = (R5 + r12) * (2 * VCC - 3 * VD) /
-		     (3 * R5 + 3 * r12 + 2 * R_555) + VD;
-	}
-	const float cv_norm = cv / VCC;
-	LOGMASKED(LOG_PITCH, "S555 CV: %f\n", cv);
 
-	// *** Compute sampling rate.
+	if (m_config.pitch_control)
+		m_sample_t[0] = m_sample_t[3];
 
-	// Compute time for which the output is high.
-	// TODO: T1 will not be a constant once tuning is supported.
-	const float r_charge = T1 + R4;
-	const float t_high =
-		-r_charge * m_config.c2 * logf((2 * cv_norm - 2) / (cv_norm - 2));
-	assert(t_high > 0);
+	select_pitch();
+}
 
-	// Compute time for which the output is low.
-	const float target_v_fraction = RES_VOLTAGE_DIVIDER(r_charge, R3);
-	const float effective_r = RES_2_PARALLEL(r_charge, R3);
-	const float t_low =
-		-effective_r * m_config.c2 * logf((cv_norm - 2 * target_v_fraction) /
-		(2 * (cv_norm - target_v_fraction)));
-	assert(t_low > 0);
+void dmx_voice_card::select_pitch()
+{
+	attotime sampling_t;
+	if (m_config.pitch_control)
+		sampling_t = m_sample_t[m_trigger_mode];
+	else
+		sampling_t = m_sample_t[0];
 
-	const attotime period = attotime::from_double(t_high + t_low);
-	m_timer->adjust(period, 0, period);
-	LOGMASKED(LOG_PITCH, "Sampling frequency: %f\n", 1.0 / period.as_double());
+	if (sampling_t == m_timer->period())
+		return;  // Avoid resetting the timer in this case.
+
+	m_timer->adjust(sampling_t, 0, sampling_t);
+	LOGMASKED(LOG_PITCH, "Setting sampling frequency: %f\n",
+	          1.0 / sampling_t.as_double());
 }
 
 void dmx_voice_card::configure_volume()
@@ -605,6 +686,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(voice_volume_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(metronome_volume_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(master_volume_changed);
+	DECLARE_INPUT_CHANGED_MEMBER(pitch_adj_changed);
 
 protected:
 	void machine_start() override ATTR_COLD;
@@ -1008,6 +1090,13 @@ DECLARE_INPUT_CHANGED_MEMBER(dmx_state::master_volume_changed)
 	LOGMASKED(LOG_FADERS, "Master volume changed: %d\n", newval);
 }
 
+DECLARE_INPUT_CHANGED_MEMBER(dmx_state::pitch_adj_changed)
+{
+	// Using "100 -" so that larger values increase pitch.
+	m_voices[param]->set_pitch_adj(100 - newval);
+	LOGMASKED(LOG_PITCH, "Voice %d pitch adjustment changed: %d\n", param, newval);
+}
+
 INPUT_PORTS_START(dmx)
 	PORT_START("buttons_0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("2") PORT_CODE(KEYCODE_2_PAD)
@@ -1094,44 +1183,79 @@ INPUT_PORTS_START(dmx)
 	// Fader potentiometers. P1-P10 on the Switch Board.
 
 	PORT_START("fader_p1")
-	PORT_ADJUSTER(100, "BASS")
+	PORT_ADJUSTER(100, "BASS volume")
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::voice_volume_changed), dmx_state::VC_BASS)
 
 	PORT_START("fader_p2")
-	PORT_ADJUSTER(100, "SNARE")
+	PORT_ADJUSTER(100, "SNARE volume")
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::voice_volume_changed), dmx_state::VC_SNARE)
 
 	PORT_START("fader_p3")
-	PORT_ADJUSTER(100, "HI-HAT")
+	PORT_ADJUSTER(100, "HI-HAT volume")
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::voice_volume_changed), dmx_state::VC_HIHAT)
 
 	PORT_START("fader_p4")
-	PORT_ADJUSTER(100, "TOM1")
+	PORT_ADJUSTER(100, "TOM1 volume")
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::voice_volume_changed), dmx_state::VC_SMALL_TOMS)
 
 	PORT_START("fader_p5")
-	PORT_ADJUSTER(100, "TOM2")
+	PORT_ADJUSTER(100, "TOM2 volume")
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::voice_volume_changed), dmx_state::VC_LARGE_TOMS)
 
 	PORT_START("fader_p6")
-	PORT_ADJUSTER(100, "CYMBAL")
+	PORT_ADJUSTER(100, "CYMBAL volume")
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::voice_volume_changed), dmx_state::VC_CYMBAL)
 
 	PORT_START("fader_p7")
-	PORT_ADJUSTER(100, "PERC1")
+	PORT_ADJUSTER(100, "PERC1 volume")
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::voice_volume_changed), dmx_state::VC_PERC1)
 
 	PORT_START("fader_p8")
-	PORT_ADJUSTER(100, "PERC2")
+	PORT_ADJUSTER(100, "PERC2 volume")
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::voice_volume_changed), dmx_state::VC_PERC2)
 
 	PORT_START("fader_p9")
-	PORT_ADJUSTER(100, "MET")
+	PORT_ADJUSTER(100, "MET volume")
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::metronome_volume_changed), 0)
 
 	PORT_START("fader_p10")
 	PORT_ADJUSTER(100, "VOLUME")
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::master_volume_changed), 0)
+
+	// Tunning potentiomenters. One per voice card, designated as T1 and labeled
+	// as "PITCH ADJ."
+
+	PORT_START("pitch_adj_0")
+	PORT_ADJUSTER(dmx_voice_card::T1_DEFAULT_PERCENT, "BASS pitch")
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::pitch_adj_changed), dmx_state::VC_BASS)
+
+	PORT_START("pitch_adj_1")
+	PORT_ADJUSTER(dmx_voice_card::T1_DEFAULT_PERCENT, "SNARE pitch")
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::pitch_adj_changed), dmx_state::VC_SNARE)
+
+	PORT_START("pitch_adj_2")
+	PORT_ADJUSTER(dmx_voice_card::T1_DEFAULT_PERCENT, "HI-HAT pitch")
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::pitch_adj_changed), dmx_state::VC_HIHAT)
+
+	PORT_START("pitch_adj_3")
+	PORT_ADJUSTER(dmx_voice_card::T1_DEFAULT_PERCENT, "TOM1 pitch")
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::pitch_adj_changed), dmx_state::VC_SMALL_TOMS)
+
+	PORT_START("pitch_adj_4")
+	PORT_ADJUSTER(dmx_voice_card::T1_DEFAULT_PERCENT, "TOM2 pitch")
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::pitch_adj_changed), dmx_state::VC_LARGE_TOMS)
+
+	PORT_START("pitch_adj_5")
+	PORT_ADJUSTER(dmx_voice_card::T1_DEFAULT_PERCENT, "PERC1 pitch")
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::pitch_adj_changed), dmx_state::VC_PERC1)
+
+	PORT_START("pitch_adj_6")
+	PORT_ADJUSTER(dmx_voice_card::T1_DEFAULT_PERCENT, "PERC2 pitch")
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::pitch_adj_changed), dmx_state::VC_PERC2)
+
+	PORT_START("pitch_adj_7")
+	PORT_ADJUSTER(dmx_voice_card::T1_DEFAULT_PERCENT, "CYMBAL pitch")
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::pitch_adj_changed), dmx_state::VC_CYMBAL)
 INPUT_PORTS_END
 
 ROM_START(obdmx)
