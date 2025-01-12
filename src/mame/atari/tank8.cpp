@@ -462,7 +462,6 @@ void tank8_state::cpu_map(address_map &map)
 	map(0x1d05, 0x1d05).nopr().writeonly().share(m_team);
 	map(0x1d06, 0x1d06).nopr().w(FUNC(tank8_state::attract_w));
 	map(0x1e00, 0x1e07).nopr().w(FUNC(tank8_state::motor_w));
-
 }
 
 
