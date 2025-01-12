@@ -237,9 +237,9 @@ void poolshrk_state::cpu_map(address_map &map)
 {
 	map.global_mask(0x7fff);
 	map(0x0000, 0x00ff).mirror(0x2300).ram();
-	map(0x0400, 0x07ff).mirror(0x2000).writeonly().share(m_playfield_ram);
-	map(0x0800, 0x080f).mirror(0x23f0).writeonly().share(m_hpos_ram);
-	map(0x0c00, 0x0c0f).mirror(0x23f0).writeonly().share(m_vpos_ram);
+	map(0x0400, 0x07ff).mirror(0x2000).nopr().writeonly().share(m_playfield_ram);
+	map(0x0800, 0x080f).mirror(0x23f0).nopr().writeonly().share(m_hpos_ram);
+	map(0x0c00, 0x0c0f).mirror(0x23f0).nopr().writeonly().share(m_vpos_ram);
 	map(0x1000, 0x13ff).mirror(0x2000).rw(FUNC(poolshrk_state::input_r), FUNC(poolshrk_state::watchdog_w));
 	map(0x1400, 0x17ff).mirror(0x2000).w(FUNC(poolshrk_state::scratch_sound_w));
 	map(0x1800, 0x1bff).mirror(0x2000).w(FUNC(poolshrk_state::score_sound_w));

@@ -453,15 +453,15 @@ void tank8_state::cpu_map(address_map &map)
 	map(0x1c10, 0x1c1f).writeonly().share(m_pos_v_ram);
 	map(0x1c20, 0x1c2f).writeonly().share(m_pos_d_ram);
 
-	map(0x1c30, 0x1c37).w(FUNC(tank8_state::lockout_w));
-	map(0x1d00, 0x1d00).w(FUNC(tank8_state::int_reset_w));
-	map(0x1d01, 0x1d01).w(FUNC(tank8_state::crash_w));
-	map(0x1d02, 0x1d02).w(FUNC(tank8_state::explosion_w));
-	map(0x1d03, 0x1d03).w(FUNC(tank8_state::bugle_w));
-	map(0x1d04, 0x1d04).w(FUNC(tank8_state::bug_w));
-	map(0x1d05, 0x1d05).writeonly().share(m_team);
-	map(0x1d06, 0x1d06).w(FUNC(tank8_state::attract_w));
-	map(0x1e00, 0x1e07).w(FUNC(tank8_state::motor_w));
+	map(0x1c30, 0x1c37).nopr().w(FUNC(tank8_state::lockout_w));
+	map(0x1d00, 0x1d00).nopr().w(FUNC(tank8_state::int_reset_w));
+	map(0x1d01, 0x1d01).nopr().w(FUNC(tank8_state::crash_w));
+	map(0x1d02, 0x1d02).nopr().w(FUNC(tank8_state::explosion_w));
+	map(0x1d03, 0x1d03).nopr().w(FUNC(tank8_state::bugle_w));
+	map(0x1d04, 0x1d04).nopr().w(FUNC(tank8_state::bug_w));
+	map(0x1d05, 0x1d05).nopr().writeonly().share(m_team);
+	map(0x1d06, 0x1d06).nopr().w(FUNC(tank8_state::attract_w));
+	map(0x1e00, 0x1e07).nopr().w(FUNC(tank8_state::motor_w));
 
 }
 
