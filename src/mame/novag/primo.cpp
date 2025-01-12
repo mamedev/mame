@@ -12,27 +12,33 @@ TODO:
 - if/when MAME supports an exit callback, hook up power-off switch to that
 - Novag Super System peripherals don't work on nsnova due to serial clock drift,
   baud rate differs a bit between host and client, m6801 serial emulation issue
-- unmapped reads from 0x3c/0x3d (primo/supremo) or 0x33/0x34 (nsnova)
+- unmapped reads from 0x33/0x34 (nsnova) or 0x3c/0x3d (others)
 - supremo unmapped writes to 0x2000/0x6000, always 0?
 - is the 1st version of supremo(black plastic) the same ROM?
 - is "Aquamarine / Super Nova" the same ROM as nsnova and just a redesign?
 
 BTANB:
-- primo has the same bug as nvip, where if the user presses Go right after
-  entering a move during the opening, the CPU opponent will answer by playing
-  a move with white
+- nprimo/beluga has the same bug as nvip, where if the user presses Go right
+  after entering a move during the opening, the CPU opponent will answer by
+  playing a move with white
 
 ================================================================================
 
-Novag Primo (model 871)
------------------------
+Novag Primo family
+------------------
 
 Hardware notes:
+
+Primo (model 871):
 - PCB label: 100059/100060
 - Hitachi HD6301Y0P (mode 2) @ 8MHz
 - 2KB RAM(M5M5118P)
 - LCD with 4 7segs and custom segments, no LCD chip
 - buzzer, 16 LEDs, 8*8 chessboard buttons
+
+Beluga (model 903):
+- PCB label: 100116
+- CPU runs at 16MHz, rest is same as Primo
 
 The LCD is the same as the one in VIP / Super VIP.
 
@@ -83,6 +89,7 @@ the Super VIP combined with the Novag Super System Touch Sensory board.
 #include "speaker.h"
 
 // internal artwork
+#include "novag_beluga.lh"
 #include "novag_primo.lh"
 #include "novag_snova.lh"
 #include "novag_supremo.lh"
@@ -106,6 +113,7 @@ public:
 	{ }
 
 	void primo(machine_config &config);
+	void beluga(machine_config &config);
 	void supremo(machine_config &config);
 	void snova(machine_config &config);
 
@@ -216,13 +224,13 @@ u8 primo_state::p2_r()
 		if (BIT(m_select, i + 6))
 			data |= BIT(m_inputs[i]->read(), m_inp_mux);
 
-	// P23 (nprimo, supremo): power switch
-	if (!m_power)
-		data |= 8;
-
 	// P23 (nsnova): serial rx
 	if (m_rs232)
 		data |= m_rs232->rxd_r() << 3;
+
+	// P23 (others): power switch
+	if (!m_power)
+		data |= 8;
 
 	return data ^ 1;
 }
@@ -398,6 +406,20 @@ void primo_state::primo(machine_config &config)
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
+void primo_state::beluga(machine_config &config)
+{
+	primo(config);
+
+	// basic machine hardware
+	m_maincpu->set_clock(16_MHz_XTAL);
+	m_maincpu->in_p2_cb().set(FUNC(primo_state::p2_r)).mask(0xef);
+
+	// P24 is tied to P52 (freq sel via P50-P53)
+	m_maincpu->in_p2_cb().append([this]() { return m_select << 2; }).mask(0x10);
+
+	config.set_default_layout(layout_novag_beluga);
+}
+
 void primo_state::supremo(machine_config &config)
 {
 	primo(config);
@@ -445,6 +467,15 @@ ROM_START( nprimo )
 ROM_END
 
 
+ROM_START( beluga )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD("novag_903_31y0rm59p.u1", 0x0000, 0x4000, CRC(16fc6bfc) SHA1(5ab4c7e92eb7b6b449c388f50293dfd01aa87c24) )
+
+	ROM_REGION( 36256, "screen", 0 )
+	ROM_LOAD("nvip.svg", 0, 36256, CRC(3373e0d5) SHA1(25bfbf0405017388c30f4529106baccb4723bc6b) )
+ROM_END
+
+
 ROM_START( supremo )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("sp_a10.u5", 0x8000, 0x8000, CRC(1db63786) SHA1(4f24452ed8955b31ba88f68cc95c357660930aa4) )
@@ -480,6 +511,8 @@ ROM_END
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS        INIT        COMPANY, FULLNAME, FLAGS
 SYST( 1987, nprimo,  0,      0,      primo,   primo,   primo_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Primo (Novag)", MACHINE_SUPPORTS_SAVE )
+
+SYST( 1990, beluga,  0,      0,      beluga,  primo,   primo_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Beluga", MACHINE_SUPPORTS_SAVE )
 
 SYST( 1988, supremo, 0,      0,      supremo, supremo, primo_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Supremo", MACHINE_SUPPORTS_SAVE )
 
