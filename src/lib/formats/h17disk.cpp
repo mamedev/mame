@@ -84,7 +84,6 @@ static std::pair<std::uint64_t, std::size_t> find_block(util::random_read &io, u
 	}
 	while (header.block_name != block_id);
 
-
 	// update position to point to data portion of the block
 	return std::make_pair(pos + 8, header.length);
 }
@@ -237,12 +236,11 @@ bool heath_h17d_format::load(util::random_read &io, uint32_t form_factor, const 
 	return true;
 }
 
-void heath_h17d_format::fm_reverse_byte_w(std::__1::vector<uint32_t> &buffer, uint8_t val) const
+void heath_h17d_format::fm_reverse_byte_w(std::vector<uint32_t> &buffer, uint8_t val) const
 {
 	static unsigned char lookup[16] = { 0x0, 0x8, 0x4, 0xc, 0x2, 0xa, 0x6, 0xe, 0x1, 0x9, 0x5, 0xd, 0x3, 0xb, 0x7, 0xf };
 
 	fm_w(buffer, 8, lookup[val & 0x0f] << 4 | lookup[val >> 4], BITCELL_SIZE);
 }
-
 
 const heath_h17d_format FLOPPY_H17D_FORMAT;

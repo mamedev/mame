@@ -31,7 +31,6 @@ public:
 protected:
 
 	void fm_reverse_byte_w(std::vector<uint32_t> &buffer, uint8_t val) const;
-
 };
 
 extern const heath_h17d_format FLOPPY_H17D_FORMAT;
