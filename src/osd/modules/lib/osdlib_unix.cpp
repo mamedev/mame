@@ -53,6 +53,7 @@ void osd_process_kill()
 	kill(getpid(), SIGKILL);
 }
 
+
 //============================================================
 //  osd_break_into_debugger
 //============================================================
@@ -67,6 +68,31 @@ void osd_break_into_debugger(const char *message)
 	printf("Ignoring MAME exception: %s\n", message);
 #endif
 }
+
+
+//============================================================
+//  osd_get_cache_line_size
+//============================================================
+
+std::pair<std::error_condition, unsigned> osd_get_cache_line_size() noexcept
+{
+#if defined(__linux__)
+	FILE *const f = std::fopen("/sys/devices/system/cpu/cpu0/cache/index0/coherency_line_size", "r");
+	if (!f)
+		return std::make_pair(std::error_condition(errno, std::generic_category()), 0U);
+
+	unsigned result = 0;
+	auto const cnt = std::fscanf(f, "%u", &result);
+	std::fclose(f);
+	if (1 == cnt)
+		return std::make_pair(std::error_condition(), result);
+	else
+		return std::make_pair(std::errc::io_error, 0U);
+#else // defined(__linux__)
+	return std::make_pair(std::errc::not_supported, 0U);
+#endif
+}
+
 
 #ifdef SDLMAME_ANDROID
 std::string osd_get_clipboard_text() noexcept
