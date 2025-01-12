@@ -30,7 +30,7 @@ public:
 
 protected:
 
-	void fm_reverse_byte_w(std::__1::vector<uint32_t> &buffer, uint8_t val) const;
+	void fm_reverse_byte_w(std::vector<uint32_t> &buffer, uint8_t val) const;
 
 };
 
