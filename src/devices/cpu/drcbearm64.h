@@ -221,7 +221,7 @@ private:
 	void mov_signed_reg64_param32(asmjit::a64::Assembler &a, const asmjit::a64::Gp &dst, const be_parameter &src) const;
 	void mov_r64_imm(asmjit::a64::Assembler &a, const asmjit::a64::Gp &dst, uint64_t const src) const;
 
-	void call_arm_addr(asmjit::a64::Assembler &a, const void *offs, bool naked = true) const;
+	void call_arm_addr(asmjit::a64::Assembler &a, const void *offs) const;
 
 	drc_hash_table m_hash;
 	drc_map_variables m_map;
