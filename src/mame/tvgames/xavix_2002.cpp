@@ -867,7 +867,7 @@ CONS( 2004, epo_doka, 0, 0, xavix2002_4mb,               xavix,      superxavix_
 CONS( 2006, ban_bkgj, 0, 0, superxavix_i2c_24c04_4mb,xavix_i2c,  superxavix_i2c_state, init_xavix, "Bandai / SSD Company LTD",  "Let's! TV Play GoGo Sentai Boukanger Run! Shoot! Mission Starts!! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // Let's!TV プレイ 体感キャストオフ 仮面ライダーカブト クロックアップ＆ライダーキック
-CONS( 2006, ban_utmj, 0, 0, superxavix_i2c_24c02,    xavix_i2c,  superxavix_i2c_state, init_xavix, "Bandai / SSD Company LTD",  "Let's! TV Play Experience Cast Off Kamen Rider Kabuto Clock Up & Rider Kick (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2006, ban_utmj, 0, 0, superxavix_i2c_24c02,    xavix_i2c,  superxavix_i2c_state, init_xavix, "Bandai / SSD Company LTD",  "Let's! TV Play Taikan Cast Off - Kamen Rider Kabuto Clock Up & Rider Kick!! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // それいけトーマス ソドー島のなかまたち
 CONS( 2005, tmy_thom, 0, 0, superxavix_i2c_24c04,    xavix_i2c,  superxavix_i2c_state, init_xavix, "Tomy / SSD Company LTD",   "Soreike Thomas - Sodor Tou no Nakamatachi / Thomas & Friends on the Island of Sodor (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
