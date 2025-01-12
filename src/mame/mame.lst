@@ -16250,7 +16250,9 @@ pinkswtsx                       // (c) 2006 Cave (AMI license) - 2006/xx/xx MAST
 pinkswtssc                      // bootleg
 
 @source:cave/fstgfish.cpp
-fstgfish                        // (c) 2008 Cave
+fstgfish                        // (c) 2009 Cave
+oygt                            // (c) 2009 Cave
+oyks                            // (c) 2009 Cave
 
 @source:cce/mc1000.cpp
 mc1000                          //
@@ -27598,6 +27600,7 @@ toride2g                        // (c) 1994
 toride2gg                       // (c) 1994
 toride2gk                       // (c) 1994
 toride2j                        // (c) 1994
+toride2ji                       // (c) 1994
 vmetal                          // (c) 1995 Excellent System?
 vmetaln                         // (c) 1995 Excellent System?
 
