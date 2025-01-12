@@ -42675,6 +42675,9 @@ dbzscout
 @source:skeleton/kron.cpp
 kron180                         // 1995 Kron Ltd, Ukraine
 
+@source:skeleton/leadsinger2.cpp
+leadsng2
+
 @source:skeleton/lee1214.cpp
 lee1214d                        //
 
