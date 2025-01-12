@@ -30711,7 +30711,6 @@ bsuertev                        // 1991, Unknown
 caspoker                        // 1988, PM / Beck Elektronik.
 caspokera                       // 1987, PM / Beck Elektronik.
 caspokerb                       // 1986, PM / Beck Elektronik.
-codemagik                       // (c) 198? Voyageur de L'Espace Inc.
 falcnwld                        // 1991, TVG
 falcnwlda                       // (c) 1990, Video Klein
 falcnwldb                       // (c) 1990, Video Klein
@@ -31098,6 +31097,7 @@ awetoss                         // Lazer-Tron Awesome Toss 'Em
 ribrac                          // Lazer-Tron Ribbit Racin
 
 @source:misc/lependu.cpp
+codemagik                       // (c) 198? Voyageur de L'Espace Inc.
 lependu                         // 198? Avenir Amusement Inc.
 
 @source:misc/limenko.cpp
