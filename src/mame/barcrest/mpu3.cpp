@@ -751,7 +751,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mpu3_state::gen_100hz)
 	/* Although reported as a '50Hz' signal, the fact that both rising and
 	falling edges of the pulse are used means the timer actually gives a 100Hz
 	oscillating signal.*/
-	m_signal_100hz = m_signal_100hz^=1;
+	m_signal_100hz ^= 1;
 	m_ptm2->set_c1(m_signal_100hz);
 	m_pia3->cb1_w(m_signal_100hz);
 	update_triacs();
@@ -1710,6 +1710,7 @@ GAMEL( 198?, m3ratrce,   0,          mpu3base, mpu3, mpu3_state, init_mpu3, ROT0
 
 GAME(  198?, m3supasw,   0,          mpu3base, mpu3, mpu3_state, init_mpu3, ROT0, "BWB","Supaswop (BWB) (MPU3)",GAME_FLAGS )
 
+// boots and then errors with REEL 'A' FAILURE
 GAMEL( 198?, m3supwin,   0,          mpu3base, mpu3, mpu3_state, init_mpu3, ROT0, "BWB","Super Win (BWB) (MPU3, set 1) (W.AG2) ", GAME_FLAGS, layout_m3supwin ) // offset VFD
 GAMEL( 198?, m3supwina,  m3supwin,   mpu3base, mpu3, mpu3_state, init_mpu3, ROT0, "BWB","Super Win (BWB) (MPU3, set 2) (S.W.2 1.0)", GAME_FLAGS, layout_m3supwin )
 
@@ -1729,14 +1730,13 @@ GAMEL( 198?, m3spoofa,   m3spoof,    mpu3base, mpu3, mpu3_state, init_mpu3, ROT0
 GAMEL( 198?, m3supspo,   0,          mpu3base, mpu3, mpu3_state, init_mpu3, ROT0, "Pcp","Super Spoof (Pcp) (MPU3, set 1)", GAME_FLAGS, layout_m3supspo )
 GAMEL( 198?, m3supspoa,  m3supspo,   mpu3base, mpu3, mpu3_state, init_mpu3, ROT0, "Pcp","Super Spoof (Pcp) (MPU3, set 2)", GAME_FLAGS, layout_m3supspo )
 
-// boots, reel error a
 GAMEL( 198?, m3loony,    0,          mpu3base, mpu3, mpu3_state, init_mpu3, ROT0, "Pcp","Loonybin (Pcp) (MPU3)", GAME_FLAGS, layout_m3loony )
 
-// does nothing
+// boots, no vfd, then locks
 GAMEL( 198?, m3online,   0,          mpu3base, mpu3, mpu3_state, init_mpu3, ROT0, "Pcp","On Line (Pcp) (MPU3)", GAME_FLAGS, layout_m3online )
 GAMEL( 198?, m3toplin,   0,          mpu3base, mpu3, mpu3_state, init_mpu3, ROT0, "Pcp","Top Line (Pcp) (MPU3)", GAME_FLAGS, layout_m3toplin )
 
-// offset VFD, don't boot (act like m3supwin above)
+// REEL 'A' FAILURE
 GAMEL( 198?, m3rockpl,   0,          mpu3base, mpu3, mpu3_state, init_mpu3, ROT0, "Pcp","Rock Pile (Pcp) (MPU3)", GAME_FLAGS, layout_m3rockpl )
 GAMEL( 198?, m3rollem,   0,          mpu3base, mpu3, mpu3_state, init_mpu3, ROT0, "Pcp","Roll 'Em (Pcp) (MPU3)", GAME_FLAGS, layout_m3rollem )
 GAME(  198?, m3wigwam,   0,          mpu3base, mpu3, mpu3_state, init_mpu3, ROT0, "Pcp","Wig Wam (Pcp) (MPU3)",GAME_FLAGS )
@@ -1747,7 +1747,7 @@ GAME(  198?, m3wigwam,   0,          mpu3base, mpu3, mpu3_state, init_mpu3, ROT0
 // no protection, boots without testing reels?
 GAMEL( 198?, m3gcrown,   0,          mpu3base, mpu3, mpu3_state, init_mpu3, ROT0, "Mdm","Golden Crowns (Mdm) (MPU3)", GAME_FLAGS, layout_m3gcrown )
 
-// reel A alarm
+// no VFD
 GAMEL( 198?, m3tfair,    0,          mpu3base, mpu3, mpu3_state, init_mpu3, ROT0, "Mdm","Tuppenny Fair (Mdm) (MPU3)", GAME_FLAGS, layout_m3tfair )
 GAME(  198?, m3wacky,    0,          mpu3base, mpu3, mpu3_state, init_mpu3, ROT0, "Mdm","Wacky Racer (Mdm) (MPU3)",GAME_FLAGS )
 
