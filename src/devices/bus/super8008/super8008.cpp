@@ -179,7 +179,7 @@ void super8008_bus_device::ext_req()
 
 uint8_t super8008_bus_device::ext_run()
 {
-	uint run_status = 0;
+	uint8_t run_status = 0;
 	for (device_super8008_card_interface &entry : m_device_list)
 	{
 		run_status |= entry.ext_run();
