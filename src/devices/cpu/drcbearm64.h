@@ -177,6 +177,9 @@ private:
 	asmjit::arm::Mem get_mem_absolute(asmjit::a64::Assembler &a, const void *ptr) const;
 	void get_imm_relative(asmjit::a64::Assembler &a, const asmjit::a64::Gp &reg, const uint64_t ptr) const;
 
+	bool emit_add_optimized(asmjit::a64::Assembler &a, const asmjit::a64::Gp &dst, const asmjit::a64::Gp &src, int64_t val) const;
+	bool emit_sub_optimized(asmjit::a64::Assembler &a, const asmjit::a64::Gp &dst, const asmjit::a64::Gp &src, int64_t val) const;
+
 	void emit_ldr_str_base_mem(asmjit::a64::Assembler &a, asmjit::a64::Inst::Id opcode, const asmjit::a64::Reg &reg, const void *ptr) const;
 	void emit_ldr_mem(asmjit::a64::Assembler &a, const asmjit::a64::Gp &reg, const void *ptr) const;
 	void emit_ldrb_mem(asmjit::a64::Assembler &a, const asmjit::a64::Gp &reg, const void *ptr) const;

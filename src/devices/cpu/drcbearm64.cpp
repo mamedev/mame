@@ -346,8 +346,49 @@ arm::Mem drcbe_arm64::get_mem_absolute(a64::Assembler &a, const void *ptr) const
 		return arm::Mem(MEM_SCRATCH_REG);
 	}
 
+	const uint64_t pagebase = codeoffs & ~make_bitmask<uint64_t>(12);
+	const int64_t pagerel = pagebase - (int64_t)ptr;
+	if (is_valid_immediate(abs(pagerel), 12) || ((abs(pagerel) & 0xfff) == 0 && is_valid_immediate(abs(pagerel) >> 12, 12)))
+	{
+		a.adrp(MEM_SCRATCH_REG, pagebase);
+
+		if (is_valid_immediate_signed(pagerel, 9))
+			return arm::Mem(MEM_SCRATCH_REG, pagerel);
+		else if (pagerel > 0 && emit_add_optimized(a, MEM_SCRATCH_REG, MEM_SCRATCH_REG, pagerel))
+			return arm::Mem(MEM_SCRATCH_REG);
+		else if (pagerel < 0 && emit_sub_optimized(a, MEM_SCRATCH_REG, MEM_SCRATCH_REG, pagerel))
+			return arm::Mem(MEM_SCRATCH_REG);
+	}
+
 	a.mov(MEM_SCRATCH_REG, ptr);
 	return arm::Mem(MEM_SCRATCH_REG);
+}
+
+bool drcbe_arm64::emit_add_optimized(a64::Assembler &a, const a64::Gp &dst, const a64::Gp &src, int64_t val) const
+{
+	// If the bottom 12 bits are 0s then an optimized form can be used if the remaining bits are <= 12
+	if (is_valid_immediate(val, 12) || ((val & 0xfff) == 0 && is_valid_immediate(val >> 12, 12)))
+	{
+		a.add(dst, src, val);
+		return true;
+	}
+
+	return false;
+}
+
+bool drcbe_arm64::emit_sub_optimized(a64::Assembler &a, const a64::Gp &dst, const a64::Gp &src, int64_t val) const
+{
+	if (val < 0)
+		val = -val;
+
+	// If the bottom 12 bits are 0s then an optimized form can be used if the remaining bits are <= 12
+	if (is_valid_immediate(val, 12) || ((val & 0xfff) == 0 && is_valid_immediate(val >> 12, 12)))
+	{
+		a.sub(dst, src, val);
+		return true;
+	}
+
+	return false;
 }
 
 void drcbe_arm64::get_imm_relative(a64::Assembler &a, const a64::Gp &reg, const uint64_t ptr) const
@@ -355,11 +396,10 @@ void drcbe_arm64::get_imm_relative(a64::Assembler &a, const a64::Gp &reg, const 
 	// If a value can be expressed relative to the base register then it's worth using it instead of a mov
 	// which can be expanded to up to 4 instructions for large immediates
 	const int64_t diff = (int64_t)ptr - (int64_t)m_baseptr;
-	if (diff > 0 && is_valid_immediate(diff, 12))
-	{
-		a.add(reg, BASE_REG, diff);
+	if (diff > 0 && emit_add_optimized(a, reg, BASE_REG, diff))
 		return;
-	}
+	else if (diff < 0 && emit_sub_optimized(a, reg, BASE_REG, diff))
+		return;
 
 	const uint64_t codeoffs = a.code()->baseAddress() + a.offset();
 	const int64_t reloffs = codeoffs - (int64_t)ptr;
@@ -399,9 +439,13 @@ void drcbe_arm64::emit_ldr_str_base_mem(a64::Assembler &a, a64::Inst::Id opcode,
 		return;
 	}
 
-	if (diff > 0 && is_valid_immediate(diff, 12))
+	if (diff > 0 && emit_add_optimized(a, MEM_SCRATCH_REG, BASE_REG, diff))
 	{
-		a.add(MEM_SCRATCH_REG, BASE_REG, diff);
+		a.emit(opcode, reg, arm::Mem(MEM_SCRATCH_REG));
+		return;
+	}
+	else if (diff < 0 && emit_sub_optimized(a, MEM_SCRATCH_REG, BASE_REG, diff))
+	{
 		a.emit(opcode, reg, arm::Mem(MEM_SCRATCH_REG));
 		return;
 	}
@@ -441,6 +485,29 @@ void drcbe_arm64::emit_ldr_str_base_mem(a64::Assembler &a, a64::Inst::Id opcode,
 			else
 				a.emit(opcode, reg, arm::Mem(BASE_REG, MEM_SCRATCH_REG));
 
+			return;
+		}
+	}
+
+	const uint64_t pagebase = codeoffs & ~make_bitmask<uint64_t>(12);
+	const int64_t pagerel = pagebase - (int64_t)ptr;
+	if (is_valid_immediate(abs(pagerel), 12) || ((abs(pagerel) & 0xfff) == 0 && is_valid_immediate(abs(pagerel) >> 12, 12)))
+	{
+		a.adrp(MEM_SCRATCH_REG, pagebase);
+
+		if (is_valid_immediate_signed(pagerel, 9))
+		{
+			a.emit(opcode, reg, arm::Mem(MEM_SCRATCH_REG, pagerel));
+			return;
+		}
+		else if (pagerel > 0 && emit_add_optimized(a, MEM_SCRATCH_REG, MEM_SCRATCH_REG, pagerel))
+		{
+			a.emit(opcode, reg, arm::Mem(MEM_SCRATCH_REG));
+			return;
+		}
+		else if (pagerel < 0 && emit_sub_optimized(a, MEM_SCRATCH_REG, MEM_SCRATCH_REG, pagerel))
+		{
+			a.emit(opcode, reg, arm::Mem(MEM_SCRATCH_REG));
 			return;
 		}
 	}
@@ -2481,7 +2548,7 @@ void drcbe_arm64::op_rolins(a64::Assembler &a, const uml::instruction &inst)
 		{
 			const a64::Gp scratch = select_register(TEMP_REG3, inst.size());
 
- 			// val1 = src & ~PARAM3
+			// val1 = src & ~PARAM3
 			if (maskp.is_immediate() && is_valid_immediate_mask(maskp.immediate(), inst.size()))
 			{
 				a.and_(dst, dst, ~maskp.immediate());
