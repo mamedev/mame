@@ -854,6 +854,7 @@ void drcbe_x86::generate(drcuml_block &block, const instruction *instlist, uint3
 		for (unsigned shift = 1; linemask & (linemask + 1); ++shift)
 			linemask |= linemask >> shift;
 	}
+	x86code *dst = (x86code *)(uintptr_t(m_cache.top() + linemask) & ~linemask);
 
 	CodeHolder ch;
 	ch.init(Environment::host(), uint64_t(dst));
