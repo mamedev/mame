@@ -351,9 +351,8 @@ void poolshrk_state::palette(palette_device &palette) const
 void poolshrk_state::poolshrk(machine_config &config)
 {
 	// basic machine hardware
-	M6800(config, m_maincpu, 11'055'000 / 8); // ?
+	M6800(config, m_maincpu, 11.055_MHz_XTAL / 8); // divider not verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &poolshrk_state::cpu_map);
-	m_maincpu->set_vblank_int("screen", FUNC(poolshrk_state::irq0_line_assert));
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
@@ -364,6 +363,7 @@ void poolshrk_state::poolshrk(machine_config &config)
 	screen.set_visarea(1, 255, 24, 255);
 	screen.set_screen_update(FUNC(poolshrk_state::screen_update));
 	screen.set_palette(m_palette);
+	screen.screen_vblank().set_inputline(m_maincpu, M6800_IRQ_LINE, ASSERT_LINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_poolshrk);
 	PALETTE(config, m_palette, FUNC(poolshrk_state::palette), 4);
