@@ -1,8 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:windyfairy
-/*
-Register x15 is unused and can be used as a volatile scratch register if needed
-*/
 
 #include "emu.h"
 #include "drcbearm64.h"
@@ -42,6 +39,9 @@ const a64::Gp TEMP_REG3 = a64::x11;
 // Temporary registers that should not be assumed to live between functions
 const a64::Gp SCRATCH_REG1 = a64::x12;
 const a64::Gp SCRATCH_REG2 = a64::x13;
+
+// Only to be used in an opcode level function. Should not be used in helper functions
+const a64::Gp FUNC_SCRATCH_REG = a64::x15;
 
 // Temporary memory calculation register, should not be used outside of functions that calculate memory addresses
 const a64::Gp MEM_SCRATCH_REG = a64::x14;
@@ -1644,18 +1644,19 @@ void drcbe_arm64::op_setfmod(a64::Assembler &a, const uml::instruction &inst)
 
 	be_parameter srcp(*this, inst.param(0), PTYPE_MRI);
 	const a64::Gp src = srcp.select_register(TEMP_REG1, inst.size());
+	const a64::Gp scratch = select_register(FUNC_SCRATCH_REG, inst.size());
 
 	if (srcp.is_immediate())
 	{
-		a.mov(src, srcp.immediate() & 3);
+		a.mov(scratch, srcp.immediate() & 3);
 	}
 	else
 	{
 		mov_reg_param(a, inst.size(), src, srcp);
-		a.and_(src, src, 3);
+		a.and_(scratch, src, 3);
 	}
 
-	emit_strb_mem(a, src.w(), &m_state.fmod);
+	emit_strb_mem(a, scratch.w(), &m_state.fmod);
 }
 
 void drcbe_arm64::op_getfmod(a64::Assembler &a, const uml::instruction &inst)
@@ -2345,30 +2346,36 @@ void drcbe_arm64::op_carry(a64::Assembler &a, const uml::instruction &inst)
 	be_parameter srcp(*this, inst.param(0), PTYPE_MRI);
 	be_parameter bitp(*this, inst.param(1), PTYPE_MRI);
 
+	const a64::Gp src = srcp.select_register(TEMP_REG1, inst.size());
+	const a64::Gp scratch = select_register(FUNC_SCRATCH_REG, inst.size());
+
 	// load non-immediate bit numbers into a register
 	// flags = (flags & ~FLAG_C) | ((src >> (PARAM1 & 31)) & FLAG_C)
 
 	if (srcp.is_immediate() && bitp.is_immediate())
 	{
-		a.mov(SCRATCH_REG1, BIT(srcp.immediate(), bitp.immediate()));
-		a.bfi(FLAGS_REG, SCRATCH_REG1, 0, 1);
+		a.mov(scratch, BIT(srcp.immediate(), bitp.immediate()));
+		a.bfi(FLAGS_REG, scratch.x(), 0, 1);
 	}
 	else if (bitp.is_immediate())
 	{
-		const a64::Gp src = srcp.select_register(TEMP_REG1, inst.size());
 		const auto shift = bitp.immediate() % (inst.size() * 8);
 
 		mov_reg_param(a, inst.size(), src, srcp);
 
 		// move carry bit to lsb
 		if (shift != 0)
-			a.lsr(src, src, shift);
-
-		store_carry_reg(a, src);
+		{
+			a.lsr(scratch, src, shift);
+			store_carry_reg(a, scratch);
+		}
+		else
+		{
+			store_carry_reg(a, src);
+		}
 	}
 	else
 	{
-		const a64::Gp src = srcp.select_register(TEMP_REG1, inst.size());
 		const a64::Gp shift = bitp.select_register(TEMP_REG2, inst.size());
 
 		mov_reg_param(a, inst.size(), src, srcp);
@@ -2377,8 +2384,8 @@ void drcbe_arm64::op_carry(a64::Assembler &a, const uml::instruction &inst)
 		a.and_(shift, shift, inst.size() * 8 - 1);
 
 		// move carry bit to lsb
-		a.lsr(src, src, shift);
-		store_carry_reg(a, src);
+		a.lsr(scratch, src, shift);
+		store_carry_reg(a, scratch);
 	}
 }
 
@@ -2510,7 +2517,8 @@ void drcbe_arm64::op_roland(a64::Assembler &a, const uml::instruction &inst)
 	be_parameter maskp(*this, inst.param(3), PTYPE_MRI);
 
 	const a64::Gp output = dstp.select_register(TEMP_REG1, inst.size());
-	const a64::Gp shift = shiftp.select_register(SCRATCH_REG1, inst.size());
+	const a64::Gp shift = shiftp.select_register(TEMP_REG2, inst.size());
+	const a64::Gp scratch = shiftp.select_register(FUNC_SCRATCH_REG, inst.size());
 	const uint64_t instbits = inst.size() * 8;
 
 	if (maskp.is_immediate() && maskp.is_immediate_value(0))
@@ -2606,10 +2614,10 @@ void drcbe_arm64::op_roland(a64::Assembler &a, const uml::instruction &inst)
 
 			mov_reg_param(a, inst.size(), shift, shiftp);
 
-			a.and_(shift, shift, inst.size() * 8 - 1);
+			a.and_(scratch, shift, inst.size() * 8 - 1);
 			a.mov(scratch2, instbits);
-			a.sub(shift, scratch2, shift);
-			a.ror(output, output, shift);
+			a.sub(scratch, scratch2, scratch);
+			a.ror(output, output, scratch);
 		}
 
 		// srcp and the results of the rors above are already going to the output register, so if the mask is all 1s this can all be skipped
@@ -2819,12 +2827,13 @@ void drcbe_arm64::op_rolins(a64::Assembler &a, const uml::instruction &inst)
 		else
 		{
 			const a64::Gp shift = shiftp.select_register(SCRATCH_REG2, inst.size());
+			const a64::Gp scratch2 = shiftp.select_register(FUNC_SCRATCH_REG, inst.size());
 			mov_reg_param(a, inst.size(), shift, shiftp);
 
 			a.mov(scratch, inst.size() * 8);
-			a.and_(shift, shift, inst.size() * 8 - 1);
-			a.sub(shift, scratch, shift);
-			a.ror(scratch, src, shift);
+			a.and_(scratch2, shift, inst.size() * 8 - 1);
+			a.sub(scratch2, scratch, scratch2);
+			a.ror(scratch, src, scratch2);
 		}
 
 		const a64::Gp mask = maskp.select_register(SCRATCH_REG2, inst.size());
@@ -3550,6 +3559,7 @@ template <a64::Inst::Id Opcode> void drcbe_arm64::op_shift(a64::Assembler &a, co
 	const a64::Gp src = src1p.select_register(TEMP_REG1, inst.size());
 	const a64::Gp shift = src2p.select_register(TEMP_REG2, inst.size());
 	const a64::Gp dst = can_use_dst_reg ? dstp.select_register(TEMP_REG3, inst.size()) : select_register(TEMP_REG3, inst.size());
+	const a64::Gp scratch = select_register(FUNC_SCRATCH_REG, inst.size());
 
 	mov_reg_param(a, inst.size(), src, src1p);
 
@@ -3574,17 +3584,17 @@ template <a64::Inst::Id Opcode> void drcbe_arm64::op_shift(a64::Assembler &a, co
 	{
 		mov_reg_param(a, inst.size(), shift, src2p);
 
-		a.and_(shift, shift, inst.size() * 8 - 1);
+		a.and_(scratch, shift, inst.size() * 8 - 1);
 
-		a.emit(Opcode, dst, src, shift);
+		a.emit(Opcode, dst, src, scratch);
 
 		Label skip = a.newLabel();
-		a.cbz(shift, skip);
+		a.cbz(scratch, skip);
 
 		if (Opcode == a64::Inst::kIdRor || Opcode == a64::Inst::kIdLsr || Opcode == a64::Inst::kIdAsr)
-			calculate_carry_shift_right(a, src, shift);
+			calculate_carry_shift_right(a, src, scratch);
 		else if (Opcode == a64::Inst::kIdLsl)
-			calculate_carry_shift_left(a, src, shift, maxBits);
+			calculate_carry_shift_left(a, src, scratch, maxBits);
 
 		if (inst.flags())
 			a.tst(dst, dst);
@@ -3617,6 +3627,7 @@ void drcbe_arm64::op_rol(a64::Assembler &a, const uml::instruction &inst)
 	const a64::Gp param = src1p.select_register(TEMP_REG1, inst.size());
 	const a64::Gp shift = src2p.select_register(TEMP_REG2, inst.size());
 	const a64::Gp output = can_use_dst_reg ? dstp.select_register(TEMP_REG3, inst.size()) : select_register(TEMP_REG3, inst.size());
+	const a64::Gp scratch2 = select_register(FUNC_SCRATCH_REG, inst.size());
 
 	mov_reg_param(a, inst.size(), param, src1p);
 
@@ -3651,13 +3662,13 @@ void drcbe_arm64::op_rol(a64::Assembler &a, const uml::instruction &inst)
 
 		const a64::Gp scratch = select_register(SCRATCH_REG1, inst.size());
 		a.mov(scratch, inst.size() * 8);
-		a.and_(shift, shift, maxBits);
-		a.sub(scratch, scratch, shift);
+		a.and_(scratch2, shift, maxBits);
+		a.sub(scratch, scratch, scratch2);
 		a.ror(output, param, scratch);
 
-		a.cbz(shift, skip);
+		a.cbz(scratch2, skip);
 
-		calculate_carry_shift_left(a, param, shift, maxBits);
+		calculate_carry_shift_left(a, param, scratch2, maxBits);
 
 		if (inst.flags())
 			a.tst(output, output);
@@ -3720,27 +3731,28 @@ void drcbe_arm64::op_rolc(a64::Assembler &a, const uml::instruction &inst)
 	{
 		const a64::Gp shift = src2p.select_register(TEMP_REG2, inst.size());
 		const a64::Gp scratch = select_register(SCRATCH_REG1, inst.size());
+		const a64::Gp scratch2 = select_register(FUNC_SCRATCH_REG, inst.size());
 
 		mov_reg_param(a, inst.size(), shift, src2p);
 
-		a.and_(shift, shift, maxBits);
+		a.and_(scratch2, shift, maxBits);
 
-		a.lsl(output, param1, shift); // PARAM1 << shift
+		a.lsl(output, param1, scratch2); // PARAM1 << shift
 
 		Label skip = a.newLabel();
 		Label skip3 = a.newLabel();
-		a.cbz(shift, skip3);
+		a.cbz(scratch2, skip3);
 
 		get_carry(a, carry);
 
-		a.sub(scratch, shift, 1);
+		a.sub(scratch, scratch2, 1);
 		a.cbz(scratch, skip);
 
 		// add carry flag to output
 		a.lsl(carry, carry, scratch);
 
 		a.mov(scratch, maxBits + 2); // PARAM1 >> (33 - shift)
-		a.sub(scratch, scratch, shift);
+		a.sub(scratch, scratch, scratch2);
 		a.lsr(scratch, param1, scratch);
 		a.orr(output, output, scratch);
 
@@ -3748,7 +3760,7 @@ void drcbe_arm64::op_rolc(a64::Assembler &a, const uml::instruction &inst)
 
 		a.orr(output, output, carry);
 
-		calculate_carry_shift_left(a, param1, shift, maxBits);
+		calculate_carry_shift_left(a, param1, scratch2, maxBits);
 
 		if (inst.flags())
 			a.tst(output, output);
@@ -3813,28 +3825,29 @@ void drcbe_arm64::op_rorc(a64::Assembler &a, const uml::instruction &inst)
 	{
 		const a64::Gp shift = src2p.select_register(TEMP_REG2, inst.size());
 		const a64::Gp scratch = select_register(SCRATCH_REG1, inst.size());
+		const a64::Gp scratch2 = select_register(FUNC_SCRATCH_REG, inst.size());
 
 		mov_reg_param(a, inst.size(), shift, src2p);
 
-		a.and_(shift, shift, maxBits);
+		a.and_(scratch2, shift, maxBits);
 
 		a.lsr(output, param1, shift); // PARAM1 >> shift
 
 		Label skip = a.newLabel();
 		Label skip3 = a.newLabel();
-		a.cbz(shift, skip3);
+		a.cbz(scratch2, skip3);
 
 		get_carry(a, carry);
 		a.lsl(carry, carry, maxBits); // (flags & FLAG_C) << 31
 
-		a.sub(scratch, shift, 1); // carry >> (shift - 1)
+		a.sub(scratch, scratch2, 1); // carry >> (shift - 1)
 		a.cbz(scratch, skip);
 
 		// add carry flag to output
 		a.lsr(carry, carry, scratch);
 
 		a.mov(scratch, maxBits + 2); // PARAM1 << (33 - shift)
-		a.sub(scratch, scratch, shift);
+		a.sub(scratch, scratch, scratch2);
 		a.lsl(scratch, param1, scratch);
 		a.orr(output, output, scratch);
 
@@ -3842,7 +3855,7 @@ void drcbe_arm64::op_rorc(a64::Assembler &a, const uml::instruction &inst)
 
 		a.orr(output, output, carry);
 
-		calculate_carry_shift_right(a, param1, shift);
+		calculate_carry_shift_right(a, param1, scratch2);
 
 		if (inst.flags())
 			a.tst(output, output);
