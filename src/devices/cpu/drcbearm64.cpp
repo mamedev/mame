@@ -17,6 +17,8 @@ using namespace uml;
 
 using namespace asmjit;
 
+namespace {
+
 const uint32_t PTYPE_M   = 1 << parameter::PTYPE_MEMORY;
 const uint32_t PTYPE_I   = 1 << parameter::PTYPE_IMMEDIATE;
 const uint32_t PTYPE_R   = 1 << parameter::PTYPE_INT_REGISTER;
@@ -56,19 +58,7 @@ const a64::Gp BASE_REG = a64::x27;
 // Software emulated flags (bit 0 = FLAG_C, bit 4 = FLAG_U)
 const a64::Gp FLAGS_REG = a64::x28;
 
-
-#define ARM_CONDITION(a, condition)        (condition_map[condition - COND_Z])
-#define ARM_NOT_CONDITION(a, condition)    (negateCond(condition_map[condition - COND_Z]))
-
-#define assert_no_condition(inst)       assert((inst).condition() == uml::COND_ALWAYS)
-#define assert_any_condition(inst)      assert((inst).condition() == uml::COND_ALWAYS || ((inst).condition() >= uml::COND_Z && (inst).condition() < uml::COND_MAX))
-#define assert_no_flags(inst)           assert((inst).flags() == 0)
-#define assert_flags(inst, valid)       assert(((inst).flags() & ~(valid)) == 0)
-
-
-drcbe_arm64::opcode_generate_func drcbe_arm64::s_opcode_table[OP_MAX];
-
-static const a64::Gp::Id int_register_map[REG_I_COUNT] =
+const a64::Gp::Id int_register_map[REG_I_COUNT] =
 {
 	a64::Gp::Id(a64::x19.id()),
 	a64::Gp::Id(a64::x20.id()),
@@ -80,7 +70,7 @@ static const a64::Gp::Id int_register_map[REG_I_COUNT] =
 	a64::Gp::Id(a64::x26.id()),
 };
 
-static const a64::Gp::Id float_register_map[REG_F_COUNT] =
+const a64::Gp::Id float_register_map[REG_F_COUNT] =
 {
 	a64::Gp::Id(a64::d8.id()),
 	a64::Gp::Id(a64::d9.id()),
@@ -93,7 +83,7 @@ static const a64::Gp::Id float_register_map[REG_F_COUNT] =
 };
 
 // condition mapping table
-static const a64::CondCode condition_map[uml::COND_MAX - uml::COND_Z] =
+const a64::CondCode condition_map[uml::COND_MAX - uml::COND_Z] =
 {
 	a64::CondCode::kEQ,    // COND_Z = 0x80,    requires Z COND_E
 	a64::CondCode::kNE,    // COND_NZ,          requires Z COND_NE
@@ -112,6 +102,30 @@ static const a64::CondCode condition_map[uml::COND_MAX - uml::COND_Z] =
 	a64::CondCode::kLT,    // COND_L,           requires SV
 	a64::CondCode::kGE,    // COND_GE,          requires SV
 };
+
+
+#define ARM_CONDITION(a, condition)        (condition_map[condition - COND_Z])
+#define ARM_NOT_CONDITION(a, condition)    (negateCond(condition_map[condition - COND_Z]))
+
+#define assert_no_condition(inst)       assert((inst).condition() == uml::COND_ALWAYS)
+#define assert_any_condition(inst)      assert((inst).condition() == uml::COND_ALWAYS || ((inst).condition() >= uml::COND_Z && (inst).condition() < uml::COND_MAX))
+#define assert_no_flags(inst)           assert((inst).flags() == 0)
+#define assert_flags(inst, valid)       assert(((inst).flags() & ~(valid)) == 0)
+
+
+class ThrowableErrorHandler : public ErrorHandler
+{
+public:
+	void handleError(Error err, const char *message, BaseEmitter *origin) override
+	{
+		throw emu_fatalerror("asmjit error %d: %s", err, message);
+	}
+};
+
+} // anonymous namespace
+
+
+drcbe_arm64::opcode_generate_func drcbe_arm64::s_opcode_table[OP_MAX];
 
 const drcbe_arm64::opcode_table_entry drcbe_arm64::s_opcode_table_source[] =
 {
@@ -206,15 +220,6 @@ const drcbe_arm64::opcode_table_entry drcbe_arm64::s_opcode_table_source[] =
 	{ uml::OP_FRSQRT,  &drcbe_arm64::op_float_alu2<a64::Inst::kIdFrsqrte_v> },     // FRSQRT  dst,src1
 	{ uml::OP_FCOPYI,  &drcbe_arm64::op_fcopyi },     // FCOPYI  dst,src
 	{ uml::OP_ICOPYF,  &drcbe_arm64::op_icopyf }      // ICOPYF  dst,src
-};
-
-class ThrowableErrorHandler : public ErrorHandler
-{
-public:
-	void handleError(Error err, const char *message, BaseEmitter *origin) override
-	{
-		throw emu_fatalerror("asmjit error %d: %s", err, message);
-	}
 };
 
 drcbe_arm64::be_parameter::be_parameter(drcbe_arm64 &drcbe, const parameter &param, uint32_t allowed)
@@ -888,68 +893,9 @@ drcbe_arm64::drcbe_arm64(drcuml_state &drcuml, device_t &device, drc_cache &cach
 	auto const resolve_accessor =
 			[] (resolved_handler &handler, address_space &space, auto accessor)
 			{
-				if (MAME_DELEGATE_USE_TYPE == MAME_DELEGATE_TYPE_ITANIUM)
-				{
-					struct { uintptr_t ptr; ptrdiff_t adj; } equiv;
-					assert(sizeof(accessor) == sizeof(equiv));
-					*reinterpret_cast<decltype(accessor) *>(&equiv) = accessor;
-					handler.obj = uintptr_t(reinterpret_cast<uint8_t *>(&space) + (equiv.adj >> 1));
-					if (BIT(equiv.adj, 0))
-					{
-						auto const vptr = *reinterpret_cast<u8 const *const *>(handler.obj) + equiv.ptr;
-						handler.func = *reinterpret_cast<uint8_t *const *>(vptr);
-					}
-					else
-					{
-						handler.func = reinterpret_cast<uint8_t *>(equiv.ptr);
-					}
-				}
-				else if (MAME_DELEGATE_USE_TYPE == MAME_DELEGATE_TYPE_MSVC)
-				{
-					// interpret the pointer to member function ignoring the virtual inheritance variant
-					struct single { uintptr_t ptr; };
-					struct multi { uintptr_t ptr; int adj; };
-					struct { uintptr_t ptr; int adj; int vadj; int vindex; } unknown;
-					assert(sizeof(accessor) <= sizeof(unknown));
-					*reinterpret_cast<decltype(accessor) *>(&unknown) = accessor;
-					uint32_t const *func = reinterpret_cast<uint32_t const *>(unknown.ptr);
-					handler.obj = uintptr_t(&space);
-					if ((sizeof(unknown) == sizeof(accessor)) && unknown.vindex)
-					{
-						handler.obj += unknown.vadj;
-						auto const vptr = *reinterpret_cast<uint8_t const *const *>(handler.obj);
-						handler.obj += *reinterpret_cast<int const *>(vptr + unknown.vindex);
-					}
-					if (sizeof(single) < sizeof(accessor))
-						handler.obj += unknown.adj;
-
-					// walk past thunks
-					while (true)
-					{
-						if ((0x90000010 == (func[0] & 0x9f00001f)) && (0x91000210 == (func[1] & 0xffc003ff)) && (0xd61f0200 == func[2]))
-						{
-							// page-relative jump with +/-4GB reach - adrp xip0,... ; add xip0,xip0,#... ; br xip0
-							int64_t const page =
-									(uint64_t(func[0] & 0x60000000) >> 17) |
-									(uint64_t(func[0] & 0x00ffffe0) << 9) |
-									((func[0] & 0x00800000) ? (~std::uint64_t(0) << 33) : 0);
-							uint32_t const offset = (func[1] & 0x003ffc00) >> 10;
-							func = reinterpret_cast<uint32_t const *>(((uintptr_t(func) + page) & (~uintptr_t(0) << 12)) + offset);
-						}
-						else if ((0xf9400010 == func[0]) && (0xf9400210 == (func[1] & 0xffc003ff)) && (0xd61f0200 == func[2]))
-						{
-							// virtual function call thunk - ldr xip0,[x0] ; ldr xip0,[x0,#...] ; br xip0
-							uint32_t const *const *const vptr = *reinterpret_cast<uint32_t const *const *const *>(handler.obj);
-							func = vptr[(func[1] & 0x003ffc00) >> 10];
-						}
-						else
-						{
-							// not something we can easily bypass
-							break;
-						}
-					}
-					handler.func = reinterpret_cast<uint8_t *>(uintptr_t(func));
-				}
+				auto const [entrypoint, adjusted] = util::resolve_member_function(accessor, &space);
+				handler.func = reinterpret_cast<uint8_t *>(entrypoint);
+				handler.obj = adjusted;
 			};
 
 	m_resolved_accessors.resize(m_space.size());
