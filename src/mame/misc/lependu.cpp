@@ -179,19 +179,15 @@ TILE_GET_INFO_MEMBER(lependu_state::get_bg_tile_info)
 {
 /*  - bits -
     7654 3210
-    ---x xxx-  Color
-    -xx- ----  Bank
-    x--- ---x  Unknown/Unused
+    --xx xx--   tiles color.
+    -x-- --x-   tiles bank.
+    x--- ---x   unused.
 */
+
 	int attr = m_colorram[tile_index];
 	int code = m_videoram[tile_index];
-	int bank = (attr & 0x60) >> 5;      // bits 5-6 switch the gfx banks
-	int color;
-
-	if (bank == 3)
-		color = ((attr & 0x1e) >> 1 );
-	else
-		color = ((attr & 0x1e) >> 2 );
+	int bank = (attr & 0x02) >> 1 | (attr & 0x40) >> 5;  // bits 6 and 1 switch the gfx banks
+	int color = (attr & 0x3c) >> 2;                      // bits 2-3-4-5 for color
 
 	tileinfo.set(bank, code, color, 0);
 }
@@ -437,10 +433,11 @@ static const gfx_layout tilelayout =
 **************************************************/
 
 static GFXDECODE_START( gfx_lependu )
+//  banks ok
 	GFXDECODE_ENTRY( "gfx1", 0,      tilelayout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx1", 0x0800, tilelayout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx1", 0x1000, tilelayout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0,      tilelayout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0x1000, tilelayout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0x0800, tilelayout, 0, 16 )
 GFXDECODE_END
 
 
@@ -595,12 +592,12 @@ ROM_START( lependu )
 	ROM_FILL(                0x0000, 0x4000, 0x0000 ) // filling the R-G bitplanes
 	ROM_LOAD( "1y.3a",       0x4000, 0x2000, CRC(ae0e37f8) SHA1(2e3404c55b92a7f9ec72d7b96bbea95ee028026c) )    // chars / multicolor tiles, bitplane 3
 
-	ROM_REGION( 0x1800, "gfx2", 0 )
-	ROM_LOAD( "3y.1a",    0x0000, 0x0800, CRC(ea868221) SHA1(fcf9a840537feb28c9fb65b58b9a41b2412aa4ef) )    // multicolor tiles, bitplane2
-	ROM_CONTINUE(         0x0000, 0x0800)  // discarding 1st half
-	ROM_LOAD( "2y.2a",    0x0800, 0x0800, CRC(6d1da4bb) SHA1(dc8c70faa301e2f7e9089d38e0ef618e8352e569) )    // multicolor tiles, bitplane1
-	ROM_CONTINUE(         0x0800, 0x0800)  // discarding 1st half
-	ROM_COPY( "gfx1",     0x5800, 0x1000, 0x0800 )    // multicolor tiles, bitplane3. found in the 3rd quarter of the chars rom
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_LOAD( "3y.1a",    0x0000, 0x1000, CRC(ea868221) SHA1(fcf9a840537feb28c9fb65b58b9a41b2412aa4ef) )    // cards deck and alt gfx, bitplane1
+	ROM_LOAD( "2y.3a",    0x1000, 0x1000, CRC(6d1da4bb) SHA1(dc8c70faa301e2f7e9089d38e0ef618e8352e569) )    // cards deck gfx, bitplane2
+	ROM_COPY( "gfx1",     0x4800, 0x2000, 0x0800 )    // cards deck gfx, bitplane3.
+	ROM_COPY( "gfx1",     0x5800, 0x2800, 0x0800 )    // cards deck alt gfx, bitplane3.
+
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "mini.5d",   0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
