@@ -8,6 +8,8 @@
 #include "emuopts.h"
 #include "uml.h"
 
+#include "mfpresolve.h"
+
 #include <cstddef>
 
 
