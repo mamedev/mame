@@ -23,8 +23,6 @@
 #include "video/poly.h"
 #include "screen.h"
 
-#define SOUND_CHANNELS  4
-
 
 class gaelco3d_state : public driver_device
 {
@@ -60,10 +58,13 @@ public:
 	template <int N> int analog_bit_r();
 	template <int N> int fp_analog_bit_r();
 
-private:
+protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
+
+private:
+	static constexpr unsigned SOUND_CHANNELS = 4;
 
 	struct gaelco3d_object_data
 	{
@@ -130,7 +131,6 @@ private:
 	uint32_t m_fp_lenght[2]{};
 	uint8_t m_fp_clock = 0;
 	uint8_t m_fp_state = 0;
-	uint8_t m_framenum = 0;
 	uint8_t m_adsp_ireg = 0;
 	offs_t m_adsp_ireg_base = 0;
 	offs_t m_adsp_incs = 0;
@@ -138,8 +138,8 @@ private:
 	std::unique_ptr<rgb_t[]> m_palette;
 	std::unique_ptr<uint32_t[]> m_polydata_buffer;
 	uint32_t m_polydata_count = 0;
-	int m_lastscan = 0;
-	int m_video_changed = 0;
+	int32_t m_lastscan = 0;
+	bool m_video_changed = false;
 	std::unique_ptr<gaelco3d_renderer> m_poly;
 
 	void irq_ack_w(uint16_t data);
@@ -157,9 +157,9 @@ private:
 	void adsp_rombank_w(offs_t offset, uint16_t data);
 	void unknown_137_w(int state);
 	void unknown_13a_w(int state);
-	void gaelco3d_render_w(uint32_t data);
-	void gaelco3d_paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void gaelco3d_paletteram_020_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void render_w(uint32_t data);
+	void paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void paletteram_020_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void ser_irq(int state);
 	uint16_t eeprom_data_r(offs_t offset, uint16_t mem_mask = ~0);
 

@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    ppcdrc.c
+    ppcdrc.cpp
 
     Universal machine language-based PowerPC emulator.
 
@@ -1746,12 +1746,12 @@ void ppc_device::generate_sequence_instruction(drcuml_block &block, compiler_sta
 		UML_EXH(block, *m_tlb_mismatch, 0);                                // exh     tlb_mismatch,0
 	}
 
-	/* validate our TLB entry at this PC; if we fail, we need to handle it */
-	if ((desc->flags & OPFLAG_VALIDATE_TLB) && (m_core->mode & MODE_DATA_TRANSLATION))
+	// validate our TLB entry at this PC; if we fail, we need to handle it
+	// TODO: this code is highly sus based on the PPC architecture manual, but I'll only disable for 601 for now
+	if ((desc->flags & OPFLAG_VALIDATE_TLB) && (m_core->mode & MODE_DATA_TRANSLATION) && !(m_cap & PPCCAP_601BAT))
 	{
 		const vtlb_entry *tlbtable = vtlb_table();
 
-		/* if we currently have a valid TLB read entry, we just verify */
 		if (tlbtable[desc->pc >> 12] != 0)
 		{
 			if (PRINTF_MMU)
@@ -2022,6 +2022,23 @@ bool ppc_device::generate_opcode(drcuml_block &block, compiler_state *compiler, 
 		case 0x07:  /* MULLI */
 			UML_MULS(block, R32(G_RD(op)), R32(G_RD(op)), R32(G_RA(op)), (int16_t)G_SIMM(op));
 																							// muls    rd,rd,ra,simm
+			return true;
+
+		case 0x9:  /* DOZI (POWER) */
+			assert(m_cap & PPCCAP_LEGACY_POWER);
+
+			UML_AND(block, I0, op, 0xffff);
+			UML_CMP(block, R32(G_RA(op)), I0); // cmp ra, I0
+			UML_JMPc(block, COND_B, compiler->labelnum);  // bae 0:
+
+			UML_XOR(block, R32(G_RD(op)), R32(G_RD(op)), R32(G_RD(op))); // xor rd, rd, rd (rd = 0)
+			UML_JMP(block, compiler->labelnum + 1);                      // jmp 1:
+
+			UML_LABEL(block, compiler->labelnum++); // 0:
+			UML_ADD(block, R32(G_RD(op)), R32(G_RA(op)), I0);
+			UML_ADD(block, R32(G_RD(op)), R32(G_RD(op)), 0x1);
+
+			UML_LABEL(block, compiler->labelnum++); // 1:
 			return true;
 
 		case 0x0e:  /* ADDI */
@@ -2687,6 +2704,13 @@ bool ppc_device::generate_instruction_1f(drcuml_block &block, compiler_state *co
 			generate_compute_flags(block, desc, op & M_RC, ((op & M_OE) ? XER_OV : 0), false);// <update flags>
 			return true;
 
+		case 0x6b:  /* MUL (POWER) */
+			assert(m_cap & PPCCAP_LEGACY_POWER);
+
+			UML_MULU(block, SPR32(SPR601_MQ), R32(G_RD(op)), R32(G_RA(op)), R32(G_RB(op))); // mulu mq, rd, ra, rb
+			generate_compute_flags(block, desc, op & M_RC, ((op & M_OE) ? XER_OV | XER_SO : 0), false); // <update flags>
+			return true;
+
 		case 0x1cb: /* DIVWUx */
 		case 0x3cb: /* DIVWUOx */
 			UML_CMP(block, R32(G_RB(op)), 0x0);                 // cmp rb, #0
@@ -2712,6 +2736,63 @@ bool ppc_device::generate_instruction_1f(drcuml_block &block, compiler_state *co
 			generate_compute_flags(block, desc, op & M_RC, ((op & M_OE) ? XER_OV : 0), false);// <update flags>
 
 			UML_LABEL(block, compiler->labelnum++);             // 1:
+			return true;
+
+		case 0x14b: /* DIV (POWER) */
+			assert(m_cap & PPCCAP_LEGACY_POWER);
+
+			UML_SHL(block, I0, R32(G_RB(op)), 32);          // I0 = RA << 32
+			UML_OR(block, I0, I0, SPR32(SPR601_MQ));            // I0 |= MQ
+			UML_CMP(block, I0, 0x0);           // cmp I0, #0
+			UML_JMPc(block, COND_NZ, compiler->labelnum); // bne 0:
+
+			UML_MOV(block, R32(G_RD(op)), 0x0); // mov rd, #0
+			if (op & M_OE)
+			{
+				UML_OR(block, XERSO32, XERSO32, 0x1);                  // SO |= 1
+				UML_OR(block, SPR32(SPR_XER), SPR32(SPR_XER), XER_OV); // OV |= 1
+			}
+			if (op & M_RC)
+			{
+				UML_MOV(block, CR32(0), 0x2); // CR = EQ
+				UML_AND(block, CR32(0), CR32(0), ~0x1);
+				UML_OR(block, CR32(0), CR32(0), XERSO32);
+			}
+
+			UML_JMP(block, compiler->labelnum + 1); // jmp 1:
+
+			UML_LABEL(block, compiler->labelnum++);                                            // 0:
+			UML_DIVS(block, R32(G_RD(op)), SPR32(SPR601_MQ), I0, R32(G_RB(op)));       // divs    rd,mq,I0,rb
+			generate_compute_flags(block, desc, op & M_RC, ((op & M_OE) ? XER_OV | XER_SO : 0), false); // <update flags>
+			UML_LABEL(block, compiler->labelnum++); // 1:
+			return true;
+
+		case 0x16b: /* DIVS (POWER) */
+			assert(m_cap & PPCCAP_LEGACY_POWER);
+
+			UML_CMP(block, R32(G_RB(op)), 0x0);           // cmp rb, #0
+			UML_JMPc(block, COND_NZ, compiler->labelnum); // bne 0:
+
+			UML_MOV(block, R32(G_RD(op)), 0x0); // mov rd, #0
+			if (op & M_OE)
+			{
+				UML_OR(block, XERSO32, XERSO32, 0x1);                  // SO |= 1
+				UML_OR(block, SPR32(SPR_XER), SPR32(SPR_XER), XER_OV); // OV |= 1
+			}
+			if (op & M_RC)
+			{
+				UML_MOV(block, CR32(0), 0x2); // CR = EQ
+				UML_AND(block, CR32(0), CR32(0), ~0x1);
+				UML_OR(block, CR32(0), CR32(0), XERSO32);
+			}
+
+			UML_JMP(block, compiler->labelnum + 1); // jmp 1:
+
+			UML_LABEL(block, compiler->labelnum++);                                            // 0:
+			UML_DIVS(block, R32(G_RD(op)), SPR32(SPR601_MQ), R32(G_RA(op)), R32(G_RB(op)));    // divs    rd,mq,ra,rb
+			generate_compute_flags(block, desc, op & M_RC, ((op & M_OE) ? XER_OV : 0), false); // <update flags>
+
+			UML_LABEL(block, compiler->labelnum++); // 1:
 			return true;
 
 		case 0x1eb: /* DIVWx */
@@ -2765,6 +2846,78 @@ bool ppc_device::generate_instruction_1f(drcuml_block &block, compiler_state *co
 			generate_compute_flags(block, desc, op & M_RC, ((op & M_OE) ? XER_OV : 0), false);// <update flags>
 
 			UML_LABEL(block, compiler->labelnum++);             // 3:
+			return true;
+
+		case 0x108: /* DOZ (POWER) */
+			assert(m_cap & PPCCAP_LEGACY_POWER);
+
+			UML_CMP(block, R32(G_RA(op)), R32(G_RB(op)));   // cmp ra, rb
+			UML_JMPc(block, COND_B, compiler->labelnum); // bae 0:
+
+			UML_XOR(block, R32(G_RD(op)), R32(G_RD(op)), R32(G_RD(op)));    // xor rd, rd, rd (rd = 0)
+			UML_JMP(block, compiler->labelnum+1); // jmp 1:
+
+			UML_LABEL(block, compiler->labelnum++); // 0:
+			UML_ADD(block, R32(G_RD(op)), R32(G_RA(op)), R32(G_RB(op)));
+			UML_ADD(block, R32(G_RD(op)), R32(G_RD(op)), 0x1);
+
+			UML_LABEL(block, compiler->labelnum++); // 1:
+			if (op & M_OE)
+			{
+				UML_OR(block, XERSO32, XERSO32, 0x1);                  // SO |= 1
+				UML_OR(block, SPR32(SPR_XER), SPR32(SPR_XER), XER_OV); // OV |= 1
+			}
+			if (op & M_RC)
+			{
+				UML_TEST(block, R32(G_RD(op)), ~0);                       // test    rd,~0
+				generate_compute_flags(block, desc, op & M_RC, 0, false); // <update flags>
+			}
+			return true;
+
+		case 0x168: /* ABS (POWER) */
+		case 0x1e8: /* NABS (POWER) */
+			assert(m_cap & PPCCAP_LEGACY_POWER);
+
+			// is rA already the correct sign (positive for ABS, negative for NABS)?
+			UML_CMP(block, R32(G_RA(op)), 0);
+			if (op & 0x080)
+			{
+				UML_JMPc(block, COND_L, compiler->labelnum); // bl 0:
+			}
+			else
+			{
+				UML_JMPc(block, COND_GE, compiler->labelnum); // bge 0:
+			}
+
+			UML_SUB(block, I0, 0, R32(G_RA(op)));   // sub 0, ra (make positive)
+			UML_JMP(block, compiler->labelnum + 1); // jmp 1:
+
+			UML_LABEL(block, compiler->labelnum++); // 0:
+			UML_MOV(block, I0, R32(G_RA(op)));
+
+			UML_LABEL(block, compiler->labelnum++); // 1:
+			UML_MOV(block, R32(G_RD(op)), I0);      // mov rd, I0
+			if (op & M_RC)
+			{
+				UML_GETFLGS(block, I0, FLAG_Z | FLAG_V | FLAG_C | FLAG_S);     // getflgs i0,zvcs
+				UML_LOAD(block, I0, m_cmp_cr_table, I0, SIZE_DWORD, SCALE_x4); // load    i0,cmp_cr_table,i0,dword
+			}
+			if (op & M_OE)
+			{
+				UML_OR(block, CR32(G_CRFD(op)), I0, XERSO32); // or      [crn],i0,[xerso]
+			}
+			return true;
+
+		case 0x21d: /* MASKIR (POWER) */
+			UML_AND(block, I0, R32(G_RS(op)), R32(G_RB(op)));   // and i0, rs, rb
+			UML_XOR(block, I1, R32(G_RB(op)), 0xffffffff);      // xor i1, rb, 0xffffffff
+			UML_AND(block, I1, I1, R32(G_RA(op)));              // and i1, i1, ra
+			UML_OR(block, R32(G_RA(op)), I0, I1);               // or ra, i0, i1
+			if (op & M_RC)
+			{
+				UML_GETFLGS(block, R32(G_RA(op)), FLAG_Z | FLAG_V | FLAG_C | FLAG_S);      // getflgs i0,zvcs
+				UML_LOAD(block, I0, m_cmp_cr_table, I0, SIZE_DWORD, SCALE_x4); // load    i0,cmp_cr_table,i0,dword
+			}
 			return true;
 
 		case 0x01c: /* ANDx */

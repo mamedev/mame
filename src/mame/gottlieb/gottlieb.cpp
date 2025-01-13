@@ -284,7 +284,6 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
-	virtual void device_post_load() override { m_gfxdecode->gfx(0)->mark_all_dirty(); }
 
 private:
 	void analog_reset_w(u8 data);

@@ -1,0 +1,589 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+copyright-holders:m1macrophage
+-->
+<mamelayout version="2">
+	<element name="panel">
+		<rect><color red="0.15" green="0.16" blue="0.15"/></rect>
+	</element>
+
+	<element name="side-light">
+		<rect><color red="0.6" green="0.51" blue="0.42"/></rect>
+	</element>
+
+	<element name="side-dark">
+		<rect><color red="0.29" green="0.15" blue="0.13"/></rect>
+	</element>
+
+	<element name="blue-line">
+		<rect><color red="0.06" green="0.6" blue="0.84"/></rect>
+	</element>
+
+	<element name="display-background">
+		<rect><color red="0.08" green="0.0" blue="0.0"/></rect>
+	</element>
+
+	<element name="digit">
+		<led16seg>
+			<color red="1" green="0" blue="0"/>
+		</led16seg>
+	</element>
+
+	<element name="button">
+		<rect>
+			<bounds x="0" y="0" width="40" height="40"/>
+			<color red="0.10" green="0.12" blue="0.11"/>
+		</rect>
+		<rect state="0">
+			<bounds x="5" y="5" width="30" height="30"/>
+			<color red="0.0" green="0.03" blue="0.05"/>
+		</rect>
+		<rect state="1">
+			<bounds x="5" y="5" width="30" height="30"/>
+			<color red="0.3" green="0.3" blue="0.3"/>
+		</rect>
+	</element>
+
+	<element name="red-button">
+		<rect>
+			<bounds x="0" y="0" width="40" height="40"/>
+			<color red="0.74" green="0.00" blue="0.01"/>
+		</rect>
+		<rect state="0">
+			<bounds x="5" y="5" width="30" height="30"/>
+			<color red="0.83" green="0.03" blue="0.02"/>
+		</rect>
+		<rect state="1">
+			<bounds x="5" y="5" width="30" height="30"/>
+			<color red="0.50" green="0.20" blue="0.20"/>
+		</rect>
+	</element>
+
+	<element name="white-button">
+		<rect>
+			<bounds x="0" y="0" width="40" height="40"/>
+			<color red="0.94" green="0.85" blue="0.57"/>
+		</rect>
+		<rect state="0">
+			<bounds x="5" y="5" width="30" height="30"/>
+			<color red="0.95" green="0.90" blue="0.67"/>
+		</rect>
+		<rect state="1">
+			<bounds x="5" y="5" width="30" height="30"/>
+			<color red="0.57" green="0.54" blue="0.402"/>
+		</rect>
+	</element>
+
+	<element name="fader-knob">
+		<rect>
+			<bounds x="0" y="0" width="35" height="35"/>
+			<color red="0.27" green="0.31" blue="0.29"/>
+		</rect>
+		<rect>
+			<bounds x="1" y="16" width="33" height="3"/>
+			<color red="0.97" green="0.97" blue="0.96"/>
+		</rect>
+	</element>
+
+	<element name="fader">
+		<rect>
+			<!-- Invisible fader knob, to ensure correct width. -->
+			<bounds x="0" y="0" width="35" height="35"/>
+			<color red="0" green="0" blue="0" alpha="0"/>
+		</rect>
+		<rect>
+			<bounds x="14" y="0" width="7" height="144"/>
+			<color red="0.0" green="0.0" blue="0.01"/>
+		</rect>
+	</element>
+
+	<element name="fader-text-1">
+		<text string="BASS"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+	<element name="fader-text-2">
+		<text string="SNARE"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+	<element name="fader-text-3">
+		<text string="HI-HAT"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+	<element name="fader-text-4">
+		<text string=""><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+	<element name="fader-text-5">
+		<text string=""><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+	<element name="fader-text-6">
+		<text string="CYMBAL"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+	<element name="fader-text-7">
+		<text string="PERC1"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+	<element name="fader-text-8">
+		<text string="PERC2"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+	<element name="fader-text-9">
+		<text string="METRONOME"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+	<element name="fader-text-toms">
+		<text string="--------   TOMS   --------">
+			<color red="0.94" green="0.94" blue="0.93"/>
+		</text>
+	</element>
+	<element name="fader-text-volume">
+		<text string="VOLUME"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+
+	<element name="num-text-1:1">
+		<text string="7"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+	<element name="num-text-1:2">
+		<text string="8"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+	<element name="num-text-1:3">
+		<text string="9"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+	<element name="num-text-2:1">
+		<text string="4"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+	<element name="num-text-2:2">
+		<text string="5"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+	<element name="num-text-2:3">
+		<text string="6"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+	<element name="num-text-3:1">
+		<text string="1"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+	<element name="num-text-3:2">
+		<text string="2"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+	<element name="num-text-3:3">
+		<text string="3"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+	<element name="num-text-4:1">
+		<text string="&lt;"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+	<element name="num-text-4:2">
+		<text string="0"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+	<element name="num-text-4:3">
+		<text string="&gt;"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+
+	<element name="drum-text-1:1">
+		<text string="1"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+	<element name="drum-text-1:2">
+		<text string="1"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+	<element name="drum-text-1:3">
+		<text string="CLOSED"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+	<element name="drum-text-1:4">
+		<text string="1"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+	<element name="drum-text-1:5">
+		<text string="4"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+	<element name="drum-text-1:6">
+		<text string="RIDE1"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+	<element name="drum-text-1:7">
+		<text string="TAMB1"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+	<element name="drum-text-1:8">
+		<text string="SHAKER1"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+
+	<element name="drum-text-2:1">
+		<text string="2"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+	<element name="drum-text-2:2">
+		<text string="2"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+	<element name="drum-text-2:3">
+		<text string="ACCENT"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+	<element name="drum-text-2:4">
+		<text string="2"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+	<element name="drum-text-2:5">
+		<text string="5"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+	<element name="drum-text-2:6">
+		<text string="RIDE2"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+	<element name="drum-text-2:7">
+		<text string="TAMB2"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+	<element name="drum-text-2:8">
+		<text string="SHAKER2"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+
+	<element name="drum-text-3:1">
+		<text string="3"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+	<element name="drum-text-3:2">
+		<text string="3"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+	<element name="drum-text-3:3">
+		<text string="OPEN"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+	<element name="drum-text-3:4">
+		<text string="3"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+	<element name="drum-text-3:5">
+		<text string="6"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+	<element name="drum-text-3:6">
+		<text string="CRASH"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+	<element name="drum-text-3:7">
+		<text string="RIMSHOT"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+	<element name="drum-text-3:8">
+		<text string="CLAPS"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+
+	<element name="text-tempo">
+		<text string="TEMPO"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+	<element name="text-signature">
+		<text string="SIGNATURE"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+	<element name="text-quantize">
+		<text string="QUANTIZE"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+	<element name="text-playstop">
+		<text string="PLAY/STOP"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+
+	<element name="edit-text-check">
+		<text string="CHECK --- PLAY --- RECORD">
+			<color red="0.94" green="0.94" blue="0.93"/>
+		</text>
+	</element>
+	<element name="edit-text-1:1">
+		<text string="SWING"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+	<element name="edit-text-1:2">
+		<text string="SONG"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+	<element name="edit-text-1:3">
+		<text string="EDIT"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+	<element name="edit-text-1:4">
+		<text string="STEP"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+	<element name="edit-text-2:1">
+		<text string="RECORD"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+	<element name="edit-text-2:2">
+		<text string="ERASE"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+	<element name="edit-text-2:3">
+		<text string="COPY"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+	<element name="edit-text-2:4">
+		<text string="LENGTH"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
+
+	<view name="Default Layout">
+		<!-- Starting at 110 to allow modeling the top part of the instrument
+		     in the future -->
+		<bounds x="0" y="110" width="960" height="518"/>
+
+		<!-- Case -->
+		<element ref="panel">
+			<bounds x="41" y="143" width="880" height="470"/>
+		</element>
+		<element ref="side-light">
+			<bounds x="10" y="143" width="24" height="480"/>
+		</element>
+		<element ref="side-dark">
+			<bounds x="34" y="143" width="7" height="475"/>
+		</element>
+		<element ref="side-dark">
+			<bounds x="920" y="143" width="7" height="475"/>
+		</element>
+		<element ref="side-light">
+			<bounds x="927" y="143" width="24" height="480"/>
+		</element>
+		<repeat count="32">
+			<param name="line_y" start="157" increment="13"/>
+			<element ref="blue-line">
+				<bounds x="47" y="~line_y~" width="868" height="1"/>
+			</element>
+		</repeat>
+
+		<!-- Mixer -->
+		<repeat count="9">
+			<param name="fader_x" start="67" increment="65"/>
+			<param name="text_x" start="52" increment="65"/>
+			<param name="text_i" start="1" increment="1"/>
+			<param name="pot_i" start="1" increment="1"/>
+			<element ref="fader" id="fader_p~pot_i~">
+				<bounds x="~fader_x~" y="222" width="35" height="144"/>
+			</element>
+			<element ref="fader-knob">
+				<animate inputtag="fader_p~pot_i~" inputmask="0x7f"/>
+				<bounds state="100" x="~fader_x~" y="213" width="35" height="35"/>
+				<bounds state="0" x="~fader_x~" y="340" width="35" height="35"/>
+			</element>
+			<element ref="fader-text-~text_i~">
+				<bounds x="~text_x~" y="380" width="65" height="10"/>
+			</element>
+		</repeat>
+		<element ref="fader-text-toms">
+			<bounds x="262" y="380" width="100" height="10"/>
+		</element>
+		<element ref="fader" id="fader_p10">
+			<bounds x="669" y="222" width="35" height="144"/>
+		</element>
+		<element ref="fader-knob">
+			<animate inputtag="fader_p10" inputmask="0x7f"/>
+			<bounds state="100" x="669" y="213" width="35" height="35"/>
+			<bounds state="0" x="669" y="340" width="35" height="35"/>
+		</element>
+		<element ref="fader-text-volume">
+			<bounds x="656" y="380" width="60" height="10"/>
+		</element>
+
+		<!-- Display -->
+		<element ref="display-background">
+			<bounds x="729" y="197" width="168" height="37"/>
+		</element>
+		<repeat count="4">  <!-- 4 x DL1414, left-to-right -->
+			<param name="display_digit" start="0" increment="4" />
+			<param name="display_x" start="738" increment="36" />
+			<repeat count="4">  <!-- 4 digits per DL1414, left-to-right -->
+				<param name="digit" start="~display_digit~" increment="1" />
+				<param name="digit_x" start="~display_x~" increment="9" />
+				<element name="digit_~digit~" ref="digit">
+					<bounds x="~digit_x~" y="211" width="9" height="11" />
+				</element>
+			</repeat>
+		</repeat>
+
+		<!-- Numpad -->
+		<!-- Unfortunately we cannot use a 4 x 3 loop, due to the input mapping.
+		     Using a combination of loops and manual drawing instead. -->
+		<repeat count="2">  <!-- 7, 8, 9 - 4, 5 ,6 -->
+			<param name="button_y" start="265" increment="40"/>
+			<param name="text_y" start="277" increment="40"/>
+			<param name="text_row" start="1" increment="1"/>
+			<param name="input_mask_start" start="0x20" rshift="3"/>
+			<repeat count="3">
+				<param name="button_x" start="757" increment="40"/>
+				<param name="text_x" start="767" increment="40"/>
+				<param name="text_col" start="1" increment="1"/>
+				<param name="input_mask" start="~input_mask_start~" lshift="1"/>
+				<element ref="button" inputtag="buttons_0" inputmask="~input_mask~">
+					<bounds x="~button_x~" y="~button_y~" width="40" height="40"/>
+				</element>
+				<element ref="num-text-~text_row~:~text_col~">
+					<bounds x="~text_x~" y="~text_y~" width="20" height="16"/>
+				</element>
+			</repeat>
+		</repeat>
+		<element ref="button" inputtag="buttons_1" inputmask="0x02">  <!-- 1 -->
+			<bounds x="757" y="345" width="40" height="40"/>
+		</element>
+		<element ref="num-text-3:1">
+			<bounds x="767" y="357" width="20" height="16"/>
+		</element>
+		<element ref="button" inputtag="buttons_0" inputmask="0x01">  <!-- 2 -->
+			<bounds x="797" y="345" width="40" height="40"/>
+		</element>
+		<element ref="num-text-3:2">
+			<bounds x="807" y="357" width="20" height="16"/>
+		</element>
+		<element ref="button" inputtag="buttons_0" inputmask="0x02">  <!-- 3 -->
+			<bounds x="837" y="345" width="40" height="40"/>
+		</element>
+		<element ref="num-text-3:3">
+			<bounds x="847" y="357" width="20" height="16"/>
+		</element>
+		<element ref="button" inputtag="buttons_1" inputmask="0x04"> <!-- < -->
+			<bounds x="757" y="385" width="40" height="40"/>
+		</element>
+		<element ref="num-text-4:1">
+			<bounds x="767" y="397" width="20" height="16"/>
+		</element>
+		<element ref="button" inputtag="buttons_1" inputmask="0x01"> <!-- 0 -->
+			<bounds x="797" y="385" width="40" height="40"/>
+		</element>
+		<element ref="num-text-4:2">
+			<bounds x="807" y="397" width="20" height="16"/>
+		</element>
+		<element ref="button" inputtag="buttons_1" inputmask="0x08"> <!-- > -->
+			<bounds x="837" y="385" width="40" height="40"/>
+		</element>
+		<element ref="num-text-4:3">
+			<bounds x="847" y="397" width="20" height="16"/>
+		</element>
+
+		<!-- Drum buttons -->
+		<repeat count="3">
+			<param name="button_y" start="402" increment="53"/>
+			<param name="text_y" start="443" increment="53"/>
+			<param name="text_row" start="1" increment="1"/>
+			<param name="input_num" start="5" increment="-1"/>
+			<repeat count="8">
+				<param name="button_x" start="65" increment="64"/>
+				<param name="text_col" start="1" increment="1"/>
+				<param name="input_mask" start="0x01" lshift="1"/>
+				<element ref="button" inputtag="buttons_~input_num~" inputmask="~input_mask~">
+					<bounds x="~button_x~" y="~button_y~" width="40" height="40"/>
+				</element>
+				<element ref="drum-text-~text_row~:~text_col~">
+					<bounds x="~button_x~" y="~text_y~" width="40" height="11"/>
+				</element>
+			</repeat>
+		</repeat>
+
+		<!-- Tempo, signature, quantize and play buttons -->
+		<element ref="button" inputtag="buttons_2" inputmask="0x20">
+			<bounds x="586" y="404" width="40" height="40"/>
+		</element>
+		<element ref="text-tempo">
+			<bounds x="586" y="444" width="40" height="11"/>
+		</element>
+		<element ref="button" inputtag="buttons_2" inputmask="0x80">
+			<bounds x="626" y="404" width="40" height="40"/>
+		</element>
+		<element ref="text-signature">
+			<bounds x="626" y="444" width="40" height="11"/>
+		</element>
+		<element ref="button" inputtag="buttons_2" inputmask="0x40">
+			<bounds x="666" y="404" width="40" height="40"/>
+		</element>
+		<element ref="text-quantize">
+			<bounds x="666" y="444" width="40" height="11"/>
+		</element>
+		<element ref="white-button" inputtag="buttons_2" inputmask="0x10">
+			<bounds x="626" y="483" width="40" height="40"/>
+		</element>
+		<element ref="text-playstop">
+			<bounds x="620" y="523" width="52" height="13"/>
+		</element>
+
+		<!-- Edit buttons -->
+		<element ref="edit-text-check">
+			<bounds x="775" y="446" width="120" height="11"/>
+		</element>
+		<repeat count="4">
+			<param name="button_x" start="735" increment="40"/>
+			<param name="text_col" start="1" increment="1"/>
+			<param name="input_mask" start="0x10" lshift="1"/>
+			<element ref="button" inputtag="buttons_1" inputmask="~input_mask~">
+				<bounds x="~button_x~" y="457" width="40" height="40"/>
+			</element>
+			<element ref="edit-text-1:~text_col~">
+				<bounds x="~button_x~" y="497" width="40" height="11"/>
+			</element>
+		</repeat>
+		<element ref="red-button" inputtag="buttons_2" inputmask="0x01">
+			<bounds x="735" y="510" width="40" height="40"/>
+		</element>
+		<element ref="edit-text-2:1">
+			<bounds x="735" y="550" width="40" height="11"/>
+		</element>
+		<repeat count="3">
+			<param name="button_x" start="775" increment="40"/>
+			<param name="button_col" start="2" increment="1"/>
+			<param name="input_mask" start="0x02" lshift="1"/>
+			<element ref="button" inputtag="buttons_2" inputmask="~input_mask~">
+				<bounds x="~button_x~" y="510" width="40" height="40"/>
+			</element>
+			<element ref="edit-text-2:~button_col~">
+				<bounds x="~button_x~" y="550" width="40" height="11"/>
+			</element>
+		</repeat>
+	</view>
+
+	<script><![CDATA[
+		file:set_resolve_tags_callback(
+			function()
+				-- These constants need to match the "fader" and "fader-knob"
+				-- element attributes in the "Mixer" section.
+				local fader_height <const> = 144
+				local knob_height <const> = 35
+				local knob_fader_delta_y <const> = 9  -- fader y - knob y
+
+				local fader_deadzone <const> = math.floor(knob_height / 2) - knob_fader_delta_y
+
+				-- Local state used by the pointer update handler.
+				local faders = {}
+				local fader_fields = {}
+				local selected = 0
+
+				-- Gather relevant elements and inputs into local state.
+				local view = file.views["Default Layout"]
+				for i = 1, #view.items do
+					local item = view.items:at(i)
+					if item.id ~= nil and string.find(item.id, "fader_") == 1 then
+						local port_tag = item.id
+						local port = file.device:ioport(port_tag)
+						local field = nil
+						if port ~= nil then
+							for k, val in pairs(port.fields) do
+								field = val
+								break
+							end
+							if field == nil then
+								print("DMX LAYOUT ERROR - Port does not have a field: " .. port_tag)
+							end
+						else
+							print("DMX LAYOUT ERROR - Port not found: " .. port_tag)
+						end
+						table.insert(faders, item)
+						table.insert(fader_fields, field)
+					end
+				end
+
+				view:set_pointer_updated_callback(
+					function(type, id, dev, x, y, btn, dn, up, cnt)
+						-- No button pressed. Reset state.
+						if btn & 1 == 0 then
+							selected = 0
+							return
+						end
+
+						-- Button just pressed. Find affected fader.
+						if dn & 1 ~= 0 then
+							for i = 1, #faders do
+								if faders[i].bounds:includes(x, y) then
+									selected = i
+									break
+								end
+							end
+						end
+
+						-- No fader selected. Nothing to do.
+						if selected <= 0 then
+							return
+						end
+
+						-- A fader is selected. Update state and, indirectly,
+						-- fader knob position, based on the pointer's Y position.
+
+						-- It is assumed the attached IO field is an IPT_ADJUSTER
+						-- with a range of 0-100 (the default).
+
+						local bbox = faders[selected].bounds
+						local scale_factor = bbox.height / fader_height
+						local min_y = bbox.y0 + fader_deadzone * scale_factor
+						local max_y = bbox.y1 - fader_deadzone * scale_factor
+
+						local new_value = 100 - 100 * (y - min_y) / (max_y - min_y)
+						new_value = math.floor(new_value + 0.5)
+						if new_value < 0 then new_value = 0 end
+						if new_value > 100 then new_value = 100 end
+						fader_fields[selected].user_value = new_value
+					end)
+			end)
+	]]></script>
+</mamelayout>
+

@@ -9,7 +9,7 @@ MAME's purpose is to preserve decades of software history. As electronic technol
 ## Where can I find out more?
 
 * [Official MAME Development Team Site](https://www.mamedev.org/) (includes binary downloads, wiki, forums, and more)
-* [MAME Testers](https://mametesters.org/) (official bug tracker for MAME and MESS)
+* [MAME Testers](https://mametesters.org/) (official bug tracker for MAME)
 
 ### Community
 

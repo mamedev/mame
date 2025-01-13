@@ -363,11 +363,11 @@ void m72_state::rtype2_port02_w(u8 data)
 
 void poundfor_state::poundfor_port02_w(u8 data)
 {
-	// bit 5 resets both uPD4701A?
-	m_upd4701[0]->resetx_w(BIT(data, 5));
-	m_upd4701[0]->resety_w(BIT(data, 5));
-	m_upd4701[1]->resetx_w(BIT(data, 5));
-	m_upd4701[1]->resety_w(BIT(data, 5));
+	// bit 6 resets both uPD4701A?
+	m_upd4701[0]->resetx_w(BIT(data, 6));
+	m_upd4701[0]->resety_w(BIT(data, 6));
+	m_upd4701[1]->resetx_w(BIT(data, 6));
+	m_upd4701[1]->resety_w(BIT(data, 6));
 
 	rtype2_port02_w(data & 0xbf);
 }

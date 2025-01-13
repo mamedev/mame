@@ -306,16 +306,15 @@ uint32_t policetr_state::video_r()
 uint32_t policetr_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const int width = cliprect.width();
-	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
 	/* render all the scanlines from the dstbitmap to MAME's bitmap */
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		uint8_t const *src = &m_dstbitmap->pix(y,cliprect.min_x);
-		uint32_t *dst = &bitmap.pix(y,cliprect.min_x);
+		uint8_t const *src = &m_dstbitmap->pix(y, cliprect.min_x);
+		uint32_t *dst = &bitmap.pix(y, cliprect.min_x);
 		//draw_scanline8(bitmap, cliprect.min_x, y, width, src, nullptr);
 		for (int x = 0; x < width; x++, dst++, src++)
-			*dst = palette[*src];
+			*dst = m_ramdac->pixel_select(*src);
 	}
 
 	return 0;

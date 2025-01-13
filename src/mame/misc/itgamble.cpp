@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders: David Haywood
+
 /******************************************************************
 
   Nazionale Elettronica + others (mostly Italian) Gambling games
@@ -117,8 +118,10 @@ Known games on this hardware revision are:
 *******************************************************************/
 
 #include "emu.h"
+
 #include "cpu/h8/h83048.h"
 #include "sound/okim6295.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -135,21 +138,20 @@ public:
 			m_palette(*this, "palette")
 	{ }
 
-	void mnumber(machine_config &config);
-	void itgamble(machine_config &config);
+	void mnumber(machine_config &config) ATTR_COLD;
+	void itgamble(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	void itgamble_map(address_map &map) ATTR_COLD;
-
-	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 
-	// driver_device overrides
-	virtual void machine_reset() override ATTR_COLD;
-	virtual void video_start() override ATTR_COLD;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void itgamble_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -174,8 +176,7 @@ uint32_t itgamble_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 void itgamble_state::itgamble_map(address_map &map)
 {
-	map.global_mask(0xffffff);
-	map(0x000000, 0xffffff).rom();
+	map(0x000000, 0x01ffff).rom();
 }
 
 
@@ -236,28 +237,12 @@ static INPUT_PORTS_START( itgamble )
 INPUT_PORTS_END
 
 
-/*************************
-*    Graphics Layouts    *
-*************************/
-
-static const gfx_layout gfxlayout_8x8x8 =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	8,
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64 },
-	8*64
-};
-
-
 /******************************
 * Graphics Decode Information *
 ******************************/
 
 static GFXDECODE_START( gfx_itgamble )
-	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout_8x8x8,   0, 16  )
+	GFXDECODE_ENTRY( "tiles", 0, gfx_8x8x8_raw, 0, 16 )
 GFXDECODE_END
 
 
@@ -267,7 +252,7 @@ GFXDECODE_END
 
 void itgamble_state::machine_reset()
 {
-	/* stop the CPU, we have no code for it anyway */
+	// stop the CPU, we have no code for it anyway
 	m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
 
@@ -277,11 +262,11 @@ void itgamble_state::machine_reset()
 
 void itgamble_state::itgamble(machine_config &config)
 {
-	/* basic machine hardware */
-	H83048(config, m_maincpu, 30_MHz_XTAL / 2 );
+	// basic machine hardware
+	H83048(config, m_maincpu, 30_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &itgamble_state::itgamble_map);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -293,9 +278,9 @@ void itgamble_state::itgamble(machine_config &config)
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_itgamble);
 	PALETTE(config, m_palette).set_entries(0x200);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	okim6295_device &oki(OKIM6295(config, "oki", 1_MHz_XTAL, okim6295_device::PIN7_HIGH)); /* 1MHz resonator */
+	okim6295_device &oki(OKIM6295(config, "oki", 1_MHz_XTAL, okim6295_device::PIN7_HIGH)); // 1MHz resonator
 	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
@@ -303,9 +288,7 @@ void itgamble_state::itgamble(machine_config &config)
 void itgamble_state::mnumber(machine_config &config)
 {
 	itgamble(config);
-	m_maincpu->set_clock(24_MHz_XTAL / 2);    /* probably the wrong CPU */
-
-	subdevice<okim6295_device>("oki")->set_clock(16_MHz_XTAL / 16); /* clock frequency & pin 7 not verified */
+	m_maincpu->set_clock(16_MHz_XTAL);
 }
 
 
@@ -319,14 +302,14 @@ PCB is marked: "H83048 bottom" on solder side
 PCB is labeled: "BOOK THEATER Vers. 1.2" on component side
 */
 ROM_START( bookthr )
-	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_LOAD( "bookthr_ver1.2_hd64f3048f16.mcu", 0x00000, 0x4000, NO_DUMP )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "bookthr_ver1.2_hd64f3048f16.mcu", 0x00000, 0x20000, NO_DUMP )
 
-	ROM_REGION( 0x100000, "gfx1", 0 ) //bigger than 8bpps?
+	ROM_REGION( 0x100000, "tiles", 0 ) //bigger than 8bpps?
 	ROM_LOAD( "2.ic18", 0x000000, 0x80000, CRC(39433a74) SHA1(088944bfb43b4f239f22d0d2213efd19cea7db30) )
 	ROM_LOAD( "3.ic17", 0x080000, 0x80000, CRC(893abdcc) SHA1(4dd28fd46bec8be5549d679d31c771888fcb1286) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* M6295 samples */
+	ROM_REGION( 0x40000, "oki", 0 ) // M6295 samples
 	ROM_LOAD( "1.ic25", 0x00000, 0x40000, CRC(4fe79e43) SHA1(7c154cb00e9b64fbdcc218280f2183b816cef20b) ) //same as Abacus
 ROM_END
 
@@ -338,14 +321,14 @@ PCB is labeled: "Capitan Uncino Vers. 1.3" and " PASSED 12/04/00" on component s
 PCB is labeled Ver 1.3, while EPROMs are labeled Ver 1.2
 */
 ROM_START( capunc )
-	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_LOAD( "capunc.ver1.2.mcu", 0x00000, 0x4000, NO_DUMP )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "capunc.ver1.2.mcu", 0x00000, 0x20000, NO_DUMP )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_REGION( 0x100000, "tiles", 0 )
 	ROM_LOAD( "2.ver.1.2.ic18", 0x000000, 0x80000, CRC(5030f7eb) SHA1(106b61c84e3647b8d68d6c30ee7e63ec2df1f5fd) )
 	ROM_LOAD( "3.ver.1.2.ic17", 0x080000, 0x80000, CRC(2b50e312) SHA1(dc901540a5e1a25fe6e7deb58b0fe01f116aaf63) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* M6295 samples */
+	ROM_REGION( 0x40000, "oki", 0 ) // M6295 samples
 	ROM_LOAD( "1.ic25", 0x00000, 0x40000, CRC(4fe79e43) SHA1(7c154cb00e9b64fbdcc218280f2183b816cef20b) )
 ROM_END
 
@@ -355,14 +338,14 @@ PCB is marked: "H83048 bottom" on solder side
 PCB is labeled: "Capitani Coraggiosi Vers. 1.3" and "PASSED 02/2001" on component side
 */
 ROM_START( capcor )
-	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_LOAD( "capcor.ver1.3.mcu", 0x00000, 0x4000, NO_DUMP )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "capcor.ver1.3.mcu", 0x00000, 0x20000, NO_DUMP )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_REGION( 0x100000, "tiles", 0 )
 	ROM_LOAD( "2.ic18", 0x000000, 0x80000, CRC(342bea85) SHA1(885080a9b55d64f9a93e3d5e31e6b13f272bdb93) )
 	ROM_LOAD( "3.ic17", 0x080000, 0x80000, CRC(ac530eff) SHA1(7c3a6e322311a1cd93801639a0498d5947fb14f2) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* M6295 samples */
+	ROM_REGION( 0x40000, "oki", 0 ) // M6295 samples
 	ROM_LOAD( "1.ic25", 0x00000, 0x40000, CRC(4fe79e43) SHA1(7c154cb00e9b64fbdcc218280f2183b816cef20b) )
 ROM_END
 
@@ -372,14 +355,14 @@ PCB is marked: "H83048 bottom" on solder side
 PCB is labeled: "Bowling Road Ver. 1.5" on component side
 */
 ROM_START( bowlroad )
-	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_LOAD( "bowlroad_ver1.5_hd64f3048f16.mcu", 0x00000, 0x4000, NO_DUMP )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "bowlroad_ver1.5_hd64f3048f16.mcu", 0x00000, 0x20000, NO_DUMP )
 
-	ROM_REGION( 0x100000, "gfx1", 0 ) //bigger than 8bpps?
+	ROM_REGION( 0x100000, "tiles", 0 ) //bigger than 8bpps?
 	ROM_LOAD( "bowling road 2.ic18", 0x000000, 0x80000, CRC(bc389c0a) SHA1(26f29820cce7b984c212a44842551b2960d371ae) )
 	ROM_LOAD( "bowling road 3.ic17", 0x080000, 0x80000, CRC(8a306a4c) SHA1(d94e2c266fb80343028da3dabe25a35b933d9e8e) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* M6295 samples */
+	ROM_REGION( 0x40000, "oki", 0 ) // M6295 samples
 	ROM_LOAD( "1.ic25", 0x00000, 0x20000, CRC(e6a0854b) SHA1(394e01bb24abd1e0d2c447b4d620fc5d02257d8a) )
 ROM_END
 
@@ -389,16 +372,16 @@ PCB is marked: "H83048 bottom" on solder side
 PCB is labeled: "EUROPA 2002 Versione 2_0" and "Non rimuovere PASSED 11/2001 Garanzia 6 MESI" on component side
 */
 ROM_START( euro2k2 )
-	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_LOAD( "euro2k2_ver2.0_hd64f3048f16.mcu", 0x00000, 0x4000, NO_DUMP )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "euro2k2_ver2.0_hd64f3048f16.mcu", 0x00000, 0x20000, NO_DUMP )
 
-	ROM_REGION( 0x180000, "gfx1", 0 )
+	ROM_REGION( 0x180000, "tiles", 0 )
 	ROM_LOAD( "4a.ic18", 0x000000, 0x80000, CRC(5decae2d) SHA1(d918aad0e2a1249b18677833f743c92fb678050a) )
 	ROM_LOAD( "5a.ic17", 0x080000, 0x80000, CRC(8f1bbbf3) SHA1(5efcf77674f8737fc1b98881acebacb26b10adc1) )
 	ROM_LOAD( "2a.ic20", 0x100000, 0x40000, CRC(f9bffb07) SHA1(efba175189d99a4548739a72f8a1f03c2782a3d0) )
 	ROM_LOAD( "3a.ic19", 0x140000, 0x40000, CRC(8b29cd56) SHA1(8a09e307271bceef6e9f863153d0f7a9bc6dc6bd) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* M6295 samples */
+	ROM_REGION( 0x40000, "oki", 0 ) // M6295 samples
 	ROM_LOAD( "1.ic25", 0x00000, 0x40000, CRC(b9b1aff0) SHA1(35622d7d099a10e5c6bcae152fded1f50692f740) )
 ROM_END
 
@@ -408,16 +391,16 @@ PCB is marked: "H83048 bottom" on solder side
 PCB is labeled: "EUROPA 2002 Versione 2_0" and "PASSED 10/2001" on component side
 */
 ROM_START( euro2k2a )
-	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_LOAD( "euro2k2a_ver2.0_hd64f3048f16.mcu", 0x00000, 0x4000, NO_DUMP )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "euro2k2a_ver2.0_hd64f3048f16.mcu", 0x00000, 0x20000, NO_DUMP )
 
-	ROM_REGION( 0x1c0000, "gfx1", 0 )
+	ROM_REGION( 0x1c0000, "tiles", 0 )
 	ROM_LOAD( "4a.ic18", 0x000000, 0x80000, CRC(5decae2d) SHA1(d918aad0e2a1249b18677833f743c92fb678050a) )
 	ROM_LOAD( "5a.ic17", 0x080000, 0x80000, CRC(8f1bbbf3) SHA1(5efcf77674f8737fc1b98881acebacb26b10adc1) )
 	ROM_LOAD( "2a.ic20", 0x100000, 0x40000, CRC(f9bffb07) SHA1(efba175189d99a4548739a72f8a1f03c2782a3d0) )
-	ROM_LOAD( "3a.ic19", 0x140000, 0x80000, CRC(56c8a73d) SHA1(49b44e5604cd8675d8f9770e5fb68dad4394e11d) ) /* identical halves */ // sldh
+	ROM_LOAD( "3a.ic19", 0x140000, 0x80000, CRC(56c8a73d) SHA1(49b44e5604cd8675d8f9770e5fb68dad4394e11d) ) // identical halves, sldh
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* M6295 samples */
+	ROM_REGION( 0x40000, "oki", 0 ) // M6295 samples
 	ROM_LOAD( "1.ic25", 0x00000, 0x40000, CRC(4fe79e43) SHA1(7c154cb00e9b64fbdcc218280f2183b816cef20b) ) // sldh
 ROM_END
 
@@ -428,14 +411,14 @@ PCB is labeled: "LABYRINTH Versione 1.5" on component side
 */
 
 ROM_START( labrinth )
-	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_LOAD( "labyrinth_ver1.5_hd64f3048f16.mcu", 0x00000, 0x4000, NO_DUMP )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "labyrinth_ver1.5_hd64f3048f16.mcu", 0x00000, 0x20000, NO_DUMP )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_REGION( 0x100000, "tiles", 0 )
 	ROM_LOAD( "labyrinth_2.ic18", 0x000000, 0x80000, CRC(2e29606c) SHA1(29a47b05556278cdea6b35414abed5b26dcfff9b) )
 	ROM_LOAD( "labyrinth_3.ic17", 0x080000, 0x80000, CRC(8b5e7556) SHA1(3e8e3b2724930349e3ca121fb5f61fac0dac9fa1) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* M6295 samples */
+	ROM_REGION( 0x40000, "oki", 0 ) // M6295 samples
 	ROM_LOAD( "1.ic25", 0x00000, 0x40000, CRC(4fe79e43) SHA1(7c154cb00e9b64fbdcc218280f2183b816cef20b) )
 ROM_END
 
@@ -445,14 +428,14 @@ PCB is marked: "H83048 bottom" on solder side
 PCB is labeled: "LA PERLA NERA Versione 2.0" and "Non Rimuovere PASSED 01/2002 garanzia 6 MESI" on component side
 */
 ROM_START( laperla )
-	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_LOAD( "laperla_ver2.0_hd64f3048f16.mcu", 0x00000, 0x4000, NO_DUMP )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "laperla_ver2.0_hd64f3048f16.mcu", 0x00000, 0x20000, NO_DUMP )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_REGION( 0x100000, "tiles", 0 )
 	ROM_LOAD( "2jolly.ic18", 0x000000, 0x80000, CRC(7bf3d5f2) SHA1(f3a51dd642358a20f6324f28fdf458e8ceaca7a1) )
 	ROM_LOAD( "3jolly.ic17", 0x080000, 0x80000, CRC(c3a8d9a0) SHA1(cc95c56ebc6137e11c82ed17be7c9f83ed7b6cfc) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* M6295 samples */
+	ROM_REGION( 0x40000, "oki", 0 ) // M6295 samples
 	ROM_LOAD( "1.ic25", 0x00000, 0x40000, CRC(4fe79e43) SHA1(7c154cb00e9b64fbdcc218280f2183b816cef20b) )
 ROM_END
 
@@ -463,14 +446,14 @@ PCB is marked: "H83048 bottom" on solder side
 PCB is labeled: "LA PERLA NERA GOLD Versione 2.0" and "Non Rimuovere PASSED 11/2001 garanzia 6 MESI" on component side
 */
 ROM_START( laperlag )
-	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_LOAD( "laperlag_ver2.0_hd64f3048f16.mcu", 0x00000, 0x4000, NO_DUMP )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "laperlag_ver2.0_hd64f3048f16.mcu", 0x00000, 0x20000, NO_DUMP )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_REGION( 0x100000, "tiles", 0 )
 	ROM_LOAD( "ic18-laperlaneragold2.bin", 0x000000, 0x80000, CRC(ae37de44) SHA1(089f97678fa39aee1885d7c63c4bc7c88e7fe553) )
 	ROM_LOAD( "ic17-laperlaneragold3.bin", 0x080000, 0x80000, CRC(86da6d11) SHA1(e6b7f9ccbf2e91a60fdf38067ec7ac7e73dea8cd) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* M6295 samples */
+	ROM_REGION( 0x40000, "oki", 0 ) // M6295 samples
 	ROM_LOAD( "ic25-uno.bin", 0x00000, 0x20000, CRC(e6a0854b) SHA1(394e01bb24abd1e0d2c447b4d620fc5d02257d8a) )
 ROM_END
 
@@ -481,16 +464,16 @@ PCB is marked: "H83048 bottom" on solder side
 PCB is labeled: "PIN UPS VER.1.0 REV.A" on component side
 */
 ROM_START( pinups )
-	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_LOAD( "pinups_ver1.0_rev_a_hd64f3048f16.mcu", 0x00000, 0x4000, NO_DUMP )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "pinups_ver1.0_rev_a_hd64f3048f16.mcu", 0x00000, 0x20000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "tiles", 0 )
 	ROM_LOAD( "pin_ups_4.ic18",   0x000000, 0x80000, CRC(e1996e31) SHA1(5da10a0d6443410558ec1a2cfbae62ac83d85c78) ) // FIXED BITS (xxxxxxx0)
 	ROM_LOAD( "pin_ups_5.ic17",   0x080000, 0x80000, CRC(1ac8bdb0) SHA1(9475135a13ffc7c4855b7749debbaad7800a3239) )
 	ROM_LOAD( "pin_ups_2-a.ic20", 0x100000, 0x80000, CRC(f106709d) SHA1(cd925059480dcda031d770db7e955f053aebb6fa) )
 	ROM_LOAD( "pin_ups_3-a.ic19", 0x180000, 0x80000, CRC(e2e13670) SHA1(96b6a90d8f841990f9e66ebc3b26146f8f6ee5e8) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* M6295 samples */
+	ROM_REGION( 0x40000, "oki", 0 ) // M6295 samples
 	ROM_LOAD( "1-a.ic25", 0x00000, 0x40000, CRC(55b73599) SHA1(20a19668392267a1cf5e148f8a9bf5970852698c) ) // 1ST AND 2ND HALF IDENTICAL, if split matches euro2k2s and uforobot
 ROM_END
 
@@ -502,14 +485,14 @@ PCB is labeled: "WORLD CUP Versione 1.5" on component side
 It is the same game as World Cup (Ver 1.4) but with less RAM
 */
 ROM_START( wcup )
-	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_LOAD( "wcup_ver1.5_hd64f3048f16.mcu", 0x00000, 0x4000, NO_DUMP )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "wcup_ver1.5_hd64f3048f16.mcu", 0x00000, 0x20000, NO_DUMP )
 
-	ROM_REGION( 0x100000, "gfx1", 0 ) //bigger than 8bpps?
+	ROM_REGION( 0x100000, "tiles", 0 ) //bigger than 8bpps?
 	ROM_LOAD( "world cup 2.ic18", 0x000000, 0x80000, CRC(4524445b) SHA1(50ec31ac9e4cd807fd4bf3d667644ed662681782) )
 	ROM_LOAD( "world cup 3.ic17", 0x080000, 0x80000, CRC(0df1af40) SHA1(f5050533e5a9cf2113e5aeffaeca23c7572cafae) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* M6295 samples */
+	ROM_REGION( 0x40000, "oki", 0 ) // M6295 samples
 	ROM_LOAD( "1.ic25", 0x00000, 0x20000, CRC(e6a0854b) SHA1(394e01bb24abd1e0d2c447b4d620fc5d02257d8a) ) // same as laperlag
 ROM_END
 
@@ -519,14 +502,14 @@ PCB is marked: "bottom" and "H83048 Rev. 1.1" on solder side
 PCB is labeled: "ABACUS Vers. 1.0" and "FR 24.08.01" on component side
 */
 ROM_START( abacus )
-	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_LOAD( "abacus_ver1.0_hd64f3048f16.mcu", 0x00000, 0x4000, NO_DUMP )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "abacus_ver1.0_hd64f3048f16.mcu", 0x00000, 0x20000, NO_DUMP )
 
-	ROM_REGION( 0x100000, "gfx1", 0 ) //bigger than 8bpps?
+	ROM_REGION( 0x100000, "tiles", 0 ) //bigger than 8bpps?
 	ROM_LOAD( "abacus2.ic18", 0x000000, 0x80000, CRC(9884ee09) SHA1(85875dbcd6821c8173457df0216145b4208d5c06) )
 	ROM_LOAD( "abacus3.ic17", 0x080000, 0x80000, CRC(ec6473c4) SHA1(49980b94ccf77fbfdaa151fccaeb3c2ddad3c119) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* M6295 samples */
+	ROM_REGION( 0x40000, "oki", 0 ) // M6295 samples
 	ROM_LOAD( "1.ic25", 0x00000, 0x40000, CRC(4fe79e43) SHA1(7c154cb00e9b64fbdcc218280f2183b816cef20b) )
 ROM_END
 
@@ -536,14 +519,14 @@ PCB is marked: "bottom" and "H83048 Rev. 1.1" on solder side
 PCB is labeled: "Bowling Road Ver. 1.4" and "Non Rimuovere PASSED 11/2001 Garanzia 6 MESI" on component side
 */
 ROM_START( bowlroad14 )
-	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_LOAD( "bowlroad_ver1.5_hd64f3048f16.mcu", 0x00000, 0x4000, NO_DUMP )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "bowlroad_ver1.5_hd64f3048f16.mcu", 0x00000, 0x20000, NO_DUMP )
 
-	ROM_REGION( 0x100000, "gfx1", 0 ) //bigger than 8bpps?
+	ROM_REGION( 0x100000, "tiles", 0 ) //bigger than 8bpps?
 	ROM_LOAD( "bowling road 2.ic18", 0x000000, 0x80000, CRC(ee3756ea) SHA1(9f77f4ebb9f5991ee9aa54a0f7e5d1159a0e53ce) ) // sldh
 	ROM_LOAD( "bowling road 3.ic17", 0x080000, 0x80000, CRC(fec5ad64) SHA1(b0178313fac8e2f118a8c3752ee55456a638e015) ) // sldh
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* M6295 samples */
+	ROM_REGION( 0x40000, "oki", 0 ) // M6295 samples
 	ROM_LOAD( "1.ic25", 0x00000, 0x40000, CRC(4fe79e43) SHA1(7c154cb00e9b64fbdcc218280f2183b816cef20b) )
 ROM_END
 
@@ -553,16 +536,16 @@ PCB is marked: "bottom" and "H83048 Rev. 1.1" on solder side
 PCB is labeled: "EUROPA 2002 SPACE Ver. 3.0" and "Non rimuovere PASSED 04/2002 Garanzia 6 MESI" on component side
 */
 ROM_START( euro2k2s )
-	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_LOAD( "euro2k2s_ver3.0_hd64f3048f16.mcu", 0x00000, 0x4000, NO_DUMP )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "euro2k2s_ver3.0_hd64f3048f16.mcu", 0x00000, 0x20000, NO_DUMP )
 
-	ROM_REGION( 0x180000, "gfx1", 0 )
+	ROM_REGION( 0x180000, "tiles", 0 )
 	ROM_LOAD( "europa2002space4.ic18", 0x000000, 0x80000, CRC(cf4db4f1) SHA1(6c03e54e30eb83778d1cad5ade17c26a370ea8a3) )
 	ROM_LOAD( "europa2002space5.ic17", 0x080000, 0x80000, CRC(1070b4ac) SHA1(3492de52cd0c784479d2774f6050b24cf4591484) )
 	ROM_LOAD( "europa2002_2-a.ic20",   0x100000, 0x40000, CRC(971bc33b) SHA1(c385e5bef57cdb52a86c1e38fca471ef5ab3da7c) )
-	ROM_LOAD( "europa2002space3.ic19", 0x140000, 0x40000, CRC(d82dba04) SHA1(63d407dd036d3c7f190ad7b6d694288e9a9e56d0) ) /* identical halves */
+	ROM_LOAD( "europa2002space3.ic19", 0x140000, 0x40000, CRC(d82dba04) SHA1(63d407dd036d3c7f190ad7b6d694288e9a9e56d0) ) // identical halves
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* M6295 samples */
+	ROM_REGION( 0x40000, "oki", 0 ) // M6295 samples
 	ROM_LOAD( "1-a.ic25", 0x00000, 0x20000, CRC(8fcb283d) SHA1(9e95c72967da13606eed6d16f84145273b9ffddf) )
 ROM_END
 
@@ -573,16 +556,16 @@ PCB is labeled: "UFO ROBOT Ver. 1.0 Rev.A" and " Non Rimuovere PASSED 12/2002 Ga
 */
 
 ROM_START( uforobot )
-	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_LOAD( "uforobot_ver1.0_rev_a_hd64f3048f16.mcu", 0x00000, 0x4000, NO_DUMP )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "uforobot_ver1.0_rev_a_hd64f3048f16.mcu", 0x00000, 0x20000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "tiles", 0 )
 	ROM_LOAD( "ufo_robot_4-a.ic18", 0x000000, 0x80000, CRC(dbd03bfc) SHA1(8d5a721869f95ee075cf3ee7743ee1b9ea9626dc) ) // FIXED BITS (xxxxxxx0)
 	ROM_LOAD( "ufo_robot_5-a.ic17", 0x080000, 0x80000, CRC(72ebd037) SHA1(4f133bba88dacda6a1e1d8b1469e76aae7b2db15) )
 	ROM_LOAD( "ufo_robot_2-a.ic20", 0x100000, 0x80000, CRC(c2d3fc8f) SHA1(12dd6c77f403fcaa5331ca6f8d02fd60f223b453) )
 	ROM_LOAD( "ufo_robot_3-a.ic19", 0x180000, 0x80000, CRC(4991101b) SHA1(a8943fa6986799b9b039c4208301a003333cc49a) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* M6295 samples */
+	ROM_REGION( 0x40000, "oki", 0 ) // M6295 samples
 	ROM_LOAD( "uno-a.ic25", 0x00000, 0x20000, CRC(8fcb283d) SHA1(9e95c72967da13606eed6d16f84145273b9ffddf) )
 ROM_END
 
@@ -594,14 +577,14 @@ PCB is labeled: "Bowling Road Ver. 1.4" and "Non Rimuovere PASSED 11/2001 Garanz
 GFX ROMs are the same as Bowling Road (Ver 1.5) but ICs location are numbered differently due to a different PCB layout. Oki ROM is different.
 */
 ROM_START( bowlroad14n )
-	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_LOAD( "bowlroad_ver1.4_nh_hd64f3048f16.mcu", 0x00000, 0x4000, NO_DUMP )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "bowlroad_ver1.4_nh_hd64f3048f16.mcu", 0x00000, 0x20000, NO_DUMP )
 
-	ROM_REGION( 0x100000, "gfx1", 0 ) //bigger than 8bpps?
+	ROM_REGION( 0x100000, "tiles", 0 ) //bigger than 8bpps?
 	ROM_LOAD( "bowling road 2.ic7", 0x000000, 0x80000, CRC(bc389c0a) SHA1(26f29820cce7b984c212a44842551b2960d371ae) )
 	ROM_LOAD( "bowling road 3.ic6", 0x080000, 0x80000, CRC(8a306a4c) SHA1(d94e2c266fb80343028da3dabe25a35b933d9e8e) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* M6295 samples */
+	ROM_REGION( 0x40000, "oki", 0 ) // M6295 samples
 	ROM_LOAD( "uno.ic25", 0x00000, 0x20000, CRC(e6a0854b) SHA1(394e01bb24abd1e0d2c447b4d620fc5d02257d8a) )
 ROM_END
 
@@ -614,14 +597,14 @@ It is the same game as World Cup (Ver 1.5) but ICs location are numbered differe
 */
 
 ROM_START( wcup14 )
-	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_LOAD( "wcup_ver1.4_hd64f3048f16.mcu", 0x00000, 0x4000, NO_DUMP )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "wcup_ver1.4_hd64f3048f16.mcu", 0x00000, 0x20000, NO_DUMP )
 
-	ROM_REGION( 0x100000, "gfx1", 0 ) //bigger than 8bpps?
+	ROM_REGION( 0x100000, "tiles", 0 ) //bigger than 8bpps?
 	ROM_LOAD( "world cup 2.ic18", 0x000000, 0x80000, CRC(4524445b) SHA1(50ec31ac9e4cd807fd4bf3d667644ed662681782) )
 	ROM_LOAD( "world cup 3.ic17", 0x080000, 0x80000, CRC(0df1af40) SHA1(f5050533e5a9cf2113e5aeffaeca23c7572cafae) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* M6295 samples */
+	ROM_REGION( 0x40000, "oki", 0 ) // M6295 samples
 	ROM_LOAD( "1.ic25", 0x00000, 0x20000, CRC(e6a0854b) SHA1(394e01bb24abd1e0d2c447b4d620fc5d02257d8a) )
 ROM_END
 
@@ -629,6 +612,7 @@ ROM_END
 
 
 /* Mystery Number
+GIFE-001 PCB
 
 CPU:
 
@@ -653,18 +637,32 @@ Note:
 
 */
 
-ROM_START( mnumber )    /* clocks should be changed for this game */
-	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_LOAD( "mnumber_hd64f3048f16.mcu", 0x00000, 0x4000, NO_DUMP )
+ROM_START( mnumber )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "mnumber_hd64f3048f16.mcu", 0x00000, 0x20000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )   /* different encoded gfx */
+	ROM_REGION( 0x200000, "tiles", 0 )   // differently encoded gfx
 	ROM_LOAD( "mysterynumber3.u20", 0x000000, 0x80000, CRC(251f1e11) SHA1(e8c90b289e76cea6a541b701859be6465a381668) )
 	ROM_LOAD( "mysterynumber4.u21", 0x080000, 0x80000, CRC(2b8744e4) SHA1(8a12c6f300818de3738e7c44c7df71c432cb9975) )
 	ROM_LOAD( "mysterynumber1.u22", 0x100000, 0x80000, CRC(d2ce1f61) SHA1(8f30407050fc102191747996258d4b5da3a0d994) )
-	ROM_LOAD( "mysterynumber2.u19", 0x180000, 0x80000, CRC(7b3a3b32) SHA1(9db46aa12077a48951056705491da1cce747c374) ) /* identical halves */
+	ROM_LOAD( "mysterynumber2.u19", 0x180000, 0x80000, CRC(7b3a3b32) SHA1(9db46aa12077a48951056705491da1cce747c374) ) // identical halves
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* M6295 samples */
+	ROM_REGION( 0x40000, "oki", 0 ) // M6295 samples
 	ROM_LOAD( "mysterynumber5.u6", 0x00000, 0x40000, CRC(80aba466) SHA1(e9bf7e1c3d1c6b1b0dba43dd79a71f89e63df814) )
+ROM_END
+
+ROM_START( gnumber )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "gnumber_hd64f3048f16.mcu", 0x00000, 0x20000, NO_DUMP )
+
+	ROM_REGION( 0x200000, "tiles", 0 )   // differently encoded gfx
+	ROM_LOAD( "golden_number_3.u20", 0x000000, 0x80000, CRC(ae927b5b) SHA1(7f27c8e1a165cd663469e768159aeac45328879c) )
+	ROM_LOAD( "golden_number_4.u21", 0x080000, 0x80000, CRC(e3de62ee) SHA1(212bfad6798332f459382ad7f9de23b9890e0981) )
+	ROM_LOAD( "golden_number_1.u22", 0x100000, 0x80000, CRC(8bd15448) SHA1(0ab853f55dd520c6b0dbcc4a604c86b54b4dc5c2) )
+	ROM_LOAD( "golden_number_2.u19", 0x180000, 0x80000, CRC(d40ffba5) SHA1(925cfdd4cbd5610d87f48c1202fa7ba7357e37d2) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) // M6295 samples
+	ROM_LOAD( "golden_number_5.u6", 0x00000, 0x40000, CRC(5264ad9e) SHA1(e076e0cd4a6b08b7c2ca01d85eecd0c2e34ad8b0) ) // 11xxxxxxxxxxxxxxxx = 0xFF
 ROM_END
 
 } // anonymous namespace
@@ -675,12 +673,12 @@ ROM_END
 *************************/
 
 //    YEAR  NAME         PARENT    MACHINE   INPUT     STATE           INIT        ROT   COMPANY                  FULLNAME                                           FLAGS
-/* hardware green H83048*/
+// hardware green H83048
 GAME( 200?, bookthr,     0,        itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "Book Theatre (Ver 1.2)",                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2000, capunc,      0,        itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "Capitan Uncino (Nazionale Elettronica, Ver 1.2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2001, capcor,      0,        itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "Capitani Coraggiosi (Ver 1.3)",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-/* hardware green H83048 + piggyback for timekeeping*/
+// hardware green H83048 + piggyback for timekeeping
 GAME( 2001, bowlroad,    0,        itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "Bowling Road (Ver 1.5)",                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2001, euro2k2,     0,        itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "Europa 2002 (Ver 2.0, set 1)",                    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2001, euro2k2a,    euro2k2,  itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "Europa 2002 (Ver 2.0, set 2)",                    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
@@ -690,15 +688,16 @@ GAME( 2001, laperlag,    0,        itgamble, itgamble, itgamble_state, empty_ini
 GAME( 200?, pinups,      0,        itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "Pin Ups (Ver 1.0 Rev A)",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2001, wcup,        0,        itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "World Cup (Ver 1.5)",                             MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-/* hardware red H83048 Rev 1.1 + timekeeping on board*/
+// hardware red H83048 Rev 1.1 + timekeeping on board
 GAME( 2001, abacus,      0,        itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "Abacus (Ver 1.0)",                                MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2001, bowlroad14,  bowlroad, itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "Bowling Road (Ver 1.4)",                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2002, euro2k2s,    euro2k2,  itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "Europa 2002 Space (Ver 3.0)",                     MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2001, uforobot,    0,        itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "UFO Robot (Ver 1.0 Rev A)",                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-/* hardware green ND2001 Rev 1.0*/
+// hardware green ND2001 Rev 1.0
 GAME( 2001, bowlroad14n, bowlroad, itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "Bowling Road (Ver 1.4, ND2001 hardware)",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2001, wcup14,      wcup,     itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "World Cup (Ver 1.4)",                             MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-/* different hardware */
+// hardware GIFE-001
 GAME( 2000, mnumber,     0,        mnumber,  itgamble, itgamble_state, empty_init, ROT0, "MM / BRL Bologna",      "Mystery Number",                                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, gnumber,     0,        mnumber,  itgamble, itgamble_state, empty_init, ROT0, "MM / BRL Bologna",      "Golden Number",                                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

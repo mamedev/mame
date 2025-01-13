@@ -106,9 +106,10 @@ void rainbow2_device::device_start()
 
 }
 
-void rainbow2_device::device_reset()
+void rainbow2_device::busrst_w(int state)
 {
-	m_control = 0;
+	if (state == 0)
+		m_control = 0;
 }
 
 void rainbow2_device::control_w(offs_t offset, uint8_t data)

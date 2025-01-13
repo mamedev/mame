@@ -136,16 +136,6 @@ const char *const amiga_state::s_custom_reg_names[0x100] =
 	"UNK1F8",       "UNK1FA",       "FMODE",        "UNK1FE"
 };
 
-constexpr XTAL amiga_state::CLK_28M_PAL;
-constexpr XTAL amiga_state::CLK_7M_PAL;
-constexpr XTAL amiga_state::CLK_C1_PAL;
-constexpr XTAL amiga_state::CLK_E_PAL;
-
-constexpr XTAL amiga_state::CLK_28M_NTSC;
-constexpr XTAL amiga_state::CLK_7M_NTSC;
-constexpr XTAL amiga_state::CLK_C1_NTSC;
-constexpr XTAL amiga_state::CLK_E_NTSC;
-
 /*************************************
  *
  *  Machine reset
@@ -175,8 +165,11 @@ void amiga_state::machine_start()
 
 void amiga_state::m68k_reset(int state)
 {
-	logerror("%s: Executed RESET\n", machine().describe_context());
-	machine_reset();
+	if (state)
+	{
+		logerror("%s: Executed RESET\n", machine().describe_context());
+		machine_reset();
+	}
 }
 
 void amiga_state::machine_reset()
@@ -1418,6 +1411,12 @@ void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 				popmessage("DSKDAT W %04x",data);
 			break;
 
+		case REG_BPL1DAT:
+			// TODO: bpl1dat serial conversion (Team17 + some demos)
+			if (data)
+				popmessage("BPL1DAT W %04x", data);
+			break;
+
 		case REG_DSKSYNC:
 			m_fdc->dsksync_w(data);
 			break;
@@ -1536,9 +1535,21 @@ void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 
 		case REG_SPR0DATA:  case REG_SPR1DATA:  case REG_SPR2DATA:  case REG_SPR3DATA:
 		case REG_SPR4DATA:  case REG_SPR5DATA:  case REG_SPR6DATA:  case REG_SPR7DATA:
+		{
 			/* enable comparitor on writes here */
 			sprite_enable_comparitor((offset - REG_SPR0DATA) / 4, true);
 			break;
+		}
+
+		case REG_SPR0POS:   case REG_SPR1POS:   case REG_SPR2POS:   case REG_SPR3POS:
+		case REG_SPR4POS:   case REG_SPR5POS:   case REG_SPR6POS:   case REG_SPR7POS:
+		{
+			// a bunch of games override position thru copper
+			// suprfrog, abreed, brian, jimpower (lives counter)
+			int which = (offset - REG_SPR0POS) / 4;
+			m_sprite_dma_reload_mask &= ~(1 << which);
+			break;
+		}
 
 		case REG_DDFSTRT:
 			/* impose hardware limits ( HRM, page 75 ) */
@@ -1679,6 +1690,9 @@ void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 			{
 				CUSTOM_REG(REG_BEAMCON0) = data;
 				update_screenmode();
+				// TODO: variable beam counter, disables hard display stops, enables HTOTAL/VTOTAL programming
+				if (BIT(data, 7))
+					popmessage("BEAMCON0: VARBEAMEN enabled");
 			}
 			break;
 

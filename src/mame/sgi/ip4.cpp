@@ -3,11 +3,50 @@
 
 /*
  * Silicon Graphics Professional IRIS 4D/50 and 4D/70 CPU board.
- *
+ */
+
+/*
  * WIP:
+ *
+ * bios 0: configuration is already set in the provided nvram, otherwise configure monitor as follows:
+ *  setenv bootfile dksc(0,1,8)sash         # configure boot device
+ *  setenv netaddr 192.168.137.2            # configure network address
+ *  setenv console d                        # configure terminal I/O
+ *
+ * label/partition disk using fx:
+ *  boot -f dksc(0,4,8)sash.IP4
+ *  boot -f dksc(0,4,7)stand/fx.IP4         # start fx, enable advanced options
+ *                                          # label all, sync, exit
+ *
+ * install irix from cdrom:
+ *  boot -f dksc(0,4,8)sash.IP4 --m         # start sash from CDROM, and copy/boot miniroot from swap
+ *  install audio.data.sounds               # optionally install sound data
+ *  go                                      # launch installation
+ *  quit                                    # exit installer, wait for post-installation processing
+ *
+ * use "auto" to boot from monitor
+ *
+ * bios 1 fpu diagnostic fails at 0x9fc0499c:
+ *  fcr31=0
+ *  f2=0x7fe52c4d'716169fe
+ *  cvt.w.s $f20,$f2  # result: f20=0xffffffff'80000000 fcr31=0x00010040 == "invalid operation" cause + flag
+ *  cvt.s.d $f20,$f2  # result: f20=0xffffffff'7f800000 fcr31=0x00015054 == "invalid operation" cause + flag + overflow/inexact
+ *  ...
+ *  expect fcr31 == 0x00020000 == "unimplemented operation"
+ *
+ * bios 1 also recognizes cdrom as floppy, requiring installation workarounds:
+ *  setenv tapedevice dksc(0,4,8)
  *  setenv root dks0d1s0
- *  setenv bootfile dksc(0,1,8)sash
- *  auto
+ *  boot -f dksc(0,4,8)sash.IP4 --m
+ *  sh: mkdir /mnt; mount /dev/dks0d4s7 /mnt; exit
+ *  from /mnt/dist
+ *  go
+ *
+ * TODO:
+ *  - fpu/cpu id, switches and leds
+ *  - fix parity diagnostic error
+ *  - fpu unimplemented operations
+ *
  */
 
 #include "emu.h"
@@ -18,6 +57,7 @@
 
 #include "bus/nscsi/hd.h"
 #include "bus/nscsi/cd.h"
+#include "bus/nscsi/tape.h"
 #include "bus/rs232/hlemouse.h"
 
 #include "kbd.h"
@@ -46,12 +86,14 @@ sgi_ip4_device::sgi_ip4_device(machine_config const &mconfig, char const *tag, d
 	, m_nvram(*this, "nvram", 0x800, ENDIANNESS_BIG)
 	, m_ram(*this, "ram")
 	, m_leds(*this, "led%u", 0U)
+	, m_dma_hi{}
+	, m_dma_page(0)
 {
 }
 
 enum cpucfg_mask : u16
 {
-	CPUCFG_LEDS = 0x001f,
+	CPUCFG_LEDS = 0x003f,
 	CPUCFG_S01  = 0x0040, // enable serial ports 0,1
 	CPUCFG_S23  = 0x0080, // enable serial ports 2,3
 	CPUCFG_MAIL = 0x0100, // enable mailbox interrupts
@@ -105,20 +147,24 @@ void sgi_ip4_device::map(address_map &map)
 	map(0x1f60'0000, 0x1f60'0003).umask32(0xff00'0000).w(m_saa, FUNC(saa1099_device::data_w));
 	map(0x1f60'0010, 0x1f60'0013).umask32(0xff00'0000).w(m_saa, FUNC(saa1099_device::control_w));
 
-	map(0x1f80'0000, 0x1f80'0003).umask32(0x00ff'0000).lr8(NAME([]() { return 0; })); // TODO: system id prom/coprocessor present
+	map(0x1f80'0000, 0x1f80'0003).umask32(0x00ff'0000).lr8(NAME([]() { return 0; })); // TODO: system id prom/coprocessor present (2=no fpu)
 
 	map(0x1f84'0000, 0x1f84'0003).umask32(0x0000'00ff).lrw8(NAME([this]() { LOG("vme_isr_r 0x%02x\n", m_vme_isr); return m_vme_isr; }), NAME([this](u8 data) { LOG("vme_isr_w 0x%02x\n", data); m_vme_isr = data; }));
 	map(0x1f84'0008, 0x1f84'000b).umask32(0x0000'00ff).lrw8(NAME([this]() { LOG("vme_imr_r 0x%02x\n", m_vme_imr); return m_vme_imr; }), NAME([this](u8 data) { LOG("vme_imr_w 0x%02x\n", data); m_vme_imr = data; }));
 
 	map(0x1f88'0000, 0x1f88'0003).umask32(0x0000'ffff).rw(FUNC(sgi_ip4_device::cpucfg_r), FUNC(sgi_ip4_device::cpucfg_w));
 
-	map(0x1f90'0000, 0x1f90'0003).umask32(0x0000'ffff).lw16(NAME([this](u16 data) { m_dmalo = data; }));
-	map(0x1f92'0000, 0x1f92'0003).umask32(0x0000'ffff).lw16(NAME([this](u16 data) { m_dmahi = data; }));
+	map(0x1f90'0000, 0x1f90'0003).umask32(0x0000'ffff).lrw16(
+		NAME([this]() { return m_dma_lo; }),
+		NAME([this](u16 data) { m_dma_lo = data; m_dma_page = 0; }));
+	map(0x1f92'0000, 0x1f92'003f).umask32(0x0000'ffff).lrw16(
+		NAME([this](offs_t offset) { return m_dma_hi[offset]; }),
+		NAME([this](offs_t offset, u16 data) { m_dma_hi[offset] = data; }));
 	map(0x1f94'0000, 0x1f94'0003).nopw(); // dma flush
 
 	map(0x1f98'0000, 0x1f98'0003).umask32(0x0000'00ff).lr8(NAME([this]() { return m_lio_isr; }));
 
-	map(0x1f9a'0000, 0x1f9a'0003).nopr(); // TODO: switches
+	map(0x1f9a'0000, 0x1f9a'0003).umask32(0x0000'ffff).lr16([]() { return 0; }, "switch_r"); // TODO: switches (0x84 == nodiag)
 
 	map(0x1fa0'0000, 0x1fa0'0003).umask32(0xff00'0000).lr8(NAME([this]() { m_cpu->set_input_line(INPUT_LINE_IRQ4, 0); return 0; }));
 	map(0x1fa2'0000, 0x1fa2'0003).umask32(0xff00'0000).lr8(NAME([this]() { m_cpu->set_input_line(INPUT_LINE_IRQ2, 0); return 0; }));
@@ -159,6 +205,7 @@ static void scsi_devices(device_slot_interface &device)
 			downcast<nscsi_cdrom_device &>(*device).set_block_size(512);
 		});
 	device.option_add("harddisk", NSCSI_HARDDISK);
+	device.option_add("tape", NSCSI_TAPE);
 }
 
 void sgi_ip4_device::device_add_mconfig(machine_config &config)
@@ -172,7 +219,7 @@ void sgi_ip4_device::device_add_mconfig(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // CXK5816PN-15L
 
-	PIT8254(config, m_pit);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<2>(3.6864_MHz_XTAL);
 	m_pit->out_handler<0>().set([this](int state) { if (state) m_cpu->set_input_line(INPUT_LINE_IRQ2, 1); });
 	m_pit->out_handler<1>().set([this](int state) { if (state) m_cpu->set_input_line(INPUT_LINE_IRQ4, 1); });
@@ -192,9 +239,9 @@ void sgi_ip4_device::device_add_mconfig(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:1", scsi_devices, "harddisk", false);
 	NSCSI_CONNECTOR(config, "scsi:2", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:3", scsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsi:4", scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsi:4", scsi_devices, "cdrom", false);
 	NSCSI_CONNECTOR(config, "scsi:5", scsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsi:6", scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsi:6", scsi_devices, "tape", false);
 	NSCSI_CONNECTOR(config, "scsi:7", scsi_devices, nullptr, false);
 
 	// duart 0 (keyboard/mouse)
@@ -300,8 +347,9 @@ void sgi_ip4_device::device_start()
 	m_leds.resolve();
 
 	save_item(NAME(m_cpucfg));
-	save_item(NAME(m_dmalo));
-	save_item(NAME(m_dmahi));
+	save_item(NAME(m_dma_lo));
+	save_item(NAME(m_dma_hi));
+	save_item(NAME(m_dma_page));
 	save_item(NAME(m_lio_isr));
 	save_item(NAME(m_vme_isr));
 	save_item(NAME(m_vme_imr));
@@ -312,8 +360,7 @@ void sgi_ip4_device::device_start()
 	save_item(NAME(m_vme_irq));
 
 	m_cpucfg = 0;
-	m_dmalo = 0;
-	m_dmahi = 0;
+	m_dma_lo = 0;
 	m_lio_isr = 0xff;
 	m_vme_isr = 0;
 	m_vme_imr = 0;
@@ -368,17 +415,17 @@ void sgi_ip4_device::scsi_drq(int state)
 {
 	if (state)
 	{
-		u32 const addr = (u32(m_dmahi) << 12) | (m_dmalo & 0x0fff);
+		u32 const addr = (u32(m_dma_hi[m_dma_page]) << 12) | (m_dma_lo & 0x0fff);
 
-		if (m_dmalo & 0x8000)
+		if (m_dma_lo & 0x8000)
 			m_cpu->space(0).write_byte(addr, m_scsi->dma_r());
 		else
 			m_scsi->dma_w(m_cpu->space(0).read_byte(addr));
 
-		m_dmalo = (m_dmalo + 1) & 0x8fff;
+		m_dma_lo = (m_dma_lo + 1) & 0x8fff;
 
-		if (!(m_dmalo & 0xfff))
-			m_dmahi++;
+		if (!(m_dma_lo & 0xfff))
+			m_dma_page = (m_dma_page + 1) & 0xf;
 	}
 }
 
@@ -387,7 +434,7 @@ void sgi_ip4_device::cpucfg_w(u16 data)
 	//LOG("cpucfg_w 0x%04x (%s)\n", data, machine().describe_context());
 
 	// update leds
-	for (unsigned i = 0; i < 5; i++)
+	for (unsigned i = 0; i < 6; i++)
 		m_leds[i] = BIT(data, i);
 
 	if ((m_cpucfg & CPUCFG_MAIL) && !BIT(data, 8))
@@ -533,6 +580,7 @@ void sgi_ip4_device::nvram_w(offs_t offset, u8 data)
 
 ROM_START(ip4)
 	ROM_REGION32_BE(0x40000, "boot", 0)
+
 	ROM_SYSTEM_BIOS(0, "4d1v30", "Version 4D1-3.0 PROM IP4 Mon Jan  4 20:29:51 PST 1988 SGI")
 	ROMX_LOAD("070-0093-009.bin", 0x000000, 0x010000, CRC(261b0a4c) SHA1(59f73d0e022a502dc5528289e388700b51b308da), ROM_BIOS(0) | ROM_SKIP(3))
 	ROMX_LOAD("070-0094-009.bin", 0x000001, 0x010000, CRC(8c05f591) SHA1(d4f86ad274f9dfe10c38551f3b6b9ba73570747f), ROM_BIOS(0) | ROM_SKIP(3))
@@ -547,6 +595,9 @@ ROM_START(ip4)
 
 	ROM_REGION32_BE(0x20, "idprom", 0)
 	ROM_LOAD("idprom.bin", 0, 0x20, NO_DUMP)
+
+	ROM_REGION(0x800, "nvram", 0)
+	ROM_LOAD("nvram", 0, 0x800, CRC(333443d0) SHA1(aceb115a2f4d2e3a229b2c2c3b20314674113705))
 ROM_END
 
 static INPUT_PORTS_START(ip4)

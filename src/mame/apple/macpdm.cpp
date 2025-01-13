@@ -26,9 +26,12 @@
 
 namespace {
 
-constexpr auto IO_CLOCK = 31.3344_MHz_XTAL;
-constexpr auto ENET_CLOCK = 20_MHz_XTAL;
-constexpr auto SOUND_CLOCK = 45.1584_MHz_XTAL;
+static constexpr auto IO_CLOCK = 31.3344_MHz_XTAL;
+static constexpr auto ENET_CLOCK = 20_MHz_XTAL;
+static constexpr auto SOUND_CLOCK = 45.1584_MHz_XTAL;
+
+static constexpr u8 DMA2_IRQ_SND_IN             = 0x01;
+static constexpr u8 DMA2_IRQ_SND_OUT            = 0x02;
 
 class macpdm_state : public driver_device
 {
@@ -61,6 +64,8 @@ private:
 	uint8_t m_hmc_bit = 0;
 
 	uint8_t m_irq_control = 0;
+
+	uint8_t m_dma_irq_1, m_dma_irq_2;
 
 	uint8_t m_via2_ier = 0, m_via2_ifr = 0, m_via2_sier = 0, m_via2_sifr = 0;
 
@@ -121,7 +126,7 @@ private:
 
 	void fdc_irq(int state);
 	void fdc_drq(int state);
-	[[maybe_unused]] void sound_irq(int state);
+	void recalc_dma_irqs();
 	void scsi_irq(int state);
 	void scsi_drq(int state);
 
@@ -166,8 +171,8 @@ private:
 
 	uint8_t diag_r(offs_t offset);
 
-	uint8_t irq_control_r();
-	void irq_control_w(uint8_t data);
+	uint8_t irq_control_r(offs_t offset);
+	void irq_control_w(offs_t offset, uint8_t data);
 	void irq_main_set(uint8_t mask, int state);
 	void via2_irq_main_set(uint8_t mask, int state);
 	void via2_irq_slot_set(uint8_t mask, int state);
@@ -228,19 +233,20 @@ macpdm_state::macpdm_state(const machine_config &mconfig, device_type type, cons
 	m_macadb(*this, "macadb"),
 	m_ram(*this, RAM_TAG),
 	m_scc(*this, "scc"),
-	m_scsibus(*this, "scsibus"),
-	m_ncr53c94(*this, "scsibus:7:ncr53c94"),
+	m_scsibus(*this, "scsi"),
+	m_ncr53c94(*this, "scsi:7:ncr53c94"),
 	m_fdc(*this, "fdc"),
 	m_floppy(*this, "fdc:%d", 0U),
-	m_video(*this, "video")
+	m_video(*this, "video"),
+	m_dma_irq_1(0),
+	m_dma_irq_2(0)
 {
 	m_cur_floppy = nullptr;
 }
 
 void macpdm_state::driver_init()
 {
-	m_maincpu->space().install_ram(0, m_ram->mask(), 0x3000000,m_ram->pointer());
-	m_maincpu->space().nop_readwrite(m_ram->size(), 0xffffff, 0x3000000);
+	m_maincpu->space().install_ram(0, m_ram->mask(), 0, m_ram->pointer());
 	m_model_id = 0xa55a3011;
 	// 7100 = a55a3012
 	// 8100 = a55a3013
@@ -281,23 +287,6 @@ void macpdm_state::driver_init()
 	save_item(NAME(m_dma_floppy_offset));
 	save_item(NAME(m_dma_floppy_byte_count));
 	save_item(NAME(m_floppy_drq));
-
-	m_maincpu->space().install_read_tap(0x4000c2e0, 0x4000c2e7, 0, "cuda", [this](offs_t offset, u64 &data, u64 mem_mask) {
-											if(mem_mask == 0xffff000000000000) {
-												address_space *space;
-												offs_t badr = m_maincpu->state_int(PPC_R16);
-												m_maincpu->translate(AS_PROGRAM, device_memory_interface::TR_READ, badr, space);
-												logerror("cuda packet %08x : type %02x cmd %02x - %02x %02x %02x %02x bytecnt %04x\n",
-														 badr,
-														 space->read_byte(badr),
-														 space->read_byte(badr+1),
-														 space->read_byte(badr+2),
-														 space->read_byte(badr+3),
-														 space->read_byte(badr+4),
-														 space->read_byte(badr+5),
-														 space->read_word(badr+6));
-											}
-										});
 }
 
 void macpdm_state::driver_reset()
@@ -340,22 +329,39 @@ void macpdm_state::driver_reset()
 
 	m_video->set_vram_base((const u64 *)m_ram->pointer());
 	m_video->set_vram_offset(0);
+
+	m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
 
-uint8_t macpdm_state::irq_control_r()
+uint8_t macpdm_state::irq_control_r(offs_t offset)
 {
-	return m_irq_control;
-}
+	switch (offset)
+	{
+		case 0x0:
+			return m_irq_control;
 
-void macpdm_state::irq_control_w(uint8_t data)
-{
-	if((m_irq_control ^ data) & 0x40) {
-		m_irq_control = (m_irq_control & ~0xc0) | (data & 0x40);
-		m_maincpu->set_input_line(PPC_IRQ, CLEAR_LINE);
+		case 0x8:
+			return m_dma_irq_1;
+
+		case 0xa:
+			return m_dma_irq_2;
 	}
-	if((data & 0xc0) == 0xc0 && (m_irq_control & 0x80)) {
-		m_irq_control &= 0x7f;
-		m_maincpu->set_input_line(PPC_IRQ, CLEAR_LINE);
+
+	return 0;
+}
+
+void macpdm_state::irq_control_w(offs_t offset, uint8_t data)
+{
+	if (offset == 0)
+	{
+		if((m_irq_control ^ data) & 0x40) {
+			m_irq_control = (m_irq_control & ~0xc0) | (data & 0x40);
+			m_maincpu->set_input_line(PPC_IRQ, CLEAR_LINE);
+		}
+		if((data & 0xc0) == 0xc0 && (m_irq_control & 0x80)) {
+			m_irq_control &= 0x7f;
+			m_maincpu->set_input_line(PPC_IRQ, CLEAR_LINE);
+		}
 	}
 }
 
@@ -652,9 +658,21 @@ void macpdm_state::via1_irq(int state)
 	irq_main_set(0x01, state);
 }
 
-void macpdm_state::sound_irq(int state)
+void macpdm_state::nmi_irq(int state)
 {
-	via2_irq_main_set(0x20, state);
+	irq_main_set(0x20, state);
+}
+
+void macpdm_state::recalc_dma_irqs()
+{
+	if ((m_dma_irq_1 | m_dma_irq_2) != 0)
+	{
+		irq_main_set(0x10, ASSERT_LINE);
+	}
+	else
+	{
+		irq_main_set(0x10, CLEAR_LINE);
+	}
 }
 
 void macpdm_state::vblank_irq(int state)
@@ -674,12 +692,16 @@ void macpdm_state::slot1_irq(int state)
 
 void macpdm_state::sndo_dma_irq(int state)
 {
-	// TODO
+	m_dma_irq_2 &= ~DMA2_IRQ_SND_OUT;
+	m_dma_irq_2 |= state ? DMA2_IRQ_SND_OUT : 0;
+	recalc_dma_irqs();
 }
 
 void macpdm_state::sndi_dma_irq(int state)
 {
-	// TODO
+	m_dma_irq_2 &= ~DMA2_IRQ_SND_IN;
+	m_dma_irq_2 |= state ? DMA2_IRQ_SND_IN : 0;
+	recalc_dma_irqs();
 }
 
 uint32_t macpdm_state::dma_badr_r()
@@ -1044,7 +1066,7 @@ void macpdm_state::pdm_map(address_map &map)
 
 	map(0x50f28000, 0x50f28007).rw(m_video, FUNC(mac_video_sonora_device::vctrl_r), FUNC(mac_video_sonora_device::vctrl_w));
 
-	map(0x50f2a000, 0x50f2a000).rw(FUNC(macpdm_state::irq_control_r), FUNC(macpdm_state::irq_control_w));
+	map(0x50f2a000, 0x50f2a00f).rw(FUNC(macpdm_state::irq_control_r), FUNC(macpdm_state::irq_control_w));
 
 	map(0x50f2c000, 0x50f2dfff).r(FUNC(macpdm_state::diag_r));
 
@@ -1082,8 +1104,10 @@ void macpdm_state::macpdm(machine_config &config)
 {
 	PPC601(config, m_maincpu, 60000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &macpdm_state::pdm_map);
+	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 
 	MAC_VIDEO_SONORA(config, m_video);
+	m_video->set_PDM();
 	m_video->screen_vblank().set(FUNC(macpdm_state::vblank_irq));
 
 	SPEAKER(config, "lspeaker").front_left();
@@ -1099,19 +1123,19 @@ void macpdm_state::macpdm(machine_config &config)
 	m_awacs->add_route(1, "rspeaker", 1.0);
 
 	NSCSI_BUS(config, m_scsibus);
-	NSCSI_CONNECTOR(config, "scsibus:0", default_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsibus:1", default_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsibus:2", default_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsibus:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config(
+	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config(
 		[](device_t *device)
 		{
 			device->subdevice<cdda_device>("cdda")->add_route(0, "^^lspeaker", 1.0);
 			device->subdevice<cdda_device>("cdda")->add_route(1, "^^rspeaker", 1.0);
 		});
-	NSCSI_CONNECTOR(config, "scsibus:4", default_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsibus:5", default_scsi_devices, "harddisk");
-	NSCSI_CONNECTOR(config, "scsibus:6", default_scsi_devices, "harddisk");
-	NSCSI_CONNECTOR(config, "scsibus:7").option_set("ncr53c94", NCR53C94).machine_config(
+	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr53c94", NCR53C94).machine_config(
 		[this] (device_t *device)
 		{
 			auto &ctrl = downcast<ncr53c94_device &>(*device);
@@ -1175,7 +1199,9 @@ void macpdm_state::macpdm(machine_config &config)
 	m_cuda->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
 	m_cuda->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));
 	m_cuda->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
+	m_cuda->nmi_callback().set(FUNC(macpdm_state::nmi_irq));
 	m_macadb->adb_data_callback().set(m_cuda, FUNC(cuda_device::set_adb_line));
+	m_macadb->adb_power_callback().set(m_cuda, FUNC(cuda_device::set_adb_power));
 	config.set_perfect_quantum(m_maincpu);
 
 	TIMER(config, "beat_60_15").configure_periodic(FUNC(macpdm_state::via1_60_15_timer), attotime::from_double(1/60.15));

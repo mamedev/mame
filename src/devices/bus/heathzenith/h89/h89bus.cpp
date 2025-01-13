@@ -150,9 +150,6 @@ h89bus_device::h89bus_device(const machine_config &mconfig, device_type type, co
 	m_out_int3_cb(*this),
 	m_out_int4_cb(*this),
 	m_out_int5_cb(*this),
-	m_out_fdcirq_cb(*this),
-	m_out_fdcdrq_cb(*this),
-	m_out_blockirq_cb(*this),
 	m_out_fmwe_cb(*this),
 	m_out_wait_cb(*this),
 	m_in_tlb_cb(*this, 0),
@@ -322,21 +319,6 @@ void h89bus_device::set_int4_line(int state)
 void h89bus_device::set_int5_line(int state)
 {
 	m_out_int5_cb(state);
-}
-
-void h89bus_device::set_fdcirq_line(int state)
-{
-	m_out_fdcirq_cb(state);
-}
-
-void h89bus_device::set_fdcdrq_line(int state)
-{
-	m_out_fdcdrq_cb(state);
-}
-
-void h89bus_device::set_blockirq_line(int state)
-{
-	m_out_blockirq_cb(state);
 }
 
 void h89bus_device::set_fmwe_line(int state)

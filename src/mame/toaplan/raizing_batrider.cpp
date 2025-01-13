@@ -790,7 +790,7 @@ static const gfx_layout batrider_tx_tilelayout =
 };
 
 static GFXDECODE_START( gfx_batrider )
-	GFXDECODE_ENTRY( nullptr, 0, batrider_tx_tilelayout, 64*16, 64 )
+	GFXDECODE_RAM( nullptr, 0, batrider_tx_tilelayout, 64*16, 64 )
 GFXDECODE_END
 
 

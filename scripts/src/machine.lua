@@ -218,19 +218,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/gayle.h,MACHINES["GAYLE"] = true
----------------------------------------------------
-
-if (MACHINES["GAYLE"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/gayle.cpp",
-		MAME_DIR .. "src/devices/machine/gayle.h",
-	}
-end
-
-
----------------------------------------------------
---
 --@src/devices/machine/40105.h,MACHINES["CMOS40105"] = true
 ---------------------------------------------------
 

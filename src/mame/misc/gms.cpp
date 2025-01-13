@@ -2179,12 +2179,11 @@ void gms_2layers_state::init_sball2k1()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
-	rom[0x14f6c / 2] = 0x4e71;
-	rom[0x14f6e / 2] = 0x4e71;
-	rom[0x14f9a / 2] = 0x6000;
-	rom[0x14f9c / 2] = 0x0010;
-	rom[0x15528 / 2] = 0x4e71;
-	rom[0x1552a / 2] = 0x4e71;
+	rom[0x14f6c / 2] = 0x4e71; // U135 ERROR
+	rom[0x14f6e / 2] = 0x4e71; // U135 ERROR
+	rom[0x14f9a / 2] = 0x6000; // U136 ERROR
+	rom[0x15528 / 2] = 0x4e71; // U135 ERROR
+	rom[0x1552a / 2] = 0x4e71; // U135 ERROR
 }
 
 void gms_3layers_state::init_sc2in1()

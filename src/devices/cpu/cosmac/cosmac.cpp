@@ -796,7 +796,7 @@ void cosmac_device::execute_run()
 
 				// execute initialization cycle
 				m_state = cosmac_state::STATE_1_INIT;
-				run();
+				run_state();
 
 				// next state is IDLE
 				m_state = cosmac_state::STATE_1_EXECUTE;

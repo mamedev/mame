@@ -52,7 +52,6 @@ public:
 
 protected:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	virtual void device_post_load() override ATTR_COLD;
 
 	// used by everything
 	void create_tx_tilemap(int dx = 0, int dx_flipped = 0);
