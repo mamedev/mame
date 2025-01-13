@@ -2760,7 +2760,7 @@ template <a64::Inst::Id Opcode> void drcbe_arm64::op_add(a64::Assembler &a, cons
 	if (Opcode == a64::Inst::kIdAdcs)
 		load_carry(a);
 
-	if (src1p.is_immediate() && !src1p.is_immediate_value(0) && is_valid_immediate(src1p.immediate(), 11))
+	if (src1p.is_immediate() && is_valid_immediate(src1p.immediate(), 11))
 	{
 		const a64::Gp src = src2p.select_register(TEMP_REG2, inst.size());
 
@@ -2771,7 +2771,7 @@ template <a64::Inst::Id Opcode> void drcbe_arm64::op_add(a64::Assembler &a, cons
 			a.emit(Opcode, output, src, src1p.immediate());
 		mov_param_reg(a, inst.size(), dstp, output);
 	}
-	else if (src2p.is_immediate() && !src2p.is_immediate_value(0) && is_valid_immediate(src2p.immediate(), 11))
+	else if (src2p.is_immediate() && is_valid_immediate(src2p.immediate(), 11))
 	{
 		const a64::Gp src = src1p.select_register(TEMP_REG1, inst.size());
 
@@ -2811,7 +2811,7 @@ template <a64::Inst::Id Opcode> void drcbe_arm64::op_sub(a64::Assembler &a, cons
 
 	const a64::Gp output = dstp.select_register(TEMP_REG3, inst.size());
 
-	if (src2p.is_immediate() && !src2p.is_immediate_value(0) && is_valid_immediate(src2p.immediate(), 11))
+	if (src2p.is_immediate() && is_valid_immediate(src2p.immediate(), 11))
 	{
 		const a64::Gp src = select_register(TEMP_REG1, inst.size());
 
@@ -2883,7 +2883,7 @@ void drcbe_arm64::op_mulu(a64::Assembler &a, const uml::instruction &inst)
 	const a64::Gp lo = TEMP_REG3;
 	const a64::Gp hi = TEMP_REG2;
 
-	if ((src1p.is_immediate() && src1p.immediate() == 0) || (src1p.is_immediate() && src1p.immediate() == 0))
+	if ((src1p.is_immediate() && src1p.is_immediate_value(0)) || (src2p.is_immediate() && src2p.is_immediate_value(0)))
 	{
 		a.mov(lo, a64::xzr);
 		a.mov(hi, a64::xzr);
@@ -2946,7 +2946,7 @@ void drcbe_arm64::op_mululw(a64::Assembler &a, const uml::instruction &inst)
 	const a64::Gp lo = TEMP_REG3;
 	const a64::Gp hi = TEMP_REG2;
 
-	if ((src1p.is_immediate() && src1p.immediate() == 0) || (src1p.is_immediate() && src1p.immediate() == 0))
+	if ((src1p.is_immediate() && src1p.is_immediate_value(0)) || (src2p.is_immediate() && src2p.is_immediate_value(0)))
 	{
 		a.mov(lo, a64::xzr);
 		a.mov(hi, a64::xzr);
@@ -3006,7 +3006,7 @@ void drcbe_arm64::op_muls(a64::Assembler &a, const uml::instruction &inst)
 	const a64::Gp lo = TEMP_REG3;
 	const a64::Gp hi = TEMP_REG2;
 
-	if ((src1p.is_immediate() && src1p.immediate() == 0) || (src1p.is_immediate() && src1p.immediate() == 0))
+	if ((src1p.is_immediate() && src1p.is_immediate_value(0)) || (src2p.is_immediate() && src2p.is_immediate_value(0)))
 	{
 		a.mov(lo, a64::xzr);
 		a.mov(hi, a64::xzr);
@@ -3079,7 +3079,7 @@ void drcbe_arm64::op_mulslw(a64::Assembler &a, const uml::instruction &inst)
 	const a64::Gp lo = TEMP_REG3;
 	const a64::Gp hi = TEMP_REG2;
 
-	if ((src1p.is_immediate() && src1p.immediate() == 0) || (src1p.is_immediate() && src1p.immediate() == 0))
+	if ((src1p.is_immediate() && src1p.is_immediate_value(0)) || (src2p.is_immediate() && src2p.is_immediate_value(0)))
 	{
 		a.mov(lo, a64::xzr);
 
