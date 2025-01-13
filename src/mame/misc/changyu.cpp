@@ -41,8 +41,9 @@ main PCB (marked 9101):
 1 x D8253C
 1 x P87C51 MCU
 
-Known undumped
+known undumped list.
 皇冠迷13 (Crown 13)
+PK13-II
 
 */
 
