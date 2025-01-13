@@ -525,6 +525,7 @@ public:
 	void system_outputb_w(uint8_t data);
 	void system_outputc_w(uint8_t data);
 
+	void init_cb2();
 	void init_lucky8a();
 	void init_lucky8f();
 	void init_lucky8l();
@@ -12207,6 +12208,34 @@ ROM_START( cb3h ) // very similar to the cb3 set, but changes are legit
 	ROM_LOAD( "dm74s288.d12", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
 ROM_END
 
+ // original Wing W4 PCB + Dyna D9005 subboard with Z80, ROM, RAM and Xilinx. Dumper says GFX ROMs are identical to many other sets.
+ROM_START( cb3s51 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cb3s-v51.ic5", 0x00000, 0x10000, CRC(1b9a12a1) SHA1(75f76b47147d07e8086812bc13c08f06952622a2) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "cb3-5.7h",  0x00000, 0x08000, CRC(83650a94) SHA1(e79420ab559d3f74013708767ca3f238fd333fb7) )
+	ROM_LOAD( "cb3-6.8h",  0x08000, 0x08000, CRC(2f46a3f5) SHA1(3e6022ee8f84039e48f41aea5e68ee28aabdc556) )
+	ROM_LOAD( "cb3-7.10h", 0x10000, 0x08000, CRC(dcf97517) SHA1(0a29696e0464c8878c499b1786a17080fd088a72) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "cb3-1.1h", 0x00000, 0x02000, CRC(7cc6d26b) SHA1(de33e8985affce7bd3ead89463117c9aaa93d5e4) )
+	ROM_LOAD( "cb3-2.3h", 0x02000, 0x02000, CRC(e73ea4e3) SHA1(c9fd56461f6986d6bc170403d298fcc408a524e9) )
+	ROM_LOAD( "cb3-3.4h", 0x04000, 0x02000, CRC(91162010) SHA1(3acc21e7074602b247f2f392eb181802092d2f21) )
+	ROM_LOAD( "cb3-4.5h", 0x06000, 0x02000, CRC(cbcc6bfb) SHA1(5bafc934fef1f50d8c182c39d3a7ce795c89d175) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD_NIB_LOW(  "n82s129.13g",  0x0000, 0x0100, CRC(59ac98e4) SHA1(5fc0f1a48c49c956cdb8826e20663dc57a9175e4) )   // 1st bank colors, low 4 bits.
+	ROM_LOAD_NIB_HIGH( "n82s129.14g",  0x0000, 0x0100, CRC(0d8f35bd) SHA1(0c2a0145cdaaf9beabdce241731a36b0c65f18a2) )   // 1st bank colors, high 4 bits.
+	ROM_LOAD(          "dm74s288.13d", 0x0080, 0x0020, CRC(77a85e21) SHA1(3b41e0ab7cc55c5d78914d23e8289383f5bd5654) )   // 2nd bank colors
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "82s129.f3", 0x0000, 0x0100, CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
+
+	ROM_REGION( 0x20, "unkprom2", 0 )
+	ROM_LOAD( "dm74s288.d12", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+ROM_END
+
 /* Cherry Gold I (bootleg)
    It runs in CB3e similar hardware...
 
@@ -15343,6 +15372,76 @@ ROM_START( f16s8l)
 
 	ROM_REGION( 0x20, "unkprom2", 0 )
 	ROM_LOAD( "5.12d", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+ROM_END
+
+ROM_START( cb2 ) // W4 base board + Dyna D8905 CPU board
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "dyna_cb2_280.ic3", 0x0000, 0x1000, CRC(ad930734) SHA1(e47f827dbecc7679aa403d838922d69763736356) ) // on CPU board
+	ROM_CONTINUE(                 0xd000, 0x1000 )
+	ROM_CONTINUE(                 0xc000, 0x1000 )
+	ROM_CONTINUE(                 0x3000, 0x1000 )
+	ROM_CONTINUE(                 0xf000, 0x1000 )
+	ROM_CONTINUE(                 0x1000, 0x1000 )
+	ROM_CONTINUE(                 0xe000, 0x1000 )
+	ROM_CONTINUE(                 0x2000, 0x1000 )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "5.7h", 0x00000, 0x8000, CRC(28e7b2c4) SHA1(b457d1da74da562f4151e188786551692435367b) )
+	ROM_LOAD( "6.8h", 0x08000, 0x8000, CRC(0625782b) SHA1(0bcc92f91b7b13ae6e87938379228108a47a8920) )
+	ROM_LOAD( "7.9h", 0x10000, 0x8000, CRC(31144af6) SHA1(bc7ada0b0b255de14b2ffed46256213880d2e586) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "1.1h", 0x0000, 0x2000, CRC(d902512a) SHA1(7e67e6942415d3580255f587060f69a50b75f445) )
+	ROM_LOAD( "2.2h", 0x2000, 0x2000, CRC(4baf17f8) SHA1(748630bcadbc40aaa64c0e3b82aca8cd28972cf8) )
+	ROM_LOAD( "3.4h", 0x4000, 0x2000, CRC(5fe4deb5) SHA1(a10206d1f0040b448da38444556364db6b21b940) )
+	ROM_LOAD( "4.5h", 0x6000, 0x2000, CRC(e3bc9e64) SHA1(a0ba18c0138233be8cb0b36f123cef16136df99b) )
+
+	// PROMs were not included in this set, but dumper's note says they match the ones for ns8lines
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "u4.bin", 0x0000, 0x0100, CRC(23e81049) SHA1(78071dae70fad870e972d944642fb3a2374be5e4) )
+	ROM_LOAD( "u5.bin", 0x0100, 0x0100, CRC(526cf9d3) SHA1(eb779d70f2507d0f26d225ac8f5de8f2243599ca) )
+
+	ROM_REGION( 0x40, "proms2", 0 )
+	ROM_LOAD( "u2.bin", 0x0000, 0x0020, CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "u3.bin", 0x0000, 0x0100, CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
+
+	ROM_REGION( 0x20, "unkprom2", 0 )
+	ROM_LOAD( "u1.bin", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+ROM_END
+
+/*
+  Dumper's note: the game uses 2x 6116 SRAM, one one the board and one on the subboard. If missing one of those the game will not boot.
+*/
+ROM_START( cbaai ) // W4 base board + CPU board.
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "dyna_cb2_280.ic3", 0x00000, 0x10000, CRC(be8359bf) SHA1(e363fdb106ab2289e02c035875c1350f74d6c4fc) ) // on CPU board
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "5.7h", 0x00000, 0x8000, CRC(a4c00251) SHA1(c8661ea98cdf78fed3890e822ab27bc82d65c234) )
+	ROM_LOAD( "6.8h", 0x08000, 0x8000, CRC(e8171fa6) SHA1(42615668802b286d6867884ab487376538c24a33) )
+	ROM_LOAD( "7.9h", 0x10000, 0x8000, CRC(60ba750d) SHA1(a7b78bc6d599a593f06a3d0adb5b0ff71224e2f8) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "1.1h", 0x0000, 0x2000, CRC(dc2e3af5) SHA1(d6b775601444274acaf8645e8df53c78219ac7e7) )
+	ROM_LOAD( "2.2h", 0x2000, 0x2000, CRC(14f36329) SHA1(09ceb73e4cc5c83740ce2bfc65468b39e3b87cbe) )
+	ROM_LOAD( "3.4h", 0x4000, 0x2000, CRC(d8189823) SHA1(26731dab01237c8d1b53861db0840cf66282d8e1) )
+	ROM_LOAD( "4.5h", 0x6000, 0x2000, CRC(cee3d9fd) SHA1(987875fa4417940641b5a18636165d05db8c89ad) )
+
+	// PROMs were not included in this set, but dumper's note says they match the ones for ns8lines
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "u4.bin", 0x0000, 0x0100, CRC(23e81049) SHA1(78071dae70fad870e972d944642fb3a2374be5e4) )
+	ROM_LOAD( "u5.bin", 0x0100, 0x0100, CRC(526cf9d3) SHA1(eb779d70f2507d0f26d225ac8f5de8f2243599ca) )
+
+	ROM_REGION( 0x40, "proms2", 0 )
+	ROM_LOAD( "u2.bin", 0x0000, 0x0020, CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "u3.bin", 0x0000, 0x0100, CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
+
+	ROM_REGION( 0x20, "unkprom2", 0 )
+	ROM_LOAD( "u1.bin", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
 ROM_END
 
 /*
@@ -22734,6 +22833,14 @@ void cmaster_state::init_tsk()
 		rom[i] = bitswap<8>(rom[i] ^ Xor_value, 6, 7, 4, 5, 2, 3, 0, 1);
 }
 
+void wingco_state::init_cb2()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (int a = 0; a < 0x10000; a++)
+		rom[a] = bitswap<8>(rom[a], 6, 7, 5, 4, 3, 2, 1, 0);
+}
+
 } // anonymous namespace
 
 
@@ -22768,6 +22875,7 @@ GAMEL( 199?, cb3e,       ncb3,     cb3e,     chrygld,  cb3_state,      init_cb3e
 GAMEL( 199?, cb3f,       ncb3,     ncb3,     ncb3,     cb3_state,      init_cb3f,      ROT0, "bootleg (Cleco)",   "Cherry Bonus III (set 5, encrypted bootleg)", MACHINE_NOT_WORKING, layout_chrygld ) // partially decrypted, stops at 'call attendant'
 GAMEL( 199?, cb3g,       ncb3,     ncb3,     ncb3,     cb3_state,      init_cb3g,      ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 6)",          0,                 layout_cherryb3 )
 GAMEL( 199?, cb3h,       ncb3,     ncb3,     ncb3,     cb3_state,      init_cb3,       ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 7)",          0,                 layout_cherryb3 )
+GAMEL( 199?, cb3s51,     ncb3,     ncb3,     ncb3,     cb3_state,      init_cb3g,      ROT0, "Dyna",              "Cherry Bonus III (ver.5.1)",                  MACHINE_NOT_WORKING, layout_cherryb3 ) // I/O need checking, seems to be working
 GAMEL( 199?, chryglda,   ncb3,     cb3e,     chrygld,  cb3_state,      init_cb3e,      ROT0, "bootleg",           "Cherry Gold I (set 2, encrypted bootleg)",    0,                 layout_chrygld )  // Runs in CB3e hardware.
 GAME(  1994, chryangla,  ncb3,     chryangla,ncb3,     cb3_state,      init_chryangl,  ROT0, "bootleg (G.C.I.)",  "Cherry Angel (encrypted, W-4 hardware)",      MACHINE_NOT_WORKING ) // DYNA CB3  V1.40 string, decrypted but only test screens work
 
@@ -22880,7 +22988,9 @@ GAME(  198?, ladylinrd,  ladylinr, ladylinrb,ladylinr, goldstar_state, init_lady
 GAME(  198?, ladylinre,  ladylinr, ladylinrb,ladylinr, goldstar_state, init_ladylinre, ROT0, "TAB Austria",       "Lady Liner (encrypted, set 4)",                            0 )
 GAME ( 1992?,wcat,       0,        wcat3,    lucky8b,  wingco_state,   init_wcat,      ROT0, "Excel",             "Wild Cat",                                                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // needs correct GFX ROMs, I/O, etc
 GAME(  1995, wcat3,      0,        wcat3,    lucky8,   wingco_state,   init_wcat3,     ROT0, "E.A.I.",            "Wild Cat 3",                                               MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS ) // decryption partially wrong, needs soft resets before running. Bad PROM decode
-GAMEL( 199?, animalw,    0,        lucky8,   animalw,  wingco_state,   empty_init,     ROT0, "bootleg",           "Animal Wonders (ver A900)",                                MACHINE_NOT_WORKING,    layout_lucky8 )    // inputs / DIPs need to be checked
+GAMEL( 199?, animalw,    0,        lucky8,   animalw,  wingco_state,   empty_init,     ROT0, "bootleg",           "Animal Wonders (ver A900)",                                MACHINE_NOT_WORKING,   layout_lucky8 )    // inputs / DIPs need to be checked
+GAMEL( 1989, cb2,        0,        lucky8,   lucky8,   wingco_state,   init_cb2,       ROT0, "Dyna",              "Cherry Bonus II (V2.00 06/01)",                            MACHINE_NOT_WORKING,   layout_lucky8 )    // I/O need to be checked, seems reasonably working
+GAMEL( 1990, cbaai,      0,        lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "Dyna",              "Cherry Bonus (A.A.I. bootleg)",                            MACHINE_NOT_WORKING,   layout_lucky8 )    // jumps to 0xf430 but there's nothing there?
 
 GAME(  1985, luckylad,   0,        luckylad, luckylad, wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "Lucky Lady (Wing, encrypted)",                             MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS )  // controls / dips, colors not correctly decoded
 GAME(  1991, megaline,   0,        megaline, megaline, unkch_state,    empty_init,     ROT0, "Fun World",         "Mega Lines",                                               MACHINE_NOT_WORKING )
