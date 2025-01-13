@@ -1673,8 +1673,6 @@ void drcbe_arm64::op_setflgs(a64::Assembler &a, const uml::instruction &inst)
 
 	a.mrs(TEMP_REG1, a64::Predicate::SysReg::kNZCV);
 
-	a.bfc(TEMP_REG1, 28, 4); // clear upper 4 status bits
-
 	a.and_(TEMP_REG2, FLAGS_REG, 0b1100); // zero + sign
 	a.ubfx(TEMP_REG3, FLAGS_REG, 1, 1); // overflow flag
 	a.orr(TEMP_REG2, TEMP_REG2, TEMP_REG3);
@@ -1789,8 +1787,6 @@ void drcbe_arm64::op_restore(a64::Assembler &a, const uml::instruction &inst)
 	a.ldrb(FLAGS_REG.w(), arm::Mem(membase, offsetof(drcuml_machine_state, flags)));
 
 	a.mrs(TEMP_REG1, a64::Predicate::SysReg::kNZCV);
-
-	a.bfc(TEMP_REG1, 28, 4); // clear upper 4 status bits
 
 	a.and_(TEMP_REG2, FLAGS_REG, 0b1100); // zero + sign
 	a.ubfx(TEMP_REG3, FLAGS_REG, 1, 1); // overflow flag
@@ -2485,7 +2481,7 @@ void drcbe_arm64::op_roland(a64::Assembler &a, const uml::instruction &inst)
 
 		if (shiftp.is_immediate())
 		{
-			const auto shift = ((inst.size() * 8) - (shiftp.immediate() % (inst.size() * 8))) % (inst.size() * 8);
+			const auto shift = -int64_t(shiftp.immediate()) & ((inst.size() * 8) - 1);
 
 			if (shift != 0)
 				a.ror(scratch, scratch, shift);
@@ -2602,7 +2598,8 @@ void drcbe_arm64::op_rolins(a64::Assembler &a, const uml::instruction &inst)
 
 		if (shiftp.is_immediate())
 		{
-			const auto shift = ((inst.size() * 8) - (shiftp.immediate() % (inst.size() * 8))) % (inst.size() * 8);
+			const auto shift = -int64_t(shiftp.immediate()) & ((inst.size() * 8) - 1);
+
 			if (shift != 0)
 				a.ror(scratch, param, shift);
 			else
@@ -3462,7 +3459,6 @@ void drcbe_arm64::op_rol(a64::Assembler &a, const uml::instruction &inst)
 
 void drcbe_arm64::op_rolc(a64::Assembler &a, const uml::instruction &inst)
 {
-	// TODO: make rolc accept src2p as an immediate as a tiny optimization
 	assert(inst.size() == 4 || inst.size() == 8);
 	assert_no_condition(inst);
 	assert_flags(inst, FLAG_C | FLAG_Z | FLAG_S);
@@ -3480,55 +3476,80 @@ void drcbe_arm64::op_rolc(a64::Assembler &a, const uml::instruction &inst)
 		can_use_dst_reg = src2p.ireg() != dstp.ireg();
 
 	const a64::Gp param1 = src1p.select_register(TEMP_REG3, inst.size());
-	const a64::Gp shift = src2p.select_register(TEMP_REG2, inst.size());
 	const a64::Gp output = can_use_dst_reg ? dstp.select_register(TEMP_REG1, inst.size()) : select_register(TEMP_REG1, inst.size());
-
 	const a64::Gp carry = select_register(SCRATCH_REG2, inst.size());
-	const a64::Gp scratch = select_register(SCRATCH_REG1, inst.size());
 
 	mov_reg_param(a, inst.size(), param1, src1p);
-	mov_reg_param(a, inst.size(), shift, src2p);
-
-	a.and_(shift, shift, maxBits);
 
 	// shift > 1: src = (PARAM1 << shift) | (carry << (shift - 1)) | (PARAM1 >> (33 - shift))
 	// shift = 1: src = (PARAM1 << shift) | carry
-	a.lsl(output, param1, shift); // PARAM1 << shift
 
-	Label skip = a.newLabel();
-	Label skip3 = a.newLabel();
-	a.cbz(shift, skip3);
+	if (src2p.is_immediate())
+	{
+		const auto shift = src2p.immediate() % (inst.size() * 8);
 
-	get_carry(a, carry);
+		if (shift != 0)
+		{
+			a.ubfx(carry, param1, (inst.size() * 8) - shift, 1);
+			if (shift > 1)
+				a.ubfx(output, param1, (inst.size() * 8) - shift + 1, shift - 1);
+			a.bfi(output.x(), FLAGS_REG, shift - 1, 1);
+			a.bfi(output, param1, shift, (inst.size() * 8) - shift);
+			a.bfi(FLAGS_REG, carry.x(), 0, 1);
 
-	a.sub(scratch, shift, 1);
-	a.cbz(scratch, skip);
+			if (inst.flags())
+				a.tst(output, output);
+		}
+		else
+		{
+			a.mov(output, param1);
+		}
+	}
+	else
+	{
+		const a64::Gp shift = src2p.select_register(TEMP_REG2, inst.size());
+		const a64::Gp scratch = select_register(SCRATCH_REG1, inst.size());
 
-	// add carry flag to output
-	a.lsl(carry, carry, scratch);
+		mov_reg_param(a, inst.size(), shift, src2p);
 
-	a.mov(scratch, maxBits + 2); // PARAM1 >> (33 - shift)
-	a.sub(scratch, scratch, shift);
-	a.lsr(scratch, param1, scratch);
-	a.orr(output, output, scratch);
+		a.and_(shift, shift, maxBits);
 
-	a.bind(skip);
+		a.lsl(output, param1, shift); // PARAM1 << shift
 
-	a.orr(output, output, carry);
+		Label skip = a.newLabel();
+		Label skip3 = a.newLabel();
+		a.cbz(shift, skip3);
 
-	calculate_carry_shift_left(a, param1, shift, maxBits);
+		get_carry(a, carry);
 
-	if (inst.flags())
-		a.tst(output, output);
+		a.sub(scratch, shift, 1);
+		a.cbz(scratch, skip);
 
-	a.bind(skip3);
+		// add carry flag to output
+		a.lsl(carry, carry, scratch);
+
+		a.mov(scratch, maxBits + 2); // PARAM1 >> (33 - shift)
+		a.sub(scratch, scratch, shift);
+		a.lsr(scratch, param1, scratch);
+		a.orr(output, output, scratch);
+
+		a.bind(skip);
+
+		a.orr(output, output, carry);
+
+		calculate_carry_shift_left(a, param1, shift, maxBits);
+
+		if (inst.flags())
+			a.tst(output, output);
+
+		a.bind(skip3);
+	}
 
 	mov_param_reg(a, inst.size(), dstp, output);
 }
 
 void drcbe_arm64::op_rorc(a64::Assembler &a, const uml::instruction &inst)
 {
-	// TODO: make rorc accept src2p as an immediate as a tiny optimization
 	assert(inst.size() == 4 || inst.size() == 8);
 	assert_no_condition(inst);
 	assert_flags(inst, FLAG_C | FLAG_Z | FLAG_S);
@@ -3546,53 +3567,77 @@ void drcbe_arm64::op_rorc(a64::Assembler &a, const uml::instruction &inst)
 		can_use_dst_reg = src2p.ireg() != dstp.ireg();
 
 	const a64::Gp param1 = src1p.select_register(TEMP_REG3, inst.size());
-	const a64::Gp shift = src2p.select_register(TEMP_REG2, inst.size());
 	const a64::Gp output = can_use_dst_reg ? dstp.select_register(TEMP_REG1, inst.size()) : select_register(TEMP_REG1, inst.size());
-
 	const a64::Gp carry = select_register(SCRATCH_REG2, inst.size());
-	const a64::Gp scratch = select_register(SCRATCH_REG1, inst.size());
 
-	// src = (PARAM1 >> shift) | (((flags & FLAG_C) << 31) >> (shift - 1)) | (PARAM1 << (33 - shift))
 	mov_reg_param(a, inst.size(), param1, src1p);
-	mov_reg_param(a, inst.size(), shift, src2p);
-
-	a.and_(shift, shift, maxBits);
 
 	// if (shift > 1)
 	//  src = (PARAM1 >> shift) | (((flags & FLAG_C) << 31) >> (shift - 1)) | (PARAM1 << (33 - shift));
 	// else if (shift == 1)
 	//  src = (PARAM1 >> shift) | ((flags & FLAG_C) << 31);
 
-	a.lsr(output, param1, shift); // PARAM1 >> shift
+	if (src2p.is_immediate())
+	{
+		const auto shift = src2p.immediate() % (inst.size() * 8);
 
-	Label skip = a.newLabel();
-	Label skip3 = a.newLabel();
-	a.cbz(shift, skip3);
+		if (shift != 0)
+		{
+			a.ubfx(carry, param1, shift - 1, 1);
+			a.ubfx(output, param1, shift, (inst.size() * 8) - shift);
+			a.bfi(output.x(), FLAGS_REG, (inst.size() * 8) - shift, 1);
+			if (shift > 1)
+				a.bfi(output, param1, (inst.size() * 8) - shift + 1, shift - 1);
+			a.bfi(FLAGS_REG, carry.x(), 0, 1);
 
-	get_carry(a, carry);
-	a.lsl(carry, carry, maxBits); // (flags & FLAG_C) << 31
+			if (inst.flags())
+				a.tst(output, output);
+		}
+		else
+		{
+			a.mov(output, param1);
+		}
+	}
+	else
+	{
+		const a64::Gp shift = src2p.select_register(TEMP_REG2, inst.size());
+		const a64::Gp scratch = select_register(SCRATCH_REG1, inst.size());
 
-	a.sub(scratch, shift, 1); // carry >> (shift - 1)
-	a.cbz(scratch, skip);
+		mov_reg_param(a, inst.size(), shift, src2p);
 
-	// add carry flag to output
-	a.lsr(carry, carry, scratch);
+		a.and_(shift, shift, maxBits);
 
-	a.mov(scratch, maxBits + 2); // PARAM1 << (33 - shift)
-	a.sub(scratch, scratch, shift);
-	a.lsl(scratch, param1, scratch);
-	a.orr(output, output, scratch);
+		a.lsr(output, param1, shift); // PARAM1 >> shift
 
-	a.bind(skip);
+		Label skip = a.newLabel();
+		Label skip3 = a.newLabel();
+		a.cbz(shift, skip3);
 
-	a.orr(output, output, carry);
+		get_carry(a, carry);
+		a.lsl(carry, carry, maxBits); // (flags & FLAG_C) << 31
 
-	calculate_carry_shift_right(a, param1, shift);
+		a.sub(scratch, shift, 1); // carry >> (shift - 1)
+		a.cbz(scratch, skip);
 
-	if (inst.flags())
-		a.tst(output, output);
+		// add carry flag to output
+		a.lsr(carry, carry, scratch);
 
-	a.bind(skip3);
+		a.mov(scratch, maxBits + 2); // PARAM1 << (33 - shift)
+		a.sub(scratch, scratch, shift);
+		a.lsl(scratch, param1, scratch);
+		a.orr(output, output, scratch);
+
+		a.bind(skip);
+
+		a.orr(output, output, carry);
+
+		calculate_carry_shift_right(a, param1, shift);
+
+		if (inst.flags())
+			a.tst(output, output);
+
+		a.bind(skip3);
+	}
 
 	mov_param_reg(a, inst.size(), dstp, output);
 }
