@@ -1713,12 +1713,14 @@ void drcbe_x64::op_hashjmp(Assembler &a, const instruction &inst)
 		}
 	}
 
+	// fix stack alignment if "no code" landing returned from abuse of call with misaligned stack
+	a.sub(rsp, 8);                                                                      // sub   rsp,8
+
 	// in all cases, if there is no code, we return here to generate the exception
 	if (LOG_HASHJMPS)
 		smart_call_m64(a, &m_near.debug_log_hashjmp_fail);
 
 	mov_mem_param(a, MABS(&m_state.exp, 4), pcp);                                       // mov   [exp],param
-	a.sub(rsp, 8);                                                                      // sub   rsp,8
 	a.call(MABS(exp.handle().codeptr_addr()));                                          // call  [exp]
 }
 

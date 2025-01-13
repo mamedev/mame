@@ -145,8 +145,7 @@ namespace asmjit {
 //! ### Supported Backends / Architectures
 //!
 //!   - **X86** and **X86_64** - Both 32-bit and 64-bit backends tested on CI.
-//!   - **AArch64** - AArch64 backend is currently only partially tested (there is no native AArch64 runner to test
-//!     AsmJit Builder/Compiler).
+//!   - **AArch64** - Tested on CI (Native Apple runners and Linux emulated via QEMU).
 //!
 //! ### Static Builds and Embedding
 //!
@@ -740,15 +739,17 @@ namespace asmjit {
 //!   JitAllocator allocator;
 //!
 //!   // Allocate an executable virtual memory and handle a possible failure.
-//!   void* p = allocator.alloc(estimatedSize);
-//!   if (!p)
+//!   JitAllocator::Span span;
+//!   Error err = allocator.alloc(span, estimatedSize);
+//!
+//!   if (err != kErrorOk) // <- NOTE: This must be checked, always!
 //!     return 0;
 //!
 //!   // Now relocate the code to the address provided by the memory allocator.
-//!   // Please note that this DOESN'T COPY anything to `p`. This function will
-//!   // store the address in CodeHolder and use relocation entries to patch the
-//!   // existing code in all sections to respect the base address provided.
-//!   code.relocateToBase((uint64_t)p);
+//!   // Please note that this DOESN'T COPY anything to it. This function will
+//!   // store the address in CodeHolder and use relocation entries to patch
+//!   // the existing code in all sections to respect the base address provided.
+//!   code.relocateToBase((uint64_t)span.rx());
 //!
 //!   // This is purely optional. There are cases in which the relocation can omit
 //!   // unneeded data, which would shrink the size of address table. If that
@@ -761,12 +762,17 @@ namespace asmjit {
 //!   // additional options that can be used to also zero pad sections' virtual
 //!   // size, etc.
 //!   //
-//!   // With some additional features, copyFlattenData() does roughly this:
-//!   //   for (Section* section : code.sections())
-//!   //     memcpy((uint8_t*)p + section->offset(),
-//!   //            section->data(),
-//!   //            section->bufferSize());
-//!   code.copyFlattenedData(p, codeSize, CopySectionFlags::kPadSectionBuffer);
+//!   // With some additional features, copyFlattenData() does roughly the following:
+//!   //
+//!   // allocator.write([&](JitAllocator::Span& span) {
+//!   //   for (Section* section : code.sections()) {
+//!   //     uint8_t* p = (uint8_t*)span.rw() + section->offset();
+//!   //     memcpy(p, section->data(), section->bufferSize());
+//!   //   }
+//!   // }
+//!   allocator.write([&](JitAllocator::Span& span) {
+//!     code.copyFlattenedData(span.rw(), codeSize, CopySectionFlags::kPadSectionBuffer);
+//!   });
 //!
 //!   // Execute the generated function.
 //!   int inA[4] = { 4, 3, 2, 1 };

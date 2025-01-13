@@ -710,16 +710,28 @@ end
 
 if not _OPTIONS["FORCE_DRC_C_BACKEND"] then
 	if _OPTIONS["BIGENDIAN"]~="1" then
-		configuration { "x64" }
-			defines {
-				"NATIVE_DRC=drcbe_x64",
-			}
-		configuration { "x32" }
-			defines {
-				"NATIVE_DRC=drcbe_x86",
-			}
-		configuration {  }
+		if (_OPTIONS["PLATFORM"]=="arm64") then
+			configuration { }
+				defines {
+					"NATIVE_DRC=drcbe_arm64",
+				}
+		else
+			configuration { "x64" }
+				defines {
+					"NATIVE_DRC=drcbe_x64",
+				}
+			configuration { "x32" }
+				defines {
+					"NATIVE_DRC=drcbe_x86",
+				}
+			configuration {  }
+		end
 	end
+
+	configuration { }
+		defines {
+			"ASMJIT_STATIC",
+		}
 end
 
 	defines {

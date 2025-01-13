@@ -39,12 +39,6 @@ namespace uml
 	constexpr int REG_F_COUNT = 10;
 	constexpr int REG_F_END = REG_F0 + REG_F_COUNT;
 
-	// vector registers
-	constexpr int REG_V0 = 0xc00;
-	constexpr int REG_V_COUNT = 10;
-	constexpr int REG_V_END = REG_V0 + REG_V_COUNT;
-
-	// map variables
 	constexpr int MAPVAR_M0 = 0x1000;
 	constexpr int MAPVAR_COUNT = 10;
 	constexpr int MAPVAR_END = MAPVAR_M0 + MAPVAR_COUNT;
@@ -105,7 +99,6 @@ namespace uml
 		SIZE_WORD,                  // 2-byte
 		SIZE_DWORD,                 // 4-byte
 		SIZE_QWORD,                 // 8-byte
-		SIZE_DQWORD,                // 16-byte (vector)
 		SIZE_SHORT = SIZE_DWORD,    // 4-byte (float)
 		SIZE_DOUBLE = SIZE_QWORD    // 8-byte (float)
 	};
@@ -284,7 +277,6 @@ namespace uml
 			PTYPE_IMMEDIATE,                    // immediate; value = sign-extended to 64 bits
 			PTYPE_INT_REGISTER,                 // integer register; value = REG_I0 - REG_I_END
 			PTYPE_FLOAT_REGISTER,               // floating point register; value = REG_F0 - REG_F_END
-			PTYPE_VECTOR_REGISTER,              // vector register; value = REG_V0 - REG_V_END
 			PTYPE_MAPVAR,                       // map variable; value = MAPVAR_M0 - MAPVAR_END
 			PTYPE_MEMORY,                       // memory; value = pointer to memory
 			PTYPE_SIZE,                         // size; value = operand_size
@@ -305,19 +297,18 @@ namespace uml
 		constexpr parameter() : m_type(PTYPE_NONE), m_value(0) { }
 		constexpr parameter(parameter const &param) : m_type(param.m_type), m_value(param.m_value) { }
 		constexpr parameter(u64 val) : m_type(PTYPE_IMMEDIATE), m_value(val) { }
-		parameter(operand_size size, memory_scale scale) : m_type(PTYPE_SIZE_SCALE), m_value((scale << 4) | size) { assert(size >= SIZE_BYTE && size <= SIZE_DQWORD); assert(scale >= SCALE_x1 && scale <= SCALE_x8); }
-		parameter(operand_size size, memory_space space) : m_type(PTYPE_SIZE_SPACE), m_value((space << 4) | size) { assert(size >= SIZE_BYTE && size <= SIZE_DQWORD); assert(space >= SPACE_PROGRAM && space <= SPACE_IO); }
+		parameter(operand_size size, memory_scale scale) : m_type(PTYPE_SIZE_SCALE), m_value((scale << 4) | size) { assert(size >= SIZE_BYTE && size <= SIZE_QWORD); assert(scale >= SCALE_x1 && scale <= SCALE_x8); }
+		parameter(operand_size size, memory_space space) : m_type(PTYPE_SIZE_SPACE), m_value((space << 4) | size) { assert(size >= SIZE_BYTE && size <= SIZE_QWORD); assert(space >= SPACE_PROGRAM && space <= SPACE_IO); }
 		parameter(code_handle &handle) : m_type(PTYPE_CODE_HANDLE), m_value(reinterpret_cast<parameter_value>(&handle)) { }
 		constexpr parameter(code_label const &label) : m_type(PTYPE_CODE_LABEL), m_value(label) { }
 
 		// creators for types that don't safely default
 		static parameter make_ireg(int regnum) { assert(regnum >= REG_I0 && regnum < REG_I_END); return parameter(PTYPE_INT_REGISTER, regnum); }
 		static parameter make_freg(int regnum) { assert(regnum >= REG_F0 && regnum < REG_F_END); return parameter(PTYPE_FLOAT_REGISTER, regnum); }
-		static parameter make_vreg(int regnum) { assert(regnum >= REG_V0 && regnum < REG_V_END); return parameter(PTYPE_VECTOR_REGISTER, regnum); }
 		static parameter make_mapvar(int mvnum) { assert(mvnum >= MAPVAR_M0 && mvnum < MAPVAR_END); return parameter(PTYPE_MAPVAR, mvnum); }
 		static parameter make_memory(void *base) { return parameter(PTYPE_MEMORY, reinterpret_cast<parameter_value>(base)); }
 		static parameter make_memory(void const *base) { return parameter(PTYPE_MEMORY, reinterpret_cast<parameter_value>(const_cast<void *>(base))); }
-		static parameter make_size(operand_size size) { assert(size >= SIZE_BYTE && size <= SIZE_DQWORD); return parameter(PTYPE_SIZE, size); }
+		static parameter make_size(operand_size size) { assert(size >= SIZE_BYTE && size <= SIZE_QWORD); return parameter(PTYPE_SIZE, size); }
 		static parameter make_string(char const *string) { return parameter(PTYPE_STRING, reinterpret_cast<parameter_value>(const_cast<char *>(string))); }
 		static parameter make_cfunc(c_function func) { return parameter(PTYPE_C_FUNCTION, reinterpret_cast<parameter_value>(func)); }
 		static parameter make_rounding(float_rounding_mode mode) { assert(mode >= ROUND_TRUNC && mode <= ROUND_DEFAULT); return parameter(PTYPE_ROUNDING, mode); }
@@ -331,7 +322,6 @@ namespace uml
 		u64 immediate() const { assert(m_type == PTYPE_IMMEDIATE); return m_value; }
 		int ireg() const { assert(m_type == PTYPE_INT_REGISTER); assert(m_value >= REG_I0 && m_value < REG_I_END); return m_value; }
 		int freg() const { assert(m_type == PTYPE_FLOAT_REGISTER); assert(m_value >= REG_F0 && m_value < REG_F_END); return m_value; }
-		int vreg() const { assert(m_type == PTYPE_VECTOR_REGISTER); assert(m_value >= REG_V0 && m_value < REG_V_END); return m_value; }
 		int mapvar() const { assert(m_type == PTYPE_MAPVAR); assert(m_value >= MAPVAR_M0 && m_value < MAPVAR_END); return m_value; }
 		void *memory() const { assert(m_type == PTYPE_MEMORY); return reinterpret_cast<void *>(m_value); }
 		operand_size size() const { assert(m_type == PTYPE_SIZE || m_type == PTYPE_SIZE_SCALE || m_type == PTYPE_SIZE_SPACE); return operand_size(m_value & 15); }
@@ -347,7 +337,6 @@ namespace uml
 		constexpr bool is_immediate() const { return m_type == PTYPE_IMMEDIATE; }
 		constexpr bool is_int_register() const { return m_type == PTYPE_INT_REGISTER; }
 		constexpr bool is_float_register() const { return m_type == PTYPE_FLOAT_REGISTER; }
-		constexpr bool is_vector_register() const { return m_type == PTYPE_VECTOR_REGISTER; }
 		constexpr bool is_mapvar() const { return m_type == PTYPE_MAPVAR; }
 		constexpr bool is_memory() const { return m_type == PTYPE_MEMORY; }
 		constexpr bool is_size() const { return m_type == PTYPE_SIZE; }
@@ -621,7 +610,6 @@ namespace uml
 	// global inline functions to specify a register parameter by index
 	inline parameter ireg(int n) { return parameter::make_ireg(REG_I0 + n); }
 	inline parameter freg(int n) { return parameter::make_freg(REG_F0 + n); }
-	inline parameter vreg(int n) { return parameter::make_vreg(REG_V0 + n); }
 	inline parameter mapvar(int n) { return parameter::make_mapvar(MAPVAR_M0 + n); }
 
 	// global inline functions to define memory parameters
@@ -649,17 +637,6 @@ namespace uml
 	const parameter F7(parameter::make_freg(REG_F0 + 7));
 	const parameter F8(parameter::make_freg(REG_F0 + 8));
 	const parameter F9(parameter::make_freg(REG_F0 + 9));
-
-	const parameter V0(parameter::make_vreg(REG_V0 + 0));
-	const parameter V1(parameter::make_vreg(REG_V0 + 1));
-	const parameter V2(parameter::make_vreg(REG_V0 + 2));
-	const parameter V3(parameter::make_vreg(REG_V0 + 3));
-	const parameter V4(parameter::make_vreg(REG_V0 + 4));
-	const parameter V5(parameter::make_vreg(REG_V0 + 5));
-	const parameter V6(parameter::make_vreg(REG_V0 + 6));
-	const parameter V7(parameter::make_vreg(REG_V0 + 7));
-	const parameter V8(parameter::make_vreg(REG_V0 + 8));
-	const parameter V9(parameter::make_vreg(REG_V0 + 9));
 
 	const parameter M0(parameter::make_mapvar(MAPVAR_M0 + 0));
 	const parameter M1(parameter::make_mapvar(MAPVAR_M0 + 1));

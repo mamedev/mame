@@ -1615,10 +1615,10 @@ public:
   ASMJIT_INLINE_NODEBUG bool operator>=(const ArrayReverseIterator& other) const noexcept { return _ptr >= other._ptr; }
 
   ASMJIT_INLINE_NODEBUG ArrayReverseIterator& operator++() noexcept { _ptr--; return *this; }
-  ASMJIT_INLINE_NODEBUG ArrayReverseIterator& operator++(int) noexcept { ArrayReverseIterator prev(*this); _ptr--; return prev; }
-
   ASMJIT_INLINE_NODEBUG ArrayReverseIterator& operator--() noexcept { _ptr++; return *this; }
-  ASMJIT_INLINE_NODEBUG ArrayReverseIterator& operator--(int) noexcept { ArrayReverseIterator prev(*this); _ptr++; return prev; }
+
+  ASMJIT_INLINE_NODEBUG ArrayReverseIterator operator++(int) noexcept { ArrayReverseIterator prev(*this); _ptr--; return prev; }
+  ASMJIT_INLINE_NODEBUG ArrayReverseIterator operator--(int) noexcept { ArrayReverseIterator prev(*this); _ptr++; return prev; }
 
   template<typename Diff> ASMJIT_INLINE_NODEBUG ArrayReverseIterator operator+(const Diff& n) noexcept { return ArrayReverseIterator(_ptr -= n); }
   template<typename Diff> ASMJIT_INLINE_NODEBUG ArrayReverseIterator operator-(const Diff& n) noexcept { return ArrayReverseIterator(_ptr += n); }
