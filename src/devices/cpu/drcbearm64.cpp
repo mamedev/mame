@@ -885,18 +885,68 @@ drcbe_arm64::drcbe_arm64(drcuml_state &drcuml, device_t &device, drc_cache &cach
 	auto const resolve_accessor =
 			[] (resolved_handler &handler, address_space &space, auto accessor)
 			{
-				struct {
-					uintptr_t ptr;
-					ptrdiff_t adj;
-				} equiv;
+				if (MAME_DELEGATE_USE_TYPE == MAME_DELEGATE_TYPE_ITANIUM)
+				{
+					struct { uintptr_t ptr; ptrdiff_t adj; } equiv;
+					assert(sizeof(accessor) == sizeof(equiv));
+					*reinterpret_cast<decltype(accessor) *>(&equiv) = accessor;
+					handler.obj = uintptr_t(reinterpret_cast<uint8_t *>(&space) + (equiv.adj >> 1));
+					if (BIT(equiv.adj, 0))
+					{
+						auto const vptr = *reinterpret_cast<u8 const *const *>(handler.obj) + equiv.ptr;
+						handler.func = *reinterpret_cast<uint8_t *const *>(vptr);
+					}
+					else
+					{
+						handler.func = reinterpret_cast<uint8_t *>(equiv.ptr);
+					}
+				}
+				else if (MAME_DELEGATE_USE_TYPE == MAME_DELEGATE_TYPE_MSVC)
+				{
+					// interpret the pointer to member function ignoring the virtual inheritance variant
+					struct single { uintptr_t ptr; };
+					struct multi { uintptr_t ptr; int adj; };
+					struct { uintptr_t ptr; int adj; int vadj; int vindex; } unknown;
+					assert(sizeof(accessor) <= sizeof(unknown));
+					*reinterpret_cast<decltype(accessor) *>(&unknown) = accessor;
+					uint32_t const *func = reinterpret_cast<uint32_t const *>(unknown.ptr);
+					handler.obj = uintptr_t(&space);
+					if ((sizeof(unknown) == sizeof(accessor)) && unknown.vindex)
+					{
+						handler.obj += unknown.vadj;
+						auto const vptr = *reinterpret_cast<uint8_t const *const *>(handler.obj);
+						handler.obj += *reinterpret_cast<int const *>(vptr + unknown.vindex);
+					}
+					if (sizeof(single) < sizeof(accessor))
+						handler.obj += unknown.adj;
 
-				assert(sizeof(accessor) == sizeof(equiv));
-				*reinterpret_cast<decltype(accessor) *>(&equiv) = accessor;
-
-				handler.obj = uintptr_t(reinterpret_cast<uint8_t *>(&space));
-
-				auto const vptr = *reinterpret_cast<uint8_t const *const *>(handler.obj) + equiv.ptr;
-				handler.func = *reinterpret_cast<uint8_t *const *>(vptr);
+					// walk past thunks
+					while (true)
+					{
+						if ((0x90000010 == (func[0] & 0x9f00001f)) && (0x91000210 == (func[1] & 0xffc003ff)) && (0xd61f0200 == func[2]))
+						{
+							// page-relative jump with +/-4GB reach - adrp xip0,... ; add xip0,xip0,#... ; br xip0
+							int64_t const page =
+									(uint64_t(func[0] & 0x60000000) >> 17) |
+									(uint64_t(func[0] & 0x00ffffe0) << 9) |
+									((func[0] & 0x00800000) ? (~std::uint64_t(0) << 33) : 0);
+							uint32_t const offset = (func[1] & 0x003ffc00) >> 10;
+							func = reinterpret_cast<uint32_t const *>(((uintptr_t(func) + page) & (~uintptr_t(0) << 12)) + offset);
+						}
+						else if ((0xf9400010 == func[0]) && (0xf9400210 == (func[1] & 0xffc003ff)) && (0xd61f0200 == func[2]))
+						{
+							// virtual function call thunk - ldr xip0,[x0] ; ldr xip0,[x0,#...] ; br xip0
+							uint32_t const *const *const vptr = *reinterpret_cast<uint32_t const *const *const *>(handler.obj);
+							func = vptr[(func[1] & 0x003ffc00) >> 10];
+						}
+						else
+						{
+							// not something we can easily bypass
+							break;
+						}
+					}
+					handler.func = reinterpret_cast<uint8_t *>(uintptr_t(func));
+				}
 			};
 
 	m_resolved_accessors.resize(m_space.size());
