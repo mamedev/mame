@@ -430,7 +430,8 @@ dmx_voice_card::dmx_voice_card(const machine_config &mconfig, const char *tag, d
 	, m_dac(*this, "dac_u8")
 	, m_vca(*this, "dmx_vca")
 	, m_filters(*this, "aa_sk_filter_%d", 0)
-	, m_config(dmx_voice_card_config{})
+	// Need non-zero entries for the filter for validation to pass.
+	, m_config(dmx_voice_card_config{.filter={1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}})
 {
 }
 
