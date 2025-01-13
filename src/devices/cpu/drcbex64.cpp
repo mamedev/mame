@@ -945,8 +945,21 @@ void drcbe_x64::generate(drcuml_block &block, const instruction *instlist, uint3
 	m_hash.block_begin(block, instlist, numinst);
 	m_map.block_begin(block);
 
-	// compute the base by aligning the cache top to a cache line (assumed to be 64 bytes)
-	x86code *dst = (x86code *)(uint64_t(m_cache.top() + 63) & ~63);
+	// compute the base by aligning the cache top to a cache line
+	auto [err, linesize] = osd_get_cache_line_size();
+	uintptr_t linemask = 63;
+	if (err)
+	{
+		osd_printf_verbose("Error getting cache line size (%s:%d %s), assuming 64 bytes\n", err.category().name(), err.value(), err.message());
+	}
+	else
+	{
+		assert(linesize);
+		linemask = linesize - 1;
+		for (unsigned shift = 1; linemask & (linemask + 1); ++shift)
+			linemask |= linemask >> shift;
+	}
+	x86code *dst = (x86code *)(uintptr_t(m_cache.top() + linemask) & ~linemask);
 
 	CodeHolder ch;
 	ch.init(Environment::host(), uint64_t(dst));
@@ -1700,12 +1713,14 @@ void drcbe_x64::op_hashjmp(Assembler &a, const instruction &inst)
 		}
 	}
 
+	// fix stack alignment if "no code" landing returned from abuse of call with misaligned stack
+	a.sub(rsp, 8);                                                                      // sub   rsp,8
+
 	// in all cases, if there is no code, we return here to generate the exception
 	if (LOG_HASHJMPS)
 		smart_call_m64(a, &m_near.debug_log_hashjmp_fail);
 
 	mov_mem_param(a, MABS(&m_state.exp, 4), pcp);                                       // mov   [exp],param
-	a.sub(rsp, 8);                                                                      // sub   rsp,8
 	a.call(MABS(exp.handle().codeptr_addr()));                                          // call  [exp]
 }
 

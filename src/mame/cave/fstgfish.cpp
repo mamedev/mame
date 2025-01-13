@@ -59,7 +59,7 @@ to the missing CV1000XP card.
 
 Connecting directly into the CV1000XP CN2 with a standard
 USB cable results in the message:  USB device not recognized. Attempts to
-increase the current on the 5V have not been succesful.
+increase the current on the 5V have not been successful.
 
 Make a dd of the image, and write to an SSD disk,
 the game will boot happily. Rename cvgame.exe to
@@ -121,7 +121,7 @@ INPUT_PORTS_END
 
 void fstgfish_state::fstgfish(machine_config &config)
 {
-	PENTIUM3(config, m_maincpu, 200'000'000); /*  Intel Core 2 Duo, 333/266/200 FSB clocks */
+	PENTIUM3(config, m_maincpu, 200'000'000); //  Intel Core 2 Duo, 333/266/200 FSB clocks
 	m_maincpu->set_addrmap(AS_PROGRAM, &fstgfish_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &fstgfish_state::main_io);
 
@@ -130,16 +130,42 @@ void fstgfish_state::fstgfish(machine_config &config)
 }
 
 ROM_START(fstgfish)
-	ROM_REGION32_LE(0x80000, "bios", 0)
-	ROM_LOAD( "g31ms2l.f7",     0x000000, 0x80000, CRC(4f92f678) SHA1(c29ce14f093b5d6ef308f674fe4d514eb10e4742) )
+	ROM_REGION32_LE( 0x80000, "bios", 0 )
+	ROM_LOAD( "g31ms2l.f7", 0x000000, 0x80000, CRC(4f92f678) SHA1(c29ce14f093b5d6ef308f674fe4d514eb10e4742) )
 
 	DISK_REGION( "cfcard" )
 	// CF with Windows XP embedded
 	DISK_IMAGE( "x11_15305", 0, SHA1(67bce99fb55760d0c06d698e68656eebbda8a28f) )
 
 	// H8S/2218 on CV2000XP board, assume with internal ROM
-	ROM_REGION(0x20000, "cv2000xp", ROMREGION_ERASEFF)
-	ROM_LOAD( "h8s2218.bin",     0x000000, 0x20000, NO_DUMP )
+	ROM_REGION( 0x20000, "cv2000xp", ROMREGION_ERASEFF )
+	ROM_LOAD( "h8s2218.bin", 0x000000, 0x20000, NO_DUMP )
+ROM_END
+
+// for the following 2 games, only CF card dumps are available.
+
+ROM_START( oyks )
+	ROM_REGION32_LE( 0x80000, "bios", 0 )
+	ROM_LOAD( "g31ms2l.f7", 0x00000, 0x080000, BAD_DUMP CRC(4f92f678) SHA1(c29ce14f093b5d6ef308f674fe4d514eb10e4742) )
+
+	DISK_REGION( "cfcard" )
+	DISK_IMAGE( "oyks", 0, SHA1(5aea6e0e64e1a2bb01b6225c215634961376e308) ) // お祭りやさん きんぎょR label, 2009/4/20 label, Window XP embedded label
+
+	// H8S/2218 on CV2000XP board, assume with internal ROM
+	ROM_REGION( 0x20000, "cv2000xp", ROMREGION_ERASEFF )
+	ROM_LOAD( "h8s2218.bin", 0x000000, 0x20000, NO_DUMP )
+ROM_END
+
+ROM_START( oygt )
+	ROM_REGION32_LE( 0x80000, "bios", 0 )
+	ROM_LOAD( "g31ms2l.f7", 0x00000, 0x080000, BAD_DUMP CRC(4f92f678) SHA1(c29ce14f093b5d6ef308f674fe4d514eb10e4742) )
+
+	DISK_REGION( "cfcard" )
+	DISK_IMAGE( "oygt", 0, SHA1(86581acca549544ec5d1945e46ca95bb76f05b40) ) // 新たこやきD label, Window XP embedded label
+
+	// H8S/2218 on CV2000XP board, assume with internal ROM
+	ROM_REGION( 0x20000, "cv2000xp", ROMREGION_ERASEFF )
+	ROM_LOAD( "h8s2218.bin", 0x000000, 0x20000, NO_DUMP )
 ROM_END
 
 } // anonymous namespace
@@ -147,4 +173,6 @@ ROM_END
 
 /*****************************************************************************/
 
-GAME(2008, fstgfish, 0, fstgfish, fstgfish, fstgfish_state, empty_init, ROT0, "Cave", "Festival: Goldfish Scoop", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2009, fstgfish, 0,        fstgfish, fstgfish, fstgfish_state, empty_init, ROT0, "Cave", "Festival: Goldfish Scoop",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // probably Japanese, too
+GAME( 2009, oyks,     fstgfish, fstgfish, fstgfish, fstgfish_state, empty_init, ROT0, "Cave", "Omatsuri Yasan: Kingyo Sukui",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2009, oygt,     0,        fstgfish, fstgfish, fstgfish_state, empty_init, ROT0, "Cave", "Omatsuri Yasan: Ganso Takoyaki", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

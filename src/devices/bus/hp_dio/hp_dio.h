@@ -289,6 +289,7 @@ DECLARE_DEVICE_TYPE_NS(DIO32_SLOT, bus::hp_dio, dio32_slot_device)
 DECLARE_DEVICE_TYPE_NS(DIO16, bus::hp_dio, dio16_device)
 
 void dio16_cards(device_slot_interface &device);
+void dio16_hp98x6_cards(device_slot_interface &device);
 void dio32_cards(device_slot_interface &device);
 
 #endif // MAME_BUS_HP_DIO_HP_DIO_H

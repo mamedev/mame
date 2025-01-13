@@ -25,6 +25,9 @@
 
 #include "ip4.h"
 
+// graphics cards
+#include "gm1.h"
+
 //#define VERBOSE (0)
 #include "logmacro.h"
 
@@ -69,6 +72,33 @@ static void vme_cards(device_slot_interface &device)
 	device.option_add("enp10", VME_ENP10);
 }
 
+static void slot8_cards(device_slot_interface &device)
+{
+	vme_cards(device);
+
+	//device.option_add("ge4", SGI_GE4); // GT
+}
+static void slot9_cards(device_slot_interface &device)
+{
+	//device.option_add("de3", SGI_DE3); // B,G
+	device.option_add("gm1", SGI_GM1); // GT
+}
+static void slot10_cards(device_slot_interface &device)
+{
+	//device.option_add("gf3", SGI_GF3); // B,G
+	//device.option_add("rm1", SGI_RM1); // GT
+}
+static void slot11_cards(device_slot_interface &device)
+{
+	//device.option_add("tb2", SGI_TB2); // B,G
+	//device.option_add("rv1", SGI_RV1); // GT
+}
+static void slot12_cards(device_slot_interface &device)
+{
+	//device.option_add("zb2", SGI_ZB2); // G
+	//device.option_add("rm1", SGI_RM1); // GT
+}
+
 void ip4_state::tt12(machine_config &config, XTAL clock)
 {
 	VME(config, m_vme);
@@ -81,12 +111,12 @@ void ip4_state::tt12(machine_config &config, XTAL clock)
 	VME_SLOT(config,  m_slot[4], vme_cards, nullptr, false);
 	VME_SLOT(config,  m_slot[5], vme_cards, nullptr, false);
 	VME_SLOT(config,  m_slot[6], vme_cards, nullptr, false);
-	VME_SLOT(config,  m_slot[7], vme_cards, nullptr, false);
+	VME_SLOT(config,  m_slot[7], slot8_cards, nullptr, false);
 
-	VME_SLOT(config,  m_slot[8], vme_cards, nullptr, false);
-	VME_SLOT(config,  m_slot[9], vme_cards, nullptr, false);
-	VME_SLOT(config, m_slot[10], vme_cards, nullptr, false);
-	VME_SLOT(config, m_slot[11], vme_cards, nullptr, false);
+	VME_SLOT(config,  m_slot[8], slot9_cards, nullptr, false);
+	VME_SLOT(config,  m_slot[9], slot10_cards, nullptr, false);
+	VME_SLOT(config, m_slot[10], slot11_cards, nullptr, false);
+	VME_SLOT(config, m_slot[11], slot12_cards, nullptr, false);
 }
 
 void ip4_state::machine_start()

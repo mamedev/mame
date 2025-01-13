@@ -136,16 +136,6 @@ const char *const amiga_state::s_custom_reg_names[0x100] =
 	"UNK1F8",       "UNK1FA",       "FMODE",        "UNK1FE"
 };
 
-constexpr XTAL amiga_state::CLK_28M_PAL;
-constexpr XTAL amiga_state::CLK_7M_PAL;
-constexpr XTAL amiga_state::CLK_C1_PAL;
-constexpr XTAL amiga_state::CLK_E_PAL;
-
-constexpr XTAL amiga_state::CLK_28M_NTSC;
-constexpr XTAL amiga_state::CLK_7M_NTSC;
-constexpr XTAL amiga_state::CLK_C1_NTSC;
-constexpr XTAL amiga_state::CLK_E_NTSC;
-
 /*************************************
  *
  *  Machine reset
@@ -1375,8 +1365,10 @@ uint16_t amiga_state::custom_chip_r(offs_t offset)
 
 		case REG_CLXDAT:
 			temp = CUSTOM_REG(REG_CLXDAT);
-			CUSTOM_REG(REG_CLXDAT) = 0;
-			return temp;
+			if (!machine().side_effects_disabled())
+				CUSTOM_REG(REG_CLXDAT) = 0;
+			// - "Barney [& Freddy] Mouse" requires bit 15 high all the time
+			return temp | (1 << 15);
 
 		case REG_DENISEID:
 			return CUSTOM_REG(REG_DENISEID);

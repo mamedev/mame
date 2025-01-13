@@ -35,11 +35,11 @@ public:
 		, m_cassette(*this, "cassette")
 		, m_ram(*this, RAM_TAG)
 		, m_special(*this, "SPECIAL")
-		, m_led(*this, "led0")
 	{ }
 
 	void elf2(machine_config &config);
 
+	DECLARE_INPUT_CHANGED_MEMBER(load_w);
 	DECLARE_INPUT_CHANGED_MEMBER(input_w);
 
 protected:
@@ -50,10 +50,6 @@ private:
 	uint8_t data_r();
 	void data_w(uint8_t data);
 	void memory_w(offs_t offset, uint8_t data);
-	int wait_r();
-	int clear_r();
-	int ef4_r();
-	void q_w(int state);
 	uint8_t dma_r();
 	void sc_w(uint8_t data);
 	void da_w(int state);
@@ -70,10 +66,10 @@ private:
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
 	required_ioport m_special;
-	output_finder<> m_led;
 
-	// display state
+	// internal state
 	uint8_t m_data = 0;
+	uint8_t m_sc = 0;
 };
 
 #endif // MAME_NETRONICS_ELF_H

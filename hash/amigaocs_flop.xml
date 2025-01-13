@@ -6395,6 +6395,7 @@ ATK test: C:1 Bad
 		<year>1992</year>
 		<publisher>Psygnosis</publisher>
 		<notes><![CDATA[
+Title screen is unresponsive, keeps prompting for "Press Left Mouse Button", [FDC] with adkcon=$3100 (heavy activity)
 ATK test: failed
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -16431,6 +16432,8 @@ ATK test: C:0 H:U 1 Sector Bad
 		<year>1990</year>
 		<publisher>Rainbow Arts</publisher>
 		<notes><![CDATA[
+Requires audiotape playback to go along with intro (otherwise silent)
+TODO: is this a Multi 5 release, where every region got its own language audio?
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">

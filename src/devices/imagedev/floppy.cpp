@@ -632,6 +632,8 @@ void floppy_image_device::init_floppy_load(bool write_supported)
 	if (m_motor_always_on) {
 		// When disk is inserted, start motor
 		mon_w(0);
+		m_ready_counter = 2;
+
 	} else if(!m_mon)
 		m_ready_counter = 2;
 

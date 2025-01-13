@@ -12,10 +12,10 @@
     * Sixteen-bit programmable counter/latch
 
     The onboad clock generator has mask options for an external crystal
-    (2MHz to 6MHz) an external TTL-compatible clock with a 300Ω pull-up
+    (2MHz to 6MHz), an external TTL-compatible clock with a 300Ω pull-up
     resistor (2MHz to 6MHz), or an RC oscillator with an external 47kΩ
     resistor and internal capacitor (nominally 2MHz).  The clock is
-    divided by two to generate the two-phase CPU code clock.
+    divided by two to generate the two-phase CPU core clock.
 
     There is no on-board power-on reset generator.  The /RES pin must be
     held low (asserted) for at least eight phase 2 clock cycles after
@@ -45,7 +45,7 @@
     on the CNTR pin in event counter mode is half the phase 2 clock
     rate.  This suggests that an internal flag is set when a rasing edge
     is detected on CNTR and reset when the counter is synchronously
-    decremented.  This is not emulated - for simplicity the counter is
+    decremented.  This is not emulated - for simplicity, the counter is
     asynchronously decremented on detecting a rising edge on CNTR.
 
     The CNTR pin has an active low driver and internal passive pull-up.
@@ -59,14 +59,14 @@
     is unknown what other differences these devices have.
 
     TODO:
-    - For some reason most if not all Amiga MCU programs accesses arbitrary
-      zero page 0x90-0xff with a back-to-back cmp($00, x) opcode at
-      PC=c06-c08 with the actual result discarded. X can be any value in
-      the 0x90-0xff range, depending on the last user keypress row source
-      e.g. 0xdf-0xe0 for 'A', 0xef-0xf0 for 'Q', 0xfb-0xfc for function
-      keys.
-      This can be extremely verbose in the logging facility so we currently
-      nop it out for the time being.
+    - For some reason most if not all Amiga MCU programs access
+      arbitrary zero page 0x90-0xff with a back-to-back cmp($00, x)
+      opcode at PC=c06-c08 with the actual result discarded.  X can be
+      any value in the 0x90-0xff range, depending on the last user
+      keypress row source e.g. 0xdf-0xe0 for 'A', 0xef-0xf0 for 'Q',
+      0xfb-0xfc for function keys.
+      This can be extremely verbose in the logging facility so we nop it
+      out for the time being.
 
 ***************************************************************************/
 

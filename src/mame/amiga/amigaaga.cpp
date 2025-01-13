@@ -621,9 +621,9 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 			ecolmask = (CUSTOM_REG(REG_CLXCON) >> 6) & 0x2a;
 		}
 
-		if ((raw_scanline & 1) == 0)
+		//if ((raw_scanline & 1) == 0)
 		{
-   			const int min_x = 0x18 << 1;
+			const int min_x = 0x18 << 1;
 			const int max_x = 0x34 << 1;
 
 			// TODO: refine, merge with OCS version

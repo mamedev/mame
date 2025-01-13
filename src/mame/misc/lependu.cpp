@@ -587,6 +587,7 @@ ROM_START( lependu )
 
 	ROM_REGION( 0x08000, "data1", 0 ) // banked data
 	ROM_LOAD( "fra_04.12a",  0x0000, 0x8000, CRC(60b9a387) SHA1(b455f7e955869308dcc5709db34a478f08dc69bb) )
+
 	ROM_REGION( 0x08000, "data2", 0 ) // banked data
 	ROM_LOAD( "fra_05.14a",  0x0000, 0x8000, CRC(5834b8e3) SHA1(f4377b54761ae934ff2c09c2808424e2b4a44898) )
 
@@ -603,6 +604,48 @@ ROM_START( lependu )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "mini.5d",   0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
+
+/*
+  Code Magik
+  Voyageur de L'Espace Inc.
+
+  Obscure vintage game.
+  Using IRQ instead of NMI.
+
+  VideoRAM: 0x800-0xbff
+  ColorRAM: 0xc00-0xfff
+
+  CRTC addr: 0x10b0-0x10b0
+  CRTC data: 0x10b1-0x10b1
+
+  PIA0 offs: 0x10f4-0x10f7      
+  PIA1 offs: 0x10f8-0x10fb      
+
+*/
+ROM_START( codemagik )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2764.11a", 0xc000, 0x2000, CRC(61a6ffef) SHA1(d7f0f1b415b14d9919f9ac3b8a1d74f3e14ccc2d) )
+	ROM_LOAD( "2764.10a", 0xe000, 0x2000, CRC(4aac24d5) SHA1(06c89052d0f6f9d435ff88be62706595fe716791) )
+
+	ROM_REGION( 0x08000, "data1", 0 ) // banked data
+	ROM_FILL(             0x0000, 0x8000, 0x0000 ) // filling the bank
+
+	ROM_REGION( 0x08000, "data2", 0 ) // banked data
+	ROM_FILL(             0x0000, 0x8000, 0x0000 ) // filling the bank
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_FILL(                0x0000, 0x4000, 0x0000 ) // filling the R-G bitplanes
+	ROM_LOAD( "1y_2764.4a",  0x4000, 0x2000, CRC(41b83c2d) SHA1(b46a43636c577c4a3620c69ef874f11aa9d48473) )    // chars / multicolor tiles, bitplane 3
+
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_LOAD( "3y_2732.1a", 0x0000, 0x1000, CRC(ea868221) SHA1(fcf9a840537feb28c9fb65b58b9a41b2412aa4ef) )    // cards deck and alt gfx, bitplane1
+	ROM_LOAD( "2y_2732.3a", 0x1000, 0x1000, CRC(6d1da4bb) SHA1(dc8c70faa301e2f7e9089d38e0ef618e8352e569) )    // cards deck gfx, bitplane2
+	ROM_COPY( "gfx1",       0x4800, 0x2000, 0x0800 )    // cards deck gfx, bitplane3.
+	ROM_COPY( "gfx1",       0x5800, 0x2800, 0x0800 )    // cards deck alt gfx, bitplane3.
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "dex.5d",   0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
 ROM_END
 
 
@@ -636,5 +679,6 @@ void lependu_state::init_lependu()
 *                Game Drivers                *
 *********************************************/
 
-//     YEAR  NAME       PARENT    MACHINE   INPUT    STATE           INIT           ROT     COMPANY                   FULLNAME                           FLAGS            LAYOUT
-GAMEL( 198?, lependu,   0,        lependu,  lependu, lependu_state,  init_lependu,  ROT0,  "Avenir Amusement Inc.",  "Le Pendu (Bilingue, Version 04)",  0,               layout_lependu )
+//     YEAR  NAME       PARENT    MACHINE   INPUT    STATE           INIT           ROT     COMPANY                      FULLNAME                           FLAGS                LAYOUT
+GAMEL( 198?, lependu,   0,        lependu,  lependu, lependu_state,  init_lependu,  ROT0,  "Avenir Amusement Inc.",     "Le Pendu (Bilingue, Version 04)",  0,                   layout_lependu )
+GAMEL( 198?, codemagik, 0,        lependu,  lependu, lependu_state,  empty_init,    ROT0,  "Voyageur de L'Espace Inc.", "Code Magik",                       MACHINE_NOT_WORKING, layout_lependu )

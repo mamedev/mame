@@ -895,8 +895,10 @@ Error queryRWInfo(Arch arch, const BaseInst& inst, const Operand_* operands, siz
         case Inst::kIdVpternlogq: {
           if (opCount == 4 && operands[3].isImm()) {
             uint32_t predicate = operands[3].as<Imm>().valueAs<uint8_t>();
+
             if ((predicate >> 4) == (predicate & 0xF)) {
               out->_operands[0].clearOpFlags(OpRWFlags::kRead);
+              out->_operands[0].setReadByteMask(0);
             }
           }
           break;

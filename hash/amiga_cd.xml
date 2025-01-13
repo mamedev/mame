@@ -7,10 +7,60 @@ http://redump.org/discs/system/acd
 -->
 <softwarelist name="amiga_cd" description="Commodore AmigaCD images">
 
+<!-- !Operating Systems -->
+
+	<software name="redhat51" supported="no">
+		<!-- "for Amiga 68k" -->
+		<description>Red Hat Linux 5.1</description>
+		<year>1998</year>
+		<publisher>Red Hat</publisher>
+		<notes><![CDATA[
+Requires a machine with 68020 (not EC) + FPU + MMU (A3000 or A4000)
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="redhat_5_1_m68k" sha1="d61a967ca60fe1f85dd485ad6b535fa07b5cee8b"/>
+			</diskarea>
+		</part>
+	</software>
+
 <!-- !Games -->
 
-    <software name="kangfu" supported="no">
-        <!-- "CD-32, A1200, A4000" on cover art -->
+	<software name="bigred" supported="no">
+		<description>The Big Red Adventure (Europe)</description>
+		<year>1997</year>
+		<publisher>Power Computing</publisher>
+		<notes><![CDATA[
+Requires an AGA machine with enough installed Fast RAM on it
+[Denise] pitch corruption during intro
+[Paula] volume gets incredibly loud during intro (verify)
+Not extensively tested
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="big_red_adventure_(1997)(ludomedia-power_computing)[m4]" sha1="4883a7e4418321c649e4df9a66958b51697656fb"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="finlodys" supported="no">
+		<!-- http://redump.org/disc/18527/ -->
+		<!-- "Peter Spinaze's Final Odyssey" on introduction screen -->
+		<description>Final Odyssey: Theseus Verses the Minotaur (Europe)</description>
+		<year>1997</year>
+		<publisher>Vulcan Software</publisher>
+		<notes><![CDATA[
+Requires an ECS or AGA machine with enough installed Fast RAM on it
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="final_odyssey_-_theseus_verses_the_minotaur_(europe)_(en,de,es,it,no,da,fi)" sha1="db1763b926a90175470871361e02047d0cc457f8"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="kangfu" supported="no">
+		<!-- "CD-32, A1200, A4000" on cover art -->
 		<description>Kang Fu</description>
 		<year>1996</year>
 		<publisher>GREat Effects Development (GREED)</publisher>
@@ -38,6 +88,21 @@ Not extensively tested, some games known to use ECS or AGA features. (cfr. Bruta
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="aminet_games" sha1="2c95d94df50fbe9c4f11a90ca926cf880693e49b" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="emuplus" supported="no">
+		<!-- http://redump.org/disc/43683/ -->
+		<description>Emulators Unlimited Plus (Germany)</description>
+		<!-- Unknown release date, file datestamps all have unlikely '92 or '78 -->
+		<!-- Has a tool for Psion Series 3/a (page 6 of Information complete list) so mid-to-late 90s possible -->
+		<year>1995?</year>
+		<!-- Epic Marketing? -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="emulators_unlimited_plus_(germany)_(en,de)" sha1="51ac9436545afdc39def039eeffea69d3f0e110c"/>
 			</diskarea>
 		</part>
 	</software>

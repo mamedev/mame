@@ -24,6 +24,7 @@
  * - internal memory maps
  * - addition of new processor types
  * - full emulation of 8xCx2 processors
+ *
  *****************************************************************************/
 
 #ifndef MAME_CPU_MCS51_MCS51_H
@@ -42,14 +43,14 @@ enum
 
 enum
 {
-	MCS51_INT0_LINE = 0,    /* P3.2: External Interrupt 0 */
-	MCS51_INT1_LINE,        /* P3.3: External Interrupt 1 */
-	MCS51_T0_LINE,          /* P3.4: Timer 0 External Input */
-	MCS51_T1_LINE,          /* P3.5: Timer 1 External Input */
-	MCS51_T2_LINE,          /* P1.0: Timer 2 External Input */
-	MCS51_T2EX_LINE,        /* P1.1: Timer 2 Capture Reload Trigger */
+	MCS51_INT0_LINE = 0,    // P3.2: External Interrupt 0
+	MCS51_INT1_LINE,        // P3.3: External Interrupt 1
+	MCS51_T0_LINE,          // P3.4: Timer 0 External Input
+	MCS51_T1_LINE,          // P3.5: Timer 1 External Input
+	MCS51_T2_LINE,          // P1.0: Timer 2 External Input
+	MCS51_T2EX_LINE,        // P1.1: Timer 2 Capture Reload Trigger
 
-	DS5002FP_PFI_LINE       /* DS5002FP Power fail interrupt */
+	DS5002FP_PFI_LINE       // DS5002FP Power fail interrupt
 };
 
 
@@ -97,58 +98,59 @@ protected:
 	address_space_config m_data_config;
 	address_space_config m_io_config;
 
-	//Internal stuff
-	uint16_t  m_ppc;            //previous pc
-	uint16_t  m_pc;             //current pc
-	uint16_t  m_features;       //features of this cpu
-	uint8_t   m_rwm;            //Signals that the current instruction is a read/write/modify instruction
+	// Internal stuff
+	uint16_t m_ppc;              // previous pc
+	uint16_t m_pc;               // current pc
+	uint16_t m_features;         // features of this cpu
+	uint8_t  m_rwm;              // Signals that the current instruction is a read/write/modify instruction
 
-	int     m_inst_cycles;        /* cycles for the current instruction */
-	const uint32_t m_rom_size;    /* size (in bytes) of internal program ROM/EPROM */
-	int     m_ram_mask;           /* second ram bank for indirect access available ? */
-	int     m_num_interrupts;     /* number of interrupts supported */
-	int     m_recalc_parity;      /* recalculate parity before next instruction */
-	uint32_t  m_last_line_state;    /* last state of input lines line */
-	int     m_t0_cnt;             /* number of 0->1 transitions on T0 line */
-	int     m_t1_cnt;             /* number of 0->1 transitions on T1 line */
-	int     m_t2_cnt;             /* number of 0->1 transitions on T2 line */
-	int     m_t2ex_cnt;           /* number of 0->1 transitions on T2EX line */
-	int     m_cur_irq_prio;       /* Holds value of the current IRQ Priority Level; -1 if no irq */
-	uint8_t   m_irq_active;         /* mask which irq levels are serviced */
-	uint8_t   m_irq_prio[8];        /* interrupt priority */
+	int      m_inst_cycles;      // cycles for the current instruction
+	const uint32_t m_rom_size;   // size (in bytes) of internal program ROM/EPROM
+	int      m_ram_mask;         // second ram bank for indirect access available ?
+	int      m_num_interrupts;   // number of interrupts supported
+	int      m_recalc_parity;    // recalculate parity before next instruction
+	uint32_t m_last_line_state;  // last state of input lines line
+	int      m_t0_cnt;           // number of 0->1 transitions on T0 line
+	int      m_t1_cnt;           // number of 0->1 transitions on T1 line
+	int      m_t2_cnt;           // number of 0->1 transitions on T2 line
+	int      m_t2ex_cnt;         // number of 0->1 transitions on T2EX line
+	int      m_cur_irq_prio;     // Holds value of the current IRQ Priority Level; -1 if no irq
+	uint8_t  m_irq_active;       // mask which irq levels are serviced
+	uint8_t  m_irq_prio[8];      // interrupt priority
 
-	uint8_t   m_forced_inputs[4];   /* allow read even if configured as output */
+	uint8_t  m_forced_inputs[4]; // allow read even if configured as output
 
 	// JB-related hacks
-	uint8_t m_last_op;
-	uint8_t m_last_bit;
+	uint8_t  m_last_op;
+	uint8_t  m_last_bit;
 
-	int     m_icount;
+	int      m_icount;
 
 	struct mcs51_uart
 	{
-		uint8_t   data_out;       //Data to send out
-		uint8_t   data_in;
-		uint8_t   txbit;
-		uint8_t   rxbit;
-		uint8_t   rxb8;
+		uint8_t  data_out;       // data to send out
+		uint8_t  data_in;
+		uint8_t  txbit;
+		uint8_t  txd;
+		uint8_t  rxbit;
+		uint8_t  rxb8;
 
-		int     smod_div;       /* signal divided by 2^SMOD */
-		int     rx_clk;         /* rx clock */
-		int     tx_clk;         /* tx clock */
-	} m_uart;            /* internal uart */
+		int      smod_div;       // signal divided by 2^SMOD
+		int      rx_clk;         // rx clock
+		int      tx_clk;         // tx clock
+	} m_uart;                    // internal uart
 
-	/* Internal Ram */
-	required_shared_ptr<uint8_t> m_sfr_ram;           /* 128 SFR - these are in 0x80 - 0xFF */
-	required_shared_ptr<uint8_t> m_scratchpad;        /* 128 RAM (8031/51) + 128 RAM in second bank (8032/52) */
+	// Internal Ram
+	required_shared_ptr<uint8_t> m_sfr_ram;    // 128 SFR - these are in 0x80 - 0xFF
+	required_shared_ptr<uint8_t> m_scratchpad; // 128 RAM (8031/51) + 128 RAM in second bank (8032/52)
 
-	/* SFR Callbacks */
+	// SFR Callbacks
 	virtual void sfr_write(size_t offset, uint8_t data);
 	virtual uint8_t sfr_read(size_t offset);
 
 	void transmit(int state);
 
-	/* Memory spaces */
+	// Memory spaces
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::cache m_program;
 	memory_access< 9, 0, 0, ENDIANNESS_LITTLE>::specific m_data;
 	memory_access<17, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
@@ -156,16 +158,17 @@ protected:
 	devcb_read8::array<4> m_port_in_cb;
 	devcb_write8::array<4> m_port_out_cb;
 
-	/* DS5002FP */
+	// DS5002FP
 	struct {
-		uint8_t   previous_ta;        /* Previous Timed Access value */
-		uint8_t   ta_window;          /* Limed Access window */
-		uint8_t   range;              /* Memory Range */
-		/* Bootstrap Configuration */
-		uint8_t   mcon;                   /* bootstrap loader MCON register */
-		uint8_t   rpctl;                  /* bootstrap loader RPCTL register */
-		uint8_t   crc;                    /* bootstrap loader CRC register */
-		int32_t   rnr_delay;              /* delay before new random number available */
+		uint8_t  previous_ta;   // Previous Timed Access value
+		uint8_t  ta_window;     // Limed Access window
+		uint8_t  range;         // Memory Range
+
+		// Bootstrap Configuration
+		uint8_t  mcon;          // bootstrap loader MCON register
+		uint8_t  rpctl;         // bootstrap loader RPCTL register
+		uint8_t  crc;           // bootstrap loader CRC register
+		int32_t  rnr_delay;     // delay before new random number available
 	} m_ds5002fp;
 
 	// for the debugger
@@ -314,19 +317,24 @@ protected:
 };
 
 
-/* variants with no internal rom and 128 byte internal memory */
+// variants with no internal rom and 128 byte internal memory
 DECLARE_DEVICE_TYPE(I8031, i8031_device)
-/* variants with no internal rom and 256 byte internal memory */
+
+// variants with no internal rom and 256 byte internal memory
 DECLARE_DEVICE_TYPE(I8032, i8032_device)
-/* variants 4k internal rom and 128 byte internal memory */
+
+// variants 4k internal rom and 128 byte internal memory
 DECLARE_DEVICE_TYPE(I8051, i8051_device)
 DECLARE_DEVICE_TYPE(I8751, i8751_device)
-/* variants 8k internal rom and 128 byte internal memory (no 8052 features) */
+
+// variants 8k internal rom and 128 byte internal memory (no 8052 features)
 DECLARE_DEVICE_TYPE(AM8753, am8753_device)
-/* variants 8k internal rom and 256 byte internal memory and more registers */
+
+// variants 8k internal rom and 256 byte internal memory and more registers
 DECLARE_DEVICE_TYPE(I8052, i8052_device)
 DECLARE_DEVICE_TYPE(I8752, i8752_device)
-/* cmos variants */
+
+// cmos variants
 DECLARE_DEVICE_TYPE(I80C31, i80c31_device)
 DECLARE_DEVICE_TYPE(I80C51, i80c51_device)
 DECLARE_DEVICE_TYPE(I87C51, i87c51_device)
@@ -342,7 +350,8 @@ DECLARE_DEVICE_TYPE(SAB80C535, sab80c535_device)
 DECLARE_DEVICE_TYPE(P80C552, p80c552_device)
 DECLARE_DEVICE_TYPE(P87C552, p87c552_device)
 DECLARE_DEVICE_TYPE(P80C562, p80c562_device)
-/* 4k internal perom and 128 internal ram and 2 analog comparators */
+
+// 4k internal perom and 128 internal ram and 2 analog comparators
 DECLARE_DEVICE_TYPE(AT89C4051, at89c4051_device)
 
 DECLARE_DEVICE_TYPE(I8344, i8344_device)
@@ -391,7 +400,7 @@ protected:
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	/* SFR Callbacks */
+	// SFR Callbacks
 	virtual void sfr_write(size_t offset, uint8_t data) override;
 	virtual uint8_t sfr_read(size_t offset) override;
 };
@@ -452,7 +461,7 @@ protected:
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	/* SFR Callbacks */
+	// SFR Callbacks
 	virtual void sfr_write(size_t offset, uint8_t data) override;
 	virtual uint8_t sfr_read(size_t offset) override;
 };
@@ -602,7 +611,7 @@ protected:
  * Internal ram 128k and security features
  */
 
-/* these allow the default state of RAM to be set from a region */
+// these allow the default state of RAM to be set from a region
 #define DS5002FP_SET_MON( _mcon) \
 	ROM_FILL( 0xc6, 1, _mcon)
 
@@ -631,7 +640,7 @@ public:
 protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	/* SFR Callbacks */
+	// SFR Callbacks
 	virtual void sfr_write(size_t offset, uint8_t data) override;
 	virtual uint8_t sfr_read(size_t offset) override;
 

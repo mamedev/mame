@@ -605,7 +605,8 @@ void amiga_state::render_scanline(bitmap_rgb32 &bitmap, int scanline)
 		/* update sprite data fetching */
 		// ensure this happens once every two scanlines for the RAM manipulation, kickoff cares
 		// this is also unaffected by LACE
-		if ((raw_scanline & 1) == 0)
+		// Update: comparison is unnecessary, as per tomato and amiga_cd:bigred cursor pointers (both enabling hires)
+		//if ((raw_scanline & 1) == 0)
 		{
 			const int min_x = 0x18 << 1;
 			const int max_x = 0x34 << 1;
