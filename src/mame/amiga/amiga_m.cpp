@@ -1365,8 +1365,10 @@ uint16_t amiga_state::custom_chip_r(offs_t offset)
 
 		case REG_CLXDAT:
 			temp = CUSTOM_REG(REG_CLXDAT);
-			CUSTOM_REG(REG_CLXDAT) = 0;
-			return temp;
+			if (!machine().side_effects_disabled())
+				CUSTOM_REG(REG_CLXDAT) = 0;
+			// - "Barney [& Freddy] Mouse" requires bit 15 high all the time
+			return temp | (1 << 15);
 
 		case REG_DENISEID:
 			return CUSTOM_REG(REG_DENISEID);

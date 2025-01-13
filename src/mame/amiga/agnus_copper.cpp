@@ -312,13 +312,14 @@ int agnus_copper_device::execute_next(int xpos, int ypos, bool is_blitter_busy, 
 		if (word0 >= m_cdang_setting)
 		{
 			// SKIP applies to valid MOVEs only
-			// - apocalyps (gameplay)
+			// - apocalyps (gameplay, chain of SKIPs & WAIT)
+			// - rbisland (loading screen at least, tries to SKIP a CDANG MOVE)
 			if (m_state_skipping)
 			{
 				LOGINST("  (Ignored)\n");
 				m_state_skipping = false;
 				// TODO: verify timings
-                // may depend on num of planes enabled (move_offset) or opcode fetch above is enough.
+				// may depend on num of planes enabled (move_offset) or opcode fetch above is enough.
 				xpos += COPPER_CYCLES_TO_PIXELS(2);
 				return xpos;
 			}
