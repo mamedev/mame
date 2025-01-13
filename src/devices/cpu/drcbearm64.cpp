@@ -2606,9 +2606,9 @@ void drcbe_arm64::op_roland(a64::Assembler &a, const uml::instruction &inst)
 
 			mov_reg_param(a, inst.size(), shift, shiftp);
 
+			a.and_(shift, shift, inst.size() * 8 - 1);
 			a.mov(scratch2, instbits);
 			a.sub(shift, scratch2, shift);
-			a.and_(shift, shift, inst.size() * 8 - 1);
 			a.ror(output, output, shift);
 		}
 
@@ -2642,107 +2642,203 @@ void drcbe_arm64::op_rolins(a64::Assembler &a, const uml::instruction &inst)
 	be_parameter srcp(*this, inst.param(1), PTYPE_MRI);
 	be_parameter shiftp(*this, inst.param(2), PTYPE_MRI);
 	be_parameter maskp(*this, inst.param(3), PTYPE_MRI);
+	const uint64_t instbits = inst.size() * 8;
+
+	a64::Gp dst;
 
 	if (maskp.is_immediate() && maskp.is_immediate_value(0))
 	{
+		// A zero mask means no bits will be inserted so it can be optimized out
 		if (inst.flags())
 		{
-			const a64::Gp dst = dstp.select_register(TEMP_REG2, inst.size());
+			dst = dstp.select_register(TEMP_REG2, inst.size());
 			mov_reg_param(a, inst.size(), dst, dstp);
 			a.tst(dst, dst);
 		}
-	}
-	else if (srcp.is_immediate() && shiftp.is_immediate() && maskp.is_immediate())
-	{
-		const a64::Gp scratch = select_register(TEMP_REG3, inst.size());
-		const a64::Gp dst = dstp.select_register(TEMP_REG2, inst.size());
-		mov_reg_param(a, inst.size(), dst, dstp);
 
-		// val1 = src & ~PARAM3
-		if (maskp.is_immediate() && is_valid_immediate_mask(maskp.immediate(), inst.size()))
-		{
-			a.and_(dst, dst, ~maskp.immediate());
-		}
-		else
-		{
-			a.mov(scratch, ~maskp.immediate());
-			a.and_(dst, dst, scratch);
-		}
+		return;
+	}
+
+	bool can_use_dst_reg = dstp.is_int_register();
+	if (can_use_dst_reg && srcp.is_int_register())
+		can_use_dst_reg = srcp.ireg() != dstp.ireg();
+	if (can_use_dst_reg && maskp.is_int_register())
+		can_use_dst_reg = maskp.ireg() != dstp.ireg();
+	if (can_use_dst_reg && shiftp.is_int_register())
+		can_use_dst_reg = shiftp.ireg() != dstp.ireg();
+
+	bool optimized = false;
+	if (srcp.is_immediate() && maskp.is_immediate() && shiftp.is_immediate() && maskp.is_immediate_value(util::make_bitmask<uint64_t>(instbits)))
+	{
+		dst = dstp.select_register(TEMP_REG2, inst.size());
 
 		uint64_t result = 0;
 		if (inst.size() == 4)
-			result = rotl_32(srcp.immediate(), shiftp.immediate()) & maskp.immediate();
+			result = rotl_32(srcp.immediate(), shiftp.immediate());
 		else
-			result = rotl_64(srcp.immediate(), shiftp.immediate()) & maskp.immediate();
+			result = rotl_64(srcp.immediate(), shiftp.immediate());
 
-		if (result != 0)
+		a.mov(dst, result);
+
+		optimized = true;
+	}
+	else if (maskp.is_immediate() && shiftp.is_immediate() && maskp.is_immediate_value(util::make_bitmask<uint64_t>(instbits)))
+	{
+		// a mask of all 1s means that the result of the rol will completely overwrite
+		// the output value, so just load the source value into the output register and rol on that
+		dst = dstp.select_register(TEMP_REG2, inst.size());
+		mov_reg_param(a, inst.size(), dst, srcp);
+
+		const auto shift = -int64_t(shiftp.immediate()) & (instbits - 1);
+
+		if (shift != 0)
+			a.ror(dst, dst, shift);
+
+		optimized = true;
+	}
+	else if (maskp.is_immediate() && shiftp.is_immediate())
+	{
+		const auto pop = population_count_64(maskp.immediate());
+		const auto lz = count_leading_zeros_64(maskp.immediate()) & (instbits - 1);
+		const auto invlamask = ~(maskp.immediate() << lz) & util::make_bitmask<uint64_t>(instbits);
+		const bool is_right_aligned = (maskp.immediate() & (maskp.immediate() + 1)) == 0;
+		const bool is_contiguous = (invlamask & (invlamask + 1)) == 0;
+		const auto s = shiftp.immediate() & (instbits - 1);
+
+		const a64::Gp src = select_register(SCRATCH_REG2, inst.size());
+
+		if (is_right_aligned || is_contiguous)
 		{
-			if (is_valid_immediate(result, 12))
+			uint32_t rot = 0;
+			uint32_t lsb = 0;
+
+			dst = can_use_dst_reg ? dstp.select_register(SCRATCH_REG1, inst.size()) : select_register(SCRATCH_REG1, inst.size());
+			mov_reg_param(a, inst.size(), dst, dstp);
+
+			if (is_right_aligned)
 			{
-				a.orr(dst, dst, result);
+				// Optimize a contiguous right-aligned mask
+				rot = instbits - s;
+			}
+			else if (is_contiguous)
+			{
+				// Optimize a contiguous mask
+				rot = (instbits * 2) - s - pop - lz;
+				lsb = instbits - pop - lz;
+			}
+
+			rot &= instbits - 1;
+
+			if (srcp.is_immediate() && rot > 0)
+			{
+				// save some instructions by avoid mov to register by computing the ror and storing it into src directly
+				uint64_t result = 0;
+
+				if (inst.size() == 4)
+					result = rotr_32(srcp.immediate(), rot);
+				else
+					result = rotr_64(srcp.immediate(), rot);
+
+				a.mov(src, result);
+
+				a.bfi(dst, src, lsb, pop);
+
+				optimized = true;
 			}
 			else
 			{
-				a.mov(SCRATCH_REG1, result);
-				a.orr(dst, dst, select_register(SCRATCH_REG1, inst.size()));
+				mov_reg_param(a, inst.size(), src, srcp);
+
+				if (rot > 0)
+					a.ror(src, src, rot);
+
+				a.bfi(dst, src, lsb, pop);
+
+				optimized = true;
 			}
 		}
+		else if (srcp.is_immediate())
+		{
+			const a64::Gp scratch = select_register(SCRATCH_REG1, inst.size());
 
-		mov_param_reg(a, inst.size(), dstp, dst);
+			dst = dstp.select_register(TEMP_REG2, inst.size());
 
-		if (inst.flags())
-			a.tst(dst, dst);
+			// val1 = src & ~PARAM3
+			if (is_valid_immediate_mask(maskp.immediate(), inst.size()))
+			{
+				a.and_(dst, dst, ~maskp.immediate());
+			}
+			else
+			{
+				a.mov(scratch, ~maskp.immediate());
+				a.and_(dst, dst, scratch);
+			}
+
+			uint64_t result = 0;
+			if (inst.size() == 4)
+				result = rotl_32(srcp.immediate(), s) & maskp.immediate();
+			else
+				result = rotl_64(srcp.immediate(), s) & maskp.immediate();
+
+			if (result != 0)
+			{
+				if (is_valid_immediate(result, 12))
+				{
+					a.orr(dst, dst, result);
+				}
+				else
+				{
+					a.mov(scratch, result);
+					a.orr(dst, dst, select_register(scratch, inst.size()));
+				}
+			}
+
+			optimized = true;
+		}
 	}
-	else
-	{
-		bool can_use_dst_reg = dstp.is_int_register();
-		if (can_use_dst_reg && srcp.is_int_register())
-			can_use_dst_reg = srcp.ireg() != dstp.ireg();
-		if (can_use_dst_reg && maskp.is_int_register())
-			can_use_dst_reg = maskp.ireg() != dstp.ireg();
-		if (can_use_dst_reg && shiftp.is_int_register())
-			can_use_dst_reg = shiftp.ireg() != dstp.ireg();
 
-		const a64::Gp dst = can_use_dst_reg ? dstp.select_register(TEMP_REG2, inst.size()) : select_register(TEMP_REG2, inst.size());
+	if (!optimized)
+	{
+		dst = can_use_dst_reg ? dstp.select_register(TEMP_REG2, inst.size()) : select_register(TEMP_REG2, inst.size());
 		mov_reg_param(a, inst.size(), dst, dstp);
 
-		const a64::Gp param = srcp.select_register(TEMP_REG1, inst.size());
-		const a64::Gp scratch = select_register(TEMP_REG3, inst.size());
+		const a64::Gp src = srcp.select_register(TEMP_REG1, inst.size());
+		const a64::Gp scratch = select_register(SCRATCH_REG1, inst.size());
 
-		mov_reg_param(a, inst.size(), param, srcp);
+		mov_reg_param(a, inst.size(), src, srcp);
 
 		if (shiftp.is_immediate())
 		{
 			const auto shift = -int64_t(shiftp.immediate()) & ((inst.size() * 8) - 1);
 
 			if (shift != 0)
-				a.ror(scratch, param, shift);
+				a.ror(scratch, src, shift);
 			else
-				a.mov(scratch, param);
+				a.mov(scratch, src);
 		}
 		else
 		{
-			const a64::Gp shift = shiftp.select_register(SCRATCH_REG1, inst.size());
+			const a64::Gp shift = shiftp.select_register(SCRATCH_REG2, inst.size());
 			mov_reg_param(a, inst.size(), shift, shiftp);
 
 			a.mov(scratch, inst.size() * 8);
 			a.and_(shift, shift, inst.size() * 8 - 1);
 			a.sub(shift, scratch, shift);
-			a.ror(scratch, param, shift);
+			a.ror(scratch, src, shift);
 		}
 
-		const a64::Gp mask = maskp.select_register(SCRATCH_REG1, inst.size());
+		const a64::Gp mask = maskp.select_register(SCRATCH_REG2, inst.size());
 		mov_reg_param(a, inst.size(), mask, maskp);
 
 		a.bic(dst, dst, mask); // val1 = src & ~PARAM3
 		a.and_(scratch, scratch, mask); // val2 = val2 & PARAM3
 		a.orr(dst, dst, scratch); // val1 | val2
-
-		mov_param_reg(a, inst.size(), dstp, dst);
-
-		if (inst.flags())
-			a.tst(dst, dst);
 	}
+
+	mov_param_reg(a, inst.size(), dstp, dst);
+
+	if (inst.flags())
+		a.tst(dst, dst);
 }
 
 template <a64::Inst::Id Opcode> void drcbe_arm64::op_add(a64::Assembler &a, const uml::instruction &inst)
