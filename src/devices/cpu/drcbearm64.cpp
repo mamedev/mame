@@ -310,15 +310,14 @@ a64::Gp drcbe_arm64::select_register(a64::Gp const &reg, uint32_t regsize) const
 bool drcbe_arm64::is_valid_immediate_mask(uint64_t val, size_t bytes)
 {
 	// all zeros and all ones aren't allowed, and disallow any value with bits outside of the max bit range
-	if (val == 0 || val == make_bitmask<uint64_t>(bytes * 8) || (bytes == 4 && (val & ~make_bitmask<uint64_t>(bytes * 8)) != 0))
+	if (val == 0 || val == make_bitmask<uint64_t>(bytes * 8))
 		return false;
 
-	int32_t head = (bytes * 8) - (int32_t)count_leading_zeros_64(val);
-
-	if (head < 0)
+	uint32_t head = 64 - count_leading_zeros_64(val);
+	if (head >= (bytes * 8))
 		return false;
 
-	int32_t tail = 0;
+	uint32_t tail = 0;
 	while (tail < head)
 	{
 		if (BIT(val, tail))
@@ -351,7 +350,7 @@ arm::Mem drcbe_arm64::get_mem_absolute(a64::Assembler &a, const void *ptr) const
 	}
 
 	const uint64_t pagebase = codeoffs & ~make_bitmask<uint64_t>(12);
-	const int64_t pagerel = pagebase - (int64_t)ptr;
+	const int64_t pagerel = (int64_t)ptr - pagebase;
 	if (is_valid_immediate_signed(pagerel, 33))
 	{
 		const uint64_t targetpage = (uint64_t)ptr & ~make_bitmask<uint64_t>(12);
@@ -495,7 +494,7 @@ void drcbe_arm64::emit_ldr_str_base_mem(a64::Assembler &a, a64::Inst::Id opcode,
 	}
 
 	const uint64_t pagebase = codeoffs & ~make_bitmask<uint64_t>(12);
-	const int64_t pagerel = pagebase - (int64_t)ptr;
+	const int64_t pagerel = (int64_t)ptr - pagebase;
 	if (is_valid_immediate_signed(pagerel, 33))
 	{
 		const uint64_t targetpage = (uint64_t)ptr & ~make_bitmask<uint64_t>(12);
@@ -2511,21 +2510,29 @@ void drcbe_arm64::op_roland(a64::Assembler &a, const uml::instruction &inst)
 	be_parameter maskp(*this, inst.param(3), PTYPE_MRI);
 
 	const a64::Gp output = dstp.select_register(TEMP_REG1, inst.size());
+	const a64::Gp shift = shiftp.select_register(SCRATCH_REG1, inst.size());
+	const uint64_t instbits = inst.size() * 8;
 
 	if (maskp.is_immediate() && maskp.is_immediate_value(0))
 	{
+		// A zero mask will always result in zero so optimize it out
 		const a64::Gp zero = select_register(a64::xzr, inst.size());
 
 		mov_param_reg(a, inst.size(), dstp, zero);
 
 		if (inst.flags())
 			a.tst(zero, zero);
+
+		return;
 	}
-	else if (srcp.is_immediate() && shiftp.is_immediate() && maskp.is_immediate())
+
+	bool optimized = false;
+	if (srcp.is_immediate() && shiftp.is_immediate() && maskp.is_immediate())
 	{
+		// Optimize all constant inputs into a single mov
 		uint64_t result = srcp.immediate();
 
-		if (shiftp.is_immediate() != 0)
+		if (shiftp.immediate() != 0)
 		{
 			if (inst.size() == 4)
 				result = rotl_32(result, shiftp.immediate());
@@ -2535,53 +2542,94 @@ void drcbe_arm64::op_roland(a64::Assembler &a, const uml::instruction &inst)
 
 		a.mov(output, result & maskp.immediate());
 
-		mov_param_reg(a, inst.size(), dstp, output);
-
-		if (inst.flags())
-			a.tst(output, output);
+		optimized = true;
 	}
-	else
+	else if (maskp.is_immediate() && shiftp.is_immediate() && !maskp.is_immediate_value(util::make_bitmask<uint64_t>(instbits)))
 	{
-		const a64::Gp scratch = select_register(TEMP_REG1, inst.size());
+		// A mask of all 1s will be handled efficiently in the unoptimized path, so only optimize for the other cases if possible
+		const auto pop = population_count_64(maskp.immediate());
+		const auto lz = count_leading_zeros_64(maskp.immediate()) & (instbits - 1);
+		const auto invlamask = ~(maskp.immediate() << lz) & util::make_bitmask<uint64_t>(instbits);
+		const bool is_right_aligned = (maskp.immediate() & (maskp.immediate() + 1)) == 0;
+		const bool is_contiguous = (invlamask & (invlamask + 1)) == 0;
+		const auto s = shiftp.immediate() & (instbits - 1);
 
-		mov_reg_param(a, inst.size(), scratch, srcp);
+		if (is_right_aligned || is_contiguous)
+		{
+			mov_reg_param(a, inst.size(), output, srcp);
+			optimized = true;
+		}
+
+		if (is_right_aligned)
+		{
+			// Optimize a contiguous right-aligned mask
+			const auto s2 = (instbits - s) & (instbits - 1);
+
+			if (s >= pop)
+			{
+				a.ubfx(output, output, s2, pop);
+			}
+			else
+			{
+				if (s2 > 0)
+					a.ror(output, output, s2);
+
+				a.bfc(output, pop, instbits - pop);
+			}
+		}
+		else if (is_contiguous)
+		{
+			// Optimize a contiguous mask
+			auto const rot = ((instbits * 2) - s - pop - lz) & (instbits - 1);
+
+			if (rot > 0)
+				a.ror(output, output, rot);
+
+			a.ubfiz(output, output, instbits - pop - lz, pop);
+		}
+	}
+
+	if (!optimized)
+	{
+		mov_reg_param(a, inst.size(), output, srcp);
 
 		if (shiftp.is_immediate())
 		{
-			const auto shift = -int64_t(shiftp.immediate()) & ((inst.size() * 8) - 1);
+			const auto s = -int64_t(shiftp.immediate()) & (instbits - 1);
 
-			if (shift != 0)
-				a.ror(scratch, scratch, shift);
+			if (s != 0)
+				a.ror(output, output, s);
 		}
 		else
 		{
-			const a64::Gp scratch2 = select_register(SCRATCH_REG1, inst.size());
-			const a64::Gp shift = shiftp.select_register(TEMP_REG2, inst.size());
+			const a64::Gp scratch2 = select_register(SCRATCH_REG2, inst.size());
 
 			mov_reg_param(a, inst.size(), shift, shiftp);
 
-			a.mov(scratch2, inst.size() * 8);
+			a.mov(scratch2, instbits);
 			a.sub(shift, scratch2, shift);
-			a.ror(scratch, scratch, shift);
+			a.and_(shift, shift, inst.size() * 8 - 1);
+			a.ror(output, output, shift);
 		}
 
+		// srcp and the results of the rors above are already going to the output register, so if the mask is all 1s this can all be skipped
 		if (maskp.is_immediate() && is_valid_immediate_mask(maskp.immediate(), inst.size()))
 		{
-			a.ands(output, scratch, maskp.immediate());
+			a.ands(output, output, maskp.immediate());
 		}
-		else
+		else if (!maskp.is_immediate() || maskp.is_immediate() != util::make_bitmask<uint64_t>(instbits))
 		{
 			const a64::Gp mask = maskp.select_register(TEMP_REG2, inst.size());
 			mov_reg_param(a, inst.size(), mask, maskp);
 
-			a.ands(output, scratch, mask);
+			a.ands(output, output, mask);
 		}
-
-		mov_param_reg(a, inst.size(), dstp, output);
-
-		if (inst.flags())
-			a.tst(output, output);
 	}
+
+	mov_param_reg(a, inst.size(), dstp, output);
+
+	if (inst.flags())
+		a.tst(output, output);
 }
 
 void drcbe_arm64::op_rolins(a64::Assembler &a, const uml::instruction &inst)
