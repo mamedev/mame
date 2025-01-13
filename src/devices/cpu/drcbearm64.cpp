@@ -310,11 +310,15 @@ a64::Gp drcbe_arm64::select_register(a64::Gp const &reg, uint32_t regsize) const
 bool drcbe_arm64::is_valid_immediate_mask(uint64_t val, size_t bytes)
 {
 	// all zeros and all ones aren't allowed, and disallow any value with bits outside of the max bit range
-	if (val == 0 || val == make_bitmask<uint64_t>(bytes * 8))
+	if (val == 0 || val == make_bitmask<uint64_t>(bytes * 8) || (bytes == 4 && (val & ~make_bitmask<uint64_t>(bytes * 8)) != 0))
 		return false;
 
-	uint32_t head = 64 - count_leading_zeros_64(val);
-	uint32_t tail = 0;
+	int32_t head = (bytes * 8) - (int32_t)count_leading_zeros_64(val);
+
+	if (head < 0)
+		return false;
+
+	int32_t tail = 0;
 	while (tail < head)
 	{
 		if (BIT(val, tail))
