@@ -2617,7 +2617,7 @@ void drcbe_arm64::op_roland(a64::Assembler &a, const uml::instruction &inst)
 		{
 			a.ands(output, output, maskp.immediate());
 		}
-		else if (!maskp.is_immediate() || maskp.is_immediate() != util::make_bitmask<uint64_t>(instbits))
+		else if (!maskp.is_immediate() || maskp.immediate() != util::make_bitmask<uint64_t>(instbits))
 		{
 			const a64::Gp mask = maskp.select_register(TEMP_REG2, inst.size());
 			mov_reg_param(a, inst.size(), mask, maskp);
