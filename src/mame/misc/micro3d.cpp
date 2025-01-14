@@ -8,7 +8,7 @@
 
     Games supported:
         * F-15 Strike Eagle [3 sets]
-        * B.O.T.S.S. - Battle of the Solar System [2 sets]
+        * B.O.T.S.S.: Battle of the Solar System [2 sets]
         * Tank Battle (prototype)
         * Super Tank Attack (prototype)
 
@@ -339,7 +339,7 @@ void micro3d_state::micro3d(machine_config &config)
 	m_audiocpu->port_out_cb<3>().set(FUNC(micro3d_state::sound_p3_w));
 
 	MC68681(config, m_duart, 3.6864_MHz_XTAL);
-	m_duart->irq_cb().set(FUNC(micro3d_state::duart_irq_handler));
+	m_duart->irq_cb().set_inputline("maincpu", M68K_IRQ_3);
 	m_duart->a_tx_cb().set("monitor_host", FUNC(rs232_port_device::write_txd));
 	m_duart->b_tx_cb().set(FUNC(micro3d_state::duart_txb));
 	m_duart->inport_cb().set(FUNC(micro3d_state::duart_input_r));
