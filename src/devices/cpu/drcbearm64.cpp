@@ -922,6 +922,7 @@ drcbe_arm64::drcbe_arm64(drcuml_state &drcuml, device_t &device, drc_cache &cach
 		if (m_space[space])
 		{
 			resolve_accessor(m_resolved_accessors[space].read_byte,         *m_space[space], static_cast<u8  (address_space::*)(offs_t)     >(&address_space::read_byte));
+			resolve_accessor(m_resolved_accessors[space].read_byte_masked,  *m_space[space], static_cast<u8  (address_space::*)(offs_t, u8) >(&address_space::read_byte));
 			resolve_accessor(m_resolved_accessors[space].read_word,         *m_space[space], static_cast<u16 (address_space::*)(offs_t)     >(&address_space::read_word));
 			resolve_accessor(m_resolved_accessors[space].read_word_masked,  *m_space[space], static_cast<u16 (address_space::*)(offs_t, u16)>(&address_space::read_word));
 			resolve_accessor(m_resolved_accessors[space].read_dword,        *m_space[space], static_cast<u32 (address_space::*)(offs_t)     >(&address_space::read_dword));
@@ -930,6 +931,7 @@ drcbe_arm64::drcbe_arm64(drcuml_state &drcuml, device_t &device, drc_cache &cach
 			resolve_accessor(m_resolved_accessors[space].read_qword_masked, *m_space[space], static_cast<u64 (address_space::*)(offs_t, u64)>(&address_space::read_qword));
 
 			resolve_accessor(m_resolved_accessors[space].write_byte,         *m_space[space], static_cast<void (address_space::*)(offs_t, u8)      >(&address_space::write_byte));
+			resolve_accessor(m_resolved_accessors[space].write_byte_masked,  *m_space[space], static_cast<void (address_space::*)(offs_t, u8, u8)  >(&address_space::write_byte));
 			resolve_accessor(m_resolved_accessors[space].write_word,         *m_space[space], static_cast<void (address_space::*)(offs_t, u16)     >(&address_space::write_word));
 			resolve_accessor(m_resolved_accessors[space].write_word_masked,  *m_space[space], static_cast<void (address_space::*)(offs_t, u16, u16)>(&address_space::write_word));
 			resolve_accessor(m_resolved_accessors[space].write_dword,        *m_space[space], static_cast<void (address_space::*)(offs_t, u32)     >(&address_space::write_dword));
@@ -2081,7 +2083,21 @@ void drcbe_arm64::op_readm(a64::Assembler &a, const uml::instruction &inst)
 	mov_reg_param(a, 4, REG_PARAM2, addrp);
 	mov_reg_param(a, inst.size(), REG_PARAM3, maskp);
 
-	if (spacesizep.size() == SIZE_WORD)
+	if (spacesizep.size() == SIZE_BYTE)
+	{
+		if (resolved.read_byte_masked.func)
+		{
+			get_imm_relative(a, REG_PARAM1, resolved.read_byte_masked.obj);
+			call_arm_addr(a, resolved.read_byte_masked.func);
+		}
+		else
+		{
+			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
+			emit_ldr_mem(a, TEMP_REG1, &trampolines.read_byte_masked);
+			a.blr(TEMP_REG1);
+		}
+	}
+	else if (spacesizep.size() == SIZE_WORD)
 	{
 		if (resolved.read_word_masked.func)
 		{
@@ -2222,7 +2238,21 @@ void drcbe_arm64::op_writem(a64::Assembler &a, const uml::instruction &inst)
 	mov_reg_param(a, inst.size(), REG_PARAM3, srcp);
 	mov_reg_param(a, inst.size(), REG_PARAM4, maskp);
 
-	if (spacesizep.size() == SIZE_WORD)
+	if (spacesizep.size() == SIZE_BYTE)
+	{
+		if (resolved.write_byte_masked.func)
+		{
+			get_imm_relative(a, REG_PARAM1, resolved.write_byte_masked.obj);
+			call_arm_addr(a, resolved.write_byte_masked.func);
+		}
+		else
+		{
+			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
+			emit_ldr_mem(a, TEMP_REG1, &trampolines.write_byte_masked);
+			a.blr(TEMP_REG1);
+		}
+	}
+	else if (spacesizep.size() == SIZE_WORD)
 	{
 		if (resolved.write_word_masked.func)
 		{

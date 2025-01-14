@@ -871,6 +871,10 @@ int drcbe_c::execute(code_handle &entry)
 				PARAM0 = m_space[PARAM2]->read_dword(PARAM1);
 				break;
 
+			case MAKE_OPCODE_SHORT(OP_READM1, 4, 0):    // READM   dst,src1,mask,space_BYTE
+				PARAM0 = m_space[PARAM3]->read_byte(PARAM1, PARAM2);
+				break;
+
 			case MAKE_OPCODE_SHORT(OP_READM2, 4, 0):    // READM   dst,src1,mask,space_WORD
 				PARAM0 = m_space[PARAM3]->read_word(PARAM1, PARAM2);
 				break;
@@ -889,6 +893,10 @@ int drcbe_c::execute(code_handle &entry)
 
 			case MAKE_OPCODE_SHORT(OP_WRITE4, 4, 0):    // WRITE   dst,src1,space_DWORD
 				m_space[PARAM2]->write_dword(PARAM0, PARAM1);
+				break;
+
+			case MAKE_OPCODE_SHORT(OP_WRITEM1, 4, 0):   // WRITEM  dst,src1,mask,space_BYTE
+				m_space[PARAM3]->write_byte(PARAM0, PARAM1, PARAM2);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_WRITEM2, 4, 0):   // WRITEM  dst,src1,mask,space_WORD

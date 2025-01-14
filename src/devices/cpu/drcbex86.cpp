@@ -3527,7 +3527,12 @@ void drcbe_x86::op_readm(Assembler &a, const instruction &inst)
 		emit_mov_m64_p64(a, qword_ptr(esp, 8), maskp);                                  // mov    [esp+8],maskp
 	emit_mov_m32_p32(a, dword_ptr(esp, 4), addrp);                                      // mov    [esp+4],addrp
 	a.mov(dword_ptr(esp, 0), imm(m_space[spacesizep.space()]));                         // mov    [esp],space
-	if (spacesizep.size() == SIZE_WORD)
+	if (spacesizep.size() == SIZE_BYTE)
+	{
+		a.call(imm(m_accessors[spacesizep.space()].read_byte_masked));                  // call   read_byte_masked
+		a.movzx(dstreg, al);                                                            // movzx  dstreg,al
+	}
+	else if (spacesizep.size() == SIZE_WORD)
 	{
 		a.call(imm(m_accessors[spacesizep.space()].read_word_masked));                  // call   read_word_masked
 		a.movzx(dstreg, ax);                                                            // movzx  dstreg,ax
@@ -3636,7 +3641,9 @@ void drcbe_x86::op_writem(Assembler &a, const instruction &inst)
 	}
 	emit_mov_m32_p32(a, dword_ptr(esp, 4), addrp);                                      // mov    [esp+4],addrp
 	a.mov(dword_ptr(esp, 0), imm(m_space[spacesizep.space()]));                         // mov    [esp],space
-	if (spacesizep.size() == SIZE_WORD)
+	if (spacesizep.size() == SIZE_BYTE)
+		a.call(imm(m_accessors[spacesizep.space()].write_byte_masked));                 // call   write_byte_masked
+	else if (spacesizep.size() == SIZE_WORD)
 		a.call(imm(m_accessors[spacesizep.space()].write_word_masked));                 // call   write_word_masked
 	else if (spacesizep.size() == SIZE_DWORD)
 		a.call(imm(m_accessors[spacesizep.space()].write_dword_masked));                // call   write_dword_masked
