@@ -810,9 +810,14 @@ void drcbe_arm64::get_shifted_bit(a64::Assembler &a, const a64::Gp &dst, const a
 
 void drcbe_arm64::calculate_carry_shift_left(a64::Assembler &a, const a64::Gp &reg, const a64::Gp &shift, int maxBits) const
 {
-	Label skip = a.newLabel();
-	a.cbz(shift, skip);
+	Label calc = a.newLabel();
+	Label end = a.newLabel();
 
+	a.cbnz(shift, calc);
+	store_carry_reg(a, a64::xzr);
+	a.b(end);
+
+	a.bind(calc);
 	const a64::Gp scratch = select_register(SCRATCH_REG1, reg.isGpW() ? 4 : 8);
 
 	// carry = ((PARAM1 << (shift - 1)) >> maxBits) & 1
@@ -821,13 +826,16 @@ void drcbe_arm64::calculate_carry_shift_left(a64::Assembler &a, const a64::Gp &r
 	a.lsr(scratch, reg, scratch);
 	store_carry_reg(a, scratch);
 
-	a.bind(skip);
+	a.bind(end);
 }
 
 void drcbe_arm64::calculate_carry_shift_left_imm(a64::Assembler &a, const a64::Gp &reg, const int shift, int maxBits) const
 {
 	if (shift == 0)
+	{
+		store_carry_reg(a, a64::xzr);
 		return;
+	}
 
 	const a64::Gp scratch = select_register(SCRATCH_REG1, reg.isGpW() ? 4 : 8);
 
@@ -838,9 +846,14 @@ void drcbe_arm64::calculate_carry_shift_left_imm(a64::Assembler &a, const a64::G
 
 void drcbe_arm64::calculate_carry_shift_right(a64::Assembler &a, const a64::Gp &reg, const a64::Gp &shift) const
 {
-	Label skip = a.newLabel();
-	a.cbz(shift, skip);
+	Label calc = a.newLabel();
+	Label end = a.newLabel();
 
+	a.cbnz(shift, calc);
+	store_carry_reg(a, a64::xzr);
+	a.b(end);
+
+	a.bind(calc);
 	const a64::Gp scratch = select_register(SCRATCH_REG1, reg.isGpW() ? 4 : 8);
 
 	// carry = (PARAM1 >> (shift - 1)) & 1
@@ -848,13 +861,16 @@ void drcbe_arm64::calculate_carry_shift_right(a64::Assembler &a, const a64::Gp &
 	a.lsr(scratch, reg, scratch);
 	store_carry_reg(a, scratch);
 
-	a.bind(skip);
+	a.bind(end);
 }
 
 void drcbe_arm64::calculate_carry_shift_right_imm(a64::Assembler &a, const a64::Gp &reg, const int shift) const
 {
 	if (shift == 0)
+	{
+		store_carry_reg(a, a64::xzr);
 		return;
+	}
 
 	const a64::Gp scratch = select_register(SCRATCH_REG1, reg.isGpW() ? 4 : 8);
 
@@ -3517,16 +3533,10 @@ template <a64::Inst::Id Opcode> void drcbe_arm64::op_shift(a64::Assembler &a, co
 
 		a.emit(Opcode, dst, src, shift);
 
-		if (shift != 0)
-		{
-			if (Opcode == a64::Inst::kIdRor || Opcode == a64::Inst::kIdLsr || Opcode == a64::Inst::kIdAsr)
-				calculate_carry_shift_right_imm(a, src, shift);
-			else if (Opcode == a64::Inst::kIdLsl)
-				calculate_carry_shift_left_imm(a, src, shift, maxBits);
-
-			if (inst.flags())
-				a.tst(dst, dst);
-		}
+		if (Opcode == a64::Inst::kIdRor || Opcode == a64::Inst::kIdLsr || Opcode == a64::Inst::kIdAsr)
+			calculate_carry_shift_right_imm(a, src, shift);
+		else if (Opcode == a64::Inst::kIdLsl)
+			calculate_carry_shift_left_imm(a, src, shift, maxBits);
 	}
 	else
 	{
@@ -3536,19 +3546,14 @@ template <a64::Inst::Id Opcode> void drcbe_arm64::op_shift(a64::Assembler &a, co
 
 		a.emit(Opcode, dst, src, scratch);
 
-		Label skip = a.newLabel();
-		a.cbz(scratch, skip);
-
 		if (Opcode == a64::Inst::kIdRor || Opcode == a64::Inst::kIdLsr || Opcode == a64::Inst::kIdAsr)
 			calculate_carry_shift_right(a, src, scratch);
 		else if (Opcode == a64::Inst::kIdLsl)
 			calculate_carry_shift_left(a, src, scratch, maxBits);
-
-		if (inst.flags())
-			a.tst(dst, dst);
-
-		a.bind(skip);
 	}
+
+	if (inst.flags())
+		a.tst(dst, dst);
 
 	// save dst after using inputs for calculations so the registers have no chance of being overwritten
 	mov_param_reg(a, inst.size(), dstp, dst);
@@ -3594,18 +3599,10 @@ void drcbe_arm64::op_rol(a64::Assembler &a, const uml::instruction &inst)
 			a.ror(output, param, s2);
 		}
 
-		if (s != 0)
-		{
-			calculate_carry_shift_left_imm(a, param, s, maxBits);
-
-			if (inst.flags())
-				a.tst(output, output);
-		}
+		calculate_carry_shift_left_imm(a, param, s, maxBits);
 	}
 	else
 	{
-		Label skip = a.newLabel();
-
 		mov_reg_param(a, inst.size(), shift, src2p);
 
 		const a64::Gp scratch = select_register(SCRATCH_REG1, inst.size());
@@ -3614,15 +3611,11 @@ void drcbe_arm64::op_rol(a64::Assembler &a, const uml::instruction &inst)
 		a.sub(scratch, scratch, scratch2);
 		a.ror(output, param, scratch);
 
-		a.cbz(scratch2, skip);
-
 		calculate_carry_shift_left(a, param, scratch2, maxBits);
-
-		if (inst.flags())
-			a.tst(output, output);
-
-		a.bind(skip);
 	}
+
+	if (inst.flags())
+		a.tst(output, output);
 
 	mov_param_reg(a, inst.size(), dstp, output);
 }
@@ -3666,14 +3659,13 @@ void drcbe_arm64::op_rolc(a64::Assembler &a, const uml::instruction &inst)
 			a.bfi(output.x(), FLAGS_REG, shift - 1, 1);
 			a.bfi(output, param1, shift, (inst.size() * 8) - shift);
 			a.bfi(FLAGS_REG, carry.x(), 0, 1);
-
-			if (inst.flags())
-				a.tst(output, output);
 		}
 		else
 		{
 			a.mov(output, param1);
 		}
+
+		calculate_carry_shift_left_imm(a, param1, shift, maxBits);
 	}
 	else
 	{
@@ -3708,13 +3700,13 @@ void drcbe_arm64::op_rolc(a64::Assembler &a, const uml::instruction &inst)
 
 		a.orr(output, output, carry);
 
-		calculate_carry_shift_left(a, param1, scratch2, maxBits);
-
-		if (inst.flags())
-			a.tst(output, output);
-
 		a.bind(skip3);
+
+		calculate_carry_shift_left(a, param1, scratch2, maxBits);
 	}
+
+	if (inst.flags())
+		a.tst(output, output);
 
 	mov_param_reg(a, inst.size(), dstp, output);
 }
@@ -3760,14 +3752,13 @@ void drcbe_arm64::op_rorc(a64::Assembler &a, const uml::instruction &inst)
 			if (shift > 1)
 				a.bfi(output, param1, (inst.size() * 8) - shift + 1, shift - 1);
 			a.bfi(FLAGS_REG, carry.x(), 0, 1);
-
-			if (inst.flags())
-				a.tst(output, output);
 		}
 		else
 		{
 			a.mov(output, param1);
 		}
+
+		calculate_carry_shift_right_imm(a, param1, shift);
 	}
 	else
 	{
@@ -3803,13 +3794,13 @@ void drcbe_arm64::op_rorc(a64::Assembler &a, const uml::instruction &inst)
 
 		a.orr(output, output, carry);
 
-		calculate_carry_shift_right(a, param1, scratch2);
-
-		if (inst.flags())
-			a.tst(output, output);
-
 		a.bind(skip3);
+
+		calculate_carry_shift_right(a, param1, scratch2);
 	}
+
+	if (inst.flags())
+		a.tst(output, output);
 
 	mov_param_reg(a, inst.size(), dstp, output);
 }

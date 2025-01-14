@@ -1162,52 +1162,54 @@ void drcbe_x64::shift_op_param(Assembler &a, Inst::Id const opcode, size_t opsiz
 {
 	if (param.is_immediate())
 	{
-		if ((param.immediate() & (opsize * 8 - 1)) == 0)
-			return;
+		const uint32_t bitshift = param.immediate() & (opsize * 8 - 1);
 
-		a.emit(opcode, dst, imm(param.immediate()));
+		if (bitshift != 0)
+			a.emit(opcode, dst, imm(param.immediate()));
 
 		if (update_flags)
-			calculate_status_flags(a, opsize, dst, FLAG_S | FLAG_Z); // calculate status flags but preserve carry
+		{
+			if (bitshift == 0)
+				a.clc(); // throw away carry since it'll never be used
+
+			calculate_status_flags(a, opsize, dst, FLAG_S | FLAG_Z);
+		}
 	}
 	else
 	{
-		Label restore_flags = a.newLabel();
+		Label calc = a.newLabel();
 		Label end = a.newLabel();
 
 		Gp shift = cl;
 
 		a.mov(r10, rax);
-		a.seto(al);
-		a.movzx(r11, al);
-		a.lahf(); // no status flags should change if shift is 0, so preserve flags
+		a.lahf();
 
 		mov_reg_param(a, shift, param);
 
 		a.and_(shift, opsize * 8 - 1);
 		a.test(shift, shift);
-		a.short_().jz(restore_flags);
+
+		a.short_().jnz(calc);
+
+		a.mov(rax, r10);
+
+		if (update_flags)
+			a.clc(); // throw away carry since it'll never be used
+
+		a.short_().jmp(end);
+
+		a.bind(calc);
 
 		a.sahf(); // restore flags to keep carry for rolc/rorc
 		a.mov(rax, r10);
 
 		a.emit(opcode, dst, shift);
 
+		a.bind(end);
+
 		if (update_flags)
 			calculate_status_flags(a, opsize, dst, FLAG_S | FLAG_Z); // calculate status flags but preserve carry
-
-		a.short_().jmp(end);
-
-		a.bind(restore_flags);
-
-		// restore overflow flag
-		a.add(r11.r32(), 0x7fffffff);
-
-		// restore other flags
-		a.sahf();
-		a.mov(rax, r10);
-
-		a.bind(end);
 	}
 }
 

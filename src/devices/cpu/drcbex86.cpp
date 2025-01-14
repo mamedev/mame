@@ -1122,44 +1122,52 @@ void drcbe_x86::shift_op_param(Assembler &a, Inst::Id const opcode, size_t opsiz
 {
 	if (param.is_immediate())
 	{
-		uint32_t bitshift = (param.immediate() & (opsize * 8 - 1));
+		const uint32_t bitshift = param.immediate() & (opsize * 8 - 1);
 
-		if (optimize(a, dst, param) || bitshift == 0)
-			return;
-
-		a.emit(opcode, dst, imm(bitshift));
+		if (!optimize(a, dst, param) && bitshift != 0)
+			a.emit(opcode, dst, imm(bitshift));
 
 		if (update_flags)
+		{
+			if (bitshift == 0)
+				a.clc(); // throw away carry since it'll never be used
+
 			calculate_status_flags(a, dst, FLAG_S | FLAG_Z); // calculate status flags but preserve carry
+		}
 	}
 	else
 	{
-		Label restore_flags = a.newLabel();
+		Label calc = a.newLabel();
 		Label end = a.newLabel();
 
 		Gp shift = dst.as<Gpd>().id() == ecx.id() ? ebx : ecx;
 
-		a.pushfd(); // no status flags should change if shift is 0, so preserve flags
+		a.pushfd(); // preserve flags for carry
 
 		emit_mov_r32_p32(a, shift, param);
 
 		a.and_(shift, opsize * 8 - 1);
 		a.test(shift, shift);
-		a.short_().jz(restore_flags);
+
+		a.short_().jnz(calc);
+
+		a.popfd(); // preserved flags not needed so throw it away
+
+		if (update_flags)
+			a.clc(); // throw away carry since it'll never be used
+
+		a.short_().jmp(end);
+
+		a.bind(calc);
 
 		a.popfd(); // restore flags to keep carry for rolc/rorc
 
 		a.emit(opcode, dst, shift);
 
+		a.bind(end);
+
 		if (update_flags)
 			calculate_status_flags(a, dst, FLAG_S | FLAG_Z); // calculate status flags but preserve carry
-
-		a.short_().jmp(end);
-
-		a.bind(restore_flags);
-		a.popfd();
-
-		a.bind(end);
 	}
 }
 
@@ -1552,8 +1560,6 @@ void drcbe_x86::emit_shl_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 			;// skip
 		else
 		{
-			saveflags = saveflags && count > 0;
-
 			while (count >= 32)
 			{
 				if (inst.flags() != 0)
@@ -1572,13 +1578,25 @@ void drcbe_x86::emit_shl_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 			if (inst.flags() != 0 || count > 0)
 			{
 				a.shld(reghi, reglo, count);                                            // shld  reghi,reglo,count
-				if (saveflags) a.pushfd();                                              // pushf
+				if (saveflags && count != 0) a.pushfd();                                // pushf
 				a.shl(reglo, count);                                                    // shl   reglo,count
 			}
 		}
 
 		if (saveflags)
-			emit_combine_z_shl_flags(a);
+		{
+			if (count == 0)
+			{
+				a.test(reglo, reglo);
+				a.pushfd();
+				calculate_status_flags(a, reghi, FLAG_S | FLAG_Z);
+				emit_combine_z_flags(a);
+			}
+			else
+			{
+				emit_combine_z_shl_flags(a);
+			}
+		}
 	}
 	else
 	{
@@ -1586,8 +1604,6 @@ void drcbe_x86::emit_shl_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 		Label end = a.newLabel();
 		Label skip1 = a.newLabel();
 		Label skip2 = a.newLabel();
-
-		a.pushfd();
 
 		emit_mov_r32_p32(a, ecx, param);                                                // mov   ecx,param
 
@@ -1622,14 +1638,21 @@ void drcbe_x86::emit_shl_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 		a.shl(reglo, cl);                                                               // shl   reglo,cl
 
 		if (saveflags)
+		{
 			emit_combine_z_shl_flags(a);
 
-		a.lea(esp, ptr(esp, 4));
-
-		a.jmp(end);
+			a.short_().jmp(end);
+		}
 
 		a.bind(skipall);
-		a.popfd();
+
+		if (saveflags)
+		{
+			a.test(reglo, reglo);
+			a.pushfd();
+			calculate_status_flags(a, reghi, FLAG_S | FLAG_Z);
+			emit_combine_z_flags(a);
+		}
 
 		a.bind(end);
 	}
@@ -1651,8 +1674,6 @@ void drcbe_x86::emit_shr_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 			;// skip
 		else
 		{
-			saveflags = saveflags && count > 0;
-
 			while (count >= 32)
 			{
 				if (inst.flags() != 0)
@@ -1671,22 +1692,32 @@ void drcbe_x86::emit_shr_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 			if (inst.flags() != 0 || count > 0)
 			{
 				a.shrd(reglo, reghi, count);                                            // shrd  reglo,reghi,count
-				if (saveflags) a.pushfd();                                              // pushf
+				if (saveflags && count != 0) a.pushfd();                                // pushf
 				a.shr(reghi, count);                                                    // shr   reghi,count
 			}
 		}
 
 		if (saveflags)
 		{
-			// take carry from lower register's flags
-			a.pushfd();
-			a.mov(ecx, dword_ptr(esp, 4));
-			a.and_(ecx, 0x01); // carry flag
-			a.and_(dword_ptr(esp, 0), ~0x01);
-			a.or_(dword_ptr(esp, 0), ecx);
-			a.popfd();
+			if (count == 0)
+			{
+				a.test(reglo, reglo);
+				a.pushfd();
+				calculate_status_flags(a, reghi, FLAG_S | FLAG_Z);
+				emit_combine_z_flags(a);
+			}
+			else
+			{
+				// take carry from lower register's flags
+				a.pushfd();
+				a.mov(ecx, dword_ptr(esp, 4));
+				a.and_(ecx, 0x01); // carry flag
+				a.and_(dword_ptr(esp, 0), ~0x01);
+				a.or_(dword_ptr(esp, 0), ecx);
+				a.popfd();
 
-			emit_combine_z_flags(a);
+				emit_combine_z_flags(a);
+			}
 		}
 	}
 	else
@@ -1695,8 +1726,6 @@ void drcbe_x86::emit_shr_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 		Label end = a.newLabel();
 		Label skip1 = a.newLabel();
 		Label skip2 = a.newLabel();
-
-		a.pushfd();
 
 		emit_mov_r32_p32(a, ecx, param);                                                // mov   ecx,param
 
@@ -1741,14 +1770,19 @@ void drcbe_x86::emit_shr_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 			a.popfd();
 
 			emit_combine_z_flags(a);
+
+			a.short_().jmp(end);
 		}
 
-		a.lea(esp, ptr(esp, 4));
-
-		a.jmp(end);
-
 		a.bind(skipall);
-		a.popfd();
+
+		if (saveflags)
+		{
+			a.test(reglo, reglo);
+			a.pushfd();
+			calculate_status_flags(a, reghi, FLAG_S | FLAG_Z);
+			emit_combine_z_flags(a);
+		}
 
 		a.bind(end);
 	}
@@ -1770,8 +1804,6 @@ void drcbe_x86::emit_sar_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 			;// skip
 		else
 		{
-			saveflags = saveflags && count > 0;
-
 			while (count >= 32)
 			{
 				if (inst.flags() != 0)
@@ -1790,32 +1822,40 @@ void drcbe_x86::emit_sar_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 			if (inst.flags() != 0 || count > 0)
 			{
 				a.shrd(reglo, reghi, count);                                            // shrd  reglo,reghi,count
-				if (saveflags) a.pushfd();                                              // pushf
+				if (saveflags && count != 0) a.pushfd();                                              // pushf
 				a.sar(reghi, count);                                                    // sar   reghi,count
 			}
 		}
 
 		if (saveflags)
 		{
-			// take carry from lower register's flags
-			a.pushfd();
-			a.mov(ecx, dword_ptr(esp, 4));
-			a.and_(ecx, 0x01); // carry flag
-			a.and_(dword_ptr(esp, 0), ~0x01);
-			a.or_(dword_ptr(esp, 0), ecx);
-			a.popfd();
+			if (count == 0)
+			{
+				a.test(reglo, reglo);
+				a.pushfd();
+				calculate_status_flags(a, reghi, FLAG_S | FLAG_Z);
+				emit_combine_z_flags(a);
+			}
+			else
+			{
+				// take carry from lower register's flags
+				a.pushfd();
+				a.mov(ecx, dword_ptr(esp, 4));
+				a.and_(ecx, 0x01); // carry flag
+				a.and_(dword_ptr(esp, 0), ~0x01);
+				a.or_(dword_ptr(esp, 0), ecx);
+				a.popfd();
 
-			emit_combine_z_flags(a);
+				emit_combine_z_flags(a);
+			}
 		}
 	}
 	else
 	{
-		Label skipall = a.newLabel();
-		Label end = a.newLabel();
 		Label skip1 = a.newLabel();
 		Label skip2 = a.newLabel();
-
-		a.pushfd();
+		Label skipall = a.newLabel();
+		Label end = a.newLabel();
 
 		emit_mov_r32_p32(a, ecx, param);                                                // mov   ecx,param
 
@@ -1860,14 +1900,19 @@ void drcbe_x86::emit_sar_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 			a.popfd();
 
 			emit_combine_z_flags(a);
+
+			a.short_().jmp(end);
 		}
 
-		a.lea(esp, ptr(esp, 4));
-
-		a.jmp(end);
-
 		a.bind(skipall);
-		a.popfd();
+
+		if (saveflags)
+		{
+			a.test(reglo, reglo);
+			a.pushfd();
+			calculate_status_flags(a, reghi, FLAG_S | FLAG_Z);
+			emit_combine_z_flags(a);
+		}
 
 		a.bind(end);
 	}
@@ -1893,8 +1938,6 @@ void drcbe_x86::emit_rol_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 			;// skip
 		else
 		{
-			saveflags = saveflags && count > 0;
-
 			while (count >= 32)
 			{
 				if (inst.flags() != 0)
@@ -1913,23 +1956,33 @@ void drcbe_x86::emit_rol_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 
 			a.mov(ecx, reglo);
 			a.shld(reglo, reghi, count);
-			if (saveflags) a.pushfd();
+			if (saveflags && count != 0) a.pushfd();
 			a.shld(reghi, ecx, count);
 		}
 
 		if (saveflags)
-			emit_combine_zs_flags(a);
+		{
+			if (count == 0)
+			{
+				a.test(reglo, reglo);
+				a.pushfd();
+				calculate_status_flags(a, reghi, FLAG_S | FLAG_Z);
+				emit_combine_z_flags(a);
+			}
+			else
+			{
+				emit_combine_zs_flags(a);
+			}
+		}
 	}
 	else
 	{
-		Label end = a.newLabel();
 		Label skipall = a.newLabel();
+		Label end = a.newLabel();
 		Label skip1 = a.newLabel();
 		Label shift_loop = a.newLabel();
 
 		emit_mov_r32_p32(a, ecx, param);
-
-		a.pushfd();
 
 		a.and_(ecx, 63);
 		a.test(ecx, ecx);
@@ -1956,20 +2009,26 @@ void drcbe_x86::emit_rol_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 
 		a.bind(skip1);
 		reset_last_upper_lower_reg();
-
 		a.mov(tempreg, reglo);
 		a.shld(reglo, reghi, cl);
 		if (saveflags) a.pushfd();
 		a.shld(reghi, tempreg, cl);
 
 		if (saveflags)
+		{
 			emit_combine_zs_flags(a);
-
-		a.lea(esp, ptr(esp, 4));
-		a.jmp(end);
+			a.short_().jmp(end);
+		}
 
 		a.bind(skipall);
-		a.popfd();
+
+		if (saveflags)
+		{
+			a.test(reglo, reglo);
+			a.pushfd();
+			calculate_status_flags(a, reghi, FLAG_S | FLAG_Z);
+			emit_combine_z_flags(a);
+		}
 
 		a.bind(end);
 	}
@@ -1997,8 +2056,6 @@ void drcbe_x86::emit_ror_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 			;// skip
 		else
 		{
-			saveflags = saveflags && count > 0;
-
 			while (count >= 32)
 			{
 				if (inst.flags() != 0)
@@ -2017,23 +2074,33 @@ void drcbe_x86::emit_ror_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 
 			a.mov(tempreg, reghi);
 			a.shrd(reghi, reglo, count);
-			if (saveflags) a.pushfd();
+			if (saveflags && count != 0) a.pushfd();
 			a.shrd(reglo, tempreg, count);
 
 			if (saveflags)
-				emit_combine_zs_flags(a);
+			{
+				if (count == 0)
+				{
+					a.test(reglo, reglo);
+					a.pushfd();
+					calculate_status_flags(a, reghi, FLAG_S | FLAG_Z);
+					emit_combine_z_flags(a);
+				}
+				else
+				{
+					emit_combine_zs_flags(a);
+				}
+			}
 		}
 	}
 	else
 	{
-		Label end = a.newLabel();
 		Label skipall = a.newLabel();
+		Label end = a.newLabel();
 		Label skip1 = a.newLabel();
 		Label shift_loop = a.newLabel();
 
 		emit_mov_r32_p32(a, ecx, param);
-
-		a.pushfd();
 
 		a.and_(ecx, 63);
 		a.test(ecx, ecx);
@@ -2060,20 +2127,26 @@ void drcbe_x86::emit_ror_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 
 		a.bind(skip1);
 		reset_last_upper_lower_reg();
-
 		a.mov(tempreg, reghi);
 		a.shrd(reghi, reglo, cl);
 		if (saveflags) a.pushfd();
 		a.shrd(reglo, tempreg, cl);
 
 		if (saveflags)
+		{
 			emit_combine_zs_flags(a);
-
-		a.lea(esp, ptr(esp, 4));
-		a.jmp(end);
+			a.short_().jmp(end);
+		}
 
 		a.bind(skipall);
-		a.popfd();
+
+		if (saveflags)
+		{
+			a.test(reglo, reglo);
+			a.pushfd();
+			calculate_status_flags(a, reghi, FLAG_S | FLAG_Z);
+			emit_combine_z_flags(a);
+		}
 
 		a.bind(end);
 	}
@@ -2092,6 +2165,7 @@ void drcbe_x86::emit_rcl_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 	Label loop = a.newLabel();
 	Label skipall = a.newLabel();
 	Label skiploop = a.newLabel();
+	Label end = a.newLabel();
 
 	a.pushfd(); // keep carry flag after and
 	emit_mov_r32_p32_keepflags(a, ecx, param);
@@ -2107,7 +2181,7 @@ void drcbe_x86::emit_rcl_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 	a.lea(ecx, ptr(ecx, -1));
 	a.rcl(reglo, 1);
 	a.rcl(reghi, 1);
-	a.jmp(loop);
+	a.short_().jmp(loop);
 
 	a.bind(skiploop);
 	reset_last_upper_lower_reg();
@@ -2120,9 +2194,21 @@ void drcbe_x86::emit_rcl_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 		a.pushfd();
 		calculate_status_flags(a, reghi, FLAG_S | FLAG_Z);
 		emit_combine_z_flags(a);
+
+		a.short_().jmp(end);
 	}
 
 	a.bind(skipall);
+
+	if (inst.flags())
+	{
+		a.test(reglo, reglo);
+		a.pushfd();
+		calculate_status_flags(a, reghi, FLAG_S | FLAG_Z);
+		emit_combine_z_flags(a);
+	}
+
+	a.bind(end);
 	reset_last_upper_lower_reg();
 }
 
@@ -2137,6 +2223,7 @@ void drcbe_x86::emit_rcr_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 	Label loop = a.newLabel();
 	Label skipall = a.newLabel();
 	Label skiploop = a.newLabel();
+	Label end = a.newLabel();
 
 	a.pushfd(); // keep carry flag after and
 	emit_mov_r32_p32_keepflags(a, ecx, param);
@@ -2152,7 +2239,7 @@ void drcbe_x86::emit_rcr_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 	a.lea(ecx, ptr(ecx, -1));
 	a.rcr(reghi, 1);
 	a.rcr(reglo, 1);
-	a.jmp(loop);
+	a.short_().jmp(loop);
 
 	a.bind(skiploop);
 	reset_last_upper_lower_reg();
@@ -2165,9 +2252,20 @@ void drcbe_x86::emit_rcr_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 		a.pushfd();
 		calculate_status_flags(a, reghi, FLAG_S | FLAG_Z);
 		emit_combine_z_flags(a);
+
+		a.short_().jmp(end);
 	}
 
 	a.bind(skipall);
+	if (inst.flags())
+	{
+		a.test(reglo, reglo);
+		a.pushfd();
+		calculate_status_flags(a, reghi, FLAG_S | FLAG_Z);
+		emit_combine_z_flags(a);
+	}
+
+	a.bind(end);
 	reset_last_upper_lower_reg();
 }
 
@@ -3614,7 +3712,7 @@ void drcbe_x86::op_carry(Assembler &a, const instruction &inst)
 
 		if (bitp.is_immediate())
 		{
-			uint32_t bitshift = (bitp.immediate() & (inst.size() * 8 - 1));
+			const uint32_t bitshift = bitp.immediate() & (inst.size() * 8 - 1);
 			if (bitshift < 32)
 			{
 				if (srcp.is_memory())
@@ -5335,7 +5433,7 @@ void drcbe_x86::op_lzcnt(Assembler &a, const instruction &inst)
 		a.jz(skip);
 		a.xor_(edx, 31 ^ 63);
 		a.mov(dstreg, edx);
-		a.jmp(end);
+		a.short_().jmp(end);
 
 		a.bind(skip);
 		a.mov(edx, 64 ^ 63);
@@ -6610,9 +6708,9 @@ int drcbe_x86::dmulu(uint64_t &dstlo, uint64_t &dsthi, uint64_t src1, uint64_t s
 	dstlo = lo;
 
 	if (halfmul_flags)
-		return ((lo >> 60) & FLAG_S) | ((hi != 0) << 1);
+		return ((lo >> 60) & FLAG_S) | ((hi != 0) << 1) | ((dstlo == 0) << 2);
 
-	return ((hi >> 60) & FLAG_S) | ((hi != 0) << 1);
+	return ((hi >> 60) & FLAG_S) | ((hi != 0) << 1) | ((dsthi == 0 && dstlo == 0) << 2);
 }
 
 
@@ -6668,9 +6766,9 @@ int drcbe_x86::dmuls(uint64_t &dstlo, uint64_t &dsthi, int64_t src1, int64_t src
 	dstlo = lo;
 
 	if (halfmul_flags)
-		return ((lo >> 60) & FLAG_S) | ((hi != ((int64_t)lo >> 63)) << 1);
+		return ((lo >> 60) & FLAG_S) | ((hi != ((int64_t)lo >> 63)) << 1) | ((dstlo == 0) << 2);
 
-	return ((hi >> 60) & FLAG_S) | ((hi != ((int64_t)lo >> 63)) << 1);
+	return ((hi >> 60) & FLAG_S) | ((hi != ((int64_t)lo >> 63)) << 1) | ((dsthi == 0 && dstlo == 0) << 2);
 }
 
 
