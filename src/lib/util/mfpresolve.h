@@ -46,8 +46,8 @@ inline std::pair<std::uintptr_t, std::uintptr_t> resolve_member_function(Ret (T:
 {
 	if (MAME_ABI_CXX_TYPE == MAME_ABI_CXX_ITANIUM)
 	{
-		struct { uintptr_t ptr; ptrdiff_t adj; } equiv;
-		static_assert(sizeof(function) == sizeof(equiv));
+		struct { std::uintptr_t ptr; std::ptrdiff_t adj; } equiv;
+		assert(sizeof(function) == sizeof(equiv));
 		*reinterpret_cast<decltype(function) *>(&equiv) = function;
 		return detail::resolve_member_function_itanium(equiv.ptr, equiv.adj, object);
 	}
@@ -68,7 +68,7 @@ inline std::pair<std::uintptr_t, std::uintptr_t> resolve_member_function(Ret (T:
 	if (MAME_ABI_CXX_TYPE == MAME_ABI_CXX_ITANIUM)
 	{
 		struct { std::uintptr_t ptr; std::ptrdiff_t adj; } equiv;
-		static_assert(sizeof(function) == sizeof(equiv));
+		assert(sizeof(function) == sizeof(equiv));
 		*reinterpret_cast<decltype(function) *>(&equiv) = function;
 		return detail::resolve_member_function_itanium(equiv.ptr, equiv.adj, object);
 	}
