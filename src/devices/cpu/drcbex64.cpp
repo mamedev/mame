@@ -706,6 +706,7 @@ drcbe_x64::drcbe_x64(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 		if (m_space[space])
 		{
 			resolve_accessor(m_resolved_accessors[space].read_byte,         *m_space[space], static_cast<u8  (address_space::*)(offs_t)     >(&address_space::read_byte));
+			resolve_accessor(m_resolved_accessors[space].read_byte_masked,  *m_space[space], static_cast<u8  (address_space::*)(offs_t, u8) >(&address_space::read_byte));
 			resolve_accessor(m_resolved_accessors[space].read_word,         *m_space[space], static_cast<u16 (address_space::*)(offs_t)     >(&address_space::read_word));
 			resolve_accessor(m_resolved_accessors[space].read_word_masked,  *m_space[space], static_cast<u16 (address_space::*)(offs_t, u16)>(&address_space::read_word));
 			resolve_accessor(m_resolved_accessors[space].read_dword,        *m_space[space], static_cast<u32 (address_space::*)(offs_t)     >(&address_space::read_dword));
@@ -714,6 +715,7 @@ drcbe_x64::drcbe_x64(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 			resolve_accessor(m_resolved_accessors[space].read_qword_masked, *m_space[space], static_cast<u64 (address_space::*)(offs_t, u64)>(&address_space::read_qword));
 
 			resolve_accessor(m_resolved_accessors[space].write_byte,         *m_space[space], static_cast<void (address_space::*)(offs_t, u8)      >(&address_space::write_byte));
+			resolve_accessor(m_resolved_accessors[space].write_byte_masked,  *m_space[space], static_cast<void (address_space::*)(offs_t, u8, u8)  >(&address_space::write_byte));
 			resolve_accessor(m_resolved_accessors[space].write_word,         *m_space[space], static_cast<void (address_space::*)(offs_t, u16)     >(&address_space::write_word));
 			resolve_accessor(m_resolved_accessors[space].write_word_masked,  *m_space[space], static_cast<void (address_space::*)(offs_t, u16, u16)>(&address_space::write_word));
 			resolve_accessor(m_resolved_accessors[space].write_dword,        *m_space[space], static_cast<void (address_space::*)(offs_t, u32)     >(&address_space::write_dword));
@@ -838,7 +840,6 @@ void drcbe_x64::reset()
 	a.emitArgsAssignment(frame, args);
 
 	a.sub(rsp, 40);
-	a.mov(MABS(&m_near.hashstacksave), rsp);
 	a.mov(MABS(&m_near.stacksave), rsp);
 	a.stmxcsr(MABS(&m_near.ssemode));
 	a.jmp(Gpq(REG_PARAM2));
@@ -847,7 +848,7 @@ void drcbe_x64::reset()
 	m_exit = dst + a.offset();
 	a.bind(a.newNamedLabel("exit_point"));
 	a.ldmxcsr(MABS(&m_near.ssemode));
-	a.mov(rsp, MABS(&m_near.hashstacksave));
+	a.mov(rsp, MABS(&m_near.stacksave));
 	a.add(rsp, 40);
 	a.emitEpilog(frame);
 
@@ -1613,7 +1614,7 @@ void drcbe_x64::op_hashjmp(Assembler &a, const instruction &inst)
 
 	// load the stack base
 	Label nocode = a.newLabel();
-	a.mov(rsp, MABS(&m_near.hashstacksave));                                            // mov   rsp,[hashstacksave]
+	a.mov(rsp, MABS(&m_near.stacksave));                                            // mov   rsp,[stacksave]
 
 	// fixed mode cases
 	if (modep.is_immediate() && m_hash.is_mode_populated(modep.immediate()))
@@ -2616,12 +2617,26 @@ void drcbe_x64::op_readm(Assembler &a, const instruction &inst)
 		mov_reg_param(a, Gpd(REG_PARAM3), maskp);                                       // mov    param3,maskp
 	else
 		mov_reg_param(a, Gpq(REG_PARAM3), maskp);                                       // mov    param3,maskp
-	if (spacesizep.size() == SIZE_WORD)
+	if (spacesizep.size() == SIZE_BYTE)
+	{
+		if (resolved.read_byte_masked.func)
+		{
+			mov_r64_imm(a, Gpq(REG_PARAM1), resolved.read_byte_masked.obj);             // mov    param1,space
+			smart_call_r64(a, resolved.read_byte_masked.func, rax);                     // call   read_byte_masked
+		}
+		else
+		{
+			mov_r64_imm(a, Gpq(REG_PARAM1), (uintptr_t)m_space[spacesizep.space()]);    // mov    param1,space
+			smart_call_m64(a, (x86code **)&trampolines.read_byte_masked);               // call   read_byte_masked
+		}
+		a.movzx(dstreg, al);                                                            // movzx  dstreg,al
+	}
+	else if (spacesizep.size() == SIZE_WORD)
 	{
 		if (resolved.read_word_masked.func)
 		{
 			mov_r64_imm(a, Gpq(REG_PARAM1), resolved.read_word_masked.obj);             // mov    param1,space
-			smart_call_r64(a, resolved.read_word_masked.func, rax);                     // call   read_byte_masked
+			smart_call_r64(a, resolved.read_word_masked.func, rax);                     // call   read_word_masked
 		}
 		else
 		{
@@ -2781,7 +2796,20 @@ void drcbe_x64::op_writem(Assembler &a, const instruction &inst)
 		mov_reg_param(a, Gpq(REG_PARAM3), srcp);                                        // mov    param3,srcp
 		mov_reg_param(a, Gpq(REG_PARAM4), maskp);                                       // mov    param4,maskp
 	}
-	if (spacesizep.size() == SIZE_WORD)
+	if (spacesizep.size() == SIZE_BYTE)
+	{
+		if (resolved.write_byte.func)
+		{
+			mov_r64_imm(a, Gpq(REG_PARAM1), resolved.write_byte_masked.obj);            // mov    param1,space
+			smart_call_r64(a, resolved.write_byte_masked.func, rax);                    // call   write_byte_masked
+		}
+		else
+		{
+			mov_r64_imm(a, Gpq(REG_PARAM1), (uintptr_t)m_space[spacesizep.space()]);    // mov    param1,space
+			smart_call_m64(a, (x86code **)&trampolines.write_byte_masked);              // call   write_byte_masked
+		}
+	}
+	else if (spacesizep.size() == SIZE_WORD)
 	{
 		if (resolved.write_word.func)
 		{
