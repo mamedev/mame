@@ -20,7 +20,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/m68000/m68030.h"
 #include "imagedev/floppy.h"
-#include "machine/8530scc.h"
+#include "machine/z80scc.h"
 #include "machine/hd63450.h"
 #include "machine/i8255.h"
 #include "machine/mb87030.h"
@@ -64,9 +64,6 @@ public:
 		, m_expansion(*this, "exp%u", 1U)
 		, m_adpcm_out(*this, {"adpcm_outl", "adpcm_outr"})
 		, m_options(*this, "options")
-		, m_mouse1(*this, "mouse1")
-		, m_mouse2(*this, "mouse2")
-		, m_mouse3(*this, "mouse3")
 		, m_eject_drv_out(*this, "eject_drv%u", 0U)
 		, m_ctrl_drv_out(*this, "ctrl_drv%u", 0U)
 		, m_access_drv_out(*this, "access_drv%u", 0U)
@@ -100,7 +97,7 @@ protected:
 	required_device<palette_device> m_pcgpalette;
 	required_device<mc68901_device> m_mfpdev;
 	required_device<rp5c15_device> m_rtc;
-	required_device<scc8530_legacy_device> m_scc;
+	required_device<scc8530_device> m_scc;
 	required_device<ym2151_device> m_ym2151;
 	required_device<i8255_device> m_ppi;
 	required_device<screen_device> m_screen;
@@ -111,9 +108,6 @@ protected:
 	required_device_array<filter_volume_device, 2> m_adpcm_out;
 
 	required_ioport m_options;
-	required_ioport m_mouse1;
-	required_ioport m_mouse2;
-	required_ioport m_mouse3;
 
 	output_finder<4> m_eject_drv_out;
 	output_finder<4> m_ctrl_drv_out;
@@ -178,24 +172,15 @@ protected:
 		uint8_t hdcvector = 0;
 		uint8_t prnvector = 0;
 	} m_ioc;
-	struct
-	{
-		int inputtype = 0;  // determines which input is to be received
-		bool irqactive = false;  // true if IRQ is being serviced
-		uint8_t irqvector = 0;
-		char last_mouse_x = 0;  // previous mouse x-axis value
-		char last_mouse_y = 0;  // previous mouse y-axis value
-		int bufferempty = 0;  // non-zero if buffer is empty
-	} m_mouse;
 	uint8_t m_ppi_portc = 0;
 	bool m_dmac_int = false;
 	bool m_mfp_int = false;
+	bool m_scc_int = false;
 	bool m_exp_irq2[2]{};
 	bool m_exp_irq4[2]{};
 	bool m_exp_nmi[2]{};
 	uint8_t m_current_ipl = 0;
 	int m_led_state = 0;
-	emu_timer* m_mouse_timer = nullptr;
 	emu_timer* m_led_timer = nullptr;
 	unsigned char m_scc_prev = 0;
 	emu_timer* m_fdc_tc = nullptr;
@@ -233,7 +218,6 @@ protected:
 	void dma_irq(int state);
 	void dma_end(offs_t offset, uint8_t data);
 
-	int read_mouse();
 	void set_adpcm();
 
 	void fm_irq(int state);
@@ -241,8 +225,6 @@ protected:
 	template <int N> void irq4_line(int state);
 	template <int N> void nmi_line(int state);
 
-	void scc_w(offs_t offset, uint16_t data);
-	uint16_t scc_r(offs_t offset);
 	void fdc_w(offs_t offset, uint16_t data);
 	uint16_t fdc_r(offs_t offset);
 	void ioc_w(offs_t offset, uint16_t data);
