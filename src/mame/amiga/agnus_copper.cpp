@@ -324,8 +324,9 @@ int agnus_copper_device::execute_next(int xpos, int ypos, bool is_blitter_busy, 
 				return xpos;
 			}
 			// delay write to the next available DMA slot if not in blanking area
-			// - bchvolly (title), suprfrog & abreed (bottom playfield rows)
-			const bool horizontal_blank = xpos < 0x47;
+			// - suprfrog & abreed (bottom playfield rows).
+			// - beast, biochall and cd32 bios wants this to be 0x5c
+			const bool horizontal_blank = xpos <= 0x5c;
 			const int move_offset = horizontal_blank ? 0 : std::max(num_planes - 4, 0);
 
 			m_pending_offset = word0;
@@ -358,7 +359,7 @@ int agnus_copper_device::execute_next(int xpos, int ypos, bool is_blitter_busy, 
 		/* handle a wait */
 		if ((word1 & 1) == 0)
 		{
-			const bool horizontal_blank = xpos < 0x47;
+			const bool horizontal_blank = xpos <= 0x5c;
 			const int wait_offset = horizontal_blank ? 0 : std::max(num_planes - 4, 0) + 1;
 
 			LOGINST("  WAIT %04x & %04x (currently %04x, num planes %d +%d)\n",
