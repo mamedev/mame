@@ -309,7 +309,7 @@ void gtdb_device::device_add_mconfig(machine_config &config)
 {
 	gt_device_base::device_add_mconfig(config);
 
-	SCC8530N(config, m_scc, 4.9152_MHz_XTAL);
+	SCC8530(config, m_scc, 4.9152_MHz_XTAL);
 
 	interpro_keyboard_port_device &keyboard(INTERPRO_KEYBOARD_PORT(config, "kbd", interpro_keyboard_devices, "lle_en_us"));
 	keyboard.rxd_handler_cb().set(m_scc, FUNC(z80scc_device::rxa_w));

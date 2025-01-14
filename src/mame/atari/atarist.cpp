@@ -16,7 +16,7 @@
 #include "cpu/m68000/m68000.h"
 #include "imagedev/floppy.h"
 #include "machine/6850acia.h"
-#include "machine/8530scc.h"
+#include "machine/z80scc.h"
 #include "machine/clock.h"
 #include "machine/input_merger.h"
 #include "machine/mc68901.h"

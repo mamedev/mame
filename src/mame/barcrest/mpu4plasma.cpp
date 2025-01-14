@@ -87,7 +87,7 @@ void mpu4plasma_state::mpu4plasma_f(machine_config &config)
 	m68000_device &plasmacpu(M68000(config, "plasmacpu", 10000000));
 	plasmacpu.set_addrmap(AS_PROGRAM, &mpu4plasma_state::mpu4plasma_map);
 
-	SCC8530N(config, "scc", 4915200).out_int_callback().set_inputline("plasmacpu", 4);
+	SCC8530(config, "scc", 4915200).out_int_callback().set_inputline("plasmacpu", 4);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);

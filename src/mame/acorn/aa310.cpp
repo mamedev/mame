@@ -1335,7 +1335,7 @@ void aa680_state::aa680(machine_config &config)
 	m_cent_ctrl_out->bit_handler<3>().set(m_centronics, FUNC(centronics_device::write_ack));
 	m_cent_ctrl_out->bit_handler<4>().set(m_centronics, FUNC(centronics_device::write_busy));
 
-	scc8530_device &scc(SCC8530N(config, "scc", 3.6864_MHz_XTAL));
+	scc8530_device &scc(SCC8530(config, "scc", 3.6864_MHz_XTAL));
 	scc.out_txda_callback().set("rs232a", FUNC(rs232_port_device::write_txd));
 	scc.out_dtra_callback().set("rs232a", FUNC(rs232_port_device::write_dtr));
 	scc.out_rtsa_callback().set("rs232a", FUNC(rs232_port_device::write_rts));
