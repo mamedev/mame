@@ -16,7 +16,7 @@
 #include "machine/74259.h"
 #include "machine/6522via.h"
 #include "machine/6522via.h"
-#include "machine/8530scc.h"
+#include "machine/z80scc.h"
 #include "machine/applefdintf.h"
 #include "machine/iwm.h"
 #include "machine/nvram.h"
@@ -144,7 +144,7 @@ private:
 	required_device<via6522_device> m_via1;
 	required_device<applefdintf_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
-	required_device<scc8530_legacy_device> m_scc;
+	required_device<scc8530_device> m_scc;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<nvram_device> m_nvram;
 	required_device<ls259_device> m_latch;

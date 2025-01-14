@@ -327,7 +327,7 @@ void micro3d_state::micro3d(machine_config &config)
 	m_drmath->set_addrmap(AS_PROGRAM, &micro3d_state::drmath_prg);
 	m_drmath->set_addrmap(AS_DATA, &micro3d_state::drmath_data);
 
-	scc8530_device &scc(SCC8530N(config, "scc", 32_MHz_XTAL / 2 / 2));
+	scc8530_device &scc(SCC8530(config, "scc", 32_MHz_XTAL / 2 / 2));
 	scc.out_txdb_callback().set("monitor_drmath", FUNC(rs232_port_device::write_txd));
 
 	I8051(config, m_audiocpu, 11.0592_MHz_XTAL);

@@ -619,18 +619,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/8530scc.h,MACHINES["8530SCC"] = true
----------------------------------------------------
-
-if (MACHINES["8530SCC"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/8530scc.cpp",
-		MAME_DIR .. "src/devices/machine/8530scc.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/machine/adc0804.h,MACHINES["ADC0804"] = true
 ---------------------------------------------------
 

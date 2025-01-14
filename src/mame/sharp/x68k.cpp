@@ -1139,7 +1139,7 @@ void x68k_state::x68000_base(machine_config &config)
 	m_hd63450->dma_read<0>().set("upd72065", FUNC(upd72065_device::dma_r));
 	m_hd63450->dma_write<0>().set("upd72065", FUNC(upd72065_device::dma_w));
 
-	SCC8530N(config, m_scc, 40_MHz_XTAL / 8);
+	SCC8530(config, m_scc, 40_MHz_XTAL / 8);
 	m_scc->out_int_callback().set([this](int state) { m_scc_int = state; update_ipl(); });
 
 	rs232_port_device &mouse(RS232_PORT(config, "mouse_port", mouse_devices, "x68k"));
