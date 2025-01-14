@@ -87,6 +87,7 @@
 #include "tilemap.h"
 
 #include "lependu.lh"
+#include "codemagik.lh"
 
 
 namespace {
@@ -115,10 +116,13 @@ public:
 	{ }
 
 	void lependu(machine_config &config);
+	void codemagik(machine_config &config);
 
 	void init_lependu();
 
 	void lamps_w(uint8_t data);
+	void lamps_cm_w(uint8_t data);
+	
 	void sound_w(uint8_t data);
 	void mux_w(uint8_t data);
 
@@ -146,12 +150,13 @@ private:
 	void lependu_map(address_map &map) ATTR_COLD;
 
 	uint8_t lependu_mux_port_r();
+	void pia0_ca2_w(int state);
 
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 	required_memory_bank_array<2> m_bank;
 	required_ioport_array<4> m_input;
-	output_finder<5> m_lamps;
+	output_finder<6> m_lamps;
 
 	tilemap_t *m_bg_tilemap = nullptr;
 	uint8_t m_mux_data = 0xff;
@@ -289,6 +294,25 @@ void lependu_state::lamps_w(uint8_t data)
 		m_lamps[i] = BIT(~data, i + 3);
 }
 
+void lependu_state::lamps_cm_w(uint8_t data)
+{
+/********** General Lamps wiring ***********
+
+    7654 3210
+    ---- ---x  Unused.
+    ---- --x-  Unused.
+    ---- -x--  Unused.
+    ---- x---  Button 5.
+    ---x ----  Button 2.
+    --x- ----  Button 3.
+    -x-- ----  Button 1.
+    x--- ----  Button 4.
+
+*/
+	for (int i = 0; i < 6 ; i++)
+		m_lamps[i] = BIT(~data, i);
+}
+
 
 void lependu_state::sound_w(uint8_t data)
 {
@@ -300,6 +324,9 @@ void lependu_state::sound_w(uint8_t data)
 	m_discrete->write(NODE_10, data & 0x07);
 }
 
+void lependu_state::pia0_ca2_w(int state)
+{
+}
 
 /*********************************************
 *           Memory Map Information           *
@@ -308,12 +335,12 @@ void lependu_state::sound_w(uint8_t data)
 void lependu_state::lependu_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().share("nvram");
+	map(0x0800, 0x0bff).ram().w(FUNC(lependu_state::lependu_videoram_w)).share("videoram");
+	map(0x0c00, 0x0fff).ram().w(FUNC(lependu_state::lependu_colorram_w)).share("colorram");
 	map(0x10b0, 0x10b0).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x10b1, 0x10b1).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x10f4, 0x10f7).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x10f8, 0x10fb).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x0800, 0x0bff).ram().w(FUNC(lependu_state::lependu_videoram_w)).share("videoram");
-	map(0x0c00, 0x0fff).ram().w(FUNC(lependu_state::lependu_colorram_w)).share("colorram");
 	map(0x8000, 0x9fff).bankr("bank0");
 	map(0xa000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xffff).rom();
@@ -386,6 +413,77 @@ static INPUT_PORTS_START(lependu)
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SW2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(codemagik)
+	// Multiplexed - 4x5bits
+	PORT_START("IN.0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_M) PORT_NAME("Mise")          // mise
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 )     PORT_NAME("Service / Test")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1) PORT_NAME("Carte / Done")  // done/deal
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V) PORT_NAME("BUTTON 4")      // cancel
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z) PORT_NAME("BUTTON 1")      // <--
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN.1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2) PORT_NAME("IN1-1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3) PORT_NAME("IN1-2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X) PORT_NAME("BUTTON 2")  // -->
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B) PORT_NAME("BUTTON 5")  // fin
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C) PORT_NAME("BUTTON 3")  // choice
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN.2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN.3")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )       // 25c coin
+	PORT_BIT( 0xfb, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("SW1")
+	// only bits 4-7 are connected here and were routed to SW1 1-4
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SW2")  // just for test
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -546,6 +644,7 @@ void lependu_state::lependu(machine_config &config)
 	PIA6821(config, m_pia[0]);
 	m_pia[0]->readpa_handler().set(FUNC(lependu_state::lependu_mux_port_r));
 	m_pia[0]->writepb_handler().set(FUNC(lependu_state::lamps_w));
+	m_pia[0]->ca2_handler().set(FUNC(lependu_state::pia0_ca2_w));
 
 	PIA6821(config, m_pia[1]);
 	m_pia[1]->readpa_handler().set_ioport("SW1");
@@ -570,6 +669,17 @@ void lependu_state::lependu(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	DISCRETE(config, m_discrete, lependu_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
+
+void lependu_state::codemagik(machine_config &config)
+{
+	lependu(config);
+
+	// basic machine hardware
+	PIA6821(config.replace(), m_pia[0]);
+	m_pia[0]->readpa_handler().set(FUNC(lependu_state::lependu_mux_port_r));
+	m_pia[0]->writepb_handler().set(FUNC(lependu_state::lamps_cm_w));
+	m_pia[0]->ca2_handler().set(FUNC(lependu_state::pia0_ca2_w));
 }
 
 
@@ -597,7 +707,6 @@ ROM_START( lependu )
 	ROM_LOAD( "2y.3a",    0x1000, 0x1000, CRC(6d1da4bb) SHA1(dc8c70faa301e2f7e9089d38e0ef618e8352e569) )    // cards deck gfx, bitplane2
 	ROM_COPY( "gfx1",     0x4800, 0x2000, 0x0800 )    // cards deck gfx, bitplane3.
 	ROM_COPY( "gfx1",     0x5800, 0x2800, 0x0800 )    // cards deck alt gfx, bitplane3.
-
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "mini.5d",   0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
@@ -676,6 +785,6 @@ void lependu_state::init_lependu()
 *                Game Drivers                *
 *********************************************/
 
-//     YEAR  NAME       PARENT    MACHINE   INPUT    STATE           INIT           ROT     COMPANY                      FULLNAME                           FLAGS                LAYOUT
-GAMEL( 198?, lependu,   0,        lependu,  lependu, lependu_state,  init_lependu,  ROT0,  "Avenir Amusement Inc.",     "Le Pendu (Bilingue, Version 04)",  0,                   layout_lependu )
-GAMEL( 198?, codemagik, 0,        lependu,  lependu, lependu_state,  empty_init,    ROT0,  "Voyageur de L'Espace Inc.", "Code Magik",                       MACHINE_NOT_WORKING, layout_lependu )
+//     YEAR  NAME       PARENT    MACHINE    INPUT      STATE          INIT          ROT    COMPANY                      FULLNAME                          FLAGS                LAYOUT
+GAMEL( 198?, lependu,   0,        lependu,   lependu,   lependu_state, init_lependu, ROT0, "Avenir Amusement Inc.",     "Le Pendu (Bilingue, Version 04)", 0,                   layout_lependu )
+GAMEL( 198?, codemagik, 0,        codemagik, codemagik, lependu_state, empty_init,   ROT0, "Voyageur de L'Espace Inc.", "Code Magik",                      MACHINE_NOT_WORKING, layout_codemagik )
