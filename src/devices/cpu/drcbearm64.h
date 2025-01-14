@@ -240,10 +240,8 @@ private:
 	{
 		void *debug_cpu_instruction_hook;
 		void *drcmap_get_value;
-		void *hashstacksave;
 
 		uint32_t emulated_flags;
-		uint32_t calldepth;
 	};
 	near_state &m_near;
 
