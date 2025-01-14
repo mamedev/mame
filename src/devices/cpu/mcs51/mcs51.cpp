@@ -2502,7 +2502,7 @@ void mcs51_cpu_device::device_reset()
 	m_uart.rx_clk = 0;
 	m_uart.tx_clk = 0;
 	m_uart.txbit = SIO_IDLE;
-	m_uart.txd = 0;
+	m_uart.txd = 1;
 	m_uart.rxbit = SIO_IDLE;
 	m_uart.rxb8 = 0;
 	m_uart.smod_div = 0;
