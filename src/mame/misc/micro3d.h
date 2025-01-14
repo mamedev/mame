@@ -177,7 +177,6 @@ private:
 	INTERRUPT_GEN_MEMBER(vblank);
 	TIMER_CALLBACK_MEMBER(mac_done_callback);
 	void upd7759_w(uint8_t data);
-	void duart_irq_handler(int state);
 	uint8_t duart_input_r();
 	void duart_output_w(uint8_t data);
 	void duart_txb(int state);
