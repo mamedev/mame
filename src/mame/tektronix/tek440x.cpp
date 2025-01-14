@@ -16,7 +16,7 @@
         * MC68681 DUART / timer (3.6864 MHz clock) (serial channel A = keyboard, channel B = RS-232 port)
         * AM9513 timer (source of timer IRQ)
         * NCR5385 SCSI controller
-				* 8255 Centronics printer interface
+		* 8255 Centronics printer interface
 				
         Video is a 640x480 1bpp window on a 1024x1024 VRAM area; smooth panning around that area
         is possible as is flat-out changing the scanout address.
@@ -117,7 +117,8 @@ class m68010_tekmmu_device : public m68010_device
 				LOG("map_r 0x%08x => %04x\n",offset>>11, m_map[(offset >> 11)&0x7ff] );
 
 			// selftest does a read and expects it to fail iff !MAP_SYS_WR_ENABLE; its not WR enable, its enable..
-			if (!BIT(m_map_control, MAP_SYS_WR_ENABLE))
+			// NB page 2.1-52 shows WrMapEn coming from latch
+			if (!BIT(m_latched_map_control, MAP_SYS_WR_ENABLE))
 			{
 					LOG("map_r: bus error: PID(%d) %08x fc(%d) pc(%08x)\n", BIT(m_map[(offset >> 11) & 0x7ff], 11, 3), OFF16_TO_OFF8(offset), get_fc(), pc());
 					set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
@@ -140,7 +141,8 @@ class m68010_tekmmu_device : public m68010_device
 				pc());
 		}
 		
-		if (BIT(m_map_control, MAP_SYS_WR_ENABLE))
+		// NB page 2.1-52 shows WrMapEn coming from latch
+		if (BIT(m_latched_map_control, MAP_SYS_WR_ENABLE))
 		{
 			COMBINE_DATA(&m_map[(offset >> 11) & 0x7ff]);
 		}
@@ -175,7 +177,7 @@ class m68010_tekmmu_device : public m68010_device
 		// copied on user mode read/write
 		m_latched_map_control = data & 0x3f;
 		
-		if (m_map_control != (data & 0x3f))
+		if (m_map_control != m_latched_map_control)
 		{
 			LOGMASKED(LOG_MMU, "mapcntl_w mmu_enable   %2d pc(%8x)\n", BIT(data, MAP_VM_ENABLE),  pc());
 			LOGMASKED(LOG_MMU, "mapcntl_w write_enable %2d\n", BIT(data, MAP_SYS_WR_ENABLE));
