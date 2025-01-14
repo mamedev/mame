@@ -565,6 +565,8 @@ private:
 	u8 mouse_r(offs_t offset);
 	void mouse_w(u8 data);
 	void led_w(u8 data);
+	u16 fpu_r(offs_t offset);
+	void fpu_w(offs_t offset, u16 data);
 	u16 videoaddr_r(offs_t offset);
 	void videoaddr_w(offs_t offset, u16 data);
 	u8 videocntl_r();
@@ -638,6 +640,12 @@ private:
 	bool m_kb_tdata;
 	bool m_kb_rclamp;
 	bool m_kb_loop;
+			
+	u16 m_fpuselect;
+	u16 m_operand;
+	u16 m_lswoperand[5];
+	u16 m_mswoperand[5];
+
 	u16 m_videoaddr[4];
 	u8 m_videocntl;
 	u8 m_diag;
@@ -998,6 +1006,103 @@ void tek440x_state::mapcntl_w(u8 data)
 	
 }
 
+
+enum {
+	FLOAT = 0xbe,
+	DOUBLE = 0x3e,
+	
+	FADD = 0x0142,
+	FSUB = 0x1142,
+	FMUL = 0x3142,
+	FDIV = 0x2142,
+	FCMP = 0x0942,
+	
+	
+	DMUL = 0x3342,
+	
+
+};
+
+void tek440x_state::fpu_w(offs_t offset, u16 data)
+{
+	switch(offset)
+	{
+		default:
+			break;
+		
+		// latches opcode.w, arg1.l, arg2.l
+		case 2:
+			m_lswoperand[m_operand] = data;
+			if (!m_operand) m_operand++;
+			break;
+		case 3:
+			m_mswoperand[m_operand] = data;
+			m_operand++;
+			break;
+	
+		// select float or double
+		case 6:
+			m_fpuselect = data;
+			if (data != FLOAT)
+				LOG("fpu_w: DOUBLE not implemented\n");
+			m_operand = 0;
+			break;
+		case 7:
+			break;
+	}
+}
+
+
+u16 tek440x_state::fpu_r(offs_t offset)
+{
+	// status check
+	if (offset == 4)
+		return 0;
+
+	// NB doing floating calc twice, once for low word read, again for high word read..
+	
+	unsigned int ai = (m_mswoperand[1] << 16) | (m_lswoperand[1]);
+	float a = *(float *)&ai;
+
+	unsigned int bi = (m_mswoperand[2] << 16) | (m_lswoperand[2]);
+	float b = *(float *)&bi;
+
+	LOG("fpu_r: %04x  %f %f\n",m_lswoperand[0], a,b);
+
+	float c;
+	switch(m_lswoperand[0])
+	{
+		case FADD:
+			c = a + b;
+			break;
+		case FSUB:
+			c = a - b;
+			break;
+		case FMUL:
+			c = a * b;
+			break;
+		case FDIV:
+			c = a / b;
+			break;
+		default:
+			LOG("fpu_r: unknown opcode 0x%04x\n", m_lswoperand[0]);
+	}
+	
+	unsigned int ci = *(unsigned int *)&c;
+	switch(offset)
+	{
+		default:
+			return 0;
+			
+		case 2:
+			return ci & 0xffff;
+
+		case 3:
+			return (ci >> 16) & 0xffff;
+	
+	}
+}
+
 u16 tek440x_state::videoaddr_r(offs_t offset)
 {
 	LOG("videoaddr_r %08x\n", offset);
@@ -1346,7 +1451,7 @@ void tek440x_state::physical_map(address_map &map)
 	map(0x784000, 0x784000).rw(FUNC(tek440x_state::videocntl_r),FUNC(tek440x_state::videocntl_w));
 	// 786000-787fff: spare
 	map(0x788000, 0x788000).w(FUNC(tek440x_state::sound_w));
-	// 78a000-78bfff: NS32081 FPU
+	map(0x78a000, 0x78bfff).rw(FUNC(tek440x_state::fpu_r),FUNC(tek440x_state::fpu_w));
 	map(0x78c000, 0x78c007).rw(m_acia, FUNC(mos6551_device::read), FUNC(mos6551_device::write)).umask16(0xff00);
 	// 78e000-78ffff: spare
 
