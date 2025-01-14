@@ -65,7 +65,6 @@ The game works perfectly. However the code is a bit of a bodge-job, originally f
 then updated for HBMAME 0.148u1. It could do with a cleanup, and removal of the various hacks. Support
 of save-state is also needed.
 
-
 ***********************************************************************************************************/
 
 #include "emu.h"
@@ -135,6 +134,7 @@ private:
  *  Address Map
  *
  *************************************/
+
 void wmg_state::wmg_cpu1(address_map &map)
 {
 	map(0x0000, 0xbfff).ram().share(m_videoram);
@@ -168,6 +168,7 @@ void wmg_state::wmg_cpu2(address_map &map)
 	map(0xf000, 0xffff).bankr(m_soundbank);
 }
 
+
 /***************************************************************
  *
  *  Inputs, banked. One set for each game.
@@ -176,6 +177,7 @@ void wmg_state::wmg_cpu2(address_map &map)
  *  JOYSTICK PLAYER(2) is really JOYSTICKRIGHT on WMG hardware
  *
  ***************************************************************/
+
 static INPUT_PORTS_START( wmg )
 	PORT_START("IN0")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(wmg_state::wmg_mux_r<0>))
@@ -193,7 +195,7 @@ static INPUT_PORTS_START( wmg )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-/* menu */
+	/* menu */
 	PORT_START("X0") // IN000 (game,port,player)
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_NAME("Menu/Left/Up")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_NAME("Menu/Left/Down")
@@ -214,7 +216,7 @@ static INPUT_PORTS_START( wmg )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Menu/Reverse")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Menu/Inviso or Flap")
 
-/* robotron */
+	/* robotron */
 	PORT_START("X2") // IN100
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_NAME("Robotron/Left/Move Up")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_NAME("Robotron/Left/Move Down")
@@ -230,7 +232,7 @@ static INPUT_PORTS_START( wmg )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_RIGHT ) PORT_8WAY PORT_NAME("Robotron/Right/Fire Right")
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-/* joust */
+	/* joust */
 	PORT_START("X4") // IN201
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(1) PORT_NAME("Joust/P1/Left")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(1) PORT_NAME("Joust/P1/Right")
@@ -250,7 +252,7 @@ static INPUT_PORTS_START( wmg )
 	PORT_START("X6") // IN210
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-/* stargate */
+	/* stargate */
 	PORT_START("X7") // IN300
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Stargate/Fire")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Stargate/Thrust")
@@ -266,7 +268,7 @@ static INPUT_PORTS_START( wmg )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Stargate/Inviso")
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-/* bubbles */
+	/* bubbles */
 	PORT_START("X9") // IN400
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_NAME("Bubbles/Up")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_NAME("Bubbles/Down")
@@ -279,7 +281,7 @@ static INPUT_PORTS_START( wmg )
 	PORT_START("X10") // IN410
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-/* defender */
+	/* defender */
 	PORT_START("X11") // IN500
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Defender/Fire")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Defender/Thrust")
@@ -294,7 +296,7 @@ static INPUT_PORTS_START( wmg )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_2WAY PORT_NAME("Defender/Up")
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-/* splat - there are no P2 controls, so it can only be played by a single player */
+	/* splat - there are no P2 controls, so it can only be played by a single player */
 	PORT_START("X13") // IN601
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1) PORT_NAME("Splat/P1/Left/Move Up")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1) PORT_NAME("Splat/P1/Left/Move Down")
@@ -318,6 +320,7 @@ static INPUT_PORTS_START( wmg )
 	PORT_START("X16") // IN612
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
+
 
 /*************************************
  *
@@ -430,6 +433,7 @@ void wmg_state::machine_reset()
 	m_maincpu->reset();
 }
 
+
 /*************************************
  *
  *  Input selector code
@@ -458,7 +462,7 @@ ioport_value wmg_state::wmg_mux_r()
 
 u8 wmg_state::wmg_pia_0_r(offs_t offset)
 {
-/* if player presses P1 and P2 in a game, return to the menu.
+	/* if player presses P1 and P2 in a game, return to the menu.
     Since there is no code in rom to handle this, it must be a hardware feature
     which probably just resets the cpu. */
 
@@ -475,6 +479,7 @@ u8 wmg_state::wmg_pia_0_r(offs_t offset)
 
 	return data;
 }
+
 
 /*************************************
  *
@@ -542,11 +547,13 @@ void wmg_state::wmg(machine_config &config)
 	WILLIAMS_BLITTER_SC1(config, m_blitter, 0xc000, m_maincpu, m_videoram);
 }
 
+
 /*************************************
  *
  *  Roms
  *
  *************************************/
+
 ROM_START( wmg )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "wmg.cpu", 0x00000, 0x80000, CRC(975516ec) SHA1(571aaf9bff8ebfc36448cd9394b47bcfae7d1b83) )
