@@ -1187,11 +1187,9 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_SHL, 4, 1):
 				shift = PARAM2 & 31;
 				temp32 = PARAM1 << shift;
+				flags = FLAGS32_NZ(temp32);
 				if (shift != 0)
-				{
-					flags = FLAGS32_NZ(temp32);
 					flags |= ((PARAM1 << (shift - 1)) >> 31) & FLAG_C;
-				}
 				PARAM0 = temp32;
 				break;
 
@@ -1202,11 +1200,9 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_SHR, 4, 1):
 				shift = PARAM2 & 31;
 				temp32 = PARAM1 >> shift;
+				flags = FLAGS32_NZ(temp32);
 				if (shift != 0)
-				{
-					flags = FLAGS32_NZ(temp32);
 					flags |= (PARAM1 >> (shift - 1)) & FLAG_C;
-				}
 				PARAM0 = temp32;
 				break;
 
@@ -1217,11 +1213,9 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_SAR, 4, 1):
 				shift = PARAM2 & 31;
 				temp32 = (int32_t)PARAM1 >> shift;
+				flags = FLAGS32_NZ(temp32);
 				if (shift != 0)
-				{
-					flags = FLAGS32_NZ(temp32);
 					flags |= (PARAM1 >> (shift - 1)) & FLAG_C;
-				}
 				PARAM0 = temp32;
 				break;
 
@@ -1232,11 +1226,9 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_ROL, 4, 1):
 				shift = PARAM2 & 31;
 				temp32 = rotl_32(PARAM1, shift);
+				flags = FLAGS32_NZ(temp32);
 				if (shift != 0)
-				{
-					flags = FLAGS32_NZ(temp32);
 					flags |= ((PARAM1 << (shift - 1)) >> 31) & FLAG_C;
-				}
 				PARAM0 = temp32;
 				break;
 
@@ -1258,11 +1250,9 @@ int drcbe_c::execute(code_handle &entry)
 					temp32 = (PARAM1 << shift) | (flags & FLAG_C);
 				else
 					temp32 = PARAM1;
+				flags = FLAGS32_NZ(temp32);
 				if (shift != 0)
-				{
-					flags = FLAGS32_NZ(temp32);
 					flags |= ((PARAM1 << (shift - 1)) >> 31) & FLAG_C;
-				}
 				PARAM0 = temp32;
 				break;
 
@@ -1273,11 +1263,9 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_ROR, 4, 1):
 				shift = PARAM2 & 31;
 				temp32 = rotr_32(PARAM1, shift);
+				flags = FLAGS32_NZ(temp32);
 				if (shift != 0)
-				{
-					flags = FLAGS32_NZ(temp32);
 					flags |= (PARAM1 >> (shift - 1)) & FLAG_C;
-				}
 				PARAM0 = temp32;
 				break;
 
@@ -1299,11 +1287,9 @@ int drcbe_c::execute(code_handle &entry)
 					temp32 = (PARAM1 >> shift) | ((flags & FLAG_C) << 31);
 				else
 					temp32 = PARAM1;
+				flags = FLAGS32_NZ(temp32);
 				if (shift != 0)
-				{
-					flags = FLAGS32_NZ(temp32);
 					flags |= (PARAM1 >> (shift - 1)) & FLAG_C;
-				}
 				PARAM0 = temp32;
 				break;
 
@@ -1823,11 +1809,9 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_SHL, 8, 1):
 				shift = DPARAM2 & 63;
 				temp64 = DPARAM1 << shift;
+				flags = FLAGS64_NZ(temp64);
 				if (shift != 0)
-				{
-					flags = FLAGS64_NZ(temp64);
 					flags |= ((DPARAM1 << (shift - 1)) >> 63) & FLAG_C;
-				}
 				DPARAM0 = temp64;
 				break;
 
@@ -1838,11 +1822,9 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_SHR, 8, 1):
 				shift = DPARAM2 & 63;
 				temp64 = DPARAM1 >> shift;
+				flags = FLAGS64_NZ(temp64);
 				if (shift != 0)
-				{
-					flags = FLAGS64_NZ(temp64);
 					flags |= (DPARAM1 >> (shift - 1)) & FLAG_C;
-				}
 				DPARAM0 = temp64;
 				break;
 
@@ -1853,11 +1835,9 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_SAR, 8, 1):
 				shift = DPARAM2 & 63;
 				temp64 = (int64_t)DPARAM1 >> shift;
+				flags = FLAGS64_NZ(temp64);
 				if (shift != 0)
-				{
-					flags = FLAGS64_NZ(temp64);
 					flags |= (DPARAM1 >> (shift - 1)) & FLAG_C;
-				}
 				DPARAM0 = temp64;
 				break;
 
@@ -1868,11 +1848,9 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_ROL, 8, 1):
 				shift = DPARAM2 & 63;
 				temp64 = rotl_64(DPARAM1, shift);
+				flags = FLAGS64_NZ(temp64);
 				if (shift != 0)
-				{
-					flags = FLAGS64_NZ(temp64);
 					flags |= ((DPARAM1 << (shift - 1)) >> 63) & FLAG_C;
-				}
 				DPARAM0 = temp64;
 				break;
 
@@ -1894,11 +1872,9 @@ int drcbe_c::execute(code_handle &entry)
 					temp64 = (DPARAM1 << shift) | (flags & FLAG_C);
 				else
 					temp64 = DPARAM1;
+				flags = FLAGS64_NZ(temp64);
 				if (shift != 0)
-				{
-					flags = FLAGS64_NZ(temp64);
 					flags |= ((DPARAM1 << (shift - 1)) >> 63) & FLAG_C;
-				}
 				DPARAM0 = temp64;
 				break;
 
@@ -1909,11 +1885,9 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_ROR, 8, 1):
 				shift = DPARAM2 & 63;
 				temp64 = rotr_64(DPARAM1, shift);
+				flags = FLAGS64_NZ(temp64);
 				if (shift != 0)
-				{
-					flags = FLAGS64_NZ(temp64);
 					flags |= (DPARAM1 >> (shift - 1)) & FLAG_C;
-				}
 				DPARAM0 = temp64;
 				break;
 
@@ -1935,11 +1909,9 @@ int drcbe_c::execute(code_handle &entry)
 					temp64 = (DPARAM1 >> shift) | (((uint64_t)flags & FLAG_C) << 63);
 				else
 					temp64 = DPARAM1;
+				flags = FLAGS64_NZ(temp64);
 				if (shift != 0)
-				{
-					flags = FLAGS64_NZ(temp64);
 					flags |= (DPARAM1 >> (shift - 1)) & FLAG_C;
-				}
 				DPARAM0 = temp64;
 				break;
 
