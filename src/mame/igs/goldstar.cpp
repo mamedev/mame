@@ -531,6 +531,7 @@ public:
 	void init_lucky8l();
 	void init_lucky8m();
 	void init_lucky8n();
+	void init_lucky8p();
 	void init_magoddsc();
 	void init_flaming7();
 	void init_flam7_tw();
@@ -554,6 +555,7 @@ public:
 	void lucky8(machine_config &config);
 	void lucky8f(machine_config &config);
 	void lucky8k(machine_config &config);
+	void lucky8p(machine_config &config);
 	void luckylad(machine_config &config);
 	void nd8lines(machine_config &config);
 	void super972(machine_config &config);
@@ -575,6 +577,7 @@ private:
 	uint8_t m_nmi_enable = 0U;
 	uint8_t m_vidreg = 0U;
 
+	void lucky8p_map(address_map &map) ATTR_COLD;
 	void nd8lines_map(address_map &map) ATTR_COLD;
 };
 
@@ -2399,6 +2402,13 @@ void goldstar_state::lucky8_map(address_map &map)
 	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::write));    /* sound */
 	map(0xc000, 0xf7ff).rom();  // could be used by some sets like super972.
 	map(0xf800, 0xffff).ram();
+}
+
+void wingco_state::lucky8p_map(address_map &map)
+{
+	lucky8_map(map);
+
+	map(0xf800, 0xffff).rom();
 }
 
 void wingco_state::nd8lines_map(address_map &map)
@@ -10760,6 +10770,13 @@ void wingco_state::lucky8k(machine_config &config)
 	maincpu.set_decrypted_tag(m_decrypted_opcodes);
 }
 
+void wingco_state::lucky8p(machine_config &config)
+{
+	lucky8(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &wingco_state::lucky8p_map);
+}
+
 void wingco_state::luckylad(machine_config &config)
 {
 	lucky8(config);
@@ -13681,6 +13698,78 @@ ROM_START( aplan ) // Has "DYNA QL-1  V1.01" string.
 	ROM_LOAD( "82s129.u46",   0x100, 0x100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
 ROM_END
 
+ // DYNA QL-1  V7.07 string, but not original. Utech Top-7v8.8  05/26/1993 string. According to pics also sports a 金鸡报喜 (Jin Ji Bao Xi) title screen
+ROM_START( top7 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "top7.u81", 0x0000, 0x1000, CRC(29b5a888) SHA1(695bebcad1d3034d6a3d0ca2fd0eb279a5db240a) )
+	ROM_CONTINUE(         0x4000, 0x1000 )
+	ROM_CONTINUE(         0x3000, 0x1000 )
+	ROM_CONTINUE(         0x7000, 0x1000 )
+	ROM_CONTINUE(         0x1000, 0x1000 )
+	ROM_CONTINUE(         0x6000, 0x1000 )
+	ROM_CONTINUE(         0x2000, 0x1000 )
+	ROM_CONTINUE(         0x5000, 0x1000 )
+	ROM_CONTINUE(         0x8000, 0x8000 )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "7.u16", 0x00000, 0x8000, CRC(40a35a3e) SHA1(040a645bd1201d484181b55f2a4ab3d6457ce21e) )
+	ROM_LOAD( "6.u11", 0x08000, 0x8000, CRC(6760ee4d) SHA1(10412d5ec62e8c442a5a772867daeaf38521b87c) )
+	ROM_LOAD( "5.u4",  0x10000, 0x8000, CRC(23246ab5) SHA1(860231a185c6d286171e0bd265d2a646fb0ee7df) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "4.u15", 0x0000, 0x2000, CRC(02b3d190) SHA1(4a68dd9f392996942c3d3e2aa28e880a9d0f62d4) )
+	ROM_LOAD( "3.u10", 0x2000, 0x2000, CRC(32972c9e) SHA1(6ebf18d9e91f7a7ef23961c31c6fbad933e1b708) )
+	ROM_LOAD( "2.u14", 0x4000, 0x2000, CRC(741f707d) SHA1(a9eb4045794662c2029c71dca2bd70142befcc5e) )
+	ROM_LOAD( "1.u9",  0x6000, 0x2000, CRC(12f9071f) SHA1(92f13ba8dffce56934b110da73c41f8aa7151e81) )
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_FILL( 0x0000, 0x10000, 0xff ) // U53 (girl bitmaps) not populated
+
+	// PROMs not dumped for this set
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s129.u84", 0x0000, 0x0100, BAD_DUMP CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
+	ROM_LOAD( "82s129.u79", 0x0100, 0x0100, BAD_DUMP CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, BAD_DUMP CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+ROM_END
+
+ // Minor differences from above, but legit.
+ROM_START( top7a )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "top7a.u81", 0x0000, 0x1000, CRC(68874abe) SHA1(bfd2c38475be8cc2bc7061b1f25bb1b6eafbc333) )
+	ROM_CONTINUE(          0x4000, 0x1000 )
+	ROM_CONTINUE(          0x3000, 0x1000 )
+	ROM_CONTINUE(          0x7000, 0x1000 )
+	ROM_CONTINUE(          0x1000, 0x1000 )
+	ROM_CONTINUE(          0x6000, 0x1000 )
+	ROM_CONTINUE(          0x2000, 0x1000 )
+	ROM_CONTINUE(          0x5000, 0x1000 )
+	ROM_CONTINUE(          0x8000, 0x8000 )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "7.u16", 0x00000, 0x8000, CRC(40a35a3e) SHA1(040a645bd1201d484181b55f2a4ab3d6457ce21e) )
+	ROM_LOAD( "6.u11", 0x08000, 0x8000, CRC(6760ee4d) SHA1(10412d5ec62e8c442a5a772867daeaf38521b87c) )
+	ROM_LOAD( "5.u4",  0x10000, 0x8000, CRC(23246ab5) SHA1(860231a185c6d286171e0bd265d2a646fb0ee7df) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "4.u15", 0x0000, 0x2000, CRC(02b3d190) SHA1(4a68dd9f392996942c3d3e2aa28e880a9d0f62d4) )
+	ROM_LOAD( "3.u10", 0x2000, 0x2000, CRC(32972c9e) SHA1(6ebf18d9e91f7a7ef23961c31c6fbad933e1b708) )
+	ROM_LOAD( "2.u14", 0x4000, 0x2000, CRC(741f707d) SHA1(a9eb4045794662c2029c71dca2bd70142befcc5e) )
+	ROM_LOAD( "1.u9",  0x6000, 0x2000, CRC(12f9071f) SHA1(92f13ba8dffce56934b110da73c41f8aa7151e81) )
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_FILL( 0x0000, 0x10000, 0xff ) // U53 (girl bitmaps) not populated
+
+	// PROMs not dumped for this set
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s129.u84", 0x0000, 0x0100, BAD_DUMP CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
+	ROM_LOAD( "82s129.u79", 0x0100, 0x0100, BAD_DUMP CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, BAD_DUMP CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+ROM_END
+
 ROM_START( war3cb ) // WANG QL-0B V1.00 in NVRAM, SANGHO in GFX ROMs
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "27c512 9 sub-board.bin", 0x2000, 0x2000, CRC(7fc6009d) SHA1(cb664890cffaddb741e8fe94d73ca23634c21e95) )
@@ -14779,6 +14868,66 @@ ROM_START( lucky8n )
 	ROM_LOAD( "g13", 0x00, 0x20, BAD_DUMP CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
 ROM_END
 
+ROM_START( lucky8o )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "256.bin",   0x0000, 0x8000, CRC(fe8e5110) SHA1(98b6a1db64312482d6ffbd5d9985e6feaa747111) )
+
+	// only the program ROM was provided, with no indication of the other ROMs / PROMs. Using bog-standard lucky8 ones for now
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "5.h7",   0x00000, 0x8000, BAD_DUMP CRC(59026af3) SHA1(3d7f7e78968ca26275635aeaa0e994468a3da575) )
+	ROM_LOAD( "6.h8",   0x08000, 0x8000, BAD_DUMP CRC(67a073c1) SHA1(36194d57d0dc0601fa1fdf2e6806f11b2ea6da36) )
+	ROM_LOAD( "7.h10",  0x10000, 0x8000, BAD_DUMP CRC(c415b9d0) SHA1(fd558fe8a116c33bbd712a639224d041447a45c1) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "1.h1",   0x0000, 0x2000, BAD_DUMP CRC(29d6f197) SHA1(1542ca457594f6b7fe8f28f7d78023edd7021bc8) )
+	ROM_LOAD( "2.h3",   0x2000, 0x2000, BAD_DUMP CRC(5f812e65) SHA1(70d9ea82f9337936bf21f82b6961768d436f3a6f) )
+	ROM_LOAD( "3.h4",   0x4000, 0x2000, BAD_DUMP CRC(898b9ed5) SHA1(11b7d1cfcf425d00d086c74e0dbcb72068dda9fe) )
+	ROM_LOAD( "4.h5",   0x6000, 0x2000, BAD_DUMP CRC(4f7cfb35) SHA1(0617cf4419be00d9bacc78724089cb8af4104d68) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "d12",   0x0000, 0x0100, BAD_DUMP CRC(23e81049) SHA1(78071dae70fad870e972d944642fb3a2374be5e4) )
+	ROM_LOAD( "prom4", 0x0100, 0x0100, BAD_DUMP CRC(526cf9d3) SHA1(eb779d70f2507d0f26d225ac8f5de8f2243599ca) )
+
+	ROM_REGION( 0x20, "proms2", 0 )
+	ROM_LOAD( "d13", 0x0000, 0x0020, BAD_DUMP CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "g14", 0x0000, 0x0100, BAD_DUMP CRC(bd48de71) SHA1(e4fa1e774af1499bc568be5b2deabb859d8c8172) )
+
+	ROM_REGION( 0x20, "unkprom2", 0 )
+	ROM_LOAD( "g13", 0x0000, 0x0020, BAD_DUMP CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+ROM_END
+
+ROM_START( lucky8p )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "27c512.bin", 0x00000, 0x10000, CRC(6b7d70be) SHA1(d6520f2da2b74eae02b6ee3375fe982c358dc927) )
+
+	// only the program ROM was provided, with no indication of the other ROMs / PROMs. Using bog-standard lucky8 ones for now
+	ROM_REGION( 0x18000, "gfx1", 0 ) // may be wrong, see missing GFX on title screen
+	ROM_LOAD( "5.h7",   0x00000, 0x8000, BAD_DUMP CRC(59026af3) SHA1(3d7f7e78968ca26275635aeaa0e994468a3da575) )
+	ROM_LOAD( "6.h8",   0x08000, 0x8000, BAD_DUMP CRC(67a073c1) SHA1(36194d57d0dc0601fa1fdf2e6806f11b2ea6da36) )
+	ROM_LOAD( "7.h10",  0x10000, 0x8000, BAD_DUMP CRC(c415b9d0) SHA1(fd558fe8a116c33bbd712a639224d041447a45c1) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "1.h1",   0x0000, 0x2000, BAD_DUMP CRC(29d6f197) SHA1(1542ca457594f6b7fe8f28f7d78023edd7021bc8) )
+	ROM_LOAD( "2.h3",   0x2000, 0x2000, BAD_DUMP CRC(5f812e65) SHA1(70d9ea82f9337936bf21f82b6961768d436f3a6f) )
+	ROM_LOAD( "3.h4",   0x4000, 0x2000, BAD_DUMP CRC(898b9ed5) SHA1(11b7d1cfcf425d00d086c74e0dbcb72068dda9fe) )
+	ROM_LOAD( "4.h5",   0x6000, 0x2000, BAD_DUMP CRC(4f7cfb35) SHA1(0617cf4419be00d9bacc78724089cb8af4104d68) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "d12",   0x0000, 0x0100, BAD_DUMP CRC(23e81049) SHA1(78071dae70fad870e972d944642fb3a2374be5e4) )
+	ROM_LOAD( "prom4", 0x0100, 0x0100, BAD_DUMP CRC(526cf9d3) SHA1(eb779d70f2507d0f26d225ac8f5de8f2243599ca) )
+
+	ROM_REGION( 0x20, "proms2", 0 )
+	ROM_LOAD( "d13", 0x0000, 0x0020, BAD_DUMP CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "g14", 0x0000, 0x0100, BAD_DUMP CRC(bd48de71) SHA1(e4fa1e774af1499bc568be5b2deabb859d8c8172) )
+
+	ROM_REGION( 0x20, "unkprom2", 0 )
+	ROM_LOAD( "g13", 0x0000, 0x0020, BAD_DUMP CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+ROM_END
+
 // only the subboard available (Z80, ROM, 2 stickered chips (sanded), 2 banks of 8 DIP switches (marked SW5 and SW6) and a rotary switch (SW7))
 // very professional-looking subboard marked Excel Planning
 // needs correct GFX ROMs / color PROMs (using the ones from wcat3, for now)
@@ -15295,6 +15444,112 @@ ROM_START( ns8linewa )
 	ROM_LOAD( "5.12d", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )  // same as ns8lines
 ROM_END
 
+ROM_START( ns8linewb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "27c256.14h", 0x0000, 0x8000, CRC(d28ec9b3) SHA1(1aa6b777f6c4cdd70b7779ac3c693de21105dcbd) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "27c512.4h", 0x00000, 0x8000, CRC(833a2735) SHA1(8073a6d50c63b4a4bcb643fa7109e5b357f1531a) ) // 1xxxxxxxxxxxxxxx = 0x00
+	ROM_IGNORE(                     0x8000 )
+	ROM_LOAD( "27c512.6h", 0x10000, 0x8000, CRC(64376fa8) SHA1(d0a9f5df7261403f8a1e42cab2cda17767ec13e6) )
+	ROM_CONTINUE(          0x08000, 0x8000 )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "27c256.10h", 0x6000, 0x2000, CRC(4df0ee91) SHA1(de99331a98b7853e417b730f52c09fb95f9da4ca) ) // BADADDR         x-xxxxxxxxxxxxx
+	ROM_CONTINUE(           0x4000, 0x2000 )
+	ROM_CONTINUE(           0x4000, 0x2000 )
+	ROM_IGNORE(                     0x2000 )
+	ROM_LOAD( "27c256.9h",  0x2000, 0x2000, CRC(a29c9da9) SHA1(58c532b109a7fcf79566c0ab904b498ca7149d69) ) // BADADDR         x-xxxxxxxxxxxxx
+	ROM_CONTINUE(           0x0000, 0x2000 )
+	ROM_CONTINUE(           0x0000, 0x2000 )
+	ROM_IGNORE(                     0x2000 )
+
+	// no PROMs provided for this set
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "dm74s287.g13", 0x0000, 0x0100, BAD_DUMP CRC(23e81049) SHA1(78071dae70fad870e972d944642fb3a2374be5e4) )
+	ROM_LOAD( "dm74s287.g14", 0x0100, 0x0100, BAD_DUMP CRC(526cf9d3) SHA1(eb779d70f2507d0f26d225ac8f5de8f2243599ca) )
+
+	ROM_REGION( 0x20, "proms2", 0 )
+	ROM_LOAD( "dm74s288.d13", 0x0000, 0x0020, BAD_DUMP CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "dm74s287.f3",  0x0000, 0x0100, BAD_DUMP CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
+
+	ROM_REGION( 0x20, "unkprom2", 0 )
+	ROM_LOAD( "dm74s288.d12", 0x0000, 0x0020, BAD_DUMP CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+ROM_END
+
+ROM_START( ns8linewc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "27c256.14h", 0x0000, 0x8000, CRC(9e2f3adb) SHA1(9d45059f04115548daa53b356db688995e7efba0) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "27c512.4h", 0x00000, 0x8000, CRC(833a2735) SHA1(8073a6d50c63b4a4bcb643fa7109e5b357f1531a) ) // 1xxxxxxxxxxxxxxx = 0x00
+	ROM_IGNORE(                     0x8000 )
+	ROM_LOAD( "27c512.6h", 0x10000, 0x8000, CRC(64376fa8) SHA1(d0a9f5df7261403f8a1e42cab2cda17767ec13e6) )
+	ROM_CONTINUE(          0x08000, 0x8000 )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "27c256.10h", 0x6000, 0x2000, CRC(4df0ee91) SHA1(de99331a98b7853e417b730f52c09fb95f9da4ca) ) // BADADDR         x-xxxxxxxxxxxxx
+	ROM_CONTINUE(           0x4000, 0x2000 )
+	ROM_CONTINUE(           0x4000, 0x2000 )
+	ROM_IGNORE(                     0x2000 )
+	ROM_LOAD( "27c256.9h",  0x2000, 0x2000, CRC(a29c9da9) SHA1(58c532b109a7fcf79566c0ab904b498ca7149d69) ) // BADADDR         x-xxxxxxxxxxxxx
+	ROM_CONTINUE(           0x0000, 0x2000 )
+	ROM_CONTINUE(           0x0000, 0x2000 )
+	ROM_IGNORE(                     0x2000 )
+
+	// no PROMs provided for this set
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "dm74s287.g13", 0x0000, 0x0100, BAD_DUMP CRC(23e81049) SHA1(78071dae70fad870e972d944642fb3a2374be5e4) )
+	ROM_LOAD( "dm74s287.g14", 0x0100, 0x0100, BAD_DUMP CRC(526cf9d3) SHA1(eb779d70f2507d0f26d225ac8f5de8f2243599ca) )
+
+	ROM_REGION( 0x20, "proms2", 0 )
+	ROM_LOAD( "dm74s288.d13", 0x0000, 0x0020, BAD_DUMP CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "dm74s287.f3",  0x0000, 0x0100, BAD_DUMP CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
+
+	ROM_REGION( 0x20, "unkprom2", 0 )
+	ROM_LOAD( "dm74s288.d12", 0x0000, 0x0020, BAD_DUMP CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+ROM_END
+
+ROM_START( ns8linewd )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "27c256.14h", 0x0000, 0x8000, CRC(eedfc910) SHA1(ef07e1aa08bedb62cdba264b8e48593b0d55f539) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "27c512.4h", 0x00000, 0x8000, CRC(833a2735) SHA1(8073a6d50c63b4a4bcb643fa7109e5b357f1531a) ) // 1xxxxxxxxxxxxxxx = 0x00
+	ROM_IGNORE(                     0x8000 )
+	ROM_LOAD( "27c512.6h", 0x10000, 0x8000, CRC(64376fa8) SHA1(d0a9f5df7261403f8a1e42cab2cda17767ec13e6) )
+	ROM_CONTINUE(          0x08000, 0x8000 )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "27c256.10h", 0x6000, 0x2000, CRC(4df0ee91) SHA1(de99331a98b7853e417b730f52c09fb95f9da4ca) ) // BADADDR         x-xxxxxxxxxxxxx
+	ROM_CONTINUE(           0x4000, 0x2000 )
+	ROM_CONTINUE(           0x4000, 0x2000 )
+	ROM_IGNORE(                     0x2000 )
+	ROM_LOAD( "27c256.9h",  0x2000, 0x2000, CRC(a29c9da9) SHA1(58c532b109a7fcf79566c0ab904b498ca7149d69) ) // BADADDR         x-xxxxxxxxxxxxx
+	ROM_CONTINUE(           0x0000, 0x2000 )
+	ROM_CONTINUE(           0x0000, 0x2000 )
+	ROM_IGNORE(                     0x2000 )
+
+	// no PROMs provided for this set
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "dm74s287.g13", 0x0000, 0x0100, BAD_DUMP CRC(23e81049) SHA1(78071dae70fad870e972d944642fb3a2374be5e4) )
+	ROM_LOAD( "dm74s287.g14", 0x0100, 0x0100, BAD_DUMP CRC(526cf9d3) SHA1(eb779d70f2507d0f26d225ac8f5de8f2243599ca) )
+
+	ROM_REGION( 0x20, "proms2", 0 )
+	ROM_LOAD( "dm74s288.d13", 0x0000, 0x0020, BAD_DUMP CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "dm74s287.f3",  0x0000, 0x0100, BAD_DUMP CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
+
+	ROM_REGION( 0x20, "unkprom2", 0 )
+	ROM_LOAD( "dm74s288.d12", 0x0000, 0x0020, BAD_DUMP CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+ROM_END
+
+
 
 /*
   New Lucky 8 Lines / New Super 8 Lines (W-4)
@@ -15442,6 +15697,36 @@ ROM_START( cbaai ) // W4 base board + CPU board.
 
 	ROM_REGION( 0x20, "unkprom2", 0 )
 	ROM_LOAD( "u1.bin", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+ROM_END
+
+ROM_START( ttactoe )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "tic_8.14b", 0x0000, 0x8000, CRC(a3b8f6ce) SHA1(e85803a0683f11f763bbcec82b0ab5b6dcc31d8f) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "t5.7h", 0x00000, 0x8000, CRC(868fd100) SHA1(00b09049c34865206d324fb329cee74f35dce7ea) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD( "t6.8h", 0x08000, 0x8000, CRC(f39ac672) SHA1(80f1b734e4321917778ce226348c31b19dc677c7) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD( "t7.9h", 0x10000, 0x8000, CRC(8b23b265) SHA1(3fc66ab5844d49e12e20f30deb6aa0d07cac3333) ) // 1ST AND 2ND HALF IDENTICAL
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "t1.1h", 0x0000, 0x2000, CRC(be8b3c26) SHA1(369703a91f430af91083cde2bbec210fa355c4a7) )
+	ROM_LOAD( "t2.2h", 0x2000, 0x2000, CRC(2385ce3d) SHA1(49d8e3357ccfbe9e2c214276e884fff97d3da472) )
+	ROM_LOAD( "t3.4h", 0x4000, 0x2000, CRC(e2074f7f) SHA1(d2ccfd52372d37fd258d8544f0d53440b6b575f9) )
+	ROM_LOAD( "t4.5h", 0x6000, 0x2000, CRC(da56407d) SHA1(9a02c8b9d2489332ac64e8af5059bc6e7a1c9902) )
+
+	// PROMs were not included in this set
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "u4.bin", 0x0000, 0x0100, NO_DUMP CRC(23e81049) SHA1(78071dae70fad870e972d944642fb3a2374be5e4) )
+	ROM_LOAD( "u5.bin", 0x0100, 0x0100, NO_DUMP CRC(526cf9d3) SHA1(eb779d70f2507d0f26d225ac8f5de8f2243599ca) )
+
+	ROM_REGION( 0x40, "proms2", 0 )
+	ROM_LOAD( "u2.bin", 0x0000, 0x0020, NO_DUMP CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "u3.bin", 0x0000, 0x0100, NO_DUMP CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
+
+	ROM_REGION( 0x20, "unkprom2", 0 )
+	ROM_LOAD( "u1.bin", 0x0000, 0x0020, NO_DUMP CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
 ROM_END
 
 /*
@@ -22015,6 +22300,57 @@ void wingco_state::init_lucky8n()
 	}
 }
 
+void wingco_state::init_lucky8p()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (int i = 0; i < 0x10000; i++)
+	{
+		uint8_t x = rom[i];
+
+		switch(i & 0xf8)
+		{
+			case 0x00: x ^= 0xd3; break;
+			case 0x08: x ^= 0xc3; break;
+			case 0x10: x ^= 0x93; break;
+			case 0x18: x ^= 0x83; break;
+			case 0x20: x ^= 0x93; break;
+			case 0x28: x ^= 0x83; break;
+			case 0x30: x ^= 0xd3; break;
+			case 0x38: x ^= 0xc3; break;
+			case 0x40: x ^= 0xc0; break;
+			case 0x48: x ^= 0xd0; break;
+			case 0x50: x ^= 0x80; break;
+			case 0x58: x ^= 0x90; break;
+			case 0x60: x ^= 0x80; break;
+			case 0x68: x ^= 0x90; break;
+			case 0x70: x ^= 0xc0; break;
+			case 0x78: x ^= 0xd0; break;
+			case 0x80: x ^= 0x5a; break;
+			case 0x88: x ^= 0x4a; break;
+			case 0x90: x ^= 0x1a; break;
+			case 0x98: x ^= 0x0a; break;
+			case 0xa0: x ^= 0x1a; break;
+			case 0xa8: x ^= 0x0a; break;
+			case 0xb0: x ^= 0x5a; break;
+			case 0xb8: x ^= 0x4a; break;
+			case 0xc0: x ^= 0x49; break;
+			case 0xc8: x ^= 0x59; break;
+			case 0xd0: x ^= 0x09; break;
+			case 0xd8: x ^= 0x19; break;
+			case 0xe0: x ^= 0x09; break;
+			case 0xe8: x ^= 0x19; break;
+			case 0xf0: x ^= 0x49; break;
+			case 0xf8: x ^= 0x59; break;
+		}
+
+		if (i & 0x4000) x ^= 0x08;
+		if (i & 0x8000) x ^= 0x82;
+
+		rom[i] = x;
+	}
+}
+
 void wingco_state::init_nd8lines()
 {
 	uint8_t *rom = memregion("maincpu")->base();
@@ -22950,6 +23286,8 @@ GAME(  1996, cmast97i,   cmast97,  cm97,     cmv801,   cmaster_state,  empty_ini
 GAME(  1999, cmast99,    0,        cm,       cmast99,  cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master '99 (V9B.00)",                  MACHINE_NOT_WORKING )
 GAME(  1999, cmast99b,   cmast99,  cm,       cmast99,  cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Cherry Master '99 (V9B.00 bootleg / hack)",   MACHINE_NOT_WORKING )
 GAME(  1993, aplan,      0,        cm,       cmast99,  cmaster_state,  init_cmv4,      ROT0, "WeaShing H.K.",     "A-Plan",                                      MACHINE_NOT_WORKING )
+GAME(  1999, top7,       0,        cm,       cmast99,  cmaster_state,  empty_init,     ROT0, "bootleg (UTech)",   "Top-7 (V8.8, set 1)",                         MACHINE_NOT_WORKING ) // doesn't boot, not investigated yet
+GAME(  1999, top7a,      top7,     cm,       cmast99,  cmaster_state,  empty_init,     ROT0, "bootleg (UTech)",   "Top-7 (V8.8, set 2)",                         MACHINE_NOT_WORKING ) // doesn't boot, not investigated yet
 
 GAME(  1996, war3cb,     0,        cm,       cmast99,  cmaster_state,  empty_init,     ROT0, "S.B.E.",            "War III Cherry Best",                         MACHINE_NOT_WORKING ) // different portmap?
 
@@ -22971,10 +23309,15 @@ GAMEL( 1989, lucky8k,    lucky8,   lucky8k,  lucky8,   wingco_state,   empty_ini
 GAMEL( 1989, lucky8l,    lucky8,   lucky8,   lucky8,   wingco_state,   init_lucky8l,   ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 11, W-4)",                          MACHINE_WRONG_COLORS,  layout_lucky8 )    // uses a strange mix of PLDs and PROMs for colors
 GAMEL( 1989, lucky8m,    lucky8,   lucky8f,  lucky8,   wingco_state,   init_lucky8m,   ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 12, W-4, encrypted)",               0,                     layout_lucky8 )
 GAMEL( 1989, lucky8n,    lucky8,   lucky8f,  lucky8,   wingco_state,   init_lucky8n,   ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 13)",                               0,                     layout_lucky8 )    // 2 control sets...
+GAMEL( 1988, lucky8o,    lucky8,   lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "Yamate",            "New Lucky 8 Lines (set 14, W-4, Yamate)",                  0,                     layout_lucky8 )    // 2 control sets...
+GAMEL( 1988, lucky8p,    lucky8,   lucky8p,  lucky8,   wingco_state,   init_lucky8p,   ROT0, "bootleg (Cleco)",   "New Lucky 8 Lines (set 15, W-4, Cleco bootleg)",           MACHINE_IMPERFECT_GRAPHICS, layout_lucky8 ) // 2 control sets, missing GFX on title screen (wrong GFX ROMs)
 GAMEL( 198?, ns8lines,   0,        lucky8,   lucky8b,  wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (W-4)",              0,                     layout_lucky8p1 )  // only 1 control set...
 GAMEL( 1985, ns8linesa,  ns8lines, lucky8,   lucky8b,  wingco_state,   empty_init,     ROT0, "Yamate (bootleg)",  "New Lucky 8 Lines / New Super 8 Lines (W-4, Lucky97 HW)",  0,                     layout_lucky8p1 )  // only 1 control set...
 GAMEL( 198?, ns8linew,   ns8lines, lucky8,   ns8linew, wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (F-5, Witch Bonus)", 0,                     layout_lucky8 )    // 2 control sets...
 GAMEL( 198?, ns8linewa,  ns8lines, lucky8,   ns8linwa, wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (W-4, Witch Bonus)", 0,                     layout_lucky8p1 )  // only 1 control set...
+GAMEL( 1985, ns8linewb,  ns8lines, lucky8,   ns8linwa, wingco_state,   empty_init,     ROT0, "Yamate",            "New Lucky 8 Lines / New Super 8 Lines (F-5, Witch Bonus, Yamate, 1985)", 0,                     layout_lucky8p1 )  // only 1 control set...
+GAMEL( 1988, ns8linewc,  ns8lines, lucky8,   ns8linwa, wingco_state,   empty_init,     ROT0, "Yamate",            "New Lucky 8 Lines / New Super 8 Lines (W-4, Witch Bonus, Yamate, 1988, set 1)", 0,                     layout_lucky8p1 )  // only 1 control set...
+GAMEL( 1988, ns8linewd,  ns8lines, lucky8,   ns8linwa, wingco_state,   empty_init,     ROT0, "Yamate",            "New Lucky 8 Lines / New Super 8 Lines (W-4, Witch Bonus, Yamate, 1988, set 2)", 0,                     layout_lucky8p1 )  // only 1 control set...
 GAMEL( 1989, f16s8l,     lucky8,   lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "Leisure Ent",       "F-16 Super 8 Lines",                                       MACHINE_NOT_WORKING,   layout_lucky8 ) // needs I/O check, seems mostly playable
 GAMEL( 1991, nd8lines,   lucky8,   nd8lines, nd8lines, wingco_state,   init_nd8lines,  ROT0, "Yamate (bootleg)",  "New Draw 8 Lines (Version 2.1)",                           MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND, layout_lucky8 ) // PROM decode wrong, SN emits terrible sound, inputs not done yet
 GAMEL( 198?, super972,   ns8lines, super972, ns8linwa, wingco_state,   init_super972,  ROT0, "<unknown>",         "Super 97-2 (Witch Bonus)",                                 MACHINE_NOT_WORKING,   layout_lucky8p1 )  // decrypted, needs correct inputs
@@ -22990,7 +23333,8 @@ GAME ( 1992?,wcat,       0,        wcat3,    lucky8b,  wingco_state,   init_wcat
 GAME(  1995, wcat3,      0,        wcat3,    lucky8,   wingco_state,   init_wcat3,     ROT0, "E.A.I.",            "Wild Cat 3",                                               MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS ) // decryption partially wrong, needs soft resets before running. Bad PROM decode
 GAMEL( 199?, animalw,    0,        lucky8,   animalw,  wingco_state,   empty_init,     ROT0, "bootleg",           "Animal Wonders (ver A900)",                                MACHINE_NOT_WORKING,   layout_lucky8 )    // inputs / DIPs need to be checked
 GAMEL( 1989, cb2,        0,        lucky8,   lucky8,   wingco_state,   init_cb2,       ROT0, "Dyna",              "Cherry Bonus II (V2.00 06/01)",                            MACHINE_NOT_WORKING,   layout_lucky8 )    // I/O need to be checked, seems reasonably working
-GAMEL( 1990, cbaai,      0,        lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "Dyna",              "Cherry Bonus (A.A.I. bootleg)",                            MACHINE_NOT_WORKING,   layout_lucky8 )    // jumps to 0xf430 but there's nothing there?
+GAMEL( 1990, cbaai,      0,        lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "bootleg (A.A.I.)",  "Cherry Bonus (A.A.I. bootleg)",                            MACHINE_NOT_WORKING,   layout_lucky8 )    // jumps to 0xf430 but there's nothing there?
+GAMEL( 199?, ttactoe,    0,        lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "bootleg (Sundance)","Tic Tac Toe (Sundance bootleg of New Lucky 8 Lines)",      MACHINE_NOT_WORKING,   layout_lucky8 )    // I/O need to be checked, seems reasonably working
 
 GAME(  1985, luckylad,   0,        luckylad, luckylad, wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "Lucky Lady (Wing, encrypted)",                             MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS )  // controls / dips, colors not correctly decoded
 GAME(  1991, megaline,   0,        megaline, megaline, unkch_state,    empty_init,     ROT0, "Fun World",         "Mega Lines",                                               MACHINE_NOT_WORKING )
