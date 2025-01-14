@@ -1156,7 +1156,7 @@ void drcbe_x86::shift_op_param(Assembler &a, Inst::Id const opcode, size_t opsiz
 		if (update_flags)
 			a.clc(); // throw away carry since it'll never be used
 
-		a.jmp(end);
+		a.short_().jmp(end);
 
 		a.bind(calc);
 
@@ -2181,7 +2181,7 @@ void drcbe_x86::emit_rcl_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 	a.lea(ecx, ptr(ecx, -1));
 	a.rcl(reglo, 1);
 	a.rcl(reghi, 1);
-	a.jmp(loop);
+	a.short_().jmp(loop);
 
 	a.bind(skiploop);
 	reset_last_upper_lower_reg();
@@ -2239,7 +2239,7 @@ void drcbe_x86::emit_rcr_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 	a.lea(ecx, ptr(ecx, -1));
 	a.rcr(reghi, 1);
 	a.rcr(reglo, 1);
-	a.jmp(loop);
+	a.short_().jmp(loop);
 
 	a.bind(skiploop);
 	reset_last_upper_lower_reg();
@@ -5433,7 +5433,7 @@ void drcbe_x86::op_lzcnt(Assembler &a, const instruction &inst)
 		a.jz(skip);
 		a.xor_(edx, 31 ^ 63);
 		a.mov(dstreg, edx);
-		a.jmp(end);
+		a.short_().jmp(end);
 
 		a.bind(skip);
 		a.mov(edx, 64 ^ 63);

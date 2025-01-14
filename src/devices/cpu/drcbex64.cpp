@@ -1197,7 +1197,7 @@ void drcbe_x64::shift_op_param(Assembler &a, Inst::Id const opcode, size_t opsiz
 		if (update_flags)
 			a.clc(); // throw away carry since it'll never be used
 
-		a.jmp(end);
+		a.short_().jmp(end);
 
 		a.bind(calc);
 
