@@ -911,7 +911,7 @@ drcbe_arm64::drcbe_arm64(drcuml_state &drcuml, device_t &device, drc_cache &cach
 	auto const resolve_accessor =
 			[] (resolved_handler &handler, address_space &space, auto accessor)
 			{
-				auto const [entrypoint, adjusted] = util::resolve_member_function(accessor, &space);
+				auto const [entrypoint, adjusted] = util::resolve_member_function(accessor, space);
 				handler.func = reinterpret_cast<uint8_t *>(entrypoint);
 				handler.obj = adjusted;
 			};

@@ -2173,11 +2173,11 @@ void drcbe_x86::emit_rcl_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 	a.and_(ecx, 63);
 	a.popfd();
 
-	a.jecxz(skipall);
+	a.short_().jecxz(skipall);
 	a.lea(ecx, ptr(ecx, -1));
 
 	a.bind(loop);
-	a.jecxz(skiploop);
+	a.short_().jecxz(skiploop);
 	a.lea(ecx, ptr(ecx, -1));
 	a.rcl(reglo, 1);
 	a.rcl(reghi, 1);
@@ -2231,11 +2231,11 @@ void drcbe_x86::emit_rcr_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 	a.and_(ecx, 63);
 	a.popfd();
 
-	a.jecxz(skipall);
+	a.short_().jecxz(skipall);
 	a.lea(ecx, ptr(ecx, -1));
 
 	a.bind(loop);
-	a.jecxz(skiploop);
+	a.short_().jecxz(skiploop);
 	a.lea(ecx, ptr(ecx, -1));
 	a.rcr(reghi, 1);
 	a.rcr(reglo, 1);
@@ -2674,9 +2674,9 @@ void drcbe_x86::op_jmp(Assembler &a, const instruction &inst)
 		jmptarget = a.newNamedLabel(labelName.c_str());
 
 	if (inst.condition() == uml::COND_ALWAYS)
-		a.jmp(jmptarget);                                                               // jmp   target
+		a.jmp(jmptarget);
 	else
-		a.j(X86_CONDITION(inst.condition()), jmptarget);                                // jcc   target
+		a.j(X86_CONDITION(inst.condition()), jmptarget);
 }
 
 
@@ -2774,7 +2774,7 @@ void drcbe_x86::op_ret(Assembler &a, const instruction &inst)
 	if (inst.condition() != uml::COND_ALWAYS)
 	{
 		skip = a.newLabel();
-		a.j(X86_NOT_CONDITION(inst.condition()), skip);                                 // jcc   skip
+		a.short_().j(X86_NOT_CONDITION(inst.condition()), skip);
 	}
 
 	// return
@@ -2811,17 +2811,17 @@ void drcbe_x86::op_callc(Assembler &a, const instruction &inst)
 	if (inst.condition() != uml::COND_ALWAYS)
 	{
 		skip = a.newLabel();
-		a.j(X86_NOT_CONDITION(inst.condition()), skip);                                 // jcc   skip
+		a.short_().j(X86_NOT_CONDITION(inst.condition()), skip);
 	}
 
 	// perform the call
-	a.mov(dword_ptr(esp, 0), imm(paramp.memory()));                                     // mov   [esp],paramp
-	a.call(imm(funcp.cfunc()));                                                         // call  funcp
+	a.mov(dword_ptr(esp, 0), imm(paramp.memory()));
+	a.call(imm(funcp.cfunc()));
 
 	// resolve the conditional link
 	if (inst.condition() != uml::COND_ALWAYS)
 	{
-		a.bind(skip);                                                               // skip:
+		a.bind(skip);
 		reset_last_upper_lower_reg();
 	}
 }
@@ -3738,7 +3738,7 @@ void drcbe_x86::op_carry(Assembler &a, const instruction &inst)
 			Label higher = a.newLabel();
 
 			a.cmp(ecx, 32);
-			a.jge(higher);
+			a.short_().jge(higher);
 
 			if (srcp.is_memory())
 			{
@@ -4795,7 +4795,7 @@ void drcbe_x86::op_divu(Assembler &a, const instruction &inst)
 			a.add(eax, eax);                                                            // add   eax,eax
 		}
 		Label skip = a.newLabel();
-		a.jecxz(skip);                                                                  // jecxz skip
+		a.short_().jecxz(skip);                                                                  // jecxz skip
 		emit_mov_r32_p32(a, eax, src1p);                                                // mov   eax,src1p
 		a.xor_(edx, edx);                                                               // xor   edx,edx
 		a.div(ecx);                                                                     // div   ecx
@@ -4866,7 +4866,7 @@ void drcbe_x86::op_divs(Assembler &a, const instruction &inst)
 			a.add(eax, eax);                                                            // add   eax,eax
 		}
 		Label skip = a.newLabel();
-		a.jecxz(skip);                                                                  // jecxz skip
+		a.short_().jecxz(skip);                                                                  // jecxz skip
 		emit_mov_r32_p32(a, eax, src1p);                                                // mov   eax,src1p
 		a.cdq();                                                                        // cdq
 		a.idiv(ecx);                                                                    // idiv  ecx
@@ -5430,7 +5430,7 @@ void drcbe_x86::op_lzcnt(Assembler &a, const instruction &inst)
 		Label end = a.newLabel();
 
 		a.bsr(edx, edx);
-		a.jz(skip);
+		a.short_().jz(skip);
 		a.xor_(edx, 31 ^ 63);
 		a.mov(dstreg, edx);
 		a.short_().jmp(end);
@@ -5494,7 +5494,7 @@ void drcbe_x86::op_tzcnt(Assembler &a, const instruction &inst)
 		Label skip = a.newLabel();
 		emit_mov_r64_p64(a, dstreg, edx, srcp);                                         // mov   dstreg:edx,srcp
 		a.bsf(dstreg, dstreg);                                                          // bsf   dstreg,dstreg
-		a.jnz(skip);                                                                    // jnz   skip
+		a.short_().jnz(skip);                                                                    // jnz   skip
 		a.mov(ecx, 32);                                                                 // mov   ecx,32
 		a.bsf(dstreg, edx);                                                             // bsf   dstreg,edx
 		a.cmovz(dstreg, ecx);                                                           // cmovz dstreg,ecx
@@ -6126,21 +6126,21 @@ void drcbe_x86::op_fmov(Assembler &a, const instruction &inst)
 	if (inst.condition() != uml::COND_ALWAYS)
 	{
 		skip = a.newLabel();
-		a.j(X86_NOT_CONDITION(inst.condition()), skip);                                 // jcc   skip
+		a.short_().j(X86_NOT_CONDITION(inst.condition()), skip);
 	}
 
 	// general case
-	a.mov(eax, MABS(srcp.memory(0)));                                                   // mov   eax,[srcp]
+	a.mov(eax, MABS(srcp.memory(0)));
 	if (inst.size() == 8)
-		a.mov(edx, MABS(srcp.memory(4)));                                               // mov   edx,[srcp + 4]
-	a.mov(MABS(dstp.memory(0)), eax);                                                   // mov   [dstp],eax
+		a.mov(edx, MABS(srcp.memory(4)));
+	a.mov(MABS(dstp.memory(0)), eax);
 	if (inst.size() == 8)
-		a.mov(MABS(dstp.memory(4)), edx);                                               // mov   [dstp + 4],edx
+		a.mov(MABS(dstp.memory(4)), edx);
 
 	// resolve the jump
 	if (inst.condition() != uml::COND_ALWAYS)
 	{
-		a.bind(skip);                                                               // skip:
+		a.bind(skip);
 		reset_last_upper_lower_reg();
 	}
 }

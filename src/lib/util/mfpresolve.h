@@ -42,18 +42,18 @@ inline T bypass_member_function_thunks(T entrypoint, U const *object) noexcept
 
 
 template <typename T, typename Ret, typename... Params>
-inline std::pair<std::uintptr_t, std::uintptr_t> resolve_member_function(Ret (T::*function)(Params...), T *object) noexcept
+inline std::pair<std::uintptr_t, std::uintptr_t> resolve_member_function(Ret (T::*function)(Params...), T &object) noexcept
 {
 	if (MAME_ABI_CXX_TYPE == MAME_ABI_CXX_ITANIUM)
 	{
 		struct { std::uintptr_t ptr; std::ptrdiff_t adj; } equiv;
 		assert(sizeof(function) == sizeof(equiv));
 		*reinterpret_cast<decltype(function) *>(&equiv) = function;
-		return detail::resolve_member_function_itanium(equiv.ptr, equiv.adj, object);
+		return detail::resolve_member_function_itanium(equiv.ptr, equiv.adj, &object);
 	}
 	else if (MAME_ABI_CXX_TYPE == MAME_ABI_CXX_MSVC)
 	{
-		return detail::resolve_member_function_msvc(&function, sizeof(function), object);
+		return detail::resolve_member_function_msvc(&function, sizeof(function), &object);
 	}
 	else
 	{
@@ -63,18 +63,18 @@ inline std::pair<std::uintptr_t, std::uintptr_t> resolve_member_function(Ret (T:
 
 
 template <typename T, typename Ret, typename... Params>
-inline std::pair<std::uintptr_t, std::uintptr_t> resolve_member_function(Ret (T::*function)(Params...) const, T const *object) noexcept
+inline std::pair<std::uintptr_t, std::uintptr_t> resolve_member_function(Ret (T::*function)(Params...) const, T const &object) noexcept
 {
 	if (MAME_ABI_CXX_TYPE == MAME_ABI_CXX_ITANIUM)
 	{
 		struct { std::uintptr_t ptr; std::ptrdiff_t adj; } equiv;
 		assert(sizeof(function) == sizeof(equiv));
 		*reinterpret_cast<decltype(function) *>(&equiv) = function;
-		return detail::resolve_member_function_itanium(equiv.ptr, equiv.adj, object);
+		return detail::resolve_member_function_itanium(equiv.ptr, equiv.adj, &object);
 	}
 	else if (MAME_ABI_CXX_TYPE == MAME_ABI_CXX_MSVC)
 	{
-		return detail::resolve_member_function_msvc(&function, sizeof(function), object);
+		return detail::resolve_member_function_msvc(&function, sizeof(function), &object);
 	}
 	else
 	{
