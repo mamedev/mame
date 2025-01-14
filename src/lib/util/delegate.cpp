@@ -72,7 +72,7 @@ const delegate_mfp_compatible::raw_mfp_data delegate_mfp_compatible::s_null_mfp 
 
 delegate_generic_function delegate_mfp_itanium::convert_to_generic(delegate_generic_class *&object) const
 {
-	auto const [entrypoint, adjusted] = detail::resolve_member_function_itanium(m_function, m_this_delta, object);
+	auto const [entrypoint, adjusted] = resolve_member_function_itanium(m_function, m_this_delta, object);
 	object = reinterpret_cast<delegate_generic_class *>(adjusted);
 	return reinterpret_cast<delegate_generic_function>(entrypoint);
 }
@@ -87,7 +87,7 @@ delegate_generic_function delegate_mfp_itanium::convert_to_generic(delegate_gene
 
 delegate_generic_function delegate_mfp_msvc::adjust_this_pointer(delegate_generic_class *&object) const
 {
-	auto const [entrypoint, adjusted] = detail::resolve_member_function_msvc(&m_function, m_size, object);
+	auto const [entrypoint, adjusted] = resolve_member_function_msvc(&m_function, m_size, object);
 	object = reinterpret_cast<delegate_generic_class *>(adjusted);
 	return reinterpret_cast<delegate_generic_function>(entrypoint);
 }
