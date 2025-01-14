@@ -6708,9 +6708,9 @@ int drcbe_x86::dmulu(uint64_t &dstlo, uint64_t &dsthi, uint64_t src1, uint64_t s
 	dstlo = lo;
 
 	if (halfmul_flags)
-		return ((lo >> 60) & FLAG_S) | ((hi != 0) << 1);
+		return ((lo >> 60) & FLAG_S) | ((hi != 0) << 1) | ((dstlo == 0) << 2);
 
-	return ((hi >> 60) & FLAG_S) | ((hi != 0) << 1);
+	return ((hi >> 60) & FLAG_S) | ((hi != 0) << 1) | ((dsthi == 0 && dstlo == 0) << 2);
 }
 
 
@@ -6766,9 +6766,9 @@ int drcbe_x86::dmuls(uint64_t &dstlo, uint64_t &dsthi, int64_t src1, int64_t src
 	dstlo = lo;
 
 	if (halfmul_flags)
-		return ((lo >> 60) & FLAG_S) | ((hi != ((int64_t)lo >> 63)) << 1);
+		return ((lo >> 60) & FLAG_S) | ((hi != ((int64_t)lo >> 63)) << 1) | ((dstlo == 0) << 2);
 
-	return ((hi >> 60) & FLAG_S) | ((hi != ((int64_t)lo >> 63)) << 1);
+	return ((hi >> 60) & FLAG_S) | ((hi != ((int64_t)lo >> 63)) << 1) | ((dsthi == 0 && dstlo == 0) << 2);
 }
 
 
