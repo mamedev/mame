@@ -167,18 +167,7 @@ private:
 
 
 	// helper functions
-	asmjit::a64::Vec select_register(asmjit::a64::Vec const &reg, uint32_t regsize) const;
-	asmjit::a64::Gp select_register(asmjit::a64::Gp const &reg, uint32_t regsize) const;
-
-	static bool is_valid_immediate(uint64_t val, size_t bits);
-	static bool is_valid_immediate_signed(int64_t val, size_t bits);
-	static bool is_valid_immediate_mask(uint64_t val, size_t bytes);
-
-	asmjit::arm::Mem get_mem_absolute(asmjit::a64::Assembler &a, const void *ptr) const;
 	void get_imm_relative(asmjit::a64::Assembler &a, const asmjit::a64::Gp &reg, const uint64_t ptr) const;
-
-	bool emit_add_optimized(asmjit::a64::Assembler &a, const asmjit::a64::Gp &dst, const asmjit::a64::Gp &src, int64_t val) const;
-	bool emit_sub_optimized(asmjit::a64::Assembler &a, const asmjit::a64::Gp &dst, const asmjit::a64::Gp &src, int64_t val) const;
 
 	void emit_ldr_str_base_mem(asmjit::a64::Assembler &a, asmjit::a64::Inst::Id opcode, const asmjit::a64::Reg &reg, const void *ptr) const;
 	void emit_ldr_mem(asmjit::a64::Assembler &a, const asmjit::a64::Gp &reg, const void *ptr) const;
@@ -202,8 +191,6 @@ private:
 	void store_unordered(asmjit::a64::Assembler &a) const;
 	void get_unordered(asmjit::a64::Assembler &a, const asmjit::a64::Gp &reg) const;
 	void check_unordered_condition(asmjit::a64::Assembler &a, uml::condition_t cond, asmjit::Label condition_met, bool not_equal) const;
-
-	void get_shifted_bit(asmjit::a64::Assembler &a, const asmjit::a64::Gp &dst, const asmjit::a64::Gp &src, uint32_t bits, uint32_t shift) const;
 
 	void calculate_carry_shift_left(asmjit::a64::Assembler &a, const asmjit::a64::Gp &reg, const asmjit::a64::Gp &shift, int maxBits) const;
 	void calculate_carry_shift_left_imm(asmjit::a64::Assembler &a, const asmjit::a64::Gp &reg, const int shift, int maxBits) const;
@@ -238,9 +225,6 @@ private:
 
 	struct near_state
 	{
-		void *debug_cpu_instruction_hook;
-		void *drcmap_get_value;
-
 		uint32_t emulated_flags;
 	};
 	near_state &m_near;
@@ -254,33 +238,12 @@ private:
 	static const opcode_table_entry s_opcode_table_source[];
 	static opcode_generate_func s_opcode_table[uml::OP_MAX];
 
-	struct resolved_handler { uintptr_t obj = 0; void *func = nullptr; };
-	struct resolved_accessors
-	{
-
-		resolved_handler read_byte;
-		resolved_handler read_byte_masked;
-		resolved_handler read_word;
-		resolved_handler read_word_masked;
-		resolved_handler read_dword;
-		resolved_handler read_dword_masked;
-		resolved_handler read_qword;
-		resolved_handler read_qword_masked;
-
-		resolved_handler write_byte;
-		resolved_handler write_byte_masked;
-		resolved_handler write_word;
-		resolved_handler write_word_masked;
-		resolved_handler write_dword;
-		resolved_handler write_dword_masked;
-		resolved_handler write_qword;
-		resolved_handler write_qword_masked;
-	};
-	using resolved_accessors_vector = std::vector<resolved_accessors>;
-	resolved_accessors_vector m_resolved_accessors;
+	resolved_member_function m_debug_cpu_instruction_hook;
+	resolved_member_function m_drcmap_get_value;
+	resolved_memory_accessors_vector m_resolved_accessors;
 };
 
-}
+} // namespace drc
 
 using drc::drcbe_arm64;
 

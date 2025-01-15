@@ -1,5 +1,76 @@
 // license:BSD-3-Clause
 // copyright-holders:windyfairy
+/***************************************************************************
+
+Register use:
+
+r0      first function parameter/return value
+r1      second function parameter
+r2      third function parameter
+r3      fourth function parameter
+r4
+r5
+r6
+r7
+r8
+r9      temporary for intermediate values
+r10     temporary for intermediate values
+r11     temporary for intermediate values
+r12     scratch register used by helper functions
+r13     scratch register used by helper functions
+r14     scratch register used for address calculation
+r15     temporary used in opcode functions
+r16
+r17
+r18
+r19     UML register I0
+r20     UML register I1
+r21     UML register I2
+r22     UML register I3
+r23     UML register I4
+r24     UML register I5
+r35     UML register I6
+r26     UML register I7
+r27     near cache pointer
+r28     emulated flags
+r29     base generated code frame pointer
+r30     link register
+sp      stack pointer
+
+
+Stack layout in top-level generated code frame:
+
+FP -> SP + 0x00  previous FP
+      SP + 0x08  top-level return address
+      SP + 0x10  saved non-volatile registers
+      SP + 0x18  ...
+
+Stack layout in nested generated code subroutine call frame:
+
+SP -> SP + 0x00  previous FP
+      SP + 0x08  return address
+      ...
+      FP - 0x10  previous FP
+      FP - 0x08  return address
+FP -> FP + 0x00  previous FP
+      FP + 0x08  top-level return address
+
+The frame pointer (FP or x29) is only updated by the top-level generated
+code entry point.  Generated code subroutines (called using CALLH, EXH or
+on a failed HASHJMP) push FP and LR onto the stack but do not update FP.
+All the saved FP values will be identical.
+
+A native debugger following the FP chain will see any number of nested
+generated code subroutine call frames as a single stack frame.  The return
+addresses and duplicate saved FP values for the generated code subroutine
+calls will appear as the local variable area of the frame.
+
+You can calculate the generated code subroutine call depth as
+(FP - SP) / 0x10.  You can see the return addresses for the generated code
+subroutine calls at SP + 0x08, SP + 0x18, SP + 0x28, etc. until reaching
+the location FP points to.
+
+***************************************************************************/
 
 #include "emu.h"
 #include "drcbearm64.h"
@@ -7,8 +78,6 @@
 #include "debug/debugcpu.h"
 #include "emuopts.h"
 #include "uml.h"
-
-#include "mfpresolve.h"
 
 #include <cstddef>
 
@@ -44,11 +113,11 @@ const a64::Gp TEMP_REG3 = a64::x11;
 const a64::Gp SCRATCH_REG1 = a64::x12;
 const a64::Gp SCRATCH_REG2 = a64::x13;
 
-// Only to be used in an opcode level function. Should not be used in helper functions
-const a64::Gp FUNC_SCRATCH_REG = a64::x15;
-
 // Temporary memory calculation register, should not be used outside of functions that calculate memory addresses
 const a64::Gp MEM_SCRATCH_REG = a64::x14;
+
+// Only to be used in an opcode level function. Should not be used in helper functions
+const a64::Gp FUNC_SCRATCH_REG = a64::x15;
 
 const a64::Vec TEMPF_REG1 = a64::d16;
 const a64::Vec TEMPF_REG2 = a64::d17;
@@ -124,6 +193,111 @@ public:
 	}
 };
 
+
+// helper functions
+
+a64::Vec select_register(a64::Vec const &reg, uint32_t regsize)
+{
+	if (regsize == 4)
+		return reg.s();
+	return reg.d();
+}
+
+a64::Gp select_register(a64::Gp const &reg, uint32_t regsize)
+{
+	if (regsize == 4)
+		return reg.w();
+	return reg.x();
+}
+
+bool is_valid_immediate_mask(uint64_t val, size_t bytes)
+{
+	// all zeros and all ones aren't allowed, and disallow any value with bits outside of the max bit range
+	if (val == 0 || val == make_bitmask<uint64_t>(bytes * 8))
+		return false;
+
+	uint32_t head = 64 - count_leading_zeros_64(val);
+	if (head >= (bytes * 8))
+		return false;
+
+	uint32_t tail = 0;
+	while (tail < head)
+	{
+		if (BIT(val, tail))
+			break;
+		tail++;
+	}
+
+	return population_count_64(val) == head - tail;
+}
+
+bool is_valid_immediate(uint64_t val, size_t bits)
+{
+	assert(bits < 64);
+	return val < (uint64_t(1) << bits);
+}
+
+bool is_valid_immediate_signed(int64_t val, size_t bits)
+{
+	return util::sext(val, bits) == val;
+}
+
+bool emit_add_optimized(a64::Assembler &a, const a64::Gp &dst, const a64::Gp &src, int64_t val)
+{
+	// If the bottom 12 bits are 0s then an optimized form can be used if the remaining bits are <= 12
+	if (is_valid_immediate(val, 12) || ((val & 0xfff) == 0 && is_valid_immediate(val >> 12, 12)))
+	{
+		a.add(dst, src, val);
+		return true;
+	}
+
+	return false;
+}
+
+bool emit_sub_optimized(a64::Assembler &a, const a64::Gp &dst, const a64::Gp &src, int64_t val)
+{
+	if (val < 0)
+		val = -val;
+
+	// If the bottom 12 bits are 0s then an optimized form can be used if the remaining bits are <= 12
+	if (is_valid_immediate(val, 12) || ((val & 0xfff) == 0 && is_valid_immediate(val >> 12, 12)))
+	{
+		a.sub(dst, src, val);
+		return true;
+	}
+
+	return false;
+}
+
+arm::Mem get_mem_absolute(a64::Assembler &a, const void *ptr)
+{
+	const uint64_t codeoffs = a.code()->baseAddress() + a.offset();
+	const int64_t reloffs = codeoffs - (int64_t)ptr;
+	if (is_valid_immediate_signed(reloffs, 21))
+	{
+		a.adr(MEM_SCRATCH_REG, ptr);
+		return arm::Mem(MEM_SCRATCH_REG);
+	}
+
+	const uint64_t pagebase = codeoffs & ~make_bitmask<uint64_t>(12);
+	const int64_t pagerel = (int64_t)ptr - pagebase;
+	if (is_valid_immediate_signed(pagerel, 33))
+	{
+		const uint64_t targetpage = (uint64_t)ptr & ~make_bitmask<uint64_t>(12);
+		const uint64_t pageoffs = (uint64_t)ptr & util::make_bitmask<uint64_t>(12);
+
+		a.adrp(MEM_SCRATCH_REG, targetpage);
+
+		if (is_valid_immediate_signed(pageoffs, 9))
+			return arm::Mem(MEM_SCRATCH_REG, pageoffs);
+		else if (emit_add_optimized(a, MEM_SCRATCH_REG, MEM_SCRATCH_REG, pageoffs))
+			return arm::Mem(MEM_SCRATCH_REG);
+	}
+
+	a.mov(MEM_SCRATCH_REG, ptr);
+	return arm::Mem(MEM_SCRATCH_REG);
+}
+
 } // anonymous namespace
 
 
@@ -161,67 +335,67 @@ const drcbe_arm64::opcode_table_entry drcbe_arm64::s_opcode_table_source[] =
 	{ uml::OP_RESTORE, &drcbe_arm64::op_restore },    // RESTORE dst
 
 	// Integer Operations
-	{ uml::OP_LOAD,    &drcbe_arm64::op_load },       // LOAD    dst,base,index,size
-	{ uml::OP_LOADS,   &drcbe_arm64::op_loads },      // LOADS   dst,base,index,size
-	{ uml::OP_STORE,   &drcbe_arm64::op_store },      // STORE   base,index,src,size
-	{ uml::OP_READ,    &drcbe_arm64::op_read },       // READ    dst,src1,spacesize
-	{ uml::OP_READM,   &drcbe_arm64::op_readm },      // READM   dst,src1,mask,spacesize
-	{ uml::OP_WRITE,   &drcbe_arm64::op_write },      // WRITE   dst,src1,spacesize
-	{ uml::OP_WRITEM,  &drcbe_arm64::op_writem },     // WRITEM  dst,src1,spacesize
-	{ uml::OP_CARRY,   &drcbe_arm64::op_carry },      // CARRY   src,bitnum
-	{ uml::OP_SET,     &drcbe_arm64::op_set },        // SET     dst,c
-	{ uml::OP_MOV,     &drcbe_arm64::op_mov },        // MOV     dst,src[,c]
-	{ uml::OP_SEXT,    &drcbe_arm64::op_sext },       // SEXT    dst,src
-	{ uml::OP_ROLAND,  &drcbe_arm64::op_roland },     // ROLAND  dst,src1,src2,src3
-	{ uml::OP_ROLINS,  &drcbe_arm64::op_rolins },     // ROLINS  dst,src1,src2,src3
-	{ uml::OP_ADD,     &drcbe_arm64::op_add<a64::Inst::kIdAdds> },       // ADD     dst,src1,src2[,f]
-	{ uml::OP_ADDC,    &drcbe_arm64::op_add<a64::Inst::kIdAdcs> },       // ADDC    dst,src1,src2[,f]
-	{ uml::OP_SUB,     &drcbe_arm64::op_sub<a64::Inst::kIdSubs> },       // SUB     dst,src1,src2[,f]
-	{ uml::OP_SUBB,    &drcbe_arm64::op_sub<a64::Inst::kIdSbcs> },       // SUBB    dst,src1,src2[,f]
-	{ uml::OP_CMP,     &drcbe_arm64::op_cmp },        // CMP     src1,src2[,f]
-	{ uml::OP_MULU,    &drcbe_arm64::op_mulu },       // MULU    dst,edst,src1,src2[,f]
-	{ uml::OP_MULULW,  &drcbe_arm64::op_mululw },     // MULULW   dst,src1,src2[,f]
-	{ uml::OP_MULS,    &drcbe_arm64::op_muls },       // MULS    dst,edst,src1,src2[,f]
-	{ uml::OP_MULSLW,  &drcbe_arm64::op_mulslw },     // MULSLW   dst,src1,src2[,f]
-	{ uml::OP_DIVU,    &drcbe_arm64::op_div<a64::Inst::kIdUdiv> },       // DIVU    dst,edst,src1,src2[,f]
-	{ uml::OP_DIVS,    &drcbe_arm64::op_div<a64::Inst::kIdSdiv> },       // DIVS    dst,edst,src1,src2[,f]
-	{ uml::OP_AND,     &drcbe_arm64::op_and },        // AND     dst,src1,src2[,f]
-	{ uml::OP_TEST,    &drcbe_arm64::op_test },       // TEST    src1,src2[,f]
-	{ uml::OP_OR,      &drcbe_arm64::op_or },         // OR      dst,src1,src2[,f]
-	{ uml::OP_XOR,     &drcbe_arm64::op_xor },        // XOR     dst,src1,src2[,f]
-	{ uml::OP_LZCNT,   &drcbe_arm64::op_lzcnt },      // LZCNT   dst,src[,f]
-	{ uml::OP_TZCNT,   &drcbe_arm64::op_tzcnt },      // TZCNT   dst,src[,f]
-	{ uml::OP_BSWAP,   &drcbe_arm64::op_bswap },      // BSWAP   dst,src
-	{ uml::OP_SHL,     &drcbe_arm64::op_shift<a64::Inst::kIdLsl> },        // SHL     dst,src,count[,f]
-	{ uml::OP_SHR,     &drcbe_arm64::op_shift<a64::Inst::kIdLsr> },        // SHR     dst,src,count[,f]
-	{ uml::OP_SAR,     &drcbe_arm64::op_shift<a64::Inst::kIdAsr> },        // SAR     dst,src,count[,f]
-	{ uml::OP_ROL,     &drcbe_arm64::op_rol },           // ROL     dst,src,count[,f]
-	{ uml::OP_ROLC,    &drcbe_arm64::op_rolc },          // ROLC    dst,src,count[,f]
+	{ uml::OP_LOAD,    &drcbe_arm64::op_load },                     // LOAD    dst,base,index,size
+	{ uml::OP_LOADS,   &drcbe_arm64::op_loads },                    // LOADS   dst,base,index,size
+	{ uml::OP_STORE,   &drcbe_arm64::op_store },                    // STORE   base,index,src,size
+	{ uml::OP_READ,    &drcbe_arm64::op_read },                     // READ    dst,src1,spacesize
+	{ uml::OP_READM,   &drcbe_arm64::op_readm },                    // READM   dst,src1,mask,spacesize
+	{ uml::OP_WRITE,   &drcbe_arm64::op_write },                    // WRITE   dst,src1,spacesize
+	{ uml::OP_WRITEM,  &drcbe_arm64::op_writem },                   // WRITEM  dst,src1,spacesize
+	{ uml::OP_CARRY,   &drcbe_arm64::op_carry },                    // CARRY   src,bitnum
+	{ uml::OP_SET,     &drcbe_arm64::op_set },                      // SET     dst,c
+	{ uml::OP_MOV,     &drcbe_arm64::op_mov },                      // MOV     dst,src[,c]
+	{ uml::OP_SEXT,    &drcbe_arm64::op_sext },                     // SEXT    dst,src
+	{ uml::OP_ROLAND,  &drcbe_arm64::op_roland },                   // ROLAND  dst,src1,src2,src3
+	{ uml::OP_ROLINS,  &drcbe_arm64::op_rolins },                   // ROLINS  dst,src1,src2,src3
+	{ uml::OP_ADD,     &drcbe_arm64::op_add<a64::Inst::kIdAdds> },  // ADD     dst,src1,src2[,f]
+	{ uml::OP_ADDC,    &drcbe_arm64::op_add<a64::Inst::kIdAdcs> },  // ADDC    dst,src1,src2[,f]
+	{ uml::OP_SUB,     &drcbe_arm64::op_sub<a64::Inst::kIdSubs> },  // SUB     dst,src1,src2[,f]
+	{ uml::OP_SUBB,    &drcbe_arm64::op_sub<a64::Inst::kIdSbcs> },  // SUBB    dst,src1,src2[,f]
+	{ uml::OP_CMP,     &drcbe_arm64::op_cmp },                      // CMP     src1,src2[,f]
+	{ uml::OP_MULU,    &drcbe_arm64::op_mulu },                     // MULU    dst,edst,src1,src2[,f]
+	{ uml::OP_MULULW,  &drcbe_arm64::op_mululw },                   // MULULW   dst,src1,src2[,f]
+	{ uml::OP_MULS,    &drcbe_arm64::op_muls },                     // MULS    dst,edst,src1,src2[,f]
+	{ uml::OP_MULSLW,  &drcbe_arm64::op_mulslw },                   // MULSLW   dst,src1,src2[,f]
+	{ uml::OP_DIVU,    &drcbe_arm64::op_div<a64::Inst::kIdUdiv> },  // DIVU    dst,edst,src1,src2[,f]
+	{ uml::OP_DIVS,    &drcbe_arm64::op_div<a64::Inst::kIdSdiv> },  // DIVS    dst,edst,src1,src2[,f]
+	{ uml::OP_AND,     &drcbe_arm64::op_and },                      // AND     dst,src1,src2[,f]
+	{ uml::OP_TEST,    &drcbe_arm64::op_test },                     // TEST    src1,src2[,f]
+	{ uml::OP_OR,      &drcbe_arm64::op_or },                       // OR      dst,src1,src2[,f]
+	{ uml::OP_XOR,     &drcbe_arm64::op_xor },                      // XOR     dst,src1,src2[,f]
+	{ uml::OP_LZCNT,   &drcbe_arm64::op_lzcnt },                    // LZCNT   dst,src[,f]
+	{ uml::OP_TZCNT,   &drcbe_arm64::op_tzcnt },                    // TZCNT   dst,src[,f]
+	{ uml::OP_BSWAP,   &drcbe_arm64::op_bswap },                    // BSWAP   dst,src
+	{ uml::OP_SHL,     &drcbe_arm64::op_shift<a64::Inst::kIdLsl> }, // SHL     dst,src,count[,f]
+	{ uml::OP_SHR,     &drcbe_arm64::op_shift<a64::Inst::kIdLsr> }, // SHR     dst,src,count[,f]
+	{ uml::OP_SAR,     &drcbe_arm64::op_shift<a64::Inst::kIdAsr> }, // SAR     dst,src,count[,f]
+	{ uml::OP_ROL,     &drcbe_arm64::op_rol },                      // ROL     dst,src,count[,f]
+	{ uml::OP_ROLC,    &drcbe_arm64::op_rolc },                     // ROLC    dst,src,count[,f]
 	{ uml::OP_ROR,     &drcbe_arm64::op_shift<a64::Inst::kIdRor> }, // ROR     dst,src,count[,f]
-	{ uml::OP_RORC,    &drcbe_arm64::op_rorc },          // RORC    dst,src,count[,f]
+	{ uml::OP_RORC,    &drcbe_arm64::op_rorc },                     // RORC    dst,src,count[,f]
 
 	// Floating Point Operations
-	{ uml::OP_FLOAD,   &drcbe_arm64::op_fload },      // FLOAD   dst,base,index
-	{ uml::OP_FSTORE,  &drcbe_arm64::op_fstore },     // FSTORE  base,index,src
-	{ uml::OP_FREAD,   &drcbe_arm64::op_fread },      // FREAD   dst,space,src1
-	{ uml::OP_FWRITE,  &drcbe_arm64::op_fwrite },     // FWRITE  space,dst,src1
-	{ uml::OP_FMOV,    &drcbe_arm64::op_fmov },       // FMOV    dst,src1[,c]
-	{ uml::OP_FTOINT,  &drcbe_arm64::op_ftoint },     // FTOINT  dst,src1,size,round
-	{ uml::OP_FFRINT,  &drcbe_arm64::op_ffrint },     // FFRINT  dst,src1,size
-	{ uml::OP_FFRFLT,  &drcbe_arm64::op_ffrflt },     // FFRFLT  dst,src1,size
-	{ uml::OP_FRNDS,   &drcbe_arm64::op_frnds },      // FRNDS   dst,src1
-	{ uml::OP_FADD,    &drcbe_arm64::op_float_alu<a64::Inst::kIdFadd_v> },       // FADD    dst,src1,src2
-	{ uml::OP_FSUB,    &drcbe_arm64::op_float_alu<a64::Inst::kIdFsub_v> },       // FSUB    dst,src1,src2
-	{ uml::OP_FCMP,    &drcbe_arm64::op_fcmp },       // FCMP    src1,src2
-	{ uml::OP_FMUL,    &drcbe_arm64::op_float_alu<a64::Inst::kIdFmul_v> },       // FMUL    dst,src1,src2
-	{ uml::OP_FDIV,    &drcbe_arm64::op_float_alu<a64::Inst::kIdFdiv_v>  },       // FDIV    dst,src1,src2
-	{ uml::OP_FNEG,    &drcbe_arm64::op_float_alu2<a64::Inst::kIdFneg_v> },       // FNEG    dst,src1
-	{ uml::OP_FABS,    &drcbe_arm64::op_float_alu2<a64::Inst::kIdFabs_v> },       // FABS    dst,src1
-	{ uml::OP_FSQRT,   &drcbe_arm64::op_float_alu2<a64::Inst::kIdFsqrt_v> },      // FSQRT   dst,src1
-	{ uml::OP_FRECIP,  &drcbe_arm64::op_float_alu2<a64::Inst::kIdFrecpe_v> },     // FRECIP  dst,src1
-	{ uml::OP_FRSQRT,  &drcbe_arm64::op_float_alu2<a64::Inst::kIdFrsqrte_v> },     // FRSQRT  dst,src1
-	{ uml::OP_FCOPYI,  &drcbe_arm64::op_fcopyi },     // FCOPYI  dst,src
-	{ uml::OP_ICOPYF,  &drcbe_arm64::op_icopyf }      // ICOPYF  dst,src
+	{ uml::OP_FLOAD,   &drcbe_arm64::op_fload },                                // FLOAD   dst,base,index
+	{ uml::OP_FSTORE,  &drcbe_arm64::op_fstore },                               // FSTORE  base,index,src
+	{ uml::OP_FREAD,   &drcbe_arm64::op_fread },                                // FREAD   dst,space,src1
+	{ uml::OP_FWRITE,  &drcbe_arm64::op_fwrite },                               // FWRITE  space,dst,src1
+	{ uml::OP_FMOV,    &drcbe_arm64::op_fmov },                                 // FMOV    dst,src1[,c]
+	{ uml::OP_FTOINT,  &drcbe_arm64::op_ftoint },                               // FTOINT  dst,src1,size,round
+	{ uml::OP_FFRINT,  &drcbe_arm64::op_ffrint },                               // FFRINT  dst,src1,size
+	{ uml::OP_FFRFLT,  &drcbe_arm64::op_ffrflt },                               // FFRFLT  dst,src1,size
+	{ uml::OP_FRNDS,   &drcbe_arm64::op_frnds },                                // FRNDS   dst,src1
+	{ uml::OP_FADD,    &drcbe_arm64::op_float_alu<a64::Inst::kIdFadd_v> },      // FADD    dst,src1,src2
+	{ uml::OP_FSUB,    &drcbe_arm64::op_float_alu<a64::Inst::kIdFsub_v> },      // FSUB    dst,src1,src2
+	{ uml::OP_FCMP,    &drcbe_arm64::op_fcmp },                                 // FCMP    src1,src2
+	{ uml::OP_FMUL,    &drcbe_arm64::op_float_alu<a64::Inst::kIdFmul_v> },      // FMUL    dst,src1,src2
+	{ uml::OP_FDIV,    &drcbe_arm64::op_float_alu<a64::Inst::kIdFdiv_v>  },     // FDIV    dst,src1,src2
+	{ uml::OP_FNEG,    &drcbe_arm64::op_float_alu2<a64::Inst::kIdFneg_v> },     // FNEG    dst,src1
+	{ uml::OP_FABS,    &drcbe_arm64::op_float_alu2<a64::Inst::kIdFabs_v> },     // FABS    dst,src1
+	{ uml::OP_FSQRT,   &drcbe_arm64::op_float_alu2<a64::Inst::kIdFsqrt_v> },    // FSQRT   dst,src1
+	{ uml::OP_FRECIP,  &drcbe_arm64::op_float_alu2<a64::Inst::kIdFrecpe_v> },   // FRECIP  dst,src1
+	{ uml::OP_FRSQRT,  &drcbe_arm64::op_float_alu2<a64::Inst::kIdFrsqrte_v> },  // FRSQRT  dst,src1
+	{ uml::OP_FCOPYI,  &drcbe_arm64::op_fcopyi },                               // FCOPYI  dst,src
+	{ uml::OP_ICOPYF,  &drcbe_arm64::op_icopyf }                                // ICOPYF  dst,src
 };
 
 drcbe_arm64::be_parameter::be_parameter(drcbe_arm64 &drcbe, const parameter &param, uint32_t allowed)
@@ -298,108 +472,6 @@ a64::Gp drcbe_arm64::be_parameter::select_register(a64::Gp const &reg, uint32_t 
 	if (regsize == 4)
 		return reg.w();
 	return reg.x();
-}
-
-a64::Vec drcbe_arm64::select_register(a64::Vec const &reg, uint32_t regsize) const
-{
-	if (regsize == 4)
-		return reg.s();
-	return reg.d();
-}
-
-a64::Gp drcbe_arm64::select_register(a64::Gp const &reg, uint32_t regsize) const
-{
-	if (regsize == 4)
-		return reg.w();
-	return reg.x();
-}
-
-bool drcbe_arm64::is_valid_immediate_mask(uint64_t val, size_t bytes)
-{
-	// all zeros and all ones aren't allowed, and disallow any value with bits outside of the max bit range
-	if (val == 0 || val == make_bitmask<uint64_t>(bytes * 8))
-		return false;
-
-	uint32_t head = 64 - count_leading_zeros_64(val);
-	if (head >= (bytes * 8))
-		return false;
-
-	uint32_t tail = 0;
-	while (tail < head)
-	{
-		if (BIT(val, tail))
-			break;
-		tail++;
-	}
-
-	return population_count_64(val) == head - tail;
-}
-
-bool drcbe_arm64::is_valid_immediate(uint64_t val, size_t bits)
-{
-	assert(bits < 64);
-	return val < (uint64_t(1) << bits);
-}
-
-bool drcbe_arm64::is_valid_immediate_signed(int64_t val, size_t bits)
-{
-	return util::sext(val, bits) == val;
-}
-
-arm::Mem drcbe_arm64::get_mem_absolute(a64::Assembler &a, const void *ptr) const
-{
-	const uint64_t codeoffs = a.code()->baseAddress() + a.offset();
-	const int64_t reloffs = codeoffs - (int64_t)ptr;
-	if (is_valid_immediate_signed(reloffs, 21))
-	{
-		a.adr(MEM_SCRATCH_REG, ptr);
-		return arm::Mem(MEM_SCRATCH_REG);
-	}
-
-	const uint64_t pagebase = codeoffs & ~make_bitmask<uint64_t>(12);
-	const int64_t pagerel = (int64_t)ptr - pagebase;
-	if (is_valid_immediate_signed(pagerel, 33))
-	{
-		const uint64_t targetpage = (uint64_t)ptr & ~make_bitmask<uint64_t>(12);
-		const uint64_t pageoffs = (uint64_t)ptr & util::make_bitmask<uint64_t>(12);
-
-		a.adrp(MEM_SCRATCH_REG, targetpage);
-
-		if (is_valid_immediate_signed(pageoffs, 9))
-			return arm::Mem(MEM_SCRATCH_REG, pageoffs);
-		else if (emit_add_optimized(a, MEM_SCRATCH_REG, MEM_SCRATCH_REG, pageoffs))
-			return arm::Mem(MEM_SCRATCH_REG);
-	}
-
-	a.mov(MEM_SCRATCH_REG, ptr);
-	return arm::Mem(MEM_SCRATCH_REG);
-}
-
-bool drcbe_arm64::emit_add_optimized(a64::Assembler &a, const a64::Gp &dst, const a64::Gp &src, int64_t val) const
-{
-	// If the bottom 12 bits are 0s then an optimized form can be used if the remaining bits are <= 12
-	if (is_valid_immediate(val, 12) || ((val & 0xfff) == 0 && is_valid_immediate(val >> 12, 12)))
-	{
-		a.add(dst, src, val);
-		return true;
-	}
-
-	return false;
-}
-
-bool drcbe_arm64::emit_sub_optimized(a64::Assembler &a, const a64::Gp &dst, const a64::Gp &src, int64_t val) const
-{
-	if (val < 0)
-		val = -val;
-
-	// If the bottom 12 bits are 0s then an optimized form can be used if the remaining bits are <= 12
-	if (is_valid_immediate(val, 12) || ((val & 0xfff) == 0 && is_valid_immediate(val >> 12, 12)))
-	{
-		a.sub(dst, src, val);
-		return true;
-	}
-
-	return false;
 }
 
 void drcbe_arm64::get_imm_relative(a64::Assembler &a, const a64::Gp &reg, const uint64_t ptr) const
@@ -765,7 +837,7 @@ void drcbe_arm64::store_unordered(a64::Assembler &a) const
 
 void drcbe_arm64::get_unordered(a64::Assembler &a, const a64::Gp &reg) const
 {
-	get_shifted_bit(a, reg.x(), FLAGS_REG, 1, 4);
+	a.ubfx(reg.x(), FLAGS_REG, 4, 1);
 }
 
 void drcbe_arm64::store_carry_reg(a64::Assembler &a, const a64::Gp &reg) const
@@ -800,12 +872,6 @@ void drcbe_arm64::load_carry(a64::Assembler &a, bool inverted) const
 		a.eor(SCRATCH_REG1, SCRATCH_REG1, 1 << 29);
 
 	a.msr(a64::Predicate::SysReg::kNZCV, SCRATCH_REG1);
-}
-
-void drcbe_arm64::get_shifted_bit(a64::Assembler &a, const a64::Gp &dst, const a64::Gp &src, uint32_t bits, uint32_t shift) const
-{
-	a.lsr(dst.x(), src.x(), shift);
-	a.and_(dst.x(), dst.x(), bits);
 }
 
 void drcbe_arm64::calculate_carry_shift_left(a64::Assembler &a, const a64::Gp &reg, const a64::Gp &shift, int maxBits) const
@@ -890,11 +956,6 @@ drcbe_arm64::drcbe_arm64(drcuml_state &drcuml, device_t &device, drc_cache &cach
 	, m_baseptr(cache.near() + 0x80)
 	, m_near(*(near_state *)cache.alloc_near(sizeof(m_near)))
 {
-	// get pointers to C functions we need to call
-	using debugger_hook_func = void (*)(device_debug *, offs_t);
-	static const debugger_hook_func debugger_inst_hook = [] (device_debug *dbg, offs_t pc) { dbg->instruction_hook(pc); };
-	m_near.debug_cpu_instruction_hook = (uint8_t *)debugger_inst_hook;
-	m_near.drcmap_get_value = (uint8_t *)&drc_map_variables::static_get_value;
 	m_near.emulated_flags = 0;
 
 	// build the opcode table (static but it doesn't hurt to regenerate it)
@@ -907,38 +968,18 @@ drcbe_arm64::drcbe_arm64(drcuml_state &drcuml, device_t &device, drc_cache &cach
 		m_log_asmjit = fopen(std::string("drcbearm64_asmjit_").append(device.shortname()).append(".asm").c_str(), "w");
 	}
 
-	// resolve the actual addresses of the address space handlers
-	auto const resolve_accessor =
-			[] (resolved_handler &handler, address_space &space, auto accessor)
-			{
-				auto const [entrypoint, adjusted] = util::resolve_member_function(accessor, space);
-				handler.func = reinterpret_cast<uint8_t *>(entrypoint);
-				handler.obj = adjusted;
-			};
-
+	// resolve the actual addresses of member functions we need to call
+	m_drcmap_get_value.set(m_map, &drc_map_variables::get_value);
+	if (!m_drcmap_get_value)
+	{
+		m_drcmap_get_value.obj = uintptr_t(&m_map);
+		m_drcmap_get_value.func = reinterpret_cast<uint8_t *>(uintptr_t(&drc_map_variables::static_get_value));
+	}
 	m_resolved_accessors.resize(m_space.size());
 	for (int space = 0; m_space.size() > space; ++space)
 	{
 		if (m_space[space])
-		{
-			resolve_accessor(m_resolved_accessors[space].read_byte,         *m_space[space], static_cast<u8  (address_space::*)(offs_t)     >(&address_space::read_byte));
-			resolve_accessor(m_resolved_accessors[space].read_byte_masked,  *m_space[space], static_cast<u8  (address_space::*)(offs_t, u8) >(&address_space::read_byte));
-			resolve_accessor(m_resolved_accessors[space].read_word,         *m_space[space], static_cast<u16 (address_space::*)(offs_t)     >(&address_space::read_word));
-			resolve_accessor(m_resolved_accessors[space].read_word_masked,  *m_space[space], static_cast<u16 (address_space::*)(offs_t, u16)>(&address_space::read_word));
-			resolve_accessor(m_resolved_accessors[space].read_dword,        *m_space[space], static_cast<u32 (address_space::*)(offs_t)     >(&address_space::read_dword));
-			resolve_accessor(m_resolved_accessors[space].read_dword_masked, *m_space[space], static_cast<u32 (address_space::*)(offs_t, u32)>(&address_space::read_dword));
-			resolve_accessor(m_resolved_accessors[space].read_qword,        *m_space[space], static_cast<u64 (address_space::*)(offs_t)     >(&address_space::read_qword));
-			resolve_accessor(m_resolved_accessors[space].read_qword_masked, *m_space[space], static_cast<u64 (address_space::*)(offs_t, u64)>(&address_space::read_qword));
-
-			resolve_accessor(m_resolved_accessors[space].write_byte,         *m_space[space], static_cast<void (address_space::*)(offs_t, u8)      >(&address_space::write_byte));
-			resolve_accessor(m_resolved_accessors[space].write_byte_masked,  *m_space[space], static_cast<void (address_space::*)(offs_t, u8, u8)  >(&address_space::write_byte));
-			resolve_accessor(m_resolved_accessors[space].write_word,         *m_space[space], static_cast<void (address_space::*)(offs_t, u16)     >(&address_space::write_word));
-			resolve_accessor(m_resolved_accessors[space].write_word_masked,  *m_space[space], static_cast<void (address_space::*)(offs_t, u16, u16)>(&address_space::write_word));
-			resolve_accessor(m_resolved_accessors[space].write_dword,        *m_space[space], static_cast<void (address_space::*)(offs_t, u32)     >(&address_space::write_dword));
-			resolve_accessor(m_resolved_accessors[space].write_dword_masked, *m_space[space], static_cast<void (address_space::*)(offs_t, u32, u32)>(&address_space::write_dword));
-			resolve_accessor(m_resolved_accessors[space].write_qword,        *m_space[space], static_cast<void (address_space::*)(offs_t, u64)     >(&address_space::write_qword));
-			resolve_accessor(m_resolved_accessors[space].write_qword_masked, *m_space[space], static_cast<void (address_space::*)(offs_t, u64, u64)>(&address_space::write_qword));
-		}
+			m_resolved_accessors[space].set(*m_space[space]);
 	}
 }
 
@@ -1048,6 +1089,19 @@ int drcbe_arm64::execute(code_handle &entry)
 
 void drcbe_arm64::generate(drcuml_block &block, const instruction *instlist, uint32_t numinst)
 {
+	// do this here because device.debug() isn't initialised at construction time
+	if (!m_debug_cpu_instruction_hook && (m_device.machine().debug_flags & DEBUG_FLAG_ENABLED))
+	{
+		m_debug_cpu_instruction_hook.set(*m_device.debug(), &device_debug::instruction_hook);
+		if (!m_debug_cpu_instruction_hook)
+		{
+			m_debug_cpu_instruction_hook.obj = uintptr_t(m_device.debug());
+			using debugger_hook_func = void (*)(device_debug *, offs_t);
+			static const auto debugger_inst_hook = [] (device_debug *dbg, offs_t pc) { dbg->instruction_hook(pc); };
+			m_debug_cpu_instruction_hook.func = reinterpret_cast<uint8_t *>(uintptr_t(debugger_hook_func(debugger_inst_hook)));
+		}
+	}
+
 	// tell all of our utility objects that a block is beginning
 	m_hash.block_begin(block, instlist, numinst);
 	m_map.block_begin(block);
@@ -1233,11 +1287,10 @@ void drcbe_arm64::op_debug(a64::Assembler &a, const uml::instruction &inst)
 		emit_ldr_mem(a, temp, &m_device.machine().debug_flags);
 		a.tbz(temp, 1, skip); // DEBUG_FLAG_CALL_HOOK
 
-		get_imm_relative(a, REG_PARAM1, (uintptr_t)m_device.debug());
+		get_imm_relative(a, REG_PARAM1, m_debug_cpu_instruction_hook.obj);
 		mov_reg_param(a, 4, REG_PARAM2, pcp);
 
-		emit_ldr_mem(a, TEMP_REG2, &m_near.debug_cpu_instruction_hook);
-		a.blr(TEMP_REG2);
+		call_arm_addr(a, m_debug_cpu_instruction_hook.func);
 
 		a.bind(skip);
 	}
@@ -1556,13 +1609,11 @@ void drcbe_arm64::op_recover(a64::Assembler &a, const uml::instruction &inst)
 
 	be_parameter dstp(*this, inst.param(0), PTYPE_MR);
 
-	get_imm_relative(a, REG_PARAM1, (uintptr_t)&m_map);
+	get_imm_relative(a, REG_PARAM1, m_drcmap_get_value.obj);
 	a.ldr(REG_PARAM2, arm::Mem(a64::x29, -8)); // saved LR (x30) from first level CALLH/EXH or failed hash jump
 	a.mov(REG_PARAM3, inst.param(1).mapvar());
 
-	emit_ldr_mem(a, TEMP_REG1, &m_near.drcmap_get_value);
-
-	a.blr(TEMP_REG1);
+	call_arm_addr(a, m_drcmap_get_value.func);
 
 	mov_param_reg(a, inst.size(), dstp, REG_PARAM1);
 }
@@ -2007,7 +2058,7 @@ void drcbe_arm64::op_read(a64::Assembler &a, const uml::instruction &inst)
 
 	if (spacesizep.size() == SIZE_BYTE)
 	{
-		if (resolved.read_byte.func)
+		if (resolved.read_byte)
 		{
 			get_imm_relative(a, REG_PARAM1, resolved.read_byte.obj);
 			call_arm_addr(a, resolved.read_byte.func);
@@ -2021,7 +2072,7 @@ void drcbe_arm64::op_read(a64::Assembler &a, const uml::instruction &inst)
 	}
 	else if (spacesizep.size() == SIZE_WORD)
 	{
-		if (resolved.read_word.func)
+		if (resolved.read_word)
 		{
 			get_imm_relative(a, REG_PARAM1, resolved.read_word.obj);
 			call_arm_addr(a, resolved.read_word.func);
@@ -2035,7 +2086,7 @@ void drcbe_arm64::op_read(a64::Assembler &a, const uml::instruction &inst)
 	}
 	else if (spacesizep.size() == SIZE_DWORD)
 	{
-		if (resolved.read_dword.func)
+		if (resolved.read_dword)
 		{
 			get_imm_relative(a, REG_PARAM1, resolved.read_dword.obj);
 			call_arm_addr(a, resolved.read_dword.func);
@@ -2049,7 +2100,7 @@ void drcbe_arm64::op_read(a64::Assembler &a, const uml::instruction &inst)
 	}
 	else if (spacesizep.size() == SIZE_QWORD)
 	{
-		if (resolved.read_qword.func)
+		if (resolved.read_qword)
 		{
 			get_imm_relative(a, REG_PARAM1, resolved.read_qword.obj);
 			call_arm_addr(a, resolved.read_qword.func);
@@ -2085,7 +2136,7 @@ void drcbe_arm64::op_readm(a64::Assembler &a, const uml::instruction &inst)
 
 	if (spacesizep.size() == SIZE_BYTE)
 	{
-		if (resolved.read_byte_masked.func)
+		if (resolved.read_byte_masked)
 		{
 			get_imm_relative(a, REG_PARAM1, resolved.read_byte_masked.obj);
 			call_arm_addr(a, resolved.read_byte_masked.func);
@@ -2099,7 +2150,7 @@ void drcbe_arm64::op_readm(a64::Assembler &a, const uml::instruction &inst)
 	}
 	else if (spacesizep.size() == SIZE_WORD)
 	{
-		if (resolved.read_word_masked.func)
+		if (resolved.read_word_masked)
 		{
 			get_imm_relative(a, REG_PARAM1, resolved.read_word_masked.obj);
 			call_arm_addr(a, resolved.read_word_masked.func);
@@ -2113,7 +2164,7 @@ void drcbe_arm64::op_readm(a64::Assembler &a, const uml::instruction &inst)
 	}
 	else if (spacesizep.size() == SIZE_DWORD)
 	{
-		if (resolved.read_dword_masked.func)
+		if (resolved.read_dword_masked)
 		{
 			get_imm_relative(a, REG_PARAM1, resolved.read_dword_masked.obj);
 			call_arm_addr(a, resolved.read_dword_masked.func);
@@ -2127,7 +2178,7 @@ void drcbe_arm64::op_readm(a64::Assembler &a, const uml::instruction &inst)
 	}
 	else if (spacesizep.size() == SIZE_QWORD)
 	{
-		if (resolved.read_qword_masked.func)
+		if (resolved.read_qword_masked)
 		{
 			get_imm_relative(a, REG_PARAM1, resolved.read_qword_masked.obj);
 			call_arm_addr(a, resolved.read_qword_masked.func);
@@ -2162,7 +2213,7 @@ void drcbe_arm64::op_write(a64::Assembler &a, const uml::instruction &inst)
 
 	if (spacesizep.size() == SIZE_BYTE)
 	{
-		if (resolved.write_byte.func)
+		if (resolved.write_byte)
 		{
 			get_imm_relative(a, REG_PARAM1, resolved.write_byte.obj);
 			call_arm_addr(a, resolved.write_byte.func);
@@ -2176,7 +2227,7 @@ void drcbe_arm64::op_write(a64::Assembler &a, const uml::instruction &inst)
 	}
 	else if (spacesizep.size() == SIZE_WORD)
 	{
-		if (resolved.write_word.func)
+		if (resolved.write_word)
 		{
 			get_imm_relative(a, REG_PARAM1, resolved.write_word.obj);
 			call_arm_addr(a, resolved.write_word.func);
@@ -2190,7 +2241,7 @@ void drcbe_arm64::op_write(a64::Assembler &a, const uml::instruction &inst)
 	}
 	else if (spacesizep.size() == SIZE_DWORD)
 	{
-		if (resolved.write_dword.func)
+		if (resolved.write_dword)
 		{
 			get_imm_relative(a, REG_PARAM1, resolved.write_dword.obj);
 			call_arm_addr(a, resolved.write_dword.func);
@@ -2204,7 +2255,7 @@ void drcbe_arm64::op_write(a64::Assembler &a, const uml::instruction &inst)
 	}
 	else if (spacesizep.size() == SIZE_QWORD)
 	{
-		if (resolved.write_qword.func)
+		if (resolved.write_qword)
 		{
 			get_imm_relative(a, REG_PARAM1, resolved.write_qword.obj);
 			call_arm_addr(a, resolved.write_qword.func);
@@ -2240,7 +2291,7 @@ void drcbe_arm64::op_writem(a64::Assembler &a, const uml::instruction &inst)
 
 	if (spacesizep.size() == SIZE_BYTE)
 	{
-		if (resolved.write_byte_masked.func)
+		if (resolved.write_byte_masked)
 		{
 			get_imm_relative(a, REG_PARAM1, resolved.write_byte_masked.obj);
 			call_arm_addr(a, resolved.write_byte_masked.func);
@@ -2254,7 +2305,7 @@ void drcbe_arm64::op_writem(a64::Assembler &a, const uml::instruction &inst)
 	}
 	else if (spacesizep.size() == SIZE_WORD)
 	{
-		if (resolved.write_word_masked.func)
+		if (resolved.write_word_masked)
 		{
 			get_imm_relative(a, REG_PARAM1, resolved.write_word_masked.obj);
 			call_arm_addr(a, resolved.write_word_masked.func);
@@ -2268,7 +2319,7 @@ void drcbe_arm64::op_writem(a64::Assembler &a, const uml::instruction &inst)
 	}
 	else if (spacesizep.size() == SIZE_DWORD)
 	{
-		if (resolved.write_dword_masked.func)
+		if (resolved.write_dword_masked)
 		{
 			get_imm_relative(a, REG_PARAM1, resolved.write_dword_masked.obj);
 			call_arm_addr(a, resolved.write_dword_masked.func);
@@ -2282,7 +2333,7 @@ void drcbe_arm64::op_writem(a64::Assembler &a, const uml::instruction &inst)
 	}
 	else if (spacesizep.size() == SIZE_QWORD)
 	{
-		if (resolved.write_qword_masked.func)
+		if (resolved.write_qword_masked)
 		{
 			get_imm_relative(a, REG_PARAM1, resolved.write_qword_masked.obj);
 			call_arm_addr(a, resolved.write_qword_masked.func);
@@ -2676,11 +2727,11 @@ void drcbe_arm64::op_rolins(a64::Assembler &a, const uml::instruction &inst)
 
 		if (is_right_aligned || is_contiguous)
 		{
-			uint32_t rot = 0;
-			uint32_t lsb = 0;
-
 			dst = can_use_dst_reg ? dstp.select_register(SCRATCH_REG1, inst.size()) : select_register(SCRATCH_REG1, inst.size());
 			mov_reg_param(a, inst.size(), dst, dstp);
+
+			uint32_t rot = 0;
+			uint32_t lsb = 0;
 
 			if (is_right_aligned)
 			{
@@ -2707,10 +2758,6 @@ void drcbe_arm64::op_rolins(a64::Assembler &a, const uml::instruction &inst)
 					result = rotr_64(srcp.immediate(), rot);
 
 				a.mov(src, result);
-
-				a.bfi(dst, src, lsb, pop);
-
-				optimized = true;
 			}
 			else
 			{
@@ -2718,11 +2765,11 @@ void drcbe_arm64::op_rolins(a64::Assembler &a, const uml::instruction &inst)
 
 				if (rot > 0)
 					a.ror(src, src, rot);
-
-				a.bfi(dst, src, lsb, pop);
-
-				optimized = true;
 			}
+
+			a.bfi(dst, src, lsb, pop);
+
+			optimized = true;
 		}
 		else if (srcp.is_immediate())
 		{
@@ -3881,7 +3928,7 @@ void drcbe_arm64::op_fread(a64::Assembler &a, const uml::instruction &inst)
 
 	if (inst.size() == 4)
 	{
-		if (resolved.read_dword.func)
+		if (resolved.read_dword)
 		{
 			get_imm_relative(a, REG_PARAM1, resolved.read_dword.obj);
 			call_arm_addr(a, resolved.read_dword.func);
@@ -3897,7 +3944,7 @@ void drcbe_arm64::op_fread(a64::Assembler &a, const uml::instruction &inst)
 	}
 	else if (inst.size() == 8)
 	{
-		if (resolved.read_qword.func)
+		if (resolved.read_qword)
 		{
 			get_imm_relative(a, REG_PARAM1, resolved.read_qword.obj);
 			call_arm_addr(a, resolved.read_qword.func);
@@ -3935,7 +3982,7 @@ void drcbe_arm64::op_fwrite(a64::Assembler &a, const uml::instruction &inst)
 
 	if (inst.size() == 4)
 	{
-		if (resolved.write_dword.func)
+		if (resolved.write_dword)
 		{
 			get_imm_relative(a, REG_PARAM1, resolved.write_dword.obj);
 			call_arm_addr(a, resolved.write_dword.func);
@@ -3949,7 +3996,7 @@ void drcbe_arm64::op_fwrite(a64::Assembler &a, const uml::instruction &inst)
 	}
 	else if (inst.size() == 8)
 	{
-		if (resolved.write_qword.func)
+		if (resolved.write_qword)
 		{
 			get_imm_relative(a, REG_PARAM1, resolved.write_qword.obj);
 			call_arm_addr(a, resolved.write_qword.func);
