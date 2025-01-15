@@ -864,7 +864,7 @@ CONS( 2004, maxheart, 0, 0, superxavix_i2c_24c04_4mb,    xavix_i2c,   superxavix
 CONS( 2004, epo_doka, 0, 0, xavix2002_4mb,               xavix,      superxavix_state,     init_epo_doka, "Epoch / SSD Company LTD",  "Doraemon anywhere - Japan travel game DX experience! Where is the Dragon Grand Prix! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // Let's!TVプレイ なりきり体感 ボウケンジャー 走れ！撃て！ミッションスタート！！
-CONS( 2006, ban_bkgj, 0, 0, superxavix_i2c_24c04_4mb,xavix_i2c,  superxavix_i2c_state, init_xavix, "Bandai / SSD Company LTD",  "Let's! TV Play GoGo Sentai Boukanger Run! Shoot! Mission Starts!! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2006, ban_bkgj, 0, 0, superxavix_i2c_24c04_4mb,xavix_i2c,  superxavix_i2c_state, init_xavix, "Bandai / SSD Company LTD",  "Let's! TV Play GoGo Sentai Boukenger Run! Shoot! Mission Starts!! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // Let's!TV プレイ 体感キャストオフ 仮面ライダーカブト クロックアップ＆ライダーキック
 CONS( 2006, ban_utmj, 0, 0, superxavix_i2c_24c02,    xavix_i2c,  superxavix_i2c_state, init_xavix, "Bandai / SSD Company LTD",  "Let's! TV Play Taikan Cast Off - Kamen Rider Kabuto Clock Up & Rider Kick!! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
