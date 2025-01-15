@@ -2627,7 +2627,7 @@ CONS( 2006, anpantv,    0,        0, spg2xx,    spg2xx,    spg2xx_game_state,   
 CONS( 2006, dmbtjunc,   0,        0, spg2xx,    dmbtjunc,  spg2xx_game_state,          empty_init,    "Bandai",                                                "Let's! TV Play Digital Monster Battle Junction (Japan)",                MACHINE_NOT_WORKING )
 
 // 川島隆太教授監修 脳と体を鍛える 体感頭脳ファミリーマットレ  - Let's! TV Play branding appears on the box
-CONS( 2006, ban_krkk,   0,        0, spg2xx,    ban_krkk,  spg2xx_game_state,          init_crc,      "Bandai",                                                "Let's! TV Play Kawashima Ryuuta Kyouju Kanshuu - Nou to Karata o Kitaeru Taikan Zunou Family Mattore (Japan)", MACHINE_IMPERFECT_SOUND )
+CONS( 2006, ban_krkk,   0,        0, spg2xx,    ban_krkk,  spg2xx_game_state,          init_crc,      "Bandai",                                                "Let's! TV Play Kawashima Ryuuta Kyouju Kanshuu - Nou to Karada o Kitaeru Taikan Zunou Family Mattore (Japan)", MACHINE_IMPERFECT_SOUND )
 
 // Train Game V1.4 2012-08-15 on PCB. SPG243 headers in each chunk.
 // Last few bytes of SEEPROM have 'JUNGT' in them, is this developed by JungleSoft/JungleTac?
