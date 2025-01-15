@@ -5358,3 +5358,17 @@ if (MACHINES["SCI4"]~=null) then
 		MAME_DIR .. "src/devices/machine/sci4.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/machine/pl6_fpga.h,MACHINES["HEBER_PLUTO"] = true
+--@src/devices/machine/pl6_pic.h,MACHINES["HEBER_PLUTO"] = true
+---------------------------------------------------
+if (MACHINES["HEBER_PLUTO"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/pl6_fpga.cpp",
+		MAME_DIR .. "src/devices/machine/pl6_fpga.h",
+		MAME_DIR .. "src/devices/machine/pl6_pic.cpp",
+		MAME_DIR .. "src/devices/machine/pl6_pic.h",
+	}
+end

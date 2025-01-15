@@ -23711,8 +23711,18 @@ hb_ydd                          // Yabba-Dabba-Dough (Qps)
 hb_ydda                         //
 
 @source:jpm/pluto6.cpp
+//pl6                             // Heber  
+pl6_atw                         // Around the World (JPM)
+pl6_cm                          // Crystal Maze (JPM)
+pl6_demo                        // Heber
+pl6vdemo                        // Heber
+pl6ddemo                        // Heber
+//pl6_fant                        // Fantaztec (JPM)
 pl6_kfp                         //
+tijkpots                        // Betcom
 pl6_lgk                         //
+scadet                          // NaokiSRC
+sspball                         // NaokiSRC
 
 @source:kaneko/airbustr.cpp
 airbustr                        // (c) 1990 Kaneko + Namco

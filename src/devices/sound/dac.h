@@ -213,6 +213,7 @@ DAC_GENERATOR(MC3410,    mc3410_device,    dac_word_device_base, dac_mapper_unsi
 DAC_GENERATOR(MP1210,    mp1210_device,    dac_word_device_base, dac_mapper_signed,   12, dac_gain_r2r, "MP1210 DAC",    "mp1210") // also addressable with separate 8-bit and 4-bit input latches
 DAC_GENERATOR(PCM54HP,   pcm54hp_device,   dac_word_device_base, dac_mapper_unsigned, 16, dac_gain_r2r, "PCM54HP DAC",   "pcm54hp")
 DAC_GENERATOR(UDA1341TS, uda1341ts_device, dac_word_device_base, dac_mapper_signed,   16, dac_gain_r2r, "UDA1341TS DAC", "uda1341ts") // I2C stereo audio codec
+DAC_GENERATOR(CS4334, 	 cs4334_device,    dac_word_device_base, dac_mapper_signed,   16, dac_gain_r2r, "CS4334 DAC", 	 "cs4334") // I2C stereo audio codec
 DAC_GENERATOR(ZN425E,    zn425e_device,    dac_byte_device_base, dac_mapper_unsigned,  8, dac_gain_r2r, "ZN425E DAC",    "zn425e")
 DAC_GENERATOR(ZN426E,    zn426e_device,    dac_byte_device_base, dac_mapper_unsigned,  8, dac_gain_r2r, "ZN426E-8 DAC",  "zn426e")
 DAC_GENERATOR(ZN428E,    zn428e_device,    dac_byte_device_base, dac_mapper_unsigned,  8, dac_gain_r2r, "ZN428E-8 DAC",  "zn428e")
