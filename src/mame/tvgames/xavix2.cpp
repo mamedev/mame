@@ -796,7 +796,7 @@ CONS( 2006, ban_db2j, 0, 0, config, naruto, naruto_state, empty_init, "Bandai / 
 CONS( 2006, epo_dabj, 0, 0, config, dabj,   xavix2_state, empty_init, "Epoch / SSD Company LTD", "TV de Asobou! Manabou! Chou Nouryoku AIUEO Zukan (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // ドラえもん 体感タケコプター! 空とぶ大冒険
-CONS( 2006, epo_dtcj, 0, 0, config, dabj,   xavix2_state, empty_init, "Epoch / SSD Company LTD", "Doraemon Experience Takecopter! Great Flying Adventure (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2006, epo_dtcj, 0, 0, config, dabj,   xavix2_state, empty_init, "Epoch / SSD Company LTD", "Doraemon Taikan Take-copter! Sora Tobu Daibouken (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 
 // These are for the 'Domyos Interactive System' other Domyos Interactive System games can be found in xavix.cpp (the SoC is inside the cartridge, base acts as a 'TV adapter' only)
