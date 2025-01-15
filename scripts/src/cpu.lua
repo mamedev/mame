@@ -42,19 +42,14 @@ if (CPU_INCLUDE_DRC) then
 		MAME_DIR .. "src/devices/cpu/drcumlsh.h",
 	}
 	if not _OPTIONS["FORCE_DRC_C_BACKEND"] then
-		if (_OPTIONS["PLATFORM"]=="arm64") then
-			files {
-				MAME_DIR .. "src/devices/cpu/drcbearm64.cpp",
-				MAME_DIR .. "src/devices/cpu/drcbearm64.h",
-			}
-		else
-			files {
-				MAME_DIR .. "src/devices/cpu/drcbex64.cpp",
-				MAME_DIR .. "src/devices/cpu/drcbex64.h",
-				MAME_DIR .. "src/devices/cpu/drcbex86.cpp",
-				MAME_DIR .. "src/devices/cpu/drcbex86.h",
-			}
-		end
+		files {
+			MAME_DIR .. "src/devices/cpu/drcbearm64.cpp",
+			MAME_DIR .. "src/devices/cpu/drcbearm64.h",
+			MAME_DIR .. "src/devices/cpu/drcbex64.cpp",
+			MAME_DIR .. "src/devices/cpu/drcbex64.h",
+			MAME_DIR .. "src/devices/cpu/drcbex86.cpp",
+			MAME_DIR .. "src/devices/cpu/drcbex86.h",
+		}
 	end
 
 	if _OPTIONS["targetos"]=="macosx" and _OPTIONS["gcc"]~=nil then

@@ -11,6 +11,8 @@
 #include "emu.h"
 #include "drcbeut.h"
 
+namespace drc {
+
 using namespace uml;
 
 
@@ -30,19 +32,19 @@ using namespace uml;
 //  drc_hash_table - constructor
 //-------------------------------------------------
 
-drc_hash_table::drc_hash_table(drc_cache &cache, uint32_t modes, uint8_t addrbits, uint8_t ignorebits)
-	: m_cache(cache),
-		m_modes(modes),
-		m_nocodeptr(nullptr),
-		m_l1bits((addrbits - ignorebits) / 2),
-		m_l2bits((addrbits - ignorebits) - m_l1bits),
-		m_l1shift(ignorebits + m_l2bits),
-		m_l2shift(ignorebits),
-		m_l1mask((1 << m_l1bits) - 1),
-		m_l2mask((1 << m_l2bits) - 1),
-		m_base(reinterpret_cast<drccodeptr ***>(cache.alloc(modes * sizeof(**m_base)))),
-		m_emptyl1(nullptr),
-		m_emptyl2(nullptr)
+drc_hash_table::drc_hash_table(drc_cache &cache, uint32_t modes, uint8_t addrbits, uint8_t ignorebits) :
+	m_cache(cache),
+	m_modes(modes),
+	m_nocodeptr(nullptr),
+	m_l1bits((addrbits - ignorebits) / 2),
+	m_l2bits((addrbits - ignorebits) - m_l1bits),
+	m_l1shift(ignorebits + m_l2bits),
+	m_l2shift(ignorebits),
+	m_l1mask((1 << m_l1bits) - 1),
+	m_l2mask((1 << m_l2bits) - 1),
+	m_base(reinterpret_cast<drccodeptr ***>(cache.alloc(modes * sizeof(**m_base)))),
+	m_emptyl1(nullptr),
+	m_emptyl2(nullptr)
 {
 	reset();
 }
@@ -577,3 +579,36 @@ void drc_label_list::oob_callback(drccodeptr *codeptr, void *param1, void *param
 	label_fixup *fixup = reinterpret_cast<label_fixup *>(param1);
 	fixup->m_callback(param2, fixup->m_label->m_codeptr);
 }
+
+
+
+//**************************************************************************
+//  RESOLVED MEMORY ACCESSORS
+//**************************************************************************
+
+//-------------------------------------------------
+//  set - bind to address space
+//-------------------------------------------------
+
+void resolved_memory_accessors::set(address_space &space) noexcept
+{
+	read_byte          .set(space, static_cast<u8  (address_space::*)(offs_t)     >(&address_space::read_byte));
+	read_byte_masked   .set(space, static_cast<u8  (address_space::*)(offs_t, u8) >(&address_space::read_byte));
+	read_word          .set(space, static_cast<u16 (address_space::*)(offs_t)     >(&address_space::read_word));
+	read_word_masked   .set(space, static_cast<u16 (address_space::*)(offs_t, u16)>(&address_space::read_word));
+	read_dword         .set(space, static_cast<u32 (address_space::*)(offs_t)     >(&address_space::read_dword));
+	read_dword_masked  .set(space, static_cast<u32 (address_space::*)(offs_t, u32)>(&address_space::read_dword));
+	read_qword         .set(space, static_cast<u64 (address_space::*)(offs_t)     >(&address_space::read_qword));
+	read_qword_masked  .set(space, static_cast<u64 (address_space::*)(offs_t, u64)>(&address_space::read_qword));
+
+	write_byte         .set(space, static_cast<void (address_space::*)(offs_t, u8)      >(&address_space::write_byte));
+	write_byte_masked  .set(space, static_cast<void (address_space::*)(offs_t, u8, u8)  >(&address_space::write_byte));
+	write_word         .set(space, static_cast<void (address_space::*)(offs_t, u16)     >(&address_space::write_word));
+	write_word_masked  .set(space, static_cast<void (address_space::*)(offs_t, u16, u16)>(&address_space::write_word));
+	write_dword        .set(space, static_cast<void (address_space::*)(offs_t, u32)     >(&address_space::write_dword));
+	write_dword_masked .set(space, static_cast<void (address_space::*)(offs_t, u32, u32)>(&address_space::write_dword));
+	write_qword        .set(space, static_cast<void (address_space::*)(offs_t, u64)     >(&address_space::write_qword));
+	write_qword_masked .set(space, static_cast<void (address_space::*)(offs_t, u64, u64)>(&address_space::write_qword));
+}
+
+} // namespace drc

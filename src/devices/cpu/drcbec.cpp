@@ -14,6 +14,8 @@
 
 #include <cmath>
 
+namespace drc {
+
 using namespace uml;
 
 
@@ -2436,3 +2438,5 @@ uint64_t drcbe_c::tzcount64(uint64_t value)
 	}
 	return 64;
 }
+
+} // namespace drc
