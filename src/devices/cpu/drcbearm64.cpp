@@ -47,10 +47,10 @@ FP -> SP + 0x00  previous FP
 
 Stack layout in nested generated code subroutine call frame:
 
-SP -> SP + 0x00  previous FP
+SP -> SP + 0x00  saved FP
       SP + 0x08  return address
       ...
-      FP - 0x10  previous FP
+      FP - 0x10  saved FP
       FP - 0x08  return address
 FP -> FP + 0x00  previous FP
       FP + 0x08  top-level return address
@@ -489,6 +489,20 @@ void drcbe_arm64::get_imm_relative(a64::Assembler &a, const a64::Gp &reg, const 
 	if (is_valid_immediate_signed(reloffs, 21))
 	{
 		a.adr(reg, ptr);
+		return;
+	}
+
+	const uint64_t pagebase = codeoffs & ~make_bitmask<uint64_t>(12);
+	const int64_t pagerel = (int64_t)ptr - pagebase;
+	if (is_valid_immediate_signed(pagerel, 33))
+	{
+		const uint64_t targetpage = (uint64_t)ptr & ~make_bitmask<uint64_t>(12);
+		const uint64_t pageoffs = (uint64_t)ptr & util::make_bitmask<uint64_t>(12);
+
+		a.adrp(reg, targetpage);
+		if (pageoffs != 0)
+			a.add(reg, reg, pageoffs);
+
 		return;
 	}
 
@@ -953,7 +967,7 @@ drcbe_arm64::drcbe_arm64(drcuml_state &drcuml, device_t &device, drc_cache &cach
 	, m_entry(nullptr)
 	, m_exit(nullptr)
 	, m_nocode(nullptr)
-	, m_baseptr(cache.near() + 0x80)
+	, m_baseptr(cache.near() + 0x100)
 	, m_near(*(near_state *)cache.alloc_near(sizeof(m_near)))
 {
 	m_near.emulated_flags = 0;
@@ -1611,6 +1625,7 @@ void drcbe_arm64::op_recover(a64::Assembler &a, const uml::instruction &inst)
 
 	get_imm_relative(a, REG_PARAM1, m_drcmap_get_value.obj);
 	a.ldr(REG_PARAM2, arm::Mem(a64::x29, -8)); // saved LR (x30) from first level CALLH/EXH or failed hash jump
+	a.sub(REG_PARAM2, REG_PARAM2, 4);
 	a.mov(REG_PARAM3, inst.param(1).mapvar());
 
 	call_arm_addr(a, m_drcmap_get_value.func);
