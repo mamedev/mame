@@ -103,6 +103,7 @@ public:
 	lependu_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_nvram(*this, "nvram"),
 		m_pia(*this, "pia%u", 0U),
 		m_screen(*this, "screen"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -138,6 +139,7 @@ protected:
 	void lependu_colorram_w(offs_t offset, uint8_t data);
 
 	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<u8> m_nvram;
 	required_device_array<pia6821_device, 2> m_pia;
 	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -311,6 +313,9 @@ void lependu_state::lamps_cm_w(uint8_t data)
 */
 	for (int i = 0; i < 6 ; i++)
 		m_lamps[i] = BIT(~data, i);
+
+	// Select stealth game (Keyboard "L" toggle)
+	m_nvram[0x0004] = m_input[3]->read() >> 7;
 }
 
 
@@ -462,7 +467,8 @@ static INPUT_PORTS_START(codemagik)
 
 	PORT_START("IN.3")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )       // 25c coin
-	PORT_BIT( 0xfb, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Sealth Mode") PORT_CODE(KEYCODE_L) PORT_TOGGLE
+	PORT_BIT( 0x7b, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SW1")
 	// only bits 4-7 are connected here and were routed to SW1 1-4
@@ -483,31 +489,8 @@ static INPUT_PORTS_START(codemagik)
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("SW2")  // just for test
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("SW2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -578,9 +561,9 @@ static const discrete_dac_r1_ladder dac_lependu_ladder =
 	3,                                  // size of ladder
 	{RES_K(30), RES_K(15), RES_K(7.5)}, // elements
 
-/*  external vBias doesn't seems to be accurate.
-    using the 555 internal values sound better.
-*/
+//  external vBias doesn't seems to be accurate.
+//  using the 555 internal values sound better.
+
 	5,                                  // voltage Bias resistor is tied to
 	RES_K(5),                           // additional resistor tied to vBias
 	RES_K(10),                          // resistor tied to ground
@@ -713,20 +696,13 @@ ROM_START( lependu )
 ROM_END
 
 /*
-  Code Magik
+  Code Magik / Super 7
   Voyageur de L'Espace Inc.
 
-  Obscure vintage game.
-  Using IRQ instead of NMI.
+  Obscure stealth vintage game, using IRQ instead of NMI.
 
-  VideoRAM: 0x800-0xbff
-  ColorRAM: 0xc00-0xfff
-
-  CRTC addr: 0x10b0-0x10b0
-  CRTC data: 0x10b1-0x10b1
-
-  PIA0 offs: 0x10f4-0x10f7      
-  PIA1 offs: 0x10f8-0x10fb      
+  Code Magik is a sort of Mastermind game that can be switched
+  to a poker bonus game called Super 7, through a complex use of the hardware.
 
 */
 ROM_START( codemagik )
@@ -749,6 +725,9 @@ ROM_START( codemagik )
 	ROM_LOAD( "2y_2732.3a", 0x1000, 0x1000, CRC(6d1da4bb) SHA1(dc8c70faa301e2f7e9089d38e0ef618e8352e569) )    // cards deck gfx, bitplane2
 	ROM_COPY( "gfx1",       0x4800, 0x2000, 0x0800 )    // cards deck gfx, bitplane3.
 	ROM_COPY( "gfx1",       0x5800, 0x2800, 0x0800 )    // cards deck alt gfx, bitplane3.
+
+	ROM_REGION( 0x0800, "nvram", 0 )  // default NVRAM, otherwise the game can't be played.
+	ROM_LOAD( "codemagik_nvram.bin", 0x0000, 0x0800, CRC(55f269ca) SHA1(c55b9f1eff66811d122718bef2bb067d4f4b817a) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "dex.5d",   0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
@@ -785,6 +764,6 @@ void lependu_state::init_lependu()
 *                Game Drivers                *
 *********************************************/
 
-//     YEAR  NAME       PARENT    MACHINE    INPUT      STATE          INIT          ROT    COMPANY                      FULLNAME                          FLAGS                LAYOUT
-GAMEL( 198?, lependu,   0,        lependu,   lependu,   lependu_state, init_lependu, ROT0, "Avenir Amusement Inc.",     "Le Pendu (Bilingue, Version 04)", 0,                   layout_lependu )
-GAMEL( 198?, codemagik, 0,        codemagik, codemagik, lependu_state, empty_init,   ROT0, "Voyageur de L'Espace Inc.", "Code Magik",                      MACHINE_NOT_WORKING, layout_codemagik )
+//     YEAR  NAME       PARENT    MACHINE    INPUT      STATE          INIT          ROT    COMPANY                      FULLNAME                                         FLAGS   LAYOUT
+GAMEL( 198?, lependu,   0,        lependu,   lependu,   lependu_state, init_lependu, ROT0, "Avenir Amusement Inc.",     "Le Pendu (Bilingue, Version 04)",                0,      layout_lependu )
+GAMEL( 198?, codemagik, 0,        codemagik, codemagik, lependu_state, empty_init,   ROT0, "Voyageur de L'Espace Inc.", "Code Magik (Ver 5.5) / Super 7 (stealth game)",  0,      layout_codemagik )
