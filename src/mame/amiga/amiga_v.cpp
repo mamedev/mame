@@ -537,7 +537,7 @@ void amiga_state::render_scanline(bitmap_rgb32 &bitmap, int scanline)
 
 	/* loop over the line */
 	// TODO: copper runs on odd timeslots
-	next_copper_x = 0;
+	next_copper_x = m_copper->restore_offset();
 	// FIXME: without the add this increment will skip bitplane ops
 	// ddf_stop_pixel_max = 0xd8 * 2 = 432 + 17 + 15 + 1(*) = 465 > width / 2 (455)
 	// (*) because there's a comparison with <= in the bitplane code.
@@ -879,6 +879,8 @@ void amiga_state::render_scanline(bitmap_rgb32 &bitmap, int scanline)
 		for (pl = 1; pl < planes; pl += 2)
 			CUSTOM_REG_LONG(REG_BPL1PTH + pl * 2) += CUSTOM_REG_SIGNED(REG_BPL2MOD);
 	}
+
+	m_copper->suspend_offset(next_copper_x, amiga_state::SCREEN_WIDTH / 2);
 
 	// restore color00
 	CUSTOM_REG(REG_COLOR00) = save_color0;

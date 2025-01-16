@@ -97,6 +97,7 @@ void agnus_copper_device::device_start()
 	save_item(NAME(m_waitmask));
 	save_item(NAME(m_pending_data));
 	save_item(NAME(m_pending_offset));
+	save_item(NAME(m_xpos_state));
 }
 
 
@@ -235,6 +236,21 @@ void agnus_copper_device::copins_w(u16 data)
 void agnus_copper_device::vblank_sync()
 {
 	set_pc(0, true);
+	m_xpos_state = 0;
+}
+
+// check current copper cycle at end of scanline
+// - auntaadv (gameplay), WAITs with $xxd9
+void agnus_copper_device::suspend_offset(int xpos, int hblank_width)
+{
+	m_xpos_state = (xpos == 511) ? 0 : xpos - hblank_width;
+//	std::assert(m_xpos_state > 0);
+}
+
+// restore at start
+int agnus_copper_device::restore_offset()
+{
+	return m_xpos_state;
 }
 
 // TODO: h/vblank checks against xpos/vpos
