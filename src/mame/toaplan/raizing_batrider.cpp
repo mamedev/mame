@@ -813,7 +813,7 @@ void batrider_state::batrider(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	// these two latches are always written together, via a single move.l instruction
+	// first two latches are always written together, via a single move.l instruction
 	GENERIC_LATCH_8(config, m_soundlatch[0]);
 	GENERIC_LATCH_8(config, m_soundlatch[1]);
 	GENERIC_LATCH_8(config, m_soundlatch[2]);
@@ -877,7 +877,7 @@ void bbakraid_state::bbakraid(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	// these two latches are always written together, via a single move.l instruction
+	// first two latches are always written together, via a single move.l instruction
 	GENERIC_LATCH_8(config, m_soundlatch[0]);
 	GENERIC_LATCH_8(config, m_soundlatch[1]);
 	GENERIC_LATCH_8(config, m_soundlatch[2]);
