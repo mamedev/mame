@@ -12,6 +12,12 @@
   Driver by Roberto Fresca & Grull Osgo.
 
 
+  Games supported:
+  
+  * Le Pendu (Bilingue, Version 04),                198?, Avenir Amusement Inc.
+  * Code Magik (Ver 5.5) / Super 7 (stealth game),  198?, Voyageur de L'Espace Inc.
+
+
 ***********************************************************************************
 
   The "mini-boy" poker games made by Bonanza Enterprises were very popular
@@ -68,6 +74,48 @@
   1x 10 MHz Xtal.
 
   Discrete circuitry for sound.
+
+
+***********************************************************************************
+
+  Code Magik (Ver 5.5) / Super 7
+  
+  This is a very rare game that has a gambling game hidden inside in stealth mode.
+  
+  The front game is a very good Mastermind type game, where you must to guess
+  a 4-numbers code to deactivate the bomb. The game will return how many numbers
+  are correct, and how many in the right position. You have 20 attempts to beat
+  the machine and win the game.
+
+  Instructions (French/English/Spanish):
+
+  - Entrez votre code en choisissant 4 chiffres de 0 a 9.
+  - Vous avez 20 essaiz.
+  - Reussissez a l'interieur de 5 essais et vous aurez una partie gratuite.
+  - Abandonnez la partie en appuyant d'abord sur CARTE et ensuite sur MISE.
+
+  - Enter your code by choosing 4 digits from 0 to 9.
+  - You have 20 attempts.
+  - Succeed within 5 tries and you will have a free game.
+  - Give up the game by first pressing CARTE and then MISE.
+
+  - Ingrese su código eligiendo 4 dígitos del 0 al 9.
+  - Tienes 20 intentos.
+  - Si lo logras en 5 intentos, tendrás un juego gratis.
+  - Abandona el juego presionando primero CARTE y luego MISE.
+
+
+  This is the very first arcade game of this type.
+
+  The game has complex routines that allow a serial comm with an unknown external
+  device that can transfer a whole NVRAM to the game, so I strongly think that
+  the game could be configurable and switched remotely.
+
+  Part of the code was injected in the NVRAM, so once the battery drains, the game
+  will be inoperable, showing only the attract (title + explanation screen).
+
+  After a big effort and days of reverse-engineering, we were capable to reconstruct
+  the NVRAM structure and the hidden game switch.
 
 
 **********************************************************************************/
