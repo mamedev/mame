@@ -326,10 +326,7 @@ void galaxold_state::_4in1_map(address_map &map)
 	map(0x6003, 0x6003).w(FUNC(galaxold_state::galaxold_coin_counter_w));
 	map(0x6004, 0x6007).w("cust", FUNC(galaxian_sound_device::lfo_freq_w));
 	map(0x6800, 0x6800).portr("IN1");
-	map(0x6800, 0x6802).w("cust", FUNC(galaxian_sound_device::background_enable_w));
-//  map(0x6803, 0x6803).w(FUNC(galaxold_state::galaxian_noise_enable_w)); // not hooked up?
-	map(0x6805, 0x6805).w("cust", FUNC(galaxian_sound_device::fire_enable_w));
-	map(0x6806, 0x6807).w("cust", FUNC(galaxian_sound_device::vol_w));
+	map(0x6800, 0x6807).w("cust", FUNC(galaxian_sound_device::sound_w));
 	map(0x7000, 0x7000).portr("DSW0");
 	map(0x7001, 0x7001).w(FUNC(galaxold_state::galaxold_nmi_enable_w));
 	map(0x7004, 0x7004).w(FUNC(galaxold_state::galaxold_stars_enable_w));
