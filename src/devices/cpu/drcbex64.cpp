@@ -1287,7 +1287,13 @@ void drcbe_x64::mov_r64_imm(Assembler &a, Gp const &reg, uint64_t const imm)
 	else if (s32(imm) == imm)
 		a.mov(reg.r64(), s32(imm));
 	else
-		a.mov(reg.r64(), imm);
+	{
+		const int64_t delta = imm - (a.code()->baseAddress() + a.offset() + 7);
+		if (short_immediate(delta))
+			a.lea(reg.r64(), ptr(rip, delta));
+		else
+			a.mov(reg.r64(), imm);
+	}
 }
 
 
