@@ -676,7 +676,7 @@ int drcbe_c::execute(code_handle &entry)
 
 			case MAKE_OPCODE_SHORT(OP_RECOVER, 4, 0):   // RECOVER dst,mapvar
 				assert(sp > 0);
-				PARAM0 = m_map.get_value((drccodeptr)callstack[0], MAPVAR_M0 + PARAM1);
+				PARAM0 = m_map.get_value(drccodeptr(callstack[0] - 1), PARAM1);
 				break;
 
 
