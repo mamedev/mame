@@ -524,14 +524,11 @@ void galaxold_state::drivfrcg_program(address_map &map)
 	map(0x1500, 0x1500).mirror(0x6000).portr("IN0");
 	map(0x1503, 0x1503).mirror(0x6000).w(FUNC(galaxold_state::galaxold_coin_counter_w));
 	map(0x1580, 0x1580).mirror(0x6000).portr("IN1");
-	map(0x1580, 0x1582).mirror(0x6000).w("cust", FUNC(galaxian_sound_device::background_enable_w));
-	map(0x1583, 0x1583).mirror(0x6000).nopw();
-	map(0x1585, 0x1585).mirror(0x6000).nopw();
-	map(0x1586, 0x1587).mirror(0x6000).w("cust", FUNC(galaxian_sound_device::lfo_freq_w));
+	map(0x1580, 0x1587).mirror(0x6000).w("cust", FUNC(galaxian_sound_device::sound_w));
 	map(0x1600, 0x1600).mirror(0x6000).portr("DSW0").w("cust", FUNC(galaxian_sound_device::pitch_w));
 	map(0x1700, 0x1700).mirror(0x6000).portr("DSW1").nopw();
 	map(0x1701, 0x1701).mirror(0x6000).nopw();
-	map(0x1704, 0x1707).mirror(0x6000).w("cust", FUNC(galaxian_sound_device::vol_w));
+	map(0x1704, 0x1707).mirror(0x6000).w("cust", FUNC(galaxian_sound_device::lfo_freq_w));
 	map(0x1800, 0x1bff).mirror(0x6000).w(FUNC(galaxold_state::galaxold_videoram_w)).share("videoram");
 	map(0x1c00, 0x1fff).mirror(0x6000).ram();
 	map(0x2000, 0x2fff).rom();
@@ -1863,7 +1860,7 @@ void galaxold_state::superbikg(machine_config &config)
 {
 	galaxold_base(config);
 
-	s2650_device &s2650(S2650(config.replace(), m_maincpu, 1'500'000)); // 1.53292 MHz measured with logic analyzer
+	s2650_device &s2650(S2650(config.replace(), m_maincpu, PIXEL_CLOCK / 4)); // 1.53292 MHz measured with logic analyzer
 	s2650.set_addrmap(AS_PROGRAM, &galaxold_state::superbikg_map);
 	s2650.set_addrmap(AS_IO, &galaxold_state::superbikg_io);
 	s2650.set_addrmap(AS_DATA, &galaxold_state::superbikg_data);
@@ -2311,8 +2308,8 @@ ROM_START( spcwarp )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "swarpt7f.bin", 0x0000, 0x1000, CRC(04d744e3) SHA1(db8218510052a05670cb0b722b73d3f10464788c) )
 	ROM_LOAD( "swarpt7h.bin", 0x2000, 0x1000, CRC(34a36536) SHA1(bc438515618683b2a7c29637871ee00ed95ad7f8) )
-	// missing ROM at $4000
-	ROM_LOAD( "swarpt7m.bin", 0x6000, 0x1000, BAD_DUMP CRC(a2dff6c8) SHA1(d1c72848450dc5ff386dc94a26e4bf704ccc7121) ) // ROMCMP reports "BADADDR            xxxxxx-xxxxx".  Observed data sequence repeated every 32 bytes
+	ROM_LOAD( "swarpt7k.bin", 0x4000, 0x1000, NO_DUMP )
+	ROM_LOAD( "swarpt7m.bin", 0x6000, 0x1000, BAD_DUMP CRC(a2dff6c8) SHA1(d1c72848450dc5ff386dc94a26e4bf704ccc7121) ) // ROMCMP reports "BADADDR xxxxxx-xxxxx".  Observed data sequence repeated every 32 bytes
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "swarpb1h.bin", 0x0000, 0x0800, CRC(6ee3b5f7) SHA1(8150f2ecd59d3a165c0541b550664c56d049edd5) )
@@ -2324,7 +2321,8 @@ ROM_START( spcwarp )
 ROM_END
 
 // GX-01 main PCB + MV-2 ROM board + HB CPU board
-// In-game it still shows the Century copyright but the PCB has no sign of being an original
+// In-game it still shows the Century copyright but the PCB has no sign of being an original.
+// Though PCB manufacture quality doesn't apply since it was sold as a Galaxian conversion kit.
 ROM_START( superbikg )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "moto1-2516.bin", 0x0000, 0x0800, CRC(2903f8c8) SHA1(288401a941853751caa8d1d69e6908dbfbcfb5ac) )
@@ -2652,7 +2650,7 @@ GAME( 1981, froggerv,  frogger,  videotron, froggerv,  galaxold_state, empty_ini
 GAME( 1983, hunchbkg,  hunchbak, hunchbkg,  hunchbkg,  galaxold_state, empty_init,     ROT90,  "Century Electronics",                                 "Hunchback (Galaxian hardware)",                               MACHINE_SUPPORTS_SAVE )
 GAME( 1983, hunchbgb,  hunchbak, hunchbkg,  hunchbkg,  galaxold_state, empty_init,     ROT90,  "bootleg (FAR S.A.)",                                  "Hunchback (FAR S.A. bootleg on Galaxian hardware)",           MACHINE_SUPPORTS_SAVE )
 GAME( 1983, spcwarp,   0,        spcwarp,   hunchbkg,  galaxold_state, empty_init,     ROT90,  "Century Electronics",                                 "Space Warp? (Cosmos conversion on Galaxian hardware)",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_WRONG_COLORS ) // bad dump
-GAME( 1983, superbikg, superbik, superbikg, superbikg, galaxold_state, init_superbikg, ROT90,  "bootleg",                                             "Superbike (bootleg on Galaxian hardware)",                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // colors look strange but match real hw video
+GAME( 1983, superbikg, superbik, superbikg, superbikg, galaxold_state, init_superbikg, ROT90,  "Century Electronics",                                 "Superbike (Galaxian hardware)",                               MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // colors look strange but match real hw video
 GAME( 1984, drivfrcg,  drivfrcp, drivfrcg,  drivfrcg,  galaxold_state, empty_init,     ROT90,  "Shinkai Inc. (Magic Electronics USA license)",        "Driving Force (Galaxian conversion)",                         MACHINE_SUPPORTS_SAVE )
 GAME( 1984, drivfrct,  drivfrcp, drivfrcg,  drivfrcg,  galaxold_state, empty_init,     ROT90,  "bootleg (EMT Germany)",                               "Top Racer (bootleg of Driving Force)",                        MACHINE_SUPPORTS_SAVE ) // Video Klein PCB
 GAME( 1985, drivfrcb,  drivfrcp, drivfrcg,  drivfrcg,  galaxold_state, empty_init,     ROT90,  "bootleg (Elsys Software)",                            "Driving Force (Galaxian conversion bootleg)",                 MACHINE_SUPPORTS_SAVE )
