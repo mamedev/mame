@@ -85,13 +85,13 @@ macro   push
 macro   jp
 	call arg16
 	PC = TDAT; WZ = PC;
-	m_branch_cb(true);
+	m_branch_cb(1);
 
 macro   jp_cond
 	if (TDAT8) {
 		call arg16
 		PC = TDAT; WZ = PC;
-		m_branch_cb(true);
+		m_branch_cb(1);
 	} else {
 		// implicit do PC += 2
 		call arg16
@@ -103,7 +103,7 @@ macro   jr
 	TADR = PC-1;
 	5 * call nomreq_addr
 	PC += (s8)TDAT8; WZ = PC;
-	m_branch_cb(true);
+	m_branch_cb(1);
 
 macro   r800:jr
 	call arg
@@ -167,7 +167,7 @@ macro   z80n:retn
 macro   reti
 	call pop
 	PC = TDAT; WZ = PC; m_iff1 = m_iff2;
-	m_reti_cb(true);
+	m_reti_cb(1);
 	daisy_call_reti_device();
 
 macro   ld_r_a
@@ -535,11 +535,11 @@ macro   take_interrupt
 	m_iff1 = m_iff2 = 0;
 	// say hi
 	// Not precise in all cases. z80 must finish current instruction (NOP) to reach this state - in such case frame timings are shifter from cb event if calculated based on it.
-	m_irqack_cb(true);
+	m_irqack_cb(1);
 	m_r++;
 	{
 		// fetch the IRQ vector
-		m_irqfetch_cb(true);
+		m_irqfetch_cb(1);
 		device_z80daisy_interface *intf = daisy_get_irq_device();
 		m_tmp_irq_vector = (intf != nullptr) ? intf->z80daisy_irq_ack() : standard_irq_callback(0, m_pc.w);
 		LOGMASKED(LOG_INT, "single INT m_tmp_irq_vector $%02x\n", m_tmp_irq_vector);
