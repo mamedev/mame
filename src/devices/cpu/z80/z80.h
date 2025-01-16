@@ -49,6 +49,10 @@ public:
 	auto irqfetch_cb() { return m_irqfetch_cb.bind(); }
 	auto reti_cb() { return m_reti_cb.bind(); }
 
+	// output pins state
+	int halt_r() { return m_halt; }
+	int busack_r() { return m_busack_state; }
+
 protected:
 	z80_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
