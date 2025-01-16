@@ -770,7 +770,7 @@ ROM_START( codemagik )
 
 	ROM_REGION( 0x3000, "gfx2", 0 )
 	ROM_LOAD( "3y_2732.1a", 0x0000, 0x1000, CRC(ea868221) SHA1(fcf9a840537feb28c9fb65b58b9a41b2412aa4ef) )    // cards deck and alt gfx, bitplane1
-	ROM_LOAD( "2y_2732.3a", 0x1000, 0x1000, CRC(6d1da4bb) SHA1(dc8c70faa301e2f7e9089d38e0ef618e8352e569) )    // cards deck gfx, bitplane2
+	ROM_LOAD( "2y_2732.3a", 0x1000, 0x1000, CRC(6d1da4bb) SHA1(dc8c70faa301e2f7e9089d38e0ef618e8352e569) )    // cards deck and alt gfx, bitplane2
 	ROM_COPY( "gfx1",       0x4800, 0x2000, 0x0800 )    // cards deck gfx, bitplane3.
 	ROM_COPY( "gfx1",       0x5800, 0x2800, 0x0800 )    // cards deck alt gfx, bitplane3.
 
