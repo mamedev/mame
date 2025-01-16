@@ -12,7 +12,9 @@
  */
 /*
  * WIP
- *  - boots 42nix from hard disk image, but can't operate GUI without mouse
+ *  - boots 42nix from hard disk image
+ *  - cursor sometimes "trapped"
+ *  - keyboard intermittently outputs garbage
  */
 
 #include "emu.h"
@@ -81,7 +83,8 @@ public:
 		, m_kbd(*this, "kbd")
 		, m_buzzer(*this, "buzzer")
 		, m_buzzen(*this, "buzzer_enable")
-		, m_mouse_buttons(*this, "mouse_buttons")
+		, m_mouse_buttons(*this, "MOUSE_B")
+		, m_mouse_axis(*this, "MOUSE_%c", 'X')
 		, m_led_err(*this, "led_err")
 		, m_led_fdd(*this, "led_fdd")
 	{
@@ -102,6 +105,9 @@ protected:
 
 private:
 	MC6845_UPDATE_ROW(update_row);
+	MC6845_END_UPDATE(draw_cursor);
+
+	template <unsigned Axis> u8 mouse_axis_r();
 
 	// devices
 	required_device<ns32016_device> m_cpu;
@@ -137,24 +143,88 @@ private:
 	required_device<input_merger_all_high_device> m_buzzen;
 
 	required_ioport m_mouse_buttons;
+	required_ioport_array<2> m_mouse_axis;
 
 	output_finder<> m_led_err;
 	output_finder<> m_led_fdd;
 
 	u8 m_sem[6] = { 0xc0, 0x80, 0xc0, 0xc0, 0xc0, 0xc0 };
 	u8 m_iop_p2;
+
+	s16 m_mouse[2];
+
+	struct cursor_cnt
+	{
+		bool partial;
+		u16 data;
+		s16 value;
+	}
+	m_cursor_cnt[2];
+
+	u8 m_cursor_reg;  // cursor page number and x offset
+	bool m_cursor_fn; // cursor function (1=nor, 0=xnor)
 };
 
 void mg1_state::machine_start()
 {
 	m_led_err.resolve();
 	m_led_fdd.resolve();
+
+	save_item(NAME(m_sem));
+	save_item(NAME(m_iop_p2));
+	save_item(NAME(m_mouse));
+	save_item(STRUCT_MEMBER(m_cursor_cnt, partial));
+	save_item(STRUCT_MEMBER(m_cursor_cnt, data));
+	save_item(STRUCT_MEMBER(m_cursor_cnt, value));
+	save_item(NAME(m_cursor_reg));
+	save_item(NAME(m_cursor_fn));
 }
 
 void mg1_state::machine_reset()
 {
 	m_fdc->set_floppy(m_fdd);
 	m_iop_p2 = 0;
+
+	m_mouse[0] = 0;
+	m_mouse[1] = 0;
+
+	for (cursor_cnt &c : m_cursor_cnt)
+	{
+		c.partial = false;
+		c.data = 0;
+		c.value = 0;
+	}
+
+	m_cursor_reg = 0;
+	m_cursor_fn = false;
+
+	// HACK: capture the counter 1 and 2 values which control the hardware cursor location
+	m_iop->space(0).install_write_tap(0x20e1, 0x20e2, "cursor_cnt_w",
+		[this](offs_t offset, u8 &data, u8 mem_mask)
+		{
+			cursor_cnt &c = m_cursor_cnt[(offset & 3) - 1];
+
+			// data is written least-significant byte first
+			c.data = u16(data) << 8 | (c.data >> 8);
+			c.partial = !c.partial;
+
+			// convert counter values to pixel coordinates after each update
+			if (!c.partial)
+			{
+				switch (offset & 3)
+				{
+				case 1:
+					// counter 1 holds cursor y position multiplied by number of characters
+					// per line (20), plus an offset (0x4d); except for lines <1
+					c.value = (c.data > 0x4c) ? (c.data - 0x4d) / 0x14 : (c.data - 0x4d);
+					break;
+				case 2:
+					// counter 2 holds cursor x position in character columns (+1)
+					c.value = (c.data - 1) * 64;
+					break;
+				}
+			}
+		});
 }
 
 template <unsigned ST> void mg1_state::cpu_map(address_map &map)
@@ -250,14 +320,17 @@ void mg1_state::iop_map(address_map &map)
 		}, "iop_sem_w");
 
 	// i/o area
-	map(0x2000, 0x201f).mirror(0x1e00).lw8([this](u8 data) { m_buzzen->in_w<1>(BIT(data, 0)); }, "mouse_x"); // mouse x counter/buzzer enable
+	map(0x2000, 0x201f).mirror(0x1e00).r(FUNC(mg1_state::mouse_axis_r<0>));
+	map(0x2000, 0x201f).mirror(0x1e00).lw8([this](u8 data) { m_buzzen->in_w<1>(BIT(data, 0)); }, "buzzer_w");
 	map(0x2020, 0x2020).mirror(0x1e00).lw8([this](offs_t offset, u8 data) { logerror("host reset %x,0x%02x\n", offset, data); }, "host_reset").select(0x0100);
-	//map(0x2040, 0x205f).mirror(0x1e00).lw8([this](u8 data) { logerror("cursor 0x%02x\n", data); }, "cursor"); // cursor pixel offset & cursor number
-	map(0x2060, 0x207f).mirror(0x1e00).lw8([this](u8 data) { m_icu->ir_w<10>(0); }, "iopint");
+	map(0x2040, 0x205f).mirror(0x1e00).lw8([this](u8 data) { m_cursor_reg = data; }, "cursor_reg_w");
+	map(0x2060, 0x207f).mirror(0x1e00).lw8([this](u8 data) { m_icu->ir_w<10>(1); m_icu->ir_w<10>(0); }, "iopint");
 	map(0x2080, 0x2080).mirror(0x1e00).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x2081, 0x2081).mirror(0x1e00).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x20a0, 0x20bf).mirror(0x1e00).lr8([this]() { return m_mouse_buttons->read(); }, "mouse_b"); // mouse buttons
-	//map(0x20c0, 0x20df).mirror(0x1e00).lw8([this](u8 data) { logerror("mouse y counter 0x%02x\n", data); }, "mouse_y"); // mouse y counter
+	map(0x20a0, 0x20bf).mirror(0x1e00).lrw8(
+		[this]() { return m_mouse_buttons->read(); }, "mouse_b_r",
+		[this](u8 data) { m_cursor_fn = BIT(data, 0); }, "cursor_fn_w");
+	map(0x20c0, 0x20df).mirror(0x1e00).r(FUNC(mg1_state::mouse_axis_r<1>));
 	map(0x20e0, 0x20ff).mirror(0x1e00).rw(m_iop_ctc, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 
 	map(0x4000, 0x47ff).mirror(0x3800).ram().share("iop_sram"); // D4016C-3 2048x8 SRAM
@@ -272,11 +345,27 @@ void mg1_state::dma_map(address_map &map)
 		[this](offs_t offset, u16 data, u16 mem_mask) { m_cpu->space(0).write_word(offset << 1, swapendian_int16(data), swapendian_int16(mem_mask)); }, "dma_w");
 }
 
+template <unsigned Axis> u8 mg1_state::mouse_axis_r()
+{
+	s16 const value = m_mouse_axis[Axis]->read();
+	s8 const delta = std::clamp<s16>(value - m_mouse[Axis], -128, 127);
+
+	m_mouse[Axis] = value;
+
+	return delta;
+}
+
 static INPUT_PORTS_START(mg1)
-	PORT_START("mouse_buttons")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse Left Button")      PORT_CODE(MOUSECODE_BUTTON1)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Mouse Middle Button")    PORT_CODE(MOUSECODE_BUTTON3)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Mouse Right Button")     PORT_CODE(MOUSECODE_BUTTON2)
+	PORT_START("MOUSE_B")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Mouse Left Button")      PORT_CODE(MOUSECODE_BUTTON1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("Mouse Middle Button")    PORT_CODE(MOUSECODE_BUTTON3)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("Mouse Right Button")     PORT_CODE(MOUSECODE_BUTTON2)
+
+	PORT_START("MOUSE_X")
+	PORT_BIT(0xffff, 0x0000, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0)
+
+	PORT_START("MOUSE_Y")
+	PORT_BIT(0xffff, 0x0000, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0)
 INPUT_PORTS_END
 
 MC6845_UPDATE_ROW(mg1_state::update_row)
@@ -303,6 +392,42 @@ MC6845_UPDATE_ROW(mg1_state::update_row)
 			bitmap.pix(y, x + 5) = BIT(data, 5) ? rgb_t::black() : rgb_t::white();
 			bitmap.pix(y, x + 6) = BIT(data, 6) ? rgb_t::black() : rgb_t::white();
 			bitmap.pix(y, x + 7) = BIT(data, 7) ? rgb_t::black() : rgb_t::white();
+		}
+	}
+}
+
+MC6845_END_UPDATE(mg1_state::draw_cursor)
+{
+	s32 const cursor_y = m_cursor_cnt[0].value;
+	s32 const cursor_x = m_cursor_cnt[1].value - BIT(m_cursor_reg, 2, 6);
+
+	rectangle cursor(cursor_x, cursor_x + 63, cursor_y, cursor_y + 63);
+	cursor &= cliprect;
+
+	for (s32 y = cursor.top(); y <= cursor.bottom(); y++)
+	{
+		// vma0-5 from counter, vma6-7 from register, vma8-15 high, vma16 low
+		u16 const vma = 0xff00 | BIT(m_cursor_reg, 0, 2) << 6;
+		u32 const va = (u32(m_vmram[vma >> 6]) << 6) + y - cursor_y;
+
+		// read first displayed byte of cursor data
+		unsigned bit = cursor.left() - cursor_x;
+		u8 data = m_ram->read((va << 3) | BYTE8_XOR_LE(bit >> 3));
+
+		for (s32 x = cursor.left(); x <= cursor.right(); x++)
+		{
+			// apply cursor function
+			if (BIT(data, bit++ & 7))
+			{
+				if (m_cursor_fn)
+					bitmap.pix(y, x) = rgb_t::black();
+				else
+					bitmap.pix(y, x) ^= rgb_t::white();
+			}
+
+			// read next byte of cursor data
+			if (!(bit & 7) && (bit < 64))
+				data = m_ram->read((va << 3) | BYTE8_XOR_LE(bit >> 3));
 		}
 	}
 }
@@ -404,6 +529,7 @@ void mg1_state::mg1(machine_config &config)
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_hpixels_per_column(64);
 	m_crtc->set_update_row_callback(FUNC(mg1_state::update_row));
+	m_crtc->set_end_update_callback(FUNC(mg1_state::draw_cursor));
 	m_crtc->out_vsync_callback().set(m_iop_ctc, FUNC(pit8253_device::write_gate1));
 	m_crtc->out_hsync_callback().set(m_iop_ctc, FUNC(pit8253_device::write_gate2));
 
@@ -412,6 +538,7 @@ void mg1_state::mg1(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(60_MHz_XTAL, 20*64, 1*64, 17*64, 51*16 + 4, 0, 50*16);
 	m_screen->set_screen_update(m_crtc, FUNC(mc6845_device::screen_update));
+	m_screen->screen_vblank().set_inputline(m_iop, M6801_TIN_LINE);
 
 	AM7990(config, m_net);
 	m_net->intr_out().set(m_icu, FUNC(ns32202_device::ir_w<6>));
