@@ -282,4 +282,4 @@ ROM_END
 
 //    YEAR  NAME    PARENT    MACHINE   INPUT     STATE        INIT        ROT     COMPANY         FULLNAME                      FLAGS
 GAME( 1985, big10,  0,        big10,    big10,    big10_state, empty_init, ROT0,   "Success",      "Big 10 (1985, Success)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1986, big10a, big10,    big10,    big10,    big10_state, empty_init, ROT0,   "System Make",  "Big 10 (1986, System Make)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, big10a, 0,        big10,    big10,    big10_state, empty_init, ROT0,   "System Make",  "Big 10 (1986, System Make)", MACHINE_SUPPORTS_SAVE )
