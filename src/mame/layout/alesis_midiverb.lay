@@ -1,0 +1,111 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+copyright-holders:m1macrophage
+-->
+<mamelayout version="2">
+	<element name="txt_defeat">
+		<text string="DEFEAT"><color red="0.84" green="0.85" blue="0.82"/></text>
+	</element>
+	<element name="txt_program">
+		<text string="PROGRAM/MIDI"><color red="0.84" green="0.85" blue="0.82"/></text>
+	</element>
+	<element name="txt_down">
+		<text string="DOWN"><color red="0.84" green="0.85" blue="0.82"/></text>
+	</element>
+	<element name="txt_up">
+		<text string="UP"><color red="0.84" green="0.85" blue="0.82"/></text>
+	</element>
+	<element name="txt_channel">
+		<text string="MIDI CHAN"><color red="0.84" green="0.85" blue="0.82"/></text>
+	</element>
+	<element name="txt_0">
+		<text string="0" align="2"><color red="0.84" green="0.85" blue="0.82"/></text>
+	</element>
+	<element name="txt_m12">
+		<text string="-12" align="2"><color red="0.84" green="0.85" blue="0.82"/></text>
+	</element>
+
+	<element name="ui_background">
+		<rect><color red="0.21" green="0.23" blue="0.22"/></rect>
+	</element>
+	<element name="line">
+		<rect><color red="0.33" green="0.65" blue="0.73"/></rect>
+	</element>
+
+	<element name="red_led">
+		<disk><color red="0.13" green="0.56" blue="0.36"/></disk>
+	</element>
+	<element name="green_led">
+		<disk><color red="0.65" green="0.14" blue="0.11"/></disk>
+	</element>
+
+	<element name="button">
+		<rect>
+			<bounds x="0" y="0" width="85" height="85"/>
+			<color red="0.02" green="0.03" blue="0.01"/>
+		</rect>
+		<rect state="0">
+			<bounds x="6" y="6" width="73" height="73"/>
+			<color red="0.27" green="0.28" blue="0.25"/>
+		</rect>
+		<rect state="1">
+			<bounds x="6" y="6" width="73" height="73"/>
+			<color red="0.5" green="0.5" blue="0.5"/>
+		</rect>
+	</element>
+
+	<element name="digit_background">
+		<rect><color red="0.16" green="0.04" blue="0.05"/></rect>
+	</element>
+	<element name="digit">
+		<led7seg><color red="0.8" green="0.03" blue="0.04"/></led7seg>
+	</element>
+
+	<view name="Default Layout">
+		<bounds x="192" y="1318" width="1244" height="282"/>
+
+		<element ref="ui_background">
+			<bounds x="208" y="1334" width="1212" height="250"/>
+		</element>
+
+		<repeat count="5">
+			<param name="line_y" start="1440" increment="10"/>
+			<element ref="line">
+				<bounds x="208" y="~line_y~" width="1212" height="7"/>
+			</element>
+		</repeat>
+
+		<element ref="txt_defeat"><bounds x="381" y="1520" width="130" height="24"/></element>
+		<element ref="button" inputtag="buttons" inputmask="0x08">
+			<bounds x="404" y="1423" width="85" height="85"/>
+		</element>
+
+		<element ref="txt_0"><bounds x="623" y="1395" width="53" height="23"/></element>
+		<element ref="red_led"><bounds x="690" y="1391" width="27" height="27"/></element>
+
+		<element ref="txt_m12"><bounds x="623" y="1510" width="53" height="23"/></element>
+		<element ref="green_led"><bounds x="690" y="1506" width="27" height="27"/></element>
+
+		<element ref="txt_program"><bounds x="768" y="1539" width="196" height="24"/></element>
+		<element ref="digit_background"><bounds x="783" y="1405" width="156" height="124"/></element>
+		<element ref="digit" name="digit_1"><bounds x="798" y="1431" width="50" height="76"/></element>
+		<element ref="digit" name="digit_2"><bounds x="874" y="1431" width="50" height="76"/></element>
+
+		<element ref="txt_down"><bounds x="998" y="1520" width="130" height="24"/></element>
+		<element ref="button" inputtag="buttons" inputmask="0x04">
+			<bounds x="1017" y="1423" width="85" height="85"/>
+		</element>
+
+		<element ref="txt_up"><bounds x="1123" y="1520" width="130" height="24"/></element>
+		<element ref="button" inputtag="buttons" inputmask="0x02">
+			<bounds x="1145" y="1423" width="85" height="85"/>
+		</element>
+
+		<element ref="txt_channel"><bounds x="1249" y="1520" width="130" height="24"/></element>
+		<element ref="button" inputtag="buttons" inputmask="0x01">
+			<bounds x="1272" y="1423" width="85" height="85"/>
+		</element>
+	</view>
+</mamelayout>
+
