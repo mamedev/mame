@@ -325,6 +325,12 @@ ROM_START( smartfpf )
 	ROM_LOAD16_WORD_SWAP("smartfitpark_fr.bin", 0x000000, 0x800000, CRC(e6d3ba29) SHA1(14e4632997318329be3291f2c4e62f088181f3c8) )
 ROM_END
 
+ROM_START( fpsport )
+	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP("fpsports.bin", 0x000000, 0x800000, CRC(d8c23ccc) SHA1(46cbe0aa180facbc06db771c09d3926b27336ac1) )
+ROM_END
+
+
 
 ROM_START( gormiti )
 	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
@@ -659,6 +665,9 @@ CONS(2008, jak_spmm,  0,       0, base, jak_spmm,  gormiti_game_state, empty_ini
 CONS(2009, smartfp,   0,       0, base, smartfp,  gcm394_game_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (UK)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS(2009, smartfps,  smartfp, 0, base, smartfp,  gcm394_game_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS(2009, smartfpf,  smartfp, 0, base, smartfp,  gcm394_game_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (France)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // boxart simply has 'Smart Fit'
+
+// skip the call at 6d47a to get it to show something
+CONS(2008, fpsport,   0,       0, base, base,     gcm394_game_state, empty_init, "Fisher-Price", "3-in-1 Smart Sports! (US)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 // These are ports of the 'Family Sport' games to GPL16250 type hardware, but they don't seem to use many unSP 2.0 instructions.
 // The menu style is close to 'm505neo' but the game selection is closer to 'dnv200fs' (but without the Sports titles removed, and with a few other extras not found on that unit)
