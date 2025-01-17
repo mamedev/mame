@@ -520,6 +520,7 @@ public:
 		m_vint(*this, "vint"),
 		m_screen(*this, "screen"),
 		m_acia(*this, "acia"),
+		m_fpu(*this, "fpu"),
 		m_printer(*this, "printer"),
 		m_prom(*this, "maincpu"),			// FIXME why is the bootrom called 'maincpu'?
 		m_mainram(*this, "mainram"),
@@ -573,12 +574,14 @@ private:
 	void mouse_w(u8 data);
 	void led_w(u8 data);
 
+	void fpu_finished(int v);
+	
 	int fpu_latch32_result(void *);
 	int fpu_latch64_result(void *);
 	int fpu_latch32_int_result(void *);
-
 	u16 fpu_r(offs_t offset);
 	void fpu_w(offs_t offset, u16 data);
+	
 	u16 videoaddr_r(offs_t offset);
 	void videoaddr_w(offs_t offset, u16 data);
 	u8 videocntl_r();
@@ -623,6 +626,7 @@ private:
 	required_device<input_merger_all_high_device> m_vint;
 	required_device<screen_device> m_screen;
 	required_device<mos6551_device> m_acia;
+	required_device<ns32081_device> m_fpu;
 	required_device<i8255_device> m_printer;
 
 	required_region_ptr<u16> m_prom;
@@ -653,6 +657,9 @@ private:
 	bool m_kb_rclamp;
 	bool m_kb_loop;
 			
+			
+	int m_fpu_finished;
+	
 	u16 m_fpuselect;
 	u16 m_fpustatus;
 	u16 m_operand;
@@ -737,6 +744,7 @@ u32 tek440x_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 	if (!BIT(m_videocntl, 5))
 	{
 		// screen off
+		bitmap.fill(rgb_t::black(), cliprect);
 		return 1;
 	}
 
@@ -1021,47 +1029,22 @@ void tek440x_state::mapcntl_w(u8 data)
 	
 }
 
-enum {
-	FPCALC = 0xbe,
-	FPCONV = 0x3e,
-	
-	SETS = 0x0b42,
-	GETS = 0x3342,
-	
-	FItoF = 0x0742,
-	FFtoIr = 0x2742,
-	FFtoIt = 0x2f42,
-	FFtoIf = 0x3f42,
-	FFtoD = 0x1b42,
-	
-	FItoD = 0x0342,
-	FDtoIr = 0x2342,
-	FDtoIt = 0x2b42,
-	FDtoIf = 0x3b42,
-	FDtoF = 0x1642,
-	
-	FADD = 0x0142,
-	FSUB = 0x1142,
-	FMUL = 0x3142,
-	FDIV = 0x2142,
-	FCMP = 0x0942,
-	FNEG = 0xff00,	// unused
-	FABS = 0xff01,	// unused
+void tek440x_state::fpu_finished(int val)
+{
 
-	DADD = 0x0042,
-	DSUB = 0x1042,
-	DMUL = 0x3042,
-	DDIV = 0x2042,
-	DCMP = 0x0842,
-	DNEG = 0xff80,	// unused
-	DABS = 0xff81,	// unused
-
-};
+	// active low
+	if (val == 0)
+	{
+		LOGMASKED(LOG_FPU, "fpu_finished\n");
+		m_fpu_finished = 1;
+	}
+}
 
 void tek440x_state::fpu_w(offs_t offset, u16 data)
 {
 	//LOGMASKED(LOG_FPU,"fpu_w:  %08x <= 0x%04x\n", offset, data);
 
+	// page 2.1-72  AD.02,AD.03 drive ST0,ST1 of 32081
 	switch(offset)
 	{
 		default:
@@ -1069,290 +1052,23 @@ void tek440x_state::fpu_w(offs_t offset, u16 data)
 		
 		// latches opcode.w, arg1.l, arg2.l
 		case 2:
-			m_lswoperand[m_operand] = data;
-			if (!m_operand) m_operand++;
-			break;
 		case 3:
-			m_mswoperand[m_operand] = data;
-			m_operand++;
+			m_fpu->slow_write(data);
 			break;
 
-		// start op,  can be FPCALC or FPCONV...possibly
+		// broadcast slave id  (0xbe or 0x3e)
 		case 6:
-			m_fpuselect = data;
-			m_result = 0;
-			m_operand = 0;
+			LOGMASKED(LOG_FPU,"fpu_w: broadcast slave 0x%04x\n", data);
+			m_fpu_finished = 0;
+			m_fpu->slow_write(data);
 			break;
 		case 7:
 			break;
 	}
 }
 
-int tek440x_state::fpu_latch32_result(void *v)
-{
-	m_result <<= 32;
-	m_result |= *(uint32_t *)v;
-	return FLOATRESULT;
-}
-
-int tek440x_state::fpu_latch64_result(void *v)
-{
-	m_result = *(uint64_t *)v;
-	return DOUBLERESULT;
-}
-
-int tek440x_state::fpu_latch32_int_result(void *v)
-{
-	fpu_latch32_result(v);
-	return INTRESULT;
-}
-
-#define CASE_ENUM(C) case C: opname = #C; break
-
 u16 tek440x_state::fpu_r(offs_t offset)
 {
-	// status check; should pretend to be not-ready for a bit
-	if (offset == 4)
-	{
-		float af,bf;
-		double ad,bd;
-		int ai;
-		
-		uint32_t v32;
-		uint64_t v64;
-
-		// assembling operands
-		if (m_operand >= 2)		// has at least 1 32-bit operands
-		{
-			v32 = (m_mswoperand[1] << 16) | (m_lswoperand[1]);
-			ai = v32;
-			af = *(float *)&v32;
-			
-			if (m_operand >= 3)		// has at least 2 32-bit operands or 1 64-bit operand
-			{
-				v32 = (m_mswoperand[2] << 16) | (m_lswoperand[2]);
-				bf = *(float *)&v32;
-
-				v64 = (((uint64_t)m_mswoperand[2]) << 48) | (((uint64_t)m_lswoperand[2])<<32) | (((uint64_t)m_mswoperand[1]) << 16) | (m_lswoperand[1]);
-				ad = *(double *)&v64;
-			}
-		
-			if (m_operand == 5)		// has 2 64-bit operands
-			{
-				v64 = (((uint64_t)m_mswoperand[4]) << 48) | (((uint64_t)m_lswoperand[4])<<32) | (((uint64_t)m_mswoperand[3]) << 16) | (m_lswoperand[3]);
-				bd = *(double *)&v64;
-			}
-		}
-
-#ifdef DEBUG
-		const char *opname;
-		switch(m_lswoperand[0])
-		{
-			CASE_ENUM(FADD);
-			CASE_ENUM(FSUB);
-			CASE_ENUM(FMUL);
-			CASE_ENUM(FDIV);
-			CASE_ENUM(FCMP);
-
-			CASE_ENUM(FItoF);
-			CASE_ENUM(FFtoIr);
-			CASE_ENUM(FFtoIt);
-			CASE_ENUM(FFtoIf);
-			CASE_ENUM(FFtoD);
-			CASE_ENUM(FDtoF);
-
-			CASE_ENUM(DADD);
-			CASE_ENUM(DSUB);
-			CASE_ENUM(DMUL);
-			CASE_ENUM(DDIV);
-			CASE_ENUM(DCMP);
-
-			CASE_ENUM(FItoD);
-			CASE_ENUM(FDtoIr);
-			CASE_ENUM(FDtoIt);
-			CASE_ENUM(FDtoIf);
-			
-			default:
-				opname = "unknown";
-				break;
-		}
-		LOGMASKED(LOG_FPU,"fpu_r: %s  ************** %s \n", m_fpuselect == FPCALC ? "FPCALC" : "FPCONV",  opname);
-		
-		LOGMASKED(LOG_FPU,"fpu_r:  m_operand(%d) float(%f) int(%d)\n", m_operand, af, ai);
-		if (m_operands >= 3)
-			LOGMASKED(LOG_FPU,"fpu_r:  m_operand(%d) float(%f) float(%f) double(%lf) 0x%lx\n", m_operand, af,bf, ad, v64);
-		if (m_operands >= 5)
-			LOGMASKED(LOG_FPU,"fpu_r:  m_operand(%d) double(%lf) double(%lf)\n", m_operand,  ad,bd);
-#endif
-
-
-		// execute the functionality
-		int resulttype = FLOATRESULT;
-		int ci;
-		float cf;
-		double cd;
-		switch(m_lswoperand[0])
-		{
-			case FADD:
-				cf = bf + af;
-				resulttype = fpu_latch32_result(&cf);
-				FLOATRESULT;
-				break;
-			case FSUB:
-				cf = bf - af;
-				resulttype = fpu_latch32_result(&cf);
-				resulttype = FLOATRESULT;
-				break;
-			case FMUL:
-				cf = bf * af;
-				resulttype = fpu_latch32_result(&cf);
-				resulttype = FLOATRESULT;
-				break;
-			case FDIV:
-				cf = bf / af;
-				resulttype = fpu_latch32_result(&cf);
-				resulttype = FLOATRESULT;
-				break;
-			case FCMP:
-				ci = af > bf ? 1 : (af < bf ? -1 : 0);
-				resulttype = fpu_latch32_result(&ci);
-				resulttype = FLOATRESULT;
-				break;
-				
-			case FNEG:
-				cf = -af;
-				resulttype = fpu_latch32_result(&cf);
-				resulttype = FLOATRESULT;
-				break;
-			case FABS:
-				cf = fabs(af);
-				resulttype = fpu_latch32_result(&cf);
-				resulttype = FLOATRESULT;
-				break;
-
-			case FItoF:
-				cf = (float)ai;
-				resulttype = fpu_latch32_result(&cf);
-				resulttype = FLOATRESULT;
-				break;
-			case FFtoIr:
-				ci = (int)(af + 0.5f);
-				resulttype = fpu_latch32_int_result(&ci);
-				resulttype = INTRESULT;
-				break;
-			case FFtoIt:
-				ci = (int)(af);
-				resulttype = fpu_latch32_int_result(&ci);
-				resulttype = INTRESULT;
-				break;
-			case FFtoIf:
-				ci = (int)floorf(af);
-				resulttype = fpu_latch32_int_result(&ci);
-				resulttype = INTRESULT;
-				break;
-
-			case FFtoD:
-				cd = (double)af;
-				resulttype = fpu_latch64_result(&cd);
-				resulttype = DOUBLERESULT;
-				break;
-			case FDtoF:
-				cf = (float)ad;
-				resulttype = fpu_latch32_result(&cf);
-				resulttype = FLOATRESULT;
-				break;
-				
-			case DADD:
-				cd = bd + ad;
-				resulttype = fpu_latch64_result(&cd);
-				resulttype = DOUBLERESULT;
-				break;
-			case DSUB:
-				cd = bd - ad;
-				resulttype = fpu_latch64_result(&cd);
-				resulttype = DOUBLERESULT;
-				break;
-			case DMUL:
-				cd = bd * ad;
-				resulttype = fpu_latch64_result(&cd);
-				resulttype = DOUBLERESULT;
-				break;
-			case DDIV:
-				cd = bd / ad;
-				resulttype = fpu_latch64_result(&cd);
-				resulttype = DOUBLERESULT;
-				break;
-			case DCMP:
-				ci = ad > bd ? 1 : (ad < bd ? -1 : 0);
-				resulttype = fpu_latch32_result(&ci);
-				resulttype = DOUBLERESULT;
-				break;
-
-			case DNEG:
-				cd = -ad;
-				resulttype = fpu_latch64_result(&cd);
-				resulttype = DOUBLERESULT;
-				break;
-			case DABS:
-				cd = fabs(ad);
-				resulttype = fpu_latch64_result(&cd);
-				resulttype = DOUBLERESULT;
-				break;
-
-			case FItoD:
-				cd = (double)ai;
-				resulttype = fpu_latch64_result(&cd);
-				resulttype = DOUBLERESULT;
-				break;
-			case FDtoIr:
-				ci = (int)(ad + 0.5);
-				resulttype = fpu_latch32_int_result(&ci);
-				resulttype = INTRESULT;
-				break;
-			case FDtoIt:
-				ci = (int)(ad);
-				resulttype = fpu_latch32_int_result(&ci);
-				resulttype = INTRESULT;
-				break;
-			case FDtoIf:
-				ci = (int)floor(ad);
-				resulttype = fpu_latch32_int_result(&ci);
-				resulttype = INTRESULT;
-				break;
-
-			case GETS:
-				ai = m_fpustatus;
-				resulttype = fpu_latch32_int_result(&ai);
-				break;
-			case SETS:
-				m_fpustatus = ai;
-				resulttype = fpu_latch32_int_result(&ai);
-				break;
-
-			default:
-				LOGMASKED(LOG_FPU,"fpu_r: unknown opcode 0x%04x\n", m_lswoperand[0]);
-				m_result = 0x4000;
-				break;
-		}
-	
-		switch(resulttype)
-		{
-			default:
-			case FLOATRESULT:
-				LOGMASKED(LOG_FPU,"fpu_r: m_result = 0x%lx float(%f)\n", m_result, cf);
-				break;
-			case DOUBLERESULT:
-				LOGMASKED(LOG_FPU,"fpu_r: m_result = 0x%lx double(%lf)\n", m_result, cd);
-				break;
-			case INTRESULT:
-				LOGMASKED(LOG_FPU,"fpu_r: m_result = 0x%lx int(%d)\n", m_result, ci);
-				break;
-
-		}
-
-		// always ready  (bit15 clear)
-		return 0;
-	}
 
 	u16 result = 0;
 	switch(offset)
@@ -1360,11 +1076,24 @@ u16 tek440x_state::fpu_r(offs_t offset)
 		default:
 			break;
 
-		// shift out result word at a time
 		case 2:
 		case 3:
-			result = m_result & 0xffff;
-			m_result >>= 16;
+			result = m_fpu->slow_read();
+			break;
+
+		case 4:
+			if (m_fpu_finished)
+			{
+				result = m_fpu->slow_status();
+				//LOGMASKED(LOG_FPU,"fpu_r: status = 0x%04x\n", result);
+			}
+			else
+			{
+				LOGMASKED(LOG_FPU,"fpu_r: status = BUSY\n");
+				
+				// page 2.1.72   FPC.pal:   IF (/Wr*FPSel) /D.15 = /FP.15*/Busy
+				result = 0x8000;
+			}
 			break;
 	}
 	
@@ -1380,7 +1109,7 @@ u16 tek440x_state::videoaddr_r(offs_t offset)
 
 void tek440x_state::videoaddr_w(offs_t offset, u16 data)
 {
-	LOG("videoaddr_w %08x %04x\n", offset, data);
+	//LOG("videoaddr_w %08x %04x\n", offset, data);
 	m_videoaddr[offset] = data;
 }
 
@@ -1837,6 +1566,9 @@ void tek440x_state::tek4404(machine_config &config)
 m_printer->in_pb_callback().set_constant(0xbf);		// HACK:  vblank always checks if printer status < 0
 	m_printer->out_pc_callback().set(FUNC(tek440x_state::printer_pc_w));
 
+	NS32081(config, m_fpu, 20_MHz_XTAL / 2);
+	m_fpu->out_scb().set(FUNC(tek440x_state::fpu_finished));
+	
 	MC68681(config, m_duart, 14.7456_MHz_XTAL / 4);
 	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_5); // auto-vectored
 	m_duart->outport_cb().set(FUNC(tek440x_state::kb_rclamp_w)).bit(4);
