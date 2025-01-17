@@ -142,8 +142,8 @@ void twinbrat_state::machine_start()
 void stlforce_state::eeprom_w(uint8_t data)
 {
 	m_eeprom->di_write(BIT(data, 0));
-	m_eeprom->cs_write(BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE );
-	m_eeprom->clk_write(BIT(data, 2) ? ASSERT_LINE : CLEAR_LINE );
+	m_eeprom->cs_write(BIT(data, 1));
+	m_eeprom->clk_write(BIT(data, 2));
 }
 
 void twinbrat_state::oki_bank_w(uint8_t data)
