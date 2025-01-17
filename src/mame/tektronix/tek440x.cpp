@@ -722,6 +722,7 @@ void tek440x_state::machine_reset()
 	m_latched_map_control = 0;
 	mapcntl_w(0);
 	videocntl_w(0);
+	videoaddr_w(0,0);
 }
 
 
@@ -742,7 +743,7 @@ u32 tek440x_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 	u32 invert = BIT(m_videocntl, 4) ? 0 : -1;
 	int pan = (m_videocntl & 15) ^ 15;
 
-	int woffset = m_videoaddr[0] - 0xffe9;  // ??? why
+	int woffset = 0;	m_videoaddr[0] - 0xffe9;  // ??? why
 
 	for (int y = 0; y < 480; y++)
 	{
