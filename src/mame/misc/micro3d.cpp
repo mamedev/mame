@@ -223,6 +223,12 @@ void micro3d_state::hostmem(address_map &map)
 	map(0xa40002, 0xa40003).r(FUNC(micro3d_state::encoder_l_r));
 }
 
+void micro3d_state::cpu_space_map(address_map &map)
+{
+	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
+	map(0xfffff6, 0xfffff7).lr16(NAME([this] () -> u16 { return m_duart->get_irq_vector(); }));
+}
+
 
 /*************************************
  *
@@ -292,12 +298,6 @@ void micro3d_state::soundmem_io(address_map &map)
 	map(0xfe00, 0xfe00).w(FUNC(micro3d_state::upd7759_w));
 	map(0xff00, 0xff00).w(FUNC(micro3d_state::snd_dac_a));
 	map(0xff01, 0xff01).w(FUNC(micro3d_state::snd_dac_b));
-}
-
-void micro3d_state::cpu_space_map(address_map &map)
-{
-	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
-	map(0xfffff6, 0xfffff7).lr16(NAME([this] () -> u16 { return m_duart->get_irq_vector(); }));
 }
 
 
@@ -480,7 +480,7 @@ ROM_START( f15se22 )
 	ROM_LOAD16_BYTE( "110-00001-007.u94", 0x0c0000, 0x20000, CRC(36e06cba) SHA1(5ffee5da6f475978be10fa5e1a2c24f00497ea5f) )
 	ROM_LOAD16_BYTE( "110-00001-008.u71", 0x100001, 0x20000, CRC(d96fd4e2) SHA1(001af758da437e955b4ee914eabeb9739ebc4454) )
 	ROM_LOAD16_BYTE( "110-00001-009.u95", 0x100000, 0x20000, CRC(33e3b473) SHA1(66deda79ba94f0ed722b399b3fc6062dcdd1a6c9) )
-	ROM_FILL(                    0x140000, 0x40000, 0xff )
+	ROM_FILL(                             0x140000, 0x40000, 0xff )
 
 	// Dr Math PCB (MPG 010-00002-001)
 	ROM_REGION32_BE( 0x100000, "drmath", 0 )

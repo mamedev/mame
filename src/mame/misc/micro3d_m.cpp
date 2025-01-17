@@ -401,9 +401,9 @@ void micro3d_state::drmath_intr2_ack(uint32_t data)
 
 /***************************************************************************
 
-    8031 port mappings:
+    8051 port mappings:
 
-    Port 1                          Port 2
+    Port 1                          Port 3
     =======                         ======
     0: S/H sel A     (O)            0:
     1: S/H sel B     (O)            1:
@@ -415,7 +415,6 @@ void micro3d_state::drmath_intr2_ack(uint32_t data)
     7: Test SW       (I)            7:
 
 ***************************************************************************/
-
 
 void micro3d_state::snd_dac_a(uint8_t data)
 {
