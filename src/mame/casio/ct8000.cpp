@@ -162,8 +162,8 @@ void ct8000_state::ct8000_io_map(address_map &map)
 void ct8000_state::config_base(machine_config &config)
 {
 	I8049(config, m_maincpu, 4.946864_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &ct8000_map);
-	m_maincpu->set_addrmap(AS_IO, &ct8000_io_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ct8000_state::ct8000_map);
+	m_maincpu->set_addrmap(AS_IO, &ct8000_state::ct8000_io_map);
 	m_maincpu->p1_out_cb().set(FUNC(ct8000_state::p1_w));
 	m_maincpu->p1_in_cb().set(FUNC(ct8000_state::p1_r));
 	m_maincpu->p2_out_cb().set(FUNC(ct8000_state::p2_w));
