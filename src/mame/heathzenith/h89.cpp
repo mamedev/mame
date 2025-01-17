@@ -247,9 +247,6 @@ public:
 
 	void h89_mms(machine_config &config);
 
-protected:
-	u8 port_f2_mms_r(offs_t offset);
-	void port_f2_mms_w(offs_t offset, u8 data);
 };
 
 
@@ -885,31 +882,6 @@ void h89_base_state::port_f2_w(offs_t offset, u8 data)
 	m_intr_socket->set_irq_level(1, CLEAR_LINE);
 }
 
-// MMS intercepts the GPIO decoding so the GPIO pin on
-// the right slots can be used as a card select without
-// interfering with normal GPIO port operation.
-u8 h89_mms_state::port_f2_mms_r(offs_t offset)
-{
-	if ((offset & 7) != 2)
-	{
-		return 0;
-	}
-
-	return m_sw501->read();
-}
-
-void h89_mms_state::port_f2_mms_w(offs_t offset, u8 data)
-{
-	if ((offset & 7) != 2)
-	{
-		return;
-	}
-
-	update_gpp(data);
-
-	m_intr_socket->set_irq_level(1, CLEAR_LINE);
-}
-
 static void tlb_options(device_slot_interface &device)
 {
 	device.option_add("heath",        HEATH_TLB);
@@ -1070,9 +1042,6 @@ void h89_mms_state::h89_mms(machine_config &config)
 {
 	h89_base(config);
 	m_h89bus->set_default_bios_tag("444-61c");
-
-	m_h89bus->in_gpp_callback().set(FUNC(h89_mms_state::port_f2_mms_r));
-	m_h89bus->out_gpp_callback().set(FUNC(h89_mms_state::port_f2_mms_w));
 
 	// the card selection is different with the MMS mapping PROM
 	H89BUS_RIGHT_SLOT(config.replace(), "p504", "h89bus", [this](device_slot_interface &device) { h89_right_cards_mms(device); }, "mms77316");

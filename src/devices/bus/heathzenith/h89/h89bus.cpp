@@ -280,7 +280,7 @@ void h89bus_device::io_dispatch_w(offs_t offset, u8 data)
 
 	if (decode)
 	{
-		if (decode & H89_GPP) m_out_gpp_cb(offset, data);
+		if ((decode & H89_GPP) && ((offset & 7) == 2)) m_out_gpp_cb(offset, data);
 		if (decode & H89_NMI) { m_out_nmi_cb(offset, data); return; }
 		if (decode & H89_TERM) { m_out_tlb_cb(offset & 7, data); return; }
 
