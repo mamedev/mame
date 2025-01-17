@@ -272,7 +272,7 @@ bool emit_sub_optimized(a64::Assembler &a, const a64::Gp &dst, const a64::Gp &sr
 arm::Mem get_mem_absolute(a64::Assembler &a, const void *ptr)
 {
 	const uint64_t codeoffs = a.code()->baseAddress() + a.offset();
-	const int64_t reloffs = codeoffs - (int64_t)ptr;
+	const int64_t reloffs = (int64_t)ptr - codeoffs;
 	if (is_valid_immediate_signed(reloffs, 21))
 	{
 		a.adr(MEM_SCRATCH_REG, ptr);
@@ -474,30 +474,30 @@ a64::Gp drcbe_arm64::be_parameter::select_register(a64::Gp const &reg, uint32_t 
 	return reg.x();
 }
 
-void drcbe_arm64::get_imm_relative(a64::Assembler &a, const a64::Gp &reg, const uint64_t ptr) const
+void drcbe_arm64::get_imm_relative(a64::Assembler &a, const a64::Gp &reg, const uint64_t val) const
 {
 	// If a value can be expressed relative to the base register then it's worth using it instead of a mov
 	// which can be expanded to up to 4 instructions for large immediates
-	const int64_t diff = (int64_t)ptr - (int64_t)m_baseptr;
+	const int64_t diff = (int64_t)val - (int64_t)m_baseptr;
 	if (diff > 0 && emit_add_optimized(a, reg, BASE_REG, diff))
 		return;
 	else if (diff < 0 && emit_sub_optimized(a, reg, BASE_REG, diff))
 		return;
 
 	const uint64_t codeoffs = a.code()->baseAddress() + a.offset();
-	const int64_t reloffs = codeoffs - (int64_t)ptr;
+	const int64_t reloffs = (int64_t)val - codeoffs;
 	if (is_valid_immediate_signed(reloffs, 21))
 	{
-		a.adr(reg, ptr);
+		a.adr(reg, val);
 		return;
 	}
 
 	const uint64_t pagebase = codeoffs & ~make_bitmask<uint64_t>(12);
-	const int64_t pagerel = (int64_t)ptr - pagebase;
+	const int64_t pagerel = (int64_t)val - pagebase;
 	if (is_valid_immediate_signed(pagerel, 33))
 	{
-		const uint64_t targetpage = (uint64_t)ptr & ~make_bitmask<uint64_t>(12);
-		const uint64_t pageoffs = (uint64_t)ptr & util::make_bitmask<uint64_t>(12);
+		const uint64_t targetpage = val & ~make_bitmask<uint64_t>(12);
+		const uint64_t pageoffs = val & util::make_bitmask<uint64_t>(12);
 
 		a.adrp(reg.x(), targetpage);
 		if (pageoffs != 0)
@@ -506,7 +506,7 @@ void drcbe_arm64::get_imm_relative(a64::Assembler &a, const a64::Gp &reg, const 
 		return;
 	}
 
-	a.mov(reg, ptr);
+	a.mov(reg, val);
 }
 
 void drcbe_arm64::emit_ldr_str_base_mem(a64::Assembler &a, a64::Inst::Id opcode, const a64::Reg &reg, const void *ptr) const
@@ -521,7 +521,7 @@ void drcbe_arm64::emit_ldr_str_base_mem(a64::Assembler &a, a64::Inst::Id opcode,
 
 	// If it can fit as an offset relative to PC
 	const uint64_t codeoffs = a.code()->baseAddress() + a.offset();
-	const int64_t reloffs = codeoffs - (int64_t)ptr;
+	const int64_t reloffs = (int64_t)ptr - codeoffs;
 	if (is_valid_immediate_signed(reloffs, 21))
 	{
 		a.adr(MEM_SCRATCH_REG, ptr);
@@ -802,7 +802,7 @@ void drcbe_arm64::mov_float_param_param(a64::Assembler &a, uint32_t regsize, con
 void drcbe_arm64::call_arm_addr(a64::Assembler &a, const void *offs) const
 {
 	const uint64_t codeoffs = a.code()->baseAddress() + a.offset();
-	const int64_t reloffs = codeoffs - (int64_t)offs;
+	const int64_t reloffs = (int64_t)offs - codeoffs;
 	if (is_valid_immediate_signed(reloffs, 26))
 	{
 		a.bl(offs);
