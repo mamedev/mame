@@ -72,7 +72,7 @@ void vtech5303_state::vtech5303(machine_config &config)
 }
 
 // Spanish machine
-ROM_START( pawpatrols )
+ROM_START( pawmoviesp )
 	ROM_REGION( 0x010000, "maincpu", 0 )
 	ROM_LOAD( "internal.bin", 0x000000, 0x010000, NO_DUMP ) // Unknown CPU type, unknown internal ROM size
 
