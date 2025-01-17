@@ -498,6 +498,12 @@ namespace {
 		PHASE_NEGATIVE
 	};
 	
+	enum {
+		FLOATRESULT=0,
+		DOUBLERESULT=1,
+		INTRESULT=2
+	};
+	
 class tek440x_state : public driver_device
 {
 public:
@@ -567,8 +573,10 @@ private:
 	void mouse_w(u8 data);
 	void led_w(u8 data);
 
-	void fpu_latch32_result(void *);
-	void fpu_latch64_result(void *);
+	int fpu_latch32_result(void *);
+	int fpu_latch64_result(void *);
+	int fpu_latch32_int_result(void *);
+
 	u16 fpu_r(offs_t offset);
 	void fpu_w(offs_t offset, u16 data);
 	u16 videoaddr_r(offs_t offset);
@@ -646,6 +654,7 @@ private:
 	bool m_kb_loop;
 			
 	u16 m_fpuselect;
+	u16 m_fpustatus;
 	u16 m_operand;
 	u16 m_lswoperand[5];
 	u16 m_mswoperand[5];
@@ -1011,8 +1020,6 @@ void tek440x_state::mapcntl_w(u8 data)
 	
 }
 
-enum {FLOATRESULT=0, DOUBLERESULT=1, INTRESULT=2};
-
 enum {
 	FPCALC = 0xbe,
 	FPCONV = 0x3e,
@@ -1052,7 +1059,7 @@ enum {
 
 void tek440x_state::fpu_w(offs_t offset, u16 data)
 {
-	LOG("fpu_w:  %08x <= 0x%04x\n", offset, data);
+	//LOGMASKED(LOG_FPU,"fpu_w:  %08x <= 0x%04x\n", offset, data);
 
 	switch(offset)
 	{
@@ -1069,10 +1076,10 @@ void tek440x_state::fpu_w(offs_t offset, u16 data)
 			m_operand++;
 			break;
 
-		// start op,  can be FPCALC or FPCONV...
+		// start op,  can be FPCALC or FPCONV...possibly
 		case 6:
-			m_result = 0;
 			m_fpuselect = data;
+			m_result = 0;
 			m_operand = 0;
 			break;
 		case 7:
@@ -1080,15 +1087,23 @@ void tek440x_state::fpu_w(offs_t offset, u16 data)
 	}
 }
 
-void tek440x_state::fpu_latch32_result(void *v)
+int tek440x_state::fpu_latch32_result(void *v)
 {
 	m_result <<= 32;
 	m_result |= *(uint32_t *)v;
+	return FLOATRESULT;
 }
 
-void tek440x_state::fpu_latch64_result(void *v)
+int tek440x_state::fpu_latch64_result(void *v)
 {
 	m_result = *(uint64_t *)v;
+	return DOUBLERESULT;
+}
+
+int tek440x_state::fpu_latch32_int_result(void *v)
+{
+	fpu_latch32_result(v);
+	return INTRESULT;
 }
 
 #define CASE_ENUM(C) case C: opname = #C; break
@@ -1104,6 +1119,29 @@ u16 tek440x_state::fpu_r(offs_t offset)
 		
 		uint32_t v32;
 		uint64_t v64;
+
+		// assembling operands
+		if (m_operand >= 2)		// has at least 1 32-bit operands
+		{
+			v32 = (m_mswoperand[1] << 16) | (m_lswoperand[1]);
+			ai = v32;
+			af = *(float *)&v32;
+			
+			if (m_operand >= 3)		// has at least 2 32-bit operands or 1 64-bit operand
+			{
+				v32 = (m_mswoperand[2] << 16) | (m_lswoperand[2]);
+				bf = *(float *)&v32;
+
+				v64 = (((uint64_t)m_mswoperand[2]) << 48) | (((uint64_t)m_lswoperand[2])<<32) | (((uint64_t)m_mswoperand[1]) << 16) | (m_lswoperand[1]);
+				ad = *(double *)&v64;
+			}
+		
+			if (m_operand == 5)		// has 2 64-bit operands
+			{
+				v64 = (((uint64_t)m_mswoperand[4]) << 48) | (((uint64_t)m_lswoperand[4])<<32) | (((uint64_t)m_mswoperand[3]) << 16) | (m_lswoperand[3]);
+				bd = *(double *)&v64;
+			}
+		}
 
 #ifdef DEBUG
 		const char *opname;
@@ -1138,36 +1176,15 @@ u16 tek440x_state::fpu_r(offs_t offset)
 				break;
 		}
 		LOGMASKED(LOG_FPU,"fpu_r: %s  ************** %s \n", m_fpuselect == FPCALC ? "FPCALC" : "FPCONV",  opname);
+		
+		LOGMASKED(LOG_FPU,"fpu_r:  m_operand(%d) float(%f) int(%d)\n", m_operand, af, ai);
+		if (m_operands >= 3)
+			LOGMASKED(LOG_FPU,"fpu_r:  m_operand(%d) float(%f) float(%f) double(%lf) 0x%lx\n", m_operand, af,bf, ad, v64);
+		if (m_operands >= 5)
+			LOGMASKED(LOG_FPU,"fpu_r:  m_operand(%d) double(%lf) double(%lf)\n", m_operand,  ad,bd);
 #endif
 
-		// assembling operands
-		if (m_operand >= 2)		// has at least 1 32-bit operands
-		{
-			v32 = (m_mswoperand[1] << 16) | (m_lswoperand[1]);
-			ai = v32;
-			af = *(float *)&v32;
-			LOGMASKED(LOG_FPU,"fpu_r:  m_operand(%d) float(%f) int(%d)\n", m_operand, af, ai);
-			
-			if (m_operand >= 3)		// has at least 2 32-bit operands or 1 64-bit operand
-			{
-				v32 = (m_mswoperand[2] << 16) | (m_lswoperand[2]);
-				bf = *(float *)&v32;
 
-				v64 = (((uint64_t)m_mswoperand[2]) << 48) | (((uint64_t)m_lswoperand[2])<<32) | (((uint64_t)m_mswoperand[1]) << 16) | (m_lswoperand[1]);
-				ad = *(double *)&v64;
-
-				LOGMASKED(LOG_FPU,"fpu_r:  m_operand(%d) float(%f) float(%f) double(%lf) 0x%lx\n", m_operand, af,bf, ad, v64);
-			}
-		
-			if (m_operand == 5)		// has 2 64-bit operands
-			{
-				v64 = (((uint64_t)m_mswoperand[4]) << 48) | (((uint64_t)m_lswoperand[4])<<32) | (((uint64_t)m_mswoperand[3]) << 16) | (m_lswoperand[3]);
-				bd = *(double *)&v64;
-
-				LOGMASKED(LOG_FPU,"fpu_r:  m_operand(%d) double(%lf) double(%lf)\n", m_operand,  ad,bd);
-			}
-		}
-		
 		// execute the functionality
 		int resulttype = FLOATRESULT;
 		int ci;
@@ -1177,128 +1194,138 @@ u16 tek440x_state::fpu_r(offs_t offset)
 		{
 			case FADD:
 				cf = bf + af;
-				fpu_latch32_result(&cf);
-				resulttype = FLOATRESULT;
+				resulttype = fpu_latch32_result(&cf);
+				FLOATRESULT;
 				break;
 			case FSUB:
 				cf = bf - af;
-				fpu_latch32_result(&cf);
+				resulttype = fpu_latch32_result(&cf);
 				resulttype = FLOATRESULT;
 				break;
 			case FMUL:
 				cf = bf * af;
-				fpu_latch32_result(&cf);
+				resulttype = fpu_latch32_result(&cf);
 				resulttype = FLOATRESULT;
 				break;
 			case FDIV:
 				cf = bf / af;
-				fpu_latch32_result(&cf);
+				resulttype = fpu_latch32_result(&cf);
 				resulttype = FLOATRESULT;
 				break;
 			case FCMP:
 				ci = af > bf ? 1 : (af < bf ? -1 : 0);
-				fpu_latch32_result(&ci);
+				resulttype = fpu_latch32_result(&ci);
 				resulttype = FLOATRESULT;
 				break;
 				
 			case FNEG:
 				cf = -af;
-				fpu_latch32_result(&cf);
+				resulttype = fpu_latch32_result(&cf);
 				resulttype = FLOATRESULT;
 				break;
 			case FABS:
 				cf = fabs(af);
-				fpu_latch32_result(&cf);
+				resulttype = fpu_latch32_result(&cf);
 				resulttype = FLOATRESULT;
 				break;
 
 			case FItoF:
 				cf = (float)ai;
-				fpu_latch32_result(&cf);
+				resulttype = fpu_latch32_result(&cf);
 				resulttype = FLOATRESULT;
 				break;
 			case FFtoIr:
 				ci = (int)(af + 0.5f);
-				fpu_latch32_result(&ci);
+				resulttype = fpu_latch32_int_result(&ci);
 				resulttype = INTRESULT;
 				break;
 			case FFtoIt:
 				ci = (int)(af);
-				fpu_latch32_result(&ci);
+				resulttype = fpu_latch32_int_result(&ci);
 				resulttype = INTRESULT;
 				break;
 			case FFtoIf:
 				ci = (int)floorf(af);
-				fpu_latch32_result(&ci);
+				resulttype = fpu_latch32_int_result(&ci);
 				resulttype = INTRESULT;
 				break;
 
 			case FFtoD:
 				cd = (double)af;
-				fpu_latch64_result(&cd);
+				resulttype = fpu_latch64_result(&cd);
 				resulttype = DOUBLERESULT;
 				break;
 			case FDtoF:
 				cf = (float)ad;
-				fpu_latch32_result(&cf);
+				resulttype = fpu_latch32_result(&cf);
+				resulttype = FLOATRESULT;
 				break;
 				
 			case DADD:
 				cd = bd + ad;
-				fpu_latch64_result(&cd);
+				resulttype = fpu_latch64_result(&cd);
 				resulttype = DOUBLERESULT;
 				break;
 			case DSUB:
 				cd = bd - ad;
-				fpu_latch64_result(&cd);
+				resulttype = fpu_latch64_result(&cd);
 				resulttype = DOUBLERESULT;
 				break;
 			case DMUL:
 				cd = bd * ad;
-				fpu_latch64_result(&cd);
+				resulttype = fpu_latch64_result(&cd);
 				resulttype = DOUBLERESULT;
 				break;
 			case DDIV:
 				cd = bd / ad;
-				fpu_latch64_result(&cd);
+				resulttype = fpu_latch64_result(&cd);
 				resulttype = DOUBLERESULT;
 				break;
 			case DCMP:
 				ci = ad > bd ? 1 : (ad < bd ? -1 : 0);
-				fpu_latch32_result(&ci);
+				resulttype = fpu_latch32_result(&ci);
 				resulttype = DOUBLERESULT;
 				break;
 
 			case DNEG:
 				cd = -ad;
-				fpu_latch64_result(&cd);
+				resulttype = fpu_latch64_result(&cd);
 				resulttype = DOUBLERESULT;
 				break;
 			case DABS:
 				cd = fabs(ad);
-				fpu_latch64_result(&cd);
+				resulttype = fpu_latch64_result(&cd);
 				resulttype = DOUBLERESULT;
 				break;
 
 			case FItoD:
 				cd = (double)ai;
-				fpu_latch64_result(&cd);
+				resulttype = fpu_latch64_result(&cd);
 				resulttype = DOUBLERESULT;
 				break;
 			case FDtoIr:
 				ci = (int)(ad + 0.5);
-				fpu_latch32_result(&ci);
-				resulttype = DOUBLERESULT;
+				resulttype = fpu_latch32_int_result(&ci);
+				resulttype = INTRESULT;
 				break;
 			case FDtoIt:
 				ci = (int)(ad);
-				fpu_latch32_result(&ci);
-				resulttype = DOUBLERESULT;
+				resulttype = fpu_latch32_int_result(&ci);
+				resulttype = INTRESULT;
 				break;
 			case FDtoIf:
 				ci = (int)floor(ad);
-				fpu_latch32_result(&ci);
-				resulttype = DOUBLERESULT;
+				resulttype = fpu_latch32_int_result(&ci);
+				resulttype = INTRESULT;
+				break;
+
+			case GETS:
+				ai = m_fpustatus;
+				resulttype = fpu_latch32_int_result(&ai);
+				break;
+			case SETS:
+				m_fpustatus = ai;
+				resulttype = fpu_latch32_int_result(&ai);
 				break;
 
 			default:
