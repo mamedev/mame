@@ -13,18 +13,20 @@
 
 #include "cpu/m6502/m6504.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/6522via.h"
+#include "machine/6522via.h"
 #include "machine/74259.h"
-#include "machine/6522via.h"
-#include "machine/6522via.h"
-#include "machine/z80scc.h"
 #include "machine/applefdintf.h"
 #include "machine/iwm.h"
 #include "machine/nvram.h"
+#include "machine/z80scc.h"
 #include "sound/spkrdev.h"
+
 #include "emupal.h"
 #include "screen.h"
 
 #include "formats/ap_dsk35.h"
+
 
 /* lisa MMU segment regs */
 struct real_mmu_entry
