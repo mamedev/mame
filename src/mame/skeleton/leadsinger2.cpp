@@ -55,11 +55,11 @@ public:
 		, m_screen(*this, "screen")
 	{ }
 
-	void leadsng2(machine_config &config);
+	void leadsng2(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<screen_device> m_screen;
