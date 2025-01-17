@@ -2826,7 +2826,7 @@ ROM_START( inquiztr )
 ROM_END
 
 // Alternate Version 1.2 
-ROM_START( inquiztra )
+ROM_START( inquiztr12a )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "inq6809", 0x08000, 0x08000, CRC(ae996600) SHA1(f360399e77b81399d910770fa8106c196f04363c) )
 
@@ -2839,7 +2839,7 @@ ROM_START( inquiztra )
 ROM_END
 
 // Version 1.1
-ROM_START( inquiztrb )
+ROM_START( inquiztr11 )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "inq6809", 0x08000, 0x08000, CRC(ae996600) SHA1(f360399e77b81399d910770fa8106c196f04363c) )
 
@@ -2997,14 +2997,14 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1989, inquiztr,  0,          bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "Inquizitor (V1.2)",                       MACHINE_NOT_WORKING )
-GAME( 1989, inquiztra, inquiztr,   bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "Inquizitor (Alternate V1.2)",             MACHINE_NOT_WORKING )
-GAME( 1989, inquiztrb, inquiztr,   bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "Inquizitor (V1.1)",                       MACHINE_NOT_WORKING )
-GAME( 1990, escounts,  0,          bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "Every Second Counts (39-360-053)",        MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1991, trebltop,  0,          bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "Treble Top (39-360-070)",                 MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1991, beeline,   0,          bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "Beeline (39-360-075)",                    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1991, quizvadr,  0,          bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "Quizvaders (39-360-078)",                 MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, qos,       0,          bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "A Question of Sport (set 1, 39-960-107)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, qosa,      qos,        bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "A Question of Sport (set 2, 39-960-099)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, qosb,      qos,        bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "A Question of Sport (set 3, 39-960-089)", MACHINE_IMPERFECT_GRAPHICS )
-GAMEL(1994, brkball,   0,          bfcobjam_with_dmd,brkball, bfcobjam_state,init_bfcobjam,ROT0, "BFM/ATOD", "Break Ball",                              MACHINE_IMPERFECT_GRAPHICS, layout_brkball )
+GAME( 1989, inquiztr,    0,          bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "Inquizitor (V1.2)",                       MACHINE_NOT_WORKING )
+GAME( 1989, inquiztr12a, inquiztr,   bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "Inquizitor (V1.2, alt)",                  MACHINE_NOT_WORKING )
+GAME( 1989, inquiztr11,  inquiztr,   bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "Inquizitor (V1.1)",                       MACHINE_NOT_WORKING )
+GAME( 1990, escounts,    0,          bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "Every Second Counts (39-360-053)",        MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, trebltop,    0,          bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "Treble Top (39-360-070)",                 MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, beeline,     0,          bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "Beeline (39-360-075)",                    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, quizvadr,    0,          bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "Quizvaders (39-360-078)",                 MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, qos,         0,          bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "A Question of Sport (set 1, 39-960-107)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, qosa,        qos,        bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "A Question of Sport (set 2, 39-960-099)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, qosb,        qos,        bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "A Question of Sport (set 3, 39-960-089)", MACHINE_IMPERFECT_GRAPHICS )
+GAMEL(1994, brkball,     0,          bfcobjam_with_dmd,brkball, bfcobjam_state,init_bfcobjam,ROT0, "BFM/ATOD", "Break Ball",                              MACHINE_IMPERFECT_GRAPHICS, layout_brkball )
