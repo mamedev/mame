@@ -855,7 +855,7 @@ CONS( 2005, mrangbat, 0, 0, superxavix_i2c_mrangbat, mrangbat,   superxavix_i2c_
 // エキサイトスポーツ　テニス×フィットネス
 CONS( 2004, epo_tfit, 0, 0, superxavix_i2c_24c04_4mb,    epo_tfit,   superxavix_i2c_state, init_xavix, "Epoch / SSD Company LTD",  "Excite Sports Tennis x Fitness (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-石川遼 エキサイトゴルフ
+// 石川遼 エキサイトゴルフ
 CONS( 2010, epo_rgfj, 0, 0, superxavix_i2c_24c08,        xavix_i2c,  superxavix_i2c_state, init_xavix, "Epoch / SSD Company LTD", "Ishikawa Ryou Excite Golf (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // Let's!TVプレイ ふたりはプリキュアMaxHeart マットでダンス MaxHeartにおどっちゃおう 
