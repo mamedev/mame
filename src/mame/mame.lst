@@ -42710,6 +42710,9 @@ dbzscout
 @source:skeleton/kron.cpp
 kron180                         // 1995 Kron Ltd, Ukraine
 
+@source:skeleton/leadsinger2.cpp
+leadsng2
+
 @source:skeleton/lee1214.cpp
 lee1214d                        //
 
@@ -45874,6 +45877,7 @@ batvgc
 rad_gtg
 rad_rsg
 rad_rsgp
+rad_rsgpa
 rad_foot
 rad_bb3
 rad_bb3p
@@ -45917,6 +45921,7 @@ gameu50
 gameu108
 gormiti
 imgame
+jak_spmm
 myac220
 smartfp                         // Smart Fit Park
 smartfpf
@@ -46021,10 +46026,12 @@ zone3d
 ablkickb
 abltenni                        //
 anpantv
+ban_krkk
 comil                           //
 ddr33v
 decathln
 decathlna
+dmbtjunc
 doraglob                        // (c) 2007 VTech
 doraglobf
 doraglobg
@@ -46067,6 +46074,7 @@ virtbb
 virtten
 vtechtvsgr                      // (c) 2006 VTech
 vtechtvssp                      // (c) 2006 VTech
+wfart
 wfcentro
 
 @source:tvgames/spg2xx_digimake.cpp
@@ -46347,6 +46355,7 @@ tak_gin                         //
 tak_geig                        //
 tak_hamr                        //
 tak_town                        //
+tak_wdg                         //
 tak_zuba                        //
 tcarnavi                        //
 tom_tvho                        //
@@ -46364,6 +46373,7 @@ ltv_naru                        //
 domfitad                        //
 dombikec                        //
 epo_dabj
+epo_dtcj
 
 @source:tvgames/xavix_2000.cpp
 ban_omt                         //
@@ -46388,9 +46398,12 @@ ttv_swj                         //
 @source:tvgames/xavix_2002.cpp
 anpanmdx
 apmj2009
+ban_bkgj
 ban_dn1j
 ban_kksj
+ban_utmj
 epo_ntpj
+epo_rgfj
 ban_ordj
 domdance                        //
 domfitch                        //
