@@ -40,8 +40,7 @@ license:CC0-1.0
 		<info name="alt_title" value="ダブルマウスパーティー" />
 		<part name="cart" interface="super_tv_pc_cart">
 			<dataarea name="prg" size="0x200000">
-				<!-- baddump because code seems to be corrupt in places -->
-				<rom name="c-03.u1" size="0x200000" crc="94634a7b" sha1="d69ec0a8c6061e749206927ee68dbcf852fcc03e" status="baddump" />
+				<rom name="c-03.u1" size="0x200000" crc="94634a7b" sha1="d69ec0a8c6061e749206927ee68dbcf852fcc03e" />
 			</dataarea>
 		</part>
 	</software>

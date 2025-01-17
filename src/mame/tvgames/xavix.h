@@ -104,6 +104,7 @@ public:
 		m_posirq_x(*this, "posirq_x"),
 		m_posirq_y(*this, "posirq_y"),
 		m_segment_regs(*this, "segment_regs"),
+		m_ext_segment_regs(*this, "ext_segment_regs"),
 		m_palette(*this, "palette"),
 		m_region(*this, "REGION"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -464,12 +465,12 @@ protected:
 		else if (offset < 0x300)
 		{
 			offset &= 0xff;
-			return ((~offset >> 4) | (offset << 4));
+			return (((~offset >> 4) & 0x0f) | (offset << 4));
 		}
 		else if (offset < 0x400)
 		{
 			offset &= 0xff;
-			return ((~offset >> 4) | (~offset << 4));
+			return (((~offset >> 4) & 0x0f) | (~offset << 4));
 		}
 		else if (offset < 0x800)
 		{
@@ -557,6 +558,7 @@ protected:
 	required_shared_ptr<uint8_t> m_posirq_y;
 
 	required_shared_ptr<uint8_t> m_segment_regs;
+	optional_shared_ptr<uint8_t> m_ext_segment_regs;
 
 	required_device<palette_device> m_palette;
 
@@ -611,6 +613,7 @@ protected:
 
 	bool m_disable_memory_bypass = false;
 	bool m_disable_sprite_yflip = false;
+	bool m_disable_tile_regs_flip = false;
 	int m_video_hres_multiplier;
 };
 
@@ -649,6 +652,8 @@ public:
 	void xavix2002(machine_config &config);
 	void xavix2002_4mb(machine_config &config);
 
+	void init_epo_doka();
+
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
@@ -662,6 +667,7 @@ protected:
 	virtual void get_tile_pixel_dat(uint8_t &dat, int bpp) override;
 
 private:
+	void ext_segment_regs_w(offs_t offset, uint8_t data);
 	void superxavix_plt_flush_w(uint8_t data);
 	uint8_t superxavix_plt_dat_r();
 	void superxavix_plt_dat_w(uint8_t data);
@@ -705,6 +711,14 @@ private:
 	void extended_extbus_reg0_w(uint8_t data);
 	void extended_extbus_reg1_w(uint8_t data);
 	void extended_extbus_reg2_w(uint8_t data);
+
+	uint8_t superxavix_read_extended_io0(offs_t offset, uint8_t mem_mask) { logerror("%s: superxavix_read_extended_io0 (mask %02x)\n", machine().describe_context(), mem_mask); return 0x00; }
+	uint8_t superxavix_read_extended_io1(offs_t offset, uint8_t mem_mask) { logerror("%s: superxavix_read_extended_io1 (mask %02x)\n", machine().describe_context(), mem_mask); return 0x00; }
+	uint8_t superxavix_read_extended_io2(offs_t offset, uint8_t mem_mask) { logerror("%s: superxavix_read_extended_io2 (mask %02x)\n", machine().describe_context(), mem_mask); return 0x00; }
+
+	void superxavix_write_extended_io0(offs_t offset, uint8_t data, uint8_t mem_mask) { logerror("%s: superxavix_write_extended_io0 %02x (mask %02x)\n", machine().describe_context(), data, mem_mask); }
+	void superxavix_write_extended_io1(offs_t offset, uint8_t data, uint8_t mem_mask) { logerror("%s: superxavix_write_extended_io1 %02x (mask %02x)\n", machine().describe_context(), data, mem_mask); }
+	void superxavix_write_extended_io2(offs_t offset, uint8_t data, uint8_t mem_mask) { logerror("%s: superxavix_write_extended_io2 %02x (mask %02x)\n", machine().describe_context(), data, mem_mask); }
 
 	void draw_bitmap_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
