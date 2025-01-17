@@ -2907,7 +2907,7 @@ CONS( 2005, has_wamg,  0,          0,  xavix_4mb,        has_wamg, xavix_state, 
 CONS( 2002, tak_geig,  0,          0,  xavix_4mb_nv,     tak_geig, xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Geigeki Go Go Shooting (Japan)", MACHINE_IMPERFECT_SOUND )
 
 // some unemulated connectivity features to add other robots into the game
-CONS( 2001, tak_wdg,   0,          0,  xavix_2mb_nv,     tak_wdg,  xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Webdiver Gladion W-05 DX (Japan)", MACHINE_IMPERFECT_SOUND )
+CONS( 2001, tak_wdg,   0,          0,  xavix_2mb_nv,     tak_wdg,  xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Webdiver DX W-05 Gladion (Japan)", MACHINE_IMPERFECT_SOUND )
 
 // TVホッケー
 // playable but could do with better deadzome handling on the controls at least
