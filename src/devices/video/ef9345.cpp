@@ -378,7 +378,23 @@ void ef9345_device::zoom(uint8_t *pix, uint16_t n)
 uint16_t ef9345_device::indexblock(uint16_t x, uint16_t y)
 {
 	uint16_t i = x, j;
-	j = (y == 0) ? ((m_tgs & 0x20) >> 5) : ((m_ror & 0x1f) + y - 1);
+
+	if (m_variant == EF9345_MODE::TYPE_EF9345)
+	{
+		// On the EF9345 the service row is always displayed at the top, and
+		// it can be fetched from either Y=0 or Y=1.
+		j = (y == 0) ? ((m_tgs & 0x20) >> 5) : ((m_ror & 0x1f) + y - 1);
+	}
+	else
+	{
+		// On the TS9347 the service row is displayed either at the top or at
+		// the bottom, and it is always fetched from Y=0.
+		if (m_tgs & 1)
+			j = (y == 24) ? 0 : ((m_ror & 0x1f) + y);
+		else
+			j = (y == 0) ? 0 : ((m_ror & 0x1f) + y - 1);
+	}
+
 	j = (j > 31) ? (j - 24) : j;
 
 	//right side of a double width character
