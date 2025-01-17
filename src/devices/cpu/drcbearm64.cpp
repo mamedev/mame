@@ -499,7 +499,7 @@ void drcbe_arm64::get_imm_relative(a64::Assembler &a, const a64::Gp &reg, const 
 		const uint64_t targetpage = (uint64_t)ptr & ~make_bitmask<uint64_t>(12);
 		const uint64_t pageoffs = (uint64_t)ptr & util::make_bitmask<uint64_t>(12);
 
-		a.adrp(reg, targetpage);
+		a.adrp(reg.x(), targetpage);
 		if (pageoffs != 0)
 			a.add(reg, reg, pageoffs);
 
