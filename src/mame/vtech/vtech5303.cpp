@@ -31,12 +31,9 @@ public:
 		m_screen(*this, "screen")
 	{ }
 
-	void vtech5303(machine_config &config);
+	void vtech5303(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 
@@ -48,22 +45,17 @@ uint32_t vtech5303_state::screen_update_vtech5303(screen_device &screen, bitmap_
 	return 0;
 }
 
-void vtech5303_state::machine_start()
-{
-}
-
-void vtech5303_state::machine_reset()
-{
-}
-
-/* For Spanish Paw Patrol the keyboard has:
+/* The Paw Patrol the keyboard has:
     -6 "character" buttons (Marshall, Rocky, Chase, Skye, Ryder, Rubble).
     -6 "activity" buttons (bone, letters, maths, pairs, maze, adventure).
-    -27 leter keys (A, B, C, D, E, F, G, H, I, J, K, L, M, N, Ñ, O, P, Q, R, S, T, U, V, W, X, Y, Z).
+    -26 leter keys in QWERTY layout (QWERTYUIOP ASDFGHJKL ZXCVBNM).
+    -Mute button to the left of Z.
     -3 navigation buttons (right arrow, left arrow, OK).
     -Clock button.
+    The Spanish version repurposes the mute button as a letter key and organises
+    the letters in alphabetical order (ABCDEFGHIJ KLMNÑOPQR STUVWXYZ)
 */
-static INPUT_PORTS_START( vtech5303 )
+INPUT_PORTS_START( vtech5303 )
 INPUT_PORTS_END
 
 void vtech5303_state::vtech5303(machine_config &config)
@@ -91,4 +83,4 @@ ROM_END
 } // anonymous namespace
 
 
-CONS( 2022, pawpatrols, 0, 0, vtech5303, vtech5303, vtech5303_state, empty_init, "VTech", "Paw Patrol (toy computer, Spanish)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2022, pawmoviesp, 0, 0, vtech5303, vtech5303, vtech5303_state, empty_init, "VTech", "Paw Patrol: The Movie Learning Tablet (Spanish)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
