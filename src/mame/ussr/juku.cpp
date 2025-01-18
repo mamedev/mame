@@ -207,6 +207,7 @@ void juku_state::io_map(address_map &map)
 	map(0x1f, 0x1f).rw(FUNC(juku_state::fdc_data_r), FUNC(juku_state::fdc_data_w));
 	// mapping for cassette version (E5101?)
 	// map(0x1c, 0x1d).rw(m_sio[1], FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x80, 0x80).r(m_mouse, FUNC(juku_mouse_device::mouse_port_r));
 }
 
 
@@ -651,10 +652,6 @@ void juku_state::pio0_portc_w(uint8_t data)
 
 void juku_state::machine_start()
 {
-	// check if mouse is plugged
-	if (m_mouse.found() && strcmp(mconfig().options().mouse_device(), "none") != 0)
-		m_maincpu->space(AS_IO).install_read_handler(0x80, 0x80, read8smo_delegate(*m_mouse, FUNC(juku_mouse_device::mouse_port_r)));
-
 	// register for save states
 	save_item(NAME(m_width));
 	save_item(NAME(m_height));
