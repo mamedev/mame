@@ -85,7 +85,7 @@ private:
 	};
 
 	required_device<cpu_device> m_maincpu;
-	required_device<i8051_device> m_audiocpu;
+	required_device<i80c31_device> m_audiocpu;
 	required_device<upd7759_device> m_upd7759;
 	required_device<cpu_device> m_drmath;
 	required_device<tms34010_device> m_vgb;

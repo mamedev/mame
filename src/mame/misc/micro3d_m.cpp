@@ -54,7 +54,7 @@ uint8_t micro3d_state::duart_input_r()
 }
 
 /*
- * 5: /I8051 reset
+ * 5: /I80C31 reset
  * 7: Status LED
 */
 void micro3d_state::duart_output_w(uint8_t data)
@@ -93,6 +93,27 @@ void micro3d_state::vgb_uart_w(offs_t offset, uint8_t data)
  *  Math unit
  *
  *************************************/
+
+void micro3d_state::shared_w(offs_t offset, uint32_t data)
+{
+	m_shared_ram[offset * 2 + 1] = data & 0xffff;
+	m_shared_ram[offset * 2 + 0] = data >> 16;
+}
+
+uint32_t micro3d_state::shared_r(offs_t offset)
+{
+	return (m_shared_ram[offset * 2] << 16) | m_shared_ram[offset * 2 + 1];
+}
+
+void micro3d_state::drmath_int_w(uint32_t data)
+{
+	m_maincpu->set_input_line(5, HOLD_LINE);
+}
+
+void micro3d_state::drmath_intr2_ack(uint32_t data)
+{
+	m_drmath->set_input_line(AM29000_INTR2, CLEAR_LINE);
+}
 
 inline constexpr int64_t micro3d_state::micro3d_vtx::dot_product(micro3d_vtx const &that) const
 {
@@ -351,6 +372,7 @@ uint16_t micro3d_state::botss_180000_r()
 	return 0xffff;
 }
 
+
 /*************************************
  *
  *  CPU control
@@ -371,37 +393,9 @@ void micro3d_state::host_drmath_int_w(uint16_t data)
 }
 
 
-/*************************************
- *
- *
- *
- *************************************/
-
-void micro3d_state::shared_w(offs_t offset, uint32_t data)
-{
-	m_shared_ram[offset * 2 + 1] = data & 0xffff;
-	m_shared_ram[offset * 2 + 0] = data >> 16;
-}
-
-uint32_t micro3d_state::shared_r(offs_t offset)
-{
-	return (m_shared_ram[offset * 2] << 16) | m_shared_ram[offset * 2 + 1];
-}
-
-void micro3d_state::drmath_int_w(uint32_t data)
-{
-	m_maincpu->set_input_line(5, HOLD_LINE);
-}
-
-void micro3d_state::drmath_intr2_ack(uint32_t data)
-{
-	m_drmath->set_input_line(AM29000_INTR2, CLEAR_LINE);
-}
-
-
 /***************************************************************************
 
-    8051 port mappings:
+    80C31 port mappings:
 
     Port 1                          Port 3
     =======                         ======
@@ -475,6 +469,11 @@ void micro3d_state::init_micro3d()
 	/* The Am29000 program seems to rely on RAM from 0x00470000 onwards being
 	non-zero on a reset, otherwise the 3D object data doesn't get uploaded! */
 	space.write_dword(0x00470000, 0xa5a5a5a5);
+
+	/* TODO? BOTSS sometimes crashes when starting a stage because the 68000
+	overwrites memory in use by the Am29000. Slowing down the 68000 slightly
+	avoids this. */
+	m_maincpu->set_clock_scale(0.945f);
 }
 
 void micro3d_state::init_botss()
