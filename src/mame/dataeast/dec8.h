@@ -79,7 +79,7 @@ protected:
 	required_shared_ptr<u8> m_videoram;
 	optional_shared_ptr<u8> m_bg_ram;
 
-	std::unique_ptr<u16[]>   m_buffered_spriteram16; // for the mxc06 sprite chip emulation (oscar, cobra)
+	std::unique_ptr<u16[]> m_buffered_spriteram16; // for the mxc06 sprite chip emulation (oscar, cobra)
 
 	// video-related
 	tilemap_t *m_bg_tilemap = nullptr;
@@ -89,6 +89,7 @@ protected:
 
 	// misc
 	bool m_coin_state = false;
+	u8 m_bank_mask = 0;
 };
 
 // with I8751 MCU
