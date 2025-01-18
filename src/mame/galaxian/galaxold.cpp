@@ -370,8 +370,8 @@ void galaxold_state::dkongjrmc_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x6fff).ram();
-	map(0x7000, 0x70ff).ram().w(FUNC(galaxold_state::galaxold_attributesram_w)).share("attributesram");
-	map(0x7100, 0x71ff).ram().share("spriteram");
+	map(0x7000, 0x70ff).w(FUNC(galaxold_state::galaxold_attributesram_w)).share("attributesram");
+	map(0x7100, 0x71ff).writeonly().share("spriteram");
 	map(0x7400, 0x77ff).ram().w(FUNC(galaxold_state::galaxold_videoram_w)).share("videoram");
 	map(0x7800, 0x7800).portr("DSW");
 	map(0x7801, 0x7801).w(FUNC(galaxold_state::galaxold_nmi_enable_w));
@@ -965,7 +965,7 @@ int galaxold_state::_4in1_fake_port_r()
 {
 	static const char *const portnames[] = { "FAKE1", "FAKE2", "FAKE3", "FAKE4" };
 
-	return (ioport(portnames[m__4in1_bank])->read() & Mask) ? 1 : 0;
+	return (ioport(portnames[m_4in1_bank])->read() & Mask) ? 1 : 0;
 }
 
 static INPUT_PORTS_START( 4in1 )
@@ -2625,18 +2625,18 @@ ROM_END
 
 // Z80 games
 //    YEAR  NAME       PARENT    MACHINE    INPUT      STATE          INIT             ROT     COMPANY,                         FULLNAME,                                                   FLAGS
-GAME( 1981, vpool,     hustler,  mooncrst,  vpool,     galaxold_state, empty_init,     ROT90,  "bootleg",                       "Video Pool (bootleg on Moon Cresta hardware)",             MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, scramblb,  scramble, scramblb,  scramblb,  galaxold_state, empty_init,     ROT90,  "bootleg",                       "Scramble (bootleg on Galaxian hardware)",                  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, scramb2,   scramble, scramb2,   scramb2,   galaxold_state, empty_init,     ROT90,  "bootleg",                       "Scramble (bootleg, set 1)",                                MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, scramb3,   scramble, scramb3,   scramb2,   galaxold_state, empty_init,     ROT90,  "bootleg",                       "Scramble (bootleg, set 2)",                                MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, scrambler, scramble, scrambler, scrambler, galaxold_state, empty_init,     ROT90,  "bootleg (Reben S.A.)",          "Scramble (Reben S.A. Spanish bootleg)",                    MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, scrambleo, scramble, scrambleo, scrambleo, galaxold_state, empty_init,     ROT90,  "bootleg (Okapi)",               "Scramble (Okapi bootleg)",                                 MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, scrabbleo, scramble, scrambler, scrambler, galaxold_state, empty_init,     ROT90,  "bootleg (Okapi?)",              "Scrabble (Spanish bootleg of Scramble)",                   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, vpool,     hustler,  mooncrst,  vpool,     galaxold_state, empty_init,     ROT90,  "bootleg",                       "Video Pool (bootleg on Moon Cresta hardware)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1981, scramblb,  scramble, scramblb,  scramblb,  galaxold_state, empty_init,     ROT90,  "bootleg",                       "Scramble (bootleg on Galaxian hardware)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1981, scramb2,   scramble, scramb2,   scramb2,   galaxold_state, empty_init,     ROT90,  "bootleg",                       "Scramble (bootleg, set 1)",                                MACHINE_SUPPORTS_SAVE )
+GAME( 1981, scramb3,   scramble, scramb3,   scramb2,   galaxold_state, empty_init,     ROT90,  "bootleg",                       "Scramble (bootleg, set 2)",                                MACHINE_SUPPORTS_SAVE )
+GAME( 1981, scrambler, scramble, scrambler, scrambler, galaxold_state, empty_init,     ROT90,  "bootleg (Reben S.A.)",          "Scramble (Reben S.A. Spanish bootleg)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1981, scrambleo, scramble, scrambleo, scrambleo, galaxold_state, empty_init,     ROT90,  "bootleg (Okapi)",               "Scramble (Okapi bootleg)",                                 MACHINE_SUPPORTS_SAVE )
+GAME( 1981, scrabbleo, scramble, scrambler, scrambler, galaxold_state, empty_init,     ROT90,  "bootleg (Okapi?)",              "Scrabble (Spanish bootleg of Scramble)",                   MACHINE_SUPPORTS_SAVE )
 GAME( 1981, 4in1,      0,        _4in1,     4in1,      galaxold_state, init_4in1,      ROT90,  "Armenia / Food and Fun",        "4 Fun in 1",                                               MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, dkongjrm,  dkongjr,  dkongjrm,  dkongjrm,  galaxold_state, empty_init,     ROT90,  "bootleg",                       "Donkey Kong Jr. (bootleg on Moon Cresta hardware, set 1)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, dkongjrm,  dkongjr,  dkongjrm,  dkongjrm,  galaxold_state, empty_init,     ROT90,  "bootleg",                       "Donkey Kong Jr. (bootleg on Moon Cresta hardware, set 1)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, dkongjrmc, dkongjr,  dkongjrmc, dkongjrmc, galaxold_state, empty_init,     ROT90,  "bootleg (Centromatic)",         "Donkey Kong Jr. (bootleg on Moon Cresta hardware, set 2)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // sprites leave artifacts
-GAME( 1982, tazzmang,  tazmania, tazzmang,  tazzmang,  galaxold_state, empty_init,     ROT90,  "bootleg",                       "Tazz-Mania (bootleg on Galaxian hardware)",                MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, tazzmang2, tazmania, tazzmang,  tazzmang,  galaxold_state, empty_init,     ROT90,  "bootleg",                       "Tazz-Mania (bootleg on Galaxian hardware with Starfield)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, tazzmang,  tazmania, tazzmang,  tazzmang,  galaxold_state, empty_init,     ROT90,  "bootleg",                       "Tazz-Mania (bootleg on Galaxian hardware)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1982, tazzmang2, tazmania, tazzmang,  tazzmang,  galaxold_state, empty_init,     ROT90,  "bootleg",                       "Tazz-Mania (bootleg on Galaxian hardware with Starfield)", MACHINE_SUPPORTS_SAVE )
 
 // Videotron cartridge system
 GAME( 1981, hustlerb3, hustler,  videotron, hustlerb3, galaxold_state, empty_init,     ROT90,  "bootleg (Videotron)",            "Video Pool (bootleg of Video Hustler)", MACHINE_SUPPORTS_SAVE )
