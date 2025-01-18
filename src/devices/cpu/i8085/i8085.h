@@ -103,29 +103,30 @@ protected:
 
 	PAIR m_PC,m_SP,m_AF,m_BC,m_DE,m_HL,m_WZ;
 	u8 m_halt;
-	u8 m_im;             /* interrupt mask (8085A only) */
-	u8 m_status;         /* status word */
+	u8 m_im;             // interrupt mask (8085A only)
+	u8 m_status;         // status word
 
-	u8 m_after_ei;       /* post-EI processing; starts at 2, check for ints at 0 */
-	u8 m_nmi_state;      /* raw NMI line state */
-	u8 m_irq_state[4];   /* raw IRQ line states */
-	u8 m_trap_pending;   /* TRAP interrupt latched? */
-	u8 m_trap_im_copy;   /* copy of IM register when TRAP was taken */
-	u8 m_sod_state;      /* state of the SOD line */
+	u8 m_after_ei;       // post-EI processing; starts at 2, check for ints at 0
+	u8 m_nmi_state;      // raw NMI line state
+	u8 m_irq_state[4];   // raw IRQ line states
+	bool m_trap_pending; // TRAP interrupt latched?
+	u8 m_trap_im_copy;   // copy of IM register when TRAP was taken
+	u8 m_sod_state;      // state of the SOD line
 	bool m_in_acknowledge;
 
-	bool m_ietemp;       /* import/export temp space */
+	u8 m_ietemp;         // import/export temp space
 
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::cache m_cprogram, m_copcodes;
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
 	memory_access< 8, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
 	int m_icount;
 
-	/* cycles lookup */
+	// cycles lookup
 	static const u8 lut_cycles_8080[256];
 	static const u8 lut_cycles_8085[256];
 	u8 lut_cycles[256];
-	/* flags lookup */
+
+	// flags lookup
 	u8 lut_zs[256];
 	u8 lut_zsp[256];
 

@@ -136,16 +136,6 @@ const char *const amiga_state::s_custom_reg_names[0x100] =
 	"UNK1F8",       "UNK1FA",       "FMODE",        "UNK1FE"
 };
 
-constexpr XTAL amiga_state::CLK_28M_PAL;
-constexpr XTAL amiga_state::CLK_7M_PAL;
-constexpr XTAL amiga_state::CLK_C1_PAL;
-constexpr XTAL amiga_state::CLK_E_PAL;
-
-constexpr XTAL amiga_state::CLK_28M_NTSC;
-constexpr XTAL amiga_state::CLK_7M_NTSC;
-constexpr XTAL amiga_state::CLK_C1_NTSC;
-constexpr XTAL amiga_state::CLK_E_NTSC;
-
 /*************************************
  *
  *  Machine reset
@@ -1251,6 +1241,11 @@ void amiga_state::aga_map(address_map &map)
 
 void amiga_state::custom_chip_reset()
 {
+    // TODO: not entirely correct
+    // - OCS Denise returns open bus
+    // - ECS Denise should return 0xff << 8 | ID
+    // - AGA Lisa bits 15-10 are jumper selectable (at least on A4000), returns 0xfc << 8 | ID
+    // cfr. https://eab.abime.net/showpost.php?p=627136&postcount=59
 	CUSTOM_REG(REG_DENISEID) = m_denise_id;
 	CUSTOM_REG(REG_VPOSR) = m_agnus_id << 8;
 	CUSTOM_REG(REG_DDFSTRT) = 0x18;
@@ -1375,8 +1370,11 @@ uint16_t amiga_state::custom_chip_r(offs_t offset)
 
 		case REG_CLXDAT:
 			temp = CUSTOM_REG(REG_CLXDAT);
-			CUSTOM_REG(REG_CLXDAT) = 0;
-			return temp;
+			if (!machine().side_effects_disabled())
+				CUSTOM_REG(REG_CLXDAT) = 0;
+			// Undocumented bit 15 always high
+			// - "Barney [& Freddy] Mouse" will always detect a player-enemy hit out of iframe cycles otherwise
+			return temp | (1 << 15);
 
 		case REG_DENISEID:
 			return CUSTOM_REG(REG_DENISEID);

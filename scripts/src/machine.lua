@@ -218,19 +218,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/gayle.h,MACHINES["GAYLE"] = true
----------------------------------------------------
-
-if (MACHINES["GAYLE"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/gayle.cpp",
-		MAME_DIR .. "src/devices/machine/gayle.h",
-	}
-end
-
-
----------------------------------------------------
---
 --@src/devices/machine/40105.h,MACHINES["CMOS40105"] = true
 ---------------------------------------------------
 
@@ -627,18 +614,6 @@ if (MACHINES["KBDC8042"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/8042kbdc.cpp",
 		MAME_DIR .. "src/devices/machine/8042kbdc.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/8530scc.h,MACHINES["8530SCC"] = true
----------------------------------------------------
-
-if (MACHINES["8530SCC"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/8530scc.cpp",
-		MAME_DIR .. "src/devices/machine/8530scc.h",
 	}
 end
 

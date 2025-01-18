@@ -296,7 +296,7 @@ static INPUT_PORTS_START( suprtvpc )
 	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_PLAYER(1)
 INPUT_PORTS_END
 
-/* SuperXavix IO port handliner (per game) */
+/* SuperXavix IO port handlers (per game) */
 
 uint8_t superxavix_i2c_jmat_state::read_extended_io0(offs_t offset, uint8_t mem_mask)
 {
@@ -375,6 +375,13 @@ void superxavix_state::xavix2002(machine_config &config)
 	m_screen->set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
 
 	XAVIX2002IO(config, m_xavix2002io, 0);
+
+	m_xavix2002io->read_0_callback().set(FUNC(superxavix_state::superxavix_read_extended_io0));
+	m_xavix2002io->write_0_callback().set(FUNC(superxavix_state::superxavix_write_extended_io0));
+	m_xavix2002io->read_1_callback().set(FUNC(superxavix_state::superxavix_read_extended_io1));
+	m_xavix2002io->write_1_callback().set(FUNC(superxavix_state::superxavix_write_extended_io1));
+	m_xavix2002io->read_2_callback().set(FUNC(superxavix_state::superxavix_read_extended_io2));
+	m_xavix2002io->write_2_callback().set(FUNC(superxavix_state::superxavix_write_extended_io2));
 }
 
 void superxavix_state::xavix2002_4mb(machine_config &config)
@@ -708,7 +715,25 @@ ROM_START( epo_doka )
 	ROM_LOAD("doka.u1", 0x000000, 0x400000, CRC(853266d2) SHA1(d4121b89ee464088951898282404e5a2b788dd69) )
 ROM_END
 
+ROM_START( ban_utmj )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("utmj.u7", 0x000000, 0x800000, CRC(0ac2bcd9) SHA1(ca7c82e2015c86bb37bd66016c33343d174e9965) )
 
+	// SEEPROM is HT24LC02 at u3
+ROM_END
+
+ROM_START( ban_bkgj )
+	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("bkgj.u2", 0x000000, 0x400000, CRC(a59ce23c) SHA1(d2a6be9e46f3cfc3cf798bf1f76732eee909c93b) )
+
+	// SEEPROM is a S-24CS04A at u4
+ROM_END
+
+ROM_START( epo_rgfj )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00)
+	// gave consistent reads 5 times, then started not, should be good, but there is the potential for the ROM to have already been failing
+	ROM_LOAD("rgfj.u1", 0x000000, 0x800000, CRC(96c9563a) SHA1(36b9dd3e5dcc8099787b25d28143997f61273234) )
+ROM_END
 
 ROM_START( udance )
 	ROM_REGION(0x800000, "bios", ROMREGION_ERASE00)
@@ -779,6 +804,11 @@ void superxavix_piano_pc_state::init_piano_pc()
 	m_disable_memory_bypass = true;
 }
 
+void superxavix_state::init_epo_doka()
+{
+	init_xavix();
+	m_disable_tile_regs_flip = true;
+}
 
 void superxavix_doradraw_state::init_doradraw()
 {
@@ -825,11 +855,20 @@ CONS( 2005, mrangbat, 0, 0, superxavix_i2c_mrangbat, mrangbat,   superxavix_i2c_
 // エキサイトスポーツ　テニス×フィットネス
 CONS( 2004, epo_tfit, 0, 0, superxavix_i2c_24c04_4mb,    epo_tfit,   superxavix_i2c_state, init_xavix, "Epoch / SSD Company LTD",  "Excite Sports Tennis x Fitness (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
+// 石川遼 エキサイトゴルフ
+CONS( 2010, epo_rgfj, 0, 0, superxavix_i2c_24c08,        xavix_i2c,  superxavix_i2c_state, init_xavix, "Epoch / SSD Company LTD", "Ishikawa Ryou Excite Golf (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
 // Let's!TVプレイ ふたりはプリキュアMaxHeart マットでダンス MaxHeartにおどっちゃおう 
 CONS( 2004, maxheart, 0, 0, superxavix_i2c_24c04_4mb,    xavix_i2c,   superxavix_i2c_state, init_xavix, "Bandai / SSD Company LTD",  "Let's! TV Play Futari wa PreCure MaxHeart Dance on the mat Let's go to MaxHeart (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // どこでもドラえもん 日本旅行ゲームDX体感！どこドラグランプリ！
-CONS( 2004, epo_doka, 0, 0, xavix2002_4mb,               xavix,      superxavix_state,     init_xavix, "Epoch / SSD Company LTD",  "Doraemon anywhere - Japan travel game DX experience! Where is the Dragon Grand Prix! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2004, epo_doka, 0, 0, xavix2002_4mb,               xavix,      superxavix_state,     init_epo_doka, "Epoch / SSD Company LTD",  "Doko Demo Doraemon Nihon Ryokou Game DX Taikan! Doko Dora Grand Prix! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// Let's!TVプレイ なりきり体感 ボウケンジャー 走れ！撃て！ミッションスタート！！
+CONS( 2006, ban_bkgj, 0, 0, superxavix_i2c_24c04_4mb,xavix_i2c,  superxavix_i2c_state, init_xavix, "Bandai / SSD Company LTD",  "Let's! TV Play Narikiri Taikan Boukenger Hashire! Ute! Mission Start!! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// Let's!TV プレイ 体感キャストオフ 仮面ライダーカブト クロックアップ＆ライダーキック
+CONS( 2006, ban_utmj, 0, 0, superxavix_i2c_24c02,    xavix_i2c,  superxavix_i2c_state, init_xavix, "Bandai / SSD Company LTD",  "Let's! TV Play Taikan Cast Off - Kamen Rider Kabuto Clock Up & Rider Kick!! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // それいけトーマス ソドー島のなかまたち
 CONS( 2005, tmy_thom, 0, 0, superxavix_i2c_24c04,    xavix_i2c,  superxavix_i2c_state, init_xavix, "Tomy / SSD Company LTD",   "Soreike Thomas - Sodor Tou no Nakamatachi / Thomas & Friends on the Island of Sodor (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

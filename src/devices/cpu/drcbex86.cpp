@@ -100,6 +100,7 @@ using namespace asmjit;
 using namespace asmjit::x86;
 
 
+namespace {
 
 //**************************************************************************
 //  DEBUGGING
@@ -124,42 +125,21 @@ const uint32_t PTYPE_MRI  = PTYPE_M | PTYPE_R | PTYPE_I;
 const uint32_t PTYPE_MF   = PTYPE_M | PTYPE_F;
 
 
-
-//**************************************************************************
-//  MACROS
-//**************************************************************************
-
-#define X86_CONDITION(condition)        (condition_map[condition - uml::COND_Z])
-#define X86_NOT_CONDITION(condition)    negateCond(condition_map[condition - uml::COND_Z])
-
-#define assert_no_condition(inst)       assert((inst).condition() == uml::COND_ALWAYS)
-#define assert_any_condition(inst)      assert((inst).condition() == uml::COND_ALWAYS || ((inst).condition() >= uml::COND_Z && (inst).condition() < uml::COND_MAX))
-#define assert_no_flags(inst)           assert((inst).flags() == 0)
-#define assert_flags(inst, valid)       assert(((inst).flags() & ~(valid)) == 0)
-
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-drcbe_x86::opcode_generate_func drcbe_x86::s_opcode_table[OP_MAX];
-
 // size-to-mask table
-//static const uint64_t size_to_mask[] = { 0, 0xff, 0xffff, 0, 0xffffffff, 0, 0, 0, 0xffffffffffffffffU };
+//const uint64_t size_to_mask[] = { 0, 0xff, 0xffff, 0, 0xffffffff, 0, 0, 0, 0xffffffffffffffffU };
 
 // register mapping tables
-static const Gp::Id int_register_map[REG_I_COUNT] =
+const Gp::Id int_register_map[REG_I_COUNT] =
 {
 	Gp::kIdBx, Gp::kIdSi, Gp::kIdDi, Gp::kIdBp
 };
 
 // flags mapping tables
-static uint8_t flags_map[0x1000];
-static uint32_t flags_unmap[0x20];
+uint8_t flags_map[0x1000];
+uint32_t flags_unmap[0x20];
 
 // condition mapping table
-static const CondCode condition_map[uml::COND_MAX - uml::COND_Z] =
+const CondCode condition_map[uml::COND_MAX - uml::COND_Z] =
 {
 	CondCode::kZ,    // COND_Z = 0x80,    requires Z
 	CondCode::kNZ,   // COND_NZ,          requires Z
@@ -180,13 +160,48 @@ static const CondCode condition_map[uml::COND_MAX - uml::COND_Z] =
 };
 
 // FPU control register mapping
-static const uint16_t fp_control[4] =
+const uint16_t fp_control[4] =
 {
 	0x0e3f,     // ROUND_TRUNC
 	0x023f,     // ROUND_ROUND
 	0x0a3f,     // ROUND_CEIL
 	0x063f      // ROUND_FLOOR
 };
+
+
+
+//**************************************************************************
+//  MACROS
+//**************************************************************************
+
+#define X86_CONDITION(condition)        (condition_map[condition - uml::COND_Z])
+#define X86_NOT_CONDITION(condition)    negateCond(condition_map[condition - uml::COND_Z])
+
+#define assert_no_condition(inst)       assert((inst).condition() == uml::COND_ALWAYS)
+#define assert_any_condition(inst)      assert((inst).condition() == uml::COND_ALWAYS || ((inst).condition() >= uml::COND_Z && (inst).condition() < uml::COND_MAX))
+#define assert_no_flags(inst)           assert((inst).flags() == 0)
+#define assert_flags(inst, valid)       assert(((inst).flags() & ~(valid)) == 0)
+
+
+
+class ThrowableErrorHandler : public ErrorHandler
+{
+public:
+	void handleError(Error err, const char *message, BaseEmitter *origin) override
+	{
+		throw emu_fatalerror("asmjit error %d: %s", err, message);
+	}
+};
+
+} // anonymous namespace
+
+
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+drcbe_x86::opcode_generate_func drcbe_x86::s_opcode_table[OP_MAX];
 
 
 
@@ -287,15 +302,6 @@ const drcbe_x86::opcode_table_entry drcbe_x86::s_opcode_table_source[] =
 	{ uml::OP_FRSQRT,  &drcbe_x86::op_frsqrt },     // FRSQRT  dst,src1
 	{ uml::OP_FCOPYI,  &drcbe_x86::op_fcopyi },     // FCOPYI  dst,src
 	{ uml::OP_ICOPYF,  &drcbe_x86::op_icopyf },     // ICOPYF  dst,src
-};
-
-class ThrowableErrorHandler : public ErrorHandler
-{
-public:
-	void handleError(Error err, const char *message, BaseEmitter *origin) override
-	{
-		throw emu_fatalerror("asmjit error %d: %s", err, message);
-	}
 };
 
 
@@ -840,8 +846,21 @@ void drcbe_x86::generate(drcuml_block &block, const instruction *instlist, uint3
 	m_hash.block_begin(block, instlist, numinst);
 	m_map.block_begin(block);
 
-	// compute the base by aligning the cache top to a cache line (assumed to be 64 bytes)
-	x86code *dst = (x86code *)(uint64_t(m_cache.top() + 63) & ~63);
+	// compute the base by aligning the cache top to a cache line
+	auto [err, linesize] = osd_get_cache_line_size();
+	uintptr_t linemask = 63;
+	if (err)
+	{
+		osd_printf_verbose("Error getting cache line size (%s:%d %s), assuming 64 bytes\n", err.category().name(), err.value(), err.message());
+	}
+	else
+	{
+		assert(linesize);
+		linemask = linesize - 1;
+		for (unsigned shift = 1; linemask & (linemask + 1); ++shift)
+			linemask |= linemask >> shift;
+	}
+	x86code *dst = (x86code *)(uintptr_t(m_cache.top() + linemask) & ~linemask);
 
 	CodeHolder ch;
 	ch.init(Environment::host(), uint64_t(dst));
@@ -1103,44 +1122,52 @@ void drcbe_x86::shift_op_param(Assembler &a, Inst::Id const opcode, size_t opsiz
 {
 	if (param.is_immediate())
 	{
-		uint32_t bitshift = (param.immediate() & (opsize * 8 - 1));
+		const uint32_t bitshift = param.immediate() & (opsize * 8 - 1);
 
-		if (optimize(a, dst, param) || bitshift == 0)
-			return;
-
-		a.emit(opcode, dst, imm(bitshift));
+		if (!optimize(a, dst, param) && bitshift != 0)
+			a.emit(opcode, dst, imm(bitshift));
 
 		if (update_flags)
+		{
+			if (bitshift == 0)
+				a.clc(); // throw away carry since it'll never be used
+
 			calculate_status_flags(a, dst, FLAG_S | FLAG_Z); // calculate status flags but preserve carry
+		}
 	}
 	else
 	{
-		Label restore_flags = a.newLabel();
+		Label calc = a.newLabel();
 		Label end = a.newLabel();
 
 		Gp shift = dst.as<Gpd>().id() == ecx.id() ? ebx : ecx;
 
-		a.pushfd(); // no status flags should change if shift is 0, so preserve flags
+		a.pushfd(); // preserve flags for carry
 
 		emit_mov_r32_p32(a, shift, param);
 
 		a.and_(shift, opsize * 8 - 1);
 		a.test(shift, shift);
-		a.short_().jz(restore_flags);
+
+		a.short_().jnz(calc);
+
+		a.popfd(); // preserved flags not needed so throw it away
+
+		if (update_flags)
+			a.clc(); // throw away carry since it'll never be used
+
+		a.short_().jmp(end);
+
+		a.bind(calc);
 
 		a.popfd(); // restore flags to keep carry for rolc/rorc
 
 		a.emit(opcode, dst, shift);
 
+		a.bind(end);
+
 		if (update_flags)
 			calculate_status_flags(a, dst, FLAG_S | FLAG_Z); // calculate status flags but preserve carry
-
-		a.short_().jmp(end);
-
-		a.bind(restore_flags);
-		a.popfd();
-
-		a.bind(end);
 	}
 }
 
@@ -1533,8 +1560,6 @@ void drcbe_x86::emit_shl_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 			;// skip
 		else
 		{
-			saveflags = saveflags && count > 0;
-
 			while (count >= 32)
 			{
 				if (inst.flags() != 0)
@@ -1553,13 +1578,25 @@ void drcbe_x86::emit_shl_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 			if (inst.flags() != 0 || count > 0)
 			{
 				a.shld(reghi, reglo, count);                                            // shld  reghi,reglo,count
-				if (saveflags) a.pushfd();                                              // pushf
+				if (saveflags && count != 0) a.pushfd();                                // pushf
 				a.shl(reglo, count);                                                    // shl   reglo,count
 			}
 		}
 
 		if (saveflags)
-			emit_combine_z_shl_flags(a);
+		{
+			if (count == 0)
+			{
+				a.test(reglo, reglo);
+				a.pushfd();
+				calculate_status_flags(a, reghi, FLAG_S | FLAG_Z);
+				emit_combine_z_flags(a);
+			}
+			else
+			{
+				emit_combine_z_shl_flags(a);
+			}
+		}
 	}
 	else
 	{
@@ -1567,8 +1604,6 @@ void drcbe_x86::emit_shl_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 		Label end = a.newLabel();
 		Label skip1 = a.newLabel();
 		Label skip2 = a.newLabel();
-
-		a.pushfd();
 
 		emit_mov_r32_p32(a, ecx, param);                                                // mov   ecx,param
 
@@ -1603,14 +1638,21 @@ void drcbe_x86::emit_shl_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 		a.shl(reglo, cl);                                                               // shl   reglo,cl
 
 		if (saveflags)
+		{
 			emit_combine_z_shl_flags(a);
 
-		a.lea(esp, ptr(esp, 4));
-
-		a.jmp(end);
+			a.short_().jmp(end);
+		}
 
 		a.bind(skipall);
-		a.popfd();
+
+		if (saveflags)
+		{
+			a.test(reglo, reglo);
+			a.pushfd();
+			calculate_status_flags(a, reghi, FLAG_S | FLAG_Z);
+			emit_combine_z_flags(a);
+		}
 
 		a.bind(end);
 	}
@@ -1632,8 +1674,6 @@ void drcbe_x86::emit_shr_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 			;// skip
 		else
 		{
-			saveflags = saveflags && count > 0;
-
 			while (count >= 32)
 			{
 				if (inst.flags() != 0)
@@ -1652,22 +1692,32 @@ void drcbe_x86::emit_shr_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 			if (inst.flags() != 0 || count > 0)
 			{
 				a.shrd(reglo, reghi, count);                                            // shrd  reglo,reghi,count
-				if (saveflags) a.pushfd();                                              // pushf
+				if (saveflags && count != 0) a.pushfd();                                // pushf
 				a.shr(reghi, count);                                                    // shr   reghi,count
 			}
 		}
 
 		if (saveflags)
 		{
-			// take carry from lower register's flags
-			a.pushfd();
-			a.mov(ecx, dword_ptr(esp, 4));
-			a.and_(ecx, 0x01); // carry flag
-			a.and_(dword_ptr(esp, 0), ~0x01);
-			a.or_(dword_ptr(esp, 0), ecx);
-			a.popfd();
+			if (count == 0)
+			{
+				a.test(reglo, reglo);
+				a.pushfd();
+				calculate_status_flags(a, reghi, FLAG_S | FLAG_Z);
+				emit_combine_z_flags(a);
+			}
+			else
+			{
+				// take carry from lower register's flags
+				a.pushfd();
+				a.mov(ecx, dword_ptr(esp, 4));
+				a.and_(ecx, 0x01); // carry flag
+				a.and_(dword_ptr(esp, 0), ~0x01);
+				a.or_(dword_ptr(esp, 0), ecx);
+				a.popfd();
 
-			emit_combine_z_flags(a);
+				emit_combine_z_flags(a);
+			}
 		}
 	}
 	else
@@ -1676,8 +1726,6 @@ void drcbe_x86::emit_shr_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 		Label end = a.newLabel();
 		Label skip1 = a.newLabel();
 		Label skip2 = a.newLabel();
-
-		a.pushfd();
 
 		emit_mov_r32_p32(a, ecx, param);                                                // mov   ecx,param
 
@@ -1722,14 +1770,19 @@ void drcbe_x86::emit_shr_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 			a.popfd();
 
 			emit_combine_z_flags(a);
+
+			a.short_().jmp(end);
 		}
 
-		a.lea(esp, ptr(esp, 4));
-
-		a.jmp(end);
-
 		a.bind(skipall);
-		a.popfd();
+
+		if (saveflags)
+		{
+			a.test(reglo, reglo);
+			a.pushfd();
+			calculate_status_flags(a, reghi, FLAG_S | FLAG_Z);
+			emit_combine_z_flags(a);
+		}
 
 		a.bind(end);
 	}
@@ -1751,8 +1804,6 @@ void drcbe_x86::emit_sar_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 			;// skip
 		else
 		{
-			saveflags = saveflags && count > 0;
-
 			while (count >= 32)
 			{
 				if (inst.flags() != 0)
@@ -1771,32 +1822,40 @@ void drcbe_x86::emit_sar_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 			if (inst.flags() != 0 || count > 0)
 			{
 				a.shrd(reglo, reghi, count);                                            // shrd  reglo,reghi,count
-				if (saveflags) a.pushfd();                                              // pushf
+				if (saveflags && count != 0) a.pushfd();                                              // pushf
 				a.sar(reghi, count);                                                    // sar   reghi,count
 			}
 		}
 
 		if (saveflags)
 		{
-			// take carry from lower register's flags
-			a.pushfd();
-			a.mov(ecx, dword_ptr(esp, 4));
-			a.and_(ecx, 0x01); // carry flag
-			a.and_(dword_ptr(esp, 0), ~0x01);
-			a.or_(dword_ptr(esp, 0), ecx);
-			a.popfd();
+			if (count == 0)
+			{
+				a.test(reglo, reglo);
+				a.pushfd();
+				calculate_status_flags(a, reghi, FLAG_S | FLAG_Z);
+				emit_combine_z_flags(a);
+			}
+			else
+			{
+				// take carry from lower register's flags
+				a.pushfd();
+				a.mov(ecx, dword_ptr(esp, 4));
+				a.and_(ecx, 0x01); // carry flag
+				a.and_(dword_ptr(esp, 0), ~0x01);
+				a.or_(dword_ptr(esp, 0), ecx);
+				a.popfd();
 
-			emit_combine_z_flags(a);
+				emit_combine_z_flags(a);
+			}
 		}
 	}
 	else
 	{
-		Label skipall = a.newLabel();
-		Label end = a.newLabel();
 		Label skip1 = a.newLabel();
 		Label skip2 = a.newLabel();
-
-		a.pushfd();
+		Label skipall = a.newLabel();
+		Label end = a.newLabel();
 
 		emit_mov_r32_p32(a, ecx, param);                                                // mov   ecx,param
 
@@ -1841,14 +1900,19 @@ void drcbe_x86::emit_sar_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 			a.popfd();
 
 			emit_combine_z_flags(a);
+
+			a.short_().jmp(end);
 		}
 
-		a.lea(esp, ptr(esp, 4));
-
-		a.jmp(end);
-
 		a.bind(skipall);
-		a.popfd();
+
+		if (saveflags)
+		{
+			a.test(reglo, reglo);
+			a.pushfd();
+			calculate_status_flags(a, reghi, FLAG_S | FLAG_Z);
+			emit_combine_z_flags(a);
+		}
 
 		a.bind(end);
 	}
@@ -1874,8 +1938,6 @@ void drcbe_x86::emit_rol_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 			;// skip
 		else
 		{
-			saveflags = saveflags && count > 0;
-
 			while (count >= 32)
 			{
 				if (inst.flags() != 0)
@@ -1894,23 +1956,33 @@ void drcbe_x86::emit_rol_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 
 			a.mov(ecx, reglo);
 			a.shld(reglo, reghi, count);
-			if (saveflags) a.pushfd();
+			if (saveflags && count != 0) a.pushfd();
 			a.shld(reghi, ecx, count);
 		}
 
 		if (saveflags)
-			emit_combine_zs_flags(a);
+		{
+			if (count == 0)
+			{
+				a.test(reglo, reglo);
+				a.pushfd();
+				calculate_status_flags(a, reghi, FLAG_S | FLAG_Z);
+				emit_combine_z_flags(a);
+			}
+			else
+			{
+				emit_combine_zs_flags(a);
+			}
+		}
 	}
 	else
 	{
-		Label end = a.newLabel();
 		Label skipall = a.newLabel();
+		Label end = a.newLabel();
 		Label skip1 = a.newLabel();
 		Label shift_loop = a.newLabel();
 
 		emit_mov_r32_p32(a, ecx, param);
-
-		a.pushfd();
 
 		a.and_(ecx, 63);
 		a.test(ecx, ecx);
@@ -1937,20 +2009,26 @@ void drcbe_x86::emit_rol_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 
 		a.bind(skip1);
 		reset_last_upper_lower_reg();
-
 		a.mov(tempreg, reglo);
 		a.shld(reglo, reghi, cl);
 		if (saveflags) a.pushfd();
 		a.shld(reghi, tempreg, cl);
 
 		if (saveflags)
+		{
 			emit_combine_zs_flags(a);
-
-		a.lea(esp, ptr(esp, 4));
-		a.jmp(end);
+			a.short_().jmp(end);
+		}
 
 		a.bind(skipall);
-		a.popfd();
+
+		if (saveflags)
+		{
+			a.test(reglo, reglo);
+			a.pushfd();
+			calculate_status_flags(a, reghi, FLAG_S | FLAG_Z);
+			emit_combine_z_flags(a);
+		}
 
 		a.bind(end);
 	}
@@ -1978,8 +2056,6 @@ void drcbe_x86::emit_ror_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 			;// skip
 		else
 		{
-			saveflags = saveflags && count > 0;
-
 			while (count >= 32)
 			{
 				if (inst.flags() != 0)
@@ -1998,23 +2074,33 @@ void drcbe_x86::emit_ror_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 
 			a.mov(tempreg, reghi);
 			a.shrd(reghi, reglo, count);
-			if (saveflags) a.pushfd();
+			if (saveflags && count != 0) a.pushfd();
 			a.shrd(reglo, tempreg, count);
 
 			if (saveflags)
-				emit_combine_zs_flags(a);
+			{
+				if (count == 0)
+				{
+					a.test(reglo, reglo);
+					a.pushfd();
+					calculate_status_flags(a, reghi, FLAG_S | FLAG_Z);
+					emit_combine_z_flags(a);
+				}
+				else
+				{
+					emit_combine_zs_flags(a);
+				}
+			}
 		}
 	}
 	else
 	{
-		Label end = a.newLabel();
 		Label skipall = a.newLabel();
+		Label end = a.newLabel();
 		Label skip1 = a.newLabel();
 		Label shift_loop = a.newLabel();
 
 		emit_mov_r32_p32(a, ecx, param);
-
-		a.pushfd();
 
 		a.and_(ecx, 63);
 		a.test(ecx, ecx);
@@ -2041,20 +2127,26 @@ void drcbe_x86::emit_ror_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 
 		a.bind(skip1);
 		reset_last_upper_lower_reg();
-
 		a.mov(tempreg, reghi);
 		a.shrd(reghi, reglo, cl);
 		if (saveflags) a.pushfd();
 		a.shrd(reglo, tempreg, cl);
 
 		if (saveflags)
+		{
 			emit_combine_zs_flags(a);
-
-		a.lea(esp, ptr(esp, 4));
-		a.jmp(end);
+			a.short_().jmp(end);
+		}
 
 		a.bind(skipall);
-		a.popfd();
+
+		if (saveflags)
+		{
+			a.test(reglo, reglo);
+			a.pushfd();
+			calculate_status_flags(a, reghi, FLAG_S | FLAG_Z);
+			emit_combine_z_flags(a);
+		}
 
 		a.bind(end);
 	}
@@ -2073,6 +2165,7 @@ void drcbe_x86::emit_rcl_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 	Label loop = a.newLabel();
 	Label skipall = a.newLabel();
 	Label skiploop = a.newLabel();
+	Label end = a.newLabel();
 
 	a.pushfd(); // keep carry flag after and
 	emit_mov_r32_p32_keepflags(a, ecx, param);
@@ -2080,15 +2173,15 @@ void drcbe_x86::emit_rcl_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 	a.and_(ecx, 63);
 	a.popfd();
 
-	a.jecxz(skipall);
+	a.short_().jecxz(skipall);
 	a.lea(ecx, ptr(ecx, -1));
 
 	a.bind(loop);
-	a.jecxz(skiploop);
+	a.short_().jecxz(skiploop);
 	a.lea(ecx, ptr(ecx, -1));
 	a.rcl(reglo, 1);
 	a.rcl(reghi, 1);
-	a.jmp(loop);
+	a.short_().jmp(loop);
 
 	a.bind(skiploop);
 	reset_last_upper_lower_reg();
@@ -2101,9 +2194,21 @@ void drcbe_x86::emit_rcl_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 		a.pushfd();
 		calculate_status_flags(a, reghi, FLAG_S | FLAG_Z);
 		emit_combine_z_flags(a);
+
+		a.short_().jmp(end);
 	}
 
 	a.bind(skipall);
+
+	if (inst.flags())
+	{
+		a.test(reglo, reglo);
+		a.pushfd();
+		calculate_status_flags(a, reghi, FLAG_S | FLAG_Z);
+		emit_combine_z_flags(a);
+	}
+
+	a.bind(end);
 	reset_last_upper_lower_reg();
 }
 
@@ -2118,6 +2223,7 @@ void drcbe_x86::emit_rcr_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 	Label loop = a.newLabel();
 	Label skipall = a.newLabel();
 	Label skiploop = a.newLabel();
+	Label end = a.newLabel();
 
 	a.pushfd(); // keep carry flag after and
 	emit_mov_r32_p32_keepflags(a, ecx, param);
@@ -2125,15 +2231,15 @@ void drcbe_x86::emit_rcr_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 	a.and_(ecx, 63);
 	a.popfd();
 
-	a.jecxz(skipall);
+	a.short_().jecxz(skipall);
 	a.lea(ecx, ptr(ecx, -1));
 
 	a.bind(loop);
-	a.jecxz(skiploop);
+	a.short_().jecxz(skiploop);
 	a.lea(ecx, ptr(ecx, -1));
 	a.rcr(reghi, 1);
 	a.rcr(reglo, 1);
-	a.jmp(loop);
+	a.short_().jmp(loop);
 
 	a.bind(skiploop);
 	reset_last_upper_lower_reg();
@@ -2146,9 +2252,20 @@ void drcbe_x86::emit_rcr_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 		a.pushfd();
 		calculate_status_flags(a, reghi, FLAG_S | FLAG_Z);
 		emit_combine_z_flags(a);
+
+		a.short_().jmp(end);
 	}
 
 	a.bind(skipall);
+	if (inst.flags())
+	{
+		a.test(reglo, reglo);
+		a.pushfd();
+		calculate_status_flags(a, reghi, FLAG_S | FLAG_Z);
+		emit_combine_z_flags(a);
+	}
+
+	a.bind(end);
 	reset_last_upper_lower_reg();
 }
 
@@ -2557,9 +2674,9 @@ void drcbe_x86::op_jmp(Assembler &a, const instruction &inst)
 		jmptarget = a.newNamedLabel(labelName.c_str());
 
 	if (inst.condition() == uml::COND_ALWAYS)
-		a.jmp(jmptarget);                                                               // jmp   target
+		a.jmp(jmptarget);
 	else
-		a.j(X86_CONDITION(inst.condition()), jmptarget);                                // jcc   target
+		a.j(X86_CONDITION(inst.condition()), jmptarget);
 }
 
 
@@ -2583,9 +2700,12 @@ void drcbe_x86::op_exh(Assembler &a, const instruction &inst)
 	drccodeptr *targetptr = handp.handle().codeptr_addr();
 
 	// perform the exception processing
-	Label no_exception = a.newLabel();
+	Label no_exception;
 	if (inst.condition() != uml::COND_ALWAYS)
+	{
+		no_exception = a.newLabel();
 		a.short_().j(X86_NOT_CONDITION(inst.condition()), no_exception);                // jcc   no_exception
+	}
 	emit_mov_m32_p32(a, MABS(&m_state.exp, 4), exp);                                    // mov   [exp],exp
 	if (*targetptr != nullptr)
 		a.call(imm(*targetptr));                                                        // call  *targetptr
@@ -2615,9 +2735,12 @@ void drcbe_x86::op_callh(Assembler &a, const instruction &inst)
 	drccodeptr *targetptr = handp.handle().codeptr_addr();
 
 	// skip if conditional
-	Label skip = a.newLabel();
+	Label skip;
 	if (inst.condition() != uml::COND_ALWAYS)
+	{
+		skip = a.newLabel();
 		a.short_().j(X86_NOT_CONDITION(inst.condition()), skip);                        // jcc   skip
+	}
 
 	// jump through the handle; directly if a normal jump
 	if (*targetptr != nullptr)
@@ -2647,9 +2770,12 @@ void drcbe_x86::op_ret(Assembler &a, const instruction &inst)
 	assert(inst.numparams() == 0);
 
 	// skip if conditional
-	Label skip = a.newLabel();
+	Label skip;
 	if (inst.condition() != uml::COND_ALWAYS)
-		a.j(X86_NOT_CONDITION(inst.condition()), skip);                                 // jcc   skip
+	{
+		skip = a.newLabel();
+		a.short_().j(X86_NOT_CONDITION(inst.condition()), skip);
+	}
 
 	// return
 	a.lea(esp, ptr(esp, 28));                                                           // lea   rsp,[rsp+28]
@@ -2681,18 +2807,21 @@ void drcbe_x86::op_callc(Assembler &a, const instruction &inst)
 	be_parameter paramp(*this, inst.param(1), PTYPE_M);
 
 	// skip if conditional
-	Label skip = a.newLabel();
+	Label skip;
 	if (inst.condition() != uml::COND_ALWAYS)
-		a.j(X86_NOT_CONDITION(inst.condition()), skip);                                 // jcc   skip
+	{
+		skip = a.newLabel();
+		a.short_().j(X86_NOT_CONDITION(inst.condition()), skip);
+	}
 
 	// perform the call
-	a.mov(dword_ptr(esp, 0), imm(paramp.memory()));                                     // mov   [esp],paramp
-	a.call(imm(funcp.cfunc()));                                                         // call  funcp
+	a.mov(dword_ptr(esp, 0), imm(paramp.memory()));
+	a.call(imm(funcp.cfunc()));
 
 	// resolve the conditional link
 	if (inst.condition() != uml::COND_ALWAYS)
 	{
-		a.bind(skip);                                                               // skip:
+		a.bind(skip);
 		reset_last_upper_lower_reg();
 	}
 }
@@ -3398,7 +3527,12 @@ void drcbe_x86::op_readm(Assembler &a, const instruction &inst)
 		emit_mov_m64_p64(a, qword_ptr(esp, 8), maskp);                                  // mov    [esp+8],maskp
 	emit_mov_m32_p32(a, dword_ptr(esp, 4), addrp);                                      // mov    [esp+4],addrp
 	a.mov(dword_ptr(esp, 0), imm(m_space[spacesizep.space()]));                         // mov    [esp],space
-	if (spacesizep.size() == SIZE_WORD)
+	if (spacesizep.size() == SIZE_BYTE)
+	{
+		a.call(imm(m_accessors[spacesizep.space()].read_byte_masked));                  // call   read_byte_masked
+		a.movzx(dstreg, al);                                                            // movzx  dstreg,al
+	}
+	else if (spacesizep.size() == SIZE_WORD)
 	{
 		a.call(imm(m_accessors[spacesizep.space()].read_word_masked));                  // call   read_word_masked
 		a.movzx(dstreg, ax);                                                            // movzx  dstreg,ax
@@ -3507,7 +3641,9 @@ void drcbe_x86::op_writem(Assembler &a, const instruction &inst)
 	}
 	emit_mov_m32_p32(a, dword_ptr(esp, 4), addrp);                                      // mov    [esp+4],addrp
 	a.mov(dword_ptr(esp, 0), imm(m_space[spacesizep.space()]));                         // mov    [esp],space
-	if (spacesizep.size() == SIZE_WORD)
+	if (spacesizep.size() == SIZE_BYTE)
+		a.call(imm(m_accessors[spacesizep.space()].write_byte_masked));                 // call   write_byte_masked
+	else if (spacesizep.size() == SIZE_WORD)
 		a.call(imm(m_accessors[spacesizep.space()].write_word_masked));                 // call   write_word_masked
 	else if (spacesizep.size() == SIZE_DWORD)
 		a.call(imm(m_accessors[spacesizep.space()].write_dword_masked));                // call   write_dword_masked
@@ -3583,7 +3719,7 @@ void drcbe_x86::op_carry(Assembler &a, const instruction &inst)
 
 		if (bitp.is_immediate())
 		{
-			uint32_t bitshift = (bitp.immediate() & (inst.size() * 8 - 1));
+			const uint32_t bitshift = bitp.immediate() & (inst.size() * 8 - 1);
 			if (bitshift < 32)
 			{
 				if (srcp.is_memory())
@@ -3609,7 +3745,7 @@ void drcbe_x86::op_carry(Assembler &a, const instruction &inst)
 			Label higher = a.newLabel();
 
 			a.cmp(ecx, 32);
-			a.jge(higher);
+			a.short_().jge(higher);
 
 			if (srcp.is_memory())
 			{
@@ -3704,9 +3840,12 @@ void drcbe_x86::op_mov(Assembler &a, const instruction &inst)
 	Gp const dstreg = dstp.select_register(eax);
 
 	// add a conditional branch unless a conditional move is possible
-	Label skip = a.newLabel();
+	Label skip;
 	if (inst.condition() != uml::COND_ALWAYS && ((inst.size() == 8) || !(dstp.is_int_register() && !srcp.is_immediate())))
+	{
+		skip = a.newLabel();
 		a.short_().j(X86_NOT_CONDITION(inst.condition()), skip);                        // jcc   skip
+	}
 
 	// 32-bit form
 	if (inst.size() == 4)
@@ -4663,7 +4802,7 @@ void drcbe_x86::op_divu(Assembler &a, const instruction &inst)
 			a.add(eax, eax);                                                            // add   eax,eax
 		}
 		Label skip = a.newLabel();
-		a.jecxz(skip);                                                                  // jecxz skip
+		a.short_().jecxz(skip);                                                                  // jecxz skip
 		emit_mov_r32_p32(a, eax, src1p);                                                // mov   eax,src1p
 		a.xor_(edx, edx);                                                               // xor   edx,edx
 		a.div(ecx);                                                                     // div   ecx
@@ -4734,7 +4873,7 @@ void drcbe_x86::op_divs(Assembler &a, const instruction &inst)
 			a.add(eax, eax);                                                            // add   eax,eax
 		}
 		Label skip = a.newLabel();
-		a.jecxz(skip);                                                                  // jecxz skip
+		a.short_().jecxz(skip);                                                                  // jecxz skip
 		emit_mov_r32_p32(a, eax, src1p);                                                // mov   eax,src1p
 		a.cdq();                                                                        // cdq
 		a.idiv(ecx);                                                                    // idiv  ecx
@@ -5298,10 +5437,10 @@ void drcbe_x86::op_lzcnt(Assembler &a, const instruction &inst)
 		Label end = a.newLabel();
 
 		a.bsr(edx, edx);
-		a.jz(skip);
+		a.short_().jz(skip);
 		a.xor_(edx, 31 ^ 63);
 		a.mov(dstreg, edx);
-		a.jmp(end);
+		a.short_().jmp(end);
 
 		a.bind(skip);
 		a.mov(edx, 64 ^ 63);
@@ -5362,7 +5501,7 @@ void drcbe_x86::op_tzcnt(Assembler &a, const instruction &inst)
 		Label skip = a.newLabel();
 		emit_mov_r64_p64(a, dstreg, edx, srcp);                                         // mov   dstreg:edx,srcp
 		a.bsf(dstreg, dstreg);                                                          // bsf   dstreg,dstreg
-		a.jnz(skip);                                                                    // jnz   skip
+		a.short_().jnz(skip);                                                                    // jnz   skip
 		a.mov(ecx, 32);                                                                 // mov   ecx,32
 		a.bsf(dstreg, edx);                                                             // bsf   dstreg,edx
 		a.cmovz(dstreg, ecx);                                                           // cmovz dstreg,ecx
@@ -5990,22 +6129,25 @@ void drcbe_x86::op_fmov(Assembler &a, const instruction &inst)
 	be_parameter srcp(*this, inst.param(1), PTYPE_MF);
 
 	// always start with a jmp
-	Label skip = a.newLabel();
+	Label skip;
 	if (inst.condition() != uml::COND_ALWAYS)
-		a.j(X86_NOT_CONDITION(inst.condition()), skip);                                 // jcc   skip
+	{
+		skip = a.newLabel();
+		a.short_().j(X86_NOT_CONDITION(inst.condition()), skip);
+	}
 
 	// general case
-	a.mov(eax, MABS(srcp.memory(0)));                                                   // mov   eax,[srcp]
+	a.mov(eax, MABS(srcp.memory(0)));
 	if (inst.size() == 8)
-		a.mov(edx, MABS(srcp.memory(4)));                                               // mov   edx,[srcp + 4]
-	a.mov(MABS(dstp.memory(0)), eax);                                                   // mov   [dstp],eax
+		a.mov(edx, MABS(srcp.memory(4)));
+	a.mov(MABS(dstp.memory(0)), eax);
 	if (inst.size() == 8)
-		a.mov(MABS(dstp.memory(4)), edx);                                               // mov   [dstp + 4],edx
+		a.mov(MABS(dstp.memory(4)), edx);
 
 	// resolve the jump
 	if (inst.condition() != uml::COND_ALWAYS)
 	{
-		a.bind(skip);                                                               // skip:
+		a.bind(skip);
 		reset_last_upper_lower_reg();
 	}
 }
@@ -6573,9 +6715,9 @@ int drcbe_x86::dmulu(uint64_t &dstlo, uint64_t &dsthi, uint64_t src1, uint64_t s
 	dstlo = lo;
 
 	if (halfmul_flags)
-		return ((lo >> 60) & FLAG_S) | ((hi != 0) << 1);
+		return ((lo >> 60) & FLAG_S) | ((hi != 0) << 1) | ((dstlo == 0) << 2);
 
-	return ((hi >> 60) & FLAG_S) | ((hi != 0) << 1);
+	return ((hi >> 60) & FLAG_S) | ((hi != 0) << 1) | ((dsthi == 0 && dstlo == 0) << 2);
 }
 
 
@@ -6631,9 +6773,9 @@ int drcbe_x86::dmuls(uint64_t &dstlo, uint64_t &dsthi, int64_t src1, int64_t src
 	dstlo = lo;
 
 	if (halfmul_flags)
-		return ((lo >> 60) & FLAG_S) | ((hi != ((int64_t)lo >> 63)) << 1);
+		return ((lo >> 60) & FLAG_S) | ((hi != ((int64_t)lo >> 63)) << 1) | ((dstlo == 0) << 2);
 
-	return ((hi >> 60) & FLAG_S) | ((hi != ((int64_t)lo >> 63)) << 1);
+	return ((hi >> 60) & FLAG_S) | ((hi != ((int64_t)lo >> 63)) << 1) | ((dsthi == 0 && dstlo == 0) << 2);
 }
 
 

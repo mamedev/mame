@@ -274,21 +274,13 @@ void i8085a_cpu_device::init_tables()
 
 		/* flags */
 		u8 zs = 0;
-		if (i==0) zs |= ZF;
-		if (i&128) zs |= SF;
+		if (i == 0) zs |= ZF;
+		if (i & 0x80) zs |= SF;
 
-		u8 p = 0;
-		if (i&1) ++p;
-		if (i&2) ++p;
-		if (i&4) ++p;
-		if (i&8) ++p;
-		if (i&16) ++p;
-		if (i&32) ++p;
-		if (i&64) ++p;
-		if (i&128) ++p;
+		u8 p = (population_count_32(i) & 1) ? 0 : PF;
 
 		lut_zs[i] = zs;
-		lut_zsp[i] = zs | ((p&1) ? 0 : PF);
+		lut_zsp[i] = zs | p;
 	}
 }
 
@@ -307,11 +299,11 @@ void i8085a_cpu_device::device_start()
 	m_after_ei = 0;
 	m_nmi_state = 0;
 	m_irq_state[3] = m_irq_state[2] = m_irq_state[1] = m_irq_state[0] = 0;
-	m_trap_pending = 0;
+	m_trap_pending = false;
 	m_trap_im_copy = 0;
-	m_sod_state = true; // SOD will go low at reset
+	m_sod_state = 1; // SOD will go low at reset
 	m_in_acknowledge = false;
-	m_ietemp = false;
+	m_ietemp = 0;
 
 	init_tables();
 
@@ -382,7 +374,7 @@ void i8085a_cpu_device::device_reset()
 	m_halt = 0;
 	m_im &= ~IM_I75;
 	m_im |= IM_M55 | IM_M65 | IM_M75;
-	m_after_ei = false;
+	m_after_ei = 0;
 	m_trap_pending = false;
 	m_trap_im_copy = 0;
 	set_inte(0);
@@ -430,11 +422,11 @@ void i8085a_cpu_device::state_export(const device_state_entry &entry)
 	switch (entry.index())
 	{
 		case I8085_SID:
-			m_ietemp = ((m_im & IM_SID) != 0) && m_in_sid_func() != 0;
+			m_ietemp = ((m_im & IM_SID) && m_in_sid_func()) ? 1 : 0;
 			break;
 
 		case I8085_INTE:
-			m_ietemp = ((m_im & IM_IE) != 0);
+			m_ietemp = (m_im & IM_IE) ? 1 : 0;
 			break;
 
 		default:

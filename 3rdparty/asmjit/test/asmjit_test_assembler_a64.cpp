@@ -42,6 +42,7 @@ static void ASMJIT_NOINLINE testA64AssemblerBase(AssemblerTester<a64::Assembler>
   TEST_INSTRUCTION("E103038B", add(x1, xzr, x3));
   TEST_INSTRUCTION("5F00030B", add(wzr, w2, w3));
   TEST_INSTRUCTION("5F00038B", add(xzr, x2, x3));
+  TEST_INSTRUCTION("4140238B", add(x1, x2, w3, uxtw(0)));
   TEST_INSTRUCTION("83004011", add(w3, w4, 0, lsl(12)));
   TEST_INSTRUCTION("83004091", add(x3, x4, 0, lsl(12)));
   TEST_INSTRUCTION("83005011", add(w3, w4, 1024, lsl(12)));
@@ -210,7 +211,8 @@ static void ASMJIT_NOINLINE testA64AssemblerBase(AssemblerTester<a64::Assembler>
   TEST_INSTRUCTION("3F00022B", cmn(w1, w2));
   TEST_INSTRUCTION("3F0002AB", cmn(x1, x2));
   TEST_INSTRUCTION("3F08222B", cmn(w1, w2, uxtb(2)));
-  TEST_INSTRUCTION("3F0822AB", cmn(x1, x2, uxtb(2)));
+  TEST_INSTRUCTION("3F0822AB", cmn(x1, w2, uxtb(2)));
+  TEST_INSTRUCTION("5F4023AB", cmn(x2, w3, uxtw(0)));
   TEST_INSTRUCTION("FF43212B", cmn(wsp, w1));
   TEST_INSTRUCTION("FF07212B", cmn(wsp, w1, uxtb(1)));
   TEST_INSTRUCTION("FF6321AB", cmn(sp, x1));
@@ -224,7 +226,8 @@ static void ASMJIT_NOINLINE testA64AssemblerBase(AssemblerTester<a64::Assembler>
   TEST_INSTRUCTION("3F00026B", cmp(w1, w2));
   TEST_INSTRUCTION("3F0002EB", cmp(x1, x2));
   TEST_INSTRUCTION("3F08226B", cmp(w1, w2, uxtb(2)));
-  TEST_INSTRUCTION("3F0822EB", cmp(x1, x2, uxtb(2)));
+  TEST_INSTRUCTION("3F0822EB", cmp(x1, w2, uxtb(2)));
+  TEST_INSTRUCTION("5F4023EB", cmp(x2, w3, uxtw(0)));
   TEST_INSTRUCTION("FF43216B", cmp(wsp, w1));
   TEST_INSTRUCTION("FF07216B", cmp(wsp, w1, uxtb(1)));
   TEST_INSTRUCTION("FF6321EB", cmp(sp, x1));

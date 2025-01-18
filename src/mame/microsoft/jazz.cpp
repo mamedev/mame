@@ -35,7 +35,8 @@
  *         Intel 82358               EISA Bus Controller
  *         Intel 82357               EISA Integrated System Peripheral (ISP)
  *         Intel 82352 x 2           EISA Bus Buffer (EBB)
- *         Emulex FAS216             SCSI controller (similar to NCR 53CF94-2)
+ *         Emulex FAS216             SCSI controller (similar to NCR 53CF94-2;
+ *                                   older boards have NCR 53C94 instead)
  *         27C01                     128k EPROM
  *         28F020                    256k flash memory
  *         NEC μPD31432              ARC address path ASIC

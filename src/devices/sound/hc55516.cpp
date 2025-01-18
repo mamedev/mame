@@ -18,6 +18,10 @@
     - MC3417 interpolation slope being determined by the number of samples in
       the current stream slice doesn't make sense
 
+    BTANB:
+    - outputs a low-volume but very high-pitched background tone when /FZ is
+      active and the hardware doesn't have a low-pass filter
+
 *****************************************************************************/
 
 #include "emu.h"

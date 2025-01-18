@@ -56,14 +56,13 @@ TILE_GET_INFO_MEMBER(tsconf_state::get_tile_info_txt)
 template <u8 Layer>
 TILE_GET_INFO_MEMBER(tsconf_state::get_tile_info_16c)
 {
-	u8 col_offset = (tile_index % tilemap.cols() + Layer * 64) << 1;
-	u16 row_offset = (tile_index / tilemap.cols() * 64 * 2) << 1;
+	const u8 col_offset = (tile_index & 0x03f) << 1;
+	const u16 row_offset = (tile_index & 0xfc0) << 2;
 
-	u8 *tile_info_addr = &m_ram->pointer()[(m_regs[T_MAP_PAGE] << 14) + row_offset + col_offset];
+	u8 *tile_info_addr = &m_ram->pointer()[(m_regs[T_MAP_PAGE] << 14) | row_offset | (Layer ? 0x80 : 0x00) | col_offset];
 	u8 hi = tile_info_addr[1];
 
-	u32 /*u16*/ tile = ((u16(hi) & 0x0f) << 8) | tile_info_addr[0];
-	tile = tile / tilemap.cols() * 64 * 8 + (tile % tilemap.cols()); // same as: tmp_tile_oversized_to_code()
+	u16 tile = ((u16(hi) & 0x0f) << 8) | tile_info_addr[0];
 	u8 pal = (BIT(m_regs[PAL_SEL], 4 + Layer * 2, 2) << 2) | BIT(hi, 4, 2);
 	tileinfo.set(TM_TILES0 + Layer, tile, pal, TILE_FLIPYX(BIT(hi, 6, 2)));
 	tileinfo.category = tile == 0 ? 2 : 1;
@@ -139,23 +138,11 @@ static const gfx_layout tsconf_charlayout =
 	8 * 8
 };
 
-static const gfx_layout tsconf_tile_16cpp_layout =
-{
-	8,
-	8,
-	64 * 64 * 8,
-	4,
-	{STEP4(0, 1)},
-	{STEP8(0, 4)},
-	{STEP8(0, 256 * 8)}, // Much more tiles when needed. Because tiles are in RAW format but we don't know region properties.
-	8 * 4
-};
-
 static GFXDECODE_START(gfx_tsconf)
 	GFXDECODE_ENTRY("maincpu", 0, tsconf_charlayout, 0xf7, 1)         // TM_TS_CHAR : TXT
-	GFXDECODE_ENTRY("maincpu", 0, tsconf_tile_16cpp_layout, 0, 16)    // TM_TILES0  : T0 16cpp
-	GFXDECODE_ENTRY("maincpu", 0, tsconf_tile_16cpp_layout, 0, 16)    // TM_TILES1  : T1 16cpp
-	GFXDECODE_ENTRY("maincpu", 0, tsconf_tile_16cpp_layout, 0, 16)    // TM_SPRITES : Sprites 16cpp
+	GFXDECODE_RAM("tiles0_raw", 0, gfx_8x8x8_raw, 0, 16)              // TM_TILES0  : T0 16cpp
+	GFXDECODE_RAM("tiles1_raw", 0, gfx_8x8x8_raw, 0, 16)              // TM_TILES1  : T1 16cpp
+	GFXDECODE_RAM("sprites_raw", 0, gfx_8x8x8_raw, 0, 16)             // TM_SPRITES : Sprites 16cpp
 	GFXDECODE_ENTRY("maincpu", 0x1fd00, spectrum_charlayout, 0xf7, 1) // TM_ZX_CHAR
 GFXDECODE_END
 
@@ -168,9 +155,13 @@ void tsconf_state::video_start()
 
 	m_ts_tilemap[TM_TILES0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tsconf_state::get_tile_info_16c<0>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_ts_tilemap[TM_TILES0]->set_transparent_pen(0);
+	m_gfxdecode->gfx(TM_TILES0)->set_granularity(16);
 
 	m_ts_tilemap[TM_TILES1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tsconf_state::get_tile_info_16c<1>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_ts_tilemap[TM_TILES1]->set_transparent_pen(0);
+	m_gfxdecode->gfx(TM_TILES1)->set_granularity(16);
+
+	m_gfxdecode->gfx(TM_SPRITES)->set_granularity(16);
 
 	m_frame_irq_timer = timer_alloc(FUNC(tsconf_state::irq_frame), this);
 	m_scanline_irq_timer = timer_alloc(FUNC(tsconf_state::irq_scanline), this);
@@ -247,6 +238,9 @@ void tsconf_state::device_post_load()
 {
 	spectrum_128_state::device_post_load();
 	m_sprites_cache.clear();
+	copy_tiles_to_raw(m_ram->pointer() + ((m_regs[SG_PAGE] & 0xf8) << 14), m_sprites_raw.target());
+	copy_tiles_to_raw(m_ram->pointer() + ((m_regs[T0_G_PAGE] & 0xf8) << 14), m_sprites_raw.target());
+	copy_tiles_to_raw(m_ram->pointer() + ((m_regs[T1_G_PAGE] & 0xf8) << 14), m_sprites_raw.target());
 }
 
 INPUT_PORTS_START( tsconf )
@@ -323,7 +317,7 @@ void tsconf_state::tsconf(machine_config &config)
 
 	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.75);;
 
-	PALETTE(config, "palette", FUNC(tsconf_state::tsconf_palette), 256);
+	PALETTE(config, "palette", palette_device::BLACK, 256);
 	m_screen->set_raw(14_MHz_XTAL / 2, 448, with_hblank(0), 448, 320, with_vblank(0), 320);
 	m_screen->set_screen_update(FUNC(tsconf_state::screen_update));
 	m_screen->set_no_palette();

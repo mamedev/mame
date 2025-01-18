@@ -11,8 +11,8 @@
 
 Notes:
 
-- mjcamerb and mmcamera is the medal version of mjcamera, however the
-   two don't run on the same hardware. mjcamera is in nbmj8688.cpp.
+- mjcameram is the medal version of mjcamera.  mjcamerao is a version of the
+   game on different hardware in nbmj8688.cpp.
 
 - In mjfocus(Medal Type), sometimes CPU's hands are forced out from the screen.
   This is correct behaviour.
@@ -621,7 +621,7 @@ static INPUT_PORTS_START( hanamomo )
 	PORT_INCLUDE( nbmjcontrols )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( mjcamerb )
+static INPUT_PORTS_START( mjcamera )
 	PORT_START("DSWA")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x07, "1 (Easy)" )
@@ -687,7 +687,7 @@ static INPUT_PORTS_START( mjcamerb )
 	PORT_INCLUDE( nbmjcontrols )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( mmcamera )
+static INPUT_PORTS_START( mjcameram )
 	PORT_START("DSWA")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -2254,7 +2254,7 @@ void nbmj8891_state::abunai(machine_config &config)
 }
 
 /* NBMJDRV2 */
-void nbmj8891_state::mjcamerb(machine_config &config)
+void nbmj8891_state::mjcamera(machine_config &config)
 {
 	gionbana(config);
 
@@ -2270,7 +2270,7 @@ void nbmj8891_state::mjcamerb(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(nbmj8891_state,_1layer)
 }
 
-void nbmj8891_state::mmcamera(machine_config &config)
+void nbmj8891_state::mjcameram(machine_config &config)
 {
 	gionbana(config);
 
@@ -3362,7 +3362,7 @@ ROM_START( hanaojia )
 	ROM_LOAD( "hnoj_11.bin", 0x100000, 0x20000, CRC(bfe38671) SHA1(6c81864caab61ea60dfe446b390221bdcfb0895e) )
 ROM_END
 
-ROM_START( mjcamerb )
+ROM_START( mjcamera )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "2.3h",        0x00000, 0x10000, CRC(3a0f110b) SHA1(8923136ed25ed91c90f93c3f75f5532ff8f9d420) )
 
@@ -3392,7 +3392,7 @@ ROM_START( mjcamerb )
 	ROM_LOAD( "mcam_m1.bin", 0x00000, 0x40000, CRC(f85c5b07) SHA1(0fc55e9b60ccc630a0d77862eb5e64a3ba366947) )   // same as housemnq/3i.bin gfx data
 ROM_END
 
-ROM_START( mmcamera )
+ROM_START( mjcameram )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "2.3ha",  0x00000, 0x10000, CRC(b6eed2cf) SHA1(87171ba9ba247e54244867f720738f9b88a1213e) )
 
@@ -3560,8 +3560,8 @@ GAME( 1989, abunai,    0,        abunai,   abunai,   nbmj8891_state, empty_init,
 GAME( 1989, mjfocus,   0,        mjfocus,  mjfocus,  nbmj8891_state, init_mjfocus,  ROT0,   "Nichibutsu", "Mahjong Focus (Japan 890313)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, mjfocusm,  mjfocus,  mjfocusm, mjfocusm, nbmj8891_state, init_mjfocusm, ROT0,   "Nichibutsu", "Mahjong Focus (Japan 890510, medal)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, peepshow,  mjfocus,  mjfocus,  mjfocus,  nbmj8891_state, init_mjfocus,  ROT0,   "AC", "Nozokimeguri Mahjong Peep Show (Japan 890404)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mjcamerb,  0,        mjcamerb, mjcamerb, nbmj8891_state, empty_init,    ROT0,   "Miki Syouji", "Mahjong Camera Kozou (set 2) (Japan 881109)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mmcamera,  mjcamerb, mmcamera, mmcamera, nbmj8891_state, empty_init,    ROT0,   "Miki Syouji", "Mahjong Camera Kozou (Japan 890509, medal)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mjcamera,  0,        mjcamera, mjcamera, nbmj8891_state, empty_init,    ROT0,   "Miki Syouji", "Mahjong Camera Kozou (Japan 881109, newer hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mjcameram, mjcamera, mjcameram,mjcameram,nbmj8891_state, empty_init,    ROT0,   "Miki Syouji", "Mahjong Camera Kozou (Japan 890509, medal)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, scandal,   0,        scandal,  scandal,  nbmj8891_state, init_scandal,  ROT0,   "Nichibutsu", "Scandal Mahjong (Japan 890213)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, scandalm,  scandal,  scandalm, scandalm, nbmj8891_state, empty_init,    ROT0,   "Nichibutsu", "Scandal Mahjong (Japan 890217, medal)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, mgmen89,   0,        mgmen89,  mgmen89,  nbmj8891_state, init_mgmen89,  ROT0,   "Nichibutsu", "Mahjong G-MEN'89 (Japan 890425)", MACHINE_SUPPORTS_SAVE )

@@ -8,8 +8,8 @@
 
 ****************************************************************************/
 
-#ifndef MAME_HEATHZENITH_INTR_CNTRL_H
-#define MAME_HEATHZENITH_INTR_CNTRL_H
+#ifndef MAME_BUS_HEATHZENITH_H89_INTR_CNTRL_H
+#define MAME_BUS_HEATHZENITH_H89_INTR_CNTRL_H
 
 #pragma once
 
@@ -165,4 +165,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(HEATH_INTR_SOCKET, heath_intr_socket)
 
-#endif // MAME_HEATHZENITH_H89_INTR_CNTRL_H
+#endif // MAME_BUS_HEATHZENITH_H89_INTR_CNTRL_H

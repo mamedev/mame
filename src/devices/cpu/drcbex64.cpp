@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    drcbex64.c
+    drcbex64.cpp
 
     64-bit x64 back-end for the universal machine language.
 
@@ -158,10 +158,10 @@
         [rsp+48]   - saved r14
         [rsp+56]   - saved r13
         [rsp+64]   - saved r12
-        [rsp+72]   - saved ebp
-        [rsp+80]   - saved edi
-        [rsp+88]   - saved esi
-        [rsp+96]   - saved ebx
+        [rsp+72]   - saved rbp
+        [rsp+80]   - saved rdi
+        [rsp+88]   - saved rsi
+        [rsp+96]   - saved rbx
         [rsp+104]  - ret
 
 ***************************************************************************/
@@ -185,6 +185,7 @@ using namespace asmjit;
 using namespace asmjit::x86;
 
 
+namespace {
 
 //**************************************************************************
 //  DEBUGGING
@@ -229,33 +230,8 @@ const Gp::Id REG_PARAM4    = Gp::kIdCx;
 
 #endif
 
-
-
-//**************************************************************************
-//  MACROS
-//**************************************************************************
-
-#define X86_CONDITION(condition)        (condition_map[condition - uml::COND_Z])
-#define X86_NOT_CONDITION(condition)    negateCond(condition_map[condition - uml::COND_Z])
-
-#define assert_no_condition(inst)       assert((inst).condition() == uml::COND_ALWAYS)
-#define assert_any_condition(inst)      assert((inst).condition() == uml::COND_ALWAYS || ((inst).condition() >= uml::COND_Z && (inst).condition() < uml::COND_MAX))
-#define assert_no_flags(inst)           assert((inst).flags() == 0)
-#define assert_flags(inst, valid)       assert(((inst).flags() & ~(valid)) == 0)
-
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-drcbe_x64::opcode_generate_func drcbe_x64::s_opcode_table[OP_MAX];
-
-// size-to-mask table
-//static const uint64_t size_to_mask[] = { 0, 0xff, 0xffff, 0, 0xffffffff, 0, 0, 0, 0xffffffffffffffffU };
-
 // register mapping tables
-static const Gp::Id int_register_map[REG_I_COUNT] =
+const Gp::Id int_register_map[REG_I_COUNT] =
 {
 #ifdef X64_WINDOWS_ABI
 	Gp::kIdBx, Gp::kIdSi, Gp::kIdDi, Gp::kIdR12, Gp::kIdR13, Gp::kIdR14, Gp::kIdR15,
@@ -264,7 +240,7 @@ static const Gp::Id int_register_map[REG_I_COUNT] =
 #endif
 };
 
-static uint32_t float_register_map[REG_F_COUNT] =
+uint32_t float_register_map[REG_F_COUNT] =
 {
 #ifdef X64_WINDOWS_ABI
 	6, 7, 8, 9, 10, 11, 12, 13, 14, 15
@@ -276,7 +252,7 @@ static uint32_t float_register_map[REG_F_COUNT] =
 };
 
 // condition mapping table
-static const CondCode condition_map[uml::COND_MAX - uml::COND_Z] =
+const CondCode condition_map[uml::COND_MAX - uml::COND_Z] =
 {
 	CondCode::kZ,    // COND_Z = 0x80,    requires Z
 	CondCode::kNZ,   // COND_NZ,          requires Z
@@ -298,7 +274,7 @@ static const CondCode condition_map[uml::COND_MAX - uml::COND_Z] =
 
 #if 0
 // rounding mode mapping table
-static const uint8_t fprnd_map[4] =
+const uint8_t fprnd_map[4] =
 {
 	FPRND_CHOP,     // ROUND_TRUNC,   truncate
 	FPRND_NEAR,     // ROUND_ROUND,   round
@@ -306,6 +282,44 @@ static const uint8_t fprnd_map[4] =
 	FPRND_DOWN      // ROUND_FLOOR    round down
 };
 #endif
+
+// size-to-mask table
+//const uint64_t size_to_mask[] = { 0, 0xff, 0xffff, 0, 0xffffffff, 0, 0, 0, 0xffffffffffffffffU };
+
+
+
+//**************************************************************************
+//  MACROS
+//**************************************************************************
+
+#define X86_CONDITION(condition)        (condition_map[condition - uml::COND_Z])
+#define X86_NOT_CONDITION(condition)    negateCond(condition_map[condition - uml::COND_Z])
+
+#define assert_no_condition(inst)       assert((inst).condition() == uml::COND_ALWAYS)
+#define assert_any_condition(inst)      assert((inst).condition() == uml::COND_ALWAYS || ((inst).condition() >= uml::COND_Z && (inst).condition() < uml::COND_MAX))
+#define assert_no_flags(inst)           assert((inst).flags() == 0)
+#define assert_flags(inst, valid)       assert(((inst).flags() & ~(valid)) == 0)
+
+
+
+class ThrowableErrorHandler : public ErrorHandler
+{
+public:
+	void handleError(Error err, const char *message, BaseEmitter *origin) override
+	{
+		throw emu_fatalerror("asmjit error %d: %s", err, message);
+	}
+};
+
+} // anonymous namespace
+
+
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+drcbe_x64::opcode_generate_func drcbe_x64::s_opcode_table[OP_MAX];
 
 
 
@@ -406,15 +420,6 @@ const drcbe_x64::opcode_table_entry drcbe_x64::s_opcode_table_source[] =
 	{ uml::OP_FRSQRT,  &drcbe_x64::op_frsqrt },     // FRSQRT  dst,src1
 	{ uml::OP_FCOPYI,  &drcbe_x64::op_fcopyi },     // FCOPYI  dst,src
 	{ uml::OP_ICOPYF,  &drcbe_x64::op_icopyf }      // ICOPYF  dst,src
-};
-
-class ThrowableErrorHandler : public ErrorHandler
-{
-public:
-	void handleError(Error err, const char *message, BaseEmitter *origin) override
-	{
-		throw emu_fatalerror("asmjit error %d: %s", err, message);
-	}
 };
 
 
@@ -653,15 +658,11 @@ drcbe_x64::drcbe_x64(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 	m_absmask64[0] = m_absmask64[1] = 0x7fffffffffffffffU;
 
 	// get pointers to C functions we need to call
-	using debugger_hook_func = void (*)(device_debug *, offs_t);
-	static const debugger_hook_func debugger_inst_hook = [] (device_debug *dbg, offs_t pc) { dbg->instruction_hook(pc); }; // TODO: kill trampoline if possible
-	m_near.debug_cpu_instruction_hook = (x86code *)debugger_inst_hook;
 	if (LOG_HASHJMPS)
 	{
 		m_near.debug_log_hashjmp = (x86code *)debug_log_hashjmp;
 		m_near.debug_log_hashjmp_fail = (x86code *)debug_log_hashjmp_fail;
 	}
-	m_near.drcmap_get_value = (x86code *)&drc_map_variables::static_get_value;
 
 	// build the flags map
 	for (int entry = 0; entry < std::size(m_near.flagsmap); entry++)
@@ -685,91 +686,18 @@ drcbe_x64::drcbe_x64(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 		m_near.flagsunmap[entry] = flags;
 	}
 
-	// resolve the actual addresses of the address space handlers
-	auto const resolve_accessor =
-			[] (resolved_handler &handler, address_space &space, auto accessor)
-			{
-				if (MAME_DELEGATE_USE_TYPE == MAME_DELEGATE_TYPE_ITANIUM)
-				{
-					struct { uintptr_t ptr; ptrdiff_t adj; } equiv;
-					assert(sizeof(accessor) == sizeof(equiv));
-					*reinterpret_cast<decltype(accessor) *>(&equiv) = accessor;
-					handler.obj = uintptr_t(reinterpret_cast<u8 *>(&space) + equiv.adj);
-					if (BIT(equiv.ptr, 0))
-					{
-						auto const vptr = *reinterpret_cast<u8 const *const *>(handler.obj) + equiv.ptr - 1;
-						handler.func = *reinterpret_cast<x86code *const *>(vptr);
-					}
-					else
-					{
-						handler.func = reinterpret_cast<x86code *>(equiv.ptr);
-					}
-				}
-				else if (MAME_DELEGATE_USE_TYPE == MAME_DELEGATE_TYPE_MSVC)
-				{
-					// interpret the pointer to member function ignoring the virtual inheritance variant
-					struct single { uintptr_t ptr; };
-					struct multi { uintptr_t ptr; int adj; };
-					struct { uintptr_t ptr; int adj; int vadj; int vindex; } unknown;
-					assert(sizeof(accessor) <= sizeof(unknown));
-					*reinterpret_cast<decltype(accessor) *>(&unknown) = accessor;
-					handler.func = reinterpret_cast<x86code *>(unknown.ptr);
-					handler.obj = uintptr_t(&space);
-					if ((sizeof(unknown) == sizeof(accessor)) && unknown.vindex)
-					{
-						handler.obj += unknown.vadj;
-						auto const vptr = *reinterpret_cast<std::uint8_t const *const *>(handler.obj);
-						handler.obj += *reinterpret_cast<int const *>(vptr + unknown.vindex);
-					}
-					if (sizeof(single) < sizeof(accessor))
-						handler.obj += unknown.adj;
-
-					// walk past thunks
-					while (true)
-					{
-						if (0xe9 == handler.func[0])
-						{
-							// absolute jump with 32-bit displacement
-							handler.func += 5 + *reinterpret_cast<s32 const *>(handler.func + 1);
-						}
-						else if ((0x48 == handler.func[0]) && (0x8b == handler.func[1]) && (0x01 == handler.func[2]) && (0xff == handler.func[3]) && ((0x60 == handler.func[4]) || (0xa0 == handler.func[4])))
-						{
-							// virtual function call thunk
-							auto const vptr = *reinterpret_cast<std::uint8_t const *const *>(handler.obj);
-							if (0x60 == handler.func[4])
-								handler.func = *reinterpret_cast<x86code *const *>(vptr + *reinterpret_cast<s8 const *>(handler.func + 5));
-							else
-								handler.func = *reinterpret_cast<x86code *const *>(vptr + *reinterpret_cast<s32 const *>(handler.func + 5));
-						}
-						else
-						{
-							// not something we can easily bypass
-							break;
-						}
-					}
-				}
-			};
+	// resolve the actual addresses of member functions we need to call
+	m_drcmap_get_value.set(m_map, &drc_map_variables::get_value);
+	if (!m_drcmap_get_value)
+	{
+		m_drcmap_get_value.obj = uintptr_t(&m_map);
+		m_drcmap_get_value.func = reinterpret_cast<uint8_t *>(uintptr_t(&drc_map_variables::static_get_value));
+	}
 	m_resolved_accessors.resize(m_space.size());
 	for (int space = 0; m_space.size() > space; ++space)
 	{
 		if (m_space[space])
-		{
-			resolve_accessor(m_resolved_accessors[space].read_byte,         *m_space[space], static_cast<u8  (address_space::*)(offs_t)     >(&address_space::read_byte));
-			resolve_accessor(m_resolved_accessors[space].read_word,         *m_space[space], static_cast<u16 (address_space::*)(offs_t)     >(&address_space::read_word));
-			resolve_accessor(m_resolved_accessors[space].read_word_masked,  *m_space[space], static_cast<u16 (address_space::*)(offs_t, u16)>(&address_space::read_word));
-			resolve_accessor(m_resolved_accessors[space].read_dword,        *m_space[space], static_cast<u32 (address_space::*)(offs_t)     >(&address_space::read_dword));
-			resolve_accessor(m_resolved_accessors[space].read_dword_masked, *m_space[space], static_cast<u32 (address_space::*)(offs_t, u32)>(&address_space::read_dword));
-			resolve_accessor(m_resolved_accessors[space].read_qword,        *m_space[space], static_cast<u64 (address_space::*)(offs_t)     >(&address_space::read_qword));
-			resolve_accessor(m_resolved_accessors[space].read_qword_masked, *m_space[space], static_cast<u64 (address_space::*)(offs_t, u64)>(&address_space::read_qword));
-
-			resolve_accessor(m_resolved_accessors[space].write_byte,         *m_space[space], static_cast<void (address_space::*)(offs_t, u8)      >(&address_space::write_byte));
-			resolve_accessor(m_resolved_accessors[space].write_word,         *m_space[space], static_cast<void (address_space::*)(offs_t, u16)     >(&address_space::write_word));
-			resolve_accessor(m_resolved_accessors[space].write_word_masked,  *m_space[space], static_cast<void (address_space::*)(offs_t, u16, u16)>(&address_space::write_word));
-			resolve_accessor(m_resolved_accessors[space].write_dword,        *m_space[space], static_cast<void (address_space::*)(offs_t, u32)     >(&address_space::write_dword));
-			resolve_accessor(m_resolved_accessors[space].write_dword_masked, *m_space[space], static_cast<void (address_space::*)(offs_t, u32, u32)>(&address_space::write_dword));
-			resolve_accessor(m_resolved_accessors[space].write_qword,        *m_space[space], static_cast<void (address_space::*)(offs_t, u64)     >(&address_space::write_qword));
-			resolve_accessor(m_resolved_accessors[space].write_qword_masked, *m_space[space], static_cast<void (address_space::*)(offs_t, u64, u64)>(&address_space::write_qword));
-		}
+			m_resolved_accessors[space].set(*m_space[space]);
 	}
 
 	// build the opcode table (static but it doesn't hurt to regenerate it)
@@ -886,9 +814,7 @@ void drcbe_x64::reset()
 	a.emitProlog(frame);
 	a.emitArgsAssignment(frame, args);
 
-	a.sub(rsp, 32);
-	a.mov(MABS(&m_near.hashstacksave), rsp);
-	a.sub(rsp, 8);
+	a.sub(rsp, 40);
 	a.mov(MABS(&m_near.stacksave), rsp);
 	a.stmxcsr(MABS(&m_near.ssemode));
 	a.jmp(Gpq(REG_PARAM2));
@@ -897,14 +823,14 @@ void drcbe_x64::reset()
 	m_exit = dst + a.offset();
 	a.bind(a.newNamedLabel("exit_point"));
 	a.ldmxcsr(MABS(&m_near.ssemode));
-	a.mov(rsp, MABS(&m_near.hashstacksave));
-	a.add(rsp, 32);
+	a.mov(rsp, MABS(&m_near.stacksave));
+	a.add(rsp, 40);
 	a.emitEpilog(frame);
 
 	// generate a no code point
 	m_nocode = dst + a.offset();
 	a.bind(a.newNamedLabel("nocode_point"));
-	a.ret();
+	a.jmp(Gpq(REG_PARAM1));
 
 	// emit the generated code
 	size_t bytes = emit(ch);
@@ -941,12 +867,38 @@ int drcbe_x64::execute(code_handle &entry)
 
 void drcbe_x64::generate(drcuml_block &block, const instruction *instlist, uint32_t numinst)
 {
+	// do this here because device.debug() isn't initialised at construction time
+	if (!m_debug_cpu_instruction_hook && (m_device.machine().debug_flags & DEBUG_FLAG_ENABLED))
+	{
+		m_debug_cpu_instruction_hook.set(*m_device.debug(), &device_debug::instruction_hook);
+		if (!m_debug_cpu_instruction_hook)
+		{
+			m_debug_cpu_instruction_hook.obj = uintptr_t(m_device.debug());
+			using debugger_hook_func = void (*)(device_debug *, offs_t);
+			static const auto debugger_inst_hook = [] (device_debug *dbg, offs_t pc) { dbg->instruction_hook(pc); };
+			m_debug_cpu_instruction_hook.func = reinterpret_cast<uint8_t *>(uintptr_t(debugger_hook_func(debugger_inst_hook)));
+		}
+	}
+
 	// tell all of our utility objects that a block is beginning
 	m_hash.block_begin(block, instlist, numinst);
 	m_map.block_begin(block);
 
-	// compute the base by aligning the cache top to a cache line (assumed to be 64 bytes)
-	x86code *dst = (x86code *)(uint64_t(m_cache.top() + 63) & ~63);
+	// compute the base by aligning the cache top to a cache line
+	auto [err, linesize] = osd_get_cache_line_size();
+	uintptr_t linemask = 63;
+	if (err)
+	{
+		osd_printf_verbose("Error getting cache line size (%s:%d %s), assuming 64 bytes\n", err.category().name(), err.value(), err.message());
+	}
+	else
+	{
+		assert(linesize);
+		linemask = linesize - 1;
+		for (unsigned shift = 1; linemask & (linemask + 1); ++shift)
+			linemask |= linemask >> shift;
+	}
+	x86code *dst = (x86code *)(uintptr_t(m_cache.top() + linemask) & ~linemask);
 
 	CodeHolder ch;
 	ch.init(Environment::host(), uint64_t(dst));
@@ -1198,52 +1150,54 @@ void drcbe_x64::shift_op_param(Assembler &a, Inst::Id const opcode, size_t opsiz
 {
 	if (param.is_immediate())
 	{
-		if ((param.immediate() & (opsize * 8 - 1)) == 0)
-			return;
+		const uint32_t bitshift = param.immediate() & (opsize * 8 - 1);
 
-		a.emit(opcode, dst, imm(param.immediate()));
+		if (bitshift != 0)
+			a.emit(opcode, dst, imm(param.immediate()));
 
 		if (update_flags)
-			calculate_status_flags(a, opsize, dst, FLAG_S | FLAG_Z); // calculate status flags but preserve carry
+		{
+			if (bitshift == 0)
+				a.clc(); // throw away carry since it'll never be used
+
+			calculate_status_flags(a, opsize, dst, FLAG_S | FLAG_Z);
+		}
 	}
 	else
 	{
-		Label restore_flags = a.newLabel();
+		Label calc = a.newLabel();
 		Label end = a.newLabel();
 
 		Gp shift = cl;
 
 		a.mov(r10, rax);
-		a.seto(al);
-		a.movzx(r11, al);
-		a.lahf(); // no status flags should change if shift is 0, so preserve flags
+		a.lahf();
 
 		mov_reg_param(a, shift, param);
 
 		a.and_(shift, opsize * 8 - 1);
 		a.test(shift, shift);
-		a.short_().jz(restore_flags);
+
+		a.short_().jnz(calc);
+
+		a.mov(rax, r10);
+
+		if (update_flags)
+			a.clc(); // throw away carry since it'll never be used
+
+		a.short_().jmp(end);
+
+		a.bind(calc);
 
 		a.sahf(); // restore flags to keep carry for rolc/rorc
 		a.mov(rax, r10);
 
 		a.emit(opcode, dst, shift);
 
+		a.bind(end);
+
 		if (update_flags)
 			calculate_status_flags(a, opsize, dst, FLAG_S | FLAG_Z); // calculate status flags but preserve carry
-
-		a.short_().jmp(end);
-
-		a.bind(restore_flags);
-
-		// restore overflow flag
-		a.add(r11.r32(), 0x7fffffff);
-
-		// restore other flags
-		a.sahf();
-		a.mov(rax, r10);
-
-		a.bind(end);
 	}
 }
 
@@ -1333,7 +1287,13 @@ void drcbe_x64::mov_r64_imm(Assembler &a, Gp const &reg, uint64_t const imm)
 	else if (s32(imm) == imm)
 		a.mov(reg.r64(), s32(imm));
 	else
-		a.mov(reg.r64(), imm);
+	{
+		const int64_t delta = imm - (a.code()->baseAddress() + a.offset() + 7);
+		if (short_immediate(delta))
+			a.lea(reg.r64(), ptr(rip, delta));
+		else
+			a.mov(reg.r64(), imm);
+	}
 }
 
 
@@ -1590,9 +1550,9 @@ void drcbe_x64::op_debug(Assembler &a, const instruction &inst)
 		a.short_().jz(skip);
 
 		// push the parameter
-		mov_r64_imm(a, Gpq(REG_PARAM1), (uintptr_t)m_device.debug());                   // mov   param1,device.debug
+		mov_r64_imm(a, Gpq(REG_PARAM1), m_debug_cpu_instruction_hook.obj);              // mov   param1,device.debug
 		mov_reg_param(a, Gpd(REG_PARAM2), pcp);                                         // mov   param2,pcp
-		smart_call_m64(a, &m_near.debug_cpu_instruction_hook);                          // call  debug_cpu_instruction_hook
+		smart_call_r64(a, m_debug_cpu_instruction_hook.func, rax);                      // call  debug_cpu_instruction_hook
 
 		a.bind(skip);
 	}
@@ -1646,30 +1606,32 @@ void drcbe_x64::op_hashjmp(Assembler &a, const instruction &inst)
 		smart_call_m64(a, &m_near.debug_log_hashjmp);
 	}
 
-	// load the stack base one word early so we end up at the right spot after our call below
-	a.mov(rsp, MABS(&m_near.hashstacksave));                                            // mov   rsp,[hashstacksave]
+	// load the stack base
+	Label nocode = a.newLabel();
+	a.mov(rsp, MABS(&m_near.stacksave));                                            // mov   rsp,[stacksave]
 
 	// fixed mode cases
 	if (modep.is_immediate() && m_hash.is_mode_populated(modep.immediate()))
 	{
-		// a straight immediate jump is direct, though we need the PC in EAX in case of failure
 		if (pcp.is_immediate())
 		{
+			// a straight immediate jump is direct, though we need the PC in EAX in case of failure
 			uint32_t l1val = (pcp.immediate() >> m_hash.l1shift()) & m_hash.l1mask();
 			uint32_t l2val = (pcp.immediate() >> m_hash.l2shift()) & m_hash.l2mask();
-			a.call(MABS(&m_hash.base()[modep.immediate()][l1val][l2val]));              // call  hash[modep][l1val][l2val]
+			a.short_().lea(Gpq(REG_PARAM1), ptr(nocode));                               // lea   rcx,[rip+nocode]
+			a.jmp(MABS(&m_hash.base()[modep.immediate()][l1val][l2val]));               // jmp   hash[modep][l1val][l2val]
 		}
-
-		// a fixed mode but variable PC
 		else
 		{
+			// a fixed mode but variable PC
 			mov_reg_param(a, eax, pcp);                                                 // mov   eax,pcp
 			a.mov(edx, eax);                                                            // mov   edx,eax
 			a.shr(edx, m_hash.l1shift());                                               // shr   edx,l1shift
 			a.and_(eax, m_hash.l2mask() << m_hash.l2shift());                           // and  eax,l2mask << l2shift
 			a.mov(rdx, ptr(rbp, rdx, 3, offset_from_rbp(&m_hash.base()[modep.immediate()][0])));
 																						// mov   rdx,hash[modep+edx*8]
-			a.call(ptr(rdx, rax, 3 - m_hash.l2shift()));                                // call  [rdx+rax*shift]
+			a.short_().lea(Gpq(REG_PARAM1), ptr(nocode));                               // lea   rcx,[rip+nocode]
+			a.jmp(ptr(rdx, rax, 3 - m_hash.l2shift()));                                 // jmp   [rdx+rax*shift]
 		}
 	}
 	else
@@ -1679,33 +1641,34 @@ void drcbe_x64::op_hashjmp(Assembler &a, const instruction &inst)
 		mov_reg_param(a, modereg, modep);                                               // mov   modereg,modep
 		a.mov(rcx, ptr(rbp, modereg, 3, offset_from_rbp(m_hash.base())));               // mov   rcx,hash[modereg*8]
 
-		// fixed PC
 		if (pcp.is_immediate())
 		{
+			// fixed PC
 			uint32_t l1val = (pcp.immediate() >> m_hash.l1shift()) & m_hash.l1mask();
 			uint32_t l2val = (pcp.immediate() >> m_hash.l2shift()) & m_hash.l2mask();
 			a.mov(rdx, ptr(rcx, l1val * 8));                                            // mov   rdx,[rcx+l1val*8]
-			a.call(ptr(rdx, l2val * 8));                                                // call  [l2val*8]
+			a.short_().lea(Gpq(REG_PARAM1), ptr(nocode));                               // lea   rcx,[rip+nocode]
+			a.jmp(ptr(rdx, l2val * 8));                                                 // jmp   [l2val*8]
 		}
-
-		// variable PC
 		else
 		{
+			// variable PC
 			mov_reg_param(a, eax, pcp);                                                 // mov   eax,pcp
 			a.mov(edx, eax);                                                            // mov   edx,eax
 			a.shr(edx, m_hash.l1shift());                                               // shr   edx,l1shift
 			a.mov(rdx, ptr(rcx, rdx, 3));                                               // mov   rdx,[rcx+rdx*8]
 			a.and_(eax, m_hash.l2mask() << m_hash.l2shift());                           // and   eax,l2mask << l2shift
-			a.call(ptr(rdx, rax, 3 - m_hash.l2shift()));                                // call  [rdx+rax*shift]
+			a.short_().lea(Gpq(REG_PARAM1), ptr(nocode));                               // lea   rcx,[rip+nocode]
+			a.jmp(ptr(rdx, rax, 3 - m_hash.l2shift()));                                 // jmp   [rdx+rax*shift]
 		}
 	}
 
 	// in all cases, if there is no code, we return here to generate the exception
+	a.bind(nocode);
 	if (LOG_HASHJMPS)
 		smart_call_m64(a, &m_near.debug_log_hashjmp_fail);
 
 	mov_mem_param(a, MABS(&m_state.exp, 4), pcp);                                       // mov   [exp],param
-	a.sub(rsp, 8);                                                                      // sub   rsp,8
 	a.call(MABS(exp.handle().codeptr_addr()));                                          // call  [exp]
 }
 
@@ -1757,9 +1720,12 @@ void drcbe_x64::op_exh(Assembler &a, const instruction &inst)
 	drccodeptr *targetptr = handp.handle().codeptr_addr();
 
 	// perform the exception processing
-	Label no_exception = a.newLabel();
+	Label no_exception;
 	if (inst.condition() != uml::COND_ALWAYS)
+	{
+		no_exception = a.newLabel();
 		a.short_().j(X86_NOT_CONDITION(inst.condition()), no_exception);                // jcc   no_exception
+	}
 	mov_mem_param(a, MABS(&m_state.exp, 4), exp);                                       // mov   [exp],exp
 	if (*targetptr != nullptr)
 		a.call(imm(*targetptr));                                                        // call  *targetptr
@@ -1789,9 +1755,12 @@ void drcbe_x64::op_callh(Assembler &a, const instruction &inst)
 	drccodeptr *targetptr = handp.handle().codeptr_addr();
 
 	// skip if conditional
-	Label skip = a.newLabel();
+	Label skip;
 	if (inst.condition() != uml::COND_ALWAYS)
+	{
+		skip = a.newLabel();
 		a.short_().j(X86_NOT_CONDITION(inst.condition()), skip);                        // jcc   skip
+	}
 
 	// jump through the handle; directly if a normal jump
 	if (*targetptr != nullptr)
@@ -1818,9 +1787,12 @@ void drcbe_x64::op_ret(Assembler &a, const instruction &inst)
 	assert(inst.numparams() == 0);
 
 	// skip if conditional
-	Label skip = a.newLabel();
+	Label skip;
 	if (inst.condition() != uml::COND_ALWAYS)
+	{
+		skip = a.newLabel();
 		a.short_().j(X86_NOT_CONDITION(inst.condition()), skip);                        // jcc   skip
+	}
 
 	// return
 	a.lea(rsp, ptr(rsp, 40));                                                           // lea   rsp,[rsp+40]
@@ -1849,9 +1821,12 @@ void drcbe_x64::op_callc(Assembler &a, const instruction &inst)
 	be_parameter paramp(*this, inst.param(1), PTYPE_M);
 
 	// skip if conditional
-	Label skip = a.newLabel();
+	Label skip;
 	if (inst.condition() != uml::COND_ALWAYS)
+	{
+		skip = a.newLabel();
 		a.short_().j(X86_NOT_CONDITION(inst.condition()), skip);                        // jcc   skip
+	}
 
 	// perform the call
 	mov_r64_imm(a, Gpq(REG_PARAM1), (uintptr_t)paramp.memory());                        // mov   param1,paramp
@@ -1880,10 +1855,10 @@ void drcbe_x64::op_recover(Assembler &a, const instruction &inst)
 	// call the recovery code
 	a.mov(rax, MABS(&m_near.stacksave));                                                // mov   rax,stacksave
 	a.mov(rax, ptr(rax, -8));                                                           // mov   rax,[rax-8]
-	mov_r64_imm(a, Gpq(REG_PARAM1), (uintptr_t)&m_map);                                 // mov   param1,m_map
+	mov_r64_imm(a, Gpq(REG_PARAM1), m_drcmap_get_value.obj);                            // mov   param1,m_map
 	a.lea(Gpq(REG_PARAM2), ptr(rax, -1));                                               // lea   param2,[rax-1]
 	mov_r64_imm(a, Gpq(REG_PARAM3), inst.param(1).mapvar());                            // mov   param3,param[1].value
-	smart_call_m64(a, &m_near.drcmap_get_value);                                        // call  drcmap_get_value
+	smart_call_r64(a, m_drcmap_get_value.func, rax);                                    // call  drcmap_get_value
 	mov_param_reg(a, dstp, eax);                                                        // mov   dstp,eax
 }
 
@@ -2542,7 +2517,7 @@ void drcbe_x64::op_read(Assembler &a, const instruction &inst)
 	mov_reg_param(a, Gpd(REG_PARAM2), addrp);                                           // mov    param2,addrp
 	if (spacesizep.size() == SIZE_BYTE)
 	{
-		if (resolved.read_byte.func)
+		if (resolved.read_byte)
 		{
 			mov_r64_imm(a, Gpq(REG_PARAM1), resolved.read_byte.obj);                    // mov    param1,space
 			smart_call_r64(a, resolved.read_byte.func, rax);                            // call   read_byte
@@ -2556,7 +2531,7 @@ void drcbe_x64::op_read(Assembler &a, const instruction &inst)
 	}
 	else if (spacesizep.size() == SIZE_WORD)
 	{
-		if (resolved.read_word.func)
+		if (resolved.read_word)
 		{
 			mov_r64_imm(a, Gpq(REG_PARAM1), resolved.read_word.obj);                    // mov    param1,space
 			smart_call_r64(a, resolved.read_word.func, rax);                            // call   read_word
@@ -2570,7 +2545,7 @@ void drcbe_x64::op_read(Assembler &a, const instruction &inst)
 	}
 	else if (spacesizep.size() == SIZE_DWORD)
 	{
-		if (resolved.read_dword.func)
+		if (resolved.read_dword)
 		{
 			mov_r64_imm(a, Gpq(REG_PARAM1), resolved.read_dword.obj);                   // mov    param1,space
 			smart_call_r64(a, resolved.read_dword.func, rax);                           // call   read_dword
@@ -2585,7 +2560,7 @@ void drcbe_x64::op_read(Assembler &a, const instruction &inst)
 	}
 	else if (spacesizep.size() == SIZE_QWORD)
 	{
-		if (resolved.read_qword.func)
+		if (resolved.read_qword)
 		{
 			mov_r64_imm(a, Gpq(REG_PARAM1), resolved.read_qword.obj);                   // mov    param1,space
 			smart_call_r64(a, resolved.read_qword.func, rax);                           // call   read_qword
@@ -2636,12 +2611,26 @@ void drcbe_x64::op_readm(Assembler &a, const instruction &inst)
 		mov_reg_param(a, Gpd(REG_PARAM3), maskp);                                       // mov    param3,maskp
 	else
 		mov_reg_param(a, Gpq(REG_PARAM3), maskp);                                       // mov    param3,maskp
-	if (spacesizep.size() == SIZE_WORD)
+	if (spacesizep.size() == SIZE_BYTE)
 	{
-		if (resolved.read_word_masked.func)
+		if (resolved.read_byte_masked)
+		{
+			mov_r64_imm(a, Gpq(REG_PARAM1), resolved.read_byte_masked.obj);             // mov    param1,space
+			smart_call_r64(a, resolved.read_byte_masked.func, rax);                     // call   read_byte_masked
+		}
+		else
+		{
+			mov_r64_imm(a, Gpq(REG_PARAM1), (uintptr_t)m_space[spacesizep.space()]);    // mov    param1,space
+			smart_call_m64(a, (x86code **)&trampolines.read_byte_masked);               // call   read_byte_masked
+		}
+		a.movzx(dstreg, al);                                                            // movzx  dstreg,al
+	}
+	else if (spacesizep.size() == SIZE_WORD)
+	{
+		if (resolved.read_word_masked)
 		{
 			mov_r64_imm(a, Gpq(REG_PARAM1), resolved.read_word_masked.obj);             // mov    param1,space
-			smart_call_r64(a, resolved.read_word_masked.func, rax);                     // call   read_byte_masked
+			smart_call_r64(a, resolved.read_word_masked.func, rax);                     // call   read_word_masked
 		}
 		else
 		{
@@ -2652,7 +2641,7 @@ void drcbe_x64::op_readm(Assembler &a, const instruction &inst)
 	}
 	else if (spacesizep.size() == SIZE_DWORD)
 	{
-		if (resolved.read_dword_masked.func)
+		if (resolved.read_dword_masked)
 		{
 			mov_r64_imm(a, Gpq(REG_PARAM1), resolved.read_dword_masked.obj);            // mov    param1,space
 			smart_call_r64(a, resolved.read_dword_masked.func, rax);                    // call   read_dword_masked
@@ -2667,7 +2656,7 @@ void drcbe_x64::op_readm(Assembler &a, const instruction &inst)
 	}
 	else if (spacesizep.size() == SIZE_QWORD)
 	{
-		if (resolved.read_qword_masked.func)
+		if (resolved.read_qword_masked)
 		{
 			mov_r64_imm(a, Gpq(REG_PARAM1), resolved.read_qword_masked.obj);            // mov    param1,space
 			smart_call_r64(a, resolved.read_qword_masked.func, rax);                    // call   read_qword_masked
@@ -2716,7 +2705,7 @@ void drcbe_x64::op_write(Assembler &a, const instruction &inst)
 		mov_reg_param(a, Gpq(REG_PARAM3), srcp);                                        // mov    param3,srcp
 	if (spacesizep.size() == SIZE_BYTE)
 	{
-		if (resolved.write_byte.func)
+		if (resolved.write_byte)
 		{
 			mov_r64_imm(a, Gpq(REG_PARAM1), resolved.write_byte.obj);                   // mov    param1,space
 			smart_call_r64(a, resolved.write_byte.func, rax);                           // call   write_byte
@@ -2729,7 +2718,7 @@ void drcbe_x64::op_write(Assembler &a, const instruction &inst)
 	}
 	else if (spacesizep.size() == SIZE_WORD)
 	{
-		if (resolved.write_word.func)
+		if (resolved.write_word)
 		{
 			mov_r64_imm(a, Gpq(REG_PARAM1), resolved.write_word.obj);                   // mov    param1,space
 			smart_call_r64(a, resolved.write_word.func, rax);                           // call   write_word
@@ -2742,7 +2731,7 @@ void drcbe_x64::op_write(Assembler &a, const instruction &inst)
 	}
 	else if (spacesizep.size() == SIZE_DWORD)
 	{
-		if (resolved.write_dword.func)
+		if (resolved.write_dword)
 		{
 			mov_r64_imm(a, Gpq(REG_PARAM1), resolved.write_dword.obj);                  // mov    param1,space
 			smart_call_r64(a, resolved.write_dword.func, rax);                          // call   write_dword
@@ -2755,7 +2744,7 @@ void drcbe_x64::op_write(Assembler &a, const instruction &inst)
 	}
 	else if (spacesizep.size() == SIZE_QWORD)
 	{
-		if (resolved.write_qword.func)
+		if (resolved.write_qword)
 		{
 			mov_r64_imm(a, Gpq(REG_PARAM1), resolved.write_qword.obj);                  // mov    param1,space
 			smart_call_r64(a, resolved.write_qword.func, rax);                          // call   write_qword
@@ -2801,9 +2790,22 @@ void drcbe_x64::op_writem(Assembler &a, const instruction &inst)
 		mov_reg_param(a, Gpq(REG_PARAM3), srcp);                                        // mov    param3,srcp
 		mov_reg_param(a, Gpq(REG_PARAM4), maskp);                                       // mov    param4,maskp
 	}
-	if (spacesizep.size() == SIZE_WORD)
+	if (spacesizep.size() == SIZE_BYTE)
 	{
-		if (resolved.write_word.func)
+		if (resolved.write_byte)
+		{
+			mov_r64_imm(a, Gpq(REG_PARAM1), resolved.write_byte_masked.obj);            // mov    param1,space
+			smart_call_r64(a, resolved.write_byte_masked.func, rax);                    // call   write_byte_masked
+		}
+		else
+		{
+			mov_r64_imm(a, Gpq(REG_PARAM1), (uintptr_t)m_space[spacesizep.space()]);    // mov    param1,space
+			smart_call_m64(a, (x86code **)&trampolines.write_byte_masked);              // call   write_byte_masked
+		}
+	}
+	else if (spacesizep.size() == SIZE_WORD)
+	{
+		if (resolved.write_word)
 		{
 			mov_r64_imm(a, Gpq(REG_PARAM1), resolved.write_word_masked.obj);            // mov    param1,space
 			smart_call_r64(a, resolved.write_word_masked.func, rax);                    // call   write_word_masked
@@ -2816,7 +2818,7 @@ void drcbe_x64::op_writem(Assembler &a, const instruction &inst)
 	}
 	else if (spacesizep.size() == SIZE_DWORD)
 	{
-		if (resolved.write_word.func)
+		if (resolved.write_word)
 		{
 			mov_r64_imm(a, Gpq(REG_PARAM1), resolved.write_dword_masked.obj);           // mov    param1,space
 			smart_call_r64(a, resolved.write_dword_masked.func, rax);                   // call   write_dword_masked
@@ -2829,7 +2831,7 @@ void drcbe_x64::op_writem(Assembler &a, const instruction &inst)
 	}
 	else if (spacesizep.size() == SIZE_QWORD)
 	{
-		if (resolved.write_word.func)
+		if (resolved.write_word)
 		{
 			mov_r64_imm(a, Gpq(REG_PARAM1), resolved.write_qword_masked.obj);           // mov    param1,space
 			smart_call_r64(a, resolved.write_qword_masked.func, rax);                   // call   write_qword_masked
@@ -2943,9 +2945,12 @@ void drcbe_x64::op_mov(Assembler &a, const instruction &inst)
 	be_parameter srcp(*this, inst.param(1), PTYPE_MRI);
 
 	// add a conditional branch unless a conditional move is possible
-	Label skip = a.newLabel();
+	Label skip;
 	if (inst.condition() != uml::COND_ALWAYS && !(dstp.is_int_register() && !srcp.is_immediate()))
+	{
+		skip = a.newLabel();
 		a.short_().j(X86_NOT_CONDITION(inst.condition()), skip);
+	}
 
 	// register to memory
 	if (dstp.is_memory() && srcp.is_int_register())
@@ -4514,9 +4519,12 @@ void drcbe_x64::op_fmov(Assembler &a, const instruction &inst)
 	Xmm dstreg = dstp.select_register(xmm0);
 
 	// always start with a jmp
-	Label skip = a.newLabel();
+	Label skip;
 	if (inst.condition() != uml::COND_ALWAYS)
+	{
+		skip = a.newLabel();
 		a.short_().j(X86_NOT_CONDITION(inst.condition()), skip);                        // jcc   skip
+	}
 
 	// 32-bit form
 	if (inst.size() == 4)

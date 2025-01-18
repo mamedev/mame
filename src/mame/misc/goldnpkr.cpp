@@ -1060,7 +1060,6 @@ public:
 	void lespendu(machine_config &config);
 	void icproul(machine_config &config);
 	void glfever(machine_config &config);
-	void codemagik(machine_config &config);
 
 	void init_vkdlswwh();
 	void init_icp1db();
@@ -1157,7 +1156,6 @@ private:
 	void icp_ext_map(address_map &map) ATTR_COLD;
 	void lespendu_map(address_map &map) ATTR_COLD;
 	void glfever_map(address_map &map) ATTR_COLD;
-	void codemagik_map(address_map &map) ATTR_COLD;
 
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
@@ -1938,19 +1936,6 @@ void goldnpkr_state::glfever_map(address_map &map)
 	map(0x3000, 0x7fff).rom();  // base rom space
 	map(0xa000, 0xa000).portr("SWB");
 	map(0xf000, 0xffff).rom();  // extended rom space
-}
-
-void goldnpkr_state::codemagik_map(address_map &map)
-{
-	map.global_mask(0x7fff);
-	map(0x0000, 0x07ff).ram().share("nvram");   // battery backed RAM
-	map(0x0800, 0x0bff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
-	map(0x0c00, 0x0fff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
-	map(0x10b0, 0x10b0).w("crtc", FUNC(mc6845_device::address_w));
-	map(0x10b1, 0x10b1).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x10f4, 0x10f7).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x10f8, 0x10fb).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x4000, 0x7fff).rom();  // 
 }
 
 
@@ -5259,21 +5244,6 @@ void goldnpkr_state::glfever(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	DISCRETE(config, m_discrete, goldnpkr_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
-}
-
-void goldnpkr_state::codemagik(machine_config &config)
-{
-	goldnpkr_base(config);
-
-	// basic machine hardware
-	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::codemagik_map);
-
-	m_pia[0]->readpa_handler().set(FUNC(goldnpkr_state::pottnpkr_mux_port_r));
-	m_pia[0]->writepa_handler().set(FUNC(goldnpkr_state::mux_port_w));
-
-	// sound hardware
-	SPEAKER(config, "mono").front_center();
-	DISCRETE(config, m_discrete, pottnpkr_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 
@@ -12625,42 +12595,6 @@ ROM_START( icproul )
 	ROM_LOAD( "n82s129an.bin", 0x0000, 0x0100, CRC(1a30bdd8) SHA1(d0a020e9604e8e0920a4500e02770db6c639bace) )
 ROM_END
 
-/*
-  Code Magik
-  Voyageur de L'Espace Inc.
-
-  Obscure vintage game.
-  Using IRQ instead of NMI.
-
-  VideoRAM: 0x800-0xbff
-  ColorRAM: 0xc00-0xfff
-
-  CRTC addr: 0x10b0-0x10b0
-  CRTC data: 0x10b1-0x10b1
-
-  PIA0 offs: 0x10f4-0x10f7      
-  PIA1 offs: 0x10f8-0x10fb      
-
-*/
-ROM_START( codemagik )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "2764.11a", 0x4000, 0x2000, CRC(61a6ffef) SHA1(d7f0f1b415b14d9919f9ac3b8a1d74f3e14ccc2d) )
-	ROM_LOAD( "2764.10a", 0x6000, 0x2000, CRC(4aac24d5) SHA1(06c89052d0f6f9d435ff88be62706595fe716791) )
-
-	ROM_REGION( 0x6000, "gfx1", 0 ) // 
-	ROM_FILL(               0x0000, 0x4000, 0x0000 ) // filling the R-G bitplanes
-	ROM_LOAD( "1y_2764.4a", 0x4000, 0x2000, CRC(ae0e37f8) SHA1(2e3404c55b92a7f9ec72d7b96bbea95ee028026c) )    // char ROM
-
-	ROM_REGION( 0x3000, "gfx2", 0 ) // 
-	ROM_LOAD( "3y_2732.1a", 0x0000, 0x1000, CRC(ea868221) SHA1(fcf9a840537feb28c9fb65b58b9a41b2412aa4ef) )    // cards deck gfx, bitplane1
-	ROM_LOAD( "2y_2732.3a", 0x1000, 0x1000, CRC(6d1da4bb) SHA1(dc8c70faa301e2f7e9089d38e0ef618e8352e569) )    // cards deck gfx, bitplane2
-	ROM_COPY( "gfx1",       0x4800, 0x2000, 0x0800 )    // cards deck gfx, bitplane3.
-	ROM_COPY( "gfx1",       0x5800, 0x2800, 0x0800 )    // cards deck alt gfx, bitplane3.
-
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "clr.bin", 0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
-ROM_END
-
 
 /*********************************************
 *                Driver Init                 *
@@ -13372,7 +13306,6 @@ GAMEL( 198?, lespenduj, 0,        lespendu, lespendu, goldnpkr_state, init_lespe
 
 GAME(  198?, icproul,   0,        icproul,  icproul,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Roulette (ICP-1 PCB)",                    0 )  // password protected
 
-GAME(  198?, codemagik, 0,        codemagik, goldnpkr, goldnpkr_state, empty_init,   ROT0,   "Voyageur de L'Espace Inc.", "Code Magik",                             MACHINE_NOT_WORKING )
 
 /*************************************** SETS W/IRQ0 ***************************************/
 

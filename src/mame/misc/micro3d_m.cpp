@@ -32,11 +32,6 @@ static constexpr XTAL MAC_CLK = XTAL(10'000'000);
  *
  *************************************/
 
-void micro3d_state::duart_irq_handler(int state)
-{
-	m_maincpu->set_input_line(3, state);
-}
-
 void micro3d_state::duart_txb(int state)
 {
 	if (state)
@@ -406,9 +401,9 @@ void micro3d_state::drmath_intr2_ack(uint32_t data)
 
 /***************************************************************************
 
-    8031 port mappings:
+    8051 port mappings:
 
-    Port 1                          Port 2
+    Port 1                          Port 3
     =======                         ======
     0: S/H sel A     (O)            0:
     1: S/H sel B     (O)            1:
@@ -420,7 +415,6 @@ void micro3d_state::drmath_intr2_ack(uint32_t data)
     7: Test SW       (I)            7:
 
 ***************************************************************************/
-
 
 void micro3d_state::snd_dac_a(uint8_t data)
 {
@@ -481,11 +475,6 @@ void micro3d_state::init_micro3d()
 	/* The Am29000 program seems to rely on RAM from 0x00470000 onwards being
 	non-zero on a reset, otherwise the 3D object data doesn't get uploaded! */
 	space.write_dword(0x00470000, 0xa5a5a5a5);
-
-	/* TODO? BOTSS crashes when starting the final stage because the 68000
-	overwrites memory in use by the Am29000. Slowing down the 68000 slightly
-	avoids this */
-	m_maincpu->set_clock_scale(0.945f);
 }
 
 void micro3d_state::init_botss()
