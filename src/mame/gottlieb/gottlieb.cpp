@@ -84,7 +84,7 @@ Main processor (8088 minimum mode)
 memory mapped ports:
 
 read:
-7000    Dip switch
+7000    DIP switch
 7001    Inputs 10-17
 7002    trackball H
 7003    trackball V
@@ -217,18 +217,6 @@ VBlank duration: 1/VSYNC * (16/256) = 1017.6 us
 
 #define LOG_AUDIO_DECODE        (0)
 
-#define SYSTEM_CLOCK            XTAL(20'000'000)
-#define CPU_CLOCK               XTAL(15'000'000)
-#define NTSC_CLOCK              XTAL(14'318'181)
-#define LASERDISC_CLOCK         PERIOD_OF_555_ASTABLE(16000, 10000, 0.001e-6)
-
-#define AUDIORAM_SIZE           0x400
-
-#define GOTTLIEB_VIDEO_HCOUNT   318
-#define GOTTLIEB_VIDEO_HBLANK   256
-#define GOTTLIEB_VIDEO_VCOUNT   256
-#define GOTTLIEB_VIDEO_VBLANK   240
-
 namespace {
 
 class gottlieb_state : public driver_device
@@ -237,7 +225,6 @@ public:
 	gottlieb_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_laserdisc(*this, "laserdisc")
 		, m_r1_sound(*this, "r1sound")
 		, m_r2_sound(*this, "r2sound")
 		, m_knocker_sample(*this, "knocker_sam")
@@ -254,38 +241,42 @@ public:
 		, m_knockers(*this, "knocker%d", 0U)
 	{ }
 
-	void gottlieb_core(machine_config &config);
-	void cobram3(machine_config &config);
-	void screwloo(machine_config &config);
-	void gottlieb2(machine_config &config);
-	void gottlieb2_ram_rom(machine_config &config);
-	void reactor(machine_config &config);
-	void g2laser(machine_config &config);
-	void qbert_old(machine_config &config);
-	void qbert(machine_config &config);
-	void qbert_knocker(machine_config &config);
-	void gottlieb1(machine_config &config);
-	void gottlieb1_rom(machine_config &config);
-	void gottlieb1_votrax_old(machine_config &config);
-	void gottlieb1_votrax(machine_config &config);
+	void gottlieb_core(machine_config &config) ATTR_COLD;
+	void screwloo(machine_config &config) ATTR_COLD;
+	void gottlieb2(machine_config &config) ATTR_COLD;
+	void gottlieb2_ram_rom(machine_config &config) ATTR_COLD;
+	void reactor(machine_config &config) ATTR_COLD;
+	void qbert_old(machine_config &config) ATTR_COLD;
+	void qbert(machine_config &config) ATTR_COLD;
+	void qbert_knocker(machine_config &config) ATTR_COLD;
+	void gottlieb1(machine_config &config) ATTR_COLD;
+	void gottlieb1_rom(machine_config &config) ATTR_COLD;
+	void gottlieb1_votrax_old(machine_config &config) ATTR_COLD;
+	void gottlieb1_votrax(machine_config &config) ATTR_COLD;
 
-	void init_romtiles();
-	void init_screwloo();
-	void init_vidvince();
-	void init_ramtiles();
-	void init_stooges();
-	void init_qbert();
-	void init_qbertqub();
+	void init_romtiles() ATTR_COLD;
+	void init_screwloo() ATTR_COLD;
+	void init_vidvince() ATTR_COLD;
+	void init_ramtiles() ATTR_COLD;
+	void init_stooges() ATTR_COLD;
+	void init_qbert() ATTR_COLD;
+	void init_qbertqub() ATTR_COLD;
 
 	template <int N> ioport_value track_delta_r();
 	ioport_value stooges_joystick_r();
 
 protected:
+	static inline constexpr size_t AUDIORAM_SIZE = 0x400;
+
+	static inline constexpr unsigned GOTTLIEB_VIDEO_HCOUNT = 318;
+	static inline constexpr unsigned GOTTLIEB_VIDEO_HBLANK = 256;
+	static inline constexpr unsigned GOTTLIEB_VIDEO_VCOUNT = 256;
+	static inline constexpr unsigned GOTTLIEB_VIDEO_VBLANK = 240;
+
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
-private:
 	void analog_reset_w(u8 data);
 	void general_output_w(u8 data);
 	void reactor_output_w(u8 data);
@@ -293,28 +284,16 @@ private:
 	void qbertqub_output_w(u8 data);
 	void qbert_output_w(u8 data);
 	void qbert_knocker(u8 knock);
-	u8 laserdisc_status_r(offs_t offset);
-	void laserdisc_select_w(u8 data);
-	void laserdisc_command_w(u8 data);
 	void sound_w(u8 data);
 	void palette_w(offs_t offset, u8 data);
 	void video_control_w(u8 data);
-	void laserdisc_video_control_w(u8 data);
 	void videoram_w(offs_t offset, u8 data);
 	void charram_w(offs_t offset, u8 data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_screwloo_bg_tile_info);
 	DECLARE_VIDEO_START(screwloo);
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(laserdisc_philips_callback);
-	TIMER_CALLBACK_MEMBER(laserdisc_bit_off_callback);
-	TIMER_CALLBACK_MEMBER(laserdisc_bit_callback);
-	void laserdisc_vblank(int state);
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	inline void audio_end_state();
-	void audio_process_clock(bool logit);
-	void audio_handle_zero_crossing(const attotime &zerotime, bool logit);
-	void laserdisc_audio_process(int samplerate, int samples, const int16_t *ch0, const int16_t *ch1);
 
 	void gottlieb_base_map(address_map &map) ATTR_COLD;
 	void gottlieb_ram_map(address_map &map) ATTR_COLD;
@@ -324,7 +303,6 @@ private:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-	optional_device<pioneer_pr8210_device> m_laserdisc;
 	optional_device<gottlieb_sound_r1_device> m_r1_sound;
 	optional_device<gottlieb_sound_r2_device> m_r2_sound;
 	optional_device<samples_device> m_knocker_sample;
@@ -346,20 +324,6 @@ private:
 	u8 m_knocker_prev = 0U;
 	u8 m_joystick_select = 0U;
 	u8 m_track[2]{};
-	emu_timer *m_laserdisc_bit_timer = nullptr;
-	emu_timer *m_laserdisc_bit_off_timer = nullptr;
-	emu_timer *m_laserdisc_philips_timer = nullptr;
-	u8 m_laserdisc_select = 0U;
-	u8 m_laserdisc_status = 0U;
-	uint16_t m_laserdisc_philips_code = 0U;
-	std::unique_ptr<u8[]> m_laserdisc_audio_buffer;
-	uint16_t m_laserdisc_audio_address = 0U;
-	int16_t m_laserdisc_last_samples[2]{};
-	attotime m_laserdisc_last_time;
-	attotime m_laserdisc_last_clock;
-	u8 m_laserdisc_zero_seen = 0U;
-	u8 m_laserdisc_audio_bits = 0U;
-	u8 m_laserdisc_audio_bit_count = 0U;
 	u8 m_gfxcharlo = 0U;
 	u8 m_gfxcharhi = 0U;
 	u8 m_background_priority = 0U;
@@ -367,6 +331,59 @@ private:
 	u8 m_transparent0 = 0U;
 	tilemap_t *m_bg_tilemap = nullptr;
 	double m_weights[4]{};
+};
+
+class gottlieb_ld_state : public gottlieb_state
+{
+public:
+	gottlieb_ld_state(const machine_config &mconfig, device_type type, const char *tag)
+		: gottlieb_state(mconfig, type, tag)
+		, m_laserdisc(*this, "laserdisc")
+	{ }
+
+	void cobram3(machine_config &config) ATTR_COLD;
+	void g2laser(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+private:
+	static inline constexpr attotime LASERDISC_CLOCK = PERIOD_OF_555_ASTABLE(16000, 10000, 0.001e-6);
+
+	void laserdisc_output_w(u8 data);
+	u8 laserdisc_status_r(offs_t offset);
+	void laserdisc_select_w(u8 data);
+	void laserdisc_command_w(u8 data);
+	void laserdisc_video_control_w(u8 data);
+	TIMER_CALLBACK_MEMBER(laserdisc_philips_callback);
+	TIMER_CALLBACK_MEMBER(laserdisc_bit_off_callback);
+	TIMER_CALLBACK_MEMBER(laserdisc_bit_callback);
+	void laserdisc_vblank(int state);
+	inline void audio_end_state();
+	void audio_process_clock(bool logit);
+	void audio_handle_zero_crossing(const attotime &zerotime, bool logit);
+	void laserdisc_audio_process(int samplerate, int samples, const s16 *ch0, const s16 *ch1);
+
+	void gottlieb_ld_ram_map(address_map &map) ATTR_COLD;
+
+	// devices
+	required_device<pioneer_pr8210_device> m_laserdisc;
+
+	emu_timer *m_laserdisc_bit_timer = nullptr;
+	emu_timer *m_laserdisc_bit_off_timer = nullptr;
+	emu_timer *m_laserdisc_philips_timer = nullptr;
+	u8 m_laserdisc_select = 0U;
+	u8 m_laserdisc_status = 0U;
+	u16 m_laserdisc_philips_code = 0U;
+	std::unique_ptr<u8[]> m_laserdisc_audio_buffer;
+	u16 m_laserdisc_audio_address = 0U;
+	s16 m_laserdisc_last_samples[2]{};
+	attotime m_laserdisc_last_time;
+	attotime m_laserdisc_last_clock;
+	u8 m_laserdisc_zero_seen = 0U;
+	u8 m_laserdisc_audio_bits = 0U;
+	u8 m_laserdisc_audio_bit_count = 0U;
 };
 
 
@@ -389,49 +406,51 @@ void gottlieb_state::machine_start()
 	save_item(NAME(m_gfxcharlo));
 	save_item(NAME(m_gfxcharhi));
 	save_item(NAME(m_weights));
+}
 
-	/* see if we have a laserdisc */
-	if (m_laserdisc != nullptr)
-	{
-		/* attach to the I/O ports */
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x05805, 0x05807, 0, 0x07f8, 0, read8sm_delegate(*this, FUNC(gottlieb_state::laserdisc_status_r)));
-		m_maincpu->space(AS_PROGRAM).install_write_handler(0x05805, 0x05805, 0, 0x07f8, 0, write8smo_delegate(*this, FUNC(gottlieb_state::laserdisc_command_w)));    /* command for the player */
-		m_maincpu->space(AS_PROGRAM).install_write_handler(0x05806, 0x05806, 0, 0x07f8, 0, write8smo_delegate(*this, FUNC(gottlieb_state::laserdisc_select_w)));
 
-		/* allocate a timer for serial transmission, and one for philips code processing */
-		m_laserdisc_bit_timer = timer_alloc(FUNC(gottlieb_state::laserdisc_bit_callback), this);
-		m_laserdisc_bit_off_timer = timer_alloc(FUNC(gottlieb_state::laserdisc_bit_off_callback), this);
-		m_laserdisc_philips_timer = timer_alloc(FUNC(gottlieb_state::laserdisc_philips_callback), this);
+void gottlieb_ld_state::machine_start()
+{
+	gottlieb_state::machine_start();
 
-		/* create some audio RAM */
-		m_laserdisc_audio_buffer = std::make_unique<u8[]>(AUDIORAM_SIZE);
-		m_laserdisc_status = 0x38;
+	/* allocate a timer for serial transmission, and one for philips code processing */
+	m_laserdisc_bit_timer = timer_alloc(FUNC(gottlieb_ld_state::laserdisc_bit_callback), this);
+	m_laserdisc_bit_off_timer = timer_alloc(FUNC(gottlieb_ld_state::laserdisc_bit_off_callback), this);
+	m_laserdisc_philips_timer = timer_alloc(FUNC(gottlieb_ld_state::laserdisc_philips_callback), this);
 
-		/* more save state registration */
-		save_item(NAME(m_laserdisc_select));
-		save_item(NAME(m_laserdisc_status));
-		save_item(NAME(m_laserdisc_philips_code));
+	/* create some audio RAM */
+	m_laserdisc_audio_buffer = std::make_unique<u8[]>(AUDIORAM_SIZE);
+	m_laserdisc_status = 0x38;
 
-		save_pointer(NAME(m_laserdisc_audio_buffer), AUDIORAM_SIZE);
-		save_item(NAME(m_laserdisc_audio_address));
-		save_item(NAME(m_laserdisc_last_samples));
-		save_item(NAME(m_laserdisc_last_time));
-		save_item(NAME(m_laserdisc_last_clock));
-		save_item(NAME(m_laserdisc_zero_seen));
-		save_item(NAME(m_laserdisc_audio_bits));
-		save_item(NAME(m_laserdisc_audio_bit_count));
-	}
+	/* more save state registration */
+	save_item(NAME(m_laserdisc_select));
+	save_item(NAME(m_laserdisc_status));
+	save_item(NAME(m_laserdisc_philips_code));
+
+	save_pointer(NAME(m_laserdisc_audio_buffer), AUDIORAM_SIZE);
+	save_item(NAME(m_laserdisc_audio_address));
+	save_item(NAME(m_laserdisc_last_samples));
+	save_item(NAME(m_laserdisc_last_time));
+	save_item(NAME(m_laserdisc_last_clock));
+	save_item(NAME(m_laserdisc_zero_seen));
+	save_item(NAME(m_laserdisc_audio_bits));
+	save_item(NAME(m_laserdisc_audio_bit_count));
 }
 
 
 void gottlieb_state::machine_reset()
 {
-	// if we have a laserdisc, reset our philips code callback for the next line 17
-	if (m_laserdisc != nullptr)
-		m_laserdisc_philips_timer->adjust(m_screen->time_until_pos(17), 17);
-
 	// HACK: prevent NMI immediately after soft reset
 	m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+}
+
+
+void gottlieb_ld_state::machine_reset()
+{
+	// if we have a laserdisc, reset our philips code callback for the next line 17
+	m_laserdisc_philips_timer->adjust(m_screen->time_until_pos(17), 17);
+
+	gottlieb_state::machine_reset();
 }
 
 
@@ -531,7 +550,7 @@ void gottlieb_state::video_control_w(u8 data)
 }
 
 
-void gottlieb_state::laserdisc_video_control_w(u8 data)
+void gottlieb_ld_state::laserdisc_video_control_w(u8 data)
 {
 	/* bit 0 works like the other games */
 	video_control_w(BIT(data, 0));
@@ -576,7 +595,7 @@ void gottlieb_state::charram_w(offs_t offset, u8 data)
 
 TILE_GET_INFO_MEMBER(gottlieb_state::get_bg_tile_info)
 {
-	int code = m_videoram[tile_index];
+	int const code = m_videoram[tile_index];
 	if ((code & 0x80) == 0)
 		tileinfo.set(m_gfxcharlo, code, 0, 0);
 	else
@@ -585,7 +604,7 @@ TILE_GET_INFO_MEMBER(gottlieb_state::get_bg_tile_info)
 
 TILE_GET_INFO_MEMBER(gottlieb_state::get_screwloo_bg_tile_info)
 {
-	int code = m_videoram[tile_index];
+	int const code = m_videoram[tile_index];
 	if ((code & 0xc0) == 0)
 		tileinfo.set(m_gfxcharlo, code, 0, 0);
 	else
@@ -614,7 +633,7 @@ void gottlieb_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 		/* of level animation. */
 		int sx = (m_spriteram[offs + 1]) - 4;
 		int sy = (m_spriteram[offs]) - 13;
-		int code = (255 ^ m_spriteram[offs + 2]) + 256 * m_spritebank;
+		int const code = (255 ^ m_spriteram[offs + 2]) + 256 * m_spritebank;
 
 		if (flip_screen_x()) sx = 233 - sx;
 		if (flip_screen_y()) sy = 228 - sy;
@@ -634,7 +653,7 @@ void gottlieb_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
  *
  *************************************/
 
-uint32_t gottlieb_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 gottlieb_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	/* if the background has lower priority, render it first, else clear the screen */
 	if (!m_background_priority)
@@ -692,13 +711,23 @@ ioport_value gottlieb_state::stooges_joystick_r()
 void gottlieb_state::general_output_w(u8 data)
 {
 	/* bits 0-3 control video features, and are different for laserdisc games */
-	if (m_laserdisc == nullptr)
-		video_control_w(data);
-	else
-		laserdisc_video_control_w(data);
+	video_control_w(data);
 
 	/* bit 4 normally controls the coin meter */
-	machine().bookkeeping().coin_counter_w(0, data & 0x10);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 4));
+
+	/* bit 5 doesn't have a generic function */
+	/* bit 6 controls "COIN1"; it appears that no games used this */
+	/* bit 7 controls the optional coin lockout; it appears that no games used this */
+}
+
+void gottlieb_ld_state::laserdisc_output_w(u8 data)
+{
+	/* bits 0-3 control video features, and are different for laserdisc games */
+	laserdisc_video_control_w(data);
+
+	/* bit 4 normally controls the coin meter */
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 4));
 
 	/* bit 5 doesn't have a generic function */
 	/* bit 6 controls "COIN1"; it appears that no games used this */
@@ -729,7 +758,7 @@ void gottlieb_state::qbertqub_output_w(u8 data)
 	general_output_w((data >> 1 & 0x10) | (data & ~0x30));
 
 	// bit 4 controls the sprite bank
-	m_spritebank = (data & 0x10) >> 4;
+	m_spritebank = BIT(data, 4);
 }
 
 void gottlieb_state::stooges_output_w(u8 data)
@@ -748,7 +777,7 @@ void gottlieb_state::stooges_output_w(u8 data)
  *
  *************************************/
 
-uint8_t gottlieb_state::laserdisc_status_r(offs_t offset)
+u8 gottlieb_ld_state::laserdisc_status_r(offs_t offset)
 {
 	/* IP5 reads low 8 bits of Philips code */
 	if (offset == 0)
@@ -771,21 +800,22 @@ uint8_t gottlieb_state::laserdisc_status_r(offs_t offset)
 	}
 	else
 	{
-		u8 result = m_laserdisc_audio_buffer[m_laserdisc_audio_address++];
-		m_laserdisc_audio_address %= AUDIORAM_SIZE;
+		u8 const result = m_laserdisc_audio_buffer[m_laserdisc_audio_address];
+		if (!machine().side_effects_disabled())
+			m_laserdisc_audio_address = (m_laserdisc_audio_address + 1) % AUDIORAM_SIZE;
 		return result;
 	}
 }
 
 
-void gottlieb_state::laserdisc_select_w(u8 data)
+void gottlieb_ld_state::laserdisc_select_w(u8 data)
 {
 	/* selects between reading audio data and reading status */
-	m_laserdisc_select = data & 1;
+	m_laserdisc_select = BIT(data, 0);
 }
 
 
-void gottlieb_state::laserdisc_command_w(u8 data)
+void gottlieb_ld_state::laserdisc_command_w(u8 data)
 {
 	/* a write here latches data into a 8-bit register and starts
 	   a sequence of events that sends serial data to the player */
@@ -805,9 +835,9 @@ void gottlieb_state::laserdisc_command_w(u8 data)
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(gottlieb_state::laserdisc_philips_callback)
+TIMER_CALLBACK_MEMBER(gottlieb_ld_state::laserdisc_philips_callback)
 {
-	uint32_t newcode = m_laserdisc->get_field_code((param == 17) ? LASERDISC_CODE_LINE17 : LASERDISC_CODE_LINE18, true);
+	u32 const newcode = m_laserdisc->get_field_code((param == 17) ? LASERDISC_CODE_LINE17 : LASERDISC_CODE_LINE18, true);
 
 	/* the PR8210 sends line 17/18 data on each frame; the laserdisc interface
 	   board receives notification and latches the most recent frame number */
@@ -825,14 +855,14 @@ TIMER_CALLBACK_MEMBER(gottlieb_state::laserdisc_philips_callback)
 }
 
 
-TIMER_CALLBACK_MEMBER(gottlieb_state::laserdisc_bit_off_callback)
+TIMER_CALLBACK_MEMBER(gottlieb_ld_state::laserdisc_bit_off_callback)
 {
 	/* deassert the control line */
 	m_laserdisc->control_w(CLEAR_LINE);
 }
 
 
-TIMER_CALLBACK_MEMBER(gottlieb_state::laserdisc_bit_callback)
+TIMER_CALLBACK_MEMBER(gottlieb_ld_state::laserdisc_bit_callback)
 {
 	u8 bitsleft = param >> 16;
 	u8 data = param;
@@ -847,7 +877,7 @@ TIMER_CALLBACK_MEMBER(gottlieb_state::laserdisc_bit_callback)
 	   555 runs at 40083Hz, is divided by 10, and then is divided by 4 for a
 	   0 bit or 8 for a 1 bit. This gives 998usec per 0 pulse or 1996usec
 	   per 1 pulse. */
-	duration = LASERDISC_CLOCK * (10 * ((data & 0x80) ? 8 : 4));
+	duration = LASERDISC_CLOCK * (10 * (BIT(data, 7) ? 8 : 4));
 	data <<= 1;
 
 	/* if we're not out of bits, set a timer for the next one; else set the ready bit */
@@ -858,7 +888,7 @@ TIMER_CALLBACK_MEMBER(gottlieb_state::laserdisc_bit_callback)
 }
 
 
-void gottlieb_state::laserdisc_vblank(int state)
+void gottlieb_ld_state::laserdisc_vblank(int state)
 {
 	if (!state)
 		return;
@@ -878,7 +908,7 @@ void gottlieb_state::laserdisc_vblank(int state)
  *
  *************************************/
 
-inline void gottlieb_state::audio_end_state()
+inline void gottlieb_ld_state::audio_end_state()
 {
 	/* this occurs either when the "break in transmission" condition is hit (no zero crossings
 	   for 400usec) or when the entire audio buffer is full */
@@ -890,7 +920,7 @@ inline void gottlieb_state::audio_end_state()
 }
 
 
-void gottlieb_state::audio_process_clock(bool logit)
+void gottlieb_ld_state::audio_process_clock(bool logit)
 {
 	/* clock the bit through the shift register */
 	m_laserdisc_audio_bits >>= 1;
@@ -931,7 +961,7 @@ void gottlieb_state::audio_process_clock(bool logit)
 }
 
 
-void gottlieb_state::audio_handle_zero_crossing(const attotime &zerotime, bool logit)
+void gottlieb_ld_state::audio_handle_zero_crossing(const attotime &zerotime, bool logit)
 {
 	/* compute time from last clock */
 	attotime deltaclock = zerotime - m_laserdisc_last_clock;
@@ -978,12 +1008,11 @@ void gottlieb_state::audio_handle_zero_crossing(const attotime &zerotime, bool l
 }
 
 
-void gottlieb_state::laserdisc_audio_process(int samplerate, int samples, const int16_t *ch0, const int16_t *ch1)
+void gottlieb_ld_state::laserdisc_audio_process(int samplerate, int samples, const s16 *ch0, const s16 *ch1)
 {
-	bool logit = LOG_AUDIO_DECODE && machine().input().code_pressed(KEYCODE_L);
+	bool const logit = LOG_AUDIO_DECODE && machine().input().code_pressed(KEYCODE_L);
 	attotime time_per_sample = attotime::from_hz(samplerate);
 	attotime curtime = m_laserdisc_last_time;
-	int cursamp;
 
 	if (logit)
 		logerror("--------------\n");
@@ -996,9 +1025,9 @@ void gottlieb_state::laserdisc_audio_process(int samplerate, int samples, const 
 	}
 
 	/* iterate over samples */
-	for (cursamp = 0; cursamp < samples; cursamp++)
+	for (int cursamp = 0; cursamp < samples; cursamp++)
 	{
-		int16_t sample = ch1[cursamp];
+		s16 const sample = ch1[cursamp];
 
 		/* start by logging the current sample and time */
 		if (logit)
@@ -1098,11 +1127,11 @@ void gottlieb_state::reactor_map(address_map &map)
 {
 	map.global_mask(0xffff);
 	map(0x0000, 0x1fff).ram();
-	map(0x2000, 0x20ff).mirror(0x0f00).writeonly().share("spriteram");                           /* FRSEL */
-	map(0x3000, 0x33ff).mirror(0x0c00).ram().w(FUNC(gottlieb_state::videoram_w)).share("videoram");       /* BRSEL */
-	map(0x4000, 0x4fff).ram().w(FUNC(gottlieb_state::charram_w)).share("charram");               /* BOJRSEL1 */
+	map(0x2000, 0x20ff).mirror(0x0f00).writeonly().share(m_spriteram);                           /* FRSEL */
+	map(0x3000, 0x33ff).mirror(0x0c00).ram().w(FUNC(gottlieb_state::videoram_w)).share(m_videoram);       /* BRSEL */
+	map(0x4000, 0x4fff).ram().w(FUNC(gottlieb_state::charram_w)).share(m_charram);               /* BOJRSEL1 */
 //  map(0x5000, 0x5fff).w(FUNC(gottlieb_state::));                                                   /* BOJRSEL2 */
-	map(0x6000, 0x601f).mirror(0x0fe0).w(FUNC(gottlieb_state::palette_w)).share("paletteram");       /* COLSEL */
+	map(0x6000, 0x601f).mirror(0x0fe0).w(FUNC(gottlieb_state::palette_w)).share(m_paletteram);       /* COLSEL */
 	map(0x7000, 0x7000).mirror(0x0ff8).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x7001, 0x7001).mirror(0x0ff8).w(FUNC(gottlieb_state::analog_reset_w));                        /* A1J2 interface */
 	map(0x7002, 0x7002).mirror(0x0ff8).w(FUNC(gottlieb_state::sound_w));                                  /* trackball H */
@@ -1120,10 +1149,10 @@ void gottlieb_state::gottlieb_base_map(address_map &map)
 {
 	map.global_mask(0xffff);
 	map(0x0000, 0x0fff).ram().share("nvram");
-	map(0x3000, 0x30ff).mirror(0x0700).writeonly().share("spriteram");                           /* FRSEL */
-	map(0x3800, 0x3bff).mirror(0x0400).ram().w(FUNC(gottlieb_state::videoram_w)).share("videoram");       /* BRSEL */
-	map(0x4000, 0x4fff).ram().w(FUNC(gottlieb_state::charram_w)).share("charram");               /* BOJRSEL1 */
-	map(0x5000, 0x501f).mirror(0x07e0).w(FUNC(gottlieb_state::palette_w)).share("paletteram");       /* COLSEL */
+	map(0x3000, 0x30ff).mirror(0x0700).writeonly().share(m_spriteram);                           /* FRSEL */
+	map(0x3800, 0x3bff).mirror(0x0400).ram().w(FUNC(gottlieb_state::videoram_w)).share(m_videoram);       /* BRSEL */
+	map(0x4000, 0x4fff).ram().w(FUNC(gottlieb_state::charram_w)).share(m_charram);               /* BOJRSEL1 */
+	map(0x5000, 0x501f).mirror(0x07e0).w(FUNC(gottlieb_state::palette_w)).share(m_paletteram);       /* COLSEL */
 	map(0x5800, 0x5800).mirror(0x07f8).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x5801, 0x5801).mirror(0x07f8).w(FUNC(gottlieb_state::analog_reset_w));                        /* A1J2 interface */
 	map(0x5802, 0x5802).mirror(0x07f8).w(FUNC(gottlieb_state::sound_w));                                  /* OP20-27 */
@@ -1143,6 +1172,16 @@ void gottlieb_state::gottlieb_ram_map(address_map &map)
 	gottlieb_base_map(map);
 
 	map(0x1000, 0x2fff).ram();
+}
+
+void gottlieb_ld_state::gottlieb_ld_ram_map(address_map &map)
+{
+	gottlieb_ram_map(map);
+
+	map(0x5803, 0x5803).mirror(0x07f8).w(FUNC(gottlieb_ld_state::laserdisc_output_w));
+	map(0x5805, 0x5807).mirror(0x07f8).r(FUNC(gottlieb_ld_state::laserdisc_status_r));
+	map(0x5805, 0x5805).mirror(0x07f8).w(FUNC(gottlieb_ld_state::laserdisc_command_w));    /* command for the player */
+	map(0x5806, 0x5806).mirror(0x07f8).w(FUNC(gottlieb_ld_state::laserdisc_select_w));
 }
 
 
@@ -2088,7 +2127,7 @@ INPUT_PORTS_END
 /* the games can store char gfx data in either a 4k RAM area (128 chars), or */
 /* a 8k ROM area (256 chars). */
 
-static const gfx_layout fg_layout =
+static const gfx_layout spr_layout =
 {
 	16,16,
 	RGN_FRAC(1,4),
@@ -2102,7 +2141,7 @@ static const gfx_layout fg_layout =
 static GFXDECODE_START( gfxdecode )
 	GFXDECODE_RAM(   "charram", 0, gfx_8x8x4_packed_msb, 0, 1 )   /* the game dynamically modifies this */
 	GFXDECODE_ENTRY( "bgtiles", 0, gfx_8x8x4_packed_msb, 0, 1 )
-	GFXDECODE_ENTRY( "sprites", 0, fg_layout,            0, 1 )
+	GFXDECODE_ENTRY( "sprites", 0, spr_layout,           0, 1 )
 GFXDECODE_END
 
 
@@ -2116,7 +2155,7 @@ GFXDECODE_END
 void gottlieb_state::gottlieb_core(machine_config &config)
 {
 	/* basic machine hardware */
-	I8088(config, m_maincpu, CPU_CLOCK/3);
+	I8088(config, m_maincpu, XTAL(15'000'000) / 3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &gottlieb_state::gottlieb_ram_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
@@ -2125,7 +2164,7 @@ void gottlieb_state::gottlieb_core(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(SYSTEM_CLOCK/4, GOTTLIEB_VIDEO_HCOUNT, 0, GOTTLIEB_VIDEO_HBLANK, GOTTLIEB_VIDEO_VCOUNT, 0, GOTTLIEB_VIDEO_VBLANK);
+	m_screen->set_raw(XTAL(20'000'000) / 4, GOTTLIEB_VIDEO_HCOUNT, 0, GOTTLIEB_VIDEO_HBLANK, GOTTLIEB_VIDEO_VCOUNT, 0, GOTTLIEB_VIDEO_VBLANK);
 	m_screen->set_screen_update(FUNC(gottlieb_state::screen_update));
 	m_screen->screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
@@ -2172,14 +2211,16 @@ void gottlieb_state::gottlieb2_ram_rom(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &gottlieb_state::gottlieb_ram_rom_map);
 }
 
-void gottlieb_state::g2laser(machine_config &config)
+void gottlieb_ld_state::g2laser(machine_config &config)
 {
 	gottlieb_core(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gottlieb_ld_state::gottlieb_ld_ram_map);
+
 	GOTTLIEB_SOUND_REV2(config, m_r2_sound).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	PIONEER_PR8210(config, m_laserdisc, 0);
-	m_laserdisc->set_audio(FUNC(gottlieb_state::laserdisc_audio_process));
-	m_laserdisc->set_overlay(GOTTLIEB_VIDEO_HCOUNT, GOTTLIEB_VIDEO_VCOUNT, FUNC(gottlieb_state::screen_update));
+	m_laserdisc->set_audio(FUNC(gottlieb_ld_state::laserdisc_audio_process));
+	m_laserdisc->set_overlay(GOTTLIEB_VIDEO_HCOUNT, GOTTLIEB_VIDEO_VCOUNT, FUNC(gottlieb_ld_state::screen_update));
 	m_laserdisc->set_overlay_clip(0, GOTTLIEB_VIDEO_HBLANK-1, 0, GOTTLIEB_VIDEO_VBLANK-8);
 	m_laserdisc->add_route(0, "speaker", 1.0);
 	m_laserdisc->set_screen(m_screen);
@@ -2190,7 +2231,7 @@ void gottlieb_state::g2laser(machine_config &config)
 	m_screen->set_raw(XTAL(14'318'181)*2, 910, 0, 704, 525, 44, 524);
 	m_screen->set_screen_update("laserdisc", FUNC(laserdisc_device::screen_update));
 	m_screen->screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
-	m_screen->screen_vblank().append(FUNC(gottlieb_state::laserdisc_vblank));
+	m_screen->screen_vblank().append(FUNC(gottlieb_ld_state::laserdisc_vblank));
 }
 
 
@@ -2234,15 +2275,17 @@ void gottlieb_state::screwloo(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(gottlieb_state,screwloo)
 }
 
-void gottlieb_state::cobram3(machine_config &config)
+void gottlieb_ld_state::cobram3(machine_config &config)
 {
 	gottlieb_core(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gottlieb_ld_state::gottlieb_ld_ram_map);
+
 	GOTTLIEB_SOUND_REV2(config, m_r2_sound).add_route(ALL_OUTPUTS, "speaker", 1.0);
 	m_r2_sound->enable_cobram3_mods();
 
 	PIONEER_PR8210(config, m_laserdisc, 0);
-	m_laserdisc->set_audio(FUNC(gottlieb_state::laserdisc_audio_process));
-	m_laserdisc->set_overlay(GOTTLIEB_VIDEO_HCOUNT, GOTTLIEB_VIDEO_VCOUNT, FUNC(gottlieb_state::screen_update));
+	m_laserdisc->set_audio(FUNC(gottlieb_ld_state::laserdisc_audio_process));
+	m_laserdisc->set_overlay(GOTTLIEB_VIDEO_HCOUNT, GOTTLIEB_VIDEO_VCOUNT, FUNC(gottlieb_ld_state::screen_update));
 	m_laserdisc->set_overlay_clip(0, GOTTLIEB_VIDEO_HBLANK-1, 0, GOTTLIEB_VIDEO_VBLANK-8);
 	m_laserdisc->add_route(0, "speaker", 1.0);
 	m_laserdisc->set_screen(m_screen);
@@ -2253,7 +2296,7 @@ void gottlieb_state::cobram3(machine_config &config)
 	m_screen->set_raw(XTAL(14'318'181)*2, 910, 0, 704, 525, 44, 524);
 	m_screen->set_screen_update("laserdisc", FUNC(laserdisc_device::screen_update));
 	m_screen->screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
-	m_screen->screen_vblank().append(FUNC(gottlieb_state::laserdisc_vblank));
+	m_screen->screen_vblank().append(FUNC(gottlieb_ld_state::laserdisc_vblank));
 
 	/* sound hardware */
 	subdevice<ad7528_device>("r2sound:dac")->reset_routes();
@@ -3023,33 +3066,33 @@ void gottlieb_state::init_vidvince()
  *************************************/
 
 /* games using rev 1 sound board */
-GAME( 1982, reactor,    0,        reactor,           reactor,  gottlieb_state, init_ramtiles, ROT0,   "Gottlieb",                  "Reactor", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, qbert,      0,        qbert,             qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb",                  "Q*bert (US set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, qberta,     qbert,    qbert,             qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb",                  "Q*bert (US set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, qbertj,     qbert,    qbert,             qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb (Konami license)", "Q*bert (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, myqbert,    qbert,    qbert,             qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb",                  "Mello Yello Q*bert", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, qberttst,   qbert,    qbert_old,         qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb",                  "Q*bert (early test version)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, qbtrktst,   qbert,    qbert,             qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb",                  "Q*bert Board Input Test Rom", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, insector,   0,        gottlieb1,         insector, gottlieb_state, init_romtiles, ROT0,   "Gottlieb",                  "Insector (prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, tylz,       0,        gottlieb1_votrax,  tylz,     gottlieb_state, init_romtiles, ROT0,   "Mylstar",                   "Tylz (prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // modified sound hw?
-GAME( 1984, argusg,     0,        gottlieb1_rom,     argusg,   gottlieb_state, init_ramtiles, ROT0,   "Gottlieb",                  "Argus (Gottlieb, prototype)" , MACHINE_SUPPORTS_SAVE ) // aka Guardian / Protector?
-GAME( 1983, mplanets,   0,        gottlieb1,         mplanets, gottlieb_state, init_romtiles, ROT270, "Gottlieb",                  "Mad Planets", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mplanetsuk, mplanets, gottlieb1,         mplanets, gottlieb_state, init_romtiles, ROT270, "Gottlieb (Taitel license)", "Mad Planets (UK)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, krull,      0,        gottlieb1_rom,     krull,    gottlieb_state, init_ramtiles, ROT270, "Gottlieb",                  "Krull", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, kngtmare,   0,        gottlieb1,         kngtmare, gottlieb_state, init_romtiles, ROT0,   "Gottlieb",                  "Knightmare (prototype)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // Missing sound ROMs
-GAME( 1983, sqbert,     0,        qbert,             qbert,    gottlieb_state, init_qbert,    ROT270, "Mylstar",                   "Faster, Harder, More Challenging Q*bert (prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, qbertqub,   0,        qbert,             qbertqub, gottlieb_state, init_qbertqub, ROT270, "Mylstar",                   "Q*bert's Qubes", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, curvebal,   0,        gottlieb1,         curvebal, gottlieb_state, init_romtiles, ROT270, "Mylstar",                   "Curve Ball", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, reactor,    0,        reactor,           reactor,  gottlieb_state,    init_ramtiles, ROT0,   "Gottlieb",                  "Reactor", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, qbert,      0,        qbert,             qbert,    gottlieb_state,    init_qbert,    ROT270, "Gottlieb",                  "Q*bert (US set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, qberta,     qbert,    qbert,             qbert,    gottlieb_state,    init_qbert,    ROT270, "Gottlieb",                  "Q*bert (US set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, qbertj,     qbert,    qbert,             qbert,    gottlieb_state,    init_qbert,    ROT270, "Gottlieb (Konami license)", "Q*bert (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, myqbert,    qbert,    qbert,             qbert,    gottlieb_state,    init_qbert,    ROT270, "Gottlieb",                  "Mello Yello Q*bert", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, qberttst,   qbert,    qbert_old,         qbert,    gottlieb_state,    init_qbert,    ROT270, "Gottlieb",                  "Q*bert (early test version)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, qbtrktst,   qbert,    qbert,             qbert,    gottlieb_state,    init_qbert,    ROT270, "Gottlieb",                  "Q*bert Board Input Test Rom", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, insector,   0,        gottlieb1,         insector, gottlieb_state,    init_romtiles, ROT0,   "Gottlieb",                  "Insector (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, tylz,       0,        gottlieb1_votrax,  tylz,     gottlieb_state,    init_romtiles, ROT0,   "Mylstar",                   "Tylz (prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // modified sound hw?
+GAME( 1984, argusg,     0,        gottlieb1_rom,     argusg,   gottlieb_state,    init_ramtiles, ROT0,   "Gottlieb",                  "Argus (Gottlieb, prototype)" , MACHINE_SUPPORTS_SAVE ) // aka Guardian / Protector?
+GAME( 1983, mplanets,   0,        gottlieb1,         mplanets, gottlieb_state,    init_romtiles, ROT270, "Gottlieb",                  "Mad Planets", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mplanetsuk, mplanets, gottlieb1,         mplanets, gottlieb_state,    init_romtiles, ROT270, "Gottlieb (Taitel license)", "Mad Planets (UK)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, krull,      0,        gottlieb1_rom,     krull,    gottlieb_state,    init_ramtiles, ROT270, "Gottlieb",                  "Krull", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, kngtmare,   0,        gottlieb1,         kngtmare, gottlieb_state,    init_romtiles, ROT0,   "Gottlieb",                  "Knightmare (prototype)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // Missing sound ROMs
+GAME( 1983, sqbert,     0,        qbert,             qbert,    gottlieb_state,    init_qbert,    ROT270, "Mylstar",                   "Faster, Harder, More Challenging Q*bert (prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, qbertqub,   0,        qbert,             qbertqub, gottlieb_state,    init_qbertqub, ROT270, "Mylstar",                   "Q*bert's Qubes", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, curvebal,   0,        gottlieb1,         curvebal, gottlieb_state,    init_romtiles, ROT270, "Mylstar",                   "Curve Ball", MACHINE_SUPPORTS_SAVE )
 
 /* games using rev 2 sound board */
-GAME( 1983, screwloo,   0,        screwloo,          screwloo, gottlieb_state, init_screwloo, ROT0,   "Mylstar",                   "Screw Loose (prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mach3,      0,        g2laser,           mach3,    gottlieb_state, init_romtiles, ROT0,   "Mylstar",                   "M.A.C.H. 3 (set 1)", 0 )
-GAME( 1983, mach3a,     mach3,    g2laser,           mach3,    gottlieb_state, init_romtiles, ROT0,   "Mylstar",                   "M.A.C.H. 3 (set 2)", 0 )
-GAME( 1983, mach3b,     mach3,    g2laser,           mach3,    gottlieb_state, init_romtiles, ROT0,   "Mylstar",                   "M.A.C.H. 3 (set 3)", 0 )
-GAME( 1984, cobram3,    cobra,    cobram3,           cobram3,  gottlieb_state, init_romtiles, ROT0,   "Data East",                 "Cobra Command (M.A.C.H. 3 hardware, set 1)", 0 )
-GAME( 1984, cobram3a,   cobra,    cobram3,           cobram3,  gottlieb_state, init_romtiles, ROT0,   "Data East",                 "Cobra Command (M.A.C.H. 3 hardware, set 2)", 0 )
-GAME( 1984, usvsthem,   0,        g2laser,           usvsthem, gottlieb_state, init_romtiles, ROT0,   "Mylstar",                   "Us vs. Them", 0 )
-GAME( 1984, 3stooges,   0,        gottlieb2_ram_rom, 3stooges, gottlieb_state, init_stooges,  ROT0,   "Mylstar",                   "The Three Stooges In Brides Is Brides (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, 3stoogesa,  3stooges, gottlieb2_ram_rom, 3stooges, gottlieb_state, init_stooges,  ROT0,   "Mylstar",                   "The Three Stooges In Brides Is Brides (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, vidvince,   0,        gottlieb2_ram_rom, vidvince, gottlieb_state, init_vidvince, ROT0,   "Mylstar",                   "Video Vince and the Game Factory (prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // sprite wrapping issues
-GAME( 1984, wizwarz,    0,        gottlieb2,         wizwarz,  gottlieb_state, init_romtiles, ROT0,   "Mylstar",                   "Wiz Warz (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, screwloo,   0,        screwloo,          screwloo, gottlieb_state,    init_screwloo, ROT0,   "Mylstar",                   "Screw Loose (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mach3,      0,        g2laser,           mach3,    gottlieb_ld_state, init_romtiles, ROT0,   "Mylstar",                   "M.A.C.H. 3 (set 1)", 0 )
+GAME( 1983, mach3a,     mach3,    g2laser,           mach3,    gottlieb_ld_state, init_romtiles, ROT0,   "Mylstar",                   "M.A.C.H. 3 (set 2)", 0 )
+GAME( 1983, mach3b,     mach3,    g2laser,           mach3,    gottlieb_ld_state, init_romtiles, ROT0,   "Mylstar",                   "M.A.C.H. 3 (set 3)", 0 )
+GAME( 1984, cobram3,    cobra,    cobram3,           cobram3,  gottlieb_ld_state, init_romtiles, ROT0,   "Data East",                 "Cobra Command (M.A.C.H. 3 hardware, set 1)", 0 )
+GAME( 1984, cobram3a,   cobra,    cobram3,           cobram3,  gottlieb_ld_state, init_romtiles, ROT0,   "Data East",                 "Cobra Command (M.A.C.H. 3 hardware, set 2)", 0 )
+GAME( 1984, usvsthem,   0,        g2laser,           usvsthem, gottlieb_ld_state, init_romtiles, ROT0,   "Mylstar",                   "Us vs. Them", 0 )
+GAME( 1984, 3stooges,   0,        gottlieb2_ram_rom, 3stooges, gottlieb_state,    init_stooges,  ROT0,   "Mylstar",                   "The Three Stooges In Brides Is Brides (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, 3stoogesa,  3stooges, gottlieb2_ram_rom, 3stooges, gottlieb_state,    init_stooges,  ROT0,   "Mylstar",                   "The Three Stooges In Brides Is Brides (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, vidvince,   0,        gottlieb2_ram_rom, vidvince, gottlieb_state,    init_vidvince, ROT0,   "Mylstar",                   "Video Vince and the Game Factory (prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // sprite wrapping issues
+GAME( 1984, wizwarz,    0,        gottlieb2,         wizwarz,  gottlieb_state,    init_romtiles, ROT0,   "Mylstar",                   "Wiz Warz (prototype)", MACHINE_SUPPORTS_SAVE )
