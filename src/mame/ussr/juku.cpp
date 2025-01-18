@@ -46,7 +46,6 @@
 #include "machine/wd_fdc.h"
 #include "sound/spkrdev.h"
 
-#include "emuopts.h"
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
@@ -207,7 +206,7 @@ void juku_state::io_map(address_map &map)
 	map(0x1f, 0x1f).rw(FUNC(juku_state::fdc_data_r), FUNC(juku_state::fdc_data_w));
 	// mapping for cassette version (E5101?)
 	// map(0x1c, 0x1d).rw(m_sio[1], FUNC(i8251_device::read), FUNC(i8251_device::write));
-	map(0x80, 0x80).r(m_mouse, FUNC(juku_mouse_device::mouse_port_r));
+	map(0x80, 0x80).r(m_mouse, FUNC(juku_mouse_device::mouse_port_r)); // TODO: turn this into a Multibus expansion
 }
 
 
