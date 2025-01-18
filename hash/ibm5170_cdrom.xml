@@ -8796,6 +8796,20 @@ Installation and Open Circulation CDs are bootable.
 		</part>
 	</software>
 
+	<!-- The Option Pack consists of backported software from Windows 2000 (NT 5.0) development. -->
+	<software name="winnt40opt">
+		<description>Windows NT 4.0 Option Pack</description>
+		<year>1998</year>
+		<publisher>Microsoft</publisher>
+		<info name="release" value="19981130" />
+		<info name="language" value="English" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows nt 4.0 option pack" sha1="19fc52af4301a33a1a0e6cca6b815e8d19005a39" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Windows 2000 floppy images are on the CD-ROM in the \bootdisk directory.
 
 	In an effort of making the list not balloon out, only "Select" editions are here.  They do not require key entry. -->
