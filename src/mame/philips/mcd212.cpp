@@ -661,9 +661,9 @@ void mcd212_device::process_vsr(uint32_t *pixels, bool *transparent)
 	const uint8_t mosaic_factor = get_mosaic_factor<Channel>();
 
 	const uint32_t dyuv_abs_start = m_dyuv_abs_start[Channel];
-	const uint8_t start_y = (dyuv_abs_start >> 16) & 0x000000ff;
-	const uint8_t start_u = (dyuv_abs_start >>  8) & 0x000000ff;
-	const uint8_t start_v = (dyuv_abs_start >>  0) & 0x000000ff;
+	uint8_t y = (dyuv_abs_start >> 16) & 0x000000ff;
+	uint8_t u = (dyuv_abs_start >>  8) & 0x000000ff;
+	uint8_t v = (dyuv_abs_start >>  0) & 0x000000ff;
 
 	const uint32_t transparent_color = m_transparent_color[Channel];
 	const uint8_t transp_ctrl_masked = transp_ctrl & 0x07;
@@ -707,9 +707,6 @@ void mcd212_device::process_vsr(uint32_t *pixels, bool *transparent)
 					use_color_key = false;
 
 					LOGMASKED(LOG_VSR, "Scanline %d: Chan %d: DYUV\n", screen().vpos(), Channel);
-					uint8_t y = start_y;
-					uint8_t u = start_u;
-					uint8_t v = start_v;
 					for (; x < width; x++)
 					{
 						const uint8_t byte1 = data[(vsr++ & 0x0007ffff) ^ 1];
@@ -719,48 +716,23 @@ void mcd212_device::process_vsr(uint32_t *pixels, bool *transparent)
 						const uint8_t v1 = v + m_delta_uv_lut[byte1];
 						const uint8_t y1 = y0 + m_delta_y_lut[byte1];
 
-						const uint8_t u0 = (u + u1) >> 1;
-						const uint8_t v0 = (v + v1) >> 1;
+						// Midpoint Interpolation prevents rollover, against spec.
+						const uint8_t u0 = (u >> 1) + (u1 >> 1) + (u & u1 & 1); 
+						const uint8_t v0 = (v >> 1) + (v1 >> 1) + (v & v1 & 1);
 
-						uint32_t *limit_r = m_dyuv_limit_r_lut + y0 + 0xff;
-						uint32_t *limit_g = m_dyuv_limit_g_lut + y0 + 0xff;
-						uint32_t *limit_b = m_dyuv_limit_b_lut + y0 + 0xff;
+						uint32_t* limit_rgb = m_dyuv_limit_rgb_lut + y0 + 0x100;
 
-						uint32_t entry = limit_r[m_dyuv_v_to_r[v0]] | limit_g[m_dyuv_u_to_g[u0] + m_dyuv_v_to_g[v0]] | limit_b[m_dyuv_u_to_b[u0]];
+						uint32_t entry = (limit_rgb[m_dyuv_v_to_r[v0]] << 16) | (limit_rgb[m_dyuv_u_to_g[u0] + m_dyuv_v_to_g[v0]] << 8) | limit_rgb[m_dyuv_u_to_b[u0]];
 						pixels[x] = entry;
 						transparent[x] = (transp_always || (use_region_flag && region_flags[x << 1])) != invert_transp_condition;
 
-						if (mosaic_enable)
-						{
-							for (int mosaic_index = 1; mosaic_index < mosaic_factor && (x + mosaic_index) < width; mosaic_index++)
-							{
-								pixels[x + mosaic_index] = pixels[x];
-								transparent[x + mosaic_index] = transparent[x << 1];
-							}
-							x += mosaic_factor;
-						}
-						else
-						{
-							x++;
-						}
+						x++;
 
-						limit_r = m_dyuv_limit_r_lut + y1 + 0xff;
-						limit_g = m_dyuv_limit_g_lut + y1 + 0xff;
-						limit_b = m_dyuv_limit_b_lut + y1 + 0xff;
+						limit_rgb = m_dyuv_limit_rgb_lut + y1 + 0x100;
 
-						entry = limit_r[m_dyuv_v_to_r[v1]] | limit_g[m_dyuv_u_to_g[u1] + m_dyuv_v_to_g[v1]] | limit_b[m_dyuv_u_to_b[u1]];
+						entry = (limit_rgb[m_dyuv_v_to_r[v1]] << 16) | (limit_rgb[m_dyuv_u_to_g[u1] + m_dyuv_v_to_g[v1]] << 8) | limit_rgb[m_dyuv_u_to_b[u1]];
 						pixels[x] = entry;
 						transparent[x] = (transp_always || (use_region_flag && region_flags[x << 1])) != invert_transp_condition;
-
-						if (mosaic_enable)
-						{
-							for (int mosaic_index = 1; mosaic_index < mosaic_factor && (x + mosaic_index) < width; mosaic_index++)
-							{
-								pixels[x + mosaic_index] = pixels[x];
-								transparent[x + mosaic_index] = transparent[x];
-							}
-							x += mosaic_factor - 1;
-						}
 
 						byte = data[(vsr++ & 0x0007ffff) ^ 1];
 
@@ -1434,12 +1406,10 @@ void mcd212_device::device_start()
 		m_delta_uv_lut[d] = s_dyuv_deltas[d >> 4];
 	}
 
-	for (uint16_t w = 0; w < 3 * 0xff; w++)
+	for (uint16_t w = 0; w < 0x300; w++)
 	{
-		const uint8_t limit = (w < 0xff + 16) ?  0 : w <= 16 + 2 * 0xff ? w - 0x10f : 0xff;
-		m_dyuv_limit_r_lut[w] = limit << 16;
-		m_dyuv_limit_g_lut[w] = limit << 8;
-		m_dyuv_limit_b_lut[w] = limit;
+		const uint8_t limit = (w < 0x100) ? 0 : (w < 0x200) ? (w - 0x100) : 0xff;
+		m_dyuv_limit_rgb_lut[w] = limit;
 	}
 
 	for (int16_t sw = 0; sw < 0x100; sw++)

@@ -202,9 +202,7 @@ protected:
 	uint8_t m_weight_factor[2][768]{};
 
 	// DYUV color limit arrays.
-	uint32_t m_dyuv_limit_r_lut[3 * 0xff];
-	uint32_t m_dyuv_limit_g_lut[3 * 0xff];
-	uint32_t m_dyuv_limit_b_lut[3 * 0xff];
+	uint32_t m_dyuv_limit_rgb_lut[0x300];
 
 	// DYUV delta-Y decoding array
 	uint8_t m_delta_y_lut[0x100];
