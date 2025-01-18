@@ -153,7 +153,7 @@ protected:
 	// Memory spaces
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::cache m_program;
 	memory_access< 9, 0, 0, ENDIANNESS_LITTLE>::specific m_data;
-	memory_access<17, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
+	memory_access<18, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
 
 	devcb_read8::array<4> m_port_in_cb;
 	devcb_write8::array<4> m_port_out_cb;
