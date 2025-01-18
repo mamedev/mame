@@ -86,7 +86,7 @@ public:
 		m_rom(*this, "maincpu"),
 		m_exp(*this, "expcart"),
 		m_ram(*this, "ram"),
-		m_ext(*this, "ext%u", 0U),
+		m_ext(*this, "ext%u", 0U, 0x8000U, ENDIANNESS_LITTLE),
 		m_mode(*this, "mode"),
 		m_pic(*this, "pic"),
 		m_pit(*this, "pit%u", 0U),
@@ -113,7 +113,7 @@ private:
 	required_region_ptr<uint8_t> m_rom;
 	optional_region_ptr<uint8_t> m_exp;
 	required_shared_ptr<uint8_t> m_ram;
-	optional_shared_ptr_array<uint8_t, 1> m_ext;
+	memory_share_array_creator<uint8_t, 1> m_ext;
 	memory_view m_mode;
 	required_device<pic8259_device> m_pic;
 	required_device_array<pit8253_device, 3> m_pit;
@@ -174,8 +174,15 @@ private:
 void juku_state::mem_map(address_map &map)
 {
 	map(0x0000, 0xffff).ram().share(m_ram);
-	map(0x0000, 0x7fff).ram().share(m_ext[0]);
 	map(0x0000, 0xffff).view(m_mode);
+	m_mode[0](0x0000, 0x3fff).rom().region("maincpu", 0x0000);
+	m_mode[1](0xd800, 0xffff).rom().region("maincpu", 0x1800);
+	// optional BASIC expansion cartridge
+	m_mode[2](0x4000, 0xbfff).rom().region("expcart", 0x0000);
+	// no info on programs actually using extra 32kb "memory window"
+	//m_mode[2](0x4000, 0xbfff).ram().share(m_ext[0]);
+	m_mode[2](0xd800, 0xffff).rom().region("maincpu", 0x1800);
+	m_mode[3]; // let everything fall through to RAM
 }
 
 void juku_state::io_map(address_map &map)
@@ -644,27 +651,6 @@ void juku_state::pio0_portc_w(uint8_t data)
 
 void juku_state::machine_start()
 {
-	// map memory modes
-	m_mode[0].install_rom(0x0000, 0x3fff, &m_rom[0x0000]);
-	m_mode[0].install_writeonly(0x0000, 0x3fff, &m_ram[0x0000]);
-	m_mode[0].install_ram(0x4000, 0xffff, &m_ram[0x4000]);
-	m_mode[1].install_ram(0x0000, 0xd7ff, &m_ram[0x0000]);
-	m_mode[1].install_rom(0xd800, 0xffff, &m_rom[0x1800]);
-	m_mode[1].install_writeonly(0xd800, 0xffff, &m_ram[0xd800]);
-	m_mode[2].install_ram(0x0000, 0x3fff, &m_ram[0x0000]);
-	// optional BASIC expansion cartridge
-	m_mode[2].install_rom(0x4000, 0xbfff, &m_exp[0x0000]);
-	//m_mode[2].install_ram(0x4000, 0xbfff, &m_ext[0][0x0000]);
-	// no info on programs actually using extra 32kb "memory window"
-	m_mode[2].install_writeonly(0x4000, 0xbfff, &m_ext[0][0x0000]);
-	// could also refer to usual ram (specs not clear)
-	//m_mode[2].install_writeonly(0x4000, 0xbfff, &m_ram[0x4000]);
-	m_mode[2].install_ram(0xc000, 0xd7ff, &m_ram[0xc000]);
-	m_mode[2].install_rom(0xd800, 0xffff, &m_rom[0x1800]);
-	m_mode[2].install_writeonly(0xd800, 0xffff, &m_ram[0xd800]);
-	// could as well disable the view, but for coherence
-	m_mode[3].install_ram(0x0000, 0xffff, &m_ram[0x0000]);
-	
 	// check if mouse is plugged
 	if (m_mouse.found() && strcmp(mconfig().options().mouse_device(), "none") != 0)
 		m_maincpu->space(AS_IO).install_read_handler(0x80, 0x80, read8smo_delegate(*m_mouse, FUNC(juku_mouse_device::mouse_port_r)));
