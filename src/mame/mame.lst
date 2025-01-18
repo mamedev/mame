@@ -36993,6 +36993,7 @@ bmf_de                          //
 bmf_fr                          //
 bmf_it                          //
 bmf_ita                         //
+bmf_itb                         //
 bmf_jp                          //
 bmf_nl                          //
 bmf_nl302                       //
@@ -37465,6 +37466,7 @@ sport2k                         //
 @source:pinball/micropin.cpp
 pentacup                        //
 pentacup2                       //
+pentacups                       //
 pentacupt                       //
 
 @source:pinball/missamer.cpp
