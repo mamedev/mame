@@ -296,7 +296,7 @@ mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type ty
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, program_map)
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, 9, 0, data_map)
-	, m_io_config("io", ENDIANNESS_LITTLE, 8, (features & FEATURE_DS5002FP) ? 17 : 16, 0)
+	, m_io_config("io", ENDIANNESS_LITTLE, 8, (features & FEATURE_DS5002FP) ? 18 : 16, 0)
 	, m_pc(0)
 	, m_features(features)
 	, m_rom_size(program_width > 0 ? 1 << program_width : 0)
@@ -871,12 +871,18 @@ uint8_t mcs51_cpu_device::r_psw() { return SFR_A(ADDR_PSW); }
 
     In order to simplify memory mapping to the data address bus, the following address map is assumed for partitioned mode:
 
+	PES = 0:
     0x00000-0x0ffff -> data memory on the expanded bus
     0x10000-0x1ffff -> data memory on the byte-wide bus
+	PES = 1:
+	0x20000-0x2ffff -> memory-mapped peripherals on the byte-wide bus
 
     For non-partitioned mode the following memory map is assumed:
 
-    0x0000-0xffff -> data memory (the bus used to access it does not matter)
+	PES = 0:
+    0x00000-0x0ffff -> data memory (the bus used to access it does not matter)
+	PES = 1:
+	0x20000-0x2ffff -> memory-mapped peripherals on the byte-wide bus
 */
 
 offs_t mcs51_cpu_device::external_ram_iaddr(offs_t offset, offs_t mem_mask)
@@ -891,7 +897,9 @@ offs_t mcs51_cpu_device::external_ram_iaddr(offs_t offset, offs_t mem_mask)
 	/* if partition mode is set, adjust offset based on the bus */
 	if (m_features & FEATURE_DS5002FP)
 	{
-		if (!GET_PM) {
+		if (GET_PES) {
+			offset += 0x20000;
+		} else if (!GET_PM) {
 			if (!GET_EXBS) {
 				if ((offset >= ds5002fp_partitions[GET_PA]) && (offset <= ds5002fp_ranges[m_ds5002fp.range])) {
 					offset += 0x10000;
