@@ -300,7 +300,7 @@ mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type ty
 	, m_pc(0)
 	, m_features(features)
 	, m_rom_size(program_width > 0 ? 1 << program_width : 0)
-	, m_ram_mask( (data_width == 8) ? 0xFF : 0x7F )
+	, m_ram_mask( (data_width == 8) ? 0xff : 0x7f )
 	, m_num_interrupts(5)
 	, m_sfr_ram(*this, "sfr_ram")
 	, m_scratchpad(*this, "scratchpad")
@@ -1296,7 +1296,7 @@ void mcs51_cpu_device::update_timer_t0(int cycles)
 				if ( count & 0xffffe000 ) /* Check for overflow */
 					SET_TF0(1);
 				TH0 = (count>>5) & 0xff;
-				TL0 =  count & 0x1f ;
+				TL0 =  count & 0x1f;
 				break;
 			case 1:         /* 16 Bit Timer Mode */
 				count = ((TH0<<8) | TL0);
@@ -1385,7 +1385,7 @@ void mcs51_cpu_device::update_timer_t1(int cycles)
 					count += delta;
 					overflow = count & 0xffffe000; /* Check for overflow */
 					TH1 = (count>>5) & 0xff;
-					TL1 =  count & 0x1f ;
+					TL1 =  count & 0x1f;
 					break;
 				case 1:         /* 16 Bit Timer Mode */
 					count = ((TH1<<8) | TL1);
@@ -1429,7 +1429,7 @@ void mcs51_cpu_device::update_timer_t1(int cycles)
 				count += delta;
 				overflow = count & 0xffffe000; /* Check for overflow */
 				TH1 = (count>>5) & 0xff;
-				TL1 =  count & 0x1f ;
+				TL1 =  count & 0x1f;
 				break;
 			case 1:         /* 16 Bit Timer Mode */
 				count = ((TH1<<8) | TL1);
@@ -2043,6 +2043,7 @@ void mcs51_cpu_device::check_irqs()
 
 void mcs51_cpu_device::burn_cycles(int cycles)
 {
+	// TODO: adjust icount one by one here, to get more accurate serial timing?
 	/* Update Timer (if any timers are running) */
 	update_timers(cycles);
 
@@ -2209,6 +2210,7 @@ void mcs51_cpu_device::execute_run()
 		if ((m_features & FEATURE_CMOS) && GET_PD)
 			return;
 
+		// TODO: readjust icount/redo burn_cycles for check_irqs incrementing m_inst_cycles
 		burn_cycles(m_inst_cycles);
 
 		/* decrement the timed access window */
@@ -2602,7 +2604,6 @@ uint8_t i80c52_device::sfr_read(size_t offset)
 /****************************************************************************
  * DS5002FP Section
  ****************************************************************************/
-
 
 #define DS5_LOGW(a, d)  LOG("write to  " # a " register at 0x%04x, data=%x\n", PC, d)
 #define DS5_LOGR(a, d)  LOG("read from " # a " register at 0x%04x\n", PC)
