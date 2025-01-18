@@ -125,7 +125,6 @@ public:
 		, m_screen(*this, "screen")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
-		, m_spriteram(*this, "spriteram", 0x1000, ENDIANNESS_BIG)
 		, m_tilemapram(*this, "tilemapram")
 		, m_d80010_ram(*this, "d80010")
 		, m_d80060_ram(*this, "d80060")
@@ -151,7 +150,6 @@ private:
 	required_device<palette_device> m_palette;
 
 	// memory pointers
-	memory_share_creator<u8> m_spriteram;
 	required_shared_ptr<u16> m_tilemapram;
 	required_shared_ptr<u16> m_d80010_ram;
 	required_shared_ptr<u16> m_d80060_ram;
@@ -174,8 +172,6 @@ private:
 	void bank_w(u8 data);
 	void eeprom_w(u8 data);
 	void es8712_reset_w(u8 data);
-	u8 spriteram_r(offs_t offset);
-	void spriteram_w(offs_t offset, u8 data);
 	void tilemaps_word_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
@@ -184,7 +180,6 @@ private:
 
 	void colpri_cb(u32 &colour, u32 &pri_mask);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_vblank(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
 
 	void program_map(address_map &map) ATTR_COLD;
@@ -247,21 +242,6 @@ void gcpinbal_state::video_start()
 void gcpinbal_state::colpri_cb(u32 &colour, u32 &pri_mask)
 {
 	pri_mask = (m_d80060_ram[0x8 / 2] & 0x8800) ? 0xf0 : 0xfc;
-}
-
-
-/******************************************************************
-                   SPRITE READ AND WRITE HANDLERS
-*******************************************************************/
-
-u8 gcpinbal_state::spriteram_r(offs_t offset)
-{
-	return m_spriteram[offset];
-}
-
-void gcpinbal_state::spriteram_w(offs_t offset, u8 data)
-{
-	m_spriteram[offset] = data;
 }
 
 
@@ -346,19 +326,9 @@ uint32_t gcpinbal_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 #endif
 	m_tilemap[layer[2]]->draw(screen, bitmap, cliprect, 0, 4);
 
-	m_sprgen->gcpinbal_draw_sprites(screen, bitmap, cliprect, 16);
+	m_sprgen->gcpinbal_draw_sprites(screen, bitmap, cliprect);
 
 	return 0;
-}
-
-void gcpinbal_state::screen_vblank(int state)
-{
-	if (state)
-	{
-		// Sprites are 1 frame delayed
-		for (int i = 0; i < m_spriteram.length(); i++)
-			m_sprgen->write(i, m_spriteram[i]);
-	}
 }
 
 
@@ -456,7 +426,7 @@ void gcpinbal_state::program_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();
 	map(0xc00000, 0xc03fff).ram().w(FUNC(gcpinbal_state::tilemaps_word_w)).share(m_tilemapram);
-	map(0xc80000, 0xc81fff).rw(FUNC(gcpinbal_state::spriteram_r), FUNC(gcpinbal_state::spriteram_w)).umask16(0x00ff);
+	map(0xc80000, 0xc81fff).rw(m_sprgen, FUNC(excellent_spr_device::read), FUNC(excellent_spr_device::write)).umask16(0x00ff);
 	map(0xd00000, 0xd00fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xd80010, 0xd8002f).ram().w(FUNC(gcpinbal_state::d80010_w)).share(m_d80010_ram);
 	map(0xd80040, 0xd8005b).w(FUNC(gcpinbal_state::d80040_w)).umask16(0x00ff);
@@ -619,7 +589,7 @@ void gcpinbal_state::gcpinbal(machine_config &config)
 	m_screen->set_size(40*8, 32*8);
 	m_screen->set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
 	m_screen->set_screen_update(FUNC(gcpinbal_state::screen_update));
-	m_screen->screen_vblank().set(FUNC(gcpinbal_state::screen_vblank));
+	m_screen->screen_vblank().set(m_sprgen, FUNC(excellent_spr_device::vblank));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gcpinbal);
