@@ -84,7 +84,7 @@ Main processor (8088 minimum mode)
 memory mapped ports:
 
 read:
-7000    Dip switch
+7000    DIP switch
 7001    Inputs 10-17
 7002    trackball H
 7003    trackball V
@@ -241,31 +241,38 @@ public:
 		, m_knockers(*this, "knocker%d", 0U)
 	{ }
 
-	void gottlieb_core(machine_config &config);
-	void screwloo(machine_config &config);
-	void gottlieb2(machine_config &config);
-	void gottlieb2_ram_rom(machine_config &config);
-	void reactor(machine_config &config);
-	void qbert_old(machine_config &config);
-	void qbert(machine_config &config);
-	void qbert_knocker(machine_config &config);
-	void gottlieb1(machine_config &config);
-	void gottlieb1_rom(machine_config &config);
-	void gottlieb1_votrax_old(machine_config &config);
-	void gottlieb1_votrax(machine_config &config);
+	void gottlieb_core(machine_config &config) ATTR_COLD;
+	void screwloo(machine_config &config) ATTR_COLD;
+	void gottlieb2(machine_config &config) ATTR_COLD;
+	void gottlieb2_ram_rom(machine_config &config) ATTR_COLD;
+	void reactor(machine_config &config) ATTR_COLD;
+	void qbert_old(machine_config &config) ATTR_COLD;
+	void qbert(machine_config &config) ATTR_COLD;
+	void qbert_knocker(machine_config &config) ATTR_COLD;
+	void gottlieb1(machine_config &config) ATTR_COLD;
+	void gottlieb1_rom(machine_config &config) ATTR_COLD;
+	void gottlieb1_votrax_old(machine_config &config) ATTR_COLD;
+	void gottlieb1_votrax(machine_config &config) ATTR_COLD;
 
-	void init_romtiles();
-	void init_screwloo();
-	void init_vidvince();
-	void init_ramtiles();
-	void init_stooges();
-	void init_qbert();
-	void init_qbertqub();
+	void init_romtiles() ATTR_COLD;
+	void init_screwloo() ATTR_COLD;
+	void init_vidvince() ATTR_COLD;
+	void init_ramtiles() ATTR_COLD;
+	void init_stooges() ATTR_COLD;
+	void init_qbert() ATTR_COLD;
+	void init_qbertqub() ATTR_COLD;
 
 	template <int N> ioport_value track_delta_r();
 	ioport_value stooges_joystick_r();
 
 protected:
+	static inline constexpr size_t AUDIORAM_SIZE = 0x400;
+
+	static inline constexpr unsigned GOTTLIEB_VIDEO_HCOUNT = 318;
+	static inline constexpr unsigned GOTTLIEB_VIDEO_HBLANK = 256;
+	static inline constexpr unsigned GOTTLIEB_VIDEO_VCOUNT = 256;
+	static inline constexpr unsigned GOTTLIEB_VIDEO_VBLANK = 240;
+
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
@@ -324,13 +331,6 @@ protected:
 	u8 m_transparent0 = 0U;
 	tilemap_t *m_bg_tilemap = nullptr;
 	double m_weights[4]{};
-
-	static constexpr size_t AUDIORAM_SIZE = 0x400;
-
-	static constexpr unsigned GOTTLIEB_VIDEO_HCOUNT = 318;
-	static constexpr unsigned GOTTLIEB_VIDEO_HBLANK = 256;
-	static constexpr unsigned GOTTLIEB_VIDEO_VCOUNT = 256;
-	static constexpr unsigned GOTTLIEB_VIDEO_VBLANK = 240;
 };
 
 class gottlieb_ld_state : public gottlieb_state
@@ -341,14 +341,16 @@ public:
 		, m_laserdisc(*this, "laserdisc")
 	{ }
 
-	void cobram3(machine_config &config);
-	void g2laser(machine_config &config);
+	void cobram3(machine_config &config) ATTR_COLD;
+	void g2laser(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
+	static inline constexpr attotime LASERDISC_CLOCK = PERIOD_OF_555_ASTABLE(16000, 10000, 0.001e-6);
+
 	void laserdisc_output_w(u8 data);
 	u8 laserdisc_status_r(offs_t offset);
 	void laserdisc_select_w(u8 data);
@@ -382,8 +384,6 @@ private:
 	u8 m_laserdisc_zero_seen = 0U;
 	u8 m_laserdisc_audio_bits = 0U;
 	u8 m_laserdisc_audio_bit_count = 0U;
-
-	static constexpr attotime LASERDISC_CLOCK = PERIOD_OF_555_ASTABLE(16000, 10000, 0.001e-6);
 };
 
 
