@@ -10,13 +10,18 @@ class juku_mouse_device : public device_t
 {
 public:
 	juku_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
-	uint8_t mouse_port_r();
+
 	auto int_handler() { return m_int_handler.bind(); }
-	TIMER_CALLBACK_MEMBER( poll_delta );
+
+	uint8_t mouse_port_r();
+
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+
+	TIMER_CALLBACK_MEMBER( poll_delta );
+
 private:
 	required_ioport m_mouse_x, m_mouse_y, m_mouse_b;
 	uint8_t m_prev_mouse_x, m_prev_mouse_y;
