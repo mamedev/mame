@@ -1381,7 +1381,7 @@ ROM_START( raiden2gb ) // original board with serial number on sticker on u0212
 	ROM_CONTINUE(0x10000,0x8000)
 	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
 
-	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
+	ROM_REGION( 0x020000, "chars", 0 ) /* chars */
 	ROM_LOAD( "seibu7.u0724", 0x000000, 0x020000, CRC(c9ec9469) SHA1(a29f480a1bee073be7a177096ef58e1887a5af24) ) /* PCB silkscreened FX0 */
 
 	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
@@ -1393,14 +1393,14 @@ ROM_START( raiden2gb ) // original board with serial number on sticker on u0212
 	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341", 0x0000, 0x117, CRC(20931f21) SHA1(95ce9cfbfb280dfc6a326e378684eff3c6f54701) )
 
 	// Common Raiden II soldered mask ROMs below
-	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
+	ROM_REGION( 0x40000, "math", 0 )   /* COPX */
 	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
+	ROM_REGION( 0x400000, "tiles", 0 ) /* background gfx */
 	ROM_LOAD( "raiden_2_seibu_bg-1.u0714", 0x000000, 0x200000, CRC(e61ad38e) SHA1(63b06cd38db946ad3fc5c1482dc863ef80b58fec) )
 	ROM_LOAD( "raiden_2_seibu_bg-2.u075",  0x200000, 0x200000, CRC(a694a4bb) SHA1(39c2614d0effc899fe58f735604283097769df77) )
 
-	ROM_REGION32_LE( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */
+	ROM_REGION32_LE( 0x800000, "sprites", 0 ) /* sprite gfx (encrypted) */
 	ROM_LOAD32_WORD( "raiden_2_seibu_obj-1.u0811", 0x000000, 0x200000, CRC(ff08ef0b) SHA1(a1858430e8171ca8bab785457ef60e151b5e5cf1) )
 	ROM_LOAD32_WORD( "raiden_2_seibu_obj-2.u082",  0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) )
 	ROM_LOAD32_WORD( "raiden_2_seibu_obj-3.u0837", 0x400000, 0x200000, CRC(897a0322) SHA1(abb2737a2446da5b364fc2d96524b43d808f4126) )
