@@ -14,12 +14,12 @@ static constexpr int MOUSE_RATE_HZ = 600;
 
 DEFINE_DEVICE_TYPE(JUKU_MOUSE, juku_mouse_device, "juku_mouse", "Juku E510x mouse")
 
-juku_mouse_device::juku_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, JUKU_MOUSE, tag, owner, clock),
-	  m_mouse_x(*this, "MOUSE_X"),
-	  m_mouse_y(*this, "MOUSE_Y"),
-	  m_mouse_b(*this, "BUTTONS"),
-	  m_int_handler(*this)
+juku_mouse_device::juku_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, JUKU_MOUSE, tag, owner, clock),
+	m_mouse_x(*this, "MOUSE_X"),
+	m_mouse_y(*this, "MOUSE_Y"),
+	m_mouse_b(*this, "BUTTONS"),
+	m_int_handler(*this)
 {
 }
 
@@ -44,14 +44,14 @@ void juku_mouse_device::device_reset()
  */
 inline int delta(int o, int n)
 {
-	if(o>n) {
-		if(o-n<128) return n-o;
-		else return n+255-o;
-		}
-	if(o<n) {
-		if(n-o<128) return n-o;
-		else return n-255-o;
-		}
+	if (o > n) {
+		if (o-n < 128) return n - o;
+		else return n + 255 - o;
+	}
+	if (o < n) {
+		if (n-o < 128) return n - o;
+		else return n - 255 - o;
+	}
 
 	return 0;
 }
@@ -69,7 +69,7 @@ TIMER_CALLBACK_MEMBER( juku_mouse_device::poll_delta )
 	}
 }
 
-INPUT_PORTS_START( juku_mouse )
+static INPUT_PORTS_START( juku_mouse )
 	PORT_START("MOUSE_X")
 	PORT_BIT(0xff, 0x00, IPT_MOUSE_X) PORT_CODE(MOUSECODE_X) PORT_SENSITIVITY(23)
 
@@ -98,12 +98,12 @@ uint8_t juku_mouse_device::mouse_port_r()
 	int dy = delta(m_prev_mouse_y, y);
 
 	if (dx != 0) {
-		data |= dx > 0 ? 0b00001000 : 0b00001100;
+		data |= (dx > 0) ? 0b00001000 : 0b00001100;
 		m_prev_mouse_x = x;
 	}
 
 	if (dy != 0) {
-		data |= dy > 0 ? 0b00110000 : 0b00100000;
+		data |= (dy > 0) ? 0b00110000 : 0b00100000;
 		m_prev_mouse_y = y;
 	}
 
