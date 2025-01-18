@@ -165,7 +165,7 @@ void ghostb_state::gondo_i8751_hi_w(u8 data)
 
 void oscar_state::bank_w(u8 data)
 {
-	m_mainbank->set_entry(data & 0x0f);
+	m_mainbank->set_entry(data & m_bank_mask);
 }
 
 // Used by Ghostbusters, Meikyuu Hunter G & Gondomania
@@ -177,7 +177,7 @@ void ghostb_state::ghostb_bank_w(u8 data)
 	   Bit 3: Screen flip
 	   Bits 4-7: Bank switch
 	*/
-	m_mainbank->set_entry(data >> 4);
+	m_mainbank->set_entry(data >> 4 & m_bank_mask);
 
 	m_secclr = BIT(data, 0);
 	if (!m_secclr)
@@ -205,7 +205,7 @@ void csilver_state::control_w(u8 data)
 	    Bit 0x40 - Unused.
 	    Bit 0x80 - Hold subcpu reset line high if clear, else low?  (Not needed anyway)
 	*/
-	m_mainbank->set_entry(data & 0x0f);
+	m_mainbank->set_entry(data & m_bank_mask);
 }
 
 void ghostb_state::sound_w(u8 data)
@@ -1873,9 +1873,10 @@ void lastmisn_state::shackled_coin_irq(int state)
 
 void dec8_state_base::machine_start()
 {
-	u8 *ROM = memregion("maincpu")->base();
-	u32 max_bank = (memregion("maincpu")->bytes() - 0x10000) / 0x4000;
-	m_mainbank->configure_entries(0, max_bank, &ROM[0x10000], 0x4000);
+	u8 *ROM = memregion("mainbank")->base();
+	u8 max_bank = memregion("mainbank")->bytes() / 0x4000;
+	m_mainbank->configure_entries(0, max_bank, &ROM[0], 0x4000);
+	m_bank_mask = (max_bank - 1) & 0xf;
 
 	save_item(NAME(m_coin_state));
 	save_item(NAME(m_scroll));
@@ -2513,123 +2514,131 @@ void oscar_state::cobracom(machine_config &config)
 /******************************************************************************/
 
 ROM_START( lastmisn )
-	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "last_mission_dl03-8.13h", 0x08000, 0x08000, CRC(a4f8d54b) SHA1(4525826fa5d12c22e0f3bc1c3a9673b86a34aad1) ) // Rev 8 roms
-	ROM_LOAD( "last_mission_dl04-5.7h",  0x10000, 0x10000, CRC(7dea1552) SHA1(920684413e2ba4313111e79821c5714977b26b1a) )
+
+	ROM_REGION( 0x10000, "mainbank", 0 )
+	ROM_LOAD( "last_mission_dl04-5.7h",  0x00000, 0x10000, CRC(7dea1552) SHA1(920684413e2ba4313111e79821c5714977b26b1a) )
 
 	ROM_REGION( 0x10000, "sub", 0 ) // CPU 2, 1st 16k is empty
 	ROM_LOAD( "last_mission_dl02-5.18h", 0x0000, 0x10000, CRC(ec9b5daf) SHA1(86d47bad123676abc82dd7c92943878c54c33075) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "last_mission_dl05-.5h",    0x8000, 0x8000, CRC(1a5df8c0) SHA1(83d36b1d5fb87f50c44f3110804d6bbdbbc0da99) )
+	ROM_LOAD( "last_mission_dl05-.5h",   0x8000, 0x8000, CRC(1a5df8c0) SHA1(83d36b1d5fb87f50c44f3110804d6bbdbbc0da99) )
 
 	ROM_REGION( 0x1000, "mcu", 0 ) // i8751 microcontroller
 	ROM_LOAD( "last_mission_dl00-e.18a", 0x0000, 0x1000, CRC(e97481c6) SHA1(5c6b0e3585712c03b1b657c814c502c396ffa333) BAD_DUMP ) // not verified to be the same data as the "A" MCU dump
 
 	ROM_REGION( 0x08000, "char", 0 )
-	ROM_LOAD( "last_mission_dl01-.2a",    0x00000, 0x2000, CRC(f3787a5d) SHA1(3701df42cb2aca951963703e72c6c7b272eed82b) )
-	ROM_CONTINUE(                         0x06000, 0x2000 )
-	ROM_CONTINUE(                         0x04000, 0x2000 )
-	ROM_CONTINUE(                         0x02000, 0x2000 )
+	ROM_LOAD( "last_mission_dl01-.2a",   0x00000, 0x2000, CRC(f3787a5d) SHA1(3701df42cb2aca951963703e72c6c7b272eed82b) )
+	ROM_CONTINUE(                        0x06000, 0x2000 )
+	ROM_CONTINUE(                        0x04000, 0x2000 )
+	ROM_CONTINUE(                        0x02000, 0x2000 )
 
 	ROM_REGION( 0x80000, "sprites", 0 )
-	ROM_LOAD( "last_mission_dl11-.13f",   0x00000, 0x08000, CRC(36579d3b) SHA1(8edf952dafcd5bc66e08074687f0bec809fd4c2f) )
-	ROM_LOAD( "last_mission_dl12-.9f",    0x20000, 0x08000, CRC(2ba6737e) SHA1(c5e4c27726bf14e9cd60d62e2f17ea5be8093c37) )
-	ROM_LOAD( "last_mission_dl13-.8f",    0x40000, 0x08000, CRC(39a7dc93) SHA1(3b7968fd06ac0379525c1d3e73f8bbe18ea36439) )
-	ROM_LOAD( "last_mission_dl10-.16f",   0x60000, 0x08000, CRC(fe275ea8) SHA1(2f089f96583235f1f5226ef2a64b430d84efbeee) )
+	ROM_LOAD( "last_mission_dl11-.13f",  0x00000, 0x08000, CRC(36579d3b) SHA1(8edf952dafcd5bc66e08074687f0bec809fd4c2f) )
+	ROM_LOAD( "last_mission_dl12-.9f",   0x20000, 0x08000, CRC(2ba6737e) SHA1(c5e4c27726bf14e9cd60d62e2f17ea5be8093c37) )
+	ROM_LOAD( "last_mission_dl13-.8f",   0x40000, 0x08000, CRC(39a7dc93) SHA1(3b7968fd06ac0379525c1d3e73f8bbe18ea36439) )
+	ROM_LOAD( "last_mission_dl10-.16f",  0x60000, 0x08000, CRC(fe275ea8) SHA1(2f089f96583235f1f5226ef2a64b430d84efbeee) )
 
 	ROM_REGION( 0x80000, "tiles1", 0 )
-	ROM_LOAD( "last_mission_dl09-.12k",   0x00000, 0x10000, CRC(6a5a0c5d) SHA1(0106cf693c284be5faf96e56b651fab92a410915) )
-	ROM_LOAD( "last_mission_dl08-.14k",   0x20000, 0x10000, CRC(3b38cfce) SHA1(d6829bed6916fb301c08031bd466ee4dcc05b275) )
-	ROM_LOAD( "last_mission_dl07-.15k",   0x40000, 0x10000, CRC(1b60604d) SHA1(1ee15cfdac87f7eeb92050766293b894cfad1466) )
-	ROM_LOAD( "last_mission_dl06-.17k",   0x60000, 0x10000, CRC(c43c26a7) SHA1(896e278935b100edc12cd970469f2e8293eb96cc) )
+	ROM_LOAD( "last_mission_dl09-.12k",  0x00000, 0x10000, CRC(6a5a0c5d) SHA1(0106cf693c284be5faf96e56b651fab92a410915) )
+	ROM_LOAD( "last_mission_dl08-.14k",  0x20000, 0x10000, CRC(3b38cfce) SHA1(d6829bed6916fb301c08031bd466ee4dcc05b275) )
+	ROM_LOAD( "last_mission_dl07-.15k",  0x40000, 0x10000, CRC(1b60604d) SHA1(1ee15cfdac87f7eeb92050766293b894cfad1466) )
+	ROM_LOAD( "last_mission_dl06-.17k",  0x60000, 0x10000, CRC(c43c26a7) SHA1(896e278935b100edc12cd970469f2e8293eb96cc) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "dl-14.9c",    0x0000, 0x0100, CRC(2e55aa12) SHA1(c0f2b9649467eb9d2c1e47589b5990f5c5e8cc93) ) // Priority (Not yet used)
 ROM_END
 
 ROM_START( lastmisnu6 )
-	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "last_mission_dl03-6.13h", 0x08000, 0x08000, CRC(47751a5e) SHA1(190970a6eb849781e8853f2bed7b34ac44e569ca) ) // Rev 6 roms
-	ROM_LOAD( "last_mission_dl04-5.7h",  0x10000, 0x10000, CRC(7dea1552) SHA1(920684413e2ba4313111e79821c5714977b26b1a) )
+
+	ROM_REGION( 0x10000, "mainbank", 0 )
+	ROM_LOAD( "last_mission_dl04-5.7h",  0x00000, 0x10000, CRC(7dea1552) SHA1(920684413e2ba4313111e79821c5714977b26b1a) )
 
 	ROM_REGION( 0x10000, "sub", 0 ) // CPU 2, 1st 16k is empty
 	ROM_LOAD( "last_mission_dl02-5.18h", 0x0000, 0x10000, CRC(ec9b5daf) SHA1(86d47bad123676abc82dd7c92943878c54c33075) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "last_mission_dl05-.5h",    0x8000, 0x8000, CRC(1a5df8c0) SHA1(83d36b1d5fb87f50c44f3110804d6bbdbbc0da99) )
+	ROM_LOAD( "last_mission_dl05-.5h",   0x8000, 0x8000, CRC(1a5df8c0) SHA1(83d36b1d5fb87f50c44f3110804d6bbdbbc0da99) )
 
 	ROM_REGION( 0x1000, "mcu", 0 ) // i8751 microcontroller
 	ROM_LOAD( "last_mission_dl00-a.18a", 0x0000, 0x1000, CRC(e97481c6) SHA1(5c6b0e3585712c03b1b657c814c502c396ffa333) ) // Hand written "A", some MCUs are known to be labeled DL00-7, it's not verified to be the same data
 
 	ROM_REGION( 0x08000, "char", 0 )
-	ROM_LOAD( "last_mission_dl01-.2a",    0x00000, 0x2000, CRC(f3787a5d) SHA1(3701df42cb2aca951963703e72c6c7b272eed82b) )
-	ROM_CONTINUE(                         0x06000, 0x2000 )
-	ROM_CONTINUE(                         0x04000, 0x2000 )
-	ROM_CONTINUE(                         0x02000, 0x2000 )
+	ROM_LOAD( "last_mission_dl01-.2a",   0x00000, 0x2000, CRC(f3787a5d) SHA1(3701df42cb2aca951963703e72c6c7b272eed82b) )
+	ROM_CONTINUE(                        0x06000, 0x2000 )
+	ROM_CONTINUE(                        0x04000, 0x2000 )
+	ROM_CONTINUE(                        0x02000, 0x2000 )
 
 	ROM_REGION( 0x80000, "sprites", 0 )
-	ROM_LOAD( "last_mission_dl11-.13f",   0x00000, 0x08000, CRC(36579d3b) SHA1(8edf952dafcd5bc66e08074687f0bec809fd4c2f) )
-	ROM_LOAD( "last_mission_dl12-.9f",    0x20000, 0x08000, CRC(2ba6737e) SHA1(c5e4c27726bf14e9cd60d62e2f17ea5be8093c37) )
-	ROM_LOAD( "last_mission_dl13-.8f",    0x40000, 0x08000, CRC(39a7dc93) SHA1(3b7968fd06ac0379525c1d3e73f8bbe18ea36439) )
-	ROM_LOAD( "last_mission_dl10-.16f",   0x60000, 0x08000, CRC(fe275ea8) SHA1(2f089f96583235f1f5226ef2a64b430d84efbeee) )
+	ROM_LOAD( "last_mission_dl11-.13f",  0x00000, 0x08000, CRC(36579d3b) SHA1(8edf952dafcd5bc66e08074687f0bec809fd4c2f) )
+	ROM_LOAD( "last_mission_dl12-.9f",   0x20000, 0x08000, CRC(2ba6737e) SHA1(c5e4c27726bf14e9cd60d62e2f17ea5be8093c37) )
+	ROM_LOAD( "last_mission_dl13-.8f",   0x40000, 0x08000, CRC(39a7dc93) SHA1(3b7968fd06ac0379525c1d3e73f8bbe18ea36439) )
+	ROM_LOAD( "last_mission_dl10-.16f",  0x60000, 0x08000, CRC(fe275ea8) SHA1(2f089f96583235f1f5226ef2a64b430d84efbeee) )
 
 	ROM_REGION( 0x80000, "tiles1", 0 )
-	ROM_LOAD( "last_mission_dl09-.12k",   0x00000, 0x10000, CRC(6a5a0c5d) SHA1(0106cf693c284be5faf96e56b651fab92a410915) )
-	ROM_LOAD( "last_mission_dl08-.14k",   0x20000, 0x10000, CRC(3b38cfce) SHA1(d6829bed6916fb301c08031bd466ee4dcc05b275) )
-	ROM_LOAD( "last_mission_dl07-.15k",   0x40000, 0x10000, CRC(1b60604d) SHA1(1ee15cfdac87f7eeb92050766293b894cfad1466) )
-	ROM_LOAD( "last_mission_dl06-.17k",   0x60000, 0x10000, CRC(c43c26a7) SHA1(896e278935b100edc12cd970469f2e8293eb96cc) )
+	ROM_LOAD( "last_mission_dl09-.12k",  0x00000, 0x10000, CRC(6a5a0c5d) SHA1(0106cf693c284be5faf96e56b651fab92a410915) )
+	ROM_LOAD( "last_mission_dl08-.14k",  0x20000, 0x10000, CRC(3b38cfce) SHA1(d6829bed6916fb301c08031bd466ee4dcc05b275) )
+	ROM_LOAD( "last_mission_dl07-.15k",  0x40000, 0x10000, CRC(1b60604d) SHA1(1ee15cfdac87f7eeb92050766293b894cfad1466) )
+	ROM_LOAD( "last_mission_dl06-.17k",  0x60000, 0x10000, CRC(c43c26a7) SHA1(896e278935b100edc12cd970469f2e8293eb96cc) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "dl-14.9c",    0x0000, 0x0100, CRC(2e55aa12) SHA1(c0f2b9649467eb9d2c1e47589b5990f5c5e8cc93) ) // Priority (Not yet used)
 ROM_END
 
 ROM_START( lastmisnu5 )
-	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "last_mission_dl03-5.13h", 0x08000, 0x08000, CRC(357f5f6b) SHA1(a114aac50db62a6bcb943681e517ad7c88ec47f4) ) // Rev 5 roms
-	ROM_LOAD( "last_mission_dl04-5.7h",  0x10000, 0x10000, CRC(7dea1552) SHA1(920684413e2ba4313111e79821c5714977b26b1a) )
+
+	ROM_REGION( 0x10000, "mainbank", 0 )
+	ROM_LOAD( "last_mission_dl04-5.7h",  0x00000, 0x10000, CRC(7dea1552) SHA1(920684413e2ba4313111e79821c5714977b26b1a) )
 
 	ROM_REGION( 0x10000, "sub", 0 ) // CPU 2, 1st 16k is empty
 	ROM_LOAD( "last_mission_dl02-5.18h", 0x0000, 0x10000, CRC(ec9b5daf) SHA1(86d47bad123676abc82dd7c92943878c54c33075) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "last_mission_dl05-.5h",    0x8000, 0x8000, CRC(1a5df8c0) SHA1(83d36b1d5fb87f50c44f3110804d6bbdbbc0da99) )
+	ROM_LOAD( "last_mission_dl05-.5h",   0x8000, 0x8000, CRC(1a5df8c0) SHA1(83d36b1d5fb87f50c44f3110804d6bbdbbc0da99) )
 
 	ROM_REGION( 0x1000, "mcu", 0 ) // i8751 microcontroller
 	ROM_LOAD( "last_mission_dl00-a.18a", 0x0000, 0x1000, CRC(e97481c6) SHA1(5c6b0e3585712c03b1b657c814c502c396ffa333) ) // Hand written "A", some MCUs are known to be labeled DL00-7, it's not verified to be the same data
 
 	ROM_REGION( 0x08000, "char", 0 )
-	ROM_LOAD( "last_mission_dl01-.2a",    0x00000, 0x2000, CRC(f3787a5d) SHA1(3701df42cb2aca951963703e72c6c7b272eed82b) )
-	ROM_CONTINUE(                         0x06000, 0x2000 )
-	ROM_CONTINUE(                         0x04000, 0x2000 )
-	ROM_CONTINUE(                         0x02000, 0x2000 )
+	ROM_LOAD( "last_mission_dl01-.2a",   0x00000, 0x2000, CRC(f3787a5d) SHA1(3701df42cb2aca951963703e72c6c7b272eed82b) )
+	ROM_CONTINUE(                        0x06000, 0x2000 )
+	ROM_CONTINUE(                        0x04000, 0x2000 )
+	ROM_CONTINUE(                        0x02000, 0x2000 )
 
 	ROM_REGION( 0x80000, "sprites", 0 )
-	ROM_LOAD( "last_mission_dl11-.13f",   0x00000, 0x08000, CRC(36579d3b) SHA1(8edf952dafcd5bc66e08074687f0bec809fd4c2f) )
-	ROM_LOAD( "last_mission_dl12-.9f",    0x20000, 0x08000, CRC(2ba6737e) SHA1(c5e4c27726bf14e9cd60d62e2f17ea5be8093c37) )
-	ROM_LOAD( "last_mission_dl13-.8f",    0x40000, 0x08000, CRC(39a7dc93) SHA1(3b7968fd06ac0379525c1d3e73f8bbe18ea36439) )
-	ROM_LOAD( "last_mission_dl10-.16f",   0x60000, 0x08000, CRC(fe275ea8) SHA1(2f089f96583235f1f5226ef2a64b430d84efbeee) )
+	ROM_LOAD( "last_mission_dl11-.13f",  0x00000, 0x08000, CRC(36579d3b) SHA1(8edf952dafcd5bc66e08074687f0bec809fd4c2f) )
+	ROM_LOAD( "last_mission_dl12-.9f",   0x20000, 0x08000, CRC(2ba6737e) SHA1(c5e4c27726bf14e9cd60d62e2f17ea5be8093c37) )
+	ROM_LOAD( "last_mission_dl13-.8f",   0x40000, 0x08000, CRC(39a7dc93) SHA1(3b7968fd06ac0379525c1d3e73f8bbe18ea36439) )
+	ROM_LOAD( "last_mission_dl10-.16f",  0x60000, 0x08000, CRC(fe275ea8) SHA1(2f089f96583235f1f5226ef2a64b430d84efbeee) )
 
 	ROM_REGION( 0x80000, "tiles1", 0 )
-	ROM_LOAD( "last_mission_dl09-.12k",   0x00000, 0x10000, CRC(6a5a0c5d) SHA1(0106cf693c284be5faf96e56b651fab92a410915) )
-	ROM_LOAD( "last_mission_dl08-.14k",   0x20000, 0x10000, CRC(3b38cfce) SHA1(d6829bed6916fb301c08031bd466ee4dcc05b275) )
-	ROM_LOAD( "last_mission_dl07-.15k",   0x40000, 0x10000, CRC(1b60604d) SHA1(1ee15cfdac87f7eeb92050766293b894cfad1466) )
-	ROM_LOAD( "last_mission_dl06-.17k",   0x60000, 0x10000, CRC(c43c26a7) SHA1(896e278935b100edc12cd970469f2e8293eb96cc) )
+	ROM_LOAD( "last_mission_dl09-.12k",  0x00000, 0x10000, CRC(6a5a0c5d) SHA1(0106cf693c284be5faf96e56b651fab92a410915) )
+	ROM_LOAD( "last_mission_dl08-.14k",  0x20000, 0x10000, CRC(3b38cfce) SHA1(d6829bed6916fb301c08031bd466ee4dcc05b275) )
+	ROM_LOAD( "last_mission_dl07-.15k",  0x40000, 0x10000, CRC(1b60604d) SHA1(1ee15cfdac87f7eeb92050766293b894cfad1466) )
+	ROM_LOAD( "last_mission_dl06-.17k",  0x60000, 0x10000, CRC(c43c26a7) SHA1(896e278935b100edc12cd970469f2e8293eb96cc) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "dl-14.9c",    0x00000, 0x0100, CRC(2e55aa12) SHA1(c0f2b9649467eb9d2c1e47589b5990f5c5e8cc93) ) // Priority (Not yet used)
 ROM_END
 
 ROM_START( lastmisnj )
-	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dl03-.13h",   0x08000, 0x08000, CRC(4be5e7e1) SHA1(9f943658663da31947cebdcbcb5f4e2be0714c06) )
-	ROM_LOAD( "dl04-.7h",    0x10000, 0x10000, CRC(f026adf9) SHA1(4ccd0e714a6eb7cee388c93beee2d5510407c961) )
+
+	ROM_REGION( 0x10000, "mainbank", 0 )
+	ROM_LOAD( "dl04-.7h",    0x00000, 0x10000, CRC(f026adf9) SHA1(4ccd0e714a6eb7cee388c93beee2d5510407c961) )
 
 	ROM_REGION( 0x10000, "sub", 0 ) // CPU 2, 1st 16k is empty
 	ROM_LOAD( "dl02-.18h",   0x0000, 0x10000, CRC(d0de2b5d) SHA1(e0bb34c2a2ef6fc6f05ab9a98bd23a39004c0c05) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "last_mission_dl05-.5h",    0x8000, 0x8000, CRC(1a5df8c0) SHA1(83d36b1d5fb87f50c44f3110804d6bbdbbc0da99) )
+	ROM_LOAD( "last_mission_dl05-.5h",  0x8000, 0x8000, CRC(1a5df8c0) SHA1(83d36b1d5fb87f50c44f3110804d6bbdbbc0da99) )
 
 	ROM_REGION( 0x1000, "mcu", 0 ) // created from dump of the US version
 	ROM_LOAD( "last_mission_japan.18a", 0x0000, 0x1000, BAD_DUMP CRC(0d58c3a1) SHA1(184e75324b7ab2de8e6441f0c954046db80b2640) ) // correct ROM label when real MCU is dumped
@@ -2657,13 +2666,15 @@ ROM_START( lastmisnj )
 ROM_END
 
 ROM_START( shackled )
-	ROM_REGION( 0x50000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dk-02.13h", 0x08000, 0x08000, CRC(87f8fa85) SHA1(1cb93a60eefdb453a3cc6ec9c5cc2e367fb8aeb0) )
-	ROM_LOAD( "dk-06.7h",  0x10000, 0x10000, CRC(69ad62d1) SHA1(1aa23b12ab4f1908cddd25f091e1f9bd70a5113c) )
-	ROM_LOAD( "dk-05.9h",  0x20000, 0x10000, CRC(598dd128) SHA1(10843c5352eef03c8675df6abaf23c9c9c795aa3) )
-	ROM_LOAD( "dk-04.10h", 0x30000, 0x10000, CRC(36d305d4) SHA1(17586c316aff405cf20c1467d69c98fa2a3c2630) )
-	ROM_LOAD( "dk-03.11h", 0x40000, 0x08000, CRC(6fd90fd1) SHA1(2f8db17e5545c82d243a7e23e7bda2c2a9101360) )
-	ROM_RELOAD(            0x48000, 0x08000 )
+
+	ROM_REGION( 0x40000, "mainbank", 0 )
+	ROM_LOAD( "dk-06.7h",  0x00000, 0x10000, CRC(69ad62d1) SHA1(1aa23b12ab4f1908cddd25f091e1f9bd70a5113c) )
+	ROM_LOAD( "dk-05.9h",  0x10000, 0x10000, CRC(598dd128) SHA1(10843c5352eef03c8675df6abaf23c9c9c795aa3) )
+	ROM_LOAD( "dk-04.10h", 0x20000, 0x10000, CRC(36d305d4) SHA1(17586c316aff405cf20c1467d69c98fa2a3c2630) )
+	ROM_LOAD( "dk-03.11h", 0x30000, 0x08000, CRC(6fd90fd1) SHA1(2f8db17e5545c82d243a7e23e7bda2c2a9101360) )
+	ROM_RELOAD(            0x38000, 0x08000 )
 
 	ROM_REGION( 0x10000, "sub", 0 ) // CPU 2, 1st 16k is empty
 	ROM_LOAD( "dk-01.18h", 0x00000, 0x10000, CRC(71fe3bda) SHA1(959cce01362b2c670c2e15b03a78a1ff9cea4ee9) )
@@ -2698,13 +2709,15 @@ ROM_START( shackled )
 ROM_END
 
 ROM_START( breywood )
-	ROM_REGION( 0x50000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dj02-2.13h", 0x08000, 0x08000, CRC(c19856b9) SHA1(766994703bb59879c311675353d7231ad27c7c16) )
-	ROM_LOAD( "dj06-2.7h",  0x10000, 0x10000, CRC(2860ea02) SHA1(7ac090c3ae9d71baa6227ec9555f1c9f2d25ea0d) )
-	ROM_LOAD( "dj05-2.9h",  0x20000, 0x10000, CRC(0fdd915e) SHA1(262df956dfc727c710ade28af7f33fddaafd7ee2) )
-	ROM_LOAD( "dj04-2.10h", 0x30000, 0x10000, CRC(71036579) SHA1(c58ff3222b5bcd75d58c5f282554e92103e80916) )
-	ROM_LOAD( "dj03-2.11h", 0x40000, 0x08000, CRC(308f4893) SHA1(539c138ff01c5718cc8a982482b989468d532699) )
-	ROM_RELOAD(             0x48000, 0x08000 )
+
+	ROM_REGION( 0x40000, "mainbank", 0 )
+	ROM_LOAD( "dj06-2.7h",  0x00000, 0x10000, CRC(2860ea02) SHA1(7ac090c3ae9d71baa6227ec9555f1c9f2d25ea0d) )
+	ROM_LOAD( "dj05-2.9h",  0x10000, 0x10000, CRC(0fdd915e) SHA1(262df956dfc727c710ade28af7f33fddaafd7ee2) )
+	ROM_LOAD( "dj04-2.10h", 0x20000, 0x10000, CRC(71036579) SHA1(c58ff3222b5bcd75d58c5f282554e92103e80916) )
+	ROM_LOAD( "dj03-2.11h", 0x30000, 0x08000, CRC(308f4893) SHA1(539c138ff01c5718cc8a982482b989468d532699) )
+	ROM_RELOAD(             0x38000, 0x08000 )
 
 	ROM_REGION( 0x10000, "sub", 0 ) // CPU 2, 1st 16k is empty
 	ROM_LOAD( "dj1-2y.18h", 0x0000, 0x10000, CRC(3d9fb623) SHA1(6e5eaad9bb0a432e2da5da5b18a2ed36617bdde2) )
@@ -2739,11 +2752,14 @@ ROM_START( breywood )
 ROM_END
 
 ROM_START( gondo )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dt00-e.f3", 0x08000, 0x08000, CRC(912a7eee) SHA1(15af89babf166dadaa77640e1973d7ebb4c078db) ) // Verified only DT00-E & DT03-E have the "-E" extention
-	ROM_LOAD( "dt01.f5",   0x10000, 0x10000, CRC(c39bb877) SHA1(9beb59ba19f38417c5d4d36e8f3c41f2b017d2d6) )
-	ROM_LOAD( "dt02.f6",   0x20000, 0x10000, CRC(925307a4) SHA1(1e8b8eb21df1a11b14c981b343b34c6cc3676517) ) // same label as the US version, but content identical to Japanese version
-	ROM_LOAD( "dt03-e.f7", 0x30000, 0x10000, CRC(ee7475eb) SHA1(8c68198ea1c3e89c9c2c4ba0e5d3f47afb8eecd4) )
+
+	ROM_REGION( 0x40000, "mainbank", 0 )
+	ROM_LOAD( "dt01.f5",   0x00000, 0x10000, CRC(c39bb877) SHA1(9beb59ba19f38417c5d4d36e8f3c41f2b017d2d6) )
+	ROM_LOAD( "dt02.f6",   0x10000, 0x10000, CRC(925307a4) SHA1(1e8b8eb21df1a11b14c981b343b34c6cc3676517) ) // same label as the US version, but content identical to Japanese version
+	ROM_LOAD( "dt03-e.f7", 0x20000, 0x10000, CRC(ee7475eb) SHA1(8c68198ea1c3e89c9c2c4ba0e5d3f47afb8eecd4) )
+	ROM_FILL(              0x30000, 0x10000, 0xff)
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "dt05-e.h5", 0x8000, 0x8000, CRC(ec08aa29) SHA1(ce83974ae095d9518d1ebf9f7e712f0cbc2c1b42) )
@@ -2783,11 +2799,14 @@ ROM_START( gondo )
 ROM_END
 
 ROM_START( gondou )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dt00.f3", 0x08000, 0x08000, CRC(a8cf9118) SHA1(865744c9866957d686a31608d356e279fe58934e) )
-	ROM_LOAD( "dt01.f5", 0x10000, 0x10000, CRC(c39bb877) SHA1(9beb59ba19f38417c5d4d36e8f3c41f2b017d2d6) )
-	ROM_LOAD( "dt02.f6", 0x20000, 0x10000, CRC(bb5e674b) SHA1(8057dc7464a8b6987536f248d607957923b223cf) )
-	ROM_LOAD( "dt03.f7", 0x30000, 0x10000, CRC(99c32b13) SHA1(3d79f48e7d198cb2e519d592a89eda505044bce5) )
+
+	ROM_REGION( 0x40000, "mainbank", 0 )
+	ROM_LOAD( "dt01.f5", 0x00000, 0x10000, CRC(c39bb877) SHA1(9beb59ba19f38417c5d4d36e8f3c41f2b017d2d6) )
+	ROM_LOAD( "dt02.f6", 0x10000, 0x10000, CRC(bb5e674b) SHA1(8057dc7464a8b6987536f248d607957923b223cf) )
+	ROM_LOAD( "dt03.f7", 0x20000, 0x10000, CRC(99c32b13) SHA1(3d79f48e7d198cb2e519d592a89eda505044bce5) )
+	ROM_FILL(            0x30000, 0x10000, 0xff)
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "dt05.h5", 0x8000, 0x8000, CRC(ec08aa29) SHA1(ce83974ae095d9518d1ebf9f7e712f0cbc2c1b42) ) // == dt05-e.h5
@@ -2827,11 +2846,14 @@ ROM_START( gondou )
 ROM_END
 
 ROM_START( makyosen )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ds00.f3", 0x08000, 0x08000, CRC(33bb16fe) SHA1(5d3873b66e0d08b35d56a8b508c774b27368a100) )
-	ROM_LOAD( "ds01.f5", 0x10000, 0x10000, CRC(c39bb877) SHA1(9beb59ba19f38417c5d4d36e8f3c41f2b017d2d6) )
-	ROM_LOAD( "ds02.f6", 0x20000, 0x10000, CRC(925307a4) SHA1(1e8b8eb21df1a11b14c981b343b34c6cc3676517) )
-	ROM_LOAD( "ds03.f7", 0x30000, 0x10000, CRC(9c0fcbf6) SHA1(bfe42b5277fea111840a9f59b2cb8dfe44444029) )
+
+	ROM_REGION( 0x40000, "mainbank", 0 )
+	ROM_LOAD( "ds01.f5", 0x00000, 0x10000, CRC(c39bb877) SHA1(9beb59ba19f38417c5d4d36e8f3c41f2b017d2d6) )
+	ROM_LOAD( "ds02.f6", 0x10000, 0x10000, CRC(925307a4) SHA1(1e8b8eb21df1a11b14c981b343b34c6cc3676517) )
+	ROM_LOAD( "ds03.f7", 0x20000, 0x10000, CRC(9c0fcbf6) SHA1(bfe42b5277fea111840a9f59b2cb8dfe44444029) )
+	ROM_FILL(            0x30000, 0x10000, 0xff)
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "ds05.h5",  0x8000, 0x8000, CRC(e6e28ca9) SHA1(3b1f8219331db1910bfb428f8964f8fc1063df6f) ) // == dt05-e.h5
@@ -2876,12 +2898,14 @@ ROM_START( makyosen )
 ROM_END
 
 ROM_START( garyoret )
-	ROM_REGION( 0x50000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dv00", 0x08000, 0x08000, CRC(cceaaf05) SHA1(b8f54638feab77d023e01ced947e1269f0d19fd8) )
-	ROM_LOAD( "dv01", 0x10000, 0x10000, CRC(c33fc18a) SHA1(0d9594b0e6c39aea5b9f15f6aa364b31604f1066) )
-	ROM_LOAD( "dv02", 0x20000, 0x10000, CRC(f9e26ce7) SHA1(8589594ebc7ae16942739382273a222dfa30b3b7) )
-	ROM_LOAD( "dv03", 0x30000, 0x10000, CRC(55d8d699) SHA1(da1519cd54d27cc406420ce0845e43f7228cfd4e) )
-	ROM_LOAD( "dv04", 0x40000, 0x10000, CRC(ed3d00ee) SHA1(6daa2ee509235ad03d3012a00382820279add620) )
+
+	ROM_REGION( 0x40000, "mainbank", 0 )
+	ROM_LOAD( "dv01", 0x00000, 0x10000, CRC(c33fc18a) SHA1(0d9594b0e6c39aea5b9f15f6aa364b31604f1066) )
+	ROM_LOAD( "dv02", 0x10000, 0x10000, CRC(f9e26ce7) SHA1(8589594ebc7ae16942739382273a222dfa30b3b7) )
+	ROM_LOAD( "dv03", 0x20000, 0x10000, CRC(55d8d699) SHA1(da1519cd54d27cc406420ce0845e43f7228cfd4e) )
+	ROM_LOAD( "dv04", 0x30000, 0x10000, CRC(ed3d00ee) SHA1(6daa2ee509235ad03d3012a00382820279add620) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "dv05", 0x08000, 0x08000, CRC(c97c347f) SHA1(a1b22733dc15d524af97db3e608a82503a49b182) )
@@ -2925,12 +2949,14 @@ ROM_START( garyoret )
 ROM_END
 
 ROM_START( ghostb )
-	ROM_REGION( 0x50000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dz01-22.1d", 0x08000, 0x08000, CRC(fc65fdf2) SHA1(b6ffe2043d5dbff061a9806631646428eed95dd3) )
-	ROM_LOAD( "dz02.3d",    0x10000, 0x10000, CRC(8e117541) SHA1(7dfa6eabb29f39a615f3e5123bddcc7197ab82d0) )
-	ROM_LOAD( "dz03.4d",    0x20000, 0x10000, CRC(5606a8f4) SHA1(e46e887f13f648fe2162cb853b3c20fa60e3d215) )
-	ROM_LOAD( "dz04-21.6d", 0x30000, 0x10000, CRC(7d46582f) SHA1(22e70675d76e2a93a732370fa42cc4b79381f4b0) )
-	ROM_LOAD( "dz05-21.7d", 0x40000, 0x10000, CRC(23e1c758) SHA1(c6432682e1d4429d0cfa8de6a05ca0152611b5b1) )
+
+	ROM_REGION( 0x40000, "mainbank", 0 )
+	ROM_LOAD( "dz02.3d",    0x00000, 0x10000, CRC(8e117541) SHA1(7dfa6eabb29f39a615f3e5123bddcc7197ab82d0) )
+	ROM_LOAD( "dz03.4d",    0x10000, 0x10000, CRC(5606a8f4) SHA1(e46e887f13f648fe2162cb853b3c20fa60e3d215) )
+	ROM_LOAD( "dz04-21.6d", 0x20000, 0x10000, CRC(7d46582f) SHA1(22e70675d76e2a93a732370fa42cc4b79381f4b0) )
+	ROM_LOAD( "dz05-21.7d", 0x30000, 0x10000, CRC(23e1c758) SHA1(c6432682e1d4429d0cfa8de6a05ca0152611b5b1) )
 
 	ROM_REGION( 2*0x10000, "audiocpu", 0 ) // 64K for sound CPU + 64k for decrypted opcodes
 	ROM_LOAD( "dz06.5f", 0x8000, 0x8000, CRC(798f56df) SHA1(aee33cd0c102015114e17f6cb98945e7cc806f55) )
@@ -2963,12 +2989,14 @@ ROM_START( ghostb )
 ROM_END
 
 ROM_START( ghostb2a )
-	ROM_REGION( 0x50000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dz01.1d", 0x08000, 0x08000, CRC(7c5bb4b1) SHA1(75865102c9bfbf9bd341b8ea54f49904c727f474) )
-	ROM_LOAD( "dz02.3d", 0x10000, 0x10000, CRC(8e117541) SHA1(7dfa6eabb29f39a615f3e5123bddcc7197ab82d0) )
-	ROM_LOAD( "dz03.4d", 0x20000, 0x10000, CRC(5606a8f4) SHA1(e46e887f13f648fe2162cb853b3c20fa60e3d215) )
-	ROM_LOAD( "dz04.6d", 0x30000, 0x10000, CRC(d09bad99) SHA1(bde8e4316cedf1d292f0aed8627b0dc6794c6e07) )
-	ROM_LOAD( "dz05.7d", 0x40000, 0x10000, CRC(0315f691) SHA1(3bfad18b9f230e64c608a22af20c3b00dca3e6da) )
+
+	ROM_REGION( 0x40000, "mainbank", 0 )
+	ROM_LOAD( "dz02.3d", 0x00000, 0x10000, CRC(8e117541) SHA1(7dfa6eabb29f39a615f3e5123bddcc7197ab82d0) )
+	ROM_LOAD( "dz03.4d", 0x10000, 0x10000, CRC(5606a8f4) SHA1(e46e887f13f648fe2162cb853b3c20fa60e3d215) )
+	ROM_LOAD( "dz04.6d", 0x20000, 0x10000, CRC(d09bad99) SHA1(bde8e4316cedf1d292f0aed8627b0dc6794c6e07) )
+	ROM_LOAD( "dz05.7d", 0x30000, 0x10000, CRC(0315f691) SHA1(3bfad18b9f230e64c608a22af20c3b00dca3e6da) )
 
 	ROM_REGION( 2*0x10000, "audiocpu", 0 ) // 64K for sound CPU + 64k for decrypted opcodes
 	ROM_LOAD( "dz06.5f", 0x8000, 0x8000, CRC(798f56df) SHA1(aee33cd0c102015114e17f6cb98945e7cc806f55) )
@@ -3001,12 +3029,14 @@ ROM_START( ghostb2a )
 ROM_END
 
 ROM_START( ghostb3 )
-	ROM_REGION( 0x50000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dz01-3b.1d", 0x08000, 0x08000, CRC(c8cc862a) SHA1(e736107beb11a12cdf413655c6874df28d5a9c70) )
-	ROM_LOAD( "dz02.3d",    0x10000, 0x10000, CRC(8e117541) SHA1(7dfa6eabb29f39a615f3e5123bddcc7197ab82d0) )
-	ROM_LOAD( "dz03.4d",    0x20000, 0x10000, CRC(5606a8f4) SHA1(e46e887f13f648fe2162cb853b3c20fa60e3d215) )
-	ROM_LOAD( "dz04-1.6d",  0x30000, 0x10000, CRC(3c3eb09f) SHA1(ae4975992698fa97c68a857a25b470a05539160a) )
-	ROM_LOAD( "dz05-1.7d",  0x40000, 0x10000, CRC(b4971d33) SHA1(25e052c4b414c7bd7b6e3ae9c211873902afb5f7) )
+
+	ROM_REGION( 0x40000, "mainbank", 0 )
+	ROM_LOAD( "dz02.3d",    0x00000, 0x10000, CRC(8e117541) SHA1(7dfa6eabb29f39a615f3e5123bddcc7197ab82d0) )
+	ROM_LOAD( "dz03.4d",    0x10000, 0x10000, CRC(5606a8f4) SHA1(e46e887f13f648fe2162cb853b3c20fa60e3d215) )
+	ROM_LOAD( "dz04-1.6d",  0x20000, 0x10000, CRC(3c3eb09f) SHA1(ae4975992698fa97c68a857a25b470a05539160a) )
+	ROM_LOAD( "dz05-1.7d",  0x30000, 0x10000, CRC(b4971d33) SHA1(25e052c4b414c7bd7b6e3ae9c211873902afb5f7) )
 
 	ROM_REGION( 2*0x10000, "audiocpu", 0 ) // 64K for sound CPU + 64k for decrypted opcodes
 	ROM_LOAD( "dz06.5f", 0x8000, 0x8000, CRC(798f56df) SHA1(aee33cd0c102015114e17f6cb98945e7cc806f55) )
@@ -3040,12 +3070,14 @@ ROM_END
 
 // DZ-1 is the verified correct MCU code for the ghostb3a set below, both DZ01-2 & DZ04- ROMs have been verified correct from multiple sources
 ROM_START( ghostb3a )
-	ROM_REGION( 0x50000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dz01-2.1d", 0x08000, 0x08000, CRC(1b16890e) SHA1(eebd253d616b6286937b72cfb64612877f383932) )
-	ROM_LOAD( "dz02-.3d",  0x10000, 0x10000, CRC(8e117541) SHA1(7dfa6eabb29f39a615f3e5123bddcc7197ab82d0) ) // == dz02.3d (ghostb3)
-	ROM_LOAD( "dz03-.4d",  0x20000, 0x10000, CRC(5606a8f4) SHA1(e46e887f13f648fe2162cb853b3c20fa60e3d215) ) // == dz03.4d (ghostb3)
-	ROM_LOAD( "dz04-.6d",  0x30000, 0x10000, CRC(490b4525) SHA1(3066b76f8fe99c8f9f1cdf943209883a199a4184) )
-	ROM_LOAD( "dz05-.7d",  0x40000, 0x10000, CRC(b4971d33) SHA1(25e052c4b414c7bd7b6e3ae9c211873902afb5f7) ) // == dz05-1.7d (ghostb3)
+
+	ROM_REGION( 0x40000, "mainbank", 0 )
+	ROM_LOAD( "dz02-.3d",  0x00000, 0x10000, CRC(8e117541) SHA1(7dfa6eabb29f39a615f3e5123bddcc7197ab82d0) ) // == dz02.3d (ghostb3)
+	ROM_LOAD( "dz03-.4d",  0x10000, 0x10000, CRC(5606a8f4) SHA1(e46e887f13f648fe2162cb853b3c20fa60e3d215) ) // == dz03.4d (ghostb3)
+	ROM_LOAD( "dz04-.6d",  0x20000, 0x10000, CRC(490b4525) SHA1(3066b76f8fe99c8f9f1cdf943209883a199a4184) )
+	ROM_LOAD( "dz05-.7d",  0x30000, 0x10000, CRC(b4971d33) SHA1(25e052c4b414c7bd7b6e3ae9c211873902afb5f7) ) // == dz05-1.7d (ghostb3)
 
 	ROM_REGION( 2*0x10000, "audiocpu", 0 ) // 64K for sound CPU + 64k for decrypted opcodes
 	ROM_LOAD( "dz06.5f", 0x8000, 0x8000, CRC(798f56df) SHA1(aee33cd0c102015114e17f6cb98945e7cc806f55) )
@@ -3164,11 +3196,14 @@ Notes:
 */
 
 ROM_START( meikyuh )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dw01-5.1d", 0x08000, 0x08000, CRC(87610c39) SHA1(47b83e7decd18f117d00a9f55c42da93b337c04a) )
-	ROM_LOAD( "dw02.3d",   0x10000, 0x10000, CRC(40c9b0b8) SHA1(81deb25e00eb4d4c5133ea42cda279c318ee771c) )
-	ROM_LOAD( "dw03.4d",   0x20000, 0x10000, CRC(5606a8f4) SHA1(e46e887f13f648fe2162cb853b3c20fa60e3d215) )
-	ROM_LOAD( "dw04.6d",   0x30000, 0x10000, CRC(235c0c36) SHA1(f0635f8348459cb8a56eb6184f1bc31c3a82de6a) )
+
+	ROM_REGION( 0x40000, "mainbank", 0 )
+	ROM_LOAD( "dw02.3d",   0x00000, 0x10000, CRC(40c9b0b8) SHA1(81deb25e00eb4d4c5133ea42cda279c318ee771c) )
+	ROM_LOAD( "dw03.4d",   0x10000, 0x10000, CRC(5606a8f4) SHA1(e46e887f13f648fe2162cb853b3c20fa60e3d215) )
+	ROM_LOAD( "dw04.6d",   0x20000, 0x10000, CRC(235c0c36) SHA1(f0635f8348459cb8a56eb6184f1bc31c3a82de6a) )
+	ROM_FILL(              0x30000, 0x10000, 0xff)
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "dw05.5f", 0x8000, 0x8000, CRC(c28c4d82) SHA1(ad88506bcbc9763e39d6e6bb25ef2bd6aa929f30) )
@@ -3257,11 +3292,14 @@ ALL MEMORIES ARE MASK ROMS!
 */
 
 ROM_START( meikyuhbl )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "27256.1d", 0x08000, 0x08000, CRC(d5b5e8a2) SHA1(0155d1d0ddbd764b960148c3c9ef34223e101659) ) // dw-01-5.1d matched 6.552124%
-	ROM_LOAD( "24512.3d", 0x10000, 0x10000, CRC(40c9b0b8) SHA1(81deb25e00eb4d4c5133ea42cda279c318ee771c) )
-	ROM_LOAD( "24512.4d", 0x20000, 0x10000, CRC(5606a8f4) SHA1(e46e887f13f648fe2162cb853b3c20fa60e3d215) )
-	ROM_LOAD( "27512.6d", 0x30000, 0x10000, CRC(8ca6055d) SHA1(37dc5d3b158dc5d7c9677fc4f82e10804181619f) ) // dw-04.6d matched 99.995422% (verified on 2 different PCBs, so almost certainly good)
+
+	ROM_REGION( 0x40000, "mainbank", 0 )
+	ROM_LOAD( "24512.3d", 0x00000, 0x10000, CRC(40c9b0b8) SHA1(81deb25e00eb4d4c5133ea42cda279c318ee771c) )
+	ROM_LOAD( "24512.4d", 0x10000, 0x10000, CRC(5606a8f4) SHA1(e46e887f13f648fe2162cb853b3c20fa60e3d215) )
+	ROM_LOAD( "27512.6d", 0x20000, 0x10000, CRC(8ca6055d) SHA1(37dc5d3b158dc5d7c9677fc4f82e10804181619f) ) // dw-04.6d matched 99.995422% (verified on 2 different PCBs, so almost certainly good)
+	ROM_FILL(             0x30000, 0x10000, 0xff)
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "27256.5f", 0x8000, 0x8000, CRC(c28c4d82) SHA1(ad88506bcbc9763e39d6e6bb25ef2bd6aa929f30) )
@@ -3350,10 +3388,12 @@ Lower board (DATA EAST DE-0251-2):
 */
 
 ROM_START( csilver )
-	ROM_REGION( 0x48000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dx03-12.18d", 0x08000, 0x08000, CRC(2d926e7c) SHA1(cf38e92904edb1870b0a4965f9049d67efe8cf6a) )
-	ROM_LOAD( "dx01.12d", 0x10000, 0x10000, CRC(570fb50c) SHA1(3002f53182834a060fc282be1bc5767906e19ba2) )
-	ROM_LOAD( "dx02.13d", 0x20000, 0x10000, CRC(58625890) SHA1(503a969085f6dcb16687217c48136ea22d07c89f) )
+
+	ROM_REGION( 0x20000, "mainbank", 0 )
+	ROM_LOAD( "dx01.12d", 0x00000, 0x10000, CRC(570fb50c) SHA1(3002f53182834a060fc282be1bc5767906e19ba2) )
+	ROM_LOAD( "dx02.13d", 0x10000, 0x10000, CRC(58625890) SHA1(503a969085f6dcb16687217c48136ea22d07c89f) )
 
 	ROM_REGION( 0x10000, "sub", 0 ) // CPU 2, 1st 16k is empty
 	ROM_LOAD( "dx04-1.19d", 0x0000, 0x10000,  CRC(29432691) SHA1(a76ecd27d217c66a0e43f93e29efe83c657925c3) )
@@ -3391,10 +3431,12 @@ ROM_END
 
 // There is known to exist an identical ROM set with different PCB locations designated for an alternate ROM board (noted on the right of the ROM definition)
 ROM_START( csilverj )
-	ROM_REGION( 0x48000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dx03-2.18d", 0x08000, 0x08000, CRC(02dd8cfc) SHA1(f29c0d9dd03e8c52672c0f3dbee44a93c5b4261d) ) // dx03-3.a4 (Different ROM label but identical to dx03-2.18d)
-	ROM_LOAD( "dx01.12d",   0x10000, 0x10000, CRC(570fb50c) SHA1(3002f53182834a060fc282be1bc5767906e19ba2) ) // dx01.a2
-	ROM_LOAD( "dx02.13d",   0x20000, 0x10000, CRC(58625890) SHA1(503a969085f6dcb16687217c48136ea22d07c89f) ) // dx01.a3
+
+	ROM_REGION( 0x20000, "mainbank", 0 )
+	ROM_LOAD( "dx01.12d",   0x00000, 0x10000, CRC(570fb50c) SHA1(3002f53182834a060fc282be1bc5767906e19ba2) ) // dx01.a2
+	ROM_LOAD( "dx02.13d",   0x10000, 0x10000, CRC(58625890) SHA1(503a969085f6dcb16687217c48136ea22d07c89f) ) // dx01.a3
 
 	ROM_REGION( 0x10000, "sub", 0 ) // CPU 2, 1st 16k is empty
 	ROM_LOAD( "dx04-1.19d", 0x0000, 0x10000,  CRC(29432691) SHA1(a76ecd27d217c66a0e43f93e29efe83c657925c3) ) // dx04-1.a5
@@ -3431,10 +3473,12 @@ ROM_START( csilverj )
 ROM_END
 
 ROM_START( csilverja ) // DE-0250-3 + DE-0251-2
-	ROM_REGION( 0x48000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dx03-1.18d", 0x08000, 0x08000, CRC(d42905be) SHA1(5a406466aa9bb2b2591d02fc87289cb93f7358c6) )
-	ROM_LOAD( "dx01.12d",   0x10000, 0x10000, CRC(570fb50c) SHA1(3002f53182834a060fc282be1bc5767906e19ba2) )
-	ROM_LOAD( "dx02.13d",   0x20000, 0x10000, CRC(58625890) SHA1(503a969085f6dcb16687217c48136ea22d07c89f) )
+
+	ROM_REGION( 0x20000, "mainbank", 0 )
+	ROM_LOAD( "dx01.12d",   0x00000, 0x10000, CRC(570fb50c) SHA1(3002f53182834a060fc282be1bc5767906e19ba2) )
+	ROM_LOAD( "dx02.13d",   0x10000, 0x10000, CRC(58625890) SHA1(503a969085f6dcb16687217c48136ea22d07c89f) )
 
 	ROM_REGION( 0x10000, "sub", 0 ) // CPU 2, 1st 16k is empty
 	ROM_LOAD( "dx04-1.19d", 0x0000, 0x10000,  CRC(29432691) SHA1(a76ecd27d217c66a0e43f93e29efe83c657925c3) )
@@ -3471,9 +3515,11 @@ ROM_START( csilverja ) // DE-0250-3 + DE-0251-2
 ROM_END
 
 ROM_START( oscar )
-	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "du10", 0x08000, 0x08000, CRC(120040d8) SHA1(22d5f84f3ca724cbf39dfc4790f2175ba4945aaf) ) // This label is probably incorrect. The correct label is needed
-	ROM_LOAD( "ed09", 0x10000, 0x10000, CRC(e2d4bba9) SHA1(99f0310debe51f4bcd00b5fdaedc1caf2eeccdeb) ) // for the world set because DU is the code for the Japanese version
+
+	ROM_REGION( 0x10000, "mainbank", 0 )
+	ROM_LOAD( "ed09", 0x00000, 0x10000, CRC(e2d4bba9) SHA1(99f0310debe51f4bcd00b5fdaedc1caf2eeccdeb) ) // for the world set because DU is the code for the Japanese version
 
 	ROM_REGION( 0x10000, "sub", 0 ) // CPU 2, 1st 16k is empty
 	ROM_LOAD( "du11", 0x0000, 0x10000, CRC(ff45c440) SHA1(4769944bcfebcdcba7ed7d5133d4d9f98890d75c) )
@@ -3498,9 +3544,11 @@ ROM_START( oscar )
 ROM_END
 
 ROM_START( oscarbl ) // very similar to the original, main difference it's it uses a standard M6502 for sound with predecrypted opcodes.
-	ROM_REGION( 0x20000, "maincpu", 0 ) // same as the original
+	ROM_REGION( 0x10000, "maincpu", 0 ) // same as the original
 	ROM_LOAD( "m27c256.3",  0x08000, 0x08000, CRC(120040d8) SHA1(22d5f84f3ca724cbf39dfc4790f2175ba4945aaf) )
-	ROM_LOAD( "at27c512.2", 0x10000, 0x10000, CRC(e2d4bba9) SHA1(99f0310debe51f4bcd00b5fdaedc1caf2eeccdeb) )
+
+	ROM_REGION( 0x10000, "mainbank", 0 )
+	ROM_LOAD( "at27c512.2", 0x00000, 0x10000, CRC(e2d4bba9) SHA1(99f0310debe51f4bcd00b5fdaedc1caf2eeccdeb) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "at27c512.4", 0x00000, 0x10000, CRC(2ad9ef5d) SHA1(19db4446a6a5f75c7ddb2807b69d7c40d8b2d55a) )
@@ -3525,9 +3573,11 @@ ROM_START( oscarbl ) // very similar to the original, main difference it's it us
 ROM_END
 
 ROM_START( oscaru )
-	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ed10", 0x08000, 0x08000, CRC(f9b0d4d4) SHA1(dc2aba978ba96f365027c7be5714728d5d7fb802) )
-	ROM_LOAD( "ed09", 0x10000, 0x10000, CRC(e2d4bba9) SHA1(99f0310debe51f4bcd00b5fdaedc1caf2eeccdeb) )
+
+	ROM_REGION( 0x10000, "mainbank", 0 )
+	ROM_LOAD( "ed09", 0x00000, 0x10000, CRC(e2d4bba9) SHA1(99f0310debe51f4bcd00b5fdaedc1caf2eeccdeb) )
 
 	ROM_REGION( 0x10000, "sub", 0 ) // CPU 2, 1st 16k is empty
 	ROM_LOAD( "ed11", 0x0000, 0x10000,  CRC(10e5d919) SHA1(13bc3497cb4aaa6dd272853819212ad63656f8a7) )
@@ -3555,9 +3605,11 @@ ROM_START( oscaru )
 ROM_END
 
 ROM_START( oscarj1 )
-	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "du10-1", 0x08000, 0x08000, CRC(4ebc9f7a) SHA1(df8fdc4b4b203dc1bdd048f069fb6b723bdea0d2) )
-	ROM_LOAD( "ed09",   0x10000, 0x10000, CRC(e2d4bba9) SHA1(99f0310debe51f4bcd00b5fdaedc1caf2eeccdeb) )
+
+	ROM_REGION( 0x10000, "mainbank", 0 )
+	ROM_LOAD( "ed09",   0x00000, 0x10000, CRC(e2d4bba9) SHA1(99f0310debe51f4bcd00b5fdaedc1caf2eeccdeb) )
 
 	ROM_REGION( 0x10000, "sub", 0 ) // CPU 2, 1st 16k is empty
 	ROM_LOAD( "du11", 0x0000, 0x10000, CRC(ff45c440) SHA1(4769944bcfebcdcba7ed7d5133d4d9f98890d75c) )
@@ -3661,9 +3713,11 @@ Notes:
 ***************************************************************************/
 
 ROM_START( oscarj2 )
-	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "du10-2.h12", 0x08000, 0x08000, CRC(114e898d) SHA1(1072ccabe6d53c50cdfa1e27d5d848ecdd6559cc) )
-	ROM_LOAD( "du09.h10",   0x10000, 0x10000, CRC(e2d4bba9) SHA1(99f0310debe51f4bcd00b5fdaedc1caf2eeccdeb) )
+
+	ROM_REGION( 0x10000, "mainbank", 0 )
+	ROM_LOAD( "du09.h10",   0x00000, 0x10000, CRC(e2d4bba9) SHA1(99f0310debe51f4bcd00b5fdaedc1caf2eeccdeb) )
 
 	ROM_REGION( 0x10000, "sub", 0 ) // CPU 2, 1st 16k is empty
 	ROM_LOAD( "du11.h16", 0x0000, 0x10000, CRC(ff45c440) SHA1(4769944bcfebcdcba7ed7d5133d4d9f98890d75c) )
@@ -3691,10 +3745,12 @@ ROM_START( oscarj2 )
 ROM_END
 
 ROM_START( srdarwin )
-	ROM_REGION( 0x28000, "maincpu", 0 )
-	ROM_LOAD( "dy_01-e.b14", 0x20000, 0x08000, CRC(176e9299) SHA1(20cd44ab610e384ab4f0172054c9adc432b12e9c) )
-	ROM_CONTINUE(            0x08000, 0x08000 )
-	ROM_LOAD( "dy_00.b16",   0x10000, 0x10000, CRC(2bf6b461) SHA1(435d922c7b9df7f2b2f774346caed81d330be8a0) )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "dy_01-e.b14", 0x00000, 0x10000, CRC(176e9299) SHA1(20cd44ab610e384ab4f0172054c9adc432b12e9c) )
+
+	ROM_REGION( 0x20000, "mainbank", 0 )
+	ROM_LOAD( "dy_00.b16",   0x00000, 0x10000, CRC(2bf6b461) SHA1(435d922c7b9df7f2b2f774346caed81d330be8a0) )
+	ROM_LOAD( "dy_01-e.b14", 0x10000, 0x10000, CRC(176e9299) SHA1(20cd44ab610e384ab4f0172054c9adc432b12e9c) )
 
 	ROM_REGION( 2*0x10000, "audiocpu", 0 ) // 64K for sound CPU + 64k for decrypted opcodes
 	ROM_LOAD( "dy_04.d7", 0x8000, 0x8000, CRC(2ae3591c) SHA1(f21b06d84e2c3d3895be0812024641fd006e45cf) )
@@ -3729,10 +3785,12 @@ ROM_START( srdarwin )
 ROM_END
 
 ROM_START( srdarwinj )
-	ROM_REGION( 0x28000, "maincpu", 0 )
-	ROM_LOAD( "dy_01.b14", 0x20000, 0x08000, CRC(1eeee4ff) SHA1(89a70de8bd61c671582b11773ce69b2edcd9c2f8) )
-	ROM_CONTINUE(          0x08000, 0x08000 )
-	ROM_LOAD( "dy_00.b16", 0x10000, 0x10000, CRC(2bf6b461) SHA1(435d922c7b9df7f2b2f774346caed81d330be8a0) )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "dy_01.b14", 0x00000, 0x10000, CRC(1eeee4ff) SHA1(89a70de8bd61c671582b11773ce69b2edcd9c2f8) )
+
+	ROM_REGION( 0x20000, "mainbank", 0 )
+	ROM_LOAD( "dy_00.b16", 0x00000, 0x10000, CRC(2bf6b461) SHA1(435d922c7b9df7f2b2f774346caed81d330be8a0) )
+	ROM_LOAD( "dy_01.b14", 0x10000, 0x10000, CRC(1eeee4ff) SHA1(89a70de8bd61c671582b11773ce69b2edcd9c2f8) )
 
 	ROM_REGION( 2*0x10000, "audiocpu", 0 ) // 64K for sound CPU + 64k for decrypted opcodes
 	ROM_LOAD( "dy_04.d7", 0x8000, 0x8000, CRC(2ae3591c) SHA1(f21b06d84e2c3d3895be0812024641fd006e45cf) )
@@ -3766,10 +3824,12 @@ ROM_START( srdarwinj )
 ROM_END
 
 ROM_START( srdarwinb )
-	ROM_REGION( 0x28000, "maincpu", 0 )
-	ROM_LOAD( "3.bin",  0x20000, 0x08000, CRC(7942b43f) SHA1(15de0c02d45d06c145fba48ef05baae793a1cb46) )
-	ROM_CONTINUE(       0x08000, 0x08000 )
-	ROM_LOAD( "4.bin",  0x10000, 0x10000, CRC(2bf6b461) SHA1(435d922c7b9df7f2b2f774346caed81d330be8a0) )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "3.bin",  0x00000, 0x10000, CRC(7942b43f) SHA1(15de0c02d45d06c145fba48ef05baae793a1cb46) )
+
+	ROM_REGION( 0x20000, "mainbank", 0 )
+	ROM_LOAD( "4.bin",  0x00000, 0x10000, CRC(2bf6b461) SHA1(435d922c7b9df7f2b2f774346caed81d330be8a0) )
+	ROM_LOAD( "3.bin",  0x10000, 0x10000, CRC(7942b43f) SHA1(15de0c02d45d06c145fba48ef05baae793a1cb46) )
 
 	ROM_REGION( 2*0x10000, "audiocpu", 0 ) // 64K for sound CPU + 64k for decrypted opcodes
 	ROM_LOAD( "5.bin", 0x8000, 0x8000, CRC(2ae3591c) SHA1(f21b06d84e2c3d3895be0812024641fd006e45cf) )
@@ -3802,10 +3862,12 @@ ROM_END
 
 
 ROM_START( cobracom )
-	ROM_REGION( 0x30000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "el11-5.5j", 0x08000, 0x08000, CRC(af0a8b05) SHA1(096e4e7f2785a20bfaec14277413ce4e20e90214) )
-	ROM_LOAD( "el12-4.7j", 0x10000, 0x10000, CRC(7a44ef38) SHA1(d7dc277dce08f9d073290e100be4a7ca2e2b82cb) )
-	ROM_LOAD( "el13.9j",   0x20000, 0x10000, CRC(04505acb) SHA1(2220efb277884588859375dab9960f04f07273a7) )
+
+	ROM_REGION( 0x20000, "mainbank", 0 )
+	ROM_LOAD( "el12-4.7j", 0x00000, 0x10000, CRC(7a44ef38) SHA1(d7dc277dce08f9d073290e100be4a7ca2e2b82cb) )
+	ROM_LOAD( "el13.9j",   0x10000, 0x10000, CRC(04505acb) SHA1(2220efb277884588859375dab9960f04f07273a7) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "el10-4.1f", 0x8000, 0x8000, CRC(edfad118) SHA1(10de8805472346fead62460a3fdc09ae26a4e0d5) )
@@ -3839,10 +3901,12 @@ ROM_START( cobracom )
 ROM_END
 
 ROM_START( cobracoma )
-	ROM_REGION( 0x30000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "el11-4.5j", 0x08000, 0x08000, CRC(6dca6734) SHA1(1d165845680df2f1febd2b7d2f3163d68523496e) )
-	ROM_LOAD( "el12-4.7j", 0x10000, 0x10000, CRC(7a44ef38) SHA1(d7dc277dce08f9d073290e100be4a7ca2e2b82cb) )
-	ROM_LOAD( "el13.9j",   0x20000, 0x10000, CRC(04505acb) SHA1(2220efb277884588859375dab9960f04f07273a7) )
+
+	ROM_REGION( 0x20000, "mainbank", 0 )
+	ROM_LOAD( "el12-4.7j", 0x00000, 0x10000, CRC(7a44ef38) SHA1(d7dc277dce08f9d073290e100be4a7ca2e2b82cb) )
+	ROM_LOAD( "el13.9j",   0x10000, 0x10000, CRC(04505acb) SHA1(2220efb277884588859375dab9960f04f07273a7) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "el10-4.1f", 0x8000, 0x8000, CRC(edfad118) SHA1(10de8805472346fead62460a3fdc09ae26a4e0d5) )
@@ -3876,10 +3940,12 @@ ROM_START( cobracoma )
 ROM_END
 
 ROM_START( cobracomb )
-	ROM_REGION( 0x30000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "el11.5j", 0x08000, 0x08000, CRC(c6a102e3) SHA1(51d9781d13a8a98c9bbdf34fa79ebfd8a152567e) ) // "zero" revision - IE: Original version
-	ROM_LOAD( "el12.7j", 0x10000, 0x10000, CRC(72b2dab4) SHA1(ff84a04cfe920a0d8105fbbd1f44ee86822cf0d3) ) // "zero" revision - IE: Original version
-	ROM_LOAD( "el13.9j", 0x20000, 0x10000, CRC(04505acb) SHA1(2220efb277884588859375dab9960f04f07273a7) )
+
+	ROM_REGION( 0x20000, "mainbank", 0 )
+	ROM_LOAD( "el12.7j", 0x00000, 0x10000, CRC(72b2dab4) SHA1(ff84a04cfe920a0d8105fbbd1f44ee86822cf0d3) ) // "zero" revision - IE: Original version
+	ROM_LOAD( "el13.9j", 0x10000, 0x10000, CRC(04505acb) SHA1(2220efb277884588859375dab9960f04f07273a7) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "el10.1f", 0x8000, 0x8000, CRC(62ca5e89) SHA1(b04acaccc58846e0d277868a873a440b7f8071b0) )
@@ -3913,10 +3979,12 @@ ROM_START( cobracomb )
 ROM_END
 
 ROM_START( cobracomj )
-	ROM_REGION( 0x30000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "eh11.5j", 0x08000, 0x08000, CRC(868637e1) SHA1(8b1e3e045e341bb94b1f6c7d89198b22e6c19de7) )
-	ROM_LOAD( "eh12.7j", 0x10000, 0x10000, CRC(7c878a83) SHA1(9b2a3083c6dae69626fdab16d97517d30eaa1859) )
-	ROM_LOAD( "el13.9j", 0x20000, 0x10000, CRC(04505acb) SHA1(2220efb277884588859375dab9960f04f07273a7) )
+
+	ROM_REGION( 0x20000, "mainbank", 0 )
+	ROM_LOAD( "eh12.7j", 0x00000, 0x10000, CRC(7c878a83) SHA1(9b2a3083c6dae69626fdab16d97517d30eaa1859) )
+	ROM_LOAD( "el13.9j", 0x10000, 0x10000, CRC(04505acb) SHA1(2220efb277884588859375dab9960f04f07273a7) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "eh10.1f", 0x8000, 0x8000, CRC(62ca5e89) SHA1(b04acaccc58846e0d277868a873a440b7f8071b0) )
@@ -3953,10 +4021,12 @@ ROM_END
 // main PCB is marked: "LC" on component side ("LC" is the Italian for "Lato Componenti" which translates to "Components Side")
 // main PCB is marked: "LS" on solder side ("LS" is the Italian for "Lato Saldature" which translates to "Solders Side")
 ROM_START( cobracomjb )
-	ROM_REGION( 0x30000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cobra4.bin", 0x08000, 0x08000, CRC(868637e1) SHA1(8b1e3e045e341bb94b1f6c7d89198b22e6c19de7) )
-	ROM_LOAD( "cobra3.bin", 0x10000, 0x10000, CRC(7c878a83) SHA1(9b2a3083c6dae69626fdab16d97517d30eaa1859) )
-	ROM_LOAD( "cobra2.bin", 0x20000, 0x10000, CRC(04505acb) SHA1(2220efb277884588859375dab9960f04f07273a7) )
+
+	ROM_REGION( 0x20000, "mainbank", 0 )
+	ROM_LOAD( "cobra3.bin", 0x00000, 0x10000, CRC(7c878a83) SHA1(9b2a3083c6dae69626fdab16d97517d30eaa1859) )
+	ROM_LOAD( "cobra2.bin", 0x10000, 0x10000, CRC(04505acb) SHA1(2220efb277884588859375dab9960f04f07273a7) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "cobra5.bin", 0x8000, 0x8000, CRC(62ca5e89) SHA1(b04acaccc58846e0d277868a873a440b7f8071b0) )
