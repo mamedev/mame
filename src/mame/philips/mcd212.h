@@ -171,7 +171,7 @@ protected:
 
 		ICM_OFF              = 0x0,
 		ICM_CLUT8            = 0x1,
-		ICM_RGB555           = 0x2,
+		ICM_RGB555           = 0x1,
 		ICM_CLUT7            = 0x3,
 		ICM_CLUT77           = 0x4,
 		ICM_DYUV             = 0x5,
