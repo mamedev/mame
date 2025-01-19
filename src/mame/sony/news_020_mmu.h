@@ -6,7 +6,6 @@
 
 #pragma once
 
-
 class news_020_mmu_device : public device_t, public device_memory_interface
 {
 public:
@@ -33,18 +32,60 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 private:
+	// Helper class for reading page table entries
 	struct news_020_pte
 	{
-		bool valid;
-		bool user_readable;
-		bool user_writable;
-		bool kernel_readable;
-		bool kernel_writable;
-		bool modified;
-		bool fill_on_demand;
-		uint8_t unused; // actually 5 bits
-		uint32_t pfnum; // actually 20 bits
-		uint32_t raw; // for logging
+		news_020_pte(uint32_t pte_bits) : pte(pte_bits) {}
+
+		const uint32_t pte;
+
+		bool valid() const
+		{
+			return pte & 0x80000000;
+		}
+
+		bool kernel_writable() const
+		{
+			return pte & 0x40000000;
+		}
+
+		bool kernel_readable() const
+		{
+			return pte & 0x20000000;
+		}
+
+		bool user_writable() const
+		{
+			return pte & 0x10000000;
+		}
+
+		bool user_readable() const
+		{
+			return pte & 0x08000000;
+		}
+
+		bool modified() const
+		{
+			return pte & 0x04000000;
+		}
+
+		bool fill_on_demand() const
+		{
+			return pte & 0x02000000;
+		}
+
+		// between FOD and pfnum are 5 unused bits for memory, there can be data here for memory-mapped file I/O
+
+		uint32_t pfnum() const
+		{
+			return pte & 0x000fffff; // 20 bits
+		}
+
+		// Additional helper functions
+		bool writeable() const
+		{
+			return kernel_writable() || user_writable();
+		}
 	};
 
 	const address_space_config m_hyperbus_config;
@@ -53,13 +94,11 @@ private:
 	bool m_enabled = false;
 	bool m_romdis = false; // ROMDIS bit controls if ROM is mapped to the start of address space or not
 
-	// TODO: these may not actually be split - maybe the system bit is part of the tag? That might work?
-	std::unique_ptr<u32[]> m_mmu_user_ram; // TODO: some kind of required_shared_ptr?
-	std::unique_ptr<u32[]> m_mmu_system_ram; // TODO: some kind of required_shared_ptr?
-	std::unique_ptr<u32[]> m_mmu_user_tag_ram; // TODO: don't do it this way, but this is OK for testing
-	std::unique_ptr<u32[]> m_mmu_system_tag_ram; // TODO: don't do it this way, but this is OK for testing
+	std::unique_ptr<u32[]> m_mmu_user_ram;
+	std::unique_ptr<u32[]> m_mmu_system_ram;
+	std::unique_ptr<u32[]> m_mmu_user_tag_ram;
+	std::unique_ptr<u32[]> m_mmu_system_tag_ram;
 
-	news_020_pte unpack_mmu_entry(const uint32_t entry);
 	void clear_user_entries();
 	void clear_kernel_entries();
 };
