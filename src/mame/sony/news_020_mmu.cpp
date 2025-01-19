@@ -143,7 +143,7 @@ void news_020_mmu_device::mmu_entry_w(offs_t offset, uint32_t data, uint32_t mem
 uint32_t news_020_mmu_device::hyperbus_r(offs_t offset, uint32_t mem_mask, bool is_supervisor)
 {
 	uint32_t result = 0;
-	if (!m_enabled || offset >= (0xc0000000 >> 2)) // TODO: second check is jank af, is it legit? Seems like a possible protection violation issue
+	if (!m_enabled || (is_supervisor && (offset >= (0xc0000000 >> 2)))) // TODO: is the physical address check here (0xc...) correct?
 	{
 		// TODO: What is the actual physical address width? The 0x1 part might also be an MMU control bit
 		offset = offset & (0x1fffffff >> 2);
@@ -202,7 +202,7 @@ uint32_t news_020_mmu_device::hyperbus_r(offs_t offset, uint32_t mem_mask, bool 
 
 void news_020_mmu_device::hyperbus_w(offs_t offset, uint32_t data, uint32_t mem_mask, bool is_supervisor)
 {
-	if (!m_enabled || offset >= (0xc0000000 >> 2)) // TODO: second check is jank af
+	if (!m_enabled || (is_supervisor && (offset >= (0xc0000000 >> 2)))) // TODO: is the physical address check here (0xc...) correct?
 	{
 		this->space(0).write_dword((offset << 2) & 0x1fffffff, data, mem_mask); // TODO: see above about physical address width
 	}
