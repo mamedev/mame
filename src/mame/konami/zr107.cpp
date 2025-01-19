@@ -169,21 +169,24 @@ Check drivers/gticlub.cpp for details on the bottom board.
 */
 
 #include "emu.h"
+
+#include "k001005.h"
+#include "k001006.h"
+#include "k001604.h"
+#include "k054156_k054157_k056832.h"
+#include "konami_helper.h"
+#include "konppc.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/powerpc/ppc.h"
 #include "cpu/sharc/sharc.h"
 #include "machine/adc083x.h"
 #include "machine/eepromser.h"
 #include "machine/k056230.h"
-#include "konppc.h"
 #include "machine/watchdog.h"
 #include "sound/k054539.h"
 #include "sound/k056800.h"
-#include "k001005.h"
-#include "k001006.h"
-#include "k001604.h"
-#include "k054156_k054157_k056832.h"
-#include "konami_helper.h"
+
 #include "emupal.h"
 #include "speaker.h"
 
@@ -238,10 +241,10 @@ protected:
 	required_shared_ptr<uint32_t> m_sharc_dataram;
 	required_device<konppc_device> m_konppc;
 
-	int m_ccu_vcth;
-	int m_ccu_vctl;
-	uint8_t m_sound_ctrl;
-	uint8_t m_sound_intck;
+	int m_ccu_vcth = 0;
+	int m_ccu_vctl = 0;
+	uint8_t m_sound_ctrl = 0;
+	uint8_t m_sound_intck = 0;
 
 	uint8_t sysreg_r(offs_t offset);
 	void sysreg_w(offs_t offset, uint8_t data);
