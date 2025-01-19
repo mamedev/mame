@@ -36,6 +36,25 @@ k001005_renderer::k001005_renderer(device_t &parent, screen_device &screen, devi
 	m_3dfifo = std::make_unique<uint32_t[]>(0x10000);
 	m_3dfifo_ptr = 0;
 	m_fb_page = 0;
+	m_light_r = 0;
+	m_light_g = 0;
+	m_light_b = 0;
+	m_ambient_r = 0;
+	m_ambient_g = 0;
+	m_ambient_b = 0;
+	m_fog_r = 0;
+	m_fog_g = 0;
+	m_fog_b = 0;
+	m_far_z = 0;
+	m_fog_start_z = 0;
+	m_fog_end_z = 0;
+	m_reg_fog_start = 0;
+	m_viewport_min_x = 0;
+	m_viewport_max_x = 0;
+	m_viewport_min_y = 0;
+	m_viewport_max_y = 0;
+	m_viewport_center_x = 0;
+	m_viewport_center_y = 0;
 
 	m_cliprect = rectangle(0, width-1, 0, height-1);
 
