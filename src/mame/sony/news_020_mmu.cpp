@@ -174,12 +174,12 @@ uint32_t news_020_mmu_device::hyperbus_r(offs_t offset, uint32_t mem_mask, bool 
 			LOGMASKED(LOG_MAP_ERROR, "(%s) hyperbus_r 0x%08x (pg 0x%08x, pte 0x%08x) -> tag mismatch 0x%x != 0x%x \n", machine().describe_context(), offset, vpgnum, pte.raw, tag, vpgnum, is_supervisor); // TODO: better log message
 			m_bus_error(offset, mem_mask, false, TAG_MISMATCH);
 		}
-		else if ((!system && !pte.user_readable) && !is_supervisor) // user memory protection violation
+		else if (!is_supervisor && !pte.user_readable) // user memory protection violation
 		{
 			LOGMASKED(LOG_MAP_ERROR, "(%s) hyperbus_r 0x%08x (pg 0x%08x, pte 0x%08x, index 0x%x) user protection violation\n", machine().describe_context(), offset, vpgnum, pte.raw, (vpgnum % MMU_ENTRY_COUNT) + (system ? MMU_ENTRY_COUNT : 0x0));
 			m_bus_error(offset, mem_mask, false, PROTECTION_VIOLATION);
 		}
-		else if ((system && !pte.kernel_readable) && is_supervisor) // kernel memory protection violation
+		else if (is_supervisor && !pte.kernel_readable) // kernel memory protection violation
 		{
 			LOGMASKED(LOG_MAP_ERROR, "(%s) hyperbus_r 0x%08x (pg 0x%08x, pte 0x%08x, index 0x%x) kernel protection violation\n", machine().describe_context(), offset, vpgnum, pte.raw, (vpgnum % MMU_ENTRY_COUNT) + (system ? MMU_ENTRY_COUNT : 0x0));
 			m_bus_error(offset, mem_mask, false, PROTECTION_VIOLATION);
@@ -227,12 +227,12 @@ void news_020_mmu_device::hyperbus_w(offs_t offset, uint32_t data, uint32_t mem_
 			m_bus_error(offset, mem_mask, true, TAG_MISMATCH); // should M be set here too?
 		}
 		// TODO: order of operations between checking valid and access bits?
-		else if ((!system && !pte.user_writable) && !is_supervisor) // user memory protection violation
+		else if (!is_supervisor && !pte.user_writable) // user memory protection violation
 		{
 			LOGMASKED(LOG_MAP_ERROR, "(%s) mmu w 0x%08x (pg 0x%08x, pte 0x%08x, index 0x%x) user protection violation\n", machine().describe_context(), offset, vpgnum, pte.raw, (vpgnum % MMU_ENTRY_COUNT) + (system ? MMU_ENTRY_COUNT : 0x0));
 			m_bus_error(offset, mem_mask, true, PROTECTION_VIOLATION);
 		}
-		else if ((system && !pte.kernel_writable) && is_supervisor) // kernel memory protection violation
+		else if (is_supervisor && !pte.kernel_writable) // kernel memory protection violation
 		{
 			LOGMASKED(LOG_MAP_ERROR, "(%s) mmu w 0x%08x (pg 0x%08x, pte 0x%08x, index 0x%x) kernel protection violation\n", machine().describe_context(), offset, vpgnum, pte.raw, (vpgnum % MMU_ENTRY_COUNT) + (system ? MMU_ENTRY_COUNT : 0x0));
 			m_bus_error(offset, mem_mask, true, PROTECTION_VIOLATION);
