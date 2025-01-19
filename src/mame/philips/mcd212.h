@@ -51,7 +51,7 @@ public:
 
 	void map(address_map &map) ATTR_COLD;
 
-	template <int Channel> int ram_dtack_cycle_count();
+	template <int Path> int ram_dtack_cycle_count();
 	int rom_dtack_cycle_count();
 
 protected:
@@ -202,7 +202,7 @@ protected:
 	uint8_t m_weight_factor[2][768]{};
 
 	// DYUV color limit arrays.
-	uint32_t m_dyuv_limit_rgb_lut[0x300];
+	uint32_t m_dyuv_limit_lut[0x300];
 
 	// DYUV delta-Y decoding array
 	uint8_t m_delta_y_lut[0x100];
@@ -243,26 +243,26 @@ protected:
 
 	int get_screen_width();
 	int get_border_width();
-	template <int Channel> int get_plane_width();
+	template <int Path> int get_plane_width();
 
-	template <int Channel> void set_vsr(uint32_t value);
-	template <int Channel> uint32_t get_vsr();
+	template <int Path> void set_vsr(uint32_t value);
+	template <int Path> uint32_t get_vsr();
 
-	template <int Channel> void set_dcp(uint32_t value);
-	template <int Channel> uint32_t get_dcp();
+	template <int Path> void set_dcp(uint32_t value);
+	template <int Path> uint32_t get_dcp();
 
-	template <int Channel> void set_display_parameters(uint8_t value);
+	template <int Path> void set_display_parameters(uint8_t value);
 
-	template <int Channel> void process_ica();
-	template <int Channel> void process_dca();
+	template <int Path> void process_ica();
+	template <int Path> void process_dca();
 
-	template <int Channel> uint8_t get_transparency_control();
-	template <int Channel> uint8_t get_icm();
-	template <int Channel> bool get_mosaic_enable();
-	template <int Channel> uint8_t get_mosaic_factor();
-	template <int Channel> void process_vsr(uint32_t *pixels, bool *transparent);
+	template <int Path> uint8_t get_transparency_control();
+	template <int Path> uint8_t get_icm();
+	template <int Path> bool get_mosaic_enable();
+	template <int Path> uint8_t get_mosaic_factor();
+	template <int Path> void process_vsr(uint32_t *pixels, bool *transparent);
 
-	template <int Channel> void set_register(uint8_t reg, uint32_t value);
+	template <int Path> void set_register(uint8_t reg, uint32_t value);
 
 	template <bool MosaicA, bool MosaicB, bool OrderAB> void mix_lines(uint32_t *plane_a, bool *transparent_a, uint32_t *plane_b, bool *transparent_b, uint32_t *out);
 
