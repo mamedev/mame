@@ -262,7 +262,7 @@ namespace
 
         // IOP IRQ state
         uint32_t m_iop_intst = 0;
-        uint32_t m_iop_inten = iop_nmi_mask;
+        uint32_t m_iop_inten = 0;
         std::map<int, bool> m_iop_int_state = {
             {INPUT_LINE_IRQ1, false},
             {INPUT_LINE_IRQ2, false},
@@ -334,6 +334,17 @@ namespace
         m_mmu->space(0).install_ram(0x0, m_ram->mask(), m_ram->pointer());
 
         m_iop_intst = 0;
+        m_cpu_intst = 0;
+        m_iop_inten = 0;
+        m_cpu_inten = 0;
+        m_cpu_bus_error = false;
+        m_last_berr_pc_cpu = 0;
+        m_cpu_bus_error_status = 0;
+        m_panel_clear = false;
+        m_panel_shift = false;
+        m_sw1_first_read = 0;
+        m_panel_shift_count = 0;
+        m_rtc_data = 0;
     }
 
     void news_iop_state::interval_timer_tick(uint8_t data)
@@ -558,7 +569,7 @@ namespace
         // IOP bus expansion I/O
         map(0x20000000, 0x20ffffff).rw(FUNC(news_iop_state::extio_bus_error_r),FUNC(news_iop_state::extio_bus_error_w)).mirror(0x1f000000);
 
-        // Expansion slot SCC (bus errors here kill iopboot, so the probe process may not use bus errors, at least not with the same setup as extio)
+        // Expansion slot SCC (bus errors here kill iopboot, so the probe process may not use bus errors, at least not with the same setup as extio - but maybe I had the base address wrong before, I need to check)
         map(0x4c000100, 0x4c0001ff).noprw();
 
         map(0x60000000, 0x60000000).r(FUNC(news_iop_state::iop_status_r));
