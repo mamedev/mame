@@ -1,14 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Brice Onken
 
-/*
- * Sony NEWS Memory Management Unit for 68020-based workstations and servers
- *
- * Note: There is very limited documentation about this MMU because starting with the
- *       '030 generation of machines, the custom MMU was no longer needed. Therefore,
- *       this emulation is not very complete (yet).
- */
-
 #ifndef MAME_SONY_NEWS_020_MMU_H
 #define MAME_SONY_NEWS_020_MMU_H
 

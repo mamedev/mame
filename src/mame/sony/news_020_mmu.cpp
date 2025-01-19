@@ -1,6 +1,18 @@
 // license:BSD-3-Clause
 // copyright-holders:Brice Onken
 
+/*
+ * Sony NEWS Memory Management Unit for 68020-based workstations and servers
+ *
+ * Note: There is very limited documentation about this MMU because starting with the
+ *       '030 generation of machines, the custom MMU was no longer needed. Therefore,
+ *       this emulation is not yet complete.
+ *
+ * TODO:
+ *  - What is the correct order of operations between checking valid/access bits/etc?
+ *  - Are the user/system entries actually split? Or is that part of the tag?
+ */
+
 #include "emu.h"
 #include "news_020_mmu.h"
 
@@ -52,7 +64,6 @@ void news_020_mmu_device::clear_user_entries()
 {
 	LOGMASKED(LOG_ENTRY, "(%s) MMU clearing user entries\n", machine().describe_context());
 
-	// TODO: user/kernel may not be split
 	for (int i = 0; i < MMU_ENTRY_COUNT; ++i)
 	{
 		m_mmu_user_ram[i] = 0x0;
@@ -64,7 +75,6 @@ void news_020_mmu_device::clear_kernel_entries()
 {
 	LOGMASKED(LOG_ENTRY, "(%s) MMU clearing kernel entries\n", machine().describe_context());
 
-	// TODO: user/kernel may not be split
 	for (int i = 0x0; i < MMU_ENTRY_COUNT; ++i)
 	{
 		m_mmu_system_ram[i] = 0x0;
@@ -105,14 +115,14 @@ uint32_t news_020_mmu_device::mmu_entry_r(offs_t offset, uint32_t mem_mask)
 void news_020_mmu_device::mmu_entry_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	const bool system_map = offset & 0x4000000; // user or system mapping
-	const uint32_t tag = (offset & ~0x4000000); // TODO: this includes the bits that determine which entry it goes into - is that also in the tag? Should the system bits also be in the tag?
+	const uint32_t tag = (offset & ~0x4000000);
 
 	// Actually update map
 	offset = offset % MMU_ENTRY_COUNT;
 	if (system_map)
 	{
 		COMBINE_DATA(&m_mmu_system_ram[offset]);
-		m_mmu_system_tag_ram[offset] = (m_mmu_system_tag_ram[offset] & ~mem_mask) | (tag & mem_mask); // COMBINE_DATA but with the tag
+		m_mmu_system_tag_ram[offset] = (m_mmu_system_tag_ram[offset] & ~mem_mask) | (tag & mem_mask);
 	}
 	else
 	{
@@ -160,7 +170,7 @@ uint32_t news_020_mmu_device::hyperbus_r(offs_t offset, uint32_t mem_mask, bool 
 	{
 		offset = offset << 2;
 		uint32_t vpgnum = (offset & ~0x80000000) >> 12;
-		bool system = offset & 0x80000000; // TODO: is this correct?
+		bool system = offset & 0x80000000;
 
 		const news_020_pte pte = unpack_mmu_entry(system ? m_mmu_system_ram[vpgnum % MMU_ENTRY_COUNT] : m_mmu_user_ram[vpgnum % MMU_ENTRY_COUNT]);
 		const uint32_t tag = system ? m_mmu_system_tag_ram[vpgnum % MMU_ENTRY_COUNT] : m_mmu_user_tag_ram[vpgnum % MMU_ENTRY_COUNT];
@@ -226,7 +236,6 @@ void news_020_mmu_device::hyperbus_w(offs_t offset, uint32_t data, uint32_t mem_
 			LOGMASKED(LOG_MAP_ERROR, "(%s) mmu w 0x%08x (pg 0x%08x) -> tag mismatch 0x%x != 0x%x\n", machine().describe_context(), offset, vpgnum, vpgnum % MMU_ENTRY_COUNT, tag, vpgnum);
 			m_bus_error(offset, mem_mask, true, TAG_MISMATCH); // should M be set here too?
 		}
-		// TODO: order of operations between checking valid and access bits?
 		else if (!is_supervisor && !pte.user_writable) // user memory protection violation
 		{
 			LOGMASKED(LOG_MAP_ERROR, "(%s) mmu w 0x%08x (pg 0x%08x, pte 0x%08x, index 0x%x) user protection violation\n", machine().describe_context(), offset, vpgnum, pte.raw, (vpgnum % MMU_ENTRY_COUNT) + (system ? MMU_ENTRY_COUNT : 0x0));
