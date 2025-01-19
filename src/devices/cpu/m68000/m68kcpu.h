@@ -604,11 +604,28 @@ inline u32 m68ki_read_imm_16()
 	result = MASK_OUT_ABOVE_16(m_pref_data);
 	m_pc += 2;
 	if (!m_mmu_tmp_buserror_occurred) {
+
+		u32 tmp_dar[16];
+		for (int i = 15; i >= 0; i--)
+		{
+			tmp_dar[i] = REG_DA()[i];
+		}
+
 		// prefetch only if no bus error occurred in opcode fetch
 		m_pref_data = m68ki_ic_readimm16(m_pc);
 		m_pref_addr = m_mmu_tmp_buserror_occurred ? ~0 : m_pc;
-		// ignore bus error on prefetch
-		//AB m_mmu_tmp_buserror_occurred = 0;
+
+		// restore cpu address registers to value at start of instruction
+		if (m_mmu_tmp_buserror_occurred)
+		for (int i = 15; i >= 0; i--)
+		{
+			if (REG_DA()[i] != tmp_dar[i])
+			{
+				REG_DA()[i] = tmp_dar[i];
+			}
+		}
+
+
 	}
 
 	return result;
