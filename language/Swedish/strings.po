@@ -369,7 +369,7 @@ msgstr ""
 #: src/frontend/mame/ui/ui.cpp:789
 msgid ""
 "This system requires media images to be mounted for the following device(s): "
-msgstr "Detta system kräver attmediabilder monteras för följande enhet(er): "
+msgstr "Detta system kräver att mediabilder monteras för följande enhet(er): "
 
 #: src/frontend/mame/ui/ui.cpp:1552
 #, c-format
