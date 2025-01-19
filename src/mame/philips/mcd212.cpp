@@ -54,7 +54,7 @@ inline ATTR_FORCE_INLINE uint8_t mcd212_device::get_region_op(const uint32_t reg
 
 void mcd212_device::update_region_arrays()
 {
-	bool latched_rf[2] { false, false };
+	bool latched_rf[2]{ false, false };
 	uint8_t latched_wfa = m_weight_factor[0][0];
 	uint8_t latched_wfb = m_weight_factor[1][0];
 	const int width = get_screen_width();
@@ -441,45 +441,45 @@ void mcd212_device::process_ica()
 		{
 			case 0x00: case 0x01: case 0x02: case 0x03: case 0x04: case 0x05: case 0x06: case 0x07: // STOP
 			case 0x08: case 0x09: case 0x0a: case 0x0b: case 0x0c: case 0x0d: case 0x0e: case 0x0f:
-				LOGMASKED(LOG_ICA, "%08x: %08x: ICA %d: STOP\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path );
+				LOGMASKED(LOG_ICA, "%08x: %08x: ICA %d: STOP\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path);
 				return;
 			case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17: // NOP
 			case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c: case 0x1d: case 0x1e: case 0x1f:
-				LOGMASKED(LOG_ICA, "%08x: %08x: ICA %d: NOP\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path );
+				LOGMASKED(LOG_ICA, "%08x: %08x: ICA %d: NOP\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path);
 				break;
 			case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27: // RELOAD DCP
 			case 0x28: case 0x29: case 0x2a: case 0x2b: case 0x2c: case 0x2d: case 0x2e: case 0x2f:
-				LOGMASKED(LOG_ICA, "%08x: %08x: ICA %d: RELOAD DCP: %06x\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path, cmd & 0x001fffff );
+				LOGMASKED(LOG_ICA, "%08x: %08x: ICA %d: RELOAD DCP: %06x\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path, cmd & 0x001fffff);
 				set_dcp<Path>(cmd & 0x003ffffc);
 				break;
 			case 0x30: case 0x31: case 0x32: case 0x33: case 0x34: case 0x35: case 0x36: case 0x37: // RELOAD DCP and STOP
 			case 0x38: case 0x39: case 0x3a: case 0x3b: case 0x3c: case 0x3d: case 0x3e: case 0x3f:
-				LOGMASKED(LOG_ICA, "%08x: %08x: ICA %d: RELOAD DCP and STOP: %06x\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path, cmd & 0x001fffff );
+				LOGMASKED(LOG_ICA, "%08x: %08x: ICA %d: RELOAD DCP and STOP: %06x\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path, cmd & 0x001fffff);
 				set_dcp<Path>(cmd & 0x003ffffc);
 				return;
 			case 0x40: case 0x41: case 0x42: case 0x43: case 0x44: case 0x45: case 0x46: case 0x47: // RELOAD VSR (ICA)
 			case 0x48: case 0x49: case 0x4a: case 0x4b: case 0x4c: case 0x4d: case 0x4e: case 0x4f:
-				LOGMASKED(LOG_ICA, "%08x: %08x: ICA %d: RELOAD VSR: %06x\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path, cmd & 0x001fffff );
+				LOGMASKED(LOG_ICA, "%08x: %08x: ICA %d: RELOAD VSR: %06x\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path, cmd & 0x001fffff);
 				addr = (cmd & 0x0007ffff) / 2;
 				break;
 			case 0x50: case 0x51: case 0x52: case 0x53: case 0x54: case 0x55: case 0x56: case 0x57: // RELOAD VSR and STOP
 			case 0x58: case 0x59: case 0x5a: case 0x5b: case 0x5c: case 0x5d: case 0x5e: case 0x5f:
-				LOGMASKED(LOG_ICA, "%08x: %08x: ICA %d: RELOAD VSR and STOP: VSR = %05x\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path, cmd & 0x001fffff );
+				LOGMASKED(LOG_ICA, "%08x: %08x: ICA %d: RELOAD VSR and STOP: VSR = %05x\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path, cmd & 0x001fffff);
 				set_vsr<Path>(cmd & 0x003fffff);
 				return;
 			case 0x60: case 0x61: case 0x62: case 0x63: case 0x64: case 0x65: case 0x66: case 0x67: // INTERRUPT
 			case 0x68: case 0x69: case 0x6a: case 0x6b: case 0x6c: case 0x6d: case 0x6e: case 0x6f:
-				LOGMASKED(LOG_ICA, "%08x: %08x: ICA %d: INTERRUPT\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path );
+				LOGMASKED(LOG_ICA, "%08x: %08x: ICA %d: INTERRUPT\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path);
 				m_csrr[1] |= 1 << (2 - Path);
 				if (m_csrr[1] & (CSR2R_IT1 | CSR2R_IT2))
 					m_int_callback(ASSERT_LINE);
 				break;
 			case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f: // RELOAD DISPLAY PARAMETERS
-				LOGMASKED(LOG_ICA, "%08x: %08x: ICA %d: RELOAD DISPLAY PARAMETERS\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path );
+				LOGMASKED(LOG_ICA, "%08x: %08x: ICA %d: RELOAD DISPLAY PARAMETERS\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path);
 				set_display_parameters<Path>(cmd & 0x1f);
 				break;
 			default:
-				LOGMASKED(LOG_ICA, "%08x: %08x: ICA %d: SET REGISTER %02x = %06x\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path, cmd >> 24, cmd & 0x00ffffff );
+				LOGMASKED(LOG_ICA, "%08x: %08x: ICA %d: SET REGISTER %02x = %06x\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path, cmd >> 24, cmd & 0x00ffffff);
 				set_register<Path>(cmd >> 24, cmd & 0x00ffffff);
 				break;
 		}
@@ -497,7 +497,7 @@ void mcd212_device::process_dca()
 	bool addr_changed = false;
 	bool processing = true;
 
-	LOGMASKED(LOG_DCA, "Scanline %d: Processing DCA %d\n", screen().vpos(), Path );
+	LOGMASKED(LOG_DCA, "Scanline %d: Processing DCA %d\n", screen().vpos(), Path);
 
 	while (processing && count < max)
 	{
@@ -508,43 +508,43 @@ void mcd212_device::process_dca()
 		{
 			case 0x00: case 0x01: case 0x02: case 0x03: case 0x04: case 0x05: case 0x06: case 0x07: // STOP
 			case 0x08: case 0x09: case 0x0a: case 0x0b: case 0x0c: case 0x0d: case 0x0e: case 0x0f:
-				LOGMASKED(LOG_DCA, "%08x: %08x: DCA %d: STOP\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path );
+				LOGMASKED(LOG_DCA, "%08x: %08x: DCA %d: STOP\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path);
 				processing = false;
 				break;
 			case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17: // NOP
 			case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c: case 0x1d: case 0x1e: case 0x1f:
-				LOGMASKED(LOG_DCA, "%08x: %08x: DCA %d: NOP\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path );
+				LOGMASKED(LOG_DCA, "%08x: %08x: DCA %d: NOP\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path);
 				break;
 			case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27: // RELOAD DCP
 			case 0x28: case 0x29: case 0x2a: case 0x2b: case 0x2c: case 0x2d: case 0x2e: case 0x2f:
-				LOGMASKED(LOG_DCA, "%08x: %08x: DCA %d: RELOAD DCP (NOP)\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path );
+				LOGMASKED(LOG_DCA, "%08x: %08x: DCA %d: RELOAD DCP (NOP)\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path);
 				break;
 			case 0x30: case 0x31: case 0x32: case 0x33: case 0x34: case 0x35: case 0x36: case 0x37: // RELOAD DCP and STOP
 			case 0x38: case 0x39: case 0x3a: case 0x3b: case 0x3c: case 0x3d: case 0x3e: case 0x3f:
-				LOGMASKED(LOG_DCA, "%08x: %08x: DCA %d: RELOAD DCP and STOP\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path );
+				LOGMASKED(LOG_DCA, "%08x: %08x: DCA %d: RELOAD DCP and STOP\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path);
 				set_dcp<Path>(cmd & 0x003ffffc);
 				m_dca[Path] = cmd & 0x0007fffc;
 				return;
 			case 0x40: case 0x41: case 0x42: case 0x43: case 0x44: case 0x45: case 0x46: case 0x47: // RELOAD VSR
 			case 0x48: case 0x49: case 0x4a: case 0x4b: case 0x4c: case 0x4d: case 0x4e: case 0x4f:
-				LOGMASKED(LOG_DCA, "%08x: %08x: DCA %d: RELOAD VSR: %06x\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path, cmd & 0x001fffff );
+				LOGMASKED(LOG_DCA, "%08x: %08x: DCA %d: RELOAD VSR: %06x\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path, cmd & 0x001fffff);
 				set_vsr<Path>(cmd & 0x003fffff);
 				break;
 			case 0x50: case 0x51: case 0x52: case 0x53: case 0x54: case 0x55: case 0x56: case 0x57: // RELOAD VSR and STOP
 			case 0x58: case 0x59: case 0x5a: case 0x5b: case 0x5c: case 0x5d: case 0x5e: case 0x5f:
-				LOGMASKED(LOG_DCA, "%08x: %08x: DCA %d: RELOAD VSR and STOP: %06x\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path, cmd & 0x001fffff );
+				LOGMASKED(LOG_DCA, "%08x: %08x: DCA %d: RELOAD VSR and STOP: %06x\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path, cmd & 0x001fffff);
 				set_vsr<Path>(cmd & 0x003fffff);
 				processing = false;
 				break;
 			case 0x60: case 0x61: case 0x62: case 0x63: case 0x64: case 0x65: case 0x66: case 0x67: // INTERRUPT
 			case 0x68: case 0x69: case 0x6a: case 0x6b: case 0x6c: case 0x6d: case 0x6e: case 0x6f:
-				LOGMASKED(LOG_DCA, "%08x: %08x: DCA %d: INTERRUPT\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path );
+				LOGMASKED(LOG_DCA, "%08x: %08x: DCA %d: INTERRUPT\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path);
 				m_csrr[1] |= 1 << (2 - Path);
 				if (m_csrr[1] & (CSR2R_IT1 | CSR2R_IT2))
 					m_int_callback(ASSERT_LINE);
 				break;
 			case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f: // RELOAD DISPLAY PARAMETERS
-				LOGMASKED(LOG_DCA, "%08x: %08x: DCA %d: RELOAD DISPLAY PARAMETERS\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path );
+				LOGMASKED(LOG_DCA, "%08x: %08x: DCA %d: RELOAD DISPLAY PARAMETERS\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path);
 				set_display_parameters<Path>(cmd & 0x1f);
 				break;
 			default:
@@ -635,9 +635,9 @@ int mcd212_device::get_plane_width()
 }
 
 template <int Path>
-void mcd212_device::process_vsr(uint32_t* pixels, bool* transparent)
+void mcd212_device::process_vsr(uint32_t *pixels, bool *transparent)
 {
-	const uint8_t* data = reinterpret_cast<uint8_t*>(Path ? m_planeb.target() : m_planea.target());
+	const uint8_t *data = reinterpret_cast<uint8_t *>(Path ? m_planeb.target() : m_planea.target());
 	const uint8_t icm = get_icm<Path>();
 	const uint8_t transp_ctrl = get_transparency_control<Path>();
 	const int width = get_screen_width();
@@ -658,8 +658,8 @@ void mcd212_device::process_vsr(uint32_t* pixels, bool* transparent)
 
 	const uint32_t dyuv_abs_start = m_dyuv_abs_start[Path];
 	uint8_t y = (dyuv_abs_start >> 16) & 0x000000ff;
-	uint8_t u = (dyuv_abs_start >> 8) & 0x000000ff;
-	uint8_t v = (dyuv_abs_start >> 0) & 0x000000ff;
+	uint8_t u = (dyuv_abs_start >>  8) & 0x000000ff;
+	uint8_t v = (dyuv_abs_start >>  0) & 0x000000ff;
 
 	const uint32_t mask_bits = (~m_mask_color[Path]) & 0x00fcfcfc;
 	const uint32_t transp_match = m_transparent_color[Path] & mask_bits;
@@ -667,7 +667,7 @@ void mcd212_device::process_vsr(uint32_t* pixels, bool* transparent)
 	const bool transp_always = (transp_ctrl_masked == TCR_COND_1);
 	const bool invert_transp_condition = BIT(transp_ctrl, 3);
 	const int region_flag_index = 1 - (transp_ctrl_masked & 1);
-	const bool* region_flags = m_region_flag[region_flag_index];
+	const bool *region_flags = m_region_flag[region_flag_index];
 	const bool use_region_flag = (transp_ctrl_masked >= TCR_COND_RF0_1 && transp_ctrl_masked <= TCR_COND_RF1KEY_1);
 	bool use_color_key = (transp_ctrl_masked == TCR_COND_KEY_1 || transp_ctrl_masked == TCR_COND_RF0KEY_1 || transp_ctrl_masked == TCR_COND_RF1KEY_1);
 
@@ -689,7 +689,7 @@ void mcd212_device::process_vsr(uint32_t* pixels, bool* transparent)
 			const uint8_t u2 = (u >> 1) + (u4 >> 1) + (u & u4 & 1);
 			const uint8_t v2 = (v >> 1) + (v4 >> 1) + (v & v4 & 1);
 
-			uint32_t* limit_rgb = m_dyuv_limit_lut + y2 + 0x100;
+			uint32_t *limit_rgb = m_dyuv_limit_lut + y2 + 0x100;
 			color0 = (limit_rgb[m_dyuv_v_to_r[v2]] << 16) | (limit_rgb[m_dyuv_u_to_g[u2] + m_dyuv_v_to_g[v2]] << 8) | limit_rgb[m_dyuv_u_to_b[u2]];
 			limit_rgb = m_dyuv_limit_lut + y4 + 0x100;
 			color1 = (limit_rgb[m_dyuv_v_to_r[v4]] << 16) | (limit_rgb[m_dyuv_u_to_g[u4] + m_dyuv_v_to_g[v4]] << 8) | limit_rgb[m_dyuv_u_to_b[u4]];
@@ -707,36 +707,39 @@ void mcd212_device::process_vsr(uint32_t* pixels, bool* transparent)
 			transparent[x + 2] = (transp_always || (use_region_flag && region_flags[x + 2])) != invert_transp_condition;
 			transparent[x + 3] = (transp_always || (use_region_flag && region_flags[x + 3])) != invert_transp_condition;
 			x += 4;
-			continue;
 		}
-		else if (icm == ICM_CLUT4)
+		else
 		{
-			const uint8_t mask = (decodingMode == DDR_FT_RLE) ? 0x7 : 0xf;
-			color0 = m_clut[BYTE_TO_CLUT<Path>(icm, mask & (byte >> 4))];
-			color1 = m_clut[BYTE_TO_CLUT<Path>(icm, mask & byte)];
-		}
-		else {
-			color1 = color0 = m_clut[BYTE_TO_CLUT<Path>(icm, byte)];
-		}
+			if (icm == ICM_CLUT4)
+			{
+				const uint8_t mask = (decodingMode == DDR_FT_RLE) ? 0x7 : 0xf;
+				color0 = m_clut[BYTE_TO_CLUT<Path>(icm, mask & (byte >> 4))];
+				color1 = m_clut[BYTE_TO_CLUT<Path>(icm, mask & byte)];
+			}
+			else
+			{
+				color1 = color0 = m_clut[BYTE_TO_CLUT<Path>(icm, byte)];
+			}
 
-		int m_length = mosaic_enable ? mosaic_factor * 2 : 2;
-		if (decodingMode == DDR_FT_RLE)
-		{
-			const uint16_t length = (byte & 0x80) ? data[((vsr++) & 0x0007ffff) ^ 1] : 1;
-			m_length = length ? length * 2 : width;
-		}
+			int length_m = mosaic_enable ? (mosaic_factor * 2) : 2;
+			if (decodingMode == DDR_FT_RLE)
+			{
+				const uint16_t length = (byte & 0x80) ? data[((vsr++) & 0x0007ffff) ^ 1] : 1;
+				length_m = length ? (length * 2) : width;
+			}
 
-		const bool color_match0 = (mask_bits & color0) == transp_match;
-		const bool color_match1 = (mask_bits & color1) == transp_match;
-		const int end = std::min(width, (int)x + m_length);
-		for (int rl_index = x; rl_index < end; rl_index += 2)
-		{
-			pixels[rl_index] = color0;
-			transparent[rl_index] = (transp_always || (use_color_key && color_match0) || (use_region_flag && region_flags[rl_index])) != invert_transp_condition;
-			pixels[rl_index + 1] = color1;
-			transparent[rl_index + 1] = (transp_always || (use_color_key && color_match1) || (use_region_flag && region_flags[rl_index + 1])) != invert_transp_condition;
+			const bool color_match0 = (mask_bits & color0) == transp_match;
+			const bool color_match1 = (mask_bits & color1) == transp_match;
+			const int end = std::min<int>(width, x + length_m);
+			for (int rl_index = x; rl_index < end; rl_index += 2)
+			{
+				pixels[rl_index] = color0;
+				transparent[rl_index] = (transp_always || (use_color_key && color_match0) || (use_region_flag && region_flags[rl_index])) != invert_transp_condition;
+				pixels[rl_index + 1] = color1;
+				transparent[rl_index + 1] = (transp_always || (use_color_key && color_match1) || (use_region_flag && region_flags[rl_index + 1])) != invert_transp_condition;
+			}
+			x = end;
 		}
-		x = end;
 	}
 	set_vsr<Path>(vsr);
 }
@@ -1199,7 +1202,7 @@ int mcd212_device::ram_dtack_cycle_count()
 		return 2;
 
 	// System access is restricted to the last 5 out of every 16 CLKs.
-	const int slot_cycle = (int)(machine().time().as_ticks(clock()) & 0xf);
+	const int slot_cycle = int(machine().time().as_ticks(clock()) & 0xf);
 	if (slot_cycle >= 11)
 		return 2;
 

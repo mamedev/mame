@@ -16,42 +16,19 @@
 #include <sstream>
 
 
-static const u16 s_dummy_psw = 0;
+namespace {
 
-nx8_500s_disassembler::nx8_500s_disassembler()
-	: nx8_500s_disassembler(s_dummy_psw)
-{
-}
-
-nx8_500s_disassembler::nx8_500s_disassembler(const u16 &psw)
-	: m_psw(psw)
-{
-}
-
-offs_t nx8_500s_disassembler::opcode_alignment() const
-{
-	return 1;
-}
-
-u32 nx8_500s_disassembler::interface_flags() const
-{
-	return PAGED;
-}
-
-u32 nx8_500s_disassembler::page_address_bits() const
-{
-	return 16;
-}
+const u16 f_dummy_psw = 0;
 
 
-static const char *const s_reg_names[3][4] =
+const char *const f_reg_names[3][4] =
 {
 	{ "ER0", "ER1", "ER2", "ER3" },
 	{ "X1", "X2", "DP", "USP" },
 	{ "SSP", "LRB", "PSW", "A" }
 };
 
-static const char *const s_pr_indirect[4] =
+const char *const f_pr_indirect[4] =
 {
 	"[X1]",
 	"[DP-]",
@@ -59,7 +36,7 @@ static const char *const s_pr_indirect[4] =
 	"[DP+]"
 };
 
-static const char *const s_bit_ops[4] =
+const char *const f_bit_ops[4] =
 {
 	"SB",
 	"RB",
@@ -67,13 +44,13 @@ static const char *const s_bit_ops[4] =
 	"JBR"
 };
 
-static const char *const s_alu_ops[2][8] =
+const char *const f_alu_ops[2][8] =
 {
 	{ "SUBB", "CMPB", "ADDB", "ANDB", "ORB", "XORB", "SBCB", "ADCB" },
 	{ "SUB", "CMP", "ADD", "AND", "OR", "XOR", "SBC", "ADC" }
 };
 
-static const char *const s_jconds[8] =
+const char *const f_jconds[8] =
 {
 	"JGT",
 	"JEQ", // alias JZ
@@ -85,7 +62,7 @@ static const char *const s_jconds[8] =
 	"JLE"
 };
 
-static const char *const s_signed_jconds[4] =
+const char *const f_signed_jconds[4] =
 {
 	"JLTS",
 	"JLES",
@@ -94,7 +71,7 @@ static const char *const s_signed_jconds[4] =
 };
 
 // FIXME: these lists combine MSM66573 and MSM66577 SFRs, including a few existing only on one or the other
-static const char *const s_msm6657x_byte_sfr_names[256] =
+const char *const f_msm6657x_byte_sfr_names[256] =
 {
 	nullptr, nullptr, "LRBL", "LRBH", "PSWL", "PSWH", "ACCL", "ACCH",
 	"TSR", "DSR", nullptr, "ROMWIN", "ROMRDY", "RAMRDY", "STPACP", "SBYCON",
@@ -130,7 +107,7 @@ static const char *const s_msm6657x_byte_sfr_names[256] =
 	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr
 };
 
-static const char *const s_msm6657x_word_sfr_names[128] =
+const char *const f_msm6657x_word_sfr_names[128] =
 {
 	"SSP", "LRB", "PSW", "ACC", "DSTSR", nullptr, nullptr, nullptr,
 	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
@@ -150,45 +127,46 @@ static const char *const s_msm6657x_word_sfr_names[128] =
 	nullptr, "FLAADRS", nullptr, nullptr, nullptr, nullptr, nullptr, nullptr
 };
 
-void nx8_500s_disassembler::format_n8(std::ostream &stream, u8 n8)
+
+void format_n8(std::ostream &stream, u8 n8)
 {
 	if (n8 >= 0xa0)
 		stream << '0';
 	util::stream_format(stream, "%02XH", n8);
 }
 
-void nx8_500s_disassembler::format_n16(std::ostream &stream, u16 n16)
+void format_n16(std::ostream &stream, u16 n16)
 {
 	if (n16 >= 0xa000)
 		stream << '0';
 	util::stream_format(stream, "%04XH", n16);
 }
 
-void nx8_500s_disassembler::format_fix8(std::ostream &stream, u8 n8)
+void format_fix8(std::ostream &stream, u8 n8)
 {
 	format_n16(stream, 0x0200 + n8);
 }
 
-void nx8_500s_disassembler::format_off8(std::ostream &stream, u8 n8)
+void format_off8(std::ostream &stream, u8 n8)
 {
 	stream << '\\';
 	format_n8(stream, n8);
 }
 
-void nx8_500s_disassembler::format_dir16(std::ostream &stream, u16 n16)
+void format_dir16(std::ostream &stream, u16 n16)
 {
 	if ((n16 & 0xff00) == 0 || (n16 & 0xff00) == 0x0200)
 		stream << "dir ";
 	format_n16(stream, n16);
 }
 
-void nx8_500s_disassembler::format_sfr8(std::ostream &stream, u8 n8, bool word)
+void format_sfr8(std::ostream &stream, u8 n8, bool word)
 {
 	const char *name = nullptr;
 	if (word && !BIT(n8, 0))
-		name = s_msm6657x_word_sfr_names[n8 >> 1];
+		name = f_msm6657x_word_sfr_names[n8 >> 1];
 	else if (!word)
-		name = s_msm6657x_byte_sfr_names[n8];
+		name = f_msm6657x_byte_sfr_names[n8];
 	if (name != nullptr)
 		stream << name;
 	else
@@ -198,6 +176,36 @@ void nx8_500s_disassembler::format_sfr8(std::ostream &stream, u8 n8, bool word)
 	}
 }
 
+} // anonymous namespace
+
+
+
+nx8_500s_disassembler::nx8_500s_disassembler()
+	: nx8_500s_disassembler(f_dummy_psw)
+{
+}
+
+nx8_500s_disassembler::nx8_500s_disassembler(const u16 &psw)
+	: m_psw(psw)
+{
+}
+
+offs_t nx8_500s_disassembler::opcode_alignment() const
+{
+	return 1;
+}
+
+u32 nx8_500s_disassembler::interface_flags() const
+{
+	return PAGED;
+}
+
+u32 nx8_500s_disassembler::page_address_bits() const
+{
+	return 16;
+}
+
+
 offs_t nx8_500s_disassembler::dasm_composite(std::ostream &stream, offs_t pc, offs_t prefix, const nx8_500s_disassembler::data_buffer &opcodes, std::string obj, bool word) const
 {
 	const u8 code = opcodes.r8(pc + prefix);
@@ -205,7 +213,7 @@ offs_t nx8_500s_disassembler::dasm_composite(std::ostream &stream, offs_t pc, of
 	{
 	case 0x00: case 0x01: case 0x02: case 0x03: case 0x04: case 0x05: case 0x06: case 0x07:
 	case 0x08: case 0x09: case 0x0a: case 0x0b: case 0x0c: case 0x0d: case 0x0e: case 0x0f:
-		util::stream_format(stream, "%-8s%s.%d", s_bit_ops[BIT(~code, 3)], obj, code & 0x07);
+		util::stream_format(stream, "%-8s%s.%d", f_bit_ops[BIT(~code, 3)], obj, code & 0x07);
 		return (prefix + 1) | SUPPORTED;
 
 	case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17:
@@ -220,7 +228,7 @@ offs_t nx8_500s_disassembler::dasm_composite(std::ostream &stream, offs_t pc, of
 
 	case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27:
 	case 0x28: case 0x29: case 0x2a: case 0x2b: case 0x2c: case 0x2d: case 0x2e: case 0x2f:
-		util::stream_format(stream, "%-8s%s.%d,", s_bit_ops[2 + BIT(~code, 3)], obj, code & 0x07);
+		util::stream_format(stream, "%-8s%s.%d,", f_bit_ops[2 + BIT(~code, 3)], obj, code & 0x07);
 		format_n16(stream, pc + prefix + 2 + s8(opcodes.r8(pc + prefix + 1)));
 		return (prefix + 2) | STEP_COND | SUPPORTED;
 
@@ -246,28 +254,28 @@ offs_t nx8_500s_disassembler::dasm_composite(std::ostream &stream, offs_t pc, of
 
 	case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:
 		if (word)
-			util::stream_format(stream, "%-8s%s,%s", "MOV", s_reg_names[BIT(code, 2)][code & 0x03], obj);
+			util::stream_format(stream, "%-8s%s,%s", "MOV", f_reg_names[BIT(code, 2)][code & 0x03], obj);
 		else
 			util::stream_format(stream, "%-8sR%d,%s", "MOVB", code & 0x07, obj);
 		return (prefix + 1) | SUPPORTED;
 
 	case 0x80: case 0x90: case 0xa0: case 0xb0: case 0xc0: case 0xd0: case 0xe0: case 0xf0:
-		util::stream_format(stream, "%-8s%s,", s_alu_ops[word][(code >> 4) & 0x07], obj);
+		util::stream_format(stream, "%-8s%s,", f_alu_ops[word][(code >> 4) & 0x07], obj);
 		format_fix8(stream, opcodes.r8(pc + prefix + 1));
 		return (prefix + 2) | SUPPORTED;
 
 	case 0x81: case 0x91: case 0xa1: case 0xb1: case 0xc1: case 0xd1: case 0xe1: case 0xf1:
-		util::stream_format(stream, "%-8s%s,", s_alu_ops[word][(code >> 4) & 0x07], obj);
+		util::stream_format(stream, "%-8s%s,", f_alu_ops[word][(code >> 4) & 0x07], obj);
 		format_off8(stream, opcodes.r8(pc + prefix + 1));
 		return (prefix + 2) | SUPPORTED;
 
 	case 0x82: case 0x92: case 0xa2: case 0xb2: case 0xc2: case 0xd2: case 0xe2: case 0xf2:
-		util::stream_format(stream, "%-8s%s,", s_alu_ops[word][(code >> 4) & 0x07], obj);
+		util::stream_format(stream, "%-8s%s,", f_alu_ops[word][(code >> 4) & 0x07], obj);
 		format_sfr8(stream, opcodes.r8(pc + prefix + 1), word);
 		return (prefix + 2) | SUPPORTED;
 
 	case 0x83: case 0x93: case 0xa3: case 0xb3: case 0xc3: case 0xd3: case 0xe3: case 0xf3:
-		util::stream_format(stream, "%-8s%s,#", s_alu_ops[word][(code >> 4) & 0x07], obj);
+		util::stream_format(stream, "%-8s%s,#", f_alu_ops[word][(code >> 4) & 0x07], obj);
 		if (word)
 		{
 			format_n16(stream, opcodes.r16(pc + prefix + 1));
@@ -280,11 +288,11 @@ offs_t nx8_500s_disassembler::dasm_composite(std::ostream &stream, offs_t pc, of
 		}
 
 	case 0x84: case 0x94: case 0xa4: case 0xb4: case 0xc4: case 0xd4: case 0xe4: case 0xf4:
-		util::stream_format(stream, "%-8s%s,A", s_alu_ops[word][(code >> 4) & 0x07], obj);
+		util::stream_format(stream, "%-8s%s,A", f_alu_ops[word][(code >> 4) & 0x07], obj);
 		return (prefix + 1) | SUPPORTED;
 
 	case 0x85: case 0x95: case 0xa5: case 0xb5: case 0xc5: case 0xd5: case 0xe5: case 0xf5:
-		util::stream_format(stream, "%-8sA,%s", s_alu_ops[word][(code >> 4) & 0x07], obj);
+		util::stream_format(stream, "%-8sA,%s", f_alu_ops[word][(code >> 4) & 0x07], obj);
 		return (prefix + 1) | SUPPORTED;
 
 	case 0x86:
@@ -300,7 +308,7 @@ offs_t nx8_500s_disassembler::dasm_composite(std::ostream &stream, offs_t pc, of
 		return (prefix + 2) | SUPPORTED;
 
 	case 0x88: case 0x89: case 0x8a: case 0x8b:
-		util::stream_format(stream, "%-8s%s,%s", word ? "MOV" : "MOVB", s_pr_indirect[code & 0x03], obj);
+		util::stream_format(stream, "%-8s%s,%s", word ? "MOV" : "MOVB", f_pr_indirect[code & 0x03], obj);
 		return (prefix + 1) | SUPPORTED;
 
 	case 0x8c: case 0x8d: case 0x8e: case 0x8f:
@@ -320,7 +328,7 @@ offs_t nx8_500s_disassembler::dasm_composite(std::ostream &stream, offs_t pc, of
 	case 0x98: case 0x99:
 		util::stream_format(stream, "%-8s", word ? "MOV" : "MOVB");
 		format_n16(stream, opcodes.r16(pc + prefix + 1));
-		util::stream_format(stream, "[%s],%s", s_reg_names[1][code & 0x01], obj);
+		util::stream_format(stream, "[%s],%s", f_reg_names[1][code & 0x01], obj);
 		return (prefix + 3) | SUPPORTED;
 
 	case 0x9a:
@@ -492,7 +500,7 @@ offs_t nx8_500s_disassembler::dasm_composite(std::ostream &stream, offs_t pc, of
 		return (prefix + 1) | SUPPORTED;
 
 	case 0xfc: case 0xfd: case 0xfe: case 0xff: // dummy prefix
-		util::stream_format(stream, "%-8s", s_signed_jconds[code & 0x03]);
+		util::stream_format(stream, "%-8s", f_signed_jconds[code & 0x03]);
 		format_n16(stream, pc + prefix + 2 + s8(opcodes.r8(pc + prefix + 1)));
 		return (prefix + 2) | STEP_COND | SUPPORTED;
 
@@ -580,7 +588,7 @@ offs_t nx8_500s_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 					{
 						if ((byte2 & ((1 << n) - 1)) != 0)
 							stream << ',';
-						stream << s_reg_names[(byte2 & 0x30) >> 4][n];
+						stream << f_reg_names[(byte2 & 0x30) >> 4][n];
 					}
 				}
 				break;
@@ -604,9 +612,9 @@ offs_t nx8_500s_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 	case 0x08: case 0x09: case 0x0a: case 0x0b: case 0x0c: case 0x0d: case 0x0e: case 0x0f:
 	case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c: case 0x1d: case 0x1e: case 0x1f:
 	case 0x28: case 0x29: case 0x2a: case 0x2b: case 0x2c: case 0x2d: case 0x2e: case 0x2f:
-		util::stream_format(stream, "%-8sA,", s_alu_ops[BIT(m_psw, 12)][byte1 >> 4]);
+		util::stream_format(stream, "%-8sA,", f_alu_ops[BIT(m_psw, 12)][byte1 >> 4]);
 		if (BIT(m_psw, 12))
-			stream << s_reg_names[BIT(byte1, 2)][byte1 & 0x03];
+			stream << f_reg_names[BIT(byte1, 2)][byte1 & 0x03];
 		else
 			util::stream_format(stream, "R%d", byte1 & 0x07);
 		return 1 | SUPPORTED;
@@ -617,12 +625,12 @@ offs_t nx8_500s_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 		return 2 | SUPPORTED;
 
 	case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27:
-		util::stream_format(stream, "%-8s%s,#", "MOV", s_reg_names[BIT(~byte1, 2)][byte1 & 0x03]);
+		util::stream_format(stream, "%-8s%s,#", "MOV", f_reg_names[BIT(~byte1, 2)][byte1 & 0x03]);
 		format_n16(stream, opcodes.r16(pc + 1));
 		return 3 | SUPPORTED;
 
 	case 0x30: case 0x31: case 0x32: case 0x33:
-		util::stream_format(stream, "%-8sA,%s", BIT(m_psw, 12) ? "ST" : "STB", s_pr_indirect[byte1 & 0x03]);
+		util::stream_format(stream, "%-8sA,%s", BIT(m_psw, 12) ? "ST" : "STB", f_pr_indirect[byte1 & 0x03]);
 		return 1 | SUPPORTED;
 
 	case 0x34:
@@ -647,13 +655,13 @@ offs_t nx8_500s_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 
 	case 0x38: case 0x39: case 0x3a: case 0x3b: case 0x3c: case 0x3d: case 0x3e: case 0x3f:
 		if (BIT(m_psw, 12))
-			util::stream_format(stream, "%-8sA,%s", "ST", s_reg_names[BIT(byte1, 2)][byte1 & 0x03]);
+			util::stream_format(stream, "%-8sA,%s", "ST", f_reg_names[BIT(byte1, 2)][byte1 & 0x03]);
 		else
 			util::stream_format(stream, "%-8sA,R%d", "STB", byte1 & 0x07);
 		return 1 | SUPPORTED;
 
 	case 0x40: case 0x41: case 0x42: case 0x43:
-		util::stream_format(stream, "%-8s%s", "INC", s_reg_names[1][byte1 & 0x03]);
+		util::stream_format(stream, "%-8s%s", "INC", f_reg_names[1][byte1 & 0x03]);
 		return 1 | SUPPORTED;
 
 	case 0x44: case 0x45: case 0x46: case 0x47: case 0x54: case 0x55: case 0x56: case 0x57:
@@ -665,7 +673,7 @@ offs_t nx8_500s_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 	case 0x58: case 0x59: case 0x5a: case 0x5b: case 0x5c: case 0x5d: case 0x5e: case 0x5f:
 	{
 		const u8 byte2 = opcodes.r8(pc + 1);
-		util::stream_format(stream, "%-8s", s_bit_ops[byte2 >> 6]);
+		util::stream_format(stream, "%-8s", f_bit_ops[byte2 >> 6]);
 		if (BIT(byte1, 4))
 			format_fix8(stream, 0xc0 | byte2);
 		else
@@ -682,17 +690,17 @@ offs_t nx8_500s_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 	}
 
 	case 0x50: case 0x51: case 0x52: case 0x53:
-		util::stream_format(stream, "%-8s%s", "DEC", s_reg_names[1][byte1 & 0x03]);
+		util::stream_format(stream, "%-8s%s", "DEC", f_reg_names[1][byte1 & 0x03]);
 		return 1 | SUPPORTED;
 
 	case 0x60: case 0x61: case 0x62: case 0x63: case 0x64: case 0x65: case 0x66: case 0x67:
-		return dasm_composite(stream, pc, 1, opcodes, s_reg_names[BIT(~byte1, 2)][byte1 & 0x03], true);
+		return dasm_composite(stream, pc, 1, opcodes, f_reg_names[BIT(~byte1, 2)][byte1 & 0x03], true);
 
 	case 0x68: case 0x69: case 0x6a: case 0x6b: case 0x6c: case 0x6d: case 0x6e: case 0x6f:
 		return dasm_composite(stream, pc, 1, opcodes, util::string_format("R%d", byte1 & 0x07), false);
 
 	case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:
-		util::stream_format(stream, "%-8sA,%s", "L", s_reg_names[BIT(~byte1, 2)][byte1 & 0x03]);
+		util::stream_format(stream, "%-8sA,%s", "L", f_reg_names[BIT(~byte1, 2)][byte1 & 0x03]);
 		return 1 | SUPPORTED;
 
 	case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f:
@@ -701,7 +709,7 @@ offs_t nx8_500s_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 
 	case 0x80: case 0x81: case 0x82: case 0x83:
 	case 0x90: case 0x91: case 0x92: case 0x93:
-		util::stream_format(stream, "%-8sA,%s", BIT(byte1, 4) ? "LB" : "L", s_pr_indirect[byte1 & 0x03]);
+		util::stream_format(stream, "%-8sA,%s", BIT(byte1, 4) ? "LB" : "L", f_pr_indirect[byte1 & 0x03]);
 		return 1 | SUPPORTED;
 
 	case 0x84: case 0x94:
@@ -752,17 +760,17 @@ offs_t nx8_500s_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 	}
 
 	case 0x8c: case 0x9c: case 0xac:
-		util::stream_format(stream, "%-8sA,", s_alu_ops[BIT(m_psw, 12)][(byte1 >> 4) & 0x07]);
+		util::stream_format(stream, "%-8sA,", f_alu_ops[BIT(m_psw, 12)][(byte1 >> 4) & 0x07]);
 		format_fix8(stream, opcodes.r8(pc + 1));
 		return 2 | SUPPORTED;
 
 	case 0x8d: case 0x9d: case 0xad: case 0xbd: case 0xcd: case 0xdd:
-		util::stream_format(stream, "%-8sA,", s_alu_ops[BIT(m_psw, 12)][(byte1 >> 4) & 0x07]);
+		util::stream_format(stream, "%-8sA,", f_alu_ops[BIT(m_psw, 12)][(byte1 >> 4) & 0x07]);
 		format_off8(stream, opcodes.r8(pc + 1));
 		return 2 | SUPPORTED;
 
 	case 0x8e: case 0x9e: case 0xae: case 0xbe: case 0xce: case 0xde:
-		util::stream_format(stream, "%-8sA,#", s_alu_ops[BIT(m_psw, 12)][(byte1 >> 4) & 0x07]);
+		util::stream_format(stream, "%-8sA,#", f_alu_ops[BIT(m_psw, 12)][(byte1 >> 4) & 0x07]);
 		if (BIT(m_psw, 12))
 		{
 			format_n16(stream, opcodes.r16(pc + 1));
@@ -784,7 +792,7 @@ offs_t nx8_500s_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 
 	case 0xa0: case 0xa1: case 0xa2: case 0xa3:
 	case 0xb0: case 0xb1: case 0xb2: case 0xb3:
-		return dasm_composite(stream, pc, 1, opcodes, s_pr_indirect[byte1 & 0x03], !BIT(byte1, 4));
+		return dasm_composite(stream, pc, 1, opcodes, f_pr_indirect[byte1 & 0x03], !BIT(byte1, 4));
 
 	case 0xa4: case 0xb4:
 	{
@@ -818,7 +826,7 @@ offs_t nx8_500s_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 	{
 		std::ostringstream string;
 		format_n16(string, opcodes.r16(pc + 1));
-		util::stream_format(string, "[%s]", s_reg_names[1][byte1 & 0x01]);
+		util::stream_format(string, "[%s]", f_reg_names[1][byte1 & 0x01]);
 		return dasm_composite(stream, pc, 3, opcodes, string.str(), !BIT(byte1, 4));
 	}
 
@@ -968,7 +976,7 @@ offs_t nx8_500s_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 		return 1 | STEP_OVER | SUPPORTED;
 
 	case 0xf0: case 0xf1: case 0xf2: case 0xf3: case 0xf4: case 0xf5: case 0xf6: case 0xf7:
-		util::stream_format(stream, "%-8s", s_jconds[byte1 & 0x07]);
+		util::stream_format(stream, "%-8s", f_jconds[byte1 & 0x07]);
 		format_n16(stream, pc + 2 + s8(opcodes.r8(pc + 1)));
 		return 2 | STEP_COND | SUPPORTED;
 
