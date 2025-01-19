@@ -7972,9 +7972,14 @@ Installation and Open Circulation CDs are bootable.
 				<disk name="en-us windows nt 3.10.528.1 1994" sha1="2076b06f7a975903265a1498b69e7fe4932d196e"/>
 			</diskarea>
 		</part>
-		<part name="flop" interface="floppy_3_5">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="en-us windows nt 3.10.528.1 3.5.img" size="1474560" crc="6501bf63" sha1="386d83a2e9fd758272cbbd0beb4148f9e238626e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1228800">
+				<rom name="en-us windows nt 3.10.528.1 5.25.img" size="1228800" crc="fe626b7c" sha1="ecfcbfb44922987adea1c9ba01c282973d419596"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7989,9 +7994,14 @@ Installation and Open Circulation CDs are bootable.
 				<disk name="en-us windows nt 3.10.528.1" sha1="1601864708df96e3f4ff57329bc6e384cd000494"/>
 			</diskarea>
 		</part>
-		<part name="flop" interface="floppy_3_5">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="en-us windows nt 3.10.528.1 3.5.img" size="1474560" crc="6501bf63" sha1="386d83a2e9fd758272cbbd0beb4148f9e238626e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1228800">
+				<rom name="en-us windows nt 3.10.528.1 5.25.img" size="1228800" crc="fe626b7c" sha1="ecfcbfb44922987adea1c9ba01c282973d419596"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8079,6 +8089,16 @@ Installation and Open Circulation CDs are bootable.
 				<disk name="de-de windows nt 3.10.511.1" sha1="5ea4098f8b0bf00bdb00af9d56a0ee2df01fdb13"/>
 			</diskarea>
 		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="de-de windows nt 3.10.511.1 3.5.img" size="1474560" crc="d1a6c818" sha1="ee0e0ef42fb3a730f2f41482cba6126d518eaa9f" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1228800">
+				<rom name="de-de windows nt 3.10.511 5.25.img" size="1228800" crc="1f49115b" sha1="03eee42ef26b65776a19e8d846fda36530b5a136" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="winnt31_eses" cloneof="winnt31">
@@ -8090,6 +8110,16 @@ Installation and Open Circulation CDs are bootable.
 			<diskarea name="cdrom">
 				<disk name="es-es windows nt 3.10.511.1" sha1="ff032060d15982d3724ea17b683faab8c4c07e27"/>
 			</diskarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="es-es windows nt 3.10.511 3.5.img" size="1474560" crc="005dc372" sha1="67fa4ba4109271b21c2c4e9a7874a92c77ade5d9" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1228800">
+				<rom name="es-es windows nt 3.10.511 5.25.img" size="1228800" crc="dcbf2e9c" sha1="60fc9fcb41267fd7a1688f3f30d0517291954c52" />
+			</dataarea>
 		</part>
 	</software>
 
@@ -8115,6 +8145,16 @@ Installation and Open Circulation CDs are bootable.
 				<disk name="fr-fr windows nt 3.10.511.1" sha1="9a6a6ade986a9ebaf2d84d0b47cb904496656e38"/>
 			</diskarea>
 		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="fr-fr windows nt 3.10.511.1 3.5.img" size="1474560" crc="b49c31bf" sha1="f9b1d649df0cba2d910cfc33b3db470842afd826" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1228800">
+				<rom name="fr-fr windows nt 3.10.511.1 5.25.img" size="1228800" crc="97ab311c" sha1="319da6febf4ca471df50e1281ebebc8495e676e2" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="winnt31_itit" cloneof="winnt31">
@@ -8127,6 +8167,16 @@ Installation and Open Circulation CDs are bootable.
 				<disk name="it-it windows nt 3.10.511.1" sha1="4756551eddc21f000194a63e7659078e945367d7"/>
 			</diskarea>
 		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="it-it windows nt 3.10.511.1 3.5.img" size="1474560" crc="0a83e51d" sha1="e2bfe11f67ec8f93159edff4387de9284f17ec11" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1228800">
+				<rom name="it-it windows nt 3.10.511.1 5.25.img" size="1228800" crc="f5897c5b" sha1="df6f406ebcc82a93c74dfb8e1a5a94bd8ada335a" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="winnt31_nlnl" cloneof="winnt31">
@@ -8138,6 +8188,16 @@ Installation and Open Circulation CDs are bootable.
 			<diskarea name="cdrom">
 				<disk name="nl-nl windows nt 3.10.511.1" sha1="572eb82f0c2c964798857b117f96438630ddb99c"/>
 			</diskarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="nl-nl windows nt 3.10.511.1 3.5.img" size="1474560" crc="e47bde7a" sha1="1a6f76f4bc3149d601faae4b781a44c338296638" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1228800">
+				<rom name="nl-nl windows nt 3.10.511.1 5.25.img" size="1228800" crc="ed512112" sha1="50882294e1f490762a61f97b2cb8e9902a1300c5" />
+			</dataarea>
 		</part>
 	</software>
 
@@ -8163,6 +8223,16 @@ Installation and Open Circulation CDs are bootable.
 				<disk name="pt-br windows nt 3.10.528.1" sha1="20d3cb0168629c019c33a493b1cc8c976c79523f"/>
 			</diskarea>
 		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="pt-br windows nt 3.10.528.1 3.5.img" size="1474560" crc="62aeb300" sha1="40af10fc4c9a4d515c9953c7cff636cb5356a077" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1228800">
+				<rom name="pt-br windows nt 3.10.528.1 5.25.img" size="1228800" crc="75196897" sha1="74f945f77538ea88a58d69fe284a5de0932eccc9" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="winnt31_svse" cloneof="winnt31">
@@ -8173,6 +8243,66 @@ Installation and Open Circulation CDs are bootable.
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="sv-se windows nt 3.10.511.1" sha1="1b184f2c14e14a43161201af8a5054fcda886c38"/>
+			</diskarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="sv-se windows nt 3.10.511.1 3.5.img" size="1474560" crc="a2c23a4a" sha1="a342567112d10ff771ed95b8c3ee0d5379e8a621" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1228800">
+				<rom name="sv-se windows nt 3.10.511.1 5.25.img" size="1228800" crc="0452e232" sha1="06fe68bddb437494c16f628578c3dabaf2e9938e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- MIA: NT 3.1 SP1 (CSD001, CSD002) install CDs -->
+	<!-- Part of the October 1994 MSDN set.  These discs contain ancillary software on top of the
+	     service pack installer.  They should be replaced if standalone discs exist and are found.
+	-->
+	<software name="winnt31sp2">
+		<description>Windows NT 3.1 Service Pack 2</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="Dutch/English/French/German/Italian/Spanish/Swedish" />
+		<info name="usage" value="This updates the operating system, but is not the operating system installer itself." />
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="English, Norwegian" />
+			<diskarea name="cdrom">
+				<disk name="en-us,no-no windows nt 3.1 service pack 2.chd" sha1="f3fee15a27e2b12754780221557bcb45f94547f6" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="Dutch, French, German, Italian, Spanish, Swedish" />
+			<diskarea name="cdrom">
+				<disk name="de-de,es-es,fr-fr,it-it,nl-nl,sv-se windows nt 3.1 service pack 2" sha1="80a87b68916e88f737e51a97b25d7c7491bbca1a" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Part of the January 1995 MSDN set.  These discs contain ancillary software on top of the
+	     service pack installer.  They should be replaced if standalone discs exist and are found.
+
+	     Norwegian exists on disc 1, but only as Service Pack 2.  It's being ommited from the
+	     language list for this reason.
+	-->
+	<software name="winnt31sp3">
+		<description>Windows NT 3.1 Service Pack 3</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="Dutch/English/French/German/Italian/Spanish/Swedish" />
+		<info name="usage" value="This updates the operating system, but is not the operating system installer itself." />
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="English, Swedish" />
+			<diskarea name="cdrom">
+				<disk name="en-us,sv-se windows nt 3.1 service pack 3" sha1="3694700981f128bce3c5ab0802804c5ce53437d5" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="Dutch, German, French, Italian, Spanish" />
+			<diskarea name="cdrom">
+				<disk name="de-de,es-es,fr-fr,it-it,nl-nl windows nt 3.1 service pack 3" sha1="5df436edf008ca65ff52935c4a5648a9f0700bfa" />
 			</diskarea>
 		</part>
 	</software>
@@ -8282,6 +8412,42 @@ Installation and Open Circulation CDs are bootable.
 		</part>
 	</software>
 
+	<!-- MIA: NT 3.5 SP1, SP3 install CDs -->
+	<!-- Part of the July 1995 MSDN set.  These discs contain ancillary software on top of the
+	     service pack installer.  They should be replaced if standalone discs exist and are found.
+	-->
+	<software name="winnt35sp2">
+		<description>Windows NT 3.5 Service Pack 2</description>
+		<year>1995</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="Danish/Dutch/English/Finnish/French/German/Italian/Norwegian/Portuguese (Brazil)/Spanish/Swedish" />
+		<info name="usage" value="This updates the operating system, but is not the operating system installer itself." />
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="English" />
+			<diskarea name="cdrom">
+				<disk name="en-us windows nt 3.5 service pack 2" sha1="e166f63dbb17ec2712b2838f00e932b6f61d9228" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="Portuguese (Brazil), Swedish" />
+			<diskarea name="cdrom">
+				<disk name="pt-br,sv-se windows nt 3.5 service pack 2" sha1="76f466c14433a5f5baed963e06d657ca1c06f8ef" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<feature name="part_id" value="Danish, Finnish, Norwegian" />
+			<diskarea name="cdrom">
+				<disk name="da-dk,fi-fi,no-no windows nt 3.5 service pack 2" sha1="edbe147248471922dad9ebbc0ef2078c489e8de6" />
+			</diskarea>
+		</part>
+		<part name="cdrom4" interface="cdrom">
+			<feature name="part_id" value="Dutch, French, German, Italian, Spanish" />
+			<diskarea name="cdrom">
+				<disk name="de-de,es-es,fr-fr,it-it,nl-nl windows nt 3.5 service pack 2" sha1="7db03d847f44a9a4a9eec601b5c0f1065919a76e" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="winnt351">
 		<description>Windows NT Workstation 3.51 (3.51.1057.1)</description>
 		<year>1995</year>
@@ -8337,6 +8503,48 @@ Installation and Open Circulation CDs are bootable.
 			<dataarea name="flop" size="1474560">
 				<rom name="en-us windows nt server 3.51.1057.1 3.5-3.img" size="1474560" crc="25a33e8e" sha1="29e8fd4ce305182a4f7b5ca2cef1f78363d95466"/>
 			</dataarea>
+		</part>
+	</software>
+
+	<!-- MIA: NT 3.51 SP2, SP5 install CDs -->
+	<software name="winnt351sp1">
+		<description>Windows NT 3.51 Service Pack 1</description>
+		<year>1995</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="This updates the operating system, but is not the operating system installer itself." />
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_id" value="English" />
+			<diskarea name="cdrom">
+				<disk name="en-us windows nt 3.51 service pack 1" sha1="56cc61a75db266cfbfd3c84c750a567dd50ae6a5" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="winnt351sp3">
+		<description>Windows NT 3.51 Service Pack 3</description>
+		<year>1995</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="This updates the operating system, but is not the operating system installer itself." />
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_id" value="English" />
+			<diskarea name="cdrom">
+				<disk name="en-us windows nt 3.51 service pack 3" sha1="07f0a5063a6de68ce45c48d50259925362cae7f3" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="winnt351sp4">
+		<description>Windows NT 3.51 Service Pack 4</description>
+		<year>1996</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="English/French/German/Italian" />
+		<info name="usage" value="This updates the operating system, but is not the operating system installer itself." />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="de-de,en-us,fr-fr,it-it windows nt 3.51 service pack 4" sha1="cbb9f303b2c67d5a51a3c91c6026f1b0331db61d" />
+			</diskarea>
 		</part>
 	</software>
 
@@ -8583,7 +8791,21 @@ Installation and Open Circulation CDs are bootable.
 		<info name="usage" value="This updates the operating system, but is not the operating system installer itself." />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="en-us windows nt 4.0 service pack 6a" sha1="8a08d51c2a131940fe7d02656bb71ca968e61835" />
+				<disk name="en-us windows nt 4.0 service pack 6a" sha1="06f03cea52be42dc4c08390be3f031fc12a5434a" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- The Option Pack consists of backported software from Windows 2000 (NT 5.0) development. -->
+	<software name="winnt40opt">
+		<description>Windows NT 4.0 Option Pack</description>
+		<year>1998</year>
+		<publisher>Microsoft</publisher>
+		<info name="release" value="19981130" />
+		<info name="language" value="English" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows nt 4.0 option pack" sha1="19fc52af4301a33a1a0e6cca6b815e8d19005a39" />
 			</diskarea>
 		</part>
 	</software>
@@ -9657,4 +9879,95 @@ Wave Studio v3.12
 		</part>
 	</software>
 
+	<software name="win32sdk">
+		<description>Win32 Software Development Kit (version 3.51)</description>
+		<year>1995</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="For Windows NT 3.51 and Windows 95" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us win32 sdk 3.51.1057.1" sha1="56b0e2b3ec8976bac7f702dcb504cc788ba3edeb" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="winnt31rk">
+		<description>Windows NT Resource Kit (version 3.1)</description>
+		<year>1993</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="English" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows nt resource kit 3.1" sha1="47cf0f58d254837f6ccfcdbf9f97da2a18954ac0" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="winnt31sdk">
+		<description>Win32 Software Development Kit and Device Driver Kit (version 3.1)</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="English" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us win32 sdk and ddk 3.10.528.1" sha1="57c11eed25ff459ee793ed8dea867c3e498436f7" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="winnt35rk">
+		<description>Windows NT Resource Kit (version 3.5)</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="English" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows nt resource kit 3.5" sha1="aadea0f25dae3f8030e490eb2d86a68be6530031" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="winnt351rk">
+		<description>Windows NT Resource Kit (version 3.51)</description>
+		<year>1995</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="English" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows nt resource kit 3.51" sha1="ff198e230549abeaf45a5b5af9a5d414ac04a9ec" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="winnt40rk">
+		<description>Windows NT Workstation Resource Kit (version 4.0)</description>
+		<year>1996</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="English" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows nt workstation resource kit 4.0" sha1="44631b02771339ae053366ad1766a272a57bd96f" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="winnt40srk" cloneof="winnt40rk">
+		<description>Windows NT Server Resource Kit (version 3.1)</description>
+		<year>1996</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="English" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows nt server resource kit 4.0" sha1="c1111892c995c76d0cba8c9667fab569ec3fd178" />
+			</diskarea>
+		</part>
+	</software>
 </softwarelist>

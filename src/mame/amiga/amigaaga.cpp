@@ -528,7 +528,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 
 	/* loop over the line */
 	// TODO: copper runs on odd timeslots
-	next_copper_x = 0;
+	next_copper_x = m_copper->restore_offset();
 	// TODO: verify where we're missing pixels here for the GFX pitch bitplane corruptions
 	// - wbenc30 scrolling in lores mode (fmode=3, expects a +58!, verify ddfstrt)
 	// - roadkill title (fmode=3, max +14), gameplay uses fmode=1
@@ -876,6 +876,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 					pri = (sprpix >> 12);
 
 					/* sprite has priority */
+                    // TODO: porting OCS alfred fix to AGA will break OCS rodland status bar (!?)
 					if (sprpix && pf1pri > pri)
 					{
 						dst[x*2+0] =
@@ -945,6 +946,8 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 				CUSTOM_REG_LONG(REG_BPL1PTH + pl * 2) += even_modulo;
 		}
 	}
+
+	m_copper->suspend_offset(next_copper_x, amiga_state::SCREEN_WIDTH / 2);
 
 	/* restore color00 */
 	CUSTOM_REG(REG_COLOR00) = save_color0;

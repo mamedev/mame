@@ -1674,7 +1674,7 @@ uint16_t lisa_state::lisa_IO_r(offs_t offset, uint16_t mem_mask)
 			switch ((offset & 0x0600) >> 9)
 			{
 			case 0: /* serial ports control */
-				answer = m_scc->reg_r(offset&7);
+				answer = m_scc->dc_ab_r(offset&3);
 				break;
 
 			case 2: /* parallel port */
@@ -1798,7 +1798,7 @@ void lisa_state::lisa_IO_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 			switch ((offset & 0x0600) >> 9)
 			{
 			case 0: /* serial ports control */
-				m_scc->reg_w(offset&7, data);
+				m_scc->dc_ab_w(offset&3, data);
 				break;
 
 			case 2: /* paralel port */

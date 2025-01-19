@@ -8,7 +8,7 @@
 
     Games supported:
         * F-15 Strike Eagle [3 sets]
-        * B.O.T.S.S. - Battle of the Solar System [2 sets]
+        * B.O.T.S.S.: Battle of the Solar System [2 sets]
         * Tank Battle (prototype)
         * Super Tank Attack (prototype)
 
@@ -223,6 +223,12 @@ void micro3d_state::hostmem(address_map &map)
 	map(0xa40002, 0xa40003).r(FUNC(micro3d_state::encoder_l_r));
 }
 
+void micro3d_state::cpu_space_map(address_map &map)
+{
+	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
+	map(0xfffff6, 0xfffff7).lr16(NAME([this] () -> u16 { return m_duart->get_irq_vector(); }));
+}
+
 
 /*************************************
  *
@@ -294,12 +300,6 @@ void micro3d_state::soundmem_io(address_map &map)
 	map(0xff01, 0xff01).w(FUNC(micro3d_state::snd_dac_b));
 }
 
-void micro3d_state::cpu_space_map(address_map &map)
-{
-	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
-	map(0xfffff6, 0xfffff7).lr16(NAME([this] () -> u16 { return m_duart->get_irq_vector(); }));
-}
-
 
 /*************************************
  *
@@ -327,10 +327,10 @@ void micro3d_state::micro3d(machine_config &config)
 	m_drmath->set_addrmap(AS_PROGRAM, &micro3d_state::drmath_prg);
 	m_drmath->set_addrmap(AS_DATA, &micro3d_state::drmath_data);
 
-	scc8530_device &scc(SCC8530N(config, "scc", 32_MHz_XTAL / 2 / 2));
+	scc8530_device &scc(SCC8530(config, "scc", 32_MHz_XTAL / 2 / 2));
 	scc.out_txdb_callback().set("monitor_drmath", FUNC(rs232_port_device::write_txd));
 
-	I8051(config, m_audiocpu, 11.0592_MHz_XTAL);
+	I80C31(config, m_audiocpu, 11.0592_MHz_XTAL);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &micro3d_state::soundmem_prg);
 	m_audiocpu->set_addrmap(AS_IO, &micro3d_state::soundmem_io);
 	m_audiocpu->port_in_cb<1>().set(FUNC(micro3d_state::sound_p1_r));
@@ -339,7 +339,7 @@ void micro3d_state::micro3d(machine_config &config)
 	m_audiocpu->port_out_cb<3>().set(FUNC(micro3d_state::sound_p3_w));
 
 	MC68681(config, m_duart, 3.6864_MHz_XTAL);
-	m_duart->irq_cb().set(FUNC(micro3d_state::duart_irq_handler));
+	m_duart->irq_cb().set_inputline("maincpu", M68K_IRQ_3);
 	m_duart->a_tx_cb().set("monitor_host", FUNC(rs232_port_device::write_txd));
 	m_duart->b_tx_cb().set(FUNC(micro3d_state::duart_txb));
 	m_duart->inport_cb().set(FUNC(micro3d_state::duart_input_r));
@@ -480,7 +480,7 @@ ROM_START( f15se22 )
 	ROM_LOAD16_BYTE( "110-00001-007.u94", 0x0c0000, 0x20000, CRC(36e06cba) SHA1(5ffee5da6f475978be10fa5e1a2c24f00497ea5f) )
 	ROM_LOAD16_BYTE( "110-00001-008.u71", 0x100001, 0x20000, CRC(d96fd4e2) SHA1(001af758da437e955b4ee914eabeb9739ebc4454) )
 	ROM_LOAD16_BYTE( "110-00001-009.u95", 0x100000, 0x20000, CRC(33e3b473) SHA1(66deda79ba94f0ed722b399b3fc6062dcdd1a6c9) )
-	ROM_FILL(                    0x140000, 0x40000, 0xff )
+	ROM_FILL(                             0x140000, 0x40000, 0xff )
 
 	// Dr Math PCB (MPG 010-00002-001)
 	ROM_REGION32_BE( 0x100000, "drmath", 0 )

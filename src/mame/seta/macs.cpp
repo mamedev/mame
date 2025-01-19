@@ -58,10 +58,12 @@ KISEKAE -- info
 */
 
 #include "emu.h"
+
 #include "st0016.h"
 
-#include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
+
 #include "speaker.h"
 
 
@@ -103,8 +105,6 @@ private:
 	void macs_rom_bank_w(uint8_t data);
 	void macs_output_w(offs_t offset, uint8_t data);
 	uint8_t dma_offset();
-
-	uint32_t screen_update_macs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	optional_device<st0016_cpu_device> m_maincpu;
 	optional_device<generic_slot_device> m_cart1;
@@ -490,12 +490,6 @@ static INPUT_PORTS_START( macs_h )
 INPUT_PORTS_END
 
 
-uint32_t macs_state::screen_update_macs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	return m_maincpu->update(screen,bitmap,cliprect);
-}
-
-
 uint8_t macs_state::dma_offset()
 {
 	return m_cart_bank;
@@ -505,7 +499,7 @@ uint8_t macs_state::dma_offset()
 void macs_state::macs(machine_config &config)
 {
 	/* basic machine hardware */
-	ST0016_CPU(config, m_maincpu, 8000000); // 8 MHz ?
+	ST0016_CPU(config, m_maincpu, 42.954545_MHz_XTAL / 6); // divider not verified
 	m_maincpu->set_memory_map(&macs_state::macs_mem);
 	m_maincpu->set_io_map(&macs_state::macs_io);
 	m_maincpu->set_dma_offs_callback(FUNC(macs_state::dma_offset));
@@ -517,7 +511,7 @@ void macs_state::macs(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(128*8, 128*8);
 	screen.set_visarea(0*8, 128*8-1, 0*8, 128*8-1);
-	screen.set_screen_update(FUNC(macs_state::screen_update_macs));
+	screen.set_screen_update(m_maincpu, FUNC(st0016_cpu_device::update));
 	screen.set_palette("maincpu:palette");
 	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_IRQ0, HOLD_LINE); // FIXME: HOLD_LINE is bad juju
 
@@ -528,19 +522,20 @@ void macs_state::macs(machine_config &config)
 	slot_b.set_default_option("rom");
 	slot_b.set_user_loadable(false);
 
-	// TODO: Mono?
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	// confirmed mono
+	SPEAKER(config, "speaker").front_center();
 
-	m_maincpu->add_route(0, "lspeaker", 1.0);
-	m_maincpu->add_route(1, "rspeaker", 1.0);
+	m_maincpu->add_route(0, "speaker", 1.0);
 }
 
 
 #define MACS_BIOS \
 	ROM_REGION( 0x1000000, "bios", 0 ) \
-	ROM_LOAD16_BYTE( "macsos_l.u43", 0x00000, 0x80000, CRC(0b5aed5e) SHA1(042e705017ee34656e2c6af45825bb2dd3447747) ) \
-	ROM_LOAD16_BYTE( "macsos_h.u44", 0x00001, 0x80000, CRC(538b68e4) SHA1(a0534147791e94e726f49451d0e95671ae0a87d5) )
+	ROM_LOAD16_BYTE( "am_macs_os_low.u43", 0x00000, 0x80000, CRC(0b5aed5e) SHA1(042e705017ee34656e2c6af45825bb2dd3447747) ) \
+	ROM_LOAD16_BYTE( "am_macs_os_hi.u44",  0x00001, 0x80000, CRC(538b68e4) SHA1(a0534147791e94e726f49451d0e95671ae0a87d5) ) \
+\
+	ROM_REGION( 0x157, "pld", 0 ) \
+	ROM_LOAD( "sx011-01.bin", 0x000, 0x157, CRC(669096c1) SHA1(36f55a2e4865bdf0506746a4df51bfb1944f905e) ) // GAL20V8B
 
 #define MACS2_BIOS \
 	ROM_REGION( 0x1000000, "bios", 0 ) \
@@ -575,6 +570,10 @@ ROM_START( kisekaem )
 	ROM_LOAD16_BYTE( "am-mj.u7", 0x000001, 0x100000, CRC(4b645354) SHA1(1dbf9141c3724e5dff2cd8066117fb1b94671a80) )
 	ROM_LOAD16_BYTE( "am-mj.u6", 0x200000, 0x100000, CRC(23b3aa24) SHA1(bfabdb16f9b1b60230bb636a944ab46fdfda49d7) )
 	ROM_LOAD16_BYTE( "am-mj.u5", 0x200001, 0x100000, CRC(b4d53e29) SHA1(d7683fdd5531bf1aa0ef1e4e6f517b31e2d5829e) )
+
+	ROM_REGION( 0x117, "slot_a:pld", 0 )
+	ROM_LOAD( "sx011-02.bin", 0x000, 0x117, CRC(ac8040b4) SHA1(1dc1cd93eaed13fb5b8cba024d93fdb9193a47c0) ) // GAL16V8B
+
 	ROM_REGION( 0x400000, "slot_b:rom", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x1000000, "maincpu", 0 )

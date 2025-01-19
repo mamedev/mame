@@ -159,7 +159,6 @@ public:
 	void init_batrider() ATTR_COLD;
 
 protected:
-	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
@@ -174,8 +173,8 @@ protected:
 	void batrider_soundlatch_w(u8 data);
 	void batrider_soundlatch2_w(u8 data);
 	void batrider_unknown_sound_w(u16 data);
-	void batrider_clear_sndirq_w(u16 data);
-	void batrider_sndirq_w(u8 data);
+	template <int Line> void batrider_clear_sndirq_w(u16 data);
+	template <int Line> void batrider_sndirq_w(u8 data);
 	void batrider_clear_nmi_w(u8 data);
 	void batrider_tx_gfxram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void batrider_textdata_dma_w(u16 data);
@@ -183,14 +182,11 @@ protected:
 	void batrider_objectbank_w(offs_t offset, u8 data);
 	void batrider_bank_cb(u8 layer, u32 &code);
 
-
 	required_device<address_map_bank_device> m_dma_space;
 	required_shared_ptr<u16> m_mainram;
 	optional_region_ptr<u8> m_z80_rom;
 
-	u16 m_gfxrom_bank[8]{};       /* Batrider object bank */
-	u8 m_sndirq_line = 0;        /* IRQ4 for batrider, IRQ2 for bbakraid */
-	u8 m_z80_busreq = 0;
+	u16 m_gfxrom_bank[8] = { }; // Batrider object bank
 };
 
 
@@ -204,8 +200,6 @@ public:
 	{ }
 
 	void bbakraid(machine_config &config) ATTR_COLD;
-
-	void init_bbakraid() ATTR_COLD;
 
 private:
 	void bbakraid_68k_mem(address_map &map) ATTR_COLD;
@@ -240,7 +234,6 @@ private:
 void batrider_state::batrider_tx_gfxram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	/*** Dynamic GFX decoding for Batrider / Battle Bakraid ***/
-
 	const u16 oldword = m_tx_gfxram[offset];
 
 	if (oldword != data)
@@ -298,29 +291,28 @@ void batrider_state::video_start()
 
 	m_vdp->disable_sprite_buffer(); // disable buffering on this game
 
-	/* Create the Text tilemap for this game */
+	// Create the Text tilemap for this game
 	m_gfxdecode->gfx(0)->set_source(reinterpret_cast<u8 *>(m_tx_gfxram.target()));
 
 	create_tx_tilemap(0x1d4, 0x16b);
 
-	/* Has special banking */
+	// Has special banking
 	save_item(NAME(m_gfxrom_bank));
 }
 
 
 u16 batrider_state::batrider_z80_busack_r()
 {
-	// Bit 0x01 returns the status of BUSAK from the Z80.
-	// These accesses are made when the 68K wants to read the Z80
-	// ROM code. Failure to return the correct status incurrs a Sound Error.
-
-	return m_z80_busreq;    // Loop BUSRQ to BUSAK
+	// bit 0x01 returns the status of BUSACK from the Z80
+	return m_audiocpu->busack_r();
 }
 
 
 void batrider_state::batrider_z80_busreq_w(u8 data)
 {
-	m_z80_busreq = (data & 0x01);   // see batrider_z80_busack_r above
+	// bit 0x01 sets Z80 BUSRQ, when the 68K wants to read the Z80 ROM code
+	m_audiocpu->set_input_line(Z80_INPUT_LINE_BUSRQ, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
+	machine().scheduler().perfect_quantum(attotime::from_usec(10));
 }
 
 
@@ -332,14 +324,14 @@ u16 batrider_state::batrider_z80rom_r(offs_t offset)
 // these two latches are always written together, via a single move.l instruction
 void batrider_state::batrider_soundlatch_w(u8 data)
 {
-	m_soundlatch[0]->write(data & 0xff);
+	m_soundlatch[0]->write(data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
 void batrider_state::batrider_soundlatch2_w(u8 data)
 {
-	m_soundlatch[1]->write(data & 0xff);
+	m_soundlatch[1]->write(data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
@@ -349,19 +341,18 @@ void batrider_state::batrider_unknown_sound_w(u16 data)
 	// for bbakraid this is on every sound command; for batrider, only on certain commands
 }
 
-
+template <int Line>
 void batrider_state::batrider_clear_sndirq_w(u16 data)
 {
-	// not sure whether this is correct
-	// the 68K writes here during the sound IRQ handler, and nowhere else...
-	m_maincpu->set_input_line(m_sndirq_line, CLEAR_LINE);
+	// not sure whether this is correct, the 68K writes here during the sound IRQ handler, and nowhere else...
+	m_maincpu->set_input_line(Line, CLEAR_LINE);
 }
 
-
+template <int Line>
 void batrider_state::batrider_sndirq_w(u8 data)
 {
-	// if batrider_clear_sndirq_w() is correct, should this be ASSERT_LINE?
-	m_maincpu->set_input_line(m_sndirq_line, HOLD_LINE);
+	// IRQ4 for batrider, IRQ2 for bbakraid
+	m_maincpu->set_input_line(Line, ASSERT_LINE);
 }
 
 
@@ -373,16 +364,8 @@ void batrider_state::batrider_clear_nmi_w(u8 data)
 
 u16 bbakraid_state::bbakraid_eeprom_r()
 {
-	// Bit 0x01 returns the status of BUSAK from the Z80.
-	// BUSRQ is activated via bit 0x10 on the EEPROM write port.
-	// These accesses are made when the 68K wants to read the Z80
-	// ROM code. Failure to return the correct status incurrs a Sound Error.
-
-	u8 data;
-	data  = ((m_eeprom->do_read() & 0x01) << 4);
-	data |= ((m_z80_busreq >> 4) & 0x01);   // Loop BUSRQ to BUSAK
-
-	return data;
+	// bit 0x01 returns the status of BUSACK from the Z80
+	return ((m_eeprom->do_read() & 0x01) << 4) | m_audiocpu->busack_r();
 }
 
 
@@ -393,14 +376,9 @@ void bbakraid_state::bbakraid_eeprom_w(u8 data)
 
 	m_eepromout->write(data, 0xff);
 
-	m_z80_busreq = data & 0x10; // see bbakraid_eeprom_r above
-}
-
-void batrider_state::machine_start()
-{
-	raizing_base_state::machine_start();
-
-	save_item(NAME(m_z80_busreq));
+	// bit 0x10 sets Z80 BUSRQ, when the 68K wants to read the Z80 ROM code
+	m_audiocpu->set_input_line(Z80_INPUT_LINE_BUSRQ, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+	machine().scheduler().perfect_quantum(attotime::from_usec(10));
 }
 
 
@@ -413,7 +391,7 @@ void batrider_state::machine_reset()
 {
 	raizing_base_state::machine_reset();
 
-	common_bgaregga_reset();
+	raizing_oki_reset();
 }
 
 static INPUT_PORTS_START( batrider )
@@ -512,7 +490,7 @@ static INPUT_PORTS_START( batrider )
 	PORT_DIPNAME( 0x0800,   0x0000, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW3:!4")
 	PORT_DIPSETTING(        0x0800, DEF_STR( No ) )
 	PORT_DIPSETTING(        0x0000, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x1000,   0x0000, "Invulnerability (Cheat)" )         PORT_DIPLOCATION("SW3:!5")
+	PORT_DIPNAME( 0x1000,   0x0000, "Invulnerability (Cheat)" ) PORT_DIPLOCATION("SW3:!5")
 	PORT_DIPSETTING(        0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(        0x1000, DEF_STR( On ) )
 	// These dips are shown only when Coin_A is set to Free_Play, but they work in normal play mode too
@@ -549,7 +527,7 @@ static INPUT_PORTS_START( bbakraid )
 	PORT_INCLUDE( batrider )
 
 	PORT_MODIFY("DSW")       // DSWA and DSWB
-	PORT_DIPNAME( 0xc000,   0x0000, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:!7,!8")
+	PORT_DIPNAME( 0xc000,   0x0000, DEF_STR( Bonus_Life ) )     PORT_DIPLOCATION("SW2:!7,!8")
 	PORT_DIPSETTING(        0xc000, DEF_STR( None ) )
 	PORT_DIPSETTING(        0x8000, "Every 4000k" )
 	PORT_DIPSETTING(        0x4000, "Every 3000k" )
@@ -672,7 +650,7 @@ void batrider_state::batrider_68k_mem(address_map &map)
 	map(0x500021, 0x500021).w(FUNC(batrider_state::batrider_soundlatch_w));
 	map(0x500023, 0x500023).w(FUNC(batrider_state::batrider_soundlatch2_w));
 	map(0x500024, 0x500025).w(FUNC(batrider_state::batrider_unknown_sound_w));
-	map(0x500026, 0x500027).w(FUNC(batrider_state::batrider_clear_sndirq_w));
+	map(0x500026, 0x500027).w(FUNC(batrider_state::batrider_clear_sndirq_w<M68K_IRQ_4>));
 	map(0x500061, 0x500061).w(FUNC(batrider_state::batrider_z80_busreq_w));
 	map(0x500080, 0x500081).w(FUNC(batrider_state::batrider_textdata_dma_w));
 	map(0x500082, 0x500083).w(FUNC(batrider_state::batrider_pal_text_dma_w));
@@ -701,7 +679,7 @@ void bbakraid_state::bbakraid_68k_mem(address_map &map)
 	map(0x500017, 0x500017).w(FUNC(bbakraid_state::batrider_soundlatch2_w));
 	map(0x500018, 0x500019).r(FUNC(bbakraid_state::bbakraid_eeprom_r));
 	map(0x50001a, 0x50001b).w(FUNC(bbakraid_state::batrider_unknown_sound_w));
-	map(0x50001c, 0x50001d).w(FUNC(bbakraid_state::batrider_clear_sndirq_w));
+	map(0x50001c, 0x50001d).w(FUNC(bbakraid_state::batrider_clear_sndirq_w<M68K_IRQ_2>));
 	map(0x50001f, 0x50001f).w(FUNC(bbakraid_state::bbakraid_eeprom_w));
 	map(0x500080, 0x500081).w(FUNC(bbakraid_state::batrider_textdata_dma_w));
 	map(0x500082, 0x500083).w(FUNC(bbakraid_state::batrider_pal_text_dma_w));
@@ -744,7 +722,7 @@ void batrider_state::batrider_sound_z80_port(address_map &map)
 	map.global_mask(0xff);
 	map(0x40, 0x40).w(m_soundlatch[2], FUNC(generic_latch_8_device::write));
 	map(0x42, 0x42).w(m_soundlatch[3], FUNC(generic_latch_8_device::write));
-	map(0x44, 0x44).w(FUNC(batrider_state::batrider_sndirq_w));
+	map(0x44, 0x44).w(FUNC(batrider_state::batrider_sndirq_w<M68K_IRQ_4>));
 	map(0x46, 0x46).w(FUNC(batrider_state::batrider_clear_nmi_w));
 	map(0x48, 0x48).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));
 	map(0x4a, 0x4a).r(m_soundlatch[1], FUNC(generic_latch_8_device::read));
@@ -758,7 +736,7 @@ void batrider_state::batrider_sound_z80_port(address_map &map)
 
 void bbakraid_state::bbakraid_sound_z80_mem(address_map &map)
 {
-	map(0x0000, 0xbfff).rom();     // No banking? ROM only contains code and data up to 0x28DC
+	map(0x0000, 0xbfff).rom(); // No banking? ROM only contains code and data up to 0x28DC
 	map(0xc000, 0xffff).ram();
 }
 
@@ -768,7 +746,7 @@ void bbakraid_state::bbakraid_sound_z80_port(address_map &map)
 	map.global_mask(0xff);
 	map(0x40, 0x40).w(m_soundlatch[2], FUNC(generic_latch_8_device::write));
 	map(0x42, 0x42).w(m_soundlatch[3], FUNC(generic_latch_8_device::write));
-	map(0x44, 0x44).w(FUNC(bbakraid_state::batrider_sndirq_w));
+	map(0x44, 0x44).w(FUNC(bbakraid_state::batrider_sndirq_w<M68K_IRQ_2>));
 	map(0x46, 0x46).w(FUNC(bbakraid_state::batrider_clear_nmi_w));
 	map(0x48, 0x48).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));
 	map(0x4a, 0x4a).r(m_soundlatch[1], FUNC(generic_latch_8_device::read));
@@ -796,18 +774,18 @@ GFXDECODE_END
 
 void batrider_state::batrider(machine_config &config)
 {
-	/* basic machine hardware */
-	M68000(config, m_maincpu, 32_MHz_XTAL/2);   // 16MHz, 32MHz Oscillator (verified)
+	// basic machine hardware
+	M68000(config, m_maincpu, 32_MHz_XTAL/2); // 16MHz, 32MHz Oscillator (verified)
 	m_maincpu->set_addrmap(AS_PROGRAM, &batrider_state::batrider_68k_mem);
 	m_maincpu->reset_cb().set(FUNC(batrider_state::reset_audiocpu));
 
-	Z80(config, m_audiocpu, 32_MHz_XTAL/6);     // 5.333MHz, 32MHz Oscillator (verified)
+	Z80(config, m_audiocpu, 32_MHz_XTAL/6); // 5.333MHz, 32MHz Oscillator (verified)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &batrider_state::batrider_sound_z80_mem);
 	m_audiocpu->set_addrmap(AS_IO, &batrider_state::batrider_sound_z80_port);
 
 	TOAPLAN_COINCOUNTER(config, m_coincounter, 0);
 
-	config.set_maximum_quantum(attotime::from_hz(600));
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	ADDRESS_MAP_BANK(config, m_dma_space, 0);
 	m_dma_space->set_addrmap(0, &batrider_state::batrider_dma_mem);
@@ -816,7 +794,7 @@ void batrider_state::batrider(machine_config &config)
 	m_dma_space->set_addr_width(16);
 	m_dma_space->set_stride(0x8000);
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(27_MHz_XTAL/4, 432, 0, 320, 262, 0, 240);
@@ -832,10 +810,10 @@ void batrider_state::batrider(machine_config &config)
 	m_vdp->set_tile_callback(FUNC(batrider_state::batrider_bank_cb));
 	m_vdp->vint_out_cb().set_inputline(m_maincpu, M68K_IRQ_2);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	// these two latches are always written together, via a single move.l instruction
+	// first two latches are always written together, via a single move.l instruction
 	GENERIC_LATCH_8(config, m_soundlatch[0]);
 	GENERIC_LATCH_8(config, m_soundlatch[1]);
 	GENERIC_LATCH_8(config, m_soundlatch[2]);
@@ -855,19 +833,21 @@ void batrider_state::batrider(machine_config &config)
 
 void bbakraid_state::bbakraid(machine_config &config)
 {
-	/* basic machine hardware */
-	M68000(config, m_maincpu, 32_MHz_XTAL/2);   // 16MHz, 32MHz Oscillator
+	// basic machine hardware
+	M68000(config, m_maincpu, 32_MHz_XTAL/2); // 16MHz, 32MHz Oscillator
 	m_maincpu->set_addrmap(AS_PROGRAM, &bbakraid_state::bbakraid_68k_mem);
 	m_maincpu->reset_cb().set(FUNC(bbakraid_state::reset_audiocpu));
 
-	Z80(config, m_audiocpu, XTAL(32'000'000)/6);     /* 5.3333MHz , 32MHz Oscillator */
+	Z80(config, m_audiocpu, 32_MHz_XTAL/6); // 5.3333MHz, 32MHz Oscillator
 	m_audiocpu->set_addrmap(AS_PROGRAM, &bbakraid_state::bbakraid_sound_z80_mem);
 	m_audiocpu->set_addrmap(AS_IO, &bbakraid_state::bbakraid_sound_z80_port);
-	m_audiocpu->set_periodic_int(FUNC(bbakraid_state::bbakraid_snd_interrupt), attotime::from_hz(XTAL(32'000'000) / 6 / 12000)); // sound CPU clock (divider unverified)
+
+	attotime snd_irq_period = attotime::from_hz(32_MHz_XTAL / 6 / 12000); // from sound CPU clock? (divider unverified)
+	m_audiocpu->set_periodic_int(FUNC(bbakraid_state::bbakraid_snd_interrupt), snd_irq_period);
 
 	TOAPLAN_COINCOUNTER(config, m_coincounter, 0);
 
-	config.set_maximum_quantum(attotime::from_hz(600));
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	EEPROM_93C66_8BIT(config, m_eeprom);
 
@@ -878,7 +858,7 @@ void bbakraid_state::bbakraid(machine_config &config)
 	m_dma_space->set_addr_width(16);
 	m_dma_space->set_stride(0x8000);
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(27_MHz_XTAL/4, 432, 0, 320, 262, 0, 240);
@@ -894,10 +874,10 @@ void bbakraid_state::bbakraid(machine_config &config)
 	m_vdp->set_tile_callback(FUNC(bbakraid_state::batrider_bank_cb));
 	m_vdp->vint_out_cb().set_inputline(m_maincpu, M68K_IRQ_1);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	// these two latches are always written together, via a single move.l instruction
+	// first two latches are always written together, via a single move.l instruction
 	GENERIC_LATCH_8(config, m_soundlatch[0]);
 	GENERIC_LATCH_8(config, m_soundlatch[1]);
 	GENERIC_LATCH_8(config, m_soundlatch[2]);
@@ -911,7 +891,7 @@ void bbakraid_state::bbakraid(machine_config &config)
 void nprobowl_state::nprobowl(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 32_MHz_XTAL / 2);   // 32MHz Oscillator, divisor not verified
+	M68000(config, m_maincpu, 32_MHz_XTAL / 2); // 32MHz Oscillator, divisor not verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &nprobowl_state::nprobowl_68k_mem);
 	m_maincpu->reset_cb().set(FUNC(nprobowl_state::reset_audiocpu));
 
@@ -952,13 +932,6 @@ void batrider_state::init_batrider()
 	m_audiobank->configure_entries(0, 16, &m_z80_rom[0], 0x4000);
 	install_raizing_okibank(0);
 	install_raizing_okibank(1);
-	m_sndirq_line = 4;
-}
-
-
-void bbakraid_state::init_bbakraid()
-{
-	m_sndirq_line = 2;
 }
 
 
@@ -1413,24 +1386,24 @@ ROM_END
 } // anonymous namespace
 
 // these are all based on Version B, even if only the Japan version states 'version B'
-GAME( 1998, batrider,    0,        batrider,   batrider,   batrider_state, init_batrider,   ROT270, "Raizing / Eighting", "Armed Police Batrider (Europe) (Fri Feb 13 1998)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1998, batrideru,   batrider, batrider,   batrider,   batrider_state, init_batrider,   ROT270, "Raizing / Eighting", "Armed Police Batrider (USA) (Fri Feb 13 1998)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1998, batriderc,   batrider, batrider,   batrider,   batrider_state, init_batrider,   ROT270, "Raizing / Eighting", "Armed Police Batrider (China) (Fri Feb 13 1998)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1998, batriderj,   batrider, batrider,   batriderj,  batrider_state, init_batrider,   ROT270, "Raizing / Eighting", "Armed Police Batrider (Japan, B version) (Fri Feb 13 1998)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, batriderk,   batrider, batrider,   batrider,   batrider_state, init_batrider,   ROT270, "Raizing / Eighting", "Armed Police Batrider (Korea) (Fri Feb 13 1998)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1998, batrider,   0,        batrider, batrider,  batrider_state, init_batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (Europe) (Fri Feb 13 1998)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1998, batrideru,  batrider, batrider, batrider,  batrider_state, init_batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (USA) (Fri Feb 13 1998)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1998, batriderc,  batrider, batrider, batrider,  batrider_state, init_batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (China) (Fri Feb 13 1998)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1998, batriderj,  batrider, batrider, batriderj, batrider_state, init_batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (Japan, B version) (Fri Feb 13 1998)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, batriderk,  batrider, batrider, batrider,  batrider_state, init_batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (Korea) (Fri Feb 13 1998)",            MACHINE_SUPPORTS_SAVE )
 // older revision of the code
-GAME( 1998, batriderja,  batrider, batrider,   batriderj,  batrider_state, init_batrider,   ROT270, "Raizing / Eighting", "Armed Police Batrider (Japan, older version) (Mon Dec 22 1997)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, batriderhk,  batrider, batrider,   batrider,   batrider_state, init_batrider,   ROT270, "Raizing / Eighting", "Armed Police Batrider (Hong Kong) (Mon Dec 22 1997)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1998, batridert,   batrider, batrider,   batrider,   batrider_state, init_batrider,   ROT270, "Raizing / Eighting", "Armed Police Batrider (Taiwan) (Mon Dec 22 1997)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1998, batriderja, batrider, batrider, batriderj, batrider_state, init_batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (Japan, older version) (Mon Dec 22 1997)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, batriderhk, batrider, batrider, batrider,  batrider_state, init_batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (Hong Kong) (Mon Dec 22 1997)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1998, batridert,  batrider, batrider, batrider,  batrider_state, init_batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (Taiwan) (Mon Dec 22 1997)",               MACHINE_SUPPORTS_SAVE )
 
 // Battle Bakraid
 // the 'unlimited' version is a newer revision of the code
-GAME( 1999, bbakraid,    0,        bbakraid,   bbakraid,   bbakraid_state, init_bbakraid,   ROT270, "Eighting", "Battle Bakraid - Unlimited Version (USA) (Tue Jun 8 1999)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1999, bbakraidc,   bbakraid, bbakraid,   bbakraid,   bbakraid_state, init_bbakraid,   ROT270, "Eighting", "Battle Bakraid - Unlimited Version (China) (Tue Jun 8 1999)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, bbakraidj,   bbakraid, bbakraid,   bbakraid,   bbakraid_state, init_bbakraid,   ROT270, "Eighting", "Battle Bakraid - Unlimited Version (Japan) (Tue Jun 8 1999)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, bbakraid,   0,        bbakraid, bbakraid,  bbakraid_state, empty_init,    ROT270, "Eighting", "Battle Bakraid - Unlimited Version (USA) (Tue Jun 8 1999)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1999, bbakraidc,  bbakraid, bbakraid, bbakraid,  bbakraid_state, empty_init,    ROT270, "Eighting", "Battle Bakraid - Unlimited Version (China) (Tue Jun 8 1999)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, bbakraidj,  bbakraid, bbakraid, bbakraid,  bbakraid_state, empty_init,    ROT270, "Eighting", "Battle Bakraid - Unlimited Version (Japan) (Tue Jun 8 1999)", MACHINE_SUPPORTS_SAVE )
 // older revision of the code
-GAME( 1999, bbakraidja,  bbakraid, bbakraid,   bbakraid,   bbakraid_state, init_bbakraid,   ROT270, "Eighting", "Battle Bakraid (Japan) (Wed Apr 7 1999)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, bbakraidja, bbakraid, bbakraid, bbakraid,  bbakraid_state, empty_init,    ROT270, "Eighting", "Battle Bakraid (Japan) (Wed Apr 7 1999)", MACHINE_SUPPORTS_SAVE )
 
 // dedicated PCB
-GAME( 1996, nprobowl,    0,        nprobowl,   nprobowl,   nprobowl_state, empty_init,      ROT0,   "Zuck / Able Corp", "New Pro Bowl", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // bad GFXs, no sound banking, controls, etc
-GAME( 1996, probowl2,    nprobowl, nprobowl,   nprobowl,   nprobowl_state, empty_init,      ROT0,   "Zuck / Able Corp", "Pro Bowl 2",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // bad GFXs, no sound banking, controls, etc
+GAME( 1996, nprobowl,   0,        nprobowl, nprobowl,  nprobowl_state, empty_init,    ROT0,   "Zuck / Able Corp", "New Pro Bowl", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // bad GFXs, no sound banking, controls, etc
+GAME( 1996, probowl2,   nprobowl, nprobowl, nprobowl,  nprobowl_state, empty_init,    ROT0,   "Zuck / Able Corp", "Pro Bowl 2",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // bad GFXs, no sound banking, controls, etc

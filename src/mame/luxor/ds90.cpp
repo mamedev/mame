@@ -121,9 +121,9 @@ void x37_state::x37(machine_config &config)
 	NMC9306(config, m_nvram, 0);
 	E0516(config, E050_16_TAG, 32'768);
 
-	SCC8530N(config, m_scc[0], 6000000);
-	SCC8530N(config, m_scc[1], 6000000);
-	SCC8530N(config, m_scc[2], 6000000);
+	SCC8530(config, m_scc[0], 6000000);
+	SCC8530(config, m_scc[1], 6000000);
+	SCC8530(config, m_scc[2], 6000000);
 
 	FD1797(config, m_fdc, 16'000'000/16);
 

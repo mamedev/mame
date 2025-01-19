@@ -97,6 +97,7 @@ void agnus_copper_device::device_start()
 	save_item(NAME(m_waitmask));
 	save_item(NAME(m_pending_data));
 	save_item(NAME(m_pending_offset));
+	save_item(NAME(m_xpos_state));
 }
 
 
@@ -235,6 +236,21 @@ void agnus_copper_device::copins_w(u16 data)
 void agnus_copper_device::vblank_sync()
 {
 	set_pc(0, true);
+	m_xpos_state = 0;
+}
+
+// check current copper cycle at end of scanline
+// - auntaadv (gameplay), WAITs with $xxd9
+void agnus_copper_device::suspend_offset(int xpos, int hblank_width)
+{
+	m_xpos_state = (xpos == 511) ? 0 : xpos - hblank_width;
+//  assert(m_xpos_state > 0);
+}
+
+// restore at start
+int agnus_copper_device::restore_offset()
+{
+	return m_xpos_state;
 }
 
 // TODO: h/vblank checks against xpos/vpos
@@ -324,8 +340,9 @@ int agnus_copper_device::execute_next(int xpos, int ypos, bool is_blitter_busy, 
 				return xpos;
 			}
 			// delay write to the next available DMA slot if not in blanking area
-			// - bchvolly (title), suprfrog & abreed (bottom playfield rows)
-			const bool horizontal_blank = xpos < 0x47;
+			// - suprfrog & abreed (bottom playfield rows).
+			// - beast, biochall and cd32 bios wants this to be 0x5c
+			const bool horizontal_blank = xpos <= 0x5c;
 			const int move_offset = horizontal_blank ? 0 : std::max(num_planes - 4, 0);
 
 			m_pending_offset = word0;
@@ -358,7 +375,7 @@ int agnus_copper_device::execute_next(int xpos, int ypos, bool is_blitter_busy, 
 		/* handle a wait */
 		if ((word1 & 1) == 0)
 		{
-			const bool horizontal_blank = xpos < 0x47;
+			const bool horizontal_blank = xpos <= 0x5c;
 			const int wait_offset = horizontal_blank ? 0 : std::max(num_planes - 4, 0) + 1;
 
 			LOGINST("  WAIT %04x & %04x (currently %04x, num planes %d +%d)\n",

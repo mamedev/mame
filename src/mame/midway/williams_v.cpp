@@ -169,6 +169,7 @@ void williams_state::video_start()
 void blaster_state::video_start()
 {
 	williams_state::video_start();
+
 	save_item(NAME(m_color0));
 	save_item(NAME(m_video_control));
 }
@@ -178,7 +179,7 @@ void williams2_state::video_start()
 {
 	williams_state::video_start();
 
-	/* create the tilemap */
+	// create the tilemap
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(williams2_state::get_tile_info)), TILEMAP_SCAN_COLS, 24,16, 128,16);
 	m_bg_tilemap->set_scrolldx(2, 0);
 
@@ -227,35 +228,35 @@ uint32_t blaster_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	uint8_t const *const scanline_control = &m_videoram[0xbc00];
 	rgb_t pens[16];
 
-	/* precompute the palette */
+	// precompute the palette
 	for (int x = 0; x < 16; x++)
 		pens[x] = m_palette->pen_color(m_paletteram[x]);
 
-	/* if we're blitting from the top, start with a 0 for color 0 */
+	// if we're blitting from the top, start with a 0 for color 0
 	if (cliprect.min_y == screen.visible_area().min_y || !(m_video_control & 1))
 		m_color0 = m_palette->pen_color(palette_0[0] ^ 0xff);
 
-	/* loop over rows */
+	// loop over rows
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		int const erase_behind = m_video_control & scanline_control[y] & 2;
 		uint8_t *const source = &m_videoram[y];
 		uint32_t *const dest = &bitmap.pix(y);
 
-		/* latch a new color0 pen? */
+		// latch a new color0 pen?
 		if (m_video_control & scanline_control[y] & 1)
 			m_color0 = m_palette->pen_color(palette_0[y] ^ 0xff);
 
-		/* loop over columns */
+		// loop over columns
 		for (int x = cliprect.min_x & ~1; x <= cliprect.max_x; x += 2)
 		{
 			uint8_t const pix = source[(x/2) * 256];
 
-			/* clear behind us if requested */
+			// clear behind us if requested
 			if (erase_behind)
 				source[(x/2) * 256] = 0;
 
-			/* now draw */
+			// now draw
 			dest[x+0] = (pix & 0xf0) ? pens[pix >> 4] : rgb_t(m_color0 | pens[0]);
 			dest[x+1] = (pix & 0x0f) ? pens[pix & 0x0f] : rgb_t(m_color0 | pens[0]);
 		}
@@ -268,20 +269,20 @@ uint32_t williams2_state::screen_update(screen_device &screen, bitmap_rgb32 &bit
 {
 	rgb_t pens[16];
 
-	/* draw the background */
+	// draw the background
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
-	/* fetch the relevant pens */
+	// fetch the relevant pens
 	for (int x = 1; x < 16; x++)
 		pens[x] = m_palette->pen_color(m_fg_color * 16 + x);
 
-	/* loop over rows */
+	// loop over rows
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		uint8_t const *const source = &m_videoram[y];
 		uint32_t *const dest = &bitmap.pix(y);
 
-		/* loop over columns */
+		// loop over columns
 		for (int x = cliprect.min_x & ~1; x <= cliprect.max_x; x += 2)
 		{
 			uint8_t const pix = source[(x/2) * 256];
@@ -300,21 +301,21 @@ uint32_t mysticm_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 {
 	rgb_t pens[16];
 
-	/* draw the background */
+	// draw the background
 	m_bg_tilemap->mark_all_dirty();
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES, 0);
 
-	/* loop over rows */
+	// loop over rows
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		/* fetch the relevant pens */
+		// fetch the relevant pens
 		for (int x = 1; x < 16; x++)
 			pens[x] = m_palette->pen_color(color_decode(m_fg_color, 1, y) * 16 + x);
 
 		uint8_t const *const source = &m_videoram[y];
 		uint32_t *const dest = &bitmap.pix(y);
 
-		/* loop over columns */
+		// loop over columns
 		for (int x = cliprect.min_x & ~1; x <= cliprect.max_x; x += 2)
 		{
 			uint8_t const pix = source[(x/2) * 256];
@@ -422,7 +423,6 @@ rgb_t williams2_state::calc_col(uint16_t lo, uint16_t hi)
 	};
 
 	// update the palette entry
-
 	const uint16_t i =  (hi >> 4) & 15;
 	const uint16_t ub = (hi >> 0) & 15;
 	const uint16_t ug = (lo >> 4) & 15;
@@ -449,10 +449,10 @@ rgb_t williams2_state::calc_col(uint16_t lo, uint16_t hi)
 
 void williams2_state::paletteram_w(offs_t offset, u8 data)
 {
-	/* set the new value */
+	// set the new value
 	m_paletteram[offset] = data;
 
-	/* pull the associated low/high bytes */
+	// pull the associated low/high bytes
 	uint16_t entry_lo = m_paletteram[offset & ~1];
 	uint16_t entry_hi = m_paletteram[offset |  1];
 
@@ -510,7 +510,7 @@ TILE_GET_INFO_MEMBER(williams2_state::get_tile_info)
 	int const data = m_tileram[tile_index];
 	int const y = (tile_index >> 1) & 7;
 
-	/* On tshoot and inferno, IC79 is a 74LS157 selector jumpered to be enabled */
+	// On tshoot and inferno, IC79 is a 74LS157 selector jumpered to be enabled
 	int const color = y;
 
 	tileinfo.set(0, data & mask, color, (data & ~mask) ? TILE_FLIPX : 0);
@@ -539,7 +539,7 @@ int mysticm_state::color_decode(uint8_t base_col, int sig_J1, int y)
 
 	// FIXME: Investigate further.
 
-	/* IC79 is a 74LS85 comparator that controls the low bit */
+	// IC79 is a 74LS85 comparator that controls the low bit
 	int const a = 1 | ((base_col & 1) << 2) | ((base_col & 1) << 3);
 	int const b = (sig_W12 << 0) | (sig_W13 << 1) | (0 << 2) | (sig_J1 << 3);
 	int const color = (a > b) || ((a == b) && !sig_W11);
@@ -575,31 +575,31 @@ TILE_GET_INFO_MEMBER(joust2_state::get_tile_info)
 	int const mask = m_gfxdecode->gfx(0)->elements() - 1;
 	int const data = m_tileram[tile_index];
 
-	/* IC79 is a 74LS157 selector jumpered to be disabled */
+	// IC79 is a 74LS157 selector jumpered to be disabled
 	int const color = 0;
 
 	tileinfo.set(0, data & mask, color, (data & ~mask) ? TILE_FLIPX : 0);
 }
 
-/* based on the board type, only certain bits are used */
-/* the rest are determined by other factors */
+// based on the board type, only certain bits are used
+// the rest are determined by other factors
 
 void williams2_state::bg_select_w(u8 data)
 {
-	/* IC79 is a 74LS157 selector jumpered to be enabled */
+	// IC79 is a 74LS157 selector jumpered to be enabled
 	m_bg_tilemap->set_palette_offset((data & 0x38) << 4);
 }
 
 void mysticm_state::bg_select_w(u8 data)
 {
-	/* IC79 is a 74LS85 comparator that controls the low bit */
+	// IC79 is a 74LS85 comparator that controls the low bit
 	m_bg_color = data;
 	m_bg_tilemap->mark_all_dirty();
 }
 
 void joust2_state::bg_select_w(u8 data)
 {
-	/* IC79 is a 74LS157 selector jumpered to be disabled */
+	// IC79 is a 74LS157 selector jumpered to be disabled
 	m_bg_tilemap->set_palette_offset((data & 0x3f) << 4);
 }
 
@@ -621,17 +621,4 @@ void williams2_state::xscroll_high_w(u8 data)
 {
 	m_tilemap_xscroll = (m_tilemap_xscroll & 0x00f) | (data << 4);
 	m_bg_tilemap->set_scrollx(0, (m_tilemap_xscroll & 7) + ((m_tilemap_xscroll >> 3) * 6));
-}
-
-
-
-/*************************************
- *
- *  Blaster-specific enhancements
- *
- *************************************/
-
-void blaster_state::video_control_w(u8 data)
-{
-	m_video_control = data;
 }

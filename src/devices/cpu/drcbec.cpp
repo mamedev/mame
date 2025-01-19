@@ -14,6 +14,8 @@
 
 #include <cmath>
 
+namespace drc {
+
 using namespace uml;
 
 
@@ -674,7 +676,7 @@ int drcbe_c::execute(code_handle &entry)
 
 			case MAKE_OPCODE_SHORT(OP_RECOVER, 4, 0):   // RECOVER dst,mapvar
 				assert(sp > 0);
-				PARAM0 = m_map.get_value((drccodeptr)callstack[0], MAPVAR_M0 + PARAM1);
+				PARAM0 = m_map.get_value(drccodeptr(callstack[0] - 1), PARAM1);
 				break;
 
 
@@ -871,6 +873,10 @@ int drcbe_c::execute(code_handle &entry)
 				PARAM0 = m_space[PARAM2]->read_dword(PARAM1);
 				break;
 
+			case MAKE_OPCODE_SHORT(OP_READM1, 4, 0):    // READM   dst,src1,mask,space_BYTE
+				PARAM0 = m_space[PARAM3]->read_byte(PARAM1, PARAM2);
+				break;
+
 			case MAKE_OPCODE_SHORT(OP_READM2, 4, 0):    // READM   dst,src1,mask,space_WORD
 				PARAM0 = m_space[PARAM3]->read_word(PARAM1, PARAM2);
 				break;
@@ -889,6 +895,10 @@ int drcbe_c::execute(code_handle &entry)
 
 			case MAKE_OPCODE_SHORT(OP_WRITE4, 4, 0):    // WRITE   dst,src1,space_DWORD
 				m_space[PARAM2]->write_dword(PARAM0, PARAM1);
+				break;
+
+			case MAKE_OPCODE_SHORT(OP_WRITEM1, 4, 0):   // WRITEM  dst,src1,mask,space_BYTE
+				m_space[PARAM3]->write_byte(PARAM0, PARAM1, PARAM2);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_WRITEM2, 4, 0):   // WRITEM  dst,src1,mask,space_WORD
@@ -1187,11 +1197,9 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_SHL, 4, 1):
 				shift = PARAM2 & 31;
 				temp32 = PARAM1 << shift;
+				flags = FLAGS32_NZ(temp32);
 				if (shift != 0)
-				{
-					flags = FLAGS32_NZ(temp32);
 					flags |= ((PARAM1 << (shift - 1)) >> 31) & FLAG_C;
-				}
 				PARAM0 = temp32;
 				break;
 
@@ -1202,11 +1210,9 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_SHR, 4, 1):
 				shift = PARAM2 & 31;
 				temp32 = PARAM1 >> shift;
+				flags = FLAGS32_NZ(temp32);
 				if (shift != 0)
-				{
-					flags = FLAGS32_NZ(temp32);
 					flags |= (PARAM1 >> (shift - 1)) & FLAG_C;
-				}
 				PARAM0 = temp32;
 				break;
 
@@ -1217,11 +1223,9 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_SAR, 4, 1):
 				shift = PARAM2 & 31;
 				temp32 = (int32_t)PARAM1 >> shift;
+				flags = FLAGS32_NZ(temp32);
 				if (shift != 0)
-				{
-					flags = FLAGS32_NZ(temp32);
 					flags |= (PARAM1 >> (shift - 1)) & FLAG_C;
-				}
 				PARAM0 = temp32;
 				break;
 
@@ -1232,11 +1236,9 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_ROL, 4, 1):
 				shift = PARAM2 & 31;
 				temp32 = rotl_32(PARAM1, shift);
+				flags = FLAGS32_NZ(temp32);
 				if (shift != 0)
-				{
-					flags = FLAGS32_NZ(temp32);
 					flags |= ((PARAM1 << (shift - 1)) >> 31) & FLAG_C;
-				}
 				PARAM0 = temp32;
 				break;
 
@@ -1258,11 +1260,9 @@ int drcbe_c::execute(code_handle &entry)
 					temp32 = (PARAM1 << shift) | (flags & FLAG_C);
 				else
 					temp32 = PARAM1;
+				flags = FLAGS32_NZ(temp32);
 				if (shift != 0)
-				{
-					flags = FLAGS32_NZ(temp32);
 					flags |= ((PARAM1 << (shift - 1)) >> 31) & FLAG_C;
-				}
 				PARAM0 = temp32;
 				break;
 
@@ -1273,11 +1273,9 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_ROR, 4, 1):
 				shift = PARAM2 & 31;
 				temp32 = rotr_32(PARAM1, shift);
+				flags = FLAGS32_NZ(temp32);
 				if (shift != 0)
-				{
-					flags = FLAGS32_NZ(temp32);
 					flags |= (PARAM1 >> (shift - 1)) & FLAG_C;
-				}
 				PARAM0 = temp32;
 				break;
 
@@ -1299,11 +1297,9 @@ int drcbe_c::execute(code_handle &entry)
 					temp32 = (PARAM1 >> shift) | ((flags & FLAG_C) << 31);
 				else
 					temp32 = PARAM1;
+				flags = FLAGS32_NZ(temp32);
 				if (shift != 0)
-				{
-					flags = FLAGS32_NZ(temp32);
 					flags |= (PARAM1 >> (shift - 1)) & FLAG_C;
-				}
 				PARAM0 = temp32;
 				break;
 
@@ -1823,11 +1819,9 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_SHL, 8, 1):
 				shift = DPARAM2 & 63;
 				temp64 = DPARAM1 << shift;
+				flags = FLAGS64_NZ(temp64);
 				if (shift != 0)
-				{
-					flags = FLAGS64_NZ(temp64);
 					flags |= ((DPARAM1 << (shift - 1)) >> 63) & FLAG_C;
-				}
 				DPARAM0 = temp64;
 				break;
 
@@ -1838,11 +1832,9 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_SHR, 8, 1):
 				shift = DPARAM2 & 63;
 				temp64 = DPARAM1 >> shift;
+				flags = FLAGS64_NZ(temp64);
 				if (shift != 0)
-				{
-					flags = FLAGS64_NZ(temp64);
 					flags |= (DPARAM1 >> (shift - 1)) & FLAG_C;
-				}
 				DPARAM0 = temp64;
 				break;
 
@@ -1853,11 +1845,9 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_SAR, 8, 1):
 				shift = DPARAM2 & 63;
 				temp64 = (int64_t)DPARAM1 >> shift;
+				flags = FLAGS64_NZ(temp64);
 				if (shift != 0)
-				{
-					flags = FLAGS64_NZ(temp64);
 					flags |= (DPARAM1 >> (shift - 1)) & FLAG_C;
-				}
 				DPARAM0 = temp64;
 				break;
 
@@ -1868,11 +1858,9 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_ROL, 8, 1):
 				shift = DPARAM2 & 63;
 				temp64 = rotl_64(DPARAM1, shift);
+				flags = FLAGS64_NZ(temp64);
 				if (shift != 0)
-				{
-					flags = FLAGS64_NZ(temp64);
 					flags |= ((DPARAM1 << (shift - 1)) >> 63) & FLAG_C;
-				}
 				DPARAM0 = temp64;
 				break;
 
@@ -1894,11 +1882,9 @@ int drcbe_c::execute(code_handle &entry)
 					temp64 = (DPARAM1 << shift) | (flags & FLAG_C);
 				else
 					temp64 = DPARAM1;
+				flags = FLAGS64_NZ(temp64);
 				if (shift != 0)
-				{
-					flags = FLAGS64_NZ(temp64);
 					flags |= ((DPARAM1 << (shift - 1)) >> 63) & FLAG_C;
-				}
 				DPARAM0 = temp64;
 				break;
 
@@ -1909,11 +1895,9 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_ROR, 8, 1):
 				shift = DPARAM2 & 63;
 				temp64 = rotr_64(DPARAM1, shift);
+				flags = FLAGS64_NZ(temp64);
 				if (shift != 0)
-				{
-					flags = FLAGS64_NZ(temp64);
 					flags |= (DPARAM1 >> (shift - 1)) & FLAG_C;
-				}
 				DPARAM0 = temp64;
 				break;
 
@@ -1935,11 +1919,9 @@ int drcbe_c::execute(code_handle &entry)
 					temp64 = (DPARAM1 >> shift) | (((uint64_t)flags & FLAG_C) << 63);
 				else
 					temp64 = DPARAM1;
+				flags = FLAGS64_NZ(temp64);
 				if (shift != 0)
-				{
-					flags = FLAGS64_NZ(temp64);
 					flags |= (DPARAM1 >> (shift - 1)) & FLAG_C;
-				}
 				DPARAM0 = temp64;
 				break;
 
@@ -2456,3 +2438,5 @@ uint64_t drcbe_c::tzcount64(uint64_t value)
 	}
 	return 64;
 }
+
+} // namespace drc

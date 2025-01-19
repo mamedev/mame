@@ -1959,13 +1959,6 @@ project "asmjit"
 		end
 	end
 
-	if (_OPTIONS["PLATFORM"]=="arm64") then
-		configuration { }
-			defines {
-				"ASMJIT_NO_X86",
-			}
-	end
-
 	files {
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/a64.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm.h",

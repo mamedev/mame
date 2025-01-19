@@ -98,7 +98,6 @@ license:CC0-1.0
 <softwarelist name="amigaocs_flop" description="Commodore Amiga OCS disk images">
 
 	<!-- Not listed in SPS? -->
-
 	<software name="hostile" supported="no">
 		<description>Hostile Breed (Europe, prototype)</description>
 		<year>199?</year>
@@ -691,7 +690,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="abanplc" supported="no">
+	<software name="abanplc" supported="partial">
 		<!-- SPS (CAPS) release 1000 -->
 		<description>Abandoned Places - A Time for Heroes (Europe)</description>
 		<!-- retail, standalone -->
@@ -699,7 +698,7 @@ ATK test: OK
 		<year>1992</year>
 		<publisher>Electronic Zoo</publisher>
 		<notes><![CDATA[
-Missing mouse pointer, [Copper] or [Denise] sprites
+One line of [Sprite] corruption for mouse pointer in main menu (works afterwards)
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -1269,7 +1268,6 @@ ATK test: OK
 		<year>1989</year>
 		<publisher>Tomahawk</publisher>
 		<notes><![CDATA[
-boot OK
 Credit text colors are a bit off on title screen (verify)
 ATK test: OK
 ]]></notes>
@@ -1329,7 +1327,7 @@ ATK test: failed
 		<year>1989</year>
 		<publisher>Dinamic</publisher>
 		<notes><![CDATA[
-No input works on title screen
+No input works on title screen (works in WHDLoad)
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -1681,7 +1679,7 @@ ATK test: C:0 H:U Bad
 		</part>
 	</software>
 
-	<software name="abreed" supported="no">
+	<software name="abreed" supported="partial">
 		<!-- SPS (CAPS) release 998 -->
 		<description>Alien Breed (Europe)</description>
 		<!-- retail, standalone -->
@@ -1690,8 +1688,7 @@ ATK test: C:0 H:U Bad
 		<publisher>Team 17</publisher>
 		<notes><![CDATA[
 Throws "amiga_fdc_device::live_run - cur_live.bit_counter > 8" after credits display (worked around)
-Motor keeps spinning badly on disk swap screen(s) (verify)
-Glitchy [Copper] on bottom part of screen, may use SKIP
+Player HP bars slightly corrupted, [Sprite] DMA triggers
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -5234,7 +5231,7 @@ Fatal errors in ipf_decode::generate_timings type 4
 		</part>
 	</software>
 
-	<software name="batlisle" supported="no">
+	<software name="batlisle" supported="partial">
 		<!-- SPS (CAPS) release 1991 -->
 		<description>Battle Isle (Europe)</description>
 		<!-- retail, standalone -->
@@ -5242,6 +5239,7 @@ Fatal errors in ipf_decode::generate_timings type 4
 		<year>1991</year>
 		<publisher>Blue Byte</publisher>
 		<notes><![CDATA[
+[Denise] overscan cut off to the far right
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -5396,6 +5394,7 @@ ATK test: OK
 		<year>1989</year>
 		<publisher>Hewson</publisher>
 		<notes><![CDATA[
+Guru Meditation 00000004.00001970
 ATK test: C:0 H:U 1 Sector Bad
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -5542,7 +5541,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="bckid" supported="no">
+	<software name="bckid" supported="partial">
 		<!-- SPS (CAPS) release 435 -->
 		<description>B.C. Kid (Europe)</description>
 		<!-- retail, standalone -->
@@ -5550,6 +5549,8 @@ ATK test: OK
 		<year>1992</year>
 		<publisher>Ubi Soft</publisher>
 		<notes><![CDATA[
+Should run at 57 Hz, pings [Denise] ECS $dff1c0 CRTC regs
+cfr. https://eab.abime.net/showthread.php?t=51954
 ATK test: failed
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -6422,7 +6423,7 @@ ATK test: failed
 		</part>
 	</software>
 
-	<software name="biochall" supported="no">
+	<software name="biochall" supported="yes">
 		<!-- SPS (CAPS) release 1733 -->
 		<description>Bio Challenge (Europe)</description>
 		<!-- retail, standalone -->
@@ -6447,6 +6448,7 @@ ATK test: C:79 H:U 1 Sector Bad
 		<year>1989</year>
 		<publisher>Delphine</publisher>
 		<notes><![CDATA[
+Guru Meditation 0000000b.00001970
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -6858,6 +6860,7 @@ ATK test: C:0 H:U Bad
 		<year>1993</year>
 		<publisher>Core Design</publisher>
 		<notes><![CDATA[
+[Denise] scrolling jitters, both vertical and horizontal
 ATK test: C:0 H:U Bad, C:67 H:L 1 Sector Bad
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -7031,6 +7034,7 @@ ATK test: OK
 		<year>1989</year>
 		<publisher>Psygnosis</publisher>
 		<notes><![CDATA[
+Cursor sprite is invisible on shops
 ATK test: failed
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -7277,7 +7281,7 @@ fatalerrors when trying to mount "Incompatible image format or corrupted data"
 		</part>
 	</software>
 
-	<software name="bmx" supported="no">
+	<software name="bmx" supported="yes">
 		<!-- SPS (CAPS) release 2059 -->
 		<description>BMX Simulator (Europe)</description>
 		<!-- retail, standalone -->
@@ -7335,7 +7339,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="bblow" supported="no">
+	<software name="bblow" supported="partial">
 		<!-- SPS (CAPS) release 1147 -->
 		<description>Body Blows (Europe, v2)</description>
 		<!-- retail, standalone -->
@@ -7343,6 +7347,8 @@ ATK test: OK
 		<year>1993</year>
 		<publisher>Team 17</publisher>
 		<notes><![CDATA[
+Individual 1 frame of GFX corruptions during gameplay (particularly on jumps)
+Slightly erratic gameplay timings (verify)
 ATK test: failed
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -7541,6 +7547,7 @@ ATK test: OK
 		<year>1992</year>
 		<publisher>Thalamus</publisher>
 		<notes><![CDATA[
+Keeps pinging [FDC] DSKDAT R during gameplay
 ATK test: failed
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -7622,6 +7629,8 @@ ATK test: OK
 		<year>1991</year>
 		<publisher>Silmarils</publisher>
 		<notes><![CDATA[
+Guru Meditation 0000000B.0000A880 if pressing mouse button before title screen appears
+Mouse cursor is uncontrollable, [joytest] reset counters
 ATK test: C:79 H:U 1 Sector Bad
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -7939,7 +7948,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="brutal" supported="no">
+	<software name="brutal" supported="partial">
 		<!-- SPS (CAPS) release 181 -->
 		<description>Brutal - Paws of Fury (Europe)</description>
 		<!-- retail, standalone -->
@@ -7947,6 +7956,7 @@ ATK test: OK
 		<year>1995</year>
 		<publisher>GameTek</publisher>
 		<notes><![CDATA[
+Options menu don't show any color change for ON OFF items (verify, copper list very bare)
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -7965,7 +7975,7 @@ ATK test: OK
 
 	<software name="brutalfb" supported="no">
 		<!-- SPS (CAPS) release 209 -->
-		<description>Brutal Football (Europe)</description>
+		<description>Brutal Sports Series: Football (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1993</year>
@@ -7973,6 +7983,8 @@ ATK test: OK
 		<notes><![CDATA[
 ATK test: OK
 ]]></notes>
+        <!-- cover/floppy title -->
+		<info name="alt_title" value="Brutal Football" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049180">
@@ -8147,6 +8159,7 @@ ATK test: C:0 H:U Bad
 		<year>1988</year>
 		<publisher>Accolade</publisher>
 		<notes><![CDATA[
+Demo inputs may desync, noticeable on 020+ machines
 ATK test: C:0 H:U 1 Sector Bad
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -12084,6 +12097,7 @@ ATK test: OK
 		</part>
 	</software>
 
+    <!-- "F40 Pursuit Simulator" alt version known to exist (title screen) -->
 	<software name="crazycr2" supported="no">
 		<!-- SPS (CAPS) release 311 -->
 		<description>Crazy Cars II (Europe)</description>
@@ -12142,6 +12156,7 @@ ATK test: C:79 H:U 1 Sector Bad
 		</part>
 	</software>
 
+    <!-- PD version known to exist https://www.aminet.net/package/game/jump/CrazySueII -->
 	<software name="crazsue2" supported="no">
 		<!-- SPS (CAPS) release 2195 -->
 		<description>Crazy Sue... Goes On (Europe)</description>
@@ -12150,10 +12165,13 @@ ATK test: C:79 H:U 1 Sector Bad
 		<year>1992</year>
 		<publisher>&lt;coverdisk&gt;</publisher>
 		<notes><![CDATA[
+TODO: test me in full, is track 43 onward bad just a side effect of using RNC cruncher?
 ATK test: C:43 onward Bad
 ]]></notes>
+        <info name="alt_title" value="Crazy Sue II" />
 		<info name="magazine" value="Amiga Mania" />
 		<info name="release" value="199209xx" />
+		<!-- Omake: type "HIRONZMUSJUMPSHOE" on title screen to enable cheat mode -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="572608">
 				<rom name="(sps2195)crazysueii.ipf" size="572608" crc="972f6c69" sha1="72ecd9fddce9b9574c980df895a518e551925cff"/>
@@ -21482,7 +21500,7 @@ ATK test: C:79 Bad
 		</part>
 	</software>
 
-	<software name="ghoulsvf" supported="no">
+	<software name="ghoulsvf" supported="partial">
 		<!-- SPS (CAPS) release 1985 -->
 		<description>Ghouls 'n' Ghosts &amp; Venus the Flytrap (Europe, Chart Attack)</description>
 		<!-- retail, standalone -->
@@ -21490,7 +21508,7 @@ ATK test: C:79 Bad
 		<year>1991</year>
 		<publisher>Gremlin Graphics</publisher>
 		<notes><![CDATA[
-gng: throws "amiga_fdc_device::live_run - cur_live.bit_counter > 8" then fatalerrors after DSKDAT access
+gng: throws "amiga_fdc_device::live_run - cur_live.bit_counter > 8" then fatalerrors after DSKDAT access (fixed)
 venus: asks to swap disk with incorrect pitch GFX then throws DSKDAT R and hangs (fixed)
 venus: [Denise] offset bitplanes (game area, weapon bar, bonus stages)
 ATK test: OK
@@ -30385,7 +30403,6 @@ fatalerrors when trying to mount "Incompatible image format or corrupted data"
 		<publisher>Ocean</publisher>
 		<notes><![CDATA[
 black screen [FDC] dsksync (fixed)
-masked Lethal Weapon intro text has raster issue, [Copper] expects +56 scanlines
 TODO: Needs multiple presses with no video feedback on mission select section?
 TODO: test extensively before promoting
 ATK test: C:0 H:U Bad
@@ -30483,7 +30500,7 @@ ATK test: C:0 H:U Bad
 		<year>1991</year>
 		<publisher>Mindscape</publisher>
 		<notes><![CDATA[
-Mouse cursor is uncontrollable, [joytest] reset counter
+Mouse cursor is uncontrollable, [joytest] reset counters
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -30622,7 +30639,7 @@ ATK test: OK
 		<notes><![CDATA[
 Has DIW alignment issues (stage intro text, in-game), first boss background layer has wrong colors.
 a500/a500p: doesn't draw any sprite
-a1200: major GFX pitch corruption on bitplanes (regressed after adding extended [Denise] delays)
+a1200: doesn't show player sprite at first boss (with colors fixed here)
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -30933,6 +30950,7 @@ ATK test: OK
 		<year>1990</year>
 		<publisher>Audiogenic</publisher>
 		<notes><![CDATA[
+Unresponsive [keyboard] space key when prompted to start a game.
 ATK test: C:0 H:U Bad
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -30944,7 +30962,9 @@ ATK test: C:0 H:U Bad
 
 	<software name="lotr1" supported="no">
 		<!-- SPS (CAPS) release 1299 -->
-		<description>Lord of the Rings Vol. I (Europe)</description>
+		<!-- "J.R.R. Tolkien's The Lord of the Rings" on box art and manual covers -->
+		<!-- "Lord of The Rings" on title and disk covers -->
+		<description>The Lord of the Rings Vol. I (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1991</year>
@@ -30974,7 +30994,7 @@ ATK test: OK
 
 	<software name="lotr1f" cloneof="lotr1" supported="no">
 		<!-- SPS (CAPS) release 2373 -->
-		<description>Lord of the Rings Vol. I (France)</description>
+		<description>The Lord of the Rings Vol. I (France)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1991</year>
@@ -31004,7 +31024,7 @@ ATK test: OK
 
 	<software name="lotr1g" cloneof="lotr1" supported="no">
 		<!-- SPS (CAPS) release 2536 -->
-		<description>Lord of the Rings Vol. I (Germany)</description>
+		<description>The Lord of the Rings Vol. I (Germany)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1991</year>
@@ -31128,7 +31148,7 @@ ATK test: C:0 H:U 1 Sector Bad
 		</part>
 	</software>
 
-	<software name="lostpatr" supported="no">
+	<software name="lostpatr" supported="partial">
 		<!-- SPS (CAPS) release 773 -->
 		<description>Lost Patrol (Europe)</description>
 		<!-- retail, standalone -->
@@ -31136,9 +31156,8 @@ ATK test: C:0 H:U 1 Sector Bad
 		<year>1990</year>
 		<publisher>Ocean</publisher>
 		<notes><![CDATA[
-Garbage on language screen select then black screen [FDC] copy protection check at PC=243ac (enables 68k trace mode)
-new68k: [FDC] read error
-Ocean logo has serious pitch issues
+[FDC] copy protection check at PC=243ac (enables 68k trace mode, fixed)
+[Denise] Ocean logo has erratic delay scrolling
 ATK test: C:0 H:U Bad
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -31155,7 +31174,7 @@ ATK test: C:0 H:U Bad
 		</part>
 	</software>
 
-	<software name="lostpatru" cloneof="lostpatr" supported="no">
+	<software name="lostpatru" cloneof="lostpatr" supported="partial">
 		<!-- SPS (CAPS) release 498 -->
 		<description>Lost Patrol (USA)</description>
 		<!-- retail, standalone -->
@@ -31163,7 +31182,6 @@ ATK test: C:0 H:U Bad
 		<year>1990</year>
 		<publisher>Ocean</publisher>
 		<notes><![CDATA[
-black screen
 ATK test: C:0 H:U Bad
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -31312,7 +31330,7 @@ ATK test: OK
 		<year>1990</year>
 		<publisher>Gremlin Graphics</publisher>
 		<notes><![CDATA[
-Locks up after Kickstart (white screen)
+Takes forever to enter gameplay
 ATK test: failed
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -31330,6 +31348,7 @@ ATK test: failed
 		<year>1990</year>
 		<publisher>Gremlin Graphics</publisher>
 		<notes><![CDATA[
+Takes forever to enter gameplay
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -31347,6 +31366,7 @@ ATK test: OK
 		<year>1990</year>
 		<publisher>Gremlin Graphics</publisher>
 		<notes><![CDATA[
+Takes forever to enter gameplay
 ATK test: failed
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -31364,9 +31384,9 @@ ATK test: failed
 		<year>1992</year>
 		<publisher>Gremlin Graphics</publisher>
 		<notes><![CDATA[
-black screen
 ATK test: failed
 ]]></notes>
+		<info name="usage" value="Sports manual copy protection" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1009712">
@@ -31389,7 +31409,7 @@ ATK test: failed
 		<year>1991</year>
 		<publisher>Gremlin Graphics</publisher>
 		<notes><![CDATA[
-Locks up after Kickstart (white screen)
+Locks up after Kickstart (white screen), tight loops for [FDC] DSKBLK with DMACON off, "DISK ERROR NUMBER 2" if bypassed
 ATK test: failed
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -41607,7 +41627,7 @@ ATK test: failed
 		</part>
 	</software>
 
-	<software name="roadrash" supported="no">
+	<software name="roadrash" supported="partial">
 		<!-- SPS (CAPS) release 1313 -->
 		<description>Road Rash (Europe)</description>
 		<!-- retail, standalone -->
@@ -41616,7 +41636,9 @@ ATK test: failed
 		<publisher>Electronic Arts</publisher>
 		<notes><![CDATA[
 Hangs with color cycle genlock at boot, [FDC] dsksync (fixed)
-Keeps asking "insert disk 2" while disk 2 is in [FDC]
+Keeps asking "insert disk 2" while disk 2 is in [FDC] (fixed)
+Gameplay logic falls apart on 020+ machines (verify)
+Slightly off [Denise] delay offsets on 020+ machines for mountain backgrounds (verify)
 ATK test: OK
 ]]></notes>
 		<info name="usage" value="Sports manual copy-protection (bike stats)"/>
@@ -42064,7 +42086,7 @@ ATK test: OK
 		<publisher>Storm</publisher>
 		<notes><![CDATA[
 Black screen [FDC] copy protection check at PC=3ed8 (enables 68k trace mode) (fixed)
-Gameplay doesn't draw status bar on the right, [Copper] sprites
+Gameplay doesn't draw status bar on the right, [Copper] sprites. Works on a1200 (sets NTSC) and in a4000
 https://codetapper.com/amiga/sprite-tricks/rod-land/
 ATK test: C:0 H:U Bad
 ]]></notes>
@@ -49341,7 +49363,7 @@ ATK test: OK
 		<notes><![CDATA[
 Red screen [FDC] dsksync (fixed?)
 Main sprite randomly don't show up, [Copper]?
-[Copper] cuts bottom part of screen badly during gameplay, may use SKIP
+Green ball attack sometimes don't show up when firing straight right
 ATK test: failed
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -49652,8 +49674,7 @@ ATK test: OK
 		<publisher>Discovery</publisher>
 		<notes><![CDATA[
 black screen [FDC] dsksync (fixed)
-Has sprite GFX vertical strip on first loaded map screen
-Has incorrect transparent pixels across gameplay (cfr. player sprite left boot, spears in stage 2, barrels in stage 3)
+[Blitter] incorrect transparent pixels across gameplay (cfr. player sprite left boot, spears in stage 2, barrels in stage 3)
 Game Over screen has [Denise] GFX glitch
 TODO: verify collision detection (cfr. attack doesn't trigger when extremely near enemies, pickups)
 TODO: verify this with a500p once [FDC] dsksync bug is actually fixed
