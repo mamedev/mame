@@ -77,8 +77,6 @@
  *          The following all perform this on a port address..
  *          (anl, orl, xrl, jbc, cpl, inc, dec, djnz, mov px.y,c, clr px.y, setb px.y)
  *
- *        Serial UART emulation is not really accurate, but faked enough to work as far as i can tell
- *
  *        August 27,2003: Currently support for only 8031/8051/8751 chips (ie 128 RAM)
  *        October 14,2003: Added initial support for the 8752 (ie 256 RAM)
  *        October 22,2003: Full support for the 8752 (ie 256 RAM)
@@ -95,7 +93,6 @@
  *  - T0 output clock ?
  *
  * - Implement 80C52 extended serial capabilities
- * - Fix serial communication - This is a big hack (but working) right now.
  * - Implement 83C751 in sslam.c
  * - Fix cardline.c
  *      most likely due to different behaviour of I/O pins. The boards
@@ -299,6 +296,7 @@ mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type ty
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, (features & FEATURE_DS5002FP) ? 18 : 16, 0)
 	, m_pc(0)
 	, m_features(features)
+	, m_inst_cycles(0)
 	, m_rom_size(program_width > 0 ? 1 << program_width : 0)
 	, m_ram_mask( (data_width == 8) ? 0xff : 0x7f )
 	, m_num_interrupts(5)
@@ -1512,27 +1510,6 @@ void mcs51_cpu_device::update_timer_t2(int cycles)
 	}
 }
 
-void mcs51_cpu_device::update_timers(int cycles)
-{
-	while (cycles--)
-	{
-		update_timer_t0(1);
-		update_timer_t1(1);
-
-		if (m_features & FEATURE_I8052)
-		{
-			update_timer_t2(1);
-		}
-	}
-}
-
-/* Check and update status of serial port */
-void mcs51_cpu_device::update_serial(int cycles)
-{
-	while (--cycles>=0)
-		transmit_receive(0);
-}
-
 /* Check and update status of serial port */
 void mcs51_cpu_device::update_irq_prio(uint8_t ipl, uint8_t iph)
 {
@@ -1941,7 +1918,8 @@ void mcs51_cpu_device::check_irqs()
 		ints &= int_mask;
 	}
 
-	if (!ints)  return;
+	if (!ints)
+		return;
 
 	/* Clear IDL - got enabled interrupt */
 	if (m_features & FEATURE_CMOS)
@@ -1950,10 +1928,15 @@ void mcs51_cpu_device::check_irqs()
 		SET_IDL(0);
 		/* external interrupt wakes up */
 		if (ints & (GET_IE0 | GET_IE1))
+		{
 			/* but not the DS5002FP */
 			if (!(m_features & FEATURE_DS5002FP))
 				SET_PD(0);
+		}
 	}
+
+	if ((m_features & FEATURE_CMOS) && GET_PD)
+		return;
 
 	for (int i=0; i<m_num_interrupts; i++)
 	{
@@ -2043,15 +2026,20 @@ void mcs51_cpu_device::check_irqs()
 
 void mcs51_cpu_device::burn_cycles(int cycles)
 {
-	// TODO: adjust icount one by one here, to get more accurate serial timing?
-	/* Update Timer (if any timers are running) */
-	update_timers(cycles);
+	while (cycles--)
+	{
+		m_icount--;
 
-	/* Update Serial (only for mode 0) */
-	update_serial(cycles);
+		// update timers
+		update_timer_t0(1);
+		update_timer_t1(1);
 
-	/* check_irqs */
-	check_irqs();
+		if (m_features & FEATURE_I8052)
+			update_timer_t2(1);
+
+		// check and update status of serial port
+		transmit_receive(0);
+	}
 }
 
 void mcs51_cpu_device::execute_set_input(int irqline, int state)
@@ -2161,72 +2149,54 @@ void mcs51_cpu_device::execute_set_input(int irqline, int state)
 	m_last_line_state = new_state;
 }
 
-/* Execute cycles - returns number of cycles actually run */
+/* Execute cycles */
 void mcs51_cpu_device::execute_run()
 {
-	uint8_t op;
-
-	/* external interrupts may have been set since we last checked */
-	m_inst_cycles = 0;
-	check_irqs();
-
-	/* if in powerdown, just return */
-	if ((m_features & FEATURE_CMOS) && GET_PD)
-	{
-		debugger_wait_hook();
-		m_icount = 0;
-		return;
-	}
-
-	m_icount -= m_inst_cycles;
-	burn_cycles(m_inst_cycles);
-
-	if ((m_features & FEATURE_CMOS) && GET_IDL)
-	{
-		do
-		{
-			/* burn the cycles */
-			m_icount--;
-			burn_cycles(1);
-		} while( m_icount > 0 );
-		return;
-	}
-
 	do
 	{
-		/* Read next opcode */
-		PPC = PC;
-		debugger_instruction_hook(PC);
-		op = m_program.read_byte(PC++);
+		// check interrupts
+		check_irqs();
 
-		/* process opcode and count cycles */
-		m_inst_cycles = mcs51_cycles[op];
-		execute_op(op);
-
-		/* burn the cycles */
-		m_icount -= m_inst_cycles;
-
-		/* if in powerdown, just return */
+		// if in powerdown and external IRQ did not wake us up, just return
 		if ((m_features & FEATURE_CMOS) && GET_PD)
+		{
+			debugger_wait_hook();
+			m_icount = 0;
 			return;
+		}
 
-		// TODO: readjust icount/redo burn_cycles for check_irqs incrementing m_inst_cycles
+		// if not idling, process next opcode
+		if (!((m_features & FEATURE_CMOS) && GET_IDL))
+		{
+			PPC = PC;
+			debugger_instruction_hook(PC);
+			uint8_t op = m_program.read_byte(PC++);
+
+			m_inst_cycles += mcs51_cycles[op];
+			execute_op(op);
+		}
+		else
+			m_inst_cycles++;
+
+		// burn the cycles
 		burn_cycles(m_inst_cycles);
 
-		/* decrement the timed access window */
+		// decrement the timed access window
 		if (m_features & FEATURE_DS5002FP)
 		{
 			m_ds5002fp.ta_window = (m_ds5002fp.ta_window ? (m_ds5002fp.ta_window - 1) : 0x00);
 
 			if (m_ds5002fp.rnr_delay > 0)
-				m_ds5002fp.rnr_delay-=m_inst_cycles;
+				m_ds5002fp.rnr_delay -= m_inst_cycles;
 		}
 
-		/* If the chip entered in idle mode, end the loop */
-		if ((m_features & FEATURE_CMOS) && GET_IDL)
-			return;
+		m_inst_cycles = 0;
 
-	} while( m_icount > 0 );
+		// if in powerdown, eat remaining cycles
+		if ((m_features & FEATURE_CMOS) && GET_PD && m_icount > 0)
+			m_icount = 0;
+
+	} while (m_icount > 0);
 }
 
 
