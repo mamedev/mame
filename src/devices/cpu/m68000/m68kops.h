@@ -1954,6 +1954,7 @@ void x4ae8_tas_b_di_071234fc();
 void x4af0_tas_b_ix_071234fc();
 void x4af8_tas_b_aw_071234fc();
 void x4af9_tas_b_al_071234fc();
+void x4ac8_halt_c();
 void x4e40_trap_071234fc();
 void x50fc_trapt_234fc();
 void x50fa_trapt_w_234fc();

@@ -260,6 +260,7 @@ protected:
 	std::string d68020_extb_32();
 	std::string d68881_ftrap();
 	std::string d68040_fpu();
+	std::string dcoldfire_halt();
 	std::string d68000_jmp();
 	std::string d68000_jsr();
 	std::string d68000_lea();
