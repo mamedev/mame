@@ -14,7 +14,7 @@ class tsconf_beta_device : public device_t
 public:
 	tsconf_beta_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	void tsconf_beta_ioext(address_map &map) ATTR_COLD;
+	void tsconf_beta_io(address_map &map) ATTR_COLD;
 
 	auto out_dos_callback() { return m_out_dos_cb.bind(); }
 	auto out_vdos_m1_callback() { return m_out_vdos_m1_cb.bind(); }

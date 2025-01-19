@@ -33,13 +33,13 @@ void beta_disk_floppies(device_slot_interface &device)
 // device type definition
 DEFINE_DEVICE_TYPE(TSCONF_BETA, tsconf_beta_device, "tsconf_beta", "Virtual TR-DOS")
 
-void tsconf_beta_device::tsconf_beta_ioext(address_map &map)
+void tsconf_beta_device::tsconf_beta_io(address_map &map)
 {
-	map(0x1001f, 0x1001f).mirror(0x0ff00).rw(FUNC(tsconf_beta_device::status_r), FUNC(tsconf_beta_device::command_w));
-	map(0x1003f, 0x1003f).mirror(0x0ff00).rw(FUNC(tsconf_beta_device::track_r), FUNC(tsconf_beta_device::track_w));
-	map(0x1005f, 0x1005f).mirror(0x0ff00).rw(FUNC(tsconf_beta_device::sector_r), FUNC(tsconf_beta_device::sector_w));
-	map(0x1007f, 0x1007f).mirror(0x0ff00).rw(FUNC(tsconf_beta_device::data_r), FUNC(tsconf_beta_device::data_w));
-	map(0x1009f, 0x1009f).select(0x0ff60).rw(FUNC(tsconf_beta_device::state_r), FUNC(tsconf_beta_device::param_w));
+	map(0x001f, 0x001f).mirror(0xff00).rw(FUNC(tsconf_beta_device::status_r), FUNC(tsconf_beta_device::command_w));
+	map(0x003f, 0x003f).mirror(0xff00).rw(FUNC(tsconf_beta_device::track_r), FUNC(tsconf_beta_device::track_w));
+	map(0x005f, 0x005f).mirror(0xff00).rw(FUNC(tsconf_beta_device::sector_r), FUNC(tsconf_beta_device::sector_w));
+	map(0x007f, 0x007f).mirror(0xff00).rw(FUNC(tsconf_beta_device::data_r), FUNC(tsconf_beta_device::data_w));
+	map(0x009f, 0x009f).select(0xff60).rw(FUNC(tsconf_beta_device::state_r), FUNC(tsconf_beta_device::param_w));
 }
 
 
@@ -62,7 +62,7 @@ bool tsconf_beta_device::pre_vg_in_check()
 		if (m_vdos)
 		{
 			m_vdos = false;
-			m_out_dos_cb(0);
+			m_out_dos_cb(dos_io_r());
 			return false;
 		}
 		else if ((1 << (m_control & 3)) & m_fddvirt)
@@ -119,14 +119,14 @@ bool tsconf_beta_device::pre_vg_out_check(bool is_port_match = true)
 			if (is_port_match)
 			{
 				m_vdos = false;
-				m_out_dos_cb(0);
+				m_out_dos_cb(dos_io_r());
 				return false;
 			}
 		}
 		else if ((1 << (m_control & 3)) & m_fddvirt)
 		{
 			m_vdos = true;
-			m_out_dos_cb(0);
+			m_out_dos_cb(dos_io_r());
 			return false;
 		}
 	}
@@ -195,7 +195,7 @@ void tsconf_beta_device::turbo_w(int state)
 void tsconf_beta_device::on_m1_w()
 {
 	m_vdos = true;
-	m_out_dos_cb(0);
+	m_out_dos_cb(dos_io_r());
 }
 
 void tsconf_beta_device::enable_w(bool state)
@@ -203,7 +203,7 @@ void tsconf_beta_device::enable_w(bool state)
 	if ((state && !m_dos) || (!state && m_dos && !m_vdos))
 	{
 		m_dos = state;
-		m_out_dos_cb(state);
+		m_out_dos_cb(dos_io_r());
 	}
 }
 
@@ -215,6 +215,7 @@ void tsconf_beta_device::fddvirt_w(u8 fddvirt)
 void tsconf_beta_device::io_forced_w(bool io_forced)
 {
 	m_io_forced = io_forced;
+	m_out_dos_cb(dos_io_r());
 }
 
 void tsconf_beta_device::fdc_hld_w(int state)

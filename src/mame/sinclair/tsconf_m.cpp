@@ -82,6 +82,16 @@ void tsconf_state::tsconf_update_bank0()
 	}
 }
 
+void tsconf_state::update_io(int dos)
+{
+	if (dos)
+		m_io_shadow_view.select(0);
+	else
+		m_io_shadow_view.disable();
+
+	tsconf_update_bank0();
+}
+
 void tsconf_state::tsconf_update_video_mode()
 {
 	rectangle visarea = screen_area[3];

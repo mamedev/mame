@@ -81,31 +81,26 @@ void tsconf_state::tsconf_mem(address_map &map)
 
 void tsconf_state::tsconf_io(address_map &map)
 {
-	map(0x0000, 0xffff).lrw8(
-		NAME([this](offs_t offset) { return m_ioext.read_byte((m_beta->dos_io_r() << 16) | offset); }),
-		NAME([this](offs_t offset, u8 data) { m_ioext.write_byte((m_beta->dos_io_r() << 16) | offset, data); }));
-}
-
-void tsconf_state::tsconf_ioext(address_map &map)
-{
 	map.unmap_value_high();
-	map(0x00000, 0x00000).mirror(0x17ffd).w(FUNC(tsconf_state::tsconf_port_7ffd_w));
-	map(0x0001f, 0x0001f).mirror(0x0ff00).r(FUNC(tsconf_state::tsconf_port_xx1f_r));
-	map(0x00057, 0x00057).mirror(0x1ff00).rw(FUNC(tsconf_state::tsconf_port_57_zctr_r), FUNC(tsconf_state::tsconf_port_57_zctr_w)); // spi config
-	map(0x00077, 0x00077).mirror(0x1ff00).rw(FUNC(tsconf_state::tsconf_port_77_zctr_r), FUNC(tsconf_state::tsconf_port_77_zctr_w)); // spi data
-	map(0x000fe, 0x000fe).select(0x1ff00).rw(FUNC(tsconf_state::spectrum_ula_r), FUNC(tsconf_state::tsconf_ula_w));
-	map(0x000af, 0x000af).select(0x1ff00).rw(FUNC(tsconf_state::tsconf_port_xxaf_r), FUNC(tsconf_state::tsconf_port_xxaf_w));
-	map(0x0fadf, 0x0fadf).mirror(0x10000).lr8(NAME([this]() -> u8 { return 0x80 | (m_io_mouse[2]->read() & 0x07); }));
-	map(0x0fbdf, 0x0fbdf).mirror(0x10000).lr8(NAME([this]() -> u8 { return  m_io_mouse[0]->read(); }));
-	map(0x0ffdf, 0x0ffdf).mirror(0x10000).lr8(NAME([this]() -> u8 { return ~m_io_mouse[1]->read(); }));
-	map(0x08ff7, 0x08ff7).select(0x17000).w(FUNC(tsconf_state::tsconf_port_f7_w)); // 3:bff7 5:dff7 6:eff7
-	map(0x0bff7, 0x0bff7).mirror(0x10000).r(FUNC(tsconf_state::tsconf_port_f7_r));
-	map(0x000fb, 0x000fb).mirror(0x1ff00).w(m_dac, FUNC(dac_byte_interface::data_w));
-	map(0x080fd, 0x080fd).mirror(0x13f00).lw8(NAME([this](u8 data) { return m_ay[m_ay_selected]->data_w(data); }));
-	map(0x0c0fd, 0x0c0fd).mirror(0x13f00).lr8(NAME([this]() { return m_ay[m_ay_selected]->data_r(); }))
+	map(0x0000, 0x0000).mirror(0x7ffd).w(FUNC(tsconf_state::tsconf_port_7ffd_w));
+	map(0x001f, 0x001f).mirror(0xff00).r(FUNC(tsconf_state::tsconf_port_xx1f_r));
+	map(0x0057, 0x0057).mirror(0xff00).rw(FUNC(tsconf_state::tsconf_port_57_zctr_r), FUNC(tsconf_state::tsconf_port_57_zctr_w)); // spi config
+	map(0x0077, 0x0077).mirror(0xff00).rw(FUNC(tsconf_state::tsconf_port_77_zctr_r), FUNC(tsconf_state::tsconf_port_77_zctr_w)); // spi data
+	map(0x00fe, 0x00fe).select(0xff00).rw(FUNC(tsconf_state::spectrum_ula_r), FUNC(tsconf_state::tsconf_ula_w));
+	map(0x00af, 0x00af).select(0xff00).rw(FUNC(tsconf_state::tsconf_port_xxaf_r), FUNC(tsconf_state::tsconf_port_xxaf_w));
+	map(0xfadf, 0xfadf).lr8(NAME([this]() -> u8 { return 0x80 | (m_io_mouse[2]->read() & 0x07); }));
+	map(0xfbdf, 0xfbdf).lr8(NAME([this]() -> u8 { return  m_io_mouse[0]->read(); }));
+	map(0xffdf, 0xffdf).lr8(NAME([this]() -> u8 { return ~m_io_mouse[1]->read(); }));
+	map(0x8ff7, 0x8ff7).select(0x7000).w(FUNC(tsconf_state::tsconf_port_f7_w)); // 3:bff7 5:dff7 6:eff7
+	map(0xbff7, 0xbff7).r(FUNC(tsconf_state::tsconf_port_f7_r));
+	map(0x00fb, 0x00fb).mirror(0xff00).w(m_dac, FUNC(dac_byte_interface::data_w));
+	map(0x80fd, 0x80fd).mirror(0x3f00).lw8(NAME([this](u8 data) { return m_ay[m_ay_selected]->data_w(data); }));
+	map(0xc0fd, 0xc0fd).mirror(0x3f00).lr8(NAME([this]() { return m_ay[m_ay_selected]->data_r(); }))
 		.w(FUNC(tsconf_state::tsconf_ay_address_w));
 
-	map(0x00000, 0x1ffff).m(m_beta, FUNC(tsconf_beta_device::tsconf_beta_ioext));
+	// IO: Shadow
+	map(0x0000, 0xffff).view(m_io_shadow_view);
+	m_io_shadow_view[0](0x0000, 0xffff).m(m_beta, FUNC(tsconf_beta_device::tsconf_beta_io));
 }
 
 void tsconf_state::tsconf_switch(address_map &map)
@@ -184,7 +179,6 @@ void tsconf_state::machine_start()
 {
 	spectrum_128_state::machine_start();
 	m_maincpu->space(AS_PROGRAM).specific(m_program);
-	m_bankio->space(AS_PROGRAM).specific(m_ioext);
 
 	// reconfigure ROMs
 	memory_region *rom = memregion("maincpu");
@@ -291,9 +285,8 @@ void tsconf_state::tsconf(machine_config &config)
 
 	m_maincpu->set_vblank_int("screen", FUNC(tsconf_state::tsconf_vblank_interrupt));
 
-	ADDRESS_MAP_BANK(config, m_bankio).set_map(&tsconf_state::tsconf_ioext).set_options(ENDIANNESS_LITTLE, 8, 17, 0);
 	zxbus_device &zxbus(ZXBUS(config, "zxbus", 0));
-	zxbus.set_iospace(m_bankio, AS_PROGRAM);
+	zxbus.set_iospace("maincpu", AS_IO);
 	ZXBUS_SLOT(config, "zxbus1", 0, "zxbus", zxbus_cards, nullptr);
 	//ZXBUS_SLOT(config, "zxbus2", 0, "zxbus", zxbus_cards, nullptr);
 
@@ -310,7 +303,7 @@ void tsconf_state::tsconf(machine_config &config)
 	m_dma->on_ready_callback().set(FUNC(tsconf_state::dma_ready));
 
 	TSCONF_BETA(config, m_beta, 0);
-	m_beta->out_dos_callback().set([this](int state) { tsconf_update_bank0(); });
+	m_beta->out_dos_callback().set(FUNC(tsconf_state::update_io));
 	m_beta->out_vdos_m1_callback().set([this](int state) { m_update_on_m1 = true; });
 
 	SPI_SDCARD(config, m_sdcard, 0);

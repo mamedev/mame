@@ -28,7 +28,7 @@ class tsconf_state : public spectrum_128_state
 public:
 	tsconf_state(const machine_config &mconfig, device_type type, const char *tag)
 		: spectrum_128_state(mconfig, type, tag)
-		, m_bankio(*this, "bankio")
+		, m_io_shadow_view(*this, "io_shadow_view")
 		, m_bank0_rom(*this, "bank0_rom")
 		, m_keyboard(*this, "pc_keyboard")
 		, m_io_mouse(*this, "mouse_input%u", 1U)
@@ -190,12 +190,12 @@ private:
 	void tsconf_ay_address_w(u8 data);
 
 	void tsconf_update_bank0();
+	void update_io(int dos);
 	u8 beta_neutral_r(offs_t offset);
 	u8 beta_enable_r(offs_t offset);
 	u8 beta_disable_r(offs_t offset);
 
 	void tsconf_io(address_map &map) ATTR_COLD;
-	void tsconf_ioext(address_map &map) ATTR_COLD;
 	void tsconf_mem(address_map &map) ATTR_COLD;
 	void tsconf_switch(address_map &map) ATTR_COLD;
 
@@ -216,8 +216,7 @@ private:
 	u8 m_regs[0x100];
 
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
-	memory_access<17, 0, 0, ENDIANNESS_LITTLE>::specific m_ioext;
-	required_device<address_map_bank_device> m_bankio;
+	memory_view m_io_shadow_view;
 	memory_view m_bank0_rom;
 
 	required_device<at_keyboard_device> m_keyboard;
