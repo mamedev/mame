@@ -18,19 +18,23 @@ public:
 	u8 read(offs_t offset);
 	void write(offs_t offset, u8 data);
 
-	void aquarium_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs);
-	void gcpinbal_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs);
+	void aquarium_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void gcpinbal_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void vblank(int state);
 
 protected:
-	std::unique_ptr<u8[]> m_ram;
-
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
 private:
 	colpri_cb_delegate m_colpri_cb;
-	required_memory_region m_gfx_region;
 	u16 m_colbase;
+
+	std::unique_ptr<u8[]> m_ram;
+	std::unique_ptr<u8[]> m_ram_buffered;
+
+	// decoding info
+	DECLARE_GFXDECODE_MEMBER(gfxinfo);
 };
 
 DECLARE_DEVICE_TYPE(EXCELLENT_SPRITE, excellent_spr_device)
