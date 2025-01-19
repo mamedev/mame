@@ -237,7 +237,7 @@ void news_020_mmu_device::hyperbus_w(offs_t offset, uint32_t data, uint32_t mem_
 			LOGMASKED(LOG_MAP_ERROR, "(%s) mmu w 0x%08x (pg 0x%08x, pte 0x%08x, index 0x%x) kernel protection violation\n", machine().describe_context(), offset, vpgnum, pte.raw, (vpgnum % MMU_ENTRY_COUNT) + (system ? MMU_ENTRY_COUNT : 0x0));
 			m_bus_error(offset, mem_mask, true, PROTECTION_VIOLATION);
 		}
-		else if (pte.kernel_writable || pte.user_writable || pte.modified) // writeable or entered as modified into the table by the OS already TODO: try without M check here
+		else if (pte.kernel_writable || pte.user_writable) // writeable
 		{
 			if (!pte.valid && pte.fill_on_demand)
 			{
