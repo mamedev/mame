@@ -744,26 +744,28 @@ void JitAllocator::reset(ResetPolicy resetPolicy) noexcept {
     JitAllocatorPool& pool = impl->pools[poolId];
     JitAllocatorBlock* block = pool.blocks.first();
 
-    JitAllocatorBlock* blockToKeep = nullptr;
-    if (resetPolicy != ResetPolicy::kHard && uint32_t(impl->options & JitAllocatorOptions::kImmediateRelease) == 0) {
-      blockToKeep = block;
-      block = block->next();
-    }
-
-    while (block) {
-      JitAllocatorBlock* next = block->next();
-      JitAllocatorImpl_deleteBlock(impl, block);
-      block = next;
-    }
-
     pool.reset();
 
-    if (blockToKeep) {
-      blockToKeep->_listNodes[0] = nullptr;
-      blockToKeep->_listNodes[1] = nullptr;
-      JitAllocatorImpl_wipeOutBlock(impl, blockToKeep);
-      JitAllocatorImpl_insertBlock(impl, blockToKeep);
-      pool.emptyBlockCount = 1;
+    if (block) {
+      JitAllocatorBlock* blockToKeep = nullptr;
+      if (resetPolicy != ResetPolicy::kHard && uint32_t(impl->options & JitAllocatorOptions::kImmediateRelease) == 0) {
+        blockToKeep = block;
+        block = block->next();
+      }
+
+      while (block) {
+        JitAllocatorBlock* next = block->next();
+        JitAllocatorImpl_deleteBlock(impl, block);
+        block = next;
+      }
+
+      if (blockToKeep) {
+        blockToKeep->_listNodes[0] = nullptr;
+        blockToKeep->_listNodes[1] = nullptr;
+        JitAllocatorImpl_wipeOutBlock(impl, blockToKeep);
+        JitAllocatorImpl_insertBlock(impl, blockToKeep);
+        pool.emptyBlockCount = 1;
+      }
     }
   }
 }
@@ -1387,6 +1389,11 @@ static void BitVectorRangeIterator_testRandom(Random& rnd, size_t count) noexcep
   }
 }
 
+static void test_jit_allocator_reset_empty() noexcept {
+  JitAllocator allocator;
+  allocator.reset(ResetPolicy::kSoft);
+}
+
 static void test_jit_allocator_alloc_release() noexcept {
   size_t kCount = BrokenAPI::hasArg("--quick") ? 20000 : 100000;
 
@@ -1553,6 +1560,7 @@ static void test_jit_allocator_query() noexcept {
 }
 
 UNIT(jit_allocator) {
+  test_jit_allocator_reset_empty();
   test_jit_allocator_alloc_release();
   test_jit_allocator_query();
 }

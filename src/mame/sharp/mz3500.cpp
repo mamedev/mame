@@ -870,4 +870,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 198?, mz3500, 0, 0, mz3500, mz3500, mz3500_state, empty_init, "Sharp", "MZ-3500", MACHINE_IS_SKELETON )
+COMP( 198?, mz3500, 0, 0, mz3500, mz3500, mz3500_state, empty_init, "Sharp", "MZ-3500", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -129,8 +129,8 @@ ROM_END
 } // anonymous namespace
 
 //    YEAR  NAME        PARENT     MACHINE    INPUT      CLASS              INIT        ROT   COMPANY       FULLNAME                FLAGS
-GAME( 199?, mastcrane,  0,         ganchonew, ganchonew, compucranes_state, empty_init, ROT0, "Compumatic", "Master Crane (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 199?, mastcranea, mastcrane, ganchonew, ganchonew, compucranes_state, empty_init, ROT0, "Compumatic", "Master Crane (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 199?, mastcraneb, mastcrane, ganchonew, ganchonew, compucranes_state, empty_init, ROT0, "Compumatic", "Master Crane (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 2000, octopussy,  mastcrane, ganchonew, ganchonew, compucranes_state, empty_init, ROT0, "Covielsa",   "Octopussy",            MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 2012, toyshop,    0,         ganchonew, ganchonew, compucranes_state, empty_init, ROT0, "OM Vending", "Toy Shop",             MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, mastcrane,  0,         ganchonew, ganchonew, compucranes_state, empty_init, ROT0, "Compumatic", "Master Crane (set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 199?, mastcranea, mastcrane, ganchonew, ganchonew, compucranes_state, empty_init, ROT0, "Compumatic", "Master Crane (set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 199?, mastcraneb, mastcrane, ganchonew, ganchonew, compucranes_state, empty_init, ROT0, "Compumatic", "Master Crane (set 3)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 2000, octopussy,  mastcrane, ganchonew, ganchonew, compucranes_state, empty_init, ROT0, "Covielsa",   "Octopussy",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 2012, toyshop,    0,         ganchonew, ganchonew, compucranes_state, empty_init, ROT0, "OM Vending", "Toy Shop",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

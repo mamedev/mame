@@ -2609,7 +2609,8 @@ void specnext_state::map_io(address_map &map)
 		return /*m_nr_d8_io_trap_fdc_en ? ... :*/ 0x00;
 	}), NAME([this](u8 data) {
 		if (m_nr_d8_io_trap_fdc_en)
-			;
+		{
+		}
 	}));
 
 

@@ -115,7 +115,7 @@ void dogyuun_state::video_start()
 
 void dogyuun_state::screen_vblank(int state)
 {
-	if (state)	// rising edge
+	if (state)  // rising edge
 	{
 		m_vdp[0]->screen_eof();
 		m_vdp[1]->screen_eof();

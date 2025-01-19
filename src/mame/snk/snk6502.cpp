@@ -772,18 +772,18 @@ static const gfx_layout charlayout_memory =
 
 
 static GFXDECODE_START( gfx_sasuke )
-	GFXDECODE_ENTRY( nullptr,           0x1000, swapcharlayout,      0, 4 )    /* the game dynamically modifies this */
-	GFXDECODE_ENTRY( "gfx1", 0x0000, swapcharlayout,    4*4, 4 )
+	GFXDECODE_RAM(   nullptr, 0x1000, swapcharlayout,      0, 4 )
+	GFXDECODE_ENTRY( "gfx1",  0x0000, swapcharlayout,    4*4, 4 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_satansat )
-	GFXDECODE_ENTRY( nullptr,           0x1000, charlayout_memory,   0, 4 )    /* the game dynamically modifies this */
-	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,        4*4, 4 )
+	GFXDECODE_RAM(   nullptr, 0x1000, charlayout_memory,   0, 4 )
+	GFXDECODE_ENTRY( "gfx1",  0x0000, charlayout,        4*4, 4 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_vanguard )
-	GFXDECODE_ENTRY( nullptr,           0x1000, charlayout_memory,   0, 8 )    /* the game dynamically modifies this */
-	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,        8*4, 8 )
+	GFXDECODE_RAM(   nullptr, 0x1000, charlayout_memory,   0, 8 )
+	GFXDECODE_ENTRY( "gfx1",  0x0000, charlayout,        8*4, 8 )
 GFXDECODE_END
 
 
@@ -795,7 +795,7 @@ GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(snk6502_state::satansat_interrupt)
 {
-	if(m_irq_mask)
+	if (m_irq_mask)
 		device.execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE); /* one IRQ per frame */
 }
 
@@ -833,7 +833,6 @@ void snk6502_state::sasuke(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(snk6502_state,sasuke)
 
 	// video hardware
-
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz((MASTER_CLOCK / 16) / (45 * 32 * 8));
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -1048,9 +1047,6 @@ ROM_START( zarzon )
 	ROM_LOAD( "zarz133.53",   0x0000, 0x0800, CRC(b253cf78) SHA1(56a73b22ed2866222c407a3e9b51b8e0c92cf2aa) )
 	ROM_LOAD( "zarz134.54",   0x0800, 0x0800, CRC(580934d2) SHA1(c1c7eba56bca2a0ea6a68c0245b071a3308f92bd) )
 ROM_END
-
-
-
 
 ROM_START( satansatind )
 	ROM_REGION( 0x10000, "maincpu", 0 )

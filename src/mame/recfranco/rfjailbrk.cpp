@@ -119,4 +119,4 @@ ROM_END
 } // anonymous namespace
 
 //   YEAR  NAME       PARENT  MACHINE    INPUT      CLASS            INIT        ROT   COMPANY               FULLNAME                                        FLAGS
-GAME(2000, rfjailbrk, 0,      rfjailbrk, rfjailbrk, rfjailbrk_state, empty_init, ROT0, "Recreativos Franco", "Jail Break (Recreativos Franco slot machine)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(2000, rfjailbrk, 0,      rfjailbrk, rfjailbrk, rfjailbrk_state, empty_init, ROT0, "Recreativos Franco", "Jail Break (Recreativos Franco slot machine)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)

@@ -12,7 +12,7 @@
     - verify frequencies on chips
     - verify alt titles, some regions have 'Car Fighting' as a subtitle, region comes from EEPROM?
     - verify text layer palettes
-	- service mode doesn't display properly
+    - service mode doesn't display properly
     - currently only coins up with service button
     - sound dies after one stage?
 */
@@ -256,9 +256,9 @@ u8 dt7_state::dt7_shared_ram_hack_r(offs_t offset)
 	int pc = m_maincpu->pc();
 
 	if (pc == 0x7d84) { return 0xff; } // status?
-	
+
 	u32 addr = (offset * 2) + 0x610000;
-	
+
 	if (addr == 0x061f00c) { return m_sysport->read(); }
 	if (addr == 0x061d000) { return 0x00; } // settings (from EEPROM?) including flipscreen
 	if (addr == 0x061d002) { return 0x00; } // settings (from EEPROM?) dipswitch?
@@ -266,7 +266,7 @@ u8 dt7_state::dt7_shared_ram_hack_r(offs_t offset)
 	if (addr == 0x061f004) { return m_p1port->read(); } // P1 inputs
 	if (addr == 0x061f006) { return m_p2port->read(); } // P2 inputs
 	//if (addr == 0x061f00e) { return machine().rand(); } // P2 coin / start
-	
+
 	logerror("%08x: dt7_shared_ram_hack_r address %08x ret %02x\n", pc, addr, ret);
 
 	return ret;
@@ -282,7 +282,7 @@ void dt7_state::shared_ram_audio_w(offs_t offset, u8 data)
 	// just a helper function to try and debug the sound CPU a bit more easily
 	//int pc = m_audiocpu->pc();
 	//if (offset == 0xf004 / 2)
-	//	logerror("%08x: shared_ram_audio_w address %08x data %02x\n", pc, offset, data);
+	//  logerror("%08x: shared_ram_audio_w address %08x data %02x\n", pc, offset, data);
 	shared_ram_w(offset, data);
 }
 

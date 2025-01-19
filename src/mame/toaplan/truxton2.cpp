@@ -58,7 +58,6 @@ protected:
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void create_tx_tilemap(int dx = 0, int dx_flipped = 0);
-	virtual void device_post_load() override;
 
 	void screen_vblank(int state);
 	void tx_gfxram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -101,12 +100,6 @@ private:
   ---- ---x xxxx xxxx = X scroll for each line
 */
 
-void truxton2_state::device_post_load()
-{
-	m_gfxdecode->gfx(0)->mark_all_dirty();
-}
-
-
 TILE_GET_INFO_MEMBER(truxton2_state::get_text_tile_info)
 {
 	const u16 attrib = m_tx_videoram[tile_index];
@@ -136,7 +129,7 @@ void truxton2_state::tx_linescroll_w(offs_t offset, u16 data, u16 mem_mask)
 
 
 void truxton2_state::screen_vblank(int state)
-{	
+{
 	if (state) // rising edge
 	{
 		m_vdp->screen_eof();
@@ -317,7 +310,7 @@ static const gfx_layout truxton2_tx_tilelayout =
 
 
 static GFXDECODE_START( gfx )
-	GFXDECODE_ENTRY( nullptr, 0, truxton2_tx_tilelayout, 64*16, 64 )
+	GFXDECODE_RAM( nullptr, 0, truxton2_tx_tilelayout, 64*16, 64 )
 GFXDECODE_END
 
 

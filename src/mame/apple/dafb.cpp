@@ -207,6 +207,7 @@ static INPUT_PORTS_START(monitor_config)
 	PORT_CONFSETTING(0x02, u8"Mac RGB Display (12\" 512\u00d7384)")             // "Rubik" (modified IIgs AppleColor RGB)
 	PORT_CONFSETTING(0x03, u8"Mac Two-Page Display (B&W 21\" 1152\u00d7870)")   // "2 Page"
 	PORT_CONFSETTING(0x06, u8"Mac Hi-Res Display (12-14\" 640\u00d7480)")       // "High Res"
+	PORT_CONFSETTING(0x07, u8"No monitor, disable internal video")              // No monitor connected
 	PORT_CONFSETTING(ext(0, 0, 0), "PAL Encoder (640\u00d7480, 768\u00d7576)")
 	PORT_CONFSETTING(ext(1, 1, 0), "NTSC Encoder (512\u00d7384, 640\u00d7480)")
 	PORT_CONFSETTING(ext(1, 1, 3), "640x480 VGA")
@@ -224,6 +225,7 @@ static INPUT_PORTS_START(monitor_config_noconv)
 	PORT_CONFSETTING(0x02, u8"Mac RGB Display (12\" 512\u00d7384)")             // "Rubik" (modified IIgs AppleColor RGB)
 	PORT_CONFSETTING(0x03, u8"Mac Two-Page Display (B&W 21\" 1152\u00d7870)")   // "2 Page"
 	PORT_CONFSETTING(0x06, u8"Mac Hi-Res Display (12-14\" 640\u00d7480)")       // "High Res"
+	PORT_CONFSETTING(0x07, u8"No monitor, disable internal video")              // No monitor connected
 	PORT_CONFSETTING(ext(1, 1, 3), "640x480 VGA")
 	PORT_CONFSETTING(ext(2, 3, 1), "832x624 16\" RGB")                          // "Goldfish" or "16 inch RGB"
 	PORT_CONFSETTING(ext(3, 2, 2), "1024\u00d7768 19\" RGB");

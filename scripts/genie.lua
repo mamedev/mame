@@ -710,16 +710,28 @@ end
 
 if not _OPTIONS["FORCE_DRC_C_BACKEND"] then
 	if _OPTIONS["BIGENDIAN"]~="1" then
-		configuration { "x64" }
-			defines {
-				"NATIVE_DRC=drcbe_x64",
-			}
-		configuration { "x32" }
-			defines {
-				"NATIVE_DRC=drcbe_x86",
-			}
-		configuration {  }
+		if (_OPTIONS["PLATFORM"]=="arm64") then
+			configuration { }
+				defines {
+					"NATIVE_DRC=drcbe_arm64",
+				}
+		else
+			configuration { "x64" }
+				defines {
+					"NATIVE_DRC=drcbe_x64",
+				}
+			configuration { "x32" }
+				defines {
+					"NATIVE_DRC=drcbe_x86",
+				}
+			configuration {  }
+		end
 	end
+
+	configuration { }
+		defines {
+			"ASMJIT_STATIC",
+		}
 end
 
 	defines {
@@ -1300,8 +1312,6 @@ configuration { "vs20*" }
 		}
 
 		buildoptions {
-			"/wd4003", -- warning C4003: not enough actual parameters for macro 'xxx'
-			"/wd4005", -- warning C4005: The macro identifier is defined twice. The compiler uses the second macro definition
 			"/wd4018", -- warning C4018: 'x' : signed/unsigned mismatch
 			"/wd4060", -- warning C4060: switch statement contains no 'case' or 'default' labels
 			"/wd4065", -- warning C4065: switch statement contains 'default' but no 'case' labels
@@ -1313,6 +1323,7 @@ configuration { "vs20*" }
 			"/wd4245", -- warning C4245: 'conversion' : conversion from 'type1' to 'type2', signed/unsigned mismatch
 			"/wd4250", -- warning C4250: 'xxx' : inherits 'xxx' via dominance
 			"/wd4267", -- warning C4267: 'var' : conversion from 'size_t' to 'type', possible loss of data
+			"/wd4305", -- warning C4305: 'conversion': truncation from 'type1' to 'type2'
 			"/wd4310", -- warning C4310: cast truncates constant value
 			"/wd4319", -- warning C4319: 'operator' : zero extending 'type' to 'type' of greater size
 			"/wd4324", -- warning C4324: 'xxx' : structure was padded due to __declspec(align())
@@ -1323,10 +1334,11 @@ configuration { "vs20*" }
 			"/wd4458", -- warning C4458: declaration of 'xxx' hides class member
 			"/wd4459", -- warning C4459: declaration of 'xxx' hides global declaration
 			"/wd4611", -- warning C4611: interaction between '_setjmp' and C++ object destruction is non-portable
+			"/wd4646", -- warning C4646: function declared with 'noreturn' has non-void return type
+			"/wd4701", -- warning C4701: potentially uninitialized local variable 'name' used
 			"/wd4702", -- warning C4702: unreachable code
-			"/wd4706", -- warning C4706: assignment within conditional expression
-			"/wd4804", -- warning C4804: '>>': unsafe use of type 'bool' in operation
 			"/wd4805", -- warning C4805: 'x' : unsafe mix of type 'xxx' and type 'xxx' in operation
+			"/wd4806", -- warning C4806: 'operation': unsafe operation: no value of type 'type' promoted to type 'type' can equal the given constant
 			"/wd4996", -- warning C4996: 'function': was declared deprecated
 		}
 

@@ -47,17 +47,18 @@ TODO:
 
 #include "moog_source.lh"
 
-#define LOG_CV (1U << 1)
-#define LOG_BUTTONS (1U << 2)
-#define LOG_ENCODER (1U << 3)
-#define LOG_KEYBOARD (1U << 4)
-#define LOG_CV_KEYBOARD_APPROX (1U << 5)
-#define VERBOSE (LOG_GENERAL|LOG_CV)
-#define LOG_OUTPUT_FUNC osd_printf_info
+#define LOG_CV                  (1U << 1)
+#define LOG_BUTTONS             (1U << 2)
+#define LOG_ENCODER             (1U << 3)
+#define LOG_KEYBOARD            (1U << 4)
+#define LOG_CV_KEYBOARD_APPROX  (1U << 5)
+
+#define VERBOSE (LOG_GENERAL | LOG_CV)
+//#define LOG_OUTPUT_FUNC osd_printf_info
+
 #include "logmacro.h"
 
-namespace
-{
+namespace {
 
 constexpr const char MAINCPU_TAG[] = "z80";
 constexpr const char NVRAM_TAG[] = "nvram";
@@ -65,8 +66,7 @@ constexpr const char NVRAM_TAG[] = "nvram";
 class source_state : public driver_device
 {
 public:
-	source_state(const machine_config& mconfig, device_type type,
-	             const char* tag) ATTR_COLD
+	source_state(const machine_config &mconfig, device_type type, const char *tag) ATTR_COLD
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, MAINCPU_TAG)
 		, m_octave_io(*this, "octave_buttons")
@@ -90,13 +90,14 @@ public:
 		, m_cv(static_cast<int>(CV::SIZE), -1)
 	{}
 
-	void source(machine_config& config) ATTR_COLD;
-
-	void machine_start() override ATTR_COLD;
-	void machine_reset() override ATTR_COLD;
+	void source(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(octave_button_pressed);
 	DECLARE_INPUT_CHANGED_MEMBER(encoder_moved);
+
+protected:
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 
 private:
 	void update_octave_leds();
@@ -111,13 +112,13 @@ private:
 
 	float get_keyboard_v() const;
 	u8 keyboard_r();
-	u8 buttons_r(const required_ioport_array<6>& button_io, const char* name) const;
+	u8 buttons_r(const required_ioport_array<6> &button_io, const char *name) const;
 	u8 buttons_a_r();
 	u8 buttons_b_r();
 	u8 encoder_r();
 
-	void memory_map(address_map& map) ATTR_COLD;
-	void io_map(address_map& map) ATTR_COLD;
+	void memory_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
 	required_ioport m_octave_io;
@@ -143,6 +144,8 @@ private:
 	bool m_octave_hi = true;  // `true` due to internal pullups of 74LS367 and 7404.
 	u8 m_button_row_latch = 0xff;
 	bool m_encoder_incr = false;
+
+	std::vector<float> m_cv;
 
 	// All MUXes are CD4051B.
 	// Component designations refer to board 2 (synthesizer board).
@@ -182,7 +185,6 @@ private:
 
 		SIZE
 	};
-	std::vector<float> m_cv;
 
 	static constexpr const float MAX_CV = 10;  // In Volts.
 	static constexpr const u8 PATTERNS_7447[16] =
@@ -365,13 +367,13 @@ void source_state::cv_w(offs_t offset, u8 data)
 		return;
 
 	const float cv = MAX_CV * data / 255.0f;
-	if (cv == m_cv.at(offset))
+	if (cv == m_cv[offset])
 		return;
-	m_cv.at(offset) = cv;
+	m_cv[offset] = cv;
 
 	if (offset == static_cast<int>(CV::KEYBOARD_APPROX))
 		LOGMASKED(LOG_CV_KEYBOARD_APPROX,
-		          "CV %d: 0x%02x, %f\n", offset, data, cv);
+				  "CV %d: 0x%02x, %f\n", offset, data, cv);
 	else
 		LOGMASKED(LOG_CV, "CV %d: 0x%02x, %f\n", offset, data, cv);
 }
@@ -408,7 +410,7 @@ float source_state::get_keyboard_v() const
 
 	// *** Convert pressed key to a voltage.
 
-	static constexpr const float KEYBOARD_VREF = 8.24;  // From schematic.
+	static constexpr const float KEYBOARD_VREF = 8.24f;  // From schematic.
 	static constexpr const float RKEY = RES_R(100);
 	static constexpr const float R74 = RES_R(150);
 	static constexpr const float R76 = RES_K(220);
@@ -426,7 +428,7 @@ float source_state::get_keyboard_v() const
 		const float v = KEYBOARD_VREF * RES_VOLTAGE_DIVIDER(upper_r, lower_r);
 		kb_voltage = v * RES_VOLTAGE_DIVIDER(R77, R76);
 		LOGMASKED(LOG_KEYBOARD, "Key %d - %f - %f\n", pressed_key, v,
-			      kb_voltage);
+				  kb_voltage);
 	}
 	return kb_voltage;
 }
@@ -445,7 +447,7 @@ u8 source_state::keyboard_r()
 	// TODO: Compute keyboard voltage in an input callback.
 	static constexpr const int KB_APPROX_INDEX =
 		static_cast<int>(CV::KEYBOARD_APPROX);
-	const u8 d0 = (get_keyboard_v() >= m_cv.at(KB_APPROX_INDEX)) ? 1 : 0;
+	const u8 d0 = (get_keyboard_v() >= m_cv[KB_APPROX_INDEX]) ? 1 : 0;
 
 	// D1, D2: Loudness and Filter contour peaks.
 	// D1 <- U32, FILT CNTR <- S22-11: 0 when envolope reaches almost 10V
@@ -479,7 +481,7 @@ u8 source_state::keyboard_r()
 }
 
 u8 source_state::buttons_r(
-	const required_ioport_array<6>& button_io, const char* name) const
+	const required_ioport_array<6> &button_io, const char *name) const
 {
 	// Button presses are active low, but the result is inverted by a CD4502.
 	// So they look active high to the firmware.
@@ -494,7 +496,7 @@ u8 source_state::buttons_r(
 	if (pressed & 0x3f)
 	{
 		LOGMASKED(LOG_BUTTONS, "Button read %s - %02X: %02X\n",
-		          name, m_button_row_latch, pressed);
+				  name, m_button_row_latch, pressed);
 	}
 	return pressed;
 }
@@ -517,14 +519,14 @@ u8 source_state::encoder_r()
 {
 	// D0 contains whether the encoder was last incremented or decremented.
 	LOGMASKED(LOG_ENCODER,
-	          "Encoder read: %d - %d\n", m_encoder->read(), m_encoder_incr);
+			  "Encoder read: %d - %d\n", m_encoder->read(), m_encoder_incr);
 	// Reading the encoder's state also clears /INT (via U21B, U7A and U15A).
 	if (!machine().side_effects_disabled())
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 	return m_encoder_incr ? 1 : 0;
 }
 
-void source_state::memory_map(address_map& map)
+void source_state::memory_map(address_map &map)
 {
 	// Address decoding done through U26, 74LS138, E1=E2=0, E3=1,
 	// A0-A2 = Z80 A13-A15.
@@ -574,7 +576,7 @@ void source_state::memory_map(address_map& map)
 	map(0xe000, 0xe000).mirror(0x1fff).r(FUNC(source_state::encoder_r));
 }
 
-void source_state::io_map(address_map& map)
+void source_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x1f).mirror(0xe0).w(FUNC(source_state::cv_w));
@@ -605,7 +607,7 @@ void source_state::machine_reset()
 	update_octave_leds();
 }
 
-void source_state::source(machine_config& config)
+void source_state::source(machine_config &config)
 {
 	// /M1, /RFSH not Connected.
 	// /HALT, /NMI pulled up to 5V, with no other connection.
@@ -651,9 +653,9 @@ DECLARE_INPUT_CHANGED_MEMBER(source_state::encoder_moved)
 {
 	static constexpr const int WRAP_BUFFER = 10;
 	const bool overflowed = newval <= WRAP_BUFFER &&
-	                        oldval >= 240 - WRAP_BUFFER;
+							oldval >= 240 - WRAP_BUFFER;
 	const bool underflowed = newval >= 240 - WRAP_BUFFER &&
-	                         oldval <= WRAP_BUFFER;
+							 oldval <= WRAP_BUFFER;
 	m_encoder_incr = ((newval > oldval) || overflowed) && !underflowed;
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 	LOGMASKED(LOG_ENCODER, "Encoder changed: %d %d\n", newval, m_encoder_incr);
@@ -769,49 +771,49 @@ INPUT_PORTS_START(source)
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(source_state::encoder_moved), 1)
 
 	PORT_START("keyboard_oct_1")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("C1")
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("C#1")
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("D1")
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("D#1")
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("E1")
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("F1")
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("F#1")
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("G1")
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("G#1")
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("A1")
-	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("A#1")
-	PORT_BIT(0x800, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("B1")
+	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_C2
+	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_CS2
+	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_D2
+	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_DS2
+	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_E2
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_F2
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_FS2
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_G2
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_GS2
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_A2
+	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_AS2
+	PORT_BIT(0x800, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_B2
 
 	PORT_START("keyboard_oct_2")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("C2")
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("C#2")
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("D2")
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("D#2")
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("E2")
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("F2")
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("F#2")
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("G2")
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("G#2")
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("A2")
-	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("A#2")
-	PORT_BIT(0x800, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("B2")
+	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_C3
+	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_CS3
+	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_D3
+	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_DS3
+	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_E3
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_F3
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_FS3
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_G3
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_GS3
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_A3
+	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_AS3
+	PORT_BIT(0x800, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_B3
 
 	PORT_START("keyboard_oct_3")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("C3")
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("C#3")
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("D3")
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("D#3")
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("E3")
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("F3")
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("F#3")
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("G3")
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("G#3")
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("A3")
-	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("A#3")
-	PORT_BIT(0x800, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("B3")
+	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_C4
+	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_CS4
+	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_D4
+	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_DS4
+	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_E4
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_F4
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_FS4
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_G4
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_GS4
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_A4
+	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_AS4
+	PORT_BIT(0x800, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_B4
 
 	PORT_START("keyboard_oct_4")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("C4")
+	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_C5
 
 	PORT_START("trigger_in")  // External trigger input (see keyboard_r()).
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("S TRIG IN") PORT_CODE(KEYCODE_T)
@@ -833,7 +835,6 @@ ROM_START(moogsource)
 	ROMX_LOAD("3p3.u23", 0x000000, 0x001000, CRC(4211331f) SHA1(8767ef6b1cbb032a89a78bdb77bb7dbc1c187974), ROM_BIOS(0))
 ROM_END
 
-}  // Anonymous namespace.
+}  // anonymous namespace.
 
-SYST(1981, moogsource, 0, 0, source, source, source_state, empty_init, "Moog Music", "Moog Source", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND);
-
+SYST(1981, moogsource, 0, 0, source, source, source_state, empty_init, "Moog Music", "Moog Source", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND)

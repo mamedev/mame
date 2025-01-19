@@ -1276,4 +1276,228 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="oej1ggdni" supported="no">
+		<description>Oyako Eigo Step 1-gatsu gou - Doubutsuen ni Ikou! (Japan)</description>
+		<year>2003</year>
+		<publisher>LeapFrog / Benesse</publisher>
+		<info name="alt_title" value="おやこえいご すてっぷ 1がつごう - どうぶつえんにいこう!" />
+		<info name="serial" value="500-00854"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-7118"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-00854.bin" size="0x200000" crc="2be805d4" sha1="67eed8451c913af274246b4f825eb01913e2cea0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oej5gg" supported="no">
+		<description>Oyako Eigo Jump 5-gatsu gou - Okashi no Kuni no Daibouken (Japan)</description>
+		<year>2003</year>
+		<publisher>LeapFrog / Benesse</publisher>
+		<info name="alt_title" value="おやこえいご じゃんぷ 5がつごう - おかしのくにのだいぼうけん" />
+		<info name="serial" value="500-01007"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-7218"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-01007.bin" size="0x200000" crc="ff72de90" sha1="2bc9c03c8ee1bf0418d0e8644d1ab36c7161473e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oej9gg" supported="no">
+		<description>Oyako Eigo Jump 9-gatsu gou - Monjaa Gou de Tankenja! (Japan)</description>
+		<year>2003</year>
+		<publisher>LeapFrog / Benesse</publisher>
+		<info name="alt_title" value="おやこえいご じゃんぷ 9がつごう - モンジャーごうでたんけんじゃ!" />
+		<info name="serial" value="500-01009"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-3348"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-01009.bin" size="0x200000" crc="aa56d507" sha1="9a1386733a1a90e15b505d179e398f7d8d18de05" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oej1ggstr" supported="no">
+		<description>Oyako Eigo Jump 1-gatsu gou - Shougakkou Taiken Report (Japan)</description>
+		<year>2004</year>
+		<publisher>LeapFrog / Benesse</publisher>
+		<info name="alt_title" value="おやこえいご じゃんぷ 1がつごう - しょうがっこうたいけんレポート" />
+		<info name="serial" value="500-01011"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-7218"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-01011.bin" size="0x200000" crc="f76f85df" sha1="41470aa545fb501c43bd485335a51f376a0851d5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kland1" supported="no">
+		<description>Korasho Land 1: Gakkou e Ikou! (Japan)</description>
+		<year>2004</year>
+		<publisher>LeapFrog / Benesse</publisher>
+		<info name="alt_title" value="コラショランド 1 がっこうへいこう!" />
+		<info name="serial" value="500-10675"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="000-835040-101001V2"/>
+			<feature name="u1" value="MR27V1602E"/> <!-- ROM under epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-10675.bin" size="0x200000" crc="36794a4d" sha1="74785196ba1cbe4b30dc328fa2a284db542c32f8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kland4" supported="no">
+		<description>Korasho Land 4: Machi no Naka o Tanken! (Japan)</description>
+		<year>2005</year>
+		<publisher>LeapFrog / Benesse</publisher>
+		<info name="alt_title" value="コラショランド 4 まちのなかをたんけん!" />
+		<info name="serial" value="500-10709"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="000-835040-101041V1"/>
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-10709.bin" size="0x400000" crc="eb860f81" sha1="92b8b1e676ac49831fad4aca4eb07cd37dac432f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kland2" supported="no">
+		<description>Korasho Land 2: Tanoshii Ichinichi (Japan)</description>
+		<year>2004</year>
+		<publisher>LeapFrog / Benesse</publisher>
+		<info name="alt_title" value="コラショランド 2 たのしいいちにち" />
+		<info name="serial" value="500-10738"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="000-835040-101040V1"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-10738.bin" size="0x200000" crc="2fd0eec7" sha1="88ae457dfc03c8892ba7058ade04df853afc526e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kland3" supported="no">
+		<description>Korasho Land 3: Tanjoubi Omedetou (Japan)</description>
+		<year>2004</year>
+		<publisher>LeapFrog / Benesse</publisher>
+		<info name="alt_title" value="コラショランド 3 たんじょうびおめでとう" />
+		<info name="serial" value="500-11018"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="000-835040-101041V1"/>
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-11018.bin" size="0x400000" crc="f266c17a" sha1="0332ce17739965a2d7a1044e3f5808525bc61d9b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kland5" supported="no">
+		<description>Korasho Land 5: Bokutatchi no Ichinen (Japan)</description>
+		<year>2005</year>
+		<publisher>LeapFrog / Benesse</publisher>
+		<info name="alt_title" value="コラショランド 5 ぼくたちのいちねん" />
+		<info name="serial" value="500-11526"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="000-835040-101041V1"/>
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-11526.bin" size="0x400000" crc="f1ac218a" sha1="5a9086419774426f6313bc28fcd1b15401b7e1ee" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oesmar06wg" supported="no">
+		<description>Oyako Eigo Step - March 2006 Welcome gou (Japan)</description>
+		<year>2006</year>
+		<publisher>LeapFrog / Benesse</publisher>
+		<info name="alt_title" value="おやこえいご すてっぷ March 2006 ウェルカムごう" />
+		<info name="serial" value="500-12182"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000+003+7218"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-12182.bin" size="0x200000" crc="7466d23a" sha1="725840c6a96686a248b09b450a77c3d9f594988f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oesmay06jul06" supported="no">
+		<description>Oyako Eigo Step - May 2006, July 2006 (Japan)</description>
+		<year>2006</year>
+		<publisher>LeapFrog / Benesse</publisher>
+		<info name="alt_title" value="おやこえいご すてっぷ May 2006, July 2006" />
+		<info name="serial" value="500-12265"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000+003+7218"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-12265.bin" size="0x200000" crc="83ad0d32" sha1="d4f8413d019e900b58a44dc8bcb746f3db1cf2cd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oessep06nov06" supported="no">
+		<description>Oyako Eigo Step - September 2006, November 2006 (Japan)</description>
+		<year>2006</year>
+		<publisher>LeapFrog / Benesse</publisher>
+		<info name="alt_title" value="おやこえいご すてっぷ September 2006, November 2006" />
+		<info name="serial" value="500-12307"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000+003+2618"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-12307.bin" size="0x200000" crc="1ef8ea97" sha1="39557c5c3dfb68a82d12c3cfc5880653744ccf00" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oesjan07" supported="no">
+		<description>Oyako Eigo Step - January 2007 (Japan)</description>
+		<year>2007</year>
+		<publisher>LeapFrog / Benesse</publisher>
+		<info name="alt_title" value="おやこえいご すてっぷ January 2007" />
+		<info name="serial" value="500-12455"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000+003+7218"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-12455.bin" size="0x200000" crc="6edc3cb0" sha1="e9e467c5c0bdfe1795271687a1940144856226e9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ribbytsga" supported="no">
+		<description>Shimajirou to Ribby no ABC Adventure / Touch and Step Game de Asobou! (Japan)</description>
+		<year>2007</year>
+		<publisher>LeapFrog / Benesse</publisher>
+		<info name="alt_title" value="しまじろうとリビーのABCアドベンチャー / しまじろうとリビーのタッチアンドステップゲームであそぼう" />
+		<info name="serial" value="500-12708"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000+003+7238"/>
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-12708.bin" size="0x400000" crc="3f3a2ded" sha1="d89228325d3c20cf9dc67c2ca60bac78c3828557" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ribbytmd" supported="no">
+		<description>Shimajirou to Ribby no Eigo Jiten / Onahashi CoCoPad Time Machine de Daibouken! (Japan)</description>
+		<year>2007</year>
+		<publisher>LeapFrog / Benesse</publisher>
+		<info name="alt_title" value="しまじろうとリビーのえいごえじてん / しまじろうとリビーのおはなしココパッド タイムマシーンでだいぼうけん!" />
+		<info name="serial" value="500-12793"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000+003+7238"/>
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-12793.bin" size="0x400000" crc="c02ef8da" sha1="47184dfe4cd7059b8c1a01ad2d88618a30a60bf1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ribbyst" supported="no">
+		<description>Shimajirou to Ribby no CoCoPad Game Party / Shougakkou Tanken (Japan)</description>
+		<year>2007</year> <!-- title has 2008, but copyright on cartridge is still 2007 -->
+		<publisher>LeapFrog / Benesse</publisher>
+		<info name="alt_title" value="しまじろうとリビーのココパッドゲームパーティー / しまじろうとリビーのしょうがっこうたんけん" />
+		<info name="serial" value="500-12814"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000+003+7238"/>
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-12814.bin" size="0x400000" crc="2707fd55" sha1="e73e5d551c7a8e29e1aa49b968c4de142b72aa25" />
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>

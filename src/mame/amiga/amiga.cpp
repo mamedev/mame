@@ -13,7 +13,9 @@
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "amiga.h"
+#include "gayle.h"
 
 #include "bus/amiga/keyboard/keyboard.h"
 #include "bus/amiga/zorro/zorro.h"
@@ -23,13 +25,12 @@
 #include "cpu/m6502/m6502.h"
 #include "machine/6525tpi.h"
 #include "machine/mos6526.h"
-#include "machine/gayle.h"
 #include "machine/dmac.h"
 #include "machine/nvram.h"
 #include "machine/i2cmem.h"
-#include "machine/amigafdc.h"
 #include "machine/cr511b.h"
 #include "machine/rp5c01.h"
+
 #include "softlist.h"
 #include "speaker.h"
 
@@ -838,7 +839,8 @@ void a2000_state::machine_reset()
 	amiga_state::machine_reset();
 
 	// reset zorro devices
-	m_zorro->reset();
+	m_zorro->busrst_w(0);
+	m_zorro->busrst_w(1);
 }
 
 void a2000_state::zorro2_int2_w(int state)
@@ -1647,7 +1649,7 @@ void amiga_state::amiga_base(machine_config &config)
 	m_cia_1->irq_wr_callback().set(FUNC(amiga_state::cia_1_irq));
 	m_cia_1->pa_rd_callback().set(FUNC(amiga_state::cia_1_port_a_read));
 	m_cia_1->pa_wr_callback().set(FUNC(amiga_state::cia_1_port_a_write));
-	m_cia_1->pb_wr_callback().set(m_fdc, FUNC(amiga_fdc_device::ciaaprb_w));
+	m_cia_1->pb_wr_callback().set(m_fdc, FUNC(paula_fdc_device::ciaaprb_w));
 
 	// audio
 	SPEAKER(config, "lspeaker").front_left();
@@ -1661,20 +1663,20 @@ void amiga_state::amiga_base(machine_config &config)
 	m_paula->int_cb().set(FUNC(amiga_state::paula_int_w));
 
 	// floppy drives
-	AMIGA_FDC(config, m_fdc, amiga_state::CLK_7M_PAL);
+	PAULA_FDC(config, m_fdc, amiga_state::CLK_7M_PAL);
 	m_fdc->index_callback().set(m_cia_1, FUNC(mos8520_device::flag_w));
 	m_fdc->read_dma_callback().set(FUNC(amiga_state::chip_ram_r));
 	m_fdc->write_dma_callback().set(FUNC(amiga_state::chip_ram_w));
 	m_fdc->dskblk_callback().set(FUNC(amiga_state::fdc_dskblk_w));
 	m_fdc->dsksyn_callback().set(FUNC(amiga_state::fdc_dsksyn_w));
-	FLOPPY_CONNECTOR(config, "fdc:0", amiga_floppies, "35dd", amiga_fdc_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", amiga_floppies, nullptr, amiga_fdc_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:2", amiga_floppies, nullptr, amiga_fdc_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:3", amiga_floppies, nullptr, amiga_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", amiga_floppies, "35dd", paula_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", amiga_floppies, nullptr, paula_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:2", amiga_floppies, nullptr, paula_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:3", amiga_floppies, nullptr, paula_fdc_device::floppy_formats).enable_sound(true);
 
 	// TODO: shouldn't have a clock
 	// (finite state machine, controlled by Agnus beams)
-	AMIGA_COPPER(config, m_copper, amiga_state::CLK_7M_PAL);
+	AGNUS_COPPER(config, m_copper, amiga_state::CLK_7M_PAL);
 	m_copper->set_host_cpu_tag(m_maincpu);
 	m_copper->mem_read_cb().set(FUNC(amiga_state::chip_ram_r));
 	m_copper->set_ecs_mode(false);
@@ -1704,6 +1706,7 @@ void amiga_state::amiga_base(machine_config &config)
 	SOFTWARE_LIST(config, "flop_list").set_original("amiga_flop");
 	SOFTWARE_LIST(config, "ocs_list").set_original("amigaocs_flop");
 	SOFTWARE_LIST(config, "demos_list").set_original("amiga_demos");
+	SOFTWARE_LIST(config, "amigacd_list").set_original("amiga_cd");
 }
 
 void a1000_state::a1000(machine_config &config)
@@ -2239,7 +2242,7 @@ void cd32_state::cd32(machine_config &config)
 	m_cia_0->sp_wr_callback().set_nop();
 
 	SOFTWARE_LIST(config, "cd32_list").set_original("cd32");
-	SOFTWARE_LIST(config, "cd_list").set_original("cdtv");
+	SOFTWARE_LIST(config, "cd_list").set_compatible("cdtv");
 }
 
 void cd32_state::cd32n(machine_config &config)

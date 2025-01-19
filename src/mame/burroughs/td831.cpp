@@ -132,4 +132,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY      FULLNAME  FLAGS
-COMP( 1976, td831, 0,      0,      td831,   td831, td831_state, empty_init, "Burroughs", "TD 831", MACHINE_IS_SKELETON )
+COMP( 1976, td831, 0,      0,      td831,   td831, td831_state, empty_init, "Burroughs", "TD 831", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

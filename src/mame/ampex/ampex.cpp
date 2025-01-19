@@ -405,4 +405,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 1980, dialog80, 0, 0, ampex, ampex, ampex_state, empty_init, "Ampex", "Dialogue 80", MACHINE_IS_SKELETON )
+COMP( 1980, dialog80, 0, 0, ampex, ampex, ampex_state, empty_init, "Ampex", "Dialogue 80", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

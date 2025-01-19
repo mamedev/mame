@@ -38,7 +38,6 @@
 # USE_PCAP = 1
 # USE_QTDEBUG = 1
 # NO_X11 = 1
-# USE_WAYLAND = 1
 # NO_USE_XINPUT = 1
 # NO_USE_XINPUT_WII_LIGHTGUN_HACK = 1
 # FORCE_DRC_C_BACKEND = 1
@@ -391,16 +390,15 @@ endif
 
 ifeq ($(findstring arm,$(UNAME)),arm)
 ARCHITECTURE :=
-ifndef FORCE_DRC_C_BACKEND
-	FORCE_DRC_C_BACKEND := 1
+ifneq ($(PLATFORM),arm64)
+	ifndef FORCE_DRC_C_BACKEND
+		FORCE_DRC_C_BACKEND := 1
+	endif
 endif
 endif
 
 ifeq ($(findstring aarch64,$(UNAME)),aarch64)
 ARCHITECTURE :=
-ifndef FORCE_DRC_C_BACKEND
-	FORCE_DRC_C_BACKEND := 1
-endif
 endif
 
 ifeq ($(findstring s390x,$(UNAME)),s390x)
@@ -805,10 +803,6 @@ endif
 
 ifdef MESA_INSTALL_ROOT
 PARAMS += --MESA_INSTALL_ROOT='$(MESA_INSTALL_ROOT)'
-endif
-
-ifdef USE_WAYLAND
-PARAMS += --USE_WAYLAND='$(USE_WAYLAND)'
 endif
 
 ifdef NO_X11
@@ -1578,7 +1572,7 @@ endif
 
 ifeq (posix,$(SHELLTYPE))
 $(GENDIR)/version.cpp: makefile $(GENDIR)/git_desc | $(GEN_FOLDERS)
-	@echo '#define BARE_BUILD_VERSION "0.272"' > $@
+	@echo '#define BARE_BUILD_VERSION "0.273"' > $@
 	@echo '#define BARE_VCS_REVISION "$(NEW_GIT_VERSION)"' >> $@
 	@echo 'extern const char bare_build_version[];' >> $@
 	@echo 'extern const char bare_vcs_revision[];' >> $@
@@ -1588,7 +1582,7 @@ $(GENDIR)/version.cpp: makefile $(GENDIR)/git_desc | $(GEN_FOLDERS)
 	@echo 'const char build_version[] = BARE_BUILD_VERSION " (" BARE_VCS_REVISION ")";' >> $@
 else
 $(GENDIR)/version.cpp: makefile $(GENDIR)/git_desc | $(GEN_FOLDERS)
-	@echo #define BARE_BUILD_VERSION "0.272" > $@
+	@echo #define BARE_BUILD_VERSION "0.273" > $@
 	@echo #define BARE_VCS_REVISION "$(NEW_GIT_VERSION)" >> $@
 	@echo extern const char bare_build_version[]; >> $@
 	@echo extern const char bare_vcs_revision[]; >> $@

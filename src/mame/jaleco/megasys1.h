@@ -91,8 +91,8 @@ protected:
 
 	void system_base(machine_config &config) ATTR_COLD;
 	void system_B(machine_config &config) ATTR_COLD;
-	void system_C(machine_config &config) ATTR_COLD;	
-	
+	void system_C(machine_config &config) ATTR_COLD;
+
 	void megasys1_palette(palette_device &palette);
 
 	virtual void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);

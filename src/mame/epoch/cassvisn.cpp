@@ -65,7 +65,7 @@ static INPUT_PORTS_START( cassvisn )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON7 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON6 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON5 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) // Jump on monstrmn 
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) // Jump on monstrmn
 INPUT_PORTS_END
 
 DEVICE_IMAGE_LOAD_MEMBER(cassvisn_state::cart_load)
@@ -109,4 +109,4 @@ ROM_END
 
 } // anonymous namespace
 
-CONS( 1981, cassvisn, 0, 0, cassvisn,  cassvisn, cassvisn_state, empty_init, "Epoch", "Cassette Vision", MACHINE_IS_SKELETON )
+CONS( 1981, cassvisn, 0, 0, cassvisn,  cassvisn, cassvisn_state, empty_init, "Epoch", "Cassette Vision", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

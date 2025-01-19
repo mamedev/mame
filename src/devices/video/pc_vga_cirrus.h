@@ -97,9 +97,9 @@ protected:
 	virtual bool get_interlace_mode() override { return BIT(m_cr1a, 0); }
 
 	uint8_t offset_select(offs_t offset);
+	virtual void recompute_params() override;
 
 private:
-	void cirrus_define_video_mode();
 
 	void start_bitblt();
 	void start_reverse_bitblt();

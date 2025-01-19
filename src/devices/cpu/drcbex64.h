@@ -29,7 +29,7 @@ namespace drc {
 
 class drcbe_x64 : public drcbe_interface
 {
-	typedef uint32_t (*x86_entry_point_func)(uint8_t *rbpvalue, x86code *entry);
+	using x86_entry_point_func = uint32_t (*)(uint8_t *rbpvalue, x86code *entry);
 
 public:
 	// construction/destruction
@@ -50,7 +50,7 @@ private:
 	{
 	public:
 		// HACK: leftover from x86emit
-		static int const REG_MAX = 16;
+		static inline constexpr int REG_MAX = 16;
 
 		// parameter types
 		enum be_parameter_type
@@ -59,7 +59,6 @@ private:
 			PTYPE_IMMEDIATE,                    // immediate; value = sign-extended to 64 bits
 			PTYPE_INT_REGISTER,                 // integer register; value = 0-REG_MAX
 			PTYPE_FLOAT_REGISTER,               // floating point register; value = 0-REG_MAX
-			PTYPE_VECTOR_REGISTER,              // vector register; value = 0-REG_MAX
 			PTYPE_MEMORY,                       // memory; value = pointer to memory
 			PTYPE_MAX
 		};
@@ -69,15 +68,15 @@ private:
 
 		// construction
 		be_parameter() : m_type(PTYPE_NONE), m_value(0) { }
-		be_parameter(be_parameter const &param) : m_type(param.m_type), m_value(param.m_value) { }
 		be_parameter(uint64_t val) : m_type(PTYPE_IMMEDIATE), m_value(val) { }
 		be_parameter(drcbe_x64 &drcbe, const uml::parameter &param, uint32_t allowed);
+		be_parameter(const be_parameter &param) = default;
 
 		// creators for types that don't safely default
-		static inline be_parameter make_ireg(int regnum) { assert(regnum >= 0 && regnum < REG_MAX); return be_parameter(PTYPE_INT_REGISTER, regnum); }
-		static inline be_parameter make_freg(int regnum) { assert(regnum >= 0 && regnum < REG_MAX); return be_parameter(PTYPE_FLOAT_REGISTER, regnum); }
-		static inline be_parameter make_memory(void *base) { return be_parameter(PTYPE_MEMORY, reinterpret_cast<be_parameter_value>(base)); }
-		static inline be_parameter make_memory(const void *base) { return be_parameter(PTYPE_MEMORY, reinterpret_cast<be_parameter_value>(const_cast<void *>(base))); }
+		static be_parameter make_ireg(int regnum) { assert(regnum >= 0 && regnum < REG_MAX); return be_parameter(PTYPE_INT_REGISTER, regnum); }
+		static be_parameter make_freg(int regnum) { assert(regnum >= 0 && regnum < REG_MAX); return be_parameter(PTYPE_FLOAT_REGISTER, regnum); }
+		static be_parameter make_memory(void *base) { return be_parameter(PTYPE_MEMORY, reinterpret_cast<be_parameter_value>(base)); }
+		static be_parameter make_memory(const void *base) { return be_parameter(PTYPE_MEMORY, reinterpret_cast<be_parameter_value>(const_cast<void *>(base))); }
 
 		// operators
 		bool operator==(be_parameter const &rhs) const { return (m_type == rhs.m_type && m_value == rhs.m_value); }
@@ -135,6 +134,7 @@ private:
 	void op_mapvar(asmjit::x86::Assembler &a, const uml::instruction &inst);
 
 	void op_nop(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_break(asmjit::x86::Assembler &a, const uml::instruction &inst);
 	void op_debug(asmjit::x86::Assembler &a, const uml::instruction &inst);
 	void op_exit(asmjit::x86::Assembler &a, const uml::instruction &inst);
 	void op_hashjmp(asmjit::x86::Assembler &a, const uml::instruction &inst);
@@ -149,6 +149,7 @@ private:
 	void op_getfmod(asmjit::x86::Assembler &a, const uml::instruction &inst);
 	void op_getexp(asmjit::x86::Assembler &a, const uml::instruction &inst);
 	void op_getflgs(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_setflgs(asmjit::x86::Assembler &a, const uml::instruction &inst);
 	void op_save(asmjit::x86::Assembler &a, const uml::instruction &inst);
 	void op_restore(asmjit::x86::Assembler &a, const uml::instruction &inst);
 
@@ -171,7 +172,9 @@ private:
 	void op_subc(asmjit::x86::Assembler &a, const uml::instruction &inst);
 	void op_cmp(asmjit::x86::Assembler &a, const uml::instruction &inst);
 	void op_mulu(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_mululw(asmjit::x86::Assembler &a, const uml::instruction &inst);
 	void op_muls(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_mulslw(asmjit::x86::Assembler &a, const uml::instruction &inst);
 	void op_divu(asmjit::x86::Assembler &a, const uml::instruction &inst);
 	void op_divs(asmjit::x86::Assembler &a, const uml::instruction &inst);
 	void op_and(asmjit::x86::Assembler &a, const uml::instruction &inst);
@@ -208,7 +211,7 @@ private:
 	// alu and shift operation helpers
 	static bool ones(u64 const value, unsigned const size) noexcept { return (size == 4) ? u32(value) == 0xffffffffU : value == 0xffffffff'ffffffffULL; }
 	void alu_op_param(asmjit::x86::Assembler &a, asmjit::x86::Inst::Id const opcode, asmjit::Operand const &dst, be_parameter const &param, std::function<bool(asmjit::x86::Assembler &a, asmjit::Operand const &dst, be_parameter const &src)> optimize = [](asmjit::x86::Assembler &a, asmjit::Operand dst, be_parameter const &src) { return false; });
-	void shift_op_param(asmjit::x86::Assembler &a, asmjit::x86::Inst::Id const opcode, asmjit::Operand const &dst, be_parameter const &param);
+	void shift_op_param(asmjit::x86::Assembler &a, asmjit::x86::Inst::Id const opcode, size_t opsize, asmjit::Operand const &dst, be_parameter const &param, bool update_flags);
 
 	// parameter helpers
 	void mov_reg_param(asmjit::x86::Assembler &a, asmjit::x86::Gp const &reg, be_parameter const &param, bool const keepflags = false);
@@ -224,6 +227,10 @@ private:
 	void movss_p32_r128(asmjit::x86::Assembler &a, be_parameter const &param, asmjit::x86::Xmm const &reg);
 	void movsd_r128_p64(asmjit::x86::Assembler &a, asmjit::x86::Xmm const &reg, be_parameter const &param);
 	void movsd_p64_r128(asmjit::x86::Assembler &a, be_parameter const &param, asmjit::x86::Xmm const &reg);
+
+	void calculate_status_flags(asmjit::x86::Assembler &a, uint32_t instsize, asmjit::Operand const &dst, u8 flags);
+	void calculate_status_flags_mul(asmjit::x86::Assembler &a, uint32_t instsize, asmjit::x86::Gp const &lo, asmjit::x86::Gp const &hi);
+	void calculate_status_flags_mul_low(asmjit::x86::Assembler &a, uint32_t instsize, asmjit::x86::Gp const &lo);
 
 	size_t emit(asmjit::CodeHolder &ch);
 
@@ -244,10 +251,8 @@ private:
 	// state to live in the near cache
 	struct near_state
 	{
-		x86code *           debug_cpu_instruction_hook;// debugger callback
 		x86code *           debug_log_hashjmp;      // hashjmp debugging
 		x86code *           debug_log_hashjmp_fail; // hashjmp debugging
-		x86code *           drcmap_get_value;       // map lookup helper
 
 		uint32_t            ssemode;                // saved SSE mode
 		uint32_t            ssemodesave;            // temporary location for saving
@@ -256,7 +261,6 @@ private:
 		double              double1;                // 1.0 in double-precision
 
 		void *              stacksave;              // saved stack pointer
-		void *              hashstacksave;          // saved stack pointer for hashjmp
 
 		uint8_t             flagsmap[0x1000];       // flags map
 		uint64_t            flagsunmap[0x20];       // flags unmapper
@@ -264,28 +268,9 @@ private:
 	near_state &            m_near;
 
 	// resolved memory handler functions
-	struct resolved_handler { uintptr_t obj = 0; x86code *func = nullptr; };
-	struct resolved_accessors
-	{
-
-		resolved_handler    read_byte;
-		resolved_handler    read_word;
-		resolved_handler    read_word_masked;
-		resolved_handler    read_dword;
-		resolved_handler    read_dword_masked;
-		resolved_handler    read_qword;
-		resolved_handler    read_qword_masked;
-
-		resolved_handler    write_byte;
-		resolved_handler    write_word;
-		resolved_handler    write_word_masked;
-		resolved_handler    write_dword;
-		resolved_handler    write_dword_masked;
-		resolved_handler    write_qword;
-		resolved_handler    write_qword_masked;
-	};
-	using resolved_accessors_vector = std::vector<resolved_accessors>;
-	resolved_accessors_vector m_resolved_accessors;
+	resolved_member_function m_debug_cpu_instruction_hook;
+	resolved_member_function m_drcmap_get_value;
+	resolved_memory_accessors_vector m_resolved_accessors;
 
 	// globals
 	using opcode_generate_func = void (drcbe_x64::*)(asmjit::x86::Assembler &, const uml::instruction &);

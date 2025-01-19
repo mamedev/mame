@@ -142,18 +142,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/akiko.h,MACHINES["AKIKO"] = true
----------------------------------------------------
-
-if (MACHINES["AKIKO"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/akiko.cpp",
-		MAME_DIR .. "src/devices/machine/akiko.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/machine/am2901b.h,MACHINES["AM2901B"] = true
 ---------------------------------------------------
 
@@ -161,18 +149,6 @@ if (MACHINES["AM2901B"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/am2901b.cpp",
 		MAME_DIR .. "src/devices/machine/am2901b.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/amiga_copper.h,MACHINES["AMIGA_COPPER"] = true
----------------------------------------------------
-
-if (MACHINES["AMIGA_COPPER"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/amiga_copper.cpp",
-		MAME_DIR .. "src/devices/machine/amiga_copper.h",
 	}
 end
 
@@ -236,19 +212,6 @@ if (MACHINES["DMAC"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/dmac.cpp",
 		MAME_DIR .. "src/devices/machine/dmac.h",
-	}
-end
-
-
----------------------------------------------------
---
---@src/devices/machine/gayle.h,MACHINES["GAYLE"] = true
----------------------------------------------------
-
-if (MACHINES["GAYLE"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/gayle.cpp",
-		MAME_DIR .. "src/devices/machine/gayle.h",
 	}
 end
 
@@ -656,18 +619,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/8530scc.h,MACHINES["8530SCC"] = true
----------------------------------------------------
-
-if (MACHINES["8530SCC"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/8530scc.cpp",
-		MAME_DIR .. "src/devices/machine/8530scc.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/machine/adc0804.h,MACHINES["ADC0804"] = true
 ---------------------------------------------------
 
@@ -831,18 +782,6 @@ if (MACHINES["AM9519"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/am9519.cpp",
 		MAME_DIR .. "src/devices/machine/am9519.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/amigafdc.h,MACHINES["AMIGAFDC"] = true
----------------------------------------------------
-
-if (MACHINES["AMIGAFDC"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/amigafdc.cpp",
-		MAME_DIR .. "src/devices/machine/amigafdc.h",
 	}
 end
 
@@ -1206,13 +1145,13 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/ds1315.h,MACHINES["DS1315"] = true
+--@src/devices/machine/ds1215.h,MACHINES["DS1215"] = true
 ---------------------------------------------------
 
-if (MACHINES["DS1315"]~=null) then
+if (MACHINES["DS1215"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/machine/ds1315.cpp",
-		MAME_DIR .. "src/devices/machine/ds1315.h",
+		MAME_DIR .. "src/devices/machine/ds1215.cpp",
+		MAME_DIR .. "src/devices/machine/ds1215.h",
 	}
 end
 

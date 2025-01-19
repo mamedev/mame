@@ -128,6 +128,6 @@ ROM_END
 } // anonymous namespace
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS          INIT         COMPANY   FULLNAME   FLAGS
-SYST( 1998, psr79,   0,      0,      psr260,  psr260, psr260_state,  empty_init,  "Yamaha", "PSR-79",  MACHINE_SUPPORTS_SAVE | MACHINE_IS_SKELETON )
-SYST( 2000, psr260,  0,      0,      psr260,  psr260, psr260_state,  empty_init,  "Yamaha", "PSR-260", MACHINE_SUPPORTS_SAVE | MACHINE_IS_SKELETON )
-SYST( 2000, psr160,  psr260, 0,      psr260,  psr260, psr260_state,  empty_init,  "Yamaha", "PSR-160", MACHINE_SUPPORTS_SAVE | MACHINE_IS_SKELETON )
+SYST( 1998, psr79,   0,      0,      psr260,  psr260, psr260_state,  empty_init,  "Yamaha", "PSR-79",  MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+SYST( 2000, psr260,  0,      0,      psr260,  psr260, psr260_state,  empty_init,  "Yamaha", "PSR-260", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+SYST( 2000, psr160,  psr260, 0,      psr260,  psr260, psr260_state,  empty_init,  "Yamaha", "PSR-160", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

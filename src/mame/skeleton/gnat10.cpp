@@ -239,4 +239,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1980, gnat10, 0, 0, gnat10, gnat10, gnat10_state, empty_init, "GNAT Computers", "GNAT System 10", MACHINE_IS_SKELETON)
+COMP(1980, gnat10, 0, 0, gnat10, gnat10, gnat10_state, empty_init, "GNAT Computers", "GNAT System 10", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

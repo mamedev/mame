@@ -234,6 +234,9 @@ ROM_START( dmndhrt )
 	ROM_LOAD16_BYTE( "diamond_heart_u.s.a_u8.u8", 0x00000, 0x20000, CRC(d1f340ce) SHA1(7567448c8694bb24f7957bb461d3be51d138634a) )
 	ROM_LOAD16_BYTE( "diamond_heart_u.s.a_u3.u3", 0x00001, 0x20000, CRC(78885bb8) SHA1(51e360036d32b609b4036be086549c011ab41fe3) )
 
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "at90s4414.u51", 0x0000, 0x1000, NO_DUMP )
+
 	ROM_REGION( 0x100000, "tiles", 0 )
 	ROM_LOAD( "diamond_heart_u.s.a_u10.u10", 0x00000, 0x80000, CRC(00b691a7) SHA1(8cc530ad204cf9168d59419a01abf338c46a49e1) )
 	ROM_LOAD( "diamond_heart_u.s.a_u11.u11", 0x80000, 0x80000, CRC(2c666c44) SHA1(15c8e97900444046adb9455bfa827735c226a727) )
@@ -253,6 +256,9 @@ ROM_START( dmndhrtn ) // u51 was scratched for this set but believed to be AT90S
 	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "w27e010.u8", 0x00000, 0x20000, CRC(2a1ba91e) SHA1(af340d9e0aa7874669557067a9e043eecdf5301b) ) // no sticker
 	ROM_LOAD16_BYTE( "w27e010.u3", 0x00001, 0x20000, CRC(cdb26ff2) SHA1(33ddda977a5f6436a690fa53763f36c7e6acfb94) ) // no sticker
+
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "at90s4414.u51", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x100000, "tiles", 0 )
 	ROM_LOAD( "diamond_heart_new_mon_v20.0_u10.u10", 0x00000, 0x80000, CRC(7525bd95) SHA1(b34ab59bde9ecdfe03489a6eceda2c95afdee6c8) )
@@ -274,6 +280,9 @@ ROM_START( honeybee ) // u51 was scratched for this set but believed to be AT90S
 	ROM_LOAD16_BYTE( "honey_bee_hb_tw_u8.u8", 0x00000, 0x40000, CRC(1e7e53a3) SHA1(30d426cca499adf82338ba6cc1391f754e908a5b) )
 	ROM_LOAD16_BYTE( "honey_bee_hb_tw_u3.u3", 0x00001, 0x40000, CRC(0ed5f0cc) SHA1(f64c27f04f74162027070f889daaec6f1847f19e) )
 
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "at90s4414.u51", 0x0000, 0x1000, NO_DUMP )
+
 	ROM_REGION( 0x100000, "tiles", 0 )
 	ROM_LOAD( "honey_bee_hb_tw_u10.u10", 0x00000, 0x80000, CRC(40526fe1) SHA1(58a3a16c4dc0fa6527571b924f43377657f0cc76) )
 	ROM_LOAD( "honey_bee_hb_tw_u11.u11", 0x80000, 0x80000, CRC(3036a082) SHA1(16393fac3ccd5c2fc6ab9fd11f8530aace94e4fc) )
@@ -293,6 +302,6 @@ ROM_END
 
 
 // TODO: possibly licensed to LSE, verify once it works
-GAME( 2001, dmndhrt,  0, cle68k, dmndhrt, cle68k_state, empty_init, ROT0, "LSE", "Diamond Heart (v1.06)",     MACHINE_IS_SKELETON ) // 2001/02/15
-GAME( 2003, dmndhrtn, 0, cle68k, dmndhrt, cle68k_state, empty_init, ROT0, "CLE", "Diamond Heart New (v20.0)", MACHINE_IS_SKELETON ) // 2003/04/25
-GAME( 2004, honeybee, 0, cle68k, dmndhrt, cle68k_state, empty_init, ROT0, "LSE", "Honey-Bee (v3.0)",          MACHINE_IS_SKELETON ) // 2004/07/01
+GAME( 2001, dmndhrt,  0, cle68k, dmndhrt, cle68k_state, empty_init, ROT0, "LSE", "Diamond Heart (v1.06)",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // 2001/02/15
+GAME( 2003, dmndhrtn, 0, cle68k, dmndhrt, cle68k_state, empty_init, ROT0, "CLE", "Diamond Heart New (v20.0)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // 2003/04/25
+GAME( 2004, honeybee, 0, cle68k, dmndhrt, cle68k_state, empty_init, ROT0, "LSE", "Honey-Bee (v3.0)",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // 2004/07/01

@@ -325,4 +325,4 @@ ROM_END
 
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY     FULLNAME                       FLAGS
-COMP( 1986, t4490, 0,      0,      t4490,   t4490, t4490_state, empty_init, "Terco AB", "Terco 4490 Mill CNC Control", MACHINE_IS_SKELETON )
+COMP( 1986, t4490, 0,      0,      t4490,   t4490, t4490_state, empty_init, "Terco AB", "Terco 4490 Mill CNC Control", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -424,7 +424,7 @@ void sprinter_state::draw_tile(u8* mode, bitmap_ind16 &bitmap, const rectangle &
 	{
 		for (auto dx = cliprect.left(); dx <= cliprect.right(); dx++)
 		{
-			const u8 color = m_vram[(y + (((dy - m_hold.second) & 7) >> lowres)) * 1024 + x + (((dx - m_hold.first) & 15) >> (1 + lowres))];
+			const u8 color = m_vram[(y + (((dy - m_hold.second) & 7) >> (lowres ? 1 : 0))) * 1024 + x + (((dx - m_hold.first) & 15) >> (1 + lowres))];
 			*pix++ = pal + (BIT(mode[0], 5) ? color : (((dx - m_hold.first) & 1) ? (color & 0x0f) : (color >> 4)));
 		}
 		pix += SPRINT_WIDTH - cliprect.width();
@@ -716,9 +716,13 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 
 	case 0x1b:
 		if (data & 0x80)
-			; // RESET
+		{
+			// RESET
+		}
 		if (data & 0x40)
-			; // AEN
+		{
+			// AEN
+		}
 		m_isa_addr_ext = data & 0x3f;
 		break;
 

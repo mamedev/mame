@@ -231,5 +231,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1998, d9flower, 0, es9501, specd9, es9501_state, empty_init, ROT0, "Cadence Technology", "Dream 9 Flower (v1.00c)",   MACHINE_IS_SKELETON )
-GAME( 1997, specd9,   0, es9501, specd9, es9501_state, empty_init, ROT0, "Excellent System",   "Special Dream 9 (v1.0.5G)", MACHINE_IS_SKELETON )
+GAME( 1998, d9flower, 0, es9501, specd9, es9501_state, empty_init, ROT0, "Cadence Technology", "Dream 9 Flower (v1.00c)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1997, specd9,   0, es9501, specd9, es9501_state, empty_init, ROT0, "Excellent System",   "Special Dream 9 (v1.0.5G)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -280,5 +280,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME(1999, freeway,        0, freeway, freeway, freeway_state, empty_init, ROT0, "NVC Electronica", "FreeWay (V5.12)", MACHINE_IS_SKELETON)
-GAME(1997, freewaya, freeway, freeway, freeway, freeway_state, empty_init, ROT0, "NVC Electronica", "FreeWay (V4.31)", MACHINE_IS_SKELETON)
+GAME(1999, freeway,        0, freeway, freeway, freeway_state, empty_init, ROT0, "NVC Electronica", "FreeWay (V5.12)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME(1997, freewaya, freeway, freeway, freeway, freeway_state, empty_init, ROT0, "NVC Electronica", "FreeWay (V4.31)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

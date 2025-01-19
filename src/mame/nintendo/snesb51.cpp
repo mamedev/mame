@@ -411,8 +411,8 @@ void snesb51_state::init_fatfurspb()
 
 
 //    YEAR  NAME       PARENT  MACHINE   INPUT    CLASS          INIT             ROT   COMPANY    FULLNAME                                     FLAGS
-GAME( 199?, mk3snes,   0,      mk3snes,  mk3snes, snesb51_state, init_snes_hirom, ROT0, "bootleg", "Mortal Kombat 3 (SNES bootleg with timer)",    MACHINE_IS_SKELETON )
-GAME( 199?, kinstsnes, 0,      mk3snes,  mk3snes, snesb51_state, init_snes_hirom, ROT0, "bootleg", "Killer Instinct (SNES bootleg with timer)",    MACHINE_IS_SKELETON )
-GAME( 1993, snes4sl,   0,      snes4sl,  snes4sl, snesb51_state, init_snes,       ROT0, "bootleg", "SNES 4 Slot arcade switcher",                  MACHINE_IS_SKELETON )
-GAME( 1994, snes4sln,  0,      snes4sln, snes4sl, snesb51_state, init_snes,       ROT0, "bootleg", "SNES 4 Slot arcade switcher (NBA Jam)",        MACHINE_IS_SKELETON )
-GAME( 199?, fatfurspb, 0,      mk3snes,  mk3snes, snesb51_state, init_fatfurspb,  ROT0, "bootleg", "Fatal Fury Special (SNES bootleg with timer)", MACHINE_IS_SKELETON )
+GAME( 199?, mk3snes,   0,      mk3snes,  mk3snes, snesb51_state, init_snes_hirom, ROT0, "bootleg", "Mortal Kombat 3 (SNES bootleg with timer)",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 199?, kinstsnes, 0,      mk3snes,  mk3snes, snesb51_state, init_snes_hirom, ROT0, "bootleg", "Killer Instinct (SNES bootleg with timer)",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1993, snes4sl,   0,      snes4sl,  snes4sl, snesb51_state, init_snes,       ROT0, "bootleg", "SNES 4 Slot arcade switcher",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1994, snes4sln,  0,      snes4sln, snes4sl, snesb51_state, init_snes,       ROT0, "bootleg", "SNES 4 Slot arcade switcher (NBA Jam)",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 199?, fatfurspb, 0,      mk3snes,  mk3snes, snesb51_state, init_fatfurspb,  ROT0, "bootleg", "Fatal Fury Special (SNES bootleg with timer)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

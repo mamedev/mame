@@ -3394,8 +3394,8 @@ ROM_START( drhl )
 	ROM_REGION( 0x1000,  "gfx", 0 )
 	ROM_LOAD( "drhl_v1.0.u31",  0x0000, 0x1000, CRC(bbc7c970) SHA1(9268a430764a5ea8ba7cd18944ec254a44d9dff2) )
 
-	ROM_REGION( 0x0200,  "plds", 0 )    // possible bad dump. fusemap's 1st half is all 1's and 2nd half 0's */
-	ROM_LOAD( "drhl_ampal16l8pc.u51",  0x0000, 0x0104, CRC(bd76fb53) SHA1(2d0634e8edb3289a103719466465e9777606086e) )
+	ROM_REGION( 0x0200,  "plds", 0 )
+	ROM_LOAD( "147-pal_ampal16l8pc.u51", 0x0000, 0x0104, CRC(4c98193f) SHA1(b6bdb6eef0d962a3aa4df0e23a8937a7e3210062) )
 ROM_END
 
 ROM_START( drhla )

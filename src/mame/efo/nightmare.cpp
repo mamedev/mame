@@ -198,7 +198,6 @@
 
   TODO:
 
-  - Soft reset doesn't work.
   - Verify video mixing (Press F2 to enter service mode, then press 1 + 2 to continue
     to settings screen. There's diagnostic color pattern at the top of screen)
   - Quitting MAME while in service mode settings screen will invalidate settings
@@ -227,8 +226,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "cdp1802")
 		, m_sound3(*this, "sound3")
-		, m_vdc(*this, "vdc")
-		, m_vdc2(*this, "vdc2")
+		, m_vdc(*this, "vdc%u", 1)
 		, m_eeprom(*this,"eeprom")
 	{ }
 
@@ -238,6 +236,7 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
+private:
 	TIMER_CALLBACK_MEMBER(clear_reset);
 
 	int clear_r();
@@ -253,8 +252,7 @@ protected:
 
 	required_device<cosmac_device> m_maincpu;
 	required_device<efo_sound3_device> m_sound3;
-	required_device<tms9928a_device> m_vdc;
-	required_device<tms9928a_device> m_vdc2;
+	required_device_array<tms9928a_device, 2> m_vdc;
 	required_device<sda2006_device> m_eeprom;
 
 	// cpu state
@@ -296,31 +294,28 @@ void nightmare_state::q_w(int state)
 
 int nightmare_state::ef1_r()
 {
-	//EEPROM Inv ???
-
+	// EEPROM Inv ???
 	return 0;
 }
 
 
 int nightmare_state::ef2_r()
 {
-	//EEPROM Dq data read;
+	// EEPROM Dq data read;
 	return m_eeprom->read_data();
 }
 
 
 void nightmare_state::ic10_w(uint8_t data)
 {
-  /*
-    7 - EEPROM Di
-    6 - EEPROM Clock
-    5 - J2
-    4 - J2
-    3 - J2
-    2 - J2
-    1 - J2
-    0 - ?
-  */
+	// 7 - EEPROM Di
+	// 6 - EEPROM Clock
+	// 5 - J2
+	// 4 - J2
+	// 3 - J2
+	// 2 - J2
+	// 1 - J2
+	// 0 - ?
 
 	m_eeprom->write_data(BIT(data, 7));
 	m_eeprom->write_enable(BIT(data, 6));
@@ -349,8 +344,8 @@ void nightmare_state::io_map(address_map &map)
 	map(1, 1).r("ic8", FUNC(cdp1852_device::read)).w(FUNC(nightmare_state::sound_w));
 	map(2, 2).r("ic9", FUNC(cdp1852_device::read)).w("ic10", FUNC(cdp1852_device::write));
 
-	map(4, 5).rw(m_vdc, FUNC(tms9928a_device::read), FUNC(tms9928a_device::write));
-	map(6, 7).rw(m_vdc2, FUNC(tms9928a_device::read), FUNC(tms9928a_device::write));
+	map(4, 5).rw(m_vdc[0], FUNC(tms9928a_device::read), FUNC(tms9928a_device::write));
+	map(6, 7).rw(m_vdc[1], FUNC(tms9928a_device::read), FUNC(tms9928a_device::write));
 }
 
 uint32_t nightmare_state::screen_update_nightmare(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -358,8 +353,8 @@ uint32_t nightmare_state::screen_update_nightmare(screen_device &screen, bitmap_
 	// combine two buffers (additive?)
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		uint32_t const *const bitmap1 = &m_vdc2->get_bitmap().pix(y);
-		uint32_t const *const bitmap2 = &m_vdc->get_bitmap().pix(y);
+		uint32_t const *const bitmap1 = &m_vdc[1]->get_bitmap().pix(y);
+		uint32_t const *const bitmap2 = &m_vdc[0]->get_bitmap().pix(y);
 		uint32_t *const dst = &bitmap.pix(y);
 
 		for (int x = cliprect.left(); x <= cliprect.right(); x++)
@@ -368,12 +363,12 @@ uint32_t nightmare_state::screen_update_nightmare(screen_device &screen, bitmap_
 			uint32_t p2 = bitmap2[x];
 			uint32_t result = 0;
 
-			for (int shift=0; shift<32;shift+=8)
+			for (int shift = 0; shift < 32; shift += 8)
 			{
-				uint32_t const data = ((p2>>shift)&0xff)+((p1>>shift)&0xff);
-				result|=((data>0xff)?0xff:data)<<shift;
+				uint32_t const data = ((p2 >> shift) & 0xff) + ((p1 >> shift) & 0xff);
+				result |= ((data > 0xff) ? 0xff : data) << shift;
 			}
-			dst[x]=result;
+			dst[x] = result;
 		}
 	}
 
@@ -397,13 +392,13 @@ static INPUT_PORTS_START( nightmare )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) // button2: jump
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) // button1: ink
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 
 	PORT_START("EF")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_WRITE_LINE_DEVICE_MEMBER("cdp1802", FUNC(cosmac_device::ef3_w)) //ic17 - cpu
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_WRITE_LINE_DEVICE_MEMBER("cdp1802", FUNC(cosmac_device::ef3_w)) // ic17 - cpu
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_TILT ) PORT_WRITE_LINE_DEVICE_MEMBER("cdp1802", FUNC(cosmac_device::ef4_w))
 INPUT_PORTS_END
 
@@ -437,14 +432,14 @@ void nightmare_state::nightmare(machine_config &config)
 	SDA2006(config, m_eeprom);
 
 	// video hardware
-	EFO90501( config, m_vdc, MASTER_CLOCK );
-	m_vdc->set_screen("screen");
-	m_vdc->set_vram_size(0x4000);
+	EFO90501(config, m_vdc[0], MASTER_CLOCK);
+	m_vdc[0]->set_screen("screen");
+	m_vdc[0]->set_vram_size(0x4000);
 
-	EFO90501( config, m_vdc2, MASTER_CLOCK );
-	m_vdc2->set_screen("screen");
-	m_vdc2->set_vram_size(0x4000);
-	m_vdc2->int_callback().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT);
+	EFO90501(config, m_vdc[1], MASTER_CLOCK);
+	m_vdc[1]->set_screen("screen");
+	m_vdc[1]->set_vram_size(0x4000);
+	m_vdc[1]->int_callback().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_screen_update(FUNC(nightmare_state::screen_update_nightmare));

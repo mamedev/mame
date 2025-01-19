@@ -206,6 +206,6 @@ void ddz_state::init_ddz()
 } // anonymous namespace
 
 
-GAME( 200?, ddz,      0, ddz, ddz, ddz_state, init_ddz,   ROT0, "IGS?", "Dou Di Zhu",     MACHINE_IS_SKELETON )
-GAME( 200?, crzclass, 0, ddz, ddz, ddz_state, init_ddz,   ROT0, "TJF",  "Zhaoji Fengdou", MACHINE_IS_SKELETON ) // 'Crazy Class'
-GAME( 2005, btlfront, 0, ddz, ddz, ddz_state, empty_init, ROT0, "TJF",  "BattleFront",    MACHINE_IS_SKELETON ) // encrypted, V133F?
+GAME( 200?, ddz,      0, ddz, ddz, ddz_state, init_ddz,   ROT0, "IGS?", "Dou Di Zhu",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, crzclass, 0, ddz, ddz, ddz_state, init_ddz,   ROT0, "TJF",  "Zhaoji Fengdou", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // 'Crazy Class'
+GAME( 2005, btlfront, 0, ddz, ddz, ddz_state, empty_init, ROT0, "TJF",  "BattleFront",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // encrypted, V133F?

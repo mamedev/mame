@@ -13,7 +13,7 @@ TODO:
 - if/when MAME supports an exit callback, hook up power-off switch/button to that
 
 Hardware notes:
-- HD614042S, 4MHz XTAL
+- Hitachi HD614042S, 4MHz XTAL
 - optional LCD panel(s), see below
 - chessboard buttons, 16+4 LEDs, piezo
 

@@ -369,7 +369,7 @@ void ceres1_state::ceres1(machine_config &config)
 	m_serial->dsr_handler().set(m_uart, FUNC(scn2681_device::ip2_w));
 
 	// TODO: RS-485 ports "na" and "nb"
-	SCC8530N(config, m_scc, 6_MHz_XTAL);
+	SCC8530(config, m_scc, 6_MHz_XTAL);
 	m_scc->configure_channels(m_uart->clock(), 0, m_uart->clock(), 0);
 	m_scc->out_int_callback().set(m_icu, FUNC(am9519_device::ireq1_w)).invert();
 

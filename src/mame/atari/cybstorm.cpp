@@ -142,7 +142,6 @@ const atari_motion_objects_config cybstorm_state::s_mob_config =
 	0,                  // maximum number of links to visit/scanline (0=all)
 
 	0x1000,             // base palette entry
-	0x1000,             // maximum number of colors
 	0,                  // transparent pen index
 
 	{{ 0x03ff,0,0,0 }}, // mask for the link
@@ -150,7 +149,7 @@ const atari_motion_objects_config cybstorm_state::s_mob_config =
 	{{ 0,0,0x000f,0 }}, // mask for the color
 	{{ 0,0,0xff80,0 }}, // mask for the X position
 	{{ 0,0,0,0xff80 }}, // mask for the Y position
-	{{ 0,0,0,0x0070 }}, // mask for the width, in tiles*/
+	{{ 0,0,0,0x0070 }}, // mask for the width, in tiles
 	{{ 0,0,0,0x0007 }}, // mask for the height, in tiles
 	{{ 0,0x8000,0,0 }}, // mask for the horizontal flip
 	{{ 0 }},            // mask for the vertical flip
@@ -306,11 +305,11 @@ void cybstorm_state::machine_start()
 
 void cybstorm_state::latch_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	uint32_t oldword = m_latch_data;
+	uint32_t const oldword = m_latch_data;
 	COMBINE_DATA(&m_latch_data);
 
 	// bit 4 is connected to the /RESET pin on the 6502
-	m_jsa->soundcpu().set_input_line(INPUT_LINE_RESET, m_latch_data & 0x00100000 ? CLEAR_LINE : ASSERT_LINE);
+	m_jsa->soundcpu().set_input_line(INPUT_LINE_RESET, BIT(m_latch_data, 20) ? CLEAR_LINE : ASSERT_LINE);
 
 	// alpha bank is selected by the upper 4 bits
 	if ((oldword ^ m_latch_data) & 0x00e00000)
@@ -461,9 +460,9 @@ static const gfx_layout pflayout =
 
 
 static GFXDECODE_START( gfx_cybstorm )
-	GFXDECODE_ENTRY( "spr_pf1",  0, pflayout,             0, 16 )       // sprites & playfield
-	GFXDECODE_ENTRY( "spr_pf2",  0, gfx_8x8x6_planar,  4096, 64 )       // sprites & playfield
-	GFXDECODE_ENTRY( "chars",    0, anlayout,         16384, 64 )       // characters 8x8
+	GFXDECODE_ENTRY( "tiles",   0, pflayout,             0, 16 )       // playfield
+	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x6_planar,  4096, 64 )       // sprites
+	GFXDECODE_ENTRY( "chars",   0, anlayout,         16384, 64 )       // characters 8x8
 GFXDECODE_END
 
 
@@ -489,7 +488,7 @@ void cybstorm_state::round2(machine_config &config)
 	m_vad->scanline_int_cb().set_inputline(m_maincpu, M68K_IRQ_4);
 	TILEMAP(config, "vad:playfield", m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64).set_info_callback(FUNC(cybstorm_state::get_playfield_tile_info));
 	TILEMAP(config, "vad:playfield2", m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64, 0).set_info_callback(FUNC(cybstorm_state::get_playfield2_tile_info));
-	TILEMAP(config, "vad:alpha", m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_ROWS, 64, 32, 0).set_info_callback(FUNC(cybstorm_state::get_alpha_tile_info));
+	TILEMAP(config, "vad:alpha", m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_ROWS, 64, 30, 0).set_info_callback(FUNC(cybstorm_state::get_alpha_tile_info));
 	ATARI_MOTION_OBJECTS(config, "vad:mob", 0, m_screen, cybstorm_state::s_mob_config).set_gfxdecode(m_gfxdecode);
 
 	ADDRESS_MAP_BANK(config, "vadbank").set_map(&cybstorm_state::vadbank_map).set_options(ENDIANNESS_BIG, 16, 32, 0x90000);
@@ -544,7 +543,7 @@ ROM_START( cybstorm )
 	ROM_REGION( 0x20000, "chars", 0 )
 	ROM_LOAD( "st_11.22.csalph.6c", 0x000000, 0x020000, CRC(bafa4bbe) SHA1(c033a952fab6eb3a06c44ba7f48e58b20fe144f0) )
 
-	ROM_REGION( 0x400000, "spr_pf1", ROMREGION_INVERT )
+	ROM_REGION( 0x400000, "tiles", ROMREGION_INVERT )
 	ROM_LOAD( "st_11.22.pf0", 0x000000, 0x080000, CRC(0cf5874c) SHA1(1d739a3fc42baa5556aa22e051c873db9357396f) )
 	ROM_LOAD( "st_11.22.pf1", 0x080000, 0x080000, CRC(ee0a6a81) SHA1(7c36ccbcd51497ea8a872ddf7dabe2ceb0895408) )
 	ROM_LOAD( "st_11.22.pf2", 0x100000, 0x080000, CRC(03791514) SHA1(0688b55015f8d86ee92497cb7fcdfbdbfbc492a2) )
@@ -554,7 +553,7 @@ ROM_START( cybstorm )
 	ROM_LOAD( "st_11.22.pf6", 0x300000, 0x080000, CRC(58b3c0d9) SHA1(226ff2e948c5bb0ca150700a2f3426492fce79f7) )
 	ROM_LOAD( "st_11.22.pf7", 0x380000, 0x080000, CRC(f84b27ca) SHA1(a7812e18e15fad9992a59b0ebd177cb848a743bb) )
 
-	ROM_REGION( 0xc00000, "spr_pf2", ROMREGION_INVERT )
+	ROM_REGION( 0xc00000, "sprites", ROMREGION_INVERT )
 	ROM_LOAD( "st_11.22.mo00", 0x000000, 0x080000, CRC(216ffdb9) SHA1(7e6418da1419d82e67bef9ae314781708ed62a76) )
 	ROM_LOAD( "st_11.22.mo01", 0x200000, 0x080000, CRC(af15908b) SHA1(9dc8dbf0288a084891bdd646cfb7b8c97b89cf2e) )
 	ROM_LOAD( "st_11.22.mo02", 0x400000, 0x080000, CRC(fc066982) SHA1(bbf258ff23619234cb31b4afab4eac1681cdeae0) )

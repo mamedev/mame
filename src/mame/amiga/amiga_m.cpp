@@ -136,16 +136,6 @@ const char *const amiga_state::s_custom_reg_names[0x100] =
 	"UNK1F8",       "UNK1FA",       "FMODE",        "UNK1FE"
 };
 
-constexpr XTAL amiga_state::CLK_28M_PAL;
-constexpr XTAL amiga_state::CLK_7M_PAL;
-constexpr XTAL amiga_state::CLK_C1_PAL;
-constexpr XTAL amiga_state::CLK_E_PAL;
-
-constexpr XTAL amiga_state::CLK_28M_NTSC;
-constexpr XTAL amiga_state::CLK_7M_NTSC;
-constexpr XTAL amiga_state::CLK_C1_NTSC;
-constexpr XTAL amiga_state::CLK_E_NTSC;
-
 /*************************************
  *
  *  Machine reset
@@ -175,8 +165,11 @@ void amiga_state::machine_start()
 
 void amiga_state::m68k_reset(int state)
 {
-	logerror("%s: Executed RESET\n", machine().describe_context());
-	machine_reset();
+	if (state)
+	{
+		logerror("%s: Executed RESET\n", machine().describe_context());
+		machine_reset();
+	}
 }
 
 void amiga_state::machine_reset()
@@ -919,7 +912,8 @@ void amiga_state::blitter_setup()
 	/* is there another blitting in progress? */
 	if (CUSTOM_REG(REG_DMACON) & 0x4000)
 	{
-		logerror("%s - This program is playing tricks with the blitter\n", machine().describe_context() );
+		popmessage("In-flight blitter_setup() call, ignored");
+		//logerror("%s - This program is playing tricks with the blitter\n", machine().describe_context() );
 		return;
 	}
 
@@ -1125,26 +1119,26 @@ void amiga_state::ocs_map(address_map &map)
 //  map(0x00a, 0x00b).r(FUNC(amiga_state::joydat_r<0>));
 //  map(0x00c, 0x00d).r(FUNC(amiga_state::joydat_r<1>));
 //  map(0x00e, 0x00f).r(FUNC(amiga_state::clxdat_r));
-	map(0x010, 0x011).r(m_fdc, FUNC(amiga_fdc_device::adkcon_r));
+	map(0x010, 0x011).r(m_fdc, FUNC(paula_fdc_device::adkcon_r));
 //  map(0x012, 0x013).r(FUNC(amiga_state::potdat_r<0>)); // POT0DAT
 //  map(0x014, 0x015).r(FUNC(amiga_state::potdat_r<1>));
 //  map(0x016, 0x017).r(FUNC(amiga_state::potgor_r)); // a.k.a. POTINP
 //  map(0x018, 0x019).r(FUNC(amiga_state::serdat_r));
-	map(0x01a, 0x01b).r(m_fdc, FUNC(amiga_fdc_device::dskbytr_r));
-//  map(0x01c, 0x01d).r(m_paula, FUNC(paula_8364_device::intenar_r));
-//  map(0x01e, 0x01f).r(m_paula, FUNC(paula_8364_device::intreqr_r));
+	map(0x01a, 0x01b).r(m_fdc, FUNC(paula_fdc_device::dskbytr_r));
+//  map(0x01c, 0x01d).r(m_paula, FUNC(paula_device::intenar_r));
+//  map(0x01e, 0x01f).r(m_paula, FUNC(paula_device::intreqr_r));
 
 	// FDC writes
 	// FIXME: these two belongs to Agnus, also shouldn't be readable
-	map(0x020, 0x021).rw(m_fdc, FUNC(amiga_fdc_device::dskpth_r), FUNC(amiga_fdc_device::dskpth_w));
-	map(0x022, 0x023).rw(m_fdc, FUNC(amiga_fdc_device::dskptl_r), FUNC(amiga_fdc_device::dskptl_w));
-	map(0x024, 0x025).w(m_fdc, FUNC(amiga_fdc_device::dsklen_w));
-//  map(0x026, 0x027).w(m_fdc, FUNC(amiga_fdc_device::dskdat_w));
+	map(0x020, 0x021).rw(m_fdc, FUNC(paula_fdc_device::dskpth_r), FUNC(paula_fdc_device::dskpth_w));
+	map(0x022, 0x023).rw(m_fdc, FUNC(paula_fdc_device::dskptl_r), FUNC(paula_fdc_device::dskptl_w));
+	map(0x024, 0x025).w(m_fdc, FUNC(paula_fdc_device::dsklen_w));
+//  map(0x026, 0x027).w(m_fdc, FUNC(paula_fdc_device::dskdat_w));
 
 //  map(0x028, 0x029).w(FUNC(amiga_state::refptr_w));
 	map(0x02a, 0x02b).w(FUNC(amiga_state::vposw_w));
 //  map(0x02c, 0x02d).w(FUNC(amiga_state::vhposw_w));
-	map(0x02e, 0x02f).w(m_copper, FUNC(amiga_copper_device::copcon_w));
+	map(0x02e, 0x02f).w(m_copper, FUNC(agnus_copper_device::copcon_w));
 
 	// input strobes
 //  map(0x030, 0x031).w(FUNC(amiga_state::serdat_w));
@@ -1159,11 +1153,11 @@ void amiga_state::ocs_map(address_map &map)
 
 //  map(0x040, 0x075).m(m_blitter, FUNC(amiga_blitter_device::regs_map));
 //  map(0x07c, 0x07d).r <open bus for OCS>
-	map(0x07e, 0x07f).w(m_fdc, FUNC(amiga_fdc_device::dsksync_w));
+	map(0x07e, 0x07f).w(m_fdc, FUNC(paula_fdc_device::dsksync_w));
 
 	// Copper
-	map(0x080, 0x08b).m(m_copper, FUNC(amiga_copper_device::regs_map));
-	map(0x08c, 0x08d).w(m_copper, FUNC(amiga_copper_device::copins_w));
+	map(0x080, 0x08b).m(m_copper, FUNC(agnus_copper_device::regs_map));
+	map(0x08c, 0x08d).w(m_copper, FUNC(agnus_copper_device::copins_w));
 	// Display window
 //  map(0x08e, 0x08f).w(FUNC(amiga_state::diwstrt_w));
 //  map(0x090, 0x091).w(FUNC(amiga_state::diwstop_w));
@@ -1173,14 +1167,14 @@ void amiga_state::ocs_map(address_map &map)
 
 //  map(0x096, 0x097).w(FUNC(amiga_state::dmacon_w));
 //  map(0x098, 0x099).w(FUNC(amiga_state::clxcon_w));
-//  map(0x09a, 0x09b).w(m_paula, FUNC(paula_8364_device::intena_w));
-//  map(0x09c, 0x09d).w(m_paula, FUNC(paula_8364_device::intreq_w));
-//  map(0x09e, 0x09f).w(m_paula, FUNC(paula_8364_device::adkcon_w));
+//  map(0x09a, 0x09b).w(m_paula, FUNC(paula_device::intena_w));
+//  map(0x09c, 0x09d).w(m_paula, FUNC(paula_device::intreq_w));
+//  map(0x09e, 0x09f).w(m_paula, FUNC(paula_device::adkcon_w));
 	// Audio section
-	map(0x0a0, 0x0ab).m(m_paula, FUNC(paula_8364_device::audio_channel_map<0>));
-	map(0x0b0, 0x0bb).m(m_paula, FUNC(paula_8364_device::audio_channel_map<1>));
-	map(0x0c0, 0x0cb).m(m_paula, FUNC(paula_8364_device::audio_channel_map<2>));
-	map(0x0d0, 0x0db).m(m_paula, FUNC(paula_8364_device::audio_channel_map<3>));
+	map(0x0a0, 0x0ab).m(m_paula, FUNC(paula_device::audio_channel_map<0>));
+	map(0x0b0, 0x0bb).m(m_paula, FUNC(paula_device::audio_channel_map<1>));
+	map(0x0c0, 0x0cb).m(m_paula, FUNC(paula_device::audio_channel_map<2>));
+	map(0x0d0, 0x0db).m(m_paula, FUNC(paula_device::audio_channel_map<3>));
 
 	// Bitplane pointer section
 //  map(0x0e0, 0x0ff).m(amiga_state::bplxptr_map));
@@ -1247,6 +1241,11 @@ void amiga_state::aga_map(address_map &map)
 
 void amiga_state::custom_chip_reset()
 {
+    // TODO: not entirely correct
+    // - OCS Denise returns open bus
+    // - ECS Denise should return 0xff << 8 | ID
+    // - AGA Lisa bits 15-10 are jumper selectable (at least on A4000), returns 0xfc << 8 | ID
+    // cfr. https://eab.abime.net/showpost.php?p=627136&postcount=59
 	CUSTOM_REG(REG_DENISEID) = m_denise_id;
 	CUSTOM_REG(REG_VPOSR) = m_agnus_id << 8;
 	CUSTOM_REG(REG_DDFSTRT) = 0x18;
@@ -1285,7 +1284,7 @@ void amiga_state::bplcon0_w(u16 data)
 	if ((data & (BPLCON0_BPU0 | BPLCON0_BPU1 | BPLCON0_BPU2)) == (BPLCON0_BPU0 | BPLCON0_BPU1 | BPLCON0_BPU2))
 	{
 		/* planes go from 0 to 6, inclusive */
-		popmessage( "bplcon0_w: setting up planes > 6, %04x", data );
+		popmessage( "bplcon0_w: setting up planes > 6, %04x (bug if not AGA SW)", data );
 		data &= ~BPLCON0_BPU0;
 	}
 	CUSTOM_REG(REG_BPLCON0) = data;
@@ -1371,8 +1370,11 @@ uint16_t amiga_state::custom_chip_r(offs_t offset)
 
 		case REG_CLXDAT:
 			temp = CUSTOM_REG(REG_CLXDAT);
-			CUSTOM_REG(REG_CLXDAT) = 0;
-			return temp;
+			if (!machine().side_effects_disabled())
+				CUSTOM_REG(REG_CLXDAT) = 0;
+			// Undocumented bit 15 always high
+			// - "Barney [& Freddy] Mouse" will always detect a player-enemy hit out of iframe cycles otherwise
+			return temp | (1 << 15);
 
 		case REG_DENISEID:
 			return CUSTOM_REG(REG_DENISEID);
@@ -1387,7 +1389,8 @@ uint16_t amiga_state::custom_chip_r(offs_t offset)
 			return m_fdc->adkcon_r();
 
 		case REG_DSKDATR:
-			popmessage("DSKDAT R");
+			if (!machine().side_effects_disabled())
+				popmessage("DSKDAT R");
 			break;
 	}
 
@@ -1411,7 +1414,15 @@ void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 			return;
 
 		case REG_DSKDAT:
-			popmessage("DSKDAT W %04x",data);
+			// WHDLoad inits with a 0 here, not enough for actual use case.
+			if (data)
+				popmessage("DSKDAT W %04x",data);
+			break;
+
+		case REG_BPL1DAT:
+			// TODO: bpl1dat serial conversion (Team17 + some demos)
+			if (data)
+				popmessage("BPL1DAT W %04x", data);
 			break;
 
 		case REG_DSKSYNC:
@@ -1532,9 +1543,21 @@ void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 
 		case REG_SPR0DATA:  case REG_SPR1DATA:  case REG_SPR2DATA:  case REG_SPR3DATA:
 		case REG_SPR4DATA:  case REG_SPR5DATA:  case REG_SPR6DATA:  case REG_SPR7DATA:
+		{
 			/* enable comparitor on writes here */
 			sprite_enable_comparitor((offset - REG_SPR0DATA) / 4, true);
 			break;
+		}
+
+		case REG_SPR0POS:   case REG_SPR1POS:   case REG_SPR2POS:   case REG_SPR3POS:
+		case REG_SPR4POS:   case REG_SPR5POS:   case REG_SPR6POS:   case REG_SPR7POS:
+		{
+			// a bunch of games override position thru copper
+			// suprfrog, abreed, brian, jimpower (lives counter)
+			int which = (offset - REG_SPR0POS) / 4;
+			m_sprite_dma_reload_mask &= ~(1 << which);
+			break;
+		}
 
 		case REG_DDFSTRT:
 			/* impose hardware limits ( HRM, page 75 ) */
@@ -1675,6 +1698,9 @@ void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 			{
 				CUSTOM_REG(REG_BEAMCON0) = data;
 				update_screenmode();
+				// TODO: variable beam counter, disables hard display stops, enables HTOTAL/VTOTAL programming
+				if (BIT(data, 7))
+					popmessage("BEAMCON0: VARBEAMEN enabled");
 			}
 			break;
 

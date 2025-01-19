@@ -102,4 +102,4 @@ ROM_END
 
 } // anonymous namespace
 
-CONS( 201?, eptvglob,       0,              0,      epoch_tv_globe, epoch_tv_globe, epoch_tv_globe_state, empty_init, "Epoch", "TV Globe (Japan)", MACHINE_IS_SKELETON )
+CONS( 201?, eptvglob,       0,              0,      epoch_tv_globe, epoch_tv_globe, epoch_tv_globe_state, empty_init, "Epoch", "TV Globe (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -106,5 +106,5 @@ ROM_END
 } // anonymous namespace
 
 //    YEAR   NAME        PARENT MACHINE   INPUT     CLASS           INIT        ROT   COMPANY      FULLNAME               FLAGS
-GAME( 19??,  tomsadvs,   0,     tomsadvs, tomsadvs, tomsadvs_state, empty_init, ROT0, "<unknown>", "Tom's Adventures",    MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 2003?, icecoldice, 0,     tomsadvs, tomsadvs, tomsadvs_state, empty_init, ROT0, "ICE",       "Ice Cold Beer (ICE)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 19??,  tomsadvs,   0,     tomsadvs, tomsadvs, tomsadvs_state, empty_init, ROT0, "<unknown>", "Tom's Adventures",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 2003?, icecoldice, 0,     tomsadvs, tomsadvs, tomsadvs_state, empty_init, ROT0, "ICE",       "Ice Cold Beer (ICE)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

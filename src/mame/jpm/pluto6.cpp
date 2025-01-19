@@ -103,5 +103,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2014, pl6_kfp, 0, pluto6, pluto6, pluto6_state, empty_init, ROT0, "G Squared", "Kung Fu Pounda",   MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 2014, pl6_lgk, 0, pluto6, pluto6, pluto6_state, empty_init, ROT0, "Betcom",    "Let's Get Kraken", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 2014, pl6_kfp, 0, pluto6, pluto6, pluto6_state, empty_init, ROT0, "G Squared", "Kung Fu Pounda",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 2014, pl6_lgk, 0, pluto6, pluto6, pluto6_state, empty_init, ROT0, "Betcom",    "Let's Get Kraken", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

@@ -1617,10 +1617,10 @@ ROM_END
 
 } // anonymous namespace
 
-COMP( 2002, zsl5500,  0, 0, zaurus_sa1110, zaurus_sa,  zaurus_sa_state,  empty_init, "Sharp", "Zaurus SL-5500 \"Collie\"",           MACHINE_IS_SKELETON )
-COMP( 2002, zslc500,  0, 0, zaurus_pxa250, zaurus_pxa, zaurus_pxa_state, empty_init, "Sharp", "Zaurus SL-C500",                      MACHINE_IS_SKELETON )
-COMP( 2002, zsl5600,  0, 0, zaurus_pxa250, zaurus_pxa, zaurus_pxa_state, empty_init, "Sharp", "Zaurus SL-5600 / SL-B500 \"Poodle\"", MACHINE_IS_SKELETON )
-COMP( 2003, zslc750,  0, 0, zaurus_pxa255, zaurus_pxa, zaurus_pxa_state, empty_init, "Sharp", "Zaurus SL-C750 \"Shepherd\" (Japan)", MACHINE_IS_SKELETON )
-COMP( 2004, zslc760,  0, 0, zaurus_pxa255, zaurus_pxa, zaurus_pxa_state, empty_init, "Sharp", "Zaurus SL-C760 \"Husky\" (Japan)",    MACHINE_IS_SKELETON )
-COMP( 200?, zslc3000, 0, 0, zaurus_pxa270, zaurus_pxa, zaurus_pxa_state, empty_init, "Sharp", "Zaurus SL-C3000 \"Spitz\" (Japan)",   MACHINE_IS_SKELETON )
-COMP( 200?, zslc1000, 0, 0, zaurus_pxa270, zaurus_pxa, zaurus_pxa_state, empty_init, "Sharp", "Zaurus SL-C3000 \"Akita\" (Japan)",   MACHINE_IS_SKELETON )
+COMP( 2002, zsl5500,  0, 0, zaurus_sa1110, zaurus_sa,  zaurus_sa_state,  empty_init, "Sharp", "Zaurus SL-5500 \"Collie\"",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 2002, zslc500,  0, 0, zaurus_pxa250, zaurus_pxa, zaurus_pxa_state, empty_init, "Sharp", "Zaurus SL-C500",                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 2002, zsl5600,  0, 0, zaurus_pxa250, zaurus_pxa, zaurus_pxa_state, empty_init, "Sharp", "Zaurus SL-5600 / SL-B500 \"Poodle\"", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 2003, zslc750,  0, 0, zaurus_pxa255, zaurus_pxa, zaurus_pxa_state, empty_init, "Sharp", "Zaurus SL-C750 \"Shepherd\" (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 2004, zslc760,  0, 0, zaurus_pxa255, zaurus_pxa, zaurus_pxa_state, empty_init, "Sharp", "Zaurus SL-C760 \"Husky\" (Japan)",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 200?, zslc3000, 0, 0, zaurus_pxa270, zaurus_pxa, zaurus_pxa_state, empty_init, "Sharp", "Zaurus SL-C3000 \"Spitz\" (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 200?, zslc1000, 0, 0, zaurus_pxa270, zaurus_pxa, zaurus_pxa_state, empty_init, "Sharp", "Zaurus SL-C3000 \"Akita\" (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

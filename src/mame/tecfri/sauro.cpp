@@ -372,7 +372,7 @@ void sauro_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		if (flipy)
 		{
 			flipx = !flipx;
-			sx = (235 - sx) & 0xff; // The & 0xff is not 100% percent correct
+			sx = (235 - sx) & 0xff; // The & 0xff is not 100% correct
 			sy = 240 - sy;
 		}
 
@@ -433,7 +433,7 @@ void trckydoc_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		{
 			flipx = !flipx;
 			flipy = !flipy;
-			sx = (235 - sx) & 0xff; // The & 0xff is not 100% percent correct
+			sx = (235 - sx) & 0xff; // The & 0xff is not 100% correct
 			sy = 240 - sy;
 		}
 

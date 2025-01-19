@@ -938,8 +938,8 @@ protected:
 	void tccr1a_w(uint8_t data);
 	void tccr1b_w(uint8_t data);
 	void tccr1c_w(uint8_t data);
-	void tcnt1l_w(uint8_t data);
-	void tcnt1h_w(uint8_t data);
+	//void tcnt1l_w(uint8_t data);
+	//void tcnt1h_w(uint8_t data);
 	void icr1l_w(uint8_t data);
 	void icr1h_w(uint8_t data);
 	void ocr1al_w(uint8_t data);
@@ -1045,8 +1045,8 @@ protected:
 	void tccr3a_w(uint8_t data);
 	void tccr3b_w(uint8_t data);
 	void tccr3c_w(uint8_t data);
-	void tcnt3l_w(uint8_t data);
-	void tcnt3h_w(uint8_t data);
+	//void tcnt3l_w(uint8_t data);
+	//void tcnt3h_w(uint8_t data);
 	void icr3l_w(uint8_t data);
 	void icr3h_w(uint8_t data);
 	void ocr3al_w(uint8_t data);

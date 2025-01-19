@@ -150,7 +150,7 @@ authors:hap
 			<color red="1" green="1" blue="1" />
 		</disk>
 		<text state="1" string="兵">
-			<bounds xc="0.5" yc="0.47" width="0.6" height="0.6" />
+			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
 			<color red="0.9" green="0.05" blue="0.05" />
 		</text>
 
@@ -163,7 +163,7 @@ authors:hap
 			<color red="1" green="1" blue="1" />
 		</disk>
 		<text state="2" string="炮">
-			<bounds xc="0.5" yc="0.47" width="0.6" height="0.6" />
+			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
 			<color red="0.85" green="0.05" blue="0.05" />
 		</text>
 
@@ -176,7 +176,7 @@ authors:hap
 			<color red="1" green="1" blue="1" />
 		</disk>
 		<text state="3" string="車">
-			<bounds xc="0.5" yc="0.47" width="0.6" height="0.6" />
+			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
 			<color red="0.85" green="0.05" blue="0.05" />
 		</text>
 
@@ -189,7 +189,7 @@ authors:hap
 			<color red="1" green="1" blue="1" />
 		</disk>
 		<text state="4" string="馬">
-			<bounds xc="0.5" yc="0.47" width="0.6" height="0.6" />
+			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
 			<color red="0.85" green="0.05" blue="0.05" />
 		</text>
 
@@ -202,7 +202,7 @@ authors:hap
 			<color red="1" green="1" blue="1" />
 		</disk>
 		<text state="5" string="相">
-			<bounds xc="0.5" yc="0.47" width="0.6" height="0.6" />
+			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
 			<color red="0.85" green="0.05" blue="0.05" />
 		</text>
 
@@ -215,7 +215,7 @@ authors:hap
 			<color red="1" green="1" blue="1" />
 		</disk>
 		<text state="6" string="仕">
-			<bounds xc="0.5" yc="0.47" width="0.6" height="0.6" />
+			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
 			<color red="0.85" green="0.05" blue="0.05" />
 		</text>
 
@@ -228,7 +228,7 @@ authors:hap
 			<color red="1" green="1" blue="1" />
 		</disk>
 		<text state="7" string="帥">
-			<bounds xc="0.5" yc="0.47" width="0.6" height="0.6" />
+			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
 			<color red="0.85" green="0.05" blue="0.05" />
 		</text>
 
@@ -242,7 +242,7 @@ authors:hap
 			<color red="1" green="1" blue="1" />
 		</disk>
 		<text state="8" string="卒">
-			<bounds xc="0.5" yc="0.47" width="0.6" height="0.6" />
+			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
 			<color red="0" green="0.25" blue="0" />
 		</text>
 
@@ -255,7 +255,7 @@ authors:hap
 			<color red="1" green="1" blue="1" />
 		</disk>
 		<text state="9" string="砲">
-			<bounds xc="0.5" yc="0.47" width="0.6" height="0.6" />
+			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
 			<color red="0" green="0.25" blue="0" />
 		</text>
 
@@ -268,7 +268,7 @@ authors:hap
 			<color red="1" green="1" blue="1" />
 		</disk>
 		<text state="10" string="車">
-			<bounds xc="0.5" yc="0.47" width="0.6" height="0.6" />
+			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
 			<color red="0" green="0.25" blue="0" />
 		</text>
 
@@ -281,7 +281,7 @@ authors:hap
 			<color red="1" green="1" blue="1" />
 		</disk>
 		<text state="11" string="馬">
-			<bounds xc="0.5" yc="0.47" width="0.6" height="0.6" />
+			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
 			<color red="0" green="0.25" blue="0" />
 		</text>
 
@@ -294,7 +294,7 @@ authors:hap
 			<color red="1" green="1" blue="1" />
 		</disk>
 		<text state="12" string="象">
-			<bounds xc="0.5" yc="0.47" width="0.6" height="0.6" />
+			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
 			<color red="0" green="0.25" blue="0" />
 		</text>
 
@@ -307,7 +307,7 @@ authors:hap
 			<color red="1" green="1" blue="1" />
 		</disk>
 		<text state="13" string="士">
-			<bounds xc="0.5" yc="0.47" width="0.6" height="0.6" />
+			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
 			<color red="0" green="0.25" blue="0" />
 		</text>
 
@@ -320,7 +320,7 @@ authors:hap
 			<color red="1" green="1" blue="1" />
 		</disk>
 		<text state="14" string="將">
-			<bounds xc="0.5" yc="0.47" width="0.6" height="0.6" />
+			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
 			<color red="0" green="0.25" blue="0" />
 		</text>
 	</element>
@@ -339,7 +339,7 @@ authors:hap
 			<color red="1" green="1" blue="1" />
 		</disk>
 		<text state="15" string="兵">
-			<bounds xc="0.5" yc="0.47" width="0.6" height="0.6" />
+			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
 			<color red="0.85" green="0.05" blue="0.05" />
 		</text>
 
@@ -352,7 +352,7 @@ authors:hap
 			<color red="1" green="1" blue="1" />
 		</disk>
 		<text state="16" string="炮">
-			<bounds xc="0.5" yc="0.47" width="0.6" height="0.6" />
+			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
 			<color red="0.85" green="0.05" blue="0.05" />
 		</text>
 
@@ -365,7 +365,7 @@ authors:hap
 			<color red="1" green="1" blue="1" />
 		</disk>
 		<text state="17" string="車">
-			<bounds xc="0.5" yc="0.47" width="0.6" height="0.6" />
+			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
 			<color red="0.85" green="0.05" blue="0.05" />
 		</text>
 
@@ -378,7 +378,7 @@ authors:hap
 			<color red="1" green="1" blue="1" />
 		</disk>
 		<text state="18" string="馬">
-			<bounds xc="0.5" yc="0.47" width="0.6" height="0.6" />
+			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
 			<color red="0.85" green="0.05" blue="0.05" />
 		</text>
 
@@ -391,7 +391,7 @@ authors:hap
 			<color red="1" green="1" blue="1" />
 		</disk>
 		<text state="19" string="相">
-			<bounds xc="0.5" yc="0.47" width="0.6" height="0.6" />
+			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
 			<color red="0.85" green="0.05" blue="0.05" />
 		</text>
 
@@ -404,7 +404,7 @@ authors:hap
 			<color red="1" green="1" blue="1" />
 		</disk>
 		<text state="20" string="仕">
-			<bounds xc="0.5" yc="0.47" width="0.6" height="0.6" />
+			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
 			<color red="0.85" green="0.05" blue="0.05" />
 		</text>
 
@@ -417,7 +417,7 @@ authors:hap
 			<color red="1" green="1" blue="1" />
 		</disk>
 		<text state="21" string="帥">
-			<bounds xc="0.5" yc="0.47" width="0.6" height="0.6" />
+			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
 			<color red="0.85" green="0.05" blue="0.05" />
 		</text>
 
@@ -431,7 +431,7 @@ authors:hap
 			<color red="1" green="1" blue="1" />
 		</disk>
 		<text state="22" string="卒">
-			<bounds xc="0.5" yc="0.47" width="0.6" height="0.6" />
+			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
 			<color red="0" green="0.25" blue="0" />
 		</text>
 
@@ -444,7 +444,7 @@ authors:hap
 			<color red="1" green="1" blue="1" />
 		</disk>
 		<text state="23" string="砲">
-			<bounds xc="0.5" yc="0.47" width="0.6" height="0.6" />
+			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
 			<color red="0" green="0.25" blue="0" />
 		</text>
 
@@ -457,7 +457,7 @@ authors:hap
 			<color red="1" green="1" blue="1" />
 		</disk>
 		<text state="24" string="車">
-			<bounds xc="0.5" yc="0.47" width="0.6" height="0.6" />
+			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
 			<color red="0" green="0.25" blue="0" />
 		</text>
 
@@ -470,7 +470,7 @@ authors:hap
 			<color red="1" green="1" blue="1" />
 		</disk>
 		<text state="25" string="馬">
-			<bounds xc="0.5" yc="0.47" width="0.6" height="0.6" />
+			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
 			<color red="0" green="0.25" blue="0" />
 		</text>
 
@@ -483,7 +483,7 @@ authors:hap
 			<color red="1" green="1" blue="1" />
 		</disk>
 		<text state="26" string="象">
-			<bounds xc="0.5" yc="0.47" width="0.6" height="0.6" />
+			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
 			<color red="0" green="0.25" blue="0" />
 		</text>
 
@@ -496,7 +496,7 @@ authors:hap
 			<color red="1" green="1" blue="1" />
 		</disk>
 		<text state="27" string="士">
-			<bounds xc="0.5" yc="0.47" width="0.6" height="0.6" />
+			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
 			<color red="0" green="0.25" blue="0" />
 		</text>
 
@@ -509,7 +509,7 @@ authors:hap
 			<color red="1" green="1" blue="1" />
 		</disk>
 		<text state="28" string="將">
-			<bounds xc="0.5" yc="0.47" width="0.6" height="0.6" />
+			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
 			<color red="0" green="0.25" blue="0" />
 		</text>
 	</element>

@@ -247,10 +247,10 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1973, vollyrmt,  0, ramtek, 0, ramtek_state, empty_init, ROT0, "Ramtek", "Volly (Ramtek)",    MACHINE_IS_SKELETON )
-GAME( 1973, hockyrmt,  0, ramtek, 0, ramtek_state, empty_init, ROT0, "Ramtek", "Hockey (Ramtek)",   MACHINE_IS_SKELETON )
-GAME( 1973, soccrrmt,  0, ramtek, 0, ramtek_state, empty_init, ROT0, "Ramtek", "Soccer (Ramtek)",   MACHINE_IS_SKELETON )
-GAME( 1974, wipeormt,  0, ramtek, 0, ramtek_state, empty_init, ROT0, "Ramtek", "Wipeout (Ramtek)",  MACHINE_IS_SKELETON )
-GAME( 1974, cleanswp,  0, ramtek, 0, ramtek_state, empty_init, ROT0, "Ramtek", "Clean Sweep",       MACHINE_IS_SKELETON )
-GAME( 1974, bballrmt,  0, ramtek, 0, ramtek_state, empty_init, ROT0, "Ramtek", "Baseball (Ramtek)", MACHINE_IS_SKELETON )
-GAME( 1975, trivia,    0, ramtek, 0, ramtek_state, empty_init, ROT0, "Ramtek", "Trivia (Rev B)",    MACHINE_IS_SKELETON )
+GAME( 1973, vollyrmt,  0, ramtek, 0, ramtek_state, empty_init, ROT0, "Ramtek", "Volly (Ramtek)",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1973, hockyrmt,  0, ramtek, 0, ramtek_state, empty_init, ROT0, "Ramtek", "Hockey (Ramtek)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1973, soccrrmt,  0, ramtek, 0, ramtek_state, empty_init, ROT0, "Ramtek", "Soccer (Ramtek)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1974, wipeormt,  0, ramtek, 0, ramtek_state, empty_init, ROT0, "Ramtek", "Wipeout (Ramtek)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1974, cleanswp,  0, ramtek, 0, ramtek_state, empty_init, ROT0, "Ramtek", "Clean Sweep",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1974, bballrmt,  0, ramtek, 0, ramtek_state, empty_init, ROT0, "Ramtek", "Baseball (Ramtek)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1975, trivia,    0, ramtek, 0, ramtek_state, empty_init, ROT0, "Ramtek", "Trivia (Rev B)",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

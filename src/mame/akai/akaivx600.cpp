@@ -102,5 +102,5 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1988, vx600, 0, 0, vx600, vx600, akaivx600_state, empty_init, "Akai", "VX600 Programmable Matrix Synthesizer", MACHINE_IS_SKELETON)
+SYST(1988, vx600, 0, 0, vx600, vx600, akaivx600_state, empty_init, "Akai", "VX600 Programmable Matrix Synthesizer", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 

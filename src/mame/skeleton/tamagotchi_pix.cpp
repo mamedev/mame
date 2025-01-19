@@ -84,4 +84,4 @@ ROM_END
 
 } // anonymous namespace
 
-CONS( 2020, tamapix,       0,              0,      tamapix, tamapix, tamagotchi_pix_state, empty_init, "Bandai", "Tamagotchi Pix", MACHINE_IS_SKELETON )
+CONS( 2020, tamapix,       0,              0,      tamapix, tamapix, tamagotchi_pix_state, empty_init, "Bandai", "Tamagotchi Pix", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

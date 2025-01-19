@@ -14,7 +14,6 @@ namespace fs {
 const char *meta_data::entry_name(meta_name name)
 {
 	switch(name) {
-	case meta_name::basic: return "basic";
 	case meta_name::creation_date: return "creation_date";
 	case meta_name::length: return "length";
 	case meta_name::loading_address: return "loading_address";

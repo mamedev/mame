@@ -198,6 +198,7 @@ const double XTAL::known_xtals[] = {
 	 10'920'000, // 10.92_MHz_XTAL         ADDS Viewpoint 60, Viewpoint A2
 	 11'000'000, // 11_MHz_XTAL            Mario I8039 sound
 	 11'004'000, // 11.004_MHz_XTAL        TI 911 VDT
+	 11'055'000, // 11.055_MHz_XTAL        Atari Tank 8
 	 11'059'200, // 11.0592_MHz_XTAL       Used with MCS-51 to generate common baud rates
 	 11'200'000, // 11.2_MHz_XTAL          New York, New York
 	 11'289'000, // 11.289_MHz_XTAL        Vanguard

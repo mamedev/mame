@@ -84,7 +84,7 @@ protected:
 	void robocop_colpri_cb(u32 &colour, u32 &pri_mask);
 	void baddudes_tile_cb(tile_data &tileinfo, u32 &tile, u32 &colour, u32 &flags);
 
-	void set_screen_raw_params_data_east(machine_config &config);
+	void set_screen_raw_params(machine_config &config);
 
 	void h6280_decrypt(const char *cputag);
 	void dec0_map(address_map &map) ATTR_COLD;
@@ -220,10 +220,10 @@ private:
 };
 
 
-class dec0_automat_state : public dec0_state
+class automat_state : public dec0_state
 {
 public:
-	dec0_automat_state(const machine_config &mconfig, device_type type, const char *tag) :
+	automat_state(const machine_config &mconfig, device_type type, const char *tag) :
 		dec0_state(mconfig, type, tag),
 		m_msm(*this, "msm%u", 1U),
 		m_adpcm_select(*this, "adpcm_select%u", 1U),

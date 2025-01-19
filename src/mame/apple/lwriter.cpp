@@ -660,7 +660,7 @@ void lwriter_state::lwriter(machine_config &config)
 	m_screen->set_visarea_full();
 	m_screen->set_screen_update(FUNC(lwriter_state::screen_update));
 
-	SCC8530N(config, m_scc, CPU_CLK);
+	SCC8530(config, m_scc, CPU_CLK);
 	m_scc->configure_channels(RXC_CLK, 0, RXC_CLK, 0);
 	/* Port A */
 	m_scc->out_txda_callback().set("rs232a", FUNC(rs232_port_device::write_txd));
@@ -815,6 +815,6 @@ ROM_END
 
 
 /*    YEAR  NAME         PARENT  COMPAT  MACHINE     INPUT    STATE          INIT        COMPANY            FULLNAME             FLAGS */
-CONS( 1985, lwriter,     0,      0,      lwriter,    lwriter, lwriter_state, empty_init, "Apple Computer",  "LaserWriter",       MACHINE_IS_SKELETON)
-CONS( 1986, lwriterplus, 0,      0,      lwriter,    lwriter, lwriter_state, empty_init, "Apple Computer",  "LaserWriter Plus",  MACHINE_IS_SKELETON)
-CONS( 1988, lwriter2nt,  0,      0,      lwriter2nt, lwriter, lwriter_state, empty_init, "Apple Computer",  "LaserWriter II NT", MACHINE_IS_SKELETON)
+CONS( 1985, lwriter,     0,      0,      lwriter,    lwriter, lwriter_state, empty_init, "Apple Computer",  "LaserWriter",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 1986, lwriterplus, 0,      0,      lwriter,    lwriter, lwriter_state, empty_init, "Apple Computer",  "LaserWriter Plus",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 1988, lwriter2nt,  0,      0,      lwriter2nt, lwriter, lwriter_state, empty_init, "Apple Computer",  "LaserWriter II NT", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

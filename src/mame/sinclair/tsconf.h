@@ -29,6 +29,8 @@ public:
 	tsconf_state(const machine_config &mconfig, device_type type, const char *tag)
 		: spectrum_128_state(mconfig, type, tag)
 		, m_bank0_rom(*this, "bank0_rom")
+		, m_tiles_raw(*this, "tiles%u_raw", 0U, 64U * 64 * 8 * 8, ENDIANNESS_LITTLE)
+		, m_sprites_raw(*this, "sprites_raw", 64U * 64 * 8 * 8, ENDIANNESS_LITTLE)
 		, m_keyboard(*this, "pc_keyboard")
 		, m_io_mouse(*this, "mouse_input%u", 1U)
 		, m_beta(*this, BETA_DISK_TAG)
@@ -170,8 +172,8 @@ private:
 	void tsconf_draw_txt(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void tsconf_draw_gfx(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void tsconf_palette(palette_device &palette) const;
 	void tsconf_update_video_mode();
+	void copy_tiles_to_raw(const u8 *tiles_src, u8 *raw_target);
 
 	u8 tsconf_port_xx1f_r(offs_t offset);
 	void tsconf_port_7ffd_w(u8 data);
@@ -214,6 +216,8 @@ private:
 
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
 	memory_view m_bank0_rom;
+	memory_share_array_creator<u8, 2> m_tiles_raw;
+	memory_share_creator<u8> m_sprites_raw;
 
 	required_device<at_keyboard_device> m_keyboard;
 	required_ioport_array<3> m_io_mouse;

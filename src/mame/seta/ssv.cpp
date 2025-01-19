@@ -2358,7 +2358,7 @@ static const gfx_layout layout_16x8x8_ram =
 };
 
 static GFXDECODE_START( gfx_eaglshot )
-	GFXDECODE_ENTRY( nullptr, 0, layout_16x8x8_ram, 0, 0x8000/64 ) // [0] Sprites (256 colors, decoded from RAM)
+	GFXDECODE_RAM( nullptr, 0, layout_16x8x8_ram, 0, 0x8000/64 ) // [0] Sprites (256 colors, decoded from RAM)
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_gdfs )

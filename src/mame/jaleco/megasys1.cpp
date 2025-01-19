@@ -121,7 +121,7 @@ RAM             RW      0e0000-0effff*        <               <
   This game has no alternate levels mode either.  Socketed encryption chip is
   unusual.
 
-- Understand raster effect related register (ex : stdragon "push start" screen)
+- Understand raster effect related register (eg. stdragon "push start" screen)
 
 - chimerab ranking screen effect is imperfect ( https://youtu.be/XhjCaFxhphA )
 
@@ -380,14 +380,14 @@ void megasys1_bc_iosim_state::ip_select_w(u16 data) // TO MCU
 
 	switch (i)
 	{
-			case 0 :    m_ip_latched = m_io_system->read(); break;
-			case 1 :    m_ip_latched = m_io_p1->read(); break;
-			case 2 :    m_ip_latched = m_io_p2->read(); break;
-			case 3 :    m_ip_latched = m_io_dsw1->read(); break;
-			case 4 :    m_ip_latched = m_io_dsw2->read(); break;
-			case 5 :    m_ip_latched = 0x0d; break; // startup check?
-			case 6 :    m_ip_latched = 0x06; break; // sent before each other command
-			default:  return; // get out if it wasn't a valid request
+			case 0:  m_ip_latched = m_io_system->read(); break;
+			case 1:  m_ip_latched = m_io_p1->read(); break;
+			case 2:  m_ip_latched = m_io_p2->read(); break;
+			case 3:  m_ip_latched = m_io_dsw1->read(); break;
+			case 4:  m_ip_latched = m_io_dsw2->read(); break;
+			case 5:  m_ip_latched = 0x0d; break; // startup check?
+			case 6:  m_ip_latched = 0x06; break; // sent before each other command
+			default: return; // get out if it wasn't a valid request
 	}
 
 	// if the command is valid, generate an IRQ from the MCU
@@ -5287,13 +5287,13 @@ GAME( 1988, lomakai,    0,        system_Z,                 lomakai,  megasys1_t
 GAME( 1988, makaiden,   lomakai,  system_Z,                 lomakai,  megasys1_typez_state,        empty_init,        ROT0,   "Jaleco", "Makai Densetsu (Japan)", MACHINE_SUPPORTS_SAVE )
 
 // Type A
-GAME( 1988, p47,        0,        system_A,                 p47,      megasys1_typea_state,        empty_init,        ROT0,   "Jaleco", "P-47 - The Phantom Fighter (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, p47a,       p47,      system_A,                 p47,      megasys1_typea_state,        empty_init,        ROT0,   "Jaleco", "P-47 - The Freedom Fighter (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, p47j,       p47,      system_A,                 p47,      megasys1_typea_state,        empty_init,        ROT0,   "Jaleco", "P-47 - The Freedom Fighter (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, p47je,      p47,      system_A,                 p47,      megasys1_typea_state,        empty_init,        ROT0,   "Jaleco", "P-47 - The Freedom Fighter (Japan, Export)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, p47bl,      p47,      system_A_p47bl,           p47,      megasys1_typea_state,        empty_init,        ROT0,   "bootleg","P-47 - The Freedom Fighter (World, bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, kickoff,    0,        system_A,                 kickoff,  megasys1_typea_state,        empty_init,        ROT0,   "Jaleco", "Kick Off - Jaleco Cup (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, kickoffb,   kickoff,  system_A_kickoffb,        kickoff,  megasys1_typea_state,        empty_init,        ROT0,   "bootleg (Comodo)", "Kick Off - World Cup (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // OKI needs to be checked
+GAME( 1988, p47,        0,        system_A,                 p47,      megasys1_typea_state,        empty_init,        ROT0,   "Jaleco", "P-47: The Phantom Fighter (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, p47a,       p47,      system_A,                 p47,      megasys1_typea_state,        empty_init,        ROT0,   "Jaleco", "P-47: The Freedom Fighter (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, p47j,       p47,      system_A,                 p47,      megasys1_typea_state,        empty_init,        ROT0,   "Jaleco", "P-47: The Freedom Fighter (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, p47je,      p47,      system_A,                 p47,      megasys1_typea_state,        empty_init,        ROT0,   "Jaleco", "P-47: The Freedom Fighter (Japan, Export)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, p47bl,      p47,      system_A_p47bl,           p47,      megasys1_typea_state,        empty_init,        ROT0,   "bootleg","P-47: The Freedom Fighter (World, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, kickoff,    0,        system_A,                 kickoff,  megasys1_typea_state,        empty_init,        ROT0,   "Jaleco", "Kick Off: Jaleco Cup (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, kickoffb,   kickoff,  system_A_kickoffb,        kickoff,  megasys1_typea_state,        empty_init,        ROT0,   "bootleg (Comodo)", "Kick Off: World Cup (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // OKI needs to be checked
 GAME( 1988, tshingen,   0,        system_A_d65006,          tshingen, megasys1_typea_state,        empty_init,        ROT0,   "Jaleco", "Shingen Samurai-Fighter (Japan, English)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1988, tshingena,  tshingen, system_A_d65006,          tshingen, megasys1_typea_state,        empty_init,        ROT0,   "Jaleco", "Takeda Shingen (Japan, Japanese)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1988, kazan,      0,        system_A_d65006_iganinju, kazan,    megasys1_typea_state,        empty_init,        ROT0,   "Jaleco", "Ninja Kazan (World)", MACHINE_SUPPORTS_SAVE )
@@ -5319,7 +5319,7 @@ GAME( 1990, rittam,     rodland,  system_A_gs88000,         rodland,  megasys1_t
 GAME( 1990, rodlandjb,  rodland,  system_A,                 rodland,  megasys1_typea_state,        init_rodland_gfx,  ROT0,   "bootleg","Rod-Land (Japan bootleg with unencrypted program)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, rodlandjb2, rodland,  system_A,                 rodland,  megasys1_typea_state,        empty_init,        ROT0,   "bootleg","Rod-Land (Japan bootleg with unencrypted program and GFX)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, phantasm,   avspirit, system_A_d65006,          phantasm, megasys1_typea_state,        empty_init,        ROT0,   "Jaleco", "Phantasm (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, edfp,       edf,      system_A_d65006,          edfp,     megasys1_typea_state,        empty_init,        ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (Japan, prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, edfp,       edf,      system_A_d65006,          edfp,     megasys1_typea_state,        empty_init,        ROT0,   "Jaleco", "E.D.F.: Earth Defense Force (Japan, prototype)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, inyourfa,   0,        system_A_d65006,          inyourfa, megasys1_typea_state,        empty_init,        ROT0,   "Jaleco", "In Your Face (North America, prototype)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, soldam,     0,        system_A_d65006_soldam,   soldam,   megasys1_typea_state,        empty_init,        ROT0,   "Jaleco", "Soldam", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, soldamj,    soldam,   system_A_gs88000_soldam,  soldam,   megasys1_typea_state,        empty_init,        ROT0,   "Jaleco", "Soldam (Japan)", MACHINE_SUPPORTS_SAVE )
@@ -5327,16 +5327,16 @@ GAME( 1992, soldamj,    soldam,   system_A_gs88000_soldam,  soldam,   megasys1_t
 // Type B
 GAME( 1991, avspirit,   0,        system_B_iosim,           avspirit, megasys1_bc_iosim_state,     init_avspirit,     ROT0,   "Jaleco", "Avenging Spirit", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, monkelf,    avspirit, system_B_monkelf,         avspirit, megasys1_state,              init_monkelf,      ROT0,   "bootleg","Monky Elf (Korean bootleg of Avenging Spirit)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, edf,        0,        system_B_iomcu,           edf,      megasys1_bc_iomcu_state,     empty_init,        ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, edfa,       edf,      system_B_iomcu,           edf,      megasys1_bc_iomcu_state,     empty_init,        ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, edfu,       edf,      system_B_iomcu,           edf,      megasys1_bc_iomcu_state,     empty_init,        ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (North America)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, edfbl,      edf,      system_Bbl,               edf,      megasys1_state,              empty_init,        ROT0,   "bootleg","E.D.F. : Earth Defense Force (bootleg)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, hayaosi1,   0,        system_B_hayaosi1,        hayaosi1, megasys1_bc_iosim_state,     init_hayaosi1,     ROT0,   "Jaleco", "Hayaoshi Quiz Ouza Ketteisen - The King Of Quiz", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, edf,        0,        system_B_iomcu,           edf,      megasys1_bc_iomcu_state,     empty_init,        ROT0,   "Jaleco", "E.D.F.: Earth Defense Force (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, edfa,       edf,      system_B_iomcu,           edf,      megasys1_bc_iomcu_state,     empty_init,        ROT0,   "Jaleco", "E.D.F.: Earth Defense Force (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, edfu,       edf,      system_B_iomcu,           edf,      megasys1_bc_iomcu_state,     empty_init,        ROT0,   "Jaleco", "E.D.F.: Earth Defense Force (North America)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, edfbl,      edf,      system_Bbl,               edf,      megasys1_state,              empty_init,        ROT0,   "bootleg","E.D.F.: Earth Defense Force (bootleg)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, hayaosi1,   0,        system_B_hayaosi1,        hayaosi1, megasys1_bc_iosim_state,     init_hayaosi1,     ROT0,   "Jaleco", "Hayaoshi Quiz Ouza Ketteisen: The King Of Quiz", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 // Type C
-GAME( 1991, 64street,   0,        system_C_iomcu,           64street, megasys1_bc_iomcu_state,     empty_init,        ROT0,   "Jaleco", "64th. Street - A Detective Story (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, 64streetj,  64street, system_C_iomcu,           64street, megasys1_bc_iomcu_state,     empty_init,        ROT0,   "Jaleco", "64th. Street - A Detective Story (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, 64streetja, 64street, system_C_iomcu,           64street, megasys1_bc_iomcu_state,     empty_init,        ROT0,   "Jaleco", "64th. Street - A Detective Story (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, 64street,   0,        system_C_iomcu,           64street, megasys1_bc_iomcu_state,     empty_init,        ROT0,   "Jaleco", "64th. Street: A Detective Story (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, 64streetj,  64street, system_C_iomcu,           64street, megasys1_bc_iomcu_state,     empty_init,        ROT0,   "Jaleco", "64th. Street: A Detective Story (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, 64streetja, 64street, system_C_iomcu,           64street, megasys1_bc_iomcu_state,     empty_init,        ROT0,   "Jaleco", "64th. Street: A Detective Story (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, bigstrik,   0,        system_C_iomcu,           bigstrik, megasys1_bc_iomcu_state,     empty_init,        ROT0,   "Jaleco", "Big Striker", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, chimerab,   0,        system_C_iomcu,           chimerab, megasys1_bc_iomcu_state,     empty_init,        ROT0,   "Jaleco", "Chimera Beast (Japan, prototype, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, chimeraba,  chimerab, system_C_iosim,           chimerab, megasys1_bc_iosim_state,     init_chimeraba,    ROT0,   "Jaleco", "Chimera Beast (Japan, prototype, set 2)", MACHINE_SUPPORTS_SAVE )

@@ -57,11 +57,11 @@ void kchamp_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
 	{
 		/* sprite format:
 
-        Offset        Encoding
-             0        YYYYYYYY
-             1        TTTTTTTT - tile#
-             2        FGGTCCCC - y flip, gfx bank, high bit of tile#, color
-             3        XXXXXXXX
+		Offset        Encoding
+		     0        YYYYYYYY
+		     1        TTTTTTTT - tile#
+		     2        FGGTCCCC - y flip, gfx bank, high bit of tile#, color
+		     3        XXXXXXXX
 		*/
 
 		int attr = m_spriteram[offs + 2];

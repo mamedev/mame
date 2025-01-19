@@ -441,12 +441,12 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1977, fisco400, 0, taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "Cisco/Fisco 400",    MACHINE_IS_SKELETON )
-GAME( 1977, gunman,   0, taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "Gunman",             MACHINE_IS_SKELETON )
-GAME( 1977, missilex, 0, taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "Missile-X",          MACHINE_IS_SKELETON )
-GAME( 1977, ttblock,  0, taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "T.T Block",          MACHINE_IS_SKELETON )
-GAME( 1978, ttsracec, 0, taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "T.T. Speed Race CL", MACHINE_IS_SKELETON )
-GAME( 1979, zzblock,  0, taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "Zun Zun Block",      MACHINE_IS_SKELETON )
+GAME( 1977, fisco400, 0, taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "Cisco/Fisco 400",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1977, gunman,   0, taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "Gunman",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1977, missilex, 0, taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "Missile-X",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1977, ttblock,  0, taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "T.T Block",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1978, ttsracec, 0, taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "T.T. Speed Race CL", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1979, zzblock,  0, taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "Zun Zun Block",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // Not from Taito
-GAME( 1978, srdchamp, 0, taitottl, 0, taitottl_state, empty_init, ROT0, "Model Racing", "Super Road Champions", MACHINE_IS_SKELETON )
+GAME( 1978, srdchamp, 0, taitottl, 0, taitottl_state, empty_init, ROT0, "Model Racing", "Super Road Champions", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
