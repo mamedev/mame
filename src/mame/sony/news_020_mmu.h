@@ -44,11 +44,15 @@ private:
 	struct news_020_pte
 	{
 		bool valid;
-		uint8_t access_settings; // actually 4 bits
+		bool user_readable;
+		bool user_writable;
+		bool kernel_readable;
+		bool kernel_writable;
 		bool modified;
 		bool fill_on_demand;
 		uint8_t unused; // actually 5 bits
 		uint32_t pfnum; // actually 20 bits
+		uint32_t raw; // for logging
 	};
 
 	const address_space_config m_hyperbus_config;
