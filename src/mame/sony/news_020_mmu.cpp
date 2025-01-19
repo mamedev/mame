@@ -34,6 +34,17 @@ namespace
 	constexpr uint8_t TAG_MISMATCH = 1 << 3;
 	constexpr uint8_t PROTECTION_VIOLATION = 1 << 2;
 	constexpr uint8_t MODIFIED = 1 << 1;
+
+	constexpr uint32_t ENTRY_MODIFIED_MASK = 0x04000000;
+
+	// Log messages for mode
+	const char KERNEL_MODE[] = "KM";
+	const char USER_MODE[] = "UM";
+
+	const char *mode(bool is_supervisor)
+	{
+		return is_supervisor ? KERNEL_MODE : USER_MODE;
+	}
 }
 
 news_020_mmu_device::news_020_mmu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -132,7 +143,8 @@ void news_020_mmu_device::mmu_entry_w(offs_t offset, uint32_t data, uint32_t mem
 
 #if (VERBOSE & LOG_ENTRY) > 0
 	news_020_pte modified_entry(system_map ? m_mmu_system_ram[offset] : m_mmu_user_ram[offset]);
-	LOGMASKED(LOG_ENTRY, "(%s) mmu %s entry write (0x%x, 0x%x, 0x%x) -> entry 0x%x: tag = 0x%x, pfnum = 0x%x (valid = %d, modified = %d, fill_on_demand = %d, kernel write = %d, kernel read = %d, user write = %d, user read = %d)\n", machine().describe_context(),
+	LOGMASKED(LOG_ENTRY, "(%s) MMU %s entry write (0x%08x, 0x%08x, 0x%08x) -> entry 0x%08x: tag = 0x%08x, pfnum = 0x%08x (valid = %d, modified = %d, fill_on_demand = %d, kernel write = %d, kernel read = %d, user write = %d, user read = %d)\n",
+			  machine().describe_context(),
 			  system_map ? "system" : "user",
 			  offset,
 			  data,
@@ -172,38 +184,40 @@ uint32_t news_020_mmu_device::hyperbus_r(offs_t offset, uint32_t mem_mask, bool 
 		uint32_t vpgnum = (offset & ~0x80000000) >> 12;
 		bool system = offset & 0x80000000;
 
-		const news_020_pte pte(system ? m_mmu_system_ram[vpgnum % MMU_ENTRY_COUNT] : m_mmu_user_ram[vpgnum % MMU_ENTRY_COUNT]);
-		const uint32_t tag = system ? m_mmu_system_tag_ram[vpgnum % MMU_ENTRY_COUNT] : m_mmu_user_tag_ram[vpgnum % MMU_ENTRY_COUNT];
+		const uint32_t map_index = vpgnum % MMU_ENTRY_COUNT;
+		const news_020_pte pte(system ? m_mmu_system_ram[map_index] : m_mmu_user_ram[map_index]);
+		const uint32_t tag = system ? m_mmu_system_tag_ram[map_index] : m_mmu_user_tag_ram[map_index];
+
 		if (!pte.valid() && !pte.fill_on_demand())
 		{
-			LOGMASKED(LOG_MAP_ERROR, "(%s) hyperbus_r 0x%08x (pg 0x%08x, pte 0x%08x, index 0x%x) -> invalid page\n", machine().describe_context(), offset, vpgnum, pte.pte, (vpgnum % MMU_ENTRY_COUNT) + (system ? MMU_ENTRY_COUNT : 0x0)); // TODO: better log message
+			LOGMASKED(LOG_MAP_ERROR, "(%s) hyperbus_r (offset 0x%08x, mask 0x%08x, pg 0x%08x, pte 0x%08x, index 0x%08x, %s) -> invalid page\n", machine().describe_context(), offset, mem_mask, vpgnum, pte.pte, map_index, mode(is_supervisor));
 			m_bus_error(offset, mem_mask, false, INVALID_ENTRY);
 		}
 		else if (tag != vpgnum)
 		{
-			LOGMASKED(LOG_MAP_ERROR, "(%s) hyperbus_r 0x%08x (pg 0x%08x, pte 0x%08x) -> tag mismatch 0x%x != 0x%x \n", machine().describe_context(), offset, vpgnum, pte.pte, tag, vpgnum, is_supervisor); // TODO: better log message
+			LOGMASKED(LOG_MAP_ERROR, "(%s) hyperbus_r (offset 0x%08x, mask 0x%08x, pg 0x%08x, pte 0x%08x, index 0x%08x, %s) -> tag mismatch 0x%08x != 0x%08x\n", machine().describe_context(), offset, mem_mask, vpgnum, pte.pte, map_index, mode(is_supervisor), tag, vpgnum);
 			m_bus_error(offset, mem_mask, false, TAG_MISMATCH);
 		}
 		else if (!is_supervisor && !pte.user_readable()) // user memory protection violation
 		{
-			LOGMASKED(LOG_MAP_ERROR, "(%s) hyperbus_r 0x%08x (pg 0x%08x, pte 0x%08x, index 0x%x) user protection violation\n", machine().describe_context(), offset, vpgnum, pte.pte, (vpgnum % MMU_ENTRY_COUNT) + (system ? MMU_ENTRY_COUNT : 0x0));
+			LOGMASKED(LOG_MAP_ERROR, "(%s) hyperbus_r (offset 0x%08x, mask 0x%08x, pg 0x%08x, pte 0x%08x, index 0x%08x, %s) -> user protection violation\n", machine().describe_context(), offset, mem_mask, vpgnum, pte.pte, map_index, mode(is_supervisor));
 			m_bus_error(offset, mem_mask, false, PROTECTION_VIOLATION);
 		}
 		else if (is_supervisor && !pte.kernel_readable()) // kernel memory protection violation
 		{
-			LOGMASKED(LOG_MAP_ERROR, "(%s) hyperbus_r 0x%08x (pg 0x%08x, pte 0x%08x, index 0x%x) kernel protection violation\n", machine().describe_context(), offset, vpgnum, pte.pte, (vpgnum % MMU_ENTRY_COUNT) + (system ? MMU_ENTRY_COUNT : 0x0));
+			LOGMASKED(LOG_MAP_ERROR, "(%s) hyperbus_r (offset 0x%08x, mask 0x%08x, pg 0x%08x, pte 0x%08x, index 0x%08x, %s) -> kernel protection violation\n", machine().describe_context(), offset, mem_mask, vpgnum, pte.pte, map_index, mode(is_supervisor));
 			m_bus_error(offset, mem_mask, false, PROTECTION_VIOLATION);
 		}
 		else if (!pte.valid() && pte.fill_on_demand())
 		{
-			LOGMASKED(LOG_MAP_ERROR, "(%s) hyperbus_r fill on demand page addr = 0x%x pte = 0x%x\n", machine().describe_context(), offset, pte.pte);
+			LOGMASKED(LOG_MAP_ERROR, "(%s) hyperbus_r (offset 0x%08x, mask 0x%08x, pg 0x%08x, pte 0x%08x, index 0x%08x, %s) -> fill on demand page read\n", machine().describe_context(), offset, mem_mask, vpgnum, pte.pte, map_index, mode(is_supervisor));
 			m_bus_error(offset, mem_mask, false, INVALID_ENTRY);
 		}
 		else
 		{
 			uint32_t paddr = ((pte.pfnum() << 12) + (offset & 0xfff)) & 0x1fffffff;
 			result = this->space(0).read_dword(paddr, mem_mask); // TODO: unmap lines in the bus instead?
-			LOGMASKED(LOG_DATA, "(%s) hyperbus_r 0x%08x 0x%08x (pg 0x%08x, pte 0x%08x) -> 0x%08x = 0x%08x\n", machine().describe_context(), offset, mem_mask, vpgnum, pte.pte, paddr, result);
+			LOGMASKED(LOG_DATA, "(%s) hyperbus_r (offset 0x%08x, mask 0x%08x, pg 0x%08x, pte 0x%08x, index 0x%08x, %s) -> 0x%08x = 0x%08x\n", machine().describe_context(), offset, mem_mask, vpgnum, pte.pte, map_index, mode(is_supervisor), paddr, result);
 		}
 	}
 
@@ -223,52 +237,53 @@ void news_020_mmu_device::hyperbus_w(offs_t offset, uint32_t data, uint32_t mem_
 		uint32_t vpgnum = (offset & ~0x80000000) >> 12;
 		bool system = offset & 0x80000000; // TODO: is this correct?
 
-		const news_020_pte pte(system ? m_mmu_system_ram[vpgnum % MMU_ENTRY_COUNT] : m_mmu_user_ram[vpgnum % MMU_ENTRY_COUNT]);
-		const uint32_t tag = system ? m_mmu_system_tag_ram[vpgnum % MMU_ENTRY_COUNT] : m_mmu_user_tag_ram[vpgnum % MMU_ENTRY_COUNT];
+		const uint32_t map_index = vpgnum % MMU_ENTRY_COUNT;
+		const news_020_pte pte(system ? m_mmu_system_ram[map_index] : m_mmu_user_ram[map_index]);
+		const uint32_t tag = system ? m_mmu_system_tag_ram[map_index] : m_mmu_user_tag_ram[map_index];
+
 		if (!pte.valid() && !pte.fill_on_demand())
 		{
-			LOGMASKED(LOG_MAP_ERROR, "(%s) mmu w 0x%08x (pg 0x%08x) -> invalid page (page % 400 = 0x%x, data = 0x%x pte = 0x%x) as supervisior? %d\n", machine().describe_context(), offset, vpgnum, vpgnum % MMU_ENTRY_COUNT, data, pte.pte, is_supervisor);
+			LOGMASKED(LOG_MAP_ERROR, "(%s) hyperbus_w (offset 0x%08x, data 0x%08x, mask 0x%08x, pg 0x%08x, pte 0x%08x, index 0x%08x, %s) -> invalid page\n", machine().describe_context(), offset, data, mem_mask, vpgnum, pte.pte, map_index, mode(is_supervisor));
 			m_bus_error(offset, mem_mask, true, INVALID_ENTRY); // should M be set here too?
 		}
 		else if (tag != vpgnum)
 		{
 			// TODO: update below log message
-			LOGMASKED(LOG_MAP_ERROR, "(%s) mmu w 0x%08x (pg 0x%08x) -> tag mismatch 0x%x != 0x%x\n", machine().describe_context(), offset, vpgnum, vpgnum % MMU_ENTRY_COUNT, tag, vpgnum);
+			LOGMASKED(LOG_MAP_ERROR, "(%s) hyperbus_w (offset 0x%08x, data 0x%08x, mask 0x%08x, pg 0x%08x, pte 0x%08x, index 0x%08x, %s) -> tag mismatch 0x%x != 0x%x\n", machine().describe_context(), offset, data, mem_mask, vpgnum, pte.pte, map_index, mode(is_supervisor), tag, vpgnum);
 			m_bus_error(offset, mem_mask, true, TAG_MISMATCH); // should M be set here too?
 		}
 		else if (!is_supervisor && !pte.user_writable()) // user memory protection violation
 		{
-			LOGMASKED(LOG_MAP_ERROR, "(%s) mmu w 0x%08x (pg 0x%08x, pte 0x%08x, index 0x%x) user protection violation\n", machine().describe_context(), offset, vpgnum, pte.pte, (vpgnum % MMU_ENTRY_COUNT) + (system ? MMU_ENTRY_COUNT : 0x0));
+			LOGMASKED(LOG_MAP_ERROR, "(%s) hyperbus_w (offset 0x%08x, data 0x%08x, mask 0x%08x, pg 0x%08x, pte 0x%08x, index 0x%08x, %s) -> user protection violation\n", machine().describe_context(), offset, data, mem_mask, vpgnum, pte.pte, map_index, mode(is_supervisor));
 			m_bus_error(offset, mem_mask, true, PROTECTION_VIOLATION);
 		}
 		else if (is_supervisor && !pte.kernel_writable()) // kernel memory protection violation
 		{
-			LOGMASKED(LOG_MAP_ERROR, "(%s) mmu w 0x%08x (pg 0x%08x, pte 0x%08x, index 0x%x) kernel protection violation\n", machine().describe_context(), offset, vpgnum, pte.pte, (vpgnum % MMU_ENTRY_COUNT) + (system ? MMU_ENTRY_COUNT : 0x0));
+			LOGMASKED(LOG_MAP_ERROR, "(%s) hyperbus_w (offset 0x%08x, data 0x%08x, mask 0x%08x, pg 0x%08x, pte 0x%08x, index 0x%08x, %s) -> kernel protection violation\n", machine().describe_context(), offset, data, mem_mask, vpgnum, pte.pte, map_index, mode(is_supervisor));
 			m_bus_error(offset, mem_mask, true, PROTECTION_VIOLATION);
 		}
 		else if (pte.writeable())
 		{
 			if (!pte.valid() && pte.fill_on_demand())
 			{
-				LOGMASKED(LOG_DATA, "(%s) fill on demand page write addr = 0x%x pte = 0x%x\n", machine().describe_context(), offset, pte.pte);
+				LOGMASKED(LOG_DATA, "(%s) hyperbus_w (offset 0x%08x, data 0x%08x, mask 0x%08x, pg 0x%08x, pte 0x%08x, index 0x%08x, %s) -> fill on demand page write\n", machine().describe_context(), offset, data, mem_mask, vpgnum, pte.pte, map_index, mode(is_supervisor));
 				m_bus_error(offset, mem_mask, true, INVALID_ENTRY); // 0x2 (first M?) or 0x10 (invalid page)?
 			}
 			else
 			{
 				uint32_t paddr = ((pte.pfnum() << 12) + (offset & 0xfff)) & 0x1fffffff;
-				LOGMASKED(LOG_DATA, "(%s) mmu w 0x%08x (pg 0x%08x) -> 0x%08x = 0x%08x\n", machine().describe_context(), offset, vpgnum, paddr, data);
+				LOGMASKED(LOG_DATA, "(%s) hyperbus_w (offset 0x%08x, data 0x%08x, mask 0x%08x, pg 0x%08x, pte 0x%08x, index 0x%08x, %s) -> 0x%08x = 0x%08x%s\n", machine().describe_context(), offset, data, mem_mask, vpgnum, pte.pte, map_index, mode(is_supervisor), paddr, data, pte.modified() ? " (newly modified page)" : "");
 				this->space(0).write_dword(paddr, data, mem_mask); // TODO: fix 1f stuff
 
 				if (!pte.modified())
 				{
-					LOGMASKED(LOG_DATA, "(%s) write to unmodified page 0x%x!\n", machine().describe_context(), vpgnum);
 					if (system)
 					{
-						m_mmu_system_ram[vpgnum % MMU_ENTRY_COUNT] |= 0x04000000;
+						m_mmu_system_ram[map_index] |= ENTRY_MODIFIED_MASK;
 					}
 					else
 					{
-						m_mmu_user_ram[vpgnum % MMU_ENTRY_COUNT] |= 0x04000000;
+						m_mmu_user_ram[map_index] |= ENTRY_MODIFIED_MASK;
 					}
 					m_bus_error(offset, mem_mask, true, MODIFIED);
 				}
@@ -276,7 +291,7 @@ void news_020_mmu_device::hyperbus_w(offs_t offset, uint32_t data, uint32_t mem_
 		}
 		else
 		{
-			LOGMASKED(LOG_MAP_ERROR, "(%s) write to read-only page 0x%x because it was not set as writable (pte = 0x%x)\n", machine().describe_context(), vpgnum, pte.pte);
+			LOGMASKED(LOG_MAP_ERROR, "(%s) hyperbus_w (offset 0x%08x, data 0x%08x, mask 0x%08x, data 0x%08x, pg 0x%08x, pte 0x%08x, index 0x%08x, %s) -> attempted write to read-only page\n", machine().describe_context(), offset, data, mem_mask, vpgnum, pte.pte, map_index, mode(is_supervisor));
 			m_bus_error(offset, mem_mask, true, PROTECTION_VIOLATION);
 		}
 	}
