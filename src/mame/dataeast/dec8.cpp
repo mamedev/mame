@@ -1980,7 +1980,7 @@ void lastmisn_state::lastmisn(machine_config &config)
 	m_mcu->port_out_cb<2>().set(FUNC(lastmisn_state::mcu_to_main_w));
 	m_mcu->port_in_cb<3>().set_ioport("COIN");
 
-	config.set_maximum_quantum(attotime::from_hz(12000));
+	config.set_perfect_quantum(m_mcu);
 
 	INPUT_MERGER_ANY_LOW(config, "coin").output_handler().set(FUNC(lastmisn_state::shackled_coin_irq));
 
@@ -2097,7 +2097,7 @@ void gondo_state::gondo(machine_config &config)
 	m_mcu->port_out_cb<2>().set(FUNC(gondo_state::mcu_to_main_w));
 	m_mcu->port_in_cb<3>().set_ioport("COIN");
 
-	config.set_maximum_quantum(attotime::from_hz(6000));
+	config.set_perfect_quantum(m_mcu);
 
 	// video hardware
 	BUFFERED_SPRITERAM8(config, m_spriteram);
@@ -2155,7 +2155,7 @@ void ghostb_state::garyoret(machine_config &config)
 	m_mcu->port_out_cb<2>().set(FUNC(ghostb_state::mcu_to_main_w));
 	m_mcu->port_in_cb<3>().set_ioport("COIN");
 
-	config.set_maximum_quantum(attotime::from_hz(6000));
+	config.set_perfect_quantum(m_mcu);
 
 	// video hardware
 	BUFFERED_SPRITERAM8(config, m_spriteram);
@@ -2214,7 +2214,7 @@ void ghostb_state::ghostb(machine_config &config)
 	m_mcu->port_out_cb<2>().set(FUNC(ghostb_state::mcu_to_main_w));
 	m_mcu->port_in_cb<3>().set_ioport("COIN");
 
-	config.set_maximum_quantum(attotime::from_hz(6000));
+	config.set_perfect_quantum(m_mcu);
 
 	// video hardware
 	BUFFERED_SPRITERAM8(config, m_spriteram);
@@ -2280,7 +2280,7 @@ void csilver_state::csilver(machine_config &config)
 	R65C02(config, m_audiocpu, 12_MHz_XTAL / 8); // verified on pcb
 	m_audiocpu->set_addrmap(AS_PROGRAM, &csilver_state::sound_map); // NMIs are caused by the main CPU
 
-	config.set_maximum_quantum(attotime::from_hz(6000));
+	config.set_perfect_quantum(m_mcu);
 
 	I8751(config, m_mcu, 8_MHz_XTAL);
 	m_mcu->port_in_cb<0>().set(FUNC(csilver_state::i8751_port0_r));
@@ -2290,7 +2290,7 @@ void csilver_state::csilver(machine_config &config)
 	m_mcu->port_out_cb<2>().set(FUNC(csilver_state::mcu_to_main_w));
 	m_mcu->port_in_cb<3>().set_ioport("COIN");
 
-	config.set_perfect_quantum(m_maincpu);
+	config.set_perfect_quantum(m_mcu);
 
 	// video hardware
 	BUFFERED_SPRITERAM8(config, m_spriteram);
@@ -2410,7 +2410,7 @@ void srdarwin_state::srdarwin(machine_config &config)
 	m_mcu->port_out_cb<2>().set(FUNC(srdarwin_state::mcu_to_main_w));
 	m_mcu->port_in_cb<3>().set_ioport("COIN");
 
-	config.set_perfect_quantum(m_maincpu); // needed for stability with emulated MCU or sometimes commands get missed and game crashes at bosses
+	config.set_perfect_quantum(m_mcu);
 
 	// video hardware
 	BUFFERED_SPRITERAM8(config, m_spriteram);
