@@ -10317,6 +10317,36 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="valdisc" supported="partial">
+		<!--
+		Origin: Redump
+		http://redump.org/disc/88153/
+		-->
+		<description>Validation Disc (Version 1.0)</description>
+		<!-- '89 for disc 1, '90 for disc 2 -->
+		<year>1990</year>
+		<publisher>Philips / Sony</publisher>
+		<notes><![CDATA[
+Disc 1 is Philips and Microwave (video tests), Disc 2 is Sony (sound tests)
+RGB and DYUV scroll tests draws GFX garbage
+https://github.com/mamedev/mame/issues/12852#issuecomment-2600790374
+Exit tests will just hang to cyan screen
+Other stuff in between
+]]></notes>
+		<!-- ring code VALDISC.CD 2899 559 01$, CD front print has sticker overlay -->
+		<part name="cdrom1" interface="cdi_cdrom">
+			<diskarea name="cdrom">
+				<disk name="validation disc (europe) (disc 1)" sha1="22849106cf51975e36366cd6caeeba9bb8cee8aa"/>
+			</diskarea>
+		</part>
+		<!-- serial/ring code TDCD-90011 -->
+		<part name="cdrom2" interface="cdi_cdrom">
+			<diskarea name="cdrom">
+				<disk name="validation disc (japan) (disc 2)" sha1="daeb82a2f563e8a8fda89c8ddc76f4a79644ad34"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="verhalmv">
 		<!--
 		Origin: TOSEC
