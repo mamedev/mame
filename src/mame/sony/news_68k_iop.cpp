@@ -334,18 +334,19 @@ namespace
 
         m_mmu->space(0).install_ram(0x0, m_ram->mask(), m_ram->pointer());
 
-        m_iop_intst = 0;
-        m_cpu_intst = 0;
-        m_iop_inten = 0;
-        m_cpu_inten = 0;
-        m_cpu_bus_error = false;
-        m_last_berr_pc_cpu = 0;
-        m_cpu_bus_error_status = 0;
-        m_panel_clear = false;
-        m_panel_shift = false;
-        m_sw1_first_read = 0;
-        m_panel_shift_count = 0;
-        m_rtc_data = 0;
+        // Save state support
+        save_item(NAME(m_iop_intst));
+        save_item(NAME(m_cpu_intst));
+        save_item(NAME(m_iop_inten));
+        save_item(NAME(m_cpu_inten));
+        save_item(NAME(m_cpu_bus_error));
+        save_item(NAME(m_last_berr_pc_cpu));
+        save_item(NAME(m_cpu_bus_error_status));
+        save_item(NAME(m_panel_clear));
+        save_item(NAME(m_panel_shift));
+        save_item(NAME(m_sw1_first_read));
+        save_item(NAME(m_panel_shift_count));
+        save_item(NAME(m_rtc_data));
     }
 
     void news_iop_state::interval_timer_tick(uint8_t data)
@@ -533,7 +534,7 @@ namespace
             break;
 
         default:
-            fatalerror("scsi_drq_w: unknown mem_mask %08x\n", mem_mask);
+            fatalerror("scsi_dma_w: unknown mem_mask %08x\n", mem_mask);
             break;
         }
     }
