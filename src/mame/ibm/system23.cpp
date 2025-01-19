@@ -12,9 +12,9 @@
 #include "machine/pic8259.h"
 #include "video/i8275.h"
 #include "machine/ram.h"
-#include "sound/beep.h"
 #include "screen.h"
 #include "speaker.h"
+#include "sound/spkrdev.h"
 #include "logmacro.h"
 
 #include "ibmsystem23.lh"
@@ -38,14 +38,15 @@ namespace
 				m_usart(*this, "usart"),
 				m_chargen(*this, "chargen"),
 				m_ram(*this, RAM_TAG),
-				m_paged_ram(*this, "paged_ram"),
+				m_ram_bank_r(*this, "ram_bank_read"),
+				m_ram_bank_w(*this, "ram_bank_write"),
+				//m_ram_bank_dma(*this, "ram_bank_dma"),
 				m_screen(*this, "screen"),
-				m_beep(*this, "beeper"),
+				m_speaker(*this,"beeper"),
 				m_language(*this,"lang"),
 				m_cedip(*this,"ce"),
 				m_j1(*this,"j1"),
 				m_diag_digits(*this, "digit%u", 0U)
-
 			{
 
 			}
@@ -69,9 +70,11 @@ namespace
 			required_device<i8251_device> m_usart;
 			required_region_ptr<uint8_t> m_chargen;
 			required_device<ram_device> m_ram;
-			required_device<ram_device> m_paged_ram;
+			required_memory_bank m_ram_bank_r;
+			required_memory_bank m_ram_bank_w;
+			//required_memory_bank m_ram_bank_dma;
 			required_device<screen_device> m_screen;
-			required_device<beep_device> m_beep;
+			required_device<speaker_sound_device> m_speaker;
 			required_ioport m_language;
 			required_ioport m_cedip;
 			required_ioport m_j1;
@@ -91,14 +94,23 @@ namespace
 			uint8_t m_ram_w_page;
 			uint8_t m_dma_page;
 
+			uint8_t m_port_4e;
+
+			//uint8_t ram_r(offs_t offset);
+			//void ram_w(offs_t offset, uint8_t data);
+			uint8_t *m_ram_ptr;
+			uint32_t m_ram_size;
+
 			void diag_digits_w(uint8_t data);
+
+			void port_4e_w(uint8_t data);
+			uint8_t port_4e_r();
 
 			void cpu_test_register_w(uint8_t data);
 			uint8_t cpu_test_register_r();
 
 			uint8_t memory_settings_r();
 
-			void sod_w(int state);
 			int sid_r();
 
 			uint8_t dmac_mem_r(offs_t offset);
@@ -111,6 +123,10 @@ namespace
 			uint8_t crtc_test_vars_r();
 			void hrtc_r(uint8_t data);
 			void vrtc_r(uint8_t data);
+
+			void update_speaker(uint32_t state);
+			void rst75(uint32_t state);
+			void rst55(uint32_t state);
 
 			uint8_t ros_page_r();
 			void ros_page_w(uint8_t data);
@@ -149,7 +165,7 @@ namespace
 
 	uint8_t system23_state::memory_settings_r()
 	{
-		return 0;	//Patch to make the memory test work while port 2e is being studied
+		return 0;//return 0;	//Patch to make the memory test work while port 2e is being studied
 	}
 
 	//This routine deals with the SID signal being read. The CPU test fails if the line is not asserted high
@@ -157,13 +173,6 @@ namespace
 	int system23_state::sid_r()
 	{
 		return ASSERT_LINE; // Actually, SID is tied to VCC at the motherboard
-	}
-
-	//This routine deals with the SOD signal being written. As of writting this comment there is no known purpose for SOD
-
-	void system23_state::sod_w(int state)
-	{
-		// At this point, it is unknown what SOD is attached to
 	}
 
 	//Those routines deal with the DMA controller accesses to memory and I/O devices
@@ -205,7 +214,7 @@ namespace
 		//if (BIT(attrcode, GPA0) || BIT(attrcode, GPA1)) printf("GPA0: %u GPA1: %u\n", BIT(attrcode, GPA0), BIT(attrcode, GPA1));
 		if (BIT(attrcode, GPA0) && BIT(attrcode, GPA1) && !lpen_ct)
 		{
-			LOG("Sytem/23: Light pen asserted\n");
+			//LOG("Sytem/23: Light pen asserted\n");
 			lpen_ct = 1;
 		}
 		else if(lpen_ct == 1)
@@ -256,7 +265,8 @@ namespace
 
 	void system23_state::ros_page_w(uint8_t data)
 	{
-		m_ros_page = data;
+		LOG("ROS page: %x\n", data);
+		m_ros_page = data | 0xf0;
 		m_ros->set_entry(data & 0xf);
 	}
 
@@ -268,7 +278,9 @@ namespace
 
 	void system23_state::ram_read_page_w(uint8_t data)
 	{
-		m_ram_r_page = data;
+		LOG("RAM read page: %x\n",data);
+		m_ram_r_page = data | 0xf0;
+		m_ram_bank_r->set_entry(data & 0xf);
 	}
 
 	uint8_t system23_state::ram_write_page_r()
@@ -278,7 +290,9 @@ namespace
 
 	void system23_state::ram_write_page_w(uint8_t data)
 	{
-		m_ram_w_page = data;
+		LOG("RAM write page: %x\n", data);
+		m_ram_w_page = data | 0xf0;
+		m_ram_bank_w->set_entry(data & 0xf);
 	}
 
 	uint8_t system23_state::dma_page_r()
@@ -288,7 +302,37 @@ namespace
 
 	void system23_state::dma_page_w(uint8_t data)
 	{
-		m_dma_page = data;
+		LOG("DMA page: %x\n",data);
+		m_dma_page = data | 0xf0;
+		//m_ram_bank_dma->set_entry(data & 0xf);
+	}
+
+	void system23_state::port_4e_w(uint8_t data)
+	{
+		m_port_4e = data;
+	}
+
+	uint8_t system23_state::port_4e_r()
+	{
+		return m_port_4e;
+	}
+
+	void system23_state::update_speaker(uint32_t state)
+	{
+		uint32_t speaker_state = !(state && !(m_port_4e && 0x01));
+		m_speaker->level_w(speaker_state);
+	}
+
+	void system23_state::rst75(uint32_t state)
+	{
+		LOG("RST7.5\n");
+		m_maincpu->set_input_line(I8085_RST75_LINE, state);
+	}
+
+	void system23_state::rst55(uint32_t state)
+	{
+		LOG("RST5.5\n");
+		m_maincpu->set_input_line(I8085_RST55_LINE, state & m_j1->read());
 	}
 
 	//This routine describes the computer's I/O map
@@ -297,16 +341,16 @@ namespace
 	{
 		map.unmap_value_high();
 		map(0x00, 0x0f).rw(m_dmac, FUNC(i8257_device::read), FUNC(i8257_device::write));
-		map(0x20, 0x20).rw(FUNC(system23_state::ram_read_page_r),FUNC(system23_state::ram_read_page_w));
+		map(0x22, 0x22).rw(FUNC(system23_state::ram_read_page_r),FUNC(system23_state::ram_read_page_w));
 		map(0x21, 0x21).rw(FUNC(system23_state::ram_write_page_r),FUNC(system23_state::ram_write_page_w));
-		map(0x22, 0x22).rw(FUNC(system23_state::dma_page_r),FUNC(system23_state::dma_page_w));
+		map(0x20, 0x20).rw(FUNC(system23_state::dma_page_r),FUNC(system23_state::dma_page_w));
 		map(0x23, 0x23).rw(FUNC(system23_state::ros_page_r),FUNC(system23_state::ros_page_w));
 		map(0x24, 0x27).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 		map(0x28, 0x2b).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 		map(0x2c, 0x2f).rw(m_ppi_settings, FUNC(i8255_device::read), FUNC(i8255_device::write));
 		map(0x40, 0x43).rw(m_ppi_diag, FUNC(i8255_device::read), FUNC(i8255_device::write));
 		map(0x44, 0x45).rw(m_crtc, FUNC(i8275_device::read), FUNC(i8275_device::write));
-		map(0x48,0x49).rw(m_usart, FUNC(i8251_device::read), FUNC(i8251_device::write));
+		map(0x48, 0x49).rw(m_usart, FUNC(i8251_device::read), FUNC(i8251_device::write));
 		map(0x4c, 0x4f).rw(m_ppi_kbd, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	}
 
@@ -318,8 +362,8 @@ namespace
 		map(0x0000, 0x3fff).rom();
 		map(0x4000, 0x7fff).bankr(m_ros);
 		map(0x8000, 0xbfff).ram();
-		map(0xc000, 0xffff).ram();
-
+		map(0xc000, 0xffff).bankr(m_ram_bank_r);
+		map(0xc000, 0xffff).bankw(m_ram_bank_w);
 	}
 
 	//This is the constructor of the class
@@ -330,12 +374,14 @@ namespace
 		m_maincpu->set_addrmap(AS_PROGRAM, &system23_state::system23_mem);
 		m_maincpu->set_addrmap(AS_IO, &system23_state::system23_io);
 		m_maincpu->in_sid_func().set(FUNC(system23_state::sid_r));
-		m_maincpu->out_sod_func().set(FUNC(system23_state::sod_w));
+		//m_maincpu->out_sod_func().set_inputline(m_maincpu, I8085_TRAP_LINE);
 
 		I8255(config, m_ppi_kbd);
 		m_ppi_kbd->in_pa_callback().set(FUNC(system23_state::cpu_test_register_r));
 		m_ppi_kbd->out_pa_callback().set(FUNC(system23_state::cpu_test_register_w));
 		m_ppi_kbd->in_pb_callback().set(FUNC(system23_state::crtc_test_vars_r));
+		m_ppi_kbd->in_pc_callback().set(FUNC(system23_state::port_4e_r));
+		m_ppi_kbd->out_pc_callback().set(FUNC(system23_state::port_4e_w));
 
 		I8255(config, m_ppi_diag);
 		m_ppi_diag->out_pb_callback().set(FUNC(system23_state::diag_digits_w));
@@ -360,32 +406,33 @@ namespace
 		m_crtc->set_screen(m_screen);
 		m_crtc->set_display_callback(FUNC(system23_state::display_pixels));
 		m_crtc->drq_wr_callback().set(m_dmac, FUNC(i8257_device::dreq2_w));
-		//m_crtc->irq_wr_callback().set_inputline(m_maincpu, I8085_RST55_LINE); // Only when jumper J1 is bridged
+		m_crtc->irq_wr_callback().set(FUNC(system23_state::rst55));
 		m_crtc->hrtc_wr_callback().set(FUNC(system23_state::hrtc_r));
 		m_crtc->vrtc_wr_callback().set(FUNC(system23_state::vrtc_r));
 
 		I8251(config, m_usart, 0);
 		SPEAKER(config, "mono").front_center();
-		BEEP(config, m_beep, 1000).add_route(ALL_OUTPUTS, "mono", 0.50);
+		SPEAKER_SOUND(config, m_speaker);
+		m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 		PIT8253(config, m_pit, 0);
-		m_pit->set_clk<0>(18'432'000 / 6);
-		m_pit->set_clk<1>(18'432'000 / 6);
+		m_pit->set_clk<0>(18'432'000 / 12);
+		m_pit->set_clk<1>(18'432'000 / 12);
 		m_pit->set_clk<2>(18'432'000 / 6);
-		//m_pit->out_handler<0>().set(m_usart, FUNC(i8251_device::clock));
-		//m_pit->out_handler<1>().set(FUNC(system23_state::update_beeper));
-		m_pit->out_handler<2>().set_inputline(m_maincpu, I8085_RST75_LINE);
+		m_pit->out_handler<0>().set(m_usart, FUNC(i8251_device::write_txc));
+		m_pit->out_handler<1>().set(FUNC(system23_state::update_speaker));
+		m_pit->out_handler<2>().set(FUNC(system23_state::rst75));
 
 		PIC8259(config, m_pic, 0);
-		//m_maincpu->set_irq_acknowledge_callback(m_pic, pic8259_device::inta_cb);
+		m_maincpu->set_irq_acknowledge_callback(m_pic, FUNC(pic8259_device::inta_cb));
+		m_usart->rxrdy_handler().set(m_pic, FUNC(pic8259_device::ir1_w));
+		m_usart->txrdy_handler().set(m_pic, FUNC(pic8259_device::ir2_w));
 
-
-
-		RAM(config, m_ram).set_default_size("16k");
-		RAM(config, m_paged_ram).set_default_size("16k").set_extra_options("16k,48k,96k");
+		RAM(config, m_ram).set_default_size("128k");
 
 		config.set_perfect_quantum(m_maincpu);
 		config.set_default_layout(layout_ibmsystem23);
+
 
 
 	}
@@ -394,12 +441,16 @@ namespace
 	{
 		m_diag_digits.resolve();
 		m_ros->configure_entries(0, 16, memregion("maincpu")->base() + 0x4000, 0x4000);
+		m_ram_ptr = m_ram->pointer();
+		m_ram_size = m_ram->size();
+		m_ram_bank_r->configure_entries(0, 16, m_ram->pointer() + 0x4000, 0x4000);
+		m_ram_bank_w->configure_entries(0, 16, m_ram->pointer() + 0x4000, 0x4000);
+		//m_ram_bank_dma->configure_entries(0, 16, m_ram->pointer() + 0x4000, 0x4000);
 	}
 
 	void system23_state::machine_reset()
 	{
-		m_beep->set_state(1);
-		m_beep->set_clock(0);
+
 	}
 
 	static INPUT_PORTS_START(system23)
@@ -409,28 +460,28 @@ namespace
 			PORT_DIPSETTING(    0x01, DEF_STR( On ))
 
 		PORT_START("ce")
-			PORT_DIPNAME( 0x01, 0x00, "A1")
+			PORT_DIPNAME( 0x01, 0x00, "RAM Base installed")
 			PORT_DIPSETTING(    0x01, DEF_STR( Off ))
 			PORT_DIPSETTING(    0x00, DEF_STR( On ))
-			PORT_DIPNAME( 0x02, 0x00, "A2")
+			PORT_DIPNAME( 0x02, 0x00, "RAM Expansion installed")
 			PORT_DIPSETTING(    0x02, DEF_STR( Off ))
 			PORT_DIPSETTING(    0x00, DEF_STR( On ))
-			PORT_DIPNAME( 0x04, 0x00, "A3")
+			PORT_DIPNAME( 0x04, 0x00, "RAM Base 32/64KB")
 			PORT_DIPSETTING(    0x04, DEF_STR( Off ))
 			PORT_DIPSETTING(    0x00, DEF_STR( On ))
-			PORT_DIPNAME( 0x08, 0x00, "A4")
+			PORT_DIPNAME( 0x08, 0x00, "RAM Expansion 32/64KB")
 			PORT_DIPSETTING(    0x08, DEF_STR( Off ))
 			PORT_DIPSETTING(    0x00, DEF_STR( On ))
-			PORT_DIPNAME( 0x10, 0x00, "A5")
+			PORT_DIPNAME( 0x10, 0x00, "A1 - CE Loop on test")
 			PORT_DIPSETTING(    0x10, DEF_STR( Off ))
 			PORT_DIPSETTING(    0x00, DEF_STR( On ))
-			PORT_DIPNAME( 0x20, 0x00, "A6")
+			PORT_DIPNAME( 0x20, 0x00, "A2 - CE Stop on error")
 			PORT_DIPSETTING(    0x20, DEF_STR( Off ))
 			PORT_DIPSETTING(    0x00, DEF_STR( On ))
-			PORT_DIPNAME( 0x40, 0x00, "A7")//Needs to be closed in order for the PIT to be detected!
+			PORT_DIPNAME( 0x40, 0x00, "A3 - Machine update card installed")
 			PORT_DIPSETTING(    0x40, DEF_STR( Off ))
 			PORT_DIPSETTING(    0x00, DEF_STR( On ))
-			PORT_DIPNAME( 0x80, 0x00, "A8")
+			PORT_DIPNAME( 0x80, 0x00, "A4")
 			PORT_DIPSETTING(    0x80, DEF_STR( Off ))
 			PORT_DIPSETTING(    0x00, DEF_STR( On ))
 
@@ -449,6 +500,15 @@ namespace
 			PORT_DIPSETTING(    0x00, DEF_STR( On ))
 			PORT_DIPNAME( 0x10, 0x00, "B5")
 			PORT_DIPSETTING(    0x10, DEF_STR( Off ))
+			PORT_DIPSETTING(    0x00, DEF_STR( On ))
+			PORT_DIPNAME( 0x20, 0x00, "B6")
+			PORT_DIPSETTING(    0x20, DEF_STR( Off ))
+			PORT_DIPSETTING(    0x00, DEF_STR( On ))
+			PORT_DIPNAME( 0x40, 0x00, "B7")
+			PORT_DIPSETTING(    0x40, DEF_STR( Off ))
+			PORT_DIPSETTING(    0x00, DEF_STR( On ))
+			PORT_DIPNAME( 0x80, 0x00, "B8")
+			PORT_DIPSETTING(    0x80, DEF_STR( Off ))
 			PORT_DIPSETTING(    0x00, DEF_STR( On ))
 	INPUT_PORTS_END
 
@@ -505,4 +565,4 @@ namespace
 
 }
 
-COMP( 1981, system23, 0,      0,      system23, system23,     system23_state, empty_init, "IBM",   "IBM System/23 Datamaster", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP( 1981, system23, 0,      0,      system23, system23,     system23_state, empty_init, "IBM",   "IBM System/23 Datamaster", MACHINE_NOT_WORKING)
