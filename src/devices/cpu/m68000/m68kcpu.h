@@ -608,7 +608,7 @@ inline u32 m68ki_read_imm_16()
 		m_pref_data = m68ki_ic_readimm16(m_pc);
 		m_pref_addr = m_mmu_tmp_buserror_occurred ? ~0 : m_pc;
 		// ignore bus error on prefetch
-		m_mmu_tmp_buserror_occurred = 0;
+		//AB m_mmu_tmp_buserror_occurred = 0;
 	}
 
 	return result;
