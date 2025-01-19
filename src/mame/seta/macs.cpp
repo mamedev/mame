@@ -499,7 +499,7 @@ uint8_t macs_state::dma_offset()
 void macs_state::macs(machine_config &config)
 {
 	/* basic machine hardware */
-	ST0016_CPU(config, m_maincpu, 8000000); // 8 MHz ?
+	ST0016_CPU(config, m_maincpu, 42.954545_MHz_XTAL / 6); // divider not verified
 	m_maincpu->set_memory_map(&macs_state::macs_mem);
 	m_maincpu->set_io_map(&macs_state::macs_io);
 	m_maincpu->set_dma_offs_callback(FUNC(macs_state::dma_offset));
@@ -522,19 +522,20 @@ void macs_state::macs(machine_config &config)
 	slot_b.set_default_option("rom");
 	slot_b.set_user_loadable(false);
 
-	// TODO: Mono?
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	// confirmed mono
+	SPEAKER(config, "speaker").front_center();
 
-	m_maincpu->add_route(0, "lspeaker", 1.0);
-	m_maincpu->add_route(1, "rspeaker", 1.0);
+	m_maincpu->add_route(0, "speaker", 1.0);
 }
 
 
 #define MACS_BIOS \
 	ROM_REGION( 0x1000000, "bios", 0 ) \
-	ROM_LOAD16_BYTE( "macsos_l.u43", 0x00000, 0x80000, CRC(0b5aed5e) SHA1(042e705017ee34656e2c6af45825bb2dd3447747) ) \
-	ROM_LOAD16_BYTE( "macsos_h.u44", 0x00001, 0x80000, CRC(538b68e4) SHA1(a0534147791e94e726f49451d0e95671ae0a87d5) )
+	ROM_LOAD16_BYTE( "am_macs_os_low.u43", 0x00000, 0x80000, CRC(0b5aed5e) SHA1(042e705017ee34656e2c6af45825bb2dd3447747) ) \
+	ROM_LOAD16_BYTE( "am_macs_os_hi.u44",  0x00001, 0x80000, CRC(538b68e4) SHA1(a0534147791e94e726f49451d0e95671ae0a87d5) ) \
+\
+	ROM_REGION( 0x157, "pld", 0 ) \
+	ROM_LOAD( "sx011-01.bin", 0x000, 0x157, CRC(669096c1) SHA1(36f55a2e4865bdf0506746a4df51bfb1944f905e) ) // GAL20V8B
 
 #define MACS2_BIOS \
 	ROM_REGION( 0x1000000, "bios", 0 ) \
