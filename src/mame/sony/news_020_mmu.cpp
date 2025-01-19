@@ -20,7 +20,7 @@
 #define LOG_DATA (1U << 2)
 #define LOG_MAP_ERROR (1U << 3)
 
-#define VERBOSE (LOG_ENTRY | LOG_MAP_ERROR | LOG_GENERAL)
+// #define VERBOSE (LOG_ENTRY | LOG_MAP_ERROR | LOG_GENERAL)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(NEWS_020_MMU, news_020_mmu_device, "news_020_mmu", "Sony NEWS 68020 MMU")
@@ -230,7 +230,7 @@ void news_020_mmu_device::hyperbus_w(offs_t offset, uint32_t data, uint32_t mem_
 	{
 		this->space(0).write_dword((offset << 2) & 0x1fffffff, data, mem_mask); // TODO: see above about physical address width
 	}
-	else // TODO: other BERR bits
+	else
 	{
 		offset = offset << 2;
 		// Get PTE
