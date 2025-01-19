@@ -32,7 +32,7 @@
  *   - NWS-18xx workstations (2x '030)
  *   - NWS-19xx servers (2x '030)
  *
- * Known NWS-800 Series Base Configurations TODO: check that all of these appear in the model list in the headers
+ * Known NWS-800 Series Base Configurations
  * - NWS-811: Jun 1987, 4MB RAM, no cache, diskless
  * - NWS-820: Jan 1987, 4MB RAM, ?? cache, 86MB HDD
  * - NWS-821: Aug 1987, 4MB RAM, no cache, 156MB HDD
@@ -51,11 +51,12 @@
  *  - https://katsu.watanabe.name/doc/sonynews/model.html
  *
  * TODO:
- *   - Investigate why clean shutdown still causes root part to have to be recovered
  *   - MMU emulation improvements (are all the right status bits set? any missing features? etc)
+ *   - Debug general OS issues - random segfaults when running `ps`, system sometimes fails to shutdown when running `shutdown -x now`, etc.
+ *   - AST (Asynchronous System Trap) emulation details - it is pretty sketchy right now, based mostly off of guesses after researching the 1960's circuit diagram
  *   - System cache emulation
  *   - Expansion slots (I/O Bus and VMEBus)
- *   - Networking is very flaky - XDMCP doesn't work, repeated telnet sessions eventually cause the network stack to hang, etc.
+ *   - Networking is very flaky - XDMCP doesn't work, repeated telnet sessions don't work, sometimes it causes the system to hang, etc.
  *   - Graphics, kbms, and parallel port emulation
  *   - Hyperbus handshake for IOP and CPU accesses. The bus has arbitration circuitry to prevent bus contention when both the CPU and IOP are trying to access the hyperbus (RAM and VME)
  */
