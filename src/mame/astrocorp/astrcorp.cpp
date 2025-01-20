@@ -33,6 +33,7 @@ Year + Game              PCB ID                    CPU                Video     
 04  Speed Master (V1.0)  CS350P003                 scratched          scratched      scratched                                  Encrypted
 05  Monkey Land (AA.13B) M1                        ASTRO V102PX-005?  ASTRO V06      ASTRO F02 2004-05-18                       Encrypted
 05  Monkey Land (AA.21A) M1.1                      ASTRO V102PX-005?  ASTRO V06      ASTRO F02 2004-12-04                       Encrypted
+05  Monkey Land (AA.21C) M1.2                      ASTRO V102PX-005?  ASTRO V07      ASTRO F01 2006-12-17                       Encrypted
 05  Dino Dino            T-3802A                   ASTRO V102PX-010?  ASTRO V05      ASTRO F02 2003-03-12                       Encrypted
 05  Stone Age            L1                        ASTRO V102PX-012?  ASTRO V05(x2)  ASTRO F02 2004-09-04                       Encrypted
 05? Hacher (hack)        M1.2                      ?                  ?              ASTRO F02 2005-02-18                       Encrypted
@@ -68,7 +69,7 @@ TODO:
 - astoneag, dinodino, magibombd, magibombg: exiting from test menu goes haywire (requires a soft-reset with F3).
 - magibombg: needs RE of the CPU code and correct EEPROM.
 - gostopac: stops with 'S4' message during boot. Needs RE of the CPU code and emulation of its peculiarities.
-- monkeyl,a: need RE of the CPU code, inputs and layout. After reset it initializes.
+- monkeyl and clones: need RE of the CPU code, inputs and layout. After reset it initializes.
 - speedmst,a,b: need RE of the CPU code, correct EEPROM. Won't boot right now.
 - cptshark: needs verifying of inputs and layout
 - wwitch: needs correct GFX ROMs loading / decode, RE of the CPU code, inputs, outputs. Currently starts but then freezes.
@@ -304,6 +305,7 @@ public:
 	void magibombd(machine_config &config);
 	void magibombg(machine_config &config);
 	void monkeyl(machine_config &config);
+	void monkeyld(machine_config &config);
 	void speedmst(machine_config &config);
 	void winbingo(machine_config &config);
 	void wwitch(machine_config &config);
@@ -318,6 +320,7 @@ public:
 	void init_magibombg();
 	void init_monkeyl();
 	void init_monkeyla();
+	void init_monkeyld();
 	void init_speedmst();
 	void init_speedmsta();
 	void init_speedmstb();
@@ -1445,6 +1448,12 @@ void zoo_state::monkeyl(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &zoo_state::monkeyl_map);
 }
 
+void zoo_state::monkeyld(machine_config &config)
+{
+	monkeyl(config);
+	TIMER(config.replace(), "scantimer").configure_scanline(FUNC(zoo_state::irq_2_4_scanline_cb), "screen", 0, 1);
+}
+
 void zoo_state::speedmst(machine_config &config)
 {
 	gostop(config);
@@ -2433,8 +2442,84 @@ ROM_START( monkeyla ) // MIN BET 1-XXX, % = LEVELS 1-8
 	ROM_LOAD( "93c46.u10", 0x0000, 0x0080, CRC(28e861d6) SHA1(4faa4d62954fd9a263d24caa6214353a109ec4f1) ) // TODO: factory default
 
 	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
-	ROM_LOAD( "monkeyl_cpucode.key", 0x00, 0x02, NO_DUMP )
+	ROM_LOAD( "monkeyla_cpucode.key", 0x00, 0x02, NO_DUMP )
 ROM_END
+
+ROM_START( monkeylb )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "f29c51001t.u26", 0x00000, 0x20000, CRC(bae5b055) SHA1(742f6aa7b66abdcfe140fb777aecb5388e9f8bdf) )
+	ROM_LOAD16_BYTE( "f29c51001t.u25", 0x00001, 0x20000, CRC(06362b30) SHA1(a73bc2bc217ecae6ed48ec30481f88767058837b) )
+
+	ROM_REGION( 0x1000000, "sprites", 0 )
+	ROM_LOAD( "mx29f1610mc.u26", 0x000000, 0x200000, CRC(1ec8b75d) SHA1(53f501126c81bdc8ccd8c44ed9f82078156c48ff) ) // the "U26" marking is present twice (should have been U31?)
+	ROM_LOAD( "mx29f1610mc.u30", 0x200000, 0x200000, CRC(9d26fa05) SHA1(571f5515411e504bf7661b8b5d358dc6c55e6fbe) )
+	ROM_RELOAD(      0x400000, 0x200000 )
+	ROM_RELOAD(      0x600000, 0x200000 )
+	ROM_RELOAD(      0x800000, 0x200000 )
+	ROM_RELOAD(      0xa00000, 0x200000 )
+	ROM_RELOAD(      0xc00000, 0x200000 )
+	ROM_RELOAD(      0xe00000, 0x200000 )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "5_m.l._e1.0.u33", 0x00000, 0x80000, CRC(62122100) SHA1(519df7825ab62f0648192e6b1760dd9cc5ec7f9f) )
+
+	ROM_REGION16_LE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46.u10", 0x0000, 0x0080, CRC(eab965cc) SHA1(258358c89faaf643b526d1014946e14567cba88d) ) // TODO: factory default
+
+	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
+	ROM_LOAD( "monkeylb_cpucode.key", 0x00, 0x02, NO_DUMP )
+ROM_END
+
+ROM_START( monkeylc )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "1_m.l._aa.21.c.u26", 0x00000, 0x20000, CRC(482303fd) SHA1(494df379dd4436546e2ce03194ac2f214a91bd92) ) // F29C51001T
+	ROM_LOAD16_BYTE( "1_m.l._aa.21.c.u25", 0x00001, 0x20000, CRC(ccb3392e) SHA1(2ea301ae857f4360012f3adfc96b66319503a033) ) // F29C51001T
+
+	ROM_REGION( 0x1000000, "sprites", 0 )
+	ROM_LOAD( "mx29f1610mc.u26", 0x000000, 0x200000, CRC(1ec8b75d) SHA1(53f501126c81bdc8ccd8c44ed9f82078156c48ff) ) // the "U26" marking is present twice (should have been U31?)
+	ROM_LOAD( "mx29f1610mc.u30", 0x200000, 0x200000, CRC(9d26fa05) SHA1(571f5515411e504bf7661b8b5d358dc6c55e6fbe) )
+	ROM_RELOAD(      0x400000, 0x200000 )
+	ROM_RELOAD(      0x600000, 0x200000 )
+	ROM_RELOAD(      0x800000, 0x200000 )
+	ROM_RELOAD(      0xa00000, 0x200000 )
+	ROM_RELOAD(      0xc00000, 0x200000 )
+	ROM_RELOAD(      0xe00000, 0x200000 )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "5_monkey_land.u33", 0x00000, 0x80000, CRC(62122100) SHA1(519df7825ab62f0648192e6b1760dd9cc5ec7f9f) )
+
+	ROM_REGION16_LE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46.u10", 0x0000, 0x0080, CRC(eab965cc) SHA1(258358c89faaf643b526d1014946e14567cba88d) ) // TODO: factory default
+
+	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
+	ROM_LOAD( "monkeylc_cpucode.key", 0x00, 0x02, NO_DUMP )
+ROM_END
+
+ROM_START( monkeyld )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "w27e010.u20", 0x00000, 0x20000, CRC(4a5c78bc) SHA1(e310605ee102eee706c9e672ca722fa5c6163f39) )
+	ROM_LOAD16_BYTE( "w27e010.u19", 0x00001, 0x20000, CRC(ac37c3be) SHA1(489d4aafdd3228b096988090da9b712a9c08b74c) )
+
+	ROM_REGION( 0x1000000, "sprites", 0 ) // not dumped for this set
+	ROM_LOAD( "mx29f1610mc.u26", 0x000000, 0x200000, BAD_DUMP CRC(1ec8b75d) SHA1(53f501126c81bdc8ccd8c44ed9f82078156c48ff) )
+	ROM_LOAD( "mx29f1610mc.u30", 0x200000, 0x200000, BAD_DUMP CRC(9d26fa05) SHA1(571f5515411e504bf7661b8b5d358dc6c55e6fbe) )
+	ROM_RELOAD(      0x400000, 0x200000 )
+	ROM_RELOAD(      0x600000, 0x200000 )
+	ROM_RELOAD(      0x800000, 0x200000 )
+	ROM_RELOAD(      0xa00000, 0x200000 )
+	ROM_RELOAD(      0xc00000, 0x200000 )
+	ROM_RELOAD(      0xe00000, 0x200000 )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "mx27c4000.rom5", 0x00000, 0x80000, CRC(10971c7f) SHA1(9de24e1585c1505dd07679dcb4eed94972fb09b7) )
+
+	ROM_REGION16_LE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46.u10", 0x0000, 0x0080, CRC(eab965cc) SHA1(258358c89faaf643b526d1014946e14567cba88d) ) // TODO: factory default
+
+	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
+	ROM_LOAD( "monkeyld_cpucode.key", 0x00, 0x02, NO_DUMP )
+ROM_END
+
 
 /***************************************************************************
 
@@ -3042,6 +3127,22 @@ void zoo_state::init_monkeyla()
 #endif
 }
 
+void zoo_state::init_monkeyld()
+{
+	decrypt_rom(v102_px005_table);
+#if 1
+	// TODO: There's more stuff happening for addresses < 0x400...
+	// override reset vector for now
+	u16 * const rom = (u16 *)memregion("maincpu")->base();
+	rom[0x00004/2] = 0x0000;
+	rom[0x00006/2] = 0x0468;
+
+	rom[0x00400/2] = 0x4e75; // overlay!?
+
+	rom[0x01334/2] = 0x4e75; // Mirror ROM word checksum (it expects 0)
+#endif
+}
+
 void zoo_state::init_speedmst()
 {
 	decrypt_rom(v102_px005_table);
@@ -3267,6 +3368,9 @@ GAMEL( 2005,  dinodino,  0,        dinodino,  dinodino,  zoo_state,       init_d
 GAMEL( 2005,  astoneag,  0,        astoneag,  astoneag,  astoneag_state,  init_astoneag,  ROT0, "Astro Corp.", "Stone Age (Astro, Ver. EN.03.A, 2005/02/21)",   MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION, layout_astoneag  )
 GAME(  2005,  monkeyl,   0,        monkeyl,   magibombd, zoo_state,       init_monkeyl,   ROT0, "Astro Corp.", "Monkey Land (Ver. AA.21.A)",                    MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 18/02/2005 15:47
 GAME(  2004,  monkeyla,  monkeyl,  monkeyl,   magibombd, zoo_state,       init_monkeyla,  ROT0, "Astro Corp.", "Monkey Land (Ver. AA.13.B)",                    MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 23/04/2004 14:57
+GAME(  2005,  monkeylb,  monkeyl,  monkeyl,   magibombd, zoo_state,       init_monkeyl,   ROT0, "Astro Corp.", "Monkey Land (Ver. AA.21.B)",                    MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 25/05/2005 11:18
+GAME(  2007,  monkeylc,  monkeyl,  monkeyl,   magibombd, zoo_state,       init_monkeyl,   ROT0, "Astro Corp.", "Monkey Land (Ver. AA.21.C)",                    MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 05/03/2007 10:40
+GAME(  2003,  monkeyld,  monkeyl,  monkeyld,  magibombg, zoo_state,       init_monkeyld,  ROT0, "Astro Corp.", "Monkey Land (Ver. A1.2)",                       MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 122303S
 GAMEL( 2005,  magibombd, magibomb, magibombd, magibombd, zoo_state,       init_magibombd, ROT0, "Astro Corp.", "Magic Bomb (Ver. AA.72.D, 14/11/05)",           MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibombb ) // 15/11/05 09:31
 GAMEL( 2005,  magibombj, magibomb, magibombd, magibombd, zoo_state,       init_magibombd, ROT0, "Astro Corp.", "Magic Bomb (Ver. AA.72.C, 25/05/05)",           MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibombb ) // 25/05/05 11:26
 GAMEL( 2004,  magibombg, magibomb, magibombg, magibombg, zoo_state,       init_magibombg, ROT0, "Astro Corp.", "Magic Bomb (Ver. NB6.1, 26/04/04)",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibomb  ) // 26/04/04. Undumped sprite ROM
