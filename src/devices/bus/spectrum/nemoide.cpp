@@ -53,10 +53,10 @@ void nemoide_device::ata_w(offs_t offset, u8 data)
 
 void nemoide_device::map_io(address_map &map)
 {
-	map(0x00011, 0x00011).mirror(0xff00).lrw8(NAME([this]() { return m_ata_data_latch; })
+	map(0x0011, 0x0011).mirror(0xff00).lrw8(NAME([this]() { return m_ata_data_latch; })
 		, NAME([this](offs_t offset, u8 data) { m_ata_data_latch = data; }));
-	map(0x00010, 0x00010).select(0xffe0).rw(FUNC(nemoide_device::ata_r), FUNC(nemoide_device::ata_w));
-	map(0x000c8, 0x000c8).mirror(0xff00).lrw8(NAME([this]() { return m_ata->cs1_r(6); })
+	map(0x0010, 0x0010).select(0xffe0).rw(FUNC(nemoide_device::ata_r), FUNC(nemoide_device::ata_w));
+	map(0x00c8, 0x00c8).mirror(0xff00).lrw8(NAME([this]() { return m_ata->cs1_r(6); })
 		, NAME([this](offs_t offset, u8 data) { m_ata->cs1_w(6, data); }));
 }
 
@@ -75,7 +75,7 @@ void nemoide_device::device_start()
 {
 	save_item(NAME(m_ata_data_latch));
 
-	m_zxbus->install_device(0x00000, 0x1ffff, *this, &nemoide_device::map_io);
+	m_zxbus->install_device(0x0000, 0xffff, *this, &nemoide_device::map_io);
 }
 
 } // anonymous namespace
