@@ -15,12 +15,29 @@ TODO:
 The IBM ThinkPad 600 series was a series of notebook computers introduced in 1998 by IBM as an lighter and
 slimmer alternative to the 770 series. Three models were produced, the 600, 600E, and 600X.
 
+Hardware for the 600X model.
+  Main PCB:
+    -Intel Pentium III 650 Mobile MMC-2 (PMM65002101AB).
+       There were options for Pentium III at either 450 MHz, 500 MHz, or 650 MHz.
+    -Intel PCIset FW82371MB (PCI-TO-ISA / IDE XCELERATOR PIIX4).
+    -NeoMagic MagicMedia 256ZX NM2360A-A.
+    -Crystal CS4624-CQ (CrystalClear SoundFusion PCI Audio Accelerator).
+    -Crystal CS4297A-JQZ (CrystalClear SoundFusion Audio Codec).
+    -National Semiconductor PC97338VJG (ACPI 1.0 and PC98/99 Compliant SuperI/O).
+    -Hitachi HD64F3437TF.
+    -Texas Instruments TI PCI1450GJG (PC Card Controller).
+    -Atmel 24RF08CT (SEEPROM).
+    -Other chips: IMI-SG577DYB, TI SN75LVDS84, 4 x IBM 0364164PT3B (64 MB of RAM on the motherboard),
+                  IBM 20H2987, IBM 10L3953, Motorola MC145583V, Maxim MAX1632EAI, etc.
+   Enhanced video PCB:
+    -Chrontel CH7004C-T (Digital PC to TV Encoder with Macrovision).
+
 Hardware for the 600E model.
   Main PCB:
     -Intel Pentium II 366 Mobile MMC-2 (PMG36602002AA).
-       There were options for Pentium II at either 300 MHz, 366 MHz, or 400 MHz
+       There were options for Pentium II at either 300 MHz, 366 MHz, or 400 MHz.
     -Texas Instruments PCIbus SN104698GFN.
-    -Intel PCIset FW82371EB (PCI-TO-ISA / IDE XCELERATOR PIIX4)
+    -Intel PCIset FW82371EB (PCI-TO-ISA / IDE XCELERATOR PIIX4).
     -NeoMagic MagicMedia 256AV NM2200C-A.
     -Crystal CS4610C-CQ (CrystalClear SoundFusion PCI Audio Accelerator).
     -Crystal CS4239-KQ (CrystalClear Portable ISA Audio System).
@@ -353,6 +370,17 @@ ROM_START(thinkpad600e)
 	ROM_LOAD( "atf1500al-modemboard.u12",              0x00000, 0x00c39, CRC(7ecd4b79) SHA1(b69ef5fe227b466f331f863ba20efd7e23056809) ) // On modem PCB
 ROM_END
 
+ROM_START(thinkpad600x)
+	ROM_REGION( 0x80000, "pci:07.0", 0 )
+	ROM_LOAD( "e28f004b5t80_08k3492_rev25_b0800m.u36", 0x00000, 0x80000, CRC(5c64ef91) SHA1(1aa2d68aff96c1ccc6859c5480fcfc5e73ab250d) )
+
+	ROM_REGION(0x0f780, "mcu", 0)
+	ROM_LOAD( "hd64f3437tf_08k3493_rev05_b1100m.u75",  0x00000, 0xc000,  CRC(99d21cad) SHA1(92a2809e5c7ca3a63489f9cd1c9a7dc57c6a1343) )
+
+	ROM_REGION(0x00080, "seeprom", 0)
+	ROM_LOAD( "atmel24rf08ct.u79",                     0x00000, 0x00080, NO_DUMP ) // BIOS settings
+ROM_END
+
 ROM_START(thinkpad770z)
 	ROM_REGION( 0x80000, "pci:07.0", 0 )
 	ROM_LOAD( "e28f004b5t80-10l1055-rev09-d0999m.u59", 0x00000, 0x80000, CRC(f9f255c5) SHA1(ee209802d08c6498a42e52c5c45ce469dc095ad4) )
@@ -376,4 +404,5 @@ ROM_END
 COMP( 1995, thinkpad760xd, 0,      0,      thinkpad600,  thinkpad600, thinkpad600_state, empty_init, "IBM",   "ThinkPad 760XD", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1998, thinkpad600,   0,      0,      thinkpad600,  thinkpad600, thinkpad600_state, empty_init, "IBM",   "ThinkPad 600",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1999, thinkpad600e,  0,      0,      thinkpad600e, thinkpad600, thinkpad600_state, empty_init, "IBM",   "ThinkPad 600E",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1999, thinkpad600x,  0,      0,      thinkpad600,  thinkpad600, thinkpad600_state, empty_init, "IBM",   "ThinkPad 600X",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1999, thinkpad770z,  0,      0,      thinkpad600,  thinkpad600, thinkpad600_state, empty_init, "IBM",   "ThinkPad 770Z",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
