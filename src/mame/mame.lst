@@ -19711,6 +19711,10 @@ mephistoj
 @source:hegenerglaser/europa.cpp
 europa
 
+@source:hegenerglaser/excalibur.cpp
+excal
+excaltm
+
 @source:hegenerglaser/glasgow.cpp
 amsterdg                        // Amsterdam
 dallas16g                       // Dallas
