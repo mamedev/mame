@@ -473,7 +473,7 @@ void micro3d_state::init_micro3d()
 	/* TODO? BOTSS sometimes crashes when starting a stage because the 68000
 	overwrites memory in use by the Am29000. Slowing down the 68000 slightly
 	avoids this. */
-	m_maincpu->set_clock_scale(0.945f);
+	m_maincpu->set_clock_scale(0.945);
 }
 
 void micro3d_state::init_botss()
