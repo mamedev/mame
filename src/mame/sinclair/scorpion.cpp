@@ -28,8 +28,8 @@ class scorpion_state : public spectrum_128_state
 public:
 	scorpion_state(const machine_config &mconfig, device_type type, const char *tag)
 		: spectrum_128_state(mconfig, type, tag)
-		, m_bankio(*this, "bankio")
 		, m_bank0_rom(*this, "bank0_rom")
+		, m_io_shadow_view(*this, "io_shadow_view")
 		, m_beta(*this, BETA_DISK_TAG)
 		, m_ay(*this, "ay%u", 0U)
 		, m_io_mouse(*this, "mouse_input%u", 1U)
@@ -54,10 +54,9 @@ protected:
 	bool romram() const { return BIT(m_port_1ffd_data, 0); }
 	bool rom1()   const { return BIT(m_port_7ffd_data, 4); }
 
-	void scorpion_io(address_map &map) ATTR_COLD;
+	virtual void scorpion_io(address_map &map) ATTR_COLD;
 	void scorpion_mem(address_map &map) ATTR_COLD;
 	void scorpion_switch(address_map &map) ATTR_COLD;
-	virtual void scorpion_ioext(address_map &map) ATTR_COLD;
 	u8 port_ff_r();
 	void port_7ffd_w(u8 data);
 	void port_1ffd_w(u8 data);
@@ -66,11 +65,11 @@ protected:
 	virtual rectangle get_screen_area() override;
 	virtual void scorpion_update_memory();
 	virtual void do_nmi();
+	void update_io(bool dos_enable);
 
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
-	memory_access<17, 0, 0, ENDIANNESS_LITTLE>::specific m_ioext;
-	required_device<address_map_bank_device> m_bankio;
 	memory_view m_bank0_rom;
+	memory_view m_io_shadow_view;
 	required_device<beta_disk_device> m_beta;
 	required_device_array<ay8912_device, 2> m_ay;
 
@@ -106,7 +105,7 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
-	virtual void scorpion_ioext(address_map &map) override ATTR_COLD;
+	virtual void scorpion_io(address_map &map) override ATTR_COLD;
 	virtual void ay_address_w(u8 data) override;
 
 	virtual void scorpion_update_memory() override;
@@ -136,7 +135,7 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
-	virtual void scorpion_ioext(address_map &map) override ATTR_COLD;
+	virtual void scorpion_io(address_map &map) override ATTR_COLD;
 	void global_cfg_w(u8 data);
 	u8 port_78fd_r();
 	u8 port_7afd_r();
@@ -230,10 +229,24 @@ INPUT_CHANGED_MEMBER(scorpion_state::on_nmi)
 
 void scorpion_state::do_nmi()
 {
-	m_beta->enable();
-	scorpion_update_memory();
+	update_io(true);
 	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	m_nmi_pending = 0;
+}
+
+void scorpion_state::update_io(bool dos_enable)
+{
+	if (dos_enable)
+		m_beta->enable();
+	else
+		m_beta->disable();
+
+	scorpion_update_memory();
+
+	if (dos())
+		m_io_shadow_view.select(0);
+	else
+		m_io_shadow_view.disable();
 }
 
 u8 scorpion_state::port_ff_r()
@@ -287,8 +300,7 @@ u8 scorpion_state::beta_enable_r(offs_t offset)
 		if (m_is_m1_even && (m_maincpu->total_cycles() & 1)) m_maincpu->eat_cycles(1);
 		if (!dos() && rom1())
 		{
-			m_beta->enable();
-			scorpion_update_memory();
+			update_io(true);
 		}
 	}
 	return m_program.read_byte(offset + 0x3d00);
@@ -305,8 +317,7 @@ u8 scorpion_state::beta_disable_r(offs_t offset)
 		}
 		else if (dos())
 		{
-			m_beta->disable();
-			scorpion_update_memory();
+			update_io(false);
 		}
 	}
 	return m_program.read_byte(offset + 0x4000);
@@ -323,21 +334,21 @@ void scorpion_state::scorpion_mem(address_map &map)
 	map(0xc000, 0xffff).bankr(m_bank_ram[3]).w(FUNC(scorpion_state::spectrum_128_ram_w<3>));
 }
 
-void scorpion_state::scorpion_ioext(address_map &map)
+void scorpion_state::scorpion_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0022, 0x0022).select(0xffdc) // FE | xxxxxxxxxx1xxx10
 		.rw(FUNC(scorpion_state::spectrum_ula_r), FUNC(scorpion_state::spectrum_ula_w));
 	map(0x0023, 0x0023).mirror(0xffdc) // FF | xxxxxxxxxx1xxx11
 		.r(FUNC(scorpion_state::port_ff_r));
-	map(0x0021, 0x0021).mirror(0x13fdc) // 1FFD | 00xxxxxxxx1xxx01
+	map(0x0021, 0x0021).mirror(0x3fdc) // 1FFD | 00xxxxxxxx1xxx01
 		.w(FUNC(scorpion_state::port_1ffd_w));
-	map(0x4021, 0x4021).mirror(0x13fdc) // 7FFD | 01xxxxxxxx1xxx01
+	map(0x4021, 0x4021).mirror(0x3fdc) // 7FFD | 01xxxxxxxx1xxx01
 		.w(FUNC(scorpion_state::port_7ffd_w));
 
-	map(0xa021, 0xa021).mirror(0x11fdc) // BFFD | 101xxxxxxx1xxx01
+	map(0xa021, 0xa021).mirror(0x1fdc) // BFFD | 101xxxxxxx1xxx01
 		.lw8(NAME([this](u8 data) { m_ay[m_ay_selected]->data_w(data); }));
-	map(0xe021, 0xe021).mirror(0x11fdc) // FFFD | 111xxxxxxx1xxx01
+	map(0xe021, 0xe021).mirror(0x1fdc) // FFFD | 111xxxxxxx1xxx01
 		.lr8(NAME([this]() { return m_ay[m_ay_selected]->data_r(); })).w(FUNC(scorpion_state::ay_address_w));
 
 	// Mouse
@@ -349,18 +360,14 @@ void scorpion_state::scorpion_ioext(address_map &map)
 
 	// Shadow
 	// DOS + xxxxxxxx0nnxxx11
-	map(0x10003, 0x10003).mirror(0xff1c).rw(m_beta, FUNC(beta_disk_device::status_r), FUNC(beta_disk_device::command_w));
-	map(0x10023, 0x10023).mirror(0xff1c).rw(m_beta, FUNC(beta_disk_device::track_r), FUNC(beta_disk_device::track_w));
-	map(0x10043, 0x10043).mirror(0xff1c).rw(m_beta, FUNC(beta_disk_device::sector_r), FUNC(beta_disk_device::sector_w));
-	map(0x10063, 0x10063).mirror(0xff1c).rw(m_beta, FUNC(beta_disk_device::data_r), FUNC(beta_disk_device::data_w));
-	map(0x100e3, 0x100e3).mirror(0xff1c).rw(m_beta, FUNC(beta_disk_device::state_r), FUNC(beta_disk_device::param_w));
-}
+	map(0x0000, 0xffff).view(m_io_shadow_view);
+	m_io_shadow_view[0](0x0003, 0x0003).mirror(0xff1c).rw(m_beta, FUNC(beta_disk_device::status_r), FUNC(beta_disk_device::command_w));
+	m_io_shadow_view[0](0x0023, 0x0023).mirror(0xff1c).rw(m_beta, FUNC(beta_disk_device::track_r), FUNC(beta_disk_device::track_w));
+	m_io_shadow_view[0](0x0043, 0x0043).mirror(0xff1c).rw(m_beta, FUNC(beta_disk_device::sector_r), FUNC(beta_disk_device::sector_w));
+	m_io_shadow_view[0](0x0063, 0x0063).mirror(0xff1c).rw(m_beta, FUNC(beta_disk_device::data_r), FUNC(beta_disk_device::data_w));
+	m_io_shadow_view[0](0x00e3, 0x00e3).mirror(0xff1c).rw(m_beta, FUNC(beta_disk_device::state_r), FUNC(beta_disk_device::param_w));
 
-void scorpion_state::scorpion_io(address_map &map)
-{
-	map(0x0000, 0xffff).lrw8(
-		NAME([this](offs_t offset) { return m_ioext.read_byte((dos() << 16) | offset); }),
-		NAME([this](offs_t offset, u8 data) { m_ioext.write_byte((dos() << 16) | offset, data); }));
+	subdevice<zxbus_device>("zxbus")->install_shadow_io(m_io_shadow_view[0]);
 }
 
 void scorpion_state::scorpion_switch(address_map &map)
@@ -381,7 +388,6 @@ void scorpion_state::machine_start()
 	save_item(NAME(m_ram_banks));
 
 	m_maincpu->space(AS_PROGRAM).specific(m_program);
-	m_bankio->space(AS_PROGRAM).specific(m_ioext);
 
 	// reconfigure ROMs
 	memory_region *rom = memregion("maincpu");
@@ -397,7 +403,6 @@ void scorpion_state::machine_reset()
 	m_nmi_pending = 0;
 	m_magic_lock = 0;
 	m_ay_selected = 0;
-	m_beta->disable();
 
 	m_port_fe_data = 255;
 	m_port_7ffd_data = 0;
@@ -405,7 +410,7 @@ void scorpion_state::machine_reset()
 
 	m_bank_ram[2]->set_entry(2);
 
-	scorpion_update_memory();
+	update_io(false);
 }
 
 void scorpion_state::video_start()
@@ -525,12 +530,10 @@ void scorpion_state::scorpion(machine_config &config)
 
 	config.device_remove("exp");
 
-	ADDRESS_MAP_BANK(config, m_bankio).set_map(&scorpion_state::scorpion_ioext).set_options(ENDIANNESS_LITTLE, 8, 17, 0);
-
 	zxbus_device &zxbus(ZXBUS(config, "zxbus", 0));
-	zxbus.set_iospace(m_bankio, AS_PROGRAM);
-	ZXBUS_SLOT(config, "zxbus:1", 0, "zxbus", zxbus_cards, nullptr);
-	ZXBUS_SLOT(config, "zxbus:2", 0, "zxbus", zxbus_cards, nullptr);
+	zxbus.set_iospace("maincpu", AS_IO);
+	ZXBUS_SLOT(config, "zxbus:1", 0, "zxbus", zxbus_gmx_cards, nullptr);
+	ZXBUS_SLOT(config, "zxbus:2", 0, "zxbus", zxbus_gmx_cards, nullptr);
 }
 
 void scorpion_state::profi(machine_config &config)
@@ -648,14 +651,14 @@ void scorpiontb_state::video_start()
 	});
 }
 
-void scorpiontb_state::scorpion_ioext(address_map &map)
+void scorpiontb_state::scorpion_io(address_map &map)
 {
-	scorpion_state::scorpion_ioext(map);
-	map(0x0021, 0x0021).mirror(0x13fdc) // 1FFD | 00xxxxxxxx1xxx01
+	scorpion_state::scorpion_io(map);
+	map(0x0021, 0x0021).mirror(0x3fdc) // 1FFD | 00xxxxxxxx1xxx01
 		.lr8(NAME([this](offs_t offset) -> u8 { m_turbo = 0; m_maincpu->set_clock_scale(1); return 0xff; }));
-	map(0x4021, 0x4021).mirror(0x13fdc) // 7FFD | 01xxxxxxxx1xxx01
+	map(0x4021, 0x4021).mirror(0x3fdc) // 7FFD | 01xxxxxxxx1xxx01
 		.lr8(NAME([this](offs_t offset) -> u8 { m_turbo = 1; m_maincpu->set_clock_scale(2); return 0xff; }));
-	map(0xe021, 0xe021).mirror(0x11fdc) // FFFD | 111xxxxxxx1xxx01
+	map(0xe021, 0xe021).mirror(0x1fdc) // FFFD | 111xxxxxxx1xxx01
 		.rw(FUNC(scorpiontb_state::ay_data_r),  FUNC(scorpiontb_state::ay_address_w));
 
 	// Centronics
@@ -873,20 +876,20 @@ void scorpiongmx_state::video_start()
 	scorpion_state::video_start();
 }
 
-void scorpiongmx_state::scorpion_ioext(address_map &map)
+void scorpiongmx_state::scorpion_io(address_map &map)
 {
-	scorpiontb_state::scorpion_ioext(map);
+	scorpiontb_state::scorpion_io(map);
 	map(0x0000, 0x0000).mirror(0xff00).w(FUNC(scorpiongmx_state::global_cfg_w));
 
-	map(0x0000, 0x1ffff).view(m_io_gmx);
-	m_io_gmx[0](0x78fd, 0x78fd).mirror(0x10000).r(FUNC(scorpiongmx_state::port_78fd_r))
+	map(0x0000, 0xffff).view(m_io_gmx);
+	m_io_gmx[0](0x78fd, 0x78fd).mirror(0x0000).r(FUNC(scorpiongmx_state::port_78fd_r))
 		.lw8(NAME([this](u8 data) { m_port_78fd_data = data & 0x7f; scorpion_update_memory(); }));
-	m_io_gmx[0](0x7afd, 0x7afd).mirror(0x10000).r(FUNC(scorpiongmx_state::port_7afd_r))
+	m_io_gmx[0](0x7afd, 0x7afd).mirror(0x0000).r(FUNC(scorpiongmx_state::port_7afd_r))
 		.lw8(NAME([this](u8 data) { m_scroll_lo = data & 0xf0; }));
-	m_io_gmx[0](0x7cfd, 0x7cfd).mirror(0x10000)
+	m_io_gmx[0](0x7cfd, 0x7cfd).mirror(0x0000)
 		.lw8(NAME([this](u8 data) { m_scroll_hi = data & 0x3f; }));
-	m_io_gmx[0](0x7efd, 0x7efd).mirror(0x10000).rw(FUNC(scorpiongmx_state::port_7efd_r), FUNC(scorpiongmx_state::port_7efd_w));
-	m_io_gmx[0](0xdffd, 0xdffd).mirror(0x10000)
+	m_io_gmx[0](0x7efd, 0x7efd).mirror(0x0000).rw(FUNC(scorpiongmx_state::port_7efd_r), FUNC(scorpiongmx_state::port_7efd_w));
+	m_io_gmx[0](0xdffd, 0xdffd).mirror(0x0000)
 		.lw8(NAME([this](u8 data) { m_port_dffd_data = data & 0x07; scorpion_update_memory(); }));
 }
 
