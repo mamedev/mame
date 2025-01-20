@@ -22,7 +22,7 @@
  * Thanks to AJR - the macscsi helper was easy to modify for this!
  * There are two key differences between this and the macscsi helper.
  * 1. The IRQ signal is used by NEWS, and the timing is important. Therefore, IRQs are suppressed until the FIFO is drained by the IOP
- *    so that the timing of IRQ can be preserved. Phase change interrupts, for example, will happen as soon as the FIFO is filled and 
+ *    so that the timing of IRQ can be preserved. Phase change interrupts, for example, will happen as soon as the FIFO is filled and
  *    there are no bytes left to transfer, which will interrupt the IOP too early.
  * 2. iopboot does not check DRQ before trying to read from the SCSI controller, because its BERR handler
  *    has a retry loop built in, so it doesn't care if the SCSI chip is ready or not. Because of this, the helper will
@@ -47,21 +47,21 @@ ALLOW_SAVE_TYPE(news_iop_scsi_helper_device::mode);
 static constexpr u8 BAD_BYTE = 0xbb;
 
 news_iop_scsi_helper_device::news_iop_scsi_helper_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-    : device_t(mconfig, NEWS_IOP_SCSI_HELPER, tag, owner, clock), 
-    m_scsi_read_callback(*this, BAD_BYTE),
-    m_scsi_write_callback(*this),
-    m_scsi_dma_read_callback(*this, BAD_BYTE),
-    m_scsi_dma_write_callback(*this),
-    m_iop_halt_callback(*this),
-    m_bus_error_callback(*this),
-    m_irq_out_callback(*this),
-    m_timeout(attotime::from_usec(16)), // TODO: proper value for NEWS
-    m_pseudo_dma_timer(nullptr),
-    m_mode(mode::NON_DMA),
-    m_read_fifo_bytes(0),
-    m_write_fifo_bytes(0),
-    m_read_fifo_data(0),
-    m_write_fifo_data(0)
+    : device_t(mconfig, NEWS_IOP_SCSI_HELPER, tag, owner, clock),
+      m_scsi_read_callback(*this, BAD_BYTE),
+      m_scsi_write_callback(*this),
+      m_scsi_dma_read_callback(*this, BAD_BYTE),
+      m_scsi_dma_write_callback(*this),
+      m_iop_halt_callback(*this),
+      m_bus_error_callback(*this),
+      m_irq_out_callback(*this),
+      m_timeout(attotime::from_usec(16)), // TODO: proper value for NEWS
+      m_pseudo_dma_timer(nullptr),
+      m_mode(mode::NON_DMA),
+      m_read_fifo_bytes(0),
+      m_write_fifo_bytes(0),
+      m_read_fifo_data(0),
+      m_write_fifo_data(0)
 {
 }
 
@@ -158,7 +158,7 @@ void news_iop_scsi_helper_device::irq_w(int state)
         m_mode = mode::IRQ_FIFO_DRAIN;
         m_irq_out_callback(false);
     }
-    else 
+    else
     {
         m_irq_out_callback(m_irq);
     }

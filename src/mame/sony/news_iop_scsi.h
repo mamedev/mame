@@ -19,7 +19,7 @@ public:
 	auto scsi_dma_write_callback() { return m_scsi_dma_write_callback.bind(); }
 	auto iop_halt_callback() { return m_iop_halt_callback.bind(); }
 	auto bus_error_callback() { return m_bus_error_callback.bind(); }
-    auto irq_out_callback() { return m_irq_out_callback.bind(); }
+	auto irq_out_callback() { return m_irq_out_callback.bind(); }
 
 	// miscellaneous configuration
 	void set_timeout(attotime timeout) { m_timeout = timeout; }
@@ -29,7 +29,7 @@ public:
 	void write_wrapper(bool pseudo_dma, offs_t offset, u8 data);
 
 	void drq_w(int state);
-    void irq_w(int state);
+	void irq_w(int state);
 
 	// Constants for consumers of the bus error details
 	static const u8 READ_ERROR = 1;
@@ -41,7 +41,15 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 private:
-	enum class mode : u8 { NON_DMA, READ_WAIT_DRQ, READ_DMA, WRITE_DMA, IRQ_FIFO_DRAIN, BAD_DMA };
+	enum class mode : u8
+	{
+		NON_DMA,
+		READ_WAIT_DRQ,
+		READ_DMA,
+		WRITE_DMA,
+		IRQ_FIFO_DRAIN,
+		BAD_DMA
+	};
 
 	// internal helpers
 	void read_fifo_process();
@@ -56,7 +64,7 @@ private:
 	devcb_write8 m_scsi_dma_write_callback;
 	devcb_write_line m_iop_halt_callback;
 	devcb_write8 m_bus_error_callback;
-    devcb_write_line m_irq_out_callback;
+	devcb_write_line m_irq_out_callback;
 
 	// misc. parameters
 	attotime m_timeout;
@@ -68,7 +76,7 @@ private:
 	u8 m_write_fifo_bytes;
 	u32 m_read_fifo_data;
 	u32 m_write_fifo_data;
-    bool m_irq;
+	bool m_irq;
 };
 
 DECLARE_DEVICE_TYPE(NEWS_IOP_SCSI_HELPER, news_iop_scsi_helper_device)
