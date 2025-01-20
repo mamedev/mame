@@ -21,7 +21,7 @@ Motherboard:
 
 Interface board:
 - PCB label: HGS 15 101 00 B
-- edge connector to module with 64KB ROM (4*2764)
+- edge connector to module with 64KB ROM (4*27128)
 
 Brikett:
 - stripped down, only the LCD/keypad PCB
@@ -44,7 +44,6 @@ number of positions 2026 for excal, and 2028 for excaltm.
 
 TODO:
 - verify CPU speed, see notes above
-- correct ROM labels
 
 *******************************************************************************/
 
@@ -222,10 +221,10 @@ void excal_state::excal(machine_config &config)
 
 ROM_START( excal )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD16_BYTE("excalibur_1u.u1", 0x00000, 0x04000, CRC(f4b16b35) SHA1(778b1ece0fc5db88b667d550a55cb757c1280d4d) )
-	ROM_LOAD16_BYTE("excalibur_1l.l1", 0x00001, 0x04000, CRC(372639b0) SHA1(fb56a19689e164175a3db10faf24ab3360264b7c) )
-	ROM_LOAD16_BYTE("excalibur_2u.u2", 0x08000, 0x04000, CRC(ad039672) SHA1(4dc80600bcc7ea450102f2d0eb25be644e5e542c) )
-	ROM_LOAD16_BYTE("excalibur_2l.l2", 0x08001, 0x04000, CRC(08dc7409) SHA1(6f7a336c615ff40dd4018a2150c3213bc7e7e1dc) )
+	ROM_LOAD16_BYTE("1u_215_22.10.u1", 0x00000, 0x04000, CRC(f4b16b35) SHA1(778b1ece0fc5db88b667d550a55cb757c1280d4d) )
+	ROM_LOAD16_BYTE("1l_215_22.10.l1", 0x00001, 0x04000, CRC(372639b0) SHA1(fb56a19689e164175a3db10faf24ab3360264b7c) )
+	ROM_LOAD16_BYTE("2u_215_22.10.u2", 0x08000, 0x04000, CRC(ad039672) SHA1(4dc80600bcc7ea450102f2d0eb25be644e5e542c) )
+	ROM_LOAD16_BYTE("2l_215_22.10.l2", 0x08001, 0x04000, CRC(08dc7409) SHA1(6f7a336c615ff40dd4018a2150c3213bc7e7e1dc) )
 ROM_END
 
 ROM_START( excaltm )

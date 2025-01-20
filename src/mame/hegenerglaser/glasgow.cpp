@@ -252,10 +252,10 @@ static INPUT_PORTS_START( glasgow )
 
 	PORT_START("WAIT") // hardwired, default to 1
 	PORT_CONFNAME( 0x03, 0x01, "LDS/UDS Wait States" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(glasgow_state::wait_changed), 0)
-	PORT_CONFSETTING(    0x00, "None (12 MHz)" )
-	PORT_CONFSETTING(    0x01, "1 (~9.5 MHz)" )
-	PORT_CONFSETTING(    0x02, "2 (~8 MHz)" )
-	PORT_CONFSETTING(    0x03, "3 (~7 Mhz)" )
+	PORT_CONFSETTING(    0x00, "None (12MHz)" )
+	PORT_CONFSETTING(    0x01, "1 (~9.5MHz)" )
+	PORT_CONFSETTING(    0x02, "2 (~8MHz)" )
+	PORT_CONFSETTING(    0x03, "3 (~7Mhz)" )
 INPUT_PORTS_END
 
 
