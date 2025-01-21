@@ -163,6 +163,7 @@ private:
 
 	u8 m_cursor_reg;  // cursor page number and x offset
 	bool m_cursor_fn; // cursor function (1=nor, 0=xnor)
+	bool m_dispen;    // display enable
 };
 
 void mg1_state::machine_start()
@@ -178,6 +179,7 @@ void mg1_state::machine_start()
 	save_item(STRUCT_MEMBER(m_cursor_cnt, value));
 	save_item(NAME(m_cursor_reg));
 	save_item(NAME(m_cursor_fn));
+	save_item(NAME(m_dispen));
 }
 
 void mg1_state::machine_reset()
@@ -197,6 +199,7 @@ void mg1_state::machine_reset()
 
 	m_cursor_reg = 0;
 	m_cursor_fn = false;
+	m_dispen = false;
 
 	// HACK: capture the counter 1 and 2 values which control the hardware cursor location
 	m_iop->space(0).install_write_tap(0x20e1, 0x20e2, "cursor_cnt_w",
@@ -321,7 +324,7 @@ void mg1_state::iop_map(address_map &map)
 
 	// i/o area
 	map(0x2000, 0x201f).mirror(0x1e00).r(FUNC(mg1_state::mouse_axis_r<0>));
-	map(0x2000, 0x201f).mirror(0x1e00).lw8([this](u8 data) { m_buzzen->in_w<1>(BIT(data, 0)); }, "buzzer_w");
+	map(0x2000, 0x201f).mirror(0x1e00).lw8([this](u8 data) { m_buzzen->in_w<1>(BIT(data, 0)); }, "buzzen_w");
 	map(0x2020, 0x2020).mirror(0x1e00).lw8([this](offs_t offset, u8 data) { logerror("host reset %x,0x%02x\n", offset, data); }, "host_reset").select(0x0100);
 	map(0x2040, 0x205f).mirror(0x1e00).lw8([this](u8 data) { m_cursor_reg = data; }, "cursor_reg_w");
 	map(0x2060, 0x207f).mirror(0x1e00).lw8([this](u8 data) { m_icu->ir_w<10>(1); m_icu->ir_w<10>(0); }, "iopint");
@@ -331,6 +334,7 @@ void mg1_state::iop_map(address_map &map)
 		[this]() { return m_mouse_buttons->read(); }, "mouse_b_r",
 		[this](u8 data) { m_cursor_fn = BIT(data, 0); }, "cursor_fn_w");
 	map(0x20c0, 0x20df).mirror(0x1e00).r(FUNC(mg1_state::mouse_axis_r<1>));
+	map(0x20c0, 0x20df).mirror(0x1e00).lw8([this](u8 data) { m_dispen = BIT(data, 0); }, "dispen_w");
 	map(0x20e0, 0x20ff).mirror(0x1e00).rw(m_iop_ctc, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 
 	map(0x4000, 0x47ff).mirror(0x3800).ram().share("iop_sram"); // D4016C-3 2048x8 SRAM
@@ -370,6 +374,9 @@ INPUT_PORTS_END
 
 MC6845_UPDATE_ROW(mg1_state::update_row)
 {
+	if (!m_dispen)
+		return;
+
 	// 16 columns x 50 rows of characters, each 64x16 pixels
 	// 10 bits look up video mapping ram -> va6-21 (16 bits)
 	// 6 bits give address of 64-bit character in page
@@ -398,6 +405,12 @@ MC6845_UPDATE_ROW(mg1_state::update_row)
 
 MC6845_END_UPDATE(mg1_state::draw_cursor)
 {
+	if (!m_dispen)
+	{
+		bitmap.fill(rgb_t::black(), cliprect);
+		return;
+	}
+
 	s32 const cursor_y = m_cursor_cnt[0].value;
 	s32 const cursor_x = m_cursor_cnt[1].value - BIT(m_cursor_reg, 2, 6);
 
