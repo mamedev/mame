@@ -83,6 +83,9 @@ public:
 
 	void excal(machine_config &config);
 
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ptm6840_device> m_ptm;
@@ -96,6 +99,12 @@ private:
 
 	u8 input_r(offs_t offset);
 };
+
+void excal_state::machine_start()
+{
+	// HACK: slow down CPU to account for suspected wait states
+	m_maincpu->set_clock_scale(5.0 / 8.0);
+}
 
 
 
@@ -191,7 +200,7 @@ INPUT_PORTS_END
 void excal_state::excal(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 16_MHz_XTAL / 3.2); // see driver notes
+	M68000(config, m_maincpu, 16_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &excal_state::excal_mem);
 
 	PTM6840(config, m_ptm, 16_MHz_XTAL / 20);

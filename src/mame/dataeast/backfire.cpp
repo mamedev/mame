@@ -593,7 +593,7 @@ void backfire_state::init_backfire()
 	deco56_decrypt_gfx(machine(), "tiles1"); /* 141 */
 	deco56_decrypt_gfx(machine(), "tiles2"); /* 141 */
 	deco156_decrypt(machine());
-	m_maincpu->set_clock_scale(4.0f); /* core timings aren't accurate */
+	m_maincpu->set_clock_scale(4.0); /* core timings aren't accurate */
 	descramble_sound();
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0170018, 0x017001b, read32smo_delegate(*this, FUNC(backfire_state::backfire_speedup_r)));
 }
