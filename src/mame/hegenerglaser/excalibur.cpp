@@ -12,7 +12,7 @@ Hardware notes:
 
 Motherboard:
 - PCB label: FORCE COMPUTERS
-- HD68000-8, 16MHz XTAL
+- HD68000-8 @ 8 MHz (16MHz XTAL)
 - 128KB DRAM (16*MB8264-20), half unused
 - 4 EPROM sockets are unpopulated
 - HD6840 PTM @ 800kHz, HD6821P PIA
@@ -34,13 +34,19 @@ except the interface is more similar to Mephisto Exclusive.
 The motherboard is a 1983 Force Computers 68000 kit with lots of patches and wire
 mods. It's an older version of the VME in src/devices/bus/vme/sys68k_cpu1.cpp.
 
-The CPU appears to run at 5MHz? This matches both piezo frequency and position
-calculation speed. How it derives this from a 16MHz XTAL is unknown. Or maybe
-it uses wait states? If so, how and why? The program copies itself to 280ns DRAM,
-which should be fast enough to run at 8MHz (500ns per memory cycle).
+The 68000 is clocked at 8MHz, but due to wait states and bus requests, it runs
+much slower, closer to around 5MHz.
+
+There's a 555 timer (R1=11K, R2=22K, C=1nf: ~26kHz) that clocks 68000 BR. Tests
+on real hardware showed that the chess computer is about 30% faster if the timer
+interval is reduced by a factor 100. It still worked fine, so it's probably a
+leftover for VME comms, not the DRAM refresh circuit.
+
+Other possible sources of wait states are periodic DRAM refresh and user/system
+area access time.
 
 See glasgow.cpp on how to verify CPU speed. On the real thing after 6 minutes,
-number of positions 2026 for excal, and 2028 for excaltm.
+number of positions is 2026 for excal, and 2028 for excaltm.
 
 TODO:
 - verify CPU speed, see notes above
@@ -102,7 +108,7 @@ private:
 
 void excal_state::machine_start()
 {
-	// HACK: slow down CPU to account for suspected wait states
+	// HACK: slow down CPU to account for bus arbiter and wait states
 	m_maincpu->set_clock_scale(5.0 / 8.0);
 }
 
