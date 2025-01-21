@@ -18,6 +18,7 @@
         * AM9513 timer (source of timer IRQ)
         * NCR5385 SCSI controller
 		* 8255 Centronics printer interface
+		* X2210 NVRAM
 				
         Video is a 640x480 1bpp window on a 1024x1024 VRAM area; smooth panning around that area
         is possible as is flat-out changing the scanout address.
@@ -61,6 +62,7 @@
 #include "machine/ns32081.h"
 #include "machine/am79c90.h"
 #include "machine/i8255.h"
+#include "machine/x2212.h"
 #include "machine/nscsi_bus.h"
 #include "sound/sn76496.h"
 
@@ -524,6 +526,7 @@ public:
 		m_acia(*this, "acia"),
 		m_fpu(*this, "fpu"),
 		m_lance(*this, "lance"),
+		m_novram(*this, "novram"),
 		m_printer(*this, "printer"),
 		m_prom(*this, "maincpu"),			// FIXME why is the bootrom called 'maincpu'?
 		m_mainram(*this, "mainram"),
@@ -578,10 +581,6 @@ private:
 	void led_w(u8 data);
 
 	void fpu_finished(int v);
-	
-	int fpu_latch32_result(void *);
-	int fpu_latch64_result(void *);
-	int fpu_latch32_int_result(void *);
 	u16 fpu_r(offs_t offset);
 	void fpu_w(offs_t offset, u16 data);
 	
@@ -590,7 +589,12 @@ private:
 	u8 videocntl_r();
 	void videocntl_w(u8 data);
 
-	u8 nvram_r(offs_t offset);
+	uint8_t readnvram(offs_t offset);
+	void writenvram(offs_t offset, u8 data);
+	uint8_t recall_r();
+	void recall_w(uint8_t data);
+	uint8_t store_r();
+	void store_w(uint8_t data);
 
 	// fake output of serial
 	void write_txd(int state);
@@ -631,6 +635,7 @@ private:
 	required_device<mos6551_device> m_acia;
 	required_device<ns32081_device> m_fpu;
 	required_device<am7990_device> m_lance;
+	required_device<x2210_device> m_novram;
 	required_device<i8255_device> m_printer;
 
 	required_region_ptr<u16> m_prom;
@@ -733,6 +738,9 @@ void tek440x_state::machine_reset()
 	mapcntl_w(0);
 	videocntl_w(0);
 	videoaddr_w(0,0);
+
+	m_novram->recall(ASSERT_LINE);
+	m_novram->recall(CLEAR_LINE);
 }
 
 
@@ -1220,15 +1228,6 @@ void tek440x_state::diag_w(u8 data)
 	m_diag = data;
 }
 
-
-u8 tek440x_state::nvram_r(offs_t offset)
-{
-	static u8  nvram[32] = {0xbf,0x6f,0x4f,0x0f,0x41,0x44,0x41,0x4d,0x42,0x2f,0x6f,0x4f,0x0f,0x41,0x5f,0x8f};
-
-	return nvram[offset>>1];
-}
-
-
 // copied from stkbd.cpp
 int tek440x_state::mouseupdate()
 {
@@ -1453,6 +1452,64 @@ void tek440x_state::duart_w(offs_t offset, u8 data)
 	m_duart->write(offset, data);
 }
 
+uint8_t tek440x_state::readnvram(offs_t offset)
+{
+	u8 data = m_novram->read(m_maincpu->space(0), offset);
+
+	LOG("readnvram(%d) => %02x\n",offset, data);
+
+	// kick it up to top 4 bits
+	return data << 4;
+}
+void tek440x_state::writenvram(offs_t offset, u8 data)
+{
+	LOG("writenvram(%d) <= %02x\n",offset, data);
+
+	// duplicate in lower 4 bits
+	m_novram->write(offset, data | (data >> 4));
+}
+	
+uint8_t tek440x_state::recall_r()
+{
+	LOG("recall_r\n");
+	if (!machine().side_effects_disabled())
+	{
+		m_novram->recall(1);
+		m_novram->recall(0);
+	}
+
+	return 0xff;
+}
+
+void tek440x_state::recall_w(uint8_t data)
+{
+	LOG("recall_w\n");
+	m_novram->recall(1);
+	m_novram->recall(0);
+}
+
+uint8_t tek440x_state::store_r()
+{
+	LOG("store_r\n");
+	if (!machine().side_effects_disabled())
+	{
+		m_novram->store(1);
+		m_novram->store(0);
+	}
+
+	return 0xff;
+}
+
+void tek440x_state::store_w(uint8_t data)
+{
+	LOG("store_w\n");
+	m_novram->store(1);
+	m_novram->store(0);
+}
+
+
+
+
 void tek440x_state::logical_map(address_map &map)
 {
 	map(0x000000, 0x7fffff).rw(FUNC(tek440x_state::memory_r), FUNC(tek440x_state::memory_w));
@@ -1470,10 +1527,15 @@ void tek440x_state::physical_map(address_map &map)
 
 	// 700000-71ffff spare 0
 	// 720000-720fff spare 1 (ethernet)
-	// 721000-721fff nvram nybbles
-	map(0x721000, 0x721fff).r(FUNC(tek440x_state::nvram_r));
 	map(0x720000, 0x720007).rw(m_lance, FUNC(am79c90_device::regs_r), FUNC(am79c90_device::regs_w));
 
+	// 721000-72107f net ram
+	// 722000-721fff nvram nybbles
+	//map(0x721000, 0x7210ff).rw(m_novram, FUNC(x2210_device::read), FUNC(x2210_device::write));
+	map(0x721000, 0x7210ff).rw(FUNC(tek440x_state::readnvram), FUNC(tek440x_state::writenvram));
+	map(0x722000, 0x722fff).rw(FUNC(tek440x_state::recall_r), FUNC(tek440x_state::recall_w));
+	map(0x723000, 0x723fff).rw(FUNC(tek440x_state::store_r), FUNC(tek440x_state::store_w));
+	
 	map(0x740000, 0x747fff).rom().mirror(0x8000).region("maincpu", 0).w(FUNC(tek440x_state::led_w));
 	map(0x760000, 0x760fff).ram().mirror(0xf000); // debug RAM
 
@@ -1621,6 +1683,9 @@ m_printer->in_pb_callback().set_constant(0xbf);		// HACK:  vblank always checks 
 //		m_maincpu->space(0).write_word(offset, data, mem_mask);
 		m_vm->write16(offset, data, mem_mask);
 	});
+
+	X2210(config, m_novram);
+
 	MC68681(config, m_duart, 14.7456_MHz_XTAL / 4);
 	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_5); // auto-vectored
 	m_duart->outport_cb().set(FUNC(tek440x_state::kb_rclamp_w)).bit(4);
