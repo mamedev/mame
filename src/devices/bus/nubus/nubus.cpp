@@ -65,19 +65,7 @@ void nubus_slot_device::device_start()
 {
 }
 
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
 DEFINE_DEVICE_TYPE(NUBUS, nubus_device, "nubus", "NuBus")
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  nubus_device - constructor
-//-------------------------------------------------
 
 nubus_device::nubus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	nubus_device(mconfig, NUBUS, tag, owner, clock)
@@ -86,27 +74,55 @@ nubus_device::nubus_device(const machine_config &mconfig, const char *tag, devic
 
 nubus_device::nubus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
+	device_memory_interface(mconfig, *this),
 	m_space(*this, finder_base::DUMMY_TAG, -1),
+	m_mem_config("nubus", ENDIANNESS_BIG, 32, 32),
 	m_out_irq9_cb(*this),
 	m_out_irqa_cb(*this),
 	m_out_irqb_cb(*this),
 	m_out_irqc_cb(*this),
 	m_out_irqd_cb(*this),
-	m_out_irqe_cb(*this)
+	m_out_irqe_cb(*this),
+	m_bus_mode(nubus_mode_t::NORMAL),
+	m_addr_mask(0xffffffff)
 {
-	m_addr_mask = 0xffffffff;
 }
 
 nubus_device::~nubus_device()
 {
 }
 
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
+device_memory_interface::space_config_vector nubus_device::memory_space_config() const
+{
+	return space_config_vector{
+		std::make_pair(AS_DATA, &m_mem_config)};
+}
 
 void nubus_device::device_start()
 {
+	switch (m_bus_mode)
+	{
+		case nubus_mode_t::NORMAL:
+			m_space->install_read_handler(0x90000000, 0xefffffff, emu::rw_delegate(*this, FUNC(nubus_device::bus_memory_r<0x90000000>)));
+			m_space->install_write_handler(0x90000000, 0xefffffff, emu::rw_delegate(*this, FUNC(nubus_device::bus_memory_w<0x90000000>)));
+			m_space->install_read_handler(0xf9000000, 0xfeffffff, emu::rw_delegate(*this, FUNC(nubus_device::bus_memory_r<0xf9000000>)));
+			m_space->install_write_handler(0xf9000000, 0xfeffffff, emu::rw_delegate(*this, FUNC(nubus_device::bus_memory_w<0xf9000000>)));
+			break;
+
+		case nubus_mode_t::QUADRA_DAFB:
+			m_space->install_read_handler(0xa0000000, 0xefffffff, emu::rw_delegate(*this, FUNC(nubus_device::bus_memory_r<0x90000000>)));
+			m_space->install_write_handler(0xa0000000, 0xefffffff, emu::rw_delegate(*this, FUNC(nubus_device::bus_memory_w<0x90000000>)));
+			m_space->install_read_handler(0xfa000000, 0xfeffffff, emu::rw_delegate(*this, FUNC(nubus_device::bus_memory_r<0xf9000000>)));
+			m_space->install_write_handler(0xfa000000, 0xfeffffff, emu::rw_delegate(*this, FUNC(nubus_device::bus_memory_w<0xf9000000>)));
+			break;
+
+		case nubus_mode_t::LC_PDS:
+			m_space->install_read_handler(0x80e00000, 0x80ffffff, emu::rw_delegate(*this, FUNC(nubus_device::bus_memory_r<0x80e00000>)));
+			m_space->install_write_handler(0x80e00000, 0x80ffffff, emu::rw_delegate(*this, FUNC(nubus_device::bus_memory_w<0x80e00000>)));
+			m_space->install_read_handler(0x00e00000, 0x00efffff, emu::rw_delegate(*this, FUNC(nubus_device::bus_memory_r<0x80e00000>)));
+			m_space->install_write_handler(0x00e00000, 0x00efffff, emu::rw_delegate(*this, FUNC(nubus_device::bus_memory_w<0x80e00000>)));
+			break;
+	}
 }
 
 void nubus_device::add_nubus_card(device_nubus_card_interface &card)
@@ -114,23 +130,39 @@ void nubus_device::add_nubus_card(device_nubus_card_interface &card)
 	m_device_list.emplace_back(card);
 }
 
+template <uint32_t Base>
+u32 nubus_device::bus_memory_r(offs_t offset, uint32_t mem_mask)
+{
+	return this->space(AS_DATA).read_dword(Base + (offset * 4), mem_mask);
+}
+
+template <uint32_t Base>
+void nubus_device::bus_memory_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	this->space(AS_DATA).write_dword(Base + (offset * 4), data, mem_mask);
+}
+
+template uint32_t nubus_device::bus_memory_r<0x90000000>(offs_t offset, u32 mem_mask);
+template void     nubus_device::bus_memory_w<0x90000000>(offs_t offset, u32 data, u32 mem_mask);
+template uint32_t nubus_device::bus_memory_r<0xf9000000>(offs_t offset, u32 mem_mask);
+template void     nubus_device::bus_memory_w<0xf9000000>(offs_t offset, u32 data, u32 mem_mask);
+
+template uint32_t nubus_device::bus_memory_r<0xa0000000>(offs_t offset, u32 mem_mask);
+template void     nubus_device::bus_memory_w<0xa0000000>(offs_t offset, u32 data, u32 mem_mask);
+template uint32_t nubus_device::bus_memory_r<0xfa000000>(offs_t offset, u32 mem_mask);
+template void     nubus_device::bus_memory_w<0xfa000000>(offs_t offset, u32 data, u32 mem_mask);
+
+template uint32_t nubus_device::bus_memory_r<0x00e00000>(offs_t offset, u32 mem_mask);
+template void     nubus_device::bus_memory_w<0x00e00000>(offs_t offset, u32 data, u32 mem_mask);
+template uint32_t nubus_device::bus_memory_r<0x80e00000>(offs_t offset, u32 mem_mask);
+template void     nubus_device::bus_memory_w<0x80e00000>(offs_t offset, u32 data, u32 mem_mask);
+
 template <typename R, typename W>
 void nubus_device::install_device(offs_t start, offs_t end, R rhandler, W whandler, uint32_t mask)
 {
-	const int buswidth = m_space->data_width();
 	start &= m_addr_mask;
 	end &= m_addr_mask;
-	switch(buswidth)
-	{
-		case 32:
-			m_space->install_readwrite_handler(start, end, rhandler, whandler, mask);
-			break;
-		case 64:
-			m_space->install_readwrite_handler(start, end, rhandler, whandler, (uint64_t(mask) << 32) | mask);
-			break;
-		default:
-			fatalerror("NUBUS: Bus width %d not supported\n", buswidth);
-	}
+	space(AS_DATA).install_readwrite_handler(start, end, rhandler, whandler, mask);
 }
 
 template void nubus_device::install_device<read8_delegate,     write8_delegate    >(offs_t start, offs_t end, read8_delegate rhandler,     write8_delegate whandler, uint32_t mask);
@@ -149,20 +181,9 @@ template void nubus_device::install_device<read32smo_delegate, write32smo_delega
 template <typename R>
 void nubus_device::install_readonly_device(offs_t start, offs_t end, R rhandler, uint32_t mask)
 {
-	const int buswidth = m_space->data_width();
 	start &= m_addr_mask;
 	end &= m_addr_mask;
-	switch(buswidth)
-	{
-		case 32:
-			m_space->install_read_handler(start, end, rhandler, mask);
-			break;
-		case 64:
-			m_space->install_read_handler(start, end, rhandler, (uint64_t(mask) << 32) | mask);
-			break;
-		default:
-			fatalerror("NUBUS: Bus width %d not supported\n", buswidth);
-	}
+	space(AS_DATA).install_read_handler(start, end, rhandler, mask);
 }
 
 template void nubus_device::install_readonly_device<read8_delegate    >(offs_t start, offs_t end, read8_delegate rhandler,     uint32_t mask);
@@ -181,20 +202,9 @@ template void nubus_device::install_readonly_device<read32smo_delegate>(offs_t s
 template <typename W>
 void nubus_device::install_writeonly_device(offs_t start, offs_t end, W whandler, uint32_t mask)
 {
-	const int buswidth = m_space->data_width();
 	start &= m_addr_mask;
 	end &= m_addr_mask;
-	switch(buswidth)
-	{
-		case 32:
-			m_space->install_write_handler(start, end, whandler, mask);
-			break;
-		case 64:
-			m_space->install_write_handler(start, end, whandler, (uint64_t(mask) << 32) | mask);
-			break;
-		default:
-			fatalerror("NUBUS: Bus width %d not supported\n", buswidth);
-	}
+	space(AS_DATA).install_write_handler(start, end, whandler, mask);
 }
 
 template void nubus_device::install_writeonly_device<write8_delegate    >(offs_t start, offs_t end, write8_delegate whandler,     uint32_t mask);
@@ -214,21 +224,23 @@ void nubus_device::install_bank(offs_t start, offs_t end, void *data)
 {
 	start &= m_addr_mask;
 	end &= m_addr_mask;
-	m_space->install_ram(start, end, data);
+	space(AS_DATA).install_ram(start, end, data);
 }
 
 void nubus_device::install_view(offs_t start, offs_t end, memory_view &view)
 {
 	start &= m_addr_mask;
 	end &= m_addr_mask;
-	m_space->install_view(start, end, view);
+	space(AS_DATA).install_view(start, end, view);
 }
 
 void nubus_device::set_irq_line(int slot, int state)
 {
 	switch (slot)
 	{
-		case 0x9:   irq9_w(state);  break;
+		case 0x9:
+			irq9_w(state);
+			break;
 		case 0xa:   irqa_w(state);  break;
 		case 0xb:   irqb_w(state);  break;
 		case 0xc:   irqc_w(state);  break;
@@ -277,7 +289,7 @@ device_nubus_card_interface::~device_nubus_card_interface()
 
 void device_nubus_card_interface::interface_pre_start()
 {
-	if ((!strncmp(m_nubus_slottag, "pds030", 6)) || (!strcmp(m_nubus_slottag, "siexp")))
+	if ((!strncmp(m_nubus_slottag, "pds030", 6)) || (!strncmp(m_nubus_slottag, "siexp", 5)))
 	{
 		m_slot = 0x9;   // '030 PDS slots phantom slot as whatever they want but default to 9
 	}
@@ -347,13 +359,6 @@ void device_nubus_card_interface::install_declaration_rom(const char *romregion,
 		inverted = true;
 	}
 
-#if 0
-	FILE *f;
-	f = fopen("romout.bin", "wb");
-	fwrite(rom, romlen, 1, f);
-	fclose(f);
-#endif
-
 	switch (byteLanes)
 	{
 		case 0x0f:  // easy case: all 4 lanes (still must scramble for 32-bit BE bus though)
@@ -365,8 +370,8 @@ void device_nubus_card_interface::install_declaration_rom(const char *romregion,
 			break;
 
 		case 0xe1:  // lane 0 only
-			m_declaration_rom.resize(romlen*4);
-			memset(&m_declaration_rom[0], 0, romlen*4);
+			m_declaration_rom.resize(romlen * 4);
+			std::fill_n(&m_declaration_rom[0], romlen * 4, 0);
 			for (int i = 0; i < romlen; i++)
 			{
 				m_declaration_rom[BYTE4_XOR_BE(i*4)] = rom[i];
@@ -375,8 +380,8 @@ void device_nubus_card_interface::install_declaration_rom(const char *romregion,
 			break;
 
 		case 0xd2:  // lane 1 only
-			m_declaration_rom.resize(romlen*4);
-			memset(&m_declaration_rom[0], 0, romlen*4);
+			m_declaration_rom.resize(romlen * 4);
+			std::fill_n(&m_declaration_rom[0], romlen * 4, 0);
 			for (int i = 0; i < romlen; i++)
 			{
 				m_declaration_rom[BYTE4_XOR_BE((i*4)+1)] = rom[i];
@@ -385,8 +390,8 @@ void device_nubus_card_interface::install_declaration_rom(const char *romregion,
 			break;
 
 		case 0xb4:  // lane 2 only
-			m_declaration_rom.resize(romlen*4);
-			memset(&m_declaration_rom[0], 0, romlen*4);
+			m_declaration_rom.resize(romlen * 4);
+			std::fill_n(&m_declaration_rom[0], romlen * 4, 0);
 			for (int i = 0; i < romlen; i++)
 			{
 				m_declaration_rom[BYTE4_XOR_BE((i*4)+2)] = rom[i];
@@ -395,8 +400,8 @@ void device_nubus_card_interface::install_declaration_rom(const char *romregion,
 			break;
 
 		case 0x78:  // lane 3 only
-			m_declaration_rom.resize(romlen*4);
-			memset(&m_declaration_rom[0], 0, romlen*4);
+			m_declaration_rom.resize(romlen * 4);
+			std::fill_n(&m_declaration_rom[0], romlen * 4, 0);
 			for (int i = 0; i < romlen; i++)
 			{
 				m_declaration_rom[BYTE4_XOR_BE((i*4)+3)] = rom[i];
@@ -405,9 +410,9 @@ void device_nubus_card_interface::install_declaration_rom(const char *romregion,
 			break;
 
 		case 0xc3:  // lanes 0, 1
-			m_declaration_rom.resize(romlen*2);
-			memset(&m_declaration_rom[0], 0, romlen*2);
-			for (int i = 0; i < romlen/2; i++)
+			m_declaration_rom.resize(romlen * 2);
+			std::fill_n(&m_declaration_rom[0], romlen * 2, 0);
+			for (int i = 0; i < romlen / 2; i++)
 			{
 				m_declaration_rom[BYTE4_XOR_BE((i*4)+0)] = rom[(i*2)];
 				m_declaration_rom[BYTE4_XOR_BE((i*4)+1)] = rom[(i*2)+1];
@@ -416,8 +421,8 @@ void device_nubus_card_interface::install_declaration_rom(const char *romregion,
 			break;
 
 		case 0xa5:  // lanes 0, 2
-			m_declaration_rom.resize(romlen*2);
-			memset(&m_declaration_rom[0], 0, romlen*2);
+			m_declaration_rom.resize(romlen * 2);
+			std::fill_n(&m_declaration_rom[0], romlen * 2, 0);
 			for (int i = 0; i < romlen/2; i++)
 			{
 				m_declaration_rom[BYTE4_XOR_BE((i*4)+0)] = rom[(i*2)];
@@ -427,8 +432,8 @@ void device_nubus_card_interface::install_declaration_rom(const char *romregion,
 			break;
 
 		case 0x3c:  // lanes 2,3
-			m_declaration_rom.resize(romlen*2);
-			memset(&m_declaration_rom[0], 0, romlen*2);
+			m_declaration_rom.resize(romlen * 2);
+			std::fill_n(&m_declaration_rom[0], romlen * 2, 0);
 			for (int i = 0; i < romlen/2; i++)
 			{
 				m_declaration_rom[BYTE4_XOR_BE((i*4)+2)] = rom[(i*2)];
@@ -438,7 +443,7 @@ void device_nubus_card_interface::install_declaration_rom(const char *romregion,
 			break;
 
 		default:
-			fatalerror("NuBus: unhandled byteLanes value %02x\n", byteLanes);
+			fatalerror("nubus: unhandled byteLanes value %02x\n", byteLanes);
 	}
 
 	// the slot manager can supposedly handle inverted ROMs by itself, but let's do it for it anyway

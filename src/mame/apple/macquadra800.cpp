@@ -247,6 +247,7 @@ void quadra800_state::macqd800(machine_config &config)
 
 	nubus_device &nubus(NUBUS(config, "nubus", 40_MHz_XTAL / 4));
 	nubus.set_space(m_maincpu, AS_PROGRAM);
+	nubus.set_bus_mode(nubus_device::nubus_mode_t::QUADRA_DAFB);
 	nubus.out_irqc_callback().set(m_iosb, FUNC(iosb_device::via2_irq_w<0x08>));
 	nubus.out_irqd_callback().set(m_iosb, FUNC(iosb_device::via2_irq_w<0x10>));
 	nubus.out_irqe_callback().set(m_iosb, FUNC(iosb_device::via2_irq_w<0x20>));
