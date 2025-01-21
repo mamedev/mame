@@ -881,7 +881,10 @@ ROM_START( otrail )
 	ROM_LOAD( "t24c04a.bin", 0x000, 0x200, CRC(ce1fad6f) SHA1(82878996765739edba42042b6336460d5c8f8096) )
 ROM_END
 
-
+ROM_START( pactin )
+	ROM_REGION( 0x100000, "mainrom", 0 )
+	ROM_LOAD( "25q80a.u3", 0x00000, 0x100000, CRC(92935759) SHA1(2333e7dcab51fa34c8d875374371854121fff27a) )
+ROM_END
 
 
 ROM_START( hhgc319 )
@@ -1065,4 +1068,5 @@ CONS( 201?, egame150,  denv150,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vt
 // uncertain, uses SPI ROM so probably VT369
 CONS( 2017, otrail,     0,        0,  nes_vt369_vtunknown_unk_1mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "Basic Fun", "The Oregon Trail", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
+CONS( 2021, pactin,     0,        0,  nes_vt369_vtunknown_unk_1mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "Fizz Creations", "Pac-Man in a Tin", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
