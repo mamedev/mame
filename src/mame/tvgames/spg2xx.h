@@ -390,6 +390,29 @@ protected:
 private:
 };
 
+class epo_tetr_game_state : public spg2xx_game_state
+{
+public:
+	epo_tetr_game_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag),
+		m_ioextra(*this, "EXTRA")
+	{ }
+	void epo_tetr(machine_config &config);
+
+protected:
+private:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+	uint16_t epo_tetr_r(offs_t offset, uint16_t mem_mask);
+	void epo_tetr_portb_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+
+	uint16_t m_old_portb_data;
+	uint16_t m_old_portb_extra_latch;
+
+	required_ioport m_ioextra;
+};
+
 class spg2xx_game_prail_state : public spg2xx_game_state
 {
 public:
