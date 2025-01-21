@@ -375,6 +375,11 @@ ROM_START( gameu50 )
 	ROM_LOAD16_WORD_SWAP( "gameu.bin", 0x000000, 0x2000000, CRC(13c42bce) SHA1(f769ceabb8ab4e60c0d663dffd5cca91c6aec206) )
 ROM_END
 
+ROM_START( gameu90 )
+	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "s29gl256.bin", 0x000000, 0x2000000, CRC(4b9e0498) SHA1(7ee387deabdd8dd59e5fa7f4f39d472bd4462ba9) )
+ROM_END
+
 ROM_START( gameu108 )
 	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "s29gl256.u5", 0x000000, 0x2000000, CRC(48e727a4) SHA1(7338f8e46f794ae148adb84146cd2eddf4eba98d) )
@@ -604,7 +609,7 @@ void gameu_handheld_game_state::machine_reset()
 	m_upperbase = 0;
 }
 
-void gameu_handheld_game_state::decrypt_gameu()
+void gameu_handheld_game_state::init_gameu()
 {
 	uint16_t *ROM = (uint16_t*)memregion("maincpu")->base();
 	int size = memregion("maincpu")->bytes();
@@ -623,9 +628,9 @@ void gameu_handheld_game_state::decrypt_gameu()
 
 }
 
-void gameu_handheld_game_state::init_gameu()
+void gameu_handheld_game_state::init_gameu50()
 {
-	decrypt_gameu();
+	init_gameu();
 
 	// why do we need these? it will jump to 0 after the menu selection (prior to fadeout and bank select) otherwise, which can't be correct
 	uint16_t *ROM = (uint16_t*)memregion("maincpu")->base();
@@ -645,7 +650,7 @@ void gameu_handheld_game_state::init_gameu()
 
 void gameu_handheld_game_state::init_gameu108()
 {
-	decrypt_gameu();
+	init_gameu();
 
 	uint16_t *ROM = (uint16_t*)memregion("maincpu")->base();
 
@@ -692,5 +697,6 @@ CONS(2013, gormiti,   0, 0, base, gormiti,  gormiti_game_state, empty_init, "Gio
 
 // unit looks a bit like a knock-off Wii-U tablet, but much smaller
 // was also available under other names, with different designs (PSP style)
-CONS( 201?, gameu50,       0,              0,      gameu, gameu, gameu_handheld_game_state, init_gameu,    "YSN", "Play Portable Color GameU+ (50-in-1) (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 201?, gameu50,       0,              0,      gameu, gameu, gameu_handheld_game_state, init_gameu50,  "YSN", "Play Portable Color GameU+ (50-in-1) (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 201?, gameu90,       0,              0,      gameu, gameu, gameu_handheld_game_state, init_gameu,    "YSN", "Play Portable Color GameU+ (90-in-1) (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 CONS( 201?, gameu108,      0,              0,      gameu, gameu, gameu_handheld_game_state, init_gameu108, "YSN", "Play Portable Color GameU+ (108-in-1) (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
