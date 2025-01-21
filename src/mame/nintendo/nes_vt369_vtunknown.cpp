@@ -170,6 +170,7 @@ public:
 
 	void nes_vt369_vtunknown_unk(machine_config& config);
 	void nes_vt369_vtunknown_unk_1mb(machine_config& config);
+	void nes_vt369_vtunknown_unk_4mb(machine_config& config);
 	void nes_vt369_vtunknown_unk_16mb(machine_config& config);
 
 	void nes_vt369_vtunknown_fp(machine_config& config);
@@ -448,7 +449,11 @@ void nes_vt369_vtunknown_unk_state::nes_vt369_vtunknown_unk_1mb(machine_config& 
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt369_vtunknown_unk_state::vt_external_space_map_1mbyte);
 }
 
-
+void nes_vt369_vtunknown_unk_state::nes_vt369_vtunknown_unk_4mb(machine_config& config)
+{
+	nes_vt369_vtunknown_unk(config);
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt369_vtunknown_unk_state::vt_external_space_map_4mbyte);
+}
 
 
 
@@ -886,6 +891,11 @@ ROM_START( pactin )
 	ROM_LOAD( "25q80a.u3", 0x00000, 0x100000, CRC(92935759) SHA1(2333e7dcab51fa34c8d875374371854121fff27a) )
 ROM_END
 
+// GC31-369-20210702-V2 on PCB
+ROM_START( unk128vt )
+	ROM_REGION( 0x400000, "mainrom", 0 )
+	ROM_LOAD( "w25q32.bin", 0x00000, 0x400000, CRC(35ccadf6) SHA1(80b25e374a097d1b9380b7e64013d7ac0d5aa2ca) )
+ROM_END
 
 ROM_START( hhgc319 )
 	ROM_REGION( 0x1000000, "mainrom", 0 )
@@ -1069,4 +1079,7 @@ CONS( 201?, egame150,  denv150,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vt
 CONS( 2017, otrail,     0,        0,  nes_vt369_vtunknown_unk_1mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "Basic Fun", "The Oregon Trail", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 2021, pactin,     0,        0,  nes_vt369_vtunknown_unk_1mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "Fizz Creations", "Pac-Man in a Tin", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+
+// boots, has a lower resolution screen. menu is natively in low resolution, other games should be scaled down
+CONS( 2021, unk128vt,   0,        0,  nes_vt369_vtunknown_unk_4mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "unknown VT369 based 128-in-1 (GC31-369-20210702-V2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
