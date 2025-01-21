@@ -57,30 +57,30 @@
 
     not dumped: xavix2.cpp
 
-    2008      究極! 筋肉スタジアム! サスケ完全制覇   kyuukyoku! kinniku grand slam! SASUKE kanzen seiha /EPOCH/Japan                                 -           -               -           -               -                   -                       -
-    2006      SASUKE サスケ＆筋肉バトル!!スポーツマンNO.1決定戦 / エポック社 / 日本   SASUKE Sasuke & Muscle Battle!! Sportsman No. 1 Decisive Battle / Epoch Publishing / Japan
-    2005      Let's!TVプレイ ドラゴンボ－ルＺ バトル体感かめはめ波～ おめぇとフュージョン / バンダイ / 日本          Let's!TV Play Dragon Ball Z Battle Experience Kamehameha ~ Ometo Fusion / Bandai / Japan
+    2008      究極! 筋肉スタジアム! サスケ完全制覇   Kyuukyoku! Kinniku Stadium! Sasuke Kanzen Seiha /EPOCH/Japan                                 -           -               -           -               -                   -                       -
+    2006      SASUKE サスケ＆筋肉バトル!!スポーツマンNO.1決定戦 / エポック社 / 日本   Sasuke & Kinniku Battle!! Sportsman No. 1 Ketteisen / Epoch Publishing / Japan
+    2005      Let's!TVプレイ ドラゴンボ－ルＺ バトル体感かめはめ波～ おめぇとフュージョン / バンダイ / 日本          Let's! TV Play Dragon Ball Z Battle Taikan Kamehameha~ Omee to Fusion / Bandai / Japan
 
     dumped: either here, xavix_2000.cpp, or xavix_2002.cpp
-	          Let's!TVプレイ 体感キャストオフ 仮面ライダーカブト クロックアップ＆ライダーキック / バンダイ / 日本  Let's!TV Play Experience Cast Off Kamen Rider Kabuto Clock Up & Rider Kick / Bandai / Japan
-			  Let's!TVプレイ なりきり体感 ボウケンジャー 走れ！撃て！ミッションスタート！！ / バンダイ / 日本   Let's! TV Play Narikiri Experience Boukenger Run! Shoot! Mission starts! ! / Bandai / Japan
+	          Let's!TVプレイ 体感キャストオフ 仮面ライダーカブト クロックアップ＆ライダーキック / バンダイ / 日本  Let's! TV Play Taikan Cast Off Kamen Rider Kabuto Clock Up & Rider Kick / Bandai / Japan
+			  Let's!TVプレイ なりきり体感 ボウケンジャー 走れ！撃て！ミッションスタート！！ / バンダイ / 日本   Let's! TV Play Narikiri Taikan Boukenger Hashire! Ute! Mission Start!! / Bandai / Japan
 			  Webdiver Gradion /TAKARA/Japan                                                                  -           -               -           -               -                   -                       -
-			  Let's!TVプレイ 魔法戦隊マジレンジャー マジマットでダンス＆バトル / バンダイ / 日本        Let's!TV Play Mahou Sentai Magiranger Dance & Battle at Magimat / Bandai / Japan
+			  Let's!TVプレイ 魔法戦隊マジレンジャー マジマットでダンス＆バトル / バンダイ / 日本        Let's! TV Play Mahou Taiketsu Magiranger - Magimat de Dance & Battle / Bandai / Japan
 			  anpan-man pyon-pyon ikunou mat /JoyPalette/Japan                                                -           -               -           -               -                   -                       -
-			  どこでもドラえもん 日本旅行ゲームDX体感！どこドラグランプリ！ / エポック社 / 日本          Doraemon anywhere - Japan travel game DX experience! Where is the Dragon Grand Prix! / Epoch / Japan
-              Let's!TVプレイ ふたりはプリキュアMaxHeart マットでダンス MaxHeartにおどっちゃおう / バンダイ / 日本         Let's!TV Play Futari wa PreCure MaxHeart Dance on the mat Let's go to MaxHeart / Bandai / Japan
+			  どこでもドラえもん 日本旅行ゲームDX体感！どこドラグランプリ！ / エポック社 / 日本          Doko Demo Doraemon Nihon Ryokou Game DX Taikan! Doko Dora Grand Prix! / Epoch / Japan
+              Let's!TVプレイ ふたりはプリキュアMaxHeart マットでダンス MaxHeartにおどっちゃおう / バンダイ / 日本         Let's! TV Play Futari wa PreCure - MaxHeart Mat de Dance MaxHeart ni Odotchaou / Bandai / Japan
 			  anpan-man kazoku de ikunou mat DX /JoyPalette/Japan                                             -           -               -           -               -                   -                       -
 			  Excite Striker (UK)
               connecTV OPUS /RADICA EU (different ROM to US?)
-              Let's!TVプレイ 音撃バトル！仮面ライダー響鬼 決めろ！一気火勢の型 / バンダイ / 日本  (Let's! TV Play Ongeki Battle! Kamen Rider Hibiki Decide! Ichikkasei no Kata / Bandai / Japan)
+              Let's!TVプレイ 音撃バトル！仮面ライダー響鬼 決めろ！一気火勢の型 / バンダイ / 日本  (Let's! TV Play Ongeki Battle! Kamen Rider Hibiki - Kimero! Ikki Kasei no Kata / Bandai / Japan)
               Let's construct the town! /TAKARA/Japan                                                         -           -               -           -               -                   -                       -
               TV hockey /TOMY/Japan                                                                           -           -               -           -               -                   -                       -
               Zuba-Zuba Blade /TAKARA/Japan                                                                   -           -               -           -               -                   -                       -
               テレビで遊び隊　韋駄天翔 激走 韋駄天バトル / トミー / 日本          Playing with TV Idaten Sho Gekisou Idaten Battle / Tommy / Japan
               Beyblade Ultimate shooter /TAKARA/Japan                                                         -           -               -           -               -                   -                       -
               東京フレンドパーク2スペシャル / エポック社 / 日本          Tokyo Friend Park 2 Special / Epochsha / Japan
-              Let's!TVプレイ ケロロ軍曹 ケロロ小隊大パニック！ドタバタ大決戦であります / バンダイ / 日本   Let's!TV Play Keroro Sergeant Keroro Platoon Panic! It’s a big slapstick battle / Bandai / Japan
-              スーパーテレビパソコン別売カートリッジ ペットケータイLink / エポック社 / 日本      Super TV PC Optional Cartridge Pet Mobile Link / Epochsha / Japan
+              Let's!TVプレイ ケロロ軍曹 ケロロ小隊大パニック！ドタバタ大決戦であります / バンダイ / 日本   Let's! TV Play Keroro Gunsou Keroro Shoutai Dai Panic! Dotabata Daikessen de Arimasu / Bandai / Japan
+              スーパーテレビパソコン別売カートリッジ ペットケータイLink / エポック社 / 日本      Super TV PC Optional Cartridge - Pet Keitai Link / Epochsha / Japan
               Challenge Ai-chan! Exciting Ping-pong /TAKARATOMY/Japan                                         -           -               -           -               -                   -                       dumped
               TV de  Asobitai Hyper Rescue - Boku wa Kyuujotai /BANDAI/Japan                                  -           -               -           -               -                   -                       -
               Tokyo Friend Park II Perfect! Mezase! Grand Slam!! /EPOCH/Japan                                 -           -               -           -               -                   -                       -
@@ -199,7 +199,7 @@
     2006      Let's!TVプレイ　ＮＡＲＵＴＯ－ナルト－ 忍者体感～だってばよ～ / バンダイ / 日本            Let's!TV Play NARUTO Ninja Experience ~Dattebayo~ / Bandai / Japan
     2006      テレビであそぼう！まなぼう！超能力あいうえお図鑑 / エポック社 / 日本   Let's play on TV! Learn! Superpower Aiueo Illustrated Book / Epochsha / Japan
     2006      Let's!TVプレイ　ドラゴンボールＺ　バトル体感かめはめ波２～オッスおめぇ悟空 天下一武道会～ / バンダイ / 日本         Let's!TV Play Dragon Ball Z Battle Experience Kamehameha 2 ~Ossu Ome Goku Tenkaichi Budokai~ / Bandai / Japan
-    2006      ドラえもん 体感タケコプター! 空とぶ大冒険 / エポック社 / 日本      Doraemon Experience Takecopter! Great Flying Adventure / Epoch Publishing / Japan
+    2006      ドラえもん 体感タケコプター! 空とぶ大冒険 / エポック社 / 日本      Doraemon Experience Take-copter! Sora Tobu Daibouken / Epoch Publishing / Japan
 
 
 

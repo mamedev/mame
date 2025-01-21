@@ -859,7 +859,7 @@ CONS( 2004, epo_tfit, 0, 0, superxavix_i2c_24c04_4mb,    epo_tfit,   superxavix_
 CONS( 2010, epo_rgfj, 0, 0, superxavix_i2c_24c08,        xavix_i2c,  superxavix_i2c_state, init_xavix, "Epoch / SSD Company LTD", "Ishikawa Ryou Excite Golf (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // Let's!TVプレイ ふたりはプリキュアMaxHeart マットでダンス MaxHeartにおどっちゃおう 
-CONS( 2004, maxheart, 0, 0, superxavix_i2c_24c04_4mb,    xavix_i2c,   superxavix_i2c_state, init_xavix, "Bandai / SSD Company LTD",  "Let's! TV Play Futari wa PreCure MaxHeart Dance on the mat Let's go to MaxHeart (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2004, maxheart, 0, 0, superxavix_i2c_24c04_4mb,    xavix_i2c,   superxavix_i2c_state, init_xavix, "Bandai / SSD Company LTD",  "Let's! TV Play Futari wa PreCure MaxHeart Mat de Dance MaxHeart ni Odotchaou (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // どこでもドラえもん 日本旅行ゲームDX体感！どこドラグランプリ！
 CONS( 2004, epo_doka, 0, 0, xavix2002_4mb,               xavix,      superxavix_state,     init_epo_doka, "Epoch / SSD Company LTD",  "Doko Demo Doraemon Nihon Ryokou Game DX Taikan! Doko Dora Grand Prix! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
@@ -901,4 +901,4 @@ CONS( 2006, suprtvpcdo,  suprtvpc, 0, superxavix_super_tv_pc,    suprtvpc,      
 CONS( 2008, epo_ntpj,  0, 0, superxavix_piano_pc, suprtvpc, superxavix_piano_pc_state, init_piano_pc, "Epoch / SSD Company LTD", "Hello Kitty Piano PC (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // ドラえもん うごく！おえかき エポック社
-CONS( 2007, doradraw,  0, 0, superxavix_doradraw,    xavix,      superxavix_doradraw_state, init_doradraw, "Epoch / SSD Company LTD", "Doraemon Moving! Oekaki (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2007, doradraw,  0, 0, superxavix_doradraw,    xavix,      superxavix_doradraw_state, init_doradraw, "Epoch / SSD Company LTD", "Doraemon Ugoku! Oekaki (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
