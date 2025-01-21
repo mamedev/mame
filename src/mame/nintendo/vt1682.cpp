@@ -6542,7 +6542,15 @@ ROM_START( icb_ts )
 	ROM_LOAD( "toystory.bin", 0x00000, 0x400000, CRC(396f8aff) SHA1(b149470306cd77558666b7ab90fa3fe4e95b6c60) )
 ROM_END
 
+ROM_START( icb_car )
+	ROM_REGION( 0x2000000, "mainrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "kh26lv320.u2", 0x00000, 0x400000, CRC(88132171) SHA1(55a9ac8c1f49dfc116565ac11149cbd4eef90938) )
+ROM_END
 
+ROM_START( icb_dp )
+	ROM_REGION( 0x2000000, "mainrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "princesscoloringbook.bin", 0x00000, 0x400000, CRC(253a0245) SHA1(1b902f179eed469cf749aaa9169fede290ce1031) )
+ROM_END
 
 ROM_START( gm235upc )
 	ROM_REGION( 0x2000000, "mainrom", ROMREGION_ERASE00 )
@@ -6638,6 +6646,8 @@ CONS( 200?, unk1682,  0,  0,   vt1682_unk1682, lxts3, vt1682_lxts3_state, unk168
 CONS( 2010, lxts3,    0,  0,   vt1682_lxts3, lxts3, vt1682_lxts3_state, regular_init,  "Lexibook", "Toy Story 3 (Lexibook)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 CONS( 200?, icb_ts,   0,  0,   vt1682_lxts3, icb,   vt1682_lxts3_state, regular_init,  "Techno Source", "Interactive Coloring Book: Disney / Pixar Toy Story", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, icb_car,  0,  0,   vt1682_lxts3, icb,   vt1682_lxts3_state, regular_init,  "Techno Source", "Interactive Coloring Book: Disney / Pixar Cars", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, icb_dp,   0,  0,   vt1682_lxts3, icb,   vt1682_lxts3_state, regular_init,  "Techno Source", "Interactive Coloring Book: Disney Princess", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // there are products on SunPlus type hardware with nearly identical shells 'Mi DiGi World' / 'Mi Digi Diary'
 // needs IO ports on sound CPU side, needs write access to space for RAM (inputs are 'mini-keyboard' style)
