@@ -633,7 +633,7 @@ void tmp94c241_device::t8run_w(uint8_t data)
 void tmp94c241_device::treg01_w(offs_t offset, uint8_t data)
 {
 
-    if (BIT(0, offset))
+    if (BIT(offset, 0))
 		SFR_TREG1 = data;
 	else
 		SFR_TREG0 = data;
@@ -742,7 +742,7 @@ void tmp94c241_device::t02ffcr_w(uint8_t data)
 void tmp94c241_device::treg23_w(offs_t offset, uint8_t data)
 {
 
-    if (BIT(0, offset))
+    if (BIT(offset, 0))
 		SFR_TREG3 = data;
 	else
 		SFR_TREG2 = data;
