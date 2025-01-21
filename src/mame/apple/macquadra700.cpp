@@ -778,6 +778,7 @@ void eclipse_state::via2_out_b_q900(u8 data)
 
 		nubus_device &nubus(NUBUS(config, "nubus", 40_MHz_XTAL / 4));
 		nubus.set_space(m_maincpu, AS_PROGRAM);
+		nubus.set_bus_mode(nubus_device::nubus_mode_t::QUADRA_DAFB);
 		nubus.out_irq9_callback().set(FUNC(quadrax00_state::nubus_irq_9_w));
 		nubus.out_irqa_callback().set(FUNC(quadrax00_state::nubus_irq_a_w));
 		nubus.out_irqb_callback().set(FUNC(quadrax00_state::nubus_irq_b_w));

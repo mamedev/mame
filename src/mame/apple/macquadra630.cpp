@@ -197,6 +197,7 @@ void quadra630_state::macqd630(machine_config &config)
 
 	nubus_device &nubus(NUBUS(config, "pds", 0));
 	nubus.set_space(m_maincpu, AS_PROGRAM);
+	nubus.set_bus_mode(nubus_device::nubus_mode_t::QUADRA_DAFB);
 	nubus.out_irqe_callback().set(m_primetimeii, FUNC(primetime_device::via2_irq_w<0x20>));
 	NUBUS_SLOT(config, "lcpds", "pds", mac_pdslc_cards, nullptr);
 
