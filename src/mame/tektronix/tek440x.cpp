@@ -10,6 +10,7 @@
         * 68010 (4404) or 68020 (4405) with custom MMU
         * Intelligent floppy subsystem with 6502 driving a uPD765 controller
         * NS32081 FPU
+        * AMD LANCE Ethernet controller
         * 6551 debug console AICA
         * SN76496 PSG for sound
         * MC146818 RTC
@@ -58,6 +59,7 @@
 #include "machine/mos6551.h"    // debug tty
 #include "machine/ncr5385.h"
 #include "machine/ns32081.h"
+#include "machine/am79c90.h"
 #include "machine/i8255.h"
 #include "machine/nscsi_bus.h"
 #include "sound/sn76496.h"
@@ -521,6 +523,7 @@ public:
 		m_screen(*this, "screen"),
 		m_acia(*this, "acia"),
 		m_fpu(*this, "fpu"),
+		m_lance(*this, "lance"),
 		m_printer(*this, "printer"),
 		m_prom(*this, "maincpu"),			// FIXME why is the bootrom called 'maincpu'?
 		m_mainram(*this, "mainram"),
@@ -627,6 +630,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<mos6551_device> m_acia;
 	required_device<ns32081_device> m_fpu;
+	required_device<am7990_device> m_lance;
 	required_device<i8255_device> m_printer;
 
 	required_region_ptr<u16> m_prom;
@@ -1468,6 +1472,8 @@ void tek440x_state::physical_map(address_map &map)
 	// 720000-720fff spare 1 (ethernet)
 	// 721000-721fff nvram nybbles
 	map(0x721000, 0x721fff).r(FUNC(tek440x_state::nvram_r));
+	map(0x720000, 0x720007).rw(m_lance, FUNC(am79c90_device::regs_r), FUNC(am79c90_device::regs_w));
+
 	map(0x740000, 0x747fff).rom().mirror(0x8000).region("maincpu", 0).w(FUNC(tek440x_state::led_w));
 	map(0x760000, 0x760fff).ram().mirror(0xf000); // debug RAM
 
@@ -1599,7 +1605,22 @@ m_printer->in_pb_callback().set_constant(0xbf);		// HACK:  vblank always checks 
 
 	NS32081(config, m_fpu, 20_MHz_XTAL / 2);
 	m_fpu->out_scb().set(FUNC(tek440x_state::fpu_finished));
-	
+
+	// ethernet
+	AM7990(config, m_lance);
+	m_lance->intr_out().set_inputline(m_maincpu, M68K_IRQ_4);
+	m_lance->dma_in().set([this](offs_t offset) {
+
+		LOG("dma_in 0x%08x\n",offset);
+//		return m_maincpu->space(0).read_word(offset);
+		return m_vm->read16(offset);
+	});
+	m_lance->dma_out().set([this](offs_t offset, u16 data, u16 mem_mask) {
+		
+		LOG("dma_out 0x%08x <= %04x\n",offset, data);
+//		m_maincpu->space(0).write_word(offset, data, mem_mask);
+		m_vm->write16(offset, data, mem_mask);
+	});
 	MC68681(config, m_duart, 14.7456_MHz_XTAL / 4);
 	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_5); // auto-vectored
 	m_duart->outport_cb().set(FUNC(tek440x_state::kb_rclamp_w)).bit(4);
