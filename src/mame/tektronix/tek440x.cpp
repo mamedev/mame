@@ -665,16 +665,8 @@ private:
 	bool m_kb_tdata;
 	bool m_kb_rclamp;
 	bool m_kb_loop;
-			
-			
+
 	int m_fpu_finished;
-	
-	u16 m_fpuselect;
-	u16 m_fpustatus;
-	u16 m_operand;
-	u16 m_lswoperand[5];
-	u16 m_mswoperand[5];
-	uint64_t m_result;
 
 	u16 m_videoaddr[4];
 	u8 m_videocntl;
@@ -1763,4 +1755,4 @@ ROM_END
  *
  *************************************/
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY      FULLNAME                               FLAGS
-COMP( 1984, tek4404, 0,      0,      tek4404, tek4404, tek440x_state, empty_init, "Tektronix", "4404 Artificial Intelligence System", MACHINE_NODEVICE_LAN  )
+COMP( 1984, tek4404, 0,      0,      tek4404, tek4404, tek440x_state, empty_init, "Tektronix", "4404 Artificial Intelligence System", MACHINE_IMPERFECT_CONTROLS  )
