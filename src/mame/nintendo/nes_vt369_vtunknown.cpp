@@ -902,6 +902,13 @@ ROM_START( hhgc319 )
 	ROM_LOAD( "s29gl128n10tfi01.u3", 0x000000, 0x1000000, CRC(4b51125f) SHA1(bab3981ae1652cf6620c7c6769a6729a1e4d588f) )
 ROM_END
 
+ROM_START( vibes240 )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	// wouldn't read consistently
+	ROM_LOAD( "s29gl128p11tfi01.bin", 0x000000, 0x1000000, BAD_DUMP CRC(7244d6e9) SHA1(951052f6cd8c873f85f79be9d64498a43e92fd10) )
+	ROM_IGNORE(0x100)
+ROM_END
+
 void nes_vt369_vtunknown_state::init_lxcmcypp()
 {
 	int size = memregion("mainrom")->bytes()/2;
@@ -1023,6 +1030,9 @@ CONS( 2020, nubsupmf,   0,      0,  nes_vt369_vtunknown_hh_4mb, nes_vt369_vtunkn
 // unknown tech level, might be scrambled as default codebank/boot vectors don't seem valid
 CONS( 201?, hhgc319,  0,        0,  nes_vt369_vtunknown_hh_16mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "Handheld Game Console 319-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
+// unknown tech, probably 2021, probably VT369, ROM wouldn't read consistently
+CONS( 202?, vibes240, 0,        0,  nes_vt369_vtunknown_hh_16mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "Vibes Retro Pocket Gamer 240-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+
 /*****************************************************************************
 * below are VT369 games that use BGA on sub
 *****************************************************************************/
@@ -1082,4 +1092,3 @@ CONS( 2021, pactin,     0,        0,  nes_vt369_vtunknown_unk_1mb, nes_vt369_vtu
 
 // boots, has a lower resolution screen. menu is natively in low resolution, other games should be scaled down
 CONS( 2021, unk128vt,   0,        0,  nes_vt369_vtunknown_unk_4mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "unknown VT369 based 128-in-1 (GC31-369-20210702-V2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-
