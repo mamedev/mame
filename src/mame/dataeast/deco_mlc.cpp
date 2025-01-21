@@ -1057,7 +1057,7 @@ void deco_mlc_state::init_mlc()
 	/* The timing in the ARM core isn't as accurate as it should be, so bump up the
 	    effective clock rate here to compensate otherwise we have slowdowns in
 	    Skull Fang where there probably shouldn't be. */
-	m_maincpu->set_clock_scale(2.0f);
+	m_maincpu->set_clock_scale(2.0);
 	m_irqLevel = ARM_IRQ_LINE;
 	deco156_decrypt(machine());
 	descramble_sound();
@@ -1065,7 +1065,7 @@ void deco_mlc_state::init_mlc()
 
 void deco_mlc_state::init_acchi() // sound ROMs don't appear to be scrambled
 {
-	m_maincpu->set_clock_scale(2.0f);  // avoids hangs in attract mode / end of round, see init_mlc()
+	m_maincpu->set_clock_scale(2.0); // avoids hangs in attract mode / end of round, see init_mlc()
 	m_irqLevel = ARM_IRQ_LINE;
 	deco156_decrypt(machine());
 }
