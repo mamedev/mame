@@ -9,7 +9,6 @@ authors:hap
 
 <!-- define elements -->
 
-	<element name="gray"><rect><color red="0.2" green="0.2" blue="0.2" /></rect></element>
 	<element name="lcdm"><rect><color red="0.54" green="0.57" blue="0.58" /></rect></element>
 
 	<element name="but" defstate="0">
