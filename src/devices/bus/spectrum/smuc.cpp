@@ -25,13 +25,15 @@ public:
 		, m_ata(*this, "ata")
 	{ }
 
+	virtual void map_shadow_io(address_map &map) override ATTR_COLD;
+
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
 private:
-	void map_io(address_map &map) ATTR_COLD;
+	void map_io(address_map &map) ATTR_COLD {}
 
 	void port_ffba_w(offs_t offset, u8 data);
 	u8 ata_r(offs_t offset);
@@ -81,26 +83,25 @@ void smuc_device::ata_w(offs_t offset, u8 data)
 		m_ata->cs0_w(ata_offset, ata_data);
 }
 
-
-void smuc_device::map_io(address_map &map)
+void smuc_device::map_shadow_io(address_map &map)
 {
-	map(0x118a2, 0x118a2).mirror(0x4718) //     5fba | 0x011xxx101xx010 | Version: 2
+	map(0x18a2, 0x18a2).mirror(0x4718) //     5fba | 0x011xxx101xx010 | Version: 2
 		.lr8(NAME([]() { return 0x40; }));
-	map(0x118a6, 0x118a6).mirror(0x4718) //     5fbe | 0x011xxx101xx110 | Revision: 0
+	map(0x18a6, 0x18a6).mirror(0x4718) //     5fbe | 0x011xxx101xx110 | Revision: 0
 		.lr8(NAME([]() { return 0x28; }));
-	map(0x138a2, 0x138a2).mirror(0x4718) //     7fba | 0x111xxx101xx010 | VirtualFDD
+	map(0x38a2, 0x38a2).mirror(0x4718) //     7fba | 0x111xxx101xx010 | VirtualFDD
 		.lrw8(NAME([this]() { return m_port_7fba_data | 0x37; })
 			, NAME([this](u8 data) { m_port_7fba_data = data; }));
-	map(0x138a6, 0x138a6).mirror(0x4718) //  7[ef]be | 0x111xxN101xx110 | i8259 - absent in 2.0
+	map(0x38a6, 0x38a6).mirror(0x4718) //  7[ef]be | 0x111xxN101xx110 | i8259 - absent in 2.0
 		.lr8(NAME([]() { return 0x57; })).nopw();
-	map(0x198a2, 0x198a2).mirror(0x4718) //     dfba | 1x011xxx101xx010 | DS1685RTC
+	map(0x98a2, 0x98a2).mirror(0x4718) //     dfba | 1x011xxx101xx010 | DS1685RTC
 		.lrw8(NAME([this]() { return m_rtc->data_r(); })
 			, NAME([this](u8 data) { if (BIT(m_port_ffba_data, 7)) m_rtc->data_w(data); else m_rtc->address_w(data); }));
-	map(0x198a6, 0x198a6).mirror(0x4718) //     d8be | 1x011xxx101xx110 | IDE-Hi
+	map(0x98a6, 0x98a6).mirror(0x4718) //     d8be | 1x011xxx101xx110 | IDE-Hi
 		.lrw8(NAME([this]() { return m_ide_hi; }), NAME([this](u8 data) { m_ide_hi = data; }));
-	map(0x1b8a2, 0x1b8a2).mirror(0x4718) //     ffba | 1x111xxx101xx010 | SYS
+	map(0xb8a2, 0xb8a2).mirror(0x4718) //     ffba | 1x111xxx101xx010 | SYS
 		.lr8(NAME([this]() { return m_eeprom->read_sda() ? 0xff : 0xbf; })).w(FUNC(smuc_device::port_ffba_w));
-	map(0x1b8a6, 0x1b8a6).select(0x4718) // f[8-f]be | 1x111NNN101xx110  | IDE#1Fx/#3F6
+	map(0xb8a6, 0xb8a6).select(0x4718) // f[8-f]be | 1x111NNN101xx110  | IDE#1Fx/#3F6
 		.rw(FUNC(smuc_device::ata_r), FUNC(smuc_device::ata_w));
 }
 
@@ -125,7 +126,7 @@ void smuc_device::device_start()
 	save_item(NAME(m_port_ffba_data));
 	save_item(NAME(m_ide_hi));
 
-	m_zxbus->install_device(0x00000, 0x1ffff, *this, &smuc_device::map_io);
+	m_zxbus->install_device(0x0000, 0xffff, *this, &smuc_device::map_io);
 }
 
 void smuc_device::device_reset()

@@ -56,6 +56,7 @@ public:
 	void init_hyperpac();
 	void init_yutnori();
 	void init_sutjarod();
+	void init_gwasu();
 
 private:
 	required_device<cpu_device> m_maincpu;

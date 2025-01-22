@@ -299,7 +299,7 @@ void vme_hk68v10_card_device::device_add_mconfig(machine_config &config)
 	Z8536(config, "cio", SCC_CLOCK);
 
 	/* Terminal Port config */
-	SCC8530N(config, m_sccterm, SCC_CLOCK);
+	SCC8530(config, m_sccterm, SCC_CLOCK);
 	m_sccterm->out_txda_callback().set("rs232trm", FUNC(rs232_port_device::write_txd));
 	m_sccterm->out_dtra_callback().set("rs232trm", FUNC(rs232_port_device::write_dtr));
 	m_sccterm->out_rtsa_callback().set("rs232trm", FUNC(rs232_port_device::write_rts));

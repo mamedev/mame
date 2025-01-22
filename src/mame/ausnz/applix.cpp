@@ -909,7 +909,7 @@ void applix_state::applix(machine_config &config)
 	FLOPPY_CONNECTOR(config, m_floppy[1], applix_floppies, "35dd", applix_state::floppy_formats).enable_sound(true);
 	TIMER(config, "applix_c").configure_periodic(FUNC(applix_state::cass_timer), attotime::from_hz(100000));
 
-	scc8530_device &scc(SCC8530N(config, "scc", 30_MHz_XTAL / 8));
+	scc8530_device &scc(SCC8530(config, "scc", 30_MHz_XTAL / 8));
 	scc.out_txda_callback().set("serial_a", FUNC(rs232_port_device::write_txd));
 	scc.out_rtsa_callback().set("serial_a", FUNC(rs232_port_device::write_rts));
 	scc.out_dtra_callback().set("serial_a", FUNC(rs232_port_device::write_dtr));

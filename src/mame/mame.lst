@@ -495,6 +495,9 @@ hr16b                           //
 mmt8                            //
 sr16                            //
 
+@source:alesis/midiverb.cpp
+midiverb                        // Alesis MIDIVerb
+
 @source:alliedleisure/ace.cpp
 ace                             // [1976 Allied Leisure]
 
@@ -1462,39 +1465,46 @@ rcasinoo                        // (c) 1984 Dyna Electronics (D-2608208A1-1, Sma
 rcasino2                        // (c) 1984 Dyna Electronics
 
 @source:astrocorp/astrcorp.cpp
-astoneag                        // (c) 2005  Astro Corp.
-cptshark                        // (c) 2006  Astro Corp.
-dinodino                        // (c) 2005  Astro Corp.
-gostopac                        // (c) 2004  Astro Corp.
-hacher                          // (c) 2005  bootleg (Gametron)
-hapfarm                         // (c) 2008  Astro Corp.
-luckycoin                       // (c) 2002  Astro Corp.
-magibomb                        // (c) 2001? Astro Corp.
-magibomba                       // (c) 2002  Astro Corp.
-magibombb                       // (c) 2002  Astro Corp.
-magibombc                       // (c) 2001  Astro Corp.
-magibombd                       // (c) 2005  Astro Corp.
-magibombe                       // (c) 2001? Astro Corp.
-magibombf                       // (c) 2002  Astro Corp.
-magibombg                       // (c) 2004  Astro Corp.
-magibombh                       // (c) 2001? Astro Corp.
-magibombi                       // (c) 2001? Astro Corp.
-magibombj                       // (c) 2005  Astro Corp.
-monkeyl                         // (c) 2005  Astro Corp.
-monkeyla                        // (c) 2004  Astro Corp.
-showhanc                        // (c) 2000  Astro Corp.
-showhand                        // (c) 2000  Astro Corp.
-skilldrp                        // (c) 2002  Astro Corp.
-skilldrpa                       // (c) 2002  Astro Corp.
-speeddrp                        // (c) 2003  Astro Corp.
-speedmst                        // (c) 2004  D2 Enterprises
-speedmsta                       // (c) 2003  D2 Enterprises
-speedmstb                       // (c) 2004  D2 Enterprises
-westvent                        // (c) 2007? Astro Corp.
-winbingo                        // (c) 2006  Astro Corp.
-winbingoa                       // (c) 2006  Astro Corp.
-wwitch                          // (c) 2005  Astro Corp.
-zoo                             // (c) 2004  Astro Corp.
+astoneag
+cptshark
+dinodino
+gostopac
+hacher
+hapfarm
+luckycoin
+magibomb
+magibomba
+magibombb
+magibombc
+magibombd
+magibombe
+magibombf
+magibombg
+magibombh
+magibombi
+magibombj
+magibombk
+magibombl
+magibombm
+magibombn
+monkeyl
+monkeyla
+monkeylb
+monkeylc
+monkeyld
+showhanc
+showhand
+skilldrp
+skilldrpa
+speeddrp
+speedmst
+speedmsta
+speedmstb
+westvent
+winbingo
+winbingoa
+wwitch
+zoo
 
 @source:astrocorp/astropc.cpp
 blackbd                         //
@@ -9293,6 +9303,8 @@ beeline                         // 1991 BFM
 brkball                         // 1994 BFM / ATOD
 escounts                        // 1990 BFM
 inquiztr                        // 1989 BFM
+inquiztr11                      // 1989 BFM
+inquiztr12a                     // 1989 BFM
 qos                             // 1992 BFM
 qosa                            // 1992 BFM
 qosb                            // 1992 BFM
@@ -12115,7 +12127,7 @@ sc4lotrrb                       //
 sc4lotrrc                       //
 sc4lotrrd                       //
 sc4lotrre                       //
-sc4lotrt                        // Lord Of The Rings Triology (Bellfruit)
+sc4lotrt                        // Lord Of The Rings Trilogy (Bellfruit)
 sc4lotrta                       //
 sc4ltr2c                        // Lord Of The Rings - The Two Towers Club (Bellfruit)
 sc4ltr2ca                       //
@@ -16709,6 +16721,9 @@ sgalaxy
 sgalaxya
 sgalaxyb
 
+@source:cxg/pchess.cpp
+cpchess
+
 @source:cxg/professor.cpp
 scprof
 
@@ -18201,6 +18216,7 @@ fex68km3
 fex68km3a
 fex68km3b
 fex68km4
+fex68km4a
 premiere
 
 @source:fidelity/eldorado.cpp
@@ -19703,6 +19719,10 @@ mephistoj
 @source:hegenerglaser/europa.cpp
 europa
 
+@source:hegenerglaser/excalibur.cpp
+excal
+excaltm
+
 @source:hegenerglaser/glasgow.cpp
 amsterdg                        // Amsterdam
 dallas16g                       // Dallas
@@ -20114,6 +20134,7 @@ cfarm                           // (c) 1999 LAI Games
 eggventr                        // (c) 1997 The Game Room
 eggventr1                       // (c) 1997 The Game Room
 eggventr2                       // (c) 1997 The Game Room
+eggventr4                       // (c) 1997 The Game Room
 eggventr7                       // (c) 1997 The Game Room
 eggventr8                       // (c) 1997 The Game Room
 eggventra                       // (c) 1997 The Game Room (Allied Leisure license)
@@ -20204,7 +20225,9 @@ cmasteri                        // (c) 1991 Dyna Electronics
 cmasterj                        // (c) 1991 Dyna Electronics
 cmasterk                        // (c) 1991 Dyna Electronics
 cmasterl                        // (c) 1991 Dyna Electronics
-cmezspin                        // (c) 1991 Dyna Electronics
+cmezspin                        // bootleg
+cmezspina                       // bootleg
+cmezspinb                       // bootleg
 cmfb55                          // bootleg
 cmfun                           // (c) 1995 Dyna Electronics
 cmpacman                        //
@@ -20276,6 +20299,8 @@ lucky8k                         // (c) 1989 Wing. With CPU NEC D315-5136
 lucky8l                         // (c) 1989 Wing Co. Ltd
 lucky8m                         // (c) 1989 Wing Co. Ltd
 lucky8n                         // (c) 1989 Wing Co. Ltd
+lucky8o                         //
+lucky8p                         //
 luckybar                        // unknown
 luckylad                        // (c) 1985 Wing Co. Ltd
 magodds                         // 198? (c) Micro Manufacturing Ltd.
@@ -20329,9 +20354,12 @@ nfma                            // bootleg
 noved                           // bootleg
 nd8lines                        // bootleg
 ns8lines                        // unknown
+ns8linesa                       // (c) 1985 Yamate (bootleg)
 ns8linew                        // unknown
 ns8linewa                       // unknown
-ns8linesa                       // (c) 1985 Yamate (bootleg)
+ns8linewb                       // (c) 1985 Yamate
+ns8linewc                       // (c) 1988 Yamate
+ns8linewd                       // (c) 1988 Yamate
 pkrmast                         // (c) 199? unknown
 pkrmasta                        // (c) 199? unknown
 pokonl97                        // (c) 1997 Amcoe
@@ -20344,6 +20372,8 @@ schery97                        // (c) 1998 Amcoe
 schery97a                       // (c) 1998 Amcoe
 scmaster                        // 1994, unknown
 skill98                         // (c) 1998 Amcoe
+skillch                         //
+skillcha                        //
 srmagic                         // bootleg
 ss2001                          // bootleg / hack
 star100                         // (c) 199? Sang Ho
@@ -20353,6 +20383,9 @@ super9a                         // (c) 2001 Playmark
 super972                        // unknown
 tcl                             // (c) 1995 Uniwang
 tonypok                         // (c) 1991 Corsica
+top7                            //
+top7a                           //
+ttactoe                         //
 unkch1                          // bootleg
 unkch2                          // bootleg
 unkch3                          // bootleg
@@ -23868,6 +23901,7 @@ cookbib2b                       // (c) 1996 SemiCom
 cookbib2c                       // (c) 1996 SemiCom
 cookbib3                        // (c) 1997 SemiCom
 finalttr                        // (c) 1993 Jeil Computer System
+gwasu                           // (c) 1997 SemiCom
 honeydol                        // (c) 1995 Barko Corp
 hyperpac                        // (c) 1995 SemiCom
 hyperpacb                       // bootleg
@@ -36584,7 +36618,6 @@ quizard_10                      // (c) TAB Austria 1996
 quizard_12                      // (c) TAB Austria 1996
 quizard_17                      // (c) TAB Austria 1996
 quizardi                        // (c) TAB Austria 199?
-quizardi_10                     // (c) TAB Austria 1996
 quizardi_12                     // (c) TAB Austria 1996
 quizardi_17                     // (c) TAB Austria 1996
 quizard2                        // (c) TAB Austria 1995
@@ -36976,6 +37009,7 @@ bmf_de                          //
 bmf_fr                          //
 bmf_it                          //
 bmf_ita                         //
+bmf_itb                         //
 bmf_jp                          //
 bmf_nl                          //
 bmf_nl302                       //
@@ -37448,6 +37482,7 @@ sport2k                         //
 @source:pinball/micropin.cpp
 pentacup                        //
 pentacup2                       //
+pentacups                       //
 pentacupt                       //
 
 @source:pinball/missamer.cpp
@@ -41371,6 +41406,7 @@ invho2a                         // 326-341 (c) 1979 Sega
 invinco                         // 310-318 (c) 1979 Sega
 nostromo                        // bootleg
 nsub                            // 268-275 (c) 1980 Sega
+nsubc                           // 581-596 (c) 1980 Sega
 pulsar                          // 790-805 (c) 1981 Sega
 safari                          // 57-66 [1977 Gremlin?]
 safaria                         // bootleg?
@@ -42701,6 +42737,9 @@ dbzscout
 
 @source:skeleton/kron.cpp
 kron180                         // 1995 Kron Ltd, Ukraine
+
+@source:skeleton/leadsinger2.cpp
+leadsng2
 
 @source:skeleton/lee1214.cpp
 lee1214d                        //
@@ -45866,6 +45905,7 @@ batvgc
 rad_gtg
 rad_rsg
 rad_rsgp
+rad_rsgpa
 rad_foot
 rad_bb3
 rad_bb3p
@@ -45909,6 +45949,7 @@ gameu50
 gameu108
 gormiti
 imgame
+jak_spmm
 myac220
 smartfp                         // Smart Fit Park
 smartfpf
@@ -45979,6 +46020,7 @@ didj                            // (c) 2008 Leapfrog
 mmahjong
 
 @source:tvgames/monkey_king_3b.cpp
+afbp4                           //
 rs70_648                        //
 
 @source:tvgames/pubint_storyreader.cpp
@@ -46013,10 +46055,12 @@ zone3d
 ablkickb
 abltenni                        //
 anpantv
+ban_krkk
 comil                           //
 ddr33v
 decathln
 decathlna
+dmbtjunc
 doraglob                        // (c) 2007 VTech
 doraglobf
 doraglobg
@@ -46059,6 +46103,7 @@ virtbb
 virtten
 vtechtvsgr                      // (c) 2006 VTech
 vtechtvssp                      // (c) 2006 VTech
+wfart
 wfcentro
 
 @source:tvgames/spg2xx_digimake.cpp
@@ -46339,6 +46384,7 @@ tak_gin                         //
 tak_geig                        //
 tak_hamr                        //
 tak_town                        //
+tak_wdg                         //
 tak_zuba                        //
 tcarnavi                        //
 tom_tvho                        //
@@ -46356,6 +46402,7 @@ ltv_naru                        //
 domfitad                        //
 dombikec                        //
 epo_dabj
+epo_dtcj
 
 @source:tvgames/xavix_2000.cpp
 ban_omt                         //
@@ -46380,9 +46427,12 @@ ttv_swj                         //
 @source:tvgames/xavix_2002.cpp
 anpanmdx
 apmj2009
+ban_bkgj
 ban_dn1j
 ban_kksj
+ban_utmj
 epo_ntpj
+epo_rgfj
 ban_ordj
 domdance                        //
 domfitch                        //
@@ -47136,6 +47186,9 @@ vz300                           // 1984 Dick Smith Electronics VZ-300
 laser350                        // 1984? Laser 350
 laser500                        // 1984? Laser 500
 laser700                        // 1984? Laser 700
+
+@source:vtech/vtech5303.cpp
+pawmoviesp                      // (c) 2022
 
 @source:vtech/vtech_eu3a12.cpp
 vreadere

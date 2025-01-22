@@ -251,10 +251,8 @@ private:
 	// state to live in the near cache
 	struct near_state
 	{
-		x86code *           debug_cpu_instruction_hook;// debugger callback
 		x86code *           debug_log_hashjmp;      // hashjmp debugging
 		x86code *           debug_log_hashjmp_fail; // hashjmp debugging
-		x86code *           drcmap_get_value;       // map lookup helper
 
 		uint32_t            ssemode;                // saved SSE mode
 		uint32_t            ssemodesave;            // temporary location for saving
@@ -263,7 +261,6 @@ private:
 		double              double1;                // 1.0 in double-precision
 
 		void *              stacksave;              // saved stack pointer
-		void *              hashstacksave;          // saved stack pointer for hashjmp
 
 		uint8_t             flagsmap[0x1000];       // flags map
 		uint64_t            flagsunmap[0x20];       // flags unmapper
@@ -271,28 +268,9 @@ private:
 	near_state &            m_near;
 
 	// resolved memory handler functions
-	struct resolved_handler { uintptr_t obj = 0; x86code *func = nullptr; };
-	struct resolved_accessors
-	{
-
-		resolved_handler    read_byte;
-		resolved_handler    read_word;
-		resolved_handler    read_word_masked;
-		resolved_handler    read_dword;
-		resolved_handler    read_dword_masked;
-		resolved_handler    read_qword;
-		resolved_handler    read_qword_masked;
-
-		resolved_handler    write_byte;
-		resolved_handler    write_word;
-		resolved_handler    write_word_masked;
-		resolved_handler    write_dword;
-		resolved_handler    write_dword_masked;
-		resolved_handler    write_qword;
-		resolved_handler    write_qword_masked;
-	};
-	using resolved_accessors_vector = std::vector<resolved_accessors>;
-	resolved_accessors_vector m_resolved_accessors;
+	resolved_member_function m_debug_cpu_instruction_hook;
+	resolved_member_function m_drcmap_get_value;
+	resolved_memory_accessors_vector m_resolved_accessors;
 
 	// globals
 	using opcode_generate_func = void (drcbe_x64::*)(asmjit::x86::Assembler &, const uml::instruction &);

@@ -94,7 +94,7 @@ void lft_state::lft(machine_config &config)
 	// Devices
 	MM58167(config, m_rtc, 32.768_kHz_XTAL);
 
-	SCC8530N(config, m_scc, 4.9152_MHz_XTAL);
+	SCC8530(config, m_scc, 4.9152_MHz_XTAL);
 	m_scc->out_txda_callback().set("rs232a", FUNC(rs232_port_device::write_txd));
 	m_scc->out_dtra_callback().set("rs232a", FUNC(rs232_port_device::write_dtr));
 	m_scc->out_rtsa_callback().set("rs232a", FUNC(rs232_port_device::write_rts));

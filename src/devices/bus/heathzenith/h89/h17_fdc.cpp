@@ -15,9 +15,10 @@
 #include "emu.h"
 #include "h17_fdc.h"
 
-#include "formats/h17disk.h"
 #include "imagedev/floppy.h"
 #include "machine/s2350.h"
+
+#include "formats/h17disk.h"
 
 
 #define LOG_REG   (1U << 1) // Register setup

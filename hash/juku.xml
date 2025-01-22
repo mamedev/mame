@@ -11,7 +11,7 @@ license:CC0-1.0
 		<year>2018</year>
 		<publisher>Универсальный эмулятор</publisher>
 		<info name="version" value="2.2" />
-		<info name="usage" value="Press t d d" />
+		<info name="usage" value="Press T D D to boot CP/M 2.2" />
 		<info name="comment" value="System floppy disk with XD and STAT. Published for initial testing at the file section of the Башкирия-2М emulator web site."/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
@@ -24,7 +24,7 @@ license:CC0-1.0
 		<description>EKDOS 2.29</description>
 		<year>1988</year>
 		<publisher>EKTA</publisher>
-		<info name="usage" value="Press t d d" />
+		<info name="usage" value="Press T D D to boot EKDOS 2.29" />
 		<info name="release" value="19880501" /><!-- Based on ИTCРВ E5104 руководство по эксплуатации (Таллинн 1988). -->
 		<info name="version" value="2.29" />
 		<info name="author" value="Andres Kaukver"/>
@@ -41,7 +41,7 @@ license:CC0-1.0
 		<description>EKDOS 2.30</description>
 		<year>1989</year>
 		<publisher>EKTA</publisher>
-		<info name="usage" value="Press t d d" />
+		<info name="usage" value="Press T D D to boot EKDOS 2.30" />
 		<info name="release" value="19890410" /><!-- From EKDOS 2.30 source code header https://github.com/infoaed/juku3000/blob/master/src/EKDOS30.ASM#L10. -->
 		<info name="version" value="2.30" />
 		<info name="author" value="Andres Kaukver"/>
@@ -54,5 +54,47 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="jukusys">
+		<description>E5104 System Disks</description>
+		<year>1988</year>
+		<publisher>Baltiyets</publisher>
+		<info name="usage" value="Press T D D to boot EKDOS 2.29" />
+		<info name="developer" value="EktaSoft"/>
+		<info name="comment" value="System disks with EKDOS 2.29 and utilities as circulated with E5104s, referred to as ДГШ5.106.105[-*] in documentation." /><!-- See https://elektroonikamuuseum.ee/juku_arvuti_tarkvara.html for overview. -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="JUKU-1" /><!-- See https://elektroonikamuuseum.ee/juku_arvuti_tarkvara_susteemiketas_1.html for details. -->
+			<dataarea name="flop" size="819200">
+				<rom name="EMUSYS1.JUK" size="819200" crc="e930b8f0" sha1="956c82e43e2b1f76a337190f78318428729e845f" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="JUKU-2" /><!-- See https://elektroonikamuuseum.ee/juku_arvuti_tarkvara_susteemiketas_2.html for details. -->
+			<dataarea name="flop" size="819200">
+				<rom name="EMUSYS2.JUK" size="819200" crc="ec35d36b" sha1="054b854a9bc58383794e74fdc2f778f746bdf55d" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="JUKU-3" /><!-- See https://elektroonikamuuseum.ee/juku_arvuti_tarkvara_susteemiketas_3.html for details. -->
+			<dataarea name="flop" size="819200">
+				<rom name="EMUSYS3.JUK" size="819200" crc="0d5c68ca" sha1="2bd379212078b892ad07766007507b02bbda3703" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="utils4">
+		<description>EKTA Utilities Disk #4</description>
+		<year>1989</year>
+		<publisher>EKTA</publisher>
+		<info name="usage" value="Press T D D to boot EKDOS 2.30" />
+		<info name="release" value="198912xx" />
+		<info name="developer" value="EktaSoft"/>
+		<info name="comment" value="Recostruction of an additional JUKU PC utilities disk #4 with EKDOS 2.30 based on file list in READ.ME published by EKTA in December 1989."/> <!-- See https://github.com/infoaed/juku3000/blob/master/docs/ekdos230.txt for READ.ME. -->
+		<part name="flop1" interface="floppy_5_25">
+                        <feature name="part_id" value="UTILS-4" /><!-- See https://juku3000.infoaed.ee/tarkvara-kataloog/#j3kutil4 for details. -->
+			<dataarea name="flop" size="819200">
+				<rom name="J3KUTIL4.JUK" size="819200" crc="839f20aa" sha1="fb8a5239cdd74eced3b0bb7ab8ec6e8b2092f4c3" />
+			</dataarea>
+		</part>
+	</software>
 
 </softwarelist>

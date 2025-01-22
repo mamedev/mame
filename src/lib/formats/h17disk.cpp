@@ -13,23 +13,23 @@ Heath H17D disk image format (version 2.0.0)
 *********************************************************************/
 
 #include "h17disk.h"
-#include "ioprocs.h"
+
 #include "imageutl.h"
+
+#include "ioprocs.h"
 
 #include <cstring>
 
-static constexpr int TRACK_SIZE           = 50'000;
-static constexpr int BITCELL_SIZE         = 4000;
 
-static constexpr int SECTOR_METADATA_SIZE = 16;
+namespace {
 
-static constexpr int SECTOR_DATA_SIZE     = 256;
-static constexpr int SECTORS_PER_TRACK    = 10;
+constexpr int TRACK_SIZE           = 50'000;
+constexpr int BITCELL_SIZE         = 4000;
 
+constexpr int SECTOR_METADATA_SIZE = 16;
 
-heath_h17d_format::heath_h17d_format() : floppy_image_format_t()
-{
-}
+constexpr int SECTOR_DATA_SIZE     = 256;
+constexpr int SECTORS_PER_TRACK    = 10;
 
 struct format {
 	int      head_count;
@@ -37,7 +37,7 @@ struct format {
 	uint32_t variant;
 };
 
-static const format formats[] = {
+const format formats[] = {
 	{ 1, 40, floppy_image::SSSD10 }, // H-17-1
 	{ 2, 40, floppy_image::DSSD10 },
 	{ 1, 80, floppy_image::SSQD10 },
@@ -64,7 +64,7 @@ enum {
 	Comm  = 0x6d6d6f43, //!< "Comm", Comment
 };
 
-static std::pair<std::uint64_t, std::size_t> find_block(util::random_read &io, uint32_t block_id)
+std::pair<std::uint64_t, std::size_t> find_block(util::random_read &io, uint32_t block_id)
 {
 	LOG_FORMATS("find_block: 0x%x\n", block_id);
 
@@ -88,7 +88,7 @@ static std::pair<std::uint64_t, std::size_t> find_block(util::random_read &io, u
 	return std::make_pair(pos + 8, header.length);
 }
 
-static format find_format(util::random_read &io)
+format find_format(util::random_read &io)
 {
 	auto const [pos, length] = find_block(io, DskF);
 	if ((pos == 0) || (length < 2) || (length > 3))
@@ -123,6 +123,13 @@ static format find_format(util::random_read &io)
 
 	LOG_FORMATS("Invalid disk format - heads: %d, tracks: %d\n", head_count, track_count);
 	return {};
+}
+
+} // anonymous namespace
+
+
+heath_h17d_format::heath_h17d_format() : floppy_image_format_t()
+{
 }
 
 int heath_h17d_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
@@ -238,7 +245,7 @@ bool heath_h17d_format::load(util::random_read &io, uint32_t form_factor, const 
 
 void heath_h17d_format::fm_reverse_byte_w(std::vector<uint32_t> &buffer, uint8_t val) const
 {
-	static unsigned char lookup[16] = { 0x0, 0x8, 0x4, 0xc, 0x2, 0xa, 0x6, 0xe, 0x1, 0x9, 0x5, 0xd, 0x3, 0xb, 0x7, 0xf };
+	constexpr unsigned char lookup[16] = { 0x0, 0x8, 0x4, 0xc, 0x2, 0xa, 0x6, 0xe, 0x1, 0x9, 0x5, 0xd, 0x3, 0xb, 0x7, 0xf };
 
 	fm_w(buffer, 8, lookup[val & 0x0f] << 4 | lookup[val >> 4], BITCELL_SIZE);
 }

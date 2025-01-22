@@ -15,6 +15,13 @@
 
 #include "drcuml.h"
 
+#include "mfpresolve.h"
+
+#include <utility>
+#include <vector>
+
+
+namespace drc {
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -55,14 +62,14 @@ public:
 private:
 	// internal state
 	drc_cache &     m_cache;                // cache where allocations come from
-	uint32_t          m_modes;                // number of modes supported
+	uint32_t        m_modes;                // number of modes supported
 
 	drccodeptr      m_nocodeptr;            // pointer to code which will handle missing entries
 
-	uint8_t           m_l1bits;               // bits worth of entries in l1 hash tables
-	uint8_t           m_l2bits;               // bits worth of entries in l2 hash tables
-	uint8_t           m_l1shift;              // shift to apply to the PC to get the l1 hash entry
-	uint8_t           m_l2shift;              // shift to apply to the PC to get the l2 hash entry
+	uint8_t         m_l1bits;               // bits worth of entries in l1 hash tables
+	uint8_t         m_l2bits;               // bits worth of entries in l2 hash tables
+	uint8_t         m_l1shift;              // shift to apply to the PC to get the l1 hash entry
+	uint8_t         m_l2shift;              // shift to apply to the PC to get the l2 hash entry
 	offs_t          m_l1mask;               // mask to apply after shifting
 	offs_t          m_l2mask;               // mask to apply after shifting
 
@@ -97,8 +104,8 @@ public:
 private:
 	// internal state
 	drc_cache &         m_cache;            // pointer to the cache
-	uint64_t              m_uniquevalue;      // unique value used to find the table
-	uint32_t              m_mapvalue[uml::MAPVAR_END - uml::MAPVAR_M0]; // array of current values
+	uint64_t            m_uniquevalue;      // unique value used to find the table
+	uint32_t            m_mapvalue[uml::MAPVAR_END - uml::MAPVAR_M0]; // array of current values
 
 	// list of entries
 	struct map_entry
@@ -106,8 +113,8 @@ private:
 		map_entry *next() const { return m_next; }
 		map_entry *     m_next;             // pointer to next map entry
 		drccodeptr      m_codeptr;          // pointer to the relevant code
-		uint32_t          m_mapvar;           // map variable id
-		uint32_t          m_newval;           // value of the variable starting at codeptr
+		uint32_t        m_mapvar;           // map variable id
+		uint32_t        m_newval;           // value of the variable starting at codeptr
 	};
 	simple_list<map_entry> m_entry_list;    // list of entries
 };
@@ -161,6 +168,58 @@ private:
 	simple_list<label_fixup> m_fixup_list;  // list of pending oob fixups
 	drc_oob_delegate    m_oob_callback_delegate; // pre-computed delegate
 };
+
+
+// ======================> resolved_member_function
+
+struct resolved_member_function
+{
+	uintptr_t obj = uintptr_t(nullptr);
+	uint8_t *func = nullptr;
+
+	explicit operator bool() const noexcept
+	{
+		return bool(func);
+	}
+
+	template <typename C, typename F>
+	void set(C &&instance, F &&mfp) noexcept
+	{
+		auto const [entrypoint, adjusted] = util::resolve_member_function(std::forward<F>(mfp), std::forward<C>(instance));
+		obj = adjusted;
+		func = reinterpret_cast<uint8_t *>(entrypoint);
+	}
+};
+
+
+// ======================> resolved_memory_accessors
+
+struct resolved_memory_accessors
+{
+	resolved_member_function read_byte;
+	resolved_member_function read_byte_masked;
+	resolved_member_function read_word;
+	resolved_member_function read_word_masked;
+	resolved_member_function read_dword;
+	resolved_member_function read_dword_masked;
+	resolved_member_function read_qword;
+	resolved_member_function read_qword_masked;
+
+	resolved_member_function write_byte;
+	resolved_member_function write_byte_masked;
+	resolved_member_function write_word;
+	resolved_member_function write_word_masked;
+	resolved_member_function write_dword;
+	resolved_member_function write_dword_masked;
+	resolved_member_function write_qword;
+	resolved_member_function write_qword_masked;
+
+	void set(address_space &space) noexcept;
+};
+
+using resolved_memory_accessors_vector = std::vector<resolved_memory_accessors>;
+
+} // namespace drc
 
 
 #endif // MAME_CPU_DRCBEUT_H

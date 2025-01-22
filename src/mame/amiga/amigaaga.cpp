@@ -528,9 +528,9 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 
 	/* loop over the line */
 	// TODO: copper runs on odd timeslots
-	next_copper_x = 0;
+	next_copper_x = m_copper->restore_offset();
 	// TODO: verify where we're missing pixels here for the GFX pitch bitplane corruptions
-	// - wbenc30 scrolling in lores mode (fmode=3, expects a +58!, verify ddfstrt)
+	// - wbenc30 scrolling in lores mode (fmode=3, expects a +58!, verify ddfstrt / delays)
 	// - roadkill title (fmode=3, max +14), gameplay uses fmode=1
 	// - sockid_a, alfred gameplay (fmode=1)
 	// - virocp_a (fmode=1, +26)
@@ -541,8 +541,22 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 	// - cd32 cdtv:insidino copyright screen (fmode=3)
 	// - cd32 cdtv:labytime intro/tutorial screens
 	//   (swaps between fmode=1 and 3, verify ddfstrt / ddfstop)
+
 	const int offset_hack[] = { 10, 11, 11, 13 };
-	const u8 bitplane_fmode = CUSTOM_REG(REG_FMODE) & 0x3;
+	const int default_bit_offset[] = { 15, 31, 31, 63 };
+
+	const int ddf_start_offset_lores[] = { 17, 17, 17, 17 };
+	const int ddf_stop_offset_lores[] = { 17 + 15, 17 + 31, 17 + 31, 17 + 63 };
+
+	// TODO: verify fmode 1/2 stops
+	// - (fmode 3) wbenc30/kangfu/pbillusn (F10 key)/cd32 (CD splash loading) all expects a +8 offset
+	const int ddf_start_offset_hires[] = { 9, 9, 9, 9 + 8 };
+	const int ddf_stop_offset_hires[] = { 9 + 15, 9 + 15, 9 + 15, 9 + 8 };
+	// TODO: move this to inner block as const
+	// atm the assignment is here just for the hack to work
+	// Alice seems to expect to change it in mid-scanline for bitplane pointers to work
+    // - amiga_cd:bigred would otherwise offset the intro
+	u8 bitplane_fmode = CUSTOM_REG(REG_FMODE) & 0x3;
 
 	for (int x = 0; x < (amiga_state::SCREEN_WIDTH / 2) + offset_hack[bitplane_fmode]; x++)
 	{
@@ -556,6 +570,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 			// TODO: verify number of planes that doesn't go beyond 8
 			if ( CUSTOM_REG(REG_BPLCON0) & BPLCON0_BPU3 )
 				planes |= 8;
+			bitplane_fmode = CUSTOM_REG(REG_FMODE) & 0x3;
 
 			/* execute the next batch, restoring and re-saving color 0 around it */
 			CUSTOM_REG(REG_COLOR00) = save_color0;
@@ -588,20 +603,14 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 			ehb = (CUSTOM_REG(REG_BPLCON0) & 0x7c10) == 0x6000 && !bool(BIT(CUSTOM_REG(REG_BPLCON2), 9));
 
 			/* get default bitoffset */
-			switch(bitplane_fmode)
-			{
-				case 0: defbitoffs = 15; break;
-				case 1:
-				case 2: defbitoffs = 31; break;
-				case 3: defbitoffs = 63; break;
-			}
+			defbitoffs = default_bit_offset[bitplane_fmode];
 
 			/* compute the pixel fetch parameters */
-			// FIXME: offsets applied are definitely not right
-			// does ddf_start_pixel offsets with fmode != 0?
-			// wbenc30 expects a +8 to align the screen with fmode == 3, which may or may not be right
-			ddf_start_pixel = ( CUSTOM_REG(REG_DDFSTRT) & 0xfc ) * 2 + (hires ? 9 : 17);
-			ddf_stop_pixel = ( CUSTOM_REG(REG_DDFSTOP) & 0xfc ) * 2 + (hires ? (9 + defbitoffs - ((defbitoffs >= 31) ? 16 : 0)) : (17 + defbitoffs));
+			// TODO: ECS/AGA can put bit 1 in play here
+			ddf_start_pixel = ( CUSTOM_REG(REG_DDFSTRT) & 0xfc ) * 2;
+			ddf_start_pixel += hires ? ddf_start_offset_hires[bitplane_fmode] : ddf_start_offset_lores[bitplane_fmode];
+			ddf_stop_pixel = ( CUSTOM_REG(REG_DDFSTOP) & 0xfc ) * 2;
+			ddf_stop_pixel += hires ? ddf_stop_offset_hires[bitplane_fmode] : ddf_stop_offset_lores[bitplane_fmode];
 
 			// FIXME: as like OCS/ECS Amiga verify this one
 			if ( ( CUSTOM_REG(REG_DDFSTRT) ^ CUSTOM_REG(REG_DDFSTOP) ) & 0x04 )
@@ -655,8 +664,11 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 				case 2:
 					odelay += (CUSTOM_REG(REG_BPLCON1) & 0x0400) >> 6;
 					edelay += (CUSTOM_REG(REG_BPLCON1) & 0x4000) >> 10;
-					odelay ^= 0x10;
-					edelay ^= 0x10;
+					// NOTE: breaks exile_a gameplay with this enabled
+					//odelay ^= 0x10;
+					//edelay ^= 0x10;
+					// TODO: amiga_cd:finlodys offset intro, particularly here with 0xffff writes
+					// (alternates fmode 1 and 3)
 					break;
 				case 3:
 					odelay += (CUSTOM_REG(REG_BPLCON1) & 0x0400) >> 6;
@@ -670,8 +682,8 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 
 			if ( hires )
 			{
-				obitoffs = defbitoffs + ( odelay << 1 );
-				ebitoffs = defbitoffs + ( edelay << 1 );
+				obitoffs = (defbitoffs + ( odelay << 1 ));
+				ebitoffs = (defbitoffs + ( edelay << 1 ));
 			}
 			else
 			{
@@ -696,8 +708,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 
 		/* to render, we must have bitplane DMA enabled, at least 1 plane, and be within the */
 		/* vertical display window */
-		// TODO: bitplane DMA enabled applies to fetch_bitplane_data only
-		if (bitplane_dma_enabled && planes > 0 && scanline >= m_diw.top() && scanline < m_diw.bottom())
+		if (planes > 0 && scanline >= m_diw.top() && scanline < m_diw.bottom())
 		{
 			int pfpix0 = 0, pfpix1 = 0, collide;
 
@@ -705,7 +716,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 			if (x >= ddf_start_pixel && x <= ddf_stop_pixel + odelay)
 			{
 				/* if we need to fetch more data, do it now */
-				if (obitoffs == defbitoffs)
+				if (obitoffs == defbitoffs && bitplane_dma_enabled)
 				{
 					for (pl = 0; pl < planes; pl += 2)
 					{
@@ -721,7 +732,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 				if (hires)
 				{
 					/* reset bit offsets and fetch more data if needed */
-					if (obitoffs < 0)
+					if (obitoffs < 0 && bitplane_dma_enabled)
 					{
 						obitoffs = defbitoffs;
 
@@ -746,7 +757,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 			if (x >= ddf_start_pixel && x <= ddf_stop_pixel + edelay)
 			{
 				/* if we need to fetch more data, do it now */
-				if (ebitoffs == defbitoffs)
+				if (ebitoffs == defbitoffs && bitplane_dma_enabled)
 				{
 					for (pl = 1; pl < planes; pl += 2)
 					{
@@ -762,7 +773,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 				if (hires)
 				{
 					/* reset bit offsets and fetch more data if needed */
-					if (ebitoffs < 0)
+					if (ebitoffs < 0 && bitplane_dma_enabled)
 					{
 						ebitoffs = defbitoffs;
 
@@ -876,6 +887,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 					pri = (sprpix >> 12);
 
 					/* sprite has priority */
+					// TODO: porting OCS alfred fix to AGA will break OCS rodland status bar (!?)
 					if (sprpix && pf1pri > pri)
 					{
 						dst[x*2+0] =
@@ -945,6 +957,8 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 				CUSTOM_REG_LONG(REG_BPL1PTH + pl * 2) += even_modulo;
 		}
 	}
+
+	m_copper->suspend_offset(next_copper_x, amiga_state::SCREEN_WIDTH / 2);
 
 	/* restore color00 */
 	CUSTOM_REG(REG_COLOR00) = save_color0;

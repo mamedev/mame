@@ -211,7 +211,6 @@ k056832_device::k056832_device(const machine_config &mconfig, const char *tag, d
 	//m_line_dirty[K056832_PAGE_COUNT][8],
 	//m_all_lines_dirty[K056832_PAGE_COUNT],
 	//m_page_tile_mode[K056832_PAGE_COUNT],
-	//m_last_colorbase[K056832_PAGE_COUNT],
 	//m_layer_tile_mode[8],
 	m_default_layer_association(0),
 	m_layer_association(0),
@@ -224,6 +223,7 @@ k056832_device::k056832_device(const machine_config &mconfig, const char *tag, d
 	m_cur_tile_bank(0),
 	m_k055555(*this, finder_base::DUMMY_TAG)
 {
+	std::fill(std::begin(m_last_colorbase), std::end(m_last_colorbase), 0);
 }
 
 void k056832_device::create_tilemaps()
