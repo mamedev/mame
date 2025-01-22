@@ -40,14 +40,12 @@
 
     The low power standby mode is entered and left by a command written to CRA
     or CRB registers. Writing the commands to either register affects the whole
-    DUART, not just one channel. Resetting the DUART also leaves low power
-    mode.
+    DUART, not just one channel. Resetting the DUART also leaves low power mode.
 
 	On the ColdFire MCF5206e, the UART modules are essentially just a pair of 
 	MC68681s with only the A port visible and no counter/timer. The ACR on the 
 	coldfire uarts shoud be updated to reflect this. Additionally, the 
 	Buad Rate Generator prescaler reg should be used to set the buad.
-    DUART, not just one channel. Resetting the DUART also leaves low power mode.
 */
 
 #include "emu.h"
