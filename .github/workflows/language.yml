@@ -3,27 +3,32 @@ name: Compile UI translations
 on:
   push:
     paths:
-    - '.github/workflows/**'
-    - 'language/**'
+      - '.github/workflows/**'
+      - 'language/**'
   pull_request:
     paths:
-    - '.github/workflows/**'
-    - 'language/**'
+      - '.github/workflows/**'
+      - 'language/**'
 
 permissions:
   contents: read
 
 jobs:
   build-language:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-    - uses: actions/checkout@main
-      with:
-        fetch-depth: 0
-    - name: Compile message catalogs
-      run: for x in language/*/*.po ; do python scripts/build/msgfmt.py --output-file "`dirname "$x"`/`basename "$x" .po`.mo" "$x" ; done
-    - uses: actions/upload-artifact@main
-      with:
-        name: mame-language-${{ github.sha }}
-        path: language/*/*.mo
-        if-no-files-found: error
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Compile message catalogs
+        run: |
+          for x in language/*/*.po; do
+            python scripts/build/msgfmt.py --output-file "`dirname "$x"`/`basename "$x" .po`.mo" "$x"
+          done
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mame-language-${{ github.sha }}
+          path: language/*/*.mo
+          if-no-files-found: error
