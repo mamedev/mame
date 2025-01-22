@@ -586,6 +586,12 @@ ROM_START( rad_orun )
 	ROM_LOAD16_WORD_SWAP( "outrun.bin", 0x000000, 0x100000, CRC(4fd6d653) SHA1(57f0e4550ff883e4bb7857caef2c893c21f80b42) )
 ROM_END
 
+ROM_START( rad_mncr )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	// radica_menacer_byteswapped.bin = mpr-15075-f.u1        megadriv:menacer  Menacer 6-Game Cartridge (Europe, USA)
+	ROM_LOAD16_WORD_SWAP( "radica_menacer.bin", 0x000000, 0x100000, CRC(5f9ef4a4) SHA1(f28350e7325cb7469d760d97ee452a9d846eb3d4) )
+ROM_END
+
 ROM_START( msi_sf2 )
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	// The first part of the ROM seems to be a boot ROM for the enhanced MD clone menus, even if it does nothing here
@@ -761,6 +767,10 @@ CONS( 2004, rad_ssoc,  0,        0, megadriv_radica_3button_pal,  radica_3button
 
 // not region locked, no Radica logos, uncertain if other regions would differ
 CONS( 2004, rad_orun,  0,        0, megadriv_radica_3button_pal,  radica_3button_1player, megadriv_radica_state, init_megadrie, "Radica / Sega",                     "Out Run 2019 (Radica Plug & Play, UK)", 0)
+
+// this has been verified as identical to the 6-in-1 cartridge that came with the Menacer gun for the MD
+CONS( 2004, rad_mncr,  0,        0, megadriv_radica_3button_ntsc, radica_3button_1player, megadriv_radica_state, init_megadriv, "Radica / Sega",                     "Menacer (Radica)", MACHINE_NOT_WORKING )
+
 
 // From a European unit but NTSC? - code is hacked from original USA Genesis game with region check still intact? (does the clone hardware always identify as such? or does the bypassed boot code skip the check?)
 // TODO: move out of here eventually once the enhanced MD part is emulated rather than bypassed (it's probably the same as the 145-in-1 multigame unit, but modified to only include this single game)
