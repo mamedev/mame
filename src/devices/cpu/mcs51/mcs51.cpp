@@ -2192,10 +2192,6 @@ void mcs51_cpu_device::execute_run()
 
 		m_inst_cycles = 0;
 
-		// if in powerdown, eat remaining cycles
-		if ((m_features & FEATURE_CMOS) && GET_PD && m_icount > 0)
-			m_icount = 0;
-
 	} while (m_icount > 0);
 }
 
