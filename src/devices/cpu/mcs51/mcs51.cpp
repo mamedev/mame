@@ -2,95 +2,74 @@
 // copyright-holders:Steve Ellenoff, Manuel Abadia, Couriersud
 /*****************************************************************************
  *
- *   i8051.c
- *   Portable MCS-51 Family Emulator
+ * Portable MCS-51 Family Emulator
+ * Copyright Steve Ellenoff
  *
- *   Chips in the family:
- *   8051 Product Line (8031,8051,8751)
- *   8052 Product Line (8032,8052,8752)
- *   8054 Product Line (8054)
- *   8058 Product Line (8058)
- *   80552 Product Line (80552, 83552, 87552)
- *   80562 Product Line (80562, 83562, 87562)
+ * Chips in the family:
+ * 8051 Product Line (8031,8051,8751)
+ * 8052 Product Line (8032,8052,8752)
+ * 8054 Product Line (8054)
+ * 8058 Product Line (8058)
+ * 80552 Product Line (80552, 83552, 87552)
+ * 80562 Product Line (80562, 83562, 87562)
  *
- *   Copyright Steve Ellenoff, all rights reserved.
- *
- *  This work is based on:
- *  #1) 'Intel(tm) MC51 Microcontroller Family Users Manual' and
- *  #2) 8051 simulator by Travis Marlatte
- *  #3) Portable UPI-41/8041/8741/8042/8742 emulator V0.1 by Juergen Buchmueller (MAME CORE)
+ * This work is based on:
+ * #1) 'Intel(tm) MC51 Microcontroller Family Users Manual' and
+ * #2) 8051 simulator by Travis Marlatte
+ * #3) Portable UPI-41/8041/8741/8042/8742 emulator V0.1 by Juergen Buchmueller (MAME CORE)
  *
  *****************************************************************************/
 
 /*****************************************************************************
- *   DS5002FP emulator by Manuel Abadia
  *
- *   October 2008, couriersud: Merged back in mcs51
+ * DS5002FP emulator by Manuel Abadia
  *
- *   What has been added?
- *      - Extra SFRs
- *      - Bytewide Bus Support
- *      - Memory Partition and Memory Range
- *      - Bootstrap Configuration
- *      - Power Fail Interrupt
- *      - Timed Access
- *      - Stop Mode
- *      - Idle Mode
+ * The main features of the DS5002FP are:
+ * - 100% code-compatible with 8051
+ * - Directly addresses 64kB program/64kB data memory
+ * - Nonvolatile memory control circuitry
+ * - 10-year data retention in the absence of power
+ * - In-system reprogramming via serial port
+ * - Dedicated memory bus, preserving four 8-bit ports for general purpose I/O
+ * - Power-fail reset
+ * - Early warning power-fail interrupt
+ * - Watchdog timer
+ * - Accesses up to 128kB on the bytewide bus
+ * - Decodes memory for 32kB x 8 or 128kB x 8 SRAMs
+ * - Four additional decoded peripheral-chip enables
+ * - CRC hardware for checking memory validity
+ * - Optionally emulates an 8042-style slave interface
+ * - Memory encryption using an 80-bit encryption key
+ * - Automatic random generation of encryption keys
+ * - Self-destruct input for tamper protection
+ * - Optional top-coating prevents microprobe
  *
- *   What is not implemented?
- *      - Peripherals and Reprogrammable Peripheral Controller
- *      - CRC-16
- *      - Watchdog timer
- *
- *   The main features of the DS5002FP are:
- *      - 100% code-compatible with 8051
- *      - Directly addresses 64kB program/64kB data memory
- *      - Nonvolatile memory control circuitry
- *      - 10-year data retention in the absence of power
- *      - In-system reprogramming via serial port
- *      - Dedicated memory bus, preserving four 8-bit ports for general purpose I/O
- *      - Power-fail reset
- *      - Early warning power-fail interrupt
- *      - Watchdog timer
- *      - Accesses up to 128kB on the bytewide bus
- *      - Decodes memory for 32kB x 8 or 128kB x 8 SRAMs
- *      - Four additional decoded peripheral-chip enables
- *      - CRC hardware for checking memory validity
- *      - Optionally emulates an 8042-style slave interface
- *      - Memory encryption using an 80-bit encryption key
- *      - Automatic random generation of encryption keys
- *      - Self-destruct input for tamper protection
- *      - Optional top-coating prevents microprobe
+ * TODO:
+ * - Peripherals and Reprogrammable Peripheral Controller
+ * - CRC-16
+ * - Watchdog timer
  *
  *****************************************************************************/
 
 /******************************************************************************
- *  Notes:
+ * Notes:
  *
- *        The term cycles is used here to really refer to clock oscilations, because 1 machine cycle
- *        actually takes 12 oscilations.
+ * The term cycles is used here to really refer to clock oscilations, because 1 machine cycle
+ * actually takes 12 oscilations.
  *
- *        Read/Write/Modify Instruction -
- *          Data is read from the Port Latch (not the Port Pin!), possibly modified, and
- *          written back to (the pin? and) the latch!
+ * Read/Write/Modify Instruction -
+ *   Data is read from the Port Latch (not the Port Pin!), possibly modified, and
+ *   written back to (the pin? and) the latch!
  *
- *          The following all perform this on a port address..
- *          (anl, orl, xrl, jbc, cpl, inc, dec, djnz, mov px.y,c, clr px.y, setb px.y)
- *
- *        August 27,2003: Currently support for only 8031/8051/8751 chips (ie 128 RAM)
- *        October 14,2003: Added initial support for the 8752 (ie 256 RAM)
- *        October 22,2003: Full support for the 8752 (ie 256 RAM)
- *        July 28,2004: Fixed MOVX command and added External Ram Paging Support
- *        July 31,2004: Added Serial Mode 0 Support & Fixed Interrupt Flags for Serial Port
- *
- *        October, 2008, Couriersud - Major rewrite
+ *   The following all perform this on a port address..
+ *   (anl, orl, xrl, jbc, cpl, inc, dec, djnz, mov px.y,c, clr px.y, setb px.y)
  *
  *****************************************************************************/
 
 /* TODO: Various
- *  - EA pin - defined by architecture, must implement:
- *    1 means external access, bypassing internal ROM
- *  - T0 output clock ?
+ * - EA pin - defined by architecture, must implement:
+ *   1 means external access, bypassing internal ROM
+ * - T0 output clock ?
  *
  * - Implement 80C52 extended serial capabilities
  * - Implement 83C751 in sslam.c
@@ -101,30 +80,6 @@
  *      a 0 written to it's latch. At least cardline expects a 1 here.
  * - ADC support for 80552/80562 (controls analog inputs for Arctic Thunder)
  *
- * Done: (Couriersud)
- * - Merged DS5002FP
- * - Disassembler now uses type specific memory names
- * - Merged DS5002FP disasm
- * - added 83C751 memory names to disassembler
- * - Pointer-ified
- * - Implemented cmos features
- * - Implemented 80C52 interrupt handling
- * - Fix segas18.c (segaic16.c) memory handling.
- * - Fix sslam.c
- * - Fix limenko.c videopkr.c : Issue with core allocation of ram (duplicate savestate)
- * - Handle internal ram better (debugger visible)
- *  - Fixed port reading
- *  - Rewrote Macros for better readability
- *  - Fixed and rewrote Interrupt handling
- *  - Now returns INTERNAL_DIVIDER, adjusted cycle counts
- *  - Remove unnecessary and duplicated code
- * - Remove unnecessary functions
- * - Rewrite to have sfr-registers stored in int_ram.
- * - Debugger may now watch sfr-registers as well.
- * - implemented interrupt callbacks (HOLD_LINE now supported)
- * - Runtime switch for processor type - remove ifdefs
- * - internal memory maps for internal rom versions (internal ram now displayed in debugger)
- * - more timer cleanups from manual
  */
 
 #include "emu.h"
@@ -205,7 +160,6 @@ enum
 	ADDR_RNR    = 0xcf,
 	ADDR_RPCTL  = 0xd8,
 	ADDR_RPS    = 0xda
-
 };
 
 /* PC vectors */
@@ -895,13 +849,14 @@ offs_t mcs51_cpu_device::external_ram_iaddr(offs_t offset, offs_t mem_mask)
 	/* if partition mode is set, adjust offset based on the bus */
 	if (m_features & FEATURE_DS5002FP)
 	{
-		if (GET_PES) {
+		if (GET_PES)
 			offset += 0x20000;
-		} else if (!GET_PM) {
-			if (!GET_EXBS) {
-				if ((offset >= ds5002fp_partitions[GET_PA]) && (offset <= ds5002fp_ranges[m_ds5002fp.range])) {
+		else if (!GET_PM)
+		{
+			if (!GET_EXBS)
+			{
+				if ((offset >= ds5002fp_partitions[GET_PA]) && (offset <= ds5002fp_ranges[m_ds5002fp.range]))
 					offset += 0x10000;
-				}
 			}
 		}
 	}
@@ -955,7 +910,8 @@ void mcs51_cpu_device::set_parity()
 	int i;
 	uint8_t a = ACC;
 
-	for (i=0; i<8; i++) {       //Test for each of the 8 bits in the ACC!
+	for (i=0; i<8; i++) //Test for each of the 8 bits in the ACC!
+	{
 		p ^= (a & 1);
 		a = (a >> 1);
 	}
@@ -974,7 +930,8 @@ uint8_t mcs51_cpu_device::bit_address_r(uint8_t offset)
 	m_last_bit = offset;
 
 	//User defined bit addresses 0x20-0x2f (values are 0x0-0x7f)
-	if (offset < 0x80) {
+	if (offset < 0x80)
+	{
 		distance = 1;
 		word = ( (offset & 0x78) >> 3) * distance + 0x20;
 		bit_pos = offset & 0x7;
@@ -982,7 +939,8 @@ uint8_t mcs51_cpu_device::bit_address_r(uint8_t offset)
 		return((IRAM_R(word) & mask) >> bit_pos);
 	}
 	//SFR bit addressable registers
-	else {
+	else
+	{
 		distance = 8;
 		word = ( (offset & 0x78) >> 3) * distance + 0x80;
 		bit_pos = offset & 0x7;
@@ -1001,7 +959,8 @@ void mcs51_cpu_device::bit_address_w(uint8_t offset, uint8_t bit)
 	int distance;
 
 	/* User defined bit addresses 0x20-0x2f (values are 0x0-0x7f) */
-	if (offset < 0x80) {
+	if (offset < 0x80)
+	{
 		distance = 1;
 		word = ((offset & 0x78) >> 3) * distance + 0x20;
 		bit_pos = offset & 0x7;
@@ -1012,7 +971,8 @@ void mcs51_cpu_device::bit_address_w(uint8_t offset, uint8_t bit)
 		IRAM_W(word, result);
 	}
 	/* SFR bit addressable registers */
-	else {
+	else
+	{
 		distance = 8;
 		word = ((offset & 0x78) >> 3) * distance + 0x80;
 		bit_pos = offset & 0x7;
@@ -1070,7 +1030,8 @@ void mcs51_cpu_device::transmit_receive(int source)
 	if (source == 1) /* timer1 */
 		m_uart.smod_div = (m_uart.smod_div + 1) & (1-GET_SMOD);
 
-	switch(mode) {
+	switch(mode)
+	{
 		// 8 bit shifter - rate set by clock freq / 12
 		case 0:
 			if (source == 0)
@@ -1287,7 +1248,8 @@ void mcs51_cpu_device::update_timer_t0(int cycles)
 		if (GET_GATE0 && !GET_IE0)
 			delta = 0;
 
-		switch(mode) {
+		switch(mode)
+		{
 			case 0:         /* 13 Bit Timer Mode */
 				count = ((TH0<<5) | ( TL0 & 0x1f ) );
 				count += delta;
@@ -1377,7 +1339,8 @@ void mcs51_cpu_device::update_timer_t1(int cycles)
 			if (GET_GATE1 && !GET_IE1)
 				delta = 0;
 
-			switch(mode) {
+			switch(mode)
+			{
 				case 0:         /* 13 Bit Timer Mode */
 					count = ((TH1<<5) | ( TL1 & 0x1f ) );
 					count += delta;
@@ -1421,7 +1384,8 @@ void mcs51_cpu_device::update_timer_t1(int cycles)
 		delta =  cycles;
 		/* taken, reset */
 		m_t1_cnt = 0;
-		switch(mode) {
+		switch(mode)
+		{
 			case 0:         /* 13 Bit Timer Mode */
 				count = ((TH1<<5) | ( TL1 & 0x1f ) );
 				count += delta;
@@ -1460,7 +1424,8 @@ void mcs51_cpu_device::update_timer_t1(int cycles)
 void mcs51_cpu_device::update_timer_t2(int cycles)
 {
 	/* Update Timer 2 */
-	if(GET_TR2) {
+	if(GET_TR2)
+	{
 		int mode = ((GET_TCLK | GET_RCLK) << 1) | GET_CP;
 		int delta = GET_CT2 ? m_t2_cnt : (mode & 2) ? cycles * (12/2) : cycles;
 
@@ -1855,7 +1820,8 @@ void mcs51_cpu_device::execute_op(uint8_t op)
 ***************************************************************************/
 
 /* # of oscilations each opcode requires*/
-const uint8_t mcs51_cpu_device::mcs51_cycles[256] = {
+const uint8_t mcs51_cpu_device::mcs51_cycles[256] =
+{
 	1,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,
 	2,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,
 	2,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,
@@ -1990,7 +1956,8 @@ void mcs51_cpu_device::check_irqs()
 	LOG("Take: %d %02x\n", m_cur_irq_prio, m_irq_active);
 
 	//Clear any interrupt flags that should be cleared since we're servicing the irq!
-	switch(int_vec) {
+	switch(int_vec)
+	{
 		case V_IE0:
 			//External Int Flag only cleared when configured as Edge Triggered..
 			if(GET_IT0)  /* for some reason having this, breaks alving dmd games */
@@ -2063,9 +2030,11 @@ void mcs51_cpu_device::execute_set_input(int irqline, int state)
 		//External Interrupt 0
 		case MCS51_INT0_LINE:
 			//Line Asserted?
-			if (state != CLEAR_LINE) {
+			if (state != CLEAR_LINE)
+			{
 				//Need cleared->active line transition? (Logical 1-0 Pulse on the line) - CLEAR->ASSERT Transition since INT0 active lo!
-				if (GET_IT0) {
+				if (GET_IT0)
+				{
 					if (GET_BIT(tr_state, MCS51_INT0_LINE))
 						SET_IE0(1);
 				}
@@ -2085,9 +2054,11 @@ void mcs51_cpu_device::execute_set_input(int irqline, int state)
 		//External Interrupt 1
 		case MCS51_INT1_LINE:
 			//Line Asserted?
-			if (state != CLEAR_LINE) {
+			if (state != CLEAR_LINE)
+			{
 				//Need cleared->active line transition? (Logical 1-0 Pulse on the line) - CLEAR->ASSERT Transition since INT1 active lo!
-				if(GET_IT1){
+				if(GET_IT1)
+				{
 					if (GET_BIT(tr_state, MCS51_INT1_LINE))
 						SET_IE1(1);
 				}

@@ -8,8 +8,6 @@
 
     Copyright Nicola Salmoria, Andreas Naive, and Charles MacDonald.
 
-    All rights reserved.
-
 ****************************************************************************
 
     The FD1094 is a custom CPU based on the 68000, which runs encrypted code.

@@ -2,28 +2,8 @@
 // copyright-holders:Steve Ellenoff, Manuel Abadia, Couriersud
 /*****************************************************************************
  *
- *   mcs51.h
- *   Portable MCS-51 Family Emulator
- *
- *   Chips in the family:
- *   8051 Product Line (8031,8051,8751)
- *   8052 Product Line (8032,8052,8752)
- *   8054 Product Line (8054)
- *   8058 Product Line (8058)
- *
- *   Copyright Steve Ellenoff, all rights reserved.
- *
- *  This work is based on:
- *  #1) 'Intel(tm) MC51 Microcontroller Family Users Manual' and
- *  #2) 8051 simulator by Travis Marlatte
- *  #3) Portable UPI-41/8041/8741/8042/8742 emulator V0.1 by Juergen Buchmueller (MAME CORE)
- *
- * 2008, October, Couriersud
- * - Rewrite of timer, interrupt and serial code
- * - addition of CMOS features
- * - internal memory maps
- * - addition of new processor types
- * - full emulation of 8xCx2 processors
+ * Portable MCS-51 Family Emulator
+ * Copyright Steve Ellenoff
  *
  *****************************************************************************/
 

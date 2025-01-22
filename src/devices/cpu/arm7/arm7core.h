@@ -5,7 +5,7 @@
  *   arm7core.h
  *   Portable ARM7TDMI Core Emulator
  *
- *   Copyright Steve Ellenoff, all rights reserved.
+ *   Copyright Steve Ellenoff
  *
  *  This work is based on:
  *  #1) 'Atmel Corporation ARM7TDMI (Thumb) Datasheet - January 1999'

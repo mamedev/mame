@@ -5,7 +5,7 @@
  * scudsp.c
  * Sega SCUDSP emulator version 1.00
  *
- * copyright Angelo Salese & Mariusz Wojcieszek, all rights reserved
+ * copyright Angelo Salese & Mariusz Wojcieszek
  *
  * Changelog:
  * 131010: Angelo Salese

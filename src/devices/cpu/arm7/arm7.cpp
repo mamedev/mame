@@ -2,10 +2,10 @@
 // copyright-holders:Steve Ellenoff,R. Belmont,Ryan Holtz
 /*****************************************************************************
  *
- *   arm7.c
+ *   arm7.cpp
  *   Portable CPU Emulator for 32-bit ARM v3/4/5/6
  *
- *   Copyright Steve Ellenoff, all rights reserved.
+ *   Copyright Steve Ellenoff
  *   Thumb, DSP, and MMU support and many bugfixes by R. Belmont and Ryan Holtz.
  *
  *  This work is based on:
