@@ -611,6 +611,13 @@ ROM_START( dgunl3227a )
 	ROM_LOAD16_WORD_SWAP( "myarcadepacman_s99jl032hbt1_9991227e_as_s29jl032h55tai01.bin", 0x000000, 0x400000, CRC(ecead966) SHA1(971e8da6eb720f670f4148c7e07922e4f24eb609) )
 ROM_END
 
+ROM_START( atgame40 )
+	ROM_REGION( 0x1000000, "rom", 0 )
+	ROM_LOAD16_WORD_SWAP( "40bonusgamesin1.bin", 0x000000, 0x1000000, CRC(4eba6e83) SHA1(b8edf1b6ecb70a136b551f1454ba8afa45bd8bc1) )
+
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_COPY( "rom", 0x800000, 0, 0x400000 )
+ROM_END
 
 
 ROM_START( ra145 )
@@ -772,3 +779,11 @@ CONS( 2018, dgunl3227,  0,        0, megadriv_dgunl_ntsc, dgunl_1player,        
 CONS( 2018, dgunl3227a, dgunl3227,0, megadriv_dgunl_ntsc, dgunl_1player,         megadriv_dgunl_state, init_dgunl3227,    "dreamGEAR",            "My Arcade Pac-Man Pocket Player (DGUNL-3227, older)", 0 )
 
 CONS( 2018, ra145,     0,        0, megadriv_ra145_ntsc, msi_6button,           megadriv_ra145_state, init_ra145,        "<unknown>",            "Retro Arcade 16 Bits Classic Edition Mini TV Game Console - 145 Classic Games - TV Arcade Plug and Play (Mega Drive bootlegs)", MACHINE_NOT_WORKING )
+
+// Technically this is a MD type cartridge, but it doesn't seem to be designed for use with a standard MD as it contains
+// nothing but the 16Mbyte ROM and a 5v to 3.3v converter yet the code clearly requires some extensive banking logic.
+// Testing it on a real MD shows nothing, not even the menu.
+// 
+// We don't seem to emulate the system it's designed for, so for now just treat it as its own thing (which may become
+// the basis of a driver for that console)
+CONS( 2012, atgame40,  0,        0, megadriv_radica_3button_pal,  radica_3button, megadriv_radica_state, init_megadrie, "AtGames",               "40 Bonus Games in 1 (AtGames)", MACHINE_NOT_WORKING)
