@@ -891,6 +891,12 @@ ROM_START( pactin )
 	ROM_LOAD( "25q80a.u3", 0x00000, 0x100000, CRC(92935759) SHA1(2333e7dcab51fa34c8d875374371854121fff27a) )
 ROM_END
 
+ROM_START( tetrtin )
+	ROM_REGION( 0x100000, "mainrom", 0 )
+	ROM_LOAD( "25q80.u3", 0x00000, 0x100000, CRC(017a99b9) SHA1(e7f891762bbc3b80ae0f177654d8d066b7524bcd) )
+ROM_END
+
+
 // GC31-369-20210702-V2 on PCB
 ROM_START( unk128vt )
 	ROM_REGION( 0x400000, "mainrom", 0 )
@@ -1088,7 +1094,10 @@ CONS( 201?, egame150,  denv150,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vt
 // uncertain, uses SPI ROM so probably VT369
 CONS( 2017, otrail,     0,        0,  nes_vt369_vtunknown_unk_1mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "Basic Fun", "The Oregon Trail", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2021, pactin,     0,        0,  nes_vt369_vtunknown_unk_1mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "Fizz Creations", "Pac-Man in a Tin", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+// seems to be running the NES version of Pac-Man with some extra splash screens
+CONS( 2021, pactin,     0,        0,  nes_vt369_vtunknown_unk_1mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "Fizz Creations", "Pac-Man Arcade in a Tin", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+
+CONS( 2021, tetrtin,    0,        0,  nes_vt369_vtunknown_unk_1mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "Fizz Creations", "Tetris Arcade in a Tin", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // boots, has a lower resolution screen. menu is natively in low resolution, other games should be scaled down
 CONS( 2021, unk128vt,   0,        0,  nes_vt369_vtunknown_unk_4mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "unknown VT369 based 128-in-1 (GC31-369-20210702-V2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
