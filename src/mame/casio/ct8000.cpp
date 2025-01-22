@@ -468,7 +468,7 @@ void ct8000_state::filter_main_w(u8 data)
 	else
 	{
 		r = RES_K(43);
-		c = CAP_P(380);
+		c = CAP_P(390);
 	}
 
 	m_filter_rc[2]->filter_rc_set_RC(filter_rc_device::LOWPASS, r, 0, 0, CAP_N(2.2));
