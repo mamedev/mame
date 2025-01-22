@@ -30265,6 +30265,8 @@ void m68000_musashi_device::x4af9_tas_b_al_071234fc()
 }
 void m68000_musashi_device::x4ac8_halt_c()
 {
+	m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
+	m_icount = 0;
 	m_stopped = STOP_LEVEL_HALT;
 
 
