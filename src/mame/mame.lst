@@ -16721,6 +16721,9 @@ sgalaxy
 sgalaxya
 sgalaxyb
 
+@source:cxg/pchess.cpp
+cpchess
+
 @source:cxg/professor.cpp
 scprof
 

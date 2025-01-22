@@ -124,7 +124,8 @@ template<int N>
 void computachess_state::mux_w(u8 data)
 {
 	// R2x,R3x: input mux, led data
-	m_inp_mux = (m_inp_mux & ~(0xf << (N*4))) | (data << (N*4));
+	const u8 shift = N * 4;
+	m_inp_mux = (m_inp_mux & ~(0xf << shift)) | (data << shift);
 	m_display->write_mx(m_inp_mux);
 }
 
