@@ -52,6 +52,7 @@
  *****************************************************************************/
 
 /******************************************************************************
+ *
  * Notes:
  *
  * The term cycles is used here to really refer to clock oscilations, because 1 machine cycle
@@ -102,11 +103,11 @@
 
 enum
 {
-	FEATURE_NONE            = 0x00,
-	FEATURE_I8052           = 0x01,
-	FEATURE_CMOS            = 0x02,
-	FEATURE_I80C52          = 0x04,
-	FEATURE_DS5002FP        = 0x08
+	FEATURE_NONE        = 0x00,
+	FEATURE_I8052       = 0x01,
+	FEATURE_CMOS        = 0x02,
+	FEATURE_I80C52      = 0x04,
+	FEATURE_DS5002FP    = 0x08
 };
 
 /* Internal address in SFR of registers */
@@ -252,7 +253,7 @@ mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type ty
 	, m_features(features)
 	, m_inst_cycles(0)
 	, m_rom_size(program_width > 0 ? 1 << program_width : 0)
-	, m_ram_mask( (data_width == 8) ? 0xff : 0x7f )
+	, m_ram_mask((data_width == 8) ? 0xff : 0x7f)
 	, m_num_interrupts(5)
 	, m_sfr_ram(*this, "sfr_ram")
 	, m_scratchpad(*this, "scratchpad")
@@ -588,55 +589,55 @@ void mcs51_cpu_device::iram_iwrite(offs_t a, uint8_t d) { if (a <= m_ram_mask) m
 /* Macros for Setting Flags */
 #define SET_X(R, v) do { R = (v);} while (0)
 
-#define SET_CY(n)       SET_PSW((PSW & 0x7f) | (n<<7))  //Carry Flag
-#define SET_AC(n)       SET_PSW((PSW & 0xbf) | (n<<6))  //Aux.Carry Flag
-#define SET_FO(n)       SET_PSW((PSW & 0xdf) | (n<<5))  //User Flag
-#define SET_RS(n)       SET_PSW((PSW & 0xe7) | (n<<3))  //R Bank Select
-#define SET_OV(n)       SET_PSW((PSW & 0xfb) | (n<<2))  //Overflow Flag
-#define SET_P(n)        SET_PSW((PSW & 0xfe) | (n<<0))  //Parity Flag
+#define SET_CY(n)       SET_PSW((PSW & 0x7f) | ((n) << 7))  //Carry Flag
+#define SET_AC(n)       SET_PSW((PSW & 0xbf) | ((n) << 6))  //Aux.Carry Flag
+#define SET_FO(n)       SET_PSW((PSW & 0xdf) | ((n) << 5))  //User Flag
+#define SET_RS(n)       SET_PSW((PSW & 0xe7) | ((n) << 3))  //R Bank Select
+#define SET_OV(n)       SET_PSW((PSW & 0xfb) | ((n) << 2))  //Overflow Flag
+#define SET_P(n)        SET_PSW((PSW & 0xfe) | ((n) << 0))  //Parity Flag
 
-#define SET_BIT(R, n, v) do { R = (R & ~(1<<(n))) | ((v) << (n));} while (0)
-#define GET_BIT(R, n) (((R)>>(n)) & 0x01)
+#define SET_BIT(R, n, v) do { R = (R & ~(1 << (n))) | ((v) << (n)); } while (0)
+#define GET_BIT(R, n) (((R) >> (n)) & 0x01)
 
-#define SET_EA(n)       SET_BIT(IE, 7, n)       //Global Interrupt Enable/Disable
-#define SET_ES(n)       SET_BIT(IE, 4, v)       //Serial Interrupt Enable/Disable
-#define SET_ET1(n)      SET_BIT(IE, 3, n)       //Timer 1 Interrupt Enable/Disable
-#define SET_EX1(n)      SET_BIT(IE, 2, n)       //External Int 1 Interrupt Enable/Disable
-#define SET_ET0(n)      SET_BIT(IE, 1, n)       //Timer 0 Interrupt Enable/Disable
-#define SET_EX0(n)      SET_BIT(IE, 0, n)       //External Int 0 Interrupt Enable/Disable
+#define SET_EA(n)       SET_BIT(IE, 7, n)    //Global Interrupt Enable/Disable
+#define SET_ES(n)       SET_BIT(IE, 4, v)    //Serial Interrupt Enable/Disable
+#define SET_ET1(n)      SET_BIT(IE, 3, n)    //Timer 1 Interrupt Enable/Disable
+#define SET_EX1(n)      SET_BIT(IE, 2, n)    //External Int 1 Interrupt Enable/Disable
+#define SET_ET0(n)      SET_BIT(IE, 1, n)    //Timer 0 Interrupt Enable/Disable
+#define SET_EX0(n)      SET_BIT(IE, 0, n)    //External Int 0 Interrupt Enable/Disable
 /* 8052 Only flags */
-#define SET_ET2(n)      SET_BIT(IE, 5, n)       //Timer 2 Interrupt Enable/Disable
+#define SET_ET2(n)      SET_BIT(IE, 5, n)    //Timer 2 Interrupt Enable/Disable
 
 /* 8052 Only flags */
-#define SET_PT2(n)      SET_BIT(IP, 5, n);  //Set Timer 2 Priority Level
+#define SET_PT2(n)      SET_BIT(IP, 5, n)    //Set Timer 2 Priority Level
 
-#define SET_PS0(n)      SET_BIT(IP, 4, n)       //Set Serial Priority Level
-#define SET_PT1(n)      SET_BIT(IP, 3, n)       //Set Timer 1 Priority Level
-#define SET_PX1(n)      SET_BIT(IP, 2, n)       //Set External Int 1 Priority Level
-#define SET_PT0(n)      SET_BIT(IP, 1, n)       //Set Timer 0 Priority Level
-#define SET_PX0(n)      SET_BIT(IP, 0, n)       //Set External Int 0 Priority Level
+#define SET_PS0(n)      SET_BIT(IP, 4, n)    //Set Serial Priority Level
+#define SET_PT1(n)      SET_BIT(IP, 3, n)    //Set Timer 1 Priority Level
+#define SET_PX1(n)      SET_BIT(IP, 2, n)    //Set External Int 1 Priority Level
+#define SET_PT0(n)      SET_BIT(IP, 1, n)    //Set Timer 0 Priority Level
+#define SET_PX0(n)      SET_BIT(IP, 0, n)    //Set External Int 0 Priority Level
 
-#define SET_TF1(n)      SET_BIT(TCON, 7, n) //Indicated Timer 1 Overflow Int Triggered
+#define SET_TF1(n)      SET_BIT(TCON, 7, n)  //Indicated Timer 1 Overflow Int Triggered
 #define SET_TR1(n)      SET_BIT(TCON, 6, n)  //IndicateS Timer 1 is running
-#define SET_TF0(n)      SET_BIT(TCON, 5, n) //Indicated Timer 0 Overflow Int Triggered
+#define SET_TF0(n)      SET_BIT(TCON, 5, n)  //Indicated Timer 0 Overflow Int Triggered
 #define SET_TR0(n)      SET_BIT(TCON, 4, n)  //IndicateS Timer 0 is running
 #define SET_IE1(n)      SET_BIT(TCON, 3, n)  //Indicated External Int 1 Triggered
 #define SET_IT1(n)      SET_BIT(TCON, 2, n)  //Indicates how External Int 1 is Triggered
 #define SET_IE0(n)      SET_BIT(TCON, 1, n)  //Indicated External Int 0 Triggered
 #define SET_IT0(n)      SET_BIT(TCON, 0, n)  //Indicates how External Int 0 is Triggered
 
-#define SET_SM0(n)      SET_BIT(SCON, 7, n) //Sets Serial Port Mode
+#define SET_SM0(n)      SET_BIT(SCON, 7, n)  //Sets Serial Port Mode
 #define SET_SM1(n)      SET_BIT(SCON, 6, n)  //Sets Serial Port Mode
-#define SET_SM2(n)      SET_BIT(SCON, 5, n) //Sets Serial Port Mode (Multiprocesser mode)
+#define SET_SM2(n)      SET_BIT(SCON, 5, n)  //Sets Serial Port Mode (Multiprocesser mode)
 #define SET_REN(n)      SET_BIT(SCON, 4, n)  //Sets Serial Port Receive Enable
 #define SET_TB8(n)      SET_BIT(SCON, 3, n)  //Transmit 8th Bit
 #define SET_RB8(n)      SET_BIT(SCON, 2, n)  //Receive 8th Bit
 #define SET_TI(n)       SET_BIT(SCON, 1, n)  //Indicates Transmit Interrupt Occurred
 #define SET_RI(n)       SET_BIT(SCON, 0, n)  //Indicates Receive Interrupt Occurred
 
-#define SET_GATE1(n)    SET_BIT(TMOD, 7, n) //Timer 1 Gate Mode
+#define SET_GATE1(n)    SET_BIT(TMOD, 7, n)  //Timer 1 Gate Mode
 #define SET_CT1(n)      SET_BIT(TMOD, 6, n)  //Timer 1 Counter Mode
-#define SET_M1_1(n)     SET_BIT(TMOD, 5, n) //Timer 1 Timer Mode Bit 1
+#define SET_M1_1(n)     SET_BIT(TMOD, 5, n)  //Timer 1 Timer Mode Bit 1
 #define SET_M1_0(n)     SET_BIT(TMOD, 4, n)  //Timer 1 Timer Mode Bit 0
 #define SET_GATE0(n)    SET_BIT(TMOD, 3, n)  //Timer 0 Gate Mode
 #define SET_CT0(n)      SET_BIT(TMOD, 2, n)  //Timer 0 Counter Mode
@@ -646,14 +647,14 @@ void mcs51_cpu_device::iram_iwrite(offs_t a, uint8_t d) { if (a <= m_ram_mask) m
 
 
 /* 8052 Only flags - T2CON Flags */
-#define SET_TF2(n)      SET_BIT(T2CON, 7, n)    //Indicated Timer 2 Overflow Int Triggered
-#define SET_EXF2(n)     SET_BIT(T2CON, 6, n)    //Indicates Timer 2 External Flag
-#define SET_RCLK(n)     SET_BIT(T2CON, 5, n)    //Receive Clock
-#define SET_TCLK(n)     SET_BIT(T2CON, 4, n)    //Transmit Clock
-#define SET_EXEN2(n)    SET_BIT(T2CON, 3, n)    //Timer 2 External Interrupt Enable
-#define SET_TR2(n)      SET_BIT(T2CON, 2, n)    //Indicates Timer 2 is running
-#define SET_CT2(n)      SET_BIT(T2CON, 1, n)    //Sets Timer 2 Counter/Timer Mode
-#define SET_CP(n)       SET_BIT(T2CON, 0, n)    //Sets Timer 2 Capture/Reload Mode
+#define SET_TF2(n)      SET_BIT(T2CON, 7, n) //Indicated Timer 2 Overflow Int Triggered
+#define SET_EXF2(n)     SET_BIT(T2CON, 6, n) //Indicates Timer 2 External Flag
+#define SET_RCLK(n)     SET_BIT(T2CON, 5, n) //Receive Clock
+#define SET_TCLK(n)     SET_BIT(T2CON, 4, n) //Transmit Clock
+#define SET_EXEN2(n)    SET_BIT(T2CON, 3, n) //Timer 2 External Interrupt Enable
+#define SET_TR2(n)      SET_BIT(T2CON, 2, n) //Indicates Timer 2 is running
+#define SET_CT2(n)      SET_BIT(T2CON, 1, n) //Sets Timer 2 Counter/Timer Mode
+#define SET_CP(n)       SET_BIT(T2CON, 0, n) //Sets Timer 2 Capture/Reload Mode
 
 #define SET_GF1(n)      SET_BIT(PCON, 3, n)
 #define SET_GF0(n)      SET_BIT(PCON, 2, n)
@@ -720,7 +721,7 @@ void mcs51_cpu_device::iram_iwrite(offs_t a, uint8_t d) { if (a <= m_ram_mask) m
 #define GET_GF1         GET_BIT(PCON, 3)
 #define GET_GF0         GET_BIT(PCON, 2)
 #define GET_PD          GET_BIT(PCON, 1)
-#define GET_IDL         (GET_BIT(PCON, 0) & ~(GET_PD))  /* PD takes precedence! */
+#define GET_IDL         (GET_BIT(PCON, 0) & ~(GET_PD))  // PD takes precedence!
 
 /* 8052 Only flags */
 #define GET_TF2         GET_BIT(T2CON, 7)
@@ -753,7 +754,7 @@ void mcs51_cpu_device::iram_iwrite(offs_t a, uint8_t d) { if (a <= m_ram_mask) m
 #define GET_SL          GET_BIT(MCON, 0)
 
 /* RPCTL Flags - DS5002FP */
-#define GET_RNR         GET_BIT(RPCTL, 7) /* Bit 6 ?? */
+#define GET_RNR         GET_BIT(RPCTL, 7) // Bit 6 ??
 #define GET_EXBS        GET_BIT(RPCTL, 5)
 #define GET_AE          GET_BIT(RPCTL, 4)
 #define GET_IBI         GET_BIT(RPCTL, 3)
@@ -766,7 +767,7 @@ void mcs51_cpu_device::iram_iwrite(offs_t a, uint8_t d) { if (a <= m_ram_mask) m
 #define DO_ADD_FLAGS(a,d,c) do_add_flags(a, d, c)
 #define DO_SUB_FLAGS(a,d,c) do_sub_flags(a, d, c)
 
-#define SET_PARITY()    do {m_recalc_parity |= 1;} while (0)
+#define SET_PARITY()    do { m_recalc_parity |= 1; } while (0)
 #define PUSH_PC()       push_pc()
 #define POP_PC()        pop_pc()
 
@@ -842,9 +843,11 @@ offs_t mcs51_cpu_device::external_ram_iaddr(offs_t offset, offs_t mem_mask)
 	/* Memory Range (RG1 and RG0 @ MCON and RPCTL registers) */
 	static const uint16_t ds5002fp_ranges[4] = { 0x1fff, 0x3fff, 0x7fff, 0xffff };
 	/* Memory Partition Table (RG1 & RG0 @ MCON & RPCTL registers) */
-	static const uint32_t ds5002fp_partitions[16] = {
+	static const uint32_t ds5002fp_partitions[16] =
+	{
 		0x0000, 0x1000, 0x2000, 0x3000, 0x4000, 0x5000, 0x6000,  0x7000,
-		0x8000, 0x9000, 0xa000, 0xb000, 0xc000, 0xd000, 0xe000, 0x10000 };
+		0x8000, 0x9000, 0xa000, 0xb000, 0xc000, 0xd000, 0xe000, 0x10000
+	};
 
 	/* if partition mode is set, adjust offset based on the bus */
 	if (m_features & FEATURE_DS5002FP)
@@ -872,12 +875,12 @@ offs_t mcs51_cpu_device::external_ram_iaddr(offs_t offset, offs_t mem_mask)
 
 uint8_t mcs51_cpu_device::iram_read(size_t offset)
 {
-	return (((offset) < 0x80) ? m_data.read_byte(offset) : sfr_read(offset));
+	return ((offset < 0x80) ? m_data.read_byte(offset) : sfr_read(offset));
 }
 
 void mcs51_cpu_device::iram_write(size_t offset, uint8_t data)
 {
-	if ((offset) < 0x80)
+	if (offset < 0x80)
 		m_data.write_byte(offset, data);
 	else
 		sfr_write(offset, data);
@@ -886,19 +889,19 @@ void mcs51_cpu_device::iram_write(size_t offset, uint8_t data)
 /*Push the current PC to the stack*/
 void mcs51_cpu_device::push_pc()
 {
-	uint8_t tmpSP = SP+1;                     //Grab and Increment Stack Pointer
-	IRAM_IW(tmpSP, (PC & 0xff));                //Store low byte of PC to Internal Ram (Use IRAM_IW to store stack above 128 bytes)
-	tmpSP++;                                    // ""
+	uint8_t tmpSP = SP + 1;                 //Grab and Increment Stack Pointer
+	IRAM_IW(tmpSP, (PC & 0xff));            //Store low byte of PC to Internal Ram (Use IRAM_IW to store stack above 128 bytes)
+	tmpSP++;                                // ""
 	SP = tmpSP;                             // ""
-	IRAM_IW(tmpSP, ( (PC & 0xff00) >> 8));      //Store hi byte of PC to next address in Internal Ram (Use IRAM_IW to store stack above 128 bytes)
+	IRAM_IW(tmpSP, ((PC & 0xff00) >> 8));   //Store hi byte of PC to next address in Internal Ram (Use IRAM_IW to store stack above 128 bytes)
 }
 
 /*Pop the current PC off the stack and into the pc*/
 void mcs51_cpu_device::pop_pc()
 {
-	uint8_t tmpSP = SP;                           //Grab Stack Pointer
-	PC = (IRAM_IR(tmpSP--) & 0xff) << 8;        //Store hi byte to PC (must use IRAM_IR to access stack pointing above 128 bytes)
-	PC = PC | IRAM_IR(tmpSP--);                 //Store lo byte to PC (must use IRAM_IR to access stack pointing above 128 bytes)
+	uint8_t tmpSP = SP;                     //Grab Stack Pointer
+	PC = (IRAM_IR(tmpSP--) & 0xff) << 8;    //Store hi byte to PC (must use IRAM_IR to access stack pointing above 128 bytes)
+	PC = PC | IRAM_IR(tmpSP--);             //Store lo byte to PC (must use IRAM_IR to access stack pointing above 128 bytes)
 	SP = tmpSP;                             //Decrement Stack Pointer
 }
 
@@ -907,10 +910,9 @@ void mcs51_cpu_device::set_parity()
 {
 	//This flag will be set when the accumulator contains an odd # of bits set..
 	uint8_t p = 0;
-	int i;
 	uint8_t a = ACC;
 
-	for (i=0; i<8; i++) //Test for each of the 8 bits in the ACC!
+	for (int i = 0; i < 8; i++) //Test for each of the 8 bits in the ACC!
 	{
 		p ^= (a & 1);
 		a = (a >> 1);
@@ -921,8 +923,8 @@ void mcs51_cpu_device::set_parity()
 
 uint8_t mcs51_cpu_device::bit_address_r(uint8_t offset)
 {
-	uint8_t   word;
-	uint8_t   mask;
+	uint8_t word;
+	uint8_t mask;
 	int bit_pos;
 	int distance;   /* distance between bit addressable words */
 					/* 1 for normal bits, 8 for sfr bit addresses */
@@ -933,7 +935,7 @@ uint8_t mcs51_cpu_device::bit_address_r(uint8_t offset)
 	if (offset < 0x80)
 	{
 		distance = 1;
-		word = ( (offset & 0x78) >> 3) * distance + 0x20;
+		word = ((offset & 0x78) >> 3) * distance + 0x20;
 		bit_pos = offset & 0x7;
 		mask = (0x1 << bit_pos);
 		return((IRAM_R(word) & mask) >> bit_pos);
@@ -942,7 +944,7 @@ uint8_t mcs51_cpu_device::bit_address_r(uint8_t offset)
 	else
 	{
 		distance = 8;
-		word = ( (offset & 0x78) >> 3) * distance + 0x80;
+		word = ((offset & 0x78) >> 3) * distance + 0x80;
 		bit_pos = offset & 0x7;
 		mask = (0x1 << bit_pos);
 		return ((IRAM_R(word) & mask) >> bit_pos);
@@ -953,9 +955,9 @@ uint8_t mcs51_cpu_device::bit_address_r(uint8_t offset)
 void mcs51_cpu_device::bit_address_w(uint8_t offset, uint8_t bit)
 {
 	int word;
-	uint8_t   mask;
+	uint8_t mask;
 	int bit_pos;
-	uint8_t   result;
+	uint8_t result;
 	int distance;
 
 	/* User defined bit addresses 0x20-0x2f (values are 0x0-0x7f) */
@@ -986,22 +988,22 @@ void mcs51_cpu_device::bit_address_w(uint8_t offset, uint8_t bit)
 
 void mcs51_cpu_device::do_add_flags(uint8_t a, uint8_t data, uint8_t c)
 {
-	uint16_t result = a+data+c;
-	int16_t result1 = (int8_t)a+(int8_t)data+c;
+	uint16_t result = a + data + c;
+	int16_t result1 = (int8_t)a + (int8_t)data + c;
 
 	SET_CY((result & 0x100) >> 8);
-	result = (a&0x0f)+(data&0x0f)+c;
+	result = (a & 0x0f) + (data & 0x0f) + c;
 	SET_AC((result & 0x10) >> 4);
 	SET_OV(result1 < -128 || result1 > 127);
 }
 
 void mcs51_cpu_device::do_sub_flags(uint8_t a, uint8_t data, uint8_t c)
 {
-	uint16_t result = a-(data+c);
-	int16_t result1 = (int8_t)a-(int8_t)(data+c);
+	uint16_t result = a - (data + c);
+	int16_t result1 = (int8_t)a - (int8_t)(data + c);
 
 	SET_CY((result & 0x100) >> 8);
-	result = (a&0x0f)-((data&0x0f)+c);
+	result = (a & 0x0f) - ((data & 0x0f) + c);
 	SET_AC((result & 0x10) >> 4);
 	SET_OV((result1 < -128 || result1 > 127));
 }
@@ -1025,12 +1027,12 @@ void mcs51_cpu_device::transmit(int state)
 
 void mcs51_cpu_device::transmit_receive(int source)
 {
-	int mode = (GET_SM0<<1) | GET_SM1;
+	int mode = (GET_SM0 << 1) | GET_SM1;
 
 	if (source == 1) /* timer1 */
 		m_uart.smod_div = (m_uart.smod_div + 1) & (1-GET_SMOD);
 
-	switch(mode)
+	switch (mode)
 	{
 		// 8 bit shifter - rate set by clock freq / 12
 		case 0:
@@ -1231,7 +1233,7 @@ void mcs51_cpu_device::transmit_receive(int source)
 
 void mcs51_cpu_device::update_timer_t0(int cycles)
 {
-	int mode = (GET_M0_1<<1) | GET_M0_0;
+	int mode = (GET_M0_1 << 1) | GET_M0_0;
 	uint32_t count;
 
 	if (GET_TR0)
@@ -1248,53 +1250,53 @@ void mcs51_cpu_device::update_timer_t0(int cycles)
 		if (GET_GATE0 && !GET_IE0)
 			delta = 0;
 
-		switch(mode)
+		switch (mode)
 		{
-			case 0:         /* 13 Bit Timer Mode */
-				count = ((TH0<<5) | ( TL0 & 0x1f ) );
+			case 0: /* 13 Bit Timer Mode */
+				count = ((TH0 << 5) | (TL0 & 0x1f));
 				count += delta;
-				if ( count & 0xffffe000 ) /* Check for overflow */
+				if (count & 0xffffe000) /* Check for overflow */
 					SET_TF0(1);
-				TH0 = (count>>5) & 0xff;
-				TL0 =  count & 0x1f;
+				TH0 = (count >> 5) & 0xff;
+				TL0 = count & 0x1f;
 				break;
-			case 1:         /* 16 Bit Timer Mode */
-				count = ((TH0<<8) | TL0);
+			case 1: /* 16 Bit Timer Mode */
+				count = ((TH0 << 8) | TL0);
 				count += delta;
-				if ( count & 0xffff0000 ) /* Check for overflow */
+				if (count & 0xffff0000) /* Check for overflow */
 					SET_TF0(1);
-				TH0 = (count>>8) & 0xff;
+				TH0 = (count >> 8) & 0xff;
 				TL0 = count & 0xff;
 				break;
-			case 2:         /* 8 Bit Autoreload */
-				count = ((uint32_t) TL0) + delta;
-				if ( count & 0xffffff00 )               /* Check for overflow */
+			case 2: /* 8 Bit Autoreload */
+				count = ((uint32_t)TL0) + delta;
+				if (count & 0xffffff00) /* Check for overflow */
 				{
 					SET_TF0(1);
-					count += TH0;                       /* Reload timer */
+					count += TH0; /* Reload timer */
 				}
 				/* Update new values of the counter */
 				TL0 =  count & 0xff;
 				break;
 			case 3:
 				/* Split Timer 1 */
-				count = ((uint32_t) TL0) + delta;
-				if ( count & 0xffffff00 )               /* Check for overflow */
+				count = ((uint32_t)TL0) + delta;
+				if (count & 0xffffff00) /* Check for overflow */
 					SET_TF0(1);
-				TL0 = count & 0xff;                     /* Update new values of the counter */
+				TL0 = count & 0xff; /* Update new values of the counter */
 				break;
 		}
 	}
 	if (GET_TR1)
 	{
-		switch(mode)
+		switch (mode)
 		{
 		case 3:
 			/* Split Timer 2 */
-			count = ((uint32_t) TH0) + cycles;            /* No gate control or counting !*/
-			if ( count & 0xffffff00 )               /* Check for overflow */
+			count = ((uint32_t)TH0) + cycles; /* No gate control or counting !*/
+			if (count & 0xffffff00) /* Check for overflow */
 				SET_TF1(1);
-			TH0 = count & 0xff;                     /* Update new values of the counter */
+			TH0 = count & 0xff; /* Update new values of the counter */
 			break;
 		}
 	}
@@ -1318,8 +1320,8 @@ switching it into or out of Mode 3 or it can be assigned as a baud rate generato
 
 void mcs51_cpu_device::update_timer_t1(int cycles)
 {
-	uint8_t mode = (GET_M1_1<<1) | GET_M1_0;
-	uint8_t mode_0 = (GET_M0_1<<1) | GET_M0_0;
+	uint8_t mode = (GET_M1_1 << 1) | GET_M1_0;
+	uint8_t mode_0 = (GET_M0_1 << 1) | GET_M0_0;
 	uint32_t count;
 
 	if (mode_0 != 3)
@@ -1339,29 +1341,27 @@ void mcs51_cpu_device::update_timer_t1(int cycles)
 			if (GET_GATE1 && !GET_IE1)
 				delta = 0;
 
-			switch(mode)
+			switch (mode)
 			{
-				case 0:         /* 13 Bit Timer Mode */
-					count = ((TH1<<5) | ( TL1 & 0x1f ) );
+				case 0: /* 13 Bit Timer Mode */
+					count = ((TH1 << 5) | (TL1 & 0x1f));
 					count += delta;
 					overflow = count & 0xffffe000; /* Check for overflow */
-					TH1 = (count>>5) & 0xff;
-					TL1 =  count & 0x1f;
+					TH1 = (count >> 5) & 0xff;
+					TL1 = count & 0x1f;
 					break;
-				case 1:         /* 16 Bit Timer Mode */
-					count = ((TH1<<8) | TL1);
+				case 1: /* 16 Bit Timer Mode */
+					count = ((TH1 << 8) | TL1);
 					count += delta;
 					overflow = count & 0xffff0000; /* Check for overflow */
-					TH1 = (count>>8) & 0xff;
+					TH1 = (count >> 8) & 0xff;
 					TL1 = count & 0xff;
 					break;
-				case 2:         /* 8 Bit Autoreload */
-					count = ((uint32_t) TL1) + delta;
+				case 2: /* 8 Bit Autoreload */
+					count = ((uint32_t)TL1) + delta;
 					overflow = count & 0xffffff00; /* Check for overflow */
-					if ( overflow )
-					{
-						count += TH1;                       /* Reload timer */
-					}
+					if (overflow)
+						count += TH1; /* Reload timer */
 					/* Update new values of the counter */
 					TL1 =  count & 0xff;
 					break;
@@ -1384,31 +1384,29 @@ void mcs51_cpu_device::update_timer_t1(int cycles)
 		delta =  cycles;
 		/* taken, reset */
 		m_t1_cnt = 0;
-		switch(mode)
+		switch (mode)
 		{
-			case 0:         /* 13 Bit Timer Mode */
-				count = ((TH1<<5) | ( TL1 & 0x1f ) );
+			case 0: /* 13 Bit Timer Mode */
+				count = ((TH1 << 5) | (TL1 & 0x1f));
 				count += delta;
 				overflow = count & 0xffffe000; /* Check for overflow */
-				TH1 = (count>>5) & 0xff;
-				TL1 =  count & 0x1f;
+				TH1 = (count >> 5) & 0xff;
+				TL1 = count & 0x1f;
 				break;
-			case 1:         /* 16 Bit Timer Mode */
-				count = ((TH1<<8) | TL1);
+			case 1: /* 16 Bit Timer Mode */
+				count = ((TH1 << 8) | TL1);
 				count += delta;
 				overflow = count & 0xffff0000; /* Check for overflow */
-				TH1 = (count>>8) & 0xff;
+				TH1 = (count >> 8) & 0xff;
 				TL1 = count & 0xff;
 				break;
-			case 2:         /* 8 Bit Autoreload */
-				count = ((uint32_t) TL1) + delta;
+			case 2: /* 8 Bit Autoreload */
+				count = ((uint32_t)TL1) + delta;
 				overflow = count & 0xffffff00; /* Check for overflow */
-				if ( overflow )
-				{
-					count += TH1;                       /* Reload timer */
-				}
+				if (overflow)
+					count += TH1; /* Reload timer */
 				/* Update new values of the counter */
-				TL1 =  count & 0xff;
+				TL1 = count & 0xff;
 				break;
 			case 3:
 				/* do nothing */
@@ -1424,37 +1422,37 @@ void mcs51_cpu_device::update_timer_t1(int cycles)
 void mcs51_cpu_device::update_timer_t2(int cycles)
 {
 	/* Update Timer 2 */
-	if(GET_TR2)
+	if (GET_TR2)
 	{
 		int mode = ((GET_TCLK | GET_RCLK) << 1) | GET_CP;
 		int delta = GET_CT2 ? m_t2_cnt : (mode & 2) ? cycles * (12/2) : cycles;
 
-		uint32_t count = ((TH2<<8) | TL2) + delta;
+		uint32_t count = ((TH2 << 8) | TL2) + delta;
 		m_t2_cnt = 0;
 
 		switch (mode)
 		{
 			case 0: /* 16 Bit Auto Reload */
-				if ( count & 0xffff0000 )
+				if (count & 0xffff0000)
 				{
 					SET_TF2(1);
-					count += ((RCAP2H<<8) | RCAP2L);
+					count += ((RCAP2H << 8) | RCAP2L);
 				}
-				else if (GET_EXEN2 && m_t2ex_cnt>0)
+				else if (GET_EXEN2 && m_t2ex_cnt > 0)
 				{
-					count += ((RCAP2H<<8) | RCAP2L);
+					count += ((RCAP2H << 8) | RCAP2L);
 					m_t2ex_cnt = 0;
 				}
-				TH2 = (count>>8) & 0xff;
-				TL2 =  count & 0xff;
+				TH2 = (count >> 8) & 0xff;
+				TL2 = count & 0xff;
 				break;
 			case 1: /* 16 Bit Capture */
-				if ( count & 0xffff0000 )
+				if (count & 0xffff0000)
 					SET_TF2(1);
-				TH2 = (count>>8) & 0xff;
-				TL2 =  count & 0xff;
+				TH2 = (count >> 8) & 0xff;
+				TL2 = count & 0xff;
 
-				if (GET_EXEN2 && m_t2ex_cnt>0)
+				if (GET_EXEN2 && m_t2ex_cnt > 0)
 				{
 					RCAP2H = TH2;
 					RCAP2L = TL2;
@@ -1463,13 +1461,13 @@ void mcs51_cpu_device::update_timer_t2(int cycles)
 				break;
 			case 2:
 			case 3: /* Baud rate */
-				if ( count & 0xffff0000 )
+				if (count & 0xffff0000)
 				{
-					count += ((RCAP2H<<8) | RCAP2L);
+					count += ((RCAP2H << 8) | RCAP2L);
 					transmit_receive(2);
 				}
-				TH2 = (count>>8) & 0xff;
-				TL2 =  count & 0xff;
+				TH2 = (count >> 8) & 0xff;
+				TL2 = count & 0xff;
 				break;
 		}
 	}
@@ -1478,8 +1476,8 @@ void mcs51_cpu_device::update_timer_t2(int cycles)
 /* Check and update status of serial port */
 void mcs51_cpu_device::update_irq_prio(uint8_t ipl, uint8_t iph)
 {
-	for (int i=0; i<8; i++)
-		m_irq_prio[i] = ((ipl >> i) & 1) | (((iph >>i ) & 1) << 1);
+	for (int i = 0; i < 8; i++)
+		m_irq_prio[i] = ((ipl >> i) & 1) | (((iph >> i) & 1) << 1);
 }
 
 
@@ -1502,17 +1500,17 @@ void mcs51_cpu_device::execute_op(uint8_t op)
 
 	m_last_op = op;
 
-	switch( op )
+	switch (op)
 	{
-		case 0x00:  nop(op);                           break;  //NOP
-		case 0x01:  ajmp(op);                      break;  //AJMP code addr
-		case 0x02:  ljmp(op);                      break;  //LJMP code addr
-		case 0x03:  rr_a(op);                      break;  //RR A
-		case 0x04:  inc_a(op);                     break;  //INC A
-		case 0x05:  RWM=1; inc_mem(op); RWM=0;     break;  //INC data addr
+		case 0x00: nop(op);                             break; //NOP
+		case 0x01: ajmp(op);                            break; //AJMP code addr
+		case 0x02: ljmp(op);                            break; //LJMP code addr
+		case 0x03: rr_a(op);                            break; //RR A
+		case 0x04: inc_a(op);                           break; //INC A
+		case 0x05: RWM = 1; inc_mem(op); RWM = 0;       break; //INC data addr
 
 		case 0x06:
-		case 0x07:  inc_ir(op&1);                       break;  //INC @R0/@R1
+		case 0x07: inc_ir(op & 1);                      break; //INC @R0/@R1
 
 		case 0x08:
 		case 0x09:
@@ -1521,17 +1519,17 @@ void mcs51_cpu_device::execute_op(uint8_t op)
 		case 0x0c:
 		case 0x0d:
 		case 0x0e:
-		case 0x0f:  inc_r(op&7);                       break;  //INC R0 to R7
+		case 0x0f: inc_r(op & 7);                       break; //INC R0 to R7
 
-		case 0x10:  RWM=1; jbc(op); RWM=0;             break;  //JBC bit addr, code addr
-		case 0x11:  acall(op);                     break;  //ACALL code addr
-		case 0x12:  lcall(op);                         break;  //LCALL code addr
-		case 0x13:  rrc_a(op);                     break;  //RRC A
-		case 0x14:  dec_a(op);                     break;  //DEC A
-		case 0x15:  RWM=1; dec_mem(op); RWM=0;     break;  //DEC data addr
+		case 0x10: RWM = 1; jbc(op); RWM = 0;           break; //JBC bit addr, code addr
+		case 0x11: acall(op);                           break; //ACALL code addr
+		case 0x12: lcall(op);                           break; //LCALL code addr
+		case 0x13: rrc_a(op);                           break; //RRC A
+		case 0x14: dec_a(op);                           break; //DEC A
+		case 0x15: RWM = 1; dec_mem(op); RWM = 0;       break; //DEC data addr
 
 		case 0x16:
-		case 0x17:  dec_ir(op&1);                  break;  //DEC @R0/@R1
+		case 0x17: dec_ir(op & 1);                      break; //DEC @R0/@R1
 
 		case 0x18:
 		case 0x19:
@@ -1540,17 +1538,17 @@ void mcs51_cpu_device::execute_op(uint8_t op)
 		case 0x1c:
 		case 0x1d:
 		case 0x1e:
-		case 0x1f:  dec_r(op&7);                   break;  //DEC R0 to R7
+		case 0x1f: dec_r(op & 7);                       break; //DEC R0 to R7
 
-		case 0x20:  jb(op);                            break;  //JB  bit addr, code addr
-		case 0x21:  ajmp(op);                      break;  //AJMP code addr
-		case 0x22:  ret(op);                           break;  //RET
-		case 0x23:  rl_a(op);                      break;  //RL A
-		case 0x24:  add_a_byte(op);                    break;  //ADD A, #data
-		case 0x25:  add_a_mem(op);                 break;  //ADD A, data addr
+		case 0x20: jb(op);                              break; //JB  bit addr, code addr
+		case 0x21: ajmp(op);                            break; //AJMP code addr
+		case 0x22: ret(op);                             break; //RET
+		case 0x23: rl_a(op);                            break; //RL A
+		case 0x24: add_a_byte(op);                      break; //ADD A, #data
+		case 0x25: add_a_mem(op);                       break; //ADD A, data addr
 
 		case 0x26:
-		case 0x27:  add_a_ir(op&1);                    break;  //ADD A, @R0/@R1
+		case 0x27: add_a_ir(op & 1);                    break; //ADD A, @R0/@R1
 
 		case 0x28:
 		case 0x29:
@@ -1559,17 +1557,17 @@ void mcs51_cpu_device::execute_op(uint8_t op)
 		case 0x2c:
 		case 0x2d:
 		case 0x2e:
-		case 0x2f:  add_a_r(op&7);                 break;  //ADD A, R0 to R7
+		case 0x2f: add_a_r(op & 7);                     break; //ADD A, R0 to R7
 
-		case 0x30:  jnb(op);                           break;  //JNB bit addr, code addr
-		case 0x31:  acall(op);                     break;  //ACALL code addr
-		case 0x32:  reti(op);                      break;  //RETI
-		case 0x33:  rlc_a(op);                     break;  //RLC A
-		case 0x34:  addc_a_byte(op);                   break;  //ADDC A, #data
-		case 0x35:  addc_a_mem(op);                    break;  //ADDC A, data addr
+		case 0x30: jnb(op);                             break; //JNB bit addr, code addr
+		case 0x31: acall(op);                           break; //ACALL code addr
+		case 0x32: reti(op);                            break; //RETI
+		case 0x33: rlc_a(op);                           break; //RLC A
+		case 0x34: addc_a_byte(op);                     break; //ADDC A, #data
+		case 0x35: addc_a_mem(op);                      break; //ADDC A, data addr
 
 		case 0x36:
-		case 0x37:  addc_a_ir(op&1);                   break;  //ADDC A, @R0/@R1
+		case 0x37: addc_a_ir(op & 1);                   break; //ADDC A, @R0/@R1
 
 		case 0x38:
 		case 0x39:
@@ -1578,17 +1576,17 @@ void mcs51_cpu_device::execute_op(uint8_t op)
 		case 0x3c:
 		case 0x3d:
 		case 0x3e:
-		case 0x3f:  addc_a_r(op&7);                    break;  //ADDC A, R0 to R7
+		case 0x3f: addc_a_r(op & 7);                    break; //ADDC A, R0 to R7
 
-		case 0x40:  jc(op);                            break;  //JC code addr
-		case 0x41:  ajmp(op);                      break;  //AJMP code addr
-		case 0x42:  RWM=1; orl_mem_a(op);  RWM=0;  break;  //ORL data addr, A
-		case 0x43:  RWM=1; orl_mem_byte(op); RWM=0;    break;  //ORL data addr, #data
-		case 0x44:  orl_a_byte(op);                    break;
-		case 0x45:  orl_a_mem(op);                 break;  //ORL A, data addr
+		case 0x40: jc(op);                              break; //JC code addr
+		case 0x41: ajmp(op);                            break; //AJMP code addr
+		case 0x42: RWM = 1; orl_mem_a(op); RWM = 0;     break; //ORL data addr, A
+		case 0x43: RWM = 1; orl_mem_byte(op); RWM = 0;  break; //ORL data addr, #data
+		case 0x44: orl_a_byte(op);                      break;
+		case 0x45: orl_a_mem(op);                       break; //ORL A, data addr
 
 		case 0x46:
-		case 0x47:  orl_a_ir(op&1);                    break;  //ORL A, @RO/@R1
+		case 0x47: orl_a_ir(op & 1);                    break; //ORL A, @RO/@R1
 
 		case 0x48:
 		case 0x49:
@@ -1597,17 +1595,17 @@ void mcs51_cpu_device::execute_op(uint8_t op)
 		case 0x4c:
 		case 0x4d:
 		case 0x4e:
-		case 0x4f:  orl_a_r(op&7);                     break;  //ORL A, RO to R7
+		case 0x4f: orl_a_r(op & 7);                     break; //ORL A, RO to R7
 
-		case 0x50:  jnc(op);                       break;  //JNC code addr
-		case 0x51:  acall(op);                     break;  //ACALL code addr
-		case 0x52:  RWM=1; anl_mem_a(op); RWM=0;       break;  //ANL data addr, A
-		case 0x53:  RWM=1; anl_mem_byte(op); RWM=0;    break;  //ANL data addr, #data
-		case 0x54:  anl_a_byte(op);                    break;  //ANL A, #data
-		case 0x55:  anl_a_mem(op);                 break;  //ANL A, data addr
+		case 0x50: jnc(op);                             break; //JNC code addr
+		case 0x51: acall(op);                           break; //ACALL code addr
+		case 0x52: RWM = 1; anl_mem_a(op); RWM = 0;     break; //ANL data addr, A
+		case 0x53: RWM = 1; anl_mem_byte(op); RWM = 0;  break; //ANL data addr, #data
+		case 0x54: anl_a_byte(op);                      break; //ANL A, #data
+		case 0x55: anl_a_mem(op);                       break; //ANL A, data addr
 
 		case 0x56:
-		case 0x57:  anl_a_ir(op&1);                    break;  //ANL A, @RO/@R1
+		case 0x57: anl_a_ir(op & 1);                    break; //ANL A, @RO/@R1
 
 		case 0x58:
 		case 0x59:
@@ -1616,17 +1614,17 @@ void mcs51_cpu_device::execute_op(uint8_t op)
 		case 0x5c:
 		case 0x5d:
 		case 0x5e:
-		case 0x5f:  anl_a_r(op&7);                 break;  //ANL A, RO to R7
+		case 0x5f: anl_a_r(op & 7);                     break; //ANL A, RO to R7
 
-		case 0x60:  jz(op);                            break;  //JZ code addr
-		case 0x61:  ajmp(op);                      break;  //AJMP code addr
-		case 0x62:  RWM=1; xrl_mem_a(op); RWM=0;       break;  //XRL data addr, A
-		case 0x63:  RWM=1; xrl_mem_byte(op); RWM=0;    break;  //XRL data addr, #data
-		case 0x64:  xrl_a_byte(op);                    break;  //XRL A, #data
-		case 0x65:  xrl_a_mem(op);                 break;  //XRL A, data addr
+		case 0x60: jz(op);                              break; //JZ code addr
+		case 0x61: ajmp(op);                            break; //AJMP code addr
+		case 0x62: RWM = 1; xrl_mem_a(op); RWM = 0;     break; //XRL data addr, A
+		case 0x63: RWM = 1; xrl_mem_byte(op); RWM = 0;  break; //XRL data addr, #data
+		case 0x64: xrl_a_byte(op);                      break; //XRL A, #data
+		case 0x65: xrl_a_mem(op);                       break; //XRL A, data addr
 
 		case 0x66:
-		case 0x67:  xrl_a_ir(op&1);                    break;  //XRL A, @R0/@R1
+		case 0x67: xrl_a_ir(op & 1);                    break; //XRL A, @R0/@R1
 
 		case 0x68:
 		case 0x69:
@@ -1635,17 +1633,17 @@ void mcs51_cpu_device::execute_op(uint8_t op)
 		case 0x6c:
 		case 0x6d:
 		case 0x6e:
-		case 0x6f:  xrl_a_r(op&7);                 break;  //XRL A, R0 to R7
+		case 0x6f: xrl_a_r(op & 7);                     break; //XRL A, R0 to R7
 
-		case 0x70:  jnz(op);                           break;  //JNZ code addr
-		case 0x71:  acall(op);                     break;  //ACALL code addr
-		case 0x72:  orl_c_bitaddr(op);             break;  //ORL C, bit addr
-		case 0x73:  jmp_iadptr(op);                    break;  //JMP @A+DPTR
-		case 0x74:  mov_a_byte(op);                    break;  //MOV A, #data
-		case 0x75:  mov_mem_byte(op);              break;  //MOV data addr, #data
+		case 0x70: jnz(op);                             break; //JNZ code addr
+		case 0x71: acall(op);                           break; //ACALL code addr
+		case 0x72: orl_c_bitaddr(op);                   break; //ORL C, bit addr
+		case 0x73: jmp_iadptr(op);                      break; //JMP @A+DPTR
+		case 0x74: mov_a_byte(op);                      break; //MOV A, #data
+		case 0x75: mov_mem_byte(op);                    break; //MOV data addr, #data
 
 		case 0x76:
-		case 0x77:  mov_ir_byte(op&1);             break;  //MOV @R0/@R1, #data
+		case 0x77: mov_ir_byte(op & 1);                 break; //MOV @R0/@R1, #data
 
 		case 0x78:
 		case 0x79:
@@ -1654,17 +1652,17 @@ void mcs51_cpu_device::execute_op(uint8_t op)
 		case 0x7c:
 		case 0x7d:
 		case 0x7e:
-		case 0x7f:  mov_r_byte(op&7);              break;  //MOV R0 to R7, #data
+		case 0x7f: mov_r_byte(op & 7);                  break; //MOV R0 to R7, #data
 
-		case 0x80:  sjmp(op);                      break;  //SJMP code addr
-		case 0x81:  ajmp(op);                      break;  //AJMP code addr
-		case 0x82:  anl_c_bitaddr(op);             break;  //ANL C, bit addr
-		case 0x83:  movc_a_iapc(op);                   break;  //MOVC A, @A + PC
-		case 0x84:  div_ab(op);                        break;  //DIV AB
-		case 0x85:  mov_mem_mem(op);                   break;  //MOV data addr, data addr
+		case 0x80: sjmp(op);                            break; //SJMP code addr
+		case 0x81: ajmp(op);                            break; //AJMP code addr
+		case 0x82: anl_c_bitaddr(op);                   break; //ANL C, bit addr
+		case 0x83: movc_a_iapc(op);                     break; //MOVC A, @A + PC
+		case 0x84: div_ab(op);                          break; //DIV AB
+		case 0x85: mov_mem_mem(op);                     break; //MOV data addr, data addr
 
 		case 0x86:
-		case 0x87:  mov_mem_ir(op&1);              break;  //MOV data addr, @R0/@R1
+		case 0x87: mov_mem_ir(op & 1);                  break; //MOV data addr, @R0/@R1
 
 		case 0x88:
 		case 0x89:
@@ -1673,17 +1671,17 @@ void mcs51_cpu_device::execute_op(uint8_t op)
 		case 0x8c:
 		case 0x8d:
 		case 0x8e:
-		case 0x8f:  mov_mem_r(op&7);                   break;  //MOV data addr,R0 to R7
+		case 0x8f: mov_mem_r(op & 7);                   break; //MOV data addr,R0 to R7
 
-		case 0x90:  mov_dptr_byte(op);             break;  //MOV DPTR, #data
-		case 0x91:  acall(op);                     break;  //ACALL code addr
-		case 0x92:  RWM = 1; mov_bitaddr_c(op); RWM = 0; break;    //MOV bit addr, C
-		case 0x93:  movc_a_iadptr(op);             break;  //MOVC A, @A + DPTR
-		case 0x94:  subb_a_byte(op);                   break;  //SUBB A, #data
-		case 0x95:  subb_a_mem(op);                    break;  //SUBB A, data addr
+		case 0x90: mov_dptr_byte(op);                   break; //MOV DPTR, #data
+		case 0x91: acall(op);                           break; //ACALL code addr
+		case 0x92: RWM = 1; mov_bitaddr_c(op); RWM = 0; break; //MOV bit addr, C
+		case 0x93: movc_a_iadptr(op);                   break; //MOVC A, @A + DPTR
+		case 0x94: subb_a_byte(op);                     break; //SUBB A, #data
+		case 0x95: subb_a_mem(op);                      break; //SUBB A, data addr
 
 		case 0x96:
-		case 0x97:  subb_a_ir(op&1);                   break;  //SUBB A, @R0/@R1
+		case 0x97: subb_a_ir(op & 1);                   break; //SUBB A, @R0/@R1
 
 		case 0x98:
 		case 0x99:
@@ -1692,17 +1690,17 @@ void mcs51_cpu_device::execute_op(uint8_t op)
 		case 0x9c:
 		case 0x9d:
 		case 0x9e:
-		case 0x9f:  subb_a_r(op&7);                    break;  //SUBB A, R0 to R7
+		case 0x9f: subb_a_r(op & 7);                    break; //SUBB A, R0 to R7
 
-		case 0xa0:  orl_c_nbitaddr(op);                break;  //ORL C, /bit addr
-		case 0xa1:  ajmp(op);                      break;  //AJMP code addr
-		case 0xa2:  mov_c_bitaddr(op);             break;  //MOV C, bit addr
-		case 0xa3:  inc_dptr(op);                  break;  //INC DPTR
-		case 0xa4:  mul_ab(op);                        break;  //MUL AB
-		case 0xa5:  illegal(op);                       break;  //reserved
+		case 0xa0: orl_c_nbitaddr(op);                  break; //ORL C, /bit addr
+		case 0xa1: ajmp(op);                            break; //AJMP code addr
+		case 0xa2: mov_c_bitaddr(op);                   break; //MOV C, bit addr
+		case 0xa3: inc_dptr(op);                        break; //INC DPTR
+		case 0xa4: mul_ab(op);                          break; //MUL AB
+		case 0xa5: illegal(op);                         break; //reserved
 
 		case 0xa6:
-		case 0xa7:  mov_ir_mem(op&1);              break;  //MOV @R0/@R1, data addr
+		case 0xa7: mov_ir_mem(op & 1);                  break; //MOV @R0/@R1, data addr
 
 		case 0xa8:
 		case 0xa9:
@@ -1711,17 +1709,17 @@ void mcs51_cpu_device::execute_op(uint8_t op)
 		case 0xac:
 		case 0xad:
 		case 0xae:
-		case 0xaf:  mov_r_mem(op&7);                   break;  //MOV R0 to R7, data addr
+		case 0xaf: mov_r_mem(op & 7);                   break; //MOV R0 to R7, data addr
 
-		case 0xb0:  anl_c_nbitaddr(op);                break;  //ANL C,/bit addr
-		case 0xb1:  acall(op);                     break;  //ACALL code addr
-		case 0xb2:  RWM=1; cpl_bitaddr(op); RWM=0;     break;  //CPL bit addr
-		case 0xb3:  cpl_c(op);                     break;  //CPL C
-		case 0xb4:  cjne_a_byte(op);                   break;  //CJNE A, #data, code addr
-		case 0xb5:  cjne_a_mem(op);                    break;  //CJNE A, data addr, code addr
+		case 0xb0: anl_c_nbitaddr(op);                  break; //ANL C,/bit addr
+		case 0xb1: acall(op);                           break; //ACALL code addr
+		case 0xb2: RWM = 1; cpl_bitaddr(op); RWM = 0;   break; //CPL bit addr
+		case 0xb3: cpl_c(op);                           break; //CPL C
+		case 0xb4: cjne_a_byte(op);                     break; //CJNE A, #data, code addr
+		case 0xb5: cjne_a_mem(op);                      break; //CJNE A, data addr, code addr
 
 		case 0xb6:
-		case 0xb7:  cjne_ir_byte(op&1);                break;  //CJNE @R0/@R1, #data, code addr
+		case 0xb7: cjne_ir_byte(op & 1);                break; //CJNE @R0/@R1, #data, code addr
 
 		case 0xb8:
 		case 0xb9:
@@ -1730,17 +1728,17 @@ void mcs51_cpu_device::execute_op(uint8_t op)
 		case 0xbc:
 		case 0xbd:
 		case 0xbe:
-		case 0xbf:  cjne_r_byte(op&7);                 break;  //CJNE R0 to R7, #data, code addr
+		case 0xbf: cjne_r_byte(op & 7);                 break; //CJNE R0 to R7, #data, code addr
 
-		case 0xc0:  push(op);                      break;  //PUSH data addr
-		case 0xc1:  ajmp(op);                      break;  //AJMP code addr
-		case 0xc2:  RWM=1; clr_bitaddr(op); RWM=0; break;  //CLR bit addr
-		case 0xc3:  clr_c(op);                         break;  //CLR C
-		case 0xc4:  swap_a(op);                        break;  //SWAP A
-		case 0xc5:  xch_a_mem(op);                 break;  //XCH A, data addr
+		case 0xc0: push(op);                            break; //PUSH data addr
+		case 0xc1: ajmp(op);                            break; //AJMP code addr
+		case 0xc2: RWM = 1; clr_bitaddr(op); RWM = 0;   break; //CLR bit addr
+		case 0xc3: clr_c(op);                           break; //CLR C
+		case 0xc4: swap_a(op);                          break; //SWAP A
+		case 0xc5: xch_a_mem(op);                       break; //XCH A, data addr
 
 		case 0xc6:
-		case 0xc7:  xch_a_ir(op&1);                    break;  //XCH A, @RO/@R1
+		case 0xc7: xch_a_ir(op & 1);                    break; //XCH A, @RO/@R1
 
 		case 0xc8:
 		case 0xc9:
@@ -1749,17 +1747,17 @@ void mcs51_cpu_device::execute_op(uint8_t op)
 		case 0xcc:
 		case 0xcd:
 		case 0xce:
-		case 0xcf:  xch_a_r(op&7);                 break;  //XCH A, RO to R7
+		case 0xcf: xch_a_r(op & 7);                     break; //XCH A, RO to R7
 
-		case 0xd0:  pop(op);                           break;  //POP data addr
-		case 0xd1:  acall(op);                     break;  //ACALL code addr
-		case 0xd2:  RWM=1; setb_bitaddr(op); RWM=0;    break;  //SETB bit addr
-		case 0xd3:  setb_c(op);                        break;  //SETB C
-		case 0xd4:  da_a(op);                      break;  //DA A
-		case 0xd5:  RWM=1; djnz_mem(op); RWM=0;        break;  //DJNZ data addr, code addr
+		case 0xd0: pop(op);                             break; //POP data addr
+		case 0xd1: acall(op);                           break; //ACALL code addr
+		case 0xd2: RWM = 1; setb_bitaddr(op); RWM = 0;  break; //SETB bit addr
+		case 0xd3: setb_c(op);                          break; //SETB C
+		case 0xd4: da_a(op);                            break; //DA A
+		case 0xd5: RWM = 1; djnz_mem(op); RWM = 0;      break; //DJNZ data addr, code addr
 
 		case 0xd6:
-		case 0xd7:  xchd_a_ir(op&1);                   break;  //XCHD A, @R0/@R1
+		case 0xd7: xchd_a_ir(op & 1);                   break; //XCHD A, @R0/@R1
 
 		case 0xd8:
 		case 0xd9:
@@ -1768,18 +1766,18 @@ void mcs51_cpu_device::execute_op(uint8_t op)
 		case 0xdc:
 		case 0xdd:
 		case 0xde:
-		case 0xdf:  djnz_r(op&7);                  break;  //DJNZ R0 to R7,code addr
+		case 0xdf: djnz_r(op & 7);                      break; //DJNZ R0 to R7,code addr
 
-		case 0xe0:  movx_a_idptr(op);              break;  //MOVX A,@DPTR
-		case 0xe1:  ajmp(op);                      break;  //AJMP code addr
+		case 0xe0: movx_a_idptr(op);                    break; //MOVX A,@DPTR
+		case 0xe1: ajmp(op);                            break; //AJMP code addr
 
 		case 0xe2:
-		case 0xe3:  movx_a_ir(op&1);                   break;  //MOVX A, @R0/@R1
+		case 0xe3: movx_a_ir(op & 1);                   break; //MOVX A, @R0/@R1
 
-		case 0xe4:  clr_a(op);                     break;  //CLR A
-		case 0xe5:  mov_a_mem(op);                 break;  //MOV A, data addr
+		case 0xe4: clr_a(op);                           break; //CLR A
+		case 0xe5: mov_a_mem(op);                       break; //MOV A, data addr
 		case 0xe6:
-		case 0xe7:  mov_a_ir(op&1);                    break;  //MOV A,@RO/@R1
+		case 0xe7: mov_a_ir(op & 1);                    break; //MOV A,@RO/@R1
 
 		case 0xe8:
 		case 0xe9:
@@ -1788,19 +1786,19 @@ void mcs51_cpu_device::execute_op(uint8_t op)
 		case 0xec:
 		case 0xed:
 		case 0xee:
-		case 0xef:  mov_a_r(op&7);                 break;  //MOV A,R0 to R7
+		case 0xef: mov_a_r(op & 7);                     break; //MOV A,R0 to R7
 
-		case 0xf0:  movx_idptr_a(op);              break;  //MOVX @DPTR,A
-		case 0xf1:  acall(op);                     break;  //ACALL code addr
+		case 0xf0: movx_idptr_a(op);                    break; //MOVX @DPTR,A
+		case 0xf1: acall(op);                           break; //ACALL code addr
 
 		case 0xf2:
-		case 0xf3:  movx_ir_a(op&1);                   break;  //MOVX @R0/@R1,A
+		case 0xf3: movx_ir_a(op & 1);                   break; //MOVX @R0/@R1,A
 
-		case 0xf4:  cpl_a(op);                     break;  //CPL A
-		case 0xf5:  mov_mem_a(op);                 break;  //MOV data addr, A
+		case 0xf4: cpl_a(op);                           break; //CPL A
+		case 0xf5: mov_mem_a(op);                       break; //MOV data addr, A
 
 		case 0xf6:
-		case 0xf7:  mov_ir_a(op&1);                    break;  //MOV @R0/@R1, A
+		case 0xf7: mov_ir_a(op & 1);                    break; //MOV @R0/@R1, A
 
 		case 0xf8:
 		case 0xf9:
@@ -1809,7 +1807,7 @@ void mcs51_cpu_device::execute_op(uint8_t op)
 		case 0xfc:
 		case 0xfd:
 		case 0xfe:
-		case 0xff:  mov_r_a(op&7);                 break;  //MOV R0 to R7, A
+		case 0xff: mov_r_a(op & 7);                     break; //MOV R0 to R7, A
 		default:
 			illegal(op);
 	}
@@ -1859,8 +1857,7 @@ const uint8_t mcs51_cpu_device::mcs51_cycles[256] =
  **********************************************************************************/
 void mcs51_cpu_device::check_irqs()
 {
-	uint8_t ints = (GET_IE0 | (GET_TF0<<1) | (GET_IE1<<2) | (GET_TF1<<3)
-			| ((GET_RI|GET_TI)<<4));
+	uint8_t ints = (GET_IE0 | (GET_TF0 << 1) | (GET_IE1 << 2) | (GET_TF1 << 3) | ((GET_RI | GET_TI) << 4));
 	uint8_t int_vec = 0;
 	uint8_t int_mask;
 	int priority_request = -1;
@@ -1869,14 +1866,14 @@ void mcs51_cpu_device::check_irqs()
 	int_mask = (GET_EA ? IE : 0x00);
 
 	if (m_features & FEATURE_I8052)
-		ints |= ((GET_TF2|GET_EXF2)<<5);
+		ints |= ((GET_TF2 | GET_EXF2) << 5);
 
 	if (m_features & FEATURE_DS5002FP)
 	{
-		ints |= ((GET_PFW)<<5);
-		m_irq_prio[6] = 3;   /* force highest priority */
+		ints |= ((GET_PFW) << 5);
+		m_irq_prio[6] = 3; /* force highest priority */
 		/* mask out interrupts not enabled */
-		ints &= ((int_mask & 0x1f) | ((GET_EPFW)<<5));
+		ints &= ((int_mask & 0x1f) | ((GET_EPFW) << 5));
 	}
 	else
 	{
@@ -1904,14 +1901,14 @@ void mcs51_cpu_device::check_irqs()
 	if ((m_features & FEATURE_CMOS) && GET_PD)
 		return;
 
-	for (int i=0; i<m_num_interrupts; i++)
+	for (int i = 0; i < m_num_interrupts; i++)
 	{
-		if (ints & (1<<i))
+		if (ints & (1 << i))
 		{
 			if (m_irq_prio[i] > priority_request)
 			{
 				priority_request = m_irq_prio[i];
-				int_vec = (i<<3) | 3;
+				int_vec = (i << 3) | 3;
 			}
 		}
 	}
@@ -1956,11 +1953,11 @@ void mcs51_cpu_device::check_irqs()
 	LOG("Take: %d %02x\n", m_cur_irq_prio, m_irq_active);
 
 	//Clear any interrupt flags that should be cleared since we're servicing the irq!
-	switch(int_vec)
+	switch (int_vec)
 	{
 		case V_IE0:
 			//External Int Flag only cleared when configured as Edge Triggered..
-			if(GET_IT0)  /* for some reason having this, breaks alving dmd games */
+			if (GET_IT0) /* for some reason having this, breaks alving dmd games */
 				SET_IE0(0);
 			break;
 		case V_TF0:
@@ -1969,7 +1966,7 @@ void mcs51_cpu_device::check_irqs()
 			break;
 		case V_IE1:
 			//External Int Flag only cleared when configured as Edge Triggered..
-			if(GET_IT1)  /* for some reason having this, breaks alving dmd games */
+			if (GET_IT1) /* for some reason having this, breaks alving dmd games */
 				SET_IE1(0);
 			break;
 		case V_TF1:
@@ -2025,7 +2022,7 @@ void mcs51_cpu_device::execute_set_input(int irqline, int state)
 	/* detect 0->1 transitions */
 	uint32_t tr_state = (~m_last_line_state) & new_state;
 
-	switch( irqline )
+	switch (irqline)
 	{
 		//External Interrupt 0
 		case MCS51_INT0_LINE:
@@ -2040,7 +2037,7 @@ void mcs51_cpu_device::execute_set_input(int irqline, int state)
 				}
 				else
 				{
-					SET_IE0(1);     //Nope, just set it..
+					SET_IE0(1); //Nope, just set it..
 				}
 			}
 			else
@@ -2057,13 +2054,13 @@ void mcs51_cpu_device::execute_set_input(int irqline, int state)
 			if (state != CLEAR_LINE)
 			{
 				//Need cleared->active line transition? (Logical 1-0 Pulse on the line) - CLEAR->ASSERT Transition since INT1 active lo!
-				if(GET_IT1)
+				if (GET_IT1)
 				{
 					if (GET_BIT(tr_state, MCS51_INT1_LINE))
 						SET_IE1(1);
 				}
 				else
-					SET_IE1(1);     //Nope, just set it..
+					SET_IE1(1); //Nope, just set it..
 			}
 			else
 			{
@@ -2195,7 +2192,7 @@ void mcs51_cpu_device::sfr_write(size_t offset, uint8_t data)
 			break;
 		case ADDR_PSW:  SET_PARITY();                       break;
 		case ADDR_ACC:  SET_PARITY();                       break;
-		case ADDR_IP:   update_irq_prio(data, 0);  break;
+		case ADDR_IP:   update_irq_prio(data, 0);           break;
 		case ADDR_B:
 		case ADDR_SP:
 		case ADDR_DPL:
@@ -2428,11 +2425,11 @@ void mcs51_cpu_device::device_reset()
 	{
 		// set initial values (some of them are set using the bootstrap loader)
 		PCON = 0;
-		MCON = m_sfr_ram[ADDR_MCON-0x80];
-		RPCTL = m_sfr_ram[ADDR_RPCTL-0x80];
+		MCON = m_sfr_ram[ADDR_MCON - 0x80];
+		RPCTL = m_sfr_ram[ADDR_RPCTL - 0x80];
 		RPS = 0;
 		RNR = 0;
-		CRCR = m_sfr_ram[ADDR_CRCR-0x80];
+		CRCR = m_sfr_ram[ADDR_CRCR - 0x80];
 		CRCL = 0;
 		CRCH = 0;
 		TA = 0;
@@ -2571,15 +2568,15 @@ void ds5002fp_device::sfr_write(size_t offset, uint8_t data)
 				LOG("TA window initiated at 0x%04x\n", PC);
 			}
 			break;
-		case ADDR_MCON:     data = ds5002fp_protected(ADDR_MCON, data, 0x0f, 0xf7);    DS5_LOGW(MCON, data); break;
+		case ADDR_MCON:     data = ds5002fp_protected(ADDR_MCON, data, 0x0f, 0xf7);  DS5_LOGW(MCON, data); break;
 		case ADDR_RPCTL:    data = ds5002fp_protected(ADDR_RPCTL, data, 0xef, 0xfe); DS5_LOGW(RPCTL, data); break;
-		case ADDR_CRCR:     data = ds5002fp_protected(ADDR_CRCR, data, 0xff, 0x0f);    DS5_LOGW(CRCR, data);   break;
-		case ADDR_PCON:     data = ds5002fp_protected(ADDR_PCON, data, 0xb9, 0xff); break;
-		case ADDR_IP:       data = ds5002fp_protected(ADDR_IP, data, 0x7f, 0xff);  break;
-		case ADDR_CRCL:     DS5_LOGW(CRCL, data);                                   break;
-		case ADDR_CRCH:     DS5_LOGW(CRCH, data);                                   break;
-		case ADDR_RNR:      DS5_LOGW(RNR, data);                                    break;
-		case ADDR_RPS:      DS5_LOGW(RPS, data);                                    break;
+		case ADDR_CRCR:     data = ds5002fp_protected(ADDR_CRCR, data, 0xff, 0x0f);  DS5_LOGW(CRCR, data); break;
+		case ADDR_PCON:     data = ds5002fp_protected(ADDR_PCON, data, 0xb9, 0xff);  break;
+		case ADDR_IP:       data = ds5002fp_protected(ADDR_IP, data, 0x7f, 0xff);    break;
+		case ADDR_CRCL:     DS5_LOGW(CRCL, data);                                    break;
+		case ADDR_CRCH:     DS5_LOGW(CRCH, data);                                    break;
+		case ADDR_RNR:      DS5_LOGW(RNR, data);                                     break;
+		case ADDR_RPS:      DS5_LOGW(RPS, data);                                     break;
 		default:
 			mcs51_cpu_device::sfr_write(offset, data);
 			return;
@@ -2637,25 +2634,25 @@ Documentation states that having the battery connected "maintains the internal s
 
 void ds5002fp_device::nvram_default()
 {
-	memset( m_scratchpad, 0, 0x80 );
-	memset( m_sfr_ram, 0, 0x80 );
+	memset(m_scratchpad, 0, 0x80);
+	memset(m_sfr_ram, 0, 0x80);
 
 	int expected_bytes = 0x80 + 0x80;
 
 	if (!m_region.found())
 	{
-		logerror( "ds5002fp_device region not found\n" );
+		logerror("ds5002fp_device region not found\n");
 	}
-	else if( m_region->bytes() != expected_bytes )
+	else if (m_region->bytes() != expected_bytes)
 	{
-		logerror( "ds5002fp_device region length 0x%x expected 0x%x\n", m_region->bytes(), expected_bytes );
+		logerror("ds5002fp_device region length 0x%x expected 0x%x\n", m_region->bytes(), expected_bytes);
 	}
 	else
 	{
 		uint8_t *region = m_region->base();
 
-		memcpy( m_scratchpad, region, 0x80 ); region += 0x80;
-		memcpy( m_sfr_ram, region, 0x80 ); region += 0x80;
+		memcpy(m_scratchpad, region, 0x80); region += 0x80;
+		memcpy(m_sfr_ram, region, 0x80); region += 0x80;
 		/* does anything else need storing? any registers that aren't in sfr ram?
 		   It isn't clear if the various initial MCON registers etc. are just stored in sfr ram
 		   or if the DS5002FP stores them elsewhere and the bootstrap copies them */
