@@ -3,45 +3,51 @@ name: CI (macOS)
 on:
   push:
     paths:
-    - '.github/workflows/**'
-    - '3rdparty/**'
-    - 'scripts/**'
-    - 'src/**'
-    - 'COPYING'
-    - 'makefile'
+      - '.github/workflows/**'
+      - '3rdparty/**'
+      - 'scripts/**'
+      - 'src/**'
+      - 'COPYING'
+      - 'makefile'
   pull_request:
     paths:
-    - '.github/workflows/**'
-    - '3rdparty/**'
-    - 'scripts/**'
-    - 'src/**'
-    - 'COPYING'
-    - 'makefile'
+      - '.github/workflows/**'
+      - '3rdparty/**'
+      - 'scripts/**'
+      - 'src/**'
+      - 'COPYING'
+      - 'makefile'
 
 permissions:
   contents: read
 
 jobs:
   build-macos:
-    runs-on: macOS-latest
+    runs-on: macos-latest
     steps:
-    - uses: actions/checkout@main
-      with:
-        fetch-depth: 0
-    - name: Install dependencies
-      run: brew install python3 sdl2
-    - name: Build
-      env:
-        USE_LIBSDL: 1
-        TOOLS: 1
-      run: make -j2
-    - name: Validate
-      run: ./mame -validate
-    - uses: actions/upload-artifact@main
-      with:
-        name: mame-macos-${{ github.sha }}
-        path: |
-          mame
-          chdman
-          unidasm
-        if-no-files-found: error
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install dependencies
+        run: brew install python3 sdl2
+
+      - name: Build
+        env:
+          USE_LIBSDL: 1
+          TOOLS: 1
+        run: make -j2
+
+      - name: Validate build
+        run: ./mame -validate
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mame-macos-${{ github.sha }}
+          path: |
+            mame
+            chdman
+            unidasm
+          if-no-files-found: error
