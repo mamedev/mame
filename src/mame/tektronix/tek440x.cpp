@@ -596,6 +596,8 @@ private:
 	uint8_t store_r();
 	void store_w(uint8_t data);
 
+	void palette(palette_device &palette) const;
+
 	// fake output of serial
 	void write_txd(int state);
 
@@ -1499,7 +1501,11 @@ void tek440x_state::store_w(uint8_t data)
 	m_novram->store(0);
 }
 
-
+void tek440x_state::palette(palette_device &palette) const
+{
+	palette.set_pen_color(0, rgb_t(0xe0, 0xec, 0xf8));   // 2 color tiles
+	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0x00));
+}
 
 
 void tek440x_state::logical_map(address_map &map)
@@ -1645,8 +1651,8 @@ void tek440x_state::tek4404(machine_config &config)
 	m_screen->set_palette("palette");
 	m_screen->screen_vblank().set(m_vint, FUNC(input_merger_all_high_device::in_w<1>));
 	m_screen->screen_vblank().append(m_vint, FUNC(input_merger_all_high_device::in_w<2>));
-	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
-
+	PALETTE(config, "palette", FUNC(tek440x_state::palette),2);
+	
 	MOS6551(config, m_acia, 40_MHz_XTAL / 4 / 10);
 	m_acia->set_xtal(1.8432_MHz_XTAL);
 	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
@@ -1665,13 +1671,11 @@ m_printer->in_pb_callback().set_constant(0xbf);		// HACK:  vblank always checks 
 	m_lance->intr_out().set_inputline(m_maincpu, M68K_IRQ_4);
 	m_lance->dma_in().set([this](offs_t offset) {
 
-		LOG("dma_in 0x%08x\n",offset);
 //		return m_maincpu->space(0).read_word(offset);
 		return m_vm->read16(offset);
 	});
 	m_lance->dma_out().set([this](offs_t offset, u16 data, u16 mem_mask) {
 		
-		LOG("dma_out 0x%08x <= %04x\n",offset, data);
 //		m_maincpu->space(0).write_word(offset, data, mem_mask);
 		m_vm->write16(offset, data, mem_mask);
 	});
