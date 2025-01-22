@@ -1,12 +1,14 @@
 // license:BSD-3-Clause
-// copyright-holders: Angelo Salese
+// copyright-holders: Angelo Salese, Vas Crabb, Roberto Fresca
 /**************************************************************************************************
 
 Chang Yu Electronic (CYE) misc gambling games
 
 TODO:
 - hookup UM5100, merge from pc/filetto.cpp;
-- both games should be working at this point, verify and promote;
+- DIPs;
+- Both games have card GFXs, verify existance of a stealth mode for enabling them;
+- changyu: verify contents of the unsorted rom space;
 
 ===================================================================================================
 
@@ -559,3 +561,4 @@ ROM_END
 // No copyright for both, are these really bootlegs?
 GAME( 1989, changyu,  0, changyu,  changyu, changyu_state,  empty_init, ROT0, "Chang Yu Electronic", "Mayo no 21", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Wing Co. in GFX1, year taken from start of maincpu ROM
 GAME( 1991?, changyu2, 0, changyu2, changyu2,changyu2_state, empty_init, ROT0, "Chang Yu Electronic", "999", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // Wing Co. in GFX1, year from a CYE flyer, cfr. pics in PR #13234
+// 皇冠迷13 likely running on this HW https://youtu.be/K3dCDVs9XCQ
