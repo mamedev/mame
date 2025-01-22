@@ -684,6 +684,7 @@ ROM_START( pl6_demo )
 	DISK_IMAGE( "pl6demo_cf", 0, SHA1(a97e0af3b35d02b014d98b48977c4a2584271f20) )
 ROM_END
 
+/*
 ROM_START( pl6vdemo )
 	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "17443iss.u1", 0x00000, 0x80000, CRC(40b4211a) SHA1(4cce50fc67a15b2b1f5d12a9f11fc12c51908773))
@@ -699,6 +700,7 @@ ROM_START( pl6ddemo )
 	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE( "21-17460", 0, SHA1(a3604dea855312f5019a4be9e1e25770203c8039) )
 ROM_END
+*/
 
 ROM_START( tijkpots )
 	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
@@ -708,22 +710,6 @@ ROM_START( tijkpots )
 	DISK_IMAGE( "pl6_tisl", 0, NO_DUMP )
 ROM_END
  
-ROM_START( scadet )
-	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "17443iss.u1", 0x00000, 0x80000, CRC(40b4211a) SHA1(4cce50fc67a15b2b1f5d12a9f11fc12c51908773))
-
-	DISK_REGION( "ata:0:hdd" )
-	DISK_IMAGE( "scadet", 0, NO_DUMP )
-ROM_END
-
-ROM_START( sspball )
-	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "17443iss.u1", 0x00000, 0x80000, CRC(40b4211a) SHA1(4cce50fc67a15b2b1f5d12a9f11fc12c51908773))
-
-	DISK_REGION( "ata:0:hdd" )
-	DISK_IMAGE( "sspball", 0, NO_DUMP )
-ROM_END
-
 } // anonymous namespace
 
 GAME( 2014, pl6_kfp, 0, pluto6_dev, pluto6, pluto6_state, empty_init, ROT0, "G Squared", "Kung Fu Pounda", MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
@@ -732,8 +718,6 @@ GAME( 2014, pl6_lgk, 0, pluto6_dev, pluto6, pluto6_state, empty_init, ROT0, "Bet
 GAME( 2014, tijkpots, 0, pluto6_betcom, pluto6, pluto6_state, empty_init, ROT0, "Betcom", "Treasure Island Jackpots", MACHINE_MECHANICAL )
 //GAME( 2004, pl6_fant, 0, pluto6_dev, pluto6, pluto6_state, empty_init, ROT0, "JPM", "Fabtaztec", MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
 GAME( 2004, pl6_cm, 0, pluto6_dev, pluto6, pluto6_state, empty_init, ROT0, "JPM", "Crystal Maze" , MACHINE_NOT_WORKING )
-GAME( 2025, scadet, 0, pluto6_dev, pluto6, pluto6_state, empty_init, ROT0, "Naoki's Retro Corner", "Space Cadet", MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
-GAME( 2025, sspball, 0, pluto6_dev, pluto6, pluto6_state, empty_init, ROT0, "Naoki's Retro Corner", "Sonic Spinball", MACHINE_NOT_WORKING | MACHINE_MECHANICAL)
 GAME( 2000, pl6_demo, 0, pluto6_dev, pluto6, pluto6_state, empty_init, ROT0, "Heber", "Pluto 6 Devkit/Evaluation Board", MACHINE_NOT_WORKING )
 //GAME( 2000, pl6vdemo, 0, pluto6v_dev, pluto6, pluto6_state, empty_init, ROT0, "Heber", "Pluto 6 Devkit/Evaluation Board Video Demo", MACHINE_NOT_WORKING )
 //GAME( 2000, pl6ddemo, 0, pluto6dv_dev, pluto6, pluto6_state, empty_init, ROT0, "Heber", "Pluto 6 Devkit/Evaluation Board Dual Video Demo", MACHINE_NOT_WORKING )
