@@ -49,7 +49,6 @@ Known audio inaccuracies (reasons for MACHINE_IMPERFECT_SOUND):
 - Uncertainty on component values for PERC2 (see comments in PERC_CONFIG).
 - No metronome yet.
 - Linear- instead of audio-taper faders.
-- The DMX stereo output uses fixed panning for each voice. Not yet emulated.
 - Envelope decay ignores diodes in capacitor discharge path. Given the quick
   decay, and that the error is larger at low volumes, this might not be
   noticeable.
@@ -69,6 +68,8 @@ Usage notes:
   A - Bass 2, S - Snare 2, ...
   Z - Bass 3, X - Snare 3, ...
 - The number buttons on the layout are mapped to the numeric keypad.
+- Can choose between the stereo (hardcoded voice panning) and mono outputs
+  from the Machine Configuration menu.
 - Can run with a high sample rate: ./mame -window obdmx -samplerate 96000
 */
 
@@ -86,13 +87,14 @@ Usage notes:
 
 #include "oberheim_dmx.lh"
 
-#define LOG_TRIGGERS  (1U << 1)
-#define LOG_INT_TIMER (1U << 2)
-#define LOG_FADERS    (1U << 3)
-#define LOG_SOUND     (1U << 4)
-#define LOG_PITCH     (1U << 5)
-#define LOG_VOLUME    (1U << 6)
-#define LOG_SAMPLES   (1U << 7)
+#define LOG_TRIGGERS      (1U << 1)
+#define LOG_INT_TIMER     (1U << 2)
+#define LOG_FADERS        (1U << 3)
+#define LOG_SOUND         (1U << 4)
+#define LOG_PITCH         (1U << 5)
+#define LOG_VOLUME        (1U << 6)
+#define LOG_SAMPLES       (1U << 7)
+#define LOG_SAMPLES_DECAY (1U << 8)
 
 #define VERBOSE (LOG_GENERAL)
 //#define LOG_OUTPUT_FUNC osd_printf_info
@@ -167,6 +169,10 @@ struct dmx_voice_card_config
 	const filter_components filter;
 };
 
+// The combination of the gain control circuit (which includes decay for some
+// voices), and the multiplying DAC form a VCA. The gain control circuit sets
+// the reference current into the DAC, and the DAC multiplies that with the
+// digital value to produce and output current.
 class dmx_voice_card_vca : public device_t, public device_sound_interface
 {
 public:
@@ -175,7 +181,6 @@ public:
 
 	void start(int trigger_mode);
 	void decay();
-	void finish();
 
 	bool in_decay() const { return m_decaying; }
 
@@ -197,9 +202,9 @@ private:
 	std::vector<float> m_decay_rc_inv;  // Decay 1/RC variations.
 
 	// Device state.
-	bool m_running = false;
 	float m_selected_gain = 1;
 	bool m_decaying = false;
+	bool m_decay_done = false;
 	float m_selected_rc_inv = 1;
 	attotime m_decay_start_time;
 };
@@ -226,8 +231,8 @@ void dmx_voice_card_vca::start(int trigger_mode)
 	assert(trigger_mode >= 1 && trigger_mode <= 3);
 
 	m_stream->update();
-	m_running = true;
 	m_decaying = false;
+	m_decay_done = false;
 
 	if (m_gain_control)
 		m_selected_gain = m_gain[trigger_mode];
@@ -256,50 +261,67 @@ void dmx_voice_card_vca::decay()
 	m_decay_start_time = machine().time();
 }
 
-void dmx_voice_card_vca::finish()
-{
-	m_running = false;
-}
-
 void dmx_voice_card_vca::device_start()
 {
 	m_stream = stream_alloc(1, 1, machine().sample_rate());
 
-	save_item(NAME(m_running));
 	save_item(NAME(m_selected_gain));
 	save_item(NAME(m_decaying));
+	save_item(NAME(m_decay_done));
 	save_item(NAME(m_selected_rc_inv));
 	save_item(NAME(m_decay_start_time));
-
 }
 
 void dmx_voice_card_vca::device_reset()
 {
-	m_running = false;
 	m_selected_gain = 1;
 	m_decaying = false;
+	m_decay_done = false;
 	m_selected_rc_inv = 1;
 }
 
 void dmx_voice_card_vca::sound_stream_update(sound_stream &stream, const std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs)
 {
+	// Gain lower than MIN_GAIN will be treated as 0.
+	static constexpr const float MIN_GAIN = 0.0001F;
+
 	const read_stream_view &in = inputs[0];
 	write_stream_view &out = outputs[0];
 	const int n = in.samples();
 
+	if (!m_decaying)  // Just gain variation without decay.
+	{
+		for (int i = 0; i < n; ++i)
+			out.put(i, m_selected_gain * in.get(i));
+
+		LOGMASKED(LOG_SAMPLES, "%s VCA - just gain: %f. Samples: %f, %f.\n",
+		          tag(), m_selected_gain, in.get(0), in.get(n - 1));
+		return;
+	}
+
+	if (m_decay_done)  // Avoid expensive expf() call if volume has decayed.
+	{
+		out.fill(0);
+		LOGMASKED(LOG_SAMPLES, "%s VCA - decay done.\n", tag());
+		return;
+	}
+
 	attotime t = in.start_time() - m_decay_start_time;
 	assert(!m_decaying || t >= attotime::from_double(0));
 
+	float gain = 1;
 	for (int i = 0; i < n; ++i, t += in.sample_period())
 	{
-		const float decay = m_decaying ? expf(-t.as_double() * m_selected_rc_inv) : 1;
-		out.put(i, decay * m_selected_gain * in.get(i));
-		if (m_running && i == 0)
-		{
-			LOGMASKED(LOG_SAMPLES, "Sample: %d, %f, %d, %f, %f\n",
-			          i, m_selected_gain, m_decaying, t.as_double(), decay);
-		}
+		const float decay = expf(-t.as_double() * m_selected_rc_inv);
+		gain = decay * m_selected_gain;
+		out.put(i, gain * in.get(i));
 	}
+
+	if (gain < MIN_GAIN)
+		m_decay_done = true;
+
+	LOGMASKED(LOG_SAMPLES_DECAY, "%s VCA - in decay: %f. Samples: %f, %f.\n",
+	          tag(), gain, in.get(0), in.get(n - 1));
 }
 
 void dmx_voice_card_vca::init_gain_and_decay_variations(const dmx_voice_card_config &config)
@@ -307,7 +329,7 @@ void dmx_voice_card_vca::init_gain_and_decay_variations(const dmx_voice_card_con
 	static constexpr const float VD = 0.6;  // Diode drop.
 	static constexpr const float R8 = RES_K(2.7);
 	static constexpr const float R9 = RES_K(5.6);
-	static constexpr const float MAX_IREF = 5.0F / (R8 + R9);
+	static constexpr const float MAX_IREF = VCC / (R8 + R9);
 
 	const float r12 = config.r12;
 	const float r17 = config.r17;
@@ -485,6 +507,7 @@ void dmx_voice_card::device_add_mconfig(machine_config &config)
 
 	m_dac->add_route(ALL_OUTPUTS, m_vca, 1.0);
 	m_vca->add_route(ALL_OUTPUTS, m_filters[0], 1.0);
+
 	m_filters[0]->add_route(ALL_OUTPUTS, m_filters[1], 1.0);
 	m_filters[1]->add_route(ALL_OUTPUTS, m_filters[2], 1.0);
 	m_filters[2]->add_route(ALL_OUTPUTS, *this, 1.0);
@@ -508,9 +531,7 @@ void dmx_voice_card::device_reset()
 
 void dmx_voice_card::sound_stream_update(sound_stream &stream, const std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs)
 {
-	const int n = inputs[0].samples();
-	for (int i = 0; i < n; ++i)
-		outputs[0].put(i, inputs[0].get(i));
+	outputs[0] = inputs[0];
 }
 
 void dmx_voice_card::reset_counter()
@@ -678,7 +699,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(dmx_voice_card::clock_callback)
 	if (m_counter >= max_count)
 	{
 		reset_counter();
-		m_vca->finish();
 		LOGMASKED(LOG_SOUND, "Done counting %d\n\n", m_config.split_rom);
 	}
 
@@ -882,14 +902,19 @@ public:
 		, m_digit_output(*this, "digit_%d", 0U)
 		, m_metronome_timer(*this, "metronome_timer")
 		, m_buttons(*this, "buttons_%d", 0)
+		, m_faders(*this, "fader_p%d", 1)
 		, m_switches(*this, "switches")
 		, m_external_triggers(*this, "external_triggers")
+		, m_output_select(*this, "output_select")
 		, m_clk_in(*this, "clk_in")
 		, m_clk_out_tip(*this, "CLK_OUT_tip")
 		, m_metronome_mix(*this, "METRONOME_MIX")
 		, m_metronome(*this, "METRONOME")
-		, m_mixer(*this, "mixer")
 		, m_voices(*this, "voice_%d", 0)
+		, m_left_mixer(*this, "left_mixer")
+		, m_right_mixer(*this, "right_mixer")
+		, m_left_speaker(*this, "lspeaker")
+		, m_right_speaker(*this, "rspeaker")
 		, m_samples(*this, "sample_%d", 0)
 	{
 	}
@@ -897,6 +922,7 @@ public:
 	void dmx(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(clk_in_changed);
+	DECLARE_INPUT_CHANGED_MEMBER(selected_output_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(voice_volume_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(metronome_volume_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(master_volume_changed);
@@ -904,6 +930,7 @@ public:
 
 protected:
 	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 
 private:
 	void refresh_int_flipflop();
@@ -923,6 +950,9 @@ private:
 	u8 cassette_r();
 	template<int GROUP> void gen_trigger_w(u8 data);
 
+	void update_output();
+	void update_voice_volume(int voice);
+
 	void memory_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
 
@@ -931,15 +961,20 @@ private:
 	output_finder<16> m_digit_output;
 	required_device<timer_device> m_metronome_timer;
 	required_ioport_array<6> m_buttons;
+	required_ioport_array<10> m_faders;
 	required_ioport m_switches;  // Includes foot switches.
 	required_ioport m_external_triggers;
+	required_ioport m_output_select;
 	required_ioport m_clk_in;
 	output_finder<> m_clk_out_tip;  // Tip conncetion of "CLK OUT" TRS jack.
 	output_finder<> m_metronome_mix;
 	output_finder<> m_metronome;
 
-	required_device<mixer_device> m_mixer;
 	required_device_array<dmx_voice_card, 8> m_voices;
+	required_device<mixer_device> m_left_mixer;
+	required_device<mixer_device> m_right_mixer;
+	required_device<speaker_device> m_left_speaker;
+	required_device<speaker_device> m_right_speaker;
 	required_memory_region_array<8> m_samples;
 
 	// 40103 timer (U11 in Processor Board)
@@ -970,6 +1005,29 @@ private:
 		PERC_CONFIG(CAP_U(0.0033)),  // VC_PERC1
 		PERC_CONFIG(CAP_U(0.0047)),  // VC_PERC2
 		CYMBAL_CONFIG,  // VC_CYMBAL
+	};
+
+	// The left and right channel mixing resistors for each voice. The voice
+	// will be panned towards the side with lower resistance. Furthermore, these
+	// resistors control the relative volume of the voices, where lower
+	// resistance means louder.
+	// Each entry needs to appear in the index specified by voice_card_indices.
+	// All resistors are located on the switchboard.
+	static constexpr const std::tuple<float, float> MIX_RESISTORS[NUM_VOICE_CARDS] =
+	{
+		{ RES_K(10),  RES_K(10)  },  // R10, R9  - VC_BASS
+		{ RES_K(8.2), RES_K(20)  },  // R12, R11 - VC_SNARE
+		{ RES_K(20),  RES_K(8.2) },  // R14, R13 - VC_HIHAT
+		{ RES_K(6.8), RES_K(100) },  // R16, R15 - VC_SMALL_TOMS
+		{ RES_K(100), RES_K(6.8) },  // R18, R17 - VC_LARGE_TOMS
+		{ RES_K(6.8), RES_K(100) },  // R22, R21 - VC_PERC1
+		{ RES_K(100), RES_K(6.8) },  // R24, R23 - VC_PERC2
+		{ RES_K(8.2), RES_K(20)  },  // R20, R19 - VC_CYMBAL
+	};
+
+	static constexpr const int VOICE_TO_FADER_MAP[NUM_VOICE_CARDS] =
+	{
+		0, 1, 2, 3, 4, 6, 7, 5,
 	};
 };
 
@@ -1189,6 +1247,50 @@ template<int GROUP> void dmx_state::gen_trigger_w(u8 data)
 	}
 }
 
+void dmx_state::update_output()
+{
+	const float stereo_gain = (m_output_select->read() & 0x01) ? 1 : 0;
+	m_left_speaker->set_input_gain(0, stereo_gain); // left
+	m_left_speaker->set_input_gain(1, 1 - stereo_gain);  // mono
+	m_right_speaker->set_input_gain(0, stereo_gain);  // right
+	m_right_speaker->set_input_gain(1, 1 - stereo_gain);  // mono
+	LOGMASKED(LOG_FADERS, "Output changed to: %d\n", m_output_select->read());
+}
+
+void dmx_state::update_voice_volume(int voice)
+{
+	// Computes the gain of a voice for the left and right channels, taking
+	// into account the fader position and the loading from the mixing
+	// resistors. Each voice has a hardcoded pan and relative mixing ratio based
+	// on the resistors in MIX_RESISTORS.
+
+	assert(voice >= 0 && voice < NUM_VOICE_CARDS);
+
+	static constexpr const float P_MAX = RES_K(10);  // Volume potentiometer.
+	static constexpr const float VC_R21 = RES_R(4.7);  // R21 on voice cards.
+
+	// Feedback resistors on the left and right summing op-amps (U1B, U1C).
+	static constexpr const float R_FEEDBACK_LEFT = RES_K(4.7);  // R30.
+	static constexpr const float R_FEEDBACK_RIGHT = RES_K(4.7);  // R29.
+
+	const s32 pot_percent = m_faders[VOICE_TO_FADER_MAP[voice]]->read();
+	const float r_pot_bottom = P_MAX * pot_percent / 100.0F;
+	const float r_pot_top = P_MAX - r_pot_bottom;
+	const float r_mix_left = std::get<0>(MIX_RESISTORS[voice]);
+	const float r_mix_right = std::get<1>(MIX_RESISTORS[voice]);
+	const float r_gnd = RES_3_PARALLEL(r_pot_bottom, r_mix_left, r_mix_right);
+
+	const float v_pot = RES_VOLTAGE_DIVIDER(r_pot_top + VC_R21, r_gnd);
+	const float gain_left = v_pot * R_FEEDBACK_LEFT / r_mix_left;
+	const float gain_right = v_pot * R_FEEDBACK_RIGHT / r_mix_right;
+
+	m_left_mixer->set_input_gain(voice, gain_left);
+	m_right_mixer->set_input_gain(voice, gain_right);
+
+	LOGMASKED(LOG_FADERS, "Voice %d volume changed to: %d (gain L:%f, R:%f)\n",
+	          voice, pot_percent, gain_left, gain_right);
+}
+
 void dmx_state::memory_map(address_map &map)
 {
 	// Component designations refer to the Processor Board.
@@ -1235,6 +1337,13 @@ void dmx_state::machine_start()
 	save_item(NAME(m_int_flipflop_clock));
 }
 
+void dmx_state::machine_reset()
+{
+	update_output();
+	for (int i = 0; i < NUM_VOICE_CARDS; ++i)
+		update_voice_volume(i);
+}
+
 void dmx_state::dmx(machine_config &config)
 {
 	Z80(config, m_maincpu, CPU_CLOCK);
@@ -1269,15 +1378,30 @@ void dmx_state::dmx(machine_config &config)
 	cas_latch.bit_handler<4>().set_output("LVI");
 	// Bit 5 not connected.
 
-	MIXER(config, m_mixer);
+	MIXER(config, m_left_mixer);
+	MIXER(config, m_right_mixer);
 	for (int i = 0; i < NUM_VOICE_CARDS; ++i)
 	{
 		DMX_VOICE_CARD(config, m_voices[i], VOICE_CONFIGS[i], &m_samples[i]);
-		m_voices[i]->add_route(ALL_OUTPUTS, m_mixer, 1.0);
+		m_voices[i]->add_route(ALL_OUTPUTS, m_left_mixer, 1.0);
+		m_voices[i]->add_route(ALL_OUTPUTS, m_right_mixer, 1.0);
 	}
 
-	SPEAKER(config, "mono").front_center();
-	m_mixer->add_route(ALL_OUTPUTS, "mono", 1.0);
+	// Passive mixer using 1K resistors (R33 and R34).
+	mixer_device &mono_mixer = MIXER(config, "mono_mixer");
+	m_left_mixer->add_route(ALL_OUTPUTS, mono_mixer, 0.5);
+	m_right_mixer->add_route(ALL_OUTPUTS, mono_mixer, 0.5);
+
+	// Only one of the left (right) or mono will be active for each speaker at
+	// runtime. Controlled by a config setting (see update_output()).
+
+	SPEAKER(config, m_left_speaker).front_left();
+	m_left_mixer->add_route(ALL_OUTPUTS, m_left_speaker, 1.0);
+	mono_mixer.add_route(ALL_OUTPUTS, m_left_speaker, 1.0);
+
+	SPEAKER(config, m_right_speaker).front_right();
+	m_right_mixer->add_route(ALL_OUTPUTS, m_right_speaker, 1.0);
+	mono_mixer.add_route(ALL_OUTPUTS, m_right_speaker, 1.0);
 }
 
 DECLARE_INPUT_CHANGED_MEMBER(dmx_state::clk_in_changed)
@@ -1285,11 +1409,14 @@ DECLARE_INPUT_CHANGED_MEMBER(dmx_state::clk_in_changed)
 	refresh_int_flipflop();
 }
 
+DECLARE_INPUT_CHANGED_MEMBER(dmx_state::selected_output_changed)
+{
+	update_output();
+}
+
 DECLARE_INPUT_CHANGED_MEMBER(dmx_state::voice_volume_changed)
 {
-	const s32 voice = param;
-	m_mixer->set_input_gain(voice, newval / 100.0F);
-	LOGMASKED(LOG_FADERS, "Voice %d volume changed: %d\n", voice, newval);
+	update_voice_volume(param);
 }
 
 DECLARE_INPUT_CHANGED_MEMBER(dmx_state::metronome_volume_changed)
@@ -1300,7 +1427,9 @@ DECLARE_INPUT_CHANGED_MEMBER(dmx_state::metronome_volume_changed)
 
 DECLARE_INPUT_CHANGED_MEMBER(dmx_state::master_volume_changed)
 {
-	m_mixer->set_output_gain(0, newval / 100.0F);
+	const float gain = newval / 100.0F;
+	m_left_mixer->set_output_gain(0, gain);
+	m_right_mixer->set_output_gain(0, gain);
 	LOGMASKED(LOG_FADERS, "Master volume changed: %d\n", newval);
 }
 
@@ -1393,6 +1522,12 @@ INPUT_PORTS_START(dmx)
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("CLK IN plugged") PORT_CODE(KEYCODE_QUOTE) PORT_TOGGLE
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("CLK IN") PORT_CODE(KEYCODE_SLASH)
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::clk_in_changed), 0)
+
+	PORT_START("output_select")
+	PORT_CONFNAME(0x01, 0x01, "Output")
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::selected_output_changed), 0)
+	PORT_CONFSETTING(   0x00, "Mono")
+	PORT_CONFSETTING(   0x01, "Stereo")
 
 	// Fader potentiometers. P1-P10 on the Switch Board.
 
