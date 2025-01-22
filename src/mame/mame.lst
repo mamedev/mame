@@ -16721,6 +16721,9 @@ sgalaxy
 sgalaxya
 sgalaxyb
 
+@source:cxg/pchess.cpp
+cpchess
+
 @source:cxg/professor.cpp
 scprof
 
@@ -18213,6 +18216,7 @@ fex68km3
 fex68km3a
 fex68km3b
 fex68km4
+fex68km4a
 premiere
 
 @source:fidelity/eldorado.cpp
