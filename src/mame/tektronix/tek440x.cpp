@@ -1503,7 +1503,7 @@ void tek440x_state::store_w(uint8_t data)
 
 void tek440x_state::palette(palette_device &palette) const
 {
-	palette.set_pen_color(0, rgb_t(0xe0, 0xec, 0xf8));   // 2 color tiles
+	palette.set_pen_color(0, rgb_t(0xec, 0xf4, 0xff));   // 2 color tiles
 	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0x00));
 }
 
