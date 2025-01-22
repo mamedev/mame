@@ -115,6 +115,8 @@ This means that the PIC18 is essentially a dongle for each game and needs to be 
 its also probably stored in an encrypted for and decrypted within the Heber CPLD/ASIC, as the FPGA bitstream lines connect 
 to this part, not the PIC18.
 
+GPU/Dual GPU: Commented out due to errors and there is not a currently suitable GPU core for the Pluto 6.
+
 * Game Notes *
 pl6_cm: 	Hybrid Pluto 6 + PC setup. They are connected over RS232. Pluto 6 is probably handling IO and security here.
 			Uses a Intel Celeron (2.1Ghz) PC with a Protech PROX3770 motherboard. Game runs on Windows XP.
@@ -147,19 +149,17 @@ EINT3: DUART INT?
 #include "machine/pl6_fpga.h"
 #include "machine/pl6_pic.h"
 #include "video/serialvfd.h"
-#include "video/mb86292.h"
+//#include "video/mb86292.h"
 
-#include "screen.h"
+//#include "screen.h"
 #include "speaker.h"
 
 
-#define LOG_VFD  (1U << 2)
-#define LOG_UART (1U << 3)
-#define VERBOSE (LOG_GENERAL | LOG_UART)
+#define LOG_VFD  (1U << 1)
+#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
 #define LOGVFDS(...)     	LOGMASKED(LOG_VFD,     __VA_ARGS__)
-#define LOGUARTS(...)     	LOGMASKED(LOG_UART,     __VA_ARGS__)
 
 #include "pl6dev.lh"
 #include "pl6vdev.lh"
@@ -172,12 +172,12 @@ public:
 	pluto6_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
-			m_gpu1(*this, "gpu1"),
-			m_gpu2(*this, "gpu2"),
-			m_vram1(*this, "vram1"),
-			m_vram2(*this, "vram2"),
-			m_screen0(*this, "screen0"),
-			m_screen1(*this, "screen1"),
+			//m_gpu1(*this, "gpu1"),
+			//m_gpu2(*this, "gpu2"),
+			//m_vram1(*this, "vram1"),
+			//m_vram2(*this, "vram2"),
+			//m_screen0(*this, "screen0"),
+			//m_screen1(*this, "screen1"),
 			m_fpga(*this, "fpga"),
 			m_pic(*this, "pic18"),
 			m_ata(*this, "ata"),
@@ -214,6 +214,10 @@ public:
 	void cfuart_rx_a_w(uint8_t state) { m_maincpu->rx1_w(state); }
 	void cfuart_rx_b_w(uint8_t state) { m_maincpu->rx2_w(state); }
 
+	// I2C Stuff
+	void pluto_sda(uint8_t state);
+	void pluto_scl(uint8_t state);
+
 	uint8_t duart_read(offs_t offset) { return m_duart->read(offset); }
 	void duart_write(offs_t offset, uint8_t data){ m_duart->write(offset, data); }
 	void duart_rx_a_w(uint8_t state) { m_duart->rx_a_w(state); }
@@ -221,8 +225,8 @@ public:
 	void duart_tx_a_w(uint8_t state) { m_fpga->duart_tx_a_w(state); }
 	void duart_tx_b_w(uint8_t state) { m_fpga->duart_tx_b_w(state); }
 
-	u32 screen1_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	u32 screen2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	//u32 screen1_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	//u32 screen2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	static constexpr feature_type unemulated_features() { return feature::PROTECTION; }
 
@@ -247,12 +251,12 @@ private:
 	// IO
 	required_device<mcf5206e_device> m_maincpu;
 
-	optional_device<mb86292_device> m_gpu1;
-	optional_device<mb86292_device> m_gpu2;
-	optional_device<ram_device> m_vram1;
-	optional_device<ram_device> m_vram2;
-	optional_device<screen_device> m_screen0;
-	optional_device<screen_device> m_screen1;
+	//optional_device<mb86292_device> m_gpu1;
+	//optional_device<mb86292_device> m_gpu2;
+	//optional_device<ram_device> m_vram1;
+	//optional_device<ram_device> m_vram2;
+	//optional_device<screen_device> m_screen0;
+	//optional_device<screen_device> m_screen1;
 
 	required_device<pl6fpga_device> m_fpga;
 	required_device<pl6pic_device> m_pic;
@@ -306,7 +310,7 @@ void pluto6_state::jpm_rom_map(address_map &map){
 	map(0x00000000, 0x0008ffff).unmaprw();
 	map(0x00000000, 0x001fffff).rom();
 }
-
+/*
 void pluto6_state::pluto6v_map(address_map &map)
 {
 	pluto6_map(map);
@@ -338,6 +342,7 @@ u32 pluto6_state::screen2_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 	m_gpu2->screen_update(screen, bitmap, cliprect);
 	return 0;
 }
+*/
 
 static INPUT_PORTS_START( pluto6 )
 	// It's a wacky layout but it's accurate according to testing.
@@ -403,6 +408,7 @@ void pluto6_state::duart_irq_handler(int state)
 	//update_interrupts();
 }
 
+/*
 void pluto6_state::gpu1_irq_handler(int state)
 {
 	//update_interrupts();
@@ -412,6 +418,7 @@ void pluto6_state::gpu2_irq_handler(int state)
 {
 	//update_interrupts();
 }
+*/
 
 uint32_t pluto6_state::input_callback(offs_t offset){
 	return m_inputs->read();
@@ -452,11 +459,23 @@ void pluto6_state::auxout_callback(offs_t offset, uint8_t data){
 	}
 }
 
+// I2C BUS
+void pluto6_state::pluto_sda(uint8_t state){
+	m_maincpu->sda_write(state);
+	m_pic->sda_write(state);
+}
+
+void pluto6_state::pluto_scl(uint8_t state){
+	m_pic->scl_write(state);
+}
+
 // Machine defs
 void pluto6_state::pluto6(machine_config &config){
 	MCF5206E(config, m_maincpu, XTAL(40'000'000));
 	m_maincpu->tx1_w_cb().set(FUNC(pluto6_state::cfuart_tx1_w));
 	m_maincpu->tx2_w_cb().set(FUNC(pluto6_state::cfuart_tx2_w));
+	m_maincpu->sda_w_cb().set(FUNC(pluto6_state::pluto_sda));
+	m_maincpu->scl_w_cb().set(FUNC(pluto6_state::pluto_scl));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -472,11 +491,12 @@ void pluto6_state::pluto6(machine_config &config){
 	m_fpga->cfuart_rx_b_callback().set(FUNC(pluto6_state::cfuart_rx_b_w));
 
 	HEBER_PLUTO6_PIC(config, m_pic, XTAL(5'000'00));
+	m_pic->sda_rx_cb().set(FUNC(pluto6_state::pluto_sda));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	config.set_default_layout(layout_pl6dev);
 }
-
+/*
 // Only use pluto6v or pluto6dv when an actual GPU is fitted, otherwise use pluto6
 void pluto6_state::pluto6v(machine_config &config){
 	pluto6(config);
@@ -533,6 +553,7 @@ void pluto6_state::pluto6dv(machine_config &config){
 
 	config.set_default_layout(layout_pl6vdev);	// Make better dual video layout
 }
+*/
 
 void pluto6_state::install_duart(machine_config &config){
 	MC68681(config, m_duart, XTAL(3'686'400));	// Actually 3.69MHz on the dev board
@@ -561,6 +582,7 @@ void pluto6_state::pluto6_dev(machine_config &config){
 	this->led_use_7seg = true;
 }
 
+/*
 void pluto6_state::pluto6v_dev(machine_config &config){
 	pluto6v(config);
 	m_fpga->set_fpga_type(pl6fpga_device::developer_fpga);
@@ -586,6 +608,7 @@ void pluto6_state::pluto6dv_dev(machine_config &config){
 	SERIAL_VFD(config, m_vfd);
 	this->led_use_7seg = true;
 }
+*/
 
 /* Betcom Pluto 6 */
 void pluto6_state::pluto6_betcom(machine_config &config){
@@ -612,30 +635,6 @@ void pluto6_state::pluto6_jpmrom(machine_config &config){
 	SERIAL_VFD(config, m_vfd);
 	this->led_use_7seg = true;
 }
-
-/*
-#define PL6_BIOS_A \
-	ROM_SYSTEM_BIOS( 0, "betcom",   "Betcom Bootloader" ) \
-	ROM_SYSTEM_BIOS( 1, "betcomb",  "Betcom-TB Bootloader" ) \
-	ROM_SYSTEM_BIOS( 2, "jpm",      "JPM Bootloader" ) \
-	ROM_SYSTEM_BIOS( 3, "topdog",   "Topdog Bootloader" ) \
-	ROM_SYSTEM_BIOS( 4, "astra",    "Astra Bootloader" ) \
-	ROM_SYSTEM_BIOS( 5, "reflex",   "Reflex Bootloader" ) \
-	ROM_SYSTEM_BIOS( 6, "dev",      "Dev Bootloader" ) \
-	ROM_REGION32_LE( 0x080000, "maincpu", 0 ) \
-	ROMX_LOAD( "betcom.u1",		0x0000000, 0x080000, CRC(7F0E0326), ROM_BIOS(0) ) \
-	ROMX_LOAD( "betcom-tb.u1",  0x0000000, 0x080000, CRC(39D5E776), ROM_BIOS(1) ) \
-	ROMX_LOAD( "jpm.u1",        0x0000000, 0x080000, CRC(A302C68E), ROM_BIOS(2) ) \
-	ROMX_LOAD( "topdog.u1",     0x0000000, 0x080000, CRC(26AF17B3), ROM_BIOS(3) ) \
-	ROMX_LOAD( "21-18260-2.u1", 0x0000000, 0x080000, CRC(3DC3901C), ROM_BIOS(4) ) \
-	ROMX_LOAD( "21-18694-3.u1", 0x0000000, 0x080000, CRC(7D81DC93), ROM_BIOS(5) ) \
-	ROMX_LOAD( "17443iss.u1",   0x0000000, 0x080000, CRC(40B4211A), ROM_BIOS(6) ) \
-
-// BIOS
-ROM_START( pl6 )
-	PL6_BIOS_A
-ROM_END
-*/
 
 // ROMS
 ROM_START( pl6_kfp )
@@ -668,23 +667,6 @@ ROM_START( pl6_cm )
 	DISK_REGION( "pcata:0:hdd" )
 	DISK_IMAGE( "pl6_cm", 0, NO_DUMP )
 ROM_END
-
-/*
-ROM_START( pl6_fant )
-	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "27c8001.u1", 0x00000, 0x40000, NO_DUMP  )
-	ROM_RELOAD(0x40000, 0x40000)
-
-	ROM_REGION( 0x80000, "program1", ROMREGION_ERASE00 )
-	ROM_LOAD( "27c8001.u2", 0x00000, 0x40000, NO_DUMP )
-
-	ROM_REGION( 0x80000, "program2", ROMREGION_ERASE00 )
-	ROM_LOAD( "27c8001.u2", 0x00000, 0x40000, NO_DUMP )
-
-	ROM_REGION( 0x80000, "program3", ROMREGION_ERASE00 )
-	ROM_LOAD( "27c8001.u3", 0x00000, 0x40000, NO_DUMP )
-ROM_END
-*/
 
 ROM_START( pl6_atw )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
@@ -753,5 +735,5 @@ GAME( 2004, pl6_cm, 0, pluto6_dev, pluto6, pluto6_state, empty_init, ROT0, "JPM"
 GAME( 2025, scadet, 0, pluto6_dev, pluto6, pluto6_state, empty_init, ROT0, "Naoki's Retro Corner", "Space Cadet", MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
 GAME( 2025, sspball, 0, pluto6_dev, pluto6, pluto6_state, empty_init, ROT0, "Naoki's Retro Corner", "Sonic Spinball", MACHINE_NOT_WORKING | MACHINE_MECHANICAL)
 GAME( 2000, pl6_demo, 0, pluto6_dev, pluto6, pluto6_state, empty_init, ROT0, "Heber", "Pluto 6 Devkit/Evaluation Board", MACHINE_NOT_WORKING )
-GAME( 2000, pl6vdemo, 0, pluto6v_dev, pluto6, pluto6_state, empty_init, ROT0, "Heber", "Pluto 6 Devkit/Evaluation Board Video Demo", MACHINE_NOT_WORKING )
-GAME( 2000, pl6ddemo, 0, pluto6dv_dev, pluto6, pluto6_state, empty_init, ROT0, "Heber", "Pluto 6 Devkit/Evaluation Board Dual Video Demo", MACHINE_NOT_WORKING )
+//GAME( 2000, pl6vdemo, 0, pluto6v_dev, pluto6, pluto6_state, empty_init, ROT0, "Heber", "Pluto 6 Devkit/Evaluation Board Video Demo", MACHINE_NOT_WORKING )
+//GAME( 2000, pl6ddemo, 0, pluto6dv_dev, pluto6, pluto6_state, empty_init, ROT0, "Heber", "Pluto 6 Devkit/Evaluation Board Dual Video Demo", MACHINE_NOT_WORKING )

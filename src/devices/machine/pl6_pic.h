@@ -45,6 +45,8 @@ class pl6pic_device :
 public:
 	pl6pic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
+	auto sda_rx_cb(){ return write_sda.bind(); }
+
 protected:
 	virtual void device_start() override;
 
