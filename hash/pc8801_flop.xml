@@ -4067,7 +4067,11 @@ A few kanji drawings in gameplay are odd to look at (cfr. signs, sports as full 
 		<description>Babylon</description>
 		<year>1986</year>
 		<publisher>クリスタルソフト (Xtal Soft)</publisher>
-		<!-- PC8801 -->
+		<notes><![CDATA[
+The scenario disk is a user disk for this set so make user is not possible.
+Check the floppy name on XM8.
+]]></notes>
+		<!-- PC8801mk2SR -->
 		<info name="release" value="198612xx"/>
 		<info name="alt_title" value="バビロン"/>
 		<info name="usage" value="Needs BASIC V2"/>
@@ -4100,7 +4104,7 @@ A few kanji drawings in gameplay are odd to look at (cfr. signs, sports as full 
 		<description>Babylon (alt)</description>
 		<year>1986</year>
 		<publisher>クリスタルソフト (Xtal Soft)</publisher>
-		<!-- PC8801 -->
+		<!-- PC8801mk2SR -->
 		<info name="release" value="198612xx"/>
 		<info name="alt_title" value="バビロン"/>
 		<info name="usage" value="Needs BASIC V2"/>
