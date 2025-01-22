@@ -915,6 +915,12 @@ ROM_START( vibes240 )
 	ROM_IGNORE(0x100)
 ROM_END
 
+ROM_START( lexi30 )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "lexi30.u3", 0x00000, 0x800000, CRC(0d4307ea) SHA1(0d7cf492f796b0bb871deebaca38a3ff3b2ed1e6) )
+ROM_END
+
+
 void nes_vt369_vtunknown_state::init_lxcmcypp()
 {
 	int size = memregion("mainrom")->bytes()/2;
@@ -955,6 +961,8 @@ CONS( 2017, fapocket,   0,        0,  nes_vt369_vtunknown_fa_4x16mb, nes_vt369_v
     driver at all.
 
 ****************************************************************************************************************/
+
+CONS( 2012, lexi30,  0,0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "Lexibook", "Arcade Center (JL1800_01)", MACHINE_NOT_WORKING )
 
 // don't even get to menu. very enhanced chipset, VT368/9?
 CONS( 2012, dgun2561,  0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init, "dreamGEAR", "My Arcade Portable Gaming System with 140 Games (DGUN-2561)", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
