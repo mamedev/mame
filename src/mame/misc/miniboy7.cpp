@@ -123,6 +123,53 @@
   The machine will need to be reset to return to normal operation.
 
 
+  * Bonanza's Joker Poker
+
+  This game is similar to Golden Poker Double Up but introduces new features.
+  You can raise bets throughout the game, and additional bonuses are awarded
+  for landing 3's and 7's.
+
+  Books Mode: To enter Books Mode, press the BOOKS button (key 0).
+
+  In Books Mode, pressing DEAL will take you to the Percentage Mode, where you can set
+  a percentage value (between 0 and 9) using the HOLD4 button. 
+
+  While in Percentage Mode, pressing HOLD5 will bring you to the Screen RAM and Inputs Test Mode.
+  To return to normal operation, reset the machine.
+
+  To exit Percentage Mode, press HOLD1.
+  To exit Books Mode, press either HOLD4 or HOLD5.
+
+
+  Programming Mode:
+
+  To access Programming Mode, press the SETTINGS button (key 9).
+  In Programming Mode, you can adjust all game parameters.
+  Use HOLD1 to move to the next item, HOLD2 to change values, and HOLD4 to finish.
+
+  MAX BET:    10-20-30-40-50
+  RE-BET:     YES/NO
+  1 JOKER:    1-2-3-4-5-6-7-8-9-10 BET / MORE
+  2 JOKERS:   1-2-3-4-5-6-7-8-9-10 BET / MORE
+
+  DOUBLE UP
+  HALF BET:   YES/NO
+  7 CARD:     EVEN/WIN/BACK/LOSE
+  AUTO HOLD:  YES/NO
+
+  3'S BONUS:  1-2-5-10 BET(S) 1 BONUS
+              200-300-400-500 MAXIMUM
+
+  7'S BONUS:  1-2-5-10 BET(S) 1 BONUS
+              200-300-400-500 MAXIMUM
+
+  COIN:       1-2-4-5-8-10-20-50 CREDIT/COIN
+  NOTE:       1-2-4-5-8-10-20-25-50 CREDIT/NOTE
+  COUPON:     1-2-4-5-8-10-20-50-100 CREDIT/COUPON
+
+  MIN. HAND:  JACKS/BETTER - 2 PAIR - ACE PAIR
+
+
 *******************************************************************************
 
   Hardware Notes:
