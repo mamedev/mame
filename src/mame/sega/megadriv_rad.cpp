@@ -769,7 +769,7 @@ CONS( 2004, rad_ssoc,  0,        0, megadriv_radica_3button_pal,  radica_3button
 CONS( 2004, rad_orun,  0,        0, megadriv_radica_3button_pal,  radica_3button_1player, megadriv_radica_state, init_megadrie, "Radica / Sega",                     "Out Run 2019 (Radica Plug & Play, UK)", 0)
 
 // this has been verified as identical to the 6-in-1 cartridge that came with the Menacer gun for the MD
-CONS( 2004, rad_mncr,  0,        0, megadriv_radica_3button_ntsc, radica_3button_1player, megadriv_radica_state, init_megadriv, "Radica / Sega",                     "Menacer (Radica)", MACHINE_NOT_WORKING )
+CONS( 2004, rad_mncr,  0,        0, megadriv_radica_3button_ntsc, radica_3button_1player, megadriv_radica_state, init_megadriv, "Radica / Sega",                     "Menacer (Radica Plug & Play)", MACHINE_NOT_WORKING )
 
 
 // From a European unit but NTSC? - code is hacked from original USA Genesis game with region check still intact? (does the clone hardware always identify as such? or does the bypassed boot code skip the check?)
