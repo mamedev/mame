@@ -7267,7 +7267,7 @@ static INPUT_PORTS_START( hginga )
 	PORT_DIPNAME( 0x20, 0x20, "Hanaroku Hopper" )                   PORT_DIPLOCATION("SW3:6")            // 花六ホッパー
 	PORT_DIPSETTING(    0x20, "Manual" )                                                                 // 手動
 	PORT_DIPSETTING(    0x00, "Automatic" )                                                              // 自動
-	PORT_DIPNAME( 0xc0, 0xc0, "Gokou/Shikou Generation Interval" )  PORT_DIPLOCATION("SW3:7,8")          // 五光、四光発生間隙
+	PORT_DIPNAME( 0xc0, 0xc0, "Gokou/Shikou Generation Interval" )  PORT_DIPLOCATION("SW3:7,8")          // 五光、四光発生間隔
 	PORT_DIPSETTING(    0xc0, "Short" )                                                                  // せまい
 	PORT_DIPSETTING(    0x80, "A Little Short" )                                                         // ややせまい
 	PORT_DIPSETTING(    0x40, "A Little Long" )                                                          // ややひろい
