@@ -10,8 +10,9 @@
 
   Games running on this hardware:
 
-  * Mini-Boy 7,      1983,  Bonanza Enterprises, Ltd.
-  * Super Mini-Boy,  1984,  Bonanza Enterprises, Ltd.
+  * Mini-Boy 7,             1983,  Bonanza Enterprises, Ltd.
+  * Super Mini-Boy,         1984,  Bonanza Enterprises, Ltd.
+  * Bonanza's Joker Poker,  1984,  Bonanza Enterprises, Ltd.
 
 
 *******************************************************************************
@@ -278,7 +279,7 @@
   - Some clean-up.
 
 
-  [2025-01]
+  [2025-01-20]
 
   - Implemented and documented the PIA port B multiplexion for Super Mini-Boy.
   - Lot of fixes, getting Super Mini-Boy working.
@@ -289,11 +290,19 @@
   - Some clean-up.
 
 
+  [2025-01-22]
+
+  - Lot of fixes and new machine driver, getting Joker Poker working.
+  - Fixed crystal/clocks and derivatives.
+  - Added lamps support and button-lamps layout for Joker Poker.
+  - Worked Super Joker Poker inputs and DIP Switches from the scratch. 
+  - Added more technical and games notes.
+
+
   TODO:
 
-  - Rework the muxed inputs for bejpoker.
-  - Find lamps and layout scheme for bejpoker.
-  - Implement fake pots for B-G background color
+  - Investigate the unknown functions that affect the CRTC
+     displacing the screen and do weird things.
 
 
 *******************************************************************************/
@@ -310,12 +319,14 @@
 
 #include "miniboy7.lh"
 #include "sminiboy.lh"
+#include "bejpoker.lh"
 
 
 
 namespace {
 
-#define MASTER_CLOCK    XTAL(12'472'500)    /* 12.4725 MHz */
+#define MASTER_CLOCK       XTAL(12'472'500)   // 12.4725 MHz
+#define BJP_MASTER_CLOCK   XTAL(10'000'000)   // 10.0000 MHz
 
 
 class miniboy7_state : public driver_device
@@ -340,6 +351,7 @@ public:
 
 	void miniboy7(machine_config &config);
 	void sminiboy(machine_config &config);
+	void bejpoker(machine_config &config);
 	
 	void init_smini();
 
@@ -670,45 +682,42 @@ static INPUT_PORTS_START( miniboy7 )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( sminiboy )
+static INPUT_PORTS_START( sminiboy_base )
+	// multiplexed
 	PORT_START("INPUT1") // pia_pa 0XFF - mem 261d
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(5)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(5) PORT_NAME("Note 1")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(5) PORT_NAME("Note 2")
-	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED )                 // program masked
+	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED )  // program masked
 
 	PORT_START("INPUT2") // pia_pa mux 0xfb  - mem 261f
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )   PORT_NAME("Big")     // Big
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_CANCEL )                       // Cancel 
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )                        // Hold 5
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )                        // Hold 4
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )                        // Hold 3
-	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )       // program masked
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )   PORT_NAME("Big")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )  // program masked
 
 	PORT_START("INPUT3") // pia_pa mux 0xfd - mem 2621
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )  PORT_NAME("Small")     // Small
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )                        // Double Up
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )                        // Take
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )  PORT_NAME("Small")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("1c-4") PORT_CODE(KEYCODE_F)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("1c-5") PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )        // program masked
-
-	PORT_START("INPUT4") // pia_pb no mux 0XFF  - mem 261e
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                        // Books 
-	PORT_BIT( 0xfb, IP_ACTIVE_LOW, IPT_UNUSED )        // program masked
-
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )  // program masked
+	
 	PORT_START("INPUT5") // pia_pb mux 0xfb - mem 2620
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )                        // Hold 2
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )                        // Hold 1
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )                      // Keyout
-	PORT_BIT( 0xf4, IP_ACTIVE_LOW, IPT_UNUSED )        // program masked
-
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+	PORT_BIT( 0xf4, IP_ACTIVE_LOW, IPT_UNUSED )  // program masked
+	
 	PORT_START("INPUT6") // pia_pb mux 0xfd - mem 2622
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )                        // Start (Deal/Draw)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("Play Bet")   // Play/Bet
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )                            // PORT_NAME("Break_SCR")  PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0xf4, IP_ACTIVE_LOW, IPT_UNUSED )      // program masked
-
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("Play Bet")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )    // PORT_NAME("Break_SCR")  PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0xf4, IP_ACTIVE_LOW, IPT_UNUSED )  // program masked
+	
 	PORT_START("DSW2")
 	// mux=0xff 
 	PORT_DIPNAME( 0x03, 0x00, "D.UP Seven" )               PORT_DIPLOCATION("DSW2:8,7")
@@ -735,6 +744,44 @@ static INPUT_PORTS_START( sminiboy )
 	PORT_DIPNAME( 0x80, 0x80, "Royal Flush" )              PORT_DIPLOCATION("DSW2:1")
 	PORT_DIPSETTING(    0x80, "Disable" )
 	PORT_DIPSETTING(    0x00, "Enable" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( sminiboy )
+
+	PORT_INCLUDE( sminiboy_base )
+
+	PORT_START("INPUT4") // pia_pb no mux 0XFF  - mem 261e
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
+	PORT_BIT( 0xfb, IP_ACTIVE_LOW, IPT_UNUSED )  // program masked
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( bejpoker )
+
+	PORT_INCLUDE( sminiboy_base )
+
+	PORT_MODIFY("INPUT5") // pia_pb mux 0xfb
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )  // program masked
+
+	PORT_MODIFY("INPUT6") // pia_pb mux 0xfd
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Settings")
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )  // program masked
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Unused ) )          PORT_DIPLOCATION("DSW2:8,7,6,5")
+	PORT_DIPNAME( 0x10, 0x10, "Bet Raise" )                PORT_DIPLOCATION("DSW2:4")
+	PORT_DIPSETTING(    0x10, "Disabled" )
+	PORT_DIPSETTING(    0x00, "Enabled" )
+	PORT_DIPNAME( 0x20, 0x20, "Big Win Music" )            PORT_DIPLOCATION("DSW2:3")
+	PORT_DIPSETTING(    0x20, "Disabled" )
+	PORT_DIPSETTING(    0x00, "Enabled" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )          PORT_DIPLOCATION("DSW2:2")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )          PORT_DIPLOCATION("DSW2:1")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -813,7 +860,7 @@ void miniboy7_state::miniboy7(machine_config &config)
 
 	PALETTE(config, m_palette, FUNC(miniboy7_state::miniboy7_palette), 256);
 
-	mc6845_device &crtc(MC6845(config, "crtc", MASTER_CLOCK / 12));  // guess
+	mc6845_device &crtc(MC6845(config, "crtc", MASTER_CLOCK / 14));  // guess
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
@@ -837,6 +884,34 @@ void miniboy7_state::sminiboy(machine_config &config)
 	pia.readpb_handler().set(FUNC(miniboy7_state::s_pia_pb_r));
 	pia.irqa_handler().set_inputline("maincpu", 0);
 	pia.irqb_handler().set_inputline("maincpu", 0);	
+}
+
+void miniboy7_state::bejpoker(machine_config &config)
+{
+	miniboy7(config);
+
+	M6502(config.replace(), m_maincpu, BJP_MASTER_CLOCK / 16);  // 10 MHz crystal instead
+	m_maincpu->set_addrmap(AS_PROGRAM, &miniboy7_state::miniboy7_map);
+
+	pia6821_device &pia(PIA6821(config.replace(), "pia0"));
+	pia.readpa_handler().set(FUNC(miniboy7_state::s_pia_pa_r));
+	pia.readpb_handler().set(FUNC(miniboy7_state::s_pia_pb_r));
+	pia.irqa_handler().set_inputline("maincpu", 0);
+	pia.irqb_handler().set_inputline("maincpu", 0);
+
+	mc6845_device &crtc(MC6845(config.replace(), "crtc", BJP_MASTER_CLOCK / 14));  // guess
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(miniboy7_state::crtc_update_row));
+	crtc.out_vsync_callback().set("pia0", FUNC(pia6821_device::ca1_w));
+
+	// sound hardware
+	ay8910_device &ay8910(AY8910(config.replace(), "ay8910", BJP_MASTER_CLOCK / 8));  // guess
+	ay8910.add_route(ALL_OUTPUTS, "mono", 0.75);
+	ay8910.port_a_write_callback().set(FUNC(miniboy7_state::ay_pa_w));
+	ay8910.port_b_write_callback().set(FUNC(miniboy7_state::ay_pb_w));
+
 }
 
 
@@ -996,8 +1071,8 @@ void miniboy7_state::init_smini()
 *           Game Drivers           *
 ***********************************/
 
-//     YEAR  NAME       PARENT    MACHINE   INPUT     CLASS           INIT        ROT    COMPANY                     FULLNAME             FLAGS                                        LAYOUT
-GAMEL( 1983, miniboy7,  0,        miniboy7, miniboy7, miniboy7_state, empty_init, ROT0, "Bonanza Enterprises, Ltd", "Mini-Boy 7 (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE, layout_miniboy7 )
-GAMEL( 1983, miniboy7a, miniboy7, miniboy7, miniboy7, miniboy7_state, empty_init, ROT0, "Bonanza Enterprises, Ltd", "Mini-Boy 7 (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE, layout_miniboy7 )
-GAMEL( 1984, sminiboy,  0,        sminiboy, sminiboy, miniboy7_state, init_smini, ROT0, "Bonanza Enterprises, Ltd", "Super Mini-Boy",     MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE, layout_sminiboy )
-GAME(  1992, bejpoker,  0,        miniboy7, sminiboy, miniboy7_state, empty_init, ROT0, "Bonanza Enterprises, Ltd", "Bonanza Enterprises' Joker Poker", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+//     YEAR  NAME       PARENT    MACHINE   INPUT     CLASS           INIT        ROT    COMPANY                     FULLNAME                FLAGS                  LAYOUT
+GAMEL( 1983, miniboy7,  0,        miniboy7, miniboy7, miniboy7_state, empty_init, ROT0, "Bonanza Enterprises, Ltd", "Mini-Boy 7 (set 1)",    MACHINE_SUPPORTS_SAVE, layout_miniboy7 )
+GAMEL( 1983, miniboy7a, miniboy7, miniboy7, miniboy7, miniboy7_state, empty_init, ROT0, "Bonanza Enterprises, Ltd", "Mini-Boy 7 (set 2)",    MACHINE_SUPPORTS_SAVE, layout_miniboy7 )
+GAMEL( 1984, sminiboy,  0,        sminiboy, sminiboy, miniboy7_state, init_smini, ROT0, "Bonanza Enterprises, Ltd", "Super Mini-Boy",        MACHINE_SUPPORTS_SAVE, layout_sminiboy )
+GAMEL( 1992, bejpoker,  0,        bejpoker, bejpoker, miniboy7_state, empty_init, ROT0, "Bonanza Enterprises, Ltd", "Bonanza's Joker Poker", MACHINE_SUPPORTS_SAVE, layout_bejpoker )
