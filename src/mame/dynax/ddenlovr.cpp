@@ -5093,7 +5093,7 @@ static INPUT_PORTS_START( htengoku )
 	PORT_DIPSETTING(    0x07, "1 (High)" )                                                               // 高い１
 	PORT_DIPNAME( 0x08, 0x00, "Payout Variation" )                  PORT_DIPLOCATION("SW 2:4")           // 配当の波
 	PORT_DIPSETTING(    0x00, "Small" )                                                                  // 小さい
-	PORT_DIPSETTING(    0x08, "Big" )                                                                    // 大きい
+	PORT_DIPSETTING(    0x08, "Large" )                                                                  // 大きい
 	PORT_DIPNAME( 0x10, 0x10, "Gokou Yaku" )                        PORT_DIPLOCATION("SW 2:5")           // 五光役
 	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                                             // 出ない
 	PORT_DIPSETTING(    0x10, DEF_STR(On) )                                                              // 出る
@@ -5833,7 +5833,7 @@ static INPUT_PORTS_START( hkagerou )
 	PORT_DIPSETTING(    0x07, "1 (High)" )                                                               // 高い１
 	PORT_DIPNAME( 0x08, 0x00, "Payout Variation" )                  PORT_DIPLOCATION("SW1:4")            // 配当の波
 	PORT_DIPSETTING(    0x00, "Small" )                                                                  // 小さい
-	PORT_DIPSETTING(    0x08, "Big" )                                                                    // 大きい
+	PORT_DIPSETTING(    0x08, "Large" )                                                                  // 大きい
 	PORT_DIPNAME( 0x10, 0x10, "Gokou Yaku" )                        PORT_DIPLOCATION("SW1:5")            // 五光役
 	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                                             // 出ない
 	PORT_DIPSETTING(    0x10, DEF_STR(On) )                                                              // 出る
@@ -7209,7 +7209,7 @@ static INPUT_PORTS_START( hginga )
 	PORT_DIPSETTING(    0x07, "1 (High)" )                                                               // 高い１
 	PORT_DIPNAME( 0x08, 0x00, "Payout Variation" )                  PORT_DIPLOCATION("SW1:4")            // 配当の波
 	PORT_DIPSETTING(    0x00, "Small" )                                                                  // 小さい
-	PORT_DIPSETTING(    0x08, "Big" )                                                                    // 大きい
+	PORT_DIPSETTING(    0x08, "Large" )                                                                  // 大きい
 	PORT_DIPNAME( 0x10, 0x10, "Gokou Yaku" )                        PORT_DIPLOCATION("SW1:5")            // 五光役
 	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                                             // 出ない
 	PORT_DIPSETTING(    0x10, DEF_STR(On) )                                                              // 出る

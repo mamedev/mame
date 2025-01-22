@@ -55,8 +55,8 @@
 		PORT_DIPSETTING(             0x00 << shift, "50" )  PORT_CONDITION(ct, 0x03 << cs, EQUALS, 0x01 << cs) \
 		PORT_DIPSETTING(             0x00 << shift, "100" ) PORT_CONDITION(ct, 0x03 << cs, EQUALS, 0x00 << cs)
 
-#define MAHJONG_YAKUMAN_BONUS(shift, loc) \
-		PORT_DIPNAME( 0x07 << shift, 0x04 << shift, "Yakuman Bonus Cycle" ) PORT_DIPLOCATION(loc) /* 役満ボーナスの設定周期 */ \
+#define MAHJONG_YAKUMAN_BONUS(shift, dflt, loc) \
+		PORT_DIPNAME( 0x07 << shift, dflt << shift, "Yakuman Bonus Cycle" ) PORT_DIPLOCATION(loc) /* 役満ボーナスの設定周期 */ \
 		PORT_DIPSETTING(             0x07 << shift, "None" )                                      /* 無し                   */ \
 		PORT_DIPSETTING(             0x06 << shift, "First time only" )                           /* 初回のみ               */ \
 		PORT_DIPSETTING(             0x05 << shift, "Every 300 coins" )                           /* ３００コイン毎         */ \
