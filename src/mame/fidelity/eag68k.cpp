@@ -951,13 +951,13 @@ ROM_START( fex68km3b ) // model 6098 - checksum E2DA
 	ROM_LOAD16_BYTE("mo_yellow.u7", 0x00001, 0x08000, CRC(572b208a) SHA1(cd50982d8fa5bde9ac83472fddd14d56fa6ead3b) ) // "
 ROM_END
 
-ROM_START( fex68km4 ) // model 6110, serial 9004009x - checksum 1185
+ROM_START( fex68km4 ) // model 6110, serial 9004000x or 9004009x - checksum 1185
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD16_BYTE("68020_mach_3_vers_1.3a_even.u6", 0x00000, 0x08000, CRC(ea47a712) SHA1(bd853f74c83d760a4f4df0250248cbdba8f1f241) ) // sic "Mach 3" on label?
-	ROM_LOAD16_BYTE("68020_mach_3_vers_1.3a_odd.u7",  0x00001, 0x08000, CRC(41b5860d) SHA1(935c43ef1ff511426f49e83e29014883c68e99b4) ) // "
+	ROM_LOAD16_BYTE("68020_mach_iv_v1.3a_even_11_30_88.u6", 0x00000, 0x08000, CRC(ea47a712) SHA1(bd853f74c83d760a4f4df0250248cbdba8f1f241) ) // also seen with "Mach 3" label, same SUM16
+	ROM_LOAD16_BYTE("68020_mach_iv_v1.3a_odd_11_30_88.u7",  0x00001, 0x08000, CRC(41b5860d) SHA1(935c43ef1ff511426f49e83e29014883c68e99b4) ) // "
 ROM_END
 
-ROM_START( fex68km4a ) // no model # on backplate, serial 0009999x but modified hardware - checksum FD96
+ROM_START( fex68km4a ) // no model # on backplate, serial 0009999x but modified hardware - checksum FD9B
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("68020_even_master_2325.u6", 0x00000, 0x08000, CRC(13ea816c) SHA1(98d00fc382ddcbccb0a47c3f8d7fc73f30a15fbd) )
 	ROM_LOAD16_BYTE("68020_odd_master_2325.u7",  0x00001, 0x08000, CRC(d24c7b54) SHA1(3204fd600786792a618965715990c44890cc7119) )
