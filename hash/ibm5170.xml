@@ -19271,10 +19271,16 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		</part>
 	</software>
 
-	<software name="pbfant">
+	<software name="pbfant" supported="partial">
 		<description>Pinball Fantasies</description>
 		<year>1994</year>
 		<publisher>21st Century Entertainment</publisher>
+		<notes><![CDATA[
+https://github.com/wanda-phi/pfr/blob/main/TECH.md
+[VGA] Main menu does a 6845 style horizontal scroll pan for the Pinball Fantasies logo
+[VGA] mid-scanline palette tricks on main menu (i.e. logo will always be wrong, and topmost game entry)
+]]></notes>
+		<!-- Unobtainium, check lodsb -> cmp bx,51e7h. Required only the first time around.  -->
 		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="Digital Illusions" />
 		<info name="ported by" value="FrontLine Design" />
