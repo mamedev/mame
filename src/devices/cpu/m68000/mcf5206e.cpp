@@ -7,6 +7,7 @@
 			* Not currently implemented, quite possible it doesn't need to be added for any functional reason aside from completeness/debugging
 		System Integration Module:
 			* MBAR: should be set up in m68000_musashi_device::x4e7a_movec_l_c() to move the ColdFire IO register map according to the contents of MBAR
+						could store m_mbar in m68000_musashi_device and move the address_space_map to the given offset?
 			* SIMR: Logged and stored, but not used as there is no BDM interface present
 			* MARB: Logged and stored, but not used, not required?
 		DRAM Controller Module:
@@ -20,8 +21,7 @@
 		Timer Modules:
 			* Slow, could be improved.
 
-		* Some of these modules can probably be split back into the /devices/machine device, namely the MBUS and maybe timer modules, but the 
-			System Integration Module (which has an included interrupt controller) needs to have more access to the CPU lines than the other modules.
+		* Some of these modules can probably be split back into the /devices/machine device, namely the MBUS and timer modules, possibly SIM too.
 */
 
 #include "emu.h"
@@ -41,7 +41,14 @@
 #define INT_LEVEL(N) 	((N&0x1c) >> 2)
 #define ICR_USE_AUTOVEC(N)	((N & 0x80) != 0)
 
+#define BITWRITE(x, n, s) ((x & ~(1 << n)) | (s << n))
+#define BITSET(x, n) BITWRITE(x, n, 1)
+#define BITCLEAR(x, n) BITWRITE(x, n, 0)
+
 DEFINE_DEVICE_TYPE(MCF5206E,    mcf5206e_device,    "mcf5206e",     "Freescale MCF5206E")
+DEFINE_DEVICE_TYPE(COLDFIRE_SIM,    coldfire_sim_device,    "coldfire_sim",     "ColdFire SIM Module")
+DEFINE_DEVICE_TYPE(COLDFIRE_MBUS,    coldfire_mbus_device,    "coldfire_mbus",     "ColdFire MBUS Module")
+DEFINE_DEVICE_TYPE(COLDFIRE_TIMER,    coldfire_timer_device,    "coldfire_timer",     "ColdFire Timer Module")
 
 std::unique_ptr<util::disasm_interface> mcf5206e_device::create_disassembler()
 {
@@ -50,26 +57,36 @@ std::unique_ptr<util::disasm_interface> mcf5206e_device::create_disassembler()
 
 mcf5206e_device::mcf5206e_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: m68000_musashi_device(mconfig, tag, owner, clock, MCF5206E, 32, 32, address_map_constructor(FUNC(mcf5206e_device::coldfire_regs_map), this))
-	, m_uart(*this, "coldfire_uart%u", 0U)
-	, m_swdt(*this, "watchdog")
+	, m_sim(*this, "sim")
+	, m_timer(*this, "timer%u", 1U)
 	, write_chip_select(*this)
-	, m_gpio_r_cb(*this, 0xFF)
-	, m_gpio_w_cb(*this)
-	, write_irq(*this)
+	, m_uart(*this, "coldfire_uart%u", 0U)
 	, write_tx1(*this)
 	, write_tx2(*this)
+	, m_gpio_w_cb(*this)
+	, m_mbus(*this, "coldfire_mbus")
 	, write_sda(*this)
 	, write_scl(*this)
 {
 }
 
 void mcf5206e_device::device_add_mconfig(machine_config &config){
+	COLDFIRE_SIM(config, m_sim, this->clock(), this->tag());
+
+	COLDFIRE_TIMER(config, m_timer[0], (this->clock()));
+	m_timer[0]->irq_cb().set(FUNC(mcf5206e_device::timer_1_irq));
+	COLDFIRE_TIMER(config, m_timer[1], (this->clock()));
+	m_timer[1]->irq_cb().set(FUNC(mcf5206e_device::timer_2_irq));
+
 	MCF5206E_UART(config, m_uart[0], (this->clock() / 32));
 	MCF5206E_UART(config, m_uart[1], (this->clock() / 32));
-	m_uart[0]->irq_cb().set(FUNC(mcf5206e_device::uart1_irq_w));
-	m_uart[1]->irq_cb().set(FUNC(mcf5206e_device::uart2_irq_w));
-	
-	WATCHDOG_TIMER(config, m_swdt);
+	m_uart[0]->irq_cb().set(FUNC(mcf5206e_device::uart_1_irq));
+	m_uart[1]->irq_cb().set(FUNC(mcf5206e_device::uart_2_irq));
+
+	COLDFIRE_MBUS(config, m_mbus, this->clock());
+	m_mbus->sda_cb().set(FUNC(mcf5206e_device::mbus_sda_w));
+	m_mbus->scl_cb().set(FUNC(mcf5206e_device::mbus_scl_w));
+	m_mbus->irq_cb().set(FUNC(mcf5206e_device::mbus_irq_w));
 }
 
 void mcf5206e_device::device_start()
@@ -78,16 +95,6 @@ void mcf5206e_device::device_start()
 	init_cpu_coldfire();
 
 	init_regs(true);
-
-	m_swdt->watchdog_enable(0);
-
-	m_timer1 = timer_alloc( FUNC( mcf5206e_device::timer1_callback ), this );
-	m_timer2 = timer_alloc( FUNC( mcf5206e_device::timer2_callback ), this );
-	m_timer_swdt = timer_alloc( FUNC( mcf5206e_device::swdt_callback ), this );	// For interrupt version
-	m_timer_mbus = timer_alloc( FUNC( mcf5206e_device::mbus_callback ), this );
-
-	save_item(NAME(m_SIMR));
-	save_item(NAME(m_MARB));
 
 	save_item(NAME(m_DCRR));
 	save_item(NAME(m_DCTR));
@@ -98,156 +105,33 @@ void mcf5206e_device::device_start()
 	save_item(NAME(m_DCMR1));
 	save_item(NAME(m_DCCR1));
 
-	save_item(NAME(m_ICR));
 	save_item(NAME(m_CSAR));
 	save_item(NAME(m_CSMR));
 	save_item(NAME(m_CSCR));
 	save_item(NAME(m_DMCR));
 
-	save_item(NAME(m_PAR));
-	save_item(NAME(m_IMR));
-	save_item(NAME(m_IPR));
-	save_item(NAME(m_SYPCR));
-	save_item(NAME(m_SWIVR));
-	save_item(NAME(m_RSR));
-	save_item(NAME(m_swdt_w_count));
-	save_item(NAME(m_sypcr_locked));
-
-	save_item(NAME(m_TMR1));
-	save_item(NAME(m_TRR1));
-	save_item(NAME(m_TCR1));
-	save_item(NAME(m_TCN1));
-	save_item(NAME(m_TER1));
-	save_item(NAME(m_TMR2));
-	save_item(NAME(m_TRR2));
-	save_item(NAME(m_TCR2));
-	save_item(NAME(m_TCN2));
-	save_item(NAME(m_TER2));
-
 	save_item(NAME(m_PPDDR));
 	save_item(NAME(m_PPDATI));
 	save_item(NAME(m_PPDATO));
-	
-	save_item(NAME(m_MADR));
-	save_item(NAME(m_MBCR));
-	save_item(NAME(m_MBSR));
-	save_item(NAME(m_MFDR));
-	save_item(NAME(m_MBDR));
-
-	save_item(NAME(m_coldfire_regs));
 }
 
 void mcf5206e_device::device_reset()
 {
 	m68000_musashi_device::device_reset();
+	m_timer[0]->reset();
+	m_timer[1]->reset();
+	m_uart[0]->reset();
+	m_uart[1]->reset();
+	m_mbus->reset();
+
 	init_regs(false);
-	m_timer1->adjust(attotime::never);
-	m_timer2->adjust(attotime::never);
 }
-
-enum {
-	T_RST = (1 << 0),
-	T_CL0 = (1 << 1),
-	T_CL1 = (1 << 2),
-	T_FRR = (1 << 3),
-	T_ORI = (1 << 4),
-	T_OM  = (1 << 5),
-	T_CE0 = (1 << 6),
-	T_CE1 = (1 << 7),
-	T_PS0 = (1 << 8),
-	T_PS1 = (1 << 9),
-	T_PS2 = (1 << 10),
-	T_PS3 = (1 << 11),
-	T_PS4 = (1 << 12),
-	T_PS5 = (1 << 13),
-	T_PS6 = (1 << 14),
-	T_PS7 = (1 << 15)
-};
-
-enum {
-	T_ECAP = (1 << 0),
-	T_EREF = (1 << 1)
-};
-
-enum {
-	ICR1 = 0,	// Bit 1
-	ICR2,		// Bit 2
-	ICR3,		// Bit 3
-	ICR4,		// Bit 4
-	ICR5,		// Bit 5
-	ICR6,		// Bit 6
-	ICR7,       // Bit 7
-	ICR_SWDT,   // Bit 8
-	ICR_TMR1,   // Bit 9
-	ICR_TMR2,   // Bit 10
-	ICR_MBUS,   // Bit 11
-	ICR_UART1,  // Bit 12
-	ICR_UART2,  // Bit 13
-	ICR_DMA0,	// Bit 14
-	ICR_DMA1,	// Bit 15
-	MAX_ICR
-};
-
-// Pin assignment register
-enum {
-	PAR0 = (1 << 0),
-	PAR1 = (1 << 1),
-	PAR2 = (1 << 2),
-	PAR3 = (1 << 3),
-	PAR4 = (1 << 4),
-	PAR5 = (1 << 5),
-	PAR6 = (1 << 6),
-	PAR7 = (1 << 7),
-	PAR8 = (1 << 8),
-	PAR9 = (1 << 9),
-	PAR10 = (1 << 10),
-	PAR11 = (1 << 11),
-	PAR12 = (1 << 12),
-	PAR13 = (1 << 13),
-	PAR14 = (1 << 14),
-	PAR15 = (1 << 15)
-};
-
-// MBCR
-enum {
-	RSTA = (1 << 2),
-	TXAK = (1 << 3),
-	MTX  = (1 << 4),
-	MSTA = (1 << 5),
-	MIEN = (1 << 6),
-	MEN  = (1 << 7)
-};
 
 // should be set up in m68000_musashi_device::x4e7a_movec_l_c() to move this map according to the contents of MBAR
 void mcf5206e_device::coldfire_regs_map(address_map &map)
 {
 	/* SIM Module */
-	map(0xf0000003, 0xf0000003).rw(FUNC(mcf5206e_device::SIMR_r), FUNC(mcf5206e_device::SIMR_w));
-	map(0xf0000007, 0xf0000007).rw(FUNC(mcf5206e_device::MARB_r), FUNC(mcf5206e_device::MARB_w));
-
-	/* Interrupt Control Registers */
-	map(0xf0000014, 0xf0000014).rw(FUNC(mcf5206e_device::ICR1_r), FUNC(mcf5206e_device::ICR1_w));
-	map(0xf0000015, 0xf0000015).rw(FUNC(mcf5206e_device::ICR2_r), FUNC(mcf5206e_device::ICR2_w));
-	map(0xf0000016, 0xf0000016).rw(FUNC(mcf5206e_device::ICR3_r), FUNC(mcf5206e_device::ICR3_w));
-	map(0xf0000017, 0xf0000017).rw(FUNC(mcf5206e_device::ICR4_r), FUNC(mcf5206e_device::ICR4_w));
-	map(0xf0000018, 0xf0000018).rw(FUNC(mcf5206e_device::ICR5_r), FUNC(mcf5206e_device::ICR5_w));
-	map(0xf0000019, 0xf0000019).rw(FUNC(mcf5206e_device::ICR6_r), FUNC(mcf5206e_device::ICR6_w));
-	map(0xf000001a, 0xf000001a).rw(FUNC(mcf5206e_device::ICR7_r), FUNC(mcf5206e_device::ICR7_w));
-	map(0xf000001b, 0xf000001b).rw(FUNC(mcf5206e_device::ICR8_r), FUNC(mcf5206e_device::ICR8_w));
-	map(0xf000001c, 0xf000001c).rw(FUNC(mcf5206e_device::ICR9_r), FUNC(mcf5206e_device::ICR9_w));
-	map(0xf000001d, 0xf000001d).rw(FUNC(mcf5206e_device::ICR10_r), FUNC(mcf5206e_device::ICR10_w));
-	map(0xf000001e, 0xf000001e).rw(FUNC(mcf5206e_device::ICR11_r), FUNC(mcf5206e_device::ICR11_w));
-	map(0xf000001f, 0xf000001f).rw(FUNC(mcf5206e_device::ICR12_r), FUNC(mcf5206e_device::ICR12_w));
-	map(0xf0000020, 0xf0000020).rw(FUNC(mcf5206e_device::ICR13_r), FUNC(mcf5206e_device::ICR13_w));
-	map(0xf0000021, 0xf0000021).rw(FUNC(mcf5206e_device::ICR14_r), FUNC(mcf5206e_device::ICR14_w));
-	map(0xf0000022, 0xf0000022).rw(FUNC(mcf5206e_device::ICR15_r), FUNC(mcf5206e_device::ICR15_w));
-	map(0xf0000036, 0xf0000037).rw(FUNC(mcf5206e_device::IMR_r), FUNC(mcf5206e_device::IMR_w));
-	map(0xf000003a, 0xf000003b).r(FUNC(mcf5206e_device::IPR_r));
-
-	map(0xf0000040, 0xf0000040).rw(FUNC(mcf5206e_device::RSR_r), FUNC(mcf5206e_device::RSR_w));
-	map(0xf0000041, 0xf0000041).rw(FUNC(mcf5206e_device::SYPCR_r), FUNC(mcf5206e_device::SYPCR_w));
-	map(0xf0000042, 0xf0000042).rw(FUNC(mcf5206e_device::SWIVR_r), FUNC(mcf5206e_device::SWIVR_w));
-	map(0xf0000043, 0xf0000043).w(FUNC(mcf5206e_device::SWSR_w));
+	map(0xf0000000, 0xf00000cf).m(m_sim, FUNC(coldfire_sim_device::sim_map));
 
 	/* DRAM Controller */
 	map(0xf0000046, 0xf0000047).rw(FUNC(mcf5206e_device::DCRR_r), FUNC(mcf5206e_device::DCRR_w));
@@ -284,23 +168,11 @@ void mcf5206e_device::coldfire_regs_map(address_map &map)
 	map(0xf00000b8, 0xf00000bb).rw(FUNC(mcf5206e_device::CSAR7_r), FUNC(mcf5206e_device::CSAR7_w));
 	map(0xf00000bc, 0xf00000bf).rw(FUNC(mcf5206e_device::CSMR7_r), FUNC(mcf5206e_device::CSMR7_w));
 	map(0xf00000c0, 0xf00000c3).rw(FUNC(mcf5206e_device::CSCR7_r), FUNC(mcf5206e_device::CSCR7_w));
-
 	map(0xf00000c4, 0xf00000c7).rw(FUNC(mcf5206e_device::DMCR_r), FUNC(mcf5206e_device::DMCR_w));
-	map(0xf00000ca, 0xf00000cb).rw(FUNC(mcf5206e_device::PAR_r), FUNC(mcf5206e_device::PAR_w));
 
 	// Timer 1
-	map(0xf0000100, 0xf0000101).rw(FUNC(mcf5206e_device::TMR1_r), FUNC(mcf5206e_device::TMR1_w));
-	map(0xf0000104, 0xf0000105).rw(FUNC(mcf5206e_device::TRR1_r), FUNC(mcf5206e_device::TRR1_w));
-	map(0xf0000108, 0xf0000109).r(FUNC(mcf5206e_device::TCR1_r));	// TCR is r/only
-	map(0xf000010c, 0xf000010d).rw(FUNC(mcf5206e_device::TCN1_r), FUNC(mcf5206e_device::TCN1_w));
-	map(0xf0000111, 0xf0000111).rw(FUNC(mcf5206e_device::TER1_r), FUNC(mcf5206e_device::TER1_w));
-
-	// Timer 2
-	map(0xf0000120, 0xf0000121).rw(FUNC(mcf5206e_device::TMR2_r), FUNC(mcf5206e_device::TMR2_w));
-	map(0xf0000124, 0xf0000125).rw(FUNC(mcf5206e_device::TRR2_r), FUNC(mcf5206e_device::TRR2_w));
-	map(0xf0000128, 0xf0000129).r(FUNC(mcf5206e_device::TCR2_r));	// TCR is r/only
-	map(0xf000012c, 0xf000012d).rw(FUNC(mcf5206e_device::TCN2_r), FUNC(mcf5206e_device::TCN2_w));
-	map(0xf0000131, 0xf0000131).rw(FUNC(mcf5206e_device::TER2_r), FUNC(mcf5206e_device::TER2_w));
+	map(0xf0000100, 0xf000011f).m(m_timer[0], FUNC(coldfire_timer_device::timer_map));
+	map(0xf0000120, 0xf000013f).m(m_timer[1], FUNC(coldfire_timer_device::timer_map));
 
 	// UART (mc68681 derrived)
 	map(0xf0000140, 0xf000017c).rw(FUNC(mcf5206e_device::uart1_r), FUNC(mcf5206e_device::uart1_w));
@@ -311,94 +183,16 @@ void mcf5206e_device::coldfire_regs_map(address_map &map)
 	map(0xf00001c9, 0xf00001c9).rw(FUNC(mcf5206e_device::PPDAT_r), FUNC(mcf5206e_device::PPDAT_w));
 
 	// MBus (I2C)
-	map(0xf00001e0, 0xf00001e0).rw(FUNC(mcf5206e_device::MADR_r), FUNC(mcf5206e_device::MADR_w));
-	map(0xf00001e4, 0xf00001e4).rw(FUNC(mcf5206e_device::MFDR_r), FUNC(mcf5206e_device::MFDR_w));
-	map(0xf00001e8, 0xf00001e8).rw(FUNC(mcf5206e_device::MBCR_r), FUNC(mcf5206e_device::MBCR_w));
-	map(0xf00001ec, 0xf00001ec).rw(FUNC(mcf5206e_device::MBSR_r), FUNC(mcf5206e_device::MBSR_w));
-	map(0xf00001f0, 0xf00001f0).rw(FUNC(mcf5206e_device::MBDR_r), FUNC(mcf5206e_device::MBDR_w));
+	map(0xf00001e0, 0xf00001f3).m(m_mbus, FUNC(coldfire_mbus_device::mbus_map));
 }
 
-// SIM Configuration Register - Not really applicable to MAME as there's no BDM port currently but hey.
-// MBAR + 0x003
-uint8_t mcf5206e_device::SIMR_r(){
-	LOGMASKED(LOG_DEBUG, "%s: SIMR_r %02x\n", this->machine().describe_context(), m_SIMR);
-	return m_SIMR;
-}
-
-void  mcf5206e_device::SIMR_w(uint8_t data){
-	LOGMASKED(LOG_DEBUG, "%s: SIMR_w %02x\n", this->machine().describe_context(), data);
-	m_SIMR = data;
-}
-
-// Bus Master Arbitration Control
-// MBAR + 0x003
-uint8_t mcf5206e_device::MARB_r(){
-	LOGMASKED(LOG_DEBUG, "%s: (Bus Master Arbitration Control) MARB_r %02x\n", this->machine().describe_context(), m_MARB);
-	return m_MARB;
-}
-
-void mcf5206e_device::MARB_w(uint8_t data){
-	LOGMASKED(LOG_DEBUG, "%s: (Bus Master Arbitration Control) MARB_w %02x\n", this->machine().describe_context(), data);
-	m_MARB = data;
-}
-
-// MBAR + 0x014 -> 0x022
-uint8_t mcf5206e_device::ICRx_r(offs_t offset){
-	LOGMASKED(LOG_DEBUG, "%s: (Interrupt Control Register %d) read: %02x\n", this->machine().describe_context(), offset, m_ICR[offset]);
-	return m_ICR[offset - 1];
-}
-
-void mcf5206e_device::ICRx_w(offs_t offset, uint8_t data){
-	m_ICR[offset - 1] = data;
-	LOGMASKED(LOG_DEBUG, "%s: (Interrupt Control Register %d) write: %02x\n", this->machine().describe_context(), offset, data);
-	ICR_info(m_ICR[offset]);
-}
-
-/* SIM Module - Interrupts */
-// MBAR + 0x036
-uint16_t mcf5206e_device::IMR_r()
-{
-	LOGMASKED(LOG_DEBUG, "%s: (Interrupt Mask Register) IMR_r %04x\n", this->machine().describe_context(), m_IMR);
-	return m_IMR;
-}
-
-void mcf5206e_device::IMR_w(uint16_t data)
-{
-	m_IMR = (data & 0xFFFE);
-	LOGMASKED(LOG_DEBUG, "%s: (Interrupt Mask Register) IMR_w %04x\n", this->machine().describe_context(), data);
-}
-
-// MBAR + 0x03A
-uint16_t mcf5206e_device::IPR_r()
-{
-	LOGMASKED(LOG_DEBUG, "%s: (Interrupt Pending Register) IPR_r\n", this->machine().describe_context());
-	return m_IPR;
-}
-
-
-void mcf5206e_device::ICR_info(uint8_t ICR)
-{
-	LOGMASKED(LOG_DEBUG, "  (AutoVector) AVEC : %01x | ", (ICR&0x80)>>7);
-	LOGMASKED(LOG_DEBUG, "(Interrupt Level) IL : %01x | ", INT_LEVEL(ICR)); // if autovector (AVEC) is used then the vectors referenced are at +24 (+0x18) + IL, ie the standard 68k autovectors, otherwise vector must be provided by device
-	LOGMASKED(LOG_DEBUG, "(Interrupt Priority) IP : %01x |", (ICR&0x03)>>0);
-	LOGMASKED(LOG_DEBUG, "(Unused bits) : %01x\n", (ICR&0x60)>>5);
-}
-
-
-/* DRAM Controller */
-uint16_t mcf5206e_device::DCRR_r(){
-	LOGMASKED(LOG_DRAM, "%s: (DRAM Controller Refresh Register) DCRR_r: %04x\n", this->machine().describe_context(), m_DCRR);
-	return m_DCRR;
-}
-
+/* 
+ * DRAM Controller
+ * Handles the DRAM refresh and access control circuits
+ */
 void mcf5206e_device::DCRR_w(uint16_t data){
 	LOGMASKED(LOG_DRAM, "%s: (DRAM Controller Refresh Register) DCRR_w: %04x\n", this->machine().describe_context(), data);
 	m_DCRR = data;
-}
-
-uint16_t mcf5206e_device::DCTR_r(){
-	LOGMASKED(LOG_DRAM, "%s: (DRAM Controller Timing Register) DCTR_r: %04x\n", this->machine().describe_context(), m_DCTR);
-	return m_DCTR;
 }
 
 void mcf5206e_device::DCTR_w(uint16_t data){
@@ -406,19 +200,9 @@ void mcf5206e_device::DCTR_w(uint16_t data){
 	m_DCTR = data;
 }
 
-uint16_t mcf5206e_device::DCAR0_r(){
-	LOGMASKED(LOG_DRAM, "%s: (DRAM Controller Access Register 0) DCAR0_r: %04x\n", this->machine().describe_context(), m_DCAR0);
-	return m_DCAR0;
-}
-
 void mcf5206e_device::DCAR0_w(uint16_t data){
 	LOGMASKED(LOG_DRAM, "%s: (DRAM Controller Access Register 0) DCAR0_w: %04x\n", this->machine().describe_context(), data);
 	m_DCAR0 = data;
-}
-
-uint32_t mcf5206e_device::DCMR0_r(){
-	LOGMASKED(LOG_DRAM, "%s: (DRAM Controller Mask Register 0) DCMR0_r: %08x\n", this->machine().describe_context(), m_DCMR0);
-	return m_DCMR0;
 }
 
 void mcf5206e_device::DCMR0_w(uint32_t data){
@@ -426,19 +210,9 @@ void mcf5206e_device::DCMR0_w(uint32_t data){
 	m_DCMR0 = data;
 }
 
-uint8_t mcf5206e_device::DCCR0_r(){
-	LOGMASKED(LOG_DRAM, "%s: (DRAM Controller Control Register 0) DCCR0_r: %04x\n", this->machine().describe_context(), m_DCCR0);
-	return m_DCCR0;
-}
-
 void mcf5206e_device::DCCR0_w(uint8_t data){
 	LOGMASKED(LOG_DRAM, "%s: (DRAM Controller Control Register 0) DCCR0_w: %04x\n", this->machine().describe_context(), data);
 	m_DCCR0 = data;
-}
-
-uint16_t mcf5206e_device::DCAR1_r(){
-	LOGMASKED(LOG_DRAM, "%s: (DRAM Controller Access Register 1) DCAR1_r: %04x\n", this->machine().describe_context(), m_DCAR1);
-	return m_DCAR1;
 }
 
 void mcf5206e_device::DCAR1_w(uint16_t data){
@@ -446,19 +220,9 @@ void mcf5206e_device::DCAR1_w(uint16_t data){
 	m_DCAR1 = data;
 }
 
-uint32_t mcf5206e_device::DCMR1_r(){
-	LOGMASKED(LOG_DRAM, "%s: (DRAM Controller Mask Register 1) DCMR1_r: %08x\n", this->machine().describe_context(), m_DCMR1);
-	return m_DCMR1;
-}
-
 void mcf5206e_device::DCMR1_w(uint32_t data){
 	LOGMASKED(LOG_DRAM, "%s: (DRAM Controller Mask Register 1) DCMR1_w: %04x\n", this->machine().describe_context(), data);
 	m_DCMR1 = data;
-}
-
-uint8_t mcf5206e_device::DCCR1_r(){
-	LOGMASKED(LOG_DRAM, "%s: (DRAM Controller Control Register 1) DCCR1_r: %04x\n", this->machine().describe_context(), m_DCCR1);
-	return m_DCCR1;
 }
 
 void mcf5206e_device::DCCR1_w(uint8_t data){
@@ -466,115 +230,10 @@ void mcf5206e_device::DCCR1_w(uint8_t data){
 	m_DCCR1 = data;
 }
 
-// Decides whether to forward interrupt to CPU or not
-void mcf5206e_device::set_interrupt(IntSrc interrupt){
-	LOG("set_interrupt(%d): %d, %d", interrupt, BIT(m_IMR, interrupt), m_IMR & interrupt);
-	if(!BIT(m_IMR, interrupt)){
-		uint8_t ICR = 0;
-		uint8_t vector = ~0;
-		uint32_t intbit = (1 << interrupt);
-		
-		m_IPR = ((m_IPR & ~intbit) | intbit);
-
-		switch (interrupt){
-			case WDINT: 								// Never autovector
-				ICR = m_ICR[ICR_SWDT]; 
-				vector = m_SWIVR;
-				break;	
-			case TINT1:	ICR = m_ICR[ICR_TMR1]; break;	// Always autovector
-			case TINT2: ICR = m_ICR[ICR_TMR2]; break;	// Always autovector
-			case MBINT: ICR = m_ICR[ICR_MBUS]; break;	// Always autovector
-			case UINT1: 
-				ICR = m_ICR[ICR_UART1];
-				if (!ICR_USE_AUTOVEC(ICR)) vector = m_uart[0]->get_irq_vector();
-				break;
-			case UINT2: 
-				ICR = m_ICR[ICR_UART2];
-				if (!ICR_USE_AUTOVEC(ICR)) vector = m_uart[1]->get_irq_vector();
-				break;
-			
-			default: return;
-		}
-
-		if (ICR_USE_AUTOVEC(ICR)){
-			LOGMASKED(LOG_DEBUG, "%s: Interrupt from %d: ICR: %02x\n", this->machine().describe_context(), interrupt, ICR);
-			set_input_line_and_vector(INT_LEVEL(ICR), HOLD_LINE, INT_LEVEL(ICR) + 24);
-		} else {
-			LOGMASKED(LOG_DEBUG, "%s: Interrupt & vector from %d: ICR: %02x, Vector: %02x\n", this->machine().describe_context(), interrupt, ICR, vector);
-			set_input_line_and_vector(INT_LEVEL(ICR), HOLD_LINE, vector);
-		}
-		
-	}
-}
-
-/* Reset status */
-// MBAR + 0x040
-uint8_t mcf5206e_device::RSR_r()
-{
-	LOGMASKED(LOG_DEBUG, "%s: (Reset Status Register) RSR_r %02x\n", this->machine().describe_context(), m_RSR);
-	return m_RSR;
-}
-
-void mcf5206e_device::RSR_w(uint8_t data)
-{
-	m_RSR &= ~data;
-	LOGMASKED(LOG_DEBUG, "%s: (Reset Status Register) IPR_w %02x\n", this->machine().describe_context(), data);
-}
-
-/* Watchdog */
-// MBAR + 0x041
-uint8_t mcf5206e_device::SYPCR_r(){
-	LOGMASKED(LOG_SWDT, "%s: (System Protection Control) SYPCR_r %02x\n", this->machine().describe_context(), m_SYPCR);
-	return m_SYPCR;
-}
-
-void mcf5206e_device::SYPCR_w(uint8_t data){
-	if(!m_sypcr_locked){
-		// SYPCR is a write-once register, whatever is written first remains until system reset.
-		LOGMASKED(LOG_SWDT, "%s: (System Protection Control) SYPCR_w %02x\n", this->machine().describe_context(), data);
-		m_sypcr_locked = true;
-		m_SYPCR = data;
-
-		// Bus monitoring is not supported (nor will it be?)
-
-		if(BIT(m_SYPCR, 6)){
-			m_swdt->watchdog_enable(BIT(data, 7));
-		} else {
-			// Set timer for interrupt
-		}
-	} else {
-		LOG("%s: Write to SYPCR_w (%02x) when PCR is locked\n", this->machine().describe_context(), data);
-	}
-}
-
-// MBAR + 0x042
-uint8_t mcf5206e_device::SWIVR_r(){
-	LOGMASKED(LOG_SWDT, "%s: (Software Watchdog Interrupt Vector) SWIVR_r %02x\n", this->machine().describe_context(), m_SWIVR);
-	return m_SWIVR;
-}
-
-void mcf5206e_device::SWIVR_w(uint8_t data){
-	LOGMASKED(LOG_SWDT, "%s: (Software Watchdog Interrupt Vector) SWIVR_w %02x\n", this->machine().describe_context(), data);
-	m_SWIVR = data;
-}
-
-// MBAR + 0x043
-void mcf5206e_device::SWSR_w(uint8_t data){
-	LOGMASKED(LOG_SWDT, "%s: (Software Watchdog Service Routine) SWIVR_r %02x\n", this->machine().describe_context(), data);
-	if(data == swdt_reset_sequence[m_swdt_w_count]) m_swdt_w_count++;
-	if(m_swdt_w_count == 2) {
-		m_swdt->watchdog_reset();
-		m_swdt_w_count = 0;
-	}
-}
-
-TIMER_CALLBACK_MEMBER(mcf5206e_device::swdt_callback)
-{
-	set_interrupt(WDINT);
-}
-
-
-/* Chip Select Module */
+/* 
+ * Chip Select Module 
+ * Controls what address spaces that the configurable chip select pins will be assigned to.
+ */
 
 inline uint16_t mcf5206e_device::CSARx_r(offs_t offset)
 {
@@ -612,12 +271,6 @@ inline void mcf5206e_device::CSCRx_w(offs_t offset, uint16_t data)
 	LOGMASKED(LOG_DEBUG, "%s: (Chip Select Control Register) CSCR%d_w %04x\n", this->machine().describe_context(), offset, data);
 }
 
-uint16_t mcf5206e_device::DMCR_r()
-{
-	LOGMASKED(LOG_DEBUG, "%s: (Default Memory Control Register) DMCR_r %04x\n", this->machine().describe_context(), m_DMCR);
-	return m_DMCR;
-}
-
 void mcf5206e_device::DMCR_w(uint16_t data)
 {
 	m_DMCR = data;
@@ -625,25 +278,17 @@ void mcf5206e_device::DMCR_w(uint16_t data)
 }
 
 
-uint16_t mcf5206e_device::PAR_r()
-{
-	LOGMASKED(LOG_DEBUG, "%s: (Pin Assignment Register) PAR_r %04x\n", this->machine().describe_context(), m_PAR);
-	return m_PAR;
+/*  
+ * Parallel port 
+ * Just a 8 bit GPIO. Nothing to see here
+ */
+
+void mcf5206e_device::gpio_pin_w(int pin, int state){
+	BITWRITE(m_PPDATI, pin, state);
 }
 
-void mcf5206e_device::PAR_w(uint16_t data)
-{
-	m_PAR = data;
-	LOGMASKED(LOG_DEBUG, "%s: (Pin Assignment Register) PAR_w %04x\n", this->machine().describe_context(), data);
-}
-
-
-/* Parallel port */
-
-uint8_t mcf5206e_device::PPDDR_r()
-{
-	LOGMASKED(LOG_DEBUG, "%s: (Port A Data Direction Register) PPDDR_r\n", this->machine().describe_context());
-	return m_PPDDR;
+void mcf5206e_device::gpio_port_w(u8 state){
+	m_PPDATI = state;
 }
 
 void mcf5206e_device::PPDDR_w(uint8_t data)
@@ -653,20 +298,14 @@ void mcf5206e_device::PPDDR_w(uint8_t data)
 	if(m_PPDDR != data){
 		// Updating the register updates the pins immediately
 		uint8_t mask = 0;
-		if(!(m_PAR & PAR4)) mask |= 0x0F;	// PP 0-3 / DDATA 0-3
-		if(!(m_PAR & PAR5)) mask |= 0xF0;	// PP 4-7 / PST 0-3
+		if(!BIT(m_sim->get_par(), 4)) mask |= 0x0F;	// PP 0-3 / DDATA 0-3
+		if(!BIT(m_sim->get_par(), 5)) mask |= 0xF0;	// PP 4-7 / PST 0-3
 
-		m_gpio_w_cb(m_PPDATO, (m_PPDDR & mask));
+		// GPIO pins will physically be set to the current input and output state, and masked according to PAR
+		m_gpio_w_cb(((m_PPDATO & m_PPDDR) | (m_PPDATI & ~m_PPDDR)) & mask);
 	}
 
 	m_PPDDR = data;
-}
-
-uint8_t mcf5206e_device::PPDAT_r()
-{
-	LOGMASKED(LOG_DEBUG, "%s: (Port A Data Register) PPDAT_r\n", this->machine().describe_context());
-	m_PPDATI = (m_gpio_r_cb() | (m_PPDATO & m_PPDDR));	// Return the inputs and current outputs
-	return m_PPDATI;
 }
 
 void mcf5206e_device::PPDAT_w(uint8_t data)
@@ -675,286 +314,376 @@ void mcf5206e_device::PPDAT_w(uint8_t data)
 	m_PPDATO = data;
 
 	uint8_t mask = 0;
-	if(!(m_PAR & PAR4)) mask |= 0x0F;	// PP 0-3 / DDATA 0-3
-	if(!(m_PAR & PAR5)) mask |= 0xF0;	// PP 4-7 / PST 0-3
+	if(!BIT(m_sim->get_par(), 4)) mask |= 0x0F;	// PP 0-3 / DDATA 0-3
+	if(!BIT(m_sim->get_par(), 5)) mask |= 0xF0;	// PP 4-7 / PST 0-3
 
-	m_gpio_w_cb(m_PPDATO, (m_PPDDR & mask));
+	m_gpio_w_cb(((m_PPDATO & m_PPDDR) | (m_PPDATI & ~m_PPDDR)) & mask);
 }
 
 
-/* MBUS */
+/* 
+ * System Integration Module
+ * Handles the interrupt system and bus
+*/
 
-TIMER_CALLBACK_MEMBER(mcf5206e_device::mbus_callback){
-
-}
-
-uint8_t mcf5206e_device::MADR_r()
+coldfire_sim_device::coldfire_sim_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) : 
+	device_t(mconfig, COLDFIRE_SIM, tag, owner, clock)
+	, m_maincpu(*this, finder_base::DUMMY_TAG)
+	, m_swdt(*this, "watchdog")
 {
-	LOGMASKED(LOG_MBUS, "%s: (M-Bus Control Register) MADR_r: %02x\n", this->machine().describe_context(), m_MADR);
-	return m_MADR;
 }
 
-void mcf5206e_device::MADR_w(uint8_t data)
-{
-	m_MADR = (data & 0xFE);
-	LOGMASKED(LOG_MBUS, "%s: (M-Bus Control Register) MADR_w: %02x\n", this->machine().describe_context(), data);
+void coldfire_sim_device::device_add_mconfig(machine_config &config){
+	WATCHDOG_TIMER(config, m_swdt);
 }
 
-uint8_t mcf5206e_device::MFDR_r()
-{
-	LOGMASKED(LOG_MBUS, "%s: (M-Bus Frequency Divider Register) MFDR_r: %02x\n", this->machine().describe_context(), m_MFDR);
-	return m_MFDR;
+void coldfire_sim_device::device_start(){
+
+	m_swdt->watchdog_enable(0);
+	m_timer_swdt = timer_alloc( FUNC( coldfire_sim_device::swdt_callback ), this );	// For interrupt version
+
+	save_item(NAME(m_SIMR));
+	save_item(NAME(m_MARB));
+
+	save_item(NAME(m_PAR));
+	save_item(NAME(m_ICR));
+	save_item(NAME(m_IMR));
+	save_item(NAME(m_IPR));
+	save_item(NAME(m_SYPCR));
+	save_item(NAME(m_SWIVR));
+	save_item(NAME(m_RSR));
+	save_item(NAME(m_swdt_w_count));
+	save_item(NAME(m_sypcr_locked));
+	save_item(NAME(m_external_ipl));
 }
 
-void mcf5206e_device::MFDR_w(uint8_t data)
-{
-	m_MFDR = (data & 0x3F);
-	LOGMASKED(LOG_MBUS, "%s: (M-Bus Frequency Divider Register) MFDR_w: %02x\n", this->machine().describe_context(), data);
+void coldfire_sim_device::device_reset(){
+	if(!(m_RSR & 0x20)) m_RSR = 0x00;	// Don't clear if watchdog triggered
+	else m_RSR = 0x70;
+
+	m_SIMR = 0xc0;
+	m_MARB = 0x00;
+	m_IPR = 0x3FFE;
+	m_SYPCR	= 0x00;
+	m_SWIVR = 0x0F;
+	m_IMR = 0x3FFE;
+	m_IPR = 0x0000;
+	m_PAR = 0x0000;
+
+	m_swdt_w_count = 0;
+	m_sypcr_locked = false;
+
+	m_ICR[ICR1] =   0x04;
+	m_ICR[ICR2] =   0x08;
+	m_ICR[ICR3] =   0x0C;
+	m_ICR[ICR4] =   0x10;
+	m_ICR[ICR5] =   0x14;
+	m_ICR[ICR6] =   0x18;
+	m_ICR[ICR7] =   0x1C;
+	m_ICR[ICR_SWDT] =   0x1C;
+	m_ICR[ICR_TMR1] =   0x80;
+	m_ICR[ICR_TMR2] =  0x80;
+	m_ICR[ICR_MBUS] =  0x80;
+	m_ICR[ICR_UART1] =  0x00;
+	m_ICR[ICR_UART2] =  0x00;
+	m_ICR[ICR_DMA0] =  0x00;
+	m_ICR[ICR_DMA1] =  0x00;
+
+	m_external_ipl = 0;
 }
 
-uint8_t mcf5206e_device::MBCR_r()
-{
-	LOGMASKED(LOG_MBUS, "%s: (M-Bus Control Register) MBCR_r: %02x\n", this->machine().describe_context(), m_MBCR);
-	return m_MBCR;
+void coldfire_sim_device::sim_map(address_map &map){
+	map(0x03, 0x03).rw(FUNC(coldfire_sim_device::SIMR_r), FUNC(coldfire_sim_device::SIMR_w));
+	map(0x07, 0x07).rw(FUNC(coldfire_sim_device::MARB_r), FUNC(coldfire_sim_device::MARB_w));
+
+	/* Interrupt Control Registers */
+	map(0x14, 0x22).rw(FUNC(coldfire_sim_device::ICR_r), FUNC(coldfire_sim_device::ICR_w));
+	map(0x36, 0x37).rw(FUNC(coldfire_sim_device::IMR_r), FUNC(coldfire_sim_device::IMR_w));
+	map(0x3a, 0x3b).r(FUNC(coldfire_sim_device::IPR_r));
+
+	map(0x40, 0x40).rw(FUNC(coldfire_sim_device::RSR_r), FUNC(coldfire_sim_device::RSR_w));
+	map(0x41, 0x41).rw(FUNC(coldfire_sim_device::SYPCR_r), FUNC(coldfire_sim_device::SYPCR_w));
+	map(0x42, 0x42).rw(FUNC(coldfire_sim_device::SWIVR_r), FUNC(coldfire_sim_device::SWIVR_w));
+	map(0x43, 0x43).w(FUNC(coldfire_sim_device::SWSR_w));
+
+	map(0xca, 0xcb).rw(FUNC(coldfire_sim_device::PAR_r), FUNC(coldfire_sim_device::PAR_w));
 }
 
-void mcf5206e_device::MBCR_w(uint8_t data)
-{
-	m_MBCR = (data & 0xFC);
-	LOGMASKED(LOG_MBUS, "%s: (M-Bus Control Register) MBCR_w: %02x\n", this->machine().describe_context(), data);
+// MBAR + 0x003: SIM Configuration Register - Not really applicable to MAME as there's no BDM port currently but hey.
+void  coldfire_sim_device::SIMR_w(uint8_t data){
+	LOGMASKED(LOG_DEBUG, "%s: SIMR_w %02x\n", this->machine().describe_context(), data);
+	m_SIMR = data;
 }
 
-uint8_t mcf5206e_device::MBSR_r()
-{
-	int hack = 0x00;
-
-	hack ^= (machine().rand()&0xff);
-	LOGMASKED(LOG_MBUS, "%s: (M-Bus Status Register) MBSR_r: %02x\n", this->machine().describe_context(), m_MBSR);
-	return m_MBSR ^ hack; // will loop on this after a while
+// MBAR + 0x003: Bus Master Arbitration Control
+void coldfire_sim_device::MARB_w(uint8_t data){
+	LOGMASKED(LOG_DEBUG, "%s: (Bus Master Arbitration Control) MARB_w %02x\n", this->machine().describe_context(), data);
+	m_MARB = data;
 }
 
-void mcf5206e_device::MBSR_w(uint8_t data)
-{
-	m_MBSR = (data & 0x14);	// MAL & MIF
-	LOGMASKED(LOG_MBUS, "%s: (M-Bus Status Register) MBSR_w: %02x\n", this->machine().describe_context(), data);
+// MBAR + 0x014 -> 0x022: Interupt Control Registers
+uint8_t coldfire_sim_device::ICR_r(offs_t offset){
+	if(offset > 15){
+		logerror("%s: Request to read invalid ICR offset received: %d", this->machine().describe_context(), offset);
+		return 0;
+	}
+	LOGMASKED(LOG_DEBUG, "%s: (Interrupt Control Register %d) read: %02x\n", this->machine().describe_context(), offset, m_ICR[offset]);
+	return m_ICR[offset];
 }
 
-uint8_t mcf5206e_device::MBDR_r()
-{
-	int hack = 0x00;
-	hack ^= (machine().rand()&0xff);
-	LOGMASKED(LOG_MBUS, "%s: (M-Bus Data I/O Register) MBDR_r: %02x\n", this->machine().describe_context(), m_MBDR);
-	return m_MBDR ^ hack;
+void coldfire_sim_device::ICR_w(offs_t offset, uint8_t data){
+	switch (offset){
+		case 0: m_ICR[offset] = (data & 0x83) + (1 << 2); break;
+		case 1: m_ICR[offset] = (data & 0x83) + (2 << 2); break;
+		case 2: m_ICR[offset] = (data & 0x83) + (3 << 2); break;
+		case 3: m_ICR[offset] = (data & 0x83) + (4 << 2); break;
+		case 4: m_ICR[offset] = (data & 0x83) + (5 << 2); break;
+		case 5: m_ICR[offset] = (data & 0x83) + (6 << 2); break;
+		case 6: m_ICR[offset] = (data & 0x83) + (7 << 2); break;
+		case 7: m_ICR[offset] = (data & 0x03) + (7 << 2); break;	// IPL7 and SWDT share same level, also you cannot use autovector on SWT.
+		case 8: m_ICR[offset] = (data & 0x1F) + 0x80; break;		// Timer 1 *must* use autovector
+		case 9: m_ICR[offset] = (data & 0x1F) + 0x80; break;		// Timer 2 *must* use autovector
+		case 10: m_ICR[offset] = (data & 0x1F) + 0x80; break;		// MBUS *must* use autovector
+		case 11: m_ICR[offset] = (data & 0x9F); break;
+		case 12: m_ICR[offset] = (data & 0x9F); break;
+		case 13: m_ICR[offset] = (data & 0x9F); break;
+		case 14: m_ICR[offset] = (data & 0x9F); break;
+		default: logerror("%s: Implausible ICR offset received: %d", this->machine().describe_context(), offset);
+	}
+	//ICR_info(m_ICR[offset]);
 }
 
-void mcf5206e_device::MBDR_w(uint8_t data)
+// MBAR + 0x036: Interrupt Mask Register
+void coldfire_sim_device::IMR_w(uint16_t data)
 {
-	m_MBDR = data;
-	LOGMASKED(LOG_MBUS, "%s: (M-Bus Data I/O Register) MBDR_w: %02x\n", this->machine().describe_context(), data);
+	m_IMR = (data & 0xFFFE);
+	LOGMASKED(LOG_DEBUG, "%s: (Interrupt Mask Register) IMR_w %04x\n", this->machine().describe_context(), data);
 }
 
-/* Timer 1 */
-
-TIMER_CALLBACK_MEMBER(mcf5206e_device::timer1_callback)
+void coldfire_sim_device::ICR_info(uint8_t ICR)
 {
-	if(m_TMR1 & T_RST){
-		//LOGMASKED(LOG_DEBUG, "timer1_callback\n");
-		if ((m_TMR1 & T_CL0) || (m_TMR1 & T_CL0)){
-			// Counter is running
-			m_TCN1++;
-		}
-		
-		if(m_TCN1 == m_TRR1 && !(m_TER1 & T_EREF)){
-			if(m_TMR1& T_FRR){
-				// FRR resets counter to 0
-				m_TCN1 = 0;
-			}
-			m_TER1 |= T_EREF;
+	LOGMASKED(LOG_DEBUG, "  (AutoVector) AVEC : %01x | ", (ICR&0x80)>>7);
+	LOGMASKED(LOG_DEBUG, "(Interrupt Level) IL : %01x | ", INT_LEVEL(ICR)); // if autovector (AVEC) is used then the vectors referenced are at +24 (+0x18) + IL, ie the standard 68k autovectors, otherwise vector must be provided by device
+	LOGMASKED(LOG_DEBUG, "(Interrupt Priority) IP : %01x |", (ICR&0x03)>>0);
+	LOGMASKED(LOG_DEBUG, "(Unused bits) : %01x\n", (ICR&0x60)>>5);
+}
 
-			// technically we should do the vector check in the IRQ callback as well as various checks based on the IRQ masks before asserting the interrupt
-			set_interrupt(TINT1);
+void coldfire_sim_device::PAR_w(uint16_t data)
+{
+	m_PAR = data;
+	LOGMASKED(LOG_DEBUG, "%s: (Pin Assignment Register) PAR_w %04x\n", this->machine().describe_context(), data);
+}
+
+void coldfire_sim_device::set_external_interrupt(int level, int state){
+	// State here is inverted, inputs are active low
+	if(BIT(m_PAR, 6)){
+		// External IPL pins are encoded (IPL 1-7 levels)
+		m_external_ipl = level;
+	} else {
+		// External IPL pins are discrete (IRQ1, IRQ4, IRQ7)
+		switch(level){
+			case 1: BITWRITE(m_external_ipl, 0, state); break;
+			case 4: BITWRITE(m_external_ipl, 1, state); break;
+			case 7: BITWRITE(m_external_ipl, 2, state); break;
+			default: break;
 		}
 	}
 }
 
-uint16_t mcf5206e_device::TMR1_r()
-{
-	LOGMASKED(LOG_TIMER, "%s: (Timer 1 Mode Register) TMR1_r: %04x\n", this->machine().describe_context(), m_TMR1);
-	return m_TMR1;
+// Decides whether to forward interrupt to CPU or not
+void coldfire_sim_device::set_interrupt(int interrupt){
+	LOG("set_interrupt(%d): %d, %d", interrupt, BIT(m_IMR, interrupt), m_IMR & interrupt);
+	if(!BIT(m_IMR, interrupt)){
+		uint8_t ICR = 0;
+		uint8_t vector = ~0;
+		uint32_t intbit = (1 << interrupt);
+		
+		m_IPR = ((m_IPR & ~intbit) | intbit);
+	
+		switch (interrupt){
+			case WATCHDOG_IRQ: 								// Never autovector
+				ICR = m_ICR[ICR_SWDT]; 
+				vector = m_SWIVR;
+				break;	
+			case TIMER_1_IRQ:	ICR = m_ICR[ICR_TMR1]; break;	// Always autovector
+			case TIMER_2_IRQ: 	ICR = m_ICR[ICR_TMR2]; break;	// Always autovector
+			case MBUS_IRQ: 		ICR = m_ICR[ICR_MBUS]; break;	// Always autovector
+			case UART_1_IRQ: 
+				ICR = m_ICR[ICR_UART1];
+				if (!ICR_USE_AUTOVEC(ICR)) vector = m_maincpu->m_uart[0]->get_irq_vector();
+				break;
+			case UART_2_IRQ: 
+				ICR = m_ICR[ICR_UART2];
+				if (!ICR_USE_AUTOVEC(ICR)) vector = m_maincpu->m_uart[1]->get_irq_vector();
+				break;
+			
+			default: return;
+		}
+
+		if (ICR_USE_AUTOVEC(ICR)){
+			//LOGMASKED(LOG_DEBUG, "%s: Interrupt from %d: ICR: %02x\n", this->machine().describe_context(), interrupt, ICR);
+			m_maincpu->set_input_line(INT_LEVEL(ICR), HOLD_LINE);
+		} else {
+			LOGMASKED(LOG_DEBUG, "%s: Interrupt & vector from %d: ICR: %02x, Vector: %02x\n", this->machine().describe_context(), interrupt, ICR, vector);
+			//m_maincpu->set_input_line(INT_LEVEL(ICR), HOLD_LINE);
+		}
+
+	}
 }
 
-void mcf5206e_device::TMR1_w(uint16_t data)
+/* Reset status */
+// MBAR + 0x040
+void coldfire_sim_device::RSR_w(uint8_t data)
+{
+	m_RSR &= ~data;
+	LOGMASKED(LOG_DEBUG, "%s: (Reset Status Register) IPR_w %02x\n", this->machine().describe_context(), data);
+}
+
+/* Watchdog */
+// MBAR + 0x041
+void coldfire_sim_device::SYPCR_w(uint8_t data){
+	if(!m_sypcr_locked){
+		// SYPCR is a write-once register, whatever is written first remains until system reset.
+		LOGMASKED(LOG_SWDT, "%s: (System Protection Control) SYPCR_w %02x\n", this->machine().describe_context(), data);
+		m_sypcr_locked = true;
+		m_SYPCR = data;
+
+		// Bus monitoring is not supported (nor will it be?)
+
+		if(BIT(m_SYPCR, 6)){
+			m_swdt->watchdog_enable(BIT(data, 7));
+		} else {
+			// Set timer for interrupt
+		}
+	} else {
+		LOG("%s: Write to SYPCR_w (%02x) when PCR is locked\n", this->machine().describe_context(), data);
+	}
+}
+
+// MBAR + 0x042
+void coldfire_sim_device::SWIVR_w(uint8_t data){
+	LOGMASKED(LOG_SWDT, "%s: (Software Watchdog Interrupt Vector) SWIVR_w %02x\n", this->machine().describe_context(), data);
+	m_SWIVR = data;
+}
+
+// MBAR + 0x043
+void coldfire_sim_device::SWSR_w(uint8_t data){
+	LOGMASKED(LOG_SWDT, "%s: (Software Watchdog Service Routine) SWIVR_r %02x\n", this->machine().describe_context(), data);
+	if(data == swdt_reset_sequence[m_swdt_w_count]) m_swdt_w_count++;
+	if(m_swdt_w_count == 2) {
+		m_swdt->watchdog_reset();
+		m_swdt_w_count = 0;
+	}
+}
+
+TIMER_CALLBACK_MEMBER(coldfire_sim_device::swdt_callback)
+{
+	// Todo
+	//set_interrupt(WDINT);
+}
+
+/* 
+ * Timer Module/s 
+ * Creates an MCF5206e compatible 16-bit timer
+ */
+coldfire_timer_device::coldfire_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) : 
+	device_t(mconfig, COLDFIRE_TIMER, tag, owner, clock)
+	, m_timer_irq(*this)
+{
+}
+
+void coldfire_timer_device::timer_map(address_map &map){
+	map(0x00, 0x01).rw(FUNC(coldfire_timer_device::TMR_r), FUNC(coldfire_timer_device::TMR_w));
+	map(0x04, 0x05).rw(FUNC(coldfire_timer_device::TRR_r), FUNC(coldfire_timer_device::TRR_w));
+	map(0x08, 0x09).r(FUNC(coldfire_timer_device::TCR_r));	// TCR is r/only
+	map(0x0c, 0x0d).rw(FUNC(coldfire_timer_device::TCN_r), FUNC(coldfire_timer_device::TCN_w));
+	map(0x11, 0x11).rw(FUNC(coldfire_timer_device::TER_r), FUNC(coldfire_timer_device::TER_w));
+}
+
+void coldfire_timer_device::device_start(){
+	m_timer = timer_alloc( FUNC( coldfire_timer_device::timer_callback ), this );
+
+	save_item(NAME(m_TMR));
+	save_item(NAME(m_TRR));
+	save_item(NAME(m_TCR));
+	save_item(NAME(m_TCN));
+	save_item(NAME(m_TER));
+	save_item(NAME(m_timer_start_time));
+}
+
+void coldfire_timer_device::device_reset(){
+	m_TMR = 0x0000;
+	m_TRR = 0xffff;
+	m_TCN = 0x0000;
+	m_TCR = 0x0000;
+	m_TER = 0x00;
+	m_timer_start_time = attotime::zero;
+	m_timer->adjust(attotime::never);
+}
+
+TIMER_CALLBACK_MEMBER(coldfire_timer_device::timer_callback)
+{
+	if(m_TMR& T_FRR){
+		// FRR resets counter to 0
+		m_TCN = 0;
+	}
+	m_TER |= T_EREF;
+	m_timer_irq(0);
+}
+
+void coldfire_timer_device::TMR_w(uint16_t data)
 {
 	uint16_t cmd = data;
 
-	if((m_TMR1 & T_RST) && !(cmd & T_RST)){
+	if((m_TMR & T_RST) && !(cmd & T_RST)){
 		// T_RST High to low resets the entire timer
-		m_TMR1 = 0;
-		m_TRR1 = 0xFFFF;
-		m_TCN1 = 0;
-		m_TCR1 = 0;
-		m_TER1 = 0;
-		m_timer1->adjust(attotime::never);
+		device_reset();
 		return;
 	}
 
-	m_TMR1 = cmd;
+	m_TMR = cmd;
 
-	if (m_TMR1 & T_RST){
+	if (m_TMR & T_RST){
 		// TODO: Add TIN pin support
-		int div;
-		div = ((m_TMR1 & 0xFF00) >> 8) + 1; // 1 -> 256 division scale
-		if ((m_TMR1 & T_CL1) && !(m_TMR1 & T_CL0)) div = div * 16;	// Input clock / 16
-		m_timer1->adjust(clocks_to_attotime(div), 0, clocks_to_attotime(div));
+		int div, start, interval;
+		start = (m_TRR - m_TCN);
+		div = ((m_TMR & 0xFF00) >> 8) + 1; 						// 1 -> 256 division scale
+		if ((m_TMR & T_CL1) && !(m_TMR & T_CL0)) div = div * 16;	// Input clock / 16
+		if (!(m_TMR & T_FRR)) interval = (0xffff * div);			// Don't reset TCN to 0
+		else interval = start;										// Else TCN is reset to 0
+		m_timer_start_time = machine().time();
+		m_timer->adjust(clocks_to_attotime(start * div), 0, clocks_to_attotime(interval * div));
 	}
 
-	LOGMASKED(LOG_TIMER, "%s: (Timer 1 Mode Register) TMR1_w: %04x\n", this->machine().describe_context(), data);
-	LOGMASKED(LOG_TIMER, " (Prescale) PS : %02x  (Capture Edge/Interrupt) CE : %01x (Output Mode) OM : %01x  (Output Reference Interrupt En) ORI : %01x   Free Run (FRR) : %01x  Input Clock Source (ICLK) : %01x  (Reset Timer) RST : %01x  \n", (m_TMR1 & 0xff00)>>8, (m_TMR1 & 0x00c0)>>6,  (m_TMR1 & 0x0020)>>5, (m_TMR1 & 0x0010)>>4, (m_TMR1 & 0x0008)>>3, (m_TMR1 & 0x0006)>>1, (m_TMR1 & 0x0001)>>0);
+	LOGMASKED(LOG_TIMER, "%s: (Timer Mode Register) TMR_w: %04x\n", this->machine().describe_context(), data);
+	//LOGMASKED(LOG_TIMER, " (Prescale) PS : %02x  (Capture Edge/Interrupt) CE : %01x (Output Mode) OM : %01x  (Output Reference Interrupt En) ORI : %01x   Free Run (FRR) : %01x  Input Clock Source (ICLK) : %01x  (Reset Timer) RST : %01x  \n", (m_TMR1 & 0xff00)>>8, (m_TMR1 & 0x00c0)>>6,  (m_TMR1 & 0x0020)>>5, (m_TMR1 & 0x0010)>>4, (m_TMR1 & 0x0008)>>3, (m_TMR1 & 0x0006)>>1, (m_TMR1 & 0x0001)>>0);
 }
 
-uint16_t mcf5206e_device::TRR1_r()
+void coldfire_timer_device::TRR_w(uint16_t data)
 {
-	LOGMASKED(LOG_TIMER, "%s: (Timer 1 Reference Register) TRR1_r: %04x\n", this->machine().describe_context(), m_TRR1);
-	return m_TRR1;
+	m_TRR = data;
+	LOGMASKED(LOG_TIMER, "%s: (Timer Reference Register) TRR_w: %04x\n", this->machine().describe_context(), data);
 }
 
-void mcf5206e_device::TRR1_w(uint16_t data)
+uint16_t coldfire_timer_device::TCN_r()
 {
-	m_TRR1 = data;
-	LOGMASKED(LOG_TIMER, "%s: (Timer 1 Reference Register) TRR1_w: %04x\n", this->machine().describe_context(), data);
+	m_TCN = (attotime_to_clocks(machine().time() - m_timer_start_time) & 0xffff);
+	return m_TCN; 
 }
 
-uint16_t mcf5206e_device::TCN1_r()
-{
-	LOGMASKED(LOG_TIMER, "%s: (Timer 1 Counter) TCN1_r: %04x\n", this->machine().describe_context(), m_TCN1);
-	return m_TCN1;
-}
-
-void mcf5206e_device::TCN1_w(uint16_t data)
+void coldfire_timer_device::TCN_w(uint16_t data)
 {
 	// Writing any value resets the counter
-	m_TCN1 = 0;
-	LOGMASKED(LOG_TIMER, "%s: (Timer 1 Counter Reset) TCN1_w: %04x\n", this->machine().describe_context(), data);
+	m_TCN = 0;
+	LOGMASKED(LOG_TIMER, "%s: (Timer Counter Reset) TCN_w: %04x\n", this->machine().describe_context(), data);
 }
 
-uint16_t mcf5206e_device::TCR1_r(){
-	// Read only
-	LOGMASKED(LOG_TIMER, "%s: (Timer 1 Capture) TCR1_r %04x\n", this->machine().describe_context(), m_TCR1);
-	return m_TCR1;
-}
-
-uint8_t mcf5206e_device::TER1_r()
+void coldfire_timer_device::TER_w(uint8_t data)
 {
-	LOGMASKED(LOG_TIMER, "%s: (Timer 1 Event) TER1_r: %02x\n", this->machine().describe_context(), m_TER1);
-	return m_TER1; // set on timer events, cleared by writing below
+	m_TER &= ~data; // Programmer must write bit to clear it. IE write 0x80 to clear bit 7.
+	LOGMASKED(LOG_TIMER, "%s: (Timer Event) TER_w: %02x\n", this->machine().describe_context(), data);
 }
 
-void mcf5206e_device::TER1_w(uint8_t data)
-{
-	m_TER1 &= ~data; // Programmer must write bit to clear it. IE write 0x80 to clear bit 7.
-	LOGMASKED(LOG_TIMER, "%s: (Timer 1 Event) TER1_w: %02x\n", this->machine().describe_context(), data);
-}
-
-
-/* Timer 2 */
-
-TIMER_CALLBACK_MEMBER(mcf5206e_device::timer2_callback)
-{
-	if(m_TMR2 & T_RST){
-		//LOGMASKED(LOG_TIMER, "timer2_callback\n");
-		if ((m_TMR2 & T_CL0) || (m_TMR2 & T_CL0)){
-			// Counter is running
-			m_TCN2++;
-		}
-		
-		if(m_TCN2 == m_TRR2 && !(m_TER2 & T_EREF)){
-			if(m_TMR2 & T_FRR){
-				// FRR resets counter to 0
-				m_TCN2 = 0;
-			}
-			m_TER2 |= T_EREF;
-			set_interrupt(TINT2);
-		}
-	}
-}
-
-uint16_t mcf5206e_device::TMR2_r()
-{
-	LOGMASKED(LOG_TIMER, "%s: (Timer 2 Mode Register) TMR2_r: %04x\n", this->machine().describe_context(), m_TMR2);
-	return m_TMR2;
-}
-
-void mcf5206e_device::TMR2_w(uint16_t data)
-{
-	uint16_t cmd = data;
-
-	if((m_TMR2 & T_RST) && !(cmd & T_RST)){
-		// T_RST High to low resets the entire timer
-		m_TMR2 = 0;
-		m_TRR2 = 0xFFFF;
-		m_TCN2 = 0;
-		m_TCR2 = 0;
-		m_TER2 = 0;
-		m_timer2->adjust(attotime::never);
-		return;
-	}
-
-	m_TMR2 = cmd;
-
-	if (m_TMR2 & T_RST){
-		// TODO: Add TIN pin support
-		int div;
-		div = ((m_TMR2 & 0xFF00) >> 8) + 1; // 1 -> 256 division scale
-		if ((m_TMR2 & T_CL1) && !(m_TMR2 & T_CL0)) div = div * 16;	// Input clock / 16
-		m_timer2->adjust(clocks_to_attotime(div), 0, clocks_to_attotime(div));
-	}
-
-	LOGMASKED(LOG_TIMER, "%s: (Timer 2 Mode Register) TMR2_w: %04x\n", this->machine().describe_context(), data);
-	LOGMASKED(LOG_TIMER, " (Prescale) PS : %02x  (Capture Edge/Interrupt) CE : %01x (Output Mode) OM : %01x  (Output Reference Interrupt En) ORI : %01x   Free Run (FRR) : %01x  Input Clock Source (ICLK) : %01x  (Reset Timer) RST : %01x  \n", (m_TMR1 & 0xff00)>>8, (m_TMR1 & 0x00c0)>>6,  (m_TMR1 & 0x0020)>>5, (m_TMR1 & 0x0010)>>4, (m_TMR1 & 0x0008)>>3, (m_TMR1 & 0x0006)>>1, (m_TMR1 & 0x0001)>>0);
-}
-
-uint16_t mcf5206e_device::TRR2_r()
-{
-	LOGMASKED(LOG_TIMER, "%s: (Timer 2 Reference Register) TRR2_r: %04x\n", this->machine().describe_context(), m_TRR2);
-	return m_TRR2;
-}
-
-void mcf5206e_device::TRR2_w(uint16_t data)
-{
-	m_TRR2 = data;
-	LOGMASKED(LOG_TIMER, "%s: (Timer 2 Reference Register) TRR2_w: %04x\n", this->machine().describe_context(), data);
-}
-
-uint16_t mcf5206e_device::TCN2_r()
-{
-	LOGMASKED(LOG_TIMER, "%s: (Timer 2 Counter) TCN2_r: %04x\n", this->machine().describe_context(), m_TCN2);
-	return m_TCN2;
-}
-
-void mcf5206e_device::TCN2_w(uint16_t data)
-{
-	// Writing any value resets counter
-	m_TCN2 = 0;
-	LOGMASKED(LOG_TIMER, "%s: (Timer 2 Counter Reset) TCN2_w: %04x\n", this->machine().describe_context(), data);
-}
-
-uint16_t mcf5206e_device::TCR2_r(){
-	// Read only
-	LOGMASKED(LOG_TIMER, "%s: (Timer 2 Capture) TCR2_r: %04x\n", this->machine().describe_context(), m_TCR2);
-	return m_TCR2;
-}
-
-uint8_t mcf5206e_device::TER2_r()
-{
-	LOGMASKED(LOG_TIMER, "%s: (Timer 2 Event) TER2_r: %02x\n", this->machine().describe_context(), m_TER2);
-	return m_TER2; // set on timer events, cleared by writing below
-}
-
-void mcf5206e_device::TER2_w(uint8_t data)
-{
-	m_TER2 &= ~data; // Programmer must write bit to clear it. IE write 0x80 to clear bit 7.
-	LOGMASKED(LOG_TIMER, "%s: (Timer 2 Event) TER2_w: %02x\n", this->machine().describe_context(), data);
-}
 
 /* UART */
 uint8_t mcf5206e_device::uart1_r(offs_t offset) { 
@@ -973,28 +702,16 @@ void mcf5206e_device::uart2_w(offs_t offset, uint8_t data) {
 	m_uart[1]->write(offset, data);
 }
 
-void mcf5206e_device::uart1_irq_w(int state){
-	if(BIT(m_IMR, UINT1) && state){
-		LOGMASKED(LOG_UART, "%s: UART1 Interrupt (%u)\n", this->machine().describe_context(), state);
-	}
-	set_interrupt(UINT1);
-}
-
-void mcf5206e_device::uart2_irq_w(int state){
-	if(BIT(m_IMR, UINT2) && state){
-		LOGMASKED(LOG_UART, "%s: UART2 Interrupt (%u)\n", this->machine().describe_context(), state);
-	}
-	set_interrupt(UINT2);
-}
-
 #define UNINIT 0
 #define UNINIT_NOTE 0
 
+/*
+ * init_regs
+ * Resets the internal registers to their POR states.
+ * first_init is used during boot, set to false during reset
+ */
 void mcf5206e_device::init_regs(bool first_init)
 {
-	m_SIMR = 0xc0;
-	m_MARB = 0x00;
-
 	m_DCRR = 0x0000;
 	m_DCTR = 0x0000; 
 	m_DCAR0 = UNINIT;
@@ -1008,8 +725,7 @@ void mcf5206e_device::init_regs(bool first_init)
 	m_CSMR[0] = 0x00000000;
 	m_CSCR[0] =   0x3C1F; /* 3C1F, 3C5F, 3C9F, 3CDF, 3D1F, 3D5F, 3D9F, 3DDF |  AA set by IRQ 7 at reset, PS1 set by IRQ 4 at reset, PS0 set by IRQ 1 at reset*/
 
-	if(!(m_RSR & 0x20)) m_RSR = 0x00;	// Don't clear if watchdog triggered
-
+	
 	if (first_init)
 	{
 		for (int x=1;x<8;x++)
@@ -1018,61 +734,127 @@ void mcf5206e_device::init_regs(bool first_init)
 			m_CSMR[1] = UNINIT;
 			m_CSCR[1] = UNINIT_NOTE; // except BRST=ASET=WRAH=RDAH=WR=RD=0
 		}
-		m_RSR = 0x70;
 	}
 
 	m_DMCR = 0x0000;
-	m_PAR = 0x0000;
-	m_ICR[ICR1] =   0x04;
-	m_ICR[ICR2] =   0x08;
-	m_ICR[ICR3] =   0x0C;
-	m_ICR[ICR4] =   0x10;
-	m_ICR[ICR5] =   0x14;
-	m_ICR[ICR6] =   0x18;
-	m_ICR[ICR7] =   0x1C;
-	m_ICR[ICR_SWDT] =   0x1C;
-	m_ICR[ICR_TMR1] =   0x80;
-	m_ICR[ICR_TMR2] =  0x80;
-	m_ICR[ICR_MBUS] =  0x80;
-	m_ICR[ICR_UART1] =  0x00;
-	m_ICR[ICR_UART2] =  0x00;
-	m_ICR[ICR_DMA0] =  0x00;
-	m_ICR[ICR_DMA1] =  0x00;
-	m_IPR = 0x3FFE;
-	m_SYPCR	= 0x00;
-	m_sypcr_locked = false;
-	m_SWIVR = 0x0F;
-
-	m_TMR1 = 0x0000;
-	m_TRR1 = 0xffff;
-	m_TCN1 = 0x0000;
-	m_TCR1 = 0x0000;
-	m_TER1 = 0x00;
-
-	m_TMR2 = 0x0000;
-	m_TRR2 = 0xffff;
-	m_TCN2 = 0x0000;
-	m_TCR2 = 0x0000;
-	m_TER2 = 0x00;
 
 	m_PPDDR = 0x00;
 	m_PPDATI = 0x00;
 	m_PPDATO = 0x00;
+}
 
-	m_IMR = 0x3FFE;
-	m_IPR = 0x0000;
 
+/*
+ * MBUS Module
+ * Hosts I2C and Motorola extensions to the format. Can act as a device or host.
+*/
+
+coldfire_mbus_device::coldfire_mbus_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) : 
+	device_t(mconfig, COLDFIRE_MBUS, tag, owner, clock)
+	, write_sda(*this)
+	, write_scl(*this)
+	, write_irq(*this)
+{
+}
+
+
+void coldfire_mbus_device::device_start(){
+	m_timer_mbus = timer_alloc( FUNC( coldfire_mbus_device::mbus_callback ), this );
+
+	save_item(NAME(m_MADR));
+	save_item(NAME(m_MBCR));
+	save_item(NAME(m_MBSR));
+	save_item(NAME(m_MFDR));
+	save_item(NAME(m_MBDR));
+
+	save_item(NAME(m_tx_in_progress));
+	save_item(NAME(m_clk_state));
+	save_item(NAME(m_tx_bit));
+	save_item(NAME(m_tx_out));
+	save_item(NAME(m_tx_in));
+
+	device_reset();
+}
+
+void coldfire_mbus_device::device_reset(){
 	m_MADR = 0x00;
 	m_MFDR = 0x00;
 	m_MBCR = 0x00;
 	m_MBSR = 0x81;
 	m_MBDR = 0x00;
 
-	m_swdt_w_count = 0;
+	m_tx_in_progress = false;
+	m_clk_state = 1;
+	m_tx_bit = 0;
+	m_tx_out = 0;
+	m_tx_in = 0;
+
+	m_timer_mbus->adjust(attotime::never);
+	write_scl(1);
+	write_sda(1);
+}
+
+
+void coldfire_mbus_device::mbus_map(address_map &map){
+	map(0x00, 0x00).rw(FUNC(coldfire_mbus_device::MADR_r), FUNC(coldfire_mbus_device::MADR_w));
+	map(0x04, 0x04).rw(FUNC(coldfire_mbus_device::MFDR_r), FUNC(coldfire_mbus_device::MFDR_w));
+	map(0x08, 0x08).rw(FUNC(coldfire_mbus_device::MBCR_r), FUNC(coldfire_mbus_device::MBCR_w));
+	map(0x0c, 0x0c).rw(FUNC(coldfire_mbus_device::MBSR_r), FUNC(coldfire_mbus_device::MBSR_w));
+	map(0xf0, 0xf0).rw(FUNC(coldfire_mbus_device::MBDR_r), FUNC(coldfire_mbus_device::MBDR_w));
+}
+
+TIMER_CALLBACK_MEMBER(coldfire_mbus_device::mbus_callback){
+	// Do bit transfers etc
+}
+
+void coldfire_mbus_device::MADR_w(uint8_t data)
+{
+	m_MADR = (data & 0xFE);
+	LOGMASKED(LOG_MBUS, "%s: (M-Bus Control Register) MADR_w: %02x\n", this->machine().describe_context(), data);
+}
+
+void coldfire_mbus_device::MFDR_w(uint8_t data)
+{
+	m_MFDR = (data & 0x3F);
+	LOGMASKED(LOG_MBUS, "%s: (M-Bus Frequency Divider Register) MFDR_w: %02x\n", this->machine().describe_context(), data);
+}
+
+void coldfire_mbus_device::MBCR_w(uint8_t data)
+{
+	m_MBCR = (data & 0xFC);
+	LOGMASKED(LOG_MBUS, "%s: (M-Bus Control Register) MBCR_w: %02x\n", this->machine().describe_context(), data);
+}
+
+uint8_t coldfire_mbus_device::MBSR_r()
+{
+	int hack = 0x00;
+
+	hack ^= (machine().rand()&0xff);
+	LOGMASKED(LOG_MBUS, "%s: (M-Bus Status Register) MBSR_r: %02x\n", this->machine().describe_context(), m_MBSR);
+	return m_MBSR ^ hack; // will loop on this after a while
+}
+
+void coldfire_mbus_device::MBSR_w(uint8_t data)
+{
+	m_MBSR = (data & 0x14);	// MAL & MIF
+	LOGMASKED(LOG_MBUS, "%s: (M-Bus Status Register) MBSR_w: %02x\n", this->machine().describe_context(), data);
+}
+
+uint8_t coldfire_mbus_device::MBDR_r()
+{
+	int hack = 0x00;
+	hack ^= (machine().rand()&0xff);
+	LOGMASKED(LOG_MBUS, "%s: (M-Bus Data I/O Register) MBDR_r: %02x\n", this->machine().describe_context(), m_MBDR);
+	return m_MBDR ^ hack;
+}
+
+void coldfire_mbus_device::MBDR_w(uint8_t data)
+{
+	m_MBDR = data;
+	LOGMASKED(LOG_MBUS, "%s: (M-Bus Data I/O Register) MBDR_w: %02x\n", this->machine().describe_context(), data);
 }
 
 /*
-
 ADDRESS (LE)            REG         WIDTH   NAME/DESCRIPTION                                    INIT VALUE (MR=Master Reset, NR=Normal Reset)       Read or Write access
 * = inited
 - = skeleton handler
