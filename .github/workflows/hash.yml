@@ -1,4 +1,4 @@
-name: XML/JSON Validation
+name: XML/JSON validation
 
 on:
   push:
