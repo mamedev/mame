@@ -3,7 +3,7 @@
 license:CC0-1.0
 copyright-holders:Roberto Fresca
 
-Super Mini-Boy control panel
+Bonanza's Joker Poker control panel
 
 -->
 <mamelayout version="2">
@@ -95,7 +95,6 @@ Super Mini-Boy control panel
 	</element>
 
 
-
 	<!-- define basic elements -->
 
 	<element name="cpanel">
@@ -182,38 +181,38 @@ Super Mini-Boy control panel
 
 	<!-- define lamps -->
 	<!-- first line: Hold 1 - Hold 2 - Hold 3 - Hold 4 - Hold 5 -->
-		<element name="lamp2" ref="buttonedge_y" inputtag="INPUT2" inputmask="0x04">
+		<element name="lamp4" ref="buttonedge_y" inputtag="INPUT2" inputmask="0x04">
 			<bounds x="2.89" y="3.08" width="0.44" height="0.24" />
 		</element>
-		<element name="lamp2" ref="hold">
+		<element name="lamp4" ref="hold">
 			<bounds x="2.91" y="3.10" width="0.40" height="0.20" />
 		</element>
 
-		<element name="lamp2" ref="buttonedge_y" inputtag="INPUT2" inputmask="0x08">
+		<element name="lamp4" ref="buttonedge_y" inputtag="INPUT2" inputmask="0x08">
 			<bounds x="2.335" y="3.08" width="0.44" height="0.24" />
 		</element>
-		<element name="lamp2" ref="hold">
+		<element name="lamp4" ref="hold">
 			<bounds x="2.355" y="3.10" width="0.40" height="0.20" />
 		</element>
 
-		<element name="lamp2" ref="buttonedge_y" inputtag="INPUT2" inputmask="0x10">
+		<element name="lamp4" ref="buttonedge_y" inputtag="INPUT2" inputmask="0x10">
 			<bounds x="1.78" y="3.08" width="0.44" height="0.24" />
 		</element>
-		<element name="lamp2" ref="hold">
+		<element name="lamp4" ref="hold">
 			<bounds x="1.80" y="3.10" width="0.40" height="0.20" />
 		</element>
 
-		<element name="lamp2" ref="buttonedge_y" inputtag="INPUT5" inputmask="0x01">
+		<element name="lamp4" ref="buttonedge_y" inputtag="INPUT5" inputmask="0x01">
 			<bounds x="1.225" y="3.08" width="0.44" height="0.24" />
 		</element>
-		<element name="lamp2" ref="hold">
+		<element name="lamp4" ref="hold">
 			<bounds x="1.245" y="3.10" width="0.40" height="0.20" />
 		</element>
 
-		<element name="lamp2" ref="buttonedge_y" inputtag="INPUT5" inputmask="0x02">
+		<element name="lamp4" ref="buttonedge_y" inputtag="INPUT5" inputmask="0x02">
 			<bounds x="0.67" y="3.08" width="0.44" height="0.24" />
 		</element>
-		<element name="lamp2" ref="hold">
+		<element name="lamp4" ref="hold">
 			<bounds x="0.69" y="3.10" width="0.40" height="0.20" />
 		</element>
 
