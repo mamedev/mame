@@ -77,8 +77,6 @@
  *          The following all perform this on a port address..
  *          (anl, orl, xrl, jbc, cpl, inc, dec, djnz, mov px.y,c, clr px.y, setb px.y)
  *
- *        Serial UART emulation is not really accurate, but faked enough to work as far as i can tell
- *
  *        August 27,2003: Currently support for only 8031/8051/8751 chips (ie 128 RAM)
  *        October 14,2003: Added initial support for the 8752 (ie 256 RAM)
  *        October 22,2003: Full support for the 8752 (ie 256 RAM)
@@ -95,7 +93,6 @@
  *  - T0 output clock ?
  *
  * - Implement 80C52 extended serial capabilities
- * - Fix serial communication - This is a big hack (but working) right now.
  * - Implement 83C751 in sslam.c
  * - Fix cardline.c
  *      most likely due to different behaviour of I/O pins. The boards
@@ -296,11 +293,12 @@ mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type ty
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, program_map)
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, 9, 0, data_map)
-	, m_io_config("io", ENDIANNESS_LITTLE, 8, (features & FEATURE_DS5002FP) ? 17 : 16, 0)
+	, m_io_config("io", ENDIANNESS_LITTLE, 8, (features & FEATURE_DS5002FP) ? 18 : 16, 0)
 	, m_pc(0)
 	, m_features(features)
+	, m_inst_cycles(0)
 	, m_rom_size(program_width > 0 ? 1 << program_width : 0)
-	, m_ram_mask( (data_width == 8) ? 0xFF : 0x7F )
+	, m_ram_mask( (data_width == 8) ? 0xff : 0x7f )
 	, m_num_interrupts(5)
 	, m_sfr_ram(*this, "sfr_ram")
 	, m_scratchpad(*this, "scratchpad")
@@ -871,12 +869,18 @@ uint8_t mcs51_cpu_device::r_psw() { return SFR_A(ADDR_PSW); }
 
     In order to simplify memory mapping to the data address bus, the following address map is assumed for partitioned mode:
 
+	PES = 0:
     0x00000-0x0ffff -> data memory on the expanded bus
     0x10000-0x1ffff -> data memory on the byte-wide bus
+	PES = 1:
+	0x20000-0x2ffff -> memory-mapped peripherals on the byte-wide bus
 
     For non-partitioned mode the following memory map is assumed:
 
-    0x0000-0xffff -> data memory (the bus used to access it does not matter)
+	PES = 0:
+    0x00000-0x0ffff -> data memory (the bus used to access it does not matter)
+	PES = 1:
+	0x20000-0x2ffff -> memory-mapped peripherals on the byte-wide bus
 */
 
 offs_t mcs51_cpu_device::external_ram_iaddr(offs_t offset, offs_t mem_mask)
@@ -891,7 +895,9 @@ offs_t mcs51_cpu_device::external_ram_iaddr(offs_t offset, offs_t mem_mask)
 	/* if partition mode is set, adjust offset based on the bus */
 	if (m_features & FEATURE_DS5002FP)
 	{
-		if (!GET_PM) {
+		if (GET_PES) {
+			offset += 0x20000;
+		} else if (!GET_PM) {
 			if (!GET_EXBS) {
 				if ((offset >= ds5002fp_partitions[GET_PA]) && (offset <= ds5002fp_ranges[m_ds5002fp.range])) {
 					offset += 0x10000;
@@ -1288,7 +1294,7 @@ void mcs51_cpu_device::update_timer_t0(int cycles)
 				if ( count & 0xffffe000 ) /* Check for overflow */
 					SET_TF0(1);
 				TH0 = (count>>5) & 0xff;
-				TL0 =  count & 0x1f ;
+				TL0 =  count & 0x1f;
 				break;
 			case 1:         /* 16 Bit Timer Mode */
 				count = ((TH0<<8) | TL0);
@@ -1377,7 +1383,7 @@ void mcs51_cpu_device::update_timer_t1(int cycles)
 					count += delta;
 					overflow = count & 0xffffe000; /* Check for overflow */
 					TH1 = (count>>5) & 0xff;
-					TL1 =  count & 0x1f ;
+					TL1 =  count & 0x1f;
 					break;
 				case 1:         /* 16 Bit Timer Mode */
 					count = ((TH1<<8) | TL1);
@@ -1421,7 +1427,7 @@ void mcs51_cpu_device::update_timer_t1(int cycles)
 				count += delta;
 				overflow = count & 0xffffe000; /* Check for overflow */
 				TH1 = (count>>5) & 0xff;
-				TL1 =  count & 0x1f ;
+				TL1 =  count & 0x1f;
 				break;
 			case 1:         /* 16 Bit Timer Mode */
 				count = ((TH1<<8) | TL1);
@@ -1502,27 +1508,6 @@ void mcs51_cpu_device::update_timer_t2(int cycles)
 				break;
 		}
 	}
-}
-
-void mcs51_cpu_device::update_timers(int cycles)
-{
-	while (cycles--)
-	{
-		update_timer_t0(1);
-		update_timer_t1(1);
-
-		if (m_features & FEATURE_I8052)
-		{
-			update_timer_t2(1);
-		}
-	}
-}
-
-/* Check and update status of serial port */
-void mcs51_cpu_device::update_serial(int cycles)
-{
-	while (--cycles>=0)
-		transmit_receive(0);
 }
 
 /* Check and update status of serial port */
@@ -1933,7 +1918,8 @@ void mcs51_cpu_device::check_irqs()
 		ints &= int_mask;
 	}
 
-	if (!ints)  return;
+	if (!ints)
+		return;
 
 	/* Clear IDL - got enabled interrupt */
 	if (m_features & FEATURE_CMOS)
@@ -1942,10 +1928,15 @@ void mcs51_cpu_device::check_irqs()
 		SET_IDL(0);
 		/* external interrupt wakes up */
 		if (ints & (GET_IE0 | GET_IE1))
+		{
 			/* but not the DS5002FP */
 			if (!(m_features & FEATURE_DS5002FP))
 				SET_PD(0);
+		}
 	}
+
+	if ((m_features & FEATURE_CMOS) && GET_PD)
+		return;
 
 	for (int i=0; i<m_num_interrupts; i++)
 	{
@@ -2035,14 +2026,20 @@ void mcs51_cpu_device::check_irqs()
 
 void mcs51_cpu_device::burn_cycles(int cycles)
 {
-	/* Update Timer (if any timers are running) */
-	update_timers(cycles);
+	while (cycles--)
+	{
+		m_icount--;
 
-	/* Update Serial (only for mode 0) */
-	update_serial(cycles);
+		// update timers
+		update_timer_t0(1);
+		update_timer_t1(1);
 
-	/* check_irqs */
-	check_irqs();
+		if (m_features & FEATURE_I8052)
+			update_timer_t2(1);
+
+		// check and update status of serial port
+		transmit_receive(0);
+	}
 }
 
 void mcs51_cpu_device::execute_set_input(int irqline, int state)
@@ -2152,71 +2149,54 @@ void mcs51_cpu_device::execute_set_input(int irqline, int state)
 	m_last_line_state = new_state;
 }
 
-/* Execute cycles - returns number of cycles actually run */
+/* Execute cycles */
 void mcs51_cpu_device::execute_run()
 {
-	uint8_t op;
-
-	/* external interrupts may have been set since we last checked */
-	m_inst_cycles = 0;
-	check_irqs();
-
-	/* if in powerdown, just return */
-	if ((m_features & FEATURE_CMOS) && GET_PD)
-	{
-		debugger_wait_hook();
-		m_icount = 0;
-		return;
-	}
-
-	m_icount -= m_inst_cycles;
-	burn_cycles(m_inst_cycles);
-
-	if ((m_features & FEATURE_CMOS) && GET_IDL)
-	{
-		do
-		{
-			/* burn the cycles */
-			m_icount--;
-			burn_cycles(1);
-		} while( m_icount > 0 );
-		return;
-	}
-
 	do
 	{
-		/* Read next opcode */
-		PPC = PC;
-		debugger_instruction_hook(PC);
-		op = m_program.read_byte(PC++);
+		// check interrupts
+		check_irqs();
 
-		/* process opcode and count cycles */
-		m_inst_cycles = mcs51_cycles[op];
-		execute_op(op);
-
-		/* burn the cycles */
-		m_icount -= m_inst_cycles;
-
-		/* if in powerdown, just return */
+		// if in powerdown and external IRQ did not wake us up, just return
 		if ((m_features & FEATURE_CMOS) && GET_PD)
+		{
+			debugger_wait_hook();
+			m_icount = 0;
 			return;
+		}
 
+		// if not idling, process next opcode
+		if (!((m_features & FEATURE_CMOS) && GET_IDL))
+		{
+			PPC = PC;
+			debugger_instruction_hook(PC);
+			uint8_t op = m_program.read_byte(PC++);
+
+			m_inst_cycles += mcs51_cycles[op];
+			execute_op(op);
+		}
+		else
+			m_inst_cycles++;
+
+		// burn the cycles
 		burn_cycles(m_inst_cycles);
 
-		/* decrement the timed access window */
+		// decrement the timed access window
 		if (m_features & FEATURE_DS5002FP)
 		{
 			m_ds5002fp.ta_window = (m_ds5002fp.ta_window ? (m_ds5002fp.ta_window - 1) : 0x00);
 
 			if (m_ds5002fp.rnr_delay > 0)
-				m_ds5002fp.rnr_delay-=m_inst_cycles;
+				m_ds5002fp.rnr_delay -= m_inst_cycles;
 		}
 
-		/* If the chip entered in idle mode, end the loop */
-		if ((m_features & FEATURE_CMOS) && GET_IDL)
-			return;
+		m_inst_cycles = 0;
 
-	} while( m_icount > 0 );
+		// if in powerdown, eat remaining cycles
+		if ((m_features & FEATURE_CMOS) && GET_PD && m_icount > 0)
+			m_icount = 0;
+
+	} while (m_icount > 0);
 }
 
 
@@ -2594,7 +2574,6 @@ uint8_t i80c52_device::sfr_read(size_t offset)
 /****************************************************************************
  * DS5002FP Section
  ****************************************************************************/
-
 
 #define DS5_LOGW(a, d)  LOG("write to  " # a " register at 0x%04x, data=%x\n", PC, d)
 #define DS5_LOGR(a, d)  LOG("read from " # a " register at 0x%04x\n", PC)

@@ -1485,6 +1485,9 @@ magibombi                       // (c) 2001? Astro Corp.
 magibombj                       // (c) 2005  Astro Corp.
 monkeyl                         // (c) 2005  Astro Corp.
 monkeyla                        // (c) 2004  Astro Corp.
+monkeylb                        // (c) 2005  Astro Corp.
+monkeylc                        // (c) 2007  Astro Corp.
+monkeyld                        // (c) 2003  Astro Corp.
 showhanc                        // (c) 2000  Astro Corp.
 showhand                        // (c) 2000  Astro Corp.
 skilldrp                        // (c) 2002  Astro Corp.
@@ -19708,6 +19711,10 @@ mephistoj
 @source:hegenerglaser/europa.cpp
 europa
 
+@source:hegenerglaser/excalibur.cpp
+excal
+excaltm
+
 @source:hegenerglaser/glasgow.cpp
 amsterdg                        // Amsterdam
 dallas16g                       // Dallas
@@ -20119,6 +20126,7 @@ cfarm                           // (c) 1999 LAI Games
 eggventr                        // (c) 1997 The Game Room
 eggventr1                       // (c) 1997 The Game Room
 eggventr2                       // (c) 1997 The Game Room
+eggventr4                       // (c) 1997 The Game Room
 eggventr7                       // (c) 1997 The Game Room
 eggventr8                       // (c) 1997 The Game Room
 eggventra                       // (c) 1997 The Game Room (Allied Leisure license)
@@ -23876,6 +23884,7 @@ cookbib2b                       // (c) 1996 SemiCom
 cookbib2c                       // (c) 1996 SemiCom
 cookbib3                        // (c) 1997 SemiCom
 finalttr                        // (c) 1993 Jeil Computer System
+gwasu                           // (c) 1997 SemiCom
 honeydol                        // (c) 1995 Barko Corp
 hyperpac                        // (c) 1995 SemiCom
 hyperpacb                       // bootleg
@@ -36598,7 +36607,6 @@ quizard_10                      // (c) TAB Austria 1996
 quizard_12                      // (c) TAB Austria 1996
 quizard_17                      // (c) TAB Austria 1996
 quizardi                        // (c) TAB Austria 199?
-quizardi_10                     // (c) TAB Austria 1996
 quizardi_12                     // (c) TAB Austria 1996
 quizardi_17                     // (c) TAB Austria 1996
 quizard2                        // (c) TAB Austria 1995
@@ -36990,6 +36998,7 @@ bmf_de                          //
 bmf_fr                          //
 bmf_it                          //
 bmf_ita                         //
+bmf_itb                         //
 bmf_jp                          //
 bmf_nl                          //
 bmf_nl302                       //
@@ -37462,6 +37471,7 @@ sport2k                         //
 @source:pinball/micropin.cpp
 pentacup                        //
 pentacup2                       //
+pentacups                       //
 pentacupt                       //
 
 @source:pinball/missamer.cpp
@@ -41385,6 +41395,7 @@ invho2a                         // 326-341 (c) 1979 Sega
 invinco                         // 310-318 (c) 1979 Sega
 nostromo                        // bootleg
 nsub                            // 268-275 (c) 1980 Sega
+nsubc                           // 581-596 (c) 1980 Sega
 pulsar                          // 790-805 (c) 1981 Sega
 safari                          // 57-66 [1977 Gremlin?]
 safaria                         // bootleg?
@@ -46002,6 +46013,7 @@ didj                            // (c) 2008 Leapfrog
 mmahjong
 
 @source:tvgames/monkey_king_3b.cpp
+afbp4                           //
 rs70_648                        //
 
 @source:tvgames/pubint_storyreader.cpp

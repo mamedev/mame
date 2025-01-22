@@ -3313,6 +3313,49 @@ void nsub_state::nsub_io_map(address_map &map)
 	map(0x00, 0x0f).rw(FUNC(nsub_state::nsub_io_r), FUNC(nsub_state::nsub_io_w));
 }
 
+void nsub_state::nsubc_io_w(offs_t offset, uint8_t data)
+{
+	if (offset & 0x01)
+		m_s97271p->port_w(data);
+
+	if (offset & 0x02)
+	{
+		palette_bank_w(data);
+		m_s97269pb->palette_bank_w(data);
+	}
+
+	if (offset & 0x08)
+		assert_coin_status();
+}
+
+void nsub_state::nsubc_prot_w(uint8_t data)
+{
+	switch (data)
+	{
+		case 0x24: m_prot_value = 0x02; break;
+		case 0x66: m_prot_value = 0x07; break;
+		default: logerror("%s: unknown protection value %02x\n", machine().describe_context(), data);
+	}
+}
+
+void nsub_state::nsubc_map(address_map &map)
+{
+	nsub_map(map);
+	map(0x7f00, 0x7f00).lr8(NAME([this] () -> uint8_t { return m_prot_value; }));
+	map(0xebe8, 0xebe8).w(FUNC(nsub_state::nsubc_prot_w));
+}
+
+void nsub_state::nsubc_io_map(address_map &map)
+{
+	map.global_mask(0x0f);
+
+	map(0x00, 0x00).mirror(0x0c).portr("IN0");
+	map(0x01, 0x01).mirror(0x0c).portr("IN1");
+	map(0x02, 0x02).mirror(0x0c).portr("IN2");
+	map(0x03, 0x03).mirror(0x0c).portr("IN3");
+	map(0x00, 0x0f).w(FUNC(nsub_state::nsubc_io_w));
+}
+
 
 // coinage is handled by extra hardware on a daughterboard, put before the coin-in pin on the main logic board
 // IC board "COIN CALCULATOR" (97201-P): two 74191 counters, a 555 timer, coin meters, and lots of other TTL
@@ -3412,25 +3455,97 @@ static INPUT_PORTS_START( nsub )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW:8" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( nsubc )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-MACHINE_START_MEMBER(nsub_state, nsub)
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(nsub_state::cblank_comp_r))
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(vicdual_state::coin_status_r))
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_COIN_DEFAULT
+
+	// TODO: hook this up. The main PCB also has a bank of 6 DIPs, but they don't seem used?
+	PORT_START("COINAGE") // "OPTION SW." on daughterboard
+	PORT_DIPNAME( 0x07, 0x01, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW:1,2,3")
+	PORT_DIPSETTING(    0x07, DEF_STR( 7C_1C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 6C_1C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
+//  PORT_DIPSETTING(    0x00, DEF_STR( 0C_1C ) ) // invalid
+	PORT_DIPNAME( 0x78, 0x08, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW:4,5,6,7")
+	PORT_DIPSETTING(    0x40, "Shared With Coin A" )
+//  PORT_DIPSETTING(    0x00, DEF_STR( 1C_0C ) ) // invalid
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x28, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x38, DEF_STR( 1C_7C ) )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW:8" )
+INPUT_PORTS_END
+
+
+void nsub_state::machine_start()
 {
 	m_nsub_play_counter = 0;
 	save_item(NAME(m_nsub_coin_counter));
 	save_item(NAME(m_nsub_play_counter));
 
-	machine_start();
+	vicdual_state::machine_start();
 
 	// playcounter 555 timer frequency is unknown
 	// keep in mind that intervals need to be longer than the main coin_in timeout
-	m_nsub_coinage_timer->adjust(attotime::zero, 0, attotime::from_msec(150));
+	if (m_nsub_coinage_timer.found())
+		m_nsub_coinage_timer->adjust(attotime::zero, 0, attotime::from_msec(150));
 }
 
-MACHINE_RESET_MEMBER(nsub_state, nsub)
+void nsub_state::machine_reset()
 {
-	m_nsub_coin_counter = m_coinage->read() & 7;
+	if (m_coinage.found())
+		m_nsub_coin_counter = m_coinage->read() & 7;
 
-	machine_reset();
+	vicdual_state::machine_reset();
+}
+
+MACHINE_START_MEMBER(nsub_state, nsubc)
+{
+	nsub_state::machine_start();
+
+	save_item(NAME(m_prot_value));
 }
 
 void nsub_state::nsub(machine_config &config)
@@ -3450,8 +3565,22 @@ void nsub_state::nsub(machine_config &config)
 
 	S97269PB(config, m_s97269pb, 0);
 
-	MCFG_MACHINE_START_OVERRIDE(nsub_state, nsub)
-	MCFG_MACHINE_RESET_OVERRIDE(nsub_state, nsub)
+	/* audio hardware */
+	S97271P(config, m_s97271p, 0);
+}
+
+void nsub_state::nsubc(machine_config &config)
+{
+	vicdual_root(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &nsub_state::nsubc_map);
+	m_maincpu->set_addrmap(AS_IO, &nsub_state::nsubc_io_map);
+
+	m_screen->set_screen_update(FUNC(nsub_state::screen_update_color));
+
+	S97269PB(config, m_s97269pb, 0);
+
+	MCFG_MACHINE_START_OVERRIDE(nsub_state, nsubc)
 
 	/* audio hardware */
 	S97271P(config, m_s97271p, 0);
@@ -3736,6 +3865,38 @@ ROM_START( nsub )
 	ROM_REGION( 0x0040, "user1", 0 )    /* timing PROMs */
 	ROM_LOAD( "pr-33.u82", 0x0000, 0x0020, CRC(e60a7960) SHA1(b8b8716e859c57c35310efc4594262afedb84823) )    /* control PROM */
 	ROM_LOAD( "pr-34.u83", 0x0020, 0x0020, CRC(a1506b9d) SHA1(037c3db2ea40eca459e8acba9d1506dd28d72d10) )    /* sequence PROM */
+ROM_END
+
+// Heavily modified Carnival PCB with an extra video output card matching the one on the upright version.
+// Had 2x PROMs missing but worked with ones dumped from the existing set.  PCB found in genuine N-Sub cocktail cabinet.
+ROM_START( nsubc ) // S-97396-P main board + 97093-P-B-S sub board + 97269-P-B (gradient and starfield) + 97201-P PCB for coinage
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "epr-581.u33", 0x0000, 0x0400, CRC(be5f0f44) SHA1(5e6802c6e15c9857f0a8150bb9b37aabfa0e0245) )
+	ROM_LOAD( "epr-582.u32", 0x0400, 0x0400, CRC(97a5e094) SHA1(c5ee9af7488f03627e780a1cf23af5f296520d95) )
+	ROM_LOAD( "epr-583.u31", 0x0800, 0x0400, CRC(bcf48a8d) SHA1(6fa96a449bc8440844a1b61c545ebed724c2d71d) )
+	ROM_LOAD( "epr-584.u30", 0x0c00, 0x0400, CRC(a0197ffb) SHA1(6bb72105e1c7a3126ada1f1b9eaf026383c203be) )
+	ROM_LOAD( "epr-585.u29", 0x1000, 0x0400, CRC(68f64111) SHA1(e7bec469316317560c99798b8b10e6a3cacf5be4) )
+	ROM_LOAD( "epr-586.u28", 0x1400, 0x0400, CRC(d7e75bce) SHA1(99726c800d60154efc42795ee9dd195e9b055bd6) )
+	ROM_LOAD( "epr-587.u27", 0x1800, 0x0400, CRC(a9f1c390) SHA1(31a197d27919a9db8e1b1a4089918f857a9e9ed6) )
+	ROM_LOAD( "epr-588.u26", 0x1c00, 0x0400, CRC(77598bf2) SHA1(df46e6f4dbf165e46c8d85d037828e96d87ad654) )
+	ROM_LOAD( "epr-589.u8",  0x2000, 0x0400, CRC(917c5204) SHA1(6633160e37d72f92f2135c9e56cd79e3d0cc6082) )
+	ROM_LOAD( "epr-590.u7",  0x2400, 0x0400, CRC(3cc9b52e) SHA1(6f2d7ce39c39b804924bafc09df585bcce250091) )
+	ROM_LOAD( "epr-591.u6",  0x2800, 0x0400, CRC(3e0ac65f) SHA1(3ae2f8c36b3d7042e5621125e6cdfcfbc0537dfe) )
+	ROM_LOAD( "epr-592.u5",  0x2c00, 0x0400, CRC(7864676c) SHA1(012292ead2f4f9fb16edc56e4ebe99e0cb4cf2d4) )
+	ROM_LOAD( "epr-593.u4",  0x3000, 0x0400, CRC(30233912) SHA1(a03a1b6271683a2e00298c30c2fea137403efab0) )
+	ROM_LOAD( "epr-594.u3",  0x3400, 0x0400, CRC(e93807cc) SHA1(2a6ad5162e539ed7be5efab1858f1c8119b70737) )
+	ROM_LOAD( "epr-595.u2",  0x3800, 0x0400, CRC(01f3f941) SHA1(33991ac68e73ef08d8dffcc5e9319f08dd2b2836) )
+	ROM_LOAD( "epr-596.u1",  0x3c00, 0x0400, CRC(ac63b3b5) SHA1(16466899d17a81c77dcb040028e54bfaf9ba9e9d) )
+
+	ROM_REGION( 0x0020, "proms", ROMREGION_INVERT )
+	ROM_LOAD( "pr-69.u49", 0x0000, 0x0020, CRC(c94dd091) SHA1(f88cfb033ff83adb7375652be1fa32ba489d8418) )
+
+	ROM_REGION( 0x0040, "user1", 0 )    // timing PROMs, missing on PCB but using the ones from nsub made the PCB work again
+	ROM_LOAD( "pr-33.u14", 0x0000, 0x0020, BAD_DUMP CRC(e60a7960) SHA1(b8b8716e859c57c35310efc4594262afedb84823) )    // control PROM
+	ROM_LOAD( "pr-34.u15", 0x0020, 0x0020, BAD_DUMP CRC(a1506b9d) SHA1(037c3db2ea40eca459e8acba9d1506dd28d72d10) )    // sequence PROM
+
+	ROM_REGION( 0x2c, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "pay03.ic4", 0x00, 0x2c, NO_DUMP ) // PAL10H8. Protection related? on 97093-P-B-S stickered sub board.
 ROM_END
 
 ROM_START( sspaceat )
@@ -5012,7 +5173,8 @@ GAME( 1979, headon2s,   headon2,  headon2bw, headon2s,  headonsa_state,  empty_i
 GAME( 1979, car2,       headon2,  headon2bw, car2,      vicdual_state,   empty_init, ROT0,   "bootleg (RZ Bologna)",    "Car 2 (bootleg of Head On 2)",                           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // title still says 'HeadOn 2'
 GAME( 1979, invho2,     0,        invho2,    invho2,    vicdual_state,   empty_init, ROT270, "Sega",                    "Invinco / Head On 2 (set 1)",                            MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, invho2a,    invho2,   invho2,    invho2,    vicdual_state,   empty_init, ROT270, "Sega",                    "Invinco / Head On 2 (set 2)",                            MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // wrong colors make Head On 2 unplayable (all black)
-GAME( 1980, nsub,       0,        nsub,      nsub,      nsub_state,      empty_init, ROT270, "Sega",                    "N-Sub (upright)",                                        MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // this is the upright set. cocktail set still needs to be dumped
+GAME( 1980, nsub,       0,        nsub,      nsub,      nsub_state,      empty_init, ROT270, "Sega",                    "N-Sub (upright)",                                        MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, nsubc,      nsub,     nsubc,     nsubc,     nsub_state,      empty_init, ROT270, "Sega",                    "N-Sub (cocktail)",                                       MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, samurai,    0,        samurai,   samurai,   vicdual_state,   empty_init, ROT270, "Sega",                    "Samurai (World)",                                        MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, samuraij,   samurai,  samurai,   samurai,   vicdual_state,   empty_init, ROT270, "Sega",                    "Samurai (Japan)",                                        MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, invinco,    0,        invinco,   invinco,   vicdual_state,   empty_init, ROT270, "Sega",                    "Invinco",                                                MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -81,7 +81,7 @@ protected:
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 12 - 1) / 12; }
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 12); }
 	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
-	virtual uint32_t execute_max_cycles() const noexcept override { return 20; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 4+2; } // max opcode cycles + irq
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -153,7 +153,7 @@ protected:
 	// Memory spaces
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::cache m_program;
 	memory_access< 9, 0, 0, ENDIANNESS_LITTLE>::specific m_data;
-	memory_access<17, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
+	memory_access<18, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
 
 	devcb_read8::array<4> m_port_in_cb;
 	devcb_write8::array<4> m_port_out_cb;
@@ -195,8 +195,6 @@ protected:
 	void update_timer_t0(int cycles);
 	void update_timer_t1(int cycles);
 	void update_timer_t2(int cycles);
-	void update_timers(int cycles);
-	void update_serial(int source);
 	void update_irq_prio(uint8_t ipl, uint8_t iph);
 	void execute_op(uint8_t op);
 	void check_irqs();

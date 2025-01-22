@@ -559,6 +559,45 @@
   The game needs ~25 seconds to check all the things to start.
 
 
+  * Roulette (ICP-1 PCB)
+
+  This game runs on ICP-1 platform, consisting of a 6502 CPU, two 6821 PIAs for I/O,
+  a 6845 CRTC for video, and discrete electronics for sound. The game features robust
+  protection through NVRAM registers and a password-like input sequence, which can be
+  configured and is requested upon each reboot. The password consists of 5 inputs,
+  with repetitions allowed. The password length is fixed.
+
+  Password Configuration and Booting Instructions...
+
+  - How to Set the Password:
+
+    1) Press and hold the PROGRAM key (key 9) while turning on or resetting the machine.
+	    (The word 'TESTING' will be displayed on the screen)
+    2) Enter the first desired input of the password, then press DOWN to confirm the choice.
+    3) Enter the second desired input of the password, then press DOWN to confirm the choice.
+    4) Enter the third desired input of the password, then press DOWN to confirm the choice.
+    5) Enter the fourth desired input of the password, then press DOWN to confirm the choice.
+    6) Enter the fifth desired input of the password, then press DOWN to confirm the choice.
+
+    Note: Each input entered will be displayed on the screen.
+
+
+  - How to Boot with Password:
+
+    1) Press the CREDITS key (key 5) once.
+    2) Enter the first input of the password, then press DOWN to confirm the choice.
+    3) Enter the second input of the password, then press DOWN to confirm the choice.
+    4) Enter the third input of the password, then press DOWN to confirm the choice.
+    5) Enter the fourth input of the password, then press DOWN to confirm the choice.
+    6) Enter the fifth input of the password, then press DOWN to confirm the choice.
+
+
+  The default NVRAM has a pre-set password (all BUTTON1). To boot the game with the
+  default password, enter the following sequence:
+
+  5 -> CTRL -> DOWN -> CTRL -> DOWN -> CTRL -> DOWN -> CTRL -> DOWN -> CTRL -> DOWN
+
+
 ************************************************************************************
 
 

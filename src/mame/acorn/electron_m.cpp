@@ -142,7 +142,7 @@ uint8_t electron_state::electron_mem_r(offs_t offset)
 	{
 	case 0x00: /* Normal */
 		/* The processor will run at 1MHz during an access cycle to the RAM */
-		m_maincpu->set_clock_scale(0.5f);
+		m_maincpu->set_clock_scale(0.5);
 		waitforramsync();
 		break;
 
@@ -167,7 +167,7 @@ void electron_state::electron_mem_w(offs_t offset, uint8_t data)
 	{
 	case 0x00: /* Normal */
 		/* The processor will run at 1MHz during an access cycle to the RAM */
-		m_maincpu->set_clock_scale(0.5f);
+		m_maincpu->set_clock_scale(0.5);
 		waitforramsync();
 		break;
 
@@ -204,7 +204,7 @@ uint8_t electron_state::electron_paged_r(offs_t offset)
 	uint8_t data = 0;
 
 	/* The processor will run at 2MHz during an access cycle to the ROM */
-	m_maincpu->set_clock_scale(1.0f);
+	m_maincpu->set_clock_scale(1.0);
 
 	switch (m_ula.rompage)
 	{
@@ -237,7 +237,7 @@ uint8_t electron_state::electron_paged_r(offs_t offset)
 void electron_state::electron_paged_w(offs_t offset, uint8_t data)
 {
 	/* The processor will run at 2MHz during an access cycle to the ROM */
-	m_maincpu->set_clock_scale(1.0f);
+	m_maincpu->set_clock_scale(1.0);
 
 	m_exp->expbus_w(0x8000 + offset, data);
 }
@@ -247,7 +247,7 @@ uint8_t electronsp_state::electron_paged_r(offs_t offset)
 	uint8_t data = 0;
 
 	/* The processor will run at 2MHz during an access cycle to the ROM */
-	m_maincpu->set_clock_scale(1.0f);
+	m_maincpu->set_clock_scale(1.0);
 
 	if ((m_ula.rompage & 0x0e) == m_rompages->read())
 	{
@@ -280,7 +280,7 @@ uint8_t electronsp_state::electron_paged_r(offs_t offset)
 void electronsp_state::electron_paged_w(offs_t offset, uint8_t data)
 {
 	/* The processor will run at 2MHz during an access cycle to the ROM */
-	m_maincpu->set_clock_scale(1.0f);
+	m_maincpu->set_clock_scale(1.0);
 
 	if ((m_ula.rompage & 0x0e) == m_rompages->read())
 	{
@@ -308,7 +308,7 @@ void electronsp_state::electron_paged_w(offs_t offset, uint8_t data)
 uint8_t electron_state::electron_mos_r(offs_t offset)
 {
 	/* The processor will run at 2MHz during an access cycle to the ROM */
-	m_maincpu->set_clock_scale(1.0f);
+	m_maincpu->set_clock_scale(1.0);
 
 	return m_region_mos->base()[0x4000 | offset];
 }
@@ -316,7 +316,7 @@ uint8_t electron_state::electron_mos_r(offs_t offset)
 void electron_state::electron_mos_w(offs_t offset, uint8_t data)
 {
 	/* The processor will run at 2MHz during an access cycle to the ROM */
-	m_maincpu->set_clock_scale(1.0f);
+	m_maincpu->set_clock_scale(1.0);
 
 	logerror("MOS: write %04x %02x\n", offset + 0xc000, data);
 	m_exp->expbus_w(0xc000 + offset, data);
@@ -325,7 +325,7 @@ void electron_state::electron_mos_w(offs_t offset, uint8_t data)
 uint8_t electron_state::electron_fred_r(offs_t offset)
 {
 	/* The processor will run at 2MHz during an access cycle to the ROM */
-	m_maincpu->set_clock_scale(1.0f);
+	m_maincpu->set_clock_scale(1.0);
 
 	/* The Issue 4 ULA returns data from OS ROM, whereas Issue 6 ULA will return 0xff */
 	//logerror("FRED: read fc%02x\n", offset);
@@ -335,7 +335,7 @@ uint8_t electron_state::electron_fred_r(offs_t offset)
 void electron_state::electron_fred_w(offs_t offset, uint8_t data)
 {
 	/* The processor will run at 2MHz during an access cycle to the ROM */
-	m_maincpu->set_clock_scale(1.0f);
+	m_maincpu->set_clock_scale(1.0);
 
 	/* Master RAM Board */
 	if (offset == 0x7f) m_mrb_mapped = !(data & 0x80);
@@ -349,7 +349,7 @@ uint8_t electronsp_state::electron_fred_r(offs_t offset)
 	uint8_t data = 0;
 
 	/* The processor will run at 2MHz during an access cycle to the ROM */
-	m_maincpu->set_clock_scale(1.0f);
+	m_maincpu->set_clock_scale(1.0);
 
 	if ((offset & 0xf0) == 0xb0)
 	{
@@ -365,7 +365,7 @@ uint8_t electronsp_state::electron_fred_r(offs_t offset)
 void electronsp_state::electron_fred_w(offs_t offset, uint8_t data)
 {
 	/* The processor will run at 2MHz during an access cycle to the ROM */
-	m_maincpu->set_clock_scale(1.0f);
+	m_maincpu->set_clock_scale(1.0);
 
 	electron_state::electron_fred_w(offset, data);
 
@@ -382,7 +382,7 @@ void electronsp_state::electron_fred_w(offs_t offset, uint8_t data)
 uint8_t electron_state::electron_jim_r(offs_t offset)
 {
 	/* The processor will run at 2MHz during an access cycle to the ROM */
-	m_maincpu->set_clock_scale(1.0f);
+	m_maincpu->set_clock_scale(1.0);
 
 	/* The Issue 4 ULA returns data from OS ROM, whereas Issue 6 ULA will return 0xff */
 	//logerror("JIM: read fd%02x\n", offset);
@@ -392,7 +392,7 @@ uint8_t electron_state::electron_jim_r(offs_t offset)
 void electron_state::electron_jim_w(offs_t offset, uint8_t data)
 {
 	/* The processor will run at 2MHz during an access cycle to the ROM */
-	m_maincpu->set_clock_scale(1.0f);
+	m_maincpu->set_clock_scale(1.0);
 
 	//logerror("JIM: write fd%02x\n", offset);
 	m_exp->expbus_w(0xfd00 + offset, data);
@@ -401,7 +401,7 @@ void electron_state::electron_jim_w(offs_t offset, uint8_t data)
 uint8_t electron_state::electron_sheila_r(offs_t offset)
 {
 	/* The processor will run at 2MHz during an access cycle to the ROM */
-	m_maincpu->set_clock_scale(1.0f);
+	m_maincpu->set_clock_scale(1.0);
 
 	/* The Issue 4 ULA returns data from OS ROM, whereas Issue 6 ULA will return 0xfe */
 	uint8_t data = 0xff;
@@ -430,7 +430,7 @@ static const int electron_mode_end[8] = { 255, 255, 255 ,249 ,255, 255, 249, 249
 void electron_state::electron_sheila_w(offs_t offset, uint8_t data)
 {
 	/* The processor will run at 2MHz during an access cycle to the ROM */
-	m_maincpu->set_clock_scale(1.0f);
+	m_maincpu->set_clock_scale(1.0);
 
 	m_exp->expbus_w(0xfe00 + offset, data);
 

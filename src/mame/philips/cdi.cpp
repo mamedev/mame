@@ -780,12 +780,6 @@ ROM_START( quizardi_12 )
 	QUIZARD1_MCU_IT
 ROM_END
 
-ROM_START( quizardi_10 )
-	QUIZARD_BIOS_ROM
-	QUIZARD1_CHD_10
-	QUIZARD1_MCU_IT
-ROM_END
-
 //********************************************************
 //                     Quizard 2
 //********************************************************
@@ -924,7 +918,6 @@ GAME( 1995, quizard_10,  quizard,  quizard,       quizard,  quizard_state, empty
 GAME( 1995, quizardi,    quizard,  quizard,       quizard,  quizard_state, empty_init,  ROT0, "TAB Austria",  "Quizard (v1.8, Italian, i8751 IT 11 I2)", MACHINE_IMPERFECT_SOUND )
 GAME( 1995, quizardi_17, quizard,  quizard,       quizard,  quizard_state, empty_init,  ROT0, "TAB Austria",  "Quizard (v1.7, Italian, i8751 IT 11 I2)", MACHINE_IMPERFECT_SOUND )
 GAME( 1995, quizardi_12, quizard,  quizard,       quizard,  quizard_state, empty_init,  ROT0, "TAB Austria",  "Quizard (v1.2, Italian, i8751 IT 11 I2)", MACHINE_IMPERFECT_SOUND )
-GAME( 1995, quizardi_10, quizard,  quizard,       quizard,  quizard_state, empty_init,  ROT0, "TAB Austria",  "Quizard (v1.0, Italian, i8751 IT 11 I2)", MACHINE_IMPERFECT_SOUND )
 
 GAME( 1995, quizard2,    cdibios,  quizard,       quizard,  quizard_state, empty_init,  ROT0, "TAB Austria",  "Quizard 2 (v2.3, German, i8751 DN 122 D3)", MACHINE_IMPERFECT_SOUND )
 GAME( 1995, quizard2_22, quizard2, quizard,       quizard,  quizard_state, empty_init,  ROT0, "TAB Austria",  "Quizard 2 (v2.2, German, i8751 DN 122 D3)", MACHINE_IMPERFECT_SOUND )

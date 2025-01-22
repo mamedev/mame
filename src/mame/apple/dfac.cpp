@@ -100,15 +100,15 @@ static constexpr double atten_table[8] =
 	1.0                     // No attenuation
 };
 
-dfac_device::dfac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, APPLE_DFAC, tag, owner, clock),
-	  device_sound_interface(mconfig, *this),
-	  m_stream(nullptr),
-	  m_data(false),
-	  m_clock(false),
-	  m_dfaclatch(false),
-	  m_settings_byte(0),
-	  m_latch_byte(0)
+dfac_device::dfac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, APPLE_DFAC, tag, owner, clock),
+	device_sound_interface(mconfig, *this),
+	m_stream(nullptr),
+	m_data(false),
+	m_clock(false),
+	m_dfaclatch(false),
+	m_settings_byte(0),
+	m_latch_byte(0)
 {
 }
 
