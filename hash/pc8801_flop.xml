@@ -4067,14 +4067,10 @@ A few kanji drawings in gameplay are odd to look at (cfr. signs, sports as full 
 		<description>Babylon</description>
 		<year>1986</year>
 		<publisher>クリスタルソフト (Xtal Soft)</publisher>
-		<notes><![CDATA[
-The scenario disk is a user disk for this set so make user is not possible.
-Check the floppy name on XM8.
-]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198612xx"/>
 		<info name="alt_title" value="バビロン"/>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="usage" value="Needs BASIC V2, check Crimson usage information's to create user disk"/>
 		<!--combined image-->
 		<!--rom name="babylon.d88" size="1067728" crc="117d7783" sha1="31bf30823e223c63f9b71c92c024904416da9294"/-->
 
