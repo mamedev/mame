@@ -310,6 +310,14 @@ ROM_START( jak_spmm )
 	// has a HT24LC04 to store settings
 ROM_END
 
+ROM_START( jak_prr )
+	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP("power_rangers_to_the_rescue.bin", 0x000000, 0x400000, CRC(96aef5c9) SHA1(d9a7f882932237c50cf5b5dbe4f8168d8916d9f2) )
+
+	// has a ISSI 827 404 (?) to store settings
+ROM_END
+
+
 ROM_START( smartfp )
 	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP("smartfitparkuk.bin", 0x000000, 0x800000, CRC(2072d7d0) SHA1(eaa4f254d6dee3a7eac64ae2204dd6291e4d27cc) )
@@ -666,6 +674,7 @@ void gameu_handheld_game_state::init_gameu108()
 
 // the JAKKS ones of these seem to be known as 'Generalplus GPAC500' hardware?
 CONS(2008, jak_spmm,  0,       0, base, jak_spmm,  gormiti_game_state, empty_init, "JAKKS Pacific Inc / Santa Cruz Games", "The Amazing Spider-Man and The Masked Menace (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS(2008, jak_prr,   0,       0, base, jak_spmm,  gormiti_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Power Rangers to the Rescue (JAKKS Pacific TV Game) (Aug 8 2008 16:46:59)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 CONS(2009, smartfp,   0,       0, base, smartfp,  gcm394_game_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (UK)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS(2009, smartfps,  smartfp, 0, base, smartfp,  gcm394_game_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
