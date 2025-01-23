@@ -598,11 +598,6 @@ private:
 
 	void palette(palette_device &palette) const;
 
-	// fake output of serial
-	void write_txd(int state);
-
-	void vblank(int state);
-
 	u8 rtc_r(offs_t offset);
 	void rtc_w(offs_t offset, u8 data);
 
@@ -749,7 +744,7 @@ u32 tek440x_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 	if (!BIT(m_videocntl, 5))
 	{
 		// screen off
-		bitmap.fill(rgb_t::black(), cliprect);
+		bitmap.fill((uint16_t)rgb_t::black(), cliprect);
 		return 1;
 	}
 
@@ -1312,11 +1307,6 @@ void tek440x_state::mouse_w(u8 data)
 	LOG("mouse select(%x)\n", m_mouse);
 }
 
-void tek440x_state::write_txd(int state)
-{
-	LOG("acia write_txd(%x)\n", state);
-}
-
 void tek440x_state::printer_pc_w(u8 data)
 {
 
@@ -1358,18 +1348,6 @@ void tek440x_state::kb_tdata_w(int state)
 		m_duart->ip4_w(!state);
 		if (m_kb_loop && m_kb_rdata && !m_kb_rclamp)
 			m_keyboard->kdo_w(state);
-	}
-}
-
-void tek440x_state::vblank(int state)
-{
-
-	if (state == 1)
-	if (BIT(m_videocntl, 6))
-	{
-		LOG("vblank %04x\n", state);
-		m_maincpu->set_input_line(M68K_IRQ_6, ASSERT_LINE);
-		m_maincpu->set_input_line(M68K_IRQ_6, CLEAR_LINE);
 	}
 }
 
