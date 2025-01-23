@@ -2504,93 +2504,88 @@ static INPUT_PORTS_START( mjdiplob )
 	PORT_DIPSETTING(    0x10, "200" )
 	PORT_DIPSETTING(    0x20, "300" )
 	PORT_DIPSETTING(    0x30, "500" )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:7")      // check code at 0x2c64, unused according to manual
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:8")     // check code at 0x2c64, unused according to manual
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR(Unknown) )       PORT_DIPLOCATION("SW2:7")  // Ｏ　Ｎ．固定                                            (check code at 0x2c64)
+	PORT_DIPSETTING(    0x40, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR(Unknown) )       PORT_DIPLOCATION("SW2:8")  // Ｏ　Ｎ．固定                                            (check code at 0x2c64)
+	PORT_DIPSETTING(    0x80, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
 
-	PORT_START("DSW3")  // DSW3 (inport $63 -> 0x76fc), switches 5-7 could do with verifying by someone who understands Japanese and mahjong (see MT05553 for manual)
-	PORT_DIPNAME( 0x01, 0x00, "Baibai Bonus" ) PORT_DIPLOCATION("SW3:1")  // see notes about 'Special Combinations'
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "Don Den" ) PORT_DIPLOCATION("SW3:2")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "W-Bet" ) PORT_DIPLOCATION("SW3:3")      // check code at 0x531f and 0x5375
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "Last Chance" ) PORT_DIPLOCATION("SW3:4")     // check code at 0x5240
-	PORT_DIPSETTING(    0x08, "Free" )
-	PORT_DIPSETTING(    0x00, "Charge" )
-	PORT_DIPNAME( 0x10, 0x00, "Renchan Rate" ) PORT_DIPLOCATION("SW3:5")      // check code at 0x2411
-	PORT_DIPSETTING(    0x00, "Good" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )
-	PORT_DIPNAME( 0x20, 0x00, "Renchan" ) PORT_DIPLOCATION("SW3:6")      // check code at 0x2411 and 0x4beb
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "Auto Tsumo?" ) PORT_DIPLOCATION("SW3:7")      // check code at 0x24ff, 0x25f2, 0x3fcf and 0x45d7
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Full Tests" ) PORT_DIPLOCATION("SW3:8")           // seems to hang after the last animation, unused according to manual
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("DSW3")  // DSW3 (inport $63 -> 0x76fc)
+	PORT_DIPNAME( 0x01, 0x00, "Double Bonus" )         PORT_DIPLOCATION("SW3:1")  // 倍々ボーナス（ＯＤＤＳ表の※印の付いた箇所は２倍）
+	PORT_DIPSETTING(    0x01, DEF_STR(Off) )                                      // 無し
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                       // 有り
+	PORT_DIPNAME( 0x02, 0x00, "Don Den" )              PORT_DIPLOCATION("SW3:2")  // Ｄｏｎ　Ｄｅｎ
+	PORT_DIPSETTING(    0x02, DEF_STR(Off) )                                      // 無し
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                       // 有り
+	PORT_DIPNAME( 0x04, 0x00, "Double Bet" )           PORT_DIPLOCATION("SW3:3")  // Ｗ－ＢＥＴ                                              (check code at 0x531f and 0x5375)
+	PORT_DIPSETTING(    0x04, DEF_STR(Off) )                                      // 無し
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                       // 有り
+	PORT_DIPNAME( 0x08, 0x00, "Last Chance" )          PORT_DIPLOCATION("SW3:4")  // ラストチャンス                                          (check code at 0x5240)
+	PORT_DIPSETTING(    0x08, "Free" )                                            // 無料
+	PORT_DIPSETTING(    0x00, "Paid" )                                            // 有料
+	PORT_DIPNAME( 0x10, 0x00, "Renchan Rate" )         PORT_DIPLOCATION("SW3:5")  // 連荘レート（配牌時、背牌の色によって連荘条件が変わる）  (check code at 0x2411)
+	PORT_DIPSETTING(    0x10, DEF_STR(Normal) )                                   // 普通
+	PORT_DIPSETTING(    0x00, "Good" )                                            // 良い
+	PORT_DIPNAME( 0x20, 0x00, "Enable Renchan Rate" )  PORT_DIPLOCATION("SW3:6")  // 連荘レート                                              (check code at 0x2411 and 0x4beb)
+	PORT_DIPSETTING(    0x20, DEF_STR(Off) )                                      // 無し
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                       // 有り
+	PORT_DIPNAME( 0x40, 0x00, "Ron Hand Animation" )   PORT_DIPLOCATION("SW3:7")  // ゲーム中、当った時　手　のキャラクターが出る。          (check code at 0x24ff, 0x25f2, 0x3fcf and 0x45d7)
+	PORT_DIPSETTING(    0x40, DEF_STR(Off) )                                      // 無し
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                       // 有り
+	PORT_DIPNAME( 0x80, 0x80, "Full Tests" )           PORT_DIPLOCATION("SW3:8")  // ＯＦＦ．固定                                            (seems to hang after the last animation)
+	PORT_DIPSETTING(    0x80, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mjderngr )
+	// Difficulty is set by the first switch in DIP SW.1 that's on,
+	// the rest of the switches are ignored after finding one on.
+	// All switches off is the same as having the first switch on (easy).
+	// e.g. XXXXXXXX = 1 (easy)
+	//      OXXXXXXX = 1 (easy)
+	//      OXOXXXXX = 1 (easy)
+	//      XOOXXXXX = 2
+	//      XXOXXXXX = 3
+	//      XXXOXXOX = 4
+
 	PORT_INCLUDE( mjctrl2 )
 
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) )           PORT_DIPLOCATION("DIP 2:1,2")
-	PORT_DIPSETTING(    0x03, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Demo_Sounds ) )       PORT_DIPLOCATION("DIP 2:3")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Auto Reach" )                 PORT_DIPLOCATION("DIP 2:4")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )           PORT_DIPLOCATION("DIP 2:5")
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )           PORT_DIPLOCATION("DIP 2:6")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )           PORT_DIPLOCATION("DIP 2:7")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "ROM & Animation Test" )       PORT_DIPLOCATION("DIP 2:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("DSW1") // stored at 0x7681
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR(Coinage) )           PORT_DIPLOCATION("DIP SW.2:1,2")              // コイン設定
+	PORT_DIPSETTING(    0x03, DEF_STR(4C_1C) )                                                           // ４コイン　１プレイ
+	PORT_DIPSETTING(    0x02, DEF_STR(2C_1C) )                                                           // ２コイン　１プレイ
+	PORT_DIPSETTING(    0x00, DEF_STR(1C_1C) )                                                           // １コイン　１プレイ
+	PORT_DIPSETTING(    0x01, DEF_STR(1C_2C) )                                                           // １コイン　２プレイ
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR(Demo_Sounds) )       PORT_DIPLOCATION("DIP SW.2:3")                // デモ・サウンド
+	PORT_DIPSETTING(    0x04, DEF_STR(Off) )                                                             // 無し
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                              // 有り
+	PORT_DIPNAME( 0x08, 0x08, "Auto Reach" )               PORT_DIPLOCATION("DIP SW.2:4")                // オート・ツモ
+	PORT_DIPSETTING(    0x08, DEF_STR(Off) )                                                             // 無し
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                              // 有り
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR(Unknown) )           PORT_DIPLOCATION("DIP SW.2:5")                // ＯＦＦ　固定
+	PORT_DIPSETTING(    0x10, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR(Unknown) )           PORT_DIPLOCATION("DIP SW.2:6")                // ＯＦＦ　固定
+	PORT_DIPSETTING(    0x20, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR(Unknown) )           PORT_DIPLOCATION("DIP SW.2:7")                // ＯＦＦ　固定
+	PORT_DIPSETTING(    0x40, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x80, 0x80, "ROM & Animation Test" )     PORT_DIPLOCATION("DIP SW.2:8")                // ＯＦＦ　固定
+	PORT_DIPSETTING(    0x80, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
 
-	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )           PORT_DIPLOCATION("DIP 1:1")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )           PORT_DIPLOCATION("DIP 1:2")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )           PORT_DIPLOCATION("DIP 1:3")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )           PORT_DIPLOCATION("DIP 1:4")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )           PORT_DIPLOCATION("DIP 1:5")
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )           PORT_DIPLOCATION("DIP 1:6")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )           PORT_DIPLOCATION("DIP 1:7")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )           PORT_DIPLOCATION("DIP 1:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("DSW2") // stored at 0x7680
+	PORT_DIPNAME( 0xff, 0xef, "Computer Strength" )        PORT_DIPLOCATION("DIP SW.1:1,2,3,4,5,6,7,8")  // コンピューターの強さ
+	PORT_DIPSETTING(    0xfe, "1 (Weak)" )                                                               // 弱い
+	PORT_DIPSETTING(    0xfd, "2" )
+	PORT_DIPSETTING(    0xfb, "3" )
+	PORT_DIPSETTING(    0xf7, "4" )
+	PORT_DIPSETTING(    0xef, "5 (Normal)" )                                                             // （標準）
+	PORT_DIPSETTING(    0xdf, "6" )
+	PORT_DIPSETTING(    0xbf, "7" )
+	PORT_DIPSETTING(    0x7f, "8 (Strong)" )                                                             // 強い
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( majs101b )
