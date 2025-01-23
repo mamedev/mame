@@ -64,31 +64,31 @@ void serial_vfd_device::run_command(){
 	if(m_reset && m_cmd & 0x80){
 		// Command
 		switch(m_cmd & 0xe0){
-			case 0xA0:
-				temp = (m_cmd & 0x0F);
-				if(temp == 0x0F) m_cursor = 0;
+			case 0xa0:
+				temp = (m_cmd & 0x0f);
+				if(temp == 0x0f) m_cursor = 0;
 				else m_cursor = temp;
 				LOGVFD("vfd cursor: %d\n", m_cursor);
 				break;
-			case 0xC0:
-				m_digits = (m_cmd & 0x0F);
+			case 0xc0:
+				m_digits = (m_cmd & 0x0f);
 				LOGVFD("vfd digits: %d\n", m_digits);
 				break;
-			case 0xE0:
-				m_bright = (m_cmd & 0x1F);
+			case 0xe0:
+				m_bright = (m_cmd & 0x1f);
 				LOGVFD("vfd brightness: %d\n", m_bright);
 				break;
 		}
 	} else {
 		// "ASCII"
-		LOGVFD("vfd_text: %02x, %s, %d\n", (m_cmd & 0x3F), m_cmd, m_cursor);
-		if(m_cmd != 0x2C && m_cmd != 0x2E){
-			m_buff[m_cursor] = vfd_charMap[m_cmd & 0x3F];
-			m_vfd[m_cursor] = vfd_charMap[m_cmd & 0x3F];
+		LOGVFD("vfd_text: %02x, %s, %d\n", (m_cmd & 0x3f), m_cmd, m_cursor);
+		if(m_cmd != 0x2c && m_cmd != 0x2e){
+			m_buff[m_cursor] = vfd_charMap[m_cmd & 0x3f];
+			m_vfd[m_cursor] = vfd_charMap[m_cmd & 0x3f];
 			m_cursor++;
 		} else {
 			// , or . so need to update last char instead
-			m_vfd[m_cursor-1] = (m_buff[m_cursor-1] | vfd_charMap[m_cmd & 0x3F]);
+			m_vfd[m_cursor-1] = (m_buff[m_cursor-1] | vfd_charMap[m_cmd & 0x3f]);
 		}
 		if(!m_digits){
 			if(m_cursor >= 16) m_cursor = 0;
