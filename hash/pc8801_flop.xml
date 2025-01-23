@@ -4070,7 +4070,8 @@ A few kanji drawings in gameplay are odd to look at (cfr. signs, sports as full 
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198612xx"/>
 		<info name="alt_title" value="バビロン"/>
-		<info name="usage" value="Needs BASIC V2, check Crimson usage information's to create user disk"/>
+		<info name="usage" value="Needs BASIC V2"/>
+		<!-- check Crimson usage information for instructions on how to create user disk -->
 		<!--combined image-->
 		<!--rom name="babylon.d88" size="1067728" crc="117d7783" sha1="31bf30823e223c63f9b71c92c024904416da9294"/-->
 
