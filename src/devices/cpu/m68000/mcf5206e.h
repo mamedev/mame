@@ -292,8 +292,8 @@ protected:
 	//virtual void device_clock_changed() override { }
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	void coldfire_vector_map(address_map &map);
-	void coldfire_regs_map(address_map &map);
+	void coldfire_vector_map(address_map &map) ATTR_COLD;
+	void coldfire_regs_map(address_map &map) ATTR_COLD;
 
 	void init_regs(bool first_init);
 
