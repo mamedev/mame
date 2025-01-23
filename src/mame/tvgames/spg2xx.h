@@ -237,11 +237,9 @@ public:
 	{ }
 
 	void init_senwfit();
+
 protected:
-
 	virtual void portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
-
-private:
 };
 
 
@@ -272,8 +270,6 @@ public:
 
 	ioport_value wheel_r();
 	ioport_value wheel2_r();
-
-private:
 };
 
 
@@ -308,10 +304,7 @@ public:
 
 	void lexiart(machine_config &config);
 
-protected:
-
 private:
-
 	void mem_map_lexiart(address_map &map) ATTR_COLD;
 };
 
@@ -329,9 +322,7 @@ public:
 	void init_jeuint();
 
 protected:
-
 	uint16_t ordentv_portc_r(offs_t offset, uint16_t mem_mask = ~0);
-private:
 };
 
 class spg2xx_game_hotwheels_state : public spg2xx_game_state
@@ -346,12 +337,10 @@ public:
 	void hotwheels(machine_config &config);
 
 protected:
-
 	uint16_t hotwheels_porta_r(offs_t offset, uint16_t mem_mask = ~0);
 	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 
 private:
-
 	uint16_t m_porta_dat_hot;
 	required_ioport m_io_p1_extra;
 };
@@ -385,9 +374,30 @@ public:
 	{ }
 
 	void init_ddr33v();
+};
+
+class epo_tetr_game_state : public spg2xx_game_state
+{
+public:
+	epo_tetr_game_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag),
+		m_ioextra(*this, "EXTRA")
+	{ }
+
+	void epo_tetr(machine_config &config);
 
 protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
 private:
+	uint16_t epo_tetr_r(offs_t offset, uint16_t mem_mask);
+	void epo_tetr_portb_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+
+	uint16_t m_old_portb_data;
+	uint16_t m_old_portb_extra_latch;
+
+	required_ioport m_ioextra;
 };
 
 class spg2xx_game_prail_state : public spg2xx_game_state
@@ -406,7 +416,5 @@ protected:
 private:
 	required_device<i2cmem_device> m_i2cmem;
 };
-
-
 
 #endif // MAME_TVGAMES_SPG2XX_H

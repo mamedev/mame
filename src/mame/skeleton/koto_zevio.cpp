@@ -2,7 +2,7 @@
 // copyright-holders:David Haywood
 
 // The Zevio SoC was developed by Koto Laboratory, the same company behind the Wonderswan
-
+// is it related to Ponto-1 in epoch_tv_globe.cpp, as Koto is credited there too
 #include "emu.h"
 
 #include "cpu/arm7/arm7.h"

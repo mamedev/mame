@@ -155,6 +155,7 @@ public:
 	void gameu(machine_config &config);
 
 	void init_gameu();
+	void init_gameu50();
 	void init_gameu108();
 
 protected:
