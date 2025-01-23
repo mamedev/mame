@@ -134,6 +134,7 @@ EINT3: DUART INT?
 		* pl6_demo: Write 0x4e75 at 0x6001063a after CF has loaded to get demo working. Hangs waiting for ColdFire UART to transmit otherwise.
 		* pl6vdemo: Doesn't work at all, needs Cremson emulating.
 		* pl6ddemo: Doesn't work at all, needs Cremson emulating.
+		* pl6_cm:	Windows harddrive is not dumped. PC is connected to the Pluto 6 over RS232.
 		* tijkpots: Game is missing CF card. For whatever reason, the blank image doesn't cause it to fail to load, and so reads invalid data
 */
 
@@ -660,12 +661,6 @@ ROM_START( pl6_cm )
 
 	ROM_REGION( 0x80000, "program1", ROMREGION_ERASE00 )
 	ROM_LOAD( "acc6_b2.u2", 0x00000, 0x40000, CRC(97494822) SHA1(01b7f2eb9af34e0a2d626ec303979c6b53cb83b9) )
-
-	ROM_REGION( 0x80000, "pcbios", ROMREGION_ERASE00 )
-	ROM_LOAD( "pcbios", 0x00000, 0x80000, NO_DUMP )
-
-	DISK_REGION( "pcata:0:hdd" )
-	DISK_IMAGE( "pl6_cm", 0, NO_DUMP )
 ROM_END
 
 ROM_START( pl6_atw )
