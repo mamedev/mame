@@ -35036,6 +35036,7 @@ gtct885
 hhgc319
 hkb502
 hkb502a
+lexi30
 lpgm240
 lxcap
 lxccatv
@@ -35057,6 +35058,7 @@ mog_m320
 myarccn
 nubsupmf
 otrail
+pactin
 q5_500in1
 rd5_240
 red5mam
@@ -35066,10 +35068,13 @@ rtvgc300fz
 sealvt
 sy888b
 sy889
+tetrtin
 tup240
+unk128vt
 unk2019hh
 unk2020hh
 unkra200
+vibes240
 zonefusn
 
 @source:nintendo/nss.cpp
@@ -35286,6 +35291,9 @@ cmpmx11
 dance555
 exsprt48
 gm235upc
+icb_car
+icb_dp
+icb_ts
 ii8in1
 ii32in1
 intact89
@@ -39746,6 +39754,7 @@ ssf2mdb
 twinktmb
 
 @source:sega/megadriv_rad.cpp
+atgame40
 dgunl3227
 dgunl3227a
 mdtvp1j
@@ -39758,6 +39767,7 @@ rad_gen2                        // (c)2004 Radica
 rad_md1
 rad_md1uk
 rad_md2uk
+rad_mncr
 rad_orun
 rad_sf2                         // (c)2004 Radica
 rad_sf2uk                       // (c)2004 Radica
@@ -42574,6 +42584,7 @@ elzet80p                        //
 epic14e                         //
 
 @source:skeleton/epoch_tv_globe.cpp
+digixar
 eptvglob
 
 @source:skeleton/esprit.cpp
@@ -45905,6 +45916,7 @@ rad_hnt3p
 rad_bask
 rad_baskp
 spidtt
+teentit
 tsbuzz
 
 @source:tvgames/generalplus_gpl16250_mobigo.cpp
@@ -45936,7 +45948,9 @@ beambox
 @source:tvgames/generalplus_gpl16250_rom.cpp
 beijuehh
 bornkidh
+fpsport
 gameu50
+gameu90
 gameu108
 gormiti
 imgame
@@ -45961,6 +45975,7 @@ wrlshunt                        // Wireless: Hunting Video Game System
 
 @source:tvgames/generalplus_gpl16250_spi.cpp
 anpanbd
+bk139in1
 bkrankp
 prailpls
 
@@ -46060,6 +46075,7 @@ doraphonf
 doyousud
 dreamlss
 drumsups
+epo_tetr
 fordrace
 gssytts
 guitarfv
@@ -46280,6 +46296,7 @@ megadri4a
 abl4play
 lexitvsprt
 my1stddr                        // (c) 2006 Konami
+senspid
 shtscore
 teleshi
 teleship

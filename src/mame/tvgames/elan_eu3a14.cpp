@@ -105,6 +105,11 @@ public:
 	void radica_eu3a14_altrambase_bb3(machine_config &config);
 	void radica_eu3a14p_altrambase_bb3(machine_config &config);
 
+	void radica_eu3a14_altspritebase(machine_config& config);
+	void radica_eu3a14_altspritebase_bat(machine_config& config);
+
+	int tsbuzz_inputs_r();
+
 private:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -210,7 +215,7 @@ void elan_eu3a14_state::portc_dat_w(uint8_t data)
 
 void elan_eu3a14_state::bank_map(address_map &map)
 {
-	map(0x000000, 0x3fffff).rom().region("maincpu", 0);
+	map(0x000000, 0x7fffff).rom().region("maincpu", 0);
 }
 
 void elan_eu3a14_state::radica_eu3a14_map(address_map& map)
@@ -260,6 +265,25 @@ static INPUT_PORTS_START( eu3a14 )
 
 	PORT_START("IN2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+int elan_eu3a14_state::tsbuzz_inputs_r()
+{
+	// Test mode shows 8 directions, 2 buttons and a trigger
+	// presumably the motion detection from the peripherals gets converted
+	// into basic input directions before reaching the SoC
+
+	// TODO: figure out protocol
+	return machine().rand();
+}
+
+static INPUT_PORTS_START( tsbuzz )
+	PORT_INCLUDE( eu3a14 )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 ) // pause(?), hold this on startup for test mode
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) // cheat? skips levels
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(elan_eu3a14_state::tsbuzz_inputs_r)) // all other inputs read through here
 INPUT_PORTS_END
 
 
@@ -800,6 +824,20 @@ void elan_eu3a14_state::radica_eu3a14(machine_config &config)
 	m_sound->sound_end_cb<5>().set(FUNC(elan_eu3a14_state::sound_end5));
 }
 
+void elan_eu3a14_state::radica_eu3a14_altspritebase(machine_config& config)
+{
+	radica_eu3a14(config);
+	m_vid->set_default_spriteramaddr(0x04); // at 0x800
+}
+
+void elan_eu3a14_state::radica_eu3a14_altspritebase_bat(machine_config& config)
+{
+	radica_eu3a14(config);
+	m_vid->set_default_spriteramaddr(0x0c); // at 0x1800
+}
+
+
+
 void elan_eu3a14_state::radica_eu3a14_altrambase(machine_config& config)
 {
 	radica_eu3a14(config);
@@ -975,6 +1013,11 @@ ROM_START( spidtt )
 	ROM_LOAD( "mag_spidtt", 0x000000, 0x800000, CRC(05de01de) SHA1(f2891d6e743abdd7bb50d0bb84701b18225a0a7a) )
 ROM_END
 
+ROM_START( teentit )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "teentitansmag.bin", 0x000000, 0x800000, CRC(6087c7ca) SHA1(0bf639218c5f25449f4f98d5c3659a2311a28f72) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -996,11 +1039,11 @@ CONS( 2005, rad_hnt3p,rad_hnt3, 0, radica_eu3a14p,               radica_hnt3,   
 CONS( 2005, rad_bask, 0,        0, radica_eu3a14_altrambase,     radica_bask,   elan_eu3a14_state, empty_init,  "Radica / FarSight Studios",                                         "Play TV Basketball", MACHINE_NOT_WORKING )
 CONS( 2005, rad_baskp,rad_bask, 0, radica_eu3a14p_altrambase,    radica_bask,   elan_eu3a14_state, empty_init,  "Radica / FarSight Studios",                                         "Connectv Basketball", MACHINE_NOT_WORKING )
 
-CONS( 200?, tsbuzz,   0,        0, radica_eu3a14,                eu3a14,        elan_eu3a14_state, empty_init,  "Thinkway Toys",                                                     "Interactive M.A.G. Motion Activated Gear: Toy Story and Beyond! Buzz Lightyear Galactic Adventure", MACHINE_NOT_WORKING )
-CONS( 200?, batvgc,   0,        0, radica_eu3a14,                eu3a14,        elan_eu3a14_state, empty_init,  "Thinkway Toys",                                                     "Interactive M.A.G. Motion Activated Gear: The Batman - Villains of Gotham City", MACHINE_NOT_WORKING )
-CONS( 200?, spidtt,   0,        0, radica_eu3a14,                eu3a14,        elan_eu3a14_state, empty_init,  "Thinkway Toys",                                                     "Interactive M.A.G. Motion Activated Gear: Spider-Man - Triple Threat", MACHINE_NOT_WORKING )
+CONS( 200?, tsbuzz,   0,        0, radica_eu3a14_altspritebase,      tsbuzz,    elan_eu3a14_state, empty_init,  "Thinkway Toys",                                                     "Interactive M.A.G. Motion Activated Gear: Toy Story and Beyond! Buzz Lightyear Galactic Adventure", MACHINE_NOT_WORKING )
+CONS( 200?, batvgc,   0,        0, radica_eu3a14_altspritebase_bat,  tsbuzz,    elan_eu3a14_state, empty_init,  "Thinkway Toys",                                                     "Interactive M.A.G. Motion Activated Gear: The Batman - Villains of Gotham City", MACHINE_NOT_WORKING )
+CONS( 200?, spidtt,   0,        0, radica_eu3a14_altspritebase_bat,  tsbuzz,    elan_eu3a14_state, empty_init,  "Thinkway Toys",                                                     "Interactive M.A.G. Motion Activated Gear: Spider-Man - Triple Threat", MACHINE_NOT_WORKING )
+CONS( 200?, teentit,  0,        0, radica_eu3a14_altspritebase_bat,  tsbuzz,    elan_eu3a14_state, empty_init,  "Thinkway Toys",                                                     "Interactive M.A.G. Motion Activated Gear: Teen Titans Arena Showdown", MACHINE_NOT_WORKING )
 
 // the following Thinkway Toys 'MAG' products likely also fit here
-// MAG: Teen Titans Arena Showdown
 // MAG: Superman Fight for Metropolis
 // MAG: Disney Pixar Cars I Am Speed
