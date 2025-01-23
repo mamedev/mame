@@ -76,7 +76,7 @@
 #define LOG_MMU (1U << 1)
 #define LOG_FPU (1U << 2)
 
-#define VERBOSE 1
+//#define VERBOSE LOG_GENERAL
 #include "logmacro.h"
 
 // mapcntl bits
