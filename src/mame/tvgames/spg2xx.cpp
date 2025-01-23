@@ -2197,13 +2197,16 @@ void epo_tetr_game_state::machine_reset()
 uint16_t epo_tetr_game_state::epo_tetr_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0;
+
 	int eeprom = m_i2cmem->read_sda();
 	data |= (eeprom << 1);
 
 	int p2 = m_old_portb_extra_latch & 1;
 	data |= (p2 << 6);
 
-	logerror("%s: epo_tetr_r: %04x (%04x)\n", machine().describe_context(), data, mem_mask);
+	if (!machine().side_effects_disabled())
+		logerror("%s: epo_tetr_r: %04x (%04x)\n", machine().describe_context(), data, mem_mask);
+
 	return data;
 }
 
