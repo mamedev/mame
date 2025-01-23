@@ -6673,5 +6673,4 @@ CONS( 2007, cmpmx11,     0,        0,  mx10, mx10, vt1682_mx10_state, mx10_init,
 // this unit has a vertical screen, and the games are designed for that aspect
 // only Jungle Soft is shown on box for manufacturer details, 30-in-1 versions also exist
 // see https://bootleggames.fandom.com/wiki/Classic_Max_Pocket for other units with these games
-// how do you specify ROT270 with CONS? using GAME macro for now
 CONS( 2007, cmpmx10,     0,        0,  mx10, mx10, vt1682_mx10_state, mx10_init, "Jungle Soft",    "Classic Max Pocket Mx-10 - 12 in 1 (vertical)", ROT270 | MACHINE_IMPERFECT_GRAPHICS )
