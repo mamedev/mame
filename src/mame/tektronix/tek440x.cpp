@@ -751,8 +751,9 @@ u32 tek440x_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 	u32 invert = BIT(m_videocntl, 4) ? 0 : -1;
 	int pan = (m_videocntl & 15) ^ 15;
 
-	int woffset = 0;	m_videoaddr[0] - 0xffe9;  // ??? why
-
+	int woffset = (m_videoaddr[0] - 0xffe9) & 0x3f;  // why 0xffe9 is TL..
+	woffset += (m_videoaddr[0] - 0xffe9) & 0x7fc0;
+	
 	for (int y = 0; y < 480; y++)
 	{
 	
