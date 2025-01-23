@@ -3,14 +3,14 @@
 // thanks-to:Sean Riddle
 /*******************************************************************************
 
-Diamond Bridge Computer (model M1011)
+Micro-Concepts Diamond Bridge Computer (model M1011)
 Also sold by Nu Vations as Nu Va Bridge Computer (model NV211)
 
 Hardware notes:
 - PCB label: MCL, M1011
 - Hitachi HD44860 @ ~800kHz (33K resistor)
 - LCD with custom segments, no sound
-- comms jack for playing against another Bridge Computer
+- comms jack for playing against another Diamond Bridge Computer
 
 TODO:
 - add comms port
@@ -255,4 +255,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1987, dbridgec, 0,      0,      dbridgec, dbridgec, dbridgec_state, empty_init, "Diamond", "Bridge Computer (Diamond)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NODEVICE_LAN )
+SYST( 1987, dbridgec, 0,      0,      dbridgec, dbridgec, dbridgec_state, empty_init, "Micro-Concepts", "Diamond Bridge Computer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NODEVICE_LAN )
