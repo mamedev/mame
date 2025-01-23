@@ -42,9 +42,11 @@
 #define INT_LEVEL(N) 	((N&0x1c) >> 2)
 #define ICR_USE_AUTOVEC(N)	((N & 0x80) != 0)
 
-#define BITWRITE(x, n, s) ((x & ~(1 << n)) | (s << n))
-#define BITSET(x, n) BITWRITE(x, n, 1)
-#define BITCLEAR(x, n) BITWRITE(x, n, 0)
+template <typename T, typename U, typename V>
+inline void BITWRITE(T &var, U bit_number, V state) {
+    var = (var & ~(static_cast<T>(1) << bit_number)) | (static_cast<T>(state) << bit_number);
+}
+
 
 DEFINE_DEVICE_TYPE(MCF5206E,    mcf5206e_device,    "mcf5206e",     "Freescale MCF5206E")
 DEFINE_DEVICE_TYPE(COLDFIRE_SIM,    coldfire_sim_device,    "coldfire_sim",     "ColdFire SIM Module")
@@ -842,7 +844,7 @@ void coldfire_mbus_device::mbsr_w(uint8_t data)
 	LOGMASKED(LOG_MBUS, "%s: (M-Bus Status Register) mbsr_w: %02x\n", this->machine().describe_context(), data);
 }
 
-uint8_t coldfire_mbus_device::mbsr_r()
+uint8_t coldfire_mbus_device::mbdr_r()
 {
 	int hack = 0x00;
 	hack ^= (machine().rand()&0xff);
