@@ -17,6 +17,7 @@
 #include "upd931.h"
 
 #include <algorithm>
+#include <cmath>
 
 DEFINE_DEVICE_TYPE(UPD931, upd931_device, "upd931", "NEC uPD931")
 
@@ -25,9 +26,9 @@ upd931_device::upd931_device(const machine_config &mconfig, const char *tag, dev
 	, device_sound_interface(mconfig, *this)
 	, m_filter_cb(*this)
 	, m_sync_cb(*this)
+	, m_master(true)
+	, m_retrig_timer(nullptr)
 {
-	m_master = true;
-	m_retrig_timer = nullptr;
 }
 
 /**************************************************************************/

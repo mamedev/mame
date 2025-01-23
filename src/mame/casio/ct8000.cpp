@@ -81,20 +81,20 @@ public:
 	{
 	}
 
-	void config_base(machine_config &config);
-	void ctmb1(machine_config &config);
-	void ct8000(machine_config &config);
-	void ctfk1(machine_config &config);
+	void config_base(machine_config &config) ATTR_COLD;
+	void ctmb1(machine_config &config) ATTR_COLD;
+	void ct8000(machine_config &config) ATTR_COLD;
+	void ctfk1(machine_config &config) ATTR_COLD;
 
 	ioport_value switch_r() { return m_switch; }
 	DECLARE_INPUT_CHANGED_MEMBER(switch_w);
 	DECLARE_INPUT_CHANGED_MEMBER(switch_clear_w);
 
 protected:
-	void ct8000_map(address_map &map);
-	void ct8000_io_map(address_map &map);
+	void ct8000_map(address_map &map) ATTR_COLD;
+	void ct8000_io_map(address_map &map) ATTR_COLD;
 
-	virtual void driver_start() override;
+	virtual void driver_start() override ATTR_COLD;
 
 	void p1_w(u8 data);
 	u8 p1_r();

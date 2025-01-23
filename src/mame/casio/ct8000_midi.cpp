@@ -102,8 +102,8 @@ ct8000_midi_device::ct8000_midi_device(const machine_config &mconfig, const char
 	, device_serial_interface(mconfig, *this)
 	, m_channel(*this, "CHANNEL")
 	, m_int_cb(*this)
+	, m_base_program(0)
 {
-	m_base_program = 0;
 }
 
 /**************************************************************************/
