@@ -653,7 +653,7 @@ void ns32081_device_base::execute()
 		}
 	}
 
-	if (!m_out_scb.isunset())
+	if (!m_out_spc.isunset())
 		m_complete->adjust(attotime::from_ticks(m_tcy, clock()));
 
 	m_state = STATUS;
@@ -680,8 +680,8 @@ u16 ns32081_device_base::status(int *icount)
 
 void ns32081_device_base::complete(s32 param)
 {
-	m_out_scb(0);
-	m_out_scb(1);
+	m_out_spc(0);
+	m_out_spc(1);
 }
 
 ns32081_device::ns32081_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
@@ -734,6 +734,21 @@ void ns32081_device::reg_set(unsigned const reg, unsigned const op_size, u64 con
 	m_f[reg ^ 0] = u32(op_value >> 0);
 	if (op_size == LENGTH_L)
 		m_f[reg ^ 1] = u32(op_value >> 32);
+}
+
+u16 ns32081_device::slow_status(int *icount)
+{
+	return status(icount);
+}
+
+u16 ns32081_device::slow_read()
+{
+	return read<u16>();
+}
+
+void ns32081_device::slow_write(u16 data)
+{
+	write<u16>(data);
 }
 
 ns32381_device::ns32381_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
@@ -791,4 +806,34 @@ void ns32381_device::reg_set(unsigned const reg, unsigned const op_size, u64 con
 		m_l[reg & 6] = (op_value << 32) | u32(m_l[reg & 6]);
 	else
 		m_l[reg & 6] = (m_l[reg & 6] & 0xffff'ffff'0000'0000ULL) | u32(op_value);
+}
+
+u16 ns32381_device::slow_status(int *icount)
+{
+	return status(icount);
+}
+
+u16 ns32381_device::slow_read()
+{
+	return read<u16>();
+}
+
+void ns32381_device::slow_write(u16 data)
+{
+	write<u16>(data);
+}
+
+u32 ns32381_device::fast_status(int *icount)
+{
+	return status(icount);
+}
+
+u32 ns32381_device::fast_read()
+{
+	return read<u32>();
+}
+
+void ns32381_device::fast_write(u32 data)
+{
+	write<u32>(data);
 }

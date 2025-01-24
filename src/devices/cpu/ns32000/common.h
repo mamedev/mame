@@ -35,11 +35,10 @@ namespace ns32000
 class ns32000_slave_interface : public device_interface
 {
 public:
-	auto out_scb() { return m_out_scb.bind(); }
+	auto out_spc() { return m_out_spc.bind(); }
 
 	ns32000_slave_interface(machine_config const &mconfig, device_t &device)
-		: device_interface(device, "ns32000_slave")
-		, m_out_scb(*this)
+		: ns32000_slave_interface(mconfig, device, "ns32000_slave")
 	{
 	}
 
@@ -68,11 +67,11 @@ public:
 protected:
 	ns32000_slave_interface(machine_config const &mconfig, device_t &device, char const *type)
 		: device_interface(device, type)
-		, m_out_scb(*this)
+		, m_out_spc(*this)
 	{
 	}
 
-	devcb_write_line m_out_scb;
+	devcb_write_line m_out_spc;
 };
 
 class ns32000_fpu_interface : public ns32000_slave_interface
