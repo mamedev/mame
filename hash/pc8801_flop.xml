@@ -41682,6 +41682,7 @@ Not extensively tested
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="Studio K2" />
 		<info name="alt_title" value="パトルエントリー"/>
+		<info name="usage" value="Needs BASIC V2"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="263184">
@@ -41741,6 +41742,34 @@ Not extensively tested
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="beed (disk 3).d88" size="348848" crc="33027d70" sha1="5c7a57fc52fa0dd0e01d514bff6ae0b354d3e879"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="berserke" supported="yes">
+		<description>Berserkers Front Gaiden 3</description>
+		<year>19??</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Studio K2" />
+		<info name="usage" value="Needs BASIC V2"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="berserkers front gaiden 3.d88" size="348848" crc="91ab779c" sha1="3c21912259d0ab43cf3fbd5c481d7275777ae81e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="berserkep" supported="yes">
+		<description>Berserkers Front Gaiden 3 Plus - Turning Point</description>
+		<year>19??</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Studio K2" />
+		<info name="usage" value="Needs BASIC V2"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="350224">
+				<rom name="berserkers front gaiden 3 plus - turning point.d88" size="350224" crc="c37b39ba" sha1="5f688a428d51438bda2225a30842e32b6812a880"/>
 			</dataarea>
 		</part>
 	</software>
@@ -51808,17 +51837,6 @@ Tests [Sound Board 2]
 			<feature name="part_id" value="Visual" />
 			<dataarea name="flop" size="348832">
 				<rom name="battle bunnygirl (a) (visual).d88" size="348832" crc="53a7ed2d" sha1="f089cdb90b758c59842d89755e4717de610d45d2"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="berserke">
-		<description>Berserkers Front Gaiden 3</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="berserkers front gaiden 3.d88" size="348848" crc="91ab779c" sha1="3c21912259d0ab43cf3fbd5c481d7275777ae81e"/>
 			</dataarea>
 		</part>
 	</software>
