@@ -540,7 +540,7 @@ void st0016_state::st0016(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(48*8, 48*8);
 	m_screen->set_visarea(0*8, 48*8-1, 0*8, 48*8-1);
-	m_screen->set_screen_update(m_maincpu, FUNC(st0016_cpu_device::update));
+	m_screen->set_screen_update(m_maincpu, FUNC(st0016_cpu_device::screen_update));
 	m_screen->set_palette("maincpu:palette");
 
 	// TODO: Mono?
