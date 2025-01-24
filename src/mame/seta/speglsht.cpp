@@ -226,7 +226,7 @@ void speglsht_state::cop_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_cop_ram[offset]);
 
-	if (m_cop_ram[offset] & 0x8000) //fix (sign)
+	if (m_cop_ram[offset] & 0x8000) // 16 bit signed to 32 bit
 	{
 		m_cop_ram[offset] |= 0xffff0000;
 	}
@@ -375,21 +375,20 @@ void speglsht_state::video_start()
 	save_item(NAME(m_videoreg));
 }
 
-#define PLOT_PIXEL_RGB(x, y, r, g, b)   if (y >= 0 && x >= 0 && x < 512 && y < 512) \
-{ \
-		bitmap.pix(y, x) = (b) | ((g) << 8) | ((r) << 16); \
-}
-
 uint32_t speglsht_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int const dy = BIT(m_videoreg, 5) ? (256 * 512) : 0; //visible frame
 
 	for (int y = 0; y < 256; y++)
 	{
+		int const dsty = y - 5;
+		uint32_t *const dstline = &bitmap.pix(dsty);
 		for (int x = 0; x < 512; x++)
 		{
 			int const tmp = dy + y * 512 + x;
-			PLOT_PIXEL_RGB(x - 67, y - 5, (m_framebuffer[tmp] >> 0) & 0xff, (m_framebuffer[tmp] >> 8) & 0xff, (m_framebuffer[tmp] >> 16) & 0xff);
+			int const dstx = x - 67;
+			if (cliprect.contains(dstx, dsty))
+				dstline[dstx] = rgb_t((m_framebuffer[tmp] >> 0) & 0xff, (m_framebuffer[tmp] >> 8) & 0xff, (m_framebuffer[tmp] >> 16) & 0xff);
 		}
 	}
 
@@ -401,12 +400,12 @@ uint32_t speglsht_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		uint16_t const *const srcline = &m_bitmap->pix(y);
+		uint32_t *const dstline = &bitmap.pix(y);
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			if (srcline[x])
 			{
-				rgb_t color = m_maincpu->palette().pen_color(srcline[x]);
-				PLOT_PIXEL_RGB(x, y, color.r(), color.g(), color.b());
+				dstline[x] = m_maincpu->palette().pen_color(srcline[x]);
 			}
 		}
 	}
