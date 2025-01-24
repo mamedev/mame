@@ -1452,13 +1452,12 @@ void am9513_device::write16(offs_t offset, u16 data)
 
 	if (BIT(offset, 0))
 	{
-		command_write(data & 0x00ff);
-
-		// NB testing afterwards because this command may have been changing bus width
 		if ((data & 0x00ff) == 0x00e7)
-			LOGWARN("8-bit data bus selected with 16-bit write\n");
+			logerror("8-bit data bus selected with 16-bit write\n");
 		else if ((data & 0x00ff) == 0x00ef && !bus_is_16_bit())
-			LOGWARN("16-bit data bus selected\n");
+			logerror("16-bit data bus selected\n");
+
+		command_write(data & 0x00ff);
 	}
 	else
 		data_write(data);
