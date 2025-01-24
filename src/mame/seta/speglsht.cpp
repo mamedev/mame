@@ -120,15 +120,14 @@ class speglsht_state : public driver_device
 {
 public:
 	speglsht_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_palette(*this, "palette"),
-			m_maincpu(*this,"maincpu"),
-			m_subcpu(*this, "sub"),
-			m_shared(*this, "shared"),
-			m_framebuffer(*this, "framebuffer"),
-			m_cop_ram(*this, "cop_ram"),
-			m_st0016_bank(*this, "st0016_bank")
-			{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this,"maincpu")
+		, m_subcpu(*this, "sub")
+		, m_shared(*this, "shared")
+		, m_framebuffer(*this, "framebuffer")
+		, m_cop_ram(*this, "cop_ram")
+		, m_st0016_bank(*this, "st0016_bank")
+	{ }
 
 	void speglsht(machine_config &config);
 
@@ -140,7 +139,6 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
-	required_device<palette_device> m_palette;
 	required_device<st0016_cpu_device> m_maincpu;
 	required_device<r3051_device> m_subcpu;
 
@@ -158,7 +156,7 @@ private:
 	void videoreg_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void cop_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t cop_r(offs_t offset);
-	uint32_t irq_ack_clear();
+	uint32_t irq_ack_r();
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -172,7 +170,7 @@ private:
 void speglsht_state::st0016_mem(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("st0016_bank");
+	map(0x8000, 0xbfff).bankr(m_st0016_bank);
 	//map(0xc000, 0xcfff).rw(FUNC(speglsht_state::st0016_sprite_ram_r), FUNC(speglsht_state::st0016_sprite_ram_w));
 	//map(0xd000, 0xdfff).rw(FUNC(speglsht_state::st0016_sprite2_ram_r), FUNC(speglsht_state::st0016_sprite2_ram_w));
 	map(0xe000, 0xe7ff).ram();
@@ -180,7 +178,7 @@ void speglsht_state::st0016_mem(address_map &map)
 	//map(0xe900, 0xe9ff) // sound - internal
 	//map(0xea00, 0xebff).rw(FUNC(speglsht_state::st0016_palette_ram_r), FUNC(speglsht_state::st0016_palette_ram_w));
 	//map(0xec00, 0xec1f).rw(FUNC(speglsht_state::st0016_character_ram_r), FUNC(speglsht_state::st0016_character_ram_w));
-	map(0xf000, 0xffff).ram().share("shared");
+	map(0xf000, 0xffff).ram().share(m_shared);
 }
 
 void speglsht_state::machine_start()
@@ -188,7 +186,7 @@ void speglsht_state::machine_start()
 	m_st0016_bank->configure_entries(0, 256, memregion("maincpu")->base(), 0x4000);
 }
 
-// common rombank? should go in machine/st0016 with larger address space exposed?
+// common rombank? should go in seta/st0016.cpp with larger address space exposed?
 void speglsht_state::st0016_rom_bank_w(uint8_t data)
 {
 	m_st0016_bank->set_entry(data);
@@ -215,7 +213,7 @@ uint32_t speglsht_state::shared_r(offs_t offset)
 
 void speglsht_state::shared_w(offs_t offset, uint32_t data)
 {
-	m_shared[offset]=data&0xff;
+	m_shared[offset] = data & 0xff;
 }
 
 void speglsht_state::videoreg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
@@ -228,40 +226,40 @@ void speglsht_state::cop_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_cop_ram[offset]);
 
-	if(m_cop_ram[offset]&0x8000) //fix (sign)
+	if (m_cop_ram[offset] & 0x8000) //fix (sign)
 	{
-		m_cop_ram[offset]|=0xffff0000;
+		m_cop_ram[offset] |= 0xffff0000;
 	}
 }
 
 //matrix * vector
 uint32_t speglsht_state::cop_r(offs_t offset)
 {
-	int32_t *cop=(int32_t*)&m_cop_ram[0];
+	int32_t *cop = (int32_t*)&m_cop_ram[0];
 
 	union
 	{
 		int32_t  a;
 		uint32_t b;
-	}temp;
+	} temp;
 
 	switch (offset)
 	{
-		case 0x40/4:
+		case 0x40 / 4:
 		{
-			temp.a=((cop[0x3]*cop[0x0]+cop[0x4]*cop[0x1]+cop[0x5]*cop[0x2])>>14)+cop[0xc];
+			temp.a = ((cop[0x3] * cop[0x0] + cop[0x4] * cop[0x1] + cop[0x5] * cop[0x2]) >> 14) + cop[0xc];
 			return temp.b;
 		}
 
-		case 0x44/4:
+		case 0x44 / 4:
 		{
-			temp.a=((cop[0x6]*cop[0x0]+cop[0x7]*cop[0x1]+cop[0x8]*cop[0x2])>>14)+cop[0xd];
+			temp.a = ((cop[0x6] * cop[0x0] + cop[0x7] * cop[0x1] + cop[0x8] * cop[0x2]) >> 14) + cop[0xd];
 			return temp.b;
 		}
 
-		case 0x48/4:
+		case 0x48 / 4:
 		{
-			temp.a=((cop[0x9]*cop[0x0]+cop[0xa]*cop[0x1]+cop[0xb]*cop[0x2])>>14)+cop[0xe];
+			temp.a = ((cop[0x9] * cop[0x0] + cop[0xa] * cop[0x1] + cop[0xb] * cop[0x2]) >> 14) + cop[0xe];
 			return temp.b;
 		}
 	}
@@ -269,9 +267,10 @@ uint32_t speglsht_state::cop_r(offs_t offset)
 	return 0;
 }
 
-uint32_t speglsht_state::irq_ack_clear()
+uint32_t speglsht_state::irq_ack_r()
 {
-	m_subcpu->set_input_line(INPUT_LINE_IRQ4, CLEAR_LINE);
+	if (!machine().side_effects_disabled())
+		m_subcpu->set_input_line(INPUT_LINE_IRQ4, CLEAR_LINE);
 	return 0;
 }
 
@@ -279,17 +278,17 @@ void speglsht_state::speglsht_mem(address_map &map)
 {
 	map(0x00000000, 0x000fffff).ram();
 	map(0x01000000, 0x01007fff).ram(); //tested - STATIC RAM
-	map(0x01600000, 0x0160004f).rw(FUNC(speglsht_state::cop_r), FUNC(speglsht_state::cop_w)).share("cop_ram");
+	map(0x01600000, 0x0160004f).rw(FUNC(speglsht_state::cop_r), FUNC(speglsht_state::cop_w)).share(m_cop_ram);
 	map(0x01800200, 0x01800203).w(FUNC(speglsht_state::videoreg_w));
 	map(0x01800300, 0x01800303).portr("IN0");
 	map(0x01800400, 0x01800403).portr("IN1");
-	map(0x01a00000, 0x01afffff).ram().share("framebuffer");
+	map(0x01a00000, 0x01afffff).ram().share(m_framebuffer);
 	map(0x01b00000, 0x01b07fff).ram(); //cleared ...  video related ?
 	map(0x01c00000, 0x01dfffff).rom().region("subdata", 0);
 	map(0x0a000000, 0x0a003fff).rw(FUNC(speglsht_state::shared_r), FUNC(speglsht_state::shared_w));
 	map(0x0fc00000, 0x0fdfffff).rom().mirror(0x10000000).region("subprog", 0);
 	map(0x1eff0000, 0x1eff001f).ram();
-	map(0x1eff003c, 0x1eff003f).r(FUNC(speglsht_state::irq_ack_clear));
+	map(0x1eff003c, 0x1eff003f).r(FUNC(speglsht_state::irq_ack_r));
 }
 
 static INPUT_PORTS_START( speglsht )
@@ -364,9 +363,6 @@ static INPUT_PORTS_START( speglsht )
 	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 INPUT_PORTS_END
 
-static GFXDECODE_START( gfx_speglsht )
-GFXDECODE_END
-
 
 void speglsht_state::machine_reset()
 {
@@ -376,23 +372,24 @@ void speglsht_state::machine_reset()
 void speglsht_state::video_start()
 {
 	m_bitmap = std::make_unique<bitmap_ind16>(512, 512);
+	save_item(NAME(m_videoreg));
 }
 
-#define PLOT_PIXEL_RGB(x,y,r,g,b)   if(y>=0 && x>=0 && x<512 && y<512) \
+#define PLOT_PIXEL_RGB(x, y, r, g, b)   if (y >= 0 && x >= 0 && x < 512 && y < 512) \
 { \
-		bitmap.pix(y, x) = (b) | ((g)<<8) | ((r)<<16); \
+		bitmap.pix(y, x) = (b) | ((g) << 8) | ((r) << 16); \
 }
 
 uint32_t speglsht_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int dy=(m_videoreg&0x20)?(256*512):0; //visible frame
+	int const dy = BIT(m_videoreg, 5) ? (256 * 512) : 0; //visible frame
 
-	for(int y=0;y<256;y++)
+	for (int y = 0; y < 256; y++)
 	{
-		for(int x=0;x<512;x++)
+		for (int x = 0; x < 512; x++)
 		{
-			int tmp=dy+y*512+x;
-			PLOT_PIXEL_RGB(x-67,y-5,(m_framebuffer[tmp]>>0)&0xff,(m_framebuffer[tmp]>>8)&0xff,(m_framebuffer[tmp]>>16)&0xff);
+			int const tmp = dy + y * 512 + x;
+			PLOT_PIXEL_RGB(x - 67, y - 5, (m_framebuffer[tmp] >> 0) & 0xff, (m_framebuffer[tmp] >> 8) & 0xff, (m_framebuffer[tmp] >> 16) & 0xff);
 		}
 	}
 
@@ -401,12 +398,12 @@ uint32_t speglsht_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	m_maincpu->draw_screen(screen, *m_bitmap, cliprect);
 
 	//copy temporary bitmap to rgb 32 bit bitmap
-	for(int y=cliprect.min_y; y<=cliprect.max_y;y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		uint16_t const *const srcline = &m_bitmap->pix(y);
-		for(int x=cliprect.min_x; x<=cliprect.max_x;x++)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			if(srcline[x])
+			if (srcline[x])
 			{
 				rgb_t color = m_maincpu->palette().pen_color(srcline[x]);
 				PLOT_PIXEL_RGB(x,y,color.r(),color.g(),color.b());
@@ -440,9 +437,6 @@ void speglsht_state::speglsht(machine_config &config)
 	screen.set_size(512, 512);
 	screen.set_visarea(0, 319, 8, 239-8);
 	screen.set_screen_update(FUNC(speglsht_state::screen_update));
-
-	GFXDECODE(config, "gfxdecode", m_palette, gfx_speglsht);
-	PALETTE(config, m_palette).set_entries(16*16*4+1);
 
 	// TODO: Mono?
 	SPEAKER(config, "lspeaker").front_left();
