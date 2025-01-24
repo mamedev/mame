@@ -131,7 +131,7 @@ void sigmab31_state::prg_map(address_map &map)
 	map(0xf800, 0xffff).rom();
 }
 
-void sigmab52_state::sound_prog_map(address_map &map)
+void sigmab31_state::sound_prog_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
 //	map(0x6020, 0x6027).rw(m_6840ptm_2, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
