@@ -77,7 +77,6 @@ private:
 
 	void rom_bank_w(uint8_t data);
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
 	void renju_mem(address_map &map) ATTR_COLD;
@@ -525,12 +524,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(st0016_state::interrupt)
  *
  *************************************/
 
-uint32_t st0016_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	return m_maincpu->update(screen, bitmap, cliprect);
-}
-
-
 void st0016_state::st0016(machine_config &config)
 {
 	// basic machine hardware
@@ -547,7 +540,7 @@ void st0016_state::st0016(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(48*8, 48*8);
 	m_screen->set_visarea(0*8, 48*8-1, 0*8, 48*8-1);
-	m_screen->set_screen_update(FUNC(st0016_state::screen_update));
+	m_screen->set_screen_update(m_maincpu, FUNC(st0016_cpu_device::screen_update));
 	m_screen->set_palette("maincpu:palette");
 
 	// TODO: Mono?
