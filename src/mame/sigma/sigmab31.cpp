@@ -122,6 +122,7 @@ private:
 	void sound_prog_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device>     m_maincpu;
+	required_device<cpu_device>     m_audiocpu;
 };
 
 void sigmab31_state::prg_map(address_map &map)
