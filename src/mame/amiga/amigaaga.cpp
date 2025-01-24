@@ -14,13 +14,15 @@ Done:
     - preliminary sprites
 
 TODO:
-    - Merge with base OCS/ECS Denise video emulation, use virtual overrides where applicable;
-    - High bits sprite collisions;
-    - SHRES video mode;
-    - Confirm diwstrt/diwstop values;
-    - Add custom screen geometry registers (specific to AGA chipset, $1c0-$1ef, most are shared
-      with Agnus/Alice really);
-    - Remaining unemulated new registers (ZD pin, SOG pin, SSCAN2, BRDRBLNK, BRDRSPRT, BPLAMx);
+- Merge with base OCS Denise video emulation, use virtual overrides where applicable;
+- Downport ECS Denise features;
+- High bits sprite collisions;
+- SHRES video mode;
+- Confirm diwstrt/diwstop values;
+- Add custom screen geometry registers (ECS/AGA chipsets, $1c0-$1ef, most are shared
+    with Agnus/Alice really);
+- Implement SPRES0/1 (sprite resolutions)
+- Remaining unemulated new registers (ZD pin, SOG pin, SSCAN2, BRDRSPRT, BPLAMx);
 
 **************************************************************************************************/
 
