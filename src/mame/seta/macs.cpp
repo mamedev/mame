@@ -511,7 +511,7 @@ void macs_state::macs(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(128*8, 128*8);
 	screen.set_visarea(0*8, 128*8-1, 0*8, 128*8-1);
-	screen.set_screen_update(m_maincpu, FUNC(st0016_cpu_device::update));
+	screen.set_screen_update(m_maincpu, FUNC(st0016_cpu_device::screen_update));
 	screen.set_palette("maincpu:palette");
 	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_IRQ0, HOLD_LINE); // FIXME: HOLD_LINE is bad juju
 

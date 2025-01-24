@@ -743,7 +743,7 @@ void st0016_cpu_device::draw_screen(screen_device &screen, bitmap_ind16 &bitmap,
 	draw_bgmap(bitmap, cliprect, 1);
 }
 
-u32 st0016_cpu_device::update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 st0016_cpu_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 #ifdef MAME_DEBUG
 	if (machine().input().code_pressed_once(KEYCODE_Z))
