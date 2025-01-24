@@ -406,7 +406,7 @@ uint32_t speglsht_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 			if (srcline[x])
 			{
 				rgb_t color = m_maincpu->palette().pen_color(srcline[x]);
-				PLOT_PIXEL_RGB(x,y,color.r(),color.g(),color.b());
+				PLOT_PIXEL_RGB(x, y, color.r(), color.g(), color.b());
 			}
 		}
 	}
