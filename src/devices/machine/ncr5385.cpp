@@ -178,7 +178,11 @@ void ncr5385_device::scsi_ctrl_changed()
 			m_state_timer->adjust(attotime::zero);
 	}
 	else if (ctrl & S_BSY)
+	{
 		LOGMASKED(LOG_STATE, "scsi_ctrl_changed 0x%03x arbitration/selection\n", ctrl);
+		if (m_state != IDLE)
+			m_state_timer->adjust(attotime::from_usec(40));
+	}
 	else
 	{
 		LOGMASKED(LOG_STATE, "scsi_ctrl_changed 0x%03x BUS FREE\n", ctrl);
