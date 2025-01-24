@@ -203,6 +203,32 @@ uint32_t mac_video_sonora_device::screen_update(screen_device &screen, bitmap_rg
 			}
 			break;
 
+		case 1: // 2bpp
+			for (uint32_t y = 0; y != vres; y++)
+			{
+				uint32_t *scanline = &bitmap.pix(y);
+				for (uint32_t x = 0; x != hres; x += 32)
+				{
+					uint64_t pixels = *vram++;
+					for (int32_t bit = 62; bit >= 0; bit -= 2)
+						*scanline ++ = pens[(((pixels >> bit) & 0x3) << 6) | 0x3f];
+				}
+			}
+			break;
+
+		case 2: // 4bpp
+			for (uint32_t y = 0; y != vres; y++)
+			{
+				uint32_t *scanline = &bitmap.pix(y);
+				for (uint32_t x = 0; x != hres; x += 16)
+				{
+					uint64_t pixels = *vram++;
+					for (int32_t bit = 60; bit >= 0; bit -= 4)
+						*scanline ++ = pens[(((pixels >> bit) & 0x0f) << 4) | 0x0f];
+				}
+			}
+			break;
+
 		case 3: // 8bpp
 			for(uint32_t y = 0; y != vres; y++) {
 				uint32_t *scanline = &bitmap.pix(y);
@@ -210,6 +236,21 @@ uint32_t mac_video_sonora_device::screen_update(screen_device &screen, bitmap_rg
 					uint64_t pixels = *vram ++;
 					for(int32_t bit = 56; bit >= 0; bit -= 8)
 						*scanline ++ = pens[((pixels >> bit) & 0xff)];
+				}
+			}
+			break;
+
+		case 4: // 16bpp
+			for (uint32_t y = 0; y != vres; y++)
+			{
+				uint32_t *scanline = &bitmap.pix(y);
+				for (uint32_t x = 0; x != hres; x += 4)
+				{
+					const uint64_t pixels = *vram++;
+					*scanline++ = rgb_t(((pixels >> 58) & 0x1f) << 3, ((pixels >> 53) & 0x1f) << 3, ((pixels >> 48) & 0x1f) << 3);
+					*scanline++ = rgb_t(((pixels >> 42) & 0x1f) << 3, ((pixels >> 37) & 0x1f) << 3, ((pixels >> 32) & 0x1f) << 3);
+					*scanline++ = rgb_t(((pixels >> 26) & 0x1f) << 3, ((pixels >> 21) & 0x1f) << 3, ((pixels >> 16) & 0x1f) << 3);
+					*scanline++ = rgb_t(((pixels >> 10) & 0x1f) << 3, ((pixels >> 5) & 0x1f) << 3, (pixels & 0x1f) << 3);
 				}
 			}
 			break;
