@@ -39,8 +39,6 @@
 
 #include "logmacro.h"
 
-#define LOGWARN(...)	LOGMASKED(LOG_WARN, "WARNING: " __VA_ARGS__)
-
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -986,7 +984,7 @@ void am9513_device::write_gate_alt(int c, bool level)
 {
 	if (bus_is_16_bit())
 	{
-		LOGWARN("Gate %dA written when configured as DB%d\n", c + 1, c + 8);
+		logerror("Gate %dA written when configured as DB%d\n", c + 1, c + 8);
 		return;
 	}
 
@@ -1112,7 +1110,7 @@ void am9513_device::internal_write(u16 data)
 		set_master_mode(data);
 		break;
 	case 0x1f: // Status register (read only?)
-		LOGWARN("Writing %04X to status register\n", data);
+		logerror("Writing %04X to status register\n", data);
 		break;
 	case 0x07: // Alarm 1 register
 	case 0x0f: // Alarm 2 register
@@ -1148,7 +1146,7 @@ void am9513_device::internal_write(u16 data)
 		m_counter_hold[(m_dpr & 7) - 1] = data;
 		break;
 	default: // Invalid register
-		LOGWARN("Writing %04X to register %02X\n", data, m_dpr);
+		logerror("Writing %04X to register %02X\n", data, m_dpr);
 		break;
 	}
 }
@@ -1227,7 +1225,7 @@ void am9513_device::command_write(u8 data)
 	case 0x00:
 		if ((data & 0x07) == 0x00 || (data & 0x07) == 0x06)
 		{
-			LOGWARN("Invalid register selected: %02X\n", data);
+			logerror("Invalid register selected: %02X\n", data);
 			break;
 		}
 
@@ -1320,7 +1318,7 @@ void am9513_device::command_write(u8 data)
 			}
 			[[fallthrough]];
 		default:
-			LOGWARN("Invalid command: %02X\n", data);
+			logerror("Invalid command: %02X\n", data);
 			break;
 		}
 		break;
@@ -1413,7 +1411,7 @@ void am9513_device::write8(offs_t offset, u8 data)
 	if (BIT(offset, 0))
 	{
 		if (data == 0xef)
-			LOGWARN("16-bit data bus selected with 8-bit write\n");
+			logerror("16-bit data bus selected with 8-bit write\n");
 		command_write(data);
 	}
 	else
@@ -1432,7 +1430,7 @@ u16 am9513_device::read16(offs_t offset)
 	else
 	{
 		if (!bus_is_16_bit())
-			LOGWARN("16-bit data read in 8-bit bus mode\n");
+			logerror("16-bit data read in 8-bit bus mode\n");
 		return data_read();
 	}
 }
@@ -1445,7 +1443,7 @@ u16 am9513_device::read16(offs_t offset)
 void am9513_device::write16(offs_t offset, u16 data)
 {
 	if ((!bus_is_16_bit() || BIT(offset, 0)) && (data & 0xff00) != 0xff00)
-		LOGWARN("Errant write of %02X to upper byte of %s register in %d-bit bus mode\n",
+		logerror("Errant write of %02X to upper byte of %s register in %d-bit bus mode\n",
 				(data & 0xff00) >> 8,
 				BIT(offset, 0) ? "control" : "data",
 				bus_is_16_bit() ? 16 : 8);
