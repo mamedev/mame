@@ -62,7 +62,7 @@ Usage notes:
 - Interactive layout included.
 - The mixer faders can be controlled with the mouse, or from the "Slider
   Controls" menu.
-- Voices can be tuned using the "Sider Controls" menu.
+- Voices can be tuned with the mouse, or the "Sider Controls" menu.
 - The drum keys are mapped to the keyboard, starting at "Q". Specifically:
   Q - Bass 1, W - Snare 1, ...
   A - Bass 2, S - Snare 2, ...
@@ -1574,37 +1574,37 @@ INPUT_PORTS_START(dmx)
 	// Tunning potentiomenters. One per voice card, designated as T1 and labeled
 	// as "PITCH ADJ."
 
-	PORT_START("pitch_adj_0")
+	PORT_START("pitch_adj_1")
 	PORT_ADJUSTER(dmx_voice_card::T1_DEFAULT_PERCENT, "BASS pitch")
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::pitch_adj_changed), dmx_state::VC_BASS)
 
-	PORT_START("pitch_adj_1")
+	PORT_START("pitch_adj_2")
 	PORT_ADJUSTER(dmx_voice_card::T1_DEFAULT_PERCENT, "SNARE pitch")
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::pitch_adj_changed), dmx_state::VC_SNARE)
 
-	PORT_START("pitch_adj_2")
+	PORT_START("pitch_adj_3")
 	PORT_ADJUSTER(dmx_voice_card::T1_DEFAULT_PERCENT, "HI-HAT pitch")
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::pitch_adj_changed), dmx_state::VC_HIHAT)
 
-	PORT_START("pitch_adj_3")
+	PORT_START("pitch_adj_4")
 	PORT_ADJUSTER(dmx_voice_card::T1_DEFAULT_PERCENT, "TOM1 pitch")
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::pitch_adj_changed), dmx_state::VC_SMALL_TOMS)
 
-	PORT_START("pitch_adj_4")
+	PORT_START("pitch_adj_5")
 	PORT_ADJUSTER(dmx_voice_card::T1_DEFAULT_PERCENT, "TOM2 pitch")
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::pitch_adj_changed), dmx_state::VC_LARGE_TOMS)
 
-	PORT_START("pitch_adj_5")
+	PORT_START("pitch_adj_6")
+	PORT_ADJUSTER(dmx_voice_card::T1_DEFAULT_PERCENT, "CYMBAL pitch")
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::pitch_adj_changed), dmx_state::VC_CYMBAL)
+
+	PORT_START("pitch_adj_7")
 	PORT_ADJUSTER(dmx_voice_card::T1_DEFAULT_PERCENT, "PERC1 pitch")
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::pitch_adj_changed), dmx_state::VC_PERC1)
 
-	PORT_START("pitch_adj_6")
+	PORT_START("pitch_adj_8")
 	PORT_ADJUSTER(dmx_voice_card::T1_DEFAULT_PERCENT, "PERC2 pitch")
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::pitch_adj_changed), dmx_state::VC_PERC2)
-
-	PORT_START("pitch_adj_7")
-	PORT_ADJUSTER(dmx_voice_card::T1_DEFAULT_PERCENT, "CYMBAL pitch")
-		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::pitch_adj_changed), dmx_state::VC_CYMBAL)
 INPUT_PORTS_END
 
 ROM_START(obdmx)
