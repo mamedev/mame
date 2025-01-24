@@ -3,8 +3,9 @@
 // thanks-to:Sean Riddle
 /*******************************************************************************
 
-Micro-Concepts Diamond Bridge Computer (model M1011)
-Also sold by Nu Vations as Nu Va Bridge Computer (model NV211)
+Micro-Concepts Ltd Diamond Bridge Computer (model M1011)
+Also sold by Nu Vations as Nu Va Bridge Computer (model NV211), and by Systema
+as BG2 Bridge Computer.
 
 Hardware notes:
 - PCB label: MCL, M1011

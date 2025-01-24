@@ -3,7 +3,7 @@
 // thanks-to:Sean Riddle
 /*******************************************************************************
 
-CXG Sphinx Junior
+CXG Sphinx Junior (model 237)
 
 NOTE: Before exiting MAME, press the OFF button to turn the power off. Otherwise,
 NVRAM won't save properly.
@@ -28,12 +28,14 @@ Fidelity Micro Chess Challenger (16 buttons):
 - PCB label: CXG 249 600-001
 - rest is similar to Sphinx Junior
 
+CXG didn't sell a handheld version of their own, CXG model 249 does not exist.
 Fidelity MCC 12-button version has a HD44820 MCU instead (see pchess.cpp).
 
 HD614140HA27 MCU is used in:
 - CXG Sphinx Junior
 - Fidelity Chess Pal Challenger (Fidelity brand Sphinx Junior)
 - Fidelity Micro Chess Challenger (16 buttons)
+- Schneider Pocket Chess (same housing as Fidelity MCC)
 
 *******************************************************************************/
 
