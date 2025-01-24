@@ -654,7 +654,7 @@ Corrupt tiles if you switch languages in language select menu
 Not extensively tested
 Gameplay is too fast
 ]]></notes>
-        <!-- cover/floppy title -->
+		<!-- cover/floppy title -->
 		<info name="alt_title" value="Brutal Football" />
 		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
@@ -2528,7 +2528,7 @@ Red screen when "Out to lunch is loading" displays, [FDC]
 		<year>1995</year>
 		<publisher>21st Century Entertainment</publisher>
 		<notes><![CDATA[
-Bitplane overlay is offset on title screen
+[Denise] Bitplane overlay is offset on title screen
 Doesn't draw left bumper during gameplay [Copper]?
 ]]></notes>
 		<info name="usage" value="Requires AGA" />
