@@ -102,7 +102,8 @@ cd32: unsupported [Akiko] close tray after CD32 BIOS plays back music, will othe
 	</software>
 
 	<software name="pballdmg" supported="no">
-		<description>Pinball Brain Damage</description>
+		<!-- http://redump.org/disc/16919/ -->
+		<description>Pinball Brain Damage (Europe)</description>
 		<year>1997</year>
 		<!-- Packaging Design: Epic Marketing -->
 		<publisher>APC &amp; TCP</publisher>
