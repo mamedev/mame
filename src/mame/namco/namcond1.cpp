@@ -518,7 +518,7 @@ void namcond1_state::namcond1(machine_config &config)
 	V 261 26 224 3 0
 	*/
 	screen.set_raw(XTAL(49'152'000) / 8, 804 / 2, 108 / 2, (108 + 576) / 2, 261, 26, 26 + 224);
-	screen.set_screen_update("ygv608", FUNC(ygv608_device::update_screen));
+	screen.set_screen_update("ygv608", FUNC(ygv608_device::screen_update));
 	screen.set_palette("ygv608");
 
 	// sound hardware
