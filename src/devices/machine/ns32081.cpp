@@ -194,9 +194,6 @@ template <typename T> void ns32081_device_base::write(T data)
 		execute();
 }
 
-// for building using MinGW on Windows, this is neccessary to avoid a unresolved link error
-template u16 ns32081_device_base::read<u16>();
-template void ns32081_device_base::write<u16>(u16 data);
 
 
 bool ns32081_device_base::decode(u8 const idbyte, u16 const opword)
