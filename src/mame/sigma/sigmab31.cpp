@@ -189,7 +189,7 @@ void sigmab31_state::sigmab31(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &sigmab31_state::prg_map);
     
 	MC6809(config, m_audiocpu, XTAL(8'000'000));
-	m_audiocpu->set_addrmap(AS_PROGRAM, &sigmab52_state::sound_prog_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &sigmab31_state::sound_prog_map);
 
 	
 	PTM6840(config, "6840ptm_1", 8_MHz_XTAL / 8);
