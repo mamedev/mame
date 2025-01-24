@@ -20,6 +20,14 @@ copyright-holders:m1macrophage
 		<rect><color red="0.06" green="0.6" blue="0.84"/></rect>
 	</element>
 
+	<element name="invisible-rect">
+		<rect><color red="0" green="0" blue="0" alpha="0"/></rect>
+	</element>
+
+	<element name="black-rect">
+		<rect><color red="0.0" green="0.0" blue="0.0"/></rect>
+	</element>
+
 	<element name="display-background">
 		<rect><color red="0.08" green="0.0" blue="0.0"/></rect>
 	</element>
@@ -75,6 +83,28 @@ copyright-holders:m1macrophage
 		</rect>
 	</element>
 
+	<element name="trimmer-knob">
+		<rect><color red="0.65" green="0.65" blue="0.65"/></rect>
+	</element>
+
+	<element name="trimmer-rail">
+		<rect><color red="0.14" green="0.16" blue="0.15"/></rect>
+	</element>
+
+	<group name="trimmer">
+		<element ref="invisible-rect" id="slider_pitch_adj_~trimmer_id~">
+			<bounds x="0" y="0" width="15" height="40"/>
+		</element>
+		<element ref="trimmer-rail">
+			<bounds x="5" y="0" width="5" height="40"/>
+		</element>
+		<element ref="trimmer-knob" id="slider_knob_pitch_adj_~trimmer_id~">
+			<animate inputtag="pitch_adj_~trimmer_id~" inputmask="0x7f"/>
+			<bounds state="100" x="0" y="0" width="15" height="5"/>
+			<bounds state="0" x="0" y="35" width="15" height="5"/>
+		</element>
+	</group>
+
 	<element name="fader-knob">
 		<rect>
 			<bounds x="0" y="0" width="35" height="35"/>
@@ -86,18 +116,26 @@ copyright-holders:m1macrophage
 		</rect>
 	</element>
 
-	<element name="fader">
-		<rect>
-			<!-- Invisible fader knob, to ensure correct width. -->
-			<bounds x="0" y="0" width="35" height="35"/>
-			<color red="0" green="0" blue="0" alpha="0"/>
-		</rect>
-		<rect>
-			<bounds x="14" y="0" width="7" height="144"/>
-			<color red="0.0" green="0.0" blue="0.01"/>
-		</rect>
-	</element>
+	<group name="fader">
+		<element id="slider_fader_p~fader_id~" ref="invisible-rect">
+			<bounds x="15" y="0" width="35" height="162"/>
+		</element>
+		<element ref="black-rect">  <!-- slider rail -->
+			<bounds x="29" y="9" width="7" height="144"/>
+		</element>
+		<element id="slider_knob_fader_p~fader_id~" ref="fader-knob">
+			<animate inputtag="fader_p~fader_id~" inputmask="0x7f"/>
+			<bounds state="100" x="15" y="0" width="35" height="35"/>
+			<bounds state="0" x="15" y="127" width="35" height="35"/>
+		</element>
+		<element ref="fader-text-~fader_id~">
+			<bounds x="0" y="167" width="65" height="10"/>
+		</element>
+	</group>
 
+	<element name="text-tune">
+		<text string="TUNE:"><color red="0.8" green="0.8" blue="0.8"/></text>
+	</element>
 	<element name="fader-text-1">
 		<text string="BASS"><color red="0.94" green="0.94" blue="0.93"/></text>
 	</element>
@@ -125,13 +163,13 @@ copyright-holders:m1macrophage
 	<element name="fader-text-9">
 		<text string="METRONOME"><color red="0.94" green="0.94" blue="0.93"/></text>
 	</element>
+	<element name="fader-text-10">
+		<text string="VOLUME"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
 	<element name="fader-text-toms">
 		<text string="--------   TOMS   --------">
 			<color red="0.94" green="0.94" blue="0.93"/>
 		</text>
-	</element>
-	<element name="fader-text-volume">
-		<text string="VOLUME"><color red="0.94" green="0.94" blue="0.93"/></text>
 	</element>
 
 	<element name="num-text-1:1">
@@ -292,7 +330,7 @@ copyright-holders:m1macrophage
 	<view name="Default Layout">
 		<!-- Starting at 110 to allow modeling the top part of the instrument
 		     in the future -->
-		<bounds x="0" y="110" width="960" height="518"/>
+		<bounds x="0" y="85" width="960" height="550"/>
 
 		<!-- Case -->
 		<element ref="panel">
@@ -317,37 +355,34 @@ copyright-holders:m1macrophage
 			</element>
 		</repeat>
 
+		<!-- Tunning trimmers -->
+		<collection name="tunning">
+			<element ref="text-tune">
+				<bounds x="20" y="110" width="30" height="10"/>
+			</element>
+			<repeat count="8">
+				<param name="trimmer_x" start="77" increment="65"/>
+				<param name="trimmer_id" start="1" increment="1"/>
+				<group ref="trimmer">
+					<bounds x="~trimmer_x~" y="95" width="15" height="40"/>
+				</group>
+			</repeat>
+		</collection>
+
 		<!-- Mixer -->
 		<repeat count="9">
-			<param name="fader_x" start="67" increment="65"/>
-			<param name="text_x" start="52" increment="65"/>
-			<param name="text_i" start="1" increment="1"/>
-			<param name="pot_i" start="1" increment="1"/>
-			<element ref="fader" id="fader_p~pot_i~">
-				<bounds x="~fader_x~" y="222" width="35" height="144"/>
-			</element>
-			<element ref="fader-knob">
-				<animate inputtag="fader_p~pot_i~" inputmask="0x7f"/>
-				<bounds state="100" x="~fader_x~" y="213" width="35" height="35"/>
-				<bounds state="0" x="~fader_x~" y="340" width="35" height="35"/>
-			</element>
-			<element ref="fader-text-~text_i~">
-				<bounds x="~text_x~" y="380" width="65" height="10"/>
-			</element>
+			<param name="fader_x" start="52" increment="65"/>
+			<param name="fader_id" start="1" increment="1"/>
+			<group ref="fader">
+				<bounds x="~fader_x~" y="213" width="65" height="177"/>
+			</group>
 		</repeat>
+		<param name="fader_id" value="10"/>
+		<group ref="fader">
+			<bounds x="656" y="213" width="65" height="177"/>
+		</group>
 		<element ref="fader-text-toms">
 			<bounds x="262" y="380" width="100" height="10"/>
-		</element>
-		<element ref="fader" id="fader_p10">
-			<bounds x="669" y="222" width="35" height="144"/>
-		</element>
-		<element ref="fader-knob">
-			<animate inputtag="fader_p10" inputmask="0x7f"/>
-			<bounds state="100" x="669" y="213" width="35" height="35"/>
-			<bounds state="0" x="669" y="340" width="35" height="35"/>
-		</element>
-		<element ref="fader-text-volume">
-			<bounds x="656" y="380" width="60" height="10"/>
 		</element>
 
 		<!-- Display -->
@@ -506,26 +541,22 @@ copyright-holders:m1macrophage
 	<script><![CDATA[
 		file:set_resolve_tags_callback(
 			function()
-				-- These constants need to match the "fader" and "fader-knob"
-				-- element attributes in the "Mixer" section.
-				local fader_height <const> = 144
-				local knob_height <const> = 35
-				local knob_fader_delta_y <const> = 9  -- fader y - knob y
-
-				local fader_deadzone <const> = math.floor(knob_height / 2) - knob_fader_delta_y
+				local id_port_index <const> = string.len("slider_knob_") + 1
 
 				-- Local state used by the pointer update handler.
-				local faders = {}
-				local fader_fields = {}
+				local sliders = {}
+				local slider_knobs = {}
+				local slider_fields = {}
 				local selected = 0
 
 				-- Gather relevant elements and inputs into local state.
 				local view = file.views["Default Layout"]
 				for i = 1, #view.items do
 					local item = view.items:at(i)
-					if item.id ~= nil and string.find(item.id, "fader_") == 1 then
-						local port_tag = item.id
-						local port = file.device:ioport(port_tag)
+					if item.id ~= nil and string.find(item.id, "slider_knob_") == 1 then
+						local slider_id = string.sub(item.id, id_port_index)
+
+						local port = file.device:ioport(slider_id)
 						local field = nil
 						if port ~= nil then
 							for k, val in pairs(port.fields) do
@@ -533,13 +564,20 @@ copyright-holders:m1macrophage
 								break
 							end
 							if field == nil then
-								print("DMX LAYOUT ERROR - Port does not have a field: " .. port_tag)
+								print("LAYOUT ERROR - Port does not have a field: " .. slider_id)
 							end
 						else
-							print("DMX LAYOUT ERROR - Port not found: " .. port_tag)
+							print("LAYOUT ERROR - Port not found: " .. slider_id)
 						end
-						table.insert(faders, item)
-						table.insert(fader_fields, field)
+
+						local slider = view.items["slider_" .. slider_id]
+						if slider == nil then
+							print("LAYOUT ERROR - Element: 'slider_" .. slider_id .. "' does not exist.")
+						end
+
+						table.insert(sliders, slider)
+						table.insert(slider_knobs, item)
+						table.insert(slider_fields, field)
 					end
 				end
 
@@ -551,37 +589,35 @@ copyright-holders:m1macrophage
 							return
 						end
 
-						-- Button just pressed. Find affected fader.
+						-- Button just pressed. Find affected slider.
 						if dn & 1 ~= 0 then
-							for i = 1, #faders do
-								if faders[i].bounds:includes(x, y) then
+							for i = 1, #sliders do
+								if sliders[i].bounds:includes(x, y) then
 									selected = i
 									break
 								end
 							end
 						end
 
-						-- No fader selected. Nothing to do.
+						-- No slider selected. Nothing to do.
 						if selected <= 0 then
 							return
 						end
 
-						-- A fader is selected. Update state and, indirectly,
-						-- fader knob position, based on the pointer's Y position.
-
+						-- A slider is selected. Update state and, indirectly,
+						-- slider knob position, based on the pointer's Y position.
 						-- It is assumed the attached IO field is an IPT_ADJUSTER
 						-- with a range of 0-100 (the default).
 
-						local bbox = faders[selected].bounds
-						local scale_factor = bbox.height / fader_height
-						local min_y = bbox.y0 + fader_deadzone * scale_factor
-						local max_y = bbox.y1 - fader_deadzone * scale_factor
+						local knob_half_height = slider_knobs[selected].bounds.height / 2
+						local min_y = sliders[selected].bounds.y0 + knob_half_height
+						local max_y = sliders[selected].bounds.y1 - knob_half_height
 
 						local new_value = 100 - 100 * (y - min_y) / (max_y - min_y)
 						new_value = math.floor(new_value + 0.5)
 						if new_value < 0 then new_value = 0 end
 						if new_value > 100 then new_value = 100 end
-						fader_fields[selected].user_value = new_value
+						slider_fields[selected].user_value = new_value
 					end)
 			end)
 	]]></script>
