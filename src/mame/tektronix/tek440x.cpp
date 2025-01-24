@@ -80,17 +80,17 @@
 #include "logmacro.h"
 
 // mapcntl bits
-#define MAP_VM_ENABLE 4
-#define MAP_SYS_WR_ENABLE 5
+constexpr int MAP_VM_ENABLE = 4;
+constexpr int MAP_SYS_WR_ENABLE = 5;
 // mapcntrl result bits
-#define MAP_BLOCK_ACCESS 6
-#define MAP_CPU_WR 7
+constexpr int MAP_BLOCK_ACCESS = 6;
+constexpr int MAP_CPU_WR = 7;
 
 #define OFF8_TO_OFF16(A)	((A)>>1)
 #define OFF16_TO_OFF8(A)	((A)<<1)
 
-#define MAXRAM 0x200000	// +1MB
-//#define MAXRAM 0x400000	// +3MB (which was never a Thing)
+constexpr offs_t MAXRAM = 0x200000	// +1MB
+//constexpr offs_t MAXRAM = 0x400000	// +3MB
 
 // have m_readXX / m_writeXX use MMU translation
 // OR
