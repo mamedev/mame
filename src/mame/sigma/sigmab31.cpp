@@ -119,11 +119,13 @@ protected:
 
 private:
 	void main_map(address_map &map) ATTR_COLD;
-	void sound_map(address_map &map) ATTR_COLD;
+	void sound_map (address_map &map) ATTR_COLD;
 
 	required_device<cpu_device>     m_maincpu;
 	required_device<cpu_device>     m_audiocpu;
+
 };
+
 
 void sigmab31_state::main_map(address_map &map)
 {
@@ -131,11 +133,11 @@ void sigmab31_state::main_map(address_map &map)
 	map(0xf800, 0xffff).rom();
 }
 
-void sigmab31_state::sound_map(address_map &map)
+void sigmab31_state::sound_map (address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
 //	map(0x6020, 0x6027).rw(m_6840ptm_2, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
-//	map(0x6030, 0x6030).w(FUNC(sigmab31_state::audiocpu_irq_ack_w));
+//	map(0x6030, 0x6030).w(FUNC(sigmab52_state::audiocpu_irq_ack_w));
 //	map(0x6050, 0x6050).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0x6060, 0x6061).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
 	map(0x8000, 0xffff).rom().region("audiocpu", 0);
@@ -187,11 +189,10 @@ void sigmab31_state::sigmab31(machine_config &config)
 {
 	MC6809(config, m_maincpu, 8_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sigmab31_state::main_map);
-    
-	MC6809(config, m_audiocpu, XTAL(8'000'000));
-	m_audiocpu->set_addrmap(AS_PROGRAM, &sigmab31_state::sound_map);
-
 	
+	MC6809(config, m_audiocpu, XTAL(8'000'000));
+	m_audiocpu->set_addrmap(AS_PROGRAM, &sigmab31_state::sound_map );
+
 	PTM6840(config, "6840ptm_1", 8_MHz_XTAL / 8);
 
 	PTM6840(config, "6840ptm_2", 8_MHz_XTAL / 8);
