@@ -54,7 +54,7 @@ class coldfire_sim_device : public device_t {
 		};
 
 		template <typename T>
-		coldfire_sim_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
+		coldfire_sim_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&cpu_tag)
 			: coldfire_sim_device(mconfig, tag, owner, clock)
 		{
 			m_maincpu.set_tag(std::forward<T>(cpu_tag));
@@ -84,43 +84,43 @@ class coldfire_sim_device : public device_t {
 
 		TIMER_CALLBACK_MEMBER(swdt_callback);
 		
-		void icr_info(uint8_t icr);
+		void icr_info(u8 icr);
 
-		uint8_t simr_r(){ return m_simr; }		// sim configuration register
-		uint8_t marb_r(){ return m_marb; }		// bus master arbitration control
-		uint8_t icr_r(offs_t offset);			// interrupt control register
-		uint16_t imr_r(){ return m_imr; }		// interrupt mask register
-		uint16_t ipr_r(){ return m_ipr; }		// interrupt pending register
-		uint8_t sypcr_r(){ return m_sypcr; }	// system protection control register
-		uint8_t swivr_r(){ return m_swivr; }	// software watchdog interrupt vector register
-		uint8_t rsr_r(){ return m_rsr; }		// reset status register
-		uint16_t par_r(){ return m_par; }		// pin assignment register
+		u8 simr_r(){ return m_simr; }		// sim configuration register
+		u8 marb_r(){ return m_marb; }		// bus master arbitration control
+		u8 icr_r(offs_t offset);			// interrupt control register
+		u16 imr_r(){ return m_imr; }		// interrupt mask register
+		u16 ipr_r(){ return m_ipr; }		// interrupt pending register
+		u8 sypcr_r(){ return m_sypcr; }	// system protection control register
+		u8 swivr_r(){ return m_swivr; }	// software watchdog interrupt vector register
+		u8 rsr_r(){ return m_rsr; }		// reset status register
+		u16 par_r(){ return m_par; }		// pin assignment register
 
-		void simr_w(uint8_t data);							
-		void marb_w(uint8_t data);
-		void icr_w(offs_t offset, uint8_t data);
-		void imr_w(uint16_t data);	
-		void sypcr_w(uint8_t data);
-		void swivr_w(uint8_t data);
-		void swsr_w(uint8_t data);				// software watchdog service routine (kick)
-		void rsr_w(uint8_t data);
-		void par_w(uint16_t data);							
+		void simr_w(u8 data);							
+		void marb_w(u8 data);
+		void icr_w(offs_t offset, u8 data);
+		void imr_w(u16 data);	
+		void sypcr_w(u8 data);
+		void swivr_w(u8 data);
+		void swsr_w(u8 data);				// software watchdog service routine (kick)
+		void rsr_w(u8 data);
+		void par_w(u16 data);							
 
-		const uint8_t swdt_reset_sequence[2] = { 0x55, 0xaa };
-		uint8_t m_swdt_w_count;
+		const u8 swdt_reset_sequence[2] = { 0x55, 0xaa };
+		u8 m_swdt_w_count;
 		bool m_sypcr_locked;
 
-		uint8_t m_simr;
-		uint8_t m_marb;
-		uint8_t m_icr[15];
-		uint16_t m_par;
-		uint16_t m_imr;
-		uint16_t m_ipr;
-		uint8_t m_sypcr;
-		uint8_t m_swivr;
-		uint8_t m_rsr;
+		u8 m_simr;
+		u8 m_marb;
+		u8 m_icr[15];
+		u16 m_par;
+		u16 m_imr;
+		u16 m_ipr;
+		u8 m_sypcr;
+		u8 m_swivr;
+		u8 m_rsr;
 
-		uint8_t m_external_ipl;
+		u8 m_external_ipl;
 
 		emu_timer *m_timer_swdt;
 		
@@ -157,23 +157,23 @@ class coldfire_mbus_device : public device_t {
 
 		TIMER_CALLBACK_MEMBER(mbus_callback);
 
-		inline uint8_t madr_r(){ return m_madr; }			// madr is only for when the cpu is a slave i2c device
-		uint8_t mbdr_r();
-		inline uint8_t mbcr_r(){ return m_mbcr; }
-		uint8_t mbsr_r();
-		inline uint8_t mfdr_r(){ return m_mfdr; }
+		inline u8 madr_r(){ return m_madr; }			// madr is only for when the cpu is a slave i2c device
+		u8 mbdr_r();
+		inline u8 mbcr_r(){ return m_mbcr; }
+		u8 mbsr_r();
+		inline u8 mfdr_r(){ return m_mfdr; }
 
-		void madr_w(uint8_t data);
-		void mbdr_w(uint8_t data);
-		void mbcr_w(uint8_t data);
-		void mbsr_w(uint8_t data);
-		void mfdr_w(uint8_t data);
+		void madr_w(u8 data);
+		void mbdr_w(u8 data);
+		void mbcr_w(u8 data);
+		void mbsr_w(u8 data);
+		void mfdr_w(u8 data);
 
-		uint8_t m_madr;
-		uint8_t m_mbcr;
-		uint8_t m_mbsr;
-		uint8_t m_mfdr;
-		uint8_t m_mbdr;
+		u8 m_madr;
+		u8 m_mbcr;
+		u8 m_mbsr;
+		u8 m_mfdr;
+		u8 m_mbdr;
 
 		bool m_tx_in_progress;
 		bool m_clk_state;
@@ -221,24 +221,24 @@ class coldfire_timer_device : public device_t {
 			T_EREF = (1 << 1)
 		};
 
-		uint16_t tmr_r(){ return m_tmr; }
-		uint16_t trr_r(){ return m_trr; }
-		uint8_t ter_r(){ return m_ter; }
-		uint16_t tcr_r(){ return m_tcr; }
-		uint16_t tcn_r();
+		u16 tmr_r(){ return m_tmr; }
+		u16 trr_r(){ return m_trr; }
+		u8 ter_r(){ return m_ter; }
+		u16 tcr_r(){ return m_tcr; }
+		u16 tcn_r();
 
-		void tmr_w(uint16_t data);
-		void trr_w(uint16_t data);
-		void ter_w(uint8_t data);
-		void tcn_w(uint16_t data);
+		void tmr_w(u16 data);
+		void trr_w(u16 data);
+		void ter_w(u8 data);
+		void tcn_w(u16 data);
 
 		TIMER_CALLBACK_MEMBER(timer_callback);
 
-		uint16_t m_tmr;
-		uint16_t m_trr;
-		uint16_t m_tcr;
-		uint16_t m_tcn;
-		uint8_t m_ter;
+		u16 m_tmr;
+		u16 m_trr;
+		u16 m_tcr;
+		u16 m_tcn;
+		u8 m_ter;
 
 		attotime m_timer_start_time;
 
@@ -307,105 +307,105 @@ protected:
 	required_device_array<coldfire_timer_device, 2> m_timer;
 	
 	/* dram controller module */
-	inline uint16_t dcrr_r(){ return m_dcrr; }
-	inline uint16_t dctr_r(){ return m_dctr; }
-	inline uint16_t dcar0_r(){ return m_dcar0; }
-	inline uint32_t dcmr0_r(){ return m_dcmr0; }
-	inline uint8_t dccr0_r(){ return m_dccr0; }
-	inline uint16_t dcar1_r(){ return m_dcar1; }
-	inline uint32_t dcmr1_r(){ return m_dcmr1; }
-	inline uint8_t dccr1_r(){ return m_dccr1; }
+	inline u16 dcrr_r(){ return m_dcrr; }
+	inline u16 dctr_r(){ return m_dctr; }
+	inline u16 dcar0_r(){ return m_dcar0; }
+	inline u32 dcmr0_r(){ return m_dcmr0; }
+	inline u8 dccr0_r(){ return m_dccr0; }
+	inline u16 dcar1_r(){ return m_dcar1; }
+	inline u32 dcmr1_r(){ return m_dcmr1; }
+	inline u8 dccr1_r(){ return m_dccr1; }
 
-	void dcrr_w(uint16_t data);
-	void dctr_w(uint16_t data);
-	void dcar0_w(uint16_t data);
-	void dcmr0_w(uint32_t data);
-	void dccr0_w(uint8_t data);
-	void dcar1_w(uint16_t data);
-	void dcmr1_w(uint32_t data);
-	void dccr1_w(uint8_t data);
+	void dcrr_w(u16 data);
+	void dctr_w(u16 data);
+	void dcar0_w(u16 data);
+	void dcmr0_w(u32 data);
+	void dccr0_w(u8 data);
+	void dcar1_w(u16 data);
+	void dcmr1_w(u32 data);
+	void dccr1_w(u8 data);
 
-	uint16_t m_dcrr;
-	uint16_t m_dctr;
-	uint16_t m_dcar0;
-	uint32_t m_dcmr0;
-	uint8_t  m_dccr0;
-	uint16_t m_dcar1;
-	uint32_t m_dcmr1;
-	uint8_t  m_dccr1;
+	u16 m_dcrr;
+	u16 m_dctr;
+	u16 m_dcar0;
+	u32 m_dcmr0;
+	u8  m_dccr0;
+	u16 m_dcar1;
+	u32 m_dcmr1;
+	u8  m_dccr1;
 
 	/* chip select module */
-	uint16_t csar_x_r(offs_t offset);
-	uint16_t cscr_x_r(offs_t offset);
-	uint32_t csmr_x_r(offs_t offset);
-	inline uint16_t csar0_r(){ return csar_x_r(0); }
-	inline uint32_t csmr0_r(){ return csmr_x_r(0); }
-	inline uint16_t cscr0_r(){ return cscr_x_r(0); }
-	inline uint16_t csar1_r(){ return csar_x_r(1); }
-	inline uint32_t csmr1_r(){ return csmr_x_r(1); }
-	inline uint16_t cscr1_r(){ return cscr_x_r(1); }
-	inline uint16_t csar2_r(){ return csar_x_r(2); }
-	inline uint32_t csmr2_r(){ return csmr_x_r(2); }
-	inline uint16_t cscr2_r(){ return cscr_x_r(2); }
-	inline uint16_t csar3_r(){ return csar_x_r(3); }
-	inline uint32_t csmr3_r(){ return csmr_x_r(3); }
-	inline uint16_t cscr3_r(){ return cscr_x_r(3); }
-	inline uint16_t csar4_r(){ return csar_x_r(4); }
-	inline uint32_t csmr4_r(){ return csmr_x_r(4); }
-	inline uint16_t cscr4_r(){ return cscr_x_r(4); }
-	inline uint16_t csar5_r(){ return csar_x_r(5); }
-	inline uint32_t csmr5_r(){ return csmr_x_r(5); }
-	inline uint16_t cscr5_r(){ return cscr_x_r(5); }
-	inline uint16_t csar6_r(){ return csar_x_r(6); }
-	inline uint32_t csmr6_r(){ return csmr_x_r(6); }
-	inline uint16_t cscr6_r(){ return cscr_x_r(6); }
-	inline uint16_t csar7_r(){ return csar_x_r(7); }
-	inline uint32_t csmr7_r(){ return csmr_x_r(7); }
-	inline uint16_t cscr7_r(){ return cscr_x_r(7); }
-	inline uint16_t dmcr_r(){ return m_dmcr; }
+	u16 csar_x_r(offs_t offset);
+	u8 cscr_x_r(offs_t offset);
+	u32 csmr_x_r(offs_t offset);
+	inline u16 csar0_r(){ return csar_x_r(0); }
+	inline u32 csmr0_r(){ return csmr_x_r(0); }
+	inline u8 cscr0_r(){ return cscr_x_r(0); }
+	inline u16 csar1_r(){ return csar_x_r(1); }
+	inline u32 csmr1_r(){ return csmr_x_r(1); }
+	inline u8 cscr1_r(){ return cscr_x_r(1); }
+	inline u16 csar2_r(){ return csar_x_r(2); }
+	inline u32 csmr2_r(){ return csmr_x_r(2); }
+	inline u8 cscr2_r(){ return cscr_x_r(2); }
+	inline u16 csar3_r(){ return csar_x_r(3); }
+	inline u32 csmr3_r(){ return csmr_x_r(3); }
+	inline u8 cscr3_r(){ return cscr_x_r(3); }
+	inline u16 csar4_r(){ return csar_x_r(4); }
+	inline u32 csmr4_r(){ return csmr_x_r(4); }
+	inline u8 cscr4_r(){ return cscr_x_r(4); }
+	inline u16 csar5_r(){ return csar_x_r(5); }
+	inline u32 csmr5_r(){ return csmr_x_r(5); }
+	inline u8 cscr5_r(){ return cscr_x_r(5); }
+	inline u16 csar6_r(){ return csar_x_r(6); }
+	inline u32 csmr6_r(){ return csmr_x_r(6); }
+	inline u8 cscr6_r(){ return cscr_x_r(6); }
+	inline u16 csar7_r(){ return csar_x_r(7); }
+	inline u32 csmr7_r(){ return csmr_x_r(7); }
+	inline u8 cscr7_r(){ return cscr_x_r(7); }
+	inline u16 dmcr_r(){ return m_dmcr; }
 
-	void csar_x_w(offs_t offset, uint16_t data);
-	void csmr_x_w(offs_t offset, uint32_t data);
-	void cscr_x_w(offs_t offset, uint16_t data);
-	inline void csar0_w(uint16_t data){ csar_x_w(0, data); }
-	inline void csmr0_w(uint32_t data){ csmr_x_w(0, data); }
-	inline void cscr0_w(uint16_t data){ cscr_x_w(0, data); }
-	inline void csar1_w(uint16_t data){ csar_x_w(1, data); }
-	inline void csmr1_w(uint32_t data){ csmr_x_w(1, data); }
-	inline void cscr1_w(uint16_t data){ cscr_x_w(1, data); }
-	inline void csar2_w(uint16_t data){ csar_x_w(2, data); }
-	inline void csmr2_w(uint32_t data){ csmr_x_w(2, data); }
-	inline void cscr2_w(uint16_t data){ cscr_x_w(2, data); }
-	inline void csar3_w(uint16_t data){ csar_x_w(3, data); }
-	inline void csmr3_w(uint32_t data){ csmr_x_w(3, data); }
-	inline void cscr3_w(uint16_t data){ cscr_x_w(3, data); }
-	inline void csar4_w(uint16_t data){ csar_x_w(4, data); }
-	inline void csmr4_w(uint32_t data){ csmr_x_w(4, data); }
-	inline void cscr4_w(uint16_t data){ cscr_x_w(4, data); }
-	inline void csar5_w(uint16_t data){ csar_x_w(5, data); }
-	inline void csmr5_w(uint32_t data){ csmr_x_w(5, data); }
-	inline void cscr5_w(uint16_t data){ cscr_x_w(5, data); }
-	inline void csar6_w(uint16_t data){ csar_x_w(6, data); }
-	inline void csmr6_w(uint32_t data){ csmr_x_w(6, data); }
-	inline void cscr6_w(uint16_t data){ cscr_x_w(6, data); }
-	inline void csar7_w(uint16_t data){ csar_x_w(7, data); }
-	inline void csmr7_w(uint32_t data){ csmr_x_w(7, data); }
-	inline void cscr7_w(uint16_t data){ cscr_x_w(7, data); }
-	void dmcr_w(uint16_t data);
+	void csar_x_w(offs_t offset, u16 data);
+	void csmr_x_w(offs_t offset, u32 data);
+	void cscr_x_w(offs_t offset, u8 data);
+	inline void csar0_w(u16 data){ csar_x_w(0, data); }
+	inline void csmr0_w(u32 data){ csmr_x_w(0, data); }
+	inline void cscr0_w(u8 data){ cscr_x_w(0, data); }
+	inline void csar1_w(u16 data){ csar_x_w(1, data); }
+	inline void csmr1_w(u32 data){ csmr_x_w(1, data); }
+	inline void cscr1_w(u8 data){ cscr_x_w(1, data); }
+	inline void csar2_w(u16 data){ csar_x_w(2, data); }
+	inline void csmr2_w(u32 data){ csmr_x_w(2, data); }
+	inline void cscr2_w(u8 data){ cscr_x_w(2, data); }
+	inline void csar3_w(u16 data){ csar_x_w(3, data); }
+	inline void csmr3_w(u32 data){ csmr_x_w(3, data); }
+	inline void cscr3_w(u8 data){ cscr_x_w(3, data); }
+	inline void csar4_w(u16 data){ csar_x_w(4, data); }
+	inline void csmr4_w(u32 data){ csmr_x_w(4, data); }
+	inline void cscr4_w(u8 data){ cscr_x_w(4, data); }
+	inline void csar5_w(u16 data){ csar_x_w(5, data); }
+	inline void csmr5_w(u32 data){ csmr_x_w(5, data); }
+	inline void cscr5_w(u8 data){ cscr_x_w(5, data); }
+	inline void csar6_w(u16 data){ csar_x_w(6, data); }
+	inline void csmr6_w(u32 data){ csmr_x_w(6, data); }
+	inline void cscr6_w(u8 data){ cscr_x_w(6, data); }
+	inline void csar7_w(u16 data){ csar_x_w(7, data); }
+	inline void csmr7_w(u32 data){ csmr_x_w(7, data); }
+	inline void cscr7_w(u8 data){ cscr_x_w(7, data); }
+	void dmcr_w(u16 data);
 	
-	uint16_t m_csar[8];
-	uint32_t m_csmr[8];
-	uint16_t m_cscr[8];
-	uint16_t m_dmcr;
+	u16 m_csar[8];
+	u32 m_csmr[8];
+	u16 m_cscr[8];
+	u16 m_dmcr;
 
 	devcb_write_line::array<8> write_chip_select;
 
 	/* UART Modules */ 
 	// Stick two 68681 A channels in the CPU with no timers.
-	uint8_t uart1_r(offs_t offset);
-	uint8_t uart2_r(offs_t offset);
-	void uart1_w(offs_t offset, uint8_t data);
-	void uart2_w(offs_t offset, uint8_t data);
+	u8 uart1_r(offs_t offset);
+	u8 uart2_r(offs_t offset);
+	void uart1_w(offs_t offset, u8 data);
+	void uart2_w(offs_t offset, u8 data);
 	void uart_1_irq(int state){ m_sim->set_external_interrupt(UART_1_IRQ, state); }
 	void uart_2_irq(int state){ m_sim->set_external_interrupt(UART_2_IRQ, state); }
 
@@ -414,15 +414,15 @@ protected:
 
 	/* parallel port */
 	// just an 8 bit gpio port
-	inline uint8_t ppddr_r(){ return m_ppddr; }
-	inline uint8_t ppdat_r(){ return (m_ppdat_in | (m_ppdat_out & m_ppddr)); }
+	inline u8 ppddr_r(){ return m_ppddr; }
+	inline u8 ppdat_r(){ return (m_ppdat_in | (m_ppdat_out & m_ppddr)); }
 	
-	void ppddr_w(uint8_t data);
-	void ppdat_w(uint8_t data);
+	void ppddr_w(u8 data);
+	void ppdat_w(u8 data);
 
-	uint8_t m_ppddr;
-	uint8_t m_ppdat_in;
-	uint8_t m_ppdat_out;
+	u8 m_ppddr;
+	u8 m_ppdat_in;
+	u8 m_ppdat_out;
 	devcb_write8 m_gpio_w_cb;
 
 	/* MBUS Module */
