@@ -158,7 +158,7 @@ NOTE that all our versions of astropin have a corruption of the right flipper th
 
 	<!-- Reminder: Basic got found both in PCB with 2 chips (4k+8k) and in PCB with 3 chips (4k+4k+4k)... split accordingly! -->
 	<software name="basico2">
-		<description>Creativision Basic (1982, Release 2)</description>
+		<description>Creativision Basic (1982, Release 1)</description>
 		<year>1982</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8011" />
@@ -174,7 +174,7 @@ NOTE that all our versions of astropin have a corruption of the right flipper th
 	</software>
 
 	<software name="basico3">
-		<description>Creativision Basic (1982, Release 1)</description>
+		<description>Creativision Basic (1982, Release 2)</description>
 		<year>1982</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8011" />
