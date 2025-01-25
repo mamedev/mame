@@ -46,7 +46,6 @@ TODO:
 #include "bus/pc_kbd/pc_kbdc.h"
 #include "bus/rs232/hlemouse.h"
 #include "bus/rs232/rs232.h"
-#include "bus/spectrum/zxbus.h"
 #include "cpu/z80/z84c015.h"
 #include "machine/ds128x.h"
 #include "sound/ay8910.h"
@@ -79,8 +78,7 @@ public:
 	sprinter_state(const machine_config &mconfig, device_type type, const char *tag)
 		: spectrum_128_state(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_isa(*this, "isa%u", 0U)
-		, m_isa_io_view(*this, "isa_io_view")
+		, m_isa(*this, "isa8%u", 1U)
 		, m_rtc(*this, "rtc")
 		, m_ata(*this, "ata%u", 1U)
 		, m_beta(*this, BETA_DISK_TAG)
@@ -114,7 +112,6 @@ protected:
 	void map_io(address_map &map) ATTR_COLD;
 	void map_mem(address_map &map) ATTR_COLD;
 	void map_fetch(address_map &map) ATTR_COLD;
-	void map_isa_io(address_map &map) ATTR_COLD;
 	u8 m1_r(offs_t offset);
 	void cio_dtrb_w(int state);
 	u8 joy_ctrl_r(int num);
@@ -141,7 +138,6 @@ protected:
 
 	required_device<z84c015_device> m_maincpu;
 	required_device_array<isa8_device, 2> m_isa;
-	memory_view m_isa_io_view;
 
 private:
 	enum accel_state : u8
@@ -1399,19 +1395,8 @@ void sprinter_state::init_taps()
 	});
 }
 
-void sprinter_state::map_isa_io(address_map &map)
-{
-	map.unmap_value_high();
-	map(0x0000, 0xffff).view(m_isa_io_view);
-	subdevice<zxbus_device>("zxbus")->set_io_space(m_isa_io_view[0], m_isa_io_view[0]);
-	m_isa_io_view.select(0);
-}
-
 void sprinter_state::machine_start()
 {
-	address_space &m_isa_io = m_isa[0]->space(isa8_device::AS_ISA_IO);
-	m_isa_io.install_device(0x0000, 0xffff, *this, &sprinter_state::map_isa_io);
-
 	m_isa[0]->space(isa8_device::AS_ISA_IO).unmap_value_high();
 	m_isa[1]->space(isa8_device::AS_ISA_IO).unmap_value_high();
 
@@ -1907,12 +1892,11 @@ void sprinter_state::sprinter(machine_config &config)
 
 	ISA8(config, m_isa[0], X_SP / 5);
 	m_isa[0]->set_custom_spaces();
-	zxbus_device &zxbus(ZXBUS(config, "zxbus", 0));
-	ZXBUS_SLOT(config, "zxbus2isa", 0, zxbus, zxbus_cards, nullptr);
+	ISA8_SLOT(config, "isa1", 0, m_isa[0], pc_isa8_cards, "zxbus_adapter", false);
 
 	ISA8(config, m_isa[1], X_SP / 5);
 	m_isa[1]->set_custom_spaces();
-	ISA8_SLOT(config, "isa8", 0, m_isa[1], pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa2", 0, m_isa[1], pc_isa8_cards, nullptr, false);
 
 	m_screen->set_raw(X_SP / 3, SPRINT_WIDTH, SPRINT_HEIGHT, { 0, SPRINT_XVIS - 1, 0, SPRINT_YVIS - 1 });
 	m_screen->set_screen_update(FUNC(sprinter_state::screen_update));
