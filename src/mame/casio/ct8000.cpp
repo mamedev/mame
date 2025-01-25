@@ -3,34 +3,34 @@
 // thanks-to:BCM
 
 /***************************************************************************
-	Casiotone 8000 / "Symphonytron" system
+    Casiotone 8000 / "Symphonytron" system
 
-	The Symphonytron was a modular electronic organ produced by Casio in 1983.
-	The full system consists of:
+    The Symphonytron was a modular electronic organ produced by Casio in 1983.
+    The full system consists of:
 
-	- up to two Casiotone 8000 keyboards (8049 CPU, 2x uPD931 "vowel-consonant synthesis")
-	- RC-1 accompaniment unit (uPD7801 CPU, uPD930 rhythm generator, analog percussion)
-	- MB-1 memory unit (8049 CPU, 2x uPD931, RAM cartridge slot)
-	- FK-1 pedal keyboard (8049 CPU, single uPD931)
-	- CS-100 or CS-200 keyboard stand with built-in mixer
+    - up to two Casiotone 8000 keyboards (8049 CPU, 2x uPD931 "vowel-consonant synthesis")
+    - RC-1 accompaniment unit (uPD7801 CPU, uPD930 rhythm generator, analog percussion)
+    - MB-1 memory unit (8049 CPU, 2x uPD931, RAM cartridge slot)
+    - FK-1 pedal keyboard (8049 CPU, single uPD931)
+    - CS-100 or CS-200 keyboard stand with built-in mixer
 
-	The keyboards and memory unit all connect to the RC-1 via 14-pin DIN connectors.
-	Although the RAM cart slot is located on the MB-1, all actual access to the cart is controlled
-	remotely by the RC-1, which uses the cart to record and play back both rhythm/chord and melody
-	data. The MB-1's sound hardware is then used to play back recorded melody data independently of
-	the keyboards. The RC-1 also has a "tone mix" feature, where note data received from one keyboard
-	is automatically forwarded to the other.
+    The keyboards and memory unit all connect to the RC-1 via 14-pin DIN connectors.
+    Although the RAM cart slot is located on the MB-1, all actual access to the cart is controlled
+    remotely by the RC-1, which uses the cart to record and play back both rhythm/chord and melody
+    data. The MB-1's sound hardware is then used to play back recorded melody data independently of
+    the keyboards. The RC-1 also has a "tone mix" feature, where note data received from one keyboard
+    is automatically forwarded to the other.
 
-	The individual units can also be used on their own; the MB-1 will also respond to notes and tone
-	selection commands via the DIN connector, but it needs the RC-1 present to do much else.
-	It's marked as "not working" for this reason.
+    The individual units can also be used on their own; the MB-1 will also respond to notes and tone
+    selection commands via the DIN connector, but it needs the RC-1 present to do much else.
+    It's marked as "not working" for this reason.
 
-	This driver also features MIDI in/thru support via an "adapter" device which translates a subset
-	of MIDI messages into the protocol used with the original connectors.
+    This driver also features MIDI in/thru support via an "adapter" device which translates a subset
+    of MIDI messages into the protocol used with the original connectors.
 
-	TODO:
-	- volume/expression pedal (for all systems)
-	- fix aliasing in BBD output for some presets
+    TODO:
+    - volume/expression pedal (for all systems)
+    - fix aliasing in BBD output for some presets
 
 ***************************************************************************/
 
@@ -778,7 +778,7 @@ INPUT_PORTS_START(ctfk1)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("E2")
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("F2")
 	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
-		
+
 	PORT_START("KC9")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Tune Up")
@@ -790,7 +790,7 @@ INPUT_PORTS_START(ctfk1)
 	PORT_START("KCA")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Sustain") PORT_TOGGLE
 	PORT_BIT(0xfe, IP_ACTIVE_LOW, IPT_UNUSED)
-		
+
 	PORT_START("KCB")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED) // KI0->KCB diode
 	PORT_BIT(0x0e, IP_ACTIVE_LOW,  IPT_UNUSED)

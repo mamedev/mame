@@ -2825,7 +2825,7 @@ ROM_START( inquiztr )
 	ROM_LOAD( "inqdisk.img", 0x000000, 0x1c2000, NO_DUMP )
 ROM_END
 
-// Alternate Version 1.2 
+// Alternate Version 1.2
 ROM_START( inquiztr12a )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "inq6809", 0x08000, 0x08000, CRC(ae996600) SHA1(f360399e77b81399d910770fa8106c196f04363c) )

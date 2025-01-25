@@ -488,7 +488,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( epo_tetr ) // all inputs verified against hidden test mode
 	PORT_INCLUDE( spg2xx )
 
-	PORT_MODIFY("P1")	
+	PORT_MODIFY("P1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
@@ -2731,12 +2731,12 @@ CONS( 2008, ddr33v,     0,        0, spg2xx,    ddr33v,    spg2xx_game_ddr33v_st
 CONS( 2006, anpantv,    0,        0, spg2xx,    spg2xx,    spg2xx_game_state,          empty_init,    "Bandai",                                                "Anpanman TV (Japan)",                                                   MACHINE_NOT_WORKING )
 
 // Has an AT24C08, not currently hooked up (probably for storing database unlocks)
-// 
+//
 // There is also a card reader/scanner which can read barcodes from Digimon cards
 // and IR connectivity which allowed for data exchange with various services using
 // an external device, including transfering characters to/from an arcade game.
 // Neither is currently emulated
-// 
+//
 // Will report 'ERROR' sometimes, maybe as a result of these not being hooked up.
 CONS( 2006, dmbtjunc,   0,        0, spg2xx,    dmbtjunc,  spg2xx_game_state,          empty_init,    "Bandai",                                                "Let's! TV Play Digital Monster Battle Junction (Japan)",                MACHINE_NOT_WORKING )
 

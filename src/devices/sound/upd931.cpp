@@ -2,15 +2,15 @@
 // copyright-holders:Devin Acker
 
 /***************************************************************************
-	NEC/Casio uPD931 synthesis chip
+    NEC/Casio uPD931 synthesis chip
 
-	Many details of this implementation are based on research and notes by Robin Whittle:
-	https://www.firstpr.com.au/rwi/casio/Casio-931-2006-06-17.txt
-	Any references to MT-65 behavior are based on this document.
+    Many details of this implementation are based on research and notes by Robin Whittle:
+    https://www.firstpr.com.au/rwi/casio/Casio-931-2006-06-17.txt
+    Any references to MT-65 behavior are based on this document.
 
-	TODO:
-	- implement vibrato register (CT-8000 doesn't use it)
-	- a few other unknown/unclear bits in the flags shift register
+    TODO:
+    - implement vibrato register (CT-8000 doesn't use it)
+    - a few other unknown/unclear bits in the flags shift register
 ***************************************************************************/
 
 #include "emu.h"

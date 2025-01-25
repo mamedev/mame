@@ -16443,7 +16443,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
         <description>Music from the Sega CD Games - Jurassic Park, Batman Returns (USA)</description>
         <year>1993</year>
         <publisher>Sega Multimedia Studio</publisher>
-		<sharedfeat name="compatibility" value="NTSC-U"/>
+        <sharedfeat name="compatibility" value="NTSC-U"/>
         <part name="cdrom" interface="scd_cdrom">
             <diskarea name="cdrom">
                 <disk name="music from the sega cd games - jurassic park, batman returns (usa)" status="nodump"/>
@@ -16462,7 +16462,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 	    <description>The Smurfs (USA, Prototype)</description>
 	    <year>2014</year>
 	    <publisher>Good Deal Games</publisher>
-		<sharedfeat name="compatibility" value="NTSC-U"/>
+	    <sharedfeat name="compatibility" value="NTSC-U"/>
 	    <part name="cdrom" interface="scd_cdrom">
 	        <diskarea name="cdrom">
 	            <disk name="the smurfs (usa, prototype)" status="nodump"/>

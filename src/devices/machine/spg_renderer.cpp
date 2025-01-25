@@ -256,7 +256,7 @@ void spg_renderer_device::draw_linemap(bool has_extended_tilemaps, const rectang
 		uint32_t palette_map = tilemapregs[3];
 
 		//if (scanline == 128)
-		//	popmessage("draw draw_linemap reg0 %04x reg1 %04x bases %04x %04x\n", tilemapregs[0], tilemapregs[1], tilemap, palette_map);
+		//  popmessage("draw draw_linemap reg0 %04x reg1 %04x bases %04x %04x\n", tilemapregs[0], tilemapregs[1], tilemap, palette_map);
 
 		//uint32_t xscroll = scrollregs[0];
 		uint32_t yscroll = scrollregs[1];
@@ -309,11 +309,11 @@ void spg_renderer_device::draw_linemap(bool has_extended_tilemaps, const rectang
 			{
 				bits <<= nc_bpp;
 				if (nbits < nc_bpp)
-				{				
+				{
 					uint16_t b = spc.read_word(sourcebase++ & 0x3fffff);
 					b = (b << 8) | (b >> 8);
 					bits |= b << (nc_bpp - nbits);
-					nbits += 16;	
+					nbits += 16;
 				}
 				nbits -= nc_bpp;
 
