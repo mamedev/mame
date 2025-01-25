@@ -670,11 +670,11 @@ void mcd212_device::process_vsr(uint32_t *pixels, bool *transparent)
 	const bool use_rgb_tp_bit = (tp_ctrl_type == TCR_RGB);
 	const bool tp_check_parity = !BIT(tp_ctrl, 3);
 	const bool tp_always = ((tp_ctrl_type == TCR_ALWAYS) && tp_check_parity);
-	const int region_flag_index = 1 - (tp_ctrl_type & 1);
-	const bool *region_flags = m_region_flag[region_flag_index];
+	const int region_flag_index = BIT(~tp_ctrl_type, 0);
+	const bool *const region_flags = m_region_flag[region_flag_index];
 	const bool use_region_flag = (tp_ctrl_type >= TCR_RF0 && tp_ctrl_type <= TCR_RF1_KEY1);
-	bool use_color_key = (tp_ctrl_type == TCR_KEY || tp_ctrl_type == TCR_RF0_KEY1 || tp_ctrl_type == TCR_RF1_KEY1);
-	use_color_key &= (icm != ICM_DYUV && !(icm == ICM_RGB555 && Path == 1)); // DYUV and RGB do not have access to color key.
+	const bool is_dyuv_rgb = (icm == ICM_DYUV) || ((icm == ICM_RGB555) && (Path == 1)); // DYUV and RGB do not have access to color key.
+	const bool use_color_key = !is_dyuv_rgb && ((tp_ctrl_type == TCR_KEY) || (tp_ctrl_type == TCR_RF0_KEY1) || (tp_ctrl_type == TCR_RF1_KEY1));
 
 	LOGMASKED(LOG_VSR, "Scanline %d: VSR Path %d, ICM (%02x), VSR (%08x)\n", screen().vpos(), Path, icm, vsr);
 
@@ -723,7 +723,7 @@ void mcd212_device::process_vsr(uint32_t *pixels, bool *transparent)
 				const uint8_t green = ((byte & 0b11100000) >> 2) + ((byte1 & 0b11) << 6);
 				const uint8_t red = (byte1 & 0b01111100) << 1;
 				rgb_tp_bit = (use_rgb_tp_bit && ((byte1 & 0x80) == tp_check_parity));
-				color1 = color0 = (red << 16) + (green << 8) + blue;
+				color1 = color0 = (uint32_t(red) << 16) | (uint32_t(green) << 8) | blue;
 			}
 			else if (icm == ICM_CLUT4)
 			{
@@ -743,8 +743,8 @@ void mcd212_device::process_vsr(uint32_t *pixels, bool *transparent)
 				length_m = length ? (length * 2) : width;
 			}
 
-			const bool color_match0 = (((mask_bits & color0) == tp_color_match) == tp_check_parity);
-			const bool color_match1 = (((mask_bits & color1) == tp_color_match) == tp_check_parity);
+			const bool color_match0 = ((mask_bits & color0) == tp_color_match) == tp_check_parity;
+			const bool color_match1 = ((mask_bits & color1) == tp_color_match) == tp_check_parity;
 			const int end = std::min<int>(width, x + length_m);
 			for (int rl_index = x; rl_index < end; rl_index += 2)
 			{
