@@ -424,6 +424,10 @@ msgstr "信息自动校验"
 msgid "Hide romless machine from available list"
 msgstr "在可用清单中隐藏无 ROM 机台"
 
+#: src/frontend/mame/ui/submenu.cpp:47
+msgid "Pause game on menu"
+msgstr "弹出菜单时暂停游戏"
+
 #: src/frontend/mame/ui/submenu.cpp:52
 msgid "Advanced Options"
 msgstr "进阶选项"
