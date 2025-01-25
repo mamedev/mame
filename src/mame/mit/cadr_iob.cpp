@@ -260,6 +260,8 @@ void cadr_iob_device::device_start()
 	save_item(NAME(m_chaos_csr));
 	save_item(NAME(m_chaos_transmit));
 	save_item(NAME(m_chaos_receive));
+	save_item(NAME(m_chaos_transmit_pointer));
+	save_item(NAME(m_chaos_transmit_buffer));
 
 	m_clock_timer = timer_alloc(FUNC(cadr_iob_device::clock_callback), this);
 	m_transmit_timer = timer_alloc(FUNC(cadr_iob_device::transmit_callback), this);
@@ -286,13 +288,20 @@ void cadr_iob_device::device_reset()
 	m_chaos_receive = 0;
 	m_speaker_data = 0;
 	m_speaker->level_w(m_speaker_data);
+	m_chaos_transmit_pointer = 0;
 }
 
 
 void cadr_iob_device::chaos_transmit_start()
 {
-	LOG("Transmitting %04x\n", m_chaos_transmit);
-	m_chaos_csr &= ~CHAOSNET_TRANSMIT_DONE;
+	LOG("Starting transmit of packet\n");
+	printf("Transmitting packet data");
+	for (int i = 0; i < m_chaos_transmit_pointer; i++)
+	{
+		printf(" %04x", m_chaos_transmit_buffer[i]);
+	}
+	printf("\n");
+
 	// TODO transmit the data
 	// TODO set proper timing
 	m_transmit_timer->adjust(attotime::from_msec(10));
@@ -341,6 +350,10 @@ void cadr_iob_device::write(offs_t offset, u16 data)
 				CHAOSNET_ANY_DESTINATION | CHAOSNET_LOOKBACK | CHAOSNET_TIMER_IRQ_ENABLE;
 			m_chaos_csr = (m_chaos_csr & ~bits_to_store) | (data & bits_to_store);
 		}
+		if (BIT(data, CHAOSNET_LOOPBACK_BIT))
+		{
+			// Loop back not implemented
+		}
 		if (BIT(data, CHAOSNET_RESET_RECEIVE_BIT))
 		{
 			// TODO Clear and enable receiver
@@ -369,8 +382,9 @@ void cadr_iob_device::write(offs_t offset, u16 data)
 		}
 		break;
 	case 0x11: // store word in transmit buffer
-		m_chaos_transmit = data;
-		chaos_transmit_start();
+		m_chaos_transmit_buffer[m_chaos_transmit_pointer] = data;
+		m_chaos_transmit_pointer = (m_chaos_transmit_pointer + 1) % CHAOS_TRANSMIT_BUFFER_SIZE;
+		m_chaos_csr &= ~CHAOSNET_TRANSMIT_DONE;
 		break;
 	default:
 		break;

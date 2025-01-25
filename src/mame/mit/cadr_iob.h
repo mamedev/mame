@@ -73,6 +73,8 @@ private:
 	static constexpr int CHAOSNET_RECEIVE_DONE_BIT = 15;
 	static constexpr u16 CHAOSNET_RECEIVE_DONE = 1 << CHAOSNET_RECEIVE_DONE_BIT;
 
+	static constexpr u16 CHAOS_TRANSMIT_BUFFER_SIZE = 512 / 2;
+
 	u8 mcu_bus_r();
 	void mcu_bus_w(u8 data);
 	void mcu_p1_w(u8 data);
@@ -99,6 +101,8 @@ private:
 	u16 m_clock;
 	u16 m_chaos_csr;
 	u16 m_chaos_transmit;
+	u16 m_chaos_transmit_buffer[CHAOS_TRANSMIT_BUFFER_SIZE];
+	u16 m_chaos_transmit_pointer;
 	u16 m_chaos_receive;
 };
 
