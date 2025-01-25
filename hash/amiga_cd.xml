@@ -112,6 +112,7 @@ Intro and main menu use [Denise] BPLCON3 SPRESx
 Optional [Denise] SHRES mode in gameplay
 Editor and HD Install untested
 ]]></notes>
+		<!-- TODO: verify assign BrainDamage: "Brain Damage:" before install as Erratum note -->
 		<info name="usage" value="CD drawer default position needs to scroll right" />
 		<info name="developer" value="Mind's Eye Entertainment"/>
 		<part name="cdrom" interface="cdrom">
