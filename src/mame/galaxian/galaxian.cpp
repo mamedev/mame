@@ -10667,7 +10667,7 @@ Cut the track on the bottom of the board going to pin 21 of IC 1H (2716 EPROM).
 Join pins 21 of IC's 1H and 1K together and connect both to +5 volts (although
 I've seen one set of docs saying to connect to pin 1 of ic 2N (7408) instead). */
 
-ROM_START( warofbug )  // Shows 20c as the base of currency. I know of no US games that used dimes - unless it's another country?
+ROM_START( warofbug )  // Shows "ONE PLAY ONLY 20C" irrespective of coinage setting - likely intended for Australia
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "warofbug.u",   0x0000, 0x0800, CRC(b8dfb7e3) SHA1(c7c675b2638869a9cd7dbd554e6131d8c71b567a) )
 	ROM_LOAD( "warofbug.v",   0x0800, 0x0800, CRC(fd8854e0) SHA1(b39ab41b834f18341968dd780f0a3cd07d70c16c) )
