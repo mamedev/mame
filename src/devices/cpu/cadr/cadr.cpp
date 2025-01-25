@@ -206,7 +206,7 @@ void cadr_cpu_device::read()
 	const u16 l2_index = (l1 << 5) | ((m_vma >> 8) & 0x1f);
 	const u32 l2 = m_vma_map_l2[l2_index] & 0xffffff;
 	u32 address = (l2 << 8) | (m_vma & 0xff);
-	LOGMASKED(LOG_VMA, "VMA addres %08x(%o) mapped to %08x, l1_index=%d, l1=%o, l2_index=%d, l2=%o\n", m_vma, m_vma, address, (m_vma >> 13) & 0x7ff, l1, l2_index, l2);
+	LOGMASKED(LOG_VMA, "VMA address %08x(%o) mapped to %08x, l1_index=%d, l1=%o, l2_index=%d, l2=%o\n", m_vma, m_vma, address, (m_vma >> 13) & 0x7ff, l1, l2_index, l2);
 
 	if (!BIT(address, 31))
 	{
@@ -226,21 +226,24 @@ void cadr_cpu_device::write()
 	m_access_fault = false;
 	m_write_fault = false;
 	m_page_fault = false;
-	const u8 l1 = m_vma_map_l1[(m_vma >> 13) & 0x7ff];
+	const u16 l1_index = (m_vma >> 13) & 0x7ff;
+	const u8 l1 = m_vma_map_l1[l1_index];
 	const u16 l2_index = (l1 << 5) | ((m_vma >> 8) & 0x1f);
 	const u32 l2 = m_vma_map_l2[l2_index] & 0xffffff;
 	u32 address = (l2 << 8) | (m_vma & 0xff);
-	LOGMASKED(LOG_VMA, "VMA addres %08x(%o) mapped to %08x, l1_index=%d, l1=%o, l2_index=%d, l2=%o\n", m_vma, m_vma, address, (m_vma >> 13) & 0x7ff, l1, l2_index, l2);
+	LOGMASKED(LOG_VMA, "VMA address 0x%08x(0%o) mapped to 0x%08x, l1_index=0x%x, l1=0%o, l2_index=0x%x, l2=0%o\n", m_vma, m_vma, address, l1_index, l1, l2_index, l2);
 
 	if (!BIT(address, 31))
 	{
 		m_access_fault = true;
 		m_page_fault = true;
+		LOGMASKED(LOG_VMA, "access fault, page fault\n");
 	}
 	if (!BIT(address, 30))
 	{
 		m_write_fault = true;
 		m_page_fault = true;
+		LOGMASKED(LOG_VMA, "wrilte fault, page fault\n");
 	}
 	else
 	{
