@@ -4984,12 +4984,13 @@ Pressing TAB key will switch to NTSC mode (?), which cuts off bottom of screen
 		</part>
 	</software>
 
-	<software name="dxgalaga" supported="partial">
+	<software name="dxgalaga" supported="no">
 		<description>Deluxe Galaga (AGA, v2.6B, 19950903)</description>
 		<year>1995</year>
 		<publisher>Edgar Vigdal</publisher>
 		<notes><![CDATA[
-Guru Meditation when run stand-alone
+Guru Meditation when run stand-alone (fixed)
+[Denise] bonus items don't collide in gameplay
 Throws "file is missing" when installed to HDD
 ]]></notes>
 		<info name="usage" value="Requires AGA" />

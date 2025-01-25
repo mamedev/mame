@@ -537,6 +537,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 	const rgb_t border_color = ecsena && BIT(CUSTOM_REG(REG_BPLCON3), 5) ? rgb_t(0, 0, 0) : aga_palette[0];
 
 	// TODO: verify where we're missing pixels here for the GFX pitch bitplane corruptions
+	// Update 2025: check and resort all these entries
 	// - wbenc30 scrolling in lores mode (fmode=3, expects a +58!, verify ddfstrt / delays)
 	// - sockid_a, alfred gameplay (fmode=1)
 	// - virocp_a (fmode=1, +26)
@@ -547,8 +548,13 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 	// - cd32 cdtv:insidino copyright screen (fmode=3)
 	// - cd32 cdtv:labytime intro/tutorial screens
 	//   (swaps between fmode=1 and 3, verify ddfstrt / ddfstop)
-
-	const int offset_hack[] = { 10, 11, 11, 13 };
+	const int offset_hack[] = {
+		11,
+		11,
+		11,
+		// fmode 3: dxgalaga (title) wants +20
+		20
+	};
 	const int default_bit_offset[] = { 15, 31, 31, 63 };
 
 	const int ddf_start_offset_lores[] = { 17, 17, 17, 17 };
