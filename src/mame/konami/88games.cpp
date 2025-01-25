@@ -293,9 +293,9 @@ static INPUT_PORTS_START( 88games )
 	PORT_DIPSETTING(    0x20, "Don't Erase" )
 	PORT_DIPSETTING(    0x00, "Erase on Reset" )
 	PORT_SERVICE_DIPLOC( 0x40, IP_ACTIVE_LOW, "SW3:3" )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW3:4")   // Listed in the manual as "continue"
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Game Ending" )           PORT_DIPLOCATION("SW3:4")   // Determines the end of the game
+	PORT_DIPSETTING(    0x80, "Restart (3 times)" )                                 // The round (9 games) is repeated 3 times increasing difficulty
+	PORT_DIPSETTING(    0x00, "Game Over" )                                         // Game is over
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
