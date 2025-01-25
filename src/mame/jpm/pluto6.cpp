@@ -99,6 +99,13 @@ P27: I2C connector
 SW1+2: Software configurable DIP switches.
 SW3: Software configurable switch.
 
+* Coldfire Chip select map *
+CS0: Boot ROM
+CS1: SRAM
+CS2: FPGA
+CS3: GPU/s
+CS4-7: Unused
+
 * Boot process *
 On power up, the CPU is held in reset by the glue logic. Meanwhile the PIC18 boots and uses the +5v LED as a heartbeat.
 The PIC18 uploads the FPGA bitstream before releasing the reset line on the CPU. The CPU then boots and runs code
@@ -137,6 +144,12 @@ EINT3: DUART INT?
 		* pl6_cm:	Windows harddrive is not dumped. PC is connected to the Pluto 6 over RS232.
 		* tijkpots: Game is missing CF card. For whatever reason, the blank image doesn't cause it to fail to load, and so reads invalid data
 */
+/*
+	Todo:
+		* Make the GPU slot device... far better than it currently is.
+		* Configurable amount of VFDs. Currently set at one, but two is not uncommon and shouldn't always be loaded if not needed
+		* Reels
+*/
 
 #include "emu.h"
 
@@ -147,12 +160,12 @@ EINT3: DUART INT?
 #include "machine/mc68681.h"
 #include "machine/i2cmem.h"
 #include "machine/nvram.h"
+#include "machine/pl6_exp.h"
 #include "machine/pl6_fpga.h"
 #include "machine/pl6_pic.h"
 #include "video/serialvfd.h"
-//#include "video/mb86292.h"
 
-//#include "screen.h"
+
 #include "speaker.h"
 
 
@@ -173,15 +186,11 @@ public:
 	pluto6_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
-			//m_gpu1(*this, "gpu1"),
-			//m_gpu2(*this, "gpu2"),
-			//m_vram1(*this, "vram1"),
-			//m_vram2(*this, "vram2"),
-			//m_screen0(*this, "screen0"),
-			//m_screen1(*this, "screen1"),
 			m_fpga(*this, "fpga"),
 			m_pic(*this, "pic18"),
 			m_ata(*this, "ata"),
+			m_exp0(*this, "exp0"),
+			m_exp1(*this, "exp1"),
 			m_duart(*this, "duart"),
 			m_i2cmem(*this, "i2cmem"),
 			m_inputs(*this, "IN0"),
@@ -194,12 +203,7 @@ public:
 	{ }
 
 	void pluto6_dev(machine_config &config);
-	void pluto6v_dev(machine_config &config);
-	void pluto6dv_dev(machine_config &config);
 	void pluto6_betcom(machine_config &config);
-	void pluto6v(machine_config &config);
-	void pluto6dv(machine_config &config);
-
 	void pluto6_jpmrom(machine_config &config);
 
 	// FPGA
@@ -226,9 +230,6 @@ public:
 	void duart_tx_a_w(uint8_t state) { m_fpga->duart_tx_a_w(state); }
 	void duart_tx_b_w(uint8_t state) { m_fpga->duart_tx_b_w(state); }
 
-	//u32 screen1_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	//u32 screen2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
 	static constexpr feature_type unemulated_features() { return feature::PROTECTION; }
 
 protected:
@@ -238,6 +239,9 @@ protected:
 private:
 	void pluto6(machine_config &config);	// Private to prevent use
 	void install_duart(machine_config &config);
+	void install_eeprom(machine_config &config);
+	void install_calypso(machine_config &config, u8 slot);
+
 
 	void duart_irq_handler(int state);
 	void gpu1_irq_handler(int state);
@@ -251,21 +255,18 @@ private:
 
 	// IO
 	required_device<mcf5206e_device> m_maincpu;
-
-	//optional_device<mb86292_device> m_gpu1;
-	//optional_device<mb86292_device> m_gpu2;
-	//optional_device<ram_device> m_vram1;
-	//optional_device<ram_device> m_vram2;
-	//optional_device<screen_device> m_screen0;
-	//optional_device<screen_device> m_screen1;
-
 	required_device<pl6fpga_device> m_fpga;
 	required_device<pl6pic_device> m_pic;
 	required_device<ata_interface_device> m_ata;
 
+	required_device<pluto6_expansion_slot_device> m_exp0;
+	required_device<pluto6_expansion_slot_device> m_exp1;
+
+	bool duart_installed = false;
 	optional_device<mc68681_device> m_duart;
 	uint8_t m_duart_irq_state = 0;
 
+	bool eeprom_installed = false;
 	optional_device<i2c_24c04_device> m_i2cmem;
 
 	required_ioport m_inputs;
@@ -275,22 +276,22 @@ private:
 	output_finder<8> m_aux;
 	optional_ioport m_debug;
 
+	bool vfd_installed = false;
 	optional_device<serial_vfd_device> m_vfd;
-
-	// PIC18
 
 	// LED hack
 	uint8_t led_array[32] = {0};
 	bool led_use_7seg = false;
 };
 
+
 void pluto6_state::pluto6_map(address_map &map)
 {
 	// ColdFire (Coldfire chip selects in brackets)
 	map(0x00000000, 0x0007ffff).rom();   					// Boot ROM (CS0)
-	map(0x10000000, 0x1003ffff).ram().share("nvram");		// Battery Backed SRAM (CS1)
-	map(0x12000000, 0x1200000f).rw(m_ata, FUNC(ata_interface_device::cs0_swap_r), FUNC(ata_interface_device::cs0_swap_w)); // IDE (CS1?)
-	map(0x12000010, 0x1200001f).rw(m_ata, FUNC(ata_interface_device::cs1_swap_r), FUNC(ata_interface_device::cs1_swap_w)); // IDE (CS1?)
+	map(0x10000000, 0x1003ffff).ram().share("nvram");		// Battery Backed SRAM (CS1 below 0x12xxxxxx)
+	map(0x12000000, 0x1200000f).rw(m_ata, FUNC(ata_interface_device::cs0_swap_r), FUNC(ata_interface_device::cs0_swap_w)); // IDE (CS1)
+	map(0x12000010, 0x1200001f).rw(m_ata, FUNC(ata_interface_device::cs1_swap_r), FUNC(ata_interface_device::cs1_swap_w)); // IDE (CS1)
 	
 	// FPGA
 	map(0x20000000, 0x20003fff).rw(m_fpga, FUNC(pl6fpga_device::dev_r), FUNC(pl6fpga_device::dev_w)); 	// Entire IO system (CS2)
@@ -464,10 +465,35 @@ void pluto6_state::auxout_callback(offs_t offset, uint8_t data){
 void pluto6_state::pluto_sda(uint8_t state){
 	m_maincpu->sda_write(state);
 	m_pic->sda_write(state);
+	if(eeprom_installed) m_i2cmem->write_sda(state);	// i2cmem seems to not have a write_line call back?
 }
 
 void pluto6_state::pluto_scl(uint8_t state){
 	m_pic->scl_write(state);
+	if(eeprom_installed) m_i2cmem->write_scl(state);
+}
+
+void pluto6_state::install_duart(machine_config &config){
+	MC68681(config, m_duart, XTAL(3'686'400));	// Actually 3.69MHz on the dev board
+	m_duart->irq_cb().set(FUNC(pluto6_state::duart_irq_handler));
+	m_duart->a_tx_cb().set(FUNC(pluto6_state::duart_tx_a_w));
+	m_duart->b_tx_cb().set(FUNC(pluto6_state::duart_tx_b_w));
+	m_fpga->duart_rx_a_callback().set(FUNC(pluto6_state::duart_rx_a_w));
+	m_fpga->duart_rx_b_callback().set(FUNC(pluto6_state::duart_rx_b_w));
+	m_fpga->duart_r_callback().set(FUNC(pluto6_state::duart_read));
+	m_fpga->duart_w_callback().set(FUNC(pluto6_state::duart_write));
+	duart_installed = true;
+}
+
+void pluto6_state::install_eeprom(machine_config &config){
+	I2C_24C04(config, m_i2cmem).set_address(0xA0);
+	eeprom_installed = true;
+}
+
+void pluto6_state::install_calypso(machine_config &config, u8 slot){
+	if(slot > 1) return;
+	if(slot == 0) m_exp0->option_set("gpu", HEBER_CALYPSO_GPU);
+	else m_exp1->option_set("gpu", HEBER_CALYPSO_GPU);
 }
 
 // Machine defs
@@ -477,6 +503,11 @@ void pluto6_state::pluto6(machine_config &config){
 	m_maincpu->tx2_w_cb().set(FUNC(pluto6_state::cfuart_tx2_w));
 	m_maincpu->sda_w_cb().set(FUNC(pluto6_state::pluto_sda));
 	m_maincpu->scl_w_cb().set(FUNC(pluto6_state::pluto_scl));
+
+	PLUTO6_EXPANSION_SLOT(config, m_exp0, 0);
+	m_exp0->set_default_option(nullptr);
+	PLUTO6_EXPANSION_SLOT(config, m_exp1, 0);
+	m_exp1->set_default_option(nullptr);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -497,75 +528,6 @@ void pluto6_state::pluto6(machine_config &config){
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	config.set_default_layout(layout_pl6dev);
 }
-/*
-// Only use pluto6v or pluto6dv when an actual GPU is fitted, otherwise use pluto6
-void pluto6_state::pluto6v(machine_config &config){
-	pluto6(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &pluto6_state::pluto6v_map);
-
-	SCREEN(config, m_screen0, SCREEN_TYPE_RASTER);
-	m_screen0->set_raw(XTAL(14'318'181), 800, 0, 640, 525, 0, 480);
-	m_screen0->set_screen_update(FUNC(pluto6_state::screen1_update));
-
-	// Configured as FCRAM 16MBit with 8MB / 64-bit data bus thru MMR register
-	RAM(config, m_vram1);
-	m_vram1->set_default_size("8M");
-	m_vram1->set_default_value(0);
-
-	MB86292(config, m_gpu1, XTAL(14'318'181));
-	m_gpu1->set_screen(m_screen0);
-	m_gpu1->set_vram(m_vram1);
-	m_gpu1->set_xint_cb().set(FUNC(pluto6_state::gpu1_irq_handler));
-
-	config.set_default_layout(layout_pl6vdev);
-}
-
-// Dual GPU
-void pluto6_state::pluto6dv(machine_config &config){
-	pluto6(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &pluto6_state::pluto6dv_map);
-	
-	SCREEN(config, m_screen0, SCREEN_TYPE_RASTER);
-	m_screen0->set_raw(XTAL(14'318'181), 800, 0, 640, 525, 0, 480);
-	m_screen0->set_screen_update(FUNC(pluto6_state::screen1_update));
-
-	// Configured as FCRAM 16MBit with 8MB / 64-bit data bus thru MMR register
-	RAM(config, m_vram1);
-	m_vram1->set_default_size("8M");
-	m_vram1->set_default_value(0);
-
-	MB86292(config, m_gpu1, XTAL(14'318'181));
-	m_gpu1->set_screen("screen0");
-	m_gpu1->set_vram(m_vram1);
-	m_gpu1->set_xint_cb().set(FUNC(pluto6_state::gpu1_irq_handler));
-	
-	SCREEN(config, m_screen1, SCREEN_TYPE_RASTER);
-	m_screen1->set_raw(XTAL(14'318'181), 800, 0, 640, 525, 0, 480);
-	m_screen1->set_screen_update(FUNC(pluto6_state::screen2_update));
-
-	RAM(config, m_vram2);
-	m_vram2->set_default_size("8M");
-	m_vram2->set_default_value(0);
-
-	MB86292(config, m_gpu2, XTAL(14'318'181));
-	m_gpu2->set_screen(m_screen1);
-	m_gpu2->set_vram(m_vram2);
-	m_gpu2->set_xint_cb().set(FUNC(pluto6_state::gpu2_irq_handler));
-
-	config.set_default_layout(layout_pl6vdev);	// Make better dual video layout
-}
-*/
-
-void pluto6_state::install_duart(machine_config &config){
-	MC68681(config, m_duart, XTAL(3'686'400));	// Actually 3.69MHz on the dev board
-	m_duart->irq_cb().set(FUNC(pluto6_state::duart_irq_handler));
-	m_duart->a_tx_cb().set(FUNC(pluto6_state::duart_tx_a_w));
-	m_duart->b_tx_cb().set(FUNC(pluto6_state::duart_tx_b_w));
-	m_fpga->duart_rx_a_callback().set(FUNC(pluto6_state::duart_rx_a_w));
-	m_fpga->duart_rx_b_callback().set(FUNC(pluto6_state::duart_rx_b_w));
-	m_fpga->duart_r_callback().set(FUNC(pluto6_state::duart_read));
-	m_fpga->duart_w_callback().set(FUNC(pluto6_state::duart_write));
-}
 
 /* Heber Pluto 6 Development Kit */
 void pluto6_state::pluto6_dev(machine_config &config){
@@ -573,43 +535,17 @@ void pluto6_state::pluto6_dev(machine_config &config){
 	m_fpga->set_fpga_type(pl6fpga_device::developer_fpga);
 	m_pic->set_address(0xC0);
 
-	install_duart(config);
-
-	I2C_24C04(config, m_i2cmem).set_address(0xA0);
-
-	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
-
-	SERIAL_VFD(config, m_vfd);
-	this->led_use_7seg = true;
-}
-
-/*
-void pluto6_state::pluto6v_dev(machine_config &config){
-	pluto6v(config);
-	m_fpga->set_fpga_type(pl6fpga_device::developer_fpga);
-	m_pic->set_address(0xC0);
-
-	install_duart(config);
-
-	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
+	m_exp0->option_add("gpu", HEBER_CALYPSO_GPU); // Is optional
+	m_exp0->set_default_option(nullptr);
 	
-	SERIAL_VFD(config, m_vfd);
-	this->led_use_7seg = true;
-}
-
-void pluto6_state::pluto6dv_dev(machine_config &config){
-	pluto6dv(config);
-	m_fpga->set_fpga_type(pl6fpga_device::developer_fpga);
-	m_pic->set_address(0xC0);
-
 	install_duart(config);
+	install_eeprom(config);
 
-	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
-	
+	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, false);
+
 	SERIAL_VFD(config, m_vfd);
 	this->led_use_7seg = true;
 }
-*/
 
 /* Betcom Pluto 6 */
 void pluto6_state::pluto6_betcom(machine_config &config){
@@ -631,7 +567,7 @@ void pluto6_state::pluto6_jpmrom(machine_config &config){
 
 	ATA_INTERFACE(config, m_ata).options(ata_devices, nullptr, nullptr, true);
 
-	I2C_24C04(config, m_i2cmem).set_address(0xA0);
+	install_eeprom(config);
 
 	SERIAL_VFD(config, m_vfd);
 	this->led_use_7seg = true;

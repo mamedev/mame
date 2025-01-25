@@ -5358,5 +5358,7 @@ if (MACHINES["HEBER_PLUTO"]~=null) then
 		MAME_DIR .. "src/devices/machine/pl6_fpga.h",
 		MAME_DIR .. "src/devices/machine/pl6_pic.cpp",
 		MAME_DIR .. "src/devices/machine/pl6_pic.h",
+		MAME_DIR .. "src/devices/machine/pl6_exp.cpp",
+		MAME_DIR .. "src/devices/machine/pl6_exp.h",
 	}
 end
