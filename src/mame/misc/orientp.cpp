@@ -170,4 +170,4 @@ ROM_END
 
 
 //    YEAR  NAME    PARENT   MACHINE   INPUT   STATE         INIT        ROT   COMPANY      FULLNAME                                                FLAGS
-GAME( 200?, east8,  0,       orientp,   orientp, orientalpearl_state, empty_init, ROT0, "<unknown>", "EAST8  v1.05 ", MACHINE_IS_SKELETON_MECHANICAL ) // EAST8  v1.05  string . this was dumped from soccer santiago II 6 ball pinball
+GAME( 200?, east8,  0,       orientp,   orientp, orientalpearl_state, empty_init, ROT0, "<unknown>", "EAST8  v1.05 ",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // EAST8  v1.05  string . this was dumped from soccer santiago II 6 ball pinball
