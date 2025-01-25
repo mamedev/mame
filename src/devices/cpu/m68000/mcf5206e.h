@@ -129,6 +129,49 @@ class coldfire_sim_device : public device_t {
 		
 };
 
+class coldfire_dma_device : public device_t {
+	// Manual states that the DMA channels cannot read from the internal SRAM
+	public:
+		coldfire_dma_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+		void dma_map(address_map &map) ATTR_COLD;
+		auto irq_cb() ATTR_COLD { return write_irq.bind(); }
+
+	protected:
+		void device_start() override ATTR_COLD;
+		void device_reset() override ATTR_COLD;
+
+	private:
+		
+		//TIMER_CALLBACK_MEMBER(dma_callback);
+
+		u32 sar_r(){ return m_sar; }
+		u32 dar_r(){ return m_dar; }
+		u16 dcr_r(){ return m_dcr; }
+		u16 bcr_r(){ return m_bcr; }
+		u8  dsr_r(){ return m_dsr; }
+		u8  divr_r(){ return m_divr; }
+
+		void sar_w(u32 data);
+		void dar_w(u32 data);
+		void dcr_w(u16 data);
+		void bcr_w(u16 data);
+		void dsr_w(u8 data);
+		void divr_w(u8 data);
+
+		u32 m_sar;
+		u32 m_dar;
+		u16 m_dcr;
+		u16 m_bcr;
+		u8 m_dsr;
+		u8 m_divr;
+
+		//bool m_tx_in_progress;
+
+		//emu_timer *m_timer_dma;
+		devcb_write_line write_irq;
+};
+
 class coldfire_mbus_device : public device_t {
 	public:
 		coldfire_mbus_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
@@ -433,11 +476,17 @@ protected:
 	required_device<coldfire_mbus_device> m_mbus;
 	devcb_write_line write_sda, write_scl;
 
+	/* DMA Modules */
+	required_device_array<coldfire_dma_device, 2> m_dma;
+	void dma0_irq_w(int state){ m_sim->set_external_interrupt(DMA_0_IRQ, state); }
+	void dma1_irq_w(int state){ m_sim->set_external_interrupt(DMA_1_IRQ, state); }
+
 };
 
 DECLARE_DEVICE_TYPE(MCF5206E, mcf5206e_device)
 DECLARE_DEVICE_TYPE(COLDFIRE_SIM, coldfire_sim_device)
 DECLARE_DEVICE_TYPE(COLDFIRE_TIMER, coldfire_timer_device)
 DECLARE_DEVICE_TYPE(COLDFIRE_MBUS, coldfire_mbus_device)
+DECLARE_DEVICE_TYPE(COLDFIRE_DMA, coldfire_dma_device)
 
 #endif
