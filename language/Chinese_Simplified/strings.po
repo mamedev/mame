@@ -930,11 +930,11 @@ msgstr "未完美模拟功能: "
 
 #: src/frontend/mame/ui/info.cpp:133
 msgid "Screen flipping in cocktail mode is not supported.\n"
-msgstr "尚未支援台面型筐体模式的画面翻转。"
+msgstr "尚未支援台面型筐体模式的画面翻转。\n"
 
 #: src/frontend/mame/ui/info.cpp:135
 msgid "This system requires external artwork files.\n"
-msgstr "此系统需要额外的装饰图档"
+msgstr "此系统需要额外的装饰图档\n"
 
 #: src/frontend/mame/ui/info.cpp:137
 msgid ""
@@ -2028,7 +2028,7 @@ msgstr ""
 "找不到系统 ROM, 请检查 %1$s.ini 档案中指定的 ROM 路径设定。\n"
 "\n"
 "如果是首次使用 %2$s, 请参阅 docs 目录中的 %2$s.pdf 以取得设定 %2$s 的相关信"
-"息\n"
+"息"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:329
 #, c-format
@@ -2973,8 +2973,8 @@ msgstr "十字准星选项"
 
 #: src/frontend/mame/ui/mainmenu.cpp:167
 msgctxt "menu-main"
-msgid "Cheat"
-msgstr "游戏作弊"
+msgid "Cheat Options"
+msgstr "作弊选项"
 
 #: src/frontend/mame/ui/mainmenu.cpp:172
 msgctxt "menu-main"
@@ -2984,7 +2984,7 @@ msgstr "插件选项"
 #: src/frontend/mame/ui/mainmenu.cpp:175
 msgctxt "menu-main"
 msgid "External DAT View"
-msgstr "檢視外部文件"
+msgstr "检视外部文件"
 
 #: src/frontend/mame/ui/mainmenu.cpp:181
 msgctxt "menu-main"
@@ -3693,6 +3693,10 @@ msgstr "* 插槽选项：\n"
 #: src/frontend/mame/ui/devopt.cpp:350
 msgid "[None]\n"
 msgstr "[ 无 ]\n"
+
+#: src/frontend/mame/ui/cheatopt.cpp:122
+msgid "Cheat Options"
+msgstr "作弊选项"
 
 #: src/emu/render.cpp:1834
 #, c-format
