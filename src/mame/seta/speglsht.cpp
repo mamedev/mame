@@ -114,6 +114,15 @@ TODO:
 #include "speaker.h"
 #include <algorithm>
 
+#define LOG_COP (1 << 1)
+
+#define LOG_ALL (LOG_COP)
+
+#define VERBOSE (0)
+#include "logmacro.h"
+
+#define LOGCOP(...) LOGMASKED(LOG_COP, __VA_ARGS__)
+
 namespace {
 
 class speglsht_state : public driver_device
@@ -224,11 +233,23 @@ void speglsht_state::videoreg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 void speglsht_state::cop_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	COMBINE_DATA(&m_cop_ram[offset]);
+	if (data & ~0xffff)
+		LOGCOP("%s: cop_w(%04x) = %08x & %08x\n", machine().describe_context(), offset, data, mem_mask);
 
-	if (m_cop_ram[offset] & 0x8000) // 16 bit signed to 32 bit
+	if (ACCESSING_BITS_0_15) // fit to 16bit
 	{
-		m_cop_ram[offset] |= 0xffff0000;
+		data &= 0xffff;
+		mem_mask &= 0xffff;
+		COMBINE_DATA(&m_cop_ram[offset]);
+
+		if (m_cop_ram[offset] & 0x8000) // 16 bit signed to 32 bit
+		{
+			m_cop_ram[offset] |= 0xffff0000;
+		}
+		else
+		{
+			m_cop_ram[offset] &= 0xffff;
+		}
 	}
 }
 
@@ -237,34 +258,21 @@ uint32_t speglsht_state::cop_r(offs_t offset)
 {
 	int32_t *cop = (int32_t*)&m_cop_ram[0];
 
-	union
-	{
-		int32_t  a;
-		uint32_t b;
-	} temp;
+	int32_t res = 0;
 
 	switch (offset)
 	{
-		case 0x40 / 4:
+		case 0x10:
+		case 0x11:
+		case 0x12:
 		{
-			temp.a = ((cop[0x3] * cop[0x0] + cop[0x4] * cop[0x1] + cop[0x5] * cop[0x2]) >> 14) + cop[0xc];
-			return temp.b;
-		}
-
-		case 0x44 / 4:
-		{
-			temp.a = ((cop[0x6] * cop[0x0] + cop[0x7] * cop[0x1] + cop[0x8] * cop[0x2]) >> 14) + cop[0xd];
-			return temp.b;
-		}
-
-		case 0x48 / 4:
-		{
-			temp.a = ((cop[0x9] * cop[0x0] + cop[0xa] * cop[0x1] + cop[0xb] * cop[0x2]) >> 14) + cop[0xe];
-			return temp.b;
+			unsigned displacement = (offset & 3) * 3;
+			res = ((cop[0x3 + displacement] * cop[0x0] + cop[0x4 + displacement] * cop[0x1] + cop[0x5 + displacement] * cop[0x2]) >> 14) + cop[0xc + (offset & 3)];
+			break;
 		}
 	}
 
-	return 0;
+	return uint32_t(res);
 }
 
 uint32_t speglsht_state::irq_ack_r()
@@ -377,18 +385,14 @@ void speglsht_state::video_start()
 
 uint32_t speglsht_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int const dy = BIT(m_videoreg, 5) ? (256 * 512) : 0; //visible frame
-
-	for (int y = 0; y < 256; y++)
+	int y = (cliprect.top() + 5 + (BIT(m_videoreg, 5) ? 256 : 0)) * 512;
+	for (int dsty = cliprect.top(); dsty <= cliprect.bottom(); dsty++, y += 512)
 	{
-		int const dsty = y - 5;
 		uint32_t *const dstline = &bitmap.pix(dsty);
-		for (int x = 0; x < 512; x++)
+		for(int dstx = cliprect.left(); dstx <= cliprect.right(); dstx++)
 		{
-			int const tmp = dy + y * 512 + x;
-			int const dstx = x - 67;
-			if (cliprect.contains(dstx, dsty))
-				dstline[dstx] = rgb_t((m_framebuffer[tmp] >> 0) & 0xff, (m_framebuffer[tmp] >> 8) & 0xff, (m_framebuffer[tmp] >> 16) & 0xff);
+			uint32_t const pix = m_framebuffer[y + dstx + 67];
+			dstline[dstx] = rgb_t((pix >> 0) & 0xff, (pix >> 8) & 0xff, (pix >> 16) & 0xff);
 		}
 	}
 
@@ -397,16 +401,14 @@ uint32_t speglsht_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	m_maincpu->draw_screen(screen, *m_bitmap, cliprect);
 
 	//copy temporary bitmap to rgb 32 bit bitmap
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		uint16_t const *const srcline = &m_bitmap->pix(y);
 		uint32_t *const dstline = &bitmap.pix(y);
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			if (srcline[x])
-			{
 				dstline[x] = m_maincpu->palette().pen_color(srcline[x]);
-			}
 		}
 	}
 
