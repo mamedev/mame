@@ -36,20 +36,22 @@
 #define LOG_MBUS	    (1U << 6)
 #define LOG_DRAM	    (1U << 7)
 #define LOG_SIM	    	(1U << 8)
+#define LOG_DMA	    	(1U << 9)
 #define VERBOSE 		( LOG_DEBUG | LOG_UART | LOG_SWDT | LOG_MBUS | LOG_DRAM | LOG_SIM )
 #include "logmacro.h"
 
 #define INT_LEVEL(N) 	((N&0x1c) >> 2)
 #define ICR_USE_AUTOVEC(N)	((N & 0x80) != 0)
 
-template <typename T, typename U, typename V>
-inline void BITWRITE(T &var, U bit_number, V state) {
+template <typename T, typename U>
+inline void BITWRITE(T &var, U bit_number, bool state) {
     var = (var & ~(static_cast<T>(1) << bit_number)) | (static_cast<T>(state) << bit_number);
 }
 
 
 DEFINE_DEVICE_TYPE(MCF5206E,    mcf5206e_device,    "mcf5206e",     "Freescale MCF5206E")
 DEFINE_DEVICE_TYPE(COLDFIRE_SIM,    coldfire_sim_device,    "coldfire_sim",     "ColdFire SIM Module")
+DEFINE_DEVICE_TYPE(COLDFIRE_DMA,    coldfire_dma_device,    "coldfire_dma",     "ColdFire DMA Module")
 DEFINE_DEVICE_TYPE(COLDFIRE_MBUS,    coldfire_mbus_device,    "coldfire_mbus",     "ColdFire MBUS Module")
 DEFINE_DEVICE_TYPE(COLDFIRE_TIMER,    coldfire_timer_device,    "coldfire_timer",     "ColdFire Timer Module")
 
@@ -63,13 +65,14 @@ mcf5206e_device::mcf5206e_device(const machine_config &mconfig, const char *tag,
 	, m_sim(*this, "sim")
 	, m_timer(*this, "timer%u", 1U)
 	, write_chip_select(*this)
-	, m_uart(*this, "coldfire_uart%u", 0U)
+	, m_uart(*this, "coldfire_uart%u", 1U)
 	, write_tx1(*this)
 	, write_tx2(*this)
 	, m_gpio_w_cb(*this)
 	, m_mbus(*this, "coldfire_mbus")
 	, write_sda(*this)
 	, write_scl(*this)
+	, m_dma(*this, "coldfire_dma%u", 0U)
 {
 }
 
@@ -90,6 +93,12 @@ void mcf5206e_device::device_add_mconfig(machine_config &config){
 	m_mbus->sda_cb().set(FUNC(mcf5206e_device::mbus_sda_w));
 	m_mbus->scl_cb().set(FUNC(mcf5206e_device::mbus_scl_w));
 	m_mbus->irq_cb().set(FUNC(mcf5206e_device::mbus_irq_w));
+
+	COLDFIRE_DMA(config, m_dma[0], this->clock());
+	COLDFIRE_DMA(config, m_dma[1], this->clock());
+	m_dma[0]->irq_cb().set(FUNC(mcf5206e_device::dma0_irq_w));
+	m_dma[1]->irq_cb().set(FUNC(mcf5206e_device::dma1_irq_w));
+
 }
 
 void mcf5206e_device::device_start()
@@ -187,6 +196,10 @@ void mcf5206e_device::coldfire_regs_map(address_map &map)
 
 	// mbus (i2c)
 	map(0xf00001e0, 0xf00001ff).m(m_mbus, FUNC(coldfire_mbus_device::mbus_map));
+
+	// dma
+	map(0xf0000200, 0xf000021f).m(m_dma[0], FUNC(coldfire_dma_device::dma_map));
+	map(0xf0000240, 0xf000025f).m(m_dma[1], FUNC(coldfire_dma_device::dma_map));
 }
 
 /* 
@@ -804,7 +817,7 @@ void coldfire_mbus_device::mbus_map(address_map &map){
 	map(0x04, 0x04).rw(FUNC(coldfire_mbus_device::mfdr_r), FUNC(coldfire_mbus_device::mfdr_w));
 	map(0x08, 0x08).rw(FUNC(coldfire_mbus_device::mbcr_r), FUNC(coldfire_mbus_device::mbcr_w));
 	map(0x0c, 0x0c).rw(FUNC(coldfire_mbus_device::mbsr_r), FUNC(coldfire_mbus_device::mbsr_w));
-	map(0xf0, 0xf0).rw(FUNC(coldfire_mbus_device::mbdr_r), FUNC(coldfire_mbus_device::mbdr_w));
+	map(0x10, 0x10).rw(FUNC(coldfire_mbus_device::mbdr_r), FUNC(coldfire_mbus_device::mbdr_w));
 }
 
 TIMER_CALLBACK_MEMBER(coldfire_mbus_device::mbus_callback){
@@ -856,6 +869,83 @@ void coldfire_mbus_device::mbdr_w(u8 data)
 {
 	m_mbdr = data;
 	LOGMASKED(LOG_MBUS, "%s: (M-Bus Data I/O Register) mbdr_w: %02x\n", this->machine().describe_context(), data);
+}
+
+
+/*
+ * DMA Module
+ * 
+*/
+
+coldfire_dma_device::coldfire_dma_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) : 
+	device_t(mconfig, COLDFIRE_DMA, tag, owner, clock)
+	, write_irq(*this)
+{
+}
+
+
+void coldfire_dma_device::device_start(){
+	//m_timer_dma = timer_alloc( FUNC( coldfire_dma_device::dma_callback ), this );
+
+	save_item(NAME(m_sar));
+	save_item(NAME(m_dar));
+	save_item(NAME(m_dcr));
+	save_item(NAME(m_bcr));
+	save_item(NAME(m_dsr));
+	save_item(NAME(m_divr));
+
+	device_reset();
+}
+
+void coldfire_dma_device::device_reset(){
+	m_sar = 0x00000000;
+	m_dar = 0x00000000;
+	m_dcr 	 = 0x0000;
+	m_bcr	 = 0x0000;
+	m_dsr	 = 0x00;
+	m_divr	 = 0x0F;
+
+	//m_timer_dma->adjust(attotime::never);
+}
+
+
+void coldfire_dma_device::dma_map(address_map &map){
+	map(0x00, 0x03).rw(FUNC(coldfire_dma_device::sar_r), FUNC(coldfire_dma_device::sar_w));
+	map(0x04, 0x07).rw(FUNC(coldfire_dma_device::dar_r), FUNC(coldfire_dma_device::dar_w));
+	map(0x08, 0x09).rw(FUNC(coldfire_dma_device::dcr_r), FUNC(coldfire_dma_device::dcr_w));
+	map(0x0c, 0x0d).rw(FUNC(coldfire_dma_device::bcr_r), FUNC(coldfire_dma_device::bcr_w));
+	map(0x10, 0x10).rw(FUNC(coldfire_dma_device::dsr_r), FUNC(coldfire_dma_device::dsr_w));
+	map(0x14, 0x14).rw(FUNC(coldfire_dma_device::divr_r), FUNC(coldfire_dma_device::divr_w));
+}
+
+void coldfire_dma_device::sar_w(u32 data){
+	m_sar = data;
+	LOGMASKED(LOG_DMA, "%s: (DMA Source Address) sar_w: %08x\n", this->machine().describe_context(), data);
+}
+
+void coldfire_dma_device::dar_w(u32 data){
+	m_dar = data;
+	LOGMASKED(LOG_DMA, "%s: (DMA Destination Address) dar_w: %08x\n", this->machine().describe_context(), data);
+}
+
+void coldfire_dma_device::dcr_w(u16 data){
+	m_dcr = data;
+	LOGMASKED(LOG_DMA, "%s: (DMA Control Register) dcr_w: %04x\n", this->machine().describe_context(), data);
+}
+
+void coldfire_dma_device::bcr_w(u16 data){
+	m_bcr = data;
+	LOGMASKED(LOG_DMA, "%s: (DMA Byte Count) bcr_w: %04x\n", this->machine().describe_context(), data);
+}
+
+void coldfire_dma_device::dsr_w(u8 data){
+	BITWRITE(m_dsr, 0, BIT(data, 0));	// Manual states only writes to bit 0 has any effect on the register
+	LOGMASKED(LOG_DMA, "%s: (DMA Status Register) dsr_w: %02x\n", this->machine().describe_context(), data);
+}
+
+void coldfire_dma_device::divr_w(u8 data){
+	m_divr = data;
+	LOGMASKED(LOG_DMA, "%s: (DMA Interrupt Vector) divr_w: %02x\n", this->machine().describe_context(), data);
 }
 
 /*
