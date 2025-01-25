@@ -8,6 +8,7 @@ The I/O Board makes the keyboard, mouse, and chaosnet available on the Unibus.
 
 TODO:
 - Chaosnet
+  - Sys300/301 needs a small hack to continu booting
 - General purpose I/O
 - Serial I/O
 - Where is the REPEAT key mapped? And how should it be used?
@@ -440,7 +441,8 @@ u16 cadr_iob_device::read(offs_t offset)
 		// -------- -----x-- Match any destination
 		// -------- ------x- Loopback
 		// -------- -------x Timer interrupt enable (not implemented)
-		return m_chaos_csr /*& ~CHAOSNET_TRANSMIT_DONE*/; // sys300 does not boot if transmit done stays enabled
+		// sys300/301 does not boot if transmit done stays enabled, but it also does not send any packets.
+		return m_chaos_csr /*& ~CHAOSNET_TRANSMIT_DONE*/;
 	case 0x11: // chaos net my address
 		// TODO: Address is configured using dip switches
 		return 0x101;
