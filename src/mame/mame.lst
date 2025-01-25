@@ -16233,6 +16233,11 @@ ct8000
 ctfk1
 ctmb1
 
+@source:casio/ct8000.cpp
+ct8000                          //
+ctfk1                           //
+ctmb1                           //
+
 @source:casio/ctk2000.cpp
 ctk2100
 

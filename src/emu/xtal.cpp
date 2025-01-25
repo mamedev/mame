@@ -119,6 +119,7 @@ const double XTAL::known_xtals[] = {
 	  4'433'619, // 4.433619_MHz_XTAL      PAL color subcarrier (technically 4.43361875mhz)
 	  4'608'000, // 4.608_MHz_XTAL         Luxor ABC-77 keyboard (Keytronic custom part #48-300-107 is equivalent)
 	  4'915'200, // 4.9152_MHz_XTAL        -
+	  4'946'864, // 4.946864_MHz_XTAL      Casiotone 8000
 	  4'952'000, // 4.952_MHz_XTAL         IGS M036 based mahjong games, for TT5665 sound chip
 	  5'000'000, // 5_MHz_XTAL             Mutant Night
 	  5'068'800, // 5.0688_MHz_XTAL        Usually used as MC2661 or COM8116 baud rate clock

@@ -52,16 +52,18 @@ public:
 	// Helper setup functions to create common filters representable by biquad filters:
 	// (and, as needed, modify/update/recalc helpers)
 
+	// universal calculator for both Sallen-Key low-pass and high-pass
+	biquad_params opamp_sk_lphp_calc(biquad_type type, double r1, double r2, double r3, double r4, double c1, double c2);
+
 	// Sallen-Key low-pass
 	filter_biquad_device& opamp_sk_lowpass_setup(double r1, double r2, double r3, double r4, double c1, double c2);
 	void opamp_sk_lowpass_modify(double r1, double r2, double r3, double r4, double c1, double c2);
-	biquad_params opamp_sk_lowpass_calc(double r1, double r2, double r3, double r4, double c1, double c2);
 
-	// TODO when needed: Sallen-Key band-pass
+	// Sallen-Key high-pass
+	filter_biquad_device& opamp_sk_highpass_setup(double r1, double r2, double r3, double r4, double c1, double c2);
+	void opamp_sk_highpass_modify(double r1, double r2, double r3, double r4, double c1, double c2);
 
-	// TODO when needed: Sallen-Key band-reject
-
-	// TODO when needed: Sallen-Key high-pass
+	// TODO when needed: Sallen-Key band-pass (there are several versions of this in the 1955 Sallen-Key paper)
 
 	// Multiple-Feedback low-pass
 	filter_biquad_device& opamp_mfb_lowpass_setup(double r1, double r2, double r3, double c1, double c2);
