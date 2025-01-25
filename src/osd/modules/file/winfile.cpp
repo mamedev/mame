@@ -407,6 +407,12 @@ std::error_condition osd_get_full_path(std::string &dst, std::string const &path
 {
 	try
 	{
+		if (win_check_socket_path(path) ||
+		    win_check_ptty_path(path))
+		{
+			dst = path;
+			return std::error_condition();
+		}
 		// get the length of the full path
 		std::wstring const w_path(osd::text::to_wstring(path));
 		DWORD const length(GetFullPathNameW(w_path.c_str(), 0, nullptr, nullptr));
