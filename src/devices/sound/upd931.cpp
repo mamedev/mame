@@ -24,6 +24,8 @@ DEFINE_DEVICE_TYPE(UPD931, upd931_device, "upd931", "NEC uPD931")
 upd931_device::upd931_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, UPD931, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
+	, device_memory_interface(mconfig, *this)
+	, m_io_config("io", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(upd931_device::io_map), this))
 	, m_retrig_timer(nullptr)
 	, m_filter_cb(*this)
 	, m_sync_cb(*this)
@@ -32,8 +34,33 @@ upd931_device::upd931_device(const machine_config &mconfig, const char *tag, dev
 }
 
 /**************************************************************************/
+device_memory_interface::space_config_vector upd931_device::memory_space_config() const
+{
+	return space_config_vector{std::make_pair(AS_IO, &m_io_config)};
+}
+
+/**************************************************************************/
+void upd931_device::io_map(address_map &map)
+{
+	map(0x20, 0x27).w(FUNC(upd931_device::note_w));
+	map(0x30, 0x37).w(FUNC(upd931_device::octave_w));
+	// waveform write position: ct8000 uses 40, mt65 uses 60
+	map(0x40, 0x40).mirror(0x20).w(FUNC(upd931_device::wave_pos_w));
+	map(0xa7, 0xa7).w(FUNC(upd931_device::wave_data_w));
+	map(0xb0, 0xb7).w(FUNC(upd931_device::flags_w)); // lower address bits are ignored
+	map(0xb8, 0xbf).w(FUNC(upd931_device::status_latch_w));
+	// vibrato/sustain: ct8000 uses c0-c7, mt65 uses d0-d7 (lower two bits are also ignored)
+	map(0xc0, 0xc3).mirror(0x10).w(FUNC(upd931_device::vibrato_w));
+	map(0xc4, 0xc7).mirror(0x10).w(FUNC(upd931_device::sustain_w));
+	map(0xe0, 0xe7).w(FUNC(upd931_device::note_on_w));
+	map(0xf4, 0xf4).lw8(NAME([this] (offs_t offset, u8 data) { m_filter_cb(data); }));
+}
+
+/**************************************************************************/
 void upd931_device::device_start()
 {
+	space(AS_IO).specific(m_io);
+
 	m_stream = stream_alloc(0, 1, clock() / CLOCKS_PER_SAMPLE);
 
 	if (m_master)
@@ -169,10 +196,13 @@ void upd931_device::i2_w(int state)
 	{
 		if (!m_i2 && state)
 		{
-			// address low nibble on I2 rising edge + apply register write
+			// address low nibble on I2 rising edge
 			m_addr &= 0xf0;
 			m_addr |= (m_db & 0xf);
-			update_register();
+
+			// apply register write
+			m_stream->update();
+			m_io.write_byte(m_addr, m_data & 0xf);
 		}
 		else if (m_i2 && !state)
 		{
@@ -223,80 +253,73 @@ void upd931_device::sync_w(int state)
 }
 
 /**************************************************************************/
-void upd931_device::update_register()
+void upd931_device::note_w(offs_t offset, u8 data)
 {
-	m_stream->update();
+	m_voice[offset].m_note = data;
+}
 
-	if ((m_addr & 0xf8) == 0x20)
-	{
-		// 0x20-27 - select voice note
-		m_voice[m_addr & 7].m_note = m_data;
-	}
-	else if ((m_addr & 0xf8) == 0x30)
-	{
-		// 0x30-37 - select voice octave
-		m_voice[m_addr & 7].m_octave = m_data;
-	}
-	else if ((m_addr & 0xdf) == 0x40)
-	{
-		// 0x40 (ct8000), 0x60 (mt65) - select waveform position
-		m_wave_pos = m_data;
-	}
-	else if (m_addr == 0xa7)
-	{
-		// 0xa7 - write to waveform
-		const u8 sel = BIT(m_flags, FLAG_WAVE_SEL);
-		m_wave[sel][m_wave_pos & 0xf] = m_data;
-	}
-	else if ((m_addr & 0xf8) == 0xb0)
-	{
-		// 0xb0-b7 - shift into flags register
-		m_flags >>= 1;
-		m_flags |= ((m_data & 1) << FLAG_WAVE_SEL);
-	}
-	else if ((m_addr & 0xf8) == 0xb8)
-	{
-		// 0xb8-bf - get voice status
-		// TODO: more details. ct8000 only checks if bits 1-3 are all zero or not
-		if (m_voice[m_addr & 7].m_env_state == ENV_IDLE)
-			m_status = 0xf;
-		else
-			m_status = 0;
-	}
-	else if ((m_addr & 0xec) == 0xc0)
-	{
-		// 0xc0-c3 (ct8000), 0xd0-d3 (mt65) - vibrato
-		// TODO: implement this. ct8000 always writes 0 since it uses the external VCO vibrato instead
-		m_vibrato = m_data & 3;
-	}
-	else if ((m_addr & 0xec) == 0xc4)
-	{
-		// 0xc4-c7 (ct8000), 0xd4-d7 (mt65) - sustain/reverb
-		m_sustain = m_data & 3;
-		m_reverb = BIT(m_data, 1, 2) ? 1 : 0;
-	}
-	else if ((m_addr & 0xf8) == 0xe0)
-	{
-		// 0xe0-e7 - note on/off
-		voice_t &voice = m_voice[m_addr & 7];
-		if (BIT(m_data, 0))
-			note_on(voice);
-		else
-			voice.m_env_state = ENV_RELEASE;
+/**************************************************************************/
+void upd931_device::octave_w(offs_t offset, u8 data)
+{
+	m_voice[offset].m_octave = m_data;
+}
 
-		// mt65 turns off sustain and reverb when changing tones, ct8000 does this instead
-		// (and also when playing a new note that is already playing)
-		voice.m_force_release = BIT(m_data, 3);
-	}
-	else if (m_addr == 0xf4)
-	{
-		// 0xf4 - filter control
-		m_filter_cb(m_data);
-	}
+/**************************************************************************/
+void upd931_device::wave_pos_w(u8 data)
+{
+	m_wave_pos = data;
+}
+
+/**************************************************************************/
+void upd931_device::wave_data_w(u8 data)
+{
+	const u8 sel = BIT(m_flags, FLAG_WAVE_SEL);
+	m_wave[sel][m_wave_pos & 0xf] = data;
+}
+
+/**************************************************************************/
+void upd931_device::flags_w(u8 data)
+{
+	m_flags >>= 1;
+	m_flags |= ((data & 1) << FLAG_WAVE_SEL);
+}
+
+/**************************************************************************/
+void upd931_device::status_latch_w(offs_t offset, u8 data)
+{
+	// TODO: more details. ct8000 only checks if bits 1-3 are all zero or not
+	if (m_voice[offset].m_env_state == ENV_IDLE)
+		m_status = 0xf;
 	else
-	{
-	//	logerror("%02x %x\n", m_addr, m_data);
-	}
+		m_status = 0;
+}
+
+/**************************************************************************/
+void upd931_device::vibrato_w(u8 data)
+{
+	// TODO: implement this. ct8000 always writes 0 since it uses the external VCO vibrato instead
+	m_vibrato = data & 3;
+}
+
+/**************************************************************************/
+void upd931_device::sustain_w(u8 data)
+{
+	m_sustain = data & 3;
+	m_reverb = BIT(data, 1, 2) ? 1 : 0;
+}
+
+/**************************************************************************/
+void upd931_device::note_on_w(offs_t offset, u8 data)
+{
+	voice_t &voice = m_voice[offset];
+	if (BIT(data, 0))
+		note_on(voice);
+	else
+		voice.m_env_state = ENV_RELEASE;
+
+	// mt65 turns off sustain and reverb when changing tones, ct8000 does this instead
+	// (and also when playing a new note that is already playing)
+	voice.m_force_release = BIT(data, 3);
 }
 
 /**************************************************************************/

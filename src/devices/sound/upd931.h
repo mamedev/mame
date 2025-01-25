@@ -12,7 +12,7 @@
 
 #include <array>
 
-class upd931_device : public device_t, public device_sound_interface
+class upd931_device : public device_t, public device_sound_interface, public device_memory_interface
 {
 public:
 	static constexpr feature_type imperfect_features() { return feature::SOUND; }
@@ -34,6 +34,8 @@ public:
 	void sync_w(int state);
 
 protected:
+	device_memory_interface::space_config_vector memory_space_config() const override;
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_clock_changed() override;
@@ -95,13 +97,27 @@ private:
 		u8 m_force_release = 0;
 	};
 
+	void io_map(address_map &map);
+
 	TIMER_CALLBACK_MEMBER(timer_tick);
 
-	void update_register();
+	void note_w(offs_t offset, u8 data);
+	void octave_w(offs_t offset, u8 data);
+	void wave_pos_w(u8 data);
+	void wave_data_w(u8 data);
+	void flags_w(u8 data);
+	void status_latch_w(offs_t offset, u8 data);
+	void vibrato_w(u8 data);
+	void sustain_w(u8 data);
+	void note_on_w(offs_t offset, u8 data);
+
 	void note_on(voice_t &voice);
 	void reset_timer();
 	void update_env(voice_t &voice);
 	void update_wave(voice_t &voice);
+
+	address_space_config m_io_config;
+	memory_access<8, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
 
 	sound_stream *m_stream;
 	emu_timer *m_retrig_timer;
