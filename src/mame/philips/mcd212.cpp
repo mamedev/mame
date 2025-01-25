@@ -638,13 +638,15 @@ template <int Path>
 void mcd212_device::process_vsr(uint32_t *pixels, bool *transparent)
 {
 	const uint8_t *data = reinterpret_cast<uint8_t *>(Path ? m_planeb.target() : m_planea.target());
+	const uint8_t *data2 = reinterpret_cast<uint8_t*>(!Path ? m_planeb.target() : m_planea.target());
 	const uint8_t icm = get_icm<Path>();
-	const uint8_t transp_ctrl = get_transparency_control<Path>();
+	const uint8_t tp_ctrl = get_transparency_control<Path>();
 	const int width = get_screen_width();
 
 	uint32_t vsr = get_vsr<Path>();
+	uint32_t vsr2 = get_vsr<!Path>();
 
-	if (transp_ctrl == TCR_COND_1 || !icm || !vsr)
+	if (tp_ctrl == TCR_ALWAYS || !icm || !vsr)
 	{
 		std::fill_n(pixels, get_screen_width(), s_4bpp_color[0]);
 		std::fill_n(transparent, get_screen_width(), true);
@@ -662,14 +664,17 @@ void mcd212_device::process_vsr(uint32_t *pixels, bool *transparent)
 	uint8_t v = (dyuv_abs_start >>  0) & 0x000000ff;
 
 	const uint32_t mask_bits = (~m_mask_color[Path]) & 0x00fcfcfc;
-	const uint32_t transp_match = m_transparent_color[Path] & mask_bits;
-	const uint8_t transp_ctrl_masked = transp_ctrl & 0x07;
-	const bool transp_always = (transp_ctrl_masked == TCR_COND_1);
-	const bool invert_transp_condition = BIT(transp_ctrl, 3);
-	const int region_flag_index = 1 - (transp_ctrl_masked & 1);
-	const bool *region_flags = m_region_flag[region_flag_index];
-	const bool use_region_flag = (transp_ctrl_masked >= TCR_COND_RF0_1 && transp_ctrl_masked <= TCR_COND_RF1KEY_1);
-	bool use_color_key = (transp_ctrl_masked == TCR_COND_KEY_1 || transp_ctrl_masked == TCR_COND_RF0KEY_1 || transp_ctrl_masked == TCR_COND_RF1KEY_1);
+	const uint32_t tp_color_match = m_transparent_color[Path] & mask_bits;
+	const uint8_t tp_ctrl_type = tp_ctrl & 0x07;
+
+	const bool use_rgb_tp_bit = (tp_ctrl_type == TCR_RGB);
+	const bool tp_check_parity = !BIT(tp_ctrl, 3);
+	const bool tp_always = ((tp_ctrl_type == TCR_ALWAYS) && tp_check_parity);
+	const int region_flag_index = BIT(~tp_ctrl_type, 0);
+	const bool *const region_flags = m_region_flag[region_flag_index];
+	const bool use_region_flag = (tp_ctrl_type >= TCR_RF0 && tp_ctrl_type <= TCR_RF1_KEY1);
+	const bool is_dyuv_rgb = (icm == ICM_DYUV) || ((icm == ICM_RGB555) && (Path == 1)); // DYUV and RGB do not have access to color key.
+	const bool use_color_key = !is_dyuv_rgb && ((tp_ctrl_type == TCR_KEY) || (tp_ctrl_type == TCR_RF0_KEY1) || (tp_ctrl_type == TCR_RF1_KEY1));
 
 	LOGMASKED(LOG_VSR, "Scanline %d: VSR Path %d, ICM (%02x), VSR (%08x)\n", screen().vpos(), Path, icm, vsr);
 
@@ -678,6 +683,7 @@ void mcd212_device::process_vsr(uint32_t *pixels, bool *transparent)
 		const uint8_t byte = data[(vsr++ & 0x0007ffff) ^ 1];
 		uint32_t color0 = 0;
 		uint32_t color1 = 0;
+		bool rgb_tp_bit = false;
 		if (icm == ICM_DYUV)
 		{
 			const uint8_t byte1 = data[(vsr++ & 0x0007ffff) ^ 1];
@@ -702,15 +708,24 @@ void mcd212_device::process_vsr(uint32_t *pixels, bool *transparent)
 			pixels[x + 1] = color0;
 			pixels[x + 2] = color1;
 			pixels[x + 3] = color1;
-			transparent[x] = (transp_always || (use_region_flag && region_flags[x])) != invert_transp_condition;
-			transparent[x + 1] = (transp_always || (use_region_flag && region_flags[x + 1])) != invert_transp_condition;
-			transparent[x + 2] = (transp_always || (use_region_flag && region_flags[x + 2])) != invert_transp_condition;
-			transparent[x + 3] = (transp_always || (use_region_flag && region_flags[x + 3])) != invert_transp_condition;
+			transparent[x    ] = tp_always || (use_region_flag && (region_flags[x    ] == tp_check_parity));
+			transparent[x + 1] = tp_always || (use_region_flag && (region_flags[x + 1] == tp_check_parity));
+			transparent[x + 2] = tp_always || (use_region_flag && (region_flags[x + 2] == tp_check_parity));
+			transparent[x + 3] = tp_always || (use_region_flag && (region_flags[x + 3] == tp_check_parity));
 			x += 4;
 		}
 		else
 		{
-			if (icm == ICM_CLUT4)
+			if (icm == ICM_RGB555 && Path == 1)
+			{
+				const uint8_t byte1 = data2[(vsr2++ & 0x0007ffff) ^ 1];
+				const uint8_t blue = (byte & 0b11111) << 3;
+				const uint8_t green = ((byte & 0b11100000) >> 2) + ((byte1 & 0b11) << 6);
+				const uint8_t red = (byte1 & 0b01111100) << 1;
+				rgb_tp_bit = (use_rgb_tp_bit && ((byte1 & 0x80) == tp_check_parity));
+				color1 = color0 = (uint32_t(red) << 16) | (uint32_t(green) << 8) | blue;
+			}
+			else if (icm == ICM_CLUT4)
 			{
 				const uint8_t mask = (decodingMode == DDR_FT_RLE) ? 0x7 : 0xf;
 				color0 = m_clut[BYTE_TO_CLUT<Path>(icm, mask & (byte >> 4))];
@@ -728,20 +743,21 @@ void mcd212_device::process_vsr(uint32_t *pixels, bool *transparent)
 				length_m = length ? (length * 2) : width;
 			}
 
-			const bool color_match0 = (mask_bits & color0) == transp_match;
-			const bool color_match1 = (mask_bits & color1) == transp_match;
+			const bool color_match0 = ((mask_bits & color0) == tp_color_match) == tp_check_parity;
+			const bool color_match1 = ((mask_bits & color1) == tp_color_match) == tp_check_parity;
 			const int end = std::min<int>(width, x + length_m);
 			for (int rl_index = x; rl_index < end; rl_index += 2)
 			{
-				pixels[rl_index] = color0;
-				transparent[rl_index] = (transp_always || (use_color_key && color_match0) || (use_region_flag && region_flags[rl_index])) != invert_transp_condition;
+				pixels[rl_index    ] = color0;
 				pixels[rl_index + 1] = color1;
-				transparent[rl_index + 1] = (transp_always || (use_color_key && color_match1) || (use_region_flag && region_flags[rl_index + 1])) != invert_transp_condition;
+				transparent[rl_index    ] = tp_always || rgb_tp_bit || (use_color_key && color_match0) || (use_region_flag && (region_flags[rl_index    ] == tp_check_parity));
+				transparent[rl_index + 1] = tp_always || rgb_tp_bit || (use_color_key && color_match1) || (use_region_flag && (region_flags[rl_index + 1] == tp_check_parity));
 			}
 			x = end;
 		}
 	}
 	set_vsr<Path>(vsr);
+	set_vsr<!Path>(vsr2);
 }
 
 const uint32_t mcd212_device::s_4bpp_color[16] =
