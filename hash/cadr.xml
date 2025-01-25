@@ -41,4 +41,16 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="sys301" supported="no">
+		<description>System 301.0</description>
+		<year>2024</year>
+		<publisher>ams</publisher>
+		<notes>Network/Chaosnet is not emulated.</notes>
+		<part name="hdd" interface="hdd">
+			<diskarea name="harddriv">
+				<disk name="sys301" sha1="037304d40e70dd09ddf3e0e082a292134271c504" writeable="yes"/>
+			</diskarea>
+		</part>
+	</software>
+
 </softwarelist>
