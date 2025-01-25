@@ -10765,7 +10765,7 @@ ROM_START( rocktcnvy )
 	ROM_LOAD( "center_c2.7a", 0x0800, 0x0800, CRC(9b75b40a) SHA1(4ad94db3f1d6b45a3de1ed9b51d361f20c6706e4) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "mmi6331.7f",   0x0000, 0x0020, BAD_DUMP CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) ) // Not dumped, borrowed from spactrai
+	ROM_LOAD( "mmi6331.7f",   0x0000, 0x0020, CRC(25c79518) SHA1(e8f7e8b3d0cf1ed9d723948548f58abf0e2c6d1f) )
 
 	ROM_REGION( 0x0100, "proms2", 0 ) // PROMs on the CPU daughterboard
 	ROM_LOAD( "tbp28l22n.1",  0x0000, 0x0100, NO_DUMP )
