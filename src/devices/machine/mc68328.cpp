@@ -972,6 +972,15 @@ u16 mc68328_device::csd_lsw_r() // 0x11e, 0x12e, 0x13e, 0x14e
 //  MMU/chip-select hardware - EZ variant
 //-------------------------------------------------
 
+void mc68ez328_device::scr_w(u8 data)
+{
+	if (data & SCR_WDTH8)
+	{
+		m_pasel = 0xff;
+	}
+	mc68328_base_device::scr_w(data);
+}
+
 u8 mc68ez328_device::revision_r(offs_t offset)
 {
 	LOGMASKED(LOG_PLL, "%s: revision_r: Silicon Revision[%d] = %02x\n", machine().describe_context(), offset, 0x01);
