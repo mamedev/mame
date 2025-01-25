@@ -299,8 +299,8 @@ No sound, hardlocks then eventually throws an exception after the Dyna Cam logo
 Switching items in main menu causes a glitch on the text
 Rightmost column of gameplay has odd "overscan" area
 ]]></notes>
-        <!-- cover title, NOTE: different than all the other version -->
-        <info name="alt_title" value="Brutal Sports Football" />
+		<!-- cover title, NOTE: different than all the other version -->
+		<info name="alt_title" value="Brutal Sports Football" />
 		<info name="serial" value="JA100"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">

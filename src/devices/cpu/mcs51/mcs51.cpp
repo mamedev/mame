@@ -824,18 +824,18 @@ uint8_t mcs51_cpu_device::r_psw() { return SFR_A(ADDR_PSW); }
 
     In order to simplify memory mapping to the data address bus, the following address map is assumed for partitioned mode:
 
-	PES = 0:
+    PES = 0:
     0x00000-0x0ffff -> data memory on the expanded bus
     0x10000-0x1ffff -> data memory on the byte-wide bus
-	PES = 1:
-	0x20000-0x2ffff -> memory-mapped peripherals on the byte-wide bus
+    PES = 1:
+    0x20000-0x2ffff -> memory-mapped peripherals on the byte-wide bus
 
     For non-partitioned mode the following memory map is assumed:
 
-	PES = 0:
+    PES = 0:
     0x00000-0x0ffff -> data memory (the bus used to access it does not matter)
-	PES = 1:
-	0x20000-0x2ffff -> memory-mapped peripherals on the byte-wide bus
+    PES = 1:
+    0x20000-0x2ffff -> memory-mapped peripherals on the byte-wide bus
 */
 
 offs_t mcs51_cpu_device::external_ram_iaddr(offs_t offset, offs_t mem_mask)

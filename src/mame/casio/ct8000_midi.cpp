@@ -2,66 +2,66 @@
 // copyright-holders:Devin Acker
 
 /***************************************************************************
-	Casiotone 8000 / Symphonytron MIDI interface
+    Casiotone 8000 / Symphonytron MIDI interface
 
-	Translates MIDI messages into the 4-bit parallel protocol used by the Symphonytron.
-	Aside from Note Off/On and Program Change messages, this also handles:
-	- CC #1 (vibrato)
-	- CC #64 (sustain pedal)
-	- CC #69 (sustain switch)
-	- CC #91 (reverb)
-	- CC #93 (chorus)
-	- CC #120 (all sound off)
-	- CC #121 (reset controllers)
-	- CC #123 (all notes off)
-	- CC #124-127 (equivalent to 123, otherwise no effect)
-	- MIDI reset (status 0xFF)
+    Translates MIDI messages into the 4-bit parallel protocol used by the Symphonytron.
+    Aside from Note Off/On and Program Change messages, this also handles:
+    - CC #1 (vibrato)
+    - CC #64 (sustain pedal)
+    - CC #69 (sustain switch)
+    - CC #91 (reverb)
+    - CC #93 (chorus)
+    - CC #120 (all sound off)
+    - CC #121 (reset controllers)
+    - CC #123 (all notes off)
+    - CC #124-127 (equivalent to 123, otherwise no effect)
+    - MIDI reset (status 0xFF)
 
-	Vibrato, reverb, and chorus CCs all behave as switches, where 64-127 is "on".
+    Vibrato, reverb, and chorus CCs all behave as switches, where 64-127 is "on".
 
 -------------------------------------------------------------------------------
 
-	Summary of 4-bit Symphonytron messages
+    Summary of 4-bit Symphonytron messages
 
-	Messages are sent in 4-bit increments over the DIN connector, in the following order:
-	- high nibble of command
-	- number of following nibbles (normally 1 or 3)
-	- low nibble of command
-	- high nibble of data (if any)
-	- low nibble of data (if any)
+    Messages are sent in 4-bit increments over the DIN connector, in the following order:
+    - high nibble of command
+    - number of following nibbles (normally 1 or 3)
+    - low nibble of command
+    - high nibble of data (if any)
+    - low nibble of data (if any)
 
-	The exception is the reset command, which is a single 0xF nibble.
+    The exception is the reset command, which is a single 0xF nibble.
 
-	The CT-8000 recognizes these messages:
-	10 xx - set effects
-	11 xx - lock effects (corresponding buttons/pedal do nothing while set)
-	12 xx - ??? effects
-	   ^^ bit 0 = reverb
-	      bit 1 = vibrato
-	      bit 2 = sustain pedal (only affects the local keyboard)
-	      bit 3 = stereo chorus
-	      bit 4 = sustain switch
+    The CT-8000 recognizes these messages:
+    10 xx - set effects
+    11 xx - lock effects (corresponding buttons/pedal do nothing while set)
+    12 xx - ??? effects
+       ^^ bit 0 = reverb
+          bit 1 = vibrato
+          bit 2 = sustain pedal (only affects the local keyboard)
+          bit 3 = stereo chorus
+          bit 4 = sustain switch
 
-	20 xx - set lowest possible note to send (default is none)
-	21 xx - set highest possible note to send (default is none)
-	22 xx - set lowest possible note to receive/play (default is 0x21 = C2)
-	23 xx - set highest possible note to receive/play (default is 0x61 = C6)
-	24    - stop all notes
-	28 xx - note on or off
-	   ^^ bit 7 = note on, bits 6-4 = octave, bits 3-0 = note from 0x1 (C) to 0xC (B)
+    20 xx - set lowest possible note to send (default is none)
+    21 xx - set highest possible note to send (default is none)
+    22 xx - set lowest possible note to receive/play (default is 0x21 = C2)
+    23 xx - set highest possible note to receive/play (default is 0x61 = C6)
+    24    - stop all notes
+    28 xx - note on or off
+       ^^ bit 7 = note on, bits 6-4 = octave, bits 3-0 = note from 0x1 (C) to 0xC (B)
 
-	C0 xx - set tuning (signed, 1.5 cent increments, 0x32 = quarter tone up)
+    C0 xx - set tuning (signed, 1.5 cent increments, 0x32 = quarter tone up)
 
-	E1 xx - set patch number
+    E1 xx - set patch number
 
-	F     - reset instrument
+    F     - reset instrument
 
-	The MB-1 recognizes all of the above, plus:
-	A0 xx - ???
-	A1 xx - ???
-	A2 xx - ???
-	A3 xx - ???
-	A4    - clear values from A0-A3
+    The MB-1 recognizes all of the above, plus:
+    A0 xx - ???
+    A1 xx - ???
+    A2 xx - ???
+    A3 xx - ???
+    A4    - clear values from A0-A3
 
 ***************************************************************************/
 

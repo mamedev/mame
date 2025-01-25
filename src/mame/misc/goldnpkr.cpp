@@ -572,7 +572,7 @@
   - How to Set the Password:
 
     1) Press and hold the PROGRAM key (key 9) while turning on or resetting the machine.
-	    (The word 'TESTING' will be displayed on the screen)
+        (The word 'TESTING' will be displayed on the screen)
     2) Enter the first desired input of the password, then press DOWN to confirm the choice.
     3) Enter the second desired input of the password, then press DOWN to confirm the choice.
     4) Enter the third desired input of the password, then press DOWN to confirm the choice.
@@ -1198,7 +1198,7 @@ private:
 
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
-	optional_device<ticket_dispenser_device> m_hopper;	
+	optional_device<ticket_dispenser_device> m_hopper;
 	optional_device<ay8910_device> m_ay8910;
 	output_finder<9> m_lamps;
 
@@ -2078,7 +2078,7 @@ static INPUT_PORTS_START( jkrbonus )
 
 	PORT_MODIFY("IN0-3")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("Weight (Coupon In)") PORT_CODE(KEYCODE_H) PORT_TOGGLE
-	
+
 	PORT_MODIFY("SW1")
 	PORT_DIPNAME( 0x20, 0x20, "50hz/60hz" )         PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x20, "50hz" )
@@ -2217,7 +2217,7 @@ static INPUT_PORTS_START( pottnpkr )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_NAME("Coupon (Note In)")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_NAME("Coin In") PORT_IMPULSE(3)
-//*	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )	
+//* PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("Weight (Coupon In)") PORT_CODE(KEYCODE_H) PORT_TOGGLE
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -6066,7 +6066,7 @@ ROM_END
   The second set is a hack of the first with unknown mods.
 
 */
-ROM_START( potnpkro ) // ICP-1 wires hack set. 
+ROM_START( potnpkro ) // ICP-1 wires hack set.
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "7.16a", 0x6000, 0x1000, CRC(2dc5e372) SHA1(70a251efe879bc1122baa78984251041a355c895) )
 	ROM_LOAD( "x.17a", 0x7000, 0x1000, CRC(1694a0d8) SHA1(bb1132d1e75347ad5156d2b3866aad255f7d53ca) )
@@ -6085,7 +6085,7 @@ ROM_START( potnpkro ) // ICP-1 wires hack set.
 	ROM_LOAD( "tbp24s10n_wh.bin", 0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
 ROM_END
 
-ROM_START( potnpkrp ) // ICP-1 PROM mod set. 
+ROM_START( potnpkrp ) // ICP-1 PROM mod set.
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "6.16a",            0x6000, 0x1000, CRC(2dc5e372) SHA1(70a251efe879bc1122baa78984251041a355c895) )
 	ROM_LOAD( "95_09_hn71_7.17a", 0x7000, 0x1000, CRC(2353317a) SHA1(18bf8cfe30aaa4b05207cc250ec1c024bc19ed56) )

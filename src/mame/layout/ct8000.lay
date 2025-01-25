@@ -8,7 +8,7 @@ license:CC0-1.0
 	<element name="line"><rect><color red="0.55" green="0.55" blue="0.575" /></rect></element>
 	<element name="line_white"><rect><color red="1" green="1" blue="0.95" /></rect></element>
 	<element name="line_black"><rect><color red="0" green="0" blue="0" /></rect></element>
-	
+
 	<element name="button_back">
 		<rect><bounds x="0" y="0" width="1" height="20" /><color red="0.55" green="0.55" blue="0.575" /></rect>
 		<rect><bounds x="0" y="1" width="1" height="18" /><color red="0.65" green="0.65" blue="0.675" /></rect>
@@ -32,7 +32,7 @@ license:CC0-1.0
 	<element name="set"><text string="SET"><color red="0" blue="0" green="0" /></text></element>
 	<element name="play"><text string="PLAY"><color red="0" blue="0" green="0" /></text></element>
 	<element name="tune"><text string="TUNE"><color red="0" blue="0" green="0" /></text></element>
-	
+
 	<element name="tone1"><text string="PIANO 1"><color red="0" blue="0" green="0" /></text></element>
 	<element name="tone2"><text string="PIPE ORGAN 1"><color red="0" blue="0" green="0" /></text></element>
 	<element name="tone3"><text string="PIANO 2"><color red="0" blue="0" green="0" /></text></element>
@@ -92,20 +92,20 @@ license:CC0-1.0
 	<element name="tone48"><text string="ELEC."><color red="0" blue="0" green="0" /></text></element>
 	<element name="tone48b"><text string="GUITAR 5"><color red="0" blue="0" green="0" /></text></element>
 	<element name="tone49"><text string="ELEC. BASS"><color red="0" blue="0" green="0" /></text></element>
-	
+
 	<!-- button primitives -->
 	<element name="button_light" defstate="0">
 		<rect><color red="0.1" green="0.1" blue="0.1" /><bounds x="0" y="0" width="5" height="10" /></rect>
 		<rect state="0"><color red="0.8" green="0.8" blue="0.8" /><bounds xc="2.5" yc="5" width="4" height="9" /></rect>
 		<rect state="1"><color red="0.5" green="0.5" blue="0.5" /><bounds xc="2.5" yc="5" width="4" height="9" /></rect>
 	</element>
-	
+
 	<element name="button_dark" defstate="0">
 		<rect><color red="0.1" green="0.1" blue="0.1" /><bounds x="0" y="0" width="5" height="10" /></rect>
 		<rect state="0"><color red="0.3" green="0.3" blue="0.3" /><bounds xc="2.5" yc="5" width="4" height="9" /></rect>
 		<rect state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds xc="2.5" yc="5" width="4" height="9" /></rect>
 	</element>
-	
+
 	<element name="button_down" defstate="0">
 		<rect><color red="0.1" green="0.1" blue="0.1" /><bounds x="0" y="0" width="5" height="10" /></rect>
 		<rect state="0"><color red="0.3" green="0.3" blue="0.3" /><bounds xc="2.5" yc="5" width="4" height="9" /></rect>
@@ -120,7 +120,7 @@ license:CC0-1.0
 			]]></data>
 		</image>
 	</element>
-	
+
 	<element name="button_up" defstate="0">
 		<rect><color red="0.1" green="0.1" blue="0.1" /><bounds x="0" y="0" width="5" height="10" /></rect>
 		<rect state="0"><color red="0.3" green="0.3" blue="0.3" /><bounds xc="2.5" yc="5" width="4" height="9" /></rect>
@@ -135,23 +135,23 @@ license:CC0-1.0
 			]]></data>
 		</image>
 	</element>
-	
+
 	<element name="button_set" defstate="0">
 		<rect><color red="0.1" green="0.1" blue="0.1" /><bounds x="0" y="0" width="10" height="10" /></rect>
 		<rect state="0"><color red="1.0" green="0.45" blue="0.0" /><bounds xc="5" yc="5" width="9" height="9" /></rect>
 		<rect state="1"><color red="0.8" green="0.25" blue="0" /><bounds xc="5" yc="5" width="9" height="9" /></rect>
 	</element>
-	
+
 	<element name="button_icon_up">
 		<rect><color red="0.7" green="0.7" blue="0.725" /><bounds x="0" y="0" width="5" height="5" /></rect>
-		
+
 		<rect><color red="0" green="0" blue="0" /><bounds xc="2.5" y="4" width="5" height="1" /></rect>
 		<rect><color red="0" green="0" blue="0" /><bounds xc="2.5" y="1" width="3.5" height="4" /></rect>
 	</element>
-	
+
 	<element name="button_icon_down">
 		<rect><color red="0.7" green="0.7" blue="0.725" /><bounds x="0" y="0" width="5" height="5" /></rect>
-		
+
 		<rect><color red="0" green="0" blue="0" /><bounds xc="2.5" y="4" width="5" height="1" /></rect>
 		<rect><color red="0" green="0" blue="0" /><bounds xc="2.5" y="3" width="3.5" height="2" /></rect>
 	</element>
@@ -203,11 +203,11 @@ license:CC0-1.0
 	<group name="left">
 		<bounds x="0" y="0" width="80" height="120" />
 		<element ref="panel_back"><bounds x="0" y="0" width="80" height="120" /></element>
-		
+
 		<element ref="line_black"><bounds xc="26" y="25" width="28" height="4" /></element>
 		<element ref="panel_back"><bounds xc="19.25" y="26" width="12.5" height="4" /></element>
 		<element ref="panel_back"><bounds xc="32.75" y="26" width="12.5" height="4" /></element>
-		
+
 		<element ref="button_back"><bounds x="0" y="35" width="80" height="20" /></element>
 		<element ref="cancel"><bounds xc="12" y="30" width="15" height="4" /></element>
 		<element ref="button_dark" inputtag="SWITCH" inputmask="0x01"><bounds xc="12" yc="45" width="9" height="18" /></element>
@@ -223,7 +223,7 @@ license:CC0-1.0
 		<element ref="chorus"><bounds xc="68" y="30" width="15" height="4" /></element>
 		<element ref="button_dark" inputtag="KC9" inputmask="0x08"><bounds xc="68" yc="45" width="9" height="18" /></element>
 		<element ref="effect"><bounds xc="40" y="55" width="80" height="4" /></element>
-		
+
 		<element ref="tone_memory"><bounds xc="40" y="62" width="80" height="4" /></element>
 		<element ref="button_back"><bounds x="0" y="70" width="80" height="20" /></element>
 		<element ref="num1"><bounds xc="19" y="66" width="15" height="4" /></element>
@@ -234,7 +234,7 @@ license:CC0-1.0
 		<element ref="button_light" inputtag="KCB" inputmask="0x04"><bounds xc="47" yc="80" width="9" height="16" /></element>
 		<element ref="num4"><bounds xc="61" y="66" width="15" height="4" /></element>
 		<element ref="button_light" inputtag="KCB" inputmask="0x08"><bounds xc="61" yc="80" width="9" height="16" /></element>
-		
+
 		<element ref="mode"><bounds xc="61" y="92" width="15" height="4" /></element>
 		<element ref="button_set" inputtag="KCB" inputmask="0x10"><bounds xc="61" yc="106" width="16" height="16" /></element>
 		<!-- these are supposed to be to the right of the button but here they are on the left for better readability -->
@@ -319,7 +319,7 @@ license:CC0-1.0
 
 	<group name="key_labels">
 		<bounds x="0" y="0" width="580" height="20" />
-		
+
 		<element ref="tone2"><bounds xc="18" y="2" width="30" height="4" /></element>
 		<element ref="line_white"><bounds xc="18" y="7" width="0.75" height="13" /></element>
 		<element ref="tone4"><bounds xc="43" y="2" width="30" height="4" /></element>
@@ -330,7 +330,7 @@ license:CC0-1.0
 		<element ref="line_white"><bounds xc="100" y="7" width="0.75" height="13" /></element>
 		<element ref="tone11"><bounds xc="123" y="2" width="30" height="4" /></element>
 		<element ref="line_white"><bounds xc="123" y="7" width="0.75" height="13" /></element>
-		
+
 		<element ref="tone1"><bounds x="-1" y="15" width="20" height="4" /></element>
 		<element ref="tone3"><bounds x="20" y="15" width="20" height="4" /></element>
 		<element ref="tone5"><bounds x="41" y="15" width="20" height="4" /></element>
@@ -340,7 +340,7 @@ license:CC0-1.0
 		<element ref="tone10"><bounds x="101" y="15" width="20" height="4" /></element>
 		<element ref="tone12"><bounds x="121" y="11" width="20" height="4" /></element>
 		<element ref="tone12b"><bounds x="121" y="15" width="20" height="4" /></element>
-		
+
 		<element ref="tone14"><bounds xc="158" y="2" width="30" height="4" /></element>
 		<element ref="line_white"><bounds xc="158" y="7" width="0.75" height="13" /></element>
 		<element ref="tone16"><bounds xc="183" y="2" width="30" height="4" /></element>
@@ -351,7 +351,7 @@ license:CC0-1.0
 		<element ref="line_white"><bounds xc="240" y="7" width="0.75" height="13" /></element>
 		<element ref="tone23"><bounds xc="263" y="2" width="30" height="4" /></element>
 		<element ref="line_white"><bounds xc="263" y="7" width="0.75" height="13" /></element>
-		
+
 		<element ref="tone13"><bounds x="140" y="11" width="20" height="4" /></element>
 		<element ref="tone13b"><bounds x="140" y="15" width="20" height="4" /></element>
 		<element ref="tone15"><bounds x="160" y="11" width="20" height="4" /></element>
@@ -361,7 +361,7 @@ license:CC0-1.0
 		<element ref="tone20"><bounds x="220" y="15" width="20" height="4" /></element>
 		<element ref="tone22"><bounds x="240" y="15" width="20" height="4" /></element>
 		<element ref="tone24"><bounds x="261" y="15" width="20" height="4" /></element>
-		
+
 		<element ref="tone26"><bounds xc="298" y="2" width="30" height="4" /></element>
 		<element ref="line_white"><bounds xc="298" y="7" width="0.75" height="13" /></element>
 		<element ref="tone28"><bounds xc="323" y="2" width="30" height="4" /></element>
@@ -372,7 +372,7 @@ license:CC0-1.0
 		<element ref="line_white"><bounds xc="380" y="7" width="0.75" height="13" /></element>
 		<element ref="tone35"><bounds xc="403" y="2" width="30" height="4" /></element>
 		<element ref="line_white"><bounds xc="403" y="7" width="0.75" height="13" /></element>
-		
+
 		<element ref="tone25"><bounds x="280" y="15" width="20" height="4" /></element>
 		<element ref="tone27"><bounds x="300" y="15" width="20" height="4" /></element>
 		<element ref="tone29"><bounds x="321" y="15" width="20" height="4" /></element>
@@ -381,7 +381,7 @@ license:CC0-1.0
 		<element ref="tone32"><bounds x="360" y="15" width="20" height="4" /></element>
 		<element ref="tone34"><bounds x="380" y="15" width="20" height="4" /></element>
 		<element ref="tone36"><bounds x="401" y="15" width="20" height="4" /></element>
-		
+
 		<element ref="tone38"><bounds xc="432" y="2" width="30" height="4" /></element>
 		<element ref="line_white"><bounds xc="438" y="7" width="0.75" height="13" /></element>
 		<element ref="tone40"><bounds xc="466" y="2" width="30" height="4" /></element>
@@ -392,7 +392,7 @@ license:CC0-1.0
 		<element ref="line_white"><bounds xc="520" y="7" width="0.75" height="13" /></element>
 		<element ref="tone47"><bounds xc="543" y="2" width="30" height="4" /></element>
 		<element ref="line_white"><bounds xc="543" y="7" width="0.75" height="13" /></element>
-		
+
 		<element ref="tone37"><bounds x="419" y="15" width="20" height="4" /></element>
 		<element ref="tone39"><bounds x="440" y="15" width="20" height="4" /></element>
 		<element ref="tone41"><bounds x="461" y="11" width="20" height="4" /></element>
@@ -406,7 +406,7 @@ license:CC0-1.0
 		<element ref="tone48"><bounds x="541" y="11" width="20" height="4" /></element>
 		<element ref="tone48b"><bounds x="541" y="15" width="20" height="4" /></element>
 		<element ref="tone49"><bounds x="560" y="15" width="20" height="4" /></element>
-		
+
 	</group>
 
 	<view name="Keyboard">

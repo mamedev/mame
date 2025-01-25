@@ -28,7 +28,7 @@ void juku_mouse_device::device_start()
 	save_item(NAME(m_prev_mouse_y));
 	save_item(NAME(m_prev_mouse_x));
 	save_item(NAME(m_prev_byte));
-	m_mouse_timer = timer_alloc(FUNC(juku_mouse_device::poll_delta), this);        
+	m_mouse_timer = timer_alloc(FUNC(juku_mouse_device::poll_delta), this);
 }
 
 void juku_mouse_device::device_reset()
@@ -75,7 +75,7 @@ static INPUT_PORTS_START( juku_mouse )
 
 	PORT_START("MOUSE_Y")
 	PORT_BIT(0xff, 0x00, IPT_MOUSE_Y) PORT_CODE(MOUSECODE_Y) PORT_SENSITIVITY(23)
-	
+
 	PORT_START("BUTTONS")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Left Button")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_CODE(MOUSECODE_BUTTON2) PORT_NAME("Right Button")

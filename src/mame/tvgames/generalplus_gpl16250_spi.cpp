@@ -215,10 +215,10 @@ CONS(2015, bkrankp,  0, 0, generalplus_gpspispi_bkrankp, gcm394, generalplus_gps
 // This can be found listed as a ZHISHAN / Aojiao / Bornkid 32 Bit Preloaded 139-in-1 Handheld Game Console
 // but these just seem to be brands, manufacturer is unknown.
 // Various case styles are available, the unit here was styled after a Nintendo Switch
-// 
+//
 // Architecture is unknown, it contains many of the games in beijuehh / bornkidh (generalplus_gpl16250_rom.cpp)
 // but is running from SPI flash and has 'Loading' screens between menus and after selecting a game.
-// 
+//
 // While those are GeneralPlus based platforms, it's possible the games were ported to something else, the SPI
 // appears to contain a filesystem, but data looks to be compressed / encrypted with no obvious code.
 // There is no GPspi header in the SPI ROM.

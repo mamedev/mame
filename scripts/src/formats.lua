@@ -1056,10 +1056,10 @@ end
 --------------------------------------------------
 
 if opt_tool(FORMATS, "H17D_DSK") then
-       files {
-               MAME_DIR.. "src/lib/formats/h17disk.cpp",
-               MAME_DIR.. "src/lib/formats/h17disk.h",
-       }
+	files {
+		MAME_DIR.. "src/lib/formats/h17disk.cpp",
+		MAME_DIR.. "src/lib/formats/h17disk.h",
+	}
 end
 
 --------------------------------------------------

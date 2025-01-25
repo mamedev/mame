@@ -134,7 +134,7 @@ struct dmx_voice_card_config
 		DISABLED,  // 4.7K resistor connected to position 1 (+5V).
 		ENABLED,  // Jumper disconnected.
 		ENABLED_ON_TR12,  // 4.7K resistor connected to position 2 (/Q of U1B).
-		                  // Decay enabled when trigger mode is 1 or 2.
+						  // Decay enabled when trigger mode is 1 or 2.
 	};
 	const decay_mode decay;
 
@@ -143,7 +143,7 @@ struct dmx_voice_card_config
 	{
 		ENABLED,  // Jumper connected to position 2 (+5V).
 		ENABLED_ON_TR1,  // Jumper connected to position 1 (Q of U1A).
-		                 // Early decay enabled when trigger mode is 1.
+						 // Early decay enabled when trigger mode is 1.
 	};
 	const early_decay_mode early_decay;
 
@@ -247,7 +247,7 @@ void dmx_voice_card_vca::start(int trigger_mode)
 		m_selected_rc_inv = 1;
 
 	LOGMASKED(LOG_VOLUME, "Selected gain: %f, 1/RC: %f\n",
-	          m_selected_gain, m_selected_rc_inv);
+			  m_selected_gain, m_selected_rc_inv);
 }
 
 void dmx_voice_card_vca::decay()
@@ -295,7 +295,7 @@ void dmx_voice_card_vca::sound_stream_update(sound_stream &stream, const std::ve
 			out.put(i, m_selected_gain * in.get(i));
 
 		LOGMASKED(LOG_SAMPLES, "%s VCA - just gain: %f. Samples: %f, %f.\n",
-		          tag(), m_selected_gain, in.get(0), in.get(n - 1));
+				  tag(), m_selected_gain, in.get(0), in.get(n - 1));
 		return;
 	}
 
@@ -321,7 +321,7 @@ void dmx_voice_card_vca::sound_stream_update(sound_stream &stream, const std::ve
 		m_decay_done = true;
 
 	LOGMASKED(LOG_SAMPLES_DECAY, "%s VCA - in decay: %f. Samples: %f, %f.\n",
-	          tag(), gain, in.get(0), in.get(n - 1));
+			  tag(), gain, in.get(0), in.get(n - 1));
 }
 
 void dmx_voice_card_vca::init_gain_and_decay_variations(const dmx_voice_card_config &config)
@@ -345,7 +345,7 @@ void dmx_voice_card_vca::init_gain_and_decay_variations(const dmx_voice_card_con
 
 		// For trigger mode 1.
 		m_gain.push_back((r12 * r17 * VCC + R8 * r12 * VD + R8 * r17 * VD) /
-		                 ((R8 * r12 * r17) + (r12 * r17 * R9) + (R8 * r17 * R9) + (R8 * r12 * R9)));
+						 ((R8 * r12 * r17) + (r12 * r17 * R9) + (R8 * r17 * R9) + (R8 * r12 * R9)));
 		// For trigger mode 2.
 		m_gain.push_back((r12 * VCC + R8 * VD) / (r12 * R8 + R8 * R9 + r12 * R9));
 		// For trigger mode 3.
@@ -354,7 +354,7 @@ void dmx_voice_card_vca::init_gain_and_decay_variations(const dmx_voice_card_con
 	for (int i = 0; i < m_gain.size(); ++i)
 	{
 		LOGMASKED(LOG_VOLUME, "%s: Gain variation %d: %f uA, %f\n",
-		          tag(), i, m_gain[i] * 1e6F, m_gain[i] / MAX_IREF);
+				  tag(), i, m_gain[i] * 1e6F, m_gain[i] / MAX_IREF);
 		m_gain[i] /= MAX_IREF;  // Normalize.
 	}
 
@@ -374,7 +374,7 @@ void dmx_voice_card_vca::init_gain_and_decay_variations(const dmx_voice_card_con
 		{
 			m_decay_rc_inv.push_back(1.0F / ((R8 + r) * c3));
 			LOGMASKED(LOG_VOLUME, "%s: Decay 1/RC variation %d: %f\n",
-			          tag(), m_decay_rc_inv.size() - 1, m_decay_rc_inv.back());
+					  tag(), m_decay_rc_inv.size() - 1, m_decay_rc_inv.back());
 		}
 	}
 }
@@ -564,11 +564,11 @@ void dmx_voice_card::init_pitch()
 		// For trigger mode 1.
 		const float alpha = 1.0F + r12 / m_config.r17;
 		m_cv.push_back((alpha * R5 + r12) * (2 * VCC - 3 * VD) /
-		               (3 * alpha * R5 + 3 * r12 + 2 * alpha * R_555) + VD);
+					   (3 * alpha * R5 + 3 * r12 + 2 * alpha * R_555) + VD);
 
 		// For trigger mode 2.
 		m_cv.push_back((R5 + r12) * (2 * VCC - 3 * VD) /
-		               (3 * R5 + 3 * r12 + 2 * R_555) + VD);
+					   (3 * R5 + 3 * r12 + 2 * R_555) + VD);
 
 		// For trigger mode 3.
 		m_cv.push_back(m_cv[0]);
@@ -636,7 +636,7 @@ void dmx_voice_card::compute_pitch_variations()
 
 		m_sample_t[i] = attotime::from_double(t_high + t_low);
 		LOGMASKED(LOG_PITCH, "%s Pitch variation %d: %f (%f, %f)\n",
-		          tag(), i, 1.0 / m_sample_t[i].as_double(), t_high, t_low);
+				  tag(), i, 1.0 / m_sample_t[i].as_double(), t_high, t_low);
 	}
 
 	if (m_config.pitch_control)
@@ -658,7 +658,7 @@ void dmx_voice_card::select_pitch()
 
 	m_timer->adjust(sampling_t, 0, sampling_t);
 	LOGMASKED(LOG_PITCH, "Setting sampling frequency: %f\n",
-	          1.0 / sampling_t.as_double());
+			  1.0 / sampling_t.as_double());
 }
 
 bool dmx_voice_card::is_decay_enabled() const
@@ -723,7 +723,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(dmx_voice_card::clock_callback)
 	if (!m_vca->in_decay() && is_decay_enabled())
 	{
 		if ((is_early_decay_enabled() && m_counter >= EARLY_DECAY_START) ||
-		    m_counter >= LATE_DECAY_START)
+			m_counter >= LATE_DECAY_START)
 		{
 			m_vca->decay();
 		}
@@ -1208,7 +1208,7 @@ u8 dmx_state::cassette_r()
 	const u8 d7 = BIT(data, 7);  // PROT* (memory protect switch. Active low).
 
 	return (d7 << 7) | (d6 << 6) | (d5 << 5) | (d4 << 4) |
-	       (d3 << 3) | (d2 << 2) | (d1 << 1) | d0;
+		   (d3 << 3) | (d2 << 2) | (d1 << 1) | d0;
 }
 
 template<int GROUP> void dmx_state::gen_trigger_w(u8 data)
@@ -1288,7 +1288,7 @@ void dmx_state::update_voice_volume(int voice)
 	m_right_mixer->set_input_gain(voice, gain_right);
 
 	LOGMASKED(LOG_FADERS, "Voice %d volume changed to: %d (gain L:%f, R:%f)\n",
-	          voice, pot_percent, gain_left, gain_right);
+			  voice, pot_percent, gain_left, gain_right);
 }
 
 void dmx_state::memory_map(address_map &map)

@@ -793,7 +793,7 @@ CONS( 2018, ra145,     0,        0, megadriv_ra145_ntsc, msi_6button,           
 // Technically this is a MD type cartridge, but it doesn't seem to be designed for use with a standard MD as it contains
 // nothing but the 16Mbyte ROM and a 5v to 3.3v converter yet the code clearly requires some extensive banking logic.
 // Testing it on a real MD shows nothing, not even the menu.
-// 
+//
 // We don't seem to emulate the system it's designed for, so for now just treat it as its own thing (which may become
 // the basis of a driver for that console)
 CONS( 2012, atgame40,  0,        0, megadriv_radica_3button_pal,  radica_3button, megadriv_radica_state, init_megadrie, "AtGames",               "40 Bonus Games in 1 (AtGames)", MACHINE_NOT_WORKING)

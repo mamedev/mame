@@ -90,7 +90,7 @@ license:CC0-1.0
 		<info name="developer" value="EktaSoft"/>
 		<info name="comment" value="Recostruction of an additional JUKU PC utilities disk #4 with EKDOS 2.30 based on file list in READ.ME published by EKTA in December 1989."/> <!-- See https://github.com/infoaed/juku3000/blob/master/docs/ekdos230.txt for READ.ME. -->
 		<part name="flop1" interface="floppy_5_25">
-                        <feature name="part_id" value="UTILS-4" /><!-- See https://juku3000.infoaed.ee/tarkvara-kataloog/#j3kutil4 for details. -->
+			<feature name="part_id" value="UTILS-4" /><!-- See https://juku3000.infoaed.ee/tarkvara-kataloog/#j3kutil4 for details. -->
 			<dataarea name="flop" size="819200">
 				<rom name="J3KUTIL4.JUK" size="819200" crc="839f20aa" sha1="fb8a5239cdd74eced3b0bb7ab8ec6e8b2092f4c3" />
 			</dataarea>

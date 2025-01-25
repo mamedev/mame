@@ -60,7 +60,7 @@ copyright-holders: Roberto Fresca & Grull Osgo
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0.1" y="0.15" width="0.8" height="0.7" />
 		</text>
-	</element>	
+	</element>
 
 	<element name="BUTTON7" defstate="0">
 		<rect state="1"><color red="1.0" green="0.5" blue="0.0" /></rect>
@@ -69,7 +69,7 @@ copyright-holders: Roberto Fresca & Grull Osgo
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0.1" y="0.15" width="0.8" height="0.7" />
 		</text>
-	</element>	
+	</element>
 
 	<element name="BUTTONBASE" defstate="0">
 		<rect state="1"><color red="0.80" green="0.80" blue="0.80" /></rect>

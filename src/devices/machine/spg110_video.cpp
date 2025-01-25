@@ -337,7 +337,7 @@ device_memory_interface::space_config_vector spg110_video_device::memory_space_c
 }
 
 
-/* 0x2063 P_DMA_control 
+/* 0x2063 P_DMA_control
 despite the name this address is more IRQ control than DMA, although there are some DMA flags in here
 
 bit15     bit14     bit13     bit12     bit11     bit10     bit9    bit8    bit7    bit6      bit5          bit4        bit3          bit2        bit1          bit0
@@ -461,7 +461,7 @@ uint16_t spg110_video_device::irq_tm_h_2037_r()
 	// added to value from the PRNG for some random number generation cases
 	// should this return the *current* horizontal position? or the register value written?
 	return m_screen->hpos();
-} 
+}
 
 void spg110_video_device::irq_tm_h_2037_w(uint16_t data)
 {
@@ -474,13 +474,13 @@ void spg110_video_device::effect_control_2039_w(uint16_t data)
 {
 	// 0803 on every scene transition
 	logerror("%s: effect_control_2039_w: %04x\n", machine().describe_context(), data);
-} 
+}
 
 void spg110_video_device::huereference_203c_w(uint16_t data)
 {
 	// 0006 on startup, twice
 	logerror("%s: huereference_203c_w: %04x\n", machine().describe_context(), data);
-} 
+}
 
 void spg110_video_device::lum_adjust_203d_w(uint16_t data)
 {
@@ -497,7 +497,7 @@ void spg110_video_device::sp_control_2042_w(uint16_t data)
 {
 	// sets bit 0x0004, masks with 0xfffb etc.
 	logerror("%s: sp_control_2042_w: %04x\n", machine().describe_context(), data);
-} 
+}
 
 void spg110_video_device::spg110_2045_w(uint16_t data)
 {
