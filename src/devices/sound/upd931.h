@@ -34,10 +34,10 @@ public:
 	void sync_w(int state);
 
 protected:
-	device_memory_interface::space_config_vector memory_space_config() const override;
+	device_memory_interface::space_config_vector memory_space_config() const override ATTR_COLD;
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_clock_changed() override;
 
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
@@ -97,7 +97,7 @@ private:
 		u8 m_force_release = 0;
 	};
 
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(timer_tick);
 
