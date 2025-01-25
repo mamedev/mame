@@ -21,7 +21,7 @@ license:CC0-1.0
 		<description>System 100.0</description>
 		<year>2023</year>
 		<publisher>ams</publisher>
-		<notes>Network/Chaosnet is not implemented.</notes>
+		<notes>Network/Chaosnet is not implemented. (DIRED) tries to load from network but no network interaction is performed.</notes>
 		<part name="hdd" interface="hdd">
 			<diskarea name="harddriv">
 				<disk name="sys100" sha1="e9e3efeaa3bf40456570c1b3a010123b2878280d" writeable="yes"/>
