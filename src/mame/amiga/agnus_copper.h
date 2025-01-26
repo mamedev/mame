@@ -32,7 +32,7 @@ public:
 	void copcon_w(u16 data);
 
 	// getters/setters
-	void vblank_sync();
+	void vblank_sync(bool state);
 	int execute_next(int xpos, int ypos, bool is_blitter_busy, int num_planes);
 	void suspend_offset(int xpos, int hblank_width);
 	int restore_offset();
@@ -72,6 +72,7 @@ private:
 	u16 m_pending_offset;
 	u16 m_pending_data;
 	u16 m_xpos_state;
+	bool m_vertical_blank;
 };
 
 

@@ -108,8 +108,9 @@ cd32: unsupported [Akiko] close tray after CD32 BIOS plays back music, will othe
 		<!-- Packaging Design: Epic Marketing -->
 		<publisher>APC &amp; TCP</publisher>
 		<notes><![CDATA[
-Intro and main menu use [Denise] BPLCON3 SPRESx
-Optional [Denise] SHRES mode in gameplay
+Intro and main menu use [Lisa] BPLCON3 SPRESx
+Optional [Lisa] SHRES mode in gameplay
+Very easy to ball stuck in table 2 (verify, https://forums.bannister.org/ubbthreads.php?ubb=showflat&Number=124163#Post124163)
 Editor and HD Install untested
 ]]></notes>
 		<!-- TODO: verify assign BrainDamage: "Brain Damage:" before install as Erratum note -->
