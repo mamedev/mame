@@ -8,7 +8,12 @@ The I/O Board makes the keyboard, mouse, and chaosnet available on the Unibus.
 
 TODO:
 - Chaosnet
-  - Sys300/301 needs a small hack to continu booting
+  - Sys300/301 needs a small hack to continu booting - timing issue with keyboard controller combined with bug in cadr code?
+    The initial 'release' message is sent slightly too soon by the keyboard??
+    wpdset 3ff435,1,r
+    wpdset 3ff430,1,rw, wait for write 0090, read 0090
+    wpdset 3ff425,1,r, MD=4
+    and continue
 - General purpose I/O
 - Serial I/O
 - Where is the REPEAT key mapped? And how should it be used?
@@ -280,7 +285,7 @@ TIMER_CALLBACK_MEMBER(cadr_iob_device::clock_callback)
 void cadr_iob_device::device_reset()
 {
 	m_p1 = 0;
-	m_bus = 0;
+	m_bus = 0xffffffff;
 	m_csr = 0;
 	m_microsecond_clock_buffer = 0;
 	m_clock = 0;
@@ -305,7 +310,7 @@ void cadr_iob_device::chaos_transmit_start()
 
 	// TODO transmit the data
 	// TODO set proper timing
-	m_transmit_timer->adjust(attotime::from_msec(10));
+	m_transmit_timer->adjust(attotime::from_nsec(500));
 }
 
 
@@ -379,7 +384,7 @@ void cadr_iob_device::write(offs_t offset, u16 data)
 			// TODO Clear and enable receiver
 			m_chaos_csr |= CHAOSNET_TRANSMIT_DONE;
 			// Clear interrupt enables and receive done
-			m_chaos_csr = m_chaos_csr & ~(CHAOSNET_RECEIVE_DONE | CHAOSNET_RECEIVE_IRQ_ENABLE | CHAOSNET_TRANSMIT_IRQ_ENABLE);
+			m_chaos_csr = m_chaos_csr & ~(CHAOSNET_RESET | CHAOSNET_RECEIVE_DONE | CHAOSNET_RECEIVE_IRQ_ENABLE | CHAOSNET_TRANSMIT_IRQ_ENABLE);
 		}
 		break;
 	case 0x11: // store word in transmit buffer
@@ -441,7 +446,7 @@ u16 cadr_iob_device::read(offs_t offset)
 		// -------- -----x-- Match any destination
 		// -------- ------x- Loopback
 		// -------- -------x Timer interrupt enable (not implemented)
-		// sys300/301 does not boot if transmit done stays enabled, but it also does not send any packets.
+		// Hack to make sys300/301 boot past the communication issue with the keyboard.
 		return m_chaos_csr /*& ~CHAOSNET_TRANSMIT_DONE*/;
 	case 0x11: // chaos net my address
 		// TODO: Address is configured using dip switches
@@ -484,7 +489,7 @@ void cadr_iob_device::mcu_bus_w(u8 data)
 		break;
 	case 0x40:
 		m_bus = (m_bus & 0xffffff00) | data;
-		m_keyboard_data = m_bus >> 1;
+		m_keyboard_data = (m_bus >> 1) & 0xffffff;
 		m_csr |= CSR_KEYBOARD_READY;
 		if (BIT(m_csr, CSR_KEYBOARD_IRQ_ENABLE_BIT))
 		{

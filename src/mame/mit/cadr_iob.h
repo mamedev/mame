@@ -70,6 +70,7 @@ private:
 	static constexpr int CHAOSNET_RESET_TRANSMIT_BIT = 8;
 	static constexpr u16 CHAOSNET_LOST_COUNT = 0x1e00;
 	static constexpr int CHAOSNET_RESET_BIT = 13;
+	static constexpr u16 CHAOSNET_RESET = 1 << CHAOSNET_RESET_BIT;
 	static constexpr int CHAOSNET_RECEIVE_DONE_BIT = 15;
 	static constexpr u16 CHAOSNET_RECEIVE_DONE = 1 << CHAOSNET_RECEIVE_DONE_BIT;
 
