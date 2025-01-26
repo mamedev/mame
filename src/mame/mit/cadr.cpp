@@ -8,8 +8,10 @@ TODO:
 - No cursor is displayed on screen.
 - Network not supported yet.
 - Add support for a second disk controller board.
-- System 300 hangs just after trying transmitting something to the
-  network. Waiting for a response?
+- System 100 errors not being able to communicatie to another host but it never
+  tries to transmit anything.
+- System 300 and 301 will not boot due to a timing/communication/bug issue with
+  the keyboard.
 
 **********************************************************************************/
 #include "emu.h"
@@ -216,7 +218,7 @@ void cadr_state::unibus_irq_and_vector(u16 vector)
 
 void cadr_state::cadr(machine_config &config)
 {
-	CADR(config, m_maincpu, 10'000'000); // Clock not correct
+	CADR(config, m_maincpu, 5'000'000); // Clock not correct
 	m_maincpu->set_addrmap(AS_DATA, &cadr_state::mem_map);
 
 	INPUT_MERGER_ANY_HIGH(config, m_mainirq).output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);

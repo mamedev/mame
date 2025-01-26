@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
-#ifndef MAME_MIT_CADR_DISPLAY_H
-#define MAME_MIT_CADR_DISPLAY_H
+#ifndef MAME_MIT_CADR_TV_CONTROL_H
+#define MAME_MIT_CADR_TV_CONTROL_H
 
 #pragma once
 
@@ -54,4 +54,4 @@ private:
 	std::unique_ptr<u8[]> m_sync_ram;
 };
 
-#endif // MAME_MIT_CADR_DISPLAY_H
+#endif // MAME_MIT_CADR_TV_CONTROL_H
