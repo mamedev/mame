@@ -628,6 +628,9 @@ protected:
 	void bplcon0_w(u16 data);
 	void aga_bplcon0_w(u16 data);
 
+	// TODO: move to Lisa
+	void clxcon2_w(u16 data);
+
 private:
 	// blitter helpers
 	uint32_t blit_ascending();
