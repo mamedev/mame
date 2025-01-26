@@ -16,8 +16,6 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
-	void map_io(address_map &map) ATTR_COLD;
-
 private:
 	memory_view m_isa_io_view;
 	required_device<zxbus_device> m_zxbus;

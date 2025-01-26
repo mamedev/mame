@@ -13,18 +13,12 @@ zxbus_adapter_device::zxbus_adapter_device(const machine_config &mconfig, const 
 {
 }
 
-void zxbus_adapter_device::map_io(address_map &map)
-{
-	map.unmap_value_high();
-	map(0x0000, 0xffff).view(m_isa_io_view);
-	m_zxbus->set_io_space(m_isa_io_view[0], m_isa_io_view[0]);
-	m_isa_io_view.select(0);
-}
-
 void zxbus_adapter_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_device(0x0000, 0xffff, *this, &zxbus_adapter_device::map_io);
+	m_isa->space(isa8_device::AS_ISA_IO).install_view(0x0000, 0xffff, m_isa_io_view);
+	m_zxbus->set_io_space(m_isa_io_view[0], m_isa_io_view[0]);
+	m_isa_io_view.select(0);
 }
 
 void zxbus_adapter_device::device_add_mconfig(machine_config &config)
