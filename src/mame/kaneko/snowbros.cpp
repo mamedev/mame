@@ -3274,7 +3274,7 @@ void snowbros_state::init_gwasu()
 	rom[0xfdaa / 2] = 0x3345;
 
 	// checksum is done on startup, must equal 0
-	rom[0x54 / 2] = 0x11ef;	
+	rom[0x54 / 2] = 0x11ef;
 }
 
 

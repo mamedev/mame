@@ -14,13 +14,15 @@ Done:
     - preliminary sprites
 
 TODO:
-    - Merge with base OCS/ECS Denise video emulation, use virtual overrides where applicable;
-    - High bits sprite collisions;
-    - SHRES video mode;
-    - Confirm diwstrt/diwstop values;
-    - Add custom screen geometry registers (specific to AGA chipset, $1c0-$1ef, most are shared
-      with Agnus/Alice really);
-    - Remaining unemulated new registers (ZD pin, SOG pin, SSCAN2, BRDRBLNK, BRDRSPRT, BPLAMx);
+- Merge with base OCS Denise video emulation, use virtual overrides where applicable;
+- Downport ECS Denise features;
+- High bits sprite collisions;
+- SHRES video mode;
+- Confirm diwstrt/diwstop values;
+- Add custom screen geometry registers (ECS/AGA chipsets, $1c0-$1ef, most are shared
+    with Agnus/Alice really);
+- Implement SPRES0/1 (sprite resolutions)
+- Remaining unemulated new registers (ZD pin, SOG pin, SSCAN2, BRDRSPRT, BPLAMx);
 
 **************************************************************************************************/
 
@@ -529,9 +531,14 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 	/* loop over the line */
 	// TODO: copper runs on odd timeslots
 	next_copper_x = m_copper->restore_offset();
+
+	const bool ecsena = !!BIT(CUSTOM_REG(REG_BPLCON0), 0);
+	// BRDRBLNK, 17bitlv6:3871 C42 Demo enables this
+	const rgb_t border_color = ecsena && BIT(CUSTOM_REG(REG_BPLCON3), 5) ? rgb_t(0, 0, 0) : aga_palette[0];
+
 	// TODO: verify where we're missing pixels here for the GFX pitch bitplane corruptions
+	// Update 2025: check and resort all these entries
 	// - wbenc30 scrolling in lores mode (fmode=3, expects a +58!, verify ddfstrt / delays)
-	// - roadkill title (fmode=3, max +14), gameplay uses fmode=1
 	// - sockid_a, alfred gameplay (fmode=1)
 	// - virocp_a (fmode=1, +26)
 	// - ssf2t (fmode=3, wants >+100, scrolling is very offset)
@@ -541,21 +548,44 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 	// - cd32 cdtv:insidino copyright screen (fmode=3)
 	// - cd32 cdtv:labytime intro/tutorial screens
 	//   (swaps between fmode=1 and 3, verify ddfstrt / ddfstop)
-
-	const int offset_hack[] = { 10, 11, 11, 13 };
+	const int offset_hack[] = {
+		11,
+		11,
+		11,
+		// fmode 3: dxgalaga (title) wants +20
+		20
+	};
 	const int default_bit_offset[] = { 15, 31, 31, 63 };
 
 	const int ddf_start_offset_lores[] = { 17, 17, 17, 17 };
-	const int ddf_stop_offset_lores[] = { 17 + 15, 17 + 31, 17 + 31, 17 + 63 };
+	const int ddf_stop_offset_lores[] = {
+		17 + 15,
+		// fmode 1:
+		// TODO: roadkill gameplay expects an extra +15 somewhere for scrolling to work to the right
+		// that breaks pbillusn main menu
+		17 + 31,
+		17 + 31,
+		17 + 63
+	};
 
-	// TODO: verify fmode 1/2 stops
-	// - (fmode 3) wbenc30/kangfu/pbillusn (F10 key)/cd32 (CD splash loading) all expects a +8 offset
-	const int ddf_start_offset_hires[] = { 9, 9, 9, 9 + 8 };
-	const int ddf_stop_offset_hires[] = { 9 + 15, 9 + 15, 9 + 15, 9 + 8 };
+	const int ddf_start_offset_hires[] = {
+		9,
+		9,
+		9,
+		// fmode 3: wbenc30/kangfu/pbillusn (F10 key)/cd32 (CD splash loading) all expects a +8 offset
+		9 + 8
+	};
+	const int ddf_stop_offset_hires[] = {
+		9 + 15,
+		9 + 15,
+		9 + 15,
+		// fmode 3: kangfu/pballdmg wants an extra +16
+		9 + 8 + 16
+	};
 	// TODO: move this to inner block as const
 	// atm the assignment is here just for the hack to work
 	// Alice seems to expect to change it in mid-scanline for bitplane pointers to work
-    // - amiga_cd:bigred would otherwise offset the intro
+	// - amiga_cd:bigred would otherwise offset the intro
 	u8 bitplane_fmode = CUSTOM_REG(REG_FMODE) & 0x3;
 
 	for (int x = 0; x < (amiga_state::SCREEN_WIDTH / 2) + offset_hack[bitplane_fmode]; x++)
@@ -647,7 +677,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 		/* clear the target pixels to the background color as a starting point */
 		if (dst != nullptr && !out_of_beam)
 			dst[x*2+0] =
-			dst[x*2+1] = aga_palette[0];
+			dst[x*2+1] = border_color;
 
 		/* if we hit the first fetch pixel, reset the counters and latch the delays */
 		if (x == ddf_start_pixel)
@@ -664,6 +694,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 				case 2:
 					odelay += (CUSTOM_REG(REG_BPLCON1) & 0x0400) >> 6;
 					edelay += (CUSTOM_REG(REG_BPLCON1) & 0x4000) >> 10;
+
 					// NOTE: breaks exile_a gameplay with this enabled
 					//odelay ^= 0x10;
 					//edelay ^= 0x10;
@@ -677,6 +708,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 						odelay ^= 0x20;
 					if (CUSTOM_REG(REG_BPLCON1) & 0x8000)
 						edelay ^= 0x20;
+
 					break;
 			}
 

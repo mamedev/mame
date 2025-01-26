@@ -62,15 +62,15 @@
     2005      Let's!TVプレイ ドラゴンボ－ルＺ バトル体感かめはめ波～ おめぇとフュージョン / バンダイ / 日本          Let's! TV Play Dragon Ball Z Battle Taikan Kamehameha~ Omee to Fusion / Bandai / Japan
 
     dumped: either here, xavix_2000.cpp, or xavix_2002.cpp
-	          Let's!TVプレイ 体感キャストオフ 仮面ライダーカブト クロックアップ＆ライダーキック / バンダイ / 日本  Let's! TV Play Taikan Cast Off Kamen Rider Kabuto Clock Up & Rider Kick / Bandai / Japan
-			  Let's!TVプレイ なりきり体感 ボウケンジャー 走れ！撃て！ミッションスタート！！ / バンダイ / 日本   Let's! TV Play Narikiri Taikan Boukenger Hashire! Ute! Mission Start!! / Bandai / Japan
-			  Webdiver Gradion /TAKARA/Japan                                                                  -           -               -           -               -                   -                       -
-			  Let's!TVプレイ 魔法戦隊マジレンジャー マジマットでダンス＆バトル / バンダイ / 日本        Let's! TV Play Mahou Taiketsu Magiranger - Magimat de Dance & Battle / Bandai / Japan
-			  anpan-man pyon-pyon ikunou mat /JoyPalette/Japan                                                -           -               -           -               -                   -                       -
-			  どこでもドラえもん 日本旅行ゲームDX体感！どこドラグランプリ！ / エポック社 / 日本          Doko Demo Doraemon Nihon Ryokou Game DX Taikan! Doko Dora Grand Prix! / Epoch / Japan
+              Let's!TVプレイ 体感キャストオフ 仮面ライダーカブト クロックアップ＆ライダーキック / バンダイ / 日本  Let's! TV Play Taikan Cast Off Kamen Rider Kabuto Clock Up & Rider Kick / Bandai / Japan
+              Let's!TVプレイ なりきり体感 ボウケンジャー 走れ！撃て！ミッションスタート！！ / バンダイ / 日本   Let's! TV Play Narikiri Taikan Boukenger Hashire! Ute! Mission Start!! / Bandai / Japan
+              Webdiver Gradion /TAKARA/Japan                                                                  -           -               -           -               -                   -                       -
+              Let's!TVプレイ 魔法戦隊マジレンジャー マジマットでダンス＆バトル / バンダイ / 日本        Let's! TV Play Mahou Taiketsu Magiranger - Magimat de Dance & Battle / Bandai / Japan
+              anpan-man pyon-pyon ikunou mat /JoyPalette/Japan                                                -           -               -           -               -                   -                       -
+              どこでもドラえもん 日本旅行ゲームDX体感！どこドラグランプリ！ / エポック社 / 日本          Doko Demo Doraemon Nihon Ryokou Game DX Taikan! Doko Dora Grand Prix! / Epoch / Japan
               Let's!TVプレイ ふたりはプリキュアMaxHeart マットでダンス MaxHeartにおどっちゃおう / バンダイ / 日本         Let's! TV Play Futari wa PreCure - MaxHeart Mat de Dance MaxHeart ni Odotchaou / Bandai / Japan
-			  anpan-man kazoku de ikunou mat DX /JoyPalette/Japan                                             -           -               -           -               -                   -                       -
-			  Excite Striker (UK)
+              anpan-man kazoku de ikunou mat DX /JoyPalette/Japan                                             -           -               -           -               -                   -                       -
+              Excite Striker (UK)
               connecTV OPUS /RADICA EU (different ROM to US?)
               Let's!TVプレイ 音撃バトル！仮面ライダー響鬼 決めろ！一気火勢の型 / バンダイ / 日本  (Let's! TV Play Ongeki Battle! Kamen Rider Hibiki - Kimero! Ikki Kasei no Kata / Bandai / Japan)
               Let's construct the town! /TAKARA/Japan                                                         -           -               -           -               -                   -                       -
@@ -311,13 +311,13 @@ void xavix_state::mainram_w(offs_t offset, uint8_t data)
 {
 	m_mainram[offset] = data;
 /*
-// trying to debug anpanmdx title screen issue 
-	if ((offset == 0x3d) && (data == 0x77))
-		logerror("%s: writing 0x77 to 0x3d\n", machine().describe_context());
-	if ((offset == 0x98) && (data == 0x77))
-		logerror("%s: writing 0x77 to 0x98\n", machine().describe_context());
-	if ((offset == 0x3f2) && (data == 0x77))
-		logerror("%s: writing 0x77 to 0x3f2\n", machine().describe_context());
+// trying to debug anpanmdx title screen issue
+    if ((offset == 0x3d) && (data == 0x77))
+        logerror("%s: writing 0x77 to 0x3d\n", machine().describe_context());
+    if ((offset == 0x98) && (data == 0x77))
+        logerror("%s: writing 0x77 to 0x98\n", machine().describe_context());
+    if ((offset == 0x3f2) && (data == 0x77))
+        logerror("%s: writing 0x77 to 0x3f2\n", machine().describe_context());
 // but the unwanted? value of 0x77 is explicitly set by the code at 1c61c
 */
 }

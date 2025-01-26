@@ -35,6 +35,7 @@ Portachess II:
 HD44801A50 MCU is used in:
 - CXG Sensor Computachess (1981 version) - 1st use
 - CXG Portachess (1983 version, has "Sound" button)
+- CGL GrandMaster Travel Sensory
 - Hanimex HCG 1500
 - Schneider Sensor Chesspartner MK 3
 - Systema Computachess

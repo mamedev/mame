@@ -29,7 +29,7 @@ public:
 	void set_game_flag(u32 flag) { m_game_flag = flag; }
 
 	void draw_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	u32 update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	// device-level overrides

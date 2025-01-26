@@ -1241,11 +1241,11 @@ void amiga_state::aga_map(address_map &map)
 
 void amiga_state::custom_chip_reset()
 {
-    // TODO: not entirely correct
-    // - OCS Denise returns open bus
-    // - ECS Denise should return 0xff << 8 | ID
-    // - AGA Lisa bits 15-10 are jumper selectable (at least on A4000), returns 0xfc << 8 | ID
-    // cfr. https://eab.abime.net/showpost.php?p=627136&postcount=59
+	// TODO: not entirely correct
+	// - OCS Denise returns open bus
+	// - ECS Denise should return 0xff << 8 | ID
+	// - AGA Lisa bits 15-10 are jumper selectable (at least on A4000), returns 0xfc << 8 | ID
+	// cfr. https://eab.abime.net/showpost.php?p=627136&postcount=59
 	CUSTOM_REG(REG_DENISEID) = m_denise_id;
 	CUSTOM_REG(REG_VPOSR) = m_agnus_id << 8;
 	CUSTOM_REG(REG_DDFSTRT) = 0x18;
@@ -1571,7 +1571,8 @@ void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 
 		case REG_DDFSTOP:
 			/* impose hardware limits ( HRM, page 75 ) */
-			data &= (IS_AGA() || IS_ECS()) ? 0xfe : 0xfc;
+			// amigaaga_flop:aladdin writes 0x0100 here, expecting the HW limit to hit instead
+			data &= (IS_AGA() || IS_ECS()) ? 0xfffe : 0xfffc;
 			if (data > 0xd8)
 			{
 				logerror("%s: Attempt to overrun DDFSTOP with %04x\n", machine().describe_context(), data);

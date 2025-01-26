@@ -1011,7 +1011,7 @@ uint8_t pacman_state::mspacman_enable_decode_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 		mspacman_enable_decode_w();
-	return memregion("maincpu")->base()[offset + Delta];
+	return memregion("maincpu")->base()[offset + Delta + 0x10000];
 }
 
 // any access to these ROM addresses disables the decoder, and all you see is the original Pac-Man code
@@ -8448,47 +8448,47 @@ void pacman_state::mspacman_install_patches(uint8_t *ROM)
 	for (int i = 0; i < 8; i++)
 	{
 		ROM[0x0410+i] = ROM[0x8008+i];
-		ROM[0x08E0+i] = ROM[0x81D8+i];
-		ROM[0x0A30+i] = ROM[0x8118+i];
-		ROM[0x0BD0+i] = ROM[0x80D8+i];
-		ROM[0x0C20+i] = ROM[0x8120+i];
-		ROM[0x0E58+i] = ROM[0x8168+i];
-		ROM[0x0EA8+i] = ROM[0x8198+i];
+		ROM[0x08e0+i] = ROM[0x81d8+i];
+		ROM[0x0a30+i] = ROM[0x8118+i];
+		ROM[0x0bd0+i] = ROM[0x80d8+i];
+		ROM[0x0c20+i] = ROM[0x8120+i];
+		ROM[0x0e58+i] = ROM[0x8168+i];
+		ROM[0x0ea8+i] = ROM[0x8198+i];
 
 		ROM[0x1000+i] = ROM[0x8020+i];
 		ROM[0x1008+i] = ROM[0x8010+i];
 		ROM[0x1288+i] = ROM[0x8098+i];
 		ROM[0x1348+i] = ROM[0x8048+i];
 		ROM[0x1688+i] = ROM[0x8088+i];
-		ROM[0x16B0+i] = ROM[0x8188+i];
-		ROM[0x16D8+i] = ROM[0x80C8+i];
-		ROM[0x16F8+i] = ROM[0x81C8+i];
-		ROM[0x19A8+i] = ROM[0x80A8+i];
-		ROM[0x19B8+i] = ROM[0x81A8+i];
+		ROM[0x16b0+i] = ROM[0x8188+i];
+		ROM[0x16d8+i] = ROM[0x80c8+i];
+		ROM[0x16f8+i] = ROM[0x81c8+i];
+		ROM[0x19a8+i] = ROM[0x80a8+i];
+		ROM[0x19b8+i] = ROM[0x81a8+i];
 
 		ROM[0x2060+i] = ROM[0x8148+i];
 		ROM[0x2108+i] = ROM[0x8018+i];
-		ROM[0x21A0+i] = ROM[0x81A0+i];
-		ROM[0x2298+i] = ROM[0x80A0+i];
-		ROM[0x23E0+i] = ROM[0x80E8+i];
+		ROM[0x21a0+i] = ROM[0x81a0+i];
+		ROM[0x2298+i] = ROM[0x80a0+i];
+		ROM[0x23e0+i] = ROM[0x80e8+i];
 		ROM[0x2418+i] = ROM[0x8000+i];
 		ROM[0x2448+i] = ROM[0x8058+i];
 		ROM[0x2470+i] = ROM[0x8140+i];
 		ROM[0x2488+i] = ROM[0x8080+i];
-		ROM[0x24B0+i] = ROM[0x8180+i];
-		ROM[0x24D8+i] = ROM[0x80C0+i];
-		ROM[0x24F8+i] = ROM[0x81C0+i];
+		ROM[0x24b0+i] = ROM[0x8180+i];
+		ROM[0x24d8+i] = ROM[0x80c0+i];
+		ROM[0x24f8+i] = ROM[0x81c0+i];
 		ROM[0x2748+i] = ROM[0x8050+i];
 		ROM[0x2780+i] = ROM[0x8090+i];
-		ROM[0x27B8+i] = ROM[0x8190+i];
+		ROM[0x27b8+i] = ROM[0x8190+i];
 		ROM[0x2800+i] = ROM[0x8028+i];
-		ROM[0x2B20+i] = ROM[0x8100+i];
-		ROM[0x2B30+i] = ROM[0x8110+i];
-		ROM[0x2BF0+i] = ROM[0x81D0+i];
-		ROM[0x2CC0+i] = ROM[0x80D0+i];
-		ROM[0x2CD8+i] = ROM[0x80E0+i];
-		ROM[0x2CF0+i] = ROM[0x81E0+i];
-		ROM[0x2D60+i] = ROM[0x8160+i];
+		ROM[0x2b20+i] = ROM[0x8100+i];
+		ROM[0x2b30+i] = ROM[0x8110+i];
+		ROM[0x2bf0+i] = ROM[0x81d0+i];
+		ROM[0x2cc0+i] = ROM[0x80d0+i];
+		ROM[0x2cd8+i] = ROM[0x80e0+i];
+		ROM[0x2cf0+i] = ROM[0x81e0+i];
+		ROM[0x2d60+i] = ROM[0x8160+i];
 	}
 }
 

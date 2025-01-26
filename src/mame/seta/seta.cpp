@@ -4483,9 +4483,9 @@ static INPUT_PORTS_START( drgnunit )
 	PORT_DIPSETTING(      0x0030, "3" )
 	PORT_DIPSETTING(      0x0020, "5" )
 	PORT_DIPUNUSED_DIPLOC( 0x0040, 0x0040, "SW1:7" )    // Labeled "Don't Touch" in manual
-	PORT_DIPNAME( 0x0080, 0x0080, "Unknown 1-8*" ) PORT_DIPLOCATION("SW1:8")    // Labeled "Don't Touch" in manual (seems to be used though)
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, "Timer" ) PORT_DIPLOCATION("SW1:8")    // Labeled "Don't Touch" in manual but it seems to work fine
+	PORT_DIPSETTING(      0x0080, "110" )
+	PORT_DIPSETTING(      0x0000, "130" )
 
 	PORT_DIPUNUSED_DIPLOC( 0x0100, 0x0100, "SW2:1" )    // Labeled "Don't Touch" in manual
 	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW2:2")

@@ -16155,6 +16155,11 @@ casloopy                        //
 cfx9850                         // Casio CFX-9850
 cfx9850gb                       // Casio CFX-9850GB Plus
 
+@source:casio/ct8000.cpp
+ct8000                          //
+ctfk1                           //
+ctmb1                           //
+
 @source:casio/ctk2000.cpp
 ctk2100                         //
 
@@ -18877,6 +18882,7 @@ redufo                          // (c) Artic
 redufob                         // bootleg
 redufob2                        // bootleg
 redufob3                        // bootleg
+rocktcnvy                       // bootleg (Radar Ltd.)
 sbhoei                          // Hoei
 sbhoeia                         // Hoei
 scobra                          // GX316 (c) 1981 Konami
@@ -46130,6 +46136,7 @@ icanpian                        //
 jak_batm                        // The Batman, 2004
 jak_mk
 jak_mpacw
+jak_pix
 jak_potc
 jak_powr
 jak_sbjd

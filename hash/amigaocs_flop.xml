@@ -7983,7 +7983,7 @@ ATK test: OK
 		<notes><![CDATA[
 ATK test: OK
 ]]></notes>
-        <!-- cover/floppy title -->
+		<!-- cover/floppy title -->
 		<info name="alt_title" value="Brutal Football" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
@@ -12097,7 +12097,7 @@ ATK test: OK
 		</part>
 	</software>
 
-    <!-- "F40 Pursuit Simulator" alt version known to exist (title screen) -->
+	<!-- "F40 Pursuit Simulator" alt version known to exist (title screen) -->
 	<software name="crazycr2" supported="no">
 		<!-- SPS (CAPS) release 311 -->
 		<description>Crazy Cars II (Europe)</description>
@@ -12156,7 +12156,7 @@ ATK test: C:79 H:U 1 Sector Bad
 		</part>
 	</software>
 
-    <!-- PD version known to exist https://www.aminet.net/package/game/jump/CrazySueII -->
+	<!-- PD version known to exist https://www.aminet.net/package/game/jump/CrazySueII -->
 	<software name="crazsue2" supported="no">
 		<!-- SPS (CAPS) release 2195 -->
 		<description>Crazy Sue... Goes On (Europe)</description>
@@ -12168,7 +12168,7 @@ ATK test: C:79 H:U 1 Sector Bad
 TODO: test me in full, is track 43 onward bad just a side effect of using RNC cruncher?
 ATK test: C:43 onward Bad
 ]]></notes>
-        <info name="alt_title" value="Crazy Sue II" />
+		<info name="alt_title" value="Crazy Sue II" />
 		<info name="magazine" value="Amiga Mania" />
 		<info name="release" value="199209xx" />
 		<!-- Omake: type "HIRONZMUSJUMPSHOE" on title screen to enable cheat mode -->
