@@ -339,9 +339,9 @@ std::string opq_registers::log_keyon(uint32_t choffs, uint32_t opoffs)
 	uint32_t opnum = opoffs;
 
 	char buffer[256];
-	char *end = &buffer[0];
+	int end = 0;
 
-	end += sprintf(end, "%u.%02u freq=%04X dt=%+2d fb=%u alg=%X mul=%X tl=%02X ksr=%u adsr=%02X/%02X/%02X/%X sl=%X out=%c%c",
+	end += snprintf(&buffer[end], sizeof(buffer) - end, "%u.%02u freq=%04X dt=%+2d fb=%u alg=%X mul=%X tl=%02X ksr=%u adsr=%02X/%02X/%02X/%X sl=%X out=%c%c",
 		chnum, opnum,
 		(opoffs & 1) ? ch_block_freq_24(choffs) : ch_block_freq_13(choffs),
 		int32_t(op_detune(opoffs)) - 0x20,
@@ -360,14 +360,14 @@ std::string opq_registers::log_keyon(uint32_t choffs, uint32_t opoffs)
 
 	bool am = (lfo_enable() && op_lfo_am_enable(opoffs) && ch_lfo_am_sens(choffs) != 0);
 	if (am)
-		end += sprintf(end, " am=%u", ch_lfo_am_sens(choffs));
+		end += snprintf(&buffer[end], sizeof(buffer) - end, " am=%u", ch_lfo_am_sens(choffs));
 	bool pm = (lfo_enable() && ch_lfo_pm_sens(choffs) != 0);
 	if (pm)
-		end += sprintf(end, " pm=%u", ch_lfo_pm_sens(choffs));
+		end += snprintf(&buffer[end], sizeof(buffer) - end, " pm=%u", ch_lfo_pm_sens(choffs));
 	if (am || pm)
-		end += sprintf(end, " lfo=%02X", lfo_rate());
+		end += snprintf(&buffer[end], sizeof(buffer) - end, " lfo=%02X", lfo_rate());
 	if (ch_reverb(choffs))
-		end += sprintf(end, " reverb");
+		end += snprintf(&buffer[end], sizeof(buffer) - end, " reverb");
 
 	return buffer;
 }

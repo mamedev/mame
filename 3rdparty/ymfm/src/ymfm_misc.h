@@ -90,5 +90,4 @@ protected:
 
 }
 
-
 #endif // YMFM_MISC_H

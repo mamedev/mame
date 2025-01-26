@@ -46,7 +46,6 @@ namespace ymfm
 void pcm_registers::reset()
 {
 	std::fill_n(&m_regdata[0], REGISTERS, 0);
-	m_regdata[0x02] = 0x20;
 	m_regdata[0xf8] = 0x1b;
 }
 
