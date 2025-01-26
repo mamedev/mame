@@ -611,7 +611,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 				x,
 				m_last_scanline & 0xff,
 				bool(BIT(CUSTOM_REG(REG_DMACON), 14)), // BBUSY
-				bitplane_fmode ? 0 : planes
+				planes
 			);
 			save_color0 = CUSTOM_REG(REG_COLOR00);
 			if (m_genlock_color != 0xffff)
