@@ -1513,6 +1513,8 @@ if (BUSES["HPDIO"]~=null) then
 		MAME_DIR .. "src/devices/bus/hp_dio/hp98620.h",
 		MAME_DIR .. "src/devices/bus/hp_dio/hp98624.cpp",
 		MAME_DIR .. "src/devices/bus/hp_dio/hp98624.h",
+		MAME_DIR .. "src/devices/bus/hp_dio/hp98628_9.cpp",
+		MAME_DIR .. "src/devices/bus/hp_dio/hp98628_9.h",
 		MAME_DIR .. "src/devices/bus/hp_dio/hp98643.cpp",
 		MAME_DIR .. "src/devices/bus/hp_dio/hp98643.h",
 		MAME_DIR .. "src/devices/bus/hp_dio/hp98644.cpp",
@@ -1848,6 +1850,8 @@ if (BUSES["ISA"]~=null) then
 		MAME_DIR .. "src/devices/bus/isa/pds.h",
 		MAME_DIR .. "src/devices/bus/isa/pgc.cpp",
 		MAME_DIR .. "src/devices/bus/isa/pgc.h",
+		MAME_DIR .. "src/devices/bus/isa/prose4k1.cpp",
+		MAME_DIR .. "src/devices/bus/isa/prose4k1.h",
 		MAME_DIR .. "src/devices/bus/isa/sb16.cpp",
 		MAME_DIR .. "src/devices/bus/isa/sb16.h",
 		MAME_DIR .. "src/devices/bus/isa/sblaster.cpp",
@@ -4696,6 +4700,8 @@ if (BUSES["ZORRO"]~=null) then
 		MAME_DIR .. "src/devices/bus/amiga/zorro/action_replay.h",
 		MAME_DIR .. "src/devices/bus/amiga/zorro/buddha.cpp",
 		MAME_DIR .. "src/devices/bus/amiga/zorro/buddha.h",
+		MAME_DIR .. "src/devices/bus/amiga/zorro/merlin.cpp",
+		MAME_DIR .. "src/devices/bus/amiga/zorro/merlin.h",
 		MAME_DIR .. "src/devices/bus/amiga/zorro/picasso2.cpp",
 		MAME_DIR .. "src/devices/bus/amiga/zorro/picasso2.h",
 		MAME_DIR .. "src/devices/bus/amiga/zorro/rainbow2.cpp",
@@ -5767,8 +5773,6 @@ end
 
 if (BUSES["H89BUS"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/bus/heathzenith/h89/cards.cpp",
-		MAME_DIR .. "src/devices/bus/heathzenith/h89/cards.h",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/cdr_fdc_880h.cpp",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/cdr_fdc_880h.h",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/h89bus.cpp",
@@ -5791,6 +5795,18 @@ if (BUSES["H89BUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/z_89_11.h",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/z37_fdc.cpp",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/z37_fdc.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/heathzenith/h89/intr_cntrl.h,BUSES["HEATH_INTR_SOCKET"] = true
+---------------------------------------------------
+
+if (BUSES["HEATH_INTR_SOCKET"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/heathzenith/h89/intr_cntrl.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h89/intr_cntrl.h",
 	}
 end
 

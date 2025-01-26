@@ -243,7 +243,7 @@ uint32_t aquarium_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_txt_tilemap->draw(screen, bitmap, cliprect, 1, 4);
 
 	m_bak_tilemap->draw(screen, bitmap, cliprect, 1, 8);
-	m_sprgen->aquarium_draw_sprites(screen, bitmap, cliprect, 16);
+	m_sprgen->aquarium_draw_sprites(screen, bitmap, cliprect);
 	m_mid_tilemap->draw(screen, bitmap, cliprect, 1, 0);
 	m_txt_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
@@ -432,6 +432,7 @@ void aquarium_state::aquarium(machine_config &config)
 	m_screen->set_size(64*8, 64*8);
 	m_screen->set_visarea(2*8, 42*8-1, 2*8, 34*8-1);
 	m_screen->set_screen_update(FUNC(aquarium_state::screen_update));
+	m_screen->screen_vblank().set(m_sprgen, FUNC(excellent_spr_device::vblank));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_aquarium);

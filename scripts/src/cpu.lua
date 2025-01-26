@@ -43,6 +43,8 @@ if (CPU_INCLUDE_DRC) then
 	}
 	if not _OPTIONS["FORCE_DRC_C_BACKEND"] then
 		files {
+			MAME_DIR .. "src/devices/cpu/drcbearm64.cpp",
+			MAME_DIR .. "src/devices/cpu/drcbearm64.h",
 			MAME_DIR .. "src/devices/cpu/drcbex64.cpp",
 			MAME_DIR .. "src/devices/cpu/drcbex64.h",
 			MAME_DIR .. "src/devices/cpu/drcbex86.cpp",

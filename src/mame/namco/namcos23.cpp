@@ -4081,7 +4081,7 @@ void gorgon_state::render_run(screen_device &screen, bitmap_rgb32 &bitmap)
 	{
 		bool y_lowres = !BIT(m_c435.spritedata[0], 2);
 		s16 deltax = (s16)((s16)m_c435.spritedata[6] + (s16)m_c435.spritedata[10] + 0x50);
-		s16 deltay = (s16)((s16)m_c435.spritedata[12] + (0x2a >> y_lowres));
+		s16 deltay = (s16)((s16)m_c435.spritedata[12] + (0x2a >> (y_lowres ? 1 : 0)));
 		u16 base = m_c435.spritedata[2];
 		u16 sprite_count = (m_c435.spritedata[4] - base) + 1;
 		for (int i = 0; i < sprite_count; i++)
@@ -6117,12 +6117,12 @@ static const gfx_layout namcos23_cg_layout =
 static GFXLAYOUT_RAW(namcos23_sprite_layout, 32, 32, 32*8, 32*32*8)
 
 static GFXDECODE_START( gfx_namcos23 )
-	GFXDECODE_ENTRY( nullptr,   0, namcos23_cg_layout, 0, 0x800 )
+	GFXDECODE_RAM(   nullptr,   0, namcos23_cg_layout, 0, 0x800 )
 	GFXDECODE_ENTRY( "textile", 0, gfx_16x16x8_raw,    0, 0x80 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_gorgon )
-	GFXDECODE_ENTRY( nullptr,   0, namcos23_cg_layout,     0, 0x800 )
+	GFXDECODE_RAM(   nullptr,   0, namcos23_cg_layout,     0, 0x800 )
 	GFXDECODE_ENTRY( "textile", 0, gfx_16x16x8_raw,        0, 0x80 )
 	GFXDECODE_ENTRY( "sprites", 0, namcos23_sprite_layout, 0, 0x80 )
 GFXDECODE_END

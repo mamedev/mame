@@ -433,7 +433,7 @@ static const gfx_layout sprite_layout =
 };
 
 static GFXDECODE_START( gfx_lemmings )
-	GFXDECODE_ENTRY( nullptr,    0, charlayout,     0,   16 ) // Dynamically modified
+	GFXDECODE_RAM(   nullptr,    0, charlayout,     0,   16 ) // Dynamically modified
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_lemmings_spr1 )

@@ -249,6 +249,11 @@ ROM_START( jak_powr ) // shows Game-Key screen but was never produced with a GK 
 	ROM_LOAD16_WORD_SWAP( "powerrangers.u2", 0x000000, 0x200000, CRC(859c6cff) SHA1(12bb08657e333c2644d707deead8cd3e34a140b2) )
 ROM_END
 
+ROM_START( jak_pix )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakkspixar.bin", 0x000000, 0x200000, CRC(ec110f2b) SHA1(a57e1d45cfb537173f94d1a95323183a62976bb4) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -285,3 +290,5 @@ CONS( 2006, jak_supm, 0, 0, spg2xx_jakks,  jak_supm,      jakks_state, empty_ini
 CONS( 2007, jak_spd3, 0, 0, spg2xx_jakks,  jak_spd3,      jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Spider-Man 3 (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
 
 CONS( 2005, jak_powr, 0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Power Rangers S.P.D. (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
+
+CONS( 2006, jak_pix,  0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Disney Pixar Classics (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )

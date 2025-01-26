@@ -443,6 +443,106 @@ ROM_START( super70s )
 ROM_END
 
 
+ROM_START( jhzb )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	// Internal ROM of IGS036 ARM based MCU
+	ROM_LOAD( "jhzb_igs036", 0x0000, 0x4000, NO_DUMP ) // stickered K7
+
+	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU)
+	ROM_LOAD( "xa", 0x00000, 0x10000, NO_DUMP )
+
+	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "v113cn.u17", 0x000000, 0x200000, CRC(1c08099b) SHA1(125a5302935e8bef8d4a4d8a6db748110bcab692) ) // 11xxxxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x200000, "oki", 0 ) // samples
+	ROM_LOAD( "v113cn.u26", 0x000000, 0x200000, CRC(99fc5dcd) SHA1(e737299d770b0fc3606085a566ad9fbbaca15ff5) )
+
+	ROM_REGION( 0x1000000, "gfx", 0 )
+	ROM_LOAD( "v113cn-cg0-h.u27", 0x000000, 0x800000, CRC(a8fb40e4) SHA1(074ab61158a0baa5811f7d33792bc71051faeb62) ) // FIXED BITS (xxxxxxxx0000xxxx)
+	ROM_LOAD( "v113cn-cg0-l.u29", 0x800000, 0x800000, CRC(a5f1952c) SHA1(3ae52eb604974414b6b97ff1e0156c39aa05a0cb) )
+ROM_END
+
+
+ROM_START( jxry )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	// Internal ROM of IGS036 ARM based MCU
+	ROM_LOAD( "jhzb_igs036", 0x0000, 0x4000, NO_DUMP ) // stickered A3
+
+	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU) stickered IL U14
+	ROM_LOAD( "xa", 0x00000, 0x10000, NO_DUMP )
+
+	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "v-116cn.u20", 0x000000, 0x200000, CRC(a8cd3431) SHA1(b978b2e27fc106a02213b6aa42620fbf287a4d24) )
+
+	ROM_REGION( 0x200000, "oki", 0 ) // samples
+	ROM_LOAD( "sp.u18", 0x000000, 0x200000, CRC(725950e1) SHA1(7226d3e9c2cb149dae598479cddeb12446944a1e) )
+
+	ROM_REGION( 0x1000000, "gfx", 0 )
+	ROM_LOAD( "cg1.u22", 0x000000, 0x800000, CRC(bfbedd8c) SHA1(f4d97e9633de6dd87f11eade5752881d61a28a38) ) // FIXED BITS (xxxxxxxx0000xxxx)
+	ROM_LOAD( "cg2.u24", 0x800000, 0x800000, CRC(c40627e5) SHA1(795217425533c569bad868b16e5b31ba29c587fb) )
+ROM_END
+
+
+ROM_START( slqzsp )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	// Internal ROM of IGS036 ARM based MCU
+	ROM_LOAD( "jhzb_igs036", 0x0000, 0x4000, NO_DUMP ) // stickered F8
+
+	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU) stickered IU U23
+	ROM_LOAD( "xa", 0x00000, 0x10000, NO_DUMP )
+
+	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "v104cn.u18", 0x000000, 0x200000, CRC(7819aa1a) SHA1(c63b375916d0009e065b6239bcc752a56d2ee127) )
+
+	ROM_REGION( 0x800000, "tt5665", 0 ) // samples
+	ROM_LOAD( "v104cn.u27", 0x000000, 0x800000, CRC(440617cc) SHA1(87019bde5f0cf2215b6e28434a0593d0b910cbed) )
+
+	ROM_REGION( 0x1000000, "gfx", 0 )
+	ROM_LOAD( "v104cn.u28", 0x000000, 0x800000, CRC(e102b951) SHA1(619cf2aa77996e1831d6ff2116d6ae8045b9066c) )
+	ROM_LOAD( "v104cn.u30", 0x800000, 0x800000, CRC(eecf61c6) SHA1(59d330508482dcc0971c5255c6c70c83ba72323c) )
+ROM_END
+
+
+ROM_START( sydh ) // PCB-0802-03-JL
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	// Internal ROM of IGS036 ARM based MCU
+	ROM_LOAD( "jhzb_igs036", 0x0000, 0x4000, NO_DUMP ) // stickered C3
+
+	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU)
+	ROM_LOAD( "xa", 0x00000, 0x10000, NO_DUMP )
+
+	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "v-104cn.u20", 0x000000, 0x200000, CRC(43219633) SHA1(0f709c700c661f20a3f47c6df5a35aff9eb05bc6) )
+
+	ROM_REGION( 0x800000, "tt5665", 0 ) // samples
+	ROM_LOAD( "v-104cn.u31", 0x000000, 0x800000, CRC(794a4ebf) SHA1(b6ea2228fc943dc65514d113c36a1e9d69564e9a) ) // 1xxxxxxxxxxxxxxxxxxxxxx = 0x00
+
+	ROM_REGION( 0x1000000, "gfx", 0 )
+	ROM_LOAD( "v-104cn.u33", 0x000000, 0x800000, CRC(cd8a1633) SHA1(2f63167fe282fc648d9e22c6a32d593f41546ba3) )
+	ROM_LOAD( "v-104cn.u34", 0x800000, 0x800000, CRC(cb33469a) SHA1(cf2c52ccc688880574452bc806b80519eeff0298) )
+ROM_END
+
+
+ROM_START( xyddz )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	// Internal ROM of IGS036 ARM based MCU
+	ROM_LOAD( "jhzb_igs036", 0x0000, 0x4000, NO_DUMP ) // stickered K8
+
+	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU)
+	ROM_LOAD( "xa", 0x00000, 0x10000, NO_DUMP )
+
+	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "xyddz.u18", 0x000000, 0x200000, CRC(5c569b88) SHA1(760bb48bb4739ae6f34921b8ed499174a8960001) )
+
+	ROM_REGION( 0x800000, "tt5665", 0 ) // samples
+	ROM_LOAD( "m2401.u27", 0x000000, 0x800000, CRC(cfaa177a) SHA1(b1ba246a51c6ec451bcd04392460f7a7ccb75cda) )
+
+	ROM_REGION( 0x1000000, "gfx", 0 )
+	ROM_LOAD( "m2403-cg0-l.u30", 0x000000, 0x800000, CRC(3065ee91) SHA1(9bb1a0a739c244513f7785305aff13c9314a5d16) )
+	ROM_LOAD( "s2402-cg0-h.u28", 0x800000, 0x800000, CRC(b0f43dd4) SHA1(5d82fdf3bd5eef1791e7204a040ede06c6028187) )
+ROM_END
+
+
 void igs_m036_state::pgm_create_dummy_internal_arm_region(void)
 {
 	uint16_t *temp16 = (uint16_t *)memregion("maincpu")->base();
@@ -557,25 +657,35 @@ void igs_m036_state::init_igsm312()
 
 ***************************************************************************/
 
-GAME( 200?, cjdh2,    0,     igs_m036,    igs_m036, igs_m036_state, init_cjdh2,   ROT0, "IGS",           "Chao Ji Da Heng 2 (V311CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 200?, cjdh2a,   cjdh2, igs_m036,    igs_m036, igs_m036_state, init_cjdh2,   ROT0, "IGS",           "Chao Ji Da Heng 2 (V311CNA)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 200?, cjdh2b,   cjdh2, igs_m036,    igs_m036, igs_m036_state, init_cjdh2,   ROT0, "IGS",           "Chao Ji Da Heng 2 (V311CNB)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 200?, cjdh2c,   cjdh2, igs_m036,    igs_m036, igs_m036_state, init_cjdh2,   ROT0, "IGS",           "Chao Ji Da Heng 2 (V215CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, cjdh2,    0,     igs_m036,    igs_m036, igs_m036_state, init_cjdh2,    ROT0, "IGS",           "Chao Ji Da Heng 2 (V311CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, cjdh2a,   cjdh2, igs_m036,    igs_m036, igs_m036_state, init_cjdh2,    ROT0, "IGS",           "Chao Ji Da Heng 2 (V311CNA)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, cjdh2b,   cjdh2, igs_m036,    igs_m036, igs_m036_state, init_cjdh2,    ROT0, "IGS",           "Chao Ji Da Heng 2 (V311CNB)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, cjdh2c,   cjdh2, igs_m036,    igs_m036, igs_m036_state, init_cjdh2,    ROT0, "IGS",           "Chao Ji Da Heng 2 (V215CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-GAME( 200?, cjddzsp,  0,     igs_m036_tt, igs_m036, igs_m036_state, init_cjddzsp, ROT0, "IGS",           "Super Dou Di Zhu Special (V122CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, cjddzsp,  0,     igs_m036_tt, igs_m036, igs_m036_state, init_cjddzsp,  ROT0, "IGS",           "Super Dou Di Zhu Special (V122CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-GAME( 2007, qhzb,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_cjddzsp, ROT0, "IGS",           "Que Huang Zheng Ba (V100CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2007, qhzb,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_cjddzsp,  ROT0, "IGS",           "Que Huang Zheng Ba (V100CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-GAME( 2009, lhtb,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_cjddzsp, ROT0, "IGS",           "Long Hu Tebie Ban (V101CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // 龍虎特別版 - Lónghǔ tèbié bǎn
+GAME( 2009, lhtb,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_cjddzsp,  ROT0, "IGS",           "Long Hu Tebie Ban (V101CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // 龍虎特別版 - Lónghǔ tèbié bǎn
 
-GAME( 200?, lhzb3in1, 0,     igs_m036_tt, igs_m036, igs_m036_state, init_cjddzsp, ROT0, "IGS",           "Long Hu Zhengba San He Yi (V100CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // 龙虎争霸三合一
+GAME( 200?, lhzb3in1, 0,     igs_m036_tt, igs_m036, igs_m036_state, init_cjddzsp,  ROT0, "IGS",           "Long Hu Zhengba San He Yi (V100CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // 龙虎争霸三合一
 
-GAME( 200?, igsm312,  0,     igs_m036_tt, igs_m036, igs_m036_state, init_igsm312, ROT0, "IGS",           "unknown 'IGS 6POKER2' game (V312CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // there's very little code and no gfx ROMs, might be a 'set/clear' chip for a gambling game.
+GAME( 200?, igsm312,  0,     igs_m036_tt, igs_m036, igs_m036_state, init_igsm312,  ROT0, "IGS",           "unknown 'IGS 6POKER2' game (V312CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // there's very little code and no gfx ROMs, might be a 'set/clear' chip for a gambling game.
 
-GAME( 200?, super70s, 0,     igs_m036_tt, igs_m036, igs_m036_state, init_igsm312, ROT0, "IGS",           "Super 70's (V100US)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, super70s, 0,     igs_m036_tt, igs_m036, igs_m036_state, init_igsm312,  ROT0, "IGS",           "Super 70's (V100US)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-GAME( 2010, lhfy,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_igsm312, ROT0, "IGS",           "Long Hu Feng Yun Gao Qing Ban (V206CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, jhzb,     0,     igs_m036,    igs_m036, igs_m036_state, init_igs_m036, ROT0, "IGS",           "Jin Hua Zheng Ba (V113CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // 金花争霸
 
-GAME( 2010, lhzbgqb,  0,     igs_m036_tt, igs_m036, igs_m036_state, init_igsm312, ROT0, "IGS",           "Long Hu Zheng Ba Gao Qing Ban (V105CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, jxry,     0,     igs_m036,    igs_m036, igs_m036_state, init_igs_m036, ROT0, "IGS",           "Ji Xiang Ru Yi (V116CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // 吉祥如意
 
-GAME( 2015, mghammer, 0,     igs_m036_tt, igs_m036, igs_m036_state, init_igsm312, ROT0, "IGS / Enheart", "Medal Get Hammer (V100JP)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, slqzsp,   0,     igs_m036_tt, igs_m036, igs_m036_state, init_igs_m036, ROT0, "IGS",           "Shuang Long Qiang Zhu Te Bie Ban (V104CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // 双龙抢珠特别版
+
+GAME( 200?, sydh,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_igs_m036, ROT0, "IGS",           "Sha Yu Da Heng (V104CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // 鲨鱼大亨
+
+GAME( 200?, xyddz,    0,     igs_m036_tt, igs_m036, igs_m036_state, init_igs_m036, ROT0, "IGS",           "Xiao Yao Dou Di Zhu", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // 逍遥斗地主
+
+GAME( 2010, lhfy,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_igsm312,  ROT0, "IGS",           "Long Hu Feng Yun Gao Qing Ban (V206CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+
+GAME( 2010, lhzbgqb,  0,     igs_m036_tt, igs_m036, igs_m036_state, init_igsm312,  ROT0, "IGS",           "Long Hu Zheng Ba Gao Qing Ban (V105CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+
+GAME( 2015, mghammer, 0,     igs_m036_tt, igs_m036, igs_m036_state, init_igsm312,  ROT0, "IGS / Enheart", "Medal Get Hammer (V100JP)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -38,14 +38,8 @@ public:
 	virtual void cts_in_w(int state) {}
 
 	// optional SigmaSet operations
-	virtual void sigma_ctrl_w(u8 data) {}
-	virtual u8 sigma_ctrl_r() { return 0x00; }
-	virtual u8 sigma_video_mem_r() { return 0x00; }
-	virtual void sigma_video_mem_w(u8 val) {}
-	virtual void sigma_io_lo_addr_w(u8 val) {}
-	virtual void sigma_io_hi_addr_w(u8 val) {}
-	virtual void sigma_window_lo_addr_w(u8 val) {}
-	virtual void sigma_window_hi_addr_w(u8 val) {}
+	virtual void sigma_w(u8 offset, u8 data) {}
+	virtual u8 sigma_r(u8 offset) { return 0x00; }
 
 protected:
 	device_heath_tlb_card_interface(const machine_config &mconfig, device_t &device);
@@ -220,9 +214,14 @@ public:
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	void mem_map(address_map &map) ATTR_COLD;
+
+	required_memory_region m_maincpu_region;
+	required_shared_ptr<u8> m_page_2_ram;
+	memory_view m_mem_view;
 };
 
 /**
@@ -312,26 +311,31 @@ class heath_igc_tlb_device : public heath_tlb_device
 public:
 	heath_igc_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	virtual void sigma_ctrl_w(u8 data) override;
-	virtual u8 sigma_ctrl_r() override;
-
-	virtual u8 sigma_video_mem_r() override;
-	virtual void sigma_video_mem_w(u8 val) override;
-
-	virtual void sigma_io_lo_addr_w(u8 val) override;
-	virtual void sigma_io_hi_addr_w(u8 val) override;
-
-	virtual void sigma_window_lo_addr_w(u8 val) override;
-	virtual void sigma_window_hi_addr_w(u8 val) override;
+	virtual void sigma_w(u8 offset, u8 data) override;
+	virtual u8 sigma_r(u8 offset) override;
 
 protected:
 	heath_igc_tlb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock = 0);
 
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual MC6845_UPDATE_ROW(crtc_update_row) override;
+
+	virtual void sigma_ctrl_w(u8 data);
+	virtual u8 sigma_ctrl_r();
+
+	u8 sigma_video_mem_r();
+	void sigma_video_mem_w(u8 val);
+
+	void sigma_io_lo_addr_w(u8 val);
+	void sigma_io_hi_addr_w(u8 val);
+
+	void sigma_window_lo_addr_w(u8 val);
+	void sigma_window_hi_addr_w(u8 val);
+
 
 	std::unique_ptr<u8[]>   m_p_graphic_ram;
 
@@ -348,6 +352,9 @@ protected:
 
 	u16                     m_io_address;
 	u16                     m_window_address;
+private:
+	required_ioport m_joystick1, m_joystick2;
+
 };
 
 /**
@@ -374,9 +381,14 @@ public:
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	void mem_map(address_map &map) ATTR_COLD;
+
+	required_memory_region m_maincpu_region;
+	required_shared_ptr<u8> m_page_2_ram;
+	memory_view m_mem_view;
 };
 
 /**
@@ -447,17 +459,8 @@ public:
 	void reset_out(int data) { m_reset(data); }
 
 	// optional SigmaSet IGC operations
-	u8 sigma_ctrl_r() { return (m_tlb) ? m_tlb->sigma_ctrl_r() : 0x00; }
-	void sigma_ctrl_w(u8 data) { if (m_tlb) m_tlb->sigma_ctrl_w(data); }
-
-	u8 sigma_video_mem_r() { return (m_tlb) ? m_tlb->sigma_video_mem_r() : 0x00; }
-	void sigma_video_mem_w(u8 val) { if (m_tlb) m_tlb->sigma_video_mem_w(val); }
-
-	void sigma_io_lo_addr_w(u8 val) { if (m_tlb) m_tlb->sigma_io_lo_addr_w(val); }
-	void sigma_io_hi_addr_w(u8 val) { if (m_tlb) m_tlb->sigma_io_hi_addr_w(val); }
-
-	void sigma_window_lo_addr_w(u8 val) { if (m_tlb) m_tlb->sigma_window_lo_addr_w(val); }
-	void sigma_window_hi_addr_w(u8 val) { if (m_tlb) m_tlb->sigma_window_hi_addr_w(val); }
+	u8 sigma_r(u8 offset) { return (m_tlb) ? m_tlb->sigma_r(offset) : 0x00; }
+	void sigma_w(u8 offset, u8 data) { if (m_tlb) m_tlb->sigma_w(offset, data); }
 
 protected:
 	virtual void device_start() override ATTR_COLD;

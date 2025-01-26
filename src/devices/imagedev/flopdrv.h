@@ -9,10 +9,6 @@
 
 #include "formats/flopimg_legacy.h"
 
-#define FLOPPY_TYPE_REGULAR 0
-#define FLOPPY_TYPE_APPLE   1
-#define FLOPPY_TYPE_SONY    2
-
 #define FLOPPY_DRIVE_2_8_INCH   1
 #define FLOPPY_DRIVE_3_INCH     2
 #define FLOPPY_DRIVE_3_5_INCH   3
@@ -116,46 +112,31 @@ public:
 	virtual const char *image_brief_type_name() const noexcept override { return "flop"; }
 	virtual const util::option_guide &create_option_guide() const override { return floppy_option_guide(); }
 
-	floppy_image_legacy *flopimg_get_image();
-	void floppy_drive_set_geometry(floppy_type_t type);
-	void floppy_drive_set_flag_state(int flag, int state);
 	void floppy_drive_set_ready_state(int state, int flag);
 	int floppy_drive_get_flag_state(int flag);
 	void floppy_drive_seek(signed int signed_tracks);
-	int floppy_drive_get_next_id(int side, chrn_id *id);
-	void floppy_drive_read_track_data_info_buffer(int side, void *ptr, int *length );
-	void floppy_drive_write_track_data_info_buffer(int side, const void *ptr, int *length );
-	void floppy_drive_format_sector(int side, int sector_index,int c,int h, int r, int n, int filler);
 	void floppy_drive_read_sector_data(int side, int index1, void *ptr, int length);
 	void floppy_drive_write_sector_data(int side, int index1, const void *ptr,int length, int ddam);
 	void floppy_install_load_proc(void (*proc)(device_image_interface &image, bool is_created));
 	void floppy_install_unload_proc(void (*proc)(device_image_interface &image));
-	void floppy_drive_set_index_pulse_callback(void (*callback)(device_t *controller,device_t *image, int state));
 	int floppy_drive_get_current_track();
-	uint64_t floppy_drive_get_current_track_size(int head);
 	void floppy_drive_set_rpm(float rpm);
 	void floppy_drive_set_controller(device_t *controller);
-	int floppy_get_drive_type();
-	void floppy_set_type(int ftype);
 	void floppy_ds_w(int state);
 	void floppy_mon_w(int state);
 	void floppy_drtn_w(int state);
-	void floppy_wtd_w(int state);
 	void floppy_stp_w(int state);
 	void floppy_wtg_w(int state);
-	int floppy_wpt_r();
 	int floppy_tk00_r();
-	int floppy_dskchg_r();
-	int floppy_twosid_r();
 	int floppy_index_r();
 	int floppy_ready_r();
 
 
 private:
-	int flopimg_get_sectors_per_track(int side);
-	void flopimg_get_id_callback(chrn_id *id, int id_index, int side);
 	void log_readwrite(const char *name, int head, int track, int sector, const char *buf, int length);
+	void floppy_drive_set_flag_state(int flag, int state);
 	void floppy_drive_set_geometry_absolute(int tracks, int sides);
+	void floppy_drive_set_geometry(floppy_type_t type);
 	TIMER_CALLBACK_MEMBER(floppy_drive_index_callback);
 	void floppy_drive_init();
 	void floppy_drive_index_func();
@@ -185,7 +166,6 @@ protected:
 	int m_idx;  /* index pulse */
 	int m_tk00; /* track 00 */
 	int m_wpt;  /* write protect */
-	int m_rdy;  /* ready */
 	int m_dskchg;     /* disk changed */
 
 	/* drive select logic */
@@ -211,7 +191,6 @@ protected:
 	float m_rpm;
 
 	emu_timer *m_wpt_timer;
-	int m_id_index;
 
 	device_t *m_controller;
 
@@ -219,7 +198,6 @@ protected:
 	int m_track;
 	void (*m_load_proc)(device_image_interface &image, bool is_created);
 	void (*m_unload_proc)(device_image_interface &image);
-	int m_floppy_drive_type;
 
 	char            m_extension_list[256];
 };

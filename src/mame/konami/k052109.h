@@ -51,6 +51,7 @@ public:
 	int get_rmrd_line();
 	void tilemap_update();
 	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tmap_num, uint32_t flags, uint8_t priority);
+	void mark_tilemap_dirty(uint8_t tmap_num);
 
 	void vblank_callback(screen_device &screen, bool state);
 
@@ -64,7 +65,7 @@ protected:
 
 private:
 	// internal state
-	std::unique_ptr<uint8_t[]>   m_ram;
+	std::unique_ptr<uint8_t[]> m_ram;
 	uint8_t    *m_videoram_F;
 	uint8_t    *m_videoram_A;
 	uint8_t    *m_videoram_B;
@@ -76,7 +77,7 @@ private:
 	uint8_t    *m_colorram_B;
 
 	tilemap_t  *m_tilemap[3];
-	int      m_tileflip_enable;
+	uint8_t    m_tileflip_enable;
 	uint8_t    m_charrombank[4];
 	uint8_t    m_charrombank_2[4];
 	uint8_t    m_has_extra_video_ram;

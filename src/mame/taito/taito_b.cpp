@@ -232,17 +232,6 @@ B72-10.IC32 - MMI PAL16L8
       HSync - 15.1782kHz \
       VSync - 60.00000Hz / <-- actual measurements on PCB
 
-***************************************************************************
-
-Real Puncher
-Taito, 1994
-
-PCB Layout
-----------
-
-TODO!
-
-
 ***************************************************************************/
 
 #include "emu.h"
@@ -3282,7 +3271,7 @@ ROM_START( qzshowby )
 	ROM_LOAD16_BYTE( "d72-12.bin", 0x00001, 0x80000, CRC(522c09a7) SHA1(2ceeb7ac24bb621630cc996381e57501f9ea672e) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )     /* 128k for Z80 code */
-	ROM_LOAD(  "d72-11.bin", 0x00000, 0x20000, CRC(2ca046e2) SHA1(983620e657d729e1441d509f18141bb3bb581855) )
+	ROM_LOAD( "d72-11.bin", 0x00000, 0x20000, CRC(2ca046e2) SHA1(983620e657d729e1441d509f18141bb3bb581855) )
 
 	ROM_REGION( 0x400000, "tc0180vcu", 0 )
 	ROM_LOAD( "d72-03.bin", 0x000000, 0x200000, CRC(1de257d0) SHA1(df03b1fb5cd69e2d2eb2088f96f26b0ea9756fb7) )
@@ -3308,9 +3297,11 @@ ROM_START( viofight )
 	ROM_LOAD16_BYTE( "c16-06.22", 0x40001, 0x20000, CRC(043761d8) SHA1(4587cadd73b628b4b9ac5c537cec20f90fb4959d) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 128k for Z80 code */
-	ROM_LOAD(  "c16-12.32", 0x00000, 0x10000, CRC(6fb028c7) SHA1(a808d82e872914f994652e95dca3fcad00ba02fc) )
+	ROM_LOAD( "c16-12.32", 0x00000, 0x10000, CRC(6fb028c7) SHA1(a808d82e872914f994652e95dca3fcad00ba02fc) )
 
 	ROM_REGION( 0x200000, "tc0180vcu", 0 )
+	// ROM dumps are confirmed good. Some bad GFX (MAME gfxdecode: 0000,0001, 1000,1001, 2000,2001, 3000,3001).
+	// See 3rd stage tiger fight background for example, see MT8048 for more information.
 	ROM_LOAD( "c16-01.1", 0x000000, 0x080000, CRC(7059ce83) SHA1(1e6825ab944254cd4ba6574762172245b3352319) )
 	ROM_LOAD( "c16-02.2", 0x080000, 0x080000, CRC(b458e905) SHA1(b712cbf4a4015e1fc2243871fe753e230f0172c2) )
 	ROM_LOAD( "c16-03.3", 0x100000, 0x080000, CRC(515a9431) SHA1(836be28614326d093be8841617cca83cef8d55cc) )
@@ -3332,7 +3323,7 @@ ROM_START( viofightu )
 	ROM_LOAD16_BYTE( "c16-06.22", 0x40001, 0x20000, CRC(043761d8) SHA1(4587cadd73b628b4b9ac5c537cec20f90fb4959d) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 128k for Z80 code */
-	ROM_LOAD(  "c16-12.32", 0x00000, 0x10000, CRC(6fb028c7) SHA1(a808d82e872914f994652e95dca3fcad00ba02fc) )
+	ROM_LOAD( "c16-12.32", 0x00000, 0x10000, CRC(6fb028c7) SHA1(a808d82e872914f994652e95dca3fcad00ba02fc) )
 
 	ROM_REGION( 0x200000, "tc0180vcu", 0 )
 	ROM_LOAD( "c16-01.1", 0x000000, 0x080000, CRC(7059ce83) SHA1(1e6825ab944254cd4ba6574762172245b3352319) )
@@ -3356,7 +3347,7 @@ ROM_START( viofightj )
 	ROM_LOAD16_BYTE( "c16-06.22", 0x40001, 0x20000, CRC(043761d8) SHA1(4587cadd73b628b4b9ac5c537cec20f90fb4959d) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 128k for Z80 code */
-	ROM_LOAD(  "c16-12.32", 0x00000, 0x10000, CRC(6fb028c7) SHA1(a808d82e872914f994652e95dca3fcad00ba02fc) )
+	ROM_LOAD( "c16-12.32", 0x00000, 0x10000, CRC(6fb028c7) SHA1(a808d82e872914f994652e95dca3fcad00ba02fc) )
 
 	ROM_REGION( 0x200000, "tc0180vcu", 0 )
 	ROM_LOAD( "c16-01.1", 0x000000, 0x080000, CRC(7059ce83) SHA1(1e6825ab944254cd4ba6574762172245b3352319) )
@@ -3462,7 +3453,7 @@ ROM_START( silentd ) /* Silkscreened PCB number ET910000B */
 	ROM_LOAD16_BYTE( "east-09.ic9",    0x40001, 0x20000, CRC(2f05b14a) SHA1(f9ae935612e95d8ac2596af1728a6062569e9a42) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 64k for Z80 code */
-	ROM_LOAD(  "east-13.ic15", 0x00000, 0x10000, CRC(651861ab) SHA1(f94a120b70a4d59e17a6e120ca461b1f37587c0c) )
+	ROM_LOAD( "east-13.ic15", 0x00000, 0x10000, CRC(651861ab) SHA1(f94a120b70a4d59e17a6e120ca461b1f37587c0c) )
 
 	ROM_REGION( 0x400000, "tc0180vcu", 0 )
 	ROM_LOAD( "east-04.ic28", 0x000000, 0x100000, CRC(53237217) SHA1(fec044c26b8c99235f88c8be0d9ac63b81a3a094) )
@@ -3485,7 +3476,7 @@ ROM_START( silentdj ) /* Silkscreened PCB number ET910000B */
 	ROM_LOAD16_BYTE( "east-09.ic9",    0x40001, 0x20000, CRC(2f05b14a) SHA1(f9ae935612e95d8ac2596af1728a6062569e9a42) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 64k for Z80 code */
-	ROM_LOAD(  "east-13.ic15", 0x00000, 0x10000, CRC(651861ab) SHA1(f94a120b70a4d59e17a6e120ca461b1f37587c0c) )
+	ROM_LOAD( "east-13.ic15", 0x00000, 0x10000, CRC(651861ab) SHA1(f94a120b70a4d59e17a6e120ca461b1f37587c0c) )
 
 	ROM_REGION( 0x400000, "tc0180vcu", 0 )
 	ROM_LOAD( "east-04.ic28", 0x000000, 0x100000, CRC(53237217) SHA1(fec044c26b8c99235f88c8be0d9ac63b81a3a094) )
@@ -3508,7 +3499,7 @@ ROM_START( silentdu ) /* Dumped from an original Taito PCB (ET910000B) */
 	ROM_LOAD16_BYTE( "east-09.ic9",    0x40001, 0x20000, CRC(2f05b14a) SHA1(f9ae935612e95d8ac2596af1728a6062569e9a42) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 64k for Z80 code */
-	ROM_LOAD(  "east-13.ic15", 0x00000, 0x10000, CRC(651861ab) SHA1(f94a120b70a4d59e17a6e120ca461b1f37587c0c) )
+	ROM_LOAD( "east-13.ic15", 0x00000, 0x10000, CRC(651861ab) SHA1(f94a120b70a4d59e17a6e120ca461b1f37587c0c) )
 
 	ROM_REGION( 0x400000, "tc0180vcu", 0 )
 	ROM_LOAD( "east-04.ic28", 0x000000, 0x100000, CRC(53237217) SHA1(fec044c26b8c99235f88c8be0d9ac63b81a3a094) )

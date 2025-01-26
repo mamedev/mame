@@ -181,15 +181,6 @@ void gx400_base_state::charram_w(offs_t offset, uint16_t data, uint16_t mem_mask
 }
 
 
-void gx400_base_state::device_post_load()
-{
-	for (int i = 0; i < 8; i++)
-	{
-		m_gfxdecode->gfx(i)->mark_all_dirty();
-	}
-}
-
-
 void gx400_base_state::video_start()
 {
 	m_spriteram_words = m_spriteram.bytes() / 2;

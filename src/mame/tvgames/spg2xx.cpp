@@ -485,6 +485,73 @@ static INPUT_PORTS_START( spg2xx ) // base structure for easy debugging / figuri
 	PORT_DIPSETTING(      0x8000, "8000" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( epo_tetr ) // all inputs verified against hidden test mode
+	PORT_INCLUDE( spg2xx )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 A")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 B")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 L")
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P1 R")
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0xfc00, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("P3")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("EXTRA")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 L")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 R")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 B")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 A")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( dmbtjunc )
+	PORT_INCLUDE( spg2xx )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Red")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Green")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 Blue")
+	// there's a 2nd set of buttons for P2, where do they map?
+	// battery state is likely in here too
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( ban_krkk )
+	// inputs shown in hidden text mode, although it refers to the physical placement of the each button on the mat rather than the colours / symbols
+	PORT_INCLUDE( spg2xx )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Blue/Top-Left")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Yellow/Top-Right")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Red/Bottom-Left")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("P1 Green/Bottom-Right")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("P1 Select")
+
+	PORT_MODIFY("P3")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Blue/Top-Left")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Yellow/Top-Right")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Red/Bottom-Left")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 Green/Bottom-Right")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2) PORT_NAME("P2 Select")
+
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_CUSTOM ) // Battery State
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( drumsups )
 	PORT_INCLUDE( spg2xx )
 
@@ -495,7 +562,6 @@ static INPUT_PORTS_START( drumsups )
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Drum pad 3: Purple")
 	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Drum pad 4: Red")
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Drum pad 5: Green")
-
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( lexiart )
@@ -2111,6 +2177,80 @@ void spg2xx_game_doraphone_state::doraphonep(machine_config &config)
 	m_screen->set_refresh_hz(50);
 }
 
+
+void epo_tetr_game_state::machine_start()
+{
+	spg2xx_game_state::machine_start();
+
+	save_item(NAME(m_old_portb_data));
+	save_item(NAME(m_old_portb_extra_latch));
+}
+
+void epo_tetr_game_state::machine_reset()
+{
+	spg2xx_game_state::machine_reset();
+
+	m_old_portb_data = 0;
+	m_old_portb_extra_latch = 0;
+}
+
+uint16_t epo_tetr_game_state::epo_tetr_r(offs_t offset, uint16_t mem_mask)
+{
+	uint16_t data = 0;
+
+	int eeprom = m_i2cmem->read_sda();
+	data |= (eeprom << 1);
+
+	int p2 = m_old_portb_extra_latch & 1;
+	data |= (p2 << 6);
+
+	if (!machine().side_effects_disabled())
+		logerror("%s: epo_tetr_r: %04x (%04x)\n", machine().describe_context(), data, mem_mask);
+
+	return data;
+}
+
+void epo_tetr_game_state::epo_tetr_portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	portb_w(offset, data, mem_mask);
+
+	if (BIT(mem_mask, 0))
+		m_i2cmem->write_scl(BIT(data, 0));
+	if (BIT(mem_mask, 1))
+		m_i2cmem->write_sda(BIT(data, 1));
+
+	if (BIT(mem_mask, 4))
+	{
+		if ((BIT(data, 4)) && (!(BIT(m_old_portb_data, 4))))
+		{
+			m_old_portb_extra_latch = m_ioextra->read();
+		}
+	}
+
+	if (BIT(mem_mask, 5))
+	{
+		if ((BIT(data, 5)) && (!(BIT(m_old_portb_data, 5))))
+		{
+			m_old_portb_extra_latch >>= 1;
+		}
+	}
+
+	m_old_portb_data = data;
+}
+
+
+void epo_tetr_game_state::epo_tetr(machine_config& config)
+{
+	spg2xx(config);
+
+	I2C_24C02(config, "i2cmem", 0); // S24CS02A
+
+	m_maincpu->portb_in().set(FUNC(epo_tetr_game_state::epo_tetr_r));
+	m_maincpu->portb_out().set(FUNC(epo_tetr_game_state::epo_tetr_portb_w));
+}
+
+
+
 void spg2xx_game_ddr33v_state::init_ddr33v()
 {
 	// what is this checking? timer? battery state? protection? it goes to a blank screen after the boot logo otherwise
@@ -2333,6 +2473,11 @@ ROM_START( wfcentro )
 	ROM_LOAD16_WORD_SWAP( "winfuncentro.bin", 0x000000, 0x800000, CRC(fd6ad052) SHA1(78af844729bf4843dc70531349e38a8c25caf748) )
 ROM_END
 
+ROM_START( wfart )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "artstudio.bin", 0x000000, 0x800000, CRC(f5fd657e) SHA1(0005826a5b22a17cafffaf7328092c8d84217398) )
+ROM_END
+
 ROM_START( lexiart )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "lexibookartstudio.u3", 0x000000, 0x800000, CRC(fc417abb) SHA1(c0a18a2cf11c47086722f0ec88410614fed7c6f7) )
@@ -2380,6 +2525,22 @@ ROM_START( anpantv )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "anpanman_tv.bin", 0x000000, 0x800000, CRC(5e32dc1a) SHA1(bae260ffc56f5315cdafd5bc40966ec6d31e267f) )
 ROM_END
+
+ROM_START( dmbtjunc )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "battlejunction.u3", 0x000000, 0x800000, CRC(31471c53) SHA1(94fdd8c4c67914054e304a55042c10710af2e596) )
+ROM_END
+
+ROM_START( ban_krkk )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "quiz.bin", 0x000000, 0x400000, CRC(6f51180a) SHA1(38017ecaae4eead38482aeb04c90b5a5eeebd6ca) )
+ROM_END
+
+ROM_START( epo_tetr )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "mx29lv320mb.bin", 0x000000, 0x400000, CRC(b4ad30e0) SHA1(83e30e199854c647f9a197562d1bf1f3bc847fff) )
+ROM_END
+
 
 ROM_START( prail )
 	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASE00 )
@@ -2549,7 +2710,8 @@ CONS( 2006, hotwhl2p,   0,        0, hotwheels, hotwheels, spg2xx_game_hotwheels
 CONS( 2007, ordentv,    0,        0, ordentv,   ordentv,   spg2xx_game_ordentv_state,  init_ordentv,  "Taikee / V-Tac",                                         "Ordenador-TV (Spain)",                                                  MACHINE_NOT_WORKING )
 CONS( 2007, jeuint,     ordentv,  0, ordentv,   ordentv,   spg2xx_game_ordentv_state,  init_jeuint,   "Taikee / V-Tac",                                         u8"Jeu Intéractif TV (France)",                                          MACHINE_NOT_WORKING)
 
-CONS( 200?, wfcentro,   0,        0, wfcentro,  spg2xx,    spg2xx_game_wfcentro_state, empty_init,    "WinFun",                                                 "Centro TV de Diseno Artistico (Spain)",                                 MACHINE_NOT_WORKING )
+CONS( 200?, wfart,      0,        0, wfcentro,  spg2xx,    spg2xx_game_wfcentro_state, empty_init,    "WinFun",                                                 "TV Art Design Center",                                                  MACHINE_NOT_WORKING )
+CONS( 200?, wfcentro,   wfart,    0, wfcentro,  spg2xx,    spg2xx_game_wfcentro_state, empty_init,    "WinFun",                                                 "Centro TV de Diseno Artistico (Spain)",                                 MACHINE_NOT_WORKING )
 
 CONS( 200?, lexiart,    0,        0, lexiart,   lexiart,   spg2xx_game_lexiart_state,  empty_init,    "Lexibook",                                               "Lexibook Junior My 1st Drawing Studio",                                 MACHINE_NOT_WORKING )
 
@@ -2567,6 +2729,21 @@ CONS( 2008, ddr33v,     0,        0, spg2xx,    ddr33v,    spg2xx_game_ddr33v_st
 
 // PCB has 'Anpanman TV 2006 Ver 1.4' printed on it, ROM has SPG260 header.  Uses custom built-in keyboard, no display built into the unit.
 CONS( 2006, anpantv,    0,        0, spg2xx,    spg2xx,    spg2xx_game_state,          empty_init,    "Bandai",                                                "Anpanman TV (Japan)",                                                   MACHINE_NOT_WORKING )
+
+// Has an AT24C08, not currently hooked up (probably for storing database unlocks)
+//
+// There is also a card reader/scanner which can read barcodes from Digimon cards
+// and IR connectivity which allowed for data exchange with various services using
+// an external device, including transfering characters to/from an arcade game.
+// Neither is currently emulated
+//
+// Will report 'ERROR' sometimes, maybe as a result of these not being hooked up.
+CONS( 2006, dmbtjunc,   0,        0, spg2xx,    dmbtjunc,  spg2xx_game_state,          empty_init,    "Bandai",                                                "Let's! TV Play Digital Monster Battle Junction (Japan)",                MACHINE_NOT_WORKING )
+
+// Let's!TVプレイ 脳と体を鍛える 体感頭脳ファミリーマットレ  - Let's! TV Play branding appears on the box
+CONS( 2006, ban_krkk,   0,        0, spg2xx,    ban_krkk,  spg2xx_game_state,          init_crc,      "Bandai",                                                "Let's! TV Play Nou to Karada o Kitaeru Taikan Zunou Family Mattore (Japan)", MACHINE_IMPERFECT_SOUND )
+
+CONS( 2007, epo_tetr,   0,        0, epo_tetr,  epo_tetr,  epo_tetr_game_state,          empty_init,    "Epoch",                                                "Minna no Tetris (Japan)", MACHINE_IMPERFECT_SOUND )
 
 // Train Game V1.4 2012-08-15 on PCB. SPG243 headers in each chunk.
 // Last few bytes of SEEPROM have 'JUNGT' in them, is this developed by JungleSoft/JungleTac?

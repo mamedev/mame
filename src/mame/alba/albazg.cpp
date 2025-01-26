@@ -118,11 +118,10 @@ TILE_GET_INFO_MEMBER(albazg_state::get_tile_info)
 	const u16 code = m_video_ram[tile_index] | ((attr & 0xf8) << 3);
 
 	tileinfo.set(
-		0,
-		code,
-		attr & 0x7,
-		0
-	);
+			0,
+			code,
+			attr & 0x7,
+			0);
 }
 
 

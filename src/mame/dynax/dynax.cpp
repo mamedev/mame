@@ -1944,7 +1944,7 @@ static INPUT_PORTS_START( hjingi )
 //  PORT_DIPSETTING(    0x00, DEF_STR( ) )
 	PORT_DIPNAME( 0x08, 0x08, "Payout Variation" )           PORT_DIPLOCATION("DIPSW 2:4")        // 配当の波
 	PORT_DIPSETTING(    0x00, "Small" )                                                           // 小さい
-	PORT_DIPSETTING(    0x08, "Big" )                                                             // 大きい
+	PORT_DIPSETTING(    0x08, "Large" )                                                           // 大きい
 	PORT_DIPNAME( 0x10, 0x10, "Double-Up Game Payout Rate" ) PORT_DIPLOCATION("DIPSW 2:5")        // ＷＵＰゲーム配当率
 	PORT_DIPSETTING(    0x00, DEF_STR(Low) )                                                      // 低い
 	PORT_DIPSETTING(    0x10, DEF_STR(High) )                                                     // 高い
@@ -3035,7 +3035,7 @@ static INPUT_PORTS_START( mjelct3 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2")  /* 7c22 (select = 80) */
-	MAHJONG_YAKUMAN_BONUS(0, "SW2:1,2,3")
+	MAHJONG_YAKUMAN_BONUS(0, 0x04, "SW2:1,2,3")
 	PORT_DIPNAME( 0x08, 0x08, "Yakuman Bonuses Per Cycle" )    PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x08, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
@@ -3162,7 +3162,7 @@ static INPUT_PORTS_START( mjelctrn )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2")  /* 7c22 (select = 80) */
-	MAHJONG_YAKUMAN_BONUS(0, "SW2:1,2,3")
+	MAHJONG_YAKUMAN_BONUS(0, 0x04, "SW2:1,2,3")
 	PORT_DIPNAME( 0x08, 0x08, "Yakuman Bonuses Per Cycle" )    PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x08, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
@@ -3254,7 +3254,7 @@ static INPUT_PORTS_START( majxtal7 )
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )
 
 	PORT_START("DSW2") /* select = 80 */
-	MAHJONG_YAKUMAN_BONUS(0, "DIP3:1,2,3")
+	MAHJONG_YAKUMAN_BONUS(0, 0x04, "DIP3:1,2,3")
 	PORT_DIPNAME( 0x08, 0x08, "Yakuman Bonuses Per Cycle" )    PORT_DIPLOCATION("DIP3:4")
 	PORT_DIPSETTING(    0x08, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
@@ -3428,7 +3428,7 @@ static INPUT_PORTS_START( tenkai )
 	PORT_DIPSETTING(    0x08, "2" )                                                               // レート　２
 	PORT_DIPSETTING(    0x04, "3" )                                                               // レート　３
 	PORT_DIPSETTING(    0x00, "5" )                                                               // レート　５
-	MAHJONG_YAKUMAN_BONUS(4, "SW 2:5,6,7")                                                        // 役満ボーナスの設定周期
+	MAHJONG_YAKUMAN_BONUS(4, 0x04, "SW 2:5,6,7")                                                  // 役満ボーナスの設定周期
 	PORT_DIPNAME( 0x80, 0x00, "Yakuman Bonuses Per Cycle" )     PORT_DIPLOCATION("SW 2:8")        // 役満ボーナスの回数設定周期毎に
 	PORT_DIPSETTING(    0x00, "1" )                                                               // １回
 	PORT_DIPSETTING(    0x80, "2" )                                                               // ２回
@@ -3599,7 +3599,7 @@ static INPUT_PORTS_START( mjreach )
 	PORT_DIPSETTING(    0x08, "2" )                                                                // レート２
 	PORT_DIPSETTING(    0x04, "3" )                                                                // レート３
 	PORT_DIPSETTING(    0x00, "5" )                                                                // レート５
-	MAHJONG_YAKUMAN_BONUS(4, "DIP-SW2:5,6,7")                                                      // 役満ボーナスチャンスの設定周期
+	MAHJONG_YAKUMAN_BONUS(4, 0x04, "DIP-SW2:5,6,7")                                                // 役満ボーナスチャンスの設定周期
 	PORT_DIPNAME( 0x80, 0x00, "Yakuman Bonuses Per Cycle" )     PORT_DIPLOCATION("DIP-SW2:8")      // 役満ボーナスの回数設定周期毎に
 	PORT_DIPSETTING(    0x00, "1" )                                                                // １回
 	PORT_DIPSETTING(    0x80, "2" )                                                                // ２回
@@ -3714,7 +3714,7 @@ static INPUT_PORTS_START( gekisha )
 	PORT_DIPSETTING(    0x00, "Active High" )
 
 	PORT_START("DSW3")  // $7c22
-	MAHJONG_YAKUMAN_BONUS(0, "SW3:1,2,3") // 役満ボーナスの設定
+	MAHJONG_YAKUMAN_BONUS(0, 0x04, "SW3:1,2,3") // 役満ボーナスの設定
 	PORT_DIPNAME( 0x08, 0x08, "Yakuman Bonuses Per Cycle" ) PORT_DIPLOCATION("SW3:4")// 役満ボーナスの回数設定周期毎に
 	PORT_DIPSETTING(    0x08, "1" ) // １回
 	PORT_DIPSETTING(    0x00, "2" ) // ２回

@@ -28,7 +28,7 @@ namespace drc {
 
 class drcbe_x86 : public drcbe_interface
 {
-	typedef uint32_t (*x86_entry_point_func)(x86code *entry);
+	using x86_entry_point_func = uint32_t (*)(x86code *entry);
 
 public:
 	// construction/destruction
@@ -45,7 +45,7 @@ public:
 
 private:
 	// HACK: leftover from x86emit
-	static int const REG_MAX = 16;
+	static inline constexpr int REG_MAX = 16;
 
 	// a be_parameter is similar to a uml::parameter but maps to native registers/memory
 	class be_parameter
@@ -58,7 +58,6 @@ private:
 			PTYPE_IMMEDIATE,                    // immediate; value = sign-extended to 64 bits
 			PTYPE_INT_REGISTER,                 // integer register; value = 0-REG_MAX
 			PTYPE_FLOAT_REGISTER,               // floating point register; value = 0-REG_MAX
-			PTYPE_VECTOR_REGISTER,              // vector register; value = 0-REG_MAX
 			PTYPE_MEMORY,                       // memory; value = pointer to memory
 			PTYPE_MAX
 		};
@@ -68,15 +67,15 @@ private:
 
 		// construction
 		be_parameter() : m_type(PTYPE_NONE), m_value(0) { }
-		be_parameter(be_parameter const &param) : m_type(param.m_type), m_value(param.m_value) { }
 		be_parameter(uint64_t val) : m_type(PTYPE_IMMEDIATE), m_value(val) { }
 		be_parameter(drcbe_x86 &drcbe, const uml::parameter &param, uint32_t allowed);
+		be_parameter(const be_parameter &param) = default;
 
 		// creators for types that don't safely default
-		static inline be_parameter make_ireg(int regnum) { assert(regnum >= 0 && regnum < REG_MAX); return be_parameter(PTYPE_INT_REGISTER, regnum); }
-		static inline be_parameter make_freg(int regnum) { assert(regnum >= 0 && regnum < REG_MAX); return be_parameter(PTYPE_FLOAT_REGISTER, regnum); }
-		static inline be_parameter make_memory(void *base) { return be_parameter(PTYPE_MEMORY, reinterpret_cast<be_parameter_value>(base)); }
-		static inline be_parameter make_memory(const void *base) { return be_parameter(PTYPE_MEMORY, reinterpret_cast<be_parameter_value>(const_cast<void *>(base))); }
+		static be_parameter make_ireg(int regnum) { assert(regnum >= 0 && regnum < REG_MAX); return be_parameter(PTYPE_INT_REGISTER, regnum); }
+		static be_parameter make_freg(int regnum) { assert(regnum >= 0 && regnum < REG_MAX); return be_parameter(PTYPE_FLOAT_REGISTER, regnum); }
+		static be_parameter make_memory(void *base) { return be_parameter(PTYPE_MEMORY, reinterpret_cast<be_parameter_value>(base)); }
+		static be_parameter make_memory(const void *base) { return be_parameter(PTYPE_MEMORY, reinterpret_cast<be_parameter_value>(const_cast<void *>(base))); }
 
 		// operators
 		bool operator==(be_parameter const &rhs) const { return (m_type == rhs.m_type && m_value == rhs.m_value); }

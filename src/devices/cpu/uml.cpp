@@ -86,7 +86,6 @@ using namespace uml;
 #define PTYPES_IMM      (1 << parameter::PTYPE_IMMEDIATE)
 #define PTYPES_IREG     (1 << parameter::PTYPE_INT_REGISTER)
 #define PTYPES_FREG     (1 << parameter::PTYPE_FLOAT_REGISTER)
-#define PTYPES_VREG     (1 << parameter::PTYPE_VECTOR_REGISTER)
 #define PTYPES_MVAR     (1 << parameter::PTYPE_MAPVAR)
 #define PTYPES_MEM      (1 << parameter::PTYPE_MEMORY)
 #define PTYPES_SIZE     (1 << parameter::PTYPE_SIZE)
@@ -429,7 +428,6 @@ void uml::instruction::simplify()
 				case SIZE_WORD:     convert_to_mov_immediate(s16(m_param[1].immediate()));    break;
 				case SIZE_DWORD:    convert_to_mov_immediate(s32(m_param[1].immediate()));    break;
 				case SIZE_QWORD:    convert_to_mov_immediate(s64(m_param[1].immediate()));    break;
-				case SIZE_DQWORD:   fatalerror("Invalid SEXT target size\n");
 				}
 			break;
 

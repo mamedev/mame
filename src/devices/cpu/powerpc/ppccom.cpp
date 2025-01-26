@@ -281,7 +281,7 @@ mpc8240_device::mpc8240_device(const machine_config &mconfig, const char *tag, d
 }
 
 ppc601_device::ppc601_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ppc_device(mconfig, PPC601, tag, owner, clock, 32, 64, PPC_MODEL_601, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_MFIOC | PPCCAP_601BAT, 0/* no TB */, address_map_constructor())
+	: ppc_device(mconfig, PPC601, tag, owner, clock, 32, 64, PPC_MODEL_601, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_MFIOC | PPCCAP_601BAT | PPCCAP_LEGACY_POWER, 0 /* no TB */, address_map_constructor())
 {
 }
 
@@ -727,6 +727,7 @@ void ppc_device::device_start()
 	m_cpu_clock = 0;
 	m_tb_zero_cycles = 0;
 	m_dec_zero_cycles = 0;
+	m_rtc_zero_cycles = 0;
 
 	m_arg1 = 0;
 	m_fastram_select = 0;
@@ -837,6 +838,11 @@ void ppc_device::device_start()
 	state_add(PPC_PC,    "PC", m_core->pc).formatstr("%08X");
 	state_add(PPC_MSR,   "MSR", m_core->msr).formatstr("%08X");
 	state_add(PPC_CR,    "CR", m_debugger_temp).callimport().callexport().formatstr("%08X");
+	// If the legacy POWER instructions exist, that implies MQ is used and should be shown
+	if (m_cap & PPCCAP_LEGACY_POWER)
+	{
+		state_add(PPC_MQ,    "MQ", m_core->spr[SPR601_MQ]).formatstr("%08X");
+	}
 	state_add(PPC_LR,    "LR", m_core->spr[SPR_LR]).formatstr("%08X");
 	state_add(PPC_CTR,   "CTR", m_core->spr[SPR_CTR]).formatstr("%08X");
 	state_add(PPC_XER,   "XER", m_debugger_temp).callimport().callexport().formatstr("%08X");
@@ -1301,8 +1307,6 @@ uint32_t ppc_device::ppccom_translate_address_internal(int intention, bool debug
 			uint32_t lower = m_core->spr[SPROEA_IBAT0U + 2*batnum + 1];
 			int privbit = ((intention & TR_USER) == 0) ? 3 : 2;
 
-//            printf("bat %d upper = %08x privbit %d\n", batnum, upper, privbit);
-
 			// is this pair valid?
 			if (lower & 0x40)
 			{
@@ -1639,6 +1643,29 @@ void ppc_device::ppccom_execute_mfspr()
 		}
 	}
 
+	/* handle 601 specific SPRs (POWER holdovers) */
+	if (m_flavor == PPC_MODEL_601)
+	{
+		switch (m_core->param0)
+		{
+			case SPR601_PWRDEC:
+				m_core->param1 = get_decrementer();
+				return;
+
+			case SPR601_RTCUR_PWR:
+				m_core->param1 = (total_cycles() - m_rtc_zero_cycles) / clock();
+				return;
+
+			case SPR601_RTCLR_PWR:
+				{
+					const uint64_t remainder = (total_cycles() - m_rtc_zero_cycles) % clock();
+					const double seconds = remainder / clock();             // get fractional seconds
+					m_core->param1 = (uint64_t)(seconds * 1'000'000'000);   // and convert to nanoseconds
+				}
+				return;
+		}
+	}
+
 	/* handle 602 SPRs */
 	if (m_flavor == PPC_MODEL_602)
 	{ // TODO: Which are read/write only?
@@ -1779,6 +1806,21 @@ void ppc_device::ppccom_execute_mtspr()
 			case SPROEA_DEC:
 				set_decrementer(m_core->param1);
 				return;
+		}
+	}
+
+	/* handle 601 specific POWER-holdover SPRs */
+	if (m_flavor == PPC_MODEL_601)
+	{
+		switch (m_core->param0)
+		{
+			case SPR601_MQ:
+				m_core->spr[m_core->param0] = m_core->param1;
+				return;
+
+			case SPR601_RTCUW_PWR:
+				m_rtc_zero_cycles = total_cycles();
+				break;
 		}
 	}
 

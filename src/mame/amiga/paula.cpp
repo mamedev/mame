@@ -9,18 +9,21 @@
     DMA driven audio, the floppy controller, a serial receiver/transmitter,
     analog inputs and contains the interrupt controller.
 
-    TODO:
-    - Inherit FDC, serial and irq controller to here;
-    - Move Agnus "location" logic out of here;
-    - low-pass filter;
-    - convert volume values to non-linear dB scale (cfr. )
-    - Verify ADKCON modulation;
-    - Verify manual mode:
-      \- AGA roadkill during gameplay, which also has very long period setups,
-         extremely aliased;
-    - When a DMA stop occurs, is the correlated channel playback stopped
-      at the end of the current cycle or as soon as possible like current
-      implementation?
+References:
+- https://www.amigarealm.com/computing/knowledge/hardref/ch5.htm
+
+TODO:
+- Inherit FDC, serial and irq controller to here;
+- Move Agnus "location" logic out of here;
+- low-pass filter control thru Amiga Power LED where available, technically
+  outside of Paula;
+- Verify ADKCON modulation;
+- Verify manual mode;
+- amigaaga_flop:roadkill gameplay sets up incredibly high period (-> low pitch)
+  samples (engine thrust, bumping into walls);
+- When a DMA stop occurs, is the correlated channel playback stopped
+  at the end of the current cycle or as soon as possible like current
+  implementation?
 
 ******************************************************************************/
 
@@ -73,6 +76,18 @@ void paula_device::device_start()
 
 	// create the stream
 	m_stream = stream_alloc(0, 4, clock() / CLOCK_DIVIDER);
+
+	save_pointer(STRUCT_MEMBER(m_channel, loc), 4);
+	save_pointer(STRUCT_MEMBER(m_channel, len), 4);
+	save_pointer(STRUCT_MEMBER(m_channel, per), 4);
+	save_pointer(STRUCT_MEMBER(m_channel, vol), 4);
+	save_pointer(STRUCT_MEMBER(m_channel, curticks), 4);
+	save_pointer(STRUCT_MEMBER(m_channel, manualmode), 4);
+	save_pointer(STRUCT_MEMBER(m_channel, curlocation), 4);
+	save_pointer(STRUCT_MEMBER(m_channel, curlength), 4);
+	save_pointer(STRUCT_MEMBER(m_channel, dma_enabled), 4);
+	save_pointer(STRUCT_MEMBER(m_channel, atper), 4);
+	save_pointer(STRUCT_MEMBER(m_channel, atvol), 4);
 }
 
 void paula_device::device_reset()
@@ -298,13 +313,12 @@ void paula_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 		for (channum = 0; channum < 4; channum++)
 		{
 			audio_channel *chan = &m_channel[channum];
-			int volume = (nextvol == -1) ? chan->vol : nextvol;
-			int period = (nextper == -1) ? chan->per : nextper;
-			s32 sample;
+			s16 volume = (nextvol == -1) ? chan->vol : nextvol;
+			s16 period = (nextper == -1) ? chan->per : nextper;
+			s16 sample;
 			int i;
 
 			// normalize the volume value
-			// FIXME: definitely not linear
 			volume = (volume & 0x40) ? 64 : (volume & 0x3f);
 			volume *= 4;
 
@@ -333,7 +347,7 @@ void paula_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 
 			// fill the buffer with the sample
 			for (i = 0; i < ticks; i += CLOCK_DIVIDER)
-				outputs[channum].put_int((sampoffs + i) / CLOCK_DIVIDER, sample, 32768);
+				outputs[channum].put_int_clamp((sampoffs + i) / CLOCK_DIVIDER, sample, 32768);
 
 			// account for the ticks; if we hit 0, advance
 			chan->curticks -= ticks;
@@ -341,6 +355,7 @@ void paula_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 			{
 				// reset the clock and ensure we're above the minimum ticks
 				chan->curticks = period;
+				// TODO: 123 for PAL machines, derive formula from clock()
 				if (chan->curticks < 124)
 					chan->curticks = 124;
 
@@ -360,11 +375,12 @@ void paula_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 					if (chan->curlength == 0)
 					{
 						dma_reload(chan, false);
-						// reload the data pointer, otherwise aliasing / buzzing outside the given buffer will be heard
-						// For example: Xenon 2 sets up location=0x63298 length=0x20
+						// silence the data pointer, avoid DC offset
+						// - xenon2 sets up location=0x63298 length=0x20
 						// for silencing channels on-the-fly without relying on irqs.
 						// Without this the location will read at 0x632d8 (data=0x7a7d), causing annoying buzzing.
-						chan->dat = m_chipmem_r(chan->curlocation);
+						// - Ocean games (bchvolly, batmancc) also rely on this
+						chan->dat = 0; //m_chipmem_r(chan->curlocation);
 					}
 				}
 

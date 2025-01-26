@@ -12,6 +12,7 @@
 #pragma once
 
 void mac_nubus_cards(device_slot_interface &device) ATTR_COLD;
+void powermac_nubus_cards(device_slot_interface &device) ATTR_COLD;
 void mac_pds030_cards(device_slot_interface &device) ATTR_COLD;
 void mac_pdslc_cards(device_slot_interface &device) ATTR_COLD;
 void mac_pdslc_orig_cards(device_slot_interface &device) ATTR_COLD;

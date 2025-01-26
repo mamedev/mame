@@ -737,7 +737,7 @@ void eclipse_state::via2_out_b_q900(u8 data)
 		applefdintf_device::add_35_hd(config, m_floppy[0]);
 		applefdintf_device::add_35_nc(config, m_floppy[1]);
 
-		SCC8530N(config, m_scc, C7M);
+		SCC8530(config, m_scc, C7M);
 		m_scc->configure_channels(3'686'400, 3'686'400, 3'686'400, 3'686'400);
 		m_scc->out_txda_callback().set("printer", FUNC(rs232_port_device::write_txd));
 		m_scc->out_txdb_callback().set("modem", FUNC(rs232_port_device::write_txd));
@@ -778,6 +778,7 @@ void eclipse_state::via2_out_b_q900(u8 data)
 
 		nubus_device &nubus(NUBUS(config, "nubus", 40_MHz_XTAL / 4));
 		nubus.set_space(m_maincpu, AS_PROGRAM);
+		nubus.set_bus_mode(nubus_device::nubus_mode_t::QUADRA_DAFB);
 		nubus.out_irq9_callback().set(FUNC(quadrax00_state::nubus_irq_9_w));
 		nubus.out_irqa_callback().set(FUNC(quadrax00_state::nubus_irq_a_w));
 		nubus.out_irqb_callback().set(FUNC(quadrax00_state::nubus_irq_b_w));

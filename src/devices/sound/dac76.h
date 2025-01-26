@@ -6,16 +6,19 @@
 
     Companding D/A Converter
 
+    Equivalent to the AM6070, which is an "improved pin-for-pin replacement for
+    DAC-76" (according to the AM6070 datasheet).
+
               ___ ___
-      E/D  1 |*  u   | 10  VLC
-       SB  2 |       | 11  VR+
-       B1  3 |       | 12  VR-
-       B2  4 |       | 13  V-
+      E/D  1 |*  u   | 18  V+
+       SB  2 |       | 17  IOD-
+       B1  3 |       | 16  IOD+
+       B2  4 |       | 15  IOE-
        B3  5 |       | 14  IOE+
-       B4  6 |       | 15  IOE-
-       B5  7 |       | 16  IOD+
-       B6  8 |       | 17  IOD-
-       B7  9 |_______| 18  V+
+       B4  6 |       | 13  V-
+       B5  7 |       | 12  VR-
+       B6  8 |       | 11  VR+
+       B7  9 |_______| 10  VLC
 
 ***************************************************************************/
 

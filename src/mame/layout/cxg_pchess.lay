@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+authors:hap
+-->
+<mamelayout version="2">
+
+<!-- NOTE: no chesspieces simulation here -->
+
+<!-- define elements -->
+
+	<element name="lcdm"><rect><color red="0.54" green="0.57" blue="0.58" /></rect></element>
+
+	<element name="but" defstate="0">
+		<rect state="0"><color red="0.65" green="0.65" blue="0.66" /></rect>
+		<rect state="1"><color red="0.65" green="0.65" blue="0.66" alpha="0.7" /></rect>
+	</element>
+
+	<element name="text_ba"><text string="A1"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_bb"><text string="B2"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_bc"><text string="C3"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_bd"><text string="D4"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_be"><text string="E5"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_bf"><text string="F6"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_bg"><text string="G7"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_bh"><text string="H8"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_b1"><text string="CE"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_b2"><text string="LV"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_b3"><text string="MO"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_b4"><text string="EN"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="-1.5" right="20.5" top="-12.034" bottom="14" />
+
+		<screen index="0"><bounds x="5" y="-10.534" width="9" height="4.284" /></screen>
+		<element ref="lcdm" blend="multiply"><bounds x="4" y="-11" width="11" height="6" /></element>
+
+		<!-- buttons -->
+		<element ref="but" inputtag="IN.0" inputmask="0x01"><bounds x="0"  y="0" width="4" height="0.75" /></element>
+		<element ref="but" inputtag="IN.1" inputmask="0x01"><bounds x="5"  y="0" width="4" height="0.75" /></element>
+		<element ref="but" inputtag="IN.2" inputmask="0x01"><bounds x="10" y="0" width="4" height="0.75" /></element>
+		<element ref="but" inputtag="IN.3" inputmask="0x01"><bounds x="15" y="0" width="4" height="0.75" /></element>
+
+		<element ref="but" inputtag="IN.0" inputmask="0x02"><bounds x="0"  y="3.5" width="4" height="0.75" /></element>
+		<element ref="but" inputtag="IN.1" inputmask="0x02"><bounds x="5"  y="3.5" width="4" height="0.75" /></element>
+		<element ref="but" inputtag="IN.2" inputmask="0x02"><bounds x="10" y="3.5" width="4" height="0.75" /></element>
+		<element ref="but" inputtag="IN.3" inputmask="0x02"><bounds x="15" y="3.5" width="4" height="0.75" /></element>
+
+		<element ref="but" inputtag="IN.3" inputmask="0x04"><bounds x="0"  y="10.5" width="4" height="0.75" /></element>
+		<element ref="but" inputtag="IN.0" inputmask="0x04"><bounds x="5"  y="10.5" width="4" height="0.75" /></element>
+		<element ref="but" inputtag="IN.1" inputmask="0x04"><bounds x="10" y="10.5" width="4" height="0.75" /></element>
+		<element ref="but" inputtag="IN.2" inputmask="0x04"><bounds x="15" y="10.5" width="4" height="0.75" /></element>
+
+		<element ref="text_ba"><bounds x="0"  y="-1.4" width="4" height="1.1" /></element>
+		<element ref="text_bb"><bounds x="5"  y="-1.4" width="4" height="1.1" /></element>
+		<element ref="text_bc"><bounds x="10" y="-1.4" width="4" height="1.1" /></element>
+		<element ref="text_bd"><bounds x="15" y="-1.4" width="4" height="1.1" /></element>
+
+		<element ref="text_be"><bounds x="0"  y="2.1" width="4" height="1.1" /></element>
+		<element ref="text_bf"><bounds x="5"  y="2.1" width="4" height="1.1" /></element>
+		<element ref="text_bg"><bounds x="10" y="2.1" width="4" height="1.1" /></element>
+		<element ref="text_bh"><bounds x="15" y="2.1" width="4" height="1.1" /></element>
+
+		<element ref="text_b1"><bounds x="0"  y="9.1" width="4" height="1.1" /></element>
+		<element ref="text_b2"><bounds x="5"  y="9.1" width="4" height="1.1" /></element>
+		<element ref="text_b3"><bounds x="10" y="9.1" width="4" height="1.1" /></element>
+		<element ref="text_b4"><bounds x="15" y="9.1" width="4" height="1.1" /></element>
+	</view>
+
+</mamelayout>

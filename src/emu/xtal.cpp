@@ -119,6 +119,7 @@ const double XTAL::known_xtals[] = {
 	  4'433'619, // 4.433619_MHz_XTAL      PAL color subcarrier (technically 4.43361875mhz)
 	  4'608'000, // 4.608_MHz_XTAL         Luxor ABC-77 keyboard (Keytronic custom part #48-300-107 is equivalent)
 	  4'915'200, // 4.9152_MHz_XTAL        -
+	  4'946'864, // 4.946864_MHz_XTAL      Casiotone 8000
 	  4'952'000, // 4.952_MHz_XTAL         IGS M036 based mahjong games, for TT5665 sound chip
 	  5'000'000, // 5_MHz_XTAL             Mutant Night
 	  5'068'800, // 5.0688_MHz_XTAL        Usually used as MC2661 or COM8116 baud rate clock
@@ -198,6 +199,7 @@ const double XTAL::known_xtals[] = {
 	 10'920'000, // 10.92_MHz_XTAL         ADDS Viewpoint 60, Viewpoint A2
 	 11'000'000, // 11_MHz_XTAL            Mario I8039 sound
 	 11'004'000, // 11.004_MHz_XTAL        TI 911 VDT
+	 11'055'000, // 11.055_MHz_XTAL        Atari Tank 8
 	 11'059'200, // 11.0592_MHz_XTAL       Used with MCS-51 to generate common baud rates
 	 11'200'000, // 11.2_MHz_XTAL          New York, New York
 	 11'289'000, // 11.289_MHz_XTAL        Vanguard

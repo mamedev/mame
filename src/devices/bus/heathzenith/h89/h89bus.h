@@ -149,9 +149,6 @@ public:
 	void set_slot_int3(int state);
 	void set_slot_int4(int state);
 	void set_slot_int5(int state);
-	void set_slot_fdcirq(int state);
-	void set_slot_fdcdrq(int state);
-	void set_slot_blockirq(int state);
 	void set_slot_fmwe(int state);
 	void set_slot_wait(int state);
 	int get_io0();
@@ -304,9 +301,6 @@ public:
 	auto out_int3_callback() { return m_out_int3_cb.bind(); }
 	auto out_int4_callback() { return m_out_int4_cb.bind(); }
 	auto out_int5_callback() { return m_out_int5_cb.bind(); }
-	auto out_fdcirq_callback() { return m_out_fdcirq_cb.bind(); }
-	auto out_fdcdrq_callback() { return m_out_fdcdrq_cb.bind(); }
-	auto out_blockirq_callback() { return m_out_blockirq_cb.bind(); }
 	auto out_fmwe_callback() { return m_out_fmwe_cb.bind(); }
 	auto out_wait_callback() { return m_out_wait_cb.bind(); }
 	auto in_tlb_callback() { return m_in_tlb_cb.bind(); }
@@ -329,9 +323,6 @@ protected:
 	void set_int3_line(int state);
 	void set_int4_line(int state);
 	void set_int5_line(int state);
-	void set_fdcirq_line(int state);
-	void set_fdcdrq_line(int state);
-	void set_blockirq_line(int state);
 	void set_fmwe_line(int state);
 	void set_wait_line(int state);
 	u8 read_gpp();
@@ -343,7 +334,7 @@ protected:
 	int m_io0, m_io1, m_mem0, m_mem1;
 
 private:
-	devcb_write_line m_out_int3_cb, m_out_int4_cb, m_out_int5_cb, m_out_fdcirq_cb, m_out_fdcdrq_cb, m_out_blockirq_cb;
+	devcb_write_line m_out_int3_cb, m_out_int4_cb, m_out_int5_cb;
 	devcb_write_line m_out_fmwe_cb, m_out_wait_cb;
 	devcb_read8 m_in_tlb_cb, m_in_nmi_cb, m_in_gpp_cb;
 	devcb_write8 m_out_tlb_cb, m_out_nmi_cb, m_out_gpp_cb;
@@ -388,21 +379,6 @@ inline void device_h89bus_right_card_interface::set_slot_int4(int state)
 inline void device_h89bus_right_card_interface::set_slot_int5(int state)
 {
 	h89bus().set_int5_line(state);
-}
-
-inline void device_h89bus_right_card_interface::set_slot_fdcirq(int state)
-{
-	h89bus().set_fdcirq_line(state);
-}
-
-inline void device_h89bus_right_card_interface::set_slot_fdcdrq(int state)
-{
-	h89bus().set_fdcdrq_line(state);
-}
-
-inline void device_h89bus_right_card_interface::set_slot_blockirq(int state)
-{
-	h89bus().set_blockirq_line(state);
 }
 
 inline void device_h89bus_right_card_interface::set_slot_fmwe(int state)

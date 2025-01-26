@@ -25,7 +25,7 @@
 
 // other devices
 #include "machine/aic6250.h"
-#include "machine/ds1315.h"
+#include "machine/ds1215.h"
 #include "machine/input_merger.h"
 #include "machine/mc68681.h"
 #include "machine/ncr5380.h"
@@ -72,7 +72,7 @@ protected:
 	required_device<ns32381_device> m_fpu;
 	required_device<ns32202_device> m_icu;
 
-	required_device<ds1315_device> m_rtc;
+	required_device<ds1216e_device> m_rtc;
 
 	required_device<ncr5380_device> m_ncr5380;
 	required_device<aic6250_device> m_aic6250;
@@ -115,16 +115,13 @@ void pc532_state::machine_start()
 {
 	// install phantom rtc using memory taps
 	// TODO: not tested
-	m_cpu->space(AS_PROGRAM).install_read_tap(0x1000'0000, 0x1000'0003, "rtc_w",
+	m_cpu->space(AS_PROGRAM).install_read_tap(0x1000'0000, 0x1000'0007, "rtc_r",
 		[this](offs_t offset, u32 &data, u32 mem_mask)
 		{
-			m_rtc->write_data(offset & 1);
-		});
-	m_cpu->space(AS_PROGRAM).install_read_tap(0x1000'0004, 0x1000'0007, "rtc_r",
-		[this](offs_t offset, u32 &data, u32 mem_mask)
-		{
-			if (m_rtc->chip_enable())
-				data = m_rtc->read_data();
+			if (m_rtc->ceo_r())
+				data = m_rtc->read(offset);
+			else
+				m_rtc->read(offset);
 		});
 }
 
@@ -312,7 +309,7 @@ void pc532_state::pc532(machine_config &config)
 	m_icu->out_g<0>().set([this](int state) { m_swap.select(state); });
 	m_icu->out_g<7>().set([this](int state) { m_select.select(state); });
 
-	DS1315(config, m_rtc, 32.768_kHz_XTAL);
+	DS1216E(config, m_rtc);
 
 	NSCSI_BUS(config, "slot");
 	NSCSI_CONNECTOR(config, "slot:0", scsi_devices, "harddisk", false);

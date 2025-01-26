@@ -660,7 +660,7 @@ void lwriter_state::lwriter(machine_config &config)
 	m_screen->set_visarea_full();
 	m_screen->set_screen_update(FUNC(lwriter_state::screen_update));
 
-	SCC8530N(config, m_scc, CPU_CLK);
+	SCC8530(config, m_scc, CPU_CLK);
 	m_scc->configure_channels(RXC_CLK, 0, RXC_CLK, 0);
 	/* Port A */
 	m_scc->out_txda_callback().set("rs232a", FUNC(rs232_port_device::write_txd));

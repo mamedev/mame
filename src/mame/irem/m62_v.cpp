@@ -3,7 +3,7 @@
 /***************************************************************************
 
 Video Hardware for Irem Games:
-Battle Road, Lode Runner, Kid Niki, Spelunker
+Kung-Fu Master, Battle Road, Lode Runner, Kid Niki, Spelunker
 
 Tile/sprite priority system (for the Kung Fu Master M62 board):
 - Tiles with color code >= N (where N is set by jumpers) have priority over
@@ -19,21 +19,19 @@ Tile/sprite priority system (for the Kung Fu Master M62 board):
 #include "video/resnet.h"
 #include "m62.h"
 
+
 /***************************************************************************
 
   Convert the color PROMs into a more useable format.
 
   Kung Fu Master has a six 256x4 palette PROMs (one per gun; three for
   characters, three for sprites).
-  I don't know the exact values of the resistors between the RAM and the
-  RGB output. I assumed these values (the same as Commando)
 
   bit 3 -- 220 ohm resistor  -- RED/GREEN/BLUE
         -- 470 ohm resistor  -- RED/GREEN/BLUE
         -- 1  kohm resistor  -- RED/GREEN/BLUE
   bit 0 -- 2.2kohm resistor  -- RED/GREEN/BLUE
 
-  The resistor values could be verified on a hires pcb picture (spelunkr).
   The schematics also exhibit one pulldown for the sprite color guns.
   Since only either the sprite or tile gun is active, i.e. the other is
   in tri-state, this pulldown resistor also applies to the tile color guns.
@@ -68,7 +66,6 @@ Tile/sprite priority system (for the Kung Fu Master M62 board):
   CB2D =>   3
 
 ***************************************************************************/
-
 
 static const res_net_info m62_tile_net_info =
 {

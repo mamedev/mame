@@ -434,6 +434,9 @@ public:
 	void amiga_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	bool get_screen_standard();
+	int get_screen_vblank_line();
 	void update_screenmode();
 
 	TIMER_CALLBACK_MEMBER( scanline_callback );
@@ -628,6 +631,9 @@ protected:
 	void bplcon0_w(u16 data);
 	void aga_bplcon0_w(u16 data);
 
+	// TODO: move to Lisa
+	void clxcon2_w(u16 data);
+
 private:
 	// blitter helpers
 	uint32_t blit_ascending();
@@ -641,7 +647,7 @@ private:
 	void sprite_dma_reset(int which);
 	void sprite_enable_comparitor(int which, int enable);
 	void fetch_sprite_data(int scanline, int sprite);
-	void update_sprite_dma(int scanline);
+	void update_sprite_dma(int scanline, int num);
 	uint32_t interleave_sprite_data(uint16_t lobits, uint16_t hibits);
 	int get_sprite_pixel(int x);
 	uint8_t assemble_odd_bitplanes(int planes, int ebitoffs);
@@ -655,7 +661,7 @@ private:
 	void aga_palette_write(int color_reg, uint16_t data);
 	void aga_fetch_sprite_data(int scanline, int sprite);
 	void aga_render_scanline(bitmap_rgb32 &bitmap, int scanline);
-	void aga_update_sprite_dma(int scanline);
+	void aga_update_sprite_dma(int scanline, int num);
 	int aga_get_sprite_pixel(int x);
 	uint8_t aga_assemble_odd_bitplanes(int planes, int obitoffs);
 	uint8_t aga_assemble_even_bitplanes(int planes, int ebitoffs);

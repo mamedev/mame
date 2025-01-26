@@ -13,7 +13,7 @@ ASMJIT_BEGIN_SUB_NAMESPACE(a64)
 
 namespace FuncInternal {
 
-static inline bool shouldThreatAsCDecl(CallConvId ccId) noexcept {
+static inline bool shouldTreatAsCDecl(CallConvId ccId) noexcept {
   return ccId == CallConvId::kCDecl ||
          ccId == CallConvId::kStdCall ||
          ccId == CallConvId::kFastCall ||
@@ -53,7 +53,7 @@ ASMJIT_FAVOR_SIZE Error initCallConv(CallConv& cc, CallConvId ccId, const Enviro
   cc.setPassedOrder(RegGroup::kVec, 0, 1, 2, 3, 4, 5, 6, 7);
   cc.setNaturalStackAlignment(16);
 
-  if (shouldThreatAsCDecl(ccId)) {
+  if (shouldTreatAsCDecl(ccId)) {
     // ARM doesn't have that many calling conventions as we can find in X86 world, treat most conventions as __cdecl.
     cc.setId(CallConvId::kCDecl);
     cc.setPreservedRegs(RegGroup::kGp, Support::bitMask(Gp::kIdOs, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30));
