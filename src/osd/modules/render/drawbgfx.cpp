@@ -395,6 +395,17 @@ bool video_bgfx::set_platform_data(bgfx::PlatformData &platform_data, osd_window
 	platform_data.ndt = nullptr;
 	platform_data.nwh = GetOSWindow(dynamic_cast<mac_window_info const &>(window).platform_window());
 #else // defined(OSD_*)
+
+#if defined(SDLMAME_EMSCRIPTEN)
+	platform_data.ndt = nullptr;
+	platform_data.nwh = (void *)"#canvas"; // HTML5 target selector
+	platform_data.context = nullptr;
+	platform_data.backBuffer = nullptr;
+	platform_data.backBufferDS = nullptr;
+	bgfx::setPlatformData(platform_data);
+	return true;
+#endif
+
 	SDL_SysWMinfo wmi;
 	SDL_VERSION(&wmi.version);
 	if (!SDL_GetWindowWMInfo(dynamic_cast<sdl_window_info const &>(window).platform_window(), &wmi))
