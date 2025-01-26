@@ -1,15 +1,17 @@
 // license:GPL-2.0+
 // copyright-holders:flama12333
 /*************************************************************************
+
 known undumped games
 
 W&P CATCHER - lucky dog 
 https://youtu.be/e1Gp7Cr6KIQ
 
-Fantasy World - Diferent version
+Fantasy World - Diferent version.
 https://youtu.be/I7l6sOW40gE
-
-There are 4 langauge Not configurable.
+seem to be used in lucky loco
+https://youtu.be/vCyPViEF5pk
+// There are 4 langauge voices which are not configurable.
 
 chinese:
 https://youtu.be/RNM4aPQNWhg
@@ -164,4 +166,4 @@ ROM_END
 } // anonymous namespace
 
 //    YEAR  NAME    PARENT   MACHINE   INPUT   STATE         INIT        ROT   COMPANY      FULLNAME                                                FLAGS
-GAME( 2003, toysoldier, 0, toysoldier, toysoldier, toysoldier_state, empty_init, ROT0, "Paokai", "Toy soldier (Coastal Amusements)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // This was dumped from an Coastal branded Toy Soldier from around 2003.
+GAME( 2003, toysoldier, 0, toysoldier, toysoldier, toysoldier_state, empty_init, ROT0, "Paokai", "Toy Soldier (Coastal Amusements)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // This was dumped from an Coastal branded Toy Soldier from around 2003.
