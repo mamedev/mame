@@ -1647,7 +1647,7 @@ m_printer->in_pb_callback().set_constant(0xbf);		// HACK:  vblank always checks 
 
 	// ethernet
 	AM7990(config, m_lance);
-	m_lance->intr_out().set_inputline(m_maincpu, M68K_IRQ_4);
+	m_lance->intr_out().set_inputline(m_maincpu, M68K_IRQ_2).invert();
 	m_lance->dma_in().set([this](offs_t offset) {
 
 //		return m_maincpu->space(0).read_word(offset);
