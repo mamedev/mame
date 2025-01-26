@@ -27,7 +27,7 @@ TODO:
 		</part>
 	</software>
 
-	<software name="interfer">
+	<software name="interfer" supported="partial">
 		<description>Interference (demo)</description>
 		<year>1993</year>
 		<publisher>&lt;homebrew&gt;</publisher>
@@ -56,7 +56,7 @@ TODO:
 		</part>
 	</software>
 
-	<software name="puggs">
+	<software name="puggs" supported="partial">
 		<description>Puggs In Space (demo)</description>
 		<year>1989</year>
 		<publisher>&lt;homebrew&gt;</publisher>
