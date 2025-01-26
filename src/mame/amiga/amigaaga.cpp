@@ -486,7 +486,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 		if (CUSTOM_REG(REG_BPLCON0) & BPLCON0_LACE)
 			CUSTOM_REG(REG_VPOSR) ^= VPOSR_LOF;
 
-		m_copper->vblank_sync();
+		m_copper->vblank_sync(true);
 		m_ham_color = CUSTOM_REG(REG_COLOR00);
 	}
 
@@ -518,6 +518,9 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 	raw_scanline = scanline;
 
 	scanline /= 2;
+
+	if (scanline == get_screen_vblank_line())
+		m_copper->vblank_sync(false);
 
 	m_last_scanline = scanline;
 
@@ -608,7 +611,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 				x,
 				m_last_scanline & 0xff,
 				bool(BIT(CUSTOM_REG(REG_DMACON), 14)), // BBUSY
-				planes
+				bitplane_fmode ? 0 : planes
 			);
 			save_color0 = CUSTOM_REG(REG_COLOR00);
 			if (m_genlock_color != 0xffff)
