@@ -1646,17 +1646,13 @@ m_printer->in_pb_callback().set_constant(0xbf);		// HACK:  vblank always checks 
 	m_fpu->out_spc().set(FUNC(tek440x_state::fpu_finished));
 
 	// ethernet
-	AM7990(config, m_lance);
+	AM7990(config, m_lance, 40_MHz_XTAL / 4);
 	m_lance->intr_out().set_inputline(m_maincpu, M68K_IRQ_2).invert();
 	m_lance->dma_in().set([this](offs_t offset) {
-
-//		return m_maincpu->space(0).read_word(offset);
-		return m_vm->read16(offset);
+		return m_maincpu->space(0).read_word(offset);;
 	});
 	m_lance->dma_out().set([this](offs_t offset, u16 data, u16 mem_mask) {
-		
-//		m_maincpu->space(0).write_word(offset, data, mem_mask);
-		m_vm->write16(offset, data, mem_mask);
+		m_maincpu->space(0).write_word(offset, data, mem_mask);
 	});
 
 	X2210(config, m_novram);
