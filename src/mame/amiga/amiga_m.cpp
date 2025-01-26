@@ -1227,6 +1227,8 @@ void amiga_state::aga_map(address_map &map)
 
 	map(0x100, 0x101).w(FUNC(amiga_state::aga_bplcon0_w));
 
+	map(0x10e, 0x10f).w(FUNC(amiga_state::clxcon2_w));
+
 	// UHRES regs
 	// TODO: may be shared with ECS?
 //  map(0x1e6, 0x1e7).w(FUNC(amiga_state::bplhmod_w));
@@ -1290,12 +1292,39 @@ void amiga_state::bplcon0_w(u16 data)
 	CUSTOM_REG(REG_BPLCON0) = data;
 }
 
+/*
+ * http://amiga-dev.wikidot.com/hardware:bplcon0
+ */
 void amiga_state::aga_bplcon0_w(u16 data)
 {
 	// just allow all (AGA surfninj title screen relies on this)
 	CUSTOM_REG(REG_BPLCON0) = data;
+	// TODO: planes > 8
+	// Should be easy to fix, this checks if anything violates the rule first.
+	if (BIT(data, 4) && data & 0x7000)
+		popmessage("BPLCON0 illegal BPU plane mask %04x", data);
+	// TODO: unsupported stuff
+	if (data & 0x00e0)
+	{
+		popmessage("BPLCON0 unsupported %04x %s%s%s",
+			data,
+			BIT(data, 7) ? "UHRES|" : "",
+			BIT(data, 6) ? "SHRES|" : "",
+			BIT(data, 5) ? "BYPASS" : ""
+		);
+	}
 }
 
+/*
+ * http://amiga-dev.wikidot.com/hardware:clxcon2
+ */
+void amiga_state::clxcon2_w(u16 data)
+{
+	// TODO: enables bitplane 7-8 collision detection, resets to 0 if CLXCON write happens
+	popmessage("CLXCON2 %04x", data);
+}
+
+// TODO: progressively remove functions from here
 uint16_t amiga_state::custom_chip_r(offs_t offset)
 {
 	uint16_t temp;
