@@ -4,18 +4,14 @@ license:CC0-1.0
 -->
 <mamelayout version="2">
 
-    <!-- green -->
 	<element name="green_led">
 		<disk state="1">
 			<color red="0.0" green="1.0" blue="0.0" />
 		</disk>
 	</element>
 
-    <!-- rs232 leds -->
-    <!-- yellow -->
 	<element name="yellow_led">
 		<disk state="1">
-			<!--<color red="1.0" green="1.0" blue="0.0" />-->
 			<color red="1.0" green="1.0" blue="0.0" />
 		</disk>
 	</element>
@@ -26,283 +22,141 @@ license:CC0-1.0
 		</disk>
 	</element>
 
-	<element name="label_b1">
-		<text string="b1">
-			<color red="1.0" green="1.0" blue="1.0" />
-		</text>
-	</element>
-	<element name="label_b2">
-		<text string="b2">
-			<color red="1.0" green="1.0" blue="1.0" />
-		</text>
-	</element>
-	<element name="label_b3">
-		<text string="b3">
-			<color red="1.0" green="1.0" blue="1.0" />
-		</text>
-	</element>
-	<element name="label_b4">
-		<text string="b4">
-			<color red="1.0" green="1.0" blue="1.0" />
-		</text>
-	</element>
-	<element name="label_b5">
-		<text string="b5">
-			<color red="1.0" green="1.0" blue="1.0" />
-		</text>
-	</element>
-	<element name="label_b6">
-		<text string="b6">
-			<color red="1.0" green="1.0" blue="1.0" />
-		</text>
-	</element>
-	<element name="label_b7">
-		<text string="b7">
-			<color red="1.0" green="1.0" blue="1.0" />
-		</text>
-	</element>
-	<element name="label_b8">
-		<text string="b8">
-			<color red="1.0" green="1.0" blue="1.0" />
-		</text>
-	</element>
+	<repeat count="8">
+		<param name="n" start="1" increment="1" />
+		<element name="label_b~n~">
+			<text string="b~n~">
+				<color red="1.0" green="1.0" blue="1.0" />
+			</text>
+		</element>
+	</repeat>
 
+<!--
+	I tried nesting these groups into a repeat but the code would fail
+	at runtime.
+
+	MAME exception:
+	Error parsing XML layout: unable to find element label_b~m~
+
+	It works when I unroll the loop and use references not
+	defined by a variable.
+-->
+	<!-- <repeat count="8">
+		<param name="i" start="0" increment="1" />
+		<param name="m" start="1" increment="1" />
+		<group name="b~m~_leds">
+			<repeat count="8">
+				<param name="n" start="0" increment="1" />
+				<param name="y" start="0" increment="5" />
+				<element name="led~i~_~n~" ref="orange_led">
+					<bounds x="2" y="~y~" width="5" height="5" />
+				</element>
+			</repeat>
+			<element name="label_b~m~" ref="label_b~m~">
+				<bounds x="0" y="40" width="10" height="7" />
+			</element>
+		</group>
+	</repeat> -->
 
 	<group name="b1_leds">
-		<element name="led0_0" ref="orange_led">
-			<bounds x="2" y="0" width="5" height="5" />
-		</element>
-		<element name="led0_1" ref="orange_led">
-			<bounds x="2" y="5" width="5" height="5" />
-		</element>
-		<element name="led0_2" ref="orange_led">
-			<bounds x="2" y="10" width="5" height="5" />
-		</element>
-		<element name="led0_3" ref="orange_led">
-			<bounds x="2" y="15" width="5" height="5" />
-		</element>
-		<element name="led0_4" ref="orange_led">
-			<bounds x="2" y="20" width="5" height="5" />
-		</element>
-		<element name="led0_5" ref="orange_led">
-			<bounds x="2" y="25" width="5" height="5" />
-		</element>
-		<element name="led0_6" ref="orange_led">
-			<bounds x="2" y="30" width="5" height="5" />
-		</element>
-		<element name="led0_7" ref="orange_led">
-			<bounds x="2" y="35" width="5" height="5" />
-		</element>
+		<repeat count="8">
+			<param name="n" start="0" increment="1" />
+			<param name="y" start="0" increment="5" />
+			<element name="led0_~n~" ref="orange_led">
+				<bounds x="2" y="~y~" width="5" height="5" />
+			</element>
+		</repeat>
 		<element name="label_b1" ref="label_b1">
 			<bounds x="0" y="40" width="10" height="7" />
 		</element>
 	</group>
 
 	<group name="b2_leds">
-		<element name="led1_0" ref="orange_led">
-			<bounds x="2" y="0" width="5" height="5" />
-		</element>
-		<element name="led1_1" ref="orange_led">
-			<bounds x="2" y="5" width="5" height="5" />
-		</element>
-		<element name="led1_2" ref="orange_led">
-			<bounds x="2" y="10" width="5" height="5" />
-		</element>
-		<element name="led1_3" ref="orange_led">
-			<bounds x="2" y="15" width="5" height="5" />
-		</element>
-		<element name="led1_4" ref="orange_led">
-			<bounds x="2" y="20" width="5" height="5" />
-		</element>
-		<element name="led1_5" ref="orange_led">
-			<bounds x="2" y="25" width="5" height="5" />
-		</element>
-		<element name="led1_6" ref="orange_led">
-			<bounds x="2" y="30" width="5" height="5" />
-		</element>
-		<element name="led1_7" ref="orange_led">
-			<bounds x="2" y="35" width="5" height="5" />
-		</element>
+		<repeat count="8">
+			<param name="n" start="0" increment="1" />
+			<param name="y" start="0" increment="5" />
+			<element name="led1_~n~" ref="orange_led">
+				<bounds x="2" y="~y~" width="5" height="5" />
+			</element>
+		</repeat>
 		<element name="label_b2" ref="label_b2">
 			<bounds x="0" y="40" width="10" height="7" />
 		</element>
 	</group>
 
 	<group name="b3_leds">
-		<element name="led2_0" ref="orange_led">
-			<bounds x="2" y="0" width="5" height="5" />
-		</element>
-		<element name="led2_1" ref="orange_led">
-			<bounds x="2" y="5" width="5" height="5" />
-		</element>
-		<element name="led2_2" ref="orange_led">
-			<bounds x="2" y="10" width="5" height="5" />
-		</element>
-		<element name="led2_3" ref="orange_led">
-			<bounds x="2" y="15" width="5" height="5" />
-		</element>
-		<element name="led2_4" ref="orange_led">
-			<bounds x="2" y="20" width="5" height="5" />
-		</element>
-		<element name="led2_5" ref="orange_led">
-			<bounds x="2" y="25" width="5" height="5" />
-		</element>
-		<element name="led2_6" ref="orange_led">
-			<bounds x="2" y="30" width="5" height="5" />
-		</element>
-		<element name="led2_7" ref="orange_led">
-			<bounds x="2" y="35" width="5" height="5" />
-		</element>
+		<repeat count="8">
+			<param name="n" start="0" increment="1" />
+			<param name="y" start="0" increment="5" />
+			<element name="led2_~n~" ref="orange_led">
+				<bounds x="2" y="~y~" width="5" height="5" />
+			</element>
+		</repeat>
 		<element name="label_b3" ref="label_b3">
 			<bounds x="0" y="40" width="10" height="7" />
 		</element>
 	</group>
 
 	<group name="b4_leds">
-		<element name="led3_0" ref="orange_led">
-			<bounds x="2" y="0" width="5" height="5" />
-		</element>
-		<element name="led3_1" ref="orange_led">
-			<bounds x="2" y="5" width="5" height="5" />
-		</element>
-		<element name="led3_2" ref="orange_led">
-			<bounds x="2" y="10" width="5" height="5" />
-		</element>
-		<element name="led3_3" ref="orange_led">
-			<bounds x="2" y="15" width="5" height="5" />
-		</element>
-		<element name="led3_4" ref="orange_led">
-			<bounds x="2" y="20" width="5" height="5" />
-		</element>
-		<element name="led3_5" ref="orange_led">
-			<bounds x="2" y="25" width="5" height="5" />
-		</element>
-		<element name="led3_6" ref="orange_led">
-			<bounds x="2" y="30" width="5" height="5" />
-		</element>
-		<element name="led3_7" ref="orange_led">
-			<bounds x="2" y="35" width="5" height="5" />
-		</element>
+		<repeat count="8">
+			<param name="n" start="0" increment="1" />
+			<param name="y" start="0" increment="5" />
+			<element name="led3_~n~" ref="orange_led">
+				<bounds x="2" y="~y~" width="5" height="5" />
+			</element>
+		</repeat>
 		<element name="label_b4" ref="label_b4">
 			<bounds x="0" y="40" width="10" height="7" />
 		</element>
 	</group>
 
 	<group name="b5_leds">
-		<element name="led4_0" ref="orange_led">
-			<bounds x="2" y="0" width="5" height="5" />
-		</element>
-		<element name="led4_1" ref="orange_led">
-			<bounds x="2" y="5" width="5" height="5" />
-		</element>
-		<element name="led4_2" ref="orange_led">
-			<bounds x="2" y="10" width="5" height="5" />
-		</element>
-		<element name="led4_3" ref="orange_led">
-			<bounds x="2" y="15" width="5" height="5" />
-		</element>
-		<element name="led4_4" ref="orange_led">
-			<bounds x="2" y="20" width="5" height="5" />
-		</element>
-		<element name="led4_5" ref="orange_led">
-			<bounds x="2" y="25" width="5" height="5" />
-		</element>
-		<element name="led4_6" ref="orange_led">
-			<bounds x="2" y="30" width="5" height="5" />
-		</element>
-		<element name="led4_7" ref="orange_led">
-			<bounds x="2" y="35" width="5" height="5" />
-		</element>
+		<repeat count="8">
+			<param name="n" start="0" increment="1" />
+			<param name="y" start="0" increment="5" />
+			<element name="led4_~n~" ref="orange_led">
+				<bounds x="2" y="~y~" width="5" height="5" />
+			</element>
+		</repeat>
 		<element name="label_b5" ref="label_b5">
 			<bounds x="0" y="40" width="10" height="7" />
 		</element>
 	</group>
 
 	<group name="b6_leds">
-		<element name="led5_0" ref="orange_led">
-			<bounds x="2" y="0" width="5" height="5" />
-		</element>
-		<element name="led5_1" ref="orange_led">
-			<bounds x="2" y="5" width="5" height="5" />
-		</element>
-		<element name="led5_2" ref="orange_led">
-			<bounds x="2" y="10" width="5" height="5" />
-		</element>
-		<element name="led5_3" ref="orange_led">
-			<bounds x="2" y="15" width="5" height="5" />
-		</element>
-		<element name="led5_4" ref="orange_led">
-			<bounds x="2" y="20" width="5" height="5" />
-		</element>
-		<element name="led5_5" ref="orange_led">
-			<bounds x="2" y="25" width="5" height="5" />
-		</element>
-		<element name="led5_6" ref="orange_led">
-			<bounds x="2" y="30" width="5" height="5" />
-		</element>
-		<element name="led5_7" ref="orange_led">
-			<bounds x="2" y="35" width="5" height="5" />
-		</element>
+		<repeat count="8">
+			<param name="n" start="0" increment="1" />
+			<param name="y" start="0" increment="5" />
+			<element name="led5_~n~" ref="orange_led">
+				<bounds x="2" y="~y~" width="5" height="5" />
+			</element>
+		</repeat>
 		<element name="label_b6" ref="label_b6">
 			<bounds x="0" y="40" width="10" height="7" />
 		</element>
 	</group>
 
 	<group name="b7_leds">
-		<element name="led6_0" ref="orange_led">
-			<bounds x="2" y="0" width="5" height="5" />
-		</element>
-		<element name="led6_1" ref="orange_led">
-			<bounds x="2" y="5" width="5" height="5" />
-		</element>
-		<element name="led6_2" ref="orange_led">
-			<bounds x="2" y="10" width="5" height="5" />
-		</element>
-		<element name="led6_3" ref="orange_led">
-			<bounds x="2" y="15" width="5" height="5" />
-		</element>
-		<element name="led6_4" ref="orange_led">
-			<bounds x="2" y="20" width="5" height="5" />
-		</element>
-		<element name="led6_5" ref="orange_led">
-			<bounds x="2" y="25" width="5" height="5" />
-		</element>
-		<element name="led6_6" ref="orange_led">
-			<bounds x="2" y="30" width="5" height="5" />
-		</element>
-		<element name="led6_7" ref="orange_led">
-			<bounds x="2" y="35" width="5" height="5" />
-		</element>
+		<repeat count="8">
+			<param name="n" start="0" increment="1" />
+			<param name="y" start="0" increment="5" />
+			<element name="led6_~n~" ref="orange_led">
+				<bounds x="2" y="~y~" width="5" height="5" />
+			</element>
+		</repeat>
 		<element name="label_b7" ref="label_b7">
 			<bounds x="0" y="40" width="10" height="7" />
 		</element>
 	</group>
 
 	<group name="b8_leds">
-		<element name="led7_0" ref="orange_led">
-			<bounds x="2" y="0" width="5" height="5" />
-		</element>
-		<element name="led7_1" ref="orange_led">
-			<bounds x="2" y="5" width="5" height="5" />
-		</element>
-		<element name="led7_2" ref="orange_led">
-			<bounds x="2" y="10" width="5" height="5" />
-		</element>
-		<element name="led7_3" ref="orange_led">
-			<bounds x="2" y="15" width="5" height="5" />
-		</element>
-		<element name="led7_4" ref="orange_led">
-			<bounds x="2" y="20" width="5" height="5" />
-		</element>
-		<element name="led7_5" ref="orange_led">
-			<bounds x="2" y="25" width="5" height="5" />
-		</element>
-		<element name="led7_6" ref="orange_led">
-			<bounds x="2" y="30" width="5" height="5" />
-		</element>
-		<element name="led7_7" ref="orange_led">
-			<bounds x="2" y="35" width="5" height="5" />
-		</element>
+		<repeat count="8">
+			<param name="n" start="0" increment="1" />
+			<param name="y" start="0" increment="5" />
+			<element name="led7_~n~" ref="orange_led">
+				<bounds x="2" y="~y~" width="5" height="5" />
+			</element>
+		</repeat>
 		<element name="label_b8" ref="label_b8">
 			<bounds x="0" y="40" width="10" height="7" />
 		</element>
@@ -311,32 +165,16 @@ license:CC0-1.0
 	<view name="LEDs and Terminal">
 		<bounds x="0" y="0" width="400" height="400" />
 		<collection name="LEDs and terminal">
-			<group ref="b1_leds">
-				<bounds x="0" y="345" width="10" height="47" />
-			</group>
-			<group ref="b2_leds">
-				<bounds x="7" y="345" width="10" height="47" />
-			</group>
-			<group ref="b3_leds">
-				<bounds x="14" y="345" width="10" height="47" />
-			</group>
-			<group ref="b4_leds">
-				<bounds x="21" y="345" width="10" height="47" />
-			</group>
-			<group ref="b5_leds">
-				<bounds x="28" y="345" width="10" height="47" />
-			</group>
-			<group ref="b6_leds">
-				<bounds x="35" y="345" width="10" height="47" />
-			</group>
-			<group ref="b7_leds">
-				<bounds x="42" y="345" width="10" height="47" />
-			</group>
-			<group ref="b8_leds">
-				<bounds x="49" y="345" width="10" height="47" />
-			</group>
-
+			<repeat count="8">
+				<param name="n" start="1" increment="1" />
+				<param name="x" start="0" increment="7" />
+				<group ref="b~n~_leds">
+					<bounds x="~x~" y="345" width="10" height="47" />
+				</group>
+			</repeat>
 		</collection>
-		<screen index="0"><bounds x="0" y="0" width="400" height="340" /></screen>
+		<screen index="0">
+			<bounds x="0" y="0" width="400" height="340" />
+		</screen>
 	</view>
 </mamelayout>

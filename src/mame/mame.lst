@@ -19910,9 +19910,15 @@ sc203                           // SC203 - Modular Z180 Computer
 @source:homebrew/sbc6510.cpp
 sbc6510                         //
 
+@source:homebrew/sbc8008.cpp
+sbc8008                         // Jim Loos - 8008-SBC
+
 @source:homebrew/sitcom.cpp
 sitcom                          //
 sitcomtmr                       //
+
+@source:homebrew/super8008.cpp
+super8008                       // Dr. Scott M. Baker - 8008-Super
 
 @source:homebrew/test_t400.cpp
 test410                         //
@@ -19932,12 +19938,6 @@ z80dev                          //
 
 @source:homebrew/zexall.cpp
 zexall                          // zexall z80 test suite with kevtris' preloader/serial interface at 0000-00ff
-
-@source:homebrew/sbc8008.cpp
-sbc8008                         // Jim Loos - 8008-SBC
-
-@source:homebrew/super8008.cpp
-super8008                       // Dr. Scott M. Baker - 8008-Super
 
 @source:homelab/braiplus.cpp
 braiplus                        //
