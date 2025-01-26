@@ -52,6 +52,7 @@ public:
 		  , m_run_led(*this, "run_led")
 		  , m_txd_led(*this, "txd_led")
 		  , m_rxd_led(*this, "rxd_led")
+		  , m_view(*this, "bootview")
 { }
 
 	// This function sets up the machine configuration
@@ -71,6 +72,7 @@ protected:
 	output_finder<> m_run_led;
 	output_finder<> m_txd_led;
 	output_finder<> m_rxd_led;
+	memory_view m_view;
 
 	uint8_t bitbang_read();
 	void bitbang_write(uint8_t data);
@@ -79,18 +81,10 @@ protected:
 	void port_10_write(uint8_t data);
 
 	virtual void machine_start() override;
-
-	bool start = true;
-
-	uint8_t memory_read(offs_t offset);
-	void memory_write(offs_t offset, uint8_t data);
-
 };
 
 void sbc8008_state::machine_start()
-{
-	save_item(NAME(start));
-
+{	
 	m_leds.resolve();
 	m_run_led.resolve();
 	m_txd_led.resolve();
@@ -102,33 +96,7 @@ void sbc8008_state::machine_start()
 	m_rom_bank->configure_entry(1, m_rom->base() + 0x4000);
 
 	m_rom_bank->set_entry(0);
-
-}
-
-uint8_t sbc8008_state::memory_read(offs_t offset)
-{
-	if (start && 0 <= offset && offset < SBC8008_ROM_SIZE)
-	{			
-		return ((uint8_t*)m_rom_bank->base())[offset];
-	} 
-	else if (0 <= offset && offset < m_ram->size())
-	{
-		return m_ram->pointer()[offset];
-	} 
-	else 
-	{
-		logerror("%s:ld invalid mode read ($%02X) start %d size %d\n", 
-			machine().describe_context(), offset, start, m_ram->size());
-		return 0xff;
-	}
-}
-
-void sbc8008_state::memory_write(offs_t offset, uint8_t data)
-{
-	if (0 <= offset && offset < m_ram->size())
-	{
-		 m_ram->pointer()[offset] = data;
-	}
+	m_view.select(0);
 }
 
 uint8_t sbc8008_state::bitbang_read()
@@ -154,8 +122,8 @@ void sbc8008_state::bitbang_write(uint8_t data)
 
 uint8_t sbc8008_state::port_1_read()
 {
-	start = false;
-	return (uint8_t)start; //Is this value used in the monitor?	
+	m_view.select(1);
+	return 0;
 }
 
 void sbc8008_state::port_9_write(uint8_t data)
@@ -182,9 +150,12 @@ void sbc8008_state::sbc8008_mem(address_map &map)
 	//   and clears the address latches. thus, the first instruction is thus always fetched from 
 	//   address 0. the instruction at address 0 must be a single byte transfer instruction in 
 	//   order to set the program counter. i.e., it must be one of the RST opcodes.
-	// 
-	map(0x0000, 0x1fff).ram().rw(FUNC(sbc8008_state::memory_read), FUNC(sbc8008_state::memory_write));
-	map(0x2000, 0x3fff).bankr("bank");
+	//
+
+	map(0x0000, 0x3fff).view(m_view);
+	m_view[0](0x0000, 0x1fff).bankr("bank").mirror(0x2000);
+	m_view[1](0x0000, 0x1fff).ram();
+	m_view[1](0x2000, 0x3fff).bankr("bank");
 }
 
 void sbc8008_state::sbc8008_io(address_map &map)
