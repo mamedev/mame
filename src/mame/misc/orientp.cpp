@@ -1,9 +1,8 @@
 // license:GPL-2.0+
 // copyright-holders:flama12333
 /*************************************************************************
-Probably created by Chang yu Electronic as they used the same music format like changyu2 and gluck2
 
-Features Notes:
+// Features Notes:
 src: Chang yu website
 
 Pearl in the  East 
@@ -27,6 +26,9 @@ Oriental Pearl - 1997
 Big bonus for scoring on all letters of "ORIENTAL PEARL".
 
 Electronic ball-checking device ensures where ball lands.
+
+
+// Hardware info
 
 Buttons
 K1
