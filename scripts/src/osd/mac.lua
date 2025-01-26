@@ -35,6 +35,7 @@ if os_version>=101100 then
 	}
 end
 
+if _OPTIONS["USE_QTDEBUG"]=="1" then
 project ("qtdbg_" .. _OPTIONS["osd"])
 	uuid (os.uuid("qtdbg_" .. _OPTIONS["osd"]))
 	kind (LIBTYPE)
@@ -56,6 +57,7 @@ project ("qtdbg_" .. _OPTIONS["osd"])
 	configuration { }
 
 	qtdebuggerbuild()
+end
 
 project ("osd_" .. _OPTIONS["osd"])
 	targetsubdir(_OPTIONS["target"] .."_" .._OPTIONS["subtarget"])

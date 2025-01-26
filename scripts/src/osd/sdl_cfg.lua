@@ -116,9 +116,11 @@ if BASE_TARGETOS=="unix" then
 			backtick(sdlconfigcmd() .. " --cflags"),
 		}
 		if _OPTIONS["targetos"]~="asmjs" then
-			buildoptions {
-				backtick(pkgconfigcmd() .. " --cflags fontconfig"),
-			}
+			if _OPTIONS["NO_MODULE_IMPLS"]~="1" then
+				buildoptions {
+					backtick(pkgconfigcmd() .. " --cflags fontconfig"),
+				}
+			end
 		end
 	end
 end
@@ -136,14 +138,16 @@ if _OPTIONS["targetos"]=="windows" then
 	configuration { }
 
 elseif _OPTIONS["targetos"]=="linux" then
-	if _OPTIONS["QT_HOME"]~=nil then
-		buildoptions {
-			"-I" .. backtick(_OPTIONS["QT_HOME"] .. "/bin/qmake -query QT_INSTALL_HEADERS"),
-		}
-	else
-		buildoptions {
-			backtick(pkgconfigcmd() .. " --cflags Qt5Widgets"),
-		}
+	if _OPTIONS["USE_QTDEBUG"]=="1" then
+		if _OPTIONS["QT_HOME"]~=nil then
+			buildoptions {
+				"-I" .. backtick(_OPTIONS["QT_HOME"] .. "/bin/qmake -query QT_INSTALL_HEADERS"),
+			}
+		else
+			buildoptions {
+				backtick(pkgconfigcmd() .. " --cflags Qt5Widgets"),
+			}
+		end
 	end
 elseif _OPTIONS["targetos"]=="macosx" then
 	defines {

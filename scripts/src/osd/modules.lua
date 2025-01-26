@@ -35,6 +35,20 @@ function addoptionsfromstring(str)
 	end
 end
 
+function modulefiles(filepaths)
+	for _, filepath in ipairs(filepaths) do
+		if _OPTIONS["NO_MODULE_IMPLS"]~="1" or
+		   (filepath:find("none%.cpp$") or
+		    filepath:find("_module%.h$") or
+		    filepath:find("/lib/[^/]+$") or
+		    filepath:find("/monitor/[^/]+$")) then
+			files {
+				filepath
+			}
+		end
+	end
+end
+
 function pkgconfigcmd()
 	local pkgconfig = os.getenv("PKG_CONFIG")
 	if pkgconfig == nil then
@@ -64,6 +78,9 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/interface/nethandler.cpp",
 		MAME_DIR .. "src/osd/interface/nethandler.h",
 		MAME_DIR .. "src/osd/interface/uievents.h",
+	}
+
+	modulefiles {
 		MAME_DIR .. "src/osd/modules/debugger/debug_module.h",
 		MAME_DIR .. "src/osd/modules/debugger/debuggdbstub.cpp",
 		MAME_DIR .. "src/osd/modules/debugger/debugimgui.cpp",
@@ -190,7 +207,7 @@ function osdmodulesbuild()
 		"BX_CONFIG_DEBUG=0",
 	}
 
-	files {
+	modulefiles {
 		MAME_DIR .. "src/osd/modules/render/drawbgfx.cpp",
 		MAME_DIR .. "src/osd/modules/render/aviwrite.cpp",
 		MAME_DIR .. "src/osd/modules/render/aviwrite.h",
@@ -277,14 +294,17 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/render/bgfx/writereader.cpp",
 		MAME_DIR .. "src/osd/modules/render/bgfx/writereader.h",
 	}
-	includedirs {
-		MAME_DIR .. "3rdparty/bgfx/examples/common",
-		MAME_DIR .. "3rdparty/bgfx/include",
-		MAME_DIR .. "3rdparty/bgfx/3rdparty",
-		MAME_DIR .. "3rdparty/bgfx/3rdparty/khronos",
-		MAME_DIR .. "3rdparty/bx/include",
-		ext_includedir("rapidjson")
-	}
+
+	if _OPTIONS["NO_MODULE_IMPLS"]~="1" then
+		includedirs {
+			MAME_DIR .. "3rdparty/bgfx/examples/common",
+			MAME_DIR .. "3rdparty/bgfx/include",
+			MAME_DIR .. "3rdparty/bgfx/3rdparty",
+			MAME_DIR .. "3rdparty/bgfx/3rdparty/khronos",
+			MAME_DIR .. "3rdparty/bx/include",
+			ext_includedir("rapidjson")
+		}
+	end
 
 	if _OPTIONS["NO_USE_PORTAUDIO"]=="1" then
 		defines {
@@ -604,6 +624,19 @@ newoption {
 
 if not _OPTIONS["USE_DISPATCH_GL"] then
 	_OPTIONS["USE_DISPATCH_GL"] = "0"
+end
+
+newoption {
+	trigger = "NO_MODULE_IMPLS",
+	description = "Disable OSD module implementations",
+	allowed = {
+		{ "0",  "Enable module implementations"  },
+		{ "1",  "Disable module implementations" },
+	},
+}
+
+if not _OPTIONS["NO_MODULE_IMPLS"] then
+	_OPTIONS["NO_MODULE_IMPLS"] = "0"
 end
 
 newoption {
