@@ -29122,29 +29122,29 @@ Start and Program Disks OK, the remaining part is damaged (missing d88 headers?)
 	</software>
 
 	<software name="sf3dthxg">
-		<description>S.F.3.D Point X Senryou Sakusen - Original Operation Thanksgiving</description>
+		<description>S.F.3.D - Original Operation Thanksgiving</description>
 		<year>1986</year>
 		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198609xx"/>
-		<info name="alt_title" value="ポイントX占領作戦 (Box)"/>
+		<info name="alt_title" value="ポイントX占領作戦 S.F.3.D - Original Operation Thanksgiving (Box)"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="365168">
-				<rom name="s.f.3.d. point x senryou sakusen - original operation thanksgiving.d88" size="365168" crc="4985b37a" sha1="d13efd4b247b0e6ec702e769e51a5963fa007411"/>
+				<rom name="s.f.3.d. - original operation thanksgiving.d88" size="365168" crc="4985b37a" sha1="d13efd4b247b0e6ec702e769e51a5963fa007411"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="sf3dthxga">
-		<description>S.F.3.D Point X Senryou Sakusen - Original Operation Thanksgiving (alt)</description>
+		<description>S.F.3.D - Original Operation Thanksgiving (alt)</description>
 		<year>1986</year>
 		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198609xx"/>
-		<info name="alt_title" value="ポイントX占領作戦 (Box)"/>
+		<info name="alt_title" value="ポイントX占領作戦 S.F.3.D - Original Operation Thanksgiving (Box)"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="365168">
-				<rom name="s.f.3.d. point x senryou sakusen - original operation thanksgiving (a).d88" size="365168" crc="ffb66bfb" sha1="8524f776b1a0730086ebc78ae6dc20b4483fff57"/>
+				<rom name="s.f.3.d. - original operation thanksgiving (a).d88" size="365168" crc="ffb66bfb" sha1="8524f776b1a0730086ebc78ae6dc20b4483fff57"/>
 			</dataarea>
 		</part>
 	</software>
