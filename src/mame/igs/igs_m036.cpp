@@ -443,6 +443,7 @@ ROM_START( super70s )
 ROM_END
 
 
+// 金花争霸 (Jīn Huā Zhēngbà)
 ROM_START( jhzb )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
@@ -463,6 +464,7 @@ ROM_START( jhzb )
 ROM_END
 
 
+// 吉祥如意 (Jíxiáng Rúyì)
 ROM_START( jxry )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
@@ -483,6 +485,7 @@ ROM_START( jxry )
 ROM_END
 
 
+// 双龙抢珠特别版 (Shuāng Lóng Qiǎng Zhū Tèbié Bǎn)
 ROM_START( slqzsp )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
@@ -503,6 +506,7 @@ ROM_START( slqzsp )
 ROM_END
 
 
+// 鲨鱼大亨 (Shāyú Dàhēng)
 ROM_START( sydh ) // PCB-0802-03-JL
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
@@ -523,6 +527,7 @@ ROM_START( sydh ) // PCB-0802-03-JL
 ROM_END
 
 
+// 逍遥斗地主 (Xiāoyáo Dòu Dìzhǔ)
 ROM_START( xyddz )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
@@ -674,15 +679,15 @@ GAME( 200?, igsm312,  0,     igs_m036_tt, igs_m036, igs_m036_state, init_igsm312
 
 GAME( 200?, super70s, 0,     igs_m036_tt, igs_m036, igs_m036_state, init_igsm312,  ROT0, "IGS",           "Super 70's (V100US)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-GAME( 200?, jhzb,     0,     igs_m036,    igs_m036, igs_m036_state, init_igs_m036, ROT0, "IGS",           "Jin Hua Zheng Ba (V113CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // 金花争霸
+GAME( 200?, jhzb,     0,     igs_m036,    igs_m036, igs_m036_state, init_igs_m036, ROT0, "IGS",           "Jin Hua Zhengba (V113CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-GAME( 200?, jxry,     0,     igs_m036,    igs_m036, igs_m036_state, init_igs_m036, ROT0, "IGS",           "Ji Xiang Ru Yi (V116CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // 吉祥如意
+GAME( 200?, jxry,     0,     igs_m036,    igs_m036, igs_m036_state, init_igs_m036, ROT0, "IGS",           "Jixiang Ruyi (V116CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-GAME( 200?, slqzsp,   0,     igs_m036_tt, igs_m036, igs_m036_state, init_igs_m036, ROT0, "IGS",           "Shuang Long Qiang Zhu Te Bie Ban (V104CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // 双龙抢珠特别版
+GAME( 200?, slqzsp,   0,     igs_m036_tt, igs_m036, igs_m036_state, init_igs_m036, ROT0, "IGS",           "Shuang Long Qiang Zhu Tebie Ban (V104CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-GAME( 200?, sydh,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_igs_m036, ROT0, "IGS",           "Sha Yu Da Heng (V104CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // 鲨鱼大亨
+GAME( 200?, sydh,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_igs_m036, ROT0, "IGS",           "Shayu Daheng (V104CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-GAME( 200?, xyddz,    0,     igs_m036_tt, igs_m036, igs_m036_state, init_igs_m036, ROT0, "IGS",           "Xiao Yao Dou Di Zhu", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // 逍遥斗地主
+GAME( 200?, xyddz,    0,     igs_m036_tt, igs_m036, igs_m036_state, init_igs_m036, ROT0, "IGS",           "Xiaoyao Dou Dizhu", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 GAME( 2010, lhfy,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_igsm312,  ROT0, "IGS",           "Long Hu Feng Yun Gao Qing Ban (V206CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 

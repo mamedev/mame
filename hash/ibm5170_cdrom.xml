@@ -6575,7 +6575,7 @@ Includes DOS and Windows installation setup.
 	<!-- <rom name="Sonic CD (USA) (OEM) (Track 41).bin" size="14803488" crc="fde56203" sha1="d4623261ca0c8eeab6aa1e8a7a1ffd091482d125" /> -->
 	<!-- <rom name="Sonic CD (USA) (OEM) (Track 42).bin" size="13498128" crc="e4cbd243" sha1="cc517df4479946828c9a6fc6e9bb956f9a83821a" /> -->
 	<software name="soniccdoem1" cloneof="soniccd">
-		<description>Sonic CD (USA, Pentium Processor Edition alt)</description>
+		<description>Sonic CD (USA, Pentium Processor Edition, alt)</description>
 		<year>1995</year>
 		<publisher>Sega / Intel</publisher>
 		<info name="language" value="English" />
