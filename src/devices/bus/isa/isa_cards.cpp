@@ -90,6 +90,7 @@
 #include "finalchs.h"
 #include "hpblp.h"
 #include "opus100pm.h"
+#include "zxbus_adapter.h"
 
 
 void pc_isa8_cards(device_slot_interface &device)
@@ -148,6 +149,7 @@ void pc_isa8_cards(device_slot_interface &device)
 	device.option_add("acb2072", ACB2072);
 	device.option_add("3xtwin", ISA8_3XTWIN);
 	device.option_add("opus108pm", ISA8_OPUS108PM);
+	device.option_add("zxbus_adapter", ISA8_ZXBUS);
 }
 
 void pc_isa16_cards(device_slot_interface &device)
