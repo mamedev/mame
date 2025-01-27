@@ -249,11 +249,12 @@ static int16_t* uef_cas_fill_bit( uint8_t loops, int16_t *buffer, bool bit )
 
 static int uef_cas_fill_wave( int16_t *buffer, int length, const uint8_t *bytes )
 {
+	const uint8_t *b = bytes;
 	if ( bytes[0] == 0x1f && bytes[1] == 0x8b ) {
 		if ( gz_ptr == nullptr ) {
 			return 1;
 		}
-		bytes = gz_ptr;
+		b = gz_ptr;
 	}
 
 	uint8_t loops = 1;
@@ -261,17 +262,18 @@ static int uef_cas_fill_wave( int16_t *buffer, int length, const uint8_t *bytes 
 	uint32_t pos = sizeof(UEF_HEADER) + 2;
 	length = length / 2;
 	while( length > 0 ) {
-		int chunk_type = get_u16le( &bytes[pos] );
-		int chunk_length = get_u32le( &bytes[pos+2] );
+		int chunk_type = get_u16le( &b[pos] );
+		int chunk_length = get_u32le( &b[pos+2] );
 
 		uint32_t baud_length, j;
-		uint8_t i, *c;
+		const uint8_t *c;
+		uint8_t i;
 		pos += 6;
 		switch( chunk_type ) {
 		case 0x0100:    /* implicit start/stop bit data block */
 		case 0x0104:    // used by atom dumps, looks like normal data
 			for( j = 0; j < chunk_length; j++ ) {
-				uint8_t byte = bytes[pos+j];
+				uint8_t byte = b[pos+j];
 				p = uef_cas_fill_bit( loops, p, 0 );
 				for( i = 0; i < 8; i++ ) {
 					p = uef_cas_fill_bit( loops, p, (byte >> i) & 1 );
@@ -285,8 +287,8 @@ static int uef_cas_fill_wave( int16_t *buffer, int length, const uint8_t *bytes 
 			LOG_FORMATS( "Unsupported chunk type: %04x\n", chunk_type );
 			break;
 		case 0x0102:    /* explicit tape data block */
-			j = ( chunk_length * 10 ) - bytes[pos];
-			c = bytes + pos;
+			j = ( chunk_length * 10 ) - b[pos];
+			c = b + pos;
 			while( j ) {
 				uint8_t byte = *c;
 				for( i = 0; i < 8 && i < j; i++ ) {
@@ -297,27 +299,27 @@ static int uef_cas_fill_wave( int16_t *buffer, int length, const uint8_t *bytes 
 			}
 			break;
 		case 0x0110:    /* carrier tone (previously referred to as 'high tone') */
-			for( baud_length = get_u16le( &bytes[pos] ) ; baud_length; baud_length-- ) {
+			for( baud_length = get_u16le( &b[pos] ) ; baud_length; baud_length-- ) {
 				*p = WAVE_LOW; p++;
 				*p = WAVE_HIGH; p++;
 				length -= 2;
 			}
 			break;
 		case 0x0112:    /* integer gap */
-			for( baud_length = get_u16le( &bytes[pos] ) ; baud_length; baud_length-- ) {
+			for( baud_length = get_u16le( &b[pos] ) ; baud_length; baud_length-- ) {
 				*p = WAVE_NULL; p++;
 				*p = WAVE_NULL; p++;
 				length -= 2;
 			}
 			break;
 		case 0x0116:    /* floating point gap */
-			for( baud_length = (get_uef_float(bytes+pos)*UEF_WAV_FREQUENCY); baud_length; baud_length-- ) {
+			for( baud_length = (get_uef_float(b+pos)*UEF_WAV_FREQUENCY); baud_length; baud_length-- ) {
 				*p = WAVE_NULL; p++;
 				length -= 1;
 			}
 			break;
 		case 0x0117:    /* change baud rate */
-			baud_length = get_u16le( &bytes[pos] );
+			baud_length = get_u16le( &b[pos] );
 			// These are the only supported numbers
 			if (baud_length == 300)
 				loops = 4;

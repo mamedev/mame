@@ -348,7 +348,7 @@ static int oric_cassette_calculate_size_in_samples(const uint8_t *bytes, int len
 static int oric_cassette_fill_wave(int16_t *buffer, int length, const uint8_t *bytes)
 {
 	unsigned char header[9];
-	uint8_t *data_ptr;
+	const uint8_t *data_ptr = bytes;
 	int16_t *p;
 	int i;
 	uint8_t data;
@@ -373,7 +373,6 @@ static int oric_cassette_fill_wave(int16_t *buffer, int length, const uint8_t *b
 	length = length - ORIC_WAVESAMPLES_TRAILER;
 
 	oric.cassette_state = ORIC_CASSETTE_SEARCHING_FOR_SYNC_BYTE;
-	data_ptr = bytes;
 
 	while ((data_ptr<(bytes + oric.tap_size)) && (p < (buffer+length)) )
 	{
