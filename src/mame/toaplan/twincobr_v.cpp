@@ -234,37 +234,37 @@ void twincobr_state::twincobr_exscroll_w(offs_t offset, u16 data)/* Extra unused
 /******************** Wardner interface to this hardware ********************/
 void twincobr_state::wardner_txlayer_w(offs_t offset, u8 data)
 {
-	const int shift = 8 * (offset & 1);
+	const int shift = 8 * BIT(offset, 0);
 	twincobr_txoffs_w(offset / 2, data << shift, 0xff << shift);
 }
 
 void twincobr_state::wardner_bglayer_w(offs_t offset, u8 data)
 {
-	const int shift = 8 * (offset & 1);
+	const int shift = 8 * BIT(offset, 0);
 	twincobr_bgoffs_w(offset / 2, data << shift, 0xff << shift);
 }
 
 void twincobr_state::wardner_fglayer_w(offs_t offset, u8 data)
 {
-	const int shift = 8 * (offset & 1);
+	const int shift = 8 * BIT(offset, 0);
 	twincobr_fgoffs_w(offset / 2, data << shift, 0xff << shift);
 }
 
 void twincobr_state::wardner_txscroll_w(offs_t offset, u8 data)
 {
-	const int shift = 8 * (offset & 1);
+	const int shift = 8 * BIT(offset, 0);
 	twincobr_txscroll_w(offset / 2, data << shift, 0xff << shift);
 }
 
 void twincobr_state::wardner_bgscroll_w(offs_t offset, u8 data)
 {
-	const int shift = 8 * (offset & 1);
+	const int shift = 8 * BIT(offset, 0);
 	twincobr_bgscroll_w(offset / 2, data << shift, 0xff << shift);
 }
 
 void twincobr_state::wardner_fgscroll_w(offs_t offset, u8 data)
 {
-	const int shift = 8 * (offset & 1);
+	const int shift = 8 * BIT(offset, 0);
 	twincobr_fgscroll_w(offset / 2, data << shift, 0xff << shift);
 }
 
@@ -281,7 +281,7 @@ void twincobr_state::wardner_exscroll_w(offs_t offset, u8 data)/* Extra unused v
 
 u8 twincobr_state::wardner_videoram_r(offs_t offset)
 {
-	const int shift = 8 * (offset & 1);
+	const int shift = 8 * BIT(offset, 0);
 	switch (offset / 2)
 	{
 		case 0: return twincobr_txram_r() >> shift;
@@ -293,7 +293,7 @@ u8 twincobr_state::wardner_videoram_r(offs_t offset)
 
 void twincobr_state::wardner_videoram_w(offs_t offset, u8 data)
 {
-	const int shift = 8 * (offset & 1);
+	const int shift = 8 * BIT(offset, 0);
 	switch (offset / 2)
 	{
 		case 0: twincobr_txram_w(0, data << shift, 0xff << shift); break;
@@ -305,7 +305,7 @@ void twincobr_state::wardner_videoram_w(offs_t offset, u8 data)
 u8 twincobr_state::wardner_sprite_r(offs_t offset)
 {
 	u16 const *const spriteram16 = reinterpret_cast<u16 *>(m_spriteram8->live());
-	const int shift = (offset & 1) * 8;
+	const int shift = BIT(offset, 0) * 8;
 	return spriteram16[offset / 2] >> shift;
 }
 
