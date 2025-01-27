@@ -32804,6 +32804,7 @@ driblingvm                      // bootleg (Videomac)
 @source:modelracing/sshot.cpp
 gunchamps                       // (c) 1980 Model Racing (sshot.cpp)
 sshot                           // (c) 1979 Model Racing
+sshota                          // (c) 1979 Model Racing
 
 @source:modelracing/subhuntr.cpp
 subhuntr                        // 1979 Model Racing
@@ -36618,6 +36619,7 @@ cdi910                          //
 cdibios                         // Base unit
 cdimono1                        // Philips CD-i model 200 (Mono-I board, PAL)
 cdimono2                        // Philips CD-i model 220 (Mono-II board, NTSC)
+gpi1200                         //
 quizard                         // (c) TAB Austria 199?
 quizard_10                      // (c) TAB Austria 1996
 quizard_12                      // (c) TAB Austria 1996
@@ -41664,6 +41666,7 @@ rdft2u                          // (c) 1997 Seibu Kaihatsu (Fabtek license)
 rdft2us                         // (c) 1997 Seibu Kaihatsu (Fabtek license)
 rdfta                           // (c) 1996 Seibu Kaihatsu
 rdftadi                         // (c) 1996 Seibu Kaihatsu (Dream Island license)
+rdftadia                        // (c) 1996 Seibu Kaihatsu (Dream Island license)
 rdftam                          // (c) 1996 Seibu Kaihatsu (Metrotainment license)
 rdftau                          // (c) 1996 Seibu Kaihatsu
 rdftauge                        // (c) 1996 Seibu Kaihatsu (Tuning license and text display, but Australia region code)
