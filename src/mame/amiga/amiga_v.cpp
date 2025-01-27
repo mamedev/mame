@@ -493,7 +493,7 @@ void amiga_state::render_scanline(bitmap_rgb32 &bitmap, int scanline)
 			CUSTOM_REG(REG_VPOSR) ^= VPOSR_LOF;
 
 		// reset copper and ham color
-		m_copper->vblank_sync();
+		m_copper->vblank_sync(true);
 		m_ham_color = CUSTOM_REG(REG_COLOR00);
 	}
 
@@ -525,6 +525,10 @@ void amiga_state::render_scanline(bitmap_rgb32 &bitmap, int scanline)
 	raw_scanline = scanline;
 
 	scanline /= 2;
+
+	// notify copper that we are not in vblank anymore
+	if (scanline == get_screen_vblank_line())
+		m_copper->vblank_sync(false);
 
 	m_last_scanline = scanline;
 
@@ -904,17 +908,24 @@ uint32_t amiga_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	return 0;
 }
 
+bool amiga_state::get_screen_standard()
+{
+	// we support dynamic switching between PAL and NTSC, determine mode from register
+	if (m_agnus_id >= AGNUS_HR_PAL)
+		return CUSTOM_REG(REG_BEAMCON0) & 0x20;
+
+	// old agnus, agnus id determines PAL or NTSC
+	return !(m_agnus_id & 0x10);
+}
+
+int amiga_state::get_screen_vblank_line()
+{
+	return get_screen_standard() ? amiga_state::VBLANK_PAL : amiga_state::VBLANK_NTSC;
+}
+
 void amiga_state::update_screenmode()
 {
-	bool pal;
-
-	// first let's see if we're PAL or NTSC
-	if (m_agnus_id >= AGNUS_HR_PAL)
-		// we support dynamic switching between PAL and NTSC, determine mode from register
-		pal = CUSTOM_REG(REG_BEAMCON0) & 0x20;
-	else
-		// old agnus, agnus id determines PAL or NTSC
-		pal = !(m_agnus_id & 0x10);
+	bool pal = get_screen_standard();
 
 	// basic height & vblank length
 	int height = pal ? SCREEN_HEIGHT_PAL : SCREEN_HEIGHT_NTSC;

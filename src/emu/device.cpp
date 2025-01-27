@@ -368,7 +368,7 @@ void device_t::set_unscaled_clock(u32 clock, bool sync_on_new_clock_domain)
 		return;
 
 	m_unscaled_clock = clock;
-	m_clock = m_unscaled_clock * m_clock_scale;
+	m_clock = m_unscaled_clock * m_clock_scale + 0.5;
 	m_attoseconds_per_clock = (m_clock == 0) ? 0 : HZ_TO_ATTOSECONDS(m_clock);
 
 	// recalculate all derived clocks
@@ -393,7 +393,7 @@ void device_t::set_clock_scale(double clockscale)
 		return;
 
 	m_clock_scale = clockscale;
-	m_clock = m_unscaled_clock * m_clock_scale;
+	m_clock = m_unscaled_clock * m_clock_scale + 0.5;
 	m_attoseconds_per_clock = (m_clock == 0) ? 0 : HZ_TO_ATTOSECONDS(m_clock);
 
 	// recalculate all derived clocks
@@ -646,7 +646,7 @@ void device_t::pre_save()
 void device_t::post_load()
 {
 	// recompute clock-related parameters if something changed
-	u32 const scaled_clock = m_unscaled_clock * m_clock_scale;
+	u32 const scaled_clock = m_unscaled_clock * m_clock_scale + 0.5;
 	if (m_clock != scaled_clock)
 	{
 		m_clock = scaled_clock;

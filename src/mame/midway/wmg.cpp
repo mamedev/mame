@@ -463,8 +463,8 @@ ioport_value wmg_state::wmg_mux_r()
 u8 wmg_state::wmg_pia_0_r(offs_t offset)
 {
 	/* if player presses P1 and P2 in a game, return to the menu.
-    Since there is no code in rom to handle this, it must be a hardware feature
-    which probably just resets the cpu. */
+	Since there is no code in rom to handle this, it must be a hardware feature
+	which probably just resets the cpu. */
 
 	uint8_t const data = m_pia[0]->read(offset);
 

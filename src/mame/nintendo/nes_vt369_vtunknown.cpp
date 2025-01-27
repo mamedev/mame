@@ -170,6 +170,7 @@ public:
 
 	void nes_vt369_vtunknown_unk(machine_config& config);
 	void nes_vt369_vtunknown_unk_1mb(machine_config& config);
+	void nes_vt369_vtunknown_unk_4mb(machine_config& config);
 	void nes_vt369_vtunknown_unk_16mb(machine_config& config);
 
 	void nes_vt369_vtunknown_fp(machine_config& config);
@@ -448,7 +449,11 @@ void nes_vt369_vtunknown_unk_state::nes_vt369_vtunknown_unk_1mb(machine_config& 
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt369_vtunknown_unk_state::vt_external_space_map_1mbyte);
 }
 
-
+void nes_vt369_vtunknown_unk_state::nes_vt369_vtunknown_unk_4mb(machine_config& config)
+{
+	nes_vt369_vtunknown_unk(config);
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt369_vtunknown_unk_state::vt_external_space_map_4mbyte);
+}
 
 
 
@@ -881,13 +886,40 @@ ROM_START( otrail )
 	ROM_LOAD( "t24c04a.bin", 0x000, 0x200, CRC(ce1fad6f) SHA1(82878996765739edba42042b6336460d5c8f8096) )
 ROM_END
 
+ROM_START( pactin )
+	ROM_REGION( 0x100000, "mainrom", 0 )
+	ROM_LOAD( "25q80a.u3", 0x00000, 0x100000, CRC(92935759) SHA1(2333e7dcab51fa34c8d875374371854121fff27a) )
+ROM_END
+
+ROM_START( tetrtin )
+	ROM_REGION( 0x100000, "mainrom", 0 )
+	ROM_LOAD( "25q80.u3", 0x00000, 0x100000, CRC(017a99b9) SHA1(e7f891762bbc3b80ae0f177654d8d066b7524bcd) )
+ROM_END
 
 
+// GC31-369-20210702-V2 on PCB
+ROM_START( unk128vt )
+	ROM_REGION( 0x400000, "mainrom", 0 )
+	ROM_LOAD( "w25q32.bin", 0x00000, 0x400000, CRC(35ccadf6) SHA1(80b25e374a097d1b9380b7e64013d7ac0d5aa2ca) )
+ROM_END
 
 ROM_START( hhgc319 )
 	ROM_REGION( 0x1000000, "mainrom", 0 )
 	ROM_LOAD( "s29gl128n10tfi01.u3", 0x000000, 0x1000000, CRC(4b51125f) SHA1(bab3981ae1652cf6620c7c6769a6729a1e4d588f) )
 ROM_END
+
+ROM_START( vibes240 )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	// wouldn't read consistently
+	ROM_LOAD( "s29gl128p11tfi01.bin", 0x000000, 0x1000000, BAD_DUMP CRC(7244d6e9) SHA1(951052f6cd8c873f85f79be9d64498a43e92fd10) )
+	ROM_IGNORE(0x100)
+ROM_END
+
+ROM_START( lexi30 )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "lexi30.u3", 0x00000, 0x800000, CRC(0d4307ea) SHA1(0d7cf492f796b0bb871deebaca38a3ff3b2ed1e6) )
+ROM_END
+
 
 void nes_vt369_vtunknown_state::init_lxcmcypp()
 {
@@ -929,6 +961,8 @@ CONS( 2017, fapocket,   0,        0,  nes_vt369_vtunknown_fa_4x16mb, nes_vt369_v
     driver at all.
 
 ****************************************************************************************************************/
+
+CONS( 2012, lexi30,  0,0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "Lexibook", "Arcade Center (JL1800_01)", MACHINE_NOT_WORKING )
 
 // don't even get to menu. very enhanced chipset, VT368/9?
 CONS( 2012, dgun2561,  0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init, "dreamGEAR", "My Arcade Portable Gaming System with 140 Games (DGUN-2561)", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
@@ -1010,6 +1044,9 @@ CONS( 2020, nubsupmf,   0,      0,  nes_vt369_vtunknown_hh_4mb, nes_vt369_vtunkn
 // unknown tech level, might be scrambled as default codebank/boot vectors don't seem valid
 CONS( 201?, hhgc319,  0,        0,  nes_vt369_vtunknown_hh_16mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "Handheld Game Console 319-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
+// unknown tech, probably from 2021, probably VT369, ROM wouldn't read consistently
+CONS( 202?, vibes240, 0,        0,  nes_vt369_vtunknown_unk_16mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "Vibes Retro Pocket Gamer 240-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+
 /*****************************************************************************
 * below are VT369 games that use BGA on sub
 *****************************************************************************/
@@ -1065,4 +1102,10 @@ CONS( 201?, egame150,  denv150,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vt
 // uncertain, uses SPI ROM so probably VT369
 CONS( 2017, otrail,     0,        0,  nes_vt369_vtunknown_unk_1mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "Basic Fun", "The Oregon Trail", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
+// seems to be running the NES version of Pac-Man with some extra splash screens
+CONS( 2021, pactin,     0,        0,  nes_vt369_vtunknown_unk_1mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "Fizz Creations", "Pac-Man Arcade in a Tin", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
+CONS( 2021, tetrtin,    0,        0,  nes_vt369_vtunknown_unk_1mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "Fizz Creations", "Tetris Arcade in a Tin", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+
+// boots, has a lower resolution screen. menu is natively in low resolution, other games should be scaled down
+CONS( 2021, unk128vt,   0,        0,  nes_vt369_vtunknown_unk_4mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "unknown VT369 based 128-in-1 (GC31-369-20210702-V2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )

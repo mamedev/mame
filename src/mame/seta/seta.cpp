@@ -4483,7 +4483,7 @@ static INPUT_PORTS_START( drgnunit )
 	PORT_DIPSETTING(      0x0030, "3" )
 	PORT_DIPSETTING(      0x0020, "5" )
 	PORT_DIPUNUSED_DIPLOC( 0x0040, 0x0040, "SW1:7" )    // Labeled "Don't Touch" in manual
-	PORT_DIPNAME( 0x0080, 0x0080, "Unknown 1-8*" ) PORT_DIPLOCATION("SW1:8")    // Labeled "Don't Touch" in manual (seems to be used though)
+	PORT_DIPNAME( 0x0080, 0x0080, "20 Seconds Timer Increase" ) PORT_DIPLOCATION("SW1:8")    // Labeled "Don't Touch" in manual but it seems to work fine
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 

@@ -13,8 +13,6 @@
 Sony SPC700 CPU Emulator V1.0
 
 Copyright Karl Stenerud
-All rights reserved.
-
 
 */
 

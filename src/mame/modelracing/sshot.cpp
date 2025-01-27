@@ -410,6 +410,10 @@ ROM_START( sshot )
 	ROM_REGION( 0x0800, "gfx", 0 )
 	ROM_LOAD( "ss_a.b9",   0x0000, 0x0400, CRC(ad3413e0) SHA1(ea4c2728755fe52a00fdceddca0b641965045005) )
 	ROM_LOAD( "ss_b.b10",  0x0400, 0x0400, CRC(ba70e619) SHA1(df39512de881df26ccc7fa74f6bae82d92cd9008) )
+
+	ROM_REGION( 0x0120, "proms", 0 ) // PROMs on the sound board
+	ROM_LOAD( "74s387_cs229_45.5a",     0x0000, 0x0100, CRC(f36cd927) SHA1(e2720d53c785df4ce03c4ecc3332c3f0a0bbe1ad) )
+	ROM_LOAD( "mmi-6331-1_cs229_46.2b", 0x0100, 0x0020, CRC(f4fa91d4) SHA1(0e0903532c8609c2d42491c2013647a42d13749a) )
 ROM_END
 
 ROM_START( gunchamps )
@@ -426,7 +430,7 @@ ROM_START( gunchamps )
 	ROM_LOAD( "gc-a.b9",   0x0000, 0x0400, CRC(c07f290e) SHA1(760ce12f4f5cadbd846d361c615f5026356a6fe2) )
 	ROM_LOAD( "gc-b.b10",  0x0400, 0x0400, CRC(10ce709b) SHA1(e6f194aa26cd0e01ba0de3909948cc8595031d4d) )
 
-	ROM_REGION( 0x0120, "proms", 0 ) // proms on the sound board
+	ROM_REGION( 0x0120, "proms", 0 ) // PROMs on the sound board
 	ROM_LOAD( "snd82s129.a5",  0x0000, 0x0100, CRC(1d74dc30) SHA1(b956d8c6564cc3cc1b5f5f55b05ad4aa13f247e6) )
 	ROM_LOAD( "snd82s23.b7",   0x0100, 0x0020, CRC(f4fa91d4) SHA1(0e0903532c8609c2d42491c2013647a42d13749a) )
 ROM_END

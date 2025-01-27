@@ -5,7 +5,7 @@
  *
  *   Portable I8085A emulator V1.3
  *
- *   Copyright Juergen Buchmueller, all rights reserved.
+ *   Copyright Juergen Buchmueller
  *   Partially based on information out of Z80Em by Marcel De Kogel
  *
  *   TODO:

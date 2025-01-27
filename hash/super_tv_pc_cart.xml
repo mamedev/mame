@@ -54,7 +54,7 @@ license:CC0-1.0
 			<dataarea name="prg" size="0x400000">
 				<rom name="c-04.u1" size="0x400000" crc="89b6ef86" sha1="1af69047508fce08fa949a7d821255e306a329a3" />
 				<!-- bypass (invisible) EEPROM error until cart EEPROM is properly hooked up -->
-				<rom value="0xea" offset="0xd5fa" size="2" loadflag="fill" />		
+				<rom value="0xea" offset="0xd5fa" size="2" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>

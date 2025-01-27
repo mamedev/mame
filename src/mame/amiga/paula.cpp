@@ -9,21 +9,21 @@
     DMA driven audio, the floppy controller, a serial receiver/transmitter,
     analog inputs and contains the interrupt controller.
 
-    References:
-    - https://www.amigarealm.com/computing/knowledge/hardref/ch5.htm
+References:
+- https://www.amigarealm.com/computing/knowledge/hardref/ch5.htm
 
-    TODO:
-    - Inherit FDC, serial and irq controller to here;
-    - Move Agnus "location" logic out of here;
-    - low-pass filter control thru Amiga Power LED where available, technically
-      outside of Paula;
-    - Verify ADKCON modulation;
-    - Verify manual mode:
-      \- AGA roadkill during gameplay, which also has very long period setups,
-         extremely aliased;
-    - When a DMA stop occurs, is the correlated channel playback stopped
-      at the end of the current cycle or as soon as possible like current
-      implementation?
+TODO:
+- Inherit FDC, serial and irq controller to here;
+- Move Agnus "location" logic out of here;
+- low-pass filter control thru Amiga Power LED where available, technically
+  outside of Paula;
+- Verify ADKCON modulation;
+- Verify manual mode;
+- amigaaga_flop:roadkill gameplay sets up incredibly high period (-> low pitch)
+  samples (engine thrust, bumping into walls);
+- When a DMA stop occurs, is the correlated channel playback stopped
+  at the end of the current cycle or as soon as possible like current
+  implementation?
 
 ******************************************************************************/
 
@@ -76,6 +76,18 @@ void paula_device::device_start()
 
 	// create the stream
 	m_stream = stream_alloc(0, 4, clock() / CLOCK_DIVIDER);
+
+	save_pointer(STRUCT_MEMBER(m_channel, loc), 4);
+	save_pointer(STRUCT_MEMBER(m_channel, len), 4);
+	save_pointer(STRUCT_MEMBER(m_channel, per), 4);
+	save_pointer(STRUCT_MEMBER(m_channel, vol), 4);
+	save_pointer(STRUCT_MEMBER(m_channel, curticks), 4);
+	save_pointer(STRUCT_MEMBER(m_channel, manualmode), 4);
+	save_pointer(STRUCT_MEMBER(m_channel, curlocation), 4);
+	save_pointer(STRUCT_MEMBER(m_channel, curlength), 4);
+	save_pointer(STRUCT_MEMBER(m_channel, dma_enabled), 4);
+	save_pointer(STRUCT_MEMBER(m_channel, atper), 4);
+	save_pointer(STRUCT_MEMBER(m_channel, atvol), 4);
 }
 
 void paula_device::device_reset()
