@@ -194,7 +194,7 @@ static void tzx_cas_get_blocks( const uint8_t *casdata, int caslen )
 
 		if (pos > caslen)
 		{
-			LOG_FORMATS("Block %d(ID=%d) with wrong lenght discarded\n", block_count, blocktype);
+			LOG_FORMATS("Block %d(ID=%d) with wrong length discarded\n", block_count, blocktype);
 		}
 		else
 		{
