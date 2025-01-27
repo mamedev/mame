@@ -598,9 +598,6 @@ private:
 
 	void palette(palette_device &palette) const;
 
-	u8 rtc_r(offs_t offset);
-	void rtc_w(offs_t offset, u8 data);
-
 	// need to handle bit 8 reset
 	void irq1_raise(int state);
 	u16 timer_r(offs_t offset);
