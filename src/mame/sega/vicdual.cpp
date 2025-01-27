@@ -3895,8 +3895,8 @@ ROM_START( nsubc ) // S-97396-P main board + 97093-P-B-S sub board + 97269-P-B (
 	ROM_LOAD( "pr-33.u14", 0x0000, 0x0020, BAD_DUMP CRC(e60a7960) SHA1(b8b8716e859c57c35310efc4594262afedb84823) )    // control PROM
 	ROM_LOAD( "pr-34.u15", 0x0020, 0x0020, BAD_DUMP CRC(a1506b9d) SHA1(037c3db2ea40eca459e8acba9d1506dd28d72d10) )    // sequence PROM
 
-	ROM_REGION( 0x2c, "plds", ROMREGION_ERASE00 )
-	ROM_LOAD( "pay03.ic4", 0x00, 0x2c, NO_DUMP ) // PAL10H8. Protection related? on 97093-P-B-S stickered sub board.
+	ROM_REGION( 0x117, "plds", 0 ) // Protection related? on 97093-P-B-S stickered sub board.
+	ROM_LOAD( "pay03.ic4", 0x000, 0x117, CRC(319ffc87) SHA1(07689c28eec19676fdec98f6d488c22754542322) ) // PAL10H8, but converted for GAL16V8
 ROM_END
 
 ROM_START( sspaceat )
