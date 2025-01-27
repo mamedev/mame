@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-01-06 18:43+0100\n"
-"PO-Revision-Date: 2025-01-06 20:07+0100\n"
+"PO-Revision-Date: 2025-01-27 15:15+0100\n"
 "Last-Translator: Daniel Nylander <github@danielnylander.se>\n"
 "Language-Team: MAME Language Team\n"
 "Language: sv\n"
@@ -30,7 +30,7 @@ msgstr "Fel vid öppning av diskettavbildning: %1$s"
 
 #: src/frontend/mame/ui/datmenu.cpp:100 src/frontend/mame/ui/selmenu.cpp:3998
 msgid "Software List Info"
-msgstr ""
+msgstr "Info om programvarulista"
 
 #: src/frontend/mame/ui/datmenu.cpp:338
 #, c-format
@@ -284,7 +284,7 @@ msgstr "  Hanafuda-inmatningar    [%1$d inmatningar]\n"
 #: src/frontend/mame/ui/devopt.cpp:320
 #, c-format
 msgid "  Gambling inputs    [%1$d inputs]\n"
-msgstr ""
+msgstr "  Ingångar för spel [%1$d ingångar]]\n"
 
 #: src/frontend/mame/ui/devopt.cpp:322
 #, c-format
@@ -294,12 +294,12 @@ msgstr "  Analoga inmatningar    [%1$d inmatningar]\n"
 #: src/frontend/mame/ui/devopt.cpp:324
 #, c-format
 msgid "  Adjuster inputs    [%1$d inputs]\n"
-msgstr ""
+msgstr "  Ingångar för justerare [%1$d ingångar]]\n"
 
 #: src/frontend/mame/ui/devopt.cpp:326
 #, c-format
 msgid "  Keypad inputs    [%1$d inputs]\n"
-msgstr ""
+msgstr "  Knappsatsens ingångar [%1$d ingångar]\n"
 
 #: src/frontend/mame/ui/devopt.cpp:328
 #, c-format
@@ -369,7 +369,7 @@ msgstr ""
 #: src/frontend/mame/ui/ui.cpp:789
 msgid ""
 "This system requires media images to be mounted for the following device(s): "
-msgstr "Detta system kräver att mediabilder monteras för följande enhet(er): "
+msgstr "Detta system kräver attmediabilder monteras för följande enhet(er): "
 
 #: src/frontend/mame/ui/ui.cpp:1552
 #, c-format
@@ -401,7 +401,7 @@ msgstr "%1$s Volym"
 #: src/frontend/mame/ui/ui.cpp:1891
 #, c-format
 msgid "%s '%s' Panning"
-msgstr ""
+msgstr "%s '%s' Panorering"
 
 #: src/frontend/mame/ui/ui.cpp:1912
 #, c-format
@@ -1198,7 +1198,7 @@ msgstr "Status: FUNGERAR INTE"
 #: src/frontend/mame/ui/simpleselgame.cpp:366
 #: src/frontend/mame/ui/selmenu.cpp:879
 msgid "Status: Unemulated Protection"
-msgstr ""
+msgstr "Status: Oemulerat skydd"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:368
 #: src/frontend/mame/ui/selmenu.cpp:881
@@ -1347,7 +1347,7 @@ msgstr "Ursprunglig utgivare"
 #: src/frontend/mame/ui/utils.cpp:73
 msgctxt "swlist-info"
 msgid "Part Number"
-msgstr ""
+msgstr "Artikelnummer"
 
 #: src/frontend/mame/ui/utils.cpp:74
 msgctxt "swlist-info"
@@ -1765,7 +1765,7 @@ msgstr "Visa DATs vy"
 
 #: src/frontend/mame/ui/selmenu.cpp:275
 msgid "Select Software Package Part"
-msgstr ""
+msgstr "Välj del av programvarupaket"
 
 #: src/frontend/mame/ui/selmenu.cpp:346
 msgid "Select System BIOS"
@@ -2429,7 +2429,7 @@ msgstr "Välj"
 #: src/frontend/mame/ui/dirmenu.cpp:65
 msgctxt "path-option"
 msgid "Game Over Screens"
-msgstr ""
+msgstr "Game Over-skärmar"
 
 #: src/frontend/mame/ui/dirmenu.cpp:66
 msgctxt "path-option"
@@ -3179,7 +3179,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/selsoft.cpp:535
 msgid "[Start empty]"
-msgstr ""
+msgstr "[Starta tom]"
 
 #: src/frontend/mame/ui/selsoft.cpp:535
 msgid "[Use file manager]"
@@ -3292,7 +3292,7 @@ msgstr "Strypning"
 
 #: src/frontend/mame/ui/submenu.cpp:57
 msgid "Mute when unthrottled"
-msgstr ""
+msgstr "Tyst när den inte stryps"
 
 #: src/frontend/mame/ui/submenu.cpp:58
 msgid "Sleep"
@@ -3660,13 +3660,13 @@ msgstr " %1$d×%2$d färg %3$X/%4$X"
 #, c-format
 msgctxt "gfxview"
 msgid "Tilemap %1$d/%2$d category %3$u"
-msgstr ""
+msgstr "Tilemap %1$d/%2$d kategori %3$u"
 
 #: src/frontend/mame/ui/viewgfx.cpp:1411
 #, c-format
 msgctxt "gfxview"
 msgid "Tilemap %1$d/%2$d "
-msgstr ""
+msgstr "Tilemap %1$d/%2$d "
 
 #: src/frontend/mame/ui/viewgfx.cpp:1433
 #, c-format
@@ -3800,7 +3800,7 @@ msgstr "%1$s Öka/minska hastighet"
 #, c-format
 msgctxt "menu-analoginput"
 msgid "%1$s Auto-centering Speed"
-msgstr ""
+msgstr "%1$s Auto-centrering hastighet"
 
 #: src/frontend/mame/ui/analogipt.cpp:645
 #, c-format
@@ -4427,22 +4427,22 @@ msgstr "%p Hanafuda Nej"
 #: src/emu/inpttype.ipp:103
 msgctxt "input-name"
 msgid "Key In"
-msgstr ""
+msgstr "Nyckel in"
 
 #: src/emu/inpttype.ipp:104
 msgctxt "input-name"
 msgid "Key Out"
-msgstr ""
+msgstr "Nyckel ut"
 
 #: src/emu/inpttype.ipp:105 src/emu/inpttype.ipp:607
 msgctxt "input-name"
 msgid "Service"
-msgstr ""
+msgstr "Service"
 
 #: src/emu/inpttype.ipp:106
 msgctxt "input-name"
 msgid "Book-Keeping"
-msgstr ""
+msgstr "Bokföring"
 
 #: src/emu/inpttype.ipp:107
 msgctxt "input-name"
@@ -4462,27 +4462,27 @@ msgstr "Satsa"
 #: src/emu/inpttype.ipp:110
 msgctxt "input-name"
 msgid "Deal"
-msgstr ""
+msgstr "Dela"
 
 #: src/emu/inpttype.ipp:111
 msgctxt "input-name"
 msgid "Stand"
-msgstr ""
+msgstr "Stanna"
 
 #: src/emu/inpttype.ipp:112
 msgctxt "input-name"
 msgid "Take Score"
-msgstr ""
+msgstr "Ta vinsten"
 
 #: src/emu/inpttype.ipp:113
 msgctxt "input-name"
 msgid "Double Up"
-msgstr ""
+msgstr "Dubbelt upp"
 
 #: src/emu/inpttype.ipp:114
 msgctxt "input-name"
 msgid "Half Gamble"
-msgstr ""
+msgstr "Halvspel"
 
 #: src/emu/inpttype.ipp:115
 msgctxt "input-name"
@@ -4497,27 +4497,27 @@ msgstr "Låg"
 #: src/emu/inpttype.ipp:121
 msgctxt "input-name"
 msgid "Hold 1"
-msgstr ""
+msgstr "Håll 1"
 
 #: src/emu/inpttype.ipp:122
 msgctxt "input-name"
 msgid "Hold 2"
-msgstr ""
+msgstr "Håll 2"
 
 #: src/emu/inpttype.ipp:123
 msgctxt "input-name"
 msgid "Hold 3"
-msgstr ""
+msgstr "Håll 3"
 
 #: src/emu/inpttype.ipp:124
 msgctxt "input-name"
 msgid "Hold 4"
-msgstr ""
+msgstr "Håll 4"
 
 #: src/emu/inpttype.ipp:125
 msgctxt "input-name"
 msgid "Hold 5"
-msgstr ""
+msgstr "Håll 5"
 
 #: src/emu/inpttype.ipp:126
 msgctxt "input-name"
@@ -4527,32 +4527,32 @@ msgstr "Avbryt"
 #: src/emu/inpttype.ipp:131
 msgctxt "input-name"
 msgid "Stop Reel 1"
-msgstr ""
+msgstr "Stoppa rulle 1"
 
 #: src/emu/inpttype.ipp:132
 msgctxt "input-name"
 msgid "Stop Reel 2"
-msgstr ""
+msgstr "Stoppa rulle 2"
 
 #: src/emu/inpttype.ipp:133
 msgctxt "input-name"
 msgid "Stop Reel 3"
-msgstr ""
+msgstr "Stoppa rulle 3"
 
 #: src/emu/inpttype.ipp:134
 msgctxt "input-name"
 msgid "Stop Reel 4"
-msgstr ""
+msgstr "Stoppa rulle 4"
 
 #: src/emu/inpttype.ipp:135
 msgctxt "input-name"
 msgid "Stop Reel 5"
-msgstr ""
+msgstr "Stoppa rulle 5"
 
 #: src/emu/inpttype.ipp:136
 msgctxt "input-name"
 msgid "Stop All Reels"
-msgstr ""
+msgstr "Stoppa alla rullar"
 
 #: src/emu/inpttype.ipp:560
 msgctxt "input-name"
@@ -4662,42 +4662,42 @@ msgstr "Sedel 1"
 #: src/emu/inpttype.ipp:589
 msgctxt "input-name"
 msgid "Service 1"
-msgstr ""
+msgstr "Service 1"
 
 #: src/emu/inpttype.ipp:590
 msgctxt "input-name"
 msgid "Service 2"
-msgstr ""
+msgstr "Service 2"
 
 #: src/emu/inpttype.ipp:591
 msgctxt "input-name"
 msgid "Service 3"
-msgstr ""
+msgstr "Service 3"
 
 #: src/emu/inpttype.ipp:592
 msgctxt "input-name"
 msgid "Service 4"
-msgstr ""
+msgstr "Service 4"
 
 #: src/emu/inpttype.ipp:597
 msgctxt "input-name"
 msgid "Tilt 1"
-msgstr ""
+msgstr "Tilt 1"
 
 #: src/emu/inpttype.ipp:598
 msgctxt "input-name"
 msgid "Tilt 2"
-msgstr ""
+msgstr "Tilt 2"
 
 #: src/emu/inpttype.ipp:599
 msgctxt "input-name"
 msgid "Tilt 3"
-msgstr ""
+msgstr "Tilt 3"
 
 #: src/emu/inpttype.ipp:600
 msgctxt "input-name"
 msgid "Tilt 4"
-msgstr ""
+msgstr "Tilt 4"
 
 #: src/emu/inpttype.ipp:605
 msgctxt "input-name"
@@ -4712,12 +4712,12 @@ msgstr "Ström av"
 #: src/emu/inpttype.ipp:608
 msgctxt "input-name"
 msgid "Tilt"
-msgstr ""
+msgstr "Tilta"
 
 #: src/emu/inpttype.ipp:609
 msgctxt "input-name"
 msgid "Door Interlock"
-msgstr ""
+msgstr "Låsning av dörr"
 
 #: src/emu/inpttype.ipp:610
 msgctxt "input-name"
@@ -5679,7 +5679,7 @@ msgstr "Hoppa-över-bild öka"
 #: src/emu/inpttype.ipp:906
 msgctxt "input-name"
 msgid "Throttle"
-msgstr ""
+msgstr "Gasreglage"
 
 #: src/emu/inpttype.ipp:907
 msgctxt "input-name"
@@ -5940,7 +5940,7 @@ msgstr "Släpp"
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "Loop to step %d"
-msgstr ""
+msgstr "Loop till steg %d"
 
 #: plugins/inputmacro/inputmacro_menu.lua:379
 #, lua-format
@@ -5951,7 +5951,7 @@ msgstr "Förläng steg %d"
 #: plugins/inputmacro/inputmacro_menu.lua:381
 msgctxt "plugin-inputmacro"
 msgid "When held"
-msgstr ""
+msgstr "När hålls"
 
 #: plugins/inputmacro/inputmacro_menu.lua:385
 #, lua-format
@@ -6324,32 +6324,36 @@ msgstr "Plats 1 värde"
 
 #: plugins/cheatfind/init.lua:739
 msgid "Last Slot Value"
-msgstr ""
+msgstr "Senaste slot-värde"
 
 #: plugins/cheatfind/init.lua:742
 msgid "Test/Write Poke Value"
-msgstr ""
+msgstr "Test/skriv Poke-värde"
 
 #: plugins/cheatfind/init.lua:749
 msgid ""
 "Use this if you want to poke the Slot 1 value (eg. You started with "
 "something but lost it)"
 msgstr ""
+"Använd detta om du vill peka på Slot 1-värdet (t.ex. Du började med något "
+"men förlorade det)"
 
 #: plugins/cheatfind/init.lua:751
 msgid ""
 "Use this if you want to poke the Last Slot value (eg. You started without an "
 "item but finally got it)"
 msgstr ""
+"Använd detta om du vill påverka värdet för Last Slot (t.ex. du började utan "
+"ett föremål men fick det till slut)"
 
 #: plugins/cheatfind/init.lua:753
 #, lua-format
 msgid "Use this if you want to poke %s"
-msgstr ""
+msgstr "Använd den här om du vill poke på %s"
 
 #: plugins/cheatfind/init.lua:776
 msgid "Aligned only"
-msgstr ""
+msgstr "Endast justerad"
 
 #: plugins/cheatfind/init.lua:793
 msgid "Undo last search -- #"
@@ -6603,7 +6607,7 @@ msgstr "Lägg till autofire-knapp"
 #: plugins/autofire/autofire_menu.lua:150
 msgctxt "plugin-autofire"
 msgid "n/a"
-msgstr ""
+msgstr "inte tillgänglig"
 
 #: plugins/autofire/autofire_menu.lua:152
 #: plugins/autofire/autofire_menu.lua:154
@@ -6624,22 +6628,22 @@ msgstr "Snabbtangent"
 #: plugins/autofire/autofire_menu.lua:160
 msgctxt "plugin-autofire"
 msgid "On frames"
-msgstr ""
+msgstr "På bildrutor"
 
 #: plugins/autofire/autofire_menu.lua:161
 msgctxt "plugin-autofire"
 msgid "Off frames"
-msgstr ""
+msgstr "Utanför bildrutor"
 
 #: plugins/autofire/autofire_menu.lua:200
 msgctxt "plugin-autofire"
 msgid "Number of frames button will be pressed"
-msgstr ""
+msgstr "Antal bildrutor som knappen ska tryckas på"
 
 #: plugins/autofire/autofire_menu.lua:213
 msgctxt "plugin-autofire"
 msgid "Number of frames button will be released"
-msgstr ""
+msgstr "Antal bildrutor som knappen kommer att släppas"
 
 #: plugins/autofire/autofire_menu.lua:230
 msgctxt "plugin-autofire"
