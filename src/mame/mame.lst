@@ -18915,309 +18915,6 @@ jumpcoast
 redrobin
 
 @source:galaxian/galaxian.cpp
-<<<<<<< HEAD
-600
-amidar
-amidar1
-amidarb
-amidarb2
-amidarc
-amidaro
-amidars
-amidaru
-amigo
-amigo2
-anteater
-anteaterg
-anteatergg
-anteateruk
-aracnis
-aracnisa
-armorcar
-armorcar2
-asideral
-astrians
-astroamb
-ataqandr
-atlantis
-atlantis2
-atlantisb
-azurian
-bagmanm2
-bagmanm3
-bagmanmc
-batman2
-bigkonggx
-blkhole
-bmxstunts
-bomber
-bongo
-bongog
-calipso
-catacomb
-checkman
-checkmanj
-chewing
-ckongcv
-ckongg
-ckonggx
-ckongis
-ckongmc
-ckongmc2
-ckongs
-crazym
-devilfshg
-devilfshgb
-dingo
-dingoe
-eagle
-eagle2
-eagle3
-exodus
-explorer
-fantastc
-fantazia
-floritas
-floritasm
-fntspcian
-frogf
-frogg
-froggeg
-frogger
-froggeram
-froggereb
-froggermc
-froggers
-froggers1
-froggers2
-froggers3
-froggert
-froggervd
-froggrs
-fourplay
-galactica2
-galap1
-galap2
-galap4
-galapx
-galartic
-galaxbsf
-galaxbsf2
-galaxcirsa
-galaxiamv
-galaxian
-galaxiana
-galaxianbl
-galaxianbl2
-galaxianbl3
-galaxianem
-galaxiani
-galaxianiii
-galaxianm
-galaxianmo
-galaxianrp
-galaxiant
-galaxrcgg
-galaxrf
-galaxrfgg
-galaxyx
-galemp
-galkamika
-galturbo
-ghostmun
-gmgalax
-gteikoku
-gteikokub
-gteikokub2
-gteikokub3
-guttangt
-guttangts3
-highroll
-jumpbug
-jumpbugb
-jumpbugbc
-jumpbugbrf
-jungsub
-kamakazi3
-kamikazesp
-kamikazp
-kingball
-kingballj
-komemokos
-kong
-ladybugg
-ladybugg2
-levers
-losttomb
-losttombh
-luctoday
-mandinga
-mandingac
-mandingaeg
-mandingag
-mandingarf
-mandinka
-mcwars
-meteora
-mimonkey
-mimonsco
-mimonscr
-mimonscra
-mltiwars
-monsterz
-monsterza
-moonal2
-moonal2b
-moonaln
-mooncmw
-mooncptc
-mooncrecm
-mooncreg
-mooncreg2
-mooncrgx
-mooncrs2
-mooncrs3
-mooncrs4
-mooncrs5
-mooncrsb
-mooncrsl
-mooncrst
-mooncrstg
-mooncrsts
-mooncrstso
-mooncrsto
-mooncrstu
-mooncrstuu
-mooncrstuk
-mooncrstuku
-moonqsr
-moonwar
-moonwara
-mouncrst
-mshuttle
-mshuttle2
-mshuttlea
-mshuttlej
-mshuttlej2
-mutacion
-namenayo
-ncentury
-offensiv
-olibug
-olmandingo
-olmandingc
-omegab
-omni
-orbitron
-ozon1
-pacmanbl
-pacmanbla
-pacmanblb
-pacmanblc
-pacmanblci
-pacmanblv
-pacmanblva
-pajaroes
-phoenxp2
-pisces
-piscesb
-porter
-portera
-quaak
-redufo
-redufob
-redufob2
-redufob3
-rocktcnvy
-sbhoei
-sbhoeia
-scobra
-scobrab
-scobrae
-scobrae2
-scobrag
-scobraggi
-scobras
-scobrase
-scorpion
-scorpiona
-scorpionb
-scorpionmc
-scramble
-scramblebb
-scramblebf
-scramblebun
-scrambles
-scrambles2
-scrambp
-scramce
-scrammr
-scrampt
-scramrf
-sfx
-sgalwars
-sirio2
-skelagon
-skybase
-skyraidr
-smooncrs
-spacbat2
-spacbatt
-spacempr
-spacian2
-spactrai
-spcdrag
-spcmission
-spctrek
-spctbird
-spdcoin
-sstarcrs
-starfght
-starfgmc
-stera
-streakng
-streaknga
-strfbomb
-superbon
-superbona
-superg
-supergs
-supergx
-supershp
-suprheli
-swarm
-tazmania
-tdpgal
-tenspot
-theend
-takeoff
-theends
-theendss
-thepitm
-timefgtr
-tst_galx
-turpin
-turpinnv
-turpins
-turtles
-uniwars
-uniwarsa
-victoryc
-victorycb
-videight
-vueloesp
-warofbug
-warofbugg
-warofbugu
-zerotime
-zerotimea
-zerotimeb
-galaktron
-zerotimed
-zerotimemc
-zigzagb
-zigzagb2
-=======
 600                             // GX353 (c) 1981 Konami
 amidar                          // GX337 (c) 1982 Konami
 amidar1                         // GX337 (c) 1981 Konami
@@ -19515,7 +19212,6 @@ zerotimed                       // hack (Datamat)
 zerotimemc                      // hack (Marti Colls)
 zigzagb                         // (c) 1982 LAX (bootleg)
 zigzagb2                        // (c) 1982 LAX (bootleg)
->>>>>>> c19fbc8d621 (galaxian/galaxian.cpp: Added Rocket Convoy (War of the Bugs clone from Radar Ltd.). (#13198))
 
 @source:galaxian/galaxian_rockclim.cpp
 rockclim
@@ -33512,9 +33208,15 @@ driblingo
 driblingvm
 
 @source:modelracing/sshot.cpp
+<<<<<<< HEAD
 gunchamps
 sshot
 sshota
+=======
+gunchamps                       // (c) 1980 Model Racing (sshot.cpp)
+sshot                           // (c) 1979 Model Racing
+sshota                          // (c) 1979 Model Racing
+>>>>>>> 650b7e1d711 (New working clones)
 
 @source:modelracing/subhuntr.cpp
 subhuntr
@@ -37381,6 +37083,7 @@ keith
 paclandp
 
 @source:philips/cdi.cpp
+<<<<<<< HEAD
 cdi490a
 cdi910
 cdibios
@@ -37404,6 +37107,31 @@ quizard4_40
 quizard4_41
 quizard4cz
 quizardff
+=======
+cdi490a                         //
+cdi910                          //
+cdibios                         // Base unit
+cdimono1                        // Philips CD-i model 200 (Mono-I board, PAL)
+cdimono2                        // Philips CD-i model 220 (Mono-II board, NTSC)
+gpi1200                         //
+quizard                         // (c) TAB Austria 199?
+quizard_10                      // (c) TAB Austria 1996
+quizard_12                      // (c) TAB Austria 1996
+quizard_17                      // (c) TAB Austria 1996
+quizardi                        // (c) TAB Austria 199?
+quizardi_12                     // (c) TAB Austria 1996
+quizardi_17                     // (c) TAB Austria 1996
+quizard2                        // (c) TAB Austria 1995
+quizard2_22                     // (c) TAB Austria 199?
+quizard3                        // (c) TAB Austria 1996
+quizard3_32                     // (c) TAB Austria 1996
+quizard3a                       // (c) TAB Austria 1996
+quizard4                        // (c) TAB Austria 1998
+quizard4_40                     // (c) TAB Austria 1997
+quizard4_41                     // (c) TAB Austria 1998
+quizard4cz                      // (c) TAB Austria 1998
+quizardff                       // (c) TAB Austria 1996
+>>>>>>> 650b7e1d711 (New working clones)
 
 @source:philips/minitel_2_rpic.cpp
 minitel2
@@ -42447,6 +42175,7 @@ emjscanb
 emjtrapz
 
 @source:seibu/seibuspi.cpp
+<<<<<<< HEAD
 batlball
 batlballa
 batlballe
@@ -42507,6 +42236,68 @@ viprp1s
 viprp1t
 viprp1u
 viprp1ua
+=======
+batlball                        // (c) 1995 Seibu Kaihatsu (Tuning License)
+batlballa                       // (c) 1995 Seibu Kaihatsu (Metrotainment License)
+batlballe                       // (c) 1995 Seibu Kaihatsu (Metrotainment License)
+batlballo                       // (c) 1995 Seibu Kaihatsu (Tuning License)
+batlballpt                      // (c) 1995 Seibu Kaihatsu
+batlballu                       // (c) 1995 Seibu Kaihatsu (Fabtek license)
+ejanhs                          // (c) 1996 Seibu Kaihatsu
+ejsakura                        // (c) 1999 Seibu Kaihatsu
+ejsakura12                      // (c) 1999 Seibu Kaihatsu
+rdft                            // (c) 1996 Seibu Kaihatsu (Tuning License)
+rdft2                           // (c) 1997 Seibu Kaihatsu (Tuning License)
+rdft22kc                        // (c) 2000 Seibu Kaihatsu
+rdft2a                          // (c) 1997 Seibu Kaihatsu (Metrotainment license)
+rdft2aa                         // (c) 1997 Seibu Kaihatsu (Dream Island license)
+rdft2it                         // (c) 1997 Seibu Kaihatsu
+rdft2j                          // (c) 1997 Seibu Kaihatsu
+rdft2ja                         // (c) 1997 Seibu Kaihatsu
+rdft2jb                         // (c) 1997 Seibu Kaihatsu
+rdft2jc                         // (c) 1997 Seibu Kaihatsu
+rdft2s                          // (c) 2000 Seibu Kaihatsu
+rdft2t                          // (c) 1997 Seibu Kaihatsu
+rdft2u                          // (c) 1997 Seibu Kaihatsu (Fabtek license)
+rdft2us                         // (c) 1997 Seibu Kaihatsu (Fabtek license)
+rdfta                           // (c) 1996 Seibu Kaihatsu
+rdftadi                         // (c) 1996 Seibu Kaihatsu (Dream Island license)
+rdftadia                        // (c) 1996 Seibu Kaihatsu (Dream Island license)
+rdftam                          // (c) 1996 Seibu Kaihatsu (Metrotainment license)
+rdftau                          // (c) 1996 Seibu Kaihatsu
+rdftauge                        // (c) 1996 Seibu Kaihatsu (Tuning license and text display, but Australia region code)
+rdftgb                          // (c) 1996 Seibu Kaihatsu
+rdftgr                          // (c) 1996 Seibu Kaihatsu
+rdftit                          // (c) 1996 Seibu Kaihatsu
+rdftj                           // (c) 1996 Seibu Kaihatsu
+rdftja                          // (c) 1996 Seibu Kaihatsu
+rdftjb                          // (c) 1996 Seibu Kaihatsu
+rdfts                           // (c) 1996 Seibu Kaihatsu (Explorer System Corp.)
+rdftu                           // (c) 1996 Seibu Kaihatsu (Fabtek license)
+rdftua                          // (c) 1996 Seibu Kaihatsu (Fabtek license)
+rfjet                           // (c) 1998 Seibu Kaihatsu (Tuning License)
+rfjet2kc                        // (c) 2000 Seibu Kaihatsu
+rfjeta                          // (c) 1998 Seibu Kaihatsu (Dream Island license)
+rfjetj                          // (c) 1998 Seibu Kaihatsu
+rfjets                          // (c) 1998 Seibu Kaihatsu
+rfjetsa                         // (c) 1998 Seibu Kaihatsu
+rfjett                          // (c) 1998 Seibu Kaihatsu (Taiwan license)
+rfjetu                          // (c) 1998 Seibu Kaihatsu (Fabtek license)
+senkyu                          // (c) 1995 Seibu Kaihatsu
+senkyua                         // (c) 1995 Seibu Kaihatsu
+viprp1                          // (c) 1995 Seibu Kaihatsu
+viprp1h                         // (c) 1995 Seibu Kaihatsu
+viprp1hk                        // (c) 1995 Seibu Kaihatsu (Metrotainment License)
+viprp1j                         // (c) 1995 Seibu Kaihatsu
+viprp1k                         // (c) 1995 Seibu Kaihatsu (Dream Island license)
+viprp1oj                        // (c) 1995 Seibu Kaihatsu
+viprp1ot                        // (c) 1995 Seibu Kaihatsu (Tuning License)
+viprp1pt                        // (c) 1995 Seibu Kaihatsu
+viprp1s                         // (c) 1995 Seibu Kaihatsu
+viprp1t                         // (c) 1995 Seibu Kaihatsu (Tuning License)
+viprp1u                         // (c) 1995 Seibu Kaihatsu (Fabtek license)
+viprp1ua                        // (c) 1995 Seibu Kaihatsu (Fabtek license)
+>>>>>>> 650b7e1d711 (New working clones)
 
 @source:seibu/seicupbl.cpp
 cupsocsb
