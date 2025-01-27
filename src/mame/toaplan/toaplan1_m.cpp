@@ -131,14 +131,14 @@ void toaplan1_demonwld_state::device_post_load()
 void toaplan1_demonwld_state::dsp_ctrl_w(u8 data)
 {
 #if 0
-	logerror("68000:%08x  Writing %02x to $e0000b.\n",m_maincpu->pc() ,data);
+	logerror("68000:%08x  Writing %02x to $e0000b.\n", m_maincpu->pc(), data);
 #endif
 
 	switch (data)
 	{
 		case 0x00:  dsp_int_w(1); break;  /* Enable the INT line to the DSP */
 		case 0x01:  dsp_int_w(0); break;  /* Inhibit the INT line to the DSP */
-		default:    logerror("68000:%08x  Writing unknown command %02x to $e0000b\n",m_maincpu->pcbase() ,data); break;
+		default:    logerror("68000:%08x  Writing unknown command %02x to $e0000b\n", m_maincpu->pcbase(), data); break;
 	}
 }
 
