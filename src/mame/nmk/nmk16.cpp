@@ -10624,7 +10624,7 @@ GAME( 1993, powerinsc,  powerins, powerinsc,   powerins,      nmk16_state,      
 GAME( 1991, manybloc,   0,        manybloc,     manybloc,     nmk16_state, init_tharrier,        ROT270, "Bee-Oh",                       "Many Block", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )
 
 // clone board, different sound / bg hardware, but similar memory maps, same tx layer, sprites etc.
-GAME( 1997, tomagic,   0,         tomagic,      tomagic,      nmk16_tomagic_state, init_tomagic, ROT0, "Hobbitron T.K.Trading Co. Ltd.", "Tom Tom Magic", 0 )
+GAME( 1997, tomagic,    0,        tomagic,      tomagic,      nmk16_tomagic_state, init_tomagic, ROT0, "Hobbitron T.K.Trading Co. Ltd.", "Tom Tom Magic", 0 )
 
 // these use the Seibu sound system (sound / music stolen from Raiden) rather than the bootleggers copying the nmk004
 GAME( 1990, mustangb,   mustang,  mustangb,     mustang,      nmk16_state, empty_init,           ROT0,   "bootleg",                       "US AAF Mustang (bootleg, set 1)", 0 )

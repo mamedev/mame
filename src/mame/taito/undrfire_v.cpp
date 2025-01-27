@@ -441,14 +441,6 @@ u32 undrfire_state::screen_update_undrfire(screen_device &screen, bitmap_ind16 &
 
 	m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[4], 0, 0);    /* TC0480SCP text layer */
 
-	/* See if we should draw artificial gun targets */
-	/* (not yet implemented...) */
-
-	if (m_io_fake->read() & 0x1)   /* Fake DSW */
-	{
-		popmessage("Gunsights on");
-	}
-
 /* Enable this to see rotation (?) control words */
 #if 0
 	{

@@ -7,13 +7,6 @@
     Contained inside MOS 8364 Paula device
 
     TODO:
-    - Some games currently writes 2+ dsksync to the buffer (marked as "[FDC] dsksync" in SW list):
-      Current workaround:
-      1. comment out dma_write in DMA_WAIT_START handling and change the dma_state *only*;
-      2. remove all of the non-DMA_WAIT_START phase inside the dsksync sub-section;
-      NB: according to documentation syncing doesn't really write anything on the bus,
-      so technically this "workaround" is more correct.
-      However it unfortunately causes other SW regressions, most notably in Workbench.
     - Other games trashes memory or refuses to boot, in a few instances randomly
       (marked as "[FDC] with adkcon=1100", implies dsksync disabled):
       they often uses the AmigaDOS trackdisk BIOS functions, which may be expecting a
@@ -281,7 +274,6 @@ void paula_fdc_device::live_run(const attotime &limit)
 			if(!(dskbyt & 0x2000)) {
 				if(cur_live.shift_reg == dsksync) {
 					if(adkcon & 0x0400) {
-						// FIXME: exact dsksync behaviour, cfr. note at top
 						if(dma_state == DMA_WAIT_START) {
 							cur_live.bit_counter = 0;
 
@@ -289,6 +281,12 @@ void paula_fdc_device::live_run(const attotime &limit)
 								dma_state = DMA_RUNNING_BYTE_0;
 							else
 								dma_done();
+						}
+						else if (dma_state != DMA_IDLE)
+						{
+							// assume wordsync (12) and DMA byte ready (15) mutually exclusive
+							dma_write(dsksync);
+							cur_live.bit_counter = 0;
 						}
 					}
 

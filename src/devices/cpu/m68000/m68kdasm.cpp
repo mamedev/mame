@@ -8,7 +8,7 @@
  *                                Version 3.32
  *
  * A portable Motorola M680x0 processor emulation engine.
- * Copyright Karl Stenerud.  All rights reserved.
+ * Copyright Karl Stenerud.
  *
  */
 
@@ -893,7 +893,7 @@ std::string m68k_disassembler::d68020_cas_8()
 	if(limit.first)
 		return limit.second;
 	u16 extension = read_imm_16();
-	return util::string_format("cas.b   D%d, D%d, %s; (2+)", extension&7, (extension>>8)&7, get_ea_mode_str_8(m_cpu_ir));
+	return util::string_format("cas.b   D%d, D%d, %s; (2+)", extension&7, (extension>>6)&7, get_ea_mode_str_8(m_cpu_ir));
 }
 
 std::string m68k_disassembler::d68020_cas_16()
@@ -902,7 +902,7 @@ std::string m68k_disassembler::d68020_cas_16()
 	if(limit.first)
 		return limit.second;
 	u16 extension = read_imm_16();
-	return util::string_format("cas.w   D%d, D%d, %s; (2+)", extension&7, (extension>>8)&7, get_ea_mode_str_16(m_cpu_ir));
+	return util::string_format("cas.w   D%d, D%d, %s; (2+)", extension&7, (extension>>6)&7, get_ea_mode_str_16(m_cpu_ir));
 }
 
 std::string m68k_disassembler::d68020_cas_32()
@@ -911,7 +911,7 @@ std::string m68k_disassembler::d68020_cas_32()
 	if(limit.first)
 		return limit.second;
 	u16 extension = read_imm_16();
-	return util::string_format("cas.l   D%d, D%d, %s; (2+)", extension&7, (extension>>8)&7, get_ea_mode_str_32(m_cpu_ir));
+	return util::string_format("cas.l   D%d, D%d, %s; (2+)", extension&7, (extension>>6)&7, get_ea_mode_str_32(m_cpu_ir));
 }
 
 std::string m68k_disassembler::d68020_cas2_16()

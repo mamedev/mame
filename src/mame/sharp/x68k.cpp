@@ -119,6 +119,7 @@
 #include "x68k.h"
 #include "x68k_hdc.h"
 #include "x68k_kbd.h"
+#include "x68k_mouse.h"
 
 #include "machine/nvram.h"
 
@@ -172,127 +173,6 @@ TIMER_CALLBACK_MEMBER(x68k_state::led_callback)
 		std::fill(std::begin(m_ctrl_drv_out), std::end(m_ctrl_drv_out), 1);
 	}
 
-}
-
-
-// mouse input
-// port B of the Z8530 SCC
-// typically read from the SCC data port on receive buffer full interrupt per byte
-int x68k_state::read_mouse()
-{
-	char val = 0;
-	char ipt = 0;
-
-	if(!(m_scc->get_reg_b(5) & 0x02))
-		return 0xff;
-
-	switch(m_mouse.inputtype)
-	{
-	case 0:
-		ipt = m_mouse1->read();
-		break;
-	case 1:
-		val = m_mouse2->read();
-		ipt = val - m_mouse.last_mouse_x;
-		m_mouse.last_mouse_x = val;
-		break;
-	case 2:
-		val = m_mouse3->read();
-		ipt = val - m_mouse.last_mouse_y;
-		m_mouse.last_mouse_y = val;
-		break;
-	}
-	m_mouse.inputtype++;
-	if(m_mouse.inputtype > 2)
-	{
-		int i_val = m_scc->get_reg_b(0);
-		m_mouse.inputtype = 0;
-		m_mouse.bufferempty = 1;
-		i_val &= ~0x01;
-		m_scc->set_reg_b(0, i_val);
-		LOGMASKED(LOG_SYS, "SCC: mouse buffer empty\n");
-	}
-
-	return ipt;
-}
-
-/*
-    0xe98001 - Z8530 command port B
-    0xe98003 - Z8530 data port B  (mouse input)
-    0xe98005 - Z8530 command port A
-    0xe98007 - Z8530 data port A  (RS232)
-*/
-uint16_t x68k_state::scc_r(offs_t offset)
-{
-	offset %= 4;
-	switch(offset)
-	{
-	case 0:
-		return m_scc->reg_r(0);
-	case 1:
-		return read_mouse();
-	case 2:
-		return m_scc->reg_r(1);
-	case 3:
-		return m_scc->reg_r(3);
-	default:
-		return 0xff;
-	}
-}
-
-void x68k_state::scc_w(offs_t offset, uint16_t data)
-{
-	offset %= 4;
-
-	switch(offset)
-	{
-	case 0:
-		m_scc->reg_w(0,(uint8_t)data);
-		if((m_scc->get_reg_b(5) & 0x02) != m_scc_prev)
-		{
-			if(m_scc->get_reg_b(5) & 0x02)  // Request to Send
-			{
-				int val = m_scc->get_reg_b(0);
-				m_mouse.bufferempty = 0;
-				val |= 0x01;
-				m_scc->set_reg_b(0,val);
-			}
-		}
-		break;
-	case 1:
-		m_scc->reg_w(2,(uint8_t)data);
-		break;
-	case 2:
-		m_scc->reg_w(1,(uint8_t)data);
-		break;
-	case 3:
-		m_scc->reg_w(3,(uint8_t)data);
-		break;
-	}
-	m_scc_prev = m_scc->get_reg_b(5) & 0x02;
-}
-
-TIMER_CALLBACK_MEMBER(x68k_state::scc_ack)
-{
-	if(m_mouse.bufferempty != 0)  // nothing to do if the mouse data buffer is empty
-		return;
-
-//  if((m_ioc.irqstatus & 0xc0) != 0)
-//      return;
-
-	// hard-code the IRQ vector for now, until the SCC code is more complete
-	if((m_scc->get_reg_a(9) & 0x08) || (m_scc->get_reg_b(9) & 0x08))  // SCC reg WR9 is the same for both channels
-	{
-		if((m_scc->get_reg_b(1) & 0x18) != 0)  // if bits 3 and 4 of WR1 are 0, then Rx IRQs are disabled on this channel
-		{
-			if(m_scc->get_reg_b(5) & 0x02)  // RTS signal
-			{
-				m_mouse.irqactive = true;
-				m_mouse.irqvector = 0x54;
-				update_ipl();
-			}
-		}
-	}
 }
 
 void x68k_state::set_adpcm()
@@ -833,7 +713,7 @@ void x68k_state::update_ipl()
 		new_ipl = 7;
 	else if (m_mfp_int)
 		new_ipl = 6;
-	else if (m_mouse.irqactive)
+	else if (m_scc_int)
 		new_ipl = 5;
 	else if (m_exp_irq4[0] || m_exp_irq4[1])
 		new_ipl = 4;
@@ -946,18 +826,6 @@ uint8_t x68k_state::iack4()
 		return 0x18; // spurious interrupt
 }
 
-uint8_t x68k_state::iack5()
-{
-	if (!machine().side_effects_disabled())
-	{
-		m_mouse.irqactive = false;
-		update_ipl();
-	}
-
-	// TODO: use vector from SCC
-	return m_mouse.irqvector;
-}
-
 void x68k_state::cpu_space_map(address_map &map)
 {
 	map.global_mask(0xffffff);
@@ -965,7 +833,7 @@ void x68k_state::cpu_space_map(address_map &map)
 	map(0xfffff5, 0xfffff5).r(FUNC(x68k_state::iack2));
 	map(0xfffff7, 0xfffff7).r(m_hd63450, FUNC(hd63450_device::iack));
 	map(0xfffff9, 0xfffff9).r(FUNC(x68k_state::iack4));
-	map(0xfffffb, 0xfffffb).r(FUNC(x68k_state::iack5));
+	map(0xfffffb, 0xfffffb).lr8(NAME([this]() { return m_scc->m1_r(); }));
 	map(0xfffffd, 0xfffffd).r(m_mfpdev, FUNC(mc68901_device::get_vector));
 	map(0xffffff, 0xffffff).lr8(NAME([] () { return m68000_base_device::autovector(7); }));
 }
@@ -1005,7 +873,7 @@ void x68k_state::x68k_base_map(address_map &map)
 	map(0xe90000, 0xe91fff).rw(m_ym2151, FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0x00ff);
 	map(0xe94000, 0xe94003).m(m_upd72065, FUNC(upd72065_device::map)).umask16(0x00ff);
 	map(0xe94004, 0xe94007).rw(FUNC(x68k_state::fdc_r), FUNC(x68k_state::fdc_w));
-	map(0xe98000, 0xe99fff).rw(FUNC(x68k_state::scc_r), FUNC(x68k_state::scc_w));
+	map(0xe98000, 0xe99fff).rw(m_scc, FUNC(scc8530_device::ab_dc_r), FUNC(scc8530_device::ab_dc_w)).umask16(0x00ff);
 	map(0xe9a000, 0xe9bfff).rw(FUNC(x68k_state::ppi_r), FUNC(x68k_state::ppi_w));
 	map(0xe9c000, 0xe9dfff).rw(FUNC(x68k_state::ioc_r), FUNC(x68k_state::ioc_w));
 	map(0xe9e000, 0xe9e3ff).rw(FUNC(x68k_state::exp_r), FUNC(x68k_state::exp_w));  // FPU (Optional)
@@ -1068,16 +936,6 @@ static INPUT_PORTS_START( x68000 )
 	PORT_CONFNAME( 0x02, 0x02, "Enable fake bus errors")
 	PORT_CONFSETTING(   0x00, DEF_STR( Off ))
 	PORT_CONFSETTING(   0x02, DEF_STR( On ))
-
-	PORT_START("mouse1")  // mouse buttons
-	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_BUTTON9) PORT_NAME("Left mouse button") PORT_CODE(MOUSECODE_BUTTON1)
-	PORT_BIT( 0x00000002, IP_ACTIVE_HIGH, IPT_BUTTON10) PORT_NAME("Right mouse button") PORT_CODE(MOUSECODE_BUTTON2)
-
-	PORT_START("mouse2")  // X-axis
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
-
-	PORT_START("mouse3")  // Y-axis
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 void x68k_state::floppy_load_unload(bool load, floppy_image_device *dev)
@@ -1151,10 +1009,6 @@ void x68k_state::machine_start()
 	m_spriteram = (uint16_t*)(memregion("user1")->base());
 	space.install_ram(0x000000,m_ram->size()-1,m_ram->pointer());
 
-	// start mouse timer
-	m_mouse_timer->adjust(attotime::zero, 0, attotime::from_msec(1));  // a guess for now
-	m_mouse.inputtype = 0;
-
 	// start LED timer
 	m_led_timer->adjust(attotime::zero, 0, attotime::from_msec(400));
 
@@ -1173,11 +1027,11 @@ void x68k_state::machine_start()
 
 	m_dmac_int = false;
 	m_mfp_int = false;
+	m_scc_int = false;
 	m_exp_irq2[0] = m_exp_irq2[1] = false;
 	m_exp_irq4[0] = m_exp_irq4[1] = false;
 	m_exp_nmi[0] = m_exp_nmi[1] = false;
 	m_ioc.irqstatus = 0;
-	m_mouse.irqactive = false;
 	m_current_ipl = 0;
 	m_adpcm.rate = 0;
 	m_adpcm.clock = 0;
@@ -1204,7 +1058,6 @@ void x68k_state::driver_start()
 	// copy last half of BIOS to a user region, to use for initial startup
 	memcpy(user2,(rom+0xff0000),0x10000);
 
-	m_mouse_timer = timer_alloc(FUNC(x68ksupr_state::scc_ack), this);
 	m_led_timer = timer_alloc(FUNC(x68ksupr_state::led_callback), this);
 	m_fdc_tc = timer_alloc(FUNC(x68ksupr_state::floppy_tc_tick), this);
 	m_adpcm_timer = timer_alloc(FUNC(x68ksupr_state::adpcm_drq_tick), this);
@@ -1249,6 +1102,11 @@ static void keyboard_devices(device_slot_interface &device)
 	device.option_add("x68k", X68K_KEYBOARD);
 }
 
+static void mouse_devices(device_slot_interface &device)
+{
+	device.option_add("x68k", X68K_MOUSE);
+}
+
 void x68k_state::x68000_base(machine_config &config)
 {
 	config.set_maximum_quantum(attotime::from_hz(60));
@@ -1282,6 +1140,11 @@ void x68k_state::x68000_base(machine_config &config)
 	m_hd63450->dma_write<0>().set("upd72065", FUNC(upd72065_device::dma_w));
 
 	SCC8530(config, m_scc, 40_MHz_XTAL / 8);
+	m_scc->out_int_callback().set([this](int state) { m_scc_int = state; update_ipl(); });
+
+	rs232_port_device &mouse(RS232_PORT(config, "mouse_port", mouse_devices, "x68k"));
+	mouse.rxd_handler().set(m_scc, FUNC(scc8530_device::rxb_w));
+	m_scc->out_rtsb_callback().set(mouse, FUNC(rs232_port_device::write_rts));
 
 	RP5C15(config, m_rtc, 32.768_kHz_XTAL);
 	m_rtc->alarm().set(m_mfpdev, FUNC(mc68901_device::i0_w));

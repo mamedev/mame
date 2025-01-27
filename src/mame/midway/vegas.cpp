@@ -342,8 +342,7 @@ public:
 		m_io_dips(*this, "DIPS"),
 		m_system_led(*this, "system_led"),
 		m_wheel_driver(*this, "wheel"),
-		m_lamps(*this, "lamp%u", 0U),
-		m_a2d_shift(0)
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	void vegascore(machine_config &config);
@@ -391,7 +390,7 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	static constexpr unsigned SYSTEM_CLOCK = 100000000;
+	static constexpr unsigned SYSTEM_CLOCK = 100'000'000;
 
 	required_device<mips3_device> m_maincpu;
 	required_device<vrc5074_device> m_nile;
@@ -418,23 +417,23 @@ private:
 
 	static const uint8_t translate49[7];
 
-	int m_a2d_shift;
-	int8_t m_wheel_force;
-	int m_wheel_offset;
-	bool m_wheel_calibrated;
-	uint8_t m_vblank_state;
-	uint8_t m_cpuio_data[4];
-	uint8_t m_sio_reset_ctrl;
-	uint8_t m_sio_irq_enable;
-	uint8_t m_sio_irq_state;
-	uint8_t m_duart_irq_state;
-	uint8_t m_sio_led_state;
-	uint8_t m_pending_analog_read;
-	uint8_t m_cmos_unlocked;
-	uint8_t m_dcs_idma_cs;
-	uint32_t m_i40_data;
-	uint32_t m_keypad_select;
-	uint32_t m_gear;
+	uint8_t m_a2d_shift = 0;
+	int8_t m_wheel_force = 0;
+	int m_wheel_offset = 0;
+	bool m_wheel_calibrated = false;
+	uint8_t m_vblank_state = 0;
+	uint8_t m_cpuio_data[4] = { };
+	uint8_t m_sio_reset_ctrl = 0;
+	uint8_t m_sio_irq_enable = 0;
+	uint8_t m_sio_irq_state = 0;
+	uint8_t m_duart_irq_state = 0;
+	uint8_t m_sio_led_state = 0;
+	uint8_t m_pending_analog_read = 0;
+	uint8_t m_cmos_unlocked = 0;
+	uint8_t m_dcs_idma_cs = 0;
+	uint32_t m_i40_data = 0;
+	uint32_t m_keypad_select = 0;
+	uint32_t m_gear = 0;
 
 	void duart_irq_cb(int state);
 	void vblank_assert(int state);
@@ -537,6 +536,7 @@ void vegas_state::machine_reset()
 
 	// Clear CPU IO registers
 	std::fill(std::begin(m_cpuio_data), std::end(m_cpuio_data), 0);
+
 	// Clear SIO registers
 	reset_sio();
 	m_duart_irq_state = 0;
@@ -585,8 +585,7 @@ void vegas_state::watchdog_reset(int state)
 
 void vegas_state::timekeeper_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	if (m_cmos_unlocked)
-	{
+	if (m_cmos_unlocked) {
 		if (ACCESSING_BITS_0_7)
 			m_timekeeper->write(offset * 4 + 0, data >> 0);
 		if (ACCESSING_BITS_8_15)
@@ -668,8 +667,7 @@ void vegas_state::vblank_assert(int state)
 {
 	LOGMASKED(LOG_SIO, "vblank_assert: m_sio_reset_ctrl: %04x state: %d\n", m_sio_reset_ctrl, state);
 	// latch on the correct polarity transition
-	if ((m_sio_irq_enable & 0x20) && ((state && !(m_sio_reset_ctrl & 0x10)) || (!state && (m_sio_reset_ctrl & 0x10))))
-	{
+	if ((m_sio_irq_enable & 0x20) && ((state && !(m_sio_reset_ctrl & 0x10)) || (!state && (m_sio_reset_ctrl & 0x10)))) {
 		m_sio_irq_state |= 0x20;
 		update_sio_irqs();
 	}
@@ -855,8 +853,7 @@ void vegas_state::cpu_io_w(offs_t offset, uint8_t data)
 	// 3: System Reset Bit 0=>enable sio, Bit 1=>enable ide, Bit 2=>enable PCI
 	m_cpuio_data[offset] = data;
 	switch (offset) {
-	case 0:
-	{
+	case 0: {
 		m_system_led = ~data & 0xff;
 		char digit = 'U';
 		switch (data & 0xff) {
@@ -1158,10 +1155,8 @@ void vegas_state::wheel_board_w(uint32_t data)
 
 	//logerror("wheel_board_w: data = %08x op: %02x arg: %02x\n", data, op, arg);
 
-	if (chip_select && latch_clk)
-	{
-		switch (op)
-		{
+	if (chip_select && latch_clk) {
+		switch (op) {
 		case 0x0:
 			m_wheel_driver[0] = arg; // target wheel angle. signed byte.
 			m_wheel_force = int8_t(~arg);
@@ -1185,8 +1180,7 @@ void vegas_state::wheel_board_w(uint32_t data)
 ioport_value vegas_state::keypad_r()
 {
 	int row_sel;
-	for (row_sel=0; row_sel<4; row_sel++)
-	{
+	for (row_sel=0; row_sel<4; row_sel++) {
 		if (!(m_keypad_select & (1 << row_sel)))
 			break;
 	}
@@ -1208,8 +1202,7 @@ ioport_value vegas_state::gearshift_r()
 {
 	// Check for gear change and save gear selection
 	uint32_t gear = m_io_gearshift->read();
-	for (int i = 0; i < 4; i++)
-	{
+	for (int i = 0; i < 4; i++) {
 		if (gear & (1 << i))
 			m_gear = 1 << i;
 	}
@@ -1408,9 +1401,9 @@ static INPUT_PORTS_START( gauntleg )
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Magic")
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Fight")
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Turbo")
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Fight")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Magic")
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Turbo")
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("8WAY_P2")
@@ -1418,9 +1411,9 @@ static INPUT_PORTS_START( gauntleg )
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(2) PORT_8WAY
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(2) PORT_8WAY
 	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_8WAY
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Magic")
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Fight")
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Turbo")
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Fight")
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Magic")
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Turbo")
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("8WAY_P3")
@@ -1428,9 +1421,9 @@ static INPUT_PORTS_START( gauntleg )
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(3) PORT_8WAY
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(3) PORT_8WAY
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(3) PORT_8WAY
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(3) PORT_NAME("P3 Magic")
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(3) PORT_NAME("P3 Fight")
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(3) PORT_NAME("P3 Turbo")
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(3) PORT_NAME("P3 Fight")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(3) PORT_NAME("P3 Magic")
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(3) PORT_NAME("P3 Turbo")
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("8WAY_P4")
@@ -1438,9 +1431,9 @@ static INPUT_PORTS_START( gauntleg )
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(4) PORT_8WAY
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(4) PORT_8WAY
 	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(4) PORT_8WAY
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(4) PORT_NAME("P4 Magic")
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(4) PORT_NAME("P4 Fight")
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(4) PORT_NAME("P4 Turbo")
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(4) PORT_NAME("P4 Fight")
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(4) PORT_NAME("P4 Magic")
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(4) PORT_NAME("P4 Turbo")
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("49WAYX_P1")
@@ -1873,14 +1866,14 @@ void vegas_state::vegascore(machine_config &config)
 {
 	// basic machine hardware
 	R5000LE(config, m_maincpu, vegas_state::SYSTEM_CLOCK * 2);
-	m_maincpu->set_icache_size(16384);
-	m_maincpu->set_dcache_size(16384);
+	m_maincpu->set_icache_size(0x4000);
+	m_maincpu->set_dcache_size(0x4000);
 	m_maincpu->set_system_clock(vegas_state::SYSTEM_CLOCK);
 
 	// PCI Bus Devices
 	PCI_ROOT(config, "pci", 0);
 
-	VRC5074(config, m_nile, 100000000, m_maincpu);
+	VRC5074(config, m_nile, SYSTEM_CLOCK, m_maincpu);
 	m_nile->set_sdram_size(0, 0x00800000);
 	m_nile->set_map(2, address_map_constructor(&vegas_state::vegas_cs2_map, "vegas_cs2_map", this), this);
 	m_nile->set_map(3, address_map_constructor(&vegas_state::vegas_cs3_map, "vegas_cs3_map", this), this);
@@ -1950,6 +1943,7 @@ void vegas_state::vegas32m(machine_config &config)
 void vegas_state::vegasban(machine_config &config)
 {
 	vegas32m(config);
+
 	voodoo_banshee_pci_device &voodoo(VOODOO_BANSHEE_PCI(config.replace(), PCI_ID_VIDEO, 0, m_maincpu, "screen"));
 	voodoo.set_fbmem(16);
 	voodoo.set_status_cycles(1000); // optimization to consume extra cycles when polling status
@@ -1960,9 +1954,10 @@ void vegas_state::vegasban(machine_config &config)
 void vegas_state::vegasv3(machine_config &config)
 {
 	vegas32m(config);
+
 	RM7000LE(config.replace(), m_maincpu, vegas_state::SYSTEM_CLOCK * 2.5);
-	m_maincpu->set_icache_size(16384);
-	m_maincpu->set_dcache_size(16384);
+	m_maincpu->set_icache_size(0x4000);
+	m_maincpu->set_dcache_size(0x4000);
 	m_maincpu->set_system_clock(vegas_state::SYSTEM_CLOCK);
 
 	voodoo_3_pci_device &voodoo(VOODOO_3_PCI(config.replace(), PCI_ID_VIDEO, 0, m_maincpu, "screen"));
@@ -1977,8 +1972,8 @@ void vegas_state::denver(machine_config &config)
 	vegascore(config);
 	RM7000LE(config.replace(), m_maincpu, vegas_state::SYSTEM_CLOCK * 2.5);
 
-	m_maincpu->set_icache_size(16384);
-	m_maincpu->set_dcache_size(16384);
+	m_maincpu->set_icache_size(0x4000);
+	m_maincpu->set_dcache_size(0x4000);
 	m_maincpu->set_system_clock(vegas_state::SYSTEM_CLOCK);
 	m_nile->set_sdram_size(0, 0x02000000);
 	m_nile->set_map(8, address_map_constructor(&vegas_state::vegas_cs8_map, "vegas_cs8_map", this), this);
@@ -2840,10 +2835,10 @@ GAME( 1999, nbanfl,     0,         nbanfl,   nbashowt, vegas_state, init_nbanfl,
 GAME( 2000, nbagold,    0,         nbagold,  nbashowt, vegas_state, init_nbagold,  ROT0, "Midway Games", "SportStation: NBA Showtime NBA on NBC Gold Edition (ver 3.0, Feb 18 2000) / NFL Blitz 2000 Gold Edition", MACHINE_SUPPORTS_SAVE ) // boot game dipswitch has no effect, so NFL Blitz 2000 version number not shown
 
 // Durango + Denver SIO + Voodoo 3
-GAMEL( 1999, sf2049,     0,        sf2049,   sf2049,   vegas_state, init_sf2049,   ROT0, "Atari Games",  "San Francisco Rush 2049", MACHINE_SUPPORTS_SAVE, layout_sf2049 )
-GAMEL( 2003, sf2049se,   0,        sf2049se, sf2049se, vegas_state, init_sf2049se, ROT0, "Atari Games",  "San Francisco Rush 2049: Special Edition", MACHINE_SUPPORTS_SAVE, layout_sf2049 )
-GAMEL( 2000, sf2049te,   0,        sf2049te, sf2049se, vegas_state, init_sf2049te, ROT0, "Atari Games",  "San Francisco Rush 2049: Tournament Edition", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sf2049 )
-GAMEL( 2001, sf2049tea,  sf2049te, sf2049te, sf2049se, vegas_state, init_sf2049te, ROT0, "Atari Games",  "San Francisco Rush 2049: Tournament Edition Unlocked", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sf2049 )
+GAMEL(1999, sf2049,     0,         sf2049,   sf2049,   vegas_state, init_sf2049,   ROT0, "Atari Games",  "San Francisco Rush 2049", MACHINE_SUPPORTS_SAVE, layout_sf2049 )
+GAMEL(2003, sf2049se,   0,         sf2049se, sf2049se, vegas_state, init_sf2049se, ROT0, "Atari Games",  "San Francisco Rush 2049: Special Edition", MACHINE_SUPPORTS_SAVE, layout_sf2049 )
+GAMEL(2000, sf2049te,   0,         sf2049te, sf2049se, vegas_state, init_sf2049te, ROT0, "Atari Games",  "San Francisco Rush 2049: Tournament Edition", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sf2049 )
+GAMEL(2001, sf2049tea,  sf2049te,  sf2049te, sf2049se, vegas_state, init_sf2049te, ROT0, "Atari Games",  "San Francisco Rush 2049: Tournament Edition Unlocked", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sf2049 )
 
 // Durango + Vegas SIO + Voodoo 3
 GAME( 2000, cartfury,   0,         cartfury, cartfury, vegas_state, init_cartfury, ROT0, "Midway Games", "CART Fury Championship Racing (ver 1.00)", MACHINE_SUPPORTS_SAVE )

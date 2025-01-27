@@ -1251,7 +1251,7 @@ int device_usb_ohci_function_interface::execute_transfer(int endpoint, int pid, 
 	else if (pid == InPid) {
 		if (endpoints[endpoint].type == ControlEndpoint) { //if (endpoint == 0) {
 			// if no data has been transferred (except for the setup stage)
-			// and the lenght of this IN transaction is 0
+			// and the length of this IN transaction is 0
 			// assume this is the status stage
 			if ((endpoints[endpoint].remain == 0) && (size == 0)) {
 				if ((endpoint == 0) && (settingaddress == true))

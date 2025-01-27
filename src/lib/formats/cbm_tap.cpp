@@ -330,7 +330,7 @@ static int cbm_tap_to_wav_size( const uint8_t *tapdata, int taplen )
 	return size;
 }
 
-static int cbm_tap_fill_wave( int16_t *buffer, int length, uint8_t *bytes )
+static int cbm_tap_fill_wave( int16_t *buffer, int length, const uint8_t *bytes )
 {
 	int16_t *p = buffer;
 

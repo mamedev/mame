@@ -13,7 +13,9 @@
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "amiga.h"
+#include "gayle.h"
 
 #include "bus/amiga/keyboard/keyboard.h"
 #include "bus/amiga/zorro/zorro.h"
@@ -23,12 +25,12 @@
 #include "cpu/m6502/m6502.h"
 #include "machine/6525tpi.h"
 #include "machine/mos6526.h"
-#include "machine/gayle.h"
 #include "machine/dmac.h"
 #include "machine/nvram.h"
 #include "machine/i2cmem.h"
 #include "machine/cr511b.h"
 #include "machine/rp5c01.h"
+
 #include "softlist.h"
 #include "speaker.h"
 

@@ -53,7 +53,7 @@ protected:
 private:
 	required_device<mips1_device_base> m_cpu;
 	required_device<ds1215_device> m_rtc;
-	required_device<pit8254_device> m_pit;
+	required_device<pit8253_device> m_pit;
 	required_device<wd33c9x_base_device> m_scsi;
 	required_device_array<scn2681_device, 3> m_duart;
 	required_device_array<rs232_port_device, 4> m_serial;
@@ -62,12 +62,13 @@ private:
 	memory_share_creator<u8> m_nvram;
 	required_shared_ptr<u32> m_ram;
 
-	output_finder<5> m_leds;
+	output_finder<6> m_leds;
 
 	// machine registers
 	u16 m_cpucfg;
-	u16 m_dmalo;
-	u16 m_dmahi;
+	u16 m_dma_lo;
+	u16 m_dma_hi[16];
+	u8 m_dma_page;
 	u8 m_lio_isr;
 	u8 m_vme_isr;
 	u8 m_vme_imr;

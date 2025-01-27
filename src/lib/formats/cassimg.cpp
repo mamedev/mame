@@ -791,7 +791,6 @@ cassette_image::error cassette_image::legacy_construct(const LegacyWaveFiller *l
 	error err;
 	int length;
 	int sample_count;
-	std::vector<uint8_t> bytes;
 	std::vector<int16_t> samples;
 	int pos = 0;
 	uint64_t offset = 0;
@@ -801,7 +800,7 @@ cassette_image::error cassette_image::legacy_construct(const LegacyWaveFiller *l
 	assert(legacy_args->trailer_samples >= 0);
 	assert(legacy_args->fill_wave);
 
-	uint64_t size = image_size();
+	const uint64_t size = image_size();
 
 	/* normalize the args */
 	LegacyWaveFiller args = *legacy_args;
@@ -812,9 +811,6 @@ cassette_image::error cassette_image::legacy_construct(const LegacyWaveFiller *l
 	if (args.sample_frequency == 0)
 		args.sample_frequency = 11025;
 
-	/* allocate a buffer for the binary data */
-	std::vector<uint8_t> chunk(args.chunk_size);
-
 	/* determine number of samples */
 	if (args.chunk_sample_calc != nullptr)
 	{
@@ -824,7 +820,8 @@ cassette_image::error cassette_image::legacy_construct(const LegacyWaveFiller *l
 			goto done;
 		}
 
-		bytes.resize(size);
+		LOG_FORMATS("Image size: %x\n", size);
+		std::vector<uint8_t> bytes(size);
 		image_read(&bytes[0], 0, size);
 		sample_count = args.chunk_sample_calc(&bytes[0], (int)size);
 
@@ -863,10 +860,12 @@ cassette_image::error cassette_image::legacy_construct(const LegacyWaveFiller *l
 	/* convert the file data to samples */
 	while ((pos < sample_count) && (offset < size))
 	{
+		/* allocate a buffer for the binary data */
+		std::vector<uint8_t> chunk(args.chunk_size);
 		image_read(&chunk[0], offset, args.chunk_size);
 		offset += args.chunk_size;
 
-		length = args.fill_wave(&samples[pos], sample_count - pos, &chunk[0]);
+		length = args.fill_wave(&samples[pos], args.chunk_size, &chunk[0]);
 		if (length < 0)
 		{
 			err = error::INVALID_IMAGE;

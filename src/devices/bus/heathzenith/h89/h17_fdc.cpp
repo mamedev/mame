@@ -18,6 +18,8 @@
 #include "imagedev/floppy.h"
 #include "machine/s2350.h"
 
+#include "formats/h17disk.h"
+
 
 #define LOG_REG   (1U << 1) // Register setup
 #define LOG_LINES (1U << 2) // Control lines
@@ -63,6 +65,7 @@ protected:
 	void ctrl_w(u8 val);
 	u8   floppy_status_r();
 
+	static void floppy_formats(format_registration &fr);
 	void set_floppy(floppy_image_device *floppy);
 	void step_w(int state);
 	void dir_w(int state);
@@ -340,6 +343,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(heath_h17_fdc_device::tx_timer_cb)
 	m_s2350->tcp_w();
 }
 
+void heath_h17_fdc_device::floppy_formats(format_registration &fr)
+{
+	fr.add(FLOPPY_H17D_FORMAT);
+}
+
 void heath_h17_fdc_device::device_add_mconfig(machine_config &config)
 {
 	S2350(config, m_s2350, 0);
@@ -348,7 +356,7 @@ void heath_h17_fdc_device::device_add_mconfig(machine_config &config)
 	for (int i = 0; i < MAX_FLOPPY_DRIVES; i++)
 	{
 		// TODO -> add (and define) heath hard-sectored floppy formats.
-		FLOPPY_CONNECTOR(config, m_floppies[i], h17_floppies, "ssdd", floppy_image_device::default_fm_floppy_formats);
+		FLOPPY_CONNECTOR(config, m_floppies[i], h17_floppies, "ssdd", heath_h17_fdc_device::floppy_formats);
 		m_floppies[i]->enable_sound(true);
 	}
 

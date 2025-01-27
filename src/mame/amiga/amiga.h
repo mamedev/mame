@@ -434,6 +434,9 @@ public:
 	void amiga_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	bool get_screen_standard();
+	int get_screen_vblank_line();
 	void update_screenmode();
 
 	TIMER_CALLBACK_MEMBER( scanline_callback );
@@ -627,6 +630,9 @@ protected:
 	void vposw_w(u16 data);
 	void bplcon0_w(u16 data);
 	void aga_bplcon0_w(u16 data);
+
+	// TODO: move to Lisa
+	void clxcon2_w(u16 data);
 
 private:
 	// blitter helpers

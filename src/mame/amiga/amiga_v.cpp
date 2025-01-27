@@ -493,7 +493,7 @@ void amiga_state::render_scanline(bitmap_rgb32 &bitmap, int scanline)
 			CUSTOM_REG(REG_VPOSR) ^= VPOSR_LOF;
 
 		// reset copper and ham color
-		m_copper->vblank_sync();
+		m_copper->vblank_sync(true);
 		m_ham_color = CUSTOM_REG(REG_COLOR00);
 	}
 
@@ -526,6 +526,10 @@ void amiga_state::render_scanline(bitmap_rgb32 &bitmap, int scanline)
 
 	scanline /= 2;
 
+	// notify copper that we are not in vblank anymore
+	if (scanline == get_screen_vblank_line())
+		m_copper->vblank_sync(false);
+
 	m_last_scanline = scanline;
 
 	/* all sprites off at the start of the line */
@@ -537,7 +541,7 @@ void amiga_state::render_scanline(bitmap_rgb32 &bitmap, int scanline)
 
 	/* loop over the line */
 	// TODO: copper runs on odd timeslots
-	next_copper_x = 0;
+	next_copper_x = m_copper->restore_offset();
 	// FIXME: without the add this increment will skip bitplane ops
 	// ddf_stop_pixel_max = 0xd8 * 2 = 432 + 17 + 15 + 1(*) = 465 > width / 2 (455)
 	// (*) because there's a comparison with <= in the bitplane code.
@@ -605,7 +609,8 @@ void amiga_state::render_scanline(bitmap_rgb32 &bitmap, int scanline)
 		/* update sprite data fetching */
 		// ensure this happens once every two scanlines for the RAM manipulation, kickoff cares
 		// this is also unaffected by LACE
-		if ((raw_scanline & 1) == 0)
+		// Update: comparison is unnecessary, as per tomato and amiga_cd:bigred cursor pointers (both enabling hires)
+		//if ((raw_scanline & 1) == 0)
 		{
 			const int min_x = 0x18 << 1;
 			const int max_x = 0x34 << 1;
@@ -879,6 +884,8 @@ void amiga_state::render_scanline(bitmap_rgb32 &bitmap, int scanline)
 			CUSTOM_REG_LONG(REG_BPL1PTH + pl * 2) += CUSTOM_REG_SIGNED(REG_BPL2MOD);
 	}
 
+	m_copper->suspend_offset(next_copper_x, amiga_state::SCREEN_WIDTH / 2);
+
 	// restore color00
 	CUSTOM_REG(REG_COLOR00) = save_color0;
 
@@ -901,17 +908,24 @@ uint32_t amiga_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	return 0;
 }
 
+bool amiga_state::get_screen_standard()
+{
+	// we support dynamic switching between PAL and NTSC, determine mode from register
+	if (m_agnus_id >= AGNUS_HR_PAL)
+		return CUSTOM_REG(REG_BEAMCON0) & 0x20;
+
+	// old agnus, agnus id determines PAL or NTSC
+	return !(m_agnus_id & 0x10);
+}
+
+int amiga_state::get_screen_vblank_line()
+{
+	return get_screen_standard() ? amiga_state::VBLANK_PAL : amiga_state::VBLANK_NTSC;
+}
+
 void amiga_state::update_screenmode()
 {
-	bool pal;
-
-	// first let's see if we're PAL or NTSC
-	if (m_agnus_id >= AGNUS_HR_PAL)
-		// we support dynamic switching between PAL and NTSC, determine mode from register
-		pal = CUSTOM_REG(REG_BEAMCON0) & 0x20;
-	else
-		// old agnus, agnus id determines PAL or NTSC
-		pal = !(m_agnus_id & 0x10);
+	bool pal = get_screen_standard();
 
 	// basic height & vblank length
 	int height = pal ? SCREEN_HEIGHT_PAL : SCREEN_HEIGHT_NTSC;
