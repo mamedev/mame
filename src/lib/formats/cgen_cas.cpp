@@ -108,7 +108,7 @@ static int cgenie_handle_cas(int16_t *buffer, const uint8_t *casdata)
 /*******************************************************************
    Generate samples for the tape image
 ********************************************************************/
-static int cgenie_cas_fill_wave(int16_t *buffer, int sample_count, uint8_t *bytes)
+static int cgenie_cas_fill_wave(int16_t *buffer, int sample_count, const uint8_t *bytes)
 {
 	return cgenie_handle_cas(buffer, bytes);
 }

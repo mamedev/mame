@@ -232,7 +232,7 @@ static int kc_handle_sss(int16_t *buffer, const uint8_t *casdata)
 /*******************************************************************
    Generate samples for the tape image
 ********************************************************************/
-static int kc_kcc_fill_wave(int16_t *buffer, int sample_count, uint8_t *bytes)
+static int kc_kcc_fill_wave(int16_t *buffer, int sample_count, const uint8_t *bytes)
 {
 	return kc_handle_kcc(buffer, bytes);
 }
@@ -284,7 +284,7 @@ static const cassette_image::Format kc_kcc_format =
 /*******************************************************************
    Generate samples for the tape image
 ********************************************************************/
-static int kc_tap_fill_wave(int16_t *buffer, int sample_count, uint8_t *bytes)
+static int kc_tap_fill_wave(int16_t *buffer, int sample_count, const uint8_t *bytes)
 {
 	return kc_handle_tap(buffer, bytes);
 }
@@ -336,7 +336,7 @@ static const cassette_image::Format kc_tap_format =
 /*******************************************************************
    Generate samples for the tape image
 ********************************************************************/
-static int kc_sss_fill_wave(int16_t *buffer, int sample_count, uint8_t *bytes)
+static int kc_sss_fill_wave(int16_t *buffer, int sample_count, const uint8_t *bytes)
 {
 	return kc_handle_sss(buffer, bytes);
 }

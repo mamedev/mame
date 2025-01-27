@@ -120,7 +120,7 @@ static int a26_cas_do_work( int16_t **buffer, const uint8_t *bytes ) {
 	return size;
 }
 
-static int a26_cas_fill_wave( int16_t *buffer, int length, uint8_t *bytes ) {
+static int a26_cas_fill_wave( int16_t *buffer, int length, const uint8_t *bytes ) {
 	int16_t   *p = buffer;
 
 	return a26_cas_do_work( &p, (const uint8_t *)bytes );

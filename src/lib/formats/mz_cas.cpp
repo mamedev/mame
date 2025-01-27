@@ -69,7 +69,7 @@ static int fill_wave_b(int16_t *buffer, int offs, int byte)
 	return count;
 }
 
-static int fill_wave(int16_t *buffer, int length, uint8_t *code)
+static int fill_wave(int16_t *buffer, int length, const uint8_t *code)
 {
 	static int16_t *beg;
 	static uint16_t csum = 0;

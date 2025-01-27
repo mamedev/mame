@@ -145,7 +145,7 @@ static int kim1_handle_kim(int16_t *buffer, const uint8_t *casdata)
 /*******************************************************************
    Generate samples for the tape image
 ********************************************************************/
-static int kim1_kim_fill_wave(int16_t *buffer, int sample_count, uint8_t *bytes)
+static int kim1_kim_fill_wave(int16_t *buffer, int sample_count, const uint8_t *bytes)
 {
 	return kim1_handle_kim( buffer, bytes );
 }

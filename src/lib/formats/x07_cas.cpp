@@ -122,7 +122,7 @@ static int x07_handle_cassette(int16_t *buffer, const uint8_t *bytes)
    Generate samples for the tape image
 ********************************************************************/
 
-static int x07_cassette_fill_wave(int16_t *buffer, int length, uint8_t *bytes)
+static int x07_cassette_fill_wave(int16_t *buffer, int length, const uint8_t *bytes)
 {
 	return x07_handle_cassette(buffer, bytes);
 }

@@ -174,7 +174,7 @@ static int trs80m3_handle_cas(int16_t *buffer, const uint8_t *casdata)
 /*******************************************************************
    Generate samples for the tape image
 ********************************************************************/
-static int trs80_cas_fill_wave(int16_t *buffer, int sample_count, uint8_t *bytes)
+static int trs80_cas_fill_wave(int16_t *buffer, int sample_count, const uint8_t *bytes)
 {
 	if (cas_size && (bytes[0] == 0x55))
 		return trs80m3_handle_cas( buffer, bytes );

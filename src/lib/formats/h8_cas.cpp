@@ -102,7 +102,7 @@ static int h8_handle_cassette(int16_t *buffer, const uint8_t *bytes)
    Generate samples for the tape image
 ********************************************************************/
 
-static int h8_cassette_fill_wave(int16_t *buffer, int length, uint8_t *bytes)
+static int h8_cassette_fill_wave(int16_t *buffer, int length, const uint8_t *bytes)
 {
 	return h8_handle_cassette(buffer, bytes);
 }

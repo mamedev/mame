@@ -101,7 +101,7 @@ static int x1_cas_to_wav_size (const uint8_t *casdata, int caslen)
 /*******************************************************************
    Generate samples for the tape image
 ********************************************************************/
-static int x1_cas_fill_wave(int16_t *buffer, int sample_count, uint8_t *bytes)
+static int x1_cas_fill_wave(int16_t *buffer, int sample_count, const uint8_t *bytes)
 {
 	return x1_handle_tap(buffer,bytes);
 }

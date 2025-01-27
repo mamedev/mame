@@ -209,7 +209,7 @@ static int mbee_handle_tap(int16_t *buffer, const uint8_t *bytes)
    Generate samples for the tape image
 ********************************************************************/
 
-static int mbee_tap_fill_wave(int16_t *buffer, int length, uint8_t *bytes)
+static int mbee_tap_fill_wave(int16_t *buffer, int length, const uint8_t *bytes)
 {
 	return mbee_handle_tap(buffer, bytes);
 }
