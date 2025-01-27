@@ -349,40 +349,38 @@ static int oric_cassette_fill_wave(int16_t *buffer, int length, const uint8_t *b
 {
 	unsigned char header[9];
 	int16_t *p = buffer;
-	int i;
-	uint8_t data;
 
 	/* header and trailer act as pauses */
 	/* the trailer is required so that the via sees the last bit of the last
 	    byte */
 	if (bytes == CODE_HEADER)
 	{
-		for (i = 0; i < ORIC_WAVESAMPLES_HEADER; i++)
+		for (int i = 0; i < ORIC_WAVESAMPLES_HEADER; i++)
 			*(p++) = WAVEENTRY_NULL;
 	}
 	else if (bytes == CODE_TRAILER)
 	{
-		for (i = 0; i < ORIC_WAVESAMPLES_TRAILER; i++)
+		for (int i = 0; i < ORIC_WAVESAMPLES_TRAILER; i++)
 			*(p++) = WAVEENTRY_NULL;
 	}
 	else
 	{
-		const uint8_t *data_ptr = bytes;
 		/* the length is the number of samples left in the buffer and NOT the number of bytes for the input file */
 		length = length - ORIC_WAVESAMPLES_TRAILER;
 
 		oric.cassette_state = ORIC_CASSETTE_SEARCHING_FOR_SYNC_BYTE;
+		const uint8_t *data_ptr = bytes;
 
-		while ((data_ptr<(bytes + oric.tap_size)) && (p < (buffer+length)) )
+		while ((data_ptr < (bytes + oric.tap_size)) && (p < (buffer+length)) )
 		{
-			data = data_ptr[0];
+			const uint8_t data = data_ptr[0];
 			data_ptr++;
 
 			switch (oric.cassette_state)
 			{
 				case ORIC_CASSETTE_SEARCHING_FOR_SYNC_BYTE:
 				{
-					if (data==ORIC_SYNC_BYTE)
+					if (data == ORIC_SYNC_BYTE)
 					{
 						LOG_FORMATS("found sync byte!\n");
 						/* found first sync byte */
@@ -393,22 +391,22 @@ static int oric_cassette_fill_wave(int16_t *buffer, int length, const uint8_t *b
 
 				case ORIC_CASSETTE_GOT_SYNC_BYTE:
 				{
-					if (data!=ORIC_SYNC_BYTE)
+					if (data != ORIC_SYNC_BYTE)
 					{
 						/* 0.25 second pause */
 						p = oric_fill_pause(p, oric_seconds_to_samples(0.25));
 
 						LOG_FORMATS("found end of sync bytes!\n");
 						/* found end of sync bytes */
-						for (i=0; i<ORIC_LEADER_LENGTH; i++)
+						for (int i = 0; i < ORIC_LEADER_LENGTH; i++)
 						{
 							p = oric_output_byte(p,0x016);
 						}
 
-						if (data==0x024)
+						if (data == 0x024)
 						{
 							//LOG_FORMATS("reading header!\n");
-							p = oric_output_byte(p,data);
+							p = oric_output_byte(p, data);
 							oric.cassette_state = ORIC_CASSETTE_READ_HEADER;
 							oric.data_count = 0;
 							oric.data_length = 9;
@@ -436,16 +434,16 @@ static int oric_cassette_fill_wave(int16_t *buffer, int length, const uint8_t *b
 					p = oric_output_byte(p, data);
 
 					/* got end of filename? */
-					if (data==0)
+					if (data == 0)
 					{
 						uint16_t end, start;
 						LOG_FORMATS("got end of filename\n");
 
 						/* oric includes a small delay, but I don't see
 						it being 1 bits */
-						for (i=0; i<100; i++)
+						for (int i = 0; i < 100; i++)
 						{
-												p = oric_output_bit(p,1);
+							p = oric_output_bit(p,1);
 						}
 
 						oric.cassette_state = ORIC_CASSETTE_WRITE_DATA;
