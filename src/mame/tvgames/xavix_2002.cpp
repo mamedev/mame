@@ -784,6 +784,14 @@ ROM_START( doradraw )
 	ROM_LOAD("dmdj.u7", 0x000000, 0x200000, CRC(0e6392f9) SHA1(30fa3d3451b37d663e124c7d1d52c7e30284d2fb) )
 ROM_END
 
+ROM_START( ndpbj )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("ndpbj.u2", 0x000000, 0x800000, CRC(80cb5cbb) SHA1(cd424c4fbea8e9e47d165c4c8be52755fc7c2d98) )
+
+	ROM_REGION( 0x400, "i2cmem", ROMREGION_ERASE00)
+	ROM_LOAD("s-24cs08a.u6", 0x000, 0x400, CRC(a22db408) SHA1(f8d925c75054a961930af12869e3002bb9c4600b) )
+ROM_END
+
 
 void superxavix_super_tv_pc_state::init_stvpc()
 {
@@ -902,3 +910,8 @@ CONS( 2008, epo_ntpj,  0, 0, superxavix_piano_pc, suprtvpc, superxavix_piano_pc_
 
 // ドラえもん うごく！おえかき エポック社
 CONS( 2007, doradraw,  0, 0, superxavix_doradraw,    xavix,      superxavix_doradraw_state, init_doradraw, "Epoch / SSD Company LTD", "Doraemon Ugoku! Oekaki (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+// doesn't boot, has a camera with a large number of connections going to it, probably wants comms to work with it?
+CONS( 2007, ndpbj, 0, 0, superxavix_i2c_24c08,    xavix_i2c,  superxavix_i2c_state, init_xavix, "Nissin / SSD Company LTD",   "Dontore da Hyoue - Donbei-kun to Training  (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+
