@@ -668,7 +668,7 @@ private:
 	u16 m_videoaddr[4];
 	u8 m_videocntl;
 	u8 m_diag;
-	u8 m_mouse,m_mouse_bnts,m_mouse_x,m_mouse_y;
+	u8 m_mouse,m_mouse_bnts,m_mouse_x,m_mouse_y,m_old_mouse_x,m_old_mouse_y;
 	u8 m_mouse_px,m_mouse_py,m_mouse_pc;
 };
 
@@ -1268,17 +1268,16 @@ const int mouse_xyb[3][4] = { { 0, 0, 0, 0 }, { 0, 1, 1, 0 }, { 1, 1, 0, 0 } };
 u8 tek440x_state::mouse_r(offs_t offset)
 {
 	u8 ans = 0;
-	static u8 oldmx,oldmy;
 	
 	switch(offset)
 	{
 		case 0:
-			ans = ~(oldmx - m_mouse_x);
-			oldmx = m_mouse_x;
+			ans = ~(m_old_mouse_x - m_mouse_x);
+			m_old_mouse_x = m_mouse_x;
 			break;
 		case 2:
-			ans = ~(oldmy - m_mouse_y);
-			oldmy = m_mouse_y;
+			ans = ~(m_old_mouse_y - m_mouse_y);
+			m_old_mouse_y = m_mouse_y;
 			ans ^= (m_diag & 15);
 			
 			break;
@@ -1295,7 +1294,7 @@ u8 tek440x_state::mouse_r(offs_t offset)
 			break;
 
 		default:
-			oldmx = oldmy = 0;
+			m_old_mouse_x = m_old_mouse_y = 0;
 			break;
 	}
 
