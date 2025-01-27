@@ -217,4 +217,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1986, cpchess, 0,      0,      pchess,  pchess, pchess_state, empty_init, "CXG Systems / Newcrest Technology / Intelligent Software", "Pocketchess (CXG)", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, cpchess, 0,      0,      pchess,  pchess, pchess_state, empty_init, "CXG Systems / Newcrest Technology / Intelligent Chess Software", "Pocketchess (CXG)", MACHINE_SUPPORTS_SAVE )
