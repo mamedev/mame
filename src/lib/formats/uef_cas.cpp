@@ -265,7 +265,8 @@ static int uef_cas_fill_wave( int16_t *buffer, int length, const uint8_t *bytes 
 		int chunk_length = get_u32le( &bytes[pos+2] );
 
 		uint32_t baud_length, j;
-		uint8_t i, *c;
+		uint8_t i;
+		const uint8_t *c;
 		pos += 6;
 		switch( chunk_type ) {
 		case 0x0100:    /* implicit start/stop bit data block */

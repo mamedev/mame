@@ -8,7 +8,7 @@
 
 #define SILENCE 8000
 
-static int generic_fill_wave(int16_t *buffer, int length, uint8_t *code, int bitsamples, int bytesamples, int lo, int16_t *(*fill_wave_byte)(int16_t *buffer, int byte))
+static int generic_fill_wave(int16_t *buffer, int length, const uint8_t *code, int bitsamples, int bytesamples, int lo, int16_t *(*fill_wave_byte)(int16_t *buffer, int byte))
 {
 	static int nullbyte;
 
