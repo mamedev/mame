@@ -885,8 +885,10 @@ CONS( 2005, ban_ordj, 0, 0, superxavix_i2c_24c04,    ban_ordj,   superxavix_i2c_
 // ディズニーキャラクターズ オト！イロ！トン・トン！ミラクルパレード
 CONS( 2007, ban_dn1j, 0, 0, superxavix_i2c_24c04,    ban_ordj,   superxavix_i2c_state, init_xavix, "Bandai / SSD Company LTD",   "Let's! TV Play Disney Characters Oto! Iro! Ton-Ton! Miracle Parade (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2011, anpanmdx, 0, 0, superxavix_i2c_24c08,    anpanmdx,   superxavix_i2c_state, init_xavix, "JoyPalette / SSD Company LTD",   "Anpanman Kazoku De Ikunou Mat DX (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+// アンパンマン かぞくで!育脳マットDX
+CONS( 2011, anpanmdx, 0, 0, superxavix_i2c_24c08,    anpanmdx,   superxavix_i2c_state, init_xavix, "JoyPalette / SSD Company LTD",   "Anpanman Kazoku de! Ikunou Mat DX (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
+// アンパンマン ぴょんぴょん育脳マット
 CONS( 2009, apmj2009, 0, 0, superxavix_i2c_24c16,    xavix_i2c,  superxavix_i2c_state, init_xavix, "JoyPalette / SSD Company LTD",   "Anpanman Pyon-Pyon Ikunou Mat (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // has HT24LC16
