@@ -143,7 +143,7 @@ static int primo_cassette_fill_wave(int16_t *buffer, int length, const uint8_t *
 	int i = 0, j = 0, k;
 
 	int16_t *p = buffer;
-	uint8_t *b = bytes;
+	const uint8_t *b = bytes;
 
 	uint32_t file_size = 0;
 	uint16_t block_size = 0;
