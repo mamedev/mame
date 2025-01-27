@@ -120,7 +120,7 @@ public:
 	/* code to adapt existing legacy fill_wave functions */
 	struct LegacyWaveFiller
 	{
-		int (*fill_wave)(int16_t *, int, uint8_t *) = nullptr;
+		int (*fill_wave)(int16_t *, int, const uint8_t *) = nullptr;
 		int chunk_size = 0;
 		int chunk_samples = 0;
 		int (*chunk_sample_calc)(const uint8_t *bytes, int length) = nullptr;
