@@ -281,7 +281,7 @@ arm::Mem get_mem_absolute(a64::Assembler &a, const void *ptr)
 
 	const uint64_t pagebase = codeoffs & ~make_bitmask<uint64_t>(12);
 	const int64_t pagerel = (int64_t)ptr - pagebase;
-	if (is_valid_immediate_signed(pagerel, 33))
+	if (is_valid_immediate_signed(pagerel, 21 + 12))
 	{
 		const uint64_t targetpage = (uint64_t)ptr & ~make_bitmask<uint64_t>(12);
 		const uint64_t pageoffs = (uint64_t)ptr & util::make_bitmask<uint64_t>(12);
@@ -494,7 +494,7 @@ void drcbe_arm64::get_imm_relative(a64::Assembler &a, const a64::Gp &reg, const 
 
 	const uint64_t pagebase = codeoffs & ~make_bitmask<uint64_t>(12);
 	const int64_t pagerel = (int64_t)val - pagebase;
-	if (is_valid_immediate_signed(pagerel, 33))
+	if (is_valid_immediate_signed(pagerel, 21 + 12))
 	{
 		const uint64_t targetpage = val & ~make_bitmask<uint64_t>(12);
 		const uint64_t pageoffs = val & util::make_bitmask<uint64_t>(12);
@@ -588,7 +588,7 @@ void drcbe_arm64::emit_ldr_str_base_mem(a64::Assembler &a, a64::Inst::Id opcode,
 
 	const uint64_t pagebase = codeoffs & ~make_bitmask<uint64_t>(12);
 	const int64_t pagerel = (int64_t)ptr - pagebase;
-	if (is_valid_immediate_signed(pagerel, 33))
+	if (is_valid_immediate_signed(pagerel, 21 + 12))
 	{
 		const uint64_t targetpage = (uint64_t)ptr & ~make_bitmask<uint64_t>(12);
 		const uint64_t pageoffs = (uint64_t)ptr & util::make_bitmask<uint64_t>(12);

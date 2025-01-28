@@ -33,6 +33,9 @@ void konppc_device::device_start()
 	for (i=0; i < num_cgboards; i++)
 	{
 		dsp_comm_ppc[i][0] = 0x00;
+		dsp_comm_ppc[i][1] = 0x00;
+		dsp_comm_sharc[i][0] = 0x00;
+		dsp_comm_sharc[i][1] = 0x00;
 		dsp_shared_ram[i] = std::make_unique<uint32_t[]>(DSP_BANK_SIZE * 2/4);
 		dsp_shared_ram_bank[i] = 0;
 

@@ -13,7 +13,7 @@
 
 
   Games supported:
-  
+
   * Le Pendu (Bilingue, Version 04),                198?, Avenir Amusement Inc.
   * Code Magik (Ver 5.5) / Super 7 (stealth game),  198?, Voyageur de L'Espace Inc.
 
@@ -79,9 +79,9 @@
 ***********************************************************************************
 
   Code Magik (Ver 5.5) / Super 7
-  
+
   This is a very rare game that has a gambling game hidden inside in stealth mode.
-  
+
   The front game is a very good Mastermind type game, where you must to guess
   a 4-numbers code to deactivate the bomb. The game will return how many numbers
   are correct, and how many in the right position. You have 20 attempts to beat
@@ -171,7 +171,7 @@ public:
 
 	void lamps_w(uint8_t data);
 	void lamps_cm_w(uint8_t data);
-	
+
 	void sound_w(uint8_t data);
 	void mux_w(uint8_t data);
 
@@ -524,16 +524,16 @@ static INPUT_PORTS_START(codemagik)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 

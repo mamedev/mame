@@ -180,22 +180,22 @@ Notes:
 #include "video/poly.h"
 #include "screen.h"
 
-#define LOG_PPC_TO_TLCS_COMMANDS	(1U << 1)
-#define LOG_TLCS_TO_PPC_COMMANDS	(1U << 2)
-#define LOG_VIDEO_REG_1_RD			(1U << 3)
-#define LOG_VIDEO_REG_2_RD			(1U << 4)
-#define LOG_VIDEO_REG_UNK_RD		(1U << 5)
-#define LOG_VIDEO_REG_1_WR			(1U << 6)
-#define LOG_VIDEO_REG_2_WR			(1U << 7)
-#define LOG_VIDEO_REG_UNK_WR		(1U << 8)
-#define LOG_VIDEO_CHIP_UNK_RD		(1U << 9)
-#define LOG_VIDEO_CHIP_UNK_WR		(1U << 10)
-#define LOG_DIRECT_FIFO				(1U << 11)
-#define LOG_TNL_FIFO				(1U << 12)
-#define LOG_RTC_UNK_RD				(1U << 13)
-#define LOG_RTC_UNK_WR				(1U << 14)
-#define LOG_VIDEO_MEM_UNK_RD		(1U << 15)
-#define LOG_VIDEO_MEM_UNK_WR		(1U << 16)
+#define LOG_PPC_TO_TLCS_COMMANDS    (1U << 1)
+#define LOG_TLCS_TO_PPC_COMMANDS    (1U << 2)
+#define LOG_VIDEO_REG_1_RD          (1U << 3)
+#define LOG_VIDEO_REG_2_RD          (1U << 4)
+#define LOG_VIDEO_REG_UNK_RD        (1U << 5)
+#define LOG_VIDEO_REG_1_WR          (1U << 6)
+#define LOG_VIDEO_REG_2_WR          (1U << 7)
+#define LOG_VIDEO_REG_UNK_WR        (1U << 8)
+#define LOG_VIDEO_CHIP_UNK_RD       (1U << 9)
+#define LOG_VIDEO_CHIP_UNK_WR       (1U << 10)
+#define LOG_DIRECT_FIFO             (1U << 11)
+#define LOG_TNL_FIFO                (1U << 12)
+#define LOG_RTC_UNK_RD              (1U << 13)
+#define LOG_RTC_UNK_WR              (1U << 14)
+#define LOG_VIDEO_MEM_UNK_RD        (1U << 15)
+#define LOG_VIDEO_MEM_UNK_WR        (1U << 16)
 
 #define VERBOSE (0)
 
@@ -561,19 +561,19 @@ public:
 	{
 	}
 
-	void taitotz(machine_config &config);
-	void landhigh(machine_config &config);
+	void taitotz(machine_config &config) ATTR_COLD;
+	void landhigh(machine_config &config) ATTR_COLD;
 
-	void init_batlgr2a();
-	void init_batlgr2();
-	void init_pwrshovl();
-	void init_batlgear();
-	void init_dendego3();
-	void init_landhigh();
-	void init_landhigha();
-	void init_raizpin();
-	void init_raizpinj();
-	void init_styphp();
+	void init_batlgr2a() ATTR_COLD;
+	void init_batlgr2() ATTR_COLD;
+	void init_pwrshovl() ATTR_COLD;
+	void init_batlgear() ATTR_COLD;
+	void init_dendego3() ATTR_COLD;
+	void init_landhigh() ATTR_COLD;
+	void init_landhigha() ATTR_COLD;
+	void init_raizpin() ATTR_COLD;
+	void init_raizpinj() ATTR_COLD;
+	void init_styphp() ATTR_COLD;
 
 	required_device<screen_device> m_screen;
 

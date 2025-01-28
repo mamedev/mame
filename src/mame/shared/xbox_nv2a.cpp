@@ -4144,7 +4144,7 @@ int nv2a_renderer::execute_method_blit(address_space &space, uint32_t chanel, ui
 	}
 	if (method == 0x0308) {
 		bitblit.width = data & 0xffff;
-		bitblit.heigth = data >> 16;
+		bitblit.height = data >> 16;
 		surface_2d_blit();
 	}
 	return 0;
@@ -4162,7 +4162,7 @@ void nv2a_renderer::surface_2d_blit()
 	}
 	srcrow = (uint32_t *)direct_access_ptr(bitblit.source_address + bitblit.pitch_source * bitblit.sourcey + bitblit.sourcex * 4);
 	destrow = (uint32_t *)direct_access_ptr(bitblit.destination_address + bitblit.pitch_destination * bitblit.destinationy + bitblit.destinationx * 4);
-	for (y = 0; y < bitblit.heigth; y++) {
+	for (y = 0; y < bitblit.height; y++) {
 		src = srcrow;
 		dest = destrow;
 		for (x = 0; x < bitblit.width; x++) {

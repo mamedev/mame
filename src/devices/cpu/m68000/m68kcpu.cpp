@@ -9,7 +9,7 @@ static const char copyright_notice[] =
 "MUSASHI\n"
 "Version 4.95 (2012-02-19)\n"
 "A portable Motorola M68xxx/CPU32/ColdFire processor emulation engine.\n"
-"Copyright Karl Stenerud.  All rights reserved.\n"
+"Copyright Karl Stenerud.\n"
 ;
 #endif
 

@@ -167,7 +167,7 @@ bool heath_h17d_format::load(util::random_read &io, uint32_t form_factor, const 
 	std::vector<uint32_t> buf;
 
 	auto const [secm_pos, secm_length] = find_block(io, SecM);
-	
+
 	uint8_t sector_meta_data[SECTOR_METADATA_SIZE];
 	uint8_t sector_data[SECTOR_DATA_SIZE];
 

@@ -310,6 +310,14 @@ ROM_START( jak_spmm )
 	// has a HT24LC04 to store settings
 ROM_END
 
+ROM_START( jak_prr )
+	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP("power_rangers_to_the_rescue.bin", 0x000000, 0x400000, CRC(96aef5c9) SHA1(d9a7f882932237c50cf5b5dbe4f8168d8916d9f2) )
+
+	// has a ISSI 827 404 (?) to store settings
+ROM_END
+
+
 ROM_START( smartfp )
 	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP("smartfitparkuk.bin", 0x000000, 0x800000, CRC(2072d7d0) SHA1(eaa4f254d6dee3a7eac64ae2204dd6291e4d27cc) )
@@ -324,6 +332,12 @@ ROM_START( smartfpf )
 	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP("smartfitpark_fr.bin", 0x000000, 0x800000, CRC(e6d3ba29) SHA1(14e4632997318329be3291f2c4e62f088181f3c8) )
 ROM_END
+
+ROM_START( fpsport )
+	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP("fpsports.bin", 0x000000, 0x800000, CRC(d8c23ccc) SHA1(46cbe0aa180facbc06db771c09d3926b27336ac1) )
+ROM_END
+
 
 
 ROM_START( gormiti )
@@ -367,6 +381,11 @@ ROM_END
 ROM_START( gameu50 )
 	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "gameu.bin", 0x000000, 0x2000000, CRC(13c42bce) SHA1(f769ceabb8ab4e60c0d663dffd5cca91c6aec206) )
+ROM_END
+
+ROM_START( gameu90 )
+	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "s29gl256.bin", 0x000000, 0x2000000, CRC(4b9e0498) SHA1(7ee387deabdd8dd59e5fa7f4f39d472bd4462ba9) )
 ROM_END
 
 ROM_START( gameu108 )
@@ -598,7 +617,7 @@ void gameu_handheld_game_state::machine_reset()
 	m_upperbase = 0;
 }
 
-void gameu_handheld_game_state::decrypt_gameu()
+void gameu_handheld_game_state::init_gameu()
 {
 	uint16_t *ROM = (uint16_t*)memregion("maincpu")->base();
 	int size = memregion("maincpu")->bytes();
@@ -617,9 +636,9 @@ void gameu_handheld_game_state::decrypt_gameu()
 
 }
 
-void gameu_handheld_game_state::init_gameu()
+void gameu_handheld_game_state::init_gameu50()
 {
-	decrypt_gameu();
+	init_gameu();
 
 	// why do we need these? it will jump to 0 after the menu selection (prior to fadeout and bank select) otherwise, which can't be correct
 	uint16_t *ROM = (uint16_t*)memregion("maincpu")->base();
@@ -639,7 +658,7 @@ void gameu_handheld_game_state::init_gameu()
 
 void gameu_handheld_game_state::init_gameu108()
 {
-	decrypt_gameu();
+	init_gameu();
 
 	uint16_t *ROM = (uint16_t*)memregion("maincpu")->base();
 
@@ -655,10 +674,14 @@ void gameu_handheld_game_state::init_gameu108()
 
 // the JAKKS ones of these seem to be known as 'Generalplus GPAC500' hardware?
 CONS(2008, jak_spmm,  0,       0, base, jak_spmm,  gormiti_game_state, empty_init, "JAKKS Pacific Inc / Santa Cruz Games", "The Amazing Spider-Man and The Masked Menace (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS(2008, jak_prr,   0,       0, base, jak_spmm,  gormiti_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Power Rangers to the Rescue (JAKKS Pacific TV Game) (Aug 8 2008 16:46:59)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 CONS(2009, smartfp,   0,       0, base, smartfp,  gcm394_game_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (UK)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS(2009, smartfps,  smartfp, 0, base, smartfp,  gcm394_game_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS(2009, smartfpf,  smartfp, 0, base, smartfp,  gcm394_game_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (France)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // boxart simply has 'Smart Fit'
+
+// skip the call at 6d47a to get it to show something
+CONS(2008, fpsport,   0,       0, base, base,     gcm394_game_state, empty_init, "Fisher-Price", "3-in-1 Smart Sports! (US)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 // These are ports of the 'Family Sport' games to GPL16250 type hardware, but they don't seem to use many unSP 2.0 instructions.
 // The menu style is close to 'm505neo' but the game selection is closer to 'dnv200fs' (but without the Sports titles removed, and with a few other extras not found on that unit)
@@ -683,5 +706,6 @@ CONS(2013, gormiti,   0, 0, base, gormiti,  gormiti_game_state, empty_init, "Gio
 
 // unit looks a bit like a knock-off Wii-U tablet, but much smaller
 // was also available under other names, with different designs (PSP style)
-CONS( 201?, gameu50,       0,              0,      gameu, gameu, gameu_handheld_game_state, init_gameu,    "YSN", "Play Portable Color GameU+ (50-in-1) (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 201?, gameu50,       0,              0,      gameu, gameu, gameu_handheld_game_state, init_gameu50,  "YSN", "Play Portable Color GameU+ (50-in-1) (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 201?, gameu90,       0,              0,      gameu, gameu, gameu_handheld_game_state, init_gameu,    "YSN", "Play Portable Color GameU+ (90-in-1) (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 CONS( 201?, gameu108,      0,              0,      gameu, gameu, gameu_handheld_game_state, init_gameu108, "YSN", "Play Portable Color GameU+ (108-in-1) (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

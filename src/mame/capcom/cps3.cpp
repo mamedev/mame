@@ -541,8 +541,8 @@ Hardware registers info
         A6      xxxx xxxx xxxx xxxx Palette DMA Destination low bits
         A8      -edc ba98 -654 3210 Palette DMA Fade low bits
         AA      ---- ---- -654 3210 Palette DMA Fade high bits
-        AC      xxxx xxxx xxxx xxxx Palette DMA Lenght low bits
-        AE      ---- ---- ---- ---0 Palette DMA Lenght high bit
+        AC      xxxx xxxx xxxx xxxx Palette DMA Length low bits
+        AE      ---- ---- ---- ---0 Palette DMA Length high bit
                 ---- ---- ---- --1- Palette DMA Start
 
         CRTC-related H/V values is last clock/line of given area, i.e. actual numbers is +1 to value, actual V Total is +2 to register value.

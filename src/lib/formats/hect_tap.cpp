@@ -121,7 +121,7 @@ static int hector_handle_tap(int16_t *buffer, const uint8_t *casdata)
 		if (data_pos>1)
 				previous_block = casdata[data_pos-1];
 
-		/* Handle block lenght on tape data */
+		/* Handle block length on tape data */
 		block_size = casdata[data_pos] ;
 		if (block_size==0)
 			block_size=256;
@@ -173,8 +173,8 @@ static int hector_handle_forth_tap(int16_t *buffer, const uint8_t *casdata)
 		/* Starting a block with 768 cycle of synchro*/
 		sample_count += hector_tap_synchro( buffer, sample_count, 768 );
 
-		/* Handle block lenght on tape data */
-		block_size = 822 ; /* Fixed size for the forth*/
+		/* Handle block length on tape data */
+		block_size = 822 ; /* Fixed size for the forth */
 
 		/*block_count=0;*/
 
@@ -203,7 +203,7 @@ static int hector_handle_forth_tap(int16_t *buffer, const uint8_t *casdata)
 /*******************************************************************
    Generate samples for the tape image
 ********************************************************************/
-static int hector_tap_fill_wave(int16_t *buffer, int sample_count, uint8_t *bytes)
+static int hector_tap_fill_wave(int16_t *buffer, int sample_count, const uint8_t *bytes)
 {
 	return hector_handle_tap( buffer, bytes );
 }
@@ -222,7 +222,7 @@ static int hector_tap_forth_to_wav_size(const uint8_t *casdata, int caslen)
 /*******************************************************************
    Generate samples for the tape image FORTH
 ********************************************************************/
-static int hector_tap_forth_fill_wave(int16_t *buffer, int sample_count, uint8_t *bytes)
+static int hector_tap_forth_fill_wave(int16_t *buffer, int sample_count, const uint8_t *bytes)
 {
 	return hector_handle_forth_tap( buffer, bytes ); //forth removed here !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 }

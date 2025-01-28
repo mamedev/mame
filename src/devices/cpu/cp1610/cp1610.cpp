@@ -5,7 +5,7 @@
  *   cp1610.c
  *   Portable CP1610 emulator (General Instrument CP1610)
  *
- *   Copyright Frank Palazzolo, all rights reserved.
+ *   Copyright Frank Palazzolo
  *
  *  This work is based on Juergen Buchmueller's F8 emulation,
  *  and the 'General Instruments CP1610' data sheets.

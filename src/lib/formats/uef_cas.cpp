@@ -247,7 +247,7 @@ static int16_t* uef_cas_fill_bit( uint8_t loops, int16_t *buffer, bool bit )
 	return buffer;
 }
 
-static int uef_cas_fill_wave( int16_t *buffer, int length, uint8_t *bytes )
+static int uef_cas_fill_wave( int16_t *buffer, int length, const uint8_t *bytes )
 {
 	if ( bytes[0] == 0x1f && bytes[1] == 0x8b ) {
 		if ( gz_ptr == nullptr ) {
@@ -264,16 +264,16 @@ static int uef_cas_fill_wave( int16_t *buffer, int length, uint8_t *bytes )
 		int chunk_type = get_u16le( &bytes[pos] );
 		int chunk_length = get_u32le( &bytes[pos+2] );
 
-		uint32_t baud_length, j;
-		uint8_t i, *c;
+		uint32_t baud_length;
+		const uint8_t *c;
 		pos += 6;
 		switch( chunk_type ) {
 		case 0x0100:    /* implicit start/stop bit data block */
 		case 0x0104:    // used by atom dumps, looks like normal data
-			for( j = 0; j < chunk_length; j++ ) {
+			for( uint32_t j = 0; j < chunk_length; j++ ) {
 				uint8_t byte = bytes[pos+j];
 				p = uef_cas_fill_bit( loops, p, 0 );
-				for( i = 0; i < 8; i++ ) {
+				for( uint8_t i = 0; i < 8; i++ ) {
 					p = uef_cas_fill_bit( loops, p, (byte >> i) & 1 );
 				}
 				p = uef_cas_fill_bit( loops, p, 1 );
@@ -285,11 +285,10 @@ static int uef_cas_fill_wave( int16_t *buffer, int length, uint8_t *bytes )
 			LOG_FORMATS( "Unsupported chunk type: %04x\n", chunk_type );
 			break;
 		case 0x0102:    /* explicit tape data block */
-			j = ( chunk_length * 10 ) - bytes[pos];
 			c = bytes + pos;
-			while( j ) {
+			for( uint32_t j = ( chunk_length * 10 ) - bytes[pos]; j; ) {
 				uint8_t byte = *c;
-				for( i = 0; i < 8 && i < j; i++ ) {
+				for( uint8_t i = 0; i < 8 && i < j; i++ ) {
 					p = uef_cas_fill_bit( loops, p, (byte >> i) & 1 );
 					j--;
 				}
@@ -311,7 +310,7 @@ static int uef_cas_fill_wave( int16_t *buffer, int length, uint8_t *bytes )
 			}
 			break;
 		case 0x0116:    /* floating point gap */
-			for( baud_length = (get_uef_float(bytes+pos)*UEF_WAV_FREQUENCY); baud_length; baud_length-- ) {
+			for( baud_length = (get_uef_float(bytes + pos)*UEF_WAV_FREQUENCY); baud_length; baud_length-- ) {
 				*p = WAVE_NULL; p++;
 				length -= 1;
 			}

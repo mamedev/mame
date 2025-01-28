@@ -2,28 +2,8 @@
 // copyright-holders:Steve Ellenoff, Manuel Abadia, Couriersud
 /*****************************************************************************
  *
- *   mcs51.h
- *   Portable MCS-51 Family Emulator
- *
- *   Chips in the family:
- *   8051 Product Line (8031,8051,8751)
- *   8052 Product Line (8032,8052,8752)
- *   8054 Product Line (8054)
- *   8058 Product Line (8058)
- *
- *   Copyright Steve Ellenoff, all rights reserved.
- *
- *  This work is based on:
- *  #1) 'Intel(tm) MC51 Microcontroller Family Users Manual' and
- *  #2) 8051 simulator by Travis Marlatte
- *  #3) Portable UPI-41/8041/8741/8042/8742 emulator V0.1 by Juergen Buchmueller (MAME CORE)
- *
- * 2008, October, Couriersud
- * - Rewrite of timer, interrupt and serial code
- * - addition of CMOS features
- * - internal memory maps
- * - addition of new processor types
- * - full emulation of 8xCx2 processors
+ * Portable MCS-51 Family Emulator
+ * Copyright Steve Ellenoff
  *
  *****************************************************************************/
 
@@ -81,7 +61,7 @@ protected:
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 12 - 1) / 12; }
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 12); }
 	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
-	virtual uint32_t execute_max_cycles() const noexcept override { return 20; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 4+2; } // max opcode cycles + irq
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -153,7 +133,7 @@ protected:
 	// Memory spaces
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::cache m_program;
 	memory_access< 9, 0, 0, ENDIANNESS_LITTLE>::specific m_data;
-	memory_access<17, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
+	memory_access<18, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
 
 	devcb_read8::array<4> m_port_in_cb;
 	devcb_write8::array<4> m_port_out_cb;
@@ -195,8 +175,6 @@ protected:
 	void update_timer_t0(int cycles);
 	void update_timer_t1(int cycles);
 	void update_timer_t2(int cycles);
-	void update_timers(int cycles);
-	void update_serial(int source);
 	void update_irq_prio(uint8_t ipl, uint8_t iph);
 	void execute_op(uint8_t op);
 	void check_irqs();

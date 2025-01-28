@@ -3,9 +3,12 @@
 // thanks-to:Berger
 /*******************************************************************************
 
-Mephisto Glasgow 3 S chess computer
+Mephisto III-S Glasgow chess computer
 Dirk V.
 sp_rinter@gmx.de
+
+Mephisto Glasgow is the last chess engine written by Thomas Nitsche & Elmar Henne.
+Amsterdam/Dallas/Roma are by Richard Lang.
 
 Hardware notes:
 - R68000C10 or MC68000P12 @ 12MHz, IRQ from 50Hz Seiko SG-10 chip "50H", to IPL0+2
@@ -25,9 +28,14 @@ Other TTL:
 1*74LS20  Dual 4 Input NAND GAte
 1*74LS367 3 State Hex Buffers
 
-TODO:
-- add waitstates, CPU is 12MHz but with DTACK waitstates for slow EPROMs,
-  effective speed is around 7.2MHz
+By default, it makes heavy use of DTACK wait states. Overall it runs much slower
+than 12MHz. The LDS/UDS wait states can be modified with solder pads on the
+backside of the PCB (under the 74LS164).
+
+To verify CPU speed: Set level to 9 and move pawn to F3. At exactly 6 minutes,
+a real Glasgow with 1 LDS/UDS wait state will have calculated 3432 positions
+(may fluctuate a little due to 74121). To see number of calculated positions,
+press INFO, C, then Right 3 times.
 
 *******************************************************************************/
 
@@ -56,13 +64,18 @@ public:
 		m_board(*this, "board"),
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
-		m_keys(*this, "KEY.%u", 0)
+		m_keys(*this, "KEY.%u", 0),
+		m_wait(*this, "WAIT")
 	{ }
+
+	DECLARE_INPUT_CHANGED_MEMBER(wait_changed) { install_wait(); }
 
 	void glasgow(machine_config &config);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD { install_wait(); }
+	virtual void device_post_load() override { install_wait(); }
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -70,19 +83,90 @@ private:
 	required_device<mephisto_display1_device> m_display;
 	required_device<dac_1bit_device> m_dac;
 	required_ioport_array<2> m_keys;
+	required_ioport m_wait;
+
+	memory_passthrough_handler m_read_tap;
+	memory_passthrough_handler m_write_tap;
 
 	u8 m_kp_mux = 0;
+	int m_wait_ticks = 0;
+	int m_ext_ticks = 0;
 
 	void glasgow_mem(address_map &map) ATTR_COLD;
+
+	void install_wait();
 
 	void control_w(u8 data);
 	u8 keys_r();
 	void keys_w(u8 data);
 };
 
+
+
+/*******************************************************************************
+    Initialization
+*******************************************************************************/
+
 void glasgow_state::machine_start()
 {
 	save_item(NAME(m_kp_mux));
+
+	// on external access (0x10000-0x17fff), additional wait states via a 74121
+	// (R=internal 2K, C=10nf, which is 20us according to datasheet)
+	attotime ext_delay = attotime::from_usec(20);
+	m_ext_ticks = ext_delay.as_ticks(m_maincpu->clock());
+
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+
+	space.install_read_tap(
+			0x10000, 0x17fff,
+			"maincpu_ext_r",
+			[this] (offs_t offset, u16 &data, u16 mem_mask)
+			{
+				if (!machine().side_effects_disabled())
+					m_maincpu->adjust_icount(-m_ext_ticks);
+			});
+	space.install_write_tap(
+			0x10000, 0x17fff,
+			"maincpu_ext_w",
+			[this] (offs_t offset, u16 &data, u16 mem_mask)
+			{
+				if (!machine().side_effects_disabled())
+					m_maincpu->adjust_icount(-m_ext_ticks);
+			});
+}
+
+void glasgow_state::install_wait()
+{
+	m_read_tap.remove();
+	m_write_tap.remove();
+
+	// optional 0-3 wait states via 74LS164 for each LDS/UDS
+	m_wait_ticks = m_wait->read() & 3;
+
+	if (m_wait_ticks)
+	{
+		address_space &program = m_maincpu->space(AS_PROGRAM);
+
+		m_read_tap = program.install_read_tap(
+				0x00000, 0x1ffff,
+				"maincpu_wait_r",
+				[this] (offs_t offset, u16 &data, u16 mem_mask)
+				{
+					if (!machine().side_effects_disabled())
+						m_maincpu->adjust_icount(-m_wait_ticks);
+				},
+				&m_read_tap);
+		m_write_tap = program.install_write_tap(
+				0x00000, 0x1ffff,
+				"maincpu_wait_w",
+				[this] (offs_t offset, u16 &data, u16 mem_mask)
+				{
+					if (!machine().side_effects_disabled())
+						m_maincpu->adjust_icount(-m_wait_ticks);
+				},
+				&m_write_tap);
+	}
 }
 
 
@@ -131,11 +215,11 @@ void glasgow_state::glasgow_mem(address_map &map)
 {
 	map.global_mask(0x1ffff);
 	map(0x000000, 0x00ffff).rom();
-	map(0x010000, 0x010000).w(m_display, FUNC(mephisto_display1_device::data_w));
-	map(0x010002, 0x010002).rw(FUNC(glasgow_state::keys_r), FUNC(glasgow_state::keys_w));
-	map(0x010004, 0x010004).w(FUNC(glasgow_state::control_w));
-	map(0x010006, 0x010006).rw(m_board, FUNC(mephisto_board_device::input_r), FUNC(mephisto_board_device::led_w));
-	map(0x010008, 0x010008).w(m_board, FUNC(mephisto_board_device::mux_w));
+	map(0x010000, 0x010001).mirror(0x007ff0).w(m_display, FUNC(mephisto_display1_device::data_w)).umask16(0xff00);
+	map(0x010002, 0x010003).mirror(0x007ff0).rw(FUNC(glasgow_state::keys_r), FUNC(glasgow_state::keys_w)).umask16(0xff00);
+	map(0x010004, 0x010005).mirror(0x007ff0).w(FUNC(glasgow_state::control_w)).umask16(0xff00);
+	map(0x010006, 0x010007).mirror(0x007ff0).rw(m_board, FUNC(mephisto_board_device::input_r), FUNC(mephisto_board_device::led_w)).umask16(0xff00);
+	map(0x010008, 0x010009).mirror(0x007ff0).w(m_board, FUNC(mephisto_board_device::mux_w)).umask16(0xff00);
 	map(0x01c000, 0x01ffff).ram();
 }
 
@@ -165,6 +249,13 @@ static INPUT_PORTS_START( glasgow )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("A / 1") PORT_CODE(KEYCODE_A) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("F / 6 / Queen") PORT_CODE(KEYCODE_F) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("B / 2 / Pawn") PORT_CODE(KEYCODE_B) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD)
+
+	PORT_START("WAIT") // hardwired, default to 1
+	PORT_CONFNAME( 0x03, 0x01, "LDS/UDS Wait States" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(glasgow_state::wait_changed), 0)
+	PORT_CONFSETTING(    0x00, "None (12MHz)" )
+	PORT_CONFSETTING(    0x01, "1 (~9.5MHz)" )
+	PORT_CONFSETTING(    0x02, "2 (~8MHz)" )
+	PORT_CONFSETTING(    0x03, "3 (~7Mhz)" )
 INPUT_PORTS_END
 
 

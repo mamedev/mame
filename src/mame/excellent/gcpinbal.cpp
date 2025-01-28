@@ -116,9 +116,6 @@ class gcpinbal_state : public driver_device
 public:
 	gcpinbal_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_tilemapram(*this, "tilemapram")
-		, m_d80010_ram(*this, "d80010")
-		, m_d80060_ram(*this, "d80060")
 		, m_maincpu(*this, "maincpu")
 		, m_eeprom(*this, "eeprom")
 		, m_watchdog(*this, "watchdog")
@@ -128,6 +125,9 @@ public:
 		, m_screen(*this, "screen")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
+		, m_tilemapram(*this, "tilemapram")
+		, m_d80010_ram(*this, "d80010")
+		, m_d80060_ram(*this, "d80060")
 	{ }
 
 	void gcpinbal(machine_config &config);
@@ -138,6 +138,17 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<mb3773_device> m_watchdog;
+	required_device<okim6295_device> m_oki;
+	required_device<es8712_device> m_essnd;
+	required_device<excellent_spr_device> m_sprgen;
+	required_device<screen_device> m_screen;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+
 	// memory pointers
 	required_shared_ptr<u16> m_tilemapram;
 	required_shared_ptr<u16> m_d80010_ram;
@@ -154,17 +165,6 @@ private:
 
 	// sound-related
 	u8 m_msm_bank = 0U;
-
-	// devices
-	required_device<cpu_device> m_maincpu;
-	required_device<eeprom_serial_93cxx_device> m_eeprom;
-	required_device<mb3773_device> m_watchdog;
-	required_device<okim6295_device> m_oki;
-	required_device<es8712_device> m_essnd;
-	required_device<excellent_spr_device> m_sprgen;
-	required_device<screen_device> m_screen;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 
 	void d80010_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void d80040_w(offs_t offset, u8 data);
@@ -326,7 +326,7 @@ uint32_t gcpinbal_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 #endif
 	m_tilemap[layer[2]]->draw(screen, bitmap, cliprect, 0, 4);
 
-	m_sprgen->gcpinbal_draw_sprites(screen, bitmap, cliprect, 16);
+	m_sprgen->gcpinbal_draw_sprites(screen, bitmap, cliprect);
 
 	return 0;
 }
@@ -373,34 +373,34 @@ void gcpinbal_state::d80060_w(offs_t offset, u16 data, u16 mem_mask)
 void gcpinbal_state::bank_w(u8 data)
 {
 	// MSM6585 bank, coin LEDs, maybe others?
-	if (m_msm_bank != ((data & 0x10) >> 4))
+	if (m_msm_bank != BIT(data, 4))
 	{
-		m_msm_bank = ((data & 0x10) >> 4);
+		m_msm_bank = BIT(data, 4);
 		m_essnd->set_rom_bank(m_msm_bank);
 		LOGESBANKSW("Bankswitching ES8712 ROM %02x\n", m_msm_bank);
 	}
-	m_oki->set_rom_bank((data & 0x20) >> 5);
+	m_oki->set_rom_bank(BIT(data, 5));
 
 	u32 old = m_bg_gfxset[0];
-	u32 newbank = (data & 0x04) ? 0x1000 : 0;
+	u32 newbank = BIT(data, 2) ? 0x1000 : 0;
 	if (old != newbank)
 	{
-		m_bg_gfxset[0] = (data & 0x04) ? 0x1000 : 0;
+		m_bg_gfxset[0] = BIT(data, 2) ? 0x1000 : 0;
 		m_tilemap[0]->mark_all_dirty();
 	}
 
 	old = m_bg_gfxset[1];
-	newbank = (data & 0x08) ? 0x1000 : 0;
+	newbank = BIT(data, 3) ? 0x1000 : 0;
 	if (old != newbank)
 	{
-		m_bg_gfxset[1] = (data & 0x04) ? 0x1000 : 0;
+		m_bg_gfxset[1] = BIT(data, 3) ? 0x1000 : 0;
 		m_tilemap[1]->mark_all_dirty();
 	}
 
 	m_watchdog->write_line_ck(BIT(data, 7));
 
-//          machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
-//          machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
+//          machine().bookkeeping().coin_lockout_w(0, BIT(~data, 0));
+//          machine().bookkeeping().coin_lockout_w(1, BIT(~data, 1));
 }
 
 void gcpinbal_state::eeprom_w(u8 data)
@@ -589,6 +589,7 @@ void gcpinbal_state::gcpinbal(machine_config &config)
 	m_screen->set_size(40*8, 32*8);
 	m_screen->set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
 	m_screen->set_screen_update(FUNC(gcpinbal_state::screen_update));
+	m_screen->screen_vblank().set(m_sprgen, FUNC(excellent_spr_device::vblank));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gcpinbal);
@@ -622,9 +623,9 @@ void gcpinbal_state::gcpinbal(machine_config &config)
 ***************************************************************************/
 
 ROM_START( pwrflip ) // Updated version of Grand Cross Pinball or semi-sequel?
-	ROM_REGION( 0x200000, "maincpu", 0 )  // 68000
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )  // 68000
 	ROM_LOAD16_WORD_SWAP( "p.f_1.33.u43",  0x000000, 0x80000, CRC(d760c987) SHA1(9200604377542193afc866c84733f2d3b5aa1c80) ) // hand written labels on genuine EXCELLENT labels
-	ROM_FILL            ( 0x80000,  0x080000, 0x00 ) // unpopulated 27C4096 socket at U44
+	// unpopulated 27C4096 socket at U44
 	ROM_LOAD16_WORD_SWAP( "p.f.u45",       0x100000, 0x80000, CRC(6ad1a457) SHA1(8746c38efa05e3318e9b1a371470d149803fb6bb) )
 	ROM_LOAD16_WORD_SWAP( "p.f.u46",       0x180000, 0x80000, CRC(e0f3a1b4) SHA1(761dddf374a92c1a1e4a211ead215d5be461a082) )
 
@@ -650,9 +651,9 @@ ROM_START( pwrflip ) // Updated version of Grand Cross Pinball or semi-sequel?
 ROM_END
 
 ROM_START( gcpinbal )
-	ROM_REGION( 0x200000, "maincpu", 0 )  // 68000
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )  // 68000
 	ROM_LOAD16_WORD_SWAP( "2_excellent.u43",  0x000000, 0x80000, CRC(d174bd7f) SHA1(0e6c17265e1400de941e3e2ca3be835aaaff6695) ) // Red line across label
-	ROM_FILL            ( 0x80000,  0x080000, 0x00 ) // unpopulated 27C4096 socket at U44
+	// unpopulated 27C4096 socket at U44
 	ROM_LOAD16_WORD_SWAP( "3_excellent.u45",  0x100000, 0x80000, CRC(0511ad56) SHA1(e0602ece514126ce719ebc9de6649ebe907be904) )
 	ROM_LOAD16_WORD_SWAP( "4_excellent.u46",  0x180000, 0x80000, CRC(e0f3a1b4) SHA1(761dddf374a92c1a1e4a211ead215d5be461a082) )
 
