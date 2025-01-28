@@ -89,7 +89,7 @@ void twincobr_state::video_start()
 	m_fgvideoram16 = make_unique_clear<u16[]>(m_fgvideoram_size);
 	m_bgvideoram16 = make_unique_clear<u16[]>(m_bgvideoram_size);
 
-	m_display_on = 0;
+	m_display_on = false;
 
 	save_pointer(NAME(m_txvideoram16), m_txvideoram_size);
 	save_pointer(NAME(m_fgvideoram16), m_fgvideoram_size);
@@ -234,37 +234,37 @@ void twincobr_state::twincobr_exscroll_w(offs_t offset, u16 data)/* Extra unused
 /******************** Wardner interface to this hardware ********************/
 void twincobr_state::wardner_txlayer_w(offs_t offset, u8 data)
 {
-	int shift = 8 * (offset & 1);
+	const int shift = 8 * BIT(offset, 0);
 	twincobr_txoffs_w(offset / 2, data << shift, 0xff << shift);
 }
 
 void twincobr_state::wardner_bglayer_w(offs_t offset, u8 data)
 {
-	int shift = 8 * (offset & 1);
+	const int shift = 8 * BIT(offset, 0);
 	twincobr_bgoffs_w(offset / 2, data << shift, 0xff << shift);
 }
 
 void twincobr_state::wardner_fglayer_w(offs_t offset, u8 data)
 {
-	int shift = 8 * (offset & 1);
+	const int shift = 8 * BIT(offset, 0);
 	twincobr_fgoffs_w(offset / 2, data << shift, 0xff << shift);
 }
 
 void twincobr_state::wardner_txscroll_w(offs_t offset, u8 data)
 {
-	int shift = 8 * (offset & 1);
+	const int shift = 8 * BIT(offset, 0);
 	twincobr_txscroll_w(offset / 2, data << shift, 0xff << shift);
 }
 
 void twincobr_state::wardner_bgscroll_w(offs_t offset, u8 data)
 {
-	int shift = 8 * (offset & 1);
+	const int shift = 8 * BIT(offset, 0);
 	twincobr_bgscroll_w(offset / 2, data << shift, 0xff << shift);
 }
 
 void twincobr_state::wardner_fgscroll_w(offs_t offset, u8 data)
 {
-	int shift = 8 * (offset & 1);
+	const int shift = 8 * BIT(offset, 0);
 	twincobr_fgscroll_w(offset / 2, data << shift, 0xff << shift);
 }
 
@@ -281,7 +281,7 @@ void twincobr_state::wardner_exscroll_w(offs_t offset, u8 data)/* Extra unused v
 
 u8 twincobr_state::wardner_videoram_r(offs_t offset)
 {
-	int shift = 8 * (offset & 1);
+	const int shift = 8 * BIT(offset, 0);
 	switch (offset / 2)
 	{
 		case 0: return twincobr_txram_r() >> shift;
@@ -293,29 +293,29 @@ u8 twincobr_state::wardner_videoram_r(offs_t offset)
 
 void twincobr_state::wardner_videoram_w(offs_t offset, u8 data)
 {
-	int shift = 8 * (offset & 1);
+	const int shift = 8 * BIT(offset, 0);
 	switch (offset / 2)
 	{
-		case 0: twincobr_txram_w(0,data << shift, 0xff << shift); break;
-		case 1: twincobr_bgram_w(0,data << shift, 0xff << shift); break;
-		case 2: twincobr_fgram_w(0,data << shift, 0xff << shift); break;
+		case 0: twincobr_txram_w(0, data << shift, 0xff << shift); break;
+		case 1: twincobr_bgram_w(0, data << shift, 0xff << shift); break;
+		case 2: twincobr_fgram_w(0, data << shift, 0xff << shift); break;
 	}
 }
 
 u8 twincobr_state::wardner_sprite_r(offs_t offset)
 {
-	u16 *spriteram16 = reinterpret_cast<u16 *>(m_spriteram8->live());
-	int shift = (offset & 1) * 8;
-	return spriteram16[offset/2] >> shift;
+	u16 const *const spriteram16 = reinterpret_cast<u16 *>(m_spriteram8->live());
+	const int shift = BIT(offset, 0) * 8;
+	return spriteram16[offset / 2] >> shift;
 }
 
 void twincobr_state::wardner_sprite_w(offs_t offset, u8 data)
 {
-	u16 *spriteram16 = reinterpret_cast<u16 *>(m_spriteram8->live());
-	if (offset & 1)
-		spriteram16[offset/2] = (spriteram16[offset/2] & 0x00ff) | (data << 8);
+	u16 *const spriteram16 = reinterpret_cast<u16 *>(m_spriteram8->live());
+	if (BIT(offset, 0))
+		spriteram16[offset / 2] = (spriteram16[offset/2] & 0x00ff) | (data << 8);
 	else
-		spriteram16[offset/2] = (spriteram16[offset/2] & 0xff00) | data;
+		spriteram16[offset / 2] = (spriteram16[offset/2] & 0xff00) | data;
 }
 
 
@@ -326,14 +326,13 @@ void twincobr_state::log_vram()
 {
 #ifdef MAME_DEBUG
 
-	if ( machine().input().code_pressed(KEYCODE_M) )
+	if (machine().input().code_pressed(KEYCODE_M))
 	{
-		offs_t tile_voffs;
-		int tcode[4];
+		int tcode[4]{};
 		while (machine().input().code_pressed(KEYCODE_M)) ;
 		logerror("Scrolls             BG-X BG-Y  FG-X FG-Y  TX-X  TX-Y\n");
 		logerror("------>             %04x %04x  %04x %04x  %04x  %04x\n",m_bgscrollx,m_bgscrolly,m_fgscrollx,m_fgscrolly,m_txscrollx,m_txscrolly);
-		for ( tile_voffs = 0; tile_voffs < (m_txvideoram_size/2); tile_voffs++ )
+		for (offs_t tile_voffs = 0; tile_voffs < (m_txvideoram_size / 2); tile_voffs++)
 		{
 			tcode[1] = m_bgvideoram16[tile_voffs];
 			tcode[2] = m_fgvideoram16[tile_voffs];
@@ -343,7 +342,7 @@ void twincobr_state::log_vram()
 							tcode[2] & 0xf000 >> 12, tcode[2] & 0x0fff,
 							tcode[3] & 0xf800 >> 11, tcode[3] & 0x07ff);
 		}
-		for ( tile_voffs = (m_txvideoram_size/2); tile_voffs < (m_fgvideoram_size/2); tile_voffs++ )
+		for (offs_t tile_voffs = (m_txvideoram_size / 2); tile_voffs < (m_fgvideoram_size / 2); tile_voffs++)
 		{
 			tcode[1] = m_bgvideoram16[tile_voffs];
 			tcode[2] = m_fgvideoram16[tile_voffs];
@@ -351,7 +350,7 @@ void twincobr_state::log_vram()
 							tcode[1] & 0xf000 >> 12, tcode[1] & 0x0fff,
 							tcode[2] & 0xf000 >> 12, tcode[2] & 0x0fff);
 		}
-		for ( tile_voffs = (m_fgvideoram_size/2); tile_voffs < (m_bgvideoram_size/2); tile_voffs++ )
+		for (offs_t tile_voffs = (m_fgvideoram_size / 2); tile_voffs < (m_bgvideoram_size / 2); tile_voffs++)
 		{
 			tcode[1] = m_bgvideoram16[tile_voffs];
 			logerror("$(%04x)  (Col-Tile) BG1:%01x-%03x\n", tile_voffs,
