@@ -1650,10 +1650,14 @@ m_printer->in_pb_callback().set_constant(0xbf);		// HACK:  vblank always checks 
 //	m_lance->intr_out().set_inputline(m_maincpu, M68K_IRQ_2).invert();
 	m_lance->intr_out().set(FUNC(tek440x_state::delay_irq2));
 	m_lance->dma_in().set([this](offs_t offset) {
-		return m_maincpu->space(0).read_word(offset);;
+		//LOG("dma_in 0x%08x\n",offset);
+		return m_vm->read16(offset);
+//		return m_maincpu->space(0).read_word(offset);;
 	});
 	m_lance->dma_out().set([this](offs_t offset, u16 data, u16 mem_mask) {
-		m_maincpu->space(0).write_word(offset, data, mem_mask);
+		//LOG("dma_out 0x%08x <= %04x\n",offset, data);
+		return m_vm->write16(offset,data, mem_mask);
+//		m_maincpu->space(0).write_word(offset, data, mem_mask);
 	});
 
 	X2210(config, m_novram);
