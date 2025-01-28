@@ -559,6 +559,9 @@ public:
 	void tek4404(machine_config &config);
 
 private:
+	TIMER_CALLBACK_MEMBER(delay_irq2_timer_deliver);
+	void delay_irq2(u8 data);
+
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -665,7 +668,25 @@ private:
 	u8 m_diag;
 	u8 m_mouse,m_mouse_bnts,m_mouse_x,m_mouse_y,m_old_mouse_x,m_old_mouse_y;
 	u8 m_mouse_px,m_mouse_py,m_mouse_pc;
+	
+	emu_timer *delay_irq2_timer;
 };
+
+void tek440x_state::delay_irq2(u8 data)
+{
+	LOG("delay_irq2: \n");
+	m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
+	delay_irq2_timer->adjust(attotime::from_usec(16));
+}
+
+TIMER_CALLBACK_MEMBER(tek440x_state::delay_irq2_timer_deliver)
+{
+
+	LOG("delay_irq2_timer_deliver: \n");
+	delay_irq2_timer->adjust(attotime::never);
+	m_maincpu->set_input_line(M68K_IRQ_2, ASSERT_LINE);
+}
+
 
 /*************************************
  *
@@ -694,7 +715,6 @@ void tek440x_state::machine_start()
 	m_led_disk.resolve();
 	m_maincpu->space(AS_PROGRAM).install_write_tap(0x7be002, 0x7be003, "led_tap", [this](offs_t offset, u16 &data, u16 mem_mask) { m_led_disk = !BIT(data, 3);});
 
-	
 	m_vint->in_w<0>(0);		// VBL enable
 	m_vint->in_w<1>(0);		// VBL
 
@@ -702,6 +722,9 @@ void tek440x_state::machine_start()
 
 	// AB is this needed for external MMU?
 	m_maincpu->set_emmu_enable(true);
+
+	// lance instantly responds with an IRQ which tek4404 doesn't like
+	delay_irq2_timer = timer_alloc(FUNC(tek440x_state::delay_irq2_timer_deliver), this);
 }
 
 
@@ -1624,7 +1647,8 @@ m_printer->in_pb_callback().set_constant(0xbf);		// HACK:  vblank always checks 
 
 	// ethernet
 	AM7990(config, m_lance, 40_MHz_XTAL / 4);
-	m_lance->intr_out().set_inputline(m_maincpu, M68K_IRQ_2).invert();
+//	m_lance->intr_out().set_inputline(m_maincpu, M68K_IRQ_2).invert();
+	m_lance->intr_out().set(FUNC(tek440x_state::delay_irq2));
 	m_lance->dma_in().set([this](offs_t offset) {
 		return m_maincpu->space(0).read_word(offset);;
 	});
