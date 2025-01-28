@@ -364,9 +364,6 @@ public:
 
 #ifdef USE_MMU
 	void init16(address_space &space, address_space &ospace)
-#else
-	void init16XXXXXX(address_space &space, address_space &ospace)
-#endif
 	{
 		LOG("m68010_tekmmu_device::init16: \n");
 		m_space = &space;
@@ -438,6 +435,7 @@ public:
 			}
 		};
 	}
+#endif
 
 	void init_cpu_m68010(void)
 	{
