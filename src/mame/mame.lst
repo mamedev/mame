@@ -32818,6 +32818,7 @@ vcarn
 sprcros2
 sprcros2a
 
+<<<<<<< HEAD
 @source:misc/sshanghai.cpp
 ssh2000
 ssh2000a
@@ -32825,6 +32826,8 @@ ssh2000wf
 ssh2001
 ssh2001a
 
+=======
+>>>>>>> 55e8b75801e (source org: add yachiyo folder)
 @source:misc/startouch.cpp
 europl01
 
@@ -48168,6 +48171,17 @@ ssingles
 @source:yachiyo/sstrangr.cpp
 sstrangr
 sstrangr2
+
+@source:yachiyo/mole.cpp
+mole                            // (c) 1982 Yachiyo Electronics, Ltd.
+
+@source:yachiyo/ssingles.cpp
+atamanot                        // (c) 1983 Yachiyo Denki / Uni Enterprize
+ssingles                        // Yachiyo?
+
+@source:yachiyo/sstrangr.cpp
+sstrangr                        // (c) 1978 Yachiyo Electronics, Ltd.
+sstrangr2                       // (c) 1979 Yachiyo Electronics, Ltd.
 
 @source:yamaha/fb01.cpp
 fb01
