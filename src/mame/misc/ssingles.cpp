@@ -15,14 +15,14 @@
  TODO:
  - atamanot: needs a trojan, in order to understand how the protection really works.
  - colors (missing PROM(s) ?)
- - samples (at least two of unused ROMs contains samples (unkn. format , ADPCM ?)
+ - samples (at least two of unused ROMs contains samples (unkn. format, ADPCM ?)
  - dips (one is tested in game (difficulty related?), another 2 are tested at start)
 
  Unknown reads/writes:
  - AY i/o ports (writes)
  - mem $c000, $c001 = protection device ? if tests fails, game crashes (problems with stack - skipped code with "pop af")
  - i/o port $8 = data read used for  $e command arg for one of AY chips (volume? - could be a sample player (based on volume changes?)
- - i/o port $1a = 1 or 0, rarely accessed, related to crt  writes
+ - i/o port $1a = 1 or 0, rarely accessed, related to crt writes
 
 ==================================================================
 
@@ -580,7 +580,6 @@ void ssingles_state::ssingles(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	AY8910(config, "ay1", 1'500'000).add_route(ALL_OUTPUTS, "mono", 0.5); // ? MHz
-
 	AY8910(config, "ay2", 1'500'000).add_route(ALL_OUTPUTS, "mono", 0.5); // ? MHz
 }
 
