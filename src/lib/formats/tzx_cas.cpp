@@ -833,16 +833,19 @@ static int tap_cas_fill_wave( int16_t *buffer, int length, const uint8_t *bytes 
 	int16_t *p = buffer;
 	int size = 0;
 
-	while (length > 0)
+	//while (length > 0)
+	while (size < length)
 	{
 		int data_size = get_u16le(&bytes[0]);
 		int pilot_length = (bytes[2] == 0x00) ? 8063 : 3223;
 		LOG_FORMATS("tap_cas_fill_wave: Handling TAP block containing 0x%X bytes\n", data_size);
+		/*
 		length -= data_size;
 		if (length < 0)
 		{
 			data_size += length; // Take as much as we can.
 		}
+		*/
 		bytes += 2;
 		size += tzx_cas_handle_block(&p, bytes, 1000, data_size, 2168, pilot_length, 667, 735, 855, 1710, 8);
 		bytes += data_size;
