@@ -820,7 +820,6 @@ cassette_image::error cassette_image::legacy_construct(const LegacyWaveFiller *l
 			goto done;
 		}
 
-		LOG_FORMATS("Image size: %x\n", size);
 		std::vector<uint8_t> bytes(size);
 		image_read(&bytes[0], 0, size);
 		sample_count = args.chunk_sample_calc(&bytes[0], (int)size);
@@ -865,7 +864,17 @@ cassette_image::error cassette_image::legacy_construct(const LegacyWaveFiller *l
 		image_read(&chunk[0], offset, args.chunk_size);
 		offset += args.chunk_size;
 
-		length = args.fill_wave(&samples[pos], args.chunk_size, &chunk[0]);
+		/*
+		This approach is problematic because we don't have control on incomming image size when processing the data
+		(at least in tap implementation).
+		The method sending the size of output (calculated in 'chunk_sample_calc' above) which uses same data as a input  but
+		without knowing how much data available in the image. Having wrong header with size bigger than image couses illegal
+		access beyond image data.
+		Desired state is:
+			length = args.fill_wave(&samples[pos], args.chunk_size, &chunk[0]);
+			aslo the fix for tap is commented out in 'tap_cas_fill_wave'
+		*/
+		length = args.fill_wave(&samples[pos], sample_count - pos, &chunk[0]);
 		if (length < 0)
 		{
 			err = error::INVALID_IMAGE;
