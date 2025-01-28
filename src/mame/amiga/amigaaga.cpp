@@ -464,6 +464,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 	int pf1pri = 0, pf2pri = 0;
 	int planes = 0;
 	int raw_scanline = 0;
+	u8 bplam = 0;
 
 	uint32_t *dst = nullptr;
 	int ebitoffs = 0, obitoffs = 0;
@@ -627,6 +628,11 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 			// In theory it's simple: maps bitplanes in 35ns resolution, offsetting where needed.
 			// In practice we need to separate bitplane delays & drawing first.
 			//shres = CUSTOM_REG(REG_BPLCON0) & 0x0040;
+
+			// bplam applies xor to bitplane colors (i.e. acting as pal bank)
+			// - aladdin, status bar in gameplay
+			// TODO: implement for ham and dualpf, below
+			bplam = CUSTOM_REG(REG_BPLCON4) >> 8;
 
 			// In AGA Extra Half-Brite applies if this condition is satisfied
 			// (bit 9 of BPLCON2 is KILLEHB)
@@ -934,8 +940,8 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 					{
 						// TODO: does it applies to sprites too?
 						rgb_t *dst_palette = ehb ? m_aga_ehb_palette : aga_palette;
-						dst[x*2+0] = dst_palette[pfpix0];
-						dst[x*2+1] = dst_palette[pfpix1];
+						dst[x*2+0] = dst_palette[pfpix0 ^ bplam];
+						dst[x*2+1] = dst_palette[pfpix1 ^ bplam];
 					}
 				}
 			}
