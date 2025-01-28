@@ -675,8 +675,7 @@ private:
 void tek440x_state::delay_irq2(u8 data)
 {
 	LOG("delay_irq2: \n");
-	m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
-	delay_irq2_timer->adjust(attotime::from_usec(16));
+	delay_irq2_timer->adjust(attotime::from_usec(2));
 }
 
 TIMER_CALLBACK_MEMBER(tek440x_state::delay_irq2_timer_deliver)
@@ -685,6 +684,7 @@ TIMER_CALLBACK_MEMBER(tek440x_state::delay_irq2_timer_deliver)
 	LOG("delay_irq2_timer_deliver: \n");
 	delay_irq2_timer->adjust(attotime::never);
 	m_maincpu->set_input_line(M68K_IRQ_2, ASSERT_LINE);
+	m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
 }
 
 
