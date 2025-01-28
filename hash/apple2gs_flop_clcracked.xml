@@ -115,7 +115,7 @@ license:CC0-1.0
 		<year>1988</year>
 		<publisher>Taito</publisher>
 		<info name="programmer" value="Ryan Ridges and John Lund" />
-		<info name="version" value="12-Jan-89" />
+		<info name="version" value="12-Jan-89 - ROM 03 compatible" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
@@ -252,17 +252,19 @@ license:CC0-1.0
 	</software>
 
 	<software name="calcraft">
-		<description>Calendar Crafter (A-194 version 1.2) (trex crack)</description>
+		<description>Calendar Crafter (A-194 version 1.2) (cleanly cracked)</description>
 		<year>1987</year>
 		<publisher>MECC</publisher>
 		<info name="partno" value="A-194" />
 		<info name="programmer" value="Gene Breault, Charolyn Kapplinger, Diane Portner, Steven D. Splinter, and Paul R. Wenker" />
-		<info name="usage" value="Requires a 768K Apple IIgs ROM 01 or later." />
 		<info name="version" value="1.2" />
+		<info name="usage" value="Requires a 768K Apple IIgs ROM 01 or later." />
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2021-08-13 -->
-		<!-- productivity program -->
+		<!-- It requires a 768K Apple IIgs ROM 01 or later. -->
+		<!-- "Calendar Crafter" is a utility that allows you to design and print customized calendars to help organize your month / year. -->
 		<!-- Protection: Bad block check for block $8 -->
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="calendar crafter v1.2 iigs(trex crack).2mg" size="819264" crc="65717231" sha1="2f2415385a699fc78a68a3a73ff8470a5fc8df6f"/>
@@ -473,17 +475,19 @@ license:CC0-1.0
 	</software>
 
 	<software name="dsgnprnt">
-		<description>Designer Prints (A-252 version 1.0) (trex crack)</description>
+		<description>Designer Prints (A-252 version 1.0) (cleanly cracked)</description>
 		<year>1989</year>
 		<publisher>MECC</publisher>
 		<info name="partno" value="A-252" />
 		<info name="programmer" value="Diane Portner, Michael Stein, Brian Walker, and Paul Wenker" />
-		<info name="usage" value="Requires a 768K Apple IIgs ROM 01 or later." />
 		<info name="version" value="1.0" />
+		<info name="usage" value="Requires a 768K Apple IIgs ROM 01 or later." />
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2021-08-13 -->
-		<!-- desktop publishing program -->
+		<!-- It requires a 768K Apple IIgs ROM 01 or later. -->
+		<!-- "Designer Prints" is a versatile desktop publishing program for making worksheets, certificates, posters and other printed materials. -->
 		<!-- Protection: Bad block check for block $8 -->
+
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1 - System disk"/>
 			<dataarea name="flop" size="819264">
@@ -499,17 +503,19 @@ license:CC0-1.0
 	</software>
 
 	<software name="dsgnpuzl">
-		<description>Designer Puzzles (A-223 version 1.0) (trex crack)</description>
+		<description>Designer Puzzles (A-223 version 1.0) (cleanly cracked)</description>
 		<year>1989</year>
 		<publisher>MECC</publisher>
 		<info name="partno" value="A-223" />
 		<info name="programmer" value="Susan Gabrys, John J. Krenz, Diane Portner, and Steve Splinter" />
-		<info name="usage" value="Requires a 768K Apple IIgs ROM 01 or later." />
 		<info name="version" value="1.0" />
+		<info name="usage" value="Requires a 768K Apple IIgs ROM 01 or later." />
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2021-08-13 -->
-		<!-- desktop publishing program -->
+		<!-- It requires a 768K Apple IIgs ROM 01 or later. -->
+		<!-- "Designer Puzzles" is a versatile desktop publishing program for making word scrambles and crossword puzzles -->
 		<!-- Protection: Bad block check for block $8 -->
+
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1 - System disk"/>
 			<dataarea name="flop" size="819264">
@@ -566,6 +572,26 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 2 - Game disk"/>
 			<dataarea name="flop" size="819264">
 				<rom name="downhill challenge iigs - disk 2 - game disk (trex crack).2mg" size="819264" crc="01d4dd29" sha1="3ae9ec0b5eb5893327eef32167ae3c95fb7c89e3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drawplus10">
+		<description>Draw Plus (version 1.0) (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Activision</publisher>
+		<info name="programmer" value="H. Lamiraux" />
+		<info name="version" value="1.0" />
+		<info name="usage" value="Requires a 512K Apple IIgs." />
+		<sharedfeat name="compatibility" value="A2GS" />
+		<!-- Dump released: 2025-01-25 -->
+		<!-- It requires a 512K Apple IIgs. -->
+		<!-- "Draw Plus" is full-color precision drawing program with text and graphics intergraion. -->
+		<!-- Protection: Bad block check for block $7, later versions dropped the copy protection -->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819264">
+				<rom name="draw plus v1.0 iigs (trex crack).2mg" size="819264" crc="efddd532" sha1="518ccb81ca6c20686e18c5a88b3d54708c62aba1" />
 			</dataarea>
 		</part>
 	</software>
@@ -674,7 +700,7 @@ license:CC0-1.0
 		<year>1987</year>
 		<publisher>Activision</publisher>
 		<info name="programmer" value="Paul Terry, Jack Thornton, Scott Orr, John Cutter, Troy Lyndon, and Russell Lieblich" />
-		<info name="usage" value="Requires a 256K Apple IIgs." />
+		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2023-04-13 -->
 		<!-- It requires a 512K Apple IIgs. -->
@@ -1174,7 +1200,7 @@ license:CC0-1.0
 		<publisher>Davidson and Associates</publisher>
 		<info name="author" value="Jan Davidson and Cathy Johnson" />
 		<info name="programmer" value="C.K. Haun" />
-		<info name="version" value="1.1" />
+		<info name="version" value="1.0" />
 		<info name="usage" value="Requires a 512K Apple IIgs ROM1 or later." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
@@ -1332,6 +1358,33 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 2 - Program disk"/>
 			<dataarea name="flop" size="819264">
 				<rom name="mercury v1.0 iigs - disk 2 - program (trex crack).2mg" size="819264" crc="2682521b" sha1="5fd3948bac00b1ca4e08c79ccb437483798f25a9"/>
+			</dataarea>
+		</part>
+
+	</software> <software name="mulscribe">
+		<description>MultiScribe IIgs (version 3.01c) (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>StyleWare</publisher>
+		<info name="developer" value="StyleWare" />
+		<info name="version" value="3.01c" />
+		<info name="usage" value="Requires a 512K Apple IIgs." />
+		<sharedfeat name="compatibility" value="A2GS" />
+		<!-- Dump released: 2025-01-25 -->
+		<!-- It requires a 512K Apple IIgs. -->
+		<!-- "MultiScrible" is a word-processor featuring the ability to use different fonts, print styles, colors as well as allowing you to add boxes, circles and other designs. -->
+		<!-- First marketed as "Scholastic MutiScrible GS by StyleWare", then it became StyleWare MultiScribe GS and eventually Beagle Bros Software acquired the StyleWare library and rebranded it as BeagleWrite GS. -->
+		<!-- Protection: Nibble count on tracks $20 & $21 -->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 - Program" />
+			<dataarea name="flop" size="819264">
+				<rom name="multiscribe gs v3.01c disk 1 - program (trex crack).2mg" size="819264" crc="d63e2246" sha1="8b5b7074f8967a79eb417cdb1a2648638473aa0f" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 - Utilities" />
+			<dataarea name="flop" size="819264">
+				<rom name="multiscribe gs v3.01c disk 2 - utilities (trex crack).2mg" size="819264" crc="c4a8d1b1" sha1="0e31bb265b031397f8b386916e791e618d3a891e" />
 			</dataarea>
 		</part>
 	</software>
@@ -1799,14 +1852,16 @@ license:CC0-1.0
 		<year>1988</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="programmer" value="Michael Kosaka, Stephen Landrum, David Bunch, and Michelle Shelfer" />
-		<info name="usage" value="Requires a 512K Apple IIgs. Music requires 768K." />
 		<info name="version" value="1.1 07-Oct-88 - ROM 03 compatible" />
-		<!-- sod.sys16 dated 07-Oct-88 -->
+		<info name="usage" value="Requires a 512K Apple IIgs. Music requires 768K." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
-		<!-- sports game -->
+		<!-- It requires a 512K Apple IIgs. Music requires 768K. -->
+		<!-- "Skate or Die" is a 1988 sports game developed by Michael Kosaka, Stephen Landrum, David Bunch, and Michelle Shelfer, and distributed by Electronic Arts. -->
 		<!-- Patched to be compatible with ROM03 -->
+		<!-- sod.sys16 dated 07-Oct-88 -->
 		<!-- Protection: Nibble count on tracks $20 & $21 -->
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="skate or die v1.1 iigs (trex crack).2mg" size="819264" crc="dde655cd" sha1="cf40c92a699cf9e7c79f1a25c3f22f32f5a28d46"/>
@@ -1819,17 +1874,20 @@ license:CC0-1.0
 		<year>1988</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="programmer" value="Michael Kosaka, Stephen Landrum, David Bunch, and Michelle Shelfer" />
-		<info name="usage" value="Requires a 512K Apple IIgs. Music requires 768K." />
 		<info name="version" value="1.0 12-Aug-88 - ROM 03 compatible" />
+		<info name="usage" value="Requires a 512K Apple IIgs. Music requires 768K." />
 		<!-- sod.sys16 dated 12-Aug-88 -->
 		<sharedfeat name="compatibility" value="A2GS"/>
-		<!-- Dump released: 2021-08-13 -->
-		<!-- sports game -->
+		<!-- Dump released: 2025-01-25, redump based on WOZ released on 2024-09-02 -->
+		<!-- It requires a 512K Apple IIgs. Music requires 768K. -->
+		<!-- "Skate or Die" is a 1988 sports game developed by Michael Kosaka, Stephen Landrum, David Bunch, and Michelle Shelfer, and distributed by Electronic Arts. -->
 		<!-- Patched to be compatible with ROM03 -->
+		<!-- sod.sys16 dated 12-Aug-88 -->
 		<!-- Protection: Nibble count on tracks $20 & $21 -->
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="skate or die v1.0 iigs (trex crack).2mg" size="819264" crc="466b7067" sha1="776c78d962d46b6b20ca464bbbed2e2f746f4099"/>
+				<rom name="skate or die v1.0 iigs (trex crack).2mg" size="819264" crc="f87d1ec3" sha1="9e28b572f9d53fd276066b3701de42d45ee9cc51"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1839,6 +1897,7 @@ license:CC0-1.0
 		<year>1987</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="release" value="2021-08-13"/>
+		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
 		<!-- It requires a 512K Apple IIgs. -->
@@ -2354,6 +2413,70 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="ntsbalpha">
+		<description>The New Talking Stickybear Alphabet (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>Optimum Resource</publisher>
+		<info name="developer" value="Optimum Resource" />
+		<info name="usage" value="Requires a 512K Apple IIgs ROM01 or later." />
+		<sharedfeat name="compatibility" value="A2GS" />
+		<!-- Dump released: 2025-01-25 -->
+		<!-- It requires a 512K Apple IIgs ROM01 or later. -->
+		<!-- "The New Talking Stickybear Alphabet" is an educational program designed to teach children the alphabet through the use of graphics and speech -->
+		<!-- Protection: Unformatted track $03, Side $01 (bad blocks $54 through $5F) check -->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="819264">
+				<rom name="the new talking stickybear alphabet iigs disk 1 (trex crack).2mg" size="819264" crc="4f80d28b" sha1="c6b243cc8aa3c2b39658095c5a1b91bbdcd40629" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="819264">
+				<rom name="the new talking stickybear alphabet iigs disk 2 (trex crack).2mg" size="819264" crc="35817368" sha1="1426cf78a664e0ec41128fec150c084e9d1f3874" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ntsbopp">
+		<description>The New Talking Stickybear Opposites (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>Optimum Resource</publisher>
+		<info name="developer" value="Optimum Resource" />
+		<info name="usage" value="Requires a 512K Apple IIgs ROM01 or later." />
+		<sharedfeat name="compatibility" value="A2GS" />
+		<!-- Dump released: 2025-01-25 -->
+		<!-- It requires a 512K Apple IIgs ROM01 or later. -->
+		<!-- "The New Talking Stickybear Opposites" is an educational program designed to teach children opposites through the use of graphics and speech -->
+		<!-- Protection: Unformatted track $03, Side $01 (bad blocks $54 through $5F) check -->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819264">
+				<rom name="the new talking stickybear opposites iigs (trex crack).2mg" size="819264" crc="a2ce5ec8" sha1="0954c66f8858d26ce70c1926236b4115f705f2c5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ntsbshapes">
+		<description>The New Talking Stickybear Shapes (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>Optimum Resource</publisher>
+		<info name="programmer" value="Richard Hefter, David Cunningham, and Susan Dubicki" />
+		<info name="usage" value="Requires a 512K Apple IIgs ROM01 or later." />
+		<sharedfeat name="compatibility" value="A2GS" />
+		<!-- Dump released: 2025-01-25 -->
+		<!-- It requires a 512K Apple IIgs ROM01 or later. -->
+		<!-- "The New Talking Stickybear Shapes" is an educational program designed to teach children basic shapes through the use of graphics and speech -->
+		<!-- Protection: Unformatted track $03, Side $01 (bad blocks $54 through $5F) check -->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819264">
+				<rom name="the new talking stickybear shapes iigs (trex crack).2mg" size="819264" crc="f52125b9" sha1="93967102bb9642aba3607291cf30d6e0a1a01c5e" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="printshp">
 		<description>The Print Shop (version 1.0) (cleanly cracked)</description>
 		<year>1987</year>
@@ -2406,6 +2529,7 @@ license:CC0-1.0
 		<year>1987</year>
 		<publisher>PBI Software</publisher>
 		<info name="programmer" value="Richard L. Seaborne and Jeff A. Lamberts" />
+		<info name="version" value="1.0" />
 		<info name="usage" value="Requires a 768K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
@@ -2540,18 +2664,39 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="topdraw100a">
-		<description>TopDraw (version 1.00A (7/12/87)) (trex crack)</description>
+	<software name="topdraw">
+		<description>TopDraw (version 1.01A (8/4/87)) (cleanly cracked)</description>
 		<year>1987</year>
 		<publisher>StyleWare</publisher>
 		<info name="programmer" value="Robert A. Hearn and Jeff G. Erickson" />
-		<info name="usage" value="Requires a 1MB Apple IIgs." />
+		<info name="version" value="1.01A (8/4/87)" />
+		<info name="usage" value="Requires a 512K Apple IIgs." />
+		<sharedfeat name="compatibility" value="A2GS" />
+		<!-- Dump released: 2025-01-25 -->
+		<!-- It requires a 512K Apple IIgs. -->
+		<!-- "TopDraw" is a professional object-oriented graphics drawing environment. Beagle Bros Software later acquired the StyleWare library and rebranded TopDraw as BeagleDraw. -->
+		<!-- Protection: Nibble count on tracks $20 & $21 -->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819264">
+				<rom name="topdraw v1.01a iigs (trex crack).2mg" size="819264" crc="d7cf235e" sha1="b488b0cef54cb71f447a0d6b508f86220cb09d4d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="topdraw100a" cloneof="topdraw">
+		<description>TopDraw (version 1.00A (7/12/87)) (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>StyleWare</publisher>
+		<info name="programmer" value="Robert A. Hearn and Jeff G. Erickson" />
 		<info name="version" value="1.00A (7/12/87)" />
+		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2021-08-13 -->
-		<!-- graphics program -->
-		<!-- TopDraw later became Beagle Draw sold under the Beagle Brothers banner. -->
+		<!-- It requires a 512K Apple IIgs. -->
+		<!-- "TopDraw" is a professional object-oriented graphics drawing environment. Beagle Bros Software later acquired the StyleWare library and rebranded TopDraw as BeagleDraw. -->
 		<!-- Protection: Nibble count on tracks $20 & $21 -->
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="topdraw v1.00a iigs (trex crack).2mg" size="819264" crc="39e7967f" sha1="35746bbc2232251d96264989705a6e6286bafef5"/>
