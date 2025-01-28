@@ -544,7 +544,6 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 	// Update 2025: check and resort all these entries
 	// - wbenc30 scrolling in lores mode (fmode=3, expects a +58!, verify ddfstrt / delays)
 	// - sockid_a, alfred gameplay (fmode=1)
-	// - virocp_a (fmode=1, +26)
 	// - ssf2t (fmode=3, wants >+100, scrolling is very offset)
 	// - turbojam gameplay
 	//   (fmode=3, unaffected here, may be missing ddfstop bits given the screen masking)
@@ -552,12 +551,14 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 	// - cd32 cdtv:insidino copyright screen (fmode=3)
 	// - cd32 cdtv:labytime intro/tutorial screens
 	//   (swaps between fmode=1 and 3, verify ddfstrt / ddfstop)
+
 	const int offset_hack[] = {
 		11,
+		// fmode 1: virocp_a (copyright) +26
 		11,
 		11,
-		// fmode 3: dxgalaga (title) wants +20
-		20
+		// fmode 3: dxgalaga (title) wants +20, fatman_a (title) +24
+		24
 	};
 	const int default_bit_offset[] = { 15, 31, 31, 63 };
 
@@ -646,15 +647,16 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 
 			/* compute the pixel fetch parameters */
 			// TODO: ECS/AGA can put bit 1 in play here
-			ddf_start_pixel = ( CUSTOM_REG(REG_DDFSTRT) & 0xfc ) * 2;
+			ddf_start_pixel = ( CUSTOM_REG(REG_DDFSTRT) & 0xf8 ) * 2;
 			ddf_start_pixel += hires ? ddf_start_offset_hires[bitplane_fmode] : ddf_start_offset_lores[bitplane_fmode];
-			ddf_stop_pixel = ( CUSTOM_REG(REG_DDFSTOP) & 0xfc ) * 2;
+			ddf_stop_pixel = ( CUSTOM_REG(REG_DDFSTOP) & 0xf8 ) * 2;
 			ddf_stop_pixel += hires ? ddf_stop_offset_hires[bitplane_fmode] : ddf_stop_offset_lores[bitplane_fmode];
 
-			// FIXME: as like OCS/ECS Amiga verify this one
-			if ( ( CUSTOM_REG(REG_DDFSTRT) ^ CUSTOM_REG(REG_DDFSTOP) ) & 0x04 )
+			// - https://github.com/dirkwhoffmann/vAmigaTS/blob/master/Agnus/DDF/DDF/ddf1/ddf1_A500_ECS.JPG
+			// - turbojam (gameplay, fmode 3) wants this, particularly when scrolling left (+15 isn't enough).
+			if ( (CUSTOM_REG(REG_DDFSTRT) & 6) != (CUSTOM_REG(REG_DDFSTOP) & 6))
 			{
-				ddf_stop_pixel += 8;
+				ddf_stop_pixel += defbitoffs;
 			}
 
 			// display window
