@@ -674,8 +674,18 @@ private:
 
 void tek440x_state::delay_irq2(u8 data)
 {
-	LOG("delay_irq2: \n");
-	delay_irq2_timer->adjust(attotime::from_usec(2));
+	LOG("delay_irq2: %d\n", data);
+	if (!data)
+	{
+		// 5 instruction busy loop, executed between 3-5 times is acceptable
+		// to simulate link speed of 10Mbps
+		// 35 cyc * 4 loops = 140cyc = 14us @ 10MHz
+		delay_irq2_timer->adjust(attotime::from_usec(15));
+	}
+	else
+	{
+		m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
+	}
 }
 
 TIMER_CALLBACK_MEMBER(tek440x_state::delay_irq2_timer_deliver)
@@ -684,7 +694,7 @@ TIMER_CALLBACK_MEMBER(tek440x_state::delay_irq2_timer_deliver)
 	LOG("delay_irq2_timer_deliver: \n");
 	delay_irq2_timer->adjust(attotime::never);
 	m_maincpu->set_input_line(M68K_IRQ_2, ASSERT_LINE);
-	m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
+
 }
 
 
