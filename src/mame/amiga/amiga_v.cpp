@@ -81,9 +81,24 @@ void amiga_state::amiga_palette(palette_device &palette) const
  *
  *************************************/
 
+void amiga_state::video_start_common()
+{
+	/* reset the genlock color */
+	m_genlock_color = 0xffff;
+
+	m_sprite_ctl_written = 0;
+
+	m_screen->register_screen_bitmap(m_flickerfixer);
+	m_screen->register_screen_bitmap(m_scanline_bitmap);
+}
+
 VIDEO_START_MEMBER( amiga_state, amiga )
 {
+	video_start_common();
+
 	/* generate tables that produce the correct playfield color for dual playfield mode */
+	m_separate_bitplanes[0].resize(64);
+	m_separate_bitplanes[1].resize(64);
 	for (int j = 0; j < 64; j++)
 	{
 		int pf1pix = ((j >> 0) & 1) | ((j >> 1) & 2) | ((j >> 2) & 4);
@@ -92,16 +107,8 @@ VIDEO_START_MEMBER( amiga_state, amiga )
 		m_separate_bitplanes[0][j] = (pf1pix || !pf2pix) ? pf1pix : (pf2pix + 8);
 		m_separate_bitplanes[1][j] = pf2pix ? (pf2pix + 8) : pf1pix;
 	}
-	// TODO: verify usage of values in the 64-255 range
+	// TODO: verify usage of values in the 64-255 range on real HW
 	// (should black out pf1 if j & 0x40, pf2 if j & 0x80)
-
-	/* reset the genlock color */
-	m_genlock_color = 0xffff;
-
-	m_sprite_ctl_written = 0;
-
-	m_screen->register_screen_bitmap(m_flickerfixer);
-	m_screen->register_screen_bitmap(m_scanline_bitmap);
 }
 
 

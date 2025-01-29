@@ -86,15 +86,25 @@ void amiga_state::aga_palette_write(int color_reg, uint16_t data)
 
 VIDEO_START_MEMBER(amiga_state,amiga_aga)
 {
-	VIDEO_START_CALL_MEMBER( amiga );
+	video_start_common();
 
-	for (int j = 0; j < 256; j++)
+    // fill the AGA dblpf table, taking bplcon3:pf2pri into account for offset values
+	m_separate_bitplanes[0].resize(256 * 8);
+	m_separate_bitplanes[1].resize(256 * 8);
+
+	static const int dblpfofs[] = { 0, 2, 4, 8, 16, 32, 64, 128 };
+
+	for (int offset_index = 0; offset_index < 8; offset_index ++)
 	{
-		int pf1pix = ((j >> 0) & 1) | ((j >> 1) & 2) | ((j >> 2) & 4) | ((j >> 3) & 8);
-		int pf2pix = ((j >> 1) & 1) | ((j >> 2) & 2) | ((j >> 3) & 4) | ((j >> 4) & 8);
+		int offset_value = dblpfofs[offset_index];
+		for (int j = 0; j < 256; j++)
+		{
+			int pf1pix = ((j >> 0) & 1) | ((j >> 1) & 2) | ((j >> 2) & 4) | ((j >> 3) & 8);
+			int pf2pix = ((j >> 1) & 1) | ((j >> 2) & 2) | ((j >> 3) & 4) | ((j >> 4) & 8);
 
-		m_separate_bitplanes[0][j] = (pf1pix || !pf2pix) ? pf1pix : (pf2pix + 16);
-		m_separate_bitplanes[1][j] = pf2pix ? (pf2pix + 16) : pf1pix;
+			m_separate_bitplanes[0][j + (offset_index << 8)] = (pf1pix || !pf2pix) ? pf1pix : (pf2pix + offset_value);
+			m_separate_bitplanes[1][j + (offset_index << 8)] = pf2pix ? (pf2pix + offset_value) : pf1pix;
+		}
 	}
 
 	m_aga_diwhigh_written = 0;
@@ -465,6 +475,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 	int planes = 0;
 	int raw_scanline = 0;
 	u8 bplam = 0;
+	u16 pf2ofx = 0;
 
 	uint32_t *dst = nullptr;
 	int ebitoffs = 0, obitoffs = 0;
@@ -630,6 +641,10 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 			// In practice we need to separate bitplane delays & drawing first.
 			//shres = CUSTOM_REG(REG_BPLCON0) & 0x0040;
 
+			// offset table for pf2 when in dualpf (note: )
+			// - alfred_a, gameplay background
+			// - slamtilt, main menu cursor
+			pf2ofx = ((CUSTOM_REG(REG_BPLCON3) >> 10) & 7) << 8;
 			// bplam applies xor to bitplane colors (i.e. acting as pal bank)
 			// - aladdin, status bar in gameplay
 			// TODO: implement for ham and dualpf, below
@@ -889,6 +904,8 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 				/* dual playfield mode */
 				else if (dualpf)
 				{
+					// pf2pri really, overshadows above (i.e. pf1pri -> pf1p2:0)
+					const u8 pf_layer_pri = BIT(CUSTOM_REG(REG_BPLCON2), 6);
 					/* mask out the sprite if it doesn't have priority */
 					pix = sprpix & 0xff;
 					pri = (sprpix >> 12);
@@ -904,7 +921,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 					if (pix)
 						dst[x*2+0] = aga_palette[pix];
 					else
-						dst[x*2+0] = aga_palette[m_separate_bitplanes[(CUSTOM_REG(REG_BPLCON2) >> 6) & 1][pfpix0]];
+						dst[x*2+0] = aga_palette[m_separate_bitplanes[pf_layer_pri][pfpix0 | pf2ofx]];
 
 					/* mask out the sprite if it doesn't have priority */
 					pix = sprpix & 0xff;
@@ -920,7 +937,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 					if (pix)
 						dst[x*2+1] = aga_palette[pix];
 					else
-						dst[x*2+1] = aga_palette[m_separate_bitplanes[(CUSTOM_REG(REG_BPLCON2) >> 6) & 1][pfpix1]];
+						dst[x*2+1] = aga_palette[m_separate_bitplanes[pf_layer_pri][pfpix1 | pf2ofx]];
 				}
 
 				/* single playfield mode */
