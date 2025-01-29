@@ -76,7 +76,7 @@
 #define LOG_MMU (1U << 1)
 #define LOG_FPU (1U << 2)
 
-//#define VERBOSE LOG_GENERAL
+#define VERBOSE LOG_GENERAL
 #include "logmacro.h"
 
 // mapcntl bits
@@ -818,7 +818,7 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 		{
 				if ((m_latched_map_control & 0x1f) != (m_map_control & 0x1f))
 				{
-					LOG("memory_r: m_map_control updated 0x%04x\n", m_latched_map_control);
+					LOGMASKED(LOG_MMU,"memory_r: m_map_control updated 0x%04x\n", m_latched_map_control);
 				}
 				m_map_control &= ~0x1f;
 				m_map_control |= (m_latched_map_control & 0x1f);
@@ -844,7 +844,7 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 
 				inbuserr = 1;
 
-				LOG("memory_r: %06x: bus error: PTE_PID(%d) != mapcntl_PID(%d) fc(%d) pc(%08x) berr(%d) map_control(%02x) latch(%02x)\n", offset<<1,
+				LOGMASKED(LOG_MMU,"memory_r: %06x: bus error: PTE_PID(%d) != mapcntl_PID(%d) fc(%d) pc(%08x) berr(%d) map_control(%02x) latch(%02x)\n", offset<<1,
 					BIT(m_map[offset >> 11], 11, 3), (m_map_control & 7), m_maincpu->get_fc(), m_maincpu->pc(),
 					inbuserr, m_map_control, m_latched_map_control);
 				m_maincpu->set_buserror_details(OFF16_TO_OFF8(offset0), true, m_maincpu->get_fc(), true);
@@ -867,14 +867,14 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 		// NB byte memory limit, offset is *word* offset
 		if (offset >= OFF8_TO_OFF16(MAXRAM) && offset < OFF8_TO_OFF16(0x600000))
 		{
-			LOG("memory_r: %08x bus error: NOMEM fc(%d) pc(%08x)\n",  OFF16_TO_OFF8(offset), m_maincpu->get_fc(), m_maincpu->pc());
+			LOGMASKED(LOG_MMU,"memory_r: %08x bus error: NOMEM fc(%d) pc(%08x)\n",  OFF16_TO_OFF8(offset), m_maincpu->get_fc(), m_maincpu->pc());
 			m_maincpu->set_buserror_details(OFF16_TO_OFF8(offset0), true, m_maincpu->get_fc(), true);
 		}
 	}
 
 	if (inbuserr && (m_maincpu->get_fc() & 4))
 	{
-	LOG("berr reset(r) %06x\n", OFF16_TO_OFF8(offset));
+	LOGMASKED(LOG_MMU,"berr reset(r) %06x\n", OFF16_TO_OFF8(offset));
 	inbuserr = 0;
 	}
 
@@ -887,7 +887,7 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 	{
 			if ((m_latched_map_control & 0x1f) != (m_map_control & 0x1f))
 			{
-				LOG("memory_w: m_map_control updated 0x%04x\n", m_latched_map_control);
+				LOGMASKED(LOG_MMU,"memory_w: m_map_control updated 0x%04x\n", m_latched_map_control);
 			}
 			m_map_control &= ~0x1f;
 			m_map_control |= (m_latched_map_control & 0x1f);
@@ -913,7 +913,7 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 				// NB active low
 				m_map_control &= ~(1 << MAP_BLOCK_ACCESS);
 
-				LOG("memory_w: %06x bus error: PTE_PID(%d) != mapcntl_PID(%d) fc(%d)\n", OFF16_TO_OFF8(offset), BIT(m_map[offset >> 11], 11, 3), (m_map_control & 7), m_maincpu->get_fc());
+				LOGMASKED(LOG_MMU,"memory_w: %06x bus error: PTE_PID(%d) != mapcntl_PID(%d) fc(%d)\n", OFF16_TO_OFF8(offset), BIT(m_map[offset >> 11], 11, 3), (m_map_control & 7), m_maincpu->get_fc());
 				m_maincpu->set_buserror_details(OFF16_TO_OFF8(offset0), false, m_maincpu->get_fc(), true);
 			}
 
@@ -939,7 +939,7 @@ m_map_control &= ~(1 << MAP_SYS_WR_ENABLE);
 
 			inbuserr = 1;
 
-			LOG("memory_w:  %06x bus error: READONLY fc(%d) pc(%08x)\n",  OFF16_TO_OFF8(offset), m_maincpu->get_fc(),  m_maincpu->pc());
+			LOGMASKED(LOG_MMU,"memory_w:  %06x bus error: READONLY fc(%d) pc(%08x)\n",  OFF16_TO_OFF8(offset), m_maincpu->get_fc(),  m_maincpu->pc());
 			m_maincpu->set_buserror_details(OFF16_TO_OFF8(offset0), false, m_maincpu->get_fc(), true);
 			
 			mem_mask = 0;	// disable write
@@ -950,7 +950,7 @@ m_map_control &= ~(1 << MAP_SYS_WR_ENABLE);
 		if (mem_mask)
 		{
 			if (!(m_map[offset >> 11] & 0x8000))
-				LOG("memory_w: DIRTY m_map(0x%04x) m_map_control(%02x) berr(%d) fc(%d)\n", m_map[offset >> 11], m_map_control, inbuserr, m_maincpu->get_fc());
+				LOGMASKED(LOG_MMU,"memory_w: DIRTY m_map(0x%04x) m_map_control(%02x) berr(%d) fc(%d)\n", m_map[offset >> 11], m_map_control, inbuserr, m_maincpu->get_fc());
 			m_map[offset >> 11] |= 0x8000;
 		}
 		
@@ -964,13 +964,13 @@ m_map_control &= ~(1 << MAP_SYS_WR_ENABLE);
 	// NB byte memory limit, offset is *word* offset
 	if (offset >= OFF8_TO_OFF16(MAXRAM) && offset < OFF8_TO_OFF16(0x600000) && !machine().side_effects_disabled())
 	{
-		LOG("memory_w: bus error: NOMEM %08x fc(%d)\n",  OFF16_TO_OFF8(offset), m_maincpu->get_fc());
+		LOGMASKED(LOG_MMU,"memory_w: bus error: NOMEM %08x fc(%d)\n",  OFF16_TO_OFF8(offset), m_maincpu->get_fc());
 		m_maincpu->set_buserror_details(OFF16_TO_OFF8(offset0), false, m_maincpu->get_fc(), true);
 	}
 
 	if (inbuserr && (m_maincpu->get_fc() & 4))
 	{
-	LOG("berr reset(w) %06x\n", OFF16_TO_OFF8(offset));
+	LOGMASKED(LOG_MMU,"berr reset(w) %06x\n", OFF16_TO_OFF8(offset));
 	inbuserr = 0;
 	}
 
@@ -1026,7 +1026,7 @@ u8 tek440x_state::mapcntl_r()
 	{
 		// page 2.1-54 implies that this can only be read in user mode
 
-		LOG("mapcntl_r(%02x) cpuWr(%s) BlockAccess(%s) SysWrEn(%d) VMenable(%d) PID(%d) pc(%08x)\n",m_map_control,
+		LOGMASKED(LOG_MMU,"mapcntl_r(%02x) cpuWr(%s) BlockAccess(%s) SysWrEn(%d) VMenable(%d) PID(%d) pc(%08x)\n",m_map_control,
 			BIT(m_map_control, MAP_CPU_WR) ? "WRITE" : "READ",
 			BIT(m_map_control, MAP_BLOCK_ACCESS) ? "NO" : "YES",
 			BIT(m_map_control, MAP_SYS_WR_ENABLE) ? 1 : 0,
