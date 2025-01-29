@@ -108,10 +108,14 @@ TODO:
 */
 
 #include "emu.h"
-#include "emupal.h"
+
 #include "st0016.h"
+
 #include "cpu/mips/mips1.h"
+
+#include "emupal.h"
 #include "speaker.h"
+
 #include <algorithm>
 
 #define LOG_COP (1 << 1)
@@ -138,9 +142,9 @@ public:
 		, m_st0016_bank(*this, "st0016_bank")
 	{ }
 
-	void speglsht(machine_config &config);
+	void speglsht(machine_config &config) ATTR_COLD;
 
-	void init_speglsht();
+	void init_speglsht() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -157,7 +161,7 @@ private:
 
 	required_memory_bank m_st0016_bank;
 
-	std::unique_ptr<bitmap_ind16> m_bitmap;
+	bitmap_ind16 m_bitmap;
 	uint32_t m_videoreg;
 
 	uint32_t shared_r(offs_t offset);
@@ -233,7 +237,7 @@ void speglsht_state::videoreg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 void speglsht_state::cop_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	if (data & ~0xffff)
+	if (data & ~uint32_t(0xffff))
 		LOGCOP("%s: cop_w(%04x) = %08x & %08x\n", machine().describe_context(), offset, data, mem_mask);
 
 	if (ACCESSING_BITS_0_15) // fit to 16bit
@@ -256,15 +260,15 @@ void speglsht_state::cop_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 //matrix * vector
 uint32_t speglsht_state::cop_r(offs_t offset)
 {
-	int32_t *cop = (int32_t*)&m_cop_ram[0];
+	int32_t *cop = (int32_t *)&m_cop_ram[0];
 
 	int32_t res = 0;
 
 	switch (offset)
 	{
-		case 0x10:
-		case 0x11:
-		case 0x12:
+	case 0x10:
+	case 0x11:
+	case 0x12:
 		{
 			unsigned displacement = (offset & 3) * 3;
 			res = ((cop[0x3 + displacement] * cop[0x0] + cop[0x4 + displacement] * cop[0x1] + cop[0x5 + displacement] * cop[0x2]) >> 14) + cop[0xc + (offset & 3)];
@@ -374,12 +378,12 @@ INPUT_PORTS_END
 
 void speglsht_state::machine_reset()
 {
-	std::fill(&m_shared[0],&m_shared[m_shared.bytes()],0);
+	std::fill_n(&m_shared[0], m_shared.length(), 0);
 }
 
 void speglsht_state::video_start()
 {
-	m_bitmap = std::make_unique<bitmap_ind16>(512, 512);
+	m_bitmap.allocate(512, 512);
 	save_item(NAME(m_videoreg));
 }
 
@@ -389,21 +393,21 @@ uint32_t speglsht_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	for (int dsty = cliprect.top(); dsty <= cliprect.bottom(); dsty++, y += 512)
 	{
 		uint32_t *const dstline = &bitmap.pix(dsty);
-		for(int dstx = cliprect.left(); dstx <= cliprect.right(); dstx++)
+		for (int dstx = cliprect.left(); dstx <= cliprect.right(); dstx++)
 		{
 			uint32_t const pix = m_framebuffer[y + dstx + 67];
 			dstline[dstx] = rgb_t((pix >> 0) & 0xff, (pix >> 8) & 0xff, (pix >> 16) & 0xff);
 		}
 	}
 
-	//draw st0016 gfx to temporary bitmap (indexed 16)
-	m_bitmap->fill(0);
-	m_maincpu->draw_screen(screen, *m_bitmap, cliprect);
+	// draw st0016 gfx to temporary bitmap (indexed 16)
+	m_bitmap.fill(0);
+	m_maincpu->draw_screen(screen, m_bitmap, cliprect);
 
-	//copy temporary bitmap to rgb 32 bit bitmap
+	// copy temporary bitmap to rgb 32 bit bitmap
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		uint16_t const *const srcline = &m_bitmap->pix(y);
+		uint16_t const *const srcline = &m_bitmap.pix(y);
 		uint32_t *const dstline = &bitmap.pix(y);
 		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
