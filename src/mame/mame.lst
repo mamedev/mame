@@ -17661,6 +17661,7 @@ yamyamk
 zrt80
 
 @source:dynax/ddenlovr.cpp
+<<<<<<< HEAD
 akamaru
 animaljr
 animaljrj
@@ -17725,6 +17726,65 @@ seljan2a
 sryudens
 ultrchmp
 ultrchmph
+=======
+akamaru                         // "501" (c) 1996 Dynax
+animaljr                        // "75" (c) 1993 Nakanihon/Taito (USA)
+animaljrj                       // "75" (c) 1993 Nakanihon/Taito (Japan)
+animaljrs                       // "75" (c) 1993 Nakanihon/Taito (Spanish version)
+daimyojn                        // "017" 2002 Dynax / Techno-Top
+daireach                        // Mahjong Dai-Reach (C) 2001 Techno-Top
+ddenlovj                        // "112" (c) 1995 Dynax (Japan)
+ddenlovr                        // "113" (c) 1996 Dynax (Hong Kong)
+ddenlovrb                       // bootleg
+ddenlovrk                       // "113" (c) 1995 Dynax (Korea)
+dtoyoken                        // "700d" 1996 Dynax / Sigma
+funkyfig                        // "74" (c) 1993 Nakanihon + East Technology
+funkyfiga                       // "74" (c) 1993 Nakanihon + East Technology
+hanakanz                        // "507" (c) 1996 Dynax
+hginga                          // "81" (c) 1994 Dynax
+hgokbang                        // "116" (c) 1995 Dynax
+hgokou                          // "108" (c) 1995 Dynax (Alba license)
+hgokoua                         // "108" (c) 1995 Dynax (Alba license)
+hkagerou                        // "510" Hana Kagerou 1996 Nakanihon
+hnrose                          // Hana Night Rose (C) 2000 Techno-Top
+hparadis                        // "101" (c) 1994 Nakanihon
+htengoku                        // "65" (c) 1992 Dynax
+janshinp                        // "700j" 1996 Dynax / Sigma
+jongtei                         // "532" Mahjong Jong-Tei (C) 1999 Dynax
+jongteia                        // Mahjong Jong-Tei (C) 2000 Techno-Top
+kotbinsp                        // "909" 1997 Dynax / Shinwhajin
+kotbinyo                        // 1997 Dynax / Shinwhajin
+kotbinyosu                      // 1997 Dynax / Shinwhajin
+mjchuuka                        // "121" (c) 1998 Dynax
+mjdchuka                        // "111" (c) 1995 Nakanihon
+mjflove                         // "500" (c) 1996 Dynax
+mjgnight                        // "003" 2000 Techno-Top
+mjmyorn2                        // "71?" (c) 1993 Dynax
+mjmyornt                        // "71" (c) 1992 Dynax
+mjmyorntr                       //
+mjmyster                        // "77" (c) 1994 Dynax
+mjmyuniv                        // "85" (c) 1994 Dynax
+mjmywrld                        // "77" (c) 1994 Dynax
+mjreach1                        // "526" Mahjong Reach Ippatsu 1998 Nihon System/Dynax
+mjschuka                        // "115" (c) 1995 Dynax
+mjtenho                         // Mahjong Tenho (C) 2002 Techno-Top
+mmpanic                         // "70" (c) 1992 Nakanihon/Taito
+momotaro                        // "027" 2004 Techno-Top
+nettoqc                         // "103" (c) 1995 Nakanihon
+quiz365                         // "78" (c) 1994 Nakanihon
+quiz365t                        // "78" (c) 1994 Nakanihon (Taiwan)
+quizchq                         // "73" (c) 1993 Nakanihon
+quizchql                        // "73" (c) 1993 Laxan
+quizchqk                        // "73" (c) 1993 KM Korea Co, Ltd
+rongrong                        // "80" (c) 1994 Nakanihon
+rongrongg                       // "80" (c) 1994 Nakanihon
+rongrongj                       // "80" (c) 1994 Nakanihon
+seljan2                         // "557" 1996 Dynax / Face
+seljan2a                        // "508" 1996 Dynax / Face
+sryudens                        // "502" (c) 1996 Dynax / Face
+ultrchmp                        // "104" (c) 1995 Nakanihon
+ultrchmph                       // "114" (c) 1995 Nakanihon
+>>>>>>> 72212bb9188 (New working clones)
 
 @source:dynax/dynax.cpp
 7jigen
@@ -18105,6 +18165,9 @@ rpanic
 
 @source:excellent/dblcrown.cpp
 dblcrown
+
+@source:excellent/es8906.cpp
+dream9
 
 @source:excellent/es8906.cpp
 dream9
@@ -29803,6 +29866,7 @@ castfpt
 castrev
 
 @source:misc/cb2001.cpp
+<<<<<<< HEAD
 cb2001
 cb4
 cb4a
@@ -29819,6 +29883,23 @@ scherrym12
 scherrymp
 scherrymp10u
 tripjack
+=======
+cb2001                          // (c) 2000 Dyna Electronics
+cb4                             // (c) 1997 Dyna Electronics
+cb4a                            // (c) 1997 Dyna Electronics
+cb5                             // (c) 1997 Dyna Electronics
+cb5_11                          // (c) 1997 Dyna Electronics
+crzybell                        // (c) 1995 Dyna Electronics
+dynastye                        // (c) 2002 Dyna Electronics
+mystjb                          // (c) 1998 Dyna Electronics
+ndongmul2                       // (c) 1999 Dyna Electronics
+nmondop                         // (c) 1998 Dyna Electronics
+scherrym                        // (c) 1993 Dyna Electronics
+scherrym12                      // (c) 1993 Dyna Electronics
+scherrymp                       // (c) 1997 Dyna Electronics
+scherrymp10u                    // (c) 1997 Dyna Electronics
+tripjack                        // (c) 1998 Dyna Electronics
+>>>>>>> 72212bb9188 (New working clones)
 
 @source:misc/chameleonrx1.cpp
 chamrx1
@@ -32521,6 +32602,7 @@ savquest
 scm_500
 
 @source:misc/sfbonus.cpp
+<<<<<<< HEAD
 abnudge
 abnudgeb
 abnudged
@@ -32757,6 +32839,244 @@ version4o
 version4v
 version4v2
 version4v3
+=======
+abnudge                         // (c) 2003 Amcoe - Animal Bonus Nudge
+abnudgeb                        // (c) 2003 Amcoe
+abnudged                        // (c) 2003 Amcoe
+abnudgeo                        // (c) 2003 Amcoe
+act2000                         // (c) 1999 Amcoe - Action 2000
+act2000b1                       // (c) 1999 Amcoe
+act2000bx                       // (c) 1999 Amcoe
+act2000d1                       // (c) 1999 Amcoe
+act2000dx                       // (c) 1999 Amcoe
+act2000o                        // (c) 1999 Amcoe
+act2000o2                       // (c) 1999 Amcoe
+act2000o3                       // (c) 1999 Amcoe
+act2000v1                       // (c) 1999 Amcoe
+act2000vx                       // (c) 1999 Amcoe
+amclink                         // (c) 200? Amcoe - Amcoe Link Control Box?
+anibonus                        // (c) 2003 Amcoe - Animal Bonus
+anibonusb1                      // (c) 2003 Amcoe
+anibonusb2                      // (c) 2003 Amcoe
+anibonusd1                      // (c) 2003 Amcoe
+anibonusd2                      // (c) 2003 Amcoe
+anibonuso                       // (c) 2003 Amcoe
+anibonuso2                      // (c) 2003 Amcoe
+anibonuso3                      // (c) 2003 Amcoe
+anibonusv1                      // (c) 2003 Amcoe
+anibonusv2                      // (c) 2003 Amcoe
+anibonusxo                      // (c) 2003 Amcoe
+anibonusxo2                     // (c) 2003 Amcoe
+anibonusxo3                     // (c) 2003 Amcoe
+anithunt                        // (c) 2003 Amcoe - Animal Treasure Hunt
+anithuntd1                      // (c) 2003 Amcoe
+anithunto                       // (c) 2003 Amcoe
+anithunto2                      // (c) 2003 Amcoe
+anithuntv1                      // (c) 2003 Amcoe
+atworld                         // (c) 2007 Amcoe - Around The World
+atworldd1                       // (c) 2007 Amcoe
+atworlde1                       // (c) 2007 Amcoe
+bugfever                        // (c) 2006 Amcoe - Bug Fever
+bugfeverd                       // (c) 2006 Amcoe
+bugfevero                       // (c) 2006 Amcoe
+bugfeverv                       // (c) 2006 Amcoe
+bugfeverv2                      // (c) 2006 Amcoe
+ch2000                          // (c) 2000 Amcoe - Fruit Bonus 2000 / New Cherry 2000
+ch2000b1                        // (c) 2000 Amcoe
+ch2000b2                        // (c) 2000 Amcoe
+ch2000c1                        // (c) 2000 Amcoe
+ch2000c2                        // (c) 2000 Amcoe
+ch2000d1                        // (c) 2000 Amcoe
+ch2000d2                        // (c) 2000 Amcoe
+ch2000o                         // (c) 2000 Amcoe
+ch2000o2                        // (c) 2000 Amcoe
+ch2000o3                        // (c) 2000 Amcoe
+ch2000v1                        // (c) 2000 Amcoe
+ch2000v2                        // (c) 2000 Amcoe
+classice                        // (c) 2004 Amcoe - Classic Edition
+classice1                       // (c) 2004 Amcoe
+classice2                       // (c) 2004 Amcoe
+classiced1                      // (c) 2004 Amcoe
+classiced2                      // (c) 2004 Amcoe
+classicev                       // (c) 2004 Amcoe
+classicev1                      // (c) 2004 Amcoe
+classicev2                      // (c) 2004 Amcoe
+dblchal                         // (c) 2003 Amcoe - Double Challenge
+dblchalc1                       // (c) 2003 Amcoe
+dblchald1                       // (c) 2003 Amcoe
+dblchalo                        // (c) 2003 Amcoe
+dblchalv1                       // (c) 2003 Amcoe
+dvisland                        // (c) 2006 Amcoe - Devil's Island
+dvislando                       // (c) 2006 Amcoe
+fb2gen                          // (c) 2004 Amcoe - Fruit Bonus 2nd Generation
+fb2genc1                        // (c) 2004 Amcoe
+fb2genc2                        // (c) 2004 Amcoe
+fb2gend1                        // (c) 2004 Amcoe
+fb2gend2                        // (c) 2004 Amcoe
+fb2geno                         // (c) 2004 Amcoe
+fb2geno2                        // (c) 2004 Amcoe
+fb2genv1                        // (c) 2004 Amcoe
+fb2genv2                        // (c) 2004 Amcoe
+fb2nd                           // (c) 2004 Amcoe - Fruit Bonus 2nd Edition
+fb2ndc2                         // (c) 2004 Amcoe
+fb2ndd1                         // (c) 2004 Amcoe
+fb2ndd2                         // (c) 2004 Amcoe
+fb2ndo                          // (c) 2004 Amcoe
+fb2ndv1                         // (c) 2004 Amcoe
+fb2ndv2                         // (c) 2004 Amcoe
+fb3g                            // (c) 200? Amcoe - Fruit Bonus 3G
+fb4                             // (c) 2004 Amcoe - Fruit Bonus 2004
+fb4_14                          // (c) 2004 Amcoe
+fb4b2                           // (c) 2004 Amcoe
+fb4c1                           // (c) 2004 Amcoe
+fb4c2                           // (c) 2004 Amcoe
+fb4d1                           // (c) 2004 Amcoe
+fb4d2                           // (c) 2004 Amcoe
+fb4exp                          // (c) 2004 Amcoe
+fb4o                            // (c) 2004 Amcoe
+fb4o2                           // (c) 2004 Amcoe
+fb4v1                           // (c) 2004 Amcoe
+fb4v2                           // (c) 2004 Amcoe
+fb5                             // (c) 2005 Amcoe - Fruit Bonus 2005
+fb5c                            // (c) 2005 Amcoe
+fb5d                            // (c) 2005 Amcoe
+fb5v                            // (c) 2005 Amcoe
+fb6                             // (c) 2006 Amcoe - Fruit Bonus '06 - 10th anniversary
+fb6d1                           // (c) 2006 Amcoe
+fb6d2                           // (c) 2006 Amcoe
+fb6s1                           // (c) 2006 Amcoe
+fb6s2                           // (c) 2006 Amcoe
+fb6s3                           // (c) 2006 Amcoe
+fb6se                           // (c) 2006 Amcoe - Fruit Bonus 2006 Special Edition
+fb6sed1                         // (c) 2006 Amcoe
+fb6sed2                         // (c) 2006 Amcoe
+fb6sev                          // (c) 2006 Amcoe
+fb6sev1                         // (c) 2006 Amcoe
+fb6sev2                         // (c) 2006 Amcoe
+fb6v                            // (c) 2006 Amcoe
+fb6v1                           // (c) 2006 Amcoe
+fb6v2                           // (c) 2006 Amcoe
+fbdeluxe                        // (c) 200? Amcoe - Fruit Bonus Deluxe
+fbdeluxeo                       // (c) 200? Amcoe
+fcnudge                         // (c) 2003 Amcoe - Fruit Carnival Nudge
+fcnudgeo                        // (c) 2003 Amcoe
+fcnudgeo2                       // (c) 2003 Amcoe
+fcnudgeo3                       // (c) 2003 Amcoe
+funriver                        // (c) 2005 Amcoe - Fun River
+funriverd1                      // (c) 2005 Amcoe
+funriverv                       // (c) 2005 Amcoe
+getrich                         // (c) 200? Amcoe - Get Rich
+hldspin1                        // (c) 2000 Amcoe - Hold & Spin I
+hldspin1dt                      // (c) 2000 Amcoe
+hldspin1o                       // (c) 2000 Amcoe
+hldspin1vt                      // (c) 2000 Amcoe
+hldspin2                        // (c) 2000 Amcoe - Hold & Spin II
+hldspin2d1                      // (c) 2000 Amcoe
+hldspin2o                       // (c) 2000 Amcoe
+hldspin2v1                      // (c) 2000 Amcoe
+mcircus                         // (c) 2009 Amcoe - Merry Circus
+moneymac                        // (c) 200? Amcoe - Money Machine
+moneymacd1                      // (c) 200? Amcoe
+moneymacd2                      // (c) 200? Amcoe
+moneymacv1                      // (c) 200? Amcoe
+moneymacv2                      // (c) 200? Amcoe
+parrot3                         // (c) 2003 Amcoe - Parrot Poker III
+parrot3b1                       // (c) 2004 Amcoe
+parrot3d1                       // (c) 2004 Amcoe
+parrot3o                        // (c) 2004 Amcoe
+parrot3v1                       // (c) 2004 Amcoe
+pickwin                         // (c) 2001 Amcoe - Pick 'n Win
+pickwinb1                       // (c) 2001 Amcoe
+pickwinbt                       // (c) 2001 Amcoe
+pickwind1                       // (c) 2001 Amcoe
+pickwindt                       // (c) 2001 Amcoe
+pickwino                        // (c) 2001 Amcoe
+pickwino2                       // (c) 2001 Amcoe
+pickwinv1                       // (c) 2001 Amcoe
+pickwinvt                       // (c) 2001 Amcoe
+pir2001                         // (c) 2001 Amcoe - Pirate 2001
+pir2001b1                       // (c) 2001 Amcoe
+pir2001bx                       // (c) 2001 Amcoe
+pir2001d1                       // (c) 2001 Amcoe
+pir2001dx                       // (c) 2001 Amcoe
+pir2001o                        // (c) 2001 Amcoe
+pir2001o2                       // (c) 2001 Amcoe
+pir2001o3                       // (c) 2001 Amcoe
+pir2001v1                       // (c) 2001 Amcoe
+pir2001vx                       // (c) 2001 Amcoe
+pir2002                         // (c) 2001 Amcoe - Pirate 2002
+pir2002b1                       // (c) 2001 Amcoe
+pir2002bx                       // (c) 2001 Amcoe
+pir2002d1                       // (c) 2001 Amcoe
+pir2002dx                       // (c) 2001 Amcoe
+pir2002o                        // (c) 2001 Amcoe
+pir2002o2                       // (c) 2001 Amcoe
+pir2002o3                       // (c) 2001 Amcoe
+pir2002v1                       // (c) 2001 Amcoe
+pir2002vx                       // (c) 2001 Amcoe
+pirpok2                         // (c) 2003 Amcoe - Pirate Poker II
+pirpok2b1                       // (c) 2003 Amcoe
+pirpok2d1                       // (c) 2003 Amcoe
+pirpok2o                        // (c) 2003 Amcoe
+pirpok2v1                       // (c) 2003 Amcoe
+robadv                          // (c) 2004 Amcoe - Robin's Adventure
+robadv2                         // (c) 2004 Amcoe - Robin's Adventure 2
+robadv2c1                       // (c) 2004 Amcoe
+robadv2c2                       // (c) 2004 Amcoe
+robadv2c3                       // (c) 2004 Amcoe
+robadv2d1                       // (c) 2004 Amcoe
+robadv2d2                       // (c) 2004 Amcoe
+robadv2d3                       // (c) 2004 Amcoe
+robadv2o                        // (c) 2004 Amcoe
+robadv2o2                       // (c) 2004 Amcoe
+robadv2v1                       // (c) 2004 Amcoe
+robadv2v2                       // (c) 2004 Amcoe
+robadv2v3                       // (c) 2004 Amcoe
+robadvc1                        // (c) 2004 Amcoe
+robadvd1                        // (c) 2004 Amcoe
+robadvo                         // (c) 2004 Amcoe
+robadvv1                        // (c) 2004 Amcoe
+seawld                          // (c) 200? Amcoe - Sea World
+seawldd1                        // (c) 200? Amcoe
+sfbonus                         // (c) 2003 Amcoe - Skill Fruit Bonus
+sfbonusd1                       // (c) 2003 Amcoe
+sfbonuso                        // (c) 2003 Amcoe
+sfbonuso2                       // (c) 2003 Amcoe
+sfbonusv1                       // (c) 2003 Amcoe
+sfruitb                         // (c) 2002 Amcoe - Super Fruit Bonus
+sfruitbb1                       // (c) 2002 Amcoe
+sfruitbb2                       // (c) 2002 Amcoe
+sfruitbbh                       // (c) 2002 Amcoe
+sfruitbd1                       // (c) 2002 Amcoe
+sfruitbd2                       // (c) 2002 Amcoe
+sfruitbdh                       // (c) 2002 Amcoe
+sfruitbh                        // (c) 2002 Amcoe
+sfruitbo                        // (c) 2002 Amcoe
+sfruitbo2                       // (c) 2002 Amcoe
+sfruitboh                       // (c) 2002 Amcoe
+sfruitbv1                       // (c) 2002 Amcoe
+sfruitbv2                       // (c) 2002 Amcoe
+sfruitbvh                       // (c) 2002 Amcoe
+spooky                          // (c) 200? Amcoe - Spooky Night (2nd Edition)
+spookyo                         // (c) 200? Amcoe - Spooky Night
+suprball                        // (c) 2002 Amcoe - Skill based
+tighook                         // (c) 2004 Amcoe - Tiger Hook
+tighookc1                       // (c) 2004 Amcoe
+tighookc2                       // (c) 2004 Amcoe
+tighookd1                       // (c) 2004 Amcoe
+tighookd2                       // (c) 2004 Amcoe
+tighooko                        // (c) 2004 Amcoe
+tighooko2                       // (c) 2004 Amcoe
+tighookv1                       // (c) 2004 Amcoe
+tighookv2                       // (c) 2004 Amcoe
+version4                        // (c) 2006 Amcoe - Version 4
+version4d2                      // (c) 2006 Amcoe
+version4d3                      // (c) 2006 Amcoe
+version4o                       // (c) 2006 Amcoe
+version4v                       // (c) 2006 Amcoe
+version4v2                      // (c) 2006 Amcoe
+version4v3                      // (c) 2006 Amcoe
+>>>>>>> 72212bb9188 (New working clones)
 
 @source:misc/shangkid.cpp
 chinhero
@@ -42424,6 +42744,7 @@ themj
 themj2
 
 @source:seta/seta.cpp
+<<<<<<< HEAD
 atehate
 blandia
 blandiap
@@ -42490,6 +42811,74 @@ zingzipbl
 zombraid
 zombraidp
 zombraidpj
+=======
+atehate                         // (C) 1993 Athena
+blandia                         // (c) 1992 Allumer
+blandiap                        // (c) 1992 Allumer
+blockcar                        // (c) 1992 Visco
+blockcarb                       // bootleg
+crazyfgt                        // (c) 1998 Subsino
+daioh                           // (C) 1993 Athena
+daioha                          // (C) 1993 Athena
+daiohc                          // (C) 1993 Athena (93111A PCB conversion)
+daiohp                          // (C) 1993 Athena (prototype)
+daiohp2                         // (C) 1993 Athena (prototype, earlier)
+daiohp3                         // (C) 1993 Athena (prototype)
+drgnunit                        // (c) 1989 Athena / Seta + Romstar or Taito license (DSW)
+eightfrc                        // (c) 1994 Tecmo
+extdwnhl                        // (c) 1995 Sammy Japan
+gderby                          // hack (CODERE)
+gundhara                        // (c) 1995 Banpresto
+gundharac                       // (c) 1995 Banpresto (Chinese, bootleg?)
+inttoote                        // (c) 1998 Coinmaster (bootleg)
+inttoote2                       // (c) 1993 Coinmaster (bootleg)
+jjsquawk                        // (c) 1993 Athena / Able
+jjsquawkb                       // bootleg
+jjsquawkb2                      // bootleg
+jjsquawko                       // (c) 1993 Athena / Able
+jockeyc                         // (c) 1990 Seta (Visco license)
+kamenrid                        // (c) 1993 Toei / Banpresto
+keroppi                         // (c) 1993 Sammy
+keroppij                        // (c) 1993 Sammy
+krzybowl                        // (c) 1994 American Sammy
+madshark                        // (c) 1993 Allumer
+madsharkbl                      // bootleg
+magspeed                        // (c) 1994 Allumer
+msgundam                        // (c) 1993 Banpresto
+msgundam1                       // (c) 1993 Banpresto
+msgundamb                       // bootleg
+neobattl                        // (c) 1992 Banpresto / Sotsu Agency. Sunrise
+oisipuzl                        // (c) 1993 SunSoft / Atlus
+orbs                            // (c) 1994 American Sammy
+pairlove                        // (c) 1991 Athena
+qzkklgy2                        // (c) 1993 Tecmo
+qzkklogy                        // (c) 1992 Tecmo
+rezon                           // (c) 1992 Allumer
+rezono                          // (c) 1991 Allumer
+setaroul                        // UF   (c) 1989? Visco
+setaroula                       // hack (CODERE)
+setaroulm                       // UF   (c) 1989? Visco
+simpsonjr                       // bootleg of J. J. Squawkers by Daigom
+sokonuke                        // (c) 1995 Sammy Industries
+stg                             // (c) 1991 Athena / Tecmo
+superbar                        // (c) 1994 Promat (not genuine seta hardware, but based on thunderl code)
+thunderl                        // (c) 1990 Seta + Romstar or Visco license (DSW)
+thunderla                       // (c) 1990 Seta + Romstar or Visco license (DSW)
+thunderlbl                      // (c) 1991 Hyogo bootleg with Tetris sound
+thunderlbl2                     // (c) 1990 bootleg with Tetris sound
+triplfun                        // bootleg
+triplfunk                       // bootleg
+umanclub                        // (c) 1992 Tsuburaya Prod. / Banpresto
+utoukond                        // (c) 1993 Banpresto + Tsuburaya Prod.
+wiggie                          // (c) 1994 Promat (not genuine seta hardware, but based on thunderl code)
+wits                            // (c) 1989 Athena (Visco license)
+wrofaero                        // (c) 1993 Yang Cheng
+zingzip                         // UY   (c) 1992 Allumer + Tecmo
+zingzipbl                       // bootleg
+zombraid                        // (c) 1995 American Sammy
+zombraidp                       // (c) 1995 American Sammy
+zombraidpj                      // (c) 1995 Sammy Industries Co.,Ltd.
+>>>>>>> 72212bb9188 (New working clones)
 
 @source:seta/seta2.cpp
 ablast
