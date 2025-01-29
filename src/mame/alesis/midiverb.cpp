@@ -67,8 +67,7 @@ Audio inputs are emulated using MAME's sample playback mechanism.
 #include "alesis_midiverb.lh"
 
 #define LOG_PROGRAM_CHANGE (1U << 1)
-#define LOG_DSP_INIT       (1U << 2)
-#define LOG_DSP_EXECUTION  (1U << 3)
+#define LOG_DSP_EXECUTION  (1U << 2)
 
 #define VERBOSE (LOG_GENERAL)
 //#define LOG_OUTPUT_FUNC osd_printf_info
@@ -94,7 +93,6 @@ private:
 
 	required_memory_region m_microcode;
 	sound_stream *m_stream = nullptr;
-	u16 m_rom_base = 0;
 
 	// State
 	u8 m_program = 0;
@@ -141,15 +139,6 @@ void midiverb_dsp::device_start()
 	save_item(NAME(m_reg));
 	save_item(NAME(m_ram_offset));
 	save_item(NAME(m_ram));
-
-	// There seem to be 2 different ROM sizes. An 27128 and an 27256. When the
-	// 27256 is installed, only its upper half is accessible.
-	assert(m_microcode->bytes() == 0x8000 || m_microcode->bytes() == 0x4000);
-	if (m_microcode->bytes() == 0x8000)
-		m_rom_base = 0x4000;
-	else
-		m_rom_base = 0;
-	LOGMASKED(LOG_DSP_INIT, "DSP: Using base offset: %04x\n", m_rom_base);
 }
 
 #define LOG_DSP(...) do { \
@@ -171,7 +160,7 @@ void midiverb_dsp::sound_stream_update(sound_stream &stream, const std::vector<r
 	write_stream_view &left = outputs[0];
 	write_stream_view &right = outputs[1];
 	const int n = in.samples();
-	const u16 rom_base = m_rom_base + (256 * m_program);
+	const u16 rom_base = u16(m_program) << 8;
 
 	for (int sample_i = 0; sample_i < n; ++sample_i)
 	{
@@ -190,7 +179,7 @@ void midiverb_dsp::sound_stream_update(sound_stream &stream, const std::vector<r
 			//   executed.
 
 			const u8 op = m_microcode->as_u8(rom_address + 1) >> 6;
-			rom_address = rom_base + 2 * ((pc + MAX_PC) % (MAX_PC + 1));
+			rom_address = rom_base + 2 * ((pc + MAX_PC) & MAX_PC);
 			const u8 ram_row = m_microcode->as_u8(rom_address);
 			const u8 ram_col = m_microcode->as_u8(rom_address + 1) & 0x3f;
 			const u16 ram_offset_delta = (u16(ram_col) << 8) | ram_row;
@@ -268,7 +257,7 @@ void midiverb_dsp::sound_stream_update(sound_stream &stream, const std::vector<r
 			}
 			LOG_DSP("\n");
 
-			m_ram_offset = (m_ram_offset + ram_offset_delta) % m_ram.size();
+			m_ram_offset = (m_ram_offset + ram_offset_delta) & (m_ram.size() - 1);
 		}
 		LOG_DSP("\n");
 	}
@@ -654,9 +643,11 @@ ROM_START(midiverb)
 	ROM_REGION(0x2000, MAINCPU_TAG, 0)  // U54. 2764 ROM.
 	ROM_LOAD("mvop_4-7-86.u54", 0x000000, 0x002000, CRC(14d6596d) SHA1(c6dc579d8086556b2dd4909c8deb3c7006293816))
 
-	ROM_REGION(0x8000, "dsp_microcode", 0)  // U51, 27256 ROM. Only the upper half is populated.
-	ROM_LOAD("mvobj_2-6-86.u51", 0x000000, 0x008000, CRC(1aa25250) SHA1(ebd7ca265540c3420f4259d0eaefecaf6d95a1bf))
-	// Seems to have also shipped with a 27128 ROM, with the same "MVOBJ 2-6-86" label.
+	ROM_REGION(0x4000, "dsp_microcode", 0)  // U51, 27256, 32K ROM, but only 16K used.
+	ROM_LOAD("mvobj_2-6-86.u51", 0x000000, 0x004000, CRC(1aa25250) SHA1(ebd7ca265540c3420f4259d0eaefecaf6d95a1bf))
+	ROM_CONTINUE(0x000000, 0x004000)  // A14 (pin 27) tied to VCC. Only upper half used.
+	// Seems to have also shipped with a 27128 ROM (16K), with the same
+	// "MVOBJ 2-6-86" label.
 ROM_END
 
 }  // anonymous namespace
