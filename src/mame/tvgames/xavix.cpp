@@ -2985,7 +2985,7 @@ CONS( 2001, ddrfammt, 0,           0,  xavix_cart_ddrfammt,ddrfammt, xavix_cart_
 // ポピラ
 CONS( 2000, popira,   0,           0,  xavix_cart_popira,popira,   xavix_cart_state,     init_xavix,    "Takara / SSD Company LTD",                     "Popira (Japan)", MACHINE_IMPERFECT_SOUND/*|MACHINE_IS_BIOS_ROOT*/ ) // The original Popira is a single yellow unit
 // the Korean release is not properly compatible with the usual Popira carts, although some of the Korean i-singer range are compatible 
-CONS( 2000, popirak,  0,           0,  xavix_cart_popira,popira,   xavix_cart_state,     init_xavix,    "Sonokong / SSD Company LTD",                   "PoPiRa - Finger Sports (Korea)", MACHINE_IMPERFECT_SOUND/*|MACHINE_IS_BIOS_ROOT*/ )
+CONS( 2001, popirak,  popira,      0,  xavix_cart_popira,popira,   xavix_cart_state,     init_xavix,    "Sonokong / SSD Company LTD",                   "PoPiRa - Finger Sports (Korea)", MACHINE_IMPERFECT_SOUND/*|MACHINE_IS_BIOS_ROOT*/ )
 
 // ポピラ2
 CONS( 2002, popira2,  0,           0,  xavix_cart_popira2,popira2,  xavix_popira2_cart_state, init_xavix,    "Takara / SSD Company LTD",                 "Popira 2 (Japan)", MACHINE_IMPERFECT_SOUND/*|MACHINE_IS_BIOS_ROOT*/ ) // Popira 2 is a set of 2 blue & green linked units (2nd unit is just a controller, no CPU or TV out)
