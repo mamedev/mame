@@ -26,6 +26,7 @@
 
 #include "h8_intc.h"
 #include "h8_adc.h"
+#include "h8_i2c.h"
 #include "h8_port.h"
 #include "h8_timer8.h"
 #include "h8_timer16.h"
@@ -54,6 +55,10 @@ public:
 	auto read_port9()  { return m_read_port [PORT_9].bind(); }
 	auto write_port9() { return m_write_port[PORT_9].bind(); }
 
+	auto scl_cb() { return m_scl_w.bind(); }
+	auto sda_cb() { return m_sda_w.bind(); }
+	auto sda_out_cb() { return m_sda_r.bind(); }
+
 	u8 wscr_r();
 	void wscr_w(u8 data);
 	u8 stcr_r();
@@ -64,10 +69,16 @@ public:
 	void mdcr_w(u8 data);
 
 protected:
+	h83337_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor map_delegate, u32 start);
 	h83337_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 start);
+
+	devcb_write_line m_scl_w;
+	devcb_write_line m_sda_w;
+	devcb_read_line m_sda_r;
 
 	required_device<h8_intc_device> m_intc;
 	required_device<h8_adc_device> m_adc;
+	required_device<h8_i2c_device> m_i2c;
 	required_device<h8_port_device> m_port1;
 	required_device<h8_port_device> m_port2;
 	required_device<h8_port_device> m_port3;
@@ -82,6 +93,8 @@ protected:
 	required_device<h8_timer16_device> m_timer16;
 	required_device<h8_timer16_channel_device> m_timer16_0;
 	required_device<h8_watchdog_device> m_watchdog;
+
+	memory_view m_sci0_i2c_view;
 
 	u32 m_ram_start;
 	u8 m_wscr;
