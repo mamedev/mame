@@ -42,7 +42,7 @@ uint32_t geniuscolor_state::screen_update_geniuscolor(screen_device &screen, bit
 	return 0;
 }
 
-// 45-keys foldable keyboard, 8 activity buttons, two direction keys (right, left) and home, OK and power buttons.
+// 45-keys "slider" keyboard, 8 activity buttons, two direction keys (right, left) and home, OK and power buttons.
 INPUT_PORTS_START( geniuscolor )
 INPUT_PORTS_END
 
