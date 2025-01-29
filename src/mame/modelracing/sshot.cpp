@@ -418,17 +418,14 @@ ROM_END
 
 ROM_START( sshota )
 	ROM_REGION( 0x2000, "maincpu", 0 )
-	ROM_LOAD( "ss_1.a6",  0x0000, 0x0400, CRC(45572eac) SHA1(17f59d651793fbfb1359327f85bf32e25c29e43d) )
+	ROM_LOAD( "ss_1.a6",  0x0000, 0x0400, CRC(ec1cbcd0) SHA1(6e4bcc7e83b1237a25f830b96c0bcb76b876ace4) )
 	ROM_LOAD( "ss_2.a7",  0x0400, 0x0400, CRC(2d63c338) SHA1(3b082ddd8dc42d68805c0a5d24e1eca3ad808f5c) )
 	ROM_LOAD( "ss_3.a9",  0x0800, 0x0400, CRC(79aae3e3) SHA1(7d9132b1a5663e118587bcebe9b467badaf51be5) )
-	ROM_LOAD( "ss_4.a10", 0x0c00, 0x0400, BAD_DUMP CRC(b7f6f5e8) SHA1(d02a84360ca746c1cc0d55198bfbff5a41183911) )
+	ROM_LOAD( "ss_4.a10", 0x0c00, 0x0400, CRC(3d4fbcbf) SHA1(a7d05fa2c65ce2f4f2d732f562f3b8b0effc6de7) )
 	ROM_LOAD( "ss_5.a11", 0x1000, 0x0400, CRC(d4f71cd9) SHA1(aab7e33c51e180c2486c59758105359d15e73a1e) )
 	ROM_LOAD( "ss_6.a12", 0x1400, 0x0400, CRC(9d2f087e) SHA1(9c64d6a872395f6097db740199a30bcbc803ac16) )
 	ROM_LOAD( "ss_7.a13", 0x1800, 0x0400, CRC(20185164) SHA1(b7ada6150a05539e9a788e6e28786a9a6832744a) )
 	ROM_LOAD( "ss_8.a15", 0x1c00, 0x0400, CRC(95a01a0e) SHA1(72c233bb94a45780fa061c603eedde9cd7df3998) )
-	 // This seems a problem in the dump (it's 00 - HALT - here while it's 0xc4 - LDI - in the other set).
-	 // This causes the game to hang when pressing start. Routine is otherwise identical to the other set.
-	ROM_FILL(             0x0c00, 0x0001, 0xc4 )
 
 	ROM_REGION( 0x0800, "gfx", 0 )
 	ROM_LOAD( "ss_a.b9",   0x0000, 0x0400, CRC(ad3413e0) SHA1(ea4c2728755fe52a00fdceddca0b641965045005) )
