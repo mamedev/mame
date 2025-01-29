@@ -127,6 +127,7 @@ public:
 		uint32_t sample_frequency = 0;
 		int header_samples = 0;
 		int trailer_samples = 0;
+		int (*fill_wave_ext)(int16_t *, int, const uint8_t *, int) = nullptr;
 	};
 
 	~cassette_image();
