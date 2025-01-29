@@ -2650,6 +2650,12 @@ ROM_START( popira )
 	ROM_RELOAD(0x000000, 0x100000)
 ROM_END
 
+ROM_START( popirak )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "kr_main.u2", 0x600000, 0x100000, CRC(785d8e21) SHA1(7877ac33b57bdd8ceac6bda3b0006a3274ad4dce) )
+	ROM_RELOAD(0x000000, 0x100000)
+ROM_END
+
 ROM_START( popira2 )
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "popira2.bin", 0x600000, 0x200000, CRC(6acd8be0) SHA1(8b6c812d37e2dc2f2531b0e47d84ad8485729dc5) )
@@ -2978,7 +2984,8 @@ CONS( 2001, ddrfammt, 0,           0,  xavix_cart_ddrfammt,ddrfammt, xavix_cart_
 
 // ポピラ
 CONS( 2000, popira,   0,           0,  xavix_cart_popira,popira,   xavix_cart_state,     init_xavix,    "Takara / SSD Company LTD",                     "Popira (Japan)", MACHINE_IMPERFECT_SOUND/*|MACHINE_IS_BIOS_ROOT*/ ) // The original Popira is a single yellow unit
-// a Korean version exists from Sonokong brand, with different songs
+// the Korean release is not properly compatible with the usual Popira carts, although some of the Korean i-singer range are compatible 
+CONS( 2000, popirak,  0,           0,  xavix_cart_popira,popira,   xavix_cart_state,     init_xavix,    "Sonokong / SSD Company LTD",                   "PoPiRa - Finger Sports (Korea)", MACHINE_IMPERFECT_SOUND/*|MACHINE_IS_BIOS_ROOT*/ )
 
 // ポピラ2
 CONS( 2002, popira2,  0,           0,  xavix_cart_popira2,popira2,  xavix_popira2_cart_state, init_xavix,    "Takara / SSD Company LTD",                 "Popira 2 (Japan)", MACHINE_IMPERFECT_SOUND/*|MACHINE_IS_BIOS_ROOT*/ ) // Popira 2 is a set of 2 blue & green linked units (2nd unit is just a controller, no CPU or TV out)
