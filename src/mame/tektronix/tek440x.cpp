@@ -493,19 +493,12 @@ DEFINE_DEVICE_TYPE(M68010_TEKMMU, m68010_tekmmu_device, "mc68010_tekmmu", "MC680
 
 namespace {
 
-
 	enum {
 		PHASE_STATIC = 0,
 		PHASE_POSITIVE,
 		PHASE_NEGATIVE
 	};
-	
-	enum {
-		FLOATRESULT=0,
-		DOUBLERESULT=1,
-		INTRESULT=2
-	};
-	
+
 class tek440x_state : public driver_device
 {
 public:
@@ -809,8 +802,11 @@ static int inbuserr = 0;
  *  CPU memory handlers
  *
  *************************************/
+ 
 u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 {
+	if (m_boot)
+		return m_prom[offset & 0x3fff];
 
 	if (!machine().side_effects_disabled())
 	{
@@ -878,7 +874,7 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 	inbuserr = 0;
 	}
 
-	return (m_boot) ? m_prom[offset & 0x3fff] : m_vm->read16(offset, mem_mask);
+	return m_vm->read16(offset, mem_mask);
 }
 
 void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
