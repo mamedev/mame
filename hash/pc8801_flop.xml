@@ -29122,7 +29122,7 @@ Start and Program Disks OK, the remaining part is damaged (missing d88 headers?)
 	</software>
 
 	<software name="sf3dthxg">
-		<description>S.F.3.D - Original Operation Thanksgiving</description>
+		<description>Point X Senryō Sakusen S.F.3.D - Original Operation Thanksgiving</description>
 		<year>1986</year>
 		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
 		<!-- PC8801 -->
@@ -29135,8 +29135,8 @@ Start and Program Disks OK, the remaining part is damaged (missing d88 headers?)
 		</part>
 	</software>
 
-	<software name="sf3dthxga">
-		<description>S.F.3.D - Original Operation Thanksgiving (alt)</description>
+	<software name="sf3dthxga" cloneof="sf3dthxg">
+		<description>Point X Senryō Sakusen S.F.3.D - Original Operation Thanksgiving (alt)</description>
 		<year>1986</year>
 		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
 		<!-- PC8801 -->

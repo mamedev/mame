@@ -2,7 +2,7 @@
 // copyright-holders:m1macrophage
 
 /*
-The Midiverb is a digital delay & reverb unit.
+The MIDIverb is a digital delay & reverb unit.
 
 The computer portion of the device is very simple. The firmware runs on a
 80C31 microcontroller. It reads the 4 buttons, drives the two 7-segment
@@ -17,7 +17,7 @@ silence program is also enabled temporarily when switching between effects.
 Finally, there is a wet/dry control knob. For more information on the audio
 hardware, see midiverb_state::configure_audio().
 
-An interesting aspect of the Midiverb is its DSP, which is built out of discrete
+An interesting aspect of the MIDIverb is its DSP, which is built out of discrete
 logic components and runs custom microcode. Each microcode instruction consists
 of a 2-bit opcode and 14-bit RAM delta offset. The effects program makes up the
 top 6 bits of the microcode ROM address, and the DSP just loops over the 128
@@ -653,4 +653,3 @@ ROM_END
 }  // anonymous namespace
 
 SYST(1986, midiverb, 0, 0, midiverb, midiverb, midiverb_state, empty_init, "Alesis", "MIDIverb", MACHINE_SUPPORTS_SAVE)
-
