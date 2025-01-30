@@ -194,8 +194,6 @@ template <typename T> void ns32081_device_base::write(T data)
 		execute();
 }
 
-
-
 bool ns32081_device_base::decode(u8 const idbyte, u16 const opword)
 {
 	LOG("decode idbyte 0x%02x opword 0x%04x (%s)\n", idbyte, opword, machine().describe_context());
