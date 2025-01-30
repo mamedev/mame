@@ -77,7 +77,7 @@ protected:
 	s32 m_txoffs = 0;
 	s32 m_fgoffs = 0;
 	s32 m_bgoffs = 0;
-	s32 m_display_on = false;
+	bool m_display_on = false;
 	tilemap_t *m_bg_tilemap = nullptr;
 	tilemap_t *m_fg_tilemap = nullptr;
 	tilemap_t *m_tx_tilemap = nullptr;
