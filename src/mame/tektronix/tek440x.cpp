@@ -1695,7 +1695,6 @@ m_printer->in_pb_callback().set_constant(0xbf);		// HACK:  vblank always checks 
 
 ROM_START( tek4404 )
 	ROM_REGION( 0x8000, "maincpu", 0 )
-	//ROM_LOAD( "boot.bin", 0x000000, 0x008000, CRC(bceb9462) SHA1(01960a90eab482957469ad4e7e3dc74f33588779) )
 	ROM_LOAD16_BYTE( "tek_u158.bin", 0x000000, 0x004000, CRC(9939e660) SHA1(66b4309e93e4ff20c1295dc2ec2a8d6389b2578c) )
 	ROM_LOAD16_BYTE( "tek_u163.bin", 0x000001, 0x004000, CRC(a82dcbb1) SHA1(a7e4545e9ea57619faacc1556fa346b18f870084) )
 
