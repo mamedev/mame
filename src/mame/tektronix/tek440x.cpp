@@ -1441,7 +1441,7 @@ uint8_t tek440x_state::readnvram(offs_t offset)
 {
 	u8 data = m_novram->read(m_maincpu->space(0), offset);
 
-	LOG("readnvram(%d) => %02x\n",offset, data);
+	LOG("readnvram(%d) => %02x pc(%08x)\n",offset, data, m_maincpu->pc());
 
 	// kick it up to top 4 bits
 	return data << 4;
@@ -1659,15 +1659,16 @@ m_printer->in_pb_callback().set_constant(0xbf);		// HACK:  vblank always checks 
 	AM7990(config, m_lance, 40_MHz_XTAL / 4);
 //	m_lance->intr_out().set_inputline(m_maincpu, M68K_IRQ_2).invert();
 	m_lance->intr_out().set(FUNC(tek440x_state::delay_irq2));
+	
+	
 	m_lance->dma_in().set([this](offs_t offset) {
-		//LOG("dma_in 0x%08x\n",offset);
-		return m_vm->read16(offset);
-//		return m_maincpu->space(0).read_word(offset);;
+		u16 data = m_vm->read16(OFF8_TO_OFF16(offset));
+		//LOG("dma_in 0x%08x => %04x\n",offset,data);
+		return data;
 	});
 	m_lance->dma_out().set([this](offs_t offset, u16 data, u16 mem_mask) {
 		//LOG("dma_out 0x%08x <= %04x\n",offset, data);
-		return m_vm->write16(offset,data, mem_mask);
-//		m_maincpu->space(0).write_word(offset, data, mem_mask);
+		return m_vm->write16(OFF8_TO_OFF16(offset),data, mem_mask);
 	});
 
 	X2210(config, m_novram);
