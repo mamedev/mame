@@ -23,11 +23,12 @@
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
-#include "d70.lh"
 
 #include "multibyte.h"
 
 #include <queue>
+
+#include "roland_d70.lh"
 
 
 namespace {
