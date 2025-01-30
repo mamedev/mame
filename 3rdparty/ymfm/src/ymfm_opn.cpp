@@ -155,14 +155,13 @@ bool opn_registers_base<IsOpnA>::write(uint16_t index, uint8_t data, uint32_t &c
 
 		// writes to the upper half just latch (only low 6 bits matter)
 		if (bitfield(index, 2))
-			m_regdata[latchindex] = data | 0x80;
+			m_regdata[latchindex] = data & 0x3f;
 
-		// writes to the lower half only commit if the latch is there
-		else if (bitfield(m_regdata[latchindex], 7))
+		// writes to the lower half also apply said latch
+		else
 		{
 			m_regdata[index] = data;
-			m_regdata[index | 4] = m_regdata[latchindex] & 0x3f;
-			m_regdata[latchindex] = 0;
+			m_regdata[index | 4] = m_regdata[latchindex];
 		}
 		return false;
 	}
