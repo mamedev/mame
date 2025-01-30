@@ -170,8 +170,8 @@ void ncr5385_device::scsi_ctrl_changed()
 
 	if ((ctrl & S_BSY) && !(ctrl & S_SEL))
 	{
-		LOGMASKED(LOG_STATE, "scsi_ctrl_changed 0x%03x phase %s%s%s pc(%s)\n", ctrl, nscsi_phase[ctrl & S_PHASE_MASK],
-			ctrl & S_REQ ? " REQ" : "", ctrl & S_ACK ? " ACK" : "", machine().describe_context());
+		LOGMASKED(LOG_STATE, "scsi_ctrl_changed 0x%03x phase %s%s%s\n", ctrl, nscsi_phase[ctrl & S_PHASE_MASK],
+			ctrl & S_REQ ? " REQ" : "", ctrl & S_ACK ? " ACK" : "");
 
 		if (m_state != IDLE)
 			m_state_timer->adjust(attotime::zero);
@@ -480,7 +480,6 @@ void ncr5385_device::dma_w(u8 data)
 	m_state_timer->adjust(attotime::zero);
 }
 
-
 void ncr5385_device::state_timer(s32 param)
 {
 	// step state machine
@@ -722,7 +721,7 @@ int ncr5385_device::state_step()
 			}
 			else
 			{
-				LOGMASKED(LOG_STATE, "xfi_out: %s pc(%s)\n", remaining() ? "phase change" : "transfer complete", machine().describe_context());
+				LOGMASKED(LOG_STATE, "xfi_out: %s\n", remaining() ? "phase change" : "transfer complete");
 
 				m_int_status |= INT_BUS_SERVICE;
 				m_state = IDLE;
@@ -831,9 +830,9 @@ void ncr5385_device::update_int()
 	bool const int_state = m_int_status & (INT_FUNC_COMPLETE | INT_BUS_SERVICE |
 			INT_DISCONNECTED | INT_SELECTED | INT_RESELECTED | INT_INVALID_CMD);
 
-	LOGMASKED(LOG_COMMAND, "update_int 0x%02x (0x%02x)  pc(%s)\n", m_int_status, m_int_state, machine().describe_context());
 	if (m_int_state != int_state)
 	{
+		LOG("update_int %d\n", int_state);
 
 		m_aux_status &= ~(AUX_STATUS_MSG | AUX_STATUS_CD | AUX_STATUS_IO);
 		if (int_state)
