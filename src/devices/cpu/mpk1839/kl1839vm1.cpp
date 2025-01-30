@@ -2,10 +2,12 @@
 // copyright-holders:Andrei I. Holub
 
 #include "emu.h"
-
 #include "kl1839vm1.h"
 #include "kl1839vm1dasm.h"
+
 #include "cpu/vax/vaxdasm.h"
+
+#include <algorithm>
 #include <regex>
 
 
@@ -132,7 +134,7 @@ u32 kl1839vm1_device::shr(u32 val, bool va, u8 fo, bool a_c, bool l_r)
 void kl1839vm1_device::kop(u8 kop, u8 fd, u32 x, u32 y, u8 rz, u8 ps, bool va = false, u8 fo = 0)
 {
 	u64 res = 0;
-	switch(fd)
+	switch (fd)
 	{
 		case 0b11:
 			x = s8(x);
@@ -148,7 +150,7 @@ void kl1839vm1_device::kop(u8 kop, u8 fd, u32 x, u32 y, u8 rz, u8 ps, bool va = 
 	}
 
 	RSP &= ~(VF | CF);
-	switch(kop)
+	switch (kop)
 	{
 		case 0b0000: res = y; break;
 		//   0b0001:
@@ -191,7 +193,7 @@ void kl1839vm1_device::kop(u8 kop, u8 fd, u32 x, u32 y, u8 rz, u8 ps, bool va = 
 		default: break;
 	}
 
-	switch(fd)
+	switch (fd)
 	{
 		case 0b11:
 			res &= 0x000000ff;
@@ -207,7 +209,8 @@ void kl1839vm1_device::kop(u8 kop, u8 fd, u32 x, u32 y, u8 rz, u8 ps, bool va = 
 			break;
 	}
 	R(rz) |= res;
-	if (rz == 0x1f) mreg_w();
+	if (rz == 0x1f)
+		mreg_w();
 }
 
 bool kl1839vm1_device::mreg_r()
@@ -874,10 +877,14 @@ void kl1839vm1_device::vax_decode_pc()
 	}
 
 	if (!m_op_size)
+	{
 		LOGVAX("(%x): undecoded OP=%02x .. EXIT\n", PC, op);
+	}
 	else
+	{
 		PC += m_op_size; // move to a next op
-		;//LOGVAX("(%x): Decoded: OP=%02x args:%d \n", PC, op, m_pcm_queue.size());
+		/*LOGVAX("(%x): Decoded: OP=%02x args:%d \n", PC, op, m_pcm_queue.size())*/;
+	}
 }
 
 u32 kl1839vm1_device::vax_pcm_pull(bool is_bo)

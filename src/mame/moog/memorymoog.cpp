@@ -1134,4 +1134,3 @@ ROM_END
 
 // In production from 1982 to 1985.
 SYST(1982, memorymoog, 0, 0, memorymoog, memorymoog, memorymoog_state, empty_init, "Moog Music", "Memorymoog", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE)
-

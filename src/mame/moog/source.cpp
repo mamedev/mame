@@ -366,7 +366,7 @@ void source_state::cv_w(offs_t offset, u8 data)
 	if (offset >= static_cast<int>(CV::SIZE))
 		return;
 
-	const float cv = MAX_CV * data / 255.0f;
+	const float cv = MAX_CV * data / 255.0F;
 	if (cv == m_cv[offset])
 		return;
 	m_cv[offset] = cv;
@@ -410,7 +410,7 @@ float source_state::get_keyboard_v() const
 
 	// *** Convert pressed key to a voltage.
 
-	static constexpr const float KEYBOARD_VREF = 8.24f;  // From schematic.
+	static constexpr const float KEYBOARD_VREF = 8.24F;  // From schematic.
 	static constexpr const float RKEY = RES_R(100);
 	static constexpr const float R74 = RES_R(150);
 	static constexpr const float R76 = RES_K(220);

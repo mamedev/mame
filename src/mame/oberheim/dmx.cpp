@@ -1661,4 +1661,3 @@ ROM_END
 }  // anonymous namespace
 
 SYST(1980, obdmx, 0, 0, dmx, dmx, dmx_state, empty_init, "Oberheim", "DMX", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND)
-

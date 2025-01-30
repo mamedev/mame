@@ -1109,7 +1109,7 @@ bool vax_disassembler::is_read_mode(vax_disassembler::mode m)
 	}
 }
 
-const vax_disassembler::mode* vax_disassembler::get_operands(u8 op)
+const vax_disassembler::mode *vax_disassembler::get_operands(u8 op)
 {
 	return s_nonprefix_ops[op].operand;
 }
