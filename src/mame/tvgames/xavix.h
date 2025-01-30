@@ -979,7 +979,9 @@ public:
 
 	void xavix_cart(machine_config &config);
 	void xavix_cart_ekara(machine_config &config);
+	void xavix_cart_isinger(machine_config &config);
 	void xavix_cart_popira(machine_config &config);
+	void xavix_cart_popirak(machine_config &config);
 	void xavix_cart_ddrfammt(machine_config &config);
 	void xavix_cart_evio(machine_config &config);
 	void xavix_cart_daig(machine_config &config);

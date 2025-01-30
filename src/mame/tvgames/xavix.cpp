@@ -2093,6 +2093,14 @@ void xavix_cart_state::xavix_cart_ekara(machine_config &config)
 	SOFTWARE_LIST(config, "cart_list").set_original("ekara_cart").set_filter("EKARA");
 }
 
+void xavix_cart_state::xavix_cart_isinger(machine_config &config)
+{
+	xavix_cart(config);
+
+	/* software lists */
+	SOFTWARE_LIST(config, "cart_list").set_original("ekara_cart").set_filter("ISINGER");
+}
+
 void xavix_hikara_state::machine_reset()
 {
 	xavix_ekara_state::machine_reset();
@@ -2157,6 +2165,13 @@ void xavix_cart_state::xavix_cart_popira(machine_config &config)
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("ekara_cart").set_filter("POPIRA");
+}
+
+void xavix_cart_state::xavix_cart_popirak(machine_config &config)
+{
+	xavix_cart(config);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+	SOFTWARE_LIST(config, "cart_list").set_original("ekara_cart").set_filter("POPIRA_KOREA");
 }
 
 // see code at 028060, using table from 00eb6d for conversion
@@ -2616,6 +2631,11 @@ ROM_START( ekaras )
 	ROM_RELOAD(0x000000, 0x200000)
 ROM_END
 
+ROM_START( isinger )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "kr_isinger.bin", 0x600000, 0x100000, CRC(6ad588fe) SHA1(879da069ca8c126232a1b2dfcce25c8615540e48) )
+	ROM_RELOAD(0x000000, 0x100000)
+ROM_END
 
 ROM_START( epitch )
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
@@ -2970,7 +2990,10 @@ CONS( 2000, ekaraa,   ekara,       0,  xavix_cart_ekara, ekara,    xavix_ekara_s
 CONS( 2000, ekaraj,   ekara,       0,  xavix_cart_ekara, ekara,    xavix_ekara_state,    init_xavix,    "Takara / SSD Company LTD",                     "e-kara (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ ) // shows Japanese message without cart
 CONS( 2002, ekarag,   ekara,       0,  xavix_cart_ekara, ekara,    xavix_ekara_state,    init_xavix,    "Takara / SSD Company LTD",                     "e-kara (Europe, includes 3 songs)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ ) // found in Germany and UK, could just be a Europe-wide model, NOT a headset model, but still has 3 songs.
 CONS( 2002, ekaras,   ekara,       0,  xavix_cart_ekara, ekara,    xavix_ekara_state,    init_xavix,    "Takara / SSD Company LTD / newgent",           "e-kara (Spain, includes 3 songs)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ )
-																																																																		// the 'e-kara pro headset' has 3 songs built in for the US release.  The Japanese release of this appears to be called 'e-kara H.S.' and it is unclear if it also has built in songs.  The Canadian box says 'cartridge contains' instead of 'songs included' but is likely a printing error.
+// the Korean i-singer release from Sonokong has a unique bios and different data resources, meaning carts are not fully compatible between it and e-kara
+CONS( 2000, isinger,  ekara,       0,  xavix_cart_isinger, ekara,    xavix_ekara_state,    init_xavix,    "Sonokong / SSD Company LTD",                   "i-Singer (Korea)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ )
+
+// the 'e-kara pro headset' has 3 songs built in for the US release.  The Japanese release of this appears to be called 'e-kara H.S.' and it is unclear if it also has built in songs.  The Canadian box says 'cartridge contains' instead of 'songs included' but is likely a printing error.
 CONS( 2002, ekaraphs, ekara,       0,  xavix_cart_ekara, ekara,    xavix_ekara_state,    init_xavix,    "Takara / SSD Company LTD",                     "e-kara Pro Headset (US, includes 3 songs)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ )
 
 // epitch (at least the pichi pichi pitch mermaid starter pack) uses the same internal rom as the Japanese ekara, but has less buttons, so some features aren't available (some games also seem to expect to read it with a different layout eg 'a7' cart, but 'a5' cart doesn't, so must be a way to enable that mode, or bug in code?)
@@ -2985,7 +3008,7 @@ CONS( 2001, ddrfammt, 0,           0,  xavix_cart_ddrfammt,ddrfammt, xavix_cart_
 // ポピラ
 CONS( 2000, popira,   0,           0,  xavix_cart_popira,popira,   xavix_cart_state,     init_xavix,    "Takara / SSD Company LTD",                     "Popira (Japan)", MACHINE_IMPERFECT_SOUND/*|MACHINE_IS_BIOS_ROOT*/ ) // The original Popira is a single yellow unit
 // the Korean release is not properly compatible with the usual Popira carts, although some of the Korean i-singer range are compatible 
-CONS( 2001, popirak,  popira,      0,  xavix_cart_popira,popira,   xavix_cart_state,     init_xavix,    "Sonokong / SSD Company LTD",                   "PoPiRa - Finger Sports (Korea)", MACHINE_IMPERFECT_SOUND/*|MACHINE_IS_BIOS_ROOT*/ )
+CONS( 2001, popirak,  popira,      0,  xavix_cart_popirak,popira,   xavix_cart_state,     init_xavix,    "Sonokong / SSD Company LTD",                   "PoPiRa - Finger Sports (Korea)", MACHINE_IMPERFECT_SOUND/*|MACHINE_IS_BIOS_ROOT*/ )
 
 // ポピラ2
 CONS( 2002, popira2,  0,           0,  xavix_cart_popira2,popira2,  xavix_popira2_cart_state, init_xavix,    "Takara / SSD Company LTD",                 "Popira 2 (Japan)", MACHINE_IMPERFECT_SOUND/*|MACHINE_IS_BIOS_ROOT*/ ) // Popira 2 is a set of 2 blue & green linked units (2nd unit is just a controller, no CPU or TV out)
