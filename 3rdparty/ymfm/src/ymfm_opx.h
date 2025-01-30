@@ -105,7 +105,7 @@ public:
 	static constexpr uint8_t STATUS_IRQ = 0;
 
 	// constructor
-	opz_registers();
+	opx_registers();
 
 	// reset to initial state
 	void reset();
@@ -244,17 +244,17 @@ protected:
 //  IMPLEMENTATION CLASSES
 //*********************************************************
 
-// ======================> ym2414
+// ======================> ymf271
 
-class ym2414
+class ymf271
 {
 public:
-	using fm_engine = fm_engine_base<opz_registers>;
+	using fm_engine = fm_engine_base<opx_registers>;
 	static constexpr uint32_t OUTPUTS = fm_engine::OUTPUTS;
 	using output_data = fm_engine::output_data;
 
 	// constructor
-	ym2414(ymfm_interface &intf);
+	ymf271(ymfm_interface &intf);
 
 	// reset
 	void reset();
@@ -287,4 +287,4 @@ protected:
 }
 
 
-#endif // YMFM_OPZ_H
+#endif // YMFM_OPX_H
