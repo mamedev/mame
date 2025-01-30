@@ -32,10 +32,8 @@
 #define LOG_MODE  (1U << 1)
 #define LOG_INPUT (1U << 2)
 #define LOG_TC    (1U << 3)
-#define LOG_WARN    (1U << 4)
 
 //#define VERBOSE (LOG_GENERAL | LOG_MODE)
-//#define VERBOSE -1
 
 #include "logmacro.h"
 
