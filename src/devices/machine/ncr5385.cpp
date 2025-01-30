@@ -759,6 +759,8 @@ int ncr5385_device::state_step()
 			else
 				m_sbx = false;
 
+			delay = 3'500;		// >=3.5us delay works, < 3.5us fails
+			
 			// clear data and ACK
 			scsi_bus->data_w(scsi_refid, 0);
 			scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
