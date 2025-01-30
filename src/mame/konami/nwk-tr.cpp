@@ -257,22 +257,21 @@ public:
 		m_work_ram(*this, "work_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_dsp(*this, {"dsp", "dsp2"}), // TODO: hardcoded tags in machine/konpc.cpp
+		m_dsp(*this, "dsp%u", 1U),
 		m_k056800(*this, "k056800"),
 		m_k001604(*this, "k001604_%u", 1U),
 		m_konppc(*this, "konppc"),
 		m_adc12138(*this, "adc12138"),
 		m_voodoo(*this, "voodoo%u", 0U),
+		m_palette(*this, "palette%u", 1U),
+		m_sharc_dataram(*this, "sharc%u_dataram", 0U),
+		m_jvs_host(*this, "jvs_host"),
+		m_gn676_lan(*this, "gn676_lan"),
 		m_in(*this, "IN%u", 0U),
 		m_dsw(*this, "DSW"),
 		m_analog(*this, "ANALOG%u", 1U),
 		m_pcb_digit(*this, "pcbdigit%u", 0U),
-		m_palette(*this, "palette"),
-		m_generic_paletteram_32(*this, "paletteram"),
-		m_sharc_dataram(*this, "sharc%u_dataram", 0U),
-		m_cg_view(*this, "cg_view"),
-		m_jvs_host(*this, "jvs_host"),
-		m_gn676_lan(*this, "gn676_lan")
+		m_cg_view(*this, "cg_view")
 	{ }
 
 	void nwktr(machine_config &config);
@@ -300,21 +299,19 @@ private:
 	required_device<konppc_device> m_konppc;
 	required_device<adc12138_device> m_adc12138;
 	required_device_array<generic_voodoo_device, 2> m_voodoo;
+	required_device_array<palette_device, 2> m_palette;
+	optional_shared_ptr_array<uint32_t, 2> m_sharc_dataram;
+	required_device<konppc_jvs_host_device> m_jvs_host;
+	required_device<konami_gn676_lan_device> m_gn676_lan;
 	required_ioport_array<3> m_in;
 	required_ioport m_dsw;
 	required_ioport_array<5> m_analog;
 	output_finder<2> m_pcb_digit;
-	required_device<palette_device> m_palette;
-	required_shared_ptr<uint32_t> m_generic_paletteram_32;
-	optional_shared_ptr_array<uint32_t, 2> m_sharc_dataram;
 	memory_view m_cg_view;
-	required_device<konppc_jvs_host_device> m_jvs_host;
-	required_device<konami_gn676_lan_device> m_gn676_lan;
 
-	emu_timer *m_sound_irq_timer;
-	bool m_exrgb;
+	emu_timer *m_sound_irq_timer = nullptr;
+	bool m_exrgb = false;
 
-	void paletteram32_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint8_t sysreg_r(offs_t offset);
 	void sysreg_w(offs_t offset, uint8_t data);
 	void soundtimer_en_w(uint16_t data);
@@ -332,18 +329,11 @@ private:
 	void sound_memmap(address_map &map) ATTR_COLD;
 };
 
-void nwktr_state::paletteram32_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	COMBINE_DATA(&m_generic_paletteram_32[offset]);
-	data = m_generic_paletteram_32[offset];
-	m_palette->set_pen_color(offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
-}
-
 uint32_t nwktr_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(m_palette->pen(0), cliprect);
+	bitmap.fill(m_palette[0]->pen(0), cliprect);
 
-	int board = m_exrgb ? 1 : 0;
+	int const board = m_exrgb ? 1 : 0;
 
 	m_voodoo[board]->update(bitmap, cliprect);
 	m_k001604[0]->draw_front_layer(screen, bitmap, cliprect);   // K001604 on slave board doesn't seem to output anything. Bug or intended?
@@ -403,15 +393,11 @@ void nwktr_state::sysreg_w(offs_t offset, uint8_t data)
 		{
 			m_gn676_lan->reset_fpga_state(BIT(data, 6));
 
-			int cs = BIT(data, 3);
-			int conv = BIT(data, 2);
-			int di = BIT(data, 1);
-			int sclk = BIT(data, 0);
 
-			m_adc12138->cs_w(cs);
-			m_adc12138->conv_w(conv);
-			m_adc12138->di_w(di);
-			m_adc12138->sclk_w(sclk);
+			m_adc12138->cs_w(BIT(data, 3));
+			m_adc12138->conv_w(BIT(data, 2));
+			m_adc12138->di_w(BIT(data, 1));
+			m_adc12138->sclk_w(BIT(data, 0));
 			break;
 		}
 
@@ -423,9 +409,9 @@ void nwktr_state::sysreg_w(offs_t offset, uint8_t data)
 			    0x10 = EXID0
 			    0x01 = EXRGB
 			*/
-			if (data & 0x80) // CG Board 1 IRQ Ack
+			if (BIT(data, 7)) // CG Board 1 IRQ Ack
 				m_maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
-			if (data & 0x40) // CG Board 0 IRQ Ack
+			if (BIT(data, 6)) // CG Board 0 IRQ Ack
 				m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 
 			m_konppc->set_cgboard_id((data >> 4) & 0x3);
@@ -433,7 +419,7 @@ void nwktr_state::sysreg_w(offs_t offset, uint8_t data)
 			// Racing Jam sets CG board ID to 2 when writing to the tilemap chip.
 			// This could mean broadcast to both CG boards?
 
-			m_exrgb = data & 0x1;       // Select which CG Board outputs signal
+			m_exrgb = BIT(data, 0);       // Select which CG Board outputs signal
 
 			m_cg_view.select(m_konppc->get_cgboard_id() ? 1 : 0);
 			break;
@@ -454,7 +440,7 @@ TIMER_CALLBACK_MEMBER(nwktr_state::sound_irq)
 
 void nwktr_state::soundtimer_en_w(uint16_t data)
 {
-	if (data & 1)
+	if (BIT(data, 0))
 	{
 		// Reset and disable timer
 		m_sound_irq_timer->adjust(attotime::from_usec(m_sound_timer_usec));
@@ -497,10 +483,11 @@ void nwktr_state::ppc_map(address_map &map)
 	map(0x00000000, 0x003fffff).ram().share(m_work_ram);
 	map(0x74000000, 0x7407ffff).view(m_cg_view);
 	m_cg_view[0](0x74000000, 0x740000ff).rw(m_k001604[0], FUNC(k001604_device::reg_r), FUNC(k001604_device::reg_w));
-	m_cg_view[1](0x74000000, 0x740000ff).rw(m_k001604[1], FUNC(k001604_device::reg_r), FUNC(k001604_device::reg_w));
-	map(0x74010000, 0x7401ffff).ram().w(FUNC(nwktr_state::paletteram32_w)).share("paletteram");
+	m_cg_view[0](0x74010000, 0x7401ffff).ram().w(m_palette[0], FUNC(palette_device::write32)).share("palette1");
 	m_cg_view[0](0x74020000, 0x7403ffff).rw(m_k001604[0], FUNC(k001604_device::tile_r), FUNC(k001604_device::tile_w));
 	m_cg_view[0](0x74040000, 0x7407ffff).rw(m_k001604[0], FUNC(k001604_device::char_r), FUNC(k001604_device::char_w));
+	m_cg_view[1](0x74000000, 0x740000ff).rw(m_k001604[1], FUNC(k001604_device::reg_r), FUNC(k001604_device::reg_w));
+	m_cg_view[1](0x74010000, 0x7401ffff).ram().w(m_palette[1], FUNC(palette_device::write32)).share("palette2");
 	m_cg_view[1](0x74020000, 0x7403ffff).rw(m_k001604[1], FUNC(k001604_device::tile_r), FUNC(k001604_device::tile_w));
 	m_cg_view[1](0x74040000, 0x7407ffff).rw(m_k001604[1], FUNC(k001604_device::char_r), FUNC(k001604_device::char_w));
 	map(0x78000000, 0x7800ffff).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_shared_r_ppc), FUNC(konppc_device::cgboard_dsp_shared_w_ppc));
@@ -532,23 +519,23 @@ void nwktr_state::sound_memmap(address_map &map)
 
 void nwktr_state::sharc0_map(address_map &map)
 {
-	map(0x0400000, 0x041ffff).rw(m_konppc, FUNC(konppc_device::cgboard_0_shared_sharc_r), FUNC(konppc_device::cgboard_0_shared_sharc_w));
+	map(0x0400000, 0x041ffff).rw(m_konppc, FUNC(konppc_device::cgboard_shared_sharc_r<0>), FUNC(konppc_device::cgboard_shared_sharc_w<0>));
 	map(0x0500000, 0x05fffff).ram().share(m_sharc_dataram[0]).lr32(NAME([this](offs_t offset) { return m_sharc_dataram[0][offset] & 0xffff; }));
 	map(0x1400000, 0x14fffff).ram();
-	map(0x2400000, 0x27fffff).rw(m_konppc, FUNC(konppc_device::nwk_voodoo_0_r), FUNC(konppc_device::nwk_voodoo_0_w));
-	map(0x3400000, 0x34000ff).rw(m_konppc, FUNC(konppc_device::cgboard_0_comm_sharc_r), FUNC(konppc_device::cgboard_0_comm_sharc_w));
-	map(0x3500000, 0x35000ff).rw(m_konppc, FUNC(konppc_device::K033906_0_r), FUNC(konppc_device::K033906_0_w));
+	map(0x2400000, 0x27fffff).rw(m_konppc, FUNC(konppc_device::nwk_voodoo_r<0>), FUNC(konppc_device::nwk_voodoo_w<0>));
+	map(0x3400000, 0x34000ff).rw(m_konppc, FUNC(konppc_device::cgboard_comm_sharc_r<0>), FUNC(konppc_device::cgboard_comm_sharc_w<0>));
+	map(0x3500000, 0x35000ff).rw(m_konppc, FUNC(konppc_device::cgboard_k033906_r<0>), FUNC(konppc_device::cgboard_k033906_w<0>));
 	map(0x3600000, 0x37fffff).bankr("master_cgboard_bank");
 }
 
 void nwktr_state::sharc1_map(address_map &map)
 {
-	map(0x0400000, 0x041ffff).rw(m_konppc, FUNC(konppc_device::cgboard_1_shared_sharc_r), FUNC(konppc_device::cgboard_1_shared_sharc_w));
+	map(0x0400000, 0x041ffff).rw(m_konppc, FUNC(konppc_device::cgboard_shared_sharc_r<1>), FUNC(konppc_device::cgboard_shared_sharc_w<1>));
 	map(0x0500000, 0x05fffff).ram().share(m_sharc_dataram[1]).lr32(NAME([this](offs_t offset) { return m_sharc_dataram[1][offset] & 0xffff; }));
 	map(0x1400000, 0x14fffff).ram();
-	map(0x2400000, 0x27fffff).rw(m_konppc, FUNC(konppc_device::nwk_voodoo_1_r), FUNC(konppc_device::nwk_voodoo_1_w));
-	map(0x3400000, 0x34000ff).rw(m_konppc, FUNC(konppc_device::cgboard_1_comm_sharc_r), FUNC(konppc_device::cgboard_1_comm_sharc_w));
-	map(0x3500000, 0x35000ff).rw(m_konppc, FUNC(konppc_device::K033906_1_r), FUNC(konppc_device::K033906_1_w));
+	map(0x2400000, 0x27fffff).rw(m_konppc, FUNC(konppc_device::nwk_voodoo_r<1>), FUNC(konppc_device::nwk_voodoo_w<1>));
+	map(0x3400000, 0x34000ff).rw(m_konppc, FUNC(konppc_device::cgboard_comm_sharc_r<1>), FUNC(konppc_device::cgboard_comm_sharc_w<1>));
+	map(0x3500000, 0x35000ff).rw(m_konppc, FUNC(konppc_device::cgboard_k033906_r<1>), FUNC(konppc_device::cgboard_k033906_w<1>));
 	map(0x3600000, 0x37fffff).bankr("slave_cgboard_bank");
 }
 
@@ -715,13 +702,14 @@ void nwktr_state::nwktr(machine_config &config)
 	screen.set_raw(XTAL(64'000'000) / 4, 644, 44, 44 + 512, 450, 31, 31 + 400);
 	screen.set_screen_update(FUNC(nwktr_state::screen_update));
 
-	PALETTE(config, m_palette).set_entries(65536);
+	PALETTE(config, m_palette[0]).set_format(4, raw_to_rgb_converter::standard_rgb_decoder<5,5,5, 10,5,0>, 65536 / 4);
+	PALETTE(config, m_palette[1]).set_format(4, raw_to_rgb_converter::standard_rgb_decoder<5,5,5, 10,5,0>, 65536 / 4);
 
 	K001604(config, m_k001604[0], 0);
-	m_k001604[0]->set_palette(m_palette);
+	m_k001604[0]->set_palette(m_palette[0]);
 
 	K001604(config, m_k001604[1], 0);
-	m_k001604[1]->set_palette(m_palette);
+	m_k001604[1]->set_palette(m_palette[1]);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -734,8 +722,14 @@ void nwktr_state::nwktr(machine_config &config)
 	rfsnd.add_route(1, "rspeaker", 1.0);
 
 	KONPPC(config, m_konppc, 0);
+	m_konppc->set_dsp_tag(0, m_dsp[0]);
+	m_konppc->set_dsp_tag(1, m_dsp[1]);
+	m_konppc->set_k033906_tag(0, "k033906_1");
+	m_konppc->set_k033906_tag(1, "k033906_2");
+	m_konppc->set_voodoo_tag(0, m_voodoo[0]);
+	m_konppc->set_voodoo_tag(1, m_voodoo[1]);
 	m_konppc->set_num_boards(2);
-	m_konppc->set_cbboard_type(konppc_device::CGBOARD_TYPE_NWKTR);
+	m_konppc->set_cgboard_type(konppc_device::CGBOARD_TYPE_NWKTR);
 
 	KONAMI_GN676A_LAN(config, m_gn676_lan, 0);
 
@@ -754,7 +748,7 @@ void nwktr_state::nwktr_lan_b(machine_config &config)
 
 void nwktr_state::jamma_jvs_w(uint8_t data)
 {
-	bool accepted = m_jvs_host->write(data);
+	bool const accepted = m_jvs_host->write(data);
 	if (accepted)
 		m_jvs_host->read();
 }
@@ -769,15 +763,15 @@ void nwktr_state::init_nwktr()
 void nwktr_state::init_racingj()
 {
 	init_nwktr();
-	m_konppc->set_cgboard_texture_bank(0, "master_cgboard_bank", memregion("master_cgboard")->base());
-	m_konppc->set_cgboard_texture_bank(0, "slave_cgboard_bank", memregion("slave_cgboard")->base()); // for some reason, additional CG roms are located on the slave CG board...
+	m_konppc->set_cgboard_texture_bank(0, membank("master_cgboard_bank"), memregion("master_cgboard")->base());
+	m_konppc->set_cgboard_texture_bank(0, membank("slave_cgboard_bank"), memregion("slave_cgboard")->base()); // for some reason, additional CG roms are located on the slave CG board...
 }
 
 void nwktr_state::init_thrilld()
 {
 	init_nwktr();
-	m_konppc->set_cgboard_texture_bank(0, "master_cgboard_bank", memregion("master_cgboard")->base());
-	m_konppc->set_cgboard_texture_bank(0, "slave_cgboard_bank", memregion("master_cgboard")->base()); // ...while this is not the case for thrilld
+	m_konppc->set_cgboard_texture_bank(0, membank("master_cgboard_bank"), memregion("master_cgboard")->base());
+	m_konppc->set_cgboard_texture_bank(0, membank("slave_cgboard_bank"), memregion("master_cgboard")->base()); // ...while this is not the case for thrilld
 }
 
 /*****************************************************************************/
