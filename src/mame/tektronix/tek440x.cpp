@@ -29,7 +29,7 @@
         5 = UART
         4 = Spare (exp slots)
         3 = SCSI
-        2 = DMA
+        2 = DMA (ethernet)
         1 = Timer	(and Printer)
         0 = Unused
 
@@ -653,7 +653,7 @@ private:
 
 	int m_fpu_finished;
 
-	u16 m_videoaddr[4];
+	u16 m_videoaddr;
 	u8 m_videocntl;
 	u8 m_diag;
 	u8 m_mouse,m_mouse_bnts,m_mouse_x,m_mouse_y,m_old_mouse_x,m_old_mouse_y;
@@ -736,9 +736,9 @@ u32 tek440x_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 	u32 invert = BIT(m_videocntl, 4) ? 0 : -1;
 	int pan = (m_videocntl & 15) ^ 15;
 
-	int woffset = (m_videoaddr[0] - 0xffe9);  // why 0xffe9 is TL..OS uses same magic number
+	u16 woffset = (m_videoaddr - (0xffe9));  // why 0xffe9 is TL..OS uses same magic number
 	
-	//LOG("screen_update: 0x%08x\n", m_videoaddr[0]);
+	//LOG("screen_update: 0x%04x\n", woffset);
 	for (int y = 0; y < 480; y++)
 	{
 	
@@ -1123,15 +1123,14 @@ u16 tek440x_state::fpu_r(offs_t offset)
 
 u16 tek440x_state::videoaddr_r(offs_t offset)
 {
-	LOG("videoaddr_r %08x\n", offset);
-
-	return m_videoaddr[offset];
+	//LOG("videoaddr_r %08x\n", offset);
+	return m_videoaddr;
 }
 
 void tek440x_state::videoaddr_w(offs_t offset, u16 data)
 {
 	//LOG("videoaddr_w %08x <= %04x\n", offset, data);
-	m_videoaddr[0] = data;
+	m_videoaddr = data;
 }
 
 u8 tek440x_state::videocntl_r()
