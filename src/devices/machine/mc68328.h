@@ -430,7 +430,7 @@ protected:
 		RTCHMSR_HOURS_SHIFT     = 24,
 	};
 
-	void scr_w(u8 data);
+	virtual void scr_w(u8 data);
 
 	void grpbasea_w(u16 data);
 	void grpbaseb_w(u16 data);
@@ -1142,6 +1142,8 @@ private:
 		INT_MEMIQ               = 23,
 		INT_MEMIQ_MASK          = (1 << INT_MEMIQ),
 	};
+
+	virtual void scr_w(u8 data) override;
 
 	void csa_w(offs_t offset, u16 data, u16 mem_mask);
 	void csb_w(offs_t offset, u16 data, u16 mem_mask);
