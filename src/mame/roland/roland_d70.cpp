@@ -545,7 +545,7 @@ void roland_d70_state::d70(machine_config &config) {
 	MIDI_PORT(config, "mdout", midiout_slot, "midiout");
 	MIDI_PORT(config, "mdthru", midiout_slot, "midiout");
 
-	config.set_default_layout(layout_d70);
+	config.set_default_layout(layout_roland_d70);
 }
 
 void roland_d70_state::init_d70() {
