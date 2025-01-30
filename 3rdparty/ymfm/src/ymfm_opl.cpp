@@ -386,9 +386,9 @@ std::string opl_registers_base<Revision>::log_keyon(uint32_t choffs, uint32_t op
 	uint32_t opnum = (opoffs & 31) - 2 * ((opoffs & 31) / 8) + 18 * bitfield(opoffs, 8);
 
 	char buffer[256];
-	char *end = &buffer[0];
+	int end = 0;
 
-	end += sprintf(end, "%2u.%02u freq=%04X fb=%u alg=%X mul=%X tl=%02X ksr=%u ns=%u ksl=%u adr=%X/%X/%X sl=%X sus=%u",
+	end += snprintf(&buffer[end], sizeof(buffer) - end, "%2u.%02u freq=%04X fb=%u alg=%X mul=%X tl=%02X ksr=%u ns=%u ksl=%u adr=%X/%X/%X sl=%X sus=%u",
 		chnum, opnum,
 		ch_block_freq(choffs),
 		ch_feedback(choffs),
@@ -405,25 +405,25 @@ std::string opl_registers_base<Revision>::log_keyon(uint32_t choffs, uint32_t op
 		op_eg_sustain(opoffs));
 
 	if (OUTPUTS > 1)
-		end += sprintf(end, " out=%c%c%c%c",
+		end += snprintf(&buffer[end], sizeof(buffer) - end, " out=%c%c%c%c",
 			ch_output_0(choffs) ? 'L' : '-',
 			ch_output_1(choffs) ? 'R' : '-',
 			ch_output_2(choffs) ? '0' : '-',
 			ch_output_3(choffs) ? '1' : '-');
 	if (op_lfo_am_enable(opoffs) != 0)
-		end += sprintf(end, " am=%u", lfo_am_depth());
+		end += snprintf(&buffer[end], sizeof(buffer) - end, " am=%u", lfo_am_depth());
 	if (op_lfo_pm_enable(opoffs) != 0)
-		end += sprintf(end, " pm=%u", lfo_pm_depth());
+		end += snprintf(&buffer[end], sizeof(buffer) - end, " pm=%u", lfo_pm_depth());
 	if (waveform_enable() && op_waveform(opoffs) != 0)
-		end += sprintf(end, " wf=%u", op_waveform(opoffs));
+		end += snprintf(&buffer[end], sizeof(buffer) - end, " wf=%u", op_waveform(opoffs));
 	if (is_rhythm(choffs))
-		end += sprintf(end, " rhy=1");
+		end += snprintf(&buffer[end], sizeof(buffer) - end, " rhy=1");
 	if (DYNAMIC_OPS)
 	{
 		operator_mapping map;
 		operator_map(map);
 		if (bitfield(map.chan[chnum], 16, 8) != 0xff)
-			end += sprintf(end, " 4op");
+			end += snprintf(&buffer[end], sizeof(buffer) - end, " 4op");
 	}
 
 	return buffer;
@@ -685,9 +685,9 @@ std::string opll_registers::log_keyon(uint32_t choffs, uint32_t opoffs)
 	uint32_t opnum = opoffs;
 
 	char buffer[256];
-	char *end = &buffer[0];
+	int end = 0;
 
-	end += sprintf(end, "%u.%02u freq=%04X inst=%X fb=%u mul=%X",
+	end += snprintf(&buffer[end], sizeof(buffer) - end, "%u.%02u freq=%04X inst=%X fb=%u mul=%X",
 		chnum, opnum,
 		ch_block_freq(choffs),
 		ch_instrument(choffs),
@@ -695,11 +695,11 @@ std::string opll_registers::log_keyon(uint32_t choffs, uint32_t opoffs)
 		op_multiple(opoffs));
 
 	if (bitfield(opoffs, 0) == 1 || (is_rhythm(choffs) && choffs >= 6))
-		end += sprintf(end, " vol=%X", op_volume(opoffs));
+		end += snprintf(&buffer[end], sizeof(buffer) - end, " vol=%X", op_volume(opoffs));
 	else
-		end += sprintf(end, " tl=%02X", ch_total_level(choffs));
+		end += snprintf(&buffer[end], sizeof(buffer) - end, " tl=%02X", ch_total_level(choffs));
 
-	end += sprintf(end, " ksr=%u ksl=%u adr=%X/%X/%X sl=%X sus=%u/%u",
+	end += snprintf(&buffer[end], sizeof(buffer) - end, " ksr=%u ksl=%u adr=%X/%X/%X sl=%X sus=%u/%u",
 		op_ksr(opoffs),
 		op_ksl(opoffs),
 		op_attack_rate(opoffs),
@@ -710,13 +710,13 @@ std::string opll_registers::log_keyon(uint32_t choffs, uint32_t opoffs)
 		ch_sustain(choffs));
 
 	if (op_lfo_am_enable(opoffs))
-		end += sprintf(end, " am=1");
+		end += snprintf(&buffer[end], sizeof(buffer) - end, " am=1");
 	if (op_lfo_pm_enable(opoffs))
-		end += sprintf(end, " pm=1");
+		end += snprintf(&buffer[end], sizeof(buffer) - end, " pm=1");
 	if (op_waveform(opoffs) != 0)
-		end += sprintf(end, " wf=1");
+		end += snprintf(&buffer[end], sizeof(buffer) - end, " wf=1");
 	if (is_rhythm(choffs))
-		end += sprintf(end, " rhy=1");
+		end += snprintf(&buffer[end], sizeof(buffer) - end, " rhy=1");
 
 	return buffer;
 }
@@ -1715,9 +1715,15 @@ uint8_t ymf278b::read_status()
 
 uint8_t ymf278b::read_data_pcm()
 {
-	// write to FM
+	// read from PCM
 	if (bitfield(m_address, 9) != 0)
-		return m_pcm.read(m_address & 0xff);
+	{
+		uint8_t result = m_pcm.read(m_address & 0xff);
+		if ((m_address & 0xff) == 0x02)
+			result |= 0x20;
+
+		return result;
+	}
 	return 0;
 }
 
