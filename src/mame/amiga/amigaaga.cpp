@@ -88,7 +88,7 @@ VIDEO_START_MEMBER(amiga_state,amiga_aga)
 {
 	video_start_common();
 
-    // fill the AGA dblpf table, taking bplcon3:pf2pri into account for offset values
+	// fill the AGA dblpf table, taking bplcon3:pf2ofx into account for offset values
 	m_separate_bitplanes[0].resize(256 * 8);
 	m_separate_bitplanes[1].resize(256 * 8);
 
@@ -641,10 +641,12 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 			// In practice we need to separate bitplane delays & drawing first.
 			//shres = CUSTOM_REG(REG_BPLCON0) & 0x0040;
 
-			// offset table for pf2 when in dualpf (note: )
+			// offset table for pf2 when in dualpf
 			// - alfred_a, gameplay background
 			// - slamtilt, main menu cursor
+			// NOTE: val << 8 so we don't need to adjust per-pixel
 			pf2ofx = ((CUSTOM_REG(REG_BPLCON3) >> 10) & 7) << 8;
+
 			// bplam applies xor to bitplane colors (i.e. acting as pal bank)
 			// - aladdin, status bar in gameplay
 			// TODO: implement for ham and dualpf, below
