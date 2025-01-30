@@ -34,7 +34,6 @@
 #define LOG_TC    (1U << 3)
 
 //#define VERBOSE (LOG_GENERAL | LOG_MODE)
-
 #include "logmacro.h"
 
 
