@@ -40,14 +40,9 @@
               Let's!TVプレイ なりきりファイト ウルトラマン 撃て！必殺光線！！ / タカラトミー / 日本   Let's!TV Play Narikiri Fight Ultraman Shoot! Deadly ray! ! / Takara Tomy / Japan
               Jala Jaland /atlus/Japan (arcade version)                                                       -           -               -           -               -                   -                       -
     2004      Printer for TV computer /EPOCH/Japan                                                            -           -               -           -               -                   -                       -
-              Accessory memory mascot for TV mail Pc mail cot 2 characters (Putchi, Petchi) /EPOCH/Japan      -           -               -           -               -                   -                       -
-              Accessory memory mascot for TV mail Pc mail cot 2 characters (Charuru, Kurau) /EPOCH/Japan      -           -               -           -               -                   -                       -
-              TV mail PC "Mercot /EPOCH/Japan                                                                 -           -               -           -               -                   -                       -
               Wildest computer robot "Daigander" (Korean version) /TAKARA/Korea                               -           -               -           -               -                   -                       -
     2003      Hello Kitty TV computer /EPOCH/Japan                                                            -           -               -           -               -                   -                       -
     2001      Ping-pong(Chinese version) /Tenpon/China                                                        -           -               -           -               -                   -                       -
-              Popira Korea version /SONOKONG/Korea                                                            -           -               -           -               -                   -                       -
-              I singer: e-kara Korean version /SONOKONG/Korea                                                 -           -               -           -               -                   -                       -
               Baseball Korean version /SONOKONG/Korea                                                         -           -               -           -               -                   -                       -
     1999      ABC Jungle Fun Hippo /VTech/HK, USA, France                                                     -           -               -           -               -                   -                       -
 
@@ -62,7 +57,12 @@
     2005      Let's!TVプレイ ドラゴンボ－ルＺ バトル体感かめはめ波～ おめぇとフュージョン / バンダイ / 日本          Let's! TV Play Dragon Ball Z Battle Taikan Kamehameha~ Omee to Fusion / Bandai / Japan
 
     dumped: either here, xavix_2000.cpp, or xavix_2002.cpp
-              Let's!TVプレイ 体感キャストオフ 仮面ライダーカブト クロックアップ＆ライダーキック / バンダイ / 日本  Let's! TV Play Taikan Cast Off Kamen Rider Kabuto Clock Up & Rider Kick / Bandai / Japan
+              Popira Korea version /SONOKONG/Korea                                                            -           -               -           -               -                   -                       -
+              I singer: e-kara Korean version /SONOKONG/Korea                                                 -           -               -           -               -                   -                       -
+			  Accessory memory mascot for TV mail Pc mail cot 2 characters (Putchi, Petchi) /EPOCH/Japan   (no unique ROM, just I2C memory storage)
+              Accessory memory mascot for TV mail Pc mail cot 2 characters (Charuru, Kurau) /EPOCH/Japan   (no unique ROM, just I2C memory storage)
+              TV mail PC "Mercot /EPOCH/Japan                                                                 -           -               -           -               -                   -                       -
+			  Let's!TVプレイ 体感キャストオフ 仮面ライダーカブト クロックアップ＆ライダーキック / バンダイ / 日本  Let's! TV Play Taikan Cast Off Kamen Rider Kabuto Clock Up & Rider Kick / Bandai / Japan
               Let's!TVプレイ なりきり体感 ボウケンジャー 走れ！撃て！ミッションスタート！！ / バンダイ / 日本   Let's! TV Play Narikiri Taikan Boukenger Hashire! Ute! Mission Start!! / Bandai / Japan
               Webdiver Gradion /TAKARA/Japan                                                                  -           -               -           -               -                   -                       -
               Let's!TVプレイ 魔法戦隊マジレンジャー マジマットでダンス＆バトル / バンダイ / 日本        Let's! TV Play Mahou Taiketsu Magiranger - Magimat de Dance & Battle / Bandai / Japan
@@ -2765,6 +2765,16 @@ ROM_START( tvpc_ham )
 	ROM_LOAD( "hpcj.u3", 0x000000, 0x400000, CRC(76e8c854) SHA1(5998c03292a16107d0d7ae00f77677582680f323) )
 ROM_END
 
+ROM_START( epo_mail )
+	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "mailcot.u3", 0x000000, 0x400000, CRC(87f13ce7) SHA1(97326257210df411ac8b47e8513bb0da7b02dbde) )
+
+	// has a HT24LC16 in the main unit
+
+	// the cartridges also contain a HT24LC16 for data transfer between units (no other ROM though)
+ROM_END
+
+
 ROM_START( tak_gin )
 	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "snowboard.bin", 0x000000, 0x200000, CRC(79fdeae3) SHA1(ab08790e95cdccf3541ecbddb87ebf0dedb3718b) )
@@ -3049,3 +3059,6 @@ CONS( 2005, tvpc_tom,  0,          0,  xavix_i2c_24c16_4mb,  tvpc_tom, xavix_i2c
 CONS( 2003, tvpc_dor,  0,          0,  xavix_i2c_24c16_4mb,  tvpc_tom, xavix_i2c_state, init_xavix, "Epoch / SSD Company LTD", "TV-PC Doraemon (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 // とっとこハム太郎 テレビパソコン
 CONS( 2003, tvpc_ham,  0,          0,  xavix_i2c_24c16_4mb,  tvpc_tom, xavix_i2c_state, init_xavix, "Epoch / SSD Company LTD", "TV-PC Tottoko Hamutaro (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
+// TVメールPC mail☆cot メルコット
+CONS( 2004, epo_mail,  0,          0,  xavix_i2c_24c16_4mb,  tvpc_tom, xavix_i2c_state, init_xavix, "Epoch / SSD Company LTD", "TV Mail PC mail☆cot (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
