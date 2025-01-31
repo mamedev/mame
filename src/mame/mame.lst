@@ -19826,6 +19826,7 @@ polgar101                       // 1990 Mephisto Polgar 10MHz
 
 @source:hegenerglaser/risc.cpp
 mrisc                           // 1992 Mephisto RISC 1MB
+mrisca                          // 1992 Mephisto RISC 1MB
 mrisc2                          // 1994 Mephisto RISC II
 
 @source:hegenerglaser/roma2.cpp
