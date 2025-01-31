@@ -43676,6 +43676,7 @@ sothello                        // (c) 1986 Success / Fujiwara.
 tonton                          // (c) 199? Success / Taiyo Jidoki.
 
 @source:sun/sun1.cpp
+multibox                        //
 sun1                            //
 
 @source:sun/sun2.cpp
