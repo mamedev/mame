@@ -20133,9 +20133,15 @@ polgar10
 polgar101
 
 @source:hegenerglaser/risc.cpp
+<<<<<<< HEAD
 mrisc
 mrisca
 mrisc2
+=======
+mrisc                           // 1992 Mephisto RISC 1MB
+mrisca                          // 1992 Mephisto RISC 1MB
+mrisc2                          // 1994 Mephisto RISC II
+>>>>>>> 755eccc28e5 (New working clones)
 
 @source:hegenerglaser/roma2.cpp
 montreal

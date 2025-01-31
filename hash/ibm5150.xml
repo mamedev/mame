@@ -10388,19 +10388,19 @@ Hangs after few seconds of gameplay
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="CM Gideon" />
 			<dataarea name="flop" size="737280">
-				<rom name="gideon.img" size="737280" crc="c858c60e" sha1="dd482fd7efc60615c2836a4fef23c520454370db"/>
+				<rom name="gideon.img" size="737280" crc="6b903e6b" sha1="3753d34a52ff765393bcc4dd0d8e68dbb9dbb662"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="CM The King" />
 			<dataarea name="flop" size="737280">
-				<rom name="theking.img" size="737280" crc="23bb50c0" sha1="9f5cb7c610fdf8404df5af59b101ed2a3a644ff2"/>
+				<rom name="theking.img" size="737280" crc="4412d875" sha1="245298ee049ba5a112f4e3f39d4e237d7fc99e6d"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Other" />
 			<dataarea name="flop" size="737280">
-				<rom name="other.img" size="737280" crc="660256ab" sha1="df629b5f0479082d25262e24af1fda7f025cf1f0"/>
+				<rom name="other.img" size="737280" crc="6bf45a36" sha1="cca48a34a22cf62b60ac545110262bd39a0e7e6b"/>
 			</dataarea>
 		</part>
 	</software>
