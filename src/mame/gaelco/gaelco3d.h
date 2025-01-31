@@ -128,7 +128,7 @@ private:
 	uint8_t m_sound_status = 0;
 	uint8_t m_analog_ports[4]{};
 	uint32_t m_fp_analog_ports[2]{};
-	uint32_t m_fp_lenght[2]{};
+	uint32_t m_fp_length[2]{};
 	uint8_t m_fp_clock = 0;
 	uint8_t m_fp_state = 0;
 	uint8_t m_adsp_ireg = 0;

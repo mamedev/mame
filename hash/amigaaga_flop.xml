@@ -8,6 +8,9 @@ license:CC0-1.0
 
     The software listed here is not designed for use on systems without the AGA chipset and
     will not function.
+
+    Note:
+    - Please use [Lisa] / [Alice] tag where issues are specifically for amiga/amigaaga.cpp
 -->
 
 <softwarelist name="amigaaga_flop" description="Commodore Amiga AGA disk images">
@@ -82,9 +85,10 @@ Some animations seems too fast
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
 		<notes><![CDATA[
-Boots to a purple and blue flickering screen, [FDC] dsksync
+Boots to a purple and blue flickering screen, [FDC] dsksync (fixed)
+[keyboard] eats inputs on copy protection screens
 ]]></notes>
-		<info name="usage" value="Requires AGA" />
+		<info name="usage" value="Requires AGA, sports manual copy protection" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -654,7 +658,7 @@ Corrupt tiles if you switch languages in language select menu
 Not extensively tested
 Gameplay is too fast
 ]]></notes>
-        <!-- cover/floppy title -->
+		<!-- cover/floppy title -->
 		<info name="alt_title" value="Brutal Football" />
 		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
@@ -2528,7 +2532,7 @@ Red screen when "Out to lunch is loading" displays, [FDC]
 		<year>1995</year>
 		<publisher>21st Century Entertainment</publisher>
 		<notes><![CDATA[
-Bitplane overlay is offset on title screen
+[Lisa] Bitplane overlay is offset on title screen
 Doesn't draw left bumper during gameplay [Copper]?
 ]]></notes>
 		<info name="usage" value="Requires AGA" />
@@ -3637,7 +3641,7 @@ ATK test: C:0 H:U Bad
 		<year>1996</year>
 		<publisher>21st Century</publisher>
 		<notes><![CDATA[
-Has no cursor on main menu
+[Denise] has no cursor on main menu, should output with plane 0x10 (pfxpri 0x3f), amigaocs_flop:swiv related trick?
 On gameplay unthrottle emulation causes idle vertical scroll to be slower
 ]]></notes>
 		<info name="usage" value="Requires AGA" />
@@ -4983,13 +4987,14 @@ Pressing TAB key will switch to NTSC mode (?), which cuts off bottom of screen
 		</part>
 	</software>
 
-	<software name="dxgalaga" supported="partial">
+	<software name="dxgalaga" supported="no">
 		<description>Deluxe Galaga (AGA, v2.6B, 19950903)</description>
 		<year>1995</year>
 		<publisher>Edgar Vigdal</publisher>
 		<notes><![CDATA[
-Guru Meditation when run stand-alone
-Throws "file is missing" when installed to HDD
+Guru Meditation when run stand-alone (fixed)
+[Denise] bonus items and enemy to player bullets don't collide in gameplay, CLXCON even mask
+TODO: Throws "file is missing" when installed to HDD
 ]]></notes>
 		<info name="usage" value="Requires AGA" />
 

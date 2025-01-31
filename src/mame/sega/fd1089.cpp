@@ -8,8 +8,6 @@
 
     Copyright Nicola Salmoria, Andreas Naive, and Charles MacDonald.
 
-    All rights reserved.
-
 ****************************************************************************
 
     Decryption tables provided by Charles MacDonald

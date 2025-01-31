@@ -52,6 +52,16 @@ void mac_nubus_cards(device_slot_interface &device)
 	device.option_add("thunder4gx", NUBUS_THUNDERIVGX); // Radius Thunder IV GX video card
 }
 
+void powermac_nubus_cards(device_slot_interface &device)
+{
+	device.option_add("mdc48", NUBUS_MDC48);            // Apple Macintosh Display Card 4•8
+	device.option_add("mdc824", NUBUS_MDC824);          // Apple Macintosh Display Card 8•24
+	device.option_add("cb264", NUBUS_CB264);            // RasterOps ColorBoard 264
+	device.option_add("asmc3nb", NUBUS_ASNTMC3NB);      // Asante MC3NB Ethernet card
+	device.option_add("enetnb", NUBUS_APPLEENET);       // Apple NuBus Ethernet
+	device.option_add("quadralink", NUBUS_QUADRALINK);  // AE Quadralink serial card
+	device.option_add("thunder4gx", NUBUS_THUNDERIVGX); // Radius Thunder IV GX video card
+}
 
 void mac_pds030_cards(device_slot_interface &device)
 {

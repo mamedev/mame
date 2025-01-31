@@ -1551,6 +1551,7 @@ public:
 	{ }
 
 	void setaroul(machine_config &config);
+	void setaroulm(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_drop_start);
 	ioport_value coin_sensors_r();
@@ -1582,7 +1583,7 @@ private:
 	void setaroul_palette(palette_device &palette) const;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
+	template <uint8_t Irq1, uint8_t Irq2> TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
 	void setaroul_map(address_map &map) ATTR_COLD;
 
@@ -4483,9 +4484,9 @@ static INPUT_PORTS_START( drgnunit )
 	PORT_DIPSETTING(      0x0030, "3" )
 	PORT_DIPSETTING(      0x0020, "5" )
 	PORT_DIPUNUSED_DIPLOC( 0x0040, 0x0040, "SW1:7" )    // Labeled "Don't Touch" in manual
-	PORT_DIPNAME( 0x0080, 0x0080, "Unknown 1-8*" ) PORT_DIPLOCATION("SW1:8")    // Labeled "Don't Touch" in manual (seems to be used though)
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, "Stage Time" ) PORT_DIPLOCATION("SW1:8")    // Labeled "Don't Touch" in manual but it seems to work fine
+	PORT_DIPSETTING(      0x0080, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x0000, "Extra 20s" )
 
 	PORT_DIPUNUSED_DIPLOC( 0x0100, 0x0100, "SW2:1" )    // Labeled "Don't Touch" in manual
 	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW2:2")
@@ -4662,6 +4663,15 @@ static INPUT_PORTS_START( setaroul )
 	PORT_DIPNAME( 0x80, 0x00, "Hopper Sensor" )        PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x80, "Active Low (Error)"  ) // "Hopper Over Run" error
 	PORT_DIPSETTING(    0x00, "Active High" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( setaroulm )
+	PORT_INCLUDE( setaroul )
+
+	PORT_MODIFY("DSW2-B")
+	PORT_DIPNAME( 0x01, 0x01, "Show Reels" ) PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -7764,15 +7774,16 @@ void seta_state::qzkklgy2(machine_config &config)
                                 The Roulette
 ***************************************************************************/
 
+template <uint8_t Irq1, uint8_t Irq2>
 TIMER_DEVICE_CALLBACK_MEMBER(setaroul_state::interrupt)
 {
 	int scanline = param;
 
 	if ((scanline % 32) == 0) // every 2ms?
-		m_maincpu->set_input_line(2, HOLD_LINE); // read 1 board column (out of 26) every other call
+		m_maincpu->set_input_line(Irq1, HOLD_LINE); // read 1 board column (out of 26) every other call
 
 	if (scanline == 248)
-		m_maincpu->set_input_line(4, HOLD_LINE); // vblank
+		m_maincpu->set_input_line(Irq2, HOLD_LINE); // vblank
 
 	// lev 6: RS232
 }
@@ -7782,7 +7793,7 @@ void setaroul_state::setaroul(machine_config &config)
 	// basic machine hardware
 	M68000(config, m_maincpu, 16_MHz_XTAL / 2); // 8 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &setaroul_state::setaroul_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(setaroul_state::interrupt), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(*this, NAME((&setaroul_state::interrupt<2, 4>)), "screen", 0, 1);
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
@@ -7825,6 +7836,13 @@ void setaroul_state::setaroul(machine_config &config)
 
 	// layout
 	config.set_default_layout(layout_setaroul);
+}
+
+void setaroul_state::setaroulm(machine_config &config)
+{
+	setaroul(config);
+
+	TIMER(config.replace(), "scantimer").configure_scanline(*this, NAME((&setaroul_state::interrupt<5, 4>)), "screen", 0, 1);
 }
 
 
@@ -11173,6 +11191,35 @@ ROM_START( setaroula )
 	ROM_LOAD16_BYTE( "uf0-018.u51", 0x001, 0x200, CRC(1c584d5f) SHA1(f1c7e3da8b108d78b459cae53fabb6e28d3a7ee8) )
 ROM_END
 
+ROM_START( setaroulm )
+	ROM_REGION( 0x0c0000, "maincpu", 0 )        // 68000 Code
+	ROM_LOAD16_BYTE( "uf011.002.5a", 0x000000, 0x010000, CRC(285f41ba) SHA1(b5ff09cae1e178526145f113cc3c85892e35ec34) )
+	ROM_LOAD16_BYTE( "uf011.003.7a", 0x000001, 0x010000, CRC(2ab925b0) SHA1(f02de8a6643330c833027dd99006ac2d5d07e2f0) )
+
+	ROM_REGION( 0x020000, "gfx1", 0 )   // Sprites
+	ROM_LOAD16_BYTE( "uf1.005.1j", 0x010001, 0x008000, CRC(12ee9729) SHA1(29f621811d52413ae37137035ad687fabfe9e56e) )
+	ROM_LOAD16_BYTE( "uf1.006.1l", 0x010000, 0x008000, CRC(5eb35519) SHA1(1af240ae725102f310a101829539d1ca5323e96c) )
+	ROM_LOAD16_BYTE( "uf1.007.1n", 0x000001, 0x008000, CRC(b287ddcf) SHA1(70d291fcb6a60be2c45e6ad61f1c3922d45ef7e0) )
+	ROM_LOAD16_BYTE( "uf1.008.1r", 0x000000, 0x008000, CRC(6de9a30b) SHA1(308468079b535d1b0ca437251c3135d7f0c91dce) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 )   // Layer 1 - 8bpp, not dumped for this set, but MASK ROM codes match
+	ROM_LOAD32_BYTE( "uf0-010.u15", 0x000000, 0x080000, CRC(0af13a56) SHA1(c294b7947d004c0e0b280ca44636e4059e05a57e) )
+	ROM_LOAD32_BYTE( "uf0-012.u29", 0x000001, 0x080000, CRC(cba2a6b7) SHA1(8627eda24c6980a0e786fd9dc06176893a33c58f) )
+	ROM_LOAD32_BYTE( "uf0-014.u38", 0x000002, 0x080000, CRC(da2bd4e4) SHA1(244af8705f2fa4ab3f3a002af16a0e4d60e03de8) )
+	ROM_LOAD32_BYTE( "uf0-015.u40", 0x000003, 0x080000, CRC(11dc19fa) SHA1(e7084f61d075a61249d924a523c32e7993d9ae46) )
+	ROM_LOAD32_BYTE( "uf0-009.u13", 0x200000, 0x080000, CRC(20f2d7f5) SHA1(343a8fac76d6ee7f845f9988c491698ebd0150d4) )
+	ROM_LOAD32_BYTE( "uf0-011.u22", 0x200001, 0x080000, CRC(af60adf9) SHA1(6505cbce6e066d75b779fdbe2c034ba4daabbefe) )
+	ROM_LOAD32_BYTE( "uf0-013.u37", 0x200002, 0x080000, CRC(645ec3c3) SHA1(e9b8056c68bf33b0b7130a5ce2bafd11dfd6c29b) )
+	ROM_LOAD32_BYTE( "uf0-016.u48", 0x200003, 0x080000, CRC(10f99fa8) SHA1(7ef9a3f71dd071483cf3513ef57e2fcfe8702994) )
+
+	ROM_REGION( 0x100000, "x1snd", ROMREGION_ERASE00 )  // Samples
+	ROM_LOAD( "uf1-004.14a", 0x040000, 0x020000, CRC(d63ea334) SHA1(93aaf58c90c4f704caae19b63785e471b2c1281a) ) // 1xxxxxxxxxxxxxxxx = 0xFF, possibly bad
+
+	ROM_REGION( 0x400, "proms", 0 ) // not dumped for this set, but stickers match
+	ROM_LOAD16_BYTE( "uf0-017.u50", 0x000, 0x200, CRC(bf50c303) SHA1(31685ed4849e5c27654f02945678db425d54bf5e) )
+	ROM_LOAD16_BYTE( "uf0-018.u51", 0x001, 0x200, CRC(1c584d5f) SHA1(f1c7e3da8b108d78b459cae53fabb6e28d3a7ee8) )
+ROM_END
+
 
 void seta_state::init_bankx1()
 {
@@ -11237,6 +11284,7 @@ void jockeyc_state::init_inttoote()
 
 GAME( 1989?, setaroul,  0,        setaroul,  setaroul,  setaroul_state, empty_init,    ROT270, "Visco",                     "The Roulette (Visco)", 0 )
 GAME( 1989?, setaroula, setaroul, setaroul,  setaroul,  setaroul_state, empty_init,    ROT270, "hack (CODERE)",             "Super Ruleta 36 (Spanish hack of The Roulette)", 0 )
+GAME( 1989?, setaroulm, setaroul, setaroulm, setaroulm, setaroul_state, empty_init,    ROT270, "Visco",                     "The Roulette (Visco, medal)", MACHINE_NOT_WORKING ) // check if game plays correctly, I/O..
 
 GAME( 1989, drgnunit,  0,        drgnunit,  drgnunit,  seta_state,     empty_init,     ROT0,   "Athena / Seta",             "Dragon Unit / Castle of Dragon", 0 ) // Country/License: DSW
 

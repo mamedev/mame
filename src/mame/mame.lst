@@ -1465,39 +1465,46 @@ rcasinoo                        // (c) 1984 Dyna Electronics (D-2608208A1-1, Sma
 rcasino2                        // (c) 1984 Dyna Electronics
 
 @source:astrocorp/astrcorp.cpp
-astoneag                        // (c) 2005  Astro Corp.
-cptshark                        // (c) 2006  Astro Corp.
-dinodino                        // (c) 2005  Astro Corp.
-gostopac                        // (c) 2004  Astro Corp.
-hacher                          // (c) 2005  bootleg (Gametron)
-hapfarm                         // (c) 2008  Astro Corp.
-luckycoin                       // (c) 2002  Astro Corp.
-magibomb                        // (c) 2001? Astro Corp.
-magibomba                       // (c) 2002  Astro Corp.
-magibombb                       // (c) 2002  Astro Corp.
-magibombc                       // (c) 2001  Astro Corp.
-magibombd                       // (c) 2005  Astro Corp.
-magibombe                       // (c) 2001? Astro Corp.
-magibombf                       // (c) 2002  Astro Corp.
-magibombg                       // (c) 2004  Astro Corp.
-magibombh                       // (c) 2001? Astro Corp.
-magibombi                       // (c) 2001? Astro Corp.
-magibombj                       // (c) 2005  Astro Corp.
-monkeyl                         // (c) 2005  Astro Corp.
-monkeyla                        // (c) 2004  Astro Corp.
-showhanc                        // (c) 2000  Astro Corp.
-showhand                        // (c) 2000  Astro Corp.
-skilldrp                        // (c) 2002  Astro Corp.
-skilldrpa                       // (c) 2002  Astro Corp.
-speeddrp                        // (c) 2003  Astro Corp.
-speedmst                        // (c) 2004  D2 Enterprises
-speedmsta                       // (c) 2003  D2 Enterprises
-speedmstb                       // (c) 2004  D2 Enterprises
-westvent                        // (c) 2007? Astro Corp.
-winbingo                        // (c) 2006  Astro Corp.
-winbingoa                       // (c) 2006  Astro Corp.
-wwitch                          // (c) 2005  Astro Corp.
-zoo                             // (c) 2004  Astro Corp.
+astoneag
+cptshark
+dinodino
+gostopac
+hacher
+hapfarm
+luckycoin
+magibomb
+magibomba
+magibombb
+magibombc
+magibombd
+magibombe
+magibombf
+magibombg
+magibombh
+magibombi
+magibombj
+magibombk
+magibombl
+magibombm
+magibombn
+monkeyl
+monkeyla
+monkeylb
+monkeylc
+monkeyld
+showhanc
+showhand
+skilldrp
+skilldrpa
+speeddrp
+speedmst
+speedmsta
+speedmstb
+westvent
+winbingo
+winbingoa
+wwitch
+zoo
 
 @source:astrocorp/astropc.cpp
 blackbd                         //
@@ -16148,6 +16155,11 @@ casloopy                        //
 cfx9850                         // Casio CFX-9850
 cfx9850gb                       // Casio CFX-9850GB Plus
 
+@source:casio/ct8000.cpp
+ct8000                          //
+ctfk1                           //
+ctmb1                           //
+
 @source:casio/ctk2000.cpp
 ctk2100                         //
 
@@ -16713,6 +16725,9 @@ sdtora
 sgalaxy
 sgalaxya
 sgalaxyb
+
+@source:cxg/pchess.cpp
+cpchess
 
 @source:cxg/professor.cpp
 scprof
@@ -17565,6 +17580,7 @@ jongtei                         // "532" Mahjong Jong-Tei (C) 1999 Dynax
 jongteia                        // Mahjong Jong-Tei (C) 2000 Techno-Top
 kotbinsp                        // "909" 1997 Dynax / Shinwhajin
 kotbinyo                        // 1997 Dynax / Shinwhajin
+kotbinyosu                      // 1997 Dynax / Shinwhajin
 mjchuuka                        // "121" (c) 1998 Dynax
 mjdchuka                        // "111" (c) 1995 Nakanihon
 mjflove                         // "500" (c) 1996 Dynax
@@ -17969,6 +17985,9 @@ rpanic                          // (c) 1992 Excellent System / Jaleco
 @source:excellent/dblcrown.cpp
 dblcrown                        // (c) 1994 Excellent System
 
+@source:excellent/es8906.cpp
+dream9
+
 @source:excellent/es9501.cpp
 d9flower
 specd9
@@ -18206,6 +18225,7 @@ fex68km3
 fex68km3a
 fex68km3b
 fex68km4
+fex68km4a
 premiere
 
 @source:fidelity/eldorado.cpp
@@ -18866,6 +18886,7 @@ redufo                          // (c) Artic
 redufob                         // bootleg
 redufob2                        // bootleg
 redufob3                        // bootleg
+rocktcnvy                       // bootleg (Radar Ltd.)
 sbhoei                          // Hoei
 sbhoeia                         // Hoei
 scobra                          // GX316 (c) 1981 Konami
@@ -19707,6 +19728,10 @@ mephistoj
 
 @source:hegenerglaser/europa.cpp
 europa
+
+@source:hegenerglaser/excalibur.cpp
+excal
+excaltm
 
 @source:hegenerglaser/glasgow.cpp
 amsterdg                        // Amsterdam
@@ -23877,6 +23902,7 @@ cookbib2b                       // (c) 1996 SemiCom
 cookbib2c                       // (c) 1996 SemiCom
 cookbib3                        // (c) 1997 SemiCom
 finalttr                        // (c) 1993 Jeil Computer System
+gwasu                           // (c) 1997 SemiCom
 honeydol                        // (c) 1995 Barko Corp
 hyperpac                        // (c) 1995 SemiCom
 hyperpacb                       // bootleg
@@ -29445,6 +29471,7 @@ castrev                         // Revolution
 @source:misc/cb2001.cpp
 cb2001                          // (c) 2000 Dyna Electronics
 cb4                             // (c) 1997 Dyna Electronics
+cb4a                            // (c) 1997 Dyna Electronics
 cb5                             // (c) 1997 Dyna Electronics
 cb5_11                          // (c) 1997 Dyna Electronics
 crzybell                        // (c) 1995 Dyna Electronics
@@ -31313,9 +31340,6 @@ mirderby                        // (c) 1988 Home Data?
 @source:misc/mjsenpu.cpp
 mjsenpu
 
-@source:misc/mole.cpp
-mole                            // (c) 1982 Yachiyo Electronics, Ltd.
-
 @source:misc/monon_color.cpp
 mononcol                        // (c) 2011 M&D
 
@@ -32161,6 +32185,7 @@ fb2ndv1                         // (c) 2004 Amcoe
 fb2ndv2                         // (c) 2004 Amcoe
 fb3g                            // (c) 200? Amcoe - Fruit Bonus 3G
 fb4                             // (c) 2004 Amcoe - Fruit Bonus 2004
+fb4_14                          // (c) 2004 Amcoe
 fb4b2                           // (c) 2004 Amcoe
 fb4c1                           // (c) 2004 Amcoe
 fb4c2                           // (c) 2004 Amcoe
@@ -32395,14 +32420,6 @@ vcarn                           // (c) 1999 Electronic Projects
 @source:misc/sprcros2.cpp
 sprcros2                        // (c) 1986 GM Shoji
 sprcros2a                       // (c) 1986 GM Shoji
-
-@source:misc/ssingles.cpp
-atamanot                        // (c) 1983 Yachiyo Denki / Uni Enterprize
-ssingles                        // Yachiyo?
-
-@source:misc/sstrangr.cpp
-sstrangr                        // (c) 1978 Yachiyo Electronics, Ltd.
-sstrangr2                       // (c) 1979 Yachiyo Electronics, Ltd.
 
 @source:misc/startouch.cpp
 europl01                        //
@@ -32782,6 +32799,7 @@ driblingvm                      // bootleg (Videomac)
 @source:modelracing/sshot.cpp
 gunchamps                       // (c) 1980 Model Racing (sshot.cpp)
 sshot                           // (c) 1979 Model Racing
+sshota                          // (c) 1979 Model Racing
 
 @source:modelracing/subhuntr.cpp
 subhuntr                        // 1979 Model Racing
@@ -35020,6 +35038,7 @@ gtct885
 hhgc319
 hkb502
 hkb502a
+lexi30
 lpgm240
 lxcap
 lxccatv
@@ -35041,6 +35060,7 @@ mog_m320
 myarccn
 nubsupmf
 otrail
+pactin
 q5_500in1
 rd5_240
 red5mam
@@ -35050,10 +35070,13 @@ rtvgc300fz
 sealvt
 sy888b
 sy889
+tetrtin
 tup240
+unk128vt
 unk2019hh
 unk2020hh
 unkra200
+vibes240
 zonefusn
 
 @source:nintendo/nss.cpp
@@ -35270,6 +35293,9 @@ cmpmx11
 dance555
 exsprt48
 gm235upc
+icb_car
+icb_dp
+icb_ts
 ii8in1
 ii32in1
 intact89
@@ -36588,6 +36614,7 @@ cdi910                          //
 cdibios                         // Base unit
 cdimono1                        // Philips CD-i model 200 (Mono-I board, PAL)
 cdimono2                        // Philips CD-i model 220 (Mono-II board, NTSC)
+gpi1200                         //
 quizard                         // (c) TAB Austria 199?
 quizard_10                      // (c) TAB Austria 1996
 quizard_12                      // (c) TAB Austria 1996
@@ -39730,6 +39757,7 @@ ssf2mdb
 twinktmb
 
 @source:sega/megadriv_rad.cpp
+atgame40
 dgunl3227
 dgunl3227a
 mdtvp1j
@@ -39742,6 +39770,7 @@ rad_gen2                        // (c)2004 Radica
 rad_md1
 rad_md1uk
 rad_md2uk
+rad_mncr
 rad_orun
 rad_sf2                         // (c)2004 Radica
 rad_sf2uk                       // (c)2004 Radica
@@ -41381,6 +41410,7 @@ invho2a                         // 326-341 (c) 1979 Sega
 invinco                         // 310-318 (c) 1979 Sega
 nostromo                        // bootleg
 nsub                            // 268-275 (c) 1980 Sega
+nsubc                           // 581-596 (c) 1980 Sega
 pulsar                          // 790-805 (c) 1981 Sega
 safari                          // 57-66 [1977 Gremlin?]
 safaria                         // bootleg?
@@ -41631,6 +41661,7 @@ rdft2u                          // (c) 1997 Seibu Kaihatsu (Fabtek license)
 rdft2us                         // (c) 1997 Seibu Kaihatsu (Fabtek license)
 rdfta                           // (c) 1996 Seibu Kaihatsu
 rdftadi                         // (c) 1996 Seibu Kaihatsu (Dream Island license)
+rdftadia                        // (c) 1996 Seibu Kaihatsu (Dream Island license)
 rdftam                          // (c) 1996 Seibu Kaihatsu (Metrotainment license)
 rdftau                          // (c) 1996 Seibu Kaihatsu
 rdftauge                        // (c) 1996 Seibu Kaihatsu (Tuning license and text display, but Australia region code)
@@ -41815,6 +41846,7 @@ rezon                           // (c) 1992 Allumer
 rezono                          // (c) 1991 Allumer
 setaroul                        // UF   (c) 1989? Visco
 setaroula                       // hack (CODERE)
+setaroulm                       // UF   (c) 1989? Visco
 simpsonjr                       // bootleg of J. J. Squawkers by Daigom
 sokonuke                        // (c) 1995 Sammy Industries
 stg                             // (c) 1991 Athena / Tecmo
@@ -42557,6 +42589,7 @@ elzet80p                        //
 epic14e                         //
 
 @source:skeleton/epoch_tv_globe.cpp
+digixar
 eptvglob
 
 @source:skeleton/esprit.cpp
@@ -45891,6 +45924,7 @@ rad_hnt3p
 rad_bask
 rad_baskp
 spidtt
+teentit
 tsbuzz
 
 @source:tvgames/generalplus_gpl16250_mobigo.cpp
@@ -45922,10 +45956,13 @@ beambox
 @source:tvgames/generalplus_gpl16250_rom.cpp
 beijuehh
 bornkidh
+fpsport
 gameu50
+gameu90
 gameu108
 gormiti
 imgame
+jak_prr
 jak_spmm
 myac220
 smartfp                         // Smart Fit Park
@@ -45947,6 +45984,7 @@ wrlshunt                        // Wireless: Hunting Video Game System
 
 @source:tvgames/generalplus_gpl16250_spi.cpp
 anpanbd
+bk139in1
 bkrankp
 prailpls
 
@@ -45997,6 +46035,7 @@ didj                            // (c) 2008 Leapfrog
 mmahjong
 
 @source:tvgames/monkey_king_3b.cpp
+afbp4                           //
 rs70_648                        //
 
 @source:tvgames/pubint_storyreader.cpp
@@ -46045,6 +46084,7 @@ doraphonf
 doyousud
 dreamlss
 drumsups
+epo_tetr
 fordrace
 gssytts
 guitarfv
@@ -46098,6 +46138,7 @@ icanpian                        //
 jak_batm                        // The Batman, 2004
 jak_mk
 jak_mpacw
+jak_pix
 jak_potc
 jak_powr
 jak_sbjd
@@ -46265,6 +46306,7 @@ megadri4a
 abl4play
 lexitvsprt
 my1stddr                        // (c) 2006 Konami
+senspid
 shtscore
 teleshi
 teleship
@@ -47277,6 +47319,17 @@ mojmikro                        //
 x168                            //
 x820                            //
 x820ii                          //
+
+@source:yachiyo/mole.cpp
+mole                            // (c) 1982 Yachiyo Electronics, Ltd.
+
+@source:yachiyo/ssingles.cpp
+atamanot                        // (c) 1983 Yachiyo Denki / Uni Enterprize
+ssingles                        // Yachiyo?
+
+@source:yachiyo/sstrangr.cpp
+sstrangr                        // (c) 1978 Yachiyo Electronics, Ltd.
+sstrangr2                       // (c) 1979 Yachiyo Electronics, Ltd.
 
 @source:yamaha/fb01.cpp
 fb01                            // 1986 FB-01

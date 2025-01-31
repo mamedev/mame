@@ -416,8 +416,8 @@ public:
 	uint16_t m_genlock_color = 0;
 
 	/* separate 6 in-order bitplanes into 2 x 3-bit bitplanes in two nibbles */
-	// FIXME: we instantiate 256 entries so that it pleases AGA
-	uint8_t m_separate_bitplanes[2][256];
+	// AGA adds extra complexity with PF2OFx, so we need to instantiate at init time
+	std::vector<uint8_t> m_separate_bitplanes[2];
 
 	/* aga */
 	int m_aga_diwhigh_written = 0;
@@ -429,11 +429,15 @@ public:
 	int m_aga_sprite_fetched_words = 0;
 	int m_aga_sprite_dma_used_words[8]{};
 
+	void video_start_common();
 	DECLARE_VIDEO_START( amiga );
 	DECLARE_VIDEO_START( amiga_aga );
 	void amiga_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	bool get_screen_standard();
+	int get_screen_vblank_line();
 	void update_screenmode();
 
 	TIMER_CALLBACK_MEMBER( scanline_callback );
@@ -627,6 +631,9 @@ protected:
 	void vposw_w(u16 data);
 	void bplcon0_w(u16 data);
 	void aga_bplcon0_w(u16 data);
+
+	// TODO: move to Lisa
+	void clxcon2_w(u16 data);
 
 private:
 	// blitter helpers

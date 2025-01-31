@@ -339,7 +339,7 @@ bool memorymoog_state::adc_comparator_on() const
 	if (m_selected_pot == 0)
 	{
 		LOGMASKED(LOG_ADC, "Comparator: %f %f %d %04x\n", v, dac_v, comp_on,
-		          m_dac_latch);
+				  m_dac_latch);
 	}
 	return comp_on;
 }
@@ -389,7 +389,7 @@ template<int N> u8 memorymoog_state::key_matrix_r(
 
 	if (pressed != 0xff)
 		LOGMASKED(LOG_KEYPRESS, "Pressed %s %02X: %02X\n", name, selection,
-		          pressed);
+				  pressed);
 
 	return pressed;  // Returned value is active-low.
 }
@@ -421,7 +421,7 @@ void memorymoog_state::update_sh()
 	m_cv[m_selected_sh] = cv;
 	// TODO: all autotune CVs are divided by a 115K-10K divider.
 	LOGMASKED(LOG_CV, "CV: %02d %-20s %04X - %f\n", m_selected_sh,
-	          CV_NAMES[m_selected_sh], m_dac_latch, cv);
+			  CV_NAMES[m_selected_sh], m_dac_latch, cv);
 }
 
 void memorymoog_state::keyboard_w(u8 data)
@@ -1134,4 +1134,3 @@ ROM_END
 
 // In production from 1982 to 1985.
 SYST(1982, memorymoog, 0, 0, memorymoog, memorymoog, memorymoog_state, empty_init, "Moog Music", "Memorymoog", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE)
-
