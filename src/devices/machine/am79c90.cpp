@@ -6,11 +6,10 @@
  * CMOS Local Area Network Controller for Ethernet (C-LANCE).
  *
  * Sources:
+ *  - Am7990 Local Area Network Controller for Ethernet (LANCE), Publication #05698, Rev. C, June 1990, Advanced Micro Devices
+ *  - Am79C90 CMOS Local Area Network Controller for Ethernet (C-LANCE), Publication #17881, Rev. C, January 1998, Advanced Micro Devices
  *
- *  http://bitsavers.org/components/amd/Am7990/Am7990.pdf
- *  http://bitsavers.org/components/amd/Am7990/Am79c90.pdf
- *
- * TODO
+ * TODO:
  *   - external loopback
  *   - hp9k/3xx diagnostic failures
  *
@@ -64,6 +63,7 @@ am7990_device_base::am7990_device_base(const machine_config &mconfig, device_typ
 	, m_intr_out_cb(*this)
 	, m_dma_in_cb(*this, 0)
 	, m_dma_out_cb(*this)
+	, m_interrupt(nullptr)
 	, m_transmit_poll(nullptr)
 	, m_intr_out_state(1)
 {
@@ -84,6 +84,7 @@ constexpr attotime am7990_device_base::TX_POLL_PERIOD;
 
 void am7990_device_base::device_start()
 {
+	m_interrupt = timer_alloc(FUNC(am7990_device_base::interrupt), this);
 	m_transmit_poll = timer_alloc(FUNC(am7990_device_base::transmit_poll), this);
 	m_transmit_poll->adjust(TX_POLL_PERIOD, 0, TX_POLL_PERIOD);
 
@@ -123,7 +124,12 @@ void am7990_device_base::device_reset()
 	update_interrupts();
 }
 
-void am7990_device_base::update_interrupts()
+void am7990_device_base::interrupt(s32 param)
+{
+	m_intr_out_cb(param);
+}
+
+void am7990_device_base::update_interrupts(attotime const delay)
 {
 	if (m_csr[0] & CSR0_INEA)
 	{
@@ -131,7 +137,7 @@ void am7990_device_base::update_interrupts()
 		if (bool(m_csr[0] & CSR0_INTR) == m_intr_out_state)
 		{
 			m_intr_out_state = !m_intr_out_state;
-			m_intr_out_cb(m_intr_out_state);
+			m_interrupt->adjust(delay, m_intr_out_state);
 
 			if (!m_intr_out_state)
 				LOG("interrupt asserted\n");
@@ -143,7 +149,7 @@ void am7990_device_base::update_interrupts()
 		if (!m_intr_out_state)
 		{
 			m_intr_out_state = !m_intr_out_state;
-			m_intr_out_cb(m_intr_out_state);
+			m_interrupt->adjust(delay, m_intr_out_state);
 		}
 	}
 }
@@ -543,6 +549,8 @@ void am7990_device_base::regs_w(offs_t offset, u16 data)
 	{
 		LOGMASKED(LOG_REG, "regs_w csr%d data 0x%04x (%s)\n", m_rap, data, machine().describe_context());
 
+		attotime delay = attotime::zero;
+
 		switch (m_rap)
 		{
 		case 0: // Control/Status
@@ -571,7 +579,17 @@ void am7990_device_base::regs_w(offs_t offset, u16 data)
 			if ((data & CSR0_INIT) && !(m_csr[0] & CSR0_INIT))
 			{
 				if (m_csr[0] & CSR0_STOP)
+				{
 					initialize();
+
+					/*
+					 * Initialization reads 12 words from the bus using single
+					 * word DMA transfers. Allow 2 cycles for bus acquisition
+					 * and release, plus 6 cycles for each single word DMA
+					 * transfer.
+					 */
+					delay = attotime::from_ticks((1 + 6 + 1) * 12, clock());
+				}
 				else
 					m_csr[0] |= m_idon ? CSR0_IDON : CSR0_INIT;
 			}
@@ -649,7 +667,7 @@ void am7990_device_base::regs_w(offs_t offset, u16 data)
 			else
 				m_csr[0] &= ~CSR0_INTR;
 
-			update_interrupts();
+			update_interrupts(delay);
 			break;
 
 		case 1: // Least significant 15 bits of the Initialization Block
