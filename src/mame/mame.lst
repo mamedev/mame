@@ -17580,6 +17580,7 @@ jongtei                         // "532" Mahjong Jong-Tei (C) 1999 Dynax
 jongteia                        // Mahjong Jong-Tei (C) 2000 Techno-Top
 kotbinsp                        // "909" 1997 Dynax / Shinwhajin
 kotbinyo                        // 1997 Dynax / Shinwhajin
+kotbinyosu                      // 1997 Dynax / Shinwhajin
 mjchuuka                        // "121" (c) 1998 Dynax
 mjdchuka                        // "111" (c) 1995 Nakanihon
 mjflove                         // "500" (c) 1996 Dynax
@@ -17983,6 +17984,9 @@ rpanic                          // (c) 1992 Excellent System / Jaleco
 
 @source:excellent/dblcrown.cpp
 dblcrown                        // (c) 1994 Excellent System
+
+@source:excellent/es8906.cpp
+dream9
 
 @source:excellent/es9501.cpp
 d9flower
@@ -29467,6 +29471,7 @@ castrev                         // Revolution
 @source:misc/cb2001.cpp
 cb2001                          // (c) 2000 Dyna Electronics
 cb4                             // (c) 1997 Dyna Electronics
+cb4a                            // (c) 1997 Dyna Electronics
 cb5                             // (c) 1997 Dyna Electronics
 cb5_11                          // (c) 1997 Dyna Electronics
 crzybell                        // (c) 1995 Dyna Electronics
@@ -32180,6 +32185,7 @@ fb2ndv1                         // (c) 2004 Amcoe
 fb2ndv2                         // (c) 2004 Amcoe
 fb3g                            // (c) 200? Amcoe - Fruit Bonus 3G
 fb4                             // (c) 2004 Amcoe - Fruit Bonus 2004
+fb4_14                          // (c) 2004 Amcoe
 fb4b2                           // (c) 2004 Amcoe
 fb4c1                           // (c) 2004 Amcoe
 fb4c2                           // (c) 2004 Amcoe
@@ -41840,6 +41846,7 @@ rezon                           // (c) 1992 Allumer
 rezono                          // (c) 1991 Allumer
 setaroul                        // UF   (c) 1989? Visco
 setaroula                       // hack (CODERE)
+setaroulm                       // UF   (c) 1989? Visco
 simpsonjr                       // bootleg of J. J. Squawkers by Daigom
 sokonuke                        // (c) 1995 Sammy Industries
 stg                             // (c) 1991 Athena / Tecmo

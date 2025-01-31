@@ -374,4 +374,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, mole, 0, mole, mole, mole_state, empty_init, ROT0, "Yachiyo Electronics, Ltd.", "Mole Attack", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mole, 0, mole, mole, mole_state, empty_init, ROT0, "Yachiyo Electronics", "Mole Attack", MACHINE_SUPPORTS_SAVE )
