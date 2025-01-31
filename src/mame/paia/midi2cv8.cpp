@@ -391,6 +391,6 @@ ROM_END
 
 } // anonymous namespace
 
-SYST(1997, midi2cv8, 0, 0, midi2cv8, midi2cv8, midi2cv8_state, empty_init, "PAiA Electronics", "midi2cv8", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE)
-SYST(1997, midi2cv8_vhz, 0, 0, midi2cv8_vhz, midi2cv8, midi2cv8_vhz_state, empty_init, "PAiA Electronics", "midi2cv8 V/Hz", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE)
+SYST(1997, midi2cv8, 0, 0, midi2cv8, midi2cv8, midi2cv8_state, empty_init, "PAiA Electronics", "midi2cv8", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE)
+SYST(1997, midi2cv8_vhz, 0, 0, midi2cv8_vhz, midi2cv8, midi2cv8_vhz_state, empty_init, "PAiA Electronics", "midi2cv8 V/Hz", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE)
 
