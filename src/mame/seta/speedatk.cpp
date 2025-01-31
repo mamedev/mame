@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese, Pierpaolo Prazzoli, Takahiro Nogi
+
 /**************************************************************************************************
 
 Dai-Fugo (c) 1983 Sega / Seta
@@ -9,17 +10,17 @@ driver by Pierpaolo Prazzoli & Angelo Salese, based on early work by David Haywo
 
 TODO:
  - Improve IOX device for daifugo (many hardwired reads);
- - It's possible that there is only one coin chute and not two,needs a real board to know
+ - It's possible that there is only one coin chute and not two, needs a real board to know
    more about it.
 
 How to play:
- - A to D selects a card.
+ - A to D select a card.
  - Turn takes one or more cards into your hand (depends on how many cards you
-   putted on the stacks).
+   put on the stacks).
  - Left & right puts a card on one of the two stacks.
 
 Notes:
- - According to the text gfx rom, there are also a Taito and a KKK versions out there.
+ - According to the text GFX ROM, there are also Taito and KKK versions out there.
 
 ===================================================================================================
 
@@ -111,16 +112,176 @@ DIPSW       8 Elements Switch Array x1
 **************************************************************************************************/
 
 #include "emu.h"
-#include "speedatk.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
+#include "video/mc6845.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 
-#define MASTER_CLOCK XTAL(12'000'000)
+namespace {
+
+class speedatk_state : public driver_device
+{
+public:
+	speedatk_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_crtc(*this, "crtc"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"),
+		m_coins(*this, "COINS"),
+		m_speedatk_input(*this, { "P1_ROW0", "P1_ROW1", "P2_ROW0", "P2_ROW1" }),
+		m_daifugo_input(*this, "PLAYER%u", 1U)
+	{ }
+
+	void speedatk(machine_config &config);
+	void daifugo(machine_config &config);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<mc6845_device> m_crtc;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+
+	required_ioport m_coins;
+	optional_ioport_array<4> m_speedatk_input;
+	optional_ioport_array<2> m_daifugo_input;
+
+	uint8_t m_crtc_vreg[0x100]{};
+	uint8_t m_crtc_index = 0;
+	uint8_t m_flip_scr = 0;
+	uint8_t m_mux_data = 0;
+	uint8_t m_km_status = 0;
+	uint8_t m_coin_settings = 0;
+	uint8_t m_coin_impulse = 0;
+
+	uint8_t key_matrix_r();
+	void key_matrix_w(uint8_t data);
+	uint8_t daifugo_key_matrix_r();
+	uint8_t key_matrix_status_r();
+	void key_matrix_status_w(uint8_t data);
+	void m6845_w(offs_t offset, uint8_t data);
+	void output_w(uint8_t data);
+
+	void palette_init(palette_device &palette) const;
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	uint8_t iox_key_matrix_calc(uint8_t p_side);
+
+	void io_map(address_map &map) ATTR_COLD;
+	void speedatk_program_map(address_map &map) ATTR_COLD;
+	void daifugo_program_map(address_map &map) ATTR_COLD;
+};
+
+
+/*****************************************************************************************
+
+ Speed Attack video hardware emulation
+
+*****************************************************************************************/
+
+void speedatk_state::palette_init(palette_device &palette) const
+{
+	uint8_t const *color_prom = memregion("proms")->base();
+
+	// create a lookup table for the palette
+	for (int i = 0; i < 0x10; i++)
+	{
+		int bit0, bit1, bit2;
+
+		// red component
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		// green component
+		bit0 = BIT(color_prom[i], 3);
+		bit1 = BIT(color_prom[i], 4);
+		bit2 = BIT(color_prom[i], 5);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		// blue component
+		bit0 = 0;
+		bit1 = BIT(color_prom[i], 6);
+		bit2 = BIT(color_prom[i], 7);
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		palette.set_indirect_color(i, rgb_t(r, g, b));
+	}
+
+	// color_prom now points to the beginning of the lookup table
+	color_prom += 0x20;
+
+	for (int i = 0; i < 0x100; i++)
+	{
+		uint8_t const ctabentry = color_prom[i] & 0x0f;
+		palette.set_pen_indirect(i, ctabentry);
+	}
+}
+
+void speedatk_state::video_start()
+{
+	save_item(NAME(m_crtc_vreg));
+	save_item(NAME(m_crtc_index));
+	save_item(NAME(m_flip_scr));
+}
+
+void speedatk_state::m6845_w(offs_t offset, uint8_t data)
+{
+	if (offset == 0)
+	{
+		m_crtc_index = data;
+		m_crtc->address_w(data);
+	}
+	else
+	{
+		m_crtc_vreg[m_crtc_index] = data;
+		m_crtc->register_w(data);
+	}
+}
+
+uint32_t speedatk_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(rgb_t::black(), cliprect);
+
+	int count = (m_crtc_vreg[0x0c] << 8) | (m_crtc_vreg[0x0d] & 0xff);
+
+	if (m_flip_scr) { count = 0x3ff - count; }
+
+	for (int y = 0; y < m_crtc_vreg[6]; y++)
+	{
+		for (int x = 0; x < m_crtc_vreg[1]; x++)
+		{
+			uint16_t const tile = m_videoram[count] + ((m_colorram[count] & 0x60) << 3);
+			uint8_t const color = m_colorram[count] & 0x1f;
+			uint8_t const region = (m_colorram[count] & 0x80) >> 7;
+
+			m_gfxdecode->gfx(region)->opaque(bitmap, cliprect, tile, color, m_flip_scr, m_flip_scr, x * 8, y * 8);
+
+			count = (m_flip_scr) ? count - 1 : count + 1;
+			count &= 0x3ff;
+		}
+	}
+
+	return 0;
+}
+
 
 void speedatk_state::machine_start()
 {
@@ -134,17 +295,13 @@ void speedatk_state::machine_start()
 
 uint8_t speedatk_state::iox_key_matrix_calc(uint8_t p_side)
 {
-	static const char *const keynames[] = { "P1_ROW0", "P1_ROW1", "P2_ROW0", "P2_ROW1" };
-
-	int i, j, t;
-
-	for (i = 0x00 ; i < 0x10 ; i += 8)
+	for (int i = 0x00; i < 0x10; i += 8)
 	{
-		j = (i / 0x08);
+		int const j = (i / 0x08);
 
-		for (t = 0 ; t < 8 ; t ++)
+		for (int t = 0; t < 8; t++)
 		{
-			if (!(ioport(keynames[j+p_side])->read() & ( 1 << t )))
+			if (!(m_speedatk_input[j + p_side]->read() & ( 1 << t )))
 			{
 				return (i + t) | (p_side ? 0x20 : 0x00);
 			}
@@ -156,62 +313,59 @@ uint8_t speedatk_state::iox_key_matrix_calc(uint8_t p_side)
 
 uint8_t speedatk_state::key_matrix_r()
 {
-	if(m_coin_impulse > 0)
+	if (m_coin_impulse > 0)
 	{
 		m_coin_impulse--;
 		return 0x80;
 	}
 
-	if((ioport("COINS")->read() & 1) || (ioport("COINS")->read() & 2))
+	if ((m_coins->read() & 1) || (m_coins->read() & 2))
 	{
 		m_coin_impulse = m_coin_settings;
 		m_coin_impulse--;
 		return 0x80;
 	}
 
-	if(m_mux_data != 1 && m_mux_data != 2 && m_mux_data != 4)
+	if (m_mux_data != 1 && m_mux_data != 2 && m_mux_data != 4)
 		return 0xff; //unknown command
 
-	/* both side checks */
-	if(m_mux_data == 1)
+	// both side checks
+	if (m_mux_data == 1)
 	{
 		uint8_t p1_side = iox_key_matrix_calc(0);
 		uint8_t p2_side = iox_key_matrix_calc(2);
 
-		if(p1_side != 0)
+		if (p1_side != 0)
 			return p1_side;
 
 		return p2_side;
 	}
 
-	/* check individual input side */
+	// check individual input side
 	return iox_key_matrix_calc((m_mux_data == 2) ? 0 : 2);
 }
 
 uint8_t speedatk_state::daifugo_key_matrix_r()
 {
-	if(m_coin_impulse > 0)
+	if (m_coin_impulse > 0)
 	{
 		m_coin_impulse--;
 		return 0x80;
 	}
 
-	if(ioport("COINS")->read() & 1)
+	if (m_coins->read() & 1)
 	{
 		m_coin_impulse = m_coin_settings;
 		m_coin_impulse--;
 		return 0x80;
 	}
 
-	static const char *const keynames[] = { "PLAYER1", "PLAYER2" };
-
-	int i;
-	const uint8_t player_side = (m_mux_data >> 2) & 1;
+	uint8_t const player_side = (m_mux_data >> 2) & 1;
 
 	// key matrix check and change binary digit to decimal number
-	for (i = 0 ; i < 16 ; i++)
+	for (int i = 0; i < 16; i++)
 	{
-		if (ioport(keynames[player_side])->read() & (1 << i))
+		if (m_daifugo_input[player_side]->read() & (1 << i))
 		{
 			return (i + 1);
 		}
@@ -225,17 +379,17 @@ void speedatk_state::key_matrix_w(uint8_t data)
 	m_mux_data = data;
 }
 
-/* Key matrix status,used for coin settings and I don't know what else... */
+// Key matrix status,used for coin settings and I don't know what else...
 uint8_t speedatk_state::key_matrix_status_r()
 {
-	/* bit 0: busy flag,active low */
+	// bit 0: busy flag, active low
 	return (m_km_status & 0xfe) | 1;
 }
 
 /*
 xxxx ---- command
 ---- xxxx param
-My guess is that the other commands configs the key matrix, it probably needs some tests on the real thing.
+My guess is that the other commands configure the key matrix, it probably needs some tests on the real thing.
 1f
 3f
 41
@@ -246,24 +400,24 @@ a1
 void speedatk_state::key_matrix_status_w(uint8_t data)
 {
 	m_km_status = data;
-	if((m_km_status & 0xf0) == 0x80) //coinage setting command
+	if ((m_km_status & 0xf0) == 0x80) //coinage setting command
 		m_coin_settings = m_km_status & 0xf;
 }
 
-void speedatk_state::speedatk_mem(address_map &map)
+void speedatk_state::speedatk_program_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x8000).rw(FUNC(speedatk_state::key_matrix_r), FUNC(speedatk_state::key_matrix_w));
 	map(0x8001, 0x8001).rw(FUNC(speedatk_state::key_matrix_status_r), FUNC(speedatk_state::key_matrix_status_w));
 	map(0x8588, 0x858f).nopr(); // speedatk only
 	map(0x8800, 0x8fff).ram();
-	map(0xa000, 0xa3ff).ram().share("videoram");
-	map(0xb000, 0xb3ff).ram().share("colorram");
+	map(0xa000, 0xa3ff).ram().share(m_videoram);
+	map(0xb000, 0xb3ff).ram().share(m_colorram);
 }
 
-void speedatk_state::daifugo_mem(address_map &map)
+void speedatk_state::daifugo_program_map(address_map &map)
 {
-	speedatk_mem(map);
+	speedatk_program_map(map);
 	map(0x8000, 0x8000).rw(FUNC(speedatk_state::daifugo_key_matrix_r), FUNC(speedatk_state::key_matrix_w));
 	map(0x8001, 0x8001).lr8(NAME([] (offs_t offset) {
 		// TODO: bit 1 seems to be a busy flag, will throw a "BAD CSTM 2" if that is high.
@@ -287,7 +441,7 @@ void speedatk_state::daifugo_mem(address_map &map)
 	}));
 }
 
-void speedatk_state::speedatk_io(address_map &map)
+void speedatk_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x01).w(FUNC(speedatk_state::m6845_w)); //h46505 address / data routing
@@ -297,6 +451,7 @@ void speedatk_state::speedatk_io(address_map &map)
 	map(0x60, 0x68).noprw();
 	//what's 60-6f for? Seems used only in attract mode and read back when a 2p play ends ...
 }
+
 
 static INPUT_PORTS_START( daifugo )
 	PORT_START("DSW")
@@ -432,6 +587,7 @@ static INPUT_PORTS_START( speedatk )
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)
 INPUT_PORTS_END
 
+
 static const gfx_layout charlayout_1bpp =
 {
 	8,8,
@@ -448,24 +604,26 @@ static GFXDECODE_START( gfx_speedatk )
 	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x3_planar,  0, 32 )
 GFXDECODE_END
 
+
 void speedatk_state::output_w(uint8_t data)
 {
 	m_flip_scr = data & 0x80;
 
-	if((data & 0x7f) != 0x7f)
-		logerror("%02x\n",data);
+	if ((data & 0x7f) != 0x7f)
+		logerror("output_w: %02x\n", data);
 }
+
 
 void speedatk_state::speedatk(machine_config &config)
 {
-	Z80(config, m_maincpu, MASTER_CLOCK/4); //divider is unknown
-	m_maincpu->set_addrmap(AS_PROGRAM, &speedatk_state::speedatk_mem);
-	m_maincpu->set_addrmap(AS_IO, &speedatk_state::speedatk_io);
+	Z80(config, m_maincpu, 12_MHz_XTAL / 4); //divider is unknown
+	m_maincpu->set_addrmap(AS_PROGRAM, &speedatk_state::speedatk_program_map);
+	m_maincpu->set_addrmap(AS_IO, &speedatk_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(speedatk_state::irq0_line_hold));
 
 	WATCHDOG_TIMER(config, "watchdog"); // timing is unknown
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -473,18 +631,18 @@ void speedatk_state::speedatk(machine_config &config)
 	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
 	screen.set_screen_update(FUNC(speedatk_state::screen_update));
 
-	HD6845S(config, m_crtc, MASTER_CLOCK/16);   /* HD46505SP/HD6845SP; hand tuned to get ~60 fps */
+	HD6845S(config, m_crtc, 12_MHz_XTAL / 16);   // HD46505SP/HD6845SP; hand tuned to get ~60 fps
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_speedatk);
-	PALETTE(config, m_palette, FUNC(speedatk_state::speedatk_palette), 0x100, 16);
+	PALETTE(config, m_palette, FUNC(speedatk_state::palette_init), 0x100, 16);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", MASTER_CLOCK/8)); //divider is unknown
+	ay8910_device &aysnd(AY8910(config, "aysnd", 12_MHz_XTAL / 8)); //divider is unknown
 	aysnd.port_b_read_callback().set_ioport("DSW");
 	aysnd.port_a_write_callback().set(FUNC(speedatk_state::output_w));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.5);
@@ -493,8 +651,9 @@ void speedatk_state::speedatk(machine_config &config)
 void speedatk_state::daifugo(machine_config &config)
 {
 	speedatk(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &speedatk_state::daifugo_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &speedatk_state::daifugo_program_map);
 }
+
 
 ROM_START( daifugo )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -529,13 +688,16 @@ ROM_START( speedatk )
 	ROM_REGION( 0x6000, "gfx2", 0 )
 	ROM_LOAD( "cb0-5",        0x0000, 0x2000, CRC(47a966e7) SHA1(fdaa0f88656afc431bae367679ce6298fa962e0f) )
 	ROM_LOAD( "cb0-6",        0x2000, 0x2000, CRC(cc1da937) SHA1(1697bb008bfa5c33a282bd470ac39c324eea7509) )
-	ROM_COPY( "gfx2",         0x0000, 0x4000, 0x1000 ) /* Fill the blank space with cards gfx */
-	ROM_COPY( "gfx1",         0x1000, 0x5000, 0x1000 ) /* Gfx from cb0-7 */
+	ROM_COPY( "gfx2",         0x0000, 0x4000, 0x1000 ) // Fill the blank space with cards GFX
+	ROM_COPY( "gfx1",         0x1000, 0x5000, 0x1000 ) // GFX from cb0-7
 
 	ROM_REGION( 0x0120, "proms", 0 )
-	ROM_LOAD( "cb1.bpr",      0x0000, 0x0020, CRC(a0176c23) SHA1(133fb9eef8a6595cac2dcd7edce4789899a59e84) ) /* color PROM */
-	ROM_LOAD( "cb2.bpr",      0x0020, 0x0100, CRC(a604cf96) SHA1(a4ef6e77dcd3abe4c27e8e636222a5ee711a51f5) ) /* lookup table */
+	ROM_LOAD( "cb1.bpr",      0x0000, 0x0020, CRC(a0176c23) SHA1(133fb9eef8a6595cac2dcd7edce4789899a59e84) ) // color PROM
+	ROM_LOAD( "cb2.bpr",      0x0020, 0x0100, CRC(a604cf96) SHA1(a4ef6e77dcd3abe4c27e8e636222a5ee711a51f5) ) // lookup table
 ROM_END
 
-GAME( 1983, daifugo, 0,  daifugo,  daifugo,  speedatk_state, empty_init, ROT90, "Seta Kikaku / Sega (Esco Trading Co license)", "Daifugo (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1984, speedatk, 0, speedatk, speedatk, speedatk_state, empty_init, ROT0,  "Seta Kikaku", "Speed Attack! (Japan)", MACHINE_SUPPORTS_SAVE )
+} // anonymous namespace
+
+
+GAME( 1983, daifugo,  0, daifugo,  daifugo,  speedatk_state, empty_init, ROT90, "Seta Kikaku / Sega (Esco Trading Co license)", "Daifugo (Japan)",       MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1984, speedatk, 0, speedatk, speedatk, speedatk_state, empty_init, ROT0,  "Seta Kikaku",                                  "Speed Attack! (Japan)", MACHINE_SUPPORTS_SAVE )

@@ -30666,6 +30666,7 @@ theglob3
 beastf
 
 @source:misc/esd16.cpp
+<<<<<<< HEAD
 deluxe5
 deluxe5a
 deluxe5b
@@ -30688,6 +30689,29 @@ multchmpa
 multchmpk
 swatpolc
 tangtang
+=======
+deluxe5                         // (c) 2000 ESD
+deluxe5a                        // (c) 2000 ESD
+deluxe5b                        // (c) 2000 ESD
+deluxe4u                        // (c) 2000 ESD
+fantstry                        // (c) 2002 Z Soft
+fantstrya                       // (c) 2002 Z Soft
+hedpanic                        // (c) 2000 ESD
+hedpanic830                     // (c) 1999 ESD
+hedpanica                       // (c) 1999 ESD
+hedpanicf                       // (c) 2000 ESD + Fuuki, Co. Ltd.
+hedpanico                       // (c) 1999 ESD
+jumppop                         // (c) 2001 ESD
+jumppope                        // (c) 2001 Emag Soft (on original ESD 11-09-98 hardware)
+mchampdx                        // (c) 1999 ESD
+mchampdxa                       // (c) 1999 ESD
+mchampdxb                       // (c) 1999 ESD
+multchmp                        // (c) 1999 (World)
+multchmpa                       // (c) 1998 (World)
+multchmpk                       // (c) 1998 (Korea)
+swatpolc                        // (c) 2001 ESD
+tangtang                        // (c) 2000 ESD
+>>>>>>> 022c0f32eea (New clones marked not working)
 
 @source:misc/esh.cpp
 esh
