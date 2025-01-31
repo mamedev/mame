@@ -243,7 +243,7 @@ public:
 	uint32_t op_decay_rate(uint32_t opoffs) const    { return byte(0x60, 0, 4, opoffs); }
 	uint32_t op_sustain_level(uint32_t opoffs) const { return byte(0x80, 4, 4, opoffs); }
 	uint32_t op_release_rate(uint32_t opoffs) const  { return byte(0x80, 0, 4, opoffs); }
-	uint32_t op_waveform(uint32_t opoffs) const      { return (IsOpl2Plus && waveform_enable()) ? byte(0xe0, 0, newflag() ? 3 : 2, opoffs) : 0; }
+	uint32_t op_waveform(uint32_t opoffs) const      { return waveform_enable() ? byte(0xe0, 0, newflag() ? 3 : 2, opoffs) : 0; }
 
 protected:
 	// return a bitfield extracted from a byte
