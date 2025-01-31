@@ -458,7 +458,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="barcode" value="0 31719 20990 3"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="4 wheel thunder (usa)" sha1="023e6d8c232ae0ef22b0315ff7a8f14ad5f686fc"/>
+				<disk name="4 wheel thunder (usa)" sha1="4852db60cda2b22a15e11dce047a1d080b629e72"/>
 			</diskarea>
 		</part>
 	</software>
@@ -530,7 +530,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="barcode" value="6 63593 12014 4"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="4x4 evo (usa)" sha1="fc8c5e09e1f6902a52fc79ae54392d700be6fdad"/>
+				<disk name="4x4 evo (usa)" sha1="2ade88e88f99c27362b68608d2983729994cf0b8"/>
 			</diskarea>
 		</part>
 	</software>
@@ -592,7 +592,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="barcode" value="0 10086 51064 5"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="18 wheeler american pro trucker (usa)" sha1="c03adc04607282f755d10abb9b69975b74b25869"/>
+				<disk name="18 wheeler american pro trucker (usa)" sha1="59b96c6f851e9698ae920d80e7ba88ba02eabe8c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -636,7 +636,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="ring_code" value="&lt;HDR-0080-0529&gt;HK919C"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="18 wheeler american pro trucker (jpn)" sha1="a385da8a0d05c8df88774f8f4417342d126f40b8"/>
+				<disk name="18 wheeler american pro trucker (jpn)" sha1="c874cd4c18f709d737702d5d48e566dd9aa26a0a"/>
 			</diskarea>
 		</part>
 	</software>
@@ -703,7 +703,7 @@ Black screen [GDROM]
 		<info name="barcode" value="4 560101 361036"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="21 two one (jpn)" sha1="46468591b751dab05b8fcc92e8d02959b3b11d9c"/>
+				<disk name="21 two one (jpn)" sha1="68fde82b29cf1d12f169240910290bece4aa25dd"/>
 			</diskarea>
 		</part>
 	</software>
@@ -724,7 +724,7 @@ Black screen [GDROM]
 		<info name="ring_code" value="MK-51190-0478SS EMI CD HOLLAND   @ 2"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="90 minutes sega championship football (euro)" sha1="295606d64f2700d497b640df7d6d56beb6fc4889"/>
+				<disk name="90 minutes sega championship football (euro)" sha1="7b08c41c6313df96e7a1ca0a662e9133af5cf187"/>
 			</diskarea>
 		</part>
 	</software>
@@ -777,7 +777,7 @@ Punts to BIOS at start of loading [GDROM READY] (fixed)
 		<info name="barcode" value="4 974365 501587"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="advanced daisenryaku 2001 (jpn)" sha1="6a5aad10b604951e8ad1506d1c0e97fb3d4070df"/>
+				<disk name="advanced daisenryaku 2001 (jpn)" sha1="d7e78aec9e907a84866ddd8e570f251842b0319b"/>
 			</diskarea>
 		</part>
 	</software>
@@ -803,7 +803,7 @@ Punts to BIOS at start of loading [GDROM READY] (fixed)
 		<info name="barcode" value="4 974365 500665"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="advanced daisenryaku sturm uber europa - der deutsche blitzkrieg (jpn)" sha1="665a179438e4da74267acfc5e808bfbf883ad124"/>
+				<disk name="advanced daisenryaku sturm uber europa - der deutsche blitzkrieg (jpn)" sha1="34b0f9b0a12b8ec6cd37956d7f760d9c92535cfd"/>
 			</diskarea>
 		</part>
 	</software>
@@ -827,7 +827,7 @@ Punts to BIOS at start of loading [GDROM READY] (fixed)
 		<info name="barcode" value="4 981670 208605"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="aero dancing i (jpn)" sha1="afa616065462af5ad362b0599c320d82a2e27b42"/>
+				<disk name="aero dancing i (jpn)" sha1="89bc7b2a8102bf00ec2b7915446f7e4093f91f7b"/>
 			</diskarea>
 		</part>
 	</software>
@@ -851,7 +851,7 @@ Punts to BIOS at start of loading [GDROM READY] (fixed)
 		<info name="barcode" value="4 981670 209008"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="aero dancing i jikai-saku made matemasen (jpn)" sha1="a06d7f06ba0b94785ea40cbd29119ba1061a738f"/>
+				<disk name="aero dancing i jikai-saku made matemasen (jpn)" sha1="b8b7885b1a970b3e5f9856d2207d8325af3cd0a6"/>
 			</diskarea>
 		</part>
 	</software>
@@ -872,7 +872,7 @@ Punts to BIOS at start of loading [GDROM READY] (fixed)
 		<info name="barcode" value="6 50008 79913 2"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="aerowings (usa)" sha1="73094cec1b4bd3b264832d7400d85a381471acda"/>
+				<disk name="aerowings (usa)" sha1="f97ef130e0e6d20ff686176981019503bab1bf0f"/>
 			</diskarea>
 		</part>
 	</software>
@@ -938,7 +938,7 @@ Punts to BIOS at start of loading [GDROM READY] (fixed)
 		<info name="barcode" value="4 981670 208209"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="aero dancing todoroki taichou no himitsu disc (jpn)" sha1="1006fbc3b55c5dca5aa1dba71d926ac59564b275"/>
+				<disk name="aero dancing todoroki taichou no himitsu disc (jpn)" sha1="0b2cfcad53608c399e854b38d4143430483e653e"/>
 			</diskarea>
 		</part>
 	</software>
@@ -974,7 +974,7 @@ Punts to BIOS at start of loading [GDROM READY] (fixed)
 		<info name="barcode" value="6 50008 79921 7"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="aerowings 2 airstrike (usa)" sha1="2cb80043518a27527432799636f1ad1ff451d472"/>
+				<disk name="aerowings 2 airstrike (usa)" sha1="c4d6c0467a42e78ba10f1d37dc86e6b6eaaa5d0a"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1084,7 +1084,7 @@ Punts to BIOS at start of loading [GDROM READY] (fixed)
 		<info name="barcode" value="4 981670 208407"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="aero dancing f todoroki tsubasa no hatsu hikou (jpn)" sha1="61d31e4edb69f054693d42b176b1917beeec659b"/>
+				<disk name="aero dancing f todoroki tsubasa no hatsu hikou (jpn)" sha1="f8cd4b0de87c4e786097fa10481922a6d37a8460"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1153,7 +1153,7 @@ Punts to BIOS at start of loading [GDROM READY], locks up (fixed)
 		<part interface="cdrom" name="cdrom1">
 			<feature name="part_id" value="After...: Wasureenu Kizuna"/>
 			<diskarea name="cdrom">
-				<disk name="after... wasureenu kizuna (jpn)" sha1="4ca05216dd45b9a5218186e7c2c0b5cd0be76d13"/>
+				<disk name="after... wasureenu kizuna (jpn)" sha1="7a0996757c21bcaafd830a5faae235b069c8e72d"/>
 			</diskarea>
 		</part>
 		<part interface="dc_cdrom" name="cdrom2">
@@ -1206,7 +1206,7 @@ Punts to BIOS at start of loading [GDROM]
 		<info name="barcode" value="4 513244 900884"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="aikagi hidamari to kanojo no heyagi (jpn)" sha1="13e335cf3ed86fbdbcbac4f3f59c1d05c1056a84"/>
+				<disk name="aikagi hidamari to kanojo no heyagi (jpn)" sha1="d803288952774eaba27a81394400b68164a9f907"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1230,7 +1230,7 @@ Punts to BIOS at start of loading [GDROM READY] (fixed)
 		<info name="ring_code" value="T-20112M-0752A   10MM1   C   19, T-20112M-0752A   11M4   C   19, T-20112M-0752A   12M1   C   19"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="air (jpn, rev. a)" sha1="7e17b8331ac245ee22e9150922058cee580ff113"/>
+				<disk name="air (jpn, rev. a)" sha1="4144ef52ba7ddca4e937f6529913e30a468b4492"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1689,10 +1689,10 @@ Punts to BIOS at start of loading [GDROM READY] (fixed)
 		<!--
 		<rom name="ALIENFRONT_ONLINE.gdi" size="143" md5="0a3db521ea34e40a63967a0108d4bc78" sha1="397340cf23de1f66776741a3b9da8914c9b48203"/>
 		<rom name="track01.iso" size="921600" md5="98de8e5db931c9106cbf5c53b75f7cc7" sha1="5e23b9e4a63d4720e114bc777640bd65f0edca9b"/>
-		<rom name="track02.raw" size="13 994 400" md5="a55424800b9a45851b3670fa8afbf6a9" sha1="6cd6c33fc86f008d87f9d4385371e5df684c4c60"/>
-		<rom name="track03.iso" size="876 550 144" md5="17f9a991a2b7758f5ae1b2c2a08adb65" sha1="e99bcff45222f59148463dab5833ddf5e8aa93bd"/>
-		<rom name="track04.raw" size="13 818 000" md5="52d4f2952f4aca03f15d23825f5609b0" sha1="b00cc2ffa6abbd0908675ced977586fd9111d881"/>
-		<rom name="track05.iso" size="143 302 656" md5="d4ca27065a01df92300d240093d61ff5" sha1="2db3177f076caaa5e779a70f1ba546ac1b709e26"/>
+		<rom name="track02.raw" size="13994400" md5="a55424800b9a45851b3670fa8afbf6a9" sha1="6cd6c33fc86f008d87f9d4385371e5df684c4c60"/>
+		<rom name="track03.iso" size="876550144" md5="17f9a991a2b7758f5ae1b2c2a08adb65" sha1="e99bcff45222f59148463dab5833ddf5e8aa93bd"/>
+		<rom name="track04.raw" size="13818000" md5="52d4f2952f4aca03f15d23825f5609b0" sha1="b00cc2ffa6abbd0908675ced977586fd9111d881"/>
+		<rom name="track05.iso" size="143302656" md5="d4ca27065a01df92300d240093d61ff5" sha1="2db3177f076caaa5e779a70f1ba546ac1b709e26"/>
 		-->
 		<description>Alien Front Online (USA, prototype 20010625)</description>
 		<year>2001</year>
@@ -1925,7 +1925,7 @@ Punts to BIOS at start of loading [GDROM READY] (fixed)
 		<info name="barcode" value="4 988658 041148"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="angel wish kimi no egao ni chu (jpn)" sha1="65c1da4807da03a1600219f5d90d8b725d190e98"/>
+				<disk name="angel wish kimi no egao ni chu (jpn)" sha1="9979bec207a0fbb9d1e1240ff2d569dc908677cd"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2170,7 +2170,7 @@ Optional [BBA] support
 		<info name="barcode" value="4 974365 501211"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="atsumare guru guru onsen bb (jpn)" sha1="d03900d542524f937ac8ab4d7e9a9b60063f7c49"/>
+				<disk name="atsumare guru guru onsen bb (jpn)" sha1="f882d15f60efe7c658e7ba2756c720efec4249af"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2454,7 +2454,7 @@ Black screen [GDROM READY] (fixed)
 		<info name="barcode" value="4 959359 009010"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="bass rush dream ecogear powerworm championship (jpn)" sha1="5600ccd51aaa3e2417ea51980a0033cc54b55350"/>
+				<disk name="bass rush dream ecogear powerworm championship (jpn)" sha1="94b6e4e503066f9412b939de4816afd2b5898fa9"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2476,7 +2476,7 @@ Black screen [GDROM READY] (fixed)
 		<info name="barcode" value="4 541823 000014"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="battle beaster (jpn)" sha1="9df8e6349fda2fe264f0f0536b38f77296ace077"/>
+				<disk name="battle beaster (jpn)" sha1="11ff4bbb2cd5f47e50ee7e7a64eb6978ad347c6e"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2627,7 +2627,11 @@ Black screen [GDROM READY] (fixed)
 	</software>
 
 	<software name="revilcvs" cloneof="revilcv" supported="no"> <!-- ELSPA Rating: 15+ -->
-		<!-- http://redump.org/disc/17364/
+		<!-- http://redump.org/disc/17364/ http://redump.org/disc/62968/
+		<rom name="Resident Evil - Code - Veronica (Spain) (Disc 1).cue" size="438" crc="4a381e1f" md5="1a2f9b05bb4327a9d8a4cb3dd0dd4f31" sha1="2015027657fc79fee0f0ab9c3be3e18f10770e21"/>
+		<rom name="Resident Evil - Code - Veronica (Spain) (Disc 1) (Track 1).bin" size="705600" crc="df4ce28a" md5="d15f4196c90da354d84875f0beae97b2" sha1="f7ca8308d5ec5bd3988f89497611162c22053241"/>
+		<rom name="Resident Evil - Code - Veronica (Spain) (Disc 1) (Track 2).bin" size="14347200" crc="49e43706" md5="9cca4624e62f04dc398aed22b5370a34" sha1="a34bdc73ac1e360b13d0592b501a388e0225e994"/>
+		<rom name="Resident Evil - Code - Veronica (Spain) (Disc 1) (Track 3).bin" size="1185760800" crc="01ca4c1e" md5="d166f9dc96ecdb7c13b582315ab74a9d" sha1="c5a1ca3b825753d364d08bec108114812c75f7ac"/>
 		<rom name="Resident Evil - Code - Veronica (Spain) (Disc 2).gdi" size="252" crc="48f963f7" md5="a0ad564b88414a4f4fc6b0858f063e26" sha1="f2716d204174c807c2b560d7e794a1129e9b353e"/>
 		<rom name="Resident Evil - Code - Veronica (Spain) (Disc 2) (Track 1).bin" size="705600" crc="8ef6567f" md5="28b2d0e26e3e95dedfee7da075ecd984" sha1="b35b37fd7577152e659f7e2438f50e57989cef95"/>
 		<rom name="Resident Evil - Code - Veronica (Spain) (Disc 2) (Track 2).bin" size="14347200" crc="49e43706" md5="9cca4624e62f04dc398aed22b5370a34" sha1="a34bdc73ac1e360b13d0592b501a388e0225e994"/>
@@ -3109,33 +3113,6 @@ Black screen [GDROM READY] (fixed)
 
 	<!-- The Limited Edition (T-23204M) comes in a cardboard slipcase and includes an audio CD. -->
 	<software name="bsbsg" supported="no"> <!-- cloneof="bsb" --> <!-- Sega Rating: Suitable for All Ages -->
-		<!-- http://redump.org/disc/43713/ http://redump.org/disc/43714/
-		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan).gdi" size="243" crc="3494ccc6" md5="aede4489a8f62e9146a5d489110993da" sha1="ecacde76f17665539d69629c14d52218cb42766a"/>
-		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Track 1).bin" size="2241456" crc="e607e01e" md5="93ae63a963ad44c86a023dafde9a63f1" sha1="b47a76464907cbd06ddf85345950f145782d00ba"/>
-		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Track 2).bin" size="2302608" crc="a9684d33" md5="3a23931b29da109b04737c79cbcc18fc" sha1="1312a9ce85a306e731945dc0e97a047b2a7c6187"/>
-		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Track 3).bin" size="1185760800" crc="2b4761b8" md5="25661323f8169f3a858c572c50505741" sha1="4ac729f5d37e58297685e90400344f2d8d540413"/>
-
-		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc).cue" size="2980" crc="5176f2bd" md5="cf5af18977c8f650cf103f8b62d7d610" sha1="1b9e6cd5ef4d6dd3fe4212f15dcf1dab41c4f5d1"/>
-		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 01).bin" size="30256128" crc="f13a49c0" md5="cf6a65a5874bde5174153b9f44bf75ff" sha1="d72744889f392797019405ffc38f70fc03c882d6"/>
-		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 02).bin" size="39160800" crc="ff625132" md5="bb45164bd996f7a5918dca98c7f510b1" sha1="e84ea9db7b053aad7ed86da027275eed15f92643"/>
-		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 03).bin" size="30766512" crc="beaac766" md5="91a63fb269a422f4b89a818f92851d9d" sha1="2ef278fa1255baf0e5a552cd2c1022f690751c7d"/>
-		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 04).bin" size="37841328" crc="fb2d9523" md5="5da6018aaa45df398f247dbad0c8f446" sha1="989dc309e26149caabf80d89e2461e1dde8f086d"/>
-		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 05).bin" size="33969936" crc="6a9a3c8c" md5="217d2824b8153dedb7be876970cd73b2" sha1="03663948ac4ea2bd26593685cb24fbe2d15b6a47"/>
-		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 06).bin" size="36665328" crc="72ca0449" md5="6d1cbe32b3afbd2bcaca89d5fb0dcd32" sha1="47702b78b0537905274c28130b60aaaed0b6b3d4"/>
-		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 07).bin" size="59112816" crc="26e85858" md5="81da242a0a6db96323b5ebe02a298c47" sha1="76c91a26c1d40c8518e78d4dddb1b6a094ca1a89"/>
-		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 08).bin" size="33741792" crc="6546438e" md5="a69746ef7f28c21b36d39e264f0eb98b" sha1="223735acf40887e269b6f9cd42282ae8a2284b5b"/>
-		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 09).bin" size="25314576" crc="77bade60" md5="a3e441a9773372decffc5b1c027c9a44" sha1="6309d25465abc1cda6fe0c237be8faff91949f6f"/>
-		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 10).bin" size="22221696" crc="78462bea" md5="64e3e50edee72c30305f7a0952eb3f1e" sha1="e6ffa2ed8f426025f2217d0b4fb80875dbcdd3bf"/>
-		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 11).bin" size="24658368" crc="aeaf98c3" md5="6c46a930a4deb53ff47bfa2d49de22dd" sha1="e63b7903ab04a138de173d1da4a6118b10452100"/>
-		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 12).bin" size="29795136" crc="44cf0fb1" md5="ff901027f4e5063b212557465cb1af2d" sha1="d95e2cffb9c567155f0d5696ae4066d0639fe384"/>
-		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 13).bin" size="26949216" crc="a2a005c2" md5="6ce241f09e4a642ea700fb86e750a153" sha1="4b43f1c073ac6c4234e8f4028ba966b93c97d7a3"/>
-		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 14).bin" size="29178912" crc="a7a88154" md5="a50f7d6ac781e739daa545608aa8a537" sha1="a106d87dc12b6f9cb6d36e301f7b3652fdf40427"/>
-		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 15).bin" size="27588960" crc="1f62e7cc" md5="543405c953245e435ebb859fe1eaced0" sha1="51dc821f46e60e2b944f3505a39e709a10ca1fdc"/>
-		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 16).bin" size="28235760" crc="32960115" md5="8be1a4af370d6052c2e5830fed4a9590" sha1="0837d5ea79725c2d034a56413713735b2f8ed454"/>
-		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 17).bin" size="41451648" crc="4ffb5d5c" md5="ef86e59cf1541cc0adea62ffd58922c9" sha1="1d7622ed63faa74aecf37d90bae119925da7733e"/>
-		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 18).bin" size="44156448" crc="723bb275" md5="f5ba54c98bf560c2ff7c2b418ce45e93" sha1="10512f01d713ff423b20656bce2c9322a5ea463e"/>
-		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 19).bin" size="37808400" crc="f66551d7" md5="c1dfc917f08848a0c85c839a7a65c7ec" sha1="d49046c4381471bd23e6c1f24cb3f41ea9981263"/>
-		-->
 		<description>Blue-Sky-Blue[s]: Sora o Mau Tsubasa - Shokai Genteiban (Japan)</description>
 		<year>2003</year>
 		<publisher>Ecole</publisher>
@@ -3146,12 +3123,40 @@ Black screen [GDROM READY] (fixed)
 		<info name="ring_code" value="T-23205M-0886   2MS1   C   36 (Game), ECAP-0003 *   JRC-13934   Made in Korea (Audio)"/>
 		<info name="barcode" value="4 512435 000068"/>
 		<part interface="cdrom" name="cdrom1">
+			<!-- http://redump.org/disc/43713/
+			<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan).gdi" size="243" crc="3494ccc6" md5="aede4489a8f62e9146a5d489110993da" sha1="ecacde76f17665539d69629c14d52218cb42766a"/>
+			<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Track 1).bin" size="2241456" crc="e607e01e" md5="93ae63a963ad44c86a023dafde9a63f1" sha1="b47a76464907cbd06ddf85345950f145782d00ba"/>
+			<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Track 2).bin" size="2302608" crc="a9684d33" md5="3a23931b29da109b04737c79cbcc18fc" sha1="1312a9ce85a306e731945dc0e97a047b2a7c6187"/>
+			<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Track 3).bin" size="1185760800" crc="2b4761b8" md5="25661323f8169f3a858c572c50505741" sha1="4ac729f5d37e58297685e90400344f2d8d540413"/>
+			-->
 			<feature name="part_id" value="Blue-Sky-Blue[s]: Sora o Mau Tsubasa"/>
 			<diskarea name="cdrom">
-				<disk name="blue-sky-blue[s] sora o mau tsubasa (jpn)" sha1="1b6db61f78b11afc250aac17f5ad4cfa651c9e19"/>
+				<disk name="blue-sky-blue[s] sora o mau tsubasa (jpn)" sha1="2959be03664d42eebcb1692337ea6b2e93bfb9fb"/>
 			</diskarea>
 		</part>
 		<part interface="dc_cdrom" name="cdrom2">
+			<!-- http://redump.org/disc/43714/
+			<rom name="blue-sky-blue[s] - sora o mau tsubasa (japan) (premium fan disc) (dc game bundle) (track 01).bin" size="30256128" crc="f13a49c0" md5="cf6a65a5874bde5174153b9f44bf75ff" sha1="d72744889f392797019405ffc38f70fc03c882d6"/>
+			<rom name="blue-sky-blue[s] - sora o mau tsubasa (japan) (premium fan disc) (dc game bundle) (track 02).bin" size="39160800" crc="ff625132" md5="bb45164bd996f7a5918dca98c7f510b1" sha1="e84ea9db7b053aad7ed86da027275eed15f92643"/>
+			<rom name="blue-sky-blue[s] - sora o mau tsubasa (japan) (premium fan disc) (dc game bundle) (track 03).bin" size="30766512" crc="beaac766" md5="91a63fb269a422f4b89a818f92851d9d" sha1="2ef278fa1255baf0e5a552cd2c1022f690751c7d"/>
+			<rom name="blue-sky-blue[s] - sora o mau tsubasa (japan) (premium fan disc) (dc game bundle) (track 04).bin" size="37841328" crc="fb2d9523" md5="5da6018aaa45df398f247dbad0c8f446" sha1="989dc309e26149caabf80d89e2461e1dde8f086d"/>
+			<rom name="blue-sky-blue[s] - sora o mau tsubasa (japan) (premium fan disc) (dc game bundle) (track 05).bin" size="33969936" crc="6a9a3c8c" md5="217d2824b8153dedb7be876970cd73b2" sha1="03663948ac4ea2bd26593685cb24fbe2d15b6a47"/>
+			<rom name="blue-sky-blue[s] - sora o mau tsubasa (japan) (premium fan disc) (dc game bundle) (track 06).bin" size="36665328" crc="72ca0449" md5="6d1cbe32b3afbd2bcaca89d5fb0dcd32" sha1="47702b78b0537905274c28130b60aaaed0b6b3d4"/>
+			<rom name="blue-sky-blue[s] - sora o mau tsubasa (japan) (premium fan disc) (dc game bundle) (track 07).bin" size="59112816" crc="26e85858" md5="81da242a0a6db96323b5ebe02a298c47" sha1="76c91a26c1d40c8518e78d4dddb1b6a094ca1a89"/>
+			<rom name="blue-sky-blue[s] - sora o mau tsubasa (japan) (premium fan disc) (dc game bundle) (track 08).bin" size="33741792" crc="6546438e" md5="a69746ef7f28c21b36d39e264f0eb98b" sha1="223735acf40887e269b6f9cd42282ae8a2284b5b"/>
+			<rom name="blue-sky-blue[s] - sora o mau tsubasa (japan) (premium fan disc) (dc game bundle) (track 09).bin" size="25314576" crc="77bade60" md5="a3e441a9773372decffc5b1c027c9a44" sha1="6309d25465abc1cda6fe0c237be8faff91949f6f"/>
+			<rom name="blue-sky-blue[s] - sora o mau tsubasa (japan) (premium fan disc) (dc game bundle) (track 10).bin" size="22221696" crc="78462bea" md5="64e3e50edee72c30305f7a0952eb3f1e" sha1="e6ffa2ed8f426025f2217d0b4fb80875dbcdd3bf"/>
+			<rom name="blue-sky-blue[s] - sora o mau tsubasa (japan) (premium fan disc) (dc game bundle) (track 11).bin" size="24658368" crc="aeaf98c3" md5="6c46a930a4deb53ff47bfa2d49de22dd" sha1="e63b7903ab04a138de173d1da4a6118b10452100"/>
+			<rom name="blue-sky-blue[s] - sora o mau tsubasa (japan) (premium fan disc) (dc game bundle) (track 12).bin" size="29795136" crc="44cf0fb1" md5="ff901027f4e5063b212557465cb1af2d" sha1="d95e2cffb9c567155f0d5696ae4066d0639fe384"/>
+			<rom name="blue-sky-blue[s] - sora o mau tsubasa (japan) (premium fan disc) (dc game bundle) (track 13).bin" size="26949216" crc="a2a005c2" md5="6ce241f09e4a642ea700fb86e750a153" sha1="4b43f1c073ac6c4234e8f4028ba966b93c97d7a3"/>
+			<rom name="blue-sky-blue[s] - sora o mau tsubasa (japan) (premium fan disc) (dc game bundle) (track 14).bin" size="29178912" crc="a7a88154" md5="a50f7d6ac781e739daa545608aa8a537" sha1="a106d87dc12b6f9cb6d36e301f7b3652fdf40427"/>
+			<rom name="blue-sky-blue[s] - sora o mau tsubasa (japan) (premium fan disc) (dc game bundle) (track 15).bin" size="27588960" crc="1f62e7cc" md5="543405c953245e435ebb859fe1eaced0" sha1="51dc821f46e60e2b944f3505a39e709a10ca1fdc"/>
+			<rom name="blue-sky-blue[s] - sora o mau tsubasa (japan) (premium fan disc) (dc game bundle) (track 16).bin" size="28235760" crc="32960115" md5="8be1a4af370d6052c2e5830fed4a9590" sha1="0837d5ea79725c2d034a56413713735b2f8ed454"/>
+			<rom name="blue-sky-blue[s] - sora o mau tsubasa (japan) (premium fan disc) (dc game bundle) (track 17).bin" size="41451648" crc="4ffb5d5c" md5="ef86e59cf1541cc0adea62ffd58922c9" sha1="1d7622ed63faa74aecf37d90bae119925da7733e"/>
+			<rom name="blue-sky-blue[s] - sora o mau tsubasa (japan) (premium fan disc) (dc game bundle) (track 18).bin" size="44156448" crc="723bb275" md5="f5ba54c98bf560c2ff7c2b418ce45e93" sha1="10512f01d713ff423b20656bce2c9322a5ea463e"/>
+			<rom name="blue-sky-blue[s] - sora o mau tsubasa (japan) (premium fan disc) (dc game bundle) (track 19).bin" size="37808400" crc="f66551d7" md5="c1dfc917f08848a0c85c839a7a65c7ec" sha1="d49046c4381471bd23e6c1f24cb3f41ea9981263"/>
+			<rom name="blue-sky-blue[s] - sora o mau tsubasa (japan) (premium fan disc) (dc game bundle).cue" size="3335" crc="22d44df4" md5="c130fa0d8bea9ef8a0eb6617d0b048be" sha1="9e1eb5f391bd97047ae4112b80658e13ee1760cd"/>
+			-->
 			<feature name="part_id" value="Premium Fan Disc"/> <!-- プレミアムファンデイスク -->
 			<diskarea name="cdrom">
 				<disk name="blue-sky-blue[s] sora o mau tsubasa - shokai genteiban (jpn) (premium fan disc)" sha1="9fc87706b7fc652cba2a6c58e709c7cacc3da03f"/>
@@ -3179,7 +3184,7 @@ Punts to BIOS at start of loading [GDROM READY] (fixed)
 		<info name="barcode" value="4 995161 013104"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="bokomu no tatsujin (jpn)" sha1="f702c8b81c69c7212a22e0b428f7c7f2e087f56d"/>
+				<disk name="bokomu no tatsujin (jpn)" sha1="b74abada79deadb627f05b50ec7e15a9b3f0c0cc"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3204,7 +3209,7 @@ Punts to BIOS at start of loading [GDROM READY] (fixed)
 		<info name="barcode" value="4 979750 891021"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="boku doraemon (jpn)" sha1="1638034edd680f6a073a97bcd220b6f2dd356ecc"/>
+				<disk name="boku doraemon (jpn)" sha1="934fae7912ab6ff035fc40b33a191f22dfc86eec"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3253,7 +3258,7 @@ Has [redbook] audio
 		<info name="barcode" value="4 528311 000022"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="boku no tennis jinsei (jpn)" sha1="31828b64c80c1b1c7632c35c0203b48b391904c5"/>
+				<disk name="boku no tennis jinsei (jpn)" sha1="4153be8019da5c56a5b3dd272be301350375b819"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3275,7 +3280,7 @@ Has [redbook] audio
 		<info name="ring_code" value="T-19717M-0855   1MM1   C   28"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="boku to, bokura no natsu (jpn)" sha1="52b64f02d20b31a3eaec988337548733639e3199"/>
+				<disk name="boku to, bokura no natsu (jpn)" sha1="7ea6ab499462b72bd9ac072070eec3b181527b99"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3299,7 +3304,7 @@ Has [redbook] audio
 		<info name="ring_code" value="T-42903M-0774   1MM1   C   1X"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="bomber hehhe (jpn)" sha1="73e7be4dc7ea5a8ee965cc7b265122aecf0bc630"/>
+				<disk name="bomber hehhe (jpn)" sha1="4d7898bc1f25ec339b08f3bd5ba0260dbc2a4fda"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3790,7 +3795,7 @@ Black screen [GDROM READY] (fixed)
 		<info name="ring_code" value="&lt;T-46513M-0877&gt;HN412A"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="cafe little wish (jpn)" sha1="117edcda020625b9e0e91b0c099eab704d5cd0a9"/>
+				<disk name="cafe little wish (jpn)" sha1="d2b3533c731c4c154a53a3f1cff9c795fec9552c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4160,7 +4165,7 @@ Punts to BIOS at start of loading [GDROM READY] (fixed)
 		<part interface="cdrom" name="cdrom1">
 			<feature name="part_id" value="Card of Destiny: Hikari to Yami no Tougousha"/>
 			<diskarea name="cdrom">
-				<disk name="card of destiny hikari to yami no tougousha - genteiban (jpn)" sha1="79a8dccf13f16beaa3b6293672c08d90d0c5f64e"/>
+				<disk name="card of destiny hikari to yami no tougousha - genteiban (jpn)" sha1="0bafa0d05b50037cc5da023c0db6ed768de2c475"/>
 			</diskarea>
 		</part>
 		<part interface="dc_cdrom" name="cdrom2">
@@ -4336,7 +4341,7 @@ Crashes after ADX logo with [drc]
 		<info name="ring_code" value="T-46901M-0807   1MM1   C   24"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="castle fantasia seima taisen (jpn)" sha1="e0702100801e79e1b039b44c6d604d89ec1849b5"/>
+				<disk name="castle fantasia seima taisen (jpn)" sha1="0903f283296b8ff60b722e753145be313c0cedb3"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4498,6 +4503,12 @@ Punts to BIOS at start of loading [GDROM READY], locks up (fixed)
 
 	<!-- The Sega Direct version shares the same disc as the regular edition (T-47801M) but comes with a bonus CD. -->
 	<software name="cfieldsd" cloneof="cfield" supported="no">
+		<!--
+		<rom name="Chaos Field v1.003 (2004)(Milestone)(NTSC)(JP)(en)[!].gdi" size="87" md5="b3ecdf113fd42344dd84142679e4cb36" sha1="9d50b816d3f69ad192f5986ab487769965c2e082"/>
+		<rom name="track01.bin" size="705600" md5="b00f57ae7e87793842232c5079006103" sha1="fc642d6e85015273870c4aa49d7cd50cca842195"/>
+		<rom name="track02.raw" size="1949808" md5="c3d6946b633e1f28e565e7f8b04c9fef" sha1="febb49adb703b3735a0161964388d527d3c4875c"/>
+		<rom name="track03.bin" size="1185760800" md5="4ebdadcf6dcc58f8d953ba3eeb7e91af" sha1="7b1a382a46516d72b53f7ab4d8d516383d247635"/>
+		-->
 		<description>Chaos Field (Japan, Sega Direct)</description>
 		<year>2004</year>
 		<publisher>Milestone Inc.</publisher>
@@ -4523,6 +4534,12 @@ Punts to BIOS at start of loading [GDROM READY], locks up (fixed)
 
 	<!-- The Sega Direct version shares the same disc as the regular edition (T-47801M) but comes with a bonus CD. -->
 	<software name="cfieldsd1" cloneof="cfield" supported="no">
+		<!--
+		<rom name="Chaos Field v1.003 (2004)(Milestone)(NTSC)(JP)(en)[!].gdi" size="87" md5="b3ecdf113fd42344dd84142679e4cb36" sha1="9d50b816d3f69ad192f5986ab487769965c2e082"/>
+		<rom name="track01.bin" size="705600" md5="b00f57ae7e87793842232c5079006103" sha1="fc642d6e85015273870c4aa49d7cd50cca842195"/>
+		<rom name="track02.raw" size="1949808" md5="c3d6946b633e1f28e565e7f8b04c9fef" sha1="febb49adb703b3735a0161964388d527d3c4875c"/>
+		<rom name="track03.bin" size="1185760800" md5="4ebdadcf6dcc58f8d953ba3eeb7e91af" sha1="7b1a382a46516d72b53f7ab4d8d516383d247635"/>
+		-->
 		<description>Chaos Field (Japan, Sega Direct, rev. 1)</description>
 		<year>2004</year>
 		<publisher>Milestone Inc.</publisher>
@@ -4682,7 +4699,7 @@ Built on Windows CE, requires [MMU] support
 		<info name="ring_code" value="T-37912M-0913   1MS1   C   43"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="cherry blossom (jpn)" sha1="0d6e60904f091dc3cba5bf72e4dc0073b66f1564"/>
+				<disk name="cherry blossom (jpn)" sha1="9969ae4c62c048fc6d8c2b6c786f673716338cf5"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4800,7 +4817,7 @@ Punts to BIOS at start of loading [GDROM READY], locks up (fixed)
 		<info name="ring_code" value="T-47107M-0904   3MS1   C   3Z"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="chocolat maid cafe curio (jpn)" sha1="92ddb0d5acf83f3fb6bec362b19082f807f13fe6"/>
+				<disk name="chocolat maid cafe curio (jpn)" sha1="0469b9ffc5202fa5ffa6d94abbbaff5341f16c66"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4943,13 +4960,13 @@ Overly stretched [PVR] output (displays top right of actual screen, SCALER_CTL)
 		<part interface="cdrom" name="cdrom1">
 			<feature name="part_id" value="Message Disc"/>
 			<diskarea name="cdrom">
-				<disk name="christmas seaman omoi o tsutaeru mou hitotsu no houhou - message kit (jpn) (message disc)" sha1="044e7326bfaa8d676541a783cd4ca2484108ed85"/>
+				<disk name="christmas seaman omoi o tsutaeru mou hitotsu no houhou - message kit (jpn) (message disc)" sha1="fb4a61854adf81ee83008aeb4dd172121e661a31"/>
 			</diskarea>
 		</part>
 		<part interface="cdrom" name="cdrom2">
 			<feature name="part_id" value="Present Disc"/>
 			<diskarea name="cdrom">
-				<disk name="christmas seaman omoi o tsutaeru mou hitotsu no houhou - present disc (jpn)" sha1="d04cb12d5dd9b674688b665084944851cbe68bf9"/>
+				<disk name="christmas seaman omoi o tsutaeru mou hitotsu no houhou - present disc (jpn)" sha1="7bcaa8d42df6e7920cbbb64fdcf95f7c7b6865df"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4970,7 +4987,7 @@ Overly stretched [PVR] output (displays top right of actual screen, SCALER_CTL)
 		<info name="ring_code" value="T-39404M-0241   2M1   C   9Z"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="christmas seaman omoi o tsutaeru mou hitotsu no houhou - present disc (jpn)" sha1="d04cb12d5dd9b674688b665084944851cbe68bf9"/>
+				<disk name="christmas seaman omoi o tsutaeru mou hitotsu no houhou - present disc (jpn)" sha1="7bcaa8d42df6e7920cbbb64fdcf95f7c7b6865df"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5417,13 +5434,13 @@ Punts to BIOS at start of loading [GDROM READY] (fixed)
 		<part interface="cdrom" name="cdrom1">
 			<feature name="part_id" value="Disc 1"/>
 			<diskarea name="cdrom">
-				<disk name="comic party (jpn) (disc 1)" sha1="4a26b68634360f6ec4c39763e1ec3aef1d46dff9"/>
+				<disk name="comic party (jpn) (disc 1)" sha1="8710002d130ef4e3fa4d10b645003075e3bacdb4"/>
 			</diskarea>
 		</part>
 		<part interface="cdrom" name="cdrom2">
 			<feature name="part_id" value="Disc 2"/>
 			<diskarea name="cdrom">
-				<disk name="comic party (jpn) (disc 2)" sha1="2b43c0f46256eaa5d9709985d79cffc90c594b9e"/>
+				<disk name="comic party (jpn) (disc 2)" sha1="2d9cd2bbb7e52d09b3276c633230395457df483e"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5488,7 +5505,7 @@ Punts to BIOS at start of loading [GDROM READY] (fixed)
 		<info name="ring_code" value="&lt;HDR-0160-0695&gt;HL425A"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="confidential mission (jpn)" sha1="be5a2cc59ee335b29821607c617c19ade454fcea"/>
+				<disk name="confidential mission (jpn)" sha1="dd7652f2efdf6144d6e872e0f2d08a5a19ae4144"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5595,7 +5612,7 @@ Punts to BIOS at start of loading [GDROM READY] (fixed)
 		<info name="ring_code" value="T-3106M-0437   1M1   C   06"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="cool cool toon (jpn)" sha1="77e8df8a4136d8be06dc63f0ce596d629557710f"/>
+				<disk name="cool cool toon (jpn)" sha1="77905a50ab7b98ab69855f512147ca065a241500"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5674,7 +5691,7 @@ Punts to BIOS at start of loading [GDROM READY], locks up (fixed)
 		<info name="ring_code" value="&lt;T-45801M-0737&gt;HL710C"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="cr hissatsu shigotonin pachitte chonmage vpachi (jpn)" sha1="893801607b6e2f91137e626924ae706dcafe6931"/>
+				<disk name="cr hissatsu shigotonin pachitte chonmage vpachi (jpn)" sha1="0313fde372d8718b16fc158732fad3cc3a0e5a52"/>
 			</diskarea>
 		</part>
 	</software>
@@ -6091,7 +6108,7 @@ No [PVR] renders/black screen on FMV and title screen (sound plays, setup [fb_r_
 		<part interface="cdrom" name="cdrom1">
 			<feature name="part_id" value="D+Vine [Luv]"/>
 			<diskarea name="cdrom">
-				<disk name="d+vine [luv] - shokai genteiban (jpn)" sha1="a55d24f09e8d191a8671fd1fcb63fc2e5c1ceb9c"/>
+				<disk name="d+vine [luv] - shokai genteiban (jpn)" sha1="57c9224d5598180a95b9267922e6f284774eada5"/>
 			</diskarea>
 		</part>
 		<part interface="dc_cdrom" name="cdrom2">
@@ -7300,7 +7317,7 @@ No [PVR] renders/black screen on FMV and title screen (sound plays, setup [fb_r_
 		<year>2000</year>
 		<publisher>Ubisoft</publisher>
 		<info name="release" value="20000505"/>
-		<part interface="cdrom" name="cdrom1">
+		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
 				<!-- Real label: Deep fighter French C/M 1 -->
 				<disk name="deep fighter (fra, prototype 20000505)" sha1="9bf2149743e2e90a8e58a29a1efd1038f15b5e16" status="baddump"/>
@@ -7367,7 +7384,7 @@ No [PVR] renders/black screen on FMV and title screen (sound plays, setup [fb_r_
 		<info name="ring_code" value="&lt;T-40801M-0206&gt;HJA30A, &lt;T-40801M-0206&gt;HL712A"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="dengen tenshi taisen mahjong shangri-la (jpn)" sha1="da7ca58149c1c2ac838e28d8c319e0b2ac21ec5e"/>
+				<disk name="dengen tenshi taisen mahjong shangri-la (jpn)" sha1="54ed775c45303731b083ed527ba5920b7c4b3583"/>
 			</diskarea>
 		</part>
 	</software>
@@ -7433,7 +7450,7 @@ Built on Windows CE, requires [MMU] support
 		<info name="ring_code" value="&lt;T-1102M-0255&gt;HJC18D"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="densha de go 2 kousoku-hen 3000 bandai (jpn)" sha1="9728cf52bb82a33812898c27cf9d96410175f9d4"/>
+				<disk name="densha de go 2 kousoku-hen 3000 bandai (jpn)" sha1="a3bc9e59efa6567d302f926644d4870cde2cc2dd"/>
 			</diskarea>
 		</part>
 	</software>
@@ -7545,7 +7562,7 @@ Built on Windows CE, requires [MMU] support
 		<info name="ring_code" value="T-46302M-0753 MT   B04"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="di gi charat fantasy (jpn)" sha1="20c245d693f0d4701be99d71ea164d0cf0468539"/>
+				<disk name="di gi charat fantasy (jpn)" sha1="79a22372a1d8441dfe16a80c6ea86bfaa89f12b7"/>
 			</diskarea>
 		</part>
 	</software>
@@ -7580,7 +7597,7 @@ Built on Windows CE, requires [MMU] support
 		<part interface="cdrom" name="cdrom1">
 			<feature name="part_id" value="Di Gi Charat Fantasy"/>
 			<diskarea name="cdrom">
-				<disk name="di gi charat fantasy (jpn)" sha1="20c245d693f0d4701be99d71ea164d0cf0468539"/>
+				<disk name="di gi charat fantasy (jpn)" sha1="79a22372a1d8441dfe16a80c6ea86bfaa89f12b7"/>
 			</diskarea>
 		</part>
 		<part interface="dc_cdrom" name="cdrom2">
@@ -8171,7 +8188,7 @@ Punts to BIOS at start of loading [GDROM READY] (fixed)
 		<info name="ring_code" value="T-46701M-0798   2M1   C   1Z"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="doki doki idol star seeker remix (jpn)" sha1="7f23fb341aa35695fdd5208f4b4bb8395b08224d"/>
+				<disk name="doki doki idol star seeker remix (jpn)" sha1="bd589bc417fc2cd8f19180a4111a1e27856a1525"/>
 			</diskarea>
 		</part>
 	</software>
@@ -11616,7 +11633,7 @@ Built on Windows CE, requires [MMU] support
 		<info name="ring_code" value="T-9503M-0080 MT   B01"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="eisei meijin iii game creator yoshimura nobuhiro no zunou (jpn)" sha1="3d8f2e655829790ee2cf83f252c9d05257234fb4"/>
+				<disk name="eisei meijin iii game creator yoshimura nobuhiro no zunou (jpn)" sha1="c35585083c71fa8f12fc16afbecf31ffc3a47456"/>
 			</diskarea>
 		</part>
 	</software>
@@ -11792,7 +11809,7 @@ Punts to BIOS at start of loading [GDROM READY] (fixed)
 		<info name="barcode" value="4 976219 555500"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="eldorado gate dai-7-kan (jpn)" sha1="f21855a78f2511c2faa4c679bd3d9b031d896654"/>
+				<disk name="eldorado gate dai-7-kan (jpn)" sha1="8e624fa15e7ae9e8adc75681da07f41b7137c455"/>
 			</diskarea>
 		</part>
 	</software>
@@ -11855,7 +11872,7 @@ Punts to BIOS at start of loading [GDROM READY] (fixed)
 		<info name="ring_code" value="&lt;T-20116M-0839&gt;HM707B"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="elysion eien no sanctuary (jpn)" sha1="ec02aba1dd210bc39c6e94926cbb091fbadfdcb2"/>
+				<disk name="elysion eien no sanctuary (jpn)" sha1="4440564fd55c7845f30bde7c462f44bea6b8d3a7"/>
 			</diskarea>
 		</part>
 	</software>
@@ -11877,7 +11894,7 @@ Punts to BIOS at start of loading [GDROM READY] (fixed)
 		<info name="barcode" value="4 933516 306273"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="erde nezu no ki no shita de (jpn)" sha1="e12bc896c2fc1f7d1bae56e5e28f89734edfb2d7"/>
+				<disk name="erde nezu no ki no shita de (jpn)" sha1="b0d35dc9a1f4ac1bfd7284f55248a73f40eba6a7"/>
 			</diskarea>
 		</part>
 	</software>
@@ -11910,19 +11927,19 @@ Punts to BIOS at start of loading [GDROM READY] (fixed)
 		<part interface="cdrom" name="cdrom1">
 			<feature name="part_id" value="Disc 1"/>
 			<diskarea name="cdrom">
-				<disk name="es (jpn) (disc 1)" sha1="6715ff835ceb413c4b52609e078fac1401c69e93"/>
+				<disk name="es (jpn) (disc 1)" sha1="8c9bd2032470d1f50c63c3e14f5f182458619c7a"/>
 			</diskarea>
 		</part>
 		<part interface="cdrom" name="cdrom2">
 			<feature name="part_id" value="Disc 2"/>
 			<diskarea name="cdrom">
-				<disk name="es (jpn) (disc 2)" sha1="b0d04e113e15db3b76f5ad78f712ac85ba10a980"/>
+				<disk name="es (jpn) (disc 2)" sha1="2b853f187c1c918ee629388d2bb10112c31c2ff4"/>
 			</diskarea>
 		</part>
 		<part interface="cdrom" name="cdrom3">
 			<feature name="part_id" value="Disc 3"/>
 			<diskarea name="cdrom">
-				<disk name="es (jpn) (disc 3)" sha1="5f01bb4d23c2f95e2064b91917ffbf5db31e02b7"/>
+				<disk name="es (jpn) (disc 3)" sha1="4f2e75f95c1260f3001bbc1f700865f45eb5390f"/>
 			</diskarea>
 		</part>
 	</software>
@@ -12069,13 +12086,13 @@ Punts to BIOS at start of loading [GDROM READY] (fixed)
 		<part interface="cdrom" name="cdrom1">
 			<feature name="part_id" value="Disc 1"/>
 			<diskarea name="cdrom">
-				<disk name="eve zero kanzenban ark of the matter (jpn) (disc 1)" sha1="5cebcca9f26156e1309be7184cfd1dac7c0d664f"/>
+				<disk name="eve zero kanzenban ark of the matter (jpn) (disc 1)" sha1="4516f8a68cd03109c0176ca337ca7b3ed5cdbb52"/>
 			</diskarea>
 		</part>
 		<part interface="cdrom" name="cdrom2">
 			<feature name="part_id" value="Disc 2"/>
 			<diskarea name="cdrom">
-				<disk name="eve zero kanzenban ark of the matter (jpn) (disc 2)" sha1="a5dc69f88b42e53ef7f64ec60d5cd14816a6ba31"/>
+				<disk name="eve zero kanzenban ark of the matter (jpn) (disc 2)" sha1="a703d033949f833c228c508a556a74a28d7e7f21"/>
 			</diskarea>
 		</part>
 	</software>
@@ -12097,7 +12114,7 @@ Punts to BIOS at start of loading [GDROM READY] (fixed)
 		<info name="barcode" value="4 933516 206160"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="ever 17 the out of infinity (jpn)" sha1="0f73c51638e72f419ca1a52ca258297c57801499"/>
+				<disk name="ever 17 the out of infinity (jpn)" sha1="3fc448657d87294f21ae52fdb60054c6f75060a4"/>
 			</diskarea>
 		</part>
 	</software>
@@ -12327,9 +12344,9 @@ Punts to BIOS at start of loading [GDROM READY] (fixed)
 
 	<software name="shinevo2" cloneof="evltion2" supported="no">
 		<!--
-		<rom name="track02.raw" size="1735776" md5="8659426a29f58924f5f0458cc720098b" sha1="e12b9ae5ebc79b7da5271bce29df450671ce5d93"/>
 		<rom name="Shinki Sekai Evolution 2 - Tooi Yakusoku v1.002 (1999)(ESP)(NTSC)(JP)[!].gdi" size="87" md5="346fea58ab1a55c577138c5b04319157" sha1="980036e44ad9d694ea1699cd05c86ccd0c894c47"/>
 		<rom name="track01.bin" size="1058400" md5="7713a0ebd50731da0c4ba8d45ab4cfbc" sha1="a04238edd82a18ca22d291f7f2176c948b7c8ede"/>
+		<rom name="track02.raw" size="1735776" md5="8659426a29f58924f5f0458cc720098b" sha1="e12b9ae5ebc79b7da5271bce29df450671ce5d93"/>
 		<rom name="track03.bin" size="1185760800" md5="93f70fbcca79c7a47275898399827cb9" sha1="702863d1b492ab95519428085ef5126bbe7343c8"/>
 		-->
 		<description>Shinkisekai Evolution 2: Tooi Yakusoku (Japan)</description>
@@ -12366,7 +12383,7 @@ Punts to BIOS at start of loading [GDROM READY] (fixed)
 		<info name="ring_code" value="T-44404M-0684   1M1   C   15"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="exodus guilty neos (jpn)" sha1="3d296c323a04fe6d2a4e87ccb89e8e9f462db045"/>
+				<disk name="exodus guilty neos (jpn)" sha1="7183ce6a92cb39dbdb090a8c06c006b4d19b49f8"/>
 			</diskarea>
 		</part>
 	</software>
@@ -13230,7 +13247,7 @@ Hangs on SNK logo
 		<info name="ring_code" value="*12S*   T-36801NA   B"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="fighting force 2 (usa, alt 2)" sha1="7814c912238861742b2375d25017ee0cc6d76d81"/>
+				<disk name="fighting force 2 (usa, alt 2)" sha1="ed7852cac7328ed43fb96d8942f76646184fbf7e"/>
 			</diskarea>
 		</part>
 	</software>
@@ -13445,7 +13462,7 @@ Has [redbook] audio
 		<info name="barcode" value="4 940261 502461"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="fire pro wrestling d (jpn)" sha1="cc87da492ad9339b1e76eb8fd52d1fc846fc1e8a"/>
+				<disk name="fire pro wrestling d (jpn)" sha1="3018edeaeb29e75a7c8cc832e08c4ea08934a6b0"/>
 			</diskarea>
 		</part>
 	</software>
@@ -13479,13 +13496,13 @@ Too fast ADX logo transition
 		<part interface="cdrom" name="cdrom1">
 			<feature name="part_id" value="Disc 1"/>
 			<diskarea name="cdrom">
-				<disk name="first kiss story ii anata ga iru kara (jpn) (disc 1)" sha1="fb04ed48d61fe558335df7631149c99c1654a670"/>
+				<disk name="first kiss story ii anata ga iru kara (jpn) (disc 1)" sha1="1b4b691ef7d3c0e1c048eaefaa8ba70d5a957341"/>
 			</diskarea>
 		</part>
 		<part interface="cdrom" name="cdrom2">
 			<feature name="part_id" value="Disc 2"/>
 			<diskarea name="cdrom">
-				<disk name="first kiss story ii anata ga iru kara (jpn) (disc 2)" sha1="2fdbc76f083c0d1a58e15b8224ba62f4e8a21d89"/>
+				<disk name="first kiss story ii anata ga iru kara (jpn) (disc 2)" sha1="ccd40b88896b0c0497ab15185b0a0d2aff414d51"/>
 			</diskarea>
 		</part>
 	</software>
@@ -13534,25 +13551,25 @@ Too fast ADX logo transition
 		<part interface="cdrom" name="cdrom1">
 			<feature name="part_id" value="First Kiss Story II: Anata ga Iru kara - Disc 1"/>
 			<diskarea name="cdrom">
-				<disk name="first kiss story ii anata ga iru kara (jpn) (disc 1)" sha1="fb04ed48d61fe558335df7631149c99c1654a670"/>
+				<disk name="first kiss story ii anata ga iru kara (jpn) (disc 1)" sha1="1b4b691ef7d3c0e1c048eaefaa8ba70d5a957341"/>
 			</diskarea>
 		</part>
 		<part interface="cdrom" name="cdrom2">
 			<feature name="part_id" value="First Kiss Story II: Anata ga Iru kara - Disc 2"/>
 			<diskarea name="cdrom">
-				<disk name="first kiss story ii anata ga iru kara (jpn) (disc 2)" sha1="2fdbc76f083c0d1a58e15b8224ba62f4e8a21d89"/>
+				<disk name="first kiss story ii anata ga iru kara (jpn) (disc 2)" sha1="ccd40b88896b0c0497ab15185b0a0d2aff414d51"/>
 			</diskarea>
 		</part>
 		<part interface="cdrom" name="cdrom3">
 			<feature name="part_id" value="First Kiss Story - Disc 1"/>
 			<diskarea name="cdrom">
-				<disk name="first kiss story (jpn) (disc 1)" sha1="12c0921eecbf28c00b1e9b35b1a132250c786d55"/>
+				<disk name="first kiss story (jpn) (disc 1)" sha1="ea75b417abf8e64e83a63281201ba6799bd0a52d"/>
 			</diskarea>
 		</part>
 		<part interface="cdrom" name="cdrom4">
 			<feature name="part_id" value="First Kiss Story - Disc 2"/>
 			<diskarea name="cdrom">
-				<disk name="first kiss story (jpn) (disc 2)" sha1="25c02a1de0790767237920e2b8b9ae31d257ad46"/>
+				<disk name="first kiss story (jpn) (disc 2)" sha1="356f27f8e85cf931e2eaba2f1093a3a6e47d261a"/>
 			</diskarea>
 		</part>
 	</software>
@@ -13599,31 +13616,31 @@ Too fast ADX logo transition
 
 	<software name="ssr" cloneof="flgtoflg" supported="no">
 		<!--
-		<rom name="track13.raw" size="42455952" md5="bf84a883b7ee9ca061b688cd54321b22" sha1="ae3333b6756bd81f0688c5360063288e32f7f01e"/>
-		<rom name="track07.raw" size="56313936" md5="82c941f3fb1450bb9ac7565e6e187338" sha1="02647f1c00ec69cfdb1b79cd62670df08c086f98"/>
-		<rom name="track06.raw" size="51224208" md5="8e17d6aa497819372c1011c7680d1702" sha1="7d4b6d39b7a64fa24c8e8e24543f69c82fd0142f"/>
-		<rom name="track17.raw" size="24378480" md5="452b04b80853af6b39be7b1506966af4" sha1="5e5331dfce7db654b3d9e23d51163194536ac5e1"/>
-		<rom name="track08.raw" size="47931408" md5="3d7ccd499d67763943403d12dbac3d28" sha1="d9f65b0cf262cb6fb086230ad305c9c7a23eecaf"/>
-		<rom name="track20.raw" size="10405248" md5="0fa59dc46c654275a7a26c8d627dff86" sha1="f986a62c5f2dc524ca6efb5e703be59bf94aab04"/>
-		<rom name="track12.raw" size="50408064" md5="edcaf90ea51ca75eddc597682f81fdc7" sha1="8e41b53c242853f88a0e0620c12b333e4e799cd2"/>
-		<rom name="track02.raw" size="1949808" md5="c28a4d0b40eee409fe201f3c1c47a0b1" sha1="437a4512cac2d8dc384ab8e7240790925158f1d9"/>
-		<rom name="track19.raw" size="22673280" md5="0f6f83dd5382dc1ddd6de509887604bb" sha1="f674b45666f66909cbef3a980b3a582b74ebc856"/>
-		<rom name="track21.raw" size="8624784" md5="08cc9355558a9da3c9168dc5dbbdaa59" sha1="bd73deced716de3f8c31e858bcbfff0e9bc4c937"/>
-		<rom name="track04.raw" size="1853376" md5="407cb08f947bb5d8a19178217950697e" sha1="b36994ab352f591593d313c0ae813987b39a466b"/>
 		<rom name="Super Speed Racing v1.004 (1999)(Sega)(NTSC)(JP)[!].gdi" size="754" md5="e5b0662fbb275e3ed9a5e332542b247f" sha1="5d73c8d93f6787fda5e22620e7647cba6b0dd747"/>
-		<rom name="track15.raw" size="30190272" md5="cb28b5c19fe7f3819588e4181802dc1c" sha1="f6ea94eb25114fb21030536cfb1dfd3a01a612ff"/>
 		<rom name="track01.bin" size="1620528" md5="c86252c64c89aee5008aa3c5c66ea220" sha1="53ada8b36a7f69152ba8c74ddff58417e038f7f2"/>
-		<rom name="track24.bin" size="397457424" md5="cf663cdc3476078f2d7b013e63a2dec5" sha1="e211b5cd4f0c4426c6f6ea5bd8b834c0af644d95"/>
-		<rom name="track18.raw" size="5651856" md5="843cee56f220a6a2f431cc0e92eb3fe8" sha1="05f45e53233691f1b3b0e4ed3458e061b3325b55"/>
+		<rom name="track02.raw" size="1949808" md5="c28a4d0b40eee409fe201f3c1c47a0b1" sha1="437a4512cac2d8dc384ab8e7240790925158f1d9"/>
+		<rom name="track03.bin" size="165604320" md5="93eacb57feb6f5590d96a4d9e0075112" sha1="322d430e98b3b4e045713a9e96b5859f42754d4e"/>
+		<rom name="track04.raw" size="1853376" md5="407cb08f947bb5d8a19178217950697e" sha1="b36994ab352f591593d313c0ae813987b39a466b"/>
+		<rom name="track05.raw" size="42587664" md5="20927a41063b8eec4938001bef770837" sha1="86cfcb9b14fb4e97090e91288958af18c396c1ee"/>
+		<rom name="track06.raw" size="51224208" md5="8e17d6aa497819372c1011c7680d1702" sha1="7d4b6d39b7a64fa24c8e8e24543f69c82fd0142f"/>
+		<rom name="track07.raw" size="56313936" md5="82c941f3fb1450bb9ac7565e6e187338" sha1="02647f1c00ec69cfdb1b79cd62670df08c086f98"/>
+		<rom name="track08.raw" size="47931408" md5="3d7ccd499d67763943403d12dbac3d28" sha1="d9f65b0cf262cb6fb086230ad305c9c7a23eecaf"/>
+		<rom name="track09.raw" size="36533616" md5="684dcee7e864c0bf466150d7ccbb2413" sha1="607771ceeb515880b3b2521c41f99937e72c7caf"/>
 		<rom name="track10.raw" size="42359520" md5="7052997bb04759ce150e5dc768f5049a" sha1="5ec50d3bd822332c8523508bdbf469a0ac5805ae"/>
 		<rom name="track11.raw" size="51318288" md5="4e09b272c7fee74f8d1e364ead954e90" sha1="d8b5a4fc1fbbc56613fa69cd158d6db9f188d555"/>
+		<rom name="track12.raw" size="50408064" md5="edcaf90ea51ca75eddc597682f81fdc7" sha1="8e41b53c242853f88a0e0620c12b333e4e799cd2"/>
+		<rom name="track13.raw" size="42455952" md5="bf84a883b7ee9ca061b688cd54321b22" sha1="ae3333b6756bd81f0688c5360063288e32f7f01e"/>
 		<rom name="track14.raw" size="46012176" md5="7e9761d7bc433907ec27d561d9ce6f71" sha1="06990a580ae03db57000d35a226799ba6025ed36"/>
-		<rom name="track23.raw" size="6082272" md5="cf869000eec622c1a72a60ac9dbc5f24" sha1="a12cacfcdabfa52f3ae006e93a5abecd45a8c5e8"/>
-		<rom name="track09.raw" size="36533616" md5="684dcee7e864c0bf466150d7ccbb2413" sha1="607771ceeb515880b3b2521c41f99937e72c7caf"/>
+		<rom name="track15.raw" size="30190272" md5="cb28b5c19fe7f3819588e4181802dc1c" sha1="f6ea94eb25114fb21030536cfb1dfd3a01a612ff"/>
 		<rom name="track16.raw" size="30851184" md5="4c10484b9aaa29b4ae897c95ae33c427" sha1="e8b27635c98e7123b45c695f608c6baa6c9ba880"/>
+		<rom name="track17.raw" size="24378480" md5="452b04b80853af6b39be7b1506966af4" sha1="5e5331dfce7db654b3d9e23d51163194536ac5e1"/>
+		<rom name="track18.raw" size="5651856" md5="843cee56f220a6a2f431cc0e92eb3fe8" sha1="05f45e53233691f1b3b0e4ed3458e061b3325b55"/>
+		<rom name="track19.raw" size="22673280" md5="0f6f83dd5382dc1ddd6de509887604bb" sha1="f674b45666f66909cbef3a980b3a582b74ebc856"/>
+		<rom name="track20.raw" size="10405248" md5="0fa59dc46c654275a7a26c8d627dff86" sha1="f986a62c5f2dc524ca6efb5e703be59bf94aab04"/>
+		<rom name="track21.raw" size="8624784" md5="08cc9355558a9da3c9168dc5dbbdaa59" sha1="bd73deced716de3f8c31e858bcbfff0e9bc4c937"/>
 		<rom name="track22.raw" size="14137872" md5="9934886537e619b6ecec0b40b4979ba9" sha1="404f290ae3f3107736cd7c150bbb8cf673baa101"/>
-		<rom name="track05.raw" size="42587664" md5="20927a41063b8eec4938001bef770837" sha1="86cfcb9b14fb4e97090e91288958af18c396c1ee"/>
-		<rom name="track03.bin" size="165604320" md5="93eacb57feb6f5590d96a4d9e0075112" sha1="322d430e98b3b4e045713a9e96b5859f42754d4e"/>
+		<rom name="track23.raw" size="6082272" md5="cf869000eec622c1a72a60ac9dbc5f24" sha1="a12cacfcdabfa52f3ae006e93a5abecd45a8c5e8"/>
+		<rom name="track24.bin" size="397457424" md5="cf663cdc3476078f2d7b013e63a2dec5" sha1="e211b5cd4f0c4426c6f6ea5bd8b834c0af644d95"/>
 		-->
 		<description>Super Speed Racing (Japan)</description>
 		<year>1999</year>
@@ -13809,7 +13826,7 @@ Built on Windows CE, requires [MMU] support
 		<info name="barcode" value="4 520644 020043"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="fragrance tale (jpn)" sha1="a6061b180e70725d3d44c8a63ca8f7c5b0948238"/>
+				<disk name="fragrance tale (jpn)" sha1="c9698934858848c6bbdb4038de2e301247bb59df"/>
 			</diskarea>
 		</part>
 	</software>
@@ -14039,7 +14056,7 @@ Corrupted [PVR] render ingame when selecting a map location, bump mapping
 		<info name="ring_code" value="HDR-0187-0794 1M1 C 21, HDR-0187-0794 1MM1 C 21"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="fushigi no dungeon fuurai no shiren gaiden onnakenshi asuka kenzan (jpn)" sha1="82fdc8677f6b24e4c75ff5191fbce47b820dc30b"/>
+				<disk name="fushigi no dungeon fuurai no shiren gaiden onnakenshi asuka kenzan (jpn)" sha1="1fc5129168a5af516e47926f1a54138854351503"/>
 			</diskarea>
 		</part>
 	</software>
@@ -14067,10 +14084,6 @@ Corrupted [PVR] render ingame when selecting a map location, bump mapping
 
 	<software name="yamazaki" supported="no">
 		<!--
-		<rom name="track18.raw" size="1067808" md5="c091da8132c95d11183e344297f2fd14" sha1="8da33e13407a367672f7a5002b6ccb63af8da3ac"/>
-		<rom name="track38.raw" size="1072512" md5="c564ea47c9f8bbed56788459af9f839c" sha1="6b754e652c5c7fa1157c64b4eb78a90ea0655193"/>
-		<rom name="track58.raw" size="2399040" md5="21eb80fbed099bce52b9eb1ee36874ee" sha1="c517341ec5845bd467d7efc77cca235d4711fe59"/>
-		<rom name="track78.raw" size="1067808" md5="066bb02d9ffca8048bef3fe46ab582b0" sha1="a807d14fae33ac99fa3db1aa2d991e8b573e31ab"/>
 		<rom name="Gakkyu wo Yamazaki - Yamazaki Oukoku Dai Fun So! v1.005 (1999)(Sega)(NTSC)(JP)[!].gdi" size="3154" md5="9712251c438080b38614c5dae03089d5" sha1="a14e8969c93711d0e2c5af07b6460c5c9967cddc"/>
 		<rom name="track01.bin" size="1058400" md5="7002e24b43123159dc87c5cff3dd5994" sha1="88c45ca8fa086632054c688e09a81f2cbb4ceb9f"/>
 		<rom name="track02.raw" size="1735776" md5="8659426a29f58924f5f0458cc720098b" sha1="e12b9ae5ebc79b7da5271bce29df450671ce5d93"/>
@@ -14089,6 +14102,7 @@ Corrupted [PVR] render ingame when selecting a map location, bump mapping
 		<rom name="track15.raw" size="1070160" md5="fcffde38bae4a843f2e89ca58ade8179" sha1="5ae8772f787307a3952f44d3aeb3d8d86ac8feca"/>
 		<rom name="track16.raw" size="1077216" md5="341ee52d7dcbea29539040c9f1d64a48" sha1="e152d237bba894f5a948149fa255a8788c90a005"/>
 		<rom name="track17.raw" size="1067808" md5="fc6531f1f80acb5a501b50ab64410b32" sha1="b5442727bf09741add9920e5d497ca98448712e5"/>
+		<rom name="track18.raw" size="1067808" md5="c091da8132c95d11183e344297f2fd14" sha1="8da33e13407a367672f7a5002b6ccb63af8da3ac"/>
 		<rom name="track19.raw" size="1074864" md5="3ee8ab43fe96a06ab2334053163c8ec9" sha1="e571f13da162a1a9dc73367ef0172f665c7a8b78"/>
 		<rom name="track20.raw" size="1086624" md5="3c60dab64991d2ba24168cee22f1d802" sha1="72a90fa550c3dac9b937b4fbdf63eeee610b5fd9"/>
 		<rom name="track21.raw" size="1067808" md5="77f3ed02edce82a351ebde9158221e3b" sha1="a085d6849fd3300cad6c5154f61405636f8c241f"/>
@@ -14108,6 +14122,7 @@ Corrupted [PVR] render ingame when selecting a map location, bump mapping
 		<rom name="track35.raw" size="1067808" md5="cee76b3acaa55b9e1c9f2a4efea6048d" sha1="97808054e82aa3a4c1f0fd780d9b1f4dce5d1304"/>
 		<rom name="track36.raw" size="1074864" md5="65d3e8451e997d2c4f2366b13b60b0a1" sha1="50a696e5ee0dd10317d25f16a69731ea6a269f1a"/>
 		<rom name="track37.raw" size="1070160" md5="89b9f40223caaa5a69476441a144cb1e" sha1="e1f5dcc846e0cdca01b4d73f349f29771ee037be"/>
+		<rom name="track38.raw" size="1072512" md5="c564ea47c9f8bbed56788459af9f839c" sha1="6b754e652c5c7fa1157c64b4eb78a90ea0655193"/>
 		<rom name="track39.raw" size="1072512" md5="e0f1aba35a37ed4066d81ca9122ae499" sha1="df594f71a4cd5d433ca3346a8c1f261e978c9874"/>
 		<rom name="track40.raw" size="1077216" md5="1e8400d0edb1be44d833085a0c187c3e" sha1="44016b9fcc1f4c05fdc689024232c9e908278db9"/>
 		<rom name="track41.raw" size="1070160" md5="809579ad9189d7b878ea110d85bac9fa" sha1="962ef2f773f4c7adb48c4328375050fef227d577"/>
@@ -14127,6 +14142,7 @@ Corrupted [PVR] render ingame when selecting a map location, bump mapping
 		<rom name="track55.raw" size="2177952" md5="63b48460aca8aca3aa5614e7b257eec4" sha1="9391d60e895db6f4584d8b9b10e882433e06e435"/>
 		<rom name="track56.raw" size="1408848" md5="d7ae386c0dc131f470002772d9401c96" sha1="7e5f43205e3241f5a5dbe88f706d09e10fa5cf7a"/>
 		<rom name="track57.raw" size="2638944" md5="04e783b5dd08a927a1f779d7f84d9662" sha1="69cb65236f0d24fbca391f7439b258d318ac797e"/>
+		<rom name="track58.raw" size="2399040" md5="21eb80fbed099bce52b9eb1ee36874ee" sha1="c517341ec5845bd467d7efc77cca235d4711fe59"/>
 		<rom name="track59.raw" size="1606416" md5="14c466274a33435a9e3abc8cad2f99a0" sha1="28b17c9c076a4779814bff054362debcc3ed7732"/>
 		<rom name="track60.raw" size="2067408" md5="a3d97b6e806dcef400d796d168363e13" sha1="f99d1d691ff01e49c33a84ee9a346b8b98834363"/>
 		<rom name="track61.raw" size="2963520" md5="1440825c47965ebef33e3d0d970bad29" sha1="0f5394c35c1e5e8c30d442995ab7b21372845829"/>
@@ -14146,6 +14162,7 @@ Corrupted [PVR] render ingame when selecting a map location, bump mapping
 		<rom name="track75.raw" size="1067808" md5="d9eae4a92bb1ba9af7d64e828c8834b1" sha1="8522a10b4eb4e95fb8ccb1b031895a86562abd78"/>
 		<rom name="track76.raw" size="1065456" md5="6ff8f7a9bebf58e934d87b45ecc1de85" sha1="5ea46be7da38a61181950024ddc8ad303ed91bbd"/>
 		<rom name="track77.raw" size="1093680" md5="e40a4480849a36c057f537311ab557f8" sha1="b4de2100b7139ed4a1161ed0d31c5c1836e419f8"/>
+		<rom name="track78.raw" size="1067808" md5="066bb02d9ffca8048bef3fe46ab582b0" sha1="a807d14fae33ac99fa3db1aa2d991e8b573e31ab"/>
 		<rom name="track79.raw" size="1070160" md5="1d61c6fd99729f71e451f91aaef4c56c" sha1="72f03e3615e3ba34ce3301fb2fa6d450da06d51f"/>
 		<rom name="track80.raw" size="1063104" md5="1f9d73f3f9c6b427d9ccc91aee68c13f" sha1="41475bfe949fbeb4032ead82bcb1fdc331fc6f4e"/>
 		<rom name="track81.raw" size="1072512" md5="6d3bc8ecca9fcd2ca3ad5f16c97ba4ac" sha1="1fb66ff6b81fde0894db13ddc8c5e0f411780e9b"/>
@@ -15037,7 +15054,7 @@ Built on Windows CE, requires [MMU] support
 		<info name="barcode" value="4 974365 500047"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="godzilla generations (jpn)" sha1="562f2a2c8e77f9e89b09a4f497f04c386fc169e5"/>
+				<disk name="godzilla generations (jpn)" sha1="7cdf962b7038a7878ef027162d24aaf5ef4021ce"/>
 			</diskarea>
 		</part>
 	</software>
@@ -15079,7 +15096,7 @@ Built on Windows CE, requires [MMU] support
 		<info name="barcode" value="4 540129 000018"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="golem no maigo (jpn)" sha1="6b28518eaca82598ee5f9801d67ec0e4eb3d19dd"/>
+				<disk name="golem no maigo (jpn)" sha1="f30afafc87c37940c95a9b68f44f8d4eebe02ad2"/>
 			</diskarea>
 		</part>
 	</software>
@@ -15384,31 +15401,41 @@ Punts to BIOS at start of loading [GDROM READY] (fixed)
 	-->
 
 	<software name="grandia2" supported="no">
-		<!--
-		<rom name="Grandia II v1.001 (2000)(Ubi Soft)(NTSC)(US)[!].gdi" size="147" md5="779bfea94c220796cb9202e719cdb2e6" sha1="0a9e87800a6d7e0b2c4b8d616f0461c91d8a90d8"/>
-		<rom name="track01.bin" size="1425312" md5="cf71233b825358b1a7f4037aee98987c" sha1="523371c8279b2b8abd8d861b4828566fe9260e5f"/>
-		<rom name="track02.raw" size="1237152" md5="94fde9cacd7a4b3c18d8918836e9cda5" sha1="4b9ed2a2eefaae6691674522b9f047a066304a75"/>
-		<rom name="track03.bin" size="11456592" md5="8438569ebff46674c270e6406c8bd454" sha1="89ace0de97116a81c5856a6ab16f9a2b5f9ccc2a"/>
-		<rom name="track04.raw" size="1060752" md5="166d547d4b80a87ad3538f9377fbf6d8" sha1="471abb758a709c9d678bd2e76f31a6d721b5f4f0"/>
-		<rom name="track05.bin" size="1172537856" md5="dbd00f0e1b9796ba3e14e0266a1f7bd0" sha1="3117d7aafce1e25364e89447cf8b158ae4764aa2"/>
-
-		<rom name="Grandia II (Includes Audio Disc) (US).cue" size="6990" md5="b4d9c2211b05674eaf7f5040f4143c80" sha1="6ada883540e6448cf307847a60d863fbb4b24941"/>
-		<rom name="Grandia II Official Music Selections by Noriyuki Iwadre [Audio CD].ccd" size="2491" md5="f0fa93382e0ff0762f1fcf9e8f3d97b9" sha1="c4b3a8180b0a1125c2fd8b9863b1cf4ab7384cba"/>
-		<rom name="Grandia II Official Music Selections by Noriyuki Iwadre [Audio CD].img" size="524058528" md5="2fea441413f8d26fe1208163fd584117" sha1="e1d79d544b442043f6e3ca3f9bb1801c824fded9"/>
-		<rom name="Grandia II Official Music Selections by Noriyuki Iwadre [Audio CD].sub" size="21390144" md5="c7950da71b8e56d2c12c9aa5a3388e4d" sha1="61e57eeed76657a0e8a85fc550dec06dd6406d5d"/>
-		-->
 		<description>Grandia II (USA)</description>
 		<year>2000</year>
 		<publisher>Ubisoft</publisher>
 		<info name="serial" value="T-17716N"/>
 		<info name="release" value="20001206"/>
 		<part interface="cdrom" name="cdrom1">
+			<!--
+			<rom name="Grandia II v1.001 (2000)(Ubi Soft)(NTSC)(US)[!].gdi" size="147" md5="779bfea94c220796cb9202e719cdb2e6" sha1="0a9e87800a6d7e0b2c4b8d616f0461c91d8a90d8"/>
+			<rom name="track01.bin" size="1425312" md5="cf71233b825358b1a7f4037aee98987c" sha1="523371c8279b2b8abd8d861b4828566fe9260e5f"/>
+			<rom name="track02.raw" size="1237152" md5="94fde9cacd7a4b3c18d8918836e9cda5" sha1="4b9ed2a2eefaae6691674522b9f047a066304a75"/>
+			<rom name="track03.bin" size="11456592" md5="8438569ebff46674c270e6406c8bd454" sha1="89ace0de97116a81c5856a6ab16f9a2b5f9ccc2a"/>
+			<rom name="track04.raw" size="1060752" md5="166d547d4b80a87ad3538f9377fbf6d8" sha1="471abb758a709c9d678bd2e76f31a6d721b5f4f0"/>
+			<rom name="track05.bin" size="1172537856" md5="dbd00f0e1b9796ba3e14e0266a1f7bd0" sha1="3117d7aafce1e25364e89447cf8b158ae4764aa2"/>
+			-->
 			<feature name="part_id" value="Grandia II"/>
 			<diskarea name="cdrom">
 				<disk name="grandia ii (usa)" sha1="5a1a449de242d31bf47931096ebe7ce5412d0215"/>
 			</diskarea>
 		</part>
 		<part interface="dc_cdrom" name="cdrom2">
+			<!-- http://redump.org/disc/72472/
+			<rom name="grandia ii music selections (usa) (track 01).bin" size="73029600" crc="e569a19b" md5="43b49137a16ce4e24c8c8d5ef7709742" sha1="4c01222ba023968c54d6f036dceae765d36aa3c2"/>
+			<rom name="grandia ii music selections (usa) (track 02).bin" size="51113664" crc="388a626b" md5="c69d814d073fc3b24db10630c3a52562" sha1="b7cc765fedf2670e548059e96fb7d01d0b44f8b8"/>
+			<rom name="grandia ii music selections (usa) (track 03).bin" size="36691200" crc="8e5bef65" md5="110e1a9bead6cc02ddc5f7a53bf9c098" sha1="3b13cb4d1b377f0e65d012d0aed13757f87b4286"/>
+			<rom name="grandia ii music selections (usa) (track 04).bin" size="40755456" crc="51179a09" md5="efb3615c7ef0ac8392b07154517f97a3" sha1="7a40a31d890e4be0060703ceccded7386e9c50af"/>
+			<rom name="grandia ii music selections (usa) (track 05).bin" size="45673488" crc="e97e8f39" md5="1d2aeced867b0d1a7dadf91a3e701dc5" sha1="539494370739f512d8f2e72a1f5ad34a991c39f6"/>
+			<rom name="grandia ii music selections (usa) (track 06).bin" size="41063568" crc="b65d4f35" md5="4077c79be889b610db4e3f65cfae178b" sha1="e29a27f2133563e6b463ca026a0d7f39f9fef0ff"/>
+			<rom name="grandia ii music selections (usa) (track 07).bin" size="29788080" crc="51b97f44" md5="6c3760246b80e3a2242d3863cf19b29c" sha1="c32d0a584d670b5d5ce9924468c9accdabfb3251"/>
+			<rom name="grandia ii music selections (usa) (track 08).bin" size="38130624" crc="bbd84f84" md5="2910babfa9e79c6bc1fda769c32b3451" sha1="6912a00a0fab17c8f2b8c602f8e3275e354063f0"/>
+			<rom name="grandia ii music selections (usa) (track 09).bin" size="31653216" crc="f34782e4" md5="e523a1dde4817eaa7cdd6b981afa65cc" sha1="9431776f7510c47f1fd94d75bc81ab20d71616f4"/>
+			<rom name="grandia ii music selections (usa) (track 10).bin" size="47959632" crc="e4ffb9c8" md5="e9965b767ba01c7858290f751302d16b" sha1="972fda06c0d9d86b4f45496ca35172a83653d44f"/>
+			<rom name="grandia ii music selections (usa) (track 11).bin" size="51511152" crc="3b9910f6" md5="5cd2ebfb4d1954c0057a0c6f9ab9743d" sha1="69c788d2fa7dcc52756c644f83e47422171394b2"/>
+			<rom name="grandia ii music selections (usa) (track 12).bin" size="36688848" crc="4f495ce8" md5="7565aeddd11c3a68960c8e615da21cce" sha1="f40eb9ad47dff120be4dc159e9f6029569e4ff29"/>
+			<rom name="grandia ii music selections (usa).cue" size="1513" crc="a31def9e" md5="957647bab9af38929e0ca188b8ed857f" sha1="0de5f1834251c4f0362ed7040a8ad714ec5f2221"/>
+			-->
 			<feature name="part_id" value="Music Selections"/>
 			<diskarea name="cdrom">
 				<disk name="grandia ii (usa) (music selections)" sha1="36b8d4c10044de33e05343cb1a68c4b28c13ee33"/>
@@ -15712,7 +15739,7 @@ Has [redbook] audio
 		<info name="ring_code" value="T-2402M-0562A   10M2   C   0Y"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="guilty gear x (jpn)" sha1="6f2d7b2da9300e3db6cf9a4921af8dca728b3679"/>
+				<disk name="guilty gear x (jpn)" sha1="e454ea7eb4988aaaf5dc4ed2374e2410a58ec811"/>
 			</diskarea>
 		</part>
 	</software>
@@ -15963,7 +15990,7 @@ Hardlocks MAME after character and team setup with [drc]
 		<info name="ring_code" value="T-13303M-0250   3MM1   C   9Y"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="kidou senshi gundam gaiden colony no ochita chi de... - tokubetsuban (jpn)" sha1="64b3fbf8cd6012f6ed28fd8a4d0928f9025b945b"/>
+				<disk name="kidou senshi gundam gaiden colony no ochita chi de... - tokubetsuban (jpn)" sha1="7d10000af76100b944407a67f79f3bddb58472b4"/>
 			</diskarea>
 		</part>
 	</software>
@@ -16167,7 +16194,7 @@ Punts to BIOS at start of loading [GDROM READY] (fixed)
 		<info name="ring_code" value="&lt;T-46512M-0870&gt;HN202A"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="happy breeding (jpn)" sha1="a6a9dba133f5e8717fd2d2fcde80605025ed128e"/>
+				<disk name="happy breeding (jpn)" sha1="b1defc4ad6b1f7a0e6324680b6ada70c4a619eda"/>
 			</diskarea>
 		</part>
 	</software>
@@ -16239,7 +16266,7 @@ Punts to BIOS at start of loading [GDROM READY] (fixed)
 		<info name="ring_code" value="T-20106M-0655 3"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="harusame youbi (jpn)" sha1="44b5c1359a672e59cac6cbb9a758e8eae0c001b2"/>
+				<disk name="harusame youbi (jpn)" sha1="0c2821d1cc3171117086ee217683ebde74815cb7"/>
 			</diskarea>
 		</part>
 	</software>
@@ -16385,7 +16412,7 @@ Has [redbook] audio
 		<info name="ring_code" value="T-2202M-0540   2MM1   C   09"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="heisei mahjong-sou (jpn)" sha1="501b56e244082e5cf43efdce3800b9c8cf910f58"/>
+				<disk name="heisei mahjong-sou (jpn)" sha1="9d3e78cb07831da6bb183b37ed55749e58052296"/>
 			</diskarea>
 		</part>
 	</software>
@@ -16432,7 +16459,7 @@ Built on Windows CE, requires [MMU] support
 		<info name="ring_code" value="610-7381-0209 1"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="hello kitty no garden panic (jpn)" sha1="a7bd2309fb7c3a1a726e6600a87913260545ac90"/>
+				<disk name="hello kitty no garden panic (jpn)" sha1="2bd64a0f0a8acdbdb4abaa6cb5c9788a1bb721ba"/>
 			</diskarea>
 		</part>
 	</software>
@@ -16618,7 +16645,7 @@ Punts to BIOS at start of loading [GDROM READY] (fixed)
 		<info name="ring_code" value="T-46101M-0730 1"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="himitsu yui ga ita natsu (jpn)" sha1="a0ed3fbac2dd23c6038165d9238e091705f822c2"/>
+				<disk name="himitsu yui ga ita natsu (jpn)" sha1="e066d34d072ce2d8f41bcfdfd30c24a029986944"/>
 			</diskarea>
 		</part>
 	</software>
@@ -17010,7 +17037,7 @@ FMV draws [PVR] black pixels instead of transparent color
 		<info name="ring_code" value="T-5703M-0150   1M1   C   98"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="idol janshi o tsukucchaou (jpn)" sha1="f31ee28505fdd303caead1160915dc11ee712ca4"/>
+				<disk name="idol janshi o tsukucchaou (jpn)" sha1="a388bc1b87f905c316662a1c8f78543bd50c1dc9"/>
 			</diskarea>
 		</part>
 	</software>
@@ -17097,7 +17124,7 @@ Punts to BIOS at start of loading [GDROM READY], locks up (fixed)
 		<info name="ring_code" value="T-45601M-0658   1M2   C   13"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="illbleed (jpn)" sha1="cb6c69e42599a9526e41e78876a8acf9d50cdff8"/>
+				<disk name="illbleed (jpn)" sha1="4def52884214c334074bbad6ac9a96f14acc4f85"/>
 			</diskarea>
 		</part>
 	</software>
@@ -17380,7 +17407,7 @@ Punts to BIOS at start of loading [GDROM READY] (fixed)
 		<info name="ring_code" value="&lt;T-19506M-0779&gt;HLA12A"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="inoue ryouko last scene (jpn)" sha1="23423fbfae0e2274d158f20495ebcfc8453869e1"/>
+				<disk name="inoue ryouko last scene (jpn)" sha1="3a465b82c2c94cc6e93f904a08ffae6cd646b8f0"/>
 			</diskarea>
 		</part>
 	</software>
@@ -17422,7 +17449,7 @@ Crashes on FMV with [drc]
 		<info name="ring_code" value="&lt;T-20117M-0874&gt;HN316D"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="interlude (jpn)" sha1="f0602aa16434efd302ab92ee2f7bc2700073dc96"/>
+				<disk name="interlude (jpn)" sha1="81b7e9419a0cb394ba3adc9dc1b87645ff337c1c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -17496,7 +17523,7 @@ Crashes on FMV with [drc]
 		<info name="ring_code" value="T-19722M-0891 MT   B03"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="iris (jpn)" sha1="ca801678eb8ccffc1b6aa9c0713f5d575491304d"/>
+				<disk name="iris (jpn)" sha1="6a8f7ae5cbb51a4649d695fe076c7354b2a091ac"/>
 			</diskarea>
 		</part>
 	</software>
@@ -17618,7 +17645,7 @@ Punts to BIOS at start of loading [GDROM READY] (fixed)
 		<info name="ring_code" value="HDR-0028-0165   1M1   C   99, HDR-0028-0165   3M3   C   99"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="j.league pro soccer club o tsukurou (jpn)" sha1="e412efe15d1a924cc3389ab7e7da2bf8f567db56"/>
+				<disk name="j.league pro soccer club o tsukurou (jpn)" sha1="301d48ae9453f59cae5ba14610da7bf1997b4fde"/>
 			</diskarea>
 		</part>
 	</software>
@@ -17649,7 +17676,7 @@ Has [redbook] audio
 		<info name="ring_code" value="&lt;T-43401M-0462&gt;HK711H"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="jahmong (jpn)" sha1="bb96e19026ebf3e12f212c2bbd3c3a95610eec25"/>
+				<disk name="jahmong (jpn)" sha1="f48495ede4aa81aad5904b8c6bb24e05223ff7dd"/>
 			</diskarea>
 		</part>
 	</software>
@@ -17790,7 +17817,7 @@ Has [redbook] audio
 		<info name="ring_code" value="&lt;T-41201M-0531&gt;HKA02A"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="jet coaster dream 2 (jpn)" sha1="8858b6252cdc67600ab26a6b9a12767726b5bd17"/>
+				<disk name="jet coaster dream 2 (jpn)" sha1="3181d15a34b34584cdc48a7647ce5a32652f4424"/>
 			</diskarea>
 		</part>
 	</software>
@@ -18293,13 +18320,13 @@ Horse bet service requiring a [modem] or [BBA]
 		<part interface="cdrom" name="cdrom1">
 			<feature name="part_id" value="Disc 1"/>
 			<diskarea name="cdrom">
-				<disk name="kaen seibo the virgin on megiddo (jpn) (disc 1)" sha1="585635db615d091f6cce5c7156e475e1f7e92daf"/>
+				<disk name="kaen seibo the virgin on megiddo (jpn) (disc 1)" sha1="486fa13f2cc89b494b59c7e501814d5e3093c04c"/>
 			</diskarea>
 		</part>
 		<part interface="cdrom" name="cdrom2">
 			<feature name="part_id" value="Disc 2"/>
 			<diskarea name="cdrom">
-				<disk name="kaen seibo the virgin on megiddo (jpn) (disc 2)" sha1="7a07dfcde19ecdaf4ead28b5afa9f01468aac576"/>
+				<disk name="kaen seibo the virgin on megiddo (jpn) (disc 2)" sha1="ae9bcd48abe94cc6f79887cecfd4a367a8ed5699"/>
 			</diskarea>
 		</part>
 	</software>
@@ -18346,15 +18373,13 @@ Built on Windows CE, requires [MMU] support
 		<info name="ring_code" value="&lt;T-20105M-0486&gt;HL516C"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="kanon (jpn)" sha1="4c915bc782f743c6f87812041c9baccb0e947825"/>
+				<disk name="kanon (jpn)" sha1="81f49e0823557f91ea98e312304c05c5691931d5"/>
 			</diskarea>
 		</part>
 	</software>
 
 	<software name="kao" supported="no">
 		<!--
-		<rom name="track18.raw" size="12449136" md5="8cb7202deb2124ae2dbfa68593b7d183" sha1="e7e5ce7b0ab6cf529f1a5a0a67a1f3a89b18c90a"/>
-		<rom name="track38.raw" size="13902672" md5="44a207f542241062f13c8d59578aed05" sha1="75d27ba691e49eae837ea8bad3534a5fe1d761ed"/>
 		<rom name="KAO the Kangaroo v1.002 (2000)(Titus)(NTSC)(US)(en-es)[!].gdi" size="1842" md5="983ce4b8203a1a2abbe0477066f726ee" sha1="e5c6e4f8cea7bb4bcd767038bd02242937f0d5e4"/>
 		<rom name="track01.bin" size="1425312" md5="623b23ea5b6641bb1e5fbe5ee545bee0" sha1="c38b641adb8944938a9e601dd80c11829d5bf3c1"/>
 		<rom name="track02.raw" size="1237152" md5="87af6d21a8b10aeffb90874118531e29" sha1="b0d28980a64765c022b4b3e47244aad32a345270"/>
@@ -18373,6 +18398,7 @@ Built on Windows CE, requires [MMU] support
 		<rom name="track15.raw" size="13055952" md5="40be89267716738b1f38211b787ba795" sha1="506244d72439a8d516f59d57bfaeea8c59f374a8"/>
 		<rom name="track16.raw" size="12451488" md5="37a107c5471a5d9095dfedc47e1dff4b" sha1="97bb897db5595fb89c6c595a2cdfdbe76e05af92"/>
 		<rom name="track17.raw" size="13258224" md5="7995eb5c51529eb19961a17ff1f505df" sha1="fafec4a2c81193edf3e74b44945b0d86a45c9f30"/>
+		<rom name="track18.raw" size="12449136" md5="8cb7202deb2124ae2dbfa68593b7d183" sha1="e7e5ce7b0ab6cf529f1a5a0a67a1f3a89b18c90a"/>
 		<rom name="track19.raw" size="11190816" md5="c4ac1853cc5c68f542425b2375f1429c" sha1="0ae2ef53811c5220b20b67be31150d9a79ba1270"/>
 		<rom name="track20.raw" size="13180608" md5="e3aa8cf0905688420b9847a04171ed52" sha1="682cf0cf236fbf87a016d8d8352ad207720531cd"/>
 		<rom name="track21.raw" size="13902672" md5="211440f97e5c58d88a552baa6f7f5471" sha1="3ffc07527be24f55989c432c89409fc51b509bd6"/>
@@ -18392,6 +18418,7 @@ Built on Windows CE, requires [MMU] support
 		<rom name="track35.raw" size="10395840" md5="e9b2ca401f30e439e09c314e378523e9" sha1="01e07bd8010be327b29566f4f68fb91037cbd5a5"/>
 		<rom name="track36.raw" size="14812896" md5="ae24259ad323756bd100a1e27f57a1b7" sha1="a3200b4dbe48b7ee0ee476a287f45631d0cf9172"/>
 		<rom name="track37.raw" size="13180608" md5="859071b98c183a3a99a957f985117886" sha1="88ec068ce73b7bf1abfd1d2b4eb706b743229881"/>
+		<rom name="track38.raw" size="13902672" md5="44a207f542241062f13c8d59578aed05" sha1="75d27ba691e49eae837ea8bad3534a5fe1d761ed"/>
 		<rom name="track39.raw" size="12547920" md5="e254d0115ef39a678251a59fc7b0e757" sha1="7fc35e0f34118c24c32926105782ffcbc9f385c4"/>
 		<rom name="track40.raw" size="13897968" md5="4a25dcd98efccb3d293bac3b8bfa8305" sha1="c0d4160e51c0b431211dea65c83fe1ddd4dca410"/>
 		<rom name="track41.raw" size="13053600" md5="4e9a57d2a250e7a88fe4fd293c76faad" sha1="12070e7ccfa4c029247b33dff5f7f3401d0c284e"/>
@@ -18428,8 +18455,6 @@ Built on Windows CE, requires [MMU] support
 	<!-- A promo version exists (P830-0197-50 T-22902D-50), it is most likely the same as retail. -->
 	<software name="kaoe" cloneof="kao" supported="no">
 		<!--
-		<rom name="track18.raw" size="12449136" md5="8cb7202deb2124ae2dbfa68593b7d183" sha1="e7e5ce7b0ab6cf529f1a5a0a67a1f3a89b18c90a"/>
-		<rom name="track38.raw" size="13902672" md5="44a207f542241062f13c8d59578aed05" sha1="75d27ba691e49eae837ea8bad3534a5fe1d761ed"/>
 		<rom name="KAO the Kangaroo v1.001 (2000)(Titus)(PAL)(M5)[!].gdi" size="1843" md5="780988f87ee0e6d35dbd6bb2849cf560" sha1="c5fa6d85c6f990698b2240f023a6602ceaac48ac"/>
 		<rom name="track01.bin" size="16075920" md5="ca93f351c33f2deeebc473948b94c8cf" sha1="84b049207401b0c669b58f513842d3fe9b2f23f5"/>
 		<rom name="track02.raw" size="13994400" md5="d1838bcbca4a24b39deddeae2a9d371a" sha1="b643df4def042b6c23f90f54c690ac7df431233f"/>
@@ -18448,6 +18473,7 @@ Built on Windows CE, requires [MMU] support
 		<rom name="track15.raw" size="13055952" md5="40be89267716738b1f38211b787ba795" sha1="506244d72439a8d516f59d57bfaeea8c59f374a8"/>
 		<rom name="track16.raw" size="12451488" md5="37a107c5471a5d9095dfedc47e1dff4b" sha1="97bb897db5595fb89c6c595a2cdfdbe76e05af92"/>
 		<rom name="track17.raw" size="13258224" md5="7995eb5c51529eb19961a17ff1f505df" sha1="fafec4a2c81193edf3e74b44945b0d86a45c9f30"/>
+		<rom name="track18.raw" size="12449136" md5="8cb7202deb2124ae2dbfa68593b7d183" sha1="e7e5ce7b0ab6cf529f1a5a0a67a1f3a89b18c90a"/>
 		<rom name="track19.raw" size="11190816" md5="c4ac1853cc5c68f542425b2375f1429c" sha1="0ae2ef53811c5220b20b67be31150d9a79ba1270"/>
 		<rom name="track20.raw" size="13180608" md5="e3aa8cf0905688420b9847a04171ed52" sha1="682cf0cf236fbf87a016d8d8352ad207720531cd"/>
 		<rom name="track21.raw" size="13902672" md5="211440f97e5c58d88a552baa6f7f5471" sha1="3ffc07527be24f55989c432c89409fc51b509bd6"/>
@@ -18467,6 +18493,7 @@ Built on Windows CE, requires [MMU] support
 		<rom name="track35.raw" size="10395840" md5="e9b2ca401f30e439e09c314e378523e9" sha1="01e07bd8010be327b29566f4f68fb91037cbd5a5"/>
 		<rom name="track36.raw" size="14812896" md5="ae24259ad323756bd100a1e27f57a1b7" sha1="a3200b4dbe48b7ee0ee476a287f45631d0cf9172"/>
 		<rom name="track37.raw" size="13180608" md5="859071b98c183a3a99a957f985117886" sha1="88ec068ce73b7bf1abfd1d2b4eb706b743229881"/>
+		<rom name="track38.raw" size="13902672" md5="44a207f542241062f13c8d59578aed05" sha1="75d27ba691e49eae837ea8bad3534a5fe1d761ed"/>
 		<rom name="track39.raw" size="12547920" md5="e254d0115ef39a678251a59fc7b0e757" sha1="7fc35e0f34118c24c32926105782ffcbc9f385c4"/>
 		<rom name="track40.raw" size="13897968" md5="4a25dcd98efccb3d293bac3b8bfa8305" sha1="c0d4160e51c0b431211dea65c83fe1ddd4dca410"/>
 		<rom name="track41.raw" size="13053600" md5="4e9a57d2a250e7a88fe4fd293c76faad" sha1="12070e7ccfa4c029247b33dff5f7f3401d0c284e"/>
@@ -18574,7 +18601,7 @@ cdrom2: [redbook] audio
 		<part interface="cdrom" name="cdrom1">
 			<feature name="part_id" value="Kaze no Uta"/>
 			<diskarea name="cdrom">
-				<disk name="kaze no uta (jpn)" sha1="96f44ea17e9de2d47061737f7528a7064fc530c2"/>
+				<disk name="kaze no uta (jpn)" sha1="279a9d2dfd1526e4b224203184275396647ab937"/>
 			</diskarea>
 		</part>
 		<part interface="cdrom" name="cdrom2">
@@ -18605,7 +18632,7 @@ cdrom2: [redbook] audio
 		<info name="barcode" value="T4997766300085"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="kidou senkan nadesico nadesico the mission (jpn)" sha1="21dda612cdc3ee96cd9baea01054b167665920f3"/>
+				<disk name="kidou senkan nadesico nadesico the mission (jpn)" sha1="c7aa3b1016252a124a9b6d9d45f78e42e05192ea"/>
 			</diskarea>
 		</part>
 	</software>
@@ -18730,7 +18757,7 @@ Punts to BIOS at start of loading [GDROM READY] (fixed)
 		<info name="barcode" value="4 519898 002240"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="kimi ga nozomu eien (jpn)" sha1="5c2afe4fa9eea00a0e1f503bd1a328f9ce627c9c"/>
+				<disk name="kimi ga nozomu eien (jpn)" sha1="7622b56158e60972f5ea2b6f82142a9a6c0054f9"/>
 			</diskarea>
 		</part>
 	</software>
@@ -18868,7 +18895,7 @@ Built on Windows CE, requires [MMU] support
 		<info name="ring_code" value="T-14301M-0057A   2M1   C   93"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="kita e. white illumination (jpn)" sha1="e389aff777840f4bf82f26573fefff2434b8867a"/>
+				<disk name="kita e. white illumination (jpn)" sha1="acb35e852a28693580ef0380123a29acc7e6b88e"/>
 			</diskarea>
 		</part>
 	</software>
@@ -19598,7 +19625,7 @@ Crashes after FMV on few seconds of (broken) GFXs [drc]
 		<info name="ring_code" value="HDR-0139-0645   2M1   C   12"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="love hina smile again (jpn)" sha1="31d6be18dad7207813b905ca422714e78b3c8b21"/>
+				<disk name="love hina smile again (jpn)" sha1="63af4720ff7fcaa14d48a47958eb3c11c167dd84"/>
 			</diskarea>
 		</part>
 	</software>
@@ -23412,6 +23439,7 @@ Crashes at the end of FMV
 		<rom name="track15.raw" size="2467248" md5="87231690aa471430d3ee89d9a25c4d25" sha1="cf632142d12ff764f849587058c8749feb62dd56"/>
 		<rom name="track16.raw" size="2467248" md5="87231690aa471430d3ee89d9a25c4d25" sha1="cf632142d12ff764f849587058c8749feb62dd56"/>
 		<rom name="track17.raw" size="1084272" md5="25b80ba0a1ce3010a397adfb3c0355f6" sha1="5ed63f5c402600a4847d6be84e2b04f423fdd47b"/>
+		<rom name="track18.raw" size="3528000" md5="c2ce25835ddc6c9936fa87294c150f8e" sha1="5208d3d25f89bb669dd8f1fca291bb9627b9eeb7"/>
 		<rom name="track19.raw" size="1237152" md5="d566b3d8cfab13512e137f2fbf3e0066" sha1="ebe1998b2cccded7413ae27d2e564e7b7eccb9b9"/>
 		<rom name="track20.raw" size="2648352" md5="5ac527092e97362ee385949c20efc52d" sha1="16e018ebb9482d18e974d21b3ede596d316c501b"/>
 		<rom name="track21.raw" size="3001152" md5="1e2dc50b3560e5f5189a925808f4e9f0" sha1="e256f05c10c23f2f28104410c543f3e29a11b399"/>
@@ -23431,6 +23459,7 @@ Crashes at the end of FMV
 		<rom name="track35.raw" size="3353952" md5="0b9ba48f275eaf617d1e24b8ce53a4e9" sha1="009a69b955ee5ad8a1e57b4f2646c6f31f10ba4e"/>
 		<rom name="track36.raw" size="1942752" md5="6ec34aa74db04241aae8c4afb8ff0ed0" sha1="7099c6e4770eb7e9097421e15988905e9238967a"/>
 		<rom name="track37.raw" size="2119152" md5="2c684efd9bdf54500cfed7db6d6cef37" sha1="d8a1d35589f457d7ab3185c2d01ba4f5cfaae916"/>
+		<rom name="track38.raw" size="1237152" md5="c5165ad0901029ae1ea0ce629ee4c25c" sha1="a57c8bd0842ec516d2d7a9daed2defd39018f529"/>
 		<rom name="track39.raw" size="3353952" md5="f72db0bbd5f5b4cbeb958ced1adfe0f6" sha1="dd0f8a4d458d04e3e1e57da437c8d7875e794bca"/>
 		<rom name="track40.raw" size="1589952" md5="398965ccb2db1aa71caff619c7783677" sha1="6598c732209e8a6ae41daf52597d599cde8d7871"/>
 		<rom name="track41.raw" size="2822400" md5="eb92fb57acaced1500a28583f0f92cc6" sha1="d2d75f79e30702e4d583c6915315cb1f0a72f164"/>
@@ -23450,6 +23479,7 @@ Crashes at the end of FMV
 		<rom name="track55.raw" size="3353952" md5="313ddc0e5ea084eb35f9e70901a338a1" sha1="bafc23cbb073a478059760800a9b0b66d343b31c"/>
 		<rom name="track56.raw" size="3883152" md5="57c0cb3e639fee8122de3acd7de3970c" sha1="add841d5cf1638583c7149344ab53a25e15edf28"/>
 		<rom name="track57.raw" size="3353952" md5="bfe9ccb2697e817591e9b0bf25115f65" sha1="7cf93598570b1376c5ba83f704f0f31201c7dd21"/>
+		<rom name="track58.raw" size="1060752" md5="aefeb9b0e1aa056577193b4db220af14" sha1="bc6b9e87667ab5484625b8d259996503ab84db06"/>
 		<rom name="track59.raw" size="3001152" md5="17cdc398cf30cce3722fbb33dfbfe17a" sha1="0cc958d4e66b33c0db716ca1181512f4c914b0b1"/>
 		<rom name="track60.raw" size="2646000" md5="2e278e73856e97a57e979dbd94ed635d" sha1="e48d1a42d45e44bfdfaba3f47e2ff2b48d8d19d1"/>
 		<rom name="track61.raw" size="2648352" md5="3be2a7a523fe8cc27fb988baa122265c" sha1="843383d71af8fb4135a685d2ed25d4d7f81dd24d"/>
@@ -23481,9 +23511,6 @@ Crashes at the end of FMV
 		<rom name="track87.raw" size="1942752" md5="66d8fd661aab68e5e88edf498a2acc51" sha1="26751a96a6c213d92d9eb6dd14d8472bec0be596"/>
 		<rom name="track88.raw" size="2469600" md5="3af390fea354f4d7f3538e31e928fde4" sha1="b28bcc529868a3227882fcbfa1ff16bc3770b21f"/>
 		<rom name="track89.bin" size="645845088" md5="4a62c134eba4b5cfd6429a31b850db23" sha1="394b34843f3422abf36bf236e59de28d6217761b"/>
-		<rom name="track18.raw" size="3528000" md5="c2ce25835ddc6c9936fa87294c150f8e" sha1="5208d3d25f89bb669dd8f1fca291bb9627b9eeb7"/>
-		<rom name="track38.raw" size="1237152" md5="c5165ad0901029ae1ea0ce629ee4c25c" sha1="a57c8bd0842ec516d2d7a9daed2defd39018f529"/>
-		<rom name="track58.raw" size="1060752" md5="aefeb9b0e1aa056577193b4db220af14" sha1="bc6b9e87667ab5484625b8d259996503ab84db06"/>
 		-->
 		<description>Nightmare Creatures II (USA)</description>
 		<year>2000</year>
@@ -23518,6 +23545,7 @@ Crashes at the end of FMV
 		<rom name="track15.raw" size="2467248" md5="83d40510e01ac292db9c5a0340bcab4a" sha1="1c534dba15ca158cf44479e60ee23b01f6bcd55c"/>
 		<rom name="track16.raw" size="2467248" md5="83d40510e01ac292db9c5a0340bcab4a" sha1="1c534dba15ca158cf44479e60ee23b01f6bcd55c"/>
 		<rom name="track17.raw" size="1084272" md5="359c22b47142ba129c5c3e2034bac7ae" sha1="3204fb42df2374a0ade768696e7da5b755985e87"/>
+		<rom name="track18.raw" size="3528000" md5="515b7115d10800b9a0d4e30f178ab1d5" sha1="b3b7af5c11ed1ea9afa4e21e8ddbf3c4f0af2160"/>
 		<rom name="track19.raw" size="1237152" md5="e311d903fb00ae2853a7015e694ea696" sha1="561b2598dd60b21132c57a517fd0ac3781b0bb7a"/>
 		<rom name="track20.raw" size="2648352" md5="456e16c7315fa5c4be169d50143f0d6b" sha1="642985b06baeeeaf49df8a070194b612d2ca9d66"/>
 		<rom name="track21.raw" size="3001152" md5="8664bba9ad9eaac38328766001e32766" sha1="bb50a94b8855a817c41e936da8c455f556b1b3a2"/>
@@ -23537,6 +23565,7 @@ Crashes at the end of FMV
 		<rom name="track35.raw" size="3353952" md5="3e35fdc04bcc5e739fad3f7e906d4037" sha1="858f1dff9a0b63e6eac4efb8a68221fc7d7c0d64"/>
 		<rom name="track36.raw" size="1942752" md5="2ef656b963396d5c8938103f3e32011c" sha1="c8fa39338303b569988a0e40f1cf1e9fd2a32d18"/>
 		<rom name="track37.raw" size="2119152" md5="22a0d59ee7ca556462ed764fa082b8d2" sha1="993dd06a664d8dbfff0631140efc6cb1b76de38f"/>
+		<rom name="track38.raw" size="1237152" md5="da1f1026a6f60923ea0f45c900b73d00" sha1="fe11284852b4bd85b8f94f48f75afa696267a532"/>
 		<rom name="track39.raw" size="3353952" md5="82012b789f61d3293bd94209d359ec36" sha1="03e2de94e117c8b5edecc20d6bedce28d1493247"/>
 		<rom name="track40.raw" size="1589952" md5="2fcac2d584ef02f6155730614c9c502f" sha1="7218b447b0144fbdea82e9174510fc126d18f8a9"/>
 		<rom name="track41.raw" size="2822400" md5="f4abdf8cef57c3169e381d5d6579b439" sha1="7e44d4fecec51db789826dcc1780a321a00b2dfb"/>
@@ -23556,6 +23585,7 @@ Crashes at the end of FMV
 		<rom name="track55.raw" size="3353952" md5="469ef19b6d726b045c8e12ae8f3731c0" sha1="c70be784a412d66623935799f530fb2ebfcdf8c4"/>
 		<rom name="track56.raw" size="3883152" md5="fce2f35ebfcbd124e70401d1f4f3d886" sha1="f31461e7b94583ec192da1fc25381a4c68cd5a90"/>
 		<rom name="track57.raw" size="3353952" md5="de4f69748b74c75a6cbe681807ac19ce" sha1="fdf74d1a88dad61b73e9881fb112497ec9cd7d2f"/>
+		<rom name="track58.raw" size="1060752" md5="0222f498cbb1ddb8014c0b3cd6d64396" sha1="7a883c1b1d5f5e172c44201630810ea07881ae63"/>
 		<rom name="track59.raw" size="3001152" md5="60a5d5cac305de12a6882bc3fb881874" sha1="fc51184b690280cde90ae1d1c9170ccb02d204a3"/>
 		<rom name="track60.raw" size="2646000" md5="ead56370293049b59fe6522b7f55aaca" sha1="faf700d5a80c14f94db389da05fcbe25781e3acb"/>
 		<rom name="track61.raw" size="2648352" md5="4ed21875269c0aa8472895717fccbd57" sha1="4ca98ef3fd018279ae9a7d3db9f79ab16c16deec"/>
@@ -23588,9 +23618,6 @@ Crashes at the end of FMV
 		<rom name="track88.raw" size="2646000" md5="98f9d4a7cb7c14936e60f6f55eb152fe" sha1="ba0169690d8b8454db9046bcf8bdffecc6491ce7"/>
 		<rom name="track89.raw" size="2116800" md5="8ac57390fa4ba17b0e138055267b3f6e" sha1="a74409044d54e3348432b3abaa4b99eb9fca08c7"/>
 		<rom name="track90.bin" size="709358496" md5="0cfe721462e028aa5419ab20e0a71906" sha1="f8c0effe1e5d7f8bf4d8363108fe918952073287"/>
-		<rom name="track18.raw" size="3528000" md5="515b7115d10800b9a0d4e30f178ab1d5" sha1="b3b7af5c11ed1ea9afa4e21e8ddbf3c4f0af2160"/>
-		<rom name="track38.raw" size="1237152" md5="da1f1026a6f60923ea0f45c900b73d00" sha1="fe11284852b4bd85b8f94f48f75afa696267a532"/>
-		<rom name="track58.raw" size="1060752" md5="0222f498cbb1ddb8014c0b3cd6d64396" sha1="7a883c1b1d5f5e172c44201630810ea07881ae63"/>
 		-->
 		<description>Nightmare Creatures II (Europe)</description>
 		<year>2000</year>
