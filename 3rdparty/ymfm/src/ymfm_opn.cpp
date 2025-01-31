@@ -146,14 +146,11 @@ bool opn_registers_base<IsOpnA>::write(uint16_t index, uint8_t data, uint32_t &c
 	// borrow unused registers 0xb8-bf/0x1b8-bf as temporary holding locations
 	if ((index & 0xf0) == 0xa0)
 	{
-		if (bitfield(index, 0, 2) == 3)
-			return false;
-
 		uint32_t latchindex = 0xb8 | bitfield(index, 3);
 		if (IsOpnA)
 			latchindex |= index & 0x100;
 
-		// writes to the upper half just latch (only low 6 bits matter)
+		// writes to the upper half go to shared 6-bit latch
 		if (bitfield(index, 2))
 			m_regdata[latchindex] = data & 0x3f;
 
