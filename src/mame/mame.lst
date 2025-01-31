@@ -44816,7 +44816,12 @@ sothello
 tonton
 
 @source:sun/sun1.cpp
+<<<<<<< HEAD
 sun1
+=======
+multibox                        //
+sun1                            //
+>>>>>>> 61c15042884 (New machines marked as NOT_WORKING)
 
 @source:sun/sun2.cpp
 sun2_120
