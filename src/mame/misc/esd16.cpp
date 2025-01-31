@@ -1312,8 +1312,8 @@ ROM_START( hedpanic830 ) // Story line & game instructions in English
 	ROM_LOAD16_BYTE( "esd2.cu03", 0x000000, 0x040000, CRC(955be87f) SHA1(835ec1c9a6d77d095bac7427e428ec25861d91dd) )
 	ROM_LOAD16_BYTE( "esd1.cu02", 0x000001, 0x040000, CRC(b56a4fe8) SHA1(dc64c81c1a04af8b248d3e46ddee73eca23c74fd) )
 
-	ROM_REGION( 0x40000, "audiocpu", 0 )        // Z80 Code, quite different to the other sets
-	ROM_LOAD( "esd3.su06", 0x00000, 0x40000, CRC(f4588a2c) SHA1(c9c26561f7ce2574032dfada707fcf99b913b1d5) )
+	ROM_REGION( 0x40000, "audiocpu", 0 )
+	ROM_LOAD( "esd3.su06", 0x00000, 0x40000, BAD_DUMP CRC(f4588a2c) SHA1(c9c26561f7ce2574032dfada707fcf99b913b1d5) )
 
 	ROM_REGION( 0x600000, "spr", 0 )    // Sprites, 16x16x5
 	ROM_LOAD( "esd6.ju01", 0x200000, 0x200000, CRC(ffa6eb26) SHA1(c2e3371925604db0f46991cbfd39d763518ed89c) )
