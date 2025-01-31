@@ -247,7 +247,7 @@ static int16_t* uef_cas_fill_bit( uint8_t loops, int16_t *buffer, bool bit )
 	return buffer;
 }
 
-static int uef_cas_fill_wave( int16_t *buffer, int length, const uint8_t *bytes )
+static int uef_cas_fill_wave( int16_t *buffer, int length, const uint8_t *bytes, int )
 {
 	if ( bytes[0] == 0x1f && bytes[1] == 0x8b ) {
 		if ( gz_ptr == nullptr ) {
