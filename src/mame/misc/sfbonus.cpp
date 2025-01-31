@@ -3699,6 +3699,25 @@ ROM_START( fb4d2 )
 	ROM_LOAD( "fb415lt.id", 0x00, 0x20, CRC(f44d3e8c) SHA1(af462959a37c271c840324d74b2619691fadf8bd) )
 ROM_END
 
+ROM_START( fb4_14 )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "rom1.bin", 0x00000, 0x40000, CRC(166fc16c) SHA1(aa571cf010a308c9f615df3aa11c956ee246dc6a) )
+
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "rom2.bin", 0x00000, 0x40000, CRC(f0bfb08e) SHA1(521a277bd0445d677afe33ec245b2b3f501771d0) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "rom3.bin", 0x00000, 0x80000, CRC(4176937d) SHA1(dbde944a154f648a86628a8165fa27032115c417) )
+	ROM_LOAD16_BYTE( "rom4.bin", 0x00001, 0x80000, CRC(f8c57041) SHA1(ca8f58e89d31563b363a78db89e2711402f3ba80) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "rom5.bin", 0x00000, 0x80000, CRC(41ad506c) SHA1(19086ab859a60e5127af0e51381cbb9fda6de74a) )
+	ROM_LOAD16_BYTE( "rom6.bin", 0x00001, 0x80000, CRC(f6c07f3d) SHA1(709fe2a443fdd32a3f9ab9161d5321a01c0119bb) )
+
+	ROM_REGION( 0x1000, "nvram", ROMREGION_ERASE00 ) /* default settings */
+	ROM_LOAD( "fb415lt.id", 0x00, 0x20, CRC(1e27e3e1) SHA1(c2111ed7b3afa24457bca3fa4a4bc5947113b370) )
+ROM_END
+
 ROM_START( fb4v1 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fb4v15r.bin", 0x00000, 0x40000, CRC(891f119f) SHA1(1823826cd958a951a930b9a1a23f7cf092ed6ab2) )
@@ -5853,7 +5872,7 @@ void sfbonus_state::sfbonus_bitswap(
 void sfbonus_state::init_abnudge()          { sfbonus_bitswap( 0x33, 0,3,7,6,5,2,1,4, 0xff, 3,7,6,5,1,0,4,2, 0x36, 4,2,3,7,6,5,1,0, 0xa8, 3,2,4,0,1,7,6,5, 0x2c, 0,1,7,6,5,2,4,3, 0xff, 3,7,6,5,1,0,4,2, 0x26, 2,4,3,7,6,5,1,0, 0xbe, 4,1,3,0,2,7,6,5); }
 void sfbonus_state::init_abnudged()         { sfbonus_bitswap( 0x3b, 0,1,7,6,5,4,3,2, 0xef, 0,7,6,5,4,3,2,1, 0x21, 0,2,1,7,6,5,4,3, 0xa9, 4,3,0,1,2,7,6,5, 0x3d, 2,1,7,6,5,4,3,0, 0xed, 2,7,6,5,4,3,1,0, 0x21, 0,2,1,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5); }
 void sfbonus_state::init_abnudgev()         { sfbonus_bitswap( 0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x21, 2,1,0,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3f, 0,1,7,6,5,4,3,2, 0xee, 1,7,6,5,4,3,0,2, 0x25, 1,0,2,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
-void sfbonus_state::init_act2000()          { sfbonus_bitswap( 0x25, 1,2,7,6,5,4,3,0, 0xE6, 1,7,6,5,4,3,0,2, 0x20, 2,4,1,7,6,5,0,3, 0xBF, 0,3,1,2,4,7,6,5, 0x2E, 1,3,7,6,5,2,0,4, 0xE0, 3,7,6,5,2,0,4,1, 0x2D, 4,1,2,7,6,5,0,3, 0xB2, 2,0,4,1,3,7,6,5); }
+void sfbonus_state::init_act2000()          { sfbonus_bitswap( 0x25, 1,2,7,6,5,4,3,0, 0xe6, 1,7,6,5,4,3,0,2, 0x20, 2,4,1,7,6,5,0,3, 0xbf, 0,3,1,2,4,7,6,5, 0x2e, 1,3,7,6,5,2,0,4, 0xe0, 3,7,6,5,2,0,4,1, 0x2d, 4,1,2,7,6,5,0,3, 0xb2, 2,0,4,1,3,7,6,5); }
 void sfbonus_state::init_act2000d()         { sfbonus_bitswap( 0x3d, 0,2,7,6,5,4,3,1, 0xef, 1,7,6,5,4,3,2,0, 0x27, 0,2,1,7,6,5,4,3, 0xad, 4,3,0,1,2,7,6,5, 0x3b, 2,1,7,6,5,4,3,0, 0xed, 0,7,6,5,4,3,2,1, 0x27, 0,2,1,7,6,5,4,3, 0xaa, 4,3,1,2,0,7,6,5); }
 void sfbonus_state::init_act2000v()         { sfbonus_bitswap( 0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x23, 2,1,0,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 0,1,7,6,5,4,3,2, 0xe9, 1,7,6,5,4,3,0,2, 0x21, 1,0,2,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
 void sfbonus_state::init_act2000v2()        { sfbonus_bitswap( 0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x21, 2,1,0,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3a, 0,1,7,6,5,4,3,2, 0xe9, 1,7,6,5,4,3,0,2, 0x21, 1,0,2,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
@@ -5879,7 +5898,7 @@ void sfbonus_state::init_classiced()        { sfbonus_bitswap( 0x38, 0,2,7,6,5,4
 void sfbonus_state::init_classiced3()       { sfbonus_bitswap( 0x3b, 2,1,7,6,5,4,3,0, 0xea, 2,7,6,5,4,3,0,1, 0x24, 2,1,0,7,6,5,4,3, 0xaa, 4,3,2,0,1,7,6,5, 0x3e, 1,0,7,6,5,4,3,2, 0xe8, 0,7,6,5,4,3,1,2, 0x24, 2,1,0,7,6,5,4,3, 0xae, 4,3,1,0,2,7,6,5); }
 void sfbonus_state::init_classicev()        { sfbonus_bitswap( 0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x22, 2,0,1,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3a, 2,1,7,6,5,4,3,0, 0xea, 2,7,6,5,4,3,1,0, 0x22, 2,1,0,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
 void sfbonus_state::init_classicev3()       { sfbonus_bitswap( 0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x22, 2,0,1,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3f, 2,1,7,6,5,4,3,0, 0xe9, 2,7,6,5,4,3,1,0, 0x22, 2,1,0,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
-void sfbonus_state::init_dblchal()          { sfbonus_bitswap( 0x3D, 0,3,7,6,5,2,1,4, 0xF3, 3,7,6,5,1,0,4,2, 0x3D, 2,0,1,7,6,5,3,4, 0xA8, 3,4,2,0,1,7,6,5, 0x3D, 2,3,7,6,5,1,0,4, 0xEF, 2,7,6,5,1,0,3,4, 0x3A, 4,2,3,7,6,5,1,0, 0xBA, 2,4,1,0,3,7,6,5); }
+void sfbonus_state::init_dblchal()          { sfbonus_bitswap( 0x3d, 0,3,7,6,5,2,1,4, 0xf3, 3,7,6,5,1,0,4,2, 0x3d, 2,0,1,7,6,5,3,4, 0xa8, 3,4,2,0,1,7,6,5, 0x3d, 2,3,7,6,5,1,0,4, 0xef, 2,7,6,5,1,0,3,4, 0x3a, 4,2,3,7,6,5,1,0, 0xba, 2,4,1,0,3,7,6,5); }
 void sfbonus_state::init_dblchald()         { sfbonus_bitswap( 0x3c, 0,1,7,6,5,4,3,2, 0xed, 0,7,6,5,4,3,2,1, 0x27, 0,2,1,7,6,5,4,3, 0xae, 4,3,1,0,2,7,6,5, 0x3b, 2,1,7,6,5,4,3,0, 0xea, 2,7,6,5,4,3,0,1, 0x27, 0,2,1,7,6,5,4,3, 0xae, 4,3,1,2,0,7,6,5); }
 void sfbonus_state::init_dblchalv()         { sfbonus_bitswap( 0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x22, 2,0,1,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3f, 1,0,7,6,5,4,3,2, 0xec, 1,7,6,5,4,3,0,2, 0x21, 1,0,2,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
 void sfbonus_state::init_fb2gen()           { sfbonus_bitswap( 0x35, 0,3,7,6,5,2,1,4, 0xe8, 2,7,6,5,4,3,1,0, 0x23, 4,3,2,7,6,5,1,0, 0xb8, 2,1,4,0,3,7,6,5, 0x2d, 0,1,7,6,5,4,2,3, 0xf8, 2,7,6,5,1,4,3,0, 0x23, 4,0,3,7,6,5,2,1, 0xb8, 2,1,4,0,3,7,6,5); }
@@ -6118,6 +6137,7 @@ GAME( 2004, fb4b2,       fb4,      sfbonus, amcoe2_reels3, sfbonus_state, init_f
 GAME( 2004, fb4c2,       fb4,      sfbonus, amcoe1_reels3, sfbonus_state, init_fb4,             ROT0,  "Amcoe", "Fruit Bonus 2004 (Version 1.5LT, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 2004, fb4d2,       fb4,      sfbonus, amcoe1_reels3, sfbonus_state, init_fb4d,            ROT0,  "Amcoe", "Fruit Bonus 2004 (Version 1.5LT, set 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 2004, fb4v2,       fb4,      sfbonus, amcoe1_reels3, sfbonus_state, init_fb4v,            ROT0,  "Amcoe", "Fruit Bonus 2004 (Version 1.5LT Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, fb4_14,      fb4,      sfbonus, amcoe1_reels3, sfbonus_state, init_fb4d,            ROT0,  "Amcoe", "Fruit Bonus 2004 (Version 1.4)", MACHINE_SUPPORTS_SAVE )
 GAME( 2004, fb4o,        fb4,      sfbonus, amcoe2_reels3, sfbonus_state, init_fb4,             ROT0,  "Amcoe", "Fruit Bonus 2004 (Version 1.3XT)", MACHINE_SUPPORTS_SAVE )
 GAME( 2004, fb4o2,       fb4,      sfbonus, amcoe2_reels3, sfbonus_state, init_fb4,             ROT0,  "Amcoe", "Fruit Bonus 2004 (Version 1.2)", MACHINE_SUPPORTS_SAVE )
 

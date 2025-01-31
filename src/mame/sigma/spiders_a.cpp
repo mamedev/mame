@@ -46,7 +46,7 @@ static const discrete_dac_r1_ladder spiders_sound_dac =
 	0           // no cap
 };
 
-/* The noice generator consists of two LS164 plus a LS74, so the lenght is 8+8+1 */
+/* The noise generator consists of two LS164 plus a LS74, so the length is 8+8+1 */
 static const discrete_lfsr_desc spiders_lfsr =
 {
 	DISC_CLK_IS_FREQ,

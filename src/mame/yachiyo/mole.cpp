@@ -50,8 +50,10 @@
 ******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -71,13 +73,16 @@ public:
 
 	void mole(machine_config &config);
 
+protected:
+	virtual void video_start() override ATTR_COLD;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 
 	/* video-related */
 	tilemap_t *m_bg_tilemap = nullptr;
-	int m_tile_bank = 0;
+	uint8_t m_tile_bank = 0;
 
 	/* memory */
 	uint16_t m_tileram[0x400];
@@ -88,9 +93,6 @@ private:
 	void mole_flipscreen_w(uint8_t data);
 	uint8_t mole_protection_r(offs_t offset);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update_mole(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void mole_map(address_map &map) ATTR_COLD;
 };
@@ -115,6 +117,7 @@ void mole_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mole_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 40, 25);
 
 	save_item(NAME(m_tileram));
+	save_item(NAME(m_tile_bank));
 }
 
 void mole_state::mole_tileram_w(offs_t offset, uint8_t data)
@@ -143,7 +146,6 @@ uint32_t mole_state::screen_update_mole(screen_device &screen, bitmap_ind16 &bit
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
-
 
 
 /*************************************
@@ -316,20 +318,10 @@ GFXDECODE_END
  *
  *************************************/
 
-void mole_state::machine_start()
-{
-	save_item(NAME(m_tile_bank));
-}
-
-void mole_state::machine_reset()
-{
-	m_tile_bank = 0;
-}
-
 void mole_state::mole(machine_config &config)
 {
 	/* basic machine hardware */
-	M6502(config, m_maincpu, 4000000); // ???
+	M6502(config, m_maincpu, 2000000); // ???
 	m_maincpu->set_addrmap(AS_PROGRAM, &mole_state::mole_map);
 	m_maincpu->set_vblank_int("screen", FUNC(mole_state::irq0_line_assert));
 
@@ -382,4 +374,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, mole, 0, mole, mole, mole_state, empty_init, ROT0, "Yachiyo Electronics, Ltd.", "Mole Attack", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mole, 0, mole, mole, mole_state, empty_init, ROT0, "Yachiyo Electronics", "Mole Attack", MACHINE_SUPPORTS_SAVE )

@@ -3709,13 +3709,9 @@ GAME( 1994, bublbust, pbobble, pbobble,  pbobble,   taitob_state, init_taito_b, 
 GAME( 1994, spacedx,  0,       spacedx,  pbobble,   taitob_state, init_taito_b, ROT0,   "Taito Corporation", "Space Invaders DX (US, v2.1)",    MACHINE_SUPPORTS_SAVE )
 GAME( 1994, spacedxj, spacedx, spacedx,  pbobble,   taitob_state, init_taito_b, ROT0,   "Taito Corporation", "Space Invaders DX (Japan, v2.1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, spacedxo, spacedx, spacedxo, spacedxo,  taitob_state, init_taito_b, ROT0,   "Taito Corporation", "Space Invaders DX (Japan, v2.0)", MACHINE_SUPPORTS_SAVE )
-/*
-    Sonic Blast Man is a ticket dispensing game.
-    (Japanese version however does not dispense them, only US does - try the "sbm_patch" in the machine_config).
-    It is a bit different from other games running on this system,
-    in that it has a punching pad that player needs to punch to hit
-    the enemy.
-*/
+
+// Sonic Blast Man is a ticket dispensing game. (Japanese version however does not dispense them, only US does - try the "sbm_patch" in the machine_config).
+// It is a bit different from other games running on this system, in that it has a punching pad that player needs to punch to hit the enemy.
 GAME( 1990, sbm,      0,       sbm,      sbm,       taitob_state,   init_taito_b, ROT0, "Taito Corporation",       "Sonic Blast Man (US)",    MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL )
 GAME( 1990, sbmj,     sbm,     sbm,      sbmj,      taitob_state,   init_taito_b, ROT0, "Taito Corporation",       "Sonic Blast Man (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL )
 GAME( 1994, realpunc, 0,       realpunc, realpunc,  taitob_c_state, init_taito_b, ROT0, "Taito Corporation Japan", "Real Puncher (World, v2.12O)",   MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL )

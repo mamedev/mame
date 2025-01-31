@@ -173,7 +173,7 @@ static int zx81_cassette_calculate_size_in_samples(const uint8_t *bytes, int len
 	return (number_of_0_data+number_of_0_name)*ZX81_LOW_BIT_LENGTH + (number_of_1_data+number_of_1_name)*ZX81_HIGH_BIT_LENGTH + ZX81_PILOT_LENGTH;
 }
 
-static int zx81_cassette_fill_wave(int16_t *buffer, int length, uint8_t *bytes)
+static int zx81_cassette_fill_wave(int16_t *buffer, int length, const uint8_t *bytes)
 {
 	int16_t * p = buffer;
 	int i;
@@ -250,7 +250,7 @@ static int zx80_cassette_calculate_size_in_samples(const uint8_t *bytes, int len
 	return number_of_0_data*ZX81_LOW_BIT_LENGTH + number_of_1_data*ZX81_HIGH_BIT_LENGTH + ZX81_PILOT_LENGTH;
 }
 
-static int zx80_cassette_fill_wave(int16_t *buffer, int length, uint8_t *bytes)
+static int zx80_cassette_fill_wave(int16_t *buffer, int length, const uint8_t *bytes)
 {
 	int16_t * p = buffer;
 	int i;

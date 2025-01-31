@@ -72,7 +72,7 @@ static void toggle_wave_data(void)
 
 static void tzx_cas_get_blocks( const uint8_t *casdata, int caslen )
 {
-	int pos = sizeof(TZX_HEADER) + 2;
+	uint32_t pos = sizeof(TZX_HEADER) + 2;
 	int max_block_count = INITIAL_MAX_BLOCK_COUNT;
 	int loopcount = 0, loopoffset = 0;
 	blocks = (uint8_t**)malloc(max_block_count * sizeof(uint8_t*));
@@ -192,7 +192,14 @@ static void tzx_cas_get_blocks( const uint8_t *casdata, int caslen )
 			break;
 		}
 
-		block_count++;
+		if (pos > caslen)
+		{
+			LOG_FORMATS("Block %d(ID=%d) with wrong length discarded\n", block_count, blocktype);
+		}
+		else
+		{
+			block_count++;
+		}
 	}
 }
 
@@ -779,7 +786,7 @@ cleanup:
 	return -1;
 }
 
-static int tzx_cas_fill_wave( int16_t *buffer, int length, uint8_t *bytes )
+static int tzx_cas_fill_wave( int16_t *buffer, int length, const uint8_t *bytes )
 {
 	int16_t *p = buffer;
 	int size = 0;
@@ -788,7 +795,7 @@ static int tzx_cas_fill_wave( int16_t *buffer, int length, uint8_t *bytes )
 	return size;
 }
 
-static int cdt_cas_fill_wave( int16_t *buffer, int length, uint8_t *bytes )
+static int cdt_cas_fill_wave( int16_t *buffer, int length, const uint8_t *bytes )
 {
 	int16_t *p = buffer;
 	int size = 0;
@@ -802,10 +809,16 @@ static int tap_cas_to_wav_size( const uint8_t *casdata, int caslen )
 	int size = 0;
 	const uint8_t *p = casdata;
 
-	while (p < casdata + caslen)
+	while (caslen > 0)
 	{
 		int data_size = get_u16le(&p[0]);
 		int pilot_length = (p[2] == 0x00) ? 8063 : 3223;
+		caslen -= data_size;
+		if (caslen < 0)
+		{
+			LOG_FORMATS("tap_cas_to_wav_size: Requested 0x%X byte but only 0x%X available.\n", data_size, data_size + caslen);
+			data_size += caslen;
+		}
 		LOG_FORMATS("tap_cas_to_wav_size: Handling TAP block containing 0x%X bytes", data_size);
 		p += 2;
 		size += tzx_cas_handle_block(nullptr, p, 1000, data_size, 2168, pilot_length, 667, 735, 855, 1710, 8);
@@ -815,16 +828,24 @@ static int tap_cas_to_wav_size( const uint8_t *casdata, int caslen )
 	return size;
 }
 
-static int tap_cas_fill_wave( int16_t *buffer, int length, uint8_t *bytes )
+static int tap_cas_fill_wave( int16_t *buffer, int length, const uint8_t *bytes )
 {
 	int16_t *p = buffer;
 	int size = 0;
 
+	//while (length > 0)
 	while (size < length)
 	{
 		int data_size = get_u16le(&bytes[0]);
 		int pilot_length = (bytes[2] == 0x00) ? 8063 : 3223;
 		LOG_FORMATS("tap_cas_fill_wave: Handling TAP block containing 0x%X bytes\n", data_size);
+		/*
+		length -= data_size;
+		if (length < 0)
+		{
+			data_size += length; // Take as much as we can.
+		}
+		*/
 		bytes += 2;
 		size += tzx_cas_handle_block(&p, bytes, 1000, data_size, 2168, pilot_length, 667, 735, 855, 1710, 8);
 		bytes += data_size;

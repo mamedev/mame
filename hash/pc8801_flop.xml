@@ -240,6 +240,7 @@ Are the following undumped or mistranslated (check also if available in TOSEC)?
  - ゴルゴ13 狼の巣 (198410xx) by Pony Canyon
  - Breakfast3号 (1984xxxx) by Kominiketo
  - Blue Blood disks (at least Vol. 1-6 and CG set Vol. 1 according to gradiusm)
+ - S.F.3.D Original Operation V by Cross Media Soft
 
 Not included:
  - ミラーズ (19901210) by Studio Wing, uses CDROM (>PC8801MC)
@@ -5898,12 +5899,13 @@ Not extensively tested
 	</software>
 
 	<software name="carmine">
-		<description>Carmine</description>
+		<description>Carmine 88</description>
 		<year>1987</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
-		<!-- PC8801 -->
+		<!-- PC8801mk2SR -->
 		<info name="release" value="198702xx"/>
-		<info name="alt_title" value="カーマイン"/>
+		<info name="alt_title" value="カーマイン88"/>
+		<info name="usage" value="Needs BASIC V2"/>
 		<!--combined image-->
 		<!--rom name="carmine.d88" size="770496" crc="ade94761" sha1="220ee916091ece8176e56867e3923529a8c49591"/-->
 
@@ -5923,12 +5925,13 @@ Not extensively tested
 	</software>
 
 	<software name="carminea" cloneof="carmine">
-		<description>Carmine (alt?)</description>
+		<description>Carmine 88 (alt?)</description>
 		<year>1987</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
-		<!-- PC8801 -->
+		<!-- PC8801mk2SR -->
 		<info name="release" value="198702xx"/>
-		<info name="alt_title" value="カーマイン"/>
+		<info name="alt_title" value="カーマイン88"/>
+		<info name="usage" value="Needs BASIC V2"/>
 		<!--combined image-->
 		<!--rom name="carmine.d88" size="1140944" crc="62aeef7e" sha1="18a952b782b71177fa0000652422d0ed23d7d6a5"/-->
 
@@ -29118,29 +29121,30 @@ Start and Program Disks OK, the remaining part is damaged (missing d88 headers?)
 		</part>
 	</software>
 
-	<software name="sf3dopv">
-		<description>S.F.3.D Original Operation V</description>
-		<year>1985</year>
-		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
-		<!-- PC8801 -->
-		<info name="release" value="198512xx"/>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="365168">
-				<rom name="s.f.3.d original operation v (1985)(cross media).d88" size="365168" crc="ffb66bfb" sha1="8524f776b1a0730086ebc78ae6dc20b4483fff57"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="sf3dthxg">
-		<description>S.F.3.D. - Original Operation Thanksgiving</description>
+		<description>Point X Senryō Sakusen S.F.3.D - Original Operation Thanksgiving</description>
 		<year>1986</year>
 		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198609xx"/>
-		<info name="alt_title" value="ポイントX占領作戦 (Box)"/>
+		<info name="alt_title" value="ポイントX占領作戦 S.F.3.D - Original Operation Thanksgiving (Box)"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="365168">
 				<rom name="s.f.3.d. - original operation thanksgiving.d88" size="365168" crc="4985b37a" sha1="d13efd4b247b0e6ec702e769e51a5963fa007411"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sf3dthxga" cloneof="sf3dthxg">
+		<description>Point X Senryō Sakusen S.F.3.D - Original Operation Thanksgiving (alt)</description>
+		<year>1986</year>
+		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198609xx"/>
+		<info name="alt_title" value="ポイントX占領作戦 S.F.3.D - Original Operation Thanksgiving (Box)"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="365168">
+				<rom name="s.f.3.d. - original operation thanksgiving (a).d88" size="365168" crc="ffb66bfb" sha1="8524f776b1a0730086ebc78ae6dc20b4483fff57"/>
 			</dataarea>
 		</part>
 	</software>

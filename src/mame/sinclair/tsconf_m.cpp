@@ -541,7 +541,7 @@ u8 tsconf_state::tsconf_port_xxaf_r(offs_t port)
 
 void tsconf_state::copy_tiles_to_raw(const u8 *tiles_src, u8 *raw_target)
 {
-	for(u32 ln = 0; ln < PAGE4K(8); ln += 4)
+	for (u32 ln = 0; ln < PAGE4K(8); ln += 4)
 	{
 		int targ = tiles_offset_to_raw(ln);
 		for (u8 x = 0; x < 4; ++x)

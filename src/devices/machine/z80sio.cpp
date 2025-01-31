@@ -2551,9 +2551,11 @@ void z80sio_channel::txc_w(int state)
 				// Generate a new bit
 				bool new_bit = false;
 				if ((m_wr4 & (WR4_SYNC_MODE_MASK | WR4_STOP_BITS_MASK)) == (WR4_SYNC_MODE_SDLC | WR4_STOP_BITS_SYNC) &&
-					(m_tx_flags & (TX_FLAG_DATA_TX | TX_FLAG_CRC_TX)) && (m_tx_hist & 0x1f) == 0x1f)
+						(m_tx_flags & (TX_FLAG_DATA_TX | TX_FLAG_CRC_TX)) && (m_tx_hist & 0x1f) == 0x1f)
+				{
 					// SDLC, sending data/CRC & 5 ones in a row: do zero insertion
 					new_bit = false;
+				}
 				else
 				{
 					bool get_out = false;

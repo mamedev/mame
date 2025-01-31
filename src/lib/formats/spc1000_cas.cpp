@@ -89,12 +89,12 @@ static int spc1000_handle_cas(int16_t *buffer, const uint8_t *bytes)
    Generate samples for the tape image
 ********************************************************************/
 
-static int spc1000_tap_fill_wave(int16_t *buffer, int length, uint8_t *bytes)
+static int spc1000_tap_fill_wave(int16_t *buffer, int length, const uint8_t *bytes)
 {
 	return spc1000_handle_tap(buffer, bytes);
 }
 
-static int spc1000_cas_fill_wave(int16_t *buffer, int length, uint8_t *bytes)
+static int spc1000_cas_fill_wave(int16_t *buffer, int length, const uint8_t *bytes)
 {
 	return spc1000_handle_cas(buffer, bytes);
 }

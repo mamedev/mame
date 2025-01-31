@@ -135,7 +135,7 @@ static int ace_handle_tap(int16_t *buffer, const uint8_t *casdata)
 /*******************************************************************
    Generate samples for the tape image
 ********************************************************************/
-static int ace_tap_fill_wave(int16_t *buffer, int sample_count, uint8_t *bytes)
+static int ace_tap_fill_wave(int16_t *buffer, int sample_count, const uint8_t *bytes)
 {
 	return ace_handle_tap( buffer, bytes );
 }

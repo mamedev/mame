@@ -17580,6 +17580,7 @@ jongtei                         // "532" Mahjong Jong-Tei (C) 1999 Dynax
 jongteia                        // Mahjong Jong-Tei (C) 2000 Techno-Top
 kotbinsp                        // "909" 1997 Dynax / Shinwhajin
 kotbinyo                        // 1997 Dynax / Shinwhajin
+kotbinyosu                      // 1997 Dynax / Shinwhajin
 mjchuuka                        // "121" (c) 1998 Dynax
 mjdchuka                        // "111" (c) 1995 Nakanihon
 mjflove                         // "500" (c) 1996 Dynax
@@ -17983,6 +17984,9 @@ rpanic                          // (c) 1992 Excellent System / Jaleco
 
 @source:excellent/dblcrown.cpp
 dblcrown                        // (c) 1994 Excellent System
+
+@source:excellent/es8906.cpp
+dream9
 
 @source:excellent/es9501.cpp
 d9flower
@@ -19822,6 +19826,7 @@ polgar101                       // 1990 Mephisto Polgar 10MHz
 
 @source:hegenerglaser/risc.cpp
 mrisc                           // 1992 Mephisto RISC 1MB
+mrisca                          // 1992 Mephisto RISC 1MB
 mrisc2                          // 1994 Mephisto RISC II
 
 @source:hegenerglaser/roma2.cpp
@@ -29467,6 +29472,7 @@ castrev                         // Revolution
 @source:misc/cb2001.cpp
 cb2001                          // (c) 2000 Dyna Electronics
 cb4                             // (c) 1997 Dyna Electronics
+cb4a                            // (c) 1997 Dyna Electronics
 cb5                             // (c) 1997 Dyna Electronics
 cb5_11                          // (c) 1997 Dyna Electronics
 crzybell                        // (c) 1995 Dyna Electronics
@@ -30246,6 +30252,7 @@ deluxe4u                        // (c) 2000 ESD
 fantstry                        // (c) 2002 Z Soft
 fantstrya                       // (c) 2002 Z Soft
 hedpanic                        // (c) 2000 ESD
+hedpanic830                     // (c) 1999 ESD
 hedpanica                       // (c) 1999 ESD
 hedpanicf                       // (c) 2000 ESD + Fuuki, Co. Ltd.
 hedpanico                       // (c) 1999 ESD
@@ -31335,9 +31342,6 @@ mirderby                        // (c) 1988 Home Data?
 @source:misc/mjsenpu.cpp
 mjsenpu
 
-@source:misc/mole.cpp
-mole                            // (c) 1982 Yachiyo Electronics, Ltd.
-
 @source:misc/monon_color.cpp
 mononcol                        // (c) 2011 M&D
 
@@ -32183,6 +32187,7 @@ fb2ndv1                         // (c) 2004 Amcoe
 fb2ndv2                         // (c) 2004 Amcoe
 fb3g                            // (c) 200? Amcoe - Fruit Bonus 3G
 fb4                             // (c) 2004 Amcoe - Fruit Bonus 2004
+fb4_14                          // (c) 2004 Amcoe
 fb4b2                           // (c) 2004 Amcoe
 fb4c1                           // (c) 2004 Amcoe
 fb4c2                           // (c) 2004 Amcoe
@@ -32417,14 +32422,6 @@ vcarn                           // (c) 1999 Electronic Projects
 @source:misc/sprcros2.cpp
 sprcros2                        // (c) 1986 GM Shoji
 sprcros2a                       // (c) 1986 GM Shoji
-
-@source:misc/ssingles.cpp
-atamanot                        // (c) 1983 Yachiyo Denki / Uni Enterprize
-ssingles                        // Yachiyo?
-
-@source:misc/sstrangr.cpp
-sstrangr                        // (c) 1978 Yachiyo Electronics, Ltd.
-sstrangr2                       // (c) 1979 Yachiyo Electronics, Ltd.
 
 @source:misc/startouch.cpp
 europl01                        //
@@ -32804,6 +32801,7 @@ driblingvm                      // bootleg (Videomac)
 @source:modelracing/sshot.cpp
 gunchamps                       // (c) 1980 Model Racing (sshot.cpp)
 sshot                           // (c) 1979 Model Racing
+sshota                          // (c) 1979 Model Racing
 
 @source:modelracing/subhuntr.cpp
 subhuntr                        // 1979 Model Racing
@@ -35959,6 +35957,10 @@ penta                           // bootleg
 @source:pacman/schick.cpp
 schick                          // Microhard
 
+@source:paia/midi2cv8.cpp
+midi2cv8                        // PAiA midi2cv8 (V/Oct)
+midi2cv8_vhz                    // PAiA midi2cv8 with V/Hz daughterboard
+
 @source:palm/palm.cpp
 palmiii                         // Palm III
 palmiiic                        // Palm IIIc
@@ -36618,6 +36620,7 @@ cdi910                          //
 cdibios                         // Base unit
 cdimono1                        // Philips CD-i model 200 (Mono-I board, PAL)
 cdimono2                        // Philips CD-i model 220 (Mono-II board, NTSC)
+gpi1200                         //
 quizard                         // (c) TAB Austria 199?
 quizard_10                      // (c) TAB Austria 1996
 quizard_12                      // (c) TAB Austria 1996
@@ -41664,6 +41667,7 @@ rdft2u                          // (c) 1997 Seibu Kaihatsu (Fabtek license)
 rdft2us                         // (c) 1997 Seibu Kaihatsu (Fabtek license)
 rdfta                           // (c) 1996 Seibu Kaihatsu
 rdftadi                         // (c) 1996 Seibu Kaihatsu (Dream Island license)
+rdftadia                        // (c) 1996 Seibu Kaihatsu (Dream Island license)
 rdftam                          // (c) 1996 Seibu Kaihatsu (Metrotainment license)
 rdftau                          // (c) 1996 Seibu Kaihatsu
 rdftauge                        // (c) 1996 Seibu Kaihatsu (Tuning license and text display, but Australia region code)
@@ -41848,6 +41852,7 @@ rezon                           // (c) 1992 Allumer
 rezono                          // (c) 1991 Allumer
 setaroul                        // UF   (c) 1989? Visco
 setaroula                       // hack (CODERE)
+setaroulm                       // UF   (c) 1989? Visco
 simpsonjr                       // bootleg of J. J. Squawkers by Daigom
 sokonuke                        // (c) 1995 Sammy Industries
 stg                             // (c) 1991 Athena / Tecmo
@@ -47317,6 +47322,17 @@ mojmikro                        //
 x168                            //
 x820                            //
 x820ii                          //
+
+@source:yachiyo/mole.cpp
+mole                            // (c) 1982 Yachiyo Electronics, Ltd.
+
+@source:yachiyo/ssingles.cpp
+atamanot                        // (c) 1983 Yachiyo Denki / Uni Enterprize
+ssingles                        // Yachiyo?
+
+@source:yachiyo/sstrangr.cpp
+sstrangr                        // (c) 1978 Yachiyo Electronics, Ltd.
+sstrangr2                       // (c) 1979 Yachiyo Electronics, Ltd.
 
 @source:yamaha/fb01.cpp
 fb01                            // 1986 FB-01
