@@ -120,14 +120,13 @@ public:
 	/* code to adapt existing legacy fill_wave functions */
 	struct LegacyWaveFiller
 	{
-		int (*fill_wave)(int16_t *, int, const uint8_t *) = nullptr;
+		int (*fill_wave)(int16_t *, int, const uint8_t *, int) = nullptr;
 		int chunk_size = 0;
 		int chunk_samples = 0;
 		int (*chunk_sample_calc)(const uint8_t *bytes, int length) = nullptr;
 		uint32_t sample_frequency = 0;
 		int header_samples = 0;
 		int trailer_samples = 0;
-		int (*fill_wave_ext)(int16_t *, int, const uint8_t *, int) = nullptr;
 	};
 
 	~cassette_image();

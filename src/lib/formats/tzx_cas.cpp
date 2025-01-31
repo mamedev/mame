@@ -786,7 +786,7 @@ cleanup:
 	return -1;
 }
 
-static int tzx_cas_fill_wave( int16_t *buffer, int length, const uint8_t *bytes )
+static int tzx_cas_fill_wave( int16_t *buffer, int length, const uint8_t *bytes, int )
 {
 	int16_t *p = buffer;
 	int size = 0;
@@ -795,7 +795,7 @@ static int tzx_cas_fill_wave( int16_t *buffer, int length, const uint8_t *bytes 
 	return size;
 }
 
-static int cdt_cas_fill_wave( int16_t *buffer, int length, const uint8_t *bytes )
+static int cdt_cas_fill_wave( int16_t *buffer, int length, const uint8_t *bytes, int )
 {
 	int16_t *p = buffer;
 	int size = 0;
@@ -829,7 +829,7 @@ static int tap_cas_to_wav_size( const uint8_t *casdata, int caslen )
 	return size;
 }
 
-static int tap_cas_fill_wave( int16_t *buffer, int length, const uint8_t *bytes, int bytes_length )
+static int tap_cas_fill_wave( int16_t *buffer, int, const uint8_t *bytes, int bytes_length )
 {
 	int16_t *p = buffer;
 	int size = 0;
@@ -865,14 +865,13 @@ static const cassette_image::LegacyWaveFiller tzx_legacy_fill_wave =
 
 static const cassette_image::LegacyWaveFiller tap_legacy_fill_wave =
 {
-	nullptr,             // fill_wave
+	tap_cas_fill_wave,   // fill_wave
 	-1,                  // chunk_size
 	0,                   // chunk_samples
 	tap_cas_to_wav_size, // chunk_sample_calc
 	TZX_WAV_FREQUENCY,   // sample_frequency
 	0,                   // header_samples
-	0,                   // trailer_samples
-	tap_cas_fill_wave    // fill_wave_ext
+	0                    // trailer_samples
 };
 
 static const cassette_image::LegacyWaveFiller cdt_legacy_fill_wave =

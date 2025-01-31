@@ -90,7 +90,7 @@ static int16_t *vtech1_fill_wave_byte(int16_t *buffer, int byte)
 	return buffer;
 }
 
-static int vtech1_cassette_fill_wave(int16_t *buffer, int length, const uint8_t *code)
+static int vtech1_cassette_fill_wave(int16_t *buffer, int length, const uint8_t *code, int)
 {
 	return generic_fill_wave(buffer, length, code, V1_BITSAMPLES, V1_BYTESAMPLES, V1_LO, vtech1_fill_wave_byte);
 }
@@ -185,7 +185,7 @@ static int16_t *vtech2_fill_wave_byte(int16_t *buffer, int byte)
 	return buffer;
 }
 
-static int vtech2_cassette_fill_wave(int16_t *buffer, int length, const uint8_t *code)
+static int vtech2_cassette_fill_wave(int16_t *buffer, int length, const uint8_t *code, int)
 {
 	return generic_fill_wave(buffer, length, code, VT2_BITSAMPLES, VT2_BYTESAMPLES, VT2_LO, vtech2_fill_wave_byte);
 }

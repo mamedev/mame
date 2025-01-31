@@ -799,7 +799,7 @@ cassette_image::error cassette_image::legacy_construct(const LegacyWaveFiller *l
 	/* sanity check the args */
 	assert(legacy_args->header_samples >= -1);
 	assert(legacy_args->trailer_samples >= 0);
-	assert(legacy_args->fill_wave || legacy_args->fill_wave_ext);
+	assert(legacy_args->fill_wave);
 
 	const uint64_t size = image_size();
 
@@ -859,7 +859,7 @@ cassette_image::error cassette_image::legacy_construct(const LegacyWaveFiller *l
 	/* if there has to be a header */
 	if (args.header_samples > 0)
 	{
-		length = args.fill_wave(&samples[pos], sample_count - pos, CODE_HEADER);
+		length = args.fill_wave(&samples[pos], sample_count - pos, CODE_HEADER, -1);
 		if (length < 0)
 		{
 			err = error::INVALID_IMAGE;
@@ -877,6 +877,11 @@ cassette_image::error cassette_image::legacy_construct(const LegacyWaveFiller *l
 	}
 	while ((pos < sample_count) && (offset < size))
 	{
+		const int slice = std::min<int>(args.chunk_size, size - offset);
+
+		image_read(&chunk[0], offset, slice);
+		offset += slice;
+
 		length = args.fill_wave(&samples[pos], sample_count - pos, chunk.get(), slice);
 		if (length < 0)
 		{
@@ -892,7 +897,7 @@ cassette_image::error cassette_image::legacy_construct(const LegacyWaveFiller *l
 	/* if there has to be a trailer */
 	if (args.trailer_samples > 0)
 	{
-		length = args.fill_wave(&samples[pos], sample_count - pos, CODE_TRAILER);
+		length = args.fill_wave(&samples[pos], sample_count - pos, CODE_TRAILER, -1);
 		if (length < 0)
 		{
 			err = error::INVALID_IMAGE;
