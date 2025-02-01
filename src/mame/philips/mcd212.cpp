@@ -59,22 +59,20 @@ void mcd212_device::update_matte_arrays()
 	uint8_t latched_wfb = m_weight_factor[1][0];
 	const int width = get_screen_width();
 
-	if (BIT(m_image_coding_method, ICM_NM_BIT))
+	int x = 0;
+	const int num_mattes = BIT(m_image_coding_method, ICM_NM_BIT) ? 2 : 1;
+	const bool matte_flag = BIT(m_matte_control[0], MC_MF_BIT); // MF bit must be the same. See 5.10.2 Matte Commands
+	
+	int matte_idx = 0;
+	for (; x < width; x++)
 	{
-		if (get_matte_op(0) == 0 && get_matte_op(4) == 0)
+		for (int f1 = 0; f1 < num_mattes; f1++)
 		{
-			std::fill_n(m_weight_factor[0], std::size(m_weight_factor[0]), latched_wfa);
-			std::fill_n(m_weight_factor[1], std::size(m_weight_factor[1]), latched_wfb);
-			std::fill_n(m_matte_flag[0], std::size(m_matte_flag[0]), false);
-			std::fill_n(m_matte_flag[1], std::size(m_matte_flag[1]), false);
-			return;
-		}
-
-		for (int x = 0; x < width; x++)
-		{
-			for (int flag = 0; flag < 2; flag++)
+			const int max_matte_id = (0x10 >> num_mattes) + (f1 << 2);
+			const int flag = (num_mattes == 2) ? f1 : matte_flag;
+			if (num_mattes == 2)
 			{
-				for (int matte = 0; matte < 4; matte++)
+				for (int matte = 0; matte < max_matte_id; matte++)
 				{
 					const int matte_idx = (flag << 2) + matte;
 					const uint32_t matte_ctrl = m_matte_control[matte_idx];
@@ -87,79 +85,6 @@ void mcd212_device::update_matte_arrays()
 					{
 						switch (matte_op)
 						{
-							case 0: // End of matte control for line
-								break;
-							case 1:
-							case 2:
-							case 3: // Not used
-								break;
-							case 4: // Change weight of plane A
-								latched_wfa = get_weight_factor(matte_idx);
-								break;
-							case 5: // Not used
-								break;
-							case 6: // Change weight of plane B
-								latched_wfb = get_weight_factor(matte_idx);
-								break;
-							case 7: // Not used
-								break;
-							case 8: // Reset matte flag
-								latched_mf[flag] = false;
-								break;
-							case 9: // Set matte flag
-								latched_mf[flag] = true;
-								break;
-							case 10:    // Not used
-							case 11:    // Not used
-								break;
-							case 12: // Reset matte flag and change weight of plane A
-								latched_wfa = get_weight_factor(matte_idx);
-								latched_mf[flag] = false;
-								break;
-							case 13: // Set matte flag and change weight of plane A
-								latched_wfa = get_weight_factor(matte_idx);
-								latched_mf[flag] = true;
-								break;
-							case 14: // Reset matte flag and change weight of plane B
-								latched_wfb = get_weight_factor(matte_idx);
-								latched_mf[flag] = false;
-								break;
-							case 15: // Set matte flag and change weight of plane B
-								latched_wfb = get_weight_factor(matte_idx);
-								latched_mf[flag] = true;
-								break;
-						}
-					}
-				}
-			}
-			m_weight_factor[0][x] = latched_wfa;
-			m_weight_factor[1][x] = latched_wfb;
-			m_matte_flag[0][x] = latched_mf[0];
-			m_matte_flag[1][x] = latched_mf[1];
-		}
-	}
-	else
-	{
-		int matte_idx = 0;
-		for (int x = 0; x < width; x++)
-		{
-			if (matte_idx < 8)
-			{
-				const int flag = BIT(m_matte_control[matte_idx], MC_MF_BIT);
-				const uint32_t matte_ctrl = m_matte_control[matte_idx];
-				const uint32_t matte_op = get_matte_op(matte_idx);
-				if (matte_op == 0)
-				{
-					std::fill_n(m_weight_factor[0] + x, std::size(m_weight_factor[0]) - x, latched_wfa);
-					std::fill_n(m_weight_factor[1] + x, std::size(m_weight_factor[1]) - x, latched_wfb);
-					std::fill_n(m_matte_flag[0] + x, std::size(m_matte_flag[0]) - x, latched_mf[0]);
-					std::fill_n(m_matte_flag[1] + x, std::size(m_matte_flag[1]) - x, latched_mf[1]);
-					return;
-				}
-				if (x == (matte_ctrl & MC_X))
-				{
-					switch (matte_op)
-					{
 						case 0: // End of matte control for line
 							break;
 						case 1:
@@ -201,16 +126,81 @@ void mcd212_device::update_matte_arrays()
 							latched_wfb = get_weight_factor(matte_idx);
 							latched_mf[flag] = true;
 							break;
+						}
 					}
-					matte_idx++;
 				}
 			}
-			m_weight_factor[0][x] = latched_wfa;
-			m_weight_factor[1][x] = latched_wfb;
-			m_matte_flag[0][x] = latched_mf[0];
-			m_matte_flag[1][x] = latched_mf[1];
+			else
+			{
+				if (matte_idx < max_matte_id)
+				{
+					const uint32_t matte_ctrl = m_matte_control[matte_idx];
+					const uint32_t matte_op = get_matte_op(matte_idx);
+					if (matte_op == 0)
+					{
+						break;
+					}
+					if (x == (matte_ctrl & MC_X))
+					{
+						switch (matte_op)
+						{
+						case 0: // End of matte control for line
+							break;
+						case 1:
+						case 2:
+						case 3: // Not used
+							break;
+						case 4: // Change weight of plane A
+							latched_wfa = get_weight_factor(matte_idx);
+							break;
+						case 5: // Not used
+							break;
+						case 6: // Change weight of plane B
+							latched_wfb = get_weight_factor(matte_idx);
+							break;
+						case 7: // Not used
+							break;
+						case 8: // Reset matte flag
+							latched_mf[flag] = false;
+							break;
+						case 9: // Set matte flag
+							latched_mf[flag] = true;
+							break;
+						case 10:    // Not used
+						case 11:    // Not used
+							break;
+						case 12: // Reset matte flag and change weight of plane A
+							latched_wfa = get_weight_factor(matte_idx);
+							latched_mf[flag] = false;
+							break;
+						case 13: // Set matte flag and change weight of plane A
+							latched_wfa = get_weight_factor(matte_idx);
+							latched_mf[flag] = true;
+							break;
+						case 14: // Reset matte flag and change weight of plane B
+							latched_wfb = get_weight_factor(matte_idx);
+							latched_mf[flag] = false;
+							break;
+						case 15: // Set matte flag and change weight of plane B
+							latched_wfb = get_weight_factor(matte_idx);
+							latched_mf[flag] = true;
+							break;
+						}
+						matte_idx++;
+					}
+				}
+			}
 		}
+		m_weight_factor[0][x] = latched_wfa;
+		m_weight_factor[1][x] = latched_wfb;
+		m_matte_flag[0][x] = latched_mf[0];
+		m_matte_flag[1][x] = latched_mf[1];
 	}
+	// Fill the remainder.
+	std::fill_n(m_weight_factor[0] + x, std::size(m_weight_factor[0]) - x, latched_wfa);
+	std::fill_n(m_weight_factor[1] + x, std::size(m_weight_factor[1]) - x, latched_wfb);
+	std::fill_n(m_matte_flag[0] + x, std::size(m_matte_flag[0]) - x, latched_mf[0]);
+	std::fill_n(m_matte_flag[1] + x, std::size(m_matte_flag[1]) - x, latched_mf[1]);
 }
 
 template <int Path>
