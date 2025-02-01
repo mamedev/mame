@@ -18,7 +18,7 @@ Supported games:
 Notes:
         Basically the same video and machine hardware as Flying Shark,
           except for the Main CPU which is a Z80 here.
-        See twincobr.cpp machine and video drivers to complete the
+        See toaplan/twincobr*.cpp machine and video drivers to complete the
           hardware setup.
         To enter the "test mode", press START1 when the grid is displayed.
         Press 0 (actually P1 button 3) on startup to skip some video RAM tests
@@ -153,8 +153,7 @@ public:
 	void init_wardner();
 
 protected:
-	virtual void driver_start() override;
-	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	memory_view m_rom_ram_view;
@@ -381,23 +380,18 @@ static const gfx_layout tilelayout =
 
 
 static GFXDECODE_START( gfx_wardner )
-	GFXDECODE_ENTRY( "chars", 0x00000, charlayout,   1536, 32 )  // colors 1536-1791
+	GFXDECODE_ENTRY( "chars",    0x00000, charlayout,   1536, 32 )  // colors 1536-1791
 	GFXDECODE_ENTRY( "fg_tiles", 0x00000, tilelayout,   1280, 16 )  // colors 1280-1535
 	GFXDECODE_ENTRY( "bg_tiles", 0x00000, tilelayout,   1024, 16 )  // colors 1024-1079
 GFXDECODE_END
 
 
-void wardner_state::driver_start()
+void wardner_state::machine_start()
 {
-	// Save-State stuff in src/machine/twincobr.cpp
-	driver_savestate();
+	// Save-State stuff in toaplan/twincobr_m.cpp
+	twincobr_state::machine_start();
 
 	m_rombank->configure_entries(0, 8, memregion("maincpu")->base(), 0x8000);
-}
-
-void wardner_state::machine_reset()
-{
-	twincobr_state::machine_reset();
 }
 
 void wardner_state::wardner(machine_config &config)
@@ -433,7 +427,7 @@ void wardner_state::wardner(machine_config &config)
 	m_coinlatch->q_out_cb<7>().set(FUNC(wardner_state::coin_lockout_2_w));
 
 	// video hardware
-	hd6845s_device &crtc(HD6845S(config, "crtc", XTAL(14'000'000)/4)); // 3.5MHz measured on CLKin
+	hd6845s_device &crtc(HD6845S(config, "crtc", XTAL(14'000'000) / 4)); // 3.5MHz measured on CLKin
 	crtc.set_screen(m_screen);
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(2);
@@ -454,7 +448,7 @@ void wardner_state::wardner(machine_config &config)
 	m_screen->screen_vblank().append(FUNC(wardner_state::wardner_vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wardner);
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 4096);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x1000 / 2);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

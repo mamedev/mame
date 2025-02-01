@@ -257,6 +257,20 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
+	<software name="ctgolf" supported="no">
+		<description>Computer the Golf</description>
+		<year>1983</year>
+		<publisher>日本ファルコム (Nihon Falcom)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198310xx"/>
+		<info name="alt_title" value="コンピュータ ザ ゴルフ"/>
+		<part name="cass" interface="pc8801_cass">
+			<dataarea name="cass" size="23624">
+				<rom name="computer the golf.t88" size="23624" crc="a149466d" sha1="176a97e426d4b0a9fca206db249bdcb07870d24c"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cosmox">
 		<description>Cosmo Cross</description>
 		<year>19??</year>

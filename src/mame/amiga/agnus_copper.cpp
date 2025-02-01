@@ -245,9 +245,13 @@ void agnus_copper_device::vblank_sync(bool state)
 
 // check current copper cycle at end of scanline
 // - auntaadv (gameplay), WAITs with $xxd9
+// - gunbee WAITs with $xxe1 at beginning of copper lists, before setting fmode.
+//   Will desync scrolling by a whole lot if we don't add a +6 here
+// cfr. https://eab.abime.net/showpost.php?p=627136&postcount=59
 void agnus_copper_device::suspend_offset(int xpos, int hblank_width)
 {
 	m_xpos_state = (xpos == 511) ? 0 : xpos - hblank_width;
+	m_xpos_state += 6;
 //  assert(m_xpos_state > 0);
 }
 

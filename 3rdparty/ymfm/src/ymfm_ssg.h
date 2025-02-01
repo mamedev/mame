@@ -49,6 +49,8 @@ namespace ymfm
 class ssg_override
 {
 public:
+	virtual ~ssg_override() = default;
+
 	// reset our status
 	virtual void ssg_reset() = 0;
 

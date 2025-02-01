@@ -78,9 +78,11 @@ public:
 	}
 
 	void sun1(machine_config &config);
+	void cyb(machine_config &config);
 
 private:
 	void sun1_mem(address_map &map) ATTR_COLD;
+	void cyb_mem(address_map &map) ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
@@ -93,12 +95,18 @@ void sun1_state::sun1_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000000, 0x001fffff).ram().share("p_ram"); // 512 KB RAM / ROM at boot
-	map(0x00200000, 0x00203fff).rom().region("user1", 0);
+	map(0x00200000, 0x00203fff).rom().region("monitor", 0);
 	map(0x00600000, 0x00600007).mirror(0x1ffff8).rw(m_iouart, FUNC(upd7201_device::ba_cd_r), FUNC(upd7201_device::ba_cd_w)).umask16(0xff00);
 	map(0x00800000, 0x00800003).mirror(0x1ffffc).rw("timer", FUNC(am9513_device::read16), FUNC(am9513_device::write16));
 	map(0x00a00000, 0x00bfffff).unmaprw(); // page map
 	map(0x00c00000, 0x00dfffff).unmaprw(); // segment map
 	map(0x00e00000, 0x00ffffff).unmaprw(); // context register
+}
+
+void sun1_state::cyb_mem(address_map &map)
+{
+	sun1_mem(map);
+	map(0x00400000, 0x00403fff).rom().region("cyb", 0);
 }
 
 /* Input ports */
@@ -108,7 +116,7 @@ INPUT_PORTS_END
 
 void sun1_state::machine_reset()
 {
-	uint8_t* user1 = memregion("user1")->base();
+	uint8_t* user1 = memregion("monitor")->base();
 
 	memcpy((uint8_t*)m_p_ram.target(),user1,0x4000);
 }
@@ -150,32 +158,50 @@ void sun1_state::sun1(machine_config &config)
 	rs232b.dcd_handler().set(m_iouart, FUNC(upd7201_device::dcdb_w));
 }
 
+void sun1_state::cyb(machine_config &config)
+{
+	sun1(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sun1_state::cyb_mem);
+}
+
 /* ROM definition */
 ROM_START( sun1 )
-	ROM_REGION16_BE( 0x4000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION16_BE(0x4000, "monitor", 0)
 	ROM_DEFAULT_BIOS("1.0")
 
 	ROM_SYSTEM_BIOS(0, "1.0", "Sun Monitor 1.0")
-	ROMX_LOAD( "v10.8.bin", 0x0000, 0x2000, CRC(3528a0f8) SHA1(be437dd93d1a44eccffa6f5e05935119482beab0), ROM_SKIP(1) | ROM_BIOS(0))
-	ROMX_LOAD( "v10.0.bin", 0x0001, 0x2000, CRC(1ad4c52a) SHA1(4bc1a19e8f202378d5d7baa8b95319275c040a6d), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("v10.8.bin", 0x0000, 0x2000, CRC(3528a0f8) SHA1(be437dd93d1a44eccffa6f5e05935119482beab0), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("v10.0.bin", 0x0001, 0x2000, CRC(1ad4c52a) SHA1(4bc1a19e8f202378d5d7baa8b95319275c040a6d), ROM_SKIP(1) | ROM_BIOS(0))
 
 	ROM_SYSTEM_BIOS(1, "diag", "Interactive Tests")
-	ROMX_LOAD( "8mhzdiag.8.bin", 0x0000, 0x2000, CRC(808a549e) SHA1(d2aba014a5507c1538f2c1a73e1d2524f28034f4), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD( "8mhzdiag.0.bin", 0x0001, 0x2000, CRC(7a92d506) SHA1(5df3800f7083293fc01bb6a7e7538ad425bbebfb), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("8mhzdiag.8.bin", 0x0000, 0x2000, CRC(808a549e) SHA1(d2aba014a5507c1538f2c1a73e1d2524f28034f4), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("8mhzdiag.0.bin", 0x0001, 0x2000, CRC(7a92d506) SHA1(5df3800f7083293fc01bb6a7e7538ad425bbebfb), ROM_SKIP(1) | ROM_BIOS(1))
 
-	ROM_REGION( 0x10000, "gfx", ROMREGION_ERASEFF )
-	ROM_LOAD( "gfxu605.g4.bin",  0x0000, 0x0200, CRC(274b7b3d) SHA1(40d8be2cfcbd03512a05925991bb5030d5d4b5e9))
-	ROM_LOAD( "gfxu308.g21.bin", 0x0200, 0x0200, CRC(35a6eed8) SHA1(25cb2dd8e5343cd7927c3045eb4cb96dc9935a37))
-	ROM_LOAD( "gfxu108.g20.bin", 0x0400, 0x0200, CRC(ecee335e) SHA1(5f4d32dc918af15872cd6e700a04720caeb6c657))
-	ROM_LOAD( "gfxu105.g0.bin",  0x0600, 0x0200, CRC(8e1a24b3) SHA1(dad2821c3a3137ad69e78b6fc29ab582e5d78646))
-	ROM_LOAD( "gfxu104.g1.bin",  0x0800, 0x0200, CRC(86f7a483) SHA1(8eb3778f5497741cd4345e81ff1a903c9a63c8bb))
-	ROM_LOAD( "gfxu307.g61.bin", 0x0a00, 0x0020, CRC(b190f25d) SHA1(80fbdc843f1eb68a2d3713499f04d99dab88ce83))
-	ROM_LOAD( "gfxu107.g60.bin", 0x0a20, 0x0020, CRC(425d3a98) SHA1(9ae4ce3761c2f995d00bed8d752c55224d274062))
+	ROM_REGION(0x0a40, "gfx", 0)
+	ROM_LOAD("gfxu605.g4.bin",  0x0000, 0x0200, CRC(274b7b3d) SHA1(40d8be2cfcbd03512a05925991bb5030d5d4b5e9))
+	ROM_LOAD("gfxu308.g21.bin", 0x0200, 0x0200, CRC(35a6eed8) SHA1(25cb2dd8e5343cd7927c3045eb4cb96dc9935a37))
+	ROM_LOAD("gfxu108.g20.bin", 0x0400, 0x0200, CRC(ecee335e) SHA1(5f4d32dc918af15872cd6e700a04720caeb6c657))
+	ROM_LOAD("gfxu105.g0.bin",  0x0600, 0x0200, CRC(8e1a24b3) SHA1(dad2821c3a3137ad69e78b6fc29ab582e5d78646))
+	ROM_LOAD("gfxu104.g1.bin",  0x0800, 0x0200, CRC(86f7a483) SHA1(8eb3778f5497741cd4345e81ff1a903c9a63c8bb))
+	ROM_LOAD("gfxu307.g61.bin", 0x0a00, 0x0020, CRC(b190f25d) SHA1(80fbdc843f1eb68a2d3713499f04d99dab88ce83))
+	ROM_LOAD("gfxu107.g60.bin", 0x0a20, 0x0020, CRC(425d3a98) SHA1(9ae4ce3761c2f995d00bed8d752c55224d274062))
 
-	ROM_REGION( 0x10000, "cpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "cpuu503.p2.bin", 0x0000, 0x0200, CRC(12d9a6be) SHA1(fca99f9c5afc630ac67cbd4e5ba4e5242b826848))
-	ROM_LOAD( "cpuu602.p1.bin", 0x0200, 0x0020, CRC(ee1e5a14) SHA1(0d3346cb3b647fa2475bd7b4fa36ea6ecfdaf805))
-	ROM_LOAD( "cpuu502.p0.bin", 0x0220, 0x0020, CRC(20eb1183) SHA1(9b268792b28d858d6b6a1b6c4148af88a8d6b735))
+	ROM_REGION(0x0240, "cpu", 0)
+	ROM_LOAD("cpuu503.p2.bin", 0x0000, 0x0200, CRC(12d9a6be) SHA1(fca99f9c5afc630ac67cbd4e5ba4e5242b826848))
+	ROM_LOAD("cpuu602.p1.bin", 0x0200, 0x0020, CRC(ee1e5a14) SHA1(0d3346cb3b647fa2475bd7b4fa36ea6ecfdaf805))
+	ROM_LOAD("cpuu502.p0.bin", 0x0220, 0x0020, CRC(20eb1183) SHA1(9b268792b28d858d6b6a1b6c4148af88a8d6b735))
+ROM_END
+
+ROM_START( multibox )
+	ROM_REGION16_BE(0x4000, "monitor", 0)
+	// "Sun Network Monitor, Version 0.10"
+	ROM_LOAD16_BYTE("cybu103-sun10v.bin", 0x0000, 0x2000, CRC(32e53691) SHA1(5b0a3c4b5352d4c19067d9eb4db6cd1f76427892))
+	ROM_LOAD16_BYTE("cybu101-sun10v.bin", 0x0001, 0x2000, CRC(900b725c) SHA1(90343de9e64ff8227c7e58c9d4df02783ecf5a76))
+
+	ROM_REGION16_BE(0x4000, "cyb", 0)
+	// "CYB Monitor - Version 2.1  6/23/84"
+	ROM_LOAD16_BYTE("cybu104-autov.bin", 0x0000, 0x2000, CRC(46570c0e) SHA1(42ad96ffb7cb0e2d9c0aa0ace283ff646eaa4584))
+	ROM_LOAD16_BYTE("cybu102-autov.bin", 0x0001, 0x2000, CRC(6198c5f6) SHA1(7d880395c4da03ac5130905c850ad638cd4b86e9))
 ROM_END
 
 } // anonymous namespace
@@ -183,5 +209,6 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY             FULLNAME  FLAGS
-COMP( 1982, sun1, 0,      0,      sun1,    sun1,  sun1_state, empty_init, "Sun Microsystems", "Sun-1",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY             FULLNAME    FLAGS
+COMP( 1982, sun1,     0,      0,      sun1,    sun1,  sun1_state, empty_init, "Sun Microsystems", "Sun-1",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1984, multibox, 0,      0,      cyb,     sun1,  sun1_state, empty_init, "CYB Systems",      "Multibox", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
