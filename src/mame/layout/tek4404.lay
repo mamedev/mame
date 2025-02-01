@@ -20,7 +20,7 @@ Tektronix 4404 Artificial Intelligence System.
 			<color red="0.0" green="0.2" blue="0.0" />
 		</rect>
 		<rect state="0">
-			<color red="0.0" green="1.0" blue="0.0" />
+			<color red="1.0" green="0.0" blue="0.0" />
 		</rect>
 	</element>
 	<view name="Graphics">
