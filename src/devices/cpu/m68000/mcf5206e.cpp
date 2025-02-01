@@ -44,6 +44,10 @@
 #define INT_PRIORITY(N) 	(N&0x03)
 #define ICR_USE_AUTOVEC(N)	((N & 0x80) != 0)
 
+static constexpr int EXCEPTION_BUS_ERROR                = 2;
+static constexpr int EXCEPTION_UNINITIALIZED_INTERRUPT = 15;
+static constexpr int EXCEPTION_SPURIOUS_INTERRUPT      = 24;
+
 template <typename T, typename U>
 inline void BITWRITE(T &var, U bit_number, bool state) {
     var = (var & ~(static_cast<T>(1) << bit_number)) | (static_cast<T>(state) << bit_number);
@@ -360,7 +364,7 @@ void mcf5206e_device::ppdat_w(u8 data)
 
 coldfire_sim_device::coldfire_sim_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) : 
 	device_t(mconfig, COLDFIRE_SIM, tag, owner, clock)
-	, irq_vector_cb(*this, (u8)m68000_musashi_device::EXCEPTION_BUS_ERROR)
+	, irq_vector_cb(*this, (u8)EXCEPTION_BUS_ERROR)
 	, m_maincpu(*this, finder_base::DUMMY_TAG)
 	, m_swdt(*this, "watchdog")
 {
@@ -546,7 +550,7 @@ u8 coldfire_sim_device::interrupt_callback(offs_t level)
 
     if (highest_priority_device == 0) {
         if(!this->machine().side_effects_disabled()) logerror("%s: Spurious interrupt detected: %u\n", this->machine().describe_context(), ipl);
-        return m68000_musashi_device::EXCEPTION_SPURIOUS_INTERRUPT;
+        return EXCEPTION_SPURIOUS_INTERRUPT;
     }
 
 	BITWRITE(m_ipr, ipl, 0);
@@ -588,7 +592,7 @@ u8 coldfire_sim_device::interrupt_callback(offs_t level)
 			default:
 				if(!this->machine().side_effects_disabled()) logerror("%s: Vector required for device that only supports autovectoring: %u, %u\n", 
 						this->machine().describe_context(), ipl, highest_priority_device);
-				vector = m68000_musashi_device::EXCEPTION_UNINITIALIZED_INTERRUPT;
+				vector = EXCEPTION_UNINITIALIZED_INTERRUPT;
 				break;
 		}
 	}

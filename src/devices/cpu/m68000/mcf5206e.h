@@ -87,8 +87,6 @@ class coldfire_sim_device : public device_t {
 		void set_interrupt(int interrupt, int state);
 
 		TIMER_CALLBACK_MEMBER(swdt_callback);
-
-		uint8_t current_irq_vector;
 		
 		void icr_info(u8 icr);
 

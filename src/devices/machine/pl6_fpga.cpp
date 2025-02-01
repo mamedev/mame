@@ -18,14 +18,14 @@
 #define LOGLAMPS(...)     	LOGMASKED(LOG_LAMPS, __VA_ARGS__)
 
 static const char *const PL6_ROUTE_NAMES[][16] = {
-	"BACTA Port (B)",
-	"RS232 Port A",
-	"RS232 Port C",
-	"RS232 Port D",
-	"CCTALK Port 1",
-	"CCTALK Port 2",
-	"TTL Port",
-	"RS485 Port"
+	{"BACTA Port (B)"},
+	{"RS232 Port A"},
+	{"RS232 Port C"},
+	{"RS232 Port D"},
+	{"CCTALK Port 1"},
+	{"CCTALK Port 2"},
+	{"TTL Port"},
+	{"RS485 Port"}
 };
 
 //************************************
