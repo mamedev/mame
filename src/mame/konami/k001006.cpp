@@ -58,7 +58,7 @@ void k001006_device::device_reset()
 {
 	m_addr = 0;
 	m_device_sel = 0;
-	for (int i = 0; i < palette_entries(); i++)
+	for (int i = 0; i < entries(); i++)
 		set_pen_color(i, 0);
 }
 
