@@ -251,7 +251,8 @@ void agnus_copper_device::vblank_sync(bool state)
 void agnus_copper_device::suspend_offset(int xpos, int hblank_width)
 {
 	m_xpos_state = (xpos == 511) ? 0 : xpos - hblank_width;
-	m_xpos_state += 6;
+	// TODO: commented out, causes issues in too many places
+	//m_xpos_state += 6;
 //  assert(m_xpos_state > 0);
 }
 
