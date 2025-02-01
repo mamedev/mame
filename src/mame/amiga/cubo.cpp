@@ -8,11 +8,9 @@
    for JAMMA use.
 
    TODO:
-   - remove m_input_hack functions, needed to make inputs working
-   - lsrquiz2i, lsrquizg: access violation on microtouch_device destructor when exiting emulation
-                          Caused by microtouch_device::rcv_complete() overrunning the m_rx_buffer
-                          array space with 149 (array size=16).
-
+   - remove m_input_hack functions, needed to make inputs working;
+   - extra RTC device mapped on i2c bus (shared with the Akiko one?);
+   - later gambling games requires extra hopper devices;
 
    Known Games:
    Dumped | Title                | Rev.  | Year | Notes
@@ -320,6 +318,7 @@ routines :
 #include "amiga.h"
 #include "imagedev/cdromimg.h"
 #include "machine/microtch.h"
+#include "machine/nvram.h"
 #include "speaker.h"
 
 
@@ -338,6 +337,7 @@ public:
 		, m_player_ports(*this, {"P1", "P2"})
 		, m_microtouch(*this, "microtouch")
 		, m_akiko(*this, "akiko")
+		, m_nvram(*this, "nvram")
 	{ }
 
 	void handle_joystick_cia(uint8_t pra, uint8_t dra);
@@ -369,12 +369,14 @@ public:
 	void cubo_mem(address_map &map) ATTR_COLD;
 	void overlay_2mb_map32(address_map &map) ATTR_COLD;
 protected:
+	virtual void machine_start() override;
 	virtual void rs232_tx(int state) override;
 	virtual void potgo_w(uint16_t data) override;
 
 private:
 	required_device<microtouch_device> m_microtouch;
 	required_device<akiko_device> m_akiko;
+	required_device<nvram_device> m_nvram;
 
 	typedef void (cubo_state::*input_hack_func)();
 	input_hack_func m_input_hack{};
@@ -386,8 +388,19 @@ private:
 	void lasstixx_input_hack();
 	void mgnumber_input_hack();
 	void mgprem11_input_hack();
+
+	std::unique_ptr<u8[]> m_nvram_data;
 };
 
+void cubo_state::machine_start()
+{
+	amiga_state::machine_start();
+
+	m_nvram_data = make_unique_clear<u8[]>(0x800);
+	subdevice<nvram_device>("nvram")->set_base(&m_nvram_data[0], 0x800);
+
+	save_pointer(NAME(m_nvram_data), 0x800);
+}
 
 void cubo_state::akiko_int_w(int state)
 {
@@ -435,8 +448,14 @@ void cubo_state::cubo_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x1fffff).m(m_overlay, FUNC(address_map_bank_device::amap32));
+	map(0x600000, 0x601fff).lrw8(
+		NAME([this] (offs_t offset) { return m_nvram_data[offset]; }),
+		NAME([this] (offs_t offset, u8 data) { m_nvram_data[offset] = data; })
+	).umask32(0x000000ff);
 	map(0x800000, 0x800003).portr("DIPSW1");
+	map(0x800008, 0x80000b).portw("OUTPUT1");
 	map(0x800010, 0x800013).portr("DIPSW2");
+	map(0x800018, 0x80001b).portw("OUTPUT2");
 	map(0xa80000, 0xb7ffff).noprw();
 	map(0xb80000, 0xb8003f).rw(m_akiko, FUNC(akiko_device::read), FUNC(akiko_device::write));
 	map(0xbf0000, 0xbfffff).rw(FUNC(cubo_state::cia_r), FUNC(cubo_state::gayle_cia_w));
@@ -638,7 +657,7 @@ static INPUT_PORTS_START( cubo )
 	PORT_DIPNAME( 0x02, 0x02, "DSW2 2" )
 	PORT_DIPSETTING(    0x02, "Reset" )
 	PORT_DIPSETTING(    0x00, "Set" )
-	PORT_DIPNAME( 0x04, 0x04, "DSW2 3" )
+	PORT_DIPNAME( 0x04, 0x04, "DSW2 3" ) // PIC data
 	PORT_DIPSETTING(    0x04, "Reset" )
 	PORT_DIPSETTING(    0x00, "Set" )
 	PORT_DIPNAME( 0x08, 0x08, "DSW2 4" )
@@ -647,7 +666,7 @@ static INPUT_PORTS_START( cubo )
 	PORT_DIPNAME( 0x10, 0x10, "DSW2 5" )
 	PORT_DIPSETTING(    0x10, "Reset" )
 	PORT_DIPSETTING(    0x00, "Set" )
-	PORT_DIPNAME( 0x20, 0x20, "DSW2 6" )
+	PORT_DIPNAME( 0x20, 0x20, "DSW2 6" ) // i2c SDA for RTC
 	PORT_DIPSETTING(    0x20, "Reset" )
 	PORT_DIPSETTING(    0x00, "Set" )
 	PORT_DIPNAME( 0x40, 0x40, "DSW2 7" )
@@ -656,6 +675,20 @@ static INPUT_PORTS_START( cubo )
 	PORT_DIPNAME( 0x80, 0x80, "DSW2 8" )
 	PORT_DIPSETTING(    0x80, "Reset" )
 	PORT_DIPSETTING(    0x00, "Set" )
+
+	PORT_START("OUTPUT1")
+	// bit 1 pic clock
+	// bit 2 hopper related
+	// bit 3 pic data write
+	// bit 6 pic enable
+	// bit 7 hopper motor
+
+	PORT_START("OUTPUT2")
+	// bit 0 chip select (0) normal ticket (1) "Suzo" / "MKXX" motor, "erogatore megagettoni"
+	// bit 4 ticket motor out
+	// bit 5 i2c RTC data
+	// bit 6 i2c RTC CS?
+	// bit 7 i2c RTC clock
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cndypuzl )
@@ -1082,6 +1115,8 @@ void cubo_state::cubo(machine_config &config)
 
 	I2C_24C08(config, "i2cmem", 0); // AT24C08N
 
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1); // unknown type, odeontw accesses it
+
 	AKIKO(config, m_akiko, 0);
 	m_akiko->mem_r_callback().set(FUNC(amiga_state::chip_ram_r));
 	m_akiko->mem_w_callback().set(FUNC(amiga_state::chip_ram_w));
@@ -1157,12 +1192,18 @@ void cubo_state::init_cubo()
 ROM_START( cndypuzl )
 	CD32_BIOS
 
+	ROM_REGION(0x1000, "pic", 0) // unknown type
+	ROM_LOAD( "pic.bin", 0x000000, 0x1000, NO_DUMP )
+
 	DISK_REGION( "akiko" )
 	DISK_IMAGE_READONLY( "cndypuzl", 0, BAD_DUMP SHA1(5f41ed3521b3e05d233ac1245b78cb0b118b2b90) )
 ROM_END
 
 ROM_START( haremchl )
 	CD32_BIOS
+
+	ROM_REGION(0x1000, "pic", 0) // unknown type
+	ROM_LOAD( "pic.bin", 0x000000, 0x1000, NO_DUMP )
 
 	DISK_REGION( "akiko" )
 	DISK_IMAGE_READONLY( "haremchl", 0, BAD_DUMP SHA1(abbab347c0d7c5eef0465d0eee770754a452e874) )
@@ -1171,12 +1212,18 @@ ROM_END
 ROM_START( lsrquiz )
 	CD32_BIOS
 
+	ROM_REGION(0x1000, "pic", 0) // unknown type
+	ROM_LOAD( "pic.bin", 0x000000, 0x1000, NO_DUMP )
+
 	DISK_REGION( "akiko" )
 	DISK_IMAGE_READONLY( "lsrquiz", 0, BAD_DUMP SHA1(41fb6cd0c9d36bd77e9c3db69d36801edc791e96) )
 ROM_END
 
 ROM_START( lsrquiz2i )
 	CD32_BIOS
+
+	ROM_REGION(0x1000, "pic", 0) // unknown type
+	ROM_LOAD( "pic.bin", 0x000000, 0x1000, NO_DUMP )
 
 	DISK_REGION( "akiko" )
 	DISK_IMAGE_READONLY( "lsrquiz2", 0, BAD_DUMP SHA1(78e261df1c548fa492e6cf37a9469640bb8816bf) )
@@ -1185,12 +1232,18 @@ ROM_END
 ROM_START( lsrquizg )
 	CD32_BIOS
 
+	ROM_REGION(0x1000, "pic", 0) // unknown type
+	ROM_LOAD( "pic.bin", 0x000000, 0x1000, NO_DUMP )
+
 	DISK_REGION( "akiko" )
 	DISK_IMAGE_READONLY( "laserquizgreek2pro", 0, BAD_DUMP SHA1(8538915b4a0078f19197a5562e37ed3e6d0429a4) )
 ROM_END
 
 ROM_START( mgprem11 )
 	CD32_BIOS
+
+	ROM_REGION(0x1000, "pic", 0) // unknown type
+	ROM_LOAD( "pic.bin", 0x000000, 0x1000, NO_DUMP )
 
 	DISK_REGION( "akiko" )
 	DISK_IMAGE_READONLY( "mgprem11", 0, BAD_DUMP SHA1(7808db33d5949f6c86d12b32bc388c12377e7038) )
@@ -1199,12 +1252,18 @@ ROM_END
 ROM_START( lasstixx )
 	CD32_BIOS
 
+	ROM_REGION(0x1000, "pic", 0) // unknown type
+	ROM_LOAD( "pic.bin", 0x000000, 0x1000, NO_DUMP )
+
 	DISK_REGION( "akiko" )
 	DISK_IMAGE_READONLY( "lasstixx", 0, BAD_DUMP SHA1(b8f6138e1f1840c193e786c56dab03c512f3e21f) )
 ROM_END
 
 ROM_START( mgnumber )
 	CD32_BIOS
+
+	ROM_REGION(0x1000, "pic", 0) // unknown type
+	ROM_LOAD( "pic.bin", 0x000000, 0x1000, NO_DUMP )
 
 	DISK_REGION( "akiko" )
 	DISK_IMAGE_READONLY( "magicnumber", 0, BAD_DUMP SHA1(60e1fadc42694742d19cc0ac2b6e99e9e33faa3d) )
@@ -1213,6 +1272,9 @@ ROM_END
 ROM_START( odeontw )
 	CD32_BIOS
 
+	ROM_REGION(0x1000, "pic", 0) // unknown type
+	ROM_LOAD( "pic.bin", 0x000000, 0x1000, NO_DUMP )
+
 	DISK_REGION( "akiko" )
 	DISK_IMAGE_READONLY( "twister32_17_3", 0, BAD_DUMP SHA1(a40ec484708e22059f7186415283084ebf01323e) ) // has its audio cut a little, worth to mark as redump needed
 ROM_END
@@ -1220,12 +1282,18 @@ ROM_END
 ROM_START( odeontw2 )
 	CD32_BIOS
 
+	ROM_REGION(0x1000, "pic", 0) // unknown type
+	ROM_LOAD( "pic.bin", 0x000000, 0x1000, NO_DUMP )
+
 	DISK_REGION( "akiko" )
 	DISK_IMAGE_READONLY( "odeontw2", 0, BAD_DUMP SHA1(f39e09f35b65a6ae9f1eba4a22f970626b7d3b71) )
 ROM_END
 
 ROM_START( eldoralg )
 	CD32_BIOS
+
+	ROM_REGION(0x1000, "pic", 0) // unknown type
+	ROM_LOAD( "pic.bin", 0x000000, 0x1000, NO_DUMP )
 
 	DISK_REGION( "akiko" )
 	DISK_IMAGE_READONLY( "eldorado", 0, BAD_DUMP SHA1(bc1617c2e3438b729421c1d8b1bf88840b12f030) )
@@ -1372,9 +1440,9 @@ GAME( 1995, lsrquiz2i, cubo, cubo, lsrquiz2, cubo_state, init_lsrquiz2, ROT0, "C
 GAME( 1995, lasstixx,  cubo, cubo, lasstixx, cubo_state, init_lasstixx, ROT0, "CD Express",    "Laser Strixx 2",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1995, mgnumber,  cubo, cubo, mgnumber, cubo_state, init_mgnumber, ROT0, "CD Express",    "Magic Number",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1996, mgprem11,  cubo, cubo, mgprem11, cubo_state, init_mgprem11, ROT0, "CD Express",    "Magic Premium (v1.1)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, eldoralg,  cubo, cubo, eldoralg, cubo_state, init_cubo,     ROT0, "Shangai Games", "Eldorado (4.2)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // touchscreen is offset and cannot be calibrated, joystick buttons aren't recognized properly, has slight GFX bug with roulette ball
-GAME( 1998, odeontw,   cubo, cubo, eldoralg, cubo_state, init_cubo,     ROT0, "CD Express",    "Odeon Twister (v1.4)",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // "Invalid NVRAM", accesses area $6xxxxx and claims invalid RAM config if bypassed
-GAME( 1998, odeontw2,  cubo, cubo, eldoralg, cubo_state, init_cubo,     ROT0, "CD Express",    "Odeon Twister 2 (v202.19)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Resets halfway thru "please wait" in service mode, therefore NVRAM cannot be inited
+GAME( 1997, eldoralg,  cubo, cubo, eldoralg, cubo_state, init_cubo,     ROT0, "Shangai Games", "Eldorado (4.2)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // touchscreen is offset and throws errors in calibration menu, joystick buttons aren't recognized properly in places, uses SPRES=3 (SHRES) for roulette ball in attract
+GAME( 1998, odeontw,   cubo, cubo, eldoralg, cubo_state, init_cubo,     ROT0, "CD Express",    "Odeon Twister (v1.4)",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // claims invalid RAM config once intialized (i2c RTC?), hangs with NVRAM viewer in service mode
+GAME( 1998, odeontw2,  cubo, cubo, eldoralg, cubo_state, init_cubo,     ROT0, "CD Express",    "Odeon Twister 2 (v202.19)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // "Security checking failed" once initialized
 // Laser Gate 2, alt title for Eldorado?
 // Lucky Five
 // Greyhound Race
