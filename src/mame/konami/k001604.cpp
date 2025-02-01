@@ -212,10 +212,9 @@ void k001604_device::device_start()
 	m_bg_tilemap16 = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(k001604_device::tile_info_bg16)), TILEMAP_SCAN_ROWS, 16, 16, 128, 128);
 	m_bg_tilemap16->set_transparent_pen(0);
 
-	set_gfx(0, std::make_unique<gfx_element>(&palette(), char_layout_8x8, &m_fg_char_ram[0], 0, palette().entries() / 16, 0));
-	set_gfx(1, std::make_unique<gfx_element>(&palette(), char_layout_8x8, &m_bg_char_ram[0], 0, palette().entries() / 16, 0));
-	set_gfx(2, std::make_unique<gfx_element>(&palette(), char_layout_16x16, &m_bg_char_ram[0], 0, palette().entries() / 16, 0));
-
+	set_gfx(0, std::make_unique<gfx_element>(&palette(), char_layout_8x8, &m_fg_char_ram[0], 0, palette().entries() / 256, 0));
+	set_gfx(1, std::make_unique<gfx_element>(&palette(), char_layout_8x8, &m_bg_char_ram[0], 0, palette().entries() / 256, 0));
+	set_gfx(2, std::make_unique<gfx_element>(&palette(), char_layout_16x16, &m_bg_char_ram[0], 0, palette().entries() / 256, 0));
 
 	save_pointer(NAME(m_reg), 0x400 / 4);
 	save_pointer(NAME(m_fg_char_ram), 0x80000);
