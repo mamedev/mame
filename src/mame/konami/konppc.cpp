@@ -5,15 +5,17 @@
 #include "emu.h"
 #include "konppc.h"
 
-#define LOG_COMM (1 << 1)
+#define LOG_COMM   (1 << 1)
+#define LOG_SHARED (1 << 2)
 
-#define LOG_ALL (LOG_SYSREG)
+#define LOG_ALL (LOG_COMM | LOG_SHARED)
 
 #define VERBOSE (0)
 
 #include "logmacro.h"
 
-#define LOGCOMM(...) LOGMASKED(LOG_COMM, __VA_ARGS__)
+#define LOGCOMM(...)   LOGMASKED(LOG_COMM, __VA_ARGS__)
+#define LOGSHARED(...) LOGMASKED(LOG_SHARED, __VA_ARGS__)
 
 static constexpr unsigned DSP_BANK_SIZE      = 0x10000;
 static constexpr unsigned DSP_BANK_SIZE_WORD = (DSP_BANK_SIZE / 4);
@@ -28,6 +30,7 @@ konppc_device::konppc_device(const machine_config &mconfig, const char *tag, dev
 	, m_dsp(*this, {finder_base::DUMMY_TAG, finder_base::DUMMY_TAG})
 	, m_k033906(*this, {finder_base::DUMMY_TAG, finder_base::DUMMY_TAG})
 	, m_voodoo(*this, {finder_base::DUMMY_TAG, finder_base::DUMMY_TAG})
+	, m_texture_bank(*this, {finder_base::DUMMY_TAG, finder_base::DUMMY_TAG})
 	, m_cgboard_type(0)
 	, m_num_cgboards(0)
 	//, m_cgboard_id(MAX_CG_BOARDS)
@@ -48,7 +51,6 @@ void konppc_device::device_start()
 		m_dsp_shared_ram_bank[i] = 0;
 
 		m_dsp_state[i] = 0x80;
-		m_texture_bank[i] = nullptr;
 
 		m_nwk_device_sel[i] = 0;
 		m_nwk_fifo_read_ptr[i] = 0;
@@ -110,13 +112,6 @@ int konppc_device::get_cgboard_id(void)
 	}
 }
 
-void konppc_device::set_cgboard_texture_bank(int board, memory_bank *bank, uint8_t *rom)
-{
-	m_texture_bank[board] = bank;
-
-	bank->configure_entries(0, 2, rom, 0x800000);
-}
-
 bool konppc_device::output_3d_enabled()
 {
 	if (m_cgboard_id < MAX_CG_BOARDS)
@@ -133,7 +128,8 @@ uint32_t konppc_device::cgboard_dsp_comm_r_ppc(offs_t offset, uint32_t mem_mask)
 {
 	if (m_cgboard_id < MAX_CG_BOARDS)
 	{
-//      LOGCOMM("%s dsp_cmd_r: (board %d) %08X, %08X\n", machine().describe_context(), m_cgboard_id, offset, mem_mask);
+		if (!machine().side_effects_disabled())
+			LOGCOMM("%s cgboard_dsp_comm_r_ppc: (board %d) %08X & %08X\n", machine().describe_context(), m_cgboard_id, offset, mem_mask);
 		return m_dsp_comm_sharc[m_cgboard_id][offset] | (m_dsp_state[m_cgboard_id] << 16);
 	}
 	else
@@ -144,7 +140,7 @@ uint32_t konppc_device::cgboard_dsp_comm_r_ppc(offs_t offset, uint32_t mem_mask)
 
 void konppc_device::cgboard_dsp_comm_w_ppc(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-//  LOGCOMM("%s dsp_cmd_w: (board %d) %08X, %08X, %08X\n", machine().describe_context(), m_cgboard_id, data, offset, mem_mask);
+	LOGCOMM("%s cgboard_dsp_comm_w_ppc: (board %d) %08X = %08X & %08X\n", machine().describe_context(), m_cgboard_id, offset, data, mem_mask);
 
 	if (m_cgboard_id < MAX_CG_BOARDS)
 	{
@@ -278,14 +274,15 @@ void konppc_device::dsp_comm_sharc_w(int board, int offset, uint32_t data)
 		}
 	}
 
-//  printf("%s:cgboard_dsp_comm_w_sharc: %08X, %08X, %08X\n", machine().describe_context().c_str(), data, offset, mem_mask);
+	LOGCOMM("%s:dsp_comm_sharc_w: %08X = %08X\n", machine().describe_context().c_str(), offset, data);
 
 	m_dsp_comm_sharc[board][offset] = data;
 }
 
 uint32_t konppc_device::dsp_shared_ram_r_sharc(int board, int offset)
 {
-//  printf("dsp_shared_r: (board %d) %08X, (%08X, %08X)\n", m_cgboard_id, offset, (uint32_t)m_dsp_shared_ram[(offset >> 1)], (uint32_t)m_dsp_shared_ram[offset]);
+	if (!machine().side_effects_disabled())
+		LOGSHARED("dsp_shared_ram_r_sharc: (board %d) %08X = %08X\n", board, offset, (uint32_t)m_dsp_shared_ram[board][ + ((m_dsp_shared_ram_bank[board] ^ 1) * DSP_BANK_SIZE_WORD)]);
 
 	if (BIT(offset, 0))
 	{
@@ -299,7 +296,7 @@ uint32_t konppc_device::dsp_shared_ram_r_sharc(int board, int offset)
 
 void konppc_device::dsp_shared_ram_w_sharc(int board, int offset, uint32_t data)
 {
-//  printf("dsp_shared_w: (board %d) %08X, %08X\n", m_cgboard_id, offset, data);
+	LOGSHARED("dsp_shared_ram_w_sharc: (board %d) %08X = %08X\n", board, offset, data);
 	if (BIT(offset, 0))
 	{
 		m_dsp_shared_ram[board][(offset >> 1) + ((m_dsp_shared_ram_bank[board] ^ 1) * DSP_BANK_SIZE_WORD)] &= 0xffff0000;

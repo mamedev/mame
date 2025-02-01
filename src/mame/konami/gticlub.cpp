@@ -276,6 +276,7 @@ protected:
 		, m_k001604(*this, "k001604%u", 1U)
 		, m_work_ram(*this, "work_ram")
 		, m_sharc_dataram(*this, "sharc%u_dataram", 0U)
+		, m_cgboard_bank(*this, "cgboard_%u_bank", 0U)
 		, m_analog(*this, "AN%u", 0U)
 		, m_ports(*this, "IN%u", 0)
 		, m_pcb_digit(*this, "pcbdigit%u", 0U)
@@ -300,6 +301,7 @@ protected:
 	optional_device_array<k001604_device, 2> m_k001604;
 	required_shared_ptr<uint32_t> m_work_ram;
 	optional_shared_ptr_array<uint32_t, 2> m_sharc_dataram;
+	optional_memory_bank_array<2> m_cgboard_bank;
 	optional_ioport_array<4> m_analog;
 	required_ioport_array<4> m_ports;
 	output_finder<2> m_pcb_digit;
@@ -390,8 +392,7 @@ private:
 	template <uint8_t Which> uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void hangplt_map(address_map &map) ATTR_COLD;
-	void hangplt_sharc0_map(address_map &map) ATTR_COLD;
-	void hangplt_sharc1_map(address_map &map) ATTR_COLD;
+	template <unsigned Board> void hangplt_sharc_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -595,28 +596,17 @@ void gticlub_state::sharc_map(address_map &map)
 	map(0x700000, 0x7000ff).rw(m_konppc, FUNC(konppc_device::cgboard_comm_sharc_r<0>), FUNC(konppc_device::cgboard_comm_sharc_w<0>));
 }
 
-void hangplt_state::hangplt_sharc0_map(address_map &map)
+template <unsigned Board>
+void hangplt_state::hangplt_sharc_map(address_map &map)
 {
-	map(0x0400000, 0x041ffff).rw(m_konppc, FUNC(konppc_device::cgboard_shared_sharc_r<0>), FUNC(konppc_device::cgboard_shared_sharc_w<0>));
-	map(0x0500000, 0x05fffff).ram().share(m_sharc_dataram[0]).lr32(NAME([this](offs_t offset) { return m_sharc_dataram[0][offset] & 0xffff; }));
+	map(0x0400000, 0x041ffff).rw(m_konppc, FUNC(konppc_device::cgboard_shared_sharc_r<Board>), FUNC(konppc_device::cgboard_shared_sharc_w<Board>));
+	map(0x0500000, 0x05fffff).ram().share(m_sharc_dataram[Board]).lr32(NAME([this](offs_t offset) { return m_sharc_dataram[Board][offset] & 0xffff; }));
 	map(0x1400000, 0x14fffff).ram();
-	map(0x2400000, 0x27fffff).r(m_konppc, FUNC(konppc_device::nwk_voodoo_r<0>)).w(m_voodoo[0], FUNC(generic_voodoo_device::write));
-	map(0x3400000, 0x34000ff).rw(m_konppc, FUNC(konppc_device::cgboard_comm_sharc_r<0>), FUNC(konppc_device::cgboard_comm_sharc_w<0>));
-	map(0x3401000, 0x34fffff).w(m_konppc, FUNC(konppc_device::nwk_voodoo_fifo_w<0>));
-	map(0x3500000, 0x3507fff).rw(m_konppc, FUNC(konppc_device::cgboard_k033906_r<0>), FUNC(konppc_device::cgboard_k033906_w<0>));
-	map(0x3600000, 0x37fffff).bankr("master_cgboard_bank");
-}
-
-void hangplt_state::hangplt_sharc1_map(address_map &map)
-{
-	map(0x0400000, 0x041ffff).rw(m_konppc, FUNC(konppc_device::cgboard_shared_sharc_r<1>), FUNC(konppc_device::cgboard_shared_sharc_w<1>));
-	map(0x0500000, 0x05fffff).ram().share(m_sharc_dataram[1]).lr32(NAME([this](offs_t offset) { return m_sharc_dataram[1][offset] & 0xffff; }));
-	map(0x1400000, 0x14fffff).ram();
-	map(0x2400000, 0x27fffff).r(m_konppc, FUNC(konppc_device::nwk_voodoo_r<1>)).w(m_voodoo[1], FUNC(generic_voodoo_device::write));
-	map(0x3400000, 0x34000ff).rw(m_konppc, FUNC(konppc_device::cgboard_comm_sharc_r<1>), FUNC(konppc_device::cgboard_comm_sharc_w<1>));
-	map(0x3401000, 0x34fffff).w(m_konppc, FUNC(konppc_device::nwk_voodoo_fifo_w<1>));
-	map(0x3500000, 0x3507fff).rw(m_konppc, FUNC(konppc_device::cgboard_k033906_r<1>), FUNC(konppc_device::cgboard_k033906_w<1>));
-	map(0x3600000, 0x37fffff).bankr("slave_cgboard_bank");
+	map(0x2400000, 0x27fffff).r(m_konppc, FUNC(konppc_device::nwk_voodoo_r<Board>)).w(m_voodoo[Board], FUNC(generic_voodoo_device::write));
+	map(0x3400000, 0x34000ff).rw(m_konppc, FUNC(konppc_device::cgboard_comm_sharc_r<Board>), FUNC(konppc_device::cgboard_comm_sharc_w<Board>));
+	map(0x3401000, 0x34fffff).w(m_konppc, FUNC(konppc_device::nwk_voodoo_fifo_w<Board>));
+	map(0x3500000, 0x3507fff).rw(m_konppc, FUNC(konppc_device::cgboard_k033906_r<Board>), FUNC(konppc_device::cgboard_k033906_w<Board>));
+	map(0x3600000, 0x37fffff).bankr(m_cgboard_bank[Board]);
 }
 
 /*****************************************************************************/
@@ -983,11 +973,11 @@ void hangplt_state::hangplt(machine_config &config)
 
 	ADSP21062(config, m_dsp[0], XTAL(36'000'000));
 	m_dsp[0]->set_boot_mode(adsp21062_device::BOOT_MODE_EPROM);
-	m_dsp[0]->set_addrmap(AS_DATA, &hangplt_state::hangplt_sharc0_map);
+	m_dsp[0]->set_addrmap(AS_DATA, &hangplt_state::hangplt_sharc_map<0>);
 
 	ADSP21062(config, m_dsp[1], XTAL(36'000'000));
 	m_dsp[1]->set_boot_mode(adsp21062_device::BOOT_MODE_EPROM);
-	m_dsp[1]->set_addrmap(AS_DATA, &hangplt_state::hangplt_sharc1_map);
+	m_dsp[1]->set_addrmap(AS_DATA, &hangplt_state::hangplt_sharc_map<1>);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
@@ -1059,6 +1049,8 @@ void hangplt_state::hangplt(machine_config &config)
 	m_konppc->set_k033906_tag(1, "k033906_2");
 	m_konppc->set_voodoo_tag(0, m_voodoo[0]);
 	m_konppc->set_voodoo_tag(1, m_voodoo[1]);
+	m_konppc->set_texture_bank_tag(0, m_cgboard_bank[0]);
+	m_konppc->set_texture_bank_tag(1, m_cgboard_bank[1]);
 	m_konppc->set_num_boards(2);
 	m_konppc->set_cgboard_type(konppc_device::CGBOARD_TYPE_HANGPLT);
 }
@@ -1359,7 +1351,7 @@ ROM_START( hangplt ) // Japan version JAB
 	ROM_LOAD( "685a09.9s", 0x000000, 0x400000, CRC(b8ae40aa) SHA1(eee27a8929e0e805f1045fd9638e661b36a1e3c7) )
 	ROM_LOAD( "685a10.7s", 0x400000, 0x400000, CRC(fef3dc36) SHA1(566c7469fc452b5965a31fa42291082ec8e48a24) )
 
-	ROM_REGION(0x800000, "master_cgboard", 0)    // texture roms
+	ROM_REGION(0x1000000, "cgboard_0", ROMREGION_ERASE00)    // texture roms
 	ROM_LOAD32_WORD( "685a13.4w",  0x000002, 0x400000, CRC(06329af4) SHA1(76cad9db604751ce48bb67bfd29e57bac0ee9a16) )
 	ROM_LOAD32_WORD( "685a14.12w", 0x000000, 0x400000, CRC(87437739) SHA1(0d45637af40938a54d5efd29c125b0fafd55f9a4) )
 
@@ -1385,7 +1377,7 @@ ROM_START( hangpltu ) // USA version UAA
 	ROM_LOAD( "685a09.9s", 0x000000, 0x400000, CRC(b8ae40aa) SHA1(eee27a8929e0e805f1045fd9638e661b36a1e3c7) )
 	ROM_LOAD( "685a10.7s", 0x400000, 0x400000, CRC(fef3dc36) SHA1(566c7469fc452b5965a31fa42291082ec8e48a24) )
 
-	ROM_REGION(0x800000, "master_cgboard", 0)    // texture roms
+	ROM_REGION(0x1000000, "cgboard_0", ROMREGION_ERASE00)    // texture roms
 	ROM_LOAD32_WORD( "685a13.4w",  0x000002, 0x400000, CRC(06329af4) SHA1(76cad9db604751ce48bb67bfd29e57bac0ee9a16) )
 	ROM_LOAD32_WORD( "685a14.12w", 0x000000, 0x400000, CRC(87437739) SHA1(0d45637af40938a54d5efd29c125b0fafd55f9a4) )
 
@@ -1401,8 +1393,8 @@ void gticlub_state::init_gticlub()
 
 void hangplt_state::init_hangplt_common()
 {
-	m_konppc->set_cgboard_texture_bank(0, membank("master_cgboard_bank"), memregion("master_cgboard")->base());
-	m_konppc->set_cgboard_texture_bank(1, membank("slave_cgboard_bank"), memregion("master_cgboard")->base());
+	m_cgboard_bank[0]->configure_entries(0, 2, memregion("cgboard_0")->base(), 0x800000);
+	m_cgboard_bank[1]->configure_entries(0, 2, memregion("cgboard_0")->base(), 0x800000);
 }
 
 void hangplt_state::init_hangplt() //fixme: remove hacks and actually emulate the step lock. Possibly similar to Alpine Racer 1/2 and Alpine Surfer?

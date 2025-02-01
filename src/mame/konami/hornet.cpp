@@ -411,6 +411,7 @@ public:
 		m_jvs_host(*this, "jvs_host"),
 		m_k033906(*this, "k033906_%u", 1U),
 		m_gn676_lan(*this, "gn676_lan"),
+		m_cgboard_bank(*this, "cgboard_%u_bank", 0U),
 		m_in(*this, "IN%u", 0U),
 		m_dsw(*this, "DSW"),
 		m_eepromout(*this, "EEPROMOUT"),
@@ -453,6 +454,7 @@ protected:
 	required_device<konppc_jvs_host_device> m_jvs_host;
 	optional_device_array<k033906_device, 2> m_k033906;
 	optional_device<konami_gn676_lan_device> m_gn676_lan;
+	optional_memory_bank_array<2> m_cgboard_bank;
 	required_ioport_array<3> m_in;
 	required_ioport m_dsw;
 	optional_ioport m_eepromout;
@@ -477,8 +479,7 @@ protected:
 	void hornet_map(address_map &map) ATTR_COLD;
 	void hornet_lan_map(address_map &map) ATTR_COLD;
 	void sscope_map(address_map &map) ATTR_COLD;
-	void sharc0_map(address_map &map) ATTR_COLD;
-	void sharc1_map(address_map &map) ATTR_COLD;
+	template <unsigned Board> void sharc_map(address_map &map) ATTR_COLD;
 	void sound_memmap(address_map &map) ATTR_COLD;
 };
 
@@ -769,7 +770,7 @@ void sscope2_state::comm_eeprom_w(uint8_t data)
 
 void sscope2_state::comm1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	LOGCOMM("comm1_w: %08X, %08X, %08X\n", offset, data, mem_mask);
+	LOGCOMM("comm1_w: %08X = %08X & %08X\n", offset, data, mem_mask);
 }
 
 void sscope2_state::comm_rombank_w(uint32_t data)
@@ -779,7 +780,8 @@ void sscope2_state::comm_rombank_w(uint32_t data)
 
 uint32_t sscope2_state::comm0_unk_r(offs_t offset, uint32_t mem_mask)
 {
-//  LOGCOMM("comm0_unk_r: %08X, %08X\n", offset, mem_mask);
+	if (!machine().side_effects_disabled())
+		LOGCOMM("comm0_unk_r: %08X & %08X\n", offset, mem_mask);
 	return 0xffffffff;
 }
 
@@ -996,26 +998,16 @@ void terabrst_state::gn680_memmap(address_map &map)
 
 /*****************************************************************************/
 
-void hornet_state::sharc0_map(address_map &map)
+template <unsigned Board> 
+void hornet_state::sharc_map(address_map &map)
 {
-	map(0x0400000, 0x041ffff).rw(m_konppc, FUNC(konppc_device::cgboard_shared_sharc_r<0>), FUNC(konppc_device::cgboard_shared_sharc_w<0>));
-	map(0x0500000, 0x05fffff).ram().share(m_sharc_dataram[0]).lr32(NAME([this](offs_t offset) { return m_sharc_dataram[0][offset] & 0xffff; }));
+	map(0x0400000, 0x041ffff).rw(m_konppc, FUNC(konppc_device::cgboard_shared_sharc_r<Board>), FUNC(konppc_device::cgboard_shared_sharc_w<Board>));
+	map(0x0500000, 0x05fffff).ram().share(m_sharc_dataram[Board]).lr32(NAME([this](offs_t offset) { return m_sharc_dataram[Board][offset] & 0xffff; }));
 	map(0x1400000, 0x14fffff).ram();
-	map(0x2400000, 0x27fffff).m(m_voodoo[0], FUNC(generic_voodoo_device::core_map));
-	map(0x3400000, 0x34000ff).rw(m_konppc, FUNC(konppc_device::cgboard_comm_sharc_r<0>), FUNC(konppc_device::cgboard_comm_sharc_w<0>));
-	map(0x3500000, 0x35000ff).rw(m_konppc, FUNC(konppc_device::cgboard_k033906_r<0>), FUNC(konppc_device::cgboard_k033906_w<0>));
-	map(0x3600000, 0x37fffff).bankr("master_cgboard_bank");
-}
-
-void hornet_state::sharc1_map(address_map &map)
-{
-	map(0x0400000, 0x041ffff).rw(m_konppc, FUNC(konppc_device::cgboard_shared_sharc_r<1>), FUNC(konppc_device::cgboard_shared_sharc_w<1>));
-	map(0x0500000, 0x05fffff).ram().share(m_sharc_dataram[1]).lr32(NAME([this](offs_t offset) { return m_sharc_dataram[1][offset] & 0xffff; }));
-	map(0x1400000, 0x14fffff).ram();
-	map(0x2400000, 0x27fffff).m(m_voodoo[1], FUNC(generic_voodoo_device::core_map));
-	map(0x3400000, 0x34000ff).rw(m_konppc, FUNC(konppc_device::cgboard_comm_sharc_r<1>), FUNC(konppc_device::cgboard_comm_sharc_w<1>));
-	map(0x3500000, 0x35000ff).rw(m_konppc, FUNC(konppc_device::cgboard_k033906_r<1>), FUNC(konppc_device::cgboard_k033906_w<1>));
-	map(0x3600000, 0x37fffff).bankr("slave_cgboard_bank");
+	map(0x2400000, 0x27fffff).m(m_voodoo[Board], FUNC(generic_voodoo_device::core_map));
+	map(0x3400000, 0x34000ff).rw(m_konppc, FUNC(konppc_device::cgboard_comm_sharc_r<Board>), FUNC(konppc_device::cgboard_comm_sharc_w<Board>));
+	map(0x3500000, 0x35000ff).rw(m_konppc, FUNC(konppc_device::cgboard_k033906_r<Board>), FUNC(konppc_device::cgboard_k033906_w<Board>));
+	map(0x3600000, 0x37fffff).bankr(m_cgboard_bank[Board]);
 }
 
 /*****************************************************************************/
@@ -1309,11 +1301,11 @@ void hornet_state::machine_reset()
 	if (m_dsp[1].found())
 		m_dsp[1]->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
-	if (memregion("master_cgboard"))
+	if (memregion("cgboard_0"))
 	{
-		membank("master_cgboard_bank")->set_base(memregion("master_cgboard")->base());
-		if (membank("slave_cgboard_bank"))
-			membank("slave_cgboard_bank")->set_base(memregion("master_cgboard")->base());
+		m_cgboard_bank[0]->set_entry(0);
+		if (m_cgboard_bank[1])
+			m_cgboard_bank[1]->set_entry(0);
 	}
 }
 
@@ -1359,7 +1351,7 @@ void hornet_state::hornet(machine_config &config)
 
 	ADSP21062(config, m_dsp[0], XTAL(36'000'000));
 	m_dsp[0]->set_boot_mode(adsp21062_device::BOOT_MODE_EPROM);
-	m_dsp[0]->set_addrmap(AS_DATA, &hornet_state::sharc0_map);
+	m_dsp[0]->set_addrmap(AS_DATA, &hornet_state::sharc_map<0>);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
@@ -1407,6 +1399,7 @@ void hornet_state::hornet(machine_config &config)
 	m_konppc->set_dsp_tag(0, m_dsp[0]);
 	m_konppc->set_k033906_tag(0, m_k033906[0]);
 	m_konppc->set_voodoo_tag(0, m_voodoo[0]);
+	m_konppc->set_texture_bank_tag(0, m_cgboard_bank[0]);
 	m_konppc->set_num_boards(1);
 	m_konppc->set_cgboard_type(konppc_device::CGBOARD_TYPE_HORNET);
 
@@ -1458,7 +1451,7 @@ void hornet_state::sscope(machine_config &config)
 
 	ADSP21062(config, m_dsp[1], XTAL(36'000'000));
 	m_dsp[1]->set_boot_mode(adsp21062_device::BOOT_MODE_EPROM);
-	m_dsp[1]->set_addrmap(AS_DATA, &hornet_state::sharc1_map);
+	m_dsp[1]->set_addrmap(AS_DATA, &hornet_state::sharc_map<1>);
 
 	m_k037122[0]->set_screen("lscreen");
 
@@ -1498,6 +1491,7 @@ void hornet_state::sscope(machine_config &config)
 	m_konppc->set_dsp_tag(1, m_dsp[1]);
 	m_konppc->set_k033906_tag(1, m_k033906[1]);
 	m_konppc->set_voodoo_tag(1, m_voodoo[1]);
+	m_konppc->set_texture_bank_tag(1, m_cgboard_bank[1]);
 	m_konppc->set_num_boards(2);
 }
 
@@ -1560,7 +1554,7 @@ void hornet_state::jamma_jvs_w(uint8_t data)
 
 void hornet_state::init_hornet()
 {
-	m_konppc->set_cgboard_texture_bank(0, membank("master_cgboard_bank"), memregion("master_cgboard")->base());
+	m_cgboard_bank[0]->configure_entries(0, 2, memregion("cgboard_0")->base(), 0x800000);
 
 	m_maincpu->ppc4xx_spu_set_tx_handler(write8smo_delegate(*this, FUNC(hornet_state::jamma_jvs_w)));
 
@@ -1576,16 +1570,16 @@ void hornet_state::init_gradius4()
 
 void hornet_state::init_sscope()
 {
-	m_konppc->set_cgboard_texture_bank(0, membank("master_cgboard_bank"), memregion("master_cgboard")->base());
-	m_konppc->set_cgboard_texture_bank(1, membank("slave_cgboard_bank"), memregion("master_cgboard")->base());
+	m_cgboard_bank[0]->configure_entries(0, 2, memregion("cgboard_0")->base(), 0x800000);
+	m_cgboard_bank[1]->configure_entries(0, 2, memregion("cgboard_0")->base(), 0x800000);
 
 	m_maincpu->ppc4xx_spu_set_tx_handler(write8smo_delegate(*this, FUNC(hornet_state::jamma_jvs_w)));
 }
 
 void sscope2_state::init_sscope2() //fixme: eventually set sscope2 to load gfx roms from the comm board
 {
-	m_konppc->set_cgboard_texture_bank(0, membank("master_cgboard_bank"), memregion("master_cgboard")->base());
-	m_konppc->set_cgboard_texture_bank(1, membank("slave_cgboard_bank"), memregion("master_cgboard")->base());
+	m_cgboard_bank[0]->configure_entries(0, 2, memregion("cgboard_0")->base(), 0x800000);
+	m_cgboard_bank[1]->configure_entries(0, 2, memregion("cgboard_0")->base(), 0x800000);
 
 	m_maincpu->ppc4xx_spu_set_tx_handler(write8smo_delegate(*this, FUNC(sscope2_state::jamma_jvs_w)));
 }
@@ -1602,7 +1596,7 @@ ROM_START(sscope)
 	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
 	ROM_LOAD16_WORD_SWAP("830a08.7s", 0x000000, 0x80000, CRC(2805ea1d) SHA1(2556a51ee98cb8f59bf081e916c69a24532196f1) )
 
-	ROM_REGION(0x1000000, "master_cgboard", 0)       // CG Board texture roms
+	ROM_REGION(0x1000000, "cgboard_0", ROMREGION_ERASE00)       // CG Board texture roms
 	ROM_LOAD32_WORD( "830a14.32u", 0x000000, 0x400000, CRC(335793e1) SHA1(d582b53c3853abd59bc728f619a30c27cfc9497c) )
 	ROM_LOAD32_WORD( "830a13.24u", 0x000002, 0x400000, CRC(d6e7877e) SHA1(b4d0e17ada7dd126ec564a20e7140775b4b3fdb7) )
 
@@ -1624,7 +1618,7 @@ ROM_START(sscopee)
 	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
 	ROM_LOAD16_WORD_SWAP("830a08.7s", 0x000000, 0x80000, CRC(2805ea1d) SHA1(2556a51ee98cb8f59bf081e916c69a24532196f1) )
 
-	ROM_REGION(0x1000000, "master_cgboard", 0)       // CG Board texture roms
+	ROM_REGION(0x1000000, "cgboard_0", ROMREGION_ERASE00)       // CG Board texture roms
 	ROM_LOAD32_WORD( "830a14.32u", 0x000000, 0x400000, CRC(335793e1) SHA1(d582b53c3853abd59bc728f619a30c27cfc9497c) )
 	ROM_LOAD32_WORD( "830a13.24u", 0x000002, 0x400000, CRC(d6e7877e) SHA1(b4d0e17ada7dd126ec564a20e7140775b4b3fdb7) )
 
@@ -1646,7 +1640,7 @@ ROM_START(sscopea)
 	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
 	ROM_LOAD16_WORD_SWAP("830a08.7s", 0x000000, 0x80000, CRC(2805ea1d) SHA1(2556a51ee98cb8f59bf081e916c69a24532196f1) )
 
-	ROM_REGION(0x1000000, "master_cgboard", 0)       // CG Board texture roms
+	ROM_REGION(0x1000000, "cgboard_0", ROMREGION_ERASE00)       // CG Board texture roms
 	ROM_LOAD32_WORD( "830a14.32u", 0x000000, 0x400000, CRC(335793e1) SHA1(d582b53c3853abd59bc728f619a30c27cfc9497c) )
 	ROM_LOAD32_WORD( "830a13.24u", 0x000002, 0x400000, CRC(d6e7877e) SHA1(b4d0e17ada7dd126ec564a20e7140775b4b3fdb7) )
 
@@ -1668,7 +1662,7 @@ ROM_START(sscopeuc)
 	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
 	ROM_LOAD16_WORD_SWAP("830a08.7s", 0x000000, 0x80000, CRC(2805ea1d) SHA1(2556a51ee98cb8f59bf081e916c69a24532196f1) )
 
-	ROM_REGION(0x1000000, "master_cgboard", 0)       // CG Board texture roms
+	ROM_REGION(0x1000000, "cgboard_0", ROMREGION_ERASE00)       // CG Board texture roms
 	ROM_LOAD32_WORD( "830a14.32u", 0x000000, 0x400000, CRC(335793e1) SHA1(d582b53c3853abd59bc728f619a30c27cfc9497c) )
 	ROM_LOAD32_WORD( "830a13.24u", 0x000002, 0x400000, CRC(d6e7877e) SHA1(b4d0e17ada7dd126ec564a20e7140775b4b3fdb7) )
 
@@ -1690,7 +1684,7 @@ ROM_START(sscopeec)
 	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
 	ROM_LOAD16_WORD_SWAP("830a08.7s", 0x000000, 0x80000, CRC(2805ea1d) SHA1(2556a51ee98cb8f59bf081e916c69a24532196f1) )
 
-	ROM_REGION(0x1000000, "master_cgboard", 0)       // CG Board texture roms
+	ROM_REGION(0x1000000, "cgboard_0", ROMREGION_ERASE00)       // CG Board texture roms
 	ROM_LOAD32_WORD( "830a14.32u", 0x000000, 0x400000, CRC(335793e1) SHA1(d582b53c3853abd59bc728f619a30c27cfc9497c) )
 	ROM_LOAD32_WORD( "830a13.24u", 0x000002, 0x400000, CRC(d6e7877e) SHA1(b4d0e17ada7dd126ec564a20e7140775b4b3fdb7) )
 
@@ -1712,7 +1706,7 @@ ROM_START(sscopeac)
 	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
 	ROM_LOAD16_WORD_SWAP("830a08.7s", 0x000000, 0x80000, CRC(2805ea1d) SHA1(2556a51ee98cb8f59bf081e916c69a24532196f1) )
 
-	ROM_REGION(0x1000000, "master_cgboard", 0)       // CG Board texture roms
+	ROM_REGION(0x1000000, "cgboard_0", ROMREGION_ERASE00)       // CG Board texture roms
 	ROM_LOAD32_WORD( "830a14.32u", 0x000000, 0x400000, CRC(335793e1) SHA1(d582b53c3853abd59bc728f619a30c27cfc9497c) )
 	ROM_LOAD32_WORD( "830a13.24u", 0x000002, 0x400000, CRC(d6e7877e) SHA1(b4d0e17ada7dd126ec564a20e7140775b4b3fdb7) )
 
@@ -1734,7 +1728,7 @@ ROM_START(sscopeub)
 	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
 	ROM_LOAD16_WORD_SWAP("830a08.7s", 0x000000, 0x80000, CRC(2805ea1d) SHA1(2556a51ee98cb8f59bf081e916c69a24532196f1) )
 
-	ROM_REGION(0x1000000, "master_cgboard", 0)       // CG Board texture roms
+	ROM_REGION(0x1000000, "cgboard_0", ROMREGION_ERASE00)       // CG Board texture roms
 	ROM_LOAD32_WORD( "830a14.32u", 0x000000, 0x400000, CRC(335793e1) SHA1(d582b53c3853abd59bc728f619a30c27cfc9497c) )
 	ROM_LOAD32_WORD( "830a13.24u", 0x000002, 0x400000, CRC(d6e7877e) SHA1(b4d0e17ada7dd126ec564a20e7140775b4b3fdb7) )
 
@@ -1756,7 +1750,7 @@ ROM_START(sscopeeb)
 	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
 	ROM_LOAD16_WORD_SWAP("830a08.7s", 0x000000, 0x80000, CRC(2805ea1d) SHA1(2556a51ee98cb8f59bf081e916c69a24532196f1) )
 
-	ROM_REGION(0x1000000, "master_cgboard", 0)       // CG Board texture roms
+	ROM_REGION(0x1000000, "cgboard_0", ROMREGION_ERASE00)       // CG Board texture roms
 	ROM_LOAD32_WORD( "830a14.32u", 0x000000, 0x400000, CRC(335793e1) SHA1(d582b53c3853abd59bc728f619a30c27cfc9497c) )
 	ROM_LOAD32_WORD( "830a13.24u", 0x000002, 0x400000, CRC(d6e7877e) SHA1(b4d0e17ada7dd126ec564a20e7140775b4b3fdb7) )
 
@@ -1778,7 +1772,7 @@ ROM_START(sscopejb)
 	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
 	ROM_LOAD16_WORD_SWAP("830a08.7s", 0x000000, 0x80000, CRC(2805ea1d) SHA1(2556a51ee98cb8f59bf081e916c69a24532196f1) )
 
-	ROM_REGION(0x1000000, "master_cgboard", 0)       // CG Board texture roms
+	ROM_REGION(0x1000000, "cgboard_0", ROMREGION_ERASE00)       // CG Board texture roms
 	ROM_LOAD32_WORD( "830a14.32u", 0x000000, 0x400000, CRC(335793e1) SHA1(d582b53c3853abd59bc728f619a30c27cfc9497c) )
 	ROM_LOAD32_WORD( "830a13.24u", 0x000002, 0x400000, CRC(d6e7877e) SHA1(b4d0e17ada7dd126ec564a20e7140775b4b3fdb7) )
 
@@ -1800,7 +1794,7 @@ ROM_START(sscopeab)
 	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
 	ROM_LOAD16_WORD_SWAP("830a08.7s", 0x000000, 0x80000, CRC(2805ea1d) SHA1(2556a51ee98cb8f59bf081e916c69a24532196f1) )
 
-	ROM_REGION(0x1000000, "master_cgboard", 0)       // CG Board texture roms
+	ROM_REGION(0x1000000, "cgboard_0", ROMREGION_ERASE00)       // CG Board texture roms
 	ROM_LOAD32_WORD( "830a14.32u", 0x000000, 0x400000, CRC(335793e1) SHA1(d582b53c3853abd59bc728f619a30c27cfc9497c) )
 	ROM_LOAD32_WORD( "830a13.24u", 0x000002, 0x400000, CRC(d6e7877e) SHA1(b4d0e17ada7dd126ec564a20e7140775b4b3fdb7) )
 
@@ -1822,7 +1816,7 @@ ROM_START(sscopeua)
 	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
 	ROM_LOAD16_WORD_SWAP("830a08.7s", 0x000000, 0x80000, CRC(2805ea1d) SHA1(2556a51ee98cb8f59bf081e916c69a24532196f1) )
 
-	ROM_REGION(0x1000000, "master_cgboard", 0)       // CG Board texture roms
+	ROM_REGION(0x1000000, "cgboard_0", ROMREGION_ERASE00)       // CG Board texture roms
 	ROM_LOAD32_WORD( "830a14.32u", 0x000000, 0x400000, CRC(335793e1) SHA1(d582b53c3853abd59bc728f619a30c27cfc9497c) )
 	ROM_LOAD32_WORD( "830a13.24u", 0x000002, 0x400000, CRC(d6e7877e) SHA1(b4d0e17ada7dd126ec564a20e7140775b4b3fdb7) )
 
@@ -1844,7 +1838,7 @@ ROM_START(sscopeea)
 	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
 	ROM_LOAD16_WORD_SWAP("830a08.7s", 0x000000, 0x80000, CRC(2805ea1d) SHA1(2556a51ee98cb8f59bf081e916c69a24532196f1) )
 
-	ROM_REGION(0x1000000, "master_cgboard", 0)       // CG Board texture roms
+	ROM_REGION(0x1000000, "cgboard_0", ROMREGION_ERASE00)       // CG Board texture roms
 	ROM_LOAD32_WORD( "830a14.32u", 0x000000, 0x400000, CRC(335793e1) SHA1(d582b53c3853abd59bc728f619a30c27cfc9497c) )
 	ROM_LOAD32_WORD( "830a13.24u", 0x000002, 0x400000, CRC(d6e7877e) SHA1(b4d0e17ada7dd126ec564a20e7140775b4b3fdb7) )
 
@@ -1866,7 +1860,7 @@ ROM_START(sscopeja)
 	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
 	ROM_LOAD16_WORD_SWAP("830a08.7s", 0x000000, 0x80000, CRC(2805ea1d) SHA1(2556a51ee98cb8f59bf081e916c69a24532196f1) )
 
-	ROM_REGION(0x1000000, "master_cgboard", 0)       // CG Board texture roms
+	ROM_REGION(0x1000000, "cgboard_0", ROMREGION_ERASE00)       // CG Board texture roms
 	ROM_LOAD32_WORD( "830a14.32u", 0x000000, 0x400000, CRC(335793e1) SHA1(d582b53c3853abd59bc728f619a30c27cfc9497c) )
 	ROM_LOAD32_WORD( "830a13.24u", 0x000002, 0x400000, CRC(d6e7877e) SHA1(b4d0e17ada7dd126ec564a20e7140775b4b3fdb7) )
 
@@ -1888,7 +1882,7 @@ ROM_START(sscopeaa)
 	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
 	ROM_LOAD16_WORD_SWAP("830a08.7s", 0x000000, 0x80000, CRC(2805ea1d) SHA1(2556a51ee98cb8f59bf081e916c69a24532196f1) )
 
-	ROM_REGION(0x1000000, "master_cgboard", 0)       // CG Board texture roms
+	ROM_REGION(0x1000000, "cgboard_0", ROMREGION_ERASE00)       // CG Board texture roms
 	ROM_LOAD32_WORD( "830a14.32u", 0x000000, 0x400000, CRC(335793e1) SHA1(d582b53c3853abd59bc728f619a30c27cfc9497c) )
 	ROM_LOAD32_WORD( "830a13.24u", 0x000002, 0x400000, CRC(d6e7877e) SHA1(b4d0e17ada7dd126ec564a20e7140775b4b3fdb7) )
 
@@ -1910,7 +1904,7 @@ ROM_START(sscopevd2)
 	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
 	ROM_LOAD16_WORD_SWAP("830a08.7s", 0x000000, 0x80000, CRC(2805ea1d) SHA1(2556a51ee98cb8f59bf081e916c69a24532196f1) )
 
-	ROM_REGION(0x1000000, "master_cgboard", 0)       // CG Board texture roms
+	ROM_REGION(0x1000000, "cgboard_0", ROMREGION_ERASE00)       // CG Board texture roms
 	ROM_LOAD32_WORD( "830a14.32u", 0x000000, 0x400000, CRC(335793e1) SHA1(d582b53c3853abd59bc728f619a30c27cfc9497c) )
 	ROM_LOAD32_WORD( "830a13.24u", 0x000002, 0x400000, CRC(d6e7877e) SHA1(b4d0e17ada7dd126ec564a20e7140775b4b3fdb7) )
 
@@ -1932,7 +1926,7 @@ ROM_START(sscopeevd2)
 	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
 	ROM_LOAD16_WORD_SWAP("830a08.7s", 0x000000, 0x80000, CRC(2805ea1d) SHA1(2556a51ee98cb8f59bf081e916c69a24532196f1) )
 
-	ROM_REGION(0x1000000, "master_cgboard", 0)       // CG Board texture roms
+	ROM_REGION(0x1000000, "cgboard_0", ROMREGION_ERASE00)       // CG Board texture roms
 	ROM_LOAD32_WORD( "830a14.32u", 0x000000, 0x400000, CRC(335793e1) SHA1(d582b53c3853abd59bc728f619a30c27cfc9497c) )
 	ROM_LOAD32_WORD( "830a13.24u", 0x000002, 0x400000, CRC(d6e7877e) SHA1(b4d0e17ada7dd126ec564a20e7140775b4b3fdb7) )
 
@@ -1954,7 +1948,7 @@ ROM_START(sscopeavd2)
 	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
 	ROM_LOAD16_WORD_SWAP("830a08.7s", 0x000000, 0x80000, CRC(2805ea1d) SHA1(2556a51ee98cb8f59bf081e916c69a24532196f1) )
 
-	ROM_REGION(0x1000000, "master_cgboard", 0)       // CG Board texture roms
+	ROM_REGION(0x1000000, "cgboard_0", ROMREGION_ERASE00)       // CG Board texture roms
 	ROM_LOAD32_WORD( "830a14.32u", 0x000000, 0x400000, CRC(335793e1) SHA1(d582b53c3853abd59bc728f619a30c27cfc9497c) )
 	ROM_LOAD32_WORD( "830a13.24u", 0x000002, 0x400000, CRC(d6e7877e) SHA1(b4d0e17ada7dd126ec564a20e7140775b4b3fdb7) )
 
@@ -1976,7 +1970,7 @@ ROM_START(sscopeucvd2)
 	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
 	ROM_LOAD16_WORD_SWAP("830a08.7s", 0x000000, 0x80000, CRC(2805ea1d) SHA1(2556a51ee98cb8f59bf081e916c69a24532196f1) )
 
-	ROM_REGION(0x1000000, "master_cgboard", 0)       // CG Board texture roms
+	ROM_REGION(0x1000000, "cgboard_0", ROMREGION_ERASE00)       // CG Board texture roms
 	ROM_LOAD32_WORD( "830a14.32u", 0x000000, 0x400000, CRC(335793e1) SHA1(d582b53c3853abd59bc728f619a30c27cfc9497c) )
 	ROM_LOAD32_WORD( "830a13.24u", 0x000002, 0x400000, CRC(d6e7877e) SHA1(b4d0e17ada7dd126ec564a20e7140775b4b3fdb7) )
 
@@ -1998,7 +1992,7 @@ ROM_START(sscopeecvd2)
 	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
 	ROM_LOAD16_WORD_SWAP("830a08.7s", 0x000000, 0x80000, CRC(2805ea1d) SHA1(2556a51ee98cb8f59bf081e916c69a24532196f1) )
 
-	ROM_REGION(0x1000000, "master_cgboard", 0)       // CG Board texture roms
+	ROM_REGION(0x1000000, "cgboard_0", ROMREGION_ERASE00)       // CG Board texture roms
 	ROM_LOAD32_WORD( "830a14.32u", 0x000000, 0x400000, CRC(335793e1) SHA1(d582b53c3853abd59bc728f619a30c27cfc9497c) )
 	ROM_LOAD32_WORD( "830a13.24u", 0x000002, 0x400000, CRC(d6e7877e) SHA1(b4d0e17ada7dd126ec564a20e7140775b4b3fdb7) )
 
@@ -2020,7 +2014,7 @@ ROM_START(sscopeacvd2)
 	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
 	ROM_LOAD16_WORD_SWAP("830a08.7s", 0x000000, 0x80000, CRC(2805ea1d) SHA1(2556a51ee98cb8f59bf081e916c69a24532196f1) )
 
-	ROM_REGION(0x1000000, "master_cgboard", 0)       // CG Board texture roms
+	ROM_REGION(0x1000000, "cgboard_0", ROMREGION_ERASE00)       // CG Board texture roms
 	ROM_LOAD32_WORD( "830a14.32u", 0x000000, 0x400000, CRC(335793e1) SHA1(d582b53c3853abd59bc728f619a30c27cfc9497c) )
 	ROM_LOAD32_WORD( "830a13.24u", 0x000002, 0x400000, CRC(d6e7877e) SHA1(b4d0e17ada7dd126ec564a20e7140775b4b3fdb7) )
 
@@ -2042,7 +2036,7 @@ ROM_START(sscopeubvd2)
 	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
 	ROM_LOAD16_WORD_SWAP("830a08.7s", 0x000000, 0x80000, CRC(2805ea1d) SHA1(2556a51ee98cb8f59bf081e916c69a24532196f1) )
 
-	ROM_REGION(0x1000000, "master_cgboard", 0)       // CG Board texture roms
+	ROM_REGION(0x1000000, "cgboard_0", ROMREGION_ERASE00)       // CG Board texture roms
 	ROM_LOAD32_WORD( "830a14.32u", 0x000000, 0x400000, CRC(335793e1) SHA1(d582b53c3853abd59bc728f619a30c27cfc9497c) )
 	ROM_LOAD32_WORD( "830a13.24u", 0x000002, 0x400000, CRC(d6e7877e) SHA1(b4d0e17ada7dd126ec564a20e7140775b4b3fdb7) )
 
@@ -2066,7 +2060,7 @@ ROM_START(sscope2)
 	ROM_LOAD("931a19.8e", 0x000000, 0x400000, CRC(0417b528) SHA1(ebd7f06b83256b94784de164f9d0642bfb2c94d4) )
 	ROM_LOAD("931a20.6e", 0x400000, 0x400000, CRC(d367a4c9) SHA1(8bf029841d9d3be20dea0423240bfec825477a1d) )
 
-	ROM_REGION(0x800000, "master_cgboard", ROMREGION_ERASE00)    // CG Board texture roms
+	ROM_REGION(0x1000000, "cgboard_0", ROMREGION_ERASE00)    // CG Board texture roms
 
 	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
 	ROM_LOAD16_WORD_SWAP("931a08.7s", 0x000000, 0x80000, CRC(1597d604) SHA1(a1eab4d25907930b59ea558b484c3b6ddcb9303c) )
@@ -2098,7 +2092,7 @@ ROM_START(sscope2e)
 	ROM_LOAD("931a19.8e", 0x000000, 0x400000, CRC(0417b528) SHA1(ebd7f06b83256b94784de164f9d0642bfb2c94d4) )
 	ROM_LOAD("931a20.6e", 0x400000, 0x400000, CRC(d367a4c9) SHA1(8bf029841d9d3be20dea0423240bfec825477a1d) )
 
-	ROM_REGION(0x800000, "master_cgboard", ROMREGION_ERASE00)    // CG Board texture roms
+	ROM_REGION(0x1000000, "cgboard_0", ROMREGION_ERASE00)    // CG Board texture roms
 
 	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
 	ROM_LOAD16_WORD_SWAP("931a08.7s", 0x000000, 0x80000, CRC(1597d604) SHA1(a1eab4d25907930b59ea558b484c3b6ddcb9303c) )
@@ -2130,7 +2124,7 @@ ROM_START(sscope2j)
 	ROM_LOAD("931a19.8e", 0x000000, 0x400000, CRC(0417b528) SHA1(ebd7f06b83256b94784de164f9d0642bfb2c94d4) )
 	ROM_LOAD("931a20.6e", 0x400000, 0x400000, CRC(d367a4c9) SHA1(8bf029841d9d3be20dea0423240bfec825477a1d) )
 
-	ROM_REGION(0x800000, "master_cgboard", ROMREGION_ERASE00)    // CG Board texture roms
+	ROM_REGION(0x1000000, "cgboard_0", ROMREGION_ERASE00)    // CG Board texture roms
 
 	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
 	ROM_LOAD16_WORD_SWAP("931a08.7s", 0x000000, 0x80000, CRC(1597d604) SHA1(a1eab4d25907930b59ea558b484c3b6ddcb9303c) )
@@ -2162,7 +2156,7 @@ ROM_START(sscope2a)
 	ROM_LOAD("931a19.8e", 0x000000, 0x400000, CRC(0417b528) SHA1(ebd7f06b83256b94784de164f9d0642bfb2c94d4) )
 	ROM_LOAD("931a20.6e", 0x400000, 0x400000, CRC(d367a4c9) SHA1(8bf029841d9d3be20dea0423240bfec825477a1d) )
 
-	ROM_REGION(0x800000, "master_cgboard", ROMREGION_ERASE00)    // CG Board texture roms
+	ROM_REGION(0x1000000, "cgboard_0", ROMREGION_ERASE00)    // CG Board texture roms
 
 	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
 	ROM_LOAD16_WORD_SWAP("931a08.7s", 0x000000, 0x80000, CRC(1597d604) SHA1(a1eab4d25907930b59ea558b484c3b6ddcb9303c) )
@@ -2194,7 +2188,7 @@ ROM_START(sscope2uc)
 	ROM_LOAD("931a19.8e", 0x000000, 0x400000, CRC(0417b528) SHA1(ebd7f06b83256b94784de164f9d0642bfb2c94d4) )
 	ROM_LOAD("931a20.6e", 0x400000, 0x400000, CRC(d367a4c9) SHA1(8bf029841d9d3be20dea0423240bfec825477a1d) )
 
-	ROM_REGION(0x800000, "master_cgboard", ROMREGION_ERASE00)    // CG Board texture roms
+	ROM_REGION(0x1000000, "cgboard_0", ROMREGION_ERASE00)    // CG Board texture roms
 
 	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
 	ROM_LOAD16_WORD_SWAP("931a08.7s", 0x000000, 0x80000, CRC(1597d604) SHA1(a1eab4d25907930b59ea558b484c3b6ddcb9303c) )
@@ -2226,7 +2220,7 @@ ROM_START(sscope2ec)
 	ROM_LOAD("931a19.8e", 0x000000, 0x400000, CRC(0417b528) SHA1(ebd7f06b83256b94784de164f9d0642bfb2c94d4) )
 	ROM_LOAD("931a20.6e", 0x400000, 0x400000, CRC(d367a4c9) SHA1(8bf029841d9d3be20dea0423240bfec825477a1d) )
 
-	ROM_REGION(0x800000, "master_cgboard", ROMREGION_ERASE00)    // CG Board texture roms
+	ROM_REGION(0x1000000, "cgboard_0", ROMREGION_ERASE00)    // CG Board texture roms
 
 	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
 	ROM_LOAD16_WORD_SWAP("931a08.7s", 0x000000, 0x80000, CRC(1597d604) SHA1(a1eab4d25907930b59ea558b484c3b6ddcb9303c) )
@@ -2258,7 +2252,7 @@ ROM_START(sscope2jc)
 	ROM_LOAD("931a19.8e", 0x000000, 0x400000, CRC(0417b528) SHA1(ebd7f06b83256b94784de164f9d0642bfb2c94d4) )
 	ROM_LOAD("931a20.6e", 0x400000, 0x400000, CRC(d367a4c9) SHA1(8bf029841d9d3be20dea0423240bfec825477a1d) )
 
-	ROM_REGION(0x800000, "master_cgboard", ROMREGION_ERASE00)    // CG Board texture roms
+	ROM_REGION(0x1000000, "cgboard_0", ROMREGION_ERASE00)    // CG Board texture roms
 
 	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
 	ROM_LOAD16_WORD_SWAP("931a08.7s", 0x000000, 0x80000, CRC(1597d604) SHA1(a1eab4d25907930b59ea558b484c3b6ddcb9303c) )
@@ -2290,7 +2284,7 @@ ROM_START(sscope2ac)
 	ROM_LOAD("931a19.8e", 0x000000, 0x400000, CRC(0417b528) SHA1(ebd7f06b83256b94784de164f9d0642bfb2c94d4) )
 	ROM_LOAD("931a20.6e", 0x400000, 0x400000, CRC(d367a4c9) SHA1(8bf029841d9d3be20dea0423240bfec825477a1d) )
 
-	ROM_REGION(0x800000, "master_cgboard", ROMREGION_ERASE00)    // CG Board texture roms
+	ROM_REGION(0x1000000, "cgboard_0", ROMREGION_ERASE00)    // CG Board texture roms
 
 	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
 	ROM_LOAD16_WORD_SWAP("931a08.7s", 0x000000, 0x80000, CRC(1597d604) SHA1(a1eab4d25907930b59ea558b484c3b6ddcb9303c) )
@@ -2322,7 +2316,7 @@ ROM_START(sscope2ub)
 	ROM_LOAD("931a19.8e", 0x000000, 0x400000, CRC(0417b528) SHA1(ebd7f06b83256b94784de164f9d0642bfb2c94d4) )
 	ROM_LOAD("931a20.6e", 0x400000, 0x400000, CRC(d367a4c9) SHA1(8bf029841d9d3be20dea0423240bfec825477a1d) )
 
-	ROM_REGION(0x800000, "master_cgboard", ROMREGION_ERASE00)    // CG Board texture roms
+	ROM_REGION(0x1000000, "cgboard_0", ROMREGION_ERASE00)    // CG Board texture roms
 
 	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
 	ROM_LOAD16_WORD_SWAP("931a08.7s", 0x000000, 0x80000, CRC(1597d604) SHA1(a1eab4d25907930b59ea558b484c3b6ddcb9303c) )
@@ -2354,7 +2348,7 @@ ROM_START(sscope2eb)
 	ROM_LOAD("931a19.8e", 0x000000, 0x400000, CRC(0417b528) SHA1(ebd7f06b83256b94784de164f9d0642bfb2c94d4) )
 	ROM_LOAD("931a20.6e", 0x400000, 0x400000, CRC(d367a4c9) SHA1(8bf029841d9d3be20dea0423240bfec825477a1d) )
 
-	ROM_REGION(0x800000, "master_cgboard", ROMREGION_ERASE00)    // CG Board texture roms
+	ROM_REGION(0x1000000, "cgboard_0", ROMREGION_ERASE00)    // CG Board texture roms
 
 	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
 	ROM_LOAD16_WORD_SWAP("931a08.7s", 0x000000, 0x80000, CRC(1597d604) SHA1(a1eab4d25907930b59ea558b484c3b6ddcb9303c) )
@@ -2386,7 +2380,7 @@ ROM_START(sscope2jb)
 	ROM_LOAD("931a19.8e", 0x000000, 0x400000, CRC(0417b528) SHA1(ebd7f06b83256b94784de164f9d0642bfb2c94d4) )
 	ROM_LOAD("931a20.6e", 0x400000, 0x400000, CRC(d367a4c9) SHA1(8bf029841d9d3be20dea0423240bfec825477a1d) )
 
-	ROM_REGION(0x800000, "master_cgboard", ROMREGION_ERASE00)    // CG Board texture roms
+	ROM_REGION(0x1000000, "cgboard_0", ROMREGION_ERASE00)    // CG Board texture roms
 
 	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
 	ROM_LOAD16_WORD_SWAP("931a08.7s", 0x000000, 0x80000, CRC(1597d604) SHA1(a1eab4d25907930b59ea558b484c3b6ddcb9303c) )
@@ -2418,7 +2412,7 @@ ROM_START(sscope2ab)
 	ROM_LOAD("931a19.8e", 0x000000, 0x400000, CRC(0417b528) SHA1(ebd7f06b83256b94784de164f9d0642bfb2c94d4) )
 	ROM_LOAD("931a20.6e", 0x400000, 0x400000, CRC(d367a4c9) SHA1(8bf029841d9d3be20dea0423240bfec825477a1d) )
 
-	ROM_REGION(0x800000, "master_cgboard", ROMREGION_ERASE00)    // CG Board texture roms
+	ROM_REGION(0x1000000, "cgboard_0", ROMREGION_ERASE00)    // CG Board texture roms
 
 	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
 	ROM_LOAD16_WORD_SWAP("931a08.7s", 0x000000, 0x80000, CRC(1597d604) SHA1(a1eab4d25907930b59ea558b484c3b6ddcb9303c) )
@@ -2450,7 +2444,7 @@ ROM_START(sscope2vd1)
 	ROM_LOAD("931a19.8e", 0x000000, 0x400000, CRC(0417b528) SHA1(ebd7f06b83256b94784de164f9d0642bfb2c94d4) )
 	ROM_LOAD("931a20.6e", 0x400000, 0x400000, CRC(d367a4c9) SHA1(8bf029841d9d3be20dea0423240bfec825477a1d) )
 
-	ROM_REGION(0x800000, "master_cgboard", ROMREGION_ERASE00)    // CG Board texture roms
+	ROM_REGION(0x1000000, "cgboard_0", ROMREGION_ERASE00)    // CG Board texture roms
 
 	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
 	ROM_LOAD16_WORD_SWAP("931a08.7s", 0x000000, 0x80000, CRC(1597d604) SHA1(a1eab4d25907930b59ea558b484c3b6ddcb9303c) )
@@ -2482,7 +2476,7 @@ ROM_START(sscope2evd1)
 	ROM_LOAD("931a19.8e", 0x000000, 0x400000, CRC(0417b528) SHA1(ebd7f06b83256b94784de164f9d0642bfb2c94d4) )
 	ROM_LOAD("931a20.6e", 0x400000, 0x400000, CRC(d367a4c9) SHA1(8bf029841d9d3be20dea0423240bfec825477a1d) )
 
-	ROM_REGION(0x800000, "master_cgboard", ROMREGION_ERASE00)    // CG Board texture roms
+	ROM_REGION(0x1000000, "cgboard_0", ROMREGION_ERASE00)    // CG Board texture roms
 
 	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
 	ROM_LOAD16_WORD_SWAP("931a08.7s", 0x000000, 0x80000, CRC(1597d604) SHA1(a1eab4d25907930b59ea558b484c3b6ddcb9303c) )
@@ -2514,7 +2508,7 @@ ROM_START(sscope2jvd1)
 	ROM_LOAD("931a19.8e", 0x000000, 0x400000, CRC(0417b528) SHA1(ebd7f06b83256b94784de164f9d0642bfb2c94d4) )
 	ROM_LOAD("931a20.6e", 0x400000, 0x400000, CRC(d367a4c9) SHA1(8bf029841d9d3be20dea0423240bfec825477a1d) )
 
-	ROM_REGION(0x800000, "master_cgboard", ROMREGION_ERASE00)    // CG Board texture roms
+	ROM_REGION(0x1000000, "cgboard_0", ROMREGION_ERASE00)    // CG Board texture roms
 
 	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
 	ROM_LOAD16_WORD_SWAP("931a08.7s", 0x000000, 0x80000, CRC(1597d604) SHA1(a1eab4d25907930b59ea558b484c3b6ddcb9303c) )
@@ -2546,7 +2540,7 @@ ROM_START(sscope2avd1)
 	ROM_LOAD("931a19.8e", 0x000000, 0x400000, CRC(0417b528) SHA1(ebd7f06b83256b94784de164f9d0642bfb2c94d4) )
 	ROM_LOAD("931a20.6e", 0x400000, 0x400000, CRC(d367a4c9) SHA1(8bf029841d9d3be20dea0423240bfec825477a1d) )
 
-	ROM_REGION(0x800000, "master_cgboard", ROMREGION_ERASE00)    // CG Board texture roms
+	ROM_REGION(0x1000000, "cgboard_0", ROMREGION_ERASE00)    // CG Board texture roms
 
 	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
 	ROM_LOAD16_WORD_SWAP("931a08.7s", 0x000000, 0x80000, CRC(1597d604) SHA1(a1eab4d25907930b59ea558b484c3b6ddcb9303c) )
@@ -2578,7 +2572,7 @@ ROM_START(sscope2ucvd1)
 	ROM_LOAD("931a19.8e", 0x000000, 0x400000, CRC(0417b528) SHA1(ebd7f06b83256b94784de164f9d0642bfb2c94d4) )
 	ROM_LOAD("931a20.6e", 0x400000, 0x400000, CRC(d367a4c9) SHA1(8bf029841d9d3be20dea0423240bfec825477a1d) )
 
-	ROM_REGION(0x800000, "master_cgboard", ROMREGION_ERASE00)    // CG Board texture roms
+	ROM_REGION(0x1000000, "cgboard_0", ROMREGION_ERASE00)    // CG Board texture roms
 
 	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
 	ROM_LOAD16_WORD_SWAP("931a08.7s", 0x000000, 0x80000, CRC(1597d604) SHA1(a1eab4d25907930b59ea558b484c3b6ddcb9303c) )
@@ -2610,7 +2604,7 @@ ROM_START(sscope2ecvd1)
 	ROM_LOAD("931a19.8e", 0x000000, 0x400000, CRC(0417b528) SHA1(ebd7f06b83256b94784de164f9d0642bfb2c94d4) )
 	ROM_LOAD("931a20.6e", 0x400000, 0x400000, CRC(d367a4c9) SHA1(8bf029841d9d3be20dea0423240bfec825477a1d) )
 
-	ROM_REGION(0x800000, "master_cgboard", ROMREGION_ERASE00)    // CG Board texture roms
+	ROM_REGION(0x1000000, "cgboard_0", ROMREGION_ERASE00)    // CG Board texture roms
 
 	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
 	ROM_LOAD16_WORD_SWAP("931a08.7s", 0x000000, 0x80000, CRC(1597d604) SHA1(a1eab4d25907930b59ea558b484c3b6ddcb9303c) )
@@ -2642,7 +2636,7 @@ ROM_START(sscope2jcvd1)
 	ROM_LOAD("931a19.8e", 0x000000, 0x400000, CRC(0417b528) SHA1(ebd7f06b83256b94784de164f9d0642bfb2c94d4) )
 	ROM_LOAD("931a20.6e", 0x400000, 0x400000, CRC(d367a4c9) SHA1(8bf029841d9d3be20dea0423240bfec825477a1d) )
 
-	ROM_REGION(0x800000, "master_cgboard", ROMREGION_ERASE00)    // CG Board texture roms
+	ROM_REGION(0x1000000, "cgboard_0", ROMREGION_ERASE00)    // CG Board texture roms
 
 	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
 	ROM_LOAD16_WORD_SWAP("931a08.7s", 0x000000, 0x80000, CRC(1597d604) SHA1(a1eab4d25907930b59ea558b484c3b6ddcb9303c) )
@@ -2674,7 +2668,7 @@ ROM_START(sscope2acvd1)
 	ROM_LOAD("931a19.8e", 0x000000, 0x400000, CRC(0417b528) SHA1(ebd7f06b83256b94784de164f9d0642bfb2c94d4) )
 	ROM_LOAD("931a20.6e", 0x400000, 0x400000, CRC(d367a4c9) SHA1(8bf029841d9d3be20dea0423240bfec825477a1d) )
 
-	ROM_REGION(0x800000, "master_cgboard", ROMREGION_ERASE00)    // CG Board texture roms
+	ROM_REGION(0x1000000, "cgboard_0", ROMREGION_ERASE00)    // CG Board texture roms
 
 	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
 	ROM_LOAD16_WORD_SWAP("931a08.7s", 0x000000, 0x80000, CRC(1597d604) SHA1(a1eab4d25907930b59ea558b484c3b6ddcb9303c) )
@@ -2706,7 +2700,7 @@ ROM_START(sscope2ubvd1)
 	ROM_LOAD("931a19.8e", 0x000000, 0x400000, CRC(0417b528) SHA1(ebd7f06b83256b94784de164f9d0642bfb2c94d4) )
 	ROM_LOAD("931a20.6e", 0x400000, 0x400000, CRC(d367a4c9) SHA1(8bf029841d9d3be20dea0423240bfec825477a1d) )
 
-	ROM_REGION(0x800000, "master_cgboard", ROMREGION_ERASE00)    // CG Board texture roms
+	ROM_REGION(0x1000000, "cgboard_0", ROMREGION_ERASE00)    // CG Board texture roms
 
 	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
 	ROM_LOAD16_WORD_SWAP("931a08.7s", 0x000000, 0x80000, CRC(1597d604) SHA1(a1eab4d25907930b59ea558b484c3b6ddcb9303c) )
@@ -2738,7 +2732,7 @@ ROM_START(sscope2ebvd1)
 	ROM_LOAD("931a19.8e", 0x000000, 0x400000, CRC(0417b528) SHA1(ebd7f06b83256b94784de164f9d0642bfb2c94d4) )
 	ROM_LOAD("931a20.6e", 0x400000, 0x400000, CRC(d367a4c9) SHA1(8bf029841d9d3be20dea0423240bfec825477a1d) )
 
-	ROM_REGION(0x800000, "master_cgboard", ROMREGION_ERASE00)    // CG Board texture roms
+	ROM_REGION(0x1000000, "cgboard_0", ROMREGION_ERASE00)    // CG Board texture roms
 
 	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
 	ROM_LOAD16_WORD_SWAP("931a08.7s", 0x000000, 0x80000, CRC(1597d604) SHA1(a1eab4d25907930b59ea558b484c3b6ddcb9303c) )
@@ -2770,7 +2764,7 @@ ROM_START(sscope2jbvd1)
 	ROM_LOAD("931a19.8e", 0x000000, 0x400000, CRC(0417b528) SHA1(ebd7f06b83256b94784de164f9d0642bfb2c94d4) )
 	ROM_LOAD("931a20.6e", 0x400000, 0x400000, CRC(d367a4c9) SHA1(8bf029841d9d3be20dea0423240bfec825477a1d) )
 
-	ROM_REGION(0x800000, "master_cgboard", ROMREGION_ERASE00)    // CG Board texture roms
+	ROM_REGION(0x1000000, "cgboard_0", ROMREGION_ERASE00)    // CG Board texture roms
 
 	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
 	ROM_LOAD16_WORD_SWAP("931a08.7s", 0x000000, 0x80000, CRC(1597d604) SHA1(a1eab4d25907930b59ea558b484c3b6ddcb9303c) )
@@ -2802,7 +2796,7 @@ ROM_START(sscope2abvd1)
 	ROM_LOAD("931a19.8e", 0x000000, 0x400000, CRC(0417b528) SHA1(ebd7f06b83256b94784de164f9d0642bfb2c94d4) )
 	ROM_LOAD("931a20.6e", 0x400000, 0x400000, CRC(d367a4c9) SHA1(8bf029841d9d3be20dea0423240bfec825477a1d) )
 
-	ROM_REGION(0x800000, "master_cgboard", ROMREGION_ERASE00)    // CG Board texture roms
+	ROM_REGION(0x1000000, "cgboard_0", ROMREGION_ERASE00)    // CG Board texture roms
 
 	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
 	ROM_LOAD16_WORD_SWAP("931a08.7s", 0x000000, 0x80000, CRC(1597d604) SHA1(a1eab4d25907930b59ea558b484c3b6ddcb9303c) )
@@ -2831,7 +2825,7 @@ ROM_START(gradius4)
 	ROM_LOAD32_WORD_SWAP( "837a04.16t",   0x000000, 0x200000, CRC(18453b59) SHA1(3c75a54d8c09c0796223b42d30fb3867a911a074) )
 	ROM_LOAD32_WORD_SWAP( "837a05.14t",   0x000002, 0x200000, CRC(77178633) SHA1(ececdd501d0692390325c8dad6dbb068808a8b26) )
 
-	ROM_REGION32_BE(0x1000000, "master_cgboard", 0)  // CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", 0)  // CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "837a14.32u",   0x000002, 0x400000, CRC(ff1b5d18) SHA1(7a38362170133dcc6ea01eb62981845917b85c36) )
 	ROM_LOAD32_WORD_SWAP( "837a13.24u",   0x000000, 0x400000, CRC(d86e10ff) SHA1(6de1179d7081d9a93ab6df47692d3efc190c38ba) )
 	ROM_LOAD32_WORD_SWAP( "837a16.32v",   0x800002, 0x400000, CRC(bb7a7558) SHA1(8c8cc062793c2dcfa72657b6ea0813d7223a0b87) )
@@ -2860,7 +2854,7 @@ ROM_START(gradius4u)
 	ROM_LOAD32_WORD_SWAP( "837a04.16t",   0x000000, 0x200000, CRC(18453b59) SHA1(3c75a54d8c09c0796223b42d30fb3867a911a074) )
 	ROM_LOAD32_WORD_SWAP( "837a05.14t",   0x000002, 0x200000, CRC(77178633) SHA1(ececdd501d0692390325c8dad6dbb068808a8b26) )
 
-	ROM_REGION32_BE(0x1000000, "master_cgboard", 0)  // CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", 0)  // CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "837a14.32u",   0x000002, 0x400000, CRC(ff1b5d18) SHA1(7a38362170133dcc6ea01eb62981845917b85c36) )
 	ROM_LOAD32_WORD_SWAP( "837a13.24u",   0x000000, 0x400000, CRC(d86e10ff) SHA1(6de1179d7081d9a93ab6df47692d3efc190c38ba) )
 	ROM_LOAD32_WORD_SWAP( "837a16.32v",   0x800002, 0x400000, CRC(bb7a7558) SHA1(8c8cc062793c2dcfa72657b6ea0813d7223a0b87) )
@@ -2889,7 +2883,7 @@ ROM_START(gradius4a)
 	ROM_LOAD32_WORD_SWAP( "837a04.16t",   0x000000, 0x200000, CRC(18453b59) SHA1(3c75a54d8c09c0796223b42d30fb3867a911a074) )
 	ROM_LOAD32_WORD_SWAP( "837a05.14t",   0x000002, 0x200000, CRC(77178633) SHA1(ececdd501d0692390325c8dad6dbb068808a8b26) )
 
-	ROM_REGION32_BE(0x1000000, "master_cgboard", 0)  // CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", 0)  // CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "837a14.32u",   0x000002, 0x400000, CRC(ff1b5d18) SHA1(7a38362170133dcc6ea01eb62981845917b85c36) )
 	ROM_LOAD32_WORD_SWAP( "837a13.24u",   0x000000, 0x400000, CRC(d86e10ff) SHA1(6de1179d7081d9a93ab6df47692d3efc190c38ba) )
 	ROM_LOAD32_WORD_SWAP( "837a16.32v",   0x800002, 0x400000, CRC(bb7a7558) SHA1(8c8cc062793c2dcfa72657b6ea0813d7223a0b87) )
@@ -2918,7 +2912,7 @@ ROM_START(gradius4ja)
 	ROM_LOAD32_WORD_SWAP( "837a04.16t",   0x000000, 0x200000, CRC(18453b59) SHA1(3c75a54d8c09c0796223b42d30fb3867a911a074) )
 	ROM_LOAD32_WORD_SWAP( "837a05.14t",   0x000002, 0x200000, CRC(77178633) SHA1(ececdd501d0692390325c8dad6dbb068808a8b26) )
 
-	ROM_REGION32_BE(0x1000000, "master_cgboard", 0)  // CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", 0)  // CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "837a14.32u",   0x000002, 0x400000, CRC(ff1b5d18) SHA1(7a38362170133dcc6ea01eb62981845917b85c36) )
 	ROM_LOAD32_WORD_SWAP( "837a13.24u",   0x000000, 0x400000, CRC(d86e10ff) SHA1(6de1179d7081d9a93ab6df47692d3efc190c38ba) )
 	ROM_LOAD32_WORD_SWAP( "837a16.32v",   0x800002, 0x400000, CRC(bb7a7558) SHA1(8c8cc062793c2dcfa72657b6ea0813d7223a0b87) )
@@ -2947,7 +2941,7 @@ ROM_START(gradius4ua)
 	ROM_LOAD32_WORD_SWAP( "837a04.16t",   0x000000, 0x200000, CRC(18453b59) SHA1(3c75a54d8c09c0796223b42d30fb3867a911a074) )
 	ROM_LOAD32_WORD_SWAP( "837a05.14t",   0x000002, 0x200000, CRC(77178633) SHA1(ececdd501d0692390325c8dad6dbb068808a8b26) )
 
-	ROM_REGION32_BE(0x1000000, "master_cgboard", 0)  // CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", 0)  // CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "837a14.32u",   0x000002, 0x400000, CRC(ff1b5d18) SHA1(7a38362170133dcc6ea01eb62981845917b85c36) )
 	ROM_LOAD32_WORD_SWAP( "837a13.24u",   0x000000, 0x400000, CRC(d86e10ff) SHA1(6de1179d7081d9a93ab6df47692d3efc190c38ba) )
 	ROM_LOAD32_WORD_SWAP( "837a16.32v",   0x800002, 0x400000, CRC(bb7a7558) SHA1(8c8cc062793c2dcfa72657b6ea0813d7223a0b87) )
@@ -2976,7 +2970,7 @@ ROM_START(gradius4aa)
 	ROM_LOAD32_WORD_SWAP( "837a04.16t",   0x000000, 0x200000, CRC(18453b59) SHA1(3c75a54d8c09c0796223b42d30fb3867a911a074) )
 	ROM_LOAD32_WORD_SWAP( "837a05.14t",   0x000002, 0x200000, CRC(77178633) SHA1(ececdd501d0692390325c8dad6dbb068808a8b26) )
 
-	ROM_REGION32_BE(0x1000000, "master_cgboard", 0)  // CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", 0)  // CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "837a14.32u",   0x000002, 0x400000, CRC(ff1b5d18) SHA1(7a38362170133dcc6ea01eb62981845917b85c36) )
 	ROM_LOAD32_WORD_SWAP( "837a13.24u",   0x000000, 0x400000, CRC(d86e10ff) SHA1(6de1179d7081d9a93ab6df47692d3efc190c38ba) )
 	ROM_LOAD32_WORD_SWAP( "837a16.32v",   0x800002, 0x400000, CRC(bb7a7558) SHA1(8c8cc062793c2dcfa72657b6ea0813d7223a0b87) )
@@ -3005,7 +2999,7 @@ ROM_START(nbapbp) // only the PowerPC program rom present in the archive
 	ROM_LOAD32_WORD_SWAP( "778a04.16t",   0x000000, 0x400000, CRC(62c70132) SHA1(405aed149fc51e0adfa3ace3c644e47d53cf1ee3) )
 	ROM_LOAD32_WORD_SWAP( "778a05.14t",   0x000002, 0x400000, CRC(03249803) SHA1(f632a5f1dfa0a8500407214df0ec8d98ce09bc2b) )
 
-	ROM_REGION32_BE(0x1000000, "master_cgboard", 0)  // CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", 0)  // CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "778a14.32u",   0x000002, 0x400000, CRC(db0c278d) SHA1(bb9884b6cdcdb707fff7e56e92e2ede062abcfd3) )
 	ROM_LOAD32_WORD_SWAP( "778a13.24u",   0x000000, 0x400000, CRC(47fda9cc) SHA1(4aae01c1f1861b4b12a3f9de6b39eb4d11a9736b) )
 	ROM_LOAD32_WORD_SWAP( "778a16.32v",   0x800002, 0x400000, CRC(6c0f46ea) SHA1(c6b9fbe14e13114a91a5925a0b46496260539687) )
@@ -3036,7 +3030,7 @@ ROM_START(nbapbpa) // only the PowerPC program rom present in the archive
 	ROM_LOAD32_WORD_SWAP( "778a04.16t",   0x000000, 0x400000, CRC(62c70132) SHA1(405aed149fc51e0adfa3ace3c644e47d53cf1ee3) )
 	ROM_LOAD32_WORD_SWAP( "778a05.14t",   0x000002, 0x400000, CRC(03249803) SHA1(f632a5f1dfa0a8500407214df0ec8d98ce09bc2b) )
 
-	ROM_REGION32_BE(0x1000000, "master_cgboard", 0)  // CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", 0)  // CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "778a14.32u",   0x000002, 0x400000, CRC(db0c278d) SHA1(bb9884b6cdcdb707fff7e56e92e2ede062abcfd3) )
 	ROM_LOAD32_WORD_SWAP( "778a13.24u",   0x000000, 0x400000, CRC(47fda9cc) SHA1(4aae01c1f1861b4b12a3f9de6b39eb4d11a9736b) )
 	ROM_LOAD32_WORD_SWAP( "778a16.32v",   0x800002, 0x400000, CRC(6c0f46ea) SHA1(c6b9fbe14e13114a91a5925a0b46496260539687) )
@@ -3067,7 +3061,7 @@ ROM_START(nbapbpj) // only the PowerPC program rom present in the archive
 	ROM_LOAD32_WORD_SWAP( "778a04.16t",   0x000000, 0x400000, CRC(62c70132) SHA1(405aed149fc51e0adfa3ace3c644e47d53cf1ee3) )
 	ROM_LOAD32_WORD_SWAP( "778a05.14t",   0x000002, 0x400000, CRC(03249803) SHA1(f632a5f1dfa0a8500407214df0ec8d98ce09bc2b) )
 
-	ROM_REGION32_BE(0x1000000, "master_cgboard", 0)  // CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", 0)  // CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "778a14.32u",   0x000002, 0x400000, CRC(db0c278d) SHA1(bb9884b6cdcdb707fff7e56e92e2ede062abcfd3) )
 	ROM_LOAD32_WORD_SWAP( "778a13.24u",   0x000000, 0x400000, CRC(47fda9cc) SHA1(4aae01c1f1861b4b12a3f9de6b39eb4d11a9736b) )
 	ROM_LOAD32_WORD_SWAP( "778a16.32v",   0x800002, 0x400000, CRC(6c0f46ea) SHA1(c6b9fbe14e13114a91a5925a0b46496260539687) )
@@ -3098,7 +3092,7 @@ ROM_START(nbapbpua)
 	ROM_LOAD32_WORD_SWAP( "778a04.16t",   0x000000, 0x400000, CRC(62c70132) SHA1(405aed149fc51e0adfa3ace3c644e47d53cf1ee3) )
 	ROM_LOAD32_WORD_SWAP( "778a05.14t",   0x000002, 0x400000, CRC(03249803) SHA1(f632a5f1dfa0a8500407214df0ec8d98ce09bc2b) )
 
-	ROM_REGION32_BE(0x1000000, "master_cgboard", 0)  // CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", 0)  // CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "778a14.32u",   0x000002, 0x400000, CRC(db0c278d) SHA1(bb9884b6cdcdb707fff7e56e92e2ede062abcfd3) )
 	ROM_LOAD32_WORD_SWAP( "778a13.24u",   0x000000, 0x400000, CRC(47fda9cc) SHA1(4aae01c1f1861b4b12a3f9de6b39eb4d11a9736b) )
 	ROM_LOAD32_WORD_SWAP( "778a16.32v",   0x800002, 0x400000, CRC(6c0f46ea) SHA1(c6b9fbe14e13114a91a5925a0b46496260539687) )
@@ -3129,7 +3123,7 @@ ROM_START(nbapbpaa)
 	ROM_LOAD32_WORD_SWAP( "778a04.16t",   0x000000, 0x400000, CRC(62c70132) SHA1(405aed149fc51e0adfa3ace3c644e47d53cf1ee3) )
 	ROM_LOAD32_WORD_SWAP( "778a05.14t",   0x000002, 0x400000, CRC(03249803) SHA1(f632a5f1dfa0a8500407214df0ec8d98ce09bc2b) )
 
-	ROM_REGION32_BE(0x1000000, "master_cgboard", 0)  // CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", 0)  // CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "778a14.32u",   0x000002, 0x400000, CRC(db0c278d) SHA1(bb9884b6cdcdb707fff7e56e92e2ede062abcfd3) )
 	ROM_LOAD32_WORD_SWAP( "778a13.24u",   0x000000, 0x400000, CRC(47fda9cc) SHA1(4aae01c1f1861b4b12a3f9de6b39eb4d11a9736b) )
 	ROM_LOAD32_WORD_SWAP( "778a16.32v",   0x800002, 0x400000, CRC(6c0f46ea) SHA1(c6b9fbe14e13114a91a5925a0b46496260539687) )
@@ -3160,7 +3154,7 @@ ROM_START(nbapbpja)
 	ROM_LOAD32_WORD_SWAP( "778a04.16t",   0x000000, 0x400000, CRC(62c70132) SHA1(405aed149fc51e0adfa3ace3c644e47d53cf1ee3) )
 	ROM_LOAD32_WORD_SWAP( "778a05.14t",   0x000002, 0x400000, CRC(03249803) SHA1(f632a5f1dfa0a8500407214df0ec8d98ce09bc2b) )
 
-	ROM_REGION32_BE(0x1000000, "master_cgboard", 0)  // CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", 0)  // CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "778a14.32u",   0x000002, 0x400000, CRC(db0c278d) SHA1(bb9884b6cdcdb707fff7e56e92e2ede062abcfd3) )
 	ROM_LOAD32_WORD_SWAP( "778a13.24u",   0x000000, 0x400000, CRC(47fda9cc) SHA1(4aae01c1f1861b4b12a3f9de6b39eb4d11a9736b) )
 	ROM_LOAD32_WORD_SWAP( "778a16.32v",   0x800002, 0x400000, CRC(6c0f46ea) SHA1(c6b9fbe14e13114a91a5925a0b46496260539687) )
@@ -3191,7 +3185,7 @@ ROM_START(nbaatw) // only the PowerPC program rom present in the archive
 	ROM_LOAD32_WORD_SWAP( "778a04.16t",   0x000000, 0x400000, CRC(62c70132) SHA1(405aed149fc51e0adfa3ace3c644e47d53cf1ee3) )
 	ROM_LOAD32_WORD_SWAP( "778a05.14t",   0x000002, 0x400000, CRC(03249803) SHA1(f632a5f1dfa0a8500407214df0ec8d98ce09bc2b) )
 
-	ROM_REGION32_BE(0x1000000, "master_cgboard", 0)  // CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", 0)  // CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "778a14.32u",   0x000002, 0x400000, CRC(db0c278d) SHA1(bb9884b6cdcdb707fff7e56e92e2ede062abcfd3) )
 	ROM_LOAD32_WORD_SWAP( "778a13.24u",   0x000000, 0x400000, CRC(47fda9cc) SHA1(4aae01c1f1861b4b12a3f9de6b39eb4d11a9736b) )
 	ROM_LOAD32_WORD_SWAP( "778a16.32v",   0x800002, 0x400000, CRC(6c0f46ea) SHA1(c6b9fbe14e13114a91a5925a0b46496260539687) )
@@ -3222,7 +3216,7 @@ ROM_START(nbaatwa)
 	ROM_LOAD32_WORD_SWAP( "778a04.16t",   0x000000, 0x400000, CRC(62c70132) SHA1(405aed149fc51e0adfa3ace3c644e47d53cf1ee3) )
 	ROM_LOAD32_WORD_SWAP( "778a05.14t",   0x000002, 0x400000, CRC(03249803) SHA1(f632a5f1dfa0a8500407214df0ec8d98ce09bc2b) )
 
-	ROM_REGION32_BE(0x1000000, "master_cgboard", 0)  // CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", 0)  // CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "778a14.32u",   0x000002, 0x400000, CRC(db0c278d) SHA1(bb9884b6cdcdb707fff7e56e92e2ede062abcfd3) )
 	ROM_LOAD32_WORD_SWAP( "778a13.24u",   0x000000, 0x400000, CRC(47fda9cc) SHA1(4aae01c1f1861b4b12a3f9de6b39eb4d11a9736b) )
 	ROM_LOAD32_WORD_SWAP( "778a16.32v",   0x800002, 0x400000, CRC(6c0f46ea) SHA1(c6b9fbe14e13114a91a5925a0b46496260539687) )
@@ -3253,7 +3247,7 @@ ROM_START(terabrst)
 	ROM_LOAD32_WORD_SWAP( "715a04.16t",   0x000000, 0x200000, CRC(00d9567e) SHA1(fe372399ad0ae89d557c93c3145b38e3ed0f714d) )
 	ROM_LOAD32_WORD_SWAP( "715a05.14t",   0x000002, 0x200000, CRC(462d53bf) SHA1(0216a84358571de6791365c69a1fa8fe2784148d) )
 
-	ROM_REGION32_BE(0x1000000, "master_cgboard", 0)  // CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", ROMREGION_ERASE00)  // CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "715a14.32u",   0x000002, 0x400000, CRC(bbb36be3) SHA1(c828d0af0546db02e87afe68423b9447db7c7e51) )
 	ROM_LOAD32_WORD_SWAP( "715a13.24u",   0x000000, 0x400000, CRC(dbff58a1) SHA1(f0c60bb2cbf268cfcbdd65606ebb18f1b4839c0e) )
 
@@ -3283,7 +3277,7 @@ ROM_START(terabrstj)
 	ROM_LOAD32_WORD_SWAP( "715a04.16t",   0x000000, 0x200000, CRC(00d9567e) SHA1(fe372399ad0ae89d557c93c3145b38e3ed0f714d) )
 	ROM_LOAD32_WORD_SWAP( "715a05.14t",   0x000002, 0x200000, CRC(462d53bf) SHA1(0216a84358571de6791365c69a1fa8fe2784148d) )
 
-	ROM_REGION32_BE(0x1000000, "master_cgboard", 0)  // CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", ROMREGION_ERASE00)  // CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "715a14.32u",   0x000002, 0x400000, CRC(bbb36be3) SHA1(c828d0af0546db02e87afe68423b9447db7c7e51) )
 	ROM_LOAD32_WORD_SWAP( "715a13.24u",   0x000000, 0x400000, CRC(dbff58a1) SHA1(f0c60bb2cbf268cfcbdd65606ebb18f1b4839c0e) )
 
@@ -3313,7 +3307,7 @@ ROM_START(terabrsta)
 	ROM_LOAD32_WORD_SWAP( "715a04.16t",   0x000000, 0x200000, CRC(00d9567e) SHA1(fe372399ad0ae89d557c93c3145b38e3ed0f714d) )
 	ROM_LOAD32_WORD_SWAP( "715a05.14t",   0x000002, 0x200000, CRC(462d53bf) SHA1(0216a84358571de6791365c69a1fa8fe2784148d) )
 
-	ROM_REGION32_BE(0x1000000, "master_cgboard", 0)  // CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", ROMREGION_ERASE00)  // CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "715a14.32u",   0x000002, 0x400000, CRC(bbb36be3) SHA1(c828d0af0546db02e87afe68423b9447db7c7e51) )
 	ROM_LOAD32_WORD_SWAP( "715a13.24u",   0x000000, 0x400000, CRC(dbff58a1) SHA1(f0c60bb2cbf268cfcbdd65606ebb18f1b4839c0e) )
 
@@ -3343,7 +3337,7 @@ ROM_START(terabrstua)
 	ROM_LOAD32_WORD_SWAP( "715a04.16t",   0x000000, 0x200000, CRC(00d9567e) SHA1(fe372399ad0ae89d557c93c3145b38e3ed0f714d) )
 	ROM_LOAD32_WORD_SWAP( "715a05.14t",   0x000002, 0x200000, CRC(462d53bf) SHA1(0216a84358571de6791365c69a1fa8fe2784148d) )
 
-	ROM_REGION32_BE(0x1000000, "master_cgboard", 0)  // CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", ROMREGION_ERASE00)  // CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "715a14.32u",   0x000002, 0x400000, CRC(bbb36be3) SHA1(c828d0af0546db02e87afe68423b9447db7c7e51) )
 	ROM_LOAD32_WORD_SWAP( "715a13.24u",   0x000000, 0x400000, CRC(dbff58a1) SHA1(f0c60bb2cbf268cfcbdd65606ebb18f1b4839c0e) )
 
@@ -3373,7 +3367,7 @@ ROM_START(terabrstja)
 	ROM_LOAD32_WORD_SWAP( "715a04.16t",   0x000000, 0x200000, CRC(00d9567e) SHA1(fe372399ad0ae89d557c93c3145b38e3ed0f714d) )
 	ROM_LOAD32_WORD_SWAP( "715a05.14t",   0x000002, 0x200000, CRC(462d53bf) SHA1(0216a84358571de6791365c69a1fa8fe2784148d) )
 
-	ROM_REGION32_BE(0x1000000, "master_cgboard", 0)  // CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", ROMREGION_ERASE00)  // CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "715a14.32u",   0x000002, 0x400000, CRC(bbb36be3) SHA1(c828d0af0546db02e87afe68423b9447db7c7e51) )
 	ROM_LOAD32_WORD_SWAP( "715a13.24u",   0x000000, 0x400000, CRC(dbff58a1) SHA1(f0c60bb2cbf268cfcbdd65606ebb18f1b4839c0e) )
 
@@ -3403,7 +3397,7 @@ ROM_START(terabrstaa)
 	ROM_LOAD32_WORD_SWAP( "715a04.16t",   0x000000, 0x200000, CRC(00d9567e) SHA1(fe372399ad0ae89d557c93c3145b38e3ed0f714d) )
 	ROM_LOAD32_WORD_SWAP( "715a05.14t",   0x000002, 0x200000, CRC(462d53bf) SHA1(0216a84358571de6791365c69a1fa8fe2784148d) )
 
-	ROM_REGION32_BE(0x1000000, "master_cgboard", 0)  // CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", ROMREGION_ERASE00)  // CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "715a14.32u",   0x000002, 0x400000, CRC(bbb36be3) SHA1(c828d0af0546db02e87afe68423b9447db7c7e51) )
 	ROM_LOAD32_WORD_SWAP( "715a13.24u",   0x000000, 0x400000, CRC(dbff58a1) SHA1(f0c60bb2cbf268cfcbdd65606ebb18f1b4839c0e) )
 
@@ -3433,7 +3427,7 @@ ROM_START(thrilldgeu) // GE713UF sticker, does not have the chip at 2G since it 
 	ROM_LOAD32_WORD_SWAP("713a04.16t", 0x000000, 0x200000, CRC(c994aaa8) SHA1(d82b9930a11e5384ad583684a27c95beec03cd5a) )
 	ROM_LOAD32_WORD_SWAP("713a05.14t", 0x000002, 0x200000, CRC(6f1e6802) SHA1(91f8a170327e9b4ee6a64aee0c106b981a317e69) )
 
-	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", ROMREGION_ERASE00) // CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "713a13.24u", 0x000000, 0x400000, CRC(b795c66b) SHA1(6e50de0d5cc444ffaa0fec7ada8c07f643374bb2) )
 	ROM_LOAD32_WORD_SWAP( "713a14.32u", 0x000002, 0x400000, CRC(5275a629) SHA1(16fadef06975f0f3625cac8f84e2e77ed7d75e15) )
 
@@ -3457,7 +3451,7 @@ ROM_START(thrilldgnj)
 	ROM_LOAD32_WORD_SWAP("713a04.16t", 0x000000, 0x200000, CRC(c994aaa8) SHA1(d82b9930a11e5384ad583684a27c95beec03cd5a) )
 	ROM_LOAD32_WORD_SWAP("713a05.14t", 0x000002, 0x200000, CRC(6f1e6802) SHA1(91f8a170327e9b4ee6a64aee0c106b981a317e69) )
 
-	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", ROMREGION_ERASE00) // CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "713a13.24u", 0x000000, 0x400000, CRC(b795c66b) SHA1(6e50de0d5cc444ffaa0fec7ada8c07f643374bb2) )
 	ROM_LOAD32_WORD_SWAP( "713a14.32u", 0x000002, 0x400000, CRC(5275a629) SHA1(16fadef06975f0f3625cac8f84e2e77ed7d75e15) )
 
@@ -3481,7 +3475,7 @@ ROM_START(thrilldgmj)
 	ROM_LOAD32_WORD_SWAP("713a04.16t", 0x000000, 0x200000, CRC(c994aaa8) SHA1(d82b9930a11e5384ad583684a27c95beec03cd5a) )
 	ROM_LOAD32_WORD_SWAP("713a05.14t", 0x000002, 0x200000, CRC(6f1e6802) SHA1(91f8a170327e9b4ee6a64aee0c106b981a317e69) )
 
-	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", ROMREGION_ERASE00) // CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "713a13.24u", 0x000000, 0x400000, CRC(b795c66b) SHA1(6e50de0d5cc444ffaa0fec7ada8c07f643374bb2) )
 	ROM_LOAD32_WORD_SWAP( "713a14.32u", 0x000002, 0x400000, CRC(5275a629) SHA1(16fadef06975f0f3625cac8f84e2e77ed7d75e15) )
 
@@ -3505,7 +3499,7 @@ ROM_START(thrilldgpj)
 	ROM_LOAD32_WORD_SWAP("713a04.16t", 0x000000, 0x200000, CRC(c994aaa8) SHA1(d82b9930a11e5384ad583684a27c95beec03cd5a) )
 	ROM_LOAD32_WORD_SWAP("713a05.14t", 0x000002, 0x200000, CRC(6f1e6802) SHA1(91f8a170327e9b4ee6a64aee0c106b981a317e69) )
 
-	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", ROMREGION_ERASE00) // CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "713a13.24u", 0x000000, 0x400000, CRC(b795c66b) SHA1(6e50de0d5cc444ffaa0fec7ada8c07f643374bb2) )
 	ROM_LOAD32_WORD_SWAP( "713a14.32u", 0x000002, 0x400000, CRC(5275a629) SHA1(16fadef06975f0f3625cac8f84e2e77ed7d75e15) )
 
@@ -3529,7 +3523,7 @@ ROM_START(thrilldgej)
 	ROM_LOAD32_WORD_SWAP("713a04.16t", 0x000000, 0x200000, CRC(c994aaa8) SHA1(d82b9930a11e5384ad583684a27c95beec03cd5a) )
 	ROM_LOAD32_WORD_SWAP("713a05.14t", 0x000002, 0x200000, CRC(6f1e6802) SHA1(91f8a170327e9b4ee6a64aee0c106b981a317e69) )
 
-	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", ROMREGION_ERASE00) // CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "713a13.24u", 0x000000, 0x400000, CRC(b795c66b) SHA1(6e50de0d5cc444ffaa0fec7ada8c07f643374bb2) )
 	ROM_LOAD32_WORD_SWAP( "713a14.32u", 0x000002, 0x400000, CRC(5275a629) SHA1(16fadef06975f0f3625cac8f84e2e77ed7d75e15) )
 
@@ -3553,7 +3547,7 @@ ROM_START(thrilldgke)
 	ROM_LOAD32_WORD_SWAP("713a04.16t", 0x000000, 0x200000, CRC(c994aaa8) SHA1(d82b9930a11e5384ad583684a27c95beec03cd5a) )
 	ROM_LOAD32_WORD_SWAP("713a05.14t", 0x000002, 0x200000, CRC(6f1e6802) SHA1(91f8a170327e9b4ee6a64aee0c106b981a317e69) )
 
-	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", ROMREGION_ERASE00) // CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "713a13.24u", 0x000000, 0x400000, CRC(b795c66b) SHA1(6e50de0d5cc444ffaa0fec7ada8c07f643374bb2) )
 	ROM_LOAD32_WORD_SWAP( "713a14.32u", 0x000002, 0x400000, CRC(5275a629) SHA1(16fadef06975f0f3625cac8f84e2e77ed7d75e15) )
 
@@ -3577,7 +3571,7 @@ ROM_START(thrilldgkee)
 	ROM_LOAD32_WORD_SWAP("713a04.16t", 0x000000, 0x200000, CRC(c994aaa8) SHA1(d82b9930a11e5384ad583684a27c95beec03cd5a) )
 	ROM_LOAD32_WORD_SWAP("713a05.14t", 0x000002, 0x200000, CRC(6f1e6802) SHA1(91f8a170327e9b4ee6a64aee0c106b981a317e69) )
 
-	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", ROMREGION_ERASE00) // CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "713a13.24u", 0x000000, 0x400000, CRC(b795c66b) SHA1(6e50de0d5cc444ffaa0fec7ada8c07f643374bb2) )
 	ROM_LOAD32_WORD_SWAP( "713a14.32u", 0x000002, 0x400000, CRC(5275a629) SHA1(16fadef06975f0f3625cac8f84e2e77ed7d75e15) )
 
@@ -3601,7 +3595,7 @@ ROM_START(thrilldgkk)
 	ROM_LOAD32_WORD_SWAP("713a04.16t", 0x000000, 0x200000, CRC(c994aaa8) SHA1(d82b9930a11e5384ad583684a27c95beec03cd5a) )
 	ROM_LOAD32_WORD_SWAP("713a05.14t", 0x000002, 0x200000, CRC(6f1e6802) SHA1(91f8a170327e9b4ee6a64aee0c106b981a317e69) )
 
-	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", ROMREGION_ERASE00) // CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "713a13.24u", 0x000000, 0x400000, CRC(b795c66b) SHA1(6e50de0d5cc444ffaa0fec7ada8c07f643374bb2) )
 	ROM_LOAD32_WORD_SWAP( "713a14.32u", 0x000002, 0x400000, CRC(5275a629) SHA1(16fadef06975f0f3625cac8f84e2e77ed7d75e15) )
 

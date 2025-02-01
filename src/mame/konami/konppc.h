@@ -27,13 +27,13 @@ public:
 	template <typename T> void set_dsp_tag(int which, T &&tag) { m_dsp[which].set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_k033906_tag(int which, T &&tag) { m_k033906[which].set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_voodoo_tag(int which, T &&tag) { m_voodoo[which].set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_texture_bank_tag(int which, T &&tag) { m_texture_bank[which].set_tag(std::forward<T>(tag)); }
 
 	void set_num_boards(int num) { m_num_cgboards = num; }
 	void set_cgboard_type(int cgtype) { m_cgboard_type = cgtype; }
 
 	void set_cgboard_id(int board_id);
 	int get_cgboard_id(void);
-	void set_cgboard_texture_bank(int board, memory_bank *bank, uint8_t *rom);
 
 	bool output_3d_enabled();
 
@@ -64,6 +64,7 @@ private:
 	optional_device_array<adsp21062_device, 2> m_dsp;
 	optional_device_array<k033906_device, 2> m_k033906;
 	optional_device_array<generic_voodoo_device, 2> m_voodoo;
+	optional_memory_bank_array<2> m_texture_bank;
 
 	// internal state
 	uint32_t m_dsp_comm_ppc[MAX_CG_BOARDS][2];
@@ -78,7 +79,6 @@ private:
 
 	uint32_t m_dsp_state[MAX_CG_BOARDS]{};
 	uint32_t m_nwk_device_sel[MAX_CG_BOARDS]{};
-	memory_bank *m_texture_bank[MAX_CG_BOARDS]{};
 
 	int m_nwk_fifo_half_full_r = 0;
 	int m_nwk_fifo_half_full_w = 0;
