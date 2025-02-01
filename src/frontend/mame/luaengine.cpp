@@ -2106,12 +2106,14 @@ void lua_engine::initialize()
 	ui_type["options"] = sol::property([] (mame_ui_manager &m) { return static_cast<core_options *>(&m.options()); });
 	ui_type["line_height"] = sol::property([] (mame_ui_manager &m) { return m.get_line_height(); });
 	ui_type["menu_active"] = sol::property(&mame_ui_manager::is_menu_active);
-	ui_type["show_menu"] = &mame_ui_manager::show_menu;
 	ui_type["ui_active"] = sol::property(&mame_ui_manager::ui_active, &mame_ui_manager::set_ui_active);
 	ui_type["single_step"] = sol::property(&mame_ui_manager::single_step, &mame_ui_manager::set_single_step);
 	ui_type["show_fps"] = sol::property(&mame_ui_manager::show_fps, &mame_ui_manager::set_show_fps);
 	ui_type["show_profiler"] = sol::property(&mame_ui_manager::show_profiler, &mame_ui_manager::set_show_profiler);
 	ui_type["image_display_enabled"] = sol::property(&mame_ui_manager::image_display_enabled, &mame_ui_manager::set_image_display_enabled);
+
+	// undocumented/unsupported
+	ui_type["show_menu"] = &mame_ui_manager::show_menu; // FIXME: this is dangerous - it doesn't give a proper chance for the current UI handler to clean up
 
 
 /* rom_entry library

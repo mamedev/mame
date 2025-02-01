@@ -233,17 +233,26 @@ void agnus_copper_device::copins_w(u16 data)
 //**************************************************************************
 
 // executed on scanline == 0
-void agnus_copper_device::vblank_sync()
+void agnus_copper_device::vblank_sync(bool state)
 {
-	set_pc(0, true);
-	m_xpos_state = 0;
+	if (state)
+	{
+		set_pc(0, true);
+		m_xpos_state = 0;
+	}
+	m_vertical_blank = state;
 }
 
 // check current copper cycle at end of scanline
 // - auntaadv (gameplay), WAITs with $xxd9
+// - gunbee WAITs with $xxe1 at beginning of copper lists, before setting fmode.
+//   Will desync scrolling by a whole lot if we don't add a +6 here
+// cfr. https://eab.abime.net/showpost.php?p=627136&postcount=59
 void agnus_copper_device::suspend_offset(int xpos, int hblank_width)
 {
 	m_xpos_state = (xpos == 511) ? 0 : xpos - hblank_width;
+	// TODO: commented out, causes issues in too many places
+	//m_xpos_state += 6;
 //  assert(m_xpos_state > 0);
 }
 
@@ -343,7 +352,7 @@ int agnus_copper_device::execute_next(int xpos, int ypos, bool is_blitter_busy, 
 			// - suprfrog & abreed (bottom playfield rows).
 			// - beast, biochall and cd32 bios wants this to be 0x5c
 			const bool horizontal_blank = xpos <= 0x5c;
-			const int move_offset = horizontal_blank ? 0 : std::max(num_planes - 4, 0);
+			const int move_offset = horizontal_blank || m_vertical_blank ? 0 : std::max(num_planes - 4, 0);
 
 			m_pending_offset = word0;
 			m_pending_data = word1;
@@ -376,7 +385,7 @@ int agnus_copper_device::execute_next(int xpos, int ypos, bool is_blitter_busy, 
 		if ((word1 & 1) == 0)
 		{
 			const bool horizontal_blank = xpos <= 0x5c;
-			const int wait_offset = horizontal_blank ? 0 : std::max(num_planes - 4, 0) + 1;
+			const int wait_offset = horizontal_blank || m_vertical_blank ? 0 : std::max(num_planes - 4, 0) + 1;
 
 			LOGINST("  WAIT %04x & %04x (currently %04x, num planes %d +%d)\n",
 				m_waitval,

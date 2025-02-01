@@ -345,139 +345,135 @@ static int oric_cassette_calculate_size_in_samples(const uint8_t *bytes, int len
 }
 
 /* length is length of sample buffer to fill! */
-static int oric_cassette_fill_wave(int16_t *buffer, int length, uint8_t *bytes)
+static int oric_cassette_fill_wave(int16_t *buffer, int length, const uint8_t *bytes)
 {
 	unsigned char header[9];
-	uint8_t *data_ptr;
-	int16_t *p;
-	int i;
-	uint8_t data;
-
-	p = buffer;
-
+	int16_t *p = buffer;
 
 	/* header and trailer act as pauses */
 	/* the trailer is required so that the via sees the last bit of the last
 	    byte */
-	if (bytes == CODE_HEADER) {
-		for (i = 0; i < ORIC_WAVESAMPLES_HEADER; i++)
+	if (bytes == CODE_HEADER)
+	{
+		for (int i = 0; i < ORIC_WAVESAMPLES_HEADER; i++)
 			*(p++) = WAVEENTRY_NULL;
 	}
-	else if (bytes == CODE_TRAILER) {
-		for (i = 0; i < ORIC_WAVESAMPLES_TRAILER; i++)
+	else if (bytes == CODE_TRAILER)
+	{
+		for (int i = 0; i < ORIC_WAVESAMPLES_TRAILER; i++)
 			*(p++) = WAVEENTRY_NULL;
 	}
 	else
-{
-	/* the length is the number of samples left in the buffer and NOT the number of bytes for the input file */
-	length = length - ORIC_WAVESAMPLES_TRAILER;
-
-	oric.cassette_state = ORIC_CASSETTE_SEARCHING_FOR_SYNC_BYTE;
-	data_ptr = bytes;
-
-	while ((data_ptr<(bytes + oric.tap_size)) && (p < (buffer+length)) )
 	{
-		data = data_ptr[0];
-		data_ptr++;
+		/* the length is the number of samples left in the buffer and NOT the number of bytes for the input file */
+		length = length - ORIC_WAVESAMPLES_TRAILER;
 
-		switch (oric.cassette_state)
+		oric.cassette_state = ORIC_CASSETTE_SEARCHING_FOR_SYNC_BYTE;
+		const uint8_t *data_ptr = bytes;
+
+		while ((data_ptr < (bytes + oric.tap_size)) && (p < (buffer+length)) )
 		{
-			case ORIC_CASSETTE_SEARCHING_FOR_SYNC_BYTE:
-			{
-				if (data==ORIC_SYNC_BYTE)
-				{
-					LOG_FORMATS("found sync byte!\n");
-					/* found first sync byte */
-					oric.cassette_state = ORIC_CASSETTE_GOT_SYNC_BYTE;
-				}
-			}
-			break;
+			const uint8_t data = data_ptr[0];
+			data_ptr++;
 
-			case ORIC_CASSETTE_GOT_SYNC_BYTE:
+			switch (oric.cassette_state)
 			{
-				if (data!=ORIC_SYNC_BYTE)
+				case ORIC_CASSETTE_SEARCHING_FOR_SYNC_BYTE:
 				{
-					/* 0.25 second pause */
-					p = oric_fill_pause(p, oric_seconds_to_samples(0.25));
-
-					LOG_FORMATS("found end of sync bytes!\n");
-					/* found end of sync bytes */
-					for (i=0; i<ORIC_LEADER_LENGTH; i++)
+					if (data == ORIC_SYNC_BYTE)
 					{
-						p = oric_output_byte(p,0x016);
+						LOG_FORMATS("found sync byte!\n");
+						/* found first sync byte */
+						oric.cassette_state = ORIC_CASSETTE_GOT_SYNC_BYTE;
 					}
+				}
+				break;
 
-					if (data==0x024)
+				case ORIC_CASSETTE_GOT_SYNC_BYTE:
+				{
+					if (data != ORIC_SYNC_BYTE)
 					{
-						//LOG_FORMATS("reading header!\n");
-						p = oric_output_byte(p,data);
-						oric.cassette_state = ORIC_CASSETTE_READ_HEADER;
+						/* 0.25 second pause */
+						p = oric_fill_pause(p, oric_seconds_to_samples(0.25));
+
+						LOG_FORMATS("found end of sync bytes!\n");
+						/* found end of sync bytes */
+						for (int i = 0; i < ORIC_LEADER_LENGTH; i++)
+						{
+							p = oric_output_byte(p,0x016);
+						}
+
+						if (data == 0x024)
+						{
+							//LOG_FORMATS("reading header!\n");
+							p = oric_output_byte(p, data);
+							oric.cassette_state = ORIC_CASSETTE_READ_HEADER;
+							oric.data_count = 0;
+							oric.data_length = 9;
+						}
+					}
+				}
+				break;
+
+				case ORIC_CASSETTE_READ_HEADER:
+				{
+					header[oric.data_count] = data;
+					p = oric_output_byte(p, data);
+					oric.data_count++;
+
+					if (oric.data_count==oric.data_length)
+					{
+						//LOG_FORMATS("finished reading header!\n");
+						oric.cassette_state = ORIC_CASSETTE_READ_FILENAME;
+					}
+				}
+				break;
+
+				case ORIC_CASSETTE_READ_FILENAME:
+				{
+					p = oric_output_byte(p, data);
+
+					/* got end of filename? */
+					if (data == 0)
+					{
+						uint16_t end, start;
+						LOG_FORMATS("got end of filename\n");
+
+						/* oric includes a small delay, but I don't see
+						it being 1 bits */
+						for (int i = 0; i < 100; i++)
+						{
+							p = oric_output_bit(p,1);
+						}
+
+						oric.cassette_state = ORIC_CASSETTE_WRITE_DATA;
 						oric.data_count = 0;
-						oric.data_length = 9;
+
+						end = get_u16be(&header[4]);
+						start = get_u16be(&header[6]);
+						LOG(("start (from header): %02x\n",start));
+						LOG(("end (from header): %02x\n",end));
+											oric.data_length = end - start + 1;
 					}
 				}
-			}
-			break;
+				break;
 
-			case ORIC_CASSETTE_READ_HEADER:
-			{
-				header[oric.data_count] = data;
-				p = oric_output_byte(p, data);
-				oric.data_count++;
-
-				if (oric.data_count==oric.data_length)
+				case ORIC_CASSETTE_WRITE_DATA:
 				{
-					//LOG_FORMATS("finished reading header!\n");
-					oric.cassette_state = ORIC_CASSETTE_READ_FILENAME;
-				}
-			}
-			break;
+					p = oric_output_byte(p, data);
+					oric.data_count++;
 
-			case ORIC_CASSETTE_READ_FILENAME:
-			{
-				p = oric_output_byte(p, data);
-
-				/* got end of filename? */
-				if (data==0)
-				{
-					uint16_t end, start;
-					LOG_FORMATS("got end of filename\n");
-
-					/* oric includes a small delay, but I don't see
-					it being 1 bits */
-					for (i=0; i<100; i++)
+					if (oric.data_count==oric.data_length)
 					{
-											p = oric_output_bit(p,1);
+						LOG_FORMATS("finished writing data!\n");
+						oric.cassette_state = ORIC_CASSETTE_SEARCHING_FOR_SYNC_BYTE;
 					}
-
-					oric.cassette_state = ORIC_CASSETTE_WRITE_DATA;
-					oric.data_count = 0;
-
-					end = get_u16be(&header[4]);
-					start = get_u16be(&header[6]);
-					LOG(("start (from header): %02x\n",start));
-					LOG(("end (from header): %02x\n",end));
-										oric.data_length = end - start + 1;
 				}
+				break;
+
 			}
-			break;
-
-			case ORIC_CASSETTE_WRITE_DATA:
-			{
-				p = oric_output_byte(p, data);
-				oric.data_count++;
-
-				if (oric.data_count==oric.data_length)
-				{
-					LOG_FORMATS("finished writing data!\n");
-					oric.cassette_state = ORIC_CASSETTE_SEARCHING_FOR_SYNC_BYTE;
-				}
-			}
-			break;
-
 		}
 	}
-}
 	return p - buffer;
 }
 

@@ -75,8 +75,8 @@ ESB II/6000 chessboard:
 ESB 3000 hardware is probably same as ESB 6000.
 There are no other known external port peripherals.
 
-The Brikett (sans PCB) was also used in the 1983 Mephisto Excalibur, but the
-hardware is completely different, based on a 68000 (see excalibur.cpp).
+The Brikett (sans main PCB) was also used in the 1983 Mephisto Excalibur, but
+the hardware is completely different, based on a 68000 (see excalibur.cpp).
 
 BTANB:
 - bad bug in mephistoj opening library: e4 e6 / d4 d5 / Nd2 c5 / exd5 Qd1xd5,

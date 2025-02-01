@@ -10768,8 +10768,8 @@ ROM_START( rocktcnvy )
 	ROM_LOAD( "mmi6331.7f",   0x0000, 0x0020, CRC(25c79518) SHA1(e8f7e8b3d0cf1ed9d723948548f58abf0e2c6d1f) )
 
 	ROM_REGION( 0x0100, "proms2", 0 ) // PROMs on the CPU daughterboard
-	ROM_LOAD( "tbp28l22n.1",  0x0000, 0x0100, NO_DUMP )
-	ROM_LOAD( "tbp28l22n.2",  0x0000, 0x0100, NO_DUMP )
+	ROM_LOAD( "tbp28l22n.1",  0x0000, 0x0100, CRC(25e282fb) SHA1(96d1798ca38fa1834a3ac85e975d09ca5c549f7e) )
+	ROM_LOAD( "tbp28l22n.2",  0x0000, 0x0100, CRC(c4923f41) SHA1(f415918f2d793bb4fdb67d4d37e477a348e9a160) )
 ROM_END
 
 ROM_START( redufo ) // Galaxian bootleg hardware known as Artic Multi-System

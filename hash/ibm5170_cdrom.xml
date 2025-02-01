@@ -6518,7 +6518,7 @@ Includes DOS and Windows installation setup.
 	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Alt) (Track 40).bin" size="19220544" crc="c857b14a" sha1="4be2e5ac9abb99020f29f9948fd4b3f9c7df9a4b" /> -->
 	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Alt) (Track 41).bin" size="14803488" crc="b04fb2af" sha1="e94120542ffcc36f75ecd9dd43bfd630d9b14485" /> -->
 	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Alt) (Track 42).bin" size="13855632" crc="36c99a26" sha1="28ab24400f850db254b435ec88320c2e4a917da9" /> -->
-	<software name="soniccdoem" cloneof="soniccd">
+	<software name="soniccdoem" cloneof="soniccd" supported="no">
 		<description>Sonic CD (USA, Pentium Processor Edition)</description>
 		<year>1996</year> <!-- Date on CD is 1995-12-28, but very likely this released in 1996 -->
 		<publisher>Sega / Intel</publisher>
@@ -6574,8 +6574,8 @@ Includes DOS and Windows installation setup.
 	<!-- <rom name="Sonic CD (USA) (OEM) (Track 40).bin" size="19220544" crc="5d8ef82c" sha1="29cd3368b2ecb96070732448d15fd55befb347dc" /> -->
 	<!-- <rom name="Sonic CD (USA) (OEM) (Track 41).bin" size="14803488" crc="fde56203" sha1="d4623261ca0c8eeab6aa1e8a7a1ffd091482d125" /> -->
 	<!-- <rom name="Sonic CD (USA) (OEM) (Track 42).bin" size="13498128" crc="e4cbd243" sha1="cc517df4479946828c9a6fc6e9bb956f9a83821a" /> -->
-	<software name="soniccdoem1" cloneof="soniccd">
-		<description>Sonic CD (USA, Pentium Processor Edition alt)</description>
+	<software name="soniccdoem1" cloneof="soniccd" supported="no">
+		<description>Sonic CD (USA, Pentium Processor Edition, alt)</description>
 		<year>1995</year>
 		<publisher>Sega / Intel</publisher>
 		<info name="language" value="English" />

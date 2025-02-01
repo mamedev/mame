@@ -8,6 +8,9 @@ license:CC0-1.0
 
     The software listed here is not designed for use on systems without the AGA chipset and
     will not function.
+
+    Note:
+    - Please use [Lisa] / [Alice] tag where issues are specifically for amiga/amigaaga.cpp
 -->
 
 <softwarelist name="amigaaga_flop" description="Commodore Amiga AGA disk images">
@@ -2529,7 +2532,7 @@ Red screen when "Out to lunch is loading" displays, [FDC]
 		<year>1995</year>
 		<publisher>21st Century Entertainment</publisher>
 		<notes><![CDATA[
-[Denise] Bitplane overlay is offset on title screen
+[Lisa] Bitplane overlay is offset on title screen
 Doesn't draw left bumper during gameplay [Copper]?
 ]]></notes>
 		<info name="usage" value="Requires AGA" />
@@ -3638,7 +3641,7 @@ ATK test: C:0 H:U Bad
 		<year>1996</year>
 		<publisher>21st Century</publisher>
 		<notes><![CDATA[
-Has no cursor on main menu
+[Denise] has no cursor on main menu, should output with plane 0x10 (pfxpri 0x3f), amigaocs_flop:swiv related trick?
 On gameplay unthrottle emulation causes idle vertical scroll to be slower
 ]]></notes>
 		<info name="usage" value="Requires AGA" />
@@ -4990,8 +4993,8 @@ Pressing TAB key will switch to NTSC mode (?), which cuts off bottom of screen
 		<publisher>Edgar Vigdal</publisher>
 		<notes><![CDATA[
 Guru Meditation when run stand-alone (fixed)
-[Denise] bonus items don't collide in gameplay
-Throws "file is missing" when installed to HDD
+[Denise] bonus items and enemy to player bullets don't collide in gameplay, CLXCON even mask
+TODO: Throws "file is missing" when installed to HDD
 ]]></notes>
 		<info name="usage" value="Requires AGA" />
 

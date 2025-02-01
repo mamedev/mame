@@ -267,7 +267,7 @@ public:
 	// assign operators
 	void assign(uint32_t index, fm_operator<RegisterType> *op)
 	{
-		assert(index < array_size(m_op));
+		assert(index < m_op.size());
 		m_op[index] = op;
 		if (op != nullptr)
 			op->set_choffs(m_choffs);
@@ -330,7 +330,7 @@ private:
 	uint32_t m_choffs;                     // channel offset in registers
 	int16_t m_feedback[2];                 // feedback memory for operator 1
 	mutable int16_t m_feedback_in;         // next input value for op 1 feedback (set in output)
-	fm_operator<RegisterType> *m_op[4];    // up to 4 operators
+	std::array<fm_operator<RegisterType> *, 4> m_op; // up to 4 operators
 	RegisterType &m_regs;                  // direct reference to registers
 	fm_engine_base<RegisterType> &m_owner; // reference to the owning engine
 };

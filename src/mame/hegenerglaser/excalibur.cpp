@@ -6,7 +6,7 @@
 Mephisto Excalibur
 
 It's a very rare chess computer, the chess engine was programmed by the same guys
-that did Mephisto III and Mephisto III-S Glasgow.
+that did Mephisto I/II/III and Mephisto III-S Glasgow.
 
 Hardware notes:
 

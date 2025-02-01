@@ -53,7 +53,7 @@ static int pc6001_cas_to_wav_size (const uint8_t *casdata, int caslen)
 /*******************************************************************
    Generate samples for the tape image
 ********************************************************************/
-static int pc6001_cas_fill_wave(int16_t *buffer, int sample_count, uint8_t *bytes)
+static int pc6001_cas_fill_wave(int16_t *buffer, int sample_count, const uint8_t *bytes)
 {
 	return pc6001_handle_cas(buffer,bytes);
 }

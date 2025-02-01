@@ -387,7 +387,7 @@ void necdsp_device::exec_op(uint32_t opcode) {
 	flag.ov1 = 0;
 
 	switch(pselect) {
-		case 0: p = dataRAM[regs.dp]; break;
+		case 0: p = dataRAM[regs.dp & 0x07ff]; break;
 		case 1: p = regs.idb; break;
 		case 2: p = regs.m; break;
 		case 3: p = regs.n; break;

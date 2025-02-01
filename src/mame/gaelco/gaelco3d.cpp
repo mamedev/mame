@@ -201,7 +201,7 @@ void gaelco3d_state::machine_start()
 	save_item(NAME(m_fp_clock));
 	save_item(NAME(m_fp_state));
 	save_item(NAME(m_fp_analog_ports));
-	save_item(NAME(m_fp_lenght));
+	save_item(NAME(m_fp_length));
 }
 
 
@@ -370,9 +370,9 @@ void gaelco3d_state::fp_analog_clock_w(int state)
 				s32 const aay = ay - 0x80;
 				s32 const aax = ax - 0x80;
 				u32 const len = aay * aay + aax * aax;
-				if (len <= m_fp_lenght[i])
+				if (len <= m_fp_length[i])
 					m_fp_analog_ports[i] |= 2;
-				m_fp_lenght[i] = len;
+				m_fp_length[i] = len;
 			}
 		}
 	}

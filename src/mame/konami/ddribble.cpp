@@ -93,7 +93,7 @@ private:
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vblank_irq(int state);
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* source, int lenght, int gfxset, int flipscreen);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* source, int length, int gfxset, int flipscreen);
 	void maincpu_map(address_map &map) ATTR_COLD;
 	void subcpu_map(address_map &map) ATTR_COLD;
 	void audiocpu_map(address_map &map) ATTR_COLD;
@@ -222,10 +222,10 @@ byte #4:    attributes
 
 ***************************************************************************/
 
-void ddribble_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* source, int lenght, int gfxset, int flipscreen)
+void ddribble_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* source, int length, int gfxset, int flipscreen)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(gfxset);
-	const uint8_t *finish = source + lenght;
+	const uint8_t *finish = source + length;
 
 	while (source < finish)
 	{
