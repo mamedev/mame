@@ -398,7 +398,7 @@ ROM_START( tutankhms )
 	/* the other banks (1900-1fff) are empty */
 
 	/* ROMS located on the KT-5112-2B board. */
-	ROM_REGION(  0x10000, "timeplt_audio:tpsound", ROMREGION_ERASE00 ) /* 64k for Z80 sound CPU code */
+	ROM_REGION(  0x3000, "timeplt_audio:tpsound", ROMREGION_ERASE00 ) /* 64k for Z80 sound CPU code */
 	ROM_LOAD( "s1.7a", 0x0000, 0x1000, CRC(b52d01fa) SHA1(9b6cf9ea51d3a87c174f34d42a4b1b5f38b48723) )
 	ROM_LOAD( "s2.8a", 0x1000, 0x1000, CRC(9db5c0ce) SHA1(b5bc1d89a7f7d7a0baae64390c37ee11f69a0e76) )
 ROM_END
