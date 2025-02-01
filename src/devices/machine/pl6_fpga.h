@@ -63,12 +63,12 @@
 class pl6fpga_device : public device_t, public device_memory_interface
 {
 public:
-	typedef enum {
+	enum {
 		developer_fpga,
 		betcom_fpga,
 		jpm_fpga,
 		invalid_fpga
-	} PlutoFPGA;
+	};
 
 	pl6fpga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
@@ -115,7 +115,7 @@ public:
 	uint32_t dev_r(offs_t offset, uint32_t mem_mask);
 	void dev_w(offs_t offset, uint32_t mem_mask, uint32_t data);
 
-	void set_fpga_type(PlutoFPGA type);
+	void set_fpga_type(int type);
 
 	static constexpr feature_type unemulated_features() { return feature::SOUND; }
 	static constexpr feature_type imperfect_features() { return feature::PROTECTION; }
@@ -177,17 +177,17 @@ private:
 	};
 
 	// FPGA
-	PlutoFPGA fpga_type;
+	int fpga_type;
 	
-	uint8_t xcra_reg = 0;
-	uint8_t xuctrl_reg = 0;
-	uint8_t xdurt_reg = 0;
-	uint8_t xfpurt0_reg = 0;
-	uint8_t xfpurt1_reg = 0;
+	uint8_t xcra_reg;
+	uint8_t xuctrl_reg;
+	uint8_t xdurt_reg;
+	uint8_t xfpurt0_reg;
+	uint8_t xfpurt1_reg;
 
 	// Lamps
-	uint8_t mpx_row = 0x0f;				// 0x00-0x0F range
-	uint32_t mpx_regs[16][8] = {{0}};		// MPX Lamp/LED state and period data.
+	uint8_t mpx_row;				// 0x00-0x0F range
+	uint32_t mpx_regs[16][8];		// MPX Lamp/LED state and period data.
 
 	// Mappings
 	void developer_map(address_map &map);

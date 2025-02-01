@@ -240,7 +240,7 @@ private:
 	void pluto6(machine_config &config);	// Private to prevent use
 	void install_duart(machine_config &config);
 	void install_eeprom(machine_config &config);
-	void install_calypso(machine_config &config, u8 slot);
+	//void install_calypso(machine_config &config, u8 slot);
 
 
 	void duart_irq_handler(int state);
@@ -490,11 +490,12 @@ void pluto6_state::install_eeprom(machine_config &config){
 	eeprom_installed = true;
 }
 
+/*
 void pluto6_state::install_calypso(machine_config &config, u8 slot){
 	if(slot > 1) return;
 	if(slot == 0) m_exp0->option_set("gpu", HEBER_CALYPSO_GPU);
 	else m_exp1->option_set("gpu", HEBER_CALYPSO_GPU);
-}
+}*/
 
 // Machine defs
 void pluto6_state::pluto6(machine_config &config){
