@@ -5,8 +5,18 @@
 #include "emu.h"
 #include "konppc.h"
 
-#define DSP_BANK_SIZE           0x10000
-#define DSP_BANK_SIZE_WORD      (DSP_BANK_SIZE / 4)
+#define LOG_COMM (1 << 1)
+
+#define LOG_ALL (LOG_SYSREG)
+
+#define VERBOSE (0)
+
+#include "logmacro.h"
+
+#define LOGCOMM(...) LOGMASKED(LOG_COMM, __VA_ARGS__)
+
+static constexpr unsigned DSP_BANK_SIZE      = 0x10000;
+static constexpr unsigned DSP_BANK_SIZE_WORD = (DSP_BANK_SIZE / 4);
 
 /*****************************************************************************/
 
@@ -123,7 +133,7 @@ uint32_t konppc_device::cgboard_dsp_comm_r_ppc(offs_t offset, uint32_t mem_mask)
 {
 	if (m_cgboard_id < MAX_CG_BOARDS)
 	{
-//      logerror("%s dsp_cmd_r: (board %d) %08X, %08X\n", machine().describe_context(), m_cgboard_id, offset, mem_mask);
+//      LOGCOMM("%s dsp_cmd_r: (board %d) %08X, %08X\n", machine().describe_context(), m_cgboard_id, offset, mem_mask);
 		return m_dsp_comm_sharc[m_cgboard_id][offset] | (m_dsp_state[m_cgboard_id] << 16);
 	}
 	else
@@ -134,7 +144,7 @@ uint32_t konppc_device::cgboard_dsp_comm_r_ppc(offs_t offset, uint32_t mem_mask)
 
 void konppc_device::cgboard_dsp_comm_w_ppc(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-//  logerror("%s dsp_cmd_w: (board %d) %08X, %08X, %08X\n", machine().describe_context(), m_cgboard_id, data, offset, mem_mask);
+//  LOGCOMM("%s dsp_cmd_w: (board %d) %08X, %08X, %08X\n", machine().describe_context(), m_cgboard_id, data, offset, mem_mask);
 
 	if (m_cgboard_id < MAX_CG_BOARDS)
 	{

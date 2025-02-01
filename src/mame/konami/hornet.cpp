@@ -376,6 +376,18 @@ Jumpers set on GFX PCB to scope monitor:
 
 #include "layout/generic.h"
 
+#define LOG_SYSREG (1 << 1)
+#define LOG_COMM   (1 << 2)
+
+#define LOG_ALL (LOG_SYSREG | LOG_COMM)
+
+#define VERBOSE (0)
+
+#include "logmacro.h"
+
+#define LOGSYSREG(...) LOGMASKED(LOG_SYSREG, __VA_ARGS__)
+#define LOGCOMM(...)   LOGMASKED(LOG_COMM, __VA_ARGS__)
+
 namespace {
 
 class hornet_state : public driver_device
@@ -611,7 +623,7 @@ void hornet_state::sysreg_w(offs_t offset, uint8_t data)
 			break;
 
 		case 2: // Parallel data register
-			logerror("Parallel data = %02X\n", data);
+			LOGSYSREG("Parallel data = %02X\n", data);
 
 			if (m_adc12138_sscope)
 			{
@@ -639,7 +651,7 @@ void hornet_state::sysreg_w(offs_t offset, uint8_t data)
 			if (m_x76f041)
 				m_x76f041->write_cs(BIT(data, 6));
 
-			logerror("System register 0 = %02X\n", data);
+			LOGSYSREG("System register 0 = %02X\n", data);
 			break;
 
 		case 4: // System Register 1
@@ -678,7 +690,7 @@ void hornet_state::sysreg_w(offs_t offset, uint8_t data)
 				m_adc12138->sclk_w(BIT(data, 0));
 			}
 
-			bool const sndres = BIT(data, 7) ? true : false;
+			bool const sndres = BIT(data, 7);
 			m_audiocpu->set_input_line(INPUT_LINE_RESET, sndres ? CLEAR_LINE : ASSERT_LINE);
 			if (sndres != m_sndres)
 			{
@@ -688,7 +700,7 @@ void hornet_state::sysreg_w(offs_t offset, uint8_t data)
 
 			m_sndres = sndres;
 
-			logerror("System register 1 = %02X\n", data);
+			LOGSYSREG("System register 1 = %02X\n", data);
 			break;
 		}
 
@@ -703,7 +715,7 @@ void hornet_state::sysreg_w(offs_t offset, uint8_t data)
 			    0x02 = DEEN0
 			    0x01 = ATCK0
 			*/
-			logerror("Sound control register = %02X\n", data);
+			LOGSYSREG("Sound control register = %02X\n", data);
 			break;
 
 		case 6: // WDT Register
@@ -757,7 +769,7 @@ void sscope2_state::comm_eeprom_w(uint8_t data)
 
 void sscope2_state::comm1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	logerror("comm1_w: %08X, %08X, %08X\n", offset, data, mem_mask);
+	LOGCOMM("comm1_w: %08X, %08X, %08X\n", offset, data, mem_mask);
 }
 
 void sscope2_state::comm_rombank_w(uint32_t data)
@@ -767,7 +779,7 @@ void sscope2_state::comm_rombank_w(uint32_t data)
 
 uint32_t sscope2_state::comm0_unk_r(offs_t offset, uint32_t mem_mask)
 {
-//  logerror("comm0_unk_r: %08X, %08X\n", offset, mem_mask);
+//  LOGCOMM("comm0_unk_r: %08X, %08X\n", offset, mem_mask);
 	return 0xffffffff;
 }
 

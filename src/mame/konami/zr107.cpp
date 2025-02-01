@@ -190,6 +190,15 @@ Check drivers/gticlub.cpp for details on the bottom board.
 #include "emupal.h"
 #include "speaker.h"
 
+#define LOG_SYSREG (1 << 1)
+
+#define LOG_ALL (LOG_SYSREG)
+
+#define VERBOSE (0)
+
+#include "logmacro.h"
+
+#define LOGSYSREG(...) LOGMASKED(LOG_SYSREG, __VA_ARGS__)
 
 namespace {
 
@@ -394,7 +403,7 @@ void zr107_state::sysreg_w(offs_t offset, uint8_t data)
 			break;
 
 		case 2: // Parallel data register
-			logerror("Parallel data = %02X\n", data);
+			LOGSYSREG("Parallel data = %02X\n", data);
 			break;
 
 		case 3: // System Register 0
@@ -410,7 +419,7 @@ void zr107_state::sysreg_w(offs_t offset, uint8_t data)
 			*/
 			m_eepromout->write(data & 0x07, 0xff);
 			m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
-			logerror("System register 0 = %02X\n", data);
+			LOGSYSREG("System register 0 = %02X\n", data);
 			break;
 
 		case 4: // System Register 1
@@ -430,7 +439,7 @@ void zr107_state::sysreg_w(offs_t offset, uint8_t data)
 				m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 			m_konppc->set_cgboard_id((data >> 4) & 3);
 			m_out4->write(data, 0xff);
-			logerror("System register 1 = %02X\n", data);
+			LOGSYSREG("System register 1 = %02X\n", data);
 			break;
 
 		case 5: // System Register 2
@@ -458,14 +467,14 @@ uint32_t zr107_state::ccu_r(offs_t offset, uint32_t mem_mask)
 				int32_t const vcth = m_ccu_vcth ^ 0xff;
 				if (!machine().side_effects_disabled())
 					m_ccu_vcth = vcth;
-				r |= m_ccu_vcth << 24;
+				r |= vcth << 24;
 			}
 			if (ACCESSING_BITS_8_15)
 			{
 				int32_t const vctl = (m_ccu_vctl + 1) & 0x1ff;
 				if (!machine().side_effects_disabled())
 					m_ccu_vctl = vctl;
-				r |= (m_ccu_vctl >> 2) << 8;
+				r |= (vctl >> 2) << 8;
 			}
 		}
 	}

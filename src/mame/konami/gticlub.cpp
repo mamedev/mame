@@ -245,6 +245,16 @@ Hang Pilot (uses an unknown but similar video board)                12W         
 #include "speaker.h"
 
 
+#define LOG_SYSREG (1 << 1)
+
+#define LOG_ALL (LOG_SYSREG)
+
+#define VERBOSE (0)
+
+#include "logmacro.h"
+
+#define LOGSYSREG(...) LOGMASKED(LOG_SYSREG, __VA_ARGS__)
+
 namespace {
 
 #define DEBUG_GTI (0)
@@ -413,7 +423,8 @@ uint8_t gticlub_base_state::sysreg_r(offs_t offset)
 		}
 
 		default:
-			logerror("sysreg_r %d\n", offset);
+			if (!machine().side_effects_disabled())
+				LOGSYSREG("sysreg_r %d\n", offset);
 			break;
 	}
 	return 0;
