@@ -37,17 +37,17 @@
 #define LOG_DRAM	    (1U << 7)
 #define LOG_SIM	    	(1U << 8)
 #define LOG_DMA	    	(1U << 9)
-#define VERBOSE 		( LOG_DEBUG | LOG_UART | LOG_SWDT | LOG_MBUS | LOG_DRAM | LOG_SIM )
+#define VERBOSE 		( LOG_DEBUG | LOG_UART | LOG_SWDT | LOG_MBUS | LOG_DRAM | LOG_SIM | LOG_DMA )
 #include "logmacro.h"
 
 #define INT_LEVEL(N) 	((N&0x1c) >> 2)
+#define INT_PRIORITY(N) 	(N&0x03)
 #define ICR_USE_AUTOVEC(N)	((N & 0x80) != 0)
 
 template <typename T, typename U>
 inline void BITWRITE(T &var, U bit_number, bool state) {
     var = (var & ~(static_cast<T>(1) << bit_number)) | (static_cast<T>(state) << bit_number);
 }
-
 
 DEFINE_DEVICE_TYPE(MCF5206E,    mcf5206e_device,    "mcf5206e",     "Freescale MCF5206E")
 DEFINE_DEVICE_TYPE(COLDFIRE_SIM,    coldfire_sim_device,    "coldfire_sim",     "ColdFire SIM Module")
@@ -61,7 +61,9 @@ std::unique_ptr<util::disasm_interface> mcf5206e_device::create_disassembler()
 }
 
 mcf5206e_device::mcf5206e_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: m68000_musashi_device(mconfig, tag, owner, clock, MCF5206E, 32, 32, address_map_constructor(FUNC(mcf5206e_device::coldfire_regs_map), this))
+	: m68000_musashi_device(mconfig, tag, owner, clock, MCF5206E, 32, 32)
+	, m_coldfire_register_map("cpu_registers", ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(mcf5206e_device::coldfire_register_map), this))
+	, m_coldfire_vector_map("cpu_space", ENDIANNESS_BIG, 32, 28, 0, address_map_constructor(FUNC(mcf5206e_device::coldfire_vector_map), this))
 	, m_sim(*this, "sim")
 	, m_timer(*this, "timer%u", 1U)
 	, write_chip_select(*this)
@@ -76,18 +78,28 @@ mcf5206e_device::mcf5206e_device(const machine_config &mconfig, const char *tag,
 {
 }
 
+device_memory_interface::space_config_vector mcf5206e_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_coldfire_register_map),
+		std::make_pair(AS_CPU_SPACE, &m_coldfire_vector_map)
+	};
+}
+
 void mcf5206e_device::device_add_mconfig(machine_config &config){
 	COLDFIRE_SIM(config, m_sim, this->clock(), this->tag());
 
-	COLDFIRE_TIMER(config, m_timer[0], (this->clock()));
+	COLDFIRE_TIMER(config, m_timer[0], this->clock());
 	m_timer[0]->irq_cb().set(FUNC(mcf5206e_device::timer_1_irq));
-	COLDFIRE_TIMER(config, m_timer[1], (this->clock()));
+	COLDFIRE_TIMER(config, m_timer[1], this->clock());
 	m_timer[1]->irq_cb().set(FUNC(mcf5206e_device::timer_2_irq));
 
-	MCF5206E_UART(config, m_uart[0], (this->clock() / 32));
-	MCF5206E_UART(config, m_uart[1], (this->clock() / 32));
+	MCF5206E_UART(config, m_uart[0], this->clock());
+	MCF5206E_UART(config, m_uart[1], this->clock());
 	m_uart[0]->irq_cb().set(FUNC(mcf5206e_device::uart_1_irq));
+	m_uart[0]->set_clocks(m_tin[0], 0, 0, 0);
 	m_uart[1]->irq_cb().set(FUNC(mcf5206e_device::uart_2_irq));
+	m_uart[1]->set_clocks(m_tin[1], 0, 0, 0);
 
 	COLDFIRE_MBUS(config, m_mbus, this->clock());
 	m_mbus->sda_cb().set(FUNC(mcf5206e_device::mbus_sda_w));
@@ -140,7 +152,7 @@ void mcf5206e_device::device_reset()
 }
 
 // should be set up in m68000_musashi_device::x4e7a_movec_l_c() to move this map according to the contents of MBAR
-void mcf5206e_device::coldfire_regs_map(address_map &map)
+void mcf5206e_device::coldfire_register_map(address_map &map)
 {
 	/* SIM Module */
 	map(0xf0000000, 0xf00000cf).m(m_sim, FUNC(coldfire_sim_device::sim_map));
@@ -187,8 +199,8 @@ void mcf5206e_device::coldfire_regs_map(address_map &map)
 	map(0xf0000120, 0xf000013f).m(m_timer[1], FUNC(coldfire_timer_device::timer_map));
 
 	// uart (mc68681 derrived)
-	map(0xf0000140, 0xf000017c).rw(FUNC(mcf5206e_device::uart1_r), FUNC(mcf5206e_device::uart1_w));
-	map(0xf0000180, 0xf00001bc).rw(FUNC(mcf5206e_device::uart2_r), FUNC(mcf5206e_device::uart2_w));
+	map(0xf0000140, 0xf000017c).rw(m_uart[0], FUNC(mcf5206e_uart_device::read), FUNC(mcf5206e_uart_device::write));
+	map(0xf0000180, 0xf00001bc).rw(m_uart[1], FUNC(mcf5206e_uart_device::read), FUNC(mcf5206e_uart_device::write));
 
 	// parallel port
 	map(0xf00001c5, 0xf00001c5).rw(FUNC(mcf5206e_device::ppddr_r), FUNC(mcf5206e_device::ppddr_w));
@@ -200,6 +212,10 @@ void mcf5206e_device::coldfire_regs_map(address_map &map)
 	// dma
 	map(0xf0000200, 0xf000021f).m(m_dma[0], FUNC(coldfire_dma_device::dma_map));
 	map(0xf0000240, 0xf000025f).m(m_dma[1], FUNC(coldfire_dma_device::dma_map));
+}
+
+void mcf5206e_device::coldfire_vector_map(address_map &map){
+	map(0xfffffe0, 0xffffffc).r(m_sim, FUNC(coldfire_sim_device::interrupt_callback));
 }
 
 /* 
@@ -344,6 +360,7 @@ void mcf5206e_device::ppdat_w(u8 data)
 
 coldfire_sim_device::coldfire_sim_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) : 
 	device_t(mconfig, COLDFIRE_SIM, tag, owner, clock)
+	, irq_vector_cb(*this, (u8)m68000_musashi_device::EXCEPTION_BUS_ERROR)
 	, m_maincpu(*this, finder_base::DUMMY_TAG)
 	, m_swdt(*this, "watchdog")
 {
@@ -354,10 +371,9 @@ void coldfire_sim_device::device_add_mconfig(machine_config &config){
 }
 
 void coldfire_sim_device::device_start(){
-
 	m_swdt->watchdog_enable(0);
 	m_timer_swdt = timer_alloc( FUNC( coldfire_sim_device::swdt_callback ), this );	// For interrupt version
-
+	
 	save_item(NAME(m_simr));
 	save_item(NAME(m_marb));
 
@@ -440,7 +456,7 @@ void coldfire_sim_device::marb_w(u8 data){
 // MBAR + 0x014 -> 0x022: Interupt Control Registers
 u8 coldfire_sim_device::icr_r(offs_t offset){
 	if(offset > 15){
-		logerror("%s: Request to read invalid ICR offset received: %d", this->machine().describe_context(), offset);
+		logerror("%s: Request to read invalid ICR offset received: %d\n", this->machine().describe_context(), offset);
 		return 0;
 	}
 	LOGMASKED(LOG_DEBUG, "%s: (Interrupt Control Register %d) read: %02x\n", this->machine().describe_context(), offset, m_icr[offset]);
@@ -506,46 +522,112 @@ void coldfire_sim_device::set_external_interrupt(int level, int state){
 	}
 }
 
-// Decides whether to forward interrupt to CPU or not
-void coldfire_sim_device::set_interrupt(int interrupt){
-	LOG("set_interrupt(%d): %d, %d", interrupt, BIT(m_imr, interrupt), m_imr & interrupt);
-	if(!BIT(m_imr, interrupt)){
-		u8 ICR = 0;
-		u8 vector = ~0;
-		u32 intbit = (1 << interrupt);
-		
-		m_ipr = ((m_ipr & ~intbit) | intbit);
-	
-		switch (interrupt){
-			case WATCHDOG_IRQ: 								// Never autovector
-				ICR = m_icr[ICR_SWDT]; 
-				vector = m_swivr;
-				break;	
-			case TIMER_1_IRQ:	ICR = m_icr[ICR_TMR1]; break;	// Always autovector
-			case TIMER_2_IRQ: 	ICR = m_icr[ICR_TMR2]; break;	// Always autovector
-			case MBUS_IRQ: 		ICR = m_icr[ICR_MBUS]; break;	// Always autovector
-			case UART_1_IRQ: 
-				ICR = m_icr[ICR_UART1];
-				if (!ICR_USE_AUTOVEC(ICR)) vector = m_maincpu->m_uart[0]->get_irq_vector();
-				break;
-			case UART_2_IRQ: 
-				ICR = m_icr[ICR_UART2];
-				if (!ICR_USE_AUTOVEC(ICR)) vector = m_maincpu->m_uart[1]->get_irq_vector();
-				break;
-			
-			default: return;
-		}
+// Return the vector for the highest priority and level interrupt
+u8 coldfire_sim_device::interrupt_callback(offs_t level)
+{
+	u8 ipl = (level >> 1) & 7; 	// Should be 2 for coldFire, really
+	u8 highest_priority_icr = 0;
+    u8 highest_priority_device = 0;
 
-		if (ICR_USE_AUTOVEC(ICR)){
-			//LOGMASKED(LOG_DEBUG, "%s: Interrupt from %d: ICR: %02x\n", this->machine().describe_context(), interrupt, ICR);
-			m_maincpu->set_input_line(INT_LEVEL(ICR), HOLD_LINE);
-		} else {
-			LOGMASKED(LOG_SIM, "%s: Interrupt & vector from %d: ICR: %02x, Vector: %02x\n", this->machine().describe_context(), interrupt, ICR, vector);
-			//m_maincpu->set_input_line(INT_LEVEL(ICR), HOLD_LINE);
-			m_maincpu->m_cpu_space->write_byte(0xfffffff1 | (INT_LEVEL(ICR) << 1), vector);
-			m_maincpu->m68ki_exception_interrupt(INT_LEVEL(ICR));
+    if(!this->machine().side_effects_disabled()) {
+		//logerror("%s: interrupt_callback(%u), ipl: %x, m_ipr: %x, m_imr: %x\n", this->machine().describe_context(), level, ipl, m_ipr, m_imr);
+		m_maincpu->set_input_line(ipl, CLEAR_LINE);
+	}
+
+    for (int i = 0; i < 15; i++) {
+		//if(!this->machine().side_effects_disabled()) logerror("i: %x, m_icr: %x, ipl: %x, ipr_bit: %x\n", i, INT_LEVEL(m_icr[i]), ipl, BIT(m_ipr, 1 + i));
+        if (BIT(m_ipr, 1 +i) && (INT_LEVEL(m_icr[i]) == ipl)) {
+            if (highest_priority_device == 0 || INT_PRIORITY(m_icr[i]) > INT_PRIORITY(highest_priority_icr)) {
+                highest_priority_icr = m_icr[i];
+                highest_priority_device = i + 1;
+            }
+        }
+    }
+
+    if (highest_priority_device == 0) {
+        if(!this->machine().side_effects_disabled()) logerror("%s: Spurious interrupt detected: %u\n", this->machine().describe_context(), ipl);
+        return m68000_musashi_device::EXCEPTION_SPURIOUS_INTERRUPT;
+    }
+
+	BITWRITE(m_ipr, ipl, 0);
+
+	u8 vector = 0xff;
+
+    // Check if ICR specifies to use autovectoring
+    if (BIT(highest_priority_icr, 7)) {
+        vector = m68000_base_device::autovector(ipl);
+    } else {
+		// Determine the correct vector to return
+		switch (highest_priority_device) {
+			case EXTERNAL_IPL_1:
+			case EXTERNAL_IPL_2:
+			case EXTERNAL_IPL_3:
+			case EXTERNAL_IPL_4:
+			case EXTERNAL_IPL_5:
+			case EXTERNAL_IPL_6:
+			case EXTERNAL_IPL_7:
+				if (!BIT(highest_priority_icr, 7)) vector = irq_vector_cb();
+				break;
+			case WATCHDOG_IRQ:
+				if (!BIT(highest_priority_icr, 7)) vector = m_swivr;
+				break;
+			case UART_1_IRQ:
+				if (!BIT(highest_priority_icr, 7)) vector = m_maincpu->m_uart[0]->get_irq_vector();
+				break;
+			case UART_2_IRQ:
+				if (!BIT(highest_priority_icr, 7)) vector = m_maincpu->m_uart[1]->get_irq_vector();
+				break;
+			case DMA_0_IRQ:
+				if (!BIT(highest_priority_icr, 7)) vector = m_maincpu->m_dma[0]->get_irq_vector();
+				//m_maincpu->m_dma[0]->dma_int_callback();
+				break;
+			case DMA_1_IRQ:
+				if (!BIT(highest_priority_icr, 7)) vector = m_maincpu->m_dma[1]->get_irq_vector();
+				//m_maincpu->m_dma[1]->dma_int_callback();
+				break;
+			default:
+				if(!this->machine().side_effects_disabled()) logerror("%s: Vector required for device that only supports autovectoring: %u, %u\n", 
+						this->machine().describe_context(), ipl, highest_priority_device);
+				vector = m68000_musashi_device::EXCEPTION_UNINITIALIZED_INTERRUPT;
+				break;
 		}
-		m_ipr = 0;
+	}
+	
+	return vector;
+}
+
+void coldfire_sim_device::set_interrupt(int interrupt, int state){
+	BITWRITE(m_ipr, interrupt, ((state == CLEAR_LINE) ? 0 : 1));
+
+	//LOGMASKED(LOG_DEBUG, "%s: set_interrupt(%u, %u): %x, %d, %d\n", this->machine().describe_context(), interrupt, state, m_ipr, BIT(m_imr, interrupt), m_imr & interrupt);
+
+	// IMR enables interrupts when bit is 0
+	if(state != CLEAR_LINE){
+		if(!BIT(m_imr, interrupt)){
+			u8 icr = 0;
+			switch (interrupt){
+				case EXTERNAL_IPL_1: icr = m_icr[ICR1]; break;
+				case EXTERNAL_IPL_2: icr = m_icr[ICR2]; break;
+				case EXTERNAL_IPL_3: icr = m_icr[ICR3]; break;
+				case EXTERNAL_IPL_4: icr = m_icr[ICR4]; break;
+				case EXTERNAL_IPL_5: icr = m_icr[ICR5]; break;
+				case EXTERNAL_IPL_6: icr = m_icr[ICR6]; break;
+				case EXTERNAL_IPL_7: icr = m_icr[ICR7]; break;
+				case WATCHDOG_IRQ: 	icr = m_icr[ICR_SWDT]; break;	
+				case TIMER_1_IRQ:	icr = m_icr[ICR_TMR1]; break;	// Always autovector
+				case TIMER_2_IRQ: 	icr = m_icr[ICR_TMR2]; break;	// Always autovector
+				case MBUS_IRQ: 		icr = m_icr[ICR_MBUS]; break;	// Always autovector
+				case UART_1_IRQ: 	icr = m_icr[ICR_UART1];	break;
+				case UART_2_IRQ: 	icr = m_icr[ICR_UART2];	break;
+				case DMA_0_IRQ: 	icr = m_icr[ICR_DMA0];	break;
+				case DMA_1_IRQ: 	icr = m_icr[ICR_DMA1];	break;
+				default: 
+					logerror("%s: Unknown device trying to set interrupt level: %u\n", this->machine().describe_context(), interrupt);
+					return;
+			}
+
+			m_maincpu->set_input_line(INT_LEVEL(icr), ASSERT_LINE);
+		}
 	}
 }
 
@@ -606,7 +688,7 @@ TIMER_CALLBACK_MEMBER(coldfire_sim_device::swdt_callback)
  */
 coldfire_timer_device::coldfire_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) : 
 	device_t(mconfig, COLDFIRE_TIMER, tag, owner, clock)
-	, m_timer_irq(*this)
+	, write_irq(*this)
 {
 }
 
@@ -637,6 +719,7 @@ void coldfire_timer_device::device_reset(){
 	m_ter = 0x00;
 	m_timer_start_time = attotime::zero;
 	m_timer->adjust(attotime::never);
+	write_irq(CLEAR_LINE);
 }
 
 TIMER_CALLBACK_MEMBER(coldfire_timer_device::timer_callback)
@@ -646,7 +729,7 @@ TIMER_CALLBACK_MEMBER(coldfire_timer_device::timer_callback)
 		m_tcn = 0;
 	}
 	m_ter |= T_EREF;
-	m_timer_irq(0);
+	write_irq(ASSERT_LINE);
 }
 
 void coldfire_timer_device::tmr_w(u16 data)
@@ -700,24 +783,7 @@ void coldfire_timer_device::ter_w(u8 data)
 {
 	m_ter &= ~data; // Programmer must write bit to clear it. IE write 0x80 to clear bit 7.
 	LOGMASKED(LOG_TIMER, "%s: (Timer Event) TER_w: %02x\n", this->machine().describe_context(), data);
-}
-
-
-/* UART */
-u8 mcf5206e_device::uart1_r(offs_t offset) { 
-	return m_uart[0]->read(offset); 
-}
-
-u8 mcf5206e_device::uart2_r(offs_t offset) { 
-	return m_uart[1]->read(offset); 
-}
-
-void mcf5206e_device::uart1_w(offs_t offset, u8 data) { 
-	m_uart[0]->write(offset, data); 
-}
-
-void mcf5206e_device::uart2_w(offs_t offset, u8 data) { 
-	m_uart[1]->write(offset, data);
+	write_irq(CLEAR_LINE);
 }
 
 #define UNINIT 0
@@ -789,8 +855,6 @@ void coldfire_mbus_device::device_start(){
 	save_item(NAME(m_tx_bit));
 	save_item(NAME(m_tx_out));
 	save_item(NAME(m_tx_in));
-
-	device_reset();
 }
 
 void coldfire_mbus_device::device_reset(){
@@ -807,8 +871,6 @@ void coldfire_mbus_device::device_reset(){
 	m_tx_in = 0;
 
 	m_timer_mbus->adjust(attotime::never);
-	write_scl(1);
-	write_sda(1);
 }
 
 
@@ -893,8 +955,6 @@ void coldfire_dma_device::device_start(){
 	save_item(NAME(m_bcr));
 	save_item(NAME(m_dsr));
 	save_item(NAME(m_divr));
-
-	device_reset();
 }
 
 void coldfire_dma_device::device_reset(){

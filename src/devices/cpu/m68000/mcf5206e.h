@@ -33,6 +33,8 @@ enum {
 class mcf5206e_device;	// Forward declaration
 
 class coldfire_sim_device : public device_t {
+	friend class mcf5206e_device; 
+
 	public:
 		enum {
 			ICR1 = 0,	// Bit 1
@@ -64,13 +66,15 @@ class coldfire_sim_device : public device_t {
 
 		void sim_map(address_map &map);
 
+		u8 interrupt_callback(offs_t int_level);
+
 		void write_irq_1(int state) { set_external_interrupt(1, state); }
 		void write_irq_4(int state) { set_external_interrupt(4, state); }
 		void write_irq_7(int state) { set_external_interrupt(7, state); }
 
 		void set_external_interrupt_level(int level){ set_external_interrupt(level, HOLD_LINE); };
 		void set_external_interrupt(int level, int state);
-		void set_internal_interrupt_request(int device, int state){ set_interrupt(device); }
+		void set_internal_interrupt_request(int device, int state){ set_interrupt(device, state); }
 
 		u16 get_par(){ return m_par; }
 
@@ -80,20 +84,24 @@ class coldfire_sim_device : public device_t {
 		void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	private:
-		void set_interrupt(int interrupt);
+		void set_interrupt(int interrupt, int state);
 
 		TIMER_CALLBACK_MEMBER(swdt_callback);
+
+		uint8_t current_irq_vector;
 		
 		void icr_info(u8 icr);
+
+		devcb_read8 irq_vector_cb;
 
 		u8 simr_r(){ return m_simr; }		// sim configuration register
 		u8 marb_r(){ return m_marb; }		// bus master arbitration control
 		u8 icr_r(offs_t offset);			// interrupt control register
 		u16 imr_r(){ return m_imr; }		// interrupt mask register
 		u16 ipr_r(){ return m_ipr; }		// interrupt pending register
-		u8 sypcr_r(){ return m_sypcr; }	// system protection control register
-		u8 swivr_r(){ return m_swivr; }	// software watchdog interrupt vector register
-		u8 rsr_r(){ return m_rsr; }		// reset status register
+		u8 sypcr_r(){ return m_sypcr; }		// system protection control register
+		u8 swivr_r(){ return m_swivr; }		// software watchdog interrupt vector register
+		u8 rsr_r(){ return m_rsr; }			// reset status register
 		u16 par_r(){ return m_par; }		// pin assignment register
 
 		void simr_w(u8 data);							
@@ -136,6 +144,7 @@ class coldfire_dma_device : public device_t {
 
 		void dma_map(address_map &map) ATTR_COLD;
 		auto irq_cb() ATTR_COLD { return write_irq.bind(); }
+		u8 get_irq_vector() { return m_divr; }
 
 	protected:
 		void device_start() override ATTR_COLD;
@@ -144,6 +153,7 @@ class coldfire_dma_device : public device_t {
 	private:
 		
 		//TIMER_CALLBACK_MEMBER(dma_callback);
+		//IRQ_CALLBACK_MEMBER(dma_int_callback)
 
 		u32 sar_r(){ return m_sar; }
 		u32 dar_r(){ return m_dar; }
@@ -199,6 +209,7 @@ class coldfire_mbus_device : public device_t {
 		};
 
 		TIMER_CALLBACK_MEMBER(mbus_callback);
+		IRQ_CALLBACK_MEMBER(mbus_int_callback);
 
 		inline u8 madr_r(){ return m_madr; }			// madr is only for when the cpu is a slave i2c device
 		u8 mbdr_r();
@@ -233,7 +244,7 @@ class coldfire_timer_device : public device_t {
 		coldfire_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 		
 		void timer_map(address_map &map) ATTR_COLD;
-		auto irq_cb() { return m_timer_irq.bind(); }
+		auto irq_cb() { return write_irq.bind(); }
 
 	protected:
 		void device_start() override ATTR_COLD;
@@ -286,13 +297,14 @@ class coldfire_timer_device : public device_t {
 		attotime m_timer_start_time;
 
 		emu_timer *m_timer;
-		devcb_write_line m_timer_irq;
+		devcb_write_line write_irq;
 
 		// Todo: Add output support
 };
 
 class mcf5206e_device : public m68000_musashi_device
 {
+	friend class coldfire_sim_device;
 public:
 	// construction/destruction
 	mcf5206e_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
@@ -302,8 +314,17 @@ public:
 	virtual u32 execute_min_cycles() const noexcept override { return 2; }
 	virtual u32 execute_max_cycles() const noexcept override { return 158; }
 
+	void set_tin1(int clk){ m_tin[0] = clk; }
+	void set_tin2(int clk){ m_tin[1] = clk; }
+	void set_tin(int tin1, int tin2){ set_tin1(tin1); set_tin2(tin2); }
+	void set_tin1(const XTAL &clk) { set_tin1(clk.value()); }
+	void set_tin2(const XTAL &clk) { set_tin2(clk.value()); }
+	void set_tin(const XTAL &tin1, const XTAL &tin2) { set_tin1(tin1); set_tin2(tin2); }
+
 	// Chip Select Module
 	template<unsigned N> auto chip_select_w_cb() { return write_chip_select[N].bind(); }
+
+	auto set_irq_acknowledge_callback() ATTR_COLD { return m_sim->irq_vector_cb.bind(); }
 
 	// Parallel Port
 	auto gpio_w_cb() { return m_gpio_w_cb.bind(); }
@@ -335,15 +356,23 @@ protected:
 	//virtual void device_clock_changed() override { }
 	virtual void device_add_mconfig(machine_config &config) override;
 
+	virtual space_config_vector memory_space_config() const override;
+	address_space_config m_coldfire_register_map;
+	address_space_config m_coldfire_vector_map;
+
+private:
+
+	void coldfire_register_map(address_map &map) ATTR_COLD;
 	void coldfire_vector_map(address_map &map) ATTR_COLD;
-	void coldfire_regs_map(address_map &map) ATTR_COLD;
 
 	void init_regs(bool first_init);
+
+	u32 m_tin[2];
 
 	/* System Intergration Module */
 	required_device<coldfire_sim_device> m_sim;
 
-	/* TImer Modules */
+	/* Timer Modules */
 	void timer_1_irq(int state){ m_sim->set_internal_interrupt_request(TIMER_1_IRQ, state); }
 	void timer_2_irq(int state){ m_sim->set_internal_interrupt_request(TIMER_2_IRQ, state); }
 
@@ -445,12 +474,8 @@ protected:
 
 	/* UART Modules */ 
 	// Stick two 68681 A channels in the CPU with no timers.
-	u8 uart1_r(offs_t offset);
-	u8 uart2_r(offs_t offset);
-	void uart1_w(offs_t offset, u8 data);
-	void uart2_w(offs_t offset, u8 data);
-	void uart_1_irq(int state){ m_sim->set_external_interrupt(UART_1_IRQ, state); }
-	void uart_2_irq(int state){ m_sim->set_external_interrupt(UART_2_IRQ, state); }
+	void uart_1_irq(int state){ m_sim->set_internal_interrupt_request(UART_1_IRQ, state); }
+	void uart_2_irq(int state){ m_sim->set_internal_interrupt_request(UART_2_IRQ, state); }
 
 	required_device_array<mcf5206e_uart_device, 2> m_uart;
 	devcb_write_line write_tx1, write_tx2;

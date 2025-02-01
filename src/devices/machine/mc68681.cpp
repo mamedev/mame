@@ -13,6 +13,7 @@
     Rewrite and modernization in progress by R. Belmont
     Addition of the duart compatible 68340 serial module support by Edstrom
     Support for the Exar XR68C681 by Joseph Zatarski (July of 2018)
+	Support for Freescale/NXP ColdFire UART module by NaokiS (June 2025)
 
     The main incompatibility between the 2681 and 68681 (Signetics and Motorola each
     manufactured both versions of the chip) is that the 68681 has a R/W input and
@@ -53,7 +54,7 @@
 
 #include <algorithm>
 
-#define VERBOSE 1
+//#define VERBOSE 1
 //#define LOG_OUTPUT_FUNC printf
 #include "logmacro.h"
 
@@ -587,7 +588,7 @@ uint8_t mcf5206e_uart_device::read(offs_t offset)
 	case 0x04: /* UIPCR */
 	case 0x05: /* UISR */
 	case 0x0d: /* UIP */
-		duart_base_device::read(offset);
+		r = duart_base_device::read(offset);
 		break;
 	
 	case 0x06: /* UBG Buad Generator Prescale MSB */
@@ -807,7 +808,8 @@ void mcf5206e_uart_device::write(offs_t offset, uint8_t data)
 	case 0x07: /* UBG2 */
 	LOG("%s: Writing mcf5206e (%s) reg %x (%s) with %02x\n", this->machine().describe_context(), tag(), offset, mcf5206e_duart_reg_write_names[offset], data);
 		UBG = (UBG & 0xff00) | data;
-		duart_base_device::m_chanA->baud_updated();
+		m_chanA->baud_updated();
+		m_chanA->update_interrupts();
 		break;
 
 	case 0x0c: /* UIVR */
@@ -1274,6 +1276,24 @@ int xr68c681_device::calc_baud(int ch, bool rx, uint8_t data)
 	if ((baud_rate == 0) && ((data & 0xf) != 0xd))
 	{
 		LOG("Unsupported transmitter clock: channel %d, clock select = %02x\n", ch, data);
+	}
+
+	//printf("%s ch %d setting baud to %d\n", tag(), ch, baud_rate);
+	return baud_rate;
+}
+
+int mcf5206e_uart_device::calc_baud(int ch, bool rx, uint8_t data)
+{
+	int baud_rate = 0;
+	u16 ubg_temp = 1;
+
+	if(UBG > 0) ubg_temp = UBG;
+
+	switch (data & 0xf){
+		case 0xe: baud_rate = ip3clk/16; break;
+		case 0xf: baud_rate = ip3clk; break;
+		case 0xd: baud_rate = (this->clock()/32) / ubg_temp; break;
+		default: LOG("Unsupported transmitter clock: channel %d, clock select = %02x\n", ch, data); break;
 	}
 
 	//printf("%s ch %d setting baud to %d\n", tag(), ch, baud_rate);

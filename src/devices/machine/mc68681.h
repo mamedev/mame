@@ -252,6 +252,8 @@ protected:
 	mcf5206e_uart_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 private:
+	virtual int calc_baud(int ch, bool rx, uint8_t data) override;
+
 	bool m_read_vector; // if this is read and IRQ is active, it counts as pulling IACK
 
 	// ColdFire UART module is essentially two 68681 a-channels with a slighty different register map and no counter
