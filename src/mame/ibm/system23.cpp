@@ -15,6 +15,8 @@
 #include "screen.h"
 #include "speaker.h"
 #include "sound/spkrdev.h"
+#include "machine/clock.h"
+#include "system23_kbd.h"
 #include "logmacro.h"
 
 #include "ibmsystem23.lh"
@@ -43,6 +45,8 @@ namespace
 				//m_ram_bank_dma(*this, "ram_bank_dma"),
 				m_screen(*this, "screen"),
 				m_speaker(*this,"beeper"),
+				m_keyboard(*this, "kbd"),
+				m_pit_clock(*this, "pit_clk"),
 				m_language(*this,"lang"),
 				m_cedip(*this,"ce"),
 				m_j1(*this,"j1"),
@@ -75,6 +79,8 @@ namespace
 			//required_memory_bank m_ram_bank_dma;
 			required_device<screen_device> m_screen;
 			required_device<speaker_sound_device> m_speaker;
+			required_device<system23_kbd_device> m_keyboard;
+			required_device<clock_device> m_pit_clock;
 			required_ioport m_language;
 			required_ioport m_cedip;
 			required_ioport m_j1;
@@ -100,6 +106,8 @@ namespace
 			//void ram_w(offs_t offset, uint8_t data);
 			uint8_t *m_ram_ptr;
 			uint32_t m_ram_size;
+
+			uint32_t m_rst75_enabled;
 
 			void diag_digits_w(uint8_t data);
 
@@ -136,6 +144,17 @@ namespace
 			void ram_write_page_w(uint8_t data);
 			uint8_t dma_page_r();
 			void dma_page_w(uint8_t data);
+
+			void reset_keyboard(uint8_t data);
+			uint8_t read_keyboard();
+			void data_strobe_w(int state);
+
+			void usart_ck_w(int state);
+
+			void trap(int state);
+
+			void pit_clk2(int state);
+			void rst75_enable(uint8_t data);
 
 			void system23_io(address_map &map) ATTR_COLD;
 			void system23_mem(address_map &map) ATTR_COLD;
@@ -319,7 +338,8 @@ namespace
 
 	void system23_state::update_speaker(uint32_t state)
 	{
-		uint32_t speaker_state = !(state && !(m_port_4e && 0x01));
+		uint32_t speaker_enable = (m_port_4e && BIT(m_port_4e, 1)) ? CLEAR_LINE : ASSERT_LINE;
+		uint32_t speaker_state = (speaker_enable ? CLEAR_LINE : ASSERT_LINE) & state;
 		m_speaker->level_w(speaker_state);
 	}
 
@@ -333,6 +353,54 @@ namespace
 	{
 		LOG("RST5.5\n");
 		m_maincpu->set_input_line(I8085_RST55_LINE, state & m_j1->read());
+	}
+
+	void system23_state::reset_keyboard(uint8_t data)
+	{
+		if(BIT(data,7))
+		{
+			m_keyboard->reset_w(CLEAR_LINE);
+		}
+		else
+		{
+			m_keyboard->reset_w(ASSERT_LINE);
+		}
+		m_pic->ir0_w(BIT(data,3));
+		m_keyboard->t0_w(BIT(data,5));
+	}
+
+	uint8_t system23_state::read_keyboard()
+	{
+		return m_keyboard->read_keyboard();
+	}
+
+	void system23_state::usart_ck_w(int state)
+	{
+		m_usart->write_rxc(state);
+		m_usart->write_txc(state);
+	}
+
+	void system23_state::data_strobe_w(int state)
+	{
+		//LOG("KBD Data strobe: %d\n", state);
+		m_ppi_diag->pc4_w(state);
+	}
+
+	void system23_state::trap(int state)
+	{
+		int new_state = state & CLEAR_LINE;//Dummy value, SOD gates a 4-input NAND output (RESET OUT, Memory Parity Error)
+		LOG("TRAP: %d", new_state);
+		m_maincpu->set_input_line(I8085_RST75_LINE, new_state);
+	}
+
+	void system23_state::pit_clk2(int state)
+	{
+    	m_pit->write_clk2(!(state & m_rst75_enabled));
+	}
+
+	void system23_state::rst75_enable(uint8_t data)
+	{
+		m_rst75_enabled = BIT(data,3);
 	}
 
 	//This routine describes the computer's I/O map
@@ -374,7 +442,8 @@ namespace
 		m_maincpu->set_addrmap(AS_PROGRAM, &system23_state::system23_mem);
 		m_maincpu->set_addrmap(AS_IO, &system23_state::system23_io);
 		m_maincpu->in_sid_func().set(FUNC(system23_state::sid_r));
-		//m_maincpu->out_sod_func().set_inputline(m_maincpu, I8085_TRAP_LINE);
+		m_maincpu->out_sod_func().set(FUNC(system23_state::trap));
+		m_maincpu->set_irq_acknowledge_callback(m_pic, FUNC(pic8259_device::inta_cb));
 
 		I8255(config, m_ppi_kbd);
 		m_ppi_kbd->in_pa_callback().set(FUNC(system23_state::cpu_test_register_r));
@@ -384,12 +453,15 @@ namespace
 		m_ppi_kbd->out_pc_callback().set(FUNC(system23_state::port_4e_w));
 
 		I8255(config, m_ppi_diag);
+		m_ppi_diag->in_pa_callback().set(FUNC(system23_state::read_keyboard));
 		m_ppi_diag->out_pb_callback().set(FUNC(system23_state::diag_digits_w));
+		m_ppi_diag->out_pc_callback().set(FUNC(system23_state::reset_keyboard));
 
 		I8255(config, m_ppi_settings);
 		m_ppi_settings->in_pc_callback().set(FUNC(system23_state::memory_settings_r));
 		m_ppi_settings->in_pa_callback().set_ioport(m_language);
 		m_ppi_settings->in_pb_callback().set_ioport(m_cedip);
+		m_ppi_settings->out_pc_callback().set(FUNC(system23_state::rst75_enable));
 
 		I8257(config, m_dmac, (18'432'000 / 6)); //frequency needs to be adjusted
 		m_dmac->out_memw_cb().set(FUNC(system23_state::dmac_mem_w));
@@ -411,6 +483,9 @@ namespace
 		m_crtc->vrtc_wr_callback().set(FUNC(system23_state::vrtc_r));
 
 		I8251(config, m_usart, 0);
+		m_usart->rxrdy_handler().set(m_pic, FUNC(pic8259_device::ir1_w));
+		m_usart->txrdy_handler().set(m_pic, FUNC(pic8259_device::ir2_w));
+
 		SPEAKER(config, "mono").front_center();
 		SPEAKER_SOUND(config, m_speaker);
 		m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -418,22 +493,25 @@ namespace
 		PIT8253(config, m_pit, 0);
 		m_pit->set_clk<0>(18'432'000 / 12);
 		m_pit->set_clk<1>(18'432'000 / 12);
-		m_pit->set_clk<2>(18'432'000 / 6);
-		m_pit->out_handler<0>().set(m_usart, FUNC(i8251_device::write_txc));
+		//m_pit->set_clk<2>(18'432'000 / 12);
+		m_pit->out_handler<0>().set(FUNC(system23_state::usart_ck_w));
 		m_pit->out_handler<1>().set(FUNC(system23_state::update_speaker));
 		m_pit->out_handler<2>().set(FUNC(system23_state::rst75));
 
-		PIC8259(config, m_pic, 0);
-		m_maincpu->set_irq_acknowledge_callback(m_pic, FUNC(pic8259_device::inta_cb));
-		m_usart->rxrdy_handler().set(m_pic, FUNC(pic8259_device::ir1_w));
-		m_usart->txrdy_handler().set(m_pic, FUNC(pic8259_device::ir2_w));
+		PIC8259(config, m_pic);
+		m_pic->out_int_callback().set_inputline(m_maincpu, I8085_INTR_LINE);
 
 		RAM(config, m_ram).set_default_size("128k");
 
+		SYSTEM23_KEYBOARD(config, m_keyboard, 0);
+		m_keyboard->scancode_export().set(FUNC(system23_state::data_strobe_w));
+
+		CLOCK(config, m_pit_clock, 18'432'000 / 12);
+		m_pit_clock->signal_handler().set(FUNC(system23_state::pit_clk2));
+
+
 		config.set_perfect_quantum(m_maincpu);
 		config.set_default_layout(layout_ibmsystem23);
-
-
 
 	}
 
@@ -565,4 +643,4 @@ namespace
 
 }
 
-COMP( 1981, system23, 0,      0,      system23, system23,     system23_state, empty_init, "IBM",   "IBM System/23 Datamaster", MACHINE_NOT_WORKING)
+COMP( 1981, system23, 0,      0,      system23, system23,     system23_state, empty_init, "IBM",   "IBM System/23 Datamaster", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_GRAPHICS)
