@@ -283,7 +283,7 @@ device_memory_interface::space_config_vector pl6fpga_device::memory_space_config
 	};
 }
 
-void pl6fpga_device::set_fpga_type(PlutoFPGA type){
+void pl6fpga_device::set_fpga_type(int type){
 	if(!(type >= invalid_fpga)){
 		fpga_type = type;
 		switch(fpga_type){
@@ -296,11 +296,38 @@ void pl6fpga_device::set_fpga_type(PlutoFPGA type){
 }
 	
 void pl6fpga_device::device_start(){
-	
+	save_item(NAME(xcra_reg));
+	save_item(NAME(xuctrl_reg));
+	save_item(NAME(xdurt_reg));
+	save_item(NAME(xfpurt0_reg));
+	save_item(NAME(xfpurt1_reg));
+	save_item(NAME(mpx_row));
+	save_item(NAME(mpx_regs));
+
+	save_item(NAME(fpga_type));
 }
 
 void pl6fpga_device::device_reset(){
-	// Needed?
+	fpga_type = invalid_fpga;
+	xcra_reg = 0;
+	xuctrl_reg = 0;
+	xdurt_reg = 0;
+	xfpurt0_reg = 0;
+	xfpurt1_reg = 0;
+
+	mpx_row = 0x0f;
+	memset(mpx_regs, 0, sizeof(mpx_regs));
+	for(int o = 0; o < 64; o++){
+		output_cb(o, 0);
+	}
+	for(int a = 0; a < 6; a++){
+		auxout_cb(a, 0);
+	}
+	for(int i = 0; i < 256; i++){
+		led_cb(i, 0);
+		lamp_cb(i, 0);
+	}
+
 }
 
 void pl6fpga_device::device_add_mconfig(machine_config &config)
