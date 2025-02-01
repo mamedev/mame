@@ -539,19 +539,6 @@ inline void drcbe_arm64::emit_ldr_str_base_mem(a64::Assembler &a, a64::Inst::Id 
 		return;
 	}
 
-	// If it's in a nearby page
-	const uint64_t pagebase = codeoffs & ~make_bitmask<uint64_t>(12);
-	const int64_t pagerel = (int64_t)ptr - pagebase;
-	if (is_valid_immediate_signed(pagerel, 21 + 12))
-	{
-		const uint64_t targetpage = (uint64_t)ptr & ~make_bitmask<uint64_t>(12);
-		const uint64_t pageoffs = (uint64_t)ptr & util::make_bitmask<uint64_t>(12);
-
-		a.adrp(MEM_SCRATCH_REG, targetpage);
-		a.emit(opcode, reg, arm::Mem(MEM_SCRATCH_REG, pageoffs));
-		return;
-	}
-
 	if (diff > 0 && is_valid_immediate(diff, 16))
 	{
 		a.mov(MEM_SCRATCH_REG, diff);
@@ -567,6 +554,27 @@ inline void drcbe_arm64::emit_ldr_str_base_mem(a64::Assembler &a, a64::Inst::Id 
 	else if (diff < 0 && emit_sub_optimized(a, MEM_SCRATCH_REG, BASE_REG, diff))
 	{
 		a.emit(opcode, reg, arm::Mem(MEM_SCRATCH_REG));
+		return;
+	}
+
+	// If it's in a nearby page
+	const uint64_t pagebase = codeoffs & ~make_bitmask<uint64_t>(12);
+	const int64_t pagerel = (int64_t)ptr - pagebase;
+	if (is_valid_immediate_signed(pagerel, 21 + 12))
+	{
+		const uint64_t targetpage = (uint64_t)ptr & ~make_bitmask<uint64_t>(12);
+		const uint64_t pageoffs = (uint64_t)ptr & util::make_bitmask<uint64_t>(12);
+
+		a.adrp(MEM_SCRATCH_REG, targetpage);
+		if (is_valid_offset(pageoffs, max_shift))
+		{
+			a.emit(opcode, reg, arm::Mem(MEM_SCRATCH_REG, pageoffs));
+		}
+		else
+		{
+			a.add(MEM_SCRATCH_REG, MEM_SCRATCH_REG, pageoffs);
+			a.emit(opcode, reg, arm::Mem(MEM_SCRATCH_REG));
+		}
 		return;
 	}
 
