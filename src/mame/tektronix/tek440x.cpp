@@ -580,8 +580,8 @@ private:
 	u8 videocntl_r();
 	void videocntl_w(u8 data);
 
-	uint8_t readnvram(offs_t offset);
-	void writenvram(offs_t offset, u8 data);
+	uint8_t nvram_r(offs_t offset);
+	void nvram_w(offs_t offset, u8 data);
 	uint8_t recall_r();
 	void recall_w(uint8_t data);
 	uint8_t store_r();
@@ -1398,18 +1398,18 @@ void tek440x_state::duart_w(offs_t offset, u8 data)
 	m_duart->write(offset, data);
 }
 
-uint8_t tek440x_state::readnvram(offs_t offset)
+uint8_t tek440x_state::nvram_r(offs_t offset)
 {
 	u8 data = m_novram->read(m_maincpu->space(0), offset);
 
-	LOG("readnvram(%d) => %02x pc(%08x)\n",offset, data, m_maincpu->pc());
+	LOG("nvram_r(%d) => %02x pc(%08x)\n",offset, data, m_maincpu->pc());
 
 	// kick it up to top 4 bits
 	return data << 4;
 }
-void tek440x_state::writenvram(offs_t offset, u8 data)
+void tek440x_state::nvram_w(offs_t offset, u8 data)
 {
-	LOG("writenvram(%d) <= %02x\n",offset, data);
+	LOG("nvram_w(%d) <= %02x\n",offset, data);
 
 	// duplicate in lower 4 bits
 	m_novram->write(offset, data | (data >> 4));
