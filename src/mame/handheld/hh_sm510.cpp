@@ -155,6 +155,7 @@ The MCUs used were not imported from Sharp, but cloned by USSR, renamed to
 #include "hh_sm510_single.lh"
 #include "hh_sm510_dualv.lh"
 #include "hh_sm510_dualh.lh"
+#include "hh_sm510_tripleh.lh"
 
 //#include "hh_sm510_test.lh" // common test-layout - use external artwork
 #include "hh_sm500_test.lh" // "
@@ -492,6 +493,17 @@ void hh_sm510_state::sm510_dualh(machine_config &config, u16 leftwidth, u16 left
 	mcfg_svg_screen(config, rightwidth, rightheight, "screen_right");
 
 	config.set_default_layout(layout_hh_sm510_dualh);
+}
+
+void hh_sm510_state::sm510_tripleh(machine_config &config, u16 leftwidth, u16 leftheight, u16 middlewidth, u16 middleheight, u16 rightwidth, u16 rightheight)
+{
+	mcfg_cpu_sm510(config);
+	mcfg_sound_r1(config);
+	mcfg_svg_screen(config, leftwidth, leftheight, "screen_left");
+	mcfg_svg_screen(config, middlewidth, middleheight, "screen_middle");
+	mcfg_svg_screen(config, rightwidth, rightheight, "screen_right");
+
+	config.set_default_layout(layout_hh_sm510_tripleh);
 }
 
 void hh_sm510_state::dualv_common(machine_config &config, u16 topwidth, u16 topheight, u16 botwidth, u16 botheight)
