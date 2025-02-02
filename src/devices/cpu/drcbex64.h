@@ -257,7 +257,7 @@ private:
 		uint32_t            ssemode;                // saved SSE mode
 		uint32_t            ssemodesave;            // temporary location for saving
 		uint32_t            ssecontrol[4];          // copy of the sse_control array
-		float               single1;                // 1.0 is single-precision
+		float               single1;                // 1.0 in single-precision
 		double              double1;                // 1.0 in double-precision
 
 		void *              stacksave;              // saved stack pointer

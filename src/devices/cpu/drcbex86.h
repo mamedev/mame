@@ -291,6 +291,9 @@ private:
 	uint64_t                m_reslo;                // extended low result
 	uint64_t                m_reshi;                // extended high result
 
+	// resolved memory handler functions
+	resolved_memory_accessors_vector m_memory_accessors;
+
 	// globals
 	typedef void (drcbe_x86::*opcode_generate_func)(asmjit::x86::Assembler &a, const uml::instruction &inst);
 	struct opcode_table_entry

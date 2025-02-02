@@ -214,7 +214,7 @@ struct resolved_memory_accessors
 	resolved_member_function write_qword;
 	resolved_member_function write_qword_masked;
 
-	void set(address_space &space) noexcept;
+	void set(address_space &space);
 };
 
 using resolved_memory_accessors_vector = std::vector<resolved_memory_accessors>;

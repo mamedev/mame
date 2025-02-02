@@ -114,6 +114,12 @@ namespace {
 //  CONSTANTS
 //**************************************************************************
 
+#ifdef _WIN32
+constexpr bool USE_THISCALL = true;
+#else
+constexpr bool USE_THISCALL = false;
+#endif
+
 const uint32_t PTYPE_M    = 1 << parameter::PTYPE_MEMORY;
 const uint32_t PTYPE_I    = 1 << parameter::PTYPE_IMMEDIATE;
 const uint32_t PTYPE_R    = 1 << parameter::PTYPE_INT_REGISTER;
@@ -538,32 +544,32 @@ inline bool drcbe_x86::can_skip_upper_load(Assembler &a, uint32_t *memref, Gp co
 //  drcbe_x86 - constructor
 //-------------------------------------------------
 
-drcbe_x86::drcbe_x86(drcuml_state &drcuml, device_t &device, drc_cache &cache, uint32_t flags, int modes, int addrbits, int ignorebits)
-	: drcbe_interface(drcuml, cache, device),
-		m_hash(cache, modes, addrbits, ignorebits),
-		m_map(cache, 0),
-		m_log(nullptr),
-		m_log_asmjit(nullptr),
-		m_logged_common(false),
-		m_sse3(CpuInfo::host().features().x86().hasSSE3()),
-		m_entry(nullptr),
-		m_exit(nullptr),
-		m_nocode(nullptr),
-		m_save(nullptr),
-		m_restore(nullptr),
-		m_last_lower_reg(Gp()),
-		m_last_lower_pc(nullptr),
-		m_last_lower_addr(nullptr),
-		m_last_upper_reg(Gp()),
-		m_last_upper_pc(nullptr),
-		m_last_upper_addr(nullptr),
-		m_fptemp(0),
-		m_fpumode(0),
-		m_fmodesave(0),
-		m_stacksave(nullptr),
-		m_hashstacksave(nullptr),
-		m_reslo(0),
-		m_reshi(0)
+drcbe_x86::drcbe_x86(drcuml_state &drcuml, device_t &device, drc_cache &cache, uint32_t flags, int modes, int addrbits, int ignorebits) :
+	drcbe_interface(drcuml, cache, device)
+	, m_hash(cache, modes, addrbits, ignorebits)
+	, m_map(cache, 0)
+	, m_log(nullptr)
+	, m_log_asmjit(nullptr)
+	, m_logged_common(false)
+	, m_sse3(CpuInfo::host().features().x86().hasSSE3())
+	, m_entry(nullptr)
+	, m_exit(nullptr)
+	, m_nocode(nullptr)
+	, m_save(nullptr)
+	, m_restore(nullptr)
+	, m_last_lower_reg(Gp())
+	, m_last_lower_pc(nullptr)
+	, m_last_lower_addr(nullptr)
+	, m_last_upper_reg(Gp())
+	, m_last_upper_pc(nullptr)
+	, m_last_upper_addr(nullptr)
+	, m_fptemp(0)
+	, m_fpumode(0)
+	, m_fmodesave(0)
+	, m_stacksave(nullptr)
+	, m_hashstacksave(nullptr)
+	, m_reslo(0)
+	, m_reshi(0)
 {
 	// compute hi pointers for each register
 	for (int regnum = 0; regnum < std::size(int_register_map); regnum++)
@@ -593,6 +599,14 @@ drcbe_x86::drcbe_x86(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 		if (entry & FLAG_S) flags |= 0x080;
 		if (entry & FLAG_V) flags |= 0x800;
 		flags_unmap[entry] = flags;
+	}
+
+	// resolve the actual addresses of member functions we need to call
+	m_memory_accessors.resize(m_space.size());
+	for (int space = 0; m_space.size() > space; ++space)
+	{
+		if (m_space[space])
+			m_memory_accessors[space].set(*m_space[space]);
 	}
 
 	// build the opcode table (static but it doesn't hurt to regenerate it)
@@ -3448,52 +3462,75 @@ void drcbe_x86::op_read(Assembler &a, const instruction &inst)
 	// pick a target register for the general case
 	Gp const dstreg = dstp.select_register(eax);
 
-	// set up a call to the read byte handler
-	emit_mov_m32_p32(a, dword_ptr(esp, 4), addrp);                                      // mov    [esp+4],addrp
-	a.mov(dword_ptr(esp, 0), imm(m_space[spacesizep.space()]));                         // mov    [esp],space
+	// set up a call to the read handler
+	auto const &accessors = m_memory_accessors[spacesizep.space()];
+	emit_mov_m32_p32(a, dword_ptr(esp, USE_THISCALL ? 0 : 4), addrp);
 	if (spacesizep.size() == SIZE_BYTE)
 	{
-		a.call(imm(m_accessors[spacesizep.space()].read_byte));                         // call   read_byte
-		a.movzx(dstreg, al);                                                            // movzx  dstreg,al
+		if (USE_THISCALL)
+			a.mov(ecx, imm(accessors.read_byte.obj));
+		else
+			a.mov(dword_ptr(esp, 0), imm(accessors.read_byte.obj));
+		a.call(imm(accessors.read_byte.func));
+		if (USE_THISCALL)
+			a.sub(esp, 4);
+		a.movzx(dstreg, al);
 	}
 	else if (spacesizep.size() == SIZE_WORD)
 	{
-		a.call(imm(m_accessors[spacesizep.space()].read_word));                         // call   read_word
-		a.movzx(dstreg, ax);                                                            // movzx  dstreg,ax
+		if (USE_THISCALL)
+			a.mov(ecx, imm(accessors.read_word.obj));
+		else
+			a.mov(dword_ptr(esp, 0), imm(accessors.read_word.obj));
+		a.call(imm(accessors.read_word.func));
+		if (USE_THISCALL)
+			a.sub(esp, 4);
+		a.movzx(dstreg, ax);
 	}
 	else if (spacesizep.size() == SIZE_DWORD)
 	{
-		a.call(imm(m_accessors[spacesizep.space()].read_dword));                        // call   read_dword
-		a.mov(dstreg, eax);                                                             // mov    dstreg,eax
+		if (USE_THISCALL)
+			a.mov(ecx, imm(accessors.read_dword.obj));
+		else
+			a.mov(dword_ptr(esp, 0), imm(accessors.read_dword.obj));
+		a.call(imm(accessors.read_dword.func));
+		if (USE_THISCALL)
+			a.sub(esp, 4);
+		a.mov(dstreg, eax);
 	}
 	else if (spacesizep.size() == SIZE_QWORD)
 	{
-		a.call(imm(m_accessors[spacesizep.space()].read_qword));                        // call   read_qword
-		a.mov(dstreg, eax);                                                             // mov    dstreg,eax
+		if (USE_THISCALL)
+			a.mov(ecx, imm(accessors.read_qword.obj));
+		else
+			a.mov(dword_ptr(esp, 0), imm(accessors.read_qword.obj));
+		a.call(imm(accessors.read_qword.func));
+		if (USE_THISCALL)
+			a.sub(esp, 4);
+		a.mov(dstreg, eax);
 	}
 
 	// store low 32 bits
-	emit_mov_p32_r32(a, dstp, dstreg);                                                  // mov    dstp,dstreg
+	emit_mov_p32_r32(a, dstp, dstreg);
 
 	// 64-bit form stores upper 32 bits
 	if (inst.size() == 8)
 	{
-		// 1, 2, or 4-byte case
 		if (spacesizep.size() != SIZE_QWORD)
 		{
+			// 1, 2, or 4-byte case
 			if (dstp.is_memory())
-				a.mov(MABS(dstp.memory(4), 4), 0);                                      // mov   [dstp+4],0
+				a.mov(MABS(dstp.memory(4), 4), 0);
 			else if (dstp.is_int_register())
-				a.mov(MABS(m_reghi[dstp.ireg()], 4), 0);                                // mov   [reghi],0
+				a.mov(MABS(m_reghi[dstp.ireg()], 4), 0);
 		}
-
-		// 8-byte case
 		else
 		{
+			// 8-byte case
 			if (dstp.is_memory())
-				a.mov(MABS(dstp.memory(4)), edx);                                       // mov   [dstp+4],edx
+				a.mov(MABS(dstp.memory(4)), edx);
 			else if (dstp.is_int_register())
-				a.mov(MABS(m_reghi[dstp.ireg()]), edx);                                 // mov   [reghi],edx
+				a.mov(MABS(m_reghi[dstp.ireg()]), edx);
 		}
 	}
 }
@@ -3521,55 +3558,78 @@ void drcbe_x86::op_readm(Assembler &a, const instruction &inst)
 	Gp const dstreg = dstp.select_register(eax);
 
 	// set up a call to the read byte handler
+	auto const &accessors = m_memory_accessors[spacesizep.space()];
 	if (spacesizep.size() != SIZE_QWORD)
-		emit_mov_m32_p32(a, dword_ptr(esp, 8), maskp);                                  // mov    [esp+8],maskp
+		emit_mov_m32_p32(a, dword_ptr(esp, USE_THISCALL ? 4 : 8), maskp);
 	else
-		emit_mov_m64_p64(a, qword_ptr(esp, 8), maskp);                                  // mov    [esp+8],maskp
-	emit_mov_m32_p32(a, dword_ptr(esp, 4), addrp);                                      // mov    [esp+4],addrp
-	a.mov(dword_ptr(esp, 0), imm(m_space[spacesizep.space()]));                         // mov    [esp],space
+		emit_mov_m64_p64(a, qword_ptr(esp, USE_THISCALL ? 4 : 8), maskp);
+	emit_mov_m32_p32(a, dword_ptr(esp, USE_THISCALL ? 0 : 4), addrp);
 	if (spacesizep.size() == SIZE_BYTE)
 	{
-		a.call(imm(m_accessors[spacesizep.space()].read_byte_masked));                  // call   read_byte_masked
-		a.movzx(dstreg, al);                                                            // movzx  dstreg,al
+		if (USE_THISCALL)
+			a.mov(ecx, imm(accessors.read_byte_masked.obj));
+		else
+			a.mov(dword_ptr(esp, 0), imm(accessors.read_byte_masked.obj));
+		a.call(imm(accessors.read_byte_masked.func));
+		if (USE_THISCALL)
+			a.sub(esp, 8);
+		a.movzx(dstreg, al);
 	}
 	else if (spacesizep.size() == SIZE_WORD)
 	{
-		a.call(imm(m_accessors[spacesizep.space()].read_word_masked));                  // call   read_word_masked
-		a.movzx(dstreg, ax);                                                            // movzx  dstreg,ax
+		if (USE_THISCALL)
+			a.mov(ecx, imm(accessors.read_word_masked.obj));
+		else
+			a.mov(dword_ptr(esp, 0), imm(accessors.read_word_masked.obj));
+		a.call(imm(accessors.read_word_masked.func));
+		if (USE_THISCALL)
+			a.sub(esp, 8);
+		a.movzx(dstreg, ax);
 	}
 	else if (spacesizep.size() == SIZE_DWORD)
 	{
-		a.call(imm(m_accessors[spacesizep.space()].read_dword_masked));                 // call   read_dword_masked
-		a.mov(dstreg, eax);                                                             // mov    dstreg,eax
+		if (USE_THISCALL)
+			a.mov(ecx, imm(accessors.read_dword_masked.obj));
+		else
+			a.mov(dword_ptr(esp, 0), imm(accessors.read_dword_masked.obj));
+		a.call(imm(accessors.read_dword_masked.func));
+		if (USE_THISCALL)
+			a.sub(esp, 8);
+		a.mov(dstreg, eax);
 	}
 	else if (spacesizep.size() == SIZE_QWORD)
 	{
-		a.call(imm(m_accessors[spacesizep.space()].read_qword_masked));                 // call   read_qword_masked
-		a.mov(dstreg, eax);                                                             // mov    dstreg,eax
+		if (USE_THISCALL)
+			a.mov(ecx, imm(accessors.read_qword_masked.obj));
+		else
+			a.mov(dword_ptr(esp, 0), imm(accessors.read_qword_masked.obj));
+		a.call(imm(accessors.read_qword_masked.func));
+		if (USE_THISCALL)
+			a.sub(esp, 12);
+		a.mov(dstreg, eax);
 	}
 
 	// store low 32 bits
-	emit_mov_p32_r32(a, dstp, dstreg);                                                  // mov    dstp,dstreg
+	emit_mov_p32_r32(a, dstp, dstreg);
 
 	// 64-bit form stores upper 32 bits
 	if (inst.size() == 8)
 	{
-		// 1, 2, or 4-byte case
 		if (spacesizep.size() != SIZE_QWORD)
 		{
+			// 1, 2, or 4-byte case
 			if (dstp.is_memory())
-				a.mov(MABS(dstp.memory(4), 4), 0);                                      // mov   [dstp+4],0
+				a.mov(MABS(dstp.memory(4), 4), 0);
 			else if (dstp.is_int_register())
-				a.mov(MABS(m_reghi[dstp.ireg()], 4), 0);                                // mov   [reghi],0
+				a.mov(MABS(m_reghi[dstp.ireg()], 4), 0);
 		}
-
-		// 8-byte case
 		else
 		{
+			// 8-byte case
 			if (dstp.is_memory())
-				a.mov(MABS(dstp.memory(4)), edx);                                       // mov   [dstp+4],edx
+				a.mov(MABS(dstp.memory(4)), edx);
 			else if (dstp.is_int_register())
-				a.mov(MABS(m_reghi[dstp.ireg()]), edx);                                 // mov   [reghi],edx
+				a.mov(MABS(m_reghi[dstp.ireg()]), edx);
 		}
 	}
 }
@@ -3593,20 +3653,52 @@ void drcbe_x86::op_write(Assembler &a, const instruction &inst)
 	assert(spacesizep.is_size_space());
 
 	// set up a call to the write byte handler
+	auto const &accessors = m_memory_accessors[spacesizep.space()];
 	if (spacesizep.size() != SIZE_QWORD)
-		emit_mov_m32_p32(a, dword_ptr(esp, 8), srcp);                                   // mov    [esp+8],srcp
+		emit_mov_m32_p32(a, dword_ptr(esp, USE_THISCALL ? 4 : 8), srcp);
 	else
-		emit_mov_m64_p64(a, qword_ptr(esp, 8), srcp);                                   // mov    [esp+8],srcp
-	emit_mov_m32_p32(a, dword_ptr(esp, 4), addrp);                                      // mov    [esp+4],addrp
-	a.mov(dword_ptr(esp, 0), imm(m_space[spacesizep.space()]));                         // mov    [esp],space
+		emit_mov_m64_p64(a, qword_ptr(esp, USE_THISCALL ? 4 : 8), srcp);
+	emit_mov_m32_p32(a, dword_ptr(esp, USE_THISCALL ? 0 : 4), addrp);
 	if (spacesizep.size() == SIZE_BYTE)
-		a.call(imm(m_accessors[spacesizep.space()].write_byte));                        // call   write_byte
+	{
+		if (USE_THISCALL)
+			a.mov(ecx, imm(accessors.write_byte.obj));
+		else
+			a.mov(dword_ptr(esp, 0), imm(accessors.write_byte.obj));
+		a.call(imm(accessors.write_byte.func));
+		if (USE_THISCALL)
+			a.sub(esp, 8);
+	}
 	else if (spacesizep.size() == SIZE_WORD)
-		a.call(imm(m_accessors[spacesizep.space()].write_word));                        // call   write_word
+	{
+		if (USE_THISCALL)
+			a.mov(ecx, imm(accessors.write_word.obj));
+		else
+			a.mov(dword_ptr(esp, 0), imm(accessors.write_word.obj));
+		a.call(imm(accessors.write_word.func));
+		if (USE_THISCALL)
+			a.sub(esp, 8);
+	}
 	else if (spacesizep.size() == SIZE_DWORD)
-		a.call(imm(m_accessors[spacesizep.space()].write_dword));                       // call   write_dword
+	{
+		if (USE_THISCALL)
+			a.mov(ecx, imm(accessors.write_dword.obj));
+		else
+			a.mov(dword_ptr(esp, 0), imm(accessors.write_dword.obj));
+		a.call(imm(accessors.write_dword.func));
+		if (USE_THISCALL)
+			a.sub(esp, 8);
+	}
 	else if (spacesizep.size() == SIZE_QWORD)
-		a.call(imm(m_accessors[spacesizep.space()].write_qword));                       // call   write_qword
+	{
+		if (USE_THISCALL)
+			a.mov(ecx, imm(accessors.write_qword.obj));
+		else
+			a.mov(dword_ptr(esp, 0), imm(accessors.write_qword.obj));
+		a.call(imm(accessors.write_qword.func));
+		if (USE_THISCALL)
+			a.sub(esp, 12);
+	}
 }
 
 
@@ -3629,26 +3721,58 @@ void drcbe_x86::op_writem(Assembler &a, const instruction &inst)
 	assert(spacesizep.is_size_space());
 
 	// set up a call to the write byte handler
+	auto const &accessors = m_memory_accessors[spacesizep.space()];
 	if (spacesizep.size() != SIZE_QWORD)
 	{
-		emit_mov_m32_p32(a, dword_ptr(esp, 12), maskp);                                 // mov    [esp+12],maskp
-		emit_mov_m32_p32(a, dword_ptr(esp, 8), srcp);                                   // mov    [esp+8],srcp
+		emit_mov_m32_p32(a, dword_ptr(esp, USE_THISCALL ? 8 : 12), maskp);
+		emit_mov_m32_p32(a, dword_ptr(esp, USE_THISCALL ? 4 : 8), srcp);
 	}
 	else
 	{
-		emit_mov_m64_p64(a, qword_ptr(esp, 16), maskp);                                 // mov    [esp+16],maskp
-		emit_mov_m64_p64(a, qword_ptr(esp, 8), srcp);                                   // mov    [esp+8],srcp
+		emit_mov_m64_p64(a, qword_ptr(esp, USE_THISCALL ? 12 : 16), maskp);
+		emit_mov_m64_p64(a, qword_ptr(esp, USE_THISCALL ? 4 : 8), srcp);
 	}
-	emit_mov_m32_p32(a, dword_ptr(esp, 4), addrp);                                      // mov    [esp+4],addrp
-	a.mov(dword_ptr(esp, 0), imm(m_space[spacesizep.space()]));                         // mov    [esp],space
+	emit_mov_m32_p32(a, dword_ptr(esp, USE_THISCALL ? 0 : 4), addrp);
 	if (spacesizep.size() == SIZE_BYTE)
-		a.call(imm(m_accessors[spacesizep.space()].write_byte_masked));                 // call   write_byte_masked
+	{
+		if (USE_THISCALL)
+			a.mov(ecx, imm(accessors.write_byte_masked.obj));
+		else
+			a.mov(dword_ptr(esp, 0), imm(accessors.write_byte_masked.obj));
+		a.call(imm(accessors.write_byte_masked.func));
+		if (USE_THISCALL)
+			a.sub(esp, 12);
+	}
 	else if (spacesizep.size() == SIZE_WORD)
-		a.call(imm(m_accessors[spacesizep.space()].write_word_masked));                 // call   write_word_masked
+	{
+		if (USE_THISCALL)
+			a.mov(ecx, imm(accessors.write_word_masked.obj));
+		else
+			a.mov(dword_ptr(esp, 0), imm(accessors.write_word_masked.obj));
+		a.call(imm(accessors.write_word_masked.func));
+		if (USE_THISCALL)
+			a.sub(esp, 12);
+	}
 	else if (spacesizep.size() == SIZE_DWORD)
-		a.call(imm(m_accessors[spacesizep.space()].write_dword_masked));                // call   write_dword_masked
+	{
+		if (USE_THISCALL)
+			a.mov(ecx, imm(accessors.write_dword_masked.obj));
+		else
+			a.mov(dword_ptr(esp, 0), imm(accessors.write_dword_masked.obj));
+		a.call(imm(accessors.write_dword_masked.func));
+		if (USE_THISCALL)
+			a.sub(esp, 12);
+	}
 	else if (spacesizep.size() == SIZE_QWORD)
-		a.call(imm(m_accessors[spacesizep.space()].write_qword_masked));                // call   write_qword_masked
+	{
+		if (USE_THISCALL)
+			a.mov(ecx, imm(accessors.write_qword_masked.obj));
+		else
+			a.mov(dword_ptr(esp, 0), imm(accessors.write_qword_masked.obj));
+		a.call(imm(accessors.write_qword_masked.func));
+		if (USE_THISCALL)
+			a.sub(esp, 20);
+	}
 }
 
 
@@ -6066,18 +6190,22 @@ void drcbe_x86::op_fread(Assembler &a, const instruction &inst)
 	assert((1 << spacep.size()) == inst.size());
 
 	// set up a call to the read dword/qword handler
-	emit_mov_m32_p32(a, dword_ptr(esp, 4), addrp);                                      // mov    [esp+4],addrp
-	a.mov(dword_ptr(esp, 0), imm(m_space[spacep.space()]));                             // mov    [esp],space
-	if (inst.size() == 4)
-		a.call(imm(m_accessors[spacep.space()].read_dword));                            // call   read_dword
-	else if (inst.size() == 8)
-		a.call(imm(m_accessors[spacep.space()].read_qword));                            // call   read_qword
+	auto const &accessors = m_memory_accessors[spacep.space()];
+	auto const &accessor = (inst.size() == 4) ? accessors.read_dword : accessors.read_qword;
+	emit_mov_m32_p32(a, dword_ptr(esp, USE_THISCALL ? 0 : 4), addrp);
+	if (USE_THISCALL)
+		a.mov(ecx, imm(accessor.obj));
+	else
+		a.mov(dword_ptr(esp, 0), imm(accessor.obj));
+	a.call(imm(accessor.func));
+	if (USE_THISCALL)
+		a.sub(esp, 4);
 
 	// store result
 	if (inst.size() == 4)
-		emit_mov_p32_r32(a, dstp, eax);                                                 // mov   dstp,eax
+		emit_mov_p32_r32(a, dstp, eax);
 	else if (inst.size() == 8)
-		emit_mov_p64_r64(a, dstp, eax, edx);                                            // mov   dstp,edx:eax
+		emit_mov_p64_r64(a, dstp, eax, edx);
 }
 
 
@@ -6100,16 +6228,19 @@ void drcbe_x86::op_fwrite(Assembler &a, const instruction &inst)
 	assert((1 << spacep.size()) == inst.size());
 
 	// set up a call to the write dword/qword handler
+	auto const &accessors = m_memory_accessors[spacep.space()];
+	auto const &accessor = (inst.size() == 4) ? accessors.write_dword : accessors.write_qword;
 	if (inst.size() == 4)
-		emit_mov_m32_p32(a, dword_ptr(esp, 8), srcp);                                   // mov    [esp+8],srcp
+		emit_mov_m32_p32(a, dword_ptr(esp, USE_THISCALL ? 4 : 8), srcp);
 	else if (inst.size() == 8)
-		emit_mov_m64_p64(a, qword_ptr(esp, 8), srcp);                                   // mov    [esp+8],srcp
-	emit_mov_m32_p32(a, dword_ptr(esp, 4), addrp);                                      // mov    [esp+4],addrp
-	a.mov(dword_ptr(esp, 0), imm(m_space[spacep.space()]));                             // mov    [esp],space
-	if (inst.size() == 4)
-		a.call(imm(m_accessors[spacep.space()].write_dword));                           // call   write_dword
-	else if (inst.size() == 8)
-		a.call(imm(m_accessors[spacep.space()].write_qword));                           // call   write_qword
+		emit_mov_m64_p64(a, qword_ptr(esp, USE_THISCALL ? 4 : 8), srcp);
+	if (USE_THISCALL)
+		a.mov(ecx, imm(accessor.obj));
+	else
+		a.mov(dword_ptr(esp, 0), imm(accessor.obj));
+	a.call(imm(accessor.func));
+	if (USE_THISCALL)
+		a.sub(esp, (inst.size() == 4) ? 8 : 12);
 }
 
 

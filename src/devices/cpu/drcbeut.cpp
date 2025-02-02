@@ -590,7 +590,7 @@ void drc_label_list::oob_callback(drccodeptr *codeptr, void *param1, void *param
 //  set - bind to address space
 //-------------------------------------------------
 
-void resolved_memory_accessors::set(address_space &space) noexcept
+void resolved_memory_accessors::set(address_space &space)
 {
 	read_byte          .set(space, static_cast<u8  (address_space::*)(offs_t)     >(&address_space::read_byte));
 	read_byte_masked   .set(space, static_cast<u8  (address_space::*)(offs_t, u8) >(&address_space::read_byte));
@@ -609,6 +609,15 @@ void resolved_memory_accessors::set(address_space &space) noexcept
 	write_dword_masked .set(space, static_cast<void (address_space::*)(offs_t, u32, u32)>(&address_space::write_dword));
 	write_qword        .set(space, static_cast<void (address_space::*)(offs_t, u64)     >(&address_space::write_qword));
 	write_qword_masked .set(space, static_cast<void (address_space::*)(offs_t, u64, u64)>(&address_space::write_qword));
+
+	if (
+			!read_byte  || !read_byte_masked  || !write_byte  || !write_byte_masked  ||
+			!read_word  || !read_word_masked  || !write_word  || !write_word_masked  ||
+			!read_dword || !read_dword_masked || !write_dword || !write_dword_masked ||
+			!read_qword || !read_qword_masked || !write_qword || !write_qword_masked)
+	{
+		throw emu_fatalerror("Error resolving address space accessor member functions!\n");
+	}
 }
 
 } // namespace drc
