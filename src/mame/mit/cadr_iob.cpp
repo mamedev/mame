@@ -33,6 +33,7 @@ TODO:
 
 
 //#define VERBOSE (LOG_GENERAL)
+//#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 
