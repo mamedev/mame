@@ -214,7 +214,7 @@ const uint32_t PTYPE_MR   = PTYPE_M | PTYPE_R;
 const uint32_t PTYPE_MRI  = PTYPE_M | PTYPE_R | PTYPE_I;
 const uint32_t PTYPE_MF   = PTYPE_M | PTYPE_F;
 
-#ifdef X64_WINDOWS_ABI
+#ifdef _WIN32
 
 const Gp::Id REG_PARAM1    = Gp::kIdCx;
 const Gp::Id REG_PARAM2    = Gp::kIdDx;
@@ -233,7 +233,7 @@ const Gp::Id REG_PARAM4    = Gp::kIdCx;
 // register mapping tables
 const Gp::Id int_register_map[REG_I_COUNT] =
 {
-#ifdef X64_WINDOWS_ABI
+#ifdef _WIN32
 	Gp::kIdBx, Gp::kIdSi, Gp::kIdDi, Gp::kIdR12, Gp::kIdR13, Gp::kIdR14, Gp::kIdR15,
 #else
 	Gp::kIdBx, Gp::kIdR12, Gp::kIdR13, Gp::kIdR14, Gp::kIdR15
@@ -242,10 +242,10 @@ const Gp::Id int_register_map[REG_I_COUNT] =
 
 uint32_t float_register_map[REG_F_COUNT] =
 {
-#ifdef X64_WINDOWS_ABI
+#ifdef _WIN32
 	6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 #else
-	// on AMD x64 ABI, XMM0-7 are FP function args.  since this code has no args, and we
+	// on SysV x64 ABI, XMM0-7 are FP function args.  since this code has no args, and we
 	// save/restore them around CALLC, they should be safe for our use.
 	0, 1, 2, 3, 4, 5, 6, 7
 #endif

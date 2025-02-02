@@ -448,7 +448,6 @@ protected:
 	uint32_t        m_byte_xor;
 	uint32_t        m_word_xor;
 	uint32_t        m_dword_xor;
-	data_accessors  m_memory;
 
 	/* cache memory */
 	size_t          c_icache_size;
