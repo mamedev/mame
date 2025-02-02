@@ -196,21 +196,21 @@ public:
 
 // helper functions
 
-a64::Vec select_register(a64::Vec const &reg, uint32_t regsize)
+inline a64::Vec select_register(a64::Vec const &reg, uint32_t regsize)
 {
 	if (regsize == 4)
 		return reg.s();
 	return reg.d();
 }
 
-a64::Gp select_register(a64::Gp const &reg, uint32_t regsize)
+inline a64::Gp select_register(a64::Gp const &reg, uint32_t regsize)
 {
 	if (regsize == 4)
 		return reg.w();
 	return reg.x();
 }
 
-bool is_valid_immediate_mask(uint64_t val, size_t bytes)
+inline bool is_valid_immediate_mask(uint64_t val, size_t bytes)
 {
 	// all zeros and all ones aren't allowed, and disallow any value with bits outside of the max bit range
 	if (val == 0 || val == make_bitmask<uint64_t>(bytes * 8))
@@ -231,18 +231,28 @@ bool is_valid_immediate_mask(uint64_t val, size_t bytes)
 	return population_count_64(val) == head - tail;
 }
 
-bool is_valid_immediate(uint64_t val, size_t bits)
+inline bool is_valid_immediate(uint64_t val, size_t bits)
 {
 	assert(bits < 64);
 	return val < (uint64_t(1) << bits);
 }
 
-bool is_valid_immediate_signed(int64_t val, size_t bits)
+inline constexpr bool is_valid_immediate_signed(int64_t val, size_t bits)
 {
 	return util::sext(val, bits) == val;
 }
 
-bool emit_add_optimized(a64::Assembler &a, const a64::Gp &dst, const a64::Gp &src, int64_t val)
+inline constexpr bool is_valid_offset(int64_t diff, int max_shift)
+{
+	if (is_valid_immediate_signed(diff, 9))
+		return true; // 9-bit signed offset
+	else if ((diff >= 0) && (diff < (1 << (12 + max_shift))) && !(diff & make_bitmask<int64_t>(max_shift)))
+		return true; // 12-bit unsigned offset shifted by operand size
+	else
+		return false;
+}
+
+inline bool emit_add_optimized(a64::Assembler &a, const a64::Gp &dst, const a64::Gp &src, int64_t val)
 {
 	// If the bottom 12 bits are 0s then an optimized form can be used if the remaining bits are <= 12
 	if (is_valid_immediate(val, 12) || ((val & 0xfff) == 0 && is_valid_immediate(val >> 12, 12)))
@@ -254,7 +264,7 @@ bool emit_add_optimized(a64::Assembler &a, const a64::Gp &dst, const a64::Gp &sr
 	return false;
 }
 
-bool emit_sub_optimized(a64::Assembler &a, const a64::Gp &dst, const a64::Gp &src, int64_t val)
+inline bool emit_sub_optimized(a64::Assembler &a, const a64::Gp &dst, const a64::Gp &src, int64_t val)
 {
 	if (val < 0)
 		val = -val;
@@ -509,11 +519,11 @@ void drcbe_arm64::get_imm_relative(a64::Assembler &a, const a64::Gp &reg, const 
 	a.mov(reg, val);
 }
 
-void drcbe_arm64::emit_ldr_str_base_mem(a64::Assembler &a, a64::Inst::Id opcode, const a64::Reg &reg, const void *ptr) const
+inline void drcbe_arm64::emit_ldr_str_base_mem(a64::Assembler &a, a64::Inst::Id opcode, const a64::Reg &reg, int max_shift, const void *ptr) const
 {
-	// If it can fit as a constant offset
+	// If it can fit as an immediate offset
 	const int64_t diff = (int64_t)ptr - (int64_t)m_baseptr;
-	if (is_valid_immediate_signed(diff, 9))
+	if (is_valid_offset(diff, max_shift))
 	{
 		a.emit(opcode, reg, arm::Mem(BASE_REG, diff));
 		return;
@@ -547,31 +557,30 @@ void drcbe_arm64::emit_ldr_str_base_mem(a64::Assembler &a, a64::Inst::Id opcode,
 		return;
 	}
 
+	// If it's in a nearby page
+	const uint64_t pagebase = codeoffs & ~make_bitmask<uint64_t>(12);
+	const int64_t pagerel = (int64_t)ptr - pagebase;
+	if (is_valid_immediate_signed(pagerel, 21 + 12))
+	{
+		const uint64_t targetpage = (uint64_t)ptr & ~make_bitmask<uint64_t>(12);
+		const uint64_t pageoffs = (uint64_t)ptr & util::make_bitmask<uint64_t>(12);
+
+		a.adrp(MEM_SCRATCH_REG, targetpage);
+		if (is_valid_offset(pageoffs, max_shift))
+		{
+			a.emit(opcode, reg, arm::Mem(MEM_SCRATCH_REG, pageoffs));
+		}
+		else
+		{
+			a.add(MEM_SCRATCH_REG, MEM_SCRATCH_REG, pageoffs);
+			a.emit(opcode, reg, arm::Mem(MEM_SCRATCH_REG));
+		}
+		return;
+	}
+
 	if (diff >= 0)
 	{
-		int shift = 0;
-		int max_shift = 0;
-
-		if (opcode == a64::Inst::kIdLdrb || opcode == a64::Inst::kIdLdrsb)
-			max_shift = 0;
-		else if (opcode == a64::Inst::kIdLdrh || opcode == a64::Inst::kIdLdrsh)
-			max_shift = 1;
-		else if (opcode == a64::Inst::kIdLdrsw)
-			max_shift = 2;
-		else
-			max_shift = (reg.isGpW() || reg.isVecS()) ? 2 : 3;
-
-		for (int i = 0; i < 64 && max_shift > 0; i++)
-		{
-			if ((uint64_t)ptr & ((uint64_t)(1) << i))
-			{
-				shift = i;
-				break;
-			}
-		}
-
-		if (shift > max_shift)
-			shift = max_shift;
+		const int shift = (diff & make_bitmask<int64_t>(max_shift)) ? 0 : max_shift;
 
 		if (is_valid_immediate(diff >> shift, 32))
 		{
@@ -586,44 +595,23 @@ void drcbe_arm64::emit_ldr_str_base_mem(a64::Assembler &a, a64::Inst::Id opcode,
 		}
 	}
 
-	const uint64_t pagebase = codeoffs & ~make_bitmask<uint64_t>(12);
-	const int64_t pagerel = (int64_t)ptr - pagebase;
-	if (is_valid_immediate_signed(pagerel, 21 + 12))
-	{
-		const uint64_t targetpage = (uint64_t)ptr & ~make_bitmask<uint64_t>(12);
-		const uint64_t pageoffs = (uint64_t)ptr & util::make_bitmask<uint64_t>(12);
-
-		a.adrp(MEM_SCRATCH_REG, targetpage);
-
-		if (is_valid_immediate_signed(pageoffs, 9))
-		{
-			a.emit(opcode, reg, arm::Mem(MEM_SCRATCH_REG, pageoffs));
-			return;
-		}
-		else if (emit_add_optimized(a, MEM_SCRATCH_REG, MEM_SCRATCH_REG, pageoffs))
-		{
-			a.emit(opcode, reg, arm::Mem(MEM_SCRATCH_REG));
-			return;
-		}
-	}
-
 	// Can't optimize it at all, most likely becomes 4 MOV commands
 	a.mov(MEM_SCRATCH_REG, ptr);
 	a.emit(opcode, reg, arm::Mem(MEM_SCRATCH_REG));
 }
 
-void drcbe_arm64::emit_ldr_mem(a64::Assembler &a, const a64::Gp &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdLdr, reg, ptr); }
-void drcbe_arm64::emit_ldrb_mem(a64::Assembler &a, const a64::Gp &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdLdrb, reg, ptr); }
-void drcbe_arm64::emit_ldrh_mem(a64::Assembler &a, const a64::Gp &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdLdrh, reg, ptr); }
-void drcbe_arm64::emit_ldrsb_mem(a64::Assembler &a, const a64::Gp &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdLdrsb, reg, ptr); }
-void drcbe_arm64::emit_ldrsh_mem(a64::Assembler &a, const a64::Gp &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdLdrsh, reg, ptr); }
-void drcbe_arm64::emit_ldrsw_mem(a64::Assembler &a, const a64::Gp &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdLdrsw, reg, ptr); }
-void drcbe_arm64::emit_str_mem(a64::Assembler &a, const a64::Gp &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdStr, reg, ptr); }
-void drcbe_arm64::emit_strb_mem(a64::Assembler &a, const a64::Gp &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdStrb, reg, ptr); }
-void drcbe_arm64::emit_strh_mem(a64::Assembler &a, const a64::Gp &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdStrh, reg, ptr); }
+void drcbe_arm64::emit_ldr_mem(a64::Assembler &a, const a64::Gp &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdLdr, reg, reg.isGpW() ? 2 : 3, ptr); }
+void drcbe_arm64::emit_ldrb_mem(a64::Assembler &a, const a64::Gp &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdLdrb, reg, 0, ptr); }
+void drcbe_arm64::emit_ldrh_mem(a64::Assembler &a, const a64::Gp &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdLdrh, reg, 1, ptr); }
+void drcbe_arm64::emit_ldrsb_mem(a64::Assembler &a, const a64::Gp &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdLdrsb, reg, 0, ptr); }
+void drcbe_arm64::emit_ldrsh_mem(a64::Assembler &a, const a64::Gp &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdLdrsh, reg, 1, ptr); }
+void drcbe_arm64::emit_ldrsw_mem(a64::Assembler &a, const a64::Gp &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdLdrsw, reg, 2, ptr); }
+void drcbe_arm64::emit_str_mem(a64::Assembler &a, const a64::Gp &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdStr, reg, reg.isGpW() ? 2 : 3, ptr); }
+void drcbe_arm64::emit_strb_mem(a64::Assembler &a, const a64::Gp &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdStrb, reg, 0, ptr); }
+void drcbe_arm64::emit_strh_mem(a64::Assembler &a, const a64::Gp &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdStrh, reg, 1, ptr); }
 
-void drcbe_arm64::emit_float_ldr_mem(a64::Assembler &a, const a64::Vec &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdLdr_v, reg, ptr); }
-void drcbe_arm64::emit_float_str_mem(a64::Assembler &a, const a64::Vec &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdStr_v, reg, ptr); }
+void drcbe_arm64::emit_float_ldr_mem(a64::Assembler &a, const a64::Vec &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdLdr_v, reg, reg.isVecS() ? 2 : 3, ptr); }
+void drcbe_arm64::emit_float_str_mem(a64::Assembler &a, const a64::Vec &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdStr_v, reg, reg.isVecS() ? 2 : 3, ptr); }
 
 void drcbe_arm64::mov_reg_param(a64::Assembler &a, uint32_t regsize, const a64::Gp &dst, const be_parameter &src) const
 {
@@ -803,7 +791,7 @@ void drcbe_arm64::call_arm_addr(a64::Assembler &a, const void *offs) const
 {
 	const uint64_t codeoffs = a.code()->baseAddress() + a.offset();
 	const int64_t reloffs = (int64_t)offs - codeoffs;
-	if (is_valid_immediate_signed(reloffs, 26))
+	if (is_valid_immediate_signed(reloffs, 26 + 2))
 	{
 		a.bl(offs);
 	}
@@ -2066,66 +2054,29 @@ void drcbe_arm64::op_read(a64::Assembler &a, const uml::instruction &inst)
 	const parameter &spacesizep = inst.param(2);
 	assert(spacesizep.is_size_space());
 
-	const auto &trampolines = m_accessors[spacesizep.space()];
 	const auto &resolved = m_resolved_accessors[spacesizep.space()];
 
 	mov_reg_param(a, 4, REG_PARAM2, addrp);
 
 	if (spacesizep.size() == SIZE_BYTE)
 	{
-		if (resolved.read_byte)
-		{
-			get_imm_relative(a, REG_PARAM1, resolved.read_byte.obj);
-			call_arm_addr(a, resolved.read_byte.func);
-		}
-		else
-		{
-			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
-			emit_ldr_mem(a, TEMP_REG1, &trampolines.read_byte);
-			a.blr(TEMP_REG1);
-		}
+		get_imm_relative(a, REG_PARAM1, resolved.read_byte.obj);
+		call_arm_addr(a, resolved.read_byte.func);
 	}
 	else if (spacesizep.size() == SIZE_WORD)
 	{
-		if (resolved.read_word)
-		{
-			get_imm_relative(a, REG_PARAM1, resolved.read_word.obj);
-			call_arm_addr(a, resolved.read_word.func);
-		}
-		else
-		{
-			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
-			emit_ldr_mem(a, TEMP_REG1, &trampolines.read_word);
-			a.blr(TEMP_REG1);
-		}
+		get_imm_relative(a, REG_PARAM1, resolved.read_word.obj);
+		call_arm_addr(a, resolved.read_word.func);
 	}
 	else if (spacesizep.size() == SIZE_DWORD)
 	{
-		if (resolved.read_dword)
-		{
-			get_imm_relative(a, REG_PARAM1, resolved.read_dword.obj);
-			call_arm_addr(a, resolved.read_dword.func);
-		}
-		else
-		{
-			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
-			emit_ldr_mem(a, TEMP_REG1, &trampolines.read_dword);
-			a.blr(TEMP_REG1);
-		}
+		get_imm_relative(a, REG_PARAM1, resolved.read_dword.obj);
+		call_arm_addr(a, resolved.read_dword.func);
 	}
 	else if (spacesizep.size() == SIZE_QWORD)
 	{
-		if (resolved.read_qword)
-		{
-			get_imm_relative(a, REG_PARAM1, resolved.read_qword.obj);
-			call_arm_addr(a, resolved.read_qword.func);
-		}
-		else
-		{
-			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
-			emit_ldr_mem(a, TEMP_REG1, &trampolines.read_qword);
-			a.blr(TEMP_REG1);
-		}
+		get_imm_relative(a, REG_PARAM1, resolved.read_qword.obj);
+		call_arm_addr(a, resolved.read_qword.func);
 	}
 
 	mov_param_reg(a, inst.size(), dstp, REG_PARAM1);
@@ -2143,7 +2094,6 @@ void drcbe_arm64::op_readm(a64::Assembler &a, const uml::instruction &inst)
 	const parameter &spacesizep = inst.param(3);
 	assert(spacesizep.is_size_space());
 
-	const auto &trampolines = m_accessors[spacesizep.space()];
 	const auto &resolved = m_resolved_accessors[spacesizep.space()];
 
 	mov_reg_param(a, 4, REG_PARAM2, addrp);
@@ -2151,59 +2101,23 @@ void drcbe_arm64::op_readm(a64::Assembler &a, const uml::instruction &inst)
 
 	if (spacesizep.size() == SIZE_BYTE)
 	{
-		if (resolved.read_byte_masked)
-		{
-			get_imm_relative(a, REG_PARAM1, resolved.read_byte_masked.obj);
-			call_arm_addr(a, resolved.read_byte_masked.func);
-		}
-		else
-		{
-			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
-			emit_ldr_mem(a, TEMP_REG1, &trampolines.read_byte_masked);
-			a.blr(TEMP_REG1);
-		}
+		get_imm_relative(a, REG_PARAM1, resolved.read_byte_masked.obj);
+		call_arm_addr(a, resolved.read_byte_masked.func);
 	}
 	else if (spacesizep.size() == SIZE_WORD)
 	{
-		if (resolved.read_word_masked)
-		{
-			get_imm_relative(a, REG_PARAM1, resolved.read_word_masked.obj);
-			call_arm_addr(a, resolved.read_word_masked.func);
-		}
-		else
-		{
-			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
-			emit_ldr_mem(a, TEMP_REG1, &trampolines.read_word_masked);
-			a.blr(TEMP_REG1);
-		}
+		get_imm_relative(a, REG_PARAM1, resolved.read_word_masked.obj);
+		call_arm_addr(a, resolved.read_word_masked.func);
 	}
 	else if (spacesizep.size() == SIZE_DWORD)
 	{
-		if (resolved.read_dword_masked)
-		{
-			get_imm_relative(a, REG_PARAM1, resolved.read_dword_masked.obj);
-			call_arm_addr(a, resolved.read_dword_masked.func);
-		}
-		else
-		{
-			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
-			emit_ldr_mem(a, TEMP_REG1, &trampolines.read_dword_masked);
-			a.blr(TEMP_REG1);
-		}
+		get_imm_relative(a, REG_PARAM1, resolved.read_dword_masked.obj);
+		call_arm_addr(a, resolved.read_dword_masked.func);
 	}
 	else if (spacesizep.size() == SIZE_QWORD)
 	{
-		if (resolved.read_qword_masked)
-		{
-			get_imm_relative(a, REG_PARAM1, resolved.read_qword_masked.obj);
-			call_arm_addr(a, resolved.read_qword_masked.func);
-		}
-		else
-		{
-			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
-			emit_ldr_mem(a, TEMP_REG1, &trampolines.read_qword_masked);
-			a.blr(TEMP_REG1);
-		}
+		get_imm_relative(a, REG_PARAM1, resolved.read_qword_masked.obj);
+		call_arm_addr(a, resolved.read_qword_masked.func);
 	}
 
 	mov_param_reg(a, inst.size(), dstp, REG_PARAM1);
@@ -2220,7 +2134,6 @@ void drcbe_arm64::op_write(a64::Assembler &a, const uml::instruction &inst)
 	const parameter &spacesizep = inst.param(2);
 	assert(spacesizep.is_size_space());
 
-	const auto &trampolines = m_accessors[spacesizep.space()];
 	const auto &resolved = m_resolved_accessors[spacesizep.space()];
 
 	mov_reg_param(a, 4, REG_PARAM2, addrp);
@@ -2228,59 +2141,23 @@ void drcbe_arm64::op_write(a64::Assembler &a, const uml::instruction &inst)
 
 	if (spacesizep.size() == SIZE_BYTE)
 	{
-		if (resolved.write_byte)
-		{
-			get_imm_relative(a, REG_PARAM1, resolved.write_byte.obj);
-			call_arm_addr(a, resolved.write_byte.func);
-		}
-		else
-		{
-			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
-			emit_ldr_mem(a, TEMP_REG1, &trampolines.write_byte);
-			a.blr(TEMP_REG1);
-		}
+		get_imm_relative(a, REG_PARAM1, resolved.write_byte.obj);
+		call_arm_addr(a, resolved.write_byte.func);
 	}
 	else if (spacesizep.size() == SIZE_WORD)
 	{
-		if (resolved.write_word)
-		{
-			get_imm_relative(a, REG_PARAM1, resolved.write_word.obj);
-			call_arm_addr(a, resolved.write_word.func);
-		}
-		else
-		{
-			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
-			emit_ldr_mem(a, TEMP_REG1, &trampolines.write_word);
-			a.blr(TEMP_REG1);
-		}
+		get_imm_relative(a, REG_PARAM1, resolved.write_word.obj);
+		call_arm_addr(a, resolved.write_word.func);
 	}
 	else if (spacesizep.size() == SIZE_DWORD)
 	{
-		if (resolved.write_dword)
-		{
-			get_imm_relative(a, REG_PARAM1, resolved.write_dword.obj);
-			call_arm_addr(a, resolved.write_dword.func);
-		}
-		else
-		{
-			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
-			emit_ldr_mem(a, TEMP_REG1, &trampolines.write_dword);
-			a.blr(TEMP_REG1);
-		}
+		get_imm_relative(a, REG_PARAM1, resolved.write_dword.obj);
+		call_arm_addr(a, resolved.write_dword.func);
 	}
 	else if (spacesizep.size() == SIZE_QWORD)
 	{
-		if (resolved.write_qword)
-		{
-			get_imm_relative(a, REG_PARAM1, resolved.write_qword.obj);
-			call_arm_addr(a, resolved.write_qword.func);
-		}
-		else
-		{
-			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
-			emit_ldr_mem(a, TEMP_REG1, &trampolines.write_qword);
-			a.blr(TEMP_REG1);
-		}
+		get_imm_relative(a, REG_PARAM1, resolved.write_qword.obj);
+		call_arm_addr(a, resolved.write_qword.func);
 	}
 }
 
@@ -2297,7 +2174,6 @@ void drcbe_arm64::op_writem(a64::Assembler &a, const uml::instruction &inst)
 	assert(spacesizep.is_size_space());
 
 	// set up a call to the write handler
-	const auto &trampolines = m_accessors[spacesizep.space()];
 	const auto &resolved = m_resolved_accessors[spacesizep.space()];
 
 	mov_reg_param(a, 4, REG_PARAM2, addrp);
@@ -2306,59 +2182,23 @@ void drcbe_arm64::op_writem(a64::Assembler &a, const uml::instruction &inst)
 
 	if (spacesizep.size() == SIZE_BYTE)
 	{
-		if (resolved.write_byte_masked)
-		{
-			get_imm_relative(a, REG_PARAM1, resolved.write_byte_masked.obj);
-			call_arm_addr(a, resolved.write_byte_masked.func);
-		}
-		else
-		{
-			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
-			emit_ldr_mem(a, TEMP_REG1, &trampolines.write_byte_masked);
-			a.blr(TEMP_REG1);
-		}
+		get_imm_relative(a, REG_PARAM1, resolved.write_byte_masked.obj);
+		call_arm_addr(a, resolved.write_byte_masked.func);
 	}
 	else if (spacesizep.size() == SIZE_WORD)
 	{
-		if (resolved.write_word_masked)
-		{
-			get_imm_relative(a, REG_PARAM1, resolved.write_word_masked.obj);
-			call_arm_addr(a, resolved.write_word_masked.func);
-		}
-		else
-		{
-			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
-			emit_ldr_mem(a, TEMP_REG1, &trampolines.write_word_masked);
-			a.blr(TEMP_REG1);
-		}
+		get_imm_relative(a, REG_PARAM1, resolved.write_word_masked.obj);
+		call_arm_addr(a, resolved.write_word_masked.func);
 	}
 	else if (spacesizep.size() == SIZE_DWORD)
 	{
-		if (resolved.write_dword_masked)
-		{
-			get_imm_relative(a, REG_PARAM1, resolved.write_dword_masked.obj);
-			call_arm_addr(a, resolved.write_dword_masked.func);
-		}
-		else
-		{
-			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
-			emit_ldr_mem(a, TEMP_REG1, &trampolines.write_dword_masked);
-			a.blr(TEMP_REG1);
-		}
+		get_imm_relative(a, REG_PARAM1, resolved.write_dword_masked.obj);
+		call_arm_addr(a, resolved.write_dword_masked.func);
 	}
 	else if (spacesizep.size() == SIZE_QWORD)
 	{
-		if (resolved.write_qword_masked)
-		{
-			get_imm_relative(a, REG_PARAM1, resolved.write_qword_masked.obj);
-			call_arm_addr(a, resolved.write_qword_masked.func);
-		}
-		else
-		{
-			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
-			emit_ldr_mem(a, TEMP_REG1, &trampolines.write_qword_masked);
-			a.blr(TEMP_REG1);
-		}
+		get_imm_relative(a, REG_PARAM1, resolved.write_qword_masked.obj);
+		call_arm_addr(a, resolved.write_qword_masked.func);
 	}
 }
 
@@ -3936,40 +3776,21 @@ void drcbe_arm64::op_fread(a64::Assembler &a, const uml::instruction &inst)
 	assert(spacesizep.is_size_space());
 	assert((1 << spacesizep.size()) == inst.size());
 
-	const auto &trampolines = m_accessors[spacesizep.space()];
 	const auto &resolved = m_resolved_accessors[spacesizep.space()];
 
 	mov_reg_param(a, 4, REG_PARAM2, addrp);
 
 	if (inst.size() == 4)
 	{
-		if (resolved.read_dword)
-		{
-			get_imm_relative(a, REG_PARAM1, resolved.read_dword.obj);
-			call_arm_addr(a, resolved.read_dword.func);
-		}
-		else
-		{
-			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
-			emit_ldr_mem(a, TEMP_REG1, &trampolines.read_dword);
-			a.blr(TEMP_REG1);
-		}
+		get_imm_relative(a, REG_PARAM1, resolved.read_dword.obj);
+		call_arm_addr(a, resolved.read_dword.func);
 
 		mov_float_param_int_reg(a, inst.size(), dstp, REG_PARAM1.w());
 	}
 	else if (inst.size() == 8)
 	{
-		if (resolved.read_qword)
-		{
-			get_imm_relative(a, REG_PARAM1, resolved.read_qword.obj);
-			call_arm_addr(a, resolved.read_qword.func);
-		}
-		else
-		{
-			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
-			emit_ldr_mem(a, TEMP_REG1, &trampolines.read_qword);
-			a.blr(TEMP_REG1);
-		}
+		get_imm_relative(a, REG_PARAM1, resolved.read_qword.obj);
+		call_arm_addr(a, resolved.read_qword.func);
 
 		mov_float_param_int_reg(a, inst.size(), dstp, REG_PARAM1);
 	}
@@ -3987,7 +3808,6 @@ void drcbe_arm64::op_fwrite(a64::Assembler &a, const uml::instruction &inst)
 	assert(spacesizep.is_size_space());
 	assert((1 << spacesizep.size()) == inst.size());
 
-	const auto &trampolines = m_accessors[spacesizep.space()];
 	const auto &resolved = m_resolved_accessors[spacesizep.space()];
 
 	mov_reg_param(a, 4, REG_PARAM2, addrp);
@@ -3997,31 +3817,13 @@ void drcbe_arm64::op_fwrite(a64::Assembler &a, const uml::instruction &inst)
 
 	if (inst.size() == 4)
 	{
-		if (resolved.write_dword)
-		{
-			get_imm_relative(a, REG_PARAM1, resolved.write_dword.obj);
-			call_arm_addr(a, resolved.write_dword.func);
-		}
-		else
-		{
-			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
-			emit_ldr_mem(a, TEMP_REG1, &trampolines.write_dword);
-			a.blr(TEMP_REG1);
-		}
+		get_imm_relative(a, REG_PARAM1, resolved.write_dword.obj);
+		call_arm_addr(a, resolved.write_dword.func);
 	}
 	else if (inst.size() == 8)
 	{
-		if (resolved.write_qword)
-		{
-			get_imm_relative(a, REG_PARAM1, resolved.write_qword.obj);
-			call_arm_addr(a, resolved.write_qword.func);
-		}
-		else
-		{
-			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
-			emit_ldr_mem(a, TEMP_REG1, &trampolines.write_qword);
-			a.blr(TEMP_REG1);
-		}
+		get_imm_relative(a, REG_PARAM1, resolved.write_qword.obj);
+		call_arm_addr(a, resolved.write_qword.func);
 	}
 }
 

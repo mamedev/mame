@@ -19826,6 +19826,7 @@ polgar101                       // 1990 Mephisto Polgar 10MHz
 
 @source:hegenerglaser/risc.cpp
 mrisc                           // 1992 Mephisto RISC 1MB
+mrisca                          // 1992 Mephisto RISC 1MB
 mrisc2                          // 1994 Mephisto RISC II
 
 @source:hegenerglaser/roma2.cpp
@@ -30251,6 +30252,7 @@ deluxe4u                        // (c) 2000 ESD
 fantstry                        // (c) 2002 Z Soft
 fantstrya                       // (c) 2002 Z Soft
 hedpanic                        // (c) 2000 ESD
+hedpanic830                     // (c) 1999 ESD
 hedpanica                       // (c) 1999 ESD
 hedpanicf                       // (c) 2000 ESD + Fuuki, Co. Ltd.
 hedpanico                       // (c) 1999 ESD
@@ -35954,6 +35956,10 @@ penta                           // bootleg
 
 @source:pacman/schick.cpp
 schick                          // Microhard
+
+@source:paia/midi2cv8.cpp
+midi2cv8                        // PAiA midi2cv8 (V/Oct)
+midi2cv8_vhz                    // PAiA midi2cv8 with V/Hz daughterboard
 
 @source:palm/palm.cpp
 palmiii                         // Palm III
@@ -43670,6 +43676,7 @@ sothello                        // (c) 1986 Success / Fujiwara.
 tonton                          // (c) 199? Success / Taiyo Jidoki.
 
 @source:sun/sun1.cpp
+multibox                        //
 sun1                            //
 
 @source:sun/sun2.cpp

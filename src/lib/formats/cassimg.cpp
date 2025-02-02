@@ -878,8 +878,7 @@ cassette_image::error cassette_image::legacy_construct(const LegacyWaveFiller *l
 	while ((pos < sample_count) && (offset < size))
 	{
 		const int slice = std::min<int>(args.chunk_size, size - offset);
-
-		image_read(&chunk[0], offset, slice);
+		image_read(chunk.get(), offset, slice);
 		offset += slice;
 
 		length = args.fill_wave(&samples[pos], sample_count - pos, chunk.get(), slice);
