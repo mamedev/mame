@@ -15819,8 +15819,8 @@ Should be supported by [PC8001mkIISR] too
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
-			<dataarea name="flop" size="622624">
-				<rom name="hibernia (disk b).d88" size="622624" crc="1c51e693" sha1="4aad9aee161e1f4bdbdab546cf3e184ce6663595"/>
+			<dataarea name="flop" size="641904">
+				<rom name="hibernia (disk b).d88" size="641904" crc="1c51e693" sha1="4aad9aee161e1f4bdbdab546cf3e184ce6663595"/>
 			</dataarea>
 		</part>
 	</software>
