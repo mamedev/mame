@@ -140,6 +140,7 @@ public:
 	void xavix_43mhz(machine_config &config);
 
 	void init_xavix();
+	void init_no_timer() { init_xavix(); m_disable_timer_irq_hack = true; }
 
 	void ioevent_trg01(int state);
 	void ioevent_trg02(int state);
@@ -196,6 +197,8 @@ public:
 
 		return 0x00;
 	}
+
+	uint16_t unknown_random_r() { return machine().rand(); }
 
 protected:
 	// driver_device overrides
@@ -645,6 +648,7 @@ public:
 		, m_bmp_palram_l(*this, "bmp_palram_l")
 		, m_bmp_base(*this, "bmp_base")
 		, m_extra(*this, "extra")
+		, m_exio(*this, "EX%u", 0U)
 	{
 		m_video_hres_multiplier = 2;
 	}
@@ -712,9 +716,9 @@ private:
 	void extended_extbus_reg1_w(uint8_t data);
 	void extended_extbus_reg2_w(uint8_t data);
 
-	uint8_t superxavix_read_extended_io0(offs_t offset, uint8_t mem_mask) { logerror("%s: superxavix_read_extended_io0 (mask %02x)\n", machine().describe_context(), mem_mask); return 0x00; }
-	uint8_t superxavix_read_extended_io1(offs_t offset, uint8_t mem_mask) { logerror("%s: superxavix_read_extended_io1 (mask %02x)\n", machine().describe_context(), mem_mask); return 0x00; }
-	uint8_t superxavix_read_extended_io2(offs_t offset, uint8_t mem_mask) { logerror("%s: superxavix_read_extended_io2 (mask %02x)\n", machine().describe_context(), mem_mask); return 0x00; }
+	uint8_t superxavix_read_extended_io0(offs_t offset, uint8_t mem_mask) { logerror("%s: superxavix_read_extended_io0 (mask %02x)\n", machine().describe_context(), mem_mask); return m_exio[0]->read(); }
+	uint8_t superxavix_read_extended_io1(offs_t offset, uint8_t mem_mask) { logerror("%s: superxavix_read_extended_io1 (mask %02x)\n", machine().describe_context(), mem_mask); return m_exio[1]->read(); }
+	uint8_t superxavix_read_extended_io2(offs_t offset, uint8_t mem_mask) { logerror("%s: superxavix_read_extended_io2 (mask %02x)\n", machine().describe_context(), mem_mask); return m_exio[2]->read(); }
 
 	void superxavix_write_extended_io0(offs_t offset, uint8_t data, uint8_t mem_mask) { logerror("%s: superxavix_write_extended_io0 %02x (mask %02x)\n", machine().describe_context(), data, mem_mask); }
 	void superxavix_write_extended_io1(offs_t offset, uint8_t data, uint8_t mem_mask) { logerror("%s: superxavix_write_extended_io1 %02x (mask %02x)\n", machine().describe_context(), data, mem_mask); }
@@ -744,6 +748,7 @@ private:
 	required_shared_ptr<uint8_t> m_bmp_base;
 
 	optional_region_ptr<uint8_t> m_extra;
+	required_ioport_array<3> m_exio;
 
 	bool m_use_superxavix_extra; // does not need saving
 };
@@ -831,8 +836,6 @@ public:
 		: xavix_state(mconfig, type, tag)
 	{ }
 
-	int camera_r() { return machine().rand(); }
-
 protected:
 };
 
@@ -843,10 +846,6 @@ public:
 	xavix_i2c_lotr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: xavix_i2c_state(mconfig, type, tag)
 	{ }
-
-	int camera_r();
-
-	void init_epo_mini();
 
 protected:
 	//virtual void write_io1(uint8_t data, uint8_t direction) override;
