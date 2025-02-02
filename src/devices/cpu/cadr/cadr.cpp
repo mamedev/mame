@@ -5,9 +5,11 @@
     MIT CADR microcode emulation
 
 TODO:
-- bit 46, statistics
-- bit 45, ilong
-- Not all ALU operations are implemented.
+- Instruction bit 46, statistics, not supported.
+- Instruction bit 45, ilong, not supported.
+- Not all ALU operations are supported.
+- Most 'Misc functions' on instructions are not supported.
+- Sequence break not supported.
 
 ***************************************************************************/
 
@@ -63,10 +65,10 @@ cadr_cpu_device::cadr_cpu_device(const machine_config &mconfig, const char *tag,
 
 device_memory_interface::space_config_vector cadr_cpu_device::memory_space_config() const
 {
-		return space_config_vector {
-			std::make_pair(AS_PROGRAM, &m_program_config),
-			std::make_pair(AS_DATA,    &m_data_config)
-		};
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_DATA,    &m_data_config)
+	};
 }
 
 
@@ -89,9 +91,11 @@ void cadr_cpu_device::device_start()
 	save_item(NAME(m_m));
 	save_item(NAME(m_q));
 	save_item(NAME(m_pdl));
-	save_item(NAME(m_pdl_pointer));
 	save_item(NAME(m_pdl_index));
+	save_item(NAME(m_pdl_pointer));
 	save_item(NAME(m_md));
+	save_item(NAME(m_read_delay));
+	save_item(NAME(m_read_data));
 	save_item(NAME(m_oa_reg_lo));
 	save_item(NAME(m_oa_reg_hi));
 	save_item(NAME(m_spc));
@@ -103,14 +107,12 @@ void cadr_cpu_device::device_start()
 	save_item(NAME(m_dispatch_constant));
 	save_item(NAME(m_ic));
 	save_item(NAME(m_lc));
+	save_item(NAME(m_diag_mode));
 	save_item(NAME(m_access_fault));
 	save_item(NAME(m_write_fault));
 	save_item(NAME(m_page_fault));
 	save_item(NAME(m_popj));
-	save_item(NAME(m_diag_mode));
 	save_item(NAME(m_interrupt_pending));
-	save_item(NAME(m_read_delay));
-	save_item(NAME(m_read_data));
 
 	space(AS_PROGRAM).specific(m_program);
 	space(AS_DATA).specific(m_data);
@@ -212,6 +214,7 @@ void cadr_cpu_device::read()
 	{
 		m_access_fault = true;
 		m_page_fault = true;
+		LOGMASKED(LOG_VMA, "access fault, page fault\n");
 	}
 	else
 	{
@@ -243,7 +246,7 @@ void cadr_cpu_device::write()
 	{
 		m_write_fault = true;
 		m_page_fault = true;
-		LOGMASKED(LOG_VMA, "wrilte fault, page fault\n");
+		LOGMASKED(LOG_VMA, "write fault, page fault\n");
 	}
 	else
 	{
@@ -897,7 +900,9 @@ void cadr_cpu_device::execute_run()
 		if (m_read_delay)
 		{
 			if (!--m_read_delay)
+			{
 				m_md = m_read_data;
+			}
 		}
 
 		if (!m_n)

@@ -6,19 +6,24 @@ CADR I/O Board emulation
 
 The I/O Board makes the keyboard, mouse, and chaosnet available on the Unibus.
 
+Implementation based on description of the operation, not schematics.
+
+
 TODO:
 - Chaosnet
-  - Sys300/301 needs a small hack to continu booting - timing issue with keyboard controller combined with bug in cadr code?
-    The initial 'release' message is sent slightly too soon by the keyboard??
+  - Sys300/301 needs a small hack to continue booting - timing issue with keyboard controller combined with bug in cadr code?
+    The initial 'release' message is sent too soon by the keyboard? or is there communication with other hardware/mcu
+    before the data is presented to the cpu.
     wpdset 3ff435,1,r
     wpdset 3ff430,1,rw, wait for write 0090, read 0090
-    wpdset 3ff425,1,r, MD=4
+    wpdset 3ff425,1,r, wait for read from 3ff425, MD=4
     and continue
 - General purpose I/O
 - Serial I/O
 - Where is the REPEAT key mapped? And how should it be used?
 - Caps lock is not working
 - The keyboard and I/O board actually communicate through a serial connection.
+- Is there another MCU on the I/O board to communicate with the keyboard??
 
 **********************************************************************************/
 #include "emu.h"
@@ -278,7 +283,9 @@ TIMER_CALLBACK_MEMBER(cadr_iob_device::clock_callback)
 {
 	m_csr |= CSR_CLOCK_READY;
 	if (BIT(m_csr, CSR_CLOCK_IRQ_ENABLE_BIT))
+	{
 		m_irq_vector_cb(IRQ_VECTOR_CLOCK);
+	}
 }
 
 
@@ -301,12 +308,12 @@ void cadr_iob_device::device_reset()
 void cadr_iob_device::chaos_transmit_start()
 {
 	LOG("Starting transmit of packet\n");
-	printf("Transmitting packet data");
+	LOG("Transmitting packet data");
 	for (int i = 0; i < m_chaos_transmit_pointer; i++)
 	{
-		printf(" %04x", m_chaos_transmit_buffer[i]);
+		LOG(" %04x", m_chaos_transmit_buffer[i]);
 	}
-	printf("\n");
+	LOG("\n");
 
 	// TODO transmit the data
 	// TODO set proper timing
@@ -358,13 +365,12 @@ void cadr_iob_device::write(offs_t offset, u16 data)
 		}
 		if (BIT(data, CHAOSNET_LOOPBACK_BIT))
 		{
-			// Loop back not implemented
+			// Loopback not implemented
 		}
 		if (BIT(data, CHAOSNET_RESET_RECEIVE_BIT))
 		{
 			// TODO Clear and enable receiver
 			m_chaos_csr = (m_chaos_csr & ~CHAOSNET_RECEIVE_DONE);
-			// Clear lost count
 			m_chaos_csr = (m_chaos_csr & ~CHAOSNET_LOST_COUNT);
 		}
 		if (BIT(data, CHAOSNET_TRANSMIT_IRQ_ENABLE_BIT))
@@ -373,17 +379,14 @@ void cadr_iob_device::write(offs_t offset, u16 data)
 		}
 		if (BIT(data, CHAOSNET_RESET_TRANSMIT_BIT))
 		{
-			// Reset the transmitter
 			m_transmit_timer->adjust(attotime::never);
 			m_chaos_csr |= CHAOSNET_TRANSMIT_DONE;
 		}
 		if (BIT(data, CHAOSNET_RESET_BIT))
 		{
-			// Stop transmitter
 			m_transmit_timer->adjust(attotime::never);
 			// TODO Clear and enable receiver
 			m_chaos_csr |= CHAOSNET_TRANSMIT_DONE;
-			// Clear interrupt enables and receive done
 			m_chaos_csr = m_chaos_csr & ~(CHAOSNET_RESET | CHAOSNET_RECEIVE_DONE | CHAOSNET_RECEIVE_IRQ_ENABLE | CHAOSNET_TRANSMIT_IRQ_ENABLE);
 		}
 		break;
@@ -446,8 +449,7 @@ u16 cadr_iob_device::read(offs_t offset)
 		// -------- -----x-- Match any destination
 		// -------- ------x- Loopback
 		// -------- -------x Timer interrupt enable (not implemented)
-		// Hack to make sys300/301 boot past the communication issue with the keyboard.
-		return m_chaos_csr /*& ~CHAOSNET_TRANSMIT_DONE*/;
+		return m_chaos_csr;
 	case 0x11: // chaos net my address
 		// TODO: Address is configured using dip switches
 		return 0x101;

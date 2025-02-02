@@ -42,15 +42,14 @@ private:
 	address_space_config m_program_config;
 	address_space_config m_data_config;
 	memory_view m_inst_view;
-//	memory_access<12, 3, -3, ENDIANNESS_BIG>::cache m_cache;
 	memory_access<ADDRESS_BITS, 3, -3, ENDIANNESS_BIG>::specific m_program;
 	memory_access<EXTERNAL_ADDRESS_BITS, 2, -2, ENDIANNESS_BIG>::specific m_data;
 	required_shared_ptr<u64> m_imem; // 16k x 48 bits
 	int m_icount;
 	u16 m_prev_pc;
-	u16 m_pc; // ? bits
-	u16 m_next_pc; // ? bits
-	u64 m_op; // aka instruction register
+	u16 m_pc; // 16 bits
+	u16 m_next_pc; // 16 bits
+	u64 m_op;
 	bool m_n;
 	u32 m_a_mem[1024]; // 1024 x 32 bits
 	u32 m_m_mem[32]; // 32 x 32 bits

@@ -15,8 +15,8 @@ TODO:
 
 const char *const cadr_disassembler::bool_op[0x10] =
 {
-	"SETZ",      "AND",           "ANDCA",        "SETM",    "ANDCM", "SETA",         "XOR",      "IOR",
-	"ANDCB",     "EQV",           "SETCA",        "ORCA",    "SETCM", "ORCM",         "ORCB",     "SETO"
+	"SETZ",  "AND", "ANDCA", "SETM", "ANDCM", "SETA", "XOR",  "IOR",
+	"ANDCB", "EQV", "SETCA", "ORCA", "SETCM", "ORCM", "ORCB", "SETO"
 };
 
 const char *const cadr_disassembler::arith_op[0x10] =
@@ -33,10 +33,10 @@ const char *const cadr_disassembler::arith_op_c[0x10] =
 
 const char *const cadr_disassembler::mult_div_op[0x20] =
 {
-	"mult-step", "div-step",      "unk",          "unk",     "unk",   "rem-corr",     "unk",      "unk",
-	"unk",       "init-div-step", "unk",          "unk",     "unk",   "unk",          "unk",      "unk",
-	"mult-step", "div-step",      "unk",          "unk",     "unk",   "rem-corr",     "unk",      "unk",
-	"unk",       "init-div-step", "unk",          "unk",     "unk",   "unk",          "unk",      "unk"
+	"mult-step", "div-step",      "unk", "unk", "unk", "rem-corr", "unk", "unk",
+	"unk",       "init-div-step", "unk", "unk", "unk", "unk",      "unk", "unk",
+	"mult-step", "div-step",      "unk", "unk", "unk", "rem-corr", "unk", "unk",
+	"unk",       "init-div-step", "unk", "unk", "unk", "unk",      "unk", "unk"
 };
 
 const char *const cadr_disassembler::output_bus_control[0x04] =
@@ -460,8 +460,6 @@ void cadr_disassembler::disassemble_destination(std::ostream &stream, u64 op)
 
 void cadr_disassembler::disassemble_condition(std::ostream &stream, u64 op)
 {
-	// 	"illegal", "M < A", "M <= A", "M = A", "pf", "pf/int", "pf/int/seq", "always"
-
 	if (BIT(op, 5))
 	{
 		switch (op & 0x07)

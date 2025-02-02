@@ -17,6 +17,9 @@ Grayscale monitor: 454x576, 16 scales of gray.
 
 60MHz and 64Mhz clocks are mentioned in the docs, as well as 64.69Hz default refresh rate.
 
+Implementation based on description of the operation, not schematics.
+
+
 **********************************************************************************/
 #include "emu.h"
 #include "cadr_tv_control.h"

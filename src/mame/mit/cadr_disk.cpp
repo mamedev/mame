@@ -4,8 +4,8 @@
 
 CADR disk controller emulation
 
-There were 2 version of the disk controller a single board version which
-connected to 1 hard disk and a 2 board version which coud connect up to 8
+There were 2 version of the disk controller: a single board version which
+connected to 1 hard disk and a 2 board version which could connect up to 8
 drives.
 
 It retrieves "CCW"s to process from main memory. Reads
@@ -17,8 +17,12 @@ The disk controller supports at least the following disk types:
 - T-80 - 80MB, 815 cylinders, 5 heads, 17 sectors per track, 1024 bytes per sector. Max transfer rate 1209KB/s, 6ms seek time; 3600 rpm.
 - T-300 - 300MB, 815 cylinders, 19 heads, 17 sectors per track, 1024 bytes per sector. Max tranfer rate 1209KB/s, 6ms seek time; 3600 rpm.
 
+Implementation based on description of the operation, not schematics.
+
+
 TODO:
 - Disk access times.
+- THe disk controller reads/writes directly to memory, implications on cpu slowdown unknown.
 
 **********************************************************************************/
 
@@ -75,7 +79,6 @@ TIMER_CALLBACK_MEMBER(cadr_disk_device::disk_done_callback)
 	if (BIT(m_command, 11))
 	{
 		m_status |= 0x08;
-		// TOOD Signal Xbus/cpu
 		m_irq_cb(ASSERT_LINE);
 	}
 }
@@ -178,9 +181,6 @@ u32 cadr_disk_device::error_correction_r()
 //                                 xxx Command code
 void cadr_disk_device::command_w(u32 data)
 {
-	// 1st command 00000105 -> offset forward, command code = 101 - at ease
-	// 2nd command 00200205 -> servo offset, command code = 101 - at ease
-	// 3rd command 00000009 -> i/o direction, command code = 001 - 
 	LOG("Disk controller command write %08x\n", data);
 	m_command = data;
 

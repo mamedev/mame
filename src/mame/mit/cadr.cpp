@@ -126,17 +126,6 @@ void cadr_state::mem_map(address_map &map)
 
 	// Unibus - 16 bit bus
 
-	// To catch unknown writes
-	map(0x3e0000, 0x3fffff).lrw16(
-		NAME([this] (offs_t offset, u16 mem_mask) {
-			LOG("3e0000-3fffff: unknown unibus read %08x (%o)\n", 0x3e0000 + offset, 0x3e0000 + offset);
-			return 0;
-		}),
-		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
-			LOG("3e0000-3fffff: unknown unibus write %08x (%o), data %04x (%o)\n", 0x3e0000 + offset, 0x3e0000 + offset, data, data);
-		})
-	).umask32(0x0000ffff);
-
 	map(0x3ff420, 0x3ff43f).rw(m_iob, FUNC(cadr_iob_device::read), FUNC(cadr_iob_device::write)).umask32(0x0000ffff);
 
 	// 766020 - 766037
