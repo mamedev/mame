@@ -67,6 +67,6 @@ private:
 } // namespace bus::amiga::zorro
 
 // device type declaration
-DECLARE_DEVICE_TYPE_NS(ZORRO_TOCCATA, bus::amiga::zorro, toccata_device)
+DECLARE_DEVICE_TYPE_NS(AMIGA_TOCCATA, bus::amiga::zorro, toccata_device)
 
 #endif // MAME_BUS_AMIGA_ZORRO_TOCCATA_H

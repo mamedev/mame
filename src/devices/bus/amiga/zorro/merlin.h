@@ -51,6 +51,6 @@ private:
 } // namespace bus::amiga::zorro
 
 // device type declaration
-DECLARE_DEVICE_TYPE_NS(ZORRO_MERLIN, bus::amiga::zorro, merlin_device)
+DECLARE_DEVICE_TYPE_NS(AMIGA_MERLIN, bus::amiga::zorro, merlin_device)
 
 #endif // MAME_BUS_AMIGA_ZORRO_MERLIN_H

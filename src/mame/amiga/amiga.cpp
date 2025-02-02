@@ -17,6 +17,7 @@
 #include "amiga.h"
 #include "gayle.h"
 
+#include "bus/amiga/cpuslot/cpuslot.h"
 #include "bus/amiga/keyboard/keyboard.h"
 #include "bus/amiga/zorro/zorro.h"
 #include "bus/ata/ataintf.h"
@@ -33,13 +34,6 @@
 
 #include "softlist.h"
 #include "speaker.h"
-
-
-//**************************************************************************
-//  CONSTANTS / MACROS
-//**************************************************************************
-
-#define EXP_SLOT_TAG "exp"
 
 
 //**************************************************************************
@@ -262,7 +256,8 @@ public:
 	a2000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: amiga_state(mconfig, type, tag)
 		, m_rtc(*this, "u65")
-		, m_zorro(*this, "zorrobus")
+		, m_cpuslot(*this, "cpuslot")
+		, m_zorro(*this, "zorro2")
 		, m_zorro2_int2(0)
 		, m_zorro2_int6(0)
 	{ }
@@ -270,6 +265,9 @@ public:
 	void init_pal();
 	void init_ntsc();
 
+	void cpuslot_ovr_w(int state);
+	void cpuslot_int2_w(int state);
+	void cpuslot_int6_w(int state);
 	void zorro2_int2_w(int state);
 	void zorro2_int6_w(int state);
 
@@ -290,9 +288,12 @@ protected:
 private:
 	// devices
 	required_device<msm6242_device> m_rtc;
+	required_device<amiga_cpuslot_device> m_cpuslot;
 	required_device<zorro2_bus_device> m_zorro;
 
 	// internal state
+	int m_cpuslot_int2;
+	int m_cpuslot_int6;
 	int m_zorro2_int2;
 	int m_zorro2_int6;
 };
@@ -302,7 +303,7 @@ class a500_state : public amiga_state
 public:
 	a500_state(const machine_config &mconfig, device_type type, const char *tag)
 		: amiga_state(mconfig, type, tag)
-		, m_side(*this, EXP_SLOT_TAG)
+		, m_side(*this, "side")
 		, m_side_int2(0)
 		, m_side_int6(0)
 	{ }
@@ -310,6 +311,7 @@ public:
 	void init_pal();
 	void init_ntsc();
 
+	void side_ovr_w(int state);
 	void side_int2_w(int state);
 	void side_int6_w(int state);
 
@@ -326,7 +328,7 @@ protected:
 
 private:
 	// devices
-	required_device<exp_slot_device> m_side;
+	required_device<amiga_cpuslot_device> m_side;
 
 	// internal state
 	int m_side_int2;
@@ -413,8 +415,8 @@ class a500p_state : public amiga_state
 public:
 	a500p_state(const machine_config &mconfig, device_type type, const char *tag)
 		: amiga_state(mconfig, type, tag)
+		, m_side(*this, "side")
 		, m_rtc(*this, "u9")
-		, m_side(*this, EXP_SLOT_TAG)
 		, m_side_int2(0)
 		, m_side_int6(0)
 	{ }
@@ -424,6 +426,10 @@ public:
 
 	void init_pal();
 	void init_ntsc();
+
+	void side_ovr_w(int state);
+	void side_int2_w(int state);
+	void side_int6_w(int state);
 
 	void a500pn(machine_config &config);
 	void a500p(machine_config &config);
@@ -438,8 +444,8 @@ protected:
 
 private:
 	// devices
+	required_device<amiga_cpuslot_device> m_side;
 	required_device<msm6242_device> m_rtc;
-	required_device<exp_slot_device> m_side;
 
 	// internal state
 	int m_side_int2;
@@ -838,9 +844,33 @@ void a2000_state::machine_reset()
 	// base reset
 	amiga_state::machine_reset();
 
+	// reset cpuslot
+	m_cpuslot->rst_w(0);
+	m_cpuslot->rst_w(1);
+
 	// reset zorro devices
 	m_zorro->busrst_w(0);
 	m_zorro->busrst_w(1);
+}
+
+void a2000_state::cpuslot_ovr_w(int state)
+{
+	if (state == 0)
+		m_maincpu->space(AS_PROGRAM).unmap_readwrite(0x000000, 0x1fffff);
+	else
+		m_maincpu->space(AS_PROGRAM).install_device(0x000000, 0x1fffff, *m_overlay, &address_map_bank_device::amap16);
+}
+
+void a2000_state::cpuslot_int2_w(int state)
+{
+	m_cpuslot_int2 = state;
+	update_int2();
+}
+
+void a2000_state::cpuslot_int6_w(int state)
+{
+	m_cpuslot_int6 = state;
+	update_int6();
 }
 
 void a2000_state::zorro2_int2_w(int state)
@@ -857,12 +887,12 @@ void a2000_state::zorro2_int6_w(int state)
 
 bool a2000_state::int2_pending()
 {
-	return m_cia_0_irq || m_zorro2_int2;
+	return m_cia_0_irq || m_cpuslot_int2 || m_zorro2_int2;
 }
 
 bool a2000_state::int6_pending()
 {
-	return m_cia_1_irq || m_zorro2_int6;
+	return m_cia_1_irq || m_cpuslot_int6 || m_zorro2_int6;
 }
 
 void a500_state::machine_reset()
@@ -870,8 +900,21 @@ void a500_state::machine_reset()
 	// base reset
 	amiga_state::machine_reset();
 
-	// reset side expansion slot device
-	m_side->reset();
+	// reset side expansion
+	m_side->rst_w(0);
+	m_side->rst_w(1);
+
+	// start autoconfig
+	m_side->cfgin_w(0);
+	m_side->cfgin_w(1);
+}
+
+void a500_state::side_ovr_w(int state)
+{
+	if (state == 0)
+		m_maincpu->space(AS_PROGRAM).unmap_readwrite(0x000000, 0x1fffff);
+	else
+		m_maincpu->space(AS_PROGRAM).install_device(0x000000, 0x1fffff, *m_overlay, &address_map_bank_device::amap16);
 }
 
 void a500_state::side_int2_w(int state)
@@ -945,8 +988,33 @@ void a500p_state::machine_reset()
 	// base reset
 	amiga_state::machine_reset();
 
-	// reset side expansion slot device
-	m_side->reset();
+	// reset side expansion
+	m_side->rst_w(0);
+	m_side->rst_w(1);
+
+	// start autoconfig
+	m_side->cfgin_w(0);
+	m_side->cfgin_w(1);
+}
+
+void a500p_state::side_ovr_w(int state)
+{
+	if (state == 0)
+		m_maincpu->space(AS_PROGRAM).unmap_readwrite(0x000000, 0x1fffff);
+	else
+		m_maincpu->space(AS_PROGRAM).install_device(0x000000, 0x1fffff, *m_overlay, &address_map_bank_device::amap16);
+}
+
+void a500p_state::side_int2_w(int state)
+{
+	m_side_int2 = state;
+	update_int2();
+}
+
+void a500p_state::side_int6_w(int state)
+{
+	m_side_int6 = state;
+	update_int6();
 }
 
 bool a500p_state::int2_pending()
@@ -1262,7 +1330,7 @@ void amiga_state::overlay_1mb_map32(address_map &map)
 	map(0x200000, 0x27ffff).rom().region("kickstart", 0);
 }
 
-// Gary/Super Gary/Gayle with 2MB chip RAM (32 bit system)
+// Gary/Super Gary/Gayle with 2MB chip RAM (16 bit system)
 void amiga_state::overlay_2mb_map16(address_map &map)
 {
 	map.unmap_value_high();
@@ -1283,6 +1351,7 @@ void a2000_state::a2000_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x1fffff).m(m_overlay, FUNC(address_map_bank_device::amap16));
+	map(0x200000, 0x9fffff).rw(m_zorro, FUNC(zorro2_bus_device::mem_r), FUNC(zorro2_bus_device::mem_w));
 	map(0xa00000, 0xbfffff).rw(FUNC(a2000_state::cia_r), FUNC(a2000_state::cia_w));
 	map(0xc00000, 0xc7ffff).ram();
 	map(0xc80000, 0xd7ffff).m(m_chipset, FUNC(address_map_bank_device::amap16));
@@ -1292,7 +1361,7 @@ void a2000_state::a2000_mem(address_map &map)
 	map(0xde0000, 0xdeffff).m(m_chipset, FUNC(address_map_bank_device::amap16));
 	map(0xdf0000, 0xdfffff).m(m_chipset, FUNC(address_map_bank_device::amap16));
 	map(0xe00000, 0xe7ffff).nopw().r(FUNC(a2000_state::rom_mirror_r));
-	map(0xe80000, 0xefffff).noprw(); // autoconfig space (installed by devices)
+	map(0xe80000, 0xefffff).rw(m_zorro, FUNC(zorro2_bus_device::io_r), FUNC(zorro2_bus_device::io_w));
 	map(0xf00000, 0xf7ffff).noprw(); // cartridge space
 	map(0xf80000, 0xffffff).rom().region("kickstart", 0);
 }
@@ -1775,19 +1844,22 @@ void a2000_state::a2000(machine_config &config)
 	MSM6242(config, m_rtc, XTAL(32'768));
 
 	// cpu slot
-	EXP_SLOT(config, EXP_SLOT_TAG, 0).set_space(m_maincpu, AS_PROGRAM);
-	ZORRO_SLOT(config, "slot", EXP_SLOT_TAG, a2000_expansion_cards, nullptr);
+	AMIGA_CPUSLOT(config, m_cpuslot, a2000_cpuslot_cards, nullptr);
+	m_cpuslot->set_space(m_maincpu, AS_PROGRAM);
+	m_cpuslot->ovr_cb().set(FUNC(a2000_state::cpuslot_ovr_w));
+	m_cpuslot->int2_cb().set(FUNC(a2000_state::cpuslot_int2_w));
+	m_cpuslot->int6_cb().set(FUNC(a2000_state::cpuslot_int6_w));
+	m_cpuslot->ipl7_cb().set([this](int state) { m_maincpu->set_input_line(7, state); });
 
-	// zorro slots
-	ZORRO2(config, m_zorro, 0);
-	m_zorro->set_space(m_maincpu, AS_PROGRAM);
+	// zorro2 slots
+	ZORRO2_BUS(config, m_zorro, 0);
 	m_zorro->int2_handler().set(FUNC(a2000_state::zorro2_int2_w));
 	m_zorro->int6_handler().set(FUNC(a2000_state::zorro2_int6_w));
-	ZORRO_SLOT(config, "zorro1", m_zorro, zorro2_cards, nullptr);
-	ZORRO_SLOT(config, "zorro2", m_zorro, zorro2_cards, nullptr);
-	ZORRO_SLOT(config, "zorro3", m_zorro, zorro2_cards, nullptr);
-	ZORRO_SLOT(config, "zorro4", m_zorro, zorro2_cards, nullptr);
-	ZORRO_SLOT(config, "zorro5", m_zorro, zorro2_cards, nullptr);
+	ZORRO2_SLOT(config, "zorro2:1", zorro2_cards, nullptr);
+	ZORRO2_SLOT(config, "zorro2:2", zorro2_cards, nullptr);
+	ZORRO2_SLOT(config, "zorro2:3", zorro2_cards, nullptr);
+	ZORRO2_SLOT(config, "zorro2:4", zorro2_cards, nullptr);
+	ZORRO2_SLOT(config, "zorro2:5", zorro2_cards, nullptr);
 }
 
 void a2000_state::a2000n(machine_config &config)
@@ -1822,16 +1894,19 @@ void a500_state::a500(machine_config &config)
 	ADDRESS_MAP_BANK(config, m_overlay).set_map(&a500_state::overlay_1mb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
 	ADDRESS_MAP_BANK(config, m_chipset).set_map(&a500_state::ocs_map).set_options(ENDIANNESS_BIG, 16, 9, 0x200);
 
-	// cpu slot
-	EXP_SLOT(config, m_side, 0).set_space(m_maincpu, AS_PROGRAM);
-	m_side->int2_handler().set(FUNC(a500_state::side_int2_w));
-	m_side->int6_handler().set(FUNC(a500_state::side_int6_w));
-	ZORRO_SLOT(config, "slot", m_side, a500_expansion_cards, nullptr);
+	// left side cpu slot
+	AMIGA_CPUSLOT(config, m_side, a500_cpuslot_cards, nullptr);
+	m_side->set_space(m_maincpu, AS_PROGRAM);
+	m_side->ovr_cb().set(FUNC(a500_state::side_ovr_w));
+	m_side->int2_cb().set(FUNC(a500_state::side_int2_w));
+	m_side->int6_cb().set(FUNC(a500_state::side_int6_w));
+	m_side->ipl7_cb().set([this](int state) { m_maincpu->set_input_line(7, state); });
 }
 
 void a500_state::a500n(machine_config &config)
 {
 	a500(config);
+
 	m_maincpu->set_clock(amiga_state::CLK_7M_NTSC);
 	config.device_remove("screen");
 	ntsc_video(config);
@@ -1887,11 +1962,11 @@ void cdtv_state::cdtv(machine_config &config)
 
 	// cd-rom controller
 	AMIGA_DMAC(config, m_dmac, amiga_state::CLK_7M_PAL);
-	m_dmac->scsi_read_handler().set(FUNC(cdtv_state::dmac_scsi_data_read));
-	m_dmac->scsi_write_handler().set(FUNC(cdtv_state::dmac_scsi_data_write));
-	m_dmac->io_read_handler().set(m_cdrom, FUNC(cr511b_device::read));
-	m_dmac->io_write_handler().set(m_cdrom, FUNC(cr511b_device::write));
-	m_dmac->int_handler().set(FUNC(cdtv_state::dmac_int_w));
+	m_dmac->css_read_cb().set(FUNC(cdtv_state::dmac_scsi_data_read));
+	m_dmac->css_write_cb().set(FUNC(cdtv_state::dmac_scsi_data_write));
+	m_dmac->csx0_read_cb().set(m_cdrom, FUNC(cr511b_device::read));
+	m_dmac->csx0_write_cb().set(m_cdrom, FUNC(cr511b_device::write));
+	m_dmac->int_cb().set(FUNC(cdtv_state::dmac_int_w));
 
 	TPI6525(config, m_tpi, 0);
 	m_tpi->out_irq_cb().set(FUNC(cdtv_state::tpi_int_w));
@@ -1985,9 +2060,13 @@ void a500p_state::a500p(machine_config &config)
 	// real-time clock
 	MSM6242(config, m_rtc, XTAL(32'768));
 
-	// cpu slot
-	EXP_SLOT(config, m_side, 0).set_space(m_maincpu, AS_PROGRAM);
-	ZORRO_SLOT(config, "slot", m_side, a500_expansion_cards, nullptr);
+	// left side cpu slot
+	AMIGA_CPUSLOT(config, m_side, a500_cpuslot_cards, nullptr);
+	m_side->set_space(m_maincpu, AS_PROGRAM);
+	m_side->ovr_cb().set(FUNC(a500p_state::side_ovr_w));
+	m_side->int2_cb().set(FUNC(a500p_state::side_int2_w));
+	m_side->int6_cb().set(FUNC(a500p_state::side_int6_w));
+	m_side->ipl7_cb().set([this](int state) { m_maincpu->set_input_line(7, state); });
 
 	// software
 	SOFTWARE_LIST(config, "ecs_list").set_original("amigaecs_flop");
