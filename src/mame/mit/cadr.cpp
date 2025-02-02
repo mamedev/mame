@@ -119,8 +119,6 @@ void cadr_state::mem_map(address_map &map)
 	// 3dfff0-3dfff7 - TV control
 	map(0x3dfff0, 0x3dfff7).rw(m_tv_control, FUNC(cadr_tv_control_device::tv_control_r), FUNC(cadr_tv_control_device::tv_control_w));
 
-	// Don't know why but using map is not working
-//	map(0x3dfff8, 0x3dffff).m(m_disk_controller, FUNC(cadr_disk_device::map));
 	map(0x3dfff8, 0x3dffff).rw(m_disk_controller, FUNC(cadr_disk_device::read), FUNC(cadr_disk_device::write));
 
 
@@ -234,8 +232,8 @@ ROM_START(cadr)
 	ROM_REGION64_BE(0x2000, "maincpu", ROMREGION_ERASE00)
 
 	ROM_REGION64_BE(0x2000, "proms", ROMREGION_ERASE00)
-	ROM_LOAD64_BYTE("cadr_1.bin", 0x002, 0x200, CRC(6a5a4183) SHA1(8957dc8ea542ef5bfac182889827a7da7365ef2e)) // 1B19 ?
-	ROM_LOAD64_BYTE("cadr_2.bin", 0x003, 0x200, CRC(63b63556) SHA1(bd30189c45c8bc17df9a8b210d6f60e056226019)) // 1B17 ?
+	ROM_LOAD64_BYTE("cadr_1.bin.1b19", 0x002, 0x200, CRC(6a5a4183) SHA1(8957dc8ea542ef5bfac182889827a7da7365ef2e))
+	ROM_LOAD64_BYTE("cadr_2.bin.1b17", 0x003, 0x200, CRC(63b63556) SHA1(bd30189c45c8bc17df9a8b210d6f60e056226019))
 	ROM_LOAD64_BYTE("cadr_3.bin", 0x004, 0x200, CRC(b3a92fe1) SHA1(e1563331a3c23cb5b06b7a244c32dce2f3950a9a)) // 1C20 ?
 	ROM_LOAD64_BYTE("cadr_4.bin", 0x005, 0x200, CRC(d8e9c9d1) SHA1(e2a4ae957f146b44b9efef150d7f984443df45f0)) // 1D16 ?
 	ROM_LOAD64_BYTE("cadr_5.bin", 0x006, 0x200, CRC(ad31e93a) SHA1(0a0b9eca440fa2f7eee9307c17185489714ea571)) // 1E19 ?

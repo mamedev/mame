@@ -22,7 +22,6 @@ public:
 
 	u32 read(offs_t offset);
 	void write(offs_t offset, u32 data);
-	void map(address_map &map) ATTR_COLD;
 
 protected:
 	// device-level overrides
