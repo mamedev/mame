@@ -29,8 +29,6 @@
  *  Not supported yet:
  *   - All other NWS-8xx workstations
  *   - NWS-9xx servers (2x '020)
- *   - NWS-18xx workstations (2x '030)
- *   - NWS-19xx servers (2x '030)
  *
  * Known NWS-800 Series Base Configurations
  * - NWS-811: Jun 1987, 4MB RAM, no cache, diskless
@@ -231,7 +229,7 @@ namespace
         uint8_t berr_status_r();
         void astreset_w(uint8_t data);
         void astset_w(uint8_t data);
-        void update_ast();
+        [[maybe_unused]] void update_ast();
 
         // CPU timer handlers
         void interval_timer_tick(uint8_t data);
@@ -697,12 +695,12 @@ namespace
         // TODO: confirm clock signal that drives AST flip flop
         map(0x0, 0xffffffff).lrw32([this](offs_t offset, uint32_t mem_mask) {
             const uint32_t result = m_mmu->hyperbus_r(offset, mem_mask, m_cpu->supervisor_mode());
-            update_ast(); // Need to catch any supervisor -> user transitions
+            // update_ast(); // Need to catch any supervisor -> user transitions
             return result;
         }, "hyperbus_r",
         [this](offs_t offset, uint32_t data, uint32_t mem_mask) {
             m_mmu->hyperbus_w(offset, data, mem_mask, m_cpu->supervisor_mode());
-            update_ast(); // Need to catch any supervisor -> user transitions
+            // update_ast(); // Need to catch any supervisor -> user transitions
         }, "hyperbus_w");
     }
 
