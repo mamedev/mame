@@ -2,6 +2,7 @@
 // copyright-holders:Sean Young
 
 #include "fmsx_cas.h"
+#include "tzx_cas.h"
 
 #include <cstring>
 
@@ -144,4 +145,5 @@ static const cassette_image::Format fmsx_cas_format =
 
 CASSETTE_FORMATLIST_START(fmsx_cassette_formats)
 	CASSETTE_FORMAT(fmsx_cas_format)
+	CASSETTE_FORMAT(tsx_cassette_format)
 CASSETTE_FORMATLIST_END
