@@ -115,12 +115,6 @@ void super8008_bus_device::add_card(device_super8008_card_interface &card)
 
 void super8008_bus_device::ext_write(offs_t offset, uint8_t data)
 {
-	//ext_cs is pulled high through a 10k resistor and is active low
-	if (m_ext_cs)
-	{
-		return;
-	}
-
 	for (device_super8008_card_interface &entry : m_device_list)
 	{
 		entry.ext_write(offset, data);
@@ -130,11 +124,6 @@ void super8008_bus_device::ext_write(offs_t offset, uint8_t data)
 uint8_t super8008_bus_device::ext_read(offs_t offset)
 {
 	uint8_t data = 0;
-
-	if (m_ext_cs)
-	{
-		return data;
-	}
 
 	for (device_super8008_card_interface &entry : m_device_list)
 	{

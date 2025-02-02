@@ -125,7 +125,6 @@ public:
 	virtual void ext_write( offs_t offset, uint8_t data);
 	virtual uint8_t ext_read(offs_t offset);
 	void ext_take(int state);
-	void ext_cs(uint8_t state){ m_ext_cs = state;}
 	void ext_int();
 	void ext_reset();
 	void ext_req();
@@ -143,7 +142,6 @@ private:
 	card_vector m_device_list;
 
 	uint8_t m_ext_take;
-	uint8_t m_ext_cs;
 };
 
 

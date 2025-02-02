@@ -4,7 +4,7 @@
 // by Dr. Scott M. Baker
 //
 // Schematics:
-// https://github.com/sbelectronics/8008-super 
+// https://github.com/sbelectronics/8008-super
 //
 // ROM Source Code:
 // https://github.com/sbelectronics/h8/tree/master/h8-8008
@@ -43,7 +43,7 @@ const uint8_t MMAP_MASK = 3;
 
 #define SUPER8008_BUS_TAG        "master_blaster"
 
-struct memory_map_info 
+struct memory_map_info
 {
 	uint8_t mmap_index;
 	uint8_t mmap_value;
@@ -55,6 +55,7 @@ struct memory_map_info
 };
 
 
+
 // State class - derives from driver_device
 class super8008_state : public driver_device
 {
@@ -63,55 +64,65 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_ram(*this, "ram")
-		, m_rom(*this, "rom")		
+		, m_rom(*this, "rom")
 		, m_rs232(*this, "rs232")
 		, m_leds(*this, "led%u", 0U)
 		, m_run_led(*this, "run_led")
-		, m_txd_led(*this, "txd_led")//TODO(JHE) Remove this
-		, m_rxd_led(*this, "rxd_led")//TODO(JHE) Remove this
 		, m_uart(*this, "uart")
 		, m_bus(*this, SUPER8008_BUS_TAG)
 		, m_slots(*this, SUPER8008_BUS_TAG ":%u", 1U)
+		, m_reg1_view(*this, "reg1_view")
+		, m_reg2_view(*this, "reg2_view")
+		, m_reg3_view(*this, "reg3_view")
+		, m_reg4_view(*this, "reg4_view")
+		, m_reg_rom_banks(*this, "reg%u_rom_bank", 0U)
+		, m_reg_ram_banks(*this, "reg%u_ram_bank", 0U)
 	{ }
 
 	// This function sets up the machine configuration
 	void super8008(machine_config &config);
 
 protected:
-	//TODO(jhe): Do we have another way to get the S0, S1 and S2 so we know when the PC has been halted?
-
 	// address maps for program memory and io memory
 	void super8008_mem(address_map &map);
 	void super8008_io(address_map &map);
-	
+
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
 	required_device<rs232_port_device> m_rs232;
 	output_finder<8> m_leds;
 	output_finder<> m_run_led;
-	output_finder<> m_txd_led;
-	output_finder<> m_rxd_led;
+
 	required_device<i8251_device> m_uart;
 	uint8_t mmap[4] = {0}; //used to simulate the 74670 4x4 memory mapper
-	//TODO So i'll need 7 of these and I need a way to set the jumpers in the code
 	optional_device<super8008_bus_device> m_bus;
 	optional_device_array<super8008_slot_device, 8> m_slots;
-	
+
+	memory_view m_reg1_view;
+	memory_view m_reg2_view;
+	memory_view m_reg3_view;
+	memory_view m_reg4_view;
+	memory_view *const m_reg_views[4] = { &m_reg1_view, &m_reg2_view, &m_reg3_view, &m_reg4_view };
+
+	required_memory_bank_array<4> m_reg_rom_banks;
+	required_memory_bank_array<4> m_reg_ram_banks;
+
+	uint8_t m_take_state = 0;
+
 	uint8_t port_1_read();
 	void serial_leds(uint8_t data);
 
 	virtual void machine_start() override;
 
-	bool start = true;
-	uint8_t take_state = 0;
+	uint8_t ext_read(offs_t offset);
+	void ext_write(offs_t offset, uint8_t data);
 
-	uint8_t memory_read(offs_t offset);
-	void memory_write(offs_t offset, uint8_t data);
 
 	void memory_mapper_w(offs_t offset, uint8_t data);
 	memory_map_info get_mmap_info(offs_t offset);
-	void log_mmap_info(std::string context, std::string message, offs_t offset, memory_map_info *mmap_info);
+	memory_map_info get_mmap_info(uint8_t idx);
+	//void log_mmap_info(std::string context, std::string message, offs_t offset, memory_map_info *mmap_info);
 
 	void super8008_blaster1_mem(address_map &map);
 	void super8008_blaster1_io(address_map &map);
@@ -124,22 +135,28 @@ protected:
 	void blaster1_serial_leds(offs_t offset, uint8_t data);
 
 	int blaster_irq_callback(device_t &device, int irqlines);
+
+	void select_memory_view(uint8_t index);
+
 };
 
 
 void super8008_state::machine_start()
 {
-	save_item(NAME(start));
 	m_leds.resolve();
 	m_run_led.resolve();
-	m_txd_led.resolve();
-	m_rxd_led.resolve();
+
+	for(int i = 0; i < 4; i++)
+	{
+		m_reg_views[i]->select(0);
+		m_reg_rom_banks[i]->configure_entries(0, 4, m_rom->base(), 0x1000);
+		m_reg_ram_banks[i]->configure_entries(0, 4, m_ram->pointer(), 0x1000);
+		m_reg_rom_banks[i]->set_entry(0);
+		m_reg_ram_banks[i]->set_entry(0);
+	}
 
 	m_run_led = 1;
 }
-
-//TODO I have internal debates about where to put this.  The 74670 with this logic is on master but ext_cs is a bus signal.  
-// I'm keeping it here for now and setting the bus signal.
 
 memory_map_info super8008_state::get_mmap_info(offs_t offset)
 {
@@ -153,59 +170,37 @@ memory_map_info super8008_state::get_mmap_info(offs_t offset)
 	mmap_info.rom_cs = BIT(mmap_info.mmap_value, 3);
 	mmap_info.address= (offset & 0x0FFF) | ((mmap_info.ra13 << 13) | (mmap_info.ra12 << 12));
 
-	m_bus->ext_cs(mmap_info.ext_cs);
-
 	return mmap_info;
 }
 
-void super8008_state::log_mmap_info(std::string context, std::string message, offs_t offset, memory_map_info *mmap_info)
+memory_map_info super8008_state::get_mmap_info(uint8_t idx)
 {
-	logerror("%s:%s ($%04X) mmap_index %X mmap_value %X, ra12 %d, ra13 %d, ext_cs %d, rom_cs %d address %04X\n", 
-		context, 
-		message,
-		offset, 
-		mmap_info->mmap_index, 
-		mmap_info->mmap_value, 
-		mmap_info->ra12, 
-		mmap_info->ra13, 
-		mmap_info->ext_cs, 
-		mmap_info->rom_cs, 
-		mmap_info->address);
+	offs_t offset = (idx & 0x3) << 12;
+	return get_mmap_info(offset);
 }
 
-uint8_t super8008_state::memory_read(offs_t offset)
+// void super8008_state::log_mmap_info(std::string context, std::string message, offs_t offset, memory_map_info *mmap_info)
+// {
+// 	logerror("%s:%s ($%04X) mmap_index %X mmap_value %X, ra12 %d, ra13 %d, ext_cs %d, rom_cs %d address %04X\n",
+// 		context,
+// 		message,
+// 		offset,
+// 		mmap_info->mmap_index,
+// 		mmap_info->mmap_value,
+// 		mmap_info->ra12,
+// 		mmap_info->ra13,
+// 		mmap_info->ext_cs,
+// 		mmap_info->rom_cs,
+// 		mmap_info->address);
+// }
+
+uint8_t super8008_state::ext_read(offs_t offset)
 {
 	memory_map_info mmap_info = get_mmap_info(offset);
-	if (start)
-	{
-		//Move this into a constant
-		//A13 and A12 are pulled low during start			
-		return ((uint8_t*)m_rom->base())[offset & 0x0fff];
-	}
-	else if (!mmap_info.ext_cs)
-	{
-		//log_mmap_info(machine().describe_context(), "ext_cs read", offset, &mmap_info);
-		return m_bus->ext_read(mmap_info.address);
-	}
-	else
-	{
-		if (!mmap_info.rom_cs && 0 <= mmap_info.address && mmap_info.address < m_ram->size())
-		{
-			return ((uint8_t*)m_rom->base())[mmap_info.address];
-		}
-		else
-		{
-			if (0 <= mmap_info.address && mmap_info.address < m_ram->size())
-			{
-				return m_ram->pointer()[mmap_info.address];
-			}
-			else
-			{
-				return 0;
-			}
-		}
-	}
+	//log_mmap_info(machine().describe_context(), "external read", offset, &mmap_info);
+	return m_bus->ext_read(mmap_info.address);
 }
+
 
 //Does takew also write to master's memory?  That is the only way the conway code would work.
 //
@@ -216,8 +211,8 @@ uint8_t super8008_state::memory_read(offs_t offset)
 //   */
 //   RAMCS = (!ROMCS & !EXTCS) # (EXTCS & TAKEW & EXT_WRP);
 //
-// One thing to be aware of, the input for EXTCS, TAKEW is inverted.  
-// 
+// One thing to be aware of, the input for EXTCS, TAKEW is inverted.
+//
 // Notes about EXT_WRP from the IO PLD:
 //
 //   /* Set EXT_WRP ahead of the eventual MEMWR that will occur. This is used
@@ -228,47 +223,31 @@ uint8_t super8008_state::memory_read(offs_t offset)
 //    * this cycle when the O2 clock is high. EXT_WRP should come on before the O2
 //    * clock
 //    */
-//   
+//
 
-
-void super8008_state::memory_write(offs_t offset, uint8_t data)
+void super8008_state::ext_write(offs_t offset, uint8_t data)
 {
 	memory_map_info mmap_info = get_mmap_info(offset);
-	if (!mmap_info.rom_cs)
+	m_bus->ext_write(mmap_info.address, data);
+	//log_mmap_info(machine().describe_context(), "external write", offset, &mmap_info);
+	//TAKEW logic
+	if (!BIT(m_take_state, 7))
 	{
-		log_mmap_info(machine().describe_context(), "ERROR writing to ROM", offset, &mmap_info);
-	}
-	else if (!mmap_info.ext_cs){ //Do I need to check the rom_cs here? External is always ram.
-		//log_mmap_info(machine().describe_context(), "ext_cs write", offset, &mmap_info);
-		m_bus->ext_write(mmap_info.address, data);
-		
-		//TAKEW logic
-		if (!BIT(take_state, 7) && 0 <= mmap_info.address && mmap_info.address < m_ram->size())
-		{ 
-			m_ram->pointer()[mmap_info.address] = data; 
-		}
-	}
-	else
-	{
-		if (0 <= mmap_info.address && mmap_info.address < m_ram->size())
-		{
-			m_ram->pointer()[mmap_info.address] = data; 
-		}
+		//log_mmap_info(machine().describe_context(), "takew", offset, &mmap_info);
+		m_ram->pointer()[mmap_info.address] = data;
 	}
 }
 
-
 // Comment from the PLD file:
 //
-//   simulated SR flip-flop made up of cross-connected NAND gates.      
+//   simulated SR flip-flop made up of cross-connected NAND gates.
 //   the flip-flop is set when the reset signal from the DS1233 goes low
-//   (power-on-reset) and cleared when input port 1 is accessed.        
-//   when set, the flip-flop forces all memory accesses to select the   
-//   EPROM. when reset, the flip-flop permits the normal memory map.    
+//   (power-on-reset) and cleared when input port 1 is accessed.
+//   when set, the flip-flop forces all memory accesses to select the
+//   EPROM. when reset, the flip-flop permits the normal memory map.
 
 uint8_t super8008_state::port_1_read()
 {
-	start = false;//This is required!
 	return m_bus->ext_run();
 }
 
@@ -293,30 +272,52 @@ void super8008_state::serial_leds(uint8_t data)
 // take is routed to buffers around blasters's 16K of RAM
 // ext_cs from the memory mapper is routed to blaster's 16K RAM's cs
 
-void super8008_state::super8008_state::ext_stat_w(offs_t offset, uint8_t data)
+void super8008_state::ext_stat_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
-		case 0: 
+		case 0:
 			//logerror("ext_stat_w %04X  take data %02X\n", offset, data);
-			take_state = data;
+			m_take_state = data;
 			m_bus->ext_take(data);
 			break;//take
-		case 1: 
+		case 1:
 			//logerror("ext_stat_w %04X   int data %02X\n", offset, data);
 			m_bus->ext_int();
 			break;//int
-		case 2: 
+		case 2:
 			//logerror("ext_stat_w %04X   req data %02X\n", offset, data);
 			m_bus->ext_req();
 			break;//req
-		case 3: 
+		case 3:
 			//logerror("ext_stat_w %04X reset data %02X\n", offset, data);
 			m_bus->ext_reset();
 			break;//reset
-			
+
 		default:
 			logerror("ext_stat_w INVALID %04X data %02X\n", offset, data);break;
+	}
+}
+
+void super8008_state::select_memory_view(uint8_t index)
+{
+	memory_map_info mmap_info = get_mmap_info(index);
+	//log_mmap_info(machine().describe_context(), "select_memory_view", index, &mmap_info);
+	uint8_t bank_index = ((mmap_info.ra13 << 1) | mmap_info.ra12);
+
+	if (!mmap_info.rom_cs)
+	{
+		m_reg_views[mmap_info.mmap_index]->select(0);
+		m_reg_rom_banks[mmap_info.mmap_index]->set_entry(bank_index);
+	}
+	else if (!mmap_info.ext_cs)
+	{
+		m_reg_views[mmap_info.mmap_index]->select(1);
+	}
+	else
+	{
+		m_reg_views[mmap_info.mmap_index]->select(2);
+		m_reg_ram_banks[mmap_info.mmap_index]->set_entry(bank_index);
 	}
 }
 
@@ -324,6 +325,7 @@ void super8008_state::memory_mapper_w(offs_t offset, uint8_t data)
 {
 	uint8_t index = offset & MMAP_MASK;
 	mmap[index] = data & 0xff;
+	select_memory_view(index);
 	//logerror("super-8008 memory mapper write ($%04X) masked ($%04X) data %04X \n", offset, index, mmap[index]);
 }
 
@@ -332,16 +334,32 @@ void super8008_state::super8008_mem(address_map &map)
 	// Comment from monitor.asm
 	//
 	//   when the reset pushbutton is pressed, the flip-flop is set which generates an interrupt
-	//   and clears the address latches. thus, the first instruction is thus always fetched from 
-	//   address 0. the instruction at address 0 must be a single byte transfer instruction in 
+	//   and clears the address latches. thus, the first instruction is thus always fetched from
+	//   address 0. the instruction at address 0 must be a single byte transfer instruction in
 	//   order to set the program counter. i.e., it must be one of the RST opcodes.
-	// 
+	//
 
-	map(0x0000, 0x3fff).rw(FUNC(super8008_state::memory_read), FUNC(super8008_state::memory_write));
+	//A 74670 4x4 register file is used for the memory mapper.  This
+	//code is setting the memory view for all possible combinations
+	//of the 4x4 register.
+
+	uint16_t start = 0x0000;
+	uint16_t end = 0x0fff;
+	for(uint8_t i = 0; i < 4; i++)
+	{
+		map(start, end).view(*m_reg_views[i]);
+		(*m_reg_views[i])[0](start, end).bankr(m_reg_rom_banks[i]);
+		(*m_reg_views[i])[1](0x0000, 0x3fff).rw(
+			FUNC(super8008_state::ext_read),
+			FUNC(super8008_state::ext_write));
+		(*m_reg_views[i])[2](start, end).bankrw(m_reg_ram_banks[i]);
+		start += 0x1000;
+		end += 0x1000;
+	}
 }
 
 
-//For checking the status master performs a read (IN) on port 0 with device 0 or 1 and it is a read.  This is the same 
+//For checking the status master performs a read (IN) on port 0 with device 0 or 1 and it is a read.  This is the same
 //interupt that will take use out of start.
 //and device 0 is for dipswitches
 //    device 1 is the external status reuquest
@@ -351,7 +369,7 @@ void super8008_state::super8008_mem(address_map &map)
 // running also sets the running led on blaster
 // running is set from the pld that is monitoring the state flag.
 
-//TODO(jhe) once all of this is working sort these 
+//TODO(jhe) once all of this is working sort these
 void super8008_state::super8008_io(address_map &map)
 {
 
@@ -363,14 +381,14 @@ void super8008_state::super8008_io(address_map &map)
 	// OUTPORT     equ 08H         ; serial output port address
 	//
 	// out 10                      ; clear the EPROM bank switch address outputs A13 and A14
-	// out 09                      ; turn off orange LEDs      
+	// out 09                      ; turn off orange LEDs
 	// out 08                      ; set serial output high (mark)
 	// in 1                        ; reset the bootstrap flip-flop internal to GAL22V10 #2
 
 
 	map.global_mask(0xff);  // use 8-bit ports
 	map.unmap_value_high(); // unmapped addresses return 0xff
-	
+
 	map(0x01, 0x01).r(FUNC(super8008_state::port_1_read));//Signals start (come out of the start state)
 	map(0x02, 0x02).r(m_uart, FUNC(i8251_device::read));
 	map(0x03, 0x03).r(m_uart, FUNC(i8251_device::status_r));
@@ -384,7 +402,7 @@ void super8008_state::super8008_io(address_map &map)
 	//lines of the ram or rom.  The ram and rom cs are the high bit
 	//and bit 3 is used for issuing an external chip select.
 	map(0x0C, 0x0F).w(FUNC(super8008_state::memory_mapper_w));
-	
+
 	//This are all output ports
 	// 14 EXT_STAT_WR - take
 	// 15 EXT_STAT_WR - int
@@ -421,6 +439,8 @@ SUPER8008_SETUP_BLASTER_JUMPERS(6)
 
 void super8008_state::super8008(machine_config &config)
 {
+	RAM(config, m_ram).set_default_size("32K");
+
 	//500khz
 	I8008(config, m_maincpu, XTAL(1'000'000)/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &super8008_state::super8008_mem);
@@ -449,9 +469,6 @@ void super8008_state::super8008(machine_config &config)
 	m_rs232->cts_handler().set(m_uart, FUNC(i8251_device::write_cts));
 	m_rs232->set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal)); // must be below the DEVICE_INPUT_DEFAULTS_START block
 
-
-	RAM(config, m_ram).set_default_size("32K");
-
 	SUPER8008_BUS(config, m_bus, 153600);
 
 	SUPER8008_SLOT(config, m_slots[0], super8008_bus_devices, "super8008_blaster");
@@ -469,11 +486,10 @@ void super8008_state::super8008(machine_config &config)
 	m_slots[4]->set_option_device_input_defaults("super8008_blaster", DEVICE_INPUT_DEFAULTS_NAME(blaster_input_4));
 	m_slots[5]->set_option_device_input_defaults("super8008_blaster", DEVICE_INPUT_DEFAULTS_NAME(blaster_input_5));
 	m_slots[6]->set_option_device_input_defaults("super8008_blaster", DEVICE_INPUT_DEFAULTS_NAME(blaster_input_6));
-
 }
 
 ROM_START(super8008)
-	ROM_REGION(0x10000, "rom",0) //For the addresses to makes since, setup a huge rom chip and load the roms to the cooresponding machine addresses	
+	ROM_REGION(0x10000, "rom",0) //For the addresses to makes since, setup a huge rom chip and load the roms to the cooresponding machine addresses
 	//         Name                     offset  Length   hash
 	ROM_LOAD("monitor-8251-master.bin", 0x0000, 0x14b5, CRC(8cfd849e) SHA1(ea40b0066823df6c1dd896e5425285dddd3432e3))
 	ROM_LOAD("scelbal-8251-master.bin", 0x2000, 0x2000, CRC(51f98937) SHA1(83705305c24313cd81e14d1e3cefb3422a9e8118))
