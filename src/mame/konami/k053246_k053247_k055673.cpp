@@ -670,7 +670,7 @@ void k053247_device::zdrawgfxzoom32GP(
 							if (!eax || ozbuf_ptr[ecx] < z8) continue;
 							ozbuf_ptr[ecx] = z8;
 
-							dst_ptr[ecx] = alpha_blend_r32(pal_base[eax], dst_ptr[ecx], alpha);
+							dst_ptr[ecx] = alpha_blend_r32(dst_ptr[ecx], pal_base[eax], alpha);
 						}
 						while (++ecx);
 
@@ -696,7 +696,7 @@ void k053247_device::zdrawgfxzoom32GP(
 							if (!eax || eax >= shdpen || ozbuf_ptr[ecx] < z8) continue;
 							ozbuf_ptr[ecx] = z8;
 
-							dst_ptr[ecx] = alpha_blend_r32(pal_base[eax], dst_ptr[ecx], alpha);
+							dst_ptr[ecx] = alpha_blend_r32(dst_ptr[ecx], pal_base[eax], alpha);
 						}
 						while (++ecx);
 
@@ -819,7 +819,7 @@ void k053247_device::zdrawgfxzoom32GP(
 							if (!eax || ozbuf_ptr[ecx] < z8) continue;
 							ozbuf_ptr[ecx] = z8;
 
-							dst_ptr[ecx] = alpha_blend_r32(pal_base[eax], dst_ptr[ecx], alpha);
+							dst_ptr[ecx] = alpha_blend_r32(dst_ptr[ecx], pal_base[eax], alpha);
 						}
 						while (++ecx);
 
@@ -839,7 +839,7 @@ void k053247_device::zdrawgfxzoom32GP(
 							if (!eax || eax >= shdpen || ozbuf_ptr[ecx] < z8) continue;
 							ozbuf_ptr[ecx] = z8;
 
-							dst_ptr[ecx] = alpha_blend_r32(pal_base[eax], dst_ptr[ecx], alpha);
+							dst_ptr[ecx] = alpha_blend_r32(dst_ptr[ecx], pal_base[eax], alpha);
 						}
 						while (++ecx);
 
