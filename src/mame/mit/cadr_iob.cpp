@@ -461,7 +461,7 @@ u16 cadr_iob_device::read(offs_t offset)
 		chaos_transmit_start();
 		return 0x101;
 	}
-	return 0xffffffff;
+	return 0xffff;
 }
 
 
