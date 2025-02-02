@@ -311,10 +311,8 @@ void cadr_disk_device::start_w(u32 data)
 		break;
 
 	case 0x205: // 1005 - Recalibrate
-		{
-			LOG("Start recalibrate\n");
-			m_status |= 5;
-		}
+		LOG("Start recalibrate\n");
+		m_status |= 5;
 		break;
 
 	case 0x008: // 0010 - Read and compare

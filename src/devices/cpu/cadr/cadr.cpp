@@ -359,7 +359,6 @@ void cadr_cpu_device::get_m_source()
 		default:
 			// When no source is selected the MF lines will float
 			logerror("%x(%o): get_m_source: illegal functional m source %02x selected", m_prev_pc, m_prev_pc, (m_op >> 26) & 0x1f);
-//			fatalerror("%x(%o): get_m_source: functional m source %02x not implemented", m_prev_pc, m_prev_pc, (m_op >> 26) & 0x1f);
 			break;
 		}
 	}
@@ -612,7 +611,7 @@ void cadr_cpu_device::write_destination(u32 output)
 			m_md = output;
 			LOGMASKED(LOG_TRACE, "MD <- %x(%o)\n", m_md, m_md);
 			break;
-		case 0x1a: // MD,start-write
+		case 0x1a: // MD, start-write
 			m_md = output;
 			write();
 			LOGMASKED(LOG_TRACE, "MD <- %x(%o), start-write, MD=%x(%o)\n", m_md, m_md, m_md, m_md);
@@ -827,7 +826,6 @@ void cadr_cpu_device::execute_dispatch()
 		m_popj = false;
 		break;
 	case 0x01: // push pc on spc stack
-		// Not entirely sure
 		push_spc(m_n ? (BIT(m_op, 25) ? m_pc - 1 : m_pc) : m_next_pc);
 		m_next_pc = dispatch & 0x3fff;
 		m_popj = false;

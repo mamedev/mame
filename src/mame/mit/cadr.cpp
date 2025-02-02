@@ -171,8 +171,12 @@ void cadr_state::machine_start()
 	u8 *prom = memregion("proms")->base();
 
 	for (int i = 0; i < 0x200; i++)
+	{
 		for (int b = 0; b < 8; b++)
-			maincpu[((511 - i) * 8) + b] = prom[(i * 8) + b];
+		{
+			maincpu[((0x1ff - i) * 8) + b] = prom[(i * 8) + b];
+		}
+	}
 
 	save_item(NAME(m_interrupt_status));
 	save_item(NAME(m_bus_error_status));
