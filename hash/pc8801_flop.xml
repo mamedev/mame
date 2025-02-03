@@ -52,7 +52,6 @@ Are the following undumped or mistranslated (check also if available in TOSEC)?
  - 超番外制服図鑑+ (198905xx) by System House Oh!
  - 少女探偵RINNちゃんの事件簿 電脳少女伝説 (19890520) by Agumix
  - 小野由美のジャンピングクエスト (198904xx) by Uchuu Kikaku
- - ハイバーニア (198904xx) by Heart Denshi
  - エントフューラー 妖精誘拐事件 (198904xx) by Zenryutsu & グローサー
  - バージン倶楽部 Vol.1 (198903xx) by Pasoket [maybe in jam/jam1??]
  - 牧本千幸のメランコリー (198902xx) by Uchuu Kikaku
@@ -145,7 +144,6 @@ Are the following undumped or mistranslated (check also if available in TOSEC)?
  - ナナちゃんのスター誕生 (198510xx) by NSI
  - バルーンファイト (198510xx) by Hudson
  - パズルパニック (198510xx) by SystemSoft
- - レッドスタック (198508xx) by Cosmos Computer
  - スタコラさっちゃん (198508xx) by CTA
  - ゴーゴートレイン (198508xx) by Colpax
  - クリティカル・マス (198508xx) by Starcraft
@@ -15827,6 +15825,32 @@ Converted to .mfm from original .hfe
 		</part>
 	</software>
 
+	<software name="hiberniaa" cloneof="hibernia" supported="no">
+		<description>Hibernia (alt .d88 format)</description>
+		<year>1989</year>
+		<publisher>ハート電子 (Heart Denshi)</publisher>
+		<notes><![CDATA[
+[Incorrect layout on track 0 head 1, expected_size=100000, current_size=134400]
+]]></notes>
+		<!-- PC8801mk2SR -->
+		<info name="release" value="198904xx"/>
+		<info name="alt_title" value="ハイバーニア"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="622624">
+				<rom name="hibernia (disk a).d88" size="622624" crc="1289b16d" sha1="e2d5c02523964e2942222aef01c87aed90d26784"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="641904">
+				<rom name="hibernia (disk b).d88" size="641904" crc="1c51e693" sha1="4aad9aee161e1f4bdbdab546cf3e184ce6663595"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hideger">
 		<description>Hideger</description>
 		<year>1988</year>
@@ -28361,6 +28385,23 @@ ExtractDisk  [07]"DiskD        " -> "psy-o-blade_07.d88"
 			<feature name="part_id" value="Disk 4" />
 			<dataarea name="flop" size="416944">
 				<rom name="re-birth (disk 4).d88" size="416944" crc="d1695682" sha1="2271e9fd5c8276e022557286de9618577e700526"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="redstack" supported="no">
+		<description>Red Stack</description>
+		<year>1985</year>
+		<publisher>コスモスコンピュータ (Cosmos Computer)</publisher>
+		<notes><![CDATA[
+[Incorrect layout on track 10 head 0, expected_size=100000, current_size=373088]
+]]></notes>
+		<!-- PC8801 -->
+		<info name="release" value="198508xx"/>
+		<info name="alt_title" value="レッドスタック"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="185008">
+				<rom name="red stack.d88" size="185008" crc="fccef1b2" sha1="f60b23641cd627667c16b1b44582e247e35aa389"/>
 			</dataarea>
 		</part>
 	</software>
