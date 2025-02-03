@@ -28394,14 +28394,14 @@ ExtractDisk  [07]"DiskD        " -> "psy-o-blade_07.d88"
 		<year>1985</year>
 		<publisher>コスモスコンピュータ (Cosmos Computer)</publisher>
 		<notes><![CDATA[
-[Incorrect layout on track 10 head 0, expected_size=100000, current_size=373088]
+Gameplay is too fast, needs [V1S]
 ]]></notes>
 		<!-- PC8801 -->
 		<info name="release" value="198508xx"/>
 		<info name="alt_title" value="レッドスタック"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="185008">
-				<rom name="red stack.d88" size="185008" crc="fccef1b2" sha1="f60b23641cd627667c16b1b44582e247e35aa389"/>
+				<rom name="red stack.d88" size="185008" crc="c02cada5" sha1="ca5e7bf04b9d815792b200ad92e4fd10ea97a79a" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
