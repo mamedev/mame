@@ -685,7 +685,7 @@ void tek440x_state::machine_start()
 	m_led_8.resolve();
 	
 	m_led_disk.resolve();
-	m_maincpu->space(AS_PROGRAM).install_write_tap(0x7be002, 0x7be003, "led_tap", [this](offs_t offset, u16 &data, u16 mem_mask) { m_led_disk = !BIT(data, 3);});
+	m_maincpu->space(AS_PROGRAM).install_write_tap(0x7be002, 0x7be003, "led_tap", [this](offs_t offset, u16 &data, u16 mem_mask) { m_led_disk = !(data & 0x18);});
 
 	m_maincpu->linktoMMU(&m_map_control, &m_map[0]);
 
