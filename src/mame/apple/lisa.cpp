@@ -16,6 +16,7 @@
 #include "softlist_dev.h"
 #include "speaker.h"
 
+#include "bus/applepp/applepp.h"
 #include "cpu/cop400/cop400.h"
 #include "cpu/m68000/m68000.h"
 #include "formats/ap_dsk35.h"
@@ -46,6 +47,7 @@ public:
 		m_fdc(*this, "fdc"),
 		m_scc(*this, "scc"),
 		m_speaker(*this, "speaker"),
+		m_pp(*this, "pp"),
 		m_mainram(*this, "mainram"),
 		m_mouse(*this, "mouse"),
 		m_mousebtn(*this, "mousebtn"),
@@ -69,6 +71,7 @@ private:
 	required_device<lisa_base_fdc_device> m_fdc;
 	required_device<z80scc_device> m_scc;
 	required_device<speaker_sound_device> m_speaker;
+	required_device<applepp_connector> m_pp;
 
 	required_shared_ptr<uint16_t> m_mainram;
 
@@ -232,6 +235,20 @@ void lisa_state::lisa(machine_config &config)
 	SCC8530N(config, m_scc, 7833600);
 
 	QUADMOUSE(config, m_mouse);
+
+	APPLEPP_CONNECTOR(config, m_pp, applepp_intf, nullptr);
+	m_pp->write_pd().set(m_via1, FUNC(mos6522_device::write_pa));
+	m_pp->write_pchk().set(m_via1, FUNC(mos6522_device::write_pb0));
+	m_pp->write_pbsy().set(m_via1, FUNC(mos6522_device::write_pb1));
+	m_pp->write_pbsy().append(m_via1, FUNC(mos6522_device::write_ca1));
+	m_pp->write_pparity().set(m_via1, FUNC(mos6522_device::write_cb2));
+	m_via1->ca2_handler().set(m_pp, FUNC(applepp_connector::pstrb_w));
+	m_via1->writepa_handler().set(m_pp, FUNC(applepp_connector::pd_w));
+	m_via1->writepb_handler().set([this](u8 data) {
+									  m_pp->prw_w(BIT(data, 3));
+									  m_pp->pcmd_w(BIT(data, 4));
+									  m_pp->pres_w(BIT(data, 7));
+								  });
 
 	config.set_perfect_quantum(m_iocop);
 }

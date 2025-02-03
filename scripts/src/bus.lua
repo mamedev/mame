@@ -5317,3 +5317,16 @@ if (BUSES["MC68000_SYSBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/mc68000/ram.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/bus/applepp/applepp.h,BUSES["APPLEPP"] = true
+---------------------------------------------------
+if (BUSES["APPLEPP"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/applepp/applepp.cpp",
+		MAME_DIR .. "src/devices/bus/applepp/applepp.h",
+		MAME_DIR .. "src/devices/bus/applepp/storagehle.cpp",
+		MAME_DIR .. "src/devices/bus/applepp/storagehle.h",
+	}
+end
