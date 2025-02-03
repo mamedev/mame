@@ -87,7 +87,6 @@ protected:
 	// machine configs
 	void mcfg_cpu_common(machine_config &config);
 	void mcfg_cpu_sm5a(machine_config &config);
-	void mcfg_cpu_kb1013vk12(machine_config &config);
 	void mcfg_cpu_sm510(machine_config &config);
 	void mcfg_cpu_sm511(machine_config &config);
 	void mcfg_cpu_sm512(machine_config &config);
@@ -96,7 +95,6 @@ protected:
 	void mcfg_sound_r1(machine_config &config);
 
 	void sm5a_common(machine_config &config, u16 width, u16 height);
-	void kb1013vk12_common(machine_config &config, u16 width, u16 height);
 	void sm510_common(machine_config &config, u16 width, u16 height);
 	void sm511_common(machine_config &config, u16 width, u16 height);
 	//void sm512_common(machine_config &config, u16 width, u16 height);
