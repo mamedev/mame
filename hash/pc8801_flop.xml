@@ -52,6 +52,7 @@ Are the following undumped or mistranslated (check also if available in TOSEC)?
  - 超番外制服図鑑+ (198905xx) by System House Oh!
  - 少女探偵RINNちゃんの事件簿 電脳少女伝説 (19890520) by Agumix
  - 小野由美のジャンピングクエスト (198904xx) by Uchuu Kikaku
+ - ハイバーニア (198904xx) by Heart Denshi
  - エントフューラー 妖精誘拐事件 (198904xx) by Zenryutsu & グローサー
  - バージン倶楽部 Vol.1 (198903xx) by Pasoket [maybe in jam/jam1??]
  - 牧本千幸のメランコリー (198902xx) by Uchuu Kikaku
@@ -15795,32 +15796,6 @@ Should be supported by [PC8001mkIISR] too
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="348848">
 				<rom name="hiatari ryoko (disk 2).d88" size="348848" crc="76f1a34f" sha1="5a18fc8a4ef427e71e06563c12e69e3c45e613db"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="hibernia" supported="no">
-		<description>Hibernia</description>
-		<year>1989</year>
-		<publisher>ハート電子 (Heart Denshi)</publisher>
-		<notes><![CDATA[
-[Incorrect layout on track 0 head 1, expected_size=100000, current_size=134400]
-]]></notes>
-		<!-- PC8801mk2SR -->
-		<info name="release" value="198904xx"/>
-		<info name="alt_title" value="ハイバーニア"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A" />
-			<dataarea name="flop" size="622624">
-				<rom name="hibernia (disk a).d88" size="622624" crc="1289b16d" sha1="e2d5c02523964e2942222aef01c87aed90d26784"/>
-			</dataarea>
-		</part>
-
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B" />
-			<dataarea name="flop" size="641904">
-				<rom name="hibernia (disk b).d88" size="641904" crc="1c51e693" sha1="4aad9aee161e1f4bdbdab546cf3e184ce6663595"/>
 			</dataarea>
 		</part>
 	</software>
