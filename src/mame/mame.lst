@@ -37425,10 +37425,17 @@ tetriskr
 tosh1000
 
 @source:pce/ggconnie.cpp
+<<<<<<< HEAD
 bmanroul
 fishingm
 ggconnie
 smf
+=======
+bmanroul                        // (c) 1996 Eighting
+fishingm                        // (c) 1997 Capcom
+ggconnie                        // (c) ???? Capcom
+smf                             // (c) 1997 Capcom
+>>>>>>> b72e6306636 (New systems marked not working)
 
 @source:pce/paranoia.cpp
 paranoia
