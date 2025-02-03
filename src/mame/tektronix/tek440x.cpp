@@ -1531,7 +1531,7 @@ void tek440x_state::physical_map(address_map &map)
 			}
 			
 		}, "scsi_addr"); // 7bc000-7bdfff: SCSI bus address registers
-	map(0x7be000, 0x7be03f).m(m_scsi, FUNC(ncr5385_device::map)).umask16(0xff00); //.mirror(0x1fe0) .cswidth(16);
+	map(0x7be000, 0x7be01f).m(m_scsi, FUNC(ncr5385_device::map)).umask16(0xff00); //.mirror(0x1fe0) .cswidth(16);
 
 	// 7c0000-7fffff EPROM application space
 	map(0x7c0000, 0x7fffff).nopr();
