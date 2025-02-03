@@ -24,6 +24,8 @@ TODO:
 - Caps lock is not working
 - The keyboard and I/O board actually communicate through a serial connection.
 - Is there another MCU on the I/O board to communicate with the keyboard??
+- How are packet checksums calculated?
+  The chaosnet documentation mentions 16 bit CRC checksums, usim uses internet checksum.
 
 **********************************************************************************/
 #include "emu.h"
@@ -49,6 +51,7 @@ cadr_iob_device::cadr_iob_device(const machine_config &mconfig, const char *tag,
 	, m_mouse_x(*this, "MOUSE_X")
 	, m_mouse_y(*this, "MOUSE_Y")
 	, m_mouse_buttons(*this, "MOUSE_BUTTONS")
+	, m_my_chaos_address(*this, "MY_CHAOS_ADDRESS")
 	, m_speaker(*this, "speaker")
 {
 }
@@ -251,6 +254,77 @@ static INPUT_PORTS_START(keyboard)
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Left mouse button")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Middle mouse button")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Right mouse button")
+
+
+	PORT_START("MY_CHAOS_ADDRESS")
+	PORT_DIPNAME(0xf000, 0x7000, "net high nybble")
+	PORT_DIPSETTING(0x0000, "0")
+	PORT_DIPSETTING(0x1000, "1")
+	PORT_DIPSETTING(0x2000, "2")
+	PORT_DIPSETTING(0x3000, "3")
+	PORT_DIPSETTING(0x4000, "4")
+	PORT_DIPSETTING(0x5000, "5")
+	PORT_DIPSETTING(0x6000, "6")
+	PORT_DIPSETTING(0x7000, "7")
+	PORT_DIPSETTING(0x8000, "8")
+	PORT_DIPSETTING(0x9000, "9")
+	PORT_DIPSETTING(0xa000, "a")
+	PORT_DIPSETTING(0xb000, "b")
+	PORT_DIPSETTING(0xc000, "c")
+	PORT_DIPSETTING(0xd000, "d")
+	PORT_DIPSETTING(0xe000, "e")
+	PORT_DIPSETTING(0xf000, "f")
+	PORT_DIPNAME(0x0f00, 0x0f00, "net low nybble")
+	PORT_DIPSETTING(0x0000, "0")
+	PORT_DIPSETTING(0x0100, "1")
+	PORT_DIPSETTING(0x0200, "2")
+	PORT_DIPSETTING(0x0300, "3")
+	PORT_DIPSETTING(0x0400, "4")
+	PORT_DIPSETTING(0x0500, "5")
+	PORT_DIPSETTING(0x0600, "6")
+	PORT_DIPSETTING(0x0700, "7")
+	PORT_DIPSETTING(0x0800, "8")
+	PORT_DIPSETTING(0x0900, "9")
+	PORT_DIPSETTING(0x0a00, "a")
+	PORT_DIPSETTING(0x0b00, "b")
+	PORT_DIPSETTING(0x0c00, "c")
+	PORT_DIPSETTING(0x0d00, "d")
+	PORT_DIPSETTING(0x0e00, "e")
+	PORT_DIPSETTING(0x0f00, "f")
+	PORT_DIPNAME(0x00f0, 0x0020, "host high nybble")
+	PORT_DIPSETTING(0x0000, "0")
+	PORT_DIPSETTING(0x0010, "1")
+	PORT_DIPSETTING(0x0020, "2")
+	PORT_DIPSETTING(0x0030, "3")
+	PORT_DIPSETTING(0x0040, "4")
+	PORT_DIPSETTING(0x0050, "5")
+	PORT_DIPSETTING(0x0060, "6")
+	PORT_DIPSETTING(0x0070, "7")
+	PORT_DIPSETTING(0x0080, "8")
+	PORT_DIPSETTING(0x0090, "9")
+	PORT_DIPSETTING(0x00a0, "a")
+	PORT_DIPSETTING(0x00b0, "b")
+	PORT_DIPSETTING(0x00c0, "c")
+	PORT_DIPSETTING(0x00d0, "d")
+	PORT_DIPSETTING(0x00e0, "e")
+	PORT_DIPSETTING(0x00f0, "f")
+	PORT_DIPNAME(0x000f, 0x0002, "host low nybble")
+	PORT_DIPSETTING(0x0000, "0")
+	PORT_DIPSETTING(0x0001, "1")
+	PORT_DIPSETTING(0x0002, "2")
+	PORT_DIPSETTING(0x0003, "3")
+	PORT_DIPSETTING(0x0004, "4")
+	PORT_DIPSETTING(0x0005, "5")
+	PORT_DIPSETTING(0x0006, "6")
+	PORT_DIPSETTING(0x0007, "7")
+	PORT_DIPSETTING(0x0008, "8")
+	PORT_DIPSETTING(0x0009, "9")
+	PORT_DIPSETTING(0x000a, "a")
+	PORT_DIPSETTING(0x000b, "b")
+	PORT_DIPSETTING(0x000c, "c")
+	PORT_DIPSETTING(0x000d, "d")
+	PORT_DIPSETTING(0x000e, "e")
+	PORT_DIPSETTING(0x000f, "f")
 INPUT_PORTS_END
 
 
@@ -270,10 +344,12 @@ void cadr_iob_device::device_start()
 	save_item(NAME(m_microsecond_clock_buffer));
 	save_item(NAME(m_clock));
 	save_item(NAME(m_chaos_csr));
-	save_item(NAME(m_chaos_transmit));
-	save_item(NAME(m_chaos_receive));
 	save_item(NAME(m_chaos_transmit_pointer));
 	save_item(NAME(m_chaos_transmit_buffer));
+	save_item(NAME(m_chaos_receive_size));
+	save_item(NAME(m_chaos_receive_pointer));
+	save_item(NAME(m_chaos_receive_buffer));
+	save_item(NAME(m_chaos_receive_bit_count));
 
 	m_clock_timer = timer_alloc(FUNC(cadr_iob_device::clock_callback), this);
 	m_transmit_timer = timer_alloc(FUNC(cadr_iob_device::transmit_callback), this);
@@ -298,16 +374,24 @@ void cadr_iob_device::device_reset()
 	m_microsecond_clock_buffer = 0;
 	m_clock = 0;
 	m_chaos_csr = CHAOSNET_TRANSMIT_DONE;
-	m_chaos_transmit = 0;
-	m_chaos_receive = 0;
 	m_speaker_data = 0;
 	m_speaker->level_w(m_speaker_data);
 	m_chaos_transmit_pointer = 0;
+	m_chaos_receive_pointer = 0;
+	m_chaos_receive_size = 0;
+	m_chaos_receive_bit_count = 0xffff;
 }
 
 
 void cadr_iob_device::chaos_transmit_start()
 {
+	// Add our source address
+	m_chaos_transmit_buffer[m_chaos_transmit_pointer] = m_my_chaos_address->read();
+	m_chaos_transmit_pointer = (m_chaos_transmit_pointer + 1) % CHAOS_BUFFER_SIZE;
+	// TODO Add checksum
+	m_chaos_transmit_buffer[m_chaos_transmit_pointer] = 0xDEAD;
+	m_chaos_transmit_pointer = (m_chaos_transmit_pointer + 1) % CHAOS_BUFFER_SIZE;
+
 	LOG("Starting transmit of packet\n");
 	LOG("Transmitting packet data");
 	for (int i = 0; i < m_chaos_transmit_pointer; i++)
@@ -316,7 +400,6 @@ void cadr_iob_device::chaos_transmit_start()
 	}
 	LOG("\n");
 
-	// TODO transmit the data
 	// TODO set proper timing
 	m_transmit_timer->adjust(attotime::from_nsec(500));
 }
@@ -324,11 +407,38 @@ void cadr_iob_device::chaos_transmit_start()
 
 TIMER_CALLBACK_MEMBER(cadr_iob_device::transmit_callback)
 {
+	if (BIT(m_chaos_csr, CHAOSNET_LOOPBACK_BIT))
+	{
+		printf("Transmitting through loopback\n");
+		// TODO move to a method.
+
+		for (int i = 0; i < m_chaos_transmit_pointer; i++)
+		{
+			m_chaos_receive_buffer[i] = m_chaos_transmit_buffer[i];
+		}
+
+		m_chaos_receive_size = m_chaos_transmit_pointer;
+		m_chaos_receive_bit_count = (m_chaos_receive_size * 16) - 1;
+		m_chaos_receive_pointer = 0;
+
+		m_chaos_csr |= CHAOSNET_RECEIVE_DONE;
+		if (BIT(m_chaos_csr, CHAOSNET_RECEIVE_IRQ_ENABLE_BIT))
+		{
+			m_irq_vector_cb(IRQ_VECTOR_CHAOS_RECEIVE);
+		}
+	}
+	else
+	{
+		// TODO transmit the data to the network
+	}
+
 	m_chaos_csr |= CHAOSNET_TRANSMIT_DONE;
+	m_chaos_transmit_pointer = 0;
 	if (BIT(m_chaos_csr, CHAOSNET_TRANSMIT_IRQ_ENABLE_BIT))
 	{
 		m_irq_vector_cb(IRQ_VECTOR_CHAOS_TRANSMIT);
 	}
+
 }
 
 
@@ -364,13 +474,10 @@ void cadr_iob_device::write(offs_t offset, u16 data)
 				CHAOSNET_ANY_DESTINATION | CHAOSNET_LOOKBACK | CHAOSNET_TIMER_IRQ_ENABLE;
 			m_chaos_csr = (m_chaos_csr & ~bits_to_store) | (data & bits_to_store);
 		}
-		if (BIT(data, CHAOSNET_LOOPBACK_BIT))
-		{
-			// Loopback not implemented
-		}
 		if (BIT(data, CHAOSNET_RESET_RECEIVE_BIT))
 		{
-			// TODO Clear and enable receiver
+			m_chaos_receive_pointer = 0;
+			m_chaos_receive_size = 0;
 			m_chaos_csr = (m_chaos_csr & ~CHAOSNET_RECEIVE_DONE);
 			m_chaos_csr = (m_chaos_csr & ~CHAOSNET_LOST_COUNT);
 		}
@@ -385,15 +492,16 @@ void cadr_iob_device::write(offs_t offset, u16 data)
 		}
 		if (BIT(data, CHAOSNET_RESET_BIT))
 		{
+			m_chaos_receive_pointer = 0;
+			m_chaos_receive_size = 0;
 			m_transmit_timer->adjust(attotime::never);
-			// TODO Clear and enable receiver
 			m_chaos_csr |= CHAOSNET_TRANSMIT_DONE;
 			m_chaos_csr = m_chaos_csr & ~(CHAOSNET_RESET | CHAOSNET_RECEIVE_DONE | CHAOSNET_RECEIVE_IRQ_ENABLE | CHAOSNET_TRANSMIT_IRQ_ENABLE);
 		}
 		break;
 	case 0x11: // store word in transmit buffer
 		m_chaos_transmit_buffer[m_chaos_transmit_pointer] = data;
-		m_chaos_transmit_pointer = (m_chaos_transmit_pointer + 1) % CHAOS_TRANSMIT_BUFFER_SIZE;
+		m_chaos_transmit_pointer = (m_chaos_transmit_pointer + 1) % CHAOS_BUFFER_SIZE;
 		m_chaos_csr &= ~CHAOSNET_TRANSMIT_DONE;
 		break;
 	default:
@@ -453,14 +561,22 @@ u16 cadr_iob_device::read(offs_t offset)
 		return m_chaos_csr;
 	case 0x11: // chaos net my address
 		// TODO: Address is configured using dip switches
-		return 0x101;
+		return m_my_chaos_address->read();
 	case 0x12: // next word from receive buffer
-		return m_chaos_receive;
+		{
+			const u16 data = m_chaos_receive_buffer[m_chaos_receive_pointer];
+			m_chaos_receive_pointer = (m_chaos_receive_pointer + 1) % CHAOS_BUFFER_SIZE;
+			return data;
+		}
 	case 0x13: // count of bits remaining in the receive buffer
-		break;
+		if (m_chaos_receive_pointer < m_chaos_receive_size)
+		{
+			return m_chaos_receive_bit_count;
+		}
+		return 0xffff;
 	case 0x15: // host number of this interface
 		chaos_transmit_start();
-		return 0x101;
+		return m_my_chaos_address->read();
 	}
 	return 0xffff;
 }

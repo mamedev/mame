@@ -74,7 +74,7 @@ private:
 	static constexpr int CHAOSNET_RECEIVE_DONE_BIT = 15;
 	static constexpr u16 CHAOSNET_RECEIVE_DONE = 1 << CHAOSNET_RECEIVE_DONE_BIT;
 
-	static constexpr u16 CHAOS_TRANSMIT_BUFFER_SIZE = 512 / 2;
+	static constexpr u16 CHAOS_BUFFER_SIZE = 512 / 2;
 
 	u8 mcu_bus_r();
 	void mcu_bus_w(u8 data);
@@ -90,6 +90,7 @@ private:
 	required_ioport m_mouse_x;
 	required_ioport m_mouse_y;
 	required_ioport m_mouse_buttons;
+	required_ioport m_my_chaos_address;
 	required_device<speaker_sound_device> m_speaker;
 	emu_timer *m_clock_timer;
 	emu_timer *m_transmit_timer;
@@ -101,10 +102,12 @@ private:
 	u32 m_microsecond_clock_buffer;
 	u16 m_clock;
 	u16 m_chaos_csr;
-	u16 m_chaos_transmit;
-	u16 m_chaos_transmit_buffer[CHAOS_TRANSMIT_BUFFER_SIZE];
+	u16 m_chaos_transmit_buffer[CHAOS_BUFFER_SIZE];
 	u16 m_chaos_transmit_pointer;
-	u16 m_chaos_receive;
+	u16 m_chaos_receive_buffer[CHAOS_BUFFER_SIZE];
+	u16 m_chaos_receive_size;
+	u16 m_chaos_receive_pointer;
+	u16 m_chaos_receive_bit_count;
 };
 
 #endif // MAME_MIT_CADR_IOB_H
