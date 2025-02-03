@@ -2,6 +2,7 @@
 // copyright-holders:Ernesto Corvi
 /*
 World Cup 90 ( Tecmo ) driver
+Tecmo 6303A + 6303B PCBs
 -----------------------------
 
 Ernesto Corvi
