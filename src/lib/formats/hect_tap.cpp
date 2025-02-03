@@ -203,7 +203,7 @@ static int hector_handle_forth_tap(int16_t *buffer, const uint8_t *casdata)
 /*******************************************************************
    Generate samples for the tape image
 ********************************************************************/
-static int hector_tap_fill_wave(int16_t *buffer, int sample_count, const uint8_t *bytes)
+static int hector_tap_fill_wave(int16_t *buffer, int sample_count, const uint8_t *bytes, int)
 {
 	return hector_handle_tap( buffer, bytes );
 }
@@ -222,7 +222,7 @@ static int hector_tap_forth_to_wav_size(const uint8_t *casdata, int caslen)
 /*******************************************************************
    Generate samples for the tape image FORTH
 ********************************************************************/
-static int hector_tap_forth_fill_wave(int16_t *buffer, int sample_count, const uint8_t *bytes)
+static int hector_tap_forth_fill_wave(int16_t *buffer, int sample_count, const uint8_t *bytes, int)
 {
 	return hector_handle_forth_tap( buffer, bytes ); //forth removed here !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 }
