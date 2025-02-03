@@ -19588,6 +19588,7 @@ rw30r
 rw31r
 
 @source:handheld/hh_sm510.cpp
+<<<<<<< HEAD
 atakaast
 auslalom
 bassmate
@@ -19763,6 +19764,177 @@ vesarif
 vespovar
 vfutbol
 vinnpukh
+=======
+atakaast                        // Elektronika
+auslalom                        // Elektronika
+bassmate                        // Telko
+biathlon                        // Elektronika
+ecircus                         // Elektronika
+ehockey                         // Elektronika
+elbaskb                         // Elektronika
+gnw_ball                        // Nintendo
+gnw_bfight                      // Nintendo
+gnw_bfightn                     // Nintendo
+gnw_bjack                       // Nintendo
+gnw_boxing                      // Nintendo
+gnw_bsweep                      // Nintendo
+gnw_cgrab                       // Nintendo
+gnw_chef                        // Nintendo
+gnw_climber                     // Nintendo
+gnw_climbern                    // Nintendo
+gnw_dkcirc                      // Nintendo
+gnw_dkhockey                    // Nintendo
+gnw_dkjr                        // Nintendo
+gnw_dkjrp                       // Nintendo
+gnw_dkong                       // Nintendo
+gnw_dkong2                      // Nintendo
+gnw_dkong3                      // Nintendo
+gnw_egg                         // Nintendo
+gnw_fire                        // Nintendo
+gnw_fireatk                     // Nintendo
+gnw_fires                       // Nintendo
+gnw_flagman                     // Nintendo
+gnw_gcliff                      // Nintendo
+gnw_ghouse                      // Nintendo
+gnw_helmet                      // Nintendo
+gnw_helmeto                     // Nintendo
+gnw_judge                       // Nintendo
+gnw_judgeo                      // Nintendo
+gnw_lboat                       // Nintendo
+gnw_lion                        // Nintendo
+gnw_manhole                     // Nintendo
+gnw_manholeg                    // Nintendo
+gnw_mario                       // Nintendo
+gnw_mariocm                     // Nintendo
+gnw_mariocmt                    // Nintendo
+gnw_mariocmta                   // Nintendo
+gnw_mariotj                     // Nintendo
+gnw_mbaway                      // Nintendo
+gnw_mmouse                      // Nintendo
+gnw_mmousep                     // Nintendo
+gnw_mickdon                     // Nintendo
+gnw_octopus                     // Nintendo
+gnw_opanic                      // Nintendo
+gnw_pchute                      // Nintendo
+gnw_pinball                     // Nintendo
+gnw_popeye                      // Nintendo
+gnw_popeyep                     // Nintendo
+gnw_rshower                     // Nintendo
+gnw_sbuster                     // Nintendo
+gnw_smb                         // Nintendo
+gnw_smbn                        // Nintendo
+gnw_snoopyp                     // Nintendo
+gnw_squish                      // Nintendo
+gnw_ssparky                     // Nintendo
+gnw_stennis                     // Nintendo
+gnw_tbridge                     // Nintendo
+gnw_tfish                       // Nintendo
+gnw_vermin                      // Nintendo
+gnw_zelda                       // Nintendo
+kbilly                          // Konami
+kblades                         // Konami
+kbottom9                        // Konami
+kbucky                          // Konami
+kcontra                         // Konami
+kdribble                        // Konami
+kgarfld                         // Konami
+kgradius                        // Konami
+kloneran                        // Konami
+knascar                         // Konami
+knfl                            // Konami
+kosmicmt                        // Elektronika
+kosmicpt                        // Elektronika
+krybolov                        // Elektronika
+kskatedie                       // Konami
+kst25                           // Konami
+ktmnt                           // Konami
+ktmnt2                          // Konami
+ktmnt3                          // Konami
+ktmntbb                         // Konami
+ktopgun                         // Konami
+ktopgun2                        // Konami
+kvakazad                        // Elektronika
+morataka                        // Elektronika
+naltair                         // Nauchpribor
+nochnyev                        // Elektronika
+nsmb3                           // Nelsonic
+nsmw                            // Nelsonic
+nstarfox                        // Nelsonic
+nummunch                        // VTech
+nupogodi                        // Elektronika
+okhota                          // Elektronika
+rkosmosa                        // Elektronika
+taddams                         // Tiger Electronics
+taltbeast                       // Tiger Electronics
+tapollo13                       // Tiger Electronics
+taynyoke                        // Elektronika
+tbatfor                         // Tiger Electronics
+tbatman                         // Tiger Electronics
+tbatmana                        // Tiger Electronics
+tbtoads                         // Tiger Electronics
+tbttf                           // Tiger Electronics
+tddragon                        // Tiger Electronics
+tddragon2                       // Tiger Electronics
+tddragon3                       // Tiger Electronics
+tdennis                         // Tiger Electronics
+tdummies                        // Tiger Electronics
+tflash                          // Tiger Electronics
+tgaiden                         // Tiger Electronics
+tgaiden3                        // Tiger Electronics
+tgargnf                         // Tiger Electronics
+tgaunt                          // Tiger Electronics
+tgoldeye                        // Tiger Electronics
+tgoldnaxe                       // Tiger Electronics
+thalone                         // Tiger Electronics
+thalone2                        // Tiger Electronics
+thook                           // Tiger Electronics
+tigarden                        // Tronica
+tinday                          // Tiger Electronics
+tjdredd                         // Tiger Electronics
+tjpark                          // Tiger Electronics
+tkarnov                         // Tiger Electronics
+tkazaam                         // Tiger Electronics
+tmchammer                       // Tiger Electronics
+tmegaman3                       // Tiger Electronics
+tmigmax                         // Tiger Electronics
+tmkombat                        // Tiger Electronics
+tnmarebc                        // Tiger Electronics
+topaliens                       // Tiger Electronics
+tpitfight                       // Tiger Electronics
+trclchick                       // Tronica
+trdivadv                        // Tronica
+trobhood                        // Tiger Electronics
+trobocop2                       // Tiger Electronics
+trobocop3                       // Tiger Electronics
+trockteer                       // Tiger Electronics
+trsgkeep                        // Tronica
+trshutvoy                       // Tronica
+trspacmis                       // Tronica
+trspider                        // Tronica
+trsrescue                       // Tronica
+trthuball                       // Tronica
+tsddragon                       // Tiger Electronics
+tsf2010                         // Tiger Electronics
+tsfight2                        // Tiger Electronics
+tshadow                         // Tiger Electronics
+tsharr2                         // Tiger Electronics
+tsimquest                       // Tiger Electronics
+tsjam                           // Tiger Electronics
+tskelwarr                       // Tiger Electronics
+tsonic                          // Tiger Electronics
+tsonic2                         // Tiger Electronics
+tspidman                        // Tiger Electronics
+tstrider                        // Tiger Electronics
+tsuperman                       // Tiger Electronics
+tswampt                         // Tiger Electronics
+ttransf2                        // Tiger Electronics
+tvindictr                       // Tiger Electronics
+twworld                         // Tiger Electronics
+txmen                           // Tiger Electronics
+txmenpx                         // Tiger Electronics
+vespovar                        // Elektronika
+vfutbol                         // Elektronika
+>>>>>>> 9ba5d7019eb (New working systems)
 
 @source:handheld/hh_smc1k.cpp
 tkkongq
