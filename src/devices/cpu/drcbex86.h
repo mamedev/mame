@@ -292,6 +292,8 @@ private:
 	uint64_t                m_reshi;                // extended high result
 
 	// resolved memory handler functions
+	resolved_member_function m_debug_cpu_instruction_hook;
+	resolved_member_function m_drcmap_get_value;
 	resolved_memory_accessors_vector m_memory_accessors;
 
 	// globals

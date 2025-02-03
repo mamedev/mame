@@ -602,6 +602,9 @@ drcbe_x86::drcbe_x86(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 	}
 
 	// resolve the actual addresses of member functions we need to call
+	m_drcmap_get_value.set(m_map, &drc_map_variables::get_value);
+	if (!m_drcmap_get_value)
+		throw emu_fatalerror("Error resolving map variable get value function!\n");
 	m_memory_accessors.resize(m_space.size());
 	for (int space = 0; m_space.size() > space; ++space)
 	{
@@ -856,6 +859,14 @@ int drcbe_x86::execute(code_handle &entry)
 
 void drcbe_x86::generate(drcuml_block &block, const instruction *instlist, uint32_t numinst)
 {
+	// do this here because device.debug() isn't initialised at construction time
+	if (!m_debug_cpu_instruction_hook && (m_device.machine().debug_flags & DEBUG_FLAG_ENABLED))
+	{
+		m_debug_cpu_instruction_hook.set(*m_device.debug(), &device_debug::instruction_hook);
+		if (!m_debug_cpu_instruction_hook)
+			throw emu_fatalerror("Error resolving debugger instruction hook member function!\n");
+	}
+
 	// tell all of our utility objects that a block is beginning
 	m_hash.block_begin(block, instlist, numinst);
 	m_map.block_begin(block);
@@ -2535,25 +2546,27 @@ void drcbe_x86::op_debug(Assembler &a, const instruction &inst)
 	assert_no_condition(inst);
 	assert_no_flags(inst);
 
-	using debugger_hook_func = void (*)(device_debug *, offs_t);
-	static const debugger_hook_func debugger_inst_hook = [] (device_debug *dbg, offs_t pc) { dbg->instruction_hook(pc); }; // TODO: kill trampoline if possible
-
 	if ((m_device.machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
 		// normalize parameters
 		be_parameter const pcp(*this, inst.param(0), PTYPE_MRI);
 
 		// test and branch
-		a.test(MABS(&m_device.machine().debug_flags, 4), DEBUG_FLAG_CALL_HOOK);         // test  [debug_flags],DEBUG_FLAG_CALL_HOOK
+		a.test(MABS(&m_device.machine().debug_flags, 4), DEBUG_FLAG_CALL_HOOK);
 		Label skip = a.newLabel();
-		a.short_().jz(skip);                                                            // jz    skip
+		a.short_().jz(skip);
 
 		// push the parameter
-		emit_mov_m32_p32(a, dword_ptr(esp, 4), pcp);                                    // mov   [esp+4],pcp
-		a.mov(dword_ptr(esp, 0), imm(m_device.debug()));                                // mov   [esp],device.debug
-		a.call(imm(debugger_inst_hook));                                                // call  debugger_inst_hook
+		emit_mov_m32_p32(a, dword_ptr(esp, USE_THISCALL ? 0 : 4), pcp);
+		if (USE_THISCALL)
+			a.mov(ecx, imm(m_debug_cpu_instruction_hook.obj));
+		else
+			a.mov(dword_ptr(esp, 0), imm(m_debug_cpu_instruction_hook.obj));
+		a.call(imm(m_debug_cpu_instruction_hook.func));
+		if (USE_THISCALL)
+			a.sub(esp, 4);
 
-		a.bind(skip);                                                               // skip:
+		a.bind(skip);
 		reset_last_upper_lower_reg();
 	}
 }
@@ -2856,14 +2869,19 @@ void drcbe_x86::op_recover(Assembler &a, const instruction &inst)
 	be_parameter dstp(*this, inst.param(0), PTYPE_MR);
 
 	// call the recovery code
-	a.mov(eax, MABS(&m_stacksave));                                                     // mov   eax,stacksave
-	a.mov(eax, ptr(eax, -4));                                                           // mov   eax,[eax-4]
-	a.sub(eax, 1);                                                                      // sub   eax,1
-	a.mov(dword_ptr(esp, 8), inst.param(1).mapvar());                                   // mov   [esp+8],param1
-	a.mov(ptr(esp, 4), eax);                                                            // mov   [esp+4],eax
-	a.mov(dword_ptr(esp, 0), imm(&m_map));                                              // mov   [esp],m_map
-	a.call(imm(&drc_map_variables::static_get_value));                                  // call  drcmap_get_value
-	emit_mov_p32_r32(a, dstp, eax);                                                     // mov   dstp,eax
+	a.mov(eax, MABS(&m_stacksave));
+	a.mov(eax, ptr(eax, -4));
+	a.sub(eax, 1);
+	a.mov(dword_ptr(esp, USE_THISCALL ? 4 : 8), inst.param(1).mapvar());
+	a.mov(ptr(esp, USE_THISCALL ? 0 : 4), eax);
+	if (USE_THISCALL)
+		a.mov(ecx, imm(m_drcmap_get_value.obj));
+	else
+		a.mov(dword_ptr(esp, 0), imm(m_drcmap_get_value.obj));
+	a.call(imm(m_drcmap_get_value.func));
+	if (USE_THISCALL)
+		a.sub(esp, 8);
+	emit_mov_p32_r32(a, dstp, eax);
 }
 
 
