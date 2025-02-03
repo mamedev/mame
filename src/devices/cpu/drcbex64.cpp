@@ -2512,73 +2512,40 @@ void drcbe_x64::op_read(Assembler &a, const instruction &inst)
 	Gp dstreg = dstp.select_register(eax);
 
 	// set up a call to the read handler
-	auto &trampolines = m_accessors[spacesizep.space()];
 	auto &resolved = m_resolved_accessors[spacesizep.space()];
-	mov_reg_param(a, Gpd(REG_PARAM2), addrp);                                           // mov    param2,addrp
+	mov_reg_param(a, Gpd(REG_PARAM2), addrp);                                       // mov    param2,addrp
 	if (spacesizep.size() == SIZE_BYTE)
 	{
-		if (resolved.read_byte)
-		{
-			mov_r64_imm(a, Gpq(REG_PARAM1), resolved.read_byte.obj);                    // mov    param1,space
-			smart_call_r64(a, resolved.read_byte.func, rax);                            // call   read_byte
-		}
-		else
-		{
-			mov_r64_imm(a, Gpq(REG_PARAM1), (uintptr_t)m_space[spacesizep.space()]);    // mov    param1,space
-			smart_call_m64(a, (x86code **)&trampolines.read_byte);                      // call   read_byte
-		}
-		a.movzx(dstreg, al);                                                            // movzx  dstreg,al
+		mov_r64_imm(a, Gpq(REG_PARAM1), resolved.read_byte.obj);                    // mov    param1,space
+		smart_call_r64(a, resolved.read_byte.func, rax);                            // call   read_byte
+		a.movzx(dstreg, al);                                                        // movzx  dstreg,al
 	}
 	else if (spacesizep.size() == SIZE_WORD)
 	{
-		if (resolved.read_word)
-		{
-			mov_r64_imm(a, Gpq(REG_PARAM1), resolved.read_word.obj);                    // mov    param1,space
-			smart_call_r64(a, resolved.read_word.func, rax);                            // call   read_word
-		}
-		else
-		{
-			mov_r64_imm(a, Gpq(REG_PARAM1), (uintptr_t)m_space[spacesizep.space()]);    // mov    param1,space
-			smart_call_m64(a, (x86code **)&trampolines.read_word);                      // call   read_word
-		}
-		a.movzx(dstreg, ax);                                                            // movzx  dstreg,ax
+		mov_r64_imm(a, Gpq(REG_PARAM1), resolved.read_word.obj);                    // mov    param1,space
+		smart_call_r64(a, resolved.read_word.func, rax);                            // call   read_word
+		a.movzx(dstreg, ax);                                                        // movzx  dstreg,ax
 	}
 	else if (spacesizep.size() == SIZE_DWORD)
 	{
-		if (resolved.read_dword)
-		{
-			mov_r64_imm(a, Gpq(REG_PARAM1), resolved.read_dword.obj);                   // mov    param1,space
-			smart_call_r64(a, resolved.read_dword.func, rax);                           // call   read_dword
-		}
-		else
-		{
-			mov_r64_imm(a, Gpq(REG_PARAM1), (uintptr_t)m_space[spacesizep.space()]);    // mov    param1,space
-			smart_call_m64(a, (x86code **)&trampolines.read_dword);                     // call   read_dword
-		}
+		mov_r64_imm(a, Gpq(REG_PARAM1), resolved.read_dword.obj);                   // mov    param1,space
+		smart_call_r64(a, resolved.read_dword.func, rax);                           // call   read_dword
 		if (dstreg != eax || inst.size() == 8)
-			a.mov(dstreg, eax);                                                         // mov    dstreg,eax
+			a.mov(dstreg, eax);                                                     // mov    dstreg,eax
 	}
 	else if (spacesizep.size() == SIZE_QWORD)
 	{
-		if (resolved.read_qword)
-		{
-			mov_r64_imm(a, Gpq(REG_PARAM1), resolved.read_qword.obj);                   // mov    param1,space
-			smart_call_r64(a, resolved.read_qword.func, rax);                           // call   read_qword
-		}
-		else
-		{
-			mov_r64_imm(a, Gpq(REG_PARAM1), (uintptr_t)m_space[spacesizep.space()]);    // mov    param1,space
-			smart_call_m64(a, (x86code **)&trampolines.read_qword);                     // call   read_qword
-		}
+		mov_r64_imm(a, Gpq(REG_PARAM1), resolved.read_qword.obj);                   // mov    param1,space
+		smart_call_r64(a, resolved.read_qword.func, rax);                           // call   read_qword
 		if (dstreg != eax)
-			a.mov(dstreg.r64(), rax);                                                   // mov    dstreg,rax
+			a.mov(dstreg.r64(), rax);                                               // mov    dstreg,rax
 	}
 
 	// store result
 	if (inst.size() == 4)
-		mov_param_reg(a, dstp, dstreg);                                                 // mov   dstp,dstreg
+		mov_param_reg(a, dstp, dstreg);                                             // mov   dstp,dstreg
 	else
-		mov_param_reg(a, dstp, dstreg.r64());                                           // mov   dstp,dstreg
+		mov_param_reg(a, dstp, dstreg.r64());                                       // mov   dstp,dstreg
 }
 
 
@@ -2604,77 +2571,44 @@ void drcbe_x64::op_readm(Assembler &a, const instruction &inst)
 	Gp dstreg = dstp.select_register(eax);
 
 	// set up a call to the read handler
-	auto &trampolines = m_accessors[spacesizep.space()];
 	auto &resolved = m_resolved_accessors[spacesizep.space()];
-	mov_reg_param(a, Gpd(REG_PARAM2), addrp);                                           // mov    param2,addrp
+	mov_reg_param(a, Gpd(REG_PARAM2), addrp);                                       // mov    param2,addrp
 	if (spacesizep.size() != SIZE_QWORD)
-		mov_reg_param(a, Gpd(REG_PARAM3), maskp);                                       // mov    param3,maskp
+		mov_reg_param(a, Gpd(REG_PARAM3), maskp);                                   // mov    param3,maskp
 	else
-		mov_reg_param(a, Gpq(REG_PARAM3), maskp);                                       // mov    param3,maskp
+		mov_reg_param(a, Gpq(REG_PARAM3), maskp);                                   // mov    param3,maskp
 	if (spacesizep.size() == SIZE_BYTE)
 	{
-		if (resolved.read_byte_masked)
-		{
-			mov_r64_imm(a, Gpq(REG_PARAM1), resolved.read_byte_masked.obj);             // mov    param1,space
-			smart_call_r64(a, resolved.read_byte_masked.func, rax);                     // call   read_byte_masked
-		}
-		else
-		{
-			mov_r64_imm(a, Gpq(REG_PARAM1), (uintptr_t)m_space[spacesizep.space()]);    // mov    param1,space
-			smart_call_m64(a, (x86code **)&trampolines.read_byte_masked);               // call   read_byte_masked
-		}
-		a.movzx(dstreg, al);                                                            // movzx  dstreg,al
+		mov_r64_imm(a, Gpq(REG_PARAM1), resolved.read_byte_masked.obj);             // mov    param1,space
+		smart_call_r64(a, resolved.read_byte_masked.func, rax);                     // call   read_byte_masked
+		a.movzx(dstreg, al);                                                        // movzx  dstreg,al
 	}
 	else if (spacesizep.size() == SIZE_WORD)
 	{
-		if (resolved.read_word_masked)
-		{
-			mov_r64_imm(a, Gpq(REG_PARAM1), resolved.read_word_masked.obj);             // mov    param1,space
-			smart_call_r64(a, resolved.read_word_masked.func, rax);                     // call   read_word_masked
-		}
-		else
-		{
-			mov_r64_imm(a, Gpq(REG_PARAM1), (uintptr_t)m_space[spacesizep.space()]);    // mov    param1,space
-			smart_call_m64(a, (x86code **)&trampolines.read_word_masked);               // call   read_word_masked
-		}
-		a.movzx(dstreg, ax);                                                            // movzx  dstreg,ax
+		mov_r64_imm(a, Gpq(REG_PARAM1), resolved.read_word_masked.obj);             // mov    param1,space
+		smart_call_r64(a, resolved.read_word_masked.func, rax);                     // call   read_word_masked
+		a.movzx(dstreg, ax);                                                        // movzx  dstreg,ax
 	}
 	else if (spacesizep.size() == SIZE_DWORD)
 	{
-		if (resolved.read_dword_masked)
-		{
-			mov_r64_imm(a, Gpq(REG_PARAM1), resolved.read_dword_masked.obj);            // mov    param1,space
-			smart_call_r64(a, resolved.read_dword_masked.func, rax);                    // call   read_dword_masked
-		}
-		else
-		{
-			mov_r64_imm(a, Gpq(REG_PARAM1), (uintptr_t)m_space[spacesizep.space()]);    // mov    param1,space
-			smart_call_m64(a, (x86code **)&trampolines.read_dword_masked);              // call   read_word_masked
-		}
+		mov_r64_imm(a, Gpq(REG_PARAM1), resolved.read_dword_masked.obj);            // mov    param1,space
+		smart_call_r64(a, resolved.read_dword_masked.func, rax);                    // call   read_dword_masked
 		if (dstreg != eax || inst.size() == 8)
-			a.mov(dstreg, eax);                                                         // mov    dstreg,eax
+			a.mov(dstreg, eax);                                                     // mov    dstreg,eax
 	}
 	else if (spacesizep.size() == SIZE_QWORD)
 	{
-		if (resolved.read_qword_masked)
-		{
-			mov_r64_imm(a, Gpq(REG_PARAM1), resolved.read_qword_masked.obj);            // mov    param1,space
-			smart_call_r64(a, resolved.read_qword_masked.func, rax);                    // call   read_qword_masked
-		}
-		else
-		{
-			mov_r64_imm(a, Gpq(REG_PARAM1), (uintptr_t)m_space[spacesizep.space()]);    // mov    param1,space
-			smart_call_m64(a, (x86code **)&trampolines.read_qword_masked);              // call   read_word_masked
-		}
+		mov_r64_imm(a, Gpq(REG_PARAM1), resolved.read_qword_masked.obj);            // mov    param1,space
+		smart_call_r64(a, resolved.read_qword_masked.func, rax);                    // call   read_qword_masked
 		if (dstreg != eax)
-			a.mov(dstreg.r64(), rax);                                                   // mov    dstreg,rax
+			a.mov(dstreg.r64(), rax);                                               // mov    dstreg,rax
 	}
 
 	// store result
 	if (inst.size() == 4)
-		mov_param_reg(a, dstp, dstreg);                                                 // mov   dstp,dstreg
+		mov_param_reg(a, dstp, dstreg);                                             // mov   dstp,dstreg
 	else
-		mov_param_reg(a, dstp, dstreg.r64());                                           // mov   dstp,dstreg
+		mov_param_reg(a, dstp, dstreg.r64());                                       // mov   dstp,dstreg
 }
 
 
@@ -2696,64 +2630,31 @@ void drcbe_x64::op_write(Assembler &a, const instruction &inst)
 	assert(spacesizep.is_size_space());
 
 	// set up a call to the write handler
-	auto &trampolines = m_accessors[spacesizep.space()];
 	auto &resolved = m_resolved_accessors[spacesizep.space()];
-	mov_reg_param(a, Gpd(REG_PARAM2), addrp);                                           // mov    param2,addrp
+	mov_reg_param(a, Gpd(REG_PARAM2), addrp);                                       // mov    param2,addrp
 	if (spacesizep.size() != SIZE_QWORD)
-		mov_reg_param(a, Gpd(REG_PARAM3), srcp);                                        // mov    param3,srcp
+		mov_reg_param(a, Gpd(REG_PARAM3), srcp);                                    // mov    param3,srcp
 	else
-		mov_reg_param(a, Gpq(REG_PARAM3), srcp);                                        // mov    param3,srcp
+		mov_reg_param(a, Gpq(REG_PARAM3), srcp);                                    // mov    param3,srcp
 	if (spacesizep.size() == SIZE_BYTE)
 	{
-		if (resolved.write_byte)
-		{
-			mov_r64_imm(a, Gpq(REG_PARAM1), resolved.write_byte.obj);                   // mov    param1,space
-			smart_call_r64(a, resolved.write_byte.func, rax);                           // call   write_byte
-		}
-		else
-		{
-			mov_r64_imm(a, Gpq(REG_PARAM1), (uintptr_t)m_space[spacesizep.space()]);    // mov    param1,space
-			smart_call_m64(a, (x86code **)&trampolines.write_byte);                     // call   write_byte
-		}
+		mov_r64_imm(a, Gpq(REG_PARAM1), resolved.write_byte.obj);                   // mov    param1,space
+		smart_call_r64(a, resolved.write_byte.func, rax);                           // call   write_byte
 	}
 	else if (spacesizep.size() == SIZE_WORD)
 	{
-		if (resolved.write_word)
-		{
-			mov_r64_imm(a, Gpq(REG_PARAM1), resolved.write_word.obj);                   // mov    param1,space
-			smart_call_r64(a, resolved.write_word.func, rax);                           // call   write_word
-		}
-		else
-		{
-			mov_r64_imm(a, Gpq(REG_PARAM1), (uintptr_t)m_space[spacesizep.space()]);    // mov    param1,space
-			smart_call_m64(a, (x86code **)&trampolines.write_word);                     // call   write_word
-		}
+		mov_r64_imm(a, Gpq(REG_PARAM1), resolved.write_word.obj);                   // mov    param1,space
+		smart_call_r64(a, resolved.write_word.func, rax);                           // call   write_word
 	}
 	else if (spacesizep.size() == SIZE_DWORD)
 	{
-		if (resolved.write_dword)
-		{
-			mov_r64_imm(a, Gpq(REG_PARAM1), resolved.write_dword.obj);                  // mov    param1,space
-			smart_call_r64(a, resolved.write_dword.func, rax);                          // call   write_dword
-		}
-		else
-		{
-			mov_r64_imm(a, Gpq(REG_PARAM1), (uintptr_t)m_space[spacesizep.space()]);    // mov    param1,space
-			smart_call_m64(a, (x86code **)&trampolines.write_dword);                    // call   write_dword
-		}
+		mov_r64_imm(a, Gpq(REG_PARAM1), resolved.write_dword.obj);                  // mov    param1,space
+		smart_call_r64(a, resolved.write_dword.func, rax);                          // call   write_dword
 	}
 	else if (spacesizep.size() == SIZE_QWORD)
 	{
-		if (resolved.write_qword)
-		{
-			mov_r64_imm(a, Gpq(REG_PARAM1), resolved.write_qword.obj);                  // mov    param1,space
-			smart_call_r64(a, resolved.write_qword.func, rax);                          // call   write_qword
-		}
-		else
-		{
-			mov_r64_imm(a, Gpq(REG_PARAM1), (uintptr_t)m_space[spacesizep.space()]);    // mov    param1,space
-			smart_call_m64(a, (x86code **)&trampolines.write_qword);                    // call   write_qword
-		}
+		mov_r64_imm(a, Gpq(REG_PARAM1), resolved.write_qword.obj);                  // mov    param1,space
+		smart_call_r64(a, resolved.write_qword.func, rax);                          // call   write_qword
 	}
 }
 
@@ -2777,70 +2678,37 @@ void drcbe_x64::op_writem(Assembler &a, const instruction &inst)
 	assert(spacesizep.is_size_space());
 
 	// set up a call to the write handler
-	auto &trampolines = m_accessors[spacesizep.space()];
 	auto &resolved = m_resolved_accessors[spacesizep.space()];
-	mov_reg_param(a, Gpd(REG_PARAM2), addrp);                                           // mov    param2,addrp
+	mov_reg_param(a, Gpd(REG_PARAM2), addrp);                                       // mov    param2,addrp
 	if (spacesizep.size() != SIZE_QWORD)
 	{
-		mov_reg_param(a, Gpd(REG_PARAM3), srcp);                                        // mov    param3,srcp
-		mov_reg_param(a, Gpd(REG_PARAM4), maskp);                                       // mov    param4,maskp
+		mov_reg_param(a, Gpd(REG_PARAM3), srcp);                                    // mov    param3,srcp
+		mov_reg_param(a, Gpd(REG_PARAM4), maskp);                                   // mov    param4,maskp
 	}
 	else
 	{
-		mov_reg_param(a, Gpq(REG_PARAM3), srcp);                                        // mov    param3,srcp
-		mov_reg_param(a, Gpq(REG_PARAM4), maskp);                                       // mov    param4,maskp
+		mov_reg_param(a, Gpq(REG_PARAM3), srcp);                                    // mov    param3,srcp
+		mov_reg_param(a, Gpq(REG_PARAM4), maskp);                                   // mov    param4,maskp
 	}
 	if (spacesizep.size() == SIZE_BYTE)
 	{
-		if (resolved.write_byte)
-		{
-			mov_r64_imm(a, Gpq(REG_PARAM1), resolved.write_byte_masked.obj);            // mov    param1,space
-			smart_call_r64(a, resolved.write_byte_masked.func, rax);                    // call   write_byte_masked
-		}
-		else
-		{
-			mov_r64_imm(a, Gpq(REG_PARAM1), (uintptr_t)m_space[spacesizep.space()]);    // mov    param1,space
-			smart_call_m64(a, (x86code **)&trampolines.write_byte_masked);              // call   write_byte_masked
-		}
+		mov_r64_imm(a, Gpq(REG_PARAM1), resolved.write_byte_masked.obj);            // mov    param1,space
+		smart_call_r64(a, resolved.write_byte_masked.func, rax);                    // call   write_byte_masked
 	}
 	else if (spacesizep.size() == SIZE_WORD)
 	{
-		if (resolved.write_word)
-		{
-			mov_r64_imm(a, Gpq(REG_PARAM1), resolved.write_word_masked.obj);            // mov    param1,space
-			smart_call_r64(a, resolved.write_word_masked.func, rax);                    // call   write_word_masked
-		}
-		else
-		{
-			mov_r64_imm(a, Gpq(REG_PARAM1), (uintptr_t)m_space[spacesizep.space()]);    // mov    param1,space
-			smart_call_m64(a, (x86code **)&trampolines.write_word_masked);              // call   write_word_masked
-		}
+		mov_r64_imm(a, Gpq(REG_PARAM1), resolved.write_word_masked.obj);            // mov    param1,space
+		smart_call_r64(a, resolved.write_word_masked.func, rax);                    // call   write_word_masked
 	}
 	else if (spacesizep.size() == SIZE_DWORD)
 	{
-		if (resolved.write_word)
-		{
-			mov_r64_imm(a, Gpq(REG_PARAM1), resolved.write_dword_masked.obj);           // mov    param1,space
-			smart_call_r64(a, resolved.write_dword_masked.func, rax);                   // call   write_dword_masked
-		}
-		else
-		{
-			mov_r64_imm(a, Gpq(REG_PARAM1), (uintptr_t)m_space[spacesizep.space()]);    // mov    param1,space
-			smart_call_m64(a, (x86code **)&trampolines.write_dword_masked);             // call   write_dword_masked
-		}
+		mov_r64_imm(a, Gpq(REG_PARAM1), resolved.write_dword_masked.obj);           // mov    param1,space
+		smart_call_r64(a, resolved.write_dword_masked.func, rax);                   // call   write_dword_masked
 	}
 	else if (spacesizep.size() == SIZE_QWORD)
 	{
-		if (resolved.write_word)
-		{
-			mov_r64_imm(a, Gpq(REG_PARAM1), resolved.write_qword_masked.obj);           // mov    param1,space
-			smart_call_r64(a, resolved.write_qword_masked.func, rax);                   // call   write_qword_masked
-		}
-		else
-		{
-			mov_r64_imm(a, Gpq(REG_PARAM1), (uintptr_t)m_space[spacesizep.space()]);    // mov    param1,space
-			smart_call_m64(a, (x86code **)&trampolines.write_qword_masked);             // call   write_qword_masked
-		}
+		mov_r64_imm(a, Gpq(REG_PARAM1), resolved.write_qword_masked.obj);           // mov    param1,space
+		smart_call_r64(a, resolved.write_qword_masked.func, rax);                   // call   write_qword_masked
 	}
 }
 
@@ -4431,27 +4299,26 @@ void drcbe_x64::op_fread(Assembler &a, const instruction &inst)
 	assert((1 << spacep.size()) == inst.size());
 
 	// set up a call to the read dword/qword handler
-	mov_r64_imm(a, Gpq(REG_PARAM1), (uintptr_t)m_space[spacep.space()]);                // mov    param1,space
-	mov_reg_param(a, Gpd(REG_PARAM2), addrp);                                           // mov    param2,addrp
-	if (inst.size() == 4)
-		smart_call_m64(a, (x86code **)&m_accessors[spacep.space()].read_dword);         // call   read_dword
-	else if (inst.size() == 8)
-		smart_call_m64(a, (x86code **)&m_accessors[spacep.space()].read_qword);         // call   read_qword
+	auto const &accessors = m_resolved_accessors[spacep.space()];
+	auto const &accessor = (inst.size() == 4) ? accessors.write_dword : accessors.write_qword;
+	mov_reg_param(a, Gpd(REG_PARAM2), addrp);
+	mov_r64_imm(a, Gpq(REG_PARAM1), accessor.obj);
+	smart_call_r64(a, accessor.func, rax);
 
 	// store result
 	if (inst.size() == 4)
 	{
 		if (dstp.is_memory())
-			a.mov(MABS(dstp.memory()), eax);                                            // mov   [dstp],eax
+			a.mov(MABS(dstp.memory()), eax);
 		else if (dstp.is_float_register())
-			a.movd(Xmm(dstp.freg()), eax);                                              // movd  dstp,eax
+			a.movd(Xmm(dstp.freg()), eax);
 	}
 	else if (inst.size() == 8)
 	{
 		if (dstp.is_memory())
-			a.mov(MABS(dstp.memory()), rax);                                            // mov   [dstp],rax
+			a.mov(MABS(dstp.memory()), rax);
 		else if (dstp.is_float_register())
-			a.movq(Xmm(dstp.freg()), rax);                                              // movq  dstp,rax
+			a.movq(Xmm(dstp.freg()), rax);
 	}
 }
 
@@ -4475,28 +4342,28 @@ void drcbe_x64::op_fwrite(Assembler &a, const instruction &inst)
 	assert((1 << spacep.size()) == inst.size());
 
 	// general case
-	mov_r64_imm(a, Gpq(REG_PARAM1), (uintptr_t)m_space[spacep.space()]);                // mov    param1,space
-	mov_reg_param(a, Gpd(REG_PARAM2), addrp);                                           // mov    param21,addrp
+	auto const &accessors = m_resolved_accessors[spacep.space()];
+	auto const &accessor = (inst.size() == 4) ? accessors.write_dword : accessors.write_qword;
+	mov_reg_param(a, Gpd(REG_PARAM2), addrp);
 
-	// 32-bit form
 	if (inst.size() == 4)
 	{
+		// 32-bit form
 		if (srcp.is_memory())
-			a.mov(Gpd(REG_PARAM3), MABS(srcp.memory()));                                // mov    param3,[srcp]
+			a.mov(Gpd(REG_PARAM3), MABS(srcp.memory()));
 		else if (srcp.is_float_register())
-			a.movd(Gpd(REG_PARAM3), Xmm(srcp.freg()));                                  // movd   param3,srcp
-		smart_call_m64(a, (x86code **)&m_accessors[spacep.space()].write_dword);        // call   write_dword
+			a.movd(Gpd(REG_PARAM3), Xmm(srcp.freg()));
 	}
-
-	// 64-bit form
 	else if (inst.size() == 8)
 	{
+		// 64-bit form
 		if (srcp.is_memory())
-			a.mov(Gpq(REG_PARAM3), MABS(srcp.memory()));                                // mov    param3,[srcp]
+			a.mov(Gpq(REG_PARAM3), MABS(srcp.memory()));
 		else if (srcp.is_float_register())
-			a.movq(Gpq(REG_PARAM3), Xmm(srcp.freg()));                                  // movq   param3,srcp
-		smart_call_m64(a, (x86code **)&m_accessors[spacep.space()].write_qword);        // call   write_qword
+			a.movq(Gpq(REG_PARAM3), Xmm(srcp.freg()));
 	}
+	mov_r64_imm(a, Gpq(REG_PARAM1), accessor.obj);
+	smart_call_r64(a, accessor.func, rax);
 }
 
 
