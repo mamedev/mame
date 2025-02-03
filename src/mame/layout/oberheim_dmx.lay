@@ -543,13 +543,11 @@ copyright-holders:m1macrophage
 			function()
 				local id_port_index <const> = string.len("slider_knob_") + 1
 
-				-- Local state used by the pointer update handler.
-				local sliders = {}
-				local slider_knobs = {}
-				local slider_fields = {}
-				local selected = 0
+				-- State used by pointer handlers.
+				local sliders = {}  -- Info about all sliders (constant after initialization).
+				local pointers = {}  -- Pointer tracking state.
 
-				-- Gather relevant elements and inputs into local state.
+				-- Gather relevant elements and inputs into `sliders`.
 				local view = file.views["Default Layout"]
 				for i = 1, #view.items do
 					local item = view.items:at(i)
@@ -575,50 +573,88 @@ copyright-holders:m1macrophage
 							print("LAYOUT ERROR - Element: 'slider_" .. slider_id .. "' does not exist.")
 						end
 
-						table.insert(sliders, slider)
-						table.insert(slider_knobs, item)
-						table.insert(slider_fields, field)
+						local slider_info = {}
+						slider_info.slider = slider
+						slider_info.knob = item
+						slider_info.field = field
+						table.insert(sliders, slider_info)
 					end
 				end
 
-				view:set_pointer_updated_callback(
-					function(type, id, dev, x, y, btn, dn, up, cnt)
-						-- No button pressed. Reset state.
-						if btn & 1 == 0 then
-							selected = 0
-							return
-						end
+				local function forget_pointers()
+					pointers = {}
+				end
 
-						-- Button just pressed. Find affected slider.
-						if dn & 1 ~= 0 then
-							for i = 1, #sliders do
-								if sliders[i].bounds:includes(x, y) then
-									selected = i
-									break
-								end
+				local function pointer_lost(type, id, dev, x, y, up, cnt)
+					pointers[id] = nil
+				end
+
+				local function pointer_updated(type, id, dev, x, y, btn, dn, up, cnt)
+					-- Button not pressed? Reset state of current pointer.
+					if btn & 1 == 0 then
+						pointers[id] = nil
+						return
+					end
+
+					-- Button just pressed? Find affected slider, if any.
+					if dn & 1 ~= 0 then
+						for i = 1, #sliders do
+							if sliders[i].knob.bounds:includes(x, y) then
+								local pointer = {}
+								pointer.selected_slider = i
+								pointer.relative = true
+								pointer.start_y = y
+								pointer.start_value = sliders[i].field.user_value
+								pointers[id] = pointer
+								break
+							elseif sliders[i].slider.bounds:includes(x, y) then
+								local pointer = {}
+								pointer.selected_slider = i
+								pointer.relative = false
+								pointers[id] = pointer
+								break
 							end
 						end
+					end
 
-						-- No slider selected. Nothing to do.
-						if selected <= 0 then
-							return
-						end
+					-- No slider selected by current pointer? Nothing to do.
+					if pointers[id] == nil then
+						return
+					end
 
-						-- A slider is selected. Update state and, indirectly,
-						-- slider knob position, based on the pointer's Y position.
-						-- It is assumed the attached IO field is an IPT_ADJUSTER
-						-- with a range of 0-100 (the default).
+					-- A slider is selected. Update state and, indirectly,
+					-- slider knob position, based on the pointer's Y position.
+					-- It is assumed the attached IO field is an IPT_ADJUSTER
+					-- with a range of 0-100 (the default).
 
-						local knob_half_height = slider_knobs[selected].bounds.height / 2
-						local min_y = sliders[selected].bounds.y0 + knob_half_height
-						local max_y = sliders[selected].bounds.y1 - knob_half_height
+					local pointer = pointers[id]
+					local slider_info = sliders[pointer.selected_slider]
 
-						local new_value = 100 - 100 * (y - min_y) / (max_y - min_y)
-						new_value = math.floor(new_value + 0.5)
-						if new_value < 0 then new_value = 0 end
-						if new_value > 100 then new_value = 100 end
-						slider_fields[selected].user_value = new_value
-					end)
+					local knob_half_height = slider_info.knob.bounds.height / 2
+					local min_y = slider_info.slider.bounds.y0 + knob_half_height
+					local max_y = slider_info.slider.bounds.y1 - knob_half_height
+
+					local new_value = 0
+					if pointer.relative then
+						-- User clicked on the knob. New value depends on how
+						-- much the knob was dragged.
+						new_value = pointer.start_value - 100 * (y - pointer.start_y) / (max_y - min_y)
+					else
+						-- User clicked elsewhere on the slider. New value
+						-- depends on the absolute position of the click.
+						new_value = 100 - 100 * (y - min_y) / (max_y - min_y)
+					end
+
+					new_value = math.floor(new_value + 0.5)
+					if new_value < 0 then new_value = 0 end
+					if new_value > 100 then new_value = 100 end
+					slider_info.field.user_value = new_value
+				end
+
+				view:set_pointer_updated_callback(pointer_updated)
+				view:set_pointer_left_callback(pointer_lost)
+				view:set_pointer_aborted_callback(pointer_lost)
+				view:set_forget_pointers_callback(forget_pointers)
 			end)
 	]]></script>
 </mamelayout>
