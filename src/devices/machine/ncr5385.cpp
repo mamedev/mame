@@ -767,6 +767,7 @@ int ncr5385_device::state_step()
 				m_sbx = false;
 
 			delay = 3'500;		// >=3.5us delay works, < 3.5us fails
+			LOGMASKED(LOG_STATE, "%10s: XFI_OUT_ACK delay %d\n", machine().time().as_string(8), delay);
 			
 			// clear data and ACK
 			scsi_bus->data_w(scsi_refid, 0);
