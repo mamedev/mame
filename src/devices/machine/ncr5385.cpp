@@ -170,7 +170,7 @@ void ncr5385_device::scsi_ctrl_changed()
 
 	if ((ctrl & S_BSY) && !(ctrl & S_SEL))
 	{
-		LOGMASKED(LOG_STATE, "scsi_ctrl_changed 0x%03x phase %s%s%s\n", ctrl, nscsi_phase[ctrl & S_PHASE_MASK],
+		LOGMASKED(LOG_STATE, "%10s: scsi_ctrl_changed 0x%03x phase %s%s%s\n", machine().time().as_string(8), ctrl, nscsi_phase[ctrl & S_PHASE_MASK],
 			ctrl & S_REQ ? " REQ" : "", ctrl & S_ACK ? " ACK" : "");
 
 		if (m_state != IDLE)
@@ -178,13 +178,13 @@ void ncr5385_device::scsi_ctrl_changed()
 	}
 	else if (ctrl & S_BSY)
 	{
-		LOGMASKED(LOG_STATE, "scsi_ctrl_changed 0x%03x arbitration/selection\n", ctrl);
+		LOGMASKED(LOG_STATE, "%10s: scsi_ctrl_changed 0x%03x arbitration/selection\n", machine().time().as_string(8), ctrl);
 		if (m_state != IDLE)
 			m_state_timer->adjust(attotime::from_usec(40));
 	}
 	else
 	{
-		LOGMASKED(LOG_STATE, "scsi_ctrl_changed 0x%03x BUS FREE\n", ctrl);
+		LOGMASKED(LOG_STATE, "%10s: scsi_ctrl_changed 0x%03x BUS FREE\n", machine().time().as_string(8), ctrl);
 
 		if (m_mode == INITIATOR)
 		{
@@ -560,7 +560,7 @@ int ncr5385_device::state_step()
 		break;
 
 	case SEL_START:
-		LOGMASKED(LOG_STATE, "selection: SEL asserted\n");
+		LOGMASKED(LOG_STATE, "%10s: selection: SEL asserted\n", machine().time().as_string(8));
 		m_state = SEL_DELAY;
 		delay = SCSI_BUS_SKEW * 2;
 
@@ -582,7 +582,7 @@ int ncr5385_device::state_step()
 	case SEL_WAIT_BSY:
 		if (ctrl & S_BSY)
 		{
-			LOGMASKED(LOG_STATE, "selection: BSY asserted by target\n");
+			LOGMASKED(LOG_STATE, "%10s: selection: BSY asserted by target\n", machine().time().as_string(8));
 			m_state = SEL_COMPLETE;
 			delay = SCSI_BUS_SKEW * 2;
 		}
@@ -598,7 +598,7 @@ int ncr5385_device::state_step()
 		}
 		break;
 	case SEL_COMPLETE:
-		LOGMASKED(LOG_STATE, "selection: complete\n");
+		LOGMASKED(LOG_STATE, "%10s: selection: complete\n", machine().time().as_string(8));
 		m_int_status |= INT_FUNC_COMPLETE;
 		m_mode = INITIATOR;
 		m_state = SEL_WAIT_REQ;
@@ -614,7 +614,7 @@ int ncr5385_device::state_step()
 		// don't generate bus service interrupt until the function complete is cleared
 		if ((ctrl & S_REQ) && !m_int_state)
 		{
-			LOGMASKED(LOG_STATE, "selection: REQ asserted by target\n");
+			LOGMASKED(LOG_STATE, "%10s: selection: REQ asserted by target\n", machine().time().as_string(8));
 			m_int_status |= INT_BUS_SERVICE;
 			m_state = IDLE;
 
@@ -665,7 +665,7 @@ int ncr5385_device::state_step()
 	case XFI_IN_DRQ:
 		m_state = XFI_IN_ACK;
 
-		LOGMASKED(LOG_STATE, "xfi_in: data 0x%02x\n", m_dat);
+		LOGMASKED(LOG_STATE, "%10s: xfi_in: data 0x%02x\n", machine().time().as_string(8), m_dat);
 
 		// assert ACK
 		scsi_bus->ctrl_w(scsi_refid, S_ACK, S_ACK);
@@ -679,7 +679,7 @@ int ncr5385_device::state_step()
 			{
 				m_cnt--;
 
-				LOGMASKED(LOG_STATE, "xfi_in: %d remaining\n", m_cnt);
+				LOGMASKED(LOG_STATE, "%10s: xfi_in: %d remaining\n", machine().time().as_string(8), m_cnt);
 
 				if (!m_cnt)
 					m_aux_status |= AUX_STATUS_TC_ZERO;
@@ -737,7 +737,7 @@ int ncr5385_device::state_step()
 		m_state = XFI_OUT_ACK;
 		m_aux_status &= ~AUX_STATUS_DATA_FULL;
 
-		LOGMASKED(LOG_STATE, "xfi_out: data 0x%02x\n", m_dat);
+		LOGMASKED(LOG_STATE, "%10s: xfi_out: data 0x%02x\n", machine().time().as_string(8), m_dat);
 
 		// assert data and ACK
 		scsi_bus->data_w(scsi_refid, m_dat);
@@ -758,7 +758,7 @@ int ncr5385_device::state_step()
 			{
 				m_cnt--;
 
-				LOGMASKED(LOG_STATE, "xfi_out: %d remaining\n", m_cnt);
+				LOGMASKED(LOG_STATE, "%10s: xfi_out: %d remaining\n", machine().time().as_string(8), m_cnt);
 
 				if (!m_cnt)
 					m_aux_status |= AUX_STATUS_TC_ZERO;
@@ -784,7 +784,7 @@ int ncr5385_device::state_step()
 				m_state = XFI_OUT_DRQ;
 			else
 			{
-				LOGMASKED(LOG_STATE, "xfi_out: %s\n", remaining() ? "phase change" : "transfer complete");
+				LOGMASKED(LOG_STATE, "%10s: xfi_out: %s\n", machine().time().as_string(8), remaining() ? "phase change" : "transfer complete");
 				m_int_status |= INT_BUS_SERVICE;
 				m_state = IDLE;
 
