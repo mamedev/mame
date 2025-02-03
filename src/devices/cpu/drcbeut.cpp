@@ -407,11 +407,6 @@ uint32_t drc_map_variables::get_value(drccodeptr codebase, uint32_t mapvar) cons
 	return result;
 }
 
-uint32_t drc_map_variables::static_get_value(drc_map_variables &map, drccodeptr codebase, uint32_t mapvar)
-{
-	return map.get_value(codebase, mapvar);
-}
-
 
 
 //-------------------------------------------------

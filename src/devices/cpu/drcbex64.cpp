@@ -146,23 +146,44 @@
     Exit point:
         Assumes exit value is in RAX.
 
-    Entry stack:
-        [rsp]      - return
+    Top-level generated code frame:
+        [rsp+0x00]   - rcx home/scratch
+        [rsp+0x08]   - rdx home/scratch
+        [rsp+0x10]   - r8 home/scratch
+        [rsp+0x18]   - r9 home/scratch
+        [rsp+0x20]   - scratch
+        [rsp+0x28]   - saved r15
+        [rsp+0x30]   - saved r14
+        [rsp+0x38]   - saved r13
+        [rsp+0x40]   - saved r12
+        [rsp+0x48]   - saved rbp
+        [rsp+0x50]   - saved rdi
+        [rsp+0x58]   - saved rsi
+        [rsp+0x60]   - saved rbx
+        [rsp+0x68]   - ret
 
-    Runtime stack:
-        [rsp]      - r9 home
-        [rsp+8]    - r8 home
-        [rsp+16]   - rdx home
-        [rsp+24]   - rcx home
-        [rsp+40]   - saved r15
-        [rsp+48]   - saved r14
-        [rsp+56]   - saved r13
-        [rsp+64]   - saved r12
-        [rsp+72]   - saved rbp
-        [rsp+80]   - saved rdi
-        [rsp+88]   - saved rsi
-        [rsp+96]   - saved rbx
-        [rsp+104]  - ret
+    Generated code subroutine call frame:
+        [rsp+0x00]   - rcx home/scratch
+        [rsp+0x08]   - rdx home/scratch
+        [rsp+0x10]   - r8 home/scratch
+        [rsp+0x18]   - r9 home/scratch
+        [rsp+0x20]   - scratch
+        [rsp+0x28]   - ret
+        ...
+                     - rcx home/scratch
+                     - rdx home/scratch
+                     - r8 home/scratch
+                     - r9 home/scratch
+                     - scratch
+                     - saved r15
+                     - saved r14
+                     - saved r13
+                     - saved r12
+                     - saved rdi
+                     - saved rsi
+                     - saved rbp
+                     - saved rbx
+                     - ret
 
 ***************************************************************************/
 
@@ -689,10 +710,7 @@ drcbe_x64::drcbe_x64(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 	// resolve the actual addresses of member functions we need to call
 	m_drcmap_get_value.set(m_map, &drc_map_variables::get_value);
 	if (!m_drcmap_get_value)
-	{
-		m_drcmap_get_value.obj = uintptr_t(&m_map);
-		m_drcmap_get_value.func = reinterpret_cast<uint8_t *>(uintptr_t(&drc_map_variables::static_get_value));
-	}
+		throw emu_fatalerror("Error resolving map variable get value function!\n");
 	m_resolved_accessors.resize(m_space.size());
 	for (int space = 0; m_space.size() > space; ++space)
 	{
@@ -872,12 +890,7 @@ void drcbe_x64::generate(drcuml_block &block, const instruction *instlist, uint3
 	{
 		m_debug_cpu_instruction_hook.set(*m_device.debug(), &device_debug::instruction_hook);
 		if (!m_debug_cpu_instruction_hook)
-		{
-			m_debug_cpu_instruction_hook.obj = uintptr_t(m_device.debug());
-			using debugger_hook_func = void (*)(device_debug *, offs_t);
-			static const auto debugger_inst_hook = [] (device_debug *dbg, offs_t pc) { dbg->instruction_hook(pc); };
-			m_debug_cpu_instruction_hook.func = reinterpret_cast<uint8_t *>(uintptr_t(debugger_hook_func(debugger_inst_hook)));
-		}
+			throw emu_fatalerror("Error resolving debugger instruction hook member function!\n");
 	}
 
 	// tell all of our utility objects that a block is beginning
@@ -1420,14 +1433,14 @@ void drcbe_x64::op_handle(Assembler &a, const instruction &inst)
 
 	// emit a jump around the stack adjust in case code falls through here
 	Label skip = a.newLabel();
-	a.short_().jmp(skip);                                                               // jmp   skip
+	a.short_().jmp(skip);
 
 	// register the current pointer for the handle
 	inst.param(0).handle().set_codeptr(drccodeptr(a.code()->baseAddress() + a.offset()));
 
-	// by default, the handle points to prolog code that moves the stack pointer
-	a.lea(rsp, ptr(rsp, -40));                                                          // lea   rsp,[rsp-40]
-	a.bind(skip);                                                                   // skip:
+	// by default, the handle points to prologue code that moves the stack pointer
+	a.lea(rsp, ptr(rsp, -40));
+	a.bind(skip);
 }
 
 
