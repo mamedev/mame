@@ -21517,6 +21517,8 @@ intlc440                        //
 
 @source:intel/intellec8.cpp
 intlc8                          //
+intlc8m80a                      //
+intlc8m80b                      //
 
 @source:intel/ipc.cpp
 ipb                             // intel
