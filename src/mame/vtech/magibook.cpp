@@ -69,4 +69,4 @@ ROM_END
 } // anonymous namespace
 
 
-CONS( 2016, magibooksp, 0, 0, magibook, magibook, magibook_state, empty_init, "VTech", "MagiBook (Spanish)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2016, magibooksp, 0, 0, magibook, magibook, magibook_state, empty_init, "VTech", "MagiBook (Spanish)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_REQUIRES_ARTWORK )
