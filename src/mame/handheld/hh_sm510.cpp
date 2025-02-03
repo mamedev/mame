@@ -380,14 +380,6 @@ void hh_sm510_state::mcfg_cpu_sm5a(machine_config &config)
 	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm500_lcd_segment_w));
 }
 
-void hh_sm510_state::mcfg_cpu_kb1013vk12(machine_config &config)
-{
-	KB1013VK12(config, m_maincpu);
-	mcfg_cpu_common(config);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm500_lcd_segment_w));
-}
-
 void hh_sm510_state::mcfg_cpu_sm510(machine_config &config)
 {
 	SM510(config, m_maincpu);
@@ -423,6 +415,9 @@ void hh_sm510_state::mcfg_cpu_sm530(machine_config &config)
 
 void hh_sm510_state::mcfg_svg_screen(machine_config &config, u16 width, u16 height, const char *tag)
 {
+	if (width == 0 || height == 0)
+		return;
+
 	screen_device &screen(SCREEN(config, tag, SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(width, height);
@@ -446,14 +441,6 @@ void hh_sm510_state::mcfg_sound_r1(machine_config &config)
 void hh_sm510_state::sm5a_common(machine_config &config, u16 width, u16 height)
 {
 	mcfg_cpu_sm5a(config);
-	mcfg_sound_r1(config);
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_input_w));
-	mcfg_svg_screen(config, width, height);
-}
-
-void hh_sm510_state::kb1013vk12_common(machine_config &config, u16 width, u16 height)
-{
-	mcfg_cpu_kb1013vk12(config);
 	mcfg_sound_r1(config);
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_input_w));
 	mcfg_svg_screen(config, width, height);
@@ -1286,7 +1273,7 @@ void gnw_octopus_state::gnw_octopus(machine_config &config)
 
 void gnw_octopus_state::taynyoke(machine_config &config)
 {
-	kb1013vk12_common(config, 1647, 1080); // R mask option confirmed
+	sm5a_common(config, 1647, 1080); // КБ1013ВК1-2, R mask option confirmed
 }
 
 // roms
@@ -1443,7 +1430,7 @@ void gnw_chef_state::gnw_chef(machine_config &config)
 
 void gnw_chef_state::vespovar(machine_config & config)
 {
-	kb1013vk12_common(config, 1679, 1080); // R mask option confirmed
+	sm5a_common(config, 1679, 1080); // КБ1013ВК1-2, R mask option confirmed
 }
 
 // roms
@@ -1621,7 +1608,7 @@ void gnw_fire_state::gnw_fire(machine_config &config)
 
 void gnw_fire_state::kosmicmt(machine_config & config)
 {
-	kb1013vk12_common(config, 1673, 1080); // R mask option confirmed
+	sm5a_common(config, 1673, 1080); // КБ1013ВК1-2, R mask option confirmed
 }
 
 // roms
@@ -4620,67 +4607,67 @@ INPUT_PORTS_END
 
 void nupogodi_state::nupogodi(machine_config &config)
 {
-	kb1013vk12_common(config, 1715, 1080); // R mask option ?
+	sm5a_common(config, 1715, 1080); // КБ1013ВК1-2, R mask option ?
 }
 
 void nupogodi_state::ehockey(machine_config &config)
 {
-	kb1013vk12_common(config, 1782, 1080); // R mask option ?
+	sm5a_common(config, 1782, 1080); // КБ1013ВК1-2, R mask option ?
 }
 
 void nupogodi_state::rkosmosa(machine_config &config)
 {
-	kb1013vk12_common(config, 1646, 1080); // R mask option ?
+	sm5a_common(config, 1646, 1080); // КБ1013ВК1-2, R mask option ?
 }
 
 void nupogodi_state::okhota(machine_config &config)
 {
-	kb1013vk12_common(config, 1632, 1080); // R mask option ?
+	sm5a_common(config, 1632, 1080); // КБ1013ВК1-2, R mask option ?
 }
 
 void nupogodi_state::biathlon(machine_config &config)
 {
-	kb1013vk12_common(config, 1633, 1080); // R mask option ?
+	sm5a_common(config, 1633, 1080); // КБ1013ВК1-2, R mask option ?
 }
 
 void nupogodi_state::vfutbol(machine_config &config)
 {
-	kb1013vk12_common(config, 1655, 1080); // R mask option ?
+	sm5a_common(config, 1655, 1080); // КБ1013ВК1-2, R mask option ?
 }
 
 void nupogodi_state::krybolov(machine_config &config)
 {
-	kb1013vk12_common(config, 1638, 1080); // R mask option ?
+	sm5a_common(config, 1638, 1080); // КБ1013ВК1-2, R mask option ?
 }
 
 void nupogodi_state::kvakazad(machine_config &config)
 {
-	kb1013vk12_common(config, 1660, 1080); // R mask option ?
+	sm5a_common(config, 1660, 1080); // КБ1013ВК1-2, R mask option ?
 }
 
 void nupogodi_state::nochnyev(machine_config &config)
 {
-	kb1013vk12_common(config, 1641, 1080); // R mask option ?
+	sm5a_common(config, 1641, 1080); // КБ1013ВК1-2, R mask option ?
 }
 
 void nupogodi_state::kosmicpt(machine_config &config)
 {
-	kb1013vk12_common(config, 1658, 1080); // R mask option ?
+	sm5a_common(config, 1658, 1080); // КБ1013ВК1-2, R mask option ?
 }
 
 void nupogodi_state::morataka(machine_config &config)
 {
-	kb1013vk12_common(config, 1648, 1080); // R mask option ?
+	sm5a_common(config, 1648, 1080); // КБ1013ВК1-2, R mask option ?
 }
 
 void nupogodi_state::atakaast(machine_config &config)
 {
-	kb1013vk12_common(config, 1620, 1080); // R mask option ?
+	sm5a_common(config, 1620, 1080); // КБ1013ВК1-2, R mask option ?
 }
 
 void nupogodi_state::ecircus(machine_config &config)
 {
-	kb1013vk12_common(config, 1657, 1080); // R mask option ?
+	sm5a_common(config, 1657, 1080); // КБ1013ВК1-2, R mask option ?
 }
 
 // roms
@@ -4848,7 +4835,7 @@ INPUT_PORTS_END
 
 void auslalom_state::auslalom(machine_config &config)
 {
-	kb1013vk12_common(config, 1732, 1080); // R mask option ?
+	sm5a_common(config, 1732, 1080); // КБ1013ВК1-2, R mask option ?
 }
 
 // roms

@@ -83,15 +83,8 @@ public:
 	sm5l_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 32768);
 };
 
-class kb1013vk12_device : public sm5a_device
-{
-public:
-	kb1013vk12_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 32768);
-};
-
 
 DECLARE_DEVICE_TYPE(SM5A, sm5a_device)
 DECLARE_DEVICE_TYPE(SM5L, sm5l_device)
-DECLARE_DEVICE_TYPE(KB1013VK12, kb1013vk12_device)
 
 #endif // MAME_CPU_SM510_SM5A_H
