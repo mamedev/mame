@@ -46,3 +46,8 @@ ROM_START(m50dass)
 	ROM_REGION(0x117, "pld", 0)
 	ROM_LOAD("315-5592_gal16v8a.ic19", 0x000, 0x117, NO_DUMP)
 ROM_END
+
+const tiny_rom_entry *m50dass_device::device_rom_region() const
+{
+	return ROM_NAME(m50dass);
+}
