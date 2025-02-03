@@ -15819,7 +15819,7 @@ Converted to .mfm from original .hfe
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
-			<dataarea name="flop" size="1085330">
+			<dataarea name="flop" size="1101276">
 				<rom name="hibernia_disk_b.mfm" size="1101276" crc="1d123a2f" sha1="7485c0bef3c5d9713a25679543b75c7a7019a025"/>
 			</dataarea>
 		</part>
