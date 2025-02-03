@@ -11,10 +11,14 @@
 
 function devicesProject(_target, _subtarget)
 
+	cpu_core_files = { }
 	disasm_files = { }
 	disasm_dependency = { }
 	disasm_custombuildtask = { }
 
+	dofile(path.join("src", "cpu.lua"))
+
+if _OPTIONS["with-emulator"] then
 	project ("optional")
 	uuid (os.uuid("optional-" .. _target .."_" .. _subtarget))
 	kind (LIBTYPE)
@@ -43,7 +47,11 @@ function devicesProject(_target, _subtarget)
 		ext_includedir("flac"),
 	}
 
-	dofile(path.join("src", "cpu.lua"))
+	if #cpu_core_files > 0 then
+		files {
+			cpu_core_files
+		}
+	end
 
 	dofile(path.join("src", "sound.lua"))
 
@@ -54,6 +62,7 @@ function devicesProject(_target, _subtarget)
 	dofile(path.join("src", "bus.lua"))
 
 	pchsource(MAME_DIR .. "src/devices/machine/timer.cpp")
+end
 
 if #disasm_files > 0 then
 	project ("dasm")

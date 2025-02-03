@@ -41,6 +41,7 @@
 # NO_USE_XINPUT = 1
 # NO_USE_XINPUT_WII_LIGHTGUN_HACK = 1
 # FORCE_DRC_C_BACKEND = 1
+# NO_MODULE_IMPLS = 1
 
 # DEBUG = 1
 # PROFILER = 1
@@ -497,6 +498,23 @@ endif
 endif
 
 #-------------------------------------------------
+# auto-disable unnecessary features if the
+# emulator isn't going to be built
+#-------------------------------------------------
+ifdef EMULATOR
+ifeq '$(EMULATOR)' '0'
+NO_X11 = 1
+NO_OPENGL = 1
+USE_WAYLAND = 0
+USE_QTDEBUG = 0
+NO_USE_MIDI = 1
+NO_USE_PORTAUDIO = 1
+NO_USE_PULSEAUDIO = 1
+NO_MODULE_IMPLS = 1
+endif
+endif
+
+#-------------------------------------------------
 # which 3rdparty library to build;
 #  link against system (common) library otherwise
 #-------------------------------------------------
@@ -767,6 +785,10 @@ endif
 
 ifdef USE_DISPATCH_GL
 PARAMS += --USE_DISPATCH_GL='$(USE_DISPATCH_GL)'
+endif
+
+ifdef NO_MODULE_IMPLS
+PARAMS += --NO_MODULE_IMPLS='$(NO_MODULE_IMPLS)'
 endif
 
 ifdef NO_USE_MIDI
@@ -1554,12 +1576,16 @@ $(GEN_FOLDERS):
 
 genie: $(GENIE)
 
+ifneq '$(EMULATOR)' '0'
 generate: \
 		genie \
 		$(GEN_FOLDERS) \
 		$(GENDIR)/version.cpp \
 		$(patsubst %.po,%.mo,$(call rwildcard, language/, *.po)) \
 		$(patsubst $(SRC)/%.lay,$(GENDIR)/%.lh,$(LAYOUTS))
+else
+generate: genie $(GENDIR)/version.cpp
+endif
 
 ifneq ($(NEW_GIT_VERSION),$(OLD_GIT_VERSION))
 stale:

@@ -45,12 +45,14 @@ function maintargetosdoptions(_target,_subtarget)
 	end
 
 	if BASE_TARGETOS=="unix" and _OPTIONS["targetos"]~="macosx" and _OPTIONS["targetos"]~="android" and _OPTIONS["targetos"]~="asmjs" then
-		links {
-			"SDL2_ttf",
-		}
-		local str = backtick(pkgconfigcmd() .. " --libs fontconfig")
-		addlibfromstring(str)
-		addoptionsfromstring(str)
+		if _OPTIONS["NO_MODULE_IMPLS"]~=1 then
+			links {
+				"SDL2_ttf",
+			}
+			local str = backtick(pkgconfigcmd() .. " --libs fontconfig")
+			addlibfromstring(str)
+			addoptionsfromstring(str)
+		end
 	end
 
 	if _OPTIONS["targetos"]=="windows" then
@@ -291,6 +293,7 @@ if BASE_TARGETOS=="unix" then
 	end
 end
 
+if _OPTIONS["USE_QTDEBUG"]=="1" then
 project ("qtdbg_" .. _OPTIONS["osd"])
 	uuid (os.uuid("qtdbg_" .. _OPTIONS["osd"]))
 	kind (LIBTYPE)
@@ -312,6 +315,7 @@ project ("qtdbg_" .. _OPTIONS["osd"])
 	configuration { }
 
 	qtdebuggerbuild()
+end
 
 project ("osd_" .. _OPTIONS["osd"])
 	targetsubdir(_OPTIONS["target"] .."_" .._OPTIONS["subtarget"])
