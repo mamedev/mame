@@ -1481,7 +1481,7 @@ void tek440x_state::physical_map(address_map &map)
 
 	// 721000-72107f net ram
 	// 722000-721fff nvram nybbles
-	map(0x721000, 0x7210ff).rw(FUNC(tek440x_state::readnvram), FUNC(tek440x_state::writenvram));
+	map(0x721000, 0x7210ff).rw(FUNC(tek440x_state::nvram_r), FUNC(tek440x_state::nvram_w));
 	map(0x722000, 0x722fff).rw(FUNC(tek440x_state::recall_r), FUNC(tek440x_state::recall_w));
 	map(0x723000, 0x723fff).rw(FUNC(tek440x_state::store_r), FUNC(tek440x_state::store_w));
 	
