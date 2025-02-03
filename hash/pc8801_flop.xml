@@ -15801,6 +15801,32 @@ Should be supported by [PC8001mkIISR] too
 		</part>
 	</software>
 
+	<software name="hibernia">
+		<description>Hibernia</description>
+		<year>1989</year>
+		<publisher>ハート電子 (Heart Denshi)</publisher>
+		<notes><![CDATA[
+Converted to .mfm from original .hfe
+]]></notes>
+		<!-- PC8801mk2SR -->
+		<info name="release" value="198904xx"/>
+		<info name="alt_title" value="ハイバーニア"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="1085330">
+				<rom name="hibernia_disk_a.mfm" size="1085330" crc="067c70b3" sha1="cc52b8199e1df3962f7a86327d266f1fc58397fa"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="1085330">
+				<rom name="hibernia_disk_b.mfm" size="1101276" crc="1d123a2f" sha1="7485c0bef3c5d9713a25679543b75c7a7019a025"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hideger">
 		<description>Hideger</description>
 		<year>1988</year>
