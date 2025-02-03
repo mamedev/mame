@@ -6234,6 +6234,7 @@ void drcbe_x86::op_fwrite(Assembler &a, const instruction &inst)
 		emit_mov_m32_p32(a, dword_ptr(esp, USE_THISCALL ? 4 : 8), srcp);
 	else if (inst.size() == 8)
 		emit_mov_m64_p64(a, qword_ptr(esp, USE_THISCALL ? 4 : 8), srcp);
+	emit_mov_m32_p32(a, dword_ptr(esp, USE_THISCALL ? 0 : 4), addrp);
 	if (USE_THISCALL)
 		a.mov(ecx, imm(accessor.obj));
 	else
