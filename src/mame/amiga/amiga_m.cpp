@@ -1617,6 +1617,9 @@ void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 			m_paula->dmacon_set(data);
 			m_copper->dmacon_set(data);
 
+			// TODO: unemulated BLTEN disable
+			// NOTE: Copper and 68k can in-flight pause a running blitter
+
 			/* if 'blitter-nasty' has been turned on and we have a blit pending, reschedule it */
 			if ( ( data & 0x400 ) && ( CUSTOM_REG(REG_DMACON) & 0x4000 ) )
 				m_blitter_timer->adjust(m_maincpu->cycles_to_attotime(BLITTER_NASTY_DELAY));
