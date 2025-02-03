@@ -35957,6 +35957,9 @@ penta                           // bootleg
 @source:pacman/schick.cpp
 schick                          // Microhard
 
+@source:paia/fatman.cpp
+fatman                          // PAiA FatMan
+
 @source:paia/midi2cv8.cpp
 midi2cv8                        // PAiA midi2cv8 (V/Oct)
 midi2cv8_vhz                    // PAiA midi2cv8 with V/Hz daughterboard
