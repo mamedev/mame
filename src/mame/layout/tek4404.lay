@@ -17,10 +17,10 @@ Tektronix 4404 Artificial Intelligence System.
 	</element>
 	<element name="led_rect" defstate="1">
 		<rect state="1">
-			<color red="0.0" green="0.2" blue="0.0" />
+			<color red="0.2" green="0.0" blue="0.0" />
 		</rect>
 		<rect state="0">
-			<color red="1.0" green="0.0" blue="0.0" />
+			<color red="1.0" green="0.1" blue="0.1" />
 		</rect>
 	</element>
 	<view name="Graphics">
