@@ -12,6 +12,7 @@ TODO:
  - Improve IOX device for daifugo (many hardwired reads);
  - It's possible that there is only one coin chute and not two, needs a real board to know
    more about it.
+ - hanaren2, harashi: Everythin. They seem to run on similar hardware, similar address maps, etc.
 
 How to play:
  - A to D select a card.
@@ -143,6 +144,7 @@ public:
 
 	void speedatk(machine_config &config);
 	void daifugo(machine_config &config);
+	void harashi(machine_config &config);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -186,6 +188,7 @@ private:
 	void io_map(address_map &map) ATTR_COLD;
 	void speedatk_program_map(address_map &map) ATTR_COLD;
 	void daifugo_program_map(address_map &map) ATTR_COLD;
+	void harashi_program_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -441,6 +444,13 @@ void speedatk_state::daifugo_program_map(address_map &map)
 	}));
 }
 
+void speedatk_state::harashi_program_map(address_map &map)
+{
+	speedatk_program_map(map);
+
+	map(0xc000, 0xffff).rom();
+}
+
 void speedatk_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
@@ -654,6 +664,12 @@ void speedatk_state::daifugo(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &speedatk_state::daifugo_program_map);
 }
 
+void speedatk_state::harashi(machine_config &config)
+{
+	speedatk(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &speedatk_state::harashi_program_map);
+}
+
 
 ROM_START( daifugo )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -696,8 +712,61 @@ ROM_START( speedatk )
 	ROM_LOAD( "cb2.bpr",      0x0020, 0x0100, CRC(a604cf96) SHA1(a4ef6e77dcd3abe4c27e8e636222a5ee711a51f5) ) // lookup table
 ROM_END
 
+// K&K95 9403-01-011 main PCB + HSB500 CPU PCB plugged into the CPU socket of the main PCB
+// Main chips on main PCB are: HD46505SP, 11 MHz XTAL, AY38910A/P, unmarked chip at u41, 2 banks of 8 DIP switches, bank of 4 DIP switches
+// Main chips on CPU PCB are: Z0840004PSC, program ROM, 3 banks of 8 DIP switches, 3x GAL16V8B, several unreadable chips and empty locations
+// DIP sheet is available
+ROM_START( hanaren2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "hana_ren_ii_kyo_rom.ic2.sub", 0x00000, 0x10000, CRC(fbf4c7cd) SHA1(90f9915f72f9bdfb4b487266057c86dad2a19299) ) // actual label is 花れんⅡ 強ROM
+
+	ROM_REGION( 0x6000, "gfx1", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x6000, "gfx2", 0 )
+	ROM_LOAD( "k.u8", 0x0000, 0x6000, CRC(86633086) SHA1(ad7d9c4f0fe74a72dbe1e139d9c02c7b44e25df9) ) // last 0x2000 empty
+	ROM_IGNORE(               0x2000 )
+
+	ROM_REGION( 0x0220, "proms", 0 ) // not dumped for this set, using daifugo's for now
+	ROM_LOAD( "tbp18s030.7l",  0x0000, 0x0020, BAD_DUMP CRC(bd674823) SHA1(c664b9959c939900dde3f86722404253b0e3f3f6) )  // color PROM
+	ROM_LOAD( "tbp24s10.6k",   0x0020, 0x0100, BAD_DUMP CRC(6bd28c7a) SHA1(6840481a9b496cb37a45895b73d3270e49212a3e) )  // lookup table
+
+	ROM_REGION( 0x900, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "gal16v8b.ic4", 0x000, 0x117, NO_DUMP ) // on CPU PCB
+	ROM_LOAD( "gal16v8b.ic7", 0x200, 0x117, NO_DUMP ) // on CPU PCB
+	ROM_LOAD( "gal16v8b.ic8", 0x400, 0x117, NO_DUMP ) // on CPU PCB
+	ROM_LOAD( "hr852.u53",    0x600, 0x2dd, NO_DUMP ) // PALCE22V10H, on main PCB
+ROM_END
+
+// set is composed by a main PCB, a CPU PCB with an original ALBA label, and another riser PCB marked AAL-03 with an unpopulated socket and logic
+// the riser boards are soldered to the main PCB.
+// Visible main chips on main PCB are: D8255AC-5, 11 MHz XTAL, 2 banks of 4 DIP switches, bank of 8 DIP switches
+// Main chips on CPU PCB are: Z0840004PSC, program ROM, 2 banks of 8 DIP switches, unreadable 40-pin chip and logic
+// has 1993 Asahi Bussan copyright in ROM. Probably board was upgraded.
+// given string, it's probably Hana Arashi but it isn't sure.
+// DIP sheet is available
+ROM_START( harashi )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	// seems to contain 2 programs (one at 0, one at 0x8000) but promptly jumps to over 0xc000?
+	ROM_LOAD( "as_a.ic4.sub", 0x00000, 0x10000, CRC(aebd6ff8) SHA1(f97ecfb079129b2bda634a189d78baedeaf349b7) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "as_cr_6.7e", 0x0000, 0x2000, CRC(6b8991ac) SHA1(44934646a1b7b42ec8b7c08770d3c5bbbe4029a7) )
+
+	ROM_REGION( 0x6000, "gfx2", 0 )
+	ROM_LOAD( "zb_04.7c", 0x0000, 0x2000, CRC(0eb2ce75) SHA1(26c78a7ca9cc49239f3b158a7438031f606a1640) ) // 1xxxxxxxxxxxx = 0xFF
+	ROM_LOAD( "zb_05.7d", 0x2000, 0x2000, CRC(9e3d49af) SHA1(9ec1be53459d10b6afe467f0c1ffac0f6d134997) ) // 1xxxxxxxxxxxx = 0xFF
+	ROM_COPY( "gfx2",     0x0000, 0x4000, 0x1000 ) // Fill the blank space with cards GFX
+	ROM_COPY( "gfx1",     0x1000, 0x5000, 0x1000 ) // GFX from cb0-7
+
+	ROM_REGION( 0x0220, "proms", 0 ) // not dumped for this set, using daifugo's for now
+	ROM_LOAD( "tbp18s030.7l",  0x0000, 0x0020, BAD_DUMP CRC(bd674823) SHA1(c664b9959c939900dde3f86722404253b0e3f3f6) )  // color PROM
+	ROM_LOAD( "tbp24s10.6k",   0x0020, 0x0100, BAD_DUMP CRC(6bd28c7a) SHA1(6840481a9b496cb37a45895b73d3270e49212a3e) )  // lookup table
+ROM_END
+
 } // anonymous namespace
 
 
-GAME( 1983, daifugo,  0, daifugo,  daifugo,  speedatk_state, empty_init, ROT90, "Seta Kikaku / Sega (Esco Trading Co license)", "Daifugo (Japan)",       MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1984, speedatk, 0, speedatk, speedatk, speedatk_state, empty_init, ROT0,  "Seta Kikaku",                                  "Speed Attack! (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, daifugo,  0, daifugo,  daifugo,  speedatk_state, empty_init, ROT90, "Seta Kikaku / Sega (Esco Trading Co license)", "Daifugo (Japan)",                      MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1984, speedatk, 0, speedatk, speedatk, speedatk_state, empty_init, ROT0,  "Seta Kikaku",                                  "Speed Attack! (Japan)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1985, hanaren2, 0, harashi,  speedatk, speedatk_state, empty_init, ROT0,  "K & K Electron",                               "Hana no Ren-Chan II (Japan)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1993, harashi,  0, harashi,  speedatk, speedatk_state, empty_init, ROT0,  "Asahi Bussan",                                 "Hana Arashi (Japan)",                  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )

@@ -43159,7 +43159,11 @@ renju
 daifugo
 hanaren2
 harashi
+<<<<<<< HEAD
 speedatk
+=======
+speedatk                        // CB-0 (c) SetaKikaku
+>>>>>>> a7b26f076f8 (New systems marked not working)
 
 @source:seta/speglsht.cpp
 speglsht
