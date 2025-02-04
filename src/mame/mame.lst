@@ -25949,6 +25949,9 @@ free220
 @source:linn/linndrum.cpp
 linndrum
 
+@source:linn/linndrum.cpp
+linndrum                        // Linn Electronics LinnDrum
+
 @source:lsi/m3.cpp
 m3
 
