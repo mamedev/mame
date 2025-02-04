@@ -171,9 +171,9 @@ void ncr5385_device::scsi_ctrl_changed()
 	if (ctrl & S_BSY)
 	{
 		if (ctrl & S_SEL)
-			LOGMASKED(LOG_STATE, "scsi_ctrl_changed 0x%03x arbitration/selection\n", ctrl);
+			LOGMASKED(LOG_STATE, "%10s: scsi_ctrl_changed 0x%03x arbitration/selection\n", machine().time().as_string(8), ctrl);
 		else
-			LOGMASKED(LOG_STATE, "scsi_ctrl_changed 0x%03x phase %s%s%s\n", ctrl, nscsi_phase[ctrl & S_PHASE_MASK],
+			LOGMASKED(LOG_STATE, "%10s: scsi_ctrl_changed 0x%03x phase %s%s%s\n", machine().time().as_string(8), ctrl, nscsi_phase[ctrl & S_PHASE_MASK],
 				ctrl & S_REQ ? " REQ" : "", ctrl & S_ACK ? " ACK" : "");
 
 		if (m_state != IDLE)
@@ -254,7 +254,7 @@ u8 ncr5385_device::aux_status_r()
 		if (ctrl & S_INP)
 			data |= AUX_STATUS_IO;
 	}
-	LOGMASKED(LOG_REGR, "aux_status_r 0x%02x (%s)\n", data, machine().describe_context());
+	LOGMASKED(LOG_REGR, "%10s: aux_status_r 0x%02x (%s)\n", machine().time().as_string(8), data, machine().describe_context());
 
 	return data;
 }
@@ -267,7 +267,7 @@ u8 ncr5385_device::own_id_r()
 u8 ncr5385_device::int_status_r()
 {
 	u8 const data = m_int_status;
-	LOGMASKED(LOG_REGR, "int_status_r 0x%02x (%s)\n", data, machine().describe_context());
+	LOGMASKED(LOG_REGR, "%10s: int_status_r 0x%02x (%s)\n", machine().time().as_string(8), data, machine().describe_context());
 	m_aux_status &= ~AUX_STATUS_PARITY_ERR;
 	m_int_status = 0;
 	update_int();
@@ -450,6 +450,8 @@ template <unsigned N> void ncr5385_device::cnt_w(u8 data)
 		m_aux_status &= ~AUX_STATUS_TC_ZERO;
 	else
 		m_aux_status |= AUX_STATUS_TC_ZERO;
+	
+ 	LOGMASKED(LOG_REGW, "%10s: cnt_w %d (%d) \n", machine().time().as_string(8), m_cnt, N);
 }
 
 void ncr5385_device::tst_w(u8 data)
@@ -830,7 +832,7 @@ void ncr5385_device::update_int()
 
 	if (m_int_state != int_state)
 	{
-		LOG("update_int %d\n", int_state);
+		LOG("%10s: update_int %d\n", machine().time().as_string(8), int_state);
 
 		m_aux_status &= ~(AUX_STATUS_MSG | AUX_STATUS_CD | AUX_STATUS_IO);
 		if (int_state)
