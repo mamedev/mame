@@ -660,7 +660,8 @@ private:
 	void render_scanline(bitmap_rgb32 &bitmap, int scanline);
 
 	// AGA video helpers
-	void aga_palette_write(int color_reg, uint16_t data);
+	u16 aga_palette_read(offs_t color_reg);
+	void aga_palette_write(offs_t color_reg, uint16_t data);
 	void aga_fetch_sprite_data(int scanline, int sprite);
 	void aga_render_scanline(bitmap_rgb32 &bitmap, int scanline);
 	void aga_update_sprite_dma(int scanline, int num);

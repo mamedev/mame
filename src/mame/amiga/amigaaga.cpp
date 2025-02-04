@@ -41,7 +41,26 @@ TODO:
  *
  *************************************/
 
-void amiga_state::aga_palette_write(int color_reg, uint16_t data)
+u16 amiga_state::aga_palette_read(offs_t color_reg)
+{
+	u8 pal_bank = (CUSTOM_REG(REG_BPLCON3) >> 13) & 0x07;
+
+	int color = (pal_bank * 32) + color_reg;
+
+	u8 cr = m_aga_palette[color].r();
+	u8 cg = m_aga_palette[color].g();
+	u8 cb = m_aga_palette[color].b();
+
+	// LOCT
+	if (BIT(CUSTOM_REG(REG_BPLCON3),9))
+	{
+		return ((cr & 0xf) << 8) | ((cg & 0xf) << 4) | ((cb & 0xf) << 0);
+	}
+
+	return ((cr & 0xf0) << 4) | (cg & 0xf0) | ((cb & 0xf0) >> 4);
+}
+
+void amiga_state::aga_palette_write(offs_t color_reg, uint16_t data)
 {
 	int r,g,b;
 	int cr,cg,cb;
@@ -68,7 +87,9 @@ void amiga_state::aga_palette_write(int color_reg, uint16_t data)
 		cr = (r << 4) | r;
 		cg = (g << 4) | g;
 		cb = (b << 4) | b;
+		// TODO: transparency, bit 15
 	}
+
 	m_aga_palette[color] = rgb_t(cr, cg, cb);
 	// make a copy for Extra Half Brite mode
 	if (pal_bank == 0)
@@ -499,6 +520,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 			CUSTOM_REG(REG_VPOSR) ^= VPOSR_LOF;
 
 		m_copper->vblank_sync(true);
+		// TODO: shouldn't be raw color ...
 		m_ham_color = CUSTOM_REG(REG_COLOR00);
 	}
 
