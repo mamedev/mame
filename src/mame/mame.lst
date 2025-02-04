@@ -25375,6 +25375,9 @@ free120                         // (c) 1993 Liberty Electronics
 free200                         // (c) 1983 Liberty Electronics
 free220                         // (c) 1984 Liberty Electronics
 
+@source:linn/linndrum.cpp
+linndrum                        // Linn Electronics LinnDrum
+
 @source:lsi/m3.cpp
 m3                              //
 
