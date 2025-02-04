@@ -76,6 +76,7 @@ void system23_kbd_device::bus_w(uint8_t data)
 	if(BIT(data,5)) m_bus |= 0x02;
 	if(BIT(data,6)) m_bus |= 0x01;
 	m_cs = BIT(data, 7);
+	LOG("m_cs: %d\n",m_cs);
 }
 
 uint8_t system23_kbd_device::read_keyboard()
@@ -88,19 +89,23 @@ void system23_kbd_device::p2_w(uint8_t data)
 {
 	m_bus_write(BIT(data,7));
 	m_t1 = BIT(data, 3);
-	int data_to_write = ((data & 0x70) << 4);
-	m_scan_r = true;
-	m_counter &= 0xff;
-	m_counter |= data_to_write;
-	m_select = data & 0x07;
+	if(!m_cs)
+	{
+		int data_to_write = ((data & 0x70) << 4);
+		m_counter &= 0xff;
+		m_counter |= data_to_write;
+		m_select &= data & 0x07;
+	}
 	LOG("Port 2 Counter: %04x Select: %d\n", m_counter, m_select);
 }
 
 void system23_kbd_device::p1_w(uint8_t data)
 {
-	m_scan_r = true;
-	m_counter &= 0x700;
-	m_counter |= data;
+	if(!m_cs)
+	{
+		m_counter &= 0x700;
+		m_counter |= data;
+	}
 	LOG("Port 1 counter: %04x\n", m_counter);
 }
 
@@ -121,11 +126,12 @@ int system23_kbd_device::t0_r()
 //This routine has the responsibility to process the keyboard matrix and extract the sense line, then feed it to the microcontroller
 int system23_kbd_device::t1_r()
 {
-	m_scan_r = false;
 	if(m_cs)
 	{
 		uint8_t kbd_data = m_columns[translate_columns()]->read();
 		LOG("Counter: %d Select: %d Value: %02x\n", translate_columns(), m_select, kbd_data);
+		m_counter = 0;
+		m_select = 7;
 		return BIT(kbd_data, m_select);
 	}
 	else
