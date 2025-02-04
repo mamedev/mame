@@ -2560,6 +2560,71 @@ void drcbe_x64::op_read(Assembler &a, const instruction &inst)
 		else
 			smart_call_r64(a, (x86code *)accessors.specific.read.function, rax);                 // call non-virtual member function
 	}
+	else if (have_specific && ((1 << spacesizep.size()) < accessors.specific.native_bytes))
+	{
+		// if the destination register isn't a non-volatile register, we can use it to save the shift count
+		bool need_save = (dstreg != ebx) && (dstreg != r12d) && (dstreg != r13d) && (dstreg != r14d) && (dstreg != r15d);
+
+		if (need_save)
+			a.mov(ptr(rsp, 32), Gpq(int_register_map[0]));                                       // save I0 register
+		if ((accessors.specific.native_bytes <= 4) || (spacesizep.size() != SIZE_QWORD))
+			a.mov(Gpd(REG_PARAM3), imm(make_bitmask<uint32_t>(8 << spacesizep.size())));         // set default mem_mask
+		else
+			a.mov(Gpq(REG_PARAM3), imm(make_bitmask<uint64_t>(8 << spacesizep.size())));         // set default mem_mask
+		a.mov(ecx, Gpd(REG_PARAM2));                                                             // copy address
+		a.and_(Gpd(REG_PARAM2), imm(addr_mask));                                                 // apply address mask
+
+		int const shift = m_space[spacesizep.space()]->addr_shift() - 3;
+		if (m_space[spacesizep.space()]->endianness() != ENDIANNESS_LITTLE)
+			a.not_(ecx);                                                                         // swizzle address for bit Endian spaces
+		mov_r64_imm(a, rax, uintptr_t(accessors.specific.read.dispatch));                        // load dispatch table pointer
+		if (shift < 0)
+			a.shl(ecx, imm(-shift));                                                             // convert address to bits (left shift)
+		else if (shift > 0)
+			a.shr(ecx, imm(shift));                                                              // convert address to bits (right shift)
+		if (accessors.specific.low_bits)
+		{
+			a.mov(r10d, Gpd(REG_PARAM2));                                                        // copy masked address
+			a.shr(Gpd(REG_PARAM2), accessors.specific.low_bits);                                 // shift off low bits
+		}
+		a.and_(ecx, imm((accessors.specific.native_bytes - (1 << spacesizep.size())) << 3));     // mask bit address
+		a.mov(rax, ptr(rax, Gpq(REG_PARAM2), 3));                                                // load dispatch table entry
+		if (accessors.specific.low_bits)
+			a.mov(Gpd(REG_PARAM2), r10d);                                                        // restore masked address
+		if (need_save)
+			a.mov(Gpd(int_register_map[0]), ecx);                                                // save masked bit address
+		else
+			a.mov(dstreg.r32(), ecx);                                                            // save masked bit address
+		if (accessors.specific.native_bytes <= 4)
+			a.shl(Gpd(REG_PARAM3), cl);                                                          // shift mem_mask by masked bit address
+		else
+			a.shl(Gpq(REG_PARAM3), cl);                                                          // shift mem_mask by masked bit address
+
+		// need to do this after finished with CL as REG_PARAM1 is A on Windows
+		a.mov(Gpq(REG_PARAM1), rax);
+		if (accessors.specific.read.is_virtual)
+			a.mov(rax, ptr(rax, accessors.specific.read.displacement));                          // load vtable pointer
+		if (accessors.specific.read.displacement)
+			a.add(Gpq(REG_PARAM1), accessors.specific.read.displacement);                        // apply this pointer offset
+		if (accessors.specific.read.is_virtual)
+			a.call(ptr(rax, accessors.specific.read.function));                                  // call virtual member function
+		else
+			smart_call_r64(a, (x86code *)accessors.specific.read.function, rax);                 // call non-virtual member function
+
+		if (need_save)
+		{
+			a.mov(ecx, Gpd(int_register_map[0]));                                                // restore masked bit address
+			a.mov(Gpq(int_register_map[0]), ptr(rsp, 32));                                       // restore I0 register
+		}
+		else
+		{
+			a.mov(ecx, dstreg.r32());                                                            // restore masked bit address
+		}
+		if (accessors.specific.native_bytes <= 4)
+			a.shr(eax, cl);                                                                      // shift result by masked bit address
+		else
+			a.shr(rax, cl);                                                                      // shift result by masked bit address
+	}
 	else if (spacesizep.size() == SIZE_BYTE)
 	{
 		mov_r64_imm(a, Gpq(REG_PARAM1), accessors.resolved.read_byte.obj);
@@ -2660,6 +2725,67 @@ void drcbe_x64::op_readm(Assembler &a, const instruction &inst)
 			a.call(ptr(rax, accessors.specific.read.function));                                  // call virtual member function
 		else
 			smart_call_r64(a, (x86code *)accessors.specific.read.function, rax);                 // call non-virtual member function
+	}
+	else if (have_specific && ((1 << spacesizep.size()) < accessors.specific.native_bytes))
+	{
+		// if the destination register isn't a non-volatile register, we can use it to save the shift count
+		bool need_save = (dstreg != ebx) && (dstreg != r12d) && (dstreg != r13d) && (dstreg != r14d) && (dstreg != r15d);
+
+		if (need_save)
+			a.mov(ptr(rsp, 32), Gpq(int_register_map[0]));                                       // save I0 register
+		a.mov(ecx, Gpd(REG_PARAM2));                                                             // copy address
+		a.and_(Gpd(REG_PARAM2), imm(addr_mask));                                                 // apply address mask
+
+		int const shift = m_space[spacesizep.space()]->addr_shift() - 3;
+		if (m_space[spacesizep.space()]->endianness() != ENDIANNESS_LITTLE)
+			a.not_(ecx);                                                                         // swizzle address for bit Endian spaces
+		mov_r64_imm(a, rax, uintptr_t(accessors.specific.read.dispatch));                        // load dispatch table pointer
+		if (shift < 0)
+			a.shl(ecx, imm(-shift));                                                             // convert address to bits (left shift)
+		else if (shift > 0)
+			a.shr(ecx, imm(shift));                                                              // convert address to bits (right shift)
+		if (accessors.specific.low_bits)
+		{
+			a.mov(r10d, Gpd(REG_PARAM2));                                                        // copy masked address
+			a.shr(Gpd(REG_PARAM2), accessors.specific.low_bits);                                 // shift off low bits
+		}
+		a.and_(ecx, imm((accessors.specific.native_bytes - (1 << spacesizep.size())) << 3));     // mask bit address
+		a.mov(rax, ptr(rax, Gpq(REG_PARAM2), 3));                                                // load dispatch table entry
+		if (accessors.specific.low_bits)
+			a.mov(Gpd(REG_PARAM2), r10d);                                                        // restore masked address
+		if (need_save)
+			a.mov(Gpd(int_register_map[0]), ecx);                                                // save masked bit address
+		else
+			a.mov(dstreg.r32(), ecx);                                                            // save masked bit address
+		if (accessors.specific.native_bytes <= 4)
+			a.shl(Gpd(REG_PARAM3), cl);                                                          // shift mem_mask by masked bit address
+		else
+			a.shl(Gpq(REG_PARAM3), cl);                                                          // shift mem_mask by masked bit address
+
+		// need to do this after finished with CL as REG_PARAM1 is A on Windows
+		a.mov(Gpq(REG_PARAM1), rax);
+		if (accessors.specific.read.is_virtual)
+			a.mov(rax, ptr(rax, accessors.specific.read.displacement));                          // load vtable pointer
+		if (accessors.specific.read.displacement)
+			a.add(Gpq(REG_PARAM1), accessors.specific.read.displacement);                        // apply this pointer offset
+		if (accessors.specific.read.is_virtual)
+			a.call(ptr(rax, accessors.specific.read.function));                                  // call virtual member function
+		else
+			smart_call_r64(a, (x86code *)accessors.specific.read.function, rax);                 // call non-virtual member function
+
+		if (need_save)
+		{
+			a.mov(ecx, Gpd(int_register_map[0]));                                                // restore masked bit address
+			a.mov(Gpq(int_register_map[0]), ptr(rsp, 32));                                       // restore I0 register
+		}
+		else
+		{
+			a.mov(ecx, dstreg.r32());                                                            // restore masked bit address
+		}
+		if (accessors.specific.native_bytes <= 4)
+			a.shr(eax, cl);                                                                      // shift result by masked bit address
+		else
+			a.shr(rax, cl);                                                                      // shift result by masked bit address
 	}
 	else if (spacesizep.size() == SIZE_BYTE)
 	{
