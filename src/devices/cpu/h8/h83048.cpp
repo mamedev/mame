@@ -33,6 +33,7 @@ h83048_device::h83048_device(const machine_config &mconfig, device_type type, co
 	m_timer16_3(*this, "timer16:3"),
 	m_timer16_4(*this, "timer16:4"),
 	m_watchdog(*this, "watchdog"),
+	m_tend_cb(*this),
 	m_ram_start(start),
 	m_syscr(0)
 {
@@ -206,7 +207,12 @@ void h83048_device::device_add_mconfig(machine_config &config)
 
 void h83048_device::execute_set_input(int inputnum, int state)
 {
-	m_intc->set_input(inputnum, state);
+	if(inputnum == H8_INPUT_LINE_TEND0 || inputnum == H8_INPUT_LINE_TEND1)
+		m_tend_cb[inputnum - H8_INPUT_LINE_TEND0](state);
+	else if(inputnum == H8_INPUT_LINE_DREQ0 || inputnum == H8_INPUT_LINE_DREQ1)
+		m_dma->set_input(inputnum, state);
+	else
+		m_intc->set_input(inputnum, state);
 }
 
 int h83048_device::trapa_setup()
@@ -284,6 +290,7 @@ void h83048_device::notify_standby(int state)
 void h83048_device::device_start()
 {
 	h8h_device::device_start();
+	m_dma_device = m_dma;
 	save_item(NAME(m_syscr));
 }
 
@@ -301,6 +308,7 @@ u8 h83048_device::syscr_r()
 void h83048_device::syscr_w(u8 data)
 {
 	m_syscr = data;
+	m_intc->set_nmi_edge(BIT(data, 2));
 	update_irq_filter();
 	logerror("syscr = %02x\n", data);
 }
