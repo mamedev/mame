@@ -711,11 +711,14 @@ drcbe_x64::drcbe_x64(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 	m_drcmap_get_value.set(m_map, &drc_map_variables::get_value);
 	if (!m_drcmap_get_value)
 		throw emu_fatalerror("Error resolving map variable get value function!\n");
-	m_resolved_accessors.resize(m_space.size());
+	m_memory_accessors.resize(m_space.size());
 	for (int space = 0; m_space.size() > space; ++space)
 	{
 		if (m_space[space])
-			m_resolved_accessors[space].set(*m_space[space]);
+		{
+			m_memory_accessors[space].resolved.set(*m_space[space]);
+			m_memory_accessors[space].specific = m_space[space]->specific_accessors();
+		}
 	}
 
 	// build the opcode table (static but it doesn't hurt to regenerate it)
@@ -2525,40 +2528,149 @@ void drcbe_x64::op_read(Assembler &a, const instruction &inst)
 	Gp dstreg = dstp.select_register(eax);
 
 	// set up a call to the read handler
-	auto &resolved = m_resolved_accessors[spacesizep.space()];
-	mov_reg_param(a, Gpd(REG_PARAM2), addrp);                                       // mov    param2,addrp
-	if (spacesizep.size() == SIZE_BYTE)
+	auto const &accessors = m_memory_accessors[spacesizep.space()];
+	bool const have_specific = (uintptr_t(nullptr) != accessors.specific.read.function) || accessors.specific.read.is_virtual;
+	auto const addr_mask = make_bitmask<uint32_t>(accessors.specific.address_width) & ~make_bitmask<uint32_t>(accessors.specific.native_mask_bits);
+	mov_reg_param(a, Gpd(REG_PARAM2), addrp);
+	if (have_specific && ((1 << spacesizep.size()) == accessors.specific.native_bytes))
 	{
-		mov_r64_imm(a, Gpq(REG_PARAM1), resolved.read_byte.obj);                    // mov    param1,space
-		smart_call_r64(a, resolved.read_byte.func, rax);                            // call   read_byte
-		a.movzx(dstreg, al);                                                        // movzx  dstreg,al
+		// set default mem_mask
+		if (accessors.specific.native_bytes <= 4)
+			a.mov(Gpd(REG_PARAM3), make_bitmask<uint32_t>(accessors.specific.native_bytes << 3));
+		else
+			a.mov(Gpq(REG_PARAM3), make_bitmask<uint64_t>(accessors.specific.native_bytes << 3));
+
+		a.and_(Gpd(REG_PARAM2), imm(addr_mask));                                                 // apply address mask
+		mov_r64_imm(a, rax, uintptr_t(accessors.specific.read.dispatch));                        // load dispatch table pointer
+		if (accessors.specific.low_bits)
+		{
+			a.mov(r10d, Gpd(REG_PARAM2));                                                        // save masked address
+			a.shr(Gpd(REG_PARAM2), accessors.specific.low_bits);                                 // shift off low bits
+		}
+		a.mov(Gpq(REG_PARAM1), ptr(rax, Gpq(REG_PARAM2), 3));                                    // load dispatch table entry
+		if (accessors.specific.low_bits)
+			a.mov(Gpd(REG_PARAM2), r10d);                                                        // restore masked address
+
+		if (accessors.specific.read.is_virtual)
+			a.mov(rax, ptr(Gpq(REG_PARAM1), accessors.specific.read.displacement));              // load vtable pointer
+		if (accessors.specific.read.displacement)
+			a.add(Gpq(REG_PARAM1), accessors.specific.read.displacement);                        // apply this pointer offset
+		if (accessors.specific.read.is_virtual)
+			a.call(ptr(rax, accessors.specific.read.function));                                  // call virtual member function
+		else
+			smart_call_r64(a, (x86code *)accessors.specific.read.function, rax);                 // call non-virtual member function
+	}
+	else if (have_specific && ((1 << spacesizep.size()) < accessors.specific.native_bytes))
+	{
+		// if the destination register isn't a non-volatile register, we can use it to save the shift count
+		bool need_save = (dstreg != ebx) && (dstreg != r12d) && (dstreg != r13d) && (dstreg != r14d) && (dstreg != r15d);
+
+		if (need_save)
+			a.mov(ptr(rsp, 32), Gpq(int_register_map[0]));                                       // save I0 register
+		if ((accessors.specific.native_bytes <= 4) || (spacesizep.size() != SIZE_QWORD))
+			a.mov(Gpd(REG_PARAM3), imm(make_bitmask<uint32_t>(8 << spacesizep.size())));         // set default mem_mask
+		else
+			a.mov(Gpq(REG_PARAM3), imm(make_bitmask<uint64_t>(8 << spacesizep.size())));         // set default mem_mask
+		a.mov(ecx, Gpd(REG_PARAM2));                                                             // copy address
+		a.and_(Gpd(REG_PARAM2), imm(addr_mask));                                                 // apply address mask
+
+		int const shift = m_space[spacesizep.space()]->addr_shift() - 3;
+		if (m_space[spacesizep.space()]->endianness() != ENDIANNESS_LITTLE)
+			a.not_(ecx);                                                                         // swizzle address for bit Endian spaces
+		mov_r64_imm(a, rax, uintptr_t(accessors.specific.read.dispatch));                        // load dispatch table pointer
+		if (shift < 0)
+			a.shl(ecx, imm(-shift));                                                             // convert address to bits (left shift)
+		else if (shift > 0)
+			a.shr(ecx, imm(shift));                                                              // convert address to bits (right shift)
+		if (accessors.specific.low_bits)
+		{
+			a.mov(r10d, Gpd(REG_PARAM2));                                                        // copy masked address
+			a.shr(Gpd(REG_PARAM2), accessors.specific.low_bits);                                 // shift off low bits
+		}
+		a.and_(ecx, imm((accessors.specific.native_bytes - (1 << spacesizep.size())) << 3));     // mask bit address
+		a.mov(rax, ptr(rax, Gpq(REG_PARAM2), 3));                                                // load dispatch table entry
+		if (accessors.specific.low_bits)
+			a.mov(Gpd(REG_PARAM2), r10d);                                                        // restore masked address
+		if (need_save)
+			a.mov(Gpd(int_register_map[0]), ecx);                                                // save masked bit address
+		else
+			a.mov(dstreg.r32(), ecx);                                                            // save masked bit address
+		if (accessors.specific.native_bytes <= 4)
+			a.shl(Gpd(REG_PARAM3), cl);                                                          // shift mem_mask by masked bit address
+		else
+			a.shl(Gpq(REG_PARAM3), cl);                                                          // shift mem_mask by masked bit address
+
+		// need to do this after finished with CL as REG_PARAM1 is C on Windows
+		a.mov(Gpq(REG_PARAM1), rax);
+		if (accessors.specific.read.is_virtual)
+			a.mov(rax, ptr(rax, accessors.specific.read.displacement));                          // load vtable pointer
+		if (accessors.specific.read.displacement)
+			a.add(Gpq(REG_PARAM1), accessors.specific.read.displacement);                        // apply this pointer offset
+		if (accessors.specific.read.is_virtual)
+			a.call(ptr(rax, accessors.specific.read.function));                                  // call virtual member function
+		else
+			smart_call_r64(a, (x86code *)accessors.specific.read.function, rax);                 // call non-virtual member function
+
+		if (need_save)
+		{
+			a.mov(ecx, Gpd(int_register_map[0]));                                                // restore masked bit address
+			a.mov(Gpq(int_register_map[0]), ptr(rsp, 32));                                       // restore I0 register
+		}
+		else
+		{
+			a.mov(ecx, dstreg.r32());                                                            // restore masked bit address
+		}
+		if (accessors.specific.native_bytes <= 4)
+			a.shr(eax, cl);                                                                      // shift result by masked bit address
+		else
+			a.shr(rax, cl);                                                                      // shift result by masked bit address
+	}
+	else if (spacesizep.size() == SIZE_BYTE)
+	{
+		mov_r64_imm(a, Gpq(REG_PARAM1), accessors.resolved.read_byte.obj);
+		smart_call_r64(a, accessors.resolved.read_byte.func, rax);
 	}
 	else if (spacesizep.size() == SIZE_WORD)
 	{
-		mov_r64_imm(a, Gpq(REG_PARAM1), resolved.read_word.obj);                    // mov    param1,space
-		smart_call_r64(a, resolved.read_word.func, rax);                            // call   read_word
-		a.movzx(dstreg, ax);                                                        // movzx  dstreg,ax
+		mov_r64_imm(a, Gpq(REG_PARAM1), accessors.resolved.read_word.obj);
+		smart_call_r64(a, accessors.resolved.read_word.func, rax);
 	}
 	else if (spacesizep.size() == SIZE_DWORD)
 	{
-		mov_r64_imm(a, Gpq(REG_PARAM1), resolved.read_dword.obj);                   // mov    param1,space
-		smart_call_r64(a, resolved.read_dword.func, rax);                           // call   read_dword
-		if (dstreg != eax || inst.size() == 8)
-			a.mov(dstreg, eax);                                                     // mov    dstreg,eax
+		mov_r64_imm(a, Gpq(REG_PARAM1), accessors.resolved.read_dword.obj);
+		smart_call_r64(a, accessors.resolved.read_dword.func, rax);
 	}
 	else if (spacesizep.size() == SIZE_QWORD)
 	{
-		mov_r64_imm(a, Gpq(REG_PARAM1), resolved.read_qword.obj);                   // mov    param1,space
-		smart_call_r64(a, resolved.read_qword.func, rax);                           // call   read_qword
+		mov_r64_imm(a, Gpq(REG_PARAM1), accessors.resolved.read_qword.obj);
+		smart_call_r64(a, accessors.resolved.read_qword.func, rax);
+	}
+
+	// move or zero-extend result if necessary
+	if (spacesizep.size() == SIZE_BYTE)
+	{
+		a.movzx(dstreg, al);
+	}
+	else if (spacesizep.size() == SIZE_WORD)
+	{
+		a.movzx(dstreg, ax);
+	}
+	else if (spacesizep.size() == SIZE_DWORD)
+	{
+		if (dstreg != eax || inst.size() == 8)
+			a.mov(dstreg, eax);
+	}
+	else if (spacesizep.size() == SIZE_QWORD)
+	{
 		if (dstreg != eax)
-			a.mov(dstreg.r64(), rax);                                               // mov    dstreg,rax
+			a.mov(dstreg.r64(), rax);
 	}
 
 	// store result
 	if (inst.size() == 4)
-		mov_param_reg(a, dstp, dstreg);                                             // mov   dstp,dstreg
+		mov_param_reg(a, dstp, dstreg);
 	else
-		mov_param_reg(a, dstp, dstreg.r64());                                       // mov   dstp,dstreg
+		mov_param_reg(a, dstp, dstreg.r64());
 }
 
 
@@ -2584,44 +2696,143 @@ void drcbe_x64::op_readm(Assembler &a, const instruction &inst)
 	Gp dstreg = dstp.select_register(eax);
 
 	// set up a call to the read handler
-	auto &resolved = m_resolved_accessors[spacesizep.space()];
-	mov_reg_param(a, Gpd(REG_PARAM2), addrp);                                       // mov    param2,addrp
+	auto const &accessors = m_memory_accessors[spacesizep.space()];
+	bool const have_specific = (uintptr_t(nullptr) != accessors.specific.read.function) || accessors.specific.read.is_virtual;
+	auto const addr_mask = make_bitmask<uint32_t>(accessors.specific.address_width) & ~make_bitmask<uint32_t>(accessors.specific.native_mask_bits);
+	mov_reg_param(a, Gpd(REG_PARAM2), addrp);
 	if (spacesizep.size() != SIZE_QWORD)
-		mov_reg_param(a, Gpd(REG_PARAM3), maskp);                                   // mov    param3,maskp
+		mov_reg_param(a, Gpd(REG_PARAM3), maskp);
 	else
-		mov_reg_param(a, Gpq(REG_PARAM3), maskp);                                   // mov    param3,maskp
-	if (spacesizep.size() == SIZE_BYTE)
+		mov_reg_param(a, Gpq(REG_PARAM3), maskp);
+	if (have_specific && ((1 << spacesizep.size()) == accessors.specific.native_bytes))
 	{
-		mov_r64_imm(a, Gpq(REG_PARAM1), resolved.read_byte_masked.obj);             // mov    param1,space
-		smart_call_r64(a, resolved.read_byte_masked.func, rax);                     // call   read_byte_masked
-		a.movzx(dstreg, al);                                                        // movzx  dstreg,al
+		a.and_(Gpd(REG_PARAM2), imm(addr_mask));                                                 // apply address mask
+		mov_r64_imm(a, rax, uintptr_t(accessors.specific.read.dispatch));                        // load dispatch table pointer
+		if (accessors.specific.low_bits)
+		{
+			a.mov(r10d, Gpd(REG_PARAM2));                                                        // save masked address
+			a.shr(Gpd(REG_PARAM2), accessors.specific.low_bits);                                 // shift off low bits
+		}
+		a.mov(Gpq(REG_PARAM1), ptr(rax, Gpq(REG_PARAM2), 3));                                    // load dispatch table entry
+		if (accessors.specific.low_bits)
+			a.mov(Gpd(REG_PARAM2), r10d);                                                        // restore masked address
+
+		if (accessors.specific.read.is_virtual)
+			a.mov(rax, ptr(Gpq(REG_PARAM1), accessors.specific.read.displacement));              // load vtable pointer
+		if (accessors.specific.read.displacement)
+			a.add(Gpq(REG_PARAM1), accessors.specific.read.displacement);                        // apply this pointer offset
+		if (accessors.specific.read.is_virtual)
+			a.call(ptr(rax, accessors.specific.read.function));                                  // call virtual member function
+		else
+			smart_call_r64(a, (x86code *)accessors.specific.read.function, rax);                 // call non-virtual member function
+	}
+	else if (have_specific && ((1 << spacesizep.size()) < accessors.specific.native_bytes))
+	{
+		// if the destination register isn't a non-volatile register, we can use it to save the shift count
+		bool need_save = (dstreg != ebx) && (dstreg != r12d) && (dstreg != r13d) && (dstreg != r14d) && (dstreg != r15d);
+
+		if (need_save)
+			a.mov(ptr(rsp, 32), Gpq(int_register_map[0]));                                       // save I0 register
+		a.mov(ecx, Gpd(REG_PARAM2));                                                             // copy address
+		a.and_(Gpd(REG_PARAM2), imm(addr_mask));                                                 // apply address mask
+
+		int const shift = m_space[spacesizep.space()]->addr_shift() - 3;
+		if (m_space[spacesizep.space()]->endianness() != ENDIANNESS_LITTLE)
+			a.not_(ecx);                                                                         // swizzle address for bit Endian spaces
+		mov_r64_imm(a, rax, uintptr_t(accessors.specific.read.dispatch));                        // load dispatch table pointer
+		if (shift < 0)
+			a.shl(ecx, imm(-shift));                                                             // convert address to bits (left shift)
+		else if (shift > 0)
+			a.shr(ecx, imm(shift));                                                              // convert address to bits (right shift)
+		if (accessors.specific.low_bits)
+		{
+			a.mov(r10d, Gpd(REG_PARAM2));                                                        // copy masked address
+			a.shr(Gpd(REG_PARAM2), accessors.specific.low_bits);                                 // shift off low bits
+		}
+		a.mov(rax, ptr(rax, Gpq(REG_PARAM2), 3));                                                // load dispatch table entry
+		a.and_(ecx, imm((accessors.specific.native_bytes - (1 << spacesizep.size())) << 3));     // mask bit address
+		if (accessors.specific.low_bits)
+			a.mov(Gpd(REG_PARAM2), r10d);                                                        // restore masked address
+		if (need_save)
+			a.mov(Gpd(int_register_map[0]), ecx);                                                // save masked bit address
+		else
+			a.mov(dstreg.r32(), ecx);                                                            // save masked bit address
+		if (accessors.specific.read.is_virtual)
+			a.mov(r10, ptr(rax, accessors.specific.read.displacement));                          // load vtable pointer
+		if (accessors.specific.read.displacement)
+			a.add(rax, accessors.specific.read.displacement);                                    // apply this pointer offset
+		if (accessors.specific.native_bytes <= 4)
+			a.shl(Gpd(REG_PARAM3), cl);                                                          // shift mem_mask by masked bit address
+		else
+			a.shl(Gpq(REG_PARAM3), cl);                                                          // shift mem_mask by masked bit address
+
+		// need to do this after finished with CL as REG_PARAM1 is C on Windows
+		a.mov(Gpq(REG_PARAM1), rax);
+		if (accessors.specific.read.is_virtual)
+			a.call(ptr(r10, accessors.specific.read.function));                                  // call virtual member function
+		else
+			smart_call_r64(a, (x86code *)accessors.specific.read.function, rax);                 // call non-virtual member function
+
+		if (need_save)
+		{
+			a.mov(ecx, Gpd(int_register_map[0]));                                                // restore masked bit address
+			a.mov(Gpq(int_register_map[0]), ptr(rsp, 32));                                       // restore I0 register
+		}
+		else
+		{
+			a.mov(ecx, dstreg.r32());                                                            // restore masked bit address
+		}
+		if (accessors.specific.native_bytes <= 4)
+			a.shr(eax, cl);                                                                      // shift result by masked bit address
+		else
+			a.shr(rax, cl);                                                                      // shift result by masked bit address
+	}
+	else if (spacesizep.size() == SIZE_BYTE)
+	{
+		mov_r64_imm(a, Gpq(REG_PARAM1), accessors.resolved.read_byte_masked.obj);
+		smart_call_r64(a, accessors.resolved.read_byte_masked.func, rax);
 	}
 	else if (spacesizep.size() == SIZE_WORD)
 	{
-		mov_r64_imm(a, Gpq(REG_PARAM1), resolved.read_word_masked.obj);             // mov    param1,space
-		smart_call_r64(a, resolved.read_word_masked.func, rax);                     // call   read_word_masked
-		a.movzx(dstreg, ax);                                                        // movzx  dstreg,ax
+		mov_r64_imm(a, Gpq(REG_PARAM1), accessors.resolved.read_word_masked.obj);
+		smart_call_r64(a, accessors.resolved.read_word_masked.func, rax);
 	}
 	else if (spacesizep.size() == SIZE_DWORD)
 	{
-		mov_r64_imm(a, Gpq(REG_PARAM1), resolved.read_dword_masked.obj);            // mov    param1,space
-		smart_call_r64(a, resolved.read_dword_masked.func, rax);                    // call   read_dword_masked
-		if (dstreg != eax || inst.size() == 8)
-			a.mov(dstreg, eax);                                                     // mov    dstreg,eax
+		mov_r64_imm(a, Gpq(REG_PARAM1), accessors.resolved.read_dword_masked.obj);
+		smart_call_r64(a, accessors.resolved.read_dword_masked.func, rax);
 	}
 	else if (spacesizep.size() == SIZE_QWORD)
 	{
-		mov_r64_imm(a, Gpq(REG_PARAM1), resolved.read_qword_masked.obj);            // mov    param1,space
-		smart_call_r64(a, resolved.read_qword_masked.func, rax);                    // call   read_qword_masked
+		mov_r64_imm(a, Gpq(REG_PARAM1), accessors.resolved.read_qword_masked.obj);
+		smart_call_r64(a, accessors.resolved.read_qword_masked.func, rax);
+	}
+
+	// move or zero-extend result if necessary
+	if (spacesizep.size() == SIZE_BYTE)
+	{
+		a.movzx(dstreg, al);
+	}
+	else if (spacesizep.size() == SIZE_WORD)
+	{
+		a.movzx(dstreg, ax);
+	}
+	else if (spacesizep.size() == SIZE_DWORD)
+	{
+		if (dstreg != eax || inst.size() == 8)
+			a.mov(dstreg, eax);
+	}
+	else if (spacesizep.size() == SIZE_QWORD)
+	{
 		if (dstreg != eax)
-			a.mov(dstreg.r64(), rax);                                               // mov    dstreg,rax
+			a.mov(dstreg.r64(), rax);
 	}
 
 	// store result
 	if (inst.size() == 4)
-		mov_param_reg(a, dstp, dstreg);                                             // mov   dstp,dstreg
+		mov_param_reg(a, dstp, dstreg);
 	else
-		mov_param_reg(a, dstp, dstreg.r64());                                       // mov   dstp,dstreg
+		mov_param_reg(a, dstp, dstreg.r64());
 }
 
 
@@ -2643,31 +2854,113 @@ void drcbe_x64::op_write(Assembler &a, const instruction &inst)
 	assert(spacesizep.is_size_space());
 
 	// set up a call to the write handler
-	auto &resolved = m_resolved_accessors[spacesizep.space()];
-	mov_reg_param(a, Gpd(REG_PARAM2), addrp);                                       // mov    param2,addrp
+	auto const &accessors = m_memory_accessors[spacesizep.space()];
+	bool const have_specific = (uintptr_t(nullptr) != accessors.specific.write.function) || accessors.specific.write.is_virtual;
+	auto const addr_mask = make_bitmask<uint32_t>(accessors.specific.address_width) & ~make_bitmask<uint32_t>(accessors.specific.native_mask_bits);
+	mov_reg_param(a, Gpd(REG_PARAM2), addrp);
 	if (spacesizep.size() != SIZE_QWORD)
-		mov_reg_param(a, Gpd(REG_PARAM3), srcp);                                    // mov    param3,srcp
+		mov_reg_param(a, Gpd(REG_PARAM3), srcp);
 	else
-		mov_reg_param(a, Gpq(REG_PARAM3), srcp);                                    // mov    param3,srcp
-	if (spacesizep.size() == SIZE_BYTE)
+		mov_reg_param(a, Gpq(REG_PARAM3), srcp);
+	if (have_specific && ((1 << spacesizep.size()) == accessors.specific.native_bytes))
 	{
-		mov_r64_imm(a, Gpq(REG_PARAM1), resolved.write_byte.obj);                   // mov    param1,space
-		smart_call_r64(a, resolved.write_byte.func, rax);                           // call   write_byte
+		// set default mem_mask
+		if (accessors.specific.native_bytes <= 4)
+			a.mov(Gpd(REG_PARAM4), make_bitmask<uint32_t>(accessors.specific.native_bytes << 3));
+		else
+			a.mov(Gpq(REG_PARAM4), make_bitmask<uint64_t>(accessors.specific.native_bytes << 3));
+
+		a.and_(Gpd(REG_PARAM2), imm(addr_mask));                                                 // apply address mask
+		mov_r64_imm(a, rax, uintptr_t(accessors.specific.write.dispatch));                       // load dispatch table pointer
+		if (accessors.specific.low_bits)
+		{
+			a.mov(r10d, Gpd(REG_PARAM2));                                                        // save masked address
+			a.shr(Gpd(REG_PARAM2), accessors.specific.low_bits);                                 // shift off low bits
+		}
+		a.mov(Gpq(REG_PARAM1), ptr(rax, Gpq(REG_PARAM2), 3));                                    // load dispatch table entry
+		if (accessors.specific.low_bits)
+			a.mov(Gpd(REG_PARAM2), r10d);                                                        // restore masked address
+
+		if (accessors.specific.write.is_virtual)
+			a.mov(rax, ptr(Gpq(REG_PARAM1), accessors.specific.write.displacement));             // load vtable pointer
+		if (accessors.specific.write.displacement)
+			a.add(Gpq(REG_PARAM1), accessors.specific.write.displacement);                       // apply this pointer offset
+		if (accessors.specific.write.is_virtual)
+			a.call(ptr(rax, accessors.specific.write.function));                                 // call virtual member function
+		else
+			smart_call_r64(a, (x86code *)accessors.specific.write.function, rax);                // call non-virtual member function
+	}
+	else if (have_specific && ((1 << spacesizep.size()) < accessors.specific.native_bytes))
+	{
+		a.mov(ecx, Gpd(REG_PARAM2));                                                             // copy address
+		a.and_(Gpd(REG_PARAM2), imm(addr_mask));                                                 // apply address mask
+
+		int const shift = m_space[spacesizep.space()]->addr_shift() - 3;
+		if (m_space[spacesizep.space()]->endianness() != ENDIANNESS_LITTLE)
+			a.not_(ecx);                                                                         // swizzle address for bit Endian spaces
+		mov_r64_imm(a, rax, uintptr_t(accessors.specific.write.dispatch));                       // load dispatch table pointer
+		if (shift < 0)
+			a.shl(ecx, imm(-shift));                                                             // convert address to bits (left shift)
+		else if (shift > 0)
+			a.shr(ecx, imm(shift));                                                              // convert address to bits (right shift)
+		if (accessors.specific.low_bits)
+		{
+			a.mov(r10d, Gpd(REG_PARAM2));                                                        // copy masked address
+			a.shr(Gpd(REG_PARAM2), accessors.specific.low_bits);                                 // shift off low bits
+		}
+		a.mov(rax, ptr(rax, Gpq(REG_PARAM2), 3));                                                // load dispatch table entry
+		a.and_(ecx, imm((accessors.specific.native_bytes - (1 << spacesizep.size())) << 3));     // mask bit address
+		if ((accessors.specific.native_bytes <= 4) || (spacesizep.size() != SIZE_QWORD))
+			a.mov(r11d, imm(make_bitmask<uint32_t>(8 << spacesizep.size())));                    // set default mem_mask
+		else
+			a.mov(r11, imm(make_bitmask<uint64_t>(8 << spacesizep.size())));                     // set default mem_mask
+		if (accessors.specific.low_bits)
+			a.mov(Gpd(REG_PARAM2), r10d);                                                        // restore masked address
+		if (accessors.specific.write.is_virtual)
+			a.mov(r10, ptr(rax, accessors.specific.write.displacement));                         // load vtable pointer
+		if (accessors.specific.write.displacement)
+			a.add(rax, accessors.specific.write.displacement);                                   // apply this pointer offset
+		if (accessors.specific.native_bytes <= 4)
+		{
+			a.shl(r11d, cl);                                                                     // shift mem_mask by masked bit address
+			a.shl(Gpd(REG_PARAM3), cl);                                                          // shift data by masked bit address
+		}
+		else
+		{
+			a.shl(r11, cl);                                                                      // shift mem_mask by masked bit address
+			a.shl(Gpq(REG_PARAM3), cl);                                                          // shift data by masked bit address
+		}
+
+		// need to do this after finished with CL as REG_PARAM1 is C on Windows and REG_PARAM4 is C on SysV
+		a.mov(Gpq(REG_PARAM1), rax);
+		if (accessors.specific.native_bytes <= 4)
+			a.mov(Gpd(REG_PARAM4), r11d);                                                        // copy mem_mask to parameter 4 (ECX on SysV)
+		else
+			a.mov(Gpq(REG_PARAM4), r11);                                                         // copy mem_mask to parameter 4 (RCX on SysV)
+		if (accessors.specific.write.is_virtual)
+			a.call(ptr(r10, accessors.specific.write.function));                                 // call virtual member function
+		else
+			smart_call_r64(a, (x86code *)accessors.specific.write.function, rax);                // call non-virtual member function
+	}
+	else if (spacesizep.size() == SIZE_BYTE)
+	{
+		mov_r64_imm(a, Gpq(REG_PARAM1), accessors.resolved.write_byte.obj);
+		smart_call_r64(a, accessors.resolved.write_byte.func, rax);
 	}
 	else if (spacesizep.size() == SIZE_WORD)
 	{
-		mov_r64_imm(a, Gpq(REG_PARAM1), resolved.write_word.obj);                   // mov    param1,space
-		smart_call_r64(a, resolved.write_word.func, rax);                           // call   write_word
+		mov_r64_imm(a, Gpq(REG_PARAM1), accessors.resolved.write_word.obj);
+		smart_call_r64(a, accessors.resolved.write_word.func, rax);
 	}
 	else if (spacesizep.size() == SIZE_DWORD)
 	{
-		mov_r64_imm(a, Gpq(REG_PARAM1), resolved.write_dword.obj);                  // mov    param1,space
-		smart_call_r64(a, resolved.write_dword.func, rax);                          // call   write_dword
+		mov_r64_imm(a, Gpq(REG_PARAM1), accessors.resolved.write_dword.obj);
+		smart_call_r64(a, accessors.resolved.write_dword.func, rax);
 	}
 	else if (spacesizep.size() == SIZE_QWORD)
 	{
-		mov_r64_imm(a, Gpq(REG_PARAM1), resolved.write_qword.obj);                  // mov    param1,space
-		smart_call_r64(a, resolved.write_qword.func, rax);                          // call   write_qword
+		mov_r64_imm(a, Gpq(REG_PARAM1), accessors.resolved.write_qword.obj);
+		smart_call_r64(a, accessors.resolved.write_qword.func, rax);
 	}
 }
 
@@ -2691,37 +2984,114 @@ void drcbe_x64::op_writem(Assembler &a, const instruction &inst)
 	assert(spacesizep.is_size_space());
 
 	// set up a call to the write handler
-	auto &resolved = m_resolved_accessors[spacesizep.space()];
-	mov_reg_param(a, Gpd(REG_PARAM2), addrp);                                       // mov    param2,addrp
+	auto const &accessors = m_memory_accessors[spacesizep.space()];
+	bool const have_specific = (uintptr_t(nullptr) != accessors.specific.write.function) || accessors.specific.write.is_virtual;
+	auto const addr_mask = make_bitmask<uint32_t>(accessors.specific.address_width) & ~make_bitmask<uint32_t>(accessors.specific.native_mask_bits);
+	mov_reg_param(a, Gpd(REG_PARAM2), addrp);
 	if (spacesizep.size() != SIZE_QWORD)
-	{
-		mov_reg_param(a, Gpd(REG_PARAM3), srcp);                                    // mov    param3,srcp
-		mov_reg_param(a, Gpd(REG_PARAM4), maskp);                                   // mov    param4,maskp
-	}
+		mov_reg_param(a, Gpd(REG_PARAM3), srcp);
 	else
+		mov_reg_param(a, Gpq(REG_PARAM3), srcp);
+	if (have_specific && ((1 << spacesizep.size()) == accessors.specific.native_bytes))
 	{
-		mov_reg_param(a, Gpq(REG_PARAM3), srcp);                                    // mov    param3,srcp
-		mov_reg_param(a, Gpq(REG_PARAM4), maskp);                                   // mov    param4,maskp
+		if (spacesizep.size() != SIZE_QWORD)
+			mov_reg_param(a, Gpd(REG_PARAM4), maskp);                                            // get mem_mask
+		else
+			mov_reg_param(a, Gpq(REG_PARAM4), maskp);                                            // get mem_mask
+		a.and_(Gpd(REG_PARAM2), imm(addr_mask));                                                 // apply address mask
+
+		mov_r64_imm(a, rax, uintptr_t(accessors.specific.write.dispatch));                       // load dispatch table pointer
+		if (accessors.specific.low_bits)
+		{
+			a.mov(r10d, Gpd(REG_PARAM2));                                                        // save masked address
+			a.shr(Gpd(REG_PARAM2), accessors.specific.low_bits);                                 // shift off low bits
+		}
+		a.mov(Gpq(REG_PARAM1), ptr(rax, Gpq(REG_PARAM2), 3));                                    // load dispatch table entry
+		if (accessors.specific.low_bits)
+			a.mov(Gpd(REG_PARAM2), r10d);                                                        // restore masked address
+
+		if (accessors.specific.write.is_virtual)
+			a.mov(rax, ptr(Gpq(REG_PARAM1), accessors.specific.write.displacement));             // load vtable pointer
+		if (accessors.specific.write.displacement)
+			a.add(Gpq(REG_PARAM1), accessors.specific.write.displacement);                       // apply this pointer offset
+		if (accessors.specific.write.is_virtual)
+			a.call(ptr(rax, accessors.specific.write.function));                                 // call virtual member function
+		else
+			smart_call_r64(a, (x86code *)accessors.specific.write.function, rax);                // call non-virtual member function
 	}
-	if (spacesizep.size() == SIZE_BYTE)
+	else if (have_specific && ((1 << spacesizep.size()) < accessors.specific.native_bytes))
 	{
-		mov_r64_imm(a, Gpq(REG_PARAM1), resolved.write_byte_masked.obj);            // mov    param1,space
-		smart_call_r64(a, resolved.write_byte_masked.func, rax);                    // call   write_byte_masked
+		a.mov(ecx, Gpd(REG_PARAM2));                                                             // copy address
+		if (spacesizep.size() != SIZE_QWORD)
+			mov_reg_param(a, r11d, maskp);                                                       // get mem_mask
+		else
+			mov_reg_param(a, r11, maskp);                                                        // get mem_mask
+		a.and_(Gpd(REG_PARAM2), imm(addr_mask));                                                 // apply address mask
+
+		int const shift = m_space[spacesizep.space()]->addr_shift() - 3;
+		if (m_space[spacesizep.space()]->endianness() != ENDIANNESS_LITTLE)
+			a.not_(ecx);                                                                         // swizzle address for bit Endian spaces
+		mov_r64_imm(a, rax, uintptr_t(accessors.specific.write.dispatch));                       // load dispatch table pointer
+		if (shift < 0)
+			a.shl(ecx, imm(-shift));                                                             // convert address to bits (left shift)
+		else if (shift > 0)
+			a.shr(ecx, imm(shift));                                                              // convert address to bits (right shift)
+		if (accessors.specific.low_bits)
+		{
+			a.mov(r10d, Gpd(REG_PARAM2));                                                        // copy masked address
+			a.shr(Gpd(REG_PARAM2), accessors.specific.low_bits);                                 // shift off low bits
+		}
+		a.and_(ecx, imm((accessors.specific.native_bytes - (1 << spacesizep.size())) << 3));     // mask bit address
+		a.mov(rax, ptr(rax, Gpq(REG_PARAM2), 3));                                                // load dispatch table entry
+		if (accessors.specific.low_bits)
+			a.mov(Gpd(REG_PARAM2), r10d);                                                        // restore masked address
+		if (accessors.specific.native_bytes <= 4)
+		{
+			a.shl(r11d, cl);                                                                     // shift mem_mask by masked bit address
+			a.shl(Gpd(REG_PARAM3), cl);                                                          // shift data by masked bit address
+			a.mov(Gpd(REG_PARAM4), r11d);                                                        // copy mem_mask to parameter 4 (ECX on SysV)
+		}
+		else
+		{
+			a.shl(r11, cl);                                                                      // shift mem_mask by masked bit address
+			a.shl(Gpq(REG_PARAM3), cl);                                                          // shift data by masked bit address
+			a.mov(Gpq(REG_PARAM4), r11);                                                         // copy mem_mask to parameter 4 (RCX on SysV)
+		}
+
+		// need to do this after finished with CL as REG_PARAM1 is C on Windows
+		a.mov(Gpq(REG_PARAM1), rax);
+		if (accessors.specific.write.is_virtual)
+			a.mov(rax, ptr(rax, accessors.specific.write.displacement));                         // load vtable pointer
+		if (accessors.specific.write.displacement)
+			a.add(Gpq(REG_PARAM1), accessors.specific.write.displacement);                       // apply this pointer offset
+		if (accessors.specific.write.is_virtual)
+			a.call(ptr(rax, accessors.specific.write.function));                                 // call virtual member function
+		else
+			smart_call_r64(a, (x86code *)accessors.specific.write.function, rax);                // call non-virtual member function
+	}
+	else if (spacesizep.size() == SIZE_BYTE)
+	{
+		mov_reg_param(a, Gpd(REG_PARAM4), maskp);
+		mov_r64_imm(a, Gpq(REG_PARAM1), accessors.resolved.write_byte_masked.obj);
+		smart_call_r64(a, accessors.resolved.write_byte_masked.func, rax);
 	}
 	else if (spacesizep.size() == SIZE_WORD)
 	{
-		mov_r64_imm(a, Gpq(REG_PARAM1), resolved.write_word_masked.obj);            // mov    param1,space
-		smart_call_r64(a, resolved.write_word_masked.func, rax);                    // call   write_word_masked
+		mov_reg_param(a, Gpd(REG_PARAM4), maskp);
+		mov_r64_imm(a, Gpq(REG_PARAM1), accessors.resolved.write_word_masked.obj);
+		smart_call_r64(a, accessors.resolved.write_word_masked.func, rax);
 	}
 	else if (spacesizep.size() == SIZE_DWORD)
 	{
-		mov_r64_imm(a, Gpq(REG_PARAM1), resolved.write_dword_masked.obj);           // mov    param1,space
-		smart_call_r64(a, resolved.write_dword_masked.func, rax);                   // call   write_dword_masked
+		mov_reg_param(a, Gpd(REG_PARAM4), maskp);
+		mov_r64_imm(a, Gpq(REG_PARAM1), accessors.resolved.write_dword_masked.obj);
+		smart_call_r64(a, accessors.resolved.write_dword_masked.func, rax);
 	}
 	else if (spacesizep.size() == SIZE_QWORD)
 	{
-		mov_r64_imm(a, Gpq(REG_PARAM1), resolved.write_qword_masked.obj);           // mov    param1,space
-		smart_call_r64(a, resolved.write_qword_masked.func, rax);                   // call   write_qword_masked
+		mov_reg_param(a, Gpq(REG_PARAM4), maskp);
+		mov_r64_imm(a, Gpq(REG_PARAM1), accessors.resolved.write_qword_masked.obj);
+		smart_call_r64(a, accessors.resolved.write_qword_masked.func, rax);
 	}
 }
 
@@ -4312,8 +4682,8 @@ void drcbe_x64::op_fread(Assembler &a, const instruction &inst)
 	assert((1 << spacep.size()) == inst.size());
 
 	// set up a call to the read dword/qword handler
-	auto const &accessors = m_resolved_accessors[spacep.space()];
-	auto const &accessor = (inst.size() == 4) ? accessors.write_dword : accessors.write_qword;
+	auto const &accessors = m_memory_accessors[spacep.space()];
+	auto const &accessor = (inst.size() == 4) ? accessors.resolved.read_dword : accessors.resolved.read_qword;
 	mov_reg_param(a, Gpd(REG_PARAM2), addrp);
 	mov_r64_imm(a, Gpq(REG_PARAM1), accessor.obj);
 	smart_call_r64(a, accessor.func, rax);
@@ -4355,8 +4725,8 @@ void drcbe_x64::op_fwrite(Assembler &a, const instruction &inst)
 	assert((1 << spacep.size()) == inst.size());
 
 	// general case
-	auto const &accessors = m_resolved_accessors[spacep.space()];
-	auto const &accessor = (inst.size() == 4) ? accessors.write_dword : accessors.write_qword;
+	auto const &accessors = m_memory_accessors[spacep.space()];
+	auto const &accessor = (inst.size() == 4) ? accessors.resolved.write_dword : accessors.resolved.write_qword;
 	mov_reg_param(a, Gpd(REG_PARAM2), addrp);
 
 	if (inst.size() == 4)

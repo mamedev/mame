@@ -570,14 +570,6 @@ configuration { "gmake or ninja" }
 
 dofile ("toolchain.lua")
 
-if _OPTIONS["targetos"]=="windows" then
-	configuration { "x64" }
-		defines {
-			"X64_WINDOWS_ABI",
-		}
-	configuration { }
-end
-
 -- Avoid error when invoking genie --help.
 if (_ACTION == nil) then return false end
 
