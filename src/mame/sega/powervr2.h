@@ -197,12 +197,16 @@ public:
 	uint32_t tafifo_buff[32];
 	int scanline;
 	int next_y;
+	osd_work_queue *m_work_queue;
+	osd_work_item *m_render_request;
+	static void *blit_request_callback(void *param, int threadid);
 
 	uint32_t id_r();
 	uint32_t revision_r();
 	uint32_t softreset_r();
 	void softreset_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void startrender_w(address_space &space, uint32_t data);
+	void startrender_real_w(address_space &space);
 	uint32_t param_base_r();
 	void param_base_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t region_base_r();
