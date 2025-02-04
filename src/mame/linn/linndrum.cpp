@@ -30,7 +30,7 @@ PCBoards:
   * Snare/Sidestick.
   * Tom/Cga.
 * MXR board.
-* 5 VSR board (Power supply).
+* 5 VSR board (power supply).
 
 Usage:
 
@@ -467,7 +467,7 @@ INPUT_PORTS_START(linndrum)
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PLAY/STOP") PORT_CODE(KEYCODE_SPACE)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PLAY/STOP FOOTSWITCH")
 
-	// The trigger circui will detect fast changes in the "trigger" inputs, and
+	// The trigger circuit will detect fast changes in the "trigger" inputs, and
 	// output a pulse. Slow changes won't trigger a pulse. So there is some
 	// flexibility in the types of input accepted. For now, trigger inputs
 	// are implemented as digital inputs (traditional trigger signals).
