@@ -450,7 +450,7 @@ void ggconnie_state::ggconnie(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	OKIM6295(config, m_oki, 2_MHz_XTAL, okim6295_device::PIN7_HIGH); // 2MHz resonator, unverified pin 7
+	OKIM6295(config, m_oki, 2_MHz_XTAL, okim6295_device::PIN7_HIGH); // 2MHz resonator, pin 7 verified
 	m_oki->set_addrmap(0, &ggconnie_state::oki_map);
 	m_oki->add_route(ALL_OUTPUTS, "lspeaker", 1.00);
 	m_oki->add_route(ALL_OUTPUTS, "rspeaker", 1.00);
