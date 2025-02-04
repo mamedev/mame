@@ -428,6 +428,7 @@ public:
 	uint16_t m_aga_sprdatb[8][4]{};
 	int m_aga_sprite_fetched_words = 0;
 	int m_aga_sprite_dma_used_words[8]{};
+	uint16_t m_aga_clxcon2;
 
 	void video_start_common();
 	DECLARE_VIDEO_START( amiga );

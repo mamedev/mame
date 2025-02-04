@@ -1317,11 +1317,12 @@ void amiga_state::aga_bplcon0_w(u16 data)
 
 /*
  * http://amiga-dev.wikidot.com/hardware:clxcon2
+ * ---- ---- xx-- ---- ENBPx enable bitplanes 8 and 7
+ * ---- ---- ---- --xx MVBPx match value for bitplanes 8 and 7
  */
 void amiga_state::clxcon2_w(u16 data)
 {
-	// TODO: enables bitplane 7-8 collision detection, resets to 0 if CLXCON write happens
-	popmessage("CLXCON2 %04x", data);
+	m_aga_clxcon2 = data;
 }
 
 // TODO: progressively remove functions from here
@@ -1624,6 +1625,14 @@ void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 			if ( ( data & 0x400 ) && ( CUSTOM_REG(REG_DMACON) & 0x4000 ) )
 				m_blitter_timer->adjust(m_maincpu->cycles_to_attotime(BLITTER_NASTY_DELAY));
 
+			break;
+
+		case REG_CLXCON:
+			if (IS_AGA())
+			{
+				// reset to zero on CLXCON writes
+				m_aga_clxcon2 = 0;
+			}
 			break;
 
 		case REG_INTENA:
