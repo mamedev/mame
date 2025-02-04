@@ -177,7 +177,7 @@ void ncr5385_device::scsi_ctrl_changed()
 				ctrl & S_REQ ? " REQ" : "", ctrl & S_ACK ? " ACK" : "");
 
 		if (m_state != IDLE)
-			m_state_timer->adjust(attotime::from_usec(40));
+			m_state_timer->adjust(attotime::zero);
 	}
 	else
 	{
@@ -270,10 +270,12 @@ u8 ncr5385_device::int_status_r()
 	LOGMASKED(LOG_REGR, "%10s: int_status_r 0x%02x (%s)\n", machine().time().as_string(8), data, machine().describe_context());
 	m_aux_status &= ~AUX_STATUS_PARITY_ERR;
 	m_int_status = 0;
-	update_int();
+	update_int();			// Q: when does this raise the IRQ?  immediately or as part of a state machine?
 
+	// tek4404 reads this reg from inside IRQ3, clear its flag ($2c3) and then spinloops waiting for it to be set by an IRQ
+	// the update_int() above has happened too fast
 	if (m_state != IDLE)
-		m_state_timer->adjust(attotime::zero);
+		m_state_timer->adjust(attotime::from_usec(40));
 
 	return data;
 }
