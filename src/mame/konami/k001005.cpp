@@ -25,11 +25,11 @@ k001005_renderer::k001005_renderer(device_t &parent, screen_device &screen, devi
 {
 	m_k001006 = k001006;
 
-	int width = 512;
-	int height = 384;
+	int const width = 512;
+	int const height = 384;
 
-	m_fb[0] = std::make_unique<bitmap_rgb32>( width, height);
-	m_fb[1] = std::make_unique<bitmap_rgb32>( width, height);
+	m_fb[0] = std::make_unique<bitmap_rgb32>(width, height);
+	m_fb[1] = std::make_unique<bitmap_rgb32>(width, height);
 
 	m_zb = std::make_unique<bitmap_ind32>(width, height);
 
@@ -56,19 +56,19 @@ k001005_renderer::k001005_renderer(device_t &parent, screen_device &screen, devi
 	m_viewport_center_x = 0;
 	m_viewport_center_y = 0;
 
-	m_cliprect = rectangle(0, width-1, 0, height-1);
+	m_cliprect = rectangle(0, width - 1, 0, height - 1);
 
-	for (int k=0; k < 8; k++)
+	for (int k = 0; k < 8; k++)
 	{
 		m_tex_mirror_table[0][k] = std::make_unique<int[]>(128);
 		m_tex_mirror_table[1][k] = std::make_unique<int[]>(128);
 
-		int size = (k+1)*8;
+		int const size = (k + 1) * 8;
 
-		for (int i=0; i < 128; i++)
+		for (int i = 0; i < 128; i++)
 		{
 			m_tex_mirror_table[0][k][i] = i % size;
-			m_tex_mirror_table[1][k][i] = (i % (size*2)) >= size ? ((size - 1) - (i % size)) : (i % size);
+			m_tex_mirror_table[1][k][i] = (i % (size * 2)) >= size ? ((size - 1) - (i % size)) : (i % size);
 		}
 	}
 
@@ -124,7 +124,7 @@ void k001005_renderer::swap_buffers()
 
 	m_fb[m_fb_page]->fill(0, m_cliprect);
 
-	float zvalue = 10000000000.0f;
+	float const zvalue = 10000000000.0f;
 	m_zb->fill(*(int*)&zvalue, m_cliprect);
 }
 
@@ -137,21 +137,19 @@ bool k001005_renderer::fifo_filled()
 template<bool UseTexture, bool UseVertexColor>
 void k001005_renderer::draw_scanline_generic(int32_t scanline, const extent_t& extent, const k001005_polydata& extradata, int threadid)
 {
-	float u, v, w, du, dv, dw;
-	float r, g, b, a, dr, dg, db, da;
-
 	k001006_device* k001006 = downcast<k001006_device*>(m_k001006);
 
 	uint32_t* const fb = &m_fb[m_fb_page]->pix(scanline);
 	float* const zb = (float*)&m_zb->pix(scanline);
 
 	float z = extent.param[POLY_Z].start;
-	float dz = extent.param[POLY_Z].dpdx;
+	float const dz = extent.param[POLY_Z].dpdx;
 	float diff = extent.param[POLY_DIFF].start;
-	float ddiff = extent.param[POLY_DIFF].dpdx;
+	float const ddiff = extent.param[POLY_DIFF].dpdx;
 	float fog = extent.param[POLY_FOG].start;
-	float dfog = extent.param[POLY_FOG].dpdx;
+	float const dfog = extent.param[POLY_FOG].dpdx;
 
+	float u, v, w, du, dv, dw;
 	if (UseTexture)
 	{
 		u = extent.param[POLY_U].start;
@@ -162,6 +160,7 @@ void k001005_renderer::draw_scanline_generic(int32_t scanline, const extent_t& e
 		dw = extent.param[POLY_W].dpdx;
 	}
 
+	float r, g, b, a, dr, dg, db, da;
 	if (UseVertexColor)
 	{
 		r = extent.param[POLY_R].start;
@@ -179,26 +178,26 @@ void k001005_renderer::draw_scanline_generic(int32_t scanline, const extent_t& e
 	rgbaint_t fog_color(extradata.fog_color);
 
 	rgbaint_t poly_color(extradata.poly_color);
-	int poly_color_a = (extradata.poly_color >> 24) & 0xff;
+	int const poly_color_a = (extradata.poly_color >> 24) & 0xff;
 
-	int texture_mirror_x = extradata.texture_mirror;
-	int texture_mirror_y = extradata.texture_mirror;
-	int texture_x = extradata.texture_x * 8;
-	int texture_y = extradata.texture_y * 8;
-	int texture_width = extradata.texture_width;
-	int texture_height = extradata.texture_height;
-	int tex_page = extradata.texture_page * 0x40000;
-	int palette_index = extradata.texture_palette * 256;
+	int const texture_mirror_x = extradata.texture_mirror;
+	int const texture_mirror_y = extradata.texture_mirror;
+	int const texture_x = extradata.texture_x * 8;
+	int const texture_y = extradata.texture_y * 8;
+	int const texture_width = extradata.texture_width;
+	int const texture_height = extradata.texture_height;
+	int const tex_page = extradata.texture_page * 0x40000;
+	int const palette_index = extradata.texture_palette * 256;
 
-	int* x_mirror_table = m_tex_mirror_table[texture_mirror_x][texture_width].get();
-	int* y_mirror_table = m_tex_mirror_table[texture_mirror_y][texture_height].get();
+	int const *const x_mirror_table = m_tex_mirror_table[texture_mirror_x][texture_width].get();
+	int const *const y_mirror_table = m_tex_mirror_table[texture_mirror_y][texture_height].get();
 
-	bool UseZCompare = (extradata.cmd & 4) != 0;
-	bool UseFBBlend = (extradata.cmd & 2) == 0;
-	bool UseFog = extradata.fog_enable;
+	bool const UseZCompare = BIT(extradata.cmd, 2);
+	bool const UseFBBlend = BIT(~extradata.cmd, 1);
+	bool const UseFog = extradata.fog_enable;
 
-	bool WriteZ = true;
-	bool UseBilinear = k001006->bilinear_enabled();
+	bool const WriteZ = true;
+	bool const UseBilinear = k001006->bilinear_enabled();
 
 	uint32_t texel = 0;
 	uint32_t texel_alpha = 0;
@@ -209,15 +208,15 @@ void k001005_renderer::draw_scanline_generic(int32_t scanline, const extent_t& e
 		{
 			if (UseTexture)
 			{
-				float oow = 1.0f / w;
+				float const oow = 1.0f / w;
 
 				int iu = (int)(u * oow);
 				int iv = (int)(v * oow);
 
 				if (!UseBilinear)
 				{
-					int texel_u = texture_x + x_mirror_table[(iu >> 4) & 0x7f];
-					int texel_v = texture_y + y_mirror_table[(iv >> 4) & 0x7f];
+					int const texel_u = texture_x + x_mirror_table[(iu >> 4) & 0x7f];
+					int const texel_v = texture_y + y_mirror_table[(iv >> 4) & 0x7f];
 
 					texel = k001006->fetch_texel(tex_page, palette_index, texel_u, texel_v);
 					texel_alpha = texel >> 24;
@@ -228,26 +227,25 @@ void k001005_renderer::draw_scanline_generic(int32_t scanline, const extent_t& e
 					iu -= 7;
 					iv -= 7;
 
-					int ufrac = iu & 0xf;
-					int vfrac = iv & 0xf;
-					int texel_u0 = texture_x + x_mirror_table[(iu >> 4) & 0x7f];
-					int texel_u1 = texture_x + x_mirror_table[((iu >> 4) + 1) & 0x7f];
-					int texel_v0 = texture_y + y_mirror_table[(iv >> 4) & 0x7f];
-					int texel_v1 = texture_y + y_mirror_table[((iv >> 4) + 1) & 0x7f];
+					int const ufrac = iu & 0xf;
+					int const vfrac = iv & 0xf;
+					int const texel_u0 = texture_x + x_mirror_table[(iu >> 4) & 0x7f];
+					int const texel_u1 = texture_x + x_mirror_table[((iu >> 4) + 1) & 0x7f];
+					int const texel_v0 = texture_y + y_mirror_table[(iv >> 4) & 0x7f];
+					int const texel_v1 = texture_y + y_mirror_table[((iv >> 4) + 1) & 0x7f];
 
-					uint32_t tex00 = k001006->fetch_texel(tex_page, palette_index, texel_u0, texel_v0);
-					uint32_t tex01 = k001006->fetch_texel(tex_page, palette_index, texel_u1, texel_v0);
-					uint32_t tex10 = k001006->fetch_texel(tex_page, palette_index, texel_u0, texel_v1);
-					uint32_t tex11 = k001006->fetch_texel(tex_page, palette_index, texel_u1, texel_v1);
+					uint32_t const tex00 = k001006->fetch_texel(tex_page, palette_index, texel_u0, texel_v0);
+					uint32_t const tex01 = k001006->fetch_texel(tex_page, palette_index, texel_u1, texel_v0);
+					uint32_t const tex10 = k001006->fetch_texel(tex_page, palette_index, texel_u0, texel_v1);
+					uint32_t const tex11 = k001006->fetch_texel(tex_page, palette_index, texel_u1, texel_v1);
 
 					texel = rgbaint_t::bilinear_filter(tex00, tex01, tex10, tex11, ufrac * 16, vfrac * 16);
 					texel_alpha = tex00 >> 24;
 				}
 			}
 
-			int idiff = std::clamp((int)(diff), 0, 255);
-			int ifog = std::clamp((int)(fog), 0, 255);
-
+			int const idiff = std::clamp((int)(diff), 0, 255);
+			int const ifog = std::clamp((int)(fog), 0, 255);
 
 			rgbaint_t light_color(extradata.diffuse_light);
 			light_color.scale_imm_and_clamp(idiff);
@@ -256,10 +254,10 @@ void k001005_renderer::draw_scanline_generic(int32_t scanline, const extent_t& e
 
 			if (UseVertexColor)
 			{
-				int ir = std::clamp((int)(r), 0, 255);
-				int ig = std::clamp((int)(g), 0, 255);
-				int ib = std::clamp((int)(b), 0, 255);
-				int ia = std::clamp((int)(a), 0, 255);
+				int const ir = std::clamp((int)(r), 0, 255);
+				int const ig = std::clamp((int)(g), 0, 255);
+				int const ib = std::clamp((int)(b), 0, 255);
+				int const ia = std::clamp((int)(a), 0, 255);
 
 				if (ia != 0)
 				{
@@ -401,21 +399,20 @@ int k001005_renderer::parse_polygon(int index, uint32_t cmd)
 	render_delegate rd_scan_vertex_color_tex = render_delegate(&k001005_renderer::draw_scanline_generic<true, true>, this);
 	render_delegate rd_scan_color = render_delegate(&k001005_renderer::draw_scanline_generic<false, false>, this);
 
-	int viewport_min_x = std::clamp(256 + m_viewport_min_x + m_viewport_center_x, m_cliprect.min_x, m_cliprect.max_x);
-	int viewport_max_x = std::clamp(256 + m_viewport_max_x + m_viewport_center_x + 1, m_cliprect.min_x, m_cliprect.max_x);
-	int viewport_min_y = std::clamp(200 + m_viewport_min_y - m_viewport_center_y, m_cliprect.min_y, m_cliprect.max_y);
-	int viewport_max_y = std::clamp(200 + m_viewport_max_y - m_viewport_center_y + 1, m_cliprect.min_y, m_cliprect.max_y);
+	int const viewport_min_x = std::clamp(256 + m_viewport_min_x + m_viewport_center_x, m_cliprect.min_x, m_cliprect.max_x);
+	int const viewport_max_x = std::clamp(256 + m_viewport_max_x + m_viewport_center_x + 1, m_cliprect.min_x, m_cliprect.max_x);
+	int const viewport_min_y = std::clamp(200 + m_viewport_min_y - m_viewport_center_y, m_cliprect.min_y, m_cliprect.max_y);
+	int const viewport_max_y = std::clamp(200 + m_viewport_max_y - m_viewport_center_y + 1, m_cliprect.min_y, m_cliprect.max_y);
 
 	rectangle cliprect(viewport_min_x, viewport_max_x, viewport_min_y, viewport_max_y);
 
+	int const start_index = index;
 
-	int start_index = index;
+	uint32_t const *const fifo = m_3dfifo.get();
 
-	uint32_t* fifo = m_3dfifo.get();
-
-	bool has_texture = (cmd & 0x18) != 0;
-	bool has_vertex_color = (cmd & 0x100) != 0;
-	bool has_vertex_z = !(cmd & 1) || has_vertex_color;     // command 0x121 breaks the logic here, maybe vertex color enforces vertex z too?
+	bool const has_texture = (cmd & 0x18) != 0;
+	bool const has_vertex_color = BIT(cmd, 8);
+	bool const has_vertex_z = BIT(~cmd, 0) || has_vertex_color;     // command 0x121 breaks the logic here, maybe vertex color enforces vertex z too?
 
 	uint32_t texture_x = 0;
 	uint32_t texture_y = 0;
@@ -468,16 +465,16 @@ int k001005_renderer::parse_polygon(int index, uint32_t cmd)
 			m_vertexb[m_vertexb_ptr].x = ((float)(x) / 16.0f) + 256.0f;
 			m_vertexb[m_vertexb_ptr].y = ((float)(-y) / 16.0f) + 200.0f;
 
-			is_quad = (fifo[index] & 0x4000) != 0;
-			last_vertex = (fifo[index] & 0x8000) != 0;
+			is_quad = BIT(fifo[index], 14);
+			last_vertex = BIT(fifo[index], 15);
 			index++;
 
 			// Z + diffuse intensity - if Z enabled
 			// -------------------------------------------------------------------------
 			if (has_vertex_z)
 			{
-				uint32_t z = fifo[index] & 0xffffff00;      // 32-bit float with low 8-bits of mantissa masked out
-				int diffuse = fifo[index] & 0xff;
+				uint32_t const z = fifo[index] & 0xffffff00;      // 32-bit float with low 8-bits of mantissa masked out
+				int const diffuse = fifo[index] & 0xff;
 				index++;
 
 				m_vertexb[m_vertexb_ptr].p[POLY_Z] = u2f(z);
@@ -496,7 +493,7 @@ int k001005_renderer::parse_polygon(int index, uint32_t cmd)
 				// polygon Z comes before the last UV coords for textured polygons
 				if (!has_vertex_z)
 				{
-					uint32_t z = (fifo[index] & 0x07ffff00) | 0x48000000;   // like fog values, these seem to be missing the 4 upper bits of exponent
+					uint32_t const z = (fifo[index] & 0x07ffff00) | 0x48000000;   // like fog values, these seem to be missing the 4 upper bits of exponent
 					polygon_diffuse = fifo[index] & 0xff;
 					index++;
 					polygon_z = u2f(z);
@@ -512,7 +509,7 @@ int k001005_renderer::parse_polygon(int index, uint32_t cmd)
 			// vertex color
 			if (has_vertex_color)
 			{
-				uint32_t vertex_color = fifo[index];
+				uint32_t const vertex_color = fifo[index];
 				index++;
 
 				m_vertexb[m_vertexb_ptr].p[POLY_A] = (vertex_color >> 24) & 0xff;
@@ -525,8 +522,8 @@ int k001005_renderer::parse_polygon(int index, uint32_t cmd)
 			// UV coords - only for texture polys
 			if (has_texture)
 			{
-				int32_t tu = (int16_t)(fifo[index] >> 16);
-				int32_t tv = (int16_t)(fifo[index] & 0xffff);
+				int32_t const tu = (int16_t)(fifo[index] >> 16);
+				int32_t const tv = (int16_t)(fifo[index] & 0xffff);
 				index++;
 
 				m_vertexb[m_vertexb_ptr].p[POLY_U] = (float)(tu) * m_vertexb[m_vertexb_ptr].p[POLY_W];
@@ -541,7 +538,7 @@ int k001005_renderer::parse_polygon(int index, uint32_t cmd)
 			}
 			else
 			{
-				float fog_factor = (m_fog_end_z - m_vertexb[m_vertexb_ptr].p[POLY_Z]) / (m_fog_end_z - m_fog_start_z);
+				float const fog_factor = (m_fog_end_z - m_vertexb[m_vertexb_ptr].p[POLY_Z]) / (m_fog_end_z - m_fog_start_z);
 				m_vertexb[m_vertexb_ptr].p[POLY_FOG] = fog_factor * 255.0f;
 			}
 
@@ -556,7 +553,7 @@ int k001005_renderer::parse_polygon(int index, uint32_t cmd)
 			// polygon Z
 			if (!has_vertex_z)
 			{
-				uint32_t z = (fifo[index] & 0x07ffff00) | 0x48000000;   // like fog values, these seem to be missing the 4 upper bits of exponent
+				uint32_t const z = (fifo[index] & 0x07ffff00) | 0x48000000;   // like fog values, these seem to be missing the 4 upper bits of exponent
 				polygon_diffuse = fifo[index] & 0xff;
 				index++;
 
@@ -605,19 +602,19 @@ int k001005_renderer::parse_polygon(int index, uint32_t cmd)
 
 		// The vertex buffer is a 4-entry circular buffer.
 		// Each polygon has at least one new vertex. 0-3 vertices are reused based on how many new vertices were inserted.
-		int v0 = (m_vertexb_ptr - 4) & 3;
-		int v1 = (m_vertexb_ptr - 3) & 3;
-		int v2 = (m_vertexb_ptr - 2) & 3;
-		int v3 = (m_vertexb_ptr - 1) & 3;
+		int const v0 = (m_vertexb_ptr - 4) & 3;
+		int const v1 = (m_vertexb_ptr - 3) & 3;
+		int const v2 = (m_vertexb_ptr - 2) & 3;
+		int const v3 = (m_vertexb_ptr - 1) & 3;
 
 
 		// This fixes shading issues in the Konami logo in Solar Assault.
 		// Some triangle strips have different shading values compared to reused vertices, causing unintended smooth shading.
 		// This ensures all vertices have the same shading value.
 		// Bit 0x20 could be a select between flat shading and gouraud shading.
-		if ((cmd & 0x20) == 0 && num_new_verts < 3)
+		if (BIT(~cmd, 5) && num_new_verts < 3)
 		{
-			int last_diffuse = m_vertexb[v3].p[POLY_DIFF];
+			int const last_diffuse = m_vertexb[v3].p[POLY_DIFF];
 			m_vertexb[v0].p[POLY_DIFF] = last_diffuse;
 			m_vertexb[v1].p[POLY_DIFF] = last_diffuse;
 			m_vertexb[v2].p[POLY_DIFF] = last_diffuse;
@@ -666,12 +663,12 @@ int k001005_renderer::parse_polygon(int index, uint32_t cmd)
 
 void k001005_renderer::render_polygons()
 {
-	uint32_t* fifo = m_3dfifo.get();
+	uint32_t const *const fifo = m_3dfifo.get();
 	int index = 0;
 
 	do
 	{
-		uint32_t cmd = fifo[index++];
+		uint32_t const cmd = fifo[index++];
 
 		if (cmd == 0x80000000 || cmd == 0x80000018)
 		{
@@ -693,19 +690,17 @@ void k001005_renderer::draw(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	for (int j = cliprect.min_y; j <= cliprect.max_y; j++)
 	{
 		uint32_t *const bmp = &bitmap.pix(j);
-		uint32_t const *const src = &m_fb[m_fb_page^1]->pix(j-cliprect.min_y);
+		uint32_t const *const src = &m_fb[m_fb_page ^ 1]->pix(j - cliprect.min_y);
 
 		for (int i = cliprect.min_x; i <= cliprect.max_x; i++)
 		{
-			if (src[i-cliprect.min_x] & 0xff000000)
+			if (src[i - cliprect.min_x] & 0xff000000)
 			{
-				bmp[i] = src[i-cliprect.min_x];
+				bmp[i] = src[i - cliprect.min_x];
 			}
 		}
 	}
-
 }
-
 
 
 DEFINE_DEVICE_TYPE(K001005, k001005_device, "k001005", "K001005 Polygon Renderer")
@@ -787,33 +782,36 @@ uint32_t k001005_device::read(address_space &space, offs_t offset, uint32_t mem_
 		case 0x000:         // FIFO read, high 16 bits
 		{
 			//osd_printf_debug("FIFO_r0: %08X\n", m_fifo_read_ptr);
-			uint16_t value = m_fifo[m_fifo_read_ptr] >> 16;
+			uint16_t const value = m_fifo[m_fifo_read_ptr] >> 16;
 			return value;
 		}
 
 		case 0x001:         // FIFO read, low 16 bits
 		{
 			//osd_printf_debug("FIFO_r1: %08X\n", m_fifo_read_ptr);
-			uint16_t value = m_fifo[m_fifo_read_ptr] & 0xffff;
+			uint16_t const value = m_fifo[m_fifo_read_ptr] & 0xffff;
 
-			if (m_status != 1 && m_status != 2)
+			if (!machine().side_effects_disabled())
 			{
-				if (m_fifo_read_ptr < 0x3ff)
+				if (m_status != 1 && m_status != 2)
 				{
-					dsp->set_flag_input(1, CLEAR_LINE);
+					if (m_fifo_read_ptr < 0x3ff)
+					{
+						dsp->set_flag_input(1, CLEAR_LINE);
+					}
+					else
+					{
+						dsp->set_flag_input(1, ASSERT_LINE);
+					}
 				}
 				else
 				{
 					dsp->set_flag_input(1, ASSERT_LINE);
 				}
-			}
-			else
-			{
-				dsp->set_flag_input(1, ASSERT_LINE);
-			}
 
-			m_fifo_read_ptr++;
-			m_fifo_read_ptr &= 0x7ff;
+				m_fifo_read_ptr++;
+				m_fifo_read_ptr &= 0x7ff;
+			}
 			return value;
 		}
 
@@ -824,15 +822,20 @@ uint32_t k001005_device::read(address_space &space, offs_t offset, uint32_t mem_
 			return 0x8000;
 
 		case 0x11f:
+		{
+			uint32_t ret = 0;
 			if (m_ram_ptr >= 0x400000)
 			{
-				return m_ram[1][(m_ram_ptr++) & 0x3fffff];
+				ret = m_ram[1][m_ram_ptr & 0x3fffff];
 			}
 			else
 			{
-				return m_ram[0][(m_ram_ptr++) & 0x3fffff];
+				ret = m_ram[0][m_ram_ptr & 0x3fffff];
 			}
-
+			if (!machine().side_effects_disabled())
+				m_ram_ptr++;
+			return ret;
+		}
 		default:
 			//osd_printf_debug("%s m_r: %08X, %08X\n", machine().describe_context(), offset, mem_mask);
 			break;
