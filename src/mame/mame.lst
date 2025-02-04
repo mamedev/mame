@@ -19294,6 +19294,7 @@ bassmate                        // Telko
 biathlon                        // Elektronika
 ecircus                         // Elektronika
 ehockey                         // Elektronika
+elbaskb                         // Elektronika
 gnw_ball                        // Nintendo
 gnw_bfight                      // Nintendo
 gnw_bfightn                     // Nintendo
@@ -21517,6 +21518,8 @@ intlc440                        //
 
 @source:intel/intellec8.cpp
 intlc8                          //
+intlc8m80a                      //
+intlc8m80b                      //
 
 @source:intel/ipc.cpp
 ipb                             // intel
@@ -35959,6 +35962,9 @@ penta                           // bootleg
 @source:pacman/schick.cpp
 schick                          // Microhard
 
+@source:paia/fatman.cpp
+fatman                          // PAiA FatMan
+
 @source:paia/midi2cv8.cpp
 midi2cv8                        // PAiA midi2cv8 (V/Oct)
 midi2cv8_vhz                    // PAiA midi2cv8 with V/Hz daughterboard
@@ -36600,6 +36606,7 @@ tetriskr                        // (c) 1988? bootleg
 tosh1000
 
 @source:pce/ggconnie.cpp
+bmanroul                        // (c) 1996 Eighting
 fishingm                        // (c) 1997 Capcom
 ggconnie                        // (c) ???? Capcom
 smf                             // (c) 1997 Capcom
