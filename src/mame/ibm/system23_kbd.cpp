@@ -1,4 +1,4 @@
-//#define VERBOSE 1
+#define VERBOSE 1
 
 #include "emu.h"
 #include "system23_kbd.h"
@@ -23,6 +23,8 @@ void system23_kbd_device::device_reset()
 	m_reset = ASSERT_LINE;
 	m_t0 = CLEAR_LINE;
 	m_t1 = CLEAR_LINE;
+	m_cs = CLEAR_LINE;
+	m_scan_r = false;
 }
 
 const tiny_rom_entry *system23_kbd_device::device_rom_region() const
@@ -33,6 +35,7 @@ const tiny_rom_entry *system23_kbd_device::device_rom_region() const
 system23_kbd_device::system23_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 : device_t(mconfig, SYSTEM23_KEYBOARD, tag, owner, clock),
 	m_mcu(*this, "i8048"),
+	m_columns(*this, "CL.%u",0),
 	m_bus_write(*this)
 {
 }
@@ -41,7 +44,8 @@ void system23_kbd_device::device_add_mconfig(machine_config &config)
 {
 	I8048(config, m_mcu, 4'350'000);//Oscillation between 4.17 and 4.35 MHz
 	m_mcu->bus_out_cb().set(FUNC(system23_kbd_device::bus_w));
-	m_mcu->p2_out_cb().set(FUNC(system23_kbd_device::data_strobe));
+	m_mcu->p1_out_cb().set(FUNC(system23_kbd_device::p1_w));
+	m_mcu->p2_out_cb().set(FUNC(system23_kbd_device::p2_w));
 	m_mcu->t0_in_cb().set(FUNC(system23_kbd_device::t0_r));
 	m_mcu->t1_in_cb().set(FUNC(system23_kbd_device::t1_r));
 
@@ -71,6 +75,7 @@ void system23_kbd_device::bus_w(uint8_t data)
 	if(BIT(data,4)) m_bus |= 0x04;
 	if(BIT(data,5)) m_bus |= 0x02;
 	if(BIT(data,6)) m_bus |= 0x01;
+	m_cs = BIT(data, 7);
 }
 
 uint8_t system23_kbd_device::read_keyboard()
@@ -79,11 +84,24 @@ uint8_t system23_kbd_device::read_keyboard()
 	return m_bus;
 }
 
-void system23_kbd_device::data_strobe(uint8_t data)
+void system23_kbd_device::p2_w(uint8_t data)
 {
 	m_bus_write(BIT(data,7));
 	m_t1 = BIT(data, 3);
-	LOG("T1: %d\n", m_t1);
+	int data_to_write = ((data & 0x70) << 4);
+	m_scan_r = true;
+	m_counter &= 0xff;
+	m_counter |= data_to_write;
+	m_select = data & 0x07;
+	LOG("Port 2 Counter: %04x Select: %d\n", m_counter, m_select);
+}
+
+void system23_kbd_device::p1_w(uint8_t data)
+{
+	m_scan_r = true;
+	m_counter &= 0x700;
+	m_counter |= data;
+	LOG("Port 1 counter: %04x\n", m_counter);
 }
 
 void system23_kbd_device::t0_w(int state)
@@ -100,7 +118,145 @@ int system23_kbd_device::t0_r()
 	return m_t0;
 }
 
+//This routine has the responsibility to process the keyboard matrix and extract the sense line, then feed it to the microcontroller
 int system23_kbd_device::t1_r()
 {
-	return m_t1;
+	m_scan_r = false;
+	if(m_cs)
+	{
+		uint8_t kbd_data = m_columns[translate_columns()]->read();
+		LOG("Counter: %d Select: %d Value: %02x\n", translate_columns(), m_select, kbd_data);
+		return BIT(kbd_data, m_select);
+	}
+	else
+	{
+		return m_t1;
+	}
+}
+
+
+INPUT_PORTS_START( system23_kbd )
+	PORT_START("CL.0")
+		PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_START("CL.1")
+		PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_START("CL.2")
+		PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_START("CL.3")
+		PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_START("CL.4")
+		PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_START("CL.5")
+		PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_START("CL.6")
+		PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_START("CL.7")
+		PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_START("CL.8")
+		PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_START("CL.9")
+		PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_START("CL.10")
+		PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
+		PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
+INPUT_PORTS_END
+
+ioport_constructor system23_kbd_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( system23_kbd );
+}
+
+int system23_kbd_device::translate_columns()
+{
+	switch(m_counter)
+	{
+		case 0x001: return 0;
+		case 0x002: return 1;
+		case 0x004: return 2;
+		case 0x008: return 3;
+		case 0x010: return 4;
+		case 0x020: return 5;
+		case 0x040: return 6;
+		case 0x080: return 7;
+		case 0x100: return 8;
+		case 0x200: return 9;
+		case 0x400: return 10;
+		default: return 0;
+	}
 }

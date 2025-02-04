@@ -15,8 +15,10 @@ class system23_kbd_device : public device_t
 		virtual void device_reset() override ATTR_COLD;
 		virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 		virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+		virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	private:
 		required_device<i8048_device> m_mcu;
+		required_ioport_array<11> m_columns;
 
 		devcb_write_line m_bus_write;
 
@@ -24,11 +26,17 @@ class system23_kbd_device : public device_t
 
 		int m_reset;
 		int m_t0, m_t1;
+		int m_select;
+		int m_cs;
+		int m_counter;
+		bool m_scan_r;
 
 		void bus_w(uint8_t data);
 		int t0_r();
 		int t1_r();
-		void data_strobe(uint8_t data);
+		void p2_w(uint8_t data);
+		void p1_w(uint8_t data);
+		int translate_columns();
 
 };
 

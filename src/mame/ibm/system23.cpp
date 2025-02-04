@@ -218,11 +218,12 @@ namespace
 	{
 		//const rgb_t *palette = m_palette->palette()->entry_list_raw();
 		uint8_t gfx = 0;
+		//uint8_t chr_bank = m_bus_test_register & 0x03;
 
 		using namespace i8275_attributes;
 
 		if (!BIT(attrcode, VSP))
-			gfx = m_chargen[(linecount & 15) | (charcode << 4)];
+			gfx = m_chargen[(linecount & 15) | (charcode << 4) /*| (chr_bank << 10)*/];
 
 		if (BIT(attrcode, LTEN))
 		 	gfx = 0xff;
@@ -592,8 +593,8 @@ namespace
 
 
 	ROM_START( system23 )
-		ROM_SYSTEM_BIOS(0, "r_set", "\"R\" Set - 1982?")
-		ROM_SYSTEM_BIOS(1, "pp_set", "\"PP\" Set - 1980")
+		ROM_SYSTEM_BIOS(0, "ros_104", "ROS 1.04 - 1982?")
+		ROM_SYSTEM_BIOS(1, "ros_101", "ROS 1.01 - 1980")
 
 		ROM_REGION(0x24000, "maincpu", 0)
 		//"R" Set (1982?)
