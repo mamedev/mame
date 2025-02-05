@@ -7,7 +7,7 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "cpu/tlcs900/tmp95c061.h" // TODO: tmp94c241.h
+#include "cpu/tlcs900/tmp94c241.h"
 #include "imagedev/floppy.h"
 #include "machine/gen_latch.h"
 #include "machine/upd765.h"
@@ -109,8 +109,8 @@ public:
 	void kn5000(machine_config &config);
 
 private:
-	required_device<tmp95c061_device> m_maincpu;
-	required_device<tmp95c061_device> m_subcpu;
+	required_device<tmp94c241_device> m_maincpu;
+	required_device<tmp94c241_device> m_subcpu;
 	required_device<generic_latch_8_device> m_maincpu_latch;
 	required_device<generic_latch_8_device> m_subcpu_latch;
 	required_device<upd72067_device> m_fdc;
@@ -196,6 +196,37 @@ static INPUT_PORTS_START(kn5000)
 	PORT_DIPSETTING(   0xd0, "PC1")
 	PORT_DIPSETTING(   0xb0, "PC2")
 	PORT_DIPSETTING(   0x70, "Mac")
+
+	PORT_START("AREA")
+	PORT_DIPNAME(0x06, 0x06, "Area Selection")
+	PORT_DIPSETTING(   0x02, "Thailand, Indonesia, Iran, U.A.E., Panama, Argentina, Peru, Brazil")
+	PORT_DIPSETTING(   0x04, "USA, Mexico")
+	PORT_DIPSETTING(   0x06, "Other")
+
+/*
+	Actual full list of regions (but it is unclear if there's any
+	other hardware difference among them):
+
+	PORT_DIPSETTING(   0x04, "(M): U.S.A.")
+	PORT_DIPSETTING(   0x06, "(MC): Canada")
+	PORT_DIPSETTING(   0x04, "(XM): Mexico")
+	PORT_DIPSETTING(   0x06, "(EN): Norway, Sweden, Denmark, Finland")
+	PORT_DIPSETTING(   0x06, "(EH): Holland, Belgium")
+	PORT_DIPSETTING(   0x06, "(EF): France, Italy")
+	PORT_DIPSETTING(   0x06, "(EZ): Germany")
+	PORT_DIPSETTING(   0x06, "(EW): Switzerland")
+	PORT_DIPSETTING(   0x06, "(EA): Austria")
+	PORT_DIPSETTING(   0x06, "(EP): Spain, Portugal, Greece, South Africa")
+	PORT_DIPSETTING(   0x06, "(EK): United Kingdom")
+	PORT_DIPSETTING(   0x06, "(XL): New Zealand")
+	PORT_DIPSETTING(   0x06, "(XR): Australia")
+	PORT_DIPSETTING(   0x06, "(XS): Malaysia")
+	PORT_DIPSETTING(   0x06, "(MD): Saudi Arabia, Hong Kong, Kuwait")
+	PORT_DIPSETTING(   0x06, "(XT): Taiwan")
+	PORT_DIPSETTING(   0x02, "(X): Thailand, Indonesia, Iran, U.A.E., Panama, Argentina, Peru, Brazil")
+	PORT_DIPSETTING(   0x06, "(XP): Philippines")
+	PORT_DIPSETTING(   0x06, "(XW): Singapore")
+*/
 
 	PORT_START("CPR_SEG0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -604,7 +635,7 @@ void kn5000_state::machine_reset()
 void kn5000_state::kn5000(machine_config &config)
 {
 	// Note: The CPU has an internal clock doubler
-	TMP95C061(config, m_maincpu, 2 * 8_MHz_XTAL); // actual cpu is TMP94C241F @ IC5
+	TMP94C241(config, m_maincpu, 2 * 8_MHz_XTAL); // TMP94C241F @ IC5
 	// Address bus is set to 32 bits by the pins AM1=+5v and AM0=GND
 	m_maincpu->set_addrmap(AS_PROGRAM, &kn5000_state::maincpu_mem);
 	// Interrupt 4: FDCINT
@@ -636,14 +667,16 @@ void kn5000_state::kn5000(machine_config &config)
 	// MAINCPU PORT C:
 	//   bit 0 (input) = "check terminal" switch
 	//   bit 1 (output) = "check terminal" LED
-	// TODO: m_maincpu->portc_read().set([this] { return ioport("CN11")->read(); });
-	// TODO: m_maincpu->portc_write().set([this] (u8 data) { m_checking_device_led_cn11 = (BIT(data, 1) == 0); });
+	m_maincpu->portc_read().set_ioport("CN11");
+	m_maincpu->portc_write().set([this] (u8 data) {
+		m_checking_device_led_cn11 = (BIT(data, 1) == 0);
+	});
 
 
 	// MAINCPU PORT D:
 	//   bit 0 (output) = FDCRST
 	//   bit 6 (input) = FD.I/O
-	// TODO: m_maincpu->portd_write().set([this] (u8 data) { m_fdc->reset_w(BIT(data, 0)); });
+	m_maincpu->portd_write().set(m_fdc, FUNC(upd72067_device::reset_w)).bit(0);
 	// TODO: bit 6!
 
 
@@ -651,7 +684,7 @@ void kn5000_state::kn5000(machine_config &config)
 	//   bit 0 (input) = +5v
 	//   bit 2 (input) = HDDRDY
 	//   bit 4 (?) = MICSNS
-	// TODO: m_maincpu->porte_read().set([] { return 1; }); //checked at EF05A6 (v10 ROM)
+	m_maincpu->porte_read().set_constant(1); //checked at EF05A6 (v10 ROM)
 	// FIXME: Bit 0 should only be 1 if the
 	// optional hard-drive extension board is disabled;
 
@@ -670,10 +703,7 @@ void kn5000_state::kn5000(machine_config &config)
 
 
 	// MAINCPU PORT H:
-	//   bit 1 = TC1 Terminal count - microDMA
-	// TODO: m_maincpu->porth_read().set([] { return 2; }); // area/region detection: checked at EF083E (v10 ROM)
-	// FIXME: These are resistors on the pcb, but could be declared
-	// in the driver as a 2 bit DIP-Switch for area/region selection.
+	m_maincpu->porth_read().set_ioport("AREA"); // checked at EF083E (v10 ROM)
 
 
 	// MAINCPU PORT Z:
@@ -701,15 +731,18 @@ void kn5000_state::kn5000(machine_config &config)
 	// AN1 = AFT
 
 	// Note: The CPU has an internal clock doubler
-	TMP95C061(config, m_subcpu, 2*10_MHz_XTAL); // actual cpu is TMP94C241F @ IC27
+	TMP94C241(config, m_subcpu, 2*10_MHz_XTAL); // TMP94C241F @ IC27
 	// Address bus is set to 8 bits by the pins AM1=GND and AM0=GND
 	m_subcpu->set_addrmap(AS_PROGRAM, &kn5000_state::subcpu_mem);
 
 	// SUBCPU PORT C:
 	//   bit 0 (input) = "check terminal" switch
 	//   bit 1 (output) = "check terminal" LED
-	// TODO: m_subcpu->portc_read().set([this] { return ioport("CN12")->read(); });
-	// TODO: m_subcpu->portc_write().set([this] (u8 data) { m_checking_device_led_cn12 = (BIT(data, 1) == 0); });
+	m_subcpu->portc_read().set_ioport("CN12");
+	m_subcpu->portc_write().set([this] (u8 data) {
+		m_checking_device_led_cn12 = (BIT(data, 1) == 0);
+	});
+
 
 	// SUBCPU PORT D:
 	//   bit 0 = (output) SSTAT0
@@ -717,12 +750,12 @@ void kn5000_state::kn5000(machine_config &config)
 	//   bit 2 = (input) MSTAT0
 	//   bit 3 (not used)
 	//   bit 4 = (input) MSTAT1
-	// TODO: m_subcpu->portd_read().set([this] {
-	// TODO:    return (BIT(m_mstat, 0) << 2) | (BIT(m_mstat, 1) << 4);
-	// TODO: });
-	// TODO: m_subcpu->portd_write().set([this] (u8 data) {
-	// TODO:    m_sstat = data & 3;
-	// TODO: });
+	m_subcpu->portd_read().set([this] {
+		return (BIT(m_mstat, 0) << 2) | (BIT(m_mstat, 1) << 4);
+	});
+	m_subcpu->portd_write().set([this] (u8 data) {
+		m_sstat = data & 3;
+	});
 
 
 	GENERIC_LATCH_8(config, m_maincpu_latch); // @ IC23
