@@ -17444,7 +17444,7 @@ ds3100                          // 1989 Digital Equipment Corporation (DECstatio
 ds5k133                         // 1993 Digital Equipment Corporation (DECstation 5000/133)
 
 @source:dec/microvax3100.cpp
-mvax3100			// 1989 Digital Equipment Corporation (MicroVAX 3100)
+mvax3100m10                     // 1989 Digital Equipment Corporation (MicroVAX 3100)
 
 @source:dec/pdp1.cpp
 pdp1                            // 1961 DEC PDP1

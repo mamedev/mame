@@ -4,6 +4,8 @@
 
   Skeleton driver for DEC MicroVAX 3100
 
+
+  Hardhare for Model 10:
                                                                          ____
   Main PCB:         _________________    _____    _____    _____    _    |   |            ___   ___________
    ________________|                |___|    |___|    |___|    |___| |___|   |___________|  |__|          |_____
@@ -140,31 +142,31 @@ void microvax3100_state::microvax3100(machine_config &config)
 	GENERIC_TERMINAL(config, m_terminal, 0);
 }
 
-ROM_START( mvax3100 )
+ROM_START( mvax3100m10 )
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASEFF )
-	ROMX_LOAD( "dec89_23-116e8-00_system_rom_lo_word.e24", 0x00000, 0x20000, CRC(69ef8cf5) SHA1(a59a500921278dc356a519cb435641426c844779), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(1) )
-	ROMX_LOAD( "dec89_23-117e8-00_system_rom_hi_word.e25", 0x00000, 0x20000, CRC(df572ac3) SHA1(5e91d0f4fc8442e3ebc2424d9f85078ba00d2de5), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(1) )
+	ROM_LOAD16_BYTE( "dec89_23-117e8-00_system_rom_hi_word.e25", 0x00000, 0x20000, CRC(df572ac3) SHA1(5e91d0f4fc8442e3ebc2424d9f85078ba00d2de5) )
+	ROM_LOAD16_BYTE( "dec89_23-116e8-00_system_rom_lo_word.e24", 0x00001, 0x20000, CRC(69ef8cf5) SHA1(a59a500921278dc356a519cb435641426c844779) )
 
 	ROM_REGION( 0x20000, "scsi", ROMREGION_ERASEFF )
-	ROM_LOAD(  "dec89_23-061e8-00_scsi_rom.e98",           0x00000, 0x20000, CRC(51fb8268) SHA1(a930869dce955b9b7a2b0fb68840e863c74e6512) )
+	ROM_LOAD(  "dec89_23-061e8-00_scsi_rom.e98",      0x00000, 0x20000, CRC(51fb8268) SHA1(a930869dce955b9b7a2b0fb68840e863c74e6512) )
 
 	ROM_REGION( 0x10000, "comms", ROMREGION_ERASEFF )
-	ROM_LOAD(  "dec90_fx9123_248e7.bin",                   0x00000, 0x10000, CRC(d50801e6) SHA1(e67b1d732ce775381eb8f41684a3366db7a435d7) )
+	ROM_LOAD(  "dec90_fx9123_248e7.bin",              0x00000, 0x10000, CRC(d50801e6) SHA1(e67b1d732ce775381eb8f41684a3366db7a435d7) )
 
 	ROM_REGION( 0x00117, "plds", ROMREGION_ERASEFF ) // All of them on the comms PCB
-	ROM_LOAD(  "dec90_lm9019_032j7_pal20l10acns.bin",      0x00000, 0x00117, NO_DUMP )
-	ROM_LOAD(  "dec90_lm9027_111l1_pls105anj.bin",         0x00000, 0x00100, NO_DUMP )
-	ROM_LOAD(  "dec90_lm9028_519j5_pal16l8nc.bin",         0x00000, 0x00117, NO_DUMP )
-	ROM_LOAD(  "dec90_lm9029_124l1_pls105anj.bin",         0x00000, 0x00100, NO_DUMP )
-	ROM_LOAD(  "dec90_lm9030_031j7_pal20l10acns.bin",      0x00000, 0x00117, NO_DUMP )
-	ROM_LOAD(  "dec90_lm9031_112l1_pls105anj.bin",         0x00000, 0x00100, NO_DUMP )
+	ROM_LOAD(  "dec90_lm9019_032j7_pal20l10acns.bin", 0x00000, 0x00117, NO_DUMP )
+	ROM_LOAD(  "dec90_lm9027_111l1_pls105anj.bin",    0x00000, 0x00100, NO_DUMP )
+	ROM_LOAD(  "dec90_lm9028_519j5_pal16l8nc.bin",    0x00000, 0x00117, NO_DUMP )
+	ROM_LOAD(  "dec90_lm9029_124l1_pls105anj.bin",    0x00000, 0x00100, NO_DUMP )
+	ROM_LOAD(  "dec90_lm9030_031j7_pal20l10acns.bin", 0x00000, 0x00117, NO_DUMP )
+	ROM_LOAD(  "dec90_lm9031_112l1_pls105anj.bin",    0x00000, 0x00100, NO_DUMP )
 
 	ROM_REGION( 0x00100, "prom", ROMREGION_ERASEFF ) // On the main PCB
-	ROM_LOAD(  "dec84_fx9206_365a1.bin",                   0x00000, 0x00100, NO_DUMP )
+	ROM_LOAD(  "dec84_fx9206_365a1.bin",              0x00000, 0x00100, NO_DUMP )
 ROM_END
 
 } // anonymous namespace
 
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE       INPUT         STATE               INIT        COMPANY                          FULLNAME         FLAGS
-COMP( 1989, mvax3100, 0,      0,      microvax3100, microvax3100, microvax3100_state, empty_init, "Digital Equipment Corporation", "MicroVAX 3100", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME         PARENT  COMPAT  MACHINE       INPUT         STATE               INIT        COMPANY                          FULLNAME                  FLAGS
+COMP( 1989, mvax3100m10, 0,      0,      microvax3100, microvax3100, microvax3100_state, empty_init, "Digital Equipment Corporation", "MicroVAX 3100 Model 10", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
