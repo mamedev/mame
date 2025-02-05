@@ -238,9 +238,14 @@ private:
 	static const opcode_table_entry s_opcode_table_source[];
 	static opcode_generate_func s_opcode_table[uml::OP_MAX];
 
+	struct memory_accessors
+	{
+		resolved_memory_accessors resolved;
+		address_space::specific_access_info specific;
+	};
 	resolved_member_function m_debug_cpu_instruction_hook;
 	resolved_member_function m_drcmap_get_value;
-	resolved_memory_accessors_vector m_resolved_accessors;
+	std::vector<memory_accessors> m_memory_accessors;
 };
 
 } // namespace drc
