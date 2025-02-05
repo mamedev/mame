@@ -1196,7 +1196,6 @@ configuration { "asmjs" }
 	if _OPTIONS["SYMBOLS"]~=nil and _OPTIONS["SYMBOLS"]~="0" then
 		linkoptions {
 			"-g" .. _OPTIONS["SYMLEVEL"],
-			"-s DEMANGLE_SUPPORT=1",
 		}
 	end
 	if _OPTIONS["WEBASSEMBLY"] then
