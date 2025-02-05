@@ -470,32 +470,30 @@ void k053247_device::zdrawgfxzoom32GP(
 		if (alpha >= 255) drawmode &= ~2;
 	}
 
-	u32 *dst_ptr  = &bitmap.pix(0);
+	// cull off-screen objects
+	if (sx > cliprect.max_x || sy > cliprect.max_y) return;
+
+	// fill internal data structure with default values
+	u8 *ozbuf_ptr = gx_objzbuf;
+	u8 *szbuf_ptr = gx_shdzbuf;
+
+	const u8 *src_base = m_gfx->get_data(code % m_gfx->elements());
+
+	const pen_t *pal_base = palette().pens() + m_gfx->colorbase() + (color % m_gfx->colors()) * granularity;
+	const pen_t *shd_base = palette().shadow_table();
+
+	u32 *dst_ptr = &bitmap.pix(0);
 	const int dst_pitch = bitmap.rowpixels();
 	const int dst_minx  = cliprect.min_x;
 	const int dst_maxx  = cliprect.max_x;
 	const int dst_miny  = cliprect.min_y;
 	const int dst_maxy  = cliprect.max_y;
-	int dst_x     = sx;
-	int dst_y     = sy;
-
-	// cull off-screen objects
-	if (dst_x > dst_maxx || dst_y > dst_maxy) return;
-
-	// fill internal data structure with default values
-	u8 *ozbuf_ptr  = gx_objzbuf;
-	u8 *szbuf_ptr  = gx_shdzbuf;
-
-	int src_pitch = 16;
-	int src_fw    = 16;
-	int src_fh    = 16;
-	const u8 *src_base  = m_gfx->get_data(code % m_gfx->elements());
-
-	const pen_t *pal_base = palette().pens() + m_gfx->colorbase() + (color % m_gfx->colors()) * granularity;
-	const pen_t *shd_base = palette().shadow_table();
+	int dst_x = sx;
+	int dst_y = sy;
 
 	int dst_w, dst_h;
 	int src_fdx, src_fdy;
+	int src_pitch = 16, src_fw = 16, src_fh = 16;
 
 	const bool nozoom = (scalex == 0x10000 && scaley == 0x10000);
 	if (nozoom)
@@ -515,17 +513,27 @@ void k053247_device::zdrawgfxzoom32GP(
 		src_fdy = src_fh / dst_h;
 	}
 	const int dst_lastx = dst_x + dst_w - 1;
-	if (dst_lastx < dst_minx) return;
 	const int dst_lasty = dst_y + dst_h - 1;
-	if (dst_lasty < dst_miny) return;
+	if (dst_lastx < dst_minx || dst_lasty < dst_miny) return;
 
 	// clip destination
 	int dst_skipx = 0;
-	int eax = dst_minx;  if ((eax -= dst_x) > 0) { dst_skipx = eax;  dst_w -= eax;  dst_x = dst_minx; }
-	eax = dst_lastx; if ((eax -= dst_maxx) > 0) dst_w -= eax;
+	if (int eax = dst_minx - dst_x; eax > 0)
+	{
+		dst_skipx = eax;
+		dst_w -= eax;
+		dst_x = dst_minx;
+	}
+	if (int eax = dst_lastx - dst_maxx; eax > 0) dst_w -= eax;
+	
 	int dst_skipy = 0;
-	eax = dst_miny;  if ((eax -= dst_y) > 0) { dst_skipy = eax;  dst_h -= eax;  dst_y = dst_miny; }
-	eax = dst_lasty; if ((eax -= dst_maxy) > 0) dst_h -= eax;
+	if (int eax = dst_miny - dst_y; eax > 0)
+	{
+		dst_skipy = eax;
+		dst_h -= eax;
+		dst_y = dst_miny;
+	}
+	if (int eax = dst_lasty - dst_maxy; eax > 0) dst_h -= eax;
 
 	int src_fby, src_fbx;
 
@@ -544,11 +552,11 @@ void k053247_device::zdrawgfxzoom32GP(
 	src_fby += dst_skipy * src_fdy;
 
 	// adjust insertion points and pre-entry constants
-	eax = (dst_y - dst_miny) * GX_ZBUFW + (dst_x - dst_minx) + dst_w;
-	const u8 z8 = (u8)zcode;
-	const u8 p8 = (u8)pri;
+	const int eax = (dst_y - dst_miny) * GX_ZBUFW + (dst_x - dst_minx) + dst_w;
 	ozbuf_ptr += eax;
 	szbuf_ptr += eax << 1;
+	const u8 z8 = (u8)zcode;
+	const u8 p8 = (u8)pri;
 	dst_ptr += dst_y * dst_pitch + dst_x + dst_w;
 	dst_w = -dst_w;
 
