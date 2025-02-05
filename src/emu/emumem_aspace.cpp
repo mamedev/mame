@@ -10,10 +10,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include <list>
-#include <map>
-#include "emuopts.h"
-#include "debug/debugcpu.h"
 
 #include "emumem_mud.h"
 #include "emumem_hea.h"
@@ -26,6 +22,14 @@
 #include "emumem_hep.h"
 #include "emumem_het.h"
 #include "emumem_hws.h"
+
+#include "emuopts.h"
+#include "debug/debugcpu.h"
+
+#include "mfpresolve.h"
+
+#include <list>
+#include <map>
 
 
 //**************************************************************************
@@ -321,49 +325,11 @@ public:
 		accessors.low_bits = emu::detail::handler_entry_dispatch_level_to_lowbits(Level, Width, AddrShift);
 		accessors.read.dispatch = reinterpret_cast<void const *const *>(m_dispatch_read);
 		accessors.write.dispatch = reinterpret_cast<void const *const *>(m_dispatch_write);
-		accessors.read.function = accessors.write.function = uintptr_t(nullptr);
-		accessors.read.displacement = accessors.write.displacement = 0;
-		accessors.read.is_virtual = accessors.write.is_virtual = false;
 
 		auto readfunc = &handler_entry_read<Width, AddrShift>::read;
 		auto writefunc = &handler_entry_write<Width, AddrShift>::write;
-		if (MAME_ABI_CXX_TYPE == MAME_ABI_CXX_ITANIUM) {
-			struct { std::uintptr_t ptr; std::ptrdiff_t adj; } equiv;
-			constexpr uintptr_t funcmask = ~uintptr_t((MAME_ABI_CXX_ITANIUM_MFP_TYPE == MAME_ABI_CXX_ITANIUM_MFP_ARM) ? 0 : 1);
-			constexpr unsigned deltashift = (MAME_ABI_CXX_ITANIUM_MFP_TYPE == MAME_ABI_CXX_ITANIUM_MFP_ARM) ? 1 : 0;
-
-			assert(sizeof(readfunc) == sizeof(equiv));
-			*reinterpret_cast<decltype(readfunc) *>(&equiv) = readfunc;
-			accessors.read.function = equiv.ptr & funcmask;
-			accessors.read.displacement = equiv.adj >> deltashift;
-			accessors.read.is_virtual = BIT((MAME_ABI_CXX_ITANIUM_MFP_TYPE == MAME_ABI_CXX_ITANIUM_MFP_ARM) ? equiv.adj : equiv.ptr, 0);
-
-			assert(sizeof(writefunc) == sizeof(equiv));
-			*reinterpret_cast<decltype(writefunc) *>(&equiv) = writefunc;
-			accessors.write.function = equiv.ptr & funcmask;
-			accessors.write.displacement = equiv.adj >> deltashift;
-			accessors.write.is_virtual = BIT((MAME_ABI_CXX_ITANIUM_MFP_TYPE == MAME_ABI_CXX_ITANIUM_MFP_ARM) ? equiv.adj : equiv.ptr, 0);
-		} else if (MAME_ABI_CXX_TYPE == MAME_ABI_CXX_MSVC) {
-			struct single { std::uintptr_t entrypoint; };
-			struct multi { std::uintptr_t entrypoint; int this_delta; };
-			struct { std::uintptr_t entrypoint; int this_delta; int vptr_offs; int vt_index; } const *unknown;
-
-			assert(sizeof(*unknown) >= sizeof(readfunc));
-			unknown = reinterpret_cast<decltype(unknown)>(&readfunc);
-			if ((sizeof(*unknown) > sizeof(readfunc)) || !unknown->vt_index) {
-				accessors.read.function = unknown->entrypoint;
-				accessors.read.displacement = (sizeof(single) < sizeof(readfunc)) ? unknown->this_delta : 0;
-				accessors.read.is_virtual = false;
-			}
-
-			assert(sizeof(*unknown) >= sizeof(writefunc));
-			unknown = reinterpret_cast<decltype(unknown)>(&writefunc);
-			if ((sizeof(*unknown) > sizeof(writefunc)) || !unknown->vt_index) {
-				accessors.write.function = unknown->entrypoint;
-				accessors.write.displacement = (sizeof(single) < sizeof(writefunc)) ? unknown->this_delta : 0;
-				accessors.write.is_virtual = false;
-			}
-		}
+		std::tie(accessors.read.function, accessors.read.displacement, accessors.read.is_virtual) = util::resolve_member_function(readfunc);
+		std::tie(accessors.write.function, accessors.write.displacement, accessors.write.is_virtual) = util::resolve_member_function(writefunc);
 
 		return accessors;
 	}
