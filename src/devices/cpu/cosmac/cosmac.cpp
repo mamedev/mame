@@ -365,6 +365,9 @@ cosmac_device::cosmac_device(const machine_config &mconfig, device_type type, co
 	m_io_config("io", ENDIANNESS_LITTLE, 8, 3),
 	m_read_wait(*this, 0),
 	m_read_clear(*this, 0),
+	m_read_int(*this, 0),
+	m_read_dma_in(*this, 0),
+	m_read_dma_out(*this, 0),
 	m_read_ef(*this, 0),
 	m_write_q(*this),
 	m_read_dma(*this, 0),
@@ -930,6 +933,28 @@ inline void cosmac_device::sample_wait_clear()
 
 
 //-------------------------------------------------
+//  sample_interrupt - sample interrupt line
+//-------------------------------------------------
+
+bool cosmac_device::sample_interrupt()
+{
+	if (!m_read_int.isunset()) m_irq = m_read_int();
+	return bool(m_irq);
+}
+
+
+//-------------------------------------------------
+//  sample_dma_io - sample dma in/out lines
+//-------------------------------------------------
+
+inline void cosmac_device::sample_dma_io()
+{
+	if (!m_read_dma_in.isunset()) m_dmain = m_read_dma_in();
+	if (!m_read_dma_out.isunset()) m_dmaout = m_read_dma_out();
+}
+
+
+//-------------------------------------------------
 //  sample_ef_lines - sample EF input lines
 //-------------------------------------------------
 
@@ -1102,6 +1127,8 @@ inline void cosmac_device::initialize()
 
 	m_icount -= CLOCKS_INIT;
 
+	sample_dma_io();
+
 	if (m_dmain)
 	{
 		m_state = cosmac_state::STATE_2_DMA_IN;
@@ -1129,6 +1156,8 @@ inline void cosmac_device::execute_instruction()
 	m_write_tpb(0);
 
 	m_icount -= CLOCKS_EXECUTE;
+
+	sample_dma_io();
 
 	if (m_state == cosmac_state::STATE_1_EXECUTE && (m_op >> 4) == 0xc) // "long" opcodes
 	{
@@ -1166,6 +1195,8 @@ inline void cosmac_device::dma_input()
 
 	m_icount -= CLOCKS_DMA;
 
+	sample_dma_io();
+
 	if (m_dmain)
 	{
 		m_state = cosmac_state::STATE_2_DMA_IN;
@@ -1201,6 +1232,8 @@ inline void cosmac_device::dma_output()
 	m_write_tpb(0);
 
 	m_icount -= CLOCKS_DMA;
+
+	sample_dma_io();
 
 	if (m_dmain)
 	{
@@ -1238,6 +1271,8 @@ inline void cosmac_device::interrupt()
 	m_write_tpb(0);
 
 	m_icount -= CLOCKS_INTERRUPT;
+
+	sample_dma_io();
 
 	if (m_dmain)
 	{
@@ -1470,7 +1505,7 @@ void cosmac_device::rsxd()  { RAM_W(R[X], R[N] & 0xff); R[X]--; RAM_W(R[X], R[N]
 void cosmac_device::rnx()   { R[X] = R[N]; }
 
 void cosmac_device::bci()   { short_branch(m_cil); m_cil = 0; }
-void cosmac_device::bxi()   { short_branch(m_irq); }
+void cosmac_device::bxi()   { short_branch(sample_interrupt()); }
 
 void cosmac_device::xie()   { m_xie = 1; }
 void cosmac_device::xid()   { m_xie = 0; }
