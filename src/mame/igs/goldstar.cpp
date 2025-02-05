@@ -23575,7 +23575,7 @@ GAMEL( 1996, nc96k,      nc96,     amcoe2,   nfb96,     cmaster_state,  init_nfb
 GAMEL( 1996, nc96l,      nc96,     amcoe2,   nfb96,     cmaster_state,  init_nfb96_a,    ROT0, "Amcoe",   "New Cherry '96 (v3.0, A PCB)",                                 0,                 layout_nfb96 ) // A  Sub-PCB
 GAMEL( 2000, nc96txt,    nc96,     amcoe2,   nfb96tx,   cmaster_state,  init_nfb96_c2,   ROT0, "Amcoe",   "New Cherry '96 Special Edition (v1.32 Texas XT, C2 PCB)",      0,                 layout_nfb96tx ) // ver. tc1.32axt C2 Sub-PCB
 
-GAME(  2009, fb2010,     0,        amcoe2,   fb2010,    cmaster_state,  init_fb2010,     ROT0, "Amcoe",   "Fruit Bonus 2010 (v. 2.0.1.3",                                 0 )
+GAME(  2009, fb2010,     0,        amcoe2,   fb2010,    cmaster_state,  init_fb2010,     ROT0, "Amcoe",   "Fruit Bonus 2010 (v. 2.0.1.3)",                                0 )
 
 GAMEL( 1996, roypok96,   0,        amcoe2,   roypok96,  cmaster_state,  init_rp35,       ROT0, "Amcoe",   "Royal Poker '96 (set 1, v97-3.5)",                             0,                 layout_roypok96 )
 GAMEL( 1996, roypok96a,  roypok96, amcoe2,   roypok96a, cmaster_state,  init_rp36,       ROT0, "Amcoe",   "Royal Poker '96 (set 2, v98-3.6)",                             0,                 layout_roypok96 )
