@@ -396,7 +396,7 @@ bool video_bgfx::set_platform_data(bgfx::PlatformData &platform_data, osd_window
 	platform_data.nwh = GetOSWindow(dynamic_cast<mac_window_info const &>(window).platform_window());
 #elif defined(SDLMAME_EMSCRIPTEN)
 	platform_data.ndt = nullptr;
-        platform_data.nwh = (void *)"#canvas"; // HTML5 target selector
+	platform_data.nwh = (void *)"#canvas"; // HTML5 target selector
 #else // defined(OSD_*)
 	SDL_SysWMinfo wmi;
 	SDL_VERSION(&wmi.version);
