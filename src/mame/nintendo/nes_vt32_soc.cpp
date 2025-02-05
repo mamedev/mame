@@ -29,7 +29,7 @@ void nes_vt32_soc_device::device_add_mconfig(machine_config& config)
 {
 	nes_vt02_vt03_soc_device::device_add_mconfig(config);
 
-	M6502_VTSCR(config.replace(), m_maincpu, NTSC_APU_CLOCK); // are these later chips RP2A03 core, or 6502 core derived?
+	RP2A03_VTSCR(config.replace(), m_maincpu, NTSC_APU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt32_soc_device::nes_vt_fp_map);
 }
 
@@ -50,16 +50,16 @@ void nes_vt32_soc_device::vtfp_411e_w(uint8_t data)
 {
 	logerror("411e_w %02x\n", data);
 	if (data == 0x05)
-		downcast<m6502_vtscr &>(*m_maincpu).set_next_scramble(true);
+		downcast<rp2a03_vtscr &>(*m_maincpu).set_next_scramble(true);
 	else if (data == 0x00)
-		downcast<m6502_vtscr &>(*m_maincpu).set_next_scramble(false);
+		downcast<rp2a03_vtscr &>(*m_maincpu).set_next_scramble(false);
 }
 
 void nes_vt32_soc_device::vtfp_4a00_w(uint8_t data)
 {
 	logerror("4a00_w %02x\n", data);
 	//if(data == 0x80)
-	//  downcast<m6502_vtscr &>(*m_maincpu).set_scramble(false);
+	//  downcast<rp2a03_vtscr &>(*m_maincpu).set_scramble(false);
 }
 
 
