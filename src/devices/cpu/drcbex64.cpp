@@ -2587,14 +2587,18 @@ void drcbe_x64::op_read(Assembler &a, const instruction &inst)
 			a.mov(r10d, Gpd(REG_PARAM2));                                                        // copy masked address
 			a.shr(Gpd(REG_PARAM2), accessors.specific.low_bits);                                 // shift off low bits
 		}
-		a.and_(ecx, imm((accessors.specific.native_bytes - (1 << spacesizep.size())) << 3));     // mask bit address
 		a.mov(rax, ptr(rax, Gpq(REG_PARAM2), 3));                                                // load dispatch table entry
+		a.and_(ecx, imm((accessors.specific.native_bytes - (1 << spacesizep.size())) << 3));     // mask bit address
 		if (accessors.specific.low_bits)
 			a.mov(Gpd(REG_PARAM2), r10d);                                                        // restore masked address
 		if (need_save)
 			a.mov(Gpd(int_register_map[0]), ecx);                                                // save masked bit address
 		else
 			a.mov(dstreg.r32(), ecx);                                                            // save masked bit address
+		if (accessors.specific.read.is_virtual)
+			a.mov(r10, ptr(rax, accessors.specific.read.displacement));                          // load vtable pointer
+		if (accessors.specific.read.displacement)
+			a.add(rax, accessors.specific.read.displacement);                                    // apply this pointer offset
 		if (accessors.specific.native_bytes <= 4)
 			a.shl(Gpd(REG_PARAM3), cl);                                                          // shift mem_mask by masked bit address
 		else
@@ -2603,11 +2607,7 @@ void drcbe_x64::op_read(Assembler &a, const instruction &inst)
 		// need to do this after finished with CL as REG_PARAM1 is C on Windows
 		a.mov(Gpq(REG_PARAM1), rax);
 		if (accessors.specific.read.is_virtual)
-			a.mov(rax, ptr(rax, accessors.specific.read.displacement));                          // load vtable pointer
-		if (accessors.specific.read.displacement)
-			a.add(Gpq(REG_PARAM1), accessors.specific.read.displacement);                        // apply this pointer offset
-		if (accessors.specific.read.is_virtual)
-			a.call(ptr(rax, accessors.specific.read.function));                                  // call virtual member function
+			a.call(ptr(r10, accessors.specific.read.function));                                  // call virtual member function
 		else
 			smart_call_r64(a, (x86code *)accessors.specific.read.function, rax);                 // call non-virtual member function
 
@@ -3041,31 +3041,33 @@ void drcbe_x64::op_writem(Assembler &a, const instruction &inst)
 			a.mov(r10d, Gpd(REG_PARAM2));                                                        // copy masked address
 			a.shr(Gpd(REG_PARAM2), accessors.specific.low_bits);                                 // shift off low bits
 		}
-		a.and_(ecx, imm((accessors.specific.native_bytes - (1 << spacesizep.size())) << 3));     // mask bit address
 		a.mov(rax, ptr(rax, Gpq(REG_PARAM2), 3));                                                // load dispatch table entry
+		a.and_(ecx, imm((accessors.specific.native_bytes - (1 << spacesizep.size())) << 3));     // mask bit address
 		if (accessors.specific.low_bits)
 			a.mov(Gpd(REG_PARAM2), r10d);                                                        // restore masked address
 		if (accessors.specific.native_bytes <= 4)
 		{
 			a.shl(r11d, cl);                                                                     // shift mem_mask by masked bit address
 			a.shl(Gpd(REG_PARAM3), cl);                                                          // shift data by masked bit address
-			a.mov(Gpd(REG_PARAM4), r11d);                                                        // copy mem_mask to parameter 4 (ECX on SysV)
 		}
 		else
 		{
 			a.shl(r11, cl);                                                                      // shift mem_mask by masked bit address
 			a.shl(Gpq(REG_PARAM3), cl);                                                          // shift data by masked bit address
-			a.mov(Gpq(REG_PARAM4), r11);                                                         // copy mem_mask to parameter 4 (RCX on SysV)
 		}
-
-		// need to do this after finished with CL as REG_PARAM1 is C on Windows
-		a.mov(Gpq(REG_PARAM1), rax);
 		if (accessors.specific.write.is_virtual)
-			a.mov(rax, ptr(rax, accessors.specific.write.displacement));                         // load vtable pointer
+			a.mov(r10, ptr(rax, accessors.specific.write.displacement));                         // load vtable pointer
+
+		// need to do this after finished with CL as REG_PARAM1 is C on Windows and REG_PARAM4 is C on SysV
+		a.mov(Gpq(REG_PARAM1), rax);
+		if (accessors.specific.native_bytes <= 4)
+			a.mov(Gpd(REG_PARAM4), r11d);                                                        // copy mem_mask to parameter 4 (ECX on SysV)
+		else
+			a.mov(Gpq(REG_PARAM4), r11);                                                         // copy mem_mask to parameter 4 (RCX on SysV)
 		if (accessors.specific.write.displacement)
 			a.add(Gpq(REG_PARAM1), accessors.specific.write.displacement);                       // apply this pointer offset
 		if (accessors.specific.write.is_virtual)
-			a.call(ptr(rax, accessors.specific.write.function));                                 // call virtual member function
+			a.call(ptr(r10, accessors.specific.write.function));                                 // call virtual member function
 		else
 			smart_call_r64(a, (x86code *)accessors.specific.write.function, rax);                // call non-virtual member function
 	}
