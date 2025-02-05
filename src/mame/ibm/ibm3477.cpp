@@ -56,7 +56,7 @@ public:
 
 private:
 	virtual void machine_reset() override ATTR_COLD;
-	void ibm3477_palette(palette_device &palette) const;
+	void palette_init(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	required_device<cpu_device> m_maincpu;
@@ -73,7 +73,7 @@ uint32_t ibm3477_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-void ibm3477_state::ibm3477_palette(palette_device &palette) const
+void ibm3477_state::palette_init(palette_device &palette) const
 {
 	palette.set_pen_color(0, 0,   0, 0); // Black
 	palette.set_pen_color(1, 0, 255, 0); // Full
@@ -98,7 +98,7 @@ void ibm3477_state::ibm3477(machine_config &config)
 	screen.set_visarea(0, 639, 0, 239);
 	screen.set_palette("palette");
 
-	PALETTE(config, "palette", FUNC(ibm3477_state::ibm3477_palette), 3);
+	PALETTE(config, "palette", FUNC(ibm3477_state::palette_init), 3);
 }
 
 // ROM definition
@@ -115,4 +115,4 @@ ROM_END
 
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY  FULLNAME               FLAGS
-COMP( 1998, ibm3477, 0,      0,      ibm3477, ibm3477, ibm3477_state, empty_init, "IBM",   "IBM InfoWindow 3477", MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // Spanish ROMs?
+COMP( 1998, ibm3477, 0,      0,      ibm3477, ibm3477, ibm3477_state, empty_init, "IBM",   "InfoWindow 3477", MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // Spanish ROMs?
