@@ -32,13 +32,13 @@ k001006_device::k001006_device(const machine_config &mconfig, const char *tag, d
 void k001006_device::device_start()
 {
 	if ((m_gfxrom.length() < 0x40000))
-		fatalerror("K001006 %s: texture memory size is less than 0x40000 bytes.",this->tag());
+		fatalerror("K001006 %s: texture memory size is less than 0x40000 bytes.", tag());
 
 	if ((m_gfxrom.length() & 0x3ffff))
-		fatalerror("K001006 %s: texture memory size is must be a multiple of 0x40000 bytes.",this->tag());
+		fatalerror("K001006 %s: texture memory size is must be a multiple of 0x40000 bytes.", tag());
 
-	m_pal_ram = make_unique_clear<uint16_t[]>(0x800);
-	m_unknown_ram = make_unique_clear<uint16_t[]>(0x1000);
+	m_pal_ram = make_unique_clear<uint16_t []>(0x800);
+	m_unknown_ram = make_unique_clear<uint16_t []>(0x1000);
 
 	m_texrom = std::make_unique<uint8_t[]>(m_gfxrom.length());
 
@@ -93,7 +93,7 @@ uint32_t k001006_device::read(offs_t offset)
 			}
 			default:
 			{
-				fatalerror("k001006_r, unknown device %02X\n", m_device_sel);
+				fatalerror("%s:k001006_r, unknown device %02X\n", tag(), m_device_sel);
 			}
 		}
 	}
@@ -130,7 +130,7 @@ void k001006_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 			}
 			case 0xf:   // Unknown RAM write
 			{
-			//  osd_printf_debug("Unknown RAM %08X = %04X\n", m_addr, data & 0xffff);
+				//osd_printf_debug("Unknown RAM %08X = %04X\n", m_addr, data & 0xffff);
 				m_unknown_ram[m_addr++] = data & 0xffff;
 				break;
 			}
@@ -173,8 +173,8 @@ void k001006_device::preprocess_texture_data(uint8_t *dst, uint8_t *src, int len
 
 		for (int i = 0; i < 0x800; i++)
 		{
-			int tx = ((i & 0x400) >> 5) | ((i & 0x100) >> 4) | ((i & 0x40) >> 3) | ((i & 0x10) >> 2) | ((i & 0x4) >> 1) | (i & 0x1);
-			int ty = ((i & 0x200) >> 5) | ((i & 0x80) >> 4) | ((i & 0x20) >> 3) | ((i & 0x8) >> 2) | ((i & 0x2) >> 1);
+			int tx = bitswap<6>(i, 10, 8, 6, 4, 2, 0);
+			int ty = bitswap<5>(i, 9, 7, 5, 3, 1);
 
 			tx <<= 3;
 			ty <<= 4;
