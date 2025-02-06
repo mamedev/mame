@@ -452,7 +452,7 @@ ROM_START( junofrst )
 	ROM_LOAD( "jfc5_a8.bin",  0x18000, 0x2000, CRC(0539f328) SHA1(c532aaed7f9e6f564e3df0dc6d8fdbee6ed721a2) )
 	ROM_LOAD( "jfc6_a9.bin",  0x1a000, 0x2000, CRC(1da2ad6e) SHA1(de997d1b2ff6671088b57192bc9f1279359fad5d) )
 
-	ROM_REGION(  0x1000, "audiocpu", 0 ) /* 64k for Z80 sound CPU code */
+	ROM_REGION(  0x1000, "audiocpu", 0 ) /* 4k for Z80 sound CPU code */
 	ROM_LOAD( "jfs1_j3.bin",  0x0000, 0x1000, CRC(235a2893) SHA1(b90251c4971f7ba12e407f86c32723d513d6b4a0) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* 8039 */
@@ -477,7 +477,7 @@ ROM_START( junofrstg )
 	ROM_LOAD( "jfc5_a8.bin",  0x18000, 0x2000, CRC(0539f328) SHA1(c532aaed7f9e6f564e3df0dc6d8fdbee6ed721a2) )
 	ROM_LOAD( "jfc6_a9.bin",  0x1a000, 0x2000, CRC(1da2ad6e) SHA1(de997d1b2ff6671088b57192bc9f1279359fad5d) )
 
-	ROM_REGION(  0x1000, "audiocpu", 0 ) /* 64k for Z80 sound CPU code */
+	ROM_REGION(  0x1000, "audiocpu", 0 ) /* 4k for Z80 sound CPU code */
 	ROM_LOAD( "jfs1_j3.bin",  0x0000, 0x1000, CRC(235a2893) SHA1(b90251c4971f7ba12e407f86c32723d513d6b4a0) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* 8039 */
