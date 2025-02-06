@@ -259,11 +259,11 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_dsp(*this, "dsp%u", 1U),
 		m_k056800(*this, "k056800"),
-		m_k001604(*this, "k001604_%u", 1U),
+		m_k001604(*this, "k001604"),
 		m_konppc(*this, "konppc"),
 		m_adc12138(*this, "adc12138"),
 		m_voodoo(*this, "voodoo%u", 0U),
-		m_palette(*this, "palette%u", 1U),
+		m_palette(*this, "palette"),
 		m_sharc_dataram(*this, "sharc%u_dataram", 0U),
 		m_jvs_host(*this, "jvs_host"),
 		m_gn676_lan(*this, "gn676_lan"),
@@ -271,8 +271,7 @@ public:
 		m_in(*this, "IN%u", 0U),
 		m_dsw(*this, "DSW"),
 		m_analog(*this, "ANALOG%u", 1U),
-		m_pcb_digit(*this, "pcbdigit%u", 0U),
-		m_cg_view(*this, "cg_view")
+		m_pcb_digit(*this, "pcbdigit%u", 0U)
 	{ }
 
 	void nwktr(machine_config &config);
@@ -296,11 +295,11 @@ private:
 	required_device<cpu_device> m_audiocpu;
 	required_device_array<adsp21062_device, 2> m_dsp;
 	required_device<k056800_device> m_k056800;
-	required_device_array<k001604_device, 2> m_k001604;
+	required_device<k001604_device> m_k001604;
 	required_device<konppc_device> m_konppc;
 	required_device<adc12138_device> m_adc12138;
 	required_device_array<generic_voodoo_device, 2> m_voodoo;
-	required_device_array<palette_device, 2> m_palette;
+	required_device<palette_device> m_palette;
 	optional_shared_ptr_array<uint32_t, 2> m_sharc_dataram;
 	required_device<konppc_jvs_host_device> m_jvs_host;
 	required_device<konami_gn676_lan_device> m_gn676_lan;
@@ -309,13 +308,13 @@ private:
 	required_ioport m_dsw;
 	required_ioport_array<5> m_analog;
 	output_finder<2> m_pcb_digit;
-	memory_view m_cg_view;
 
 	emu_timer *m_sound_irq_timer = nullptr;
 	bool m_exrgb = false;
 
 	uint8_t sysreg_r(offs_t offset);
 	void sysreg_w(offs_t offset, uint8_t data);
+	void cg_view_select(int view);
 	void soundtimer_en_w(uint16_t data);
 	void soundtimer_count_w(uint16_t data);
 	double adc12138_input_callback(uint8_t input);
@@ -332,12 +331,12 @@ private:
 
 uint32_t nwktr_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(m_palette[0]->pen(0), cliprect);
+	bitmap.fill(m_palette->pen(0), cliprect);
 
 	int const board = m_exrgb ? 1 : 0;
 
 	m_voodoo[board]->update(bitmap, cliprect);
-	m_k001604[0]->draw_front_layer(screen, bitmap, cliprect);   // K001604 on slave board doesn't seem to output anything. Bug or intended?
+	m_k001604->draw_front_layer(screen, bitmap, cliprect);
 
 	return 0;
 }
@@ -417,19 +416,24 @@ void nwktr_state::sysreg_w(offs_t offset, uint8_t data)
 
 			m_konppc->set_cgboard_id((data >> 4) & 0x3);
 
-			// Racing Jam sets CG board ID to 2 when writing to the tilemap chip.
-			// This could mean broadcast to both CG boards?
+			/* 
+			Racing Jam sets both EXID bits when writing to the tilemap chip before POST. This means 
+			writing to both CG boards at the tilemap chip simultaneously. However, broadcasting
+			read/write handlers currently isn't supported and likely will never be for preventing
+			possible race conditions. Due to the way Konami configured this hardware in such an
+			illegal manner, we'll cheat by only using one K001604 instead to show all the tilemap
+			graphics can properly display during POST (and pass "both" tilemap IC tests).
+			*/
+
+//			cg_view_select((data >> 4) & 0x3);  This normally selects which CG board to read/write to (see above note)
 
 			m_exrgb = BIT(data, 0);       // Select which CG Board outputs signal
-
-			m_cg_view.select(m_konppc->get_cgboard_id() ? 1 : 0);
 			break;
 
 		default:
 			break;
 	}
 }
-
 
 /*****************************************************************************/
 
@@ -479,18 +483,19 @@ void nwktr_state::machine_start()
 	save_item(NAME(m_exrgb));
 }
 
+void nwktr_state::machine_reset()
+{
+	m_dsp[0]->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_dsp[1]->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+}
+
 void nwktr_state::ppc_map(address_map &map)
 {
 	map(0x00000000, 0x003fffff).ram().share(m_work_ram);
-	map(0x74000000, 0x7407ffff).view(m_cg_view);
-	m_cg_view[0](0x74000000, 0x740000ff).rw(m_k001604[0], FUNC(k001604_device::reg_r), FUNC(k001604_device::reg_w));
-	m_cg_view[0](0x74010000, 0x7401ffff).ram().w(m_palette[0], FUNC(palette_device::write32)).share("palette1");
-	m_cg_view[0](0x74020000, 0x7403ffff).rw(m_k001604[0], FUNC(k001604_device::tile_r), FUNC(k001604_device::tile_w));
-	m_cg_view[0](0x74040000, 0x7407ffff).rw(m_k001604[0], FUNC(k001604_device::char_r), FUNC(k001604_device::char_w));
-	m_cg_view[1](0x74000000, 0x740000ff).rw(m_k001604[1], FUNC(k001604_device::reg_r), FUNC(k001604_device::reg_w));
-	m_cg_view[1](0x74010000, 0x7401ffff).ram().w(m_palette[1], FUNC(palette_device::write32)).share("palette2");
-	m_cg_view[1](0x74020000, 0x7403ffff).rw(m_k001604[1], FUNC(k001604_device::tile_r), FUNC(k001604_device::tile_w));
-	m_cg_view[1](0x74040000, 0x7407ffff).rw(m_k001604[1], FUNC(k001604_device::char_r), FUNC(k001604_device::char_w));
+	map(0x74000000, 0x740000ff).rw(m_k001604, FUNC(k001604_device::reg_r), FUNC(k001604_device::reg_w));
+	map(0x74010000, 0x7401ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0x74020000, 0x7403ffff).rw(m_k001604, FUNC(k001604_device::tile_r), FUNC(k001604_device::tile_w));
+	map(0x74040000, 0x7407ffff).rw(m_k001604, FUNC(k001604_device::char_r), FUNC(k001604_device::char_w));
 	map(0x78000000, 0x7800ffff).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_shared_r_ppc), FUNC(konppc_device::cgboard_dsp_shared_w_ppc));
 	map(0x780c0000, 0x780c0003).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_comm_r_ppc), FUNC(konppc_device::cgboard_dsp_comm_w_ppc));
 	map(0x7d000000, 0x7d00ffff).r(FUNC(nwktr_state::sysreg_r));
@@ -636,12 +641,6 @@ double nwktr_state::adc12138_input_callback(uint8_t input)
 	return (double)(value) / 4095.0;
 }
 
-void nwktr_state::machine_reset()
-{
-	m_dsp[0]->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	m_dsp[1]->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-}
-
 void nwktr_state::nwktr(machine_config &config)
 {
 	// basic machine hardware
@@ -693,14 +692,10 @@ void nwktr_state::nwktr(machine_config &config)
 	screen.set_raw(XTAL(64'000'000) / 4, 644, 44, 44 + 512, 450, 31, 31 + 400);
 	screen.set_screen_update(FUNC(nwktr_state::screen_update));
 
-	PALETTE(config, m_palette[0]).set_format(4, raw_to_rgb_converter::standard_rgb_decoder<5,5,5, 10,5,0>, 65536 / 4);
-	PALETTE(config, m_palette[1]).set_format(4, raw_to_rgb_converter::standard_rgb_decoder<5,5,5, 10,5,0>, 65536 / 4);
+	PALETTE(config, m_palette).set_format(4, raw_to_rgb_converter::standard_rgb_decoder<5,5,5, 10,5,0>, 65536 / 4);
 
-	K001604(config, m_k001604[0], 0);
-	m_k001604[0]->set_palette(m_palette[0]);
-
-	K001604(config, m_k001604[1], 0);
-	m_k001604[1]->set_palette(m_palette[1]);
+	K001604(config, m_k001604, 0);
+	m_k001604->set_palette(m_palette); // see sysreg_w case 7 for why we're only use one K001604 instead of two
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
