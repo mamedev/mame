@@ -403,6 +403,7 @@ void nwktr_state::sysreg_w(offs_t offset, uint8_t data)
 		}
 
 		case 7:
+		{
 			/*
 			    0x80 = EXRES1
 			    0x40 = EXRES0
@@ -415,15 +416,16 @@ void nwktr_state::sysreg_w(offs_t offset, uint8_t data)
 			if (BIT(data, 6)) // CG Board 0 IRQ Ack
 				m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 
-			m_konppc->set_cgboard_id((data >> 4) & 0x3);
-
-			// Racing Jam sets CG board ID to 2 when writing to the tilemap chip.
-			// This could mean broadcast to both CG boards?
+			// NOTE: racingj writes a 2 to broadcast writes to both CG boards
+			// it also sets a 3 during POST, assume to just unmap the space.
+			const u8 exid = (data >> 4) & 0x3;
+			m_konppc->set_cgboard_id(exid);
 
 			m_exrgb = BIT(data, 0);       // Select which CG Board outputs signal
 
-			m_cg_view.select(m_konppc->get_cgboard_id() ? 1 : 0);
+			m_cg_view.select(exid);
 			break;
+		}
 
 		default:
 			break;
@@ -491,6 +493,34 @@ void nwktr_state::ppc_map(address_map &map)
 	m_cg_view[1](0x74010000, 0x7401ffff).ram().w(m_palette[1], FUNC(palette_device::write32)).share("palette2");
 	m_cg_view[1](0x74020000, 0x7403ffff).rw(m_k001604[1], FUNC(k001604_device::tile_r), FUNC(k001604_device::tile_w));
 	m_cg_view[1](0x74040000, 0x7407ffff).rw(m_k001604[1], FUNC(k001604_device::char_r), FUNC(k001604_device::char_w));
+	// racingj broadcast
+	m_cg_view[2](0x74000000, 0x740000ff).lw32(
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			m_k001604[0]->reg_w(offset, data, mem_mask);
+			m_k001604[1]->reg_w(offset, data, mem_mask);
+		})
+	);
+	m_cg_view[2](0x74010000, 0x7401ffff).lw32(
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			m_palette[0]->write32(offset, data, mem_mask);
+			m_palette[1]->write32(offset, data, mem_mask);
+		})
+	);
+	m_cg_view[2](0x74020000, 0x7403ffff).lw32(
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			m_k001604[0]->tile_w(offset, data, mem_mask);
+			m_k001604[1]->tile_w(offset, data, mem_mask);
+		})
+	);
+	m_cg_view[2](0x74040000, 0x7407ffff).lw32(
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			m_k001604[0]->char_w(offset, data, mem_mask);
+			m_k001604[1]->char_w(offset, data, mem_mask);
+		})
+	);
+	// racingj POST only, assume unmapped
+	m_cg_view[3](0x74000000, 0x7407ffff).unmaprw();
+
 	map(0x78000000, 0x7800ffff).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_shared_r_ppc), FUNC(konppc_device::cgboard_dsp_shared_w_ppc));
 	map(0x780c0000, 0x780c0003).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_comm_r_ppc), FUNC(konppc_device::cgboard_dsp_comm_w_ppc));
 	map(0x7d000000, 0x7d00ffff).r(FUNC(nwktr_state::sysreg_r));
@@ -1746,53 +1776,51 @@ ROM_END
 
 /*****************************************************************************/
 
-#define GAME_FLAGS (MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-
 // GNxxx -> 5+R gear shift (8-way joystick), clutch pedal, hand brake lever
 // GYxxx -> Same as GN but intended for the 'super deluxe' cab (Cobra system). GY676 RTC is interchangable between Cobra and NWK-TR Racing Jam
 // GPxxx, GExxx, GMxxx -> up/down gear shift, no clutch, hand brake lever
 // GQxxx -> up/down gear shift, no clutch, no hand brake lever
 // Change the first two bytes in the NVRAM and fix the checksum at 0x0e-0x0f (calculated as the negated sum of 0x00-0x0e as 16-bit big endian values)
 // to generate new NVRAMs.
-GAME( 1998, racingj,    0,        nwktr, nwktr_gq, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GQ676UAC)",               GAME_FLAGS )
-GAME( 1998, racingje,   racingj,  nwktr, nwktr_gq, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GQ676EAC)",               GAME_FLAGS )
-GAME( 1998, racingjj,   racingj,  nwktr, nwktr_gq, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GQ676JAC)",               GAME_FLAGS )
-GAME( 1998, racingja,   racingj,  nwktr, nwktr_gq, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GQ676AAC)",               GAME_FLAGS )
-GAME( 1998, racingjm,   racingj,  nwktr, nwktr_gm, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GM676UAC)",               GAME_FLAGS )
-GAME( 1998, racingjme,  racingj,  nwktr, nwktr_gm, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GM676EAC)",               GAME_FLAGS )
-GAME( 1998, racingjmj,  racingj,  nwktr, nwktr_gm, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GM676JAC)",               GAME_FLAGS )
-GAME( 1998, racingjma,  racingj,  nwktr, nwktr_gm, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GM676AAC)",               GAME_FLAGS )
-GAME( 1998, racingjn,   racingj,  nwktr, nwktr_gn, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GN676UAC)",               GAME_FLAGS )
-GAME( 1998, racingjne,  racingj,  nwktr, nwktr_gn, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GN676EAC)",               GAME_FLAGS )
-GAME( 1998, racingjnj,  racingj,  nwktr, nwktr_gn, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GN676JAC)",               GAME_FLAGS )
-GAME( 1998, racingjna,  racingj,  nwktr, nwktr_gn, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GN676AAC)",               GAME_FLAGS )
+GAME( 1998, racingj,    0,        nwktr, nwktr_gq, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GQ676UAC)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, racingje,   racingj,  nwktr, nwktr_gq, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GQ676EAC)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, racingjj,   racingj,  nwktr, nwktr_gq, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GQ676JAC)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, racingja,   racingj,  nwktr, nwktr_gq, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GQ676AAC)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, racingjm,   racingj,  nwktr, nwktr_gm, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GM676UAC)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, racingjme,  racingj,  nwktr, nwktr_gm, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GM676EAC)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, racingjmj,  racingj,  nwktr, nwktr_gm, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GM676JAC)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, racingjma,  racingj,  nwktr, nwktr_gm, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GM676AAC)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, racingjn,   racingj,  nwktr, nwktr_gn, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GN676UAC)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, racingjne,  racingj,  nwktr, nwktr_gn, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GN676EAC)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, racingjnj,  racingj,  nwktr, nwktr_gn, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GN676JAC)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, racingjna,  racingj,  nwktr, nwktr_gn, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GN676AAC)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1998, racingj2,   0,        nwktr, nwktr_gq, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GQ888UAA)",   GAME_FLAGS )
-GAME( 1998, racingj2e,  racingj2, nwktr, nwktr_gq, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GQ888EAA)",   GAME_FLAGS )
-GAME( 1998, racingj2j,  racingj2, nwktr, nwktr_gq, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GQ888JAA)",   GAME_FLAGS )
-GAME( 1998, racingj2a,  racingj2, nwktr, nwktr_gq, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GQ888AAA)",   GAME_FLAGS )
-GAME( 1998, racingj2m,  racingj2, nwktr, nwktr_gm, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GM888UAA)",   GAME_FLAGS )
-GAME( 1998, racingj2me, racingj2, nwktr, nwktr_gm, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GM888EAA)",   GAME_FLAGS )
-GAME( 1998, racingj2mj, racingj2, nwktr, nwktr_gm, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GM888JAA)",   GAME_FLAGS )
-GAME( 1998, racingj2ma, racingj2, nwktr, nwktr_gm, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GM888AAA)",   GAME_FLAGS )
-GAME( 1998, racingj2n,  racingj2, nwktr, nwktr_gn, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GN888UAA)",   GAME_FLAGS )
-GAME( 1998, racingj2ne, racingj2, nwktr, nwktr_gn, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GN888EAA)",   GAME_FLAGS )
-GAME( 1998, racingj2nj, racingj2, nwktr, nwktr_gn, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GN888JAA)",   GAME_FLAGS )
-GAME( 1998, racingj2na, racingj2, nwktr, nwktr_gn, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GN888AAA)",   GAME_FLAGS )
+GAME( 1998, racingj2,   0,        nwktr, nwktr_gq, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GQ888UAA)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, racingj2e,  racingj2, nwktr, nwktr_gq, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GQ888EAA)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, racingj2j,  racingj2, nwktr, nwktr_gq, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GQ888JAA)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, racingj2a,  racingj2, nwktr, nwktr_gq, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GQ888AAA)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, racingj2m,  racingj2, nwktr, nwktr_gm, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GM888UAA)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, racingj2me, racingj2, nwktr, nwktr_gm, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GM888EAA)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, racingj2mj, racingj2, nwktr, nwktr_gm, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GM888JAA)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, racingj2ma, racingj2, nwktr, nwktr_gm, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GM888AAA)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, racingj2n,  racingj2, nwktr, nwktr_gn, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GN888UAA)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, racingj2ne, racingj2, nwktr, nwktr_gn, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GN888EAA)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, racingj2nj, racingj2, nwktr, nwktr_gn, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GN888JAA)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, racingj2na, racingj2, nwktr, nwktr_gn, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GN888AAA)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // JAx, ABx --> 5+R gear shift (8-way joystick), clutch pedal, hand brake lever
 // JCx, ACx, UDx --> up/down gear shift, no clutch, hand brake lever
 // EDx --> prompts you to select if you have a hand brake lever installed, a clutch pedal installed,
 // gear shifter type (up/down, 4 pos, or 5+R), and gear shifter's display position.
-GAME( 1998, thrilld,    0,       nwktr_lan_b, nwktr_gm, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (UDE)",             GAME_FLAGS )
-GAME( 1998, thrilldj,   thrilld, nwktr_lan_b, nwktr_gm, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (JCE)",             GAME_FLAGS )
-GAME( 1998, thrilldja,  thrilld, nwktr_lan_b, nwktr_gn, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (JAE)",             GAME_FLAGS )
-GAME( 1998, thrillde,   thrilld, nwktr_lan_b, thrillde, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (EDE)",             GAME_FLAGS )
-GAME( 1998, thrillda,   thrilld, nwktr_lan_b, nwktr_gm, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (ACE)",             GAME_FLAGS )
-GAME( 1998, thrilldab,  thrilld, nwktr_lan_b, nwktr_gn, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (ABE)",             GAME_FLAGS )
-GAME( 1998, thrilldb,   thrilld, nwktr_lan_b, nwktr_gm, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (UDB)",             GAME_FLAGS )
-GAME( 1998, thrilldbj,  thrilld, nwktr_lan_b, nwktr_gm, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (JCB)",             GAME_FLAGS )
-GAME( 1998, thrilldbja, thrilld, nwktr_lan_b, nwktr_gn, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (JAB)",             GAME_FLAGS )
-GAME( 1998, thrilldbe,  thrilld, nwktr_lan_b, thrillde, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (EDB)",             GAME_FLAGS )
-GAME( 1998, thrilldba,  thrilld, nwktr_lan_b, nwktr_gm, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (ACB)",             GAME_FLAGS )
-GAME( 1998, thrilldbab, thrilld, nwktr_lan_b, nwktr_gn, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (ABB)",             GAME_FLAGS )
+GAME( 1998, thrilld,    0,       nwktr_lan_b, nwktr_gm, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (UDE)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, thrilldj,   thrilld, nwktr_lan_b, nwktr_gm, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (JCE)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, thrilldja,  thrilld, nwktr_lan_b, nwktr_gn, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (JAE)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, thrillde,   thrilld, nwktr_lan_b, thrillde, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (EDE)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, thrillda,   thrilld, nwktr_lan_b, nwktr_gm, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (ACE)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, thrilldab,  thrilld, nwktr_lan_b, nwktr_gn, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (ABE)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, thrilldb,   thrilld, nwktr_lan_b, nwktr_gm, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (UDB)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, thrilldbj,  thrilld, nwktr_lan_b, nwktr_gm, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (JCB)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, thrilldbja, thrilld, nwktr_lan_b, nwktr_gn, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (JAB)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, thrilldbe,  thrilld, nwktr_lan_b, thrillde, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (EDB)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, thrilldba,  thrilld, nwktr_lan_b, nwktr_gm, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (ACB)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, thrilldbab, thrilld, nwktr_lan_b, nwktr_gn, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (ABB)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
