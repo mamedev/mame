@@ -28,10 +28,10 @@ k001005_renderer::k001005_renderer(device_t &parent, screen_device &screen, devi
 	int const width = 512;
 	int const height = 384;
 
-	m_fb[0] = std::make_unique<bitmap_rgb32>(width, height);
-	m_fb[1] = std::make_unique<bitmap_rgb32>(width, height);
+	m_fb[0].allocate(width, height);
+	m_fb[1].allocate(width, height);
 
-	m_zb = std::make_unique<bitmap_ind32>(width, height);
+	m_zb.allocate(width, height);
 
 	m_3dfifo = std::make_unique<uint32_t []>(0x10000);
 	m_3dfifo_ptr = 0;
@@ -75,9 +75,9 @@ k001005_renderer::k001005_renderer(device_t &parent, screen_device &screen, devi
 	// save state
 	parent.save_pointer(NAME(m_3dfifo), 0x10000);
 	parent.save_item(NAME(m_3dfifo_ptr));
-	parent.save_item(NAME(*m_fb[0]));
-	parent.save_item(NAME(*m_fb[1]));
-	parent.save_item(NAME(*m_zb));
+	parent.save_item(NAME(m_fb[0]));
+	parent.save_item(NAME(m_fb[1]));
+	parent.save_item(NAME(m_zb));
 	parent.save_item(NAME(m_fb_page));
 	parent.save_item(NAME(m_light_r));
 	parent.save_item(NAME(m_light_g));
@@ -122,10 +122,10 @@ void k001005_renderer::swap_buffers()
 {
 	m_fb_page ^= 1;
 
-	m_fb[m_fb_page]->fill(0, m_cliprect);
+	m_fb[m_fb_page].fill(0, m_cliprect);
 
 	float const zvalue = 10000000000.0F;
-	m_zb->fill(*(int*)&zvalue, m_cliprect);
+	m_zb.fill(*(int*)&zvalue, m_cliprect);
 }
 
 bool k001005_renderer::fifo_filled()
@@ -139,8 +139,8 @@ void k001005_renderer::draw_scanline_generic(int32_t scanline, const extent_t& e
 {
 	k001006_device* k001006 = downcast<k001006_device*>(m_k001006);
 
-	uint32_t *const fb = &m_fb[m_fb_page]->pix(scanline);
-	float *const zb = (float*)&m_zb->pix(scanline);
+	uint32_t *const fb = &m_fb[m_fb_page].pix(scanline);
+	float *const zb = (float*)&m_zb.pix(scanline);
 
 	float z = extent.param[POLY_Z].start;
 	float const dz = extent.param[POLY_Z].dpdx;
@@ -690,7 +690,7 @@ void k001005_renderer::draw(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	for (int j = cliprect.min_y; j <= cliprect.max_y; j++)
 	{
 		uint32_t *const bmp = &bitmap.pix(j);
-		uint32_t const *const src = &m_fb[m_fb_page ^ 1]->pix(j - cliprect.min_y);
+		uint32_t const *const src = &m_fb[m_fb_page ^ 1].pix(j - cliprect.min_y);
 
 		for (int i = cliprect.min_x; i <= cliprect.max_x; i++)
 		{
