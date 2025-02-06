@@ -7,9 +7,11 @@ AAJ-11 PCB
 
 TODO:
 - CRTC processes params as 1088x224 with char width 8;
-- Writes RAM NG 8AF0 if NMI is triggered;
-- Resets itself in attract sequence;
-- Inputs (from AY8910 ports at very least);
+- Resets itself in attract sequence, thrash protection?
+\- bp b85,1,{pc+=3;g} to bypass for a bit;
+- Implement 2x IOX for inputs;
+- Writes RAM NG 8AF0 if NMI is triggered, is it even used?
+- "AY8910 upper address mismatch";
 
 ===================================================================================================
 
@@ -84,15 +86,15 @@ void hanadojo_state::palette_init(palette_device &palette) const
 	for (int i = 0; i < 0x20; i++)
 	{
 		int bit0, bit1, bit2;
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = (color_prom[i] >> 3) & 0x01;
-		bit1 = (color_prom[i] >> 4) & 0x01;
-		bit2 = (color_prom[i] >> 5) & 0x01;
-		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 		bit0 = 0;
+		bit1 = (color_prom[i] >> 0) & 0x01;
+		bit2 = (color_prom[i] >> 1) & 0x01;
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (color_prom[i] >> 2) & 0x01;
+		bit1 = (color_prom[i] >> 3) & 0x01;
+		bit2 = (color_prom[i] >> 4) & 0x01;
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (color_prom[i] >> 5) & 0x01;
 		bit1 = (color_prom[i] >> 6) & 0x01;
 		bit2 = (color_prom[i] >> 7) & 0x01;
 		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
@@ -130,7 +132,7 @@ uint32_t hanadojo_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 			const u16 value = m_videoram[tile_address] | (m_videoram[tile_address + 1] << 8);
 			u16 tile = value & 0xff;
 			tile |= (value & 0xe000) >> 5;
-			u8 color = (value >> 8) & 0x0f;
+			u8 color = (value >> 8) & 0x1f;
 
 			gfx->zoom_opaque(bitmap, cliprect, tile, color, 0, 0, x * dx, y * 8, cclk_x, 0x10000);
 		}
@@ -156,8 +158,10 @@ void hanadojo_state::io_map(address_map &map)
 
 	map(0x20, 0x20).w("crtc", FUNC(hd6845s_device::address_w));
 	map(0x21, 0x21).w("crtc", FUNC(hd6845s_device::register_w));
-	// resets sooner if either is high
+	// TODO: 2x IOX!
+	// player inputs, PATSW 2
 	map(0x40, 0x41).lr8(NAME([] () { return 0; }));
+	// coinage (cfr. init at $61), service buttons, dip bank B
 	map(0x60, 0x61).lr8(NAME([] () { return 0; }));
 
 	map(0x80, 0x80).nopw(); // very noisy, just watchdog?
@@ -166,24 +170,56 @@ void hanadojo_state::io_map(address_map &map)
 
 static INPUT_PORTS_START( hanadojo )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_DIPNAME( 0x01, 0x01, "IN0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_DIPNAME( 0x01, 0x01, "IN1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW1")
 	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW1:1")
@@ -193,7 +229,7 @@ static INPUT_PORTS_START( hanadojo )
 	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW1:5")
 	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW1:6")
 	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW1:7")
-	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW1:8")
+	PORT_SERVICE_DIPLOC(0x80, IP_ACTIVE_HIGH, "SW1:8")
 
 	PORT_START("DSW2")
 	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW2:1")
@@ -246,6 +282,8 @@ void hanadojo_state::hanadojo(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 
 	ay8910_device &ay(AY8910(config, "ay", 12_MHz_XTAL / 16)); // divider guessed
+//  ay.port_a_read_callback()
+	ay.port_b_read_callback().set_ioport("DSW1");
 	ay.add_route(ALL_OUTPUTS, "speaker", 0.33);
 }
 
