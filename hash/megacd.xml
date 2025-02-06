@@ -4275,7 +4275,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<software name="eternalcu">
+	<software name="eternalcu" cloneof="eternalc">
 		<!-- http://redump.org/disc/2263/
 		<rom name="Eternal Champions - Challenge from the Dark Side (USA).cue" size="2813" crc="c12d13d7" />
 		<rom name="Eternal Champions - Challenge from the Dark Side (USA) (Track 01).bin" size="155641248" crc="5fd53235" />
