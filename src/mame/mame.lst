@@ -22074,9 +22074,13 @@ intlc8
 intlc8m80
 =======
 intlc8                          //
+<<<<<<< HEAD
 intlc8m80a                      //
 intlc8m80b                      //
 >>>>>>> 8e4976ef6d0 (intel/intellec8.cpp: Add two Intellec 8 MOD80 sets (#13327))
+=======
+intlc8m80                       //
+>>>>>>> d246968ffcb (Cleaned up some recent commits.)
 
 @source:intel/ipc.cpp
 ipb

@@ -20,45 +20,49 @@ We output a leader, followed by the contents of the H8T file.
 
 namespace {
 
-static constexpr double ONE_FREQ              = 1200.0;
-static constexpr double ONE_FREQ_VARIANCE     = 300.0;
-static constexpr double ZERO_FREQ             = 2400.0;
-static constexpr double ZERO_FREQ_VARIANCE    = 600.0;
+constexpr double ONE_FREQ              = 1200.0;
+constexpr double ONE_FREQ_VARIANCE     = 300.0;
+constexpr double ZERO_FREQ             = 2400.0;
+constexpr double ZERO_FREQ_VARIANCE    = 600.0;
 
-static const cassette_image::Modulation heath_h8t_modulation =
+const cassette_image::Modulation heath_h8t_modulation =
 {
 	cassette_image::MODULATION_SINEWAVE,
 	ONE_FREQ - ONE_FREQ_VARIANCE,   ONE_FREQ,  ONE_FREQ + ONE_FREQ_VARIANCE,
 	ZERO_FREQ - ZERO_FREQ_VARIANCE, ZERO_FREQ, ZERO_FREQ + ZERO_FREQ_VARIANCE
 };
 
-static cassette_image::error heath_h8t_identify(cassette_image *cassette, cassette_image::Options *opts)
+cassette_image::error heath_h8t_identify(cassette_image *cassette, cassette_image::Options *opts)
 {
 	return cassette->modulation_identify(heath_h8t_modulation, opts);
 }
 
 
-#define MODULATE(_value) \
-	for (int i = 0; i < (_value ? 8 : 4); i++) { \
-		err = cassette->put_modulated_data_bit(0, time_index, _value, heath_h8t_modulation, &time_displacement); \
-		if (err != cassette_image::error::SUCCESS) return err; \
-		time_index += time_displacement; \
-	}
-
-static cassette_image::error heath_h8t_load(cassette_image *cassette)
+cassette_image::error heath_h8t_load(cassette_image *cassette)
 {
 	cassette_image::error err = cassette_image::error::SUCCESS;
 	uint64_t image_size = cassette->image_size();
 	double time_index = 0.0;
 	double time_displacement;
 
-	// leader - 1 second
-	while (time_index < 1.0)
-	{
-		MODULATE(1);
-	}
+	auto const MODULATE =
+			[&cassette, &err, &time_index, &time_displacement] (unsigned value)
+			{
+				for (int i = 0; (i < (value ? 8 : 4)); i++)
+				{
+					err = cassette->put_modulated_data_bit(0, time_index, value, heath_h8t_modulation, &time_displacement);
+					if (cassette_image::error::SUCCESS == err)
+						time_index += time_displacement;
+					else
+						return;
+				}
+			};
 
-	for (uint64_t image_pos = 0; image_pos < image_size; image_pos++)
+	// leader - 1 second
+	while ((cassette_image::error::SUCCESS == err) && (time_index < 1.0))
+		MODULATE(1);
+
+	for (uint64_t image_pos = 0; (cassette_image::error::SUCCESS == err) && (image_pos < image_size); image_pos++)
 	{
 		uint8_t data = cassette->image_read_byte(image_pos);
 
@@ -66,13 +70,12 @@ static cassette_image::error heath_h8t_load(cassette_image *cassette)
 		MODULATE(0);
 
 		// data bits
-		for (int bit = 0; bit < 8; bit++)
-		{
+		for (int bit = 0; (cassette_image::error::SUCCESS == err) && (bit < 8); bit++)
 			MODULATE(util::BIT(data, bit));
-		}
 
 		// stop bit
-		MODULATE(1);
+		if (cassette_image::error::SUCCESS == err)
+			MODULATE(1);
 	}
 
 	return err;
