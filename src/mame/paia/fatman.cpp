@@ -72,10 +72,10 @@ until a restart or reset (F3).
 // Emulates a (DC) RC circuit with a variable resistance. Useful for emulating
 // envelope generators. This is not a simulation, just uses the standard RC
 // equations to return voltage at a specific time.
-class fatman_rc_network_state : public device_t
+class fatman_rc_network_state_device : public device_t
 {
 public:
-	fatman_rc_network_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0) ATTR_COLD;
+	fatman_rc_network_state_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0) ATTR_COLD;
 
 	void set_c(float c);
 	void reset(float v_target, float r, const attotime &t);
@@ -93,14 +93,14 @@ private:
 	attotime m_start_t;
 };
 
-DEFINE_DEVICE_TYPE(FATMAN_RC_NETWORK_STATE, fatman_rc_network_state, "fatman_rc_network_state", "Fatman EG RC network");
+DEFINE_DEVICE_TYPE(FATMAN_RC_NETWORK_STATE, fatman_rc_network_state_device, "fatman_rc_network_state", "Fatman EG RC network");
 
-fatman_rc_network_state::fatman_rc_network_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+fatman_rc_network_state_device::fatman_rc_network_state_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, FATMAN_RC_NETWORK_STATE, tag, owner, clock)
 {
 }
 
-void fatman_rc_network_state::device_start()
+void fatman_rc_network_state_device::device_start()
 {
 	save_item(NAME(m_c));
 	save_item(NAME(m_r));
@@ -109,12 +109,12 @@ void fatman_rc_network_state::device_start()
 	save_item(NAME(m_start_t));
 }
 
-void fatman_rc_network_state::set_c(float c)
+void fatman_rc_network_state_device::set_c(float c)
 {
 	m_c = c;
 }
 
-void fatman_rc_network_state::reset(float v_target, float r, const attotime &t)
+void fatman_rc_network_state_device::reset(float v_target, float r, const attotime &t)
 {
 	m_v_start = get_v(t);
 	m_v_end = v_target;
@@ -122,7 +122,7 @@ void fatman_rc_network_state::reset(float v_target, float r, const attotime &t)
 	m_start_t = t;
 }
 
-float fatman_rc_network_state::get_v(const attotime &t) const
+float fatman_rc_network_state_device::get_v(const attotime &t) const
 {
 	assert(t >= m_start_t);
 	const attotime delta_t = t - m_start_t;
@@ -187,8 +187,8 @@ private:
 	void external_memory_map(address_map &map) ATTR_COLD;
 
 	required_device<mcs51_cpu_device> m_maincpu;
-	required_device<fatman_rc_network_state> m_vca_adsr_state;
-	required_device<fatman_rc_network_state> m_vcf_ar_state;
+	required_device<fatman_rc_network_state_device> m_vca_adsr_state;
+	required_device<fatman_rc_network_state_device> m_vcf_ar_state;
 	required_device<pwm_display_device> m_midi_led_pwm;  // D2
 	output_finder<> m_gate_led;  // D13
 	required_ioport m_dsw_io;
