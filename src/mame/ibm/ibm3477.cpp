@@ -106,9 +106,6 @@ ROM_START( ibm3477 )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD("pn_38f5843_ibm_30-10-89.zm12", 0x00000, 0x20000, CRC(b07efb93) SHA1(84d245d17828bc4e096e0cae2d066f2209f56a8f) )
 	ROM_LOAD("pn_38f5844_ibm_20-10-89.zm13", 0x20000, 0x20000, CRC(05f3c0f6) SHA1(f99096a2f3e97fe1eb540db3f3e620ddccf71bbc) )
-
-	ROM_REGION( 0x2000, "chargen", 0 )
-	ROM_LOAD( "char.bin", 0x0000, 0x2000, NO_DUMP ) // probably inside the video processor
 ROM_END
 
 } // anonymous namespace
