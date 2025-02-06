@@ -57,7 +57,7 @@ void magibook_state::magibook(machine_config &config)
 	SPEAKER(config, "mono").front_left();
 }
 
-// Spanish machine, may be different between regions.
+// Spanish machine on VTech 6021 hardware, may be different between regions.
 ROM_START( magibooksp )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "internal.u200", 0x00000, 0x10000, NO_DUMP ) // Unknown internal ROM size, if any
