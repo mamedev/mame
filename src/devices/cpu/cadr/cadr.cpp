@@ -10,6 +10,7 @@ TODO:
 - Not all ALU operations are supported.
 - Most 'Misc functions' on instructions are not supported.
 - Sequence break not supported.
+- Most of the diagnostic/spy interface is not supported.
 
 ***************************************************************************/
 

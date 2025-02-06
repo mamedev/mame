@@ -126,7 +126,7 @@ void cadr_state::mem_map(address_map &map)
 
 	map(0x3ff420, 0x3ff43f).rw(m_iob, FUNC(cadr_iob_device::read), FUNC(cadr_iob_device::write)).umask32(0x0000ffff);
 
-	// 766020 - 766037
+	// 766000 - 766017 - diagnostic interface
 	map(0x3ff600, 0x3ff60f).rw(m_maincpu, FUNC(cadr_cpu_device::diag_r), FUNC(cadr_cpu_device::diag_w)).umask32(0x0000ffff);
 
 	// 3ff610/3ff611 - 766040/766042 - interrupt status

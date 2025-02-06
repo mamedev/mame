@@ -18,6 +18,8 @@ class cadr_iob_device : public device_t
 public:
 	cadr_iob_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+	static constexpr feature_type unemulated_features() { return feature::LAN; }
+
 	// configuration
 	auto irq_vector_callback() { return m_irq_vector_cb.bind(); }
 
