@@ -484,10 +484,6 @@ void k053247_device::zdrawgfxzoom32GP(
 
 	u32 *dst_ptr = &bitmap.pix(0);
 	const int dst_pitch = bitmap.rowpixels();
-	const int dst_minx  = cliprect.min_x;
-	const int dst_maxx  = cliprect.max_x;
-	const int dst_miny  = cliprect.min_y;
-	const int dst_maxy  = cliprect.max_y;
 	int dst_x = sx;
 	int dst_y = sy;
 
@@ -512,28 +508,29 @@ void k053247_device::zdrawgfxzoom32GP(
 		src_fdx = src_fw / dst_w;
 		src_fdy = src_fh / dst_h;
 	}
+
 	const int dst_lastx = dst_x + dst_w - 1;
 	const int dst_lasty = dst_y + dst_h - 1;
-	if (dst_lastx < dst_minx || dst_lasty < dst_miny) return;
+	if (dst_lastx < cliprect.min_x || dst_lasty < cliprect.min_y) return;
 
 	// clip destination
 	int dst_skipx = 0;
-	if (int eax = dst_minx - dst_x; eax > 0)
+	if (int delta_min_x = cliprect.min_x - dst_x; delta_min_x > 0)
 	{
-		dst_skipx = eax;
-		dst_w -= eax;
-		dst_x = dst_minx;
+		dst_skipx = delta_min_x;
+		dst_w -= delta_min_x;
+		dst_x = cliprect.min_x;
 	}
-	if (int eax = dst_lastx - dst_maxx; eax > 0) dst_w -= eax;
+	if (int delta_max_x = dst_lastx - cliprect.max_x; delta_max_x > 0) dst_w -= delta_max_x;
 	
 	int dst_skipy = 0;
-	if (int eax = dst_miny - dst_y; eax > 0)
+	if (int delta_min_y = cliprect.min_y - dst_y; delta_min_y > 0)
 	{
-		dst_skipy = eax;
-		dst_h -= eax;
-		dst_y = dst_miny;
+		dst_skipy = delta_min_y;
+		dst_h -= delta_min_y;
+		dst_y = cliprect.min_y;
 	}
-	if (int eax = dst_lasty - dst_maxy; eax > 0) dst_h -= eax;
+	if (int delta_max_y = dst_lasty - cliprect.max_y; delta_max_y > 0) dst_h -= delta_max_y;
 
 	int src_fby, src_fbx;
 
@@ -552,9 +549,9 @@ void k053247_device::zdrawgfxzoom32GP(
 	src_fby += dst_skipy * src_fdy;
 
 	// adjust insertion points and pre-entry constants
-	const int eax = (dst_y - dst_miny) * GX_ZBUFW + (dst_x - dst_minx) + dst_w;
-	ozbuf_ptr += eax;
-	szbuf_ptr += eax << 1;
+	const int offset = (dst_y - cliprect.min_y) * GX_ZBUFW + (dst_x - cliprect.min_x) + dst_w;
+	ozbuf_ptr += offset;
+	szbuf_ptr += offset << 1;
 	const u8 z8 = (u8)zcode;
 	const u8 p8 = (u8)pri;
 	dst_ptr += dst_y * dst_pitch + dst_x + dst_w;
@@ -576,11 +573,11 @@ void k053247_device::zdrawgfxzoom32GP(
 		{
 			do {
 				do {
-					const u8 eax = src_ptr[src_x];
+					const u8 pal_idx = src_ptr[src_x];
 					src_x = src_fx >> FP;
 					src_fx += src_fdx;
-					if (!eax || eax >= shdpen) continue;
-					dst_ptr [ecx] = pal_base[eax];
+					if (!pal_idx || pal_idx >= shdpen) continue;
+					dst_ptr[ecx] = pal_base[pal_idx];
 				}
 				while (++ecx);
 
@@ -601,12 +598,12 @@ void k053247_device::zdrawgfxzoom32GP(
 				case 0: // all pens solid
 					do {
 						do {
-							const u8 eax = src_ptr[src_x];
+							const u8 pal_idx = src_ptr[src_x];
 							src_x = src_fx >> FP;
 							src_fx += src_fdx;
-							if (!eax || ozbuf_ptr[ecx] < z8) continue;
+							if (!pal_idx || ozbuf_ptr[ecx] < z8) continue;
 							ozbuf_ptr[ecx] = z8;
-							dst_ptr[ecx] = pal_base[eax];
+							dst_ptr[ecx] = pal_base[pal_idx];
 						}
 						while (++ecx);
 
@@ -625,12 +622,12 @@ void k053247_device::zdrawgfxzoom32GP(
 				case 1: // solid pens only
 					do {
 						do {
-							const u8 eax = src_ptr[src_x];
+							const u8 pal_idx = src_ptr[src_x];
 							src_x = src_fx >> FP;
 							src_fx += src_fdx;
-							if (!eax || eax >= shdpen || ozbuf_ptr[ecx] < z8) continue;
+							if (!pal_idx || pal_idx >= shdpen || ozbuf_ptr[ecx] < z8) continue;
 							ozbuf_ptr[ecx] = z8;
-							dst_ptr[ecx] = pal_base[eax];
+							dst_ptr[ecx] = pal_base[pal_idx];
 						}
 						while (++ecx);
 
@@ -649,12 +646,12 @@ void k053247_device::zdrawgfxzoom32GP(
 				case 2: // all pens solid with alpha blending
 					do {
 						do {
-							const u8 eax = src_ptr[src_x];
+							const u8 pal_idx = src_ptr[src_x];
 							src_x = src_fx >> FP;
 							src_fx += src_fdx;
-							if (!eax || ozbuf_ptr[ecx] < z8) continue;
+							if (!pal_idx || ozbuf_ptr[ecx] < z8) continue;
 							ozbuf_ptr[ecx] = z8;
-							dst_ptr[ecx] = alpha_blend_r32(dst_ptr[ecx], pal_base[eax], alpha);
+							dst_ptr[ecx] = alpha_blend_r32(dst_ptr[ecx], pal_base[pal_idx], alpha);
 						}
 						while (++ecx);
 
@@ -673,12 +670,12 @@ void k053247_device::zdrawgfxzoom32GP(
 				case 3: // solid pens only with alpha blending
 					do {
 						do {
-							const u8 eax = src_ptr[src_x];
+							const u8 pal_idx = src_ptr[src_x];
 							src_x = src_fx >> FP;
 							src_fx += src_fdx;
-							if (!eax || eax >= shdpen || ozbuf_ptr[ecx] < z8) continue;
+							if (!pal_idx || pal_idx >= shdpen || ozbuf_ptr[ecx] < z8) continue;
 							ozbuf_ptr[ecx] = z8;
-							dst_ptr[ecx] = alpha_blend_r32(dst_ptr[ecx], pal_base[eax], alpha);
+							dst_ptr[ecx] = alpha_blend_r32(dst_ptr[ecx], pal_base[pal_idx], alpha);
 						}
 						while (++ecx);
 
@@ -697,10 +694,10 @@ void k053247_device::zdrawgfxzoom32GP(
 				case 4: // shadow pens only
 					do {
 						do {
-							const u8 eax = src_ptr[src_x];
+							const u8 pal_idx = src_ptr[src_x];
 							src_x = src_fx >> FP;
 							src_fx += src_fdx;
-							if (eax < shdpen || szbuf_ptr[ecx*2] < z8 || szbuf_ptr[ecx*2+1] <= p8) continue;
+							if (pal_idx < shdpen || szbuf_ptr[ecx*2] < z8 || szbuf_ptr[ecx*2+1] <= p8) continue;
 							rgb_t pix = dst_ptr[ecx];
 							szbuf_ptr[ecx*2] = z8;
 							szbuf_ptr[ecx*2+1] = p8;
@@ -735,10 +732,10 @@ void k053247_device::zdrawgfxzoom32GP(
 		{
 			do {
 				do {
-					const u8 eax = *src_ptr;
+					const u8 pal_idx = *src_ptr;
 					src_ptr += src_fdx;
-					if (!eax || eax >= shdpen) continue;
-					dst_ptr[ecx] = pal_base[eax];
+					if (!pal_idx || pal_idx >= shdpen) continue;
+					dst_ptr[ecx] = pal_base[pal_idx];
 				}
 				while (++ecx);
 
@@ -755,11 +752,11 @@ void k053247_device::zdrawgfxzoom32GP(
 				case 0: // all pens solid
 					do {
 						do {
-							const u8 eax = *src_ptr;
+							const u8 pal_idx = *src_ptr;
 							src_ptr += src_fdx;
-							if (!eax || ozbuf_ptr[ecx] < z8) continue;
+							if (!pal_idx || ozbuf_ptr[ecx] < z8) continue;
 							ozbuf_ptr[ecx] = z8;
-							dst_ptr[ecx] = pal_base[eax];
+							dst_ptr[ecx] = pal_base[pal_idx];
 						}
 						while (++ecx);
 
@@ -774,11 +771,11 @@ void k053247_device::zdrawgfxzoom32GP(
 				case 1:  // solid pens only
 					do {
 						do {
-							const u8 eax = *src_ptr;
+							const u8 pal_idx = *src_ptr;
 							src_ptr += src_fdx;
-							if (!eax || eax >= shdpen || ozbuf_ptr[ecx] < z8) continue;
+							if (!pal_idx || pal_idx >= shdpen || ozbuf_ptr[ecx] < z8) continue;
 							ozbuf_ptr[ecx] = z8;
-							dst_ptr[ecx] = pal_base[eax];
+							dst_ptr[ecx] = pal_base[pal_idx];
 						}
 						while (++ecx);
 
@@ -793,11 +790,11 @@ void k053247_device::zdrawgfxzoom32GP(
 				case 2: // all pens solid with alpha blending
 					do {
 						do {
-							const u8 eax = *src_ptr;
+							const u8 pal_idx = *src_ptr;
 							src_ptr += src_fdx;
-							if (!eax || ozbuf_ptr[ecx] < z8) continue;
+							if (!pal_idx || ozbuf_ptr[ecx] < z8) continue;
 							ozbuf_ptr[ecx] = z8;
-							dst_ptr[ecx] = alpha_blend_r32(dst_ptr[ecx], pal_base[eax], alpha);
+							dst_ptr[ecx] = alpha_blend_r32(dst_ptr[ecx], pal_base[pal_idx], alpha);
 						}
 						while (++ecx);
 
@@ -812,11 +809,11 @@ void k053247_device::zdrawgfxzoom32GP(
 				case 3: // solid pens only with alpha blending
 					do {
 						do {
-							const u8 eax = *src_ptr;
+							const u8 pal_idx = *src_ptr;
 							src_ptr += src_fdx;
-							if (!eax || eax >= shdpen || ozbuf_ptr[ecx] < z8) continue;
+							if (!pal_idx || pal_idx >= shdpen || ozbuf_ptr[ecx] < z8) continue;
 							ozbuf_ptr[ecx] = z8;
-							dst_ptr[ecx] = alpha_blend_r32(dst_ptr[ecx], pal_base[eax], alpha);
+							dst_ptr[ecx] = alpha_blend_r32(dst_ptr[ecx], pal_base[pal_idx], alpha);
 						}
 						while (++ecx);
 
@@ -831,9 +828,9 @@ void k053247_device::zdrawgfxzoom32GP(
 				case 4: // shadow pens only
 					do {
 						do {
-							const u8 eax = *src_ptr;
+							const u8 pal_idx = *src_ptr;
 							src_ptr += src_fdx;
-							if (eax < shdpen || szbuf_ptr[ecx*2] < z8 || szbuf_ptr[ecx*2+1] <= p8) continue;
+							if (pal_idx < shdpen || szbuf_ptr[ecx*2] < z8 || szbuf_ptr[ecx*2+1] <= p8) continue;
 							rgb_t pix = dst_ptr[ecx];
 							szbuf_ptr[ecx*2] = z8;
 							szbuf_ptr[ecx*2+1] = p8;
