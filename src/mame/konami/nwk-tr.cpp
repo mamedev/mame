@@ -416,12 +416,12 @@ void nwktr_state::sysreg_w(offs_t offset, uint8_t data)
 			m_konppc->set_cgboard_id((data >> 4) & 0x3);
 
 			/* 
-			Racing Jam sets both EXID bits when writing to the tilemap chip before POST. This means 
+			Racing Jam enables both EXID bits when writing to the tilemap chip before POST. This means 
 			writing to both CG boards at the tilemap chip simultaneously. However, broadcasting
-			read/write handlers currently isn't supported and likely will never be for preventing
-			possible race conditions. Due to the way Konami configured this hardware in such an
-			illegal manner, we'll cheat by only using one K001604 instead to show all the tilemap
-			graphics can properly display during POST (and pass "both" tilemap IC tests).
+			read/write handlers in this kind of manner wouldn't be very ideal and could cause undefined
+			values and/or race conditions. Due to the way Konami configured this hardware in such an
+			unorthodox way, we'll cheat by only using one K001604 instead so POST can properly display
+   			its tilemap graphics (and pass "both" tilemap IC tests in the process).
 			*/
 
 //			cg_view_select((data >> 4) & 0x3);  This normally selects which CG board to read/write to (see above note)
