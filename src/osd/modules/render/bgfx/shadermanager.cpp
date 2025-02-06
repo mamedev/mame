@@ -83,6 +83,15 @@ std::string shader_manager::make_path_string(const osd_options &options, const s
 {
 	std::string shader_path(options.bgfx_path());
 	shader_path += PATH_SEPARATOR "shaders" PATH_SEPARATOR;
+
+#if defined(SDLMAME_EMSCRIPTEN)
+	// Hard-code renderer type to OpenGL ES for emscripten builds since the
+	// bgfx::getRendererType() is called here before BGFX has been
+	// initialized and therefore gives the wrong renderer type (Noop).
+	shader_path += "essl" PATH_SEPARATOR;
+	return shader_path;
+#endif
+
 	switch (bgfx::getRendererType())
 	{
 		case bgfx::RendererType::Noop:
