@@ -89,9 +89,7 @@ K055673_CB_MEMBER(mystwarr_state::metamrph_sprite_callback)
 
 	const int shadow = (*color >> 10) & 0b11;
 	const int effect_attributes = ((*color >> 8) & 0b11) << K055555_MIXSHIFT; // used for blending
-	*color = (*color & 0x1f) | m_sprite_colorbase | effect_attributes;
-
-	if (shadow == 0b11) { *color |= K055555_SKIPSHADOW; }
+	*color = (*color & 0x1f) | m_sprite_colorbase | effect_attributes | ((shadow == 0b11) ? K055555_SKIPSHADOW : 0);
 }
 
 K055673_CB_MEMBER(mystwarr_state::gaiapols_sprite_callback)
