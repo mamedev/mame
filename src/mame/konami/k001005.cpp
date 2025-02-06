@@ -33,7 +33,7 @@ k001005_renderer::k001005_renderer(device_t &parent, screen_device &screen, devi
 
 	m_zb = std::make_unique<bitmap_ind32>(width, height);
 
-	m_3dfifo = std::make_unique<uint32_t[]>(0x10000);
+	m_3dfifo = std::make_unique<uint32_t []>(0x10000);
 	m_3dfifo_ptr = 0;
 	m_fb_page = 0;
 	m_light_r = 0;
@@ -60,8 +60,8 @@ k001005_renderer::k001005_renderer(device_t &parent, screen_device &screen, devi
 
 	for (int k = 0; k < 8; k++)
 	{
-		m_tex_mirror_table[0][k] = std::make_unique<int[]>(128);
-		m_tex_mirror_table[1][k] = std::make_unique<int[]>(128);
+		m_tex_mirror_table[0][k] = std::make_unique<int []>(128);
+		m_tex_mirror_table[1][k] = std::make_unique<int []>(128);
 
 		int const size = (k + 1) * 8;
 
@@ -124,7 +124,7 @@ void k001005_renderer::swap_buffers()
 
 	m_fb[m_fb_page]->fill(0, m_cliprect);
 
-	float const zvalue = 10000000000.0f;
+	float const zvalue = 10000000000.0F;
 	m_zb->fill(*(int*)&zvalue, m_cliprect);
 }
 
@@ -139,8 +139,8 @@ void k001005_renderer::draw_scanline_generic(int32_t scanline, const extent_t& e
 {
 	k001006_device* k001006 = downcast<k001006_device*>(m_k001006);
 
-	uint32_t* const fb = &m_fb[m_fb_page]->pix(scanline);
-	float* const zb = (float*)&m_zb->pix(scanline);
+	uint32_t *const fb = &m_fb[m_fb_page]->pix(scanline);
+	float *const zb = (float*)&m_zb->pix(scanline);
 
 	float z = extent.param[POLY_Z].start;
 	float const dz = extent.param[POLY_Z].dpdx;
@@ -208,10 +208,10 @@ void k001005_renderer::draw_scanline_generic(int32_t scanline, const extent_t& e
 		{
 			if (UseTexture)
 			{
-				float const oow = 1.0f / w;
+				float const oow = 1.0F / w;
 
-				int iu = (int)(u * oow);
-				int iv = (int)(v * oow);
+				int iu = int(u * oow);
+				int iv = int(v * oow);
 
 				if (!UseBilinear)
 				{
@@ -526,8 +526,8 @@ int k001005_renderer::parse_polygon(int index, uint32_t cmd)
 				int32_t const tv = (int16_t)(fifo[index] & 0xffff);
 				index++;
 
-				m_vertexb[m_vertexb_ptr].p[POLY_U] = (float)(tu) * m_vertexb[m_vertexb_ptr].p[POLY_W];
-				m_vertexb[m_vertexb_ptr].p[POLY_V] = (float)(tv) * m_vertexb[m_vertexb_ptr].p[POLY_W];
+				m_vertexb[m_vertexb_ptr].p[POLY_U] = float(tu) * m_vertexb[m_vertexb_ptr].p[POLY_W];
+				m_vertexb[m_vertexb_ptr].p[POLY_V] = float(tv) * m_vertexb[m_vertexb_ptr].p[POLY_W];
 			}
 
 			// fog
@@ -703,6 +703,7 @@ void k001005_renderer::draw(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 }
 
 
+
 DEFINE_DEVICE_TYPE(K001005, k001005_device, "k001005", "K001005 Polygon Renderer")
 
 k001005_device::k001005_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -780,40 +781,33 @@ uint32_t k001005_device::read(address_space &space, offs_t offset, uint32_t mem_
 	switch(offset)
 	{
 		case 0x000:         // FIFO read, high 16 bits
-		{
 			//osd_printf_debug("FIFO_r0: %08X\n", m_fifo_read_ptr);
-			uint16_t const value = m_fifo[m_fifo_read_ptr] >> 16;
-			return value;
-		}
+			return m_fifo[m_fifo_read_ptr] >> 16;
 
 		case 0x001:         // FIFO read, low 16 bits
-		{
-			//osd_printf_debug("FIFO_r1: %08X\n", m_fifo_read_ptr);
-			uint16_t const value = m_fifo[m_fifo_read_ptr] & 0xffff;
-
-			if (!machine().side_effects_disabled())
 			{
-				if (m_status != 1 && m_status != 2)
+				//osd_printf_debug("FIFO_r1: %08X\n", m_fifo_read_ptr);
+				uint16_t const value = m_fifo[m_fifo_read_ptr] & 0xffff;
+	
+				if (!machine().side_effects_disabled())
 				{
-					if (m_fifo_read_ptr < 0x3ff)
+					if (m_status != 1 && m_status != 2)
 					{
-						dsp->set_flag_input(1, CLEAR_LINE);
+						if (m_fifo_read_ptr < 0x3ff)
+							dsp->set_flag_input(1, CLEAR_LINE);
+						else
+							dsp->set_flag_input(1, ASSERT_LINE);
 					}
 					else
 					{
 						dsp->set_flag_input(1, ASSERT_LINE);
 					}
+	
+					m_fifo_read_ptr++;
+					m_fifo_read_ptr &= 0x7ff;
 				}
-				else
-				{
-					dsp->set_flag_input(1, ASSERT_LINE);
-				}
-
-				m_fifo_read_ptr++;
-				m_fifo_read_ptr &= 0x7ff;
+				return value;
 			}
-			return value;
-		}
 
 		case 0x11b:         // status ?
 			return 0x8002;
@@ -822,20 +816,17 @@ uint32_t k001005_device::read(address_space &space, offs_t offset, uint32_t mem_
 			return 0x8000;
 
 		case 0x11f:
-		{
-			uint32_t ret = 0;
-			if (m_ram_ptr >= 0x400000)
 			{
-				ret = m_ram[1][m_ram_ptr & 0x3fffff];
+				uint32_t ret = 0;
+				if (m_ram_ptr >= 0x400000)
+					ret = m_ram[1][m_ram_ptr & 0x3fffff];
+				else
+					ret = m_ram[0][m_ram_ptr & 0x3fffff];
+				if (!machine().side_effects_disabled())
+					m_ram_ptr++;
+				return ret;
 			}
-			else
-			{
-				ret = m_ram[0][m_ram_ptr & 0x3fffff];
-			}
-			if (!machine().side_effects_disabled())
-				m_ram_ptr++;
-			return ret;
-		}
+
 		default:
 			//osd_printf_debug("%s m_r: %08X, %08X\n", machine().describe_context(), offset, mem_mask);
 			break;
@@ -850,25 +841,20 @@ void k001005_device::write(address_space &space, offs_t offset, uint32_t data, u
 	switch (offset)
 	{
 		case 0x000:         // FIFO write
-		{
 			//osd_printf_debug("%s K001005 FIFO write: %08X\n", machine().describe_context(), data);
 			if (m_status != 1 && m_status != 2)
 			{
 				if (m_fifo_write_ptr < 0x400)
-				{
 					dsp->set_flag_input(1, ASSERT_LINE);
-				}
 				else
-				{
 					dsp->set_flag_input(1, CLEAR_LINE);
-				}
 			}
 			else
 			{
 				dsp->set_flag_input(1, ASSERT_LINE);
 			}
 
-		//  osd_printf_debug("%s K001005 FIFO write: %08X\n", machine().describe_context(), data);
+			//osd_printf_debug("%s K001005 FIFO write: %08X\n", machine().describe_context(), data);
 			m_fifo[m_fifo_write_ptr] = data;
 			m_fifo_write_ptr++;
 			m_fifo_write_ptr &= 0x7ff;
@@ -887,9 +873,7 @@ void k001005_device::write(address_space &space, offs_t offset, uint32_t data, u
 				// This is used to make the SHARC timeout
 				dsp->spin_until_trigger(10000);
 			}
-
 			break;
-		}
 
 		case 0x100:     break;
 
@@ -905,11 +889,9 @@ void k001005_device::write(address_space &space, offs_t offset, uint32_t data, u
 		case 0x108:     m_renderer->m_viewport_center_y = data & 0xffff; break;
 
 		case 0x109:                 // far Z value
-			{
-				// the SHARC code throws away the bottom 11 bits of mantissa and the top 5 bits (to fit in a 16-bit register?)
-				m_renderer->m_far_z = u2f((data & 0xffff) << 11);
-				break;
-			}
+			// the SHARC code throws away the bottom 11 bits of mantissa and the top 5 bits (to fit in a 16-bit register?)
+			m_renderer->m_far_z = u2f((data & 0xffff) << 11);
+			break;
 
 		case 0x10a:     m_renderer->m_light_r = data & 0xff; break;
 		case 0x10b:     m_renderer->m_light_g = data & 0xff; break;
@@ -924,28 +906,23 @@ void k001005_device::write(address_space &space, offs_t offset, uint32_t data, u
 		case 0x112:     m_renderer->m_fog_b = data & 0xff; break;
 
 		case 0x117:                 // linear fog start Z
-			{
-				// 4 bits exponent + 12 bits mantissa, similar to far Z value
-				// value of 0xffff is used to effectively turn off fog
+			// 4 bits exponent + 12 bits mantissa, similar to far Z value
+			// value of 0xffff is used to effectively turn off fog
 
-				// reconstruct float from 16-bit data
-				// assuming implicit exponent 1001xxxx, sign bit 0 (z-values are all positive)
-				m_renderer->m_reg_fog_start = data & 0xffff;
-				m_renderer->m_fog_start_z = u2f((0x90000 | (data & 0xffff)) << 11);
-				break;
-			}
+			// reconstruct float from 16-bit data
+			// assuming implicit exponent 1001xxxx, sign bit 0 (z-values are all positive)
+			m_renderer->m_reg_fog_start = data & 0xffff;
+			m_renderer->m_fog_start_z = u2f((0x90000 | (data & 0xffff)) << 11);
+			break;
+
 		case 0x118:                 // linear fog end Z
-			{
-				// 4 bits exponent + 12 bits mantissa, similar to far Z value
-				m_renderer->m_fog_end_z = u2f((0x90000 | (data & 0xffff)) << 11);
-				break;
-			}
+			// 4 bits exponent + 12 bits mantissa, similar to far Z value
+			m_renderer->m_fog_end_z = u2f((0x90000 | (data & 0xffff)) << 11);
+			break;
 
 		case 0x119:                 // 1 / (end_fog - start_fog) ?
-			{
-				// 5 bits exponent + 11 bits mantissa
-				break;
-			}
+			// 5 bits exponent + 11 bits mantissa
+			break;
 
 
 		case 0x11a:
@@ -956,9 +933,7 @@ void k001005_device::write(address_space &space, offs_t offset, uint32_t data, u
 			if (data == 2)
 			{
 				if (m_renderer->fifo_filled())
-				{
 					m_renderer->render_polygons();
-				}
 
 				m_renderer->swap_buffers();
 			}
@@ -975,13 +950,9 @@ void k001005_device::write(address_space &space, offs_t offset, uint32_t data, u
 
 		case 0x11f:
 			if (m_ram_ptr >= 0x400000)
-			{
 				m_ram[1][(m_ram_ptr++) & 0x3fffff] = data & 0xffff;
-			}
 			else
-			{
 				m_ram[0][(m_ram_ptr++) & 0x3fffff] = data & 0xffff;
-			}
 			break;
 
 		default:
@@ -991,7 +962,7 @@ void k001005_device::write(address_space &space, offs_t offset, uint32_t data, u
 
 }
 
-void k001005_device::draw( bitmap_rgb32 &bitmap, const rectangle &cliprect )
+void k001005_device::draw(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_renderer->draw(bitmap, cliprect);
 }
