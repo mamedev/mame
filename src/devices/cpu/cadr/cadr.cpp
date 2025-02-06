@@ -83,7 +83,7 @@ void cadr_cpu_device::device_start()
 	save_item(NAME(m_prev_pc));
 	save_item(NAME(m_pc));
 	save_item(NAME(m_next_pc));
-	save_item(NAME(m_op));
+	save_item(NAME(m_ir));
 	save_item(NAME(m_n));
 	save_item(NAME(m_a_mem));
 	save_item(NAME(m_m_mem));
@@ -140,7 +140,7 @@ void cadr_cpu_device::device_reset()
 {
 	m_pc = 0;
 	m_next_pc = 0;
-	m_op = 0;
+	m_ir = 0;
 	m_q = 0;
 	m_n = true;
 	m_oa_reg_lo = 0;
@@ -290,14 +290,14 @@ void cadr_cpu_device::write_vma_map()
 
 void cadr_cpu_device::get_m_source()
 {
-	if (BIT(m_op, 31))
+	if (BIT(m_ir, 31))
 	{
 		// IR26 -  SEL0 3D22, SEL0 3D23 on SOURCE, DEST, OP DECODE
 		// IR27 -  SEL1 3D22, SEL1 3D23
 		// IR28 -  SEL2 3D22, SEL2 3D23
 		// IR29 -  CE1 3D22,  CE2 3D23
 		// -IR31 - CE0 3D22,  CE0 3D23
-		switch ((m_op >> 26) & 0x1f)
+		switch ((m_ir >> 26) & 0x1f)
 		{
 		case 0x00:
 			m_m = m_dispatch_constant;
@@ -351,20 +351,20 @@ void cadr_cpu_device::get_m_source()
 
 		case 0x04: // PDL buffer indexed by PDL index, PDL pointer decremented
 		case 0x06: // OPC registers 13-0
-			fatalerror("%x(%o): get_m_source: functional m source %02x not implemented", m_prev_pc, m_prev_pc, (m_op >> 26) & 0x1f);
+			fatalerror("%x(%o): get_m_source: functional m source %02x not implemented", m_prev_pc, m_prev_pc, (m_ir >> 26) & 0x1f);
 		case 0x0d: // reserved
 		case 0x0e: // reserved
 		case 0x0f: // reserved
 		case 0x16: // instruction at 21c5 / 20705
 		default:
 			// When no source is selected the MF lines will float
-			logerror("%x(%o): get_m_source: illegal functional m source %02x selected", m_prev_pc, m_prev_pc, (m_op >> 26) & 0x1f);
+			logerror("%x(%o): get_m_source: illegal functional m source %02x selected", m_prev_pc, m_prev_pc, (m_ir >> 26) & 0x1f);
 			break;
 		}
 	}
 	else
 	{
-		m_m = m_m_mem[(m_op >> 26) & 0x1f];
+		m_m = m_m_mem[(m_ir >> 26) & 0x1f];
 	}
 }
 
@@ -387,16 +387,16 @@ void cadr_cpu_device::sub32(u32 x, u32 y, u32 carry_in, u32 &res, u32 &carry_out
 
 void cadr_cpu_device::alu_operation(u32 &res, u32 &carry_out)
 {
-	if (BIT(m_op, 8))
+	if (BIT(m_ir, 8))
 	{
 		// div/mult
-		switch ((m_op >> 3) & 0x1f)
+		switch ((m_ir >> 3) & 0x1f)
 		{
 		case 0x00: // mult step
 			LOGMASKED(LOG_TRACE, "mult-step, a=0x%x(%o), m=0x%x(%o), q=%08x\n", m_a, m_a, m_m, m_m, m_q);
 			if (BIT(m_q, 0))
 			{
-				add32(m_a, m_m, BIT(m_op, 2), res, carry_out);
+				add32(m_a, m_m, BIT(m_ir, 2), res, carry_out);
 			}
 			else
 			{
@@ -407,16 +407,16 @@ void cadr_cpu_device::alu_operation(u32 &res, u32 &carry_out)
 			break;
 		case 0x09: // initial div step
 			LOGMASKED(LOG_TRACE, "initial div %o/%o, %d/%d\n", m_q, m_a, m_q, m_a);
-			sub32(m_a, m_m, BIT(~m_op, 2), res, carry_out);
+			sub32(m_a, m_m, BIT(~m_ir, 2), res, carry_out);
 			break;
 		case 0x01: // div step
 			if (BIT(m_q, 0))
 			{
-				sub32(m_a, m_m, BIT(~m_op, 2), res, carry_out);
+				sub32(m_a, m_m, BIT(~m_ir, 2), res, carry_out);
 			}
 			else
 			{
-				add32(m_a, m_m, BIT(m_op, 2), res, carry_out);
+				add32(m_a, m_m, BIT(m_ir, 2), res, carry_out);
 			}
 			break;
 		case 0x05: // remainder correction
@@ -426,16 +426,16 @@ void cadr_cpu_device::alu_operation(u32 &res, u32 &carry_out)
 			}
 			else
 			{
-				add32(m_a, m_m, BIT(m_op, 2), res, carry_out);
+				add32(m_a, m_m, BIT(m_ir, 2), res, carry_out);
 			}
 			break;
 		default:
-			fatalerror("%x(%o): alu div/mult %02x operation not implemented", m_prev_pc, m_prev_pc, (m_op >> 3) & 0x1f);
+			fatalerror("%x(%o): alu div/mult %02x operation not implemented", m_prev_pc, m_prev_pc, (m_ir >> 3) & 0x1f);
 		}
 	}
 	else
 	{
-		switch ((m_op >> 3) & 0x1f)
+		switch ((m_ir >> 3) & 0x1f)
 		{
 		case 0x00: // SETZ - ZEROS
 			res = 0;
@@ -471,19 +471,19 @@ void cadr_cpu_device::alu_operation(u32 &res, u32 &carry_out)
 			res = ~0;
 			break;
 		case 0x10: // -1 (C=0), 0 (C=1)
-			res = u32(-1 + BIT(m_op, 2));
+			res = u32(-1 + BIT(m_ir, 2));
 			break;
 		case 0x16: // M-A-1 (C=0), M-A (C=1)
-			sub32(m_a, m_m, BIT(m_op, 2), res, carry_out);
+			sub32(m_a, m_m, BIT(m_ir, 2), res, carry_out);
 			break;
 		case 0x19: // M+A (C=0), M+A+1 (C=1)
-			add32(m_a, m_m, BIT(m_op, 2), res, carry_out);
+			add32(m_a, m_m, BIT(m_ir, 2), res, carry_out);
 			break;
 		case 0x1c: // M (C=0), M+1 (C=1)
-			add32(0, m_m, BIT(m_op, 2), res, carry_out);
+			add32(0, m_m, BIT(m_ir, 2), res, carry_out);
 			break;
 		case 0x1f: // M+M (C=0), M+M+1 (C=1)
-			add32(m_m, m_m, BIT(m_op, 2), res, carry_out);
+			add32(m_m, m_m, BIT(m_ir, 2), res, carry_out);
 			break;
 
 		case 0x09: // EQV - M=A
@@ -502,7 +502,7 @@ void cadr_cpu_device::alu_operation(u32 &res, u32 &carry_out)
 		case 0x1b: // (M|A)+M (C=0), (M|A)+M+1 (C=1)
 		case 0x1d: // M+(M&~A) (C=0), M+(M&~A)+1 (C=1)
 		case 0x1e: // M+(M|~A) (C=0), M+(M|~A)+1 (C=1)
-			fatalerror("%x(%o): alu operation %02x not implemented", m_prev_pc, m_prev_pc, (m_op >> 3) & 0x1f);
+			fatalerror("%x(%o): alu operation %02x not implemented", m_prev_pc, m_prev_pc, (m_ir >> 3) & 0x1f);
 			break;
 		}
 	}
@@ -511,10 +511,10 @@ void cadr_cpu_device::alu_operation(u32 &res, u32 &carry_out)
 
 u32 cadr_cpu_device::get_output(u32 m, u32 alu_out, u32 alu_carry)
 {
-	switch ((m_op >> 12) & 0x03)
+	switch ((m_ir >> 12) & 0x03)
 	{
 	case 0x00:
-		return rotl_32(m, m_op & 0x1f); /* illegal, output of byte extractor */
+		return rotl_32(m, m_ir & 0x1f); /* illegal, output of byte extractor */
 	case 0x01:
 		return alu_out;
 	case 0x02:
@@ -528,15 +528,15 @@ u32 cadr_cpu_device::get_output(u32 m, u32 alu_out, u32 alu_carry)
 
 void cadr_cpu_device::write_destination(u32 output)
 {
-	if (BIT(m_op, 25))
+	if (BIT(m_ir, 25))
 	{
-		const u16 index = (m_op >> 14) & 0x3ff;
+		const u16 index = (m_ir >> 14) & 0x3ff;
 		m_a_mem[index] = output;
 		LOGMASKED(LOG_TRACE, "a[%x(%o)] <- %x(%o)\n", index, index, output, output);
 	}
 	else
 	{
-		switch ((m_op >> 19) & 0x1f)
+		switch ((m_ir >> 19) & 0x1f)
 		{
 		case 0x00: break;
 		case 0x01:
@@ -623,9 +623,9 @@ void cadr_cpu_device::write_destination(u32 output)
 
 		case 0x19: // MD, start-read
 		default:
-		   fatalerror("%x(%o): output %02x not implemented", m_prev_pc, m_prev_pc, (m_op >> 19) & 0x1f); break;
+		   fatalerror("%x(%o): output %02x not implemented", m_prev_pc, m_prev_pc, (m_ir >> 19) & 0x1f); break;
 		}
-		const u16 index = (m_op >> 14) & 0x1f;
+		const u16 index = (m_ir >> 14) & 0x1f;
 		m_m_mem[index] = output;
 		m_a_mem[index] = output;
 		LOGMASKED(LOG_TRACE, "m/a[%x(%o)] <- %x(%o)\n", index, index, output, output);
@@ -637,9 +637,9 @@ bool cadr_cpu_device::jump_condition(s32 a, s32 m)
 {
 	bool condition = true;
 
-	if (BIT(m_op, 5))
+	if (BIT(m_ir, 5))
 	{
-		switch (m_op & 0x1f)
+		switch (m_ir & 0x1f)
 		{
 		case 0x01: condition = m < a; break;
 		case 0x02: condition = m <= a; break;
@@ -649,16 +649,16 @@ bool cadr_cpu_device::jump_condition(s32 a, s32 m)
 		case 0x06: condition = m_page_fault || m_interrupt_pending /* || m_sequence_break */; break;
 		case 0x07: condition = true; break;
 		default:
-			fatalerror("%x(%o): jump condition %02x not implemented", m_prev_pc, m_prev_pc, m_op & 0x1f);
+			fatalerror("%x(%o): jump condition %02x not implemented", m_prev_pc, m_prev_pc, m_ir & 0x1f);
 			break;
 		}
 	}
 	else
 	{
-		condition = BIT(rotl_32(m, m_op & 0x1f), 0);
+		condition = BIT(rotl_32(m, m_ir & 0x1f), 0);
 	}
 
-	if (BIT(m_op, 6))
+	if (BIT(m_ir, 6))
 	{
 		condition = !condition;
 	}
@@ -702,8 +702,8 @@ void cadr_cpu_device::instruction_stream()
 void cadr_cpu_device::execute_alu()
 {
 	// TODO Misc functions
-	if ((m_op >> 10) & 0x03) {
-		fatalerror("%x(%o): alu misc function %d not implemented", m_prev_pc, m_prev_pc, (m_op >> 10) & 0x03);
+	if ((m_ir >> 10) & 0x03) {
+		fatalerror("%x(%o): alu misc function %d not implemented", m_prev_pc, m_prev_pc, (m_ir >> 10) & 0x03);
 	}
 
 	u32 alu_out = 0;
@@ -711,7 +711,7 @@ void cadr_cpu_device::execute_alu()
 	alu_operation(alu_out, carry_out);
 
 	u32 output = get_output(m_m, alu_out, carry_out);
-	switch (m_op & 0x03)
+	switch (m_ir & 0x03)
 	{
 	case 0x01: m_q = (m_q << 1) | (BIT(alu_out, 31) ^ 0x01); break;
 	case 0x02: m_q = (m_q >> 1) | (BIT(alu_out, 0) << 31); break;
@@ -724,23 +724,23 @@ void cadr_cpu_device::execute_alu()
 void cadr_cpu_device::execute_jump()
 {
 	// TODO Misc functions
-	if (((m_op >> 10) & 0x03) > 0x01) {
-		fatalerror("%x(%o): jump misc function %d not implemented", m_prev_pc, m_prev_pc, (m_op >> 10) & 0x03);
+	if (((m_ir >> 10) & 0x03) > 0x01) {
+		fatalerror("%x(%o): jump misc function %d not implemented", m_prev_pc, m_prev_pc, (m_ir >> 10) & 0x03);
 	}
 
 	if (jump_condition(m_a, m_m))
 	{
-		m_n = BIT(m_op, 7);
+		m_n = BIT(m_ir, 7);
 
-		switch ((m_op >> 8) & 0x03)
+		switch ((m_ir >> 8) & 0x03)
 		{
 		case 0x00: // jump
-			m_next_pc = (m_op >> 12) & 0x3fff;
+			m_next_pc = (m_ir >> 12) & 0x3fff;
 			m_popj = false;
 			break;
 		case 0x01: // push pc on spc stack
 			push_spc(m_n ? m_pc : m_next_pc);
-			m_next_pc = (m_op >> 12) & 0x3fff;
+			m_next_pc = (m_ir >> 12) & 0x3fff;
 			m_popj = false;
 			break;
 		case 0x02: // pop new pcp off spc stack
@@ -753,8 +753,8 @@ void cadr_cpu_device::execute_jump()
 			m_popj = false;
 			break;
 		case 0x03: // write i-mem
-			LOGMASKED(LOG_TRACE, "write imem a[%x] = %08x , m = %08x\n", (m_op >> 12) & 0x3fff, m_a, m_m);
-			m_imem[(m_op >> 12) & 0x3fff] = (u64(m_a & 0xffff) << 32) | m_m;
+			LOGMASKED(LOG_TRACE, "write imem a[%x] = %08x , m = %08x\n", (m_ir >> 12) & 0x3fff, m_a, m_m);
+			m_imem[(m_ir >> 12) & 0x3fff] = (u64(m_a & 0xffff) << 32) | m_m;
 			m_icount--;
 			m_n = false;
 			break;
@@ -766,20 +766,20 @@ void cadr_cpu_device::execute_jump()
 
 void cadr_cpu_device::execute_dispatch()
 {
-	m_dispatch_constant = (m_op >> 32) & 0x3ff;
+	m_dispatch_constant = (m_ir >> 32) & 0x3ff;
 
-	if (((m_op >> 10) & 0x03) == 0x02)
+	if (((m_ir >> 10) & 0x03) == 0x02)
 	{
 		// Write dispatch memory
-		const u16 addr = (m_op >> 12) & 0x7ff;
+		const u16 addr = (m_ir >> 12) & 0x7ff;
 		const u32 a = m_a_mem[m_dispatch_constant];
 		m_dpc[addr] = a & 0x3ffff;
 		return;
 	}
-	u8 rotation = m_op & 0x1f;
+	u8 rotation = m_ir & 0x1f;
 
 	// TODO Misc functions
-	if (((m_op >> 10) & 0x03) == 0x03) {
+	if (((m_ir >> 10) & 0x03) == 0x03) {
 		if (BIT(m_ic, 29))
 		{
 			rotation = rotation ^ ((BIT(m_lc, 1) ^ BIT(m_lc, 0)) << 4);
@@ -791,25 +791,25 @@ void cadr_cpu_device::execute_dispatch()
 		}
 		LOGMASKED(LOG_TRACE, "byte: mode 0x03, LC=%x(%o), rotation=%d\n", m_lc, m_lc, rotation);
 	}
-	else if ((m_op >> 10) & 0x03)
+	else if ((m_ir >> 10) & 0x03)
 	{
-		fatalerror("%x(%o): dispatch misc function %d not implemented", m_prev_pc, m_prev_pc, (m_op >> 10) & 0x03);
+		fatalerror("%x(%o): dispatch misc function %d not implemented", m_prev_pc, m_prev_pc, (m_ir >> 10) & 0x03);
 	}
 
-	const u32 m = rotl_32(m_m, rotation) & dispatch_mask[(m_op >> 5) & 0x07];
-	u32 index = ((m_op >> 12) & 0x7ff) | m;
+	const u32 m = rotl_32(m_m, rotation) & dispatch_mask[(m_ir >> 5) & 0x07];
+	u32 index = ((m_ir >> 12) & 0x7ff) | m;
 
-	if ((m_op >> 8) & 0x03) {
+	if ((m_ir >> 8) & 0x03) {
 		const u8 l1 = m_vma_map_l1[(m_md >> 13) & 0x7ff];
 		const u16 l2_index = (l1 << 5) | ((m_md >> 8) & 0x1f);
 		const u32 l2 = m_vma_map_l2[l2_index] & 0xffffff;
 		LOGMASKED(LOG_TRACE, "l2_index=%x(%o), l2=%x(%o)\n", l2_index, l2_index, l2, l2);
 
-		if (BIT(m_op, 8))
+		if (BIT(m_ir, 8))
 		{
 			index |= BIT(l2, 18);
 		}
-		if (BIT(m_op, 9))
+		if (BIT(m_ir, 9))
 		{
 			index |= BIT(l2, 19);
 		}
@@ -826,7 +826,7 @@ void cadr_cpu_device::execute_dispatch()
 		m_popj = false;
 		break;
 	case 0x01: // push pc on spc stack
-		push_spc(m_n ? (BIT(m_op, 25) ? m_pc - 1 : m_pc) : m_next_pc);
+		push_spc(m_n ? (BIT(m_ir, 25) ? m_pc - 1 : m_pc) : m_next_pc);
 		m_next_pc = dispatch & 0x3fff;
 		m_popj = false;
 		break;
@@ -843,7 +843,7 @@ void cadr_cpu_device::execute_dispatch()
 		break;
 	}
 
-	if (BIT(m_op, 24))
+	if (BIT(m_ir, 24))
 	{
 		u32 save_next_pc = m_next_pc;
 		instruction_stream();
@@ -855,8 +855,8 @@ void cadr_cpu_device::execute_dispatch()
 void cadr_cpu_device::execute_byte()
 {
 	// TODO Misc functions
-	u8 rotation = m_op & 0x1f;
-	if (((m_op >> 10) & 0x03) == 0x03) {
+	u8 rotation = m_ir & 0x1f;
+	if (((m_ir >> 10) & 0x03) == 0x03) {
 		if (BIT(m_ic, 29))
 		{
 			rotation = rotation ^ ((BIT(m_lc, 1) ^ BIT(m_lc, 0)) << 4);
@@ -868,17 +868,17 @@ void cadr_cpu_device::execute_byte()
 		}
 		LOGMASKED(LOG_TRACE, "byte: mode 0x03, LC=%x(%o), rotation=%d\n", m_lc, m_lc, rotation);
 	}
-	else if ((m_op >> 10) & 0x03)
+	else if ((m_ir >> 10) & 0x03)
 	{
-		fatalerror("%x(%o): byte misc function %d not implemented", m_prev_pc, m_prev_pc, (m_op >> 10) & 0x03);
+		fatalerror("%x(%o): byte misc function %d not implemented", m_prev_pc, m_prev_pc, (m_ir >> 10) & 0x03);
 	}
 
 	u32 output = 0;
-	if (m_op & (3 << 12))
+	if (m_ir & (3 << 12))
 	{
-		const u32 length = (m_op >> 5) & 0x1f;
-		const u32 r = BIT(m_op, 12) ? rotl_32(m_m, rotation) : m_m;
-		const u32 shift_right = BIT(m_op, 13) ? rotation : 0;
+		const u32 length = (m_ir >> 5) & 0x1f;
+		const u32 r = BIT(m_ir, 12) ? rotl_32(m_m, rotation) : m_m;
+		const u32 shift_right = BIT(m_ir, 13) ? rotation : 0;
 		const u32 right_mask = 0xffffffff << shift_right;
 		const u32 left_mask = 0xffffffff >> (31 - ((shift_right + length) & 0x1f));
 		const u32 mask = right_mask & left_mask;
@@ -911,20 +911,20 @@ void cadr_cpu_device::execute_run()
 		m_pc = m_next_pc;
 		u64 next_op = m_program.read_qword(m_next_pc++);
 
-		m_op |= m_oa_reg_lo;
+		m_ir |= m_oa_reg_lo;
 		m_oa_reg_lo = 0;
-		m_op |= (u64(m_oa_reg_hi) << 26);
+		m_ir |= (u64(m_oa_reg_hi) << 26);
 		m_oa_reg_hi = 0;
 
 		if (!m_n)
 		{
-			LOGMASKED(LOG_TRACE, "%x(%o): IR: 0x%x(0%o), LC=0%o, MD=0%o\n", m_prev_pc, m_prev_pc, m_op, m_op, m_lc, m_md);
+			LOGMASKED(LOG_TRACE, "%x(%o): IR: 0x%x(0%o), LC=0%o, MD=0%o\n", m_prev_pc, m_prev_pc, m_ir, m_ir, m_lc, m_md);
 
-			m_popj = BIT(m_op, 42);
-			m_a = m_a_mem[(m_op >> 32) & 0x3ff];
+			m_popj = BIT(m_ir, 42);
+			m_a = m_a_mem[(m_ir >> 32) & 0x3ff];
 			get_m_source();
 
-			switch (m_op & (u64(3) << 43))
+			switch (m_ir & (u64(3) << 43))
 			{
 			case u64(0) << 43: execute_alu(); break;
 			case u64(1) << 43: execute_jump(); break;
@@ -937,7 +937,7 @@ void cadr_cpu_device::execute_run()
 			m_n = false;
 		}
 
-		m_op = next_op;
+		m_ir = next_op;
 
 		if (m_popj)
 		{

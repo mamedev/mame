@@ -49,7 +49,7 @@ private:
 	u16 m_prev_pc;
 	u16 m_pc; // 16 bits
 	u16 m_next_pc; // 16 bits
-	u64 m_op;
+	u64 m_ir;
 	bool m_n;
 	u32 m_a_mem[1024]; // 1024 x 32 bits
 	u32 m_m_mem[32]; // 32 x 32 bits

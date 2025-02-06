@@ -158,6 +158,15 @@ void cadr_state::mem_map(address_map &map)
 			m_bus_error_status = 0;
 		})
 	).umask32(0x0000ffff);
+
+	// This diagnostics interface is not described in AI Memo 528, but it
+	// is used by the CC-TEST_MACHINE program from 1980.
+	//
+	// 3ff620 - 3ff626 - Debug interface to another machine
+	// 3ff620 - read or write the debuggee unibus location
+	// 3ff624 - Bit 17 of the debuggee Unibus address
+	// 3ff626 - Debuggee Unibus address to access (bits 1-16)
+	//
 }
 
 
