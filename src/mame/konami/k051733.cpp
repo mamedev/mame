@@ -162,36 +162,34 @@ uint8_t k051733_device::read(offs_t offset)
 
 		case 0x04:
 			return k051733_int_sqrt(op3 << 16) >> 8;
-
 		case 0x05:
 			return k051733_int_sqrt(op3 << 16) & 0xff;
 
 		case 0x06:
-		{
-			uint8_t const rng = m_rng + m_ram[0x13];
-			if (!machine().side_effects_disabled())
-				m_rng = rng;
-			return rng; //RNG read, used by Chequered Flag for differentiate cars, implementation is a raw guess
-		}
-		case 0x07:{ /* note: Chequered Flag definitely wants all these bits to be enabled */
+			{
+				uint8_t const rng = m_rng + m_ram[0x13];
+				if (!machine().side_effects_disabled())
+					m_rng = rng;
+				return rng; //RNG read, used by Chequered Flag for differentiate cars, implementation is a raw guess
+			}
+
+		case 0x07: /* note: Chequered Flag definitely wants all these bits to be enabled */
 			if (xobj1c + rad < xobj2c)
 				return 0xff;
-
-			if (xobj2c + rad < xobj1c)
+			else if (xobj2c + rad < xobj1c)
 				return 0xff;
-
-			if (yobj1c + rad < yobj2c)
+			else if (yobj1c + rad < yobj2c)
 				return 0xff;
-
-			if (yobj2c + rad < yobj1c)
+			else if (yobj2c + rad < yobj1c)
 				return 0xff;
+			else
+				return 0;
 
-			return 0;
-		}
 		case 0x0e: /* best guess */
 			return (xobj2c - xobj1c) >> 8;
 		case 0x0f:
 			return (xobj2c - xobj1c) & 0xff;
+
 		default:
 			return m_ram[offset];
 	}
