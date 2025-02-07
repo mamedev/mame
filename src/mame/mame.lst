@@ -21518,8 +21518,7 @@ intlc440                        //
 
 @source:intel/intellec8.cpp
 intlc8                          //
-intlc8m80a                      //
-intlc8m80b                      //
+intlc8m80                       //
 
 @source:intel/ipc.cpp
 ipb                             // intel
@@ -25374,6 +25373,9 @@ free120                         // (c) 1993 Liberty Electronics
 @source:liberty/freedom200.cpp
 free200                         // (c) 1983 Liberty Electronics
 free220                         // (c) 1984 Liberty Electronics
+
+@source:linn/linndrum.cpp
+linndrum                        // Linn Electronics LinnDrum
 
 @source:lsi/m3.cpp
 m3                              //
@@ -41935,6 +41937,8 @@ renju                           // (c) 1994 Visco
 
 @source:seta/speedatk.cpp
 daifugo
+hanaren2
+harashi
 speedatk                        // CB-0 (c) SetaKikaku
 
 @source:seta/speglsht.cpp
@@ -43406,12 +43410,14 @@ smc777                          //
 @source:sony/taitogn.cpp
 chaoshea                        // 1998.10 Chaos Heat (V2.09O)
 chaosheaj                       // 1998.10 Chaos Heat (V2.08J)
+coh1002t                        //
 coh3002t                        //
 flipmaze                        // 1999.09 Flip Maze (V2.04J)
 gobyrc                          // 1999.?? Go By RC (V2.03O)
 kollon                          // 2003.11 Kollon (V2.04J)
 kollonc                         // 2003.11 Kollon (V2.04JC, Compact Flash version)
 mahjngoh                        // 1999.12 Mahjong Oh (V2.06J)
+mawasunda                       // 2000.02 Mawasunda!! (V2.08J)
 nightrai                        // 2001.05 Night Raid (V2.03J)
 otenamhf                        // 2005.04 Otenami Haiken Final (V2.07JC)
 otenamih                        // 1999.02 Otenami Haiken (Success)
@@ -43429,12 +43435,20 @@ shikigama                       // 2001.09 Shikigami no Shiro (V1.02J)
 sianniv                         // 2003.10 Space Invaders Anniversary (V2.02J)
 soutenry                        // 2001.02 Soutenryu (V2.07J)
 spuzbobl                        // 1999.?? Super Puzzle Bobble (V2.05O)
-spuzboblj                       // 1999.03 Super Puzzle Bobble (Japan)
+spuzboblj                       // 1999.03 Super Puzzle Bobble (V2.04J)
 usagi                           // 2001.12 Usagi (V2.02J)
 xiistag                         // 2002.07 XII Stag (V2.01J)
 zokuoten                        // 2000.12 Zoku Otenamihaiken (V2.05J)
 zokuotena                       // 2000.12 Zoku Otenamihaiken (V2.03J)
-zooo                            // 2004.05 Zooo
+zooo                            // 2004.05 Zooo (V2.01JA)
+aerofgtsg                       // 2011.01 Aero Fighters Special (VER 1.00G)
+brvbladeg                       // 2011.01 Brave Blade (VER 1.40G)
+flamegung                       // 2011.01 Flame Gunner (VER 1.40G)
+ftimpactg                       // 2011.01 Fighters' Impact (VER 2.10G)
+gdariusg                        // 2011.01 G-Darius (Ver 2.70G)
+raystormg                       // 2011.01 Ray Storm (Ver 2.60G)
+shngmtkbg                       // 2011.01 Shanghai Matekibuyuu (VER 1.20G)
+tblkkuzug                       // 2011.01 The Block Kuzushi (VER 1.10G)
 
 @source:sony/umatic.cpp
 vo5850pm                        // Sony U-Matic VO-5850PM
@@ -43443,7 +43457,8 @@ vo5850pm                        // Sony U-Matic VO-5850PM
 1on1gov                         // 1 on 1 Government (JAPAN)
 aerofgts                        // Aero Fighters Special (USA)
 aerofgtst                       // Aero Fighters Special (TAIWAN)
-bam2                            // Bust a Move 2 (JAPANESE ROM ver. 1999/07/17 10:00:00)
+bam2                            // Bust a Move 2 (HDD JAPANESE ROM ver. 1999/07/17 10:00:00)
+bam2a                           // Bust a Move 2 (CDROM JAPANESE ROM ver. 1999/07/17 10:00:00)
 beastrzr                        // Beastorizer (USA, Sep 22 1997)
 beastrzra                       // Beastorizer (USA, Jun 21 1997)
 beastrzrb                       // Beastorizer (USA Bootleg)
@@ -43457,6 +43472,7 @@ brvbladea                       // Brave Blade (ASIA)
 brvbladej                       // Brave Blade (JAPAN)
 brvbladeu                       // Brave Blade (USA)
 cbaj                            // Cool Boaders Arcade Jam
+cbajbl                          // Cool Boaders Arcade Jam (Bootleg)
 coh1000a                        //
 coh1000c                        //
 coh1000t                        //

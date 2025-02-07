@@ -207,18 +207,18 @@ class megazone_state : public driver_device
 public:
 	megazone_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_scrolly(*this, "scrolly"),
-		m_scrollx(*this, "scrollx"),
-		m_videoram(*this, "videoram%u", 1U),
-		m_colorram(*this, "colorram%u", 1U),
-		m_spriteram(*this, "spriteram"),
-		m_share1(*this, "share1"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_daccpu(*this, "daccpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_filter(*this, "filter.0.%u", 0U)
+		m_filter(*this, "filter.0.%u", 0U),
+		m_scrolly(*this, "scrolly"),
+		m_scrollx(*this, "scrollx"),
+		m_videoram(*this, "videoram%u", 1U),
+		m_colorram(*this, "colorram%u", 1U),
+		m_spriteram(*this, "spriteram"),
+		m_sharedram(*this, "sharedram")
 	{ }
 
 	void megazone(machine_config &config);
@@ -229,13 +229,21 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<i8039_device> m_daccpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device_array<filter_rc_device, 3> m_filter;
+
 	// memory pointers
 	required_shared_ptr<uint8_t> m_scrolly;
 	required_shared_ptr<uint8_t> m_scrollx;
 	required_shared_ptr_array<uint8_t, 2> m_videoram;
 	required_shared_ptr_array<uint8_t, 2> m_colorram;
 	required_shared_ptr<uint8_t> m_spriteram;
-	required_shared_ptr<uint8_t> m_share1;
+	required_shared_ptr<uint8_t> m_sharedram;
 
 	// video-related
 	std::unique_ptr<bitmap_ind16> m_tmpbitmap;
@@ -245,18 +253,9 @@ private:
 	uint8_t m_i8039_status = 0;
 	bool m_irq_mask = false;
 
-	// devices
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
-	required_device<i8039_device> m_daccpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	required_device_array<filter_rc_device, 3> m_filter;
-
 	void i8039_irq_w(uint8_t data);
 	void i8039_irqen_and_status_w(uint8_t data);
-	void coin_counter_1_w(int state);
-	void coin_counter_2_w(int state);
+	template <unsigned Which> void coin_counter_w(int state);
 	void irq_mask_w(int state);
 	void flipscreen_w(int state);
 	uint8_t port_a_r();
@@ -372,8 +371,8 @@ uint32_t megazone_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	{
 		int sx = offs % 32;
 		int sy = offs / 32;
-		int flipx = m_colorram[0][offs] & (1 << 6);
-		int flipy = m_colorram[0][offs] & (1 << 5);
+		bool flipx = BIT(m_colorram[0][offs], 6);
+		bool flipy = BIT(m_colorram[0][offs], 5);
 
 		if (m_flipscreen)
 		{
@@ -384,8 +383,8 @@ uint32_t megazone_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		}
 
 		m_gfxdecode->gfx(1)->opaque(*m_tmpbitmap, m_tmpbitmap->cliprect(),
-				((int)m_videoram[0][offs]) + ((m_colorram[0][offs] & (1 << 7) ? 256 : 0) ),
-				(m_colorram[0][offs] & 0x0f) + 0x10,
+				((uint32_t)m_videoram[0][offs]) + ((BIT(m_colorram[0][offs], 7) ? 256 : 0)),
+				m_colorram[0][offs] & 0x0f,
 				flipx, flipy,
 				8 * sx, 8 * sy);
 	}
@@ -414,11 +413,11 @@ uint32_t megazone_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	{
 		for (int offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 		{
-			int sx = m_spriteram[offs + 3];
-			int sy = 255 - ((m_spriteram[offs + 1] + 16) & 0xff);
-			int color =  m_spriteram[offs + 0] & 0x0f;
-			int flipx = ~m_spriteram[offs + 0] & 0x40;
-			int flipy =  m_spriteram[offs + 0] & 0x80;
+			int sx               = m_spriteram[offs + 3];
+			int sy               = 255 - ((m_spriteram[offs + 1] + 16) & 0xff);
+			uint32_t const color = m_spriteram[offs + 0] & 0x0f;
+			bool const flipx     = BIT(~m_spriteram[offs + 0], 6);
+			bool const flipy     = BIT( m_spriteram[offs + 0], 7);
 
 			if (m_flipscreen)
 			{
@@ -437,7 +436,7 @@ uint32_t megazone_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		}
 	}
 
-	for (int y = 0; y < 32;y++)
+	for (int y = 0; y < 32; y++)
 	{
 		int offs = y * 32;
 		for (int x = 0; x < 6; x++)
@@ -445,8 +444,8 @@ uint32_t megazone_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 			int sx = x;
 			int sy = y;
 
-			int flipx = m_colorram[1][offs] & (1 << 6);
-			int flipy = m_colorram[1][offs] & (1 << 5);
+			bool flipx = BIT(m_colorram[1][offs], 6);
+			bool flipy = BIT(m_colorram[1][offs], 5);
 
 			if (m_flipscreen)
 			{
@@ -457,8 +456,8 @@ uint32_t megazone_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 			}
 
 			m_gfxdecode->gfx(1)->opaque(bitmap, cliprect,
-					((int)m_videoram[1][offs]) + ((m_colorram[1][offs] & (1 << 7) ? 256 : 0) ),
-					(m_colorram[1][offs] & 0x0f) + 0x10,
+					((uint32_t)m_videoram[1][offs]) + ((BIT(m_colorram[1][offs], 7) ? 256 : 0)),
+					m_colorram[1][offs] & 0x0f,
 					flipx, flipy,
 					8 * sx, 8 * sy);
 			offs++;
@@ -474,8 +473,8 @@ uint8_t megazone_state::port_a_r()
 	// The base clock for the CPU and 8910 is NOT the same, so we have to compensate.
 	// (divide by (1024/2), and not 1024, because the CPU cycle counter is incremented every other state change of the clock)
 
-	int clock = m_audiocpu->total_cycles() * 7159 / 12288;    // = (14318 / 8) / (18432 / 6)
-	int timer = (clock / (1024 / 2)) & 0x0f;
+	int const clock = m_audiocpu->total_cycles() * 7159 / 12288;    // = (14318 / 8) / (18432 / 6)
+	int const timer = (clock / (1024 / 2)) & 0x0f;
 
 	// low three bits come from the 8039
 	return (timer << 4) | m_i8039_status;
@@ -486,9 +485,9 @@ void megazone_state::port_b_w(uint8_t data)
 	for (int i = 0; i < 3; i++)
 	{
 		int C = 0;
-		if (data & 1)
+		if (BIT(data, 0))
 			C +=  10000;    //  10000pF = 0.01uF
-		if (data & 2)
+		if (BIT(data, 1))
 			C += 220000;    // 220000pF = 0.22uF
 
 		data >>= 2;
@@ -503,19 +502,15 @@ void megazone_state::i8039_irq_w(uint8_t data)
 
 void megazone_state::i8039_irqen_and_status_w(uint8_t data)
 {
-	if ((data & 0x80) == 0)
+	if (BIT(~data, 7))
 		m_daccpu->set_input_line(0, CLEAR_LINE);
 	m_i8039_status = (data & 0x70) >> 4;
 }
 
-void megazone_state::coin_counter_1_w(int state)
+template <unsigned Which>
+void megazone_state::coin_counter_w(int state)
 {
-	machine().bookkeeping().coin_counter_w(0, state);
-}
-
-void megazone_state::coin_counter_2_w(int state)
-{
-	machine().bookkeeping().coin_counter_w(1, state);
+	machine().bookkeeping().coin_counter_w(Which, state);
 }
 
 void megazone_state::irq_mask_w(int state)
@@ -535,7 +530,7 @@ void megazone_state::main_map(address_map &map)
 	map(0x2800, 0x2bff).ram().share(m_colorram[0]);
 	map(0x2c00, 0x2fff).ram().share(m_colorram[1]);
 	map(0x3000, 0x33ff).ram().share(m_spriteram);
-	map(0x3800, 0x3fff).lrw8([this](offs_t off) { return m_share1[off]; }, "share_r", [this](offs_t off, u8 data) { m_share1[off] = data; }, "share_w");
+	map(0x3800, 0x3fff).lrw8([this](offs_t off) { return m_sharedram[off]; }, "share_r", [this](offs_t off, u8 data) { m_sharedram[off] = data; }, "share_w");
 	map(0x4000, 0xffff).rom();     // 4000->5FFF is a debug ROM
 }
 
@@ -552,7 +547,7 @@ void megazone_state::sound_map(address_map &map)
 	map(0xa000, 0xa000).nopw();                    // INTMAIN - Interrupts main CPU (unused)
 	map(0xc000, 0xc000).nopw();                    // INT (Actually is NMI) enable/disable (unused)
 	map(0xc001, 0xc001).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0xe000, 0xe7ff).ram().share(m_share1);
+	map(0xe000, 0xe7ff).ram().share(m_sharedram);
 }
 
 void megazone_state::sound_io_map(address_map &map)
@@ -628,33 +623,20 @@ static INPUT_PORTS_START( megazona )
 INPUT_PORTS_END
 
 
-static const gfx_layout charlayout =
-{
-	8,8,    // 8*8 characters
-	512,    // 512 characters
-	4,      // 4 bits per pixel
-	{ 0, 1, 2, 3 }, // the four bitplanes are packed in one nibble
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8    // every char takes 8 consecutive bytes
-};
-
 static const gfx_layout spritelayout =
 {
-	16,16,  // 16*16 sprites
-	256,    // 256 sprites
-	4,  // 4 bits per pixel
-	{ 0x4000*8+4, 0x4000*8+0, 4, 0 },
-	{ 0, 1, 2, 3, 8*8+0, 8*8+1, 8*8+2, 8*8+3,
-			16*8+0, 16*8+1, 16*8+2, 16*8+3, 24*8+0, 24*8+1, 24*8+2, 24*8+3 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 ,
-		32*8, 33*8, 34*8, 35*8, 36*8, 37*8, 38*8, 39*8 },
-	64*8    // every sprite takes 64 consecutive bytes
+	16,16,            // 16*16 sprites
+	RGN_FRAC(1,2),    // 256 sprites
+	4,                // 4 bits per pixel
+	{ RGN_FRAC(1,2)+4, RGN_FRAC(1,2)+0, 4, 0 },
+	{ STEP4(0,1), STEP4(8*8,1), STEP4(8*8*2,1), STEP4(8*8*3,1) },
+	{ STEP8(0,8), STEP8(8*8*4,8) },
+	16*16*2    // every sprite takes 64 consecutive bytes
 };
 
 static GFXDECODE_START( gfx_megazone )
-	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,     0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, charlayout,   16*16, 16 )
+	GFXDECODE_ENTRY( "sprites", 0, spritelayout,             0, 16 )
+	GFXDECODE_ENTRY( "tiles",   0, gfx_8x8x4_packed_msb, 16*16, 16 )
 GFXDECODE_END
 
 void megazone_state::machine_start()
@@ -698,8 +680,8 @@ void megazone_state::megazone(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(900));
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // 13A
-	mainlatch.q_out_cb<0>().set(FUNC(megazone_state::coin_counter_2_w));
-	mainlatch.q_out_cb<1>().set(FUNC(megazone_state::coin_counter_1_w));
+	mainlatch.q_out_cb<0>().set(FUNC(megazone_state::coin_counter_w<1>));
+	mainlatch.q_out_cb<1>().set(FUNC(megazone_state::coin_counter_w<0>));
 	mainlatch.q_out_cb<5>().set(FUNC(megazone_state::flipscreen_w));
 	mainlatch.q_out_cb<7>().set(FUNC(megazone_state::irq_mask_w));
 
@@ -759,13 +741,13 @@ ROM_START( megazone )
 	ROM_REGION( 0x1000, "daccpu", 0 )     // 4k for the 8039 DAC CPU
 	ROM_LOAD( "319e01.3a",    0x0000, 0x1000, CRC(ed5725a0) SHA1(64f54621487291fbfe827fb4cecca299fd0db781) )
 
-	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_REGION( 0x08000, "sprites", 0 )
 	ROM_LOAD( "319e11.3e",    0x0000, 0x2000, CRC(965a7ff6) SHA1(210aae91a3838e5f7c78747d9b7419d266538ffc) )
 	ROM_LOAD( "319e09.2e",    0x2000, 0x2000, CRC(5eaa7f3e) SHA1(4c038e80d575988407252897a1f1bc6b76af597c) )
 	ROM_LOAD( "319e10.3d",    0x4000, 0x2000, CRC(7bb1aeee) SHA1(be2dd46cd0121cedad6dab90a22643798a3176ab) )
 	ROM_LOAD( "319e08.2d",    0x6000, 0x2000, CRC(6add71b1) SHA1(fc8c0ecd3b7f03d63b6c3143143986883345fa38) )
 
-	ROM_REGION( 0x04000, "gfx2", 0 )
+	ROM_REGION( 0x04000, "tiles", 0 )
 	ROM_LOAD( "319_g12.8c",   0x0000, 0x2000, CRC(07b8b24b) SHA1(faadcb20ee8b26b9ab0692df6a81e5423514863e) )
 	ROM_LOAD( "319_g13.10c",  0x2000, 0x2000, CRC(3d8f3743) SHA1(1f6fbf804dacfa44cd11b4cf41d0bedb7f2ff6b6) ) // same as e13
 
@@ -791,13 +773,13 @@ ROM_START( megazonej ) // Interlogic + Kosuka license set
 	ROM_REGION( 0x1000, "daccpu", 0 )     // 4k for the 8039 DAC CPU
 	ROM_LOAD( "319e01.3a",    0x0000, 0x1000, CRC(ed5725a0) SHA1(64f54621487291fbfe827fb4cecca299fd0db781) )
 
-	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_REGION( 0x08000, "sprites", 0 )
 	ROM_LOAD( "319e11.3e",    0x0000, 0x2000, CRC(965a7ff6) SHA1(210aae91a3838e5f7c78747d9b7419d266538ffc) )
 	ROM_LOAD( "319e09.2e",    0x2000, 0x2000, CRC(5eaa7f3e) SHA1(4c038e80d575988407252897a1f1bc6b76af597c) )
 	ROM_LOAD( "319e10.3d",    0x4000, 0x2000, CRC(7bb1aeee) SHA1(be2dd46cd0121cedad6dab90a22643798a3176ab) )
 	ROM_LOAD( "319e08.2d",    0x6000, 0x2000, CRC(6add71b1) SHA1(fc8c0ecd3b7f03d63b6c3143143986883345fa38) )
 
-	ROM_REGION( 0x04000, "gfx2", 0 )
+	ROM_REGION( 0x04000, "tiles", 0 )
 	ROM_LOAD( "319_g12.8c",   0x0000, 0x2000, CRC(07b8b24b) SHA1(faadcb20ee8b26b9ab0692df6a81e5423514863e) )
 	ROM_LOAD( "319_g13.10c",  0x2000, 0x2000, CRC(3d8f3743) SHA1(1f6fbf804dacfa44cd11b4cf41d0bedb7f2ff6b6) ) // same as e13
 
@@ -823,13 +805,13 @@ ROM_START( megazonei )
 	ROM_REGION( 0x1000, "daccpu", 0 )     // 4k for the 8039 DAC CPU
 	ROM_LOAD( "319e01.3a",    0x0000, 0x1000, CRC(ed5725a0) SHA1(64f54621487291fbfe827fb4cecca299fd0db781) )
 
-	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_REGION( 0x08000, "sprites", 0 )
 	ROM_LOAD( "319e11.3e",    0x0000, 0x2000, CRC(965a7ff6) SHA1(210aae91a3838e5f7c78747d9b7419d266538ffc) )
 	ROM_LOAD( "319e09.2e",    0x2000, 0x2000, CRC(5eaa7f3e) SHA1(4c038e80d575988407252897a1f1bc6b76af597c) )
 	ROM_LOAD( "319e10.3d",    0x4000, 0x2000, CRC(7bb1aeee) SHA1(be2dd46cd0121cedad6dab90a22643798a3176ab) )
 	ROM_LOAD( "319e08.2d",    0x6000, 0x2000, CRC(6add71b1) SHA1(fc8c0ecd3b7f03d63b6c3143143986883345fa38) )
 
-	ROM_REGION( 0x04000, "gfx2", 0 )
+	ROM_REGION( 0x04000, "tiles", 0 )
 	ROM_LOAD( "319_e12.8c",   0x0000, 0x2000, CRC(e0fb7835) SHA1(44ccaaf92bdb83323f45e08dbe118697720e9105) )
 	ROM_LOAD( "319_e13.10c",  0x2000, 0x2000, CRC(3d8f3743) SHA1(1f6fbf804dacfa44cd11b4cf41d0bedb7f2ff6b6) )
 
@@ -855,13 +837,13 @@ ROM_START( megazoneh ) // Kosuka license set
 	ROM_REGION( 0x1000, "daccpu", 0 )     // 4k for the 8039 DAC CPU
 	ROM_LOAD( "319h01.3a",    0x0000, 0x1000, CRC(ed5725a0) SHA1(64f54621487291fbfe827fb4cecca299fd0db781) ) // same as e01
 
-	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_REGION( 0x08000, "sprites", 0 )
 	ROM_LOAD( "319e11.3e",    0x0000, 0x2000, CRC(965a7ff6) SHA1(210aae91a3838e5f7c78747d9b7419d266538ffc) )
 	ROM_LOAD( "319e09.2e",    0x2000, 0x2000, CRC(5eaa7f3e) SHA1(4c038e80d575988407252897a1f1bc6b76af597c) )
 	ROM_LOAD( "319e10.3d",    0x4000, 0x2000, CRC(7bb1aeee) SHA1(be2dd46cd0121cedad6dab90a22643798a3176ab) )
 	ROM_LOAD( "319e08.2d",    0x6000, 0x2000, CRC(6add71b1) SHA1(fc8c0ecd3b7f03d63b6c3143143986883345fa38) )
 
-	ROM_REGION( 0x04000, "gfx2", 0 )
+	ROM_REGION( 0x04000, "tiles", 0 )
 	ROM_LOAD( "319_g12.8c",   0x0000, 0x2000, CRC(07b8b24b) SHA1(faadcb20ee8b26b9ab0692df6a81e5423514863e) )
 	ROM_LOAD( "319_g13.10c",  0x2000, 0x2000, CRC(3d8f3743) SHA1(1f6fbf804dacfa44cd11b4cf41d0bedb7f2ff6b6) ) // same as e13
 
@@ -888,13 +870,13 @@ ROM_START( megazonea ) // Interlogic + Kosuka license set.
 	ROM_REGION( 0x1000, "daccpu", 0 )     // 4k for the 8039 DAC CPU
 	ROM_LOAD( "319e01.3a",    0x0000, 0x1000, CRC(ed5725a0) SHA1(64f54621487291fbfe827fb4cecca299fd0db781) ) // 2nd PCB: 319e01.ic2
 
-	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_REGION( 0x08000, "sprites", 0 )
 	ROM_LOAD( "319e11.3e",    0x0000, 0x2000, CRC(965a7ff6) SHA1(210aae91a3838e5f7c78747d9b7419d266538ffc) ) // 2nd PCB: 319e11.ic015
 	ROM_LOAD( "319e09.2e",    0x2000, 0x2000, CRC(5eaa7f3e) SHA1(4c038e80d575988407252897a1f1bc6b76af597c) ) // 2nd PCB: 319e09.ic005
 	ROM_LOAD( "319e10.3d",    0x4000, 0x2000, CRC(7bb1aeee) SHA1(be2dd46cd0121cedad6dab90a22643798a3176ab) ) // 2nd PCB: 319e10.ic014
 	ROM_LOAD( "319e08.2d",    0x6000, 0x2000, CRC(6add71b1) SHA1(fc8c0ecd3b7f03d63b6c3143143986883345fa38) ) // 2nd PCB: 319e08.ic004
 
-	ROM_REGION( 0x04000, "gfx2", 0 )
+	ROM_REGION( 0x04000, "tiles", 0 )
 	ROM_LOAD( "319_g12.8c",   0x0000, 0x2000, CRC(07b8b24b) SHA1(faadcb20ee8b26b9ab0692df6a81e5423514863e) ) // 2nd PCB: 319g12.ic046
 	ROM_LOAD( "319_g13.10c",  0x2000, 0x2000, CRC(3d8f3743) SHA1(1f6fbf804dacfa44cd11b4cf41d0bedb7f2ff6b6) ) // same as e13 // 2nd PCB: 319g13.ic058
 
@@ -920,13 +902,13 @@ ROM_START( megazoneb )
 	ROM_REGION( 0x1000, "daccpu", 0 )     // 4k for the 8039 DAC CPU
 	ROM_LOAD( "319h01.3a",    0x0000, 0x1000, CRC(ed5725a0) SHA1(64f54621487291fbfe827fb4cecca299fd0db781) ) // same as e01
 
-	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_REGION( 0x08000, "sprites", 0 )
 	ROM_LOAD( "319e11.3e",    0x0000, 0x2000, CRC(965a7ff6) SHA1(210aae91a3838e5f7c78747d9b7419d266538ffc) )
 	ROM_LOAD( "319e09.2e",    0x2000, 0x2000, CRC(5eaa7f3e) SHA1(4c038e80d575988407252897a1f1bc6b76af597c) )
 	ROM_LOAD( "319e10.3d",    0x4000, 0x2000, CRC(7bb1aeee) SHA1(be2dd46cd0121cedad6dab90a22643798a3176ab) )
 	ROM_LOAD( "319e08.2d",    0x6000, 0x2000, CRC(6add71b1) SHA1(fc8c0ecd3b7f03d63b6c3143143986883345fa38) )
 
-	ROM_REGION( 0x04000, "gfx2", 0 )
+	ROM_REGION( 0x04000, "tiles", 0 )
 	ROM_LOAD( "319_e12.8c",   0x0000, 0x2000, CRC(e0fb7835) SHA1(44ccaaf92bdb83323f45e08dbe118697720e9105) )
 	ROM_LOAD( "319_g13.10c",  0x2000, 0x2000, CRC(3d8f3743) SHA1(1f6fbf804dacfa44cd11b4cf41d0bedb7f2ff6b6) ) // same as e13
 

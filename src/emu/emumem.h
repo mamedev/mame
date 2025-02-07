@@ -71,28 +71,6 @@ using offs_t = u32;
 // address map constructors are delegates that build up an address_map
 using address_map_constructor = named_delegate<void (address_map &)>;
 
-// struct with function pointers for accessors; use is generally discouraged unless necessary
-struct data_accessors
-{
-	u8      (*read_byte)(address_space &space, offs_t address);
-	u8      (*read_byte_masked)(address_space &space, offs_t address, u8 mask);
-	u16     (*read_word)(address_space &space, offs_t address);
-	u16     (*read_word_masked)(address_space &space, offs_t address, u16 mask);
-	u32     (*read_dword)(address_space &space, offs_t address);
-	u32     (*read_dword_masked)(address_space &space, offs_t address, u32 mask);
-	u64     (*read_qword)(address_space &space, offs_t address);
-	u64     (*read_qword_masked)(address_space &space, offs_t address, u64 mask);
-
-	void    (*write_byte)(address_space &space, offs_t address, u8 data);
-	void    (*write_byte_masked)(address_space &space, offs_t address, u8 data, u8 mask);
-	void    (*write_word)(address_space &space, offs_t address, u16 data);
-	void    (*write_word_masked)(address_space &space, offs_t address, u16 data, u16 mask);
-	void    (*write_dword)(address_space &space, offs_t address, u32 data);
-	void    (*write_dword_masked)(address_space &space, offs_t address, u32 data, u32 mask);
-	void    (*write_qword)(address_space &space, offs_t address, u64 data);
-	void    (*write_qword_masked)(address_space &space, offs_t address, u64 data, u64 mask);
-};
-
 // a line in the memory structure dump
 struct memory_entry_context {
 	memory_view *view;
@@ -1643,65 +1621,65 @@ template<int Width, int AddrShift, endianness_t Endian, int TargetWidth, bool Al
 
 template<int Level, int Width, int AddrShift> emu::detail::handler_entry_size_t<Width> dispatch_read(offs_t mask, offs_t offset, emu::detail::handler_entry_size_t<Width> mem_mask, const handler_entry_read<Width, AddrShift> *const *dispatch)
 {
-	static constexpr u32 LowBits  = emu::detail::handler_entry_dispatch_level_to_lowbits(Level, Width, AddrShift);
-	return dispatch[(offset & mask) >> LowBits]->read(offset, mem_mask);
+	constexpr u32 LOW_BITS  = emu::detail::handler_entry_dispatch_level_to_lowbits(Level, Width, AddrShift);
+	return dispatch[(offset & mask) >> LOW_BITS]->read(offset, mem_mask);
 }
 
 
 template<int Level, int Width, int AddrShift> void dispatch_write(offs_t mask, offs_t offset, emu::detail::handler_entry_size_t<Width> data, emu::detail::handler_entry_size_t<Width> mem_mask, const handler_entry_write<Width, AddrShift> *const *dispatch)
 {
-	static constexpr u32 LowBits  = emu::detail::handler_entry_dispatch_level_to_lowbits(Level, Width, AddrShift);
-	return dispatch[(offset & mask) >> LowBits]->write(offset, data, mem_mask);
+	constexpr u32 LOW_BITS  = emu::detail::handler_entry_dispatch_level_to_lowbits(Level, Width, AddrShift);
+	return dispatch[(offset & mask) >> LOW_BITS]->write(offset, data, mem_mask);
 }
 
 
 template<int Level, int Width, int AddrShift> std::pair<emu::detail::handler_entry_size_t<Width>, u16> dispatch_read_flags(offs_t mask, offs_t offset, emu::detail::handler_entry_size_t<Width> mem_mask, const handler_entry_read<Width, AddrShift> *const *dispatch)
 {
-	static constexpr u32 LowBits  = emu::detail::handler_entry_dispatch_level_to_lowbits(Level, Width, AddrShift);
-	return dispatch[(offset & mask) >> LowBits]->read_flags(offset, mem_mask);
+	constexpr u32 LOW_BITS  = emu::detail::handler_entry_dispatch_level_to_lowbits(Level, Width, AddrShift);
+	return dispatch[(offset & mask) >> LOW_BITS]->read_flags(offset, mem_mask);
 }
 
 
 template<int Level, int Width, int AddrShift> u16 dispatch_write_flags(offs_t mask, offs_t offset, emu::detail::handler_entry_size_t<Width> data, emu::detail::handler_entry_size_t<Width> mem_mask, const handler_entry_write<Width, AddrShift> *const *dispatch)
 {
-	static constexpr u32 LowBits  = emu::detail::handler_entry_dispatch_level_to_lowbits(Level, Width, AddrShift);
-	return dispatch[(offset & mask) >> LowBits]->write_flags(offset, data, mem_mask);
+	constexpr u32 LOW_BITS  = emu::detail::handler_entry_dispatch_level_to_lowbits(Level, Width, AddrShift);
+	return dispatch[(offset & mask) >> LOW_BITS]->write_flags(offset, data, mem_mask);
 }
 
 template<int Level, int Width, int AddrShift> u16 dispatch_lookup_read_flags(offs_t mask, offs_t offset, emu::detail::handler_entry_size_t<Width> mem_mask, const handler_entry_read<Width, AddrShift> *const *dispatch)
 {
-	static constexpr u32 LowBits  = emu::detail::handler_entry_dispatch_level_to_lowbits(Level, Width, AddrShift);
-	return dispatch[(offset & mask) >> LowBits]->lookup_flags(offset, mem_mask);
+	constexpr u32 LOW_BITS  = emu::detail::handler_entry_dispatch_level_to_lowbits(Level, Width, AddrShift);
+	return dispatch[(offset & mask) >> LOW_BITS]->lookup_flags(offset, mem_mask);
 }
 
 
 template<int Level, int Width, int AddrShift> u16 dispatch_lookup_write_flags(offs_t mask, offs_t offset, emu::detail::handler_entry_size_t<Width> mem_mask, const handler_entry_write<Width, AddrShift> *const *dispatch)
 {
-	static constexpr u32 LowBits  = emu::detail::handler_entry_dispatch_level_to_lowbits(Level, Width, AddrShift);
-	return dispatch[(offset & mask) >> LowBits]->lookup_flags(offset, mem_mask);
+	constexpr u32 LOW_BITS  = emu::detail::handler_entry_dispatch_level_to_lowbits(Level, Width, AddrShift);
+	return dispatch[(offset & mask) >> LOW_BITS]->lookup_flags(offset, mem_mask);
 }
 
 
 
 template<int Level, int Width, int AddrShift> emu::detail::handler_entry_size_t<Width> dispatch_read_interruptible(offs_t mask, offs_t offset, emu::detail::handler_entry_size_t<Width> mem_mask, const handler_entry_read<Width, AddrShift> *const *dispatch)
 {
-	static constexpr u32 LowBits  = emu::detail::handler_entry_dispatch_level_to_lowbits(Level, Width, AddrShift);
-	return dispatch[(offset & mask) >> LowBits]->read_interruptible(offset, mem_mask);
+	constexpr u32 LOW_BITS  = emu::detail::handler_entry_dispatch_level_to_lowbits(Level, Width, AddrShift);
+	return dispatch[(offset & mask) >> LOW_BITS]->read_interruptible(offset, mem_mask);
 }
 
 
 template<int Level, int Width, int AddrShift> void dispatch_write_interruptible(offs_t mask, offs_t offset, emu::detail::handler_entry_size_t<Width> data, emu::detail::handler_entry_size_t<Width> mem_mask, const handler_entry_write<Width, AddrShift> *const *dispatch)
 {
-	static constexpr u32 LowBits  = emu::detail::handler_entry_dispatch_level_to_lowbits(Level, Width, AddrShift);
-	return dispatch[(offset & mask) >> LowBits]->write_interruptible(offset, data, mem_mask);
+	constexpr u32 LOW_BITS  = emu::detail::handler_entry_dispatch_level_to_lowbits(Level, Width, AddrShift);
+	return dispatch[(offset & mask) >> LOW_BITS]->write_interruptible(offset, data, mem_mask);
 }
 
+
+namespace emu::detail {
 
 // ======================> memory_access_specific
 
 // memory_access_specific does uncached but faster accesses by shortcutting the address_space virtual call
-
-namespace emu::detail {
 
 template<int Level, int Width, int AddrShift, endianness_t Endian> class memory_access_specific
 {
@@ -1709,19 +1687,19 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> class memory_
 
 	using NativeType = emu::detail::handler_entry_size_t<Width>;
 	static constexpr u32 NATIVE_BYTES = 1 << Width;
-	static constexpr u32 NATIVE_MASK = Width + AddrShift >= 0 ? (1 << (Width + AddrShift)) - 1 : 0;
+	static constexpr u32 NATIVE_MASK = (Width + AddrShift >= 0) ? ((1 << (Width + AddrShift)) - 1) : 0;
 
 public:
 	// construction/destruction
-	memory_access_specific()
-		: m_space(nullptr),
-		  m_addrmask(0),
-		  m_dispatch_read(nullptr),
-		  m_dispatch_write(nullptr)
+	memory_access_specific() :
+		m_space(nullptr),
+		m_addrmask(0),
+		m_dispatch_read(nullptr),
+		m_dispatch_write(nullptr)
 	{
 	}
 
-	inline address_space &space() const {
+	address_space &space() const {
 		return *m_space;
 	}
 
@@ -1824,11 +1802,11 @@ public:
 	u16 lookup_write_qword_unaligned_flags(offs_t address, u64 mask) { return lookup_memory_write_generic_flags<Width, AddrShift, Endian, 3, false>(lwopf(), address, mask); }
 
 	NativeType read_interruptible(offs_t address, NativeType mask = ~NativeType(0)) {
-		return dispatch_read_interruptible<Level, Width, AddrShift>(offs_t(-1), address & m_addrmask, mask, m_dispatch_read);
+		return dispatch_read_interruptible<Level, Width, AddrShift>(~offs_t(0), address & m_addrmask, mask, m_dispatch_read);
 	}
 
 	void write_interruptible(offs_t address, NativeType data, NativeType mask = ~NativeType(0)) {
-		dispatch_write_interruptible<Level, Width, AddrShift>(offs_t(-1), address & m_addrmask, data, mask, m_dispatch_write);
+		dispatch_write_interruptible<Level, Width, AddrShift>(~offs_t(0), address & m_addrmask, data, mask, m_dispatch_write);
 	}
 
 private:
@@ -1840,27 +1818,27 @@ private:
 	const handler_entry_write<Width, AddrShift> *const *m_dispatch_write;
 
 	NativeType read_native(offs_t address, NativeType mask = ~NativeType(0)) {
-		return dispatch_read<Level, Width, AddrShift>(offs_t(-1), address & m_addrmask, mask, m_dispatch_read);
+		return dispatch_read<Level, Width, AddrShift>(~offs_t(0), address & m_addrmask, mask, m_dispatch_read);
 	}
 
 	void write_native(offs_t address, NativeType data, NativeType mask = ~NativeType(0)) {
-		dispatch_write<Level, Width, AddrShift>(offs_t(-1), address & m_addrmask, data, mask, m_dispatch_write);
+		dispatch_write<Level, Width, AddrShift>(~offs_t(0), address & m_addrmask, data, mask, m_dispatch_write);
 	}
 
 	std::pair<NativeType, u16> read_native_flags(offs_t address, NativeType mask = ~NativeType(0)) {
-		return dispatch_read_flags<Level, Width, AddrShift>(offs_t(-1), address & m_addrmask, mask, m_dispatch_read);
+		return dispatch_read_flags<Level, Width, AddrShift>(~offs_t(0), address & m_addrmask, mask, m_dispatch_read);
 	}
 
 	u16 write_native_flags(offs_t address, NativeType data, NativeType mask = ~NativeType(0)) {
-		return dispatch_write_flags<Level, Width, AddrShift>(offs_t(-1), address & m_addrmask, data, mask, m_dispatch_write);
+		return dispatch_write_flags<Level, Width, AddrShift>(~offs_t(0), address & m_addrmask, data, mask, m_dispatch_write);
 	}
 
 	u16 lookup_read_native_flags(offs_t address, NativeType mask = ~NativeType(0)) {
-		return dispatch_lookup_read_flags<Level, Width, AddrShift>(offs_t(-1), address & m_addrmask, mask, m_dispatch_read);
+		return dispatch_lookup_read_flags<Level, Width, AddrShift>(~offs_t(0), address & m_addrmask, mask, m_dispatch_read);
 	}
 
 	u16 lookup_write_native_flags(offs_t address, NativeType mask = ~NativeType(0)) {
-		return dispatch_lookup_write_flags<Level, Width, AddrShift>(offs_t(-1), address & m_addrmask, mask, m_dispatch_write);
+		return dispatch_lookup_write_flags<Level, Width, AddrShift>(~offs_t(0), address & m_addrmask, mask, m_dispatch_write);
 	}
 
 	void set(address_space *space, std::pair<const void *, const void *> rw);
@@ -2327,13 +2305,13 @@ protected:
 	void check_optimize_mirror(const char *function, offs_t addrstart, offs_t addrend, offs_t addrmirror, offs_t &nstart, offs_t &nend, offs_t &nmask, offs_t &nmirror);
 	void check_address(const char *function, offs_t addrstart, offs_t addrend);
 
-	address_space_installer(const address_space_config &config, memory_manager &manager)
-		: m_config(config),
-		  m_manager(manager),
-		  m_addrmask(make_bitmask<offs_t>(m_config.addr_width())),
-		  m_logaddrmask(make_bitmask<offs_t>(m_config.logaddr_width())),
-		  m_addrchars((m_config.addr_width() + 3) / 4),
-		  m_logaddrchars((m_config.logaddr_width() + 3) / 4)
+	address_space_installer(const address_space_config &config, memory_manager &manager) :
+		m_config(config),
+		m_manager(manager),
+		m_addrmask(make_bitmask<offs_t>(m_config.addr_width())),
+		m_logaddrmask(make_bitmask<offs_t>(m_config.logaddr_width())),
+		m_addrchars((m_config.addr_width() + 3) / 4),
+		m_logaddrchars((m_config.logaddr_width() + 3) / 4)
 	{}
 
 	const address_space_config &m_config;       // configuration of this space
@@ -2357,6 +2335,24 @@ protected:
 	address_space(memory_manager &manager, device_memory_interface &memory, int spacenum);
 
 public:
+	struct specific_access_info
+	{
+		struct side
+		{
+			void const *const *dispatch;
+			uintptr_t function;
+			ptrdiff_t displacement;
+			bool is_virtual;
+		};
+
+		unsigned native_bytes;
+		unsigned native_mask_bits;
+		unsigned address_width;
+		unsigned low_bits;
+		side read;
+		side write;
+	};
+
 	virtual ~address_space();
 
 	// getters
@@ -2420,7 +2416,7 @@ public:
 	void set_log_unmap(bool log) { m_log_unmap = log; }
 
 	// general accessors
-	virtual void accessors(data_accessors &accessors) const = 0;
+	virtual specific_access_info specific_accessors() const = 0;
 	virtual void *get_read_ptr(offs_t address) const = 0;
 	virtual void *get_write_ptr(offs_t address) const = 0;
 
