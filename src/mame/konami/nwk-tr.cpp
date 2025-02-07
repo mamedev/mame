@@ -5,7 +5,6 @@
     Driver by Ville Linde
 
 
-
     Hardware overview:
 
     GN676 CPU Board:
@@ -394,7 +393,6 @@ void nwktr_state::sysreg_w(offs_t offset, uint8_t data)
 		{
 			m_gn676_lan->reset_fpga_state(BIT(data, 6));
 
-
 			m_adc12138->cs_w(BIT(data, 3));
 			m_adc12138->conv_w(BIT(data, 2));
 			m_adc12138->di_w(BIT(data, 1));
@@ -403,7 +401,6 @@ void nwktr_state::sysreg_w(offs_t offset, uint8_t data)
 		}
 
 		case 7:
-		{
 			/*
 			    0x80 = EXRES1
 			    0x40 = EXRES0
@@ -416,16 +413,15 @@ void nwktr_state::sysreg_w(offs_t offset, uint8_t data)
 			if (BIT(data, 6)) // CG Board 0 IRQ Ack
 				m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 
-			// NOTE: racingj writes a 2 to broadcast writes to both CG boards
-			// it also sets a 3 during POST, assume to just unmap the space.
-			const u8 exid = (data >> 4) & 0x3;
-			m_konppc->set_cgboard_id(exid);
+			m_konppc->set_cgboard_id((data >> 4) & 0x3);
+
+			// Racing Jam sets CG board ID to 2 when writing to the tilemap chip.
+			// This could mean broadcast to both CG boards?
 
 			m_exrgb = BIT(data, 0);       // Select which CG Board outputs signal
 
-			m_cg_view.select(exid);
+			m_cg_view.select(m_konppc->get_cgboard_id() ? 1 : 0);
 			break;
-		}
 
 		default:
 			break;
@@ -493,34 +489,6 @@ void nwktr_state::ppc_map(address_map &map)
 	m_cg_view[1](0x74010000, 0x7401ffff).ram().w(m_palette[1], FUNC(palette_device::write32)).share("palette2");
 	m_cg_view[1](0x74020000, 0x7403ffff).rw(m_k001604[1], FUNC(k001604_device::tile_r), FUNC(k001604_device::tile_w));
 	m_cg_view[1](0x74040000, 0x7407ffff).rw(m_k001604[1], FUNC(k001604_device::char_r), FUNC(k001604_device::char_w));
-	// racingj broadcast
-	m_cg_view[2](0x74000000, 0x740000ff).lw32(
-		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			m_k001604[0]->reg_w(offset, data, mem_mask);
-			m_k001604[1]->reg_w(offset, data, mem_mask);
-		})
-	);
-	m_cg_view[2](0x74010000, 0x7401ffff).lw32(
-		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			m_palette[0]->write32(offset, data, mem_mask);
-			m_palette[1]->write32(offset, data, mem_mask);
-		})
-	);
-	m_cg_view[2](0x74020000, 0x7403ffff).lw32(
-		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			m_k001604[0]->tile_w(offset, data, mem_mask);
-			m_k001604[1]->tile_w(offset, data, mem_mask);
-		})
-	);
-	m_cg_view[2](0x74040000, 0x7407ffff).lw32(
-		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			m_k001604[0]->char_w(offset, data, mem_mask);
-			m_k001604[1]->char_w(offset, data, mem_mask);
-		})
-	);
-	// racingj POST only, assume unmapped
-	m_cg_view[3](0x74000000, 0x7407ffff).unmaprw();
-
 	map(0x78000000, 0x7800ffff).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_shared_r_ppc), FUNC(konppc_device::cgboard_dsp_shared_w_ppc));
 	map(0x780c0000, 0x780c0003).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_comm_r_ppc), FUNC(konppc_device::cgboard_dsp_comm_w_ppc));
 	map(0x7d000000, 0x7d00ffff).r(FUNC(nwktr_state::sysreg_r));
@@ -1771,7 +1739,7 @@ ROM_START(thrilldbab)
 	ROM_LOAD( "gm676aa_m48t58y.35d", 0x000000, 0x002000, BAD_DUMP CRC(c011dcea) SHA1(39cbbe518bfc256cdb72bdaece03c539f705c807) ) // hand built
 ROM_END
 
-} // Anonymous namespace
+} // anonymous namespace
 
 
 /*****************************************************************************/
