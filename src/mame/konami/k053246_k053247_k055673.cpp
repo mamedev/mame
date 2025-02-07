@@ -444,10 +444,8 @@ void k053247_device::zdrawgfxzoom32GP(
 		u32 code, u32 color, bool flipx, bool flipy, int sx, int sy,
 		int scalex, int scaley, int alpha, int drawmode, int zcode, int pri, u8* gx_objzbuf, u8* gx_shdzbuf)
 {
-#define FP     19
-#define FPONE  (1<<FP)
-#define FPHALF (1<<(FP-1))
-#define FPENT  0
+	constexpr int FP    = 19;
+	constexpr int FPENT = 0;
 
 	// cull illegal and transparent objects
 	if (!scalex || !scaley) return;
@@ -850,10 +848,6 @@ void k053247_device::zdrawgfxzoom32GP(
 			}
 		}
 	}
-#undef FP
-#undef FPONE
-#undef FPHALF
-#undef FPENT
 }
 
 
