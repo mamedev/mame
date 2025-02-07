@@ -15089,7 +15089,7 @@ GAME( 1993, punisher,    0,        qsound,     punisher, cps_state, init_punishe
 GAME( 1993, punisheru,   punisher, qsound,     punisher, cps_state, init_punisher, ROT0,   "Capcom", "The Punisher (USA 930422)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, punisherh,   punisher, qsound,     punisher, cps_state, init_punisher, ROT0,   "Capcom", "The Punisher (Hispanic 930422)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, punisherj,   punisher, qsound,     punisher, cps_state, init_punisher, ROT0,   "Capcom", "The Punisher (Japan 930422)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, punisherbz,  punisher, wofhfh,     punisherbz, cps_state, init_cps1,   ROT0,   "bootleg", "Biaofeng Zhanjing (Chinese bootleg of The Punisher)", MACHINE_SUPPORTS_SAVE )  // (c) 2002, they ripped the sound from Final Fight!
+GAME( 2002, punisherbz,  punisher, wofhfh,     punisherbz, cps_state, init_cps1,   ROT0,   "bootleg", "Biaofeng Zhanjing (Chinese bootleg of The Punisher)", MACHINE_SUPPORTS_SAVE )  // (c) 2002, they ripped the sound from Final Fight!
 GAME( 1993, slammast,    0,        qsound,     slammast, cps_state, init_slammast, ROT0,   "Capcom", "Saturday Night Slam Masters (World 930713)", MACHINE_SUPPORTS_SAVE )    // "ETC"
 GAME( 1993, slammastu,   slammast, qsound,     slammast, cps_state, init_slammast, ROT0,   "Capcom", "Saturday Night Slam Masters (USA 930713)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, mbomberj,    slammast, qsound,     slammast, cps_state, init_slammast, ROT0,   "Capcom", "Muscle Bomber: The Body Explosion (Japan 930713)", MACHINE_SUPPORTS_SAVE )
