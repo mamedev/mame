@@ -1127,7 +1127,7 @@ protected:
 
 /*
 
-Primal Rage 2
+Primal Rage II
 Atari, 1996
 
 This game runs on Sony ZN1 hardware with a custom Atari top board.
@@ -6088,7 +6088,7 @@ GAME( 1999, shiryu2,   strider2, coh3002c,  strider2, capcom_zn_state,  empty_in
 
 // Atari (PSXTRA)
 GAME( 1996, coh1000w,  0,        coh1000w,  zn,       primrag2_state,   empty_init, ROT0, "Atari",                   "Atari PSX",                         MACHINE_IS_BIOS_ROOT | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, primrag2,  coh1000w, coh1000w,  primrag2, primrag2_state,   empty_init, ROT0, "Atari",                   "Primal Rage 2 (Ver 0.36a)",                                MACHINE_SUPPORTS_SAVE )
+GAME( 1996, primrag2,  coh1000w, coh1000w,  primrag2, primrag2_state,   empty_init, ROT0, "Atari",                   "Primal Rage II (Ver 0.36a)",                                MACHINE_SUPPORTS_SAVE )
 
 // Acclaim (PCB-100102 PCB-100095)
 GAME( 1995, coh1000a,  0,        coh1000a,  zn,       acclaim_zn_state, empty_init, ROT0, "Acclaim",                 "Acclaim PSX",                       MACHINE_IS_BIOS_ROOT | MACHINE_SUPPORTS_SAVE )
