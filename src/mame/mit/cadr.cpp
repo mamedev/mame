@@ -5,7 +5,7 @@
 MIT CADR emulation
 
 TODO:
-- No cursor is displayed on screen.
+- Keyboard sometimes becomes unresponsive.
 - Network not supported yet.
 - Add support for a second disk controller board.
 - System 100 errors not being able to communicatie to another host but it never
@@ -160,9 +160,12 @@ void cadr_state::mem_map(address_map &map)
 	).umask32(0x0000ffff);
 
 	// This diagnostics interface is not described in AI Memo 528, but it
-	// is used by the CC-TEST_MACHINE program from 1980.
+	// is used by the CC-TEST_MACHINE program to test another machine.
 	//
-	// 3ff620 - 3ff626 - Debug interface to another machine
+	// This interface ends up writing to the debuggee's diagnostic/spy area
+	// to single step through debug statements.
+	//
+	// 3ff620 - 3ff626 - Debug/diagnostic interface to another machine
 	// 3ff620 - read or write the debuggee unibus location
 	// 3ff624 - Bit 17 of the debuggee Unibus address
 	// 3ff626 - Debuggee Unibus address to access (bits 1-16)
