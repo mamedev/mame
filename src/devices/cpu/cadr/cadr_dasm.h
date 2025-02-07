@@ -18,10 +18,10 @@ public:
 	virtual u32 opcode_alignment() const override;
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
 
-	static constexpr u64 NOP_MASK = u64(0x7fffffffeffff); // With POPJ bit
-//	static constexpr u64 NOP_MASK = u64(0x7fbfffffeffff); // Excluding POPJ bit
 
 private:
+	static constexpr u64 NOP_MASK = u64(0x7fffffffeffff);
+
 	static const char *const bool_op[0x10];
 	static const char *const arith_op[0x10];
 	static const char *const arith_op_c[0x10];

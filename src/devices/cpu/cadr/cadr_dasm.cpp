@@ -4,6 +4,10 @@
 
     MIT CADR microcode disassembler
 
+The official assembler language is unknown.
+An attempt has been made to keep the generated assembler code short and
+understandable.
+
 TODO:
 - bit 45 ilong
 
