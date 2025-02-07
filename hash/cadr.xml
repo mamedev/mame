@@ -21,7 +21,7 @@ license:CC0-1.0
 		<description>System 100.0</description>
 		<year>2023</year>
 		<publisher>ams</publisher>
-		<notes>Network/Chaosnet is not implemented. (DIRED) tries to load from network but no network interaction is performed.</notes>
+		<notes>(DIRED) tries to load from network but no network interaction is performed.</notes>
 		<part name="hdd" interface="hdd">
 			<diskarea name="harddriv">
 				<disk name="sys100" sha1="e9e3efeaa3bf40456570c1b3a010123b2878280d" writeable="yes"/>
@@ -33,7 +33,7 @@ license:CC0-1.0
 		<description>System 300.0</description>
 		<year>2023</year>
 		<publisher>ams</publisher>
-		<notes>Network/Chaosnet is not emulated.</notes>
+		<notes>Initial communication between keyboard and system cause the machine to go into an endless loop.</notes>
 		<part name="hdd" interface="hdd">
 			<diskarea name="harddriv">
 				<disk name="sys300" sha1="aaa5fe8572c0ad8bfb234c0940b347eb3d872205" writeable="yes"/>
@@ -45,7 +45,7 @@ license:CC0-1.0
 		<description>System 301.0</description>
 		<year>2024</year>
 		<publisher>ams</publisher>
-		<notes>Network/Chaosnet is not emulated.</notes>
+		<notes>Initial communication between keyboard and system cause the machine to go into an endless loop.</notes>
 		<part name="hdd" interface="hdd">
 			<diskarea name="harddriv">
 				<disk name="sys301" sha1="037304d40e70dd09ddf3e0e082a292134271c504" writeable="yes"/>
