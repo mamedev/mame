@@ -9,6 +9,23 @@ Toshiba TLCS-900/H disassembly
 #include "emu.h"
 #include "dasm900.h"
 
+tlcs900_disassembler::tlcs900_disassembler(std::pair<u16, char const *> const symbols[], std::size_t symbol_count)
+	: m_symbols(symbols), m_symbol_count(symbol_count)
+{
+}
+
+template <typename T> std::string tlcs900_disassembler::address(T offset, int size) const
+{
+	auto const symbol = std::lower_bound(m_symbols,
+										 m_symbols + m_symbol_count,
+										 offset,
+										 [] (auto const &sym, u16 addr) { return sym.first < addr; });
+	if ((m_symbol_count != (symbol - m_symbols)) && (symbol->first == offset))
+		return symbol->second;
+	else
+		return util::string_format("0x%0*x", size, offset);
+}
+
 const char *const tlcs900_disassembler::s_mnemonic[] =
 {
 	"adc", "add", "and", "andcf", "bit", "bs1b",
@@ -1369,11 +1386,119 @@ const char *const tlcs900_disassembler::s_cond[16] =
 	"F","LT","LE","ULE","PE/OV","M/MI","Z","C","T","GE","GT","UGT","PO/NOV","P/PL","NZ","NC"
 };
 
-
 u32 tlcs900_disassembler::opcode_alignment() const
 {
 	return 1;
 }
+
+void tlcs900_disassembler::decode_control_register_8(std::ostream &stream, uint8_t imm){
+	switch( imm )
+	{
+	case 0x22: util::stream_format(stream, " DMAM0"); break;
+	case 0x26: util::stream_format(stream, " DMAM1"); break;
+	case 0x2a: util::stream_format(stream, " DMAM2"); break;
+	case 0x2e: util::stream_format(stream, " DMAM3"); break;
+	default:
+		util::stream_format(stream, " unknown (encoding is 0x%02x)", imm);
+		break;
+	}
+}
+
+
+void tmp94c241_disassembler::decode_control_register_8(std::ostream &stream, uint8_t imm){
+	switch( imm )
+	{
+	case 0x42: util::stream_format(stream, " DMAM0"); break;
+	case 0x46: util::stream_format(stream, " DMAM1"); break;
+	case 0x4a: util::stream_format(stream, " DMAM2"); break;
+	case 0x4e: util::stream_format(stream, " DMAM3"); break;
+	case 0x52: util::stream_format(stream, " DMAM4"); break;
+	case 0x56: util::stream_format(stream, " DMAM5"); break;
+	case 0x5a: util::stream_format(stream, " DMAM6"); break;
+	case 0x5e: util::stream_format(stream, " DMAM7"); break;
+	default:
+		util::stream_format(stream, " unknown (encoding is 0x%02x)", imm);
+		break;
+	}
+}
+
+
+void tlcs900_disassembler::decode_control_register_16(std::ostream &stream, uint8_t imm){
+	switch( imm )
+	{
+	case 0x20: util::stream_format(stream, " DMAC0"); break;
+	case 0x24: util::stream_format(stream, " DMAC1"); break;
+	case 0x28: util::stream_format(stream, " DMAC2"); break;
+	case 0x2c: util::stream_format(stream, " DMAC3"); break;
+	case 0x7c: util::stream_format(stream, " NSP"); break;
+	default:
+		util::stream_format(stream, " unknown (encoding is 0x%02x)", imm);
+		break;
+	}
+}
+
+
+void tmp94c241_disassembler::decode_control_register_16(std::ostream &stream, uint8_t imm){
+	switch( imm )
+	{
+	case 0x40: util::stream_format(stream, " DMAC0"); break;
+	case 0x44: util::stream_format(stream, " DMAC1"); break;
+	case 0x48: util::stream_format(stream, " DMAC2"); break;
+	case 0x4c: util::stream_format(stream, " DMAC3"); break;
+	case 0x50: util::stream_format(stream, " DMAC4"); break;
+	case 0x54: util::stream_format(stream, " DMAC5"); break;
+	case 0x58: util::stream_format(stream, " DMAC6"); break;
+	case 0x5c: util::stream_format(stream, " DMAC7"); break;
+	default:
+		util::stream_format(stream, " unknown (encoding is 0x%02x)", imm);
+		break;
+	}
+}
+
+
+void tlcs900_disassembler::decode_control_register_32(std::ostream &stream, uint8_t imm){
+	switch( imm )
+	{
+	case 0x00: util::stream_format(stream, " DMAS0"); break;
+	case 0x04: util::stream_format(stream, " DMAS1"); break;
+	case 0x08: util::stream_format(stream, " DMAS2"); break;
+	case 0x0c: util::stream_format(stream, " DMAS3"); break;
+	case 0x10: util::stream_format(stream, " DMAD0"); break;
+	case 0x14: util::stream_format(stream, " DMAD1"); break;
+	case 0x18: util::stream_format(stream, " DMAD2"); break;
+	case 0x1c: util::stream_format(stream, " DMAD3"); break;
+	default:
+		util::stream_format(stream, " unknown (encoding is 0x%02x)", imm);
+		break;
+	}
+}
+
+
+void tmp94c241_disassembler::decode_control_register_32(std::ostream &stream, uint8_t imm){
+	switch( imm )
+	{
+	case 0x00: util::stream_format(stream, " DMAS0"); break;
+	case 0x04: util::stream_format(stream, " DMAS1"); break;
+	case 0x08: util::stream_format(stream, " DMAS2"); break;
+	case 0x0c: util::stream_format(stream, " DMAS3"); break;
+	case 0x10: util::stream_format(stream, " DMAS4"); break;
+	case 0x14: util::stream_format(stream, " DMAS5"); break;
+	case 0x18: util::stream_format(stream, " DMAS6"); break;
+	case 0x1c: util::stream_format(stream, " DMAS7"); break;
+	case 0x20: util::stream_format(stream, " DMAD0"); break;
+	case 0x24: util::stream_format(stream, " DMAD1"); break;
+	case 0x28: util::stream_format(stream, " DMAD2"); break;
+	case 0x2c: util::stream_format(stream, " DMAD3"); break;
+	case 0x30: util::stream_format(stream, " DMAD4"); break;
+	case 0x34: util::stream_format(stream, " DMAD5"); break;
+	case 0x38: util::stream_format(stream, " DMAD6"); break;
+	case 0x3c: util::stream_format(stream, " DMAD7"); break;
+	default:
+		util::stream_format(stream, " unknown (encoding is 0x%02x)", imm);
+		break;
+	}
+}
+
 
 offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
@@ -1449,25 +1574,25 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 	case M_C0:
 		switch( op & 0x07 )
 		{
-		case 0x00:  /* 0xC0 */
+		case 0x00:  /* 0xc0 */
 			imm = opcodes.r8( pos++ );
-			buf = string_format("0x%02x", imm);
+			buf = address( imm, 2 );
 			break;
 
-		case 0x01:  /* 0xC1 */
+		case 0x01:  /* 0xc1 */
 			imm = opcodes.r8( pos++ );
 			imm = imm | (opcodes.r8( pos++ ) << 8);
-			buf = string_format("0x%04x", imm);
+			buf = address( imm, 4 );
 			break;
 
-		case 0x02:  /* 0xC2 */
+		case 0x02:  /* 0xc2 */
 			imm = opcodes.r8( pos++ );
 			imm = imm | (opcodes.r8( pos++ ) << 8);
 			imm = imm | (opcodes.r8( pos++ ) << 16);
-			buf = string_format("0x%06x", imm);
+			buf = address( imm, 6 );
 			break;
 
-		case 0x03:  /* 0xC3 */
+		case 0x03:  /* 0xc3 */
 			imm = opcodes.r8( pos++ );
 			switch( imm & 0x03 )
 			{
@@ -1511,12 +1636,12 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 			}
 			break;
 
-		case 0x04:  /* 0xC4 */
+		case 0x04:  /* 0xc4 */
 			imm = opcodes.r8( pos++ );
 			buf = string_format("-%s", s_allreg32[imm]);
 			break;
 
-		case 0x05:  /* 0xC5 */
+		case 0x05:  /* 0xc5 */
 			imm = opcodes.r8( pos++ );
 			buf = string_format("%s+", s_allreg32[imm]);
 			break;
@@ -1526,7 +1651,7 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 		break;
 
 	case oC8:
-		if ( op & 0x08 )
+		if( op & 0x08 )
 		{
 			buf = string_format("%s", s_reg8[ op & 0x07 ]);
 		}
@@ -1542,25 +1667,25 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 	case M_D0:
 		switch( op & 0x07 )
 		{
-		case 0x00:  /* 0xD0 */
+		case 0x00:  /* 0xd0 */
 			imm = opcodes.r8( pos++ );
 			buf = string_format("0x%02x", imm);
 			break;
 
-		case 0x01:  /* 0xD1 */
+		case 0x01:  /* 0xd1 */
 			imm = opcodes.r8( pos++ );
 			imm = imm | (opcodes.r8( pos++ ) << 8);
 			buf = string_format("0x%04x", imm);
 			break;
 
-		case 0x02:  /* 0xD2 */
+		case 0x02:  /* 0xd2 */
 			imm = opcodes.r8( pos++ );
 			imm = imm | (opcodes.r8( pos++ ) << 8);
 			imm = imm | (opcodes.r8( pos++ ) << 16);
 			buf = string_format("0x%06x", imm);
 			break;
 
-		case 0x03:  /* 0xD3 */
+		case 0x03:  /* 0xd3 */
 			imm = opcodes.r8( pos++ );
 			switch( imm & 0x03 )
 			{
@@ -1604,12 +1729,12 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 			}
 			break;
 
-		case 0x04:  /* 0xD4 */
+		case 0x04:  /* 0xd4 */
 			imm = opcodes.r8( pos++ );
 			buf = string_format("-%s", s_allreg32[imm]);
 			break;
 
-		case 0x05:  /* 0xD5 */
+		case 0x05:  /* 0xd5 */
 			imm = opcodes.r8( pos++ );
 			buf = string_format("%s+", s_allreg32[imm]);
 			break;
@@ -1619,7 +1744,7 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 		break;
 
 	case oD8:
-		if ( op & 0x08 )
+		if( op & 0x08 )
 		{
 			buf = string_format("%s", s_reg16[ op & 0x07 ]);
 		}
@@ -1636,25 +1761,25 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 	case M_E0:
 		switch( op & 0x07 )
 		{
-		case 0x00:  /* 0xE0 */
+		case 0x00:  /* 0xe0 */
 			imm = opcodes.r8( pos++ );
 			buf = string_format("0x%02x", imm);
 			break;
 
-		case 0x01:  /* 0xE1 */
+		case 0x01:  /* 0xe1 */
 			imm = opcodes.r8( pos++ );
 			imm = imm | (opcodes.r8( pos++ ) << 8);
 			buf = string_format("0x%04x", imm);
 			break;
 
-		case 0x02:  /* 0xE2 */
+		case 0x02:  /* 0xe2 */
 			imm = opcodes.r8( pos++ );
 			imm = imm | (opcodes.r8( pos++ ) << 8);
 			imm = imm | (opcodes.r8( pos++ ) << 16);
 			buf = string_format("0x%06x", imm);
 			break;
 
-		case 0x03:  /* 0xE3 */
+		case 0x03:  /* 0xe3 */
 			imm = opcodes.r8( pos++ );
 			switch( imm & 0x03 )
 			{
@@ -1698,12 +1823,12 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 			}
 			break;
 
-		case 0x04:  /* 0xE4 */
+		case 0x04:  /* 0xe4 */
 			imm = opcodes.r8( pos++ );
 			buf = string_format("-%s", s_allreg32[imm]);
 			break;
 
-		case 0x05:  /* 0xE5 */
+		case 0x05:  /* 0xe5 */
 			imm = opcodes.r8( pos++ );
 			buf = string_format("%s+", s_allreg32[imm]);
 			break;
@@ -1713,7 +1838,7 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 		break;
 
 	case M_E8:
-		if ( op & 0x08 )
+		if( op & 0x08 )
 		{
 			buf = string_format("%s", s_reg32[ op & 0x07 ]);
 		}
@@ -1729,25 +1854,25 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 	case M_F0:
 		switch( op & 0x07 )
 		{
-		case 0x00:  /* 0xF0 */
+		case 0x00:  /* 0xf0 */
 			imm = opcodes.r8( pos++ );
-			buf = string_format("0x%02x", imm);
+			buf = address( imm, 2 );
 			break;
 
-		case 0x01:  /* 0xF1 */
+		case 0x01:  /* 0xf1 */
 			imm = opcodes.r8( pos++ );
 			imm = imm | (opcodes.r8( pos++ ) << 8);
-			buf = string_format("0x%04x", imm);
+			buf = address( imm, 4 );
 			break;
 
-		case 0x02:  /* 0xF2 */
+		case 0x02:  /* 0xf2 */
 			imm = opcodes.r8( pos++ );
 			imm = imm | (opcodes.r8( pos++ ) << 8);
 			imm = imm | (opcodes.r8( pos++ ) << 16);
-			buf = string_format("0x%06x", imm);
+			buf = address( imm, 6 );
 			break;
 
-		case 0x03:  /* 0xF3 */
+		case 0x03:  /* 0xf3 */
 			imm = opcodes.r8( pos++ );
 			switch( imm & 0x03 )
 			{
@@ -1791,12 +1916,12 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 			}
 			break;
 
-		case 0x04:  /* 0xF4 */
+		case 0x04:  /* 0xf4 */
 			imm = opcodes.r8( pos++ );
 			buf = string_format("-%s", s_allreg32[imm]);
 			break;
 
-		case 0x05:  /* 0xF5 */
+		case 0x05:  /* 0xf5 */
 			imm = opcodes.r8( pos++ );
 			buf = string_format("%s+", s_allreg32[imm]);
 			break;
@@ -1854,97 +1979,36 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 
 	case O_CC:
 		util::stream_format(stream, " %s", s_cond[op & 0x0F]);
-		if ((op & 0x07) != 0 && dasm->mnemonic != M_SCC)
+		if( (op & 0x07) != 0 && dasm->mnemonic != M_SCC )
+		{
 			flags |= STEP_COND;
+		}
 		break;
 
 	case O_CR8:
 		imm = opcodes.r8( pos++ );
-		switch( imm )
-		{
-		case 0x22:
-			util::stream_format(stream, " DMAM0");
-			break;
-		case 0x26:
-			util::stream_format(stream, " DMAM1");
-			break;
-		case 0x2a:
-			util::stream_format(stream, " DMAM2");
-			break;
-		case 0x2e:
-			util::stream_format(stream, " DMAM3");
-			break;
-		default:
-			util::stream_format(stream, " unknown");
-			break;
-		}
+		decode_control_register_8(stream, imm);
 		break;
 
 	case O_CR16:
 		imm = opcodes.r8( pos++ );
-		switch( imm )
-		{
-		case 0x20:
-			util::stream_format(stream, " DMAC0");
-			break;
-		case 0x24:
-			util::stream_format(stream, " DMAC1");
-			break;
-		case 0x28:
-			util::stream_format(stream, " DMAC2");
-			break;
-		case 0x2c:
-			util::stream_format(stream, " DMAC3");
-			break;
-		default:
-			util::stream_format(stream, " unknown");
-			break;
-		}
+		decode_control_register_16(stream, imm);
 		break;
 
 	case O_CR32:
 		imm = opcodes.r8( pos++ );
-		switch( imm )
-		{
-		case 0x00:
-			util::stream_format(stream, " DMAS0");
-			break;
-		case 0x04:
-			util::stream_format(stream, " DMAS1");
-			break;
-		case 0x08:
-			util::stream_format(stream, " DMAS2");
-			break;
-		case 0x0c:
-			util::stream_format(stream, " DMAS3");
-			break;
-		case 0x10:
-			util::stream_format(stream, " DMAD0");
-			break;
-		case 0x14:
-			util::stream_format(stream, " DMAD1");
-			break;
-		case 0x18:
-			util::stream_format(stream, " DMAD2");
-			break;
-		case 0x1c:
-			util::stream_format(stream, " DMAD3");
-			break;
-		default:
-			util::stream_format(stream, " unknown");
-			break;
-		}
+		decode_control_register_32(stream, imm);
 		break;
 
 	case O_D8:
 		imm = opcodes.r8( pos++ );
-		util::stream_format(stream, " 0x%06x", ( pos + (int8_t)imm ) & 0xFFFFFF);
+		util::stream_format(stream, " 0x%06x", ( pos + (int8_t)imm ) & 0xffffff);
 		break;
 
 	case O_D16:
 		imm = opcodes.r8( pos++ );
 		imm = imm | (opcodes.r8( pos++ ) << 8);
-		util::stream_format(stream, " 0x%06x", ( pos + (int16_t)imm ) & 0xFFFFFF);
+		util::stream_format(stream, " 0x%06x", ( pos + (int16_t)imm ) & 0xffffff);
 		break;
 
 	case O_F:
@@ -1997,13 +2061,13 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 
 	case O_M8:
 		imm = opcodes.r8( pos++ );
-		util::stream_format(stream, " (0x%02x)", imm);
+		util::stream_format(stream, " (%s)", address( imm, 2 ));
 		break;
 
 	case O_M16:
 		imm = opcodes.r8( pos++ );
 		imm = imm | (opcodes.r8( pos++ ) << 8);
-		util::stream_format(stream, " (0x%04x)", imm);
+		util::stream_format(stream, " (%s)", address( imm, 4 ));
 		break;
 
 	case O_R:
@@ -2042,97 +2106,39 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 
 	case O_CC:
 		util::stream_format(stream, ",%s", s_cond[op & 0x0F]);
-		if ((op & 0x07) != 0 && dasm->mnemonic != M_SCC)
+		if( (op & 0x07) != 0 && dasm->mnemonic != M_SCC )
+		{
 			flags |= STEP_COND;
+		}
 		break;
 
 	case O_CR8:
 		imm = opcodes.r8( pos++ );
-		switch( imm )
-		{
-		case 0x22:
-			util::stream_format(stream, ",DMAM0");
-			break;
-		case 0x26:
-			util::stream_format(stream, ",DMAM1");
-			break;
-		case 0x2a:
-			util::stream_format(stream, ",DMAM2");
-			break;
-		case 0x2e:
-			util::stream_format(stream, ",DMAM3");
-			break;
-		default:
-			util::stream_format(stream, ",unknown");
-			break;
-		}
+		util::stream_format(stream, ",");
+		decode_control_register_8(stream, imm);
 		break;
 
 	case O_CR16:
 		imm = opcodes.r8( pos++ );
-		switch( imm )
-		{
-		case 0x20:
-			util::stream_format(stream, ",DMAC0");
-			break;
-		case 0x24:
-			util::stream_format(stream, ",DMAC1");
-			break;
-		case 0x28:
-			util::stream_format(stream, ",DMAC2");
-			break;
-		case 0x2c:
-			util::stream_format(stream, ",DMAC3");
-			break;
-		default:
-			util::stream_format(stream, ",unknown");
-			break;
-		}
+		util::stream_format(stream, ",");
+		decode_control_register_16(stream, imm);
 		break;
 
 	case O_CR32:
 		imm = opcodes.r8( pos++ );
-		switch( imm )
-		{
-		case 0x00:
-			util::stream_format(stream, ",DMAS0");
-			break;
-		case 0x04:
-			util::stream_format(stream, ",DMAS1");
-			break;
-		case 0x08:
-			util::stream_format(stream, ",DMAS2");
-			break;
-		case 0x0c:
-			util::stream_format(stream, ",DMAS3");
-			break;
-		case 0x10:
-			util::stream_format(stream, ",DMAD0");
-			break;
-		case 0x14:
-			util::stream_format(stream, ",DMAD1");
-			break;
-		case 0x18:
-			util::stream_format(stream, ",DMAD2");
-			break;
-		case 0x1c:
-			util::stream_format(stream, ",DMAD3");
-			break;
-		default:
-			util::stream_format(stream, ",unknown");
-			break;
-		}
+		util::stream_format(stream, ",");
+		decode_control_register_32(stream, imm);
 		break;
 
 	case O_D8:
 		imm = opcodes.r8( pos++ );
-		util::stream_format(stream, ",0x%06x", ( pos + (int8_t)imm ) & 0xFFFFFF);
+		util::stream_format(stream, ",0x%06x", ( pos + (int8_t)imm ) & 0xffffff);
 		break;
 
 	case O_D16:
 		imm = opcodes.r8( pos++ );
 		imm = imm | (opcodes.r8( pos++ ) << 8);
-		util::stream_format(stream, ",0x%06x", ( pos + (int16_t)imm ) & 0xFFFFFF);
+		util::stream_format(stream, ",0x%06x", ( pos + (int16_t)imm ) & 0xffffff);
 		break;
 
 	case O_F:
@@ -2185,13 +2191,13 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 
 	case O_M8:
 		imm = opcodes.r8( pos++ );
-		util::stream_format(stream, ",(0x%02x)", imm);
+		util::stream_format(stream, " (%s)", address( imm, 2 ));
 		break;
 
 	case O_M16:
 		imm = opcodes.r8( pos++ );
 		imm = imm | (opcodes.r8( pos++ ) << 8);
-		util::stream_format(stream, ",(0x%04x)", imm);
+		util::stream_format(stream, " (%s)", address( imm, 4 ));
 		break;
 
 	case O_R:
