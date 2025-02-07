@@ -332,6 +332,17 @@ public:
 	}
 };
 
+
+inline bool is_nonvolatile_register(Gp reg)
+{
+	auto const r = reg.r64();
+#ifdef _WIN32
+	return (r == rbx) || (r == rsi) || (r == rdi) || (r == rbp) || (r == r12) || (r == r13) || (r == r14) || (r == r15);
+#else
+	return (r == rbx) || (r == rbp) || (r == r12) || (r == r13) || (r == r14) || (r == r15);
+#endif
+}
+
 } // anonymous namespace
 
 
@@ -716,8 +727,15 @@ drcbe_x64::drcbe_x64(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 	{
 		if (m_space[space])
 		{
-			m_memory_accessors[space].resolved.set(*m_space[space]);
-			m_memory_accessors[space].specific = m_space[space]->specific_accessors();
+			auto &accessors = m_memory_accessors[space];
+			accessors.resolved.set(*m_space[space]);
+			accessors.specific = m_space[space]->specific_accessors();
+			accessors.address_mask = m_space[space]->addrmask() & make_bitmask<offs_t>(accessors.specific.address_width) & ~make_bitmask<offs_t>(accessors.specific.native_mask_bits);
+			offs_t const shiftedmask = accessors.address_mask >> accessors.specific.low_bits;
+			offs_t const nomask = ~offs_t(0);
+			accessors.no_mask = nomask == accessors.address_mask;
+			accessors.has_high_bits = shiftedmask != 0U;
+			accessors.mask_high_bits = !accessors.specific.low_bits || !BIT(accessors.address_mask, (sizeof(offs_t) * 8) - 1) || (shiftedmask & (shiftedmask + 1));
 		}
 	}
 
@@ -1898,17 +1916,16 @@ void drcbe_x64::op_setfmod(Assembler &a, const instruction &inst)
 	// normalize parameters
 	be_parameter srcp(*this, inst.param(0), PTYPE_MRI);
 
-	// immediate case
 	if (srcp.is_immediate())
 	{
+		// immediate case
 		int value = srcp.immediate() & 3;
 		a.mov(MABS(&m_state.fmod, 1), value);                                           // mov   [fmod],srcp
 		a.ldmxcsr(MABS(&m_near.ssecontrol[value]));                                     // ldmxcsr fp_control[srcp]
 	}
-
-	// register/memory case
 	else
 	{
+		// register/memory case
 		mov_reg_param(a, eax, srcp);                                                    // mov   eax,srcp
 		a.and_(eax, 3);                                                                 // and   eax,3
 		a.mov(MABS(&m_state.fmod), al);                                                 // mov   [fmod],al
@@ -2530,7 +2547,6 @@ void drcbe_x64::op_read(Assembler &a, const instruction &inst)
 	// set up a call to the read handler
 	auto const &accessors = m_memory_accessors[spacesizep.space()];
 	bool const have_specific = (uintptr_t(nullptr) != accessors.specific.read.function) || accessors.specific.read.is_virtual;
-	offs_t const addr_mask = m_space[spacesizep.space()]->addrmask() & make_bitmask<offs_t>(accessors.specific.address_width) & ~make_bitmask<offs_t>(accessors.specific.native_mask_bits);
 	mov_reg_param(a, Gpd(REG_PARAM2), addrp);
 	if (have_specific && ((1 << spacesizep.size()) == accessors.specific.native_bytes))
 	{
@@ -2540,16 +2556,36 @@ void drcbe_x64::op_read(Assembler &a, const instruction &inst)
 		else
 			a.mov(Gpq(REG_PARAM3), make_bitmask<uint64_t>(accessors.specific.native_bytes << 3));
 
-		a.and_(Gpd(REG_PARAM2), imm(addr_mask));                                                 // apply address mask
+		if (accessors.has_high_bits && !accessors.mask_high_bits)
+			a.mov(r10d, Gpd(REG_PARAM2));                                                        // copy address for dispatch index
+		if (!accessors.no_mask)
+			a.and_(Gpd(REG_PARAM2), imm(accessors.address_mask));                                // apply address mask
+		if (accessors.has_high_bits && !accessors.mask_high_bits)
+			a.shr(r10d, accessors.specific.low_bits);                                            // shift off low bits
 		mov_r64_imm(a, rax, uintptr_t(accessors.specific.read.dispatch));                        // load dispatch table pointer
-		if (accessors.specific.low_bits)
+		if (accessors.has_high_bits)
 		{
-			a.mov(r10d, Gpd(REG_PARAM2));                                                        // save masked address
-			a.shr(Gpd(REG_PARAM2), accessors.specific.low_bits);                                 // shift off low bits
+			if (accessors.mask_high_bits)
+			{
+				if (accessors.specific.low_bits)
+				{
+					a.mov(r10d, Gpd(REG_PARAM2));                                                // save masked address
+					a.shr(Gpd(REG_PARAM2), accessors.specific.low_bits);                         // shift off low bits
+				}
+				a.mov(Gpq(REG_PARAM1), ptr(rax, Gpd(REG_PARAM2), 3));                            // load dispatch table entry
+				if (accessors.specific.low_bits)
+					a.mov(Gpd(REG_PARAM2), r10d);                                                // restore masked address
+
+			}
+			else
+			{
+				a.mov(Gpq(REG_PARAM1), ptr(rax, r10d, 3));                                       // load dispatch table entry
+			}
 		}
-		a.mov(Gpq(REG_PARAM1), ptr(rax, Gpq(REG_PARAM2), 3));                                    // load dispatch table entry
-		if (accessors.specific.low_bits)
-			a.mov(Gpd(REG_PARAM2), r10d);                                                        // restore masked address
+		else
+		{
+			a.mov(Gpq(REG_PARAM1), ptr(rax));                                                    // load dispatch table entry
+		}
 
 		if (accessors.specific.read.is_virtual)
 			a.mov(rax, ptr(Gpq(REG_PARAM1), accessors.specific.read.displacement));              // load vtable pointer
@@ -2563,33 +2599,53 @@ void drcbe_x64::op_read(Assembler &a, const instruction &inst)
 	else if (have_specific && ((1 << spacesizep.size()) < accessors.specific.native_bytes))
 	{
 		// if the destination register isn't a non-volatile register, we can use it to save the shift count
-		bool need_save = (dstreg != ebx) && (dstreg != r12d) && (dstreg != r13d) && (dstreg != r14d) && (dstreg != r15d);
-
+		bool need_save = !is_nonvolatile_register(dstreg);
 		if (need_save)
 			a.mov(ptr(rsp, 32), Gpq(int_register_map[0]));                                       // save I0 register
+
 		if ((accessors.specific.native_bytes <= 4) || (spacesizep.size() != SIZE_QWORD))
 			a.mov(Gpd(REG_PARAM3), imm(make_bitmask<uint32_t>(8 << spacesizep.size())));         // set default mem_mask
 		else
 			a.mov(Gpq(REG_PARAM3), imm(make_bitmask<uint64_t>(8 << spacesizep.size())));         // set default mem_mask
-		a.mov(ecx, Gpd(REG_PARAM2));                                                             // copy address
-		a.and_(Gpd(REG_PARAM2), imm(addr_mask));                                                 // apply address mask
+
+		a.mov(ecx, Gpd(REG_PARAM2));                                                             // copy address for bit offset
+		if (accessors.has_high_bits && !accessors.mask_high_bits)
+			a.mov(r10d, Gpd(REG_PARAM2));                                                        // copy address for dispatch index
+		if (!accessors.no_mask)
+			a.and_(Gpd(REG_PARAM2), imm(accessors.address_mask));                                // apply address mask
 
 		int const shift = m_space[spacesizep.space()]->addr_shift() - 3;
 		if (m_space[spacesizep.space()]->endianness() != ENDIANNESS_LITTLE)
 			a.not_(ecx);                                                                         // swizzle address for bit Endian spaces
+		if (accessors.has_high_bits && !accessors.mask_high_bits)
+			a.shr(r10d, accessors.specific.low_bits);                                            // shift off low bits
 		mov_r64_imm(a, rax, uintptr_t(accessors.specific.read.dispatch));                        // load dispatch table pointer
 		if (shift < 0)
 			a.shl(ecx, imm(-shift));                                                             // convert address to bits (left shift)
 		else if (shift > 0)
 			a.shr(ecx, imm(shift));                                                              // convert address to bits (right shift)
-		if (accessors.specific.low_bits)
+		if (accessors.has_high_bits)
 		{
-			a.mov(r10d, Gpd(REG_PARAM2));                                                        // copy masked address
-			a.shr(Gpd(REG_PARAM2), accessors.specific.low_bits);                                 // shift off low bits
+			if (accessors.mask_high_bits)
+			{
+				if (accessors.specific.low_bits)
+				{
+					a.mov(r10d, Gpd(REG_PARAM2));                                                // copy masked address
+					a.shr(Gpd(REG_PARAM2), accessors.specific.low_bits);                         // shift off low bits
+				}
+				a.mov(rax, ptr(rax, Gpd(REG_PARAM2), 3));                                        // load dispatch table entry
+			}
+			else
+			{
+				a.mov(rax, ptr(rax, r10d, 3));                                                   // load dispatch table entry
+			}
 		}
-		a.mov(rax, ptr(rax, Gpq(REG_PARAM2), 3));                                                // load dispatch table entry
+		else
+		{
+			a.mov(Gpq(REG_PARAM1), ptr(rax));                                                    // load dispatch table entry
+		}
 		a.and_(ecx, imm((accessors.specific.native_bytes - (1 << spacesizep.size())) << 3));     // mask bit address
-		if (accessors.specific.low_bits)
+		if (accessors.has_high_bits && accessors.mask_high_bits && accessors.specific.low_bits)
 			a.mov(Gpd(REG_PARAM2), r10d);                                                        // restore masked address
 		if (need_save)
 			a.mov(Gpd(int_register_map[0]), ecx);                                                // save masked bit address
@@ -2698,7 +2754,6 @@ void drcbe_x64::op_readm(Assembler &a, const instruction &inst)
 	// set up a call to the read handler
 	auto const &accessors = m_memory_accessors[spacesizep.space()];
 	bool const have_specific = (uintptr_t(nullptr) != accessors.specific.read.function) || accessors.specific.read.is_virtual;
-	offs_t const addr_mask = m_space[spacesizep.space()]->addrmask() & make_bitmask<offs_t>(accessors.specific.address_width) & ~make_bitmask<offs_t>(accessors.specific.native_mask_bits);
 	mov_reg_param(a, Gpd(REG_PARAM2), addrp);
 	if (spacesizep.size() != SIZE_QWORD)
 		mov_reg_param(a, Gpd(REG_PARAM3), maskp);
@@ -2706,16 +2761,35 @@ void drcbe_x64::op_readm(Assembler &a, const instruction &inst)
 		mov_reg_param(a, Gpq(REG_PARAM3), maskp);
 	if (have_specific && ((1 << spacesizep.size()) == accessors.specific.native_bytes))
 	{
-		a.and_(Gpd(REG_PARAM2), imm(addr_mask));                                                 // apply address mask
+		if (accessors.has_high_bits && !accessors.mask_high_bits)
+			a.mov(r10d, Gpd(REG_PARAM2));                                                        // copy address for dispatch index
+		if (!accessors.no_mask)
+			a.and_(Gpd(REG_PARAM2), imm(accessors.address_mask));                                // apply address mask
+		if (accessors.has_high_bits && !accessors.mask_high_bits)
+			a.shr(r10d, accessors.specific.low_bits);                                            // shift off low bits
 		mov_r64_imm(a, rax, uintptr_t(accessors.specific.read.dispatch));                        // load dispatch table pointer
-		if (accessors.specific.low_bits)
+		if (accessors.has_high_bits)
 		{
-			a.mov(r10d, Gpd(REG_PARAM2));                                                        // save masked address
-			a.shr(Gpd(REG_PARAM2), accessors.specific.low_bits);                                 // shift off low bits
+			if (accessors.mask_high_bits)
+			{
+				if (accessors.specific.low_bits)
+				{
+					a.mov(r10d, Gpd(REG_PARAM2));                                                // save masked address
+					a.shr(Gpd(REG_PARAM2), accessors.specific.low_bits);                         // shift off low bits
+				}
+				a.mov(Gpq(REG_PARAM1), ptr(rax, Gpd(REG_PARAM2), 3));                            // load dispatch table entry
+				if (accessors.specific.low_bits)
+					a.mov(Gpd(REG_PARAM2), r10d);                                                // restore masked address
+			}
+			else
+			{
+				a.mov(Gpq(REG_PARAM1), ptr(rax, r10d, 3));                                       // load dispatch table entry
+			}
 		}
-		a.mov(Gpq(REG_PARAM1), ptr(rax, Gpq(REG_PARAM2), 3));                                    // load dispatch table entry
-		if (accessors.specific.low_bits)
-			a.mov(Gpd(REG_PARAM2), r10d);                                                        // restore masked address
+		else
+		{
+			a.mov(Gpq(REG_PARAM1), ptr(rax));                                                    // load dispatch table entry
+		}
 
 		if (accessors.specific.read.is_virtual)
 			a.mov(rax, ptr(Gpq(REG_PARAM1), accessors.specific.read.displacement));              // load vtable pointer
@@ -2729,29 +2803,48 @@ void drcbe_x64::op_readm(Assembler &a, const instruction &inst)
 	else if (have_specific && ((1 << spacesizep.size()) < accessors.specific.native_bytes))
 	{
 		// if the destination register isn't a non-volatile register, we can use it to save the shift count
-		bool need_save = (dstreg != ebx) && (dstreg != r12d) && (dstreg != r13d) && (dstreg != r14d) && (dstreg != r15d);
-
+		bool need_save = !is_nonvolatile_register(dstreg);
 		if (need_save)
 			a.mov(ptr(rsp, 32), Gpq(int_register_map[0]));                                       // save I0 register
-		a.mov(ecx, Gpd(REG_PARAM2));                                                             // copy address
-		a.and_(Gpd(REG_PARAM2), imm(addr_mask));                                                 // apply address mask
+
+		a.mov(ecx, Gpd(REG_PARAM2));                                                             // copy address for bit offset
+		if (accessors.has_high_bits && !accessors.mask_high_bits)
+			a.mov(r10d, Gpd(REG_PARAM2));                                                        // copy address for dispatch index
+		if (!accessors.no_mask)
+			a.and_(Gpd(REG_PARAM2), imm(accessors.address_mask));                                // apply address mask
 
 		int const shift = m_space[spacesizep.space()]->addr_shift() - 3;
 		if (m_space[spacesizep.space()]->endianness() != ENDIANNESS_LITTLE)
 			a.not_(ecx);                                                                         // swizzle address for bit Endian spaces
+		if (accessors.has_high_bits && !accessors.mask_high_bits)
+			a.shr(r10d, accessors.specific.low_bits);                                            // shift off low bits
 		mov_r64_imm(a, rax, uintptr_t(accessors.specific.read.dispatch));                        // load dispatch table pointer
 		if (shift < 0)
 			a.shl(ecx, imm(-shift));                                                             // convert address to bits (left shift)
 		else if (shift > 0)
 			a.shr(ecx, imm(shift));                                                              // convert address to bits (right shift)
-		if (accessors.specific.low_bits)
+		if (accessors.has_high_bits)
 		{
-			a.mov(r10d, Gpd(REG_PARAM2));                                                        // copy masked address
-			a.shr(Gpd(REG_PARAM2), accessors.specific.low_bits);                                 // shift off low bits
+			if (accessors.mask_high_bits)
+			{
+				if (accessors.specific.low_bits)
+				{
+					a.mov(r10d, Gpd(REG_PARAM2));                                                // copy masked address
+					a.shr(Gpd(REG_PARAM2), accessors.specific.low_bits);                         // shift off low bits
+				}
+				a.mov(rax, ptr(rax, Gpd(REG_PARAM2), 3));                                        // load dispatch table entry
+			}
+			else
+			{
+				a.mov(rax, ptr(rax, r10d, 3));                                                   // load dispatch table entry
+			}
 		}
-		a.mov(rax, ptr(rax, Gpq(REG_PARAM2), 3));                                                // load dispatch table entry
+		else
+		{
+			a.mov(rax, ptr(rax));                                                                // load dispatch table entry
+		}
 		a.and_(ecx, imm((accessors.specific.native_bytes - (1 << spacesizep.size())) << 3));     // mask bit address
-		if (accessors.specific.low_bits)
+		if (accessors.has_high_bits && accessors.mask_high_bits && accessors.specific.low_bits)
 			a.mov(Gpd(REG_PARAM2), r10d);                                                        // restore masked address
 		if (need_save)
 			a.mov(Gpd(int_register_map[0]), ecx);                                                // save masked bit address
@@ -2856,7 +2949,6 @@ void drcbe_x64::op_write(Assembler &a, const instruction &inst)
 	// set up a call to the write handler
 	auto const &accessors = m_memory_accessors[spacesizep.space()];
 	bool const have_specific = (uintptr_t(nullptr) != accessors.specific.write.function) || accessors.specific.write.is_virtual;
-	offs_t const addr_mask = m_space[spacesizep.space()]->addrmask() & make_bitmask<offs_t>(accessors.specific.address_width) & ~make_bitmask<offs_t>(accessors.specific.native_mask_bits);
 	mov_reg_param(a, Gpd(REG_PARAM2), addrp);
 	if (spacesizep.size() != SIZE_QWORD)
 		mov_reg_param(a, Gpd(REG_PARAM3), srcp);
@@ -2870,16 +2962,35 @@ void drcbe_x64::op_write(Assembler &a, const instruction &inst)
 		else
 			a.mov(Gpq(REG_PARAM4), make_bitmask<uint64_t>(accessors.specific.native_bytes << 3));
 
-		a.and_(Gpd(REG_PARAM2), imm(addr_mask));                                                 // apply address mask
+		if (accessors.has_high_bits && !accessors.mask_high_bits)
+			a.mov(r10d, Gpd(REG_PARAM2));                                                        // copy address for dispatch index
+		if (!accessors.no_mask)
+			a.and_(Gpd(REG_PARAM2), imm(accessors.address_mask));                                // apply address mask
+		if (accessors.has_high_bits && !accessors.mask_high_bits)
+			a.shr(r10d, accessors.specific.low_bits);                                            // shift off low bits
 		mov_r64_imm(a, rax, uintptr_t(accessors.specific.write.dispatch));                       // load dispatch table pointer
-		if (accessors.specific.low_bits)
+		if (accessors.has_high_bits)
 		{
-			a.mov(r10d, Gpd(REG_PARAM2));                                                        // save masked address
-			a.shr(Gpd(REG_PARAM2), accessors.specific.low_bits);                                 // shift off low bits
+			if (accessors.mask_high_bits)
+			{
+				if (accessors.specific.low_bits)
+				{
+					a.mov(r10d, Gpd(REG_PARAM2));                                                // save masked address
+					a.shr(Gpd(REG_PARAM2), accessors.specific.low_bits);                         // shift off low bits
+				}
+				a.mov(Gpq(REG_PARAM1), ptr(rax, Gpd(REG_PARAM2), 3));                            // load dispatch table entry
+				if (accessors.specific.low_bits)
+					a.mov(Gpd(REG_PARAM2), r10d);                                                // restore masked address
+			}
+			else
+			{
+				a.mov(Gpq(REG_PARAM1), ptr(rax, r10d, 3));                                       // load dispatch table entry
+			}
 		}
-		a.mov(Gpq(REG_PARAM1), ptr(rax, Gpq(REG_PARAM2), 3));                                    // load dispatch table entry
-		if (accessors.specific.low_bits)
-			a.mov(Gpd(REG_PARAM2), r10d);                                                        // restore masked address
+		else
+		{
+			a.mov(Gpq(REG_PARAM1), ptr(rax));                                                    // load dispatch table entry
+		}
 
 		if (accessors.specific.write.is_virtual)
 			a.mov(rax, ptr(Gpq(REG_PARAM1), accessors.specific.write.displacement));             // load vtable pointer
@@ -2892,29 +3003,48 @@ void drcbe_x64::op_write(Assembler &a, const instruction &inst)
 	}
 	else if (have_specific && ((1 << spacesizep.size()) < accessors.specific.native_bytes))
 	{
-		a.mov(ecx, Gpd(REG_PARAM2));                                                             // copy address
-		a.and_(Gpd(REG_PARAM2), imm(addr_mask));                                                 // apply address mask
+		a.mov(ecx, Gpd(REG_PARAM2));                                                             // copy address for bit offset
+		if (accessors.has_high_bits && !accessors.mask_high_bits)
+			a.mov(r10d, Gpd(REG_PARAM2));                                                        // copy address for dispatch index
+		if (!accessors.no_mask)
+			a.and_(Gpd(REG_PARAM2), imm(accessors.address_mask));                                // apply address mask
 
 		int const shift = m_space[spacesizep.space()]->addr_shift() - 3;
 		if (m_space[spacesizep.space()]->endianness() != ENDIANNESS_LITTLE)
 			a.not_(ecx);                                                                         // swizzle address for bit Endian spaces
+		if (accessors.has_high_bits && !accessors.mask_high_bits)
+			a.shr(r10d, accessors.specific.low_bits);                                            // shift off low bits
 		mov_r64_imm(a, rax, uintptr_t(accessors.specific.write.dispatch));                       // load dispatch table pointer
 		if (shift < 0)
 			a.shl(ecx, imm(-shift));                                                             // convert address to bits (left shift)
 		else if (shift > 0)
 			a.shr(ecx, imm(shift));                                                              // convert address to bits (right shift)
-		if (accessors.specific.low_bits)
+		if (accessors.has_high_bits)
 		{
-			a.mov(r10d, Gpd(REG_PARAM2));                                                        // copy masked address
-			a.shr(Gpd(REG_PARAM2), accessors.specific.low_bits);                                 // shift off low bits
+			if (accessors.mask_high_bits)
+			{
+				if (accessors.specific.low_bits)
+				{
+					a.mov(r10d, Gpd(REG_PARAM2));                                                // copy masked address
+					a.shr(Gpd(REG_PARAM2), accessors.specific.low_bits);                         // shift off low bits
+				}
+				a.mov(rax, ptr(rax, Gpd(REG_PARAM2), 3));                                        // load dispatch table entry
+			}
+			else
+			{
+				a.mov(rax, ptr(rax, r10d, 3));                                                   // load dispatch table entry
+			}
 		}
-		a.mov(rax, ptr(rax, Gpq(REG_PARAM2), 3));                                                // load dispatch table entry
+		else
+		{
+			a.mov(rax, ptr(rax));                                                                // load dispatch table entry
+		}
 		a.and_(ecx, imm((accessors.specific.native_bytes - (1 << spacesizep.size())) << 3));     // mask bit address
 		if ((accessors.specific.native_bytes <= 4) || (spacesizep.size() != SIZE_QWORD))
 			a.mov(r11d, imm(make_bitmask<uint32_t>(8 << spacesizep.size())));                    // set default mem_mask
 		else
 			a.mov(r11, imm(make_bitmask<uint64_t>(8 << spacesizep.size())));                     // set default mem_mask
-		if (accessors.specific.low_bits)
+		if (accessors.has_high_bits && accessors.mask_high_bits && accessors.specific.low_bits)
 			a.mov(Gpd(REG_PARAM2), r10d);                                                        // restore masked address
 		if (accessors.specific.write.is_virtual)
 			a.mov(r10, ptr(rax, accessors.specific.write.displacement));                         // load vtable pointer
@@ -2986,7 +3116,6 @@ void drcbe_x64::op_writem(Assembler &a, const instruction &inst)
 	// set up a call to the write handler
 	auto const &accessors = m_memory_accessors[spacesizep.space()];
 	bool const have_specific = (uintptr_t(nullptr) != accessors.specific.write.function) || accessors.specific.write.is_virtual;
-	offs_t const addr_mask = m_space[spacesizep.space()]->addrmask() & make_bitmask<offs_t>(accessors.specific.address_width) & ~make_bitmask<offs_t>(accessors.specific.native_mask_bits);
 	mov_reg_param(a, Gpd(REG_PARAM2), addrp);
 	if (spacesizep.size() != SIZE_QWORD)
 		mov_reg_param(a, Gpd(REG_PARAM3), srcp);
@@ -2998,17 +3127,36 @@ void drcbe_x64::op_writem(Assembler &a, const instruction &inst)
 			mov_reg_param(a, Gpd(REG_PARAM4), maskp);                                            // get mem_mask
 		else
 			mov_reg_param(a, Gpq(REG_PARAM4), maskp);                                            // get mem_mask
-		a.and_(Gpd(REG_PARAM2), imm(addr_mask));                                                 // apply address mask
 
+		if (accessors.has_high_bits && !accessors.mask_high_bits)
+			a.mov(r10d, Gpd(REG_PARAM2));                                                        // copy address for dispatch index
+		if (!accessors.no_mask)
+			a.and_(Gpd(REG_PARAM2), imm(accessors.address_mask));                                // apply address mask
+		if (accessors.has_high_bits && !accessors.mask_high_bits)
+			a.shr(r10d, accessors.specific.low_bits);                                            // shift off low bits
 		mov_r64_imm(a, rax, uintptr_t(accessors.specific.write.dispatch));                       // load dispatch table pointer
-		if (accessors.specific.low_bits)
+		if (accessors.has_high_bits)
 		{
-			a.mov(r10d, Gpd(REG_PARAM2));                                                        // save masked address
-			a.shr(Gpd(REG_PARAM2), accessors.specific.low_bits);                                 // shift off low bits
+			if (accessors.mask_high_bits)
+			{
+				if (accessors.specific.low_bits)
+				{
+					a.mov(r10d, Gpd(REG_PARAM2));                                                // save masked address
+					a.shr(Gpd(REG_PARAM2), accessors.specific.low_bits);                         // shift off low bits
+				}
+				a.mov(Gpq(REG_PARAM1), ptr(rax, Gpd(REG_PARAM2), 3));                            // load dispatch table entry
+				if (accessors.specific.low_bits)
+					a.mov(Gpd(REG_PARAM2), r10d);                                                // restore masked address
+			}
+			else
+			{
+				a.mov(Gpq(REG_PARAM1), ptr(rax, r10d, 3));                                       // load dispatch table entry
+			}
 		}
-		a.mov(Gpq(REG_PARAM1), ptr(rax, Gpq(REG_PARAM2), 3));                                    // load dispatch table entry
-		if (accessors.specific.low_bits)
-			a.mov(Gpd(REG_PARAM2), r10d);                                                        // restore masked address
+		else
+		{
+			a.mov(Gpq(REG_PARAM1), ptr(rax));                                                    // load dispatch table entry
+		}
 
 		if (accessors.specific.write.is_virtual)
 			a.mov(rax, ptr(Gpq(REG_PARAM1), accessors.specific.write.displacement));             // load vtable pointer
@@ -3021,29 +3169,48 @@ void drcbe_x64::op_writem(Assembler &a, const instruction &inst)
 	}
 	else if (have_specific && ((1 << spacesizep.size()) < accessors.specific.native_bytes))
 	{
-		a.mov(ecx, Gpd(REG_PARAM2));                                                             // copy address
+		a.mov(ecx, Gpd(REG_PARAM2));                                                             // copy address for bit offset
+		if (accessors.has_high_bits && !accessors.mask_high_bits)
+			a.mov(r10d, Gpd(REG_PARAM2));                                                        // copy address for dispatch index
 		if (spacesizep.size() != SIZE_QWORD)
 			mov_reg_param(a, r11d, maskp);                                                       // get mem_mask
 		else
 			mov_reg_param(a, r11, maskp);                                                        // get mem_mask
-		a.and_(Gpd(REG_PARAM2), imm(addr_mask));                                                 // apply address mask
+		if (!accessors.no_mask)
+			a.and_(Gpd(REG_PARAM2), imm(accessors.address_mask));                                // apply address mask
 
 		int const shift = m_space[spacesizep.space()]->addr_shift() - 3;
 		if (m_space[spacesizep.space()]->endianness() != ENDIANNESS_LITTLE)
 			a.not_(ecx);                                                                         // swizzle address for bit Endian spaces
+		if (accessors.has_high_bits && !accessors.mask_high_bits)
+			a.shr(r10d, accessors.specific.low_bits);                                            // shift off low bits
 		mov_r64_imm(a, rax, uintptr_t(accessors.specific.write.dispatch));                       // load dispatch table pointer
 		if (shift < 0)
 			a.shl(ecx, imm(-shift));                                                             // convert address to bits (left shift)
 		else if (shift > 0)
 			a.shr(ecx, imm(shift));                                                              // convert address to bits (right shift)
-		if (accessors.specific.low_bits)
+		if (accessors.has_high_bits)
 		{
-			a.mov(r10d, Gpd(REG_PARAM2));                                                        // copy masked address
-			a.shr(Gpd(REG_PARAM2), accessors.specific.low_bits);                                 // shift off low bits
+			if (accessors.mask_high_bits)
+			{
+				if (accessors.specific.low_bits)
+				{
+					a.mov(r10d, Gpd(REG_PARAM2));                                                // copy masked address
+					a.shr(Gpd(REG_PARAM2), accessors.specific.low_bits);                         // shift off low bits
+				}
+				a.mov(rax, ptr(rax, Gpd(REG_PARAM2), 3));                                        // load dispatch table entry
+			}
+			else
+			{
+				a.mov(rax, ptr(rax, r10d, 3));                                                   // load dispatch table entry
+			}
 		}
-		a.mov(rax, ptr(rax, Gpq(REG_PARAM2), 3));                                                // load dispatch table entry
+		else
+		{
+			a.mov(rax, ptr(rax));                                                                // load dispatch table entry
+		}
 		a.and_(ecx, imm((accessors.specific.native_bytes - (1 << spacesizep.size())) << 3));     // mask bit address
-		if (accessors.specific.low_bits)
+		if (accessors.has_high_bits && accessors.mask_high_bits && accessors.specific.low_bits)
 			a.mov(Gpd(REG_PARAM2), r10d);                                                        // restore masked address
 		if (accessors.specific.native_bytes <= 4)
 		{
