@@ -44718,6 +44718,7 @@ pve500
 smc777
 
 @source:sony/taitogn.cpp
+<<<<<<< HEAD
 chaoshea
 chaosheaj
 coh1002t
@@ -44759,11 +44760,55 @@ gdariusg
 raystormg
 shngmtkbg
 tblkkuzug
+=======
+chaoshea                        // 1998.10 Chaos Heat (V2.09O)
+chaosheaj                       // 1998.10 Chaos Heat (V2.08J)
+coh1002t                        //
+coh3002t                        //
+flipmaze                        // 1999.09 Flip Maze (V2.04J)
+gobyrc                          // 1999.?? Go By RC (V2.03O)
+kollon                          // 2003.11 Kollon (V2.04J)
+kollonc                         // 2003.11 Kollon (V2.04JC, Compact Flash version)
+mahjngoh                        // 1999.12 Mahjong Oh (V2.06J)
+mawasunda                       // 2000.02 Mawasunda!! (V2.08J)
+nightrai                        // 2001.05 Night Raid (V2.03J)
+otenamhf                        // 2005.04 Otenami Haiken Final (V2.07JC)
+otenamih                        // 1999.02 Otenami Haiken (Success)
+otenki                          // 2001.10 Otenki Kororin
+psyvaria                        // 2000.03 Psyvariar -Medium Unit- (V2.02O)
+psyvarij                        // 2000.03 Psyvariar -Medium Unit- (V2.04J)
+psyvarrv                        // 2000.09 Psyvariar -Revision- (V2.04J)
+raycris                         // 1998.12 Ray Crisis (V2.03O)
+raycrisj                        // 1998.12 Ray Crisis (V2.03J)
+rcdego                          // 1999.06 RC De Go (V2.03J)
+shanghss                        // 2000.07 Shanghai Shoryu Sairin (V2.03J)
+shangtou                        // 2002.02 Shanghai Sangokuhaitougi
+shikigam                        // 2001.09 Shikigami no Shiro (V2.03J)
+shikigama                       // 2001.09 Shikigami no Shiro (V1.02J)
+sianniv                         // 2003.10 Space Invaders Anniversary (V2.02J)
+soutenry                        // 2001.02 Soutenryu (V2.07J)
+spuzbobl                        // 1999.?? Super Puzzle Bobble (V2.05O)
+spuzboblj                       // 1999.03 Super Puzzle Bobble (V2.04J)
+usagi                           // 2001.12 Usagi (V2.02J)
+xiistag                         // 2002.07 XII Stag (V2.01J)
+zokuoten                        // 2000.12 Zoku Otenamihaiken (V2.05J)
+zokuotena                       // 2000.12 Zoku Otenamihaiken (V2.03J)
+zooo                            // 2004.05 Zooo (V2.01JA)
+aerofgtsg                       // 2011.01 Aero Fighters Special (VER 1.00G)
+brvbladeg                       // 2011.01 Brave Blade (VER 1.40G)
+flamegung                       // 2011.01 Flame Gunner (VER 1.40G)
+ftimpactg                       // 2011.01 Fighters' Impact (VER 2.10G)
+gdariusg                        // 2011.01 G-Darius (Ver 2.70G)
+raystormg                       // 2011.01 Ray Storm (Ver 2.60G)
+shngmtkbg                       // 2011.01 Shanghai Matekibuyuu (VER 1.20G)
+tblkkuzug                       // 2011.01 The Block Kuzushi (VER 1.10G)
+>>>>>>> c6f90b472c3 (New working machines added)
 
 @source:sony/umatic.cpp
 vo5850pm
 
 @source:sony/zn.cpp
+<<<<<<< HEAD
 1on1gov
 aerofgts
 aerofgtst
@@ -44880,6 +44925,124 @@ ts2j
 ts2ja
 ts2u
 ts2ua
+=======
+1on1gov                         // 1 on 1 Government (JAPAN)
+aerofgts                        // Aero Fighters Special (USA)
+aerofgtst                       // Aero Fighters Special (TAIWAN)
+bam2                            // Bust a Move 2 (HDD JAPANESE ROM ver. 1999/07/17 10:00:00)
+bam2a                           // Bust a Move 2 (CDROM JAPANESE ROM ver. 1999/07/17 10:00:00)
+beastrzr                        // Beastorizer (USA, Sep 22 1997)
+beastrzra                       // Beastorizer (USA, Jun 21 1997)
+beastrzrb                       // Beastorizer (USA Bootleg)
+bldyroar                        // Bloody Roar (JAPAN, Jun 21 1997)
+bldyror2                        // Bloody Roar 2 (WORLD)
+bldyror2a                       // Bloody Roar 2 (ASIA)
+bldyror2j                       // Bloody Roar 2 (JAPAN)
+bldyror2u                       // Bloody Roar 2 (USA)
+brvblade                        // Brave Blade (WORLD)
+brvbladea                       // Brave Blade (ASIA)
+brvbladej                       // Brave Blade (JAPAN)
+brvbladeu                       // Brave Blade (USA)
+cbaj                            // Cool Boaders Arcade Jam
+cbajbl                          // Cool Boaders Arcade Jam (Bootleg)
+coh1000a                        //
+coh1000c                        //
+coh1000t                        //
+coh1000w                        //
+coh1001l                        //
+coh1002v                        //
+coh1002e                        //
+coh1002m                        //
+coh3002c                        //
+doapp                           // Dead Or Alive ++ (JAPAN)
+doappk                          // Dead Or Alive ++ (Korea)
+flamegun                        // Flame Gunner (USA)
+flamegunj                       // Flame Gunner (JAPAN)
+ftimpact                        // Fighters' Impact (Ver 2.02O)
+ftimpactj                       // Fighters' Impact (Ver 2.02J)
+ftimpactu                       // Fighters' Impact (Ver 2.02A)
+ftimpcta                        // Fighters' Impact A (Ver 2.00J)
+gdarius                         // G-Darius (Ver 2.02O)
+gdarius2                        // G-Darius Ver.2 (Ver 2.03J)
+gdariusj                        // G-Darius (Ver 2.01J)
+gdariusu                        // G-Darius (Ver 2.02A)
+glpracr                         // Gallop Racer (English Ver 10.17.K)
+glpracr2                        // Gallop Racer 2 (USA)
+glpracr2j                       // Gallop Racer 2 (JAPAN)
+glpracr2l                       // Gallop Racer 2 Link HW (JAPAN)
+glpracr3                        // Gallop Racer 3 (Export)
+glpracr3j                       // Gallop Racer 3 (JAPAN)
+glpracrj                        // Gallop Racer (Japanese Ver 9.01.12)
+hvnsgate                        // Heaven's Gate (JAPAN)
+jdredd                          // Judge Dredd (Rev C)
+jdreddb                         // Judge Dredd (Rev B)
+jgakuen                         // Justice Gakuen (JAPAN 971216)
+jgakuen1                        // Justice Gakuen (JAPAN 971117)
+kikaioh                         // Kikaioh (JAPAN 980914)
+lpadv                           // Logic Pro Adventure (JAPAN)
+mfjump                          // Monster Farm Jump (JAPAN)
+mgcldate                        // Magical Date (JAPAN Ver 2.02J)
+mgcldtex                        // Magical Date EX (JAPAN Ver 2.01J)
+nbajamex                        // NBA Jam Extreme (ver. 1.10I)
+nbajamexa                       // NBA Jam Extreme (ver. 1.04)
+plsmaswd                        // Plasma Sword (USA 980316)
+plsmaswda                       // Plasma Sword (ASIA 980316)
+primrag2                        // Primal Rage 2
+psyforce                        // Psychic Force (Ver 2.4O)
+psyforcej                       // Psychic Force (Ver 2.4J)
+psyforcex                       // Psychic Force EX (Ver 2.0J)
+raystorm                        // Ray Storm (Ver 2.06A)
+raystormj                       // Ray Storm (Ver 2.05J)
+raystormo                       // Ray Storm (Ver 2.05O)
+raystormu                       // Ray Storm (Ver 2.05A)
+rvschool                        // Rival Schools (EURO 971117)
+rvschoola                       // Rival Schools (ASIA 971117)
+rvschoolu                       // Rival Schools (USA 971117)
+sfchamp                         // Super Football Champ (Ver 2.5O)
+sfchampj                        // Super Football Champ (Ver 2.4J)
+sfchampo                        // Super Football Champ (Ver 2.4O)
+sfchampu                        // Super Football Champ (Ver 2.4A)
+sfex                            // Street Fighter EX (EURO 961219)
+sfex2                           // Street Fighter EX 2 (EURO 980312)
+sfex2a                          // Street Fighter EX 2 (ASIA 980312)
+sfex2h                          // Street Fighter EX 2 (HISPANIC 980312)
+sfex2j                          // Street Fighter EX 2 (JAPAN 980312)
+sfex2p                          // Street Fighter EX 2 Plus (EURO 990611)
+sfex2pa                         // Street Fighter EX 2 Plus (ASIA 990611)
+sfex2ph                         // Street Fighter EX 2 Plus (HISPANIC 990611)
+sfex2pj                         // Street Fighter EX 2 Plus (JAPAN 990611)
+sfex2pu                         // Street Fighter EX 2 Plus (USA 990611)
+sfex2u                          // Street Fighter EX 2 (USA 980526)
+sfex2u1                         // Street Fighter EX 2 (USA 980312)
+sfexa                           // Street Fighter EX (ASIA 961219)
+sfexj                           // Street Fighter EX (JAPAN 961130)
+sfexp                           // Street Fighter EX Plus (USA 970407)
+sfexpj                          // Street Fighter EX Plus (JAPAN 970407)
+sfexpj1                         // Street Fighter EX Plus (JAPAN 970311)
+sfexpu1                         // Street Fighter EX Plus (USA 970311)
+sfexu                           // Street Fighter EX (USA 961219)
+shiryu2                         // Strider Hiryu 2 (JAPAN 991213)
+shngmtkb                        // Shanghai Matekibuyuu
+sncwgltd                        // Sonic Wings Limited (JAPAN)
+starglad                        // Star Gladiator (USA 960627)
+stargladj                       // Star Gladiator (JAPAN 960627)
+stargld2                        // Star Gladiator 2 (JAPAN 980316)
+strider2                        // Strider 2 (Euro 991213)
+strider2a                       // Strider 2 (ASIA 991213)
+strider2u                       // Strider 2 (USA 991213)
+tblkkuzu                        // The Block Kuzushi (JAPAN)
+techromn                        // Tech Romancer (EURO 980914)
+techromna                       // Tech Romancer (ASIA 980914)
+techromnu                       // Tech Romancer (USA 980914)
+twcupmil                        // Tecmo World Cup Millennium (JAPAN)
+tgmj                            // Tetris The Grand Master (JAPAN 980710)
+tondemo                         // Tondemo Crisis (JAPAN)
+ts2                             // Battle Arena Toshinden 2 (EURO 951124)
+ts2j                            // Battle Arena Toshinden 2 (JAPAN 951124)
+ts2ja                           // Battle Arena Toshinden 2 (JAPAN 951124)
+ts2u                            // Battle Arena Toshinden 2 (USA 951124)
+ts2ua                           // Battle Arena Toshinden 2 (USA 951124)
+>>>>>>> c6f90b472c3 (New working machines added)
 
 @source:sord/m5.cpp
 m5
