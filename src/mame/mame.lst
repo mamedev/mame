@@ -16718,6 +16718,9 @@ ch2001
 scpchess
 scpchessa
 
+@source:cxg/computachess2.cpp
+cpchess2
+
 @source:cxg/dominator.cpp
 scmder
 sdtor
