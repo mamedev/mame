@@ -113,6 +113,8 @@ Notes:
 #include "emupal.h"
 #include "speaker.h"
 
+#include <algorithm>
+
 
 namespace {
 
@@ -599,7 +601,6 @@ INPUT_PORTS_END
 void simpsons_state::object_dma()
 {
 	uint16_t *dst;
-
 	m_k053246->k053247_get_ram(&dst);
 
 	uint16_t const *src = m_spriteram.get();
@@ -609,20 +610,16 @@ void simpsons_state::object_dma()
 	{
 		if (BIT(*src, 15) && (*src & 0xff))
 		{
-			memcpy(dst, src, 0x10);
-			dst += 8;
+			dst = std::copy_n(src, 8, dst);
 			num_inactive--;
 		}
 		src += 8;
 	}
 
-	if (num_inactive)
+	while (num_inactive--)
 	{
-		while (num_inactive--)
-		{
-			*dst = 0;
-			dst += 8;
-		}
+		*dst = 0;
+		dst += 8;
 	}
 }
 
