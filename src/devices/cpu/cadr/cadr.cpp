@@ -293,11 +293,6 @@ void cadr_cpu_device::get_m_source()
 {
 	if (BIT(m_ir, 31))
 	{
-		// IR26 -  SEL0 3D22, SEL0 3D23 on SOURCE, DEST, OP DECODE
-		// IR27 -  SEL1 3D22, SEL1 3D23
-		// IR28 -  SEL2 3D22, SEL2 3D23
-		// IR29 -  CE1 3D22,  CE2 3D23
-		// -IR31 - CE0 3D22,  CE0 3D23
 		switch ((m_ir >> 26) & 0x1f)
 		{
 		case 0x00:
@@ -549,10 +544,6 @@ void cadr_cpu_device::write_destination(u32 output)
 			LOGMASKED(LOG_TRACE, "LC <- %x(%o)\n", output, output);
 			break;
 		case 0x02: // IC
-			// bit 26 - sequence break
-			// bit 27 - interrupt enable
-			// bit 28 - bus reset
-			// bit 29 - lc byte mode
 			m_ic = output;
 			m_lc = (m_lc & 0x83ffffff) | (m_ic & 0x3c000000);
 			LOGMASKED(LOG_INT, "sequence break %d\n", BIT(m_ic, 26));
@@ -744,7 +735,7 @@ void cadr_cpu_device::execute_jump()
 			m_next_pc = (m_ir >> 12) & 0x3fff;
 			m_popj = false;
 			break;
-		case 0x02: // pop new pcp off spc stack
+		case 0x02: // pop new pc from spc stack
 			m_next_pc = pop_spc();
 			if (BIT(m_next_pc, 14))
 			{
@@ -831,7 +822,7 @@ void cadr_cpu_device::execute_dispatch()
 		m_next_pc = dispatch & 0x3fff;
 		m_popj = false;
 		break;
-	case 0x02: // pop new pcp off spc stack
+	case 0x02: // pop new pc from spc stack
 		m_next_pc = pop_spc();
 		if (BIT(m_next_pc, 14))
 		{

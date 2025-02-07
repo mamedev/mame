@@ -24,7 +24,7 @@ TODO:
 - Caps lock is not working
 - The keyboard and I/O board actually communicate through a serial connection.
 - Is there another MCU on the I/O board to communicate with the keyboard??
-- How are packet checksums calculated?
+- How are chaosnet packet checksums calculated?
   The chaosnet documentation mentions 16 bit CRC checksums, usim uses internet checksum.
 
 **********************************************************************************/
@@ -409,9 +409,6 @@ TIMER_CALLBACK_MEMBER(cadr_iob_device::transmit_callback)
 {
 	if (BIT(m_chaos_csr, CHAOSNET_LOOPBACK_BIT))
 	{
-		printf("Transmitting through loopback\n");
-		// TODO move to a method.
-
 		for (int i = 0; i < m_chaos_transmit_pointer; i++)
 		{
 			m_chaos_receive_buffer[i] = m_chaos_transmit_buffer[i];
@@ -560,7 +557,6 @@ u16 cadr_iob_device::read(offs_t offset)
 		// -------- -------x Timer interrupt enable (not implemented)
 		return m_chaos_csr;
 	case 0x11: // chaos net my address
-		// TODO: Address is configured using dip switches
 		return m_my_chaos_address->read();
 	case 0x12: // next word from receive buffer
 		{
