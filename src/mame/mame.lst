@@ -38147,9 +38147,12 @@ ncrpc8
 neat
 necapciv
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 //nws286                        // 1988 Nokia WS286
 >>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
+=======
+>>>>>>> b128c1f9b6a (mame.lst: remove unused nws286 entry (it's a commented out NO_DUMP set in driver))
 o286foxii
 ocfoxm
 ochawk
