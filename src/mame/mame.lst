@@ -40,7 +40,10 @@ aa3010_de
 aa3020
 aa4000
 aa5000a
+<<<<<<< HEAD
 av20dev
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:acorn/accomm.cpp
 accomm
@@ -356,6 +359,7 @@ torchf
 torchh
 torch301
 torch725
+<<<<<<< HEAD
 
 @source:acorn/belatra.cpp
 fairyl2
@@ -366,6 +370,8 @@ ldrink
 ldrinka
 merryjn
 unkbel
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:acorn/cms.cpp
 cms6502
@@ -382,6 +388,7 @@ ertictac
 ertictaca
 ertictacb
 poizone
+<<<<<<< HEAD
 
 @source:acorn/eurocube.cpp
 eurobeeb1
@@ -390,6 +397,8 @@ eurobeeb3m
 eurobeeb3c
 eurocube09
 eurocube65
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:acorn/riscpc.cpp
 a7000
@@ -403,6 +412,22 @@ sarpc_j233
 ppcar
 ssfindo
 tetfight
+<<<<<<< HEAD
+=======
+
+@source:acorn/z88.cpp
+z88
+z88ch
+z88de
+z88dk
+z88es
+z88fi
+z88fr
+z88it
+z88no
+z88se
+z88tr
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:act/apricot.cpp
 apricot
@@ -443,8 +468,11 @@ fashiong
 fashiong2
 fstation
 funlddlx
+<<<<<<< HEAD
 funlddlx2
 funlddlx4
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 quickjac
 skattv
 skattva
@@ -469,6 +497,7 @@ kniffi
 supermultib
 
 @source:adp/stellafr.cpp
+<<<<<<< HEAD
 action
 allfred
 grandhand
@@ -479,6 +508,10 @@ st_vulkn
 sunny
 taipan
 turbosun
+=======
+st_ohla
+st_vulkn
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:agat/agat.cpp
 agat7
@@ -496,6 +529,30 @@ mpc60
 @source:akai/mpc3000.cpp
 mpc3000
 
+<<<<<<< HEAD
+=======
+@source:alba/albazg.cpp
+hana6pt2
+yumefuda
+
+@source:alba/hanadojo.cpp
+hanadojo
+hanadojoa
+
+@source:alba/rmhaihai.cpp
+rmhaihai
+rmhaihai2
+rmhaihaibl
+rmhaihib
+rmhaijin
+rmhaisei
+themj
+themj2
+
+@source:alba/vsmjtria.cpp
+vsmjtria
+
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 @source:alesis/alesis.cpp
 hr16
 hr16b
@@ -986,6 +1043,7 @@ macpb165c
 macpb170
 macpb180
 macpb180c
+<<<<<<< HEAD
 
 @source:apple/macpwrbkmsc.cpp
 macpd210
@@ -994,6 +1052,9 @@ macpd250
 macpd270c
 macpd280
 macpd280c
+=======
+macpd210
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:apple/macquadra605.cpp
 macqd605
@@ -1278,7 +1339,10 @@ holdrma6
 holdrma6a
 househrt
 househrta
+<<<<<<< HEAD
 hrtantny
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 incachf
 indream
 indreama
@@ -1320,7 +1384,10 @@ mnytreea
 moonfire
 moonwalt
 mrwoo
+<<<<<<< HEAD
 mrwoou
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 mskitty
 mystarr
 mysteycm
@@ -1918,7 +1985,10 @@ cmmb103
 cops
 copsuk
 revlatns
+<<<<<<< HEAD
 visnqust
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:atari/copsnrob.cpp
 copsnrob
@@ -2230,7 +2300,10 @@ dominos4
 sprint1
 sprint2
 sprint2a
+<<<<<<< HEAD
 sprint2bl
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 sprint2h
 
 @source:atari/sprint4.cpp
@@ -9323,7 +9396,10 @@ pockchal
 
 @source:bfm/bfcobra.cpp
 beeline
+<<<<<<< HEAD
 brainbox2
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 brkball
 escounts
 inquiztr
@@ -15176,6 +15252,7 @@ bmcbowl
 
 @source:bmc/bmcpokr.cpp
 bmcpokr
+<<<<<<< HEAD
 dbshahb
 fengyunh
 mjmaglmp
@@ -15185,13 +15262,24 @@ xyddzhh
 @source:bmc/koftball.cpp
 jxzh
 kaimenhu
+=======
+fengyunh
+mjmaglmp
+shendeng
+
+@source:bmc/koftball.cpp
+jxzh
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 koftball
 
 @source:bmc/popobear.cpp
 magkengo
 magkengou
 popobear
+<<<<<<< HEAD
 qiwang
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:bondwell/bw12.cpp
 bw12
@@ -15203,6 +15291,7 @@ bw2
 
 @source:booth/apexc.cpp
 apexc
+<<<<<<< HEAD
 
 @source:bordun/att.cpp
 lianhp2
@@ -15238,6 +15327,8 @@ sstar97jb
 superb2k
 tigerslt
 
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:brother/ax145.cpp
 ax145
@@ -15310,7 +15401,10 @@ dkbanans
 dkjfever
 dokodemo
 gekimaka
+<<<<<<< HEAD
 katochan
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 mariojjl
 masmario
 masmarios
@@ -15368,7 +15462,10 @@ sinvasnb
 1941u
 3wonders
 3wondersb
+<<<<<<< HEAD
 3wondersbi
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 3wondersh
 3wondersr1
 3wondersu
@@ -15656,7 +15753,10 @@ batcira
 batcird
 batcirj
 choko
+<<<<<<< HEAD
 chokop
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 csclub
 csclub1
 csclub1d
@@ -15794,7 +15894,10 @@ progearud
 pzloop2
 pzloop2j
 pzloop2jd
+<<<<<<< HEAD
 pzloop2jp
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 pzloop2jr1
 qndream
 ringdest
@@ -15993,9 +16096,13 @@ sfiii3
 sfiii3j
 sfiii3jr1
 sfiii3n
+<<<<<<< HEAD
 sfiii3na
 sfiii3nr1
 sfiii3nar1
+=======
+sfiii3nr1
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 sfiii3r1
 sfiii3u
 sfiii3ur1
@@ -16036,7 +16143,10 @@ diamrun
 gng
 gnga
 gngbl
+<<<<<<< HEAD
 gngbla
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 gngblita
 gngc
 gngprot
@@ -16224,6 +16334,7 @@ casloopy
 @source:casio/cfx9850.cpp
 cfx9850
 cfx9850gb
+<<<<<<< HEAD
 
 @source:casio/cps2000.cpp
 cps2000
@@ -16232,11 +16343,13 @@ cps2000
 ct8000
 ctfk1
 ctmb1
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:casio/ct8000.cpp
-ct8000                          //
-ctfk1                           //
-ctmb1                           //
+ct8000
+ctfk1
+ctmb1
 
 @source:casio/ctk2000.cpp
 ctk2100
@@ -16268,11 +16381,14 @@ fp1100
 
 @source:casio/fp6000.cpp
 fp6000
+<<<<<<< HEAD
 
 @source:casio/fz1.cpp
 fz1
 fz10m
 fz20m
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:casio/ht6000.cpp
 ht6000
@@ -16288,7 +16404,10 @@ pb2000c
 @source:casio/pickytlk.cpp
 jd363
 jd364
+<<<<<<< HEAD
 jd366
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 jd368
 pickydis
 pickytlk
@@ -16312,10 +16431,13 @@ sk10
 
 @source:casio/sx1000.cpp
 sx1010
+<<<<<<< HEAD
 
 @source:casio/wk1800.cpp
 wk1600
 wk1800
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:casio/zoomer.cpp
 zoomer
@@ -16576,7 +16698,10 @@ minimonyb
 miniguay
 
 @source:cirsa/missbamby.cpp
+<<<<<<< HEAD
 3mini
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 basket
 goldfrts
 gwinner
@@ -16896,9 +17021,15 @@ ragtimea
 
 @source:dataeast/brkthru.cpp
 brkthru
+<<<<<<< HEAD
 brkthruj
 brkthrut
 brkthruu
+=======
+brkthrubl
+brkthruj
+brkthrut
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 darwin
 forcebrk
 
@@ -17107,7 +17238,10 @@ nslashers
 nslasheru
 tattass
 tattassa
+<<<<<<< HEAD
 tattasso
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:dataeast/deco_ld.cpp
 begas
@@ -17334,7 +17468,10 @@ rohgah
 rohgau
 schmeisr
 wizdfire
+<<<<<<< HEAD
 wizdfirea
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 wizdfireu
 wolffang
 hangzo
@@ -17550,6 +17687,7 @@ sms1000
 rainbow
 rainbow100a
 rainbow190
+<<<<<<< HEAD
 
 @source:dec/uvax1.cpp
 uvax1
@@ -17563,6 +17701,8 @@ mv3500
 
 @source:dec/uvax3100.cpp
 mv3100m10
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:dec/vax11.cpp
 vax785
@@ -17642,7 +17782,10 @@ polluxn
 popbingo
 primella
 rshark
+<<<<<<< HEAD
 rsharka
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 sadari
 superx
 superxm
@@ -17662,6 +17805,9 @@ zrt80
 
 @source:dynax/ddenlovr.cpp
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 akamaru
 animaljr
 animaljrj
@@ -17685,7 +17831,10 @@ hnrose
 hparadis
 htengoku
 janshinp
+<<<<<<< HEAD
 jongoh
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 jongtei
 jongteia
 kotbinsp
@@ -17699,6 +17848,7 @@ mjmyorn2
 mjmyornt
 mjmyorntr
 mjmyster
+<<<<<<< HEAD
 mjmysterr
 mjmyuniv
 mjmyunivh
@@ -17710,6 +17860,13 @@ mjschuka
 mjswacad
 mjtenho
 mjxysl
+=======
+mjmyuniv
+mjmywrld
+mjreach1
+mjschuka
+mjtenho
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 mmpanic
 momotaro
 nettoqc
@@ -17726,6 +17883,7 @@ seljan2a
 sryudens
 ultrchmp
 ultrchmph
+<<<<<<< HEAD
 =======
 akamaru                         // "501" (c) 1996 Dynax
 animaljr                        // "75" (c) 1993 Nakanihon/Taito (USA)
@@ -17785,6 +17943,8 @@ sryudens                        // "502" (c) 1996 Dynax / Face
 ultrchmp                        // "104" (c) 1995 Nakanihon
 ultrchmph                       // "114" (c) 1995 Nakanihon
 >>>>>>> 72212bb9188 (New working clones)
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:dynax/dynax.cpp
 7jigen
@@ -17800,7 +17960,10 @@ hjingia
 hnkochou
 hnoridur
 inca
+<<<<<<< HEAD
 intrgirl
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 jantouki
 janyuki
 majxtal7
@@ -17815,14 +17978,20 @@ mjdialq2
 mjdialq2a
 mjelct3
 mjelct3a
+<<<<<<< HEAD
 mjelct3b
 mjelct3bl
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 mjelctrb
 mjelctrn
 mjembase
 mjfriday
 mjreach
+<<<<<<< HEAD
 mjreacha
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 mjreachbl
 mjreachp2
 neruton
@@ -17832,8 +18001,13 @@ ougonhaib1
 ougonhaib2
 ougonhaib3
 quiztvqq
+<<<<<<< HEAD
 qyjdzjp
 shpeng
+=======
+shpeng
+intrgirl
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 sprtmtch
 tenkai
 tenkai2b
@@ -17870,7 +18044,10 @@ dondenmj
 dragonmj
 dragonmj103
 ichiban
+<<<<<<< HEAD
 ichiban235
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 ippatsu
 jangtaku
 janoh
@@ -17922,7 +18099,10 @@ cgenienz
 
 @source:edevices/diverboy.cpp
 diverboy
+<<<<<<< HEAD
 tumblebed
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:edevices/fantland.cpp
 borntofi
@@ -18165,9 +18345,12 @@ rpanic
 
 @source:excellent/dblcrown.cpp
 dblcrown
+<<<<<<< HEAD
 
 @source:excellent/es8906.cpp
 dream9
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:excellent/es8906.cpp
 dream9
@@ -18209,7 +18392,10 @@ ripcord
 robotbwl
 smash
 springbd
+<<<<<<< HEAD
 trapeze
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:exidy/exidy.cpp
 fax
@@ -18515,9 +18701,12 @@ fmtownshr
 fmtownsmx
 fmtownssj
 fmtownsux
+<<<<<<< HEAD
 
 @source:fujitsu/secoinsa20.cpp
 secoinsa20
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:funtech/supracan.cpp
 supracan
@@ -18721,7 +18910,10 @@ watrball
 
 @source:gaelco/gaelco.cpp
 bigkarnk
+<<<<<<< HEAD
 bigkarnka
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 biomtoy
 biomtoya
 biomtoyb
@@ -18729,6 +18921,7 @@ biomtoyc
 bioplayc
 maniacsp
 lastkm
+<<<<<<< HEAD
 lastkma
 sltpcycld
 sltpcycle
@@ -18747,6 +18940,10 @@ thoopnna
 thoopnnaa
 xorwflat
 xorwflata
+=======
+squash
+thoop
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:gaelco/gaelco2.cpp
 aligator
@@ -18755,6 +18952,7 @@ aligatorun
 aligatoruna
 aligatorp
 bang
+<<<<<<< HEAD
 banga
 bangb
 bangj
@@ -18767,20 +18965,33 @@ maniacsq
 maniacsqa
 maniacsqb
 maniacsqc
+=======
+bangj
+chmppool
+jungleani
+maniacsq
+maniacsqa
+maniacsqu
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 maniacsqs
 play2000
 play2000_40i
 play2000_50i
 sltpcycl
+<<<<<<< HEAD
 sltpcycla
 sltpcyclb
 sltpcyclc
 sltpstep
 sltpstepa
+=======
+sltpstep
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 snowboar
 snowboara
 srollnd
 touchgo
+<<<<<<< HEAD
 touchgoa
 touchgona
 touchgonna
@@ -18793,10 +19004,18 @@ wrally2a
 wrally2b
 wrally2c
 wrally2d
+=======
+touchgoe
+touchgon
+touchgok
+wrally2
+wrally2a
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:gaelco/gaelco3d.cpp
 footbpow
 footbpow11
+<<<<<<< HEAD
 footbpow12
 footbpow14
 radikalb
@@ -18814,13 +19033,26 @@ surfplnt12
 surfplnt20
 surfplnt30
 surfplnt31
+=======
+radikalb
+radikalba
+speedup
+speedup10
+speedup12
+surfplnt
+surfplnt20
+surfplnt30
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 surfplnt40
 
 @source:gaelco/gaelcof3.cpp
 autopapa
 donpepito
+<<<<<<< HEAD
 mueve
 obladi
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 susanita
 
 @source:gaelco/gaelcopc.cpp
@@ -18834,6 +19066,7 @@ tuningrc
 glass
 glass10
 glass10a
+<<<<<<< HEAD
 glass10b
 glass10c
 glass10d
@@ -18844,6 +19077,9 @@ glasskra
 glassp
 ssplash
 ssplash10
+=======
+glasskr
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:gaelco/goldart.cpp
 goldart
@@ -18867,6 +19103,7 @@ lotoplayp
 @source:gaelco/mastboy.cpp
 mastboy
 mastboya
+<<<<<<< HEAD
 mastboyb
 mastboyc
 mastboyd
@@ -18883,6 +19120,11 @@ mastboyol
 mastboyola
 mastboyv2
 mastboyv2a
+=======
+mastboyi
+mastboyia
+mastboyiv2
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:gaelco/mastboyo.cpp
 mastboyo
@@ -18902,8 +19144,11 @@ rollext
 
 @source:gaelco/splash.cpp
 funystrp
+<<<<<<< HEAD
 nsplashkr
 nsplashkra
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 paintlad
 puckpepl
 rebus
@@ -18911,10 +19156,13 @@ roldfrog
 roldfroga
 splash
 splash10
+<<<<<<< HEAD
 splash11
 splash12
 splashkr
 splashna
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 ringball
 
 @source:gaelco/splash_ms.cpp
@@ -18922,28 +19170,40 @@ splashms
 splashmsa
 
 @source:gaelco/targeth.cpp
+<<<<<<< HEAD
 quickshts
 targeth
 targetha
 targethb
+=======
+targeth
+targetha
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 targeth10
 
 @source:gaelco/thoop2.cpp
 thoop2
 thoop2a
+<<<<<<< HEAD
 thoop2b
 thoop2c
 thoop2d
 thoop2e
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:gaelco/wrally.cpp
 wrally
 wrallya
+<<<<<<< HEAD
 wrallyac
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 wrallyat
 wrallyata
 wrallyb
 wrallyc
+<<<<<<< HEAD
 wrallyd
 wrallye
 
@@ -18957,6 +19217,11 @@ xorworlda
 @source:gaelco/xorworld_ms.cpp
 xorwldms
 xorwldmsa
+=======
+
+@source:gaelco/xorworld.cpp
+xorworld
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:galaxian/dambustr.cpp
 dambustr
@@ -18978,303 +19243,303 @@ jumpcoast
 redrobin
 
 @source:galaxian/galaxian.cpp
-600                             // GX353 (c) 1981 Konami
-amidar                          // GX337 (c) 1982 Konami
-amidar1                         // GX337 (c) 1981 Konami
-amidarb                         // bootleg
-amidarb2                        // bootleg
-amidarc                         // bootleg
-amidaro                         // GX337 (c) 1982 Konami + Olympia license
-amidars                         // GX337 (c) 1982 Konami
-amidaru                         // GX337 (c) 1982 Konami + Stern license
-amigo                           // bootleg
-amigo2                          // bootleg
-anteater                        // (c) 1982 Tago
-anteaterg                       // (c) 1983 TV-Tuning (F.E.G. license)
-anteatergg                      // bootleg
-anteateruk                      // (c) 1983 Free Enterprise Games
-aracnis                         // bootleg
-aracnisa                        // bootleg
-armorcar                        // (c) 1981 Stern
-armorcar2                       // (c) 1981 Stern
-asideral                        // bootleg
-astrians                        //
-astroamb                        // bootleg
-ataqandr                        // bootleg (FAR S.A.)
-atlantis                        // (c) 1981 Comsoft
-atlantis2                       // (c) 1981 Comsoft
-atlantisb                       // bootleg
-azurian                         // (c) 1982 Rait Electronics Ltd
-bagmanm2                        // (c) 1984 Valadon Automation / GIB
-bagmanm3                        // bootleg
-bagmanmc                        // bootleg
-batman2                         // bootleg
-bigkonggx                       // bootleg
-blkhole                         // TDS (Tokyo Denshi Sekkei) & MINTS
-bmxstunts                       // (c) 1985 Jetsoft
-bomber                          //
-bongo                           // (c) 1983 Jetsoft
-bongog                          // (c) 1983 Jetsoft
-calipso                         // (c) 1982 Tago
-catacomb                        // 1982 MTM Games
-checkman                        // (c) 1982 Zilec-Zenitone
-checkmanj                       // (c) 1982 Jaleco (Zenitone/Zilec in ROM CM4, and the programmer names)
-chewing                         // ?? unknown
-ckongcv                         // 19?? Competitive Video?
-ckongg                          // 1981 bootleg
-ckonggx                         //
-ckongis                         //
-ckongmc                         // 1981 bootleg
-ckongmc2                        // 1981 bootleg
-ckongs                          // bootleg
-crazym                          // (c) 1982 GAT (bootleg)
-devilfshg                       // (c) 1982 Artic (bootleg?)
-devilfshgb                      // (c) 1984 Vision / Artic (bootleg?)
-dingo                           // (c) 1983 Ashby Computers and Graphics LTD. + Jaleco license
-dingoe                          // (c) 1983 Ashby Computers and Graphics LTD. + Jaleco license
-eagle                           // [1980] Centuri
-eagle2                          // [1980] Centuri
-eagle3                          // [1980] Centuri
-exodus                          // Subelectro - bootleg?
-explorer                        // bootleg
-fantastc                        // (c) Taito (Brazil) - rewrite of Galaga
-fantazia                        // bootleg
-floritas                        // bootleg
-floritasm                       // bootleg (Multivideo)
-frogf                           // bootleg
-frogg                           // bootleg
-froggeg                         // bootleg (Hermatic)
-frogger                         // GX392 (c) 1981 Konami
-froggeram                       // bootleg
-froggereb                       // bootleg
-froggermc                       // 800-3110 (c) 1981 Sega
-froggers                        // bootleg
-froggers1                       // (c) 1981 Sega
-froggers2                       // 834-0068 (c) 1981 Sega
-froggers3                       //
-froggert                        // 834-0222 (c) 1981 Sega
-froggervd                       // Video Dens
-froggrs                         // bootleg (Coin Music)
-fourplay                        // multigame
-galactica2                      // bootleg (Cirsa)
-galap1                          // hack
-galap2                          // hack
-galap4                          // hack
-galapx                          // hack
-galartic                        // Artic System
-galaxbsf                        // hack
-galaxbsf2                       // bootleg
-galaxcirsa                      // bootleg (Cirsa)
-galaxiamv                       // bootleg (Multivideo)
-galaxian                        // (c) Namco
-galaxiana                       // (c) Namco
-galaxianbl                      // bootleg
-galaxianbl2                     // bootleg
-galaxianbl3                     // bootleg
-galaxianem                      // bootleg (Electromar Madrid)
-galaxiani                       // (c) Irem
-galaxianiii                     // bootleg
-galaxianm                       // (c) Midway
-galaxianmo                      // (c) Midway
-galaxianrp                      // bootleg (Rene Pierre)
-galaxiant                       // (c) Taito
-galaxrcgg                       // bootleg (Recreativos Covadonga)
-galaxrf                         // bootleg (Recreativos Franco)
-galaxrfgg                       // bootleg (Recreativos Franco)
-galaxyx                         // bootleg
-galemp                          // (c) Taito do Brasil
-galkamika                       // bootleg (Video Game / Electrogame)
-galturbo                        // hack
-ghostmun                        //
-gmgalax                         // bootleg
-gteikoku                        // (c) Irem
-gteikokub                       // bootleg
-gteikokub2                      // bootleg
-gteikokub3                      // bootleg (Honly Enterprises)
-guttangt                        //
-guttangts3                      //
-highroll                        //
-jumpbug                         // (c) 1981 Rock-ola
-jumpbugb                        // (c) 1981 Sega
-jumpbugbc                       // bootleg
-jumpbugbrf                      // bootleg
-jungsub                         // bootleg
-kamakazi3                       // Video Games (UK) Ltd., hack or bootleg?
-kamikazesp                      // bootleg (Euromatic S.A.)
-kamikazp                        // bootleg (Potomac Games)
-kingball                        // (c) 1980 Namco
-kingballj                       // (c) 1980 Namco
-komemokos                       // hack
-kong                            // (c) Taito (Brazil) - rewrite of Donkey Kong
-ladybugg                        // bootleg
-levers                          // (c) 1983 Rock-ola
-losttomb                        // (c) 1982 Stern
-losttombh                       // (c) 1982 Stern
-luctoday                        // 1980 Sigma
-mandinga                        // bootleg (Artemi)
-mandingac                       // bootleg (Centromatic)
-mandingaeg                      // bootleg (Electrogame)
-mandingarf                      // bootleg (Recreativos Franco S.A.)
-mandinka                        // bootleg
-mcwars                          // bootleg
-meteora                         // bootleg (Alca)
-mimonkey                        // (c) 1982 Universal Video Games (US Copyright Office info - http://cocatalog.loc.gov)
-mimonsco                        // (c) 1982 bootleg
-mimonscr                        // (c) 1982 bootleg
-mimonscra                       // (c) 1982 bootleg
-mltiwars                        // bootleg (Gayton Games)
-monsterz                        // (c) 1982 Nihon (Arcade TV Game List - P.102, Left, 20 from top)
-monsterza                       // (c) 1982 Nihon (Arcade TV Game List - P.102, Left, 20 from top)
-moonal2                         // [1980] Nichibutsu
-moonal2b                        // [1980] Nichibutsu
-moonaln                         // [Nichibutsu] (Karateco license) or hack
-mooncmw                         // bootleg
-mooncptc                        // bootleg (Petaco S.A.)
-mooncrecm                       // bootleg (Centromatic)
-mooncreg                        // bootleg
-mooncreg2                       // bootleg
-mooncrgx                        // bootleg
-mooncrs2                        // bootleg
-mooncrs3                        // bootleg
-mooncrs4                        // bootleg
-mooncrs5                        // bootleg
-mooncrsb                        // bootleg
-mooncrsl                        // bootleg (Laguna S.A.)
-mooncrst                        // (c) 1980 Nichibutsu
-mooncrstg                       // (c) 1980 Gremlin
-mooncrstso                      // (c) 1980 SegaSA / Sonic
-mooncrsto                       // (c) 1980 Nichibutsu
-mooncrstu                       // (c) 1980 Nichibutsu USA
-mooncrstuu                      // (c) 1980 Nichibutsu USA
-mooncrstuk                      // (c) 1980 Nichibutsu UK
-mooncrstuku                     // (c) 1980 Nichibutsu UK
-moonqsr                         // (c) 1980 Nichibutsu
-moonwar                         // (c) 1981 Stern
-moonwara                        // (c) 1981 Stern
-mouncrst                        // bootleg
-mshuttle                        // (c) 1981 Nichibutsu
-mshuttle2                       // (c) 1981 Nichibutsu
-mshuttlea                       // (c) 1981 Nichibutsu
-mshuttlej                       // (c) 1981 Nichibutsu
-mshuttlej2                      // (c) 1981 Nichibutsu
-mutacion                        // bootleg (Explomatic)
-namenayo                        // (c) 1982 Cat's
-ncentury                        // bootleg (Petaco S.A.)
-offensiv                        // bootleg (Video Dens)
-olibug                          // bootleg
-olmandingo                      // bootleg
-olmandingc                      // bootleg (Calfesa)
-omegab                          // bootleg
-omni                            // bootleg
-orbitron                        // (c) 1982 Signatron USA (Arcade Tv Game List - P.160, Left, 22 from top)
-ozon1                           // (c) 1983 Proma
-pacmanbl                        // bootleg
-pacmanbla                       // bootleg
-pacmanblb                       // bootleg
-pacmanblc                       // bootleg (Calfesa)
-pacmanblci                      // bootleg (Cirsa)
-pacmanblv                       // bootleg (Video Dens)
-pacmanblva                      // bootleg (Video Dens)
-pajaroes                        // bootleg
-phoenxp2                        // bootleg
-pisces                          // Subelectro
-piscesb                         // bootleg
-porter                          // 1982 bootleg (Arcade TV Game List - P.98, Left, 15 from bottom)
-portera                         // bootleg
-quaak                           // bootleg
-redufo                          // (c) Artic
-redufob                         // bootleg
-redufob2                        // bootleg
-redufob3                        // bootleg
-rocktcnvy                       // bootleg (Radar Ltd.)
-sbhoei                          // Hoei
-sbhoeia                         // Hoei
-scobra                          // GX316 (c) 1981 Konami
-scobrab                         // GX316 (c) 1981 Karateco (bootleg?)
-scobrae                         // GX316 (c) 1981 Stern
-scobrae2                        //
-scobrag                         // AVG by Zaccaria (bootleg?)
-scobraggi                       // bootleg (Cocamatic)
-scobras                         // GX316 (c) 1981 Stern
-scobrase                        // GX316 (c) 1981 Sega
-scorpion                        // (c) 1982 Zaccaria
-scorpiona                       // (c) 1982 Zaccaria
-scorpionb                       // (c) 1982 Zaccaria
-scorpionmc                      // bootleg
-scramble                        // GX387 (c) 1981 Konami
-scramblebb                      // bootleg?
-scramblebf                      // bootleg
-scramblebun                     // bootleg?
-scrambles                       // GX387 (c) 1981 Stern
-scrambles2                      // GX387 (c) 1981 Stern
-scrambp                         // bootleg (Billport S.A.)
-scramce                         // bootleg (Centromatic S.A.)
-scrammr                         // bootleg (Model Racing)
-scrampt                         // bootleg (Petaco S.A.)
-scramrf                         // bootleg (Recreativos Franco)
-sfx                             // (c) 1983 Nichibutsu
-sgalwars                        // bootleg
-sirio2                          // bootleg (Calfesa S.L.)
-skelagon                        // (c) 1983 Nichibutsu USA
-skybase                         // (c) 1982 Omori Electric Co., Ltd.
-skyraidr                        // bootleg
-smooncrs                        // Gremlin
-spacbat2                        // bootleg
-spacbatt                        // bootleg
-spacempr                        // bootleg
-spacian2                        //
-spactrai                        //
-spcdrag                         // bootleg
-spcmission                      // bootleg (SegaSA / Sonic)
-spctrek                         // bootleg
-spctbird                        // (c) Fortrek
-spdcoin                         // (c) 1984 Stern
-sstarcrs                        // Taito (Brazil)
-starfght                        // hack
-starfgmc                        // bootleg
-stera                           // bootleg
-streakng                        // [1980] Shoei
-streaknga                       // [1980] Shoei
-strfbomb                        // bootleg
-superbon                        // bootleg
-superbona                       // bootleg
-superg                          // hack
-supergs                         // Silver Systems hack
-supergx                         // [1980] Nichibutsu
-supershp                        // bootleg
-suprheli                        // bootleg
-swarm                           // hack
-tazmania                        // (c) 1982 Stern
-tdpgal                          // 1983 Design Labs / Thomas Automatics
-tenspot                         // (c) 1982 Thomas Automatics
-theend                          // (c) 1980 Konami
-takeoff                         // (c) 1980 Sidam (bootleg)
-theends                         // (c) 1980 Stern
-theendss                        // bootleg (SegaSA / Sonic)
-thepitm                         // bootleg
-timefgtr                        // (c) Taito (Brazil) - rewrite of Time Pilot
-tst_galx                        // Galaxian Test ROM
-turpin                          // (c) 1981 Sega
-turpinnv                        // bootleg (Novatronic)
-turpins                         // (c) 1981 bootleg
-turtles                         // (c) 1981 Stern
-uniwars                         // (c) Irem
-uniwarsa                        // (c) Karateco
-victoryc                        // (c) Comsoft
-victorycb                       // (c) Comsoft (bootleg)
-videight                        // multigame
-vueloesp                        // bootleg (Centromatic)
-warofbug                        // (c) 1981 Armenia
-warofbugg                       // German Version
-warofbugu                       // (c) 1981 Armenia
-zerotime                        // hack (Petaco S.A.)
-zerotimea                       // hack
-zerotimeb                       // hack
-galaktron                       // bootleg (Petaco S.A.)
-zerotimed                       // hack (Datamat)
-zerotimemc                      // hack (Marti Colls)
-zigzagb                         // (c) 1982 LAX (bootleg)
-zigzagb2                        // (c) 1982 LAX (bootleg)
+600
+amidar
+amidar1
+amidarb
+amidarb2
+amidarc
+amidaro
+amidars
+amidaru
+amigo
+amigo2
+anteater
+anteaterg
+anteatergg
+anteateruk
+aracnis
+aracnisa
+armorcar
+armorcar2
+asideral
+astrians
+astroamb
+ataqandr
+atlantis
+atlantis2
+atlantisb
+azurian
+bagmanm2
+bagmanm3
+bagmanmc
+batman2
+bigkonggx
+blkhole
+bmxstunts
+bomber
+bongo
+bongog
+calipso
+catacomb
+checkman
+checkmanj
+chewing
+ckongcv
+ckongg
+ckonggx
+ckongis
+ckongmc
+ckongmc2
+ckongs
+crazym
+devilfshg
+devilfshgb
+dingo
+dingoe
+eagle
+eagle2
+eagle3
+exodus
+explorer
+fantastc
+fantazia
+floritas
+floritasm
+frogf
+frogg
+froggeg
+frogger
+froggeram
+froggereb
+froggermc
+froggers
+froggers1
+froggers2
+froggers3
+froggert
+froggervd
+froggrs
+fourplay
+galactica2
+galap1
+galap2
+galap4
+galapx
+galartic
+galaxbsf
+galaxbsf2
+galaxcirsa
+galaxiamv
+galaxian
+galaxiana
+galaxianbl
+galaxianbl2
+galaxianbl3
+galaxianem
+galaxiani
+galaxianiii
+galaxianm
+galaxianmo
+galaxianrp
+galaxiant
+galaxrcgg
+galaxrf
+galaxrfgg
+galaxyx
+galemp
+galkamika
+galturbo
+ghostmun
+gmgalax
+gteikoku
+gteikokub
+gteikokub2
+gteikokub3
+guttangt
+guttangts3
+highroll
+jumpbug
+jumpbugb
+jumpbugbc
+jumpbugbrf
+jungsub
+kamakazi3
+kamikazesp
+kamikazp
+kingball
+kingballj
+komemokos
+kong
+ladybugg
+levers
+losttomb
+losttombh
+luctoday
+mandinga
+mandingac
+mandingaeg
+mandingarf
+mandinka
+mcwars
+meteora
+mimonkey
+mimonsco
+mimonscr
+mimonscra
+mltiwars
+monsterz
+monsterza
+moonal2
+moonal2b
+moonaln
+mooncmw
+mooncptc
+mooncrecm
+mooncreg
+mooncreg2
+mooncrgx
+mooncrs2
+mooncrs3
+mooncrs4
+mooncrs5
+mooncrsb
+mooncrsl
+mooncrst
+mooncrstg
+mooncrstso
+mooncrsto
+mooncrstu
+mooncrstuu
+mooncrstuk
+mooncrstuku
+moonqsr
+moonwar
+moonwara
+mouncrst
+mshuttle
+mshuttle2
+mshuttlea
+mshuttlej
+mshuttlej2
+mutacion
+namenayo
+ncentury
+offensiv
+olibug
+olmandingo
+olmandingc
+omegab
+omni
+orbitron
+ozon1
+pacmanbl
+pacmanbla
+pacmanblb
+pacmanblc
+pacmanblci
+pacmanblv
+pacmanblva
+pajaroes
+phoenxp2
+pisces
+piscesb
+porter
+portera
+quaak
+redufo
+redufob
+redufob2
+redufob3
+rocktcnvy
+sbhoei
+sbhoeia
+scobra
+scobrab
+scobrae
+scobrae2
+scobrag
+scobraggi
+scobras
+scobrase
+scorpion
+scorpiona
+scorpionb
+scorpionmc
+scramble
+scramblebb
+scramblebf
+scramblebun
+scrambles
+scrambles2
+scrambp
+scramce
+scrammr
+scrampt
+scramrf
+sfx
+sgalwars
+sirio2
+skelagon
+skybase
+skyraidr
+smooncrs
+spacbat2
+spacbatt
+spacempr
+spacian2
+spactrai
+spcdrag
+spcmission
+spctrek
+spctbird
+spdcoin
+sstarcrs
+starfght
+starfgmc
+stera
+streakng
+streaknga
+strfbomb
+superbon
+superbona
+superg
+supergs
+supergx
+supershp
+suprheli
+swarm
+tazmania
+tdpgal
+tenspot
+theend
+takeoff
+theends
+theendss
+thepitm
+timefgtr
+tst_galx
+turpin
+turpinnv
+turpins
+turtles
+uniwars
+uniwarsa
+victoryc
+victorycb
+videight
+vueloesp
+warofbug
+warofbugg
+warofbugu
+zerotime
+zerotimea
+zerotimeb
+galaktron
+zerotimed
+zerotimemc
+zigzagb
+zigzagb2
 
 @source:galaxian/galaxian_rockclim.cpp
 rockclim
@@ -19589,6 +19854,9 @@ rw31r
 
 @source:handheld/hh_sm510.cpp
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 atakaast
 auslalom
 bassmate
@@ -19659,7 +19927,10 @@ kbilly
 kblades
 kbottom9
 kbucky
+<<<<<<< HEAD
 kchqflag
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 kcontra
 kdribble
 kgarfld
@@ -19734,12 +20005,18 @@ trobocop3
 trockteer
 trsgkeep
 trshutvoy
+<<<<<<< HEAD
 trspacadv
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 trspacmis
 trspider
 trsrescue
 trthuball
+<<<<<<< HEAD
 trtreisl
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 tsddragon
 tsf2010
 tsfight2
@@ -19759,6 +20036,7 @@ tvindictr
 twworld
 txmen
 txmenpx
+<<<<<<< HEAD
 uchitari
 vesarif
 vespovar
@@ -19935,6 +20213,10 @@ txmenpx                         // Tiger Electronics
 vespovar                        // Elektronika
 vfutbol                         // Elektronika
 >>>>>>> 9ba5d7019eb (New working systems)
+=======
+vespovar
+vfutbol
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:handheld/hh_smc1k.cpp
 tkkongq
@@ -20263,7 +20545,10 @@ port32
 port32a
 port32b
 lyon16
+<<<<<<< HEAD
 lyon16a
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 lyon32
 van16
 van32
@@ -20306,6 +20591,7 @@ polgar101
 
 @source:hegenerglaser/risc.cpp
 <<<<<<< HEAD
+<<<<<<< HEAD
 mrisc
 mrisca
 mrisc2
@@ -20314,6 +20600,11 @@ mrisc                           // 1992 Mephisto RISC 1MB
 mrisca                          // 1992 Mephisto RISC 1MB
 mrisc2                          // 1994 Mephisto RISC II
 >>>>>>> 755eccc28e5 (New working clones)
+=======
+mrisc
+mrisca
+mrisc2
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:hegenerglaser/roma2.cpp
 montreal
@@ -20579,9 +20870,12 @@ husky
 
 @source:ibm/ibm3153.cpp
 ibm3153
+<<<<<<< HEAD
 
 @source:ibm/ibm3477.cpp
 ibm3477
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:ibm/ibm5100.cpp
 ibm5100
@@ -20615,7 +20909,10 @@ chexx83
 faceoffh
 olihockey
 olihockeya
+<<<<<<< HEAD
 unkbubsc
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:ice/frenzyxprss.cpp
 frenzyxprss
@@ -20670,6 +20967,9 @@ poker21
 
 @source:igs/goldstar.cpp
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 3cdpoker
 3cdpokera
 amaztsk
@@ -20678,8 +20978,11 @@ animalhsa
 animalhsb
 animalhsc
 animalw
+<<<<<<< HEAD
 animalwa
 animalwbl
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 aplan
 bingowng
 bingownga
@@ -20820,7 +21123,10 @@ moonlght
 moonlghta
 moonlghtb
 moonlghtc
+<<<<<<< HEAD
 mtonic2
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 nc96
 nc96a
 nc96b
@@ -20881,6 +21187,10 @@ skill98
 skillch
 skillcha
 srmagic
+<<<<<<< HEAD
+=======
+ss2001
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 star100
 super7
 super9
@@ -20900,6 +21210,7 @@ wcat
 wcat3
 wcat3a
 wcherry
+<<<<<<< HEAD
 =======
 3cdpoker                        // hack?
 3cdpokera                       // hack?
@@ -21130,6 +21441,8 @@ wcat3                           //
 wcat3a                          //
 wcherry                         // bootleg
 >>>>>>> 9083885823d (New clones marked not working)
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:igs/igs009.cpp
 animalhjb
@@ -21154,8 +21467,11 @@ drgnwrldv30
 drgnwrldv40k
 lhb
 lhb2
+<<<<<<< HEAD
 lhb2cpgs
 lhb3
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 lhbv33c
 nkishusp
 ryukobou
@@ -21165,7 +21481,10 @@ vbowlhk
 vbowlj
 wlcc
 xymg
+<<<<<<< HEAD
 xymga
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:igs/igs017.cpp
 cpoker2
@@ -21176,13 +21495,17 @@ happyskl
 iqblocka
 iqblockf
 jking103a
+<<<<<<< HEAD
 jking105us
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 jking200pr
 jking302us
 lhzb
 lhzba
 lhzb2
 lhzb2a
+<<<<<<< HEAD
 lhzb2b
 lhzb2c
 mgcs
@@ -21197,53 +21520,86 @@ sdmg2p
 slqz2
 slqz2a
 slqz2b
+=======
+mgcs
+mgcsa
+mgdh
+mgdha
+sdmg2
+sdmg2a
+sdmg2p
+slqz2
+slqz2a
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 spkrform
 starzan
 tarzan
 tarzan103m
+<<<<<<< HEAD
 tarzan106fa
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 tarzan202fa
 tarzana
 tarzanb
 tarzanc
 tjsb
+<<<<<<< HEAD
 
 @source:igs/igs_68k_023vid.cpp
 xypmd
 xypmda
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:igs/igs_fear.cpp
 fearless
 icescape
+<<<<<<< HEAD
 mjzb
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 superkds
 
 @source:igs/igs_m027.cpp
 amazoni2
 amazonia
 amazonkp
+<<<<<<< HEAD
 ccly
 chessc2
 cjddz
 cjddz213cn
+=======
+chessc2
+cjddz
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 cjddz215cn
 cjddz217cn
 cjddzlf
 cjddzp
+<<<<<<< HEAD
 cjddzps
 cjddzs
 cjddzsa
 cjdh6th
 cjsxp
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 cjtljp
 extradrw
 fruitpar
 fruitpar206us
 gonefsh2
+<<<<<<< HEAD
 jhg3d
 jking02
 klxyj102cn
 klxyj104cn
+=======
+jking02
+klxyj
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 lhdmg
 lhdmgp
 lhdmgp200c3m
@@ -21261,6 +21617,7 @@ oceanpar
 oceanpar101us
 olympic5
 olympic5107us
+<<<<<<< HEAD
 qlgs
 royal5p
 sdwx
@@ -21270,14 +21627,23 @@ tripslot
 tshs
 tswxp
 xypdk
+=======
+tripslot
+qlgs
+sdwx
+slqz3
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 zhongguo
 
 @source:igs/igs_m027_023vid.cpp
 mxsqy
+<<<<<<< HEAD
 
 @source:igs/igs_m027_033vid.cpp
 huahuas5
 qiji6
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:igs/igs_m027_link.cpp
 cjslh
@@ -21292,6 +21658,7 @@ crzybugs200us
 crzybugs202us
 haunthig
 haunthig101us
+<<<<<<< HEAD
 jking04
 tripfev
 tripfev105us
@@ -21301,15 +21668,26 @@ wldfruit
 
 @source:igs/igs_m036.cpp
 cjbq
+=======
+tripfev
+tripfev105us
+tripfev107us
+wldfruit
+
+@source:igs/igs_m036.cpp
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 cjddzsp
 cjdh2
 cjdh2a
 cjdh2b
 cjdh2c
+<<<<<<< HEAD
 cjdh2d
 cjgdy
 dahuaxy
 huoqilin
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 igsm312
 jhzb
 jxry
@@ -21318,12 +21696,16 @@ lhtb
 lhzb3in1
 lhzbgqb
 mghammer
+<<<<<<< HEAD
 mjzhizun
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 qhzb
 slqzsp
 super70s
 sydh
 xyddz
+<<<<<<< HEAD
 xydn
 
 @source:igs/igspoker.cpp
@@ -21331,6 +21713,14 @@ chleague
 chleaguel
 chleaguexa
 chleaguexb
+=======
+
+@source:igs/igspoker.cpp
+chleague
+chleagul
+chleagxa
+chleagxb
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 citalcup
 cpoker
 cpokerpk
@@ -21348,7 +21738,11 @@ igs_ncs2
 igstet341
 igstet342
 number10
+<<<<<<< HEAD
 number10l
+=======
+numbr10l
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 pktet346
 stellecu
 
@@ -21453,15 +21847,21 @@ kov2p200
 kov2p202
 kov2p203
 kov2p204
+<<<<<<< HEAD
 kovbl
 kovgsyx
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 kovlsjb
 kovlsjba
 kovlsqh
 kovlsqh2
 kovplus
 kovplusa
+<<<<<<< HEAD
 kovplusbl
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 kovqhsgs
 kovsgqyz
 kovsgqyza
@@ -21551,6 +21951,7 @@ kov3hd101
 
 @source:igs/spoker.cpp
 3super8
+<<<<<<< HEAD
 dafuwng3
 hsheng2
 huahuas2
@@ -21565,19 +21966,28 @@ jinhulu2120gi
 sleyuan2
 spk100
 spk102u
+=======
+jbell
+jinhulu2
+spk100
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 spk102ua
 spk114it
 spk115it
 spk116it
 spk116itmx
 spk120in
+<<<<<<< HEAD
 spk130
 spk200
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 spk200ua
 spk201ua
 spk203us
 spk205us
 spk306us
+<<<<<<< HEAD
 xjinhuang
 zuanshiw
 
@@ -21594,6 +22004,12 @@ fortune1
 videocba
 videodad
 videopkr
+=======
+
+@source:igt/drw80pkr.cpp
+drw80pk2
+drw80pkr
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:igt/gkigt.cpp
 bmoonii
@@ -22277,6 +22693,19 @@ spset005
 spset015
 spset026
 spss4240
+<<<<<<< HEAD
+=======
+
+@source:igt/videopkr.cpp
+babydad
+babypkr
+blckjack
+bpoker
+fortune1
+videocba
+videodad
+videopkr
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:informer/informer_207_100.cpp
 in207100
@@ -22301,6 +22730,7 @@ intlc440
 
 @source:intel/intellec8.cpp
 <<<<<<< HEAD
+<<<<<<< HEAD
 intlc8
 intlc8m80
 =======
@@ -22312,6 +22742,10 @@ intlc8m80b                      //
 =======
 intlc8m80                       //
 >>>>>>> d246968ffcb (Cleaned up some recent commits.)
+=======
+intlc8
+intlc8m80
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:intel/ipc.cpp
 ipb
@@ -22561,7 +22995,10 @@ hook
 hookj
 hooku
 inthunt
+<<<<<<< HEAD
 inthuntk
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 inthuntu
 kaiteids
 leaguemn
@@ -23001,7 +23438,10 @@ rockn3
 rockn4
 rockna
 rocknms
+<<<<<<< HEAD
 rocknms10
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 step3
 stepstag
 tetrisp2
@@ -23016,7 +23456,10 @@ vjslap
 crisscrs
 guab
 tenup
+<<<<<<< HEAD
 ttrail
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:jpm/jpmimpct.cpp
 buzzundr
@@ -24555,10 +24998,13 @@ hb_ydda
 @source:jpm/pluto6.cpp
 pl6_kfp
 pl6_lgk
+<<<<<<< HEAD
 pl6_atw
 tijkpots
 pl6_cm
 pl6_demo
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:kaneko/airbustr.cpp
 airbustr
@@ -25233,7 +25679,10 @@ salmndr2
 salmndr2a
 sexyparo
 sexyparoa
+<<<<<<< HEAD
 sexyparoebl
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 slamdnk2
 soccerss
 soccerssa
@@ -25746,7 +26195,10 @@ ropeman
 
 @source:konami/rollerg.cpp
 rollerg
+<<<<<<< HEAD
 rollerga
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 rollergj
 
 @source:konami/rungun.cpp
@@ -26094,11 +26546,14 @@ korgm1ex
 korgm1p1
 korgm1r
 korgm1rex
+<<<<<<< HEAD
 
 @source:korg/korgtriton.cpp
 korgtriton
 korgtritona
 korgtritonb
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:korg/korgws.cpp
 korgwsad
@@ -26180,12 +26635,15 @@ free120
 @source:liberty/freedom200.cpp
 free200
 free220
+<<<<<<< HEAD
 
 @source:linn/linndrum.cpp
 linndrum
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:linn/linndrum.cpp
-linndrum                        // Linn Electronics LinnDrum
+linndrum
 
 @source:lsi/m3.cpp
 m3
@@ -28289,9 +28747,12 @@ pitbossps
 riviera
 rivieraa
 rivierab
+<<<<<<< HEAD
 rivierac
 rivierad
 rivierae
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 tictac
 tictaca
 tictacuk
@@ -28367,7 +28828,10 @@ megat5t
 megat5tg
 megat6
 megat7e
+<<<<<<< HEAD
 megata
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 meritjp
 mtjpoker
 pbss330
@@ -28413,7 +28877,10 @@ mtchxlti
 
 @source:merit/pubtimed.cpp
 pubtimed
+<<<<<<< HEAD
 pubtimeda
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:metro/hyprduel.cpp
 hyprduel
@@ -28543,7 +29010,10 @@ attackfcu
 ballbomb
 cane
 claybust
+<<<<<<< HEAD
 cosmicbat
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 cosmicin
 cosmicm2
 cosmicmo
@@ -28625,7 +29095,10 @@ schaserm
 searthie
 searthin
 searthina
+<<<<<<< HEAD
 searthinc
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 supinvsion
 sflush
 shuttlei
@@ -28670,7 +29143,10 @@ yosakdona
 
 @source:midw8080/mw8080bw.cpp
 280zzzap
+<<<<<<< HEAD
 280zzzapa
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 blueshrk
 blueshrkmr
 blueshrkmr2
@@ -29008,7 +29484,10 @@ crusnexoaa
 crusnexob
 crusnexoc
 crusnexod
+<<<<<<< HEAD
 crusnexoe
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 invasnab
 invasnab3
 invasnab4
@@ -29163,7 +29642,10 @@ maydaya
 maydayb
 mysticm
 mysticmp
+<<<<<<< HEAD
 nextcent
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 playball
 robotron
 robotronyo
@@ -29271,7 +29753,10 @@ tvpoker
 
 @source:misc/acefruit.cpp
 acefruit
+<<<<<<< HEAD
 flshback
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 sidewndr
 spellbnd
 starspnr
@@ -30155,6 +30640,19 @@ ctainv
 @source:misc/beezer.cpp
 beezer
 beezer1
+<<<<<<< HEAD
+=======
+
+@source:misc/belatra.cpp
+fairyl2
+fairyl2a
+fairyl2b
+fairyl2bl
+ldrink
+ldrinka
+merryjn
+unkbel
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:misc/bingoman.cpp
 bingoman
@@ -30221,7 +30719,10 @@ cas21iwc
 comg074
 comg076
 comg079
+<<<<<<< HEAD
 comg079b
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 comg080
 comg094
 comg107
@@ -30282,6 +30783,10 @@ bsebmanbl
 bsebmanbl2
 carrera
 drkseal
+<<<<<<< HEAD
+=======
+ncarrera
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:misc/castle.cpp
 castfpt
@@ -30289,12 +30794,18 @@ castrev
 
 @source:misc/cb2001.cpp
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 cb2001
 cb4
 cb4a
 cb5
 cb5_11
+<<<<<<< HEAD
 cb5_13
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 crzybell
 dynastye
 mystjb
@@ -30305,6 +30816,7 @@ scherrym12
 scherrymp
 scherrymp10u
 tripjack
+<<<<<<< HEAD
 =======
 cb2001                          // (c) 2000 Dyna Electronics
 cb4                             // (c) 1997 Dyna Electronics
@@ -30322,6 +30834,8 @@ scherrymp                       // (c) 1997 Dyna Electronics
 scherrymp10u                    // (c) 1997 Dyna Electronics
 tripjack                        // (c) 1998 Dyna Electronics
 >>>>>>> 72212bb9188 (New working clones)
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:misc/chameleonrx1.cpp
 chamrx1
@@ -30382,7 +30896,10 @@ unkct
 comebaby
 
 @source:misc/compucranes.cpp
+<<<<<<< HEAD
 crsauruss
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 mastcrane
 mastcranea
 mastcraneb
@@ -30506,6 +31023,7 @@ fredmesp
 lottof2
 
 @source:misc/ddz.cpp
+<<<<<<< HEAD
 baibians
 btlfront
 cjmx
@@ -30514,6 +31032,11 @@ ddz
 
 @source:misc/deecoseal.cpp
 deecoseal
+=======
+btlfront
+crzclass
+ddz
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:misc/dfruit.cpp
 dfruit
@@ -31089,6 +31612,9 @@ beastf
 
 @source:misc/esd16.cpp
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 deluxe5
 deluxe5a
 deluxe5b
@@ -31106,11 +31632,15 @@ mchampdx
 mchampdxa
 mchampdxb
 multchmp
+<<<<<<< HEAD
 multchmp25
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 multchmpa
 multchmpk
 swatpolc
 tangtang
+<<<<<<< HEAD
 =======
 deluxe5                         // (c) 2000 ESD
 deluxe5a                        // (c) 2000 ESD
@@ -31134,6 +31664,8 @@ multchmpk                       // (c) 1998 (Korea)
 swatpolc                        // (c) 2001 ESD
 tangtang                        // (c) 2000 ESD
 >>>>>>> 022c0f32eea (New clones marked not working)
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:misc/esh.cpp
 esh
@@ -31214,7 +31746,10 @@ flipjack
 @source:misc/flower.cpp
 flower
 flowerj
+<<<<<<< HEAD
 flowerjb
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:misc/fortecar.cpp
 fortecrd
@@ -31580,23 +32115,34 @@ nfsug
 gluck2
 
 @source:misc/gms.cpp
+<<<<<<< HEAD
 baile
 ballch
 cjdlz
 cots
 hgly
 jinpaish
+=======
+ballch
+cots
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 magslot
 rbmk
 rbspm
 sball2k1
 sc2in1
+<<<<<<< HEAD
 smatch03
 ssanguoj
 sscs
 sscs0118
 super555
 yyhm
+=======
+ssanguoj
+sscs
+super555
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:misc/goldngam.cpp
 moviecrd
@@ -31659,7 +32205,10 @@ goodluck
 icproul
 jkrbonus
 jokercar
+<<<<<<< HEAD
 kmhpan
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 lespendu
 lespenduj
 maverik
@@ -32032,7 +32581,10 @@ lependu
 
 @source:misc/limenko.cpp
 dynabomb
+<<<<<<< HEAD
 hrthouse
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 legendoh
 sb2003
 sb2003a
@@ -32151,6 +32703,7 @@ yoyospel
 megaturbo
 
 @source:misc/menghong.cpp
+<<<<<<< HEAD
 fkddz2
 jpddz
 jpddza
@@ -32160,6 +32713,10 @@ menghonga
 pljh2
 sandayi
 wakeng
+=======
+crzyddz2
+menghong
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:misc/meyc8080.cpp
 casbjack
@@ -32226,6 +32783,7 @@ miraxb
 
 @source:misc/mirderby.cpp
 mirderby
+<<<<<<< HEAD
 
 @source:misc/miuchiz.cpp
 miuchiz
@@ -32236,6 +32794,8 @@ mcm_inferno
 mcm_roc
 mcp_dash
 mcp_spike
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:misc/mjsenpu.cpp
 mjsenpu
@@ -32631,9 +33191,12 @@ musclem
 
 @source:misc/nabupc.cpp
 nabupc
+<<<<<<< HEAD
 
 @source:misc/ncarrera.cpp
 ncarrera
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:misc/neomania.cpp
 neomania
@@ -32674,6 +33237,7 @@ cdrawpkr
 cgip23b
 cgip30b
 cgip30cs
+<<<<<<< HEAD
 cgip30e
 cgidjp
 ddellf96
@@ -32688,12 +33252,21 @@ df_djpkra
 dphl
 dphla
 dphljp
+=======
+cgidjp
+df_djpkr
+dphl
+dphla
+dphljp
+dphlunka
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 dphlunkb
 drhl
 drhla
 fastdrwp
 gtipoker
 gtipokra
+<<<<<<< HEAD
 gtipokrb
 gtipokrba
 gtipokrc
@@ -32714,17 +33287,30 @@ ndxron10
 newhilop
 nor6007a
 nor6007b
+=======
+kimbldhl
+kimblz80
+mainline
+ndxron10
+newhilop
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 noraut3a
 noraut3b
 norautdx
 norautjo
 norautjp
+<<<<<<< HEAD
 norautn1a
 norautp
 norautpb
 norautpl
 norautpn
 norautpt
+=======
+norautp
+norautpl
+norautpn
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 norautra
 norautrh
 norautu
@@ -32732,6 +33318,7 @@ norautua
 norautub
 pkii_dm
 pma
+<<<<<<< HEAD
 pokplus
 pokplusa
 pokplusb
@@ -32751,6 +33338,12 @@ tpoker2b
 tpoker2c
 tpoker2d
 winbnk88
+=======
+smshilo
+ssjkrpkr
+tpoker2
+unkljfpk
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:misc/notechan.cpp
 notechan
@@ -32780,9 +33373,12 @@ spirulo
 
 @source:misc/pachifev.cpp
 pachifev
+<<<<<<< HEAD
 
 @source:misc/paracaidista.cpp
 paraca
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:misc/pasha2.cpp
 pasha2
@@ -32832,9 +33428,12 @@ unkpmc
 
 @source:misc/pntnpuzl.cpp
 pntnpuzl
+<<<<<<< HEAD
 
 @source:misc/pntnpuzls.cpp
 pntnpuzls
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:misc/poker72.cpp
 poker72
@@ -32999,6 +33598,10 @@ psattack
 bazooka
 bazookabr
 dpatrol
+<<<<<<< HEAD
+=======
+dpatrola
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 gametree
 knightar
 
@@ -33049,6 +33652,9 @@ scm_500
 
 @source:misc/sfbonus.cpp
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 abnudge
 abnudgeb
 abnudged
@@ -33285,6 +33891,7 @@ version4o
 version4v
 version4v2
 version4v3
+<<<<<<< HEAD
 =======
 abnudge                         // (c) 2003 Amcoe - Animal Bonus Nudge
 abnudgeb                        // (c) 2003 Amcoe
@@ -33523,6 +34130,8 @@ version4v                       // (c) 2006 Amcoe
 version4v2                      // (c) 2006 Amcoe
 version4v3                      // (c) 2006 Amcoe
 >>>>>>> 72212bb9188 (New working clones)
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:misc/shangkid.cpp
 chinhero
@@ -33549,6 +34158,34 @@ skimaxx
 
 @source:misc/skyarmy.cpp
 skyarmy
+<<<<<<< HEAD
+=======
+
+@source:misc/skylncr.cpp
+bdream97
+blshark
+butrfly
+butrflybl
+gallag50
+leader
+leadera
+madzoo
+mbutrfly
+miaction
+neraidou
+olymp
+rolla
+score5
+seadevil
+skylncr
+sonikfig
+spcliner
+speedway
+speedwaya
+sstar97
+superb2k
+tigerslt
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:misc/sliver.cpp
 sliver
@@ -33635,9 +34272,12 @@ supertr2
 supertr3
 tripdraw
 trivquiz
+<<<<<<< HEAD
 
 @source:misc/stc3910.cpp
 executel
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:misc/stop.cpp
 stop
@@ -33757,7 +34397,10 @@ twinbskt
 saiyukip
 umipoker
 umipokera
+<<<<<<< HEAD
 vparadis2
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:misc/unkgolf.cpp
 unkgolf
@@ -33950,9 +34593,12 @@ z80netf
 tx0_64kw
 tx0_8kwo
 tx0_8kw
+<<<<<<< HEAD
 
 @source:mits/al8800b.cpp
 al8800b
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:mits/altair.cpp
 al8800bt
@@ -33978,6 +34624,7 @@ driblingvm
 
 @source:modelracing/sshot.cpp
 <<<<<<< HEAD
+<<<<<<< HEAD
 gunchamps
 sshot
 sshota
@@ -33986,6 +34633,11 @@ gunchamps                       // (c) 1980 Model Racing (sshot.cpp)
 sshot                           // (c) 1979 Model Racing
 sshota                          // (c) 1979 Model Racing
 >>>>>>> 650b7e1d711 (New working clones)
+=======
+gunchamps
+sshot
+sshota
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:modelracing/subhuntr.cpp
 subhuntr
@@ -34851,7 +35503,10 @@ tekken3b
 tekken3c
 tekken3d
 tekken3ja
+<<<<<<< HEAD
 tekken3jd
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 tekken3je1
 tekken3ua
 tekken3ud
@@ -35030,9 +35685,12 @@ tactcian2
 
 @source:namco/rbowlorama.cpp
 rbowlorama
+<<<<<<< HEAD
 
 @source:namco/sg_vga.cpp
 hplanet
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:namco/shootaway2.cpp
 shootaw2
@@ -35196,7 +35854,10 @@ pc9801fs
 pc9801rs
 pc9801rx
 pc9801us
+<<<<<<< HEAD
 pc9801uv2
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 pc9801ux
 pc9801vm
 pc9801vx
@@ -35214,12 +35875,21 @@ pc9821ap2
 pc9821as
 pc9821ce2
 pc9821cx3
+<<<<<<< HEAD
+=======
+pc9821ne
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 pc9821nr15
 pc9821nr166
 pc9821nw150
 pc9821ra20
 pc9821ra266
 pc9821ra333
+<<<<<<< HEAD
+=======
+pc9821v13
+pc9821v20
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 pc9821xa16
 pc9821xs
 
@@ -35352,7 +36022,10 @@ kof95
 kof95a
 kof95h
 kof96
+<<<<<<< HEAD
 kof96a
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 kof96h
 kof97
 kof97h
@@ -35753,7 +36426,10 @@ vipclub
 @source:nichibutsu/nbmj8891.cpp
 abunai
 avmjts
+<<<<<<< HEAD
 avmjyk
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 bananadr
 chinmoku
 club90s
@@ -35798,7 +36474,10 @@ av2mj2rg
 finalbny
 galkaika
 galkoku
+<<<<<<< HEAD
 galkokua
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 hyouban
 ladymakr
 mcontest
@@ -35926,9 +36605,12 @@ srmvsa
 starsldr
 twrshaft
 vivdolls
+<<<<<<< HEAD
 
 @source:nintendo/blockfvr.cpp
 blockfvr
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:nintendo/cham24.cpp
 cham24
@@ -36665,7 +37347,10 @@ vandykejal2
 drail
 draillov
 hpierrot
+<<<<<<< HEAD
 hpierrota
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 omatsuri
 pldoraemon
 plpittashi
@@ -36834,12 +37519,15 @@ obdmx
 
 @source:oberheim/ob8.cpp
 ob8
+<<<<<<< HEAD
 
 @source:oberheim/xpander.cpp
 xpander
 
 @source:olivetti/celint2k.cpp
 celint2kss
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:olivetti/m20.cpp
 m20
@@ -37152,7 +37840,10 @@ porky
 puckman
 puckmana
 puckmanb
+<<<<<<< HEAD
 puckmanb3
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 puckmanf
 puckmanh
 puckmod
@@ -37187,6 +37878,7 @@ penta
 
 @source:pacman/schick.cpp
 schick
+<<<<<<< HEAD
 
 @source:paia/fatman.cpp
 fatman
@@ -37194,13 +37886,15 @@ fatman
 @source:paia/midi2cv8.cpp
 midi2cv8
 midi2cv8_vhz
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:paia/fatman.cpp
-fatman                          // PAiA FatMan
+fatman
 
 @source:paia/midi2cv8.cpp
-midi2cv8                        // PAiA midi2cv8 (V/Oct)
-midi2cv8_vhz                    // PAiA midi2cv8 with V/Hz daughterboard
+midi2cv8
+midi2cv8_vhz
 
 @source:palm/palm.cpp
 palmiii
@@ -37452,6 +38146,10 @@ ncr3433
 ncrpc8
 neat
 necapciv
+<<<<<<< HEAD
+=======
+//nws286                        // 1988 Nokia WS286
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 o286foxii
 ocfoxm
 ochawk
@@ -37787,9 +38485,12 @@ ms4144
 so30h
 so4saw2
 zito4dps
+<<<<<<< HEAD
 
 @source:pc/play4texash.cpp
 play4texash
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:pc/poisk1.cpp
 poisk1
@@ -37842,16 +38543,22 @@ tosh1000
 
 @source:pce/ggconnie.cpp
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 bmanroul
 fishingm
 ggconnie
 smf
+<<<<<<< HEAD
 =======
 bmanroul                        // (c) 1996 Eighting
 fishingm                        // (c) 1997 Capcom
 ggconnie                        // (c) ???? Capcom
 smf                             // (c) 1997 Capcom
 >>>>>>> b72e6306636 (New systems marked not working)
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:pce/paranoia.cpp
 paranoia
@@ -37867,6 +38574,9 @@ paclandp
 
 @source:philips/cdi.cpp
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 cdi490a
 cdi910
 cdibios
@@ -37890,6 +38600,7 @@ quizard4_40
 quizard4_41
 quizard4cz
 quizardff
+<<<<<<< HEAD
 =======
 cdi490a                         //
 cdi910                          //
@@ -37915,6 +38626,8 @@ quizard4_41                     // (c) TAB Austria 1998
 quizard4cz                      // (c) TAB Austria 1998
 quizardff                       // (c) TAB Austria 1996
 >>>>>>> 650b7e1d711 (New working clones)
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:philips/minitel_2_rpic.cpp
 minitel2
@@ -37968,7 +38681,10 @@ condorva
 falcon
 falconz
 fenix
+<<<<<<< HEAD
 fenixexpl
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 fenixn
 griffon
 griffono
@@ -38480,7 +39196,10 @@ cueball
 cueballa
 cueballb
 cueballc
+<<<<<<< HEAD
 cueballv
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 freddy
 freddy3
 gladiatp
@@ -38491,13 +39210,20 @@ sfightiia
 sfightiib
 shaqattq
 shaqattq2
+<<<<<<< HEAD
 smbmush
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 smbp
 smbpa
 smbpb
 smbpc
+<<<<<<< HEAD
 smbpv
 smbpva
+=======
+smbmush
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 snspares
 snspares1
 snspares2
@@ -38984,7 +39710,10 @@ pb_l5
 pb_p4
 
 @source:pinball/s11b.cpp
+<<<<<<< HEAD
 bcats_f1
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 bcats_g4
 bcats_l2
 bcats_l5
@@ -40126,7 +40855,10 @@ roboti
 scram_tp
 socrking
 socrkinga
+<<<<<<< HEAD
 socrkingb
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 socrkingg
 socrkingi
 spookyi
@@ -40223,6 +40955,9 @@ x2222o
 
 @source:psikyo/psikyo.cpp
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 btlkroad
 btlkroadk
 gunbird
@@ -40241,6 +40976,7 @@ sngkacea
 tengai
 tengaibl
 tengaij
+<<<<<<< HEAD
 =======
 btlkroad                        // (c) 1994
 btlkroadk                       // (c) 1994 (Korea)
@@ -40261,6 +40997,8 @@ tengai                          // (c) 1996 (World)
 tengaibl                         // bootleg
 tengaij                         // (c) 1996 (Japan)
 >>>>>>> 9083885823d (New clones marked not working)
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:psikyo/psikyo4.cpp
 hgkairak
@@ -40299,16 +41037,25 @@ mcword_de
 @source:psion/psion.cpp
 psion1
 psioncm
+<<<<<<< HEAD
 psioncmm
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 psionla
 psionlam
 psionlz
 psionlz64
+<<<<<<< HEAD
 psionp200
 psionp200a
 psionp250
 psionp350
 psionp432
+=======
+psionlz64s
+psionp200
+psionp350
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 psionp464
 psionxp
 
@@ -40339,7 +41086,10 @@ psionhc120
 
 @source:psion/siena.cpp
 siena
+<<<<<<< HEAD
 siena_fr
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:psion/workabout.cpp
 psionwa
@@ -40833,14 +41583,20 @@ st1707
 st1708
 st1714
 
+<<<<<<< HEAD
 @source:sealy/sealy_8031.cpp
 jinsanse
+=======
+@source:sealy/sealy.cpp
+crzyddz
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:sealy/sealy_eagle.cpp
 qczl
 
 @source:sealy/sealy_fr.cpp
 snowbwar
+<<<<<<< HEAD
 
 @source:sealy/sealy_m16c.cpp
 crzyddz
@@ -40854,6 +41610,8 @@ bbddz
 ddz2
 djddz
 pljh
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:sega/angelkds.cpp
 angelkds
@@ -41052,7 +41810,10 @@ genesis_tmss
 laseract
 laseractj
 mahg156
+<<<<<<< HEAD
 mdhh100
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 megacd
 megacd2
 megacd2j
@@ -41252,7 +42013,10 @@ powsledr
 powsledm
 rascot2
 rchase2
+<<<<<<< HEAD
 rchase2a
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 schamp
 segawski
 sfight
@@ -41504,7 +42268,10 @@ mj1
 moeru
 mok
 monkeyba
+<<<<<<< HEAD
 mushi2k3
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 mushi2k4
 mushi2k5
 mushi2k61
@@ -41764,7 +42531,10 @@ tfrceacj
 tfrceacjpb
 twinsqua
 wwanpanm
+<<<<<<< HEAD
 wwanpanmo
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 wwmarine
 zunkyou
 
@@ -41792,7 +42562,10 @@ m5001
 
 @source:sega/segag80r.cpp
 005
+<<<<<<< HEAD
 005a
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 astrob
 astrob1
 astrob2
@@ -42267,7 +43040,10 @@ ochaken
 puyomedal
 segasp
 shateki
+<<<<<<< HEAD
 spchecksrv
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 tetgiano
 tetgiant
 unomedal
@@ -42339,7 +43115,10 @@ gforce2j
 gforce2ja
 gforce2sd
 gloc
+<<<<<<< HEAD
 glocj
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 glocr360
 glocr360j
 glocu
@@ -42347,7 +43126,10 @@ pdrift
 pdrifta
 pdrifte
 pdriftj
+<<<<<<< HEAD
 pdriftjb
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 pdriftl
 rchase
 rchasej
@@ -42409,7 +43191,10 @@ stactics
 astrass
 bakubaku
 batmanfr
+<<<<<<< HEAD
 chalgolf
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 choroqhr
 colmns97
 cotton2
@@ -42509,7 +43294,10 @@ vfremix
 vmahjong
 wasafari
 winterht
+<<<<<<< HEAD
 wwshin
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 yattrmnp
 znpwfv
 znpwfvt
@@ -42731,7 +43519,10 @@ carnivalca
 carnivalh
 carnivalha
 carnivalmm
+<<<<<<< HEAD
 colision
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 depthch
 depthcho
 digger
@@ -42980,6 +43771,9 @@ emjtrapz
 
 @source:seibu/seibuspi.cpp
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 batlball
 batlballa
 batlballe
@@ -43040,6 +43834,7 @@ viprp1s
 viprp1t
 viprp1u
 viprp1ua
+<<<<<<< HEAD
 =======
 batlball                        // (c) 1995 Seibu Kaihatsu (Tuning License)
 batlballa                       // (c) 1995 Seibu Kaihatsu (Metrotainment License)
@@ -43102,6 +43897,8 @@ viprp1t                         // (c) 1995 Seibu Kaihatsu (Tuning License)
 viprp1u                         // (c) 1995 Seibu Kaihatsu (Fabtek license)
 viprp1ua                        // (c) 1995 Seibu Kaihatsu (Fabtek license)
 >>>>>>> 650b7e1d711 (New working clones)
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:seibu/seicupbl.cpp
 cupsocsb
@@ -43155,10 +43952,13 @@ prpht600
 
 @source:seta/albazc.cpp
 hanaroku
+<<<<<<< HEAD
 
 @source:seta/albazg.cpp
 hana6pt2
 yumefuda
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:seta/champbwl.cpp
 champbwl
@@ -43180,10 +43980,13 @@ usclssic
 
 @source:seta/hanaawas.cpp
 hanaawas
+<<<<<<< HEAD
 
 @source:seta/hanadojo.cpp
 hanadojo
 hanadojoa
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:seta/jclub2.cpp
 darkhors
@@ -43213,6 +44016,7 @@ yuka
 
 @source:seta/namcoeva.cpp
 hammerch
+<<<<<<< HEAD
 
 @source:seta/rmhaihai.cpp
 rmhaihai
@@ -43226,6 +44030,10 @@ themj2
 
 @source:seta/seta.cpp
 <<<<<<< HEAD
+=======
+
+@source:seta/seta.cpp
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 atehate
 blandia
 blandiap
@@ -43292,6 +44100,7 @@ zingzipbl
 zombraid
 zombraidp
 zombraidpj
+<<<<<<< HEAD
 =======
 atehate                         // (C) 1993 Athena
 blandia                         // (c) 1992 Allumer
@@ -43360,11 +44169,16 @@ zombraid                        // (c) 1995 American Sammy
 zombraidp                       // (c) 1995 American Sammy
 zombraidpj                      // (c) 1995 Sammy Industries Co.,Ltd.
 >>>>>>> 72212bb9188 (New working clones)
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:seta/seta2.cpp
 ablast
 ablastb
+<<<<<<< HEAD
 blnctry
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 deerhunt
 deerhunta
 deerhuntb
@@ -43401,7 +44215,10 @@ wschampa
 wschampb
 
 @source:seta/simple_st0016.cpp
+<<<<<<< HEAD
 crownpkr
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 dcrown
 dcrowna
 gostop
@@ -43416,10 +44233,14 @@ daifugo
 hanaren2
 harashi
 <<<<<<< HEAD
+<<<<<<< HEAD
 speedatk
 =======
 speedatk                        // CB-0 (c) SetaKikaku
 >>>>>>> a7b26f076f8 (New systems marked not working)
+=======
+speedatk
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:seta/speglsht.cpp
 speglsht
@@ -43477,9 +44298,12 @@ vasara2a
 
 @source:seta/thedealr.cpp
 thedealr
+<<<<<<< HEAD
 
 @source:seta/vsmjtria.cpp
 vsmjtria
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:sfrj/galaxy.cpp
 galaxy
@@ -43508,9 +44332,12 @@ orao103
 @source:sfrj/pecom.cpp
 pecom32
 pecom64
+<<<<<<< HEAD
 
 @source:sfrj/pmp11.cpp
 pmp11
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:sfrj/tim011.cpp
 tim011
@@ -43686,14 +44513,20 @@ gocowboy
 gunkids
 haekaka
 itazuram
+<<<<<<< HEAD
 kingyosu
 kotekita
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 lufykzku
 mnrockman
 pepsiman
 pyenaget
 sammymdl
+<<<<<<< HEAD
 shatekds
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 sushimar
 tbeastw2
 tdoboon
@@ -43823,6 +44656,7 @@ zx97
 
 @source:sinclair/specnext.cpp
 tbblue
+<<<<<<< HEAD
 
 @source:sinclair/z88.cpp
 z88
@@ -43836,6 +44670,8 @@ z88it
 z88no
 z88se
 z88tr
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:skeleton/600cat.cpp
 600cat
@@ -43909,12 +44745,15 @@ basf7120
 
 @source:skeleton/bert.cpp
 bert
+<<<<<<< HEAD
 
 @source:skeleton/biorhythm.cpp
 biorhthm
 
 @source:skeleton/biorhythm_fp.cpp
 biortmfp
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:skeleton/bitgraph.cpp
 bitgrpha
@@ -43988,9 +44827,12 @@ ckz80
 dmndhrt
 dmndhrtn
 honeybee
+<<<<<<< HEAD
 
 @source:skeleton/clownmgc.cpp
 clownmgc
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:skeleton/clxvme186.cpp
 clxvme186
@@ -44012,9 +44854,12 @@ cosmicos
 
 @source:skeleton/cp1.cpp
 cp1
+<<<<<<< HEAD
 
 @source:skeleton/css11501sk9.cpp
 css11501sk9
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:skeleton/ct909e_segadvd.cpp
 megatrix
@@ -44217,12 +45062,17 @@ hprotr8a
 
 @source:skeleton/ht68k.cpp
 ht68k
+<<<<<<< HEAD
 
 @source:skeleton/huangyeh_m68k.cpp
 wlzb
 
 @source:skeleton/hudson_poems.cpp
 ewalk2tv
+=======
+
+@source:skeleton/hudson_poems.cpp
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 marimba
 poembase
 poemgolf
@@ -44232,10 +45082,13 @@ poemzet2
 
 @source:skeleton/i7000.cpp
 i7000
+<<<<<<< HEAD
 
 @source:skeleton/iam2.cpp
 zhonggmj
 szjl
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:skeleton/icatel.cpp
 icatel
@@ -44338,9 +45191,12 @@ mice2_z80
 mice2_6502
 mice2_8085
 mice2_6809
+<<<<<<< HEAD
 
 @source:skeleton/mice3s68k.cpp
 mice3s68k
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:skeleton/micral.cpp
 micral
@@ -44369,6 +45225,12 @@ minifram
 
 @source:skeleton/minihock.cpp
 minihockey
+<<<<<<< HEAD
+=======
+
+@source:skeleton/miuchiz.cpp
+miuchiz
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:skeleton/ml20.cpp
 ml20
@@ -44419,23 +45281,32 @@ ngenb38
 
 @source:skeleton/nordlead.cpp
 nordle2x
+<<<<<<< HEAD
 
 @source:skeleton/omdisv22.cpp
 omdisv22
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:skeleton/onyx.cpp
 c5000
 c8002
+<<<<<<< HEAD
 
 @source:skeleton/optomaxv.cpp
 optomaxv
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:skeleton/p8k.cpp
 p8000
 p8000_16
+<<<<<<< HEAD
 
 @source:skeleton/paipaile.cpp
 paipail3
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:skeleton/palestra.cpp
 palestra
@@ -44475,9 +45346,12 @@ plan80
 
 @source:skeleton/pm68k.cpp
 pm68k
+<<<<<<< HEAD
 
 @source:skeleton/powerpack.cpp
 powerpack
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:skeleton/proteus3.cpp
 proteus3
@@ -44549,18 +45423,24 @@ semcrossw
 
 @source:skeleton/seoul88.cpp
 seoul88
+<<<<<<< HEAD
 
 @source:skeleton/sgm.cpp
 wpddz
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:skeleton/sh4robot.cpp
 sh4robot
 
 @source:skeleton/shine.cpp
 shine
+<<<<<<< HEAD
 
 @source:skeleton/shoken_md06.cpp
 petitlot
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:skeleton/si5500.cpp
 si5500
@@ -44641,9 +45521,12 @@ alcat258
 loewe715
 loewed
 teleguide
+<<<<<<< HEAD
 
 @source:skeleton/testlove.cpp
 testlove
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:skeleton/testpat.cpp
 tp1983
@@ -44673,10 +45556,13 @@ prose2ko
 
 @source:skeleton/tulip1.cpp
 tulip1
+<<<<<<< HEAD
 
 @source:skeleton/turnierdart.cpp
 turnierd
 turnierda
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:skeleton/tvcobrasd.cpp
 cobrasd
@@ -44707,11 +45593,15 @@ vectrix
 venteta
 
 @source:skeleton/vgame.cpp
+<<<<<<< HEAD
 cjdn
 cjlddz
 cjsjh
 hilice
 mjxy2
+=======
+hilice
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:skeleton/vp415.cpp
 vp415
@@ -44798,9 +45688,12 @@ smiconk
 @source:snk/munchmo.cpp
 joyfulr
 mnchmobl
+<<<<<<< HEAD
 
 @source:snk/neocrnvl.cpp
 neocrnvl
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:snk/ngp.cpp
 ngp
@@ -44885,7 +45778,10 @@ nibblerp
 pballoon
 pballoonr
 sasuke
+<<<<<<< HEAD
 sasukea
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 satansat
 satansata
 satansatind
@@ -44939,9 +45835,12 @@ nws3860
 
 @source:sony/news_68k.cpp
 nws1580
+<<<<<<< HEAD
 
 @source:sony/news_68k_iop.cpp
 nws831
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:sony/news_r3k.cpp
 nws3260
@@ -44971,6 +45870,9 @@ smc777
 
 @source:sony/taitogn.cpp
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 chaoshea
 chaosheaj
 coh1002t
@@ -45012,6 +45914,7 @@ gdariusg
 raystormg
 shngmtkbg
 tblkkuzug
+<<<<<<< HEAD
 =======
 chaoshea                        // 1998.10 Chaos Heat (V2.09O)
 chaosheaj                       // 1998.10 Chaos Heat (V2.08J)
@@ -45055,12 +45958,17 @@ raystormg                       // 2011.01 Ray Storm (Ver 2.60G)
 shngmtkbg                       // 2011.01 Shanghai Matekibuyuu (VER 1.20G)
 tblkkuzug                       // 2011.01 The Block Kuzushi (VER 1.10G)
 >>>>>>> c6f90b472c3 (New working machines added)
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:sony/umatic.cpp
 vo5850pm
 
 @source:sony/zn.cpp
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 1on1gov
 aerofgts
 aerofgtst
@@ -45177,6 +46085,7 @@ ts2j
 ts2ja
 ts2u
 ts2ua
+<<<<<<< HEAD
 =======
 1on1gov                         // 1 on 1 Government (JAPAN)
 aerofgts                        // Aero Fighters Special (USA)
@@ -45295,6 +46204,8 @@ ts2ja                           // Battle Arena Toshinden 2 (JAPAN 951124)
 ts2u                            // Battle Arena Toshinden 2 (USA 951124)
 ts2ua                           // Battle Arena Toshinden 2 (USA 951124)
 >>>>>>> c6f90b472c3 (New working machines added)
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:sord/m5.cpp
 m5
@@ -45303,7 +46214,10 @@ m5p_brno
 
 @source:stern/astinvad.cpp
 astinvad
+<<<<<<< HEAD
 astinvadb
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 betafrce
 kamikaze
 kosmokil
@@ -45395,7 +46309,10 @@ queenbee
 queenbeeb
 queenbeei
 queenbeesa
+<<<<<<< HEAD
 queenbn
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 saklove
 squeenb
 strain
@@ -45431,11 +46348,16 @@ tonton
 
 @source:sun/sun1.cpp
 <<<<<<< HEAD
+<<<<<<< HEAD
 sun1
 =======
 multibox                        //
 sun1                            //
 >>>>>>> 61c15042884 (New machines marked as NOT_WORKING)
+=======
+multibox
+sun1
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:sun/sun2.cpp
 sun2_120
@@ -45585,9 +46507,12 @@ anoworld
 
 @source:sunwise/jankenmn.cpp
 jankenmn
+<<<<<<< HEAD
 
 @source:sunwise/jankmg2.cpp
 jankmg2
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:svi/svi318.cpp
 svi318
@@ -45678,7 +46603,10 @@ arkgcbla
 arktayt2
 block2
 brixian
+<<<<<<< HEAD
 cruisin5
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 hexa
 hexaa
 paddle2
@@ -45708,7 +46636,10 @@ cadashj1
 cadashjo
 cadashp
 cadashs
+<<<<<<< HEAD
 cadashso
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 cadashu
 cadashu1
 earthjkr
@@ -45807,7 +46738,10 @@ dariusu
 @source:taito/dinoking.cpp
 dkbattle
 dkkids
+<<<<<<< HEAD
 hkuranai
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:taito/exzisus.cpp
 exzisus
@@ -46115,7 +47049,10 @@ cameltry
 cameltrya
 cameltryau
 cameltryj
+<<<<<<< HEAD
 cameltryu
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 deadconx
 deadconxj
 dinorex
@@ -46367,7 +47304,10 @@ contcircu
 contcircua
 dblaxle
 dblaxleu
+<<<<<<< HEAD
 dblaxleua
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 dblaxleul
 enforce
 enforcej
@@ -46455,7 +47395,10 @@ fisco400
 gunman
 missilex
 srdchamp
+<<<<<<< HEAD
 speedrac
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 ttblock
 ttsracec
 zzblock
@@ -46487,6 +47430,10 @@ dendego3
 landhigh
 landhigha
 pwrshovl
+<<<<<<< HEAD
+=======
+pwrshovla
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 raizpin
 raizpinj
 styphp
@@ -46614,6 +47561,7 @@ orica
 prav8d
 prav8dd
 telstrat
+<<<<<<< HEAD
 
 @source:tatsumi/apache3.cpp
 apache3
@@ -46626,6 +47574,8 @@ bigfightj
 cyclwarr
 cyclwarra
 cyclwarrb
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:tatsumi/kingdrby.cpp
 cowrace
@@ -46637,7 +47587,19 @@ kingdrby
 lockon
 lockonc
 
+<<<<<<< HEAD
 @source:tatsumi/roundup5.cpp
+=======
+@source:tatsumi/tatsumi.cpp
+apache3
+apache3a
+apache3b
+bigfight
+bigfightj
+cyclwarr
+cyclwarra
+cyclwarrb
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 roundup5
 
 @source:tatsumi/tx1.cpp
@@ -46758,7 +47720,10 @@ ddungeone
 stoffy
 stoffyu
 toffy
+<<<<<<< HEAD
 toffya
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 tstrike
 tstrikea
 
@@ -47527,9 +48492,12 @@ emma2
 
 @source:trainer/instruct.cpp
 instruct
+<<<<<<< HEAD
 
 @source:trainer/mac3.cpp
 mac3
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:trainer/mcg85.cpp
 mcg85
@@ -47769,9 +48737,13 @@ jak_swcl
 jak_ths
 jak_tink
 jak_totm
+<<<<<<< HEAD
 lazertag
 paccon
 tomycar
+=======
+jak_ths
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 wrlshunt
 
 @source:tvgames/generalplus_gpl16250_spi.cpp
@@ -47851,11 +48823,15 @@ easports
 easportsu
 jak_blue
 jak_bobb
+<<<<<<< HEAD
 jak_bobbo
 jak_capb
 jak_diso
 jak_dood
 jak_sbdd
+=======
+jak_capb
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 jak_spdmo
 jak_spdmoa
 jak_ssmo
@@ -47885,9 +48861,12 @@ abltenni
 anpantv
 backybbs
 ban_krkk
+<<<<<<< HEAD
 ban_tam2
 barbpet
 carled99
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 comil
 ddr33v
 decathln
@@ -47896,7 +48875,10 @@ dmbtjunc
 doraglob
 doraglobf
 doraglobg
+<<<<<<< HEAD
 doraglobuk
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 doraphon
 doraphonf
 doyousud
@@ -47920,16 +48902,24 @@ lpetshop
 lxairjet
 lxspidaj
 mattelcs
+<<<<<<< HEAD
 mylpony
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 ordentv
 pballpup
 prail
 rad_crik
 rad_fb2
+<<<<<<< HEAD
 rad_jib
 rad_skat
 rad_skatp
 rocksock
+=======
+rad_skat
+rad_skatp
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 senspeed
 senwfit
 smartcyc
@@ -47961,6 +48951,7 @@ icanguit
 icanpian
 
 @source:tvgames/spg2xx_jakks.cpp
+<<<<<<< HEAD
 jak_1vs
 jak_5thg
 jak_avtr
@@ -47978,6 +48969,9 @@ jak_hmbb
 jak_hsm
 jak_jpdy
 jak_marv
+=======
+jak_batm
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 jak_mk
 jak_mpaco
 jak_mpacq
@@ -48014,6 +49008,11 @@ jak_dora
 jak_dorr
 jak_dpr
 jak_dprs
+<<<<<<< HEAD
+=======
+jak_dwmn
+jak_dwmno
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 jak_fan4
 jak_just
 jak_mpac
@@ -48027,6 +49026,10 @@ jak_spdm
 jak_swot
 jak_wof
 jak_wwe
+<<<<<<< HEAD
+=======
+jak_xmenp
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:tvgames/spg2xx_jakks_sharp.cpp
 jsc_dora
@@ -48042,7 +49045,10 @@ tvtchspd
 tvtchsb
 
 @source:tvgames/spg2xx_lexibook.cpp
+<<<<<<< HEAD
 arcade3d
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 lexizeus
 lexiseal
 discpal
@@ -48200,7 +49206,10 @@ epo_esht
 epo_fish
 epo_guru
 epo_hamd
+<<<<<<< HEAD
 epo_mail
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 epo_mj
 epo_mms
 epo_mmsp
@@ -48218,15 +49227,21 @@ gungunad
 gungunrv
 has_wamg
 hikara
+<<<<<<< HEAD
 hippofr
 isinger
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 jarajal
 jpopira
 ltv_tam
 namcons1
 namcons2
 popira
+<<<<<<< HEAD
 popirak
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 popira2
 rad_bass
 rad_bassp
@@ -48316,9 +49331,12 @@ ban_dn1j
 ban_gkrj
 ban_kksj
 ban_ordj
+<<<<<<< HEAD
 ban_ult
 ban_utmj
 ban_um2j
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 domdance
 domfitch
 domfitex
@@ -48342,12 +49360,18 @@ xavaero
 xavbaseb
 xavbassf
 xavbowl
+<<<<<<< HEAD
 xavbowlj
 xavbox
 xavcheck
 xavjmat
 xavmusic
 xavpkjr
+=======
+xavbox
+xavjmat
+xavmusic
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 xavtenni
 
 @source:ultimachine/rambo.cpp
@@ -48923,9 +49947,12 @@ wizzard
 @source:vtech/gamemachine.cpp
 gamemach
 v4in1eg
+<<<<<<< HEAD
 
 @source:vtech/geniuscolor.cpp
 geniuscps
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:vtech/geniusiq.cpp
 iq128
@@ -48986,9 +50013,12 @@ learnwin2
 learnwin1
 learnwinf
 spielmast
+<<<<<<< HEAD
 
 @source:vtech/magibook.cpp
 magibooksp
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:vtech/pc1000.cpp
 misterx
@@ -49031,7 +50061,10 @@ snotec
 snotecex
 snotecu
 snotecug
+<<<<<<< HEAD
 snotecut
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:vtech/primusex.cpp
 primusex
@@ -49119,7 +50152,10 @@ wicat
 7smash
 luckgrln
 luckstrn
+<<<<<<< HEAD
 luckstrna
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:wing/lucky37.cpp
 bingo75
@@ -49138,7 +50174,10 @@ lucky74b
 lucky88w
 
 @source:wing/pinkiri8.cpp
+<<<<<<< HEAD
 janmu
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 janshi
 pinkiri8
 ronjan
@@ -49202,6 +50241,7 @@ mojmikro
 x168
 x820
 x820ii
+<<<<<<< HEAD
 
 @source:yachiyo/mole.cpp
 mole
@@ -49213,17 +50253,19 @@ ssingles
 @source:yachiyo/sstrangr.cpp
 sstrangr
 sstrangr2
+=======
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
 @source:yachiyo/mole.cpp
-mole                            // (c) 1982 Yachiyo Electronics, Ltd.
+mole
 
 @source:yachiyo/ssingles.cpp
-atamanot                        // (c) 1983 Yachiyo Denki / Uni Enterprize
-ssingles                        // Yachiyo?
+atamanot
+ssingles
 
 @source:yachiyo/sstrangr.cpp
-sstrangr                        // (c) 1978 Yachiyo Electronics, Ltd.
-sstrangr2                       // (c) 1979 Yachiyo Electronics, Ltd.
+sstrangr
+sstrangr2
 
 @source:yamaha/fb01.cpp
 fb01
@@ -49448,4 +50490,8 @@ monymony2
 iq151
 
 @source:zvt/pp01.cpp
+<<<<<<< HEAD
 pp01
+=======
+pp01
+>>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
