@@ -18461,22 +18461,15 @@ ROM_END
 
 ROM_START( fb2010 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "fb2013r.bin", 0x00000, 0x1000, CRC(9cc75315) SHA1(f77fbce1037dbf38ddaa4ce79266d62e5cc7989e) )
-	ROM_CONTINUE(0x4000, 0x1000)
-	ROM_CONTINUE(0x3000, 0x1000)
-	ROM_CONTINUE(0x7000, 0x1000)
-	ROM_CONTINUE(0x1000, 0x1000)
-	ROM_CONTINUE(0x6000, 0x1000)
-	ROM_CONTINUE(0x2000, 0x1000)
-	ROM_CONTINUE(0x5000, 0x1000)
-	ROM_CONTINUE(0x8000, 0x1000)
-	ROM_CONTINUE(0x9000, 0x1000)
-	ROM_CONTINUE(0xa000, 0x1000)
-	ROM_CONTINUE(0xb000, 0x1000)
-	ROM_CONTINUE(0xc000, 0x1000)
-	ROM_CONTINUE(0xd000, 0x1000)
-	ROM_CONTINUE(0xe000, 0x1000)
-	ROM_CONTINUE(0xf000, 0x1000)
+	ROM_LOAD( "fb2013r.bin", 0x0000, 0x1000, CRC(9cc75315) SHA1(f77fbce1037dbf38ddaa4ce79266d62e5cc7989e) )
+	ROM_CONTINUE(            0x4000, 0x1000 )
+	ROM_CONTINUE(            0x3000, 0x1000 )
+	ROM_CONTINUE(            0x7000, 0x1000 )
+	ROM_CONTINUE(            0x1000, 0x1000 )
+	ROM_CONTINUE(            0x6000, 0x1000 )
+	ROM_CONTINUE(            0x2000, 0x1000 )
+	ROM_CONTINUE(            0x5000, 0x1000 )
+	ROM_CONTINUE(            0x8000, 0x8000 )
 
 	ROM_REGION( 0x20000, "graphics", 0 )
 	ROM_LOAD( "high.bin", 0x00000, 0x10000, CRC(5950b5fb) SHA1(64441fdbd768e7765e20a33acd4002e69b868f09) )
@@ -18501,7 +18494,46 @@ ROM_START( fb2010 )
 	ROM_LOAD( "chu20.bin", 0x0100, 0x0100, BAD_DUMP CRC(05224f73) SHA1(051c3ee9c63f5436e4f6c355fc308f37910a88ef) )
 
 	ROM_REGION( 0x800, "nvram", 0 )
-	ROM_LOAD( "fb2010.nv", 0x000, 0x800, CRC(a8fc7d38) SHA1(06848e50be1968e89ba92c29661e8ee9c479d29f) ) // default NVRAM. 0xd2a must be 0x53 to pass start up check
+	ROM_LOAD( "fb2010.nv", 0x000, 0x800, CRC(a8fc7d38) SHA1(06848e50be1968e89ba92c29661e8ee9c479d29f) ) // default NVRAM. 0x2da must be 0x53 to pass start up check
+ROM_END
+
+
+ROM_START( fb2010a )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "27c512.u12", 0x0000, 0x1000, CRC(e5eb181d) SHA1(96288a31005d06f83d04c4410befe6dcf0b63cf5) )
+	ROM_CONTINUE(           0x4000, 0x1000 )
+	ROM_CONTINUE(           0x3000, 0x1000 )
+	ROM_CONTINUE(           0x7000, 0x1000 )
+	ROM_CONTINUE(           0x1000, 0x1000 )
+	ROM_CONTINUE(           0x6000, 0x1000 )
+	ROM_CONTINUE(           0x2000, 0x1000 )
+	ROM_CONTINUE(           0x5000, 0x1000 )
+	ROM_CONTINUE(           0x8000, 0x8000 )
+
+	ROM_REGION( 0x20000, "graphics", 0 )
+	ROM_LOAD( "high.bin", 0x00000, 0x10000, CRC(5950b5fb) SHA1(64441fdbd768e7765e20a33acd4002e69b868f09) )
+	ROM_LOAD( "low.bin",  0x10000, 0x10000, CRC(98b0454f) SHA1(91f7f4119a0cd591e68c87a9e716a8cd5233a4aa) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_COPY( "graphics", 0x18000, 0x00000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x08000, 0x08000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x04000, 0x10000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x1c000, 0x04000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x0c000, 0x0c000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x14000, 0x14000, 0x4000 ) // 2
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_COPY( "graphics", 0x02000, 0x00000, 0x2000 )
+	ROM_COPY( "graphics", 0x12000, 0x02000, 0x2000 )
+	ROM_COPY( "graphics", 0x00000, 0x04000, 0x2000 )
+	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
+
+	ROM_REGION( 0x200, "proms", 0 ) // palette (taken from nfb96se, not verified)
+	ROM_LOAD( "chu19.bin", 0x0000, 0x0100, BAD_DUMP CRC(fafc43ad) SHA1(e94592b83f19e5f9b6205473c1e06b36405ebfc2) )
+	ROM_LOAD( "chu20.bin", 0x0100, 0x0100, BAD_DUMP CRC(05224f73) SHA1(051c3ee9c63f5436e4f6c355fc308f37910a88ef) )
+
+	ROM_REGION( 0x800, "nvram", 0 )
+	ROM_LOAD( "fb2010a.nv", 0x000, 0x800, CRC(f5a7ab38) SHA1(11f984c79fecc5ff5a61e4dc86cb442627e7d7a1) ) // default NVRAM
 ROM_END
 
 
@@ -23576,6 +23608,7 @@ GAMEL( 1996, nc96l,      nc96,     amcoe2,   nfb96,     cmaster_state,  init_nfb
 GAMEL( 2000, nc96txt,    nc96,     amcoe2,   nfb96tx,   cmaster_state,  init_nfb96_c2,   ROT0, "Amcoe",   "New Cherry '96 Special Edition (v1.32 Texas XT, C2 PCB)",      0,                 layout_nfb96tx ) // ver. tc1.32axt C2 Sub-PCB
 
 GAME(  2009, fb2010,     0,        amcoe2,   fb2010,    cmaster_state,  init_fb2010,     ROT0, "Amcoe",   "Fruit Bonus 2010 (v. 2.0.1.3)",                                0 )
+GAME(  2009, fb2010a,    fb2010,   amcoe2,   fb2010,    cmaster_state,  init_fb2010,     ROT0, "Amcoe",   "Fruit Bonus 2010 (v. 2.0.1.0)",                                0 )
 
 GAMEL( 1996, roypok96,   0,        amcoe2,   roypok96,  cmaster_state,  init_rp35,       ROT0, "Amcoe",   "Royal Poker '96 (set 1, v97-3.5)",                             0,                 layout_roypok96 )
 GAMEL( 1996, roypok96a,  roypok96, amcoe2,   roypok96a, cmaster_state,  init_rp36,       ROT0, "Amcoe",   "Royal Poker '96 (set 2, v98-3.6)",                             0,                 layout_roypok96 )

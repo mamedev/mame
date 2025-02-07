@@ -20270,6 +20270,7 @@ eldoraddob                      // (c) 1991 Dyna Electronics
 eldoraddoc                      // (c) 1991 Dyna Electronics
 f16s8l                          //
 fb2010                          // (c) 2009 Amcoe
+fb2010a                         // (c) 2009 Amcoe
 feverch                         // (c) 1986 Wing Co. Ltd
 fevercha                        // (c) 1986 Wing Co. Ltd
 feverchtw                       // (c) 1986 Wing Co. Ltd
@@ -38964,6 +38965,7 @@ samuraia                        // (c) 1993 (World)
 sngkace                         // (c) 1993 (Japan)
 sngkacea                        // (c) 1993 (Japan)
 tengai                          // (c) 1996 (World)
+tengaibl                         // bootleg
 tengaij                         // (c) 1996 (Japan)
 
 @source:psikyo/psikyo4.cpp

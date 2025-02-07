@@ -12,7 +12,7 @@ TODO:
  - Improve IOX device for daifugo (many hardwired reads);
  - It's possible that there is only one coin chute and not two, needs a real board to know
    more about it.
- - hanaren2, harashi: Everythin. They seem to run on similar hardware, similar address maps, etc.
+ - hanaren2, harashi: Everything. They seem to run on similar hardware, similar address maps, etc.
 
 How to play:
  - A to D select a card.
