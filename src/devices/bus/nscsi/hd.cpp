@@ -10,7 +10,7 @@
 #define LOG_DATA        (1U << 2)
 #define LOG_UNSUPPORTED (1U << 3)
 
-#define VERBOSE 0
+#define VERBOSE (LOG_GENERAL|LOG_COMMAND|LOG_UNSUPPORTED)
 
 #include "logmacro.h"
 
@@ -170,9 +170,9 @@ void nscsi_harddisk_device::scsi_command()
 				LOG("IDNT tag not found in chd metadata, using default inquiry data\n");
 
 				// Apple HD SC setup utility needs to see this
-				strcpy((char *)&scsi_cmdbuf[8], " SEAGATE");
-				strcpy((char *)&scsi_cmdbuf[16], "          ST225N");
-				strcpy((char *)&scsi_cmdbuf[32], "1.00");
+				strcpy((char *)&scsi_cmdbuf[8], "CDC     ");
+				strcpy((char *)&scsi_cmdbuf[16], "94221-5         ");
+				strcpy((char *)&scsi_cmdbuf[32], "5457");
 				scsi_cmdbuf[36] = 0x00; // # of extents high
 				scsi_cmdbuf[37] = 0x08; // # of extents low
 				scsi_cmdbuf[38] = 0x00; // group 0 commands 0-1f
@@ -454,6 +454,8 @@ void nscsi_harddisk_device::scsi_command()
 
 		const auto &info = image->get_info();
 		uint32_t size = info.cylinders * info.heads * info.sectors - 1;
+
+		LOG("size = 0x%x, info.cylinders = 0x%x, info.heads = 0x%x, info.sectors = 0x%x, info.sectorbytes = 0x%x", size, info.cylinders, info.heads, info.sectors, info.sectorbytes);
 
 		put_u32be(&scsi_cmdbuf[0], size);
 		put_u32be(&scsi_cmdbuf[4], info.sectorbytes);

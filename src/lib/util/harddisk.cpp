@@ -63,21 +63,33 @@ hard_disk_file::hard_disk_file(util::random_read_write &corefile, uint32_t skipo
 	fileoffset = skipoffs;
 
 	// attempt to guess geometry in case this is an ATA situation
+	printf("length = 0x%lx, skipoffs = 0x%x\n", length, skipoffs);
 	for (uint32_t totalsectors = (length - skipoffs) / hdinfo.sectorbytes; ; totalsectors++)
+	{
+		printf("totalsectors = 0x%x\n", totalsectors);
 		for (uint32_t cursectors = 63; cursectors > 1; cursectors--)
+		{
+			printf("cursectors = 0x%x\n", cursectors);
 			if (totalsectors % cursectors == 0)
 			{
 				uint32_t totalheads = totalsectors / cursectors;
+				printf("totalheads = 0x%x\n", totalheads);
 				for (uint32_t curheads = 16; curheads > 1; curheads--)
+				{
+					printf("curheads = 0x%x\n", curheads);
 					if (totalheads % curheads == 0)
 					{
 						hdinfo.cylinders = totalheads / curheads;
 						hdinfo.heads = curheads;
 						hdinfo.sectors = cursectors;
 						osd_printf_verbose("Guessed CHS of %d/%d/%d\n", hdinfo.cylinders, hdinfo.heads, hdinfo.sectors);
+						printf("Guessed CHS of %d/%d/%d\n", hdinfo.cylinders, hdinfo.heads, hdinfo.sectors);
 						return;
 					}
+				}
 			}
+		}
+	}
 }
 
 
