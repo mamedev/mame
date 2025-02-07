@@ -20669,6 +20669,7 @@ fts2in1
 poker21
 
 @source:igs/goldstar.cpp
+<<<<<<< HEAD
 3cdpoker
 3cdpokera
 amaztsk
@@ -20899,6 +20900,236 @@ wcat
 wcat3
 wcat3a
 wcherry
+=======
+3cdpoker                        // hack?
+3cdpokera                       // hack?
+amaztsk                         //
+animalhs                        // (c) 1991 Suns Co Ltd.
+animalhsa                       // (c) 1991 Suns Co Ltd.
+animalhsb                       // bootleg
+animalhsc                       // bootleg
+animalw                         // bootleg
+aplan                           // bootleg (WeaShing)
+bingowng                        // (c) 1993 Wing Co. Ltd
+bingownga                       // (c) 1993 Wing Co. Ltd
+bonusch                         // (c) 1990 Wing Co. Ltd
+bonuscha                        // (c) 1990 Wing Co. Ltd
+carb2002                        // bootleg
+carb2003                        // bootleg
+cb2                             // (c) 1989 Dyna Electronics
+cb3                             // (c) 199? Dyna Electronics
+cb3a                            // (c) 199? Dyna Electronics
+cb3b                            // (c) 199? Dyna Electronics
+cb3c                            // (c) 199? Dyna Electronics
+cb3d                            // (c) 199? Dyna Electronics
+cb3e                            // 199? bootleg
+cb3f                            // 199? bootleg
+cb3g                            // (c) 199? Dyna Electronics
+cb3h                            // (c) 199? Dyna Electronics
+cb3s51                          // (c) 199? Dyna Electronics
+cbaai                           // A.I.I. bootleg
+cherry96                        // bootleg
+chry10                          // bootleg
+chryangl                        // (c) 199? Dyna Electronics
+chryangla                       // unknown, W-4 hardware
+chryanglb                       // bootleg
+chrygld                         // bootleg
+chryglda                        // bootleg
+chthree                         // 199? Promat
+cll                             // (c) 1991 Dyna Electronics
+cmast91                         // (c) 1991 Dyna Electronics
+cmast92                         // (c) 1992 Dyna Electronics
+cmast92a                        // (c) 1992 Dyna Electronics
+cmast97                         // (c) 1996 Dyna Electronics
+cmast97a                        // (c) 1996 Dyna Electronics
+cmast97i                        // (c) 1996 Dyna Electronics
+cmast99                         // (c) 1999 Dyna Electronics
+cmast99b                        // bootleg
+cmaster                         // (c) 1991 Dyna Electronics
+cmasterb                        // (c) 1991 Dyna Electronics
+cmasterbv                       // (c) 1991 Dyna Electronics / Gerald Duhamel?
+cmasterc                        // (c) 1991 Dyna Electronics
+cmasterd                        // (c) 1991 Dyna Electronics
+cmastere                        // (c) 1991 Dyna Electronics
+cmasterf                        // (c) 1991 Dyna Electronics
+cmasterg                        // (c) 1991 Dyna Electronics
+cmasterh                        // (c) 1991 Dyna Electronics
+cmasteri                        // (c) 1991 Dyna Electronics
+cmasterj                        // (c) 1991 Dyna Electronics
+cmasterk                        // (c) 1991 Dyna Electronics
+cmasterl                        // (c) 1991 Dyna Electronics
+cmezspin                        // bootleg
+cmezspina                       // bootleg
+cmezspinb                       // bootleg
+cmfb55                          // bootleg
+cmfun                           // (c) 1995 Dyna Electronics
+cmpacman                        //
+cmpacmana                       //
+cmpacmanb                       //
+cmtetris                        //
+cmtetrisa                       //
+cmtetrisb                       //
+cmtetrisc                       //
+cmtetrisd                       //
+cmtetriskr                      //
+cmv4                            // (c) 1992 Dyna Electronics
+cmv4a                           // (c) 1992 Dyna Electronics
+cmv4zg                          // hack
+cmv4zga                         // hack
+cmv801                          // (c) 198? Corsica
+cmwm                            // (c) 199? Dyna Electronics
+crazybon                        // (c) 199? Sang Ho
+crazybona                       // (c) 199? Sang Ho
+crazybonb                       // (c) 199? unknown
+cutyline                        //
+cutylinea                       //
+cutylineb                       //
+eldoradd                        // (c) 1991 Dyna Electronics
+eldoraddo                       // (c) 1991 Dyna Electronics
+eldoraddoa                      // (c) 1991 Dyna Electronics
+eldoraddob                      // (c) 1991 Dyna Electronics
+eldoraddoc                      // (c) 1991 Dyna Electronics
+f16s8l                          //
+fb2010                          // (c) 2009 Amcoe
+fb2010a                         // (c) 2009 Amcoe
+feverch                         // (c) 1986 Wing Co. Ltd
+fevercha                        // (c) 1986 Wing Co. Ltd
+feverchtw                       // (c) 1986 Wing Co. Ltd
+fl7_3121                        // (c) 199? Cyberdyne Systems, Inc.
+fl7_50                          // (c) 199? Cyberdyne Systems, Inc.
+fl7_500                         // (c) 199? Cyberdyne Systems, Inc.
+fl7_2000                        // (c) 199? Cyberdyne Systems, Inc.
+fl7_2k16                        // (c) 199? Cyberdyne Systems, Inc.
+fl7_tw                          // Taiwanese Hardware.
+goldfrui                        // bootleg
+goldstar                        // (c) 198? IGS
+goldstbl                        // (c) 198? IGS
+gregular                        // Playmark
+halltsk                         //
+hamhouse                        // bootleg
+hamhouse9                       // bootleg
+jkrmast                         // (c) 199? unknown
+jkrmasta                        // (c) 199? unknown
+kkotnoli                        // 198? south korean hack
+ladylinr                        // (c) 198? TAB Austria
+ladylinra                       // (c) 198? TAB Austria
+ladylinrb                       // (c) 198? TAB Austria
+ladylinrc                       // (c) 198? TAB Austria
+ladylinrd                       // (c) 198? TAB Austria
+ladylinre                       // (c) 198? TAB Austria
+ll3                             // bootleg
+lucky8                          // (c) 1989 Wing Co. Ltd
+lucky8a                         // (c) 1989 Wing Co. Ltd
+lucky8b                         // (c) 1989 Wing Co. Ltd
+lucky8c                         // (c) 1989 Wing Co. Ltd
+lucky8d                         // (c) 1989 Wing Co. Ltd
+lucky8e                         // (c) 1989 Wing Co. Ltd
+lucky8f                         // bootleg?
+lucky8g                         // (c) 1989 Wing Co. Ltd
+lucky8h                         // 1991, hack
+lucky8i                         // 199?, Eagle, licensed by Wing
+lucky8j                         // 199?, hack
+lucky8k                         // (c) 1989 Wing. With CPU NEC D315-5136
+lucky8l                         // (c) 1989 Wing Co. Ltd
+lucky8m                         // (c) 1989 Wing Co. Ltd
+lucky8n                         // (c) 1989 Wing Co. Ltd
+lucky8o                         //
+lucky8p                         //
+luckybar                        // unknown
+luckylad                        // (c) 1985 Wing Co. Ltd
+magodds                         // 198? (c) Micro Manufacturing Ltd.
+magoddsa                        // 198? (c) Micro Manufacturing Ltd.
+magoddsb                        // 198? (c) Micro Manufacturing Ltd.
+magoddsc                        // 198? (c) Micro Manufacturing Ltd.
+magoddsd                        // 198? (c) Micro Manufacturing Ltd.
+match98                         // (c) 1998 Amcoe
+mbs2euro                        // (c) 2002 Auto-Data Graz
+megaline                        // (c) 1991 Fun World.
+moonlght                        // bootleg
+moonlghta                       // bootleg
+moonlghtb                       // bootleg
+moonlghtc                       // bootleg
+nc96                            // (c) 1996 Amcoe
+nc96a                           // (c) 1996 Amcoe
+nc96b                           // (c) 1996 Amcoe
+nc96c                           // (c) 1996 Amcoe
+nc96d                           // (c) 1996 Amcoe
+nc96e                           // (c) 1996 Amcoe
+nc96f                           // (c) 1996 Amcoe
+nc96g                           // (c) 1996 Amcoe
+nc96h                           // (c) 1996 Amcoe
+nc96i                           // (c) 1996 Amcoe
+nc96j                           // (c) 1996 Amcoe
+nc96k                           // (c) 1996 Amcoe
+nc96l                           // (c) 1996 Amcoe
+nc96txt                         // (c) 2000 Amcoe
+ncb3                            // (c) 199? Dyna Electronics
+nfb96                           // (c) 1996 Amcoe
+nfb96a                          // (c) 1996 Amcoe
+nfb96b                          // (c) 1996 Amcoe
+nfb96c                          // (c) 1996 Amcoe
+nfb96d                          // (c) 1996 Amcoe
+nfb96e                          // (c) 1996 Amcoe
+nfb96f                          // (c) 1996 Amcoe
+nfb96g                          // (c) 1996 Amcoe
+nfb96h                          // (c) 1996 Amcoe
+nfb96i                          // (c) 1996 Amcoe
+nfb96j                          // (c) 1996 Amcoe
+nfb96k                          // (c) 1996 Amcoe
+nfb96l                          // (c) 1996 Amcoe
+nfb96m                          // (c) 1996 Amcoe
+nfb96se                         // bootleg
+nfb96sea                        // bootleg
+nfb96seb                        // bootleg
+nfb96sec                        // bootleg
+nfb96txt                        // (c) 2000 Amcoe
+nfm                             // bootleg
+nfma                            // bootleg
+noved                           // bootleg
+nd8lines                        // bootleg
+ns8lines                        // unknown
+ns8linesa                       // (c) 1985 Yamate (bootleg)
+ns8linew                        // unknown
+ns8linewa                       // unknown
+ns8linewb                       // (c) 1985 Yamate
+ns8linewc                       // (c) 1988 Yamate
+ns8linewd                       // (c) 1988 Yamate
+pkrmast                         // (c) 199? unknown
+pkrmasta                        // (c) 199? unknown
+pokonl97                        // (c) 1997 Amcoe
+rolling                         // bootleg
+roypok96                        // (c) 1996 Amcoe
+roypok96a                       // (c) 1996 Amcoe
+roypok96b                       // (c) 1996 Amcoe
+roypok96c                       // (c) 1996 Amcoe
+schery97                        // (c) 1998 Amcoe
+schery97a                       // (c) 1998 Amcoe
+scmaster                        // 1994, unknown
+skill98                         // (c) 1998 Amcoe
+skillch                         //
+skillcha                        //
+srmagic                         // bootleg
+ss2001                          // bootleg / hack
+star100                         // (c) 199? Sang Ho
+super7                          // bootleg (New Impeuropex?)
+super9                          // (c) 2001 Playmark
+super9a                         // (c) 2001 Playmark
+super972                        // unknown
+tcl                             // (c) 1995 Uniwang
+tonypok                         // (c) 1991 Corsica
+top7                            //
+top7a                           //
+ttactoe                         //
+unkch1                          // bootleg
+unkch2                          // bootleg
+unkch3                          // bootleg
+unkch4                          // bootleg
+war3cb                          //
+wcat                            //
+wcat3                           //
+wcat3a                          //
+wcherry                         // bootleg
+>>>>>>> 9083885823d (New clones marked not working)
 
 @source:igs/igs009.cpp
 animalhjb
@@ -39991,6 +40222,7 @@ x2222
 x2222o
 
 @source:psikyo/psikyo.cpp
+<<<<<<< HEAD
 btlkroad
 btlkroadk
 gunbird
@@ -40009,6 +40241,26 @@ sngkacea
 tengai
 tengaibl
 tengaij
+=======
+btlkroad                        // (c) 1994
+btlkroadk                       // (c) 1994 (Korea)
+gunbird                         // (c) 1994
+gunbirdj                        // (c) 1994 (Japan)
+gunbirdk                        // (c) 1994 (Korea)
+s1945                           // (c) 1995 (Japan)
+s1945a                          // (c) 1995
+s1945bl                         // (c) 1995 (Hong Kong bootleg)
+s1945j                          // (c) 1995 (Japan)
+s1945k                          // (c) 1995 (Korea)
+s1945n                          // (c) 1995 (World, unprotected)
+s1945nj                         // (c) 1995 (Japan, unprotected)
+samuraia                        // (c) 1993 (World)
+sngkace                         // (c) 1993 (Japan)
+sngkacea                        // (c) 1993 (Japan)
+tengai                          // (c) 1996 (World)
+tengaibl                         // bootleg
+tengaij                         // (c) 1996 (Japan)
+>>>>>>> 9083885823d (New clones marked not working)
 
 @source:psikyo/psikyo4.cpp
 hgkairak

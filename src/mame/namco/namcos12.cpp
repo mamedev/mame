@@ -3557,7 +3557,7 @@ ROM_START( truckk )
 	ROM_LOAD( "tkk1prg0.ic7",             0x0000000, 0x020000, CRC(11fd9c31) SHA1(068b8364ec0eb1e88f9f85f40b8b322876f6f3e2) )
 
 	DISK_REGION( "cdxa_pcb:ata:0:cdrom" )
-	DISK_IMAGE_READONLY( "tkk2-a", 0, SHA1(6b7c3686b22a508c44f67295b188504b757dd482) )
+	DISK_IMAGE_READONLY( "tkk2-a", 0, SHA1(6b7c3686b22a508c44f67295b188504b757dd482) ) // TKK1-A CD is confirmed to have the same content as the TKK2-A CD
 ROM_END
 
 ROM_START( ujlnow )
