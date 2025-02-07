@@ -1191,7 +1191,17 @@ void amiga_state::ocs_map(address_map &map)
 	// Sprite section
 //  map(0x120, 0x17f).m(amiga_state::sprxpt_map));
 	// Color section
-//  map(0x180, 0x1bf).m(amiga_state::colorxx_map));
+	map(0x180, 0x1bf).lrw16(
+		NAME([this] (offs_t offset) {
+			return CUSTOM_REG(REG_COLOR00 + offset);
+		}),
+		NAME([this] (offs_t offset, u16 data) {
+			CUSTOM_REG(REG_COLOR00 + offset) = data;
+			data &= 0xfff;
+			// Extra Half-Brite
+			CUSTOM_REG(REG_COLOR00 + offset + 32) = (data >> 1) & 0x777;
+		})
+	);
 }
 
 void amiga_state::ecs_map(address_map &map)
@@ -1228,6 +1238,8 @@ void amiga_state::aga_map(address_map &map)
 	map(0x100, 0x101).w(FUNC(amiga_state::aga_bplcon0_w));
 
 	map(0x10e, 0x10f).w(FUNC(amiga_state::clxcon2_w));
+
+	map(0x180, 0x1bf).rw(FUNC(amiga_state::aga_palette_read), FUNC(amiga_state::aga_palette_write));
 
 	// UHRES regs
 	// TODO: may be shared with ECS?
@@ -1317,11 +1329,12 @@ void amiga_state::aga_bplcon0_w(u16 data)
 
 /*
  * http://amiga-dev.wikidot.com/hardware:clxcon2
+ * ---- ---- xx-- ---- ENBPx enable bitplanes 8 and 7
+ * ---- ---- ---- --xx MVBPx match value for bitplanes 8 and 7
  */
 void amiga_state::clxcon2_w(u16 data)
 {
-	// TODO: enables bitplane 7-8 collision detection, resets to 0 if CLXCON write happens
-	popmessage("CLXCON2 %04x", data);
+	m_aga_clxcon2 = data;
 }
 
 // TODO: progressively remove functions from here
@@ -1617,10 +1630,21 @@ void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 			m_paula->dmacon_set(data);
 			m_copper->dmacon_set(data);
 
+			// TODO: unemulated BLTEN disable
+			// NOTE: Copper and 68k can in-flight pause a running blitter
+
 			/* if 'blitter-nasty' has been turned on and we have a blit pending, reschedule it */
 			if ( ( data & 0x400 ) && ( CUSTOM_REG(REG_DMACON) & 0x4000 ) )
 				m_blitter_timer->adjust(m_maincpu->cycles_to_attotime(BLITTER_NASTY_DELAY));
 
+			break;
+
+		case REG_CLXCON:
+			if (IS_AGA())
+			{
+				// reset to zero on CLXCON writes
+				m_aga_clxcon2 = 0;
+			}
 			break;
 
 		case REG_INTENA:
@@ -1685,26 +1709,6 @@ void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 			// and wouldn't otherwise make sense with 68k inability of word reading with odd addresses.
 			// hpoker/hpokera would otherwise draw misaligned bottom GFX area without this (writes 0x27)
 			data &= ~1;
-			break;
-
-		case REG_COLOR00:   case REG_COLOR01:   case REG_COLOR02:   case REG_COLOR03:
-		case REG_COLOR04:   case REG_COLOR05:   case REG_COLOR06:   case REG_COLOR07:
-		case REG_COLOR08:   case REG_COLOR09:   case REG_COLOR10:   case REG_COLOR11:
-		case REG_COLOR12:   case REG_COLOR13:   case REG_COLOR14:   case REG_COLOR15:
-		case REG_COLOR16:   case REG_COLOR17:   case REG_COLOR18:   case REG_COLOR19:
-		case REG_COLOR20:   case REG_COLOR21:   case REG_COLOR22:   case REG_COLOR23:
-		case REG_COLOR24:   case REG_COLOR25:   case REG_COLOR26:   case REG_COLOR27:
-		case REG_COLOR28:   case REG_COLOR29:   case REG_COLOR30:   case REG_COLOR31:
-			if (IS_AGA())
-			{
-				aga_palette_write(offset - REG_COLOR00, data);
-			}
-			else
-			{
-				data &= 0xfff;
-				// Extra Half-Brite
-				CUSTOM_REG(offset + 32) = (data >> 1) & 0x777;
-			}
 			break;
 
 		// display window start/stop

@@ -353,7 +353,7 @@ above in All Platforms.
 Emscripten Javascript and HTML
 ------------------------------
 
-First, download and install Emscripten 2.0.25 or later by following the
+First, download and install Emscripten 3.1.35 or later by following the
 instructions at the `official site <https://emscripten.org/docs/getting_started/downloads.html>`_.
 
 Once Emscripten has been installed, it should be possible to compile MAME

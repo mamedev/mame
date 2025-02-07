@@ -428,6 +428,7 @@ public:
 	uint16_t m_aga_sprdatb[8][4]{};
 	int m_aga_sprite_fetched_words = 0;
 	int m_aga_sprite_dma_used_words[8]{};
+	uint16_t m_aga_clxcon2;
 
 	void video_start_common();
 	DECLARE_VIDEO_START( amiga );
@@ -659,7 +660,8 @@ private:
 	void render_scanline(bitmap_rgb32 &bitmap, int scanline);
 
 	// AGA video helpers
-	void aga_palette_write(int color_reg, uint16_t data);
+	u16 aga_palette_read(offs_t color_reg);
+	void aga_palette_write(offs_t color_reg, uint16_t data);
 	void aga_fetch_sprite_data(int scanline, int sprite);
 	void aga_render_scanline(bitmap_rgb32 &bitmap, int scanline);
 	void aga_update_sprite_dma(int scanline, int num);

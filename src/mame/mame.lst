@@ -19294,6 +19294,7 @@ bassmate                        // Telko
 biathlon                        // Elektronika
 ecircus                         // Elektronika
 ehockey                         // Elektronika
+elbaskb                         // Elektronika
 gnw_ball                        // Nintendo
 gnw_bfight                      // Nintendo
 gnw_bfightn                     // Nintendo
@@ -21517,6 +21518,7 @@ intlc440                        //
 
 @source:intel/intellec8.cpp
 intlc8                          //
+intlc8m80                       //
 
 @source:intel/ipc.cpp
 ipb                             // intel
@@ -25371,6 +25373,9 @@ free120                         // (c) 1993 Liberty Electronics
 @source:liberty/freedom200.cpp
 free200                         // (c) 1983 Liberty Electronics
 free220                         // (c) 1984 Liberty Electronics
+
+@source:linn/linndrum.cpp
+linndrum                        // Linn Electronics LinnDrum
 
 @source:lsi/m3.cpp
 m3                              //
@@ -35957,6 +35962,9 @@ penta                           // bootleg
 @source:pacman/schick.cpp
 schick                          // Microhard
 
+@source:paia/fatman.cpp
+fatman                          // PAiA FatMan
+
 @source:paia/midi2cv8.cpp
 midi2cv8                        // PAiA midi2cv8 (V/Oct)
 midi2cv8_vhz                    // PAiA midi2cv8 with V/Hz daughterboard
@@ -36598,6 +36606,7 @@ tetriskr                        // (c) 1988? bootleg
 tosh1000
 
 @source:pce/ggconnie.cpp
+bmanroul                        // (c) 1996 Eighting
 fishingm                        // (c) 1997 Capcom
 ggconnie                        // (c) ???? Capcom
 smf                             // (c) 1997 Capcom
@@ -41924,6 +41933,8 @@ renju                           // (c) 1994 Visco
 
 @source:seta/speedatk.cpp
 daifugo
+hanaren2
+harashi
 speedatk                        // CB-0 (c) SetaKikaku
 
 @source:seta/speglsht.cpp

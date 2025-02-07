@@ -36,12 +36,11 @@ protected:
 private:
 	// internal state
 	required_device<generic_latch_8_device> m_soundlatch;
-	required_device_array<filter_rc_device, 3> m_filter_0;
-	required_device_array<filter_rc_device, 3> m_filter_1;
+	required_device_array<filter_rc_device, 3> m_filter[2];
 
 	uint8_t    m_last_irq_state;
 
-	void set_filter(filter_rc_device &device, int data);
+	void set_filter(int no, int ch, int data);
 };
 
 class locomotn_audio_device : public timeplt_audio_device

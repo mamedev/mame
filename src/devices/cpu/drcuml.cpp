@@ -95,7 +95,6 @@ drcbe_interface::drcbe_interface(drcuml_state &drcuml, drc_cache &cache, device_
 	, m_device(device)
 	, m_space()
 	, m_state(*reinterpret_cast<drcuml_machine_state *>(cache.alloc_near(sizeof(m_state))))
-	, m_accessors(nullptr)
 {
 	// reset the machine state
 	memset(&m_state, 0, sizeof(m_state));
@@ -105,17 +104,12 @@ drcbe_interface::drcbe_interface(drcuml_state &drcuml, drc_cache &cache, device_
 	if (device.interface(memory))
 	{
 		int const count = memory->max_space_count();
-		m_accessors = reinterpret_cast<data_accessors *>(cache.alloc_near(sizeof(*m_accessors) * count));
-		memset(m_accessors, 0, sizeof(*m_accessors) * count);
 		m_space.resize(count, nullptr);
 
 		for (int spacenum = 0; spacenum < count; ++spacenum)
 		{
 			if (memory->has_space(spacenum))
-			{
 				m_space[spacenum] = &memory->space(spacenum);
-				m_space[spacenum]->accessors(m_accessors[spacenum]);
-			}
 		}
 	}
 }

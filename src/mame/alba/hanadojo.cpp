@@ -1,9 +1,19 @@
 // license:BSD-3-Clause
 // copyright-holders:
+/**************************************************************************************************
 
-/*
 花道場 (Hana Doujou) - Alba 1984
 AAJ-11 PCB
+
+TODO:
+- CRTC processes params as 1088x224 with char width 8;
+- Resets itself in attract sequence, thrash protection?
+\- bp b85,1,{pc+=3;g} to bypass for a bit;
+- Implement 2x IOX for inputs;
+- Writes RAM NG 8AF0 if NMI is triggered, is it even used?
+- "AY8910 upper address mismatch";
+
+===================================================================================================
 
 Main components are:
 
@@ -21,8 +31,7 @@ unknown 40-pin chip (stickered AN-003)
 2x AX-014 epoxy covered chips
 AX-013 epoxy covered chip
 
-TODO: everything. Puts RAM N.G. in video RAM. Banked RAM or protection?
-*/
+**************************************************************************************************/
 
 #include "emu.h"
 
@@ -61,11 +70,44 @@ private:
 
 	required_shared_ptr<uint8_t> m_videoram;
 
+	void palette_init(palette_device &palette) const;
+
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void program_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
 };
+
+void hanadojo_state::palette_init(palette_device &palette) const
+{
+	const u8 *color_prom = memregion("color_prom")->base();
+	const u8 *clut_prom = memregion("clut_prom")->base();
+
+	for (int i = 0; i < 0x20; i++)
+	{
+		int bit0, bit1, bit2;
+		bit0 = 0;
+		bit1 = (color_prom[i] >> 0) & 0x01;
+		bit2 = (color_prom[i] >> 1) & 0x01;
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (color_prom[i] >> 2) & 0x01;
+		bit1 = (color_prom[i] >> 3) & 0x01;
+		bit2 = (color_prom[i] >> 4) & 0x01;
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (color_prom[i] >> 5) & 0x01;
+		bit1 = (color_prom[i] >> 6) & 0x01;
+		bit2 = (color_prom[i] >> 7) & 0x01;
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		palette.set_indirect_color(i, rgb_t(r, g, b));
+	}
+
+	// assume bit 4 coming from external bank
+	for (int i = 0; i < 0x200; i++)
+	{
+		palette.set_pen_indirect(i, clut_prom[i & 0xff] | BIT(i, 8) << 4);
+	}
+}
 
 
 void hanadojo_state::video_start()
@@ -74,6 +116,28 @@ void hanadojo_state::video_start()
 
 uint32_t hanadojo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	// throwaway sample code
+	gfx_element *gfx = m_gfxdecode->gfx(0);
+
+	const u16 pitch = 34;
+	const u32 cclk_x = 0x20000;
+	const int dx = 16;
+
+	for (int y = 0; y < 28; y++)
+	{
+		u16 base_address = (y * pitch) << 1;
+		for (int x = 0; x < pitch; x++)
+		{
+			const u16 tile_address = base_address + (x << 1);
+			const u16 value = m_videoram[tile_address] | (m_videoram[tile_address + 1] << 8);
+			u16 tile = value & 0xff;
+			tile |= (value & 0xe000) >> 5;
+			u8 color = (value >> 8) & 0x1f;
+
+			gfx->zoom_opaque(bitmap, cliprect, tile, color, 0, 0, x * dx, y * 8, cclk_x, 0x10000);
+		}
+	}
+
 	return 0;
 }
 
@@ -87,31 +151,75 @@ void hanadojo_state::program_map(address_map &map)
 
 void hanadojo_state::io_map(address_map &map)
 {
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x00).rw("ay", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
+	map(0x01, 0x01).w("ay", FUNC(ay8910_device::data_w));
+
 	map(0x20, 0x20).w("crtc", FUNC(hd6845s_device::address_w));
 	map(0x21, 0x21).w("crtc", FUNC(hd6845s_device::register_w));
+	// TODO: 2x IOX!
+	// player inputs, PATSW 2
+	map(0x40, 0x41).lr8(NAME([] () { return 0; }));
+	// coinage (cfr. init at $61), service buttons, dip bank B
+	map(0x60, 0x61).lr8(NAME([] () { return 0; }));
+
+	map(0x80, 0x80).nopw(); // very noisy, just watchdog?
 }
 
 
 static INPUT_PORTS_START( hanadojo )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_DIPNAME( 0x01, 0x01, "IN0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_DIPNAME( 0x01, 0x01, "IN1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW1")
 	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW1:1")
@@ -121,7 +229,7 @@ static INPUT_PORTS_START( hanadojo )
 	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW1:5")
 	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW1:6")
 	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW1:7")
-	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW1:8")
+	PORT_SERVICE_DIPLOC(0x80, IP_ACTIVE_HIGH, "SW1:8")
 
 	PORT_START("DSW2")
 	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW2:1")
@@ -142,7 +250,7 @@ INPUT_PORTS_END
 
 
 static GFXDECODE_START( gfx_hanadojo )
-	GFXDECODE_ENTRY( "tiles", 0, gfx_8x8x3_planar, 0, 32 ) // TODO: wrong
+	GFXDECODE_ENTRY( "tiles", 0, gfx_8x8x3_planar, 0, 32 * 2 )
 GFXDECODE_END
 
 
@@ -152,17 +260,18 @@ void hanadojo_state::hanadojo(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &hanadojo_state::program_map);
 	m_maincpu->set_addrmap(AS_IO, &hanadojo_state::io_map);
 
-	hd6845s_device &crtc(HD6845S(config, "crtc", 12_MHz_XTAL / 16)); // divider guessed
+	hd6845s_device &crtc(HD6845S(config, "crtc", 12_MHz_XTAL / 4)); // divider guessed
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
-	crtc.set_char_width(8);
-	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	crtc.set_char_width(4);
+	crtc.out_vsync_callback().set_inputline(m_maincpu, 0);
 
-	PALETTE(config, "palette").set_entries(0x20); // TODO: wrong
+	PALETTE(config, "palette", FUNC(hanadojo_state::palette_init), 0x100 * 2, 0x20);
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_hanadojo);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO: wrong
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	// TODO: default values
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
@@ -173,6 +282,8 @@ void hanadojo_state::hanadojo(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 
 	ay8910_device &ay(AY8910(config, "ay", 12_MHz_XTAL / 16)); // divider guessed
+//  ay.port_a_read_callback()
+	ay.port_b_read_callback().set_ioport("DSW1");
 	ay.add_route(ALL_OUTPUTS, "speaker", 0.33);
 }
 
@@ -191,9 +302,11 @@ ROM_START( hanadojo )
 	ROM_LOAD( "no10.6e", 0x6000, 0x2000, CRC(bfb79118) SHA1(191c441b60fdec714733e326e7ad984b551e2cce) )
 	ROM_LOAD( "no11.6d", 0xa000, 0x2000, CRC(a601d401) SHA1(ac10da18c6ef46d9c9da10e292dcb49554676885) )
 
-	ROM_REGION( 0x120, "proms", 0 )
+	ROM_REGION( 0x020, "color_prom", 0 )
+	ROM_LOAD( "n1.11d", 0x000, 0x020, CRC(1e6f668a) SHA1(6006ee30920e51581862b0e7f56ac724831b0034) )
+
+	ROM_REGION( 0x100, "clut_prom", 0 )
 	ROM_LOAD( "n2.9d",  0x000, 0x100, CRC(e6812f63) SHA1(2286b43970e51d6cfbceaaf74bcb6d2f35620d3a) )
-	ROM_LOAD( "n1.11d", 0x100, 0x020, CRC(1e6f668a) SHA1(6006ee30920e51581862b0e7f56ac724831b0034) )
 ROM_END
 
 ROM_START( hanadojoa )
@@ -205,19 +318,21 @@ ROM_START( hanadojoa )
 
 	ROM_REGION( 0xc000, "tiles", 0 )
 	ROM_LOAD( "no6.4f",  0x0000, 0x2000, CRC(f049bc57) SHA1(cb6baaa4eaf9306a54ec39689e3b16ab7acc82c7) )
-	ROM_LOAD( "no7.4e",  0x2000, 0x2000, CRC(2ff0c6c7) SHA1(a92926d497189fadb11d0c8fd12d8e4a1506c4fd) )
-	ROM_LOAD( "no8.4d",  0x4000, 0x2000, CRC(32ed9c86) SHA1(6614df331ab8e57327b27393d189cc538f1b9567) )
-	ROM_LOAD( "no9.6f",  0x6000, 0x2000, CRC(1e5f720e) SHA1(e3d55fae723625fcdd78ee02fb10e47d8e0628f0) )
-	ROM_LOAD( "no10.6e", 0x8000, 0x2000, CRC(bfb79118) SHA1(191c441b60fdec714733e326e7ad984b551e2cce) )
+	ROM_LOAD( "no7.4e",  0x4000, 0x2000, CRC(2ff0c6c7) SHA1(a92926d497189fadb11d0c8fd12d8e4a1506c4fd) )
+	ROM_LOAD( "no8.4d",  0x8000, 0x2000, CRC(32ed9c86) SHA1(6614df331ab8e57327b27393d189cc538f1b9567) )
+	ROM_LOAD( "no9.6f",  0x2000, 0x2000, CRC(1e5f720e) SHA1(e3d55fae723625fcdd78ee02fb10e47d8e0628f0) )
+	ROM_LOAD( "no10.6e", 0x6000, 0x2000, CRC(bfb79118) SHA1(191c441b60fdec714733e326e7ad984b551e2cce) )
 	ROM_LOAD( "no11.6d", 0xa000, 0x2000, CRC(a601d401) SHA1(ac10da18c6ef46d9c9da10e292dcb49554676885) )
 
-	ROM_REGION( 0x120, "proms", 0 )
+	ROM_REGION( 0x020, "color_prom", 0 )
+	ROM_LOAD( "n1.11d", 0x000, 0x020, CRC(1e6f668a) SHA1(6006ee30920e51581862b0e7f56ac724831b0034) )
+
+	ROM_REGION( 0x100, "clut_prom", 0 )
 	ROM_LOAD( "n2.9d",  0x000, 0x100, CRC(e6812f63) SHA1(2286b43970e51d6cfbceaaf74bcb6d2f35620d3a) )
-	ROM_LOAD( "n1.11d", 0x100, 0x020, CRC(1e6f668a) SHA1(6006ee30920e51581862b0e7f56ac724831b0034) )
 ROM_END
 
 } // anonymous namespace
 
 
-GAME( 1984, hanadojo,  0,        hanadojo, hanadojo, hanadojo_state, empty_init, ROT0, "Alba", "Hana Doujou (set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1984, hanadojoa, hanadojo, hanadojo, hanadojo, hanadojo_state, empty_init, ROT0, "Alba", "Hana Doujou (set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1984, hanadojo,  0,        hanadojo, hanadojo, hanadojo_state, empty_init, ROT0, "Alba", "Hana Doujou (set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1984, hanadojoa, hanadojo, hanadojo, hanadojo, hanadojo_state, empty_init, ROT0, "Alba", "Hana Doujou (set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION )
