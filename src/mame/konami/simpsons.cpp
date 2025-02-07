@@ -602,10 +602,11 @@ void simpsons_state::object_dma()
 
 	m_k053246->k053247_get_ram(&dst);
 
-	uint16_t *src = m_spriteram.get();
-	int num_inactive = 256, counter = 256;
+	uint16_t const *src = m_spriteram.get();
+	int num_inactive = 256;
 
-	do {
+	for (int counter = 256; counter; --counter)
+	{
 		if (BIT(*src, 15) && (*src & 0xff))
 		{
 			memcpy(dst, src, 0x10);
@@ -614,9 +615,15 @@ void simpsons_state::object_dma()
 		}
 		src += 8;
 	}
-	while (--counter);
 
-	if (num_inactive) do { *dst = 0; dst += 8; } while (--num_inactive);
+	if (num_inactive)
+	{
+		while (num_inactive--)
+		{
+			*dst = 0;
+			dst += 8;
+		}
+	}
 }
 
 INTERRUPT_GEN_MEMBER(simpsons_state::periodic_irq)
