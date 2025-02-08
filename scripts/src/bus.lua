@@ -3284,6 +3284,8 @@ end
 
 if (BUSES["CENTRONICS"]~=null) then
 	files {
+		MAME_DIR .. "src/devices/bus/centronics/adaptator.cpp",
+		MAME_DIR .. "src/devices/bus/centronics/adaptator.h",
 		MAME_DIR .. "src/devices/bus/centronics/ctronics.cpp",
 		MAME_DIR .. "src/devices/bus/centronics/ctronics.h",
 		MAME_DIR .. "src/devices/bus/centronics/chessmec.cpp",
