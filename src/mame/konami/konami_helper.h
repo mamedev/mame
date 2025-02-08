@@ -9,7 +9,9 @@
 #include <algorithm>
 #include <functional>
 
+
 void konami_decode_gfx(device_gfx_interface &gfxdecode, int gfx_index, uint8_t *data, uint32_t total, const gfx_layout *layout, int bpp);
+
 
 // unrolled bubble sort helper
 template <unsigned N, unsigned A = N - 2, unsigned B = N - 1, typename C, typename T, typename U>
@@ -47,6 +49,5 @@ inline void konami_sortlayers5(T *layer, U *pri)
 {
 	konami_sortlayers<5>(std::less_equal<U>(), layer, pri);
 }
-
 
 #endif // MAME_KONAMI_KONAMI_HELPER_H
