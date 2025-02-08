@@ -77,7 +77,7 @@ K056832_CB_MEMBER(mystwarr_state::game4bpp_tile_callback)
 
 K055673_CB_MEMBER(mystwarr_state::mystwarr_sprite_callback)
 {
-	*priority_mask = *color & 0x00f0;
+	*priority_mask = *color & 0x00e0;
 
 	const int effect_attributes = ((*color >> 8) & 0b11) << K055555_MIXSHIFT; // used for blending
 	*color = m_sprite_colorbase | (*color & 0x001f) | effect_attributes;
