@@ -51,13 +51,13 @@ void adaptator_multitap_device::device_add_mconfig(machine_config &config)
 
 void adaptator_multitap_device::device_start()
 {
-
+	save_item(NAME(m_ddr));
 }
 
 void adaptator_multitap_device::input_strobe(int state)
 {
 	// assume 1 -> 0, assume writing to the data port causes pullup
-	// i.e. ControllerTest just writes a 0xff, at init time
+	// i.e. ControllerTest just writes a 0xff, at init time. ct486 do the same at POST.
 	if (state)
 		return;
 
