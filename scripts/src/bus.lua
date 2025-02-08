@@ -3337,6 +3337,8 @@ end
 
 if (BUSES["RS232"]~=null) then
 	files {
+		MAME_DIR .. "src/devices/bus/rs232/cricket.cpp",
+		MAME_DIR .. "src/devices/bus/rs232/cricket.h",
 		MAME_DIR .. "src/devices/bus/rs232/exorterm.cpp",
 		MAME_DIR .. "src/devices/bus/rs232/exorterm.h",
 		MAME_DIR .. "src/devices/bus/rs232/hlemouse.cpp",

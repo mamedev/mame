@@ -154,6 +154,7 @@ device_rs232_port_interface::~device_rs232_port_interface()
 }
 
 
+#include "cricket.h"
 #include "ie15.h"
 #include "hlemouse.h"
 #include "keyboard.h"
@@ -175,6 +176,7 @@ template class device_finder<device_rs232_port_interface, true>;
 
 void default_rs232_devices(device_slot_interface &device)
 {
+	device.option_add("cricket",       SERIAL_CRICKET);
 	device.option_add("dec_loopback",  DEC_RS232_LOOPBACK);
 	device.option_add("ie15",          SERIAL_TERMINAL_IE15);
 	device.option_add("keyboard",      SERIAL_KEYBOARD);
