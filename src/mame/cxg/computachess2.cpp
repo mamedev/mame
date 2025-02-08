@@ -10,8 +10,11 @@ again by Intelligent Software.
 
 Hardware notes:
 - PCB label: W&A 002B-600-003
-- Hitachi HD44840 @ ~650kHz (62K resistor)
+- Hitachi 44840A14 MCU @ ~650kHz (62K resistor)
 - buzzer, 16 leds, button sensors chessboard
+
+There's also an older revision (002 600 002 PCB, separate LED PCB), the rest of
+the hardware is the same. Seen with either A13 or A14 MCU.
 
 HD44840A13/A14 MCU is used in:
 - CXG Computachess II
