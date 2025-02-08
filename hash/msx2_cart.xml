@@ -39,7 +39,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Compile</publisher>
 		<info name="alt_title" value="アレスタ" />
 		<info name="serial" value="IA-8801"/>
-		<info name="gtin" value="04988161800010"/>
+		<info name="barcode" value="4988161800010"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="2M-16KB" />
 			<feature name="slot" value="ascii16" />
@@ -55,7 +55,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1988</year>
 		<publisher>Nihon Telenet</publisher>
 		<info name="alt_title" value="反生命戦機アンドロギュヌス" />
-		<info name="gtin" value="04988624920064"/>
+		<info name="barcode" value="4988624920064"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M016-03M" />
 			<!-- LZ93A13 with 16KB banks?? -->
@@ -93,7 +93,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Nidecom</publisher>
 		<info name="alt_title" value="アルカノイドII" />
 		<info name="serial" value="MSX-12"/>
-		<info name="gtin" value="04988611870228"/>
+		<info name="barcode" value="4988611870228"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-1M008S" />
 			<feature name="slot" value="ascii8" />
@@ -127,7 +127,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Panasoft / T&amp;E Soft</publisher>
 		<info name="serial" value="SW-M002" />
 		<info name="alt_title" value="アシュギーネ 虚空の牙城" />
-		<info name="gtin" value="04902704840011"/>
+		<info name="barcode" value="4902704840011"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M-008M" />
 			<feature name="slot" value="ascii8" />
@@ -144,7 +144,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Panasoft / Micro Cabin</publisher>
 		<info name="serial" value="SW-M003" />
 		<info name="alt_title" value="アシュギーネ 復讐の炎" />
-		<info name="gtin" value="04902704840028"/>
+		<info name="barcode" value="4902704840028"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M-008M" />
 			<feature name="slot" value="ascii8" />
@@ -161,7 +161,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Panasoft / Micro Cabin</publisher>
 		<info name="alt_title" value="アシュギーネ 復讐の炎" />
 		<info name="serial" value="SW-M003"/>
-		<info name="gtin" value="04902704840028"/>
+		<info name="barcode" value="4902704840028"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M-008M" />
 			<feature name="slot" value="ascii8" />
@@ -180,7 +180,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<info name="alt_title" value="太陽の神殿 アステカII" />
 		<info name="alt_title" value="Templo del Sol (Asteka II)"/>
 		<info name="serial" value="MXTS32001"/>
-		<info name="gtin" value="04961355677025"/>
+		<info name="barcode" value="4961355677025"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-2M208-03A" />
 			<feature name="slot" value="ascii8_sram" />
@@ -233,7 +233,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Scaptrust</publisher>
 		<info name="alt_title" value="クリムゾン" />
 		<info name="serial" value="EF1811"/>
-		<info name="gtin" value="04988660561115"/>
+		<info name="barcode" value="4988660561115"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M-008M" />
 			<feature name="slot" value="ascii8" />
@@ -249,7 +249,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1990</year>
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="大航海時代" />
-		<info name="gtin" value="04988615001857"/>
+		<info name="barcode" value="4988615001857"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M208-03A" />
 			<feature name="slot" value="ascii8_sram" />
@@ -269,7 +269,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="大戦略" />
 		<info name="serial" value="71180"/>
-		<info name="gtin" value="04988608711800"/>
+		<info name="barcode" value="4988608711800"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-621N" />
 			<feature name="slot" value="ascii16_sram" />
@@ -341,7 +341,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Sony</publisher>
 		<info name="alt_title" value="ドラゴンクエスト" />
 		<info name="serial" value="E-G184 / HBJ-G061C"/>
-		<info name="gtin" value="04988601001847"/>
+		<info name="barcode" value="4988601001847"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="slot" value="ascii8" />
@@ -359,7 +359,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Enix</publisher>
 		<info name="alt_title" value="ドラゴンクエストII 悪霊の神々" />
 		<info name="serial" value="EG207"/>
-		<info name="gtin" value="04988601002073"/>
+		<info name="barcode" value="4988601002073"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M-008M" />
 			<feature name="slot" value="ascii8" />
@@ -376,7 +376,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Panasoft</publisher>
 		<info name="alt_title" value="ダーウィン4078" />
 		<info name="serial" value="PANA-6"/>
-		<info name="gtin" value="04988607102418"/>
+		<info name="barcode" value="4988607102418"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="slot" value="ascii8" />
@@ -409,7 +409,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Toshiba EMI</publisher>
 		<info name="alt_title" value="ダイナマイトボウル" />
 		<info name="serial" value="PS-2021G"/>
-		<info name="gtin" value="04988006010758"/>
+		<info name="barcode" value="4988006010758"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="slot" value="ascii16" />
@@ -441,7 +441,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1990</year>
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="ランペルール" />
-		<info name="gtin" value="04988615002106"/>
+		<info name="barcode" value="4988615002106"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M208-03A" />
 			<feature name="slot" value="ascii8_sram" />
@@ -460,7 +460,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1992</year>
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="ヨーロッパ戦線" />
-		<info name="gtin" value="04988615003318"/>
+		<info name="barcode" value="4988615003318"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-8M308-03A" />
 			<feature name="slot" value="ascii8_sram" />
@@ -496,7 +496,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Pack-In-Video</publisher>
 		<info name="alt_title" value="ファミリービリヤード" />
 		<info name="serial" value="MS-14"/>
-		<info name="gtin" value="04988110800146"/>
+		<info name="barcode" value="4988110800146"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="1M-8K" />
 			<feature name="slot" value="ascii8" />
@@ -514,7 +514,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Sony</publisher>
 		<info name="alt_title" value="ファミリーボクシング" />
 		<info name="serial" value="HBS-G066C"/>
-		<info name="gtin" value="04901780081790"/>
+		<info name="barcode" value="4901780081790"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="IS-03-001-0" />
 			<feature name="slot" value="ascii8" />
@@ -547,7 +547,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Namco</publisher>
 		<info name="alt_title" value="プロ野球ファミリースタジアム ペナントレース" />
 		<info name="serial" value="NMX-890828"/>
-		<info name="gtin" value="04907892030206"/>
+		<info name="barcode" value="4907892030206"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M016-03M" />
 			<feature name="slot" value="ascii16" />
@@ -564,7 +564,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="ファンタジーゾーンII ～オパオパの涙～" />
 		<info name="serial" value="R68Y5815"/>
-		<info name="gtin" value="04988013017092"/>
+		<info name="barcode" value="4988013017092"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-2M" />
 			<feature name="slot" value="ascii16" />
@@ -596,7 +596,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1990</year>
 		<publisher>ASCII</publisher>
 		<info name="alt_title" value="フリートコマンダーII 黄昏の海域" />
-		<info name="gtin" value="04988606207121"/>
+		<info name="barcode" value="4988606207121"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="FLEET COMMANDER II" />
 			<feature name="slot" value="ascii8" />
@@ -612,7 +612,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1988</year>
 		<publisher>Game Arts</publisher>
 		<info name="alt_title" value="ぎゅわんぶらあ自己中心派2 自称! 強豪雀士編" />
-		<info name="gtin" value="04988649922029"/>
+		<info name="barcode" value="4988649922029"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="2M-8KB" />
 			<feature name="slot" value="ascii8" />
@@ -628,7 +628,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1988</year>
 		<publisher>Wachi Software</publisher>
 		<info name="alt_title" value="お絵描きソフト 画楽多 ~ Oekaki Soft Garakuta" />
-		<info name="gtin" value="04958494341016"/>
+		<info name="barcode" value="4958494341016"/>
 		<info name="usage" value="Requires a mouse in general purpose port 1."/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-1M016S" />
@@ -647,7 +647,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1992</year>
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="蒼き狼と白き牝鹿 元朝秘史" />
-		<info name="gtin" value="04988615003899"/>
+		<info name="barcode" value="4988615003899"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-8M308-03A" />
 			<feature name="slot" value="ascii8_sram" />
@@ -667,7 +667,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="蒼き狼と白き牝鹿 ジンギスカン" />
 		<info name="serial" value="MXKN12006"/>
-		<info name="gtin" value="04988615000287"/>
+		<info name="barcode" value="4988615000287"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M208-02A" /> <!-- also seen TA-621 KAGA -->
 			<feature name="slot" value="ascii8_sram" />
@@ -687,7 +687,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>The Links</publisher>
 		<info name="alt_title" value="ガーリーブロック" />
 		<info name="serial" value="NGS-001"/>
-		<info name="gtin" value="04953973010018"/>
+		<info name="barcode" value="4953973010018"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-1M016S" />
 			<feature name="slot" value="ascii16" />
@@ -704,7 +704,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Sony</publisher>
 		<info name="alt_title" value="ハードボール"/>
 		<info name="serial" value="HBS-G060C"/>
-		<info name="gtin" value="04901780066483"/>
+		<info name="barcode" value="4901780066483"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="slot" value="ascii8" />
@@ -738,7 +738,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>T&amp;E Soft</publisher>
 		<info name="alt_title" value="ハイドライド3" />
 		<info name="serial" value="TEX-80"/>
-		<info name="gtin" value="04988604030806"/>
+		<info name="barcode" value="4988604030806"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M-008M" />
 			<feature name="slot" value="ascii8" />
@@ -755,7 +755,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Pack-In Video</publisher>
 		<info name="alt_title" value="井出洋介名人の実戦麻雀" />
 		<info name="serial" value="MS-18"/>
-		<info name="gtin" value="04988110800184"/>
+		<info name="barcode" value="4988110800184"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="1M-8KB" />
 			<feature name="slot" value="ascii8" />
@@ -771,7 +771,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1991</year>
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="伊忍道 打倒信長" />
-		<info name="gtin" value="04988615002694"/>
+		<info name="barcode" value="4988615002694"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-8M308-64" />
 			<feature name="slot" value="ascii8_sram" />
@@ -790,7 +790,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1989</year>
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="維新の嵐" />
-		<info name="gtin" value="04988615001185"/>
+		<info name="barcode" value="4988615001185"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M208-03A" />
 			<feature name="slot" value="ascii8_sram" />
@@ -831,7 +831,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Sony</publisher>
 		<info name="alt_title" value="奇々怪界" />
 		<info name="serial" value="HBS-G063C"/>
-		<info name="gtin" value="04901780068777"/>
+		<info name="barcode" value="4901780068777"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="IS-02-030-0" />
 			<feature name="slot" value="ascii8" />
@@ -848,7 +848,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Sony</publisher>
 		<info name="alt_title" value="棋聖" />
 		<info name="serial" value="HBS-G057C"/>
-		<info name="gtin" value="04901780066469"/>
+		<info name="barcode" value="4901780066469"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-621-8K" />
 			<feature name="slot" value="ascii8_sram" />
@@ -868,7 +868,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="本格将棋 棋太平" />
 		<info name="serial" value="MIC-M022R"/>
-		<info name="gtin" value="04988608651809"/>
+		<info name="barcode" value="4988608651809"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="slot" value="ascii8" />
@@ -918,7 +918,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="めぞん一刻" />
 		<info name="serial" value="66580"/>
-		<info name="gtin" value="04988608665806"/>
+		<info name="barcode" value="4988608665806"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA6228" />
 			<feature name="slot" value="ascii8" />
@@ -935,7 +935,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="めぞん一刻 完結篇" />
 		<info name="serial" value="82580"/>
-		<info name="gtin" value="04988608825804"/>
+		<info name="barcode" value="4988608825804"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M-008M" />
@@ -953,7 +953,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Jaleco</publisher>
 		<info name="alt_title" value="ミシシッピー殺人事件" />
 		<info name="serial" value="JX-15"/>
-		<info name="gtin" value="04907659102115"/>
+		<info name="barcode" value="4907659102115"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-1M008S" />
 			<feature name="slot" value="ascii8" />
@@ -990,7 +990,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Hot-B</publisher>
 		<info name="alt_title" value="モンモンモンスター" />
 		<info name="serial" value="MXHB22003"/>
-		<info name="gtin" value="04967948000249"/>
+		<info name="barcode" value="4967948000249"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="IS-02-030-0" />
 			<feature name="slot" value="ascii8" />
@@ -1023,7 +1023,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>HAL Kenkyuujo</publisher>
 		<info name="alt_title" value="忍者くん 阿修羅の章" />
 		<info name="serial" value="HM-028"/>
-		<info name="gtin" value="04988610115283"/>
+		<info name="barcode" value="4988610115283"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-1M008S" />
 			<feature name="slot" value="ascii8" />
@@ -1040,7 +1040,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="信長の野望 戦国群雄伝" />
 		<info name="serial" value="MXKN12009"/>
-		<info name="gtin" value="04988615000843"/>
+		<info name="barcode" value="4988615000843"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M208-03A" />
 			<feature name="slot" value="ascii8_sram" />
@@ -1060,7 +1060,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="信長の野望 全国版" />
 		<info name="serial" value="MXKN12003"/>
-		<info name="gtin" value="04988615000140"/>
+		<info name="barcode" value="4988615000140"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M208-03A" />
 			<feature name="slot" value="ascii8_sram" />
@@ -1079,7 +1079,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1991</year>
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="信長の野望 武将風雲録" />
-		<info name="gtin" value="04988615002410"/>
+		<info name="barcode" value="4988615002410"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-8M308-03A" />
 			<feature name="slot" value="ascii8_sram" />
@@ -1130,7 +1130,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1988</year>
 		<publisher>ASCII</publisher>
 		<info name="alt_title" value="プロフェッショナル麻雀悟空" />
-		<info name="gtin" value="04988606201525"/>
+		<info name="barcode" value="4988606201525"/>
 		<info name="usage" value="Requires a Japanese system" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-621N" />
@@ -1151,7 +1151,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Pony</publisher>
 		<info name="alt_title" value="プロジェクトA2 史上最大の標的" />
 		<info name="serial" value="R58Y5109"/>
-		<info name="gtin" value="04988013011496"/>
+		<info name="barcode" value="4988013011496"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="slot" value="ascii8" />
@@ -1184,7 +1184,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Bit²</publisher>
 		<info name="alt_title" value="クインプル" />
 		<info name="serial" value="BM-802"/>
-		<info name="gtin" value="04988655220188"/>
+		<info name="barcode" value="4988655220188"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-2M008-E2M" />
 			<feature name="slot" value="ascii8" />
@@ -1202,7 +1202,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Taito</publisher>
 		<info name="alt_title" value="ラスタン・サーガ" />
 		<info name="serial" value="TMS-05"/>
-		<info name="gtin" value="04988611870303"/>
+		<info name="barcode" value="4988611870303"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M-008M" />
 			<feature name="slot" value="ascii8" />
@@ -1219,7 +1219,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Bothtec / Sony</publisher>
 		<info name="alt_title" value="レリクス" />
 		<info name="serial" value="LL-8515 / HBJ-G058C"/>
-		<info name="gtin" value="04901780054213"/>
+		<info name="barcode" value="4901780054213"/>
 		<info name="usage" value="Requires a Japanese system" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
@@ -1286,7 +1286,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="ロイヤルブラッド" />
 		<info name="serial" value="KN10201050"/>
-		<info name="gtin" value="04988615003103"/>
+		<info name="barcode" value="4988615003103"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-8M308-64" />
 			<feature name="slot" value="ascii8_sram" />
@@ -1305,7 +1305,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1988</year>
 		<publisher>Namco</publisher>
 		<info name="alt_title" value="イシターの復活" />
-		<info name="gtin" value="04907892030145"/>
+		<info name="barcode" value="4907892030145"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M016-03M" />
 			<!-- LZ93A13 with 16KB banks?? -->
@@ -1323,7 +1323,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="三国志II" />
 		<info name="serial" value="MXKN12021"/>
-		<info name="gtin" value="04988615001505"/>
+		<info name="barcode" value="4988615001505"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-8M308-03A" />
 			<feature name="slot" value="ascii8_sram" />
@@ -1343,7 +1343,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Taito</publisher>
 		<info name="alt_title" value="スクランブルフォーメーション" />
 		<info name="serial" value="TMS-01"/>
-		<info name="gtin" value="04988611870129"/>
+		<info name="barcode" value="4988611870129"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA6228" />
 			<feature name="slot" value="ascii8" />
@@ -1360,7 +1360,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Sony</publisher>
 		<info name="alt_title" value="聖飢魔IIスペシャル 悪魔の逆襲" />
 		<info name="serial" value="HBS-G064C"/>
-		<info name="gtin" value="04901780064885"/>
+		<info name="barcode" value="4901780064885"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="slot" value="ascii8" />
@@ -1377,7 +1377,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Victor Music Industry</publisher>
 		<info name="alt_title" value="死霊戦線" />
 		<info name="serial" value="M-2010"/>
-		<info name="gtin" value="04988002142712"/>
+		<info name="barcode" value="4988002142712"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-2M208-03A" />
 			<feature name="slot" value="ascii8_sram" />
@@ -1412,7 +1412,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="水滸伝 天命の誓い" />
 		<info name="serial" value="MXKN12014"/>
-		<info name="gtin" value="04988615000928"/>
+		<info name="barcode" value="4988615000928"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M208-03A" />
 			<feature name="slot" value="ascii8_sram" />
@@ -1432,7 +1432,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="SUPER大戦略" />
 		<info name="serial" value="85180"/>
-		<info name="gtin" value="04988608851803"/>
+		<info name="barcode" value="4988608851803"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M116-03A" />
 			<feature name="slot" value="ascii16_sram" />
@@ -1452,7 +1452,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="スーパーランナー" />
 		<info name="serial" value="R58Y5111"/>
-		<info name="gtin" value="04988013012097"/>
+		<info name="barcode" value="4988013012097"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="1M-8KB" />
 			<!-- MR6401 -->
@@ -1486,7 +1486,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="提督の決断" />
 		<info name="serial" value="KN10051050"/>
-		<info name="gtin" value="04988615002229"/>
+		<info name="barcode" value="4988615002229"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-8M308-03A" />
 			<feature name="slot" value="ascii8_sram" />
@@ -1506,7 +1506,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Taito</publisher>
 		<info name="alt_title" value="天国よいとこ" />
 		<info name="serial" value="TMS-03"/>
-		<info name="gtin" value="04988611870235"/>
+		<info name="barcode" value="4988611870235"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-1M008S" />   <!-- Also seen with TAS-1M016S with 16KB mapper? -->
 			<feature name="slot" value="ascii8" />
@@ -1523,7 +1523,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>BPS</publisher>
 		<info name="alt_title" value="テトリス" />
 		<info name="serial" value="MXBP-12003"/>
-		<info name="gtin" value="04988627100142"/>
+		<info name="barcode" value="4988627100142"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-1M-008S" />
 			<feature name="slot" value="ascii8" />
@@ -1556,7 +1556,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="ウルティマ 恐怖のエクソダス ~ Ultima - Kyoufu no Exodus (Box?)" />
 		<info name="serial" value="R68Y5552"/>
-		<info name="gtin" value="04988013013292"/>
+		<info name="barcode" value="4988013013292"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-2M208-03M" />
 			<feature name="slot" value="ascii8_sram" />
@@ -1576,7 +1576,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="うる星やつら" />
 		<info name="serial" value="72480"/>
-		<info name="gtin" value="04988608724800"/>
+		<info name="barcode" value="4988608724800"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M-008M" />
 			<feature name="slot" value="ascii8" />
@@ -1593,7 +1593,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Nidecom</publisher>
 		<info name="alt_title" value="ビクトリアス・ナインII 高校野球編" />
 		<info name="serial" value="MSX-11"/>
-		<info name="gtin" value="04988611870211"/>
+		<info name="barcode" value="4988611870211"/>
 		<info name="usage" value="Requires a Japanese system" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-1M016S" />
@@ -1627,7 +1627,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1989</year>
 		<publisher>Namco</publisher>
 		<info name="alt_title" value="ゼビウス ファードラウト伝説" />
-		<info name="gtin" value="04907892030152"/>
+		<info name="barcode" value="4907892030152"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M016-03M" />
 			<feature name="slot" value="ascii16" />
@@ -1659,7 +1659,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Taito</publisher>
 		<info name="alt_title" value="京都龍の寺殺人事件" />
 		<info name="serial" value="TMS-04"/>
-		<info name="gtin" value="04988611870198"/>
+		<info name="barcode" value="4988611870198"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M-008M" />
 			<feature name="slot" value="ascii8" />
@@ -1675,7 +1675,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1988</year>
 		<publisher>System Sacom</publisher>
 		<info name="alt_title" value="幽霊君" />
-		<info name="gtin" value="04956375414149"/>
+		<info name="barcode" value="4956375414149"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M-008M" />
 			<feature name="slot" value="ascii8" />
@@ -1692,7 +1692,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Pony</publisher>
 		<info name="alt_title" value="ザナック EX" />
 		<info name="serial" value="R58Y5093"/>
-		<info name="gtin" value="04988013008397"/>
+		<info name="barcode" value="4988013008397"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="slot" value="ascii16" />
@@ -1723,7 +1723,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Toshiba EMI</publisher>
 		<info name="alt_title" value="ゾイド 中央大陸の戦い" />
 		<info name="serial" value="PS-2022G"/>
-		<info name="gtin" value="04988006027466"/>
+		<info name="barcode" value="4988006027466"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-1M016S" />
 			<feature name="slot" value="ascii16" />
@@ -1858,7 +1858,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1988</year>
 		<publisher>Nihon Telenet</publisher>
 		<info name="alt_title" value="反生命戦機アンドロギュヌス" />
-		<info name="gtin" value="04988624920064"/>
+		<info name="barcode" value="4988624920064"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -1890,7 +1890,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="アークティック" />
 		<info name="serial" value="R58Y5120"/>
-		<info name="gtin" value="04988013017597"/>
+		<info name="barcode" value="4988013017597"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -1906,7 +1906,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="アークティック" />
 		<info name="serial" value="R58Y5120"/>
-		<info name="gtin" value="04988013017597"/>
+		<info name="barcode" value="4988013017597"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -1936,7 +1936,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Panasoft / Micro Cabin</publisher>
 		<info name="alt_title" value="アシュギーネ 復讐の炎"/>
 		<info name="serial" value="SW-M003"/>
-		<info name="gtin" value="04902704840028"/>
+		<info name="barcode" value="4902704840028"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8"/>
 			<dataarea name="rom" size="0x40000">
@@ -1966,7 +1966,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="魂斗羅" />
 		<info name="serial" value="RC762"/>
-		<info name="gtin" value="04988602544763"/>
+		<info name="barcode" value="4988602544763"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami_scc" />
 			<feature name="mapper" value="KONAMI-SCC" />
@@ -1982,7 +1982,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="大戦略"/>
 		<info name="serial" value="71180"/>
-		<info name="gtin" value="04988608711800"/>
+		<info name="barcode" value="4988608711800"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii16_sram"/>
 			<dataarea name="rom" size="0x40000">
@@ -2000,7 +2000,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Hudson Soft</publisher>
 		<info name="alt_title" value="ダーウィン4078" />
 		<info name="serial" value="PANA-6"/>
-		<info name="gtin" value="04988607102418"/>
+		<info name="barcode" value="4988607102418"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -2016,7 +2016,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Hudson Soft</publisher>
 		<info name="alt_title" value="ダーウィン4078" />
 		<info name="serial" value="PANA-6"/>
-		<info name="gtin" value="04988607102418"/>
+		<info name="barcode" value="4988607102418"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -2063,7 +2063,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Enix</publisher>
 		<info name="alt_title" value="ドラゴンクエストII 悪霊の神々" />
 		<info name="serial" value="EG207"/>
-		<info name="gtin" value="04988601002073"/>
+		<info name="barcode" value="4988601002073"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -2125,7 +2125,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Toshiba EMI</publisher>
 		<info name="alt_title" value="ダイナマイトボウル" />
 		<info name="serial" value="PS-2021G"/>
-		<info name="gtin" value="04988006010758"/>
+		<info name="barcode" value="4988006010758"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -2155,7 +2155,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>NCS</publisher>
 		<info name="alt_title" value="エルスリード" />
 		<info name="serial" value="MXNC22001"/>
-		<info name="gtin" value="04988616000156"/>
+		<info name="barcode" value="4988616000156"/>
 		<info name="usage" value="Requires a Japanese system" />
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8_sram" />
@@ -2174,7 +2174,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="ファンタジーゾーンII ～オパオパの涙～" />
 		<info name="serial" value="R68Y5815"/>
-		<info name="gtin" value="04988013017092"/>
+		<info name="barcode" value="4988013017092"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -2234,7 +2234,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="ＴＨＥプロ野球 激突ペナントレース" />
 		<info name="serial" value="RC757"/>
-		<info name="gtin" value="04988602532401"/>
+		<info name="barcode" value="4988602532401"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami_scc" />
 			<feature name="mapper" value="KONAMI-SCC" />
@@ -2250,7 +2250,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="ＴＨＥプロ野球 激突ペナントレース" />
 		<info name="serial" value="RC757"/>
-		<info name="gtin" value="04988602532401"/>
+		<info name="barcode" value="4988602532401"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami_scc" />
 			<feature name="mapper" value="KONAMI-SCC" />
@@ -2266,7 +2266,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="ＴＨＥプロ野球 激突ペナントレース" />
 		<info name="serial" value="RC757"/>
-		<info name="gtin" value="04988602532401"/>
+		<info name="barcode" value="4988602532401"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami_scc" />
 			<feature name="mapper" value="KONAMI-SCC" />
@@ -2282,7 +2282,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="ＴＨＥプロ野球 激突ペナントレース" />
 		<info name="serial" value="RC757"/>
-		<info name="gtin" value="04988602532401"/>
+		<info name="barcode" value="4988602532401"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami_scc" />
 			<feature name="mapper" value="KONAMI-SCC" />
@@ -2298,7 +2298,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="激突ペナントレース2" />
 		<info name="serial" value="RC766"/>
-		<info name="gtin" value="04988602553673"/>
+		<info name="barcode" value="4988602553673"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami_scc" />
 			<feature name="mapper" value="KONAMI-SCC" />
@@ -2328,7 +2328,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="がんばれゴエモン!からくり道中" />
 		<info name="serial" value="RC748"/>
-		<info name="gtin" value="04988602524604"/>
+		<info name="barcode" value="4988602524604"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami" />
 			<feature name="mapper" value="KONAMI" />
@@ -2344,7 +2344,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="ハッカー" />
 		<info name="serial" value="R58Y5519"/>
-		<info name="gtin" value="04988013012493"/>
+		<info name="barcode" value="4988013012493"/>
 		<info name="usage" value="Password to start the game: AUSTRALIA."/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii16" />
@@ -2361,7 +2361,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="牌の魔術師" />
 		<info name="serial" value="RC765"/>
-		<info name="gtin" value="04988602549102"/>
+		<info name="barcode" value="4988602549102"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="majutsushi" />
 			<feature name="mapper" value="MAJUTSUSHI" />
@@ -2377,7 +2377,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="ヒーローオブザランス" />
 		<info name="serial" value="R75Y5122"/>
-		<info name="gtin" value="04988013023697"/>
+		<info name="barcode" value="4988013023697"/>
 		<info name="usage" value="Requires a Japanese system for the Japanese text" />
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8_sram" />
@@ -2396,7 +2396,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>ASCII</publisher>
 		<info name="alt_title" value="魔界島 七つの島大冒険" />
 		<info name="serial" value="CAP-201"/>
-		<info name="gtin" value="04988606201006"/>
+		<info name="barcode" value="4988606201006"/>
 		<info name="usage" value="Requires a Japanese system" />
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii16" />
@@ -2428,7 +2428,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="火の鳥鳳凰編" />
 		<info name="serial" value="RC747"/>
-		<info name="gtin" value="04988602524369"/>
+		<info name="barcode" value="4988602524369"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami" />
 			<feature name="mapper" value="KONAMI" />
@@ -2444,7 +2444,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="火の鳥鳳凰編" />
 		<info name="serial" value="RC747"/>
-		<info name="gtin" value="04988602524369"/>
+		<info name="barcode" value="4988602524369"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami" />
 			<feature name="mapper" value="KONAMI" />
@@ -2460,7 +2460,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="火の鳥鳳凰編" />
 		<info name="serial" value="RC747"/>
-		<info name="gtin" value="04988602524369"/>
+		<info name="barcode" value="4988602524369"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami" />
 			<feature name="mapper" value="KONAMI" />
@@ -2503,7 +2503,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="怒" />
 		<info name="serial" value="SFX-IK"/>
-		<info name="gtin" value="04964808000043"/>
+		<info name="barcode" value="4964808000043"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -2519,7 +2519,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="怒" />
 		<info name="serial" value="SFX-IK"/>
-		<info name="gtin" value="04964808000043"/>
+		<info name="barcode" value="4964808000043"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -2535,7 +2535,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Sony</publisher>
 		<info name="alt_title" value="雀聖" />
 		<info name="serial" value="HBS-G059C"/>
-		<info name="gtin" value="04901780056637"/>
+		<info name="barcode" value="4901780056637"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii16_sram" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -2553,7 +2553,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Sony</publisher>
 		<info name="alt_title" value="雀聖" />
 		<info name="serial" value="HBS-G059C"/>
-		<info name="gtin" value="04901780056637"/>
+		<info name="barcode" value="4901780056637"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii16_sram" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -2571,7 +2571,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="ケンペレンチェス" />
 		<info name="serial" value="R55Y5152"/>
-		<info name="gtin" value="04988013014695"/>
+		<info name="barcode" value="4988013014695"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -2588,7 +2588,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="キングコング2 甦る伝説" />
 		<info name="serial" value="RC745"/>
-		<info name="gtin" value="04988602512748"/>
+		<info name="barcode" value="4988602512748"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami" />
 			<feature name="mapper" value="KONAMI" />
@@ -2632,7 +2632,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Pack-In Video</publisher>
 		<info name="alt_title" value="ラビリンス" />
 		<info name="serial" value="MS-10"/>
-		<info name="gtin" value="04988110800108"/>
+		<info name="barcode" value="4988110800108"/>
 		<info name="usage" value="Requires a Japanese system" />
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
@@ -2649,7 +2649,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Pack-In Video</publisher>
 		<info name="alt_title" value="ラビリンス" />
 		<info name="serial" value="MS-10"/>
-		<info name="gtin" value="04988110800108"/>
+		<info name="barcode" value="4988110800108"/>
 		<info name="usage" value="Requires a Japanese system" />
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
@@ -2666,7 +2666,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Toho</publisher>
 		<info name="alt_title" value="ルパン3 世バビロンの黄金伝説" />
 		<info name="serial" value="CS11-011R"/>
-		<info name="gtin" value="04988104004840"/>
+		<info name="barcode" value="4988104004840"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -2682,7 +2682,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Toho</publisher>
 		<info name="alt_title" value="ルパン3 世バビロンの黄金伝説" />
 		<info name="serial" value="CS11-011R"/>
-		<info name="gtin" value="04988104004840"/>
+		<info name="barcode" value="4988104004840"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -2742,7 +2742,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="マラヤの秘宝" />
 		<info name="serial" value="R58Y5115"/>
-		<info name="gtin" value="04988013014497"/>
+		<info name="barcode" value="4988013014497"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -2757,7 +2757,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="RC750"/>
-		<info name="gtin" value="04988602527230"/>
+		<info name="barcode" value="4988602527230"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami" />
 			<feature name="mapper" value="KONAMI" />
@@ -2773,7 +2773,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="メタルギア" />
 		<info name="serial" value="RC750"/>
-		<info name="gtin" value="04988602527230"/>
+		<info name="barcode" value="4988602527230"/>
 		<info name="usage" value="Requires a Japanese system. Game resets on a non-Japanese system."/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami" />
@@ -2805,7 +2805,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="ソリッドスネークメタルギア2" />
 		<info name="serial" value="RC767"/>
-		<info name="gtin" value="04988602553932"/>
+		<info name="barcode" value="4988602553932"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami_scc" />
 			<feature name="mapper" value="KONAMI-SCC" />
@@ -2917,7 +2917,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="熱血柔道" />
 		<info name="serial" value="R68Y5118"/>
-		<info name="gtin" value="04988013016293"/>
+		<info name="barcode" value="4988013016293"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -2933,7 +2933,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="熱血柔道" />
 		<info name="serial" value="R68Y5118"/>
-		<info name="gtin" value="04988013016293"/>
+		<info name="barcode" value="4988013016293"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -2964,7 +2964,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="エルギーザの封印" />
 		<info name="serial" value="RC761"/>
-		<info name="gtin" value="04988602542059"/>
+		<info name="barcode" value="4988602542059"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami_scc" />
 			<feature name="mapper" value="KONAMI-SCC" />
@@ -2994,7 +2994,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="アウトラン" />
 		<info name="serial" value="R68Y5814"/>
-		<info name="gtin" value="04988013014091"/>
+		<info name="barcode" value="4988013014091"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -3024,7 +3024,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1988</year>
 		<publisher>ASCII</publisher>
 		<info name="alt_title" value="ぺんぎんくんウォーズ２" />
-		<info name="gtin" value="04988606202980"/>
+		<info name="barcode" value="4988606202980"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -3039,7 +3039,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1988</year>
 		<publisher>ASCII</publisher>
 		<info name="alt_title" value="ぺんぎんくんウォーズ２" />
-		<info name="gtin" value="04988606202980"/>
+		<info name="barcode" value="4988606202980"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -3070,7 +3070,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="クォース" />
 		<info name="serial" value="RC769"/>
-		<info name="gtin" value="04988602560572"/>
+		<info name="barcode" value="4988602560572"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami_scc" />
 			<feature name="mapper" value="KONAMI-SCC" />
@@ -3129,7 +3129,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="三國志" />
 		<info name="serial" value="MXKN12002"/>
-		<info name="gtin" value="04988615000096"/>
+		<info name="barcode" value="4988615000096"/>
 		<info name="usage" value="Requires a Japanese system" />
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8_sram" />
@@ -3178,7 +3178,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Sony</publisher>
 		<info name="alt_title" value="聖飢魔IIスペシャル 悪魔の逆襲" />
 		<info name="serial" value="HBS-G064C"/>
-		<info name="gtin" value="04901780064885"/>
+		<info name="barcode" value="4901780064885"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -3209,7 +3209,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="スペースマンボウ" />
 		<info name="serial" value="RC768"/>
-		<info name="gtin" value="04988602554137"/>
+		<info name="barcode" value="4988602554137"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami_scc" />
 			<feature name="mapper" value="KONAMI-SCC" />
@@ -3225,7 +3225,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Pack-In Video</publisher>
 		<info name="alt_title" value="スーパーランボースペシャル" />
 		<info name="serial" value="MS-5"/>
-		<info name="gtin" value="04988110800054"/>
+		<info name="barcode" value="4988110800054"/>
 		<info name="usage" value="Requires a Japanese system" />
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii16" />
@@ -3242,7 +3242,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="スターヴァージン" />
 		<info name="serial" value="R58Y5112"/>
-		<info name="gtin" value="04988013013490"/>
+		<info name="barcode" value="4988013013490"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -3258,7 +3258,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="スターヴァージン" />
 		<info name="serial" value="R58Y5112"/>
-		<info name="gtin" value="04988013013490"/>
+		<info name="barcode" value="4988013013490"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -3274,7 +3274,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Irem</publisher>
 		<info name="alt_title" value="スーパーロードランナー" />
 		<info name="serial" value="IM-03"/>
-		<info name="gtin" value="04962891300033"/>
+		<info name="barcode" value="4962891300033"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="superloderunner" />
 			<feature name="mapper" value="SUPERLODE" />
@@ -3290,7 +3290,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Irem</publisher>
 		<info name="alt_title" value="スーパーロードランナー"/>
 		<info name="serial" value="IM-03"/>
-		<info name="gtin" value="04962891300033"/>
+		<info name="barcode" value="4962891300033"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="superloderunner"/>
 			<feature name="mapper" value="SUPERLODE"/>
@@ -3319,7 +3319,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="谷川浩司の将棋指南II" />
 		<info name="serial" value="R55Y5110"/>
-		<info name="gtin" value="04988013013193"/>
+		<info name="barcode" value="4988013013193"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8_sram" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -3337,7 +3337,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="ウシャス" />
 		<info name="serial" value="RC753"/>
-		<info name="gtin" value="04988602528787"/>
+		<info name="barcode" value="4988602528787"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami" />
 			<feature name="mapper" value="KONAMI" />
@@ -3353,7 +3353,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="ウシャス" />
 		<info name="serial" value="RC753"/>
-		<info name="gtin" value="04988602528787"/>
+		<info name="barcode" value="4988602528787"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami" />
 			<feature name="mapper" value="KONAMI" />
@@ -3369,7 +3369,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="悪魔城ドラキュラ" />
 		<info name="serial" value="RC744"/>
-		<info name="gtin" value="04988602512472"/>
+		<info name="barcode" value="4988602512472"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami" />
 			<feature name="mapper" value="KONAMI" />
@@ -3385,7 +3385,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="悪魔城ドラキュラ" />
 		<info name="serial" value="RC744"/>
-		<info name="gtin" value="04988602512472"/>
+		<info name="barcode" value="4988602512472"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami" />
 			<feature name="mapper" value="KONAMI" />
@@ -3401,7 +3401,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="悪魔城ドラキュラ" />
 		<info name="serial" value="RC744"/>
-		<info name="gtin" value="04988602512472"/>
+		<info name="barcode" value="4988602512472"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami" />
 			<feature name="mapper" value="KONAMI" />
@@ -3417,7 +3417,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="悪魔城ドラキュラ" />
 		<info name="serial" value="RC744"/>
-		<info name="gtin" value="04988602512472"/>
+		<info name="barcode" value="4988602512472"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami" />
 			<feature name="mapper" value="KONAMI" />
@@ -3480,7 +3480,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1989</year>
 		<publisher>Namco</publisher>
 		<info name="alt_title" value="ゼビウス ファードラウト伝説" />
-		<info name="gtin" value="04907892030152"/>
+		<info name="barcode" value="4907892030152"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -3496,7 +3496,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Pony</publisher>
 		<info name="alt_title" value="ザナック EX" />
 		<info name="serial" value="R58Y5093"/>
-		<info name="gtin" value="04988013008397"/>
+		<info name="barcode" value="4988013008397"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -3629,7 +3629,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Bit²</publisher>
 		<info name="alt_title" value="シンセサウルス" />
 		<info name="serial" value="BM-813"/>
-		<info name="gtin" value="04988655321182"/>
+		<info name="barcode" value="4988655321182"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -3729,7 +3729,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>ASCII</publisher>
 		<info name="alt_title" value="日本語 MSX-DOS 2"/>
 		<info name="serial" value="2307601"/>
-		<info name="gtin" value="04988606202515"/>
+		<info name="barcode" value="4988606202515"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="msxdos2j"/>
 			<feature name="bank_address" value="0x6000"/>
