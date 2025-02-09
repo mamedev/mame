@@ -92,18 +92,6 @@ void super8008_bus_device::device_start()
 
 
 //-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void super8008_bus_device::device_reset()
-{
-}
-
-void super8008_bus_device::device_post_load()
-{
-}
-
-//-------------------------------------------------
 //  add_card - add card
 //-------------------------------------------------
 

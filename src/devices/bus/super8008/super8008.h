@@ -131,11 +131,8 @@ public:
 	uint8_t ext_run();
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_post_load() override;
+	virtual void device_start() override ATTR_COLD;
 	
-
 private:
 	using card_vector = std::vector<std::reference_wrapper<device_super8008_card_interface> >;
 

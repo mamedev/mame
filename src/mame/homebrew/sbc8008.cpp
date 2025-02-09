@@ -17,7 +17,7 @@
 //    force the SBC to execute code in the first 8K segment of the EPROM. when
 //    START is low, ROMA14 and ROMA13 are controlled by the Q3 and Q2 inputs from
 //    port 10 allowing any one of the four 8K sections of the EPROM to be selected
-//    for code. 
+//    for code.
 //
 // TODO get file transfer working for both hex and binary
 // TODO what are outputs 1,2,3,4,5,6,7 doing?
@@ -25,12 +25,12 @@
 
 
 #include "emu.h"
+
+#include "bus/rs232/rs232.h"
 #include "cpu/i8008/i8008.h"
 #include "machine/ram.h"
-#include "bus/rs232/rs232.h"
 
 #include "sbc8008.lh"
-
 
 namespace
 {
@@ -45,7 +45,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		  , m_maincpu(*this, "maincpu")
 		  , m_ram(*this, "ram")
-		  , m_rom(*this, "rom")		
+		  , m_rom(*this, "rom")
 		  , m_rom_bank(*this, "bank")
 		  , m_rs232(*this, "rs232")
 		  , m_leds(*this, "led%u", 0U)
@@ -59,10 +59,6 @@ public:
 	void sbc8008(machine_config &config);
 
 protected:
-	// address maps for program memory and io memory
-	void sbc8008_mem(address_map &map);
-	void sbc8008_io(address_map &map);
-	
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
@@ -80,11 +76,15 @@ protected:
 	void port_9_write(uint8_t data);
 	void port_10_write(uint8_t data);
 
-	virtual void machine_start() override;
+	// address maps for program memory and io memory
+	void sbc8008_mem(address_map &map);
+	void sbc8008_io(address_map &map);
+
+	virtual void machine_start() override ATTR_COLD;
 };
 
 void sbc8008_state::machine_start()
-{	
+{
 	m_leds.resolve();
 	m_run_led.resolve();
 	m_txd_led.resolve();
@@ -108,17 +108,17 @@ uint8_t sbc8008_state::bitbang_read()
 
 void sbc8008_state::bitbang_write(uint8_t data)
 {
-	m_txd_led = BIT(data, 0);    
+	m_txd_led = BIT(data, 0);
 	m_rs232->write_txd(BIT(data, 0));
 }
 
 // Comment from the PLD file:
 //
-//   simulated SR flip-flop made up of cross-connected NAND gates.      
+//   simulated SR flip-flop made up of cross-connected NAND gates.
 //   the flip-flop is set when the reset signal from the DS1233 goes low
-//   (power-on-reset) and cleared when input port 1 is accessed.        
-//   when set, the flip-flop forces all memory accesses to select the   
-//   EPROM. when reset, the flip-flop permits the normal memory map.    
+//   (power-on-reset) and cleared when input port 1 is accessed.
+//   when set, the flip-flop forces all memory accesses to select the
+//   EPROM. when reset, the flip-flop permits the normal memory map.
 
 uint8_t sbc8008_state::port_1_read()
 {
@@ -147,8 +147,8 @@ void sbc8008_state::sbc8008_mem(address_map &map)
 	// Comment from monitor.asm
 	//
 	//   when the reset pushbutton is pressed, the flip-flop is set which generates an interrupt
-	//   and clears the address latches. thus, the first instruction is thus always fetched from 
-	//   address 0. the instruction at address 0 must be a single byte transfer instruction in 
+	//   and clears the address latches. thus, the first instruction is thus always fetched from
+	//   address 0. the instruction at address 0 must be a single byte transfer instruction in
 	//   order to set the program counter. i.e., it must be one of the RST opcodes.
 	//
 
@@ -168,7 +168,7 @@ void sbc8008_state::sbc8008_io(address_map &map)
 	// OUTPORT     equ 08H         ; serial output port address
 	//
 	// out 10                      ; clear the EPROM bank switch address outputs A13 and A14
-	// out 09                      ; turn off orange LEDs      
+	// out 09                      ; turn off orange LEDs
 	// out 08                      ; set serial output high (mark)
 	// in 1                        ; reset the bootstrap flip-flop internal to GAL22V10 #2
 
@@ -179,7 +179,7 @@ void sbc8008_state::sbc8008_io(address_map &map)
 	map(0x01, 0x01).r(FUNC(sbc8008_state::port_1_read));
 	map(0x08, 0x08).w(FUNC(sbc8008_state::bitbang_write));
 	map(0x09, 0x09).w(FUNC(sbc8008_state::port_9_write));
-	map(0x0A, 0x0A).w(FUNC(sbc8008_state::port_10_write));
+	map(0x0a, 0x0a).w(FUNC(sbc8008_state::port_10_write));
 }
 
 static DEVICE_INPUT_DEFAULTS_START( terminal )
@@ -193,20 +193,20 @@ DEVICE_INPUT_DEFAULTS_END
 
 void sbc8008_state::sbc8008(machine_config &config)
 {
-	// The original 1 Mhz crystal goes to a flip-flop which divides by two and then that feeds a PLD which 
-	// produces phase 1 and 2 signals.  Simluating the logic gives me this timing diagram.  Dividing by 4 provides 
+	// The original 1 Mhz crystal goes to a flip-flop which divides by two and then that feeds a PLD which
+	// produces phase 1 and 2 signals.  Simluating the logic gives me this timing diagram.  Dividing by 4 provides
 	// the correct timing for the monitor to bitbang rs232 successfully.
-	// 
 	//
-	//         +--+  +--+  +--+  +--+  +--+  +--+  +--+  +--+  +--+  
-	//         |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  
+	//
+	//         +--+  +--+  +--+  +--+  +--+  +--+  +--+  +--+  +--+
+	//         |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
 	// clk   : +  +--+  +--+  +--+  +--+  +--+  +--+  +--+  +--+  +--
-	//                  +--+        +--+        +--+        +--+     
-	//                  |  |        |  |        |  |        |  |     
+	//                  +--+        +--+        +--+        +--+
+	//                  |  |        |  |        |  |        |  |
 	// phase1: ---------+  +--------+  +--------+  +--------+  +-----
 	//            +--+        +--+        +--+        +--+        +--
-	//            |  |        |  |        |  |        |  |        |  
-	// phase2: ---+  +--------+  +--------+  +--------+  +--------+  
+	//            |  |        |  |        |  |        |  |        |
+	// phase2: ---+  +--------+  +--------+  +--------+  +--------+
 
 
 	I8008(config, m_maincpu, XTAL(1'000'000)/4);
@@ -219,7 +219,7 @@ void sbc8008_state::sbc8008(machine_config &config)
 	RS232_PORT(config, m_rs232, default_rs232_devices, "terminal");
 	// must be below the DEVICE_INPUT_DEFAULTS_START block
 	m_rs232->set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
-	
+
 	RAM(config, m_ram).set_default_size("8K");
 }
 

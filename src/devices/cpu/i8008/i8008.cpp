@@ -94,8 +94,6 @@ void i8008_device::device_start()
 	for (int addrnum = 0; addrnum < 8; addrnum++)
 		state_add(I8008_ADDR1 + addrnum, string_format("ADDR%d", addrnum + 1).c_str(), m_ADDR[addrnum].w.l).mask(0xfff);
 
-	state_add(I8008_STOPPED,     "STOPPED",     m_HALT);
-
 	init_tables();
 }
 

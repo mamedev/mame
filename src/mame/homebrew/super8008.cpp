@@ -25,12 +25,13 @@
 // The Mame driver for the 8008-SBC is named sbc8008.
 
 #include "emu.h"
+
+#include "bus/super8008/super8008.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/i8008/i8008.h"
 #include "machine/clock.h"
 #include "machine/i8251.h"
 #include "machine/ram.h"
-#include "bus/rs232/rs232.h"
-#include "bus/super8008/super8008.h"
 
 #include "super8008.lh"
 
@@ -83,10 +84,6 @@ public:
 	void super8008(machine_config &config);
 
 protected:
-	// address maps for program memory and io memory
-	void super8008_mem(address_map &map);
-	void super8008_io(address_map &map);
-
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
@@ -103,41 +100,36 @@ protected:
 	memory_view m_reg2_view;
 	memory_view m_reg3_view;
 	memory_view m_reg4_view;
-	memory_view *const m_reg_views[4] = { &m_reg1_view, &m_reg2_view, &m_reg3_view, &m_reg4_view };
+	memory_view *const m_reg_views[4] =
+		{ &m_reg1_view, &m_reg2_view, &m_reg3_view, &m_reg4_view };
 
 	required_memory_bank_array<4> m_reg_rom_banks;
 	required_memory_bank_array<4> m_reg_ram_banks;
 
 	uint8_t m_take_state = 0;
 
+	virtual void machine_start() override ATTR_COLD;
+
+	// address maps for program memory and io memory
+	void super8008_mem(address_map &map);
+	void super8008_io(address_map &map);
+
 	uint8_t port_1_read();
 	void serial_leds(uint8_t data);
 
-	virtual void machine_start() override;
-
 	uint8_t ext_read(offs_t offset);
 	void ext_write(offs_t offset, uint8_t data);
-
+	void ext_take_w(offs_t offset, uint8_t data);
+	void ext_int_w(offs_t offset, uint8_t data);
+	void ext_req_w(offs_t offset, uint8_t data);
+	void ext_reset_w(offs_t offset, uint8_t data);
 
 	void memory_mapper_w(offs_t offset, uint8_t data);
 	memory_map_info get_mmap_info(offs_t offset);
 	memory_map_info get_mmap_info(uint8_t idx);
-	//void log_mmap_info(std::string context, std::string message, offs_t offset, memory_map_info *mmap_info);
-
-	void super8008_blaster1_mem(address_map &map);
-	void super8008_blaster1_io(address_map &map);
-	uint8_t blaster_memory_read(offs_t offset);
-	void blaster_memory_write(offs_t offset, uint8_t data);
-
-	uint8_t ext_stat_r(offs_t offset);
-	void ext_stat_w(offs_t offset, uint8_t data);
-	uint8_t blaster1_ext_req(offs_t offset);
-	void blaster1_serial_leds(offs_t offset, uint8_t data);
-
-	int blaster_irq_callback(device_t &device, int irqlines);
-
 	void select_memory_view(uint8_t index);
 
+	//void log_mmap_info(std::string context, std::string message, offs_t offset, memory_map_info *mmap_info);
 };
 
 
@@ -168,7 +160,7 @@ memory_map_info super8008_state::get_mmap_info(offs_t offset)
 	mmap_info.ra13   = BIT(mmap_info.mmap_value, 1);
 	mmap_info.ext_cs = BIT(mmap_info.mmap_value, 2);
 	mmap_info.rom_cs = BIT(mmap_info.mmap_value, 3);
-	mmap_info.address= (offset & 0x0FFF) | ((mmap_info.ra13 << 13) | (mmap_info.ra12 << 12));
+	mmap_info.address= (offset & 0x0fff) | ((mmap_info.ra13 << 13) | (mmap_info.ra12 << 12));
 
 	return mmap_info;
 }
@@ -272,31 +264,26 @@ void super8008_state::serial_leds(uint8_t data)
 // take is routed to buffers around blasters's 16K of RAM
 // ext_cs from the memory mapper is routed to blaster's 16K RAM's cs
 
-void super8008_state::ext_stat_w(offs_t offset, uint8_t data)
-{
-	switch(offset)
-	{
-		case 0:
-			//logerror("ext_stat_w %04X  take data %02X\n", offset, data);
-			m_take_state = data;
-			m_bus->ext_take(data);
-			break;//take
-		case 1:
-			//logerror("ext_stat_w %04X   int data %02X\n", offset, data);
-			m_bus->ext_int();
-			break;//int
-		case 2:
-			//logerror("ext_stat_w %04X   req data %02X\n", offset, data);
-			m_bus->ext_req();
-			break;//req
-		case 3:
-			//logerror("ext_stat_w %04X reset data %02X\n", offset, data);
-			m_bus->ext_reset();
-			break;//reset
 
-		default:
-			logerror("ext_stat_w INVALID %04X data %02X\n", offset, data);break;
-	}
+void super8008_state::ext_take_w(offs_t offset, uint8_t data)
+{
+	m_take_state = data;
+	m_bus->ext_take(data);
+}
+
+void super8008_state::ext_int_w(offs_t offset, uint8_t data)
+{
+	m_bus->ext_int();
+}
+
+void super8008_state::ext_req_w(offs_t offset, uint8_t data)
+{
+	m_bus->ext_req();
+}
+
+void super8008_state::ext_reset_w(offs_t offset, uint8_t data)
+{
+	m_bus->ext_reset();
 }
 
 void super8008_state::select_memory_view(uint8_t index)
@@ -323,9 +310,8 @@ void super8008_state::select_memory_view(uint8_t index)
 
 void super8008_state::memory_mapper_w(offs_t offset, uint8_t data)
 {
-	uint8_t index = offset & MMAP_MASK;
-	mmap[index] = data & 0xff;
-	select_memory_view(index);
+	mmap[offset] = data ;
+	select_memory_view(offset);
 	//logerror("super-8008 memory mapper write ($%04X) masked ($%04X) data %04X \n", offset, index, mmap[index]);
 }
 
@@ -401,14 +387,12 @@ void super8008_state::super8008_io(address_map &map)
 	//to reference which of the 4 registers contains the A12 and A13
 	//lines of the ram or rom.  The ram and rom cs are the high bit
 	//and bit 3 is used for issuing an external chip select.
-	map(0x0C, 0x0F).w(FUNC(super8008_state::memory_mapper_w));
+	map(0x0c, 0x0f).w(FUNC(super8008_state::memory_mapper_w));
 
-	//This are all output ports
-	// 14 EXT_STAT_WR - take
-	// 15 EXT_STAT_WR - int
-	// 16 EXT_STAT_WR - REQ
-	// 17 EXT_STAT_WR - RESET
-	map(0x14, 0x17).w(FUNC(super8008_state::ext_stat_w));
+	map(0x14, 0x14).w(FUNC(super8008_state::ext_take_w));
+	map(0x15, 0x15).w(FUNC(super8008_state::ext_int_w));
+	map(0x16, 0x16).w(FUNC(super8008_state::ext_req_w));
+	map(0x17, 0x17).w(FUNC(super8008_state::ext_reset_w));
 }
 
 static DEVICE_INPUT_DEFAULTS_START( terminal )
