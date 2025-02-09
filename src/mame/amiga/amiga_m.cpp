@@ -1071,10 +1071,14 @@ uint8_t amiga_state::cia_1_port_a_read()
 	// bit 0 to 2, centronics
 	data |= m_centronics_busy << 0;
 	data |= m_centronics_perror << 1;
-	data |= m_centronics_select << 2;
+	// TODO: verify if this doesn't break Ring Indicator
+	// (amigajoy port 3 fire button won't work with previous behaviour)
+	// https://github.com/dirkwhoffmann/vAmiga/issues/49#issuecomment-502444017
+	// NOTE: RI is unavailable on a1000 anyway
+	data |= (m_centronics_select & m_rs232_ri) << 2;
 
 	// bit 2 to 7, serial line
-	data |= m_rs232_ri << 2;
+//  data |= m_rs232_ri << 2;
 	data |= m_rs232_dsr << 3;
 	data |= m_rs232_cts << 4;
 	data |= m_rs232_dcd << 5;
