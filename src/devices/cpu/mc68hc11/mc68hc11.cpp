@@ -9,6 +9,7 @@ TODO:
 - Timers are really sketchy as per now;
 - Complete opcodes hook-up;
 - Emulate the MC68HC12 (same as HC11 with a bunch of new opcodes);
+- UART serial port is only emulated partially
 
  */
 
@@ -50,6 +51,7 @@ enum
 static const int div_tab[4] = { 1, 4, 8, 16 };
 
 
+DEFINE_DEVICE_TYPE(MC68HC11A0, mc68hc11a0_device, "mc68hc11a0", "Motorola MC68HC11A0")
 DEFINE_DEVICE_TYPE(MC68HC11A1, mc68hc11a1_device, "mc68hc11a1", "Motorola MC68HC11A1")
 DEFINE_DEVICE_TYPE(MC68HC11D0, mc68hc11d0_device, "mc68hc11d0", "Motorola MC68HC11D0")
 DEFINE_DEVICE_TYPE(MC68HC11E1, mc68hc11e1_device, "mc68hc11e1", "Motorola MC68HC11E1")
@@ -69,6 +71,7 @@ mc68hc11_cpu_device::mc68hc11_cpu_device(const machine_config &mconfig, device_t
 	, m_analog_cb(*this, 0)
 	, m_spi2_data_input_cb(*this, 0xff)
 	, m_spi2_data_output_cb(*this)
+	, m_serial_tx_cb(*this)
 	, m_ram_view(*this, "ram")
 	, m_reg_view(*this, "regs")
 	, m_eeprom_view(*this, "eeprom")
@@ -112,6 +115,16 @@ void mc68hc11_cpu_device::internal_map(address_map &map)
 		m_reg_view[pos](pos << 12, (pos << 12) + m_reg_block_size - 1).unmaprw();
 		mc68hc11_reg_map(m_reg_view[pos], pos << 12);
 	}
+}
+
+mc68hc11a0_device::mc68hc11a0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mc68hc11a1_device(mconfig, MC68HC11A0, tag, owner, clock, false)
+{
+}
+
+mc68hc11a1_device::mc68hc11a1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool enable_eeprom)
+	: mc68hc11_cpu_device(mconfig, type, tag, owner, clock, 256, 64, 0, enable_eeprom ? 512 : 0, 0x01, 0x0f, 0xfb)
+{
 }
 
 mc68hc11a1_device::mc68hc11a1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -384,6 +397,71 @@ void mc68hc11_cpu_device::tmsk2_w(uint8_t data)
 	m_tmsk2 = data;
 }
 
+void mc68hc11_cpu_device::serial_w(u8 val)
+{
+	m_scdr = val;
+	m_scsr |= 0x20;
+	if ((m_sccr2 & 0x20) != 0)
+		set_irq_state(0x14, true);
+}
+
+// unimplemented
+uint8_t mc68hc11_cpu_device::baud_r()
+{
+	return m_baud;
+}
+void mc68hc11_cpu_device::baud_w(uint8_t data)
+{
+	m_baud = data;
+}
+
+// unimplemented
+uint8_t mc68hc11_cpu_device::sccr1_r()
+{
+	return m_sccr1;
+}
+void mc68hc11_cpu_device::sccr1_w(uint8_t data)
+{
+	m_sccr1 = data;
+}
+
+uint8_t mc68hc11_cpu_device::sccr2_r()
+{
+	return m_sccr2;
+}
+void mc68hc11_cpu_device::sccr2_w(uint8_t data)
+{
+	m_sccr2 = data;
+
+	// TODO: check
+	if ((m_sccr2 & 0x80) != 0)
+		set_irq_state(0x14, true);
+}
+
+uint8_t mc68hc11_cpu_device::scsr_r()
+{
+	return m_scsr;
+}
+void mc68hc11_cpu_device::scsr_w(uint8_t data)
+{
+	m_scsr = data;
+}
+
+uint8_t mc68hc11_cpu_device::scdr_r()
+{
+	set_irq_state(0x14, false);
+	m_scsr |= 0b10000000;
+	return m_scdr;
+}
+void mc68hc11_cpu_device::scdr_w(uint8_t data)
+{
+	m_scsr &= 0b01111111;
+	if ((m_sccr2 & 0x80) != 0)
+		set_irq_state(0x14, true);
+	
+	m_serial_tx_cb(data);
+}
+
 template <int N>
 uint8_t mc68hc11_cpu_device::spcr_r()
 {
@@ -512,16 +590,6 @@ uint8_t mc68hc11_cpu_device::scbd_r(offs_t offset)
 	return 0;
 }
 
-uint8_t mc68hc11_cpu_device::sccr1_r()
-{
-	return 0;
-}
-
-uint8_t mc68hc11_cpu_device::sccr2_r()
-{
-	return 0;
-}
-
 uint8_t mc68hc11_cpu_device::scsr1_r()
 {
 	return 0x40;
@@ -566,8 +634,11 @@ void mc68hc11a1_device::mc68hc11_reg_map(memory_view::memory_view_entry &block, 
 	block(base + 0x28, base + 0x28).r(FUNC(mc68hc11a1_device::spcr_r<0>)).nopw(); // SPCR
 	block(base + 0x29, base + 0x29).r(FUNC(mc68hc11a1_device::spsr_r<0>)).nopw(); // SPSR
 	block(base + 0x2a, base + 0x2a).rw(FUNC(mc68hc11a1_device::spdr_r<0>), FUNC(mc68hc11a1_device::spdr_w<0>)); // SPDR
-	block(base + 0x2c, base + 0x2c).r(FUNC(mc68hc11a1_device::sccr1_r)).nopw(); // SCCR1
-	block(base + 0x2d, base + 0x2d).r(FUNC(mc68hc11a1_device::sccr2_r)).nopw(); // SCCR2
+	block(base + 0x2b, base + 0x2b).rw(FUNC(mc68hc11a1_device::baud_r), FUNC(mc68hc11a1_device::baud_w)); // BAUD
+	block(base + 0x2c, base + 0x2c).rw(FUNC(mc68hc11a1_device::sccr1_r), FUNC(mc68hc11a1_device::sccr1_w)); // SCCR1
+	block(base + 0x2d, base + 0x2d).rw(FUNC(mc68hc11a1_device::sccr2_r), FUNC(mc68hc11a1_device::sccr2_w)); // SCCR2
+	block(base + 0x2e, base + 0x2e).rw(FUNC(mc68hc11a1_device::scsr_r), FUNC(mc68hc11a1_device::scsr_w)); // SCSR
+	block(base + 0x2f, base + 0x2f).rw(FUNC(mc68hc11a1_device::scdr_r), FUNC(mc68hc11a1_device::scdr_w)); // SCCR2
 	block(base + 0x30, base + 0x30).rw(FUNC(mc68hc11a1_device::adctl_r), FUNC(mc68hc11a1_device::adctl_w)); // ADCTL
 	block(base + 0x31, base + 0x34).r(FUNC(mc68hc11a1_device::adr_r)); // ADR1-ADR4
 	block(base + 0x39, base + 0x39).rw(FUNC(mc68hc11a1_device::option_r), FUNC(mc68hc11a1_device::option_w)); // OPTION
@@ -1031,6 +1102,11 @@ void mc68hc11_cpu_device::device_reset()
 		set_irq_state(0x06, true);
 	m_frc_base = m_reset_time = total_cycles();
 	std::fill(std::begin(m_port_dir), std::end(m_port_dir), 0x00);
+
+	m_sccr1 = 0;
+	m_sccr2 = 0;
+	m_scsr  = 0xc0;
+	m_scdr  = 0;
 }
 
 void mc68hc11a1_device::device_reset()

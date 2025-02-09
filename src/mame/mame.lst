@@ -39220,6 +39220,9 @@ d550
 @source:roland/roland_d70.cpp
 d70
 
+@source:roland/roland_proe.cpp
+proe                            //
+
 @source:roland/roland_jd800.cpp
 jd800
 
