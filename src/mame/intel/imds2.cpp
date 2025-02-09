@@ -310,7 +310,7 @@ void imds2_state::imds2(machine_config &config)
 
 	MULTIBUS(config, m_bus, 9'830'400);
 	m_bus->xack_cb().set(FUNC(imds2_state::xack));
-	MULTIBUS_SLOT(config, m_slot, m_bus, imds2_cards, nullptr, false); // FIXME: isbc202
+	MULTIBUS_SLOT(config, m_slot, imds2_cards, nullptr, false); // FIXME: isbc202
 }
 
 void imds2_state::xack(int state)

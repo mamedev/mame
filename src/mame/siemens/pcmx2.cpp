@@ -75,14 +75,14 @@ void pcmx2_state::pcmx2(machine_config &config)
 {
 	MULTIBUS(config, m_bus, 20_MHz_XTAL / 2);
 
-	MULTIBUS_SLOT(config, "slot:1", m_bus, pcmx2_cards, nullptr, false); // DTC 86-1 or Storager
-	MULTIBUS_SLOT(config, "slot:2", m_bus, pcmx2_cards, nullptr, false);
-	MULTIBUS_SLOT(config, "slot:3", m_bus, pcmx2_cards, "serad", false);
-	MULTIBUS_SLOT(config, "slot:4", m_bus, pcmx2_cards, nullptr, false);
-	MULTIBUS_SLOT(config, "slot:5", m_bus, pcmx2_cards, nullptr, false);
-	MULTIBUS_SLOT(config, "slot:6", m_bus, pcmx2_cards, "cpuap", false);
-	MULTIBUS_SLOT(config, "slot:7", m_bus, pcmx2_cards, nullptr, false); // MEM
-	MULTIBUS_SLOT(config, "slot:8", m_bus, pcmx2_cards, nullptr, false);
+	MULTIBUS_SLOT(config, "slot:1", pcmx2_cards, nullptr, false); // DTC 86-1 or Storager
+	MULTIBUS_SLOT(config, "slot:2", pcmx2_cards, nullptr, false);
+	MULTIBUS_SLOT(config, "slot:3", pcmx2_cards, "serad", false);
+	MULTIBUS_SLOT(config, "slot:4", pcmx2_cards, nullptr, false);
+	MULTIBUS_SLOT(config, "slot:5", pcmx2_cards, nullptr, false);
+	MULTIBUS_SLOT(config, "slot:6", pcmx2_cards, "cpuap", false);
+	MULTIBUS_SLOT(config, "slot:7", pcmx2_cards, nullptr, false); // MEM
+	MULTIBUS_SLOT(config, "slot:8", pcmx2_cards, nullptr, false);
 }
 
 ROM_START(pcmx2)

@@ -157,7 +157,7 @@ void a7150_state::a7150(machine_config &config)
 	m_bus->int_callback<1>().set(m_pic8259, FUNC(pic8259_device::ir1_w));
 	m_bus->int_callback<6>().set(m_pic8259, FUNC(pic8259_device::ir6_w));
 	m_bus->int_callback<7>().set(m_pic8259, FUNC(pic8259_device::ir7_w));
-	MULTIBUS_SLOT(config, "slot:1", m_bus, a7150_cards, "kgs", false);
+	MULTIBUS_SLOT(config, "slot:1", a7150_cards, "kgs", false);
 
 	// ZRE board
 
