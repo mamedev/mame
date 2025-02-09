@@ -260,8 +260,9 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		</part>
 	</software>
 
-	<software name="2xtreme">
-		<!-- Original images (Redump)
+	<software name="2xtreme_us" cloneof="2xtreme">
+		<!--
+		http://redump.org/disc/2094/
 		<rom name="2Xtreme (USA).cue" size="700" crc="7e95393e" sha1="ed526fe2905f428530cc001038dd72c413bbe291"/>
 		<rom name="2Xtreme (USA) (Track 1).bin" size="45715824" crc="aad124a6" sha1="3f25e5d1366e60e70a416109711e109d48c9f19b"/>
 		<rom name="2Xtreme (USA) (Track 2).bin" size="56064624" crc="6f8d371b" sha1="9b986d87e8314c72757f629f6d7201bdeb0190b0"/>
@@ -275,11 +276,13 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<description>2Xtreme (USA)</description>
 		<year>1996</year>
 		<publisher>Sony Computer Entertainment America</publisher>
+		<info name="developer" value="Sony" />
+		<info name="language" value="English" />
 		<info name="serial" value="SCUS-94508"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="2xtreme (usa)" sha1="cf2eda5444f604fdfdc6e38c12c4a92a58749044"/>
+				<disk name="2Xtreme (USA)" sha1="81e5c9f63798bb785555ef6bd2a89ee8172c7860"/>
 			</diskarea>
 		</part>
 	</software>
@@ -301,8 +304,9 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		</part>
 	</software>
 
-	<software name="3dlemmin">
-		<!-- Original images (Redump)
+	<software name="3dlemmin_us" cloneof="3dlemmin">
+		<!--
+		http://redump.org/disc/14951/
 		<rom name="3D Lemmings (USA).cue" size="2670" crc="b394a6d2" sha1="b2b3cbba19838d9883c5042f5119a2e531e93484"/>
 		<rom name="3D Lemmings (USA) (Track 01).bin" size="192184272" crc="b7dbfea7" sha1="f713cdcb5d0e3d875031dbdc438dbbab0cdd3340"/>
 		<rom name="3D Lemmings (USA) (Track 02).bin" size="17741136" crc="7bacf147" sha1="a96d42f61d3952bc7956433c453ffa34fdcc97b7"/>
@@ -330,13 +334,15 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="3D Lemmings (USA) (Track 24).bin" size="11089680" crc="3402228c" sha1="9057a5bd1a656e2fa8afc8b2d7ef216b218ca74a"/>
 		-->
 		<description>3D Lemmings (USA)</description>
-		<year>1997</year>
+		<year>1995</year>
 		<publisher>Psygnosis</publisher>
+		<info name="developer" value="Clockwork Games" />
+		<info name="language" value="English" />
 		<info name="serial" value="SCUS-94601"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="3d lemmings (usa)" sha1="ce0fe62049e1f2567b7e4e66f209d97713fb54d8"/>
+				<disk name="3D Lemmings (USA)" sha1="4801d11a8fc06628bc972bfb5a9d5b411fe15101"/>
 			</diskarea>
 		</part>
 	</software>
@@ -370,36 +376,65 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		</part>
 	</software>
 
-	<software name="3xtreme">
-		<!-- Original images (Redump)
+	<software name="3xtreme" supported="partial">
+		<!--
+		http://redump.org/disc/2715/
+		<rom name="3Xtreme (USA).cue" size="196" crc="a689937f" sha1="6d16c06c59a0eab13c1364c03dce6db699c5793a"/>
 		<rom name="3Xtreme (USA) (Track 1).bin" size="340649568" crc="c16782c6" sha1="4e6ced10157eda5e1881e95d1bd8363ae6b560f8"/>
 		<rom name="3Xtreme (USA) (Track 2).bin" size="26732832" crc="efb07e5e" sha1="60da792ac141a78f7fe875788d0e73b5bc1b943d"/>
 		-->
 		<description>3Xtreme (USA)</description>
 		<year>1999</year>
-		<publisher>989 Studios</publisher>
+		<publisher>989 Sports</publisher>
+		<notes>Compatibility set as PAL since it didn't work on NTSC system</notes>
+		<info name="developer" value="989 Sports" />
+		<info name="language" value="English" />
 		<info name="serial" value="SCUS-94231"/>
-		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="3xtreme (usa)" sha1="dbc36461c1491be04b9b41cdb43f5aacc5b8d219"/>
+				<disk name="3Xtreme (USA)" sha1="a0678bbf322f512072f7a78f072fdbab6555559b"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="40winks">
-		<!-- Original images (Redump)
+	<software name="3xtreme_d" cloneof="3xtreme">
+		<!--
+		http://redump.org/disc/63416/
+		<rom name="3Xtreme (USA) (Demo).cue" size="210" crc="afd8623e" sha1="bb568da1f73df38143f07e8487fb8b18414f2b23"/>
+		<rom name="3Xtreme (USA) (Demo) (Track 1).bin" size="88625712" crc="a20fb256" sha1="a6f3eb421cab68ad005fab381c634827226f1388"/>
+		<rom name="3Xtreme (USA) (Demo) (Track 2).bin" size="12999504" crc="fe85bf0c" sha1="7744ffae36986f09cc87a649a6a8d44e3756284f"/>
+		-->
+		<description>3Xtreme (USA, demo)</description>
+		<year>1999</year>
+		<publisher>989 Sports</publisher>
+		<info name="developer" value="989 Sports" />
+		<info name="language" value="English" />
+		<info name="serial" value="SCUS-94365"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="3Xtreme (USA) (Demo)" sha1="a2791f84517ab05c0e744217510d9e074ad5357b"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="40winks_us" cloneof="40winks">
+		<!--
+		http://redump.org/disc/583/
 		<rom name="40 Winks (USA).cue" size="80" crc="1d060c48" sha1="327eb468983d8aeebc67998a7e8a017d5c41bdd3"/>
 		<rom name="40 Winks (USA).bin" size="540854160" crc="5b53f0a5" sha1="68b0e80f3f59cb673fc5ae7c4ebb8eba4a7b6a50"/>
 		-->
 		<description>40 Winks (USA)</description>
 		<year>1999</year>
-		<publisher>GT Interactive Software</publisher>
+		<publisher>GT Interactive</publisher>
+		<info name="developer" value="Eurocom Entertainment" />
+		<info name="language" value="English" />
 		<info name="serial" value="SLUS-00874"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="40 winks (usa)" sha1="8247541f750a4dbe16ed653a9db0e7a9a8ddfc12"/>
+				<disk name="40 Winks (USA)" sha1="4f424d7e5a574d72e135bf8124ae50e95edd4b79"/>
 			</diskarea>
 		</part>
 	</software>
@@ -31412,6 +31447,26 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 <!-- LIGHTSPAN EDUSOFT FROM REDUMP SET -->
 <!-- WE SPLIT THEM HERE BECAUSE THEY USE A SEPARATE CODE SYSTEM -->
 
+	<software name="16tales1">
+		<!--
+		http://redump.org/disc/44996/
+		<rom name="16 Tales 1 (USA).cue" size="82" crc="79224c44" sha1="d887c3ed3f743b8dfe0579db1e4884ab00736f96"/>
+		<rom name="16 Tales 1 (USA).bin" size="622045200" crc="eaba661f" sha1="d57b2141d93c179a638c92cd9dd501fd3ec83c44"/>
+		-->
+		<description>16 Tales 1 (USA)</description>
+		<year>1996</year>
+		<publisher>The Lightspan Partnership</publisher>
+		<info name="language" value="English" />
+		<info name="developer" value="The Lightspan Partnership" />
+		<info name="serial" value="LSP-99012101"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="16 Tales 1 (USA)" sha1="629a2ee55b04092a717266b1d01f675ab7b4d6ec"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="16tales2">
 		<!-- Original images (Redump)
 		<rom name="16 Tales 2 (USA).cue" size="82" crc="359166ed" sha1="b699b8ff729299c4e631aae6d57c959e0a586b52"/>
@@ -34374,36 +34429,6 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		</part>
 	</software>
 
-	<software name="ttycoon">
-		<!-- Original images (Redump)
-		<rom name="Transport Tycoon (EU).cue" size="1489" crc="c0d4caef" sha1="c5ad4f1b1b9e23fd775c76bcc993e230b40b0485"/>
-		<rom name="Transport Tycoon (Europe) (En,Fr,De,Es,It) (Track 01).bin" size="132641040" crc="0e968d6b" sha1="9c79ebcac1d29701c15b2c9fd16564c5089d212e"/>
-		<rom name="Transport Tycoon (Europe) (En,Fr,De,Es,It) (Track 02).bin" size="42858144" crc="3233248e" sha1="571ac211fca70fdf95d8981688664217d889144e"/>
-		<rom name="Transport Tycoon (Europe) (En,Fr,De,Es,It) (Track 03).bin" size="43008672" crc="57aed47c" sha1="849e7b29f769060594407e6a727d0e0f0c088098"/>
-		<rom name="Transport Tycoon (Europe) (En,Fr,De,Es,It) (Track 04).bin" size="40470864" crc="d1000a47" sha1="d69f8fa48646b5d5e459f3100cfb8651617dd619"/>
-		<rom name="Transport Tycoon (Europe) (En,Fr,De,Es,It) (Track 05).bin" size="43262688" crc="84cba52d" sha1="dd05eb6fcf5a453b25452cbb6645e76884922019"/>
-		<rom name="Transport Tycoon (Europe) (En,Fr,De,Es,It) (Track 06).bin" size="44382240" crc="1321fedb" sha1="4871a6f90709e029f82615c89a9b50c3b415589d"/>
-		<rom name="Transport Tycoon (Europe) (En,Fr,De,Es,It) (Track 07).bin" size="41103552" crc="554771fb" sha1="3d812fe5e9ce422b8c9b5da5934c2294870822ab"/>
-		<rom name="Transport Tycoon (Europe) (En,Fr,De,Es,It) (Track 08).bin" size="40414416" crc="5482d255" sha1="4a03aa86c8b528d68996fdb32ddc0383450a7ba5"/>
-		<rom name="Transport Tycoon (Europe) (En,Fr,De,Es,It) (Track 09).bin" size="42178416" crc="1b533fa3" sha1="af1f32695ef3aa4e4469243c433309de6793db73"/>
-		<rom name="Transport Tycoon (Europe) (En,Fr,De,Es,It) (Track 10).bin" size="46353216" crc="a7be7787" sha1="65fb31bcc92b4fe84815ebe1735cf2cf93345bec"/>
-		<rom name="Transport Tycoon (Europe) (En,Fr,De,Es,It) (Track 11).bin" size="2126208" crc="2a8d265d" sha1="b6eae98e3e5c7521928b69d500e9eac4fd45a649"/>
-		-->
-		<description>Transport Tycoon (Europe)</description>
-		<year>1997</year>
-		<publisher>Ocean Software Limited</publisher>
-		<info name="developer" value="MicroProse"/>
-		<info name="language" value="English/French/German/Italian/Spanish"/>
-		<info name="release" value="19970915"/>
-		<info name="serial" value="SLES-00262"/>
-		<sharedfeat name="compatibility" value="PAL-E"/>
-		<part name="cdrom" interface="psx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="transport tycoon (europe)" sha1="a7cca2cf45ffcc2d381ab15e65255a89156b3d30" />
-			</diskarea>
-		</part>
-	</software>
-
 	<software name="tycorcd" cloneof="tycorc">
 		<!-- Original images (Redump)
 		<rom name="Tyco R-C - Assault with a Battery (USA) (Demo).cue" size="112" crc="7f2351e0" sha1="a424f3d09970ef5738ead698e88a7346cfaf581d"/>
@@ -37254,6 +37279,49 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<software name="3dlemmin_jp" cloneof="3dlemmin">
+		<!--
+		http://redump.org/disc/10867/
+		<rom name="3D Lemmings (Japan).cue" size="2718" crc="e2404409" sha1="45987f8afb3ea4396b8d8b6dc45cfb4178808d48"/>
+		<rom name="3D Lemmings (Japan) (Track 01).bin" size="192160752" crc="c67ef7af" sha1="f7359b9946dd97e974c37b1d18ea109f87928467"/>
+		<rom name="3D Lemmings (Japan) (Track 02).bin" size="17741136" crc="7bacf147" sha1="a96d42f61d3952bc7956433c453ffa34fdcc97b7"/>
+		<rom name="3D Lemmings (Japan) (Track 03).bin" size="15593760" crc="a998222f" sha1="387e15b378a75acaa16a126273e95c112e7d58c5"/>
+		<rom name="3D Lemmings (Japan) (Track 04).bin" size="16626288" crc="a6d9c21b" sha1="d8c681ea04e29f43f7a24a67d07ab12d384ffb60"/>
+		<rom name="3D Lemmings (Japan) (Track 05).bin" size="15798384" crc="9b0692b7" sha1="dcf195fd7b364a2a2c4e2023ae2159c938f970ee"/>
+		<rom name="3D Lemmings (Japan) (Track 06).bin" size="15311520" crc="5376fed3" sha1="288d1aaa5e2af517178feda3adcf4179e0b7d978"/>
+		<rom name="3D Lemmings (Japan) (Track 07).bin" size="14669424" crc="817c1e4b" sha1="2d81f0fa59c47fdae024249cbe7e1764d6a00e36"/>
+		<rom name="3D Lemmings (Japan) (Track 08).bin" size="14982240" crc="29a46a79" sha1="a75aa456140bf1572b9344822a81368fd97bf879"/>
+		<rom name="3D Lemmings (Japan) (Track 09).bin" size="15327984" crc="ed9b1ae8" sha1="0e1087c49fb61d2d1bca61667e81dbeb871cfbf4"/>
+		<rom name="3D Lemmings (Japan) (Track 10).bin" size="15960672" crc="ee48037e" sha1="235b6e2090135866cb30dc3bbf209089be3556cb"/>
+		<rom name="3D Lemmings (Japan) (Track 11).bin" size="18794832" crc="a31147db" sha1="8281f5a9429e73288c3e8dfbc2b35348bd5ed6bc"/>
+		<rom name="3D Lemmings (Japan) (Track 12).bin" size="18366768" crc="adb10891" sha1="fe1571f0a692baa43edf2f4bb39d214951922685"/>
+		<rom name="3D Lemmings (Japan) (Track 13).bin" size="14596512" crc="d920f2ed" sha1="80862a1597da82c7590e2d1f9652c576202f0369"/>
+		<rom name="3D Lemmings (Japan) (Track 14).bin" size="14787024" crc="d33bef1b" sha1="fd3ee97ff11b21fe020255b2640f393fc1ee8b43"/>
+		<rom name="3D Lemmings (Japan) (Track 15).bin" size="17148432" crc="8ce16106" sha1="ce0d0d81334156cdd6cf7fa7b7469e1c7e04aea2"/>
+		<rom name="3D Lemmings (Japan) (Track 16).bin" size="15840720" crc="9dbb8470" sha1="93b23c4a4199d81a9098bcb975949ab2c23b8496"/>
+		<rom name="3D Lemmings (Japan) (Track 17).bin" size="15492624" crc="a0b90757" sha1="bddbaea5766784cb8e7b23d6ee005a525ad70e5d"/>
+		<rom name="3D Lemmings (Japan) (Track 18).bin" size="15036336" crc="d2f88b4f" sha1="53f18dd471d5ad59f66aba4c039edfcb2d971f25"/>
+		<rom name="3D Lemmings (Japan) (Track 19).bin" size="15647856" crc="ef63cef4" sha1="65b78e3fd2ff621afa78b9b23d0da86a5ad18796"/>
+		<rom name="3D Lemmings (Japan) (Track 20).bin" size="15069264" crc="9db75cf2" sha1="f9b62c22012413bc3ff9c4ed91e103a48c820948"/>
+		<rom name="3D Lemmings (Japan) (Track 21).bin" size="15375024" crc="ae7ef886" sha1="5ebc5d291c8fdba624e9f973cf9e2abd75114ef9"/>
+		<rom name="3D Lemmings (Japan) (Track 22).bin" size="12792528" crc="266c2120" sha1="c4b153fcacca362886c3f503f539cc8204f03ee8"/>
+		<rom name="3D Lemmings (Japan) (Track 23).bin" size="11089680" crc="3402228c" sha1="9057a5bd1a656e2fa8afc8b2d7ef216b218ca74a"/>
+		<rom name="3D Lemmings (Japan) (Track 24).bin" size="33908784" crc="857edda8" sha1="28a06c34d53442f736fed283c086340d7c56321e"/>
+		-->
+		<description>3D Lemmings (Japan)</description>
+		<year>1996</year>
+		<publisher>Psygnosis</publisher>
+		<info name="developer" value="Clockwork Games" />
+		<info name="language" value="English" />
+		<info name="serial" value="SIPS 60002"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="3D Lemmings (Japan)" sha1="b2c3b7d108ee21d3e3e5883b487365c62ed25361"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="aressh4" cloneof="a4evolgl">
 		<!--
 		redump.org/disc/8493
@@ -37324,6 +37392,45 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="Actua Golf (Japan)" sha1="6e74c663af2d33f71ad08b686ebb90663554b9a9"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="cheesy_jp" cloneof="cheesy">
+		<!--
+		http://redump.org/disc/23696/
+		<rom name="Cheesy (Japan).cue" size="2462" crc="b05983db" sha1="06f9f01c529a544743932119b009361c2782eb6b"/>
+		<rom name="Cheesy (Japan) (Track 01).bin" size="123583488" crc="25c7dfd9" sha1="d6cd42f7a3b23797380e098ba2106ce63746cb17"/>
+		<rom name="Cheesy (Japan) (Track 02).bin" size="48201888" crc="12a2b3fa" sha1="de96feb091ef6194d0e71b5c2821860c0f223094"/>
+		<rom name="Cheesy (Japan) (Track 03).bin" size="23988048" crc="f599934b" sha1="b5d80811e7f9ca8d328f09223a8ce02e1a5426bf"/>
+		<rom name="Cheesy (Japan) (Track 04).bin" size="33233760" crc="29ff8e58" sha1="3ed95b4cc6665847ad3710e2610f6ca562d72a6d"/>
+		<rom name="Cheesy (Japan) (Track 05).bin" size="26521152" crc="58137ecc" sha1="d49a59d282f0a6283ce1b993775aee4d718eab9d"/>
+		<rom name="Cheesy (Japan) (Track 06).bin" size="13855632" crc="f97816d5" sha1="1b16bf8ed08d16c27d8153114827fb09a70541e1"/>
+		<rom name="Cheesy (Japan) (Track 07).bin" size="48872208" crc="fcb13505" sha1="975afd5604c32336a44755ba2e7a251ac1ed0bc7"/>
+		<rom name="Cheesy (Japan) (Track 08).bin" size="19952016" crc="d1e10ce1" sha1="ed97a5217d9083615a245c4ae3b5c6842b9d5af9"/>
+		<rom name="Cheesy (Japan) (Track 09).bin" size="21426720" crc="9c79b80b" sha1="cea109fc53ed3c01075d2399fa6f1e468f389d8c"/>
+		<rom name="Cheesy (Japan) (Track 10).bin" size="14020272" crc="5b95f932" sha1="df54df9fa2344a83e955dacf4e8f5cc231b8a97c"/>
+		<rom name="Cheesy (Japan) (Track 11).bin" size="12463248" crc="114b0719" sha1="7e68611e2c7858cfe26d29266ab3d1b41641a298"/>
+		<rom name="Cheesy (Japan) (Track 12).bin" size="44097648" crc="d16dbe0b" sha1="f0f41a3f3330de5902b21c41eea95009778eb3bd"/>
+		<rom name="Cheesy (Japan) (Track 13).bin" size="30477216" crc="5fc1335d" sha1="a54f4080f1b4a3e3b92a4f0dd90a404ee3149fa7"/>
+		<rom name="Cheesy (Japan) (Track 14).bin" size="15739584" crc="f24073ed" sha1="2d9e9b058d773b29ac09330b47bd33e50d3e6304"/>
+		<rom name="Cheesy (Japan) (Track 15).bin" size="17289552" crc="a41707e2" sha1="1be05ff317b931ac7022ee9d990dc909995cc3f6"/>
+		<rom name="Cheesy (Japan) (Track 16).bin" size="17484768" crc="ea9ef323" sha1="379b5d5a8a81a8a792329efd16abfdcd794cade7"/>
+		<rom name="Cheesy (Japan) (Track 17).bin" size="18180960" crc="f5469959" sha1="d930350e918f65b0204bbb7e513500a1c090214c"/>
+		<rom name="Cheesy (Japan) (Track 18).bin" size="16409904" crc="ba4eb43d" sha1="1b6629730b6d503054796ec9c85b8fd1ab4da8c1"/>
+		<rom name="Cheesy (Japan) (Track 19).bin" size="21349104" crc="52ec4cc9" sha1="852f8f04b74e0858a976fe555edac11a42c691d1"/>
+		<rom name="Cheesy (Japan) (Track 20).bin" size="55121472" crc="0bb5ee7d" sha1="76b1878250676aeb823bc9b476e8c195e94efe60"/>
+		-->
+		<description>Cheesy (Japan)</description>
+		<year>1997</year>
+		<publisher>Jaleco Entertainment</publisher>
+		<info name="developer" value="Ocean" />
+		<info name="language" value="Japanese" />
+		<info name="serial" value="SLPS 00893"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Cheesy (Japan)" sha1="8ab25d368352d085cae44125575e473403fa7554"/>
 			</diskarea>
 		</part>
 	</software>
@@ -59763,6 +59870,191 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<software name="2xtreme">
+		<!--
+		http://redump.org/disc/504/
+		<rom name="2Xtreme (Europe).cue" size="862" crc="4211e6e3" sha1="35b196dfe7cc8b15f22db1474382f9ed43b535b9"/>
+		<rom name="2Xtreme (Europe) (Track 1).bin" size="45511200" crc="f0cfee6d" sha1="cca776ddb1b0142846befd9d5565a43af0ab2197"/>
+		<rom name="2Xtreme (Europe) (Track 2).bin" size="59239824" crc="62b16b5d" sha1="c615beaa8e4aab515aa2473b2d1e4a6482a6ca62"/>
+		<rom name="2Xtreme (Europe) (Track 3).bin" size="80473680" crc="129b5977" sha1="ee55f9f8d332805d1a42bfb97ec9e7e4f3c102d1"/>
+		<rom name="2Xtreme (Europe) (Track 4).bin" size="76818672" crc="1ba44c84" sha1="19adda1a8e2021dfc4a0b94d714016989348ea08"/>
+		<rom name="2Xtreme (Europe) (Track 5).bin" size="65345616" crc="5490ecbc" sha1="8a449968494f1dd88399256e08d0bc8001f435c1"/>
+		<rom name="2Xtreme (Europe) (Track 6).bin" size="61152000" crc="2a432ca6" sha1="bab1fc47b782be10e76eb49ba5689a19e2cebca4"/>
+		<rom name="2Xtreme (Europe) (Track 7).bin" size="76776336" crc="73d57534" sha1="5257a96d6b864d1ff11a3a26cafab6f6827ee78b"/>
+		<rom name="2Xtreme (Europe) (Track 8).bin" size="76776336" crc="73d57534" sha1="5257a96d6b864d1ff11a3a26cafab6f6827ee78b"/>
+		-->
+		<description>2Xtreme (Europe)</description>
+		<year>1997</year>
+		<publisher>Sony Computer Entertainment</publisher>
+		<info name="developer" value="Sony"/>
+		<info name="language" value="English" />
+		<info name="serial" value="SCES-00400"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="2Xtreme (Europe)" sha1="9db4941bc3c8fc43022a4b6f992f9245ce51509a"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="3dlemmin">
+		<!--
+		http://redump.org/disc/1127/
+		<rom name="3D Lemmings (Europe).cue" size="2742" crc="51c41b34" sha1="28327fb2e596ffeff96db17948b5e3463bf7bf08"/>
+		<rom name="3D Lemmings (Europe) (Track 01).bin" size="191979648" crc="d01f4b54" sha1="4b650f874c19a5526700c8fcfb254947adca0b7a"/>
+		<rom name="3D Lemmings (Europe) (Track 02).bin" size="17741136" crc="7bacf147" sha1="a96d42f61d3952bc7956433c453ffa34fdcc97b7"/>
+		<rom name="3D Lemmings (Europe) (Track 03).bin" size="15593760" crc="a998222f" sha1="387e15b378a75acaa16a126273e95c112e7d58c5"/>
+		<rom name="3D Lemmings (Europe) (Track 04).bin" size="16626288" crc="a6d9c21b" sha1="d8c681ea04e29f43f7a24a67d07ab12d384ffb60"/>
+		<rom name="3D Lemmings (Europe) (Track 05).bin" size="15798384" crc="9b0692b7" sha1="dcf195fd7b364a2a2c4e2023ae2159c938f970ee"/>
+		<rom name="3D Lemmings (Europe) (Track 06).bin" size="15311520" crc="5376fed3" sha1="288d1aaa5e2af517178feda3adcf4179e0b7d978"/>
+		<rom name="3D Lemmings (Europe) (Track 07).bin" size="14669424" crc="817c1e4b" sha1="2d81f0fa59c47fdae024249cbe7e1764d6a00e36"/>
+		<rom name="3D Lemmings (Europe) (Track 08).bin" size="14982240" crc="29a46a79" sha1="a75aa456140bf1572b9344822a81368fd97bf879"/>
+		<rom name="3D Lemmings (Europe) (Track 09).bin" size="15327984" crc="ed9b1ae8" sha1="0e1087c49fb61d2d1bca61667e81dbeb871cfbf4"/>
+		<rom name="3D Lemmings (Europe) (Track 10).bin" size="15960672" crc="ee48037e" sha1="235b6e2090135866cb30dc3bbf209089be3556cb"/>
+		<rom name="3D Lemmings (Europe) (Track 11).bin" size="18794832" crc="a31147db" sha1="8281f5a9429e73288c3e8dfbc2b35348bd5ed6bc"/>
+		<rom name="3D Lemmings (Europe) (Track 12).bin" size="18366768" crc="adb10891" sha1="fe1571f0a692baa43edf2f4bb39d214951922685"/>
+		<rom name="3D Lemmings (Europe) (Track 13).bin" size="14596512" crc="d920f2ed" sha1="80862a1597da82c7590e2d1f9652c576202f0369"/>
+		<rom name="3D Lemmings (Europe) (Track 14).bin" size="14787024" crc="d33bef1b" sha1="fd3ee97ff11b21fe020255b2640f393fc1ee8b43"/>
+		<rom name="3D Lemmings (Europe) (Track 15).bin" size="17148432" crc="8ce16106" sha1="ce0d0d81334156cdd6cf7fa7b7469e1c7e04aea2"/>
+		<rom name="3D Lemmings (Europe) (Track 16).bin" size="15840720" crc="9dbb8470" sha1="93b23c4a4199d81a9098bcb975949ab2c23b8496"/>
+		<rom name="3D Lemmings (Europe) (Track 17).bin" size="15492624" crc="a0b90757" sha1="bddbaea5766784cb8e7b23d6ee005a525ad70e5d"/>
+		<rom name="3D Lemmings (Europe) (Track 18).bin" size="15036336" crc="d2f88b4f" sha1="53f18dd471d5ad59f66aba4c039edfcb2d971f25"/>
+		<rom name="3D Lemmings (Europe) (Track 19).bin" size="15647856" crc="ef63cef4" sha1="65b78e3fd2ff621afa78b9b23d0da86a5ad18796"/>
+		<rom name="3D Lemmings (Europe) (Track 20).bin" size="15069264" crc="9db75cf2" sha1="f9b62c22012413bc3ff9c4ed91e103a48c820948"/>
+		<rom name="3D Lemmings (Europe) (Track 21).bin" size="15375024" crc="ae7ef886" sha1="5ebc5d291c8fdba624e9f973cf9e2abd75114ef9"/>
+		<rom name="3D Lemmings (Europe) (Track 22).bin" size="12792528" crc="266c2120" sha1="c4b153fcacca362886c3f503f539cc8204f03ee8"/>
+		<rom name="3D Lemmings (Europe) (Track 23).bin" size="11089680" crc="3402228c" sha1="9057a5bd1a656e2fa8afc8b2d7ef216b218ca74a"/>
+		<rom name="3D Lemmings (Europe) (Track 24).bin" size="11089680" crc="3402228c" sha1="9057a5bd1a656e2fa8afc8b2d7ef216b218ca74a"/>
+		-->
+		<description>3D Lemmings (Europe)</description>
+		<year>1995</year>
+		<publisher>Psygnosis</publisher>
+		<info name="developer" value="Clockwork Games" />
+		<info name="language" value="English" />
+		<info name="serial" value="SCES-00009"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="3D Lemmings (Europe)" sha1="3df567cf15ae0cbdb065376a7b8dc27bf6a51880"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="442soccr">
+		<!--
+		http://redump.org/disc/26612/
+		<rom name="4-4-2 Soccer (Europe) (En,Fr,De,Es).cue" size="1802" crc="66d6bc0d" sha1="aee918fb7a54ca358f4021b817637d2c2348ac2b"/>
+		<rom name="4-4-2 Soccer (Europe) (En,Fr,De,Es) (Track 01).bin" size="18846576" crc="f80f364c" sha1="c51ecc78eb1bc377ea20d16ecff5aa7542a016d8"/>
+		<rom name="4-4-2 Soccer (Europe) (En,Fr,De,Es) (Track 02).bin" size="30164400" crc="5d496b28" sha1="2a618624fa812be29120fe22c5e2c72abde9cf74"/>
+		<rom name="4-4-2 Soccer (Europe) (En,Fr,De,Es) (Track 03).bin" size="10464048" crc="f71c03c5" sha1="82dc9c7a5262b138d1ea6233231d7585cb15df9e"/>
+		<rom name="4-4-2 Soccer (Europe) (En,Fr,De,Es) (Track 04).bin" size="22685040" crc="fe680473" sha1="0923efa57897402ee94c7535f569b08f796f9b40"/>
+		<rom name="4-4-2 Soccer (Europe) (En,Fr,De,Es) (Track 05).bin" size="21436128" crc="c654b4c8" sha1="7fb67ab5d2f060d4b3ac20f65ba2d7da2e6edc76"/>
+		<rom name="4-4-2 Soccer (Europe) (En,Fr,De,Es) (Track 06).bin" size="24907680" crc="0858e3b7" sha1="2bdc7f209db5f9295f96c727a54be0b7fc3b84cd"/>
+		<rom name="4-4-2 Soccer (Europe) (En,Fr,De,Es) (Track 07).bin" size="15709008" crc="bd38bdef" sha1="afe7852732811e0e1c1ba78f1c365f23ab316c66"/>
+		<rom name="4-4-2 Soccer (Europe) (En,Fr,De,Es) (Track 08).bin" size="5063856" crc="0451acba" sha1="f434bcf8ddebc27f8da334826a3bf9dc22357543"/>
+		<rom name="4-4-2 Soccer (Europe) (En,Fr,De,Es) (Track 09).bin" size="11792928" crc="7795b29c" sha1="77b511fab22e701d096f6ceec3a6b188d57404cc"/>
+		<rom name="4-4-2 Soccer (Europe) (En,Fr,De,Es) (Track 10).bin" size="4631088" crc="8908ea9d" sha1="f497522fdf182991b7cb2bf5231d5f1ee0dfadeb"/>
+		<rom name="4-4-2 Soccer (Europe) (En,Fr,De,Es) (Track 11).bin" size="33219648" crc="55c88f25" sha1="47b3e9893e45e7928ce3834cabb700036e8548e1"/>
+		<rom name="4-4-2 Soccer (Europe) (En,Fr,De,Es) (Track 12).bin" size="5882352" crc="d01bf7b5" sha1="bce99580a35140e5e5ac2c5b29b14934f87edf48"/>
+		<rom name="4-4-2 Soccer (Europe) (En,Fr,De,Es) (Track 13).bin" size="5169696" crc="16c4eda7" sha1="e8a5d9c00e1edfc221ba12aaf33c337b4425d41d"/>
+		<rom name="4-4-2 Soccer (Europe) (En,Fr,De,Es) (Track 14).bin" size="33219648" crc="55c88f25" sha1="47b3e9893e45e7928ce3834cabb700036e8548e1"/>
+		-->
+		<description>4-4-2 Soccer (Europe)</description>
+		<year>1997</year>
+		<publisher>Virgin Interactive</publisher>
+		<info name="developer" value="Arc Developments" />
+		<info name="language" value="English/French/German/Spanish" />
+		<info name="serial" value="SLES-00095"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="4-4-2 Soccer (Europe) (En,Fr,De,Es)" sha1="993a76631ea70150f31b6dfb0d54c148438f0700"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="40winks">
+		<!--
+		http://redump.org/disc/6859/
+		<rom name="40 Winks (Europe).cue" size="83" crc="29f57347" sha1="4cd2841e565a42c73d4fc00b736c1d2cc8ebd7a6"/>
+		<rom name="40 Winks (Europe).bin" size="551478144" crc="fdcde564" sha1="43fa48364b0693a4b6144b11b010cc80cc5af2c4"/>
+		-->
+		<description>40 Winks (Europe)</description>
+		<year>1999</year>
+		<publisher>GT Interactive</publisher>
+		<info name="alt_title" value="40 Winks: Conquer Your Dream" />
+		<info name="developer" value="Eurocom Entertainment" />
+		<info name="language" value="English" />
+		<info name="serial" value="SLES-01937"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="40 Winks (Europe)" sha1="65f02d58038b84a55f3e00dbc219bd45f827749d"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="40winks_d" cloneof="40winks">
+		<!--
+		http://redump.org/disc/45283/
+		<rom name="40 Winks (Europe) (Demo).cue" size="90" crc="b254247f" sha1="13baf191b3e859aeec99558a7e821f58b82fbddf"/>
+		<rom name="40 Winks (Europe) (Demo).bin" size="201604032" crc="284dcd3a" sha1="8094ce1df453de43b859a75ab443aff77451f527"/>
+		-->
+		<description>40 Winks (Europe, demo)</description>
+		<year>1999</year>
+		<publisher>GT Interactive</publisher>
+		<info name="developer" value="Eurocom Entertainment" />
+		<info name="language" value="English" />
+		<info name="serial" value="SLED-02435"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="40 Winks (Europe) (Demo)" sha1="035b0c349297d3b18b03bde0fc960393801a7b76"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="40winks_it" cloneof="40winks">
+		<!--
+		http://redump.org/disc/28334/
+		<rom name="40 Winks (Italy).cue" size="82" crc="8d5e56a7" sha1="23978daf31ac2a0dd20e57f18d8d80e14ee281bb"/>
+		<rom name="40 Winks (Italy).bin" size="551344080" crc="677b7ea9" sha1="70380215dd02ae68cdff88ee29738771f57d0207"/>
+		-->
+		<description>40 Winks (Italy)</description>
+		<year>1999</year>
+		<publisher>GT Interactive</publisher>
+		<info name="alt_title" value="40 Winks: Con Ruff e Tumble" />
+		<info name="developer" value="Eurocom Entertainment" />
+		<info name="language" value="Italian" />
+		<info name="serial" value="SLES-01940"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="40 Winks (Italy)" sha1="cb637215d5fffcd46d1ba91aadc26c4e998c50aa"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="40winks_es" cloneof="40winks">
+		<!--
+		http://redump.org/disc/25544/
+		<rom name="40 Winks (Spain).cue" size="82" crc="d01aa77f" sha1="b11bb31d90d22571e311edc270b4d3044540abe4"/>
+		<rom name="40 Winks (Spain).bin" size="551268816" crc="815a014f" sha1="eac587a040ea4db03772bade7ad4a85ab81fd039"/>
+		-->
+		<description>40 Winks (Spain)</description>
+		<year>1999</year>
+		<publisher>GT Interactive</publisher>
+		<info name="developer" value="Eurocom Entertainment" />
+		<info name="language" value="Spanish" />
+		<info name="serial" value="SLES-01941"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="40 Winks (Spain)" sha1="d7a615aadaecc882975b270a9cbad64987e1cfcc"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="actgolf">
 		<!--
 		redump.org/disc/26887
@@ -59941,6 +60233,45 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 			<feature name="part_id" value="Disc 2 of 2"/>
 			<diskarea name="cdrom">
 				<disk name="chase the express (europe) (disc 2)" sha1="89da12c05d32872c25292527b830228ca25c34f6"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="cheesy">
+		<!--
+		http://redump.org/disc/27322/
+		<rom name="Cheesy (Europe) (En,Fr).cue" size="2342" crc="788ddfa4" sha1="1624d915936a55499d57548a97938db7b8d78e67"/>
+		<rom name="Cheesy (Europe) (En,Fr) (Track 01).bin" size="109095168" crc="50078ebd" sha1="8e2f9f1f97e7962efc7179f33198d0cb274a4963"/>
+		<rom name="Cheesy (Europe) (En,Fr) (Track 02).bin" size="48201888" crc="12a2b3fa" sha1="de96feb091ef6194d0e71b5c2821860c0f223094"/>
+		<rom name="Cheesy (Europe) (En,Fr) (Track 03).bin" size="23988048" crc="f599934b" sha1="b5d80811e7f9ca8d328f09223a8ce02e1a5426bf"/>
+		<rom name="Cheesy (Europe) (En,Fr) (Track 04).bin" size="33233760" crc="29ff8e58" sha1="3ed95b4cc6665847ad3710e2610f6ca562d72a6d"/>
+		<rom name="Cheesy (Europe) (En,Fr) (Track 05).bin" size="26521152" crc="58137ecc" sha1="d49a59d282f0a6283ce1b993775aee4d718eab9d"/>
+		<rom name="Cheesy (Europe) (En,Fr) (Track 06).bin" size="13855632" crc="f97816d5" sha1="1b16bf8ed08d16c27d8153114827fb09a70541e1"/>
+		<rom name="Cheesy (Europe) (En,Fr) (Track 07).bin" size="48872208" crc="fcb13505" sha1="975afd5604c32336a44755ba2e7a251ac1ed0bc7"/>
+		<rom name="Cheesy (Europe) (En,Fr) (Track 08).bin" size="19952016" crc="d1e10ce1" sha1="ed97a5217d9083615a245c4ae3b5c6842b9d5af9"/>
+		<rom name="Cheesy (Europe) (En,Fr) (Track 09).bin" size="21426720" crc="9c79b80b" sha1="cea109fc53ed3c01075d2399fa6f1e468f389d8c"/>
+		<rom name="Cheesy (Europe) (En,Fr) (Track 10).bin" size="14020272" crc="5b95f932" sha1="df54df9fa2344a83e955dacf4e8f5cc231b8a97c"/>
+		<rom name="Cheesy (Europe) (En,Fr) (Track 11).bin" size="12463248" crc="114b0719" sha1="7e68611e2c7858cfe26d29266ab3d1b41641a298"/>
+		<rom name="Cheesy (Europe) (En,Fr) (Track 12).bin" size="44097648" crc="d16dbe0b" sha1="f0f41a3f3330de5902b21c41eea95009778eb3bd"/>
+		<rom name="Cheesy (Europe) (En,Fr) (Track 13).bin" size="30477216" crc="5fc1335d" sha1="a54f4080f1b4a3e3b92a4f0dd90a404ee3149fa7"/>
+		<rom name="Cheesy (Europe) (En,Fr) (Track 14).bin" size="15739584" crc="f24073ed" sha1="2d9e9b058d773b29ac09330b47bd33e50d3e6304"/>
+		<rom name="Cheesy (Europe) (En,Fr) (Track 15).bin" size="17289552" crc="a41707e2" sha1="1be05ff317b931ac7022ee9d990dc909995cc3f6"/>
+		<rom name="Cheesy (Europe) (En,Fr) (Track 16).bin" size="17484768" crc="ea9ef323" sha1="379b5d5a8a81a8a792329efd16abfdcd794cade7"/>
+		<rom name="Cheesy (Europe) (En,Fr) (Track 17).bin" size="18180960" crc="f5469959" sha1="d930350e918f65b0204bbb7e513500a1c090214c"/>
+		<rom name="Cheesy (Europe) (En,Fr) (Track 18).bin" size="16409904" crc="ba4eb43d" sha1="1b6629730b6d503054796ec9c85b8fd1ab4da8c1"/>
+		<rom name="Cheesy (Europe) (En,Fr) (Track 19).bin" size="21349104" crc="52ec4cc9" sha1="852f8f04b74e0858a976fe555edac11a42c691d1"/>
+		<rom name="Cheesy (Europe) (En,Fr) (Track 20).bin" size="55121472" crc="0bb5ee7d" sha1="76b1878250676aeb823bc9b476e8c195e94efe60"/>
+		-->
+		<description>Cheesy (Europe)</description>
+		<year>1996</year>
+		<publisher>Ocean</publisher>
+		<info name="developer" value="Ocean" />
+		<info name="language" value="English/French" />
+		<info name="serial" value="SLES-00053"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Cheesy (Europe) (En,Fr)" sha1="41d63450ba603039d345c3462888ebb967588bd4"/>
 			</diskarea>
 		</part>
 	</software>
@@ -61074,6 +61405,37 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="tomb raider - the last revelation (europe, australia)" sha1="5e2cc704652b42edcb77c96576bc96dbb2bcb282"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ttycoon">
+		<!--
+		http://redump.org/disc/26603/
+		<rom name="Transport Tycoon (EU).cue" size="1489" crc="c0d4caef" sha1="c5ad4f1b1b9e23fd775c76bcc993e230b40b0485"/>
+		<rom name="Transport Tycoon (Europe) (En,Fr,De,Es,It) (Track 01).bin" size="132641040" crc="0e968d6b" sha1="9c79ebcac1d29701c15b2c9fd16564c5089d212e"/>
+		<rom name="Transport Tycoon (Europe) (En,Fr,De,Es,It) (Track 02).bin" size="42858144" crc="3233248e" sha1="571ac211fca70fdf95d8981688664217d889144e"/>
+		<rom name="Transport Tycoon (Europe) (En,Fr,De,Es,It) (Track 03).bin" size="43008672" crc="57aed47c" sha1="849e7b29f769060594407e6a727d0e0f0c088098"/>
+		<rom name="Transport Tycoon (Europe) (En,Fr,De,Es,It) (Track 04).bin" size="40470864" crc="d1000a47" sha1="d69f8fa48646b5d5e459f3100cfb8651617dd619"/>
+		<rom name="Transport Tycoon (Europe) (En,Fr,De,Es,It) (Track 05).bin" size="43262688" crc="84cba52d" sha1="dd05eb6fcf5a453b25452cbb6645e76884922019"/>
+		<rom name="Transport Tycoon (Europe) (En,Fr,De,Es,It) (Track 06).bin" size="44382240" crc="1321fedb" sha1="4871a6f90709e029f82615c89a9b50c3b415589d"/>
+		<rom name="Transport Tycoon (Europe) (En,Fr,De,Es,It) (Track 07).bin" size="41103552" crc="554771fb" sha1="3d812fe5e9ce422b8c9b5da5934c2294870822ab"/>
+		<rom name="Transport Tycoon (Europe) (En,Fr,De,Es,It) (Track 08).bin" size="40414416" crc="5482d255" sha1="4a03aa86c8b528d68996fdb32ddc0383450a7ba5"/>
+		<rom name="Transport Tycoon (Europe) (En,Fr,De,Es,It) (Track 09).bin" size="42178416" crc="1b533fa3" sha1="af1f32695ef3aa4e4469243c433309de6793db73"/>
+		<rom name="Transport Tycoon (Europe) (En,Fr,De,Es,It) (Track 10).bin" size="46353216" crc="a7be7787" sha1="65fb31bcc92b4fe84815ebe1735cf2cf93345bec"/>
+		<rom name="Transport Tycoon (Europe) (En,Fr,De,Es,It) (Track 11).bin" size="2126208" crc="2a8d265d" sha1="b6eae98e3e5c7521928b69d500e9eac4fd45a649"/>
+		-->
+		<description>Transport Tycoon (Europe)</description>
+		<year>1997</year>
+		<publisher>Ocean</publisher>
+		<info name="developer" value="MicroProse"/>
+		<info name="language" value="English/French/German/Italian/Spanish"/>
+		<info name="release" value="19970915"/>
+		<info name="serial" value="SLES-00262"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="transport tycoon (europe)" sha1="a7cca2cf45ffcc2d381ab15e65255a89156b3d30" />
 			</diskarea>
 		</part>
 	</software>
