@@ -468,27 +468,6 @@ mpc60
 @source:akai/mpc3000.cpp
 mpc3000
 
-@source:alba/albazg.cpp
-hana6pt2
-yumefuda
-
-@source:alba/hanadojo.cpp
-hanadojo
-hanadojoa
-
-@source:alba/rmhaihai.cpp
-rmhaihai
-rmhaihai2
-rmhaihaibl
-rmhaihib
-rmhaijin
-rmhaisei
-themj
-themj2
-
-@source:alba/vsmjtria.cpp
-vsmjtria
-
 @source:alesis/alesis.cpp
 hr16
 hr16b
@@ -41769,6 +41748,10 @@ prpht600
 @source:seta/albazc.cpp
 hanaroku
 
+@source:seta/albazg.cpp
+hana6pt2
+yumefuda
+
 @source:seta/champbwl.cpp
 champbwl
 champbwla
@@ -41789,6 +41772,10 @@ usclssic
 
 @source:seta/hanaawas.cpp
 hanaawas
+
+@source:seta/hanadojo.cpp
+hanadojo
+hanadojoa
 
 @source:seta/jclub2.cpp
 darkhors
@@ -41818,6 +41805,16 @@ yuka
 
 @source:seta/namcoeva.cpp
 hammerch
+
+@source:seta/rmhaihai.cpp
+rmhaihai
+rmhaihai2
+rmhaihaibl
+rmhaihib
+rmhaijin
+rmhaisei
+themj
+themj2
 
 @source:seta/seta.cpp
 atehate
@@ -41997,6 +41994,9 @@ vasara2a
 
 @source:seta/thedealr.cpp
 thedealr
+
+@source:seta/vsmjtria.cpp
+vsmjtria
 
 @source:sfrj/galaxy.cpp
 galaxy
