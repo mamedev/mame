@@ -366,7 +366,7 @@ public:
 	void metalb(machine_config &config);
 
 protected:
-	optional_device<tc0480scp_device> m_tc0480scp;
+	required_device<tc0480scp_device> m_tc0480scp;
 
 	DECLARE_VIDEO_START(deadconx);
 	DECLARE_VIDEO_START(footchmp);
