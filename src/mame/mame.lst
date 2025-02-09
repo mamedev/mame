@@ -530,6 +530,7 @@ mpc60
 mpc3000
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 @source:alba/albazg.cpp
 hana6pt2
@@ -553,6 +554,8 @@ themj2
 vsmjtria
 
 >>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
+=======
+>>>>>>> b6758ad3f61 (seta: move alba into seta folder)
 @source:alesis/alesis.cpp
 hr16
 hr16b
@@ -43963,6 +43966,10 @@ yumefuda
 =======
 >>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
+@source:seta/albazg.cpp
+hana6pt2
+yumefuda
+
 @source:seta/champbwl.cpp
 champbwl
 champbwla
@@ -43990,6 +43997,10 @@ hanadojo
 hanadojoa
 =======
 >>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
+
+@source:seta/hanadojo.cpp
+hanadojo
+hanadojoa
 
 @source:seta/jclub2.cpp
 darkhors
@@ -44020,6 +44031,16 @@ yuka
 @source:seta/namcoeva.cpp
 hammerch
 <<<<<<< HEAD
+
+@source:seta/rmhaihai.cpp
+rmhaihai
+rmhaihai2
+rmhaihaibl
+rmhaihib
+rmhaijin
+rmhaisei
+themj
+themj2
 
 @source:seta/rmhaihai.cpp
 rmhaihai
@@ -44307,6 +44328,9 @@ thedealr
 vsmjtria
 =======
 >>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
+
+@source:seta/vsmjtria.cpp
+vsmjtria
 
 @source:sfrj/galaxy.cpp
 galaxy

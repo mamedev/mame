@@ -14,7 +14,7 @@ I/O:    2x 8255, 4x 8-dip banks, 1x single dip switch (at position 11m)
 OSC:    20MHz
 
 Notes:
-- Loosely based off alba/rmhaihai.cpp.
+- Loosely based off seta/rmhaihai.cpp.
   Changes needed for merging both implementations seems too non-trivial to warrant a
   driver merge, basically just the video HW, the CRTC (448x224 clocked at 20 MHz?)
   and a few I/O bits looks similar, the odd screen size is also a thing in srmp2.cpp
