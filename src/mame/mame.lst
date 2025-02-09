@@ -46376,6 +46376,7 @@ tonton
 @source:sun/sun1.cpp
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 sun1
 =======
 multibox                        //
@@ -46383,6 +46384,8 @@ sun1                            //
 >>>>>>> 61c15042884 (New machines marked as NOT_WORKING)
 =======
 multibox
+=======
+>>>>>>> c2ccf4cf6ed (sun1: refactor into multibus cage/card)
 sun1
 >>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
