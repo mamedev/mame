@@ -1,55 +1,16 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<!--
-license:CC0-1.0
 
-This list contains the system software specific to the Amiga 3000:
-SuperKickstart disks, SCSI installation disks and AMIX
+<!--
+
+license: CC0-1.0
+
+This list contains images for the Amiga UNIX System V Release 4 (AMIX)
+
 -->
 
-<softwarelist name="amiga_a3000" description="Commodore Amiga 3000 System disks">
+<softwarelist name="amiga_amix" description="Commodore AMIX disks">
 
-	<!-- SuperKickstart -->
-
-	<software name="sk201">
-		<description>Kickstart 2.01</description>
-		<year>1990</year>
-		<publisher>Commodore</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Kickstart 2.01" />
-			<dataarea name="flop" size="901120">
-				<rom name="367245-03_kickstart.adf" size="901120" crc="79c58ce8" sha1="8e738fb5a9d293c8321cf5055c06f368d43a6e2b"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sk204">
-		<description>Kickstart 2.04</description>
-		<year>1991</year>
-		<publisher>Commodore</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Kickstart 2.04" />
-			<dataarea name="flop" size="901120">
-				<rom name="367245-06_kickstart.adf" size="901120" crc="87ad0c5b" sha1="922ec2776766a6568f3e2de37101c497067948e4"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- A3000 Installation disks -->
-
-	<software name="a3kin203">
-		<description>A3000 Install Disk 2.03</description>
-		<year>1991</year>
-		<publisher>Commodore</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="A3000 Install Disk 2.03" />
-			<dataarea name="flop" size="901120">
-				<rom name="335603-04_install.adf" size="901120" crc="9a3cc466" sha1="b12a225890a3957bb01dcbfba44c046c19e19c8f"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Amiga UNIX System V Release 4 -->
 	<!-- TODO: Part numbers -->
 
 	<software name="amix11">

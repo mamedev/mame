@@ -1804,8 +1804,6 @@ void a1000_state::a1000(machine_config &config)
 	ADDRESS_MAP_BANK(config, m_overlay).set_map(&a1000_state::a1000_overlay_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
 	ADDRESS_MAP_BANK(config, "bootrom").set_map(&a1000_state::a1000_bootrom_map).set_options(ENDIANNESS_BIG, 16, 19, 0x40000);
 	ADDRESS_MAP_BANK(config, m_chipset).set_map(&a1000_state::ocs_map).set_options(ENDIANNESS_BIG, 16, 9, 0x200);
-
-	SOFTWARE_LIST(config, "a1000_list").set_original("amiga_a1000");
 }
 
 void a1000_state::a1000n(machine_config &config)
@@ -2027,7 +2025,7 @@ void a3000_state::a3000(machine_config &config)
 	// TODO: zorro3 slots, super dmac, scsi
 
 	// software
-	SOFTWARE_LIST(config, "a3000_list").set_original("amiga_a3000");
+	SOFTWARE_LIST(config, "amix_list").set_original("amiga_amix");
 	SOFTWARE_LIST(config, "ecs_list").set_original("amigaecs_flop");
 }
 
