@@ -188,7 +188,7 @@ private:
 	void lcd_palette(palette_device &palette) const;
 
 	void write_acia_clock(int state);
-  void int_midi_w(u8 data);
+	void int_midi_w(u8 data);
 
 	required_device<mc68hc11a0_device> m_cpu;
 	required_region_ptr<u8> m_patterns;
@@ -282,7 +282,7 @@ void roland_proe_state::leds_w(u8 data)
 void roland_proe_state::bank_w(u8 data)
 {
 	m_rom_bank->set_entry(data >> 4);
-	m_ram_bank->set_entry(data & 0xf);
+	m_ram_bank->set_entry(data & 3);
 }
 
 // u8 roland_proe_state::patterns_r(offs_t offset)
@@ -339,7 +339,7 @@ void roland_proe_state::proe(machine_config &config)
 	m_acia->txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
 	m_acia->irq_handler().set_inputline(m_cpu, MC68HC11_XIRQ_LINE);
 
-  clock_device &acia_clock(CLOCK(config, "acia_clock", main_clock / 8));
+	clock_device &acia_clock(CLOCK(config, "acia_clock", main_clock / 8));
 	acia_clock.signal_handler().set(FUNC(roland_proe_state::write_acia_clock));
 }
 
