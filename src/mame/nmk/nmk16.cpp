@@ -7651,7 +7651,7 @@ ROM_START( airattcka )
 	ROM_LOAD( "82s147.uh6", 0x0000, 0x0200, CRC(ed0bd072) SHA1(66a6d435d8587c82ae96dd09c39ed5749fe00e24) )  // 82S147 - only half space used. A5 tied to GND
 ROM_END
 
-ROM_START( strahl )
+ROM_START( strahl ) // UPL 91074 PCB
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "strahl-02.ic82", 0x00000, 0x20000, CRC(e6709a0d) SHA1(ec5741f6a708ac2a6831fb65198d81dc7e6c5aea) )
 	ROM_LOAD16_BYTE( "strahl-01.ic83", 0x00001, 0x20000, CRC(bfd021cf) SHA1(fcf252c42a58e2f7e9982869931447ee8aa5baaa) )

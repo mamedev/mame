@@ -4004,6 +4004,31 @@ ROM_END
 
 ROM_START( cameltry )
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* 256k for 68000 code */
+	ROM_LOAD16_BYTE( "c38-11.ic10", 0x00000, 0x20000, CRC(be172da0) SHA1(e4915bf25832175591a014aa1abac5edae09380d) )
+	ROM_LOAD16_BYTE( "c38-13.ic11", 0x00001, 0x20000, CRC(2c6a6ef7) SHA1(04e969ac0e44f849cf244f773f20f2fef6ae7e51) )
+
+	ROM_REGION( 0x100000, "tc0100scn_1", ROMREGION_ERASEFF )
+	/* empty! */
+
+	ROM_REGION( 0x080000, "sprites", 0 )   /* OBJ */
+	ROM_LOAD( "c38-01.ic1", 0x00000, 0x80000, CRC(c170ff36) SHA1(6a19cc99847ed35ac8a8e9ba0e2e91bfac662203) )
+
+	ROM_REGION( 0x080000, "tc0280grd", 0 )   /* pivot gfx */
+	ROM_LOAD( "c38-02.ic27", 0x00000, 0x20000, CRC(1a11714b) SHA1(419f5ec37161fd6b4ca962768e720adf541271d5) )
+	/* this is on the PCB twice, probably one for each ROZ layer, we load it twice to make this clear */
+	ROM_LOAD( "c38-02.ic29", 0x00000, 0x20000, CRC(1a11714b) SHA1(419f5ec37161fd6b4ca962768e720adf541271d5) )
+
+	/* These are for a YM2610 */
+	ROM_REGION( 0x10000, "audiocpu", 0 )      /* sound cpu */
+	ROM_LOAD( "c38-08.ic25", 0x00000, 0x10000, CRC(7ff78873) SHA1(6574f1c707b8911fa957dd057e1cddc7a1cea99b) )
+
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
+	ROM_LOAD( "c38-03.ic2", 0x000000, 0x020000, CRC(59fa59a7) SHA1(161f11b96a47c8431c33e300f6a509bf804309af) )
+	/* no Delta-T samples */
+ROM_END
+
+ROM_START( cameltryu )
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* 256k for 68000 code */
 	ROM_LOAD16_BYTE( "c38-11", 0x00000, 0x20000, CRC(be172da0) SHA1(e4915bf25832175591a014aa1abac5edae09380d) )
 	ROM_LOAD16_BYTE( "c38-14", 0x00001, 0x20000, CRC(ffa430de) SHA1(a3cdb35151a92ddfa2090c1f8710500925e7ad0c) )
 
@@ -5616,7 +5641,8 @@ GAME( 1990, thundfox,   0,        thundfox,  thundfox,   taitof2_state, empty_in
 GAME( 1990, thundfoxu,  thundfox, thundfox,  thundfoxu,  taitof2_state, empty_init,    ROT0,   "Taito America Corporation", "Thunder Fox (US, rev 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, thundfoxj,  thundfox, thundfox,  thundfoxj,  taitof2_state, empty_init,    ROT0,   "Taito Corporation",         "Thunder Fox (Japan, rev 1)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, cameltry,   0,        cameltry,  cameltry,   taitof2_state, init_cameltry, ROT0,   "Taito America Corporation", "Cameltry (US, YM2610)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, cameltry,   0,        cameltry,  cameltry,   taitof2_state, init_cameltry, ROT0,   "Taito America Corporation", "Cameltry (World, YM2610)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, cameltryu,  cameltry, cameltry,  cameltry,   taitof2_state, init_cameltry, ROT0,   "Taito America Corporation", "Cameltry (US, YM2610)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, cameltryj,  cameltry, cameltry,  cameltryj,  taitof2_state, init_cameltry, ROT0,   "Taito Corporation",         "Cameltry (Japan, YM2610)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, cameltrya,  cameltry, cameltrya, cameltry,   taitof2_state, init_cameltry, ROT0,   "Taito America Corporation", "Cameltry (World, YM2203 + M6295)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, cameltryau, cameltry, cameltrya, cameltry,   taitof2_state, init_cameltry, ROT0,   "Taito America Corporation", "Cameltry (US, YM2203 + M6295)", MACHINE_SUPPORTS_SAVE )
