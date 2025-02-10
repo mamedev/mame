@@ -1125,7 +1125,7 @@ void mystwarr_state::dadandrn(machine_config &config)
 
 	m_k056832->set_tile_callback(FUNC(mystwarr_state::game5bpp_tile_callback));
 
-	m_k055673->set_sprite_callback(FUNC(mystwarr_state::gaiapols_sprite_callback));
+	m_k055673->set_sprite_callback(FUNC(mystwarr_state::mystwarr_sprite_callback));
 	m_k055673->set_config(K055673_LAYOUT_GX, -42, -22);
 }
 
