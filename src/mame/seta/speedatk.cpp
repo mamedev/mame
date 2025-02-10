@@ -9,7 +9,8 @@ Speed Attack! (c) 1984 Seta Kikaku Corp.
 driver by Pierpaolo Prazzoli & Angelo Salese, based on early work by David Haywood
 
 TODO:
- - Improve IOX device for daifugo (many hardwired reads);
+ - speedatk: Jack and King cards shouldn't have cyan border according to ref pics;
+ - daifugo: Improve IOX device (many hardwired reads);
  - It's possible that there is only one coin chute and not two, needs a real board to know
    more about it.
  - hanaren2, harashi: Everything. They seem to run on similar hardware, similar address maps, etc.
@@ -56,7 +57,7 @@ SW 5,6 : NOT USE
 SW 7   : FLIP SCREEN H:FLIP
 SW 8   : TEST MODE H:TEST
 
-   PARTS SIDE | SOLDIER SIDE
+   PARTS SIDE | SOLDER SIDE
   ----------------------------
       GND   | 1|    GND
       GND   | 2|    GND
