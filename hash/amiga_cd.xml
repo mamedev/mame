@@ -15,7 +15,7 @@ http://redump.org/discs/system/acd
 		<year>1998</year>
 		<publisher>Red Hat</publisher>
 		<notes><![CDATA[
-Requires a machine with 68020 (not EC) + FPU + MMU (A3000 or A4000)
+Requires a machine with 68020 (not EC variants) + FPU + MMU (A3000 or A4000)
 ]]></notes>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -33,6 +33,7 @@ Requires a machine with 68020 (not EC) + FPU + MMU (A3000 or A4000)
 		<notes><![CDATA[
 Requires an AGA machine with enough installed Fast RAM on it
 [Denise] pitch corruption during intro
+Uses [Denise] BPLCON3 SPRESx
 [Paula] volume gets incredibly loud during intro (verify)
 Not extensively tested
 ]]></notes>
@@ -59,6 +60,29 @@ Requires an ECS or AGA machine with enough installed Fast RAM on it
 		</part>
 	</software>
 
+	<software name="gunbee" supported="no">
+		<!-- http://redump.org/disc/41238/ -->
+		<description>Gunbee F-99: The Kidnapping of Lady Akiko (Europe)</description>
+		<year>1998</year>
+		<!-- APC &amp; TCP? -->
+		<publisher>&lt;coverdisk&gt;</publisher>
+		<notes><![CDATA[
+https://amr.abime.net/issue_273_contents
+[Paula] BGM ch. 0 and ch. 1 goes silent after first note, eventually leading to hang after intro (loops waiting for irqs)
+[Denise] heavy delay offsets during intro, flips FMODE between $000c and $000d
+]]></notes>
+		<!-- December '98 -->
+		<!-- TODO: comes packaged with a 2 CD edition -->
+		<info name="magazine" value="Amiga Format 117 - AFCD33" />
+		<info name="usage" value="CD drawer default position needs to scroll down" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="gunbee_f-99_-_the_kidnapping_of_lady_akiko_(europe)_(en,de)" sha1="123d4efea6a0587e47c3cf61fc2e0909737939b1"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="kangfu" supported="no">
 		<!-- "CD-32, A1200, A4000" on cover art -->
 		<description>Kang Fu</description>
@@ -66,7 +90,9 @@ Requires an ECS or AGA machine with enough installed Fast RAM on it
 		<publisher>GREat Effects Development (GREED)</publisher>
 		<notes><![CDATA[
 Plenty of [AGA] bugs
-CD32: unsupported [Akiko] close tray after CD32 BIOS plays back music, will otherwise throw "Out of Memory" afterwards.
+Uses [Denise] BPLCON3 SPRESx
+Has [CDROM] redbook tracks
+cd32: unsupported [Akiko] close tray after CD32 BIOS plays back music, will otherwise throw "Out of Memory" afterwards.
 ]]></notes>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -75,7 +101,97 @@ CD32: unsupported [Akiko] close tray after CD32 BIOS plays back music, will othe
 		</part>
 	</software>
 
+	<software name="pballdmg" supported="no">
+		<!-- http://redump.org/disc/16919/ -->
+		<description>Pinball Brain Damage (Europe)</description>
+		<year>1997</year>
+		<!-- Packaging Design: Epic Marketing -->
+		<publisher>APC &amp; TCP</publisher>
+		<notes><![CDATA[
+Intro and main menu use [Lisa] BPLCON3 SPRESx
+Optional [Lisa] SHRES mode in gameplay
+Very easy to ball stuck in table 2 (verify, https://forums.bannister.org/ubbthreads.php?ubb=showflat&Number=124163#Post124163)
+Editor and HD Install untested
+]]></notes>
+		<!-- TODO: verify assign BrainDamage: "Brain Damage:" before install as Erratum note -->
+		<info name="usage" value="CD drawer default position needs to scroll right" />
+		<info name="developer" value="Mind's Eye Entertainment"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="pinball_brain_damage_(europe)" sha1="883518fb03b69ec1460b22cbb57a52845b9324cd"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="wendetta" supported="no">
+		<!-- "A1200/A4000 CD32" on cover art -->
+		<!-- http://redump.org/disc/106519/ -->
+		<description>Wendetta 2175 (Europe)</description>
+		<year>1996</year>
+		<publisher>Skills</publisher>
+		<notes><![CDATA[
+[Lisa] Uses SPRESx for intro credits text
+[Lisa] heavy graphic corruptions in ship select and gameplay
+]]></notes>
+		<info name="developer" value="Vortex Design" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="wendetta_2175_(europe)" sha1="c7a4e4c9cc2acbe6b561bf2230c22529d6592e8c"/>
+			</diskarea>
+		</part>
+	</software>
+
 <!-- !Collections -->
+
+	<software name="17bitph4" supported="no">
+		<!-- http://redump.org/disc/20852/ -->
+		<description>17 Bit - Phase Four (Europe)</description>
+		<year>1994</year>
+		<publisher>Almathera</publisher>
+		<notes><![CDATA[
+Disks 2801-3351 of 17 Bit PD Library
+Requires stable [FDC] write
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="17_bit_-_phase_four_(europe)" sha1="1673a4027e1a581996c14b5d062610fffb92856e"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="17bit5th" supported="no">
+		<!-- http://redump.org/disc/20853/ -->
+		<description>17 Bit - The Fifth Dimension (Europe)</description>
+		<year>1995</year>
+		<!-- No publisher on CD covers, assume Almathera went bankrupt at this point -->
+		<publisher>17 Bit Software</publisher>
+		<notes><![CDATA[
+Disks 3352-3870 of 17 Bit PD Library
+Requires stable [FDC] write
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="17_bit_-_the_fifth_dimension_(europe)" sha1="a294d8426310f7fe46be156050958c5322d6aad2"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="17bitlv6" supported="no">
+		<!-- http://redump.org/disc/20854/ -->
+		<description>17 Bit - Level 6 (Europe)</description>
+		<!-- Year and publisher from info file -->
+		<year>1997</year>
+		<publisher>Epic Marketing / Quartz Public Domain</publisher>
+		<notes><![CDATA[
+Disks 3870-4567 of 17 Bit PD Library
+Requires stable [FDC] write
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="17_bit_-_level_6_(europe)" sha1="cd0d8bfc52861fd98eefe991343c9969b2ffa513"/>
+			</diskarea>
+		</part>
+	</software>
 
 	<software name="amigames" supported="partial">
 		<description>Aminet Games</description>

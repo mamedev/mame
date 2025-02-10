@@ -36,8 +36,8 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(ZORRO_RAINBOW2, bus::amiga::zorro::rainbow2_device, "zorro_rainbow2", "Rainbow II Framebuffer")
-DEFINE_DEVICE_TYPE(ZORRO_FRAMEMASTER, bus::amiga::zorro::framemaster_device, "zorro_framemaster", "FrameMaster Framebuffer")
+DEFINE_DEVICE_TYPE(AMIGA_RAINBOW2, bus::amiga::zorro::rainbow2_device, "amiga_rainbow2", "Rainbow II Framebuffer")
+DEFINE_DEVICE_TYPE(AMIGA_FRAMEMASTER, bus::amiga::zorro::framemaster_device, "amiga_framemaster", "FrameMaster Framebuffer")
 
 namespace bus::amiga::zorro {
 
@@ -51,12 +51,12 @@ rainbow2_device::rainbow2_device(const machine_config &mconfig, const char *tag,
 }
 
 rainbow2_device::rainbow2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	rainbow2_device(mconfig, tag, owner, clock, ZORRO_RAINBOW2, 2145)
+	rainbow2_device(mconfig, tag, owner, clock, AMIGA_RAINBOW2, 2145)
 {
 }
 
 framemaster_device::framemaster_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	rainbow2_device(mconfig, tag, owner, clock, ZORRO_FRAMEMASTER, 2092)
+	rainbow2_device(mconfig, tag, owner, clock, AMIGA_FRAMEMASTER, 2092)
 {
 }
 
@@ -180,22 +180,22 @@ void rainbow2_device::autoconfig_base_address(offs_t address)
 	LOG("-> installing rainbow2\n");
 
 	// stop responding to default autoconfig
-	m_slot->space().unmap_readwrite(0xe80000, 0xe8007f);
+	m_zorro->space().unmap_readwrite(0xe80000, 0xe8007f);
 
 	// video memory
-	m_slot->space().install_ram(address, address + 0x1fffff, m_vram.get());
+	m_zorro->space().install_ram(address, address + 0x1fffff, m_vram.get());
 
 	// control register
-	m_slot->space().install_write_handler(address + 0x1ffff8, address + 0x1ffff8,
+	m_zorro->space().install_write_handler(address + 0x1ffff8, address + 0x1ffff8,
 		emu::rw_delegate(*this, FUNC(rainbow2_device::control_w)));
 
 	// we're done
-	m_slot->cfgout_w(0);
+	m_zorro->cfgout_w(0);
 }
 
 void rainbow2_device::cfgin_w(int state)
 {
-	LOG("configin_w (%d)\n", state);
+	LOG("cfgin_w (%d)\n", state);
 
 	if (state == 0)
 	{
@@ -213,9 +213,9 @@ void rainbow2_device::cfgin_w(int state)
 		autoconfig_rom_vector(0x0000);
 
 		// install autoconfig handler
-		m_slot->space().install_readwrite_handler(0xe80000, 0xe8007f,
+		m_zorro->space().install_readwrite_handler(0xe80000, 0xe8007f,
 			read16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_read)),
-			write16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_write)), 0xffffffff);
+			write16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_write)), 0xffff);
 	}
 }
 

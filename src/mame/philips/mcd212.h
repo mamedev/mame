@@ -107,21 +107,21 @@ protected:
 		TCR_TA               = 0x00000f,    // Plane A
 		TCR_TB               = 0x000f00,    // Plane B
 		TCR_TB_SHIFT         = 8,
-		TCR_COND_1           = 0x0,         // Transparent if: Always (Plane Disabled)
-		TCR_COND_KEY_1       = 0x1,         // Transparent if: Color Key = True
-		TCR_COND_XLU_1       = 0x2,         // Transparent if: Transparency Bit = 1
-		TCR_COND_RF0_1       = 0x3,         // Transparent if: Region Flag 0 = True
-		TCR_COND_RF1_1       = 0x4,         // Transparent if: Region Flag 1 = True
-		TCR_COND_RF0KEY_1    = 0x5,         // Transparent if: Region Flag 0 = True || Color Key = True
-		TCR_COND_RF1KEY_1    = 0x6,         // Transparent if: Region Flag 1 = True || Color Key = True
+		TCR_ALWAYS           = 0x0,         // Transparent if: Always (Plane Disabled)
+		TCR_KEY              = 0x1,         // Transparent if: Color Key = True
+		TCR_RGB              = 0x2,         // Transparent if: Transparency Bit = 1 (RGB Only)
+		TCR_RF0              = 0x3,         // Transparent if: Region Flag 0 = True
+		TCR_RF1              = 0x4,         // Transparent if: Region Flag 1 = True
+		TCR_RF0_KEY1         = 0x5,         // Transparent if: Region Flag 0 = True || Color Key = True
+		TCR_RF1_KEY1         = 0x6,         // Transparent if: Region Flag 1 = True || Color Key = True
 		TCR_COND_UNUSED0     = 0x7,         // Unused
-		TCR_COND_0           = 0x8,         // Transparent if: Never (No Transparent Area)
-		TCR_COND_KEY_0       = 0x9,         // Transparent if: Color Key = False
-		TCR_COND_XLU_0       = 0xa,         // Transparent if: Transparency Bit = 0
-		TCR_COND_RF0_0       = 0xb,         // Transparent if: Region Flag 0 = False
-		TCR_COND_RF1_0       = 0xc,         // Transparent if: Region Flag 1 = False
-		TCR_COND_RF0KEY_0    = 0xd,         // Transparent if: Region Flag 0 = False && Color Key = False
-		TCR_COND_RF1KEY_0    = 0xe,         // Transparent if: Region Flag 1 = False && Color Key = False
+		TCR_NEVER            = 0x8,         // Transparent if: Never (No Transparent Area)
+		TCR_NOT_KEY          = 0x9,         // Transparent if: Color Key = False
+		TCR_NOT_RGB          = 0xa,         // Transparent if: Transparency Bit = 0 (RGB Only)
+		TCR_NOT_RF0          = 0xb,         // Transparent if: Region Flag 0 = False
+		TCR_NOT_RF1          = 0xc,         // Transparent if: Region Flag 1 = False
+		TCR_NOT_RF0_KEY      = 0xd,         // Transparent if: Region Flag 0 = False || Color Key = False
+		TCR_NOT_RF1_KEY      = 0xe,         // Transparent if: Region Flag 1 = False || Color Key = False
 		TCR_COND_UNUSED1     = 0xf,         // Unused
 		TCR_DISABLE_MX       = 0x800000,    // Mix disable
 
@@ -171,7 +171,7 @@ protected:
 
 		ICM_OFF              = 0x0,
 		ICM_CLUT8            = 0x1,
-		ICM_RGB555           = 0x2,
+		ICM_RGB555           = 0x1,
 		ICM_CLUT7            = 0x3,
 		ICM_CLUT77           = 0x4,
 		ICM_DYUV             = 0x5,

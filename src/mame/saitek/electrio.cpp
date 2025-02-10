@@ -423,8 +423,8 @@ ROM_START( mk12 )
 	ROM_IGNORE( 0x2000 ) // ignore factory test banks
 ROM_END
 
-#define rom_pchess rom_electrio
-#define rom_pplus rom_mk12
+#define rom_kpchess rom_electrio
+#define rom_kpplus rom_mk12
 
 } // anonymous namespace
 
@@ -436,8 +436,8 @@ ROM_END
 
 //    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT      CLASS           INIT        COMPANY, FULLNAME, FLAGS
 SYST( 1985, electrio,  0,        0,      electrio,  electrio,  electrio_state, empty_init, "SciSys / Heuristic Software", "Electronic Trio", MACHINE_SUPPORTS_SAVE )
-SYST( 1985, pchess,    electrio, 0,      pchess,    pchess,    electrio_state, empty_init, "SciSys / Heuristic Software", "Kasparov Pocket Chess", MACHINE_SUPPORTS_SAVE )
+SYST( 1985, kpchess,   electrio, 0,      pchess,    pchess,    electrio_state, empty_init, "SciSys / Heuristic Software", "Kasparov Pocket Chess", MACHINE_SUPPORTS_SAVE )
 SYST( 1988, pcheckers, electrio, 0,      pcheckers, pcheckers, electrio_state, empty_init, "Saitek / Heuristic Software", "Pocket Checkers", MACHINE_SUPPORTS_SAVE )
 
 SYST( 1986, mk12,      0,        0,      mk12,      mk12,      electrio_state, empty_init, "SciSys / Heuristic Software", "Kasparov Mk 12", MACHINE_SUPPORTS_SAVE )
-SYST( 1986, pplus,     mk12,     0,      pplus,     pplus,     electrio_state, empty_init, "SciSys / Heuristic Software", "Kasparov Pocket Plus", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, kpplus,    mk12,     0,      pplus,     pplus,     electrio_state, empty_init, "SciSys / Heuristic Software", "Kasparov Pocket Plus", MACHINE_SUPPORTS_SAVE )

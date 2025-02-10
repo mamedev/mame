@@ -62,7 +62,7 @@ Usage notes:
 - Interactive layout included.
 - The mixer faders can be controlled with the mouse, or from the "Slider
   Controls" menu.
-- Voices can be tuned using the "Sider Controls" menu.
+- Voices can be tuned with the mouse, or the "Sider Controls" menu.
 - The drum keys are mapped to the keyboard, starting at "Q". Specifically:
   Q - Bass 1, W - Snare 1, ...
   A - Bass 2, S - Snare 2, ...
@@ -134,7 +134,7 @@ struct dmx_voice_card_config
 		DISABLED,  // 4.7K resistor connected to position 1 (+5V).
 		ENABLED,  // Jumper disconnected.
 		ENABLED_ON_TR12,  // 4.7K resistor connected to position 2 (/Q of U1B).
-		                  // Decay enabled when trigger mode is 1 or 2.
+						  // Decay enabled when trigger mode is 1 or 2.
 	};
 	const decay_mode decay;
 
@@ -143,7 +143,7 @@ struct dmx_voice_card_config
 	{
 		ENABLED,  // Jumper connected to position 2 (+5V).
 		ENABLED_ON_TR1,  // Jumper connected to position 1 (Q of U1A).
-		                 // Early decay enabled when trigger mode is 1.
+						 // Early decay enabled when trigger mode is 1.
 	};
 	const early_decay_mode early_decay;
 
@@ -173,11 +173,11 @@ struct dmx_voice_card_config
 // voices), and the multiplying DAC form a VCA. The gain control circuit sets
 // the reference current into the DAC, and the DAC multiplies that with the
 // digital value to produce and output current.
-class dmx_voice_card_vca : public device_t, public device_sound_interface
+class dmx_voice_card_vca_device : public device_t, public device_sound_interface
 {
 public:
-	dmx_voice_card_vca(const machine_config &mconfig, const char *tag, device_t *owner, const dmx_voice_card_config &config) ATTR_COLD;
-	dmx_voice_card_vca(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0) ATTR_COLD;
+	dmx_voice_card_vca_device(const machine_config &mconfig, const char *tag, device_t *owner, const dmx_voice_card_config &config) ATTR_COLD;
+	dmx_voice_card_vca_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0) ATTR_COLD;
 
 	void start(int trigger_mode);
 	void decay();
@@ -209,9 +209,9 @@ private:
 	attotime m_decay_start_time;
 };
 
-DEFINE_DEVICE_TYPE(DMX_VOICE_CARD_VCA, dmx_voice_card_vca, "dmx_voice_card_vca", "DMX Voice Card VCA");
+DEFINE_DEVICE_TYPE(DMX_VOICE_CARD_VCA, dmx_voice_card_vca_device, "dmx_voice_card_vca", "DMX Voice Card VCA");
 
-dmx_voice_card_vca::dmx_voice_card_vca(const machine_config &mconfig, const char *tag, device_t *owner, const dmx_voice_card_config &config)
+dmx_voice_card_vca_device::dmx_voice_card_vca_device(const machine_config &mconfig, const char *tag, device_t *owner, const dmx_voice_card_config &config)
 	: device_t(mconfig, DMX_VOICE_CARD_VCA, tag, owner, 0)
 	, device_sound_interface(mconfig, *this)
 	, m_gain_control(!config.pitch_control)
@@ -219,14 +219,14 @@ dmx_voice_card_vca::dmx_voice_card_vca(const machine_config &mconfig, const char
 	init_gain_and_decay_variations(config);
 }
 
-dmx_voice_card_vca::dmx_voice_card_vca(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+dmx_voice_card_vca_device::dmx_voice_card_vca_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, DMX_VOICE_CARD_VCA, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_gain_control(false)
 {
 }
 
-void dmx_voice_card_vca::start(int trigger_mode)
+void dmx_voice_card_vca_device::start(int trigger_mode)
 {
 	assert(trigger_mode >= 1 && trigger_mode <= 3);
 
@@ -247,10 +247,10 @@ void dmx_voice_card_vca::start(int trigger_mode)
 		m_selected_rc_inv = 1;
 
 	LOGMASKED(LOG_VOLUME, "Selected gain: %f, 1/RC: %f\n",
-	          m_selected_gain, m_selected_rc_inv);
+			  m_selected_gain, m_selected_rc_inv);
 }
 
-void dmx_voice_card_vca::decay()
+void dmx_voice_card_vca_device::decay()
 {
 	assert(has_decay());
 	if (!has_decay())
@@ -261,7 +261,7 @@ void dmx_voice_card_vca::decay()
 	m_decay_start_time = machine().time();
 }
 
-void dmx_voice_card_vca::device_start()
+void dmx_voice_card_vca_device::device_start()
 {
 	m_stream = stream_alloc(1, 1, machine().sample_rate());
 
@@ -272,7 +272,7 @@ void dmx_voice_card_vca::device_start()
 	save_item(NAME(m_decay_start_time));
 }
 
-void dmx_voice_card_vca::device_reset()
+void dmx_voice_card_vca_device::device_reset()
 {
 	m_selected_gain = 1;
 	m_decaying = false;
@@ -280,7 +280,7 @@ void dmx_voice_card_vca::device_reset()
 	m_selected_rc_inv = 1;
 }
 
-void dmx_voice_card_vca::sound_stream_update(sound_stream &stream, const std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs)
+void dmx_voice_card_vca_device::sound_stream_update(sound_stream &stream, const std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs)
 {
 	// Gain lower than MIN_GAIN will be treated as 0.
 	static constexpr const float MIN_GAIN = 0.0001F;
@@ -295,7 +295,7 @@ void dmx_voice_card_vca::sound_stream_update(sound_stream &stream, const std::ve
 			out.put(i, m_selected_gain * in.get(i));
 
 		LOGMASKED(LOG_SAMPLES, "%s VCA - just gain: %f. Samples: %f, %f.\n",
-		          tag(), m_selected_gain, in.get(0), in.get(n - 1));
+				  tag(), m_selected_gain, in.get(0), in.get(n - 1));
 		return;
 	}
 
@@ -321,10 +321,10 @@ void dmx_voice_card_vca::sound_stream_update(sound_stream &stream, const std::ve
 		m_decay_done = true;
 
 	LOGMASKED(LOG_SAMPLES_DECAY, "%s VCA - in decay: %f. Samples: %f, %f.\n",
-	          tag(), gain, in.get(0), in.get(n - 1));
+			  tag(), gain, in.get(0), in.get(n - 1));
 }
 
-void dmx_voice_card_vca::init_gain_and_decay_variations(const dmx_voice_card_config &config)
+void dmx_voice_card_vca_device::init_gain_and_decay_variations(const dmx_voice_card_config &config)
 {
 	static constexpr const float VD = 0.6;  // Diode drop.
 	static constexpr const float R8 = RES_K(2.7);
@@ -345,7 +345,7 @@ void dmx_voice_card_vca::init_gain_and_decay_variations(const dmx_voice_card_con
 
 		// For trigger mode 1.
 		m_gain.push_back((r12 * r17 * VCC + R8 * r12 * VD + R8 * r17 * VD) /
-		                 ((R8 * r12 * r17) + (r12 * r17 * R9) + (R8 * r17 * R9) + (R8 * r12 * R9)));
+						 ((R8 * r12 * r17) + (r12 * r17 * R9) + (R8 * r17 * R9) + (R8 * r12 * R9)));
 		// For trigger mode 2.
 		m_gain.push_back((r12 * VCC + R8 * VD) / (r12 * R8 + R8 * R9 + r12 * R9));
 		// For trigger mode 3.
@@ -354,7 +354,7 @@ void dmx_voice_card_vca::init_gain_and_decay_variations(const dmx_voice_card_con
 	for (int i = 0; i < m_gain.size(); ++i)
 	{
 		LOGMASKED(LOG_VOLUME, "%s: Gain variation %d: %f uA, %f\n",
-		          tag(), i, m_gain[i] * 1e6F, m_gain[i] / MAX_IREF);
+				  tag(), i, m_gain[i] * 1e6F, m_gain[i] / MAX_IREF);
 		m_gain[i] /= MAX_IREF;  // Normalize.
 	}
 
@@ -374,7 +374,7 @@ void dmx_voice_card_vca::init_gain_and_decay_variations(const dmx_voice_card_con
 		{
 			m_decay_rc_inv.push_back(1.0F / ((R8 + r) * c3));
 			LOGMASKED(LOG_VOLUME, "%s: Decay 1/RC variation %d: %f\n",
-			          tag(), m_decay_rc_inv.size() - 1, m_decay_rc_inv.back());
+					  tag(), m_decay_rc_inv.size() - 1, m_decay_rc_inv.back());
 		}
 	}
 }
@@ -382,14 +382,14 @@ void dmx_voice_card_vca::init_gain_and_decay_variations(const dmx_voice_card_con
 // Emulates the original DMX voice cards, including the cymbal card. Later
 // DMX models shipped with the "Mark II" voice cards for the Tom voices.
 // The Mark II cards are not yet emulated.
-class dmx_voice_card : public device_t, public device_sound_interface
+class dmx_voice_card_device : public device_t, public device_sound_interface
 {
 public:
 	// Default value of pitch adjustment trimpot.
 	static constexpr const s32 T1_DEFAULT_PERCENT = 50;
 
-	dmx_voice_card(const machine_config &mconfig, const char *tag, device_t *owner, const dmx_voice_card_config &config, required_memory_region *sample_rom) ATTR_COLD;
-	dmx_voice_card(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0) ATTR_COLD;
+	dmx_voice_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const dmx_voice_card_config &config, required_memory_region *sample_rom) ATTR_COLD;
+	dmx_voice_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0) ATTR_COLD;
 
 	void trigger(bool tr0, bool tr1);
 	void set_pitch_adj(s32 t1_percent);  // Valid values: 0-100.
@@ -414,7 +414,7 @@ private:
 
 	required_device<timer_device> m_timer;  // 555, U5.
 	required_device<dac76_device> m_dac;  // AM6070, U8. Compatible with DAC76.
-	required_device<dmx_voice_card_vca> m_vca;
+	required_device<dmx_voice_card_vca_device> m_vca;
 	required_device_array<filter_biquad_device, 3> m_filters;
 
 	// Configuration. Do not include in save state.
@@ -430,9 +430,9 @@ private:
 	u8 m_trigger_mode = 0;  // Valid modes: 1-3. 0 OK after reset.
 };
 
-DEFINE_DEVICE_TYPE(DMX_VOICE_CARD, dmx_voice_card, "dmx_voice_card", "DMX Voice Card");
+DEFINE_DEVICE_TYPE(DMX_VOICE_CARD, dmx_voice_card_device, "dmx_voice_card", "DMX Voice Card");
 
-dmx_voice_card::dmx_voice_card(const machine_config &mconfig, const char *tag, device_t *owner, const dmx_voice_card_config &config, required_memory_region *sample_rom)
+dmx_voice_card_device::dmx_voice_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const dmx_voice_card_config &config, required_memory_region *sample_rom)
 	: device_t(mconfig, DMX_VOICE_CARD, tag, owner, 0)
 	, device_sound_interface(mconfig, *this)
 	, m_timer(*this, "555_u5")
@@ -445,7 +445,7 @@ dmx_voice_card::dmx_voice_card(const machine_config &mconfig, const char *tag, d
 	init_pitch();
 }
 
-dmx_voice_card::dmx_voice_card(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+dmx_voice_card_device::dmx_voice_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, DMX_VOICE_CARD, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_timer(*this, "555_u5")
@@ -457,7 +457,7 @@ dmx_voice_card::dmx_voice_card(const machine_config &mconfig, const char *tag, d
 {
 }
 
-void dmx_voice_card::trigger(bool tr0, bool tr1)
+void dmx_voice_card_device::trigger(bool tr0, bool tr1)
 {
 	assert(tr0 || tr1);
 	if (tr1 && tr0)
@@ -479,19 +479,19 @@ void dmx_voice_card::trigger(bool tr0, bool tr1)
 	LOGMASKED(LOG_SOUND, "Trigger: (%d, %d) %d %f\n", tr0, tr1, m_trigger_mode);
 }
 
-void dmx_voice_card::set_pitch_adj(s32 t1_percent)
+void dmx_voice_card_device::set_pitch_adj(s32 t1_percent)
 {
 	m_stream->update();
 	m_t1_percent = t1_percent;
 	compute_pitch_variations();
 }
 
-void dmx_voice_card::device_add_mconfig(machine_config &config)
+void dmx_voice_card_device::device_add_mconfig(machine_config &config)
 {
 	static constexpr const double SK_R3 = RES_M(999.99);
 	static constexpr const double SK_R4 = RES_R(0.001);
 
-	TIMER(config, m_timer).configure_generic(FUNC(dmx_voice_card::clock_callback));
+	TIMER(config, m_timer).configure_generic(FUNC(dmx_voice_card_device::clock_callback));
 	DAC76(config, m_dac, 0U);
 	DMX_VOICE_CARD_VCA(config, m_vca, m_config);
 
@@ -513,7 +513,7 @@ void dmx_voice_card::device_add_mconfig(machine_config &config)
 	m_filters[2]->add_route(ALL_OUTPUTS, *this, 1.0);
 }
 
-void dmx_voice_card::device_start()
+void dmx_voice_card_device::device_start()
 {
 	m_stream = stream_alloc(1, 1, machine().sample_rate());
 
@@ -522,25 +522,25 @@ void dmx_voice_card::device_start()
 	save_item(NAME(m_trigger_mode));
 }
 
-void dmx_voice_card::device_reset()
+void dmx_voice_card_device::device_reset()
 {
 	m_trigger_mode = 0;
 	reset_counter();
 	compute_pitch_variations();
 }
 
-void dmx_voice_card::sound_stream_update(sound_stream &stream, const std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs)
+void dmx_voice_card_device::sound_stream_update(sound_stream &stream, const std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs)
 {
 	outputs[0] = inputs[0];
 }
 
-void dmx_voice_card::reset_counter()
+void dmx_voice_card_device::reset_counter()
 {
 	m_counter = 0;
 	m_counting = false;
 }
 
-void dmx_voice_card::init_pitch()
+void dmx_voice_card_device::init_pitch()
 {
 	// Precompute all variations of CV (pin 5 of 555 timer).
 
@@ -564,11 +564,11 @@ void dmx_voice_card::init_pitch()
 		// For trigger mode 1.
 		const float alpha = 1.0F + r12 / m_config.r17;
 		m_cv.push_back((alpha * R5 + r12) * (2 * VCC - 3 * VD) /
-		               (3 * alpha * R5 + 3 * r12 + 2 * alpha * R_555) + VD);
+					   (3 * alpha * R5 + 3 * r12 + 2 * alpha * R_555) + VD);
 
 		// For trigger mode 2.
 		m_cv.push_back((R5 + r12) * (2 * VCC - 3 * VD) /
-		               (3 * R5 + 3 * r12 + 2 * R_555) + VD);
+					   (3 * R5 + 3 * r12 + 2 * R_555) + VD);
 
 		// For trigger mode 3.
 		m_cv.push_back(m_cv[0]);
@@ -582,7 +582,7 @@ void dmx_voice_card::init_pitch()
 	m_sample_t.resize(m_cv.size());
 }
 
-void dmx_voice_card::compute_pitch_variations()
+void dmx_voice_card_device::compute_pitch_variations()
 {
 	static constexpr const float R3 = RES_K(1);
 	static constexpr const float R4 = RES_K(10);
@@ -636,7 +636,7 @@ void dmx_voice_card::compute_pitch_variations()
 
 		m_sample_t[i] = attotime::from_double(t_high + t_low);
 		LOGMASKED(LOG_PITCH, "%s Pitch variation %d: %f (%f, %f)\n",
-		          tag(), i, 1.0 / m_sample_t[i].as_double(), t_high, t_low);
+				  tag(), i, 1.0 / m_sample_t[i].as_double(), t_high, t_low);
 	}
 
 	if (m_config.pitch_control)
@@ -645,7 +645,7 @@ void dmx_voice_card::compute_pitch_variations()
 	select_pitch();
 }
 
-void dmx_voice_card::select_pitch()
+void dmx_voice_card_device::select_pitch()
 {
 	attotime sampling_t;
 	if (m_config.pitch_control)
@@ -658,10 +658,10 @@ void dmx_voice_card::select_pitch()
 
 	m_timer->adjust(sampling_t, 0, sampling_t);
 	LOGMASKED(LOG_PITCH, "Setting sampling frequency: %f\n",
-	          1.0 / sampling_t.as_double());
+			  1.0 / sampling_t.as_double());
 }
 
-bool dmx_voice_card::is_decay_enabled() const
+bool dmx_voice_card_device::is_decay_enabled() const
 {
 	switch (m_config.decay)
 	{
@@ -675,7 +675,7 @@ bool dmx_voice_card::is_decay_enabled() const
 	return false;
 }
 
-bool dmx_voice_card::is_early_decay_enabled() const
+bool dmx_voice_card_device::is_early_decay_enabled() const
 {
 	switch (m_config.early_decay)
 	{
@@ -687,7 +687,7 @@ bool dmx_voice_card::is_early_decay_enabled() const
 	return false;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(dmx_voice_card::clock_callback)
+TIMER_DEVICE_CALLBACK_MEMBER(dmx_voice_card_device::clock_callback)
 {
 	if (!m_counting)
 		return;
@@ -723,7 +723,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(dmx_voice_card::clock_callback)
 	if (!m_vca->in_decay() && is_decay_enabled())
 	{
 		if ((is_early_decay_enabled() && m_counter >= EARLY_DECAY_START) ||
-		    m_counter >= LATE_DECAY_START)
+			m_counter >= LATE_DECAY_START)
 		{
 			m_vca->decay();
 		}
@@ -970,7 +970,7 @@ private:
 	output_finder<> m_metronome_mix;
 	output_finder<> m_metronome;
 
-	required_device_array<dmx_voice_card, 8> m_voices;
+	required_device_array<dmx_voice_card_device, 8> m_voices;
 	required_device<mixer_device> m_left_mixer;
 	required_device<mixer_device> m_right_mixer;
 	required_device<speaker_device> m_left_speaker;
@@ -1208,7 +1208,7 @@ u8 dmx_state::cassette_r()
 	const u8 d7 = BIT(data, 7);  // PROT* (memory protect switch. Active low).
 
 	return (d7 << 7) | (d6 << 6) | (d5 << 5) | (d4 << 4) |
-	       (d3 << 3) | (d2 << 2) | (d1 << 1) | d0;
+		   (d3 << 3) | (d2 << 2) | (d1 << 1) | d0;
 }
 
 template<int GROUP> void dmx_state::gen_trigger_w(u8 data)
@@ -1288,7 +1288,7 @@ void dmx_state::update_voice_volume(int voice)
 	m_right_mixer->set_input_gain(voice, gain_right);
 
 	LOGMASKED(LOG_FADERS, "Voice %d volume changed to: %d (gain L:%f, R:%f)\n",
-	          voice, pot_percent, gain_left, gain_right);
+			  voice, pot_percent, gain_left, gain_right);
 }
 
 void dmx_state::memory_map(address_map &map)
@@ -1574,37 +1574,37 @@ INPUT_PORTS_START(dmx)
 	// Tunning potentiomenters. One per voice card, designated as T1 and labeled
 	// as "PITCH ADJ."
 
-	PORT_START("pitch_adj_0")
-	PORT_ADJUSTER(dmx_voice_card::T1_DEFAULT_PERCENT, "BASS pitch")
+	PORT_START("pitch_adj_1")
+	PORT_ADJUSTER(dmx_voice_card_device::T1_DEFAULT_PERCENT, "BASS pitch")
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::pitch_adj_changed), dmx_state::VC_BASS)
 
-	PORT_START("pitch_adj_1")
-	PORT_ADJUSTER(dmx_voice_card::T1_DEFAULT_PERCENT, "SNARE pitch")
+	PORT_START("pitch_adj_2")
+	PORT_ADJUSTER(dmx_voice_card_device::T1_DEFAULT_PERCENT, "SNARE pitch")
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::pitch_adj_changed), dmx_state::VC_SNARE)
 
-	PORT_START("pitch_adj_2")
-	PORT_ADJUSTER(dmx_voice_card::T1_DEFAULT_PERCENT, "HI-HAT pitch")
+	PORT_START("pitch_adj_3")
+	PORT_ADJUSTER(dmx_voice_card_device::T1_DEFAULT_PERCENT, "HI-HAT pitch")
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::pitch_adj_changed), dmx_state::VC_HIHAT)
 
-	PORT_START("pitch_adj_3")
-	PORT_ADJUSTER(dmx_voice_card::T1_DEFAULT_PERCENT, "TOM1 pitch")
+	PORT_START("pitch_adj_4")
+	PORT_ADJUSTER(dmx_voice_card_device::T1_DEFAULT_PERCENT, "TOM1 pitch")
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::pitch_adj_changed), dmx_state::VC_SMALL_TOMS)
 
-	PORT_START("pitch_adj_4")
-	PORT_ADJUSTER(dmx_voice_card::T1_DEFAULT_PERCENT, "TOM2 pitch")
+	PORT_START("pitch_adj_5")
+	PORT_ADJUSTER(dmx_voice_card_device::T1_DEFAULT_PERCENT, "TOM2 pitch")
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::pitch_adj_changed), dmx_state::VC_LARGE_TOMS)
 
-	PORT_START("pitch_adj_5")
-	PORT_ADJUSTER(dmx_voice_card::T1_DEFAULT_PERCENT, "PERC1 pitch")
-		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::pitch_adj_changed), dmx_state::VC_PERC1)
-
 	PORT_START("pitch_adj_6")
-	PORT_ADJUSTER(dmx_voice_card::T1_DEFAULT_PERCENT, "PERC2 pitch")
-		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::pitch_adj_changed), dmx_state::VC_PERC2)
+	PORT_ADJUSTER(dmx_voice_card_device::T1_DEFAULT_PERCENT, "CYMBAL pitch")
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::pitch_adj_changed), dmx_state::VC_CYMBAL)
 
 	PORT_START("pitch_adj_7")
-	PORT_ADJUSTER(dmx_voice_card::T1_DEFAULT_PERCENT, "CYMBAL pitch")
-		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::pitch_adj_changed), dmx_state::VC_CYMBAL)
+	PORT_ADJUSTER(dmx_voice_card_device::T1_DEFAULT_PERCENT, "PERC1 pitch")
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::pitch_adj_changed), dmx_state::VC_PERC1)
+
+	PORT_START("pitch_adj_8")
+	PORT_ADJUSTER(dmx_voice_card_device::T1_DEFAULT_PERCENT, "PERC2 pitch")
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::pitch_adj_changed), dmx_state::VC_PERC2)
 INPUT_PORTS_END
 
 ROM_START(obdmx)
@@ -1661,4 +1661,3 @@ ROM_END
 }  // anonymous namespace
 
 SYST(1980, obdmx, 0, 0, dmx, dmx, dmx_state, empty_init, "Oberheim", "DMX", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND)
-

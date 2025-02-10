@@ -138,12 +138,12 @@ static int primo_cassette_calculate_size_in_samples(const uint8_t *bytes, int le
 	return size_in_samples;
 }
 
-static int primo_cassette_fill_wave(int16_t *buffer, int length, uint8_t *bytes)
+static int primo_cassette_fill_wave(int16_t *buffer, int length, const uint8_t *bytes)
 {
 	int i = 0, j = 0, k;
 
 	int16_t *p = buffer;
-	uint8_t *b = bytes;
+	const uint8_t *b = bytes;
 
 	uint32_t file_size = 0;
 	uint16_t block_size = 0;

@@ -50,7 +50,6 @@ private:
 	uint8_t data_r();
 	void data_w(uint8_t data);
 	void memory_w(offs_t offset, uint8_t data);
-	uint8_t dma_r();
 	void sc_w(uint8_t data);
 	void da_w(int state);
 
@@ -70,6 +69,7 @@ private:
 	// internal state
 	uint8_t m_data = 0;
 	uint8_t m_sc = 0;
+	uint8_t m_dmain = 0;
 };
 
 #endif // MAME_NETRONICS_ELF_H

@@ -36,8 +36,7 @@ timeplt_audio_device::timeplt_audio_device(const machine_config &mconfig, device
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_soundcpu(*this, "tpsound")
 	, m_soundlatch(*this, "soundlatch")
-	, m_filter_0(*this, "filter.0.%u", 0)
-	, m_filter_1(*this, "filter.1.%u", 0)
+	, m_filter{{*this, "filter.0.%u", 0U}, {*this, "filter.1.%u", 0U}}
 	, m_last_irq_state(0)
 {
 }
@@ -94,27 +93,27 @@ uint8_t timeplt_audio_device::portB_r()
  *
  *************************************/
 
-void timeplt_audio_device::set_filter(filter_rc_device &device, int data)
+void timeplt_audio_device::set_filter(int no, int ch, int data)
 {
 	int C = 0;
 
-	if (data & 1)
+	if (BIT(data, 0))
 		C += 220000;    /* 220000pF = 0.220uF */
-	if (data & 2)
+	if (BIT(data, 1))
 		C +=  47000;    /*  47000pF = 0.047uF */
 
-	device.filter_rc_set_RC(filter_rc_device::LOWPASS_3R, 1000, 5100, 0, CAP_P(C));
+	m_filter[no][ch]->filter_rc_set_RC(filter_rc_device::LOWPASS_3R, 1000, 5100, 0, CAP_P(C));
 }
 
 
 void timeplt_audio_device::filter_w(offs_t offset, uint8_t data)
 {
-	set_filter(*m_filter_1[0], (offset >>  0) & 3);
-	set_filter(*m_filter_1[1], (offset >>  2) & 3);
-	set_filter(*m_filter_1[2], (offset >>  4) & 3);
-	set_filter(*m_filter_0[0], (offset >>  6) & 3);
-	set_filter(*m_filter_0[1], (offset >>  8) & 3);
-	set_filter(*m_filter_0[2], (offset >> 10) & 3);
+	set_filter(1, 0, (offset >>  0) & 3);
+	set_filter(1, 1, (offset >>  2) & 3);
+	set_filter(1, 2, (offset >>  4) & 3);
+	set_filter(0, 0, (offset >>  6) & 3);
+	set_filter(0, 1, (offset >>  8) & 3);
+	set_filter(0, 2, (offset >> 10) & 3);
 }
 
 
@@ -210,10 +209,10 @@ void timeplt_audio_device::device_add_mconfig(machine_config &config)
 	ay2.add_route(1, "filter.1.1", 0.60);
 	ay2.add_route(2, "filter.1.2", 0.60);
 
-	for (required_device<filter_rc_device> &filter : m_filter_0)
+	for (required_device<filter_rc_device> &filter : m_filter[0])
 		FILTER_RC(config, filter).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	for (required_device<filter_rc_device> &filter : m_filter_1)
+	for (required_device<filter_rc_device> &filter : m_filter[1])
 		FILTER_RC(config, filter).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 

@@ -257,7 +257,7 @@ private:
 		uint32_t            ssemode;                // saved SSE mode
 		uint32_t            ssemodesave;            // temporary location for saving
 		uint32_t            ssecontrol[4];          // copy of the sse_control array
-		float               single1;                // 1.0 is single-precision
+		float               single1;                // 1.0 in single-precision
 		double              double1;                // 1.0 in double-precision
 
 		void *              stacksave;              // saved stack pointer
@@ -268,9 +268,18 @@ private:
 	near_state &            m_near;
 
 	// resolved memory handler functions
+	struct memory_accessors
+	{
+		resolved_memory_accessors resolved;
+		address_space::specific_access_info specific;
+		offs_t address_mask;
+		bool no_mask;
+		bool has_high_bits;
+		bool mask_high_bits;
+	};
 	resolved_member_function m_debug_cpu_instruction_hook;
 	resolved_member_function m_drcmap_get_value;
-	resolved_memory_accessors_vector m_resolved_accessors;
+	std::vector<memory_accessors> m_memory_accessors;
 
 	// globals
 	using opcode_generate_func = void (drcbe_x64::*)(asmjit::x86::Assembler &, const uml::instruction &);

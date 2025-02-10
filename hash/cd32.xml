@@ -6,7 +6,7 @@ license:CC0-1.0
 <softwarelist name="cd32" description="Commodore Amiga CD32 CD-ROMs">
 
 	<!--
-	UNDUMPED:
+	UNDUMPED (possibly outdated, cfr. amigacd.xml):
 
 	1001 Girl
 	Acid Attack Compilation (Guardian, Roadkill, Super Skidmarks)
@@ -731,7 +731,7 @@ license:CC0-1.0
 		<description>Brutal Sports Series: Football</description>
 		<year>1994</year>
 		<publisher>Millennium</publisher>
-        <!-- Cover/CD title -->
+		<!-- Cover/CD title -->
 		<info name="alt_title" value="Brutal Football" />
 		<info name="disc_matrix" value="CDD3361 BRUTAL FOOTBALL : MASTERED BY NIMBUS" />
 		<part name="cdrom" interface="cdrom">

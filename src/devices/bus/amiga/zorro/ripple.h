@@ -69,6 +69,6 @@ private:
 } // namespace bus::amiga::zorro
 
 // device type declaration
-DECLARE_DEVICE_TYPE_NS(ZORRO_RIPPLE, bus::amiga::zorro, ripple_ide_device)
+DECLARE_DEVICE_TYPE_NS(AMIGA_RIPPLE, bus::amiga::zorro, ripple_ide_device)
 
 #endif // MAME_BUS_AMIGA_ZORRO_RIPPLE_H

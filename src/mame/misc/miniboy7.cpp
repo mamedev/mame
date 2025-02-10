@@ -24,7 +24,7 @@
   Model BE-7000/MBS.
   https://flyers.arcade-museum.com/videogames/show/4043
   https://flyers.arcade-museum.com/videogames/show/6161
-  
+
   Seven games in one, plus Ad message support.
 
   - Draw Poker.
@@ -132,7 +132,7 @@
   Books Mode: To enter Books Mode, press the BOOKS button (key 0).
 
   In Books Mode, pressing DEAL will take you to the Percentage Mode, where you can set
-  a percentage value (between 0 and 9) using the HOLD4 button. 
+  a percentage value (between 0 and 9) using the HOLD4 button.
 
   While in Percentage Mode, pressing HOLD5 will bring you to the Screen RAM and Inputs Test Mode.
   To return to normal operation, reset the machine.
@@ -332,7 +332,7 @@
   - Lot of fixes, getting Super Mini-Boy working.
   - Added lamps support and button-lamps layout for Super Mini-Boy.
   - Fixed the Super Mini-Boy color scheme.
-  - Worked Super Mini-Boy inputs and DIP Switches from the scratch. 
+  - Worked Super Mini-Boy inputs and DIP Switches from the scratch.
   - Added technical and games notes.
   - Some clean-up.
 
@@ -342,7 +342,7 @@
   - Lot of fixes and new machine driver, getting Joker Poker working.
   - Fixed crystal/clocks and derivatives.
   - Added lamps support and button-lamps layout for Joker Poker.
-  - Worked Super Joker Poker inputs and DIP Switches from the scratch. 
+  - Worked Super Joker Poker inputs and DIP Switches from the scratch.
   - Added more technical and games notes.
 
 
@@ -399,7 +399,7 @@ public:
 	void miniboy7(machine_config &config);
 	void sminiboy(machine_config &config);
 	void bejpoker(machine_config &config);
-	
+
 	void init_smini();
 
 protected:
@@ -578,7 +578,7 @@ uint8_t miniboy7_state::lamp_latch_r()
 	m_lamps[0] = BIT(data, 4);  // [----x] lamp0 bet
 	m_lamps[1] = BIT(data, 3);  // [---x-] lamp1 deal/draw
 	m_lamps[2] = BIT(data, 2);  // [--x--] lamp2 holds
-	m_lamps[3] = BIT(data, 1);  // [-x---] lamp3 d.up+take+big+small 
+	m_lamps[3] = BIT(data, 1);  // [-x---] lamp3 d.up+take+big+small
 	m_lamps[4] = BIT(data, 0);  // [x----] lamp4 cancel
 
 	machine().bookkeeping().coin_counter_w(0, data & 0x40);    // counter
@@ -620,9 +620,9 @@ uint8_t miniboy7_state::s_pia_pb_r()
 		case 0xfb:
 		case 0x7b: ret = m_input[4]->read(); break;
 		case 0xfd:
-        case 0x7d: ret = m_input[5]->read(); break;
+		case 0x7d: ret = m_input[5]->read(); break;
 		case 0x7f: ret = m_dsw2->read() & 0xf0; break; // high nibble of dip switch
-	}	
+	}
 	return ret;
 }
 
@@ -752,27 +752,27 @@ static INPUT_PORTS_START( sminiboy_base )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("1c-4") PORT_CODE(KEYCODE_F)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("1c-5") PORT_CODE(KEYCODE_G)
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )  // program masked
-	
+
 	PORT_START("INPUT5") // pia_pb mux 0xfb - mem 2620
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 	PORT_BIT( 0xf4, IP_ACTIVE_LOW, IPT_UNUSED )  // program masked
-	
+
 	PORT_START("INPUT6") // pia_pb mux 0xfd - mem 2622
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("Play Bet")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )    // PORT_NAME("Break_SCR")  PORT_CODE(KEYCODE_E)
 	PORT_BIT( 0xf4, IP_ACTIVE_LOW, IPT_UNUSED )  // program masked
-	
+
 	PORT_START("DSW2")
-	// mux=0xff 
+	// mux=0xff
 	PORT_DIPNAME( 0x03, 0x00, "D.UP Seven" )               PORT_DIPLOCATION("DSW2:8,7")
 	PORT_DIPSETTING(    0x00, "Reset" )
 	PORT_DIPSETTING(    0x01, "Reset" )
 	PORT_DIPSETTING(    0x02, "Even" )
 	PORT_DIPSETTING(    0x03, "Lose" )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ) )          PORT_DIPLOCATION("DSW2:6")  // No code to read this bit  
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ) )          PORT_DIPLOCATION("DSW2:6")  // No code to read this bit
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ) )          PORT_DIPLOCATION("DSW2:5")  // No code to read this bit
@@ -925,12 +925,12 @@ void miniboy7_state::miniboy7(machine_config &config)
 void miniboy7_state::sminiboy(machine_config &config)
 {
 	miniboy7(config);
-	
+
 	pia6821_device &pia(PIA6821(config.replace(), "pia0"));
 	pia.readpa_handler().set(FUNC(miniboy7_state::s_pia_pa_r));
 	pia.readpb_handler().set(FUNC(miniboy7_state::s_pia_pb_r));
 	pia.irqa_handler().set_inputline("maincpu", 0);
-	pia.irqb_handler().set_inputline("maincpu", 0);	
+	pia.irqb_handler().set_inputline("maincpu", 0);
 }
 
 void miniboy7_state::bejpoker(machine_config &config)

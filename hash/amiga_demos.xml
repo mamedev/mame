@@ -27,6 +27,20 @@ TODO:
 		</part>
 	</software>
 
+	<software name="interfer" supported="no">
+		<description>Interference (demo)</description>
+		<year>1993</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Sanity"/>
+		<info name="release" value="19930424"/>
+		<!-- OCS/ECS -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="901120">
+				<rom name="sanity-interference.adf" size="901120" crc="7075359f" sha1="8dc41dccf7dab7b742f9fd21d3e2d2055120f3dc"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="miseryd2" supported="no">
 		<description>Misery Dentro 2 (demo)</description>
 		<year>1993</year>
@@ -38,6 +52,20 @@ TODO:
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="901120">
 				<rom name="misery dentro 2 (1992)(trsi).adf" size="901120" crc="c61f8f60" sha1="25a16e354931f2050dffb5b945a9210b59e9be08"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="puggs" supported="no">
+		<description>Puggs In Space (demo)</description>
+		<year>1989</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Dionysus"/>
+		<!-- 10th best demo in EuroChart Top Ten #3 -->
+		<!-- OCS/ECS -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="901120">
+				<rom name="dionysus-puggsinspace.adf" size="901120" crc="c55e5390" sha1="b8af05dc8905c1e215f3b2b4c450020d890add25"/>
 			</dataarea>
 		</part>
 	</software>

@@ -62,7 +62,7 @@ static int orao_cas_to_wav_size( const uint8_t *casdata, int caslen ) {
 	return size;
 }
 
-static int orao_cas_fill_wave( int16_t *buffer, int length, uint8_t *bytes ) {
+static int orao_cas_fill_wave( int16_t *buffer, int length, const uint8_t *bytes ) {
 	int i,j,size,k;
 	uint8_t b;
 	size = 0;

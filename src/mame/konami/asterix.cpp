@@ -3,6 +3,7 @@
 /***************************************************************************
 
 Asterix
+Konami GX068 PCB
 
 TODO:
  - the konami logo: in the original the outline is drawn, then there's a slight
@@ -186,7 +187,7 @@ uint32_t asterix_state::screen_update_asterix(screen_device &screen, bitmap_ind1
 	m_k056832->tilemap_draw(screen, bitmap, cliprect, layer[2], K056832_DRAW_FLAG_MIRROR, 4);
 
 	/* this isn't supported anymore and it is unsure if still needed; keeping here for reference
-    pdrawgfx_shadow_lowpri = 1; fix shadows in front of feet */
+	pdrawgfx_shadow_lowpri = 1; fix shadows in front of feet */
 	m_k053244->sprites_draw(bitmap, cliprect, screen.priority());
 
 	m_k056832->tilemap_draw(screen, bitmap, cliprect, 2, K056832_DRAW_FLAG_MIRROR, 0);

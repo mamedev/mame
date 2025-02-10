@@ -174,6 +174,12 @@ const a64::CondCode condition_map[uml::COND_MAX - uml::COND_Z] =
 	a64::CondCode::kGE,    // COND_GE,          requires SV
 };
 
+// masks for immediate values that can be generated with movz instructions
+constexpr uint64_t LSL0_MASK = 0x00000000'0000ffff;
+constexpr uint64_t LSL16_MASK = 0x00000000'ffff0000;
+constexpr uint64_t LSL32_MASK = 0x0000ffff'00000000;
+constexpr uint64_t LSL48_MASK = 0xffff0000'00000000;
+
 
 #define ARM_CONDITION(a, condition)        (condition_map[condition - COND_Z])
 #define ARM_NOT_CONDITION(a, condition)    (negateCond(condition_map[condition - COND_Z]))
@@ -196,56 +202,82 @@ public:
 
 // helper functions
 
-a64::Vec select_register(a64::Vec const &reg, uint32_t regsize)
+inline a64::Vec select_register(a64::Vec const &reg, uint32_t regsize)
 {
 	if (regsize == 4)
 		return reg.s();
 	return reg.d();
 }
 
-a64::Gp select_register(a64::Gp const &reg, uint32_t regsize)
+inline a64::Gp select_register(a64::Gp const &reg, uint32_t regsize)
 {
 	if (regsize == 4)
 		return reg.w();
 	return reg.x();
 }
 
-bool is_valid_immediate_mask(uint64_t val, size_t bytes)
+inline bool is_valid_immediate_mask(uint64_t val, size_t bytes)
 {
+	const unsigned bits = bytes * 8;
+
 	// all zeros and all ones aren't allowed, and disallow any value with bits outside of the max bit range
-	if (val == 0 || val == make_bitmask<uint64_t>(bytes * 8))
+	if ((val == 0) || (val >= util::make_bitmask<uint64_t>(bits)))
 		return false;
 
-	uint32_t head = 64 - count_leading_zeros_64(val);
-	if (head >= (bytes * 8))
-		return false;
-
-	uint32_t tail = 0;
-	while (tail < head)
+	// work out if the value is repeating sequence of a power-of-two bit group
+	unsigned width = 2;
+	uint64_t mask = util::make_bitmask<uint64_t>(bits - width);
+	while ((width < bits) && ((val & mask) != (val >> width)))
 	{
-		if (BIT(val, tail))
-			break;
-		tail++;
+		mask >>= width;
+		width <<= 1;
 	}
 
-	return population_count_64(val) == head - tail;
+	// check check that set bits are contiguous
+	const auto lz = count_leading_zeros_64(val & make_bitmask<uint64_t>(width));
+	const uint64_t invleftaligned = ~(val << lz);
+	return !(invleftaligned & (invleftaligned + 1));
 }
 
-bool is_valid_immediate(uint64_t val, size_t bits)
+inline bool is_valid_immediate(uint64_t val, size_t bits)
 {
 	assert(bits < 64);
 	return val < (uint64_t(1) << bits);
 }
 
-bool is_valid_immediate_signed(int64_t val, size_t bits)
+inline constexpr bool is_valid_immediate_signed(int64_t val, size_t bits)
 {
 	return util::sext(val, bits) == val;
 }
 
-bool emit_add_optimized(a64::Assembler &a, const a64::Gp &dst, const a64::Gp &src, int64_t val)
+inline constexpr bool is_valid_offset(int64_t diff, int max_shift)
+{
+	if (is_valid_immediate_signed(diff, 9))
+		return true; // 9-bit signed offset
+	else if ((diff >= 0) && (diff < (1 << (12 + max_shift))) && !(diff & make_bitmask<int64_t>(max_shift)))
+		return true; // 12-bit unsigned offset shifted by operand size
+	else
+		return false;
+}
+
+inline bool is_simple_mov_immediate(uint64_t val, size_t bytes)
+{
+	if (!(val & ~LSL0_MASK) || !(val & ~LSL16_MASK) || !(val & ~LSL32_MASK) || !(val & ~LSL48_MASK))
+		return true; // movz
+	else if (!(~val & ~LSL0_MASK) || !(~val & ~LSL16_MASK) || !(~val & ~LSL32_MASK) || !(~val & ~LSL48_MASK))
+		return true; // movn
+	else if ((val == uint32_t(val)) && (((val & LSL0_MASK) == LSL0_MASK) || ((val & LSL16_MASK) == LSL16_MASK)))
+		return true; // movn to w register
+	else if (is_valid_immediate_mask(val, bytes))
+		return true; // orr with zero register
+	else
+		return false;
+}
+
+inline bool emit_add_optimized(a64::Assembler &a, const a64::Gp &dst, const a64::Gp &src, int64_t val)
 {
 	// If the bottom 12 bits are 0s then an optimized form can be used if the remaining bits are <= 12
-	if (is_valid_immediate(val, 12) || ((val & 0xfff) == 0 && is_valid_immediate(val >> 12, 12)))
+	if (is_valid_immediate(val, 12) || (!(val & 0xfff) && is_valid_immediate(val, 12 + 12)))
 	{
 		a.add(dst, src, val);
 		return true;
@@ -254,7 +286,7 @@ bool emit_add_optimized(a64::Assembler &a, const a64::Gp &dst, const a64::Gp &sr
 	return false;
 }
 
-bool emit_sub_optimized(a64::Assembler &a, const a64::Gp &dst, const a64::Gp &src, int64_t val)
+inline bool emit_sub_optimized(a64::Assembler &a, const a64::Gp &dst, const a64::Gp &src, int64_t val)
 {
 	if (val < 0)
 		val = -val;
@@ -269,33 +301,46 @@ bool emit_sub_optimized(a64::Assembler &a, const a64::Gp &dst, const a64::Gp &sr
 	return false;
 }
 
-arm::Mem get_mem_absolute(a64::Assembler &a, const void *ptr)
+void get_imm_absolute(a64::Assembler &a, const a64::Gp &reg, const uint64_t val)
 {
+	// Check for constants that can be generated with a single instruction
+	if (is_simple_mov_immediate(val, reg.isGpX() ? 8 : 4))
+	{
+		a.mov(reg, val);
+		return;
+	}
+	else if (reg.isGpX() && is_valid_immediate_mask(val, 4))
+	{
+		a.mov(reg.w(), val); // asmjit isn't smart enough to work this out
+		return;
+	}
+
+	// Values close to the program counter can be generated with a single adr
 	const uint64_t codeoffs = a.code()->baseAddress() + a.offset();
-	const int64_t reloffs = (int64_t)ptr - codeoffs;
+	const int64_t reloffs = int64_t(val) - codeoffs;
 	if (is_valid_immediate_signed(reloffs, 21))
 	{
-		a.adr(MEM_SCRATCH_REG, ptr);
-		return arm::Mem(MEM_SCRATCH_REG);
+		a.adr(reg, val);
+		return;
 	}
 
+	// Values within 4G of the program counter can be generated with adrp followed by add
 	const uint64_t pagebase = codeoffs & ~make_bitmask<uint64_t>(12);
-	const int64_t pagerel = (int64_t)ptr - pagebase;
+	const int64_t pagerel = int64_t(val) - pagebase;
 	if (is_valid_immediate_signed(pagerel, 21 + 12))
 	{
-		const uint64_t targetpage = (uint64_t)ptr & ~make_bitmask<uint64_t>(12);
-		const uint64_t pageoffs = (uint64_t)ptr & util::make_bitmask<uint64_t>(12);
+		const uint64_t targetpage = val & ~make_bitmask<uint64_t>(12);
+		const uint64_t pageoffs = val & util::make_bitmask<uint64_t>(12);
 
-		a.adrp(MEM_SCRATCH_REG, targetpage);
+		a.adrp(reg.x(), targetpage);
+		if (pageoffs != 0)
+			a.add(reg, reg, pageoffs);
 
-		if (is_valid_immediate_signed(pageoffs, 9))
-			return arm::Mem(MEM_SCRATCH_REG, pageoffs);
-		else if (emit_add_optimized(a, MEM_SCRATCH_REG, MEM_SCRATCH_REG, pageoffs))
-			return arm::Mem(MEM_SCRATCH_REG);
+		return;
 	}
 
-	a.mov(MEM_SCRATCH_REG, ptr);
-	return arm::Mem(MEM_SCRATCH_REG);
+	// up to four instructions
+	a.mov(reg, val);
 }
 
 } // anonymous namespace
@@ -476,24 +521,37 @@ a64::Gp drcbe_arm64::be_parameter::select_register(a64::Gp const &reg, uint32_t 
 
 void drcbe_arm64::get_imm_relative(a64::Assembler &a, const a64::Gp &reg, const uint64_t val) const
 {
-	// If a value can be expressed relative to the base register then it's worth using it instead of a mov
-	// which can be expanded to up to 4 instructions for large immediates
-	const int64_t diff = (int64_t)val - (int64_t)m_baseptr;
-	if (diff > 0 && emit_add_optimized(a, reg, BASE_REG, diff))
+	// Check for constants that can be generated with a single instruction
+	if (is_simple_mov_immediate(val, reg.isGpX() ? 8 : 4))
+	{
+		a.mov(reg, val);
 		return;
-	else if (diff < 0 && emit_sub_optimized(a, reg, BASE_REG, diff))
+	}
+	else if (reg.isGpX() && is_valid_immediate_mask(val, 4))
+	{
+		a.mov(reg.w(), val); // asmjit isn't smart enough to work this out
 		return;
+	}
 
+	// Values close to the program counter can be generated with a single adr
 	const uint64_t codeoffs = a.code()->baseAddress() + a.offset();
-	const int64_t reloffs = (int64_t)val - codeoffs;
+	const int64_t reloffs = int64_t(val) - codeoffs;
 	if (is_valid_immediate_signed(reloffs, 21))
 	{
 		a.adr(reg, val);
 		return;
 	}
 
+	// If a value can be expressed relative to the base register then it's worth using it
+	const int64_t diff = int64_t(val) - int64_t(m_baseptr);
+	if ((diff > 0) && emit_add_optimized(a, reg, BASE_REG, diff))
+		return;
+	else if ((diff < 0) && emit_sub_optimized(a, reg, BASE_REG, diff))
+		return;
+
+	// Values within 4G of the program counter can be generated with adrp followed by add
 	const uint64_t pagebase = codeoffs & ~make_bitmask<uint64_t>(12);
-	const int64_t pagerel = (int64_t)val - pagebase;
+	const int64_t pagerel = int64_t(val) - pagebase;
 	if (is_valid_immediate_signed(pagerel, 21 + 12))
 	{
 		const uint64_t targetpage = val & ~make_bitmask<uint64_t>(12);
@@ -506,14 +564,15 @@ void drcbe_arm64::get_imm_relative(a64::Assembler &a, const a64::Gp &reg, const 
 		return;
 	}
 
+	// up to four instructions
 	a.mov(reg, val);
 }
 
-void drcbe_arm64::emit_ldr_str_base_mem(a64::Assembler &a, a64::Inst::Id opcode, const a64::Reg &reg, const void *ptr) const
+inline void drcbe_arm64::emit_ldr_str_base_mem(a64::Assembler &a, a64::Inst::Id opcode, const a64::Reg &reg, int max_shift, const void *ptr) const
 {
-	// If it can fit as a constant offset
+	// If it can fit as an immediate offset
 	const int64_t diff = (int64_t)ptr - (int64_t)m_baseptr;
-	if (is_valid_immediate_signed(diff, 9))
+	if (is_valid_offset(diff, max_shift))
 	{
 		a.emit(opcode, reg, arm::Mem(BASE_REG, diff));
 		return;
@@ -547,31 +606,30 @@ void drcbe_arm64::emit_ldr_str_base_mem(a64::Assembler &a, a64::Inst::Id opcode,
 		return;
 	}
 
+	// If it's in a nearby page
+	const uint64_t pagebase = codeoffs & ~make_bitmask<uint64_t>(12);
+	const int64_t pagerel = (int64_t)ptr - pagebase;
+	if (is_valid_immediate_signed(pagerel, 21 + 12))
+	{
+		const uint64_t targetpage = (uint64_t)ptr & ~make_bitmask<uint64_t>(12);
+		const uint64_t pageoffs = (uint64_t)ptr & util::make_bitmask<uint64_t>(12);
+
+		a.adrp(MEM_SCRATCH_REG, targetpage);
+		if (is_valid_offset(pageoffs, max_shift))
+		{
+			a.emit(opcode, reg, arm::Mem(MEM_SCRATCH_REG, pageoffs));
+		}
+		else
+		{
+			a.add(MEM_SCRATCH_REG, MEM_SCRATCH_REG, pageoffs);
+			a.emit(opcode, reg, arm::Mem(MEM_SCRATCH_REG));
+		}
+		return;
+	}
+
 	if (diff >= 0)
 	{
-		int shift = 0;
-		int max_shift = 0;
-
-		if (opcode == a64::Inst::kIdLdrb || opcode == a64::Inst::kIdLdrsb)
-			max_shift = 0;
-		else if (opcode == a64::Inst::kIdLdrh || opcode == a64::Inst::kIdLdrsh)
-			max_shift = 1;
-		else if (opcode == a64::Inst::kIdLdrsw)
-			max_shift = 2;
-		else
-			max_shift = (reg.isGpW() || reg.isVecS()) ? 2 : 3;
-
-		for (int i = 0; i < 64 && max_shift > 0; i++)
-		{
-			if ((uint64_t)ptr & ((uint64_t)(1) << i))
-			{
-				shift = i;
-				break;
-			}
-		}
-
-		if (shift > max_shift)
-			shift = max_shift;
+		const int shift = (diff & make_bitmask<int64_t>(max_shift)) ? 0 : max_shift;
 
 		if (is_valid_immediate(diff >> shift, 32))
 		{
@@ -586,44 +644,23 @@ void drcbe_arm64::emit_ldr_str_base_mem(a64::Assembler &a, a64::Inst::Id opcode,
 		}
 	}
 
-	const uint64_t pagebase = codeoffs & ~make_bitmask<uint64_t>(12);
-	const int64_t pagerel = (int64_t)ptr - pagebase;
-	if (is_valid_immediate_signed(pagerel, 21 + 12))
-	{
-		const uint64_t targetpage = (uint64_t)ptr & ~make_bitmask<uint64_t>(12);
-		const uint64_t pageoffs = (uint64_t)ptr & util::make_bitmask<uint64_t>(12);
-
-		a.adrp(MEM_SCRATCH_REG, targetpage);
-
-		if (is_valid_immediate_signed(pageoffs, 9))
-		{
-			a.emit(opcode, reg, arm::Mem(MEM_SCRATCH_REG, pageoffs));
-			return;
-		}
-		else if (emit_add_optimized(a, MEM_SCRATCH_REG, MEM_SCRATCH_REG, pageoffs))
-		{
-			a.emit(opcode, reg, arm::Mem(MEM_SCRATCH_REG));
-			return;
-		}
-	}
-
 	// Can't optimize it at all, most likely becomes 4 MOV commands
 	a.mov(MEM_SCRATCH_REG, ptr);
 	a.emit(opcode, reg, arm::Mem(MEM_SCRATCH_REG));
 }
 
-void drcbe_arm64::emit_ldr_mem(a64::Assembler &a, const a64::Gp &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdLdr, reg, ptr); }
-void drcbe_arm64::emit_ldrb_mem(a64::Assembler &a, const a64::Gp &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdLdrb, reg, ptr); }
-void drcbe_arm64::emit_ldrh_mem(a64::Assembler &a, const a64::Gp &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdLdrh, reg, ptr); }
-void drcbe_arm64::emit_ldrsb_mem(a64::Assembler &a, const a64::Gp &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdLdrsb, reg, ptr); }
-void drcbe_arm64::emit_ldrsh_mem(a64::Assembler &a, const a64::Gp &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdLdrsh, reg, ptr); }
-void drcbe_arm64::emit_ldrsw_mem(a64::Assembler &a, const a64::Gp &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdLdrsw, reg, ptr); }
-void drcbe_arm64::emit_str_mem(a64::Assembler &a, const a64::Gp &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdStr, reg, ptr); }
-void drcbe_arm64::emit_strb_mem(a64::Assembler &a, const a64::Gp &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdStrb, reg, ptr); }
-void drcbe_arm64::emit_strh_mem(a64::Assembler &a, const a64::Gp &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdStrh, reg, ptr); }
+void drcbe_arm64::emit_ldr_mem(a64::Assembler &a, const a64::Gp &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdLdr, reg, reg.isGpW() ? 2 : 3, ptr); }
+void drcbe_arm64::emit_ldrb_mem(a64::Assembler &a, const a64::Gp &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdLdrb, reg, 0, ptr); }
+void drcbe_arm64::emit_ldrh_mem(a64::Assembler &a, const a64::Gp &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdLdrh, reg, 1, ptr); }
+void drcbe_arm64::emit_ldrsb_mem(a64::Assembler &a, const a64::Gp &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdLdrsb, reg, 0, ptr); }
+void drcbe_arm64::emit_ldrsh_mem(a64::Assembler &a, const a64::Gp &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdLdrsh, reg, 1, ptr); }
+void drcbe_arm64::emit_ldrsw_mem(a64::Assembler &a, const a64::Gp &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdLdrsw, reg, 2, ptr); }
+void drcbe_arm64::emit_str_mem(a64::Assembler &a, const a64::Gp &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdStr, reg, reg.isGpW() ? 2 : 3, ptr); }
+void drcbe_arm64::emit_strb_mem(a64::Assembler &a, const a64::Gp &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdStrb, reg, 0, ptr); }
+void drcbe_arm64::emit_strh_mem(a64::Assembler &a, const a64::Gp &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdStrh, reg, 1, ptr); }
 
-void drcbe_arm64::emit_float_ldr_mem(a64::Assembler &a, const a64::Vec &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdLdr_v, reg, ptr); }
-void drcbe_arm64::emit_float_str_mem(a64::Assembler &a, const a64::Vec &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdStr_v, reg, ptr); }
+void drcbe_arm64::emit_float_ldr_mem(a64::Assembler &a, const a64::Vec &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdLdr_v, reg, reg.isVecS() ? 2 : 3, ptr); }
+void drcbe_arm64::emit_float_str_mem(a64::Assembler &a, const a64::Vec &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdStr_v, reg, reg.isVecS() ? 2 : 3, ptr); }
 
 void drcbe_arm64::mov_reg_param(a64::Assembler &a, uint32_t regsize, const a64::Gp &dst, const be_parameter &src) const
 {
@@ -803,7 +840,7 @@ void drcbe_arm64::call_arm_addr(a64::Assembler &a, const void *offs) const
 {
 	const uint64_t codeoffs = a.code()->baseAddress() + a.offset();
 	const int64_t reloffs = (int64_t)offs - codeoffs;
-	if (is_valid_immediate_signed(reloffs, 26))
+	if (is_valid_immediate_signed(reloffs, 26 + 2))
 	{
 		a.bl(offs);
 	}
@@ -985,15 +1022,15 @@ drcbe_arm64::drcbe_arm64(drcuml_state &drcuml, device_t &device, drc_cache &cach
 	// resolve the actual addresses of member functions we need to call
 	m_drcmap_get_value.set(m_map, &drc_map_variables::get_value);
 	if (!m_drcmap_get_value)
-	{
-		m_drcmap_get_value.obj = uintptr_t(&m_map);
-		m_drcmap_get_value.func = reinterpret_cast<uint8_t *>(uintptr_t(&drc_map_variables::static_get_value));
-	}
-	m_resolved_accessors.resize(m_space.size());
+		throw emu_fatalerror("Error resolving map variable get value function!\n");
+	m_memory_accessors.resize(m_space.size());
 	for (int space = 0; m_space.size() > space; ++space)
 	{
 		if (m_space[space])
-			m_resolved_accessors[space].set(*m_space[space]);
+		{
+			m_memory_accessors[space].resolved.set(*m_space[space]);
+			m_memory_accessors[space].specific = m_space[space]->specific_accessors();
+		}
 	}
 }
 
@@ -1065,7 +1102,7 @@ void drcbe_arm64::reset()
 
 	a.emitProlog(frame);
 
-	a.ldr(BASE_REG, get_mem_absolute(a, &m_baseptr));
+	get_imm_absolute(a, BASE_REG, uintptr_t(m_baseptr));
 	emit_ldr_mem(a, FLAGS_REG.w(), &m_near.emulated_flags);
 
 	a.emitArgsAssignment(frame, args);
@@ -1108,12 +1145,7 @@ void drcbe_arm64::generate(drcuml_block &block, const instruction *instlist, uin
 	{
 		m_debug_cpu_instruction_hook.set(*m_device.debug(), &device_debug::instruction_hook);
 		if (!m_debug_cpu_instruction_hook)
-		{
-			m_debug_cpu_instruction_hook.obj = uintptr_t(m_device.debug());
-			using debugger_hook_func = void (*)(device_debug *, offs_t);
-			static const auto debugger_inst_hook = [] (device_debug *dbg, offs_t pc) { dbg->instruction_hook(pc); };
-			m_debug_cpu_instruction_hook.func = reinterpret_cast<uint8_t *>(uintptr_t(debugger_hook_func(debugger_inst_hook)));
-		}
+			throw emu_fatalerror("Error resolving debugger instruction hook member function!\n");
 	}
 
 	// tell all of our utility objects that a block is beginning
@@ -1212,7 +1244,7 @@ void drcbe_arm64::op_handle(a64::Assembler &a, const uml::instruction &inst)
 	// register the current pointer for the handle
 	inst.param(0).handle().set_codeptr(drccodeptr(a.code()->baseAddress() + a.offset()));
 
-	// the handle points to prolog code that creates a minimal non-leaf frame
+	// the handle points to prologue code that creates a minimal non-leaf frame
 	a.stp(a64::x29, a64::x30, arm::Mem(a64::sp, -16).pre());
 	a.bind(skip);
 }
@@ -2066,66 +2098,29 @@ void drcbe_arm64::op_read(a64::Assembler &a, const uml::instruction &inst)
 	const parameter &spacesizep = inst.param(2);
 	assert(spacesizep.is_size_space());
 
-	const auto &trampolines = m_accessors[spacesizep.space()];
-	const auto &resolved = m_resolved_accessors[spacesizep.space()];
+	auto const &accessors = m_memory_accessors[spacesizep.space()];
 
 	mov_reg_param(a, 4, REG_PARAM2, addrp);
 
 	if (spacesizep.size() == SIZE_BYTE)
 	{
-		if (resolved.read_byte)
-		{
-			get_imm_relative(a, REG_PARAM1, resolved.read_byte.obj);
-			call_arm_addr(a, resolved.read_byte.func);
-		}
-		else
-		{
-			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
-			emit_ldr_mem(a, TEMP_REG1, &trampolines.read_byte);
-			a.blr(TEMP_REG1);
-		}
+		get_imm_relative(a, REG_PARAM1, accessors.resolved.read_byte.obj);
+		call_arm_addr(a, accessors.resolved.read_byte.func);
 	}
 	else if (spacesizep.size() == SIZE_WORD)
 	{
-		if (resolved.read_word)
-		{
-			get_imm_relative(a, REG_PARAM1, resolved.read_word.obj);
-			call_arm_addr(a, resolved.read_word.func);
-		}
-		else
-		{
-			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
-			emit_ldr_mem(a, TEMP_REG1, &trampolines.read_word);
-			a.blr(TEMP_REG1);
-		}
+		get_imm_relative(a, REG_PARAM1, accessors.resolved.read_word.obj);
+		call_arm_addr(a, accessors.resolved.read_word.func);
 	}
 	else if (spacesizep.size() == SIZE_DWORD)
 	{
-		if (resolved.read_dword)
-		{
-			get_imm_relative(a, REG_PARAM1, resolved.read_dword.obj);
-			call_arm_addr(a, resolved.read_dword.func);
-		}
-		else
-		{
-			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
-			emit_ldr_mem(a, TEMP_REG1, &trampolines.read_dword);
-			a.blr(TEMP_REG1);
-		}
+		get_imm_relative(a, REG_PARAM1, accessors.resolved.read_dword.obj);
+		call_arm_addr(a, accessors.resolved.read_dword.func);
 	}
 	else if (spacesizep.size() == SIZE_QWORD)
 	{
-		if (resolved.read_qword)
-		{
-			get_imm_relative(a, REG_PARAM1, resolved.read_qword.obj);
-			call_arm_addr(a, resolved.read_qword.func);
-		}
-		else
-		{
-			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
-			emit_ldr_mem(a, TEMP_REG1, &trampolines.read_qword);
-			a.blr(TEMP_REG1);
-		}
+		get_imm_relative(a, REG_PARAM1, accessors.resolved.read_qword.obj);
+		call_arm_addr(a, accessors.resolved.read_qword.func);
 	}
 
 	mov_param_reg(a, inst.size(), dstp, REG_PARAM1);
@@ -2143,67 +2138,30 @@ void drcbe_arm64::op_readm(a64::Assembler &a, const uml::instruction &inst)
 	const parameter &spacesizep = inst.param(3);
 	assert(spacesizep.is_size_space());
 
-	const auto &trampolines = m_accessors[spacesizep.space()];
-	const auto &resolved = m_resolved_accessors[spacesizep.space()];
+	auto const &accessors = m_memory_accessors[spacesizep.space()];
 
 	mov_reg_param(a, 4, REG_PARAM2, addrp);
 	mov_reg_param(a, inst.size(), REG_PARAM3, maskp);
 
 	if (spacesizep.size() == SIZE_BYTE)
 	{
-		if (resolved.read_byte_masked)
-		{
-			get_imm_relative(a, REG_PARAM1, resolved.read_byte_masked.obj);
-			call_arm_addr(a, resolved.read_byte_masked.func);
-		}
-		else
-		{
-			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
-			emit_ldr_mem(a, TEMP_REG1, &trampolines.read_byte_masked);
-			a.blr(TEMP_REG1);
-		}
+		get_imm_relative(a, REG_PARAM1, accessors.resolved.read_byte_masked.obj);
+		call_arm_addr(a, accessors.resolved.read_byte_masked.func);
 	}
 	else if (spacesizep.size() == SIZE_WORD)
 	{
-		if (resolved.read_word_masked)
-		{
-			get_imm_relative(a, REG_PARAM1, resolved.read_word_masked.obj);
-			call_arm_addr(a, resolved.read_word_masked.func);
-		}
-		else
-		{
-			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
-			emit_ldr_mem(a, TEMP_REG1, &trampolines.read_word_masked);
-			a.blr(TEMP_REG1);
-		}
+		get_imm_relative(a, REG_PARAM1, accessors.resolved.read_word_masked.obj);
+		call_arm_addr(a, accessors.resolved.read_word_masked.func);
 	}
 	else if (spacesizep.size() == SIZE_DWORD)
 	{
-		if (resolved.read_dword_masked)
-		{
-			get_imm_relative(a, REG_PARAM1, resolved.read_dword_masked.obj);
-			call_arm_addr(a, resolved.read_dword_masked.func);
-		}
-		else
-		{
-			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
-			emit_ldr_mem(a, TEMP_REG1, &trampolines.read_dword_masked);
-			a.blr(TEMP_REG1);
-		}
+		get_imm_relative(a, REG_PARAM1, accessors.resolved.read_dword_masked.obj);
+		call_arm_addr(a, accessors.resolved.read_dword_masked.func);
 	}
 	else if (spacesizep.size() == SIZE_QWORD)
 	{
-		if (resolved.read_qword_masked)
-		{
-			get_imm_relative(a, REG_PARAM1, resolved.read_qword_masked.obj);
-			call_arm_addr(a, resolved.read_qword_masked.func);
-		}
-		else
-		{
-			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
-			emit_ldr_mem(a, TEMP_REG1, &trampolines.read_qword_masked);
-			a.blr(TEMP_REG1);
-		}
+		get_imm_relative(a, REG_PARAM1, accessors.resolved.read_qword_masked.obj);
+		call_arm_addr(a, accessors.resolved.read_qword_masked.func);
 	}
 
 	mov_param_reg(a, inst.size(), dstp, REG_PARAM1);
@@ -2220,67 +2178,30 @@ void drcbe_arm64::op_write(a64::Assembler &a, const uml::instruction &inst)
 	const parameter &spacesizep = inst.param(2);
 	assert(spacesizep.is_size_space());
 
-	const auto &trampolines = m_accessors[spacesizep.space()];
-	const auto &resolved = m_resolved_accessors[spacesizep.space()];
+	auto const &accessors = m_memory_accessors[spacesizep.space()];
 
 	mov_reg_param(a, 4, REG_PARAM2, addrp);
 	mov_reg_param(a, inst.size(), REG_PARAM3, srcp);
 
 	if (spacesizep.size() == SIZE_BYTE)
 	{
-		if (resolved.write_byte)
-		{
-			get_imm_relative(a, REG_PARAM1, resolved.write_byte.obj);
-			call_arm_addr(a, resolved.write_byte.func);
-		}
-		else
-		{
-			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
-			emit_ldr_mem(a, TEMP_REG1, &trampolines.write_byte);
-			a.blr(TEMP_REG1);
-		}
+		get_imm_relative(a, REG_PARAM1, accessors.resolved.write_byte.obj);
+		call_arm_addr(a, accessors.resolved.write_byte.func);
 	}
 	else if (spacesizep.size() == SIZE_WORD)
 	{
-		if (resolved.write_word)
-		{
-			get_imm_relative(a, REG_PARAM1, resolved.write_word.obj);
-			call_arm_addr(a, resolved.write_word.func);
-		}
-		else
-		{
-			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
-			emit_ldr_mem(a, TEMP_REG1, &trampolines.write_word);
-			a.blr(TEMP_REG1);
-		}
+		get_imm_relative(a, REG_PARAM1, accessors.resolved.write_word.obj);
+		call_arm_addr(a, accessors.resolved.write_word.func);
 	}
 	else if (spacesizep.size() == SIZE_DWORD)
 	{
-		if (resolved.write_dword)
-		{
-			get_imm_relative(a, REG_PARAM1, resolved.write_dword.obj);
-			call_arm_addr(a, resolved.write_dword.func);
-		}
-		else
-		{
-			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
-			emit_ldr_mem(a, TEMP_REG1, &trampolines.write_dword);
-			a.blr(TEMP_REG1);
-		}
+		get_imm_relative(a, REG_PARAM1, accessors.resolved.write_dword.obj);
+		call_arm_addr(a, accessors.resolved.write_dword.func);
 	}
 	else if (spacesizep.size() == SIZE_QWORD)
 	{
-		if (resolved.write_qword)
-		{
-			get_imm_relative(a, REG_PARAM1, resolved.write_qword.obj);
-			call_arm_addr(a, resolved.write_qword.func);
-		}
-		else
-		{
-			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
-			emit_ldr_mem(a, TEMP_REG1, &trampolines.write_qword);
-			a.blr(TEMP_REG1);
-		}
+		get_imm_relative(a, REG_PARAM1, accessors.resolved.write_qword.obj);
+		call_arm_addr(a, accessors.resolved.write_qword.func);
 	}
 }
 
@@ -2297,8 +2218,7 @@ void drcbe_arm64::op_writem(a64::Assembler &a, const uml::instruction &inst)
 	assert(spacesizep.is_size_space());
 
 	// set up a call to the write handler
-	const auto &trampolines = m_accessors[spacesizep.space()];
-	const auto &resolved = m_resolved_accessors[spacesizep.space()];
+	auto const &accessors = m_memory_accessors[spacesizep.space()];
 
 	mov_reg_param(a, 4, REG_PARAM2, addrp);
 	mov_reg_param(a, inst.size(), REG_PARAM3, srcp);
@@ -2306,59 +2226,23 @@ void drcbe_arm64::op_writem(a64::Assembler &a, const uml::instruction &inst)
 
 	if (spacesizep.size() == SIZE_BYTE)
 	{
-		if (resolved.write_byte_masked)
-		{
-			get_imm_relative(a, REG_PARAM1, resolved.write_byte_masked.obj);
-			call_arm_addr(a, resolved.write_byte_masked.func);
-		}
-		else
-		{
-			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
-			emit_ldr_mem(a, TEMP_REG1, &trampolines.write_byte_masked);
-			a.blr(TEMP_REG1);
-		}
+		get_imm_relative(a, REG_PARAM1, accessors.resolved.write_byte_masked.obj);
+		call_arm_addr(a, accessors.resolved.write_byte_masked.func);
 	}
 	else if (spacesizep.size() == SIZE_WORD)
 	{
-		if (resolved.write_word_masked)
-		{
-			get_imm_relative(a, REG_PARAM1, resolved.write_word_masked.obj);
-			call_arm_addr(a, resolved.write_word_masked.func);
-		}
-		else
-		{
-			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
-			emit_ldr_mem(a, TEMP_REG1, &trampolines.write_word_masked);
-			a.blr(TEMP_REG1);
-		}
+		get_imm_relative(a, REG_PARAM1, accessors.resolved.write_word_masked.obj);
+		call_arm_addr(a, accessors.resolved.write_word_masked.func);
 	}
 	else if (spacesizep.size() == SIZE_DWORD)
 	{
-		if (resolved.write_dword_masked)
-		{
-			get_imm_relative(a, REG_PARAM1, resolved.write_dword_masked.obj);
-			call_arm_addr(a, resolved.write_dword_masked.func);
-		}
-		else
-		{
-			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
-			emit_ldr_mem(a, TEMP_REG1, &trampolines.write_dword_masked);
-			a.blr(TEMP_REG1);
-		}
+		get_imm_relative(a, REG_PARAM1, accessors.resolved.write_dword_masked.obj);
+		call_arm_addr(a, accessors.resolved.write_dword_masked.func);
 	}
 	else if (spacesizep.size() == SIZE_QWORD)
 	{
-		if (resolved.write_qword_masked)
-		{
-			get_imm_relative(a, REG_PARAM1, resolved.write_qword_masked.obj);
-			call_arm_addr(a, resolved.write_qword_masked.func);
-		}
-		else
-		{
-			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
-			emit_ldr_mem(a, TEMP_REG1, &trampolines.write_qword_masked);
-			a.blr(TEMP_REG1);
-		}
+		get_imm_relative(a, REG_PARAM1, accessors.resolved.write_qword_masked.obj);
+		call_arm_addr(a, accessors.resolved.write_qword_masked.func);
 	}
 }
 
@@ -2613,7 +2497,7 @@ void drcbe_arm64::op_roland(a64::Assembler &a, const uml::instruction &inst)
 		else if (is_contiguous)
 		{
 			// Optimize a contiguous mask
-			auto const rot = ((instbits * 2) - s - pop - lz) & (instbits - 1);
+			auto const rot = -int(s + pop + lz) & (instbits - 1);
 
 			if (rot > 0)
 				a.ror(output, output, rot);
@@ -2751,16 +2635,14 @@ void drcbe_arm64::op_rolins(a64::Assembler &a, const uml::instruction &inst)
 			if (is_right_aligned)
 			{
 				// Optimize a contiguous right-aligned mask
-				rot = instbits - s;
+				rot = (instbits - s) & (instbits - 1);
 			}
 			else if (is_contiguous)
 			{
 				// Optimize a contiguous mask
-				rot = (instbits * 2) - s - pop - lz;
+				rot = -int32_t(s + pop + lz) & (instbits - 1);
 				lsb = instbits - pop - lz;
 			}
-
-			rot &= instbits - 1;
 
 			if (srcp.is_immediate() && rot > 0)
 			{
@@ -3327,7 +3209,14 @@ void drcbe_arm64::op_and(a64::Assembler &a, const uml::instruction &inst)
 
 	const a64::Gp dst = dstp.select_register(TEMP_REG3, inst.size());
 
-	if (src1p.is_immediate() && src2p.is_immediate())
+	if (src1p.is_immediate_value(0) || src2p.is_immediate_value(0))
+	{
+		if (inst.flags())
+			a.ands(dst, select_register(a64::xzr, inst.size()), 1); // immediate value doesn't matter, result will be zero
+		else
+			a.mov(dst, 0);
+	}
+	else if (src1p.is_immediate() && src2p.is_immediate())
 	{
 		get_imm_relative(a, dst, src1p.immediate() & src2p.immediate());
 
@@ -3339,10 +3228,14 @@ void drcbe_arm64::op_and(a64::Assembler &a, const uml::instruction &inst)
 		const a64::Gp src1 = src1p.select_register(TEMP_REG1, inst.size());
 		mov_reg_param(a, inst.size(), src1, src1p);
 
-		if (src2p.is_immediate_value(0))
-			a.ands(dst, src1, select_register(a64::xzr, inst.size()));
-		else
-			a.ands(dst, src1, src2p.immediate());
+		a.ands(dst, src1, src2p.immediate());
+	}
+	else if (!inst.flags() && (inst.size() == 8) && src2p.is_immediate() && is_valid_immediate_mask(src2p.immediate(), 4))
+	{
+		const a64::Gp src1 = src1p.select_register(TEMP_REG1, inst.size());
+		mov_reg_param(a, inst.size(), src1, src1p);
+
+		a.and_(dst.w(), src1.w(), src2p.immediate());
 	}
 	else
 	{
@@ -3936,40 +3829,21 @@ void drcbe_arm64::op_fread(a64::Assembler &a, const uml::instruction &inst)
 	assert(spacesizep.is_size_space());
 	assert((1 << spacesizep.size()) == inst.size());
 
-	const auto &trampolines = m_accessors[spacesizep.space()];
-	const auto &resolved = m_resolved_accessors[spacesizep.space()];
+	auto const &accessors = m_memory_accessors[spacesizep.space()];
 
 	mov_reg_param(a, 4, REG_PARAM2, addrp);
 
 	if (inst.size() == 4)
 	{
-		if (resolved.read_dword)
-		{
-			get_imm_relative(a, REG_PARAM1, resolved.read_dword.obj);
-			call_arm_addr(a, resolved.read_dword.func);
-		}
-		else
-		{
-			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
-			emit_ldr_mem(a, TEMP_REG1, &trampolines.read_dword);
-			a.blr(TEMP_REG1);
-		}
+		get_imm_relative(a, REG_PARAM1, accessors.resolved.read_dword.obj);
+		call_arm_addr(a, accessors.resolved.read_dword.func);
 
 		mov_float_param_int_reg(a, inst.size(), dstp, REG_PARAM1.w());
 	}
 	else if (inst.size() == 8)
 	{
-		if (resolved.read_qword)
-		{
-			get_imm_relative(a, REG_PARAM1, resolved.read_qword.obj);
-			call_arm_addr(a, resolved.read_qword.func);
-		}
-		else
-		{
-			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
-			emit_ldr_mem(a, TEMP_REG1, &trampolines.read_qword);
-			a.blr(TEMP_REG1);
-		}
+		get_imm_relative(a, REG_PARAM1, accessors.resolved.read_qword.obj);
+		call_arm_addr(a, accessors.resolved.read_qword.func);
 
 		mov_float_param_int_reg(a, inst.size(), dstp, REG_PARAM1);
 	}
@@ -3987,8 +3861,7 @@ void drcbe_arm64::op_fwrite(a64::Assembler &a, const uml::instruction &inst)
 	assert(spacesizep.is_size_space());
 	assert((1 << spacesizep.size()) == inst.size());
 
-	const auto &trampolines = m_accessors[spacesizep.space()];
-	const auto &resolved = m_resolved_accessors[spacesizep.space()];
+	auto const &accessors = m_memory_accessors[spacesizep.space()];
 
 	mov_reg_param(a, 4, REG_PARAM2, addrp);
 	mov_float_reg_param(a, inst.size(), TEMPF_REG1, srcp);
@@ -3997,31 +3870,13 @@ void drcbe_arm64::op_fwrite(a64::Assembler &a, const uml::instruction &inst)
 
 	if (inst.size() == 4)
 	{
-		if (resolved.write_dword)
-		{
-			get_imm_relative(a, REG_PARAM1, resolved.write_dword.obj);
-			call_arm_addr(a, resolved.write_dword.func);
-		}
-		else
-		{
-			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
-			emit_ldr_mem(a, TEMP_REG1, &trampolines.write_dword);
-			a.blr(TEMP_REG1);
-		}
+		get_imm_relative(a, REG_PARAM1, accessors.resolved.write_dword.obj);
+		call_arm_addr(a, accessors.resolved.write_dword.func);
 	}
 	else if (inst.size() == 8)
 	{
-		if (resolved.write_qword)
-		{
-			get_imm_relative(a, REG_PARAM1, resolved.write_qword.obj);
-			call_arm_addr(a, resolved.write_qword.func);
-		}
-		else
-		{
-			get_imm_relative(a, REG_PARAM1, (uintptr_t)m_space[spacesizep.space()]);
-			emit_ldr_mem(a, TEMP_REG1, &trampolines.write_qword);
-			a.blr(TEMP_REG1);
-		}
+		get_imm_relative(a, REG_PARAM1, accessors.resolved.write_qword.obj);
+		call_arm_addr(a, accessors.resolved.write_qword.func);
 	}
 }
 

@@ -8,7 +8,6 @@
 /*                                                     */
 /*******************************************************/
 
-
 /*
 ********************************************************
 
@@ -323,9 +322,11 @@ TODO:
 
 
 #include "emu.h"
+
 #include "cpu/i8085/i8085.h"
 #include "sound/samples.h"
 #include "sound/sn76477.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -570,7 +571,7 @@ void sstrangr_state::sstrangr(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_size(32*8, 262);     // vert size is a guess, taken from mw8080bw
+	screen.set_size(32*8, 262); // vert size is a guess, taken from mw8080bw
 	screen.set_visarea(0*8, 32*8-1, 4*8, 32*8-1);
 	screen.set_refresh_hz(60);
 	screen.set_screen_update(FUNC(sstrangr_state::screen_update_sstrangr));
@@ -634,7 +635,7 @@ static INPUT_PORTS_START( sstrngr2 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
 
 	PORT_START("INPUTS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH,  IPT_COIN1 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_SERVICE( 0x08, IP_ACTIVE_HIGH )  // This is an edge connector pin for testing ROM/RAM and I/O ports
@@ -690,5 +691,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAMEL( 1978, sstrangr,  0,        sstrangr, sstrangr, sstrangr_state, empty_init, ROT270, "Yachiyo Electronics, Ltd.", "Space Stranger",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_sstrangr )
-GAME(  1979, sstrangr2, sstrangr, sstrngr2, sstrngr2, sstrangr_state, empty_init, ROT270, "Yachiyo Electronics, Ltd.", "Space Stranger 2", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAMEL( 1978, sstrangr,  0,        sstrangr, sstrangr, sstrangr_state, empty_init, ROT270, "Yachiyo Electric", "Space Stranger",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_sstrangr )
+GAME(  1979, sstrangr2, sstrangr, sstrngr2, sstrngr2, sstrangr_state, empty_init, ROT270, "Yachiyo Electric", "Space Stranger 2", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

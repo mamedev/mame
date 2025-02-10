@@ -36399,7 +36399,9 @@ Please stick to using the floppy versions for the time being...
 		</part>
 	</software>
 
-	<software name="technocp" supported="no">
+	<!-- All data is in the one tape image.  When the game asks to flip the tape to side 2, just keep the tape running.
+	     You may want to take note where this occurs in case you need to restart and rewind the tape. -->
+	<software name="technocp" supported="yes">
 		<description>Techno Cop (UK)</description>
 		<year>1988</year>
 		<publisher>Gremlin Graphics Software</publisher>

@@ -571,7 +571,7 @@ void xbox_base_state::help_command(const std::vector<std::string_view> &params)
 	con.printf("  xbox waitvblank -- Toggle support for wait vblank method\n");
 	con.printf("  xbox grab_texture,<type>,<filename> -- Save to <filename> the next used texture of type <type>\n");
 	con.printf("  xbox grab_vprog,<filename> -- save current vertex program instruction slots to <filename>\n");
-	con.printf("  xbox vprogdis,<address>,<length>[,<type>] -- disassemble <lenght> vertex program instructions at <address> of <type>\n");
+	con.printf("  xbox vprogdis,<address>,<length>[,<type>] -- disassemble <length> vertex program instructions at <address> of <type>\n");
 	con.printf("  xbox vdeclaration,<address> -- decode vertex program declaration at <address>\n");
 	con.printf("  xbox help -- this list\n");
 }

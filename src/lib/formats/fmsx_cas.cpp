@@ -49,7 +49,7 @@ static int fmsx_cas_to_wav_size (const uint8_t *casdata, int caslen)
 /*******************************************************************
    Generate samples for the tape image
 ********************************************************************/
-static int fmsx_cas_fill_wave(int16_t *buffer, int sample_count, uint8_t *bytes)
+static int fmsx_cas_fill_wave(int16_t *buffer, int sample_count, const uint8_t *bytes)
 {
 	int cas_pos, bit, state = 1, samples_pos, size, n, i, p;
 
