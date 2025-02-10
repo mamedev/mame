@@ -218,15 +218,23 @@ inline a64::Gp select_register(a64::Gp const &reg, uint32_t regsize)
 
 inline bool is_valid_immediate_mask(uint64_t val, size_t bytes)
 {
+	const unsigned bits = bytes * 8;
+
 	// all zeros and all ones aren't allowed, and disallow any value with bits outside of the max bit range
-	if (val == 0)
+	if ((val == 0) || (val >= util::make_bitmask<uint64_t>(bits)))
 		return false;
 
-	const auto lz = count_leading_zeros_64(val);
-	if ((64 - lz) >= (bytes * 8))
-		return false;
+	// work out if the value is repeating sequence of a power-of-two bit group
+	unsigned width = 2;
+	uint64_t mask = util::make_bitmask<uint64_t>(bits - width);
+	while ((width < bits) && ((val & mask) != (val >> width)))
+	{
+		mask >>= width;
+		width <<= 1;
+	}
 
 	// check check that set bits are contiguous
+	const auto lz = count_leading_zeros_64(val & make_bitmask<uint64_t>(width));
 	const uint64_t invleftaligned = ~(val << lz);
 	return !(invleftaligned & (invleftaligned + 1));
 }
@@ -254,11 +262,16 @@ inline constexpr bool is_valid_offset(int64_t diff, int max_shift)
 
 inline bool is_simple_mov_immediate(uint64_t val, size_t bytes)
 {
-	return
-			!(val & ~LSL0_MASK) || !(val & ~LSL16_MASK) || !(val & ~LSL32_MASK) || !(val & ~LSL48_MASK) || // movz
-			!(~val & ~LSL0_MASK) || !(~val & ~LSL16_MASK) || !(~val & ~LSL32_MASK) || !(~val & ~LSL48_MASK) || // movn
-			(!(val & (LSL48_MASK | LSL32_MASK)) && ((val & LSL16_MASK) == LSL16_MASK)) || // movn to w register
-			is_valid_immediate_mask(val, bytes); // orr
+	if (!(val & ~LSL0_MASK) || !(val & ~LSL16_MASK) || !(val & ~LSL32_MASK) || !(val & ~LSL48_MASK))
+		return true; // movz
+	else if (!(~val & ~LSL0_MASK) || !(~val & ~LSL16_MASK) || !(~val & ~LSL32_MASK) || !(~val & ~LSL48_MASK))
+		return true; // movn
+	else if ((val == uint32_t(val)) && (((val & LSL0_MASK) == LSL0_MASK) || ((val & LSL16_MASK) == LSL16_MASK)))
+		return true; // movn to w register
+	else if (is_valid_immediate_mask(val, bytes))
+		return true; // orr with zero register
+	else
+		return false;
 }
 
 inline bool emit_add_optimized(a64::Assembler &a, const a64::Gp &dst, const a64::Gp &src, int64_t val)
@@ -296,6 +309,11 @@ void get_imm_absolute(a64::Assembler &a, const a64::Gp &reg, const uint64_t val)
 		a.mov(reg, val);
 		return;
 	}
+	else if (reg.isGpX() && is_valid_immediate_mask(val, 4))
+	{
+		a.mov(reg.w(), val); // asmjit isn't smart enough to work this out
+		return;
+	}
 
 	// Values close to the program counter can be generated with a single adr
 	const uint64_t codeoffs = a.code()->baseAddress() + a.offset();
@@ -306,7 +324,7 @@ void get_imm_absolute(a64::Assembler &a, const a64::Gp &reg, const uint64_t val)
 		return;
 	}
 
-	// Values withing 4G of the program counter can be generated with adrp followed by add
+	// Values within 4G of the program counter can be generated with adrp followed by add
 	const uint64_t pagebase = codeoffs & ~make_bitmask<uint64_t>(12);
 	const int64_t pagerel = int64_t(val) - pagebase;
 	if (is_valid_immediate_signed(pagerel, 21 + 12))
@@ -509,6 +527,11 @@ void drcbe_arm64::get_imm_relative(a64::Assembler &a, const a64::Gp &reg, const 
 		a.mov(reg, val);
 		return;
 	}
+	else if (reg.isGpX() && is_valid_immediate_mask(val, 4))
+	{
+		a.mov(reg.w(), val); // asmjit isn't smart enough to work this out
+		return;
+	}
 
 	// Values close to the program counter can be generated with a single adr
 	const uint64_t codeoffs = a.code()->baseAddress() + a.offset();
@@ -526,7 +549,7 @@ void drcbe_arm64::get_imm_relative(a64::Assembler &a, const a64::Gp &reg, const 
 	else if ((diff < 0) && emit_sub_optimized(a, reg, BASE_REG, diff))
 		return;
 
-	// Values withing 4G of the program counter can be generated with adrp followed by add
+	// Values within 4G of the program counter can be generated with adrp followed by add
 	const uint64_t pagebase = codeoffs & ~make_bitmask<uint64_t>(12);
 	const int64_t pagerel = int64_t(val) - pagebase;
 	if (is_valid_immediate_signed(pagerel, 21 + 12))
@@ -3186,7 +3209,14 @@ void drcbe_arm64::op_and(a64::Assembler &a, const uml::instruction &inst)
 
 	const a64::Gp dst = dstp.select_register(TEMP_REG3, inst.size());
 
-	if (src1p.is_immediate() && src2p.is_immediate())
+	if (src1p.is_immediate_value(0) || src2p.is_immediate_value(0))
+	{
+		if (inst.flags())
+			a.ands(dst, select_register(a64::xzr, inst.size()), 1); // immediate value doesn't matter, result will be zero
+		else
+			a.mov(dst, 0);
+	}
+	else if (src1p.is_immediate() && src2p.is_immediate())
 	{
 		get_imm_relative(a, dst, src1p.immediate() & src2p.immediate());
 
@@ -3198,10 +3228,14 @@ void drcbe_arm64::op_and(a64::Assembler &a, const uml::instruction &inst)
 		const a64::Gp src1 = src1p.select_register(TEMP_REG1, inst.size());
 		mov_reg_param(a, inst.size(), src1, src1p);
 
-		if (src2p.is_immediate_value(0))
-			a.ands(dst, src1, select_register(a64::xzr, inst.size()));
-		else
-			a.ands(dst, src1, src2p.immediate());
+		a.ands(dst, src1, src2p.immediate());
+	}
+	else if (!inst.flags() && (inst.size() == 8) && src2p.is_immediate() && is_valid_immediate_mask(src2p.immediate(), 4))
+	{
+		const a64::Gp src1 = src1p.select_register(TEMP_REG1, inst.size());
+		mov_reg_param(a, inst.size(), src1, src1p);
+
+		a.and_(dst.w(), src1.w(), src2p.immediate());
 	}
 	else
 	{
