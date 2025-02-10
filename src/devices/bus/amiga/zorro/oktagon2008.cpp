@@ -14,7 +14,7 @@
 #include "machine/i2cmem.h"
 #include "machine/ncr53c90.h"
 
-#define VERBOSE (LOG_GENERAL)
+#define VERBOSE (0)
 #include "logmacro.h"
 
 
@@ -40,8 +40,7 @@ protected:
 	virtual void autoconfig_base_address(offs_t address) override;
 
 private:
-	u8 rom_diag_r(offs_t offset);
-	u8 rom_device_r(offs_t offset);
+	u8 rom_r(offs_t offset);
 	u8 int_control_r();
 	void int_control_w(u8 data);
 	u8 i2c_sda_r();
@@ -74,14 +73,9 @@ oktagon2008_device::oktagon2008_device(const machine_config &mconfig, const char
 {
 }
 
-u8 oktagon2008_device::rom_diag_r(offs_t offset)
+u8 oktagon2008_device::rom_r(offs_t offset)
 {
 	return m_rom[offset];
-}
-
-u8 oktagon2008_device::rom_device_r(offs_t offset)
-{
-	return m_rom[offset + 0x1000];
 }
 
 u8 oktagon2008_device::int_control_r()
@@ -154,6 +148,10 @@ void oktagon2008_device::autoconfig_base_address(offs_t address)
 	}
 	else
 	{
+		// Diag init read from $Ex0001-$Ex0FFF; device drivers read from $Ex2001-$ExFFFF
+		m_zorro->space().install_read_handler(address + 0x0000, address + 0xffff,
+			read8sm_delegate(*this, FUNC(oktagon2008_device::rom_r)), 0x00ff);
+
 		m_zorro->space().install_readwrite_handler(address + 0x1000, address + 0x1fff,
 			read16smo_delegate(*m_scsic, FUNC(ncr53c94_device::dma16_swap_r)),
 			write16smo_delegate(*m_scsic, FUNC(ncr53c94_device::dma16_swap_w)), 0xffff);
@@ -168,11 +166,6 @@ void oktagon2008_device::autoconfig_base_address(offs_t address)
 		m_zorro->space().install_readwrite_handler(address + 0x8018, address + 0x8019,
 				read8smo_delegate(*this, FUNC(oktagon2008_device::i2c_sda_r)),
 				write8smo_delegate(*this, FUNC(oktagon2008_device::i2c_sda_w)), 0xff00);
-
-		m_zorro->space().install_read_handler(address + 0xf000, address + 0xffff,
-			read8sm_delegate(*this, FUNC(oktagon2008_device::rom_diag_r)), 0xff00);
-		m_zorro->space().install_read_handler(address + 0x2000, address + 0xffff,
-			read8sm_delegate(*this, FUNC(oktagon2008_device::rom_device_r)), 0x00ff);
 
 		m_zorro->space().unmap_readwrite(0xe80000, 0xe8007f);
 		m_zorro->cfgout_w(0);
@@ -222,7 +215,7 @@ void oktagon2008_device::cfgin_w(int state)
 			autoconfig_product(5);
 			autoconfig_manufacturer(2092);
 			autoconfig_serial(0x00000000);
-			autoconfig_rom_vector(0xf000); // maybe
+			autoconfig_rom_vector(0x0001);
 		}
 	}
 }
