@@ -724,7 +724,6 @@
 4ab8 ffff tst.l   adr16 -
 4ab9 ffff tst.l   adr32 -
 4ac0 fff8 tas     ds    -
-4ac8 ffff halt    -     -
 4ad0 fff8 tas     ais   -
 4ad8 fff8 tas     aips  -
 4ae0 fff8 tas     pais  -
