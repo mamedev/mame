@@ -229,7 +229,6 @@ namespace
         uint8_t berr_status_r();
         void astreset_w(uint8_t data);
         void astset_w(uint8_t data);
-        void update_ast();
 
         // CPU timer handlers
         void interval_timer_tick(uint8_t data);
@@ -273,7 +272,6 @@ namespace
         };
 
         // CPU IRQ state
-        bool m_ast = false;
         uint32_t m_cpu_intst = 0;
         uint32_t m_cpu_inten = 0;
         std::map<int, bool> m_cpu_int_state = {
@@ -314,7 +312,7 @@ namespace
     };
 
     const std::map<int, news_iop_state::cpu_irq_number> news_iop_state::cpu_irq_line_map = {
-        // AST is excluded from this check since it is handled separately
+        // AST is excluded from this check
         {INPUT_LINE_IRQ2, CPIRQ1},
         {INPUT_LINE_IRQ3, IOPIRQ3},
         {INPUT_LINE_IRQ4, CPIRQ3},
@@ -368,18 +366,16 @@ namespace
 
     uint8_t news_iop_state::iop_status_r()
     {
-        // Assume no CPIRQ3/CPIRQ1 (Expansion I/O and VME interrupts) for now, but those are also in this register
-        // TODO: update below comments for NWS800 series
+        // IOP status bits defined as below for the NWS-18xx/19xx series
         // 7: FDC IRQ
         // 6: ~CPIRQ3
         // 5: Main Memory Parity Error Flag
-        // 4: ~CPIRQ1 (NWS-800: SCSI interrupt status?)
+        // 4: ~CPIRQ1 (On the NWS-800, this seems to be SCSI interrupt status?)
         // 3: DSR CHB
         // 2: RI CHB
         // 1: DSR CHA
         // 0: RI CHA
 
-        // TODO: this is SCSI IRQ, not DRQ, right?
         const uint8_t status = (is_iop_irq_set<SCSI_IRQ>() ? 0x10 : 0) | (is_iop_irq_set<FDCIRQ>() ? 0x80 : 0);
         LOGMASKED(LOG_ALL_INTERRUPT, "Read IOPSTATUS = 0x%x\n", status);
         return status;
@@ -394,7 +390,6 @@ namespace
         }
         else
         {
-            // TODO: also unmap RAM?
             m_iop->space(0).install_rom(0x00000000, 0x0000ffff, m_eprom);
         }
         m_panel_shift_count = 0; // hack, clear state from init
@@ -551,9 +546,6 @@ namespace
 
         // CPU doesn't run until the IOP tells it to
         m_cpu->set_input_line(INPUT_LINE_HALT, 1);
-
-        // Clear AST state
-        m_ast = false;
     }
 
     void news_iop_state::init_common()
@@ -636,30 +628,15 @@ namespace
         return status;
     }
 
+    // TODO: implement AST (Asynchronous System Trap)
     void news_iop_state::astreset_w(uint8_t data)
     {
         LOGMASKED(LOG_AST, "(%s) AST_RESET 0x%x\n", machine().describe_context(), data);
-        m_ast = false;
     }
 
     void news_iop_state::astset_w(uint8_t data)
     {
         LOGMASKED(LOG_AST, "(%s) AST_SET 0x%x\n", machine().describe_context(), data);
-        m_ast = true;
-    }
-
-    void news_iop_state::update_ast()
-    {
-        // Logic equation: !AST || (AST && PREV_AST && SUPERVISOR), 0 is IRQ active
-        const bool previous_ast_state = m_cpu_int_state[INPUT_LINE_IRQ1];
-        m_cpu_int_state[INPUT_LINE_IRQ1] = !m_ast || (m_ast && previous_ast_state && m_cpu->supervisor_mode());
-        if (!m_cpu_int_state[INPUT_LINE_IRQ1] && previous_ast_state) {
-            LOGMASKED(LOG_INTERRUPT, "Setting AST interrupt!\n");
-            m_cpu->set_input_line(INPUT_LINE_IRQ1, 1);
-        } else if (m_cpu_int_state[INPUT_LINE_IRQ1] && !previous_ast_state) {
-            LOGMASKED(LOG_INTERRUPT, "Clearing AST interrupt!\n");
-            m_cpu->set_input_line(INPUT_LINE_IRQ1, 0);
-        }
     }
 
     void news_iop_state::mmu_map(address_map &map)
@@ -667,7 +644,7 @@ namespace
         map(0x03000000, 0x0300ffff).rom().region("eprom", 0).mirror(0x007f0000);
 
         // VME bus
-        map(0x03900000, 0x039fffff).rw(FUNC(news_iop_state::vme_bus_error_r), FUNC(news_iop_state::vme_bus_error_w)); // TODO: actual region start/end
+        map(0x03900000, 0x039fffff).rw(FUNC(news_iop_state::vme_bus_error_r), FUNC(news_iop_state::vme_bus_error_w)); // TODO: full region start/end
 
         // Various platform control registers (MMU and otherwise)
         map(0x04400000, 0x04400000).w(FUNC(news_iop_state::cpu_romdis_w));
@@ -692,15 +669,12 @@ namespace
 
     void news_iop_state::cpu_map(address_map &map)
     {
-        // TODO: confirm clock signal that drives AST flip flop
         map(0x0, 0xffffffff).lrw32([this](offs_t offset, uint32_t mem_mask) {
             const uint32_t result = m_mmu->hyperbus_r(offset, mem_mask, m_cpu->supervisor_mode());
-            update_ast(); // Need to catch any supervisor -> user transitions
             return result;
         }, "hyperbus_r",
         [this](offs_t offset, uint32_t data, uint32_t mem_mask) {
             m_mmu->hyperbus_w(offset, data, mem_mask, m_cpu->supervisor_mode());
-            update_ast(); // Need to catch any supervisor -> user transitions
         }, "hyperbus_w");
     }
 
@@ -963,7 +937,7 @@ namespace
     {
         if (!machine().side_effects_disabled())
         {
-            // TODO: try using full cpu bus error func and setting the status to HB_BERR
+            // TODO: this might be more accurate with the full cpu bus error func and setting the status to HB_BERR
             LOG("vme_r(0x%x, 0x%x) -> 0x%x = 0x%x (%s)\n", offset, mem_mask, 0x03900000 + offset, 0xff, machine().describe_context());
             m_cpu->set_buserror_details(0x03900000 + offset, 1, m_cpu->get_fc());
             m_cpu->pulse_input_line(M68K_LINE_BUSERROR, attotime::zero);
@@ -983,7 +957,7 @@ namespace
 
     void news_iop_state::common(machine_config &config)
     {
-        M68020(config, m_iop, 16.67_MHz_XTAL); // TODO: probably divided somehow
+        M68020(config, m_iop, 16.67_MHz_XTAL); // TODO: this might come from a 33.3333MHz crystal divided by two
         m_iop->set_addrmap(AS_PROGRAM, &news_iop_state::iop_map);
         m_iop->set_addrmap(m68000_base_device::AS_CPU_SPACE, &news_iop_state::iop_autovector_map);
 
@@ -1057,6 +1031,8 @@ namespace
         // ID 7: NEWS (the workstation itself, SCSI initiator)
         // Most Sony tools can be configured to use any ID for anything, but the defaults will generally follow the above
         // So, even for expansion MO, tape drives, etc. it is usually easiest to use the above IDs for assignment
+        // Early (pre-OS-3) bootloaders are extremely picky about IDNT data and reported capacity; ensure you are using IDNT data and the matching size reported
+        // from an actual CDC drive if dealing with early versions.
         // Note: Only the NWS-891 came with a CD-ROM as a default option, others required an external CD-ROM drive
         NSCSI_BUS(config, "scsi");
         NSCSI_CONNECTOR(config, "scsi:0", news_scsi_devices, "harddisk");
