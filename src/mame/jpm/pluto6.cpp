@@ -66,7 +66,7 @@ U27: ??
 U28: ??
 U41: RS485 Transceiver
 U55: Heber custom ASIC. Probably a CPLD of sorts
-U56: MC68682 DUART
+U56: SCC68692 DUART
 B1: Varta NiCd 3v SRAM battery, which is likely leaking if not already replaced. 
 
 EXP 0+1: Fujitsu Cremson MB86290A/Expansion ports. 
@@ -263,7 +263,7 @@ private:
 	required_device<pluto6_expansion_slot_device> m_exp1;
 
 	bool duart_installed = false;
-	optional_device<mc68681_device> m_duart;
+	optional_device<mc68681_device> m_duart;	// Should be a SCC68692 instead
 	uint8_t m_duart_irq_state = 0;
 
 	bool eeprom_installed = false;
