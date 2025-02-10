@@ -241,4 +241,4 @@ TIMER_DEVICE_CALLBACK_MEMBER(cricket_device::clock_interrupt)
 } // anonymous namespace
 
 
-DEFINE_DEVICE_TYPE_PRIVATE(SERIAL_CRICKET, device_rs232_port_interface, cricket_device, "cricket", "Street Electronics The Cricket!")
+DEFINE_DEVICE_TYPE_PRIVATE(SERIAL_CRICKET, device_rs232_port_interface, cricket_device, "secricket", "Street Electronics The Cricket!")
