@@ -43379,7 +43379,7 @@ librie
 nws3860
 
 @source:sony/news_68k_iop.cpp
-nws831                          // Sony NEWS NWS-831
+nws831
 
 @source:sony/news_68k.cpp
 nws1580
