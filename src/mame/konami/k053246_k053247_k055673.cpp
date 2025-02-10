@@ -409,9 +409,6 @@ void k053247_device::k053247_sprites_draw_common(BitmapClass &bitmap, const rect
 				/* non-gx only */
 				primask,shadow,drawmode_table,shadowmode_table,shdmask
 				);
-
-
-
 	} // end of sprite-list loop
 #undef NUM_SPRITES
 }
@@ -589,68 +586,65 @@ void k053247_device::zdrawgfxzoom32GP(
 			}
 			while (--dst_h);
 		}
+		else if (drawmode < 4)
+		{
+			// 0: all pens solid
+			// 1: solid pens only
+			// 2: all pens solid with alpha blending
+			// 3: solid pens only with alpha blending
+			do {
+				do {
+					const u8 pal_idx = src_ptr[src_x];
+					src_x = src_fx >> FP;
+					src_fx += src_fdx;
+					if (!pal_idx || (drawmode & 0b01 && pal_idx >= shdpen) || ozbuf_ptr[ecx] < z8) continue;
+					ozbuf_ptr[ecx] = z8;
+					dst_ptr[ecx] = (drawmode & 0b10) ? alpha_blend_r32(dst_ptr[ecx], pal_base[pal_idx], alpha) : pal_base[pal_idx];
+				}
+				while (++ecx);
+
+				ecx = src_fby;   src_fby += src_fdy;
+				ozbuf_ptr += GX_ZBUFW;
+				dst_ptr += dst_pitch;
+				ecx >>= FP;      src_fx = src_fbx;
+				src_x = src_fbx; src_fx += src_fdx;
+				ecx <<= 4;       src_ptr = src_base;
+				src_x >>= FP;    src_ptr += ecx;
+				ecx = dst_w;
+			}
+			while (--dst_h);
+		}
 		else
 		{
-			if (drawmode < 4)
-			{
-				// 0: all pens solid
-				// 1: solid pens only
-				// 2: all pens solid with alpha blending
-				// 3: solid pens only with alpha blending
+			// 4: shadow pens only
+			do {
 				do {
-					do {
-						const u8 pal_idx = src_ptr[src_x];
-						src_x = src_fx >> FP;
-						src_fx += src_fdx;
-						if (!pal_idx || (drawmode & 0b01 && pal_idx >= shdpen) || ozbuf_ptr[ecx] < z8) continue;
-						ozbuf_ptr[ecx] = z8;
-						dst_ptr[ecx] = (drawmode & 0b10) ? alpha_blend_r32(dst_ptr[ecx], pal_base[pal_idx], alpha) : pal_base[pal_idx];
-					}
-					while (++ecx);
+					const u8 pal_idx = src_ptr[src_x];
+					src_x = src_fx >> FP;
+					src_fx += src_fdx;
+					if (pal_idx < shdpen || szbuf_ptr[ecx*2] < z8 || szbuf_ptr[ecx*2+1] <= p8) continue;
+					rgb_t pix = dst_ptr[ecx];
+					szbuf_ptr[ecx*2] = z8;
+					szbuf_ptr[ecx*2+1] = p8;
 
-					ecx = src_fby;   src_fby += src_fdy;
-					ozbuf_ptr += GX_ZBUFW;
-					dst_ptr += dst_pitch;
-					ecx >>= FP;      src_fx = src_fbx;
-					src_x = src_fbx; src_fx += src_fdx;
-					ecx <<= 4;       src_ptr = src_base;
-					src_x >>= FP;    src_ptr += ecx;
-					ecx = dst_w;
+					// the shadow tables are 15-bit lookup tables which accept RGB15... lossy, nasty, yuck!
+					dst_ptr[ecx] = shd_base[pix.as_rgb15()];
+					//dst_ptr[ecx] =(eax>>3&0x001f);lend_r32(eax, 0x00000000, 128);
 				}
-				while (--dst_h);
-			}
-			else
-			{
-				// 4: shadow pens only
-				do {
-					do {
-						const u8 pal_idx = src_ptr[src_x];
-						src_x = src_fx >> FP;
-						src_fx += src_fdx;
-						if (pal_idx < shdpen || szbuf_ptr[ecx*2] < z8 || szbuf_ptr[ecx*2+1] <= p8) continue;
-						rgb_t pix = dst_ptr[ecx];
-						szbuf_ptr[ecx*2] = z8;
-						szbuf_ptr[ecx*2+1] = p8;
+				while (++ecx);
 
-						// the shadow tables are 15-bit lookup tables which accept RGB15... lossy, nasty, yuck!
-						dst_ptr[ecx] = shd_base[pix.as_rgb15()];
-						//dst_ptr[ecx] =(eax>>3&0x001f);lend_r32(eax, 0x00000000, 128);
-					}
-					while (++ecx);
-
-					ecx = src_fby;   src_fby += src_fdy;
-					szbuf_ptr += (GX_ZBUFW<<1);
-					dst_ptr += dst_pitch;
-					ecx >>= FP;      src_fx = src_fbx;
-					src_x = src_fbx; src_fx += src_fdx;
-					ecx <<= 4;       src_ptr = src_base;
-					src_x >>= FP;    src_ptr += ecx;
-					ecx = dst_w;
-				}
-				while (--dst_h);
+				ecx = src_fby;   src_fby += src_fdy;
+				szbuf_ptr += (GX_ZBUFW<<1);
+				dst_ptr += dst_pitch;
+				ecx >>= FP;      src_fx = src_fbx;
+				src_x = src_fbx; src_fx += src_fdx;
+				ecx <<= 4;       src_ptr = src_base;
+				src_x >>= FP;    src_ptr += ecx;
+				ecx = dst_w;
 			}
-		}   // if (zcode < 0)
-	}   // if (!nozoom)
+			while (--dst_h);
+		}
+	} // if (!nozoom)
 	else
 	{
 		src_ptr = src_base + (src_fby<<4) + src_fbx;
@@ -674,55 +668,52 @@ void k053247_device::zdrawgfxzoom32GP(
 			}
 			while (--dst_h);
 		}
+		else if (drawmode < 4)
+		{
+			// 0: all pens solid
+			// 1: solid pens only
+			// 2: all pens solid with alpha blending
+			// 3: solid pens only with alpha blending
+			do {
+				do {
+					const u8 pal_idx = *src_ptr;
+					src_ptr += src_fdx;
+					if (!pal_idx || (drawmode & 0b01 && pal_idx >= shdpen) || ozbuf_ptr[ecx] < z8) continue;
+					ozbuf_ptr[ecx] = z8;
+					dst_ptr[ecx] = (drawmode & 0b10) ? alpha_blend_r32(dst_ptr[ecx], pal_base[pal_idx], alpha) : pal_base[pal_idx];
+				}
+				while (++ecx);
+
+				src_ptr += src_fdy;
+				ozbuf_ptr += GX_ZBUFW;
+				dst_ptr += dst_pitch;
+				ecx = dst_w;
+			}
+			while (--dst_h);
+		}
 		else
 		{
-			if (drawmode < 4)
-			{
-				// 0: all pens solid
-				// 1: solid pens only
-				// 2: all pens solid with alpha blending
-				// 3: solid pens only with alpha blending
+			// 4: shadow pens only
+			do {
 				do {
-					do {
-						const u8 pal_idx = *src_ptr;
-						src_ptr += src_fdx;
-						if (!pal_idx || (drawmode & 0b01 && pal_idx >= shdpen) || ozbuf_ptr[ecx] < z8) continue;
-						ozbuf_ptr[ecx] = z8;
-						dst_ptr[ecx] = (drawmode & 0b10) ? alpha_blend_r32(dst_ptr[ecx], pal_base[pal_idx], alpha) : pal_base[pal_idx];
-					}
-					while (++ecx);
+					const u8 pal_idx = *src_ptr;
+					src_ptr += src_fdx;
+					if (pal_idx < shdpen || szbuf_ptr[ecx*2] < z8 || szbuf_ptr[ecx*2+1] <= p8) continue;
+					rgb_t pix = dst_ptr[ecx];
+					szbuf_ptr[ecx*2] = z8;
+					szbuf_ptr[ecx*2+1] = p8;
 
-					src_ptr += src_fdy;
-					ozbuf_ptr += GX_ZBUFW;
-					dst_ptr += dst_pitch;
-					ecx = dst_w;
+					// the shadow tables are 15-bit lookup tables which accept RGB15... lossy, nasty, yuck!
+					dst_ptr[ecx] = shd_base[pix.as_rgb15()];
 				}
-				while (--dst_h);
-			}
-			else
-			{
-				// 4: shadow pens only
-				do {
-					do {
-						const u8 pal_idx = *src_ptr;
-						src_ptr += src_fdx;
-						if (pal_idx < shdpen || szbuf_ptr[ecx*2] < z8 || szbuf_ptr[ecx*2+1] <= p8) continue;
-						rgb_t pix = dst_ptr[ecx];
-						szbuf_ptr[ecx*2] = z8;
-						szbuf_ptr[ecx*2+1] = p8;
+				while (++ecx);
 
-						// the shadow tables are 15-bit lookup tables which accept RGB15... lossy, nasty, yuck!
-						dst_ptr[ecx] = shd_base[pix.as_rgb15()];
-					}
-					while (++ecx);
-
-					src_ptr += src_fdy;
-					szbuf_ptr += (GX_ZBUFW<<1);
-					dst_ptr += dst_pitch;
-					ecx = dst_w;
-				}
-				while (--dst_h);
+				src_ptr += src_fdy;
+				szbuf_ptr += (GX_ZBUFW<<1);
+				dst_ptr += dst_pitch;
+				ecx = dst_w;
 			}
+			while (--dst_h);
 		}
 	}
 }
