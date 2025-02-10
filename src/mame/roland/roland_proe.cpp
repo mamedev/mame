@@ -22,14 +22,17 @@
  */
 
 #include "emu.h"
+
 #include "bus/midi/midiinport.h"
 #include "cpu/mc68hc11/mc68hc11.h"
-#include "video/hd44780.h"
-#include "mb63h149.h"
-#include "emupal.h"
-#include "screen.h"
 #include "machine/6850acia.h"
 #include "machine/clock.h"
+#include "video/hd44780.h"
+
+#include "mb63h149.h"
+
+#include "emupal.h"
+#include "screen.h"
 
 
 namespace {
@@ -180,7 +183,7 @@ private:
 	u8 keys_r();
 	void leds_w(u8 data);
 
-	u8 lcd_mode;
+	u8 lcd_mode = 0;
 	void lcd_data_w(u8 data);
 	void lcd_control_w(u8 data);
 	u8 lcd_r();
