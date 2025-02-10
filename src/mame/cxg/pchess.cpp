@@ -200,12 +200,12 @@ void pchess_state::pchess(machine_config &config)
     ROM Definitions
 *******************************************************************************/
 
-ROM_START( cpchess )
+ROM_START( pchess )
 	ROM_REGION( 0x2000, "maincpu", 0 )
 	ROM_LOAD("1985_white_and_allcock_hd44820b63", 0x0000, 0x2000, CRC(8decfb8f) SHA1(ac216663fe72cc98607ce44c033bc4b13b309ad1) )
 
 	ROM_REGION( 57412, "screen", 0 )
-	ROM_LOAD("cpchess.svg", 0, 57412, CRC(7859b1ac) SHA1(518c5cd08fa8562628345e8e28048c01c9e4edd6) )
+	ROM_LOAD("pchess.svg", 0, 57412, CRC(7859b1ac) SHA1(518c5cd08fa8562628345e8e28048c01c9e4edd6) )
 ROM_END
 
 } // anonymous namespace
@@ -216,5 +216,5 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1986, cpchess, 0,      0,      pchess,  pchess, pchess_state, empty_init, "CXG Systems / Newcrest Technology / Intelligent Chess Software", "Pocketchess (CXG)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1986, pchess, 0,      0,      pchess,  pchess, pchess_state, empty_init, "CXG Systems / Newcrest Technology / Intelligent Chess Software", "Pocketchess (CXG)", MACHINE_SUPPORTS_SAVE )

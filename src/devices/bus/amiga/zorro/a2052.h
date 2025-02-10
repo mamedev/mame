@@ -47,6 +47,6 @@ private:
 } // namespace bus::amiga::zorro
 
 // device type declaration
-DECLARE_DEVICE_TYPE_NS(ZORRO_A2052, bus::amiga::zorro, a2052_device)
+DECLARE_DEVICE_TYPE_NS(AMIGA_A2052, bus::amiga::zorro, a2052_device)
 
 #endif // MAME_BUS_AMIGA_ZORRO_A2052_H

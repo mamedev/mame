@@ -58,15 +58,17 @@ protected:
 	u8 read_inputs(int columns, int fixed = -1);
 
 	virtual void update_k_line();
-	virtual void sm510_lcd_segment_w(offs_t offset, u16 data);
-	virtual void sm500_lcd_segment_w(offs_t offset, u16 data);
 	virtual u8 input_r();
 	virtual void input_w(u8 data);
+
 	virtual void piezo_r1_w(u8 data);
 	virtual void piezo_r2_w(u8 data);
 	virtual void piezo_input_w(u8 data);
 	virtual void piezo2bit_r1_w(u8 data);
 	virtual void piezo2bit_input_w(u8 data);
+
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// display common
 	int m_decay_pivot = 8;                // lcd segment off-to-on delay in 1kHz ticks (affects input lag)
@@ -77,17 +79,17 @@ protected:
 	u32 m_display_state[0x20] = { };      // lcd segment data (max. 5-bit offset)
 	u8 m_display_decay[0x20][0x20] = { }; // (internal use)
 
-	void set_display_size(u8 x, u8 y, u8 z);
-	TIMER_CALLBACK_MEMBER(display_decay_tick);
-	emu_timer *m_display_decay_timer = nullptr;
+	virtual void update_display();
+	virtual void sm510_lcd_segment_w(offs_t offset, u16 data);
+	virtual void sm500_lcd_segment_w(offs_t offset, u16 data);
 
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
+	void set_display_size(u8 x, u8 y, u8 z);
+	TIMER_CALLBACK_MEMBER(display_decay_tick) { update_display(); }
+	emu_timer *m_display_decay_timer = nullptr;
 
 	// machine configs
 	void mcfg_cpu_common(machine_config &config);
 	void mcfg_cpu_sm5a(machine_config &config);
-	void mcfg_cpu_kb1013vk12(machine_config &config);
 	void mcfg_cpu_sm510(machine_config &config);
 	void mcfg_cpu_sm511(machine_config &config);
 	void mcfg_cpu_sm512(machine_config &config);
@@ -96,13 +98,13 @@ protected:
 	void mcfg_sound_r1(machine_config &config);
 
 	void sm5a_common(machine_config &config, u16 width, u16 height);
-	void kb1013vk12_common(machine_config &config, u16 width, u16 height);
 	void sm510_common(machine_config &config, u16 width, u16 height);
 	void sm511_common(machine_config &config, u16 width, u16 height);
 	//void sm512_common(machine_config &config, u16 width, u16 height);
 	void sm530_common(machine_config &config, u16 width, u16 height);
 
 	void sm510_dualh(machine_config &config, u16 leftwidth, u16 leftheight, u16 rightwidth, u16 rightheight);
+	[[maybe_unused]] void sm510_tripleh(machine_config &config, u16 leftwidth, u16 leftheight, u16 middlewidth, u16 middleheight, u16 rightwidth, u16 rightheight);
 	void dualv_common(machine_config &config, u16 topwidth, u16 topheight, u16 botwidth, u16 botheight);
 	void sm510_dualv(machine_config &config, u16 topwidth, u16 topheight, u16 botwidth, u16 botheight);
 	void sm511_dualv(machine_config &config, u16 topwidth, u16 topheight, u16 botwidth, u16 botheight);

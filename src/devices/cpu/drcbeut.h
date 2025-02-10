@@ -98,9 +98,6 @@ public:
 	uint32_t get_value(drccodeptr codebase, uint32_t mapvar) const;
 	uint32_t get_last_value(uint32_t mapvar);
 
-	// static accessors to be called directly by generated code
-	static uint32_t static_get_value(drc_map_variables &map, drccodeptr codebase, uint32_t mapvar);
-
 private:
 	// internal state
 	drc_cache &         m_cache;            // pointer to the cache
@@ -214,7 +211,7 @@ struct resolved_memory_accessors
 	resolved_member_function write_qword;
 	resolved_member_function write_qword_masked;
 
-	void set(address_space &space) noexcept;
+	void set(address_space &space);
 };
 
 using resolved_memory_accessors_vector = std::vector<resolved_memory_accessors>;

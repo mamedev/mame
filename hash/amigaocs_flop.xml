@@ -17160,7 +17160,7 @@ ATK test: OK
 		<year>1994</year>
 		<publisher>Empire Software</publisher>
 		<notes><![CDATA[
-Soccer field background GFX has serious glitches during gameplay, wrong [Blitter] copies
+Soccer field background GFX has serious glitches during gameplay, wrong [Blitter] copies (can't repro, assume fixed)
 ATK test: OK
 ]]></notes>
 		<info name="usage" value="Sports score card copy-protection at first half time"/>

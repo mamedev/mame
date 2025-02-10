@@ -12,21 +12,22 @@
     CPU  :Hu6280
     Video:Hu6202,Hu6260,Hu6270
 
-    OSC  :21.47727MHz
+    OSC  :21.47727MHz, 2.00MHz (resonator)
     Other:XILINX XC7336-15,OKI M6295
 
 
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "pcecommn.h"
 
-#include "sound/okim6295.h"
-#include "video/huc6270.h"
-#include "video/huc6260.h"
-#include "video/huc6202.h"
 #include "machine/input_merger.h"
 #include "machine/msm6242.h"
+#include "sound/okim6295.h"
+#include "video/huc6202.h"
+#include "video/huc6260.h"
+#include "video/huc6270.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -71,13 +72,13 @@ void ggconnie_state::machine_start()
 {
 	m_lamp.resolve();
 
-	for(auto &okibank : m_okibank)
+	for (auto &okibank : m_okibank)
 		okibank->configure_entries(0, 8, memregion("oki")->base(), 0x10000);
 }
 
 void ggconnie_state::lamp_w(uint8_t data)
 {
-	m_lamp =!BIT(data, 0);
+	m_lamp = !BIT(data, 0);
 }
 
 void ggconnie_state::output_w(uint8_t data)
@@ -111,9 +112,9 @@ void ggconnie_state::sgx_mem(address_map &map)
 	map(0x1f7500, 0x1f750f).rw(m_rtc, FUNC(msm6242_device::read), FUNC(msm6242_device::write));
 	map(0x1f7700, 0x1f7700).portr("IN1");
 	map(0x1f7800, 0x1f7800).w(FUNC(ggconnie_state::output_w));
-	map(0x1fe000, 0x1fe007).rw("huc6270_0", FUNC(huc6270_device::read), FUNC(huc6270_device::write)).mirror(0x03E0);
-	map(0x1fe008, 0x1fe00f).rw("huc6202", FUNC(huc6202_device::read), FUNC(huc6202_device::write)).mirror(0x03E0);
-	map(0x1fe010, 0x1fe017).rw("huc6270_1", FUNC(huc6270_device::read), FUNC(huc6270_device::write)).mirror(0x03E0);
+	map(0x1fe000, 0x1fe007).rw("huc6270_0", FUNC(huc6270_device::read), FUNC(huc6270_device::write)).mirror(0x03e0);
+	map(0x1fe008, 0x1fe00f).rw("huc6202", FUNC(huc6202_device::read), FUNC(huc6202_device::write)).mirror(0x03e0);
+	map(0x1fe010, 0x1fe017).rw("huc6270_1", FUNC(huc6270_device::read), FUNC(huc6270_device::write)).mirror(0x03e0);
 	map(0x1fe400, 0x1fe7ff).rw(m_huc6260, FUNC(huc6260_device::read), FUNC(huc6260_device::write));
 }
 
@@ -133,9 +134,9 @@ void ggconnie_state::oki_map(address_map &map)
 static INPUT_PORTS_START(ggconnie)
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME( "Medal" )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 ) /* 100 Yen */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) /* 10 Yen */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 ) /* run */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 ) // 100 Yen
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) // 10 Yen
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 ) // run
 	PORT_SERVICE_NO_TOGGLE(0x10, IP_ACTIVE_LOW)  PORT_DIPLOCATION("SWC:8")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Hopper")
@@ -218,9 +219,9 @@ INPUT_PORTS_END
 static INPUT_PORTS_START(smf)
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME( "Medal" )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 ) /* 100 Yen */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) /* 10 Yen */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 ) /* run */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 ) // 100 Yen
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) // 10 Yen
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 ) // run
 	PORT_SERVICE_NO_TOGGLE(0x10, IP_ACTIVE_LOW)  PORT_DIPLOCATION("SWC:8")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Hopper")
@@ -323,10 +324,84 @@ static INPUT_PORTS_START(fishingm)
 	PORT_DIPUNUSED_DIPLOC(0x80, 0x80, "SWB:8")
 INPUT_PORTS_END
 
+static INPUT_PORTS_START(bmanroul)
+	PORT_INCLUDE(smf)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	// manual states default is all off
+	PORT_MODIFY("SWA")
+	PORT_DIPNAME(          0x03, 0x03, "Medal Settings" )  PORT_DIPLOCATION("SWA:1,2")
+	PORT_DIPSETTING(             0x00, DEF_STR(3C_1C) )
+	PORT_DIPSETTING(             0x01, DEF_STR(2C_1C) )
+	PORT_DIPSETTING(             0x03, DEF_STR(1C_1C) )
+	PORT_DIPSETTING(             0x02, DEF_STR(1C_2C) )
+	PORT_DIPNAME(          0x1c, 0x1c, "100 Yen -> Coin" )  PORT_DIPLOCATION("SWA:3,4,5")
+	PORT_DIPSETTING(             0x08, "No Coin Exchange" )
+	PORT_DIPSETTING(             0x0c, "5 Coins" )
+	PORT_DIPSETTING(             0x10, "6 Coins" )
+	PORT_DIPSETTING(             0x14, "7 Coins" )
+	PORT_DIPSETTING(             0x18, "8 Coins" )
+	PORT_DIPSETTING(             0x1c, "10 Coins" )
+	PORT_DIPSETTING(             0x00, "11 Coins" )
+	PORT_DIPSETTING(             0x04, "12 Coins" )
+	PORT_DIPNAME(          0x60, 0x60, "10 Yen Set" )  PORT_DIPLOCATION("SWA:6,7")
+	PORT_DIPSETTING(             0x00, DEF_STR(3C_1C) )
+	PORT_DIPSETTING(             0x20, DEF_STR(2C_1C) )
+	PORT_DIPSETTING(             0x60, DEF_STR(1C_1C) )
+	PORT_DIPSETTING(             0x40, DEF_STR(1C_2C) )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "SWA:8" )
+
+	PORT_MODIFY("SWB")
+	PORT_DIPNAME(          0x07, 0x07, "Payout" )  PORT_DIPLOCATION("SWB:1,2,3")
+	PORT_DIPSETTING(             0x02, "55%" )
+	PORT_DIPSETTING(             0x03, "60%" )
+	PORT_DIPSETTING(             0x04, "65%" )
+	PORT_DIPSETTING(             0x05, "70%" )
+	PORT_DIPSETTING(             0x06, "75%" )
+	PORT_DIPSETTING(             0x07, "80%" )
+	PORT_DIPSETTING(             0x00, "85%" )
+	PORT_DIPSETTING(             0x01, "90%" )
+	PORT_DIPNAME(          0x18, 0x18, "Max Number of Credits" )  PORT_DIPLOCATION("SWB:4,5")
+	PORT_DIPSETTING(             0x08, "3" )
+	PORT_DIPSETTING(             0x10, "4" )
+	PORT_DIPSETTING(             0x18, "5" )
+	PORT_DIPSETTING(             0x00, "5" ) // marked as unused in the manual, actually is a duplicate of 5
+	PORT_DIPNAME(          0x20, 0x20, "Payout Info" )  PORT_DIPLOCATION("SWB:6")
+	PORT_DIPSETTING(             0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(             0x20, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SWB:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SWB:8" )
+
+	PORT_MODIFY("SWC")
+	PORT_DIPNAME(          0x03, 0x03, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SWC:1,2")
+	PORT_DIPSETTING(             0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(             0x01, "Once Every 3 Attract Cycles" )
+	PORT_DIPSETTING(             0x02, "Once Every 2 Attract Cycles" )
+	PORT_DIPSETTING(             0x03, DEF_STR( On ) )
+	PORT_DIPNAME(          0x0c, 0x0c, "Start Time" )  PORT_DIPLOCATION("SWC:3,4")
+	PORT_DIPSETTING(             0x00, "4 Seconds" )
+	PORT_DIPSETTING(             0x0c, "5 Seconds" )
+	PORT_DIPSETTING(             0x08, "6 Seconds" )
+	PORT_DIPSETTING(             0x04, "8 Seconds" )
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x00, "SWC:5" )
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x00, "SWC:6" )
+	PORT_DIPNAME(          0x40, 0x40, "RAM Clear" )  PORT_DIPLOCATION("SWC:7")
+	PORT_DIPSETTING(             0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(             0x00, DEF_STR( On ) )
+	PORT_DIPNAME(          0x80, 0x80, DEF_STR( Service_Mode ) )  PORT_DIPLOCATION("SWC:8")
+	PORT_DIPSETTING(             0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(             0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
 void ggconnie_state::ggconnie(machine_config &config)
 {
-	/* basic machine hardware */
-	H6280(config, m_maincpu, PCE_MAIN_CLOCK/3);
+	// basic machine hardware
+	H6280(config, m_maincpu, PCE_MAIN_CLOCK / 3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ggconnie_state::sgx_mem);
 	m_maincpu->set_addrmap(AS_IO, &ggconnie_state::sgx_io);
 	m_maincpu->port_in_cb().set_ioport("IN0");
@@ -334,7 +409,7 @@ void ggconnie_state::ggconnie(machine_config &config)
 	m_maincpu->add_route(0, "lspeaker", 1.00);
 	m_maincpu->add_route(1, "rspeaker", 1.00);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(PCE_MAIN_CLOCK, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242);
 	screen.set_screen_update(FUNC(ggconnie_state::screen_update));
@@ -375,7 +450,7 @@ void ggconnie_state::ggconnie(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	OKIM6295(config, m_oki, PCE_MAIN_CLOCK/12, okim6295_device::PIN7_HIGH); /* unknown clock / pin 7 */
+	OKIM6295(config, m_oki, 2_MHz_XTAL, okim6295_device::PIN7_HIGH); // 2MHz resonator, pin 7 verified
 	m_oki->set_addrmap(0, &ggconnie_state::oki_map);
 	m_oki->add_route(ALL_OUTPUTS, "lspeaker", 1.00);
 	m_oki->add_route(ALL_OUTPUTS, "rspeaker", 1.00);
@@ -422,9 +497,25 @@ ROM_START(fishingm)
 	ROM_LOAD( "gal16v8b.u8", 0x400, 0x117, NO_DUMP )
 ROM_END
 
+ROM_START(bmanroul)
+	ROM_REGION( 0x180000, "maincpu", 0 )
+	ROM_LOAD( "bon_prg0.u3", 0x000000, 0x80000, CRC(0db0960d) SHA1(59cbd9d87608894d8965268c1a0eb81d55a6d742) )
+	ROM_LOAD( "bon_prg1.u4", 0x080000, 0x80000, CRC(412fd212) SHA1(35f8e94076beff9a637f508f74a89315f02de130) )
+	// u5 not populated
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "bon_adpcm.u31", 0x00000, 0x80000, CRC(dc7734a0) SHA1(296166f1a7dd2ec4571a77297653a3dc3a97a086) )
+
+	ROM_REGION( 0x600, "plds", 0 ) // protected
+	ROM_LOAD( "gal16v8b.u6", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8b.u7", 0x200, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8b.u8", 0x400, 0x117, NO_DUMP )
+ROM_END
+
 } // anonymous namespace
 
 
 GAME( 1996, ggconnie, 0, ggconnie, ggconnie, ggconnie_state, init_pce_common, ROT0, "Eighting", "Go! Go! Connie chan Jaka Jaka Janken", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // Throws Hopper Empty when winning, sound
+GAME( 1996, bmanroul, 0, ggconnie, bmanroul, ggconnie_state, init_pce_common, ROT0, "Eighting (Hudson Soft license)", "Bomberman Misobon Roulette (961028 JPN)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // "
 GAME( 1997, smf,      0, ggconnie, smf,      ggconnie_state, init_pce_common, ROT0, "Eighting (Capcom license)", "Super Medal Fighters (Japan 970228)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // Throws Hopper Jam when using COIN1, sound
 GAME( 1997, fishingm, 0, ggconnie, fishingm, ggconnie_state, init_pce_common, ROT0, "Capcom", "Fishing Master (971107 JPN)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // Hopper Jam Error

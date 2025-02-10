@@ -615,13 +615,15 @@ TIMER_CALLBACK_MEMBER(z80dma_device::clock_w)
 u8 z80dma_device::read()
 {
 	const u8 res = m_read_regs_follow[m_read_cur_follow];
-	m_read_cur_follow++;
+	if (!machine().side_effects_disabled())
+	{
+		m_read_cur_follow++;
 
-	if(m_read_cur_follow >= m_read_num_follow)
-		m_read_cur_follow = 0;
+		if(m_read_cur_follow >= m_read_num_follow)
+			m_read_cur_follow = 0;
 
-	LOG("Z80DMA Read %02x\n", res);
-
+		LOG("Z80DMA Read %02x\n", res);
+	}
 	return res;
 }
 
@@ -733,9 +735,7 @@ void z80dma_device::write(u8 data)
 					interrupt_check();
 					// Needs six reset commands to reset the DMA
 					{
-						u8 WRi;
-
-						for (WRi = 0; WRi < 7; WRi++)
+						for (u8 WRi = 0; WRi < 7; WRi++)
 							REG(WRi,m_reset_pointer) = 0;
 
 						m_reset_pointer++;

@@ -34,7 +34,7 @@ DEFINE_DEVICE_TYPE(CXD8654Q,  cxd8654q_device,  "cxd8654q",  "CXD8654Q GPU") // 
 psxgpu_device::psxgpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t vram_size, psxcpu_device *cpu)
 	: psxgpu_device(mconfig, type, tag, owner, clock)
 {
-	set_vram_size(vram_size);
+	vramSize = vram_size;
 	cpu->gpu_read().set(tag, FUNC(psxgpu_device::read));
 	cpu->gpu_write().set(tag, FUNC(psxgpu_device::write));
 	cpu->subdevice<psxdma_device>("dma")->install_read_handler(2, psxdma_device::read_delegate(&psxgpu_device::dma_read, this));
@@ -2716,7 +2716,7 @@ void psxgpu_device::MoveImage()
 	}
 	DebugMesh( S11_COORD_X( m_packet.MoveImage.vertex[ 1 ].n_coord ), S11_COORD_Y( m_packet.MoveImage.vertex[ 1 ].n_coord ) );
 	DebugMesh( S11_COORD_X( m_packet.MoveImage.vertex[ 1 ].n_coord ) + SIZE_W( m_packet.MoveImage.n_size ), S11_COORD_Y( m_packet.MoveImage.vertex[ 1 ].n_coord ) );
-	DebugMesh( S11_COORD_X( m_packet.MoveImage.vertex[ 1 ].n_coord ), S11_COORD_Y( m_packet.MoveImage.vertex[ 1 ].n_coord ) ) + SIZE_H( m_packet.MoveImage.n_size ) );
+	DebugMesh( S11_COORD_X( m_packet.MoveImage.vertex[ 1 ].n_coord ), S11_COORD_Y( m_packet.MoveImage.vertex[ 1 ].n_coord ) + SIZE_H( m_packet.MoveImage.n_size ) );
 	DebugMesh( S11_COORD_X( m_packet.MoveImage.vertex[ 1 ].n_coord ) + SIZE_W( m_packet.MoveImage.n_size ), S11_COORD_Y( m_packet.MoveImage.vertex[ 1 ].n_coord ) + SIZE_H( m_packet.MoveImage.n_size ) );
 	DebugMeshEnd();
 #endif
@@ -3463,6 +3463,11 @@ uint32_t psxgpu_device::read(offs_t offset, uint32_t mem_mask)
 		break;
 	case 0x01:
 		data = n_gpustatus;
+
+		if ((((n_gpustatus & (1U << 22)) && (n_gpustatus & (1U << 13))) ||
+			(!(n_gpustatus & (1U << 22)) && (BIT(screen().vpos(), 0)))))
+			data |= 1U << 31;
+
 		LOGMASKED(LOG_READ, "%s: read GPU status (%08x)\n", machine().describe_context(), data);
 		break;
 	default:
@@ -3481,7 +3486,11 @@ void psxgpu_device::vblank(screen_device &screen, bool vblank_state)
 		DebugCheckKeys();
 #endif
 
-		n_gpustatus ^= ( 1L << 31 );
+		if (n_gpustatus & (1U << 22))
+			n_gpustatus ^= 1U << 13;
+		else
+			n_gpustatus |= 1U << 13;
+
 		m_vblank_handler(1);
 	}
 }
