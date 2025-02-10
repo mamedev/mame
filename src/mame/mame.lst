@@ -37532,6 +37532,9 @@ celint2kss
 =======
 >>>>>>> db3ffe8e8b0 (mame.lst: Removed majority of comments.)
 
+@source:oberheim/xpander.cpp
+xpander
+
 @source:olivetti/m20.cpp
 m20
 m40
