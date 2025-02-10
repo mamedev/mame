@@ -11,6 +11,7 @@
  * TODO:
  *  - What is the correct order of operations between checking valid/access bits/etc?
  *  - Are the user/system entries actually split? Or is that part of the tag?
+ *  - General accuracy improvements
  */
 
 #include "emu.h"
@@ -248,7 +249,6 @@ void news_020_mmu_device::hyperbus_w(offs_t offset, uint32_t data, uint32_t mem_
 		}
 		else if (tag != vpgnum)
 		{
-			// TODO: update below log message
 			LOGMASKED(LOG_MAP_ERROR, "(%s) hyperbus_w (offset 0x%08x, data 0x%08x, mask 0x%08x, pg 0x%08x, pte 0x%08x, index 0x%08x, %s) -> tag mismatch 0x%x != 0x%x\n", machine().describe_context(), offset, data, mem_mask, vpgnum, pte.pte, map_index, mode(is_supervisor), tag, vpgnum);
 			m_bus_error(offset, mem_mask, true, TAG_MISMATCH); // should M be set here too?
 		}
@@ -273,7 +273,7 @@ void news_020_mmu_device::hyperbus_w(offs_t offset, uint32_t data, uint32_t mem_
 			{
 				uint32_t paddr = ((pte.pfnum() << 12) + (offset & 0xfff)) & 0x1fffffff;
 				LOGMASKED(LOG_DATA, "(%s) hyperbus_w (offset 0x%08x, data 0x%08x, mask 0x%08x, pg 0x%08x, pte 0x%08x, index 0x%08x, %s) -> 0x%08x = 0x%08x%s\n", machine().describe_context(), offset, data, mem_mask, vpgnum, pte.pte, map_index, mode(is_supervisor), paddr, data, pte.modified() ? " (newly modified page)" : "");
-				this->space(0).write_dword(paddr, data, mem_mask); // TODO: fix 1f stuff
+				this->space(0).write_dword(paddr, data, mem_mask);
 
 				if (!pte.modified())
 				{
