@@ -1,17 +1,18 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders: Angelo Salese
 /**************************************************************************************************
 
 花道場 (Hana Doujou) - Alba 1984
 AAJ-11 PCB
 
 TODO:
-- CRTC processes params as 1088x224 with char width 8;
 - Resets itself in attract sequence, thrash protection?
 \- bp b85,1,{pc+=3;g} to bypass for a bit;
 - Implement 2x IOX for inputs;
 - Writes RAM NG 8AF0 if NMI is triggered, is it even used?
 - "AY8910 upper address mismatch";
+- hanadojoa: slightly more protected, keeps resetting at IOX tests;
+- CRTC processes params as 1088x224 with char width 8;
 
 ===================================================================================================
 
@@ -35,6 +36,8 @@ AX-013 epoxy covered chip
 
 #include "emu.h"
 
+#include "iox_hle.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
@@ -53,10 +56,11 @@ class hanadojo_state : public driver_device
 {
 public:
 	hanadojo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_videoram(*this, "videoram")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_iox(*this, "iox_%u", 1U)
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_videoram(*this, "videoram")
 	{ }
 
 	void hanadojo(machine_config &config);
@@ -66,6 +70,7 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device_array<iox_hle_device, 2> m_iox;
 	required_device<gfxdecode_device> m_gfxdecode;
 
 	required_shared_ptr<uint8_t> m_videoram;
@@ -160,92 +165,117 @@ void hanadojo_state::io_map(address_map &map)
 	map(0x21, 0x21).w("crtc", FUNC(hd6845s_device::register_w));
 	// TODO: 2x IOX!
 	// player inputs, PATSW 2
-	map(0x40, 0x41).lr8(NAME([] () { return 0; }));
+	map(0x40, 0x40).rw(m_iox[0], FUNC(iox_hle_device::data_r), FUNC(iox_hle_device::data_w));
+	map(0x41, 0x41).rw(m_iox[0], FUNC(iox_hle_device::status_r), FUNC(iox_hle_device::command_w));
+
 	// coinage (cfr. init at $61), service buttons, dip bank B
-	map(0x60, 0x61).lr8(NAME([] () { return 0; }));
+	map(0x60, 0x60).rw(m_iox[1], FUNC(iox_hle_device::data_r), FUNC(iox_hle_device::data_w));
+	map(0x61, 0x61).rw(m_iox[1], FUNC(iox_hle_device::status_r), FUNC(iox_hle_device::command_w));
 
 	map(0x80, 0x80).nopw(); // very noisy, just watchdog?
 }
 
 
+// TODO: verify what's CAN/DEA/PLY with gameplay
 static INPUT_PORTS_START( hanadojo )
-	PORT_START("IN0")
-	PORT_DIPNAME( 0x01, 0x01, "IN0" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("P1_KEY0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_HANAFUDA_A ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_D ) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_HANAFUDA_F ) PORT_PLAYER(1) PORT_NAME("P1 CAN")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_HANAFUDA_B ) PORT_PLAYER(1)
 
-	PORT_START("IN1")
-	PORT_DIPNAME( 0x01, 0x01, "IN1" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("P1_KEY1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_C ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_E ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 ) // PLY?
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_HANAFUDA_G ) PORT_PLAYER(1) PORT_NAME("P1 DEA")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_HANAFUDA_NO ) PORT_PLAYER(1)
 
-	PORT_START("DSW1")
-	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW1:1")
-	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW1:2")
-	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW1:3")
-	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW1:4")
-	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW1:5")
-	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW1:6")
-	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW1:7")
-	PORT_SERVICE_DIPLOC(0x80, IP_ACTIVE_HIGH, "SW1:8")
+	PORT_START("P1_KEY2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_YES ) PORT_PLAYER(1)
+	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW2")
-	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW2:1")
-	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW2:2")
-	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW2:3")
-	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW2:4")
-	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW2:5")
-	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW2:6")
-	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW2:7")
-	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW2:8")
+	PORT_START("P2_KEY0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_HANAFUDA_A ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_D ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_HANAFUDA_F ) PORT_PLAYER(2) PORT_NAME("P2 CAN")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_HANAFUDA_B ) PORT_PLAYER(2)
 
-	PORT_START("DSW3")
-	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW3:1")
-	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW3:2")
-	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW3:3")
-	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW3:4")
+	PORT_START("P2_KEY1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_C ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_E ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 ) // PLY?
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_HANAFUDA_G ) PORT_PLAYER(2) PORT_NAME("P2 DEA")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_HANAFUDA_NO ) PORT_PLAYER(2)
+
+	PORT_START("P2_KEY2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_YES ) PORT_PLAYER(2)
+	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("DSWA")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SWA:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SWA:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SWA:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SWA:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SWA:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SWA:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SWA:7")
+	PORT_SERVICE_DIPLOC(0x80, IP_ACTIVE_HIGH, "SWA:8")
+
+	PORT_START("DSWB")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SWB:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SWB:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SWB:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SWB:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SWB:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SWB:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SWB:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SWB:8")
+
+	PORT_START("DSWC")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SWC:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SWC:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SWC:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SWC:4")
+
+	// NOTE: DSWD is 4 bit banks, near AY on board.
+	// Game has no clear bank display compared to the others, assume one is SW2 nearby.
+	PORT_START("DSWD")
+	PORT_DIPNAME( 0x01, 0x00, "ARS" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, "RES" ) // RST?
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, "M M" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, "CLR" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_GAMBLE_KEYIN )
+	PORT_DIPNAME( 0x20, 0x00, "MDL" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	// vestigial, just to have one for now
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
 INPUT_PORTS_END
 
 
@@ -259,6 +289,19 @@ void hanadojo_state::hanadojo(machine_config &config)
 	Z80(config, m_maincpu, 12_MHz_XTAL / 2); // divider guessed
 	m_maincpu->set_addrmap(AS_PROGRAM, &hanadojo_state::program_map);
 	m_maincpu->set_addrmap(AS_IO, &hanadojo_state::io_map);
+
+	IOX_HLE(config, m_iox[0], 0);
+	m_iox[0]->p1_key_input_cb<0>().set_ioport("P1_KEY0");
+	m_iox[0]->p1_key_input_cb<1>().set_ioport("P1_KEY1");
+	m_iox[0]->p1_key_input_cb<2>().set_ioport("P1_KEY2");
+	m_iox[0]->p2_key_input_cb<0>().set_ioport("P2_KEY0");
+	m_iox[0]->p2_key_input_cb<1>().set_ioport("P2_KEY1");
+	m_iox[0]->p2_key_input_cb<2>().set_ioport("P2_KEY2");
+
+	IOX_HLE(config, m_iox[1], 0);
+	m_iox[1]->p1_direct_input_cb().set_ioport("DSWD");
+	// TODO: seemingly only SW2 0:6 are here
+	m_iox[1]->p2_direct_input_cb().set_ioport("DSWB");
 
 	hd6845s_device &crtc(HD6845S(config, "crtc", 12_MHz_XTAL / 4)); // divider guessed
 	crtc.set_screen("screen");
@@ -283,7 +326,7 @@ void hanadojo_state::hanadojo(machine_config &config)
 
 	ay8910_device &ay(AY8910(config, "ay", 12_MHz_XTAL / 16)); // divider guessed
 //  ay.port_a_read_callback()
-	ay.port_b_read_callback().set_ioport("DSW1");
+	ay.port_b_read_callback().set_ioport("DSWA");
 	ay.add_route(ALL_OUTPUTS, "speaker", 0.33);
 }
 
@@ -334,5 +377,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1984, hanadojo,  0,        hanadojo, hanadojo, hanadojo_state, empty_init, ROT0, "Alba", "Hana Doujou (set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1984, hanadojoa, hanadojo, hanadojo, hanadojo, hanadojo_state, empty_init, ROT0, "Alba", "Hana Doujou (set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1984, hanadojo,  0,        hanadojo, hanadojo, hanadojo_state, empty_init, ROT0, "Alba", "Hana Doujou (set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1984, hanadojoa, hanadojo, hanadojo, hanadojo, hanadojo_state, empty_init, ROT0, "Alba", "Hana Doujou (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_UNEMULATED_PROTECTION )
