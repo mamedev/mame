@@ -90681,23 +90681,6 @@ void m68000_device::tas_ds_if() // 4ac0 fff8
 	return;
 }
 
-void m68000_device::halt_if() // 4ac8 ffff
-{
-	// 3ff -
-	// alu r=15 c=0 m=.....  i=b...... ALU.or_ a=none d=none
-	m_icount -= 2;
-	goto rstp1;
-rstp1:
-	// 000 rstp1
-	// alu r=15 c=0 m=.....  i=b...... ALU.or_ a=none d=none
-	m_icount -= 2;
-	// 1c8 rstp2
-	m_ftu = m_sr;
-	m_au = m_pc - 2;
-	// alu r=15 c=0 m=.....  i=b...... ALU.or_ a=none d=none
-	m_icount = 0;
-}
-
 void m68000_device::tas_ais_if() // 4ad0 fff8
 {
 	int ry = map_sp((m_irdi & 7) | 8);
@@ -184577,7 +184560,6 @@ const m68000_device::handler m68000_device::s_handlers_if[] = {
 	&m68000_device::tst_l_adr16_if,
 	&m68000_device::tst_l_adr32_if,
 	&m68000_device::tas_ds_if,
-	&m68000_device::halt_if,
 	&m68000_device::tas_ais_if,
 	&m68000_device::tas_aips_if,
 	&m68000_device::tas_pais_if,
