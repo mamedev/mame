@@ -177,13 +177,13 @@ private:
 	void bank_w(u8 data);
 	void proe_map_a(address_map &map);
 	
-	u8 key_scan_i = 0;
+	u8 m_key_scan_i = 0;
 	u8 pa_r();
 	void pa_w(u8 data);
 	u8 keys_r();
 	void leds_w(u8 data);
 
-	u8 lcd_mode = 0;
+	u8 m_lcd_mode = 0;
 	void lcd_data_w(u8 data);
 	void lcd_control_w(u8 data);
 	u8 lcd_r();
@@ -204,6 +204,9 @@ private:
 
 void roland_proe_state::machine_start()
 {
+	save_item(NAME(m_key_scan_i));
+	save_item(NAME(m_lcd_mode));
+
 	m_rom_bank->configure_entries(0, 8, memregion("patterns")->base(), 0x8000);
 	m_rom_bank->configure_entries(8, 8, memregion("patterns")->base(), 0x8000); // TODO: card goes here
 	m_ram_bank->configure_entries(0, 4, &m_ram[0], 0x2000);
@@ -211,7 +214,7 @@ void roland_proe_state::machine_start()
 
 void roland_proe_state::machine_reset()
 {
-	key_scan_i = 0;
+	m_key_scan_i = 0;
 }
 
 void roland_proe_state::write_acia_clock(int state)
@@ -239,9 +242,9 @@ HD44780_PIXEL_UPDATE(roland_proe_state::pixel_update)
 
 void roland_proe_state::lcd_data_w(u8 data)
 {
-	if (lcd_mode == 0x04)
+	if (m_lcd_mode == 0x04)
 		m_lcd->data_w(data);
-	else if (lcd_mode == 0xf8)
+	else if (m_lcd_mode == 0xf8)
 		m_lcd->control_w(data);
 }
 
@@ -251,7 +254,7 @@ void roland_proe_state::lcd_control_w(u8 data)
 	// 0x06: ??
 	// 0xf8: control
 	if (data == 0x04 || data == 0x06 || data == 0xf8)
-		lcd_mode = data;
+		m_lcd_mode = data;
 }
 
 u8 roland_proe_state::lcd_r()
@@ -261,19 +264,19 @@ u8 roland_proe_state::lcd_r()
 
 u8 roland_proe_state::keys_r()
 {
-	u8 result = m_keys[key_scan_i]->read() & 0xff;
+	u8 result = m_keys[m_key_scan_i]->read() & 0xff;
 	return result;
 }
 
 u8 roland_proe_state::pa_r()
 {
-	u8 result = (m_keys[key_scan_i]->read() >> 8) | 0b11111000;
+	u8 result = (m_keys[m_key_scan_i]->read() >> 8) | 0b11111000;
 	return result;
 }
 
 void roland_proe_state::pa_w(u8 data)
 {
-	key_scan_i = (data >> 3) & 0x07;
+	m_key_scan_i = (data >> 3) & 0x07;
 }
 
 void roland_proe_state::leds_w(u8 data)
