@@ -238,7 +238,13 @@ void pl6fpga_device::betcom_map(address_map &map){
 }
 
 void pl6fpga_device::jpm_map(address_map &map){
+	map(0x0010, 0x0010).rw(FUNC(pl6fpga_device::xcra_read), FUNC(pl6fpga_device::xcra_write)); 	// ?
+	//map(0x0011, 0x0011).rw(FUNC(pl6fpga_device::), FUNC(pl6fpga_device::));
 	map(0x0018, 0x0018).w(FUNC(pl6fpga_device::crcchk_write));
+	map(0x0900, 0x091f).w(FUNC(pl6fpga_device::lamp_write));	// ?
+	map(0x1900, 0x1903).rw(FUNC(pl6fpga_device::input_r), FUNC(pl6fpga_device::output_write));		// ?
+	map(0x1904, 0x1904).w(FUNC(pl6fpga_device::xmpx_write));	// ?
+	map(0x1a00, 0x1a07).w(FUNC(pl6fpga_device::aux_write));		// ?
 }
 
 //************************************
