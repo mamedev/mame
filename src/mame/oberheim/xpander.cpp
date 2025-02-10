@@ -15,11 +15,11 @@ low), and a control input ("chain advance", active low).
 
 The Xpander has two 6809-based computers. The main computer scans for button
 presses, drives the VFDs, interprets the digital and analog inputs (MIDI, CVs,
-triggers, etc)., and sends parameters to the voice computer.
+triggers, etc.), and sends parameters to the voice computer.
 
 The voice board consists of 6 analog voices controlled by the voice computer.
 
-Each voice is built around a CEM3347 (dual oscillator) and a CEM3372 (VCF and
+Each voice is built around a CEM3374 (dual oscillator) and a CEM3372 (VCF and
 VCA). VCO2 can modulate either VCO1 or the VCF to produce FM effects. There is
 also circuitry to generate pulse waves out of the saw ones, and to mix in noise.
 The noise source is shared for all voices. The CEM3372 is combined with a 4051
@@ -100,7 +100,7 @@ constexpr const int NUM_ENCODER_POSITIONS = 30;
 class xpander_state : public driver_device
 {
 public:
-	xpander_state(const machine_config &mconfig, device_type type, const char *tag)
+	xpander_state(const machine_config &mconfig, device_type type, const char *tag) ATTR_COLD
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, MAINCPU_TAG)
 		, m_midiacia(*this, "midiacia")
@@ -116,7 +116,6 @@ public:
 		, m_vfd_devices(*this, "vfd_%d", 0U)
 		, m_vfd_outputs()
 		, m_cassmute(*this, "cassmute")
-		, m_debug_pw(*this, "voice_pw*")
 		, m_voicecpu(*this, VOICECPU_TAG)
 		, m_voicepit(*this, "voice_pit_8253")
 		, m_voiceram(*this, VOICERAM_TAG)
@@ -197,7 +196,7 @@ private:
 	static constexpr const int NUM_VOICES = 6;
 	static constexpr const int NUM_CVS = 9;
 	static constexpr const int RES_CV_INDEX = 8;
-	static constexpr const char* CV_NAMES[NUM_CVS] =
+	static constexpr const char *CV_NAMES[NUM_CVS] =
 	{
 		"VCA", "PW1", "VOLA", "VCOF1", "VOLB", "VCFF", "PW2", "VCOF2", "RES"
 	};
@@ -217,7 +216,6 @@ private:
 	required_device_array<pwm_display_device, 3> m_vfd_devices;
 	std::vector<output_finder<40>> m_vfd_outputs;
 	output_finder<> m_cassmute;
-	output_finder<> m_debug_pw;
 
 	// Voice computer.
 	required_device<mc6809_device> m_voicecpu;
@@ -239,9 +237,9 @@ private:
 	// But the variables here are always active-high (active == true).
 
 	// Main computer state.
-	u8 m_firq_timer_preset = 0xff;  // Preset for 40103 timer. pullup high.
-	u8 m_selected_cv_in = 0x07;  // MUX A-C inputs pulled high.
-	bool m_inhibit_cv_in = true;  // MUX INHibit input pulled high.
+	u8 m_firq_timer_preset = 0xff;  // Preset for 40103 timer. Pulled high.
+	u8 m_selected_cv_in = 0x07;  // MUX A-C inputs. Pulled high.
+	bool m_inhibit_cv_in = true;  // MUX INHibit input. Pulled high.
 	std::vector<bool> m_haltreq;  // Halt request to the voice board (HALTREQ).
 	std::vector<bool> m_encoder_dir;
 	std::vector<bool> m_encoder_changed;
@@ -522,9 +520,9 @@ void xpander_state::display_w(offs_t offset, u8 data)
 void xpander_state::display_output_w(int display, offs_t offset, u32 data)
 {
 	// The FG405A2 is a non-standard 16-segment display. It includes a
-	// 14-segment character, a period and an underline.
-	// Map the 16 segments of the FG405A2 to a led14segsc. The underline will be
-	// represented with the comma.
+	// 14-segment character, a period, and a line under the character.
+	// Map the 16 segments of the FG405A2 to a `led14segsc`. The line under the
+	// character will be represented with the comma.
 	assert(display >= 0 && display < 3);
 	m_vfd_outputs[display][offset] =
 		bitswap<16>(data, 0, 1, 3, 6, 5, 4, 2, 7, 12, 11, 10, 13, 15, 14, 9, 8);
@@ -760,7 +758,7 @@ void xpander_state::maincpu_map(address_map &map)
 	// Component designations refer to the Processor board, unless otherwise
 	// noted. The signal names below (e.g. DISP*, HALTSET*) reference those in
 	// the schematics.
-	map.unmap_value_high();  // Data bus pulled high by resistors in Pot Board.
+	map.unmap_value_high();  // Data bus pulled high by resistors in Pot board.
 
 	// 1/2 74LS139 (U22, O0-O2) controls access to RAM and other ports.
 	// RAM write and select signals can only go active low when there is power
@@ -785,8 +783,8 @@ void xpander_state::maincpu_map(address_map &map)
 	map(0x7400, 0x7400).mirror(0x03ff).w("latch_u24_proc", FUNC(output_latch_device::write));  // LED2*
 	map(0x7800, 0x7800).mirror(0x03ff).unmaprw();  // Unused. U23 output 6 not connected.
 
-	// Peripherals on Pot Board mapped to 0x7c00-0x7fff (BEN* output of U23).
-	// Additional decoding for those is done by U15 on the Pot Board (74LS42).
+	// Peripherals on Pot board mapped to 0x7c00-0x7fff (BEN* output of U23).
+	// Additional decoding for those is done by U15 on the Pot board (74LS42).
 	// A9 and A0-A5 are not used for decoding (mirror: 0x023f)
 	map(0x7c00, 0x7c00).mirror(0x023f).r(FUNC(xpander_state::encoder_dir_r));  // DIR*
 	map(0x7c40, 0x7c40).mirror(0x023f).r(FUNC(xpander_state::encoder_sw_r));  // SW*
@@ -888,7 +886,6 @@ void xpander_state::xpander(machine_config &config)
 
 	config.set_default_layout(layout_oberheim_xpander);
 
-
 	MC6809(config, m_voicecpu, 16_MHz_XTAL / 2);
 	m_voicecpu->set_addrmap(AS_PROGRAM, &xpander_state::voicecpu_map);
 
@@ -954,7 +951,7 @@ DECLARE_INPUT_CHANGED_MEMBER(xpander_state::encoder_moved)
 	m_encoder_dir[encoder] = ((newval > oldval) || overflowed) && !underflowed;
 
 	LOGMASKED(LOG_ENCODERS, "Encoder %d changed from: %d to: %d (o: %d, u: %d), dir: %d\n",
-	          param, oldval, newval, overflowed, underflowed, m_encoder_dir[encoder]);
+	          encoder, oldval, newval, overflowed, underflowed, bool(m_encoder_dir[encoder]));
 }
 
 DECLARE_INPUT_CHANGED_MEMBER(xpander_state::memory_protect_changed)
@@ -1048,7 +1045,7 @@ INPUT_PORTS_START(xpander)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)  // No switch. Pulled up.
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)  // No switch. Pulled up.
 
-	PORT_START("memory_protect")  // SW6 on Processor Board.
+	PORT_START("memory_protect")  // SW6 on Processor board.
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Memory Protect") PORT_TOGGLE PORT_CODE(KEYCODE_P)
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(xpander_state::memory_protect_changed), 0)
 
@@ -1148,4 +1145,3 @@ ROM_END
 
 // In production from 1984 to 1988.
 SYST(1984, xpander, 0, 0, xpander, xpander, xpander_state, empty_init, "Oberheim", "Xpander", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-
