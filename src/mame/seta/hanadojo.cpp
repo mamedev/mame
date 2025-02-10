@@ -6,13 +6,17 @@
 AAJ-11 PCB
 
 TODO:
-- Resets itself in attract sequence, thrash protection?
-\- bp b85,1,{pc+=3;g} to bypass for a bit;
-- Implement 2x IOX for inputs;
-- Writes RAM NG 8AF0 if NMI is triggered, is it even used?
-- "AY8910 upper address mismatch";
-- hanadojoa: slightly more protected, keeps resetting at IOX tests;
+- Resets itself in attract sequence, NVRAM thrash protection?
+\- bp b6e sub-routine: loops with ld hl,$8f14 de,$0005 expecting all values to be 0x55 or 0xaa;
+\- writes a 0 to $8f28 the 3rd time around, expecting one of the IOX to prevent that;
+\- some code uploaded in RAM at $8c00, including an IOX data_w 0x60;
+\- wpset 0x8f00,0x100,r,PC!=0xb91
+\- program and I/O accesses to $b8xx / $bcxx areas;
+\- second reset: bp 1a3,1,{a=4;g} for gameplay and attract;
+- Hookup NMI for coin chutes;
+- Eventually uses hopper;
 - CRTC processes params as 1088x224 with char width 8;
+- hanadojoa: slightly more protected, keeps resetting at IOX tests;
 
 ===================================================================================================
 
@@ -59,8 +63,12 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_iox(*this, "iox_%u", 1U)
+		, m_dswb(*this, "DSWB")
+		, m_dswc(*this, "DSWC")
+		, m_patsw(*this, "PATSW")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_videoram(*this, "videoram")
+
 	{ }
 
 	void hanadojo(machine_config &config);
@@ -71,6 +79,9 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device_array<iox_hle_device, 2> m_iox;
+	required_ioport m_dswb;
+	required_ioport m_dswc;
+	required_ioport m_patsw;
 	required_device<gfxdecode_device> m_gfxdecode;
 
 	required_shared_ptr<uint8_t> m_videoram;
@@ -149,34 +160,43 @@ uint32_t hanadojo_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 void hanadojo_state::program_map(address_map &map)
 {
-	map(0x0000, 0x7fff).rom();
+	// ldir 0-0x1ff at POST
+	map(0x0000, 0x7fff).rom().nopw();
 	map(0x8800, 0x8fff).ram();
+	map(0x8f28, 0x8f28).lr8(NAME([] (offs_t offset) { return 0x55; }));
 	map(0x9000, 0x97ff).ram().share(m_videoram);
 }
 
 void hanadojo_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
-	map.global_mask(0xff);
-	map(0x00, 0x00).rw("ay", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
-	map(0x01, 0x01).w("ay", FUNC(ay8910_device::data_w));
+	map(0x0000, 0x0000).rw("ay", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
+	map(0x0001, 0x0001).w("ay", FUNC(ay8910_device::data_w));
 
-	map(0x20, 0x20).w("crtc", FUNC(hd6845s_device::address_w));
-	map(0x21, 0x21).w("crtc", FUNC(hd6845s_device::register_w));
+	map(0x0020, 0x0020).w("crtc", FUNC(hd6845s_device::address_w));
+	map(0x0021, 0x0021).w("crtc", FUNC(hd6845s_device::register_w));
 	// TODO: 2x IOX!
 	// player inputs, PATSW 2
-	map(0x40, 0x40).rw(m_iox[0], FUNC(iox_hle_device::data_r), FUNC(iox_hle_device::data_w));
-	map(0x41, 0x41).rw(m_iox[0], FUNC(iox_hle_device::status_r), FUNC(iox_hle_device::command_w));
+	map(0x0040, 0x0040).rw(m_iox[0], FUNC(iox_hle_device::data_r), FUNC(iox_hle_device::data_w));
+	map(0x0041, 0x0041).rw(m_iox[0], FUNC(iox_hle_device::status_r), FUNC(iox_hle_device::command_w));
 
 	// coinage (cfr. init at $61), service buttons, dip bank B
-	map(0x60, 0x60).rw(m_iox[1], FUNC(iox_hle_device::data_r), FUNC(iox_hle_device::data_w));
-	map(0x61, 0x61).rw(m_iox[1], FUNC(iox_hle_device::status_r), FUNC(iox_hle_device::command_w));
+	map(0x0060, 0x0060).rw(m_iox[1], FUNC(iox_hle_device::data_r), FUNC(iox_hle_device::data_w));
+	map(0x0061, 0x0061).rw(m_iox[1], FUNC(iox_hle_device::status_r), FUNC(iox_hle_device::command_w));
 
-	map(0x80, 0x80).nopw(); // very noisy, just watchdog?
+	map(0x0080, 0x0080).nopw(); // very noisy, just watchdog?
+
+	map(0x00a0, 0x00a3).lr8(
+		NAME([this] (offs_t offset) {
+			const u8 bankb_select = BIT(offset, 1) ?
+				BIT(m_patsw->read(), offset & 1) :
+				BIT(m_dswb->read(), offset + 6);
+			return (bankb_select) | (BIT(m_dswc->read(), offset) << 1);
+		})
+	);
 }
 
 
-// TODO: verify what's CAN/DEA/PLY with gameplay
 static INPUT_PORTS_START( hanadojo )
 	PORT_START("P1_KEY0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -184,7 +204,7 @@ static INPUT_PORTS_START( hanadojo )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_HANAFUDA_A ) PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_D ) PORT_PLAYER(1)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_HANAFUDA_F ) PORT_PLAYER(1) PORT_NAME("P1 CAN")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_CANCEL ) PORT_PLAYER(1) PORT_NAME("P1 Cancel") // CAN
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_HANAFUDA_B ) PORT_PLAYER(1)
 
@@ -192,10 +212,10 @@ static INPUT_PORTS_START( hanadojo )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_C ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_E ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 ) // PLY?
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_PLAYER(1) PORT_NAME("P1 Play / Bet") // PLY
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_HANAFUDA_G ) PORT_PLAYER(1) PORT_NAME("P1 DEA")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_PLAYER(1) PORT_NAME("P1 Deal") // DEA
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_HANAFUDA_NO ) PORT_PLAYER(1)
 
 	PORT_START("P1_KEY2")
@@ -208,7 +228,7 @@ static INPUT_PORTS_START( hanadojo )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_HANAFUDA_A ) PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_D ) PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_HANAFUDA_F ) PORT_PLAYER(2) PORT_NAME("P2 CAN")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_HANAFUDA_F ) PORT_PLAYER(2) PORT_NAME("P2 Cancel")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_HANAFUDA_B ) PORT_PLAYER(2)
 
@@ -216,15 +236,23 @@ static INPUT_PORTS_START( hanadojo )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_C ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_E ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 ) // PLY?
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_PLAYER(2) PORT_NAME("P2 Play / Bet")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_HANAFUDA_G ) PORT_PLAYER(2) PORT_NAME("P2 DEA")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_PLAYER(2) PORT_NAME("P2 Deal")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_HANAFUDA_NO ) PORT_PLAYER(2)
 
 	PORT_START("P2_KEY2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_YES ) PORT_PLAYER(2)
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("PATSW")
+	PORT_DIPNAME( 0x01, 0x01, "PATSW2" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "PATSW1" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSWA")
 	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SWA:1")
@@ -300,8 +328,8 @@ void hanadojo_state::hanadojo(machine_config &config)
 
 	IOX_HLE(config, m_iox[1], 0);
 	m_iox[1]->p1_direct_input_cb().set_ioport("DSWD");
-	// TODO: seemingly only SW2 0:6 are here
-	m_iox[1]->p2_direct_input_cb().set_ioport("DSWB");
+	// TODO: looks latch inverted compared to the $a0-$a1 version
+	m_iox[1]->p2_direct_input_cb().set([this] () { return (m_dswb->read() & 0x3f) ^ 0x3f; });
 
 	hd6845s_device &crtc(HD6845S(config, "crtc", 12_MHz_XTAL / 4)); // divider guessed
 	crtc.set_screen("screen");
