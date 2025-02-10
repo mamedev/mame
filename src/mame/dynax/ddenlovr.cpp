@@ -4695,7 +4695,7 @@ void hanakanz_state::daireach_portmap(address_map &map)
 }
 
 /***************************************************************************
-                            Hana Night Rose
+                            Hanafuda Night Rose
 ***************************************************************************/
 
 // 29EE: D4 ED 76 C9 CB
@@ -4723,8 +4723,8 @@ void hanakanz_state::hnrose_portmap(address_map &map)
 	map(0x60, 0x61).w("ym2413", FUNC(ym2413_device::write));
 	map(0x62, 0x62).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x68, 0x68).portr("SYSTEM");
-	map(0x6a, 0x6a).r(FUNC(hanakanz_state::daimyojn_keyb1_r));
-	map(0x6c, 0x6c).r(FUNC(hanakanz_state::daimyojn_keyb2_r));
+	map(0x6a, 0x6a).r(FUNC(hanakanz_state::hanamai_keyboard_r<1>));
+	map(0x6c, 0x6c).r(FUNC(hanakanz_state::hanamai_keyboard_r<0>));
 	map(0x6e, 0x6e).w(FUNC(hanakanz_state::hanakanz_coincounter_w));
 	map(0x70, 0x70).w(FUNC(hanakanz_state::mjmyster_rambank_w));
 	map(0x80, 0x8f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
@@ -8758,6 +8758,155 @@ static INPUT_PORTS_START( daimyojn )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( hnrose )
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) // pay
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test ))
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )   // analyzer
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // data clear
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_INCLUDE( dynax_hanafuda_keys_bet )
+
+	// Note the PCB has 4x 10-position DIP switches and SW5 is a 4-position DIP switch.
+	// SW5 is marked as Unused and 'leave all off' in the manual
+	// Definitions and defaults from manual
+	// The manual provides four sets of standard settings (definitions below use the first one):
+	//       標準設定 コインプールタイプA                        標準設定 コインプールタイプB                        標準設定 メダルコーナータイプ                        クレジット・タイマータイプ（標準設定 アミューズコーナータイプ）
+	// SW 1   ON  ON OFF  ON OFF  ON OFF OFF OFF OFF       OFF  ON OFF  ON OFF  ON OFF OFF OFF OFF       OFF  ON OFF  ON OFF  ON OFF OFF OFF OFF       OFF OFF OFF  ON OFF  ON OFF OFF  ON OFF
+	// SW 2  OFF OFF OFF OFF OFF OFF OFF  ON OFF OFF       OFF OFF OFF OFF OFF OFF OFF  ON OFF OFF       OFF OFF OFF OFF OFF OFF OFF  ON OFF OFF       OFF OFF OFF OFF OFF OFF OFF  ON OFF OFF
+	// SW 3   ON OFF OFF OFF OFF OFF OFF OFF OFF OFF        ON OFF OFF OFF OFF OFF OFF OFF OFF OFF        ON OFF OFF OFF OFF OFF OFF OFF OFF  ON       OFF OFF OFF OFF OFF OFF OFF OFF OFF OFF
+	// SW 4   ON  ON OFF OFF OFF OFF OFF OFF OFF OFF       OFF OFF OFF OFF OFF OFF OFF OFF OFF OFF       OFF OFF OFF OFF OFF OFF OFF OFF OFF OFF       OFF OFF OFF OFF OFF OFF OFF  ON OFF OFF
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x07, 0x04, "Payout Rate" ) PORT_DIPLOCATION("SW1:1,2,3")
+	PORT_DIPSETTING(    0x07, "1 (High)" )
+	PORT_DIPSETTING(    0x06, "2" )
+	PORT_DIPSETTING(    0x05, "3" )
+	PORT_DIPSETTING(    0x04, "4" )
+	PORT_DIPSETTING(    0x03, "5" )
+	PORT_DIPSETTING(    0x02, "6" )
+	PORT_DIPSETTING(    0x01, "7" )
+	PORT_DIPSETTING(    0x00, "8 (Low)" )
+	PORT_DIPNAME( 0x08, 0x00, "Payout Variance" ) PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, "Large" )
+	PORT_DIPSETTING(    0x00, "Small" )
+	PORT_DIPNAME( 0x10, 0x10, "Gokou Hand (Five Brights Yaku)" ) PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x60, 0x40, "W-Up Win Percentage" ) PORT_DIPLOCATION("SW1:6,7")
+	PORT_DIPSETTING(    0x60, "70%" )
+	PORT_DIPSETTING(    0x40, "65%" )
+	PORT_DIPSETTING(    0x20, "60%" )
+	PORT_DIPSETTING(    0x00, "55%" )
+	PORT_DIPNAME( 0x80, 0x80, "Bet Max" ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPSETTING(    0x80, "10" )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x00, "1 Coin 10 Credits" )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:3") // manual has no description for it
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x38, 0x38, "Minimum Bet" ) PORT_DIPLOCATION("SW2:4,5,6")
+	PORT_DIPSETTING(    0x38, "1" )
+	PORT_DIPSETTING(    0x30, "2" )
+	PORT_DIPSETTING(    0x28, "3" )
+	PORT_DIPSETTING(    0x20, "4" )
+	PORT_DIPSETTING(    0x18, "5" )
+	PORT_DIPSETTING(    0x10, "6" )
+	PORT_DIPSETTING(    0x08, "7" )
+	PORT_DIPSETTING(    0x00, "8" )
+	PORT_DIPNAME( 0xc0, 0x40, "Credit Limit" ) PORT_DIPLOCATION("SW2:7,8")
+	PORT_DIPSETTING(    0xc0, "1000" )
+	PORT_DIPSETTING(    0x80, "2000" )
+	PORT_DIPSETTING(    0x40, "3000" )
+	PORT_DIPSETTING(    0x00, "5000" )
+
+	PORT_START("DSW3")
+	PORT_DIPNAME( 0x07, 0x06, "Sankou & Ameyonko Control" ) PORT_DIPLOCATION("SW3:1,2,3")
+	PORT_DIPSETTING(    0x07, "1 (None)" )
+	PORT_DIPSETTING(    0x06, "2 (Weak)" )
+	PORT_DIPSETTING(    0x05, "3" )
+	PORT_DIPSETTING(    0x04, "4" )
+	PORT_DIPSETTING(    0x03, "5" )
+	PORT_DIPSETTING(    0x02, "6" )
+	PORT_DIPSETTING(    0x01, "7" )
+	PORT_DIPSETTING(    0x00, "8 (Strong)" )
+	PORT_DIPNAME( 0x18, 0x18, "Gokou Odds (Five Brights)" ) PORT_DIPLOCATION("SW3:4,5")
+	PORT_DIPSETTING(    0x18, "100" )
+	PORT_DIPSETTING(    0x10, "200" )
+	PORT_DIPSETTING(    0x08, "250" )
+	PORT_DIPSETTING(    0x00, "300" )
+	PORT_DIPNAME( 0x60, 0x60, "Shikou Odds (Four Brights)" ) PORT_DIPLOCATION("SW3:6,7")
+	PORT_DIPSETTING(    0x60, "50" )
+	PORT_DIPSETTING(    0x40, "60" )
+	PORT_DIPSETTING(    0x20, "70" )
+	PORT_DIPSETTING(    0x00, "80" )
+	PORT_BIT(           0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(ddenlovr_state::io_fake_r<0>))
+
+	PORT_START("DSW4")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW4:1")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "In-Game Music" ) PORT_DIPLOCATION("SW4:2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Gal Voice" ) PORT_DIPLOCATION("SW4:3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Winning Streak Gal Display" ) PORT_DIPLOCATION("SW4:4")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Odds Type" ) PORT_DIPLOCATION("SW4:5")
+	PORT_DIPSETTING(    0x10, "Punch Board" ) // TODO: verify this translation of パンチボード in this context
+	PORT_DIPSETTING(    0x00, "Slot" )
+	PORT_DIPNAME( 0x20, 0x20, "Linkage" ) PORT_DIPLOCATION("SW4:6")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0xc0, 0xc0, "Credit Type" ) PORT_DIPLOCATION("SW4:7,8")
+	PORT_DIPSETTING(    0xc0, "Credit" )
+	PORT_DIPSETTING(    0x80, "Medal Timer" )
+	PORT_DIPSETTING(    0x40, "Credit Timer" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Unused ) ) // manual doesn't show this setting
+
+	PORT_START("DSW5")
+	PORT_DIPNAME( 0x01, 0x01, "Note Rate" ) PORT_DIPLOCATION("SW1:9")
+	PORT_DIPSETTING(    0x00, "x5" )
+	PORT_DIPSETTING(    0x01, "x10" )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:10")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0c, 0x0c, "Gokou & Shikou Odds" ) PORT_DIPLOCATION("SW2:9,10")
+	PORT_DIPSETTING(    0x0c, "1 (Less Often)" )
+	PORT_DIPSETTING(    0x08, "2" )
+	PORT_DIPSETTING(    0x04, "3" )
+	PORT_DIPSETTING(    0x00, "4 (More Often)" )
+	PORT_BIT(           0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(ddenlovr_state::io_fake_r<1>))
+	PORT_DIPNAME( 0x20, 0x20, "Bonus Points Max" ) PORT_DIPLOCATION("SW3:10")
+	PORT_DIPSETTING(    0x20, "99" )
+	PORT_DIPSETTING(    0x00, "999" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Panel" ) PORT_DIPLOCATION("SW4:9,10")
+	PORT_DIPSETTING(    0xc0, "Hanafuda" )
+	PORT_DIPSETTING(    0x80, "Mahjong" )
+	PORT_DIPSETTING(    0x40, "Hanafuda Amusement" )
+	PORT_DIPSETTING(    0x00, "Mahjong Amusement" )
+
+	PORT_START("FAKE")
+	PORT_DIPNAME( 0x03, 0x03, "Ameyonko Odds (Rain Four Brights)" ) PORT_DIPLOCATION("SW3:8,9")
+	PORT_DIPSETTING(    0x03, "20" )
+	PORT_DIPSETTING(    0x02, "30" )
+	PORT_DIPSETTING(    0x01, "40" )
+	PORT_DIPSETTING(    0x00, "50" )
+INPUT_PORTS_END
+
+
 /***************************************************************************
 
 
@@ -12441,7 +12590,7 @@ ROM_END
 
 /***************************************************************************
 
-Hana Night Rose
+Hanafuda Night Rose
 
 Techno-Top, Limited
 
@@ -12552,7 +12701,7 @@ GAME( 2000, jongteia,    jongtei,  jongteia,  jongtei,    hanakanz_state, empty_
 
 GAME( 2000, mjgnight,    0,        mjgnight,  mjgnight,   hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Gorgeous Night (Japan, TSM003-01)",                      MACHINE_NO_COCKTAIL  )
 
-GAME( 2000, hnrose,      0,        hnrose,    daimyojn,   hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Hana Night Rose (Japan, TSM008-04)",                             MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL  )
+GAME( 2000, hnrose,      0,        hnrose,    hnrose,     hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Hanafuda Night Rose (Japan, TSM008-04)",                         MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL  )
 
 GAME( 2001, daireach,    0,        daireach,  seljan2,    hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Dai-Reach (Japan, TSM012-C01)",                          MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL )
 
