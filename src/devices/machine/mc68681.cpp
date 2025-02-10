@@ -794,7 +794,7 @@ void mcf5206e_uart_device::write(offs_t offset, uint8_t data)
 	case 0x01: /* UCSR */
 	case 0x02: /* UCR */
 	case 0x03: /* UTB */
-	case 0x04: /* ACR */	// <-- This needs changing as ACR on ColdFire only handles interrupt enable for CTS
+	case 0x04: /* ACR */	// <-- TODO: This needs changing as ACR on ColdFire only handles interrupt enable for CTS
 	case 0x05: /* IMR */
 	case 0x0e: /* Set Output Port (RTS) Bit */
 	case 0x0f: /* Reset Output Port (RTS) Bit */
