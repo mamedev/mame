@@ -1304,30 +1304,34 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<!-- boot OK, weapon menu has random horizontal lines -->
-	<software name="aquales" supported="partial">
+	<software name="aquales" supported="no">
 		<description>Aquales</description>
 		<year>1991</year>
 		<publisher>エグザクト (Exact)</publisher>
+		<notes><![CDATA[
+Doesn't autoboot with both disks in, requires a fake data disk swap from user
+Opening hangs at first line
+During gameplay, weapon menu has random horizontal lines
+]]></notes>
 		<info name="alt_title" value="アクアレス" />
 		<info name="release" value="19910912" />
-		<info name="usage" value="Requires Disk 1 and Disk 3 mounted to boot" />
+		<info name="usage" value="Boot with flop1 and flop2 for gameplay, flop3 for opening" />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1" />
+			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261824">
 				<rom name="aquales (1991)(exact)(disk 1 of 3).dim" size="1261824" crc="c03bb393" sha1="f752eb5b7c56f96a466c1f1da26682e2142c33a8" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2" />
+			<feature name="part_id" value="Data Disk" />
 			<dataarea name="flop" size="1261824">
-				<rom name="aquales (1991)(exact)(disk 2 of 3).dim" size="1261824" crc="d178d948" sha1="35fe019806f31906baade488f3c9714328f6d430" />
+				<rom name="aquales (1991)(exact)(disk 3 of 3).dim" size="1261824" crc="5954a3e4" sha1="510755526ecce6589a60ace5f3fe0332d91723c0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3" />
+			<feature name="part_id" value="Opening Disk" />
 			<dataarea name="flop" size="1261824">
-				<rom name="aquales (1991)(exact)(disk 3 of 3).dim" size="1261824" crc="5954a3e4" sha1="510755526ecce6589a60ace5f3fe0332d91723c0" />
+				<rom name="aquales (1991)(exact)(disk 2 of 3).dim" size="1261824" crc="d178d948" sha1="35fe019806f31906baade488f3c9714328f6d430" />
 			</dataarea>
 		</part>
 	</software>

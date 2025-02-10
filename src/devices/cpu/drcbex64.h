@@ -272,6 +272,10 @@ private:
 	{
 		resolved_memory_accessors resolved;
 		address_space::specific_access_info specific;
+		offs_t address_mask;
+		bool no_mask;
+		bool has_high_bits;
+		bool mask_high_bits;
 	};
 	resolved_member_function m_debug_cpu_instruction_hook;
 	resolved_member_function m_drcmap_get_value;

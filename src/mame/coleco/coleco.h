@@ -17,27 +17,27 @@
 class coleco_state : public driver_device
 {
 public:
-	coleco_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_cart(*this, COLECOVISION_CARTRIDGE_SLOT_TAG),
-			m_ctrlsel(*this, "CTRLSEL"),
-			m_std_keypad1(*this, "STD_KEYPAD1"),
-			m_std_joy1(*this, "STD_JOY1"),
-			m_std_keypad2(*this, "STD_KEYPAD2"),
-			m_std_joy2(*this, "STD_JOY2"),
-			m_sac_keypad1(*this, "SAC_KEYPAD1"),
-			m_sac_joy1(*this, "SAC_JOY1"),
-			m_sac_slide1(*this, "SAC_SLIDE1"),
-			m_sac_keypad2(*this, "SAC_KEYPAD2"),
-			m_sac_joy2(*this, "SAC_JOY2"),
-			m_sac_slide2(*this, "SAC_SLIDE2"),
-			m_driv_wheel1(*this, "DRIV_WHEEL1"),
-			m_driv_pedal1(*this, "DRIV_PEDAL1"),
-			m_driv_wheel2(*this, "DRIV_WHEEL2"),
-			m_driv_pedal2(*this, "DRIV_PEDAL2"),
-			m_roller_x(*this, "ROLLER_X"),
-			m_roller_y(*this, "ROLLER_Y")
+	coleco_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_cart(*this, COLECOVISION_CARTRIDGE_SLOT_TAG),
+		m_ctrlsel(*this, "CTRLSEL"),
+		m_std_keypad1(*this, "STD_KEYPAD1"),
+		m_std_joy1(*this, "STD_JOY1"),
+		m_std_keypad2(*this, "STD_KEYPAD2"),
+		m_std_joy2(*this, "STD_JOY2"),
+		m_sac_keypad1(*this, "SAC_KEYPAD1"),
+		m_sac_joy1(*this, "SAC_JOY1"),
+		m_sac_slide1(*this, "SAC_SLIDE1"),
+		m_sac_keypad2(*this, "SAC_KEYPAD2"),
+		m_sac_joy2(*this, "SAC_JOY2"),
+		m_sac_slide2(*this, "SAC_SLIDE2"),
+		m_driv_wheel1(*this, "DRIV_WHEEL1"),
+		m_driv_pedal1(*this, "DRIV_PEDAL1"),
+		m_driv_wheel2(*this, "DRIV_WHEEL2"),
+		m_driv_pedal2(*this, "DRIV_PEDAL2"),
+		m_roller_x(*this, "ROLLER_X"),
+		m_roller_y(*this, "ROLLER_Y")
 	{ }
 
 	virtual void machine_start() override ATTR_COLD;
@@ -67,8 +67,9 @@ public:
 	void coleco_io_map(address_map &map) ATTR_COLD;
 	void coleco_map(address_map &map) ATTR_COLD;
 	void czz50_map(address_map &map) ATTR_COLD;
+
 protected:
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<colecovision_cartridge_slot_device> m_cart;
 
 	int m_joy_mode = 0;
@@ -106,12 +107,12 @@ protected:
 class bit90_state : public coleco_state
 {
 public:
-	bit90_state(const machine_config &mconfig, device_type type, const char *tag)
-		: coleco_state(mconfig, type, tag),
-			m_bank(*this, "bank"),
-			m_ram(*this, RAM_TAG),
-			m_io_keyboard(*this, {"ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7"})
-		{}
+	bit90_state(const machine_config &mconfig, device_type type, const char *tag) :
+		coleco_state(mconfig, type, tag),
+		m_bank(*this, "bank"),
+		m_ram(*this, RAM_TAG),
+		m_io_keyboard(*this, {"ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7"})
+	{ }
 
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;

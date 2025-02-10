@@ -6088,7 +6088,7 @@ GAME( 1999, shiryu2,   strider2, coh3002c,  strider2, capcom_zn_state,  empty_in
 
 // Atari (PSXTRA)
 GAME( 1996, coh1000w,  0,        coh1000w,  zn,       primrag2_state,   empty_init, ROT0, "Atari",                   "Atari PSX",                         MACHINE_IS_BIOS_ROOT | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, primrag2,  coh1000w, coh1000w,  primrag2, primrag2_state,   empty_init, ROT0, "Atari",                   "Primal Rage II (Ver 0.36a)",                                MACHINE_SUPPORTS_SAVE )
+GAME( 1996, primrag2,  coh1000w, coh1000w,  primrag2, primrag2_state,   empty_init, ROT0, "Atari",                   "Primal Rage II (Ver 0.36a)",                               MACHINE_SUPPORTS_SAVE )
 
 // Acclaim (PCB-100102 PCB-100095)
 GAME( 1995, coh1000a,  0,        coh1000a,  zn,       acclaim_zn_state, empty_init, ROT0, "Acclaim",                 "Acclaim PSX",                       MACHINE_IS_BIOS_ROOT | MACHINE_SUPPORTS_SAVE )
@@ -6122,7 +6122,7 @@ GAME( 2001, mfjump,    coh1002m, coh1002m,  zn2p,     tecmo_zn_state,   empty_in
 
 // Video System (VS34)
 GAME( 1996, coh1002v,  0,        coh1002v,  zn,       visco_zn_state,   empty_init, ROT0, "Video System Co.",        "Video System PSX",                  MACHINE_IS_BIOS_ROOT | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, aerofgts,  coh1002v, coh1002v,  aerofgts, visco_zn_state,   empty_init, ROT270, "McO'River, Inc.",       "Aero Fighters Special (USA)",                              MACHINE_SUPPORTS_SAVE )
+GAME( 1996, aerofgts,  coh1002v, coh1002v,  aerofgts, visco_zn_state,   empty_init, ROT270, "McO'River, Inc.",       "Aero Fighters Special (USA)",                              MACHINE_SUPPORTS_SAVE ) // Video System subsidiary (before they renamed to Video System USA)
 GAME( 1996, aerofgtst, aerofgts, coh1002v,  aerofgts, visco_zn_state,   empty_init, ROT270, "Video System Co.",      "Aero Fighters Special (Taiwan)",                           MACHINE_SUPPORTS_SAVE )
 GAME( 1996, sncwgltd,  aerofgts, coh1002v,  aerofgts, visco_zn_state,   empty_init, ROT270, "Video System Co.",      "Sonic Wings Limited (Japan)",                              MACHINE_SUPPORTS_SAVE )
 

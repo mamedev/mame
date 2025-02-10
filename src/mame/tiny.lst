@@ -1,95 +1,95 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
-/******************************************************************************
+/*******************************************************************************
 
     tiny.lst
 
-    List of all enabled drivers in the system. This file is parsed by
-    makelist.exe, sorted, and output as C code describing the drivers.
+    List of all enabled drivers for compile target. This is not an automatically
+    generated file, and it should be manually updated when a new driver is added.
 
-******************************************************************************/
+*******************************************************************************/
 
 @source:exidy/carpolo.cpp
-carpolo         // (c) 1977 Exidy
+carpolo
 
 @source:exidy/circus.cpp
-circus          // (c) 1977 Exidy
-circuso         // (c) 1977 Exidy
-robotbwl        // (c) 197? Exidy
-crash           // (c) 1979 Exidy
-ripcord         // (c) 1979 Exidy
+circus
+circuso
+robotbwl
+crash
+ripcord
 
 @source:exidy/exidy.cpp
-sidetrac        // (c) 1979 Exidy
-targ            // (c) 1980 Exidy
-spectar         // (c) 1980 Exidy
-teetert         // (c) 1982 Exidy
-hardhat         // (c) 1982
-fax             // (c) 1983
-fax2            // (c) 1983
+sidetrac
+targ
+spectar
+teetert
+hardhat
+fax
+fax2
 
 @source:exidy/starfire.cpp
-starfire        // (c) 1979 Exidy
-starfirea       // (c) 1979 Exidy
-fireone         // (c) 1979 Exidy
-starfir2        // (c) 1979 Exidy
+starfire
+starfirea
+fireone
+starfir2
 
 @source:exidy/vertigo.cpp
-topgunnr        // (c) 1986
+topgunnr
 
 @source:exidy/victory.cpp
-victory         // (c) 1982
-victorba        // (c) 1982
+victory
+victorba
 
 @source:gaelco/wrally.cpp
-wrally          // (c) 1993 - Ref 930705
+wrally
 
 @source:midway/astrocde.cpp
-robby           // (c) 1981 Bally Midway
+robby
 
 @source:midway/gridlee.cpp
-gridlee         // [1983 Videa] prototype - no copyright notice
+gridlee
 
 @source:midway/williams.cpp
-alienar         // (c) 1985 Duncan Brown
+alienar
 
 @source:venture/looping.cpp
-looping         // (c) 1982 Video Games GMBH
+looping
 
 @source:misc/supertnk.cpp
-supertnk        // (c) 1981 VIDEO GAMES GmbH, W.-GERMANY
+supertnk
 
 @source:misc/goldnpkr.cpp
-witchgme        // (c) 1991 Video Klein
-witchjol        // (c) 1994 Video Klein
-wldwitch        // (c) 2001 Video Klein
-wldwitcha       // (c) 1992 Video Klein
-wldwitchc       // (c) 1994 Video Klein
-wldwitchd       // (c) 1994 Video Klein
-wldwitchf       // (c) 1994 Video Klein
-wldwitchg       // (c) 1994 Video Klein
-wldwitchh       // (c) 1995 Video Klein
-wldwitchi       // (c) 1996 Video Klein
-wldwitchj       // (c) 1996 Video Klein
-wldwitchk       // (c) 1996 Video Klein
-wldwitchl       // (c) 1996 Video Klein
-wldwitchm       // (c) 1996 Video Klein
-wldwitchn       // (c) 1997 Video Klein
-wldwitcho       // (c) 1998 Video Klein
-wldwitchp       // (c) 1998 Video Klein
-wldwitchq       // (c) 1998 Video Klein
-wldwitchr       // (c) 1999 Video Klein
-wldwitchs       // (c) 1999 Video Klein
-wldwitcht       // (c) 1999 Video Klein
-wldwitchu       // (c) 2000 Video Klein
-wldwitchv       // (c) 2001 Video Klein
-wupndown        // (c) 1998 Video Klein
-wupndowna       // (c) 1998 Video Klein
-wupndownb       // (c) 1998 Video Klein
-wupndownc       // (c) 1998 Video Klein
-wupndownd       // (c) 1998 Video Klein
-wstrike         // (c) 1992 Video Klein
-wstrikea        // (c) 1992 Video Klein
-wtchjack        // (c) 1996 Video Klein
-wtchjacka       // (c) 1996 Video Klein
-wtchjackb       // (c) 1996 Video Klein
+witchgme
+witchjol
+wldwitch
+wldwitcha
+wldwitchc
+wldwitchd
+wldwitchf
+wldwitchg
+wldwitchh
+wldwitchi
+wldwitchj
+wldwitchk
+wldwitchl
+wldwitchm
+wldwitchn
+wldwitcho
+wldwitchp
+wldwitchq
+wldwitchr
+wldwitchs
+wldwitcht
+wldwitchu
+wldwitchv
+wupndown
+wupndowna
+wupndownb
+wupndownc
+wupndownd
+wstrike
+wstrikea
+wtchjack
+wtchjacka
+wtchjackb

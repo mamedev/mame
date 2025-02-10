@@ -174,6 +174,12 @@ const a64::CondCode condition_map[uml::COND_MAX - uml::COND_Z] =
 	a64::CondCode::kGE,    // COND_GE,          requires SV
 };
 
+// masks for immediate values that can be generated with movz instructions
+constexpr uint64_t LSL0_MASK = 0x00000000'0000ffff;
+constexpr uint64_t LSL16_MASK = 0x00000000'ffff0000;
+constexpr uint64_t LSL32_MASK = 0x0000ffff'00000000;
+constexpr uint64_t LSL48_MASK = 0xffff0000'00000000;
+
 
 #define ARM_CONDITION(a, condition)        (condition_map[condition - COND_Z])
 #define ARM_NOT_CONDITION(a, condition)    (negateCond(condition_map[condition - COND_Z]))
@@ -212,23 +218,25 @@ inline a64::Gp select_register(a64::Gp const &reg, uint32_t regsize)
 
 inline bool is_valid_immediate_mask(uint64_t val, size_t bytes)
 {
+	const unsigned bits = bytes * 8;
+
 	// all zeros and all ones aren't allowed, and disallow any value with bits outside of the max bit range
-	if (val == 0 || val == make_bitmask<uint64_t>(bytes * 8))
+	if ((val == 0) || (val >= util::make_bitmask<uint64_t>(bits)))
 		return false;
 
-	uint32_t head = 64 - count_leading_zeros_64(val);
-	if (head >= (bytes * 8))
-		return false;
-
-	uint32_t tail = 0;
-	while (tail < head)
+	// work out if the value is repeating sequence of a power-of-two bit group
+	unsigned width = 2;
+	uint64_t mask = util::make_bitmask<uint64_t>(bits - width);
+	while ((width < bits) && ((val & mask) != (val >> width)))
 	{
-		if (BIT(val, tail))
-			break;
-		tail++;
+		mask >>= width;
+		width <<= 1;
 	}
 
-	return population_count_64(val) == head - tail;
+	// check check that set bits are contiguous
+	const auto lz = count_leading_zeros_64(val & make_bitmask<uint64_t>(width));
+	const uint64_t invleftaligned = ~(val << lz);
+	return !(invleftaligned & (invleftaligned + 1));
 }
 
 inline bool is_valid_immediate(uint64_t val, size_t bits)
@@ -252,10 +260,24 @@ inline constexpr bool is_valid_offset(int64_t diff, int max_shift)
 		return false;
 }
 
+inline bool is_simple_mov_immediate(uint64_t val, size_t bytes)
+{
+	if (!(val & ~LSL0_MASK) || !(val & ~LSL16_MASK) || !(val & ~LSL32_MASK) || !(val & ~LSL48_MASK))
+		return true; // movz
+	else if (!(~val & ~LSL0_MASK) || !(~val & ~LSL16_MASK) || !(~val & ~LSL32_MASK) || !(~val & ~LSL48_MASK))
+		return true; // movn
+	else if ((val == uint32_t(val)) && (((val & LSL0_MASK) == LSL0_MASK) || ((val & LSL16_MASK) == LSL16_MASK)))
+		return true; // movn to w register
+	else if (is_valid_immediate_mask(val, bytes))
+		return true; // orr with zero register
+	else
+		return false;
+}
+
 inline bool emit_add_optimized(a64::Assembler &a, const a64::Gp &dst, const a64::Gp &src, int64_t val)
 {
 	// If the bottom 12 bits are 0s then an optimized form can be used if the remaining bits are <= 12
-	if (is_valid_immediate(val, 12) || ((val & 0xfff) == 0 && is_valid_immediate(val >> 12, 12)))
+	if (is_valid_immediate(val, 12) || (!(val & 0xfff) && is_valid_immediate(val, 12 + 12)))
 	{
 		a.add(dst, src, val);
 		return true;
@@ -279,33 +301,46 @@ inline bool emit_sub_optimized(a64::Assembler &a, const a64::Gp &dst, const a64:
 	return false;
 }
 
-arm::Mem get_mem_absolute(a64::Assembler &a, const void *ptr)
+void get_imm_absolute(a64::Assembler &a, const a64::Gp &reg, const uint64_t val)
 {
+	// Check for constants that can be generated with a single instruction
+	if (is_simple_mov_immediate(val, reg.isGpX() ? 8 : 4))
+	{
+		a.mov(reg, val);
+		return;
+	}
+	else if (reg.isGpX() && is_valid_immediate_mask(val, 4))
+	{
+		a.mov(reg.w(), val); // asmjit isn't smart enough to work this out
+		return;
+	}
+
+	// Values close to the program counter can be generated with a single adr
 	const uint64_t codeoffs = a.code()->baseAddress() + a.offset();
-	const int64_t reloffs = (int64_t)ptr - codeoffs;
+	const int64_t reloffs = int64_t(val) - codeoffs;
 	if (is_valid_immediate_signed(reloffs, 21))
 	{
-		a.adr(MEM_SCRATCH_REG, ptr);
-		return arm::Mem(MEM_SCRATCH_REG);
+		a.adr(reg, val);
+		return;
 	}
 
+	// Values within 4G of the program counter can be generated with adrp followed by add
 	const uint64_t pagebase = codeoffs & ~make_bitmask<uint64_t>(12);
-	const int64_t pagerel = (int64_t)ptr - pagebase;
+	const int64_t pagerel = int64_t(val) - pagebase;
 	if (is_valid_immediate_signed(pagerel, 21 + 12))
 	{
-		const uint64_t targetpage = (uint64_t)ptr & ~make_bitmask<uint64_t>(12);
-		const uint64_t pageoffs = (uint64_t)ptr & util::make_bitmask<uint64_t>(12);
+		const uint64_t targetpage = val & ~make_bitmask<uint64_t>(12);
+		const uint64_t pageoffs = val & util::make_bitmask<uint64_t>(12);
 
-		a.adrp(MEM_SCRATCH_REG, targetpage);
+		a.adrp(reg.x(), targetpage);
+		if (pageoffs != 0)
+			a.add(reg, reg, pageoffs);
 
-		if (is_valid_immediate_signed(pageoffs, 9))
-			return arm::Mem(MEM_SCRATCH_REG, pageoffs);
-		else if (emit_add_optimized(a, MEM_SCRATCH_REG, MEM_SCRATCH_REG, pageoffs))
-			return arm::Mem(MEM_SCRATCH_REG);
+		return;
 	}
 
-	a.mov(MEM_SCRATCH_REG, ptr);
-	return arm::Mem(MEM_SCRATCH_REG);
+	// up to four instructions
+	a.mov(reg, val);
 }
 
 } // anonymous namespace
@@ -486,24 +521,37 @@ a64::Gp drcbe_arm64::be_parameter::select_register(a64::Gp const &reg, uint32_t 
 
 void drcbe_arm64::get_imm_relative(a64::Assembler &a, const a64::Gp &reg, const uint64_t val) const
 {
-	// If a value can be expressed relative to the base register then it's worth using it instead of a mov
-	// which can be expanded to up to 4 instructions for large immediates
-	const int64_t diff = (int64_t)val - (int64_t)m_baseptr;
-	if (diff > 0 && emit_add_optimized(a, reg, BASE_REG, diff))
+	// Check for constants that can be generated with a single instruction
+	if (is_simple_mov_immediate(val, reg.isGpX() ? 8 : 4))
+	{
+		a.mov(reg, val);
 		return;
-	else if (diff < 0 && emit_sub_optimized(a, reg, BASE_REG, diff))
+	}
+	else if (reg.isGpX() && is_valid_immediate_mask(val, 4))
+	{
+		a.mov(reg.w(), val); // asmjit isn't smart enough to work this out
 		return;
+	}
 
+	// Values close to the program counter can be generated with a single adr
 	const uint64_t codeoffs = a.code()->baseAddress() + a.offset();
-	const int64_t reloffs = (int64_t)val - codeoffs;
+	const int64_t reloffs = int64_t(val) - codeoffs;
 	if (is_valid_immediate_signed(reloffs, 21))
 	{
 		a.adr(reg, val);
 		return;
 	}
 
+	// If a value can be expressed relative to the base register then it's worth using it
+	const int64_t diff = int64_t(val) - int64_t(m_baseptr);
+	if ((diff > 0) && emit_add_optimized(a, reg, BASE_REG, diff))
+		return;
+	else if ((diff < 0) && emit_sub_optimized(a, reg, BASE_REG, diff))
+		return;
+
+	// Values within 4G of the program counter can be generated with adrp followed by add
 	const uint64_t pagebase = codeoffs & ~make_bitmask<uint64_t>(12);
-	const int64_t pagerel = (int64_t)val - pagebase;
+	const int64_t pagerel = int64_t(val) - pagebase;
 	if (is_valid_immediate_signed(pagerel, 21 + 12))
 	{
 		const uint64_t targetpage = val & ~make_bitmask<uint64_t>(12);
@@ -516,6 +564,7 @@ void drcbe_arm64::get_imm_relative(a64::Assembler &a, const a64::Gp &reg, const 
 		return;
 	}
 
+	// up to four instructions
 	a.mov(reg, val);
 }
 
@@ -1053,7 +1102,7 @@ void drcbe_arm64::reset()
 
 	a.emitProlog(frame);
 
-	a.ldr(BASE_REG, get_mem_absolute(a, &m_baseptr));
+	get_imm_absolute(a, BASE_REG, uintptr_t(m_baseptr));
 	emit_ldr_mem(a, FLAGS_REG.w(), &m_near.emulated_flags);
 
 	a.emitArgsAssignment(frame, args);
@@ -2448,7 +2497,7 @@ void drcbe_arm64::op_roland(a64::Assembler &a, const uml::instruction &inst)
 		else if (is_contiguous)
 		{
 			// Optimize a contiguous mask
-			auto const rot = ((instbits * 2) - s - pop - lz) & (instbits - 1);
+			auto const rot = -int(s + pop + lz) & (instbits - 1);
 
 			if (rot > 0)
 				a.ror(output, output, rot);
@@ -2586,16 +2635,14 @@ void drcbe_arm64::op_rolins(a64::Assembler &a, const uml::instruction &inst)
 			if (is_right_aligned)
 			{
 				// Optimize a contiguous right-aligned mask
-				rot = instbits - s;
+				rot = (instbits - s) & (instbits - 1);
 			}
 			else if (is_contiguous)
 			{
 				// Optimize a contiguous mask
-				rot = (instbits * 2) - s - pop - lz;
+				rot = -int32_t(s + pop + lz) & (instbits - 1);
 				lsb = instbits - pop - lz;
 			}
-
-			rot &= instbits - 1;
 
 			if (srcp.is_immediate() && rot > 0)
 			{
@@ -3162,7 +3209,14 @@ void drcbe_arm64::op_and(a64::Assembler &a, const uml::instruction &inst)
 
 	const a64::Gp dst = dstp.select_register(TEMP_REG3, inst.size());
 
-	if (src1p.is_immediate() && src2p.is_immediate())
+	if (src1p.is_immediate_value(0) || src2p.is_immediate_value(0))
+	{
+		if (inst.flags())
+			a.ands(dst, select_register(a64::xzr, inst.size()), 1); // immediate value doesn't matter, result will be zero
+		else
+			a.mov(dst, 0);
+	}
+	else if (src1p.is_immediate() && src2p.is_immediate())
 	{
 		get_imm_relative(a, dst, src1p.immediate() & src2p.immediate());
 
@@ -3174,10 +3228,14 @@ void drcbe_arm64::op_and(a64::Assembler &a, const uml::instruction &inst)
 		const a64::Gp src1 = src1p.select_register(TEMP_REG1, inst.size());
 		mov_reg_param(a, inst.size(), src1, src1p);
 
-		if (src2p.is_immediate_value(0))
-			a.ands(dst, src1, select_register(a64::xzr, inst.size()));
-		else
-			a.ands(dst, src1, src2p.immediate());
+		a.ands(dst, src1, src2p.immediate());
+	}
+	else if (!inst.flags() && (inst.size() == 8) && src2p.is_immediate() && is_valid_immediate_mask(src2p.immediate(), 4))
+	{
+		const a64::Gp src1 = src1p.select_register(TEMP_REG1, inst.size());
+		mov_reg_param(a, inst.size(), src1, src1p);
+
+		a.and_(dst.w(), src1.w(), src2p.immediate());
 	}
 	else
 	{

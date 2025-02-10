@@ -63,14 +63,14 @@ void isbc660_state::isbc660(machine_config &config)
 {
 	MULTIBUS(config, m_bus, 10_MHz_XTAL); // FIXME: clock driven by bus master
 
-	MULTIBUS_SLOT(config, "slot:1", m_bus, isbc660_cards, nullptr, false);
-	MULTIBUS_SLOT(config, "slot:2", m_bus, isbc660_cards, nullptr, false);
-	MULTIBUS_SLOT(config, "slot:3", m_bus, isbc660_cards, nullptr, false);
-	MULTIBUS_SLOT(config, "slot:4", m_bus, isbc660_cards, nullptr, false);
-	MULTIBUS_SLOT(config, "slot:5", m_bus, isbc660_cards, nullptr, false);
-	MULTIBUS_SLOT(config, "slot:6", m_bus, isbc660_cards, nullptr, false);
-	MULTIBUS_SLOT(config, "slot:7", m_bus, isbc660_cards, nullptr, false);
-	MULTIBUS_SLOT(config, "slot:8", m_bus, isbc660_cards, nullptr, false);
+	MULTIBUS_SLOT(config, "slot:1", isbc660_cards, nullptr, false);
+	MULTIBUS_SLOT(config, "slot:2", isbc660_cards, nullptr, false);
+	MULTIBUS_SLOT(config, "slot:3", isbc660_cards, nullptr, false);
+	MULTIBUS_SLOT(config, "slot:4", isbc660_cards, nullptr, false);
+	MULTIBUS_SLOT(config, "slot:5", isbc660_cards, nullptr, false);
+	MULTIBUS_SLOT(config, "slot:6", isbc660_cards, nullptr, false);
+	MULTIBUS_SLOT(config, "slot:7", isbc660_cards, nullptr, false);
+	MULTIBUS_SLOT(config, "slot:8", isbc660_cards, nullptr, false);
 }
 
 ROM_START(isbc660)
