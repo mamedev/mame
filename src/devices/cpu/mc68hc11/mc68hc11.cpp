@@ -1004,6 +1004,11 @@ void mc68hc11_cpu_device::device_start()
 	save_item(NAME(m_option));
 	if ((m_config_mask & 0xf0) == 0xb0)
 		save_item(NAME(m_init2));
+	save_item(NAME(m_scdr));
+	save_item(NAME(m_sccr1));
+	save_item(NAME(m_sccr2));
+	save_item(NAME(m_scsr));
+	save_item(NAME(m_baud));
 
 	m_pc = 0;
 	m_d.d16 = 0;
@@ -1020,6 +1025,7 @@ void mc68hc11_cpu_device::device_start()
 	m_tflg1 = 0;
 	m_tmsk1 = 0;
 	std::fill(std::begin(m_port_data), std::end(m_port_data), 0x00);
+	m_baud = 0;
 
 	state_add( HC11_PC,  "PC", m_pc);
 	state_add( HC11_SP,  "SP", m_sp);
@@ -1107,6 +1113,7 @@ void mc68hc11_cpu_device::device_reset()
 	m_sccr2 = 0;
 	m_scsr  = 0xc0;
 	m_scdr  = 0;
+	m_baud &= 0b111;
 }
 
 void mc68hc11a1_device::device_reset()
