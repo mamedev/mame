@@ -50,11 +50,11 @@
  *
  * TODO:
  *   - MMU emulation improvements (are all the right status bits set? any missing features? etc)
- *   - Debug general OS issues - random segfaults when running `ps`, system sometimes fails to shutdown when running `shutdown -x now`, etc.
- *   - AST (Asynchronous System Trap) emulation details - it is pretty sketchy right now, based mostly off of guesses after researching the 1960's circuit diagram
+ *   - Debug general OS issues - random segfaults when running `ps`, system sometimes fails to shutdown when running `shutdown -x now` after using the networking stack, etc.
+ *   - AST (Asynchronous System Trap) emulation
  *   - System cache emulation
  *   - Expansion slots (I/O Bus and VMEBus)
- *   - Networking is very flaky - XDMCP doesn't work, repeated telnet sessions don't work, sometimes it causes the system to hang, etc.
+ *   - Networking is very flaky, especially on NEWS-OS 4.
  *   - Graphics, kbms, and parallel port emulation
  *   - Hyperbus handshake for IOP and CPU accesses. The bus has arbitration circuitry to prevent bus contention when both the CPU and IOP are trying to access the hyperbus (RAM and VME)
  */
@@ -229,7 +229,7 @@ namespace
         uint8_t berr_status_r();
         void astreset_w(uint8_t data);
         void astset_w(uint8_t data);
-        [[maybe_unused]] void update_ast();
+        void update_ast();
 
         // CPU timer handlers
         void interval_timer_tick(uint8_t data);
@@ -695,12 +695,12 @@ namespace
         // TODO: confirm clock signal that drives AST flip flop
         map(0x0, 0xffffffff).lrw32([this](offs_t offset, uint32_t mem_mask) {
             const uint32_t result = m_mmu->hyperbus_r(offset, mem_mask, m_cpu->supervisor_mode());
-            // update_ast(); // Need to catch any supervisor -> user transitions
+            update_ast(); // Need to catch any supervisor -> user transitions
             return result;
         }, "hyperbus_r",
         [this](offs_t offset, uint32_t data, uint32_t mem_mask) {
             m_mmu->hyperbus_w(offset, data, mem_mask, m_cpu->supervisor_mode());
-            // update_ast(); // Need to catch any supervisor -> user transitions
+            update_ast(); // Need to catch any supervisor -> user transitions
         }, "hyperbus_w");
     }
 
