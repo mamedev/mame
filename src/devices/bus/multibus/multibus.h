@@ -123,18 +123,25 @@ class multibus_slot_device
 public:
 	multibus_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = DERIVED_CLOCK(1, 1));
 
-	template <typename T>
-	multibus_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&slot_options, char const *default_option, bool const fixed)
+	template <typename T, typename U>
+	multibus_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&bus_tag, U &&slot_options, char const *default_option, bool const fixed)
 		: multibus_slot_device(mconfig, tag, owner, DERIVED_CLOCK(1,1))
 	{
+		m_bus.set_tag(std::forward<T>(bus_tag));
+
 		option_reset();
 		slot_options(*this);
 		set_default_option(default_option);
 		set_fixed(fixed);
 	}
 
+	auto bus() const { return m_bus; }
+
 protected:
 	virtual void device_start() override ATTR_COLD;
+
+private:
+	required_device<multibus_device> m_bus;
 };
 
 class device_multibus_interface : public device_interface

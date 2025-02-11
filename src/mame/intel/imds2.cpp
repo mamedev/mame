@@ -188,8 +188,8 @@ imds2_state::imds2_state(const machine_config &mconfig, device_type type, const 
 	m_ipcctrl(*this, "ipcctrl"),
 	m_serial(*this, "serial%u", 0U),
 	m_ioc(*this, "ioc"),
-	m_bus(*this, "slot"),
-	m_slot(*this, "slot:1"),
+	m_bus(*this, "bus"),
+	m_slot(*this, "slot1"),
 	m_ram(*this, "ram"),
 	m_boot(*this, "boot")
 {
@@ -310,7 +310,7 @@ void imds2_state::imds2(machine_config &config)
 
 	MULTIBUS(config, m_bus, 9'830'400);
 	m_bus->xack_cb().set(FUNC(imds2_state::xack));
-	MULTIBUS_SLOT(config, m_slot, imds2_cards, nullptr, false); // FIXME: isbc202
+	MULTIBUS_SLOT(config, m_slot, m_bus, imds2_cards, nullptr, false); // FIXME: isbc202
 }
 
 void imds2_state::xack(int state)
