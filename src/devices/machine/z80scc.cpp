@@ -379,7 +379,6 @@ DEFINE_DEVICE_TYPE(SCC85C30,       scc85c30_device, "scc85c30",       "Zilog Z85
 DEFINE_DEVICE_TYPE(SCC85230,       scc85230_device, "scc85230",       "Zilog Z85230 ESCC")
 DEFINE_DEVICE_TYPE(SCC85233,       scc85233_device, "scc85233",       "Zilog Z85233 EMSCC")
 DEFINE_DEVICE_TYPE(SCC8523L,       scc8523l_device, "scc8523l",       "Zilog Z8523L SCC")
-DEFINE_DEVICE_TYPE(LH8530,         lh8530_device,   "lh8530",         "Sharp LH8530 SCC")
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
@@ -477,11 +476,6 @@ scc85233_device::scc85233_device(const machine_config &mconfig, const char *tag,
 
 scc8523l_device::scc8523l_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: z80scc_device(mconfig, SCC8523L, tag, owner, clock, TYPE_SCC8523L)
-{
-}
-
-lh8530_device::lh8530_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z80scc_device(mconfig, LH8530, tag, owner, clock, TYPE_SCC8530)
 {
 }
 

@@ -177,12 +177,4 @@ public:
 };
 
 DECLARE_DEVICE_TYPE(FE2010_PIT, fe2010_pit_device)
-
-class upd8253_pit_device : public pit8253_device
-{
-public:
-	upd8253_pit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
-};
-
-DECLARE_DEVICE_TYPE(UPD8253_PIT, upd8253_pit_device)
 #endif // MAME_MACHINE_PIT8253_H

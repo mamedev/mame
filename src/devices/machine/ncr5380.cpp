@@ -27,7 +27,6 @@
 DEFINE_DEVICE_TYPE(NCR5380,  ncr5380_device,  "ncr5380",  "NCR 5380 SCSI")
 DEFINE_DEVICE_TYPE(NCR53C80, ncr53c80_device, "ncr53c80", "NCR 53C80 SCSI")
 DEFINE_DEVICE_TYPE(CXD1180,  cxd1180_device,  "cxd1180",  "Sony CXD1180")
-DEFINE_DEVICE_TYPE(AM5380,   am5380_device,   "am5380",   "AMD Am5380 SCSI Interface Controller")
 
 ALLOW_SAVE_TYPE(ncr5380_device::state);
 
@@ -52,11 +51,6 @@ ncr53c80_device::ncr53c80_device(machine_config const &mconfig, char const *tag,
 
 cxd1180_device::cxd1180_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: ncr5380_device(mconfig, CXD1180, tag, owner, clock, true)
-{
-}
-
-am5380_device::am5380_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
-	: ncr5380_device(mconfig, AM5380, tag, owner, clock, true)
 {
 }
 

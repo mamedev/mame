@@ -246,13 +246,13 @@ namespace
         required_region_ptr<u32> m_idrom;
 
         // Platform hardware
-        required_device<rtc58321_device> m_rtc;
-        required_device<upd8253_pit_device> m_interval_timer;
-        required_device<lh8530_device> m_scc_external;
-        required_device<lh8530_device> m_scc_peripheral;
+        required_device<msm58321_device> m_rtc;
+        required_device<pit8253_device> m_interval_timer;
+        required_device<scc8530_device> m_scc_external;
+        required_device<scc8530_device> m_scc_peripheral;
         required_device<am7990_device> m_net;
         required_device<upd765a_device> m_fdc;
-        required_device<am5380_device> m_scsi;
+        required_device<ncr5380_device> m_scsi;
         required_device<news_iop_scsi_helper_device> m_scsi_dma;
         required_ioport m_dip_switch;
         required_device_array<rs232_port_device, 2> m_serial;
@@ -974,7 +974,7 @@ namespace
         m_ram->set_default_value(0);
 
         // NEC uPD8253 programmable interval timer
-        UPD8253_PIT(config, m_interval_timer, 0);
+        PIT8253(config, m_interval_timer, 0);
         constexpr XTAL PIT_INPUT_FREQUENCY = XTAL(2'000'000); // Assume same as 1960 for now
         m_interval_timer->set_clk<0>(PIT_INPUT_FREQUENCY);
         m_interval_timer->set_clk<1>(PIT_INPUT_FREQUENCY);
@@ -982,8 +982,8 @@ namespace
         m_interval_timer->out_handler<0>().set(FUNC(news_iop_state::interval_timer_tick));
 
         // 2x Sharp LH8530A Z8530A-SCC
-        LH8530(config, m_scc_external, (16_MHz_XTAL / 4));
-        LH8530(config, m_scc_peripheral, (16_MHz_XTAL / 4));
+        SCC8530(config, m_scc_external, (16_MHz_XTAL / 4));
+        SCC8530(config, m_scc_peripheral, (16_MHz_XTAL / 4));
         m_scc_external->out_int_callback().set(FUNC(news_iop_state::iop_irq_w<SCC>));
         m_scc_peripheral->out_int_callback().set(FUNC(news_iop_state::iop_irq_w<SCC_PERIPHERAL>));
 
@@ -1044,9 +1044,9 @@ namespace
         NSCSI_CONNECTOR(config, "scsi:6", news_scsi_devices, nullptr);
 
         // AMD Am5380PC SCSI interface
-        NSCSI_CONNECTOR(config, "scsi:7").option_set("am5380", AM5380).machine_config([this](device_t *device)
+        NSCSI_CONNECTOR(config, "scsi:7").option_set("am5380", NCR5380).machine_config([this](device_t *device)
         {
-            am5380_device &adapter = downcast<am5380_device &>(*device);
+            ncr5380_device &adapter = downcast<ncr5380_device &>(*device);
             adapter.irq_handler().set([this](int state){ m_scsi_dma->irq_w(state); });
             adapter.drq_handler().set(*this, FUNC(news_iop_state::scsi_drq_handler));
         });
@@ -1063,7 +1063,7 @@ namespace
         m_scsi_dma->irq_out_callback().set(FUNC(news_iop_state::iop_irq_w<SCSI_IRQ>));
 
         // Epson RTC-58321B
-        RTC58321(config, m_rtc, 32.768_kHz_XTAL);
+        MSM58321(config, m_rtc, 32.768_kHz_XTAL);
         m_rtc->d0_handler().set([this](int data) { set_rtc_data_bit(0, data); });
         m_rtc->d1_handler().set([this](int data) { set_rtc_data_bit(1, data); });
         m_rtc->d2_handler().set([this](int data) { set_rtc_data_bit(2, data); });

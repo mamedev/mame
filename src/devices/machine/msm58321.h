@@ -71,8 +71,6 @@ public:
 	void cs1_w(int state);
 
 protected:
-	msm58321_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 
@@ -133,14 +131,8 @@ private:
 	int m_khz_ctr;
 };
 
-class rtc58321_device : public msm58321_device
-{
-public:
-	rtc58321_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-};
 
-// device type definitions
+// device type definition
 DECLARE_DEVICE_TYPE(MSM58321, msm58321_device)
-DECLARE_DEVICE_TYPE(RTC58321, rtc58321_device)
 
 #endif

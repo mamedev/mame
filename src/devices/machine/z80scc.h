@@ -507,12 +507,6 @@ public:
 	scc8523l_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-class lh8530_device : public z80scc_device
-{
-public:
-	lh8530_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-};
-
 // device type definition
 DECLARE_DEVICE_TYPE(Z80SCC_CHANNEL, z80scc_channel)
 DECLARE_DEVICE_TYPE(SCC8030,        scc8030_device)
@@ -523,6 +517,5 @@ DECLARE_DEVICE_TYPE(SCC85C30,       scc85c30_device)
 DECLARE_DEVICE_TYPE(SCC85230,       scc85230_device)
 DECLARE_DEVICE_TYPE(SCC85233,       scc85233_device)
 DECLARE_DEVICE_TYPE(SCC8523L,       scc8523l_device)
-DECLARE_DEVICE_TYPE(LH8530,         lh8530_device)
 
 #endif // MAME_MACHINE_Z80SCC_H
