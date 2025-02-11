@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Brice Onken,AJR
+// copyright-holders:AJR
 
 /*
  * Sony NEWS 68k IOP SCSI DMA helper

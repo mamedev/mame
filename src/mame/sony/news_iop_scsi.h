@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Brice Onken,AJR
+// copyright-holders:AJR
 
 #ifndef MAME_SONY_NEWS_IOP_SCSI_H
 #define MAME_SONY_NEWS_IOP_SCSI_H
