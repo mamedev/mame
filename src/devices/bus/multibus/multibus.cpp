@@ -73,7 +73,8 @@ device_multibus_interface::device_multibus_interface(machine_config const &mconf
 
 void device_multibus_interface::interface_config_complete()
 {
-	if (device().owner())
+	// FIXME: avoid listxml crash caused by owner device not being a slot
+	if (device().owner() && device().owner()->owner())
 	{
 		m_bus.set_tag(downcast<multibus_slot_device &>(*device().owner()).bus());
 		multibus_device &bus(*m_bus.lookup());
