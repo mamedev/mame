@@ -1655,10 +1655,10 @@ void drcbe_arm64::op_recover(a64::Assembler &a, const uml::instruction &inst)
 
 	be_parameter dstp(*this, inst.param(0), PTYPE_MR);
 
-	get_imm_relative(a, REG_PARAM1, m_drcmap_get_value.obj);
 	a.ldr(REG_PARAM2, arm::Mem(a64::x29, -8)); // saved LR (x30) from first level CALLH/EXH or failed hash jump
-	a.sub(REG_PARAM2, REG_PARAM2, 4);
+	get_imm_relative(a, REG_PARAM1, m_drcmap_get_value.obj);
 	a.mov(REG_PARAM3, inst.param(1).mapvar());
+	a.sub(REG_PARAM2, REG_PARAM2, 4);
 
 	call_arm_addr(a, m_drcmap_get_value.func);
 
