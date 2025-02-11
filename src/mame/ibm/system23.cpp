@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders: Jaume López
 
-#define VERBOSE 1
+//#define VERBOSE 1
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"

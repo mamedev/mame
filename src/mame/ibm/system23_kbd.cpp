@@ -1,4 +1,4 @@
-#define VERBOSE 1
+//#define VERBOSE 1
 
 #include "emu.h"
 #include "system23_kbd.h"
