@@ -253,25 +253,25 @@ void taitob_state::bankswitch_w(uint8_t data)
 }
 
 template<int Player>
-uint16_t taitob_state::tracky_hi_r()
+uint16_t rambo3_state::tracky_hi_r()
 {
 	return m_trackx_io[Player]->read();
 }
 
 template<int Player>
-uint16_t taitob_state::tracky_lo_r()
+uint16_t rambo3_state::tracky_lo_r()
 {
 	return (m_trackx_io[Player]->read() & 0xff) << 8;
 }
 
 template<int Player>
-uint16_t taitob_state::trackx_hi_r()
+uint16_t rambo3_state::trackx_hi_r()
 {
 	return m_tracky_io[Player]->read();
 }
 
 template<int Player>
-uint16_t taitob_state::trackx_lo_r()
+uint16_t rambo3_state::trackx_lo_r()
 {
 	return (m_tracky_io[Player]->read() & 0xff) << 8;
 }
@@ -323,10 +323,10 @@ void taitob_state::eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 void taitob_state::player_12_coin_ctrl_w(uint8_t data)
 {
-	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
-	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
-	machine().bookkeeping().coin_counter_w(0, data & 0x04);
-	machine().bookkeeping().coin_counter_w(1, data & 0x08);
+	machine().bookkeeping().coin_lockout_w(0, BIT(~data, 0));
+	machine().bookkeeping().coin_lockout_w(1, BIT(~data, 1));
+	machine().bookkeeping().coin_counter_w(0, BIT( data, 2));
+	machine().bookkeeping().coin_counter_w(1, BIT( data, 3));
 }
 
 uint16_t taitob_state::player_34_coin_ctrl_r()
@@ -339,10 +339,10 @@ void taitob_state::player_34_coin_ctrl_w(offs_t offset, uint16_t data, uint16_t 
 	COMBINE_DATA(&m_coin_word);
 
 	/* coin counters and lockout */
-	machine().bookkeeping().coin_lockout_w(2, ~data & 0x0100);
-	machine().bookkeeping().coin_lockout_w(3, ~data & 0x0200);
-	machine().bookkeeping().coin_counter_w(2,  data & 0x0400);
-	machine().bookkeeping().coin_counter_w(3,  data & 0x0800);
+	machine().bookkeeping().coin_lockout_w(2, BIT(~data, 8));
+	machine().bookkeeping().coin_lockout_w(3, BIT(~data, 9));
+	machine().bookkeeping().coin_counter_w(2, BIT( data, 10));
+	machine().bookkeeping().coin_counter_w(3, BIT( data, 11));
 }
 
 void taitob_state::spacedxo_tc0220ioc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -356,7 +356,7 @@ void taitob_state::spacedxo_tc0220ioc_w(offs_t offset, uint16_t data, uint16_t m
 	}
 }
 
-void taitob_c_state::realpunc_output_w(uint16_t data)
+void taitob_c_state::output_w(uint16_t data)
 {
 /*
    15 = Camera Enable?
@@ -417,7 +417,7 @@ void taitob_state::tetrista_map(address_map &map)
 }
 
 
-void hitice_state::hitice_map(address_map &map)
+void hitice_state::main_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x400000, 0x47ffff).m(m_tc0180vcu, FUNC(tc0180vcu_device::tc0180vcu_memrw));
@@ -434,7 +434,7 @@ void hitice_state::hitice_map(address_map &map)
 }
 
 
-void taitob_state::rambo3_map(address_map &map)
+void rambo3_state::main_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x200000, 0x200001).nopr();
@@ -442,14 +442,14 @@ void taitob_state::rambo3_map(address_map &map)
 	map(0x200002, 0x200002).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 	map(0x400000, 0x47ffff).m(m_tc0180vcu, FUNC(tc0180vcu_device::tc0180vcu_memrw));
 	map(0x600000, 0x60000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0xff00);
-	map(0x600010, 0x600011).r(FUNC(taitob_state::tracky_lo_r<0>)); /*player 1*/
-	map(0x600012, 0x600013).r(FUNC(taitob_state::tracky_hi_r<0>));
-	map(0x600014, 0x600015).r(FUNC(taitob_state::trackx_lo_r<0>));
-	map(0x600016, 0x600017).r(FUNC(taitob_state::trackx_hi_r<0>));
-	map(0x600018, 0x600019).r(FUNC(taitob_state::tracky_lo_r<1>)); /*player 2*/
-	map(0x60001a, 0x60001b).r(FUNC(taitob_state::tracky_hi_r<1>));
-	map(0x60001c, 0x60001d).r(FUNC(taitob_state::trackx_lo_r<1>));
-	map(0x60001e, 0x60001f).r(FUNC(taitob_state::trackx_hi_r<1>));
+	map(0x600010, 0x600011).r(FUNC(rambo3_state::tracky_lo_r<0>)); /*player 1*/
+	map(0x600012, 0x600013).r(FUNC(rambo3_state::tracky_hi_r<0>));
+	map(0x600014, 0x600015).r(FUNC(rambo3_state::trackx_lo_r<0>));
+	map(0x600016, 0x600017).r(FUNC(rambo3_state::trackx_hi_r<0>));
+	map(0x600018, 0x600019).r(FUNC(rambo3_state::tracky_lo_r<1>)); /*player 2*/
+	map(0x60001a, 0x60001b).r(FUNC(rambo3_state::tracky_hi_r<1>));
+	map(0x60001c, 0x60001d).r(FUNC(rambo3_state::trackx_lo_r<1>));
+	map(0x60001e, 0x60001f).r(FUNC(rambo3_state::trackx_hi_r<1>));
 	map(0x800000, 0x803fff).ram(); /* Main RAM */
 	map(0xa00000, 0xa01fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 }
@@ -598,28 +598,28 @@ void taitob_state::sbm_map(address_map &map)
 	map(0x900000, 0x97ffff).m(m_tc0180vcu, FUNC(tc0180vcu_device::tc0180vcu_memrw));
 }
 
-void taitob_c_state::realpunc_map(address_map &map)
+void taitob_c_state::main_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x10ffff).ram();
 	map(0x110000, 0x12ffff).ram();
 	map(0x130000, 0x13ffff).ram(); // Check me
 	map(0x180000, 0x18000f).rw(m_tc0510nio, FUNC(tc0510nio_device::halfword_wordswap_r), FUNC(tc0510nio_device::halfword_wordswap_w));
-	map(0x184000, 0x184001).w(FUNC(taitob_c_state::realpunc_video_ctrl_w));
+	map(0x184000, 0x184001).w(FUNC(taitob_c_state::video_ctrl_w));
 	map(0x188000, 0x188001).nopr();
 	map(0x188000, 0x188000).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
 	map(0x188002, 0x188003).nopr();
 	map(0x188002, 0x188002).w("tc0140syt", FUNC(tc0140syt_device::master_comm_w));
-	map(0x18c000, 0x18c001).w(FUNC(taitob_c_state::realpunc_output_w));
+	map(0x18c000, 0x18c001).w(FUNC(taitob_c_state::output_w));
 	map(0x200000, 0x27ffff).m(m_tc0180vcu, FUNC(tc0180vcu_device::tc0180vcu_memrw));
 	map(0x280000, 0x281fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x300000, 0x300003).rw("hd63484", FUNC(hd63484_device::read16), FUNC(hd63484_device::write16));
+	map(0x300000, 0x300003).rw(m_hd63484, FUNC(hd63484_device::read16), FUNC(hd63484_device::write16));
 //  map(0x320000, 0x320001).nop(); // ?
 	map(0x320002, 0x320003).nopr();
 	map(0x320002, 0x320002).w("tc0140syt", FUNC(tc0140syt_device::master_comm_w));
 }
 
-void taitob_c_state::realpunc_hd63484_map(address_map &map)
+void taitob_c_state::hd63484_map(address_map &map)
 {
 	map(0x00000, 0x7ffff).ram();
 }
@@ -627,7 +627,7 @@ void taitob_c_state::realpunc_hd63484_map(address_map &map)
 void taitob_state::masterw_sound_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x7fff).bankr("audiobank");
+	map(0x4000, 0x7fff).bankr(m_audiobank);
 	map(0x8000, 0x8fff).ram();
 	map(0x9000, 0x9001).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xa000, 0xa000).w("ciu", FUNC(pc060ha_device::slave_port_w));
@@ -637,7 +637,7 @@ void taitob_state::masterw_sound_map(address_map &map)
 void taitob_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x7fff).bankr("audiobank");
+	map(0x4000, 0x7fff).bankr(m_audiobank);
 	map(0xc000, 0xdfff).ram();
 	map(0xe000, 0xe003).rw("ymsnd", FUNC(ym_generic_device::read), FUNC(ym_generic_device::write));
 	map(0xe200, 0xe200).nopr().w("tc0140syt", FUNC(tc0140syt_device::slave_port_w));
@@ -652,13 +652,8 @@ void taitob_state::sound_map(address_map &map)
 
 void taitob_state::viofight_sound_map(address_map &map)
 {
-	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x7fff).bankr("audiobank");
-	map(0x8000, 0x8fff).ram();
-	map(0x9000, 0x9001).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	masterw_sound_map(map);
 	map(0xb000, 0xb001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));       /* yes, both addresses for the same chip */
-	map(0xa000, 0xa000).w("ciu", FUNC(pc060ha_device::slave_port_w));
-	map(0xa001, 0xa001).rw("ciu", FUNC(pc060ha_device::slave_comm_r), FUNC(pc060ha_device::slave_comm_w));
 }
 
 
@@ -1073,7 +1068,6 @@ static INPUT_PORTS_START( rambo3p )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )        /* Listed as "Unused" */
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )        /* Listed as "Unused" */
 
-
 	PORT_START("IN0")
 	TAITO_JOY_UDLR_2_BUTTONS( 1 )
 
@@ -1081,6 +1075,18 @@ static INPUT_PORTS_START( rambo3p )
 	TAITO_JOY_UDLR_2_BUTTONS( 2 )
 
 	TAITO_B_SYSTEM_INPUT
+
+	PORT_START("TRACKX1")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("TRACKY1")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("TRACKX2")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("TRACKY2")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
@@ -1837,6 +1843,8 @@ void taitob_state::mb87078_gain_changed(offs_t offset, uint8_t data)
 
 void taitob_state::machine_start()
 {
+	m_audiobank->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
+
 	save_item(NAME(m_eep_latch));
 	save_item(NAME(m_coin_word));
 }
@@ -1873,7 +1881,7 @@ void taitob_state::rastsag2(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
-	m_screen->set_screen_update(FUNC(taitob_state::screen_update_taitob));
+	m_screen->set_screen_update(FUNC(taitob_state::screen_update));
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 4096);
@@ -1927,7 +1935,7 @@ void taitob_state::masterw(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
-	m_screen->set_screen_update(FUNC(taitob_state::screen_update_taitob));
+	m_screen->set_screen_update(FUNC(taitob_state::screen_update));
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 4096);
@@ -1970,6 +1978,7 @@ void taitob_state::tetrista(machine_config &config) /* Master of Weapon conversi
 {
 	masterw(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitob_state::tetrista_map);
+	m_palette->set_format(palette_device::RRRRGGGGBBBBRGBx, 4096);
 }
 
 
@@ -1998,7 +2007,7 @@ void taitob_state::ashura(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
-	m_screen->set_screen_update(FUNC(taitob_state::screen_update_taitob));
+	m_screen->set_screen_update(FUNC(taitob_state::screen_update));
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 4096);
@@ -2052,7 +2061,7 @@ void taitob_state::crimec(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
-	m_screen->set_screen_update(FUNC(taitob_state::screen_update_taitob));
+	m_screen->set_screen_update(FUNC(taitob_state::screen_update));
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 4096);
@@ -2085,7 +2094,7 @@ void hitice_state::hitice(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 24_MHz_XTAL / 2);   /* 12 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &hitice_state::hitice_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &hitice_state::main_map);
 
 	Z80(config, m_audiocpu, 24_MHz_XTAL / 4);  /* 6 MHz Z80B */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &hitice_state::viofight_sound_map);
@@ -2106,7 +2115,7 @@ void hitice_state::hitice(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
-	m_screen->set_screen_update(FUNC(hitice_state::screen_update_taitob));
+	m_screen->set_screen_update(FUNC(hitice_state::screen_update_hitice));
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 4096);
@@ -2140,14 +2149,14 @@ void hitice_state::hitice(machine_config &config)
 }
 
 
-void taitob_state::rambo3p(machine_config &config)
+void rambo3_state::rambo3p(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 24_MHz_XTAL / 2);   /* verified on pcb */
-	m_maincpu->set_addrmap(AS_PROGRAM, &taitob_state::rambo3_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &rambo3_state::main_map);
 
 	Z80(config, m_audiocpu, 16_MHz_XTAL / 4); /* verified on pcb */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_state::sound_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &rambo3_state::sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
@@ -2156,7 +2165,7 @@ void taitob_state::rambo3p(machine_config &config)
 	m_tc0220ioc->read_1_callback().set_ioport("DSWB");
 	m_tc0220ioc->read_2_callback().set_ioport("IN0");
 	m_tc0220ioc->read_3_callback().set_ioport("IN1");
-	m_tc0220ioc->write_4_callback().set(FUNC(taitob_state::player_12_coin_ctrl_w));
+	m_tc0220ioc->write_4_callback().set(FUNC(rambo3_state::player_12_coin_ctrl_w));
 	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
@@ -2165,7 +2174,7 @@ void taitob_state::rambo3p(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
-	m_screen->set_screen_update(FUNC(taitob_state::screen_update_taitob));
+	m_screen->set_screen_update(FUNC(rambo3_state::screen_update));
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 4096);
@@ -2194,14 +2203,14 @@ void taitob_state::rambo3p(machine_config &config)
 }
 
 
-void taitob_state::rambo3(machine_config &config)
+void rambo3_state::rambo3(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 24_MHz_XTAL / 2);   /* 12MHz verified on pcb */
-	m_maincpu->set_addrmap(AS_PROGRAM, &taitob_state::rambo3_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &rambo3_state::main_map);
 
 	Z80(config, m_audiocpu, 16_MHz_XTAL / 4); /* 4MHz verified on pcb */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_state::sound_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &rambo3_state::sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
@@ -2210,7 +2219,7 @@ void taitob_state::rambo3(machine_config &config)
 	m_tc0220ioc->read_1_callback().set_ioport("DSWB");
 	m_tc0220ioc->read_2_callback().set_ioport("IN0");
 	m_tc0220ioc->read_3_callback().set_ioport("IN1");
-	m_tc0220ioc->write_4_callback().set(FUNC(taitob_state::player_12_coin_ctrl_w));
+	m_tc0220ioc->write_4_callback().set(FUNC(rambo3_state::player_12_coin_ctrl_w));
 	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
@@ -2219,7 +2228,7 @@ void taitob_state::rambo3(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
-	m_screen->set_screen_update(FUNC(taitob_state::screen_update_taitob));
+	m_screen->set_screen_update(FUNC(rambo3_state::screen_update));
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 4096);
@@ -2278,7 +2287,7 @@ void taitob_state::pbobble(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
-	m_screen->set_screen_update(FUNC(taitob_state::screen_update_taitob));
+	m_screen->set_screen_update(FUNC(taitob_state::screen_update));
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 4096);
@@ -2337,7 +2346,7 @@ void taitob_state::spacedx(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
-	m_screen->set_screen_update(FUNC(taitob_state::screen_update_taitob));
+	m_screen->set_screen_update(FUNC(taitob_state::screen_update));
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 4096);
@@ -2391,7 +2400,7 @@ void taitob_state::spacedxo(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
-	m_screen->set_screen_update(FUNC(taitob_state::screen_update_taitob));
+	m_screen->set_screen_update(FUNC(taitob_state::screen_update));
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 4096);
@@ -2450,7 +2459,7 @@ void taitob_state::qzshowby(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
-	m_screen->set_screen_update(FUNC(taitob_state::screen_update_taitob));
+	m_screen->set_screen_update(FUNC(taitob_state::screen_update));
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 4096);
@@ -2504,7 +2513,7 @@ void taitob_state::viofight(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
-	m_screen->set_screen_update(FUNC(taitob_state::screen_update_taitob));
+	m_screen->set_screen_update(FUNC(taitob_state::screen_update));
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 4096);
@@ -2563,7 +2572,7 @@ void taitob_state::silentd(machine_config &config) /* ET910000B PCB */
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
-	m_screen->set_screen_update(FUNC(taitob_state::screen_update_taitob));
+	m_screen->set_screen_update(FUNC(taitob_state::screen_update));
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 4096);
@@ -2580,7 +2589,7 @@ void taitob_state::silentd(machine_config &config) /* ET910000B PCB */
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16_MHz_XTAL / 2));  /* 8 MHz */
+	ym2610b_device &ymsnd(YM2610B(config, "ymsnd", 16_MHz_XTAL / 2));  /* 8 MHz */
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(0, "mono", 0.25);
 	ymsnd.add_route(1, "mono", 1.0);
@@ -2617,7 +2626,7 @@ void taitob_state::selfeena(machine_config &config) /* ET910000A PCB */
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
-	m_screen->set_screen_update(FUNC(taitob_state::screen_update_taitob));
+	m_screen->set_screen_update(FUNC(taitob_state::screen_update));
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 4096);
@@ -2689,7 +2698,7 @@ void taitob_state::sbm(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
-	m_screen->set_screen_update(FUNC(taitob_state::screen_update_taitob));
+	m_screen->set_screen_update(FUNC(taitob_state::screen_update));
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 4096);
@@ -2722,7 +2731,7 @@ void taitob_c_state::realpunc(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 12000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &taitob_c_state::realpunc_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &taitob_c_state::main_map);
 
 	Z80(config, m_audiocpu, 6000000);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_c_state::sound_map);
@@ -2743,14 +2752,14 @@ void taitob_c_state::realpunc(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
-	m_screen->set_screen_update(FUNC(taitob_c_state::screen_update_taitob));
+	m_screen->set_screen_update(FUNC(taitob_c_state::screen_update));
 	m_screen->set_palette(m_palette);
 
-	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 4096);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 4096);
 
-	hd63484_device &hd63484(HD63484(config, "hd63484", 0));
-	hd63484.set_addrmap(0, &taitob_c_state::realpunc_hd63484_map);
-	hd63484.set_auto_configure_screen(false);
+	HD63484(config, m_hd63484, 0);
+	m_hd63484->set_addrmap(0, &taitob_c_state::hd63484_map);
+	m_hd63484->set_auto_configure_screen(false);
 
 	TC0180VCU(config, m_tc0180vcu, 27.164_MHz_XTAL / 4);
 	m_tc0180vcu->set_fb_colorbase(0x40);
@@ -3659,64 +3668,59 @@ ROM_START( realpuncj )
 	ROM_LOAD( "d76_01.93", 0x000000, 0x200000, CRC(2bc265f2) SHA1(409b822989e2aad50872f80f5160d4909c42206c) )
 ROM_END
 
-void taitob_state::init_taito_b()
-{
-	m_audiobank->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
-}
+GAME( 1989, masterw,  0,       masterw,  masterw,   taitob_state, empty_init, ROT270, "Taito Corporation Japan",   "Master of Weapon (World)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1989, masterwu, masterw, masterw,  masterwu,  taitob_state, empty_init, ROT270, "Taito America Corporation", "Master of Weapon (US)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1989, masterwj, masterw, masterw,  masterwj,  taitob_state, empty_init, ROT270, "Taito Corporation",         "Master of Weapon (Japan)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1989, yukiwo,   masterw, masterw,  yukiwo,    taitob_state, empty_init, ROT270, "Taito Corporation Japan",   "Yukiwo (World, prototype)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, masterw,  0,       masterw,  masterw,   taitob_state, init_taito_b, ROT270, "Taito Corporation Japan",   "Master of Weapon (World)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1989, masterwu, masterw, masterw,  masterwu,  taitob_state, init_taito_b, ROT270, "Taito America Corporation", "Master of Weapon (US)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1989, masterwj, masterw, masterw,  masterwj,  taitob_state, init_taito_b, ROT270, "Taito Corporation",         "Master of Weapon (Japan)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1989, yukiwo,   masterw, masterw,  yukiwo,    taitob_state, init_taito_b, ROT270, "Taito Corporation Japan",   "Yukiwo (World, prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, nastar,   0,       rastsag2, nastar,    taitob_state, empty_init, ROT0,   "Taito Corporation Japan",   "Nastar (World)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1988, nastarw,  nastar,  rastsag2, nastarw,   taitob_state, empty_init, ROT0,   "Taito America Corporation", "Nastar Warrior (US)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1988, rastsag2, nastar,  rastsag2, rastsag2,  taitob_state, empty_init, ROT0,   "Taito Corporation",         "Rastan Saga 2 (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, nastar,   0,       rastsag2, nastar,    taitob_state, init_taito_b, ROT0,   "Taito Corporation Japan",   "Nastar (World)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1988, nastarw,  nastar,  rastsag2, nastarw,   taitob_state, init_taito_b, ROT0,   "Taito America Corporation", "Nastar Warrior (US)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1988, rastsag2, nastar,  rastsag2, rastsag2,  taitob_state, init_taito_b, ROT0,   "Taito Corporation",         "Rastan Saga 2 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, rambo3,   0,       rambo3,   rambo3,    rambo3_state, empty_init, ROT0,   "Taito Europe Corporation",  "Rambo III (Europe)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1989, rambo3u,  rambo3,  rambo3,   rambo3u,   rambo3_state, empty_init, ROT0,   "Taito America Corporation", "Rambo III (US)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1989, rambo3p,  rambo3,  rambo3p,  rambo3p,   rambo3_state, empty_init, ROT0,   "Taito Europe Corporation",  "Rambo III (Europe, Proto?)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, rambo3,   0,       rambo3,   rambo3,    taitob_state, init_taito_b, ROT0,   "Taito Europe Corporation",  "Rambo III (Europe)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1989, rambo3u,  rambo3,  rambo3,   rambo3u,   taitob_state, init_taito_b, ROT0,   "Taito America Corporation", "Rambo III (US)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1989, rambo3p,  rambo3,  rambo3p,  rambo3p,   taitob_state, init_taito_b, ROT0,   "Taito Europe Corporation",  "Rambo III (Europe, Proto?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, crimec,   0,       crimec,   crimec,    taitob_state, empty_init, ROT0,   "Taito Corporation Japan",   "Crime City (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, crimecu,  crimec,  crimec,   crimecu,   taitob_state, empty_init, ROT0,   "Taito America Corporation", "Crime City (US)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1989, crimecj,  crimec,  crimec,   crimecj,   taitob_state, empty_init, ROT0,   "Taito Corporation",         "Crime City (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, crimec,   0,       crimec,   crimec,    taitob_state, init_taito_b, ROT0,   "Taito Corporation Japan",   "Crime City (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, crimecu,  crimec,  crimec,   crimecu,   taitob_state, init_taito_b, ROT0,   "Taito America Corporation", "Crime City (US)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1989, crimecj,  crimec,  crimec,   crimecj,   taitob_state, init_taito_b, ROT0,   "Taito Corporation",         "Crime City (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tetrist,  tetris,  tetrist,  tetrist,   taitob_state, empty_init, ROT0,   "Sega", "Tetris (Japan, Taito B-System, Nastar Conversion Kit)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tetrista, tetris,  tetrista, tetrist,   taitob_state, empty_init, ROT0,   "Sega", "Tetris (Japan, Taito B-System, Master of Weapon Conversion Kit)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, tetrist,  tetris,  tetrist,  tetrist,   taitob_state, init_taito_b, ROT0,   "Sega", "Tetris (Japan, Taito B-System, Nastar Conversion Kit)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1988, tetrista, tetris,  tetrista, tetrist,   taitob_state, init_taito_b, ROT0,   "Sega", "Tetris (Japan, Taito B-System, Master of Weapon Conversion Kit)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, viofight, 0,       viofight, viofight,  taitob_state, empty_init, ROT0,   "Taito Corporation Japan",   "Violence Fight (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, viofightu,viofight,viofight, viofightu, taitob_state, empty_init, ROT0,   "Taito America Corporation", "Violence Fight (US)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1989, viofightj,viofight,viofight, viofightj, taitob_state, empty_init, ROT0,   "Taito Corporation",         "Violence Fight (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, viofight, 0,       viofight, viofight,  taitob_state, init_taito_b, ROT0,   "Taito Corporation Japan",   "Violence Fight (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, viofightu,viofight,viofight, viofightu, taitob_state, init_taito_b, ROT0,   "Taito America Corporation", "Violence Fight (US)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1989, viofightj,viofight,viofight, viofightj, taitob_state, init_taito_b, ROT0,   "Taito Corporation",         "Violence Fight (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ashura,   0,       ashura,   ashura,    taitob_state, empty_init, ROT270, "Taito Corporation Japan",   "Ashura Blaster (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ashuraj,  ashura,  ashura,   ashuraj,   taitob_state, empty_init, ROT270, "Taito Corporation",         "Ashura Blaster (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ashurau,  ashura,  ashura,   ashurau,   taitob_state, empty_init, ROT270, "Taito America Corporation", "Ashura Blaster (US)",    MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, ashura,   0,       ashura,   ashura,    taitob_state, init_taito_b, ROT270, "Taito Corporation Japan",   "Ashura Blaster (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ashuraj,  ashura,  ashura,   ashuraj,   taitob_state, init_taito_b, ROT270, "Taito Corporation",         "Ashura Blaster (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ashurau,  ashura,  ashura,   ashurau,   taitob_state, init_taito_b, ROT270, "Taito America Corporation", "Ashura Blaster (US)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hitice,   0,       hitice,   hitice,    hitice_state, empty_init, ROT0,   "Taito Corporation (Williams license)",     "Hit the Ice (US)",                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hiticerb, hitice,  hitice,   hitice,    hitice_state, empty_init, ROT0,   "Taito Corporation (Williams license)",     "Hit the Ice (US, with riser board)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hiticej,  hitice,  hitice,   hiticej,   hitice_state, empty_init, ROT0,   "Taito Corporation (licensed from Midway)", "Hit the Ice (Japan)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, hitice,   0,       hitice,   hitice,    hitice_state, init_taito_b, ROT0,   "Taito Corporation (Williams license)",     "Hit the Ice (US)",                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hiticerb, hitice,  hitice,   hitice,    hitice_state, init_taito_b, ROT0,   "Taito Corporation (Williams license)",     "Hit the Ice (US, with riser board)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hiticej,  hitice,  hitice,   hiticej,   hitice_state, init_taito_b, ROT0,   "Taito Corporation (licensed from Midway)", "Hit the Ice (Japan)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, selfeena, 0,       selfeena, selfeena,  taitob_state, empty_init, ROT0,   "East Technology", "Sel Feena", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, selfeena, 0,       selfeena, selfeena,  taitob_state, init_taito_b, ROT0,   "East Technology", "Sel Feena", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, silentd,  0,       silentd,  silentd,   taitob_state, empty_init, ROT0,   "Taito Corporation Japan",   "Silent Dragon (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, silentdj, silentd, silentd,  silentdj,  taitob_state, empty_init, ROT0,   "Taito Corporation",         "Silent Dragon (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, silentdu, silentd, silentd,  silentdu,  taitob_state, empty_init, ROT0,   "Taito America Corporation", "Silent Dragon (US)",    MACHINE_SUPPORTS_SAVE )
 
-GAME( 1992, silentd,  0,       silentd,  silentd,   taitob_state, init_taito_b, ROT0,   "Taito Corporation Japan",   "Silent Dragon (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, silentdj, silentd, silentd,  silentdj,  taitob_state, init_taito_b, ROT0,   "Taito Corporation",         "Silent Dragon (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, silentdu, silentd, silentd,  silentdu,  taitob_state, init_taito_b, ROT0,   "Taito America Corporation", "Silent Dragon (US)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1993, ryujin,   0,       silentd,  ryujin,    taitob_state, empty_init, ROT270, "Taito Corporation", "Ryu Jin (Japan, ET910000B PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, ryujina,  ryujin,  selfeena, ryujin,    taitob_state, empty_init, ROT270, "Taito Corporation", "Ryu Jin (Japan, ET910000A PCB)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, ryujin,   0,       silentd,  ryujin,    taitob_state, init_taito_b, ROT270, "Taito Corporation", "Ryu Jin (Japan, ET910000B PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, ryujina,  ryujin,  selfeena, ryujin,    taitob_state, init_taito_b, ROT270, "Taito Corporation", "Ryu Jin (Japan, ET910000A PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, qzshowby, 0,       qzshowby, qzshowby,  taitob_state, empty_init, ROT0,   "Taito Corporation", "Quiz Sekai wa SHOW by shobai (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, qzshowby, 0,       qzshowby, qzshowby,  taitob_state, init_taito_b, ROT0,   "Taito Corporation", "Quiz Sekai wa SHOW by shobai (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, pbobble,  0,       pbobble,  pbobble,   taitob_state, empty_init, ROT0,   "Taito Corporation",         "Puzzle Bobble (Japan, B-System)", MACHINE_SUPPORTS_SAVE ) // PUZZLE  VER 2.0J   1994/06/15  15:28:30
+GAME( 1994, bublbust, pbobble, pbobble,  pbobble,   taitob_state, empty_init, ROT0,   "Taito America Corporation", "Bubble Buster (USA, B-System)",   MACHINE_SUPPORTS_SAVE ) // PUZZLE  VER 2.0A   1994/06/15  15:28:30 - Location test but same build as Japan release?
 
-GAME( 1994, pbobble,  0,       pbobble,  pbobble,   taitob_state, init_taito_b, ROT0,   "Taito Corporation",         "Puzzle Bobble (Japan, B-System)", MACHINE_SUPPORTS_SAVE ) // PUZZLE  VER 2.0J   1994/06/15  15:28:30
-GAME( 1994, bublbust, pbobble, pbobble,  pbobble,   taitob_state, init_taito_b, ROT0,   "Taito America Corporation", "Bubble Buster (USA, B-System)",   MACHINE_SUPPORTS_SAVE ) // PUZZLE  VER 2.0A   1994/06/15  15:28:30 - Location test but same build as Japan release?
-
-GAME( 1994, spacedx,  0,       spacedx,  pbobble,   taitob_state, init_taito_b, ROT0,   "Taito Corporation", "Space Invaders DX (US, v2.1)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1994, spacedxj, spacedx, spacedx,  pbobble,   taitob_state, init_taito_b, ROT0,   "Taito Corporation", "Space Invaders DX (Japan, v2.1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, spacedxo, spacedx, spacedxo, spacedxo,  taitob_state, init_taito_b, ROT0,   "Taito Corporation", "Space Invaders DX (Japan, v2.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, spacedx,  0,       spacedx,  pbobble,   taitob_state, empty_init, ROT0,   "Taito Corporation", "Space Invaders DX (US, v2.1)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1994, spacedxj, spacedx, spacedx,  pbobble,   taitob_state, empty_init, ROT0,   "Taito Corporation", "Space Invaders DX (Japan, v2.1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, spacedxo, spacedx, spacedxo, spacedxo,  taitob_state, empty_init, ROT0,   "Taito Corporation", "Space Invaders DX (Japan, v2.0)", MACHINE_SUPPORTS_SAVE )
 
 // Sonic Blast Man is a ticket dispensing game. (Japanese version however does not dispense them, only US does - try the "sbm_patch" in the machine_config).
 // It is a bit different from other games running on this system, in that it has a punching pad that player needs to punch to hit the enemy.
-GAME( 1990, sbm,      0,       sbm,      sbm,       taitob_state,   init_taito_b, ROT0, "Taito Corporation",       "Sonic Blast Man (US)",    MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL )
-GAME( 1990, sbmj,     sbm,     sbm,      sbmj,      taitob_state,   init_taito_b, ROT0, "Taito Corporation",       "Sonic Blast Man (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL )
-GAME( 1994, realpunc, 0,       realpunc, realpunc,  taitob_c_state, init_taito_b, ROT0, "Taito Corporation Japan", "Real Puncher (World, v2.12O)",   MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL )
-GAME( 1994, realpuncj,realpunc,realpunc, realpunc,  taitob_c_state, init_taito_b, ROT0, "Taito Corporation Japan", "Real Puncher (Japan, v2.12J)",   MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL )
+GAME( 1990, sbm,      0,       sbm,      sbm,       taitob_state,   empty_init, ROT0, "Taito Corporation",       "Sonic Blast Man (US)",    MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL )
+GAME( 1990, sbmj,     sbm,     sbm,      sbmj,      taitob_state,   empty_init, ROT0, "Taito Corporation",       "Sonic Blast Man (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL )
+GAME( 1994, realpunc, 0,       realpunc, realpunc,  taitob_c_state, empty_init, ROT0, "Taito Corporation Japan", "Real Puncher (World, v2.12O)",   MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL )
+GAME( 1994, realpuncj,realpunc,realpunc, realpunc,  taitob_c_state, empty_init, ROT0, "Taito Corporation Japan", "Real Puncher (Japan, v2.12J)",   MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL )
