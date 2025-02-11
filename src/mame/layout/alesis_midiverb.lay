@@ -4,6 +4,578 @@ license:CC0-1.0
 copyright-holders:m1macrophage
 -->
 <mamelayout version="2">
+	<element name="txt_fx_1_a">
+		<text align="2" string=".2 Sec."><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_1_b">
+		<text align="1" string="SMALL"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_1_c">
+		<text align="1" string="BRIGHT"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+
+	<element name="txt_fx_2_a">
+		<text align="2" string=".2 Sec."><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_2_b">
+		<text align="1" string="SMALL"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_2_c">
+		<text align="1" string="WARM"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+
+	<element name="txt_fx_3_a">
+		<text align="2" string=".2 Sec."><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_3_b">
+		<text align="1" string="MEDIUM"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_3_c">
+		<text align="1" string="BRIGHT"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+
+	<element name="txt_fx_4_a">
+		<text align="2" string=".3 Sec."><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_4_b">
+		<text align="1" string="SMALL"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_4_c">
+		<text align="1" string="BRIGHT"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+
+	<element name="txt_fx_5_a">
+		<text align="2" string=".3 Sec."><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_5_b">
+		<text align="1" string="SMALL"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_5_c">
+		<text align="1" string="WARM"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+
+	<element name="txt_fx_6_a">
+		<text align="2" string=".4 Sec."><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_6_b">
+		<text align="1" string="MEDIUM"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_6_c">
+		<text align="1" string="BRIGHT"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+
+	<element name="txt_fx_7_a">
+		<text align="2" string=".4 Sec."><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_7_b">
+		<text align="1" string="MEDIUM"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_7_c">
+		<text align="1" string="WARM"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+
+	<element name="txt_fx_8_a">
+		<text align="2" string=".6 Sec."><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_8_b">
+		<text align="1" string="SMALL"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_8_c">
+		<text align="1" string="BRIGHT"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+
+	<element name="txt_fx_9_a">
+		<text align="2" string=".6 Sec."><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_9_b">
+		<text align="1" string="MEDIUM"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_9_c">
+		<text align="1" string="WARM"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+
+	<element name="txt_fx_10_a">
+		<text align="2" string=".6 Sec."><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_10_b">
+		<text align="1" string="MEDIUM"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_10_c">
+		<text align="1" string="DARK"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+
+	<element name="txt_fx_11_a">
+		<text align="2" string=".8 Sec."><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_11_b">
+		<text align="1" string="SMALL"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_11_c">
+		<text align="1" string="BRIGHT"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+
+	<element name="txt_fx_12_a">
+		<text align="2" string=".8 Sec."><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_12_b">
+		<text align="1" string="LARGE"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_12_c">
+		<text align="1" string="WARM"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+
+	<element name="txt_fx_13_a">
+		<text align="2" string="1.0 Sec."><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_13_b">
+		<text align="1" string="SMALL"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_13_c">
+		<text align="1" string="WARM"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+
+	<element name="txt_fx_14_a">
+		<text align="2" string="1.0 Sec."><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_14_b">
+		<text align="1" string="MEDIUM"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_14_c">
+		<text align="1" string="WARM"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+
+	<element name="txt_fx_15_a">
+		<text align="2" string="1.0 Sec."><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_15_b">
+		<text align="1" string="LARGE"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_15_c">
+		<text align="1" string="BRIGHT"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+
+	<element name="txt_fx_16_a">
+		<text align="2" string="1.2 Sec."><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_16_b">
+		<text align="1" string="MEDIUM"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_16_c">
+		<text align="1" string="WARM"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+
+	<element name="txt_fx_17_a">
+		<text align="2" string="1.2 Sec."><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_17_b">
+		<text align="1" string="SMALL"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_17_c">
+		<text align="1" string="WARM"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+
+	<element name="txt_fx_18_a">
+		<text align="2" string="1.2 Sec."><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_18_b">
+		<text align="1" string="SMALL"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_18_c">
+		<text align="1" string="BRIGHT"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+
+	<element name="txt_fx_19_a">
+		<text align="2" string="1.4 Sec."><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_19_b">
+		<text align="1" string="LARGE"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_19_c">
+		<text align="1" string="WARM"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+
+	<element name="txt_fx_20_a">
+		<text align="2" string="1.4 Sec."><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_20_b">
+		<text align="1" string="LARGE"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_20_c">
+		<text align="1" string="DARK"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+
+	<element name="txt_fx_21_a">
+		<text align="2" string="1.4 Sec."><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_21_b">
+		<text align="1" string="MEDIUM"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_21_c">
+		<text align="1" string="WARM"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+
+	<element name="txt_fx_22_a">
+		<text align="2" string="1.6 Sec."><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_22_b">
+		<text align="1" string="SMALL"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_22_c">
+		<text align="1" string="DARK"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+
+	<element name="txt_fx_23_a">
+		<text align="2" string="1.6 Sec."><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_23_b">
+		<text align="1" string="LARGE"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_23_c">
+		<text align="1" string="BRIGHT"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+
+	<element name="txt_fx_24_a">
+		<text align="2" string="1.6 Sec."><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_24_b">
+		<text align="1" string="MEDIUM"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_24_c">
+		<text align="1" string="BRIGHT"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+
+	<element name="txt_fx_25_a">
+		<text align="2" string="1.8 Sec."><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_25_b">
+		<text align="1" string="LARGE"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_25_c">
+		<text align="1" string="DARK"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+
+	<element name="txt_fx_26_a">
+		<text align="2" string="1.8 Sec."><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_26_b">
+		<text align="1" string="LARGE"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_26_c">
+		<text align="1" string="BRIGHT"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+
+	<element name="txt_fx_27_a">
+		<text align="2" string="1.8 Sec."><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_27_b">
+		<text align="1" string="MEDIUM"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_27_c">
+		<text align="1" string="WARM"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+
+	<element name="txt_fx_28_a">
+		<text align="2" string="2.0 Sec."><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_28_b">
+		<text align="1" string="LARGE"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_28_c">
+		<text align="1" string="BRIGHT"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+
+	<element name="txt_fx_29_a">
+		<text align="2" string="2.0 Sec."><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_29_b">
+		<text align="1" string="MEDIUM"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_29_c">
+		<text align="1" string="WARM"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+
+	<element name="txt_fx_30_a">
+		<text align="2" string="2.0 Sec."><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_30_b">
+		<text align="1" string="LARGE"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_30_c">
+		<text align="1" string="WARM"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+
+	<element name="txt_fx_31_a">
+		<text align="2" string="2.5 Sec."><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_31_b">
+		<text align="1" string="MEDIUM"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_31_c">
+		<text align="1" string="WARM"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+
+	<element name="txt_fx_32_a">
+		<text align="2" string="2.5 Sec."><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_32_b">
+		<text align="1" string="LARGE"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_32_c">
+		<text align="1" string="BRIGHT"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+
+	<element name="txt_fx_33_a">
+		<text align="2" string="2.5 Sec."><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_33_b">
+		<text align="1" string="MEDIUM"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_33_c">
+		<text align="1" string="DARK"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+
+	<element name="txt_fx_34_a">
+		<text align="2" string="2.8Sec."><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_34_b">
+		<text align="1" string="SMALL"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_34_c">
+		<text align="1" string="BRIGHT"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+
+	<element name="txt_fx_35_a">
+		<text align="2" string="2.8 Sec."><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_35_b">
+		<text align="1" string="MEDIUM"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_35_c">
+		<text align="1" string="BRIGHT"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+
+	<element name="txt_fx_36_a">
+		<text align="2" string="3.0 Sec."><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_36_b">
+		<text align="1" string="LARGE"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_36_c">
+		<text align="1" string="BRIGHT"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+
+	<element name="txt_fx_37_a">
+		<text align="2" string="3.0 Sec."><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_37_b">
+		<text align="1" string="LARGE"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_37_c">
+		<text align="1" string="WARM"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+
+	<element name="txt_fx_38_a">
+		<text align="2" string="3.0 Sec."><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_38_b">
+		<text align="1" string="MEDIUM"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_38_c">
+		<text align="1" string="DARK"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+
+	<element name="txt_fx_39_a">
+		<text align="2" string="3.5 Sec."><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_39_b">
+		<text align="1" string="LARGE"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_39_c">
+		<text align="1" string="BRIGHT"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+
+	<element name="txt_fx_40_a">
+		<text align="2" string="3.5 Sec."><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_40_b">
+		<text align="1" string="MEDIUM"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_40_c">
+		<text align="1" string="WARM"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+
+	<element name="txt_fx_41_a">
+		<text align="2" string="4.0 Sec."><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_41_b">
+		<text align="1" string="LARGE"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_41_c">
+		<text align="1" string="DARK"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+
+	<element name="txt_fx_42_a">
+		<text align="2" string="4.0 Sec."><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_42_b">
+		<text align="1" string="MEDIUM"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_42_c">
+		<text align="1" string="BRIGHT"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+
+	<element name="txt_fx_43_a">
+		<text align="2" string="5 Sec."><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_43_b">
+		<text align="1" string="LARGE"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_43_c">
+		<text align="1" string="WARM"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+
+	<element name="txt_fx_44_a">
+		<text align="2" string="8 Sec."><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_44_b">
+		<text align="1" string="LARGE"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_44_c">
+		<text align="1" string="BRIGHT"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+
+	<element name="txt_fx_45_a">
+		<text align="2" string="8 Sec."><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_45_b">
+		<text align="1" string="LARGE"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_45_c">
+		<text align="1" string="WARM"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+
+	<element name="txt_fx_46_a">
+		<text align="2" string="10 Sec."><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_46_b">
+		<text align="1" string="LARGE"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_46_c">
+		<text align="1" string="BRIGHT"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+
+	<element name="txt_fx_47_a">
+		<text align="2" string="10 Sec."><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_47_b">
+		<text align="1" string="LARGE"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_47_c">
+		<text align="1" string="WARM"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+
+	<element name="txt_fx_48_a">
+		<text align="2" string="16 Sec."><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_48_b">
+		<text align="1" string="LARGE"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_48_c">
+		<text align="1" string="DARK"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+
+	<element name="txt_fx_49_a">
+		<text align="2" string="18 Sec."><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_49_b">
+		<text align="1" string="EX. LARGE"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_49_c">
+		<text align="1" string="BRIGHT"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+
+	<element name="txt_fx_50_a">
+		<text align="2" string="20 Sec."><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_50_b">
+		<text align="1" string="EX. LARGE"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_50_c">
+		<text align="1" string="DARK"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+
+	<element name="txt_fx_51">
+		<text align="1" string="GATED --- 100 MS"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_52">
+		<text align="1" string="GATED --- 150 MS"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_53">
+		<text align="1" string="GATED --- 200 MS"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_54">
+		<text align="1" string="GATED --- 250 MS"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_55">
+		<text align="1" string="GATED --- 300 MS"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_56">
+		<text align="1" string="GATED --- 350 MS"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_57">
+		<text align="1" string="GATED --- 400 MS"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_58">
+		<text align="1" string="GATED --- 500 MS"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_59">
+		<text align="1" string="GATED --- 600 MS"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_60">
+		<text align="1" string="REVERSE --- 300 MS"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_61">
+		<text align="1" string="REVERSE --- 400 MS"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_62">
+		<text align="1" string="REVERSE --- 500 MS"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_fx_63">
+		<text align="1" string="REVERSE --- 600 MS"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+
+	<repeat count="63">
+		<param name="i" start="1" increment="1"/>
+		<element name="txt_fx_index_~i~">
+			<text align="2" string="~i~"><color red="0.89" green="0.94" blue="0.92"/></text>
+		</element>
+	</repeat>
+
+	<element name="txt_left">
+		<text string="LEFT"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_right">
+		<text string="RIGHT"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_input">
+		<text string="INPUT"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_mix">
+		<text string="MIX"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_output">
+		<text string="OUTPUT"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_midi_in">
+		<text string="MIDI IN"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_midi_thru">
+		<text string="MIDI THRU"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+	<element name="txt_16v">
+		<text string="16V CT"><color red="0.89" green="0.94" blue="0.92"/></text>
+	</element>
+
 	<element name="txt_defeat">
 		<text string="DEFEAT"><color red="0.84" green="0.85" blue="0.82"/></text>
 	</element>
@@ -26,11 +598,31 @@ copyright-holders:m1macrophage
 		<text string="-12" align="2"><color red="0.84" green="0.85" blue="0.82"/></text>
 	</element>
 
-	<element name="ui_background">
-		<rect><color red="0.21" green="0.23" blue="0.22"/></rect>
+	<element name="case">
+		<image><data><![CDATA[
+			<rect stroke="none" fill="#151717" width="1613" height="1573" rx="40" ry="40"/>
+		]]></data></image>
 	</element>
-	<element name="line">
+	<element name="sides">
+		<rect><color red="0.14" green="0.15" blue="0.15"/></rect>
+	</element>
+	<element name="ui_background">
+		<rect><color red="0.18" green="0.21" blue="0.20"/></rect>
+	</element>
+	<element name="blue_line">
 		<rect><color red="0.33" green="0.65" blue="0.73"/></rect>
+	</element>
+	<element name="white_line">
+		<rect><color red="0.89" green="0.94" blue="0.92"/></rect>
+	</element>
+	<element name="transparent_rect">
+		<rect><color red="0.0" green="0.0" blue="0.0" alpha="0.0"/></rect>
+	</element>
+
+	<element name="mix-display">
+		<simplecounter maxstate="100" digits="1">
+			<color red="0.89" green="0.94" blue="0.92"/>
+		</simplecounter>
 	</element>
 
 	<element name="red_led">
@@ -63,15 +655,114 @@ copyright-holders:m1macrophage
 	</element>
 
 	<view name="Default Layout">
-		<bounds x="192" y="1318" width="1244" height="282"/>
+		<bounds x="0" y="0" width="1628" height="1600"/>
 
-		<element ref="ui_background">
-			<bounds x="208" y="1334" width="1212" height="250"/>
+		<element ref="case"><bounds x="12" y="20" width="1613" height="1573"/></element>
+		<element ref="ui_background"><bounds x="84" y="96" width="1453" height="1134"/></element>
+		<element ref="sides"><bounds x="172" y="1320" width="1280" height="271"/></element>
+		<element ref="ui_background"><bounds x="208" y="1334" width="1212" height="250"/></element>
+
+		<!-- I/O section -->
+
+		<element ref="transparent_rect" clickthrough="no">
+			<!-- Disables clicks to the simplecounter below. -->
+			<bounds x="410" y="40" width="100" height="30"/>
 		</element>
+		<element ref="mix-display" inputtag="mix" inputmask="0x7f" inputraw="yes">
+			<bounds x="410" y="40" width="100" height="30"/>
+		</element>
+
+		<element ref="white_line"><bounds x="120" y="132" width="4" height="18"/></element>
+		<element ref="white_line"><bounds x="123" y="146" width="33" height="4"/></element>
+		<element ref="white_line"><bounds x="242" y="146" width="33" height="4"/></element>
+		<element ref="white_line"><bounds x="275" y="132" width="4" height="18"/></element>
+		<element ref="txt_left"><bounds x="91" y="105" width="67" height="22"/></element>
+		<element ref="txt_right"><bounds x="234" y="105" width="85" height="22"/></element>
+		<element ref="txt_input"><bounds x="158" y="135" width="83" height="22"/></element>
+
+		<element ref="white_line"><bounds x="458" y="103" width="4" height="18"/></element>
+		<element ref="txt_mix"><bounds x="433" y="126" width="52" height="22"/></element>
+
+		<element ref="white_line"><bounds x="631" y="132" width="4" height="18"/></element>
+		<element ref="white_line"><bounds x="635" y="146" width="24" height="4"/></element>
+		<element ref="white_line"><bounds x="761" y="146" width="24" height="4"/></element>
+		<element ref="white_line"><bounds x="785" y="132" width="4" height="18"/></element>
+		<element ref="txt_left"><bounds x="600" y="105" width="67" height="22"/></element>
+		<element ref="txt_right"><bounds x="747" y="105" width="85" height="22"/></element>
+		<element ref="txt_output"><bounds x="657" y="135" width="108" height="22"/></element>
+
+		<element ref="white_line"><bounds x="1027" y="103" width="4" height="19"/></element>
+		<element ref="txt_midi_in"><bounds x="984" y="126" width="90" height="22"/></element>
+		<element ref="white_line"><bounds x="1220" y="103" width="4" height="19"/></element>
+		<element ref="txt_midi_thru"><bounds x="1158" y="126" width="136" height="22"/></element>
+		<element ref="white_line"><bounds x="1513" y="103" width="4" height="19"/></element>
+		<element ref="txt_16v"><bounds x="1452" y="126" width="92" height="22"/></element>
+
+		<repeat count="5">
+			<param name="line_y" start="227" increment="11"/>
+			<element ref="blue_line"><bounds x="90" y="~line_y~" width="1445" height="7"/></element>
+		</repeat>
+		<element ref="blue_line"><bounds x="90" y="345" width="1445" height="7"/></element>
+		<element ref="blue_line"><bounds x="90" y="387" width="1445" height="7"/></element>
+
+		<!-- Effect names section -->
+
+		<repeat count="21">  <!-- Left and middle column, effects 1-42. -->
+			<param name="y" start="477" increment="36"/>
+			<param name="i" start="1" increment="1"/>
+			<param name="j" start="22" increment="1"/>
+			<element ref="txt_fx_index_~i~"><bounds x="113" y="~y~" width="34" height="22"/></element>
+			<element ref="txt_fx_~i~_a"><bounds x="170" y="~y~" width="70" height="22"/></element>
+			<element ref="txt_fx_~i~_b"><bounds x="300" y="~y~" width="116" height="22"/></element>
+			<element ref="txt_fx_~i~_c"><bounds x="443" y="~y~" width="110" height="22"/></element>
+			<element ref="txt_fx_index_~j~"><bounds x="585" y="~y~" width="34" height="22"/></element>
+			<element ref="txt_fx_~j~_a"><bounds x="638" y="~y~" width="70" height="22"/></element>
+			<element ref="txt_fx_~j~_b"><bounds x="767" y="~y~" width="116" height="22"/></element>
+			<element ref="txt_fx_~j~_c"><bounds x="913" y="~y~" width="110" height="22"/></element>
+		</repeat>
+
+		<repeat count="6">  <!-- Right column, effects 43-48. -->
+			<param name="y" start="477" increment="36"/>
+			<param name="i" start="43" increment="1"/>
+			<element ref="txt_fx_index_~i~"><bounds x="1056" y="~y~" width="34" height="22"/></element>
+			<element ref="txt_fx_~i~_a"><bounds x="1104" y="~y~" width="70" height="22"/></element>
+			<element ref="txt_fx_~i~_b"><bounds x="1220" y="~y~" width="116" height="22"/></element>
+			<element ref="txt_fx_~i~_c"><bounds x="1360" y="~y~" width="110" height="22"/></element>
+		</repeat>
+
+		<repeat count="2">  <!-- Right column, effects 49-50. -->
+			<param name="y" start="693" increment="36"/>
+			<param name="i" start="49" increment="1"/>
+			<element ref="txt_fx_index_~i~"><bounds x="1056" y="~y~" width="34" height="22"/></element>
+			<element ref="txt_fx_~i~_a"><bounds x="1104" y="~y~" width="70" height="22"/></element>
+			<element ref="txt_fx_~i~_b"><bounds x="1220" y="~y~" width="150" height="22"/></element>
+			<element ref="txt_fx_~i~_c"><bounds x="1410" y="~y~" width="110" height="22"/></element>
+		</repeat>
+
+		<repeat count="13">  <!-- Right column, effects 51-63. -->
+			<param name="y" start="765" increment="36"/>
+			<param name="i" start="51" increment="1"/>
+			<element ref="txt_fx_index_~i~"><bounds x="1056" y="~y~" width="34" height="22"/></element>
+			<element ref="txt_fx_~i~"><bounds x="1140" y="~y~" width="262" height="22"/></element>
+		</repeat>
+
+		<repeat count="22">  <!-- Horizontal lines. -->
+			<param name="line_y" start="467" increment="36"/>
+			<element ref="white_line"><bounds x="85" y="~line_y~" width="1452" height="2"/></element>
+		</repeat>
+
+		<repeat count="3">  <!-- Vertical lines. -->
+			<param name="line_x1" start="99" increment="472"/>
+			<param name="line_x2" start="150" increment="472"/>
+			<element ref="white_line"><bounds x="~line_x1~" y="468" width="4" height="756"/></element>
+			<element ref="white_line"><bounds x="~line_x2~" y="468" width="2" height="756"/></element>
+		</repeat>
+
+		<!-- UI Section -->
 
 		<repeat count="5">
 			<param name="line_y" start="1440" increment="10"/>
-			<element ref="line">
+			<element ref="blue_line">
 				<bounds x="208" y="~line_y~" width="1212" height="7"/>
 			</element>
 		</repeat>
