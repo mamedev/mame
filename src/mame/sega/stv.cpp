@@ -43,11 +43,12 @@
 #include "emu.h"
 #include "stv.h"
 
+#include "stvcd.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/scudsp/scudsp.h"
 #include "cpu/sh/sh7604.h"
 #include "machine/smpc.h"
-#include "machine/stvcd.h"
 #include "sound/scsp.h"
 
 #include "softlist.h"
