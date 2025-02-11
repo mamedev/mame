@@ -30,7 +30,7 @@ namespace
 				: driver_device(mconfig, type, tag),
 				m_maincpu(*this, "maincpu"),
 				m_ros(*this, "ros"),
-				m_ppi_kbd(*this, "ppi_kbd"),
+				m_ppi_crtc(*this, "ppi_kbd"),
 				m_ppi_diag(*this, "ppi_diag"),
 				m_ppi_settings(*this, "ppi_settings"),
 				m_dmac(*this,"dma"),
@@ -64,7 +64,7 @@ namespace
 		private:
 			required_device<i8085a_cpu_device> m_maincpu;
 			required_memory_bank m_ros;
-			required_device<i8255_device> m_ppi_kbd;
+			required_device<i8255_device> m_ppi_crtc;
 			required_device<i8255_device> m_ppi_diag;
 			required_device<i8255_device> m_ppi_settings;
 			required_device<i8257_device> m_dmac;
@@ -109,6 +109,9 @@ namespace
 
 			uint32_t m_rst75_enabled;
 
+			int m_sod;
+			int m_ros_w;
+
 			void diag_digits_w(uint8_t data);
 
 			void port_4e_w(uint8_t data);
@@ -151,7 +154,9 @@ namespace
 
 			void usart_ck_w(int state);
 
-			void trap(int state);
+			void trap();
+			void sod_trap(int state);
+			void ros_w_trap(uint8_t data);
 
 			void pit_clk2(int state);
 			void rst75_enable(uint8_t data);
@@ -372,7 +377,7 @@ namespace
 
 	uint8_t system23_state::read_keyboard()
 	{
-		return m_keyboard->read_keyboard();
+		return m_keyboard->read_keyboard() & 0x7f;
 	}
 
 	void system23_state::usart_ck_w(int state)
@@ -387,11 +392,24 @@ namespace
 		m_ppi_diag->pc4_w(state);
 	}
 
-	void system23_state::trap(int state)
+	void system23_state::trap()
 	{
-		int new_state = state & CLEAR_LINE;//Dummy value, SOD gates a 4-input NAND output (RESET OUT, Memory Parity Error)
-		LOG("TRAP: %d", new_state);
-		m_maincpu->set_input_line(I8085_RST75_LINE, new_state);
+		int error = !(m_ros_w);
+		int state = m_sod & error;//SOD gates a 4-input NAND output (RESET OUT, Memory Parity Error, ROS write Error)
+		LOG("TRAP: %d", state);
+		m_maincpu->set_input_line(I8085_RST75_LINE, state);
+	}
+
+	void system23_state::sod_trap(int state)
+	{
+		m_sod = state;
+		trap();
+	}
+
+	void system23_state::ros_w_trap(uint8_t data)
+	{
+		m_ros_w = CLEAR_LINE;
+		trap();
 	}
 
 	void system23_state::pit_clk2(int state)
@@ -420,7 +438,7 @@ namespace
 		map(0x40, 0x43).rw(m_ppi_diag, FUNC(i8255_device::read), FUNC(i8255_device::write));
 		map(0x44, 0x45).rw(m_crtc, FUNC(i8275_device::read), FUNC(i8275_device::write));
 		map(0x48, 0x49).rw(m_usart, FUNC(i8251_device::read), FUNC(i8251_device::write));
-		map(0x4c, 0x4f).rw(m_ppi_kbd, FUNC(i8255_device::read), FUNC(i8255_device::write));
+		map(0x4c, 0x4f).rw(m_ppi_crtc, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	}
 
 	//This routine describes the computer's memory map
@@ -428,8 +446,8 @@ namespace
 	void system23_state::system23_mem(address_map &map)
 	{
 		map.unmap_value_high();
-		map(0x0000, 0x3fff).rom();
-		map(0x4000, 0x7fff).bankr(m_ros);
+		map(0x0000, 0x3fff).rom().w(FUNC(system23_state::ros_w_trap));
+		map(0x4000, 0x7fff).bankr(m_ros).w(FUNC(system23_state::ros_w_trap));
 		map(0x8000, 0xbfff).ram();
 		map(0xc000, 0xffff).bankr(m_ram_bank_r);
 		map(0xc000, 0xffff).bankw(m_ram_bank_w);
@@ -443,15 +461,15 @@ namespace
 		m_maincpu->set_addrmap(AS_PROGRAM, &system23_state::system23_mem);
 		m_maincpu->set_addrmap(AS_IO, &system23_state::system23_io);
 		m_maincpu->in_sid_func().set(FUNC(system23_state::sid_r));
-		m_maincpu->out_sod_func().set(FUNC(system23_state::trap));
+		m_maincpu->out_sod_func().set(FUNC(system23_state::sod_trap));
 		m_maincpu->set_irq_acknowledge_callback(m_pic, FUNC(pic8259_device::inta_cb));
 
-		I8255(config, m_ppi_kbd);
-		m_ppi_kbd->in_pa_callback().set(FUNC(system23_state::cpu_test_register_r));
-		m_ppi_kbd->out_pa_callback().set(FUNC(system23_state::cpu_test_register_w));
-		m_ppi_kbd->in_pb_callback().set(FUNC(system23_state::crtc_test_vars_r));
-		m_ppi_kbd->in_pc_callback().set(FUNC(system23_state::port_4e_r));
-		m_ppi_kbd->out_pc_callback().set(FUNC(system23_state::port_4e_w));
+		I8255(config, m_ppi_crtc);
+		m_ppi_crtc->in_pa_callback().set(FUNC(system23_state::cpu_test_register_r));
+		m_ppi_crtc->out_pa_callback().set(FUNC(system23_state::cpu_test_register_w));
+		m_ppi_crtc->in_pb_callback().set(FUNC(system23_state::crtc_test_vars_r));
+		m_ppi_crtc->in_pc_callback().set(FUNC(system23_state::port_4e_r));
+		m_ppi_crtc->out_pc_callback().set(FUNC(system23_state::port_4e_w));
 
 		I8255(config, m_ppi_diag);
 		m_ppi_diag->in_pa_callback().set(FUNC(system23_state::read_keyboard));
@@ -510,7 +528,6 @@ namespace
 		CLOCK(config, m_pit_clock, 18'432'000 / 12);
 		m_pit_clock->signal_handler().set(FUNC(system23_state::pit_clk2));
 
-
 		config.set_perfect_quantum(m_maincpu);
 		config.set_default_layout(layout_ibmsystem23);
 
@@ -525,6 +542,8 @@ namespace
 		m_ram_bank_r->configure_entries(0, 16, m_ram->pointer() + 0x4000, 0x4000);
 		m_ram_bank_w->configure_entries(0, 16, m_ram->pointer() + 0x4000, 0x4000);
 		//m_ram_bank_dma->configure_entries(0, 16, m_ram->pointer() + 0x4000, 0x4000);
+		m_sod = CLEAR_LINE;
+		m_ros_w = ASSERT_LINE;
 	}
 
 	void system23_state::machine_reset()
@@ -604,8 +623,8 @@ namespace
 		ROMX_LOAD("0b_4f631183_8519404.bin", 0x06000, 0x2000, CRC(4f631183) SHA1(5f7b011129616bae46c70133309a70c29cc0f127), ROM_BIOS(0))
 		ROMX_LOAD("0c_48646293_8519403.bin", 0x08000, 0x2000, CRC(48646293) SHA1(3d7eaf2c143499757681fbedbc3716829ef9bd25), ROM_BIOS(0))
 		ROMX_LOAD("0d_bea5a812_8519405.bin", 0x0a000, 0x2000, CRC(bea5a812) SHA1(5da3a9231c5d456fa7a26ab36b9d5380e096af59), ROM_BIOS(0))
-		//ROM E is empty
-		//ROM F is empty
+		ROMX_FILL(0xc000, 0x2000, 0xff, ROM_BIOS(0))//ROM E is empty
+		ROMX_FILL(0xe000, 0x2000, 0xff, ROM_BIOS(0))//ROM F is empty
 		ROMX_LOAD("10_41e6c232_8519411.bin", 0x10000, 0x2000, CRC(41e6c232) SHA1(6711000a0c6836a411997de15274b990dd2c0ed0), ROM_BIOS(0))
 		ROMX_LOAD("11_b17f5c6e_8519407.bin", 0x12000, 0x2000, CRC(b17f5c6e) SHA1(1d5c2f33de6d1efa2b27b7c43b30268946ef5920), ROM_BIOS(0))
 		ROMX_LOAD("12_04dcc52f_8519408.bin", 0x14000, 0x2000, CRC(04dcc52f) SHA1(feba4f189a8bb442c241dadb1fa1f2cb4f344fa3), ROM_BIOS(0))
@@ -624,10 +643,10 @@ namespace
 		ROMX_LOAD("0b_4f631183_8493754.bin", 0x06000, 0x2000, CRC(4f631183) SHA1(5f7b011129616bae46c70133309a70c29cc0f127), ROM_BIOS(1))
 		ROMX_LOAD("0c_48646293_8493749.bin", 0x08000, 0x2000, CRC(48646293) SHA1(3d7eaf2c143499757681fbedbc3716829ef9bd25), ROM_BIOS(1))
 		ROMX_LOAD("0d_bea5a812_8493755.bin", 0x0a000, 0x2000, CRC(bea5a812) SHA1(5da3a9231c5d456fa7a26ab36b9d5380e096af59), ROM_BIOS(1))
-		//ROM E is empty
-		//ROM F is empty
-		//ROM 10 is empty
-		//ROM 11 is empty
+		ROMX_FILL(0x0c000, 0x2000, 0xff, ROM_BIOS(1))//ROM E is empty
+		ROMX_FILL(0x0e000, 0x2000, 0xff, ROM_BIOS(1))//ROM F is empty
+		ROMX_FILL(0x10000, 0x2000, 0xff, ROM_BIOS(1))//ROM 10 is empty
+		ROMX_FILL(0x10000, 0x2000, 0xff, ROM_BIOS(1))//ROM 11 is empty
 		ROMX_LOAD("12_04dcc52f_8493760.bin", 0x14000, 0x2000, CRC(04dcc52f) SHA1(feba4f189a8bb442c241dadb1fa1f2cb4f344fa3), ROM_BIOS(1))
 		ROMX_LOAD("13_26869666_8493761.bin", 0x16000, 0x2000, CRC(26869666) SHA1(9fae28fe3613218a6f8d7fb7a88bbc29a3f75a0f), ROM_BIOS(1))
 		ROMX_LOAD("14_91b2969e_8493756.bin", 0x18000, 0x2000, CRC(91b2969e) SHA1(dedac0b9b3e607bcb03bc16653c2c002eb67b633), ROM_BIOS(1))
