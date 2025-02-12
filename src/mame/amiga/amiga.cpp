@@ -1780,6 +1780,8 @@ void amiga_state::amiga_base(machine_config &config)
 	SOFTWARE_LIST(config, "ocs_list").set_original("amigaocs_flop");
 	SOFTWARE_LIST(config, "demos_list").set_original("amiga_demos");
 	SOFTWARE_LIST(config, "amigacd_list").set_original("amiga_cd");
+	// CD32 should support this off the bat, Aminet Photo CD packages available anyway.
+	SOFTWARE_LIST(config, "photocd_list").set_compatible("photo_cd");
 }
 
 void a1000_state::a1000(machine_config &config)
