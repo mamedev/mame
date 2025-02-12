@@ -1085,13 +1085,13 @@ license:CC0-1.0
 		<publisher>Synergy Ikunangaku</publisher>   <!-- シナジー幾何学 -->
 		<info name="serial" value="BDS-20023" />
 		<info name="alt_title" value="イエロー・ブリック・ロード II　グリンダと西の魔女" />
-		<part name="cdrom1" interface="scd_cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<feature name="part_id" value="Disc 1" />
 			<diskarea name="cdrom">
 				<disk name="yellow21" sha1="84d6f55c14a3f72c3c324ebf7b60a462ea914a2f"/>
 			</diskarea>
 		</part>
-		<part name="cdrom2" interface="scd_cdrom">
+		<part name="cdrom2" interface="cdrom">
 			<feature name="part_id" value="Disc 2" />
 			<diskarea name="cdrom">
 				<disk name="yellow22" sha1="b707ada43a3ecee8fefb41d112919021001a05df"/>
