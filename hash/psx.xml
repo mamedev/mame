@@ -376,7 +376,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		</part>
 	</software>
 
-	<software name="3xtreme" supported="partial">
+	<software name="3xtreme" supported="no">
 		<!--
 		http://redump.org/disc/2715/
 		<rom name="3Xtreme (USA).cue" size="196" crc="a689937f" sha1="6d16c06c59a0eab13c1364c03dce6db699c5793a"/>
@@ -386,11 +386,11 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<description>3Xtreme (USA)</description>
 		<year>1999</year>
 		<publisher>989 Sports</publisher>
-		<notes>Compatibility set as PAL since it didn't work on NTSC system</notes>
+		<notes>Work on PAL but it doesn't work on NTSC system</notes>
 		<info name="developer" value="989 Sports" />
 		<info name="language" value="English" />
 		<info name="serial" value="SCUS-94231"/>
-		<sharedfeat name="compatibility" value="PAL-E"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="3Xtreme (USA)" sha1="a0678bbf322f512072f7a78f072fdbab6555559b"/>
