@@ -561,7 +561,8 @@ namespace
         // IOP bus expansion I/O
         map(0x20000000, 0x20ffffff).rw(FUNC(news_iop_state::extio_bus_error_r),FUNC(news_iop_state::extio_bus_error_w)).mirror(0x1f000000);
 
-        // Expansion slot SCC (bus errors here kill iopboot, so the probe process may not use bus errors, at least not with the same setup as extio - but maybe I had the base address wrong before, I need to check)
+        // Expansion slot SCC (bus errors here kill iopboot, so the probe process may not use bus errors, at least not with the same setup as extio)
+        // TODO: Does the fact that NEWS-OS 4 poke at these addresses mean that something is not configured properly elsewhere?
         map(0x4c000100, 0x4c0001ff).noprw();
 
         map(0x60000000, 0x60000000).r(FUNC(news_iop_state::iop_status_r));
