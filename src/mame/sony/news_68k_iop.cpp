@@ -556,7 +556,7 @@ namespace
     {
         map.unmap_value_low();
         map(0x03000000, 0x0300ffff).rom().region("eprom", 0).mirror(0x007f0000);
-        map(0x00800000, 0x00ffffff).noprw(); // TODO: how to handle this, lower RAM
+        map(0x00000000, 0x00ffffff).noprw(); // Silence unmapped read/write warnings during memory probe
 
         // IOP bus expansion I/O
         map(0x20000000, 0x20ffffff).rw(FUNC(news_iop_state::extio_bus_error_r),FUNC(news_iop_state::extio_bus_error_w)).mirror(0x1f000000);
