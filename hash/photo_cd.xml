@@ -5,7 +5,7 @@ license:CC0-1.0
 
 http://redump.org/discs/system/photo-cd/
 -->
-<softwarelist name="photo_cd" description="Generic Photo CD images">
+<softwarelist name="photo_cd" description="Kodak Photo CD images (Beige Book)">
 
 	<software name="toilhana" supported="no">
 		<!-- http://redump.org/disc/103991/ -->
