@@ -63,10 +63,10 @@
 #include "cricket.h"
 
 #include "cpu/m6800/m6801.h"
+#include "machine/timer.h"
 #include "sound/ay8910.h"
 #include "sound/tms5220.h"
 #include "speaker.h"
-#include "machine/timer.h"
 
 
 namespace {
@@ -84,31 +84,30 @@ public:
 	virtual void input_txd(int state) override;
     virtual void input_dtr(int state) override;
 
-	required_device<m6801_cpu_device> m_mcu;
-	required_device<ay8913_device> m_ay1;
-	required_device<ay8913_device> m_ay2;
-	required_device<tms5220c_device> m_tms;
-
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
+
 private:
-	u8 p2_r() { return m_rx_state<<3 | M6801_MODE_7; };
+	required_device<m6801_cpu_device> m_mcu;
+	required_device<ay8913_device> m_ay1;
+	required_device<ay8913_device> m_ay2;
+	required_device<tms5220c_device> m_tms;
+
+    u8 p2_r() { return m_rx_state<<3 | M6801_MODE_7; };
 	void p1_w(u8 data);
-	u8 p3_r(void);
+	u8 p3_r();
 	void p3_w(u8 data);
-	u8 p4_r(void);
+	u8 p4_r();
 	void p4_w(u8 data);
-	void ser_tx_w(int state) { output_rxd(state); }
-
-	int m_rx_state;
-    int m_dtr_state;
-    u8 m_data;
-
     TIMER_DEVICE_CALLBACK_MEMBER(clock_interrupt);
+
+	u8 m_rx_state;
+    u8 m_dtr_state;
+    u8 m_data;
 };
 
 cricket_device::cricket_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -118,6 +117,9 @@ cricket_device::cricket_device(const machine_config &mconfig, const char *tag, d
 	, m_ay1(*this, "ay1")
 	, m_ay2(*this, "ay2")
     , m_tms(*this, "tms")
+    , m_rx_state(0)
+    , m_dtr_state(0)
+    , m_data(0)
 {
 }
 
@@ -130,7 +132,7 @@ void cricket_device::device_add_mconfig(machine_config &config)
 	m_mcu->out_p3_cb().set(FUNC(cricket_device::p3_w));
 	m_mcu->in_p4_cb().set(FUNC(cricket_device::p4_r));
 	m_mcu->out_p4_cb().set(FUNC(cricket_device::p4_w));
-	m_mcu->out_ser_tx_cb().set(FUNC(cricket_device::ser_tx_w));
+	m_mcu->out_ser_tx_cb().set(FUNC(cricket_device::output_rxd));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -152,6 +154,9 @@ const tiny_rom_entry *cricket_device::device_rom_region() const
 
 void cricket_device::device_start()
 {
+    save_item(NAME(m_rx_state));
+	save_item(NAME(m_dtr_state));
+    save_item(NAME(m_data));
 }
 
 void cricket_device::device_reset()
@@ -162,12 +167,12 @@ void cricket_device::device_reset()
 
 void cricket_device::input_txd(int state)
 {
-	m_rx_state = (state & 1);
+	m_rx_state = state ? 1 : 0;
 }
 
 void cricket_device::input_dtr(int state)
 {
-	m_dtr_state = (state & 1);
+	m_dtr_state = state ? 1 : 0;
 }
 
 void cricket_device::p1_w(u8 data)
@@ -189,27 +194,27 @@ void cricket_device::p3_w(u8 data)
 {
 	if (!BIT(data, 5)) //AY1 *CS
 	{
-        if (BIT(data,2)) // BDIR
+        if (BIT(data, 2)) // BDIR
         {
-            if (BIT(data,3)) // BC1
+            if (BIT(data, 3)) // BC1
                 m_ay1->address_w(m_data);
             else
                 m_ay1->data_w(m_data);
         }
-        else if (!BIT(data,3))
+        else if (!BIT(data, 3))
             m_data = m_ay1->data_r();
     }
     
     if (!BIT(data, 4)) // AY2 *CS
     {
-        if (BIT(data,2)) // BDIR
+        if (BIT(data, 2)) // BDIR
         {
-            if (BIT(data,3)) // BC1
+            if (BIT(data, 3)) // BC1
                 m_ay2->address_w(m_data);
             else
                 m_ay2->data_w(m_data);
         }
-        else if(!BIT(data,3))
+        else if(!BIT(data, 3))
             m_data = m_ay2->data_r();
     }
     
