@@ -5835,6 +5835,8 @@ if (BUSES["AMIGA_CPUSLOT"]~=null) then
 		MAME_DIR .. "src/devices/bus/amiga/cpuslot/cpuslot.h",
 		MAME_DIR .. "src/devices/bus/amiga/cpuslot/cards.cpp",
 		MAME_DIR .. "src/devices/bus/amiga/cpuslot/cards.h",
+		MAME_DIR .. "src/devices/bus/amiga/cpuslot/a570.cpp",
+		MAME_DIR .. "src/devices/bus/amiga/cpuslot/a570.h",
 		MAME_DIR .. "src/devices/bus/amiga/cpuslot/a590.cpp",
 		MAME_DIR .. "src/devices/bus/amiga/cpuslot/a590.h",
 		MAME_DIR .. "src/devices/bus/amiga/cpuslot/action_replay.cpp",
