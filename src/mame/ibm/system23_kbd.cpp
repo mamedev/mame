@@ -76,7 +76,7 @@ void system23_kbd_device::bus_w(uint8_t data)
 uint8_t system23_kbd_device::read_keyboard()
 {
 	LOG("Read Keyboard %02x\n", m_bus);
-	printf("Scan Code: %02x\n", (m_bus ^ 0xff) & 0x7f);
+	//printf("Scan Code: %02x\n", (m_bus ^ 0xff) & 0x7f);
 	return m_bus;
 }
 
