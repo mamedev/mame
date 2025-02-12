@@ -2784,7 +2784,9 @@ void stvcd_device::set_tray_open()
 	hirqreg |= DCHG;
 	cd_stat = CD_STAT_OPEN;
 
-	// TODO: unmount image
+	// unmount the existing image, pretend that's what user wants if we are there.
+	m_cdrom_image->unload();
+
 	tray_is_closed = 0;
 
 	popmessage("Tray Open");
