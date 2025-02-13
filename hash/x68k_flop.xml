@@ -1304,14 +1304,12 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<software name="aquales" supported="no">
+	<software name="aquales" supported="yes">
 		<description>Aquales</description>
 		<year>1991</year>
 		<publisher>エグザクト (Exact)</publisher>
 		<notes><![CDATA[
-Doesn't autoboot with both disks in, requires a fake data disk swap from user
-Opening hangs at first line
-During gameplay, weapon menu has random horizontal lines
+If autoboot doesn't work, delete nvram
 ]]></notes>
 		<info name="alt_title" value="アクアレス" />
 		<info name="release" value="19910912" />
