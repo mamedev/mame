@@ -11775,7 +11775,7 @@ INPUT_PORTS_END
 
 void trspacadv_state::trspacadv(machine_config &config)
 {
-	sm511_common(config, 1494, 1053);
+	sm511_common(config, 1532, 1080);
 }
 
 // roms
@@ -11787,8 +11787,8 @@ ROM_START( trspacadv )
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
 	ROM_LOAD( "1112_237c.melody", 0x000, 0x100, BAD_DUMP CRC(685a3305) SHA1(31b948dbd0fbae3517db505bc58904092c2b077f) ) // decap needed for verification
 
-	ROM_REGION( 116894, "screen", 0)
-	ROM_LOAD( "trspacadv.svg", 0, 116894, CRC(33464014) SHA1(7a932060dfbd290d1c7c0767cac4638e629b374a) )
+	ROM_REGION( 117824, "screen", 0)
+	ROM_LOAD( "trspacadv.svg", 0, 117824, CRC(5b7c7f28) SHA1(3851eb2221660a33c521bbd3b01d7a76a558d07c) )
 ROM_END
 
 
