@@ -9697,7 +9697,7 @@ Contains software drivers for a ScanExpress 6000SP Flatbed Scanner, SCSI i/f
 		<description>Paranasal Sinuses &amp; Anterior Skull Base</description>
 		<year>1993</year>
 		<publisher>Elsevier Science B.V.</publisher>
-		<part name="cdrom" interface="cdi_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="paranasal sinuses &amp; anterior skull base (1993)(elsevier science b.v.)(windows 3.1 disc)" sha1="fddedb4f78bc5687d65f11fd4e18463e1fc4edda"/>
 			</diskarea>
