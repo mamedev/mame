@@ -114,7 +114,7 @@ void mms77316_fdc_device::data_w(u8 val)
 
 void mms77316_fdc_device::write(u8 select_lines, u8 reg, u8 val)
 {
-	if (!(select_lines & h89bus_device::H89_GPP))
+	if (!(select_lines & h89bus_device::H89_IO_GPP))
 	{
 		return;
 	}
@@ -171,7 +171,7 @@ u8 mms77316_fdc_device::data_r()
 
 u8 mms77316_fdc_device::read(u8 select_lines, u8 reg)
 {
-	if (!(select_lines & h89bus_device::H89_GPP))
+	if (!(select_lines & h89bus_device::H89_IO_GPP))
 	{
 		return 0;
 	}
@@ -323,7 +323,7 @@ void mms77316_fdc_device::set_drq(int state)
 			set_slot_wait(CLEAR_LINE);
 		}
 
-		m_intr_cntrl->set_drq(m_drq_count == 0 ? m_drq : CLEAR_LINE);
+		m_intr_cntrl->set_drq(m_drq_count++ == 0 ? m_drq : CLEAR_LINE);
 	}
 	else
 	{

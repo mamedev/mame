@@ -185,13 +185,13 @@ void h89bus_sigmasoft_snd_device::device_reset()
 			m_port_selection = 0;
 			break;
 		case 0x01:
-			m_port_selection = h89bus_device::H89_SER0;
+			m_port_selection = h89bus_device::H89_IO_SER0;
 			break;
 		case 0x02:
-			m_port_selection = h89bus_device::H89_SER1;
+			m_port_selection = h89bus_device::H89_IO_SER1;
 			break;
 		case 0x03:
-			m_port_selection = h89bus_device::H89_LP;
+			m_port_selection = h89bus_device::H89_IO_LP;
 			break;
 	}
 }

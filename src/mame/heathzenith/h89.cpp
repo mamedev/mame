@@ -50,9 +50,11 @@
 #include "bus/heathzenith/h89/h_88_3.h"
 #include "bus/heathzenith/h89/h_88_5.h"
 #include "bus/heathzenith/h89/mms77316_fdc.h"
+#include "bus/heathzenith/h89/mt_win89.h"
 #include "bus/heathzenith/h89/sigmasoft_parallel_port.h"
 #include "bus/heathzenith/h89/sigmasoft_sound.h"
 #include "bus/heathzenith/h89/we_pullup.h"
+#include "bus/heathzenith/h89/wh_88_16.h"
 #include "bus/heathzenith/h89/z_89_11.h"
 #include "bus/heathzenith/h89/z37_fdc.h"
 
@@ -86,40 +88,38 @@ protected:
 	h89_base_state(const machine_config &mconfig, device_type type, const char *tag):
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_maincpu_region(*this, "maincpu"),
-		m_mem_view(*this, "rom_bank"),
-		m_ram(*this, RAM_TAG),
-		m_floppy_ram(*this, "floppyram"),
+		m_ram(*this, "rambank%u", 0U),
+		m_sys_rom(*this, "sys_rom"),
+		m_floppy_rom(*this, "flpy_rom"),
+		m_floppy_ram(*this, "flpy_ram"),
 		m_tlbc(*this, "tlbc"),
 		m_intr_socket(*this, "intr_socket"),
 		m_h89bus(*this, "h89bus"),
 		m_console(*this, "console"),
 		m_config(*this, "CONFIG"),
-		m_sw501(*this, "SW501")
+		m_sw501(*this, "SW501"),
+		m_jj501_502(*this, "JJ501-JJ502")
 	{
 	}
 
 	void h89_base(machine_config &config);
 
-	required_device<z80_device>                          m_maincpu;
-	required_memory_region                               m_maincpu_region;
-	memory_view                                          m_mem_view;
-	required_device<ram_device>                          m_ram;
-	required_shared_ptr<u8>                              m_floppy_ram;
-	required_device<heath_tlb_connector>                 m_tlbc;
-	required_device<heath_intr_socket>                   m_intr_socket;
-	required_device<h89bus_device>                       m_h89bus;
-	required_device<ins8250_device>                      m_console;
-	required_ioport                                      m_config, m_sw501;
-	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
+	required_device<z80_device>             m_maincpu;
+	required_device_array<ram_device, 3>    m_ram;
+	required_region_ptr<u8>                 m_sys_rom;
+	required_region_ptr<u8>                 m_floppy_rom;
+	required_device<ram_device>             m_floppy_ram;
+	required_device<heath_tlb_connector>    m_tlbc;
+	required_device<heath_intr_socket>      m_intr_socket;
+	required_device<h89bus_device>          m_h89bus;
+	required_device<ins8250_device>         m_console;
+	required_ioport                         m_config, m_sw501, m_jj501_502;
 
 	// General Purpose Port (GPP)
 	u8   m_gpp;
 
-	bool m_rom_enabled;
 	bool m_timer_intr_enabled;
 	bool m_single_step_enabled;
-	bool m_floppy_ram_we;
 
 	// single step flags
 	bool m_555a_latch;
@@ -129,8 +129,8 @@ protected:
 	u32  m_cpu_speed_multiplier;
 
 	// Clocks
-	static constexpr XTAL H89_CLOCK                      = XTAL(12'288'000) / 6;
-	static constexpr XTAL INS8250_CLOCK                  = XTAL(1'843'200);
+	static constexpr XTAL H89_CLOCK     = XTAL(12'288'000) / 6;
+	static constexpr XTAL INS8250_CLOCK = XTAL(1'843'200);
 
 	static constexpr u8 GPP_SINGLE_STEP_BIT             = 0;
 	static constexpr u8 GPP_ENABLE_TIMER_INTERRUPT_BIT  = 1;
@@ -138,8 +138,6 @@ protected:
 	static constexpr u8 GPP_MEM1_BIT                    = 5;
 	static constexpr u8 GPP_IO0_BIT                     = 6;
 	static constexpr u8 GPP_IO1_BIT                     = 7;
-
-	void update_mem_view();
 
 	void update_gpp(u8 gpp);
 	void port_f2_w(offs_t offset, u8 data);
@@ -156,8 +154,6 @@ protected:
 
 	void set_wait_state(int data);
 
-	void set_fmwe(int data);
-
 	u8 raise_NMI_r();
 	void raise_NMI_w(u8 data);
 	void console_intr(int data);
@@ -165,6 +161,13 @@ protected:
 	void reset_single_step_state();
 
 	template <int line> void slot_irq(int state);
+	template <int line> u8 bank_r(offs_t offset);
+	template <int line> void bank_w(offs_t offset, u8 data);
+
+	u8 sys_rom_r(offs_t offset);
+	u8 flpy_rom_r(offs_t offset);
+	u8 flpy_ram_r(offs_t offset);
+	void flpy_ram_w(offs_t offset, u8 data);
 
 	void h89_left_cards(device_slot_interface &device);
 	void h89_right_cards(device_slot_interface &device);
@@ -249,62 +252,9 @@ public:
 
 };
 
-
-/*
-  The H89 supported 16K, 32K, 48K, or 64K of RAM. The first 8K of address space
-  is reserved for the monitor ROM, floppy ROM, and scratch pad RAM. For 16k-48K
-  sizes, the upper 8k of memory is remapped to the first 8K when the ROM is disabled.
-  For systems with 64K of RAM, the upper half of the expansion board is permanently
-  mapped to the lower 8K. Even when ROM is mapped, any writes will still occur
-  to the RAM.
-
-  H89 Lower 8K address map
-
-        HDOS Mode                       CP/M Mode
-  ------------------- 0x2000 (8k) ----------------
-  |   Floppy ROM   |                |            |
-  ------------------- 0x1800 (6k)   |            |
-  |   Floppy RAM   |                |            |
-  ------------------- 0x1400 (5k)   |    RAM     |
-  |      Open      |                |            |
-  ------------------- 0x1000 (4k)   |            |
-  |   MTR-90 ROM   |                |            |
-  -................-- 0x0800 (2k)   |            |
-  | MTR(88/89) ROM |                |            |
-  ------------------- 0x0000 (0k) ----------------
-
-
-        16K RAM Example
-
-      HDOS                           CP/M
-  ------------- 24k
-  |    RAM    |  ------+
-  ------------- 16k    |         ------------- 16k
-  |    RAM    |  ------------->  |    RAM    |
-  -------------  8k    |         -------------  8k
-  |    ROM    |        +------>  |    RAM    |
-  -------------  0k              -------------  0k
-
-*/
 void h89_base_state::h89_mem(address_map &map)
 {
-	map.unmap_value_high();
-
-	map(0x0000, 0xffff).view(m_mem_view);
-
-	// View 0 - ROM / Floppy RAM R/O
-	// View 1 - ROM / Floppy RAM R/W
-	// monitor ROM
-	m_mem_view[0](0x0000, 0x0fff).rom().region(m_maincpu_region, 0).unmapw();
-	m_mem_view[1](0x0000, 0x0fff).rom().region(m_maincpu_region, 0).unmapw();
-
-	// Floppy RAM
-	m_mem_view[0](0x1400, 0x17ff).readonly().share(m_floppy_ram);
-	m_mem_view[1](0x1400, 0x17ff).ram().share(m_floppy_ram);
-
-	// Floppy ROM
-	m_mem_view[0](0x1800, 0x1fff).rom().region(m_maincpu_region, 0x1800).unmapw();
-	m_mem_view[1](0x1800, 0x1fff).rom().region(m_maincpu_region, 0x1800).unmapw();
+	map.unmap_value_low();
 }
 
 void h89_base_state::map_fetch(address_map &map)
@@ -314,7 +264,7 @@ void h89_base_state::map_fetch(address_map &map)
 
 u8 h89_base_state::m1_r(offs_t offset)
 {
-	u8 data = m_program.read_byte(offset);
+	u8 data = m_h89bus->mem_m1_r(offset);
 
 	if (!machine().side_effects_disabled() && m_single_step_enabled && !m_556b_latch)
 	{
@@ -343,36 +293,6 @@ u8 h89_base_state::m1_r(offs_t offset)
 	return data;
 }
 
-/*
-                                   PORT
-    Use                      |  Hex  |  Octal
-   --------------------------+-------+---------
-    Not specified, available |  0-77 |   0-167
-    Disk I/O #1              | 78-7B | 170-173
-    Disk I/O #2              | 7C-7F | 174-177
-    Not specified, reserved  | 80-CF | 200-317
-    DCE Serial I/O           | D0-D7 | 320-327
-    DTE Serial I/O           | D8-DF | 330-337
-    DCE Serial I/O           | EO-E7 | 340-347
-    Console I/O              | E8-EF | 350-357
-    NMI                      | F0-F1 | 360-361
-    General purpose port     |    F2 |     362
-    Cassette I/O(MTR-88 only)| F8-F9 | 370-371
-    NMI                      | FA-FB | 372-373
-
-    Disk I/O #1 - 0170-0173 (0x78-0x7b)
-       Heath Options
-         - H37 5-1/4" Soft-sectored Controller - Requires MTR-90 ROM
-         - H47 Dual 8" Drives - Requires MTR-89 or MTR-90 ROM
-         - H67 8" Hard disk + 8" Floppy Drives - Requires MTR-90 ROM
-
-    Disk I/O #2 - 0174-0177 (0x7c-0x7f)
-       Heath Options
-         - 5-1/4" Hard-sectored Controller - supported by all ROMs
-         - H47 Dual 8" Drives - Requires MTR-89 or MTR-90 ROM
-         - H67 8" Hard disk + 8" Floppy Drives - MTR-90 ROM
-
-*/
 void h89_base_state::h89_base_io(address_map &map)
 {
 	map.unmap_value_high();
@@ -397,6 +317,13 @@ static INPUT_PORTS_START( h88 )
 	PORT_DIPSETTING(    0x40, "19200" )
 	PORT_DIPSETTING(    0x80, "38400" )
 	PORT_DIPSETTING(    0xc0, "57600" )
+
+	PORT_START("JJ501-JJ502")
+	PORT_DIPNAME( 0x03, 0x03, "Installed Memory")
+	PORT_DIPSETTING(    0x00, "16k")
+	PORT_DIPSETTING(    0x01, "32k")
+	PORT_DIPSETTING(    0x02, "48k")
+	PORT_DIPSETTING(    0x03, "64k")
 
 	PORT_START("CONFIG")
 	PORT_CONFNAME( 0x03, 0x00, "CPU Clock Speed Upgrade")
@@ -638,6 +565,12 @@ static INPUT_PORTS_START( h89 )
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x80, "Auto" )
 
+	PORT_START("JJ501-JJ502")
+	PORT_DIPNAME( 0x03, 0x03, "Installed Memory")
+	PORT_DIPSETTING(    0x00, "16k")
+	PORT_DIPSETTING(    0x01, "32k")
+	PORT_DIPSETTING(    0x02, "48k")
+	PORT_DIPSETTING(    0x03, "64k")
 
 	PORT_START("CONFIG")
 	PORT_CONFNAME(0x03, 0x00, "CPU Clock Speed Upgrade")
@@ -661,63 +594,16 @@ INPUT_PORTS_END
 void h89_base_state::machine_start()
 {
 	save_item(NAME(m_gpp));
-	save_item(NAME(m_rom_enabled));
 	save_item(NAME(m_timer_intr_enabled));
 	save_item(NAME(m_single_step_enabled));
-	save_item(NAME(m_floppy_ram_we));
 	save_item(NAME(m_cpu_speed_multiplier));
 	save_item(NAME(m_555a_latch));
 	save_item(NAME(m_555b_latch));
 	save_item(NAME(m_556b_latch));
-
-	m_maincpu->space(AS_PROGRAM).specific(m_program);
-
-	// update RAM mappings based on RAM size
-	u8 *ram_ptr  = m_ram->pointer();
-	u32 ram_size = m_ram->size();
-
-	if (ram_size == 0x10000)
-	{
-		// system has a full 64k
-		m_maincpu->space(AS_PROGRAM).install_ram(0x2000, 0xffff, ram_ptr);
-
-		// install shadow writing to RAM when in ROM mode and Floppy RAM is write-protected.
-		m_mem_view[0].install_writeonly(0x0000, 0x1fff, ram_ptr + 0xe000);
-		// when Floppy RAM is in write enable mode, must use write_tap so writes occur to both RAMs
-		// NOTE: the H89 had space reserved for additional RAM (without write protection) in the ROM space, but not aware
-		// it was ever used. If that was added to this emulation, m_mem_view[0] would also need to be a write_tap.
-		m_mem_view[1].install_write_tap(0x0000, 0x1fff, "shadow_w", [ram_ptr](offs_t offset, u8 &data, u8 mem_mask)
-		{
-			ram_ptr[0xe000 + offset] = data;
-		});
-
-		// The Org-0 (often used for CP/M) view has RAM at the lower 8k
-		m_mem_view[2].install_ram(0x0000, 0x1fff, ram_ptr + 0xe000);
-	}
-	else
-	{
-		// less than 64k
-
-		// for views with ROM visible, the top of memory is 8k higher than
-		// the memory size, since the base starts at 8k.
-		u32 ram_top = ram_size + 0x1fff;
-
-		m_mem_view[0].install_ram(0x2000, ram_top, ram_ptr);
-		m_mem_view[1].install_ram(0x2000, ram_top, ram_ptr);
-
-		// when ROM is not active, memory still starts at 8k, but is 8k smaller so the last 8k can be mapped to addr 0.
-		m_mem_view[2].install_ram(0x2000, ram_size - 1, ram_ptr);
-
-		// remap the top 8k down to addr 0
-		m_mem_view[2].install_ram(0x0000, 0x1fff, ram_ptr + ram_size - 0x2000);
-	}
-
-	m_floppy_ram_we       = false;
 }
 
 void h89_base_state::machine_reset()
 {
-	m_rom_enabled         = true;
 	m_timer_intr_enabled  = true;
 	m_single_step_enabled = false;
 	reset_single_step_state();
@@ -745,8 +631,9 @@ void h89_base_state::machine_reset()
 		break;
 	}
 
+	m_h89bus->set_jj501_502(m_jj501_502->read());
+
 	update_gpp(0);
-	update_mem_view();
 }
 
 void h89_base_state::set_wait_state(int data)
@@ -757,13 +644,6 @@ void h89_base_state::set_wait_state(int data)
 		machine().scheduler().synchronize();
 		m_maincpu->defer_access();
 	}
-}
-
-void h89_base_state::set_fmwe(int data)
-{
-	m_floppy_ram_we = bool(data);
-
-	update_mem_view();
 }
 
 u8 h89_base_state::raise_NMI_r()
@@ -785,12 +665,50 @@ void h89_base_state::console_intr(int data)
 
 template <int line> void h89_base_state::slot_irq(int state)
 {
-	   m_intr_socket->set_irq_level(line, state);
+	m_intr_socket->set_irq_level(line, state);
 }
 
 template void h89_base_state::slot_irq<3>(int state);
 template void h89_base_state::slot_irq<4>(int state);
 template void h89_base_state::slot_irq<5>(int state);
+
+template <int line> u8 h89_base_state::bank_r(offs_t offset)
+{
+	return m_ram[line]->read(offset & 0x3fff);
+}
+
+template u8 h89_base_state::bank_r<0>(offs_t offset);
+template u8 h89_base_state::bank_r<1>(offs_t offset);
+template u8 h89_base_state::bank_r<2>(offs_t offset);
+
+template <int line> void h89_base_state::bank_w(offs_t offset, u8 data)
+{
+	m_ram[line]->write(offset & 0x3fff, data);
+}
+
+template void h89_base_state::bank_w<0>(offs_t offset, u8 data);
+template void h89_base_state::bank_w<1>(offs_t offset, u8 data);
+template void h89_base_state::bank_w<2>(offs_t offset, u8 data);
+
+u8 h89_base_state::sys_rom_r(offs_t offset)
+{
+	return m_sys_rom[offset & 0xfff];
+}
+
+u8 h89_base_state::flpy_rom_r(offs_t offset)
+{
+	return m_floppy_rom[offset & 0x7ff];
+}
+
+u8 h89_base_state::flpy_ram_r(offs_t offset)
+{
+	return m_floppy_ram->read(offset & 0x3ff);
+}
+
+void h89_base_state::flpy_ram_w(offs_t offset, u8 data)
+{
+	m_floppy_ram->write(offset & 0x3ff, data);
+}
 
 void h89_base_state::reset_line(int data)
 {
@@ -807,11 +725,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(h89_base_state::h89_irq_timer)
 	{
 		m_intr_socket->set_irq_level(1, ASSERT_LINE);
 	}
-}
-
-void h89_base_state::update_mem_view()
-{
-	m_mem_view.select(m_rom_enabled ? (m_floppy_ram_we ? 1 : 0) : 2);
 }
 
 void h89_base_state::reset_single_step_state()
@@ -860,13 +773,6 @@ void h89_base_state::update_gpp(u8 gpp)
 		}
 	}
 
-	if (BIT(changed_gpp, GPP_MEM1_BIT))
-	{
-		m_rom_enabled = BIT(m_gpp, GPP_MEM1_BIT) == 0;
-
-		update_mem_view();
-	}
-
 	if (BIT(changed_gpp, GPP_MEM0_BIT))
 	{
 		m_maincpu->set_clock(BIT(m_gpp, GPP_MEM0_BIT) ?
@@ -907,24 +813,25 @@ static void intr_ctrl_options(device_slot_interface &device)
 
 void h89_base_state::h89_left_cards(device_slot_interface &device)
 {
-	device.option_add("ss_parallel", H89BUS_SIGMASOFT_PARALLEL);
+	device.option_add("mt_win89",        H89BUS_MT_WIN89_PARALLEL);
+	device.option_add("ss_parallel",     H89BUS_SIGMASOFT_PARALLEL);
 	device.option_add("ss_parallel_igc", H89BUS_SIGMASOFT_PARALLEL_IGC).machine_config(
 		[this](device_t *device)
 		{
 			downcast<sigmasoft_parallel_port_igc &>(*device).set_tlbc(m_tlbc);
 		});
+	device.option_add("wh_88_16",        H89BUS_WH_88_16);
 }
 
 void h89_base_state::h89_right_cards(device_slot_interface &device)
 {
 	device.option_add("cdr_fdc", H89BUS_CDR_FDC_880H);
-	device.option_add("h_88_3", H89BUS_H_88_3);
+	device.option_add("h_88_3",  H89BUS_H_88_3);
 	device.option_add("ha_88_3", H89BUS_HA_88_3);
-	device.option_add("h_88_5", H89BUS_H_88_5);
-	device.option_add("ss_snd", H89BUS_SIGMASOFT_SND);
+	device.option_add("h_88_5",  H89BUS_H_88_5);
+	device.option_add("ss_snd",  H89BUS_SIGMASOFT_SND);
 	device.option_add("z_89_11", H89BUS_Z_89_11);
-
-	device.option_add("z37fdc", H89BUS_Z37).machine_config(
+	device.option_add("z37fdc",  H89BUS_Z37).machine_config(
 		[this](device_t *device)
 		{
 			downcast<h89bus_z37_device &>(*device).set_intr_cntrl(m_intr_socket);
@@ -943,9 +850,9 @@ void h89_base_state::h89_right_cards_mms(device_slot_interface &device)
 
 void h89_base_state::h89_right_p506_cards(device_slot_interface &device)
 {
-	device.option_add("h_88_3", H89BUS_H_88_3);
-	device.option_add("ha_88_3", H89BUS_HA_88_3);
-	device.option_add("ss_snd", H89BUS_SIGMASOFT_SND);
+	device.option_add("h_88_3",    H89BUS_H_88_3);
+	device.option_add("ha_88_3",   H89BUS_HA_88_3);
+	device.option_add("ss_snd",    H89BUS_SIGMASOFT_SND);
 	device.option_add("we_pullup", H89BUS_WE_PULLUP);
 }
 
@@ -960,7 +867,10 @@ void h89_base_state::h89_base(machine_config &config)
 	m_maincpu->set_io_map(&h89_base_state::h89_base_io);
 	m_maincpu->set_irq_acknowledge_callback("intr_socket", FUNC(heath_intr_socket::irq_callback));
 
-	RAM(config, m_ram).set_default_size("64K").set_extra_options("16K,32K,48K").set_default_value(0x00);
+	RAM(config, m_ram[0]).set_default_size("16K");
+	RAM(config, m_ram[1]).set_default_size("16K");
+	RAM(config, m_ram[2]).set_default_size("16K");
+	RAM(config, m_floppy_ram).set_default_size("1K");
 
 	HEATH_INTR_SOCKET(config, m_intr_socket, intr_ctrl_options, nullptr);
 	m_intr_socket->irq_line_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -993,10 +903,20 @@ void h89_base_state::h89_base(machine_config &config)
 	m_h89bus->out_int4_callback().set(FUNC(h89_base_state::slot_irq<4>));
 	m_h89bus->out_int5_callback().set(FUNC(h89_base_state::slot_irq<5>));
 	m_h89bus->out_wait_callback().set(FUNC(h89_base_state::set_wait_state));
-	m_h89bus->out_fmwe_callback().set(FUNC(h89_base_state::set_fmwe));
+	m_h89bus->in_sys_rom_callback().set(FUNC(h89_base_state::sys_rom_r));
+	m_h89bus->in_flpy_rom_callback().set(FUNC(h89_base_state::flpy_rom_r));
+	m_h89bus->in_flpy_ram_callback().set(FUNC(h89_base_state::flpy_ram_r));
+	m_h89bus->out_flpy_ram_callback().set(FUNC(h89_base_state::flpy_ram_w));
+	m_h89bus->in_bank0_callback().set(FUNC(h89_base_state::bank_r<0>));
+	m_h89bus->out_bank0_callback().set(FUNC(h89_base_state::bank_w<0>));
+	m_h89bus->in_bank1_callback().set(FUNC(h89_base_state::bank_r<1>));
+	m_h89bus->out_bank1_callback().set(FUNC(h89_base_state::bank_w<1>));
+	m_h89bus->in_bank2_callback().set(FUNC(h89_base_state::bank_r<2>));
+	m_h89bus->out_bank2_callback().set(FUNC(h89_base_state::bank_w<2>));
+
 	H89BUS_LEFT_SLOT(config, "p501", "h89bus", [this](device_slot_interface &device) { h89_left_cards(device); }, nullptr);
 	H89BUS_LEFT_SLOT(config, "p502", "h89bus", [this](device_slot_interface &device) { h89_left_cards(device); }, nullptr);
-	H89BUS_LEFT_SLOT(config, "p503", "h89bus", [this](device_slot_interface &device) { h89_left_cards(device); }, nullptr);
+	H89BUS_LEFT_SLOT(config, "p503", "h89bus", [this](device_slot_interface &device) { h89_left_cards(device); }, "wh_88_16");
 	H89BUS_RIGHT_SLOT(config, "p504", "h89bus", [this](device_slot_interface &device) { h89_right_cards(device); }, nullptr);
 	H89BUS_RIGHT_SLOT(config, "p505", "h89bus", [this](device_slot_interface &device) { h89_right_cards(device); }, "ha_88_3");
 	H89BUS_RIGHT_SLOT(config, "p506", "h89bus", [this](device_slot_interface &device) { h89_right_p506_cards(device); }, "we_pullup").set_p506_signalling(true);
@@ -1052,7 +972,7 @@ void h89_mms_state::h89_mms(machine_config &config)
 }
 
 #define ROM_H17 \
-		ROM_LOAD( "2716_444-19_h17.u520",     0x1800, 0x0800, CRC(26e80ae3) SHA1(0c0ee95d7cb1a760f924769e10c0db1678f2435c))
+		ROM_LOAD("2716_444-19_h17.u520",     0x0000, 0x0800, CRC(26e80ae3) SHA1(0c0ee95d7cb1a760f924769e10c0db1678f2435c))
 
 #define ROM_MTR90_444_142(x) \
 		ROM_SYSTEM_BIOS(x, "mtr90", "Zenith Data Systems MTR-90 (444-142)") \
@@ -1095,29 +1015,30 @@ void h89_mms_state::h89_mms(machine_config &config)
 		ROMX_LOAD("2732_sigma_rom_v_1.2.bin", 0x0000, 0x1000, CRC(c4ff47c5) SHA1(d6f3d71ff270a663003ec18a3ed1fa49f627123a), ROM_BIOS(x))
 
 #define ROM_CDR_8390(x) \
-	ROM_SYSTEM_BIOS(x, "cdr8390", "CDR 8390") \
-	ROMX_LOAD("2732_cdr8390.u518",        0x0000, 0x1000, CRC(1d30fe43) SHA1(170092d1b62cf88edd29338b474e799c249a0dd7), ROM_BIOS(x))
+		ROM_SYSTEM_BIOS(x, "cdr8390", "CDR 8390") \
+		ROMX_LOAD("2732_cdr8390.u518",        0x0000, 0x1000, CRC(1d30fe43) SHA1(170092d1b62cf88edd29338b474e799c249a0dd7), ROM_BIOS(x))
 
 // NOTE: this rom is not currently working
 #define ROM_CDR_80B2(x) \
-	ROM_SYSTEM_BIOS(x, "cdr80b2", "CDR 80B2") \
-	ROMX_LOAD("2732_cdr80b2.u518",        0x0000, 0x1000, CRC(804a6898) SHA1(a58daca0baf7b5d7c1485531680bd63168eb2d7e), ROM_BIOS(x))
+		ROM_SYSTEM_BIOS(x, "cdr80b2", "CDR 80B2") \
+		ROMX_LOAD("2732_cdr80b2.u518",        0x0000, 0x1000, CRC(804a6898) SHA1(a58daca0baf7b5d7c1485531680bd63168eb2d7e), ROM_BIOS(x))
 
 
 ROM_START( h88 )
-	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
-
+	ROM_REGION( 0x800, "flpy_rom", ROMREGION_ERASEFF )
 	ROM_H17
 
+	ROM_REGION( 0x800, "sys_rom", ROMREGION_ERASEFF )
 	ROM_LOAD("2716_444-40_mtr88.u518",    0x0000, 0x0800, CRC(093afb79) SHA1(bcc1569ad9da7babf0a4199cab96d8cd59b2dd78))
 ROM_END
 
 ROM_START( h89 )
-	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS("mtr90")
 
+	ROM_REGION( 0x800, "flpy_rom", ROMREGION_ERASEFF )
 	ROM_H17
 
+	ROM_REGION( 0x1000, "sys_rom", ROMREGION_ERASEFF )
 	ROM_MTR90_444_142(0)
 
 	ROM_MTR89(1)
@@ -1144,11 +1065,12 @@ ROM_START( h89 )
 ROM_END
 
 ROM_START( h89_cdr )
-	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS("cdr8390")
 
+	ROM_REGION( 0x800, "flpy_rom", ROMREGION_ERASEFF )
 	ROM_H17
 
+	ROM_REGION( 0x1000, "sys_rom", ROMREGION_ERASEFF )
 	ROM_CDR_8390(0)
 
 	ROM_CDR_80B2(1)
@@ -1159,11 +1081,12 @@ ROM_START( h89_cdr )
 ROM_END
 
 ROM_START( h89_mms )
-	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS("mms84b")
 
+	ROM_REGION( 0x800, "flpy_rom", ROMREGION_ERASEFF )
 	ROM_H17
 
+	ROM_REGION( 0x1000, "sys_rom", ROMREGION_ERASEFF )
 	ROM_MMS_444_84B(0)
 
 	ROM_KMR_100(1)
@@ -1176,11 +1099,12 @@ ROM_START( h89_mms )
 ROM_END
 
 ROM_START( z90 )
-	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS("mtr90")
 
+	ROM_REGION( 0x800, "flpy_rom", ROMREGION_ERASEFF )
 	ROM_H17
 
+	ROM_REGION( 0x1000, "sys_rom", ROMREGION_ERASEFF )
 	ROM_MTR90_444_142(0)
 
 	ROM_MMS_444_84B(1)

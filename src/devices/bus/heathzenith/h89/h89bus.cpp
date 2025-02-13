@@ -39,8 +39,21 @@
 #include "emu.h"
 #include "h89bus.h"
 
-#include <algorithm>
-#include <cctype>
+
+#define LOG_PORT_READ     (1U << 1)
+#define LOG_PORT_WRITE    (1U << 2)
+
+#define LOG_MEM_READ      (1U << 3)
+#define LOG_MEM_WRITE     (1U << 4)
+
+#define VERBOSE (LOG_PORT_READ | LOG_PORT_WRITE)
+#include "logmacro.h"
+
+#define LOGPORTREAD(...)     LOGMASKED(LOG_PORT_READ,    __VA_ARGS__)
+#define LOGPORTWRITE(...)    LOGMASKED(LOG_PORT_WRITE,   __VA_ARGS__)
+#define LOGMEMREAD(...)      LOGMASKED(LOG_MEM_READ,     __VA_ARGS__)
+#define LOGMEMWRITE(...)     LOGMASKED(LOG_MEM_WRITE,    __VA_ARGS__)
+
 
 DEFINE_DEVICE_TYPE(H89BUS_LEFT_SLOT, h89bus_left_slot_device, "h89bus_lslot", "H-89 left (memory) slot")
 
@@ -111,22 +124,45 @@ void h89bus_right_slot_device::device_resolve_objects()
 DEFINE_DEVICE_TYPE(H89BUS, h89bus_device, "h89bus", "H-89/Z-90 bus")
 
 ROM_START(h89bus)
-	ROM_REGION(0x100, "iodecode", 0)
+
+	// I/O Decoder
+	// -----------
+	ROM_REGION(0x100, "io_decode", 0)
 	// H88 I/O decoding
 	ROM_SYSTEM_BIOS(0, "444-43", "Heath/Zenith stock decoding (444-43)")
-	ROMX_LOAD("444-43.bin", 0x000000, 0x000100, CRC(3e0315f4) SHA1(11da9a9145de07f1f3bf1270a10e059dff30c693), ROM_BIOS(0))
+	ROMX_LOAD("444-43.u550",  0x000000, 0x000100, CRC(3e0315f4) SHA1(11da9a9145de07f1f3bf1270a10e059dff30c693), ROM_BIOS(0))
 
-	// H89 I/O decoding
+	// H89/Z90 I/O decoding
 	ROM_SYSTEM_BIOS(1, "444-61", "Z-37 decoding (444-61)")
-	ROMX_LOAD("444-61.bin", 0x000000, 0x000100, CRC(0b3c129f) SHA1(92da6484d1339160400d6bc75578a977c5e4d23e), ROM_BIOS(1))
+	ROMX_LOAD("444-61.u550",  0x000000, 0x000100, CRC(0b3c129f) SHA1(92da6484d1339160400d6bc75578a977c5e4d23e), ROM_BIOS(1))
 
 	// MMS (Magnolia Micro Systems) I/O decoding
 	ROM_SYSTEM_BIOS(2, "444-61c", "MMS decoding (444-61c)")
-	ROMX_LOAD( "444-61c.bin",  0x000000, 0x000100, CRC(e7122061) SHA1(33c124f44c0f9cb99c9b17ad15411b4bc6407eae), ROM_BIOS(2))
+	ROMX_LOAD("444-61c.u550", 0x000000, 0x000100, CRC(e7122061) SHA1(33c124f44c0f9cb99c9b17ad15411b4bc6407eae), ROM_BIOS(2))
 
 	// CDR Systems
 	ROM_SYSTEM_BIOS(3, "cdr86", "CDR decoding (CDR86)")
-	ROMX_LOAD( "cdr86.bin",  0x000000, 0x000100, CRC(d35e4063) SHA1(879f9d265d77f8a74c70febd9a80d6896ab8ec7e), ROM_BIOS(3))
+	ROMX_LOAD("cdr86.u550",   0x000000, 0x000100, CRC(d35e4063) SHA1(879f9d265d77f8a74c70febd9a80d6896ab8ec7e), ROM_BIOS(3))
+
+
+	// Primary Memory Decoder
+	// ----------------------
+	ROM_REGION(0x100, "mem_pri_decode", 0)
+	// Newest PROM supports 64k and ORG0
+	ROM_LOAD("444-66.u517", 0x0000, 0x0100, CRC(ad94a5df) SHA1(33b478e2c19da1cfa301506866d6810e4171556d))
+
+	// Alternative PROM - 444-42, original does not support 64k or ORG0
+	// ROM_LOAD("444-42.u517", 0x0000, 0x0100, CRC(ad94a5df) SHA1(33b478e2c19da1cfa301506866d6810e4171556d))
+
+
+	// Secondary Memory Decoder
+	// ------------------------
+	ROM_REGION(0x20, "mem_sec_decode", 0)
+	// Newest PROM, supports 4k Code ROM chips
+	ROM_LOAD("444-83.u516", 0x0000, 0x0020, CRC(20159109) SHA1(dec556bbee8b05109582f0e0a81b3ec662035e66))
+
+	// Alt PROM - 444-41, for 2k Code ROM chips.
+	// ROM_LOAD("444-41.u516",  0x000000, 0x000020, CRC(1232f9f6) SHA1(44ee87741e25c51e0f6dc4d5f0408c5d9ec499a5))
 ROM_END
 
 //**************************************************************************
@@ -146,7 +182,9 @@ h89bus_device::h89bus_device(const machine_config &mconfig, device_type type, co
 	device_t(mconfig, type, tag, owner, clock),
 	m_program_space(*this, finder_base::DUMMY_TAG, -1),
 	m_io_space(*this, finder_base::DUMMY_TAG, -1),
-	m_decode_prom(*this, "iodecode"),
+	m_io_decode_prom(*this, "io_decode"),
+	m_mem_primary_decode_prom(*this,"mem_pri_decode"),
+	m_mem_secondary_decode_prom(*this,"mem_sec_decode"),
 	m_out_int3_cb(*this),
 	m_out_int4_cb(*this),
 	m_out_int5_cb(*this),
@@ -157,7 +195,20 @@ h89bus_device::h89bus_device(const machine_config &mconfig, device_type type, co
 	m_in_gpp_cb(*this, 0),
 	m_out_tlb_cb(*this),
 	m_out_nmi_cb(*this),
-	m_out_gpp_cb(*this)
+	m_out_gpp_cb(*this),
+	m_in_bank0_cb(*this, 0),
+	m_in_bank1_cb(*this, 0),
+	m_in_bank2_cb(*this, 0),
+	m_out_bank0_cb(*this),
+	m_out_bank1_cb(*this),
+	m_out_bank2_cb(*this),
+	m_in_sys_rom_cb(*this, 0),
+	m_in_opt_rom_cb(*this, 0),
+	m_in_opt_ram_cb(*this, 0),
+	m_in_flpy_ram_cb(*this, 0),
+	m_in_flpy_rom_cb(*this, 0),
+	m_out_opt_ram_cb(*this),
+	m_out_flpy_ram_cb(*this)
 {
 }
 
@@ -176,7 +227,10 @@ const tiny_rom_entry *h89bus_device::device_rom_region() const
 
 void h89bus_device::device_start()
 {
+	m_program_space->install_readwrite_handler(0x0000, 0xffff, emu::rw_delegate(*this, FUNC(h89bus_device::mem_dispatch_r)), emu::rw_delegate(*this, FUNC(h89bus_device::mem_dispatch_w)));
 	m_io_space->install_readwrite_handler(0x0000, 0x00ff, emu::rw_delegate(*this, FUNC(h89bus_device::io_dispatch_r)), emu::rw_delegate(*this, FUNC(h89bus_device::io_dispatch_w)));
+
+	save_item(NAME(jj501_502));
 }
 
 void h89bus_device::add_h89bus_left_card(device_h89bus_left_card_interface &card)
@@ -229,6 +283,17 @@ int h89bus_device::get_mem1()
 	return m_mem1;
 }
 
+void h89bus_device::set_jj501_502(u8 val)
+{
+	// place it in the correct position for the PROM lookup
+	jj501_502 = val << 5;
+}
+
+u8 h89bus_device::mem_m1_r(offs_t offset)
+{
+	return mem_dispatch_r(offset);
+}
+
 u8 h89bus_device::read_gpp()
 {
 	return m_in_gpp_cb(0);
@@ -238,29 +303,71 @@ void h89bus_device::write_gpp(u8 data)
 	m_out_gpp_cb(0, data);
 }
 
+/*
+                                   PORT
+    Use                      |  Hex  |  Octal
+   --------------------------+-------+---------
+    Not specified, available |  0-77 |   0-167
+    Disk I/O #1              | 78-7B | 170-173
+    Disk I/O #2              | 7C-7F | 174-177
+    Not specified, reserved  | 80-CF | 200-317
+    DCE Serial I/O           | D0-D7 | 320-327
+    DTE Serial I/O           | D8-DF | 330-337
+    DCE Serial I/O           | EO-E7 | 340-347
+    Console I/O              | E8-EF | 350-357
+    NMI                      | F0-F1 | 360-361
+    General purpose port     |    F2 |     362
+    Cassette I/O(MTR-88 only)| F8-F9 | 370-371
+    NMI                      | FA-FB | 372-373
+
+    Disk I/O #1 - 0170-0173 (0x78-0x7b)
+       Heath Options
+         - H37 5-1/4" Soft-sectored Controller - Requires MTR-90 ROM
+         - H47 Dual 8" Drives - Requires MTR-89 or MTR-90 ROM
+         - H67 8" Hard disk + 8" Floppy Drives - Requires MTR-90 ROM
+
+    Disk I/O #2 - 0174-0177 (0x7c-0x7f)
+       Heath Options
+         - 5-1/4" Hard-sectored Controller - supported by all ROMs
+         - H47 Dual 8" Drives - Requires MTR-89 or MTR-90 ROM
+         - H67 8" Hard disk + 8" Floppy Drives - MTR-90 ROM
+
+*/
 u8 h89bus_device::io_dispatch_r(offs_t offset)
 {
 	u8 retval = 0;
 
-	u16 decode = m_decode_prom[offset] ^ 0xff;
+	u8 decode = m_io_decode_prom[offset] ^ 0xff;
 
 	if (decode)
 	{
-		if ((decode & H89_GPP) && ((offset & 7) == 2)) return m_in_gpp_cb(offset);
-		if (decode & H89_NMI) return m_in_nmi_cb(offset);
-		if (decode & H89_TERM) return m_in_tlb_cb(offset & 7);
+		if ((decode & H89_IO_GPP) && ((offset & 7) == 2))
+		{
+			retval = m_in_gpp_cb(offset);
+			goto done;
+		}
+		if (decode & H89_IO_NMI)
+		{
+			retval = m_in_nmi_cb(offset);
+			goto done;
+		}
+		if (decode & H89_IO_TERM)
+		{
+			retval = m_in_tlb_cb(offset & 7);
+			goto done;
+		}
 
 		for (device_h89bus_right_card_interface &entry : m_right_device_list)
 		{
 			if (entry.m_p506_signals)
 			{
 				// p506 does not have CASS or LP
-				retval |= entry.read(decode & ~(H89_CASS | H89_LP), offset & 7);
+				retval |= entry.read(decode & ~(H89_IO_CASS | H89_IO_LP), offset & 7);
 			}
 			else
 			{
 				// p504/p505 does not have FLPY
-				retval |= entry.read(decode & ~H89_FLPY , offset & 7);
+				retval |= entry.read(decode & ~H89_IO_FLPY , offset & 7);
 			}
 		}
 	}
@@ -268,33 +375,49 @@ u8 h89bus_device::io_dispatch_r(offs_t offset)
 	// service left-slot cards that have a motherboard connection to snoop the I/O space
 	for (device_h89bus_left_card_interface &entry : m_left_device_list)
 	{
-		retval |= entry.read(H89_IO, offset & 0x1fff);
+		retval |= entry.read(offset & 0xff);
 	}
+
+done:
+	LOGPORTREAD("port read - offset: 0x%02x - 0x%02x\n", offset, retval);
 
 	return retval;
 }
 
 void h89bus_device::io_dispatch_w(offs_t offset, u8 data)
 {
-	u16 decode = m_decode_prom[offset] ^ 0xff;
+	LOGPORTWRITE("port write - offset: 0x%02x - 0x%02x\n", offset, data);
+
+	u8 decode = m_io_decode_prom[offset] ^ 0xff;
 
 	if (decode)
 	{
-		if ((decode & H89_GPP) && ((offset & 7) == 2)) m_out_gpp_cb(offset, data);
-		if (decode & H89_NMI) { m_out_nmi_cb(offset, data); return; }
-		if (decode & H89_TERM) { m_out_tlb_cb(offset & 7, data); return; }
+		if ((decode & H89_IO_GPP) && ((offset & 7) == 2))
+		{
+			m_out_gpp_cb(offset, data);
+		}
+		if (decode & H89_IO_NMI)
+		{
+			m_out_nmi_cb(offset, data);
+			return;
+		}
+		if (decode & H89_IO_TERM)
+		{
+			m_out_tlb_cb(offset & 7, data);
+			return;
+		}
 
 		for (device_h89bus_right_card_interface &entry : m_right_device_list)
 		{
 			if (entry.m_p506_signals)
 			{
 				// p506 does not have CASS or LP
-				entry.write(decode &  ~(H89_CASS | H89_LP), offset & 7, data);
+				entry.write(decode &  ~(H89_IO_CASS | H89_IO_LP), offset & 7, data);
 			}
 			else
 			{
 				// p504/p505 does not have FLPY
-				entry.write(decode & ~H89_FLPY, offset & 7, data);
+				entry.write(decode & ~H89_IO_FLPY, offset & 7, data);
 			}
 		}
 	}
@@ -302,7 +425,200 @@ void h89bus_device::io_dispatch_w(offs_t offset, u8 data)
 	// service left-slot cards that have a motherboard connection to snoop the I/O space
 	for (device_h89bus_left_card_interface &entry : m_left_device_list)
 	{
-		entry.write(H89_IO, offset, data);
+		entry.write(offset & 0xff, data);
+	}
+}
+
+/*
+  The H89 supported 16K, 32K, 48K, or 64K of RAM. The first 8K of address space
+  is reserved for the monitor ROM, floppy ROM, and scratch pad RAM. For 16k-48K
+  sizes, the upper 8k of memory is remapped to the first 8K when the ROM is disabled.
+  For systems with 64K of RAM, the upper half of the expansion board is permanently
+  mapped to the lower 8K. Even when ROM is mapped, any writes will still occur
+  to the RAM.
+
+  H89 Lower 8K address map
+
+        HDOS Mode                       CP/M Mode
+  ------------------- 0x2000 (8k) ----------------
+  |   Floppy ROM   |                |            |
+  ------------------- 0x1800 (6k)   |            |
+  |   Floppy RAM   |                |            |
+  ------------------- 0x1400 (5k)   |    RAM     |
+  |      Open      |                |            |
+  ------------------- 0x1000 (4k)   |            |
+  |   MTR-90 ROM   |                |            |
+  -................-- 0x0800 (2k)   |            |
+  | MTR(88/89) ROM |                |            |
+  ------------------- 0x0000 (0k) ----------------
+
+
+        16K RAM Example
+
+      HDOS                           CP/M
+  ------------- 24k
+  |    RAM    |  ------+
+  ------------- 16k    |         ------------- 16k
+  |    RAM    |  ------------->  |    RAM    |
+  -------------  8k    |         -------------  8k
+  |    ROM    |        +------>  |    RAM    |
+  -------------  0k              -------------  0k
+
+*/
+u8 h89bus_device::mem_dispatch_r(offs_t offset)
+{
+	u8 retval = 0;
+	bool checkedCards = false;
+
+	u8 val = (m_mem1 << 7) | jj501_502 | 0x08 | BIT(offset, 13, 3);
+	u8 decode = m_mem_primary_decode_prom[val] ^ 0xff;
+
+	LOGMEMREAD("mem_r - offset: 0x%04x val: 0x%02x decode: 0x%02x\n", offset, val, decode);
+
+	if (decode)
+	{
+		if (decode & H89_MEM_PRI_NOMEM)
+		{
+			LOGMEMREAD("mem_r - PRI_NOMEM\n");
+			// return default 0.
+			goto done;
+		}
+		if ((decode & H89_MEM_PRI_U516))
+		{
+			u8 sec_val = (m_fmwe << 4) | ((BIT(decode, 7) ^ 1) << 3) | BIT(offset, 10, 3);
+			u8 sec_decode = m_mem_secondary_decode_prom[sec_val] ^ 0xff;
+			LOGMEMREAD("mem_r - PRI_U516 - sec_val: 0x%02x sec_decode: 0x%02x\n", sec_decode, sec_val);
+
+			for (device_h89bus_left_card_interface &entry : m_left_device_list)
+			{
+				retval |= entry.mem_read(decode, sec_decode, offset);
+			}
+			checkedCards = true;
+
+			if (sec_decode & H89_MEM_SEC_SYS_ROM)
+			{
+				LOGMEMREAD("mem_r - SEC_SYS_ROM\n");
+				retval = m_in_sys_rom_cb(offset & 0x1fff);
+			}
+			if (sec_decode & H89_MEM_SEC_OPT_ROM)
+			{
+				LOGMEMREAD("mem_r - SEC_OPT_ROM\n");
+				retval = m_in_opt_rom_cb(offset & 0x1fff);
+			}
+			if (sec_decode & H89_MEM_SEC_OPT_RAM)
+			{
+				LOGMEMREAD("mem_r - SEC_OPT_RAM\n");
+				retval = m_in_opt_ram_cb(offset & 0x1fff);
+			}
+			if (sec_decode & H89_MEM_SEC_FPY_RAM)
+			{
+				LOGMEMREAD("mem_r - SEC_FPY_RAM\n");
+				retval = m_in_flpy_ram_cb(offset & 0x1fff);
+			}
+			if (sec_decode & H89_MEM_SEC_FPY_ROM)
+			{
+				LOGMEMREAD("mem_r - SEC_FPY_ROM\n");
+				retval = m_in_flpy_rom_cb(offset & 0x1fff);
+			}
+		}
+
+		if (!checkedCards)
+		{
+			for (device_h89bus_left_card_interface &entry : m_left_device_list)
+			{
+				u8 sec_select = 0;
+
+				retval |= entry.mem_read(decode, sec_select, offset);
+			}
+		}
+
+		if (decode & H89_MEM_PRI_RAS0)
+		{
+			LOGMEMREAD("mem_r - PRI_RAS0\n");
+			retval = m_in_bank0_cb(offset & 0x3fff);
+		}
+		if (decode & H89_MEM_PRI_RAS1)
+		{
+			LOGMEMREAD("mem_r - PRI_RAS1\n");
+			retval = m_in_bank1_cb(offset & 0x3fff);
+		}
+		if (decode & H89_MEM_PRI_RAS2)
+		{
+			LOGMEMREAD("mem_r - PRI_RAS2\n");
+			retval = m_in_bank2_cb(offset & 0x3fff);
+		}
+	}
+
+done:
+	LOGMEMREAD("mem_r - retval: decode: 0x%02x\n", retval);
+
+	return retval;
+}
+
+void h89bus_device::mem_dispatch_w(offs_t offset, u8 data)
+{
+	u8 val = (m_mem1 << 7) | jj501_502 | 0x18 | BIT(offset, 13, 3);
+	u8 decode = m_mem_primary_decode_prom[val] ^ 0xff;
+	bool checkedCards = false;
+
+	LOGMEMWRITE("mem_w - offset: 0x%04x decode: 0x%02x data: 0x%02x\n", offset, decode, data);
+
+	if (decode)
+	{
+		if (decode & H89_MEM_PRI_NOMEM)
+		{
+			// no memory, do nothing with the write
+			return;
+		}
+		if ((decode & H89_MEM_PRI_U516))
+		{
+			u8 sec_val = (m_fmwe << 4) | ((BIT(decode, 7) ^ 1) << 3) | BIT(offset, 10, 3);
+			u8 sec_decode = m_mem_secondary_decode_prom[sec_val] ^ 0xff;
+			LOGMEMWRITE("mem_w - PRI_U516 - sec_decode: 0x%02x sec_decode: 0x%02x\n", sec_decode, sec_val);
+
+			for (device_h89bus_left_card_interface &entry : m_left_device_list)
+			{
+				entry.mem_write(decode, sec_decode, offset, data);
+			}
+			checkedCards = true;
+
+			if (sec_decode & H89_MEM_SEC_OPT_RAM)
+			{
+				LOGMEMWRITE("mem_w - SEC_OPT_RAM\n");
+				m_out_opt_ram_cb(offset & 0x1fff, data);
+			}
+			if (sec_decode & H89_MEM_SEC_FPY_RAM)
+			{
+				LOGMEMWRITE("mem_w - SEC_FPY_RAM\n");
+				m_out_flpy_ram_cb(offset & 0x1fff, data);
+			}
+		}
+
+		if (!checkedCards)
+		{
+			for (device_h89bus_left_card_interface &entry : m_left_device_list)
+			{
+				u8 sec_select = 0;
+
+				entry.mem_write(decode, sec_select, offset, data);
+			}
+		}
+
+		if (decode & H89_MEM_PRI_RAS0)
+		{
+			LOGMEMWRITE("mem_w - PRI_RAS0\n");
+			m_out_bank0_cb(offset & 0x3fff, data);
+		}
+		if (decode & H89_MEM_PRI_RAS1)
+		{
+			LOGMEMWRITE("mem_w - PRI_RAS1\n");
+			m_out_bank1_cb(offset & 0x3fff, data);
+		}
+		if (decode & H89_MEM_PRI_RAS2)
+		{
+			LOGMEMWRITE("mem_w - PRI_RAS2\n");
+			m_out_bank2_cb(offset & 0x3fff, data);
+		}
 	}
 }
 
@@ -323,6 +639,8 @@ void h89bus_device::set_int5_line(int state)
 
 void h89bus_device::set_fmwe_line(int state)
 {
+	m_fmwe = state;
+
 	m_out_fmwe_cb(state);
 }
 

@@ -131,7 +131,7 @@ u8 h89bus_z37_device::data_r()
 
 void h89bus_z37_device::write(u8 select_lines, u8 offset, u8 data)
 {
-	if (!(select_lines & h89bus_device::H89_CASS))
+	if (!(select_lines & h89bus_device::H89_IO_CASS))
 	{
 		return;
 	}
@@ -157,7 +157,7 @@ void h89bus_z37_device::write(u8 select_lines, u8 offset, u8 data)
 
 u8 h89bus_z37_device::read(u8 select_lines, u8 offset)
 {
-	if (!(select_lines & h89bus_device::H89_CASS))
+	if (!(select_lines & h89bus_device::H89_IO_CASS))
 	{
 		return 0;
 	}

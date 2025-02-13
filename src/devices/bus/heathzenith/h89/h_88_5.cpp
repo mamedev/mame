@@ -82,7 +82,7 @@ h_88_5_device::h_88_5_device(const machine_config &mconfig, const char *tag, dev
 
 void h_88_5_device::write(u8 select_lines, u8 reg, u8 val)
 {
-	if (select_lines & h89bus_device::H89_CASS)
+	if (select_lines & h89bus_device::H89_IO_CASS)
 	{
 		LOGREG("%s: reg: %d val: 0x%02x\n", FUNCNAME, reg, val);
 
@@ -92,7 +92,7 @@ void h_88_5_device::write(u8 select_lines, u8 reg, u8 val)
 
 u8 h_88_5_device::read(u8 select_lines, u8 reg)
 {
-	if (select_lines & h89bus_device::H89_CASS)
+	if (select_lines & h89bus_device::H89_IO_CASS)
 	{
 		u8 val = m_uart->read(reg);
 

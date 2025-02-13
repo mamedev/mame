@@ -118,7 +118,7 @@ heath_h17_fdc_device::heath_h17_fdc_device(const machine_config &mconfig, const 
 
 void heath_h17_fdc_device::write(u8 select_lines, u8 offset, u8 data)
 {
-	if (!(select_lines & h89bus_device::H89_FLPY))
+	if (!(select_lines & h89bus_device::H89_IO_FLPY))
 	{
 		return;
 	}
@@ -250,7 +250,7 @@ void heath_h17_fdc_device::ctrl_w(u8 val)
 
 u8 heath_h17_fdc_device::read(u8 select_lines, u8 offset)
 {
-	if (!(select_lines & h89bus_device::H89_FLPY))
+	if (!(select_lines & h89bus_device::H89_IO_FLPY))
 	{
 		return 0;
 	}
