@@ -519,7 +519,7 @@ uint16_t ata_hle_device_base::dma_r()
 			if ((m_status & IDE_STATUS_DRQ) && single_word_dma_mode() >= 0)
 				set_dmarq(ASSERT_LINE);
 
-			LOGREADDATA("%s device %d dma_r 0x%04x\n", data);
+			LOGREADDATA("%s device %d dma_r 0x%04x\n", machine().describe_context(), m_csel, data);
 			return data;
 		}
 	}
@@ -571,7 +571,7 @@ uint16_t ata_hle_device_base::command_r(offs_t offset)
 				else
 				{
 					uint16_t data = device_selected() ? read_data() : 0xffff;
-					LOGREADDATA("%s device %d cs0_r data 0x%04x\n", data);
+					LOGREADDATA("%s device %d cs0_r data 0x%04x\n", machine().describe_context(), m_csel, data);
 					return data;
 				}
 				break;
@@ -727,9 +727,9 @@ void ata_hle_device_base::dma_w(uint16_t data)
 
 void ata_hle_device_base::command_w(offs_t offset, uint16_t data)
 {
-	if ((m_status & (IDE_STATUS_DRQ | IDE_STATUS_BSY)) && offset != IDE_CS0_DATA_RW)
+	if ((m_status & (IDE_STATUS_DRQ | IDE_STATUS_BSY)) && offset != IDE_CS0_DATA_RW && (offset != IDE_CS0_DEVICE_HEAD_RW || data != m_device_head))
 	{
-		LOGREADCOMPLETED("%s device %d cs0_w (0x%x) aborted after %d bytes\n", machine().describe_context(), m_csel, offset, m_buffer_offset);
+		LOG("%s device %d cs0_w (0x%x) aborted after %d bytes (%02x)\n", machine().describe_context(), m_csel, offset, m_buffer_offset, m_command);
 		stop_busy();
 		m_status &= ~IDE_STATUS_DRQ;
 		set_dmarq(CLEAR_LINE);
