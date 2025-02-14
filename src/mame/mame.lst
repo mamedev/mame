@@ -20793,6 +20793,16 @@ spk306us
 drw80pk2
 drw80pkr
 
+@source:igt/fortune1.cpp
+babydad
+babypkr
+blckjack
+bpoker
+fortune1
+videocba
+videodad
+videopkr
+
 @source:igt/gkigt.cpp
 bmoonii
 brhino
@@ -21475,16 +21485,6 @@ spset005
 spset015
 spset026
 spss4240
-
-@source:igt/videopkr.cpp
-babydad
-babypkr
-blckjack
-bpoker
-fortune1
-videocba
-videodad
-videopkr
 
 @source:informer/informer_207_100.cpp
 in207100
