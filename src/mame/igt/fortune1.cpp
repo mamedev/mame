@@ -1204,7 +1204,8 @@ uint8_t babypkr_state::baby_sound_p1_r()
 	m_hp_2 = (~m_p24_data >> 5) & 1;
 	m_bell = (m_p1 >> 4) & 1;
 	m_aux3 = (m_p1 >> 3) & 1;
-	return m_c_io | (m_hp_1 << 1) | (m_hp_2 << 2) | 0xf8;}
+	return m_c_io | (m_hp_1 << 1) | (m_hp_2 << 2) | 0xf8;
+}
 
 void babypkr_state::baby_sound_p3_w(uint8_t data)
 {
