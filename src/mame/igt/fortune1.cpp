@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Roberto Fresca, Grull Osgo
+// copyright-holders: Roberto Fresca, Grull Osgo
 /*************************************************************************
 
   Fortune I - Baby - Video Poker.
@@ -1285,9 +1285,11 @@ void babypkr_state::i8751_io_port(address_map &map)
 	map(0xf000, 0xf000).w(FUNC(babypkr_state::bpoker_wd_reset_w));
 }
 
+
 /*****************************************
 *              Input Ports               *
 *****************************************/
+
 static INPUT_PORTS_START( videopkr )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_GAMBLE_DOOR )
@@ -1554,7 +1556,7 @@ void videopkr_state::machine_start()
 void babypkr_state::machine_start()
 {
 	videopkr_state::machine_start();
-
+	m_p24_data = 0;
 	m_top_lamps.resolve();
 }
 
