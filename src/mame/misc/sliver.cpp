@@ -106,8 +106,8 @@ protected:
 	virtual void device_post_load() override;
 
 private:
-	uint16_t m_io_offset = 0;
-	uint16_t m_io_reg[IO_SIZE]{};
+	uint8_t m_io_offset = 0;
+	uint8_t m_io_reg[IO_SIZE]{};
 	uint16_t m_fifo[FIFO_SIZE]{};
 	uint16_t m_fptr = 0;
 
@@ -132,8 +132,8 @@ private:
 	void fifo_flush_w(uint16_t data);
 	void jpeg1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void jpeg2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void io_offset_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void io_data_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void io_offset_w(offs_t offset, uint8_t data);
+	void io_data_w(offs_t offset, uint8_t data);
 	void sound_w(uint16_t data);
 	void oki_setbank(uint8_t data);
 
@@ -297,15 +297,11 @@ void sliver_state::render_jpeg()
 				uint8_t g = buffer[0][(x*3)+1];
 				uint8_t r = buffer[0][(x*3)+2];
 				plot_pixel_rgb(x - x_offset + m_jpeg_x, y - y_offset - m_jpeg_y, r, g, b);
-
 			}
-
 		}
 
 		jpeg_finish_decompress(&cinfo);
 		jpeg_destroy_decompress(&cinfo);
-
-
 	}
 
 }
@@ -318,18 +314,20 @@ void sliver_state::jpeg2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 }
 
-void sliver_state::io_offset_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void sliver_state::io_offset_w(offs_t offset, uint8_t data)
 {
-	COMBINE_DATA(&m_io_offset);
+	m_io_offset = data;
 }
 
-void sliver_state::io_data_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void sliver_state::io_data_w(offs_t offset, uint8_t data)
 {
 	if (m_io_offset < IO_SIZE)
 	{
 		int tmpx, tmpy;
-		COMBINE_DATA(&m_io_reg[m_io_offset]);
+		m_io_reg[m_io_offset] = data;
 
+		// TODO: this doesn't match ZR36050 control registers
+		// is it really accessing FPGA instead, simplifying Zoran access?
 		tmpy = m_io_reg[0x1a] + (m_io_reg[0x1b] << 8) - m_io_reg[0x20]; //0x20  ???
 		tmpx = m_io_reg[0x1e] + (m_io_reg[0x1f] << 8);
 
@@ -360,10 +358,11 @@ void sliver_state::sliver_map(address_map &map)
 	map(0x100003, 0x100003).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x100005, 0x100005).w("ramdac", FUNC(ramdac_device::mask_w));
 
-	map(0x300002, 0x300003).noprw(); // bit 0 tested, writes 0xe0 and 0xc0 - both r and w at the end of interrupt code
+//  map(0x200000, 0x20001f) // memory controller?
 
-	map(0x300004, 0x300005).w(FUNC(sliver_state::io_offset_w)); //unknown i/o device
-	map(0x300006, 0x300007).w(FUNC(sliver_state::io_data_w));
+//  map(0x300003, 0x300003) Zoran access lines? Read in irq 2 service
+	map(0x300005, 0x300005).w(FUNC(sliver_state::io_offset_w)); //unknown i/o device
+	map(0x300007, 0x300007).w(FUNC(sliver_state::io_data_w));
 
 	map(0x400000, 0x400001).portr("P1_P2");
 	map(0x400002, 0x400003).portr("SYSTEM");
@@ -374,7 +373,7 @@ void sliver_state::sliver_map(address_map &map)
 	map(0x40000c, 0x40000d).w(FUNC(sliver_state::jpeg1_w));
 	map(0x40000e, 0x40000f).w(FUNC(sliver_state::jpeg2_w));
 
-	map(0x400010, 0x400015).nopw(); //unknown
+	map(0x400010, 0x400015).nopw(); //unknown, $400012 write at end of irq 3 service
 	map(0x400016, 0x400017).w(FUNC(sliver_state::sound_w));
 	map(0x400018, 0x400019).nopw(); //unknown
 
@@ -458,7 +457,7 @@ static INPUT_PORTS_START( sliver )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN ) //jpeg ready flag
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // jpeg ready flag, ZR36050 /STOP?
 	PORT_BIT( 0xffa4, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")
@@ -538,6 +537,7 @@ void sliver_state::sliver(machine_config &config)
 	m_screen->set_screen_update(FUNC(sliver_state::screen_update));
 
 	PALETTE(config, "palette").set_entries(0x100);
+	// AT76C176
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, "palette"));
 	ramdac.set_addrmap(0, &sliver_state::ramdac_map);
 
