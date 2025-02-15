@@ -55,6 +55,8 @@ public:
 
 	[[maybe_unused]] void side_select_w(int state);
 
+	static constexpr feature_type unemulated_features() { return feature::DISK; }
+
 protected:
 	static constexpr u8 MAX_FLOPPY_DRIVES = 3;
 

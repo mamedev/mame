@@ -4,13 +4,10 @@
 
   Heathkit H-17 Floppy Disk Controller
 
-
   Model number: H-88-1
 
   TODO
-   - Mame core must support hard-sectored disk images.
    - used floppy clock bits to clock USRT received clock.
-   - Add support for a heath hard-sectored disk support (h17disk).
 
 ****************************************************************************/
 

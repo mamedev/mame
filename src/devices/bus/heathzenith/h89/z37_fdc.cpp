@@ -37,7 +37,7 @@
 
 
 h89bus_z37_device::h89bus_z37_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock):
-	device_t(mconfig, H89BUS_Z37, tag, owner, 0),
+	device_t(mconfig, H89BUS_Z_89_37, tag, owner, 0),
 	device_h89bus_right_card_interface(mconfig, *this),
 	m_fdc(*this, "z37_fdc"),
 	m_floppies(*this, "z37_fdc:%u", 0U),
@@ -246,4 +246,4 @@ void h89bus_z37_device::set_drq(int state)
 	m_intr_cntrl->set_drq(m_drq_allowed ? state : CLEAR_LINE);
 }
 
-DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_Z37, device_h89bus_right_card_interface, h89bus_z37_device, "h89_z37", "Heathkit Z-37 Floppy Disk Controller");
+DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_Z_89_37, device_h89bus_right_card_interface, h89bus_z37_device, "h89_z_89_37", "Heathkit Z-37 Floppy Disk Controller");

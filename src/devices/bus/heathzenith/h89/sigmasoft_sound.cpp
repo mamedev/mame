@@ -205,10 +205,10 @@ void h89bus_sigmasoft_snd_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
 
-	AY8910(config, m_ay8910, XTAL(8'000'000)/4); /* ??? 2.000 MHz */
+	AY8910(config, m_ay8910, XTAL(8'000'000) / 4); /* ??? 2.000 MHz */
 	m_ay8910->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
-}   // anonymous namespace
+} // anonymous namespace
 
 DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_SIGMASOFT_SND, device_h89bus_right_card_interface, h89bus_sigmasoft_snd_device, "h89_sigma_snd", "SigmaSoft Sound Effects Board");

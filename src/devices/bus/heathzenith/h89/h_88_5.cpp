@@ -209,6 +209,6 @@ void h_88_5_device::device_add_mconfig(machine_config &config)
 	TIMER(config, "kansas_r").configure_periodic(FUNC(h_88_5_device::kansas_r), attotime::from_hz(40000));
 }
 
-}
+} // anonymous namespace
 
-DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_H_88_5, device_h89bus_right_card_interface, h_88_5_device, "h89h_88_5", "Heath H-88-5 Cassette Interface Board");
+DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_H_88_5, device_h89bus_right_card_interface, h_88_5_device, "h89_h_88_5", "Heath H-88-5 Cassette Interface Board");

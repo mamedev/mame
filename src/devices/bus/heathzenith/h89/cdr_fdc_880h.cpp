@@ -394,6 +394,7 @@ void cdr_fdc_880h_device::set_drq(int state)
 	}
 
 }
-}
 
-DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_CDR_FDC_880H, device_h89bus_right_card_interface, cdr_fdc_880h_device, "cdr_fdc_880h", "CDR FDC-880H Soft-sectored Controller");
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_CDR_FDC_880H, device_h89bus_right_card_interface, cdr_fdc_880h_device, "h89_cdr_fdc_880h", "CDR FDC-880H Soft-sectored Controller");

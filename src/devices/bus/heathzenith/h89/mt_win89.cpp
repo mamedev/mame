@@ -36,6 +36,7 @@
 #endif
 
 
+namespace {
 
 class mt_win89_parallel_port : public device_t, public device_h89bus_left_card_interface
 {
@@ -275,5 +276,6 @@ const tiny_rom_entry *mt_win89_parallel_port::device_rom_region() const
 	return ROM_NAME(mtwin89);
 }
 
+} // anonymous namespace
 
-DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_MT_WIN89_PARALLEL, device_h89bus_left_card_interface, mt_win89_parallel_port, "mt_win89_parallel_port", "Micronics Technology Win89 Parallel Board");
+DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_MT_WIN89_PARALLEL, device_h89bus_left_card_interface, mt_win89_parallel_port, "h89_mt_win89", "Micronics Technology Win89 Parallel Board");

@@ -47,6 +47,7 @@
 #include "bus/heathzenith/h89/h89bus.h"
 #include "bus/heathzenith/h89/intr_cntrl.h"
 #include "bus/heathzenith/h89/cdr_fdc_880h.h"
+#include "bus/heathzenith/h89/h17_fdc.h"
 #include "bus/heathzenith/h89/h_88_3.h"
 #include "bus/heathzenith/h89/h_88_5.h"
 #include "bus/heathzenith/h89/mms77316_fdc.h"
@@ -831,7 +832,7 @@ void h89_base_state::h89_right_cards(device_slot_interface &device)
 	device.option_add("h_88_5",  H89BUS_H_88_5);
 	device.option_add("ss_snd",  H89BUS_SIGMASOFT_SND);
 	device.option_add("z_89_11", H89BUS_Z_89_11);
-	device.option_add("z37fdc",  H89BUS_Z37).machine_config(
+	device.option_add("z37fdc",  H89BUS_Z_89_37).machine_config(
 		[this](device_t *device)
 		{
 			downcast<h89bus_z37_device &>(*device).set_intr_cntrl(m_intr_socket);
@@ -850,6 +851,7 @@ void h89_base_state::h89_right_cards_mms(device_slot_interface &device)
 
 void h89_base_state::h89_right_p506_cards(device_slot_interface &device)
 {
+	device.option_add("h_88_1",    H89BUS_H_17_FDC);
 	device.option_add("h_88_3",    H89BUS_H_88_3);
 	device.option_add("ha_88_3",   H89BUS_HA_88_3);
 	device.option_add("ss_snd",    H89BUS_SIGMASOFT_SND);

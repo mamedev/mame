@@ -383,7 +383,7 @@ ha_88_3_device::ha_88_3_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-}   // anonymous namespace
+} // anonymous namespace
 
-DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_H_88_3, device_h89bus_right_card_interface, h_88_3_device, "h89h_88_3", "Heath H-88-3 3-port Serial Board");
-DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_HA_88_3, device_h89bus_right_card_interface, ha_88_3_device, "h89ha_88_3", "Heath HA-88-3 3-port Serial Board");
+DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_H_88_3, device_h89bus_right_card_interface, h_88_3_device, "h89_h_88_3", "Heath H-88-3 3-port Serial Board");
+DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_HA_88_3, device_h89bus_right_card_interface, ha_88_3_device, "h89_ha_88_3", "Heath HA-88-3 3-port Serial Board");

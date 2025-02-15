@@ -22,6 +22,7 @@
 #define LOGMEMREAD(...)      LOGMASKED(LOG_MEM_READ,     __VA_ARGS__)
 #define LOGMEMWRITE(...)     LOGMASKED(LOG_MEM_WRITE,    __VA_ARGS__)
 
+namespace {
 
 class wh_88_16_device : public device_t, public device_h89bus_left_card_interface
 {
@@ -94,5 +95,6 @@ void wh_88_16_device::device_add_mconfig(machine_config &config)
 	RAM(config, m_ram).set_default_size("16K");
 }
 
+} // anonymous namespace
 
-DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_WH_88_16, device_h89bus_left_card_interface, wh_88_16_device, "wh_88_16", "WH-88-16 16k RAM");
+DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_WH_88_16, device_h89bus_left_card_interface, wh_88_16_device, "h89_wh_88_16", "WH-88-16 16k RAM");
