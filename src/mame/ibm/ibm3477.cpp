@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert
+// copyright-holders:
 /*******************************************************************************
 
 Skeleton driver for IBM InfoWindow 3477 terminal.
