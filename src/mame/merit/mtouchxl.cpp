@@ -247,7 +247,8 @@ void mtxl_state::at486(machine_config &config)
 
 	// on board devices
 	ISA16_SLOT(config, "board1", 0, "mb:isabus", pc_isa16_cards, "ide", true).set_option_machine_config("ide", cdrom); // FIXME: determine ISA bus clock
-	ISA16_SLOT(config, "isa1", 0, "mb:isabus", pc_isa16_cards, "svga_dm", true); // original is a gd-5440
+	// TODO: original is a gd-5440, PCI only (svga_dm is '30)
+	ISA16_SLOT(config, "isa1", 0, "mb:isabus", pc_isa16_cards, "svga_dm", true);
 
 	ns16550_device &uart(NS16550(config, "ns16550", XTAL(1'843'200)));
 	uart.out_tx_callback().set("microtouch", FUNC(microtouch_device::rx));
