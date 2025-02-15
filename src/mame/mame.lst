@@ -20086,6 +20086,9 @@ husky
 @source:ibm/ibm3153.cpp
 ibm3153
 
+@source:ibm/ibm3477.cpp
+ibm3477                         // IBM InfoWindow 3477
+
 @source:ibm/ibm5100.cpp
 ibm5100
 ibm5110
