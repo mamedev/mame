@@ -555,8 +555,10 @@ namespace
     void news_iop_state::iop_map(address_map &map)
     {
         map.unmap_value_low();
+        // Silence unmapped read/write warnings during memory probe - whatever RAM is present will be installed over top of this region
+        map(0x00000000, 0x00ffffff).noprw();
+
         map(0x03000000, 0x0300ffff).rom().region("eprom", 0).mirror(0x007f0000);
-        map(0x00000000, 0x00ffffff).noprw(); // Silence unmapped read/write warnings during memory probe
 
         // IOP bus expansion I/O
         map(0x20000000, 0x20ffffff).rw(FUNC(news_iop_state::extio_bus_error_r),FUNC(news_iop_state::extio_bus_error_w)).mirror(0x1f000000);
@@ -1009,7 +1011,7 @@ namespace
         m_scc_external->out_txdb_callback().set(m_serial[1], FUNC(rs232_port_device::write_txd));
 
         // LANCE ethernet controller
-        AM7990(config, m_net);
+        AM7990(config, m_net, 20_MHz_XTAL);
         m_net->intr_out().set(FUNC(news_iop_state::iop_irq_w<LANCE>)).invert();
         m_net->dma_in().set([this](offs_t offset)
                             { return m_net_ram[(offset >> 1) & 0x1fff]; });
