@@ -5,12 +5,18 @@
   Taito JC System
 
 *************************************************************************/
+#ifndef MAME_TAITO_TAITOJC_H
+#define MAME_TAITO_TAITOJC_H
 
-#include "tc0780fpa.h"
+#pragma once
+
 #include "taitoio.h"
+#include "tc0780fpa.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
+
 
 class taitojc_state : public driver_device
 {
@@ -37,10 +43,10 @@ public:
 	{
 	}
 
-	void taitojc(machine_config &config);
+	void taitojc(machine_config &config) ATTR_COLD;
 
-	void init_dangcurv();
-	void init_taitojc();
+	void init_dangcurv() ATTR_COLD;
+	void init_taitojc() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -147,9 +153,9 @@ public:
 	{
 	}
 
-	void dendego(machine_config &config);
+	void dendego(machine_config &config) ATTR_COLD;
 
-	void init_dendego2();
+	void init_dendego2() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -169,3 +175,5 @@ private:
 
 	void dendego_map(address_map &map) ATTR_COLD;
 };
+
+#endif // MAME_TAITO_TAITOJC_H
