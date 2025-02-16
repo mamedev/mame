@@ -69,11 +69,6 @@ device_zxbus_card_interface::device_zxbus_card_interface(const machine_config &m
 {
 }
 
-void zxbus_device::install_shadow_io(memory_view::memory_view_entry &io_view)
-{
-	m_shadow_io_view = &io_view;
-}
-
 void device_zxbus_card_interface::interface_pre_start()
 {
 	if (!m_zxbus)

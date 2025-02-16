@@ -73,11 +73,7 @@ void tsconf_state::tsconf_update_bank0()
 
 void tsconf_state::update_io(int dos)
 {
-	if (dos)
-		m_io_shadow_view.select(0);
-	else
-		m_io_shadow_view.disable();
-
+	m_io_shadow_view.select(dos ? 1 : 0);
 	tsconf_update_bank0();
 }
 

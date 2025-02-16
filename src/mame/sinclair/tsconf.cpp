@@ -97,9 +97,12 @@ void tsconf_state::tsconf_io(address_map &map)
 	map(0xc0fd, 0xc0fd).mirror(0x3f00).lr8(NAME([this]() { return m_ay[m_ay_selected]->data_r(); }))
 		.w(FUNC(tsconf_state::tsconf_ay_address_w));
 
-	// IO: Shadow
 	map(0x0000, 0xffff).view(m_io_shadow_view);
-	m_io_shadow_view[0](0x0000, 0xffff).m(m_beta, FUNC(tsconf_beta_device::tsconf_beta_io));
+	m_io_shadow_view[0]; // !Shadow
+
+	// IO: Shadow
+	m_io_shadow_view[1](0x0000, 0xffff).m(m_beta, FUNC(tsconf_beta_device::tsconf_beta_io));
+	subdevice<zxbus_device>("zxbus")->set_io_space(m_io_shadow_view[0], m_io_shadow_view[1]);
 }
 
 void tsconf_state::tsconf_switch(address_map &map)

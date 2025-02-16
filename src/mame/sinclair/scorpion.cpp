@@ -334,6 +334,7 @@ void scorpion_state::scorpion_mem(address_map &map)
 void scorpion_state::scorpion_io(address_map &map)
 {
 	map.unmap_value_high();
+
 	map(0x0021, 0x0021).mirror(0x3fdc) // 1FFD | 00xxxxxxxx1xxx01
 		.w(FUNC(scorpion_state::port_1ffd_w));
 	map(0x4021, 0x4021).mirror(0x3fdc) // 7FFD | 01xxxxxxxx1xxx01

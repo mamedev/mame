@@ -92,7 +92,6 @@ public:
 	}
 
 	void add_slot(zxbus_slot_device &slot);
-	void install_shadow_io(memory_view::memory_view_entry &io_view);
 
 protected:
 	zxbus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
