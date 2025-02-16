@@ -799,9 +799,9 @@ void taitojc_state::dsp_math_viewport_w(offs_t offset, uint16_t data)
 	m_viewport_data[offset] = data;
 }
 
-static inline const uint16_t muldiv(int16_t ma, int16_t mb, int16_t d)
+inline uint16_t muldiv(int16_t ma, int16_t mb, int16_t d)
 {
-	return (d != 0) ? (ma * mb) / d : 0;
+	return (d != 0) ? ((ma * mb) / d) : 0;
 }
 
 uint16_t taitojc_state::dsp_math_projection_y_r()
