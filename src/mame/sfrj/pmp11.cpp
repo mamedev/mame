@@ -22,7 +22,8 @@ public:
 		, m_fdc(*this, "fdc")
 	{ }
 
-	void pmp11(machine_config &config);
+	void pmp11(machine_config &config) ATTR_COLD;
+
 private:
 	void pdp11_mem(address_map &map) ATTR_COLD;
 
@@ -39,8 +40,8 @@ void pmp11_state::pdp11_mem(address_map &map)
 	map(0xf000, 0xf7ff).rom();
 	map(0xf800, 0xfbff).ram();
 	// TODO: Not sure if these are mirrored, but no control_w on alternate address
-	map(0xff70, 0xff71).mirror(0x4).rw(m_uart1, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w)).umask16(0x00ff);
-	map(0xff72, 0xff73).mirror(0x4).rw(m_uart1, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w)).umask16(0x00ff);
+	map(0xff70, 0xff71).mirror(0x4).umask16(0x00ff).rw(m_uart1, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xff72, 0xff73).mirror(0x4).umask16(0x00ff).rw(m_uart1, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 }
 
 /* Input ports */

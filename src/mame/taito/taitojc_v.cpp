@@ -99,7 +99,7 @@ void taitojc_state::draw_object(bitmap_ind16 &bitmap, const rectangle &cliprect,
 	if (BIT(w2, 14))
 		address |= 0x40000;
 
-	int x = util((w1 >>  0) & 0x3ff);
+	int x = ((w1 >>  0) & 0x3ff);
 	x = util::sext(x, 10); // sign-extend
 
 	int y = ((w1 >> 16) & 0x3ff);
