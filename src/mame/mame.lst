@@ -19348,6 +19348,7 @@ kbilly
 kblades
 kbottom9
 kbucky
+kchqflag
 kcontra
 kdribble
 kgarfld
@@ -20087,7 +20088,7 @@ husky
 ibm3153
 
 @source:ibm/ibm3477.cpp
-ibm3477                         // IBM InfoWindow 3477
+ibm3477
 
 @source:ibm/ibm5100.cpp
 ibm5100
