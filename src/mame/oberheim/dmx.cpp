@@ -43,7 +43,7 @@ PCBoards:
 - 7 x voice cards: Bass, Snare, Hi-hat, Tom 1, Tom 2, Perc 1, Perc 2.
 - 2 x cymbal cards: A single voice that occupies two card slots.
 
-Known audio inaccuracies (reasons for MACHINE_IMPERFECT_SOUND):
+Possible audio inaccuracies:
 - Some uncertainty on component values for HIHAT and PERC2 (see comments in
   HIHAT_CONFIG and PERC_CONFIG).
 - Linear- instead of audio-taper faders.
@@ -897,6 +897,8 @@ public:
 	};
 	static constexpr const int METRONOME_INDEX = NUM_VOICE_CARDS;
 
+	static constexpr feature_type unemulated_features() { return feature::TAPE; }
+
 	dmx_state(const machine_config &mconfig, device_type type, const char *tag) ATTR_COLD
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, MAINCPU_TAG)
@@ -1348,7 +1350,7 @@ void dmx_state::update_mix_level(int voice)
 	m_left_mixer->set_input_gain(voice, gain_left);
 	m_right_mixer->set_input_gain(voice, gain_right);
 
-	LOGMASKED(LOG_FADERS, "Voice %d volume changed to: %d (gain L:%f, R:%f), HPF cutoff: %.02f Hz\n",
+	LOGMASKED(LOG_FADERS, "Voice %d volume changed to: %d (gain L:%f, R:%f), HPF cutoff: %.2f Hz\n",
 			  voice, pot_percent, gain_left, gain_right, 1.0F / (2 * float(M_PI) * r_gnd * rc_c));
 }
 
@@ -1729,4 +1731,4 @@ ROM_END
 
 }  // anonymous namespace
 
-SYST(1980, obdmx, 0, 0, dmx, dmx, dmx_state, empty_init, "Oberheim", "DMX", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND)
+SYST(1980, obdmx, 0, 0, dmx, dmx, dmx_state, empty_init, "Oberheim", "DMX", MACHINE_SUPPORTS_SAVE)
