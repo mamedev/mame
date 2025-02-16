@@ -30,23 +30,24 @@ static constexpr unsigned TC0280GRD_RAM_SIZE = 0x2000;
 DEFINE_DEVICE_TYPE(TC0280GRD, tc0280grd_device, "tc0280grd", "Taito TC0280GRD")
 DEFINE_DEVICE_TYPE(TC0430GRW, tc0430grw_device, "tc0430grw", "Taito TC0430GRW")
 
-tc0280grd_device::tc0280grd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+tc0280grd_device::tc0280grd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int xmultiply)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this)
 	, m_ram(nullptr)
 	, m_base_color(0)
 	, m_colorbase(0)
+	, m_xmultiply(xmultiply)
 {
 	std::fill(std::begin(m_ctrl), std::end(m_ctrl), 0);
 }
 
 tc0280grd_device::tc0280grd_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: tc0280grd_device(mconfig, TC0280GRD, tag, owner, clock)
+	: tc0280grd_device(mconfig, TC0280GRD, tag, owner, clock, 2)
 {
 }
 
 tc0430grw_device::tc0430grw_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: tc0280grd_device(mconfig, TC0430GRW, tag, owner, clock)
+	: tc0280grd_device(mconfig, TC0430GRW, tag, owner, clock, 1)
 {
 }
 
@@ -73,7 +74,7 @@ void tc0280grd_device::device_start()
 	m_tilemap = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(tc0280grd_device::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_tilemap->set_transparent_pen(0);
 
-	m_ram = make_unique_clear<u16[]>(TC0280GRD_RAM_SIZE / 2);
+	m_ram = make_unique_clear<u16 []>(TC0280GRD_RAM_SIZE / 2);
 
 	save_pointer(NAME(m_ram), TC0280GRD_RAM_SIZE / 2);
 	save_item(NAME(m_ctrl));
@@ -136,7 +137,7 @@ void tc0280grd_device::zoom_draw(screen_device &screen, bitmap_ind16 &bitmap, co
 		startx -= 0x1000000;
 
 	int incxx = (s16)m_ctrl[2];
-	incxx *= get_xmultiply();
+	incxx *= m_xmultiply;
 	int const incyx = (s16)m_ctrl[3];
 
 	/* 24-bit signed */
@@ -146,7 +147,7 @@ void tc0280grd_device::zoom_draw(screen_device &screen, bitmap_ind16 &bitmap, co
 		starty -= 0x1000000;
 
 	int incxy = (s16)m_ctrl[6];
-	incxy *= get_xmultiply();
+	incxy *= m_xmultiply;
 	int const incyy = (s16)m_ctrl[7];
 
 	startx -= xoffset * incxx + yoffset * incyx;
@@ -154,6 +155,6 @@ void tc0280grd_device::zoom_draw(screen_device &screen, bitmap_ind16 &bitmap, co
 
 	m_tilemap->draw_roz(screen, bitmap, cliprect, startx << 4, starty << 4,
 			incxx << 4, incxy << 4, incyx << 4, incyy << 4,
-			1,  /* copy with wraparound */
+			1,  // copy with wraparound
 			0, priority, priority_mask);
 }
