@@ -23,13 +23,11 @@ public:
 	void zoom_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffset, int yoffset, u8 priority, u8 priority_mask = 0xff);
 
 protected:
-	tc0280grd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	tc0280grd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int xmultiply);
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
-
-	virtual int get_xmultiply() { return 2; }
 
 private:
 	// internal state
@@ -40,9 +38,11 @@ private:
 	u16         m_ctrl[8]{};
 	u32         m_base_color;
 
+	u16         m_colorbase;
+	int const   m_xmultiply;
+
 	// decoding info
 	DECLARE_GFXDECODE_MEMBER(gfxinfo);
-	u16 m_colorbase;
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 };
@@ -51,9 +51,6 @@ class tc0430grw_device : public tc0280grd_device
 {
 public:
 	tc0430grw_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
-protected:
-	virtual int get_xmultiply() override { return 1; }
 };
 
 DECLARE_DEVICE_TYPE(TC0280GRD, tc0280grd_device)
