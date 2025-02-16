@@ -7,14 +7,15 @@
 
 #include "taitocchip.h"
 #include "taitoio.h"
-
-#include "sound/okim6295.h"
 #include "tc0100scn.h"
 #include "tc0110pcr.h"
 #include "tc0280grd.h"
 #include "tc0360pri.h"
 #include "tc0480scp.h"
+
 #include "machine/timer.h"
+#include "sound/okim6295.h"
+
 #include "emupal.h"
 #include "screen.h"
 
@@ -39,32 +40,32 @@ public:
 		, m_audiobank(*this, "audiobank")
 	{ }
 
-	void taito_f2_tc0220ioc(machine_config &config);
-	void taito_f2_tc0510nio(machine_config &config);
-	void taito_f2_te7750(machine_config &config);
-	void taito_f2_tc0110pcr(machine_config &config);
-	void taito_f2(machine_config &config);
-	void thundfox(machine_config &config);
-	void dinorex(machine_config &config);
-	void koshien(machine_config &config);
-	void qzchikyu(machine_config &config);
-	void yesnoj(machine_config &config);
-	void quizhq(machine_config &config);
-	void qcrayon2(machine_config &config);
-	void qtorimon(machine_config &config);
-	void solfigtr(machine_config &config);
-	void qzquest(machine_config &config);
-	void liquidk(machine_config &config);
-	void ssi(machine_config &config);
-	void growl(machine_config &config);
-	void ninjak(machine_config &config);
-	void finalb(machine_config &config);
-	void gunfront(machine_config &config);
-	void qcrayon(machine_config &config);
-	void qjinsei(machine_config &config);
-	void yuyugogo(machine_config &config);
+	void taito_f2_tc0220ioc(machine_config &config) ATTR_COLD;
+	void taito_f2_tc0510nio(machine_config &config) ATTR_COLD;
+	void taito_f2_te7750(machine_config &config) ATTR_COLD;
+	void taito_f2_tc0110pcr(machine_config &config) ATTR_COLD;
+	void taito_f2(machine_config &config) ATTR_COLD;
+	void thundfox(machine_config &config) ATTR_COLD;
+	void dinorex(machine_config &config) ATTR_COLD;
+	void koshien(machine_config &config) ATTR_COLD;
+	void qzchikyu(machine_config &config) ATTR_COLD;
+	void yesnoj(machine_config &config) ATTR_COLD;
+	void quizhq(machine_config &config) ATTR_COLD;
+	void qcrayon2(machine_config &config) ATTR_COLD;
+	void qtorimon(machine_config &config) ATTR_COLD;
+	void solfigtr(machine_config &config) ATTR_COLD;
+	void qzquest(machine_config &config) ATTR_COLD;
+	void liquidk(machine_config &config) ATTR_COLD;
+	void ssi(machine_config &config) ATTR_COLD;
+	void growl(machine_config &config) ATTR_COLD;
+	void ninjak(machine_config &config) ATTR_COLD;
+	void finalb(machine_config &config) ATTR_COLD;
+	void gunfront(machine_config &config) ATTR_COLD;
+	void qcrayon(machine_config &config) ATTR_COLD;
+	void qjinsei(machine_config &config) ATTR_COLD;
+	void yuyugogo(machine_config &config) ATTR_COLD;
 
-	void init_finalb();
+	void init_finalb() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -80,6 +81,7 @@ protected:
 		int zoomx = 0, zoomy = 0;
 		u64 primask = 0;
 	};
+
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -210,7 +212,7 @@ public:
 		, m_cchip_irq_clear(*this, "cchip_irq_clear")
 	{ }
 
-	void megab(machine_config &config);
+	void megab(machine_config &config) ATTR_COLD;
 
 private:
 	required_device<taito_cchip_device> m_cchip;
@@ -232,9 +234,9 @@ public:
 		, m_io_dsw(*this, "DSW%c", 'A')
 	{ }
 
-	void mjnquest(machine_config &config);
+	void mjnquest(machine_config &config) ATTR_COLD;
 
-	void init_mjnquest();
+	void init_mjnquest() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -266,9 +268,9 @@ public:
 		, m_tc0430grw(*this, "tc0430grw")
 	{ }
 
-	void dondokod(machine_config &config);
-	void driftout(machine_config &config);
-	void pulirula(machine_config &config);
+	void dondokod(machine_config &config) ATTR_COLD;
+	void driftout(machine_config &config) ATTR_COLD;
+	void pulirula(machine_config &config) ATTR_COLD;
 
 protected:
 	/* devices */
@@ -298,9 +300,9 @@ public:
 		, m_io_paddle(*this, "PADDLE%u", 1U)
 	{ }
 
-	void cameltrya(machine_config &config);
-	void cameltry(machine_config &config);
-	void driftoutct(machine_config &config);
+	void cameltrya(machine_config &config) ATTR_COLD;
+	void cameltry(machine_config &config) ATTR_COLD;
+	void driftoutct(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -328,7 +330,7 @@ public:
 		, m_okibank(*this, "okibank")
 	{ }
 
-	void driveout(machine_config &config);
+	void driveout(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -358,12 +360,12 @@ public:
 		, m_tc0480scp(*this, "tc0480scp")
 	{ }
 
-	void deadconx(machine_config &config);
-	void deadconxj(machine_config &config);
-	void footchmp(machine_config &config);
-	void footchmpbl(machine_config &config);
-	void hthero(machine_config &config);
-	void metalb(machine_config &config);
+	void deadconx(machine_config &config) ATTR_COLD;
+	void deadconxj(machine_config &config) ATTR_COLD;
+	void footchmp(machine_config &config) ATTR_COLD;
+	void footchmpbl(machine_config &config) ATTR_COLD;
+	void hthero(machine_config &config) ATTR_COLD;
+	void metalb(machine_config &config) ATTR_COLD;
 
 protected:
 	required_device<tc0480scp_device> m_tc0480scp;
