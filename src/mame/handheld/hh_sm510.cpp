@@ -5650,8 +5650,8 @@ ROM_START( kchqflag )
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
 	ROM_LOAD( "783.melody", 0x000, 0x100, CRC(ffeef4bc) SHA1(a3b21eefb170aa54eb53cf56f88b0c00dd29703f))
 
-	ROM_REGION( 439248, "screen", 0)
-	ROM_LOAD( "kchqflag.svg", 0, 439248, CRC(bb490885) SHA1(8cf3db765517c3532c04dce5e7f88a6d66d3f7c4) )
+	ROM_REGION( 439251, "screen", 0)
+	ROM_LOAD( "kchqflag.svg", 0, 439251, CRC(8d477ab1) SHA1(eb0fe02a4f285081f0fd422df17bca48498112de) )
 ROM_END
 
 
