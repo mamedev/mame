@@ -1091,6 +1091,17 @@ Unoffical software releases for the Coleco Colecovision
 		</part>
 	</software>
 
+	<software name="mieyen">
+		<description>Mieyen</description>
+		<year>2025</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="8361">
+				<rom name="mieyen.rom" size="8361" crc="f47e5bf5" sha1="bf868509223450b5f49fe06a8cdc6ee9fc7ee534" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mikie">
 		<description>Mikie</description>
 		<year>2021</year>
