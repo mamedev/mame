@@ -1088,29 +1088,44 @@ void tmp94c241_device::tlcs900_handle_ad()
 //  tlcs900_handle_timers -
 //-------------------------------------------------
 
+/* Prescaler shift ammounts corresponding
+    to each possible timer input clock sources: */
+static constexpr uint8_t T1 = 3;
+static constexpr uint8_t T4 = 5;
+static constexpr uint8_t T16 = 7;
+static constexpr uint8_t T256 = 11;
+
 void tmp94c241_device::tlcs900_handle_timers()
 {
 	uint32_t  old_pre = m_timer_pre;
+
+	auto update_timer_count = [this, old_pre](
+		uint8_t timer_index,
+		uint8_t input_clk_select,
+		uint8_t s1,
+		uint8_t s2,
+		uint8_t s3)
+	{
+		switch( input_clk_select )
+		{
+			case 0:
+			/* Not yet implemented.
+			    - For the 8 bit timers: TIO, TO0TRG, invalid and TO2TRG
+			    - For all 16 bit timers: TIA
+			*/
+			break;
+			case 1: m_timer_change[timer_index] += ((m_timer_pre >> s1) - (old_pre >> s1)); break;
+			case 2: m_timer_change[timer_index] += ((m_timer_pre >> s2) - (old_pre >> s2)); break;
+			case 3: m_timer_change[timer_index] += ((m_timer_pre >> s3) - (old_pre >> s3)); break;
+		}
+	};
 
 	if ( BIT(m_t16run, 7) ) /* prescaler is active */
 		m_timer_pre += m_cycles;
 
 	if ( BIT(m_t8run, 0) ) /* Timer 0 is running */
 	{
-		switch( m_t01mod & 3 ) /* T0_INPUT_CLOCK */
-		{
-			case 0:  /* TIO */
-				break;
-			case 1:  /* T1 */
-				m_timer_change[0] += ( m_timer_pre >> 3 ) - ( old_pre >> 3 );
-				break;
-			case 2:  /* T4 */
-				m_timer_change[0] += ( m_timer_pre >> 5 ) - ( old_pre >> 5 );
-				break;
-			case 3:  /* T16 */
-				m_timer_change[0] += ( m_timer_pre >> 7 ) - ( old_pre >> 7 );
-				break;
-		}
+		update_timer_count(0, m_t01mod & 3, T1, T4, T16);
 
 		for( ; m_timer_change[0] > 0; m_timer_change[0]-- )
 		{
@@ -1136,20 +1151,7 @@ void tmp94c241_device::tlcs900_handle_timers()
 
 	if ( BIT(m_t8run, 1) ) /* Timer 1 is running */
 	{
-		switch( (m_t01mod >> 2) & 3 ) /* T1_INPUT_CLOCK */
-		{
-			case 0:  /* TO0TRG */
-				break;
-			case 1:  /* T1 */
-				m_timer_change[1] += ( m_timer_pre >> 3 ) - ( old_pre >> 3 );
-				break;
-			case 2:  /* T16 */
-				m_timer_change[1] += ( m_timer_pre >> 7 ) - ( old_pre >> 7 );
-				break;
-			case 3:  /* T256 */
-				m_timer_change[1] += ( m_timer_pre >> 11 ) - ( old_pre >> 11 );
-				break;
-		}
+		update_timer_count(1, (m_t01mod >> 2) & 3, T1, T16, T256);
 
 		for( ; m_timer_change[1] > 0; m_timer_change[1]-- )
 		{
@@ -1172,21 +1174,7 @@ void tmp94c241_device::tlcs900_handle_timers()
 
 	if ( BIT(m_t8run, 2) ) /* Timer 2 is running */
 	{
-		switch( m_t23mod & 3 ) /* T2_INPUT_CLOCK */
-		{
-			case 0: /* invalid */
-				// Not sure yet how this case would be handled...
-				break;
-			case 1: /* T1 */
-				m_timer_change[2] += ( m_timer_pre >> 3 ) - ( old_pre >> 3 );
-				break;
-			case 2: /* T4 */
-				m_timer_change[2] += ( m_timer_pre >> 5 ) - ( old_pre >> 5 );
-				break;
-			case 3: /* T16 */
-				m_timer_change[2] += ( m_timer_pre >> 7 ) - ( old_pre >> 7 );
-				break;
-		}
+		update_timer_count(2, m_t23mod & 3, T1, T4, T16);
 
 		for( ; m_timer_change[2] > 0; m_timer_change[2]-- )
 		{
@@ -1212,20 +1200,7 @@ void tmp94c241_device::tlcs900_handle_timers()
 
 	if ( BIT(m_t8run, 3) ) /* Timer 3 is running */
 	{
-		switch( (m_t23mod >> 2) & 3 ) /* T3_INPUT_CLOCK */
-		{
-			case 0: /* TO2TRG */
-				break;
-			case 1: /* T1 */
-				m_timer_change[3] += ( m_timer_pre >> 3 ) - ( old_pre >> 3 );
-				break;
-			case 2: /* T16 */
-				m_timer_change[3] += ( m_timer_pre >> 7 ) - ( old_pre >> 7 );
-				break;
-			case 3: /* T256 */
-				m_timer_change[3] += ( m_timer_pre >> 11 ) - ( old_pre >> 11 );
-				break;
-		}
+		update_timer_count(3, (m_t23mod >> 2) & 3, T1, T16, T256);
 
 		for( ; m_timer_change[3] > 0; m_timer_change[3]-- )
 		{
@@ -1248,21 +1223,7 @@ void tmp94c241_device::tlcs900_handle_timers()
 
 	if ( BIT(m_t16run, 0) ) /* Timer 4 is running */
 	{
-		switch( m_t4mod & 3 ) /* T4_INPUT_CLOCK */
-		{
-			case 0:  /* TIA */
-				// TODO: implement-me!
-				break;
-			case 1:  /* T1 */
-				m_timer_change[4] += ( m_timer_pre >> 3 ) - ( old_pre >> 3 );
-				break;
-			case 2:  /* T4 */
-				m_timer_change[4] += ( m_timer_pre >> 5 ) - ( old_pre >> 5 );
-				break;
-			case 3:  /* T16 */
-				m_timer_change[4] += ( m_timer_pre >> 7 ) - ( old_pre >> 7 );
-				break;
-		}
+		update_timer_count(4, m_t4mod & 3, T1, T4, T16);
 
 		for( ; m_timer_change[4] > 0; m_timer_change[4]-- )
 		{
@@ -1282,22 +1243,7 @@ void tmp94c241_device::tlcs900_handle_timers()
 	if ( BIT(m_t16run, 1) ) /* Timer 6 is running */
 	{
 		/*** NOTE: TIMER_CHANGE_6 is stored at m_timer_change[5] ***/
-
-		switch( m_t6mod & 3 ) /* T6_INPUT_CLOCK */
-		{
-			case 0: /* TIA */
-				// TODO: implement-me!
-				break;
-			case 1: /* T1 */
-				m_timer_change[5] += ( m_timer_pre >> 3 ) - ( old_pre >> 3 );
-				break;
-			case 2: /* T4 */
-				m_timer_change[5] += ( m_timer_pre >> 5 ) - ( old_pre >> 5 );
-				break;
-			case 3: /* T16 */
-				m_timer_change[5] += ( m_timer_pre >> 7 ) - ( old_pre >> 7 );
-				break;
-		}
+		update_timer_count(5, m_t6mod & 3, T1, T4, T16);
 
 		for( ; m_timer_change[5] > 0; m_timer_change[5]-- )
 		{
@@ -1317,22 +1263,7 @@ void tmp94c241_device::tlcs900_handle_timers()
 	if ( BIT(m_t16run, 2) ) /* Timer 8 is running */
 	{
 		/*** NOTE: TIMER_CHANGE_8 is stored at m_timer_change[6] ***/
-
-		switch( m_t8mod & 3 ) /* T8_INPUT_CLOCK */
-		{
-			case 0:  /* TIA */
-				// TODO: implement-me!
-				break;
-			case 1:  /* T1 */
-				m_timer_change[6] += ( m_timer_pre >> 3 ) - ( old_pre >> 3 );
-				break;
-			case 2:  /* T4 */
-				m_timer_change[6] += ( m_timer_pre >> 5 ) - ( old_pre >> 5 );
-				break;
-			case 3:  /* T16 */
-				m_timer_change[6] += ( m_timer_pre >> 7 ) - ( old_pre >> 7 );
-				break;
-		}
+		update_timer_count(6, m_t8mod & 3, T1, T4, T16);
 
 		for( ; m_timer_change[6] > 0; m_timer_change[6]-- )
 		{
@@ -1351,22 +1282,7 @@ void tmp94c241_device::tlcs900_handle_timers()
 	if ( BIT(m_t16run, 3) ) /* Timer A is running */
 	{
 		/*** NOTE: TIMER_CHANGE_A is stored at m_timer_change[7] ***/
-
-		switch( m_tamod & 3 ) /* TA_INPUT_CLOCK */
-		{
-			case 0: /* TIA */
-				// TODO: implement-me!
-				break;
-			case 1: /* T1 */
-				m_timer_change[7] += ( m_timer_pre >> 3 ) - ( old_pre >> 3 );
-				break;
-			case 2: /* T4 */
-				m_timer_change[7] += ( m_timer_pre >> 5 ) - ( old_pre >> 5 );
-				break;
-			case 3: /* T16 */
-				m_timer_change[7] += ( m_timer_pre >> 7 ) - ( old_pre >> 7 );
-				break;
-		}
+		update_timer_count(7, m_tamod & 3, T1, T4, T16);
 
 		for( ; m_timer_change[7] > 0; m_timer_change[7]-- )
 		{
