@@ -9482,7 +9482,7 @@ Installation and Open Circulation CDs are bootable.
 		<publisher>Pinnacle Systems</publisher>
 		<notes><![CDATA[
 Video editing software for [ZR36067]-based PCI card, can also detect [DC30] and [DC50]
-Has HW tester
+Has an HW tester, DirectDraw fails to enable overlay with [ViRGE] Scenic Highway interface
 ]]></notes>
 		<!-- Serial number: 3920519554 -->
 		<info name="language" value="Deutsch/Dutch/English"/>
