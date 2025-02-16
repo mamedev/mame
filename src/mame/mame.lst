@@ -43378,11 +43378,11 @@ librie
 @source:sony/news_38xx.cpp
 nws3860
 
-@source:sony/news_68k_iop.cpp
-nws831
-
 @source:sony/news_68k.cpp
 nws1580
+
+@source:sony/news_68k_iop.cpp
+nws831
 
 @source:sony/news_r3k.cpp
 nws3260
