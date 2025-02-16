@@ -109,10 +109,10 @@ public:
 	virtual ~coco_os9_impl() = default;
 
 	virtual meta_data volume_metadata() override;
-	virtual std::pair<err_t, meta_data> metadata(const std::vector<std::string> &path) override;
-	virtual std::pair<err_t, std::vector<dir_entry>> directory_contents(const std::vector<std::string> &path) override;
-	virtual std::pair<err_t, std::vector<u8>> file_read(const std::vector<std::string> &path) override;
-	virtual err_t format(const meta_data &meta) override;
+	virtual std::pair<std::error_condition, meta_data> metadata(const std::vector<std::string> &path) override;
+	virtual std::pair<std::error_condition, std::vector<dir_entry>> directory_contents(const std::vector<std::string> &path) override;
+	virtual std::pair<std::error_condition, std::vector<u8>> file_read(const std::vector<std::string> &path) override;
+	virtual std::error_condition format(const meta_data &meta) override;
 
 	std::optional<file_header> find(const std::vector<std::string> &path, std::optional<dir_entry_type> expected_entry_type) const;
 	void iterate_directory_entries(const file_header &header, const std::function<bool(std::string &&, u32)> callback) const;
@@ -301,14 +301,14 @@ meta_data coco_os9_impl::volume_metadata()
 //  coco_os9_impl::metadata
 //-------------------------------------------------
 
-std::pair<err_t, meta_data> coco_os9_impl::metadata(const std::vector<std::string> &path)
+std::pair<std::error_condition, meta_data> coco_os9_impl::metadata(const std::vector<std::string> &path)
 {
 	// look up the path
 	std::optional<file_header> header = find(path, { });
 	if (!header)
-		return std::make_pair(ERR_NOT_FOUND, meta_data());
+		return std::make_pair(error::not_found, meta_data());
 
-	return std::make_pair(ERR_OK, header->metadata());
+	return std::make_pair(std::error_condition(), header->metadata());
 }
 
 
@@ -316,12 +316,12 @@ std::pair<err_t, meta_data> coco_os9_impl::metadata(const std::vector<std::strin
 //  coco_os9_impl::directory_contents
 //-------------------------------------------------
 
-std::pair<err_t, std::vector<dir_entry>> coco_os9_impl::directory_contents(const std::vector<std::string> &path)
+std::pair<std::error_condition, std::vector<dir_entry>> coco_os9_impl::directory_contents(const std::vector<std::string> &path)
 {
 	// look up the path
 	std::optional<file_header> header = find(path, dir_entry_type::dir);
 	if (!header)
-		return std::make_pair(ERR_NOT_FOUND, std::vector<dir_entry>());
+		return std::make_pair(error::not_found, std::vector<dir_entry>());
 
 	// iterate through the directory
 	std::vector<dir_entry> results;
@@ -337,7 +337,7 @@ std::pair<err_t, std::vector<dir_entry>> coco_os9_impl::directory_contents(const
 	iterate_directory_entries(*header, callback);
 
 	// and we're done
-	return std::make_pair(ERR_OK, std::move(results));
+	return std::make_pair(std::error_condition(), std::move(results));
 }
 
 
@@ -345,15 +345,15 @@ std::pair<err_t, std::vector<dir_entry>> coco_os9_impl::directory_contents(const
 //  coco_os9_impl::file_read
 //-------------------------------------------------
 
-std::pair<err_t, std::vector<u8>> coco_os9_impl::file_read(const std::vector<std::string> &path)
+std::pair<std::error_condition, std::vector<u8>> coco_os9_impl::file_read(const std::vector<std::string> &path)
 {
 	// look up the path
 	std::optional<file_header> header = find(path, dir_entry_type::file);
 	if (!header)
-		return std::make_pair(ERR_NOT_FOUND, std::vector<u8>());
+		return std::make_pair(error::not_found, std::vector<u8>());
 
 	std::vector<u8> data = read_file_data(*header);
-	return std::make_pair(ERR_OK, std::move(data));
+	return std::make_pair(std::error_condition(), std::move(data));
 }
 
 
@@ -361,7 +361,7 @@ std::pair<err_t, std::vector<u8>> coco_os9_impl::file_read(const std::vector<std
 //  coco_os9_impl::format
 //-------------------------------------------------
 
-err_t coco_os9_impl::format(const meta_data &meta)
+std::error_condition coco_os9_impl::format(const meta_data &meta)
 {
 	// for some reason, the OS-9 world favored filling with 0xE5
 	m_blockdev.fill(0xe5);
@@ -464,7 +464,7 @@ err_t coco_os9_impl::format(const meta_data &meta)
 	rootdata_blk.w8(0x1f, 1 + allocation_bitmap_lsns);
 	rootdata_blk.w8(0x20, 0xae);
 	rootdata_blk.w8(0x3f, 1 + allocation_bitmap_lsns);
-	return ERR_OK;
+	return std::error_condition();
 }
 
 
