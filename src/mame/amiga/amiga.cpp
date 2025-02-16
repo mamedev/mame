@@ -377,7 +377,7 @@ protected:
 private:
 	// devices
 	required_device<msm6242_device> m_rtc;
-	required_device<amiga_dmac_device> m_dmac;
+	required_device<amiga_dmac_rev1_device> m_dmac;
 	required_device<tpi6525_device> m_tpi;
 	required_device<cr511b_device> m_cdrom;
 
@@ -1965,7 +1965,7 @@ void cdtv_state::cdtv(machine_config &config)
 	MSM6242(config, m_rtc, XTAL(32'768));
 
 	// cd-rom controller
-	AMIGA_DMAC(config, m_dmac, amiga_state::CLK_7M_PAL);
+	AMIGA_DMAC_REV1(config, m_dmac, amiga_state::CLK_7M_PAL);
 	m_dmac->css_read_cb().set(FUNC(cdtv_state::dmac_scsi_data_read));
 	m_dmac->css_write_cb().set(FUNC(cdtv_state::dmac_scsi_data_write));
 	m_dmac->csx0_read_cb().set(m_cdrom, FUNC(cr511b_device::read));

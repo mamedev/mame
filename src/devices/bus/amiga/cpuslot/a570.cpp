@@ -2,7 +2,7 @@
 // copyright-holders: Dirk Best
 /***************************************************************************
 
-    Commodore A590
+    Commodore A570
 
     DMAC based CD-ROM controller for the A500
 
@@ -94,7 +94,7 @@ const tiny_rom_entry *a570_device::device_rom_region() const
 
 void a570_device::device_add_mconfig(machine_config &config)
 {
-	AMIGA_DMAC(config, m_dmac, 28.37516_MHz_XTAL / 4); // 7M
+	AMIGA_DMAC_REV2(config, m_dmac, 28.37516_MHz_XTAL / 4); // 7M
 	m_dmac->cfgout_cb().set([this] (int state) { m_host->cfgout_w(state); });
 	m_dmac->int_cb().set([this] (int state) { m_host->int2_w(state); });
 

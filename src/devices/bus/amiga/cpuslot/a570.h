@@ -38,7 +38,7 @@ protected:
 private:
 	void map(address_map &map) ATTR_COLD;
 
-	required_device<amiga_dmac_device> m_dmac;
+	required_device<amiga_dmac_rev2_device> m_dmac;
 	required_ioport m_config;
 
 	std::unique_ptr<uint16_t[]> m_ram;

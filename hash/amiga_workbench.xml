@@ -386,10 +386,10 @@ Below is an incomplete list of Commodore part numbers:
 		</part>
 	</software>
 
-	<!-- 317612-01 Workbench 1.2 Rev. 33.56 A500 (Fr/Be) -->
+	<!-- 317612-01 Workbench 1.2 Rev. 33.56 A500 (Fr/Be) [label found] -->
 	<!-- 317613-01 Workbench 1.2 Rev. 33.56 A500 (It) -->
 	<!-- 317615-01 Workbench 1.2 Rev. 33.56 A500 (Se/Fi) [label found] -->
-	<!-- 317617-01 Workbench 1.2 Rev. 33.56 A500 (Dk) -->
+	<!-- 317617-01 Workbench 1.2 Rev. 33.56 A500 (Dk) [label found] -->
 	<!-- 317617-02 Workbench 1.2 A500 (Dk) Okt. 87 -->
 	<!-- 317619-01 A500 (probably No) -->
 	<!-- 317621-01 Workbench 1.2 Rev. 33.56 A500 (Ch) [label found] -->
@@ -573,6 +573,7 @@ Below is an incomplete list of Commodore part numbers:
 		<year>1988</year>
 		<publisher>Commodore</publisher>
 		<part name="workbench" interface="floppy_3_5">
+			<!-- original label found -->
 			<feature name="part_id" value="Workbench 1.3 (Dk)" />
 			<dataarea name="flop" size="901120">
 				<rom name="317798-01_workbench.adf" size="901120" crc="6b3bc3b2" sha1="d48769a027c3a156bcc11f9a04fadb5301407552" />
@@ -700,6 +701,8 @@ Below is an incomplete list of Commodore part numbers:
 			</dataarea>
 		</part>
 	</software>
+
+	<!-- 317798-03 Workbench 1.3.2 (Dk) [label found] -->
 
 	<software name="wb132_a3000" cloneof="wb132">
 		<description>Workbench 1.3.2 Rev. 34.28 A3000 (US)</description>
@@ -841,6 +844,7 @@ Below is an incomplete list of Commodore part numbers:
 		<year>1990</year>
 		<publisher>Commodore</publisher>
 		<part name="workbench" interface="floppy_3_5">
+			<!-- original label found -->
 			<feature name="part_id" value="Workbench 1.3.3 (Dk)" />
 			<dataarea name="flop" size="901120">
 				<rom name="317798-04_workbench.adf" size="901120" crc="6395ec1f" sha1="8d8314faa3b5fbc472c11d5fc669358522c1d00b" status="baddump" />
