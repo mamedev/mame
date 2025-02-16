@@ -441,18 +441,18 @@ void tmp94c241_device::change_timer_flipflop(uint8_t flipflop, uint8_t operation
 
 	switch(operation)
 	{
-	case FF_INVERT:
-		ff_state = !ff_state;
-		break;
-	case FF_SET:
-		ff_state = true;
-		break;
-	case FF_CLEAR:
-		ff_state = false;
-		break;
-	default:
-		// invalid operation
-		return;
+		case FF_INVERT:
+			ff_state = !ff_state;
+			break;
+		case FF_SET:
+			ff_state = true;
+			break;
+		case FF_CLEAR:
+			ff_state = false;
+			break;
+		default:
+			// invalid operation
+			return;
 	}
 
 	/* The value of the flipflop is only exposed to a pin in certain modes of operation
@@ -461,7 +461,7 @@ void tmp94c241_device::change_timer_flipflop(uint8_t flipflop, uint8_t operation
 	   So here we bail out if the flipflop is not routed to its corresponding port bit:
 	*/
 	switch( flipflop )
-		{
+	{
 		case 0x1:
 			if (!BIT(m_port_function[PORT_C], 0) || BIT(m_port_control[PORT_C], 0)) return;
 			break;
@@ -489,12 +489,12 @@ void tmp94c241_device::change_timer_flipflop(uint8_t flipflop, uint8_t operation
 		default:
 			// invalid flip flop
 			return;
-		}
+	}
 
 	/* And here we actually send the value to the corresponding pin */
 	uint8_t new_port_value = 0;
 	switch( flipflop )
-		{
+	{
 		case 0x1:
 		case 0x7:
 			new_port_value = m_port_latch[PORT_C] & 0xfe;
@@ -527,7 +527,7 @@ void tmp94c241_device::change_timer_flipflop(uint8_t flipflop, uint8_t operation
 			if (ff_state) new_port_value |= 0x10;
 			port_w<PORT_E>(new_port_value);
 			break;
-		}
+	}
 }
 
 void tmp94c241_device::tffcr_w(uint8_t data)
@@ -782,10 +782,10 @@ void tmp94c241_device::admod1_w(uint8_t data)
 
 		switch ((m_ad_mode2 >> 4) & 3)
 		{
-		case 0: m_ad_cycles_left = 160; break;
-		case 1: m_ad_cycles_left = 320; break;
-		case 2: m_ad_cycles_left = 640; break;
-		case 3: m_ad_cycles_left = 1280; break;
+			case 0: m_ad_cycles_left = 160; break;
+			case 1: m_ad_cycles_left = 320; break;
+			case 2: m_ad_cycles_left = 640; break;
+			case 3: m_ad_cycles_left = 1280; break;
 		}
 	}
 
@@ -1027,12 +1027,12 @@ void tmp94c241_device::tlcs900_check_irqs()
 		{
 			switch( tmp94c241_irq_vector_map[i].iff )
 			{
-			case 0x80:
-				irq_vectors[ ( m_int_reg[ tmp94c241_irq_vector_map[i].reg ] >> 4 ) & 0x07 ] = i;
-				break;
-			case 0x08:
-				irq_vectors[ m_int_reg[ tmp94c241_irq_vector_map[i].reg ] & 0x07 ] = i;
-				break;
+				case 0x80:
+					irq_vectors[ ( m_int_reg[ tmp94c241_irq_vector_map[i].reg ] >> 4 ) & 0x07 ] = i;
+					break;
+				case 0x08:
+					irq_vectors[ m_int_reg[ tmp94c241_irq_vector_map[i].reg ] & 0x07 ] = i;
+					break;
 			}
 		}
 	}
@@ -1099,17 +1099,17 @@ void tmp94c241_device::tlcs900_handle_timers()
 	{
 		switch( m_t01mod & 3 ) /* T0_INPUT_CLOCK */
 		{
-		case 0:  /* TIO */
-			break;
-		case 1:  /* T1 */
-			m_timer_change[0] += ( m_timer_pre >> 3 ) - ( old_pre >> 3 );
-			break;
-		case 2:  /* T4 */
-			m_timer_change[0] += ( m_timer_pre >> 5 ) - ( old_pre >> 5 );
-			break;
-		case 3:  /* T16 */
-			m_timer_change[0] += ( m_timer_pre >> 7 ) - ( old_pre >> 7 );
-			break;
+			case 0:  /* TIO */
+				break;
+			case 1:  /* T1 */
+				m_timer_change[0] += ( m_timer_pre >> 3 ) - ( old_pre >> 3 );
+				break;
+			case 2:  /* T4 */
+				m_timer_change[0] += ( m_timer_pre >> 5 ) - ( old_pre >> 5 );
+				break;
+			case 3:  /* T16 */
+				m_timer_change[0] += ( m_timer_pre >> 7 ) - ( old_pre >> 7 );
+				break;
 		}
 
 		for( ; m_timer_change[0] > 0; m_timer_change[0]-- )
@@ -1138,17 +1138,17 @@ void tmp94c241_device::tlcs900_handle_timers()
 	{
 		switch( (m_t01mod >> 2) & 3 ) /* T1_INPUT_CLOCK */
 		{
-		case 0:  /* TO0TRG */
-			break;
-		case 1:  /* T1 */
-			m_timer_change[1] += ( m_timer_pre >> 3 ) - ( old_pre >> 3 );
-			break;
-		case 2:  /* T16 */
-			m_timer_change[1] += ( m_timer_pre >> 7 ) - ( old_pre >> 7 );
-			break;
-		case 3:  /* T256 */
-			m_timer_change[1] += ( m_timer_pre >> 11 ) - ( old_pre >> 11 );
-			break;
+			case 0:  /* TO0TRG */
+				break;
+			case 1:  /* T1 */
+				m_timer_change[1] += ( m_timer_pre >> 3 ) - ( old_pre >> 3 );
+				break;
+			case 2:  /* T16 */
+				m_timer_change[1] += ( m_timer_pre >> 7 ) - ( old_pre >> 7 );
+				break;
+			case 3:  /* T256 */
+				m_timer_change[1] += ( m_timer_pre >> 11 ) - ( old_pre >> 11 );
+				break;
 		}
 
 		for( ; m_timer_change[1] > 0; m_timer_change[1]-- )
@@ -1174,18 +1174,18 @@ void tmp94c241_device::tlcs900_handle_timers()
 	{
 		switch( m_t23mod & 3 ) /* T2_INPUT_CLOCK */
 		{
-		case 0: /* invalid */
-			// Not sure yet how this case would be handled...
-			break;
-		case 1: /* T1 */
-			m_timer_change[2] += ( m_timer_pre >> 3 ) - ( old_pre >> 3 );
-			break;
-		case 2: /* T4 */
-			m_timer_change[2] += ( m_timer_pre >> 5 ) - ( old_pre >> 5 );
-			break;
-		case 3: /* T16 */
-			m_timer_change[2] += ( m_timer_pre >> 7 ) - ( old_pre >> 7 );
-			break;
+			case 0: /* invalid */
+				// Not sure yet how this case would be handled...
+				break;
+			case 1: /* T1 */
+				m_timer_change[2] += ( m_timer_pre >> 3 ) - ( old_pre >> 3 );
+				break;
+			case 2: /* T4 */
+				m_timer_change[2] += ( m_timer_pre >> 5 ) - ( old_pre >> 5 );
+				break;
+			case 3: /* T16 */
+				m_timer_change[2] += ( m_timer_pre >> 7 ) - ( old_pre >> 7 );
+				break;
 		}
 
 		for( ; m_timer_change[2] > 0; m_timer_change[2]-- )
@@ -1214,17 +1214,17 @@ void tmp94c241_device::tlcs900_handle_timers()
 	{
 		switch( (m_t23mod >> 2) & 3 ) /* T3_INPUT_CLOCK */
 		{
-		case 0: /* TO2TRG */
-			break;
-		case 1: /* T1 */
-			m_timer_change[3] += ( m_timer_pre >> 3 ) - ( old_pre >> 3 );
-			break;
-		case 2: /* T16 */
-			m_timer_change[3] += ( m_timer_pre >> 7 ) - ( old_pre >> 7 );
-			break;
-		case 3: /* T256 */
-			m_timer_change[3] += ( m_timer_pre >> 11 ) - ( old_pre >> 11 );
-			break;
+			case 0: /* TO2TRG */
+				break;
+			case 1: /* T1 */
+				m_timer_change[3] += ( m_timer_pre >> 3 ) - ( old_pre >> 3 );
+				break;
+			case 2: /* T16 */
+				m_timer_change[3] += ( m_timer_pre >> 7 ) - ( old_pre >> 7 );
+				break;
+			case 3: /* T256 */
+				m_timer_change[3] += ( m_timer_pre >> 11 ) - ( old_pre >> 11 );
+				break;
 		}
 
 		for( ; m_timer_change[3] > 0; m_timer_change[3]-- )
@@ -1250,18 +1250,18 @@ void tmp94c241_device::tlcs900_handle_timers()
 	{
 		switch( m_t4mod & 3 ) /* T4_INPUT_CLOCK */
 		{
-		case 0:  /* TIA */
-			// TODO: implement-me!
-			break;
-		case 1:  /* T1 */
-			m_timer_change[4] += ( m_timer_pre >> 3 ) - ( old_pre >> 3 );
-			break;
-		case 2:  /* T4 */
-			m_timer_change[4] += ( m_timer_pre >> 5 ) - ( old_pre >> 5 );
-			break;
-		case 3:  /* T16 */
-			m_timer_change[4] += ( m_timer_pre >> 7 ) - ( old_pre >> 7 );
-			break;
+			case 0:  /* TIA */
+				// TODO: implement-me!
+				break;
+			case 1:  /* T1 */
+				m_timer_change[4] += ( m_timer_pre >> 3 ) - ( old_pre >> 3 );
+				break;
+			case 2:  /* T4 */
+				m_timer_change[4] += ( m_timer_pre >> 5 ) - ( old_pre >> 5 );
+				break;
+			case 3:  /* T16 */
+				m_timer_change[4] += ( m_timer_pre >> 7 ) - ( old_pre >> 7 );
+				break;
 		}
 
 		for( ; m_timer_change[4] > 0; m_timer_change[4]-- )
@@ -1285,18 +1285,18 @@ void tmp94c241_device::tlcs900_handle_timers()
 
 		switch( m_t6mod & 3 ) /* T6_INPUT_CLOCK */
 		{
-		case 0: /* TIA */
-			// TODO: implement-me!
-			break;
-		case 1: /* T1 */
-			m_timer_change[5] += ( m_timer_pre >> 3 ) - ( old_pre >> 3 );
-			break;
-		case 2: /* T4 */
-			m_timer_change[5] += ( m_timer_pre >> 5 ) - ( old_pre >> 5 );
-			break;
-		case 3: /* T16 */
-			m_timer_change[5] += ( m_timer_pre >> 7 ) - ( old_pre >> 7 );
-			break;
+			case 0: /* TIA */
+				// TODO: implement-me!
+				break;
+			case 1: /* T1 */
+				m_timer_change[5] += ( m_timer_pre >> 3 ) - ( old_pre >> 3 );
+				break;
+			case 2: /* T4 */
+				m_timer_change[5] += ( m_timer_pre >> 5 ) - ( old_pre >> 5 );
+				break;
+			case 3: /* T16 */
+				m_timer_change[5] += ( m_timer_pre >> 7 ) - ( old_pre >> 7 );
+				break;
 		}
 
 		for( ; m_timer_change[5] > 0; m_timer_change[5]-- )
@@ -1320,18 +1320,18 @@ void tmp94c241_device::tlcs900_handle_timers()
 
 		switch( m_t8mod & 3 ) /* T8_INPUT_CLOCK */
 		{
-		case 0:  /* TIA */
-			// TODO: implement-me!
-			break;
-		case 1:  /* T1 */
-			m_timer_change[6] += ( m_timer_pre >> 3 ) - ( old_pre >> 3 );
-			break;
-		case 2:  /* T4 */
-			m_timer_change[6] += ( m_timer_pre >> 5 ) - ( old_pre >> 5 );
-			break;
-		case 3:  /* T16 */
-			m_timer_change[6] += ( m_timer_pre >> 7 ) - ( old_pre >> 7 );
-			break;
+			case 0:  /* TIA */
+				// TODO: implement-me!
+				break;
+			case 1:  /* T1 */
+				m_timer_change[6] += ( m_timer_pre >> 3 ) - ( old_pre >> 3 );
+				break;
+			case 2:  /* T4 */
+				m_timer_change[6] += ( m_timer_pre >> 5 ) - ( old_pre >> 5 );
+				break;
+			case 3:  /* T16 */
+				m_timer_change[6] += ( m_timer_pre >> 7 ) - ( old_pre >> 7 );
+				break;
 		}
 
 		for( ; m_timer_change[6] > 0; m_timer_change[6]-- )
@@ -1354,18 +1354,18 @@ void tmp94c241_device::tlcs900_handle_timers()
 
 		switch( m_tamod & 3 ) /* TA_INPUT_CLOCK */
 		{
-		case 0: /* TIA */
-			// TODO: implement-me!
-			break;
-		case 1: /* T1 */
-			m_timer_change[7] += ( m_timer_pre >> 3 ) - ( old_pre >> 3 );
-			break;
-		case 2: /* T4 */
-			m_timer_change[7] += ( m_timer_pre >> 5 ) - ( old_pre >> 5 );
-			break;
-		case 3: /* T16 */
-			m_timer_change[7] += ( m_timer_pre >> 7 ) - ( old_pre >> 7 );
-			break;
+			case 0: /* TIA */
+				// TODO: implement-me!
+				break;
+			case 1: /* T1 */
+				m_timer_change[7] += ( m_timer_pre >> 3 ) - ( old_pre >> 3 );
+				break;
+			case 2: /* T4 */
+				m_timer_change[7] += ( m_timer_pre >> 5 ) - ( old_pre >> 5 );
+				break;
+			case 3: /* T16 */
+				m_timer_change[7] += ( m_timer_pre >> 7 ) - ( old_pre >> 7 );
+				break;
 		}
 
 		for( ; m_timer_change[7] > 0; m_timer_change[7]-- )
@@ -1395,120 +1395,124 @@ void tmp94c241_device::execute_set_input(int input, int level)
 {
 	switch( input )
 	{
-	case INPUT_LINE_NMI:
-	case TLCS900_NMI:
-		if ( level != m_level[TLCS900_NMI])
-		{
-			m_level[TLCS900_NMI] = level;
-			if (level == ASSERT_LINE)
-				m_nmi_state = ASSERT_LINE;
-		}
-		break;
-
-	case TLCS900_INTWD:
-		break;
-
-	case TLCS900_INT0:
-		if (m_iimc & 0x02)
-		{
-			/* Rising edge detect */
-			if (level != m_level[TLCS900_INT0] && level == ASSERT_LINE)
+		case INPUT_LINE_NMI:
+		case TLCS900_NMI:
+			if ( level != m_level[TLCS900_NMI])
 			{
-				/* Leave HALT state */
-				m_halted = 0;
-				m_int_reg[INTE0AD] |= 0x08;
+				m_level[TLCS900_NMI] = level;
+				if (level == ASSERT_LINE)
+					m_nmi_state = ASSERT_LINE;
 			}
-		}
-		else
-		{
-			/* Level detect */
-			if (level == ASSERT_LINE)
-				m_int_reg[INTE0AD] |= 0x08;
-			else
-				m_int_reg[INTE0AD] &= ~0x08;
-		}
-		m_level[TLCS900_INT0] = level;
-		break;
+			break;
 
-	case TLCS900_INT4:
-		if (level != m_level[TLCS900_INT4]) {
-			m_level[TLCS900_INT4] = level;
-			if (level == ASSERT_LINE)
-				m_int_reg[INTE45] |= 0x08;
-			else
-				m_int_reg[INTE45] &= ~0x08;
-		}
-		break;
+		case TLCS900_INTWD:
+			break;
 
-	case TLCS900_INT5:
-		if (level != m_level[TLCS900_INT5]) {
-			m_level[TLCS900_INT5] = level;
-			if (level == ASSERT_LINE)
-				m_int_reg[INTE45] |= 0x80;
+		case TLCS900_INT0:
+			if (m_iimc & 0x02)
+			{
+				/* Rising edge detect */
+				if (level != m_level[TLCS900_INT0] && level == ASSERT_LINE)
+				{
+					/* Leave HALT state */
+					m_halted = 0;
+					m_int_reg[INTE0AD] |= 0x08;
+				}
+			}
 			else
-				m_int_reg[INTE45] &= ~0x80;
-		}
-		break;
+			{
+				/* Level detect */
+				if (level == ASSERT_LINE)
+					m_int_reg[INTE0AD] |= 0x08;
+				else
+					m_int_reg[INTE0AD] &= ~0x08;
+			}
+			m_level[TLCS900_INT0] = level;
+			break;
 
-	case TLCS900_INT6:
-		if (level != m_level[TLCS900_INT6]) {
-			m_level[TLCS900_INT6] = level;
-			if (level == ASSERT_LINE)
-				m_int_reg[INTE67] |= 0x08;
-			else
-				m_int_reg[INTE67] &= ~0x08;
-		}
-		break;
+		case TLCS900_INT4:
+			if (level != m_level[TLCS900_INT4]) {
+				m_level[TLCS900_INT4] = level;
+				if (level == ASSERT_LINE)
+					m_int_reg[INTE45] |= 0x08;
+				else
+					m_int_reg[INTE45] &= ~0x08;
+			}
+			break;
 
-	case TLCS900_INT7:
-		if (level != m_level[TLCS900_INT7]) {
-			m_level[TLCS900_INT7] = level;
-			if (level == ASSERT_LINE)
-				m_int_reg[INTE67] |= 0x80;
-			else
-				m_int_reg[INTE67] &= ~0x80;
-		}
-		break;
+		case TLCS900_INT5:
+			if (level != m_level[TLCS900_INT5]) {
+				m_level[TLCS900_INT5] = level;
+				if (level == ASSERT_LINE)
+					m_int_reg[INTE45] |= 0x80;
+				else
+					m_int_reg[INTE45] &= ~0x80;
+			}
+			break;
 
-	case TLCS900_INT8:
-		if (level != m_level[TLCS900_INT8]) {
-			m_level[TLCS900_INT8] = level;
-			if (level == ASSERT_LINE)
-				m_int_reg[INTE89] |= 0x08;
-			else
-				m_int_reg[INTE89] &= ~0x08;
-		}
-		break;
+		case TLCS900_INT6:
+			if (level != m_level[TLCS900_INT6]) {
+				m_level[TLCS900_INT6] = level;
+				if (level == ASSERT_LINE)
+					m_int_reg[INTE67] |= 0x08;
+				else
+					m_int_reg[INTE67] &= ~0x08;
+			}
+			break;
 
-	case TLCS900_INT9:
-		if (level != m_level[TLCS900_INT9]) {
-			m_level[TLCS900_INT9] = level;
-			if (level == ASSERT_LINE)
-				m_int_reg[INTE89] |= 0x80;
-			else
-				m_int_reg[INTE89] &= ~0x80;
-		}
-		break;
+		case TLCS900_INT7:
+			if (level != m_level[TLCS900_INT7]) {
+				m_level[TLCS900_INT7] = level;
+				if (level == ASSERT_LINE)
+					m_int_reg[INTE67] |= 0x80;
+				else
+					m_int_reg[INTE67] &= ~0x80;
+			}
+			break;
 
-	case TLCS900_INTA:
-		if (level != m_level[TLCS900_INTA]) {
-			m_level[TLCS900_INTA] = level;
-			if (level == ASSERT_LINE)
-				m_int_reg[INTEAB] |= 0x08;
-			else
-				m_int_reg[INTEAB] &= ~0x08;
-		}
-		break;
+		case TLCS900_INT8:
+			if (level != m_level[TLCS900_INT8]) {
+				m_level[TLCS900_INT8] = level;
+				if (level == ASSERT_LINE)
+					m_int_reg[INTE89] |= 0x08;
+				else
+					m_int_reg[INTE89] &= ~0x08;
+			}
+			break;
 
-	case TLCS900_INTB:
-		if (level != m_level[TLCS900_INTB]) {
-			m_level[TLCS900_INTB] = level;
-			if (level == ASSERT_LINE)
-				m_int_reg[INTEAB] |= 0x80;
-			else
-				m_int_reg[INTEAB] &= ~0x80;
-		}
-		break;
+		case TLCS900_INT9:
+			if (level != m_level[TLCS900_INT9]) {
+				m_level[TLCS900_INT9] = level;
+				if (level == ASSERT_LINE)
+					m_int_reg[INTE89] |= 0x80;
+				else
+					m_int_reg[INTE89] &= ~0x80;
+			}
+			break;
+
+		case TLCS900_INTA:
+			if (level != m_level[TLCS900_INTA]) {
+				m_level[TLCS900_INTA] = level;
+				if (level == ASSERT_LINE)
+					m_int_reg[INTEAB] |= 0x08;
+				else
+					m_int_reg[INTEAB] &= ~0x08;
+			}
+			break;
+
+		case TLCS900_INTB:
+			if (level != m_level[TLCS900_INTB]) {
+				m_level[TLCS900_INTB] = level;
+				if (level == ASSERT_LINE)
+					m_int_reg[INTEAB] |= 0x80;
+				else
+					m_int_reg[INTEAB] &= ~0x80;
+			}
+			break;
+
+		default:
+			/* invalid */
+			return;
 	}
 	m_check_irqs = 1;
 }
