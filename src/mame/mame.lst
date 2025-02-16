@@ -47161,6 +47161,9 @@ learnwin1
 learnwinf
 spielmast
 
+@source:vtech/magibook.cpp
+magibooksp                      // (c) 2016 VTech / LeapFrog
+
 @source:vtech/pc1000.cpp
 misterx
 ordisava
