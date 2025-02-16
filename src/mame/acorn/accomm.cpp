@@ -25,22 +25,22 @@
 
 #include "emu.h"
 
+#include "bus/centronics/ctronics.h"
+#include "bus/econet/econet.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/g65816/g65816.h"
 #include "machine/6522via.h"
 #include "machine/6850acia.h"
 #include "machine/clock.h"
 #include "machine/input_merger.h"
 #include "machine/mc6854.h"
-#include "machine/ram.h"
 #include "machine/nvram.h"
 #include "machine/pcf8573.h"
+#include "machine/ram.h"
 #include "machine/scn_pci.h"
 #include "sound/beep.h"
 #include "sound/pcd3311.h"
 #include "video/saa5240.h"
-#include "bus/econet/econet.h"
-#include "bus/centronics/ctronics.h"
-#include "bus/rs232/rs232.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -110,6 +110,8 @@ private:
 	void ram_w(offs_t offset, uint8_t data);
 	uint8_t sheila_r(offs_t offset);
 	void sheila_w(offs_t offset, uint8_t data);
+	uint8_t via_pb_r();
+	void via_pb_w(uint8_t data);
 
 	void accomm_palette(palette_device &palette) const;
 
@@ -509,32 +511,31 @@ uint8_t accomm_state::ram_r(offs_t offset)
 	}
 	else
 	{
-		switch (m_ram->size())
-		{
-		case 512 * 1024:
-			data = m_ram->pointer()[offset & 0x7ffff];
-			break;
-
-		case 1024 * 1024:
-			data = m_ram->pointer()[offset & 0xfffff];
-			break;
-		}
+		data = m_ram->pointer()[offset & m_ram->mask()];
 	}
 	return data;
 }
 
 void accomm_state::ram_w(offs_t offset, uint8_t data)
 {
-	switch (m_ram->size())
-	{
-	case 512 * 1024:
-		m_ram->pointer()[offset & 0x7ffff] = data;
-		break;
+	m_ram->pointer()[offset & m_ram->mask()] = data;
+}
 
-	case 1024 * 1024:
-		m_ram->pointer()[offset & 0xfffff] = data;
-		break;
-	}
+
+uint8_t accomm_state::via_pb_r()
+{
+	return 0xfe | (m_rtc->sda_r() & m_cct->read_sda());
+}
+
+void accomm_state::via_pb_w(uint8_t data)
+{
+	data ^= 0xff;
+
+	m_rtc->sda_w(BIT(data, 1));
+	m_rtc->scl_w(BIT(data, 2));
+
+	m_cct->write_sda(BIT(data, 1));
+	m_cct->write_scl(BIT(data, 2));
 }
 
 
@@ -710,11 +711,6 @@ void accomm_state::main_map(address_map &map)
 	map(0xff0000, 0xffffff).rom().region("maincpu", 0x010000);                                      /* ROM bank 1 (ROM Slot 0) */
 }
 
-void accomm_state::saa5240_map(address_map &map)
-{
-	map.global_mask(0x07ff);
-	map(0x0000, 0x07ff).ram();
-}
 
 INPUT_CHANGED_MEMBER(accomm_state::trigger_reset)
 {
@@ -926,17 +922,14 @@ void accomm_state::accomm(machine_config &config)
 
 	/* teletext */
 	SAA5240A(config, m_cct, 6_MHz_XTAL);
-	m_cct->set_addrmap(0, &accomm_state::saa5240_map);
+	m_cct->set_ram_size(0x800);
 
 	/* via */
 	MOS6522(config, m_via, 16_MHz_XTAL / 16);
 	m_via->writepa_handler().set("cent_data_out", FUNC(output_latch_device::write));
 	m_via->ca2_handler().set("centronics", FUNC(centronics_device::write_strobe));
-	m_via->readpb_handler().set([this] () { return uint8_t(m_rtc->sda_r() & m_cct->read_sda()); });
-	m_via->writepb_handler().set(m_rtc, FUNC(pcf8573_device::sda_w)).bit(1).invert();
-	m_via->writepb_handler().append(m_rtc, FUNC(pcf8573_device::scl_w)).bit(2).invert();
-	m_via->writepb_handler().append(m_cct, FUNC(saa5240a_device::write_sda)).bit(1).invert();
-	m_via->writepb_handler().append(m_cct, FUNC(saa5240a_device::write_scl)).bit(2).invert();
+	m_via->readpb_handler().set(FUNC(accomm_state::via_pb_r));
+	m_via->writepb_handler().set(FUNC(accomm_state::via_pb_w));
 	m_via->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<0>));
 
 	/* rs423 */
@@ -977,7 +970,7 @@ void accomm_state::accomm(machine_config &config)
 	econet.clk_wr_callback().append(m_adlc, FUNC(mc6854_device::rxc_w));
 	econet.data_wr_callback().set(m_adlc, FUNC(mc6854_device::set_rx));
 
-	ECONET_SLOT(config, "econet254", "econet", econet_devices).set_slot(254);
+	ECONET_SLOT(config, "econet254", "econet", econet_devices);
 
 	/* printer */
 	centronics_device &centronics(CENTRONICS(config, "centronics", centronics_devices, "printer"));
@@ -993,7 +986,7 @@ void accomm_state::accommi(machine_config &config)
 
 	/* teletext */
 	SAA5240B(config.replace(), m_cct, 6_MHz_XTAL);
-	m_cct->set_addrmap(0, &accomm_state::saa5240_map);
+	m_cct->set_ram_size(0x800);
 }
 
 
