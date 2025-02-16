@@ -514,8 +514,8 @@ void taitopjc_state::videochip_w(offs_t address, uint32_t data)
 
 		if (address >= 0x1003f000 && address < 0x10040000)
 		{
-			uint32_t const a = (address - 0x1003f000) & 0x7ff;
-			m_tilemap[BIT(address, 11)]->mark_tile_dirty((a * 2));
+			uint32_t const a = address & 0x7ff;
+			m_tilemap[BIT(address, 11)]->mark_tile_dirty((a * 2) + 0);
 			m_tilemap[BIT(address, 11)]->mark_tile_dirty((a * 2) + 1);
 		}
 		m_gfxdecode->gfx(0)->mark_dirty(addr / 64);
@@ -569,17 +569,17 @@ uint64_t taitopjc_state::ppc_common_r(offs_t offset, uint64_t mem_mask)
 {
 	uint64_t r = 0;
 
-	LOGIO("ppc_common_r: %08X, %08X%08X\n", offset, (uint32_t)(mem_mask >> 32), (uint32_t)(mem_mask));
+	LOGIO("ppc_common_r: %08X, %016X\n", offset, mem_mask);
 
 	uint32_t const address = offset * 2;
 
 	if (ACCESSING_BITS_48_63)
 	{
-		r |= (uint64_t)(m_io_share_ram[address]) << 48;
+		r |= uint64_t(m_io_share_ram[address]) << 48;
 	}
 	if (ACCESSING_BITS_16_31)
 	{
-		r |= (uint64_t)(m_io_share_ram[address + 1]) << 16;
+		r |= uint64_t(m_io_share_ram[address + 1]) << 16;
 	}
 
 	return r;
