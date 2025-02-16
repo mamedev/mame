@@ -17,14 +17,14 @@ TODO (main):
 - PS/2 mouse is unstable, worked around by disabling and using a serial mouse instead.
 
 TODO (usability, to be moved in a SW list):
-- windows xp sp3: tests HW then does an ACPI devtrap write ($48), will eventually BSoD with
+- Windows XP SP3: tests HW then does an ACPI devtrap write ($48), will eventually BSoD with
   ACPI STOP #a5 error with param $11
 \- To bypass hold F7 while the "to install SCSI drivers [...] press F6" appears.
    And by F7 I really mean it :shrug:
 
-- windows xp sp3: BSoD during install with a STOP #0a IRQL_NOT_LESS_OR_EQUAL;
+- Windows XP SP3: BSoD during install with a STOP #0a IRQL_NOT_LESS_OR_EQUAL;
 
-- windows neptune: BSoD during ethernet check (after time clock setup)
+- Windows Neptune: BSoD during ethernet check (after time clock setup)
   with a STOP #a0 INTERNAL_POWER_ERROR with param1 0x5 ("reserved"!?)
 
 - gamecstl Kontron BIOS:
@@ -39,12 +39,12 @@ TODO (usability, to be moved in a SW list):
    hangs there;
 \- GUI is never recognized no matter what, punts with DirectX not installed;
 
-- xubuntu 6.10: throws several SCSIDEV unhandled $46 & $51 commands
+- Xubuntu 6.10: throws several SCSIDEV unhandled $46 & $51 commands
   (get configuration/read disc information),
   eventually punts to prompt with a "can't access tty: job control turned off" (on live CD) or
   hangs at "Configuring network interfaces" (on actual install);
 
-- xubuntu 10.10: stalls after '900 ethernet check;
+- Xubuntu 10.10: stalls after '900 ethernet check;
 
 - Haiku 0.1: hangs throwing an "unhandled READ TOC format 2",
   serial COM1 prints a "vm_mark_page_range_inuse: page 0x9f in non-free state 7!"
@@ -400,8 +400,24 @@ ROM_START(zidav630e)
 //  ROMX_LOAD( "V630e104.bin",     0x040000, 0x040000, CRC(?) SHA1(?), ROM_BIOS(1) )
 ROM_END
 
-/*
- * Arcade based GameCristal
+
+/* GameCristal is a PC-based multigame arcade (with an unknown emulator).
+   It uses a small external PCB from Azkoyen with an MCU (unknown type) for the JAMMA interface:
+                              _______________         _______
+   ____--__-- _______________|   DB-25      |________| DB-9 |_____
+  |   |__||__| <-Jacks       |______________|        |______|    |
+  | _________                                               ___  |
+  ||o o o o |<-Power                     ________________  |  |  |
+  |                                     | MCU           |  |  |  |
+  |                                     |_______________|  |__|  |
+  |                                      _________   Xtal        |
+  |                                     |DIPS x 8|   5 MHz       |
+  |                                                              |
+  |    Test sw->(o)         _________   _________   _________    |
+  | Service sw->(o)         SN74HC245N  SN74HC245N  SN74HC245N   |
+  |_________                                          ___________|
+           |_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|
+                          JAMMA
  */
 
 ROM_START(gamecstl)
@@ -412,6 +428,9 @@ ROM_START(gamecstl)
 
 	DISK_REGION( "pci:00.1:ide1:0:hdd" )
 	DISK_IMAGE( "gamecstl", 0, SHA1(b431af3c42c48ba07972d77a3d24e60ee1e4359e) )
+
+	ROM_REGION( 0x2000, "mcu", 0 )
+	ROM_LOAD( "gamecristal_datasat.bin", 0x0000, 0x2000, NO_DUMP ) // MCU on the JAMMA interface PCB, unknown type and ROM size
 ROM_END
 
 ROM_START(gamecst2)
@@ -421,15 +440,18 @@ ROM_START(gamecst2)
 
 	DISK_REGION( "pci:00.1:ide1:0:hdd" )
 	DISK_IMAGE( "gamecst2", 0, SHA1(14e1b311cb474801c7bdda3164a0c220fb102159) )
+
+	ROM_REGION( 0x2000, "mcu", 0 )
+	ROM_LOAD( "gamecristal_datasat.bin", 0x0000, 0x2000, NO_DUMP ) // MCU on the JAMMA interface PCB, unknown type and ROM size
 ROM_END
 
 } // anonymous namespace
 
 
-COMP( 2000, shutms11,  0,      0,      sis630,   sis630, sis630_state, empty_init, "Shuttle", "MS11 PC (SiS630 chipset)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 2001, asuspolo,  0,      0,      asuspolo, sis630, sis630_state, empty_init, "Asus", "Polo \"Genie\" (SiS630 chipset)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // hangs at CMOS check first time, corrupts flash ROM on successive boots
-COMP( 2001, asuscusc,  0,      0,      asuscusc, sis630, sis630_state, empty_init, "Asus", "Terminator P-3 \"Cusc\" (SiS630 chipset)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // fails CMOS test, does crc with I/O accesses at $c00
-COMP( 2001, zidav630e, 0,      0,      zidav630e,sis630, sis630_state, empty_init, "Zida", "V630E Baby AT (SiS630 chipset)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // Flash ROM corrupts often, otherwise same-y as shutms11
+COMP( 2000, shutms11,  0, 0, sis630,   sis630, sis630_state, empty_init, "Shuttle", "MS11 PC (SiS630 chipset)",                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 2001, asuspolo,  0, 0, asuspolo, sis630, sis630_state, empty_init, "Asus",    "Polo \"Genie\" (SiS630 chipset)",          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // hangs at CMOS check first time, corrupts flash ROM on successive boots
+COMP( 2001, asuscusc,  0, 0, asuscusc, sis630, sis630_state, empty_init, "Asus",    "Terminator P-3 \"Cusc\" (SiS630 chipset)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // fails CMOS test, does crc with I/O accesses at $c00
+COMP( 2001, zidav630e, 0, 0, zidav630e,sis630, sis630_state, empty_init, "Zida",    "V630E Baby AT (SiS630 chipset)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // Flash ROM corrupts often, otherwise same-y as shutms11
 
 
 // Arcade based games
