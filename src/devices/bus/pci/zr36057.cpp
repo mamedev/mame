@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders: Angelo Salese
 /**************************************************************************************************
 
 Zoran ZR36057 / ZR36067 PCI-based chipsets
@@ -8,8 +8,18 @@ PCI glue logic for multimedia MJPEG, MPEG1 & DVD.
 Paired with every single TV standard for video capture in the fairly decent number of subvendor
 iterations.
 - https://www.kernel.org/doc/html/v4.14/media/v4l-drivers/zoran.html
-- misc/sliver.cpp uses ZR36050
-- misc/magictg.cpp uses ZR36016
+- Currently using DC10+ configuration:
+  ZR36067 + ZR36060 (ZR36050 + ZR36016 glued together)
+  SAA7110a (TV decoder) + adv7176 (TV encoder)
+- misc/sliver.cpp uses ZR36050 + ZR36011
+- misc/magictg.cpp uses ZR36120 + ZR36050 + ZR36016
+ZR36057 is known to have two HW quirks that are been fixed with ZR36067.
+
+TODO:
+- Currently at dc10plus HW test "Error at video decoder", requires SAA7110a to continue;
+- Hookup busmaster;
+- Stub, eventually decouple AV PCI controller part from the actual client cards;
+- Soft Reset & Write lock mechanisms (each register have separate macro-groups);
 
 **************************************************************************************************/
 
@@ -41,7 +51,7 @@ zr36057_device::zr36057_device(const machine_config &mconfig, device_type type, 
 	// - 0x13ca4231: Iomega JPEG/TV Card
 	// NOTE: subvendor is omitted in '36057 design (missing?), driven at PCIRST time to 32 pins in
 	// '36067 thru pull-up or pull-down resistors (subvendor responsibility?)
-	set_ids(0x11de6057, 0x01, 0x040000, 0x10317efe);
+	set_ids(0x11de6057, 0x02, 0x040000, 0x10317efe);
 }
 
 zr36057_device::zr36057_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -58,7 +68,7 @@ void zr36057_device::device_start()
 {
 	pci_card_device::device_start();
 
-	add_map(4096, M_MEM, FUNC(zr36057_device::map));
+	add_map(4 * 1024, M_MEM, FUNC(zr36057_device::asr_map));
 
 	// INTA#
 	intr_pin = 1;
@@ -68,20 +78,124 @@ void zr36057_device::device_reset()
 {
 	pci_card_device::device_reset();
 
-	// fast DEVSEL#
+	// fast DEVSEL# (00), can enable busmaster
 	command = 0x0000;
+	command_mask = 0x0006;
 	status = 0x0000;
 	intr_line = 0x0a;
 	// TODO: PCI regs 0x3e/0x3f max_lat = 0x10 (4 usec), min_gnt = 0x02 (0.5 usec)
 
 	remap_cb();
+
+	m_softreset = 0;
+	software_reset();
+}
+
+void zr36057_device::software_reset()
+{
+	LOG("SoftReset\n");
+	m_video_frontend.horizontal_config = (0 << 30) | (0x001 << 10) | (0x3ff << 0);
+	m_video_frontend.vertical_config = (0 << 30) | (0x001 << 10) | (0x3ff << 0);
+
+	m_pci_waitstate_control = 0;
+	m_gpio_ddr = 0xff; // all inputs
+    // GuestBus ID default
+    // m_gpio_data = 0xf0;
+    for (int i = 0; i < 4; i++)
+        m_guestbus.time[i] = 0;
 }
 
 void zr36057_device::config_map(address_map &map)
 {
 	pci_card_device::config_map(map);
+	map(0x3e, 0x3e).lr8(NAME([] () { return 0x02; }));
+	map(0x3f, 0x3f).lr8(NAME([] () { return 0x10; }));
 }
 
-void zr36057_device::map(address_map &map)
+// Application Specific Register
+void zr36057_device::asr_map(address_map &map)
 {
+	map(0x000, 0x003).lrw32(
+		NAME([this] (offs_t offset) {
+            // NOTE: wants to read-back here, throws "Bus Master ASIC error" otherwise (?)
+            LOG("Video Front End Horizontal Configuration R\n");
+			return m_video_frontend.horizontal_config;
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			COMBINE_DATA(&m_video_frontend.horizontal_config);
+			LOG("Video Front End Horizontal Configuration W %08x & %08x\n", data, mem_mask);
+		})
+	);
+	map(0x004, 0x007).lrw32(
+		NAME([this] (offs_t offset) {
+            LOG("Video Front End Vertical Configuration R\n");
+			return m_video_frontend.vertical_config;
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			COMBINE_DATA(&m_video_frontend.vertical_config);
+			LOG("Video Front End Vertical Configuration %08x & %08\n", data, mem_mask);
+		})
+	);
+
+    // ...
+
+	map(0x028, 0x02b).lrw32(
+		NAME([this] (offs_t offset) {
+			return (m_softreset << 24) | (m_pci_waitstate_control << 16) | m_gpio_ddr;
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			LOG("System, PCI and General Purpose Pins Control %08x & %08x\n", data, mem_mask);
+			if (ACCESSING_BITS_24_31)
+			{
+				m_softreset = !!BIT(data, 24);
+				// TODO: will lock all writes in config_map but this bit
+                // (inclusive of the "all" group?)
+				if (!m_softreset)
+				{
+					software_reset();
+					return;
+				}
+			}
+			if (ACCESSING_BITS_16_23)
+				m_pci_waitstate_control = (data >> 16) & 7;
+
+			if (ACCESSING_BITS_0_7)
+				m_gpio_ddr = data & 0xff;
+		})
+	);
+    map(0x02c, 0x02f).lrw32(
+        NAME([this] (offs_t offset) {
+            LOG("General Purpose Pins and GuestBus Control R\n");
+
+            // The doc claims 0xf0 default for GPIO, but win98 driver will throw "subvendor ID failed"
+            // while testing various ID combinations here
+            return (0x7e << 24) | (m_guestbus.time[3] << 12) | (m_guestbus.time[2] << 8) | (m_guestbus.time[1] << 4) | (m_guestbus.time[0] << 0);
+        }),
+        NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+            LOG("General Purpose Pins and GuestBus Control W %08x & %08x\n", data, mem_mask);
+
+            // if (ACCESSING_BITS_24_31)
+            // GenPurIO writes, TBD
+
+            if (ACCESSING_BITS_8_15)
+            {
+                m_guestbus.time[3] = (data >> 12) & 0xf;
+                m_guestbus.time[2] = (data >> 8) & 0xf;
+            }
+
+            if (ACCESSING_BITS_0_7)
+            {
+                m_guestbus.time[1] = (data >> 4) & 0xf;
+                m_guestbus.time[0] = (data >> 0) & 0xf;
+            }
+        })
+    );
+
+    map(0x044, 0x047).lr32(
+        NAME([this] (offs_t offset) {
+            LOG("I2C R\n");
+            // avoid win98 stall for now
+            return 0x3;
+        })
+    );
 }
