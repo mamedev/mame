@@ -17,14 +17,14 @@ TODO (main):
 - PS/2 mouse is unstable, worked around by disabling and using a serial mouse instead.
 
 TODO (usability, to be moved in a SW list):
-- Windows XP SP3: tests HW then does an ACPI devtrap write ($48), will eventually BSoD with
+- windows xp sp3: tests HW then does an ACPI devtrap write ($48), will eventually BSoD with
   ACPI STOP #a5 error with param $11
 \- To bypass hold F7 while the "to install SCSI drivers [...] press F6" appears.
    And by F7 I really mean it :shrug:
 
-- Windows XP SP3: BSoD during install with a STOP #0a IRQL_NOT_LESS_OR_EQUAL;
+- windows xP sp3: BSoD during install with a STOP #0a IRQL_NOT_LESS_OR_EQUAL;
 
-- Windows Neptune: BSoD during ethernet check (after time clock setup)
+- windows neptune: BSoD during ethernet check (after time clock setup)
   with a STOP #a0 INTERNAL_POWER_ERROR with param1 0x5 ("reserved"!?)
 
 - gamecstl Kontron BIOS:
@@ -38,13 +38,29 @@ TODO (usability, to be moved in a SW list):
 \- Doesn't accept any PS/2 input, tries to install a "PCI standard CPU Host Bridge" (?),
    hangs there;
 \- GUI is never recognized no matter what, punts with DirectX not installed;
+\- It uses a small external PCB from Azkoyen with an MCU (unknown type) for the JAMMA interface:
+                              _______________         _______
+   ____--__-- _______________|   DB-25      |________| DB-9 |_____
+  |   |__||__| <-Jacks       |______________|        |______|    |
+  | _________                                               ___  |
+  ||o o o o |<-Power                     ________________  |  |  |
+  |                                     | MCU           |  |  |  |
+  |                                     |_______________|  |__|  |
+  |                                      _________   Xtal        |
+  |                                     |DIPS x 8|   5 MHz       |
+  |                                                              |
+  |    Test sw->(o)         _________   _________   _________    |
+  | Service sw->(o)         SN74HC245N  SN74HC245N  SN74HC245N   |
+  |_________                                          ___________|
+           |_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|
+                          JAMMA
 
-- Xubuntu 6.10: throws several SCSIDEV unhandled $46 & $51 commands
+- xubuntu 6.10: throws several SCSIDEV unhandled $46 & $51 commands
   (get configuration/read disc information),
   eventually punts to prompt with a "can't access tty: job control turned off" (on live CD) or
   hangs at "Configuring network interfaces" (on actual install);
 
-- Xubuntu 10.10: stalls after '900 ethernet check;
+- xubuntu 10.10: stalls after '900 ethernet check;
 
 - Haiku 0.1: hangs throwing an "unhandled READ TOC format 2",
   serial COM1 prints a "vm_mark_page_range_inuse: page 0x9f in non-free state 7!"
@@ -401,24 +417,7 @@ ROM_START(zidav630e)
 ROM_END
 
 
-/* GameCristal is a PC-based multigame arcade (with an unknown emulator).
-   It uses a small external PCB from Azkoyen with an MCU (unknown type) for the JAMMA interface:
-                              _______________         _______
-   ____--__-- _______________|   DB-25      |________| DB-9 |_____
-  |   |__||__| <-Jacks       |______________|        |______|    |
-  | _________                                               ___  |
-  ||o o o o |<-Power                     ________________  |  |  |
-  |                                     | MCU           |  |  |  |
-  |                                     |_______________|  |__|  |
-  |                                      _________   Xtal        |
-  |                                     |DIPS x 8|   5 MHz       |
-  |                                                              |
-  |    Test sw->(o)         _________   _________   _________    |
-  | Service sw->(o)         SN74HC245N  SN74HC245N  SN74HC245N   |
-  |_________                                          ___________|
-           |_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|
-                          JAMMA
- */
+// GameCristal - PC-based multigame arcade (with an unknown emulator).
 
 ROM_START(gamecstl)
 	ROM_REGION32_LE(0x80000, "flash", ROMREGION_ERASEFF )
