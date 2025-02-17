@@ -118,7 +118,7 @@ void taitojc_state::draw_object(bitmap_ind16 &bitmap, const rectangle &cliprect,
 	uint32_t const *v;
 	if (address >= 0xff000)
 		v = &m_objlist[(address - 0xff000) / 4];
-	if (address >= 0xfc000)
+	else if (address >= 0xfc000)
 		v = &m_char_ram[(address - 0xfc000) / 4];
 	else if (address >= 0xf8000)
 		v = &m_tile_ram[(address - 0xf8000) / 4];
