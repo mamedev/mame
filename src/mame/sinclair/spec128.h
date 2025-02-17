@@ -13,14 +13,18 @@
 
 #include "spectrum.h"
 
+#include "machine/z80dma.h"
+
 
 class spectrum_128_state : public spectrum_state
 {
 public:
 	spectrum_128_state(const machine_config &mconfig, device_type type, const char *tag) :
-		spectrum_state(mconfig, type, tag),
-		m_bank_rom(*this, "bank_rom%u", 0U),
-		m_bank_ram(*this, "bank_ram%u", 0U)
+		spectrum_state(mconfig, type, tag)
+		, m_bank_rom(*this, "bank_rom%u", 0U)
+		, m_bank_ram(*this, "bank_ram%u", 0U)
+		, m_dma(*this, "dma_ext")
+		, m_mod_dma(*this, "MOD_DMA")
 	{ }
 
 	void spectrum_128(machine_config &config);
@@ -55,12 +59,16 @@ private:
 	void spectrum_128_io(address_map &map) ATTR_COLD;
 	void spectrum_128_mem(address_map &map) ATTR_COLD;
 	void spectrum_128_fetch(address_map &map) ATTR_COLD;
+
+	optional_device<z80dma_device> m_dma;
+
+	optional_ioport m_mod_dma;
 };
 
 #define X1_128_AMSTRAD  35'469'000       // Main clock (Amstrad 128K model, +2A?)
 #define X1_128_SINCLAIR 35.469_MHz_XTAL  // Main clock (Sinclair 128K model)
 
-/* 128K machines take an extra 4 cycles per scan line - add this to retrace */
+// 128K machines take an extra 4 cycles per scan line - add this to retrace 
 #define SPEC128_UNSEEN_LINES    15
 #define SPEC128_RETRACE_CYCLES  52
 #define SPEC128_CYCLES_PER_LINE 228
