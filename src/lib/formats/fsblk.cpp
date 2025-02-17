@@ -186,69 +186,99 @@ meta_data filesystem_t::volume_metadata()
 	return meta_data();
 }
 
-err_t filesystem_t::volume_metadata_change(const meta_data &meta)
+std::error_condition filesystem_t::volume_metadata_change(const meta_data &meta)
 {
-	return ERR_UNSUPPORTED;
+	return error::unsupported;
 }
 
-std::pair<err_t, meta_data> filesystem_t::metadata(const std::vector<std::string> &path)
+std::pair<std::error_condition, meta_data> filesystem_t::metadata(const std::vector<std::string> &path)
 {
-	return std::make_pair(ERR_UNSUPPORTED, meta_data());
+	return std::make_pair(error::unsupported, meta_data());
 }
 
-err_t filesystem_t::metadata_change(const std::vector<std::string> &path, const meta_data &meta)
+std::error_condition filesystem_t::metadata_change(const std::vector<std::string> &path, const meta_data &meta)
 {
-	return ERR_UNSUPPORTED;
+	return error::unsupported;
 }
 
-std::pair<err_t, std::vector<dir_entry>> filesystem_t::directory_contents(const std::vector<std::string> &path)
+std::pair<std::error_condition, std::vector<dir_entry>> filesystem_t::directory_contents(const std::vector<std::string> &path)
 {
-	return std::make_pair(ERR_UNSUPPORTED, std::vector<dir_entry>());
+	return std::make_pair(error::unsupported, std::vector<dir_entry>());
 }
 
-err_t filesystem_t::rename(const std::vector<std::string> &opath, const std::vector<std::string> &npath)
+std::error_condition filesystem_t::rename(const std::vector<std::string> &opath, const std::vector<std::string> &npath)
 {
-	return ERR_UNSUPPORTED;
+	return error::unsupported;
 }
 
-err_t filesystem_t::remove(const std::vector<std::string> &path)
+std::error_condition filesystem_t::remove(const std::vector<std::string> &path)
 {
-	return ERR_UNSUPPORTED;
+	return error::unsupported;
 }
 
-err_t filesystem_t::dir_create(const std::vector<std::string> &path, const meta_data &meta)
+std::error_condition filesystem_t::dir_create(const std::vector<std::string> &path, const meta_data &meta)
 {
-	return ERR_UNSUPPORTED;
+	return error::unsupported;
 }
 
-err_t filesystem_t::file_create(const std::vector<std::string> &path, const meta_data &meta)
+std::error_condition filesystem_t::file_create(const std::vector<std::string> &path, const meta_data &meta)
 {
-	return ERR_UNSUPPORTED;
+	return error::unsupported;
 }
 
-std::pair<err_t, std::vector<u8>> filesystem_t::file_read(const std::vector<std::string> &path)
+std::pair<std::error_condition, std::vector<u8>> filesystem_t::file_read(const std::vector<std::string> &path)
 {
-	return std::make_pair(ERR_UNSUPPORTED, std::vector<u8>());
+	return std::make_pair(error::unsupported, std::vector<u8>());
 }
 
-err_t filesystem_t::file_write(const std::vector<std::string> &path, const std::vector<u8> &data)
+std::error_condition filesystem_t::file_write(const std::vector<std::string> &path, const std::vector<u8> &data)
 {
-	return ERR_UNSUPPORTED;
+	return error::unsupported;
 }
 
-std::pair<err_t, std::vector<u8>> filesystem_t::file_rsrc_read(const std::vector<std::string> &path)
+std::pair<std::error_condition, std::vector<u8>> filesystem_t::file_rsrc_read(const std::vector<std::string> &path)
 {
-	return std::make_pair(ERR_UNSUPPORTED, std::vector<u8>());
+	return std::make_pair(error::unsupported, std::vector<u8>());
 }
 
-err_t filesystem_t::file_rsrc_write(const std::vector<std::string> &path, const std::vector<u8> &data)
+std::error_condition filesystem_t::file_rsrc_write(const std::vector<std::string> &path, const std::vector<u8> &data)
 {
-	return ERR_UNSUPPORTED;
+	return error::unsupported;
 }
 
-err_t filesystem_t::format(const meta_data &meta)
+std::error_condition filesystem_t::format(const meta_data &meta)
 {
-	return ERR_UNSUPPORTED;
+	return error::unsupported;
+}
+
+std::error_category const &fs_category() noexcept
+{
+	class fs_category_impl : public std::error_category
+	{
+	public:
+		virtual char const *name() const noexcept override { return "fs"; }
+
+		virtual std::string message(int condition) const override
+		{
+			using namespace std::literals;
+			static std::string_view const s_messages[] = {
+					"No error"sv,
+					"Unsupported operation"sv,
+					"File or directory not found"sv,
+					"No space on volume"sv,
+					"Invalid block number"sv,
+					"Invalid filename or path"sv,
+					"Incorrect file size"sv,
+					"File already exists"sv,
+			};
+			if ((0 <= condition) && (std::size(s_messages) > condition))
+				return std::string(s_messages[condition]);
+			else
+				return "Unknown error"s;
+		}
+	};
+	static fs_category_impl const s_fs_category_instance;
+	return s_fs_category_instance;
 }
 
 } // namespace fs

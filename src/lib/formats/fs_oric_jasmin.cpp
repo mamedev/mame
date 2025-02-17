@@ -56,20 +56,20 @@ public:
 	virtual ~oric_jasmin_impl() = default;
 
 	virtual meta_data volume_metadata() override;
-	virtual err_t volume_metadata_change(const meta_data &info) override;
-	virtual std::pair<err_t, meta_data> metadata(const std::vector<std::string> &path) override;
-	virtual err_t metadata_change(const std::vector<std::string> &path, const meta_data &meta) override;
+	virtual std::error_condition volume_metadata_change(const meta_data &info) override;
+	virtual std::pair<std::error_condition, meta_data> metadata(const std::vector<std::string> &path) override;
+	virtual std::error_condition metadata_change(const std::vector<std::string> &path, const meta_data &meta) override;
 
-	virtual std::pair<err_t, std::vector<dir_entry>> directory_contents(const std::vector<std::string> &path) override;
-	virtual err_t rename(const std::vector<std::string> &opath, const std::vector<std::string> &npath) override;
-	virtual err_t remove(const std::vector<std::string> &path) override;
+	virtual std::pair<std::error_condition, std::vector<dir_entry>> directory_contents(const std::vector<std::string> &path) override;
+	virtual std::error_condition rename(const std::vector<std::string> &opath, const std::vector<std::string> &npath) override;
+	virtual std::error_condition remove(const std::vector<std::string> &path) override;
 
-	virtual err_t file_create(const std::vector<std::string> &path, const meta_data &meta) override;
+	virtual std::error_condition file_create(const std::vector<std::string> &path, const meta_data &meta) override;
 
-	virtual std::pair<err_t, std::vector<u8>> file_read(const std::vector<std::string> &path) override;
-	virtual err_t file_write(const std::vector<std::string> &path, const std::vector<u8> &data) override;
+	virtual std::pair<std::error_condition, std::vector<u8>> file_read(const std::vector<std::string> &path) override;
+	virtual std::error_condition file_write(const std::vector<std::string> &path, const std::vector<u8> &data) override;
 
-	virtual err_t format(const meta_data &meta) override;
+	virtual std::error_condition format(const meta_data &meta) override;
 
 	static bool validate_filename(std::string name);
 
@@ -196,7 +196,7 @@ bool oric_jasmin_impl::validate_filename(std::string name)
 		return name.size() > 0 && name.size() <= 8;
 }
 
-err_t oric_jasmin_impl::format(const meta_data &meta)
+std::error_condition oric_jasmin_impl::format(const meta_data &meta)
 {
 	std::string volume_name = meta.get_string(meta_name::name, "UNTITLED");
 	u32 blocks = m_blockdev.block_count();
@@ -229,7 +229,7 @@ err_t oric_jasmin_impl::format(const meta_data &meta)
 	bdir.w16l(0, 0x0000);
 	bdir.w16l(2, 0x0000);
 
-	return ERR_OK;
+	return std::error_condition();
 }
 
 meta_data oric_jasmin_impl::volume_metadata()
@@ -244,14 +244,14 @@ meta_data oric_jasmin_impl::volume_metadata()
 	return res;
 }
 
-err_t oric_jasmin_impl::volume_metadata_change(const meta_data &meta)
+std::error_condition oric_jasmin_impl::volume_metadata_change(const meta_data &meta)
 {
 	if(meta.has(meta_name::name)) {
 		std::string volume_name = meta.get_string(meta_name::name);
 		volume_name.resize(8, ' ');
 		m_blockdev.get(20*17).wstr(0xf8, volume_name);
 	}
-	return ERR_OK;
+	return std::error_condition();
 }
 
 std::string oric_jasmin_impl::file_name_prepare(std::string fname)
@@ -344,27 +344,27 @@ std::tuple<fsblk_t::block_t, u32, bool> oric_jasmin_impl::file_find(std::string 
 	}
 }
 
-std::pair<err_t, meta_data> oric_jasmin_impl::metadata(const std::vector<std::string> &path)
+std::pair<std::error_condition, meta_data> oric_jasmin_impl::metadata(const std::vector<std::string> &path)
 {
 	if(path.size() != 1)
-		return std::make_pair(ERR_NOT_FOUND, meta_data());
+		return std::make_pair(error::not_found, meta_data());
 
 	auto [bdir, off, sys] = file_find(path[0]);
 	std::ignore = sys;
 	if(!off)
-		return std::make_pair(ERR_NOT_FOUND, meta_data());
+		return std::make_pair(error::not_found, meta_data());
 
-	return std::make_pair(ERR_OK, file_metadata(bdir.rodata() + off));
+	return std::make_pair(std::error_condition(), file_metadata(bdir.rodata() + off));
 }
 
-err_t oric_jasmin_impl::metadata_change(const std::vector<std::string> &path, const meta_data &meta)
+std::error_condition oric_jasmin_impl::metadata_change(const std::vector<std::string> &path, const meta_data &meta)
 {
 	if(path.size() != 1)
-		return ERR_NOT_FOUND;
+		return error::not_found;
 
 	auto [bdir, off, sys] = file_find(path[0]);
 	if(!off)
-		return ERR_NOT_FOUND;
+		return error::not_found;
 
 	u8 *entry = bdir.data() + off;
 	if(meta.has(meta_name::locked))
@@ -376,19 +376,19 @@ err_t oric_jasmin_impl::metadata_change(const std::vector<std::string> &path, co
 	if(!sys && meta.has(meta_name::loading_address))
 		m_blockdev.get(cs_to_block(get_u16be(entry))).w16l(2, meta.get_number(meta_name::loading_address));
 
-	return ERR_OK;
+	return std::error_condition();
 }
 
-std::pair<err_t, std::vector<dir_entry>> oric_jasmin_impl::directory_contents(const std::vector<std::string> &path)
+std::pair<std::error_condition, std::vector<dir_entry>> oric_jasmin_impl::directory_contents(const std::vector<std::string> &path)
 {
-	std::pair<err_t, std::vector<dir_entry>> res;
+	std::pair<std::error_condition, std::vector<dir_entry>> res;
 
 	if(path.size() != 0) {
-		res.first = ERR_NOT_FOUND;
+		res.first = error::not_found;
 		return res;
 	}
 
-	res.first = ERR_OK;
+	res.first = std::error_condition();
 
 	auto bdir = m_blockdev.get(20*17+1);
 	for(;;) {
@@ -408,30 +408,30 @@ std::pair<err_t, std::vector<dir_entry>> oric_jasmin_impl::directory_contents(co
 	return res;
 }
 
-err_t oric_jasmin_impl::rename(const std::vector<std::string> &opath, const std::vector<std::string> &npath)
+std::error_condition oric_jasmin_impl::rename(const std::vector<std::string> &opath, const std::vector<std::string> &npath)
 {
 	if(opath.size() != 1 || npath.size() != 1)
-		return ERR_NOT_FOUND;
+		return error::not_found;
 
 	auto [bdir, off, sys] = file_find(opath[0]);
 	std::ignore = sys;
 	if(!off)
-		return ERR_NOT_FOUND;
+		return error::not_found;
 
 	wstr(bdir.data() + off + 0x03, file_name_prepare(npath[0]));
 
-	return ERR_OK;
+	return std::error_condition();
 }
 
-err_t oric_jasmin_impl::remove(const std::vector<std::string> &path)
+std::error_condition oric_jasmin_impl::remove(const std::vector<std::string> &path)
 {
-	return ERR_UNSUPPORTED;
+	return error::unsupported;
 }
 
-err_t oric_jasmin_impl::file_create(const std::vector<std::string> &path, const meta_data &meta)
+std::error_condition oric_jasmin_impl::file_create(const std::vector<std::string> &path, const meta_data &meta)
 {
 	if(path.size() != 0)
-		return ERR_NOT_FOUND;
+		return error::not_found;
 
 	// One block of sector list, one block of data
 	u32 nb = 2;
@@ -457,7 +457,7 @@ err_t oric_jasmin_impl::file_create(const std::vector<std::string> &path, const 
  found:
 	auto block = allocate_blocks(nb);
 	if(block.empty())
-		return ERR_NO_SPACE;
+		return error::no_space;
 
 	auto sblk = m_blockdev.get(cs_to_block(block[0]));
 	sblk.w16b(0, 0xff00);   // Next sector
@@ -480,19 +480,19 @@ err_t oric_jasmin_impl::file_create(const std::vector<std::string> &path, const 
 	bdir.w8  (off+0x0f, meta.get_flag(meta_name::sequential, true) ? 'S' : 'D');
 	bdir.w16l(off+0x10, 2); // 2 sectors for an empty file
 
-	return ERR_OK;
+	return std::error_condition();
 }
 
-std::pair<err_t, std::vector<u8>> oric_jasmin_impl::file_read(const std::vector<std::string> &path)
+std::pair<std::error_condition, std::vector<u8>> oric_jasmin_impl::file_read(const std::vector<std::string> &path)
 {
 	std::vector<u8> data;
 
 	if(path.size() != 1)
-		return std::make_pair(ERR_NOT_FOUND, data);
+		return std::make_pair(error::not_found, data);
 
 	auto [bdir, off, sys] = file_find(path[0]);
 	if(!off)
-		return std::make_pair(ERR_NOT_FOUND, data);
+		return std::make_pair(error::not_found, data);
 
 	if(sys) {
 		data.resize(0x3e00);
@@ -527,21 +527,21 @@ std::pair<err_t, std::vector<u8>> oric_jasmin_impl::file_read(const std::vector<
 		data.resize(length);
 	}
 
-	return std::make_pair(ERR_OK, data);
+	return std::make_pair(std::error_condition(), data);
 }
 
-err_t oric_jasmin_impl::file_write(const std::vector<std::string> &path, const std::vector<u8> &data)
+std::error_condition oric_jasmin_impl::file_write(const std::vector<std::string> &path, const std::vector<u8> &data)
 {
 	if(path.size() != 1)
-		return ERR_NOT_FOUND;
+		return error::not_found;
 
 	auto [bdir, off, sys] = file_find(path[0]);
 	if(!off)
-		return ERR_NOT_FOUND;
+		return error::not_found;
 
 	if(sys) {
 		if(data.size() != 0x3e00)
-			return ERR_INVALID;
+			return error::incorrect_size;
 
 		for(u32 i=0; i != 0x3e; i++)
 			m_blockdev.get(i).copy(0, data.data() + i * 256, 256);
@@ -558,7 +558,7 @@ err_t oric_jasmin_impl::file_write(const std::vector<std::string> &path, const s
 
 		// Enough space?
 		if(cur_ns < need_ns && free_block_count() < need_ns - cur_ns)
-			return ERR_NO_SPACE;
+			return error::no_space;
 
 		u16 load_address = 0;
 		std::vector<u16> tofree;
@@ -603,7 +603,7 @@ err_t oric_jasmin_impl::file_write(const std::vector<std::string> &path, const s
 		put_u16le(entry + 0x10, need_ns);
 		put_u16be(entry + 0x00, blocks[0]);
 	}
-	return ERR_OK;
+	return std::error_condition();
 }
 
 std::vector<u16> oric_jasmin_impl::allocate_blocks(u32 count)

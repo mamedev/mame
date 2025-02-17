@@ -74,9 +74,9 @@ public:
 	virtual ~impl() = default;
 
 	virtual meta_data volume_metadata() override;
-	virtual std::pair<err_t, meta_data> metadata(const std::vector<std::string> &path) override;
-	virtual std::pair<err_t, std::vector<dir_entry>> directory_contents(const std::vector<std::string> &path) override;
-	virtual std::pair<err_t, std::vector<u8>> file_read(const std::vector<std::string> &path) override;
+	virtual std::pair<std::error_condition, meta_data> metadata(const std::vector<std::string> &path) override;
+	virtual std::pair<std::error_condition, std::vector<dir_entry>> directory_contents(const std::vector<std::string> &path) override;
+	virtual std::pair<std::error_condition, std::vector<u8>> file_read(const std::vector<std::string> &path) override;
 
 private:
 	fsblk_t::block_t read_sector(u32 starting_sector) const;
@@ -84,7 +84,7 @@ private:
 	void iterate_directory_entries(const std::function<bool(const hplif_dirent &dirent)> &callback) const;
 	util::arbitrary_datetime decode_datetime(const hplif_time *time) const;
 	meta_data metadata_from_dirent(const hplif_dirent &dirent) const;
-	err_t format(const meta_data &meta) override;
+	std::error_condition format(const meta_data &meta) override;
 };
 
 // methods
@@ -265,13 +265,13 @@ meta_data impl::volume_metadata()
 //  impl::metadata
 //-------------------------------------------------
 
-std::pair<err_t, meta_data> impl::metadata(const std::vector<std::string> &path)
+std::pair<std::error_condition, meta_data> impl::metadata(const std::vector<std::string> &path)
 {
 	std::optional<hplif_dirent> dirent = dirent_from_path(path);
 	if (!dirent)
-		return std::make_pair(ERR_NOT_FOUND, meta_data());
+		return std::make_pair(error::not_found, meta_data());
 
-	return std::make_pair(ERR_OK, metadata_from_dirent(*dirent));
+	return std::make_pair(std::error_condition(), metadata_from_dirent(*dirent));
 }
 
 
@@ -279,7 +279,7 @@ std::pair<err_t, meta_data> impl::metadata(const std::vector<std::string> &path)
 //  impl::directory_contents
 //-------------------------------------------------
 
-std::pair<err_t, std::vector<dir_entry>> impl::directory_contents(const std::vector<std::string> &path)
+std::pair<std::error_condition, std::vector<dir_entry>> impl::directory_contents(const std::vector<std::string> &path)
 {
 	std::vector<dir_entry> results;
 	auto callback = [this, &results](const hplif_dirent &ent)
@@ -288,7 +288,7 @@ std::pair<err_t, std::vector<dir_entry>> impl::directory_contents(const std::vec
 		return false;
 	};
 	iterate_directory_entries(callback);
-	return std::make_pair(ERR_OK, std::move(results));
+	return std::make_pair(std::error_condition(), std::move(results));
 }
 
 
@@ -296,12 +296,12 @@ std::pair<err_t, std::vector<dir_entry>> impl::directory_contents(const std::vec
 //  impl::file_read
 //-------------------------------------------------
 
-std::pair<err_t, std::vector<u8>> impl::file_read(const std::vector<std::string> &path)
+std::pair<std::error_condition, std::vector<u8>> impl::file_read(const std::vector<std::string> &path)
 {
 	// find the file
 	std::optional<hplif_dirent> dirent = dirent_from_path(path);
 	if (!dirent)
-		return std::make_pair(ERR_NOT_FOUND, std::vector<u8>());
+		return std::make_pair(error::not_found, std::vector<u8>());
 
 	// and get the data
 	u32 sector_count = big_endianize_int32(dirent->m_sector_count);
@@ -316,7 +316,7 @@ std::pair<err_t, std::vector<u8>> impl::file_read(const std::vector<std::string>
 	while (iter.next())
 		result.insert(result.end(), (const u8 *)iter.data(), (const u8 *)iter.data() + 256);
 
-	return std::make_pair(ERR_OK, std::move(result));
+	return std::make_pair(std::error_condition(), std::move(result));
 }
 
 
@@ -468,7 +468,7 @@ const void *impl::block_iterator::data() const
 //  impl::format
 //-------------------------------------------------
 
-err_t impl::format(const meta_data &meta)
+std::error_condition impl::format(const meta_data &meta)
 {
 	std::string volume_name = meta.get_string(meta_name::name, "B9826 ");
 	fsblk_t::block_t block = m_blockdev.get(0);
@@ -484,7 +484,7 @@ err_t impl::format(const meta_data &meta)
 	block.w16b(12, 0x1000); // LIF identifier
 	block.w32b(16, 14);     // directory size
 	block.w16b(20, 1);      // LIF version
-	return ERR_OK;
+	return std::error_condition();
 }
 
 //-------------------------------------------------

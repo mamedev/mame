@@ -26,14 +26,14 @@ public:
 	virtual ~prodos_impl() = default;
 
 	virtual meta_data volume_metadata() override;
-	virtual std::pair<err_t, meta_data> metadata(const std::vector<std::string> &path) override;
+	virtual std::pair<std::error_condition, meta_data> metadata(const std::vector<std::string> &path) override;
 
-	virtual std::pair<err_t, std::vector<dir_entry>> directory_contents(const std::vector<std::string> &path) override;
+	virtual std::pair<std::error_condition, std::vector<dir_entry>> directory_contents(const std::vector<std::string> &path) override;
 
-	virtual std::pair<err_t, std::vector<u8>> file_read(const std::vector<std::string> &path) override;
-	virtual std::pair<err_t, std::vector<u8>> file_rsrc_read(const std::vector<std::string> &path) override;
+	virtual std::pair<std::error_condition, std::vector<u8>> file_read(const std::vector<std::string> &path) override;
+	virtual std::pair<std::error_condition, std::vector<u8>> file_rsrc_read(const std::vector<std::string> &path) override;
 
-	virtual err_t format(const meta_data &meta) override;
+	virtual std::error_condition format(const meta_data &meta) override;
 
 private:
 	static const u8 boot[512];
@@ -41,7 +41,7 @@ private:
 
 	std::tuple<fsblk_t::block_t, u32> path_find_step(const std::string &name, u16 block);
 	std::tuple<fsblk_t::block_t, u32, bool> path_find(const std::vector<std::string> &path);
-	std::pair<err_t, std::vector<u8>> any_read(u8 type, u16 block, u32 length);
+	std::pair<std::error_condition, std::vector<u8>> any_read(u8 type, u16 block, u32 length);
 };
 }
 
@@ -210,7 +210,7 @@ std::vector<meta_description> prodos_image::directory_meta_description() const
 	return res;
 }
 
-err_t prodos_impl::format(const meta_data &meta)
+std::error_condition prodos_impl::format(const meta_data &meta)
 {
 	std::string volume_name = meta.get_string(meta_name::name, "UNTITLED");
 	u32 blocks = m_blockdev.block_count();
@@ -274,7 +274,7 @@ err_t prodos_impl::format(const meta_data &meta)
 				memset(fdata+sb, 0xff, eb-sb-1);
 		}
 	}
-	return ERR_OK;
+	return std::error_condition();
 }
 
 prodos_impl::prodos_impl(fsblk_t &blockdev) : filesystem_t(blockdev, 512)
@@ -309,7 +309,7 @@ meta_data prodos_impl::volume_metadata()
 	return res;
 }
 
-std::pair<err_t, std::vector<dir_entry>> prodos_impl::directory_contents(const std::vector<std::string> &path)
+std::pair<std::error_condition, std::vector<dir_entry>> prodos_impl::directory_contents(const std::vector<std::string> &path)
 {
 	u16 block;
 	if(path.empty())
@@ -318,7 +318,7 @@ std::pair<err_t, std::vector<dir_entry>> prodos_impl::directory_contents(const s
 	else {
 		auto [blk, off, dir] = path_find(path);
 		if(!off || !dir)
-			return std::make_pair(ERR_NOT_FOUND, std::vector<dir_entry>());
+			return std::make_pair(error::not_found, std::vector<dir_entry>());
 		block = blk.r16l(off+0x11);
 	}
 
@@ -356,7 +356,7 @@ std::pair<err_t, std::vector<dir_entry>> prodos_impl::directory_contents(const s
 		if(block >= m_blockdev.block_count())
 			break;
 	} while(block);
-	return std::make_pair(ERR_OK, res);
+	return std::make_pair(std::error_condition(), res);
 }
 
 std::tuple<fsblk_t::block_t, u32> prodos_impl::path_find_step(const std::string &name, u16 block)
@@ -396,15 +396,15 @@ std::tuple<fsblk_t::block_t, u32, bool> prodos_impl::path_find(const std::vector
 }
 
 
-std::pair<err_t, meta_data> prodos_impl::metadata(const std::vector<std::string> &path)
+std::pair<std::error_condition, meta_data> prodos_impl::metadata(const std::vector<std::string> &path)
 {
 	if(path.size() == 0)
-		return std::make_pair(ERR_OK, meta_data());
+		return std::make_pair(std::error_condition(), meta_data());
 
 	auto [blk, off, dir] = path_find(path);
 
 	if(!off)
-		return std::make_pair(ERR_NOT_FOUND, meta_data());
+		return std::make_pair(error::not_found, meta_data());
 
 	const u8 *entry = blk.rodata() + off;
 
@@ -427,16 +427,16 @@ std::pair<err_t, meta_data> prodos_impl::metadata(const std::vector<std::string>
 			res.set(meta_name::length, get_u24le(entry + 0x15));
 
 		else
-			return std::make_pair(ERR_UNSUPPORTED, meta_data());
+			return std::make_pair(error::unsupported, meta_data());
 	}
 
-	return std::make_pair(ERR_OK, res);
+	return std::make_pair(std::error_condition(), res);
 }
 
-std::pair<err_t, std::vector<u8>> prodos_impl::any_read(u8 type, u16 block, u32 length)
+std::pair<std::error_condition, std::vector<u8>> prodos_impl::any_read(u8 type, u16 block, u32 length)
 {
-	std::pair<err_t, std::vector<u8>> data;
-	data.first = ERR_OK;
+	std::pair<std::error_condition, std::vector<u8>> data;
+	data.first = std::error_condition();
 	data.second.resize((length + 511) & ~511);
 	u32 nb = data.second.size()/512;
 	if(!nb)
@@ -475,7 +475,7 @@ std::pair<err_t, std::vector<u8>> prodos_impl::any_read(u8 type, u16 block, u32 
 	}
 
 	default:
-		data.first = ERR_UNSUPPORTED;
+		data.first = error::unsupported;
 		data.second.clear();
 		return data;
 	}
@@ -484,11 +484,11 @@ std::pair<err_t, std::vector<u8>> prodos_impl::any_read(u8 type, u16 block, u32 
 	return data;
 }
 
-std::pair<err_t, std::vector<u8>> prodos_impl::file_read(const std::vector<std::string> &path)
+std::pair<std::error_condition, std::vector<u8>> prodos_impl::file_read(const std::vector<std::string> &path)
 {
 	auto [blk, off, dir] = path_find(path);
 	if(!off || dir)
-		return std::make_pair(ERR_NOT_FOUND, std::vector<u8>());
+		return std::make_pair(error::not_found, std::vector<u8>());
 
 	const u8 *entry = blk.rodata() + off;
 	u8 type = entry[0] >> 4;
@@ -501,14 +501,14 @@ std::pair<err_t, std::vector<u8>> prodos_impl::file_read(const std::vector<std::
 		return any_read(kblk.r8(0x000), kblk.r16l(0x001), kblk.r24l(0x005));
 
 	} else
-		return std::make_pair(ERR_UNSUPPORTED, std::vector<u8>());
+		return std::make_pair(error::unsupported, std::vector<u8>());
 }
 
-std::pair<err_t, std::vector<u8>> prodos_impl::file_rsrc_read(const std::vector<std::string> &path)
+std::pair<std::error_condition, std::vector<u8>> prodos_impl::file_rsrc_read(const std::vector<std::string> &path)
 {
 	auto [blk, off, dir] = path_find(path);
 	if(!off || dir)
-		return std::make_pair(ERR_NOT_FOUND, std::vector<u8>());
+		return std::make_pair(error::not_found, std::vector<u8>());
 
 	const u8 *entry = blk.rodata() + off;
 	u8 type = entry[0] >> 4;
@@ -518,5 +518,5 @@ std::pair<err_t, std::vector<u8>> prodos_impl::file_rsrc_read(const std::vector<
 		return any_read(kblk.r8(0x100), kblk.r16l(0x101), kblk.r24l(0x105));
 
 	} else
-		return std::make_pair(ERR_UNSUPPORTED, std::vector<u8>());
+		return std::make_pair(error::unsupported, std::vector<u8>());
 }
