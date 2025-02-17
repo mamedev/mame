@@ -1097,7 +1097,7 @@ static constexpr uint8_t T256 = 11;
 
 void tmp94c241_device::tlcs900_handle_timers()
 {
-	uint32_t  old_pre = m_timer_pre;
+	uint32_t old_pre = m_timer_pre;
 
 	auto update_timer_count = [this, old_pre](
 		uint8_t timer_index,
@@ -1120,182 +1120,144 @@ void tmp94c241_device::tlcs900_handle_timers()
 		}
 	};
 
+	auto timer_8bits = [this](
+		uint8_t timer_index,
+		uint8_t timer_reg,
+		uint8_t interrupt,
+		uint8_t interrupt_mask,
+		uint8_t operating_mode,
+		bool invert)
+	{
+		for( ; m_timer_change[timer_index] > 0; m_timer_change[timer_index]-- )
+		{
+			m_timer_8[timer_index]++;
+			if ( m_timer_8[timer_index] == m_treg_8[timer_reg] )
+			{
+				if (BIT(timer_index, 0) == 0)
+				{
+					if ( operating_mode == 0 ) /* mode == MODE_8BIT_TIMER */
+						m_timer_change[timer_index | 1]++;
+
+					/* In 16bit timer mode the timer should not be reset */
+					if ( operating_mode != 1 ) /* mode != MODE_16BIT_TIMER */
+					{
+						m_timer_8[timer_index] = 0;
+						m_int_reg[interrupt] |= interrupt_mask;
+						m_check_irqs = 1;
+					}
+				}
+				else
+				{
+					m_timer_8[timer_index] = 0;
+					m_int_reg[interrupt] |= interrupt_mask;
+					m_check_irqs = 1;
+
+					/* In 16bit timer mode also reset its 8-bit counterpart (timer N-1) */
+					if ( operating_mode == 1 ) /* mode == MODE_16BIT_TIMER */
+						m_timer_8[timer_index & ~1] = 0;
+				}
+
+				if ( invert )
+					change_timer_flipflop( timer_index | 1, FF_INVERT );
+			}
+		}
+	};
+
+	auto timer_16bits = [this](
+		uint8_t timer_id,
+		uint8_t timer_reg_low,
+		uint8_t timer_reg_high,
+		uint8_t tffcr,
+		uint8_t interrupt)
+	{
+		/*
+		    timer_id 4  =>  m_timer_16[0]  m_timer_change[4]
+		    timer_id 6  =>  m_timer_16[1]  m_timer_change[5]
+		    timer_id 8  =>  m_timer_16[2]  m_timer_change[6]
+		    timer_id A  =>  m_timer_16[3]  m_timer_change[7]
+		*/
+		uint8_t timer_index = (timer_id - 4)/2;
+
+		for( ; m_timer_change[timer_index + 4] > 0; m_timer_change[timer_index + 4]-- )
+		{
+			m_timer_16[timer_index]++;
+			/* TODO: also check for criteria of up counter matching CAPn registers */
+			if ( ((m_timer_16[timer_index] == m_treg_16[timer_reg_high]) && BIT(tffcr, 3)) ||
+				((m_timer_16[timer_index] == m_treg_16[timer_reg_low]) && BIT(tffcr, 2)) )
+			{
+				change_timer_flipflop( timer_id, FF_INVERT );
+				m_timer_16[timer_index] = 0;
+				m_int_reg[interrupt] |= 0x08;
+				m_check_irqs = 1;
+			}
+		}
+	};
+
 	if ( BIT(m_t16run, 7) ) /* prescaler is active */
 		m_timer_pre += m_cycles;
 
 	if ( BIT(m_t8run, 0) ) /* Timer 0 is running */
 	{
 		update_timer_count(0, m_t01mod & 3, T1, T4, T16);
-
-		for( ; m_timer_change[0] > 0; m_timer_change[0]-- )
-		{
-			m_timer_8[0]++; /* UPCOUNTER_0 */
-			if ( m_timer_8[0] == m_treg_8[TREG0] )
-			{
-				if ( ((m_t01mod >> 6) & 3) == 0 ) /* TO1_OPERATING_MODE == MODE_8BIT_TIMER */
-					m_timer_change[1]++;
-
-				if ( (m_tffcr & 3) == 2 ) /* "FF1 Invert Enable" && "Invert by 8-bit timer 0" */
-					change_timer_flipflop( 1, FF_INVERT );
-
-				/* In 16bit timer mode the timer should not be reset */
-				if ( ((m_t01mod >> 6) & 3) != 1 ) /* TO1_OPERATING_MODE != MODE_16BIT_TIMER */
-				{
-					m_timer_8[0] = 0;
-					m_int_reg[INTET01] |= 0x08;
-					m_check_irqs = 1;
-				}
-			}
-		}
+		timer_8bits(
+			0, TREG0, INTET01, 0x08,
+			(m_t01mod >> 6) & 3, /* TO1_OPERATING_MODE */
+			(m_tffcr & 3) == 2 /* "FF1 Invert Enable" && "Invert by 8-bit timer 0" */
+		);
 	}
 
 	if ( BIT(m_t8run, 1) ) /* Timer 1 is running */
 	{
 		update_timer_count(1, (m_t01mod >> 2) & 3, T1, T16, T256);
-
-		for( ; m_timer_change[1] > 0; m_timer_change[1]-- )
-		{
-			m_timer_8[1] += 1; /* UPCOUNTER_1 */
-			if ( m_timer_8[1] == m_treg_8[TREG1] )
-			{
-				m_timer_8[1] = 0;
-				m_int_reg[INTET01] |= 0x80;
-				m_check_irqs = 1;
-
-				if ( (m_tffcr & 3) == 3 ) /* "FF1 Invert Enable" && "Invert by timer 1" */
-					change_timer_flipflop( 1, FF_INVERT );
-
-				/* In 16bit timer mode also reset timer 0 */
-				if ( ((m_t01mod >> 6) & 3) == 1 ) /* TO1_OPERATING_MODE == MODE_16BIT_TIMER */
-					m_timer_8[1] = 0;
-			}
-		}
+		timer_8bits(
+			1, TREG1, INTET01, 0x80,
+			(m_t01mod >> 6) & 3, /* TO1_OPERATING_MODE */
+			(m_tffcr & 3) == 3 /* "FF1 Invert Enable" && "Invert by 8-bit timer 1" */
+		);
 	}
 
 	if ( BIT(m_t8run, 2) ) /* Timer 2 is running */
 	{
 		update_timer_count(2, m_t23mod & 3, T1, T4, T16);
-
-		for( ; m_timer_change[2] > 0; m_timer_change[2]-- )
-		{
-			m_timer_8[2]++; /* UPCOUNTER_2 */
-			if ( m_timer_8[2] == m_treg_8[TREG2] )
-			{
-				if ( ((m_t23mod >> 6) & 3) == 0 ) /* T23_OPERATING_MODE == MODE_8BIT_TIMER */
-					m_timer_change[3]++;
-
-				if ( ((m_tffcr >> 4) & 3) == 2 ) /* "FF3 Invert Enable" && "Invert by 8-bit timer 2" */
-					change_timer_flipflop( 3, FF_INVERT );
-
-				/* In 16bit timer mode the timer should not be reset */
-				if ( ((m_t23mod >> 6) & 3) != 1 ) /* T23_OPERATING_MODE != MODE_16BIT_TIMER */
-				{
-					m_timer_8[2] = 0;
-					m_int_reg[INTET23] |= 0x08;
-					m_check_irqs = 1;
-				}
-			}
-		}
+		timer_8bits(
+			2, TREG2, INTET23, 0x08,
+			(m_t23mod >> 6) & 3, /* T23_OPERATING_MODE */
+			((m_tffcr >> 4) & 3) == 2 /* "FF3 Invert Enable" && "Invert by 8-bit timer 2" */
+		);
 	}
 
 	if ( BIT(m_t8run, 3) ) /* Timer 3 is running */
 	{
 		update_timer_count(3, (m_t23mod >> 2) & 3, T1, T16, T256);
-
-		for( ; m_timer_change[3] > 0; m_timer_change[3]-- )
-		{
-			m_timer_8[3]++; /* UPCOUNTER_3 */
-			if ( m_timer_8[3] == m_treg_8[TREG3] )
-			{
-				m_timer_8[3] = 0;
-				m_int_reg[INTET23] |= 0x80;
-				m_check_irqs = 1;
-
-				if ( ((m_tffcr >> 4) & 3) == 3 ) /* "FF3 Invert Enable" && "Invert by timer 3" */
-					change_timer_flipflop( 3, FF_INVERT );
-
-				/* In 16bit timer mode also reset timer 2 */
-				if ( ((m_t23mod >> 6) & 3) == 1 ) /* T23_OPERATING_MODE == MODE_16BIT_TIMER */
-					m_timer_8[2] = 0;
-			}
-		}
+		timer_8bits(
+			3, TREG3, INTET23, 0x80,
+			(m_t23mod >> 6) & 3, /* T23_OPERATING_MODE */
+			((m_tffcr >> 4) & 3) == 3 /* "FF3 Invert Enable" && "Invert by 8-bit timer 3" */
+		);
 	}
 
 	if ( BIT(m_t16run, 0) ) /* Timer 4 is running */
 	{
 		update_timer_count(4, m_t4mod & 3, T1, T4, T16);
-
-		for( ; m_timer_change[4] > 0; m_timer_change[4]-- )
-		{
-			m_timer_16[0]++; /* UPCOUNTER_4 */
-			if ( ((m_timer_16[0] == m_treg_16[TREG5]) && BIT(m_t4ffcr, 3)) ||
-				((m_timer_16[0] == m_treg_16[TREG4]) && BIT(m_t4ffcr, 2)) )
-			{
-				change_timer_flipflop( 4, FF_INVERT );
-				m_timer_16[0] = 0;
-				m_int_reg[INTET45] |= 0x08;
-				m_check_irqs = 1;
-			}
-		}
+		timer_16bits(4, TREG4, TREG5, m_t4ffcr, INTET45);
 	}
-
 
 	if ( BIT(m_t16run, 1) ) /* Timer 6 is running */
 	{
-		/*** NOTE: TIMER_CHANGE_6 is stored at m_timer_change[5] ***/
 		update_timer_count(5, m_t6mod & 3, T1, T4, T16);
-
-		for( ; m_timer_change[5] > 0; m_timer_change[5]-- )
-		{
-			m_timer_16[1]++; /* UPCOUNTER_6 */
-			if ( ((m_timer_16[1] == m_treg_16[TREG7]) && BIT(m_t6ffcr, 3)) ||
-				((m_timer_16[1] == m_treg_16[TREG6]) && BIT(m_t6ffcr, 2)) )
-			{
-				change_timer_flipflop( 6, FF_INVERT );
-				m_timer_16[1] = 0;
-				m_int_reg[INTET67] |= 0x08;
-				m_check_irqs = 1;
-			}
-		}
+		timer_16bits(6, TREG6, TREG7, m_t6ffcr, INTET67);
 	}
-
 
 	if ( BIT(m_t16run, 2) ) /* Timer 8 is running */
 	{
-		/*** NOTE: TIMER_CHANGE_8 is stored at m_timer_change[6] ***/
 		update_timer_count(6, m_t8mod & 3, T1, T4, T16);
-
-		for( ; m_timer_change[6] > 0; m_timer_change[6]-- )
-		{
-			m_timer_16[2]++; /* UPCOUNTER_8 */
-			if ( ((m_timer_16[2] == m_treg_16[TREG9]) && BIT(m_t8ffcr, 3)) ||
-				((m_timer_16[2] == m_treg_16[TREG8]) && BIT(m_t8ffcr, 2)) )
-			{
-				change_timer_flipflop( 8, FF_INVERT );
-				m_timer_16[2] = 0;
-				m_int_reg[INTET89] |= 0x08;
-				m_check_irqs = 1;
-			}
-		}
+		timer_16bits(8, TREG8, TREG9, m_t8ffcr, INTET89);
 	}
 
 	if ( BIT(m_t16run, 3) ) /* Timer A is running */
 	{
-		/*** NOTE: TIMER_CHANGE_A is stored at m_timer_change[7] ***/
 		update_timer_count(7, m_tamod & 3, T1, T4, T16);
-
-		for( ; m_timer_change[7] > 0; m_timer_change[7]-- )
-		{
-			m_timer_16[3]++; /* UPCOUNTER_A */
-			if ( ((m_timer_16[3] == m_treg_16[TREGA]) && BIT(m_taffcr, 2)) ||
-				((m_timer_16[3] == m_treg_16[TREGB]) && BIT(m_taffcr, 3)) )
-			{
-				change_timer_flipflop( 0xa, FF_INVERT );
-				m_timer_16[3] = 0;
-				m_int_reg[INTETAB] |= 0x08;
-				m_check_irqs = 1;
-			}
-		}
+		timer_16bits(0xa, TREGA, TREGB, m_taffcr, INTETAB);
 	}
 
 	m_timer_pre &= 0xffffff;
