@@ -22,7 +22,7 @@ TODO (usability, to be moved in a SW list):
 \- To bypass hold F7 while the "to install SCSI drivers [...] press F6" appears.
    And by F7 I really mean it :shrug:
 
-- windows xP sp3: BSoD during install with a STOP #0a IRQL_NOT_LESS_OR_EQUAL;
+- windows xp sp3: BSoD during install with a STOP #0a IRQL_NOT_LESS_OR_EQUAL;
 
 - windows neptune: BSoD during ethernet check (after time clock setup)
   with a STOP #a0 INTERNAL_POWER_ERROR with param1 0x5 ("reserved"!?)
