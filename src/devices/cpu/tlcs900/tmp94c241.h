@@ -107,10 +107,10 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_config_complete() override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_resolve_objects() override;
+	virtual void device_config_complete() override ATTR_COLD;
+	virtual void device_resolve_objects() override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual void execute_set_input(int inputnum, int state) override;
@@ -128,28 +128,28 @@ private:
 	void change_timer_flipflop(uint8_t flipflop, uint8_t operation);
 
 	// Ports
-	template <uint8_t> uint8_t port_r();
-	template <uint8_t> void port_w(uint8_t data);
-	template <uint8_t> void port_cr_w(uint8_t data);
-	template <uint8_t> void port_fc_w(uint8_t data);
+	template <uint8_t P> uint8_t port_r();
+	template <uint8_t P> void port_w(uint8_t data);
+	template <uint8_t P> void port_cr_w(uint8_t data);
+	template <uint8_t P> void port_fc_w(uint8_t data);
 
 	// Special Function Registers
-	template <uint8_t> void bNcs_w(offs_t offset, uint16_t data, uint16_t mem_mask);
-	template <uint8_t> uint16_t cap_r();
-	template <uint8_t> uint8_t mamr_r();
-	template <uint8_t> void mamr_w(uint8_t data);
-	template <uint8_t> uint8_t msar_r();
-	template <uint8_t> void msar_w(uint8_t data);
-	template <uint8_t> void treg_8_w(uint8_t data);
-	template <uint8_t> void treg_16_w(uint16_t data);
-	template <uint8_t> uint8_t scNbuf_r();
-	template <uint8_t> void scNbuf_w(uint8_t data);
-	template <uint8_t> uint8_t scNcr_r();
-	template <uint8_t> void scNcr_w(uint8_t data);
-	template <uint8_t> uint8_t scNmod_r();
-	template <uint8_t> void scNmod_w(uint8_t data);
-	template <uint8_t> uint8_t brNcr_r();
-	template <uint8_t> void brNcr_w(uint8_t data);
+	template <uint8_t N> void bNcs_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	template <uint8_t Timer> uint16_t cap_r();
+	template <uint8_t N> uint8_t mamr_r();
+	template <uint8_t N> void mamr_w(uint8_t data);
+	template <uint8_t N> uint8_t msar_r();
+	template <uint8_t N> void msar_w(uint8_t data);
+	template <uint8_t Timer> void treg_8_w(uint8_t data);
+	template <uint8_t Timer> void treg_16_w(uint16_t data);
+	template <uint8_t Channel> uint8_t scNbuf_r();
+	template <uint8_t Channel> void scNbuf_w(uint8_t data);
+	template <uint8_t Channel> uint8_t scNcr_r();
+	template <uint8_t Channel> void scNcr_w(uint8_t data);
+	template <uint8_t Channel> uint8_t scNmod_r();
+	template <uint8_t Channel> void scNmod_w(uint8_t data);
+	template <uint8_t Channel> uint8_t brNcr_r();
+	template <uint8_t Channel> void brNcr_w(uint8_t data);
 	uint8_t t8run_r();
 	void t8run_w(uint8_t data);
 	uint8_t t01mod_r();

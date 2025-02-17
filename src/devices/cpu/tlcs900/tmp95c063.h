@@ -57,10 +57,10 @@ public:
 	template <size_t Bit> auto an_read() { return m_an_read[Bit].bind(); }
 
 protected:
-	virtual void device_config_complete() override;
+	virtual void device_config_complete() override ATTR_COLD;
+	virtual void device_resolve_objects() override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
-	virtual void device_resolve_objects() override;
 
 	virtual void execute_set_input(int inputnum, int state) override;
 	virtual void tlcs900_check_hdma() override;
