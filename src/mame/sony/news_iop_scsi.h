@@ -32,8 +32,8 @@ public:
 	void irq_w(int state);
 
 	// Constants for consumers of the bus error details
-	static const u8 READ_ERROR = 1;
-	static const u8 WRITE_ERROR = 0;
+	static inline constexpr u8 READ_ERROR = 1;
+	static inline constexpr u8 WRITE_ERROR = 0;
 
 protected:
 	// device_t implementation

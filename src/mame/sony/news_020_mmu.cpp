@@ -108,7 +108,9 @@ news_020_mmu_device::news_020_mmu_device(const machine_config &mconfig, const ch
 	: device_t(mconfig, NEWS_020_MMU, tag, owner, clock),
 	  device_memory_interface(mconfig, *this),
 	  m_hyperbus_config("hyperbus", ENDIANNESS_BIG, 32, 32, 0),
-	  m_bus_error(*this)
+	  m_bus_error(*this),
+	  m_enabled(false),
+	  m_romdis(false)
 {
 }
 
@@ -198,7 +200,6 @@ void news_020_mmu_device::mmu_entry_w(offs_t offset, uint32_t data, uint32_t mem
 		m_mmu_user_tag_ram[offset] = (m_mmu_user_tag_ram[offset] & ~mem_mask) | (tag & mem_mask);
 	}
 
-#if (VERBOSE & LOG_ENTRY) > 0
 	news_020_pte modified_entry(system_map ? m_mmu_system_ram[offset] : m_mmu_user_ram[offset]);
 	LOGMASKED(LOG_ENTRY, "(%s) MMU %s entry write (0x%08x, 0x%08x, 0x%08x) -> entry 0x%08x: tag = 0x%08x, pfnum = 0x%08x (valid = %d, modified = %d, fill_on_demand = %d, kernel write = %d, kernel read = %d, user write = %d, user read = %d)\n",
 			  machine().describe_context(),
@@ -216,7 +217,6 @@ void news_020_mmu_device::mmu_entry_w(offs_t offset, uint32_t data, uint32_t mem
 			  modified_entry.kernel_readable(),
 			  modified_entry.user_writable(),
 			  modified_entry.user_readable());
-#endif
 }
 
 uint32_t news_020_mmu_device::hyperbus_r(offs_t offset, uint32_t mem_mask, bool is_supervisor)

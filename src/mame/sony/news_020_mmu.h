@@ -34,10 +34,8 @@ protected:
 private:
 	const address_space_config m_hyperbus_config;
 	device_delegate<void(offs_t, uint32_t, bool, uint8_t)> m_bus_error;
-
-	bool m_enabled = false;
-	bool m_romdis = false; // ROMDIS bit controls if ROM is mapped to the start of address space or not
-
+	bool m_enabled;
+	bool m_romdis;
 	std::unique_ptr<u32[]> m_mmu_user_ram;
 	std::unique_ptr<u32[]> m_mmu_system_ram;
 	std::unique_ptr<u32[]> m_mmu_user_tag_ram;
