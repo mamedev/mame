@@ -104,11 +104,8 @@ void taitojc_state::draw_object(bitmap_ind16 &bitmap, const rectangle &cliprect,
 	if (BIT(w2, 14))
 		address |= 0x40000;
 
-	int x = ((w1 >>  0) & 0x3ff);
-	x = util::sext(x, 10); // sign-extend
-
-	int y = ((w1 >> 16) & 0x3ff);
-	y = util::sext(y, 10); // sign-extend
+	int x = util::sext(w1, 10);
+	int y = util::sext(w1 >> 16, 10);
 
 	int width         = ((w1 >> 10) & 0x3f) << 4;
 	int height        = ((w1 >> 26) & 0x3f) << 4;
