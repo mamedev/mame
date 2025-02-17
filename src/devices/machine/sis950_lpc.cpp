@@ -478,6 +478,8 @@ void sis950_lpc_device::io_map(address_map &map)
 
 	// map(0x0278, 0x027f) parallel port 2 & PnP
 	// map(0x02e8, 0x02ef) serial 3
+	// unmap high: beos5 keeps PnP here for a COM3 that doesn't exist in shutms11
+	map(0x02e8, 0x02ef).lr8(NAME([] () { return 0xff; }));
 	// map(0x02f8, 0x02ff) serial 1
 
 	// map(0x0300, 0x0301) - MIDI ($330 as shutms11 default)

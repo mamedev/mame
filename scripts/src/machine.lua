@@ -3442,18 +3442,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/stvcd.h,MACHINES["STVCD"] = true
----------------------------------------------------
-
-if (MACHINES["STVCD"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/stvcd.cpp",
-		MAME_DIR .. "src/devices/machine/stvcd.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/machine/swtpc8212.h,MACHINES["SWTPC8212"] = true
 ---------------------------------------------------
 

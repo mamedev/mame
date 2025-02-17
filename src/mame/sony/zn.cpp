@@ -2,9 +2,8 @@
 // copyright-holders:smf, R. Belmont
 /*
 
-  Sony ZN1/ZN2 - Arcade PSX Hardware
-  ==================================
-  Driver by smf & R Belmont
+  Sony ZN-1/ZN-2 - Arcade PlayStation Hardware
+  --------------------------------------------
   Board notes by The Guru
   Thanks to Zinc Team, Peter Ferrie, Amuse & Miguel Angel Horna
 
@@ -277,10 +276,10 @@ namespace {
 
 /*
 
-Capcom ZN1 generic PCB Layout
-----------------------------
+Capcom ZN-1 generic PCB Layout
+------------------------------
 
-Main board (Standard ZN1 Main Board with Capcom ZN1 BIOS)
+Main board (Standard ZN-1 Main Board with Capcom ZN-1 BIOS)
 ZN-1 1-659-709-12  COH-1000C
 |--------------------------------------------------------|
 |  LA4705             |---------------------------|      |
@@ -323,7 +322,7 @@ Notes:
       SW1   - Slide switch for stereo or mono sound output
       DSW   - Dip switch (4 position, defaults all OFF)
 
-      BIOS           - COH1000C.353, Capcom ZN1 BIOS, 4MBit MaskROM type M534002 (SOP40)
+      BIOS           - COH1000C.353, Capcom ZN-1 BIOS, 4MBit MaskROM type M534002 (SOP40)
       AT28C16        - Atmel AT28C16 2K x8 EEPROM (SOP24)
       814260-70      - 256K x16 (4MBit) DRAM (SOJ40)
       KM4132G271Q-12 - 128K x32 x2 banks (32MBit) SGRAM (QFP100)
@@ -677,7 +676,7 @@ protected:
 
 /*
 
-Main board (Standard ZN1 Main Board with Taito ZN1 BIOS)
+Main board (Standard ZN-1 Main Board with Taito FX-1 BIOS)
 ZN-1 1-659-709-12  COH-1000T
 |--------------------------------------------------------|
 |  LA4705             |---------------------------|      |
@@ -720,7 +719,7 @@ Notes:
       SW1   - Slide switch for stereo or mono sound output
       DSW   - Dip switch (4 position, defaults all OFF)
 
-      BIOS           - COH1000T.353, Taito ZN1 BIOS, 4MBit MaskROM type M534002 (SOP40)
+      BIOS           - COH1000T.353, Taito FX-1 BIOS, 4MBit MaskROM type M534002 (SOP40)
       AT28C16        - Atmel AT28C16 2K x8 EEPROM (SOP24)
       814260-70      - 256K x16 (4MBit) DRAM (SOJ40)
       KM4132G271Q-12 - 128K x32 x2 banks (32MBit) SGRAM (QFP100)
@@ -783,7 +782,7 @@ Notes:
       84C000AM-6       - Z80-A; clock 4.000MHz
       YM2610           - clock 8.000MHz
 
-Main board (Standard ZN1 Main Board with Taito ZN1 BIOS)
+Main board (Standard ZN-1 Main Board with Taito FX-1 BIOS)
 ZN-1 1-659-709-12  COH-1000T
 K11X0831A RAY STORM
 |--------------------------------------------------------|
@@ -827,7 +826,7 @@ Notes:
       SW1   - Slide switch for stereo or mono sound output
       DSW   - Dip switch (4 position, defaults all OFF)
 
-      BIOS           - COH1000T.353, Taito ZN1 BIOS, 4MBit MaskROM type M534002 (SOP40)
+      BIOS           - COH1000T.353, Taito FX-1 BIOS, 4MBit MaskROM type M534002 (SOP40)
       AT28C16        - Atmel AT28C16 2K x8 EEPROM (SOP24)
       814260-70      - 256K x16 (4MBit) DRAM (SOJ40)
       KM4132G271Q-12 - 128K x32 x2 banks (32MBit) SGRAM (QFP100)
@@ -943,11 +942,11 @@ protected:
 	required_device<mb3773_device> m_mb3773;
 };
 
-class taito_fx1a_state :
+class taito_fx1s_state :
 	public taito_fx_state
 {
 public:
-	taito_fx1a_state(const machine_config &mconfig, device_type type, const char *tag) :
+	taito_fx1s_state(const machine_config &mconfig, device_type type, const char *tag) :
 		taito_fx_state(mconfig, type, tag),
 		m_audiocpu(*this, "audiocpu"),
 		m_ym2610b(*this, "ym2610b"),
@@ -963,7 +962,7 @@ public:
 		cat702<1>(config);
 
 		Z80(config, m_audiocpu, XTAL(16'000'000) / 4);
-		m_audiocpu->set_addrmap(AS_PROGRAM, &taito_fx1a_state::sound_map);
+		m_audiocpu->set_addrmap(AS_PROGRAM, &taito_fx1s_state::sound_map);
 
 		YM2610B(config, m_ym2610b, 16_MHz_XTAL / 2);
 		m_ym2610b->irq_handler().set_inputline(m_audiocpu, 0);
@@ -1013,7 +1012,7 @@ protected:
 		map(0xe400, 0xe403).nopw(); // pan
 		map(0xee00, 0xee00).noprw(); // ??
 		map(0xf000, 0xf000).nopw(); // ??
-		map(0xf200, 0xf200).w(FUNC(taito_fx1a_state::sound_bankswitch_w));
+		map(0xf200, 0xf200).w(FUNC(taito_fx1s_state::sound_bankswitch_w));
 	}
 
 	void sound_bankswitch_w(uint8_t data)
@@ -1027,11 +1026,11 @@ protected:
 	required_memory_bank m_soundbank;
 };
 
-class taito_fx1b_state :
+class taito_fx1z_state :
 	public taito_fx_state
 {
 public:
-	taito_fx1b_state(const machine_config &mconfig, device_type type, const char *tag) :
+	taito_fx1z_state(const machine_config &mconfig, device_type type, const char *tag) :
 		taito_fx_state(mconfig, type, tag),
 		m_zoom(*this, "taito_zoom"),
 		m_fm1208s(*this, "fm1208s")
@@ -1083,7 +1082,7 @@ protected:
 	{
 		taito_fx_state::maincpu_program_map(map);
 
-		map(0x1fb00000, 0x1fb003ff).rw(FUNC(taito_fx1b_state::fram_r), FUNC(taito_fx1b_state::fram_w)).umask32(0x00ff00ff);
+		map(0x1fb00000, 0x1fb003ff).rw(FUNC(taito_fx1z_state::fram_r), FUNC(taito_fx1z_state::fram_w)).umask32(0x00ff00ff);
 		map(0x1fb80000, 0x1fb80001).w(m_zoom, FUNC(taito_zoom_device::reg_data_w));
 		map(0x1fb80002, 0x1fb80003).w(m_zoom, FUNC(taito_zoom_device::reg_address_w));
 		map(0x1fba0000, 0x1fba0001).w(m_zoom, FUNC(taito_zoom_device::sound_irq_w));
@@ -1108,18 +1107,18 @@ protected:
 };
 
 class gdarius_state :
-	public taito_fx1b_state
+	public taito_fx1z_state
 {
 public:
 	gdarius_state(const machine_config &mconfig, device_type type, const char *tag) :
-		taito_fx1b_state(mconfig, type, tag)
+		taito_fx1z_state(mconfig, type, tag)
 	{
 	}
 
 protected:
 	virtual void coin_w(uint8_t data) override
 	{
-		taito_fx1b_state::coin_w(data);
+		taito_fx1z_state::coin_w(data);
 
 		// BIT(m_coin, 3); ??
 	}
@@ -1128,16 +1127,15 @@ protected:
 /*
 
 Primal Rage II
-Atari, 1996
+Atari, 1996-1997
 
-This game runs on Sony ZN1 hardware with a custom Atari top board.
+This game runs on Sony ZN-1 hardware with a custom Atari top board.
 
 
 PCB Layout
 ----------
 
-Main board (Standard ZN1 Main Board with Atari BIOS)
-
+Main board (Standard ZN-1 Main Board with Time Warner ZN-1 BIOS)
 ZN-1 1-659-709-12  COH-1000W
 |--------------------------------------------------------|
 |  LA4705             |---------------------------|      |
@@ -1180,7 +1178,7 @@ Notes:
       SW1   - Slide switch for stereo or mono sound output
       DSW   - Dip switch (4 position, defaults all OFF)
 
-      BIOS           - COH1000W.353, Atari ZN1 BIOS, 4MBit MaskROM type M534002 (SOP40)
+      BIOS           - COH1000W.353, Time Warner ZN-1 BIOS, 4MBit MaskROM type M534002 (SOP40)
       AT28C16        - Atmel AT28C16 2K x8 EEPROM (SOP24)
       814260-70      - 256K x16 (4MBit) DRAM (SOJ40)
       KM4132G271Q-12 - 128K x32 x2 banks (32MBit) SGRAM (QFP100)
@@ -1405,8 +1403,7 @@ protected:
 
 /*
 
-Main board (Standard ZN1 Main Board with Raizing/8ing BIOS)
-
+Main board (Standard ZN-1 Main Board with Raizing/8ing ZN-1 BIOS)
 ZN-1 1-659-709-12  COH-1002E
 |--------------------------------------------------------|
 |  LA4705             |---------------------------|      |
@@ -1449,7 +1446,7 @@ Notes:
       SW1   - Slide switch for stereo or mono sound output
       DSW   - Dip switch (4 position, defaults all OFF)
 
-      BIOS           - COH1002E.353, Raizing/8ing ZN1 BIOS, 4MBit MaskROM type M53402CZ (SOP40)
+      BIOS           - COH1002E.353, Raizing/8ing ZN-1 BIOS, 4MBit MaskROM type M53402CZ (SOP40)
       AT28C16        - Atmel AT28C16 2K x8 EEPROM (SOP24)
       814260-70      - 256K x16 (4MBit) DRAM (SOJ40)
       KM4132G271Q-12 - 128K x32 x2 banks (32MBit) SGRAM (QFP100)
@@ -1547,8 +1544,6 @@ Notes:
       N341256             - 32K x8 SRAM, equivalent to 62256 SRAM (SOJ28)
       68000 clock         - 12MHz
       YMF271-F clock      - 16.93MHz
-
-
 */
 
 class raizing_zn_state :
@@ -1760,8 +1755,8 @@ private:
 
 Bust A Move 2
 
-Runs on ZN1 hardware
-Lower PCB is common ZN1 with COH-1002E bios and ET01 sec chip
+Runs on ZN-1 hardware
+Lower PCB is common ZN-1 with COH-1002E bios and ET01 sec chip
 Top PCB is unique for this game....
 
 MTR990601-(A)
@@ -1790,7 +1785,6 @@ MTR-BAM* - DIP42 32MBit maskROMs
  CN3/CN5 - Connectors for ? (controls?)
   IDE-40 - 40 Pin flat cable connector for IDE HDD
            HDD is 3.5" Quantum Fireball CR 4.3AT
-
 */
 
 /*
@@ -1968,7 +1962,7 @@ NBA Jam Extreme
 Acclaim, 1996
 
 
-Main board (Standard ZN1 Main Board with Acclaim ZN1 BIOS)
+Main board (Standard ZN-1 Main Board with Acclaim ZN-1 BIOS)
 ZN-1 1-659-709-11  COH-1000A
 |--------------------------------------------------------|
 |  LA4705             |---------------------------|      |
@@ -2011,7 +2005,7 @@ Notes:
       SW1   - Slide switch for stereo or mono sound output
       DSW   - Dip switch (4 position, defaults all OFF)
 
-      BIOS           - COH1000A.353, Acclaim ZN1 BIOS, 4MBit MaskROM type M534002 (SOP40)
+      BIOS           - COH1000A.353, Acclaim ZN-1 BIOS, 4MBit MaskROM type M534002 (SOP40)
       AT28C16        - Atmel AT28C16 2K x8 EEPROM (SOP24)
       TC51V4260BJ-80 - 256K x16 (4MBit) DRAM (SOJ40)
       KM4132G271Q-12 - 128K x32 x2 banks (32MBit) SGRAM (QFP100)
@@ -2367,8 +2361,7 @@ protected:
 
 /*
 
-Main board (Standard ZN1 Main Board with Atlus BIOS)
-
+Main board (Standard ZN-1 Main Board with Atlus ZN-1 BIOS)
 ZN-1 1-659-709-12  COH-1001L
 |--------------------------------------------------------|
 |  LA4705             |---------------------------|      |
@@ -2411,7 +2404,7 @@ Notes:
       SW1   - Slide switch for stereo or mono sound output
       DSW   - Dip switch (4 position, defaults all OFF)
 
-      BIOS           - coh1001l.353, Atlus ZN1 BIOS, 4MBit MaskROM type M534002 (SOP40)
+      BIOS           - coh1001l.353, Atlus ZN-1 BIOS, 4MBit MaskROM type M534002 (SOP40)
       AT28C16        - Atmel AT28C16 2K x8 EEPROM
       814260         - 256K x16 (4MBit) DRAM
       MB81G83222-012 - 128K x32 x2 banks (32MBit) SGRAM
@@ -2593,7 +2586,6 @@ Board:  PS based (ZN-1,COH-1002V)
 
 Key:    Mother    KN01
     ROM board KN02
-
 */
 
 class visco_zn_state :
@@ -2658,8 +2650,7 @@ protected:
 
 /*
 
-Main board (Standard ZN1 Main Board with Tecmo BIOS)
-
+Main board (Standard ZN-1 Main Board with Tecmo TPS System BIOS)
 ZN-1 1-659-709-12  COH-1002M
 |--------------------------------------------------------|
 |  LA4705             |---------------------------|      |
@@ -2702,7 +2693,7 @@ Notes:
       SW1   - Slide switch for stereo or mono sound output
       DSW   - Dip switch (4 position, defaults all OFF)
 
-      BIOS           - COH1002M.353, Tecmo ZN1 BIOS, 4MBit MaskROM type M534002 (SOP40)
+      BIOS           - COH1002M.353, Tecmo TPS System BIOS, 4MBit MaskROM type M534002 (SOP40)
       AT28C16        - Atmel AT28C16 2K x8 EEPROM
       M5M44260       - 256K x16 (4MBit) DRAM
       KM4132G271Q-12 - 128K x32 x2 banks (32MBit) SGRAM
@@ -3424,7 +3415,7 @@ static INPUT_PORTS_START(tgmj)
 INPUT_PORTS_END
 
 
-#define CPZN1_BIOS \
+#define CAPCOM_ZN1_BIOS \
 	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) \
 	ROM_SYSTEM_BIOS( 0, "j", "japan" ) \
 	ROMX_LOAD( "m534002c-13.ic353", 0x000000, 0x080000, CRC(50033af6) SHA1(486d92ff6c7f1e54f8e0ef41cd9116eca0e10e1a), ROM_BIOS(0) ) /* japanese */ \
@@ -3436,7 +3427,7 @@ INPUT_PORTS_END
 	ROM_LOAD( "78081g503.ic655", 0x000000, 0x002000, NO_DUMP )
 
 ROM_START( coh1000c )
-	CPZN1_BIOS
+	CAPCOM_ZN1_BIOS
 
 	ROM_REGION32_LE( 0x080000, "countryrom", ROMREGION_ERASEFF )
 	ROM_REGION32_LE( 0x2400000, "bankedroms", ROMREGION_ERASEFF )
@@ -3446,7 +3437,7 @@ ROM_START( coh1000c )
 ROM_END
 
 ROM_START( ts2 )
-	CPZN1_BIOS
+	CAPCOM_ZN1_BIOS
 
 	ROM_REGION32_LE( 0x080000, "countryrom", 0 )
 	ROM_LOAD( "ts2e_04.2h", 0x0000000, 0x080000, CRC(7a3b535f) SHA1(f17f0dad81e50a7f4ccd042a26af1d472df4785f) ) // genuine CAPCOM label with Blue stripe & hand written TS2E 04
@@ -3471,7 +3462,7 @@ ROM_START( ts2 )
 ROM_END
 
 ROM_START( ts2u )
-	CPZN1_BIOS
+	CAPCOM_ZN1_BIOS
 
 	ROM_REGION32_LE( 0x080000, "countryrom", 0 )
 	ROM_LOAD( "ts2u_04.2h", 0x0000000, 0x080000, CRC(ddb52e7c) SHA1(e77891abae7681d911ef6eba2e0920d81433ebe6) ) // genuine CAPCOM label with Red stripe
@@ -3496,7 +3487,7 @@ ROM_START( ts2u )
 ROM_END
 
 ROM_START( ts2ua )
-	CPZN1_BIOS
+	CAPCOM_ZN1_BIOS
 
 	ROM_REGION32_LE( 0x080000, "countryrom", 0 )
 	ROM_LOAD( "ts2u_04.2h", 0x0000000, 0x080000, CRC(ddb52e7c) SHA1(e77891abae7681d911ef6eba2e0920d81433ebe6) ) // genuine CAPCOM label with Red stripe
@@ -3519,7 +3510,7 @@ ROM_START( ts2ua )
 ROM_END
 
 ROM_START( ts2j )
-	CPZN1_BIOS
+	CAPCOM_ZN1_BIOS
 
 	ROM_REGION32_LE( 0x080000, "countryrom", 0 )
 	ROM_LOAD( "ts2j_04.2h", 0x0000000, 0x080000, CRC(4aba8c5e) SHA1(a56001bf50bfc1b03036e88ae1febd1aac8c63c0) )
@@ -3544,7 +3535,7 @@ ROM_START( ts2j )
 ROM_END
 
 ROM_START( ts2ja )
-	CPZN1_BIOS
+	CAPCOM_ZN1_BIOS
 
 	ROM_REGION32_LE( 0x080000, "countryrom", 0 )
 	ROM_LOAD( "ts2j_04.2h", 0x0000000, 0x080000, CRC(4aba8c5e) SHA1(a56001bf50bfc1b03036e88ae1febd1aac8c63c0) )
@@ -3567,7 +3558,7 @@ ROM_START( ts2ja )
 ROM_END
 
 ROM_START( starglad )
-	CPZN1_BIOS
+	CAPCOM_ZN1_BIOS
 
 	ROM_REGION32_LE( 0x080000, "countryrom", 0 )
 	ROM_LOAD( "ps1u_04.2h", 0x0000000, 0x080000, CRC(121fb234) SHA1(697d18d37afd95f302b40a5a6a78d8c92a41ea73) )
@@ -3592,7 +3583,7 @@ ROM_START( starglad )
 ROM_END
 
 ROM_START( stargladj )
-	CPZN1_BIOS
+	CAPCOM_ZN1_BIOS
 
 	ROM_REGION32_LE( 0x080000, "countryrom", 0 )
 	ROM_LOAD( "ps1j_04.2h", 0x0000000, 0x080000, CRC(f865006d) SHA1(6abb476777a4309b1a60f12e6313c051db195808) )
@@ -3632,7 +3623,7 @@ As well as a hand written sum16 checksum of D04B (which matches dump)
 */
 
 ROM_START( glpracr )
-	CPZN1_BIOS
+	CAPCOM_ZN1_BIOS
 
 	ROM_REGION32_LE( 0x080000, "countryrom", 0 )
 	ROM_LOAD( "gra_ep-eng.2h", 0x0000000, 0x080000, CRC(f3ab9c85) SHA1(ce9d5d0406a6854975d5c71935fe917706334429) )
@@ -3653,7 +3644,7 @@ ROM_START( glpracr )
 ROM_END
 
 ROM_START( glpracrj )
-	CPZN1_BIOS
+	CAPCOM_ZN1_BIOS
 
 	ROM_REGION32_LE( 0x080000, "countryrom", 0 )
 	ROM_LOAD( "gpaj_04.2h", 0x0000000, 0x080000, CRC(53bf551c) SHA1(320632b5010630cee4c5ccb1578d5ee6d2754632) )
@@ -3674,7 +3665,7 @@ ROM_START( glpracrj )
 ROM_END
 
 ROM_START( sfex )
-	CPZN1_BIOS
+	CAPCOM_ZN1_BIOS
 
 	ROM_REGION32_LE( 0x080000, "countryrom", 0 )
 	ROM_LOAD( "sfee_04a.2h", 0x0000000, 0x080000, CRC(092cfa2e) SHA1(8af38a3f4f89f661233995a672faf486e71b79bc) )
@@ -3699,7 +3690,7 @@ ROM_START( sfex )
 ROM_END
 
 ROM_START( sfexu )
-	CPZN1_BIOS
+	CAPCOM_ZN1_BIOS
 
 	ROM_REGION32_LE( 0x080000, "countryrom", 0 )
 	ROM_LOAD( "sfeu_04b.2h", 0x0000000, 0x080000, CRC(de02bd29) SHA1(62a88a30f73db661f5b98fc7e2d34d51acb965cc) )
@@ -3724,7 +3715,7 @@ ROM_START( sfexu )
 ROM_END
 
 ROM_START( sfexa )
-	CPZN1_BIOS
+	CAPCOM_ZN1_BIOS
 
 	ROM_REGION32_LE( 0x080000, "countryrom", 0 )
 	ROM_LOAD( "sfea_04a.2h", 0x0000000, 0x080000, CRC(08247bd4) SHA1(07f356ef2827b3fbd0bfaf2010915315d9d60ef1) ) // could be sfea_04.2h
@@ -3749,7 +3740,7 @@ ROM_START( sfexa )
 ROM_END
 
 ROM_START( sfexj )
-	CPZN1_BIOS
+	CAPCOM_ZN1_BIOS
 
 	ROM_REGION32_LE( 0x080000, "countryrom", 0 )
 	ROM_LOAD( "sfej_04.2h", 0x0000000, 0x080000, CRC(ea100607) SHA1(27ef8c619804999d32d14fcc5ec783c057b4dc73) )
@@ -3774,7 +3765,7 @@ ROM_START( sfexj )
 ROM_END
 
 ROM_START( sfexp )
-	CPZN1_BIOS
+	CAPCOM_ZN1_BIOS
 
 	ROM_REGION32_LE( 0x080000, "countryrom", 0 )
 	ROM_LOAD( "sfpu_04a.2h", 0x0000000, 0x080000, CRC(4617adc2) SHA1(200307904349ad7e5d7d76d8c904b6b10424c7ef) )
@@ -3799,7 +3790,7 @@ ROM_START( sfexp )
 ROM_END
 
 ROM_START( sfexpu1 )
-	CPZN1_BIOS
+	CAPCOM_ZN1_BIOS
 
 	ROM_REGION32_LE( 0x080000, "countryrom", 0 )
 	ROM_LOAD( "sfpu_04.2h", 0x0000000, 0x080000, CRC(305e4ec0) SHA1(0df9572d7fc1bbc7131483960771d016fa5487a5) )
@@ -3824,7 +3815,7 @@ ROM_START( sfexpu1 )
 ROM_END
 
 ROM_START( sfexpj )
-	CPZN1_BIOS
+	CAPCOM_ZN1_BIOS
 
 	ROM_REGION32_LE( 0x080000, "countryrom", 0 )
 	ROM_LOAD( "sfpj_04a.2h", 0x0000000, 0x080000, CRC(6e99a0f7) SHA1(8f22bc545dd0e3eff24ab62ce5af1998d48d3770) )
@@ -3849,7 +3840,7 @@ ROM_START( sfexpj )
 ROM_END
 
 ROM_START( sfexpj1 )
-	CPZN1_BIOS
+	CAPCOM_ZN1_BIOS
 
 	ROM_REGION32_LE( 0x080000, "countryrom", 0 )
 	ROM_LOAD( "sfpj_04.2h", 0x0000000, 0x080000, CRC(18d043f5) SHA1(9e6e24a722d13888fbfd391ddb1a5045b162488c) )
@@ -3874,7 +3865,7 @@ ROM_START( sfexpj1 )
 ROM_END
 
 
-#define CPZN2_BIOS \
+#define CAPCOM_ZN2_BIOS \
 	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) \
 	ROM_LOAD( "m534002c-59.ic353", 0x000000, 0x080000, CRC(e860ea8b) SHA1(66e7e1d4e426466b8f48a2ba055a91b475569504) ) /* english */ \
 	ROM_REGION( 0x000008, "cat702_1", 0 ) \
@@ -3883,7 +3874,7 @@ ROM_END
 	ROM_LOAD( "78081g503.ic655", 0x000000, 0x002000, NO_DUMP )
 
 ROM_START( coh3002c )
-	CPZN2_BIOS
+	CAPCOM_ZN2_BIOS
 
 	ROM_REGION32_LE( 0x080000, "countryrom", ROMREGION_ERASEFF )
 	ROM_REGION32_LE( 0x3000000, "bankedroms", ROMREGION_ERASEFF )
@@ -3893,7 +3884,7 @@ ROM_START( coh3002c )
 ROM_END
 
 ROM_START( rvschool )
-	CPZN2_BIOS
+	CAPCOM_ZN2_BIOS
 
 	ROM_REGION32_LE( 0x080000, "countryrom", 0 )
 	ROM_LOAD( "jste_04.2h", 0x0000000, 0x080000, CRC(1567555a) SHA1(3b93235076ab3c06914c83becf0da8e810b8917a) )
@@ -3921,7 +3912,7 @@ ROM_START( rvschool )
 ROM_END
 
 ROM_START( rvschoolu )
-	CPZN2_BIOS
+	CAPCOM_ZN2_BIOS
 
 	ROM_REGION32_LE( 0x080000, "countryrom", 0 )
 	ROM_LOAD( "jstu_04.2h", 0x0000000, 0x080000, CRC(d83724ae) SHA1(0890c0164116606acc600f646e82972d0d4f79b4) )
@@ -3949,7 +3940,7 @@ ROM_START( rvschoolu )
 ROM_END
 
 ROM_START( rvschoola )
-	CPZN2_BIOS
+	CAPCOM_ZN2_BIOS
 
 	ROM_REGION32_LE( 0x080000, "countryrom", 0 )
 	ROM_LOAD( "jsta_04.2h", 0x0000000, 0x080000, CRC(034b1011) SHA1(6773246be242ee336503d21d7d44a3884832eb1e) )
@@ -3977,7 +3968,7 @@ ROM_START( rvschoola )
 ROM_END
 
 ROM_START( jgakuen )
-	CPZN2_BIOS
+	CAPCOM_ZN2_BIOS
 
 	ROM_REGION32_LE( 0x080000, "countryrom", 0 )
 	ROM_LOAD( "jstj_04a.2h", 0x0000000, 0x080000, CRC(91b36f38) SHA1(423dbf0f9f08458a866e9acb2a5b657c736b179f) )
@@ -4005,7 +3996,7 @@ ROM_START( jgakuen )
 ROM_END
 
 ROM_START( jgakuen1 )
-	CPZN2_BIOS
+	CAPCOM_ZN2_BIOS
 
 	ROM_REGION32_LE( 0x080000, "countryrom", 0 )
 	ROM_LOAD( "jstj_04.2h", 0x0000000, 0x080000, CRC(28b8000a) SHA1(9ebf74b453d775cadca9c2d7d8e2c7eb57bb9a38) )
@@ -4034,7 +4025,7 @@ ROM_END
 
 
 ROM_START( sfex2 )
-	CPZN2_BIOS
+	CAPCOM_ZN2_BIOS
 
 	ROM_REGION32_LE( 0x080000, "countryrom", 0 )
 	ROM_LOAD( "ex2e_04.2h", 0x0000000, 0x080000, CRC(77e1622b) SHA1(626a6718e7e843b09075b652d4fcbd9c86eea02b) )
@@ -4057,7 +4048,7 @@ ROM_START( sfex2 )
 ROM_END
 
 ROM_START( sfex2u )
-	CPZN2_BIOS
+	CAPCOM_ZN2_BIOS
 
 	ROM_REGION32_LE( 0x080000, "countryrom", 0 )
 	ROM_LOAD( "ex2u_04a.2h", 0x0000000, 0x080000, CRC(8dc5317f) SHA1(c35224caf70662a0e45a74cbead294a51f9b9e16) )
@@ -4080,7 +4071,7 @@ ROM_START( sfex2u )
 ROM_END
 
 ROM_START( sfex2u1 )
-	CPZN2_BIOS
+	CAPCOM_ZN2_BIOS
 
 	ROM_REGION32_LE( 0x080000, "countryrom", 0 )
 	ROM_LOAD( "ex2u_04.2h", 0x0000000, 0x080000, CRC(eb417c2c) SHA1(bd47d0a1d911af4457c795ec348c847c2cf9e721) )
@@ -4103,7 +4094,7 @@ ROM_START( sfex2u1 )
 ROM_END
 
 ROM_START( sfex2a )
-	CPZN2_BIOS
+	CAPCOM_ZN2_BIOS
 
 	ROM_REGION32_LE( 0x080000, "countryrom", 0 )
 	ROM_LOAD( "ex2a_04.2h", 0x0000000, 0x080000, CRC(ac9a872d) SHA1(4e237f5e2e5de58e587e9abc5767509b8d750004) )
@@ -4126,7 +4117,7 @@ ROM_START( sfex2a )
 ROM_END
 
 ROM_START( sfex2h )
-	CPZN2_BIOS
+	CAPCOM_ZN2_BIOS
 
 	ROM_REGION32_LE( 0x080000, "countryrom", 0 )
 	ROM_LOAD( "ex2h_04.2h", 0x0000000, 0x080000, CRC(68f2ef80) SHA1(212bb3c0d935c64f5e3b20e427e06d97404709d8) )
@@ -4149,7 +4140,7 @@ ROM_START( sfex2h )
 ROM_END
 
 ROM_START( sfex2j )
-	CPZN2_BIOS
+	CAPCOM_ZN2_BIOS
 
 	ROM_REGION32_LE( 0x080000, "countryrom", 0 )
 	ROM_LOAD( "ex2j_04.2h", 0x0000000, 0x080000, CRC(5d603586) SHA1(ff546d3bd011d6441e9672b88bab763d3cd89be2) )
@@ -4172,7 +4163,7 @@ ROM_START( sfex2j )
 ROM_END
 
 ROM_START( plsmaswd )
-	CPZN2_BIOS
+	CAPCOM_ZN2_BIOS
 
 	ROM_REGION32_LE( 0x080000, "countryrom", 0 )
 	ROM_LOAD( "sg2u_04.2h", 0x0000000, 0x080000, CRC(154187c0) SHA1(58cc0e9d32786b1c1d64ecee4667190456b36ef6) )
@@ -4196,7 +4187,7 @@ ROM_START( plsmaswd )
 ROM_END
 
 ROM_START( plsmaswda )
-	CPZN2_BIOS
+	CAPCOM_ZN2_BIOS
 
 	ROM_REGION32_LE( 0x080000, "countryrom", 0 )
 	ROM_LOAD( "sg2a_04.2h", 0x0000000, 0x080000, CRC(66e5dada) SHA1(f2e50ee963b8a6aadf25a17b3ff6dcb428b8bdb2) )
@@ -4220,7 +4211,7 @@ ROM_START( plsmaswda )
 ROM_END
 
 ROM_START( stargld2 )
-	CPZN2_BIOS
+	CAPCOM_ZN2_BIOS
 
 	ROM_REGION32_LE( 0x080000, "countryrom", 0 )
 	ROM_LOAD( "sg2j_04.2h", 0x0000000, 0x080000, CRC(cf4ce6ac) SHA1(52b6f61d79671c9c108b3dfbd3c2ac333285412c) )
@@ -4244,7 +4235,7 @@ ROM_START( stargld2 )
 ROM_END
 
 ROM_START( tgmj )
-	CPZN2_BIOS
+	CAPCOM_ZN2_BIOS
 
 	ROM_REGION32_LE( 0x080000, "countryrom", 0 )
 	ROM_LOAD( "atej_04.2h", 0x0000000, 0x080000, CRC(bb4bbb96) SHA1(808f4b29493e74efd661d561d11cbec2f4afd1c8) )
@@ -4264,7 +4255,7 @@ ROM_START( tgmj )
 ROM_END
 
 ROM_START( techromn )
-	CPZN2_BIOS
+	CAPCOM_ZN2_BIOS
 
 	ROM_REGION32_LE( 0x080000, "countryrom", 0 )
 	ROM_LOAD( "kioe_04.2h", 0x0000000, 0x080000, CRC(ebd33b09) SHA1(3f0226d275efc7b97c8d3431211f948aa1271d34) )
@@ -4289,7 +4280,7 @@ ROM_START( techromn )
 ROM_END
 
 ROM_START( techromnu )
-	CPZN2_BIOS
+	CAPCOM_ZN2_BIOS
 
 	ROM_REGION32_LE( 0x080000, "countryrom", 0 )
 	ROM_LOAD( "kiou_04.2h", 0x0000000, 0x080000, CRC(08aca34a) SHA1(768a37f719af5d96993db5592b6505b013e0d6f4) )
@@ -4314,7 +4305,7 @@ ROM_START( techromnu )
 ROM_END
 
 ROM_START( techromna )
-	CPZN2_BIOS
+	CAPCOM_ZN2_BIOS
 
 	ROM_REGION32_LE( 0x080000, "countryrom", 0 )
 	ROM_LOAD( "kioa_04.2h", 0x0000000, 0x080000, CRC(8ff43381) SHA1(7ce81e70fdc593b01a56e5e8b7d1de8000fe9453) )
@@ -4339,7 +4330,7 @@ ROM_START( techromna )
 ROM_END
 
 ROM_START( kikaioh )
-	CPZN2_BIOS
+	CAPCOM_ZN2_BIOS
 
 	ROM_REGION32_LE( 0x080000, "countryrom", 0 )
 	ROM_LOAD( "kioj_04.2h", 0x0000000, 0x080000, CRC(3a2a3bc8) SHA1(3c4ae3cfe00a7f60ab2196ae042dab4a8eb6f597) )
@@ -4364,7 +4355,7 @@ ROM_START( kikaioh )
 ROM_END
 
 ROM_START( sfex2p )
-	CPZN2_BIOS
+	CAPCOM_ZN2_BIOS
 
 	ROM_REGION32_LE( 0x080000, "countryrom", 0 )
 	ROM_LOAD( "x2pe_04.2h", 0x0000000, 0x080000, CRC(2cbd44ff) SHA1(9f32e447b811df8a8fa8d28d11204fc8ca7f93f8) ) // HN27C4096AG-12
@@ -4389,7 +4380,7 @@ ROM_START( sfex2p )
 ROM_END
 
 ROM_START( sfex2pu )
-	CPZN2_BIOS
+	CAPCOM_ZN2_BIOS
 
 	ROM_REGION32_LE( 0x080000, "countryrom", 0 )
 	ROM_LOAD( "x2pu_04.2h", 0x0000000, 0x080000, CRC(2938118c) SHA1(4bdeeb9aa3dd54ef44aa3fc73d78d65297b1ed25) )
@@ -4414,7 +4405,7 @@ ROM_START( sfex2pu )
 ROM_END
 
 ROM_START( sfex2pa )
-	CPZN2_BIOS
+	CAPCOM_ZN2_BIOS
 
 	ROM_REGION32_LE( 0x080000, "countryrom", 0 )
 	ROM_LOAD( "x2pa_04.2h", 0x0000000, 0x080000, CRC(c437d602) SHA1(150f0dfd9f2e4f9adc11f8960da1e6be250456b1) )
@@ -4439,7 +4430,7 @@ ROM_START( sfex2pa )
 ROM_END
 
 ROM_START( sfex2ph )
-	CPZN2_BIOS
+	CAPCOM_ZN2_BIOS
 
 	ROM_REGION32_LE( 0x080000, "countryrom", 0 )
 	ROM_LOAD( "x2ph_04.2h", 0x0000000, 0x080000, CRC(a4f07439) SHA1(630be537062134da2d01866b9587e5c119c198bb) )
@@ -4464,7 +4455,7 @@ ROM_START( sfex2ph )
 ROM_END
 
 ROM_START( sfex2pj )
-	CPZN2_BIOS
+	CAPCOM_ZN2_BIOS
 
 	ROM_REGION32_LE( 0x080000, "countryrom", 0 )
 	ROM_LOAD( "x2pj_04.2h", 0x0000000, 0x080000, CRC(c6d0aea3) SHA1(f48ee889dd743109f830063da3eb0f687db2d86c) )
@@ -4489,7 +4480,7 @@ ROM_START( sfex2pj )
 ROM_END
 
 ROM_START( strider2 )
-	CPZN2_BIOS
+	CAPCOM_ZN2_BIOS
 
 	ROM_REGION32_LE( 0x080000, "countryrom", 0 )
 	ROM_LOAD( "hr2e_04.2h", 0x0000000, 0x080000, CRC(32d89b1c) SHA1(77d4d9de768cb195d1290b89892feaef6d8705e8) )
@@ -4514,7 +4505,7 @@ ROM_START( strider2 )
 ROM_END
 
 ROM_START( strider2u )
-	CPZN2_BIOS
+	CAPCOM_ZN2_BIOS
 
 	ROM_REGION32_LE( 0x080000, "countryrom", 0 )
 	ROM_LOAD( "hr2u_04.2h", 0x0000000, 0x080000, CRC(b28b01c6) SHA1(ad40f550ce14f09cf34d51b9b0b7154c31c8936e) )
@@ -4539,7 +4530,7 @@ ROM_START( strider2u )
 ROM_END
 
 ROM_START( strider2a )
-	CPZN2_BIOS
+	CAPCOM_ZN2_BIOS
 
 	ROM_REGION32_LE( 0x080000, "countryrom", 0 )
 	ROM_LOAD( "hr2a_04.2h", 0x0000000, 0x080000, CRC(56ff9394) SHA1(fe8417965d945210ac098c6678c02f1c678bd13b) )
@@ -4564,7 +4555,7 @@ ROM_START( strider2a )
 ROM_END
 
 ROM_START( shiryu2 )
-	CPZN2_BIOS
+	CAPCOM_ZN2_BIOS
 
 	ROM_REGION32_LE( 0x080000, "countryrom", 0 )
 	ROM_LOAD( "hr2j_04.2h", 0x0000000, 0x080000, CRC(0824ee5f) SHA1(a296ffe03f0d947deb9803d05de3c240a26b52bb) )
@@ -4589,7 +4580,7 @@ ROM_START( shiryu2 )
 ROM_END
 
 
-#define TPS_BIOS \
+#define TECMO_TPS_SYSTEM_BIOS \
 	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) \
 	ROM_LOAD( "m534002c-61.ic353", 0x000000, 0x080000, CRC(69ffbcb4) SHA1(03eb2febfab3fcde716defff291babd9392de965) ) /* english */ \
 	ROM_REGION( 0x000008, "cat702_1", 0 ) \
@@ -4598,7 +4589,7 @@ ROM_END
 	ROM_LOAD( "78081g503.ic655", 0x000000, 0x002000, NO_DUMP )
 
 ROM_START( coh1002m )
-	TPS_BIOS
+	TECMO_TPS_SYSTEM_BIOS
 
 	ROM_REGION32_LE( 0x2800000, "bankedroms", ROMREGION_ERASEFF )
 	ROM_REGION( 0x000008, "cat702_2", 0 ) ROM_COPY( "cat702_1", 0x000000, 0x000000, 0x000008 )
@@ -4608,7 +4599,7 @@ ROM_END
 // .217 goes at 0x800000, .218 at 0xc00000, .219 at 0x1000000, and so on.
 
 ROM_START( glpracr2 )
-	TPS_BIOS
+	TECMO_TPS_SYSTEM_BIOS
 
 	ROM_REGION32_LE( 0x2800000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "gallop2u.119", 0x0000001, 0x100000, CRC(9899911c) SHA1(f043fb97760c53422ad6aeb214474c0be00017ce) )
@@ -4627,7 +4618,7 @@ ROM_START( glpracr2 )
 ROM_END
 
 ROM_START( glpracr2j )
-	TPS_BIOS
+	TECMO_TPS_SYSTEM_BIOS
 
 	ROM_REGION32_LE( 0x2800000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "1.119", 0x0000001, 0x100000, CRC(0fe2d2df) SHA1(031369f4e1138e2ee293c321e5ee418e560b3f06) )
@@ -4646,7 +4637,7 @@ ROM_START( glpracr2j )
 ROM_END
 
 ROM_START( glpracr2l )
-	TPS_BIOS
+	TECMO_TPS_SYSTEM_BIOS
 
 	ROM_REGION32_LE( 0x2800000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "gra2b.119", 0x0000001, 0x100000, CRC(43abee7c) SHA1(ea0afc820d8480c12c9af54057877ff11a8012fb) )
@@ -4668,7 +4659,7 @@ ROM_START( glpracr2l )
 ROM_END
 
 ROM_START( cbaj )
-	TPS_BIOS
+	TECMO_TPS_SYSTEM_BIOS
 
 	ROM_REGION32_LE( 0x2800000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "cbaj_1.119", 0x0000001, 0x080000, CRC(814f8b4b) SHA1(17966038a692d0701139660f25725d7c10a2a928) )
@@ -4703,7 +4694,7 @@ ROM_START( cbaj )
 ROM_END
 
 ROM_START( cbajbl )
-	TPS_BIOS
+	TECMO_TPS_SYSTEM_BIOS
 
 	ROM_REGION32_LE( 0x2800000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "uo119.bin",  0x0000001, 0x080000, CRC(814f8b4b) SHA1(17966038a692d0701139660f25725d7c10a2a928) )
@@ -4743,7 +4734,7 @@ ROM_START( cbajbl )
 ROM_END
 
 ROM_START( shngmtkb )
-	TPS_BIOS
+	TECMO_TPS_SYSTEM_BIOS
 
 	ROM_REGION32_LE( 0x2800000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "shmj-b.119", 0x0000001, 0x080000, CRC(65522c67) SHA1(b5981e5859aab742a87d6742feb9c55a3e6ba13f) )
@@ -4758,7 +4749,7 @@ ROM_START( shngmtkb )
 ROM_END
 
 ROM_START( doapp )
-	TPS_BIOS
+	TECMO_TPS_SYSTEM_BIOS
 
 	ROM_REGION32_LE( 0x2800000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "doapp119.bin", 0x0000001, 0x100000, CRC(bbe04cef) SHA1(f2dae4810ca78075fc3007a6001531a455235a2e) )
@@ -4775,7 +4766,7 @@ ROM_START( doapp )
 ROM_END
 
 ROM_START( doappk )
-	TPS_BIOS
+	TECMO_TPS_SYSTEM_BIOS
 
 	ROM_REGION32_LE( 0x2800000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "doapp_u0119.119", 0x0000001, 0x100000, CRC(9084704e) SHA1(616b3e65a32768767209ae77c48ad34d11b31754) )
@@ -4792,7 +4783,7 @@ ROM_START( doappk )
 ROM_END
 
 ROM_START( tondemo )
-	TPS_BIOS
+	TECMO_TPS_SYSTEM_BIOS
 
 	ROM_REGION32_LE( 0x2800000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "u0119.bin", 0x0000001, 0x100000, CRC(5711e301) SHA1(005375d32c1eda9bd39e46326880a62506d06389) )
@@ -4808,7 +4799,7 @@ ROM_START( tondemo )
 ROM_END
 
 ROM_START( glpracr3 )
-	TPS_BIOS
+	TECMO_TPS_SYSTEM_BIOS
 
 	ROM_REGION32_LE( 0x2800000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "1.119", 0x0000001, 0x100000, CRC(89bdf567) SHA1(916accbcad52e9ee4e3b28a339138fe2bfbecdfe) )
@@ -4830,7 +4821,7 @@ ROM_START( glpracr3 )
 ROM_END
 
 ROM_START( glpracr3j )
-	TPS_BIOS
+	TECMO_TPS_SYSTEM_BIOS
 
 	ROM_REGION32_LE( 0x2800000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "gra3u119.119", 0x0000001, 0x100000, CRC(aba69017) SHA1(670b895ee7d36bc5a00f6b0df7ce965517986617) )
@@ -4849,7 +4840,7 @@ ROM_START( glpracr3j )
 ROM_END
 
 ROM_START( twcupmil )
-	TPS_BIOS
+	TECMO_TPS_SYSTEM_BIOS
 
 	ROM_REGION32_LE( 0x2800000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "twm-ep.119", 0x0000001, 0x100000, CRC(5f2908fb) SHA1(fc7ac1f6e81543678705e6e510dbf786b1502444) )
@@ -4865,7 +4856,7 @@ ROM_START( twcupmil )
 ROM_END
 
 ROM_START( flamegun )
-	TPS_BIOS
+	TECMO_TPS_SYSTEM_BIOS
 
 	ROM_REGION32_LE( 0x3800000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "flamegun.119", 0x0000001, 0x100000, CRC(bc8e9e29) SHA1(02e4f079f0ed864dbc056d5f64d33a0522c034fd) )
@@ -4888,7 +4879,7 @@ ROM_START( flamegun )
 ROM_END
 
 ROM_START( flamegunj )
-	TPS_BIOS
+	TECMO_TPS_SYSTEM_BIOS
 
 	ROM_REGION32_LE( 0x3800000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "fg_1.119", 0x0000001, 0x100000, CRC(1f2aa527) SHA1(de3a20d9aeb745fe82cd1d87bde26876e088483a) )
@@ -4911,7 +4902,7 @@ ROM_START( flamegunj )
 ROM_END
 
 ROM_START( lpadv )
-	TPS_BIOS
+	TECMO_TPS_SYSTEM_BIOS
 
 	ROM_REGION32_LE( 0x1000000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "lp_3.u0119", 0x000001, 0x100000, CRC(18cade44) SHA1(8a44156224c77c51f4f6ca61a0168e48dfcc6eda) )
@@ -4924,7 +4915,7 @@ ROM_START( lpadv )
 ROM_END
 
 ROM_START( mfjump )
-	TPS_BIOS
+	TECMO_TPS_SYSTEM_BIOS
 
 	ROM_REGION32_LE( 0x2800000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "mfj-o.119", 0x0000001, 0x100000, CRC(0d724dc5) SHA1(2ba388fe6254c0cf3847fd173a414ee5ca31f4f4) )
@@ -4936,7 +4927,7 @@ ROM_START( mfjump )
 ROM_END
 
 ROM_START( tblkkuzu )
-	TPS_BIOS
+	TECMO_TPS_SYSTEM_BIOS
 
 	ROM_REGION32_LE( 0x2800000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "tbk.u119", 0x0000001, 0x100000, CRC(621b07e1) SHA1(30773aaa333fdee7ef55db2f8adde010688abce1) )
@@ -4948,7 +4939,7 @@ ROM_START( tblkkuzu )
 ROM_END
 
 ROM_START( 1on1gov )
-	TPS_BIOS
+	TECMO_TPS_SYSTEM_BIOS
 
 	ROM_REGION32_LE( 0x2800000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "1on1.u119", 0x0000001, 0x100000, CRC(10aecc19) SHA1(ad2fe6011551935907568cc3b4028f481034537c) )
@@ -4971,7 +4962,7 @@ ROM_START( 1on1gov )
 ROM_END
 
 
-#define KN_BIOS \
+#define VIDEO_SYSTEM_ZN1_BIOS \
 	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) \
 	ROM_LOAD( "coh-1002v.ic353", 0x000000, 0x080000, CRC(5ff165f3) SHA1(8f59314c1093446b9bcb06d232244da6df78e206) ) /* english */ \
 	ROM_REGION( 0x000008, "cat702_1", 0 ) \
@@ -4980,7 +4971,7 @@ ROM_END
 	ROM_LOAD( "78081g503.ic655", 0x000000, 0x002000, NO_DUMP )
 
 ROM_START( coh1002v )
-	KN_BIOS
+	VIDEO_SYSTEM_ZN1_BIOS
 
 	ROM_REGION32_LE( 0x0280000, "fixedroms", ROMREGION_ERASEFF )
 	ROM_REGION32_LE( 0x1800000, "bankedroms", ROMREGION_ERASEFF )
@@ -4988,7 +4979,7 @@ ROM_START( coh1002v )
 ROM_END
 
 ROM_START( aerofgts )
-	KN_BIOS
+	VIDEO_SYSTEM_ZN1_BIOS
 
 	ROM_REGION32_LE( 0x0280000, "fixedroms", 0 )
 	ROM_LOAD( "1-8_prog0_usa_aa9e.ic5", 0x0000000, 0x080000, CRC(d15a4904) SHA1(4e329f56584df4b057b56e21f0230dda4ec46bcf) ) // hand written label: 1/8 PROG 0 USA AA9E @ IC5
@@ -5010,7 +5001,7 @@ ROM_START( aerofgts )
 ROM_END
 
 ROM_START( aerofgtst )
-	KN_BIOS
+	VIDEO_SYSTEM_ZN1_BIOS
 
 	ROM_REGION32_LE( 0x0280000, "fixedroms", 0 )
 	ROM_LOAD( "vs.ic5",   0x0000000, 0x080000, CRC(453dd514) SHA1(189fe5598485de160f5c0add90235ed63ed92747) )
@@ -5032,7 +5023,7 @@ ROM_START( aerofgtst )
 ROM_END
 
 ROM_START( sncwgltd )
-	KN_BIOS
+	VIDEO_SYSTEM_ZN1_BIOS
 
 	ROM_REGION32_LE( 0x0280000, "fixedroms", 0 )
 	ROM_LOAD( "ic5.bin",  0x0000000, 0x080000, CRC(458f14aa) SHA1(b4e50be60ffb9b7911561dd35b6a7e0df3432a3a) )
@@ -5054,7 +5045,7 @@ ROM_START( sncwgltd )
 ROM_END
 
 
-#define TAITOFX1_BIOS \
+#define TAITO_FX1_BIOS \
 	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) \
 	ROM_LOAD( "m534002c-14.ic353", 0x000000, 0x080000, CRC(e3f23b6e) SHA1(e18907cf8c6ba54d96edba0a9a00487a90219e0d) ) /* japanese */ \
 	ROM_REGION( 0x000008, "cat702_1", 0 ) \
@@ -5063,7 +5054,7 @@ ROM_END
 	ROM_LOAD( "78081g503.ic655", 0x000000, 0x002000, NO_DUMP )
 
 ROM_START( coh1000t )
-	TAITOFX1_BIOS
+	TAITO_FX1_BIOS
 
 	ROM_REGION32_LE( 0x1000000, "bankedroms", ROMREGION_ERASEFF )
 	ROM_REGION( 0x080000, "audiocpu", ROMREGION_ERASEFF )
@@ -5072,7 +5063,7 @@ ROM_START( coh1000t )
 ROM_END
 
 ROM_START( ftimpcta )
-	TAITOFX1_BIOS
+	TAITO_FX1_BIOS
 
 	ROM_REGION32_LE( 0x1000000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "e25-13.4", 0x0000001, 0x100000, CRC(7f078d7b) SHA1(df9800dd6885dbc33736c5143d877b0847221061) )
@@ -5093,7 +5084,7 @@ ROM_START( ftimpcta )
 ROM_END
 
 ROM_START( ftimpact )
-	TAITOFX1_BIOS
+	TAITO_FX1_BIOS
 
 	ROM_REGION32_LE( 0x1000000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "e25-09.4", 0x0000001, 0x080000, CRC(d457bfc7) SHA1(e974a9c3e7b0748ef89d78e76a7dbb763c42b6f7) )
@@ -5114,7 +5105,7 @@ ROM_START( ftimpact )
 ROM_END
 
 ROM_START( ftimpactu )
-	TAITOFX1_BIOS
+	TAITO_FX1_BIOS
 
 	ROM_REGION32_LE( 0x1000000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "e25-08.4", 0x0000001, 0x080000, CRC(a3508f51) SHA1(fd4c3cc186e280497dc905ebda92472d5b72b1b4) )
@@ -5135,7 +5126,7 @@ ROM_START( ftimpactu )
 ROM_END
 
 ROM_START( ftimpactj )
-	TAITOFX1_BIOS
+	TAITO_FX1_BIOS
 
 	ROM_REGION32_LE( 0x1000000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "e25-06.4", 0x0000001, 0x080000, CRC(3a59deeb) SHA1(4377c5829fb5b6f5d0120caf992b1ee714897641) )
@@ -5156,7 +5147,7 @@ ROM_START( ftimpactj )
 ROM_END
 
 ROM_START( gdarius )
-	TAITOFX1_BIOS
+	TAITO_FX1_BIOS
 
 	ROM_REGION32_LE( 0x1000000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "e39-09.ic4", 0x0000001, 0x100000, CRC(f457794d) SHA1(43571770b239298e3442d3da8aa4f4507380d639) )
@@ -5176,7 +5167,7 @@ ROM_START( gdarius )
 ROM_END
 
 ROM_START( gdariusu )
-	TAITOFX1_BIOS
+	TAITO_FX1_BIOS
 
 	ROM_REGION32_LE( 0x1000000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "e39-08.ic4", 0x0000001, 0x100000, CRC(835049db) SHA1(2b230c8fd6c6ea4e30740fda28f631344b018b79) )
@@ -5196,7 +5187,7 @@ ROM_START( gdariusu )
 ROM_END
 
 ROM_START( gdariusj )
-	TAITOFX1_BIOS
+	TAITO_FX1_BIOS
 
 	ROM_REGION32_LE( 0x1000000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "e39-06.4", 0x0000001, 0x100000, CRC(2980c30d) SHA1(597321642125c3ae37581c2d9abc2723c7909996) )
@@ -5216,7 +5207,7 @@ ROM_START( gdariusj )
 ROM_END
 
 ROM_START( gdarius2 )
-	TAITOFX1_BIOS
+	TAITO_FX1_BIOS
 
 	ROM_REGION32_LE( 0x1000000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "e39-12.4", 0x0000001, 0x100000, CRC(b23266c3) SHA1(80aaddaaf10e40280ade4c7d11f45ddab47ee9a6) )
@@ -5236,7 +5227,7 @@ ROM_START( gdarius2 )
 ROM_END
 
 ROM_START( mgcldate )
-	TAITOFX1_BIOS
+	TAITO_FX1_BIOS
 
 	ROM_REGION32_LE( 0x1000000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "e32-05.2", 0x0000001, 0x080000, CRC(72fc7f7b) SHA1(50d9e84bc74fb63ec1900ab149051888bc3d03a5) )
@@ -5256,7 +5247,7 @@ ROM_START( mgcldate )
 ROM_END
 
 ROM_START( mgcldtex )
-	TAITOFX1_BIOS
+	TAITO_FX1_BIOS
 
 	ROM_REGION32_LE( 0x1000000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "e32-08.2", 0x0000001, 0x100000, CRC(3d42cd28) SHA1(9017922e835a359ba5126c8a9e8c27380a5ce081) )
@@ -5277,7 +5268,7 @@ ROM_END
 
 ROM_START( psyforce )
 	// It is VERY ODD that Taito had 2 different labels for the same data (E22-06* & E22-10*) but is verified correct!
-	TAITOFX1_BIOS
+	TAITO_FX1_BIOS
 
 	ROM_REGION32_LE( 0x1000000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "e22-09_.2", 0x0000001, 0x080000, CRC(997e4500) SHA1(4a90b452c9a877ccec55a11f36c4cbc6df1f1f41) ) // E22-09*
@@ -5297,7 +5288,7 @@ ROM_START( psyforce )
 ROM_END
 
 ROM_START( psyforcej )
-	TAITOFX1_BIOS
+	TAITO_FX1_BIOS
 
 	ROM_REGION32_LE( 0x1000000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "e22-05_.2", 0x0000001, 0x080000, CRC(7770242c) SHA1(dd37575d3d9ffdef60fe0e4cab6c9e42d087f714) ) // E22-05*
@@ -5317,7 +5308,7 @@ ROM_START( psyforcej )
 ROM_END
 
 ROM_START( psyforcex )
-	TAITOFX1_BIOS
+	TAITO_FX1_BIOS
 
 	ROM_REGION32_LE( 0x1000000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "e22-11.2", 0x0000001, 0x080000, CRC(29ebebc9) SHA1(48a3371460d69ae5ba58d3e24615f389bf43b2cc) )
@@ -5337,7 +5328,7 @@ ROM_START( psyforcex )
 ROM_END
 
 ROM_START( raystorm )
-	TAITOFX1_BIOS
+	TAITO_FX1_BIOS
 
 	ROM_REGION32_LE( 0x1000000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "e24-xx.ic4", 0x0000001, 0x080000, CRC(33f63638) SHA1(fdda33ffc9902b3605a3272fae5a614e93856a86) ) // Need to verify actual label
@@ -5356,7 +5347,7 @@ ROM_START( raystorm )
 ROM_END
 
 ROM_START( raystormo )
-	TAITOFX1_BIOS
+	TAITO_FX1_BIOS
 
 	ROM_REGION32_LE( 0x1000000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "e24-08.4", 0x0000001, 0x080000, CRC(ae071b95) SHA1(0e1597220808d6e3998ef1e9d88779e0187ba0af) )
@@ -5375,7 +5366,7 @@ ROM_START( raystormo )
 ROM_END
 
 ROM_START( raystormu )
-	TAITOFX1_BIOS
+	TAITO_FX1_BIOS
 
 	ROM_REGION32_LE( 0x1000000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "e24-07.4", 0x0000001, 0x080000, CRC(d9002b03) SHA1(bdb0aa88536c4c98c150ece87387930b3dbdd258) )
@@ -5394,7 +5385,7 @@ ROM_START( raystormu )
 ROM_END
 
 ROM_START( raystormj )
-	TAITOFX1_BIOS
+	TAITO_FX1_BIOS
 
 	ROM_REGION32_LE( 0x1000000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "e24-05.4", 0x0000001, 0x080000, CRC(40097ab9) SHA1(67e73568b35515c2c5a9119e97ac4709baff8c5a) )
@@ -5413,7 +5404,7 @@ ROM_START( raystormj )
 ROM_END
 
 ROM_START( sfchamp )
-	TAITOFX1_BIOS
+	TAITO_FX1_BIOS
 
 	ROM_REGION32_LE( 0x1000000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "e18-12.2", 0x0000001, 0x080000, CRC(72304685) SHA1(2e6f645871e19a49fcdfbdca49c6be415471eadf) ) // Ver 2.5O
@@ -5434,7 +5425,7 @@ ROM_START( sfchamp )
 ROM_END
 
 ROM_START( sfchampo )
-	TAITOFX1_BIOS
+	TAITO_FX1_BIOS
 
 	ROM_REGION32_LE( 0x1000000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "e18-11.2", 0x0000001, 0x080000, CRC(f5462f30) SHA1(44eb03a9b51e2d8dd14fe2ed36dbcf17035a22c7) ) // Ver 2.4O
@@ -5455,7 +5446,7 @@ ROM_START( sfchampo )
 ROM_END
 
 ROM_START( sfchampu )
-	TAITOFX1_BIOS
+	TAITO_FX1_BIOS
 
 	ROM_REGION32_LE( 0x1000000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "e18-10.2", 0x0000001, 0x080000, CRC(82411fa6) SHA1(0aa1764b7ff68258ef76a41355c50d5067262d75) )
@@ -5476,7 +5467,7 @@ ROM_START( sfchampu )
 ROM_END
 
 ROM_START( sfchampj )
-	TAITOFX1_BIOS
+	TAITO_FX1_BIOS
 
 	ROM_REGION32_LE( 0x1000000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "e18-07.2", 0x0000001, 0x080000, CRC(1b484e1c) SHA1(f29f40a9988475d8abbb126095b0716133c087a0) )
@@ -5497,7 +5488,7 @@ ROM_START( sfchampj )
 ROM_END
 
 
-#define PSARC95_BIOS \
+#define EIGHTING_RAIZING_ZN1_BIOS \
 	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) \
 	ROM_LOAD( "m27c402cz-54.ic353", 0x000000, 0x080000, CRC(910f3a8b) SHA1(cd68532967a25f476a6d73473ec6b6f4df2e1689) ) /* english */ \
 	ROM_REGION( 0x000008, "cat702_1", 0 ) \
@@ -5506,7 +5497,7 @@ ROM_END
 	ROM_LOAD( "78081g503.ic655", 0x000000, 0x002000, NO_DUMP )
 
 ROM_START( coh1002e )
-	PSARC95_BIOS
+	EIGHTING_RAIZING_ZN1_BIOS
 
 	ROM_REGION32_LE( 0x1800000, "bankedroms", ROMREGION_ERASEFF )
 	ROM_REGION( 0x080000, "audiocpu", ROMREGION_ERASEFF )
@@ -5515,7 +5506,7 @@ ROM_START( coh1002e )
 ROM_END
 
 ROM_START( beastrzr )
-	PSARC95_BIOS
+	EIGHTING_RAIZING_ZN1_BIOS
 
 	ROM_REGION32_LE( 0x1800000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "b.roar_u0213.u0213",  0x000001, 0x080000, CRC(2c586534) SHA1(a38dfc3a45446d24a1caac89b0f560989d46ded5) ) // sldh - at offset 0x4C9C: Sep 22 1997 11:42:18
@@ -5537,7 +5528,7 @@ ROM_START( beastrzr )
 ROM_END
 
 ROM_START( beastrzra )
-	PSARC95_BIOS
+	EIGHTING_RAIZING_ZN1_BIOS
 
 	ROM_REGION32_LE( 0x1800000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "b.roar_u0213.u0213",  0x000001, 0x080000, CRC(5c3ca4d3) SHA1(f246de057c2ea725e5e628dd32597f3bc7d22070) ) // sldh - at offset 0x4C9C: Jun 21 1997 14:09:23
@@ -5562,7 +5553,7 @@ ROM_START( beastrzra )
 ROM_END
 
 ROM_START( bldyroar )
-	PSARC95_BIOS
+	EIGHTING_RAIZING_ZN1_BIOS
 
 	ROM_REGION32_LE( 0x1800000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "b.roar_u0213.u0213",  0x000001, 0x080000, CRC(63769342) SHA1(7231188073b997b039467db85ce7c85383daf591) ) // sldh - at offset 0x4C9C: Jun 21 1997 14:18:11
@@ -5584,7 +5575,7 @@ ROM_START( bldyroar )
 ROM_END
 
 ROM_START( beastrzrb )
-	PSARC95_BIOS
+	EIGHTING_RAIZING_ZN1_BIOS
 
 	ROM_REGION32_LE( 0x1800000, "bankedroms", 0 )
 	ROM_LOAD( "27c160.1",     0x000000, 0x200000, CRC(820855e2) SHA1(18bdd4d0b4a92ae4fde457e1f37c813be6eece71) )
@@ -5608,7 +5599,7 @@ ROM_START( beastrzrb )
 ROM_END
 
 ROM_START( brvblade )
-	TPS_BIOS
+	TECMO_TPS_SYSTEM_BIOS
 
 	ROM_REGION32_LE( 0x1800000, "bankedroms", 0 )
 	ROM_LOAD( "flash0.021",      0x0000000, 0x200000, CRC(97e12c63) SHA1(382970617a363f6c98ee741f26be6a75c9752bdb) )
@@ -5630,7 +5621,7 @@ ROM_START( brvblade )
 ROM_END
 
 ROM_START( brvbladeu )
-	TPS_BIOS
+	TECMO_TPS_SYSTEM_BIOS
 
 	ROM_REGION32_LE( 0x1800000, "bankedroms", 0 )
 	ROM_LOAD( "flash0.021",      0x0000000, 0x200000, CRC(97e12c63) SHA1(382970617a363f6c98ee741f26be6a75c9752bdb) )
@@ -5652,7 +5643,7 @@ ROM_START( brvbladeu )
 ROM_END
 
 ROM_START( brvbladej )
-	TPS_BIOS
+	TECMO_TPS_SYSTEM_BIOS
 
 	ROM_REGION32_LE( 0x1800000, "bankedroms", 0 )
 	ROM_LOAD( "flash0.021",      0x0000000, 0x200000, CRC(97e12c63) SHA1(382970617a363f6c98ee741f26be6a75c9752bdb) )
@@ -5674,7 +5665,7 @@ ROM_START( brvbladej )
 ROM_END
 
 ROM_START( brvbladea )
-	TPS_BIOS
+	TECMO_TPS_SYSTEM_BIOS
 
 	ROM_REGION32_LE( 0x1800000, "bankedroms", 0 )
 	ROM_LOAD( "flash0.021",      0x0000000, 0x200000, CRC(97e12c63) SHA1(382970617a363f6c98ee741f26be6a75c9752bdb) )
@@ -5696,7 +5687,7 @@ ROM_START( brvbladea )
 ROM_END
 
 ROM_START( bldyror2 )
-	PSARC95_BIOS
+	EIGHTING_RAIZING_ZN1_BIOS
 
 	ROM_REGION32_LE( 0x1800000, "bankedroms", 0 )
 	ROM_LOAD( "flash0.021", 0x0000000, 0x200000, CRC(fa7602e1) SHA1(6fb6af09656fbb86d2abda35804b2ed4a4cd7461) )
@@ -5721,7 +5712,7 @@ ROM_START( bldyror2 )
 ROM_END
 
 ROM_START( bldyror2u )
-	PSARC95_BIOS
+	EIGHTING_RAIZING_ZN1_BIOS
 
 	ROM_REGION32_LE( 0x1800000, "bankedroms", 0 )
 	ROM_LOAD( "flash0.021", 0x0000000, 0x200000, CRC(fa7602e1) SHA1(6fb6af09656fbb86d2abda35804b2ed4a4cd7461) )
@@ -5746,7 +5737,7 @@ ROM_START( bldyror2u )
 ROM_END
 
 ROM_START( bldyror2j )
-	PSARC95_BIOS
+	EIGHTING_RAIZING_ZN1_BIOS
 
 	ROM_REGION32_LE( 0x1800000, "bankedroms", 0 )
 	ROM_LOAD( "flash0.021", 0x0000000, 0x200000, CRC(fa7602e1) SHA1(6fb6af09656fbb86d2abda35804b2ed4a4cd7461) )
@@ -5771,7 +5762,7 @@ ROM_START( bldyror2j )
 ROM_END
 
 ROM_START( bldyror2a )
-	PSARC95_BIOS
+	EIGHTING_RAIZING_ZN1_BIOS
 
 	ROM_REGION32_LE( 0x1800000, "bankedroms", 0 )
 	ROM_LOAD( "flash0.021", 0x0000000, 0x200000, CRC(fa7602e1) SHA1(6fb6af09656fbb86d2abda35804b2ed4a4cd7461) )
@@ -5796,7 +5787,7 @@ ROM_START( bldyror2a )
 ROM_END
 
 ROM_START( bam2 )
-	PSARC95_BIOS
+	EIGHTING_RAIZING_ZN1_BIOS
 
 	ROM_REGION32_LE( 0x2c00000, "bankedroms", 0 )
 	ROM_LOAD( "u19",             0x0000000, 0x200000, CRC(4d9f2337) SHA1(b156fd461d9d5141c60dbcd9ecd26b4f277b7919) )
@@ -5823,7 +5814,7 @@ ROM_START( bam2 )
 ROM_END
 
 ROM_START( bam2a )
-	PSARC95_BIOS
+	EIGHTING_RAIZING_ZN1_BIOS
 
 	ROM_REGION32_LE( 0x2c00000, "bankedroms", 0 )
 	ROM_LOAD( "u19",             0x0000000, 0x200000, CRC(4d9f2337) SHA1(b156fd461d9d5141c60dbcd9ecd26b4f277b7919) )
@@ -5850,7 +5841,7 @@ ROM_START( bam2a )
 ROM_END
 
 
-#define TW_BIOS \
+#define TIME_WARNER_ZN1_BIOS \
 	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) \
 	ROM_LOAD( "msm27c402zb.ic353", 0x000000, 0x080000, CRC(45e8a4b4) SHA1(815488d8563c85f97fbc3384ff21f08e4c88b7b7) ) /* english */ \
 	ROM_REGION( 0x000008, "cat702_1", 0 ) \
@@ -5859,14 +5850,14 @@ ROM_END
 	ROM_LOAD( "78081g503.ic655", 0x000000, 0x002000, NO_DUMP )
 
 ROM_START( coh1000w )
-	TW_BIOS
+	TIME_WARNER_ZN1_BIOS
 
 	ROM_REGION32_LE( 0x200000, "roms", ROMREGION_ERASEFF )
 	ROM_REGION( 0x000008, "cat702_2", 0 ) ROM_COPY( "cat702_1", 0x000000, 0x000000, 0x000008 )
 ROM_END
 
 ROM_START( primrag2 )
-	TW_BIOS
+	TIME_WARNER_ZN1_BIOS
 
 	ROM_REGION32_LE( 0x200000, "roms", 0 )
 	ROM_LOAD16_BYTE( "pr2_036.u16",  0x000001, 0x080000, CRC(3ee39e4f) SHA1(dbd859b54fb9be33effc14eb847dcd829024eea3) )
@@ -5885,7 +5876,7 @@ ROM_START( primrag2 )
 ROM_END
 
 
-#define AC_BIOS \
+#define ACCLAIM_ZN1_BIOS \
 	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) \
 	ROM_LOAD( "m534002c-15.ic353", 0x000000, 0x080000, CRC(8d8d0764) SHA1(7ee83d317190bb1cef2f8f01c81eaaae47150ebb) ) /* english */ \
 	ROM_REGION( 0x000008, "cat702_1", 0 ) \
@@ -5894,14 +5885,14 @@ ROM_END
 	ROM_LOAD( "78081g503.ic655", 0x000000, 0x002000, NO_DUMP )
 
 ROM_START( coh1000a )
-	AC_BIOS
+	ACCLAIM_ZN1_BIOS
 
 	ROM_REGION32_LE( 0x2000000, "bankedroms", ROMREGION_ERASEFF )
 	ROM_REGION( 0x000008, "cat702_2", 0 ) ROM_COPY( "cat702_1", 0x000000, 0x000000, 0x000008 )
 ROM_END
 
 ROM_START( nbajamex )
-	AC_BIOS
+	ACCLAIM_ZN1_BIOS
 
 	ROM_REGION32_LE( 0x2000000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "nba_jam_110i_odd_cs_cc48.u36",  0x0000001, 0x100000, CRC(533041e7) SHA1(691a11a031e61d892db74c4c29b6a999917c341b) ) // labeled  NBA JAM 1.10I  ODD  CS = CC48
@@ -5931,7 +5922,7 @@ ROM_START( nbajamex )
 ROM_END
 
 ROM_START( nbajamexa )
-	AC_BIOS
+	ACCLAIM_ZN1_BIOS
 
 	ROM_REGION32_LE( 0x2000000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "360-mp-a1_odd_cs_e0fe.u36",  0x0000001, 0x100000, CRC(c433e827) SHA1(1d2a5a6990a1b1864e63ce3ba7306d48ebbd4775) ) // labeled  360-MP-A1  ODD  CS = E0FE
@@ -5961,7 +5952,7 @@ ROM_START( nbajamexa )
 ROM_END
 
 ROM_START( jdredd )
-	AC_BIOS
+	ACCLAIM_ZN1_BIOS
 
 	ROM_REGION32_LE( 0x200000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "9e54_01-16-98_1566_u_36.u36",  0x000001, 0x020000, CRC(37addbf9) SHA1(a4061a1ba9e230f080f0bfea69bf77efe9264a92) ) // ROMs for Rev.C hard drive are dated 01-16-98 - still same checksum of 9E54
@@ -5975,7 +5966,7 @@ ROM_START( jdredd )
 ROM_END
 
 ROM_START( jdreddb )
-	AC_BIOS
+	ACCLAIM_ZN1_BIOS
 
 	ROM_REGION32_LE( 0x200000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "9e54_11-21-97_1566_u_36.u36",  0x000001, 0x020000, CRC(37addbf9) SHA1(a4061a1ba9e230f080f0bfea69bf77efe9264a92) ) // ROMs for Rev.B hard drive are dated 11-21-97 - still same checksum of 9E54
@@ -5989,7 +5980,7 @@ ROM_START( jdreddb )
 ROM_END
 
 
-#define ATLUS_BIOS \
+#define ATLUS_ZN1_BIOS \
 	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) \
 	ROM_LOAD( "m534002c-17.ic353", 0x000000, 0x080000, CRC(6721146b) SHA1(9511d24bfe25eb180fb2db0835b131cb4a12730e) ) /* english */ \
 	ROM_REGION( 0x000008, "cat702_1", 0 ) \
@@ -5998,7 +5989,7 @@ ROM_END
 	ROM_LOAD( "78081g503.ic655", 0x000000, 0x002000, NO_DUMP )
 
 ROM_START( coh1001l )
-	ATLUS_BIOS
+	ATLUS_ZN1_BIOS
 
 	ROM_REGION32_LE( 0x2000000, "bankedroms", ROMREGION_ERASEFF )
 	ROM_REGION( 0x040000, "audiocpu", ROMREGION_ERASEFF )
@@ -6006,7 +5997,7 @@ ROM_START( coh1001l )
 ROM_END
 
 ROM_START( hvnsgate )
-	ATLUS_BIOS
+	ATLUS_ZN1_BIOS
 
 	ROM_REGION32_LE( 0x2000000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "athg-01b.18", 0x0000001, 0x080000, CRC(e820136f) SHA1(2bc3465928dd08060736a2a67d98864d634275d6) )
@@ -6032,8 +6023,8 @@ ROM_END
 
 }; // anonymous namespace
 
-// Capcom ZN1 (95681-2)
-GAME( 1995, coh1000c,  0,        coh1000c,  capcom6b, capcom_zn_state,  empty_init, ROT0, "Capcom",                  "Capcom ZN1",                        MACHINE_IS_BIOS_ROOT | MACHINE_SUPPORTS_SAVE )
+// Capcom ZN-1 (95681-2)
+GAME( 1995, coh1000c,  0,        coh1000c,  capcom6b, capcom_zn_state,  empty_init, ROT0, "Capcom",                  "Capcom ZN-1",                       MACHINE_IS_BIOS_ROOT | MACHINE_SUPPORTS_SAVE )
 GAME( 1995, ts2,       coh1000c, coh1000c,  capcom6b, capcom_zn_state,  empty_init, ROT0, "Capcom / Takara",         "Battle Arena Toshinden 2 (Europe 951124)",                 MACHINE_SUPPORTS_SAVE )
 GAME( 1995, ts2u,      ts2,      coh1000c,  capcom6b, capcom_zn_state,  empty_init, ROT0, "Capcom / Takara",         "Battle Arena Toshinden 2 (USA 951124)",                    MACHINE_SUPPORTS_SAVE )
 GAME( 1995, ts2ua,     ts2,      coh1000c,  capcom6b, capcom_zn_state,  empty_init, ROT0, "Capcom / Takara",         "Battle Arena Toshinden 2 (USA 951124, 32Mb mask ROMs)",    MACHINE_SUPPORTS_SAVE )
@@ -6052,15 +6043,81 @@ GAME( 1997, sfexpu1,   sfexp,    coh1002c,  capcom6b, capcom_zn_state,  empty_in
 GAME( 1997, sfexpj,    sfexp,    coh1002c,  capcom6b, capcom_zn_state,  empty_init, ROT0, "Capcom / Arika",          "Street Fighter EX Plus (Japan 970407)",                    MACHINE_SUPPORTS_SAVE )
 GAME( 1997, sfexpj1,   sfexp,    coh1002c,  capcom6b, capcom_zn_state,  empty_init, ROT0, "Capcom / Arika",          "Street Fighter EX Plus (Japan 970311)",                    MACHINE_SUPPORTS_SAVE )
 
-// Capcom ZN2 (95681-2)
-GAME( 1997, coh3002c,  0,        coh3002c,  capcom6b, capcom_zn_state,  empty_init, ROT0, "Capcom",                  "Capcom ZN2",                        MACHINE_IS_BIOS_ROOT | MACHINE_SUPPORTS_SAVE )
+// Taito FX-1 (SROM PCB-A)
+GAME( 1995, coh1000t,  0,        coh1000ta, znt2p,    taito_fx1s_state, empty_init, ROT0, "Taito",                   "Taito FX-1",                        MACHINE_IS_BIOS_ROOT | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sfchamp,   coh1000t, coh1000ta, znt2p,    taito_fx1s_state, empty_init, ROT0, "Taito",                   "Super Football Champ (Ver 2.5O)",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sfchampo,  sfchamp,  coh1000ta, znt2p,    taito_fx1s_state, empty_init, ROT0, "Taito",                   "Super Football Champ (Ver 2.4O)",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sfchampu,  sfchamp,  coh1000ta, znt2p,    taito_fx1s_state, empty_init, ROT0, "Taito",                   "Super Football Champ (Ver 2.4A)",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sfchampj,  sfchamp,  coh1000ta, znt2p,    taito_fx1s_state, empty_init, ROT0, "Taito",                   "Super Football Champ (Ver 2.4J)",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1995, psyforce,  coh1000t, coh1000ta, znt2p,    taito_fx1s_state, empty_init, ROT0, "Taito",                   "Psychic Force (Ver 2.4O)",                                 MACHINE_SUPPORTS_SAVE )
+GAME( 1995, psyforcej, psyforce, coh1000ta, znt2p,    taito_fx1s_state, empty_init, ROT0, "Taito",                   "Psychic Force (Ver 2.4J)",                                 MACHINE_SUPPORTS_SAVE )
+GAME( 1995, psyforcex, psyforce, coh1000ta, znt2p,    taito_fx1s_state, empty_init, ROT0, "Taito",                   "Psychic Force EX (Ver 2.0J)",                              MACHINE_SUPPORTS_SAVE )
+GAME( 1996, mgcldate,  mgcldtex, coh1000ta, znt2p,    taito_fx1s_state, empty_init, ROT0, "Taito",                   "Magical Date / Magical Date - Dokidoki Kokuhaku Daisakusen (Ver 2.02J)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, mgcldtex,  coh1000t, coh1000ta, znt2p,    taito_fx1s_state, empty_init, ROT0, "Taito",                   "Magical Date EX / Magical Date - Sotsugyou Kokuhaku Daisakusen (Ver 2.01J)", MACHINE_SUPPORTS_SAVE )
+
+// Taito FX-1 (ZROM PCB)
+GAME( 1996, raystorm,  coh1000t, coh1000tb, raystorm, taito_fx1z_state, empty_init, ROT0, "Taito",                   "Ray Storm (Ver 2.06A)",                                    MACHINE_SUPPORTS_SAVE )
+GAME( 1996, raystormo, raystorm, coh1000tb, raystorm, taito_fx1z_state, empty_init, ROT0, "Taito",                   "Ray Storm (Ver 2.05O)",                                    MACHINE_SUPPORTS_SAVE )
+GAME( 1996, raystormu, raystorm, coh1000tb, raystorm, taito_fx1z_state, empty_init, ROT0, "Taito",                   "Ray Storm (Ver 2.05A)",                                    MACHINE_SUPPORTS_SAVE )
+GAME( 1996, raystormj, raystorm, coh1000tb, raystorm, taito_fx1z_state, empty_init, ROT0, "Taito",                   "Ray Storm (Ver 2.05J)",                                    MACHINE_SUPPORTS_SAVE )
+GAME( 1996, ftimpact,  ftimpcta, coh1000tb, znt2p,    taito_fx1z_state, empty_init, ROT0, "Taito",                   "Fighters' Impact (Ver 2.02O)",                             MACHINE_SUPPORTS_SAVE )
+GAME( 1996, ftimpactu, ftimpcta, coh1000tb, znt2p,    taito_fx1z_state, empty_init, ROT0, "Taito",                   "Fighters' Impact (Ver 2.02A)",                             MACHINE_SUPPORTS_SAVE )
+GAME( 1996, ftimpactj, ftimpcta, coh1000tb, znt2p,    taito_fx1z_state, empty_init, ROT0, "Taito",                   "Fighters' Impact (Ver 2.02J)",                             MACHINE_SUPPORTS_SAVE )
+GAME( 1997, ftimpcta,  coh1000t, coh1000tb, znt2p,    taito_fx1z_state, empty_init, ROT0, "Taito",                   "Fighters' Impact A (Ver 2.00J)",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1997, gdarius,   gdarius2, coh1002tb, znt2p,    gdarius_state,    empty_init, ROT0, "Taito",                   "G-Darius (Ver 2.02O)",                                     MACHINE_SUPPORTS_SAVE )
+GAME( 1997, gdariusu,  gdarius2, coh1002tb, znt2p,    gdarius_state,    empty_init, ROT0, "Taito",                   "G-Darius (Ver 2.02A)",                                     MACHINE_SUPPORTS_SAVE )
+GAME( 1997, gdariusj,  gdarius2, coh1002tb, znt2p,    gdarius_state,    empty_init, ROT0, "Taito",                   "G-Darius (Ver 2.01J)",                                     MACHINE_SUPPORTS_SAVE )
+GAME( 1997, gdarius2,  coh1000t, coh1002tb, znt2p,    gdarius_state,    empty_init, ROT0, "Taito",                   "G-Darius Ver.2 (Ver 2.03J)",                               MACHINE_SUPPORTS_SAVE )
+
+// Acclaim ZN-1 (PCB-100102 PCB-100095)
+GAME( 1995, coh1000a,  0,        coh1000a,  zn,       acclaim_zn_state, empty_init, ROT0, "Acclaim",                 "Acclaim ZN-1",                      MACHINE_IS_BIOS_ROOT | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, nbajamex,  coh1000a, nbajamex,  nbajamex, nbajamex_state,   empty_init, ROT0, "Acclaim",                 "NBA Jam Extreme (ver. 1.10I)",                             MACHINE_SUPPORTS_SAVE )
+GAME( 1996, nbajamexa, nbajamex, nbajamex,  nbajamex, nbajamex_state,   empty_init, ROT0, "Acclaim",                 "NBA Jam Extreme (ver. 1.04)",                              MACHINE_SUPPORTS_SAVE )
+
+// Acclaim ZN-1 (PCB-100102)
+GAME( 1996, jdredd,    coh1000a, jdredd,    jdredd,   jdredd_state,     empty_init, ROT0, "Acclaim",                 "Judge Dredd (Rev C Dec. 17 1997)",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1996, jdreddb,   jdredd,   jdredd,    jdredd,   jdredd_state,     empty_init, ROT0, "Acclaim",                 "Judge Dredd (Rev B Nov. 26 1997)",                         MACHINE_SUPPORTS_SAVE )
+
+// Time Warner ZN-1 (PSXTRA)
+GAME( 1995, coh1000w,  0,        coh1000w,  zn,       primrag2_state,   empty_init, ROT0, "Atari",                   "Time Warner ZN-1",                  MACHINE_IS_BIOS_ROOT | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, primrag2,  coh1000w, coh1000w,  primrag2, primrag2_state,   empty_init, ROT0, "Atari",                   "Primal Rage II (Test Version 0.36a)",                      MACHINE_SUPPORTS_SAVE )
+
+// Atlus ZN-1 (ATHG-01)
+GAME( 1995, coh1001l,  0,        coh1001l,  zn,       atlus_zn_state,   empty_init, ROT0, "Atlus",                   "Atlus ZN-1",                        MACHINE_IS_BIOS_ROOT | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, hvnsgate,  coh1001l, coh1001l,  zn2p,     atlus_zn_state,   empty_init, ROT0, "Racdym / Atlus",          "Heaven's Gate",                                            MACHINE_SUPPORTS_SAVE )
+
+// Video System ZN-1 (VS34)
+GAME( 1996, coh1002v,  0,        coh1002v,  zn,       visco_zn_state,   empty_init, ROT0, "Video System Co.",        "Video System ZN-1",                 MACHINE_IS_BIOS_ROOT | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, aerofgts,  coh1002v, coh1002v,  aerofgts, visco_zn_state,   empty_init, ROT270, "McO'River, Inc.",       "Aero Fighters Special (USA)",                              MACHINE_SUPPORTS_SAVE )
+GAME( 1996, aerofgtst, aerofgts, coh1002v,  aerofgts, visco_zn_state,   empty_init, ROT270, "Video System Co.",      "Aero Fighters Special (Taiwan)",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1996, sncwgltd,  aerofgts, coh1002v,  aerofgts, visco_zn_state,   empty_init, ROT270, "Video System Co.",      "Sonic Wings Limited (Japan)",                              MACHINE_SUPPORTS_SAVE )
+
+// Eighting / Raizing ZN-1 (RA9701 SUB)
+GAME( 1996, coh1002e,  0,        coh1002e,  znt2p,    raizing_zn_state, empty_init, ROT0, "Eighting / Raizing",      "Eighting / Raizing ZN-1",           MACHINE_IS_BIOS_ROOT | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, beastrzr,  coh1002e, coh1002e,  znt2p,    raizing_zn_state, empty_init, ROT0, "Eighting / Raizing",      "Beastorizer (USA, Sep 22 1997)",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1997, beastrzra, beastrzr, coh1002e,  znt2p,    raizing_zn_state, empty_init, ROT0, "Eighting / Raizing",      "Beastorizer (USA, Jun 21 1997)",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1997, bldyroar,  beastrzr, coh1002e,  znt2p,    raizing_zn_state, empty_init, ROT0, "Eighting / Raizing",      "Bloody Roar (Japan, Jun 21 1997)",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1997, beastrzrb, beastrzr, beastrzrb, znt2p,    beastrzrb_state,  empty_init, ROT0, "bootleg",                 "Beastorizer (USA bootleg)",                                MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+
+// Eighting / Raizing ZN-1 (PS9805)
+GAME( 1998, bldyror2,  coh1002e, coh1002e,  bldyror2, raizing_zn_state, empty_init, ROT0, "Eighting / Raizing",      "Bloody Roar 2 (World)",                                    MACHINE_SUPPORTS_SAVE )
+GAME( 1998, bldyror2u, bldyror2, coh1002e,  bldyror2, raizing_zn_state, empty_init, ROT0, "Eighting / Raizing",      "Bloody Roar 2 (USA)",                                      MACHINE_SUPPORTS_SAVE )
+GAME( 1998, bldyror2a, bldyror2, coh1002e,  bldyror2, raizing_zn_state, empty_init, ROT0, "Eighting / Raizing",      "Bloody Roar 2 (Asia)",                                     MACHINE_SUPPORTS_SAVE )
+GAME( 1998, bldyror2j, bldyror2, coh1002e,  bldyror2, raizing_zn_state, empty_init, ROT0, "Eighting / Raizing",      "Bloody Roar 2 (Japan)",                                    MACHINE_SUPPORTS_SAVE )
+
+// Eighting / Raizing ZN-1 (MTR990601-(A))
+GAME( 1999, bam2,      coh1002e, bam2hdd,   bam2,     bam2_state,       empty_init, ROT0, "Metro / Enix / Namco",    "Bust a Move 2 - Dance Tengoku Mix (HDD Japanese ROM ver. 1999/07/17 10:00:00)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1999, bam2a,     bam2,     bam2cdrom, bam2,     bam2_state,       empty_init, ROT0, "Metro / Enix / Namco",    "Bust a Move 2 - Dance Tengoku Mix (CDROM Japanese ROM ver. 1999/07/17 10:00:00)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+
+// Capcom ZN-2 (95681-2)
+GAME( 1997, coh3002c,  0,        coh3002c,  capcom6b, capcom_zn_state,  empty_init, ROT0, "Capcom",                  "Capcom ZN-2",                       MACHINE_IS_BIOS_ROOT | MACHINE_SUPPORTS_SAVE )
 GAME( 1997, rvschool,  coh3002c, coh3002c,  capcom4b, capcom_zn_state,  empty_init, ROT0, "Capcom",                  "Rival Schools: United By Fate (Europe 971117)",            MACHINE_SUPPORTS_SAVE )
 GAME( 1997, rvschoolu, rvschool, coh3002c,  capcom4b, capcom_zn_state,  empty_init, ROT0, "Capcom",                  "Rival Schools: United By Fate (USA 971117)",               MACHINE_SUPPORTS_SAVE )
 GAME( 1997, rvschoola, rvschool, coh3002c,  capcom4b, capcom_zn_state,  empty_init, ROT0, "Capcom",                  "Rival Schools: United By Fate (Asia 971117)",              MACHINE_SUPPORTS_SAVE )
 GAME( 1997, jgakuen,   rvschool, coh3002c,  capcom4b, capcom_zn_state,  empty_init, ROT0, "Capcom",                  "Shiritsu Justice Gakuen: Legion of Heroes (Japan 971216)", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, jgakuen1,  rvschool, coh3002c,  capcom4b, capcom_zn_state,  empty_init, ROT0, "Capcom",                  "Shiritsu Justice Gakuen: Legion of Heroes (Japan 971117)", MACHINE_SUPPORTS_SAVE )
 
-// Capcom ZN2 (97695-1)
+// Capcom ZN-2 (97695-1)
 // An undumped japanese pcb of Shiritsu Justice Gakuen: Legion of Heroes running on the new game board 97695-1 and mounting the EPROM JSTJ_04A located @ 2H is proved to exist.
 GAME( 1998, sfex2,     coh3002c, coh3002c,  capcom6b, capcom_zn_state,  empty_init, ROT0, "Capcom / Arika",          "Street Fighter EX2 (Europe 980312)",                       MACHINE_SUPPORTS_SAVE )
 GAME( 1998, sfex2u,    sfex2,    coh3002c,  capcom6b, capcom_zn_state,  empty_init, ROT0, "Capcom / Arika",          "Street Fighter EX2 (USA 980526)",                          MACHINE_SUPPORTS_SAVE )
@@ -6072,7 +6129,7 @@ GAME( 1998, plsmaswd,  coh3002c, coh3002c,  plsmaswd, capcom_zn_state,  empty_in
 GAME( 1998, plsmaswda, plsmaswd, coh3002c,  plsmaswd, capcom_zn_state,  empty_init, ROT0, "Capcom",                  "Plasma Sword: Nightmare of Bilstein (Asia 980316)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1998, stargld2,  plsmaswd, coh3002c,  plsmaswd, capcom_zn_state,  empty_init, ROT0, "Capcom",                  "Star Gladiator 2: Nightmare of Bilstein (Japan 980316)",   MACHINE_SUPPORTS_SAVE )
 GAME( 1998, tgmj,      coh3002c, coh3002c,  tgmj,     capcom_zn_state,  empty_init, ROT0, "Arika / Capcom",          "Tetris: The Grand Master (Japan 980710)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1998, techromn,  coh3002c, coh3002c,  plsmaswd, capcom_zn_state,  empty_init, ROT0, "Capcom",                  "Tech Romancer (Europe 980914)",                            MACHINE_SUPPORTS_SAVE ) // TODO: cannot enter test mode after qsound screen
+GAME( 1998, techromn,  coh3002c, coh3002c,  plsmaswd, capcom_zn_state,  empty_init, ROT0, "Capcom",                  "Tech Romancer (Europe 980914)",                            MACHINE_SUPPORTS_SAVE ) // Font is not uploaded if entering test mode after qsound screen
 GAME( 1998, techromnu, techromn, coh3002c,  plsmaswd, capcom_zn_state,  empty_init, ROT0, "Capcom",                  "Tech Romancer (USA 980914)",                               MACHINE_SUPPORTS_SAVE ) // ""
 GAME( 1998, techromna, techromn, coh3002c,  plsmaswd, capcom_zn_state,  empty_init, ROT0, "Capcom",                  "Tech Romancer (Asia 980914)",                              MACHINE_SUPPORTS_SAVE ) // ""
 GAME( 1998, kikaioh,   techromn, coh3002c,  plsmaswd, capcom_zn_state,  empty_init, ROT0, "Capcom",                  "Choukou Senki Kikaioh (Japan 980914)",                     MACHINE_SUPPORTS_SAVE )
@@ -6086,21 +6143,8 @@ GAME( 1999, strider2u, strider2, coh3002c,  strider2, capcom_zn_state,  empty_in
 GAME( 1999, strider2a, strider2, coh3002c,  strider2, capcom_zn_state,  empty_init, ROT0, "Capcom",                  "Strider 2 (Asia 991213)",                                  MACHINE_SUPPORTS_SAVE )
 GAME( 1999, shiryu2,   strider2, coh3002c,  strider2, capcom_zn_state,  empty_init, ROT0, "Capcom",                  "Strider Hiryu 2 (Japan 991213)",                           MACHINE_SUPPORTS_SAVE )
 
-// Atari (PSXTRA)
-GAME( 1996, coh1000w,  0,        coh1000w,  zn,       primrag2_state,   empty_init, ROT0, "Atari",                   "Atari PSX",                         MACHINE_IS_BIOS_ROOT | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, primrag2,  coh1000w, coh1000w,  primrag2, primrag2_state,   empty_init, ROT0, "Atari",                   "Primal Rage II (Ver 0.36a)",                               MACHINE_SUPPORTS_SAVE )
-
-// Acclaim (PCB-100102 PCB-100095)
-GAME( 1995, coh1000a,  0,        coh1000a,  zn,       acclaim_zn_state, empty_init, ROT0, "Acclaim",                 "Acclaim PSX",                       MACHINE_IS_BIOS_ROOT | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, nbajamex,  coh1000a, nbajamex,  nbajamex, nbajamex_state,   empty_init, ROT0, "Acclaim",                 "NBA Jam Extreme (ver. 1.10I)",                             MACHINE_SUPPORTS_SAVE )
-GAME( 1996, nbajamexa, nbajamex, nbajamex,  nbajamex, nbajamex_state,   empty_init, ROT0, "Acclaim",                 "NBA Jam Extreme (ver. 1.04)",                              MACHINE_SUPPORTS_SAVE )
-
-// Acclaim (PCB-100102)
-GAME( 1996, jdredd,    coh1000a, jdredd,    jdredd,   jdredd_state,     empty_init, ROT0, "Acclaim",                 "Judge Dredd (Rev C Dec. 17 1997)",                         MACHINE_SUPPORTS_SAVE )
-GAME( 1996, jdreddb,   jdredd,   jdredd,    jdredd,   jdredd_state,     empty_init, ROT0, "Acclaim",                 "Judge Dredd (Rev B Nov. 26 1997)",                         MACHINE_SUPPORTS_SAVE )
-
-// Tecmo (TPS1-7)
-GAME( 1997, coh1002m,  0,        coh1002m,  zn,       tecmo_zn_state,   empty_init, ROT0, "Tecmo",                   "TPS",                               MACHINE_IS_BIOS_ROOT | MACHINE_SUPPORTS_SAVE )
+// Tecmo TPS System (TPS1-7)
+GAME( 1997, coh1002m,  0,        coh1002m,  zn,       tecmo_zn_state,   empty_init, ROT0, "Tecmo",                   "Tecmo TPS System",                  MACHINE_IS_BIOS_ROOT | MACHINE_SUPPORTS_SAVE )
 GAME( 1997, glpracr2,  coh1002m, coh1002m,  glpracr2, tecmo_zn_state,   empty_init, ROT0, "Tecmo",                   "Gallop Racer 2 (Export)",                                  MACHINE_SUPPORTS_SAVE )
 GAME( 1997, glpracr2j, glpracr2, coh1002m,  glpracr2, tecmo_zn_state,   empty_init, ROT0, "Tecmo",                   "Gallop Racer 2 (Japan)",                                   MACHINE_SUPPORTS_SAVE )
 GAME( 1997, glpracr2l, glpracr2, coh1002ml, glpracr2, glpracr2l_state,  empty_init, ROT0, "Tecmo",                   "Gallop Racer 2 Link HW (Japan)",                           MACHINE_SUPPORTS_SAVE )
@@ -6120,61 +6164,8 @@ GAME( 2000, 1on1gov,   coh1002m, coh1002m,  zn,       tecmo_zn_state,   empty_in
 GAME( 2000, twcupmil,  coh1002m, coh1002m,  zn2p,     tecmo_zn_state,   empty_init, ROT0, "Tecmo",                   "Tecmo World Cup Millennium (Japan)",                       MACHINE_SUPPORTS_SAVE )
 GAME( 2001, mfjump,    coh1002m, coh1002m,  zn2p,     tecmo_zn_state,   empty_init, ROT0, "Tecmo",                   "Monster Farm Jump (Japan)",                                MACHINE_SUPPORTS_SAVE )
 
-// Video System (VS34)
-GAME( 1996, coh1002v,  0,        coh1002v,  zn,       visco_zn_state,   empty_init, ROT0, "Video System Co.",        "Video System PSX",                  MACHINE_IS_BIOS_ROOT | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, aerofgts,  coh1002v, coh1002v,  aerofgts, visco_zn_state,   empty_init, ROT270, "McO'River, Inc.",       "Aero Fighters Special (USA)",                              MACHINE_SUPPORTS_SAVE ) // Video System subsidiary (before they renamed to Video System USA)
-GAME( 1996, aerofgtst, aerofgts, coh1002v,  aerofgts, visco_zn_state,   empty_init, ROT270, "Video System Co.",      "Aero Fighters Special (Taiwan)",                           MACHINE_SUPPORTS_SAVE )
-GAME( 1996, sncwgltd,  aerofgts, coh1002v,  aerofgts, visco_zn_state,   empty_init, ROT270, "Video System Co.",      "Sonic Wings Limited (Japan)",                              MACHINE_SUPPORTS_SAVE )
-
-// Taito FX-1 (SROM PCB-A)
-GAME( 1995, coh1000t,  0,        coh1000ta, znt2p,    taito_fx1a_state, empty_init, ROT0, "Taito",                   "Taito FX1",                         MACHINE_IS_BIOS_ROOT | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sfchamp,   coh1000t, coh1000ta, znt2p,    taito_fx1a_state, empty_init, ROT0, "Taito",                   "Super Football Champ (Ver 2.5O)",                          MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sfchampo,  sfchamp,  coh1000ta, znt2p,    taito_fx1a_state, empty_init, ROT0, "Taito",                   "Super Football Champ (Ver 2.4O)",                          MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sfchampu,  sfchamp,  coh1000ta, znt2p,    taito_fx1a_state, empty_init, ROT0, "Taito",                   "Super Football Champ (Ver 2.4A)",                          MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sfchampj,  sfchamp,  coh1000ta, znt2p,    taito_fx1a_state, empty_init, ROT0, "Taito",                   "Super Football Champ (Ver 2.4J)",                          MACHINE_SUPPORTS_SAVE )
-GAME( 1995, psyforce,  coh1000t, coh1000ta, znt2p,    taito_fx1a_state, empty_init, ROT0, "Taito",                   "Psychic Force (Ver 2.4O)",                                 MACHINE_SUPPORTS_SAVE )
-GAME( 1995, psyforcej, psyforce, coh1000ta, znt2p,    taito_fx1a_state, empty_init, ROT0, "Taito",                   "Psychic Force (Ver 2.4J)",                                 MACHINE_SUPPORTS_SAVE )
-GAME( 1995, psyforcex, psyforce, coh1000ta, znt2p,    taito_fx1a_state, empty_init, ROT0, "Taito",                   "Psychic Force EX (Ver 2.0J)",                              MACHINE_SUPPORTS_SAVE )
-GAME( 1996, mgcldate,  mgcldtex, coh1000ta, znt2p,    taito_fx1a_state, empty_init, ROT0, "Taito",                   "Magical Date / Magical Date - Dokidoki Kokuhaku Daisakusen (Ver 2.02J)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, mgcldtex,  coh1000t, coh1000ta, znt2p,    taito_fx1a_state, empty_init, ROT0, "Taito",                   "Magical Date EX / Magical Date - Sotsugyou Kokuhaku Daisakusen (Ver 2.01J)", MACHINE_SUPPORTS_SAVE )
-
-// Taito FX-1 (ZROM PCB)
-GAME( 1996, raystorm,  coh1000t, coh1000tb, raystorm, taito_fx1b_state, empty_init, ROT0, "Taito",                   "Ray Storm (Ver 2.06A)",                                    MACHINE_SUPPORTS_SAVE )
-GAME( 1996, raystormo, raystorm, coh1000tb, raystorm, taito_fx1b_state, empty_init, ROT0, "Taito",                   "Ray Storm (Ver 2.05O)",                                    MACHINE_SUPPORTS_SAVE )
-GAME( 1996, raystormu, raystorm, coh1000tb, raystorm, taito_fx1b_state, empty_init, ROT0, "Taito",                   "Ray Storm (Ver 2.05A)",                                    MACHINE_SUPPORTS_SAVE )
-GAME( 1996, raystormj, raystorm, coh1000tb, raystorm, taito_fx1b_state, empty_init, ROT0, "Taito",                   "Ray Storm (Ver 2.05J)",                                    MACHINE_SUPPORTS_SAVE )
-GAME( 1996, ftimpact,  ftimpcta, coh1000tb, znt2p,    taito_fx1b_state, empty_init, ROT0, "Taito",                   "Fighters' Impact (Ver 2.02O)",                             MACHINE_SUPPORTS_SAVE )
-GAME( 1996, ftimpactu, ftimpcta, coh1000tb, znt2p,    taito_fx1b_state, empty_init, ROT0, "Taito",                   "Fighters' Impact (Ver 2.02A)",                             MACHINE_SUPPORTS_SAVE )
-GAME( 1996, ftimpactj, ftimpcta, coh1000tb, znt2p,    taito_fx1b_state, empty_init, ROT0, "Taito",                   "Fighters' Impact (Ver 2.02J)",                             MACHINE_SUPPORTS_SAVE )
-GAME( 1997, ftimpcta,  coh1000t, coh1000tb, znt2p,    taito_fx1b_state, empty_init, ROT0, "Taito",                   "Fighters' Impact A (Ver 2.00J)",                           MACHINE_SUPPORTS_SAVE )
-GAME( 1997, gdarius,   gdarius2, coh1002tb, znt2p,    gdarius_state,    empty_init, ROT0, "Taito",                   "G-Darius (Ver 2.02O)",                                     MACHINE_SUPPORTS_SAVE )
-GAME( 1997, gdariusu,  gdarius2, coh1002tb, znt2p,    gdarius_state,    empty_init, ROT0, "Taito",                   "G-Darius (Ver 2.02A)",                                     MACHINE_SUPPORTS_SAVE )
-GAME( 1997, gdariusj,  gdarius2, coh1002tb, znt2p,    gdarius_state,    empty_init, ROT0, "Taito",                   "G-Darius (Ver 2.01J)",                                     MACHINE_SUPPORTS_SAVE )
-GAME( 1997, gdarius2,  coh1000t, coh1002tb, znt2p,    gdarius_state,    empty_init, ROT0, "Taito",                   "G-Darius Ver.2 (Ver 2.03J)",                               MACHINE_SUPPORTS_SAVE )
-
-// Eighting / Raizing (RA9701 SUB)
-GAME( 1997, coh1002e,  0,        coh1002e,  znt2p,    raizing_zn_state, empty_init, ROT0, "Eighting / Raizing",      "PS Arcade 95",                      MACHINE_IS_BIOS_ROOT | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, beastrzr,  coh1002e, coh1002e,  znt2p,    raizing_zn_state, empty_init, ROT0, "Eighting / Raizing",      "Beastorizer (USA, Sep 22 1997)",                           MACHINE_SUPPORTS_SAVE )
-GAME( 1997, beastrzra, beastrzr, coh1002e,  znt2p,    raizing_zn_state, empty_init, ROT0, "Eighting / Raizing",      "Beastorizer (USA, Jun 21 1997)",                           MACHINE_SUPPORTS_SAVE )
-GAME( 1997, bldyroar,  beastrzr, coh1002e,  znt2p,    raizing_zn_state, empty_init, ROT0, "Eighting / Raizing",      "Bloody Roar (Japan, Jun 21 1997)",                         MACHINE_SUPPORTS_SAVE )
-GAME( 1997, beastrzrb, beastrzr, beastrzrb, znt2p,    beastrzrb_state,  empty_init, ROT0, "bootleg",                 "Beastorizer (USA bootleg)",                                MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-
-// Eighting / Raizing (PS9805)
-GAME( 1998, bldyror2,  coh1002e, coh1002e,  bldyror2, raizing_zn_state, empty_init, ROT0, "Eighting / Raizing",      "Bloody Roar 2 (World)",                                    MACHINE_SUPPORTS_SAVE )
-GAME( 1998, bldyror2u, bldyror2, coh1002e,  bldyror2, raizing_zn_state, empty_init, ROT0, "Eighting / Raizing",      "Bloody Roar 2 (USA)",                                      MACHINE_SUPPORTS_SAVE )
-GAME( 1998, bldyror2a, bldyror2, coh1002e,  bldyror2, raizing_zn_state, empty_init, ROT0, "Eighting / Raizing",      "Bloody Roar 2 (Asia)",                                     MACHINE_SUPPORTS_SAVE )
-GAME( 1998, bldyror2j, bldyror2, coh1002e,  bldyror2, raizing_zn_state, empty_init, ROT0, "Eighting / Raizing",      "Bloody Roar 2 (Japan)",                                    MACHINE_SUPPORTS_SAVE )
-
-// Eighting / Raizing (MTR990601-(A))
-GAME( 1999, bam2,      coh1002e, bam2hdd,   bam2,     bam2_state,       empty_init, ROT0, "Metro / Enix / Namco",    "Bust a Move 2 - Dance Tengoku Mix (HDD Japanese ROM ver. 1999/07/17 10:00:00)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 1999, bam2a,     bam2,     bam2cdrom, bam2,     bam2_state,       empty_init, ROT0, "Metro / Enix / Namco",    "Bust a Move 2 - Dance Tengoku Mix (CDROM Japanese ROM ver. 1999/07/17 10:00:00)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-
-// Tecmo (PS9805)
+// Tecmo TPS System (PS9805)
 GAME( 2000, brvblade,  coh1002m, coh1002e,  znt2p,    raizing_zn_state, empty_init, ROT270, "Eighting / Raizing",    "Brave Blade (World)",                                      MACHINE_SUPPORTS_SAVE )
 GAME( 2000, brvbladeu, brvblade, coh1002e,  znt2p,    raizing_zn_state, empty_init, ROT270, "Eighting / Raizing",    "Brave Blade (USA)",                                        MACHINE_SUPPORTS_SAVE )
 GAME( 2000, brvbladea, brvblade, coh1002e,  znt2p,    raizing_zn_state, empty_init, ROT270, "Eighting / Raizing",    "Brave Blade (Asia)",                                       MACHINE_SUPPORTS_SAVE )
 GAME( 2000, brvbladej, brvblade, coh1002e,  znt2p,    raizing_zn_state, empty_init, ROT270, "Eighting / Raizing",    "Brave Blade (Japan)",                                      MACHINE_SUPPORTS_SAVE )
-
-// Atlus (ATHG-01)
-GAME( 1996, coh1001l,  0,        coh1001l,  zn,       atlus_zn_state,   empty_init, ROT0, "Atlus",                   "Atlus PSX",                         MACHINE_IS_BIOS_ROOT | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, hvnsgate,  coh1001l, coh1001l,  zn2p,     atlus_zn_state,   empty_init, ROT0, "Racdym / Atlus",          "Heaven's Gate",                                            MACHINE_SUPPORTS_SAVE )

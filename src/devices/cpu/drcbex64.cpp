@@ -1887,13 +1887,13 @@ void drcbe_x64::op_recover(Assembler &a, const instruction &inst)
 	be_parameter dstp(*this, inst.param(0), PTYPE_MR);
 
 	// call the recovery code
-	a.mov(rax, MABS(&m_near.stacksave));                                                // mov   rax,stacksave
-	a.mov(rax, ptr(rax, -8));                                                           // mov   rax,[rax-8]
-	mov_r64_imm(a, Gpq(REG_PARAM1), m_drcmap_get_value.obj);                            // mov   param1,m_map
-	a.lea(Gpq(REG_PARAM2), ptr(rax, -1));                                               // lea   param2,[rax-1]
-	mov_r64_imm(a, Gpq(REG_PARAM3), inst.param(1).mapvar());                            // mov   param3,param[1].value
-	smart_call_r64(a, m_drcmap_get_value.func, rax);                                    // call  drcmap_get_value
-	mov_param_reg(a, dstp, eax);                                                        // mov   dstp,eax
+	a.mov(rax, MABS(&m_near.stacksave));
+	mov_r64_imm(a, Gpq(REG_PARAM1), m_drcmap_get_value.obj);
+	mov_r64_imm(a, Gpq(REG_PARAM3), inst.param(1).mapvar());
+	a.mov(Gpq(REG_PARAM2), ptr(rax, -8));
+	a.sub(Gpq(REG_PARAM2), 1);
+	smart_call_r64(a, m_drcmap_get_value.func, rax);
+	mov_param_reg(a, dstp, eax);
 }
 
 

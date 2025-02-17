@@ -377,7 +377,7 @@ protected:
 private:
 	// devices
 	required_device<msm6242_device> m_rtc;
-	required_device<amiga_dmac_device> m_dmac;
+	required_device<amiga_dmac_rev1_device> m_dmac;
 	required_device<tpi6525_device> m_tpi;
 	required_device<cr511b_device> m_cdrom;
 
@@ -1710,6 +1710,7 @@ void amiga_state::amiga_base(machine_config &config)
 	m_cia_0->irq_wr_callback().set(FUNC(amiga_state::cia_0_irq));
 	m_cia_0->pa_rd_callback().set_ioport("cia_0_port_a");
 	m_cia_0->pa_wr_callback().set(FUNC(amiga_state::cia_0_port_a_write));
+	m_cia_0->pb_rd_callback().set("cent_data_in", FUNC(input_buffer_device::read));
 	m_cia_0->pb_wr_callback().set("cent_data_out", FUNC(output_latch_device::write));
 	m_cia_0->pc_wr_callback().set(m_centronics, FUNC(centronics_device::write_strobe));
 	m_cia_0->sp_wr_callback().set("kbd", FUNC(amiga_keyboard_bus_device::kdat_in_w)).invert();
@@ -1760,10 +1761,13 @@ void amiga_state::amiga_base(machine_config &config)
 
 	// centronics
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->set_data_input_buffer("cent_data_in");
 	m_centronics->ack_handler().set(FUNC(amiga_state::centronics_ack_w));
 	m_centronics->busy_handler().set(FUNC(amiga_state::centronics_busy_w));
 	m_centronics->perror_handler().set(FUNC(amiga_state::centronics_perror_w));
 	m_centronics->select_handler().set(FUNC(amiga_state::centronics_select_w));
+
+	INPUT_BUFFER(config, "cent_data_in");
 
 	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
 	m_centronics->set_output_latch(cent_data_out);
@@ -1776,6 +1780,8 @@ void amiga_state::amiga_base(machine_config &config)
 	SOFTWARE_LIST(config, "ocs_list").set_original("amigaocs_flop");
 	SOFTWARE_LIST(config, "demos_list").set_original("amiga_demos");
 	SOFTWARE_LIST(config, "amigacd_list").set_original("amiga_cd");
+	// CD32 should support this off the bat, Aminet Photo CD packages available anyway.
+	SOFTWARE_LIST(config, "photocd_list").set_compatible("photo_cd");
 }
 
 void a1000_state::a1000(machine_config &config)
@@ -1800,8 +1806,6 @@ void a1000_state::a1000(machine_config &config)
 	ADDRESS_MAP_BANK(config, m_overlay).set_map(&a1000_state::a1000_overlay_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
 	ADDRESS_MAP_BANK(config, "bootrom").set_map(&a1000_state::a1000_bootrom_map).set_options(ENDIANNESS_BIG, 16, 19, 0x40000);
 	ADDRESS_MAP_BANK(config, m_chipset).set_map(&a1000_state::ocs_map).set_options(ENDIANNESS_BIG, 16, 9, 0x200);
-
-	SOFTWARE_LIST(config, "a1000_list").set_original("amiga_a1000");
 }
 
 void a1000_state::a1000n(machine_config &config)
@@ -1961,7 +1965,7 @@ void cdtv_state::cdtv(machine_config &config)
 	MSM6242(config, m_rtc, XTAL(32'768));
 
 	// cd-rom controller
-	AMIGA_DMAC(config, m_dmac, amiga_state::CLK_7M_PAL);
+	AMIGA_DMAC_REV1(config, m_dmac, amiga_state::CLK_7M_PAL);
 	m_dmac->css_read_cb().set(FUNC(cdtv_state::dmac_scsi_data_read));
 	m_dmac->css_write_cb().set(FUNC(cdtv_state::dmac_scsi_data_write));
 	m_dmac->csx0_read_cb().set(m_cdrom, FUNC(cr511b_device::read));
@@ -2023,7 +2027,7 @@ void a3000_state::a3000(machine_config &config)
 	// TODO: zorro3 slots, super dmac, scsi
 
 	// software
-	SOFTWARE_LIST(config, "a3000_list").set_original("amiga_a3000");
+	SOFTWARE_LIST(config, "amix_list").set_original("amiga_amix");
 	SOFTWARE_LIST(config, "ecs_list").set_original("amigaecs_flop");
 }
 

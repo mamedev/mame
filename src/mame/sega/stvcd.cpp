@@ -2,7 +2,7 @@
 // copyright-holders:Angelo Salese, R. Belmont
 /***************************************************************************
 
-  machine/stvcd.cpp - Sega Saturn and ST-V CD-ROM handling
+  sega/stvcd.cpp - Sega Saturn and ST-V CD-ROM handling
 
   Another tilt at the windmill in 2011 by R. Belmont.
 
@@ -114,7 +114,7 @@ stvcd_device::stvcd_device(const machine_config &mconfig, const char *tag, devic
 
 void stvcd_device::device_add_mconfig(machine_config &config)
 {
-	CDROM(config, "cdrom").set_interface("sat_cdrom");
+	CDROM(config, "cdrom").set_interface("cdrom");
 
 	TIMER(config, m_sector_timer).configure_generic(FUNC(stvcd_device::stv_sector_cb));
 	TIMER(config, m_sh1_timer).configure_generic(FUNC(stvcd_device::stv_sh1_sim));
@@ -2784,7 +2784,9 @@ void stvcd_device::set_tray_open()
 	hirqreg |= DCHG;
 	cd_stat = CD_STAT_OPEN;
 
-	// TODO: unmount image
+	// unmount the existing image, pretend that's what user wants if we are there.
+	m_cdrom_image->unload();
+
 	tray_is_closed = 0;
 
 	popmessage("Tray Open");

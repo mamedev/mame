@@ -1281,7 +1281,7 @@ void jaguarcd_state::butch_regs_w(offs_t offset, uint32_t data, uint32_t mem_mas
 					break;
 
 				default:
-					printf("%04x CMD\n",m_butch_regs[offset]);
+					logerror("%04x CMD\n", m_butch_regs[offset]);
 					break;
 			}
 			break;
@@ -1860,7 +1860,9 @@ void jaguarcd_state::jaguarcd(machine_config &config)
 
 	m_dsp->set_addrmap(AS_PROGRAM, &jaguarcd_state::jagcd_gpu_dsp_map);
 
-	CDROM(config, "cdrom").set_interface("jag_cdrom");
+	CDROM(config, "cdrom").set_interface("cdrom");
+
+	// TODO: software list, requires multisession support first
 }
 
 

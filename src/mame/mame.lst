@@ -40,6 +40,7 @@ aa3010_de
 aa3020
 aa4000
 aa5000a
+av20dev
 
 @source:acorn/accomm.cpp
 accomm
@@ -467,27 +468,6 @@ mpc60
 
 @source:akai/mpc3000.cpp
 mpc3000
-
-@source:alba/albazg.cpp
-hana6pt2
-yumefuda
-
-@source:alba/hanadojo.cpp
-hanadojo
-hanadojoa
-
-@source:alba/rmhaihai.cpp
-rmhaihai
-rmhaihai2
-rmhaihaibl
-rmhaihib
-rmhaijin
-rmhaisei
-themj
-themj2
-
-@source:alba/vsmjtria.cpp
-vsmjtria
 
 @source:alesis/alesis.cpp
 hr16
@@ -979,7 +959,14 @@ macpb165c
 macpb170
 macpb180
 macpb180c
+
+@source:apple/macpwrbkmsc.cpp
 macpd210
+macpd230
+macpd250
+macpd270c
+macpd280
+macpd280c
 
 @source:apple/macquadra605.cpp
 macqd605
@@ -2208,6 +2195,7 @@ dominos4
 sprint1
 sprint2
 sprint2a
+sprint2bl
 sprint2h
 
 @source:atari/sprint4.cpp
@@ -19361,6 +19349,7 @@ kbilly
 kblades
 kbottom9
 kbucky
+kchqflag
 kcontra
 kdribble
 kgarfld
@@ -19435,6 +19424,7 @@ trobocop3
 trockteer
 trsgkeep
 trshutvoy
+trspacadv
 trspacmis
 trspider
 trsrescue
@@ -20097,6 +20087,9 @@ husky
 
 @source:ibm/ibm3153.cpp
 ibm3153
+
+@source:ibm/ibm3477.cpp
+ibm3477
 
 @source:ibm/ibm5100.cpp
 ibm5100
@@ -20806,6 +20799,16 @@ spk306us
 drw80pk2
 drw80pkr
 
+@source:igt/fortune1.cpp
+babydad
+babypkr
+blckjack
+bpoker
+fortune1
+videocba
+videodad
+videopkr
+
 @source:igt/gkigt.cpp
 bmoonii
 brhino
@@ -21488,16 +21491,6 @@ spset005
 spset015
 spset026
 spss4240
-
-@source:igt/videopkr.cpp
-babydad
-babypkr
-blckjack
-bpoker
-fortune1
-videocba
-videodad
-videopkr
 
 @source:informer/informer_207_100.cpp
 in207100
@@ -35623,6 +35616,9 @@ obdmx
 @source:oberheim/ob8.cpp
 ob8
 
+@source:oberheim/xpander.cpp
+xpander
+
 @source:olivetti/m20.cpp
 m20
 m40
@@ -40452,6 +40448,7 @@ tfrceacj
 tfrceacjpb
 twinsqua
 wwanpanm
+wwanpanmo
 wwmarine
 zunkyou
 
@@ -41773,6 +41770,10 @@ prpht600
 @source:seta/albazc.cpp
 hanaroku
 
+@source:seta/albazg.cpp
+hana6pt2
+yumefuda
+
 @source:seta/champbwl.cpp
 champbwl
 champbwla
@@ -41793,6 +41794,10 @@ usclssic
 
 @source:seta/hanaawas.cpp
 hanaawas
+
+@source:seta/hanadojo.cpp
+hanadojo
+hanadojoa
 
 @source:seta/jclub2.cpp
 darkhors
@@ -41822,6 +41827,16 @@ yuka
 
 @source:seta/namcoeva.cpp
 hammerch
+
+@source:seta/rmhaihai.cpp
+rmhaihai
+rmhaihai2
+rmhaihaibl
+rmhaihib
+rmhaijin
+rmhaisei
+themj
+themj2
 
 @source:seta/seta.cpp
 atehate
@@ -42002,6 +42017,9 @@ vasara2a
 @source:seta/thedealr.cpp
 thedealr
 
+@source:seta/vsmjtria.cpp
+vsmjtria
+
 @source:sfrj/galaxy.cpp
 galaxy
 galaxyp
@@ -42029,6 +42047,9 @@ orao103
 @source:sfrj/pecom.cpp
 pecom32
 pecom64
+
+@source:sfrj/pmp11.cpp
+pmp11
 
 @source:sfrj/tim011.cpp
 tim011
@@ -43707,7 +43728,6 @@ sothello
 tonton
 
 @source:sun/sun1.cpp
-multibox
 sun1
 
 @source:sun/sun2.cpp
@@ -44382,6 +44402,7 @@ cameltry
 cameltrya
 cameltryau
 cameltryj
+cameltryu
 deadconx
 deadconxj
 dinorex
@@ -47151,6 +47172,9 @@ learnwin2
 learnwin1
 learnwinf
 spielmast
+
+@source:vtech/magibook.cpp
+magibooksp                      // (c) 2016 VTech / LeapFrog
 
 @source:vtech/pc1000.cpp
 misterx

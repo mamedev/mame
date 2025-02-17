@@ -3284,6 +3284,8 @@ end
 
 if (BUSES["CENTRONICS"]~=null) then
 	files {
+		MAME_DIR .. "src/devices/bus/centronics/adaptator.cpp",
+		MAME_DIR .. "src/devices/bus/centronics/adaptator.h",
 		MAME_DIR .. "src/devices/bus/centronics/ctronics.cpp",
 		MAME_DIR .. "src/devices/bus/centronics/ctronics.h",
 		MAME_DIR .. "src/devices/bus/centronics/chessmec.cpp",
@@ -4700,6 +4702,8 @@ if (BUSES["ZORRO"]~=null) then
 		MAME_DIR .. "src/devices/bus/amiga/zorro/buddha.h",
 		MAME_DIR .. "src/devices/bus/amiga/zorro/merlin.cpp",
 		MAME_DIR .. "src/devices/bus/amiga/zorro/merlin.h",
+		MAME_DIR .. "src/devices/bus/amiga/zorro/oktagon2008.cpp",
+		MAME_DIR .. "src/devices/bus/amiga/zorro/oktagon2008.h",
 		MAME_DIR .. "src/devices/bus/amiga/zorro/picasso2.cpp",
 		MAME_DIR .. "src/devices/bus/amiga/zorro/picasso2.h",
 		MAME_DIR .. "src/devices/bus/amiga/zorro/rainbow2.cpp",
@@ -5831,6 +5835,8 @@ if (BUSES["AMIGA_CPUSLOT"]~=null) then
 		MAME_DIR .. "src/devices/bus/amiga/cpuslot/cpuslot.h",
 		MAME_DIR .. "src/devices/bus/amiga/cpuslot/cards.cpp",
 		MAME_DIR .. "src/devices/bus/amiga/cpuslot/cards.h",
+		MAME_DIR .. "src/devices/bus/amiga/cpuslot/a570.cpp",
+		MAME_DIR .. "src/devices/bus/amiga/cpuslot/a570.h",
 		MAME_DIR .. "src/devices/bus/amiga/cpuslot/a590.cpp",
 		MAME_DIR .. "src/devices/bus/amiga/cpuslot/a590.h",
 		MAME_DIR .. "src/devices/bus/amiga/cpuslot/action_replay.cpp",

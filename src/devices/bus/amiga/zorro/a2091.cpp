@@ -122,11 +122,15 @@ ROM_START( firmware )
 	ROMX_LOAD("390721-02.u13", 0x4000, 0x2000, CRC(c0871d25) SHA1(e155f18abb90cf820589c15e70559d3b6b391af8), ROM_SKIP(1) | ROM_BIOS(2))
 	ROMX_LOAD("390722-02.u12", 0x4001, 0x2000, CRC(e536bbb2) SHA1(fd7f8a6da18c1b02d07eb990c2467a24183ede12), ROM_SKIP(1) | ROM_BIOS(2))
 
-	ROM_SYSTEM_BIOS(3, "v70", "Version 7.0") // also seen with -07
-	ROMX_LOAD("390721-04.u13", 0x0000, 0x2000, CRC(2942747a) SHA1(dbd7648e79c753337ff3e4f491de224bf05e6bb6), ROM_SKIP(1) | ROM_BIOS(3))
-	ROMX_LOAD("390722-04.u12", 0x0001, 0x2000, CRC(a9ccffed) SHA1(149f5bd52e2d29904e3de483b9ad772448e9278e), ROM_SKIP(1) | ROM_BIOS(3))
-	ROMX_LOAD("390721-04.u13", 0x4000, 0x2000, CRC(2942747a) SHA1(dbd7648e79c753337ff3e4f491de224bf05e6bb6), ROM_SKIP(1) | ROM_BIOS(3))
-	ROMX_LOAD("390722-04.u12", 0x4001, 0x2000, CRC(a9ccffed) SHA1(149f5bd52e2d29904e3de483b9ad772448e9278e), ROM_SKIP(1) | ROM_BIOS(3))
+	ROM_SYSTEM_BIOS(3, "v70", "Version 7.0")
+	// 360721-07  ©1994 CBM  V7.0 081C U13
+	// A590 / A2091 390721-4  V7.0 ROM - (U13)  ©1993 CAI (different pn - same content?)
+	ROMX_LOAD("390721-07.u13", 0x0000, 0x2000, CRC(2942747a) SHA1(dbd7648e79c753337ff3e4f491de224bf05e6bb6), ROM_SKIP(1) | ROM_BIOS(3))
+	// 390722-07  ©1994 CBM  V7.0 3EF2 U12
+	// A590 / A2091 390722-4  V7.0 ROM - (U12)  ©1993 CAI (different pn - same content?)
+	ROMX_LOAD("390722-07.u12", 0x0001, 0x2000, CRC(a9ccffed) SHA1(149f5bd52e2d29904e3de483b9ad772448e9278e), ROM_SKIP(1) | ROM_BIOS(3))
+	ROMX_LOAD("390721-07.u13", 0x4000, 0x2000, CRC(2942747a) SHA1(dbd7648e79c753337ff3e4f491de224bf05e6bb6), ROM_SKIP(1) | ROM_BIOS(3))
+	ROMX_LOAD("390722-07.u12", 0x4001, 0x2000, CRC(a9ccffed) SHA1(149f5bd52e2d29904e3de483b9ad772448e9278e), ROM_SKIP(1) | ROM_BIOS(3))
 
 	// third-party upgrade ROM, requires a small ROM adapter pcb
 	ROM_SYSTEM_BIOS(4, "g614", "Guru-ROM 6.14")
@@ -156,7 +160,7 @@ void a2091_device::wd33c93_config(device_t *device)
 
 void a2091_device::device_add_mconfig(machine_config &config)
 {
-	AMIGA_DMAC(config, m_dmac, 28.37516_MHz_XTAL / 4); // 7M
+	AMIGA_DMAC_REV2(config, m_dmac, 28.37516_MHz_XTAL / 4); // 7M
 	m_dmac->set_rom("bootrom");
 	m_dmac->cfgout_cb().set([this] (int state) { m_zorro->cfgout_w(state); });
 	m_dmac->int_cb().set([this] (int state) { m_zorro->int2_w(state); });
