@@ -43,6 +43,11 @@ void taitojc_state::char_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	m_gfxdecode->gfx(0)->mark_dirty(offset/32);
 }
 
+uint32_t taitojc_state::char_r(offs_t offset)
+{
+	return m_char_ram[offset];
+}
+
 // Object data format:
 //
 // 0x00:   xxxxxx-- -------- -------- --------   Height

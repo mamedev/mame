@@ -637,7 +637,7 @@ void taitojc_state::taitojc_map(address_map &map)
 	map(0x00400000, 0x01bfffff).rom().region("maingfx", 0);
 	map(0x04000000, 0x040f7fff).ram().share(m_vram);
 	map(0x040f8000, 0x040fbfff).ram().w(FUNC(taitojc_state::tile_w)).share(m_tile_ram);
-	map(0x040fc000, 0x040fefff).ram().w(FUNC(taitojc_state::char_w)).share(m_char_ram);
+	map(0x040fc000, 0x040fefff).rw(FUNC(taitojc_state::char_r), FUNC(taitojc_state::char_w));
 	map(0x040ff000, 0x040fffff).ram().share(m_objlist);
 	map(0x05800000, 0x0580003f).r(FUNC(taitojc_state::pcbid_r));
 	map(0x05900000, 0x05900007).rw(FUNC(taitojc_state::mcu_comm_r), FUNC(taitojc_state::mcu_comm_w));
