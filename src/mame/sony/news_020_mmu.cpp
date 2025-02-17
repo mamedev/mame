@@ -46,6 +46,62 @@ namespace
 	{
 		return is_supervisor ? KERNEL_MODE : USER_MODE;
 	}
+
+	// Helper class for reading page table entries
+	struct news_020_pte
+	{
+		news_020_pte(uint32_t pte_bits) : pte(pte_bits) {}
+
+		const uint32_t pte;
+
+		bool valid() const
+		{
+			return pte & 0x80000000;
+		}
+
+		bool kernel_writable() const
+		{
+			return pte & 0x40000000;
+		}
+
+		bool kernel_readable() const
+		{
+			return pte & 0x20000000;
+		}
+
+		bool user_writable() const
+		{
+			return pte & 0x10000000;
+		}
+
+		bool user_readable() const
+		{
+			return pte & 0x08000000;
+		}
+
+		bool modified() const
+		{
+			return pte & 0x04000000;
+		}
+
+		bool fill_on_demand() const
+		{
+			return pte & 0x02000000;
+		}
+
+		// between FOD and pfnum are 5 unused bits for memory, there can be data here for memory-mapped file I/O
+
+		uint32_t pfnum() const
+		{
+			return pte & 0x000fffff; // 20 bits
+		}
+
+		// Additional helper functions
+		bool writeable() const
+		{
+			return kernel_writable() || user_writable();
+		}
+	};
 }
 
 news_020_mmu_device::news_020_mmu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
