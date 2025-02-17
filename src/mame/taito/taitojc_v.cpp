@@ -43,6 +43,11 @@ void taitojc_state::char_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	m_gfxdecode->gfx(0)->mark_dirty(offset/32);
 }
 
+uint32_t taitojc_state::char_r(offs_t offset)
+{
+	return m_char_ram[offset];
+}
+
 // Object data format:
 //
 // 0x00:   xxxxxx-- -------- -------- --------   Height
@@ -99,11 +104,8 @@ void taitojc_state::draw_object(bitmap_ind16 &bitmap, const rectangle &cliprect,
 	if (BIT(w2, 14))
 		address |= 0x40000;
 
-	int x = ((w1 >>  0) & 0x3ff);
-	x = util::sext(x, 10); // sign-extend
-
-	int y = ((w1 >> 16) & 0x3ff);
-	y = util::sext(y, 10); // sign-extend
+	int x = util::sext(w1, 10);
+	int y = util::sext(w1 >> 16, 10);
 
 	int width         = ((w1 >> 10) & 0x3f) << 4;
 	int height        = ((w1 >> 26) & 0x3f) << 4;
@@ -113,7 +115,7 @@ void taitojc_state::draw_object(bitmap_ind16 &bitmap, const rectangle &cliprect,
 	uint32_t const *v;
 	if (address >= 0xff000)
 		v = &m_objlist[(address - 0xff000) / 4];
-	if (address >= 0xfc000)
+	else if (address >= 0xfc000)
 		v = &m_char_ram[(address - 0xfc000) / 4];
 	else if (address >= 0xf8000)
 		v = &m_tile_ram[(address - 0xf8000) / 4];

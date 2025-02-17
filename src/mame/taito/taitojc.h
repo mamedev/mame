@@ -36,7 +36,7 @@ public:
 		, m_main_ram(*this, "main_ram")
 		, m_dsp_shared_ram(*this, "dsp_shared")
 		, m_tile_ram(*this, "tile_ram")
-		, m_char_ram(*this, "char_ram")
+		, m_char_ram(*this, "char_ram", 0x4000, ENDIANNESS_BIG)
 		, m_analog_ports(*this, "AN.%u", 0)
 		, m_lamps(*this, "lamp%u", 0U)
 		, m_counters(*this, "counter%u", 0U)
@@ -69,7 +69,7 @@ protected:
 	required_shared_ptr<uint32_t> m_main_ram;
 	required_shared_ptr<uint16_t> m_dsp_shared_ram;
 	required_shared_ptr<uint32_t> m_tile_ram;
-	required_shared_ptr<uint32_t> m_char_ram;
+	memory_share_creator<uint32_t> m_char_ram;
 
 	optional_ioport_array<8> m_analog_ports;
 
@@ -129,6 +129,7 @@ protected:
 
 	void tile_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void char_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t char_r(offs_t offset);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
