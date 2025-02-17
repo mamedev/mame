@@ -48,6 +48,7 @@ DEFINE_DEVICE_TYPE(ZR36057_PCI, zr36057_device,   "zr36057",   "Zoran ZR36057-ba
 
 zr36057_device::zr36057_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: pci_card_device(mconfig, type, tag, owner, clock)
+	, m_decoder(*this, "decoder")
 {
 	// ZR36057PQC Video cutting chipset
 	// device ID reportedly same for ZR36057 and ZR36067, revision 0x02 for latter.
@@ -69,7 +70,17 @@ zr36057_device::zr36057_device(const machine_config &mconfig, const char *tag, d
 
 void zr36057_device::device_add_mconfig(machine_config &config)
 {
+	// 27'000'000 xtal near ZR36060
 
+	SAA7110A(config, m_decoder, XTAL(26'800'000));
+	m_decoder->sda_callback().set([this](int state) { m_decoder_sdao_state = state; });
+
+	// S-Video input/output
+	// composite video input/output
+
+	// video and audio input/output pins on PCB, for cross connection with other boards
+
+	// DC30 combines the two audio input/output as an external jack option
 }
 
 void zr36057_device::device_start()
@@ -199,11 +210,20 @@ void zr36057_device::asr_map(address_map &map)
 		})
 	);
 
-	map(0x044, 0x047).lr32(
+	map(0x044, 0x047).lrw32(
 		NAME([this] (offs_t offset) {
 			LOG("I2C R\n");
 			// avoid win98 stall for now
-			return 0x3;
+			return m_decoder_sdao_state << 1 | 1;
+			//return 3;
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			//printf("I2C %02x %08x\n", data, mem_mask);
+			if (ACCESSING_BITS_0_7)
+			{
+				m_decoder->sda_write(BIT(data, 1));
+				m_decoder->scl_write(BIT(data, 0));
+			}
 		})
 	);
 }
