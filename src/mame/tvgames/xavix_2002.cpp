@@ -963,4 +963,4 @@ CONS( 2007, doradraw,  0, 0, superxavix_doradraw,    xavix,      superxavix_dora
 
 // どんトレだ兵衛～どん兵衛くんとトレーニング
 // doesn't boot, has a camera with a large number of connections going to it, probably wants comms to work with it?
-CONS( 2007, ndpbj, 0, 0, superxavix_i2c_24c08,    xavix_i2c,  superxavix_i2c_state, init_xavix, "Nissin / SSD Company LTD",   "Dontore da Hyoue - Donbei-kun to Training (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2007, ndpbj, 0, 0, superxavix_i2c_24c08,    xavix_i2c,  superxavix_i2c_state, init_xavix, "Nissin / SSD Company LTD",   "Dontore da bei - Donbei-kun to Training (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
