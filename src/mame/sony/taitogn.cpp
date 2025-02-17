@@ -1193,7 +1193,7 @@ ROM_START( mawasunda )
 	COH1002T_BIOS
 
 	DISK_REGION( "pccard:taitocf" )
-	DISK_IMAGE( "mawasunda", 0, SHA1(ae5b14186905c93401ca65231dec43724df7957a) )
+	DISK_IMAGE( "e83-01__", 0, SHA1(ae5b14186905c93401ca65231dec43724df7957a) ) // e83-01**
 ROM_END
 
 ROM_START( nightrai )
