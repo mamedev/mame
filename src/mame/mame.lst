@@ -47163,7 +47163,7 @@ learnwinf
 spielmast
 
 @source:vtech/magibook.cpp
-magibooksp                      // (c) 2016 VTech / LeapFrog
+magibooksp
 
 @source:vtech/pc1000.cpp
 misterx

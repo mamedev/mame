@@ -48,7 +48,7 @@
     Bay Route        171-5704    a5-a8:12516,12456,12517,12458,fd1094:317-0116
     Cotton           171-5704    a5-a8:13919a-13922a,fd1094:317-0181a
     Dynamite Dux     171-5521
-    E-Swat           171-5797    a1:12656,a2:12657,fd1094:317-0129
+    ESWAT            171-5797    a1:12656,a2:12657,fd1094:317-0129
     Flash Point      171-5704    a5:12590b,a8:12591b,fd1094:317-0127a
     Golden Axe       171-5797    a1:12388,a2:12389,fd1094:317-0110
     Heavyweight C.   171-5521    a5:11238,a7:11239
@@ -90,7 +90,7 @@ Bullet                     (C) Sega, 1987
 Cotton                     (C) Sega/Success, 1989
 Dunk Shot                  (C) Sega, 1987
 Dynamite Dux               (C) Sega, 1988
-E-Swat                     (C) Sega, 1989
+ESWAT                      (C) Sega, 1989
 Excite League              (C) Sega, 1989
 Flash Point                (C) Sega, 1989
 Golden Axe                 (C) Sega, 1989
@@ -644,7 +644,7 @@ CPU  - 68000     |--------------------------------------------------------------
 -----------------|--------------------------------------------------------------------------------------------------|
 
 -----------------|--------------------------------------------------------------------------------------------------|
-E-Swat           |A1       A2                                                             A11      A12      A13     |
+ESWAT            |A1       A2                                                             A11      A12      A13     |
 CPU  - 317-0129  |--------------------------------------------------------------------------------------------------|
 8751 -           |EPR12656 EPR12657                                                       EPR12616 -        EPR12617|
                  |--------------------------------------------------------------------------------------------------|
@@ -655,7 +655,7 @@ CPU  - 317-0129  |--------------------------------------------------------------
 -----------------|--------------------------------------------------------------------------------------------------|
 
 -----------------|--------------------------------------------------------------------------------------------------|
-E-Swat           |A1       A2                                                             A11      A12      A13     |
+ESWAT            |A1       A2                                                             A11      A12      A13     |
 CPU  - 317-0130  |--------------------------------------------------------------------------------------------------|
 8751 -           |EPR12658 EPR12659                                                       EPR12616 -        EPR12617|
                  |--------------------------------------------------------------------------------------------------|
@@ -6524,7 +6524,7 @@ ROM_END
 //*************************************************************************************************************************
 //*************************************************************************************************************************
 //*************************************************************************************************************************
-//  E-Swat (World), Sega System 16B
+//  ESWAT (World), Sega System 16B
 //  CPU: FD1094 (317-0130)
 //  ROM Board type: 171-5797
 //  Sega game ID: 833-7164-02 ESWAT
@@ -6599,7 +6599,7 @@ ROM_START( eswatd )
 ROM_END
 
 //*************************************************************************************************************************
-//  E-Swat (US), Sega System 16B
+//  ESWAT (US), Sega System 16B
 //  CPU: FD1094 (317-0129)
 //  ROM Board type: 171-5797
 //  Sega game ID: 833-7164-01 ESWAT
@@ -6674,7 +6674,7 @@ ROM_START( eswatud )
 ROM_END
 
 //*************************************************************************************************************************
-//  E-Swat (Japan), Sega System 16B
+//  ESWAT (Japan), Sega System 16B
 //  CPU: FD1094 (317-0128)
 //  ROM Board type: 171-5797
 //  Sega game ID: 833-7164 ESWAT
@@ -6750,7 +6750,7 @@ ROM_END
 
 
 //*************************************************************************************************************************
-//  E-Swat (Japan), Sega System 16B
+//  ESWAT (Japan), Sega System 16B
 //  CPU: FD1094 (317-0131)
 //  ROM Board type: 171-5704
 //
@@ -10135,10 +10135,10 @@ GAME( 1987, dunkshot,   0,        system16b_fd1089a,     dunkshot, segas16b_stat
 GAME( 1987, dunkshota,  dunkshot, system16b_fd1089a,     dunkshot, segas16b_state, init_dunkshot_5358_small,ROT0,   "Sega", "Dunk Shot (Rev A, FD1089A 317-0022)", 0 )
 GAME( 1986, dunkshoto,  dunkshot, system16b_fd1089a,     dunkshoto,segas16b_state, init_dunkshot_5358_small,ROT0,   "Sega", "Dunk Shot (FD1089A 317-0022)", 0 )
 
-GAME( 1989, eswat,      0,        system16b_fd1094_5797, eswat,    segas16b_state, init_generic_5797,       ROT0,   "Sega", "E-Swat - Cyber Police (set 4, World) (FD1094 317-0130)", 0 )
-GAME( 1989, eswatu,     eswat,    system16b_fd1094_5797, eswat,    segas16b_state, init_generic_5797,       ROT0,   "Sega", "E-Swat - Cyber Police (set 3, US) (FD1094 317-0129)", 0 )
-GAME( 1989, eswatj,     eswat,    system16b_fd1094_5797, eswat,    segas16b_state, init_generic_5797,       ROT0,   "Sega", "E-Swat - Cyber Police (set 2, Japan) (FD1094 317-0128)", 0 )
-GAME( 1989, eswatj1,    eswat,    system16b_fd1094,      eswat,    segas16b_state, init_generic_5704,       ROT0,   "Sega", "E-Swat - Cyber Police (set 1, Japan) (FD1094 317-0131)", 0 )
+GAME( 1989, eswat,      0,        system16b_fd1094_5797, eswat,    segas16b_state, init_generic_5797,       ROT0,   "Sega", "Cyber Police ESWAT (set 4, World) (FD1094 317-0130)", 0 )
+GAME( 1989, eswatu,     eswat,    system16b_fd1094_5797, eswat,    segas16b_state, init_generic_5797,       ROT0,   "Sega", "Cyber Police ESWAT (set 3, US) (FD1094 317-0129)", 0 )
+GAME( 1989, eswatj,     eswat,    system16b_fd1094_5797, eswat,    segas16b_state, init_generic_5797,       ROT0,   "Sega", "Cyber Police ESWAT (set 2, Japan) (FD1094 317-0128)", 0 )
+GAME( 1989, eswatj1,    eswat,    system16b_fd1094,      eswat,    segas16b_state, init_generic_5704,       ROT0,   "Sega", "Cyber Police ESWAT (set 1, Japan) (FD1094 317-0131)", 0 )
 
 GAME( 1988, exctleag,   0,        system16b_fd1094,      exctleag, segas16b_state, init_exctleag_5358,      ROT0,   "Sega", "Excite League (FD1094 317-0079)", 0 )
 
@@ -10264,10 +10264,10 @@ GAME( 1987, hwchampjd,  hwchamp,  hwchamp,               hwchamp,  segas16b_stat
 
 GAME( 1987, bulletd,    bullet,   system16b,             bullet,   segas16b_state, init_generic_5358_small, ROT0,   "bootleg", "Bullet (bootleg of FD1094 317-0041 set)", 0 )
 
-GAME( 1989, eswatd,     eswat,    system16b_5797,        eswat,    segas16b_state, init_generic_5797,       ROT0,   "bootleg", "E-Swat - Cyber Police (set 4, World) (bootleg of FD1094 317-0130 set)", 0 )
-GAME( 1989, eswatud,    eswat,    system16b_5797,        eswat,    segas16b_state, init_generic_5797,       ROT0,   "bootleg", "E-Swat - Cyber Police (set 3, US) (bootleg of FD1094 317-0129 set)", 0 )
-GAME( 1989, eswatjd,    eswat,    system16b_5797,        eswat,    segas16b_state, init_generic_5797,       ROT0,   "bootleg", "E-Swat - Cyber Police (set 2, Japan) (bootleg of FD1094 317-0128 set)", 0 )
-GAME( 1989, eswatj1d,   eswat,    system16b,             eswat,    segas16b_state, init_generic_5704,       ROT0,   "bootleg", "E-Swat - Cyber Police (set 1, Japan) (bootleg of FD1094 317-0131 set)", 0 )
+GAME( 1989, eswatd,     eswat,    system16b_5797,        eswat,    segas16b_state, init_generic_5797,       ROT0,   "bootleg", "Cyber Police ESWAT (set 4, World) (bootleg of FD1094 317-0130 set)", 0 )
+GAME( 1989, eswatud,    eswat,    system16b_5797,        eswat,    segas16b_state, init_generic_5797,       ROT0,   "bootleg", "Cyber Police ESWAT (set 3, US) (bootleg of FD1094 317-0129 set)", 0 )
+GAME( 1989, eswatjd,    eswat,    system16b_5797,        eswat,    segas16b_state, init_generic_5797,       ROT0,   "bootleg", "Cyber Police ESWAT (set 2, Japan) (bootleg of FD1094 317-0128 set)", 0 )
+GAME( 1989, eswatj1d,   eswat,    system16b,             eswat,    segas16b_state, init_generic_5704,       ROT0,   "bootleg", "Cyber Police ESWAT (set 1, Japan) (bootleg of FD1094 317-0131 set)", 0 )
 
 
 GAME( 1989, goldnaxeud, goldnaxe, system16b_5797,        goldnaxe, segas16b_state, init_generic_5797,       ROT0,   "bootleg", "Golden Axe (set 5, US) (bootleg of FD1094 317-0122 set)", 0 )
