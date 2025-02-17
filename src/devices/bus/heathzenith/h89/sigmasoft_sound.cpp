@@ -185,13 +185,13 @@ void h89bus_sigmasoft_snd_device::device_reset()
 			m_port_selection = 0;
 			break;
 		case 0x01:
-			m_port_selection = h89bus_device::H89_SER0;
+			m_port_selection = h89bus_device::H89_IO_SER0;
 			break;
 		case 0x02:
-			m_port_selection = h89bus_device::H89_SER1;
+			m_port_selection = h89bus_device::H89_IO_SER1;
 			break;
 		case 0x03:
-			m_port_selection = h89bus_device::H89_LP;
+			m_port_selection = h89bus_device::H89_IO_LP;
 			break;
 	}
 }
@@ -205,10 +205,10 @@ void h89bus_sigmasoft_snd_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
 
-	AY8910(config, m_ay8910, XTAL(8'000'000)/4); /* ??? 2.000 MHz */
+	AY8910(config, m_ay8910, XTAL(8'000'000) / 4); /* ??? 2.000 MHz */
 	m_ay8910->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
-}   // anonymous namespace
+} // anonymous namespace
 
 DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_SIGMASOFT_SND, device_h89bus_right_card_interface, h89bus_sigmasoft_snd_device, "h89_sigma_snd", "SigmaSoft Sound Effects Board");

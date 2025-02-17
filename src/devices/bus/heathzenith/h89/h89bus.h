@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:R. Belmont
+// copyright-holders:R. Belmont,Mark Garlanger
 /***************************************************************************
 
   h89.h - Heath/Zenith H-89/Z-90 bus
@@ -129,8 +129,11 @@ public:
 	int get_mem0();
 	int get_mem1();
 
-	virtual u8 read(u8 select_lines, u16 offset) { return 0; };
-	virtual void write(u8 select_lines, u16 offset, u8 data) {};
+	virtual u8 read(u8 offset) { return 0; };
+	virtual void write(u8 offset, u8 data) {};
+
+	virtual u8 mem_read(u8 &pri_select_lines, u8 &sec_select_lines, u16 offset) { return 0; };
+	virtual void mem_write(u8 &pri_select_lines, u8 &sec_select_lines, u16 offset, u8 data) {};
 
 protected:
 	device_h89bus_left_card_interface(const machine_config &mconfig, device_t &device);
@@ -262,25 +265,41 @@ class h89bus_device : public device_t
 	friend class device_h89bus_right_card_interface;
 
 public:
-	// left card select lines
-	static constexpr u8 H89_RD5         = 0x01;
-	static constexpr u8 H89_RD6         = 0x02;
-	static constexpr u8 H89_RD7         = 0x04;
-	// The Sigmasoft parallel card plugs into the left slot and has a jumper to
-	// get the memory / I/O select signal from the motherboard.  This plus the left
-	// slots' A0-A13 lines means it can claim arbitrary I/O ranges that the PROM doesn't
-	// select anything at.
-	static constexpr u8 H89_IO          = 0x80;
+	// Left Card I/O space
+	// Some cards which plugs into the left slot use a ribbon cable to
+	// get the CPU signals (such as I/O select signal) from the motherboard.
+	// That plus the left slots' A0-A12 lines (although only A0-A7 are used
+	// for port access) means they can claim arbitrary I/O ranges
+	// that the PROM doesn't select anything at.
 
 	// right card and on-board I/O space select lines
-	static constexpr u8 H89_GPP         = 0x01;
-	static constexpr u8 H89_NMI         = 0x02;
-	static constexpr u8 H89_TERM        = 0x04;
-	static constexpr u8 H89_SER1        = 0x08;
-	static constexpr u8 H89_SER0        = 0x10;
-	static constexpr u8 H89_LP          = 0x20;
-	static constexpr u8 H89_CASS        = 0x40;
-	static constexpr u8 H89_FLPY        = 0x80;
+	static constexpr u8 H89_IO_GPP          = 0x01;
+	static constexpr u8 H89_IO_NMI          = 0x02;
+	static constexpr u8 H89_IO_TERM         = 0x04;
+	static constexpr u8 H89_IO_SER1         = 0x08;
+	static constexpr u8 H89_IO_SER0         = 0x10;
+	static constexpr u8 H89_IO_LP           = 0x20;
+	static constexpr u8 H89_IO_CASS         = 0x40;
+	static constexpr u8 H89_IO_FLPY         = 0x80;
+
+	// Primary memory decoder PROM (selects with of the 16k banks to use)
+	static constexpr u8 H89_MEM_PRI_U516    = 0x01;
+	static constexpr u8 H89_MEM_PRI_NOMEM   = 0x02;
+	static constexpr u8 H89_MEM_PRI_RAS0    = 0x04;
+	static constexpr u8 H89_MEM_PRI_RAS1    = 0x08;
+	static constexpr u8 H89_MEM_PRI_RAS2    = 0x10;
+	static constexpr u8 H89_MEM_PRI_RD6     = 0x20;
+	static constexpr u8 H89_MEM_PRI_RD7     = 0x40;
+	static constexpr u8 H89_MEM_PRI_WE      = 0x80;
+
+	// Secondary memory decoder PROM (selects devices in the first 8k when
+	// ORG0 is not active)
+	static constexpr u8 H89_MEM_SEC_SYS_ROM = 0x01;
+	static constexpr u8 H89_MEM_SEC_OPT_ROM = 0x02;
+	static constexpr u8 H89_MEM_SEC_OPT_RAM = 0x04;
+	static constexpr u8 H89_MEM_SEC_FPY_RAM = 0x08;
+	static constexpr u8 H89_MEM_SEC_FPY_ROM = 0x10;
+	static constexpr u8 H89_MEM_SEC_WE      = 0x80;
 
 	// construction/destruction
 	h89bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -290,14 +309,19 @@ public:
 	void set_io1(int state);
 	void set_mem0(int state);
 	void set_mem1(int state);
+	void set_jj501_502(u8 val);
 	int get_io0();
 	int get_io1();
 	int get_mem0();
 	int get_mem1();
 
+	u8 mem_m1_r(offs_t offset);
+
 	// inline configuration
 	template <typename T> void set_program_space(T &&tag, int spacenum) { m_program_space.set_tag(std::forward<T>(tag), spacenum); }
 	template <typename T> void set_io_space(T &&tag, int spacenum) { m_io_space.set_tag(std::forward<T>(tag), spacenum); }
+
+	// IO related
 	auto out_int3_callback() { return m_out_int3_cb.bind(); }
 	auto out_int4_callback() { return m_out_int4_cb.bind(); }
 	auto out_int5_callback() { return m_out_int5_cb.bind(); }
@@ -309,6 +333,21 @@ public:
 	auto out_tlb_callback() { return m_out_tlb_cb.bind(); }
 	auto out_nmi_callback() { return m_out_nmi_cb.bind(); }
 	auto out_gpp_callback() { return m_out_gpp_cb.bind(); }
+
+	// memory related
+	auto in_bank0_callback() { return m_in_bank0_cb.bind(); }
+	auto in_bank1_callback() { return m_in_bank1_cb.bind(); }
+	auto in_bank2_callback() { return m_in_bank2_cb.bind(); }
+	auto out_bank0_callback() { return m_out_bank0_cb.bind(); }
+	auto out_bank1_callback() { return m_out_bank1_cb.bind(); }
+	auto out_bank2_callback() { return m_out_bank2_cb.bind(); }
+	auto in_sys_rom_callback() { return m_in_sys_rom_cb.bind(); }
+	auto in_opt_rom_callback() { return m_in_opt_rom_cb.bind(); }
+	auto in_opt_ram_callback() { return m_in_opt_ram_cb.bind(); }
+	auto in_flpy_ram_callback() { return m_in_flpy_ram_cb.bind(); }
+	auto in_flpy_rom_callback() { return m_in_flpy_rom_cb.bind(); }
+	auto out_opt_ram_callback() { return m_out_opt_ram_cb.bind(); }
+	auto out_flpy_ram_callback() { return m_out_flpy_ram_cb.bind(); }
 
 protected:
 	h89bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -328,10 +367,17 @@ protected:
 	u8 read_gpp();
 	void write_gpp(u8 data);
 
+	u8 io_dispatch_r(offs_t offset);
+	void io_dispatch_w(offs_t offset, u8 data);
+	u8 mem_dispatch_r(offs_t offset);
+	void mem_dispatch_w(offs_t offset, u8 data);
+
 	// internal state
 	required_address_space m_program_space, m_io_space;
-	required_region_ptr<uint8_t> m_decode_prom;
-	int m_io0, m_io1, m_mem0, m_mem1;
+	required_region_ptr<u8> m_io_decode_prom;
+	required_region_ptr<u8> m_mem_primary_decode_prom;
+	required_region_ptr<u8> m_mem_secondary_decode_prom;
+	int m_io0, m_io1, m_mem0, m_mem1, m_fmwe;
 
 private:
 	devcb_write_line m_out_int3_cb, m_out_int4_cb, m_out_int5_cb;
@@ -339,11 +385,18 @@ private:
 	devcb_read8 m_in_tlb_cb, m_in_nmi_cb, m_in_gpp_cb;
 	devcb_write8 m_out_tlb_cb, m_out_nmi_cb, m_out_gpp_cb;
 
+	// memory banks on the CPU board
+	devcb_read8 m_in_bank0_cb, m_in_bank1_cb, m_in_bank2_cb;
+	devcb_write8 m_out_bank0_cb, m_out_bank1_cb, m_out_bank2_cb;
+
+	// devices in first 8k when not in ORG0 mode.
+	devcb_read8 m_in_sys_rom_cb, m_in_opt_rom_cb, m_in_opt_ram_cb, m_in_flpy_ram_cb, m_in_flpy_rom_cb;
+	devcb_write8 m_out_opt_ram_cb, m_out_flpy_ram_cb;
+
 	std::vector<std::reference_wrapper<device_h89bus_left_card_interface>> m_left_device_list;
 	std::vector<std::reference_wrapper<device_h89bus_right_card_interface>> m_right_device_list;
 
-	u8 io_dispatch_r(offs_t offset);
-	void io_dispatch_w(offs_t offset, u8 data);
+	u8 jj501_502;
 };
 
 inline int device_h89bus_left_card_interface::get_mem0()

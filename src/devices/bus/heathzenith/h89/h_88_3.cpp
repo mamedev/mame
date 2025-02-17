@@ -105,17 +105,17 @@ h_88_3_device::h_88_3_device(const machine_config &mconfig, device_type type, co
 
 u8 h_88_3_device::read(u8 select_lines, u8 offset)
 {
-	if ((select_lines & h89bus_device::H89_SER0) && (m_aux_enabled))
+	if ((select_lines & h89bus_device::H89_IO_SER0) && (m_aux_enabled))
 	{
 		return aux_r(offset);
 	}
 
-	if ((select_lines & h89bus_device::H89_SER1) && (m_modem_enabled))
+	if ((select_lines & h89bus_device::H89_IO_SER1) && (m_modem_enabled))
 	{
 		return modem_r(offset);
 	}
 
-	if ((select_lines & h89bus_device::H89_LP) && (m_lp_enabled))
+	if ((select_lines & h89bus_device::H89_IO_LP) && (m_lp_enabled))
 	{
 		return lp_r(offset);
 	}
@@ -125,19 +125,19 @@ u8 h_88_3_device::read(u8 select_lines, u8 offset)
 
 void h_88_3_device::write(u8 select_lines, u8 offset, u8 data)
 {
-	if ((select_lines & h89bus_device::H89_SER0) && (m_aux_enabled))
+	if ((select_lines & h89bus_device::H89_IO_SER0) && (m_aux_enabled))
 	{
 		aux_w(offset, data);
 		return;
 	}
 
-	if ((select_lines & h89bus_device::H89_SER1) && (m_modem_enabled))
+	if ((select_lines & h89bus_device::H89_IO_SER1) && (m_modem_enabled))
 	{
 		modem_w(offset, data);
 		return;
 	}
 
-	if ((select_lines & h89bus_device::H89_LP) && (m_lp_enabled))
+	if ((select_lines & h89bus_device::H89_IO_LP) && (m_lp_enabled))
 	{
 		lp_w(offset, data);
 		return;
@@ -383,7 +383,7 @@ ha_88_3_device::ha_88_3_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-}   // anonymous namespace
+} // anonymous namespace
 
-DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_H_88_3, device_h89bus_right_card_interface, h_88_3_device, "h89h_88_3", "Heath H-88-3 3-port Serial Board");
-DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_HA_88_3, device_h89bus_right_card_interface, ha_88_3_device, "h89ha_88_3", "Heath HA-88-3 3-port Serial Board");
+DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_H_88_3, device_h89bus_right_card_interface, h_88_3_device, "h89_h_88_3", "Heath H-88-3 3-port Serial Board");
+DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_HA_88_3, device_h89bus_right_card_interface, ha_88_3_device, "h89_ha_88_3", "Heath HA-88-3 3-port Serial Board");
