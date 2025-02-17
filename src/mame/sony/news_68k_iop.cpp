@@ -655,7 +655,10 @@ namespace
         map(0x04400002, 0x04400002).w(FUNC(news_iop_state::cpu_inten_w<IOPIRQ3>));
         map(0x04400003, 0x04400003).w(FUNC(news_iop_state::cpu_inten_w<IOPIRQ5>));
         map(0x04400004, 0x04400004).w(FUNC(news_iop_state::cpu_inten_w<TIMER>));
-        map(0x04400005, 0x04400005).lw8([this](uint8_t data) { LOG("(%s) Write CACHEEN = 0x%x\n", machine().describe_context(), data); }, "CACHEEN");
+        map(0x04400005, 0x04400005).lw8([this](uint8_t data)
+                                        {
+                                            LOGMASKED(LOG_MEMORY, "(%s) Write CACHEEN = 0x%x\n", machine().describe_context(), data);
+                                        }, "CACHEEN");
         map(0x04400006, 0x04400006).w(FUNC(news_iop_state::cpu_inten_w<PERR>));
         map(0x04800000, 0x04800000).lw8([this](uint8_t data) { iop_irq_w<CPU>(1); }, "INT_IOP");
         map(0x04c00000, 0x04c00000).select(0x10000000).w(m_mmu, FUNC(news_020_mmu_device::clear_entries));
@@ -673,8 +676,7 @@ namespace
     void news_iop_state::cpu_map(address_map &map)
     {
         map(0x0, 0xffffffff).lrw32([this](offs_t offset, uint32_t mem_mask) {
-            const uint32_t result = m_mmu->hyperbus_r(offset, mem_mask, m_cpu->supervisor_mode());
-            return result;
+            return m_mmu->hyperbus_r(offset, mem_mask, m_cpu->supervisor_mode());
         }, "hyperbus_r",
         [this](offs_t offset, uint32_t data, uint32_t mem_mask) {
             m_mmu->hyperbus_w(offset, data, mem_mask, m_cpu->supervisor_mode());
@@ -684,7 +686,7 @@ namespace
     template <news_iop_state::iop_irq_number Number>
     bool news_iop_state::is_iop_irq_set()
     {
-        return (m_iop_intst & (1 << Number)) > 0;
+        return BIT(m_iop_intst, Number);
     }
 
     template <news_iop_state::iop_irq_number Number>
@@ -866,11 +868,11 @@ namespace
             if ((m_sw1_first_read < 2) && multiplexer_value == 0)
             {
                 m_sw1_first_read++;
-                dcd_state = m_dip_switch->read() & (1 << 5);
+                dcd_state = BIT(m_dip_switch->read(), 5);
             }
             else
             {
-                dcd_state = m_dip_switch->read() & (1 << multiplexer_value);
+                dcd_state = BIT(m_dip_switch->read(), multiplexer_value);
             }
         }
         else // IDROM
