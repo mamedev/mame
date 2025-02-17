@@ -162,6 +162,28 @@ license:CC0-1.0
 		</element>
 	</group>
 
+	<element name="label_output">
+		<text string="Output">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+
+	<group name="leds">
+		<!--Master leds -->
+		<element name="label_output" ref="label_output">
+			<bounds x="0" y="2.5" width="30" height="7" />
+		</element>
+
+		<repeat count="8">
+			<param name="n" start="0" increment="1" />
+			<param name="x" start="32" increment="5" />
+			<element name="led~n~" ref="orange_led">
+				<bounds x="~x~" y="3.5" width="5" height="5" />
+			</element>
+		</repeat>
+
+	</group>
+
 	<view name="LEDs and Terminal">
 		<bounds x="0" y="0" width="400" height="400" />
 		<collection name="LEDs and terminal">
@@ -172,6 +194,9 @@ license:CC0-1.0
 					<bounds x="~x~" y="345" width="10" height="47" />
 				</group>
 			</repeat>
+			<group ref="leds">
+				<bounds x="75" y="385" width="72" height="7" />
+			</group>
 		</collection>
 		<screen index="0">
 			<bounds x="0" y="0" width="400" height="340" />
