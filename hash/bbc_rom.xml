@@ -5282,8 +5282,6 @@ license:CC0-1.0
 			<dataarea name="rom" size="32768">
 				<rom name="PMSGenie-1.01.rom" size="32768" crc="be152c01" sha1="34d8d21c71b1bf1f3648a4dda90fde5d8dc48cd2"/>
 			</dataarea>
-			<dataarea name="nvram" size="32768" />
-			<dataarea name="ram" size="32768" />
 		</part>
 	</software>
 
@@ -5300,8 +5298,6 @@ license:CC0-1.0
 				<rom name="PMSGenie3-1.02.rom" size="8192" crc="9a37428c" sha1="a951c61c81acea3d7510a0e23b0c054fae86a95b" offset="0x4000" status="baddump"/>
 				<rom name="PMSGenie4-1.02.rom" size="8192" crc="25cdd418" sha1="07a5f4f5dde38679140815a6b5ee22eccd678cb1" offset="0x6000" status="baddump"/>
 			</dataarea>
-			<dataarea name="nvram" size="32768" />
-			<dataarea name="ram" size="32768" />
 		</part>
 	</software>
 
