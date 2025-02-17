@@ -12,7 +12,7 @@
 #define LOG_WRITEDATA (1U << 7)
 #define LOG_WRITECOMPLETED (1U << 8)
 
-//#define VERBOSE (LOG_GENERAL | LOG_COMMAND | LOG_READ | LOG_WRITE | LOG_READCOMPLETED | LOG_WRITECOMPLETED)
+//#define VERBOSE (LOG_GENERAL | LOG_COMMAND | LOG_READ | /* LOG_READDATA | LOG_READSTATUS | */ LOG_READCOMPLETED | LOG_WRITE | /* LOG_WRITEDATA | */ LOG_WRITECOMPLETED)
 //#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
@@ -727,7 +727,7 @@ void ata_hle_device_base::dma_w(uint16_t data)
 
 void ata_hle_device_base::command_w(offs_t offset, uint16_t data)
 {
-	if ((m_status & (IDE_STATUS_DRQ | IDE_STATUS_BSY)) && offset != IDE_CS0_DATA_RW && (offset != IDE_CS0_DEVICE_HEAD_RW || data != m_device_head))
+	if ((m_status & IDE_STATUS_DRQ) && offset != IDE_CS0_DATA_RW && (offset != IDE_CS0_DEVICE_HEAD_RW || data != m_device_head))
 	{
 		LOG("%s device %d cs0_w (0x%x) aborted after %d bytes (%02x)\n", machine().describe_context(), m_csel, offset, m_buffer_offset, m_command);
 		stop_busy();
@@ -737,7 +737,9 @@ void ata_hle_device_base::command_w(offs_t offset, uint16_t data)
 		m_error = IDE_ERROR_ABRT;
 	}
 
-	if (m_dmack)
+	if (m_status & IDE_STATUS_BSY)
+		LOG("%s device %d cs0_w (0x%x) 0x%04x (ignored BSY)\n", machine().describe_context(), m_csel, offset, data);
+	else if (m_dmack)
 		LOG("%s device %d cs0_w (0x%x) 0x%04x (ignored DMACK)\n", machine().describe_context(), m_csel, offset, data);
 	else
 	{
@@ -748,10 +750,9 @@ void ata_hle_device_base::command_w(offs_t offset, uint16_t data)
 			{
 				if (!device_selected())
 					LOG("%s device %d cs0_w data 0x%04x (ignored !selected)\n", machine().describe_context(), m_csel, data);
-				else if (m_status & IDE_STATUS_BSY)
-					LOG("%s device %d cs0_w data 0x%04x (ignored BSY)\n", machine().describe_context(), m_csel, data);
 				else if (!(m_status & IDE_STATUS_DRQ))
 					LOG("%s device %d cs0_w data 0x%04x (ignored !DRQ)\n", machine().describe_context(), m_csel, data);
+				else
 				{
 					LOGWRITEDATA("%s device %d cs0_w data 0x%04x\n", machine().describe_context(), m_csel, data);
 					write_data(data);
