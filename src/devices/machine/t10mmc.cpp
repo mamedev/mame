@@ -1492,8 +1492,9 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 		{
 			memset(data, 0, SCSILengthFromUINT16( &command[ 7 ] ));
 
+			const int dbd = BIT(command[1], 3);
 			const uint8_t page = command[2] & 0x3f;
-			int ptr = (command[0] == T10SPC_CMD_MODE_SENSE_6) ? 4 : 8;
+			int ptr = dbd ? 0 : (command[0] == T10SPC_CMD_MODE_SENSE_6) ? 4 : 8;
 
 			if ((page == 0xe) || (page == 0x3f))
 			{
@@ -1561,20 +1562,28 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 				data[ptr++] = 0;
 			}
 
-			if (command[0] == T10SPC_CMD_MODE_SENSE_6)
+			if (!dbd)
 			{
-				data[0] = ptr - 1; // Mode Data Length
-				data[1] = 0x70; // Medium Type
-				data[2] = 0x00; // Device-Specific Parameter
-				data[3] = 0x00; // Block Descriptor Length
-			}
-			else
-			{
-				put_u16be(&data[0], ptr - 2); // Mode Data Length
-				data[2] = 0x70; // Medium Type
-				data[3] = 0x00; // Device-Specific Parameter
-				put_u16be(&data[4], 0); // Reserved
-				put_u16be(&data[6], 0); // Block Descriptor Length
+				int const medium_type =
+					m_image->is_dvd() ? 0x41 :
+					(m_image->get_last_track() >= 1 && m_image->get_track_type(0) == cdrom_file::CD_TRACK_AUDIO) ? 0x02 :
+					m_image->get_last_track() > 1 ? 0x03 : 0x01;
+
+				if (command[0] == T10SPC_CMD_MODE_SENSE_6)
+				{
+					data[0] = ptr - 1; // Mode Data Length
+					data[1] = medium_type;
+					data[2] = 0x00; // Device-Specific Parameter
+					data[3] = 0x00; // Block Descriptor Length
+				}
+				else
+				{
+					put_u16be(&data[0], ptr - 2); // Mode Data Length
+					data[2] = medium_type;
+					data[3] = 0x00; // Device-Specific Parameter
+					put_u16be(&data[4], 0); // Reserved
+					put_u16be(&data[6], 0); // Block Descriptor Length
+				}
 			}
 		}
 		break;
@@ -1609,7 +1618,11 @@ void t10mmc::WriteData( uint8_t *data, int dataLength )
 	case T10SPC_CMD_MODE_SELECT_6:
 	case T10SPC_CMD_MODE_SELECT_10:
 	{
-		int len = (command[0] == T10SPC_CMD_MODE_SELECT_6) ? data[0] + 1 : get_u16be(&data[0]) + 2;
+		int len = dataLength;
+		int reserved = (command[0] == T10SPC_CMD_MODE_SELECT_6) ? data[0] + 1 : get_u16be(&data[0]) + 2;
+		if (len != reserved && reserved)
+			m_device->logerror("T10MMC: reserved length=%d (%d)", reserved, dataLength);
+
 		int bdlen = (command[0] == T10SPC_CMD_MODE_SELECT_6) ? data[3] : get_u16be(&data[6]);
 		int ptr = (command[0] == T10SPC_CMD_MODE_SELECT_6) ? 4 : 8;
 
