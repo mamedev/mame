@@ -288,7 +288,9 @@ register. So what is controlling priority.
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tc0060dca.h"
 
+static constexpr float volume_map[] = TC0060DCA_CURVE;
 
 namespace {
 
@@ -755,7 +757,7 @@ void opwolf_state::opwolf_adpcm_b_w(offs_t offset, uint8_t data)
 		m_adpcm_pos[0] = start;
 		m_adpcm_end[0] = end;
 		m_msm[0]->reset_w(0);
-		m_msm[0]->set_output_gain(0, m_adpcm_b[5] / 255.0);
+		m_msm[0]->set_output_gain(0, volume_map[m_adpcm_b[5]]);
 		//logerror("TRIGGER MSM1\n");
 	}
 
@@ -778,7 +780,7 @@ void opwolf_state::opwolf_adpcm_c_w(offs_t offset, uint8_t data)
 		m_adpcm_pos[1] = start;
 		m_adpcm_end[1] = end;
 		m_msm[1]->reset_w(0);
-		m_msm[1]->set_output_gain(0, m_adpcm_c[5] / 255.0);
+		m_msm[1]->set_output_gain(0, volume_map[m_adpcm_c[5]]);
 		//logerror("TRIGGER MSM2\n");
 	}
 
@@ -789,14 +791,14 @@ void opwolf_state::opwolf_adpcm_d_w(uint8_t data)
 {
 	// total volume (speaker 1)
 	for (int i = 0; i <= 2; i++)
-		m_lspeaker->set_input_gain(i, data / 255.0);
+		m_lspeaker->set_input_gain(i, volume_map[data]);
 }
 
 void opwolf_state::opwolf_adpcm_e_w(uint8_t data)
 {
 	// total volume (speaker 2)
 	for (int i = 0; i <= 2; i++)
-		m_rspeaker->set_input_gain(i, data / 255.0);
+		m_rspeaker->set_input_gain(i, volume_map[data]);
 }
 
 
