@@ -110,6 +110,7 @@ protected:
 	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_resolve_objects() override;
 
 	// device_execute_interface overrides
 	virtual void execute_set_input(int inputnum, int state) override;

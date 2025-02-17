@@ -593,7 +593,10 @@ void tmp95c063_device::device_start()
 	save_item(NAME(m_dram_refresh));
 	save_item(NAME(m_dram_access));
 	save_item(NAME(m_da_drive));
+}
 
+void tmp95c063_device::device_resolve_objects()
+{
 	m_nmi_state = CLEAR_LINE;
 	for( int i = 0; i < TLCS900_NUM_INPUTS; i++ )
 	{
