@@ -38,22 +38,6 @@ TODO (usability, to be moved in a SW list):
 \- Doesn't accept any PS/2 input, tries to install a "PCI standard CPU Host Bridge" (?),
    hangs there;
 \- GUI is never recognized no matter what, punts with DirectX not installed;
-\- It uses a small external PCB from Azkoyen with an MCU (unknown type) for the JAMMA interface:
-                              _______________         _______
-   ____--__-- _______________|   DB-25      |________| DB-9 |_____
-  |   |__||__| <-Jacks       |______________|        |______|    |
-  | _________                                               ___  |
-  ||o o o o |<-Power                     ________________  |  |  |
-  |                                     | MCU           |  |  |  |
-  |                                     |_______________|  |__|  |
-  |                                      _________   Xtal        |
-  |                                     |DIPS x 8|   5 MHz       |
-  |                                                              |
-  |    Test sw->(o)         _________   _________   _________    |
-  | Service sw->(o)         SN74HC245N  SN74HC245N  SN74HC245N   |
-  |_________                                          ___________|
-           |_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|
-                          JAMMA
 
 - xubuntu 6.10: throws several SCSIDEV unhandled $46 & $51 commands
   (get configuration/read disc information),
@@ -166,6 +150,24 @@ Notes on possible shutms11 BIOS bugs:
     00000003       00000000       00000000       B8BA1941       00038881
     80000000       00000000       00000000       B8BA1941       00038881
     C0000000       00000000       00000000       B8BA1941       00038881
+
+
+    The JAMMA adaptor is a small external PCB from Azkoyen with an MCU (unknown type):
+                                _______________         _______
+     ____--__-- _______________|   DB-25      |________| DB-9 |_____
+    |   |__||__| <-Jacks       |______________|        |______|    |
+    | _________                                               ___  |
+    ||o o o o |<-Power                     ________________  |  |  |
+    |                                     | MCU           |  |  |  |
+    |                                     |_______________|  |__|  |
+    |                                      _________   Xtal        |
+    |                                     |DIPS x 8|   5 MHz       |
+    |                                                              |
+    |    Test sw->(o)         _________   _________   _________    |
+    | Service sw->(o)         SN74HC245N  SN74HC245N  SN74HC245N   |
+    |_________                                          ___________|
+             |_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|
+                               JAMMA
 
 **************************************************************************************************/
 
