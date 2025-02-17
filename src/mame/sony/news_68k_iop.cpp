@@ -72,11 +72,8 @@
 
 #include "cpu/m68000/m68020.h"
 
-#include "formats/pc_dsk.h"
-
-#include "imagedev/floppy.h"
-
 #include "machine/am79c90.h"
+#include "machine/bankdev.h"
 #include "machine/msm58321.h"
 #include "machine/ncr5380.h"
 #include "machine/nscsi_bus.h"
@@ -85,7 +82,10 @@
 #include "machine/timekpr.h"
 #include "machine/upd765.h"
 #include "machine/z80scc.h"
-#include "machine/bankdev.h"
+
+#include "imagedev/floppy.h"
+
+#include "formats/pc_dsk.h"
 
 #define LOG_INTERRUPT (1U << 1)
 #define LOG_ALL_INTERRUPT (1U << 2)
@@ -132,22 +132,22 @@ namespace
         {
         }
 
-        void nws831(machine_config &config);
-        void init_common();
+        void nws831(machine_config &config) ATTR_COLD;
+        void init_common() ATTR_COLD;
 
     protected:
         // driver_device overrides
-        virtual void machine_start() override;
-        virtual void machine_reset() override;
+        virtual void machine_start() override ATTR_COLD;
+        virtual void machine_reset() override ATTR_COLD;
 
         // address maps
-        void iop_map(address_map &map);
-        void iop_autovector_map(address_map &map);
-        void mmu_map(address_map &map);
-        void cpu_map(address_map &map);
+        void iop_map(address_map &map) ATTR_COLD;
+        void iop_autovector_map(address_map &map) ATTR_COLD;
+        void mmu_map(address_map &map) ATTR_COLD;
+        void cpu_map(address_map &map) ATTR_COLD;
 
         // machine config
-        void common(machine_config &config);
+        void common(machine_config &config) ATTR_COLD;
 
         // IOP IRQ setup
         enum iop_irq_number : unsigned
@@ -463,10 +463,10 @@ namespace
         m_rtc->cs1_w(1);
         m_rtc->cs2_w(1);
 
-        m_rtc->d0_w((data & 0x1) > 0);
-        m_rtc->d1_w((data & 0x2) > 0);
-        m_rtc->d2_w((data & 0x4) > 0);
-        m_rtc->d3_w((data & 0x8) > 0);
+        m_rtc->d0_w(BIT(data, 0));
+        m_rtc->d1_w(BIT(data, 1));
+        m_rtc->d2_w(BIT(data, 2));
+        m_rtc->d3_w(BIT(data, 3));
 
         m_rtc->address_write_w(1);
         m_rtc->address_write_w(0);
@@ -799,8 +799,9 @@ namespace
         for (auto irq : cpu_irq_line_map)
         {
             // Update input pin status if it has changed
-            const bool state = active_irq & (1 << irq.second);
-            if (m_cpu_int_state[irq.first] != state) {
+            const bool state = BIT(active_irq, irq.second);
+            if (m_cpu_int_state[irq.first] != state)
+            {
                 if (irq.first != INPUT_LINE_IRQ6)
                 {
                     LOGMASKED(LOG_INTERRUPT, "Setting CPU input line %d to %d\n", irq.first, state ? 1 : 0);

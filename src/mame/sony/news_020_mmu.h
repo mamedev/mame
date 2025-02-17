@@ -9,7 +9,7 @@
 class news_020_mmu_device : public device_t, public device_memory_interface
 {
 public:
-	news_020_mmu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	news_020_mmu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) ATTR_COLD;
 
 	template <typename... T>
 	void set_bus_error_callback(T &&...args) { m_bus_error.set(std::forward<T>(args)...); }
@@ -28,8 +28,8 @@ public:
 	void hyperbus_w(offs_t offset, uint32_t data, uint32_t mem_mask, bool is_supervisor);
 
 protected:
-	virtual void device_start() override;
-	virtual space_config_vector memory_space_config() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual space_config_vector memory_space_config() const override ATTR_COLD;
 
 private:
 	const address_space_config m_hyperbus_config;
