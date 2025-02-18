@@ -198,7 +198,7 @@ public:
 		return 0x00;
 	}
 
-	uint16_t unknown_random_r() { return machine().rand(); }
+	int unknown_random_r() { return machine().rand(); }
 
 protected:
 	// driver_device overrides
