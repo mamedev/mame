@@ -101,7 +101,10 @@ void pmp11_state::pmp11(machine_config &config)
 
 ROM_START( pmp11 )
 	ROM_REGION( 0x0800, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "rom.bin", 0x0000, 0x0800, CRC(2cfdc3a3) SHA1(50ffa2a3bd0b75c1ecb4ab6c691796ab0d85dd4e))
+	ROM_SYSTEM_BIOS( 0, "v20", "v 2.0 - 1867" ) // ODT 2.0 - from museum item #1867, no markings on EPROM
+	ROMX_LOAD( "rom.bin", 0x0000, 0x0800, CRC(2cfdc3a3) SHA1(50ffa2a3bd0b75c1ecb4ab6c691796ab0d85dd4e), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS( 1, "alt", "v 2.0 - 1113" ) // ODT 2.0 - from museum item #1113
+	ROMX_LOAD( "odt_2.0.bin", 0x0000, 0x0800, CRC(0e970130) SHA1(811b40eb6ca78d7a1b0701c5d62738bd31026db8), ROM_BIOS(1))
 ROM_END
 
 } // Anonymous namespace
