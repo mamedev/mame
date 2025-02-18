@@ -198,7 +198,13 @@ public:
 		return 0x00;
 	}
 
-	int unknown_random_r() { return machine().rand(); }
+	int unknown_random_r()
+	{
+		if (!machine().side_effects_disabled())
+			return machine().rand();
+		else
+			return 0;
+	}
 
 protected:
 	// driver_device overrides
