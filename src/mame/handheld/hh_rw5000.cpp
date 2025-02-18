@@ -735,7 +735,7 @@ ROM_END
 /*******************************************************************************
 
   Rockwell 8R "Automatic Percent", Rockwell 18R "Memory"
-  * B5000 MCU (label B5000CC, die label B5000)
+  * B5000 MCU (label B5000CB/CC, die label B5000)
   * 8-digit 7seg LED display
 
   This MCU was used in Rockwell 8R, 18R, and 9TR. It was also sold by

@@ -581,7 +581,10 @@ void alibaba_state::mystery_tick(int state)
 uint8_t alibaba_state::mystery_1_r()
 {
 	// the return value determines what the mystery item is
-	return machine().rand() & 0x0f;
+	if (!machine().side_effects_disabled())
+		return machine().rand() & 0x0f;
+
+	return 0;
 }
 
 uint8_t alibaba_state::mystery_2_r()
