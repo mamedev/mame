@@ -6,7 +6,8 @@ Mikrocomputer fuer Ausbildung
 Berufsfoerdungszentrum Essen
 Information found on Wikipedia:
 - System is a backbone upon which all functions are available on plug-in cards
-- 32k RAM, 32k ROM
+- 32k RAM, 32k ROM - either multiple 8k or 16k modules or a single 64k module 
+  are used for the desired RAM/ROM complement
 - Serial is via CPU SID/SOD pins, but can be replaced by 8251 on RS232 card
 - Protocol is COM1, 4800, 8N1
 - Timer card uses 8253
@@ -17,6 +18,42 @@ Information found on Wikipedia:
 
 Manuals have no schematics and no mention of the 8253 or 8255. The bios
 doesn't try communicating with them either.
+
+Row    a         c
+|-------------------------|
+| +5V       1    +5V      |
+| CLKOUT/   2    S1/      |
+| ALE/      3    S0/      | 
+| D0        4    D1       | 
+| D2        5    D3       | 
+| D4        6    D5       | 
+| D6        7    D7       |
+| HLDA/     8    INTA/    |  
+| IOW/      9    MEMW/    |
+| IOR/     10    MEMR/    | 
+| ROM/     11    IN/      | 
+| RAM/     12    OUT/     |
+| TRAP     13    RESOUT/  |  
+|          14             | 
+|          15    A16      | 
+| A17      16    A00      | 
+| A01      17    A02      | 
+| A03      18    A04      |
+| A05      19    A06      | 
+| A07      20    A08      |
+| A09      21    A10      | 
+| A11      22    A12      |
+| A13      23    A14      |
+| A15      24             |
+| RST7.5   25    INTR     |
+| READY    26    RST5.5   |
+| RESIN/   27    RST6.5   | 
+| HOLD     28             | 
+| PULSOUT  29    RX       | 
+| PLS f. I.30    TX       | signal 30a: PULS F.INT.
+| +12V     31    -12V     |
+| 0V       32    0V       | 
+|-------------------------
 
 Commands:
 A     Assembler
@@ -34,8 +71,8 @@ R     Set initial register contents
 S     Save memory to tape
 T     Trace interval
 
-Pressing enter will change the prompt from KMD > to KMD+> and pressing
-space will change it back.
+Pressing enter will change the prompt from KMD > to KMD+> for the commands present in
+the extended MAT ROM, and pressing space will change it back.
 
 mfabfz85 -bios 0, 3 and 4 work; others produce rubbish.
 
@@ -45,6 +82,22 @@ Cassette:
 - The higher frequencies, only 50% apart, cause the interface to be less reliable
 - Baud rates of 150, 300, 600, 1200 selected by a jumper. We emulate 1200 only,
   as the current code would be too unreliable with the lower rates.
+  
+CP/M Ausbaustufe (CP/M expansion level):
+The modularity of this teaching system meant that most of the components of a complete
+system capable of CP/M were available, you could etch your own PCBs or buy kits.
+You could buy the manual for the CP/M expansion that describes the modifications to turn
+your training kit into a full blown CP/M machine, but it was closed source.
+In 2019, in a community effort for the German vintage computer forum https://forum.classic-computing.de/forum/ ,
+Mike Douglas at https://deramp.com/downloads/mfa_computer/ released an open source CP/M version and
+monitor ROM. This effort revealed that the MFA's floppy module contained a 3.5"/80 track DD floppy drive
+and could use any DD capable drive. In its native MFA and the original MFA CP/M mode, only
+the first 40 tracks were used.
+In the CP/M capable version, the MFA uses an 8085 processor, 64K RAM card with a bankable 2K boot
+EPROM, one or more serial cards at I/O addresses 0xA0, 0x90 and 0xF0, a printer card at E0 and a WD1793
+based floppy controller at 0xC0. Bank switching is performed by a read at address 0xf200.
+The console is at 0xA0 and can be handled via a terminal emulator on a PC or routed over the computer's
+bus to a video/keyboard module. The terminal is set to 9600 Baud, no parity, 1 stop bit.
 
 ****************************************************************************/
 
@@ -55,6 +108,7 @@ Cassette:
 #include "machine/i8251.h"
 #include "bus/rs232/rs232.h"
 #include "speaker.h"
+#include "softlist_dev.h"
 
 
 namespace {
@@ -87,6 +141,29 @@ private:
 	required_device<i8251_device> m_uart;
 };
 
+class mfacpm_state : public driver_device
+{
+public:
+	mfacpm_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_shared_ram(*this, "shared_ram")
+		, m_bootview(*this, "bootview") // see memory map
+		, m_uart(*this, "uart2")
+	{ }
+
+	void mfacpm(machine_config &config);
+
+private:
+	void mfacpm_io(address_map &map) ATTR_COLD;
+	void mfacpm_mem(address_map &map) ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
+	void machine_start() override ATTR_COLD;
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<uint8_t> m_shared_ram;
+	memory_view m_bootview;
+	required_device<i8251_device> m_uart;
+};
 
 void mfabfz_state::mfabfz_mem(address_map &map)
 {
@@ -95,13 +172,67 @@ void mfabfz_state::mfabfz_mem(address_map &map)
 	map(0x8000, 0xffff).ram();
 }
 
+// According to the manual for the 64k RAM card, in the original MFA mode, 
+// reading an address equal or higher to the boundary set by solder bridges on the card
+// (which offers the banking of 2/4/8/16/32k ROMs and is needed for CP/M mode), 
+// memory operations below the boundary reset the card to its ROM active state.
+// For CP/M mode, this behaviour can be changed, so that ROM is banked out by a 
+// read from 0xf200 (CP/M boot ROMs are 2k), and only a reset will restore 
+// ROM from 0x0000.
+
+// Memory card manual at https://oldcomputers.dyndns.org/public/pub/rechner/mfa_mikrocomputer_fuer_ausbildung/mfa_64k_ram_rom_3.3b/mfa_-_64k_ram_rom.pdf
+// CP/M manual at https://oldcomputers.dyndns.org/public/pub/rechner/mfa_mikrocomputer_fuer_ausbildung/mfa_cpm_handbuch/mfa_-_cpm_handbuch.pdf
+
+void mfacpm_state::mfacpm_mem(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("shared_ram");
+	map(0x0800, 0xffff).ram();
+	map(0x0000, 0xffff).view(m_bootview);
+	m_bootview[0](0x0000, 0x07ff).rom().region("roms", 0); // the actual banking mechanism is missing
+}
+
 void mfabfz_state::mfabfz_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0xbe, 0xbf).rw("uart1", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0xfe, 0xff).rw("uart2", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	// map(0xc0, 0xcf).rw // Floppy port, c0 ... c3 and c8 are used with a WD1793 floppy controller, 40 tracks, 8 sectors, on 3.5" DD media
 }
+
+void mfacpm_state::mfacpm_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x90, 0x9f).rw("uart2", FUNC(i8251_device::read), FUNC(i8251_device::write)); // secondary serial port
+	map(0xa0, 0xaf).rw("uart1", FUNC(i8251_device::read), FUNC(i8251_device::write)); // Terminal and data transfer
+	// map(0xc0, 0xc3).rw // Floppy port, 0xc0 ... 0xc3 and 0xc8 are used with a WD1793 floppy controller, 80 tracks, 9 sectors on 3.5" DD media 
+	// for the open CP/M, 40 tracks, 8 sectors on 3.5" DD media for the original CP/M
+	// map(0xe0, 0xef).rw // Centronics printer card
+	// map(0xf0, 0xff).rw // tertiary serial port
+}
+/* Floppy interface, needed for CP/M
+https://oldcomputers.dyndns.org/public/pub/rechner/mfa_mikrocomputer_fuer_ausbildung/mfa_floppy_controller_4.7b_and_drive/mfa_-_floppy_disk(seiten_einzeln).pdf
+The floppy interface at 0xc0 is based on the WD1793 floppy controller. IO lines 0xc0 ... 0xc3 are used for communication,
+0xc8 halts the processor via the CPU's READY line. DRQ and INTRQ are used to synchronize the data transfer.
+The floppy controller responds to RST5.5. */
+
+/* The parallel printer card uses a non-standard cable to connect to printers with a Centronics interface
+https://oldcomputers.dyndns.org/public/pub/rechner/mfa_mikrocomputer_fuer_ausbildung/mfa_programmable_parallel_&_eprommer_4.3b/mfa_-_programmable_parallel_&_eprommer_4.3.pdf
+DB25 	Centronics
+1		 2
+2		 3
+3		 4
+4		 5
+5		 6
+6		 7
+7		 8
+8		 9
+9 - 21 not connected 	
+22		32
+23		10
+24		 1
+25		16 */
 
 void mfabfz_state::mfabfz85_io(address_map &map)
 {
@@ -112,6 +243,10 @@ void mfabfz_state::mfabfz85_io(address_map &map)
 
 /* Input ports */
 static INPUT_PORTS_START( mfabfz )
+INPUT_PORTS_END
+
+/* Input ports */
+static INPUT_PORTS_START( mfacpm )
 INPUT_PORTS_END
 
 // Note: if the other baud rates are to be supported, then this function
@@ -187,6 +322,14 @@ void mfabfz_state::kansas_r(int state)
 	m_uart->write_rxc(state);
 }
 
+void mfabfz_state::machine_start()
+{
+	save_item(NAME(m_cass_data));
+	save_item(NAME(m_cassoutbit));
+	save_item(NAME(m_cassbit));
+	save_item(NAME(m_cassold));
+}
+
 void mfabfz_state::machine_reset()
 {
 	m_cass_data[0] = m_cass_data[1] = m_cass_data[2] = m_cass_data[3] = m_cass_data[4] = 0;
@@ -195,12 +338,15 @@ void mfabfz_state::machine_reset()
 	m_uart->write_cts(0);
 }
 
-void mfabfz_state::machine_start()
+void mfacpm_state::machine_start()
 {
-	save_item(NAME(m_cass_data));
-	save_item(NAME(m_cassoutbit));
-	save_item(NAME(m_cassbit));
-	save_item(NAME(m_cassold));
+}
+
+void mfacpm_state::machine_reset()
+{
+	m_bootview.select(0);
+	m_uart->write_rxd(1);
+	m_uart->write_cts(0);
 }
 
 void mfabfz_state::mfabfz(machine_config &config)
@@ -274,6 +420,36 @@ void mfabfz_state::mfabfz85(machine_config &config)
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 }
 
+void mfacpm_state::mfacpm(machine_config &config)
+{
+	/* basic machine hardware */
+	I8085A(config, m_maincpu, 4_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mfacpm_state::mfacpm_mem);
+	m_maincpu->set_addrmap(AS_IO, &mfacpm_state::mfacpm_io);
+	
+	// uart1 - terminal
+	clock_device &uart1_clock(CLOCK(config, "uart1_clock", 4_MHz_XTAL / 26));
+	uart1_clock.signal_handler().set("uart1", FUNC(i8251_device::write_txc));
+	uart1_clock.signal_handler().append("uart1", FUNC(i8251_device::write_rxc));
+
+	i8251_device &uart1(I8251(config, "uart1", 0));
+	uart1.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	uart1.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+	uart1.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set("uart1", FUNC(i8251_device::write_rxd));
+	rs232.dsr_handler().set("uart1", FUNC(i8251_device::write_dsr));
+	rs232.cts_handler().set("uart1", FUNC(i8251_device::write_cts));
+
+	// uart2 - cassette - clock comes from 2MHz through a divider consisting of 4 chips and some jumpers.
+	I8251(config, m_uart, 4_MHz_XTAL / 2);
+	
+	// Needs at least a floppy at 0xc0
+	
+	SOFTWARE_LIST(config, "floppy_list").set_original("mfacpm");
+
+}
 
 /* ROM definition */
 ROM_START( mfabfz )
@@ -312,9 +488,21 @@ ROM_START( mfabfz85 )
 	ROMX_LOAD( "mfa_mat85_sp1_ed_kpl_dtp_terminal.bin", 0x0000, 0x8000, CRC(ed432c19) SHA1(31cbc06d276dbb201d50967f4ddba26a42560753), ROM_BIOS(4) )
 ROM_END
 
+ROM_START( mfacpm )
+	ROM_REGION( 0x0800, "roms", 0 ) 
+	// Original MFA CP/M boot ROM as outlined in the MFA CP/M manual
+	ROM_SYSTEM_BIOS(0, "mfacpm", "Original MFA CP/M") 
+	ROMX_LOAD( "boot-bios_2k_v03.20_mfa.bin", 0x0000, 0x0800, CRC(b543a61b) SHA1(36039c3351c6d039407027829abcc8b0a0d6f1a2), ROM_BIOS(0) )
+	// MFA Open CP/M boot ROM by Mike Douglas https://deramp.com/downloads/mfa_computer/, integrated monitor program is displayed on start
+	// The size of the ROM on Mike's site is just 0x750 as a result of a conversion from HEX and has been padded with 0x00 to the end for convenience
+	ROM_SYSTEM_BIOS(1, "mfaopen", "Open MFA CP/M") 
+	ROMX_LOAD( "monopencpm.bin", 0x0000, 0x0800, CRC(93d01a8b) SHA1(553473EDC15608A927007639AC4AA43338684D9B), ROM_BIOS(1) )
+ROM_END
+
 } // anonymous namespace
 
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT   CLASS,        INIT        COMPANY                         FULLNAME                               FLAGS */
 COMP( 1979, mfabfz,   0,      0,      mfabfz,   mfabfz, mfabfz_state, empty_init, "Berufsfoerdungszentrum Essen", "Mikrocomputer fuer Ausbildung",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
 COMP( 1979, mfabfz85, mfabfz, 0,      mfabfz85, mfabfz, mfabfz_state, empty_init, "Berufsfoerdungszentrum Essen", "Mikrocomputer fuer Ausbildung MAT85", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 1979, mfacpm,   0,      0,      mfacpm,   mfacpm, mfacpm_state, empty_init, "Berufsfoerdungszentrum Essen", "Mikrocomputer fuer Ausbildung CP/M Ausbaustufe", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
