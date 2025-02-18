@@ -158,10 +158,10 @@ Notes on possible shutms11 BIOS bugs:
     |   |__||__| <-Jacks       |______________|        |______|    |
     | _________                                               ___  |
     ||o o o o |<-Power                     ________________  |  |  |
-    |                                     | MCU           |  |  |  |
+    |                                     | MCU           |  | <-MAX232N
     |                                     |_______________|  |__|  |
     |                                      _________   Xtal        |
-    |                                     |DIPS x 8|   5 MHz       |
+    |                                     |DIPS x 8|   6 MHz       |
     |                                                              |
     |    Test sw->(o)         _________   _________   _________    |
     | Service sw->(o)         SN74HC245N  SN74HC245N  SN74HC245N   |
