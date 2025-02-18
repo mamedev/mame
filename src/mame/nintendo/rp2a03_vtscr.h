@@ -2,23 +2,23 @@
 // copyright-holders:David Shah
 /***************************************************************************
 
-    m6502_vtscr.h
+    rp2a03_vtscr.h
 
-    6502 with VRT VTxx instruction scrambling
+    RP2A03 with VRT VTxx instruction scrambling
 
 ***************************************************************************/
 
-#ifndef MAME_NINTENDO_M6502_VTSCR_H
-#define MAME_NINTENDO_M6502_VTSCR_H
+#ifndef MAME_NINTENDO_RP2A03_VTSCR_H
+#define MAME_NINTENDO_RP2A03_VTSCR_H
 
 #pragma once
 
-#include "cpu/m6502/m6502.h"
-#include "cpu/m6502/m6502d.h"
+#include "cpu/m6502/rp2a03.h"
+#include "cpu/m6502/rp2a03d.h"
 
-class m6502_vtscr : public m6502_device {
+class rp2a03_vtscr : public rp2a03_core_device {
 public:
-	m6502_vtscr(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	rp2a03_vtscr(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_next_scramble(bool scr);
 	void set_scramble(bool scr);
@@ -38,7 +38,7 @@ protected:
 
 	};
 
-	class disassembler : public m6502_disassembler {
+	class disassembler : public rp2a03_disassembler {
 	public:
 		mi_decrypt *mintf;
 
@@ -53,6 +53,6 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
 
-DECLARE_DEVICE_TYPE(M6502_VTSCR, m6502_vtscr)
+DECLARE_DEVICE_TYPE(RP2A03_VTSCR, rp2a03_vtscr)
 
-#endif // MAME_NINTENDO_M6502_VTSCR_H
+#endif // MAME_NINTENDO_RP2A03_VTSCR_H
