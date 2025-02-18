@@ -68,7 +68,6 @@ ROM/RAM sockets and User Port for a mouse.
 Emulation notes:
 
 Incomplete:
-    - Graphics (seems to be wrong for several games)
     - 1 MHz bus is not emulated
     - Bus claiming by ULA is not implemented
 
@@ -80,38 +79,28 @@ Other internal boards to emulate:
 ******************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
 #include "electron.h"
-#include "imagedev/cassette.h"
+
+#include "cpu/m6502/m6502.h"
 #include "formats/uef_cas.h"
 #include "formats/csw_cas.h"
-#include "sound/beep.h"
+#include "imagedev/cassette.h"
+
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
 
 
-void electron_state::electron_colours(palette_device &palette) const
+void electron_state::mem_map(address_map &map)
 {
-	for (int i = 0; i < palette.entries(); i++)
-	{
-		palette.set_pen_color(i ^ 7, rgb_t(pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2)));
-	}
+	map(0x0000, 0x7fff).rw(FUNC(electron_state::ram_r), FUNC(electron_state::ram_w));          /* 32KB of RAM */
+	map(0x8000, 0xffff).rw(FUNC(electron_state::rom_r), FUNC(electron_state::rom_w));          /* 32KB of ROM */
+	map(0xfc00, 0xfeff).rw(FUNC(electron_state::io_r), FUNC(electron_state::io_w));            /* IO */
 }
 
-void electron_state::electron_mem(address_map &map)
+void electron_state::opcodes_map(address_map &map)
 {
-	map(0x0000, 0x7fff).rw(FUNC(electron_state::electron_mem_r), FUNC(electron_state::electron_mem_w));          /* 32KB of RAM */
-	map(0x8000, 0xbfff).rw(FUNC(electron_state::electron_paged_r), FUNC(electron_state::electron_paged_w));      /* Banked ROM pages */
-	map(0xc000, 0xffff).rw(FUNC(electron_state::electron_mos_r), FUNC(electron_state::electron_mos_w));          /* OS ROM */
-	map(0xfc00, 0xfcff).rw(FUNC(electron_state::electron_fred_r), FUNC(electron_state::electron_fred_w));        /* FRED */
-	map(0xfd00, 0xfdff).rw(FUNC(electron_state::electron_jim_r), FUNC(electron_state::electron_jim_w));          /* JIM */
-	map(0xfe00, 0xfeff).rw(FUNC(electron_state::electron_sheila_r), FUNC(electron_state::electron_sheila_w));    /* SHEILA */
-}
-
-void electron_state::electron64_opcodes(address_map &map)
-{
-	map(0x0000, 0xffff).r(FUNC(electron_state::electron64_fetch_r));
+	map(0x0000, 0xffff).r(FUNC(electron_state::fetch_r));
 }
 
 INPUT_CHANGED_MEMBER(electron_state::trigger_reset)
@@ -246,24 +235,31 @@ void electron_state::plus3_default(device_t* device)
 void electron_state::electron(machine_config &config)
 {
 	M6502(config, m_maincpu, 16_MHz_XTAL / 8);
-	m_maincpu->set_addrmap(AS_PROGRAM, &electron_state::electron_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &electron_state::mem_map);
 	config.set_perfect_quantum(m_maincpu);
 
 	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(16_MHz_XTAL, 1024, 0, 640, 312, 0, 256);
-	//m_screen->set_raw(16_MHz_XTAL, 1024, 264, 264 + 640, 312, 28, 28 + 256)
-	m_screen->set_screen_update(FUNC(electron_state::screen_update_electron));
+	m_screen->set_screen_update(m_ula, FUNC(electron_ula_device::screen_update));
 	m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE);
-	m_screen->set_palette("palette");
 
-	PALETTE(config, "palette", FUNC(electron_state::electron_colours), 8);
+	PALETTE(config, "palette").set_entries(8);
 
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 300).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	RAM(config, m_ram).set_default_size("32K");
+
+	ELECTRON_ULA(config, m_ula, 16_MHz_XTAL);
+	m_ula->set_cpu_tag("maincpu");
+	m_ula->kbd_cb().set(FUNC(electron_state::keyboard_r));
+	m_ula->caps_lock_cb().set([this](int state) { m_capslock_led = state; });
+	m_ula->cas_mo_cb().set([this](int state) { m_cassette->set_motor(state); });
+	m_ula->cas_in_cb("cassette", FUNC(cassette_image_device::input));
+	m_ula->cas_out_cb("cassette", FUNC(cassette_image_device::output));
+	m_ula->add_route(ALL_OUTPUTS, "mono", 0.25);
+	m_ula->irq_cb().set(m_irqs, FUNC(input_merger_device::in_w<0>));
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(bbc_cassette_formats);
@@ -307,8 +303,8 @@ void electron_state::electron64(machine_config &config)
 {
 	electron(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &electron_state::electron_mem);
-	m_maincpu->set_addrmap(AS_OPCODES, &electron_state::electron64_opcodes);
+	m_maincpu->set_addrmap(AS_PROGRAM, &electron_state::mem_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &electron_state::opcodes_map);
 
 	m_ram->set_default_size("64K");
 }
