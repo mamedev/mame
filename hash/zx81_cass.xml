@@ -122,12 +122,54 @@ RAND USR 16530
 	</software>
 
 	<software name="2kgames">
-		<description>2K Games Pack</description>
+		<description>2K Games Pack (I.P.S.)</description>
 		<year>1983</year>
 		<publisher>International Publishing &amp; Software Inc.</publisher>
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="6977">
 				<rom name="2KGamesPack(IPS).tzx" size="6977" crc="c1893b03" sha1="b33fdc40eb4631617c2687795de02904c92255c3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="2kgamesyn">
+		<description>2K Games Pack (Softsync)</description>
+		<year>1983</year>
+		<publisher>Softsync</publisher>
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Copter Patrol"/>
+			<dataarea name="cass" size="1517">
+				<rom name="Copter Patrol.p" size="1517" crc="cff8846b" sha1="f55958a8d59a4433d2263a302eb6a21347be6fcc"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="Killer Whale"/>
+			<dataarea name="cass" size="1396">
+				<rom name="Killer Whale.p" size="1396" crc="3c007f48" sha1="8577c526f056921801e532e89fa2e9f27fb23aab"/>
+			</dataarea>
+		</part>
+		<part name="cass3" interface="zx81_cass">
+			<feature name="part_id" value="Astro Walk"/>
+			<dataarea name="cass" size="1247">
+				<rom name="Astro Walk.p" size="1247" crc="792a06d2" sha1="b52ebebf8a226fcdfbf58d08e202cfe7b8e1d3f7"/>
+			</dataarea>
+		</part>
+		<part name="cass4" interface="zx81_cass">
+			<feature name="part_id" value="Monster Masher"/>
+			<dataarea name="cass" size="1351">
+				<rom name="Monster Masher.p" size="1351" crc="7c414c0c" sha1="8c9cc9eeb101c47f34f8c8cefd939ff9d40996a8"/>
+			</dataarea>
+		</part>
+		<part name="cass5" interface="zx81_cass">
+			<feature name="part_id" value="Star Blaster"/>
+			<dataarea name="cass" size="1425">
+				<rom name="Star Blaster.p" size="1425" crc="1db36fef" sha1="f3fa166204d3706d0808a4e023be59ee6deb088b"/>
+			</dataarea>
+		</part>
+		<part name="cass6" interface="zx81_cass">
+			<feature name="part_id" value="Dragon Slayer"/>
+			<dataarea name="cass" size="1422">
+				<rom name="Dragon Slayer.p" size="1422" crc="1f202cdf" sha1="63983f20e7c36feedcf45ae6332416e518d316d5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -519,6 +561,7 @@ RAND USR 16530
 		<description>Algebra 1</description>
 		<year>1982</year>
 		<publisher>Timex</publisher>
+		<info name="usage" value="2K" />
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="3926">
 				<rom name="Algebra1.tzx" size="3926" crc="11f6af7c" sha1="4cfec3ba12646b6b5cf05860401750fa149fbce9"/>
@@ -561,6 +604,18 @@ RAND USR 16530
 		<part name="cass2" interface="zx81_cass">
 			<dataarea name="cass" size="15383">
 				<rom name="Alien Invaders - Side 2.tzx" size="15383" crc="2cd6b41e" sha1="33fb3083bd96941f8705209098a4698ee316cf7a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alieninv16">
+		<description>Alien Invasion 16K</description>
+		<year>198?</year>
+		<publisher>Softsync</publisher>
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="7100">
+				<rom name="Alien Invasion 16K.p" size="7100" crc="3b37ec11" sha1="09d86a57da24b7295acd6952badd835bbe19c0d8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -751,6 +806,60 @@ RAND USR 16530
 		</part>
 	</software>
 
+	<software name="athlfoot">
+		<description>Athlete's Foot (master)</description>
+		<year>1984</year>
+		<publisher>Biteware</publisher>
+		<info name="developer" value="P.F. Mofatt" />
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="13240">
+				<rom name="Athletes Foot - Master.tzx" size="13240" crc="0e107328" sha1="a3b9573b3440402f6a5acb56583d2f9405f6bb42"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="athlfoot_a" cloneof="athlfoot">
+		<description>Athlete's Foot</description>
+		<year>1984</year>
+		<publisher>Biteware</publisher>
+		<info name="developer" value="P.F. Mofatt" />
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="13240">
+				<rom name="Athletes Foot.tzx" size="13240" crc="2f131d79" sha1="4b60db52859e7818fd2779ae6518e47df32fbdfd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atorabcg">
+		<description>Ator the ABC Gator</description>
+		<year>198?</year>
+		<publisher>Timex</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K; type RUN after loading the program" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="16294">
+				<rom name="ABC.p" size="16294" crc="6ef192c2" sha1="2726ff41e25984ac8784a96c11aaa2097625cdde"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="14216">
+				<rom name="Swamp.p" size="14216" crc="bc19fe6d" sha1="f94f5ff726e915df1f68c3f42b1b59a976a427bb"/>
+			</dataarea>
+		</part>
+		<part name="cass3" interface="zx81_cass">
+			<feature name="part_id" value="Audio tape for Side A"/>
+			<dataarea name="cass" size="12698668">
+				<rom name="Audio side A.wav" size="12698668" crc="b2044e23" sha1="0022e08c201082a5102b95d34c70d2874df92048"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="autochef">
 		<description>Autochef</description>
 		<year>1982</year>
@@ -899,9 +1008,29 @@ RAND USR 16530
 		<description>Bat Cage</description>
 		<year>1982</year>
 		<publisher>Timex</publisher>
+		<info name="usage" value="2K" />
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="1446">
 				<rom name="BatCage.tzx" size="1446" crc="650a94d8" sha1="8f6842f02e416e8b66c8d6172f2e852a5e14d2f8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="battlplan">
+		<description>Battle of the Planets</description>
+		<year>1983</year>
+		<publisher>Kamisoft</publisher>
+		<info name="developer" value="R. Kaminski" />
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="15046">
+				<rom name="Battle of the Planets (Kamisoft) - Side 1.tzx" size="15046" crc="91990bbd" sha1="f767246300d3f31e95a27992109feff254a49c12"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<dataarea name="cass" size="15046">
+				<rom name="Battle of the Planets (Kamisoft) - Side 2.tzx" size="15046" crc="63431655" sha1="b30eaa4afcbce4fd5a0c9359c6626277f35e66e4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -917,10 +1046,22 @@ RAND USR 16530
 		</part>
 	</software>
 
+	<software name="batlships_a" cloneof="batlships">
+		<description>Battleships (alt)</description>
+		<year>1982</year>
+		<publisher>JRS Software</publisher>
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="12944">
+				<rom name="Battleships (JRS).tzx" size="12944" crc="37f693fb	" sha1="1a0df19df7562be4cdb36f92d066af2fc32d01b8"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bigflapatt">
 		<description>Bigflap Attack</description>
 		<year>1982</year>
 		<publisher>Timex</publisher>
+		<info name="usage" value="16K" />
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="10053">
 				<rom name="BigflapAttack.A.tzx" size="10053" crc="02352386" sha1="dc23f585b4b9094f110d2b4b805bbafc518e009f"/>
@@ -1976,6 +2117,8 @@ RAND USR 16530
 		<description>The Computer Coach</description>
 		<year>1983</year>
 		<publisher>Timex</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K; type RUN after loading the program" />
 		<part name="cass1" interface="zx81_cass">
 			<feature name="part_id" value="Part 1"/>
 			<dataarea name="cass" size="7858">
@@ -2391,6 +2534,19 @@ RAND USR 16530
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="12047">
 				<rom name="EE1FilterDesign.tzx" size="12047" crc="1159b6aa" sha1="d6714fe623f9e444c22cde90f56488a58fce0d33"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="elvalle">
+		<description>El Valle</description>
+		<year>198?</year>
+		<publisher>GIC ZX Software</publisher>
+		<info name="language" value="Spanish" />
+		<info name="usage" value="16K, after loading the program type RUN" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="14697">
+				<rom name="El Valle.p" size="14697" crc="4b4603d6" sha1="2602e92b2d90cb6a1126a360528c9427d2ddab6d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3655,6 +3811,26 @@ RAND USR 16530
 		</part>
 	</software>
 
+	<software name="gprixglf">
+		<description>Grand Prix &amp; Golf</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="16K; type RUN after loading the program" />
+		<info name="language" value="English" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Side 1 - Grand Prix"/>
+			<dataarea name="cass" size="8886">
+				<rom name="Grand Prix - Golf - Side 1.tzx" size="8886" crc="9ffbc481" sha1="ecbbef5228fafc3c46ceee267f7a80b07e6807d8"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="Side 2 - Golf"/>
+			<dataarea name="cass" size="6601">
+				<rom name="Grand Prix - Golf - Side 2.tzx" size="6601" crc="bb38b82a" sha1="767007b50a1a0f59e4f571e22370d05a94efb69d"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="graphkit">
 		<description>Graphics Kit</description>
 		<year>1981</year>
@@ -3734,6 +3910,30 @@ RAND USR 16530
 			<feature name="part_id" value="Graphics Demo"/>
 			<dataarea name="cass" size="3366">
 				<rom name="GraphicsToolkit(CI).B.GrDemo.tzx" size="3366" crc="d3ff44c3" sha1="72734c6c78005c20bccfcf1002ea3c99106aa704"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="graphix" supported="no">
+		<description>Graphix</description>
+		<year>1984</year>
+		<publisher>ERE Informatique</publisher>
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="8603">
+				<rom name="Graphix.tzx" size="8603" crc="464f23ac" sha1="18a256acce19e98a22a852d1c6a832d038b64229"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="graphix_a" cloneof="graphix" supported="no">
+		<description>Graphix (alt)</description>
+		<year>1984</year>
+		<publisher>ERE Informatique</publisher>
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="8781">
+				<rom name="Graphix_2.tzx" size="8781" crc="4a9013cd" sha1="eddbba52bf26d85d73ff856ec032063bb9051989"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5927,6 +6127,19 @@ Defender: not working
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="16181">
 				<rom name="OraclesCaveThe.tzx" size="16181" crc="dea5489a" sha1="752bb718f14e0a7e9da87fa958ccd0e366813a34"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ordidact">
+		<description>Ordidactic - 1. Language Machine</description>
+		<year>1984</year>
+		<publisher>Excelsior Publications / ERE Informatique</publisher>
+		<info name="language" value="French" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="26660">
+				<rom name="Ordidactic - 1. Language Machine.tzx" size="26660" crc="e370158b" sha1="304105926183b65d438e9fce42f21155b981a8c8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9748,6 +9961,19 @@ Defender: not working
 		</part>
 	</software>
 
+	<software name="battlzxn">
+		<description>Battle ZXone</description>
+		<year>2022</year>
+		<publisher>Busker Games</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="13236">
+				<rom name="BattleZXone.p" size="13236" crc="37a77b37" sha1="f80b984f918e721477cba752f37d0b5bcd7fa04c"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="battlot">
 		<description>Battlot</description>
 		<year>2022</year>
@@ -9757,6 +9983,19 @@ Defender: not working
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="9224">
 				<rom name="battlot.p" size="9224" crc="342a5182" sha1="6ef6dc287bd70a58376c1cce093d795223adfeb2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bmxtrial">
+		<description>BMX Trial</description>
+		<year>2022</year>
+		<publisher>Salvacam</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="14075">
+				<rom name="BMXTrial.p" size="14075" crc="82c60bc3" sha1="4d0bd9ea783cab23dc1d1acfaca4556324913ad8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9840,6 +10079,34 @@ Defender: not working
 		</part>
 	</software>
 
+	<software name="ccatacom">
+		<description>Cursed Catacombs (v2.0)</description>
+		<year>2022</year>
+		<publisher>Naranjito Games</publisher>
+		<info name="developer" value="Walter Ariel Risi" />
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="12714">
+				<rom name="cursed_catacombs_final_v2.p" size="12714" crc="7bcd9ee6" sha1="17909840bae0f44132f97c52551db3f40c84efe1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ccatacom_a"  cloneof="ccatacom">
+		<description>Cursed Catacombs (v2.1, ZXpand joystick)</description>
+		<year>2022</year>
+		<publisher>Naranjito Games</publisher>
+		<info name="developer" value="Walter Ariel Risi" />
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="12703">
+				<rom name="cursed_catacombs__v2.1_zxpand.p" size="12703" crc="693adc81" sha1="22e5d3015b466747896c90d4faac0bd36faf979e"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="domin8tr">
 		<description>Domin8tr1s</description>
 		<year>2010</year>
@@ -9863,6 +10130,20 @@ Defender: not working
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="16189">
 				<rom name="Down (2012) - Full Version.p" size="16189" crc="11b509f9" sha1="e048c10af990ff2ef9086962b89801911e1e8106"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dgzedd">
+		<description>Dungeons of Zedd</description>
+		<year>2022</year>
+		<publisher>Naranjito Games</publisher>
+		<info name="developer" value="Walter Ariel Risi" />
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="15484">
+				<rom name="dungeons_of_zedd_final.p" size="15484" crc="a09b63de" sha1="eed30567897bc666882366ebd875eb92441c70ef"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9942,6 +10223,19 @@ Defender: not working
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="7786">
 				<rom name="mazy.p" size="7786" crc="6332b815" sha1="ad28a2e73f9be1a2948afcb6772bc478396e6571"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mieyen">
+		<description>Mieyen</description>
+		<year>2025</year>
+		<publisher>Inufuto</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K, type RUN after loading the tape" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="7099">
+				<rom name="mieyen.p" size="7099" crc="f249a88b" sha1="fd20c684313711dc48feab00ce6211945eac2093"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10153,6 +10447,20 @@ Defender: not working
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="7909">
 				<rom name="yewdow.p" size="7909" crc="7c5b686b" sha1="88ef9ea679b414296eb01ed5a4dbe875b8ae1a90"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zeddytrn">
+		<description>Zeddytron 2081</description>
+		<year>2022</year>
+		<publisher>Naranjito Games</publisher>
+		<info name="developer" value="Walter Ariel Risi" />
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="16233">
+				<rom name="zeddytron_2081_final.p" size="16233" crc="f74aef2a" sha1="a5224eae95e501742bfdbb66ee0255012feeaccd"/>
 			</dataarea>
 		</part>
 	</software>
