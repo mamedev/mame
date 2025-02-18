@@ -36,12 +36,19 @@ private:
 void pmp11_state::pdp11_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xefff).ram();
-	map(0xf000, 0xf7ff).rom();
-	map(0xf800, 0xfbff).ram();
-	// TODO: Not sure if these are mirrored, but no control_w on alternate address
-	map(0xff70, 0xff71).mirror(0x4).umask16(0x00ff).rw(m_uart1, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0xff72, 0xff73).mirror(0x4).umask16(0x00ff).rw(m_uart1, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0000000, 0167777).ram();
+	map(0170000, 0173777).rom().region("maincpu", 0);
+	map(0174000, 0175777).ram();
+	map(0176500, 0176500).r(m_uart2, FUNC(i8251_device::status_r));
+	map(0176502, 0176502).r(m_uart2, FUNC(i8251_device::data_r));
+	map(0176504, 0176507).nopr();
+	map(0176504, 0176504).w(m_uart2, FUNC(i8251_device::control_w));
+	map(0176506, 0176506).w(m_uart2, FUNC(i8251_device::data_w));
+	map(0177560, 0177560).r(m_uart1, FUNC(i8251_device::status_r));
+	map(0177562, 0177562).r(m_uart1, FUNC(i8251_device::data_r));
+	map(0177564, 0177567).nopr();
+	map(0177564, 0177564).w(m_uart1, FUNC(i8251_device::control_w));
+	map(0177566, 0177566).w(m_uart1, FUNC(i8251_device::data_w));
 }
 
 /* Input ports */
@@ -93,8 +100,8 @@ void pmp11_state::pmp11(machine_config &config)
 }
 
 ROM_START( pmp11 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "rom.bin", 0xf000, 0x0800, CRC(2cfdc3a3) SHA1(50ffa2a3bd0b75c1ecb4ab6c691796ab0d85dd4e))
+	ROM_REGION( 0x0800, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "rom.bin", 0x0000, 0x0800, CRC(2cfdc3a3) SHA1(50ffa2a3bd0b75c1ecb4ab6c691796ab0d85dd4e))
 ROM_END
 
 } // Anonymous namespace
