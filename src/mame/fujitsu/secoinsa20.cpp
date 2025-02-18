@@ -603,9 +603,9 @@ ROM_START( secoinsa20 )
 	ROM_LOAD( "62-000019-02-a0_n82s181n.u14",     0x0800, 0x0400, CRC(94f9ed35) SHA1(2a14134849213a733b05b9e216b45909c36bd859) )
 
 	ROM_REGION(0x00117, "plds", 0)
-	ROM_LOAD( "asp1_2m_v00.1_pal16l8.2m",         0x0000, 0x0117, NO_DUMP ) // On PCB SM16B-0200-0010
+	ROM_LOAD( "asp1_2m_v00.1_pal16l8.2m",         0x0000, 0x0117, BAD_DUMP CRC(c20eae34) SHA1(9a879350be345ea757ba7b6636a9c789932b75b4)) // On PCB SM16B-0200-0010, bruteforced
 	ROM_LOAD( "asp2_2l_v00.1_pal16l8.2l",         0x0000, 0x0117, NO_DUMP ) // On PCB SM16B-0200-0010
-	ROM_LOAD( "asp_p3_2k_v00.1_pal16l8.2k",       0x0000, 0x0117, NO_DUMP ) // On PCB SM16B-0200-0010
+	ROM_LOAD( "asp_p3_2k_v00.1_pal16l8.2k",       0x0000, 0x0117, BAD_DUMP CRC(4838b218) SHA1(312a2cca2a403776f6d861763258edee17a040b8)) // On PCB SM16B-0200-0010, bruteforced
 	ROM_LOAD( "palp1_1d_v00.1_pal16l8.1d",        0x0000, 0x0117, NO_DUMP ) // On PCB SM16B-0200-0170
 	ROM_LOAD( "palp2_1c_v00.1_pal16r4.1c",        0x0000, 0x0117, NO_DUMP ) // On PCB SM16B-0200-0170
 	ROM_LOAD( "palp3_3u_v00.1_pal16l8.3u",        0x0000, 0x0117, NO_DUMP ) // On PCB SM16B-0200-0170
@@ -613,9 +613,9 @@ ROM_START( secoinsa20 )
 	ROM_LOAD( "palp5_2p_v00.2_pal16l8.2p",        0x0000, 0x0117, NO_DUMP ) // On PCB SM16B-0200-0170
 	ROM_LOAD( "pcpu_2h_v00.1_pal16l8.2h",         0x0000, 0x0117, NO_DUMP ) // On CPU PCB
 	ROM_LOAD( "pss1_1h_v00.1_pal16l8.1h",         0x0000, 0x0117, NO_DUMP ) // On PCB SM16B-0200-0140
-	ROM_LOAD( "pss2_1k_v00.1_pal16l8.1k",         0x0000, 0x0117, NO_DUMP ) // On PCB SM16B-0200-0140
+	ROM_LOAD( "pss2_1k_v00.1_pal16l8.1k",         0x0000, 0x0117, BAD_DUMP CRC(069664b1) SHA1(c5d32b20a3e9985dd1cb23acfe73f1f8be2e270d)) // On PCB SM16B-0200-0140, bruteforced
 	ROM_LOAD( "pss3_1a_v00.2_pal16r4.1a",         0x0000, 0x0117, NO_DUMP ) // On PCB SM16B-0200-0140
-	ROM_LOAD( "pss4_2g_v00.1_pal16l8.2g",         0x0000, 0x0117, NO_DUMP ) // On PCB SM16B-0200-0140
+	ROM_LOAD( "pss4_2g_v00.1_pal16l8.2g",         0x0000, 0x0117, BAD_DUMP CRC(34f23cf6) SHA1(c67f0c1878e1a93787bcd09647162e174218fd6f)) // On PCB SM16B-0200-0140, bruteforced
 	ROM_LOAD( "pss5_1n_v00.2_pal16r4.1n",         0x0000, 0x0117, NO_DUMP ) // On PCB SM16B-0200-0140
 	ROM_LOAD( "pss6_2m_v00.1_pal16l8.2m",         0x0000, 0x0117, NO_DUMP ) // On PCB SM16B-0200-0140
 ROM_END
@@ -624,4 +624,3 @@ ROM_END
 
 //    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT        COMPANY     FULLNAME    FLAGS
 COMP( 1981, secoinsa20, 0,      0,      secoinsa20, secoinsa20, secoinsa20_state, empty_init, "Secoinsa", "Serie 20", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-
