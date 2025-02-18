@@ -485,8 +485,8 @@ void taitof2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 	non zoom parts.
 
 	*/
-	int big_sprite = 0;
-	int y_no = 0, x_no = 0, xlatch = 0, ylatch = 0, last_continuation_tile = 0;   /* for zooms */
+	bool big_sprite = false, last_continuation_tile = false;
+	int y_no = 0, x_no = 0, xlatch = 0, ylatch = 0;   /* for zooms */
 	u32 zoomword, zoomx, zoomy, zx = 0, zy = 0, zoomxlatch = 0, zoomylatch = 0;   /* for zooms */
 	int scrollx = 0, scrolly = 0;
 
@@ -547,24 +547,14 @@ void taitof2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 		/* check for extra scroll offset */
 		if ((m_spriteram_buffered[(offs + 4) / 2] & 0xf000) == 0xa000)
 		{
-			master_scrollx = m_spriteram_buffered[(offs + 4) / 2] & 0xfff;
-			if (master_scrollx >= 0x800)
-				master_scrollx -= 0x1000;   /* signed value */
-
-			master_scrolly = m_spriteram_buffered[(offs + 6) / 2] & 0xfff;
-			if (master_scrolly >= 0x800)
-				master_scrolly -= 0x1000;   /* signed value */
+			master_scrollx = util::sext(m_spriteram_buffered[(offs + 4) / 2], 12);
+			master_scrolly = util::sext(m_spriteram_buffered[(offs + 6) / 2], 12);
 		}
 
 		if ((m_spriteram_buffered[(offs + 4) / 2] & 0xf000) == 0x5000)
 		{
-			scroll1x = m_spriteram_buffered[(offs + 4) / 2] & 0xfff;
-			if (scroll1x >= 0x800)
-				scroll1x -= 0x1000;   /* signed value */
-
-			scroll1y = m_spriteram_buffered[(offs + 6) / 2] & 0xfff;
-			if (scroll1y >= 0x800)
-				scroll1y -= 0x1000;   /* signed value */
+			scroll1x = util::sext(m_spriteram_buffered[(offs + 4) / 2], 12);
+			scroll1y = util::sext(m_spriteram_buffered[(offs + 6) / 2], 12);
 		}
 
 		if (disabled)
@@ -574,9 +564,9 @@ void taitof2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 
 		const u16 spritecont = (spritedata & 0xff00) >> 8;
 
-		if ((spritecont & 0x08) != 0)   /* sprite continuation flag set */
+		if (BIT(spritecont, 3))   /* sprite continuation flag set */
 		{
-			if (big_sprite == 0)   /* are we starting a big sprite ? */
+			if (!big_sprite)   /* are we starting a big sprite ? */
 			{
 				xlatch = m_spriteram_buffered[(offs + 4) / 2] & 0xfff;
 				ylatch = m_spriteram_buffered[(offs + 6) / 2] & 0xfff;
@@ -585,12 +575,12 @@ void taitof2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 				zoomword = m_spriteram_buffered[(offs + 2) / 2];
 				zoomylatch = (zoomword >> 8) & 0xff;
 				zoomxlatch = (zoomword >> 0) & 0xff;
-				big_sprite = 1;   /* we have started a new big sprite */
+				big_sprite = true;   /* we have started a new big sprite */
 			}
 		}
 		else if (big_sprite)
 		{
-			last_continuation_tile = 1;   /* don't clear big_sprite until last tile done */
+			last_continuation_tile = true;   /* don't clear big_sprite until last tile done */
 		}
 
 
@@ -601,7 +591,7 @@ void taitof2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 // The bigsprite == 0 check fixes "tied-up" little sprites in Thunderfox
 // which (mostly?) have spritecont = 0x20 when they are not continuations
 // of anything.
-		if (big_sprite == 0 || (spritecont & 0xf0) == 0)
+		if ((!big_sprite) || (spritecont & 0xf0) == 0)
 		{
 			x = m_spriteram_buffered[(offs + 4) / 2];
 
@@ -687,8 +677,8 @@ void taitof2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 
 		if (last_continuation_tile)
 		{
-			big_sprite = 0;
-			last_continuation_tile = 0;
+			big_sprite = false;
+			last_continuation_tile = false;
 		}
 
 		u32 code = 0;
@@ -698,26 +688,26 @@ void taitof2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 
 		if (m_sprite_type == 0)
 		{
-			code = m_spriteram_buffered[(offs) / 2] & 0x1fff;
+			code = m_spriteram_buffered[offs / 2] & 0x1fff;
 			const u32 i = (code & 0x1c00) >> 10;
 			code = m_spritebank[i] + (code & 0x3ff);
 		}
 
 		if (m_sprite_type == 1)   /* Yuyugogo */
 		{
-			code = m_spriteram_buffered[(offs) / 2] & 0x3ff;
+			code = m_spriteram_buffered[offs / 2] & 0x3ff;
 			code |= (m_sprite_extension[(extoffs >> 4)] & 0x3f) << 10;
 		}
 
 		if (m_sprite_type == 2)   /* Pulirula */
 		{
-			code = m_spriteram_buffered[(offs) / 2] & 0xff;
+			code = m_spriteram_buffered[offs / 2] & 0xff;
 			code |= (m_sprite_extension[(extoffs >> 4)] & 0xff00);
 		}
 
 		if (m_sprite_type == 3)   /* Dinorex and a few quizzes */
 		{
-			code = m_spriteram_buffered[(offs) / 2] & 0xff;
+			code = m_spriteram_buffered[offs / 2] & 0xff;
 			code |= (m_sprite_extension[(extoffs >> 4)] & 0xff) << 8;
 		}
 
@@ -726,11 +716,8 @@ void taitof2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 		int flipx = BIT(spritecont, 0);
 		int flipy = BIT(spritecont, 1);
 
-		int curx = (x + scrollx) & 0xfff;
-		if (curx >= 0x800)  curx -= 0x1000;   /* treat it as signed */
-
-		int cury = (y + scrolly) & 0xfff;
-		if (cury >= 0x800)  cury -= 0x1000;   /* treat it as signed */
+		int curx = util::sext(x + scrollx, 12);
+		int cury = util::sext(y + scrolly, 12);
 
 		if (m_sprites_flipscreen)
 		{
@@ -854,13 +841,8 @@ void taitof2_state::update_sprites_active_area()
 		/* check for extra scroll offset */
 		if ((m_spriteram_buffered[(offs + 4) / 2] & 0xf000) == 0xa000)
 		{
-			m_sprites_master_scrollx = m_spriteram_buffered[(offs + 4) / 2] & 0xfff;
-			if (m_sprites_master_scrollx >= 0x800)
-				m_sprites_master_scrollx -= 0x1000;   /* signed value */
-
-			m_sprites_master_scrolly = m_spriteram_buffered[(offs + 6) / 2] & 0xfff;
-			if (m_sprites_master_scrolly >= 0x800)
-				m_sprites_master_scrolly -= 0x1000;   /* signed value */
+			m_sprites_master_scrollx = util::sext(m_spriteram_buffered[(offs + 4) / 2], 12);
+			m_sprites_master_scrolly = util::sext(m_spriteram_buffered[(offs + 6) / 2], 12);
 		}
 	}
 }
