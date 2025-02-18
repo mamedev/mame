@@ -75,6 +75,11 @@ TODO:
 - hookup lamps and do layouts
 - keyboard inputs for mahjong games
 - use real values for reel tilemaps offsets instead of hardcoded ones (would fix magslot)
+- complete inputs for baile, yyhm, jinpaish (needs someone who understands Chinese and
+  knows how to play)
+- game logic in baile seems broken (you always win), maybe due to the patches?
+- broken title GFX in yyhm (transparent pen problem?)
+- the newer games seem to use range 0x9e1000-0x9e1fff during gameplay
 
 Video references:
 rbspm: https://www.youtube.com/watch?v=pPk-6N1wXoE
@@ -129,19 +134,19 @@ public:
 	{
 	}
 
-	void rbmk(machine_config &config);
-	void rbspm(machine_config &config);
-	void ssanguoj(machine_config &config);
+	void rbmk(machine_config &config) ATTR_COLD;
+	void rbspm(machine_config &config) ATTR_COLD;
+	void ssanguoj(machine_config &config) ATTR_COLD;
 
-	void super555(machine_config &config);
+	void super555(machine_config &config) ATTR_COLD;
 
-	void init_ballch();
-	void init_cots();
-	void init_rbspm();
-	void init_sball2k1();
-	void init_ssanguoj();
-	void init_sscs();
-	void init_super555();
+	void init_ballch() ATTR_COLD;
+	void init_cots() ATTR_COLD;
+	void init_rbspm() ATTR_COLD;
+	void init_sball2k1() ATTR_COLD;
+	void init_ssanguoj() ATTR_COLD;
+	void init_sscs() ATTR_COLD;
+	void init_super555() ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -202,9 +207,12 @@ public:
 	{
 	}
 
-	void init_sc2in1();
+	void init_baile() ATTR_COLD;
+	void init_jinpaish() ATTR_COLD;
+	void init_sc2in1() ATTR_COLD;
+	void init_yyhm() ATTR_COLD;
 
-	void magslot(machine_config &config);
+	void magslot(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -1256,6 +1264,127 @@ static INPUT_PORTS_START( sc2in1 )
 	PORT_DIPSETTING(       0x0080, "Joystick" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( jinpaish )
+	PORT_INCLUDE( sc2in1 )
+
+	PORT_MODIFY("IN1") // TODO: likely incomplete
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_SERVICE_NO_TOGGLE(0x02, IP_ACTIVE_LOW)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME( "Select" )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "Show Card" )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	// Only 1 8-DIP bank on PCB. Dips' effects as per test mode.
+	PORT_MODIFY("DSW1")
+	PORT_DIPUNUSED_DIPLOC( 0x0001, 0x0000, "SW1:1") // first 5 seem hardcoded to Single Player / No connection
+	PORT_DIPUNUSED_DIPLOC( 0x0002, 0x0000, "SW1:2")
+	PORT_DIPUNUSED_DIPLOC( 0x0004, 0x0000, "SW1:3")
+	PORT_DIPUNUSED_DIPLOC( 0x0008, 0x0000, "SW1:4")
+	PORT_DIPUNUSED_DIPLOC( 0x0010, 0x0000, "SW1:5")
+	PORT_DIPNAME(          0x0020, 0x0000, "Display Game Title" ) PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(               0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(               0x0000, DEF_STR( On ) )
+	PORT_DIPNAME(          0x0040, 0x0000, "Game Password" ) PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(               0x0000, DEF_STR( Normal ) )
+	PORT_DIPSETTING(               0x0040, "Power On" )
+	PORT_DIPNAME(          0x0080, 0x0000, "Connector" ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(               0x0000, "Joystick" )
+	PORT_DIPSETTING(               0x0080, "Mahjong" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( baile )
+	PORT_INCLUDE( sc2in1 )
+
+	PORT_MODIFY("IN1") // TODO: likely incomplete
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_SERVICE_NO_TOGGLE(0x02, IP_ACTIVE_LOW)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "Tie Bet" )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME( "Player Bet" )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME( "Banker Bet" )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME( "Bet Modifier" )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	// Only 1 8-DIP bank on PCB. Most options appear to be software settings.
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME(           0x0001, 0x0000, DEF_STR( Test ) ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(                0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(                0x0001, DEF_STR( On ) )
+	PORT_DIPNAME(           0x0002, 0x0002, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(                0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(                0x0002, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0004, 0x0004, "SW1:3")
+	PORT_DIPUNKNOWN_DIPLOC( 0x0008, 0x0008, "SW1:4")
+	PORT_DIPUNKNOWN_DIPLOC( 0x0010, 0x0010, "SW1:5")
+	PORT_DIPUNKNOWN_DIPLOC( 0x0020, 0x0020, "SW1:6")
+	PORT_DIPUNKNOWN_DIPLOC( 0x0040, 0x0040, "SW1:7")
+	PORT_DIPNAME(           0x0080, 0x0000, "Connector" ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(                0x0000, "Joystick" )
+	PORT_DIPSETTING(                0x0080, "Mahjong" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( yyhm )
+	PORT_INCLUDE( sc2in1 )
+
+	PORT_MODIFY("IN1") // TODO: likely incomplete
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_SERVICE_NO_TOGGLE(0x02, IP_ACTIVE_LOW)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON2 ) // also used to select in test mode
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	// Only 1 8-DIP bank on PCB. Dips' effects as per test mode.
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME(          0x0001, 0x0001, DEF_STR( Test ) ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(               0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(               0x0000, DEF_STR( On ) )
+	PORT_DIPNAME(          0x0002, 0x0002, "Voice Announcements" ) PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(               0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(               0x0002, DEF_STR( On ) )
+	PORT_DIPNAME(          0x0004, 0x0004, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(               0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(               0x0004, DEF_STR( On ) )
+	PORT_DIPNAME(          0x0008, 0x0008, "Scoring Type" ) PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(               0x0000, "Mahjong Tile Scoring" )
+	PORT_DIPSETTING(               0x0008, "Numeric Scoring" )
+	PORT_DIPUNUSED_DIPLOC( 0x0010, 0x0010, "SW1:5") // No effect listed in test mode
+	PORT_DIPUNUSED_DIPLOC( 0x0020, 0x0020, "SW1:6") // "
+	PORT_DIPUNUSED_DIPLOC( 0x0040, 0x0040, "SW1:7") // "
+	PORT_DIPNAME(          0x0080, 0x0000, "Connector" ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(               0x0000, "Joystick" )
+	PORT_DIPSETTING(               0x0080, "Mahjong" )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( ballch )
 	PORT_START("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2037,6 +2166,57 @@ ROM_START( sc2in1 )
 	ROM_LOAD16_WORD_SWAP( "is93c46.u136", 0x00, 0x080, CRC(f0552ce8) SHA1(2dae746d9808d8a37f4f928dedda500063efdcfe) )
 ROM_END
 
+ROM_START( jinpaish ) // some of the labels were partly unreadable, all labels have 金牌 梭哈 before what's reported below
+	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD( "0922_1a59.u64", 0x00000, 0x80000, CRC(e0d9d814) SHA1(f3c9adabdfe517c2b944a82b36483af1088819b4) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "s1_dce4.u83", 0x00000, 0x80000, BAD_DUMP CRC(e236a02d) SHA1(21361739c2d9b62249dfccc176638a6f375c313c) ) // same as cots??? label seems original, but sounds are clearly wrong
+
+	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_LOAD( "a1.u178", 0x000000, 0x200000, CRC(eaceb446) SHA1(db312f555e060eea6450f506cbbdca8874a05d58) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD( "t1_9269.u39", 0x00000, 0x80000, CRC(b87f62c0) SHA1(108c32271fb4802aec0606ff70d10be4fb0846bd) )
+
+	ROM_REGION( 0x80000, "gfx3", 0 )
+	ROM_LOAD( "u1_2b6_.u169", 0x00000, 0x80000, CRC(31cdca7c) SHA1(eb60bc85408ecfc40dabac2b11f3d9bfc5467d3e) )
+ROM_END
+
+ROM_START( baile ) // all labels have 百乐 before what's reported below
+	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD( "2005_v3.2_918a.u64", 0x00000, 0x80000, CRC(f1d01a43) SHA1(a36af064cf45261d360bf3c8abc9c7a919fe40c0) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "2005_s1_78ac.u83", 0x00000, 0x80000, CRC(ab51ca24) SHA1(a867b52af2938779c83f4d5a24bc99ec7c2bf90e) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_LOAD( "2005_a1_1a5e.u178", 0x000000, 0x200000, CRC(0e338aeb) SHA1(8c645b0658bbbbd53bab7d769723abe08eee7acd) ) // 1xxxxxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD( "2005_t1_20cb.u39", 0x00000, 0x80000, CRC(bdb9a0d3) SHA1(0e8f675d244e7fe2eada90d02e836afc0e2840ca) )
+
+	ROM_REGION( 0x20000, "gfx3", 0 )
+	ROM_LOAD( "2005_u1_7fe2.u169", 0x00000, 0x20000, CRC(d6216c9d) SHA1(693c6cd44e5d74f372ee3c8e5a0b1bd59f42bf22) )
+ROM_END
+
+ROM_START( yyhm ) // some of the labels were partly unreadable, all have 鸳鸯蝴蝶梦 before what's reported below
+	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD( "8a_9___.u64", 0x00000, 0x80000, CRC(ed1572fd) SHA1(d9bddc105b1c4eaa22226785d12152a058f283e6) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "s1_f___.u83", 0x00000, 0x80000, CRC(beaf22fb) SHA1(cccb547360a6b694bc3c976406ad36a5b7cc785d) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_LOAD( "a1_c___.u178", 0x000000, 0x200000, CRC(a8e8aad5) SHA1(7576549fc23d5863d0affc27717492199bda2a6f) ) // 1xxxxxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD( "t1_aabe.u39", 0x00000, 0x80000, CRC(767bc6c3) SHA1(c1ccd6940e00c82278030a2c0875c411f1a0c1af) )
+
+	ROM_REGION( 0x40000, "gfx3", 0 )
+	ROM_LOAD( "u1_333a.u169", 0x00000, 0x40000, CRC(4ceec182) SHA1(6c43db0ccf8f6c9c4350b072ebe7101cfbb1763f) ) // 1xxxxxxxxxxxxxxxxx = 0xFF
+ROM_END
+
 
 // the PCB is slightly different from the others, both layout-wise and component-wise, but it's mostly compatible. It seems to use one more GFX layer and not to have the 89C51.
 // GMS-branded chips: A66, A89, A201, A202. Not populated: M88
@@ -2186,6 +2366,45 @@ void gms_2layers_state::init_sball2k1()
 	rom[0x1552a / 2] = 0x4e71; // U135 ERROR
 }
 
+void gms_3layers_state::init_baile()
+{
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+
+	// U135 ERROR
+	rom[0xb494 / 2] = 0x6000;
+	rom[0xb4a6 / 2] = 0x4e71;
+	rom[0xb4a8 / 2] = 0x4e71;
+
+	// U136 ERROR
+	rom[0xb4ba / 2] = 0x6000;
+	rom[0xb530 / 2] = 0x6000;
+	rom[0xb542 / 2] = 0x4e71;
+	rom[0xb544 / 2] = 0x4e71;
+}
+
+void gms_3layers_state::init_jinpaish()
+{
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+
+	// U135 ERROR
+	rom[0x319f0 / 2] = 0x4e71;
+	rom[0x319f2 / 2] = 0x4e71;
+	rom[0x31a0a / 2] = 0x6000;
+	rom[0x31a1a / 2] = 0x4e71;
+	rom[0x31a1c / 2] = 0x4e71;
+
+	// U136 ERROR
+	rom[0x31a4a / 2] = 0x6000;
+	rom[0x31f38 / 2] = 0x6000;
+	rom[0x31f4a / 2] = 0x4e71;
+	rom[0x31f4c / 2] = 0x4e71;
+
+	// U181 ERROR
+	rom[0x31f64 / 2] = 0x6000;
+	rom[0x31f74 / 2] = 0x4e71;
+	rom[0x31f76 / 2] = 0x4e71;
+}
+
 void gms_3layers_state::init_sc2in1()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
@@ -2200,6 +2419,20 @@ void gms_3layers_state::init_sc2in1()
 	rom[0x4681a / 2] = 0x4e71;
 	rom[0x46842 / 2] = 0x4e71;
 	rom[0x46844 / 2] = 0x4e71;
+}
+
+void gms_3layers_state::init_yyhm()
+{
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+
+	// REPAIR ERROR
+	rom[0x9a2 / 2] = 0x6000;
+	rom[0x9b4 / 2] = 0x4e71;
+	rom[0x9b6 / 2] = 0x4e71;
+	rom[0x9d4 / 2] = 0x6000;
+	rom[0xb7a / 2] = 0x6000;
+	rom[0xb8c / 2] = 0x4e71;
+	rom[0xb8e / 2] = 0x4e71;
 }
 
 void gms_2layers_state::init_super555()
@@ -2252,12 +2485,15 @@ void gms_2layers_state::init_sscs()
 GAME( 1998, rbmk,     0, rbmk,     rbmk,     gms_2layers_state, empty_init,    ROT0,  "GMS", "Shizhan Majiang Wang (Version 8.8)",                  MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // misses YM2151 hookup
 GAME( 1998, rbspm,    0, rbspm,    rbspm,    gms_2layers_state, init_rbspm,    ROT0,  "GMS", "Shizhan Ding Huang Maque (Version 4.1)",              MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now. Misses YM2151 hookup
 GAME( 1998, ssanguoj, 0, ssanguoj, ssanguoj, gms_2layers_state, init_ssanguoj, ROT0,  "GMS", "Shizhan Sanguo Ji Jiaqiang Ban (Version 8.9 980413)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now. YM3812 isn't hooked up (goes through undumped MCU).
+GAME( 2005, yyhm,     0, magslot,  yyhm,     gms_3layers_state, init_yyhm,     ROT0,  "GMS", "Yuanyan Hudie Meng (Version 8.8A 2005-09-25)",        MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now. Also needs EEPROM support.
 
 // card games
 GAME( 1999, super555, 0, super555, super555, gms_2layers_state, init_super555, ROT0,  "GMS", "Super 555 (English version V1.5)",                    MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // stops during boot, patched for now. Also needs EEPROM support.
 GAME( 1999, sscs,     0, super555, sscs,     gms_2layers_state, init_sscs,     ROT0,  "GMS", "San Se Caishen (Version 0502)",                       MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // stops during boot, patched for now. Also needs EEPROM support.
 GAME( 2001, sball2k1, 0, super555, sball2k1, gms_2layers_state, init_sball2k1, ROT0,  "GMS", "Super Ball 2001 (Italy version 5.23)",                MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // stops during boot, patched for now. Also needs EEPROM support.
 GAME( 2001, sc2in1,   0, magslot,  sc2in1,   gms_3layers_state, init_sc2in1,   ROT0,  "GMS", "Super Card 2 in 1 (English version 03.23)",           MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // stops during boot, patched for now. Also needs EEPROM support.
+GAME( 2004, jinpaish, 0, magslot,  jinpaish, gms_3layers_state, init_jinpaish, ROT0,  "GMS", "Jinpai Show Hand (Chinese version 2004-09-22)",       MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // stops during boot, patched for now. Also needs EEPROM support. Also needs correct controls.
+GAME( 2005, baile,    0, magslot,  baile,    gms_3layers_state, init_baile,    ROT0,  "GMS", "Baile 2005 (V3.2 2005-01-12)",                        MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // stops during boot, patched for now. Also needs EEPROM support.
 
 // slot, on slightly different PCB
 GAME( 2003, magslot,  0, magslot,  magslot,  gms_3layers_state, empty_init,    ROT0,  "GMS", "Magic Slot (normal 1.0C)",                            MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // reel / tilemaps priorities are wrong, inputs to be verified. Also needs EEPROM support.
