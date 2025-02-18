@@ -1,0 +1,131 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+	<element name="vfdtext"><text string="VFD:" /></element>
+	<element name="ledtext"><text string="LEDs:" /></element>
+	<element name="lamptext"><text string="Lamps:" /></element>
+	<element name="odtext"><text string="Open-Drains:" /></element>
+	<element name="heartbeat_txt"><text string="+5v/Heartbeat:" /></element>
+	<element name="aux0_txt"><text string="AUX0:" /></element>
+	<element name="aux1_txt"><text string="AUX1:" /></element>
+	<element name="aux2_txt"><text string="AUX2:" /></element>
+	<element name="aux3_txt"><text string="AUX3:" /></element>
+	<element name="aux4_txt"><text string="AUX4:" /></element>
+	<element name="aux5_txt"><text string="AUX5:" /></element>
+	<element name="aux6_txt"><text string="AUX6:" /></element>
+	<element name="aux7_txt"><text string="AUX7:" /></element>
+
+	<element name="lampdot">
+		<disk state="0"><color red="1.0" green="0.75" blue="0.1" alpha="0.2" /></disk>
+		<disk state="1"><color red="1.0" green="0.75" blue="0.1" alpha="0.5" /></disk>
+		<disk state="2"><color red="1.0" green="0.75" blue="0.1" alpha="0.55" /></disk>
+		<disk state="3"><color red="1.0" green="0.75" blue="0.1" alpha="0.6" /></disk>
+		<disk state="4"><color red="1.0" green="0.75" blue="0.1" alpha="0.65" /></disk>
+		<disk state="5"><color red="1.0" green="0.75" blue="0.1" alpha="0.7" /></disk>
+		<disk state="6"><color red="1.0" green="0.75" blue="0.1" alpha="0.8" /></disk>
+		<disk state="7"><color red="1.0" green="0.75" blue="0.1" alpha="0.9" /></disk>
+		<disk state="8"><color red="1.0" green="0.75" blue="0.1" alpha="1.0" /></disk>
+	</element>
+
+	<element name="7seg">
+		<rect state="0"><color red="1.0" green="0.0" blue="0.0" alpha="0.2" /></rect>
+		<rect state="1"><color red="1.0" green="0.0" blue="0.0" alpha="0.5" /></rect>
+		<rect state="2"><color red="1.0" green="0.0" blue="0.0" alpha="0.55" /></rect>
+		<rect state="3"><color red="1.0" green="0.0" blue="0.0" alpha="0.6" /></rect>
+		<rect state="4"><color red="1.0" green="0.0" blue="0.0" alpha="0.65" /></rect>
+		<rect state="5"><color red="1.0" green="0.0" blue="0.0" alpha="0.7" /></rect>
+		<rect state="6"><color red="1.0" green="0.0" blue="0.0" alpha="0.8" /></rect>
+		<rect state="7"><color red="1.0" green="0.0" blue="0.0" alpha="0.9" /></rect>
+		<rect state="8"><color red="1.0" green="0.0" blue="0.0" alpha="1.0" /></rect>
+	</element>
+
+	<element name="outputdot">
+		<disk state="0"><color red="0.25" green="0.1" blue="0.0" /></disk>
+		<disk state="1"><color red="1.0" green="0.75" blue="0.1" /></disk>
+	</element>
+	
+	<element name="led">
+		<led7seg><color red="1.0" green="0.1" blue="0.15" /></led7seg>
+	</element>
+
+	<element name="vfd">
+		<led14segsc><color red="0.0" green="0.75" blue="0.9" /></led14segsc>
+	</element>
+
+	<view name="Lamps">
+		<!-- Screen 0 -->
+		<screen index="0">
+			<bounds left="0" top="0" right="640" bottom="480"/>
+		</screen>
+
+		<!-- 16 14sc-Segment Displays-->
+		<element name="vfdtext" ref="vfdtext"><bounds x="0" y="485" width="48" height="16"/></element>
+		<repeat count="16">
+			<param name="vfdnum" start="0" increment="1" />
+			<param name="vfdx" start="0" increment="28" />
+			<element name="vfd~vfdnum~" ref="vfd" state="0">
+				<bounds x="~vfdx~" y="505" width="25" height="45"/>
+			</element>
+		</repeat>
+
+		<!-- 32x7 Segment Displays-->
+		<element name="ledtext" ref="ledtext"><bounds x="0" y="565" width="48" height="16"/></element>
+		<repeat count="16">
+			<param name="lednum" start="16" increment="1" />
+			<param name="ledx" start="0" increment="22" />
+			<element name="led~lednum~" ref="led" state="0">
+				<bounds x="~ledx~" y="585" width="20" height="32"/>
+			</element>
+		</repeat>
+		<repeat count="16">
+			<param name="lednum" start="0" increment="1" />
+			<param name="ledx" start="0" increment="22" />	
+			<element name="led~lednum~" ref="led" state="0">
+				<bounds x="~ledx~" y="625" width="20" height="32"/>
+			</element>
+		</repeat>
+
+		<!-- 16x16 Lamp grid-->
+		<element name="lamptext" ref="lamptext"><bounds x="0" y="690" width="48" height="16"/></element>
+		<repeat count="16">
+			<param name="lny" start="0" increment="16" />
+			<param name="lampy" start="710" increment="10" />
+			<repeat count="16">
+				<param name="lampx" start="10" increment="10" />
+				<param name="lampnum" start="~lny~" increment="1" />
+				<element name="lamp~lampnum~" ref="lampdot">
+					<bounds x="~lampx~" y="~lampy~" width="8" height="8"/>
+				</element>
+			</repeat>
+		</repeat>
+
+		<!-- 64 Open-Drain outputs-->
+		<element name="odtext" ref="odtext"><bounds x="180" y="690" width="80" height="16"/></element>
+		<repeat count="8">
+			<param name="odny" start="63" increment="-8" />
+			<param name="ody" start="710" increment="16" />
+			<repeat count="8">
+				<param name="odnum" start="~odny~" increment="-1" />
+				<param name="odx" start="180" increment="16" />
+				<element name="open_drain~odnum~" ref="outputdot">
+					<bounds x="~odx~" y="~ody~" width="8" height="8"/>
+				</element>
+			</repeat>
+		</repeat>
+
+		<element name="heartbeat_txt" ref="heartbeat_txt"><bounds x="0" y="890" width="100" height="16"/></element>
+		<element name="heartbeat_led" ref="outputdot"><bounds x="100" y="895" width="10" height="10"/></element>
+
+		<repeat count="8">
+			<param name="auxnum" start="0" increment="1" />
+			<param name="auxy" start="910" increment="20" />
+			<param name="auxly" start="915" increment="20" />
+			<element name="aux~auxnum~_txt" ref="aux~auxnum~_txt"><bounds x="0" y="~auxy~" width="100" height="16"/></element>
+			<element name="aux~auxnum~" ref="outputdot"><bounds x="100" y="~auxly~" width="10" height="10"/></element>
+		</repeat>
+
+
+	</view>
+</mamelayout>
