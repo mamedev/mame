@@ -591,7 +591,7 @@ void taitof2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 // The bigsprite == 0 check fixes "tied-up" little sprites in Thunderfox
 // which (mostly?) have spritecont = 0x20 when they are not continuations
 // of anything.
-		if ((!big_sprite) || (spritecont & 0xf0) == 0)
+		if (!big_sprite || !(spritecont & 0xf0))
 		{
 			x = m_spriteram_buffered[(offs + 4) / 2];
 
