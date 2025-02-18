@@ -3067,6 +3067,6 @@ CONS( 2003, tvpc_ham,  0,          0,  xavix_i2c_24c16_4mb,  tvpc_tom, xavix_i2c
 
 CONS( 2004, tvpc_hk,   0,          0,  xavix_i2c_24c16_4mb,  tvpc_tom, xavix_i2c_state, init_xavix, "Epoch / SSD Company LTD", "TV-PC Hello Kitty (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
-// TVメールPC mail☆cot メルコット
+// TVメールPC mail*cot メルコット
 // has a 74HC541D (maybe keyboard related?)
-CONS( 2004, epo_mail,  0,          0,  xavix_i2c_24c16_4mb,  tvpc_tom, xavix_i2c_state, init_xavix, "Epoch / SSD Company LTD", "TV Mail PC mail☆cot (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS( 2004, epo_mail,  0,          0,  xavix_i2c_24c16_4mb,  tvpc_tom, xavix_i2c_state, init_xavix, "Epoch / SSD Company LTD", "TV Mail PC mail*cot (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
