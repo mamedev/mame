@@ -10,14 +10,17 @@ iterations.
 - https://www.kernel.org/doc/html/v6.13/driver-api/media/drivers/zoran.html
 - Currently using DC10+ configuration:
   ZR36067 + ZR36060 (ZR36050 + ZR36016 glued together)
-  SAA7110a (TV decoder, PAL B/G / NTSC M / SECAM) + adv7176 (TV encoder, Linux driver name is adv7175)
+  SAA7110a (TV decoder) + adv7176 (TV encoder, Linux driver name is adv7175)
 ZR36057 is known to have two HW quirks that are been fixed with ZR36067.
 
 TODO:
-- Currently at dc10plus HW test "Error at video decoder", requires SAA7110a to continue;
+- Currently at dc10plus HW test "Error at M-JPEG codec", requires ZR36060 to continue;
 - Hookup busmaster;
-- Stub, eventually decouple AV PCI controller part from the actual client cards;
+- What are i2c 0x8e >> 1 address device checks for?
+\- Can't be adv7175 (0xd4 >> 1) nor adv7176 (0x54 >> 1)
+...
 - Soft Reset & Write lock mechanisms (each register have separate macro-groups);
+- eventually decouple AV PCI controller part from the actual client cards;
 
 Known mix-ins:
 - s3virge.cpp uses SAA7110 for Scenic Highway overlay available with its S3 LPB connector;
@@ -167,7 +170,7 @@ void zr36057_device::asr_map(address_map &map)
 			if (ACCESSING_BITS_24_31)
 			{
 				m_softreset = !!BIT(data, 24);
-				// TODO: will lock all writes in config_map but this bit
+				// TODO: will lock all writes in asr_map but this bit
 				// (inclusive of the "all" group?)
 				if (!m_softreset)
 				{
