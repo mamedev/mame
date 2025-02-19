@@ -445,10 +445,9 @@ void z80dma_device::do_write()
 			break;
 	}
 
+	m_byte_counter++;
 	m_addressA += PORTA_FIXED ? 0 : PORTA_INC ? 1 : -1;
 	m_addressB += PORTB_FIXED ? 0 : PORTB_INC ? 1 : -1;
-
-	m_byte_counter++;
 }
 
 /****************************************************************************
@@ -674,6 +673,7 @@ void z80dma_device::write(u8 data)
 
 			if (BIT(data, 6))
 			{
+				// UA858D doesn't do enable() in this case
 				enable();
 			}
 		}
@@ -875,7 +875,7 @@ TIMER_CALLBACK_MEMBER(z80dma_device::rdy_write_callback)
 void z80dma_device::rdy_w(int state)
 {
 	LOG("Z80DMA RDY: %d Active High: %d\n", state, READY_ACTIVE_HIGH);
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(z80dma_device::rdy_write_callback),this), state);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(z80dma_device::rdy_write_callback), this), state);
 }
 
 /****************************************************************************

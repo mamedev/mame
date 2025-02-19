@@ -39,27 +39,16 @@ specnext_dma_device::specnext_dma_device(const machine_config &mconfig, const ch
 
 void specnext_dma_device::write(u8 data)
 {
-	z80dma_device::write(data);
-
-	if (num_follow() == 0)
+	if (!m_ndma_mode && data == COMMAND_ENABLE_DMA && num_follow() == 0)
 	{
-		if ((data & 0x83) == 0x83) // WR6
-		{
-			switch (data)
-			{
-			case COMMAND_ENABLE_DMA:
-				m_byte_counter = 0;
-				break;
-			default:
-				break;
-			}
-		}
+		m_byte_counter = 0;
 	}
+	z80dma_device::write(data);
 }
 
 void specnext_dma_device::do_write()
 {
-	if (m_dma_mode)
+	if (m_ndma_mode)
 	{
 		z80dma_device::do_write();
 		return;
@@ -101,12 +90,12 @@ void specnext_dma_device::device_start()
 {
 	z80dma_device::device_start();
 
-	save_item(NAME(m_dma_mode));
+	save_item(NAME(m_ndma_mode));
 }
 
 void specnext_dma_device::device_reset()
 {
 	z80dma_device::device_reset();
 
-	m_dma_mode = 0;
+	m_ndma_mode = 0;
 }
