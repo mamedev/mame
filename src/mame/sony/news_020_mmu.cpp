@@ -154,6 +154,7 @@ void news_020_mmu_device::clear_kernel_entries()
 
 void news_020_mmu_device::device_start()
 {
+	space(0).specific(m_hyperbus);
 	m_bus_error.resolve();
 
 	save_item(NAME(m_enabled));
@@ -228,11 +229,11 @@ uint32_t news_020_mmu_device::hyperbus_r(offs_t offset, uint32_t mem_mask, bool 
 		offset = offset & (0x1fffffff >> 2);
 		if (!m_romdis && offset < ((0xffff - 0x100) >> 2))
 		{
-			result = this->space(0).read_dword((0x03000000 + 0x100) + (offset << 2), mem_mask);
+			result = this->m_hyperbus.read_dword((0x03000000 + 0x100) + (offset << 2), mem_mask);
 		}
 		else
 		{
-			result = this->space(0).read_dword(offset << 2, mem_mask);
+			result = this->m_hyperbus.read_dword(offset << 2, mem_mask);
 		}
 	}
 	else
@@ -273,7 +274,7 @@ uint32_t news_020_mmu_device::hyperbus_r(offs_t offset, uint32_t mem_mask, bool 
 		else
 		{
 			uint32_t paddr = ((pte.pfnum() << 12) + (offset & 0xfff)) & 0x1fffffff;
-			result = this->space(0).read_dword(paddr, mem_mask); // TODO: unmap lines in the bus instead?
+			result = this->m_hyperbus.read_dword(paddr, mem_mask); // TODO: unmap lines in the bus instead?
 			LOGMASKED(LOG_DATA, "(%s) hyperbus_r (offset 0x%08x, mask 0x%08x, pg 0x%08x, pte 0x%08x, index 0x%08x, %s) -> 0x%08x = 0x%08x\n", machine().describe_context(), offset, mem_mask, vpgnum, pte.pte, map_index, mode(is_supervisor), paddr, result);
 		}
 	}
@@ -285,7 +286,7 @@ void news_020_mmu_device::hyperbus_w(offs_t offset, uint32_t data, uint32_t mem_
 {
 	if (!m_enabled || (is_supervisor && (offset >= (0xc0000000 >> 2)))) // TODO: is the physical address check here (0xc...) correct?
 	{
-		this->space(0).write_dword((offset << 2) & 0x1fffffff, data, mem_mask); // TODO: see above about physical address width
+		this->m_hyperbus.write_dword((offset << 2) & 0x1fffffff, data, mem_mask); // TODO: see above about physical address width
 	}
 	else
 	{
@@ -329,7 +330,7 @@ void news_020_mmu_device::hyperbus_w(offs_t offset, uint32_t data, uint32_t mem_
 			{
 				uint32_t paddr = ((pte.pfnum() << 12) + (offset & 0xfff)) & 0x1fffffff;
 				LOGMASKED(LOG_DATA, "(%s) hyperbus_w (offset 0x%08x, data 0x%08x, mask 0x%08x, pg 0x%08x, pte 0x%08x, index 0x%08x, %s) -> 0x%08x = 0x%08x%s\n", machine().describe_context(), offset, data, mem_mask, vpgnum, pte.pte, map_index, mode(is_supervisor), paddr, data, pte.modified() ? " (newly modified page)" : "");
-				this->space(0).write_dword(paddr, data, mem_mask);
+				this->m_hyperbus.write_dword(paddr, data, mem_mask);
 
 				if (!pte.modified())
 				{

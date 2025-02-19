@@ -33,6 +33,7 @@ protected:
 
 private:
 	const address_space_config m_hyperbus_config;
+	memory_access<32, 2, 0, ENDIANNESS_BIG>::specific m_hyperbus;
 	device_delegate<void(offs_t, uint32_t, bool, uint8_t)> m_bus_error;
 	bool m_enabled;
 	bool m_romdis;
