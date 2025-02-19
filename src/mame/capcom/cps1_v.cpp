@@ -96,7 +96,7 @@ U.S. Navy (Japan 901012)                                           89625B-1   CA
 
 Nemo (World 901109)                                          1990  89624B-3   NM24B            IOB1  88622-C-5    CPS-B-15  DL-0411-10010  None
 Nemo (World 901130)                                                89624B-3   NM24B            IOB1  88622-C-5    CPS-B-15  DL-0411-10010  None
-Nemo (Japan 901120)                                                89622B-3   NM22B            LWIO  88622-C-5    CPS-B-15  DL-0411-10010  None
+Nemo (Japan 901120)                                                88622B-3   NM22B            LWIO  88622-C-5    CPS-B-15  DL-0411-10010  None
 Nemo (Japan 901120)                                                89625B-1   NM22B            IOB1  88622-C-5    CPS-B-15  DL-0411-10010  None
 
 Street Fighter II: The World Warrior (World 910129)          1991  90629B-2   STF29            IOB1  90632C-1     CPS-B-17  DL-0411-10012  C632
