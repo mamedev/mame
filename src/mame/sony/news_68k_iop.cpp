@@ -278,29 +278,11 @@ namespace
 		const std::map<int, std::vector<iop_irq_number>> iop_irq_line_map;
 		uint32_t m_iop_intst = 0;
 		uint32_t m_iop_inten = 0;
-		std::map<int, bool> m_iop_int_state = {
-			{INPUT_LINE_IRQ1, false},
-			{INPUT_LINE_IRQ2, false},
-			{INPUT_LINE_IRQ3, false},
-			{INPUT_LINE_IRQ4, false},
-			{INPUT_LINE_IRQ5, false},
-			{INPUT_LINE_IRQ6, false},
-			{INPUT_LINE_IRQ7, false}
-		};
 
 		// CPU IRQ state
 		const std::map<int, cpu_irq_number> cpu_irq_line_map;
 		uint32_t m_cpu_intst = 0;
 		uint32_t m_cpu_inten = 0;
-		std::map<int, bool> m_cpu_int_state = {
-			{INPUT_LINE_IRQ1, false},
-			{INPUT_LINE_IRQ2, false},
-			{INPUT_LINE_IRQ3, false},
-			{INPUT_LINE_IRQ4, false},
-			{INPUT_LINE_IRQ5, false},
-			{INPUT_LINE_IRQ6, false},
-			{INPUT_LINE_IRQ7, false}
-		};
 
 		// Bus error details
 		bool m_cpu_bus_error = false;
@@ -741,12 +723,12 @@ namespace
 			}
 
 			// Update input pin status if it has changed
-			if (m_iop_int_state[irq.first] != state) {
+			if (m_iop->input_state(irq.first) != state) {
 				if (irq.first != INPUT_LINE_IRQ6)
 				{
 					LOGMASKED(LOG_INTERRUPT, "Setting IOP input line %d to %d\n", irq.first, state ? 1 : 0);
 				}
-				m_iop_int_state[irq.first] = state;
+
 				m_iop->set_input_line(irq.first, state ? 1 : 0);
 			}
 	   }
@@ -800,13 +782,13 @@ namespace
 		{
 			// Update input pin status if it has changed
 			const bool state = BIT(active_irq, irq.second);
-			if (m_cpu_int_state[irq.first] != state)
+			if (m_cpu->input_state(irq.first) != state)
 			{
 				if (irq.first != INPUT_LINE_IRQ6)
 				{
 					LOGMASKED(LOG_INTERRUPT, "Setting CPU input line %d to %d\n", irq.first, state ? 1 : 0);
 				}
-				m_cpu_int_state[irq.first] = state;
+
 				m_cpu->set_input_line(irq.first, state ? 1 : 0);
 			}
 		}
