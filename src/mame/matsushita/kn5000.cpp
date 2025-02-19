@@ -165,7 +165,7 @@ void kn5000_state::subcpu_mem(address_map &map)
 	map(0x120000, 0x12ffff).r(m_subcpu_latch, FUNC(generic_latch_8_device::read)); // @ IC22
 	map(0x120000, 0x12ffff).w(m_maincpu_latch, FUNC(generic_latch_8_device::write)); // @ IC23
 	//map(0x130000, 0x13????).rw(FUNC(kn5000_state::dsp1_r), FUNC(kn5000_state::dsp1_w)); // @ IC311
-	map(0xfe0000, 0xffffff).rom().region("mask", 0); // 1Mbit MASK ROM @ IC30
+	map(0xfe0000, 0xffffff).rom().region("subcpu", 0); // 1Mbit MASK ROM @ IC30
 
 	//Note:
 	// DSP2 @ IC302 uses a serial #0 pins but I think it is bitbanging those pins.
@@ -833,16 +833,8 @@ ROM_START(kn5000)
 	ROMX_LOAD("kn5000_subprogram_v140.rom", 0x000000, 0x030000, CRC(d9a537aa) SHA1(b7f471522ab3125e5eb42c7368d57a56084ce32a), ROM_BIOS(5)) // v5
 	ROMX_LOAD("kn5000_subprogram_v139.rom", 0x000000, 0x030000, NO_DUMP, ROM_BIOS(6)) // v4
 
-	ROM_REGION16_LE(0x20000, "mask", 0) // subcpu boot rom
-	ROM_LOAD("kn5000_mask_rom.fe0000.ic30", 0x00000, 0x800, CRC(3f55d17f) SHA1(e6333e53570fb05a841a7f141872c8bd14143f9c))
-	ROM_FILL(0x00800, 0x17000, 0xff) // not dumped yet
-	ROM_LOAD("kn5000_mask_rom.ff7800.ic30", 0x17800, 0x800, CRC(3f55d17f) SHA1(e6333e53570fb05a841a7f141872c8bd14143f9c))
-	ROM_LOAD("kn5000_mask_rom.ff8000.ic30", 0x18000, 0x800, CRC(c7a0bc46) SHA1(63dc6208c7188bc9125907701be4560696ea04e4))
-	ROM_LOAD("kn5000_mask_rom.ff8800.ic30", 0x18800, 0x800, CRC(62ddee53) SHA1(4c7d30898f18f9e2c5429466044e61b28175e35e))
-	ROM_LOAD("kn5000_mask_rom.ff9000.ic30", 0x19000, 0x800, CRC(beb506b9) SHA1(b8f18234cf816f261b721079c1b646d7e6932205))
-	ROM_FILL(0x19800, 0x5800, 0xff) // not dumped yet
-	ROM_LOAD("kn5000_mask_rom.fff000.ic30", 0x1f000, 0x800, CRC(3f55d17f) SHA1(e6333e53570fb05a841a7f141872c8bd14143f9c))
-	ROM_LOAD("kn5000_mask_rom.fff800.ic30", 0x1f800, 0x800, CRC(61f0935f) SHA1(97c33e7fed46a7332e0f037e8a56762d78918381))
+	ROM_REGION16_LE(0x20000, "subcpu", 0)
+	ROM_LOAD("kn5000_subcpu_boot.ic30", 0x00000, 0x20000, BAD_DUMP CRC(a45ceb77) SHA1(d29429a9a1ef7a718fa88c1aa38d0f7238ba5d94)) // Ranges fe0800-ff7800 and ff9800-fff000 not dumped yet. Assumed here as being filled with 0xFF.
 
 	ROM_REGION16_LE(0x200000, "table_data", 0)
 	ROM_LOAD32_WORD("kn5000_table_data_rom_even.ic3", 0x000000, 0x100000, CRC(b6f0becd) SHA1(1fd2604236b8d12ea7281fad64d72746eb00c525))
