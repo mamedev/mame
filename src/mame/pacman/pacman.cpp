@@ -4268,7 +4268,7 @@ ROM_START( puckmanb )
 ROM_END
 
 // This set is, on ROMs 6J and 6P (its only unique ROMs), a mix of code from other sets (no new code).
-ROM_START( puckmanb2 )
+ROM_START( puckmanb3 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.6e",         0x0000, 0x0800, CRC(2c0fa0ab) SHA1(37680e4502771ae69d51d07ce43f65b9b2dd2a49) )
 	ROM_LOAD( "2.6k",         0x0800, 0x0800, CRC(afeca2f1) SHA1(1e6d6c75eeb3a354ce2dc88da62caf9e7d53d0cb) )
@@ -8871,9 +8871,9 @@ void epospm_state::init_sprglobp2()
 //          ROM        PARENT    MACHINE   INP       STATE          INIT
 GAME( 1980, puckman,   0,        pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "Namco",                             "Puck Man (Japan, set 1)",                                  MACHINE_SUPPORTS_SAVE )
 GAME( 1980, puckmanb,  puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "bootleg",                           "Puck Man (bootleg, set 1)",                                MACHINE_SUPPORTS_SAVE )
-GAME( 1981, puckmanb2, puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "bootleg",                           "Puck Man (bootleg, set 2)",                                MACHINE_SUPPORTS_SAVE )
 GAME( 1980, puckmanf,  puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "hack",                              "Puck Man (speedup hack)",                                  MACHINE_SUPPORTS_SAVE )
 GAME( 1980, puckmanh,  puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "bootleg (Falcom?)",                 "Puck Man (bootleg, set 2)",                                MACHINE_SUPPORTS_SAVE )
+GAME( 1981, puckmanb3, puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "bootleg",                           "Puck Man (bootleg, set 3)",                                MACHINE_SUPPORTS_SAVE )
 GAME( 1980, pacman,    puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "Namco (Midway license)",            "Pac-Man (Midway)",                                         MACHINE_SUPPORTS_SAVE )
 GAME( 1980, pacmanso,  puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "Namco (Sonic license)",             "Pac-Man (SegaSA / Sonic)",                                 MACHINE_SUPPORTS_SAVE ) // from SegaSA / Sonic, could be licensed, could be bootleg - it ignores the service mode credit settings despite listing them which is suspicious
 GAME( 1980, pacmanvg,  puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "bootleg (Video Game SA)",           "Pac-Man (Video Game SA bootleg)",                          MACHINE_SUPPORTS_SAVE )
