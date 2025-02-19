@@ -4267,34 +4267,6 @@ ROM_START( puckmanb )
 	ROM_LOAD( "82s126.3m",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) ) // Timing - not used
 ROM_END
 
-// This set is, on ROMs 6J and 6P (its only unique ROMs), a mix of code from other sets (no new code).
-ROM_START( puckmanb3 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "1.6e",         0x0000, 0x0800, CRC(2c0fa0ab) SHA1(37680e4502771ae69d51d07ce43f65b9b2dd2a49) )
-	ROM_LOAD( "2.6k",         0x0800, 0x0800, CRC(afeca2f1) SHA1(1e6d6c75eeb3a354ce2dc88da62caf9e7d53d0cb) )
-	ROM_LOAD( "3.6f",         0x1000, 0x0800, CRC(7d177853) SHA1(9b5ddaaa8b564654f97af193dbcc29f81f230a25) )
-	ROM_LOAD( "4.6m",         0x1800, 0x0800, CRC(d3e8914c) SHA1(c2f00e1773c6864435f29c8b7f44f2ef85d227d3) )
-	ROM_LOAD( "5.6h",         0x2000, 0x0800, CRC(9045a44c) SHA1(a97d7016effbd2ace9a7d92ceb04a6ce18fb42f9) )
-	ROM_LOAD( "6.6n",         0x2800, 0x0800, CRC(93f344c5) SHA1(987c7fa18a774a47c045fa1dc7dff37457cb8983) )
-	ROM_LOAD( "7.6j",         0x3000, 0x0800, CRC(727ea0e9) SHA1(7c3a27db7aa4e198ac74895b1fc1d410679b9fa9) )
-	ROM_LOAD( "8.6p",         0x3800, 0x0800, CRC(64cf4fd2) SHA1(2b57b3e68555ca9b86cb6917f72fa4353c4dc847) )
-
-	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "9.5e",         0x0000, 0x0800, CRC(2229ab07) SHA1(56000ed5009ae60c7f0498b5cac1b06da6ae270e) )
-	ROM_LOAD( "10.5h",        0x0800, 0x0800, CRC(3591b89d) SHA1(79bb456be6c39c1ccd7d077fbe181523131fb300) )
-	ROM_LOAD( "11.5f",        0x1000, 0x0800, CRC(9e39323a) SHA1(be933e691df4dbe7d12123913c3b7b7b585b7a35) )
-	ROM_LOAD( "12.5j",        0x1800, 0x0800, CRC(1b1d9096) SHA1(53771c573051db43e7185b1d188533056290a620) )
-
-	ROM_REGION( 0x0120, "proms", 0 )
-	ROM_LOAD( "prom.7f",      0x0000, 0x0020, BAD_DUMP CRC(2fc650bd) SHA1(8d0268dee78e47c712202b0ec4f1f51109b1f2a5) ) // Not dumped on this set
-	ROM_LOAD( "prom.4a",      0x0020, 0x0100, BAD_DUMP CRC(3eb3a8e4) SHA1(19097b5f60d1030f8b82d9f1d3a241f93e5c75d6) ) // Not dumped on this set
-
-	ROM_REGION( 0x0200, "namco", 0 ) // Sound PROMs
-	ROM_LOAD( "prom.1m",      0x0000, 0x0100, BAD_DUMP CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) ) // Not dumped on this set
-	ROM_LOAD( "prom.3m",      0x0100, 0x0100, BAD_DUMP CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) ) // Timing - not used. Not dumped on this set
-ROM_END
-
-
 ROM_START( puckmanf )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "namcopac.6e",  0x0000, 0x1000, CRC(fee263b3) SHA1(87117ba5082cd7a615b4ec7c02dd819003fbd669) )
@@ -5572,6 +5544,33 @@ ROM_START( puckmanh )
 	ROM_REGION( 0x0200, "namco", 0 ) // Sound PROMs
 	ROM_LOAD( "82s126.1m",    0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
 	ROM_LOAD( "82s126.3m",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) ) // Timing - not used
+ROM_END
+
+// This set is, on ROMs 6J and 6P (its only unique ROMs), a mix of code from other sets (no new code).
+ROM_START( puckmanb3 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.6e",         0x0000, 0x0800, CRC(2c0fa0ab) SHA1(37680e4502771ae69d51d07ce43f65b9b2dd2a49) )
+	ROM_LOAD( "2.6k",         0x0800, 0x0800, CRC(afeca2f1) SHA1(1e6d6c75eeb3a354ce2dc88da62caf9e7d53d0cb) )
+	ROM_LOAD( "3.6f",         0x1000, 0x0800, CRC(7d177853) SHA1(9b5ddaaa8b564654f97af193dbcc29f81f230a25) )
+	ROM_LOAD( "4.6m",         0x1800, 0x0800, CRC(d3e8914c) SHA1(c2f00e1773c6864435f29c8b7f44f2ef85d227d3) )
+	ROM_LOAD( "5.6h",         0x2000, 0x0800, CRC(9045a44c) SHA1(a97d7016effbd2ace9a7d92ceb04a6ce18fb42f9) )
+	ROM_LOAD( "6.6n",         0x2800, 0x0800, CRC(93f344c5) SHA1(987c7fa18a774a47c045fa1dc7dff37457cb8983) )
+	ROM_LOAD( "7.6j",         0x3000, 0x0800, CRC(727ea0e9) SHA1(7c3a27db7aa4e198ac74895b1fc1d410679b9fa9) )
+	ROM_LOAD( "8.6p",         0x3800, 0x0800, CRC(64cf4fd2) SHA1(2b57b3e68555ca9b86cb6917f72fa4353c4dc847) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "9.5e",         0x0000, 0x0800, CRC(2229ab07) SHA1(56000ed5009ae60c7f0498b5cac1b06da6ae270e) )
+	ROM_LOAD( "10.5h",        0x0800, 0x0800, CRC(3591b89d) SHA1(79bb456be6c39c1ccd7d077fbe181523131fb300) )
+	ROM_LOAD( "11.5f",        0x1000, 0x0800, CRC(9e39323a) SHA1(be933e691df4dbe7d12123913c3b7b7b585b7a35) )
+	ROM_LOAD( "12.5j",        0x1800, 0x0800, CRC(1b1d9096) SHA1(53771c573051db43e7185b1d188533056290a620) )
+
+	ROM_REGION( 0x0120, "proms", 0 )
+	ROM_LOAD( "prom.7f",      0x0000, 0x0020, BAD_DUMP CRC(2fc650bd) SHA1(8d0268dee78e47c712202b0ec4f1f51109b1f2a5) ) // Not dumped on this set
+	ROM_LOAD( "prom.4a",      0x0020, 0x0100, BAD_DUMP CRC(3eb3a8e4) SHA1(19097b5f60d1030f8b82d9f1d3a241f93e5c75d6) ) // Not dumped on this set
+
+	ROM_REGION( 0x0200, "namco", 0 ) // Sound PROMs
+	ROM_LOAD( "prom.1m",      0x0000, 0x0100, BAD_DUMP CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) ) // Not dumped on this set
+	ROM_LOAD( "prom.3m",      0x0100, 0x0100, BAD_DUMP CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) ) // Timing - not used. Not dumped on this set
 ROM_END
 
 
