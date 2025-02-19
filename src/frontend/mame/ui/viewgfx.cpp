@@ -1143,15 +1143,12 @@ bool gfx_viewer::gfxset::handle_keys(running_machine& machine, int xcells, int y
 		result = true;
 	}
 
-	// Save the set to PNG picture
+	// Handle snapshot (F12)
 	if (input.pressed_repeat(IPT_UI_SNAPSHOT, 4))
 	{
-		unsigned currentColor{ set.m_color };
-
+		// output teh current set to  PNG
 		gfxWriter writer(machine, *this);
 		writer.writePng();
-
-		set.m_color = currentColor;
 		result = true;
 	}
 

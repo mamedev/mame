@@ -192,6 +192,8 @@ files {
 	MAME_DIR .. "src/frontend/mame/ui/utils.h",
 	MAME_DIR .. "src/frontend/mame/ui/videoopt.cpp",
 	MAME_DIR .. "src/frontend/mame/ui/videoopt.h",
+    MAME_DIR .. "src/frontend/mame/ui/gfx_writer.cpp",
+    MAME_DIR .. "src/frontend/mame/ui/gfx_writer.h",
 	MAME_DIR .. "src/frontend/mame/ui/viewgfx.cpp",
 	MAME_DIR .. "src/frontend/mame/ui/viewgfx.h",
 	MAME_DIR .. "src/frontend/mame/ui/widgets.cpp",
