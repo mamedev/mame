@@ -134,7 +134,6 @@ void qix_state::audio_map(address_map &map)
 
 
 
-
 /*************************************
  *
  *  Machine drivers

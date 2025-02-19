@@ -108,8 +108,8 @@ protected:
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 	void audio_map(address_map &map) ATTR_COLD;
-	void main_map(address_map &map) ATTR_COLD;
-	void qix_video_map(address_map &map) ATTR_COLD;
+	virtual void main_map(address_map &map) ATTR_COLD;
+	virtual void video_map(address_map &map) ATTR_COLD;
 };
 
 // with encrypted CPU opcode
@@ -126,12 +126,14 @@ public:
 
 	void init_kram3();
 
+protected:
+	virtual void main_map(address_map &map) override ATTR_COLD;
+	virtual void video_map(address_map &map) override ATTR_COLD;
+
 private:
 	void lic_maincpu_changed(int state);
 	void lic_videocpu_changed(int state);
 
-	void main_map(address_map &map) ATTR_COLD;
-	void video_map(address_map &map) ATTR_COLD;
 
 	std::unique_ptr<uint8_t[]> m_main_decrypted;
 	std::unique_ptr<uint8_t[]> m_video_decrypted;
@@ -157,6 +159,8 @@ public:
 protected:
 	virtual void machine_start() override ATTR_COLD;
 
+	virtual void video_map(address_map &map) override ATTR_COLD;
+
 private:
 	static constexpr XTAL SLITHER_CLOCK_OSC = XTAL(21'300'000);    /* 21.3 MHz */
 
@@ -165,8 +169,6 @@ private:
 	void slither_coinctr_w(uint8_t data);
 	void slither_videoram_w(offs_t offset, uint8_t data);
 	void slither_addresslatch_w(uint8_t data);
-
-	void video_map(address_map &map) ATTR_COLD;
 
 	required_device_array<sn76489_device, 2> m_sn;
 	required_shared_ptr<uint8_t> m_videoram_mask;
@@ -223,11 +225,11 @@ public:
 protected:
 	virtual void machine_start() override ATTR_COLD;
 
+	virtual void main_map(address_map &map) override ATTR_COLD;
+	virtual void video_map(address_map &map) override ATTR_COLD;
+
 private:
 	void bankswitch_w(uint8_t data);
-
-	void main_map(address_map &map) ATTR_COLD;
-	void video_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_TAITO_QIX_H
