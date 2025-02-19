@@ -128,7 +128,25 @@ namespace
 			  m_scsi(*this, "scsi:7:am5380"),
 			  m_scsi_dma(*this, "scsi_dma"),
 			  m_dip_switch(*this, "FRONT_PANEL"),
-			  m_serial(*this, "serial%u", 0U)
+			  m_serial(*this, "serial%u", 0U),
+			  iop_irq_line_map( {
+				{INPUT_LINE_IRQ1, {CPIRQ_3_1}},
+				{INPUT_LINE_IRQ2, {SCSI_IRQ, SCSI_DRQ}},
+				{INPUT_LINE_IRQ3, {LANCE}},
+				{INPUT_LINE_IRQ4, {CPU}},
+				{INPUT_LINE_IRQ5, {SCC, SCC_PERIPHERAL}},
+				{INPUT_LINE_IRQ6, {TIMEOUT, FDCIRQ}},
+				{INPUT_LINE_IRQ7, {FDCDRQ}}
+			}),
+			cpu_irq_line_map({
+				// AST is excluded from this check
+				{INPUT_LINE_IRQ2, CPIRQ1},
+				{INPUT_LINE_IRQ3, IOPIRQ3},
+				{INPUT_LINE_IRQ4, CPIRQ3},
+				{INPUT_LINE_IRQ5, IOPIRQ5},
+				{INPUT_LINE_IRQ6, TIMER},
+				{INPUT_LINE_IRQ7, PERR}
+			})
 		{
 		}
 
@@ -165,7 +183,6 @@ namespace
 		};
 		static constexpr std::array iop_irq_names = {"CPIRQ"sv, "SCSI_IRQ"sv, "SCSI_DRQ"sv, "LANCE"sv, "CPU"sv, "SCC"sv, "SCC_PERIPHERAL"sv, "TIMEOUT"sv, "FDCIRQ"sv, "FDCDRQ"sv};
 		static constexpr uint32_t iop_nmi_mask = (1 << SCSI_IRQ) | (1 << SCC) | (1 << LANCE) | (1 << FDCIRQ) | (1 << FDCDRQ);
-		static const std::map<int, std::vector<iop_irq_number>> iop_irq_line_map;
 
 		template <iop_irq_number Number>
 		void iop_irq_w(int state);
@@ -187,7 +204,6 @@ namespace
 			PERR     // Parity error interrupt
 		};
 		static constexpr std::array cpu_irq_names = {"AST"sv, "CPIRQ1"sv, "IOPIRQ3"sv, "CPIRQ3"sv, "IOPIRQ5"sv, "TIMER"sv, "PERR"sv};
-		static const std::map<int, cpu_irq_number> cpu_irq_line_map;
 
 		template <cpu_irq_number Number>
 		void cpu_irq_w(int state);
@@ -259,6 +275,7 @@ namespace
 		std::unique_ptr<u16[]> m_net_ram;
 
 		// IOP IRQ state
+		const std::map<int, std::vector<iop_irq_number>> iop_irq_line_map;
 		uint32_t m_iop_intst = 0;
 		uint32_t m_iop_inten = 0;
 		std::map<int, bool> m_iop_int_state = {
@@ -272,6 +289,7 @@ namespace
 		};
 
 		// CPU IRQ state
+		const std::map<int, cpu_irq_number> cpu_irq_line_map;
 		uint32_t m_cpu_intst = 0;
 		uint32_t m_cpu_inten = 0;
 		std::map<int, bool> m_cpu_int_state = {
@@ -299,26 +317,6 @@ namespace
 
 		// Other constants
 		static constexpr int NET_RAM_SIZE = 8192; // 16K RAM, in 16-bit words
-	};
-
-	const std::map<int, std::vector<news_iop_state::iop_irq_number>> news_iop_state::iop_irq_line_map = {
-		{INPUT_LINE_IRQ1, {CPIRQ_3_1}},
-		{INPUT_LINE_IRQ2, {SCSI_IRQ, SCSI_DRQ}},
-		{INPUT_LINE_IRQ3, {LANCE}},
-		{INPUT_LINE_IRQ4, {CPU}},
-		{INPUT_LINE_IRQ5, {SCC, SCC_PERIPHERAL}},
-		{INPUT_LINE_IRQ6, {TIMEOUT, FDCIRQ}},
-		{INPUT_LINE_IRQ7, {FDCDRQ}}
-	};
-
-	const std::map<int, news_iop_state::cpu_irq_number> news_iop_state::cpu_irq_line_map = {
-		// AST is excluded from this check
-		{INPUT_LINE_IRQ2, CPIRQ1},
-		{INPUT_LINE_IRQ3, IOPIRQ3},
-		{INPUT_LINE_IRQ4, CPIRQ3},
-		{INPUT_LINE_IRQ5, IOPIRQ5},
-		{INPUT_LINE_IRQ6, TIMER},
-		{INPUT_LINE_IRQ7, PERR}
 	};
 
 	void news_iop_state::machine_start()

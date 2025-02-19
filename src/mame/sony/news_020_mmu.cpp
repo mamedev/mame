@@ -81,7 +81,7 @@ namespace
 
 		bool modified() const
 		{
-			return pte & 0x04000000;
+			return pte & ENTRY_MODIFIED_MASK;
 		}
 
 		bool fill_on_demand() const
