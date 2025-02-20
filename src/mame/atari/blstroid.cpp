@@ -117,7 +117,6 @@ const atari_motion_objects_config blstroid_state::s_mob_config =
 	0,                  // maximum number of links to visit/scanline (0=all)
 
 	0x000,              // base palette entry
-	0x100,              // maximum number of colors
 	0,                  // transparent pen index
 
 	{{ 0,0,0x0ff8,0 }}, // mask for the link
@@ -173,7 +172,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(blstroid_state::scanline_update)
 
 	// check for interrupts
 	if (offset < 0x800)
-		if (m_playfield_tilemap->basemem_read(offset) & 0x8000)
+		if (BIT(m_playfield_tilemap->basemem_read(offset), 15))
 		{
 			// FIXME: - the only thing this IRQ does it tweak the starting MO link
 			// unfortunately, it does it too early for the given MOs!
@@ -342,18 +341,6 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const gfx_layout pflayout =
-{
-	16,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 0,0, 4,4, 8,8, 12,12, 16,16, 20,20, 24,24, 28,28 },
-	{ 0*8, 4*8, 8*8, 12*8, 16*8, 20*8, 24*8, 28*8 },
-	32*8
-};
-
-
 static const gfx_layout molayout =
 {
 	16,8,
@@ -368,8 +355,8 @@ static const gfx_layout molayout =
 
 
 static GFXDECODE_START( gfx_blstroid )
-	GFXDECODE_ENTRY( "tiles", 0, pflayout,  256, 16 )
-	GFXDECODE_ENTRY( "sprites", 0, molayout,    0, 16 )
+	GFXDECODE_SCALE( "tiles",   0, gfx_8x8x4_packed_msb, 256, 16, 2, 1 )
+	GFXDECODE_ENTRY( "sprites", 0, molayout,               0, 16 )
 GFXDECODE_END
 
 

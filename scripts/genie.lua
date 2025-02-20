@@ -570,14 +570,6 @@ configuration { "gmake or ninja" }
 
 dofile ("toolchain.lua")
 
-if _OPTIONS["targetos"]=="windows" then
-	configuration { "x64" }
-		defines {
-			"X64_WINDOWS_ABI",
-		}
-	configuration { }
-end
-
 -- Avoid error when invoking genie --help.
 if (_ACTION == nil) then return false end
 
@@ -710,16 +702,28 @@ end
 
 if not _OPTIONS["FORCE_DRC_C_BACKEND"] then
 	if _OPTIONS["BIGENDIAN"]~="1" then
-		configuration { "x64" }
-			defines {
-				"NATIVE_DRC=drcbe_x64",
-			}
-		configuration { "x32" }
-			defines {
-				"NATIVE_DRC=drcbe_x86",
-			}
-		configuration {  }
+		if (_OPTIONS["PLATFORM"]=="arm64") then
+			configuration { }
+				defines {
+					"NATIVE_DRC=drcbe_arm64",
+				}
+		else
+			configuration { "x64" }
+				defines {
+					"NATIVE_DRC=drcbe_x64",
+				}
+			configuration { "x32" }
+				defines {
+					"NATIVE_DRC=drcbe_x86",
+				}
+			configuration {  }
+		end
 	end
+
+	configuration { }
+		defines {
+			"ASMJIT_STATIC",
+		}
 end
 
 	defines {
@@ -1166,26 +1170,24 @@ configuration { "asmjs" }
 		"-O" .. _OPTIONS["OPTIMIZE"],
 		"-s USE_SDL=2",
 		"-s USE_SDL_TTF=2",
-		"--memory-init-file 0",
 		"-s DEFAULT_LIBRARY_FUNCS_TO_INCLUDE=\"['\\$$ERRNO_CODES']\"",
 		"-s EXPORTED_FUNCTIONS=\"['_main', '_malloc', '__ZN15running_machine30emscripten_get_running_machineEv', '__ZN15running_machine17emscripten_get_uiEv', '__ZN15running_machine20emscripten_get_soundEv', '__ZN15mame_ui_manager12set_show_fpsEb', '__ZNK15mame_ui_manager8show_fpsEv', '__ZN13sound_manager4muteEbh', '_SDL_PauseAudio', '_SDL_SendKeyboardKey', '__ZN15running_machine15emscripten_saveEPKc', '__ZN15running_machine15emscripten_loadEPKc', '__ZN15running_machine21emscripten_hard_resetEv', '__ZN15running_machine21emscripten_soft_resetEv', '__ZN15running_machine15emscripten_exitEv']\"",
 		"-s EXPORTED_RUNTIME_METHODS=\"['cwrap']\"",
 		"-s ERROR_ON_UNDEFINED_SYMBOLS=0",
-		"-s USE_WEBGL2=1",
-		"-s LEGACY_GL_EMULATION=1",
-		"-s GL_UNSAFE_OPTS=0",
+		"-s STACK_SIZE=5MB",
+		"-s MAX_WEBGL_VERSION=2",
 		"--pre-js " .. _MAKE.esc(MAME_DIR) .. "src/osd/modules/sound/js_sound.js",
 		"--post-js " .. _MAKE.esc(MAME_DIR) .. "scripts/resources/emscripten/emscripten_post.js",
 		"--embed-file " .. _MAKE.esc(MAME_DIR) .. "bgfx/chains@bgfx/chains",
 		"--embed-file " .. _MAKE.esc(MAME_DIR) .. "bgfx/effects@bgfx/effects",
 		"--embed-file " .. _MAKE.esc(MAME_DIR) .. "bgfx/shaders/essl@bgfx/shaders/essl",
 		"--embed-file " .. _MAKE.esc(MAME_DIR) .. "artwork/bgfx@artwork/bgfx",
+		"--embed-file " .. _MAKE.esc(MAME_DIR) .. "artwork/lut-default.png@artwork/lut-default.png",
 		"--embed-file " .. _MAKE.esc(MAME_DIR) .. "artwork/slot-mask.png@artwork/slot-mask.png",
 	}
 	if _OPTIONS["SYMBOLS"]~=nil and _OPTIONS["SYMBOLS"]~="0" then
 		linkoptions {
 			"-g" .. _OPTIONS["SYMLEVEL"],
-			"-s DEMANGLE_SUPPORT=1",
 		}
 	end
 	if _OPTIONS["WEBASSEMBLY"] then
@@ -1201,11 +1203,12 @@ configuration { "asmjs" }
 		-- define a fixed memory size because allowing memory growth disables asm.js optimizations
 		linkoptions {
 			"-s ALLOW_MEMORY_GROWTH=0",
-			"-s TOTAL_MEMORY=268435456",
+			"-s INITIAL_MEMORY=256MB",
 		}
 	else
 		linkoptions {
 			"-s ALLOW_MEMORY_GROWTH=1",
+			"-s INITIAL_MEMORY=24MB"
 		}
 	end
 	archivesplit_size "20"
@@ -1300,8 +1303,6 @@ configuration { "vs20*" }
 		}
 
 		buildoptions {
-			"/wd4003", -- warning C4003: not enough actual parameters for macro 'xxx'
-			"/wd4005", -- warning C4005: The macro identifier is defined twice. The compiler uses the second macro definition
 			"/wd4018", -- warning C4018: 'x' : signed/unsigned mismatch
 			"/wd4060", -- warning C4060: switch statement contains no 'case' or 'default' labels
 			"/wd4065", -- warning C4065: switch statement contains 'default' but no 'case' labels
@@ -1313,6 +1314,7 @@ configuration { "vs20*" }
 			"/wd4245", -- warning C4245: 'conversion' : conversion from 'type1' to 'type2', signed/unsigned mismatch
 			"/wd4250", -- warning C4250: 'xxx' : inherits 'xxx' via dominance
 			"/wd4267", -- warning C4267: 'var' : conversion from 'size_t' to 'type', possible loss of data
+			"/wd4305", -- warning C4305: 'conversion': truncation from 'type1' to 'type2'
 			"/wd4310", -- warning C4310: cast truncates constant value
 			"/wd4319", -- warning C4319: 'operator' : zero extending 'type' to 'type' of greater size
 			"/wd4324", -- warning C4324: 'xxx' : structure was padded due to __declspec(align())
@@ -1323,10 +1325,11 @@ configuration { "vs20*" }
 			"/wd4458", -- warning C4458: declaration of 'xxx' hides class member
 			"/wd4459", -- warning C4459: declaration of 'xxx' hides global declaration
 			"/wd4611", -- warning C4611: interaction between '_setjmp' and C++ object destruction is non-portable
+			"/wd4646", -- warning C4646: function declared with 'noreturn' has non-void return type
+			"/wd4701", -- warning C4701: potentially uninitialized local variable 'name' used
 			"/wd4702", -- warning C4702: unreachable code
-			"/wd4706", -- warning C4706: assignment within conditional expression
-			"/wd4804", -- warning C4804: '>>': unsafe use of type 'bool' in operation
 			"/wd4805", -- warning C4805: 'x' : unsafe mix of type 'xxx' and type 'xxx' in operation
+			"/wd4806", -- warning C4806: 'operation': unsafe operation: no value of type 'type' promoted to type 'type' can equal the given constant
 			"/wd4996", -- warning C4996: 'function': was declared deprecated
 		}
 

@@ -1,91 +1,93 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert, R. Belmont, hap, superctr
 /*
-    ZOOM ZSG-2 custom wavetable synthesizer
 
-    Written by Olivier Galibert
-    MAME conversion by R. Belmont
-    Working emulation by The Talentuous Hands Of The Popularious hap
-    Properly working emulation by superctr
-    ---------------------------------------------------------
+ZOOM ZSG-2 custom wavetable synthesizer
 
-    Register map:
-    000-5fe : Channel specific registers (48 channels)
-              (high)   (low)
-       +000 : xxxxxxxx -------- : Start address (low)
-       +000 : -------- xxxxxxxx :   Unknown register (usually cleared)
-       +002 : xxxxxxxx -------- : Address page
-            : -------- xxxxxxxx : Start address (high)
-       +004 : -------- -------- :   Unknown register (usually cleared)
-       +006 : -----x-- -------- :   Unknown bit, always set
-       +008 : xxxxxxxx xxxxxxxx : Frequency
-       +00a : xxxxxxxx -------- : DSP ch 3 (right) output gain
-            : -------- xxxxxxxx : Loop address (low)
-       +00c : xxxxxxxx xxxxxxxx : End address
-       +00e : xxxxxxxx -------- : DSP ch 2 (Left) output gain
-            : -------- xxxxxxxx : Loop address (high)
-       +010 : xxxxxxxx xxxxxxxx : Initial filter time constant
-       +012 : xxxxxxxx xxxxxxxx : Current filter time constant
-       +014 : xxxxxxxx xxxxxxxx : Initial volume
-       +016 : xxxxxxxx xxxxxxxx : Current volume?
-       +018 : xxxxxxxx xxxxxxxx : Target filter time constant
-       +01a : xxxxxxxx -------- : DSP ch 1 (chorus) output gain
-            : -------- xxxxxxxx : Filter ramping speed
-       +01c : xxxxxxxx xxxxxxxx : Target volume
-       +01e : xxxxxxxx -------- : DSP ch 0 (reverb) output gain
-            : -------- xxxxxxxx : Filter ramping speed
-    600-604 : Key on flags (each bit corresponds to a channel)
-    608-60c : Key off flags (each bit corresponds to a channel)
-    618     : Unknown register (usually 0x5cbc is written)
-    61a     : Unknown register (usually 0x5cbc is written)
-    620     : Unknown register (usually 0x0128 is written)
-    628     : Unknown register (usually 0x0066 is written)
-    630     : Unknown register (usually 0x0001 is written)
-    638     : ROM readback address low
-    63a     : ROM readback address high
-    63c     : ROM readback word low
-    63e     : ROM readback word high
+Written by Olivier Galibert
+MAME conversion by R. Belmont
+Working emulation by The Talentuous Hands Of The Popularious hap
+Properly working emulation by superctr
+---------------------------------------------------------
 
-    ---------------------------------------------------------
+Register map:
+000-5fe : Channel specific registers (48 channels)
+          (high)   (low)
+   +000 : xxxxxxxx -------- : Start address (low)
+   +000 : -------- xxxxxxxx :   Unknown register (usually cleared)
+   +002 : xxxxxxxx -------- : Address page
+        : -------- xxxxxxxx : Start address (high)
+   +004 : -------- -------- :   Unknown register (usually cleared)
+   +006 : -----x-- -------- :   Unknown bit, always set
+   +008 : xxxxxxxx xxxxxxxx : Frequency
+   +00a : xxxxxxxx -------- : DSP ch 3 (right) output gain
+        : -------- xxxxxxxx : Loop address (low)
+   +00c : xxxxxxxx xxxxxxxx : End address
+   +00e : xxxxxxxx -------- : DSP ch 2 (Left) output gain
+        : -------- xxxxxxxx : Loop address (high)
+   +010 : xxxxxxxx xxxxxxxx : Initial filter time constant
+   +012 : xxxxxxxx xxxxxxxx : Current filter time constant
+   +014 : xxxxxxxx xxxxxxxx : Initial volume
+   +016 : xxxxxxxx xxxxxxxx : Current volume?
+   +018 : xxxxxxxx xxxxxxxx : Target filter time constant
+   +01a : xxxxxxxx -------- : DSP ch 1 (chorus) output gain
+        : -------- xxxxxxxx : Filter ramping speed
+   +01c : xxxxxxxx xxxxxxxx : Target volume
+   +01e : xxxxxxxx -------- : DSP ch 0 (reverb) output gain
+        : -------- xxxxxxxx : Filter ramping speed
+600-604 : Key on flags (each bit corresponds to a channel)
+608-60c : Key off flags (each bit corresponds to a channel)
+618     : Unknown register (usually 0x5cbc is written)
+61a     : Unknown register (usually 0x5cbc is written)
+620     : Unknown register (usually 0x0128 is written)
+628     : Unknown register (usually 0x0066 is written)
+630     : Unknown register (usually 0x0001 is written)
+638     : ROM readback address low
+63a     : ROM readback address high
+63c     : ROM readback word low
+63e     : ROM readback word high
 
-    Additional notes on the sample format, reverse-engineered
-    by Olivier Galibert and David Haywood:
+---------------------------------------------------------
 
-    The zoom sample rom is decomposed in 0x40000 bytes pages.  Each page
-    starts by a header and is followed by compressed samples.
+Additional notes on the sample format, reverse-engineered
+by Olivier Galibert and David Haywood:
 
-    The header is a vector of 16 bytes structures composed of 4 32bits
-    little-endian values representing:
-    - sample start position in bytes, always a multiple of 4
-    - sample end position in bytes, minus 4, always...
-    - loop position in bytes, always....
-    - flags, probably
+The zoom sample rom is decomposed in 0x40000 bytes pages.  Each page
+starts by a header and is followed by compressed samples.
 
-    It is interesting to note that this header is *not* parsed by the
-    ZSG.  The main program reads the rom through appropriate ZSG
-    commands, and use the results in subsequent register setups.  It's
-    not even obvious that the ZSG cares about the pages, it may just
-    see the address space as linear.  In the same line, the
-    interpretation of the flags is obviously dependent on the main
-    program, not the ZSG, but some of the bits are directly copied to
-    some of the registers.
+The header is a vector of 16 bytes structures composed of 4 32bits
+little-endian values representing:
+- sample start position in bytes, always a multiple of 4
+- sample end position in bytes, minus 4, always...
+- loop position in bytes, always....
+- flags, probably
 
-    The samples are compressed with a 2:1 ratio.  Each block of 4-bytes
-    becomes 4 16-bits samples.  Reading the 4 bytes as a *little-endian*
-    32bits values, the structure is:
+It is interesting to note that this header is *not* parsed by the
+ZSG.  The main program reads the rom through appropriate ZSG
+commands, and use the results in subsequent register setups.  It's
+not even obvious that the ZSG cares about the pages, it may just
+see the address space as linear.  In the same line, the
+interpretation of the flags is obviously dependent on the main
+program, not the ZSG, but some of the bits are directly copied to
+some of the registers.
 
-    42222222 51111111 60000000 ssss3333
+The samples are compressed with a 2:1 ratio.  Each block of 4-bytes
+becomes 4 16-bits samples.  Reading the 4 bytes as a *little-endian*
+32bits values, the structure is:
 
-    's' is a 4-bit scale value.  '0000000', '1111111', '2222222' and
-    '6543333' are signed 7-bits values corresponding to the 4 samples.
-    To compute the final 16bits value, left-align and shift right by s.
-    Yes, that simple.
+42222222 51111111 60000000 ssss3333
 
-    ---------------------------------------------------------
+'s' is a 4-bit scale value.  '0000000', '1111111', '2222222' and
+'6543333' are signed 7-bits values corresponding to the 4 samples.
+To compute the final 16bits value, left-align and shift right by s.
+Yes, that simple.
+
+---------------------------------------------------------
 
 TODO:
 - Filter and ramping behavior might not be perfect.
-- clicking / popping noises in gdarius, raystorm: maybe the sample ROMs are bad dumps?
+- clicking / popping noises in gdarius, raystorm: maybe the sample ROMs
+  are bad dumps?
 - memory reads out of range sometimes
 
 */
@@ -290,7 +292,7 @@ void zsg2_device::sound_stream_update(sound_stream &stream, std::vector<read_str
 		// loop over all channels
 		for (auto & elem : m_chan)
 		{
-			if(~elem.status & STATUS_ACTIVE)
+			if (~elem.status & STATUS_ACTIVE)
 				continue;
 
 			elem.step_ptr += elem.step;
@@ -309,7 +311,7 @@ void zsg2_device::sound_stream_update(sound_stream &stream, std::vector<read_str
 					}
 				}
 
-				if(elem.cur_pos == elem.start_pos)
+				if (elem.cur_pos == elem.start_pos)
 					elem.emphasis_filter_state = EMPHASIS_INITIAL_BIAS;
 
 				elem.step_ptr &= 0xffff;
@@ -320,19 +322,19 @@ void zsg2_device::sound_stream_update(sound_stream &stream, std::vector<read_str
 			int32_t sample = elem.samples[sample_pos];
 
 			// linear interpolation (hardware certainly does something similar)
-			sample += ((uint16_t)(elem.step_ptr<<2&0xffff) * (int16_t)(elem.samples[sample_pos+1] - sample))>>16;
+			sample += ((uint16_t)(elem.step_ptr << 2 & 0xffff) * (int16_t)(elem.samples[sample_pos+1] - sample)) >> 16;
 
 			// another filter...
-			elem.output_filter_state += (sample - (elem.output_filter_state>>16)) * elem.output_cutoff;
+			elem.output_filter_state += (sample - (elem.output_filter_state >> 16)) * elem.output_cutoff;
 			sample = elem.output_filter_state >> 16;
 
 			// To prevent DC bias, we need to slowly discharge the filter when the output filter cutoff is 0
-			if(!elem.output_cutoff)
+			if (!elem.output_cutoff)
 				elem.output_filter_state >>= 1;
 
-			sample = (sample * elem.vol)>>16;
+			sample = (sample * elem.vol) >> 16;
 
-			for(int output=0; output<4; output++)
+			for (int output = 0; output < 4; output++)
 			{
 				int output_gain = elem.output_gain[output] & 0x1f; // left / right
 				int32_t output_sample = sample;
@@ -340,19 +342,19 @@ void zsg2_device::sound_stream_update(sound_stream &stream, std::vector<read_str
 				if (elem.output_gain[output] & 0x80) // perhaps ?
 					output_sample = -output_sample;
 
-				mix[output] += (output_sample * m_gain_tab[output_gain&0x1f]) >> 16;
+				mix[output] += (output_sample * m_gain_tab[output_gain & 0x1f]) >> 16;
 			}
 
 			// Apply ramping every other update
 			// It's possible key on is handled on the other sample
-			if(m_sample_count & 1)
+			if (m_sample_count & 1)
 			{
 				elem.vol = ramp(elem.vol, elem.vol_target, elem.vol_delta);
 				elem.output_cutoff = ramp(elem.output_cutoff, elem.output_cutoff_target, elem.output_cutoff_delta);
 			}
 		}
 
-		for(int output=0; output<4; output++)
+		for (int output = 0; output < 4; output++)
 			outputs[output].put_int_clamp(i, mix[output], 32768);
 	}
 	m_sample_count++;
@@ -491,17 +493,17 @@ uint16_t zsg2_device::chan_r(int ch, int reg)
 // calculate this value, for now I'm generating an opproximate inverse.
 int16_t zsg2_device::get_ramp(uint8_t val)
 {
-	int16_t frac = val<<12; // sign extend
-	frac = ((frac>>12) ^ 8) << (val >> 4);
+	int16_t frac = val << 12; // sign extend
+	frac = ((frac >> 12) ^ 8) << (val >> 4);
 	return (frac >> 4);
 }
 
 inline uint16_t zsg2_device::ramp(uint16_t current, uint16_t target, int16_t delta)
 {
 	int32_t rampval = current + delta;
-	if(delta < 0 && rampval < target)
+	if (delta < 0 && rampval < target)
 		rampval = target;
-	else if(delta >= 0 && rampval > target)
+	else if (delta >= 0 && rampval > target)
 		rampval = target;
 
 	return rampval;
@@ -572,7 +574,7 @@ void zsg2_device::control_w(int reg, uint16_t data)
 			break;
 
 		default:
-			if(reg < 0x20)
+			if (reg < 0x20)
 				m_reg[reg] = data;
 			logerror("ZSG2 control   %02X = %04X\n", reg, data & 0xffff);
 			break;
@@ -596,7 +598,7 @@ uint16_t zsg2_device::control_r(int reg)
 			return read_memory(m_read_address) >> 16;
 
 		default:
-			if(reg < 0x20)
+			if (reg < 0x20)
 				return m_reg[reg];
 			break;
 	}
@@ -638,6 +640,8 @@ uint16_t zsg2_device::read(offs_t offset, uint16_t mem_mask)
 		popmessage("ZSG2 read mask %04X, contact MAMEdev", mem_mask);
 		return 0;
 	}
+
+	m_stream->update();
 
 	if (offset < 0x300)
 	{

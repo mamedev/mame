@@ -1,12 +1,19 @@
 // license:BSD-3-Clause
 // copyright-holders:Manuel Abadia, David Haywood
+#ifndef MAME_GAELCO_GAELCO2_H
+#define MAME_GAELCO_GAELCO2_H
+
+#pragma once
+
 #include "cpu/m68000/m68000.h"
-#include "video/bufsprite.h"
 #include "machine/74259.h"
 #include "machine/eepromser.h"
 #include "machine/timer.h"
+#include "video/bufsprite.h"
+
 #include "emupal.h"
 #include "tilemap.h"
+
 
 class gaelco2_state : public driver_device
 {
@@ -180,3 +187,5 @@ private:
 
 	u8 m_analog_ports[2]{};
 };
+
+#endif // MAME_GAELCO_GAELCO2_H

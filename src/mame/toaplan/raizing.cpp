@@ -142,14 +142,6 @@ void raizing_base_state::tx_linescroll_w(offs_t offset, u16 data, u16 mem_mask)
 }
 
 
-
-void raizing_base_state::device_post_load()
-{
-	if (m_tx_gfxram != nullptr)
-		m_gfxdecode->gfx(0)->mark_all_dirty();
-}
-
-
 u32 raizing_base_state::screen_update_base(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
@@ -230,7 +222,7 @@ void raizing_base_state::raizing_oki_bankswitch_w(offs_t offset, u8 data)
 	m_raizing_okibank[(offset & 4) >> 2][4 + (offset & 3)]->set_entry(data & 0xf);
 }
 
-void raizing_base_state::common_bgaregga_reset()
+void raizing_base_state::raizing_oki_reset()
 {
 	for (int chip = 0; chip < 2; chip++)
 	{
@@ -755,7 +747,7 @@ void bgaregga_state::machine_reset()
 {
 	raizing_base_state::machine_reset();
 
-	common_bgaregga_reset();
+	raizing_oki_reset();
 }
 
 void sstriker_state::mahoudai_68k_mem(address_map &map)

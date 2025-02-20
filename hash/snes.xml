@@ -45355,7 +45355,7 @@ List of unclassified roms
 		<description>Jim Power - The Lost Dimension in 3D (enhanced version)</description>
 		<year>2015</year>
 		<publisher>Piko Interactive</publisher>
-		<sharedfeat name="developer" value="Loriciel" />
+		<info name="developer" value="Loriciel" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="2097152">

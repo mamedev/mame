@@ -24,7 +24,7 @@ static int cas_size; // FIXME: global variable prevents multiple instances
 /*******************************************************************
    Generate samples for the tape image
 ********************************************************************/
-static int svi_cas_fill_wave(int16_t *buffer, int sample_count, uint8_t *bytes)
+static int svi_cas_fill_wave(int16_t *buffer, int sample_count, const uint8_t *bytes)
 {
 	int cas_pos, samples_pos, n, i;
 

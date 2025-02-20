@@ -17,6 +17,7 @@
 #include "drcbeut.h"
 
 
+namespace drc {
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -57,5 +58,8 @@ private:
 	static uint64_t           s_immediate_zero;
 };
 
+} // namespace drc
+
+using drc::drcbe_c;
 
 #endif // MAME_CPU_DRCBEC_H

@@ -161,7 +161,7 @@
 
 
 /*
- * The noice generator consists of three LS164 8+8+8
+ * The noise generator consists of three LS164 8+8+8
  * the output signal is taken after the xor, so
  * taking bit 0 is not exact
  */

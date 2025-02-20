@@ -38,27 +38,19 @@
 #pragma once
 
 
-
-//**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-#define SAA5240_SLAVE_ADDRESS ( 0x22 )
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
 // ======================> saa5240_device
 
-class saa5240_device :
-	public device_t,
-	public device_memory_interface
+class saa5240_device : public device_t
 {
 public:
 	// construction/destruction
 	saa5240_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	void set_ram_size(uint16_t ram_size) { m_ram_size = ram_size; }
 
 	void write_scl(int state);
 	void write_sda(int state);
@@ -73,18 +65,16 @@ public:
 protected:
 	saa5240_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
+	// device_t overrides
 	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
-
-	// optional information overrides
-	virtual space_config_vector memory_space_config() const override;
 
 private:
+	static constexpr uint8_t SAA5240_SLAVE_ADDRESS = 0x22;
+
 	required_region_ptr<uint16_t> m_char_rom;
 
-	const address_space_config m_space_config;
-	address_space *m_videoram;
+	std::unique_ptr<uint8_t[]> m_ram;
+	uint16_t m_ram_size;
 
 	// internal state
 	uint8_t m_register[12];
@@ -98,12 +88,11 @@ private:
 	int m_i2c_devsel;
 	int m_i2c_address;
 
+	uint16_t ram_addr(int chapter, int row, int column);
 	void increment_active_data();
 	void update_active_data();
 
-	enum { STATE_IDLE, STATE_DEVSEL, STATE_ADDRESS, STATE_DATAIN, STATE_DATAOUT };
-
-	void saa5240_vram(address_map &map) ATTR_COLD;
+	enum { STATE_IDLE, STATE_DEVSEL, STATE_ADDRESS, STATE_DATAIN, STATE_DATAOUT, STATE_READSELACK };
 
 	enum
 	{
@@ -146,6 +135,10 @@ private:
 	uint16_t get_gfx_data(uint8_t data, offs_t row, bool separated);
 	uint16_t get_rom_data(uint8_t data, offs_t row);
 	void get_character_data(uint8_t data);
+
+	static constexpr uint8_t ALPHANUMERIC = 0x01;
+	static constexpr uint8_t CONTIGUOUS   = 0x02;
+	static constexpr uint8_t SEPARATED    = 0x03;
 
 	uint8_t m_held_char;
 	uint8_t m_next_chartype;

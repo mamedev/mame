@@ -234,6 +234,9 @@ ROM_START( dmndhrt )
 	ROM_LOAD16_BYTE( "diamond_heart_u.s.a_u8.u8", 0x00000, 0x20000, CRC(d1f340ce) SHA1(7567448c8694bb24f7957bb461d3be51d138634a) )
 	ROM_LOAD16_BYTE( "diamond_heart_u.s.a_u3.u3", 0x00001, 0x20000, CRC(78885bb8) SHA1(51e360036d32b609b4036be086549c011ab41fe3) )
 
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "at90s4414.u51", 0x0000, 0x1000, NO_DUMP )
+
 	ROM_REGION( 0x100000, "tiles", 0 )
 	ROM_LOAD( "diamond_heart_u.s.a_u10.u10", 0x00000, 0x80000, CRC(00b691a7) SHA1(8cc530ad204cf9168d59419a01abf338c46a49e1) )
 	ROM_LOAD( "diamond_heart_u.s.a_u11.u11", 0x80000, 0x80000, CRC(2c666c44) SHA1(15c8e97900444046adb9455bfa827735c226a727) )
@@ -254,6 +257,9 @@ ROM_START( dmndhrtn ) // u51 was scratched for this set but believed to be AT90S
 	ROM_LOAD16_BYTE( "w27e010.u8", 0x00000, 0x20000, CRC(2a1ba91e) SHA1(af340d9e0aa7874669557067a9e043eecdf5301b) ) // no sticker
 	ROM_LOAD16_BYTE( "w27e010.u3", 0x00001, 0x20000, CRC(cdb26ff2) SHA1(33ddda977a5f6436a690fa53763f36c7e6acfb94) ) // no sticker
 
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "at90s4414.u51", 0x0000, 0x1000, NO_DUMP )
+
 	ROM_REGION( 0x100000, "tiles", 0 )
 	ROM_LOAD( "diamond_heart_new_mon_v20.0_u10.u10", 0x00000, 0x80000, CRC(7525bd95) SHA1(b34ab59bde9ecdfe03489a6eceda2c95afdee6c8) )
 	ROM_LOAD( "diamond_heart_new_mon_v20.0_u11.u11", 0x80000, 0x80000, CRC(1ffc66a6) SHA1(fd5bfa9ec01ad7aa3060929dbce417babe241700) )
@@ -273,6 +279,9 @@ ROM_START( honeybee ) // u51 was scratched for this set but believed to be AT90S
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "honey_bee_hb_tw_u8.u8", 0x00000, 0x40000, CRC(1e7e53a3) SHA1(30d426cca499adf82338ba6cc1391f754e908a5b) )
 	ROM_LOAD16_BYTE( "honey_bee_hb_tw_u3.u3", 0x00001, 0x40000, CRC(0ed5f0cc) SHA1(f64c27f04f74162027070f889daaec6f1847f19e) )
+
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "at90s4414.u51", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x100000, "tiles", 0 )
 	ROM_LOAD( "honey_bee_hb_tw_u10.u10", 0x00000, 0x80000, CRC(40526fe1) SHA1(58a3a16c4dc0fa6527571b924f43377657f0cc76) )

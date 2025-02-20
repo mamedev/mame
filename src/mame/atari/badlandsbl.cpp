@@ -94,7 +94,8 @@ void badlandsbl_state::bootleg_shared_w(offs_t offset, uint8_t data)
 
 uint8_t badlandsbl_state::sound_response_r()
 {
-	m_maincpu->set_input_line(2, CLEAR_LINE);
+	if (!machine().side_effects_disabled())
+		m_maincpu->set_input_line(2, CLEAR_LINE);
 	return m_sound_response;
 }
 
@@ -105,7 +106,7 @@ void badlandsbl_state::bootleg_map(address_map &map)
 	map(0x400000, 0x400005).rw(FUNC(badlandsbl_state::bootleg_shared_r), FUNC(badlandsbl_state::bootleg_shared_w));
 	map(0x400006, 0x400006).r(FUNC(badlandsbl_state::sound_response_r));
 	map(0x400008, 0x40000f).ram(); // breaks tilemap gfxs otherwise?
-	map(0x400010, 0x4000ff).ram().share("spriteram");
+	map(0x400010, 0x4000ff).ram().share(m_spriteram);
 
 	// sound comms?
 	map(0xfc0000, 0xfc0001).r(FUNC(badlandsbl_state::badlandsb_unk_r)).nopw();
@@ -136,7 +137,7 @@ void badlandsbl_state::bootleg_main_irq_w(uint8_t data)
 void badlandsbl_state::bootleg_audio_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom().region("audiorom", 0);
-	map(0x2000, 0x2005).ram().share("b_sharedram");
+	map(0x2000, 0x2005).ram().share(m_b_sharedram);
 	map(0x2006, 0x3fff).ram();
 	map(0x4000, 0xcfff).rom().region("audiorom", 0x4000);
 	map(0xd400, 0xd400).w(FUNC(badlandsbl_state::bootleg_main_irq_w));
@@ -196,8 +197,8 @@ static const gfx_layout badlands_molayout =
 };
 
 static GFXDECODE_START( gfx_badlandsb )
-	GFXDECODE_ENTRY( "gfx1", 0, pflayout_bootleg,    0, 8 )
-	GFXDECODE_ENTRY( "gfx2", 0, badlands_molayout,  128, 8 )
+	GFXDECODE_ENTRY( "tiles",   0, pflayout_bootleg,    0, 8 )
+	GFXDECODE_ENTRY( "sprites", 0, badlands_molayout,  128, 8 )
 GFXDECODE_END
 
 
@@ -274,7 +275,7 @@ ROM_START( badlandsb )
 	ROM_LOAD( "blb26.ic27", 0x00000, 0x10000, CRC(59503ab4) SHA1(ea5686ee28f6125c1394d687cc35c6322c8f900c) )
 
 	/* the 2nd half of 122,123,124 and 125 is identical to the first half and not used */
-	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_REGION( 0x80000, "tiles", 0 )
 	ROM_LOAD( "13.ic123",     0x000000, 0x10000, CRC(55fac198) SHA1(055938f38cb7fc02ecaf35446b2598f7808baa1c) ) // alt set replaced bad rom
 	ROM_LOAD( "blb37.ic92",   0x008000, 0x10000, CRC(9188db9f) SHA1(8f7dc2c4c0dec9a80b6214a2efaa0de0858de84c) )
 	ROM_LOAD( "blb38.ic125",  0x020000, 0x10000, CRC(4839dd54) SHA1(031efbc144e5e088be0f3576aa514c7c2b775f6d) )
@@ -285,7 +286,7 @@ ROM_START( badlandsb )
 	ROM_LOAD( "blb29.ic88",   0x068000, 0x10000, CRC(a9f280e5) SHA1(daff021d14f17da8c4469270a1e50e5a01d05d49) )
 
 	/* the 1st half of 67 & 68 are empty and not used */
-	ROM_REGION( 0x40000, "gfx2", 0 )
+	ROM_REGION( 0x40000, "sprites", 0 )
 	ROM_LOAD16_BYTE( "blb33.ic67", 0x10001, 0x10000, CRC(aebf9938) SHA1(3778aacbde07e5a5d010e41ab62d5b0db8632ad8) )
 	ROM_LOAD16_BYTE( "blb34.ic34", 0x00001, 0x10000, CRC(3eac30a5) SHA1(deefc668185bf30ad3eeba73853f97ce12b85293) )
 	ROM_LOAD16_BYTE( "blb39.ic68", 0x10000, 0x10000, CRC(f398f2d7) SHA1(1eef64680101888425490eb4d5b86072e59753cf) )
@@ -306,7 +307,7 @@ ROM_START( badlandsb2 )
 	ROM_LOAD( "3.ic27", 0x00000, 0x10000, CRC(08850eb5) SHA1(be169e8ccee275b72bcfca66cd126cc27af7a1d6) )  // only rom that differs from badlandsb
 
 	/* the 2nd half of 122,123,124 and 125 is identical to the first half and not used */
-	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_REGION( 0x80000, "tiles", 0 )
 	ROM_LOAD( "13.ic123",  0x000000, 0x10000, CRC(55fac198) SHA1(055938f38cb7fc02ecaf35446b2598f7808baa1c) )
 	ROM_LOAD( "14.ic92",   0x008000, 0x10000, CRC(9188db9f) SHA1(8f7dc2c4c0dec9a80b6214a2efaa0de0858de84c) )
 	ROM_LOAD( "15.ic125",  0x020000, 0x10000, CRC(4839dd54) SHA1(031efbc144e5e088be0f3576aa514c7c2b775f6d) )
@@ -317,7 +318,7 @@ ROM_START( badlandsb2 )
 	ROM_LOAD( "6.ic88",    0x068000, 0x10000, CRC(a9f280e5) SHA1(daff021d14f17da8c4469270a1e50e5a01d05d49) )
 
 	/* the 1st half of 67 & 68 are empty and not used */
-	ROM_REGION( 0x40000, "gfx2", 0 )
+	ROM_REGION( 0x40000, "sprites", 0 )
 	ROM_LOAD16_BYTE( "10.ic67", 0x10001, 0x10000, CRC(aebf9938) SHA1(3778aacbde07e5a5d010e41ab62d5b0db8632ad8) )
 	ROM_LOAD16_BYTE( "11.ic34", 0x00001, 0x10000, CRC(3eac30a5) SHA1(deefc668185bf30ad3eeba73853f97ce12b85293) )
 	ROM_LOAD16_BYTE( "16.ic68", 0x10000, 0x10000, CRC(f398f2d7) SHA1(1eef64680101888425490eb4d5b86072e59753cf) )

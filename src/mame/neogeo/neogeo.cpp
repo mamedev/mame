@@ -751,10 +751,11 @@ protected:
 // 1146 mclks from the rising edge of /HSYNC.
 #define NEOGEO_VBLANK_RELOAD_HTIM (attotime::from_ticks(1146, NEOGEO_MASTER_CLOCK))
 
-#define IRQ2CTRL_ENABLE             (0x10)
-#define IRQ2CTRL_LOAD_RELATIVE      (0x20)
-#define IRQ2CTRL_AUTOLOAD_VBLANK    (0x40)
-#define IRQ2CTRL_AUTOLOAD_REPEAT    (0x80)
+static constexpr unsigned IRQ2CTRL_ENABLE          = 4;
+static constexpr unsigned IRQ2CTRL_LOAD_RELATIVE   = 5;
+static constexpr unsigned IRQ2CTRL_AUTOLOAD_VBLANK = 6;
+static constexpr unsigned IRQ2CTRL_AUTOLOAD_REPEAT = 7;
+
 
 void neogeo_base_state::adjust_display_position_interrupt_timer()
 {
@@ -785,7 +786,7 @@ void neogeo_base_state::set_display_counter_lsb(uint16_t data)
 
 	LOGMASKED(LOG_VIDEO_SYSTEM, "PC %06x: set_display_counter %08x\n", m_maincpu->pc(), m_display_counter);
 
-	if (m_display_position_interrupt_control & IRQ2CTRL_LOAD_RELATIVE)
+	if (BIT(m_display_position_interrupt_control, IRQ2CTRL_LOAD_RELATIVE))
 	{
 		LOGMASKED(LOG_VIDEO_SYSTEM, "AUTOLOAD_RELATIVE ");
 		adjust_display_position_interrupt_timer();
@@ -803,11 +804,11 @@ void neogeo_base_state::update_interrupts()
 
 void neogeo_base_state::acknowledge_interrupt(uint16_t data)
 {
-	if (data & 0x01)
+	if (BIT(data, 0))
 		m_irq3_pending = 0;
-	if (data & 0x02)
+	if (BIT(data, 1))
 		m_display_position_interrupt_pending = 0;
-	if (data & 0x04)
+	if (BIT(data, 2))
 		m_vblank_interrupt_pending = 0;
 
 	update_interrupts();
@@ -818,7 +819,7 @@ TIMER_CALLBACK_MEMBER(neogeo_base_state::display_position_interrupt_callback)
 {
 	LOGMASKED(LOG_VIDEO_SYSTEM, "--- Scanline @ %d,%d\n", m_screen->vpos(), m_screen->hpos());
 
-	if (m_display_position_interrupt_control & IRQ2CTRL_ENABLE)
+	if (BIT(m_display_position_interrupt_control, IRQ2CTRL_ENABLE))
 	{
 		LOGMASKED(LOG_VIDEO_SYSTEM, "*** Scanline interrupt (IRQ2) ***  y: %02x  x: %02x\n", m_screen->vpos(), m_screen->hpos());
 		m_display_position_interrupt_pending = 1;
@@ -826,7 +827,7 @@ TIMER_CALLBACK_MEMBER(neogeo_base_state::display_position_interrupt_callback)
 		update_interrupts();
 	}
 
-	if (m_display_position_interrupt_control & IRQ2CTRL_AUTOLOAD_REPEAT)
+	if (BIT(m_display_position_interrupt_control, IRQ2CTRL_AUTOLOAD_REPEAT))
 	{
 		LOGMASKED(LOG_VIDEO_SYSTEM, "AUTOLOAD_REPEAT ");
 		adjust_display_position_interrupt_timer();
@@ -836,7 +837,7 @@ TIMER_CALLBACK_MEMBER(neogeo_base_state::display_position_interrupt_callback)
 
 TIMER_CALLBACK_MEMBER(neogeo_base_state::display_position_vblank_callback)
 {
-	if (m_display_position_interrupt_control & IRQ2CTRL_AUTOLOAD_VBLANK)
+	if (BIT(m_display_position_interrupt_control, IRQ2CTRL_AUTOLOAD_VBLANK))
 	{
 		LOGMASKED(LOG_VIDEO_SYSTEM, "AUTOLOAD_VBLANK ");
 		adjust_display_position_interrupt_timer();
@@ -1069,7 +1070,8 @@ ioport_value neogeo_base_state::get_memcard_status()
 
 uint16_t neogeo_base_state::memcard_r(offs_t offset, uint16_t mem_mask)
 {
-	m_maincpu->eat_cycles(2); // insert waitstate
+	if (!machine().side_effects_disabled())
+		m_maincpu->eat_cycles(2); // insert waitstate
 
 	// memory card enabled by /UDS
 	if (ACCESSING_BITS_8_15 && m_memcard->present())
@@ -1097,9 +1099,7 @@ void neogeo_base_state::memcard_w(offs_t offset, uint16_t data, uint16_t mem_mas
 
 ioport_value neogeo_base_state::get_audio_result()
 {
-	uint8_t ret = m_soundlatch2->read();
-
-	return ret;
+	return m_soundlatch2->read();
 }
 
 
@@ -1111,7 +1111,8 @@ ioport_value neogeo_base_state::get_audio_result()
 
 uint8_t neogeo_base_state::audio_cpu_bank_select_r(offs_t offset)
 {
-	m_bank_audio_cart[offset & 3]->set_entry(offset >> 8);
+	if (!machine().side_effects_disabled())
+		m_bank_audio_cart[offset & 3]->set_entry(offset >> 8);
 
 	return 0;
 }
@@ -1132,14 +1133,14 @@ void neogeo_base_state::set_use_cart_vectors(int state)
 void neogeo_base_state::set_use_cart_audio(int state)
 {
 	m_use_cart_audio = state;
-	m_sprgen->neogeo_set_fixed_layer_source(state);
+	m_sprgen->set_fixed_layer_source(state);
 	m_bank_audio_main->set_entry(m_use_cart_audio);
 }
 
 
 void neogeo_base_state::write_banksel(uint16_t data)
 {
-	uint32_t len = (!m_slots[m_curr_slot] || m_slots[m_curr_slot]->get_rom_size() == 0) ? m_region_maincpu->bytes() : m_slots[m_curr_slot]->get_rom_size();
+	uint32_t const len = (!m_slots[m_curr_slot] || m_slots[m_curr_slot]->get_rom_size() == 0) ? m_region_maincpu->bytes() : m_slots[m_curr_slot]->get_rom_size();
 
 	if ((len <= 0x100000) && (data & 0x07))
 		logerror("PC %06x: warning: bankswitch to %02x but no banks available\n", m_maincpu->pc(), data);
@@ -1299,7 +1300,7 @@ uint16_t neogeo_base_state::read_lorom_kof10th(offs_t offset)
 void neogeo_base_state::init_cpu()
 {
 	uint8_t *ROM = (!m_slots[m_curr_slot] || m_slots[m_curr_slot]->get_rom_size() == 0) ? m_region_maincpu->base() : (uint8_t *)m_slots[m_curr_slot]->get_rom_base();
-	uint32_t len = (!m_slots[m_curr_slot] || m_slots[m_curr_slot]->get_rom_size() == 0) ? m_region_maincpu->bytes() : m_slots[m_curr_slot]->get_rom_size();
+	uint32_t const len = (!m_slots[m_curr_slot] || m_slots[m_curr_slot]->get_rom_size() == 0) ? m_region_maincpu->bytes() : m_slots[m_curr_slot]->get_rom_size();
 
 	if (len > 0x100000)
 		m_bank_base = 0x100000;
@@ -1312,8 +1313,7 @@ void neogeo_base_state::init_cpu()
 void neogeo_base_state::init_audio()
 {
 	uint8_t *ROM = (!m_slots[m_curr_slot] || m_slots[m_curr_slot]->get_audio_size() == 0) ? m_region_audiocpu->base() : m_slots[m_curr_slot]->get_audio_base();
-	uint32_t len = (!m_slots[m_curr_slot] || m_slots[m_curr_slot]->get_audio_size() == 0) ? m_region_audiocpu->bytes() : m_slots[m_curr_slot]->get_audio_size();
-	uint32_t address_mask;
+	uint32_t const len = (!m_slots[m_curr_slot] || m_slots[m_curr_slot]->get_audio_size() == 0) ? m_region_audiocpu->bytes() : m_slots[m_curr_slot]->get_audio_size();
 
 	/* audio bios/cartridge selection */
 	m_bank_audio_main->configure_entry(0, (m_region_audiobios != nullptr) ? m_region_audiobios->base() : ROM); /* on hardware with no SM1 ROM, the cart ROM is always enabled */
@@ -1326,12 +1326,12 @@ void neogeo_base_state::init_audio()
 	m_bank_audio_cart[2] = membank("audio_c000");
 	m_bank_audio_cart[3] = membank("audio_8000");
 
-	address_mask = (len - 0x10000 - 1) & 0x3ffff;
+	uint32_t const address_mask = (len - 0x10000 - 1) & 0x3ffff;
 	for (int region = 0; region < 4; region++)
 	{
 		for (int bank = 0xff; bank >= 0; bank--)
 		{
-			uint32_t bank_address = 0x10000 + ((bank << (11 + region)) & address_mask);
+			uint32_t const bank_address = 0x10000 + ((bank << (11 + region)) & address_mask);
 			m_bank_audio_cart[region]->configure_entry(bank, &ROM[bank_address]);
 		}
 	}
@@ -1379,7 +1379,7 @@ void neogeo_base_state::init_sprites()
 			m_sprgen->optimize_sprite_data();
 		else
 			m_sprgen->set_optimized_sprite_data(m_slots[m_curr_slot]->get_sprites_opt_base(), m_slots[m_curr_slot]->get_sprites_opt_size() - 1);
-		m_sprgen->m_fixed_layer_bank_type = m_slots[m_curr_slot]->get_fixed_bank_type();
+		m_sprgen->set_fixed_layer_bank_type(m_slots[m_curr_slot]->get_fixed_bank_type());
 	}
 	else
 	{
@@ -1424,7 +1424,7 @@ void neogeo_base_state::set_slot_idx(int slot)
 		if (!m_slots[m_curr_slot]->user_loadable())
 			m_slots[m_curr_slot]->set_cart_type(m_slots[m_curr_slot]->default_option());
 
-		int type = m_slots[m_curr_slot]->get_type();
+		int const type = m_slots[m_curr_slot]->get_type();
 		switch (type)
 		{
 		case NEOGEO_FATFURY2:
@@ -1608,7 +1608,7 @@ void mvs_state::machine_start()
 {
 	ngarcade_base_state::machine_start();
 
-	m_sprgen->m_fixed_layer_bank_type = 0;
+	m_sprgen->set_fixed_layer_bank_type(neosprite_base_device::FIX_BANKTYPE_STD);
 
 	m_curr_slot = -1;
 	set_slot_idx(0);
@@ -1780,7 +1780,7 @@ void aes_state::aes_main_map(address_map &map)
 
 void neogeo_base_state::audio_map(address_map &map)
 {
-	map(0x0000, 0x7fff).bankr("audio_main");
+	map(0x0000, 0x7fff).bankr(m_bank_audio_main);
 	map(0x8000, 0xbfff).bankr("audio_8000");
 	map(0xc000, 0xdfff).bankr("audio_c000");
 	map(0xe000, 0xefff).bankr("audio_e000");
@@ -2130,7 +2130,7 @@ void aes_base_state::machine_start()
 {
 	neogeo_base_state::machine_start();
 
-	m_sprgen->m_fixed_layer_bank_type = 0;
+	m_sprgen->set_fixed_layer_bank_type(neosprite_base_device::FIX_BANKTYPE_STD);
 }
 
 void aes_state::machine_start()
@@ -2141,7 +2141,7 @@ void aes_state::machine_start()
 	set_slot_idx(0);
 
 	// AES has no SFIX ROM and always uses the cartridge's
-	m_sprgen->neogeo_set_fixed_layer_source(1);
+	m_sprgen->set_fixed_layer_source(1);
 }
 
 void aes_state::device_post_load()

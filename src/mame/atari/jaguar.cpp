@@ -366,36 +366,9 @@ Notes:
  *
  *************************************/
 
-/// HACK: Maximum force requests data but doesn't transfer it all before issuing another command.
-/// According to the ATA specification this is not allowed, more investigation is required.
-
-DECLARE_DEVICE_TYPE(COJAG_HARDDISK, cojag_hdd)
-
-class cojag_hdd : public ide_hdd_device
-{
-public:
-	cojag_hdd(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: ide_hdd_device(mconfig, COJAG_HARDDISK, tag, owner, clock)
-	{
-	}
-
-	virtual void write_cs0(offs_t offset, uint16_t data, uint16_t mem_mask) override
-	{
-		// the first write is to the device head register
-		if( offset == 6 && (m_status & IDE_STATUS_DRQ))
-		{
-			m_status &= ~IDE_STATUS_DRQ;
-		}
-
-		ide_hdd_device::write_cs0(offset, data, mem_mask);
-	}
-};
-
-DEFINE_DEVICE_TYPE(COJAG_HARDDISK, cojag_hdd, "cojag_hdd", "HDD CoJag")
-
 void cojag_devices(device_slot_interface &device)
 {
-	device.option_add("hdd", COJAG_HARDDISK);
+	device.option_add("hdd", IDE_HARDDISK);
 }
 
 
@@ -1308,7 +1281,7 @@ void jaguarcd_state::butch_regs_w(offs_t offset, uint32_t data, uint32_t mem_mas
 					break;
 
 				default:
-					printf("%04x CMD\n",m_butch_regs[offset]);
+					logerror("%04x CMD\n", m_butch_regs[offset]);
 					break;
 			}
 			break;
@@ -1887,7 +1860,9 @@ void jaguarcd_state::jaguarcd(machine_config &config)
 
 	m_dsp->set_addrmap(AS_PROGRAM, &jaguarcd_state::jagcd_gpu_dsp_map);
 
-	CDROM(config, "cdrom").set_interface("jag_cdrom");
+	CDROM(config, "cdrom").set_interface("cdrom");
+
+	// TODO: software list, requires multisession support first
 }
 
 

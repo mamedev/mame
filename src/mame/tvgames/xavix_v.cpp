@@ -167,6 +167,12 @@ uint8_t superxavix_state::superxavix_crtc_2_r(offs_t offset)
 	return m_sx_crtc_2[offset];
 }
 
+void superxavix_state::ext_segment_regs_w(offs_t offset, uint8_t data)
+{
+	logerror("%s ext_segment_regs_w %02x %02x\n", machine().describe_context(), offset, data);
+	m_ext_segment_regs[offset] = data;
+}
+
 void superxavix_state::superxavix_plt_flush_w(uint8_t data)
 {
 	// flush current write buffer (as we might not have filled a byte when plotting)
@@ -731,7 +737,7 @@ void xavix_state::draw_tilemap_line(screen_device &screen, bitmap_rgb32 &bitmap,
 	if (!(tileregs[0x7] & 0x80))
 		return;
 
-	int alt_tileaddressing = 0;
+	int use_inline_header = 0;
 	int alt_tileaddressing2 = 0;
 
 	int ydimension = 0;
@@ -776,15 +782,19 @@ void xavix_state::draw_tilemap_line(screen_device &screen, bitmap_rgb32 &bitmap,
 	}
 
 	if (tileregs[0x7] & 0x10)
-		alt_tileaddressing = 1;
+		use_inline_header = 1;
 	else
-		alt_tileaddressing = 0;
+		use_inline_header = 0;
 
 	if (tileregs[0x7] & 0x02)
 		alt_tileaddressing2 = 1;
 
 	if ((tileregs[0x7] & 0x7f) == 0x04)
 		alt_tileaddressing2 = 2;
+
+	// SuperXaviX only?
+	if ((tileregs[0x7] & 0x7f) == 0x0d)
+		alt_tileaddressing2 = 3;
 
 	//LOG("draw tilemap %d, regs base0 %02x base1 %02x base2 %02x tilesize,bpp %02x scrollx %02x scrolly %02x pal %02x mode %02x\n", which, tileregs[0x0], tileregs[0x1], tileregs[0x2], tileregs[0x3], tileregs[0x4], tileregs[0x5], tileregs[0x6], tileregs[0x7]);
 
@@ -847,6 +857,16 @@ void xavix_state::draw_tilemap_line(screen_device &screen, bitmap_rgb32 &bitmap,
 		int basereg;
 		int flipx = (tileregs[0x03]&0x40)>>6;
 		int flipy = (tileregs[0x03]&0x80)>>7;
+
+		// epo_doka explicitly sets these registers on the XaviX logo
+		// but expects no flipping.  Is code being executed out of order or
+		// is this further evidence that they don't work as expected on SuperXaviX
+		// hardware (see other hack for xavmusic needing sprite flip disabled)
+		if (m_disable_tile_regs_flip)
+		{
+			flipx = flipy = 0;
+		}
+
 		int gfxbase;
 
 		// tile 0 is always skipped, doesn't even point to valid data packets in alt mode
@@ -863,7 +883,7 @@ void xavix_state::draw_tilemap_line(screen_device &screen, bitmap_rgb32 &bitmap,
 
 		int test = 0;
 
-		if (!alt_tileaddressing)
+		if (!use_inline_header)
 		{
 			if (alt_tileaddressing2 == 0)
 			{
@@ -894,6 +914,27 @@ void xavix_state::draw_tilemap_line(screen_device &screen, bitmap_rgb32 &bitmap,
 					tile = tile * 8;
 					gfxbase = (m_segment_regs[(basereg * 2) + 1] << 16) | (m_segment_regs[(basereg * 2)] << 8);
 					tile += gfxbase;
+				}
+			}
+			else if (alt_tileaddressing2 == 3)
+			{
+				// SuperXaviX only?
+				if (m_ext_segment_regs)
+				{
+					// Tile Based Addressing takes into account Tile Sizes and bpp
+					const int offset_multiplier = (ytilesize * xtilesize) / 8;
+					const int basereg = 0;
+					gfxbase = (m_ext_segment_regs[(basereg * 4) + 3] << 24) |
+						(m_ext_segment_regs[(basereg * 4) + 2] << 16) |
+						(m_ext_segment_regs[(basereg * 4) + 1] << 8) |
+						(m_ext_segment_regs[(basereg * 4) + 0] << 0);
+
+					tile = tile * (offset_multiplier * bpp);
+					tile += gfxbase;
+				}
+				else
+				{
+					tile = 0;
 				}
 			}
 
@@ -1038,7 +1079,7 @@ void xavix_state::draw_sprites_line(screen_device &screen, bitmap_rgb32 &bitmap,
 
 		int zval = (attr1 & 0xf0) >> 4;
 		int flipx = (attr1 & 0x01);
-		int flipy = (attr1 & 0x02); 
+		int flipy = (attr1 & 0x02);
 
 		// many elements, including the XaviX logo on xavmusic have yflip set, but don't want it, why?
 		if (m_disable_sprite_yflip)
@@ -1153,6 +1194,20 @@ void xavix_state::draw_sprites_line(screen_device &screen, bitmap_rgb32 &bitmap,
 					tile = (tile * drawheight * drawwidth * bpp) / 8;
 					int gfxbase = (m_segment_regs[1] << 16) | (m_segment_regs[0] << 8); // always use segment 0
 					tile += gfxbase;
+
+					// ban_bkgj is in sprite mode 0x01 but seems to expect the extended SuperXaviX registers to apply too?
+					//
+					// Is the register being set correctly? I'd expect it to be a different value to enable this. It does
+					// briefly set mode 4 and 5 on the startup logos, where it *doesn't* need this logic
+					if (m_ext_segment_regs)
+					{
+						int gfxbase = (m_ext_segment_regs[3] << 24) |
+									  (m_ext_segment_regs[2] << 16) |
+									  (m_ext_segment_regs[1] << 8) |
+									  (m_ext_segment_regs[0] << 0);
+						tile += gfxbase;
+					}
+
 
 				}
 				else if (alt_addressing == 2)
@@ -1384,7 +1439,7 @@ void superxavix_state::draw_bitmap_layer(screen_device &screen, bitmap_rgb32 &bi
 			// anpanmdx title screen ends up with a seemingly incorrect value for start
 			// when it does the scroller.  There is presumably an opcode or math bug causing this.
 			//if (start >= 0x7700)
-			///	start -= 0x3c00;
+			/// start -= 0x3c00;
 
 			int base = start * 0x800;
 			int base2 = topadr * 0x8;
@@ -1601,6 +1656,8 @@ void xavix_state::tmap1_regs_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 	    ---0 1001 (09) 16-bit+8 addressing (Tile Number + 8-bit Attribute) (Taito Nostalgia 2)
 	    ---0 1010 (0a) 16-bit+8 addressing (8-byte alignment Addressing Mode + 8-bit Attribute) (boxing, Snowboard)
 	    ---0 1011 (0b) 16-bit+8 addressing (Addressing Mode 2 + 8-bit Attribute)
+
+	    ---0 1100 (0d) ban_bkgj - seems to be a SuperXaviX only mode using the extended 32-bit segment regs
 
 	    ---1 0011 (13) 16-bit addressing (Addressing Mode 2 + Inline Header)  (monster truck)
 	    ---1 0100 (14) 24-bit addressing (Addressing Mode 2 + Inline Header)

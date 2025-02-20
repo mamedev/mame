@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert
+// copyright-holders:Robbbert,Mark Garlanger
 /********************************************************************
 
-Support for Heathkit H8 H8T cassette images
+Support for Heathkit H8/H88 H8T cassette images
 
 
 Standard Kansas City format (300 baud)
@@ -15,138 +15,82 @@ We output a leader, followed by the contents of the H8T file.
 
 #include "h8_cas.h"
 
-#include <algorithm>
+#include "coretmpl.h" // BIT
 
 
-static constexpr uint16_t WAVEENTRY_LOW         = -32768;
-static constexpr uint16_t WAVEENTRY_HIGH        = 32767;
-static constexpr uint16_t SILENCE               = 0;
+namespace {
 
-// using a multiple of 4800 will ensure an integer multiple of samples for each wave.
-static constexpr uint16_t H8_WAV_FREQUENCY      = 9600;
-static constexpr uint16_t TAPE_BAUD_RATE        = 300;
-static constexpr uint16_t SAMPLES_PER_BIT       = H8_WAV_FREQUENCY / TAPE_BAUD_RATE;
-static constexpr uint16_t SAMPLES_PER_HALF_WAVE = SAMPLES_PER_BIT / 2;
+constexpr double ONE_FREQ              = 1200.0;
+constexpr double ONE_FREQ_VARIANCE     = 300.0;
+constexpr double ZERO_FREQ             = 2400.0;
+constexpr double ZERO_FREQ_VARIANCE    = 600.0;
 
-static constexpr uint16_t ONE_FREQ              = 1200;
-static constexpr uint16_t ZERO_FREQ             = 2400;
-static constexpr uint16_t ONE_CYCLES            = H8_WAV_FREQUENCY / ONE_FREQ;
-static constexpr uint16_t ZERO_CYCLES           = H8_WAV_FREQUENCY / ZERO_FREQ;
-
-// image size
-static int h8_image_size; // FIXME: global variable prevents multiple instances
-
-static int h8_put_samples(int16_t *buffer, int sample_pos, int count, int level)
+const cassette_image::Modulation heath_h8t_modulation =
 {
-	if (buffer)
-	{
-		std::fill_n(&buffer[sample_pos], count, level);
-	}
-
-	return count;
-}
-
-static int h8_output_bit(int16_t *buffer, int sample_pos, bool bit)
-{
-	int samples = 0;
-
-	const int loops = bit ? ONE_CYCLES : ZERO_CYCLES;
-	const int samplePerValue = SAMPLES_PER_HALF_WAVE / loops;
-
-	for (int i = 0; i < loops; i++)
-	{
-		samples += h8_put_samples(buffer, sample_pos + samples, samplePerValue, WAVEENTRY_LOW);
-		samples += h8_put_samples(buffer, sample_pos + samples, samplePerValue, WAVEENTRY_HIGH);
-	}
-
-	return samples;
-}
-
-static int h8_output_byte(int16_t *buffer, int sample_pos, uint8_t data)
-{
-	int samples = 0;
-
-	// start bit
-	samples += h8_output_bit(buffer, sample_pos + samples, 0);
-
-	// data bits
-	for (int i = 0; i < 8; i++)
-	{
-		samples += h8_output_bit(buffer, sample_pos + samples, data & 1);
-		data >>= 1;
-	}
-
-	// stop bit
-	samples += h8_output_bit(buffer, sample_pos + samples, 1);
-
-	return samples;
-}
-
-static int h8_handle_cassette(int16_t *buffer, const uint8_t *bytes)
-{
-	int sample_count = 0;
-
-	// leader - 1 second
-	for (int i = 0; i < TAPE_BAUD_RATE; i++)
-		sample_count += h8_output_bit(buffer, sample_count, 1);
-
-	// data
-	for (int i = 0; i < h8_image_size; i++)
-		sample_count += h8_output_byte(buffer, sample_count, bytes[i]);
-
-	return sample_count;
-}
-
-
-/*******************************************************************
-   Generate samples for the tape image
-********************************************************************/
-
-static int h8_cassette_fill_wave(int16_t *buffer, int length, uint8_t *bytes)
-{
-	return h8_handle_cassette(buffer, bytes);
-}
-
-/*******************************************************************
-   Calculate the number of samples needed for this tape image
-********************************************************************/
-
-static int h8_cassette_calculate_size_in_samples(const uint8_t *bytes, int length)
-{
-	h8_image_size = length;
-
-	return h8_handle_cassette(nullptr, bytes);
-}
-
-static const cassette_image::LegacyWaveFiller h8_legacy_fill_wave =
-{
-	h8_cassette_fill_wave,                  // fill_wave
-	-1,                                     // chunk_size
-	0,                                      // chunk_samples
-	h8_cassette_calculate_size_in_samples,  // chunk_sample_calc
-	H8_WAV_FREQUENCY,                       // sample_frequency
-	0,                                      // header_samples
-	0                                       // trailer_samples
+	cassette_image::MODULATION_SINEWAVE,
+	ONE_FREQ - ONE_FREQ_VARIANCE,   ONE_FREQ,  ONE_FREQ + ONE_FREQ_VARIANCE,
+	ZERO_FREQ - ZERO_FREQ_VARIANCE, ZERO_FREQ, ZERO_FREQ + ZERO_FREQ_VARIANCE
 };
 
-static cassette_image::error h8_cassette_identify(cassette_image *cassette, cassette_image::Options *opts)
+cassette_image::error heath_h8t_identify(cassette_image *cassette, cassette_image::Options *opts)
 {
-	return cassette->legacy_identify(opts, &h8_legacy_fill_wave);
+	return cassette->modulation_identify(heath_h8t_modulation, opts);
 }
 
-static cassette_image::error h8_cassette_load(cassette_image *cassette)
+
+cassette_image::error heath_h8t_load(cassette_image *cassette)
 {
-	return cassette->legacy_construct(&h8_legacy_fill_wave);
+	cassette_image::error err = cassette_image::error::SUCCESS;
+	uint64_t image_size = cassette->image_size();
+	double time_index = 0.0;
+	double time_displacement;
+
+	auto const MODULATE =
+			[&cassette, &err, &time_index, &time_displacement] (unsigned value)
+			{
+				for (int i = 0; (i < (value ? 8 : 4)); i++)
+				{
+					err = cassette->put_modulated_data_bit(0, time_index, value, heath_h8t_modulation, &time_displacement);
+					if (cassette_image::error::SUCCESS == err)
+						time_index += time_displacement;
+					else
+						return;
+				}
+			};
+
+	// leader - 1 second
+	while ((cassette_image::error::SUCCESS == err) && (time_index < 1.0))
+		MODULATE(1);
+
+	for (uint64_t image_pos = 0; (cassette_image::error::SUCCESS == err) && (image_pos < image_size); image_pos++)
+	{
+		uint8_t data = cassette->image_read_byte(image_pos);
+
+		// start bit
+		MODULATE(0);
+
+		// data bits
+		for (int bit = 0; (cassette_image::error::SUCCESS == err) && (bit < 8); bit++)
+			MODULATE(util::BIT(data, bit));
+
+		// stop bit
+		if (cassette_image::error::SUCCESS == err)
+			MODULATE(1);
+	}
+
+	return err;
 }
 
-static const cassette_image::Format h8_cassette_image_format =
+const cassette_image::Format heath_h8t_format =
 {
 	"h8t",
-	h8_cassette_identify,
-	h8_cassette_load,
+	heath_h8t_identify,
+	heath_h8t_load,
 	nullptr
 };
 
-CASSETTE_FORMATLIST_START(h8_cassette_formats)
-	CASSETTE_FORMAT(h8_cassette_image_format)
+}
+
+CASSETTE_FORMATLIST_START( h8_cassette_formats )
+	CASSETTE_FORMAT( heath_h8t_format )
 CASSETTE_FORMATLIST_END

@@ -52,7 +52,6 @@ Are the following undumped or mistranslated (check also if available in TOSEC)?
  - 超番外制服図鑑+ (198905xx) by System House Oh!
  - 少女探偵RINNちゃんの事件簿 電脳少女伝説 (19890520) by Agumix
  - 小野由美のジャンピングクエスト (198904xx) by Uchuu Kikaku
- - ハイバーニア (198904xx) by Heart Denshi
  - エントフューラー 妖精誘拐事件 (198904xx) by Zenryutsu & グローサー
  - バージン倶楽部 Vol.1 (198903xx) by Pasoket [maybe in jam/jam1??]
  - 牧本千幸のメランコリー (198902xx) by Uchuu Kikaku
@@ -145,7 +144,6 @@ Are the following undumped or mistranslated (check also if available in TOSEC)?
  - ナナちゃんのスター誕生 (198510xx) by NSI
  - バルーンファイト (198510xx) by Hudson
  - パズルパニック (198510xx) by SystemSoft
- - レッドスタック (198508xx) by Cosmos Computer
  - スタコラさっちゃん (198508xx) by CTA
  - ゴーゴートレイン (198508xx) by Colpax
  - クリティカル・マス (198508xx) by Starcraft
@@ -240,6 +238,7 @@ Are the following undumped or mistranslated (check also if available in TOSEC)?
  - ゴルゴ13 狼の巣 (198410xx) by Pony Canyon
  - Breakfast3号 (1984xxxx) by Kominiketo
  - Blue Blood disks (at least Vol. 1-6 and CG set Vol. 1 according to gradiusm)
+ - S.F.3.D Original Operation V by Cross Media Soft
 
 Not included:
  - ミラーズ (19901210) by Studio Wing, uses CDROM (>PC8801MC)
@@ -4067,10 +4066,11 @@ A few kanji drawings in gameplay are odd to look at (cfr. signs, sports as full 
 		<description>Babylon</description>
 		<year>1986</year>
 		<publisher>クリスタルソフト (Xtal Soft)</publisher>
-		<!-- PC8801 -->
+		<!-- PC8801mk2SR -->
 		<info name="release" value="198612xx"/>
 		<info name="alt_title" value="バビロン"/>
 		<info name="usage" value="Needs BASIC V2"/>
+		<!-- check Crimson usage information for instructions on how to create user disk -->
 		<!--combined image-->
 		<!--rom name="babylon.d88" size="1067728" crc="117d7783" sha1="31bf30823e223c63f9b71c92c024904416da9294"/-->
 
@@ -4100,7 +4100,7 @@ A few kanji drawings in gameplay are odd to look at (cfr. signs, sports as full 
 		<description>Babylon (alt)</description>
 		<year>1986</year>
 		<publisher>クリスタルソフト (Xtal Soft)</publisher>
-		<!-- PC8801 -->
+		<!-- PC8801mk2SR -->
 		<info name="release" value="198612xx"/>
 		<info name="alt_title" value="バビロン"/>
 		<info name="usage" value="Needs BASIC V2"/>
@@ -5897,12 +5897,13 @@ Not extensively tested
 	</software>
 
 	<software name="carmine">
-		<description>Carmine</description>
+		<description>Carmine 88</description>
 		<year>1987</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
-		<!-- PC8801 -->
+		<!-- PC8801mk2SR -->
 		<info name="release" value="198702xx"/>
-		<info name="alt_title" value="カーマイン"/>
+		<info name="alt_title" value="カーマイン88"/>
+		<info name="usage" value="Needs BASIC V2"/>
 		<!--combined image-->
 		<!--rom name="carmine.d88" size="770496" crc="ade94761" sha1="220ee916091ece8176e56867e3923529a8c49591"/-->
 
@@ -5922,12 +5923,13 @@ Not extensively tested
 	</software>
 
 	<software name="carminea" cloneof="carmine">
-		<description>Carmine (alt?)</description>
+		<description>Carmine 88 (alt?)</description>
 		<year>1987</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
-		<!-- PC8801 -->
+		<!-- PC8801mk2SR -->
 		<info name="release" value="198702xx"/>
-		<info name="alt_title" value="カーマイン"/>
+		<info name="alt_title" value="カーマイン88"/>
+		<info name="usage" value="Needs BASIC V2"/>
 		<!--combined image-->
 		<!--rom name="carmine.d88" size="1140944" crc="62aeef7e" sha1="18a952b782b71177fa0000652422d0ed23d7d6a5"/-->
 
@@ -15793,6 +15795,58 @@ Should be supported by [PC8001mkIISR] too
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="348848">
 				<rom name="hiatari ryoko (disk 2).d88" size="348848" crc="76f1a34f" sha1="5a18fc8a4ef427e71e06563c12e69e3c45e613db"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hibernia">
+		<description>Hibernia</description>
+		<year>1989</year>
+		<publisher>ハート電子 (Heart Denshi)</publisher>
+		<notes><![CDATA[
+Converted to .mfm from original .hfe
+]]></notes>
+		<!-- PC8801mk2SR -->
+		<info name="release" value="198904xx"/>
+		<info name="alt_title" value="ハイバーニア"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="1085330">
+				<rom name="hibernia_disk_a.mfm" size="1085330" crc="067c70b3" sha1="cc52b8199e1df3962f7a86327d266f1fc58397fa"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="1101276">
+				<rom name="hibernia_disk_b.mfm" size="1101276" crc="1d123a2f" sha1="7485c0bef3c5d9713a25679543b75c7a7019a025"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hiberniaa" cloneof="hibernia" supported="no">
+		<description>Hibernia (alt .d88 format)</description>
+		<year>1989</year>
+		<publisher>ハート電子 (Heart Denshi)</publisher>
+		<notes><![CDATA[
+[Incorrect layout on track 0 head 1, expected_size=100000, current_size=134400]
+]]></notes>
+		<!-- PC8801mk2SR -->
+		<info name="release" value="198904xx"/>
+		<info name="alt_title" value="ハイバーニア"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="622624">
+				<rom name="hibernia (disk a).d88" size="622624" crc="1289b16d" sha1="e2d5c02523964e2942222aef01c87aed90d26784"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="641904">
+				<rom name="hibernia (disk b).d88" size="641904" crc="1c51e693" sha1="4aad9aee161e1f4bdbdab546cf3e184ce6663595"/>
 			</dataarea>
 		</part>
 	</software>
@@ -28335,6 +28389,23 @@ ExtractDisk  [07]"DiskD        " -> "psy-o-blade_07.d88"
 		</part>
 	</software>
 
+	<software name="redstack" supported="no">
+		<description>Red Stack</description>
+		<year>1985</year>
+		<publisher>コスモスコンピュータ (Cosmos Computer)</publisher>
+		<notes><![CDATA[
+Gameplay is too fast, needs [V1S]
+]]></notes>
+		<!-- PC8801 -->
+		<info name="release" value="198508xx"/>
+		<info name="alt_title" value="レッドスタック"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="185008">
+				<rom name="red stack.d88" size="185008" crc="c02cada5" sha1="ca5e7bf04b9d815792b200ad92e4fd10ea97a79a" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="redwing">
 		<description>Red Wing</description>
 		<year>1987</year>
@@ -29117,29 +29188,30 @@ Start and Program Disks OK, the remaining part is damaged (missing d88 headers?)
 		</part>
 	</software>
 
-	<software name="sf3dopv">
-		<description>S.F.3.D Original Operation V</description>
-		<year>1985</year>
-		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
-		<!-- PC8801 -->
-		<info name="release" value="198512xx"/>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="365168">
-				<rom name="s.f.3.d original operation v (1985)(cross media).d88" size="365168" crc="ffb66bfb" sha1="8524f776b1a0730086ebc78ae6dc20b4483fff57"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="sf3dthxg">
-		<description>S.F.3.D. - Original Operation Thanksgiving</description>
+		<description>Point X Senryō Sakusen S.F.3.D - Original Operation Thanksgiving</description>
 		<year>1986</year>
 		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198609xx"/>
-		<info name="alt_title" value="ポイントX占領作戦 (Box)"/>
+		<info name="alt_title" value="ポイントX占領作戦 S.F.3.D - Original Operation Thanksgiving (Box)"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="365168">
 				<rom name="s.f.3.d. - original operation thanksgiving.d88" size="365168" crc="4985b37a" sha1="d13efd4b247b0e6ec702e769e51a5963fa007411"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sf3dthxga" cloneof="sf3dthxg">
+		<description>Point X Senryō Sakusen S.F.3.D - Original Operation Thanksgiving (alt)</description>
+		<year>1986</year>
+		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198609xx"/>
+		<info name="alt_title" value="ポイントX占領作戦 S.F.3.D - Original Operation Thanksgiving (Box)"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="365168">
+				<rom name="s.f.3.d. - original operation thanksgiving (a).d88" size="365168" crc="ffb66bfb" sha1="8524f776b1a0730086ebc78ae6dc20b4483fff57"/>
 			</dataarea>
 		</part>
 	</software>
@@ -41681,6 +41753,7 @@ Not extensively tested
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="Studio K2" />
 		<info name="alt_title" value="パトルエントリー"/>
+		<info name="usage" value="Needs BASIC V2"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="263184">
@@ -41740,6 +41813,34 @@ Not extensively tested
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="beed (disk 3).d88" size="348848" crc="33027d70" sha1="5c7a57fc52fa0dd0e01d514bff6ae0b354d3e879"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="berserke" supported="yes">
+		<description>Berserkers Front Gaiden 3</description>
+		<year>19??</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Studio K2" />
+		<info name="usage" value="Needs BASIC V2"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="berserkers front gaiden 3.d88" size="348848" crc="91ab779c" sha1="3c21912259d0ab43cf3fbd5c481d7275777ae81e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="berserkep" supported="yes">
+		<description>Berserkers Front Gaiden 3 Plus - Turning Point</description>
+		<year>19??</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Studio K2" />
+		<info name="usage" value="Needs BASIC V2"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="350224">
+				<rom name="berserkers front gaiden 3 plus - turning point.d88" size="350224" crc="c37b39ba" sha1="5f688a428d51438bda2225a30842e32b6812a880"/>
 			</dataarea>
 		</part>
 	</software>
@@ -51807,17 +51908,6 @@ Tests [Sound Board 2]
 			<feature name="part_id" value="Visual" />
 			<dataarea name="flop" size="348832">
 				<rom name="battle bunnygirl (a) (visual).d88" size="348832" crc="53a7ed2d" sha1="f089cdb90b758c59842d89755e4717de610d45d2"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="berserke">
-		<description>Berserkers Front Gaiden 3</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="berserkers front gaiden 3.d88" size="348848" crc="91ab779c" sha1="3c21912259d0ab43cf3fbd5c481d7275777ae81e"/>
 			</dataarea>
 		</part>
 	</software>

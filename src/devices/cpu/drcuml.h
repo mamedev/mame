@@ -150,7 +150,6 @@ protected:
 	device_t &                      m_device;      // CPU device we are associated with
 	std::vector<address_space *>    m_space;       // pointers to CPU's address space
 	drcuml_machine_state &          m_state;       // state of the machine (in near cache)
-	data_accessors *                m_accessors;   // memory accessors (in near cache)
 };
 
 

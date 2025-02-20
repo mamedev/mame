@@ -18,18 +18,18 @@
 
 TILE_GET_INFO_MEMBER(atarisy2_state::get_alpha_tile_info)
 {
-	uint16_t data = m_alpha_tilemap->basemem_read(tile_index);
-	int code = data & 0x3ff;
-	int color = (data >> 13) & 0x07;
+	uint16_t const data = m_alpha_tilemap->basemem_read(tile_index);
+	int const code = data & 0x3ff;
+	int const color = (data >> 13) & 0x07;
 	tileinfo.set(2, code, color, 0);
 }
 
 
 TILE_GET_INFO_MEMBER(atarisy2_state::get_playfield_tile_info)
 {
-	uint16_t data = tile_index < 020000/2 ? m_playfieldt[tile_index] : m_playfieldb[tile_index & (020000/2 - 1)];
-	int code = (m_playfield_tile_bank[(data >> 10) & 1] << 10) | (data & 0x3ff);
-	int color = (data >> 11) & 7;
+	uint16_t const data = tile_index < 020000/2 ? m_playfieldt[tile_index] : m_playfieldb[tile_index & (020000/2 - 1)];
+	int const code = (m_playfield_tile_bank[(data >> 10) & 1] << 10) | (data & 0x3ff);
+	int const color = (data >> 11) & 7;
 	tileinfo.set(0, code, color, 0);
 	tileinfo.category = (~data >> 14) & 3;
 }
@@ -55,7 +55,6 @@ const atari_motion_objects_config atarisy2_state::s_mob_config =
 	0,                  /* maximum number of links to visit/scanline (0=all) */
 
 	0x00,               /* base palette entry */
-	0x40,               /* maximum number of colors */
 	15,                 /* transparent pen index */
 
 	{{ 0,0,0,0x07f8 }}, /* mask for the link */
@@ -93,7 +92,7 @@ void atarisy2_state::video_start()
 
 void atarisy2_state::xscroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	uint16_t oldscroll = *m_xscroll;
+	uint16_t const oldscroll = *m_xscroll;
 	uint16_t newscroll = oldscroll;
 	COMBINE_DATA(&newscroll);
 
@@ -124,7 +123,7 @@ TIMER_CALLBACK_MEMBER(atarisy2_state::reset_yscroll_callback)
 
 void atarisy2_state::yscroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	uint16_t oldscroll = *m_yscroll;
+	uint16_t const oldscroll = *m_yscroll;
 	uint16_t newscroll = oldscroll;
 	COMBINE_DATA(&newscroll);
 
@@ -213,7 +212,7 @@ void atarisy2_state::playfieldb_w(offs_t offset, uint16_t data, uint16_t mem_mas
  *
  *************************************/
 
-uint32_t atarisy2_state::screen_update_atarisy2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t atarisy2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// start drawing
 	m_mob->draw_async(cliprect);

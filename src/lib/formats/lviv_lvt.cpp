@@ -71,7 +71,7 @@ static int lviv_cassette_calculate_size_in_samples(const uint8_t *bytes, int len
 
 /*************************************************************************************/
 
-static int lviv_cassette_fill_wave(int16_t *buffer, int length, uint8_t *bytes)
+static int lviv_cassette_fill_wave(int16_t *buffer, int length, const uint8_t *bytes)
 {
 	int16_t * p = buffer;
 

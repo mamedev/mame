@@ -178,7 +178,7 @@ protected:
 
 	optional_device_array<neogeo_cart_slot_device, 6> m_slots;
 
-	int m_curr_slot = 0;
+	int32_t m_curr_slot = 0;
 
 private:
 	void update_interrupts();
@@ -214,8 +214,8 @@ private:
 	// color/palette related
 	std::vector<uint16_t> m_paletteram;
 	uint8_t      m_palette_lookup[32][4]{};
-	int          m_screen_shadow = 0;
-	int          m_palette_bank = 0;
+	bool         m_screen_shadow = false;
+	uint32_t     m_palette_bank = 0;
 };
 
 

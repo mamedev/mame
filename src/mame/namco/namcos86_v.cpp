@@ -60,14 +60,14 @@ void namcos86_state::namcos86_palette(palette_device &palette)
 		bit2 = BIT(color_prom[i], 2);
 		bit3 = BIT(color_prom[i], 3);
 		int const r = combine_weights(rweights, bit0, bit1, bit2, bit3);
-		
+
 		// green component
 		bit0 = BIT(color_prom[i], 4);
 		bit1 = BIT(color_prom[i], 5);
 		bit2 = BIT(color_prom[i], 6);
 		bit3 = BIT(color_prom[i], 7);
 		int const g = combine_weights(gweights, bit0, bit1, bit2, bit3);
-		
+
 		// blue component
 		bit0 = BIT(color_prom[i | 0x200], 0);
 		bit1 = BIT(color_prom[i | 0x200], 1);

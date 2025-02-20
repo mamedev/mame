@@ -2,8 +2,9 @@
 // copyright-holders: Lee Taylor, Chris Moore
 
 /*************************************************************************
+
     Universal Cheeky Mouse Driver
-    (c)Lee Taylor May/June 1998, All rights reserved.
+    (c)Lee Taylor May/June 1998
 
 **************************************************************************/
 

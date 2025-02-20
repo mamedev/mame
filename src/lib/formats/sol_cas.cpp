@@ -335,7 +335,7 @@ static int sol20_handle_cassette(int16_t *buffer, const uint8_t *bytes)
    Generate samples for the tape image
 ********************************************************************/
 
-static int sol20_cassette_fill_wave(int16_t *buffer, int length, uint8_t *bytes)
+static int sol20_cassette_fill_wave(int16_t *buffer, int length, const uint8_t *bytes)
 {
 	return sol20_handle_cassette(buffer, bytes);
 }

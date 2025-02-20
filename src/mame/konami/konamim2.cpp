@@ -288,7 +288,7 @@ public:
 	void init_btltryst();
 	void init_hellngt();
 
-	template<int N> ioport_value evilngt_aim_up() { return m_guny[N]->read() ? 0 : 1; }
+	template<int N> ioport_value evilngt_aim_up();
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -424,6 +424,13 @@ void konamim2_state::ata_int(int state)
  *  Konami I/O
  *
  *************************************/
+
+template<int N>
+ioport_value konamim2_state::evilngt_aim_up()
+{
+	// when P1/P3 gun is aimed up, it triggers a mercury switch inside the gun
+	return (m_guny[N]->read() > 0) ? 0 : 1;
+}
 
 uint16_t konamim2_state::konami_io0_r(offs_t offset)
 {

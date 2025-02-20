@@ -35,10 +35,10 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
 
 	// device_zorro2_card_interface overrides
 	virtual void cfgin_w(int state) override;
+	virtual void busrst_w(int state) override;
 
 	// amiga_autoconfig overrides
 	virtual void autoconfig_base_address(offs_t address) override;
@@ -81,6 +81,6 @@ private:
 } // namespace bus::amiga::zorro
 
 // device type declaration
-DECLARE_DEVICE_TYPE_NS(ZORRO_BUDDHA, bus::amiga::zorro, buddha_device)
+DECLARE_DEVICE_TYPE_NS(AMIGA_BUDDHA, bus::amiga::zorro, buddha_device)
 
 #endif // MAME_BUS_AMIGA_ZORRO_BUDDHA_H

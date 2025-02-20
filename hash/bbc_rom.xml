@@ -732,11 +732,13 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>System Software</publisher>
 		<part name="rom1" interface="bbc_rom">
+			<feature name="part_id" value="ADE/Linker" />
 			<dataarea name="rom" size="16384">
 				<rom name="ADEplus-1.0.rom" size="16384" crc="81daa16e" sha1="2aad47b02e6c68510f725256e71913ce95bb8e53"/>
 			</dataarea>
 		</part>
 		<part name="rom2" interface="bbc_rom">
+			<feature name="part_id" value="65C00 assembler" />
 			<dataarea name="rom" size="16384">
 				<rom name="ADE6500-1.0.rom" size="16384" crc="946f793d" sha1="d8653a9d5dedb6651514939941a82bd8927b03cc"/>
 			</dataarea>
@@ -748,16 +750,19 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>System Software</publisher>
 		<part name="rom1" interface="bbc_rom">
+			<feature name="part_id" value="ADE/Linker" />
 			<dataarea name="rom" size="16384">
 				<rom name="ADEplus-0.93.rom" size="16384" crc="30e16ac1" sha1="eda8a21bdb7c588a531fda80dc376f3b3f6f07e8"/>
 			</dataarea>
 		</part>
 		<part name="rom2" interface="bbc_rom">
+			<feature name="part_id" value="65C00 assembler" />
 			<dataarea name="rom" size="16384">
 				<rom name="ADE6500-0.93.rom" size="16384" crc="4c3e6409" sha1="65e0e31e83211fb7721408b66d98222e5b2e4bf1"/>
 			</dataarea>
 		</part>
 		<part name="rom3" interface="bbc_rom">
+			<feature name="part_id" value="Debugger" />
 			<dataarea name="rom" size="16384">
 				<rom name="ADEBUG-0.93.rom" size="16384" crc="ae95a2ad" sha1="db6dd7445f5570ecdb037e0cf24d8946c2b29f50"/>
 			</dataarea>
@@ -1832,6 +1837,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="axr">
+		<description>Assembler Extension ROM 1.12</description>
+		<year>1985</year>
+		<publisher>Acorn User</publisher>
+		<info name="author" value="Steve Picton"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="AXR-1.12.rom" size="16384" crc="f49c02fd" sha1="c2853a06ae06c0cff6305858d2cccf9042154703"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="b2p" supported="no">
 		<description>B2P-6502</description>
 		<year>1986</year>
@@ -2134,7 +2151,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="beebscan" supported="no">
-		<description>BeebScan</description>
+		<description>BeebScan 1.31</description>
 		<year>1989</year>
 		<publisher>Watford Electronics</publisher>
 		<part name="rom1" interface="bbc_rom">
@@ -2994,9 +3011,9 @@ license:CC0-1.0
 	</software>
 
 	<software name="control023" cloneof="control">
-		<description>SJ Control ROM 0.23</description>
+		<description>The Control ROM 0.23</description>
 		<year>1983</year>
-		<publisher>SJ Research</publisher>
+		<publisher>Control Universal</publisher>
 		<info name="author" value="Peter Miller"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
@@ -3425,7 +3442,7 @@ license:CC0-1.0
 		<sharedfeat name="fdc_default" value="opus2793"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="Opus-DDOS-3.35r2.rom" size="16384" crc="e33167fb" sha1="42fbc9932db2087708da41cb1ffa94358683cf7a"/>
+				<rom name="Opus-DDOS-3.35r2.rom" size="16384" crc="262b860e" sha1="f8be50ff46bd5d3705ef4cb2217a99118b984c11"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4763,7 +4780,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="eurobeeb1" cloneof="eurobeeb" supported="no">
+	<software name="eurobeeb1" cloneof="eurobeeb4" supported="no">
 		<description>EURO-Beeb Terminal 1</description>
 		<year>1984</year>
 		<publisher>Control Universal</publisher>
@@ -4774,13 +4791,24 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="eurobeeb" supported="no">
+	<software name="eurobeeb4" supported="no">
 		<description>EURO-Beeb Terminal 4.13</description>
 		<year>1986</year>
 		<publisher>Control Universal</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
 				<rom name="EURO-Beeb_Terminal-4.13.rom" size="8192" crc="5e80e864" sha1="d1c42206bc4bd8210967b1574a090117338535e9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eurobeeb414" cloneof="eurobeeb4" supported="no">
+		<description>EURO-Beeb Terminal 4.14</description>
+		<year>1986</year>
+		<publisher>Control Universal</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="EURO-Beeb_Terminal-4.14.rom" size="8192" crc="52c5eb7b" sha1="347253da64f81fd643d2800a6e09fade86c40f18"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5254,8 +5282,6 @@ license:CC0-1.0
 			<dataarea name="rom" size="32768">
 				<rom name="PMSGenie-1.01.rom" size="32768" crc="be152c01" sha1="34d8d21c71b1bf1f3648a4dda90fde5d8dc48cd2"/>
 			</dataarea>
-			<dataarea name="nvram" size="32768" />
-			<dataarea name="ram" size="32768" />
 		</part>
 	</software>
 
@@ -5272,8 +5298,6 @@ license:CC0-1.0
 				<rom name="PMSGenie3-1.02.rom" size="8192" crc="9a37428c" sha1="a951c61c81acea3d7510a0e23b0c054fae86a95b" offset="0x4000" status="baddump"/>
 				<rom name="PMSGenie4-1.02.rom" size="8192" crc="25cdd418" sha1="07a5f4f5dde38679140815a6b5ee22eccd678cb1" offset="0x6000" status="baddump"/>
 			</dataarea>
-			<dataarea name="nvram" size="32768" />
-			<dataarea name="ram" size="32768" />
 		</part>
 	</software>
 
@@ -5881,6 +5905,54 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="ibos121" cloneof="ibos">
+		<description>Integra-B OS 1.21</description>
+		<year>2019</year>
+		<publisher>Ken Lowe</publisher>
+		<info name="usage" value="Requires Integra-B" />
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="IBOS-1.21.rom" size="16384" crc="736e6d13" sha1="9c6fb32ac9ee78d5b527079a5abea5689e64b5e3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ibos122" cloneof="ibos">
+		<description>Integra-B OS 1.22</description>
+		<year>2021</year>
+		<publisher>Ken Lowe</publisher>
+		<info name="usage" value="Requires Integra-B" />
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="IBOS-1.22.rom" size="16384" crc="8e05fcb8" sha1="d38baab64627689d9f88d33892c7fb0af331514a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ibos123" cloneof="ibos">
+		<description>Integra-B OS 1.23</description>
+		<year>2022</year>
+		<publisher>Ken Lowe</publisher>
+		<info name="usage" value="Requires Integra-B" />
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="IBOS-1.23.rom" size="16384" crc="181ddc08" sha1="d89ade928c47b440d19b916e691565f17d92a689"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ibos124" cloneof="ibos">
+		<description>Integra-B OS 1.24</description>
+		<year>2022</year>
+		<publisher>Ken Lowe</publisher>
+		<info name="usage" value="Requires Integra-B" />
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="IBOS-1.24.rom" size="16384" crc="7e14b658" sha1="cc2cf9428fb9f1cb799bb27d8f88b2a5d9e18767"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ibos125" cloneof="ibos">
 		<description>Integra-B OS 1.25</description>
 		<year>2022</year>
@@ -5916,6 +5988,17 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="ieee191" cloneof="ieee">
+		<description>IEEE 1.91</description>
+		<year>1983</year>
+		<publisher>Procyon Research</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="IEEE-1.91.rom" size="8192" crc="3eb94350" sha1="a488f5904b2d669170edf8ab4244324ef36a4f41"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ieee192" cloneof="ieee">
 		<description>IEEE 1.92</description>
 		<year>1983</year>
@@ -5923,6 +6006,17 @@ license:CC0-1.0
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
 				<rom name="IEEE-1.92.rom" size="8192" crc="87e5f701" sha1="673eab99031ca88aa90e6deade39b653f8c6b9da"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ieee196" cloneof="ieee">
+		<description>IEEE 1.96</description>
+		<year>1984</year>
+		<publisher>Procyon Research</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="IEEE-1.96.rom" size="8192" crc="f4e6a15e" sha1="5f01ac0b8940126025611bd4a99320e1fd1212f5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6410,6 +6504,17 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="lambda7" supported="no">
+		<description>Lambda 7 Spectrophotometer Simulation 1.23</description>
+		<year>1986</year>
+		<publisher>Oxford Polytechnic</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Lambda7-1.23.rom" size="16384" crc="9c80bdfd" sha1="83fc762f58c166b33c2e00671d172c3953c3b38e"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lanman032" cloneof="lanman" supported="no">
 		<description>LAN Manager 0.32</description>
 		<year>2008</year>
@@ -6872,13 +6977,24 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="matrix">
-		<description>Matrix</description>
+	<software name="matrix101" cloneof="matrix">
+		<description>Matrix 1.01</description>
 		<year>1986</year>
 		<publisher>Vine Micros</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
 				<rom name="Matrix-1.01.rom" size="8192" crc="79beb2e0" sha1="3759f55e9f39b83eb96cb95ea4466ab72baca57f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="matrix">
+		<description>Matrix 1.06</description>
+		<year>1986</year>
+		<publisher>Vine Micros</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Matrix-1.06.rom" size="16384" crc="fe24af29" sha1="78fa4e2f3fc4743a01de2af1567be92dddd1bc74"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6901,6 +7017,17 @@ license:CC0-1.0
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="Microbrush-Injector-1.00.rom" size="16384" crc="c8c3d200" sha1="90e93da3b2b14b0ba4f7040c0f1d10cca15e360a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcl">
+		<description>MCL 1.6</description>
+		<year>1986</year>
+		<publisher>Unilab</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="MCL-1.6.rom" size="16384" crc="69463561" sha1="4a4fc7f875677948c44fa5c518d6117dd5cceb7b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7819,6 +7946,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="mxr">
+		<description>Maths Extension ROM 1.05</description>
+		<year>1984</year>
+		<publisher>Acorn User</publisher>
+		<info name="author" value="Steve Picton"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="MXR-1.05.rom" size="16384" crc="b3bb5ec7" sha1="10391981e8c6becf5b0e409f1c40a43a862c0b27"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="nfs334">
 		<description>Acorn NFS 3.34</description>
 		<year>1982</year>
@@ -8402,12 +8541,12 @@ license:CC0-1.0
 	</software>
 
 	<software name="prestel47" cloneof="prestel" supported="no">
-		<description>Prestel 4.7n</description>
+		<description>Prestel 4.70n</description>
 		<year>1984</year>
 		<publisher>SofMac</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
-				<rom name="Prestel-4.7n.rom" size="8192" crc="0a67a386" sha1="4e3f983e51e812a903dfce9bfbb41a040c4b9ff5"/>
+				<rom name="Prestel-4.70n.rom" size="8192" crc="0a67a386" sha1="4e3f983e51e812a903dfce9bfbb41a040c4b9ff5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8956,13 +9095,24 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="ramdisc">
+	<software name="ramdisc101" cloneof="ramdisc">
 		<description>RAMDisc 1.01</description>
 		<year>198?</year>
 		<publisher>Morley Electronics</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="RAMDisc-1.01.rom" size="16384" crc="627568c2" sha1="17e727998756fe35ff451fd2ce1d4b5977be24fc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ramdisc">
+		<description>RAMDisc 1.04</description>
+		<year>1987</year>
+		<publisher>Morley Electronics</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="RAMDisc-1.04.rom" size="16384" crc="39ddebdb" sha1="d992d095f1dfac0d27ba655afb2656ddc4635ac7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9731,6 +9881,19 @@ license:CC0-1.0
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="Watford-SFS-0.92.rom" size="16384" crc="9fdb8089" sha1="c4a1df15cd470e9e52a4d1c6afee1629cdf14797"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shadowfax" cloneof="weram">
+		<description>Micro Club 32K Shadow Ram 1.00</description>
+		<year>1986</year>
+		<publisher>Micro Club</publisher>
+		<info name="usage" value="Requires Micro Club 32K Shadow RAM (Watford 32K Shadow RAM)" />
+		<sharedfeat name="compatibility" value="B"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Shadowfax-1.00.rom" size="8192" crc="911e4988" sha1="e1985068a08a81525f009575ea3f1dac6ddcbfe6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11666,6 +11829,17 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="ttx2000b">
+		<description>TTX2000B 1.12</description>
+		<year>1985</year>
+		<publisher>Volex</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="TTX2000B-1.12.rom" size="16384" crc="5ed73112" sha1="f13a0fc801f15c186d4de033a44cc29a570e6f36"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tubeed">
 		<description>TUBE Editor</description>
 		<year>1985</year>
@@ -12027,6 +12201,30 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="utilrom20" cloneof="utilrom">
+		<description>The UtilRom 2.0</description>
+		<year>1992</year>
+		<publisher>B&amp;B Software</publisher>
+		<sharedfeat name="compatibility" value="M"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="TheUtilRom-2.0.rom" size="16384" crc="8148e86c" sha1="fe47e58907fc128d5dced2e482d5609f76e82080"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="utilrom23" cloneof="utilrom">
+		<description>The UtilRom 2.3</description>
+		<year>1993</year>
+		<publisher>B&amp;B Software</publisher>
+		<sharedfeat name="compatibility" value="M"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="TheUtilRom-2.3.rom" size="16384" crc="52d8e0cb" sha1="8325fbd419ce9e2751bc22a7d70bbc24461cf598"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="utools124" cloneof="utools">
 		<description>U-Tools 1.24</description>
 		<year>1984</year>
@@ -12185,6 +12383,20 @@ license:CC0-1.0
 			<feature name="part_id" value="CONSOLE Program" />
 			<dataarea name="rom" size="16384">
 				<rom name="ULCC-Console-V872_9.rom" size="16384" crc="d0f6a01a" sha1="da35145d821a16c73cb617146362d1cdc1f40747"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vdsdfs">
+		<description>Viglen DSDFS 1.00</description>
+		<year>1984</year>
+		<publisher>Viglen</publisher>
+		<info name="usage" value="Requires Watford Electronics DDB2 1770 FDC" />
+		<sharedfeat name="compatibility" value="B"/>
+		<sharedfeat name="fdc_default" value="weddb2"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Watford-DDFS-1.40.rom" size="16384" crc="159054a7" sha1="6671c61d016e58bd3a5b4b97aefa314ae9b11574"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12638,6 +12850,17 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="vtclockm">
+		<description>VT Clock 1.0</description>
+		<year>1989</year>
+		<publisher>Moonlight Video</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="VTClock-1.0.rom" size="8192" crc="2a01eee6" sha1="75875b1a69c8341be2f60617b430128ac8284fb4"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="vtclock">
 		<description>VT Clock 1.16</description>
 		<year>1984</year>
@@ -13029,7 +13252,7 @@ license:CC0-1.0
 		<publisher>Computer Concepts</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
-				<rom name="Wordwise-1.17.rom" size="8192" crc="c9510583" sha1="098763e97595a12274f56de92beb8cdd722c64a5"/>
+				<rom name="Wordwise-1.17.rom" size="8192" crc="e453ea0e" sha1="a38037d70f2a8e460482a0c6ad3bce80865a0154"/>
 			</dataarea>
 		</part>
 	</software>

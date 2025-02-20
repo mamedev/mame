@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders: Angelo Salese
 
 #ifndef MAME_BUS_PCI_ZR36057_H
 #define MAME_BUS_PCI_ZR36057_H
@@ -7,7 +7,7 @@
 #pragma once
 
 #include "pci_slot.h"
-
+#include "video/saa7110.h"
 
 class zr36057_device : public pci_card_device
 {
@@ -31,7 +31,24 @@ protected:
 	virtual void config_map(address_map &map) override ATTR_COLD;
 
 private:
-	void map(address_map &map) ATTR_COLD;
+	required_device<saa7110a_device> m_decoder;
+	void asr_map(address_map &map) ATTR_COLD;
+
+	void software_reset();
+
+	struct {
+		u32 horizontal_config;
+		u32 vertical_config;
+	} m_video_frontend;
+
+	bool m_softreset;
+	u8 m_gpio_ddr, m_pci_waitstate_control;
+
+	struct {
+		u8 time[4];
+	} m_guestbus;
+
+	int m_decoder_sdao_state;
 };
 
 DECLARE_DEVICE_TYPE(ZR36057_PCI, zr36057_device)

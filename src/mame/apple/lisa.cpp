@@ -12,11 +12,15 @@
 
 #include "emu.h"
 #include "lisa.h"
+
 #include "cpu/cop400/cop400.h"
-#include "formats/ap_dsk35.h"
+
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
+
+#include "formats/ap_dsk35.h"
+
 
 /***************************************************************************
     ADDRESS MAP

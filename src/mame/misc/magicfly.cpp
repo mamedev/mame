@@ -191,7 +191,7 @@
 
         ($0D)            ; Incremented each time a NMI is triggered.
         ($1D)            ; In case of 0x00, NMI do nothing and return.
-        ($11)            ; Store lenghts for text handling.
+        ($11)            ; Store lengths for text handling.
         ($12)            ; Store values to be written in color RAM.
         ($13 - $14)      ; Pointer to text offset.
         ($15 - $16)      ; Pointer to video RAM.

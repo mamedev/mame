@@ -65,6 +65,7 @@
 #define PPCCAP_601BAT               0x80        /* TRUE if we're doing 601-style BATs (unified I/D, different bit layout) */
 #define PPCCAP_604_MMU              0x100       /* TRUE if we have 604-class MMU features */
 #define PPCCAP_750_TLB              0x200       /* TRUE if we have the extended 740/750 series TLB */
+#define PPCCAP_LEGACY_POWER         0x400       /* TRUE if we support the legacy POWER instructions */
 
 /* exception types */
 enum
@@ -171,6 +172,14 @@ enum
 	SPR4XX_PBL2         = 0x3fe,    /* R/W  403GA 406GA Protection Bound Lower 2 */
 	SPR4XX_PBU2         = 0x3ff,    /* R/W  403GA 406GA Protection Bound Upper 2 */
 
+	/* PowerPC 601 POWER back compatibility SPR indexes */
+	SPR601_MQ           = 0x000,    /* R/W  Muliplicand/Quotient for 601 POWER instructions */
+	SPR601_RTCUR_PWR    = 0x004,    /* R    Counts up number set in SPR 20 once per second, POWER only */
+	SPR601_RTCLR_PWR    = 0x005,    /* R    Number of nanoseconds between the seconds counted in SPR 4 */
+	SPR601_PWRDEC       = 0x006,    /* R    Decrementer register mirror for POWER compatibilty */
+	SPR601_RTCUW_PWR    = 0x014,    /* W    Seconds counter, set here and read SPR 4 */
+	SPR601_RTCLW_PWR    = 0x015,    /* W    Nanoseconds counter, not clear what writing here does */
+
 	/* PowerPC 602 SPR register indexes */
 	SPR602_TCR          = 0x3d8,    /* 602 */
 	SPR602_IBR          = 0x3da,    /* 602 */
@@ -197,7 +206,6 @@ enum
 	SPR603_IABR         = 0x3f2,    /* R/W 603 Instruction Address Breakpoint Register */
 	SPR603_HID2         = 0x3f3     /* R/W 603 */
 };
-
 
 /* PowerPC 4XX DCR register indexes */
 enum

@@ -1,0 +1,386 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+copyright-holders:m1macrophage
+-->
+<mamelayout version="2">
+	<!-- Case -->
+	<element name="bezel">
+		<rect><color red="0.827" green="0.757" blue="0.627"/></rect>
+	</element>
+	<element name="case">
+		<rect><color red="0.078" green="0.094" blue="0.098"/></rect>
+	</element>
+	<element name="vent">
+		<rect><color red="0.027" green="0.024" blue="0.043"/></rect>
+	</element>
+	<element name="led" defstate="0">
+		<disk state="0"><color red="0.3" green="0.0" blue="0.0"/></disk>
+		<disk state="1"><color red="0.7" green="0.0" blue="0.0"/></disk>
+	</element>
+	<element name="led-power">
+		<disk><color red="0.7" green="0.0" blue="0.0"/></disk>
+	</element>
+
+	<!-- Silkscreen -->
+	<element name="rounded-rect-narrow">
+		<image><data><![CDATA[
+			<rect stroke="#d1dbd3" fill="none" stroke-width="4" width="260" height="539" rx="28" ry="38"/>
+		]]></data></image>
+	</element>
+	<element name="rounded-rect-wide">
+		<image><data><![CDATA[
+			<rect stroke="#d1dbd3" fill="none" stroke-width="4" width="441" height="539" rx="28" ry="38"/>
+		]]></data></image>
+	</element>
+	<element name="line">
+		<rect><color red="0.820" green="0.859" blue="0.827"/></rect>
+	</element>
+
+	<!-- Text -->
+	<element name="text-gate">
+		<text string="Gate" align="1"><color red="0.820" green="0.859" blue="0.827"/></text>
+	</element>
+	<element name="text-midi">
+		<text string="MIDI In" align="2"><color red="0.820" green="0.859" blue="0.827"/></text>
+	</element>
+	<element name="text-power">
+		<text string="POWER" align="1"><color red="0.820" green="0.859" blue="0.827"/></text>
+	</element>
+	<element name="text-vcos">
+		<text string="VCOs"><color red="0.820" green="0.859" blue="0.827"/></text>
+	</element>
+	<element name="text-vcf">
+		<text string="VCF"><color red="0.820" green="0.859" blue="0.827"/></text>
+	</element>
+	<element name="text-vca">
+		<text string="VCA"><color red="0.820" green="0.859" blue="0.827"/></text>
+	</element>
+	<element name="text-modulation">
+		<text string="Modulation"><color red="0.820" green="0.859" blue="0.827"/></text>
+	</element>
+	<element name="text-transient">
+		<text string="Transient"><color red="0.820" green="0.859" blue="0.827"/></text>
+	</element>
+	<element name="text-unison">
+		<text string="unison"><color red="0.820" green="0.859" blue="0.827"/></text>
+	</element>
+	<element name="text-both">
+		<text string="both"><color red="0.820" green="0.859" blue="0.827"/></text>
+	</element>
+
+	<!-- Knob and switch text -->
+	<element name="text-pitch-caps">
+		<text string="PITCH" align="1"><color red="0.820" green="0.859" blue="0.827"/></text>
+	</element>
+	<element name="text-glide">
+		<text string="Glide" align="1"><color red="0.820" green="0.859" blue="0.827"/></text>
+	</element>
+	<element name="text-offset">
+		<text string="Offset" align="1"><color red="0.820" green="0.859" blue="0.827"/></text>
+	</element>
+	<element name="text-mix">
+		<text string="1-2 Mix" align="1"><color red="0.820" green="0.859" blue="0.827"/></text>
+	</element>
+	<element name="text-freq">
+		<text string="Freq." align="1"><color red="0.820" green="0.859" blue="0.827"/></text>
+	</element>
+	<element name="text-res">
+		<text string="Res." align="1"><color red="0.820" green="0.859" blue="0.827"/></text>
+	</element>
+	<element name="text-punch">
+		<text string="PUNCH" align="1"><color red="0.820" green="0.859" blue="0.827"/></text>
+	</element>
+	<element name="text-on">
+		<text string="on"><color red="0.820" green="0.859" blue="0.827"/></text>
+	</element>
+	<element name="text-off">
+		<text string="off"><color red="0.820" green="0.859" blue="0.827"/></text>
+	</element>
+	<element name="text-output">
+		<text string="Output" align="1"><color red="0.820" green="0.859" blue="0.827"/></text>
+	</element>
+	<element name="text-pitch">
+		<text string="Pitch" align="1"><color red="0.820" green="0.859" blue="0.827"/></text>
+	</element>
+	<element name="text-velocity">
+		<text string="Velocity" align="1"><color red="0.820" green="0.859" blue="0.827"/></text>
+	</element>
+	<element name="text-asr-paren">
+		<text string="A(S)R" align="1"><color red="0.820" green="0.859" blue="0.827"/></text>
+	</element>
+	<element name="text-asr">
+		<text string="ASR"><color red="0.820" green="0.859" blue="0.827"/></text>
+	</element>
+	<element name="text-ar">
+		<text string="AR"><color red="0.820" green="0.859" blue="0.827"/></text>
+	</element>
+	<element name="text-adsr">
+		<text string="ADSR" align="1"><color red="0.820" green="0.859" blue="0.827"/></text>
+	</element>
+	<element name="text-attack">
+		<text string="Attack" align="1"><color red="0.820" green="0.859" blue="0.827"/></text>
+	</element>
+	<element name="text-decay">
+		<text string="Decay" align="1"><color red="0.820" green="0.859" blue="0.827"/></text>
+	</element>
+	<element name="text-sustain">
+		<text string="Sustain" align="1"><color red="0.820" green="0.859" blue="0.827"/></text>
+	</element>
+	<element name="text-release">
+		<text string="Release" align="1"><color red="0.820" green="0.859" blue="0.827"/></text>
+	</element>
+	<element name="text-minus-half">
+		<text string="-1/2" align="2"><color red="0.820" green="0.859" blue="0.827"/></text>
+	</element>
+	<element name="text-plus-half">
+		<text string="+1/2" align="1"><color red="0.820" green="0.859" blue="0.827"/></text>
+	</element>
+	<element name="text-minus-one">
+		<text string="-1" align="2"><color red="0.820" green="0.859" blue="0.827"/></text>
+	</element>
+	<element name="text-plus-one">
+		<text string="+1" align="1"><color red="0.820" green="0.859" blue="0.827"/></text>
+	</element>
+	<element name="text-vco1">
+		<text string="VCO1" align="2"><color red="0.820" green="0.859" blue="0.827"/></text>
+	</element>
+	<element name="text-vco2">
+		<text string="VCO2" align="1"><color red="0.820" green="0.859" blue="0.827"/></text>
+	</element>
+	<element name="text-min">
+		<text string="Min" align="2"><color red="0.820" green="0.859" blue="0.827"/></text>
+	</element>
+	<element name="text-max">
+		<text string="Max" align="1"><color red="0.820" green="0.859" blue="0.827"/></text>
+	</element>
+	<element name="text-fast">
+		<text string="Fast" align="2"><color red="0.820" green="0.859" blue="0.827"/></text>
+	</element>
+	<element name="text-slow">
+		<text string="Slow" align="1"><color red="0.820" green="0.859" blue="0.827"/></text>
+	</element>
+
+	<!-- Knobs -->
+	<element name="white-disk">
+		<disk><color red="0.820" green="0.859" blue="0.827"/></disk>
+	</element>
+	<element name="blue-disk">
+		<disk><color red="0.0" green="0.090" blue="0.322"/></disk>
+	</element>
+	<element name="gray-disk">
+		<disk><color red="0.239" green="0.231" blue="0.227"/></disk>
+	</element>
+	<element name="transparent-rect">
+		<rect><color red="0" green="0" blue="0" alpha="0"/></rect>
+	</element>
+	<element name="knob-value">
+		<simplecounter maxstate="100" digits="1">
+			<color red="0.820" green="0.859" blue="0.827"/>
+		</simplecounter>
+	</element>
+	<group name="knob">
+		<bounds width="178" height="109"/>
+		<element ref="gray-disk">
+			<bounds x="52" y="24" width="72" height="72"/>
+		</element>
+		<element ref="blue-disk">
+			<bounds x="61" y="33" width="54" height="54"/>
+		</element>
+		<element ref="white-disk">
+			<bounds x="45" y="93" width="8" height="8"/>
+		</element>
+		<element ref="white-disk">
+			<bounds x="29" y="54" width="9" height="9"/>
+		</element>
+		<element ref="white-disk">
+			<bounds x="45" y="16" width="10" height="10"/>
+		</element>
+		<element ref="white-disk">
+			<bounds x="82" y="0" width="11" height="11"/>
+		</element>
+		<element ref="white-disk">
+			<bounds x="120" y="15" width="12" height="12"/>
+		</element>
+		<element ref="white-disk">
+			<bounds x="135" y="53" width="13" height="13"/>
+		</element>
+		<element ref="white-disk">
+			<bounds x="119" y="90" width="14" height="14"/>
+		</element>
+	</group>
+	<group name="knob-no-top-circle">
+		<bounds width="178" height="109"/>
+		<element ref="gray-disk">
+			<bounds x="52" y="24" width="72" height="72"/>
+		</element>
+		<element ref="blue-disk">
+			<bounds x="61" y="33" width="54" height="54"/>
+		</element>
+		<element ref="white-disk">
+			<bounds x="45" y="93" width="8" height="8"/>
+		</element>
+		<element ref="white-disk">
+			<bounds x="29" y="54" width="9" height="9"/>
+		</element>
+		<element ref="white-disk">
+			<bounds x="45" y="16" width="10" height="10"/>
+		</element>
+		<element ref="white-disk">
+			<bounds x="120" y="15" width="12" height="12"/>
+		</element>
+		<element ref="white-disk">
+			<bounds x="135" y="53" width="13" height="13"/>
+		</element>
+		<element ref="white-disk">
+			<bounds x="119" y="90" width="14" height="14"/>
+		</element>
+	</group>
+	<group name="knob-min-max">
+		<bounds width="178" height="109"/>
+		<group ref="knob">
+			<bounds x="0" y="0" width="178" height="109"/>
+		</group>
+		<element ref="text-min">
+			<bounds x="0" y="94" width="40" height="15"/>
+		</element>
+		<element ref="text-max">
+			<bounds x="138" y="94" width="40" height="15"/>
+		</element>
+	</group>
+	<group name="knob-fast-slow">
+		<bounds width="178" height="109"/>
+		<group ref="knob">
+			<bounds x="0" y="0" width="178" height="109"/>
+		</group>
+		<element ref="text-fast">
+			<bounds x="0" y="94" width="40" height="15"/>
+		</element>
+		<element ref="text-slow">
+			<bounds x="138" y="94" width="40" height="15"/>
+		</element>
+		<element ref="transparent-rect" clickthrough="no">
+			<!-- Disable clicks on the `simplecounter` below, because they
+			change the value in an unintuitive way. -->
+			<bounds x="68" y="52" width="40" height="16"/>
+		</element>
+		<element ref="knob-value" inputraw="yes" inputtag="~knob_inputtag~" inputmask="0x7f">
+			<bounds x="68" y="52" width="40" height="16"/>
+		</element>
+	</group>
+
+	<!-- Switches -->
+	<element name="switch" defstate="0">
+		<rect>
+			<color red="0.2" green="0.2" blue="0.2"/>
+			<bounds x="0.0" y="0.0" width="1.0" height="1.0"/>
+		</rect>
+		<rect state="0">
+			<color red="0.7" green="0.7" blue="0.7"/>
+			<bounds x="0.0" y="0.7" width="1.0" height="0.3"/>
+		</rect>
+		<rect state="1">
+			<color red="0.7" green="0.7" blue="0.7"/>
+			<bounds x="0.0" y="0.0" width="1.0" height="0.3"/>
+		</rect>
+	</element>
+
+	<view name="fatman_desktop">
+		<bounds x="0" y="0" width="1470" height="780"/>
+
+		<!-- Chasis -->
+		<element ref="bezel"><bounds x="22" y="42" width="35" height="719"/></element>
+		<element ref="case"><bounds x="58" y="65" width="1365" height="668"/></element>
+		<element ref="vent"><bounds x="1268" y="255" width="19" height="125"/></element>
+		<element ref="vent"><bounds x="1300" y="255" width="19" height="125"/></element>
+		<element ref="vent"><bounds x="1333" y="255" width="19" height="125"/></element>
+		<element ref="bezel"><bounds x="1424" y="42" width="35" height="719"/></element>
+		<element ref="text-gate"><bounds x="679" y="82" width="54" height="17"/></element>
+		<element ref="led" name="gate_led"><bounds x="647" y="79" width="25" height="25"/></element>
+		<element ref="text-midi"><bounds x="1053" y="82" width="91" height="17"/></element>
+		<element ref="led" name="midi_led"><bounds x="1157" y="79" width="25" height="25"/></element>
+		<element ref="text-power"><bounds x="1310" y="82" width="90" height="17"/></element>
+		<element ref="led-power"><bounds x="1277" y="79" width="25" height="25"/></element>
+
+		<!-- VCO Section -->
+		<element ref="text-minus-half"><bounds x="89" y="268" width="40" height="15"/></element>
+		<element ref="text-minus-one"><bounds x="89" y="536" width="40" height="15"/></element>
+		<element ref="text-vco1"><bounds x="89" y="671" width="40" height="15"/></element>
+		<group ref="knob"><bounds x="89" y="174" width="178" height="109"/></group>
+		<group ref="knob-min-max"><bounds x="89" y="309" width="178" height="109"/></group>
+		<element ref="text-unison"><bounds x="89" y="441" width="178" height="14"/></element>
+		<group ref="knob-no-top-circle"><bounds x="89" y="442" width="178" height="109"/></group>
+		<element ref="text-both"><bounds x="89" y="573" width="178" height="14"/></element>
+		<group ref="knob-no-top-circle"><bounds x="89" y="577" width="178" height="109"/></group>
+		<element ref="text-plus-half"><bounds x="227" y="268" width="40" height="15"/></element>
+		<element ref="text-plus-one"><bounds x="227" y="536" width="40" height="15"/></element>
+		<element ref="text-vco2"><bounds x="227" y="671" width="40" height="15"/></element>
+		<element ref="text-pitch-caps"><bounds x="249" y="221" width="70" height="17"/></element>
+		<element ref="text-glide"><bounds x="249" y="354" width="70" height="17"/></element>
+		<element ref="text-offset"><bounds x="249" y="489" width="70" height="17"/></element>
+		<element ref="text-mix"><bounds x="249" y="622" width="70" height="17"/></element>
+		<element ref="text-vcos"><bounds x="236" y="162" width="76" height="23"/></element>
+		<element ref="rounded-rect-narrow"><bounds x="74" y="158" width="260" height="539"/></element>
+
+		<!-- VCF Section -->
+		<group ref="knob-min-max"><bounds x="359" y="174" width="178" height="109"/></group>
+		<group ref="knob-min-max"><bounds x="359" y="309" width="178" height="109"/></group>
+		<group ref="knob-min-max"><bounds x="359" y="442" width="178" height="109"/></group>
+		<param name="knob_inputtag" value="VCF_attack"/>
+		<group ref="knob-fast-slow"><bounds x="359" y="577" width="178" height="109"/></group>
+		<element ref="text-freq"><bounds x="519" y="221" width="70" height="17"/></element>
+		<element ref="text-pitch"><bounds x="519" y="354" width="70" height="17"/></element>
+		<element ref="text-asr-paren"><bounds x="519" y="489" width="70" height="17"/></element>
+		<element ref="text-attack"><bounds x="519" y="622" width="70" height="17"/></element>
+		<group ref="knob-min-max"><bounds x="560" y="174" width="178" height="109"/></group>
+		<group ref="knob-min-max"><bounds x="560" y="309" width="178" height="109"/></group>
+		<element ref="text-asr"><bounds x="635" y="457" width="28" height="15"/></element>
+		<element ref="switch" inputtag="VCF_sustain" inputmask="0x01">
+			<bounds x="635" y="477" width="28" height="40"/>
+		</element>
+		<element ref="text-ar"><bounds x="635" y="522" width="28" height="15"/></element>
+		<param name="knob_inputtag" value="VCF_release"/>
+		<group ref="knob-fast-slow"><bounds x="560" y="577" width="178" height="109"/></group>
+		<element ref="text-res"><bounds x="720" y="221" width="70" height="17"/></element>
+		<element ref="text-velocity"><bounds x="720" y="354" width="70" height="17"/></element>
+		<element ref="text-sustain"><bounds x="695" y="489" width="70" height="17"/></element>
+		<element ref="text-release"><bounds x="720" y="622" width="70" height="17"/></element>
+		<element ref="text-vcf"><bounds x="706" y="162" width="57" height="23"/></element>
+		<element ref="rounded-rect-wide"><bounds x="348" y="158" width="441" height="539"/></element>
+		<element ref="text-modulation"><bounds x="511" y="299" width="70" height="13"/></element>
+		<element ref="line"><bounds x="364" y="290" width="411" height="3"/></element>
+		<element ref="text-transient"><bounds x="511" y="568" width="70" height="13"/></element>
+		<element ref="line"><bounds x="364" y="560" width="411" height="3"/></element>
+
+		<!-- VCA Section -->
+		<element ref="text-on"><bounds x="886" y="189" width="28" height="15"/></element>
+		<element ref="switch"><bounds x="886" y="209" width="28" height="40"/></element>
+		<element ref="text-off"><bounds x="886" y="254" width="28" height="15"/></element>
+		<group ref="knob-min-max"><bounds x="811" y="309" width="178" height="109"/></group>
+		<param name="knob_inputtag" value="VCA_attack"/>
+		<group ref="knob-fast-slow"><bounds x="811" y="442" width="178" height="109"/></group>
+		<param name="knob_inputtag" value="VCA_sustain"/>
+		<group ref="knob-fast-slow"><bounds x="811" y="577" width="178" height="109"/></group>
+		<element ref="text-punch"><bounds x="925" y="221" width="70" height="17"/></element>
+		<element ref="text-adsr"><bounds x="971" y="354" width="70" height="17"/></element>
+		<element ref="text-attack"><bounds x="971" y="489" width="70" height="17"/></element>
+		<element ref="text-sustain"><bounds x="971" y="622" width="70" height="17"/></element>
+		<group ref="knob-min-max"><bounds x="1012" y="174" width="178" height="109"/></group>
+		<group ref="knob-min-max"><bounds x="1012" y="309" width="178" height="109"/></group>
+		<param name="knob_inputtag" value="VCA_decay"/>
+		<group ref="knob-fast-slow"><bounds x="1012" y="442" width="178" height="109"/></group>
+		<param name="knob_inputtag" value="VCA_release"/>
+		<group ref="knob-fast-slow"><bounds x="1012" y="577" width="178" height="109"/></group>
+		<element ref="text-output"><bounds x="1172" y="221" width="70" height="17"/></element>
+		<element ref="text-velocity"><bounds x="1172" y="354" width="70" height="17"/></element>
+		<element ref="text-decay"><bounds x="1172" y="489" width="70" height="17"/></element>
+		<element ref="text-release"><bounds x="1172" y="622" width="70" height="17"/></element>
+		<element ref="text-vca"><bounds x="1161" y="162" width="56" height="23"/></element>
+		<element ref="rounded-rect-wide"><bounds x="803" y="158" width="441" height="539"/></element>
+		<element ref="text-modulation"><bounds x="963" y="299" width="70" height="13"/></element>
+		<element ref="line"><bounds x="818" y="290" width="411" height="3"/></element>
+		<element ref="text-transient"><bounds x="963" y="430" width="70" height="13"/></element>
+		<element ref="line"><bounds x="818" y="425" width="411" height="3"/></element>
+	</view>
+</mamelayout>
+

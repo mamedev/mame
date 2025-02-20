@@ -106,9 +106,7 @@ public:
 		: tutankhm_state(mconfig, type, tag)
 		, m_audiocpu(*this, "audiocpu")
 		, m_i8039(*this, "mcu")
-		, m_filter_0_0(*this, "filter.0.0")
-		, m_filter_0_1(*this, "filter.0.1")
-		, m_filter_0_2(*this, "filter.0.2")
+		, m_filter(*this, "filter.0.%u", 0U)
 		, m_blitrom(*this, "blitrom")
 	{
 	}
@@ -121,7 +119,6 @@ protected:
 
 private:
 	void blitter_w(offs_t offset, uint8_t data);
-	void bankselect_w(uint8_t data);
 	void sh_irqtrigger_w(uint8_t data);
 	void i8039_irq_w(uint8_t data);
 	void i8039_irqen_and_status_w(uint8_t data);
@@ -136,9 +133,7 @@ private:
 
 	required_device<cpu_device> m_audiocpu;
 	required_device<i8039_device> m_i8039;
-	required_device<filter_rc_device> m_filter_0_0;
-	required_device<filter_rc_device> m_filter_0_1;
-	required_device<filter_rc_device> m_filter_0_2;
+	required_device_array<filter_rc_device, 3> m_filter;
 	required_region_ptr<uint8_t> m_blitrom;
 
 	uint8_t  m_blitterdata[4]{};
@@ -175,7 +170,7 @@ void junofrst_state::blitter_w(offs_t offset, uint8_t data)
 		offs_t src = ((m_blitterdata[2] << 8) | m_blitterdata[3]) & 0xfffc;
 		offs_t dest = (m_blitterdata[0] << 8) | m_blitterdata[1];
 
-		int copy = m_blitterdata[3] & 0x01;
+		bool const copy = BIT(m_blitterdata[3], 0);
 
 		/* 16x16 graphics */
 		for (int i = 0; i < 16; i++)
@@ -184,50 +179,40 @@ void junofrst_state::blitter_w(offs_t offset, uint8_t data)
 			{
 				uint8_t data;
 
-				if (src & 1)
+				if (BIT(src, 0))
 					data = m_blitrom[src >> 1] & 0x0f;
 				else
 					data = m_blitrom[src >> 1] >> 4;
 
-				src += 1;
+				src++;
 
 				/* if there is a source pixel either copy the pixel or clear the pixel depending on the copy flag */
 
 				if (data)
 				{
-					if (copy == 0)
+					if (!copy)
 						data = 0;
 
-					if (dest & 1)
+					if (BIT(dest, 0))
 						m_videoram[dest >> 1] = (m_videoram[dest >> 1] & 0x0f) | (data << 4);
 					else
 						m_videoram[dest >> 1] = (m_videoram[dest >> 1] & 0xf0) | data;
 				}
-
-				dest += 1;
+				dest++;
 			}
-
 			dest += 240;
 		}
 	}
 }
 
 
-void junofrst_state::bankselect_w(uint8_t data)
-{
-	m_mainbank->set_entry(data & 0x0f);
-}
-
-
 uint8_t junofrst_state::portA_r()
 {
-	int timer;
-
 	/* main xtal 14.318MHz, divided by 8 to get the CPU clock, further */
 	/* divided by 1024 to get this timer */
 	/* (divide by (1024/2), and not 1024, because the CPU cycle counter is */
 	/* incremented every other state change of the clock) */
-	timer = (m_audiocpu->total_cycles() / (1024 / 2)) & 0x0f;
+	int const timer = (m_audiocpu->total_cycles() / (1024 / 2)) & 0x0f;
 
 	/* low three bits come from the 8039 */
 
@@ -237,20 +222,17 @@ uint8_t junofrst_state::portA_r()
 
 void junofrst_state::portB_w(uint8_t data)
 {
-	filter_rc_device *filter[3] = { m_filter_0_0, m_filter_0_1, m_filter_0_2 };
-	int i;
-
-	for (i = 0; i < 3; i++)
+	for (int i = 0; i < 3; i++)
 	{
 		int C = 0;
 
-		if (data & 1)
+		if (BIT(data, 0))
 			C += 47000; /* 47000pF = 0.047uF */
-		if (data & 2)
+		if (BIT(data, 1))
 			C += 220000;    /* 220000pF = 0.22uF */
 
 		data >>= 2;
-		filter[i]->filter_rc_set_RC(filter_rc_device::LOWPASS_3R, 1000, 2200, 200, CAP_P(C));
+		m_filter[i]->filter_rc_set_RC(filter_rc_device::LOWPASS_3R, 1000, 2200, 200, CAP_P(C));
 	}
 }
 
@@ -262,7 +244,6 @@ void junofrst_state::sh_irqtrigger_w(uint8_t data)
 		/* setting bit 0 low then high triggers IRQ on the sound CPU */
 		m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 	}
-
 	m_last_irq = data;
 }
 
@@ -275,7 +256,7 @@ void junofrst_state::i8039_irq_w(uint8_t data)
 
 void junofrst_state::i8039_irqen_and_status_w(uint8_t data)
 {
-	if ((data & 0x80) == 0)
+	if (BIT(~data, 7))
 		m_i8039->set_input_line(0, CLEAR_LINE);
 	m_i8039_status = (data & 0x70) >> 4;
 }
@@ -283,7 +264,7 @@ void junofrst_state::i8039_irqen_and_status_w(uint8_t data)
 
 void junofrst_state::main_map(address_map &map)
 {
-	map(0x0000, 0x7fff).ram().share("videoram");
+	map(0x0000, 0x7fff).ram().share(m_videoram);
 	map(0x8000, 0x800f).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0x8010, 0x8010).portr("DSW2");
 	map(0x801c, 0x801c).r("watchdog", FUNC(watchdog_timer_device::reset_r));
@@ -434,9 +415,8 @@ void junofrst_state::junofrst(machine_config &config)
 	m_screen->set_raw(GALAXIAN_PIXEL_CLOCK, GALAXIAN_HTOTAL, GALAXIAN_HBEND, GALAXIAN_HBSTART, GALAXIAN_VTOTAL, GALAXIAN_VBEND, GALAXIAN_VBSTART);
 	PALETTE(config, m_palette).set_format(1, tutankhm_state::raw_to_rgb_func, 16);
 
-	m_screen->set_screen_update(FUNC(junofrst_state::screen_update_tutankhm_scramble));
+	m_screen->set_screen_update(FUNC(junofrst_state::screen_update_scramble));
 	m_screen->screen_vblank().set(FUNC(junofrst_state::_30hz_irq));
-
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -453,14 +433,14 @@ void junofrst_state::junofrst(machine_config &config)
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // 100K (R56-63)/200K (R64-71) ladder network
 
-	FILTER_RC(config, m_filter_0_0).add_route(ALL_OUTPUTS, "speaker", 1.0);
-	FILTER_RC(config, m_filter_0_1).add_route(ALL_OUTPUTS, "speaker", 1.0);
-	FILTER_RC(config, m_filter_0_2).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	FILTER_RC(config, m_filter[0]).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	FILTER_RC(config, m_filter[1]).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	FILTER_RC(config, m_filter[2]).add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
 
 ROM_START( junofrst )
-	ROM_REGION( 0x1c000, "maincpu", 0 ) /* code + space for decrypted opcodes */
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) /* code + space for decrypted opcodes */
 	ROM_LOAD( "jfa_b9.bin",   0x0a000, 0x2000, CRC(f5a7ab9d) SHA1(9603e797839290f8e1f93ccff9cc820604cc49ab) ) /* program ROMs */
 	ROM_LOAD( "jfb_b10.bin",  0x0c000, 0x2000, CRC(f20626e0) SHA1(46f58bdc1a613124e2c148b61f774fcc6c232868) )
 	ROM_LOAD( "jfc_a10.bin",  0x0e000, 0x2000, CRC(1e7744a7) SHA1(bee69833af886436016560295cddf0c8b4c5e771) )
@@ -472,7 +452,7 @@ ROM_START( junofrst )
 	ROM_LOAD( "jfc5_a8.bin",  0x18000, 0x2000, CRC(0539f328) SHA1(c532aaed7f9e6f564e3df0dc6d8fdbee6ed721a2) )
 	ROM_LOAD( "jfc6_a9.bin",  0x1a000, 0x2000, CRC(1da2ad6e) SHA1(de997d1b2ff6671088b57192bc9f1279359fad5d) )
 
-	ROM_REGION(  0x10000 , "audiocpu", 0 ) /* 64k for Z80 sound CPU code */
+	ROM_REGION(  0x1000, "audiocpu", 0 ) /* 4k for Z80 sound CPU code */
 	ROM_LOAD( "jfs1_j3.bin",  0x0000, 0x1000, CRC(235a2893) SHA1(b90251c4971f7ba12e407f86c32723d513d6b4a0) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* 8039 */
@@ -485,7 +465,7 @@ ROM_START( junofrst )
 ROM_END
 
 ROM_START( junofrstg )
-	ROM_REGION( 0x1c000, "maincpu", 0 ) /* code + space for decrypted opcodes */
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) /* code + space for decrypted opcodes */
 	ROM_LOAD( "jfg_a.9b",     0x0a000, 0x2000, CRC(8f77d1c5) SHA1(d47fcdbc47673c228661a3528fff0c691c76df9e) ) /* program ROMs */
 	ROM_LOAD( "jfg_b.10b",    0x0c000, 0x2000, CRC(cd645673) SHA1(25994210a8a424bdf2eca3efa19e7eeffc097cec) )
 	ROM_LOAD( "jfg_c.10a",    0x0e000, 0x2000, CRC(47852761) SHA1(eeef814b6ad681d4c2274f0a69d1ed9c5c1b9118) )
@@ -497,7 +477,7 @@ ROM_START( junofrstg )
 	ROM_LOAD( "jfc5_a8.bin",  0x18000, 0x2000, CRC(0539f328) SHA1(c532aaed7f9e6f564e3df0dc6d8fdbee6ed721a2) )
 	ROM_LOAD( "jfc6_a9.bin",  0x1a000, 0x2000, CRC(1da2ad6e) SHA1(de997d1b2ff6671088b57192bc9f1279359fad5d) )
 
-	ROM_REGION(  0x10000 , "audiocpu", 0 ) /* 64k for Z80 sound CPU code */
+	ROM_REGION(  0x1000, "audiocpu", 0 ) /* 4k for Z80 sound CPU code */
 	ROM_LOAD( "jfs1_j3.bin",  0x0000, 0x1000, CRC(235a2893) SHA1(b90251c4971f7ba12e407f86c32723d513d6b4a0) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* 8039 */

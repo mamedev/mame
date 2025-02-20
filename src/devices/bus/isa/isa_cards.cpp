@@ -10,84 +10,93 @@
 #include "isa_cards.h"
 
 // video
-#include "mda.h"
-#include "cga.h"
 #include "aga.h"
+#include "cga.h"
 #include "ega.h"
+#include "eis_hgb107x.h"
+#include "ex1280.h"
+#include "mda.h"
+#include "num9rev.h"
 #include "pgc.h"
-#include "vga.h"
-#include "vga_ati.h"
 #include "svga_cirrus.h"
 #include "svga_paradise.h"
 #include "svga_s3.h"
-#include "svga_tseng.h"
 #include "svga_trident.h"
-#include "num9rev.h"
-#include "eis_hgb107x.h"
-#include "ex1280.h"
+#include "svga_tseng.h"
+#include "vga.h"
+#include "vga_ati.h"
 
-// storage
+// storage (floppy only)
 #include "fdc.h"
 #include "mufdc.h"
-#include "hdc.h"
-#include "wdxt_gen.h"
-#include "ide.h"
-#include "xtide.h"
-#include "side116.h"
+
+// storage (MFM/RLL/ESDI)
 #include "acb2072.h"
+#include "cl_sh260.h"
+#include "hdc.h"
+#include "lrk330.h"
+#include "omti8621.h"
+#include "ultra12f.h"
+#include "wd1002a_wx1.h"
+#include "wd1007a.h"
+#include "wdxt_gen.h"
+
+// storage (SCSI)
 #include "aha1542b.h"
 #include "aha1542c.h"
 #include "aha174x.h"
-#include "wd1002a_wx1.h"
-#include "wd1007a.h"
-#include "mcd.h"
-#include "lbaenhancer.h"
-#include "cl_sh260.h"
+#include "asc88.h"
 #include "bt54x.h"
 #include "dcb.h"
-#include "ultra12f.h"
+#include "tekram_dc820.h"
 #include "ultra14f.h"
 #include "ultra24f.h"
-#include "tekram_dc820.h"
-#include "asc88.h"
-#include "omti8621.h"
-#include "lrk330.h"
+
+// storage (IDE/XT-IDE)
+#include "ide.h"
+#include "side116.h"
+#include "xtide.h"
+
+// storage (miscellaneous)
+#include "lbaenhancer.h"
+#include "mcd.h"
 
 // sound
 #include "adlib.h"
+#include "dectalk.h"
 #include "gblaster.h"
 #include "gus.h"
 #include "ibm_mfc.h"
 #include "ibm_speech.h"
 #include "mpu401.h"
 #include "pcmidi.h"
+#include "prose4k1.h"
+#include "sb16.h"
 #include "sblaster.h"
 #include "ssi2001.h"
 #include "stereo_fx.h"
-#include "dectalk.h"
-#include "sb16.h"
 
 // network
 #include "3c503.h"
-#include "ne1000.h"
-#include "ne2000.h"
 #include "3c505.h"
+#include "3xtwin.h"
 #include "eis_sad8852.h"
 #include "eis_twib.h"
+#include "ne1000.h"
+#include "ne2000.h"
 #include "np600.h"
-#include "3xtwin.h"
 
 // communication ports
-#include "lpt.h"
 #include "com.h"
+#include "lpt.h"
 #include "pds.h"
 
 // other
-#include "hpblp.h"
+#include "bblue2.h"
 #include "chessmdr.h"
 #include "chessmsr.h"
 #include "finalchs.h"
-#include "bblue2.h"
+#include "hpblp.h"
 #include "opus100pm.h"
 
 
@@ -134,6 +143,7 @@ void pc_isa8_cards(device_slot_interface &device)
 	device.option_add("ibm_mfc", ISA8_IBM_MFC);
 	device.option_add("wd1002a_wx1", ISA8_WD1002A_WX1);
 	device.option_add("dectalk", ISA8_DECTALK);
+	device.option_add("prose4k1", ISA8_PROSE4001);
 	device.option_add("pds", ISA8_PDS);
 	device.option_add("lba_enhancer", ISA8_LBA_ENHANCER);
 	device.option_add("asc88", ASC88);
@@ -182,6 +192,7 @@ void pc_isa16_cards(device_slot_interface &device)
 	device.option_add("ibm_mfc", ISA8_IBM_MFC);
 	device.option_add("fdcsmc", ISA8_FDC_SMC);
 	device.option_add("dectalk", ISA8_DECTALK);
+	device.option_add("prose4k1", ISA8_PROSE4001);
 	device.option_add("pds", ISA8_PDS);
 	device.option_add("lba_enhancer", ISA8_LBA_ENHANCER);
 	device.option_add("chessmdr", ISA8_CHESSMDR);
