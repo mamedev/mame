@@ -134,7 +134,6 @@ private:
 	void lic_maincpu_changed(int state);
 	void lic_videocpu_changed(int state);
 
-
 	std::unique_ptr<uint8_t[]> m_main_decrypted;
 	std::unique_ptr<uint8_t[]> m_video_decrypted;
 
