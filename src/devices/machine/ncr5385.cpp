@@ -275,7 +275,7 @@ u8 ncr5385_device::int_status_r()
 	// tek4404 reads this reg from inside IRQ3, clear its flag ($2c3) and then spinloops waiting for it to be set by an IRQ
 	// the update_int() above has happened too fast
 	if (m_state != IDLE)
-		m_state_timer->adjust(attotime::from_usec(40));
+		m_state_timer->adjust(attotime::from_usec(80));
 
 	return data;
 }
