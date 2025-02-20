@@ -1612,7 +1612,7 @@ void tek440x_state::tek4404(machine_config &config)
 
 	I8255A(config, m_printer);
 	m_printer->in_pb_callback().set_constant(0x30);
-m_printer->in_pb_callback().set_constant(0xbf);		// HACK:  vblank always checks if printer status < 0
+//m_printer->in_pb_callback().set_constant(0xbf);		// HACK:  vblank always checks if printer status < 0
 	m_printer->out_pc_callback().set(FUNC(tek440x_state::printer_pc_w));
 
 	NS32081(config, m_fpu, 20_MHz_XTAL / 2);
