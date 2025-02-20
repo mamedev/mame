@@ -111,7 +111,8 @@ private:
 	int              m_icount;
 	u32              m_op_size;
 
-	std::vector<u32> m_pcm_queue;
+	u8               m_pcm_queue_size;
+	u32              m_pcm_queue[6];
 	u8               m_mem_reg[6];
 };
 
