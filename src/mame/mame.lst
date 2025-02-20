@@ -47110,6 +47110,9 @@ wizzard
 gamemach
 v4in1eg
 
+@source:vtech/geniuscolor.cpp
+geniuscps
+
 @source:vtech/geniusiq.cpp
 iq128
 iq128_fr
