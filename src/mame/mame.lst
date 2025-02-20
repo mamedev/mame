@@ -47042,7 +47042,7 @@ gamemach                        //
 v4in1eg                         //
 
 @source:vtech/geniuscolor.cpp
-geniuscps                       // 2013 Genio Color Pocket (Spanish)
+geniuscps
 
 @source:vtech/geniusiq.cpp
 iq128                           // 1997 Genius IQ 128 (Germany)
