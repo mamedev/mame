@@ -48,18 +48,14 @@
 
 namespace {
 
-class wk1800_state : public driver_device
+class wk1600_state : public driver_device
 {
 public:
-	static constexpr feature_type unemulated_features() { return feature::DISK; }
-
-	wk1800_state(machine_config const &mconfig, device_type type, char const *tag)
+	wk1600_state(machine_config const &mconfig, device_type type, char const *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_gt155(*this, "gt155")
 		, m_lcdc(*this, "lcdc")
-		, m_fdc(*this, "fdc")
-		, m_floppy(*this, "fdc:0")
 		, m_sound_rom(*this, "gt155")
 		, m_inputs(*this, "KC%u", 0U)
 		, m_outputs(*this, "%02x.%d.%d", 0U, 0U, 0U)
@@ -69,14 +65,11 @@ public:
 	}
 
 	void wk1600(machine_config &config) ATTR_COLD;
-	void wk1800(machine_config &config) ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(nmi_clear) { m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE); }
 
 	ioport_value lcd_r()   { return m_lcdc->db_r() >> 4; }
 	void lcd_w(int state)  { m_lcdc->db_w(state << 4); }
-
-	void fdc_rate_w(int state) { if (m_fdc) m_fdc->rate_w(state); }
 
 	void shift_data_w(int state) { m_shift_data = state; }
 	void led_clk_w(int state);
@@ -88,19 +81,19 @@ public:
 
 	void apo_w(int state);
 
-private:
-	void wk1600_map(address_map &map) ATTR_COLD;
-	void wk1800_map(address_map &map) ATTR_COLD;
-
+protected:
 	virtual void driver_start() override ATTR_COLD;
 
-	void render_w(int state);
+	void common_map(address_map &map) ATTR_COLD;
 
 	required_device<h83048_device> m_maincpu;
 	required_device<gt155_device> m_gt155;
 	required_device<hd44780_device> m_lcdc;
-	optional_device<hd63266f_device> m_fdc;
-	optional_device<floppy_connector> m_floppy;
+
+private:
+	void wk1600_map(address_map &map) ATTR_COLD;
+
+	void render_w(int state);
 
 	required_memory_region m_sound_rom;
 
@@ -120,16 +113,31 @@ private:
 	u8 m_led_clk, m_input_clk, m_shift_data;
 };
 
-class wk1600_state : public wk1800_state
+class wk1800_state : public wk1600_state
 {
 public:
-	static constexpr feature_type unemulated_features() { return feature::NONE; }
+	static constexpr feature_type unemulated_features() { return feature::DISK; }
 
-	using wk1800_state::wk1800_state;
+	wk1800_state(machine_config const &mconfig, device_type type, char const *tag)
+		: wk1600_state(mconfig, type, tag)
+		, m_fdc(*this, "fdc")
+		, m_floppy(*this, "fdc:0")
+	{
+	}
+
+	void wk1800(machine_config &config) ATTR_COLD;
+
+	void fdc_rate_w(int state) { if (m_fdc) m_fdc->rate_w(state); }
+
+private:
+	void wk1800_map(address_map &map) ATTR_COLD;
+
+	optional_device<hd63266f_device> m_fdc;
+	optional_device<floppy_connector> m_floppy;
 };
 
 /**************************************************************************/
-void wk1800_state::led_clk_w(int state)
+void wk1600_state::led_clk_w(int state)
 {
 	if (state && !m_led_clk)
 	{
@@ -144,7 +152,7 @@ void wk1800_state::led_clk_w(int state)
 }
 
 /**************************************************************************/
-void wk1800_state::input_clk_w(int state)
+void wk1600_state::input_clk_w(int state)
 {
 	if (state && !m_input_clk)
 	{
@@ -156,7 +164,7 @@ void wk1800_state::input_clk_w(int state)
 }
 
 /**************************************************************************/
-INPUT_CHANGED_MEMBER(wk1800_state::power_w)
+INPUT_CHANGED_MEMBER(wk1600_state::power_w)
 {
 	if (newval)
 	{
@@ -173,7 +181,7 @@ INPUT_CHANGED_MEMBER(wk1800_state::power_w)
 
 /**************************************************************************/
 template<int StartBit>
-ioport_value wk1800_state::inputs_r()
+ioport_value wk1600_state::inputs_r()
 {
 	ioport_value result = 0;
 	for (unsigned i = 0U; i < m_inputs.size(); i++)
@@ -186,7 +194,7 @@ ioport_value wk1800_state::inputs_r()
 }
 
 /**************************************************************************/
-void wk1800_state::apo_w(int state)
+void wk1600_state::apo_w(int state)
 {
 	logerror("apo_w: %x\n", state);
 	if (!state)
@@ -197,7 +205,7 @@ void wk1800_state::apo_w(int state)
 }
 
 /**************************************************************************/
-void wk1800_state::render_w(int state)
+void wk1600_state::render_w(int state)
 {
 	if (!state)
 		return;
@@ -217,22 +225,25 @@ void wk1800_state::render_w(int state)
 
 
 /**************************************************************************/
-void wk1800_state::wk1600_map(address_map &map)
+void wk1600_state::common_map(address_map &map)
 {
 	map(0x00000, 0x1ffff).rom();
 	map(0x20000, 0x2ffff).rw(m_gt155, FUNC(gt155_device::read), FUNC(gt155_device::write));
 	map(0x30000, 0x30001).mirror(0x0fff0).r("kbd", FUNC(gt913_kbd_hle_device::read));
 	map(0x30002, 0x30003).mirror(0x0fff0).r("kbd", FUNC(gt913_kbd_hle_device::status_r));
+}
+
+/**************************************************************************/
+void wk1600_state::wk1600_map(address_map &map)
+{
+	common_map(map);
 	map(0x80000, 0x9ffff).mirror(0x60000).ram().share("nvram");
 }
 
 /**************************************************************************/
 void wk1800_state::wk1800_map(address_map &map)
 {
-	map(0x00000, 0x1ffff).rom();
-	map(0x20000, 0x2ffff).rw(m_gt155, FUNC(gt155_device::read), FUNC(gt155_device::write));
-	map(0x30000, 0x30001).mirror(0x0fff0).r("kbd", FUNC(gt913_kbd_hle_device::read));
-	map(0x30002, 0x30003).mirror(0x0fff0).r("kbd", FUNC(gt913_kbd_hle_device::status_r));
+	common_map(map);
 //	map(0x40000, 0x40003).mirror(0x1fffc).m(m_fdc, FUNC(hd63266f_device::map));
 //	map(0x60000, 0x7ffff).rw(m_fdc, FUNC(hd63266f_device::dma_r), FUNC(hd63266f_device::dma_w));
 	map(0x80000, 0xbffff).mirror(0x40000).ram().share("nvram");
@@ -240,13 +251,13 @@ void wk1800_state::wk1800_map(address_map &map)
 
 
 /**************************************************************************/
-void wk1800_state::driver_start()
+void wk1600_state::driver_start()
 {
 	m_led.resolve();
 	m_led_power.resolve();
 	m_outputs.resolve();
 
-	m_nmi_timer = timer_alloc(FUNC(wk1800_state::nmi_clear), this);
+	m_nmi_timer = timer_alloc(FUNC(wk1600_state::nmi_clear), this);
 
 	std::fill(std::begin(m_sound_regs), std::end(m_sound_regs), 0);
 	std::fill(std::begin(m_dsp_data), std::end(m_dsp_data), 0);
@@ -271,10 +282,10 @@ void wk1800_state::driver_start()
 
 
 /**************************************************************************/
-void wk1800_state::wk1600(machine_config &config)
+void wk1600_state::wk1600(machine_config &config)
 {
 	H83048(config, m_maincpu, 16'000'000).set_mode_a20();
-	m_maincpu->set_addrmap(AS_PROGRAM, &wk1800_state::wk1600_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &wk1600_state::wk1600_map);
 	m_maincpu->read_adc<0>().set_constant(0);
 	m_maincpu->read_adc<1>().set_ioport("AN1");
 	m_maincpu->read_adc<2>().set_constant(0);
@@ -286,7 +297,7 @@ void wk1800_state::wk1600(machine_config &config)
 	m_maincpu->read_port9().set_ioport("P9");
 	m_maincpu->read_porta().set_ioport("PA");
 	m_maincpu->write_porta().set_ioport("PA");
-	m_maincpu->read_portb().set(FUNC(wk1800_state::lcd_r));
+	m_maincpu->read_portb().set(FUNC(wk1600_state::lcd_r));
 	m_maincpu->write_portb().set_ioport("PB");
 
 	NVRAM(config, "nvram");
@@ -308,7 +319,7 @@ void wk1800_state::wk1600(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_size(1755, 450);
 	screen.set_visarea_full();
-	screen.screen_vblank().set(FUNC(wk1800_state::render_w));
+	screen.screen_vblank().set(FUNC(wk1600_state::render_w));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -539,7 +550,7 @@ INPUT_PORTS_START(wk1600)
 	PORT_BIT( 0x100, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("SWITCH")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_ON ) PORT_NAME("Power") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(wk1800_state::power_w), 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_ON ) PORT_NAME("Power") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(wk1600_state::power_w), 0)
 
 	PORT_START("AN1")
 	PORT_BIT( 0x3ff, 0x200, IPT_PADDLE ) PORT_NAME("Pitch Wheel") PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_MINMAX(0x00, 0x3ff) PORT_CODE_DEC(JOYCODE_Y_DOWN_SWITCH) PORT_CODE_INC(JOYCODE_Y_UP_SWITCH)
@@ -549,11 +560,11 @@ INPUT_PORTS_START(wk1600)
 
 	PORT_START("P6")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x06, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(wk1800_state::inputs_r<1>))
+	PORT_BIT( 0x06, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(wk1600_state::inputs_r<1>))
 	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P7")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(wk1800_state::inputs_r<0>))
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(wk1600_state::inputs_r<0>))
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_CONFNAME( 0x04, 0x00, "Power Source" )
 	PORT_CONFSETTING(    0x00, "AC Adapter" )
@@ -561,7 +572,7 @@ INPUT_PORTS_START(wk1600)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER  ) PORT_NAME("Pedal")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(wk1800_state::inputs_r<4>))
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(wk1600_state::inputs_r<4>))
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P8")
@@ -572,21 +583,21 @@ INPUT_PORTS_START(wk1600)
 
 	PORT_START("P9")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(wk1800_state::inputs_r<3>))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(wk1600_state::inputs_r<3>))
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x38, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(wk1800_state::inputs_r<5>))
+	PORT_BIT( 0x38, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(wk1600_state::inputs_r<5>))
 
 	PORT_START("PA")
 	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(wk1800_state::inputs_r<8>))
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_MEMBER(FUNC(wk1800_state::input_clk_w))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(wk1600_state::inputs_r<8>))
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_MEMBER(FUNC(wk1600_state::input_clk_w))
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_MEMBER(FUNC(wk1800_state::shift_data_w))
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_MEMBER(FUNC(wk1800_state::led_clk_w))
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_MEMBER(FUNC(wk1800_state::apo_w))
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_MEMBER(FUNC(wk1600_state::shift_data_w))
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_MEMBER(FUNC(wk1600_state::led_clk_w))
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_MEMBER(FUNC(wk1600_state::apo_w))
 
 	PORT_START("PB")
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_MEMBER(FUNC(wk1800_state::lcd_w))
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_MEMBER(FUNC(wk1600_state::lcd_w))
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("lcdc", FUNC(hd44780_device::e_w))
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("lcdc", FUNC(hd44780_device::rw_w))
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
