@@ -16219,6 +16219,10 @@ sk10
 @source:casio/sx1000.cpp
 sx1010
 
+@source:casio/wk1800.cpp
+wk1600                          // 2000 Casio
+wk1800                          // 2000 Casio
+
 @source:casio/zoomer.cpp
 zoomer
 
