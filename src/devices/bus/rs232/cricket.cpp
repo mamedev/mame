@@ -107,7 +107,8 @@ private:
 
 	u8 m_rx_state;
     u8 m_dtr_state;
-    u8 m_data;
+    u8 m_data_r;
+    u8 m_data_w;
 };
 
 cricket_device::cricket_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -119,7 +120,8 @@ cricket_device::cricket_device(const machine_config &mconfig, const char *tag, d
     , m_tms(*this, "tms")
     , m_rx_state(0)
     , m_dtr_state(0)
-    , m_data(0)
+    , m_data_r(0)
+    , m_data_w(0)
 {
 }
 
@@ -156,7 +158,8 @@ void cricket_device::device_start()
 {
     save_item(NAME(m_rx_state));
 	save_item(NAME(m_dtr_state));
-    save_item(NAME(m_data));
+    save_item(NAME(m_data_r));
+    save_item(NAME(m_data_w));
 }
 
 void cricket_device::device_reset()
@@ -197,12 +200,12 @@ void cricket_device::p3_w(u8 data)
         if (BIT(data, 2)) // BDIR
         {
             if (BIT(data, 3)) // BC1
-                m_ay1->address_w(m_data);
+                m_ay1->address_w(m_data_w);
             else
-                m_ay1->data_w(m_data);
+                m_ay1->data_w(m_data_w);
         }
         else if (!BIT(data, 3))
-            m_data = m_ay1->data_r();
+            m_data_r = m_ay1->data_r();
     }
     
     if (!BIT(data, 4)) // AY2 *CS
@@ -210,31 +213,31 @@ void cricket_device::p3_w(u8 data)
         if (BIT(data, 2)) // BDIR
         {
             if (BIT(data, 3)) // BC1
-                m_ay2->address_w(m_data);
+                m_ay2->address_w(m_data_w);
             else
-                m_ay2->data_w(m_data);
+                m_ay2->data_w(m_data_w);
         }
         else if(!BIT(data, 3))
-            m_data = m_ay2->data_r();
+            m_data_r = m_ay2->data_r();
     }
     
     if (!BIT(data, 0)) //5220 read
-        m_data = m_tms->status_r();
+        m_data_r = m_tms->status_r();
     
     if (!BIT(data, 1)) //5220 write
-        m_tms->data_w(m_data);
+        m_tms->data_w(m_data_w);
 
     output_dsr(!BIT(data, 7));
 }
 
 u8 cricket_device::p4_r()
 {
-	return m_data;
+	return m_data_r;
 }
 
 void cricket_device::p4_w(u8 data)
 {
-	m_data = data;
+	m_data_w = data;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(cricket_device::clock_interrupt)
