@@ -1455,11 +1455,13 @@ license:CC0-1.0
 		<!-- Dump released: 2021-05-28 -->
 		<!-- adventure game -->
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Reel 1"/>
 			<dataarea name="flop" size="1296682">
 				<rom name="the king of chicago iigs - reel 1.woz" size="1296682" crc="41530912" sha1="85fb08f8da981e9cc87edf8446e722ab7eefae91" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Reel 2"/>
 			<dataarea name="flop" size="1296170">
 				<rom name="the king of chicago iigs - reel 2.woz" size="1296170" crc="a53c37c0" sha1="ff0519cf1b17e77587d82a41c12c836f44e21ab5" />
 			</dataarea>

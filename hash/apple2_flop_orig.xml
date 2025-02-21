@@ -3458,11 +3458,13 @@ license:CC0-1.0
 		<!-- Dump released: 2019-05-22 -->
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="234744">
 				<rom name="trinity side a.woz" size="234744" crc="1b9bf646" sha1="dfcb84e4b61bf958fa838e7556c46e36c32e15d6" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="234744">
 				<rom name="trinity side b.woz" size="234744" crc="6b814a97" sha1="4e6ae3a33788e47bac09a7d8f6e160d879f8b263" />
 			</dataarea>
@@ -4080,11 +4082,13 @@ license:CC0-1.0
 		<!-- Dump released: 2019-07-12 -->
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A"/>
 			<dataarea name="flop" size="235547">
 				<rom name="algebra shop - disk 1, side a.woz" size="235547" crc="e1ec2c11" sha1="57582c651bda902821beb7c179da3a15d26b88aa" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B"/>
 			<dataarea name="flop" size="235547">
 				<rom name="algebra shop - disk 1, side b.woz" size="235547" crc="58b54d48" sha1="c327fd58ffcb53faabc66f6f546ea2a6cd7a57ae" />
 			</dataarea>
@@ -5286,6 +5290,7 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="242161">
 				<rom name="pharaoh's revenge side b (boot).woz" size="242161" crc="9bb62483" sha1="c45c93711ad545687dae142e7505c5bff1c001d8" />
 			</dataarea>
@@ -5826,6 +5831,7 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="234814">
 				<rom name="the hunt for red october side b (boot).woz" size="234814" crc="d37c8b65" sha1="9d2c0caffb1999f987954a4337232ad68fee1135" />
 			</dataarea>
@@ -11580,11 +11586,13 @@ license:CC0-1.0
 		<!-- "A Question of Scruples" is a 1987 board game developed by Sentient Software and distributed by Leisure Genius. It requires a 48K Apple ][+ or later. -->
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A - Program"/>
 			<dataarea name="flop" size="234838">
 				<rom name="a question of scruples - disk a (program disk).woz" size="234838" crc="8d6b5e39" sha1="fc05cbe47accd7359e439e7bab276e73253ab458" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B - Questions"/>
 			<dataarea name="flop" size="234840">
 				<rom name="a question of scruples - disk b (questions disk).woz" size="234840" crc="e06d7439" sha1="e79bb730be5b7c5455a34c5e1538fc10e24e37ef" />
 			</dataarea>
@@ -14321,14 +14329,15 @@ license:CC0-1.0
 		<!-- "Locksmith" is a 1986 disk utility developed and distributed by Alpha Logic Business Systems. This is version 6.0 revision A. It runs on any Apple ][ with 48K. This archive also includes Locksmith 6.0 Parameter Disk 1. -->
 
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1" />
-			<dataarea name="flop" size="234798">
-				<rom name="locksmith v6.0a parameter disk 1.woz" size="234798" crc="88e3563c" sha1="ad16d3e5d07feef9871f01c678d59a6bc658faac" />
+			<feature name="part_id" value="Disk 1 - Program"/>
+			<dataarea name="flop" size="234790">
+				<rom name="locksmith v6.0a.woz" size="234790" crc="84b8d5ef" sha1="d782dab1994115295d00c6697f996269cf71e5fa" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="234790">
-				<rom name="locksmith v6.0a.woz" size="234790" crc="84b8d5ef" sha1="d782dab1994115295d00c6697f996269cf71e5fa" />
+			<feature name="part_id" value="Disk 2 - Parameter" />
+			<dataarea name="flop" size="234798">
+				<rom name="locksmith v6.0a parameter disk 1.woz" size="234798" crc="88e3563c" sha1="ad16d3e5d07feef9871f01c678d59a6bc658faac" />
 			</dataarea>
 		</part>
 	</software>
@@ -14343,13 +14352,13 @@ license:CC0-1.0
 		<!-- "Locksmith" is a 1986 disk utility developed and distributed by Alpha Logic Business Systems. This is version 6.0 revision B, created by booting version 6.0 revision A and executing the "patch to rev. B" file from Locksmith Parameter Disk 1D. It runs on any Apple ][ with 48K. This archive also includes Locksmith 6.0 Parameter Disk 1D. -->
 
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Locksmith v6.0b" />
+			<feature name="part_id" value="Disk 1 - Program" />
 			<dataarea name="flop" size="234790">
 				<rom name="locksmith v6.0b.woz" size="234790" crc="9106c526" sha1="efdaec6e6c9592ea98e65b098dd19099f5f61149" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Locksmith 6.0B parameter disk 1D" />
+			<feature name="part_id" value="Disk 2 - Parameter" />
 			<!-- This disk upgrades 6.0A to 6.0B -->
 			<dataarea name="flop" size="234799">
 				<rom name="locksmith v6.0b parameter disk 1d.woz" size="234799" crc="e31292d4" sha1="bab8cc7a5f34a2a44954648b17f85997cacd443a" />
@@ -31722,11 +31731,13 @@ license:CC0-1.0
 		<!-- Dump released: 2019-04-20 -->
 		<!-- graphics utility -->
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="234794">
 				<rom name="the print shop companion v1.2 side a.woz" size="234794" crc="e8af250e" sha1="875f61ac89ec48ed450fb646e5eafd9a24233c4d" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="234794">
 				<rom name="the print shop companion v1.2 side b.woz" size="234794" crc="a06b52a9" sha1="1c6f461fbd4c78dd48480c334f0d5f1df2cf591e" />
 			</dataarea>
