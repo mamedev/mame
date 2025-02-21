@@ -20786,12 +20786,15 @@ kov3hd101
 jbell
 jinhulu2
 spk100
+spk102u
 spk102ua
 spk114it
 spk115it
 spk116it
 spk116itmx
 spk120in
+spk130
+spk200
 spk200ua
 spk201ua
 spk203us
@@ -43184,7 +43187,7 @@ venteta
 
 @source:skeleton/vgame.cpp
 hilice
-mjxy
+mjxy2
 
 @source:skeleton/vp415.cpp
 vp415

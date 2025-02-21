@@ -164,12 +164,12 @@ ROM_START( hilice )
 ROM_END
 
 // VGAME-0030-02-AG PCB, almost identical to the hilice one.
-// all labels have 麻將學園 (Mahjong Academy) prepended to what's below.
-ROM_START( mjxy )
-	ROM_REGION( 0x200000, "maincpu", 0 )
+// while all labels have 麻將學園 (Mahjong School) prepended to what's below, title screen shows 麻將學園 2 - Mahjong School 2
+ROM_START( mjxy2 )
+	ROM_REGION( 0x200000, "maincpu", 0 ) // dumped as EV29LV160 (same rare ROM as some IGS titles)
 	ROM_LOAD( "u12_v108tw.u12", 0x000000, 0x200000, CRC(a6d99849) SHA1(c280635517d5ffded524e15048568817bd927bf9) )
 
-	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_REGION( 0x400000, "gfx", 0 ) // dumped as EV29LV160 (same rare ROM as some IGS titles)
 	ROM_LOAD16_BYTE( "u3_cg_v105.u3", 0x000000, 0x200000, CRC(fda38fb1) SHA1(7bd744e42f619254ebad2fb60f3851f61073fe8c) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
 	ROM_LOAD16_BYTE( "u7_cg_v105.u7", 0x000001, 0x200000, CRC(5acf5b99) SHA1(ee638635c25ab9d392b8a7ff79209e657ccfd5c0) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
 
@@ -186,5 +186,5 @@ void vgame_state::init_hilice()
 } // anonymous namespace
 
 
-GAME( 200?, hilice,  0, vgame, hilice, vgame_state, init_hilice, ROT0, "VGame", "Hi Lice (V102FA)",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 200?, mjxy,    0, vgame, hilice, vgame_state, init_hilice, ROT0, "VGame", "Majiang Xueyuan (V108TW)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, hilice,  0, vgame, hilice, vgame_state, init_hilice, ROT0, "VGame", "Hi Lice (V102FA)",                              MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, mjxy2,   0, vgame, hilice, vgame_state, init_hilice, ROT0, "VGame", "Majiang Xueyuan 2 - Mahjong School 2 (V108TW)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
