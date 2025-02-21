@@ -46,22 +46,22 @@ ALLOW_SAVE_TYPE(news_iop_scsi_helper_device::mode);
 // TODO: adjustments to the below for NEWS?
 static constexpr u8 BAD_BYTE = 0xbb;
 
-news_iop_scsi_helper_device::news_iop_scsi_helper_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, NEWS_IOP_SCSI_HELPER, tag, owner, clock),
-	  m_scsi_read_callback(*this, BAD_BYTE),
-	  m_scsi_write_callback(*this),
-	  m_scsi_dma_read_callback(*this, BAD_BYTE),
-	  m_scsi_dma_write_callback(*this),
-	  m_iop_halt_callback(*this),
-	  m_bus_error_callback(*this),
-	  m_irq_out_callback(*this),
-	  m_timeout(attotime::from_usec(16)), // TODO: proper value for NEWS
-	  m_pseudo_dma_timer(nullptr),
-	  m_mode(mode::NON_DMA),
-	  m_read_fifo_bytes(0),
-	  m_write_fifo_bytes(0),
-	  m_read_fifo_data(0),
-	  m_write_fifo_data(0)
+news_iop_scsi_helper_device::news_iop_scsi_helper_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, NEWS_IOP_SCSI_HELPER, tag, owner, clock),
+	m_scsi_read_callback(*this, BAD_BYTE),
+	m_scsi_write_callback(*this),
+	m_scsi_dma_read_callback(*this, BAD_BYTE),
+	m_scsi_dma_write_callback(*this),
+	m_iop_halt_callback(*this),
+	m_bus_error_callback(*this),
+	m_irq_out_callback(*this),
+	m_timeout(attotime::from_usec(16)), // TODO: proper value for NEWS
+	m_pseudo_dma_timer(nullptr),
+	m_mode(mode::NON_DMA),
+	m_read_fifo_bytes(0),
+	m_write_fifo_bytes(0),
+	m_read_fifo_data(0),
+	m_write_fifo_data(0)
 {
 }
 
