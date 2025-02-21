@@ -123,11 +123,12 @@ public:
 	{ }
 
 	void kram3(machine_config &config) ATTR_COLD;
-	void video(machine_config &config) ATTR_COLD;
 
 	void init_kram3();
 
 protected:
+	void video(machine_config &config) ATTR_COLD;
+
 	void main_map(address_map &map) ATTR_COLD;
 	void video_map(address_map &map) ATTR_COLD;
 
@@ -153,11 +154,12 @@ public:
 	{ }
 
 	void slither(machine_config &config) ATTR_COLD;
-	void video(machine_config &config) ATTR_COLD;
-	void audio(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
+
+	void video(machine_config &config) ATTR_COLD;
+	void audio(machine_config &config) ATTR_COLD;
 
 	void video_map(address_map &map) ATTR_COLD;
 
@@ -220,10 +222,11 @@ public:
 
 	void zookeep(machine_config &config) ATTR_COLD;
 	void zookeepbl(machine_config &config) ATTR_COLD;
-	void video(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
+
+	void video(machine_config &config) ATTR_COLD;
 
 	void main_map(address_map &map) ATTR_COLD;
 	void video_map(address_map &map) ATTR_COLD;
