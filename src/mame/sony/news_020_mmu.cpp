@@ -104,13 +104,13 @@ namespace
 	};
 }
 
-news_020_mmu_device::news_020_mmu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, NEWS_020_MMU, tag, owner, clock),
-	  device_memory_interface(mconfig, *this),
-	  m_hyperbus_config("hyperbus", ENDIANNESS_BIG, 32, 32, 0),
-	  m_bus_error(*this),
-	  m_enabled(false),
-	  m_romdis(false)
+news_020_mmu_device::news_020_mmu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, NEWS_020_MMU, tag, owner, clock),
+	device_memory_interface(mconfig, *this),
+	m_hyperbus_config("hyperbus", ENDIANNESS_BIG, 32, 32, 0),
+	m_bus_error(*this),
+	m_enabled(false),
+	m_romdis(false)
 {
 }
 
@@ -174,7 +174,7 @@ void news_020_mmu_device::device_start()
 device_memory_interface::space_config_vector news_020_mmu_device::memory_space_config() const
 {
 	return space_config_vector{
-		std::make_pair(AS_PROGRAM, &m_hyperbus_config)};
+			std::make_pair(AS_PROGRAM, &m_hyperbus_config) };
 }
 
 uint32_t news_020_mmu_device::mmu_entry_r(offs_t offset, uint32_t mem_mask)
@@ -201,7 +201,7 @@ void news_020_mmu_device::mmu_entry_w(offs_t offset, uint32_t data, uint32_t mem
 		m_mmu_user_tag_ram[offset] = (m_mmu_user_tag_ram[offset] & ~mem_mask) | (tag & mem_mask);
 	}
 
-	news_020_pte modified_entry(system_map ? m_mmu_system_ram[offset] : m_mmu_user_ram[offset]);
+	const news_020_pte modified_entry(system_map ? m_mmu_system_ram[offset] : m_mmu_user_ram[offset]);
 	LOGMASKED(LOG_ENTRY, "(%s) MMU %s entry write (0x%08x, 0x%08x, 0x%08x) -> entry 0x%08x: tag = 0x%08x, pfnum = 0x%08x (valid = %d, modified = %d, fill_on_demand = %d, kernel write = %d, kernel read = %d, user write = %d, user read = %d)\n",
 			  machine().describe_context(),
 			  system_map ? "system" : "user",
