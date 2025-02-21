@@ -35,9 +35,6 @@ class h83048_device : public h8h_device {
 public:
 	h83048_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	auto tend0() { return m_tend_cb[0].bind(); }
-	auto tend1() { return m_tend_cb[1].bind(); }
-
 	auto read_port1()  { return m_read_port [PORT_1].bind(); }
 	auto write_port1() { return m_write_port[PORT_1].bind(); }
 	auto read_port2()  { return m_read_port [PORT_2].bind(); }
@@ -92,8 +89,6 @@ protected:
 	required_device<h8h_timer16_channel_device> m_timer16_3;
 	required_device<h8h_timer16_channel_device> m_timer16_4;
 	required_device<h8_watchdog_device> m_watchdog;
-
-	devcb_write_line::array<2> m_tend_cb;
 
 	u32 m_ram_start;
 	u8 m_syscr;
