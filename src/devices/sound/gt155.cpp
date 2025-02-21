@@ -99,7 +99,7 @@ void gt155_device::sound_stream_update(sound_stream& stream, std::vector<read_st
 	{
 		s64 left = 0, right = 0;
 
-		for (auto& voice : m_voices)
+		for (auto &voice : m_voices)
 		{
 			if (voice.m_enable)
 			{
@@ -132,7 +132,7 @@ void gt155_device::mix_sample(voice_t &voice, s64 &left, s64 &right)
 
 	// TODO: does this produce accurate filter output?
 	sample = sample * voice.m_filter_gain;
-	sample += (s32)voice.m_filter_out * (voice.m_filter ^ 0xffff);
+	sample += s32(voice.m_filter_out) * (voice.m_filter ^ 0xffff);
 	sample >>= 16;
 	voice.m_filter_out = sample;
 
@@ -199,11 +199,15 @@ void gt155_device::update_sample(voice_t &voice)
 	}
 
 	if (voice.m_format)
+	{
 		voice.m_sample = read_word(voice.m_addr & ~1);
+	}
 	else
+	{
 		// wk1800 apparently expects 8bit samples to only be expanded to 9 bits
 		// (with m_filter_gain then boosted to compensate)
-		voice.m_sample = (s16)(s8)read_byte(voice.m_addr) << 1;
+		voice.m_sample = s16(s8(read_byte(voice.m_addr))) << 1;
+	}
 }
 
 /**************************************************************************/
@@ -317,13 +321,13 @@ void gt155_device::voice_command(u8 data)
 		if (cmd == 0x2002)
 			voice.m_env_rate <<= 1;
 		voice.m_env_level = reg16(2);
-		voice.m_env_target = (u32)voice.m_env_level * voice.m_env_scale;
+		voice.m_env_target = u32(voice.m_env_level) * voice.m_env_scale;
 		break;
 
 	case 0x0003: // sample end address and envelope scale
 		voice.m_addr_end = reg24(0) << 1;
 		voice.m_env_scale = m_data[3];
-		voice.m_env_target = (u32)voice.m_env_level * voice.m_env_scale;
+		voice.m_env_target = u32(voice.m_env_level) * voice.m_env_scale;
 		break;
 
 	case 0x0004:
@@ -352,12 +356,12 @@ void gt155_device::voice_command(u8 data)
 		break;
 
 	case 0x2005:
-	{
-		// this is actually gain premultiplied by filter level, so the sound HW does one fewer mult when applying the filter.
-		const u16 gain = reg16(0);
-		voice.m_filter_gain = (gain & 0x1fff) << (3 + (gain >> 13));
+		{
+			// this is actually gain premultiplied by filter level, so the sound HW does one fewer mult when applying the filter.
+			const u16 gain = reg16(0);
+			voice.m_filter_gain = (gain & 0x1fff) << (3 + (gain >> 13));
+		}
 		break;
-	}
 
 	case 0x4005:
 		/*
@@ -397,8 +401,8 @@ void gt155_device::voice_command(u8 data)
 
 	default:
 		logerror("%s: sound cmd %02x%02x, param = %02x %02x %02x %02x %02x\n", machine().describe_context(),
-			m_data[5], data,
-			m_data[0], m_data[1], m_data[2], m_data[3], m_data[4]);
+				m_data[5], data,
+				m_data[0], m_data[1], m_data[2], m_data[3], m_data[4]);
 		break;
 	}
 }
