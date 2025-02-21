@@ -51,6 +51,8 @@ namespace {
 class wk1800_state : public driver_device
 {
 public:
+	static constexpr feature_type unemulated_features() { return feature::DISK; }
+
 	wk1800_state(machine_config const &mconfig, device_type type, char const *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
@@ -66,8 +68,8 @@ public:
 	{
 	}
 
-	void wk1600(machine_config &config);
-	void wk1800(machine_config &config);
+	void wk1600(machine_config &config) ATTR_COLD;
+	void wk1800(machine_config &config) ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(nmi_clear) { m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE); }
 
@@ -87,10 +89,10 @@ public:
 	void apo_w(int state);
 
 private:
-	void wk1600_map(address_map& map);
-	void wk1800_map(address_map& map);
+	void wk1600_map(address_map &map) ATTR_COLD;
+	void wk1800_map(address_map &map) ATTR_COLD;
 
-	virtual void driver_start() override;
+	virtual void driver_start() override ATTR_COLD;
 
 	void render_w(int state);
 
@@ -116,6 +118,14 @@ private:
 
 	u8 m_led_sel, m_input_sel;
 	u8 m_led_clk, m_input_clk, m_shift_data;
+};
+
+class wk1600_state : public wk1800_state
+{
+public:
+	static constexpr feature_type unemulated_features() { return feature::NONE; }
+
+	using wk1800_state::wk1800_state;
 };
 
 /**************************************************************************/
@@ -167,8 +177,10 @@ ioport_value wk1800_state::inputs_r()
 {
 	ioport_value result = 0;
 	for (unsigned i = 0U; i < m_inputs.size(); i++)
+	{
 		if (BIT(m_input_sel, i))
 			result |= m_inputs[i].read_safe(0);
+	}
 
 	return result >> StartBit;
 }
@@ -205,7 +217,7 @@ void wk1800_state::render_w(int state)
 
 
 /**************************************************************************/
-void wk1800_state::wk1600_map(address_map& map)
+void wk1800_state::wk1600_map(address_map &map)
 {
 	map(0x00000, 0x1ffff).rom();
 	map(0x20000, 0x2ffff).rw(m_gt155, FUNC(gt155_device::read), FUNC(gt155_device::write));
@@ -215,7 +227,7 @@ void wk1800_state::wk1600_map(address_map& map)
 }
 
 /**************************************************************************/
-void wk1800_state::wk1800_map(address_map& map)
+void wk1800_state::wk1800_map(address_map &map)
 {
 	map(0x00000, 0x1ffff).rom();
 	map(0x20000, 0x2ffff).rw(m_gt155, FUNC(gt155_device::read), FUNC(gt155_device::write));
@@ -281,18 +293,18 @@ void wk1800_state::wk1600(machine_config &config)
 
 	GT913_KBD_HLE(config, "kbd"); // actually TC190C020AF-001 gate array
 
-	auto& mdin(MIDI_PORT(config, "mdin"));
+	auto &mdin(MIDI_PORT(config, "mdin"));
 	midiin_slot(mdin);
 	mdin.rxd_handler().set(m_maincpu, FUNC(h83048_device::sci_rx_w<0>));
 
-	auto& mdout(MIDI_PORT(config, "mdout"));
+	auto &mdout(MIDI_PORT(config, "mdout"));
 	midiout_slot(mdout);
 	m_maincpu->write_sci_tx<0>().set(mdout, FUNC(midi_port_device::write_txd));
 
 	HD44780(config, m_lcdc, 270'000); // TODO: Wrong device type, should be SED1278F2A; clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 8);
 
-	auto& screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	auto &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(1755, 450);
 	screen.set_visarea_full();
@@ -307,7 +319,7 @@ void wk1800_state::wk1600(machine_config &config)
 } 
 
 /**************************************************************************/
-[[maybe_unused]] static void wk1800_floppies(device_slot_interface& device)
+[[maybe_unused]] static void wk1800_floppies(device_slot_interface &device)
 {
 	device.option_add("35hd", FLOPPY_35_HD);
 }
@@ -318,7 +330,7 @@ void wk1800_state::wk1800(machine_config &config)
 	wk1600(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &wk1800_state::wk1800_map);
 
-	/*
+#if 0
 	HD63266F(config, m_fdc, 16'000'000);
 	m_fdc->set_ready_line_connected(false);
 	m_fdc->drq_wr_callback().set_inputline(m_maincpu, H8_INPUT_LINE_DREQ0);
@@ -327,7 +339,7 @@ void wk1800_state::wk1800(machine_config &config)
 	FLOPPY_CONNECTOR(config, m_floppy, wk1800_floppies, "35hd", floppy_image_device::default_pc_floppy_formats);
 	m_floppy->enable_sound(true);
 	SOFTWARE_LIST(config, "flop_list").set_compatible("midi_flop");
-	*/
+#endif
 }
 
 
@@ -622,4 +634,4 @@ ROM_END
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY  FULLNAME   FLAGS
 SYST( 2000, wk1800,  0,      0,      wk1800,  wk1800, wk1800_state, empty_init,  "Casio", "WK-1800", MACHINE_SUPPORTS_SAVE )
-SYST( 2000, wk1600,  wk1800, 0,      wk1600,  wk1600, wk1800_state, empty_init,  "Casio", "WK-1600", MACHINE_SUPPORTS_SAVE )
+SYST( 2000, wk1600,  wk1800, 0,      wk1600,  wk1600, wk1600_state, empty_init,  "Casio", "WK-1600", MACHINE_SUPPORTS_SAVE )
