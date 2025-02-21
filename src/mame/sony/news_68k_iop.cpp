@@ -61,8 +61,8 @@
 
 #include "emu.h"
 
-#include "news_hid.h"
 #include "news_020_mmu.h"
+#include "news_hid.h"
 #include "news_iop_scsi.h"
 
 #include "bus/nscsi/cd.h"
@@ -111,33 +111,32 @@ namespace
 	public:
 		static constexpr feature_type unemulated_features() { return feature::GRAPHICS; }
 
-		news_iop_state(machine_config const &mconfig, device_type type, char const *tag)
-			: driver_device(mconfig, type, tag),
-			  m_iop(*this, "iop"),
-			  m_cpu(*this, "cpu"),
-			  m_mmu(*this, "mmu"),
-			  m_ram(*this, "ram"),
-			  m_eprom(*this, "eprom"),
-			  m_idrom(*this, "idrom"),
-			  m_rtc(*this, "rtc"),
-			  m_interval_timer(*this, "interval_timer"),
-			  m_scc_external(*this, "scc_external"),
-			  m_scc_peripheral(*this, "scc_peripheral"),
-			  m_net(*this, "net"),
-			  m_fdc(*this, "fdc"),
-			  m_scsi(*this, "scsi:7:am5380"),
-			  m_scsi_dma(*this, "scsi_dma"),
-			  m_dip_switch(*this, "FRONT_PANEL"),
-			  m_serial(*this, "serial%u", 0U),
-			  iop_irq_line_map( {
+		news_iop_state(machine_config const &mconfig, device_type type, char const *tag) :
+			driver_device(mconfig, type, tag),
+			m_iop(*this, "iop"),
+			m_cpu(*this, "cpu"),
+			m_mmu(*this, "mmu"),
+			m_ram(*this, "ram"),
+			m_eprom(*this, "eprom"),
+			m_idrom(*this, "idrom"),
+			m_rtc(*this, "rtc"),
+			m_interval_timer(*this, "interval_timer"),
+			m_scc_external(*this, "scc_external"),
+			m_scc_peripheral(*this, "scc_peripheral"),
+			m_net(*this, "net"),
+			m_fdc(*this, "fdc"),
+			m_scsi(*this, "scsi:7:am5380"),
+			m_scsi_dma(*this, "scsi_dma"),
+			m_dip_switch(*this, "FRONT_PANEL"),
+			m_serial(*this, "serial%u", 0U),
+			iop_irq_line_map({
 				{INPUT_LINE_IRQ1, {CPIRQ_3_1}},
 				{INPUT_LINE_IRQ2, {SCSI_IRQ, SCSI_DRQ}},
 				{INPUT_LINE_IRQ3, {LANCE}},
 				{INPUT_LINE_IRQ4, {CPU}},
 				{INPUT_LINE_IRQ5, {SCC, SCC_PERIPHERAL}},
 				{INPUT_LINE_IRQ6, {TIMEOUT, FDCIRQ}},
-				{INPUT_LINE_IRQ7, {FDCDRQ}}
-			}),
+				{INPUT_LINE_IRQ7, {FDCDRQ}} }),
 			cpu_irq_line_map({
 				// AST is excluded from this check
 				{INPUT_LINE_IRQ2, CPIRQ1},
@@ -145,8 +144,7 @@ namespace
 				{INPUT_LINE_IRQ4, CPIRQ3},
 				{INPUT_LINE_IRQ5, IOPIRQ5},
 				{INPUT_LINE_IRQ6, TIMER},
-				{INPUT_LINE_IRQ7, PERR}
-			})
+				{INPUT_LINE_IRQ7, PERR} })
 		{
 		}
 
@@ -569,19 +567,19 @@ namespace
 		map(0x4c000000, 0x4c000003).rw(m_scc_external, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w));   // rs232
 
 		map(0x4e000000, 0x4e000007).r(m_scsi, FUNC(ncr5380_device::read));
-		map(0x4e000000, 0x4e000007).lrw8(NAME([this](offs_t offset) {
+		map(0x4e000000, 0x4e000007).lrw8(NAME([this] (offs_t offset) {
 			return m_scsi_dma->read_wrapper(false, offset);
-		}), NAME([this](offs_t offset, uint8_t data) {
+		}), NAME([this] (offs_t offset, uint8_t data) {
 			m_scsi_dma->write_wrapper(false, offset, data);
 		}));
 
-		map(0x6a000001, 0x6a000001).lw8(NAME([this](uint8_t data) { cpu_irq_w<IOPIRQ5>(data > 0); }));
-		map(0x6a000002, 0x6a000002).lw8(NAME([this](uint8_t data) { cpu_irq_w<IOPIRQ3>(data > 0); }));
+		map(0x6a000001, 0x6a000001).lw8(NAME([this] (uint8_t data) { cpu_irq_w<IOPIRQ5>(data > 0); }));
+		map(0x6a000002, 0x6a000002).lw8(NAME([this] (uint8_t data) { cpu_irq_w<IOPIRQ3>(data > 0); }));
 
 		map(0x64000000, 0x64000003).rw(FUNC(news_iop_state::scsi_dma_r), FUNC(news_iop_state::scsi_dma_w));
 
-		map(0x66000000, 0x66003fff).lrw16([this](offs_t offset) { return m_net_ram[offset]; }, "net_ram_r",
-										  [this](offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_net_ram[offset]); }, "net_ram_w");
+		map(0x66000000, 0x66003fff).lrw16([this] (offs_t offset) { return m_net_ram[offset]; }, "net_ram_r",
+										  [this] (offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_net_ram[offset]); }, "net_ram_w");
 
 		map(0x68000000, 0x68000003).rw(m_net, FUNC(am7990_device::regs_r), FUNC(am7990_device::regs_w));
 
@@ -635,15 +633,15 @@ namespace
 		map(0x04400002, 0x04400002).w(FUNC(news_iop_state::cpu_inten_w<IOPIRQ3>));
 		map(0x04400003, 0x04400003).w(FUNC(news_iop_state::cpu_inten_w<IOPIRQ5>));
 		map(0x04400004, 0x04400004).w(FUNC(news_iop_state::cpu_inten_w<TIMER>));
-		map(0x04400005, 0x04400005).lw8([this](uint8_t data)
+		map(0x04400005, 0x04400005).lw8([this] (uint8_t data)
 										{
 											LOGMASKED(LOG_MEMORY, "(%s) Write CACHEEN = 0x%x\n", machine().describe_context(), data);
 										}, "CACHEEN");
 		map(0x04400006, 0x04400006).w(FUNC(news_iop_state::cpu_inten_w<PERR>));
-		map(0x04800000, 0x04800000).lw8([this](uint8_t data) { iop_irq_w<CPU>(1); }, "INT_IOP");
+		map(0x04800000, 0x04800000).lw8([this] (uint8_t data) { iop_irq_w<CPU>(1); }, "INT_IOP");
 		map(0x04c00000, 0x04c00000).select(0x10000000).w(m_mmu, FUNC(news_020_mmu_device::clear_entries));
 
-		map(0x05000000, 0x05000000).select(0x400000).lw8([this](offs_t offset, uint8_t data)
+		map(0x05000000, 0x05000000).select(0x400000).lw8([this] (offs_t offset, uint8_t data)
 														 {
 															 LOGMASKED(LOG_MEMORY, "%s cache clear = 0x%x (%s)\n", (offset & 0x400000) ? "system" : "user", data, machine().describe_context());
 														 }, "CACHE_CLR");
@@ -655,12 +653,13 @@ namespace
 
 	void news_iop_state::cpu_map(address_map &map)
 	{
-		map(0x0, 0xffffffff).lrw32([this](offs_t offset, uint32_t mem_mask) {
-			return m_mmu->hyperbus_r(offset, mem_mask, m_cpu->supervisor_mode());
-		}, "hyperbus_r",
-		[this](offs_t offset, uint32_t data, uint32_t mem_mask) {
-			m_mmu->hyperbus_w(offset, data, mem_mask, m_cpu->supervisor_mode());
-		}, "hyperbus_w");
+		map(0x0, 0xffffffff).lrw32(
+				[this] (offs_t offset, uint32_t mem_mask) {
+					return m_mmu->hyperbus_r(offset, mem_mask, m_cpu->supervisor_mode());
+				}, "hyperbus_r",
+				[this] (offs_t offset, uint32_t data, uint32_t mem_mask) {
+					m_mmu->hyperbus_w(offset, data, mem_mask, m_cpu->supervisor_mode());
+				}, "hyperbus_w");
 	}
 
 	template <news_iop_state::iop_irq_number Number>
@@ -996,9 +995,9 @@ namespace
 		// LANCE ethernet controller
 		AM7990(config, m_net, 20_MHz_XTAL);
 		m_net->intr_out().set(FUNC(news_iop_state::iop_irq_w<LANCE>)).invert();
-		m_net->dma_in().set([this](offs_t offset)
+		m_net->dma_in().set([this] (offs_t offset)
 							{ return m_net_ram[(offset >> 1) & 0x1fff]; });
-		m_net->dma_out().set([this](offs_t offset, u16 data, u16 mem_mask)
+		m_net->dma_out().set([this] (offs_t offset, u16 data, u16 mem_mask)
 							 { COMBINE_DATA(&m_net_ram[(offset >> 1) & 0x1fff]); });
 
 		// uPD7265 FDC (Compatible with 765A except it should use Sony/ECMA format by default?)
@@ -1030,10 +1029,10 @@ namespace
 		NSCSI_CONNECTOR(config, "scsi:6", news_scsi_devices, nullptr);
 
 		// AMD Am5380PC SCSI interface
-		NSCSI_CONNECTOR(config, "scsi:7").option_set("am5380", NCR5380).machine_config([this](device_t *device)
+		NSCSI_CONNECTOR(config, "scsi:7").option_set("am5380", NCR5380).machine_config([this] (device_t *device)
 		{
 			ncr5380_device &adapter = downcast<ncr5380_device &>(*device);
-			adapter.irq_handler().set([this](int state){ m_scsi_dma->irq_w(state); });
+			adapter.irq_handler().set([this] (int state){ m_scsi_dma->irq_w(state); });
 			adapter.drq_handler().set(*this, FUNC(news_iop_state::scsi_drq_handler));
 		});
 
@@ -1050,23 +1049,23 @@ namespace
 
 		// Epson RTC-58321B
 		MSM58321(config, m_rtc, 32.768_kHz_XTAL);
-		m_rtc->d0_handler().set([this](int data) { set_rtc_data_bit(0, data); });
-		m_rtc->d1_handler().set([this](int data) { set_rtc_data_bit(1, data); });
-		m_rtc->d2_handler().set([this](int data) { set_rtc_data_bit(2, data); });
-		m_rtc->d3_handler().set([this](int data) { set_rtc_data_bit(3, data); });
+		m_rtc->d0_handler().set([this] (int data) { set_rtc_data_bit(0, data); });
+		m_rtc->d1_handler().set([this] (int data) { set_rtc_data_bit(1, data); });
+		m_rtc->d2_handler().set([this] (int data) { set_rtc_data_bit(2, data); });
+		m_rtc->d3_handler().set([this] (int data) { set_rtc_data_bit(3, data); });
 	}
 
 	void news_iop_state::iop_autovector_map(address_map &map)
 	{
-		map(0xfffffff3, 0xfffffff3).lr8(NAME([]()
+		map(0xfffffff3, 0xfffffff3).lr8(NAME([] ()
 											 { return m68000_base_device::autovector(1); }));
-		map(0xfffffff5, 0xfffffff5).lr8(NAME([]()
+		map(0xfffffff5, 0xfffffff5).lr8(NAME([] ()
 											 { return m68000_base_device::autovector(2); }));
-		map(0xfffffff7, 0xfffffff7).lr8(NAME([]()
+		map(0xfffffff7, 0xfffffff7).lr8(NAME([] ()
 											 { return m68000_base_device::autovector(3); }));
-		map(0xfffffff9, 0xfffffff9).lr8(NAME([]()
+		map(0xfffffff9, 0xfffffff9).lr8(NAME([] ()
 											 { return m68000_base_device::autovector(4); }));
-		map(0xfffffffb, 0xfffffffb).lr8(NAME([this]()
+		map(0xfffffffb, 0xfffffffb).lr8(NAME([this] ()
 											 {
 												uint8_t vector = m68000_base_device::autovector(5);
 												// TODO: serial port vs peripheral SCC vector priority?
@@ -1080,9 +1079,9 @@ namespace
 												}
 												return vector;
 											 }));
-		map(0xfffffffd, 0xfffffffd).lr8(NAME([]()
+		map(0xfffffffd, 0xfffffffd).lr8(NAME([] ()
 											 { return m68000_base_device::autovector(6); }));
-		map(0xffffffff, 0xffffffff).lr8(NAME([]()
+		map(0xffffffff, 0xffffffff).lr8(NAME([] ()
 											 { return m68000_base_device::autovector(7); }));
 	}
 
