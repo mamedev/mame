@@ -1342,18 +1342,19 @@ void tek440x_state::irq1_raise(int state)
 {
 	LOG("irq1_raise %04x\n", state);
 	
-	if (m_u244latch == 1 && state == 0)
+	if (m_u244latch == 0)
 	{
 		LOG("M68K_IRQ_1 assert\n");
 		m_maincpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
+
+		m_u244latch = 1;
 	}
-	m_u244latch = state;
 }
 
 // to handle offset 0x1xx writes resetting TPInt...
 u16 tek440x_state::timer_r(offs_t offset)
 {
-	LOG("timer_r %08x\n", offset);
+	LOG("timer_r %08x pc(%08x)\n", offset, m_maincpu->pc());
 
 	if (m_u244latch)
 	{
@@ -1368,7 +1369,7 @@ u16 tek440x_state::timer_r(offs_t offset)
 // to handle offset 0x1xx writes resetting TPInt...
 void tek440x_state::timer_w(offs_t offset, u16 data)
 {
-	LOG("timer_w %08x %04x\n", OFF16_TO_OFF8(offset), data);
+	LOG("timer_w %08x %04x pc(%08x)\n", OFF16_TO_OFF8(offset), data, m_maincpu->pc());
 	m_timer->write16(offset, data);
 
 	if (m_u244latch)
@@ -1612,7 +1613,7 @@ void tek440x_state::tek4404(machine_config &config)
 
 	I8255A(config, m_printer);
 	m_printer->in_pb_callback().set_constant(0x30);
-//m_printer->in_pb_callback().set_constant(0xbf);		// HACK:  vblank always checks if printer status < 0
+m_printer->in_pb_callback().set_constant(0xbf);		// HACK:  vblank always checks if printer status < 0
 	m_printer->out_pc_callback().set(FUNC(tek440x_state::printer_pc_w));
 
 	NS32081(config, m_fpu, 20_MHz_XTAL / 2);
