@@ -282,7 +282,7 @@ MC6845_UPDATE_ROW(qix_state::crtc_update_row)
  *
  *************************************/
 
-void qix_state::video_map(address_map &map)
+void qix_state::qix_video_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rw(FUNC(qix_state::videoram_r), FUNC(qix_state::videoram_w));
 	map(0x8000, 0x83ff).ram().share("sharedram");
@@ -369,7 +369,7 @@ void qix_state::qix_video(machine_config &config)
 	constexpr XTAL QIX_CHARACTER_CLOCK = (XTAL(20'000'000)/2/16);
 
 	MC6809E(config, m_videocpu, MAIN_CLOCK_OSC/4/4); /* 1.25 MHz */
-	m_videocpu->set_addrmap(AS_PROGRAM, &qix_state::video_map);
+	m_videocpu->set_addrmap(AS_PROGRAM, &qix_state::qix_video_map);
 
 	MC6845(config, m_crtc, QIX_CHARACTER_CLOCK);
 	m_crtc->set_screen(m_screen);

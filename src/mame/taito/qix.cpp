@@ -276,7 +276,7 @@ uint8_t slither_state::trak_r()
  *
  *************************************/
 
-void qix_state::main_map(address_map &map)
+void qix_state::qix_main_map(address_map &map)
 {
 	map(0x8000, 0x83ff).ram().share("sharedram");
 	map(0x8400, 0x87ff).ram();
@@ -636,7 +636,7 @@ void qix_state::qix_base(machine_config &config)
 {
 	/* basic machine hardware */
 	MC6809E(config, m_maincpu, MAIN_CLOCK_OSC/4/4);  /* 1.25 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &qix_state::main_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &qix_state::qix_main_map);
 
 	// high interleave needed to ensure correct text in service mode
 	// Zookeeper settings and high score table seem especially sensitive to this
@@ -1370,7 +1370,7 @@ static const uint8_t xor2_table[] =
 	99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,11, 6,99,
 };
 
-static inline int permut1(int idx, int value)
+static inline int kram3_permut1(int idx, int value)
 {
 	switch (idx)
 	{
@@ -1382,7 +1382,7 @@ static inline int permut1(int idx, int value)
 	}
 }
 
-static inline int permut2(int tbl_index, int idx, const uint8_t *xor_table)
+static inline int kram3_permut2(int tbl_index, int idx, const uint8_t *xor_table)
 {
 	int xorval = 0;
 
@@ -1403,7 +1403,7 @@ static inline int permut2(int tbl_index, int idx, const uint8_t *xor_table)
 	return xorval;
 }
 
-static inline int decrypt(int address, int value)
+static inline int kram3_decrypt(int address, int value)
 {
 	int indx1 = (BIT(address,1) << 1) | BIT(address,5);
 	int indx2 = (BIT(address,7) << 1) | BIT(address,3);
@@ -1413,15 +1413,15 @@ static inline int decrypt(int address, int value)
 
 	int tbl_index = ((address & 0x7f00) >> 4) | (BIT(address,6) << 3) | (BIT(address,4) << 2) | (BIT(address,2) << 1) | (BIT(address,0) << 0);
 
-	int xor1 = permut2(tbl_index, indx1, xor1_table);
-	int xor2 = permut2(tbl_index, indx2, xor2_table);
+	int xor1 = kram3_permut2(tbl_index, indx1, xor1_table);
+	int xor2 = kram3_permut2(tbl_index, indx2, xor2_table);
 
 	// handle missing values in table
 	if (xor1 == 99 || xor2 == 99)
 		return 99;
 
-	bits1 = permut1(indx1, bits1);
-	bits2 = permut1(indx2, bits2);
+	bits1 = kram3_permut1(indx1, bits1);
+	bits2 = kram3_permut1(indx2, bits2);
 
 	bits1 ^= xor1;
 	bits2 ^= xor2;
@@ -1456,7 +1456,7 @@ void kram3_state::init_kram3()
 	memcpy(m_main_decrypted.get(),&rom[0xa000],0x6000);
 	for (int i = 0xa000; i < 0x10000; ++i)
 	{
-		m_main_decrypted[i - 0xa000] = decrypt(i, rom[i]);
+		m_main_decrypted[i - 0xa000] = kram3_decrypt(i, rom[i]);
 	}
 
 	m_mainbank->configure_entry(0, memregion("maincpu")->base() + 0xa000);
@@ -1470,7 +1470,7 @@ void kram3_state::init_kram3()
 	memcpy(m_video_decrypted.get(),&rom[0xa000],0x6000);
 	for (int i = 0xa000; i < 0x10000; ++i)
 	{
-		m_video_decrypted[i - 0xa000] = decrypt(i, rom[i]);
+		m_video_decrypted[i - 0xa000] = kram3_decrypt(i, rom[i]);
 	}
 
 	m_videobank->configure_entry(0, memregion("videocpu")->base() + 0xa000);

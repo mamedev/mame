@@ -45,10 +45,7 @@ public:
 		m_videobank(*this, "videobank")
 	{ }
 
-	void qix_base(machine_config &config);
-	void qix(machine_config &config);
-	void qix_video(machine_config &config);
-	void qix_audio(machine_config &config);
+	void qix(machine_config &config) ATTR_COLD;
 
 protected:
 	static constexpr XTAL MAIN_CLOCK_OSC  = XTAL(20'000'000);    /* 20 MHz */
@@ -107,9 +104,13 @@ protected:
 	MC6845_BEGIN_UPDATE(crtc_begin_update);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
+	void qix_base(machine_config &config) ATTR_COLD;
+	void qix_video(machine_config &config) ATTR_COLD;
+	void qix_audio(machine_config &config) ATTR_COLD;
+
 	void audio_map(address_map &map) ATTR_COLD;
-	virtual void main_map(address_map &map) ATTR_COLD;
-	virtual void video_map(address_map &map) ATTR_COLD;
+	void qix_main_map(address_map &map) ATTR_COLD;
+	void qix_video_map(address_map &map) ATTR_COLD;
 };
 
 // with encrypted CPU opcode
@@ -121,14 +122,14 @@ public:
 		m_mainbank(*this, "mainbank")
 	{ }
 
-	void kram3(machine_config &config);
-	void video(machine_config &config);
+	void kram3(machine_config &config) ATTR_COLD;
+	void video(machine_config &config) ATTR_COLD;
 
 	void init_kram3();
 
 protected:
-	virtual void main_map(address_map &map) override ATTR_COLD;
-	virtual void video_map(address_map &map) override ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void video_map(address_map &map) ATTR_COLD;
 
 private:
 	void lic_maincpu_changed(int state);
@@ -151,14 +152,14 @@ public:
 		m_trak(*this, "AN%u", 0U)
 	{ }
 
-	void slither(machine_config &config);
-	void video(machine_config &config);
-	void audio(machine_config &config);
+	void slither(machine_config &config) ATTR_COLD;
+	void video(machine_config &config) ATTR_COLD;
+	void audio(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 
-	virtual void video_map(address_map &map) override ATTR_COLD;
+	void video_map(address_map &map) ATTR_COLD;
 
 private:
 	static constexpr XTAL SLITHER_CLOCK_OSC = XTAL(21'300'000);    /* 21.3 MHz */
@@ -186,7 +187,7 @@ public:
 		m_coin(*this, "COIN")
 	{ }
 
-	void mcu(machine_config &config);
+	void mcu(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -217,15 +218,15 @@ public:
 		qixmcu_state(mconfig, type, tag)
 	{ }
 
-	void zookeep(machine_config &config);
-	void zookeepbl(machine_config &config);
-	void video(machine_config &config);
+	void zookeep(machine_config &config) ATTR_COLD;
+	void zookeepbl(machine_config &config) ATTR_COLD;
+	void video(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 
-	virtual void main_map(address_map &map) override ATTR_COLD;
-	virtual void video_map(address_map &map) override ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void video_map(address_map &map) ATTR_COLD;
 
 private:
 	void bankswitch_w(uint8_t data);
