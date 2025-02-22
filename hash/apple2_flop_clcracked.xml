@@ -9631,76 +9631,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="lcksmth50c">
-		<description>Locksmith (version 5.0 Revision C) (cleanly cracked)</description>
-		<year>1983</year>
-		<publisher>Omega MicroWare</publisher>
-		<info name="release" value="2016-08-01"/>
-		<!-- Disks re-cracked on August 28th, 2021 due to subtle
-		timing difference between Disk II and IWM hardware that resulted
-		in the previous version not working on some machines. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="locksmith 5.0 rev c (4am crack).dsk" size="143360" crc="4174acf1" sha1="6209a736c8652151601cd2b66c41b7e912688f0f" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="lcksmth50cb" cloneof="lcksmth50c">
-		<description>Locksmith (version 5.0 Revision C) (imperfect clean crack)</description>
-		<year>1983</year>
-		<publisher>Omega MicroWare</publisher>
-		<info name="release" value="2016-08-01"/>
-		<!-- Disks re-cracked on August 28th, 2021 due to subtle
-		timing difference between Disk II and IWM hardware that resulted
-		in the previous version not working on some machines.
-
-		This 'imperfect crack' version remains in here for
-		documentation purposes. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="locksmith 5.0 rev c (imperfect 4am crack).dsk" size="143360" crc="f1babc45" sha1="2d3df1fa974832f8a9f2a2ddc8ffd580085df914" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="lcksmth50f">
-		<description>Locksmith (version 5.0 Revision F) (cleanly cracked)</description>
-		<year>1983</year>
-		<publisher>Omega Microware</publisher>
-		<info name="release" value="2018-06-23"/>
-		<!-- Disks re-cracked on August 28th, 2021 due to subtle
-		timing difference between Disk II and IWM hardware that resulted
-		in the previous version not working on some machines. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="locksmith 5.0 rev f (4am crack).dsk" size="143360" crc="1246095e" sha1="a41321e6174368d2f6b048c2746f2709639ca447" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="lcksmth50fb" cloneof="lcksmth50f">
-		<description>Locksmith (version 5.0 Revision F) (imperfect clean crack)</description>
-		<year>1983</year>
-		<publisher>Omega Microware</publisher>
-		<info name="release" value="2018-06-23"/>
-		<!-- Disks re-cracked on August 28th, 2021 due to subtle
-		timing difference between Disk II and IWM hardware that resulted
-		in the previous version not working on some machines.
-
-		This 'imperfect crack' version remains in here for
-		documentation purposes. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="locksmith 5.0 rev f (imperfect 4am crack).dsk" size="143360" crc="a28819ea" sha1="1de6c7672a3f48e6dda1cd74ecd540aaafe46873" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="logclvls">
 		<description>Logic Levels (cleanly cracked)</description>
 		<year>1984</year>
@@ -33224,20 +33154,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="lcksmth50g">
-		<description>Locksmith (version 5.0 Revision G) (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>Alpha Logic Business Systems</publisher>
-		<info name="release" value="2022-06-10"/>
-		<!-- "Locksmith" is a 1984 disk utility developed and distributed by Alpha Logic Business Systems. This is version 5.0G. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="locksmith v5.0g (4am crack).dsk" size="143360" crc="4be27a62" sha1="3e19e176a314c6c888e6c3d53fe361d4767d3285"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="vt100emu">
 		<description>VT-100 Emulator (cleanly cracked)</description>
 		<year>1980</year>
@@ -44807,6 +44723,63 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="143360">
 				<rom name="library magic (4am crack) disk 2.dsk" size="143360" crc="0af2175b" sha1="820376ed388a683c8d644645cd40fdf051979e05" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="locksmth50c" cloneof="locksmth">
+		<description>Locksmith (version 5.0 revision level C) (4am crack)</description>
+		<year>1983</year>
+		<publisher>Omega Microware</publisher>
+		<info name="alt_title" value="NIBY"/>
+		<!-- NIBY was the unreleased version 1.0 of Locksmith -->
+		<info name="original_publisher" value="Omega Software Products" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<info name="version" value="5.0 revision level C" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2016-08-01. Redumped: 2021-08-28 due to subtle timing difference between Disk II and IWM hardware that resulted in the previous version not working on some machines.  -->
+		<!-- disk utility -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="locksmith 5.0 rev c (4am crack).dsk" size="143360" crc="4174acf1" sha1="6209a736c8652151601cd2b66c41b7e912688f0f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="locksmth50f" cloneof="locksmth">
+		<description>Locksmith (version 5.0 revision level F) (4am crack)</description>
+		<year>1983</year>
+		<publisher>Omega Microware</publisher>
+		<info name="alt_title" value="NIBY"/>
+		<!-- NIBY was the unreleased version 1.0 of Locksmith -->
+		<info name="original_publisher" value="Omega Software Products" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<info name="version" value="5.0 revision level F" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2018-06-23. Redumped: 2021-08-28 due to subtle timing difference between Disk II and IWM hardware that resulted in the previous version not working on some machines.  -->
+		<!-- disk utility -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="locksmith 5.0 rev f (4am crack).dsk" size="143360" crc="1246095e" sha1="a41321e6174368d2f6b048c2746f2709639ca447" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="locksmth">
+		<description>Locksmith (version 5.0 revision level G) (4am crack)</description>
+		<year>1984</year>
+		<publisher>Alpha Logic Business Systems</publisher>
+		<info name="alt_title" value="NIBY"/>
+		<!-- NIBY was the unreleased version 1.0 of Locksmith -->
+		<info name="original_publisher" value="Omega Software Products" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<info name="version" value="5.0 revision level G" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2022-06-10 -->
+		<!-- disk utility -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="locksmith v5.0g (4am crack).dsk" size="143360" crc="4be27a62" sha1="3e19e176a314c6c888e6c3d53fe361d4767d3285"/>
 			</dataarea>
 		</part>
 	</software>
