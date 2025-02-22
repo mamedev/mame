@@ -117,12 +117,12 @@ ROM_START(tdl12)
 	ROM_REGION(0x4000, "firmware", 0)
 	ROM_LOAD("tdl-12_v180.bin", 0x0000, 0x4000, CRC(fd0f4468) SHA1(1cf0bf8702747ff3047691d2b661bb08d40754f0)) // Am(27128?)-25DC
 
-	ROM_REGION(0x40, "proms", 0) // probably either Q-bus address decode or a short bootstrap program
-	ROM_LOAD("m_tdl-11.bin", 0x00, 0x20, NO_DUMP) // N82S123AN
-	ROM_LOAD("m_tdl-12.bin", 0x20, 0x20, NO_DUMP) // N82S123AN
+	ROM_REGION16_LE(0x40, "proms", 0) // probably PDP-11 bootstrap code (address & CE inputs are in common)
+	ROM_LOAD16_BYTE("m_tdl-11.bin", 0x00, 0x20, NO_DUMP) // N82S123AN
+	ROM_LOAD16_BYTE("m_tdl-12.bin", 0x01, 0x20, NO_DUMP) // N82S123AN
 
 	ROM_REGION(0x7a1, "plds", 0)
-	ROM_LOAD("mst_tdl-13.bin", 0x000, 0x117, NO_DUMP) // TIBPAL16L8-25CN (socketed, next to A/B jumpers)
+	ROM_LOAD("mst_tdl-13.bin", 0x000, 0x117, NO_DUMP) // TIBPAL16L8-25CN (socketed, next to A/B jumpers; also decodes address)
 	ROM_LOAD("mst_tdl-21.bin", 0x117, 0x117, NO_DUMP) // TIBPAL16L8-25CN
 	ROM_LOAD("mst_tdl-26.bin", 0x22e, 0x117, NO_DUMP) // TIBPAL16L8-25CN
 	ROM_LOAD("mst_tdl-31.bin", 0x345, 0x117, NO_DUMP) // TIBPAL16L8-25CN
