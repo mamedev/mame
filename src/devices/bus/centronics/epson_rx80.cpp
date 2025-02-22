@@ -5,7 +5,7 @@
     Epson RX-80 Dot Matrix printer (skeleton)
 
  Main CPU is a UPD7810 running at 11 MHz.
-     8K of mask rom (marked EPSON M64200CA)
+     8K of mask ROM (marked EPSON M64200CA)
      uses 256 bytes of ram inside upd7810, no external ram chips
      has a limited line buffer of 137 bytes maximum from ff00 to ff88,
      used for character buffer as well as during graphic print operation.
@@ -14,16 +14,16 @@
 *****************************************************************************/
 
 #include "emu.h"
-#include "cpu/upd7810/upd7810.h"
 #include "epson_rx80.h"
+
+#include "cpu/upd7810/upd7810.h"
+
 
 namespace {
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-// ======================> epson_rx80_device
 
 class epson_rx80_device :  public device_t, public device_centronics_peripheral_interface
 {
@@ -135,7 +135,6 @@ epson_rx80_device::epson_rx80_device(const machine_config &mconfig, const char *
 	device_centronics_peripheral_interface(mconfig, *this),
 	m_maincpu(*this, "maincpu")
 {
-
 }
 
 //-------------------------------------------------
@@ -144,7 +143,6 @@ epson_rx80_device::epson_rx80_device(const machine_config &mconfig, const char *
 
 void epson_rx80_device::device_start()
 {
-
 }
 
 //-------------------------------------------------
@@ -153,7 +151,6 @@ void epson_rx80_device::device_start()
 
 void epson_rx80_device::device_reset()
 {
-
 }
 
 /***************************************************************************
@@ -162,15 +159,13 @@ void epson_rx80_device::device_reset()
 
 void epson_rx80_device::input_strobe(int state)
 {
-
 }
 
 void epson_rx80_device::input_init(int state)
 {
-
 }
 
 } // anonymous namespace
 
 // GLOBAL
-DEFINE_DEVICE_TYPE_PRIVATE(EPSON_RX80, device_centronics_peripheral_interface, epson_rx80_device, "rx80", "Epson RX-80")
+DEFINE_DEVICE_TYPE_PRIVATE(EPSON_RX80, device_centronics_peripheral_interface, epson_rx80_device, "epson_rx80", "Epson RX-80")
