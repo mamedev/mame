@@ -184,7 +184,7 @@ void sigmab31_state::sigmab31(machine_config &config)
 {
 	MC6809(config, m_maincpu, 8_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sigmab31_state::main_map);
-	
+
 	MC6809(config, m_audiocpu, 8_MHz_XTAL);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &sigmab31_state::sound_map);
 

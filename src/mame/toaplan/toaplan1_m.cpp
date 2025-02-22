@@ -50,7 +50,7 @@ u16 toaplan1_demonwld_state::dsp_r()
 		case 0xc00000: {address_space &mainspace = m_maincpu->space(AS_PROGRAM);
 						input_data = mainspace.read_word(m_main_ram_seg + m_dsp_addr_w);
 						break;}
-		default:        
+		default:
 			if (!machine().side_effects_disabled())
 				logerror("DSP PC:%04x Warning !!! IO reading from %08x (port 1)\n", m_dsp->pcbase(), m_main_ram_seg + m_dsp_addr_w);
 			break;

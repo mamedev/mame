@@ -3,16 +3,16 @@
 
 /***************************************************************************
 
-	Casio GT155 (HG51B155FD)
+    Casio GT155 (HG51B155FD)
 
-	This is the sound generator and DSP used in various higher-end
-	"A-Squared Sound Source" keyboards and pianos between roughly 1994-2001.
+    This is the sound generator and DSP used in various higher-end
+    "A-Squared Sound Source" keyboards and pianos between roughly 1994-2001.
 
-	TODO:
-	- verify per-voice lowpass filter behavior
-	- DSP (architecture/instruction set seems to be the same as the standalone
-	  "GD277" DSP used in other contemporary keyboards)
- 
+    TODO:
+    - verify per-voice lowpass filter behavior
+    - DSP (architecture/instruction set seems to be the same as the standalone
+      "GD277" DSP used in other contemporary keyboards)
+
 ***************************************************************************/
 
 #include "emu.h"

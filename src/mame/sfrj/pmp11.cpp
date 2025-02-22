@@ -30,7 +30,7 @@ private:
 	required_device<t11_device> m_maincpu;
 	required_device<i8251_device> m_uart1;
 	required_device<i8251_device> m_uart2;
-	required_device<wd2797_device> m_fdc;	
+	required_device<wd2797_device> m_fdc;
 };
 
 void pmp11_state::pdp11_mem(address_map &map)
@@ -95,8 +95,8 @@ void pmp11_state::pmp11(machine_config &config)
 	rs232b.rxd_handler().set("uart2", FUNC(i8251_device::write_rxd));
 	rs232b.dsr_handler().set("uart2", FUNC(i8251_device::write_dsr));
 	rs232b.cts_handler().set("uart2", FUNC(i8251_device::write_cts));
-	
-	WD2797(config, m_fdc, 8_MHz_XTAL / 4); 
+
+	WD2797(config, m_fdc, 8_MHz_XTAL / 4);
 }
 
 ROM_START( pmp11 )

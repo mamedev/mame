@@ -366,7 +366,7 @@ ROM_START( fcpocket )
 	ROM_LOAD( "s29gl01gp.bin", 0x00000, 0x8000000, CRC(8703b18a) SHA1(07943443294e80ca93f83181c8bdbf950b87c52f) ) // 2nd half = 0x00 (so 64MByte of content)
 ROM_END
 
-ROM_START( matet300 ) 
+ROM_START( matet300 )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
 	ROM_LOAD( "tetris.bin", 0x00000, 0x2000000, CRC(73cbd40a) SHA1(5996c97cebd6cec42a0ba1fba9517adf1af00098) )
 ROM_END

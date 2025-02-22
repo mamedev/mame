@@ -1052,7 +1052,7 @@ RAND USR 16530
 		<publisher>JRS Software</publisher>
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="12944">
-				<rom name="Battleships (JRS).tzx" size="12944" crc="37f693fb	" sha1="1a0df19df7562be4cdb36f92d066af2fc32d01b8"/>
+				<rom name="Battleships (JRS).tzx" size="12944" crc="37f693fb" sha1="1a0df19df7562be4cdb36f92d066af2fc32d01b8"/>
 			</dataarea>
 		</part>
 	</software>

@@ -2,29 +2,29 @@
 // copyright-holders:Devin Acker
 
 /*
-	Casio WK-1600/1800 series keyboards
+    Casio WK-1600/1800 series keyboards
 
-	Models on this hardware:
-		- CTK-711EX (1998)
-			61 keys, 5MB wave ROM
-		- CTK-811EX (1998), CTK-731 (1999)
-			61 keys, 5MB wave ROM, floppy drive
-		- WK-1600, WK-1630 (2000)
-			73 keys, 8MB wave ROM
-		- WK-1800 (2000)
-			73 keys, 8MB wave ROM, floppy drive
-		- AP-60R (1999), AP-65R (2001)
-			88 keys, 8MB wave ROM, floppy drive
+    Models on this hardware:
+        - CTK-711EX (1998)
+            61 keys, 5MB wave ROM
+        - CTK-811EX (1998), CTK-731 (1999)
+            61 keys, 5MB wave ROM, floppy drive
+        - WK-1600, WK-1630 (2000)
+            73 keys, 8MB wave ROM
+        - WK-1800 (2000)
+            73 keys, 8MB wave ROM, floppy drive
+        - AP-60R (1999), AP-65R (2001)
+            88 keys, 8MB wave ROM, floppy drive
 
-	TODO:
-		- fix floppy controller hookup for wk1800. current issues:
-			- pressing the Disk button with the drive empty starts the drive motor,
-			  then the firmware waits forever on some status bit that is never set
-			- pressing the Disk button with a disk inserted results in several 'forced abort'
-			  errors from the H8 DMA controller
-			- wk1800 firmware seems to rely on different TS bit behavior from the HD63266
-			  compared to a standard uPD765
-		- add software list for style/program disks
+    TODO:
+        - fix floppy controller hookup for wk1800. current issues:
+            - pressing the Disk button with the drive empty starts the drive motor,
+              then the firmware waits forever on some status bit that is never set
+            - pressing the Disk button with a disk inserted results in several 'forced abort'
+              errors from the H8 DMA controller
+            - wk1800 firmware seems to rely on different TS bit behavior from the HD63266
+              compared to a standard uPD765
+        - add software list for style/program disks
  */
 
 #include "emu.h"
@@ -244,8 +244,8 @@ void wk1600_state::wk1600_map(address_map &map)
 void wk1800_state::wk1800_map(address_map &map)
 {
 	common_map(map);
-//	map(0x40000, 0x40003).mirror(0x1fffc).m(m_fdc, FUNC(hd63266f_device::map));
-//	map(0x60000, 0x7ffff).rw(m_fdc, FUNC(hd63266f_device::dma_r), FUNC(hd63266f_device::dma_w));
+//  map(0x40000, 0x40003).mirror(0x1fffc).m(m_fdc, FUNC(hd63266f_device::map));
+//  map(0x60000, 0x7ffff).rw(m_fdc, FUNC(hd63266f_device::dma_r), FUNC(hd63266f_device::dma_w));
 	map(0x80000, 0xbffff).mirror(0x40000).ram().share("nvram");
 }
 
@@ -327,7 +327,7 @@ void wk1600_state::wk1600(machine_config &config)
 	GT155(config, m_gt155, 24.576_MHz_XTAL);
 	m_gt155->add_route(0, "lspeaker", 1.0);
 	m_gt155->add_route(1, "rspeaker", 1.0);
-} 
+}
 
 /**************************************************************************/
 [[maybe_unused]] static void wk1800_floppies(device_slot_interface &device)

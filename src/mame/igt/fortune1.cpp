@@ -68,8 +68,8 @@
 
   There are three well known platforms:
   Fortune I, Baby and Baby with I8051 microcontroller.
-  
-  
+
+
   Fortune I Platform (Original IGT)
   =================================
   This is a three board system: Main, Interface & Sound board.
@@ -93,7 +93,7 @@
                                   Configurable 50Hz-60Hz V-Sync through hardware jumper.
 
   * Interface
-  
+
   I/O System                      Buffered, latched & optocoupled.
 
 
@@ -104,32 +104,32 @@
   1x 1408 DAC
   1x 8.0000 MHz. Crystal
 
-  
+
   Baby Platform (Recreativos Franco)
   ==================================
-  
+
   This is a single board system: Integrates all Fortune I hardware.
   Replaces the I8039 sound uP with an I8751 uP.
   Adds 1x AY-3-8910 sound processor.
-  
-  
+
+
   Baby with I8051 Platform (CODERE Argentina)
   ===========================================
-  
+
   The same Baby platform which replaces the I8039 main cpu uP daugther board with:
 
-  1x INTEL I8051 CPU 			Main CPU.
-  1x 27C256						Program ROM.
-  1x NEC D4364 SRAM 			Data RAM.
-  1x Dallas DS1216 				Battery + Timekeeper SRAM Socket.
-  1x Dallas DS12321				Watchdog.
+  1x INTEL I8051 CPU            Main CPU.
+  1x 27C256                     Program ROM.
+  1x NEC D4364 SRAM             Data RAM.
+  1x Dallas DS1216              Battery + Timekeeper SRAM Socket.
+  1x Dallas DS12321             Watchdog.
   1x AM8255APC                  PPI.
   1x SN74HCT373                 Octal D-type transparent latch with 3-state outputs.
   1x SN74HCT138                 3-line to 8-line Inverting Decoder/demultiplexer.
   1x SN74HCT00                  Quadruple independent 2-input NAND gates.
   1x 8.00000 MHZ. Crystal       System Clock
 
- 
+
 ********************************************************************************
 
   Main CPU Memory Map
@@ -457,7 +457,7 @@ protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	output_finder<28> m_digits;
 	output_finder<14> m_lamps;
-	optional_device<ticket_dispenser_device> m_hopper;		
+	optional_device<ticket_dispenser_device> m_hopper;
 };
 
 
@@ -490,21 +490,21 @@ protected:
 	void bpoker_wd_reset_w(offs_t offset, uint8_t data);
 	uint8_t bp_timekeep_r(offs_t offset);
 	void bp_timekeep_w(offs_t offset, uint8_t data);
-	
+
 private:
 	uint8_t baby_sound_p0_r();
 	void baby_sound_p0_w(uint8_t data);
 	uint8_t baby_sound_p1_r();
 	void baby_sound_p3_w(uint8_t data);
 	void babypkr_palette(palette_device &palette) const;
-	
+
 	void i8751_map(address_map &map) ATTR_COLD;
 	void i8751_io_port(address_map &map) ATTR_COLD;
 	void i8051_sound_mem(address_map &map) ATTR_COLD;
 	void i8051_sound_port(address_map &map) ATTR_COLD;
 
 	required_device<ay8910_device> m_aysnd;
-	optional_device<watchdog_timer_device> m_watchdog; 
+	optional_device<watchdog_timer_device> m_watchdog;
 	optional_device<ds1215_device> m_rtc;
 	output_finder<3> m_top_lamps;
 
@@ -795,14 +795,14 @@ void videopkr_state::videopkr_io_w(offs_t offset, uint8_t data)
 			m_hp_1 = (~m_p24_data >> 6) & 1;
 			m_hp_2 = (~m_p24_data >> 5) & 1;
 			m_dvrt = (~m_p24_data >> 7) & 1;
-			
+
 			if((m_p24_data & 0x60)==0x60)
 				m_hopper->motor_w(true);
 			else
 				m_hopper->motor_w(false);
-	
+
 			//popmessage("hopper %02x", m_p24_data & 0x60);
-			
+
 			break;
 		}
 
@@ -958,7 +958,7 @@ uint8_t videopkr_state::sound_io_r()
 			break;
 		}
 	}
-	
+
 	return m_sound_latch;
 }
 
@@ -1063,7 +1063,7 @@ void babypkr_state::bpoker_p1_data_w(uint8_t data)
 
 	m_ant_cio = m_c_io;
 	m_ant_jckp = m_jckp;
-	
+
 }
 
 uint8_t babypkr_state::bp_io_port_r(offs_t offset)
@@ -1071,7 +1071,7 @@ uint8_t babypkr_state::bp_io_port_r(offs_t offset)
 	uint8_t valor = 0;
 	uint8_t hf, co;
 	uint16_t kbdin;
-	
+
 	hf = ((ioport("IN1")->read() & 0x10 ) >> 4) & 1;        // Hopper full detection
 	co = 0x10 * ((ioport("IN1")->read() & 0x20 ) >> 5);     // Coin Out detection
 	kbdin = ((ioport("IN1")->read() & 0xaf ) << 8) + ioport("IN0")->read();
@@ -1094,7 +1094,7 @@ uint8_t babypkr_state::bp_io_port_r(offs_t offset)
 		case 0x0400: valor = 0x0e; break;   // Hold 5
 		case 0x0800: valor = 0x06; break;   // Bet
 	}
-	
+
 	if ((valor == 0x00) & hf )
 	{
 		valor = 0x0f;
@@ -1102,7 +1102,7 @@ uint8_t babypkr_state::bp_io_port_r(offs_t offset)
 
 	valor += co;
 
-	return valor;	
+	return valor;
 }
 
 void babypkr_state::bp_io_port_w(offs_t offset, uint8_t data)
@@ -1118,8 +1118,8 @@ void babypkr_state::bp_io_port_w(offs_t offset, uint8_t data)
 	m_p24_data = data;
 	m_hp_1 = (m_p24_data >> 6) & 1;
 	m_hp_2 = (m_p24_data >> 5) & 1;
-	m_dvrt = (~m_p24_data >> 7) & 1;	
-	
+	m_dvrt = (~m_p24_data >> 7) & 1;
+
 	// bit 5 - bit 6 -> Hopper
 	if((data&0x60)==0x60)
 		m_hopper->motor_w(true);
@@ -1279,7 +1279,7 @@ void babypkr_state::i8751_io_port(address_map &map)
 	map(0x4900, 0x49ff).rw(FUNC(babypkr_state::bp_timekeep_r), FUNC(babypkr_state::bp_timekeep_w));
 	map(0x8000, 0x80ff).rw(FUNC(babypkr_state::bp_io_port_r), FUNC(babypkr_state::bp_io_port_w));
 	map(0x9000, 0x9000).w(FUNC(babypkr_state::prog_w));  // replaces PROG line in i8039 used to clear interrupt flip flop
-	map(0xa000, 0xa0ff).rw(FUNC(babypkr_state::bp_video_io_r), FUNC(babypkr_state::bp_video_io_w));  // partial video RAM address 
+	map(0xa000, 0xa0ff).rw(FUNC(babypkr_state::bp_video_io_r), FUNC(babypkr_state::bp_video_io_w));  // partial video RAM address
 	map(0xb000, 0xb0ff).rw(FUNC(babypkr_state::bp_color_io_r), FUNC(babypkr_state::bp_color_io_w));  // Idem to color RAM
 	map(0xc000, 0xc003).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xf000, 0xf000).w(FUNC(babypkr_state::bpoker_wd_reset_w));
@@ -1437,7 +1437,7 @@ static INPUT_PORTS_START( babydad )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER )         PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED  )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_GAMBLE_KEYOUT ) // over 400 Coins/Credits
-	
+
 	PORT_START("IN2")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
@@ -1471,13 +1471,13 @@ static INPUT_PORTS_START( bpoker )
 	PORT_START("PPI_PA")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )       PORT_NAME("SET")            PORT_CODE(KEYCODE_A)  // Change field value / Last Operations
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )       PORT_NAME("NEXT")           PORT_CODE(KEYCODE_S)  // Select next field / Paper Cut (Ticket printer)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )       PORT_NAME("INIT")           PORT_CODE(KEYCODE_D)	 // Set NVRAM data / Set Time / Set Machine Number & Series
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )       PORT_NAME("INIT")           PORT_CODE(KEYCODE_D)  // Set NVRAM data / Set Time / Set Machine Number & Series
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )       PORT_NAME("BOOK")           PORT_CODE(KEYCODE_F)  // Bookeeping / Enter / Exit
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )       PORT_NAME("PERIOD")         PORT_CODE(KEYCODE_G)  // Operator Key / NVRAM Clear / Close and Report period
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )       PORT_NAME("pa-5")           PORT_CODE(KEYCODE_J)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )       PORT_NAME("pa-6")           PORT_CODE(KEYCODE_K)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )       PORT_NAME("pa-7")           PORT_CODE(KEYCODE_L)
-	
+
 	PORT_START("PPI_PC")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )       PORT_NAME("pc-4")           PORT_CODE(KEYCODE_E)  // /BUSY (Ticket printer)
@@ -1604,7 +1604,7 @@ void videopkr_state::videopkr(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.275);
-	
+
 	HOPPER(config, m_hopper, attotime::from_msec(150));
 }
 
@@ -1687,15 +1687,15 @@ void babypkr_state::bpoker(machine_config &config)
 	maincpu.set_vblank_int("screen", FUNC(babypkr_state::irq0_line_assert));
 	maincpu.port_in_cb<0>().set_constant(0);
 	maincpu.port_out_cb<1>().set(FUNC(babypkr_state::bpoker_p1_data_w));
-	
+
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_msec(600));  // Dallas DS1232: TD(2) -> float = 600ms) Verified
 	DS1215(config, m_rtc);
-	
+
 	screen_device &screen(*subdevice<screen_device>("screen"));
 	screen.set_size(32*16, 32*8);
 	screen.set_visarea(3*16, 31*16-1, 0*8, 29*8-1);
-	
+
 	i8255_device &ppi(I8255A(config, "ppi"));
 	//ppi.out_pa_callback().set_constant(0);
 	ppi.in_pb_callback().set_ioport("PPI_PA");

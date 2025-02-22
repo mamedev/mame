@@ -35,33 +35,33 @@ void zr36060_device::device_reset()
 
 void zr36060_device::regs_map(address_map &map)
 {
-//	map(0x000, 0x000) LOAD Parameters
-//	map(0x001, 0x001) Code FIFO Status (r/o)
-//	map(0x002, 0x002) Code Interface
-//	map(0x003, 0x003) Codec Mode
+//  map(0x000, 0x000) LOAD Parameters
+//  map(0x001, 0x001) Code FIFO Status (r/o)
+//  map(0x002, 0x002) Code Interface
+//  map(0x003, 0x003) Codec Mode
 
-//	map(0x005, 0x005) Maximum Block Code
-//	map(0x006, 0x006) Markers Enable
-//	map(0x007, 0x007) Interrupt Mask
-//	map(0x008, 0x008) Interrupt Status (r/o)
-//	map(0x009, 0x00c) Target Net Code Volume
-//	map(0x00d, 0x010) Target Data Code Volume
-//	map(0x011, 0x012) Scale Factor
-//	map(0x013, 0x015) Allocation Factor
-//	map(0x016, 0x019) Accumulated Code Volume
-//	map(0x01a, 0x01d) Accumulated Total Activity
-//	map(0x01e, 0x021) Accumulated Truncated Bits
+//  map(0x005, 0x005) Maximum Block Code
+//  map(0x006, 0x006) Markers Enable
+//  map(0x007, 0x007) Interrupt Mask
+//  map(0x008, 0x008) Interrupt Status (r/o)
+//  map(0x009, 0x00c) Target Net Code Volume
+//  map(0x00d, 0x010) Target Data Code Volume
+//  map(0x011, 0x012) Scale Factor
+//  map(0x013, 0x015) Allocation Factor
+//  map(0x016, 0x019) Accumulated Code Volume
+//  map(0x01a, 0x01d) Accumulated Total Activity
+//  map(0x01e, 0x021) Accumulated Truncated Bits
 	map(0x022, 0x022).lr8(NAME([this] (offs_t offset) { LOG("Read Device ID\n"); return 0x33; }));
 	map(0x023, 0x023).lr8(NAME([this] (offs_t offset) { LOG("Read Revision ID\n"); return 0x01; }));
-//	map(0x024, 0x025) Test Control
+//  map(0x024, 0x025) Test Control
 
-//	map(0x030, 0x030) Video Control
-//	map(0x031, 0x031) Video Polarity
-//	map(0x032, 0x032) Scaling
-//	map(0x033, 0x035) Background Color
-//	map(0x036, 0x041) Sync Generator
-//	map(0x042, 0x049) Active Area
-//	map(0x04a, 0x051) SUBIMG Window
+//  map(0x030, 0x030) Video Control
+//  map(0x031, 0x031) Video Polarity
+//  map(0x032, 0x032) Scaling
+//  map(0x033, 0x035) Background Color
+//  map(0x036, 0x041) Sync Generator
+//  map(0x042, 0x049) Active Area
+//  map(0x04a, 0x051) SUBIMG Window
 
 	map(0x060, 0x3ff).ram(); // JPEG Markers Array
 }

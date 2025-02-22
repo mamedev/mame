@@ -179,8 +179,8 @@ void midi2cv8_state::update_active_cv()
 	m_cv_display_fractional[physical_output] = cv_millis % 1000;
 
 	LOGMASKED(LOG_CVS, "CV %d - %d: %f - %d @ %f\n",
-	          physical_output + 1, m_selected_output_mux, cv, cv_millis,
-	          machine().time().as_double());
+			physical_output + 1, m_selected_output_mux, cv, cv_millis,
+			machine().time().as_double());
 }
 
 bool midi2cv8_state::compute_cv(float *cv) const

@@ -244,8 +244,8 @@ void midiverb_dsp_device::sound_stream_update(sound_stream &stream, const std::v
 			}
 
 			LOG_DSP("%04X %02x - DSP OP: %d %s (%04x), A: %6d, R: %6d, bus: %6d, ram: %6d @ %04x",
-			        rom_address, pc, op, OP_NAME[op], ram_offset_delta, m_accum,
-			        m_reg, bus_value, m_ram[m_ram_offset], m_ram_offset);
+					rom_address, pc, op, OP_NAME[op], ram_offset_delta, m_accum,
+					m_reg, bus_value, m_ram[m_ram_offset], m_ram_offset);
 			if (mode_rc0)
 				LOG_DSP(" [ADC]");
 			if (ld_dac)

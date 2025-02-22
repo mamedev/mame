@@ -169,8 +169,8 @@ u8 linndrum_state::keyboard_r(offs_t offset)
 	if (selected != 0x3f || d7 == 0)
 	{
 		LOGMASKED(LOG_KEYBOARD,
-		          "Offset: %02x, keys: %02x, debounce: %d, play: %d\n",
-			      offset, selected, d6, d7);
+				"Offset: %02x, keys: %02x, debounce: %d, play: %d\n",
+				offset, selected, d6, d7);
 	}
 
 	return (d7 << 7) | (d6 << 6) | selected;
@@ -267,14 +267,14 @@ void linndrum_state::trigger_w(offs_t offset, u8 data)
 {
 	assert(offset >= 0 && offset < NUM_VOICE_TRIGGERS);
 	LOGMASKED(LOG_TRIGGERS, "Trigger %s (%02x), data: %02x, data enabled: %d\n",
-	          VOICE_TRIGGER_NAMES[offset], offset, data, m_data_out_enabled);
+			VOICE_TRIGGER_NAMES[offset], offset, data, m_data_out_enabled);
 	// TODO: Implement.
 }
 
 void linndrum_state::trigger_beep_w(int state)
 {
 	LOGMASKED(LOG_TRIGGERS, "Trigger BEEP: %d, data enabled: %d\n",
-	          state, m_data_out_enabled);
+			state, m_data_out_enabled);
 	// TODO: Implement.
 }
 

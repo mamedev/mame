@@ -248,7 +248,7 @@ void dmx_voice_card_vca_device::start(int trigger_mode)
 		m_selected_rc_inv = 1;
 
 	LOGMASKED(LOG_VOLUME, "Selected gain: %f, 1/RC: %f\n",
-			  m_selected_gain, m_selected_rc_inv);
+			m_selected_gain, m_selected_rc_inv);
 }
 
 void dmx_voice_card_vca_device::decay()
@@ -296,7 +296,7 @@ void dmx_voice_card_vca_device::sound_stream_update(sound_stream &stream, const 
 			out.put(i, m_selected_gain * in.get(i));
 
 		LOGMASKED(LOG_SAMPLES, "%s VCA - just gain: %f. Samples: %f, %f.\n",
-				  tag(), m_selected_gain, in.get(0), in.get(n - 1));
+				tag(), m_selected_gain, in.get(0), in.get(n - 1));
 		return;
 	}
 
@@ -322,7 +322,7 @@ void dmx_voice_card_vca_device::sound_stream_update(sound_stream &stream, const 
 		m_decay_done = true;
 
 	LOGMASKED(LOG_SAMPLES_DECAY, "%s VCA - in decay: %f. Samples: %f, %f.\n",
-			  tag(), gain, in.get(0), in.get(n - 1));
+			tag(), gain, in.get(0), in.get(n - 1));
 }
 
 void dmx_voice_card_vca_device::init_gain_and_decay_variations(const dmx_voice_card_config &config)
@@ -355,7 +355,7 @@ void dmx_voice_card_vca_device::init_gain_and_decay_variations(const dmx_voice_c
 	for (int i = 0; i < m_gain.size(); ++i)
 	{
 		LOGMASKED(LOG_VOLUME, "%s: Gain variation %d: %f uA, %f\n",
-				  tag(), i, m_gain[i] * 1e6F, m_gain[i] / MAX_IREF);
+				tag(), i, m_gain[i] * 1e6F, m_gain[i] / MAX_IREF);
 		m_gain[i] /= MAX_IREF;  // Normalize.
 	}
 
@@ -375,7 +375,7 @@ void dmx_voice_card_vca_device::init_gain_and_decay_variations(const dmx_voice_c
 		{
 			m_decay_rc_inv.push_back(1.0F / ((R8 + r) * c3));
 			LOGMASKED(LOG_VOLUME, "%s: Decay 1/RC variation %d: %f\n",
-					  tag(), m_decay_rc_inv.size() - 1, m_decay_rc_inv.back());
+					tag(), m_decay_rc_inv.size() - 1, m_decay_rc_inv.back());
 		}
 	}
 }
@@ -637,7 +637,7 @@ void dmx_voice_card_device::compute_pitch_variations()
 
 		m_sample_t[i] = attotime::from_double(t_high + t_low);
 		LOGMASKED(LOG_PITCH, "%s Pitch variation %d: %f (%f, %f)\n",
-				  tag(), i, 1.0 / m_sample_t[i].as_double(), t_high, t_low);
+				tag(), i, 1.0 / m_sample_t[i].as_double(), t_high, t_low);
 	}
 
 	if (m_config.pitch_control)
@@ -659,7 +659,7 @@ void dmx_voice_card_device::select_pitch()
 
 	m_timer->adjust(sampling_t, 0, sampling_t);
 	LOGMASKED(LOG_PITCH, "Setting sampling frequency: %f\n",
-			  1.0 / sampling_t.as_double());
+			1.0 / sampling_t.as_double());
 }
 
 bool dmx_voice_card_device::is_decay_enabled() const
@@ -1044,7 +1044,7 @@ private:
 		{ RES_K(100), RES_K(6.8) },  // R24, R23 - VC_PERC2
 		{ RES_K(8.2), RES_K(20)  },  // R20, R19 - VC_CYMBAL
 		{ RES_K(10),  RES_K(10)  },  // R26, R25 - METRONOME_INDEX
-		                             // ECO 304 values (see update_metronome()).
+									 // ECO 304 values (see update_metronome()).
 	};
 
 	static constexpr const int VOICE_TO_FADER_MAP[NUM_MIXED_VOICES] =
@@ -1165,7 +1165,7 @@ void dmx_state::update_metronome()
 	m_metronome->level_w(level);
 
 	LOGMASKED(LOG_METRONOME, "Metronome update - on:%d, mix:%d, level:%d\n",
-	          m_metronome_on, m_metronome_mix, level);
+			m_metronome_on, m_metronome_mix, level);
 }
 
 void dmx_state::metronome_mix_w(u8 data)
@@ -1351,7 +1351,7 @@ void dmx_state::update_mix_level(int voice)
 	m_right_mixer->set_input_gain(voice, gain_right);
 
 	LOGMASKED(LOG_FADERS, "Voice %d volume changed to: %d (gain L:%f, R:%f), HPF cutoff: %.2f Hz\n",
-			  voice, pot_percent, gain_left, gain_right, 1.0F / (2 * float(M_PI) * r_gnd * rc_c));
+			voice, pot_percent, gain_left, gain_right, 1.0F / (2 * float(M_PI) * r_gnd * rc_c));
 }
 
 void dmx_state::memory_map(address_map &map)

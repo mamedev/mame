@@ -517,7 +517,7 @@ void k053247_device::zdrawgfxzoom32GP(
 		dst_x = cliprect.min_x;
 	}
 	if (int delta_max_x = dst_lastx - cliprect.max_x; delta_max_x > 0) dst_w -= delta_max_x;
-	
+
 	int dst_skipy = 0;
 	if (int delta_min_y = cliprect.min_y - dst_y; delta_min_y > 0)
 	{

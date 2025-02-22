@@ -601,7 +601,7 @@ void xpander_state::voice_update_cv(u8 voice, u8 cv_index, float cv, bool fast)
 	m_cv[voice][cv_index] = cv;
 	m_fast[voice][cv_index] = fast;
 	LOGMASKED(LOG_DAC, "Voice %d - CV %s: %f, fast: %d\n",
-	          voice, CV_NAMES[cv_index], cv, fast);
+			voice, CV_NAMES[cv_index], cv, fast);
 }
 
 void xpander_state::voice_update_resonance_cv(u8 voice, float cv)
@@ -613,7 +613,7 @@ void xpander_state::voice_update_resonance_cv(u8 voice, float cv)
 
 	m_cv[voice][RES_CV_INDEX] = cv;
 	LOGMASKED(LOG_DAC, "Voice %d - CV %s: %f\n",
-	          voice, CV_NAMES[RES_CV_INDEX], cv);
+			voice, CV_NAMES[RES_CV_INDEX], cv);
 }
 
 void xpander_state::voice_dac_enable_w(offs_t offset, u8 data)
@@ -680,7 +680,7 @@ void xpander_state::voice_dac_enable_w(offs_t offset, u8 data)
 	if (is_hres)  // Turns on U814.
 	{
 		dac_v += -RES_K(10) / RES_K(30.1) * m_dac_fine_v
-		         -RES_K(10) / RES_K(17.4) * m_dac_vref;
+				 -RES_K(10) / RES_K(17.4) * m_dac_vref;
 	}
 
 	const u8 sh_address = (offset >> 1) & 0x07;  // A1-A3.
@@ -723,7 +723,7 @@ void xpander_state::voice_dac_clear_w(u8 data)
 	m_dac_data = ((data & LOW7_MASK) << 7) | (m_dac_data & LOW7_MASK);
 	m_allow_fast = BIT(data, 7);
 	LOGMASKED(LOG_DAC_VERBOSE, "DAC clear %02x: %04x - %d\n",
-	          data, m_dac_data, m_allow_fast);
+			data, m_dac_data, m_allow_fast);
 }
 
 void xpander_state::voice_dac_w(offs_t offset, u8 data)
@@ -945,13 +945,13 @@ DECLARE_INPUT_CHANGED_MEMBER(xpander_state::encoder_moved)
 
 	static constexpr const int WRAP_BUFFER = 3;
 	const bool overflowed = newval <= WRAP_BUFFER &&
-	           oldval >= NUM_ENCODER_POSITIONS - WRAP_BUFFER;
+			oldval >= NUM_ENCODER_POSITIONS - WRAP_BUFFER;
 	const bool underflowed = newval >= NUM_ENCODER_POSITIONS - WRAP_BUFFER &&
-	           oldval <= WRAP_BUFFER;
+			oldval <= WRAP_BUFFER;
 	m_encoder_dir[encoder] = ((newval > oldval) || overflowed) && !underflowed;
 
 	LOGMASKED(LOG_ENCODERS, "Encoder %d changed from: %d to: %d (o: %d, u: %d), dir: %d\n",
-	          encoder, oldval, newval, overflowed, underflowed, bool(m_encoder_dir[encoder]));
+			encoder, oldval, newval, overflowed, underflowed, bool(m_encoder_dir[encoder]));
 }
 
 DECLARE_INPUT_CHANGED_MEMBER(xpander_state::memory_protect_changed)

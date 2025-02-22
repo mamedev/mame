@@ -183,14 +183,14 @@ void zr36057_device::asr_map(address_map &map)
 			LOG("\tVSPOL %d VSTART %d VEND %d\n", m_vfe.vspol, m_vfe.vstart, m_vfe.vend);
 		})
 	);
-//	map(0x008, 0x00b) VFE Config, Video Scaler and Pixel Format
-//	map(0x00c, 0x00f) Video Display Top
-//	map(0x010, 0x013) Video Display Bottom
-//	map(0x014, 0x017) Video Display Stride, Status and Frame Grab
-//	map(0x018, 0x01b) Video Display Configuration
-//	map(0x01c, 0x01f) Masking Map Top
-//	map(0x020, 0x023) Masking Map Bottom
-//	map(0x024, 0x027) Overlay Control
+//  map(0x008, 0x00b) VFE Config, Video Scaler and Pixel Format
+//  map(0x00c, 0x00f) Video Display Top
+//  map(0x010, 0x013) Video Display Bottom
+//  map(0x014, 0x017) Video Display Stride, Status and Frame Grab
+//  map(0x018, 0x01b) Video Display Configuration
+//  map(0x01c, 0x01f) Masking Map Top
+//  map(0x020, 0x023) Masking Map Bottom
+//  map(0x024, 0x027) Overlay Control
 	map(0x028, 0x02b).lrw32(
 		NAME([this] (offs_t offset) {
 			return (m_softreset << 24) | (m_pci_waitstate_control << 16) | m_gpio_ddr;
@@ -243,11 +243,11 @@ void zr36057_device::asr_map(address_map &map)
 			}
 		})
 	);
-//	map(0x030, 0x033) MPEG Code Source Address
-//	map(0x034, 0x037) MPEG Code Transfer Control
-//	map(0x038, 0x03b) MPEG Code Memory Pointer
-//	map(0x03c, 0x03f) Interrupt Status
-//	map(0x040, 0x043) Interrupt Control
+//  map(0x030, 0x033) MPEG Code Source Address
+//  map(0x034, 0x037) MPEG Code Transfer Control
+//  map(0x038, 0x03b) MPEG Code Memory Pointer
+//  map(0x03c, 0x03f) Interrupt Status
+//  map(0x040, 0x043) Interrupt Control
 	map(0x044, 0x047).lrw32(
 		NAME([this] (offs_t offset) {
 			LOG("I2C R\n");
@@ -264,15 +264,15 @@ void zr36057_device::asr_map(address_map &map)
 			}
 		})
 	);
-//	map(0x100, 0x103) JPEG Mode and Control
-//	map(0x104, 0x107) JPEG Process Control
-//	map(0x108, 0x10b) Vertical Sync Parameters (as sync master)
-//	map(0x10c, 0x10f) Horizontal Sync Parameters (as sync master)
-//	map(0x110, 0x113) Field Horizontal Active Portion
-//	map(0x114, 0x117) Field Vertical Active Portion
-//	map(0x118, 0x11b) Field Process Parameters
-//	map(0x11c, 0x11f) JPEG Code Base Address
-//	map(0x120, 0x123) JPEG Code FIFO Threshold
+//  map(0x100, 0x103) JPEG Mode and Control
+//  map(0x104, 0x107) JPEG Process Control
+//  map(0x108, 0x10b) Vertical Sync Parameters (as sync master)
+//  map(0x10c, 0x10f) Horizontal Sync Parameters (as sync master)
+//  map(0x110, 0x113) Field Horizontal Active Portion
+//  map(0x114, 0x117) Field Vertical Active Portion
+//  map(0x118, 0x11b) Field Process Parameters
+//  map(0x11c, 0x11f) JPEG Code Base Address
+//  map(0x120, 0x123) JPEG Code FIFO Threshold
 	map(0x124, 0x124).lrw8(
 		NAME([this] (offs_t offset) {
 			LOG("JPEG Codec Guest ID R\n");
@@ -308,7 +308,7 @@ void zr36057_device::asr_map(address_map &map)
 	);
 
 	map(0x200, 0x2ff).rw(FUNC(zr36057_device::postoffice_r), FUNC(zr36057_device::postoffice_w));
-//	map(0x300, 0x303) Still Transfer
+//  map(0x300, 0x303) Still Transfer
 }
 
 // TODO: PostOffice accesses thru GuestBus are dictated with PCI clock cycles, asynchronous
@@ -317,10 +317,10 @@ void zr36057_device::asr_map(address_map &map)
 // This should eventually be expressed in a osd_work_queue, with guestbus address_space roughly as:
 // for (int i = 0; i < 8; i++)
 // {
-// 	if (<is_device_installed>)
-// 		map(0 | (i << 2), 3 | (i << 2)).flags(<fn>).m(m_guest[i], map);
-// 	else
-// 		map(0 | (i << 2), 3 | (i << 2)).flags(<abort_fn>);
+//  if (<is_device_installed>)
+//      map(0 | (i << 2), 3 | (i << 2)).flags(<fn>).m(m_guest[i], map);
+//  else
+//      map(0 | (i << 2), 3 | (i << 2)).flags(<abort_fn>);
 // }
 u32 zr36057_device::postoffice_r(offs_t offset)
 {

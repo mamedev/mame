@@ -1104,8 +1104,8 @@ void tmp94c241_device::tlcs900_handle_timers()
 				{
 					case 0:
 					/* Not yet implemented.
-						- For the 8 bit timers: TIO, TO0TRG, invalid and TO2TRG
-						- For all 16 bit timers: TIA
+					    - For the 8 bit timers: TIO, TO0TRG, invalid and TO2TRG
+					    - For all 16 bit timers: TIA
 					*/
 					break;
 					case 1: m_timer_change[timer_index] += ((m_timer_pre >> s1) - (old_pre >> s1)); break;
@@ -1167,10 +1167,10 @@ void tmp94c241_device::tlcs900_handle_timers()
 					uint8_t interrupt)
 			{
 				/*
-					timer_id 4  =>  m_timer_16[0]  m_timer_change[4]
-					timer_id 6  =>  m_timer_16[1]  m_timer_change[5]
-					timer_id 8  =>  m_timer_16[2]  m_timer_change[6]
-					timer_id A  =>  m_timer_16[3]  m_timer_change[7]
+				    timer_id 4  =>  m_timer_16[0]  m_timer_change[4]
+				    timer_id 6  =>  m_timer_16[1]  m_timer_change[5]
+				    timer_id 8  =>  m_timer_16[2]  m_timer_change[6]
+				    timer_id A  =>  m_timer_16[3]  m_timer_change[7]
 				*/
 				uint8_t timer_index = (timer_id - 4)/2;
 

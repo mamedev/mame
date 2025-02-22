@@ -55,14 +55,14 @@
     2005      Let's!TVプレイ ドラゴンボ－ルＺ バトル体感かめはめ波～ おめぇとフュージョン / バンダイ / 日本          Let's! TV Play Dragon Ball Z Battle Taikan Kamehameha~ Omee to Fusion / Bandai / Japan
 
     dumped: either here, xavix_2000.cpp, or xavix_2002.cpp
-	          Let's!TVプレイ なりきりファイト ウルトラマン 撃て！必殺光線！！ / タカラトミー / 日本   Let's!TV Play Narikiri Fight Ultraman Shoot! Deadly ray! ! / Takara Tomy / Japan
-			  Hello Kitty TV computer /EPOCH/Japan                                                            -           -               -           -               -                   -                       -
-			  Popira Korea version /SONOKONG/Korea                                                            -           -               -           -               -                   -                       -
+              Let's!TVプレイ なりきりファイト ウルトラマン 撃て！必殺光線！！ / タカラトミー / 日本   Let's!TV Play Narikiri Fight Ultraman Shoot! Deadly ray! ! / Takara Tomy / Japan
+              Hello Kitty TV computer /EPOCH/Japan                                                            -           -               -           -               -                   -                       -
+              Popira Korea version /SONOKONG/Korea                                                            -           -               -           -               -                   -                       -
               I singer: e-kara Korean version /SONOKONG/Korea                                                 -           -               -           -               -                   -                       -
-			  Accessory memory mascot for TV mail Pc mail cot 2 characters (Putchi, Petchi) /EPOCH/Japan   (no unique ROM, just I2C memory storage)
+              Accessory memory mascot for TV mail Pc mail cot 2 characters (Putchi, Petchi) /EPOCH/Japan   (no unique ROM, just I2C memory storage)
               Accessory memory mascot for TV mail Pc mail cot 2 characters (Charuru, Kurau) /EPOCH/Japan   (no unique ROM, just I2C memory storage)
               TV mail PC "Mercot /EPOCH/Japan                                                                 -           -               -           -               -                   -                       -
-			  Let's!TVプレイ 体感キャストオフ 仮面ライダーカブト クロックアップ＆ライダーキック / バンダイ / 日本  Let's! TV Play Taikan Cast Off Kamen Rider Kabuto Clock Up & Rider Kick / Bandai / Japan
+              Let's!TVプレイ 体感キャストオフ 仮面ライダーカブト クロックアップ＆ライダーキック / バンダイ / 日本  Let's! TV Play Taikan Cast Off Kamen Rider Kabuto Clock Up & Rider Kick / Bandai / Japan
               Let's!TVプレイ なりきり体感 ボウケンジャー 走れ！撃て！ミッションスタート！！ / バンダイ / 日本   Let's! TV Play Narikiri Taikan Boukenger Hashire! Ute! Mission Start!! / Bandai / Japan
               Webdiver Gradion /TAKARA/Japan                                                                  -           -               -           -               -                   -                       -
               Let's!TVプレイ 魔法戦隊マジレンジャー マジマットでダンス＆バトル / バンダイ / 日本        Let's! TV Play Mahou Taiketsu Magiranger - Magimat de Dance & Battle / Bandai / Japan
@@ -3022,7 +3022,7 @@ CONS( 2001, ddrfammt, 0,           0,  xavix_cart_ddrfammt,ddrfammt, xavix_cart_
 
 // ポピラ
 CONS( 2000, popira,   0,           0,  xavix_cart_popira,popira,   xavix_cart_state,     init_xavix,    "Takara / SSD Company LTD",                     "Popira (Japan)", MACHINE_IMPERFECT_SOUND/*|MACHINE_IS_BIOS_ROOT*/ ) // The original Popira is a single yellow unit
-// the Korean release is not properly compatible with the usual Popira carts, although some of the Korean i-singer range are compatible 
+// the Korean release is not properly compatible with the usual Popira carts, although some of the Korean i-singer range are compatible
 CONS( 2001, popirak,  popira,      0,  xavix_cart_popirak,popira,   xavix_cart_state,     init_xavix,    "Sonokong / SSD Company LTD",                   "PoPiRa - Finger Sports (Korea)", MACHINE_IMPERFECT_SOUND/*|MACHINE_IS_BIOS_ROOT*/ )
 
 // ポピラ2
