@@ -3,12 +3,12 @@
 /***************************************************************************
 
 Mini Vaders (Space Invaders's mini game)
-(c)1990 Taito Corporation
+(c) 1990 Taito Corporation
 
 Driver by Takahiro Nogi 1999/12/19 -
 
-This is a test board sold together with the cabinet (as required by law in
-Japan). It has no sound.
+This is a test board sold together with cabinets (as required by law in
+Japan).  It has no sound.
 
 PCB Layout
 ----------
@@ -75,7 +75,7 @@ uint32_t minivadr_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 		uint32_t *const dst = &bitmap.pix(y);
 		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
-			dst[x] = BIT(src[x >> 3], 7 - (x & 7)) ? rgb_t::white() : rgb_t::black();
+			dst[x] = BIT(src[x >> 3], ~x & 7) ? rgb_t::white() : rgb_t::black();
 		}
 	}
 
@@ -106,12 +106,12 @@ INPUT_PORTS_END
 
 void minivadr_state::minivadr(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(24'000'000) / 6);
+	// basic machine hardware
+	Z80(config, m_maincpu, 24_MHz_XTAL / 6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &minivadr_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(minivadr_state::irq0_line_hold));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -119,7 +119,7 @@ void minivadr_state::minivadr(machine_config &config)
 	screen.set_visarea(0, 256-1, 16, 240-1);
 	screen.set_screen_update(FUNC(minivadr_state::screen_update));
 
-	/* the board has no sound hardware */
+	// the board has no sound hardware
 }
 
 
