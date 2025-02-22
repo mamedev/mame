@@ -310,7 +310,6 @@ std::pair<std::error_condition, std::vector<u8>> vtech_impl::file_read(const std
 	while(pos < len) {
 		if(track >= 40 || sector >= 16)
 			break;
-		fprintf(stderr, "Reading to pos %d from track %d sector %d\n", pos, track, sector);
 		auto dblk = m_blockdev.get(track*16 + sector);
 		int size = len - pos;
 		if(size > 126)
