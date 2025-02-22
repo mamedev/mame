@@ -14,11 +14,56 @@
 *****************************************************************************/
 
 #include "emu.h"
+#include "cpu/upd7810/upd7810.h"
 #include "epson_rx80.h"
 
+namespace {
 
-DEFINE_DEVICE_TYPE(EPSON_RX80, epson_rx80_device, "rx80", "Epson RX-80")
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
 
+// ======================> epson_rx80_device
+
+class epson_rx80_device :  public device_t, public device_centronics_peripheral_interface
+{
+public:
+	// construction/destruction
+	epson_rx80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	static constexpr feature_type unemulated_features() { return feature::PRINTER; }
+
+	/* Centronics stuff */
+	virtual void input_init(int state) override;
+	virtual void input_strobe(int state) override;
+	virtual void input_data0(int state) override { if (state) m_centronics_data |= 0x01; else m_centronics_data &= ~0x01; }
+	virtual void input_data1(int state) override { if (state) m_centronics_data |= 0x02; else m_centronics_data &= ~0x02; }
+	virtual void input_data2(int state) override { if (state) m_centronics_data |= 0x04; else m_centronics_data &= ~0x04; }
+	virtual void input_data3(int state) override { if (state) m_centronics_data |= 0x08; else m_centronics_data &= ~0x08; }
+	virtual void input_data4(int state) override { if (state) m_centronics_data |= 0x10; else m_centronics_data &= ~0x10; }
+	virtual void input_data5(int state) override { if (state) m_centronics_data |= 0x20; else m_centronics_data &= ~0x20; }
+	virtual void input_data6(int state) override { if (state) m_centronics_data |= 0x40; else m_centronics_data &= ~0x40; }
+	virtual void input_data7(int state) override { if (state) m_centronics_data |= 0x80; else m_centronics_data &= ~0x80; }
+
+protected:
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+
+	virtual bool supports_pin35_5v() override { return true; }
+
+private:
+	uint8_t centronics_data_r(offs_t offset) { return m_centronics_data; };
+
+	void epson_rx80_mem(address_map &map) ATTR_COLD;
+
+	required_device<upd7810_device> m_maincpu;
+
+	uint8_t m_centronics_data;
+};
 
 //-------------------------------------------------
 //  ROM( epson_rx80 )
@@ -59,26 +104,7 @@ void epson_rx80_device::device_add_mconfig(machine_config &config)
 {
 	upd7810_device &upd(UPD7810(config, m_maincpu, 11000000)); // 11 Mhz
 	upd.set_addrmap(AS_PROGRAM, &epson_rx80_device::epson_rx80_mem);
-	upd.pa_in_cb().set(FUNC(epson_rx80_device::porta_r));
-	upd.pa_out_cb().set(FUNC(epson_rx80_device::porta_w));
-	upd.pb_in_cb().set(FUNC(epson_rx80_device::portb_r));
-	upd.pb_out_cb().set(FUNC(epson_rx80_device::portb_w));
-	upd.pc_in_cb().set(FUNC(epson_rx80_device::portc_r));
-	upd.pc_out_cb().set(FUNC(epson_rx80_device::portc_w));
-	upd.pd_in_cb().set(FUNC(epson_rx80_device::portd_r));
-	upd.pd_out_cb().set(FUNC(epson_rx80_device::portd_w));
-	upd.pf_in_cb().set(FUNC(epson_rx80_device::portf_r));
-	upd.pf_out_cb().set(FUNC(epson_rx80_device::portf_w));
 
-	upd.an0_func().set(FUNC(epson_rx80_device::an0_r));
-	upd.an1_func().set(FUNC(epson_rx80_device::an1_r));
-	upd.an2_func().set(FUNC(epson_rx80_device::an2_r));
-	upd.an3_func().set(FUNC(epson_rx80_device::an3_r));
-	upd.an4_func().set(FUNC(epson_rx80_device::an4_r));
-	upd.an5_func().set(FUNC(epson_rx80_device::an5_r));
-	upd.an6_func().set(FUNC(epson_rx80_device::an6_r));
-	upd.an7_func().set(FUNC(epson_rx80_device::an7_r));
-//  upd.co0_func().set(FUNC(epson_rx80_device::co0_w));
 }
 
 
@@ -130,107 +156,6 @@ void epson_rx80_device::device_reset()
 
 }
 
-uint8_t epson_rx80_device::porta_r()
-{
-	u8 result = 0;
-	return result;
-}
-
-uint8_t epson_rx80_device::portb_r()
-{
-	u8 result = 0;
-	return result;
-}
-
-uint8_t epson_rx80_device::portc_r()
-{
-	u8 result = 0;
-	return result;
-}
-
-uint8_t epson_rx80_device::portd_r()
-{
-	u8 result = 0;
-	return result;
-}
-
-uint8_t epson_rx80_device::portf_r()
-{
-	u8 result = 0;
-	return result;
-}
-
-void epson_rx80_device::porta_w(uint8_t data)
-{
-
-}
-
-void epson_rx80_device::portb_w(uint8_t data)
-{
-
-}
-
-void epson_rx80_device::portc_w(uint8_t data)
-{
-
-}
-
-
-void epson_rx80_device::portd_w(uint8_t data)
-{
-
-}
-
-void epson_rx80_device::portf_w(uint8_t data)
-{
-
-}
-
-//-------------------------------------------------
-//  Analog Inputs
-//-------------------------------------------------
-
-uint8_t epson_rx80_device::an0_r()
-{
-	return 0;
-}
-
-uint8_t epson_rx80_device::an1_r()
-{
-	return 0;
-}
-
-uint8_t epson_rx80_device::an2_r()
-{
-	return 0;
-}
-
-uint8_t epson_rx80_device::an3_r()
-{
-	return 0;
-}
-
-uint8_t epson_rx80_device::an4_r()
-{
-	return 0;
-}
-
-uint8_t epson_rx80_device::an5_r()
-{
-	return 0;
-}
-
-uint8_t epson_rx80_device::an6_r()
-{
-	return 0;
-}
-
-uint8_t epson_rx80_device::an7_r()
-{
-	return 0;
-}
-
-
 /***************************************************************************
     Centronics
 ***************************************************************************/
@@ -240,8 +165,12 @@ void epson_rx80_device::input_strobe(int state)
 
 }
 
-
 void epson_rx80_device::input_init(int state)
 {
 
 }
+
+} // anonymous namespace
+
+// GLOBAL
+DEFINE_DEVICE_TYPE_PRIVATE(EPSON_RX80, device_centronics_peripheral_interface, epson_rx80_device, "rx80", "Epson RX-80")
