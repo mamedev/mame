@@ -44727,7 +44727,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="locksmth50c" cloneof="locksmth">
+	<software name="locksmth50c" cloneof="locksmth5">
 		<description>Locksmith (version 5.0 revision level C) (4am crack)</description>
 		<year>1983</year>
 		<publisher>Omega Microware</publisher>
@@ -44746,7 +44746,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="locksmth50f" cloneof="locksmth">
+	<software name="locksmth50f" cloneof="locksmth5">
 		<description>Locksmith (version 5.0 revision level F) (4am crack)</description>
 		<year>1983</year>
 		<publisher>Omega Microware</publisher>
@@ -44765,7 +44765,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="locksmth">
+	<software name="locksmth5">
 		<description>Locksmith (version 5.0 revision level G) (4am crack)</description>
 		<year>1984</year>
 		<publisher>Alpha Logic Business Systems</publisher>

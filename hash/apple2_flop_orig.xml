@@ -26554,7 +26554,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="locksmth31" cloneof="locksmth">
+	<software name="locksmth3">
 		<description>Locksmith (version 3.1)</description>
 		<year>1981</year>
 		<publisher>Omega Software Products</publisher>
@@ -26572,7 +26572,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="locksmth41" cloneof="locksmth">
+	<software name="locksmth4">
 		<description>Locksmith (version 4.1)</description>
 		<year>1983</year>
 		<publisher>Omega Microware</publisher>
@@ -26591,7 +26591,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="locksmth50c" cloneof="locksmth">
+	<software name="locksmth50c" cloneof="locksmth5">
 		<description>Locksmith (version 5.0 revision level C)</description>
 		<year>1983</year>
 		<publisher>Omega Microware</publisher>
@@ -26610,7 +26610,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="locksmth50f" cloneof="locksmth">
+	<software name="locksmth50f" cloneof="locksmth5">
 		<description>Locksmith (version 5.0 revision level F)</description>
 		<year>1983</year>
 		<publisher>Omega Microware</publisher>
@@ -26629,7 +26629,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="locksmth50g" cloneof="locksmth">
+	<software name="locksmth5">
 		<description>Locksmith (version 5.0 revision level G)</description>
 		<year>1984</year>
 		<publisher>Alpha Logic Business Systems</publisher>
@@ -26648,7 +26648,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="locksmth60a" cloneof="locksmth">
+	<software name="locksmth60a" cloneof="locksmth6">
 		<description>Locksmith (version 6.0 revision A)</description>
 		<year>1986</year>
 		<publisher>Alpha Logic Business Systems</publisher>
@@ -26674,7 +26674,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="locksmth">
+	<software name="locksmth6">
 		<description>Locksmith (version 6.0 revision B)</description>
 		<year>1986</year>
 		<publisher>Alpha Logic Business Systems</publisher>
