@@ -12,7 +12,7 @@
 
 #include <cmath>
 
-DEFINE_DEVICE_TYPE(TC0060DCA, tc0060dca_device, "tc0060dca", "Taito TC0060DCA")
+DEFINE_DEVICE_TYPE(TC0060DCA, tc0060dca_device, "tc0060dca", "Taito TC0060DCA volume control")
 
 tc0060dca_device::tc0060dca_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, TC0060DCA, tag, owner, clock),

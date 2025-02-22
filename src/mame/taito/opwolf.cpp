@@ -268,6 +268,10 @@ Raine source has standard Asuka/Mofflot sprite/tile priority:
 Raine simply kludges in this value, failing to read it from a
 register. So what is controlling priority.
 
+Sound routing is wrong: according to schematics, msm0 goes to tc0060dca0 input 0,
+msm1 goes to tc0060dca0 input 1. ym2151 (mono) and tc0060dca0 outputs go to
+tc0060dca1 inputs. The 2nd tc0060dca is for total volume (opwolf_adpcm_d_w and
+opwolf_adpcm_e_w), outputs go to left/right speakers.
 
 ***************************************************************************/
 
