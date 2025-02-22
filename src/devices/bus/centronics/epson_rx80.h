@@ -13,7 +13,7 @@
 
 #include "ctronics.h"
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(EPSON_RX80, device_centronics_peripheral_interface)
 
 #endif // MAME_BUS_CENTRONICS_EPSON_RX80_H
