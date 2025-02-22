@@ -10,7 +10,7 @@ class tc0060dca_device : public device_t, public device_sound_interface
 public:
 	tc0060dca_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_level(u8 level) { m_level = level; }
+	void set_level(u8 level);
 
 protected:
 	// device_t override

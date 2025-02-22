@@ -22,6 +22,12 @@ tc0060dca_device::tc0060dca_device(const machine_config &mconfig, const char *ta
 {
 }
 
+void tc0060dca_device::set_level(u8 level)
+{
+	m_stream->update();
+	m_level = level;
+}
+
 void tc0060dca_device::device_start()
 {
 	m_stream = stream_alloc(8, 2, clock(), STREAM_DEFAULT_FLAGS);
