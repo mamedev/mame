@@ -8,9 +8,9 @@
 class tc0060dca_device : public device_t, public device_sound_interface
 {
 public:
-	tc0060dca_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tc0060dca_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	void set_level(u8 level);
+	void level_w(offs_t offset, u8 data);
 
 protected:
 	// device_t override
@@ -21,7 +21,7 @@ protected:
 
 private:
 	sound_stream *m_stream;
-	u8 m_level;
+	float m_gain[2];
 	float m_atten_table[256];
 };
 
