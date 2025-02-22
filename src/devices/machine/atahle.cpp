@@ -668,16 +668,16 @@ uint16_t ata_hle_device_base::control_r(offs_t offset)
 
 				/*
 
-					bit     description
+				    bit     description
 
-					0       master active
-					1       slave active
-					2       complement of active disk head bit 0
-					3       complement of active disk head bit 1
-					4       complement of active disk head bit 2
-					5       complement of active disk head bit 3
-					6       write in progress
-					7       floppy present (unused)
+				    0       master active
+				    1       slave active
+				    2       complement of active disk head bit 0
+				    3       complement of active disk head bit 1
+				    4       complement of active disk head bit 2
+				    5       complement of active disk head bit 3
+				    6       write in progress
+				    7       floppy present (unused)
 
 				*/
 

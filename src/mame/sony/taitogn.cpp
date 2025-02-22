@@ -1009,21 +1009,10 @@ static INPUT_PORTS_START(mawasunda)
 	PORT_INCLUDE(taitogn)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x1f, IP_ACTIVE_LOW, IPT_UNUSED) // debug
-	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x7f, IP_ACTIVE_LOW, IPT_UNUSED) // P1 UP/P1 DOWN/P1 LEFT/P1 RIGHT/P1 BUTTON1/P1 BUTTON2/P1 BUTTON3
 
 	PORT_MODIFY("P2")
-	PORT_BIT(0x1f, IP_ACTIVE_LOW, IPT_UNUSED) // debug
-	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
-
-	PORT_MODIFY("P3")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
-
-	PORT_MODIFY("P4")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
-
-	PORT_MODIFY("SYSTEM")
-	PORT_BIT(0xcc, IP_ACTIVE_LOW, IPT_UNUSED) // START3/START4/COIN3/COIN4
+	PORT_BIT(0x7f, IP_ACTIVE_LOW, IPT_UNUSED) // P2 UP/P2 DOWN/P2 LEFT/P2 RIGHT/P2 BUTTON1/P2 BUTTON2/P2 BUTTON3
 
 	PORT_START("HANDLE1")
 	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X) PORT_MINMAX(0x01, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(16) PORT_CENTERDELTA(32) PORT_NAME("%p Handle")
@@ -1424,7 +1413,7 @@ GAME( 2002, shangtou,  coh3002t, coh3002t_t1,    taitogn,      taitogn_state, em
 
 // Takumi
 GAME( 2001, nightrai,  coh3002t, coh3002t_t1,    taitogn,      ttgncl4_state, empty_init, ROT0,   "Takumi", "Night Raid (V2.03J 2001/02/26 17:00)", MACHINE_SUPPORTS_SAVE )
-GAME( 2001, otenki,    coh3002t, coh3002t_t1,    taitogn,      ttgncl4_state, empty_init, ROT0,   "Takumi", "Otenki Kororin (V2.01J 2001/07/02 1	0:00)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, otenki,    coh3002t, coh3002t_t1,    taitogn,      ttgncl4_state, empty_init, ROT0,   "Takumi", "Otenki Kororin (V2.01J 2001/07/02 10:00)", MACHINE_SUPPORTS_SAVE )
 
 // Triangle Service
 GAME( 2002, xiistag,   coh3002t, coh3002t_t1,    taitogn,      taitogn_state, empty_init, ROT270, "Triangle Service", "XII Stag (V2.01J 2002/6/26 22:27)", MACHINE_SUPPORTS_SAVE )
