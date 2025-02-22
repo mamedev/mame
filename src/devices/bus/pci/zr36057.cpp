@@ -14,12 +14,13 @@ iterations.
 ZR36057 is known to have two HW quirks that are been fixed with ZR36067.
 
 TODO:
-- Currently at dc10plus HW test "Error at M-JPEG codec", requires ZR36060 to continue;
+- Enough to pass board functions in dc10plus HW test, requires VSYNC signal from ZR36060 to continue;
 - Hookup busmaster;
 - What are i2c 0x8e >> 1 address device checks for?
 \- Can't be adv7175 (0xd4 >> 1) nor adv7176 (0x54 >> 1)
 ...
 - Soft Reset & Write lock mechanisms (each register have separate macro-groups);
+- GuestBus slot mechanism (relevant when multiple devices are hooked);
 - eventually decouple AV PCI controller part from the actual client cards;
 
 Known mix-ins:
@@ -37,13 +38,14 @@ Known mix-ins:
 #include "zr36057.h"
 
 #define LOG_WARN      (1U << 1)
+#define LOG_PO        (1U << 2) // PostOffice interactions
 
-#define VERBOSE (LOG_GENERAL | LOG_WARN)
+#define VERBOSE (LOG_GENERAL | LOG_WARN | LOG_PO)
 //#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 #define LOGWARN(...)            LOGMASKED(LOG_WARN, __VA_ARGS__)
-
+#define LOGPO(...)              LOGMASKED(LOG_PO, __VA_ARGS__)
 
 DEFINE_DEVICE_TYPE(ZR36057_PCI, zr36057_device,   "zr36057",   "Zoran ZR36057-based Enhanced Multimedia Controller")
 //DEFINE_DEVICE_TYPE(ZR36067_PCI, zr36067_device,   "zr36067",   "Zoran ZR36067-based AV Controller")
@@ -51,6 +53,7 @@ DEFINE_DEVICE_TYPE(ZR36057_PCI, zr36057_device,   "zr36057",   "Zoran ZR36057-ba
 
 zr36057_device::zr36057_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: pci_card_device(mconfig, type, tag, owner, clock)
+	, m_guest(*this, "guest")
 	, m_decoder(*this, "decoder")
 {
 	// ZR36057PQC Video cutting chipset
@@ -73,10 +76,12 @@ zr36057_device::zr36057_device(const machine_config &mconfig, const char *tag, d
 
 void zr36057_device::device_add_mconfig(machine_config &config)
 {
-	// 27'000'000 xtal near ZR36060
+	ZR36060(config, m_guest, XTAL(27'000'000));
 
 	SAA7110A(config, m_decoder, XTAL(26'800'000));
 	m_decoder->sda_callback().set([this](int state) { m_decoder_sdao_state = state; });
+
+	//ADV7176(config, m_encoder, XTAL(27'000'000));
 
 	// S-Video input/output
 	// composite video input/output
@@ -116,8 +121,11 @@ void zr36057_device::device_reset()
 void zr36057_device::software_reset()
 {
 	LOG("SoftReset\n");
-	m_video_frontend.horizontal_config = (0 << 30) | (0x001 << 10) | (0x3ff << 0);
-	m_video_frontend.vertical_config = (0 << 30) | (0x001 << 10) | (0x3ff << 0);
+	m_vfe.hspol = m_vfe.vspol = 0;
+	m_vfe.hstart = m_vfe.vstart = 0x001;
+	m_vfe.hend = m_vfe.vend = 0x3ff;
+	m_vfe.horizontal_config = (m_vfe.hspol << 30) | (m_vfe.hstart << 10) | (m_vfe.hend << 0);
+	m_vfe.vertical_config = (m_vfe.vspol << 30) | (m_vfe.vstart << 10) | (m_vfe.vend << 0);
 
 	m_pci_waitstate_control = 0;
 	m_gpio_ddr = 0xff; // all inputs
@@ -125,6 +133,15 @@ void zr36057_device::software_reset()
 	// m_gpio_data = 0xf0;
 	for (int i = 0; i < 4; i++)
 		m_guestbus.time[i] = 0;
+
+	m_jpeg_guest_id = 4;
+	m_jpeg_guest_reg = 0;
+
+	m_po.pending = false;
+	m_po.time_out = false;
+	m_po.dir = true;
+	m_po.guest_id = 0;
+	m_po.guest_reg = 0;
 }
 
 void zr36057_device::config_map(address_map &map)
@@ -134,33 +151,46 @@ void zr36057_device::config_map(address_map &map)
 	map(0x3f, 0x3f).lr8(NAME([] () { return 0x10; }));
 }
 
-// Application Specific Register
+// Application Specific Register(s)
 void zr36057_device::asr_map(address_map &map)
 {
 	map(0x000, 0x003).lrw32(
 		NAME([this] (offs_t offset) {
 			// NOTE: wants to read-back here, throws "Bus Master ASIC error" otherwise (?)
 			LOG("Video Front End Horizontal Configuration R\n");
-			return m_video_frontend.horizontal_config;
+			return m_vfe.horizontal_config;
 		}),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			COMBINE_DATA(&m_video_frontend.horizontal_config);
+			COMBINE_DATA(&m_vfe.horizontal_config);
 			LOG("Video Front End Horizontal Configuration W %08x & %08x\n", data, mem_mask);
+			m_vfe.hspol = BIT(m_vfe.horizontal_config, 30);
+			m_vfe.hstart = (m_vfe.horizontal_config >> 10) & 0x3ff;
+			m_vfe.hend = (m_vfe.horizontal_config >> 0) & 0x3ff;
+			LOG("\tVSPOL %d VSTART %d VEND %d\n", m_vfe.hspol, m_vfe.hstart, m_vfe.hend);
 		})
 	);
 	map(0x004, 0x007).lrw32(
 		NAME([this] (offs_t offset) {
 			LOG("Video Front End Vertical Configuration R\n");
-			return m_video_frontend.vertical_config;
+			return m_vfe.vertical_config;
 		}),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			COMBINE_DATA(&m_video_frontend.vertical_config);
+			COMBINE_DATA(&m_vfe.vertical_config);
 			LOG("Video Front End Vertical Configuration %08x & %08\n", data, mem_mask);
+			m_vfe.vspol = BIT(m_vfe.vertical_config, 30);
+			m_vfe.vstart = (m_vfe.vertical_config >> 10) & 0x3ff;
+			m_vfe.vend = (m_vfe.vertical_config >> 0) & 0x3ff;
+			LOG("\tVSPOL %d VSTART %d VEND %d\n", m_vfe.vspol, m_vfe.vstart, m_vfe.vend);
 		})
 	);
-
-	// ...
-
+//	map(0x008, 0x00b) VFE Config, Video Scaler and Pixel Format
+//	map(0x00c, 0x00f) Video Display Top
+//	map(0x010, 0x013) Video Display Bottom
+//	map(0x014, 0x017) Video Display Stride, Status and Frame Grab
+//	map(0x018, 0x01b) Video Display Configuration
+//	map(0x01c, 0x01f) Masking Map Top
+//	map(0x020, 0x023) Masking Map Bottom
+//	map(0x024, 0x027) Overlay Control
 	map(0x028, 0x02b).lrw32(
 		NAME([this] (offs_t offset) {
 			return (m_softreset << 24) | (m_pci_waitstate_control << 16) | m_gpio_ddr;
@@ -191,6 +221,7 @@ void zr36057_device::asr_map(address_map &map)
 
 			// The doc claims 0xf0 default for GPIO, but win98 driver will throw "subvendor ID failed"
 			// while testing various ID combinations here
+			// This should come from GDAT pin at strapping time
 			return (0x7e << 24) | (m_guestbus.time[3] << 12) | (m_guestbus.time[2] << 8) | (m_guestbus.time[1] << 4) | (m_guestbus.time[0] << 0);
 		}),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
@@ -212,7 +243,11 @@ void zr36057_device::asr_map(address_map &map)
 			}
 		})
 	);
-
+//	map(0x030, 0x033) MPEG Code Source Address
+//	map(0x034, 0x037) MPEG Code Transfer Control
+//	map(0x038, 0x03b) MPEG Code Memory Pointer
+//	map(0x03c, 0x03f) Interrupt Status
+//	map(0x040, 0x043) Interrupt Control
 	map(0x044, 0x047).lrw32(
 		NAME([this] (offs_t offset) {
 			LOG("I2C R\n");
@@ -229,4 +264,112 @@ void zr36057_device::asr_map(address_map &map)
 			}
 		})
 	);
+//	map(0x100, 0x103) JPEG Mode and Control
+//	map(0x104, 0x107) JPEG Process Control
+//	map(0x108, 0x10b) Vertical Sync Parameters (as sync master)
+//	map(0x10c, 0x10f) Horizontal Sync Parameters (as sync master)
+//	map(0x110, 0x113) Field Horizontal Active Portion
+//	map(0x114, 0x117) Field Vertical Active Portion
+//	map(0x118, 0x11b) Field Process Parameters
+//	map(0x11c, 0x11f) JPEG Code Base Address
+//	map(0x120, 0x123) JPEG Code FIFO Threshold
+	map(0x124, 0x124).lrw8(
+		NAME([this] (offs_t offset) {
+			LOG("JPEG Codec Guest ID R\n");
+			return (m_jpeg_guest_id << 4) | (m_jpeg_guest_reg << 0);
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_jpeg_guest_id = (data >> 4) & 7;
+			m_jpeg_guest_reg = (data >> 0) & 7;
+			LOG("JPEG Codec Guest ID W %02x\n", data);
+		})
+	);
+	map(0x12c, 0x12f).lrw32(
+		NAME([this] (offs_t offset) {
+			LOG("GuestBus Control (II) R\n");
+
+			return (0 << 16) | (m_guestbus.time[7] << 12) | (m_guestbus.time[6] << 8) | (m_guestbus.time[5] << 4) | (m_guestbus.time[4] << 0);
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			LOG("GuestBus Control (II) W %08x & %08x\n", data, mem_mask);
+
+			if (ACCESSING_BITS_8_15)
+			{
+				m_guestbus.time[7] = (data >> 12) & 0xf;
+				m_guestbus.time[6] = (data >> 8) & 0xf;
+			}
+
+			if (ACCESSING_BITS_0_7)
+			{
+				m_guestbus.time[5] = (data >> 4) & 0xf;
+				m_guestbus.time[4] = (data >> 0) & 0xf;
+			}
+		})
+	);
+
+	map(0x200, 0x2ff).rw(FUNC(zr36057_device::postoffice_r), FUNC(zr36057_device::postoffice_w));
+//	map(0x300, 0x303) Still Transfer
+}
+
+// TODO: PostOffice accesses thru GuestBus are dictated with PCI clock cycles, asynchronous
+// We pretend they are synchronous as a starting point, and one port only (which may matter later
+// with CODE transfers). A time out happens 64 PCI cycles later in ZR36067, '120 halves that threshold.
+// This should eventually be expressed in a osd_work_queue, with guestbus address_space roughly as:
+// for (int i = 0; i < 8; i++)
+// {
+// 	if (<is_device_installed>)
+// 		map(0 | (i << 2), 3 | (i << 2)).flags(<fn>).m(m_guest[i], map);
+// 	else
+// 		map(0 | (i << 2), 3 | (i << 2)).flags(<abort_fn>);
+// }
+u32 zr36057_device::postoffice_r(offs_t offset)
+{
+	//LOGPO("PO R %d %d\n", m_po.guest_id, m_po.guest_reg);
+	u8 res = 0;
+	if (m_po.guest_id == 0)
+	{
+		if (m_po.dir == false)
+			res = m_guest->read(m_po.guest_reg);
+	}
+	else if (!machine().side_effects_disabled())
+	{
+		m_po.time_out = true;
+		LOGWARN("Warning: PO access unmapped POGuestID read %d %02x\n", m_po.guest_id, m_po.guest_reg);
+	}
+
+	return (m_po.pending << 25)
+		| (m_po.time_out << 24)
+		| (m_po.dir << 23)
+		| (m_po.guest_id << 20)
+		| (m_po.guest_reg << 16)
+		| res;
+}
+
+void zr36057_device::postoffice_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	// clear a previously set time out flag
+	if (BIT(data, 24))
+		m_po.time_out = false;
+	m_po.dir = !!(BIT(data, 23));
+	m_po.guest_id = (data >> 20) & 7;
+	m_po.guest_reg = (data >> 16) & 7;
+	LOGPO("PO W [%08x] %08x & %08x PODir %s POGuestID %d POGuestReg %d POData %02x\n"
+		, offset << 2
+		, data
+		, mem_mask
+		, m_po.dir ? "Write" : "Read"
+		, m_po.guest_id
+		, m_po.guest_reg
+		, data & 0xff
+	);
+	if (m_po.guest_id == 0)
+	{
+		if (m_po.dir == true)
+			m_guest->write(m_po.guest_reg, data & 0xff);
+	}
+	else
+	{
+		m_po.time_out = true;
+		LOGWARN("Warning: PO access unmapped POGuestID write %d %02x\n", m_po.guest_id, m_po.guest_reg);
+	}
 }

@@ -1699,6 +1699,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/zr36060.h,VIDEOS["ZR36060"] = true
+--------------------------------------------------
+
+if (VIDEOS["ZR36060"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/zr36060.cpp",
+		MAME_DIR .. "src/devices/video/zr36060.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/zr36110.h,VIDEOS["ZR36110"] = true
 --------------------------------------------------
 
