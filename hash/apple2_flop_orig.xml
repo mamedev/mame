@@ -3419,21 +3419,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="lsmith41">
-		<description>Locksmith 4.1</description>
-		<year>1983</year>
-		<publisher>Omega Microware</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or later." />
-		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2019-05-19 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="108291">
-				<rom name="locksmith 4.1.woz" size="108291" crc="fa9116e7" sha1="6f6528a640bd4a5643b339e59a5ba99f8fba2d01" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="cutthr23">
 		<description>Cutthroats (Release 23 / 840809)</description>
 		<year>1984</year>
@@ -12251,22 +12236,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="lcksmth31">
-		<description>Locksmith 3.1</description>
-		<year>1981</year>
-		<publisher>Omega Software Products</publisher>
-		<info name="usage" value="Requires an Apple ][, ][+, or unenhanced //e with at least 32K. Due to coding bugs unrelated to copy protection, it will not run on later models." />
-		<sharedfeat name="compatibility" value="A2,A2P,A2E" />
-		<!-- Dump released: 2022-02-09 -->
-		<!-- "Locksmith" is a 1981 disk utility developed and distributed by Omega Software Products. This is version 3.1. It requires an Apple ][, ][+, or unenhanced //e with at least 32K. Due to coding bugs unrelated to copy protection, it will not run on later models. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="55061">
-				<rom name="locksmith v3.1.woz" size="55061" crc="6b9321ca" sha1="48de65dd3d3ce9656dc75dce5b328974e2ab748b" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="compkara">
 		<description>Competition Karate</description>
 		<year>1984</year>
@@ -14267,101 +14236,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1296162">
 				<rom name="the oregon trail 800k.woz" size="1296162" crc="89ee473a" sha1="101e39fed19715a6b577bb90ca67ac7b0c6ace23" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="lsmith50c">
-		<description>Locksmith (version 5.0 Revision C)</description>
-		<year>1983</year>
-		<publisher>Omega Microware</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or later." />
-		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-03-26 -->
-		<!-- "Locksmith" is a 1983 disk utility developed and distributed by Omega Microware. This is version 5.0 revision C. It runs on any Apple ][ with 48K. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234792">
-				<rom name="locksmith v5.0c.woz" size="234792" crc="a50a0a75" sha1="6505f88cdd389f21e3638d8bcfc1df3bf88b7812" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="lsmith50f">
-		<description>Locksmith (version 5.0 Revision F)</description>
-		<year>1983</year>
-		<publisher>Omega Microware</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or later." />
-		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-03-26 -->
-		<!-- "Locksmith" is a 1983 disk utility developed and distributed by Omega Microware. This is version 5.0 revision F. It runs on any Apple ][ with 48K. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234792">
-				<rom name="locksmith v5.0f.woz" size="234792" crc="961919c1" sha1="1e4769a0c14079ed163b27b8857b5674afb520e3" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="lsmith50g">
-		<description>Locksmith (version 5.0 Revision G)</description>
-		<year>1983</year>
-		<publisher>Omega Microware</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or later." />
-		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-03-26 -->
-		<!-- "Locksmith" is a 1983 disk utility developed and distributed by Omega Microware. This is version 5.0 revision G. It runs on any Apple ][ with 48K. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234803">
-				<rom name="locksmith v5.0g.woz" size="234803" crc="453629cd" sha1="9f8b59c4e5a21fdb5c41263f813a0e441c586217" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="lsmith60a">
-		<description>Locksmith (version 6.0 Revision A)</description>
-		<year>1986</year>
-		<publisher>Alpha Logic Business Systems</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or later." />
-		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-03-26 -->
-		<!-- "Locksmith" is a 1986 disk utility developed and distributed by Alpha Logic Business Systems. This is version 6.0 revision A. It runs on any Apple ][ with 48K. This archive also includes Locksmith 6.0 Parameter Disk 1. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 - Program"/>
-			<dataarea name="flop" size="234790">
-				<rom name="locksmith v6.0a.woz" size="234790" crc="84b8d5ef" sha1="d782dab1994115295d00c6697f996269cf71e5fa" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2 - Parameter" />
-			<dataarea name="flop" size="234798">
-				<rom name="locksmith v6.0a parameter disk 1.woz" size="234798" crc="88e3563c" sha1="ad16d3e5d07feef9871f01c678d59a6bc658faac" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="lsmith60b">
-		<description>Locksmith (version 6.0 Revision B)</description>
-		<year>1986</year>
-		<publisher>Alpha Logic Business Systems</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or later." />
-		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-03-27 -->
-		<!-- "Locksmith" is a 1986 disk utility developed and distributed by Alpha Logic Business Systems. This is version 6.0 revision B, created by booting version 6.0 revision A and executing the "patch to rev. B" file from Locksmith Parameter Disk 1D. It runs on any Apple ][ with 48K. This archive also includes Locksmith 6.0 Parameter Disk 1D. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 - Program" />
-			<dataarea name="flop" size="234790">
-				<rom name="locksmith v6.0b.woz" size="234790" crc="9106c526" sha1="efdaec6e6c9592ea98e65b098dd19099f5f61149" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2 - Parameter" />
-			<!-- This disk upgrades 6.0A to 6.0B -->
-			<dataarea name="flop" size="234799">
-				<rom name="locksmith v6.0b parameter disk 1d.woz" size="234799" crc="e31292d4" sha1="bab8cc7a5f34a2a44954648b17f85997cacd443a" />
 			</dataarea>
 		</part>
 	</software>
@@ -26676,6 +26550,154 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 3 Side A" />
 			<dataarea name="flop" size="235596">
 				<rom name="leisure suit larry in the land of the lounge lizards disk 3a.woz" size="235596" crc="1463b109" sha1="32f48c48e87fe716de1db5cfd1b52694a4fe2750" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="locksmth31" cloneof="locksmth">
+		<description>Locksmith (version 3.1)</description>
+		<year>1981</year>
+		<publisher>Omega Software Products</publisher>
+		<info name="alt_title" value="NIBY"/>
+		<!-- NIBY was the unreleased version 1.0 of Locksmith -->
+		<info name="usage" value="Requires an Apple ][, ][+, or unenhanced //e with at least 32K. Due to coding bugs unrelated to copy protection, it will not run on later models." />
+		<info name="version" value="3.1" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E" />
+		<!-- Dump released: 2022-02-09 -->
+		<!-- disk utility -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="55061">
+				<rom name="locksmith v3.1.woz" size="55061" crc="6b9321ca" sha1="48de65dd3d3ce9656dc75dce5b328974e2ab748b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="locksmth41" cloneof="locksmth">
+		<description>Locksmith (version 4.1)</description>
+		<year>1983</year>
+		<publisher>Omega Microware</publisher>
+		<info name="alt_title" value="NIBY"/>
+		<!-- NIBY was the unreleased version 1.0 of Locksmith -->
+		<info name="original_publisher" value="Omega Software Products" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<info name="version" value="4.1" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2019-05-19 -->
+		<!-- disk utility -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="108291">
+				<rom name="locksmith 4.1.woz" size="108291" crc="fa9116e7" sha1="6f6528a640bd4a5643b339e59a5ba99f8fba2d01" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="locksmth50c" cloneof="locksmth">
+		<description>Locksmith (version 5.0 revision level C)</description>
+		<year>1983</year>
+		<publisher>Omega Microware</publisher>
+		<info name="alt_title" value="NIBY"/>
+		<!-- NIBY was the unreleased version 1.0 of Locksmith -->
+		<info name="original_publisher" value="Omega Software Products" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<info name="version" value="5.0 revision level C" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2022-03-26 -->
+		<!-- disk utility -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234792">
+				<rom name="locksmith v5.0c.woz" size="234792" crc="a50a0a75" sha1="6505f88cdd389f21e3638d8bcfc1df3bf88b7812" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="locksmth50f" cloneof="locksmth">
+		<description>Locksmith (version 5.0 revision level F)</description>
+		<year>1983</year>
+		<publisher>Omega Microware</publisher>
+		<info name="alt_title" value="NIBY"/>
+		<!-- NIBY was the unreleased version 1.0 of Locksmith -->
+		<info name="original_publisher" value="Omega Software Products" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<info name="version" value="5.0 revision level F" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2022-03-26 -->
+		<!-- disk utility -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234792">
+				<rom name="locksmith v5.0f.woz" size="234792" crc="961919c1" sha1="1e4769a0c14079ed163b27b8857b5674afb520e3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="locksmth50g" cloneof="locksmth">
+		<description>Locksmith (version 5.0 revision level G)</description>
+		<year>1984</year>
+		<publisher>Alpha Logic Business Systems</publisher>
+		<info name="alt_title" value="NIBY"/>
+		<!-- NIBY was the unreleased version 1.0 of Locksmith -->
+		<info name="original_publisher" value="Omega Software Products" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<info name="version" value="5.0 revision level G" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2022-03-26 -->
+		<!-- disk utility -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234803">
+				<rom name="locksmith v5.0g.woz" size="234803" crc="453629cd" sha1="9f8b59c4e5a21fdb5c41263f813a0e441c586217" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="locksmth60a" cloneof="locksmth">
+		<description>Locksmith (version 6.0 revision A)</description>
+		<year>1986</year>
+		<publisher>Alpha Logic Business Systems</publisher>
+		<info name="alt_title" value="NIBY"/>
+		<!-- NIBY was the unreleased version 1.0 of Locksmith -->
+		<info name="original_publisher" value="Omega Software Products" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<info name="version" value="6.0 revision A" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2022-03-26 -->
+		<!-- disk utility -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Locksmith revision A"/>
+			<dataarea name="flop" size="234790">
+				<rom name="locksmith v6.0a.woz" size="234790" crc="84b8d5ef" sha1="d782dab1994115295d00c6697f996269cf71e5fa" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Parameter Disk 1" />
+			<dataarea name="flop" size="234798">
+				<rom name="locksmith v6.0a parameter disk 1.woz" size="234798" crc="88e3563c" sha1="ad16d3e5d07feef9871f01c678d59a6bc658faac" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="locksmth">
+		<description>Locksmith (version 6.0 revision B)</description>
+		<year>1986</year>
+		<publisher>Alpha Logic Business Systems</publisher>
+		<info name="alt_title" value="NIBY"/>
+		<!-- NIBY was the unreleased version 1.0 of Locksmith -->
+		<info name="original_publisher" value="Omega Software Products" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<info name="version" value="6.0 revision B" />
+		<!-- Created by booting version 6.0 revision A and executing the "patch to rev. B" file from Locksmith Parameter Disk 1D. -->
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2022-03-27 -->
+		<!-- disk utility -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Locksmith revision B" />
+			<dataarea name="flop" size="234790">
+				<rom name="locksmith v6.0b.woz" size="234790" crc="9106c526" sha1="efdaec6e6c9592ea98e65b098dd19099f5f61149" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Parameter Disk 1D" />
+			<!-- This disk upgrades 6.0A to 6.0B -->
+			<dataarea name="flop" size="234799">
+				<rom name="locksmith v6.0b parameter disk 1d.woz" size="234799" crc="e31292d4" sha1="bab8cc7a5f34a2a44954648b17f85997cacd443a" />
 			</dataarea>
 		</part>
 	</software>
