@@ -187,4 +187,4 @@ void vgame_state::init_hilice()
 
 
 GAME( 200?, hilice,  0, vgame, hilice, vgame_state, init_hilice, ROT0, "VGame", "Hi Lice (V102FA)",                              MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 200?, mjxy2,   0, vgame, hilice, vgame_state, init_hilice, ROT0, "VGame", "Majiang Xueyuan 2 - Mahjong School 2 (V108TW)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, mjxy2,   0, vgame, hilice, vgame_state, init_hilice, ROT0, "VGame", "Majiang Xueyuan 2 - Mahjong School (V108TW)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
