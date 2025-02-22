@@ -95,6 +95,8 @@
         47      7     (keypad)
         48      8     (keypad)
         49      9     (keypad)
+        
+		// Tektronix 410x
         4A      F1
         4B      F2
         4C      F3
@@ -107,6 +109,22 @@
         53      Cancel/Setup
         54      DCopy/SCopy
         55      Menu
+
+		// Tektronix 440x
+		52		F1
+		53		F2
+		54		F3
+		55		F4
+		4A		F5
+		4B		F6
+		4C		F7
+		4D		F8
+		4E		F9
+		4F		F10
+		50		F11
+		51		F12
+
+
         56      Cursor Right (joystick)
         57      Cursor Up    (joystick)
         58      Cursor Left  (joystick)
