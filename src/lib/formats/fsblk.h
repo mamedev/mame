@@ -12,6 +12,7 @@
 
 #include <string>
 #include <string_view>
+#include <system_error>
 #include <utility>
 #include <vector>
 
@@ -22,13 +23,14 @@ using u16 = uint16_t;
 using u32 = uint32_t;
 using u64 = uint64_t;
 
-enum err_t {
-	ERR_OK = 0,
-	ERR_UNSUPPORTED,
-	ERR_INVALID,
-	ERR_NOT_FOUND,
-	ERR_NOT_EMPTY,
-	ERR_NO_SPACE,
+enum class error : int {
+	unsupported = 1,
+	not_found,
+	no_space,
+	invalid_block,
+	invalid_name,
+	incorrect_size,
+	already_exists,
 };
 
 template<typename T> class refcounted_outer {
@@ -218,44 +220,44 @@ public:
 	virtual meta_data volume_metadata();
 
 	// Change the metadata for the volume
-	virtual err_t volume_metadata_change(const meta_data &meta);
+	virtual std::error_condition volume_metadata_change(const meta_data &meta);
 
 	// Get the metadata for a file or a directory.  Empty path targets the root directory
-	virtual std::pair<err_t, meta_data> metadata(const std::vector<std::string> &path);
+	virtual std::pair<std::error_condition, meta_data> metadata(const std::vector<std::string> &path);
 
 	// Change the metadata for a file or a directory.  Empty path targets the root directory
-	virtual err_t metadata_change(const std::vector<std::string> &path, const meta_data &meta);
+	virtual std::error_condition metadata_change(const std::vector<std::string> &path, const meta_data &meta);
 
 	// Get the contents of a directory, empty path targets the root directory
-	virtual std::pair<err_t, std::vector<dir_entry>> directory_contents(const std::vector<std::string> &path);
+	virtual std::pair<std::error_condition, std::vector<dir_entry>> directory_contents(const std::vector<std::string> &path);
 
 	// Rename a file or a directory.  In contrast to metadata_change, this can move the object
 	// between directories
-	virtual err_t rename(const std::vector<std::string> &opath, const std::vector<std::string> &npath);
+	virtual std::error_condition rename(const std::vector<std::string> &opath, const std::vector<std::string> &npath);
 
 	// Remove a file or a directory.  Directories must be empty (e.g. it's not recursive)
-	virtual err_t remove(const std::vector<std::string> &path);
+	virtual std::error_condition remove(const std::vector<std::string> &path);
 
 	// Create a directory, path designates where the directory must be, directory name is in meta
-	virtual err_t dir_create(const std::vector<std::string> &path, const meta_data &meta);
+	virtual std::error_condition dir_create(const std::vector<std::string> &path, const meta_data &meta);
 
 	// Create an empty file, path designates where the file must be, file name is in meta
-	virtual err_t file_create(const std::vector<std::string> &path, const meta_data &meta);
+	virtual std::error_condition file_create(const std::vector<std::string> &path, const meta_data &meta);
 
 	// Read the contents of a file
-	virtual std::pair<err_t, std::vector<u8>> file_read(const std::vector<std::string> &path);
+	virtual std::pair<std::error_condition, std::vector<u8>> file_read(const std::vector<std::string> &path);
 
 	// Replace the contents of a file, the file must already exist
-	virtual err_t file_write(const std::vector<std::string> &path, const std::vector<u8> &data);
+	virtual std::error_condition file_write(const std::vector<std::string> &path, const std::vector<u8> &data);
 
 	// Read the resource fork of a file on systems that handle those
-	virtual std::pair<err_t, std::vector<u8>> file_rsrc_read(const std::vector<std::string> &path);
+	virtual std::pair<std::error_condition, std::vector<u8>> file_rsrc_read(const std::vector<std::string> &path);
 
 	// Replace the resource fork of a file, the file must already exist
-	virtual err_t file_rsrc_write(const std::vector<std::string> &path, const std::vector<u8> &data);
+	virtual std::error_condition file_rsrc_write(const std::vector<std::string> &path, const std::vector<u8> &data);
 
 	// Format an image, provide the volume metadata
-	virtual err_t format(const meta_data &meta);
+	virtual std::error_condition format(const meta_data &meta);
 
 	static void wstr(u8 *p, std::string_view str);
 
@@ -271,6 +273,17 @@ protected:
 	fsblk_t &m_blockdev;
 };
 
+// error category for filesystem errors
+std::error_category const &fs_category() noexcept;
+inline std::error_condition make_error_condition(error err) noexcept { return std::error_condition(int(err), fs_category()); }
+
 } // namespace fs
+
+
+namespace std {
+
+template <> struct is_error_condition_enum<fs::error> : public std::true_type { };
+
+} // namespace std
 
 #endif
