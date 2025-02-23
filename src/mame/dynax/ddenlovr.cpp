@@ -45,8 +45,8 @@ Year + Game                         Board                  CPU    Sound         
 1996  Return Of Sel Jan II          NM504-2                Z80    YM2149 YM2413 M6295  TZ-2053P?
 1996  Return Of Sel Jan II          NM5020403              Z80    YMZ284 YM2413 M6295  70C160F011?
 1997  Hana Kagerou                                         KC80          YM2413 M6295  70C160F011
-1997  Kkot Bi Nyo                   9090123-2              KC80          YM2413 M6295  70C160F011                            A1010
-1997  Kkot Bi Nyo Special           9090123-3              KC80          YM2413 M6295  ?
+1997  Kkotbinyeo                    9090123-2              KC80          YM2413 M6295  70C160F011                            A1010
+1997  Kkotbinyeo Special            9090123-3              KC80          YM2413 M6295  ?
 1997  Mj Mysterious Orient Returns  NM71S0519              Z80    YMZ284 YM2413 M6295  scratched off
 1998  Máquè zhōnghuá érnǚ           D11107218L1            Z80    AY8910 YM2413 M6295  70C160F009
 1998  Mj Reach Ippatsu                                     KC80          YM2413 M6295  70C160F011
@@ -6071,12 +6071,12 @@ static INPUT_PORTS_START( kotbinyosu )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x00, "Unknown 2-4" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) ) // Shows Kkot Bi Nyo title regardless of the setting of 2-9
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) ) // Shows Kkotbinyeo title regardless of the setting of 2-9
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )  // Shows Speed Up title, but only if 2-9 is On
 
 	PORT_MODIFY("DSW5")
 	PORT_DIPNAME( 0x08, 0x00, "Unknown 2-9" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) ) // Shows Kkot Bi Nyo title regardless of the setting of 2-4
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) ) // Shows Kkotbinyeo title regardless of the setting of 2-4
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )  // Shows Speed Up title, but only if 2-4 is On
 INPUT_PORTS_END
 
@@ -10998,7 +10998,7 @@ ROM_END
 
 /***************************************************************************
 
-Kkot Bi Nyo
+Kkotbinyeo
 Dynax / Nakanihon / Shinwhajin
 1997
 
@@ -11042,7 +11042,7 @@ ROM_START( kotbinyo )
 	ROM_LOAD( "ampal16l8.7a", 0x000, 0x104, NO_DUMP )
 ROM_END
 
-// 9090123-1 PCB. Title can be chosen via DSWs between Kkot Bi Nyo and Speed Up (스피드업)
+// 9090123-1 PCB. Title can be chosen via DSWs between Kkotbinyeo and Speed Up (스피드업)
 // Speed Up seems to be just the minigames, with the Hanafuda main game disabled.
 ROM_START( kotbinyosu )
 	ROM_REGION( 0x80000, "maincpu", 0 )   // ! KL5C80 Code !
@@ -11067,7 +11067,7 @@ ROM_END
 
 /***************************************************************************
 
-Kkot Bi Nyo Special
+Kkotbinyeo Special
 Dynax / Nakanihon / Shinwhajin
 1997
 
@@ -12678,10 +12678,10 @@ GAME( 1995, ddenlovrb,   ddenlovj, ddenlovr,  ddenlovr,   ddenlovr_state, empty_
 GAME( 1996, ddenlovr,    ddenlovj, ddenlovr,  ddenlovr,   ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Don Den Lover Vol. 1 (Hong Kong)",                               MACHINE_NO_COCKTAIL  )
 
 GAME( 1996, hanakanz,    0,        hanakanz,  hanakanz,   hanakanz_state, empty_init,    ROT0, "Dynax",                                       "Hana Kanzashi (Japan)",                                          MACHINE_NO_COCKTAIL  )
-GAME( 1997, kotbinyo,    hanakanz, kotbinyo,  kotbinyo,   hanakanz_state, empty_init,    ROT0, "Dynax / Shinwhajin",                          "Kkot Bi Nyo (Korea)",                                            MACHINE_NO_COCKTAIL  )
-GAME( 1997, kotbinyosu,  hanakanz, kotbinyo,  kotbinyosu, hanakanz_state, empty_init,    ROT0, "Dynax / Shinwhajin",                          "Speed Up / Kkot Bi Nyo (Korea)",                                 MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL  )
+GAME( 1997, kotbinyo,    hanakanz, kotbinyo,  kotbinyo,   hanakanz_state, empty_init,    ROT0, "Dynax / Shinwhajin",                          "Kkotbinyeo (Korea)",                                             MACHINE_NO_COCKTAIL  )
+GAME( 1997, kotbinyosu,  hanakanz, kotbinyo,  kotbinyosu, hanakanz_state, empty_init,    ROT0, "Dynax / Shinwhajin",                          "Speed Up / Kkotbinyeo (Korea)",                                  MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL  )
 
-GAME( 1997, kotbinsp,    0,        kotbinsp,  kotbinsp,   hanakanz_state, empty_init,    ROT0, "Dynax / Shinwhajin",                          "Kkot Bi Nyo Special (Korea)",                                    MACHINE_NO_COCKTAIL  )
+GAME( 1997, kotbinsp,    0,        kotbinsp,  kotbinsp,   hanakanz_state, empty_init,    ROT0, "Dynax / Shinwhajin",                          "Kkotbinyeo Special (Korea)",                                     MACHINE_NO_COCKTAIL  )
 
 GAME( 1996, akamaru,     0,        akamaru,   akamaru,    ddenlovr_state, empty_init,    ROT0, "Dynax (Nakanihon license)",                   "Panel & Variety Akamaru Q Joushou Dont-R",                       MACHINE_NO_COCKTAIL  )
 
