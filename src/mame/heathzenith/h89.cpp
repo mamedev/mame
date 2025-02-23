@@ -116,9 +116,6 @@ protected:
 	required_device<ins8250_device>         m_console;
 	required_ioport                         m_config, m_sw501, m_jj501_502;
 
-	// General Purpose Port (GPP)
-	u8   m_gpp;
-
 	bool m_timer_intr_enabled;
 	bool m_single_step_enabled;
 
@@ -133,16 +130,6 @@ protected:
 	static constexpr XTAL H89_CLOCK     = XTAL(12'288'000) / 6;
 	static constexpr XTAL INS8250_CLOCK = XTAL(1'843'200);
 
-	static constexpr u8 GPP_SINGLE_STEP_BIT             = 0;
-	static constexpr u8 GPP_ENABLE_TIMER_INTERRUPT_BIT  = 1;
-	static constexpr u8 GPP_MEM0_BIT                    = 4;
-	static constexpr u8 GPP_MEM1_BIT                    = 5;
-	static constexpr u8 GPP_IO0_BIT                     = 6;
-	static constexpr u8 GPP_IO1_BIT                     = 7;
-
-	void update_gpp(u8 gpp);
-	void port_f2_w(offs_t offset, u8 data);
-
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	TIMER_DEVICE_CALLBACK_MEMBER(h89_irq_timer);
@@ -154,6 +141,10 @@ protected:
 	void h89_base_io(address_map &map) ATTR_COLD;
 
 	void set_wait_state(int data);
+	void set_timer_intr(int data);
+	void set_single_step(int data);
+	void set_cpu_speed(int data);
+	void clear_timer_intr(u8);
 
 	u8 raise_NMI_r();
 	void raise_NMI_w(u8 data);
@@ -366,14 +357,14 @@ static INPUT_PORTS_START( h89 )
 
 	// MTR-90 (444-84 or 444-142)
 	PORT_DIPNAME( 0x03, 0x00, "Disk I/O #2" )                        PORT_DIPLOCATION("SW501:1,2")     PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x04)
-	PORT_DIPSETTING(    0x00, "H-88-1 (Not yet implemented)" )
-	PORT_DIPSETTING(    0x01, "H/Z-47 (Not yet implemented)" )
-	PORT_DIPSETTING(    0x02, "Z-67 (Not yet implemented)" )
+	PORT_DIPSETTING(    0x00, "H-88-1" )
+	PORT_DIPSETTING(    0x01, "H/Z-47" )
+	PORT_DIPSETTING(    0x02, "Z-67" )
 	PORT_DIPSETTING(    0x03, "Undefined" )
 	PORT_DIPNAME( 0x0c, 0x00, "Disk I/O #1" )                        PORT_DIPLOCATION("SW501:3,4")     PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x04)
 	PORT_DIPSETTING(    0x00, "H-89-37" )
-	PORT_DIPSETTING(    0x04, "H/Z-47 (Not yet implemented)" )
-	PORT_DIPSETTING(    0x08, "Z-67 (Not yet implemented)" )
+	PORT_DIPSETTING(    0x04, "H/Z-47" )
+	PORT_DIPSETTING(    0x08, "Z-67" )
 	PORT_DIPSETTING(    0x0c, "Undefined" )
 	PORT_DIPNAME( 0x10, 0x00, "Primary Boot from" )                  PORT_DIPLOCATION("SW501:5")       PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x04)
 	PORT_DIPSETTING(    0x00, "Disk I/O #2" )
@@ -415,13 +406,13 @@ static INPUT_PORTS_START( h89 )
 	// MMS 444-84B (and possibly 444-84A)
 	PORT_DIPNAME( 0x03, 0x00, "Disk I/O #2" )                        PORT_DIPLOCATION("SW501:1,2")     PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x0c)
 	PORT_DIPSETTING(    0x00, "H-88-1" )
-	PORT_DIPSETTING(    0x01, "H/Z-47 (Not yet implemented)" )
-	PORT_DIPSETTING(    0x02, "MMS 77320 SASI or Z-67 (Not yet implemented)" )
+	PORT_DIPSETTING(    0x01, "H/Z-47" )
+	PORT_DIPSETTING(    0x02, "MMS 77320 SASI or Z-67" )
 	PORT_DIPSETTING(    0x03, "MMS 77422 Network Controller" )
 	PORT_DIPNAME( 0x0c, 0x00, "Disk I/O #1" )                        PORT_DIPLOCATION("SW501:3,4")     PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x0c)
 	PORT_DIPSETTING(    0x00, "H-89-37" )
-	PORT_DIPSETTING(    0x04, "H/Z-47 (Not yet implemented)" )
-	PORT_DIPSETTING(    0x08, "MMS 77320 SASI or Z-67 (Not yet implemented)" )
+	PORT_DIPSETTING(    0x04, "H/Z-47" )
+	PORT_DIPSETTING(    0x08, "MMS 77320 SASI or Z-67" )
 	PORT_DIPSETTING(    0x0c, "MMS 77422 Network Controller" )
 	PORT_DIPNAME( 0x70, 0x00, "Default Boot Device" )                PORT_DIPLOCATION("SW501:5,6,7")   PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x0c)
 	PORT_DIPSETTING(    0x00, "MMS 77316 Dbl Den 5\"" )
@@ -594,7 +585,6 @@ INPUT_PORTS_END
 
 void h89_base_state::machine_start()
 {
-	save_item(NAME(m_gpp));
 	save_item(NAME(m_timer_intr_enabled));
 	save_item(NAME(m_single_step_enabled));
 	save_item(NAME(m_cpu_speed_multiplier));
@@ -633,8 +623,6 @@ void h89_base_state::machine_reset()
 	}
 
 	m_h89bus->set_jj501_502(m_jj501_502->read());
-
-	update_gpp(0);
 }
 
 void h89_base_state::set_wait_state(int data)
@@ -645,6 +633,27 @@ void h89_base_state::set_wait_state(int data)
 		machine().scheduler().synchronize();
 		m_maincpu->defer_access();
 	}
+}
+
+void h89_base_state::set_timer_intr(int data)
+{
+	m_timer_intr_enabled = bool(data);
+}
+
+void h89_base_state::set_single_step(int data)
+{
+	LOGSS("single step enable: %d\n",data);
+	m_single_step_enabled = bool(data);
+
+	if (!m_single_step_enabled)
+	{
+		reset_single_step_state();
+	}
+}
+
+void h89_base_state::set_cpu_speed(int data)
+{
+	m_maincpu->set_clock(data ? H89_CLOCK * m_cpu_speed_multiplier : H89_CLOCK);
 }
 
 u8 h89_base_state::raise_NMI_r()
@@ -737,55 +746,8 @@ void h89_base_state::reset_single_step_state()
 	m_intr_socket->set_irq_level(2, CLEAR_LINE);
 }
 
-// General Purpose Port
-//
-// Bit     OUTPUT
-// ---------------------
-//  0    Single-step enable
-//  1    2 mSec interrupt enable
-//  2    Not used (on original Heath CPU Board)
-//  3    Not used (on original Heath CPU Board)
-//  4    Latched bit MEM 0 H on memory expansion connector (Commonly used for Speed upgrades)
-//  5    Latched bit MEM 1 H on memory expansion connector - ORG-0 (CP/M map)
-//  6    Latched bit I/O 0 on I/O exp connector
-//  7    Latched bit I/O 1 on I/O exp connector
-//
-void h89_base_state::update_gpp(u8 gpp)
+void h89_base_state::clear_timer_intr(u8)
 {
-	u8 changed_gpp = gpp ^ m_gpp;
-
-	m_gpp = gpp;
-
-	m_timer_intr_enabled = bool(BIT(m_gpp, GPP_ENABLE_TIMER_INTERRUPT_BIT));
-
-	m_h89bus->set_mem0(BIT(m_gpp, GPP_MEM0_BIT));
-	m_h89bus->set_mem1(BIT(m_gpp, GPP_MEM1_BIT));
-	m_h89bus->set_io0(BIT(m_gpp, GPP_IO0_BIT));
-	m_h89bus->set_io1(BIT(m_gpp, GPP_IO1_BIT));
-
-	if (BIT(changed_gpp, GPP_SINGLE_STEP_BIT))
-	{
-		LOGSS("single step enable: %d\n", BIT(m_gpp, GPP_SINGLE_STEP_BIT));
-		m_single_step_enabled = bool(BIT(m_gpp, GPP_SINGLE_STEP_BIT));
-
-		if (!m_single_step_enabled)
-		{
-			reset_single_step_state();
-		}
-	}
-
-	if (BIT(changed_gpp, GPP_MEM0_BIT))
-	{
-		m_maincpu->set_clock(BIT(m_gpp, GPP_MEM0_BIT) ?
-			H89_CLOCK * m_cpu_speed_multiplier : H89_CLOCK);
-	}
-}
-
-// General Purpose Port
-void h89_base_state::port_f2_w(offs_t offset, u8 data)
-{
-	update_gpp(data);
-
 	m_intr_socket->set_irq_level(1, CLEAR_LINE);
 }
 
@@ -900,11 +862,14 @@ void h89_base_state::h89_base(machine_config &config)
 	m_h89bus->in_nmi_callback().set(FUNC(h89_base_state::raise_NMI_r));
 	m_h89bus->out_nmi_callback().set(FUNC(h89_base_state::raise_NMI_w));
 	m_h89bus->in_gpp_callback().set_ioport(m_sw501);
-	m_h89bus->out_gpp_callback().set(FUNC(h89_base_state::port_f2_w));
+	m_h89bus->out_clear_timer_callback().set(FUNC(h89_base_state::clear_timer_intr));
 	m_h89bus->out_int3_callback().set(FUNC(h89_base_state::slot_irq<3>));
 	m_h89bus->out_int4_callback().set(FUNC(h89_base_state::slot_irq<4>));
 	m_h89bus->out_int5_callback().set(FUNC(h89_base_state::slot_irq<5>));
 	m_h89bus->out_wait_callback().set(FUNC(h89_base_state::set_wait_state));
+	m_h89bus->out_timer_intr_callback().set(FUNC(h89_base_state::set_timer_intr));
+	m_h89bus->out_single_step_callback().set(FUNC(h89_base_state::set_single_step));
+	m_h89bus->out_cpu_speed_callback().set(FUNC(h89_base_state::set_cpu_speed));
 	m_h89bus->in_sys_rom_callback().set(FUNC(h89_base_state::sys_rom_r));
 	m_h89bus->in_flpy_rom_callback().set(FUNC(h89_base_state::flpy_rom_r));
 	m_h89bus->in_flpy_ram_callback().set(FUNC(h89_base_state::flpy_ram_r));

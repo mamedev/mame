@@ -305,15 +305,13 @@ public:
 	h89bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~h89bus_device();
 
-	void set_io0(int state);
-	void set_io1(int state);
-	void set_mem0(int state);
-	void set_mem1(int state);
 	void set_jj501_502(u8 val);
 	int get_io0();
 	int get_io1();
 	int get_mem0();
 	int get_mem1();
+	int get_rsv0();
+	int get_rsv1();
 
 	u8 mem_m1_r(offs_t offset);
 
@@ -327,12 +325,15 @@ public:
 	auto out_int5_callback() { return m_out_int5_cb.bind(); }
 	auto out_fmwe_callback() { return m_out_fmwe_cb.bind(); }
 	auto out_wait_callback() { return m_out_wait_cb.bind(); }
+	auto out_timer_intr_callback() { return m_out_timer_intr_cb.bind(); }
+	auto out_single_step_callback() { return m_out_single_step_cb.bind(); }
+	auto out_cpu_speed_callback() { return m_out_cpu_speed_cb.bind(); }
 	auto in_tlb_callback() { return m_in_tlb_cb.bind(); }
 	auto in_nmi_callback() { return m_in_nmi_cb.bind(); }
 	auto in_gpp_callback() { return m_in_gpp_cb.bind(); }
 	auto out_tlb_callback() { return m_out_tlb_cb.bind(); }
 	auto out_nmi_callback() { return m_out_nmi_cb.bind(); }
-	auto out_gpp_callback() { return m_out_gpp_cb.bind(); }
+	auto out_clear_timer_callback() { return m_out_clear_timer_intr.bind(); }
 
 	// memory related
 	auto in_bank0_callback() { return m_in_bank0_cb.bind(); }
@@ -354,6 +355,7 @@ protected:
 
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	// bus-internal handlers
@@ -364,8 +366,7 @@ protected:
 	void set_int5_line(int state);
 	void set_fmwe_line(int state);
 	void set_wait_line(int state);
-	u8 read_gpp();
-	void write_gpp(u8 data);
+	void update_gpp(u8 gpp);
 
 	u8 io_dispatch_r(offs_t offset);
 	void io_dispatch_w(offs_t offset, u8 data);
@@ -377,13 +378,24 @@ protected:
 	required_region_ptr<u8> m_io_decode_prom;
 	required_region_ptr<u8> m_mem_primary_decode_prom;
 	required_region_ptr<u8> m_mem_secondary_decode_prom;
-	int m_io0, m_io1, m_mem0, m_mem1, m_fmwe;
+	int m_io0, m_io1, m_mem0, m_mem1, m_rsv0, m_rsv1, m_fmwe;
+	u8 m_gpp;
+
+	static constexpr u8 GPP_SINGLE_STEP_BIT            = 0;
+	static constexpr u8 GPP_ENABLE_TIMER_INTERRUPT_BIT = 1;
+	static constexpr u8 GPP_RSV0_BIT                   = 2;
+	static constexpr u8 GPP_RSV1_BIT                   = 3;
+	static constexpr u8 GPP_MEM0_BIT                   = 4;
+	static constexpr u8 GPP_MEM1_BIT                   = 5;
+	static constexpr u8 GPP_IO0_BIT                    = 6;
+	static constexpr u8 GPP_IO1_BIT                    = 7;
 
 private:
 	devcb_write_line m_out_int3_cb, m_out_int4_cb, m_out_int5_cb;
 	devcb_write_line m_out_fmwe_cb, m_out_wait_cb;
+	devcb_write_line m_out_timer_intr_cb, m_out_single_step_cb, m_out_cpu_speed_cb, m_out_clear_timer_intr;
 	devcb_read8 m_in_tlb_cb, m_in_nmi_cb, m_in_gpp_cb;
-	devcb_write8 m_out_tlb_cb, m_out_nmi_cb, m_out_gpp_cb;
+	devcb_write8 m_out_tlb_cb, m_out_nmi_cb;
 
 	// memory banks on the CPU board
 	devcb_read8 m_in_bank0_cb, m_in_bank1_cb, m_in_bank2_cb;

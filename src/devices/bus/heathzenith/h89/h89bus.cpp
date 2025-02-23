@@ -123,26 +123,57 @@ void h89bus_right_slot_device::device_resolve_objects()
 
 DEFINE_DEVICE_TYPE(H89BUS, h89bus_device, "h89bus", "H-89/Z-90 bus")
 
+//
+//                                     PORT
+//         444-43                |  Hex  |  Octal
+// ------------------------------+-------+---------
+//  Not specified, available     |  0-7B |   0-173
+//  Hard-sector disk controller  | 7C-7F | 174-177
+//  Not specified, reserved      | 80-CF | 200-317
+//  DCE Serial I/O               | D0-D7 | 320-327
+//  DTE Serial I/O               | D8-DF | 330-337
+//  DCE Serial I/O               | EO-E7 | 340-347
+//  Console I/O                  | E8-EF | 350-357
+//  NMI                          | F0-F1 | 360-361
+//  General purpose port         |    F2 |     362
+//  Cassette I/O                 | F8-F9 | 370-371
+//  NMI                          | FA-FB | 372-373
+//
+//                                     PORT
+//         444-61                |  Hex  |  Octal
+// ------------------------------+-------+---------
+//  Not specified, available     |  0-77 |   0-167
+//  Disk I/O #1                  | 78-7B | 170-173
+//  Disk I/O #2                  | 7C-7F | 174-177
+//  Not specified, reserved      | 80-CF | 200-317
+//  DCE Serial I/O               | D0-D7 | 320-327
+//  DTE Serial I/O               | D8-DF | 330-337
+//  DCE Serial I/O               | EO-E7 | 340-347
+//  Console I/O                  | E8-EF | 350-357
+//  NMI                          | F0-F1 | 360-361
+//  General purpose port         |    F2 |     362
+//  NMI                          | FA-FB | 372-373
+//
 ROM_START(h89bus)
 
 	// I/O Decoder
 	// -----------
 	ROM_REGION(0x100, "io_decode", 0)
-	// H88 I/O decoding
-	ROM_SYSTEM_BIOS(0, "444-43", "Heath/Zenith stock decoding (444-43)")
-	ROMX_LOAD("444-43.u550",  0x000000, 0x000100, CRC(3e0315f4) SHA1(11da9a9145de07f1f3bf1270a10e059dff30c693), ROM_BIOS(0))
+	// H88 (Cassette & hard-sectored controller) I/O decoding
+	ROM_SYSTEM_BIOS(0, "444-43", "H88 (Cassette & hard-sectored controller)")
+	ROMX_LOAD("444-43.u550",  0x0000, 0x0100, CRC(3e0315f4) SHA1(11da9a9145de07f1f3bf1270a10e059dff30c693), ROM_BIOS(0))
 
-	// H89/Z90 I/O decoding
-	ROM_SYSTEM_BIOS(1, "444-61", "Z-37 decoding (444-61)")
-	ROMX_LOAD("444-61.u550",  0x000000, 0x000100, CRC(0b3c129f) SHA1(92da6484d1339160400d6bc75578a977c5e4d23e), ROM_BIOS(1))
+	// H89/Z90 (all Heath cards except cassette) I/O decoding
+	ROM_SYSTEM_BIOS(1, "444-61", " H89/Z90 (all Heath cards except cassette)")
+	ROMX_LOAD("444-61.u550",  0x0000, 0x0100, CRC(0b3c129f) SHA1(92da6484d1339160400d6bc75578a977c5e4d23e), ROM_BIOS(1))
 
 	// MMS (Magnolia Micro Systems) I/O decoding
 	ROM_SYSTEM_BIOS(2, "444-61c", "MMS decoding (444-61c)")
-	ROMX_LOAD("444-61c.u550", 0x000000, 0x000100, CRC(e7122061) SHA1(33c124f44c0f9cb99c9b17ad15411b4bc6407eae), ROM_BIOS(2))
+	ROMX_LOAD("444-61c.u550", 0x0000, 0x0100, CRC(e7122061) SHA1(33c124f44c0f9cb99c9b17ad15411b4bc6407eae), ROM_BIOS(2))
 
 	// CDR Systems
 	ROM_SYSTEM_BIOS(3, "cdr86", "CDR decoding (CDR86)")
-	ROMX_LOAD("cdr86.u550",   0x000000, 0x000100, CRC(d35e4063) SHA1(879f9d265d77f8a74c70febd9a80d6896ab8ec7e), ROM_BIOS(3))
+	ROMX_LOAD("cdr86.u550",   0x0000, 0x0100, CRC(d35e4063) SHA1(879f9d265d77f8a74c70febd9a80d6896ab8ec7e), ROM_BIOS(3))
 
 
 	// Primary Memory Decoder
@@ -152,17 +183,17 @@ ROM_START(h89bus)
 	ROM_LOAD("444-66.u517", 0x0000, 0x0100, CRC(ad94a5df) SHA1(33b478e2c19da1cfa301506866d6810e4171556d))
 
 	// Alternative PROM - 444-42, original does not support 64k or ORG0
-	// ROM_LOAD("444-42.u517", 0x0000, 0x0100, CRC(ad94a5df) SHA1(33b478e2c19da1cfa301506866d6810e4171556d))
+	// ROM_LOAD("444-42.u517", 0x0000, 0x0100, CRC(65831fa4) SHA1(ed9865b4b11c292eef3bc7f415de836af8c6bcc7))
 
 
 	// Secondary Memory Decoder
 	// ------------------------
 	ROM_REGION(0x20, "mem_sec_decode", 0)
 	// Newest PROM, supports 4k Code ROM chips
-	ROM_LOAD("444-83.u516", 0x0000, 0x0020, CRC(20159109) SHA1(dec556bbee8b05109582f0e0a81b3ec662035e66))
+	ROM_LOAD("444-83.u516", 0x0000, 0x0020, CRC(9160de2b) SHA1(50fb3f9358514f79c407585e3ccd3f3b0aef54df))
 
 	// Alt PROM - 444-41, for 2k Code ROM chips.
-	// ROM_LOAD("444-41.u516",  0x000000, 0x000020, CRC(1232f9f6) SHA1(44ee87741e25c51e0f6dc4d5f0408c5d9ec499a5))
+	// ROM_LOAD("444-41.u516", 0x0000, 0x0020, CRC(1232f9f6) SHA1(44ee87741e25c51e0f6dc4d5f0408c5d9ec499a5))
 ROM_END
 
 //**************************************************************************
@@ -190,12 +221,15 @@ h89bus_device::h89bus_device(const machine_config &mconfig, device_type type, co
 	m_out_int5_cb(*this),
 	m_out_fmwe_cb(*this),
 	m_out_wait_cb(*this),
+	m_out_timer_intr_cb(*this),
+	m_out_single_step_cb(*this),
+	m_out_cpu_speed_cb(*this),
+	m_out_clear_timer_intr(*this),
 	m_in_tlb_cb(*this, 0),
 	m_in_nmi_cb(*this, 0),
 	m_in_gpp_cb(*this, 0),
 	m_out_tlb_cb(*this),
 	m_out_nmi_cb(*this),
-	m_out_gpp_cb(*this),
 	m_in_bank0_cb(*this, 0),
 	m_in_bank1_cb(*this, 0),
 	m_in_bank2_cb(*this, 0),
@@ -230,7 +264,19 @@ void h89bus_device::device_start()
 	m_program_space->install_readwrite_handler(0x0000, 0xffff, emu::rw_delegate(*this, FUNC(h89bus_device::mem_dispatch_r)), emu::rw_delegate(*this, FUNC(h89bus_device::mem_dispatch_w)));
 	m_io_space->install_readwrite_handler(0x0000, 0x00ff, emu::rw_delegate(*this, FUNC(h89bus_device::io_dispatch_r)), emu::rw_delegate(*this, FUNC(h89bus_device::io_dispatch_w)));
 
+	save_item(NAME(m_gpp));
+	save_item(NAME(m_mem0));
+	save_item(NAME(m_mem1));
+	save_item(NAME(m_io0));
+	save_item(NAME(m_io1));
+	save_item(NAME(m_rsv0));
+	save_item(NAME(m_rsv1));
 	save_item(NAME(jj501_502));
+}
+
+void h89bus_device::device_reset()
+{
+	update_gpp(0);
 }
 
 void h89bus_device::add_h89bus_left_card(device_h89bus_left_card_interface &card)
@@ -241,26 +287,6 @@ void h89bus_device::add_h89bus_left_card(device_h89bus_left_card_interface &card
 void h89bus_device::add_h89bus_right_card(device_h89bus_right_card_interface &card)
 {
 	m_right_device_list.emplace_back(card);
-}
-
-void h89bus_device::set_io0(int state)
-{
-	m_io0 = state;
-}
-
-void h89bus_device::set_io1(int state)
-{
-	m_io1 = state;
-}
-
-void h89bus_device::set_mem0(int state)
-{
-	m_mem0 = state;
-}
-
-void h89bus_device::set_mem1(int state)
-{
-	m_mem1 = state;
 }
 
 int h89bus_device::get_io0()
@@ -283,6 +309,16 @@ int h89bus_device::get_mem1()
 	return m_mem1;
 }
 
+int h89bus_device::get_rsv0()
+{
+	return m_rsv0;
+}
+
+int h89bus_device::get_rsv1()
+{
+	return m_rsv1;
+}
+
 void h89bus_device::set_jj501_502(u8 val)
 {
 	// place it in the correct position for the PROM lookup
@@ -294,45 +330,48 @@ u8 h89bus_device::mem_m1_r(offs_t offset)
 	return mem_dispatch_r(offset);
 }
 
-u8 h89bus_device::read_gpp()
+//
+// General Purpose Port
+//
+// Bit   OUTPUT
+// ---------------------
+//  0    Single-step enable
+//  1    2 mSec interrupt enable
+//  2    Not used with original Heath equipment (RSV 0)
+//  3    Not used with original Heath equipment (RSV 1)
+//  4    Latched bit MEM 0 H on memory expansion connector (Commonly used for Speed upgrades)
+//  5    Latched bit MEM 1 H on memory expansion connector - ORG-0 (CP/M map)
+//  6    Latched bit I/O 0 on I/O exp connector
+//  7    Latched bit I/O 1 on I/O exp connector
+//
+void h89bus_device::update_gpp(u8 gpp)
 {
-	return m_in_gpp_cb(0);
+	u8 changed_gpp = gpp ^ m_gpp;
+
+	m_gpp = gpp;
+
+	m_mem0 = BIT(m_gpp, GPP_MEM0_BIT);
+	m_mem1 = BIT(m_gpp, GPP_MEM1_BIT);
+	m_io0 = BIT(m_gpp, GPP_IO0_BIT);
+	m_io1 = BIT(m_gpp, GPP_IO1_BIT);
+	m_rsv0 = BIT(m_gpp, GPP_RSV0_BIT);
+	m_rsv1 = BIT(m_gpp, GPP_RSV1_BIT);
+
+	m_out_clear_timer_intr(0);
+
+	m_out_timer_intr_cb(BIT(m_gpp, GPP_ENABLE_TIMER_INTERRUPT_BIT));
+
+	if (BIT(changed_gpp, GPP_SINGLE_STEP_BIT))
+	{
+		m_out_single_step_cb(BIT(m_gpp, GPP_SINGLE_STEP_BIT));
+	}
+
+	if (BIT(changed_gpp, GPP_MEM0_BIT))
+	{
+		m_out_cpu_speed_cb(m_mem0);
+	}
 }
-void h89bus_device::write_gpp(u8 data)
-{
-	m_out_gpp_cb(0, data);
-}
 
-/*
-                                   PORT
-    Use                      |  Hex  |  Octal
-   --------------------------+-------+---------
-    Not specified, available |  0-77 |   0-167
-    Disk I/O #1              | 78-7B | 170-173
-    Disk I/O #2              | 7C-7F | 174-177
-    Not specified, reserved  | 80-CF | 200-317
-    DCE Serial I/O           | D0-D7 | 320-327
-    DTE Serial I/O           | D8-DF | 330-337
-    DCE Serial I/O           | EO-E7 | 340-347
-    Console I/O              | E8-EF | 350-357
-    NMI                      | F0-F1 | 360-361
-    General purpose port     |    F2 |     362
-    Cassette I/O(MTR-88 only)| F8-F9 | 370-371
-    NMI                      | FA-FB | 372-373
-
-    Disk I/O #1 - 0170-0173 (0x78-0x7b)
-       Heath Options
-         - H37 5-1/4" Soft-sectored Controller - Requires MTR-90 ROM
-         - H47 Dual 8" Drives - Requires MTR-89 or MTR-90 ROM
-         - H67 8" Hard disk + 8" Floppy Drives - Requires MTR-90 ROM
-
-    Disk I/O #2 - 0174-0177 (0x7c-0x7f)
-       Heath Options
-         - 5-1/4" Hard-sectored Controller - supported by all ROMs
-         - H47 Dual 8" Drives - Requires MTR-89 or MTR-90 ROM
-         - H67 8" Hard disk + 8" Floppy Drives - MTR-90 ROM
-
-*/
 u8 h89bus_device::io_dispatch_r(offs_t offset)
 {
 	u8 retval = 0;
@@ -394,7 +433,7 @@ void h89bus_device::io_dispatch_w(offs_t offset, u8 data)
 	{
 		if ((decode & H89_IO_GPP) && ((offset & 7) == 2))
 		{
-			m_out_gpp_cb(offset, data);
+			update_gpp(data);
 		}
 		if (decode & H89_IO_NMI)
 		{

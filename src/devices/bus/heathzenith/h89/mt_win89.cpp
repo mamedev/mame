@@ -68,8 +68,8 @@ protected:
 	static constexpr u16 SELECT_HD_ADDR   = 0x20; // Hard drive ports
 
 private:
-	required_device<i8255_device> m_par;
 	required_region_ptr<u8> m_sys_rom;
+	required_device<i8255_device> m_par;
 
 	bool use_original_rom;
 };
@@ -81,8 +81,8 @@ private:
 mt_win89_parallel_port::mt_win89_parallel_port(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock):
 	device_t(mconfig, H89BUS_MT_WIN89_PARALLEL, tag, owner, clock),
 	device_h89bus_left_card_interface(mconfig, *this),
-	m_par(*this, "parallel_port"),
-	m_sys_rom(*this, "sys_rom")
+	m_sys_rom(*this, "sys_rom"),
+	m_par(*this, "parallel_port")
 {
 }
 
@@ -259,7 +259,6 @@ void mt_win89_parallel_port::device_start()
 
 void mt_win89_parallel_port::device_add_mconfig(machine_config &config)
 {
-	// Parallel 0xD0-0xD7 (320 - 327 octal)
 	I8255(config, m_par, m_clock);
 }
 
