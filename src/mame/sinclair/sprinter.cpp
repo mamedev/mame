@@ -1643,7 +1643,10 @@ void sprinter_state::on_kbd_data(int state)
 		m_kbd_data_cnt++;
 		m_kbd_data_cnt %= 11;
 		if (!m_kbd_data_cnt)
-			irq_on(1);
+		{
+			m_irqs->in_set<1>();
+			m_irq_off_timer->adjust(attotime::from_ticks(32, m_maincpu->unscaled_clock()));
+		}
 	}
 }
 
@@ -1659,15 +1662,11 @@ void sprinter_state::do_mem_wait(u8 cpu_taken = 0)
 
 TIMER_CALLBACK_MEMBER(sprinter_state::irq_on)
 {
-	if (param != 1)
-	{
-		m_joy1_ctrl = m_joy2_ctrl = 0;
-		update_int(false);
-		m_irqs->in_set<0>();
-	} else {
-		m_irqs->in_set<1>();
-	}
+	m_irqs->in_set<0>();
 	m_irq_off_timer->adjust(attotime::from_ticks(32, m_maincpu->unscaled_clock()));
+
+	m_joy1_ctrl = m_joy2_ctrl = 0;
+	update_int(false);
 }
 
 TIMER_CALLBACK_MEMBER(sprinter_state::irq_off)
