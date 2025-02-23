@@ -3,10 +3,13 @@
 
 <!-- license:CC0-1.0 -->
 
-<softwarelist name="mfacpm" description="MFA Mikrocomputer fuer Ausbildung CP/M disks">
+<softwarelist name="mfacpm" description="MFA Mikrocomputer für Ausbildung CP/M disks">
+
+<!-- marked bad dump because it's the only known copy, but it contains utilities added by the copying service.
+It's unclear how it was originally distributed -->
 
 	<software name="mfacpm">
-		<description>MFA Mikrocomputer fuer Ausbildung original CP/M</description>
+		<description>MFA CP/M V 2.2 48tpi, 40 track DS System Disk</description>
 		<year>1987</year>
 		<publisher>BFZ Essen</publisher>
 		<!--
@@ -17,25 +20,25 @@
 		into a general purpose CP/M computer.
 		-->
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Mikrocomputer fuer Ausbildung CP/M" />
+			<feature name="part_id" value="Mikrocomputer für Ausbildung CP/M" />
 			<feature name="pn" value="mfacpm" />
 			<dataarea name="flop" size="327680">
-				<rom name="mfacpm.img" size="327680" crc="209cc380" sha1="aeee0bf797ff434e7e5721bace6ec25ece8cd27c" />
+				<rom name="mfacpm.img" status="baddump" size="327680" crc="209cc380" sha1="aeee0bf797ff434e7e5721bace6ec25ece8cd27c" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="mfaopen">
-		<description>MFA Mikrocomputer fuer Ausbildung Open Source CP/M</description>
-		<year>1997</year>
+		<description>MFA Mikrocomputer für Ausbildung Open Source CP/M</description>
+		<year>2019</year>
 		<publisher>Mike Douglas (deramp)</publisher>
 		<!--
 		CP/M 2.2 boot disk with an open Source
-		BIOS for the MFA Mikrocomputer fuer Ausbildung
+		BIOS for the MFA Mikrocomputer für Ausbildung
 		by Mike Douglas (deramp)
 		-->
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Mikrocomputer fuer Ausbildung Open CP/M" />
+			<feature name="part_id" value="Mikrocomputer für Ausbildung Open CP/M" />
 			<feature name="pn" value="mfaopen" />
 			<dataarea name="flop" size="737280">
 				<rom name="mcpm720.img" size="737280" crc="b1a8b4cd" sha1="f99271851ad7a33cb64b460d6a4b9ce8fc55186d" />
