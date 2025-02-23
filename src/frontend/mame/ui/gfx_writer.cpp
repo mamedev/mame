@@ -11,12 +11,13 @@
 #include "emu.h"
 #include "gfx_writer.h"
 
-bitmap_rgb32 gfxWriter::getBitmap(int xCells, int yCells, gfx_viewer::gfxset::setinfo& set, gfx_element& gfx) const
+bitmap_argb32 gfx_writer::getBitmap(int xCells, int yCells, gfx_viewer::gfxset::setinfo& set, gfx_element& gfx) const
 {
 	auto cellXpix{ (set.m_rotate & ORIENTATION_SWAP_XY) ? gfx.height() : gfx.width() };
 	auto cellYpix{ (set.m_rotate & ORIENTATION_SWAP_XY) ? gfx.width() : gfx.height() };
 
-	bitmap_rgb32 bitmap;
+	//bitmap_rgb32 bitmap;
+	bitmap_argb32 bitmap;
 	bitmap.reset();
 	bitmap.allocate(cellXpix * xCells, cellYpix * yCells);
 
@@ -41,17 +42,19 @@ bitmap_rgb32 gfxWriter::getBitmap(int xCells, int yCells, gfx_viewer::gfxset::se
 				// only render if there is data
 				if (index < gfx.elements())
 					drawCell(gfx, index, bitmap, cellBounds.min_x, cellBounds.min_y, set.m_color, set.m_rotate, set.m_palette);
-				else    // otherwise, fill with transparency
+				// otherwise, fill with transparency
+				else
 					bitmap.fill(0, cellBounds);
 			}
 		}
-		else    // otherwise, fill with transparency
+		// otherwise, fill with transparency
+		else
 			bitmap.fill(0, cellBounds);
 	}
 	return bitmap;
 }
 
-void gfxWriter::drawCell(gfx_element& gfx, int index, bitmap_rgb32& bitmap, int dstx, int dsty, int color, int rotate, device_palette_interface* dpalette) const
+void gfx_writer::drawCell(gfx_element& gfx, int index, bitmap_argb32& bitmap, int dstx, int dsty, int color, int rotate, device_palette_interface* dpalette) const
 {
 	auto width{ (rotate & ORIENTATION_SWAP_XY) ? gfx.height() : gfx.width() };
 	auto height{ (rotate & ORIENTATION_SWAP_XY) ? gfx.width() : gfx.height() };
@@ -96,13 +99,13 @@ void gfxWriter::drawCell(gfx_element& gfx, int index, bitmap_rgb32& bitmap, int 
 	}
 }
 
-gfxWriter::gfxWriter(running_machine& machine, gfx_viewer::gfxset& gfxSet) :
+gfx_writer::gfx_writer(running_machine& machine, gfx_viewer::gfxset& gfxSet) :
 	mMachine{ machine },
 	mGfxSet{ gfxSet }
 {
 }
 
-void gfxWriter::writePng()
+void gfx_writer::writePng()
 {
 	// get graphics info
 	auto& info{ mGfxSet.m_devices[mGfxSet.m_device] };
@@ -113,7 +116,7 @@ void gfxWriter::writePng()
 		// Compute the number of cells in the x and y directions
 	u32 xCells{ 32 };
 	u32 yCells{ (gfx.elements() + xCells - 1) / xCells };
-	bitmap_rgb32 bitmap{ getBitmap(xCells, yCells, set, gfx) };
+	bitmap_argb32 bitmap{ getBitmap(xCells, yCells, set, gfx) };
 
 	// add two text entries describing the image
 	std::string text1 = std::string(emulator_info::get_appname()).append(" ").append(emulator_info::get_build_version());
