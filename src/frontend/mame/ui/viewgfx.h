@@ -13,26 +13,28 @@
 
 #pragma once
 
-#include <vector>
-
 #include "emu.h"
-#include "ui/viewgfx.h"
 
-#include "emupal.h"
+#include "bitmap.h"
+#include "digfx.h"
+#include "dipalette.h"
+#include "drawgfx.h"
+#include "machine.h"
 #include "render.h"
-#include "rendfont.h"
-#include "rendutil.h"
-#include "screen.h"
+#include "rendertypes.h"
 #include "tilemap.h"
 #include "uiinput.h"
 
-#include "util/unicode.h"
-
-#include "osdepend.h"
 #include "ui/ui.h"
+
+#include <vector>
+
+class gfx_writer;
 
 class gfx_viewer
 {
+public:
+	friend class gfx_writer;
 private:
 	enum class view
 	{
@@ -105,7 +107,6 @@ private:
 		int yoffs() const noexcept;
 		bool handle_keys(running_machine& machine, float pixelscale);
 	};
-public:
 	class gfxset
 	{
 	public:
@@ -181,7 +182,7 @@ private:
 	bool map_mouse(render_container& container, render_bounds const& clip, float& x, float& y) const;
 public:
 	gfx_viewer(running_machine& machine);
-	gfx_viewer(gfx_viewer const& that);		// copy constructor needed to make std::any happy
+	gfx_viewer(gfx_viewer const& that);     // copy constructor needed to make std::any happy
 	~gfx_viewer();
 	uint32_t handle(mame_ui_manager& mui, render_container& container, bool uistate);
 };

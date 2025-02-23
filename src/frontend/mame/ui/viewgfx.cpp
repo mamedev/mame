@@ -8,16 +8,23 @@
 
 *********************************************************************/
 
-#include <cmath>
-
-#include "viewgfx.h"
-#include "ui/ui.h"
+#include "emupal.h"
 #include "gfx_writer.h"
+#include "rendfont.h"
+#include "rendutil.h"
+#include "screen.h"
+
+#include "osdepend.h"
+
+#include "ui/viewgfx.h"
+
+#include "util/unicode.h"
 
 bool gfx_viewer::is_relevant() const noexcept
 {
 	return m_palette.interface() || m_gfxset.has_gfx() || m_machine.tilemap().count();
 }
+
 uint32_t gfx_viewer::handle_general_keys(bool uistate)
 {
 	auto& input = m_machine.ui_input();
@@ -51,6 +58,7 @@ uint32_t gfx_viewer::handle_general_keys(bool uistate)
 
 	return uistate;
 }
+
 uint32_t gfx_viewer::cancel(bool uistate)
 {
 	if (!uistate)
@@ -65,6 +73,7 @@ uint32_t gfx_viewer::cancel(bool uistate)
 	m_bitmap_dirty = true;
 	return mame_ui_manager::HANDLER_CANCEL;
 }
+
 uint32_t gfx_viewer::handle_palette(mame_ui_manager& mui, render_container& container, bool uistate)
 {
 	device_palette_interface& palette = *m_palette.interface();
@@ -219,6 +228,7 @@ uint32_t gfx_viewer::handle_palette(mame_ui_manager& mui, render_container& cont
 	m_palette.handle_keys(m_machine);
 	return handle_general_keys(uistate);
 }
+
 uint32_t gfx_viewer::handle_gfxset(mame_ui_manager& mui, render_container& container, bool uistate)
 {
 	// get graphics info
@@ -419,6 +429,7 @@ uint32_t gfx_viewer::handle_gfxset(mame_ui_manager& mui, render_container& conta
 		m_bitmap_dirty = true;
 	return handle_general_keys(uistate);
 }
+
 uint32_t gfx_viewer::handle_tilemap(mame_ui_manager& mui, render_container& container, bool uistate)
 {
 	// get some UI metrics
@@ -557,6 +568,7 @@ uint32_t gfx_viewer::handle_tilemap(mame_ui_manager& mui, render_container& cont
 		m_bitmap_dirty = true;
 	return handle_general_keys(uistate);
 }
+
 void gfx_viewer::update_gfxset_bitmap(int xcells, int ycells, gfx_element& gfx)
 {
 	auto const& info = m_gfxset.m_devices[m_gfxset.m_device];
@@ -593,7 +605,8 @@ void gfx_viewer::update_gfxset_bitmap(int xcells, int ycells, gfx_element& gfx)
 
 					if (index < gfx.elements()) // only render if there is data
 						gfxset_draw_item(gfx, index, cellbounds.min_x, cellbounds.min_y, set);
-					else // otherwise, fill with transparency
+					// otherwise, fill with transparency
+					else
 						m_bitmap.fill(0, cellbounds);
 				}
 			}
@@ -604,6 +617,7 @@ void gfx_viewer::update_gfxset_bitmap(int xcells, int ycells, gfx_element& gfx)
 		m_bitmap_dirty = false;
 	}
 }
+
 void gfx_viewer::update_tilemap_bitmap(int width, int height)
 {
 	// swap the coordinates back if they were talking about a rotated surface
@@ -627,6 +641,7 @@ void gfx_viewer::update_tilemap_bitmap(int width, int height)
 		m_bitmap_dirty = false;
 	}
 }
+
 void gfx_viewer::gfxset_draw_item(gfx_element& gfx, int index, int dstx, int dsty, gfxset::setinfo const& info)
 {
 	int const width = (info.m_rotate & ORIENTATION_SWAP_XY) ? gfx.height() : gfx.width();
@@ -668,6 +683,7 @@ void gfx_viewer::gfxset_draw_item(gfx_element& gfx, int index, int dstx, int dst
 		}
 	}
 }
+
 void gfx_viewer::draw_text(mame_ui_manager& mui, render_container& container, std::string_view str, float x, float y)
 {
 	render_font* const font = mui.get_font();
@@ -686,6 +702,7 @@ void gfx_viewer::draw_text(mame_ui_manager& mui, render_container& container, st
 		x += font->char_width(height, aspect, ch);
 	}
 }
+
 void gfx_viewer::resize_bitmap(int32_t width, int32_t height)
 {
 	if (!m_bitmap.valid() || !m_texture || (m_bitmap.width() != width) || (m_bitmap.height() != height))
@@ -703,6 +720,7 @@ void gfx_viewer::resize_bitmap(int32_t width, int32_t height)
 		m_bitmap_dirty = true;
 	}
 }
+
 bool gfx_viewer::map_mouse(render_container& container, render_bounds const& clip, float& x, float& y) const
 {
 	if (((0 > m_current_pointer) && (m_pointer_type != ui_event::pointer::TOUCH)) || !m_pointer_inside)
@@ -712,6 +730,7 @@ bool gfx_viewer::map_mouse(render_container& container, render_bounds const& cli
 	y = m_pointer_y;
 	return clip.includes(x, y);
 }
+
 gfx_viewer::gfx_viewer(running_machine& machine):
 	m_machine(machine),
 	m_palette(machine),
@@ -719,15 +738,18 @@ gfx_viewer::gfx_viewer(running_machine& machine):
 	m_tilemap(machine)
 {
 }
+
 gfx_viewer::gfx_viewer(gfx_viewer const& that) :
 	gfx_viewer(that.m_machine)
 {
 }
+
 gfx_viewer::~gfx_viewer()
 {
 	if (m_texture)
 		m_machine.render().texture_free(m_texture);
 }
+
 uint32_t gfx_viewer::handle(mame_ui_manager& mui, render_container& container, bool uistate)
 {
 	// implicitly cancel if there's nothing to display
@@ -841,10 +863,12 @@ uint32_t gfx_viewer::handle(mame_ui_manager& mui, render_container& container, b
 		}
 	}
 }
+
 void gfx_viewer::palette::set_device(running_machine& machine)
 {
 	m_interface = palette_interface_enumerator(machine.root_device()).byindex(m_index);
 }
+
 void gfx_viewer::palette::next_group(running_machine& machine) noexcept
 {
 	if ((subset::PENS == m_which) && m_interface->indirect_entries())
@@ -858,6 +882,7 @@ void gfx_viewer::palette::next_group(running_machine& machine) noexcept
 		m_which = subset::PENS;
 	}
 }
+
 void gfx_viewer::palette::prev_group(running_machine& machine) noexcept
 {
 	if (subset::INDIRECT == m_which)
@@ -871,24 +896,29 @@ void gfx_viewer::palette::prev_group(running_machine& machine) noexcept
 		m_which = m_interface->indirect_entries() ? subset::INDIRECT : subset::PENS;
 	}
 }
+
 gfx_viewer::palette::palette(running_machine& machine) :
 	m_count(palette_interface_enumerator(machine.root_device()).count())
 {
 	if (m_count)
 		set_device(machine);
 }
+
 bool gfx_viewer::palette::indirect() const noexcept
 {
 	return subset::INDIRECT == m_which;
 }
+
 unsigned gfx_viewer::palette::columns() const noexcept
 {
 	return m_columns;
 }
+
 unsigned gfx_viewer::palette::index(unsigned x, unsigned y) const noexcept
 {
 	return m_offset + (y * m_columns) + x;
 }
+
 void gfx_viewer::palette::handle_keys(running_machine& machine)
 {
 	auto& input = machine.ui_input();
@@ -934,10 +964,12 @@ void gfx_viewer::palette::handle_keys(running_machine& machine)
 	if (m_offset < 0)
 		m_offset = 0;
 }
+
 device_palette_interface* gfx_viewer::palette::interface() const noexcept
 {
 	return m_interface;
 }
+
 void gfx_viewer::gfxset::setinfo::next_color() noexcept
 {
 	if ((m_color_count - 1) > m_color)
@@ -945,6 +977,7 @@ void gfx_viewer::gfxset::setinfo::next_color() noexcept
 	else
 		m_color = 0U;
 }
+
 void gfx_viewer::gfxset::setinfo::prev_color() noexcept
 {
 	if (m_color)
@@ -952,6 +985,7 @@ void gfx_viewer::gfxset::setinfo::prev_color() noexcept
 	else
 		m_color = m_color_count - 1;
 }
+
 gfx_viewer::gfxset::devinfo::devinfo(device_gfx_interface& interface, device_palette_interface* first_palette, u8 rotate) :
 	m_interface(&interface),
 	m_setcount(0U)
@@ -974,22 +1008,27 @@ gfx_viewer::gfxset::devinfo::devinfo(device_gfx_interface& interface, device_pal
 		set.m_rotate = rotate;
 	}
 }
+
 unsigned gfx_viewer::gfxset::devinfo::setcount() const noexcept
 {
 	return m_setcount;
 }
+
 gfx_viewer::gfxset::setinfo const& gfx_viewer::gfxset::devinfo::set(unsigned index) const noexcept
 {
 	return m_sets[index];
 }
+
 gfx_viewer::gfxset::setinfo& gfx_viewer::gfxset::devinfo::set(unsigned index) noexcept
 {
 	return m_sets[index];
 }
+
 device_gfx_interface& gfx_viewer::gfxset::devinfo::interface() const noexcept
 {
 	return *m_interface;
 }
+
 bool gfx_viewer::gfxset::next_group() noexcept
 {
 	if ((m_devices[m_device].setcount() - 1) > m_set)
@@ -1008,6 +1047,7 @@ bool gfx_viewer::gfxset::next_group() noexcept
 		return false;
 	}
 }
+
 bool gfx_viewer::gfxset::prev_group() noexcept
 {
 	if (m_set)
@@ -1026,6 +1066,7 @@ bool gfx_viewer::gfxset::prev_group() noexcept
 		return false;
 	}
 }
+
 gfx_viewer::gfxset::gfxset(running_machine& machine)
 {
 	// get useful defaults
@@ -1040,10 +1081,12 @@ gfx_viewer::gfxset::gfxset(running_machine& machine)
 			m_devices.emplace_back(interface, first_palette, rotate);
 	}
 }
+
 bool gfx_viewer::gfxset::has_gfx() const noexcept
 {
 	return !m_devices.empty();
 }
+
 bool gfx_viewer::gfxset::handle_keys(running_machine& machine, int xcells, int ycells)
 {
 	auto& input = machine.ui_input();
@@ -1147,13 +1190,14 @@ bool gfx_viewer::gfxset::handle_keys(running_machine& machine, int xcells, int y
 	if (input.pressed_repeat(IPT_UI_SNAPSHOT, 4))
 	{
 		// output teh current set to  PNG
-		gfxWriter writer(machine, *this);
+		gfx_writer writer(machine, *this);
 		writer.writePng();
 		result = true;
 	}
 
 	return result;
 }
+
 int gfx_viewer::tilemap::scroll_step(running_machine& machine)
 {
 	auto& input = machine.input();
@@ -1164,6 +1208,7 @@ int gfx_viewer::tilemap::scroll_step(running_machine& machine)
 	else
 		return 8;
 }
+
 gfx_viewer::tilemap::tilemap(running_machine& machine)
 {
 	uint8_t const rotate = machine.system().flags & machine_flags::MASK_ORIENTATION;
@@ -1171,35 +1216,43 @@ gfx_viewer::tilemap::tilemap(running_machine& machine)
 	for (auto& info : m_info)
 		info.m_rotate = rotate;
 }
+
 unsigned gfx_viewer::tilemap::index() const noexcept
 {
 	return m_index;
 }
+
 float gfx_viewer::tilemap::zoom_scale() const noexcept
 {
 	auto const& info = m_info[m_index];
 	return info.m_zoom_frac ? (1.0f / float(info.m_zoom)) : float(info.m_zoom);
 }
+
 bool gfx_viewer::tilemap::auto_zoom() const noexcept
 {
 	return m_info[m_index].m_auto_zoom;
 }
+
 uint8_t gfx_viewer::tilemap::rotate() const noexcept
 {
 	return m_info[m_index].m_rotate;
 }
+
 uint32_t gfx_viewer::tilemap::flags() const noexcept
 {
 	return m_info[m_index].m_flags;
 }
+
 int gfx_viewer::tilemap::xoffs() const noexcept
 {
 	return m_info[m_index].m_xoffs;
 }
+
 int gfx_viewer::tilemap::yoffs() const noexcept
 {
 	return m_info[m_index].m_yoffs;
 }
+
 bool gfx_viewer::tilemap::handle_keys(running_machine& machine, float pixelscale)
 {
 	auto& input = machine.ui_input();
@@ -1318,6 +1371,7 @@ bool gfx_viewer::tilemap::handle_keys(running_machine& machine, float pixelscale
 
 	return result;
 }
+
 bool gfx_viewer::tilemap::info::zoom_in(float pixelscale) noexcept
 {
 	if (m_auto_zoom)
@@ -1345,6 +1399,7 @@ bool gfx_viewer::tilemap::info::zoom_in(float pixelscale) noexcept
 		return false;
 	}
 }
+
 bool gfx_viewer::tilemap::info::zoom_out(float pixelscale) noexcept
 {
 	if (m_auto_zoom)
@@ -1380,6 +1435,7 @@ bool gfx_viewer::tilemap::info::zoom_out(float pixelscale) noexcept
 		return false;
 	}
 }
+
 bool gfx_viewer::tilemap::info::next_category() noexcept
 {
 	if (TILEMAP_DRAW_ALL_CATEGORIES == m_flags)
@@ -1397,6 +1453,7 @@ bool gfx_viewer::tilemap::info::next_category() noexcept
 		return false;
 	}
 }
+
 bool gfx_viewer::tilemap::info::prev_catagory() noexcept
 {
 	if (!m_flags)
