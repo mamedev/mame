@@ -34917,8 +34917,11 @@ nesm8b
 m82
 
 @source:nintendo/nes_sh6578.cpp
+6578tv1
+6578tv2
 bandgpad
 bandggcn
+bb6578
 cpatrolm
 dancmix3
 ts_handy11

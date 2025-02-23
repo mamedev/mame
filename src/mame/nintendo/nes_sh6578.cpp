@@ -666,6 +666,21 @@ ROM_START( cpatrolm )
 	ROM_LOAD( "citypatrolman.bin", 0x00000, 0x100000, CRC(4b139c67) SHA1(a5b03f472a94ee879f58bbff201b671fbf4f1ea1) )
 ROM_END
 
+ROM_START( bb6578 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "tv game baseball.bin", 0x00000, 0x80000, CRC(dec862b2) SHA1(fb3d97ccde17ab6ead8eafb4e0aafb72fbb6674c) )
+ROM_END
+
+ROM_START( 6578tv1 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "tv game1.bin", 0x00000, 0x100000, CRC(161c4119) SHA1(b2ce91b070bcaba73c8a23e7067fe8ba41151a40) )
+ROM_END
+
+ROM_START( 6578tv2 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "tv game2.bin", 0x00000, 0x100000, CRC(cda1395c) SHA1(b0fdf1d3ebd9b7138ec907a0acdf0ea2d275c990) )
+ROM_END
+
 ROM_START( ablwikid )
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "mx29f1610atc.u2", 0x00000, 0x200000, CRC(f16abf79) SHA1(aeccbb40d7fdd451ba8e5cca20464da2cf116461) )
@@ -743,6 +758,12 @@ CONS( 1997, bandgpad,    0,  0,  nes_sh6578,     nes_sh6578, nes_sh6578_state, i
 CONS( 1997, bandggcn,    0,  0,  nes_sh6578,     nes_sh6578, nes_sh6578_state, init_nes_sh6578, "Bandai", "Go! Go! Connie-chan! Asobou Mouse", MACHINE_NOT_WORKING )
 
 CONS( 200?, cpatrolm,    0,  0,  nes_sh6578_pal, nes_sh6578, nes_sh6578_state, init_nes_sh6578, "TimeTop", "City Patrolman", MACHINE_NOT_WORKING )
+
+CONS( 200?, bb6578,      0,  0,  nes_sh6578,     nes_sh6578, nes_sh6578_state, init_nes_sh6578, "DaiDaiXing Electronics", "TV Games Baseball (SH6578 hardware)", MACHINE_NOT_WORKING )
+
+// these don't boot much further than the timetop logo and a splash screen, titles unknown
+CONS( 200?, 6578tv1,     0,  0,  nes_sh6578,     nes_sh6578, nes_sh6578_state, init_nes_sh6578, "TimeTop", "unknown TV Game 1 (SH6578 hardware)", MACHINE_NOT_WORKING )
+CONS( 200?, 6578tv2,     0,  0,  nes_sh6578,     nes_sh6578, nes_sh6578_state, init_nes_sh6578, "TimeTop", "unknown TV Game 2 (SH6578 hardware)", MACHINE_NOT_WORKING )
 
 // Super Moto 3 https://youtu.be/DR5Y_r6C_qk - has JungleTac copyrights intact, and appears to have the SH6578 versions of the games
 
