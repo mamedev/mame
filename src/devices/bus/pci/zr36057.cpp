@@ -40,7 +40,7 @@ Known mix-ins:
 #define LOG_WARN      (1U << 1)
 #define LOG_PO        (1U << 2) // PostOffice interactions
 
-#define VERBOSE (LOG_GENERAL | LOG_WARN | LOG_PO)
+#define VERBOSE (LOG_GENERAL | LOG_WARN)
 //#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
