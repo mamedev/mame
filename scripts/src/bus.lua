@@ -3936,6 +3936,8 @@ if (BUSES["SG1000_EXP"]~=null) then
 		MAME_DIR .. "src/devices/bus/sg1000_exp/sk1100.h",
 		MAME_DIR .. "src/devices/bus/sg1000_exp/sk1100prn.cpp",
 		MAME_DIR .. "src/devices/bus/sg1000_exp/sk1100prn.h",
+		MAME_DIR .. "src/devices/bus/sg1000_exp/sp400.cpp",
+		MAME_DIR .. "src/devices/bus/sg1000_exp/sp400.h",
 		MAME_DIR .. "src/devices/bus/sg1000_exp/kblink.cpp",
 		MAME_DIR .. "src/devices/bus/sg1000_exp/kblink.h",
 	}
