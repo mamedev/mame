@@ -2,9 +2,9 @@
 // copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
 /***************************************************************************
 
-    ui/viewgfx.h
+	ui/viewgfx.h
 
-    Internal graphics viewer.
+	Internal graphics viewer.
 
 ***************************************************************************/
 
@@ -189,11 +189,11 @@ public:
 
 
 /***************************************************************************
-    FUNCTION PROTOTYPES
+	FUNCTION PROTOTYPES
 ***************************************************************************/
 
 // master handler
-uint32_t ui_gfx_ui_handler(render_container &container, mame_ui_manager &mui, bool uistate);
+uint32_t ui_gfx_ui_handler(render_container& container, mame_ui_manager& mui, bool uistate);
 
 
 #endif // MAME_FRONTEND_MAME_UI_VIEWGFX_H

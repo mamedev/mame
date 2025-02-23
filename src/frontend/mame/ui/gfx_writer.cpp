@@ -11,11 +11,12 @@
 #include "emu.h"
 #include "gfx_writer.h"
 
-bitmap_argb32 gfxWriter::getBitmap(int xCells, int yCells, gfx_viewer::gfxset::setinfo& set, gfx_element& gfx) const
+bitmap_argb32 gfx_writer::getBitmap(int xCells, int yCells, gfx_viewer::gfxset::setinfo& set, gfx_element& gfx) const
 {
 	auto cellXpix{ (set.m_rotate & ORIENTATION_SWAP_XY) ? gfx.height() : gfx.width() };
 	auto cellYpix{ (set.m_rotate & ORIENTATION_SWAP_XY) ? gfx.width() : gfx.height() };
 
+	//bitmap_rgb32 bitmap;
 	bitmap_argb32 bitmap;
 	bitmap.reset();
 	bitmap.allocate(cellXpix * xCells, cellYpix * yCells);
@@ -41,17 +42,19 @@ bitmap_argb32 gfxWriter::getBitmap(int xCells, int yCells, gfx_viewer::gfxset::s
 				// only render if there is data
 				if (index < gfx.elements())
 					drawCell(gfx, index, bitmap, cellBounds.min_x, cellBounds.min_y, set.m_color, set.m_rotate, set.m_palette);
-				else    // otherwise, fill with transparency
+				// otherwise, fill with transparency
+				else
 					bitmap.fill(0, cellBounds);
 			}
 		}
-		else    // otherwise, fill with transparency
+		// otherwise, fill with transparency
+		else
 			bitmap.fill(0, cellBounds);
 	}
 	return bitmap;
 }
 
-void gfxWriter::drawCell(gfx_element& gfx, int index, bitmap_argb32& bitmap, int dstx, int dsty, int color, int rotate, device_palette_interface* dpalette) const
+void gfx_writer::drawCell(gfx_element& gfx, int index, bitmap_argb32& bitmap, int dstx, int dsty, int color, int rotate, device_palette_interface* dpalette) const
 {
 	auto width{ (rotate & ORIENTATION_SWAP_XY) ? gfx.height() : gfx.width() };
 	auto height{ (rotate & ORIENTATION_SWAP_XY) ? gfx.width() : gfx.height() };
@@ -96,13 +99,13 @@ void gfxWriter::drawCell(gfx_element& gfx, int index, bitmap_argb32& bitmap, int
 	}
 }
 
-gfxWriter::gfxWriter(running_machine& machine, gfx_viewer::gfxset& gfxSet) :
+gfx_writer::gfx_writer(running_machine& machine, gfx_viewer::gfxset& gfxSet) :
 	mMachine{ machine },
 	mGfxSet{ gfxSet }
 {
 }
 
-void gfxWriter::writePng()
+void gfx_writer::writePng()
 {
 	// get graphics info
 	auto& info{ mGfxSet.m_devices[mGfxSet.m_device] };
@@ -110,7 +113,7 @@ void gfxWriter::writePng()
 	device_gfx_interface& interface{ info.interface() };
 	gfx_element& gfx{ *interface.gfx(mGfxSet.m_set) };
 
-		// Compute the number of cells in the x and y directions
+	// Compute the number of cells in the x and y directions
 	u32 xCells{ 32 };
 	u32 yCells{ (gfx.elements() + xCells - 1) / xCells };
 	bitmap_argb32 bitmap{ getBitmap(xCells, yCells, set, gfx) };
@@ -122,7 +125,7 @@ void gfxWriter::writePng()
 	pnginfo.add_text("Software", text1);
 	pnginfo.add_text("System", text2);
 
-	emu_file file{ "gfxsave", OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS};
+	emu_file file{ "gfxsave", OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS };
 	std::error_condition const filerr = mMachine.video().open_next(file, "png");
 	if (!filerr)
 	{
@@ -134,4 +137,3 @@ void gfxWriter::writePng()
 			osd_printf_error("Error generating PNG for snapshot (%s:%d %s)\n", error.category().name(), error.value(), error.message());
 	}
 }
-

@@ -2,9 +2,9 @@
 // copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
 /*********************************************************************
 
-    ui/viewgfx.cpp
+	ui/viewgfx.cpp
 
-    Internal graphics viewer.
+	Internal graphics viewer.
 
 *********************************************************************/
 
@@ -731,7 +731,7 @@ bool gfx_viewer::map_mouse(render_container& container, render_bounds const& cli
 	return clip.includes(x, y);
 }
 
-gfx_viewer::gfx_viewer(running_machine& machine):
+gfx_viewer::gfx_viewer(running_machine& machine) :
 	m_machine(machine),
 	m_palette(machine),
 	m_gfxset(machine),
@@ -1473,7 +1473,7 @@ bool gfx_viewer::tilemap::info::prev_catagory() noexcept
 }
 
 /***************************************************************************
-    MAIN ENTRY POINT
+	MAIN ENTRY POINT
 ***************************************************************************/
 
 //-------------------------------------------------
@@ -1484,10 +1484,7 @@ bool gfx_viewer::tilemap::info::prev_catagory() noexcept
 //  create or modify gfx sets in VIDEO_START
 //-------------------------------------------------
 
-uint32_t ui_gfx_ui_handler(render_container &container, mame_ui_manager &mui, bool uistate)
+uint32_t ui_gfx_ui_handler(render_container& container, mame_ui_manager& mui, bool uistate)
 {
 	return mui.get_session_data<gfx_viewer, gfx_viewer>(mui.machine()).handle(mui, container, uistate);
 }
-
-
-
