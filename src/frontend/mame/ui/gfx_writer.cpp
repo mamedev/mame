@@ -11,12 +11,12 @@
 #include "emu.h"
 #include "gfx_writer.h"
 
-bitmap_rgb32 gfxWriter::getBitmap(int xCells, int yCells, gfx_viewer::gfxset::setinfo& set, gfx_element& gfx) const
+bitmap_argb32 gfxWriter::getBitmap(int xCells, int yCells, gfx_viewer::gfxset::setinfo& set, gfx_element& gfx) const
 {
 	auto cellXpix{ (set.m_rotate & ORIENTATION_SWAP_XY) ? gfx.height() : gfx.width() };
 	auto cellYpix{ (set.m_rotate & ORIENTATION_SWAP_XY) ? gfx.width() : gfx.height() };
 
-	bitmap_rgb32 bitmap;
+	bitmap_argb32 bitmap;
 	bitmap.reset();
 	bitmap.allocate(cellXpix * xCells, cellYpix * yCells);
 
@@ -51,7 +51,7 @@ bitmap_rgb32 gfxWriter::getBitmap(int xCells, int yCells, gfx_viewer::gfxset::se
 	return bitmap;
 }
 
-void gfxWriter::drawCell(gfx_element& gfx, int index, bitmap_rgb32& bitmap, int dstx, int dsty, int color, int rotate, device_palette_interface* dpalette) const
+void gfxWriter::drawCell(gfx_element& gfx, int index, bitmap_argb32& bitmap, int dstx, int dsty, int color, int rotate, device_palette_interface* dpalette) const
 {
 	auto width{ (rotate & ORIENTATION_SWAP_XY) ? gfx.height() : gfx.width() };
 	auto height{ (rotate & ORIENTATION_SWAP_XY) ? gfx.width() : gfx.height() };
@@ -113,7 +113,7 @@ void gfxWriter::writePng()
 		// Compute the number of cells in the x and y directions
 	u32 xCells{ 32 };
 	u32 yCells{ (gfx.elements() + xCells - 1) / xCells };
-	bitmap_rgb32 bitmap{ getBitmap(xCells, yCells, set, gfx) };
+	bitmap_argb32 bitmap{ getBitmap(xCells, yCells, set, gfx) };
 
 	// add two text entries describing the image
 	std::string text1 = std::string(emulator_info::get_appname()).append(" ").append(emulator_info::get_build_version());
