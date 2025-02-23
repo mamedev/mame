@@ -169,19 +169,20 @@ void ncr5385_device::scsi_ctrl_changed()
 
 	static char const *const nscsi_phase[] = { "DATA OUT", "DATA IN", "COMMAND", "STATUS", "*", "*", "MESSAGE OUT", "MESSAGE IN" };
 
-	if ((ctrl & S_BSY) && !(ctrl & S_SEL))
+	if (ctrl & S_BSY)
 	{
-		LOGMASKED(LOG_STATE, "scsi_ctrl_changed 0x%03x phase %s%s%s\n", ctrl, nscsi_phase[ctrl & S_PHASE_MASK],
-			ctrl & S_REQ ? " REQ" : "", ctrl & S_ACK ? " ACK" : "");
+		if (ctrl & S_SEL)
+			LOGMASKED(LOG_STATE, "%10s: scsi_ctrl_changed 0x%03x arbitration/selection\n", machine().time().as_string(8), ctrl);
+		else
+			LOGMASKED(LOG_STATE, "%10s: scsi_ctrl_changed 0x%03x phase %s%s%s\n", machine().time().as_string(8), ctrl, nscsi_phase[ctrl & S_PHASE_MASK],
+				ctrl & S_REQ ? " REQ" : "", ctrl & S_ACK ? " ACK" : "");
 
 		if (m_state != IDLE)
 			m_state_timer->adjust(attotime::zero);
 	}
-	else if (ctrl & S_BSY)
-		LOGMASKED(LOG_STATE, "scsi_ctrl_changed 0x%03x arbitration/selection\n", ctrl);
 	else
 	{
-		LOGMASKED(LOG_STATE, "scsi_ctrl_changed 0x%03x BUS FREE\n", ctrl);
+		LOGMASKED(LOG_STATE, "%10s: scsi_ctrl_changed 0x%03x BUS FREE\n", machine().time().as_string(8), ctrl);
 
 		if (m_mode == INITIATOR)
 		{
@@ -254,7 +255,7 @@ u8 ncr5385_device::aux_status_r()
 		if (ctrl & S_INP)
 			data |= AUX_STATUS_IO;
 	}
-	LOGMASKED(LOG_REGR, "aux_status_r 0x%02x (%s)\n", data, machine().describe_context());
+	LOGMASKED(LOG_REGR, "%10s: aux_status_r 0x%02x (%s)\n", machine().time().as_string(8), data, machine().describe_context());
 
 	return data;
 }
@@ -267,13 +268,15 @@ u8 ncr5385_device::own_id_r()
 u8 ncr5385_device::int_status_r()
 {
 	u8 const data = m_int_status;
-	LOGMASKED(LOG_REGR, "int_status_r 0x%02x (%s)\n", data, machine().describe_context());
+	LOGMASKED(LOG_REGR, "%10s: int_status_r 0x%02x (%s)\n", machine().time().as_string(8), data, machine().describe_context());
 	m_aux_status &= ~AUX_STATUS_PARITY_ERR;
 	m_int_status = 0;
-	update_int();
+	update_int();			// Q: when does this raise the IRQ?  immediately or as part of a state machine?
 
+	// tek4404 reads this reg from inside IRQ3, clear its flag ($2c3) and then spinloops waiting for it to be set by an IRQ
+	// the update_int() above has happened too fast
 	if (m_state != IDLE)
-		m_state_timer->adjust(attotime::zero);
+		m_state_timer->adjust(attotime::from_usec(80));
 
 	return data;
 }
@@ -450,6 +453,8 @@ template <unsigned N> void ncr5385_device::cnt_w(u8 data)
 		m_aux_status &= ~AUX_STATUS_TC_ZERO;
 	else
 		m_aux_status |= AUX_STATUS_TC_ZERO;
+	
+ 	LOGMASKED(LOG_REGW, "%10s: cnt_w %d (%d) \n", machine().time().as_string(8), m_cnt, N);
 }
 
 void ncr5385_device::tst_w(u8 data)
@@ -557,7 +562,7 @@ int ncr5385_device::state_step()
 		break;
 
 	case SEL_START:
-		LOGMASKED(LOG_STATE, "selection: SEL asserted\n");
+		LOGMASKED(LOG_STATE, "%10s: selection: SEL asserted\n", machine().time().as_string(8));
 		m_state = SEL_DELAY;
 		delay = SCSI_BUS_SKEW * 2;
 
@@ -579,7 +584,7 @@ int ncr5385_device::state_step()
 	case SEL_WAIT_BSY:
 		if (ctrl & S_BSY)
 		{
-			LOGMASKED(LOG_STATE, "selection: BSY asserted by target\n");
+			LOGMASKED(LOG_STATE, "%10s: selection: BSY asserted by target\n", machine().time().as_string(8));
 			m_state = SEL_COMPLETE;
 			delay = SCSI_BUS_SKEW * 2;
 		}
@@ -595,7 +600,7 @@ int ncr5385_device::state_step()
 		}
 		break;
 	case SEL_COMPLETE:
-		LOGMASKED(LOG_STATE, "selection: complete\n");
+		LOGMASKED(LOG_STATE, "%10s: selection: complete\n", machine().time().as_string(8));
 		m_int_status |= INT_FUNC_COMPLETE;
 		m_mode = INITIATOR;
 		m_state = SEL_WAIT_REQ;
@@ -611,7 +616,7 @@ int ncr5385_device::state_step()
 		// don't generate bus service interrupt until the function complete is cleared
 		if ((ctrl & S_REQ) && !m_int_state)
 		{
-			LOGMASKED(LOG_STATE, "selection: REQ asserted by target\n");
+			LOGMASKED(LOG_STATE, "%10s: selection: REQ asserted by target\n", machine().time().as_string(8));
 			m_int_status |= INT_BUS_SERVICE;
 			m_state = IDLE;
 
@@ -662,7 +667,7 @@ int ncr5385_device::state_step()
 	case XFI_IN_DRQ:
 		m_state = XFI_IN_ACK;
 
-		LOGMASKED(LOG_STATE, "xfi_in: data 0x%02x\n", m_dat);
+		LOGMASKED(LOG_STATE, "%10s: xfi_in: data 0x%02x\n", machine().time().as_string(8), m_dat);
 
 		// assert ACK
 		scsi_bus->ctrl_w(scsi_refid, S_ACK, S_ACK);
@@ -676,7 +681,7 @@ int ncr5385_device::state_step()
 			{
 				m_cnt--;
 
-				LOGMASKED(LOG_STATE, "xfi_in: %d remaining\n", m_cnt);
+				LOGMASKED(LOG_STATE, "%10s: xfi_in: %d remaining\n", machine().time().as_string(8), m_cnt);
 
 				if (!m_cnt)
 					m_aux_status |= AUX_STATUS_TC_ZERO;
@@ -687,6 +692,8 @@ int ncr5385_device::state_step()
 			// clear ACK except after last byte of message input phase
 			if (!remaining() && (ctrl & S_PHASE_MASK) == S_PHASE_MSG_IN)
 			{
+				LOGMASKED(LOG_STATE, "xfi_in: INT_FUNC_COMPLETE\n" );
+			
 				m_int_status |= INT_FUNC_COMPLETE;
 				m_state = IDLE;
 
@@ -717,6 +724,7 @@ int ncr5385_device::state_step()
 			else
 			{
 				LOGMASKED(LOG_STATE, "xfi_out: %s\n", remaining() ? "phase change" : "transfer complete");
+
 				m_int_status |= INT_BUS_SERVICE;
 				m_state = IDLE;
 
@@ -726,11 +734,12 @@ int ncr5385_device::state_step()
 		else
 			delay = -1;
 		break;
+
 	case XFI_OUT_DRQ:
 		m_state = XFI_OUT_ACK;
 		m_aux_status &= ~AUX_STATUS_DATA_FULL;
 
-		LOGMASKED(LOG_STATE, "xfi_out: data 0x%02x\n", m_dat);
+		LOGMASKED(LOG_STATE, "%10s: xfi_out: data 0x%02x\n", machine().time().as_string(8), m_dat);
 
 		// assert data and ACK
 		scsi_bus->data_w(scsi_refid, m_dat);
@@ -751,7 +760,7 @@ int ncr5385_device::state_step()
 			{
 				m_cnt--;
 
-				LOGMASKED(LOG_STATE, "xfi_out: %d remaining\n", m_cnt);
+				LOGMASKED(LOG_STATE, "%10s: xfi_out: %d remaining\n", machine().time().as_string(8), m_cnt);
 
 				if (!m_cnt)
 					m_aux_status |= AUX_STATUS_TC_ZERO;
@@ -759,9 +768,13 @@ int ncr5385_device::state_step()
 			else
 				m_sbx = false;
 
+			delay = 3'500;		// >=3.5us delay works, < 3.5us fails
+			LOGMASKED(LOG_STATE, "%10s: XFI_OUT_ACK delay %d\n", machine().time().as_string(8), delay);
+			
 			// clear data and ACK
 			scsi_bus->data_w(scsi_refid, 0);
 			scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
+
 		}
 		else
 			delay = -1;
@@ -774,7 +787,7 @@ int ncr5385_device::state_step()
 				m_state = XFI_OUT_DRQ;
 			else
 			{
-				LOGMASKED(LOG_STATE, "xfi_out: %s\n", remaining() ? "phase change" : "transfer complete");
+				LOGMASKED(LOG_STATE, "%10s: xfi_out: %s\n", machine().time().as_string(8), remaining() ? "phase change" : "transfer complete");
 				m_int_status |= INT_BUS_SERVICE;
 				m_state = IDLE;
 
@@ -822,7 +835,7 @@ void ncr5385_device::update_int()
 
 	if (m_int_state != int_state)
 	{
-		LOG("update_int %d\n", int_state);
+		LOG("%10s: update_int %d\n", machine().time().as_string(8), int_state);
 
 		m_aux_status &= ~(AUX_STATUS_MSG | AUX_STATUS_CD | AUX_STATUS_IO);
 		if (int_state)
