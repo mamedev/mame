@@ -1172,7 +1172,7 @@ bool screen_device::update_partial(int scanline)
 	}
 
 	// skip if we already rendered this frame
-	// this can happen if the executing cpu timeslice is in the previous frame while scanline 0 already started
+	// this can happen if a cpu timeslice that called update_partial is in the previous frame while scanline 0 already started
 	if (m_last_partial_scan == 0 && m_last_partial_reset > machine().time())
 	{
 		LOG_PARTIAL_UPDATES(("skipped because frame was already rendered\n"));
@@ -1290,7 +1290,7 @@ void screen_device::update_now()
 	}
 
 	// skip if we already rendered this frame
-	// this can happen if the executing cpu timeslice is in the previous frame while scanline 0 already started
+	// this can happen if a cpu timeslice that called update_now is in the previous frame while scanline 0 already started
 	if (m_last_partial_scan == 0 && m_partial_scan_hpos == 0 && m_last_partial_reset > machine().time())
 	{
 		LOG_PARTIAL_UPDATES(("skipped because frame was already rendered\n"));
