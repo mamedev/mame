@@ -55,7 +55,6 @@ void zr36060_device::regs_map(address_map &map)
 	map(0x00d, 0x010).rw(FUNC(zr36060_device::tcv_data_r), FUNC(zr36060_device::tcv_data_w));
 	map(0x011, 0x012).rw(FUNC(zr36060_device::sf_r), FUNC(zr36060_device::sf_w));
 	map(0x013, 0x015).rw(FUNC(zr36060_device::af_r), FUNC(zr36060_device::af_w));
-
 	map(0x016, 0x019).rw(FUNC(zr36060_device::acv_r), FUNC(zr36060_device::acv_w));
 	map(0x01a, 0x01d).rw(FUNC(zr36060_device::act_r), FUNC(zr36060_device::act_w));
 	map(0x01e, 0x021).rw(FUNC(zr36060_device::acv_trun_r), FUNC(zr36060_device::acv_trun_w));

@@ -41,14 +41,53 @@ private:
 	struct {
 		u32 horizontal_config;
 		u32 vertical_config;
+		u32 format_config;
 		int hspol, vspol;
 		u16 hstart, hend, vstart, vend;
+
+		int ext_fi, top_field, vclk_pol;
+		u8 hfilter;
+		int dup_fld;
+		u8 hor_dcm, ver_dcm;
+		int disp_mod;
+		u8 yuv2rgb;
+		int err_dif, pack24, little_endian;
+
+		u32 vid_top_base, vid_bottom_base;
+
+		u16 disp_stride;
+		bool vid_ovf;
+		bool snapshot, frame_grab;
+
+		u32 display_config;
+		bool vid_en;
+		u8 min_pix;
+		bool triton;
+		u16 window_height, window_width;
+
+		u32 mask_top_base, mask_bottom_base;
+		bool ovl_enable;
+		u8 mask_stride;
 	} m_vfe;
 
 	u8 m_jpeg_guest_id, m_jpeg_guest_reg;
 
 	bool m_softreset;
 	u8 m_gpio_ddr, m_pci_waitstate_control;
+
+	u32 m_irq_status, m_irq_enable;
+	bool m_inta_pin_enable;
+
+	struct {
+		u8 vsync_size;
+		u16 hsync_start;
+		u16 vtotal, htotal;
+	} m_sync_gen;
+
+	struct {
+		u16 nax, pax, nay, pay;
+		bool odd;
+	} m_active_area;
 
 	struct {
 		u8 time[8];

@@ -14,7 +14,8 @@ iterations.
 ZR36057 is known to have two HW quirks that are been fixed with ZR36067.
 
 TODO:
-- Enough to pass board functions in dc10plus HW test, requires VSYNC signal from ZR36060 to continue;
+- Enough to pass board functions in dc10plus HW test, requires GIRQ1 signal source to continue
+(from SAA7110? On its own it doesn't touch any of the sync registers);
 - Hookup busmaster;
 - What are i2c 0x8e >> 1 address device checks for?
 \- Can't be adv7175 (0xd4 >> 1) nor adv7176 (0x54 >> 1)
@@ -39,13 +40,17 @@ Known mix-ins:
 
 #define LOG_WARN      (1U << 1)
 #define LOG_PO        (1U << 2) // PostOffice interactions
+#define LOG_VFE       (1U << 3) // Log Video Front End
+#define LOG_SYNC      (1U << 4) // Log Sync signals and Active Area (as SyncMstr)
 
-#define VERBOSE (LOG_GENERAL | LOG_WARN)
+#define VERBOSE (LOG_GENERAL | LOG_WARN | LOG_VFE | LOG_SYNC)
 //#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 #define LOGWARN(...)            LOGMASKED(LOG_WARN, __VA_ARGS__)
 #define LOGPO(...)              LOGMASKED(LOG_PO, __VA_ARGS__)
+#define LOGVFE(...)             LOGMASKED(LOG_VFE, __VA_ARGS__)
+#define LOGSYNC(...)            LOGMASKED(LOG_SYNC, __VA_ARGS__)
 
 DEFINE_DEVICE_TYPE(ZR36057_PCI, zr36057_device,   "zr36057",   "Zoran ZR36057-based Enhanced Multimedia Controller")
 //DEFINE_DEVICE_TYPE(ZR36067_PCI, zr36067_device,   "zr36067",   "Zoran ZR36067-based AV Controller")
@@ -127,6 +132,46 @@ void zr36057_device::software_reset()
 	m_vfe.horizontal_config = (m_vfe.hspol << 30) | (m_vfe.hstart << 10) | (m_vfe.hend << 0);
 	m_vfe.vertical_config = (m_vfe.vspol << 30) | (m_vfe.vstart << 10) | (m_vfe.vend << 0);
 
+	m_vfe.ext_fi = 0;
+	m_vfe.top_field = 1;
+	m_vfe.vclk_pol = 0;
+	m_vfe.hfilter = 0;
+	m_vfe.dup_fld = 0;
+	m_vfe.hor_dcm = 0;
+	m_vfe.ver_dcm = 0;
+	m_vfe.disp_mod = 0;
+	m_vfe.yuv2rgb = 2;
+	m_vfe.err_dif = 0;
+	m_vfe.pack24 = 0;
+	m_vfe.little_endian = 1;
+	m_vfe.format_config = (m_vfe.top_field << 25) | (m_vfe.yuv2rgb << 3) | (m_vfe.little_endian << 0);
+	m_vfe.vid_bottom_base = m_vfe.vid_top_base = m_vfe.mask_bottom_base = m_vfe.mask_top_base = 0xffff'fffc;
+	m_vfe.disp_stride = 0xfffc;
+	m_vfe.vid_ovf = m_vfe.snapshot = m_vfe.frame_grab = false;
+	m_vfe.vid_en = false;
+	m_vfe.min_pix = 0xf;
+	m_vfe.triton = false;
+	m_vfe.window_height = 0x0f0;
+	m_vfe.window_width = 0x3ff;
+	m_vfe.display_config = (m_vfe.vid_en << 31) | (m_vfe.min_pix << 24) | (m_vfe.window_height << 12) | (m_vfe.window_width);
+
+	m_vfe.ovl_enable = false;
+	m_vfe.mask_stride = 0xff;
+
+	m_sync_gen.vsync_size = 6;
+	m_sync_gen.vtotal = 525;
+	m_sync_gen.hsync_start = 640;
+	m_sync_gen.htotal = 780;
+
+	m_active_area.nax = 0;
+	m_active_area.pax = 640;
+	m_active_area.nay = 10;
+	m_active_area.pay = 240;
+	m_active_area.odd = true;
+
+	m_irq_status = m_irq_enable = 0;
+	m_inta_pin_enable = false;
+
 	m_pci_waitstate_control = 0;
 	m_gpio_ddr = 0xff; // all inputs
 	// GuestBus ID default
@@ -157,40 +202,193 @@ void zr36057_device::asr_map(address_map &map)
 	map(0x000, 0x003).lrw32(
 		NAME([this] (offs_t offset) {
 			// NOTE: wants to read-back here, throws "Bus Master ASIC error" otherwise (?)
-			LOG("Video Front End Horizontal Configuration R\n");
+			LOGVFE("Video Front End: Horizontal Configuration R\n");
 			return m_vfe.horizontal_config;
 		}),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			COMBINE_DATA(&m_vfe.horizontal_config);
-			LOG("Video Front End Horizontal Configuration W %08x & %08x\n", data, mem_mask);
+			LOGVFE("Video Front End: Horizontal Configuration W %08x & %08x\n", data, mem_mask);
 			m_vfe.hspol = BIT(m_vfe.horizontal_config, 30);
 			m_vfe.hstart = (m_vfe.horizontal_config >> 10) & 0x3ff;
 			m_vfe.hend = (m_vfe.horizontal_config >> 0) & 0x3ff;
-			LOG("\tVSPOL %d VSTART %d VEND %d\n", m_vfe.hspol, m_vfe.hstart, m_vfe.hend);
+			LOGVFE("\tHSPol %d, HStart %d, HEnd %d\n", m_vfe.hspol, m_vfe.hstart, m_vfe.hend);
 		})
 	);
 	map(0x004, 0x007).lrw32(
 		NAME([this] (offs_t offset) {
-			LOG("Video Front End Vertical Configuration R\n");
+			LOGVFE("Video Front End: Vertical Configuration R\n");
 			return m_vfe.vertical_config;
 		}),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			COMBINE_DATA(&m_vfe.vertical_config);
-			LOG("Video Front End Vertical Configuration %08x & %08\n", data, mem_mask);
+			LOGVFE("Video Front End: Vertical Configuration W %08x & %08x\n", data, mem_mask);
 			m_vfe.vspol = BIT(m_vfe.vertical_config, 30);
 			m_vfe.vstart = (m_vfe.vertical_config >> 10) & 0x3ff;
 			m_vfe.vend = (m_vfe.vertical_config >> 0) & 0x3ff;
-			LOG("\tVSPOL %d VSTART %d VEND %d\n", m_vfe.vspol, m_vfe.vstart, m_vfe.vend);
+			LOGVFE("\tVSPol %d, VStart %d, VEnd %d\n", m_vfe.vspol, m_vfe.vstart, m_vfe.vend);
 		})
 	);
-//  map(0x008, 0x00b) VFE Config, Video Scaler and Pixel Format
-//  map(0x00c, 0x00f) Video Display Top
-//  map(0x010, 0x013) Video Display Bottom
-//  map(0x014, 0x017) Video Display Stride, Status and Frame Grab
-//  map(0x018, 0x01b) Video Display Configuration
-//  map(0x01c, 0x01f) Masking Map Top
-//  map(0x020, 0x023) Masking Map Bottom
-//  map(0x024, 0x027) Overlay Control
+	map(0x008, 0x00b).lrw32(
+		NAME([this] (offs_t offset) {
+			LOGVFE("Video Front End: Format Configuration R\n");
+			return m_vfe.format_config;
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			COMBINE_DATA(&m_vfe.format_config);
+			LOGVFE("Video Front End: Format Configuration W %08x & %08x\n", data, mem_mask);
+			m_vfe.ext_fi = BIT(m_vfe.format_config, 26);
+			m_vfe.top_field = BIT(m_vfe.format_config, 25);
+			m_vfe.vclk_pol = BIT(m_vfe.format_config, 24);
+			LOGVFE("\tExtFI %d, TopField %d, VCLKPol %d\n"
+				, m_vfe.ext_fi, m_vfe.top_field, m_vfe.vclk_pol
+			);
+			// Video Scaler
+			m_vfe.hfilter = (m_vfe.format_config >> 21) & 7;
+			m_vfe.dup_fld = BIT(m_vfe.format_config, 20);
+			m_vfe.hor_dcm = (m_vfe.format_config >> 14) & 0x3f;
+			m_vfe.ver_dcm = (m_vfe.format_config >> 8) & 0x3f;
+			LOGVFE("\tHFilter %d, DupFld %d, HorDcm %d, VerDcm %d\n"
+				, m_vfe.hfilter
+				, m_vfe.dup_fld
+				, m_vfe.hor_dcm
+				, m_vfe.ver_dcm
+			);
+			// Pixel Formatter
+			m_vfe.disp_mod = BIT(m_vfe.format_config, 6);
+			m_vfe.yuv2rgb = (m_vfe.format_config >> 3) & 3;
+			m_vfe.err_dif = BIT(m_vfe.format_config, 2);
+			m_vfe.pack24 = BIT(m_vfe.format_config, 1);
+			m_vfe.little_endian = BIT(m_vfe.format_config, 0);
+			LOGVFE("\tDispMod %d, YUV2RGB %d, ErrDif %d, Pack24 %d, LittleEndian %d\n"
+				, m_vfe.disp_mod
+				, m_vfe.yuv2rgb
+				, m_vfe.err_dif
+				, m_vfe.pack24
+				, m_vfe.little_endian
+			);
+		})
+	);
+	map(0x00c, 0x00f).lrw32(
+		NAME([this] (offs_t offset) {
+			LOGVFE("Video Display Top R\n");
+			return m_vfe.vid_top_base;
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			COMBINE_DATA(&m_vfe.vid_top_base);
+			m_vfe.vid_top_base &= 0xffff'fffc;
+			LOGVFE("Video Display Top W %08x & %08x\n", data, mem_mask);
+		})
+	);
+	map(0x010, 0x013).lrw32(
+		NAME([this] (offs_t offset) {
+			LOGVFE("Video Display Top R\n");
+			return m_vfe.vid_bottom_base;
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			COMBINE_DATA(&m_vfe.vid_bottom_base);
+			m_vfe.vid_bottom_base &= 0xffff'fffc;
+			LOGVFE("Video Display Bottom W %08x & %08x\n", data, mem_mask);
+		})
+	);
+	map(0x014, 0x017).lrw32(
+		NAME([this] (offs_t offset) {
+			LOGVFE("Video Stride, Status and Frame Grab R\n");
+			return (m_vfe.disp_stride << 16) | (m_vfe.vid_ovf << 8) | (m_vfe.snapshot << 1) | (m_vfe.frame_grab << 0);
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			LOGVFE("Video Stride, Status and Frame Grab W %08x & %08x\n", data, mem_mask);
+			if (ACCESSING_BITS_16_31)
+			{
+				COMBINE_DATA(&m_vfe.disp_stride);
+				m_vfe.disp_stride &= 0xfffc;
+				LOGVFE("\tDispStride %d\n", m_vfe.disp_stride);
+			}
+
+			if (ACCESSING_BITS_8_15)
+			{
+				// bit 8 high clears the overflow flag
+				if (BIT(data, 8))
+				{
+					m_vfe.vid_ovf = false;
+					LOGVFE("\tVidOvf clear\n");
+				}
+			}
+
+			if (ACCESSING_BITS_0_7)
+			{
+				m_vfe.snapshot = !!(BIT(data, 1));
+				m_vfe.frame_grab = !!(BIT(data, 0));
+				LOGVFE("\tSnapShot %d, FrameGrab %d\n", m_vfe.snapshot, m_vfe.frame_grab);
+				// Presumably this will stall the emulation (goes off after two fields)
+				if (m_vfe.frame_grab)
+					popmessage("zr36057: FrameGrab enabled");
+			}
+		})
+	);
+	map(0x018, 0x01b).lrw32(
+		NAME([this] (offs_t offset) {
+			LOG("Video Display Configuration R\n");
+			return m_vfe.display_config;
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			COMBINE_DATA(&m_vfe.display_config);
+			LOGVFE("Video Display Configuration W %08x & %08x\n", data, mem_mask);
+			m_vfe.vid_en = !!BIT(m_vfe.display_config, 31);
+			// Not a mistake: min_pix overlaps with the /Triton setting
+			m_vfe.min_pix = (m_vfe.display_config >> 24) & 0x7f;
+			m_vfe.triton = !!BIT(~m_vfe.display_config, 24);
+			LOGVFE("\tVidEn %d, MinPix %d, Triton %s Controller"
+				, m_vfe.vid_en
+				, m_vfe.min_pix
+				, m_vfe.triton ? "Intel 'Triton' Bridge" : "Other PCI Bridge"
+			);
+			m_vfe.window_height = (m_vfe.display_config >> 12) & 0x3ff;
+			m_vfe.window_width = (m_vfe.display_config >> 0) & 0x3ff;
+			LOGVFE("\tVidWinHt %d, VidWinWid %d\n", m_vfe.window_height, m_vfe.window_width);
+		})
+	);
+	map(0x01c, 0x01f).lrw32(
+		NAME([this] (offs_t offset) {
+			LOGVFE("Masking Map Top R\n");
+			return m_vfe.mask_top_base;
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			COMBINE_DATA(&m_vfe.mask_top_base);
+			m_vfe.mask_top_base &= 0xffff'fffc;
+			LOGVFE("Masking Map Top W %08x & %08x\n", data, mem_mask);
+		})
+	);
+	map(0x020, 0x023).lrw32(
+		NAME([this] (offs_t offset) {
+			LOGVFE("Masking Map Bottom R\n");
+			return m_vfe.mask_bottom_base;
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			COMBINE_DATA(&m_vfe.mask_bottom_base);
+			m_vfe.mask_bottom_base &= 0xffff'fffc;
+			LOGVFE("Masking Map Bottom W %08x & %08x\n", data, mem_mask);
+		})
+	);
+	map(0x024, 0x027).lrw32(
+		NAME([this] (offs_t offset) {
+			LOGVFE("Overlay Control R\n");
+			return (m_vfe.ovl_enable << 15) | (m_vfe.mask_stride << 0);
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			LOGVFE("Overlay Control W %08x & %08x\n", data, mem_mask);
+			if (ACCESSING_BITS_8_15)
+			{
+				m_vfe.ovl_enable = !!(BIT(data, 15));
+				LOGVFE("\tOvlEnable %d\n", m_vfe.ovl_enable);
+			}
+
+			if (ACCESSING_BITS_0_7)
+			{
+				m_vfe.mask_stride = data & 0xff;
+				LOGVFE("\tMaskStride %d\n", m_vfe.mask_stride);
+			}
+		})
+	);
 	map(0x028, 0x02b).lrw32(
 		NAME([this] (offs_t offset) {
 			return (m_softreset << 24) | (m_pci_waitstate_control << 16) | m_gpio_ddr;
@@ -246,17 +444,48 @@ void zr36057_device::asr_map(address_map &map)
 //  map(0x030, 0x033) MPEG Code Source Address
 //  map(0x034, 0x037) MPEG Code Transfer Control
 //  map(0x038, 0x03b) MPEG Code Memory Pointer
-//  map(0x03c, 0x03f) Interrupt Status
-//  map(0x040, 0x043) Interrupt Control
+	map(0x03c, 0x03f).lrw32(
+		NAME([this] (offs_t offset) {
+			return m_irq_status;
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			if (ACCESSING_BITS_24_31)
+			{
+				m_irq_status &= ~data;
+				m_irq_status &= 0x7800'0000;
+			}
+		})
+	);
+	map(0x040, 0x043).lrw32(
+		NAME([this] (offs_t offset) {
+			return m_irq_enable | (m_inta_pin_enable << 24);
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			if (ACCESSING_BITS_24_31)
+			{
+				LOG("IRQ Enable W %08x & %08x\n", data, mem_mask);
+				m_irq_enable = data;
+				m_irq_enable &= 0x7800'0000;
+				m_inta_pin_enable = BIT(data, 24);
+				LOG("\tINTA enable %d\n", m_inta_pin_enable);
+				LOG("\tGIRQ1 %d GIRQ0 %d CodRepIRQ %d JPEGRepIRQ\n"
+					, BIT(data, 30)
+					, BIT(data, 29)
+					, BIT(data, 28)
+					, BIT(data, 27)
+				);
+			}
+		})
+	);
 	map(0x044, 0x047).lrw32(
 		NAME([this] (offs_t offset) {
-			LOG("I2C R\n");
+			//LOG("I2C R\n");
 			// avoid win98 stall for now
 			return m_decoder_sdao_state << 1 | 1;
 			//return 3;
 		}),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			//printf("I2C %02x %08x\n", data, mem_mask);
+			//LOG("I2C %02x %08x\n", data, mem_mask);
 			if (ACCESSING_BITS_0_7)
 			{
 				m_decoder->sda_write(BIT(data, 1));
@@ -266,11 +495,100 @@ void zr36057_device::asr_map(address_map &map)
 	);
 //  map(0x100, 0x103) JPEG Mode and Control
 //  map(0x104, 0x107) JPEG Process Control
-//  map(0x108, 0x10b) Vertical Sync Parameters (as sync master)
-//  map(0x10c, 0x10f) Horizontal Sync Parameters (as sync master)
-//  map(0x110, 0x113) Field Horizontal Active Portion
-//  map(0x114, 0x117) Field Vertical Active Portion
-//  map(0x118, 0x11b) Field Process Parameters
+	map(0x108, 0x10b).lrw32(
+		NAME([this] (offs_t offset) {
+			LOGSYNC("Vertical Sync Parameters R\n");
+			return (m_sync_gen.vsync_size << 16) | (m_sync_gen.vtotal);
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			LOGSYNC("Vertical Sync Parameters W %08x & %08x\n", data, mem_mask);
+			if (ACCESSING_BITS_16_23)
+			{
+				m_sync_gen.vsync_size = (data >> 16) & 0xff;
+				LOGSYNC("\tVsyncSize %d\n", m_sync_gen.vsync_size);
+			}
+
+			if (ACCESSING_BITS_0_15)
+			{
+				m_sync_gen.vtotal = data & 0xffff;
+				LOGSYNC("\tFrmTot %d\n", m_sync_gen.vtotal);
+			}
+		})
+	);
+	map(0x10c, 0x10f).lrw32(
+		NAME([this] (offs_t offset) {
+			LOGSYNC("Horizontal Sync Parameters R\n");
+			return (m_sync_gen.hsync_start << 16) | (m_sync_gen.htotal);
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			LOGSYNC("Horizontal Sync Parameters W %08x & %08x\n", data, mem_mask);
+			if (ACCESSING_BITS_16_31)
+			{
+				m_sync_gen.hsync_start = (data >> 16) & 0xffff;
+				LOGSYNC("\tHsyncStart %d\n", m_sync_gen.hsync_start);
+			}
+
+			if (ACCESSING_BITS_0_15)
+			{
+				m_sync_gen.htotal = data & 0xffff;
+				LOGSYNC("\tLineTot %d\n", m_sync_gen.htotal);
+			}
+		})
+	);
+	map(0x110, 0x113).lrw32(
+		NAME([this] (offs_t offset) {
+			LOGSYNC("Field Horizontal Active Portion R\n");
+			return (m_active_area.nax << 16) | (m_active_area.pax);
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			LOGSYNC("Field Horizontal Active Portion W %08x & %08x\n", data, mem_mask);
+			if (ACCESSING_BITS_16_31)
+			{
+				m_active_area.nax = (data >> 16) & 0xffff;
+				LOGSYNC("\tNAX %d\n", m_active_area.nax);
+			}
+
+			if (ACCESSING_BITS_0_15)
+			{
+				m_active_area.pax = data & 0xffff;
+				LOGSYNC("\tPAX %d\n", m_active_area.pax);
+			}
+		})
+	);
+	map(0x114, 0x117).lrw32(
+		NAME([this] (offs_t offset) {
+			LOGSYNC("Field Vertical Active Portion R\n");
+			return (m_active_area.nay << 16) | (m_active_area.pay);
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			LOGSYNC("Field Vertical Active Portion W %08x & %08x\n", data, mem_mask);
+			if (ACCESSING_BITS_16_31)
+			{
+				m_active_area.nay = (data >> 16) & 0xffff;
+				LOGSYNC("\tNAY %d\n", m_active_area.nay);
+			}
+
+			if (ACCESSING_BITS_0_15)
+			{
+				m_active_area.pay = data & 0xffff;
+				LOGSYNC("\tPAY %d\n", m_active_area.pay);
+			}
+		})
+	);
+	map(0x118, 0x11b).lrw32(
+		NAME([this] (offs_t offset) {
+			LOGSYNC("Field Process Parameters R\n");
+			return m_active_area.odd;
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			LOGSYNC("Field Process Parameters W %08x & %08x\n", data, mem_mask);
+			if (ACCESSING_BITS_0_7)
+			{
+				m_active_area.odd = !!BIT(data, 0);
+				LOGSYNC("\tOdd_Even: %s\n", m_active_area.odd ? "Odd" : "Even");
+			}
+		})
+	);
 //  map(0x11c, 0x11f) JPEG Code Base Address
 //  map(0x120, 0x123) JPEG Code FIFO Threshold
 	map(0x124, 0x124).lrw8(

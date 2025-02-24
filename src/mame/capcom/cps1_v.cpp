@@ -411,7 +411,7 @@ maps for every game.
 Known Bug List
 ==============
 CPS2:
-* CPS2 can do raster effects, certainly used by ssf2 (Cammy, DeeJay, T.Hawk levels),
+* CPS2 can do raster effects, certainly used by ssf2 (Cammy, DeeJay, T.Hawk stages),
   msh (Blackheart lava stage) and maybe others (xmcotaj, vsavj).
   IRQ4 is some sort of scanline interrupt used for that purpose.
 
