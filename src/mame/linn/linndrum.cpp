@@ -35,7 +35,7 @@ Usage:
 
 The driver includes a (mostly) interactive layout, including buttons, LEDs and
 sliders. The only non-interactive widgets right now are the knobs (such as
-tunning and volume). Those will display their current value, but they can only
+tuning and volume). Those will display their current value, but they can only
 be modified by the Slider Control menu.
 
 Since there is no audio, the driver logs triggers and other info. To see these
@@ -490,19 +490,19 @@ INPUT_PORTS_START(linndrum)
 	PORT_START("pot_volume")
 	PORT_ADJUSTER(100, "MASTER VOLUME")
 
-	PORT_START("pot_tunning_1")
+	PORT_START("pot_tuning_1")
 	PORT_ADJUSTER(50, "SNARE TUNING");
-	PORT_START("pot_tunning_2")
+	PORT_START("pot_tuning_2")
 	PORT_ADJUSTER(50, "HI TOM TUNING");
-	PORT_START("pot_tunning_3")
+	PORT_START("pot_tuning_3")
 	PORT_ADJUSTER(50, "MID TOM TUNING");
-	PORT_START("pot_tunning_4")
+	PORT_START("pot_tuning_4")
 	PORT_ADJUSTER(50, "LO TOM TUNING");
-	PORT_START("pot_tunning_5")
+	PORT_START("pot_tuning_5")
 	PORT_ADJUSTER(50, "HI CONGAS TUNING");
-	PORT_START("pot_tunning_6")
+	PORT_START("pot_tuning_6")
 	PORT_ADJUSTER(50, "LO CONGAS TUNING");
-	PORT_START("pot_tunning_7")
+	PORT_START("pot_tuning_7")
 	PORT_ADJUSTER(50, "HIHAT DECAY");
 
 	PORT_START("pot_pan_1")

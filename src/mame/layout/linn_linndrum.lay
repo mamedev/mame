@@ -59,7 +59,7 @@ copyright-holders:m1macrophage
 	<element name="txt_drum_bottom_7"><text string=""><color red="0.82" green="0.43" blue="0.31"/></text></element>
 	<element name="txt_drum_bottom_8"><text string=""><color red="0.82" green="0.43" blue="0.31"/></text></element>
 
-	<element name="txt_tunning"><text string="TUNNING"><color red="0.82" green="0.43" blue="0.31"/></text></element>
+	<element name="txt_tuning"><text string="TUNING"><color red="0.82" green="0.43" blue="0.31"/></text></element>
 	<element name="txt_decay"><text string="DECAY"><color red="0.82" green="0.43" blue="0.31"/></text></element>
 	<element name="txt_tune_1"><text string=""><color red="0.82" green="0.43" blue="0.31"/></text></element>
 	<element name="txt_tune_2"><text string="HI"><color red="0.82" green="0.43" blue="0.31"/></text></element>
@@ -166,7 +166,7 @@ copyright-holders:m1macrophage
 			<rect stroke="#f28367" fill="none" stroke-width="3" width="124" height="273" rx="16" ry="16"/>
 		]]></data></image>
 	</element>
-	<element name="outline_tunning">
+	<element name="outline_tuning">
 		<image><data><![CDATA[
 			<rect stroke="#f28367" fill="none" stroke-width="3" width="783" height="195" rx="16" ry="16"/>
 		]]></data></image>
@@ -520,15 +520,15 @@ copyright-holders:m1macrophage
 		</element>
 		<element ref="txt_play"><bounds x="1012" y="1068" width="114" height="24"/></element>
 
-		<!-- TUNNING -->
-		<element ref="outline_tunning"><bounds x="1138" y="425" width="783" height="195"/></element>
-		<element ref="txt_tunning"><bounds x="1473" y="435" width="118" height="24"/></element>
+		<!-- TUNING -->
+		<element ref="outline_tuning"><bounds x="1138" y="425" width="783" height="195"/></element>
+		<element ref="txt_tuning"><bounds x="1473" y="435" width="118" height="24"/></element>
 		<element ref="line"><bounds x="1183" y="445" width="295" height="2"/></element>
 		<element ref="line"><bounds x="1590" y="445" width="295" height="2"/></element>
 		<repeat count="7">
 			<param name="i" start="1" increment="1"/>
 			<param name="x" start="1183" increment="106"/>
-			<param name="knob_input" value="pot_tunning_~i~"/>
+			<param name="knob_input" value="pot_tuning_~i~"/>
 			<group ref="knob"><bounds x="~x~" y="495" width="54" height="54"/></group>
 			<element ref="txt_tune_~i~"><bounds x="~x~" y="560" width="54" height="17"/></element>
 		</repeat>
