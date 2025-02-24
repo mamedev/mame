@@ -555,6 +555,7 @@ screen_device::screen_device(const machine_config &mconfig, const char *tag, dev
 	, m_curbitmap(0)
 	, m_curtexture(0)
 	, m_changed(true)
+	, m_last_partial_reset(attotime::zero)
 	, m_last_partial_scan(0)
 	, m_partial_scan_hpos(0)
 	, m_color(rgb_t(0xff, 0xff, 0xff, 0xff))
@@ -877,6 +878,7 @@ void screen_device::device_start()
 	save_item(NAME(m_visarea.min_y));
 	save_item(NAME(m_visarea.max_x));
 	save_item(NAME(m_visarea.max_y));
+	save_item(NAME(m_last_partial_reset));
 	save_item(NAME(m_last_partial_scan));
 	save_item(NAME(m_frame_period));
 	save_item(NAME(m_brightness));
@@ -1169,6 +1171,14 @@ bool screen_device::update_partial(int scanline)
 		return false;
 	}
 
+	// skip if we already rendered this frame
+	// this can happen if the executing cpu timeslice is in the previous frame while scanline 0 already started
+	if (m_last_partial_scan == 0 && m_last_partial_reset > machine().time())
+	{
+		LOG_PARTIAL_UPDATES(("skipped because frame was already rendered\n"));
+		return false;
+	}
+
 	// set the range of scanlines to render
 	rectangle clip(m_visarea);
 	clip.sety((std::max)(clip.top(), m_last_partial_scan), (std::min)(clip.bottom(), scanline));
@@ -1276,6 +1286,14 @@ void screen_device::update_now()
 	if (current_vpos == m_last_partial_scan && current_hpos == m_partial_scan_hpos)
 	{
 		LOG_PARTIAL_UPDATES(("skipped because beam position is unchanged\n"));
+		return;
+	}
+
+	// skip if we already rendered this frame
+	// this can happen if the executing cpu timeslice is in the previous frame while scanline 0 already started
+	if (m_last_partial_scan == 0 && m_partial_scan_hpos == 0 && m_last_partial_reset > machine().time())
+	{
+		LOG_PARTIAL_UPDATES(("skipped because frame was already rendered\n"));
 		return;
 	}
 
@@ -1394,6 +1412,7 @@ void screen_device::update_now()
 
 void screen_device::reset_partial_updates()
 {
+	m_last_partial_reset = machine().time();
 	m_last_partial_scan = 0;
 	m_partial_scan_hpos = 0;
 	m_partial_updates_this_frame = 0;
