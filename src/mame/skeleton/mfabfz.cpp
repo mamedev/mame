@@ -2,22 +2,74 @@
 // copyright-holders:rfka01
 /***************************************************************************
 
-Mikrocomputer fuer Ausbildung
-Berufsfoerdungszentrum Essen
-Information found on Wikipedia:
-- System is a backbone upon which all functions are available on plug-in cards
-- 32k RAM, 32k ROM - either multiple 8k or 16k modules or a single 64k module 
-  are used for the desired RAM/ROM complement
-- Serial is via CPU SID/SOD pins, but can be replaced by 8251 on RS232 card
-- Protocol is COM1, 4800, 8N1
-- Timer card uses 8253
-- PIO card uses 8255 and has a printer interface
-- Cassette interface uses RS232 card
-- Optional floppy (both sizes); and a EPROM burner
-- OS: MAT85
+Mikrocomputer für Ausbildung
+Berufsfördungszentrum Essen (Vocational training center)
 
-Manuals have no schematics and no mention of the 8253 or 8255. The bios
-doesn't try communicating with them either.
+This system was developed to be built in electronics classes at the vocational training center.
+Students would either buy kits or etch PCBs and assemble their system bit by bit, helped along 
+by well put together books.
+In its most simple form it didn't even need a CPU, the bus control and monitor modules were used
+to explain the relationship between bus signals, addresses and data.
+
+
+Known "official" modules (published in the official manuals): 
+0.1 Baugruppentraeger mit Busverdrahtung (passive backplane with 11 slots, later 14 slots)
+0.2 - Busabschluss (bus termination)
+1.1 - Trafo-Einschub (power supply) and 1.2 - Spannungsregelung (voltage regulation), later combined into one module
+2.1 - Prozessor 8085 (8085 CPU and a serial port via the SID/SOD pins of the CPU)
+2.2 - NSC800 Adapter (small PCB replaces the 8085 with a NSC800 CPU for Z80 compatibility)
+3.1 - 8K RAM/EPROM
+3.2 - 16K RAM/EPROM
+3.3 - 64K RAM (up to 64K of RAM and a socket for a monitor/boot EPROM)
+4.1 - 8-bit-Parallel-Ausgabe (output, eight LEDs and eight sockets for jumper leads)
+4.2 - 8-bit-Parallel-Eingabe (input, eight LEDs and eight switches)
+4.3 - Programmierbare Parallelschnittstelle (programmable parallel port, 8255 based), this is the basis for 4.3a, b and c as well as the GAL-Programmer 4.14
+4.3a- Eprommer (EPROM programmer, based on the parallel card)
+4.3b- Drucker-Interface (printer port, see pinout table)
+4.3c- Zeitwerk (four signals can be delayed, the front has for potentiometers to set the time, and LEDs to show the state of the delayed signals)
+4.4 - Serielle Ein-/Ausgabe, universell programmierbar (programmable serial card, 8251 based), this is the basis for 4.4a
+4.4a- Kassetten-Interface (with a 5 pin DIN socket for the cassette recorder and two status LEDs)
+4.5 - Analoge Ein-Ausgabe 2 kanalig (two channel analogue in- and output card, two AD558JD converters, five sockets for jump leads)
+4.6 - Zähler und Zeitgeber (counters and timers, 8253 based, interrupt switch, jump lead sockets for Out 0,1,2 Clk 1,2 and Gate 1,2
+4.7 - Floppy Disk Interface (WD1793 based, card only or as a module with a 3.5" 80 track DD floppy drive, of which only 40 tracks are used in MAT and original
+      CP/M mode (320K)
+4.8 - 8bit Parallel Eingabe galvanisch getrennt (optocoupled input, 8 LEDs and cable connectors for data and ground)
+4.9 - 8bit Parallel Ausgabe galvanisch getrennt (optocoupled output, 8 LEDs and cable connectors for data and ground)
+4.10- V24-RS232 Schnittstelle (serial port, 8251 based)
+4.13- AD-DA Wandler (analogue-digital converter, three sockets for jump leads in/out/ground, uses two ZN427E-8 AD-converters and an UA747CN opamp)
+4.14- Vektor Interrupt Karte (six interrupt sources on channels A,B and C, 100Hz output and in/out for INTA carry?)
+4.14- GAL-Programmierinterface (the code 14 has been used twice)
+5.1 - Bus-Signalgeber (bus controller, on/off switch, four digit hex address input, two digit hex data input, MEMW, MEMR, IOW and IOR push buttons)
+5.2 - Bus-Signalanzeige (bus monitor, four digit hex address LED display, two digit hex data LED display, step push button, HLT/RUN and ON/OFF ADDR STOP
+      switches, LEDs for MEMW, MEMR, IOW, IOR and INSTR
+5.3 - Adapterkarte (extender card to troubleshoot cards outside the case)
+5.4 - Fehlersimulation (fault simulation)
+8.2 - Video Keyboard Interface (first version, uses AY-5-1013, EF 9364 AP)
+8.4 - Video Keyboard Interface (second version, required for CP/M unless you want to use a seperate serial terminal, NS405-A12N, 8K chargen ROM, 16K RAM, has a 
+	  TVI terminal emulation mode)
+
+There are 16 IO base addresses from 0x00 ... 0xff, this is configurable on most of the interfaces.
+
+Cassette:
+- Like many early designs, the interface is grossly over-complicated, using 12 chips.
+- Similar to Kansas City, except that 1 = 3600Hz, 0 = 2400Hz
+- The higher frequencies, only 50% apart, cause the interface to be less reliable
+- Baud rates of 150, 300, 600, 1200 selected by a jumper. We emulate 1200 only,
+  as the current code would be too unreliable with the lower rates.
+  
+CP/M Ausbaustufe (CP/M expansion level):
+The modularity of this teaching system meant that most of the components of a complete
+system capable of CP/M were available, you could etch your own PCBs or buy kits.
+You could buy the manual for the CP/M expansion that describes the modifications to turn
+your training kit into a full blown CP/M machine, but it was closed source.
+In 2019, in a community effort for the German vintage computer forum https://forum.classic-computing.de/forum/ ,
+Mike Douglas at https://deramp.com/downloads/mfa_computer/ released an open source CP/M version and
+monitor ROM. 
+In the CP/M capable version, the MFA uses an 8085 processor, 64K RAM card with a bankable 2K boot
+EPROM, one or more serial cards at I/O addresses 0xA0, 0x90 and 0xF0, a printer card at E0 and a WD1793
+based floppy controller at 0xC0. Bank switching is performed by a read at address 0xf200.
+The console is at 0xA0 and can be handled via a terminal emulator on a PC or routed over the computer's
+bus to a video/keyboard module. The terminal is set to 9600 Baud, no parity, 1 stop bit.
 
 Row    a         c
 |-------------------------|
@@ -55,7 +107,8 @@ Row    a         c
 | 0V       32    0V       | 
 |-------------------------
 
-Commands:
+
+MAT monitor commands:
 A     Assembler
 B     Set Breakpoint
 D     Disassembler
@@ -71,33 +124,11 @@ R     Set initial register contents
 S     Save memory to tape
 T     Trace interval
 
-Pressing enter will change the prompt from KMD > to KMD+> for the commands present in
+Pressing Enter will change the prompt from KMD > to KMD+> for the commands present in
 the extended MAT ROM, and pressing space will change it back.
 
 mfabfz85 -bios 0, 3 and 4 work; others produce rubbish.
 
-Cassette:
-- Like many early designs, the interface is grossly over-complicated, using 12 chips.
-- Similar to Kansas City, except that 1 = 3600Hz, 0 = 2400Hz
-- The higher frequencies, only 50% apart, cause the interface to be less reliable
-- Baud rates of 150, 300, 600, 1200 selected by a jumper. We emulate 1200 only,
-  as the current code would be too unreliable with the lower rates.
-  
-CP/M Ausbaustufe (CP/M expansion level):
-The modularity of this teaching system meant that most of the components of a complete
-system capable of CP/M were available, you could etch your own PCBs or buy kits.
-You could buy the manual for the CP/M expansion that describes the modifications to turn
-your training kit into a full blown CP/M machine, but it was closed source.
-In 2019, in a community effort for the German vintage computer forum https://forum.classic-computing.de/forum/ ,
-Mike Douglas at https://deramp.com/downloads/mfa_computer/ released an open source CP/M version and
-monitor ROM. This effort revealed that the MFA's floppy module contained a 3.5"/80 track DD floppy drive
-and could use any DD capable drive. In its native MFA and the original MFA CP/M mode, only
-the first 40 tracks were used.
-In the CP/M capable version, the MFA uses an 8085 processor, 64K RAM card with a bankable 2K boot
-EPROM, one or more serial cards at I/O addresses 0xA0, 0x90 and 0xF0, a printer card at E0 and a WD1793
-based floppy controller at 0xC0. Bank switching is performed by a read at address 0xf200.
-The console is at 0xA0 and can be handled via a terminal emulator on a PC or routed over the computer's
-bus to a video/keyboard module. The terminal is set to 9600 Baud, no parity, 1 stop bit.
 
 ****************************************************************************/
 
@@ -172,13 +203,17 @@ void mfabfz_state::mfabfz_mem(address_map &map)
 	map(0x8000, 0xffff).ram();
 }
 
-// According to the manual for the 64k RAM card, in the original MFA mode, 
-// reading an address equal or higher to the boundary set by solder bridges on the card
-// (which offers the banking of 2/4/8/16/32k ROMs and is needed for CP/M mode), 
+// According to the manual for the 64k RAM card, in the original MFA mode,
+// reading an address equal or higher to the boundary (0x8000 or 0xc000) set by solder bridges on the card,
 // memory operations below the boundary reset the card to its ROM active state.
-// For CP/M mode, this behaviour can be changed, so that ROM is banked out by a 
-// read from 0xf200 (CP/M boot ROMs are 2k), and only a reset will restore 
-// ROM from 0x0000.
+// For CP/M mode, this behaviour can be changed, so that ROM is banked out, and only a reset will restore
+// ROM from 0x0000. 
+// The 64k card offers the banking of 2/4/8/16/32k ROMs and is needed for CP/M mode, unless you modify one of
+// four 16k cards by adding the boot logic. This is described in the CP/M manual.
+// The original original boot ROM contains the hardware dependant BIOS portion of CP/M and copies that
+// to addresses starting from 0xf200. It jumps to the copy in RAM at 0xf200, and this read causes ROM to be banked out.
+// The open CP/M has a monitor program in ROM, the BIOS portion resides on disk. It copies itself to 0xf800 for execution
+// from RAM.
 
 // Memory card manual at https://oldcomputers.dyndns.org/public/pub/rechner/mfa_mikrocomputer_fuer_ausbildung/mfa_64k_ram_rom_3.3b/mfa_-_64k_ram_rom.pdf
 // CP/M manual at https://oldcomputers.dyndns.org/public/pub/rechner/mfa_mikrocomputer_fuer_ausbildung/mfa_cpm_handbuch/mfa_-_cpm_handbuch.pdf
