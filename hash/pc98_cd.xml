@@ -25,8 +25,9 @@ license:CC0-1.0
 		-->
 		<!-- "XFree86 3.1.2 Beta(98) Version PL.0" printed on CD -->
 		<!-- "ISO 9660 / Rock Ridge extension" printed on CD -->
-		<description>FreeBSD(98) Nyuumon Kit (2.1.OR)</description>
-		<year>1995</year>
+		<!-- 07/1996 as per file timestamps -->
+		<description>FreeBSD(98) Nyuumon Kit (2.1.0R)</description>
+		<year>1996</year>
 		<publisher>Shuwa System</publisher>
 		<notes><![CDATA[
 boot.flp: cannot read CD-ROM device at install time

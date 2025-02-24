@@ -412,7 +412,7 @@ Known Bug List
 ==============
 CPS2:
 * CPS2 can do raster effects, certainly used by ssf2 (Cammy, DeeJay, T.Hawk levels),
-  msh (lava level, early in attract mode) and maybe others (xmcotaj, vsavj).
+  msh (Blackheart lava stage) and maybe others (xmcotaj, vsavj).
   IRQ4 is some sort of scanline interrupt used for that purpose.
 
 * Its unknown what CPS2_OBJ_BASE register (0x400000) does but it is not a object base
