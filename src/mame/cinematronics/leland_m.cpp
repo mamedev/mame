@@ -34,11 +34,9 @@
 #define VERBOSE             LOG_WARN
 #include "logmacro.h"
 
+
+
 /* Internal routines */
-
-
-
-
 
 /*************************************
  *
@@ -104,7 +102,6 @@ u8 leland_state::cerberus_dial_2_r()
  *  Alley Master inputs
  *
  *************************************/
-
 
 void leland_state::alleymas_joystick_kludge(u8 data)
 {
@@ -859,6 +856,7 @@ void ataxx_state::ataxx_battery_ram_w(offs_t offset, u8 data)
 	}
 	else if ((m_master_bank & 0x30) == 0x20)
 	{
+		m_screen->update_partial(m_screen->vpos() - 1);
 		m_ataxx_qram[((m_master_bank & 0xc0) << 8) | offset] = data;
 		m_tilemap->mark_tile_dirty(((m_master_bank & 0x80) << 8) | offset);
 	}

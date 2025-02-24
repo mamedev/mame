@@ -154,9 +154,7 @@ void ataxx_state::video_start()
 
 void leland_state::scroll_w(offs_t offset, u8 data)
 {
-	int scanline = m_screen->vpos();
-	if (scanline > 0)
-		m_screen->update_partial(scanline - 1);
+	m_screen->update_partial(m_screen->vpos() - 1);
 
 	/* adjust the proper scroll value */
 	switch (offset)
@@ -185,12 +183,10 @@ void leland_state::scroll_w(offs_t offset, u8 data)
 
 void leland_state::gfx_port_w(u8 data)
 {
-	int scanline = m_screen->vpos();
-	if (scanline > 0)
-		m_screen->update_partial(scanline - 1);
-
 	if (m_gfxbank != data)
 	{
+		m_screen->update_partial(m_screen->vpos() - 1);
+
 		m_gfxbank = data;
 		m_tilemap->mark_all_dirty();
 	}
@@ -274,11 +270,7 @@ void leland_state::vram_port_w(offs_t offset, u8 data, int num)
 	int inc = (offset >> 2) & 2;
 	int trans = (offset >> 4) & num;
 
-	/* don't fully understand why this is needed.  Isn't the
-	   video RAM just one big RAM? */
-	int scanline = m_screen->vpos();
-	if (scanline > 0)
-		m_screen->update_partial(scanline - 1);
+	m_screen->update_partial(m_screen->vpos() - 1);
 
 	if (addr >= 0xf000)
 		LOGMASKED(LOG_COMM, "%s:%s comm write %04X = %02X\n", machine().describe_context(), num ? "slave" : "master", addr, data);
