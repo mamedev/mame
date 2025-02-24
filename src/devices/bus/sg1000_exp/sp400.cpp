@@ -107,6 +107,14 @@ sp400_printer_device::sp400_printer_device(const machine_config &mconfig, const 
 
 void sp400_printer_device::device_start()
 {
+	save_item(NAME(m_data));
+	save_item(NAME(m_busy));
+	save_item(NAME(m_dserdataout));
+	save_item(NAME(m_dserstrobe));
+	save_item(NAME(m_motbusy));
+	save_item(NAME(m_motPenUp));
+	save_item(NAME(m_motPenDown));
+	save_item(NAME(m_pendown));
 }
 
 void sp400_printer_device::device_reset()
