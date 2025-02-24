@@ -508,7 +508,6 @@ void leland_state::leland_video(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::BGR_233, 1024);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->set_raw(14.318181_MHz_XTAL / 2, 424, 0, 320, 256, 0, 240);
 	m_screen->set_screen_update(FUNC(leland_state::screen_update));
 	m_screen->set_palette(m_palette);
