@@ -75,6 +75,23 @@ void konamigx_state::K055550_word_w(offs_t offset, uint16_t data, uint16_t mem_m
 					mspace.write_word(i, m_prot_data[0x1a/2]);
 			break;
 
+			case 0x98: // memcpy of some kind. incomplete
+			{
+				// known use cases:
+				// viostorm: transfer "color check" palette
+
+				const u32 dst = (m_prot_data[7] << 16) | m_prot_data[8];
+				const u32 src = (m_prot_data[2] << 16) | m_prot_data[3];
+				const u32 count = m_prot_data[10] << 16 | m_prot_data[11] >> 2;
+
+				for(int x = 0; x < count; ++x)
+				{
+					const u32 src_data = mspace.read_dword(src + x * 8);
+					mspace.write_dword(dst + x *4, src_data);
+				}
+			}
+			break;
+
 			// WARNING: The following cases are speculation based with questionable accuracy!(AAT)
 
 			case 0x87: // unknown memory write (Violent Storm at 0x00b6ea)
