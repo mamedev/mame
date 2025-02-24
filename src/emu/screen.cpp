@@ -1042,19 +1042,19 @@ void screen_device::reset_origin(int beamy, int beamx)
 	m_vblank_end_time = curtime - attotime(0, beamy * m_scantime + beamx * m_pixeltime);
 	m_vblank_start_time = m_vblank_end_time - attotime(0, m_vblank_period);
 
-	// if we are resetting relative to (0,0) == VBLANK end, call the
-	// scanline 0 timer by hand now; otherwise, adjust it for the future
-	if (beamy == 0 && beamx == 0)
-		reset_partial_updates();
-	else
-		m_scanline0_timer->adjust(time_until_pos(0));
-
 	// if we are resetting relative to (visarea.bottom() + 1, 0) == VBLANK start,
 	// call the VBLANK start timer now; otherwise, adjust it for the future
 	if (beamy == ((m_visarea.bottom() + 1) % m_height) && beamx == 0)
 		vblank_begin(0);
 	else
 		m_vblank_begin_timer->adjust(time_until_vblank_start());
+
+	// if we are resetting relative to (0,0) == VBLANK end, call the
+	// scanline 0 timer by hand now; otherwise, adjust it for the future
+	if (beamy == 0 && beamx == 0)
+		reset_partial_updates();
+	else
+		m_scanline0_timer->adjust(time_until_pos(0));
 }
 
 
