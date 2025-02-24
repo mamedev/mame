@@ -20806,8 +20806,8 @@ spk205us
 spk306us
 
 @source:igt/drw80pkr.cpp
-drw80pk2
 drw80pkr
+drw80wld
 
 @source:igt/fortune1.cpp
 babydad
