@@ -4710,7 +4710,7 @@ ROM_START( cbajbl )
 	ROM_LOAD( "uo220.bin",         0x1400000, 0x200000, BAD_DUMP CRC(19102f15) SHA1(b7964e0cb53b608b775d7a713b63f13307b1b532) ) // cb-04.220 [1/2] 2 bits different
 	ROM_LOAD( "uo220h.bin",        0x1600000, 0x200000, BAD_DUMP CRC(e7b94df3) SHA1(07b5d85e1a337f10c25cebdb0f3f893e38a1db6c) ) // cb-04.220 [2/2] 5 bits different
 	ROM_LOAD( "uo221.bin",         0x1800000, 0x200000, CRC(701d7c4e) SHA1(b06c2db7e06d453991f9872bcb62951eb62b5d56) ) // cb-05.221 [1/2]
-	ROM_LOAD( "uo221h.bin"     ,   0x1a00000, 0x200000, CRC(5e93c0d6) SHA1(2ec5afd53eee9e8e6e2ac91a269a5ec55cef4da1) ) // cb-05.221 [2/2]
+	ROM_LOAD( "uo221h.bin",        0x1a00000, 0x200000, CRC(5e93c0d6) SHA1(2ec5afd53eee9e8e6e2ac91a269a5ec55cef4da1) ) // cb-05.221 [2/2]
 	ROM_LOAD( "uo222.bin",         0x1c00000, 0x200000, CRC(76ad7801) SHA1(9cb38aff86f3f8151145f2661bf1261adbd2ec1c) ) // cb-06.222 [1/2]
 	ROM_LOAD( "uo222h.bin",        0x1e00000, 0x200000, CRC(34561670) SHA1(2131fcbbc8bc3da31cd4ef027ec6688af212b7c1) ) // cb-06.222 [2/2]
 	ROM_LOAD( "uo223.bin",         0x2000000, 0x200000, CRC(d4a80392) SHA1(d8d69e8a15910471b718dc6531e4470fc35365cc) ) // cb-07.223 [1/2]
