@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders: Jaume López
 
-//#define VERBOSE 1
+#define VERBOSE 1
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
@@ -95,12 +95,12 @@ namespace
 			uint8_t m_vrtc = 0;
 			uint8_t m_pixel = 0;
 
-			uint8_t m_ros_page;
-			uint8_t m_ram_r_page;
-			uint8_t m_ram_w_page;
-			uint8_t m_dma_page;
+			uint8_t m_ros_page = 0;
+			uint8_t m_ram_r_page = 0;
+			uint8_t m_ram_w_page = 0;
+			uint8_t m_dma_page = 0;
 
-			uint8_t m_port_4e;
+			uint8_t m_port_4e = 0;
 
 			//uint8_t ram_r(offs_t offset);
 			//void ram_w(offs_t offset, uint8_t data);
@@ -109,8 +109,8 @@ namespace
 
 			uint32_t m_rst75_enabled;
 
-			int m_sod;
-			int m_ros_w;
+			int m_sod = 0;
+			int m_ros_w = 0;
 
 			void diag_digits_w(uint8_t data);
 
@@ -137,6 +137,7 @@ namespace
 
 			void update_speaker(uint32_t state);
 			void rst75(uint32_t state);
+			//void rst65(uint32_t state);
 			void rst55(uint32_t state);
 
 			uint8_t ros_page_r();
@@ -227,8 +228,14 @@ namespace
 
 		using namespace i8275_attributes;
 
+		int hi_char = BIT(charcode,6);
+		int char_page = 0;
+		char_page |= ((hi_char && BIT(m_bus_test_register, 1)) << 0);
+		char_page |= ((hi_char && BIT(m_bus_test_register, 2)) << 1);
+		char_page |= ((hi_char && BIT(m_bus_test_register, 3)) << 2);
+
 		if (!BIT(attrcode, VSP))
-			gfx = m_chargen[(linecount & 15) | (charcode << 4) /*| (chr_bank << 10)*/];
+			gfx = m_chargen[(linecount & 0x0f) | ((charcode & 0x7f) << 4) /* | (char_page << 10) */];
 
 		if (BIT(attrcode, LTEN))
 		 	gfx = 0xff;
@@ -344,8 +351,7 @@ namespace
 
 	void system23_state::update_speaker(uint32_t state)
 	{
-		uint32_t speaker_enable = (m_port_4e && BIT(m_port_4e, 1)) ? CLEAR_LINE : ASSERT_LINE;
-		uint32_t speaker_state = (speaker_enable ? CLEAR_LINE : ASSERT_LINE) & state;
+		uint32_t speaker_state = BIT(m_port_4e, 1) && state;
 		m_speaker->level_w(speaker_state);
 	}
 
@@ -355,6 +361,12 @@ namespace
 		m_maincpu->set_input_line(I8085_RST75_LINE, state);
 	}
 
+	// void system23_state::rst65(uint32_t state)
+	// {
+	// 	LOG("RST6.5\n");
+	// 	m_maincpu->set_input_line(I8085_RST65_LINE, state);
+	// }
+
 	void system23_state::rst55(uint32_t state)
 	{
 		LOG("RST5.5\n");
@@ -363,14 +375,7 @@ namespace
 
 	void system23_state::reset_keyboard(uint8_t data)
 	{
-		if(BIT(data,7))
-		{
-			m_keyboard->reset_w(CLEAR_LINE);
-		}
-		else
-		{
-			m_keyboard->reset_w(ASSERT_LINE);
-		}
+		m_keyboard->reset_w(!BIT(data,7));
 		m_pic->ir0_w(BIT(data,3));
 		m_keyboard->t0_w(BIT(data,5));
 	}
@@ -615,7 +620,7 @@ namespace
 		ROM_SYSTEM_BIOS(0, "ros_104", "ROS 1.04 - 1982?")
 		ROM_SYSTEM_BIOS(1, "ros_101", "ROS 1.01 - 1980")
 
-		ROM_REGION(0x24000, "maincpu", ROMREGION_ERASEFF)
+		ROM_REGION(0x34000, "maincpu", ROMREGION_ERASEFF)
 		//ROS 1.04 (1982?)
 		ROMX_LOAD("02_61c9866a_4481186.bin", 0x00000, 0x2000, CRC(61c9866a) SHA1(43f2bed5cc2374c7fde4632948329062e57e994b), ROM_BIOS(0))
 		ROMX_LOAD("09_07843020_8493747.bin", 0x02000, 0x2000, CRC(07843020) SHA1(828ca0199af1246f6caf58bcb785f791c3a7e34e), ROM_BIOS(0))
