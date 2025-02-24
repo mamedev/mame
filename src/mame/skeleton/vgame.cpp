@@ -122,7 +122,7 @@ static INPUT_PORTS_START( hilice )
 INPUT_PORTS_END
 
 
-// TODO: wrong, just enough to glimpse some alphanumericals
+// TODO: wrong, just enough to glimpse some alphanumerics
 static GFXDECODE_START( gfx_vgame )
 	GFXDECODE_ENTRY( "gfx", 0, gfx_16x16x4_packed_lsb, 0, 1 )
 GFXDECODE_END
