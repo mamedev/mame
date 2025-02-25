@@ -389,8 +389,8 @@ void tatsumi_state::draw_sprites(BitmapClass &bitmap, const rectangle &cliprect,
 		if (index >= 0x4000)
 			continue;
 
-		uint8_t const *src1 = m_rom_sprite_lookup[0] + (index * 4);
-		uint8_t const *src2 = m_rom_sprite_lookup[1] + (index * 4);
+		uint8_t const *src1 = m_sprites_l_rom + (index * 4);
+		uint8_t const *src2 = m_sprites_h_rom + (index * 4);
 
 		int lines = src1[2];
 		int y_offset = src1[0]&0xf8;
@@ -517,9 +517,8 @@ void tatsumi_state::draw_sprites(BitmapClass &bitmap, const rectangle &cliprect,
  */
 void tatsumi_state::update_cluts(int object_base, int length)
 {
-
-	const uint8_t* bank1 = m_rom_clut[0];
-	const uint8_t* bank2 = m_rom_clut[1];
+	const uint8_t* bank1 = m_sprites_l_rom + m_rom_clut_offset;
+	const uint8_t* bank2 = m_sprites_h_rom + m_rom_clut_offset;
 	for (int i=0; i<length; i+=8)
 	{
 		m_fakepalette->set_pen_color(i+0,m_palette->pen_color(bank1[1]+object_base));

@@ -1547,12 +1547,7 @@ ROM_END
 
 void apache3_state::init_apache3()
 {
-	// Copy sprite & palette data out of GFX rom area
-	m_rom_sprite_lookup[0] = memregion("sprites_l")->base();
-	m_rom_sprite_lookup[1] = memregion("sprites_h")->base();
-	m_rom_clut[0] = memregion("sprites_l")->base()+ 0x100000 - 0x800;
-	m_rom_clut[1] = memregion("sprites_h")->base()+ 0x100000 - 0x800;
-
+	m_rom_clut_offset = 0x100000 - 0x800;
 	tatsumi_reset();
 
 	m_apache3_rot_idx = 0;
@@ -1565,26 +1560,19 @@ void apache3_state::init_apache3()
 
 void roundup5_state::init_roundup5()
 {
-	// Copy sprite & palette data out of GFX rom area
-	m_rom_sprite_lookup[0] = memregion("sprites_l")->base();
-	m_rom_sprite_lookup[1] = memregion("sprites_h")->base();
-	m_rom_clut[0] = memregion("sprites_l")->base()+ 0xc0000 - 0x800;
-	m_rom_clut[1] = memregion("sprites_h")->base()+ 0xc0000 - 0x800;
-
+	m_rom_clut_offset = 0xc0000 - 0x800;
 	tatsumi_reset();
 }
 
 void cyclwarr_state::init_cyclwarr()
 {
-	int len1 = memregion("sprites_l")->bytes();
-	int len2 = memregion("sprites_h")->bytes();
+	m_rom_clut_offset = 0x100000 - 0x1000;
+	tatsumi_reset();
+}
 
-	// Copy sprite & palette data out of GFX rom area
-	m_rom_sprite_lookup[0] = memregion("sprites_l")->base();
-	m_rom_sprite_lookup[1] = memregion("sprites_h")->base();
-	m_rom_clut[0] = memregion("sprites_l")->base() + len1 - 0x1000;
-	m_rom_clut[1] = memregion("sprites_h")->base() + len2 - 0x1000;
-
+void cyclwarr_state::init_bigfight()
+{
+	m_rom_clut_offset = 0x200000 - 0x1000;
 	tatsumi_reset();
 }
 
@@ -1604,5 +1592,5 @@ GAME( 1991, cyclwarr,  0,        cyclwarr,  cyclwarr, cyclwarr_state, init_cyclw
 GAME( 1991, cyclwarra, cyclwarr, cyclwarr,  cyclwarb, cyclwarr_state, init_cyclwarr, ROT0, "Tatsumi", "Cycle Warriors (rev B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // Rev B & A CPU code
 GAME( 1991, cyclwarrb, cyclwarr, cyclwarr,  cyclwarb, cyclwarr_state, init_cyclwarr, ROT0, "Tatsumi", "Cycle Warriors", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // Original version with no Rev roms
 
-GAME( 1992, bigfight,  0,        bigfight,  bigfight, cyclwarr_state, init_cyclwarr, ROT0, "Tatsumi", "Big Fight - Big Trouble In The Atlantic Ocean", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, bigfightj, bigfight, bigfight,  bigfight, cyclwarr_state, init_cyclwarr, ROT0, "Tatsumi", "Big Fight - Big Trouble In The Atlantic Ocean (Japan, rev F)", MACHINE_IMPERFECT_GRAPHICS ) // Rev D through F CPU codes
+GAME( 1992, bigfight,  0,        bigfight,  bigfight, cyclwarr_state, init_bigfight, ROT0, "Tatsumi", "Big Fight - Big Trouble In The Atlantic Ocean", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, bigfightj, bigfight, bigfight,  bigfight, cyclwarr_state, init_bigfight, ROT0, "Tatsumi", "Big Fight - Big Trouble In The Atlantic Ocean (Japan, rev F)", MACHINE_IMPERFECT_GRAPHICS ) // Rev D through F CPU codes

@@ -27,6 +27,8 @@ public:
 		, m_spritegfxdecode(*this, "spritegfxdecode")
 		, m_palette(*this, "palette")
 		, m_fakepalette(*this, "fakepalette")
+		, m_sprites_l_rom(*this, "sprites_l")
+		, m_sprites_h_rom(*this, "sprites_h")
 		, m_videoram(*this, "videoram")
 		, m_sharedram(*this, "sharedram")
 		, m_sprite_control_ram(*this, "obj_ctrl_ram")
@@ -49,6 +51,8 @@ protected:
 	required_device<gfxdecode_device> m_spritegfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<palette_device> m_fakepalette;
+	required_region_ptr<uint8_t> m_sprites_l_rom;
+	required_region_ptr<uint8_t> m_sprites_h_rom;
 
 	optional_shared_ptr<uint16_t> m_videoram;
 	optional_shared_ptr<uint16_t> m_sharedram;
@@ -57,8 +61,7 @@ protected:
 	required_memory_region m_mainregion;
 	required_memory_region m_subregion;
 
-	uint8_t *m_rom_sprite_lookup[2];
-	uint8_t *m_rom_clut[2];
+	int m_rom_clut_offset;
 	uint16_t m_control_word;
 	uint8_t m_last_control;
 	tilemap_t *m_tx_layer;
@@ -211,6 +214,7 @@ public:
 	void bigfight(machine_config &config);
 
 	void init_cyclwarr();
+	void init_bigfight();
 
 protected:
 	virtual void machine_reset() override ATTR_COLD;
