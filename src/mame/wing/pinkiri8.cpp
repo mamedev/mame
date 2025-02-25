@@ -60,7 +60,11 @@ Dumped by Chackn
 class janshi_vdp_device : public device_t, public device_memory_interface, public device_gfx_interface
 {
 public:
+	// constructor/destructor
 	janshi_vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// configurations
+	void set_janshi_hack(bool janshi_hack) { m_janshi_hack = janshi_hack; }
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -86,10 +90,13 @@ private:
 	required_shared_ptr<uint8_t> m_vram2;
 	required_shared_ptr<uint8_t> m_crtc_regs;
 
+	// internal states
+	tilemap_t *m_tilemap = nullptr;
 	uint32_t m_vram_addr;
 	int32_t m_prev_writes;
 
-	tilemap_t *m_tilemap;
+	// configurations
+	bool m_janshi_hack;
 
 	void back_vram_w(offs_t offset, uint8_t data);
 	DECLARE_GFXDECODE_MEMBER(gfxinfo);
@@ -112,6 +119,7 @@ public:
 
 	void pinkiri8(machine_config &config);
 	void ronjan(machine_config &config);
+	void janshi(machine_config &config);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -176,6 +184,7 @@ janshi_vdp_device::janshi_vdp_device(const machine_config &mconfig, const char *
 	, m_crtc_regs(*this, "crtc_regs")
 	, m_vram_addr(0)
 	, m_prev_writes(0)
+	, m_janshi_hack(false)
 {
 }
 
@@ -269,12 +278,8 @@ TILE_GET_INFO_MEMBER(janshi_vdp_device::get_tile_info)
 
 void janshi_vdp_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bool MACHINE_TYPE_hack = false;
-
-	if (!strcmp(machine().system().name,"janshi")) MACHINE_TYPE_hack = true;
-
 	//popmessage("%02x", m_crtc_regs[0x0a]);
-	int const col_bank = (m_crtc_regs[0x0a] & 0x40) >> 6;
+	int const col_bank = BIT(m_crtc_regs[0x0a], 6);
 
 	for (int i = (0x1000 / 4) - 4; i >= 0; i--)
 	{
@@ -322,7 +327,7 @@ void janshi_vdp_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 		}
 
 		// hacks!
-		if (MACHINE_TYPE_hack) // janshi
+		if (m_janshi_hack) // janshi
 		{
 			if (spr_offs < 0x400)
 			{
@@ -1116,6 +1121,13 @@ void pinkiri8_state::ronjan(machine_config &config)
 	m_maincpu->in_pg_callback().set(FUNC(pinkiri8_state::ronjan_prot_status_r));
 }
 
+void pinkiri8_state::janshi(machine_config &config)
+{
+	pinkiri8(config);
+
+	m_vdp->set_janshi_hack(true);
+}
+
 /***************************************************************************
 
   Game driver(s)
@@ -1276,7 +1288,7 @@ uint8_t pinkiri8_state::ronjan_patched_prot_r()
 	return 0; //value is read then discarded
 }
 
-GAME( 1992,  janshi,   0,       pinkiri8, janshi,   pinkiri8_state, empty_init, ROT0, "Eagle",         "Janshi",                MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1992,  janshi,   0,       janshi,   janshi,   pinkiri8_state, empty_init, ROT0, "Eagle",         "Janshi",                MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 GAME( 1991,  ronjan,   ronjans, ronjan,   ronjan,   pinkiri8_state, empty_init, ROT0, "Wing Co., Ltd", "Ron Jan (set 1)",       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 GAME( 1994,  ronjana,  ronjans, ronjan,   ronjan,   pinkiri8_state, empty_init, ROT0, "Wing Co., Ltd", "Ron Jan (set 2)",       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 GAME( 1994,  ronjans,  0,       ronjan,   ronjan,   pinkiri8_state, empty_init, ROT0, "Wing Co., Ltd", "Ron Jan Super (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // 'SUPER' flashes in the middle of the screen
