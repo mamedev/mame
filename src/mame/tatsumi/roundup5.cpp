@@ -14,6 +14,17 @@
 
 #include "roundup5.lh"
 
+/* TODO
+
+    - Round Up 5: Finish road layer.
+      Tunnel sections are borderline unplayable, plus slopes are ugly to watch.
+    - Round Up 5: always boots with a coin inserted
+      $5152 is the coin counter, gets an explicit 1 at boot.
+      There are other two buffers read from 68k before that, written to $5156 and $515a
+      If these are 0xffff by then game boots normally ...
+    - (fixed) Round Up 5 doesn't survive a reset
+
+*/
 
 #define CLOCK_1     XTAL(16'000'000)
 #define CLOCK_2     XTAL(50'000'000)

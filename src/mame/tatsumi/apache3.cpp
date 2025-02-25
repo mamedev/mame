@@ -1,6 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail, Angelo Salese
 
+/* TODO:
+
+	- Apache 3: road layer, has twelve rotation registers!
+
+*/
+
 #include "emu.h"
 #include "tatsumi.h"
 

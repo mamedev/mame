@@ -44925,6 +44925,13 @@ apache3
 apache3a
 apache3b
 
+@source:tatsumi/cyclwarr.cpp
+bigfight
+bigfightj
+cyclwarr
+cyclwarra
+cyclwarrb
+
 @source:tatsumi/kingdrby.cpp
 cowrace
 kingdrbb
@@ -44937,13 +44944,6 @@ lockonc
 
 @source:tatsumi/roundup5.cpp
 roundup5
-
-@source:tatsumi/tatsumi.cpp
-bigfight
-bigfightj
-cyclwarr
-cyclwarra
-cyclwarrb
 
 @source:tatsumi/tx1.cpp
 buggyboy
