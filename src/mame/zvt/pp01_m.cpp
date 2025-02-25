@@ -34,7 +34,6 @@ void pp01_state::video_w(u8 block, u16 offset, u8 data, bool part)
 			else
 				ram[rgb_offset[i] + offset] = 0;
 		}
-
 	}
 	else
 	{
@@ -79,7 +78,7 @@ void pp01_state::set_memory(u8 block, u8 data)
 	{
 		// This is RAM
 		space.install_read_bank(startaddr, endaddr, m_bank[block]);
-		switch(data)
+		switch (data)
 		{
 		case 0xe6:
 			space.install_write_handler(startaddr, endaddr, write8sm_delegate(*this, FUNC(pp01_state::video_r_1_w)));
@@ -103,7 +102,6 @@ void pp01_state::set_memory(u8 block, u8 data)
 			space.install_write_bank(startaddr, endaddr, m_bank[block]);
 			break;
 		}
-
 		m_bank[block]->set_base(m_ram->pointer() + (data & 0x0f) * 0x1000);
 	}
 	else if (data >= 0xfc)
