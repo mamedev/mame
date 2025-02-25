@@ -26,6 +26,7 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_spritegfxdecode(*this, "spritegfxdecode")
 		, m_palette(*this, "palette")
+		, m_fakepalette(*this, "fakepalette")
 		, m_videoram(*this, "videoram")
 		, m_sharedram(*this, "sharedram")
 		, m_sprite_control_ram(*this, "obj_ctrl_ram")
@@ -47,6 +48,7 @@ protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<gfxdecode_device> m_spritegfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<palette_device> m_fakepalette;
 
 	optional_shared_ptr<uint16_t> m_videoram;
 	optional_shared_ptr<uint16_t> m_sharedram;
@@ -73,7 +75,7 @@ protected:
 	template<class BitmapClass> inline void roundupt_drawgfxzoomrotate( BitmapClass &dest_bmp, const rectangle &clip,
 		gfx_element *gfx, uint32_t code,uint32_t color,int flipx,int flipy,uint32_t ssx,uint32_t ssy,
 		int scalex, int scaley, int rotate, int write_priority_only );
-	void update_cluts(int fake_palette_offset, int object_base, int length);
+	void update_cluts(int object_base, int length);
 
 	uint8_t m_hd6445_reg[64];
 	void apply_shadow_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &shadow_bitmap, uint8_t xor_output);

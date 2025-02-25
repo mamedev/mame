@@ -829,13 +829,13 @@ static const gfx_layout roundup5_vramlayout =
 };
 
 static GFXDECODE_START( gfx_apache3_sprites )
-	GFXDECODE_ENTRY( "sprites_l", 0, spritelayout,    1024, 256)
-	GFXDECODE_ENTRY( "sprites_h", 0, spritelayout,    1024, 256)
+	GFXDECODE_ENTRY( "sprites_l", 0, spritelayout,    0, 256)
+	GFXDECODE_ENTRY( "sprites_h", 0, spritelayout,    0, 256)
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_cyclwarr_sprites )
-	GFXDECODE_ENTRY( "sprites_l", 0, spritelayout,  8192, 512)
-	GFXDECODE_ENTRY( "sprites_h", 0, spritelayout,  8192, 512)
+	GFXDECODE_ENTRY( "sprites_l", 0, spritelayout,  0, 512)
+	GFXDECODE_ENTRY( "sprites_h", 0, spritelayout,  0, 512)
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_apache3 )
@@ -907,9 +907,10 @@ void apache3_state::apache3(machine_config &config)
 	screen.set_raw(CLOCK_2 / 8, 400, 0, 320, 272, 0, 240); // TODO: Hook up CRTC
 	screen.set_screen_update(FUNC(apache3_state::screen_update_apache3));
 
-	GFXDECODE(config, m_spritegfxdecode, m_palette, gfx_apache3_sprites);
+	GFXDECODE(config, m_spritegfxdecode, m_fakepalette, gfx_apache3_sprites);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_apache3);
-	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024 + 4096); // 1024 real colours, and 4096 arranged as series of CLUTs
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024); // 1024 real colours
+	PALETTE(config, m_fakepalette).set_format(palette_device::xRGB_555, 4096); // 4096 arranged as series of CLUTs
 
 	/* apache 3 schematics state
 	bit 4:  250
@@ -960,10 +961,12 @@ void roundup5_state::roundup5(machine_config &config)
 	screen.set_raw(CLOCK_2 / 8, 400, 0, 320, 272, 0, 240); // TODO: Hook up CRTC
 	screen.set_screen_update(FUNC(roundup5_state::screen_update_roundup5));
 
-	GFXDECODE(config, m_spritegfxdecode, m_palette, gfx_apache3_sprites);
+	GFXDECODE(config, m_spritegfxdecode, m_fakepalette, gfx_apache3_sprites);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_roundup5);
-	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024 + 4096); // 1024 real colours, and 4096 arranged as series of CLUTs
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024); // 1024 real colours
 	m_palette->set_membits(8).set_endianness(ENDIANNESS_BIG);
+	PALETTE(config, m_fakepalette).set_format(palette_device::xRGB_555, 4096); // 4096 arranged as series of CLUTs
+	m_fakepalette->set_membits(8).set_endianness(ENDIANNESS_BIG);
 
 	MCFG_VIDEO_START_OVERRIDE(roundup5_state,roundup5)
 
@@ -1042,9 +1045,10 @@ void cyclwarr_state::cyclwarr(machine_config &config)
 	screen.set_raw(CLOCK_2 / 8, 400, 0, 320, 272, 0, 240); // TODO: Hook up CRTC
 	screen.set_screen_update(FUNC(cyclwarr_state::screen_update_cyclwarr));
 
-	GFXDECODE(config, m_spritegfxdecode, m_palette, gfx_cyclwarr_sprites);
+	GFXDECODE(config, m_spritegfxdecode, m_fakepalette, gfx_cyclwarr_sprites);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cyclwarr);
-	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 8192 + 8192);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 8192);
+	PALETTE(config, m_fakepalette).set_format(palette_device::xRGB_555, 8192);
 
 	MCFG_VIDEO_START_OVERRIDE(cyclwarr_state, cyclwarr)
 
@@ -1589,6 +1593,7 @@ void cyclwarr_state::init_cyclwarr()
 /* http://www.tatsu-mi.co.jp/game/trace/index.html */
 
 /* ** 1987  grayout    - Gray Out (not dumped yet) */
+
 GAME( 1988, apache3,   0,        apache3,   apache3,  apache3_state,  init_apache3,  ROT0, "Tatsumi", "Apache 3 (rev F)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // Rev F CPU code
 GAME( 1988, apache3a,  apache3,  apache3,   apache3,  apache3_state,  init_apache3,  ROT0, "Tatsumi", "Apache 3 (rev E)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // Rev C & E CPU code
 GAME( 1988, apache3b,  apache3,  apache3,   apache3,  apache3_state,  init_apache3,  ROT0, "Tatsumi (Kana Corporation license)", "Apache 3 (Kana Corporation license, rev G)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // Rev C & G CPU code
