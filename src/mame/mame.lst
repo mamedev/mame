@@ -44920,6 +44920,11 @@ prav8d
 prav8dd
 telstrat
 
+@source:tatsumi/apache3.cpp
+apache3
+apache3a
+apache3b
+
 @source:tatsumi/kingdrby.cpp
 cowrace
 kingdrbb
@@ -44931,9 +44936,6 @@ lockon
 lockonc
 
 @source:tatsumi/tatsumi.cpp
-apache3
-apache3a
-apache3b
 bigfight
 bigfightj
 cyclwarr

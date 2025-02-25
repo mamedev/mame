@@ -76,62 +76,6 @@ protected:
 	uint8_t m_hd6445_address;
 };
 
-class apache3_state : public tatsumi_state
-{
-public:
-	apache3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: tatsumi_state(mconfig, type, tag)
-		, m_subcpu2(*this, "sub2")
-		, m_apache3_g_ram(*this, "apache3_g_ram")
-		, m_apache3_z80_ram(*this, "apache3_z80_ram")
-		, m_apache3_prom(*this, "proms")
-		, m_vr1(*this, "VR1")
-	{
-	}
-
-	void apache3(machine_config &config);
-
-	void init_apache3();
-
-private:
-	uint16_t apache3_bank_r();
-	void apache3_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void apache3_z80_ctrl_w(uint16_t data);
-	uint16_t apache3_v30_v20_r(offs_t offset);
-	void apache3_v30_v20_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t apache3_z80_r(offs_t offset);
-	void apache3_z80_w(offs_t offset, uint16_t data);
-	uint8_t apache3_vr1_r();
-	void apache3_rotate_w(uint16_t data);
-	void apache3_road_z_w(uint16_t data);
-	void apache3_road_x_w(offs_t offset, uint8_t data);
-
-	DECLARE_MACHINE_RESET(apache3);
-	DECLARE_VIDEO_START(apache3);
-	uint32_t screen_update_apache3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void apache3_68000_reset(int state);
-
-	void apache3_68000_map(address_map &map) ATTR_COLD;
-	void apache3_v20_map(address_map &map) ATTR_COLD;
-	void apache3_v30_map(address_map &map) ATTR_COLD;
-	void apache3_z80_map(address_map &map) ATTR_COLD;
-
-	void draw_sky(bitmap_rgb32 &bitmap, const rectangle &cliprect, int palette_base, int start_offset);
-	void draw_ground(bitmap_rgb32 &dst, const rectangle &cliprect);
-
-	required_device<cpu_device> m_subcpu2;
-
-	required_shared_ptr<uint16_t> m_apache3_g_ram;
-	required_shared_ptr<uint8_t> m_apache3_z80_ram;
-	required_region_ptr<uint8_t> m_apache3_prom;
-
-	required_ioport m_vr1;
-
-	uint16_t m_apache3_rotate_ctrl[12];
-	int m_apache3_rot_idx;
-	std::unique_ptr<uint8_t[]> m_apache3_road_x_ram;
-	uint8_t m_apache3_road_z;
-};
 
 class roundup5_state : public tatsumi_state
 {
