@@ -909,7 +909,7 @@ void apache3_state::apache3(machine_config &config)
 
 	GFXDECODE(config, m_spritegfxdecode, m_fakepalette, gfx_apache3_sprites);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_apache3);
-	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024); // 1024 real colours
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048); // 2048 real colours
 	PALETTE(config, m_fakepalette).set_format(palette_device::xRGB_555, 4096); // 4096 arranged as series of CLUTs
 
 	/* apache 3 schematics state
