@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    Cinemat/Leland driver
+    Cinematronics / Leland Cinemat System driver
 
     Leland video hardware
 
@@ -33,18 +33,17 @@ static constexpr int QRAM_SIZE = 0x10000;
 
 TIMER_CALLBACK_MEMBER(leland_state::scanline_callback)
 {
-	int scanline = param;
+	u8 scanline = param;
+	u8 last_scanline = scanline - 1;
 
 	/* update the DACs */
 	if (!(m_dac_control & 0x01))
-		m_dac[0]->write(m_video_ram[(m_last_scanline) * 256 + 160]);
+		m_dac[0]->write(m_video_ram[last_scanline << 8 | 0xa0]);
 
 	if (!(m_dac_control & 0x02))
-		m_dac[1]->write(m_video_ram[(m_last_scanline) * 256 + 161]);
+		m_dac[1]->write(m_video_ram[last_scanline << 8 | 0xa1]);
 
-	m_last_scanline = scanline;
-
-	scanline = (scanline+1) % 256;
+	scanline++;
 
 	/* come back at the next appropriate scanline */
 	m_scanline_timer->adjust(m_screen->time_until_pos(scanline), scanline);
@@ -114,7 +113,6 @@ void leland_state::video_start()
 	save_item(NAME(m_xscroll));
 	save_item(NAME(m_yscroll));
 	save_item(NAME(m_gfxbank));
-	save_item(NAME(m_last_scanline));
 	for (u8 i = 0; i < 2; i++)
 	{
 		save_item(NAME(m_vram_state[i].m_addr), i);
@@ -242,15 +240,20 @@ int leland_state::vram_port_r(offs_t offset, int num)
 			break;
 
 		default:
-			LOGMASKED(LOG_WARN, "%s: Warning: Unknown video port %02x read (address=%04x)\n",
-						machine().describe_context(), offset, addr);
+			if (!machine().side_effects_disabled())
+				LOGMASKED(LOG_WARN, "%s: Warning: Unknown video port %02x read (address=%04x)\n",
+							machine().describe_context(), offset, addr);
 			ret = 0;
 			break;
 	}
-	state->m_addr = addr;
 
-	if (addr >= 0xf000)
-		LOGMASKED(LOG_COMM, "%s:%s comm read %04X = %02X\n", machine().describe_context(), num ? "slave" : "master", addr, ret);
+	if (!machine().side_effects_disabled())
+	{
+		state->m_addr = addr;
+
+		if (addr >= 0xf000)
+			LOGMASKED(LOG_COMM, "%s:%s comm read %04X = %02X\n", machine().describe_context(), num ? "slave" : "master", addr, ret);
+	}
 
 	return ret;
 }
