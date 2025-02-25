@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "tatsumi_rotating_sprites.h"
+
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
 #include "cpu/m68000/m68000.h"
@@ -23,12 +25,11 @@ public:
 		, m_subcpu(*this, "sub")
 		, m_ym2151(*this, "ymsnd")
 		, m_oki(*this, "oki")
+		, m_rotatingsprites(*this, "rotatingsprites")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_spritegfxdecode(*this, "spritegfxdecode")
 		, m_palette(*this, "palette")
 		, m_fakepalette(*this, "fakepalette")
-		, m_sprites_l_rom(*this, "sprites_l")
-		, m_sprites_h_rom(*this, "sprites_h")
 		, m_videoram(*this, "videoram")
 		, m_sharedram(*this, "sharedram")
 		, m_sprite_control_ram(*this, "obj_ctrl_ram")
@@ -41,18 +42,19 @@ public:
 	INTERRUPT_GEN_MEMBER(v30_interrupt);
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 
+	void init_tatsumi();
+
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<m68000_base_device> m_subcpu;
 	optional_device<ym2151_device> m_ym2151;
 	required_device<okim6295_device> m_oki;
+	required_device<tatsumi_rotating_sprites_device> m_rotatingsprites;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<gfxdecode_device> m_spritegfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<palette_device> m_fakepalette;
-	required_region_ptr<uint8_t> m_sprites_l_rom;
-	required_region_ptr<uint8_t> m_sprites_h_rom;
 
 	optional_shared_ptr<uint16_t> m_videoram;
 	optional_shared_ptr<uint16_t> m_sharedram;
@@ -61,14 +63,9 @@ protected:
 	required_memory_region m_mainregion;
 	required_memory_region m_subregion;
 
-	int m_rom_clut_offset;
-	int m_rom_clut_size;
-	int m_sprite_palette_base;
 	uint16_t m_control_word;
 	uint8_t m_last_control;
 	tilemap_t *m_tx_layer;
-	bitmap_rgb32 m_temp_bitmap;
-	std::unique_ptr<uint8_t[]> m_shadow_pen_array;
 	void text_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t tatsumi_v30_68000_r(offs_t offset);
 	void tatsumi_v30_68000_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -76,11 +73,6 @@ protected:
 	void tatsumi_sprite_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void tatsumi_reset();
-	template<class BitmapClass> void draw_sprites(BitmapClass &bitmap, const rectangle &cliprect, int write_priority_only, int rambank);
-	template<class BitmapClass> inline void roundupt_drawgfxzoomrotate( BitmapClass &dest_bmp, const rectangle &clip,
-		gfx_element *gfx, uint32_t code,uint32_t color,int flipx,int flipy,uint32_t ssx,uint32_t ssy,
-		int scalex, int scaley, int rotate, int write_priority_only );
-	void update_cluts();
 
 	uint8_t m_hd6445_reg[64];
 	void apply_shadow_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &shadow_bitmap, uint8_t xor_output);
@@ -163,7 +155,6 @@ public:
 
 	void roundup5(machine_config &config);
 
-	void init_roundup5();
 
 private:
 	uint16_t roundup_v30_z80_r(offs_t offset);
@@ -214,9 +205,6 @@ public:
 
 	void cyclwarr(machine_config &config);
 	void bigfight(machine_config &config);
-
-	void init_cyclwarr();
-	void init_bigfight();
 
 protected:
 	virtual void machine_reset() override ATTR_COLD;
