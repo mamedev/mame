@@ -1547,7 +1547,8 @@ ROM_END
 
 void apache3_state::init_apache3()
 {
-	m_rom_clut_offset = 0x100000 - 0x800;
+	m_rom_clut_size = 0x800;
+	m_rom_clut_offset = 0x100000 - m_rom_clut_size;
 	tatsumi_reset();
 
 	m_apache3_rot_idx = 0;
@@ -1560,19 +1561,22 @@ void apache3_state::init_apache3()
 
 void roundup5_state::init_roundup5()
 {
-	m_rom_clut_offset = 0xc0000 - 0x800;
+	m_rom_clut_size = 0x800;
+	m_rom_clut_offset = 0xc0000 - m_rom_clut_size;
 	tatsumi_reset();
 }
 
 void cyclwarr_state::init_cyclwarr()
 {
-	m_rom_clut_offset = 0x100000 - 0x1000;
+	m_rom_clut_size = 0x1000;
+	m_rom_clut_offset = 0x100000 - m_rom_clut_size;
 	tatsumi_reset();
 }
 
 void cyclwarr_state::init_bigfight()
 {
-	m_rom_clut_offset = 0x200000 - 0x1000;
+	m_rom_clut_size = 0x1000;
+	m_rom_clut_offset = 0x200000 - m_rom_clut_size;
 	tatsumi_reset();
 }
 

@@ -62,6 +62,7 @@ protected:
 	required_memory_region m_subregion;
 
 	int m_rom_clut_offset;
+	int m_rom_clut_size;
 	uint16_t m_control_word;
 	uint8_t m_last_control;
 	tilemap_t *m_tx_layer;
@@ -78,7 +79,7 @@ protected:
 	template<class BitmapClass> inline void roundupt_drawgfxzoomrotate( BitmapClass &dest_bmp, const rectangle &clip,
 		gfx_element *gfx, uint32_t code,uint32_t color,int flipx,int flipy,uint32_t ssx,uint32_t ssy,
 		int scalex, int scaley, int rotate, int write_priority_only );
-	void update_cluts(int object_base, int length);
+	void update_cluts(int object_base);
 
 	uint8_t m_hd6445_reg[64];
 	void apply_shadow_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &shadow_bitmap, uint8_t xor_output);
