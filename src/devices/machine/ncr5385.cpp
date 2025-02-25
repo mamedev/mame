@@ -759,6 +759,10 @@ int ncr5385_device::state_step()
 			else
 				m_sbx = false;
 
+			// tek4404 fails to load without a delay here
+			// >=3.5us delay works, < 3.5us fails
+			delay = 3'500;
+			
 			// clear data and ACK
 			scsi_bus->data_w(scsi_refid, 0);
 			scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
