@@ -34,15 +34,16 @@
 
         I/O F4/F5 main console input and output
         I/O F6/F7 alternate console input
+        I/O FF    ROM control (enable/disable access to bootstrap ROM)
 
         ToDo:
         - Everything!
-        - Switch between bootstrap ROM area and high RAM at runtime
 
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "machine/74259.h"
 #include "machine/i8251.h"
 #include "machine/pit8253.h"
 #include "bus/rs232/rs232.h"
@@ -67,7 +68,10 @@ private:
 	void ipc_mem_map(address_map &map) ATTR_COLD;
 
 	virtual void machine_reset() override ATTR_COLD;
+	void ipc_control_w(uint8_t data);
 	required_device<cpu_device> m_maincpu;
+	required_device<ls259_device> m_ipcctrl;
+	memory_view m_boot;
 };
 
 
@@ -75,7 +79,17 @@ void ipc_state::ipb_mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x7fff).ram();
-	map(0xe800, 0xe7ff).rom().region("roms", 0);
+
+	// selectively map the boot/diagnostic segment
+	map(0x0000, 0x7fff).view(m_boot);
+
+	// SEL_BOOT/ == 0 and START_UP/ == 0
+	m_boot[0](0x0000, 0x07ff).rom().region("roms", 0);
+	m_boot[0](0xe800, 0xefff).rom().region("roms", 0);
+
+	// SEL_BOOT/ == 0 and START_UP/ == 1
+	m_boot[1](0xe800, 0xefff).rom().region("roms", 0);
+
 	map(0xf800, 0xffff).rom().region("roms", 0x800);
 }
 
@@ -83,8 +97,18 @@ void ipc_state::ipb_mem_map(address_map &map)
 void ipc_state::ipc_mem_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xdfff).ram();
-	map(0xe800, 0xe7ff).rom().region("roms", 0);
+	map(0x0000, 0xffff).ram();
+
+	// selectively map the boot/diagnostic segment
+	map(0x0000, 0xefff).view(m_boot);
+
+	// SEL_BOOT/ == 0 and START_UP/ == 0
+	m_boot[0](0x0000, 0x07ff).rom().region("roms", 0);
+	m_boot[0](0xe800, 0xefff).rom().region("roms", 0);
+
+	// SEL_BOOT/ == 0 and START_UP/ == 1
+	m_boot[1](0xe800, 0xefff).rom().region("roms", 0);
+	
 	map(0xf800, 0xffff).rom().region("roms", 0x800);
 }
 
@@ -95,6 +119,7 @@ void ipc_state::io_map(address_map &map)
 	map(0xf0, 0xf3).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0xf4, 0xf5).rw("uart1", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0xf6, 0xf7).rw("uart2", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0xff, 0xff).w(FUNC(ipc_state::ipc_control_w));
 }
 
 /* Input ports */
@@ -105,6 +130,20 @@ INPUT_PORTS_END
 void ipc_state::machine_reset()
 {
 	m_maincpu->set_state_int(i8085a_cpu_device::I8085_PC, 0xE800);
+}
+
+void ipc_state::ipc_control_w(uint8_t data)
+{
+	// b3 is ~(bit to be written)
+	// b2-b0 is ~(no. of bit to be written)
+	m_ipcctrl->write_bit(~data & 7, BIT(~data, 3));
+
+	// SEL_BOOT/ == 0
+	if (!m_ipcctrl->q3_r())
+		// START_UP/
+		m_boot.select(m_ipcctrl->q5_r());
+	else
+		m_boot.disable();
 }
 
 
