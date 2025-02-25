@@ -44935,13 +44935,15 @@ kingdrby
 lockon
 lockonc
 
+@source:tatsumi/roundup5.cpp
+roundup5
+
 @source:tatsumi/tatsumi.cpp
 bigfight
 bigfightj
 cyclwarr
 cyclwarra
 cyclwarrb
-roundup5
 
 @source:tatsumi/tx1.cpp
 buggyboy

@@ -77,58 +77,6 @@ protected:
 };
 
 
-class roundup5_state : public tatsumi_state
-{
-public:
-	roundup5_state(const machine_config &mconfig, device_type type, const char *tag)
-		: tatsumi_state(mconfig, type, tag)
-		, m_vregs(*this, "vregs")
-		, m_bg_scrollx(*this, "bg_scrollx")
-		, m_bg_scrolly(*this, "bg_scrolly")
-		, m_road_ctrl_ram(*this, "road_ctrl_ram")
-		, m_road_pixel_ram(*this, "road_pixel_ram")
-		, m_road_color_ram(*this, "road_color_ram")
-		, m_road_yclip(*this, "road_yclip")
-		, m_road_vregs(*this, "road_vregs")
-	{
-	}
-
-	void roundup5(machine_config &config);
-
-
-private:
-	uint16_t roundup_v30_z80_r(offs_t offset);
-	void roundup_v30_z80_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void roundup5_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void road_vregs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint8_t gfxdata_r(offs_t offset);
-	void gfxdata_w(offs_t offset, uint8_t data);
-	void output_w(uint8_t data);
-
-	DECLARE_VIDEO_START(roundup5);
-	uint32_t screen_update_roundup5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-	void roundup5_68000_map(address_map &map) ATTR_COLD;
-	void roundup5_v30_map(address_map &map) ATTR_COLD;
-	void roundup5_z80_map(address_map &map) ATTR_COLD;
-
-//  virtual void machine_reset() override ATTR_COLD;
-
-	void draw_road(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void draw_landscape(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t type);
-
-	required_shared_ptr<uint16_t> m_vregs;
-	required_shared_ptr<uint16_t> m_bg_scrollx;
-	required_shared_ptr<uint16_t> m_bg_scrolly;
-	required_shared_ptr<uint16_t> m_road_ctrl_ram;
-	required_shared_ptr<uint16_t> m_road_pixel_ram;
-	required_shared_ptr<uint16_t> m_road_color_ram;
-	required_shared_ptr<uint16_t> m_road_yclip;
-	required_shared_ptr<uint16_t> m_road_vregs;
-
-	std::unique_ptr<uint8_t[]> m_tx_gfxram;
-	std::unique_ptr<uint8_t[]> m_bg_gfxram;
-};
 
 class cyclwarr_state : public tatsumi_state
 {
