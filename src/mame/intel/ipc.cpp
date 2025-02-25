@@ -139,7 +139,7 @@ void ipc_state::board_common(machine_config &config)
 	pit.out_handler<1>().set("uart2", FUNC(i8251_device::write_txc));
 	pit.out_handler<1>().append("uart2", FUNC(i8251_device::write_rxc));
 
-	i8251_device &uart1(I8251(config, "uart1", 0)); // 8 data bits, no parity, 1 stop bit, 9600 baud
+	i8251_device &uart1(I8251(config, "uart1", 0)); // 8 data bits, no parity, 2 stop bits, 110 baud
 	uart1.txd_handler().set("rs232a", FUNC(rs232_port_device::write_txd));
 	uart1.dtr_handler().set("rs232a", FUNC(rs232_port_device::write_dtr));
 	uart1.rts_handler().set("rs232a", FUNC(rs232_port_device::write_rts));
@@ -163,8 +163,19 @@ void ipc_state::board_common(machine_config &config)
 /* ROM definition */
 ROM_START( ipb )
 	ROM_REGION( 0x1000, "roms", 0 )
-	ROM_LOAD( "ipb_e8_v1.3.bin", 0x0000, 0x0800, CRC(fc9d4703) SHA1(2ce078e1bcd8b24217830c54bcf04c5d146d1b76) )
-	ROM_LOAD( "ipb_f8_v1.3.bin", 0x0800, 0x0800, CRC(966ba421) SHA1(d6a904c7d992a05ed0f451d7d34c1fc8de9547ee) )
+	ROM_DEFAULT_BIOS("mon12")
+	// 1x2732 Copyright 1979 (in IPC)
+	// note: it's not clear if an IPB ever shipped with this ROM, but aftermarket ROM upgrades to 1.3 were common
+	ROM_SYSTEM_BIOS(0, "mon13", "Series II Monitor v1.3")
+	ROMX_LOAD( "ipc_v1.3_104584-001.u82", 0x0000, 0x1000, CRC(0889394f) SHA1(b7525baf1884a7d67402dea4b5566016a9861ef2), ROM_BIOS(0) )
+	// 2x2716 Copyright 1978
+	ROM_SYSTEM_BIOS(1, "mon12", "Series II Monitor v1.2")
+	ROMX_LOAD( "ipb_e8_v1.2.bin", 0x0000, 0x0800, CRC(6496efaf) SHA1(1a9c0f1b19c1807803db3f1543f51349d7fd693a), ROM_BIOS(1) )
+	ROMX_LOAD( "ipb_f8_v1.2.bin", 0x0800, 0x0800, CRC(258dc9a6) SHA1(3fde993aee06d9af5093d7a2d9a8cbd71fed0951), ROM_BIOS(1) )
+	// 2x2716 Copyright 1977
+	ROM_SYSTEM_BIOS(2, "mon11", "Series II Monitor v1.1")
+	ROMX_LOAD( "ipb_e8_v1.1.bin", 0x0000, 0x0800, CRC(ffb7c036) SHA1(6f60cdfe20621c4b633c972adcb644a1c02eaa39), ROM_BIOS(2) )
+	ROMX_LOAD( "ipb_e8_v1.1.bin", 0x0800, 0x0800, CRC(3696ff28) SHA1(38b435e10a81629430275aec051fb0a55ec1f6fd), ROM_BIOS(2) )
 ROM_END
 
 ROM_START( ipc )
