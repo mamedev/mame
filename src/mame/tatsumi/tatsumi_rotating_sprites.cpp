@@ -6,15 +6,27 @@
 #include "screen.h"
 
 DEFINE_DEVICE_TYPE(TATSUMI_ROTATING_SPRITES, tatsumi_rotating_sprites_device, "tatsumi_rotating_spr", "Tatsumi Rotating Sprites")
+DEFINE_DEVICE_TYPE(TATSUMI_ROTATING_SPRITES_BIGPAL, tatsumi_rotating_sprites_bigpal_device, "tatsumi_rotating_spr_bigpal", "Tatsumi Rotating Sprites (larger palette)")
 
-tatsumi_rotating_sprites_device::tatsumi_rotating_sprites_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TATSUMI_ROTATING_SPRITES, tag, owner, clock)
-	, m_palette(*this, "^palette")
+
+tatsumi_rotating_sprites_device::tatsumi_rotating_sprites_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, m_fakepalette(*this, "fakepalette")
+	, m_palette(*this, "^palette")
 	, m_spritegfxdecode(*this, "^spritegfxdecode")
 	, m_spriteram(*this, "^spriteram")
 	, m_sprites_l_rom(*this, "sprites_l")
 	, m_sprites_h_rom(*this, "sprites_h")
+{
+}
+
+tatsumi_rotating_sprites_device::tatsumi_rotating_sprites_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: tatsumi_rotating_sprites_device(mconfig, TATSUMI_ROTATING_SPRITES, tag, owner, clock)
+{
+}
+
+tatsumi_rotating_sprites_bigpal_device::tatsumi_rotating_sprites_bigpal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: tatsumi_rotating_sprites_device(mconfig, TATSUMI_ROTATING_SPRITES_BIGPAL, tag, owner, clock)
 {
 }
 
@@ -33,6 +45,10 @@ void tatsumi_rotating_sprites_device::device_add_mconfig(machine_config &config)
 	PALETTE(config, m_fakepalette).set_format(palette_device::xRGB_555, 4096); // 4096 arranged as series of CLUTs
 }
 
+void tatsumi_rotating_sprites_bigpal_device::device_add_mconfig(machine_config &config)
+{
+	PALETTE(config, m_fakepalette).set_format(palette_device::xRGB_555, 8192); // 8192 arranged as series of CLUTs
+}
 
 void tatsumi_rotating_sprites_device::mycopyrozbitmap_core(bitmap_ind8 &bitmap, const bitmap_rgb32 &srcbitmap,
 		int dstx, int dsty, int srcwidth, int srcheight, int incxx, int incxy, int incyx, int incyy,

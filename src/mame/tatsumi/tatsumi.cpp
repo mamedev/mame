@@ -1055,7 +1055,7 @@ void cyclwarr_state::cyclwarr(machine_config &config)
 	screen.set_raw(CLOCK_2 / 8, 400, 0, 320, 272, 0, 240); // TODO: Hook up CRTC
 	screen.set_screen_update(FUNC(cyclwarr_state::screen_update_cyclwarr));
 
-	TATSUMI_ROTATING_SPRITES(config, m_rotatingsprites, 0);
+	TATSUMI_ROTATING_SPRITES_BIGPAL(config, m_rotatingsprites, 0);
 	m_rotatingsprites->set_rom_clut_offset(0x100000 - 0x1000);
 	m_rotatingsprites->set_rom_clut_size(0x1000);
 	m_rotatingsprites->set_sprite_palette_base(4096);

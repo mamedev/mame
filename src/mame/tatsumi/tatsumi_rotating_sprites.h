@@ -23,10 +23,14 @@ public:
 	void update_cluts();
 
 protected:
+	tatsumi_rotating_sprites_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+
+	required_device<palette_device> m_fakepalette;
 
 private:
 	std::unique_ptr<uint8_t[]> m_shadow_pen_array;
@@ -50,13 +54,23 @@ private:
 		int scalex, int scaley, int rotate, int write_priority_only );
 
 	required_device<palette_device> m_palette;
-	required_device<palette_device> m_fakepalette;
 	required_device<gfxdecode_device> m_spritegfxdecode;
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_region_ptr<uint8_t> m_sprites_l_rom;
 	required_region_ptr<uint8_t> m_sprites_h_rom;
 };
 
+class tatsumi_rotating_sprites_bigpal_device : public tatsumi_rotating_sprites_device
+{
+public:
+	tatsumi_rotating_sprites_bigpal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+};
+
+
 DECLARE_DEVICE_TYPE(TATSUMI_ROTATING_SPRITES, tatsumi_rotating_sprites_device)
+DECLARE_DEVICE_TYPE(TATSUMI_ROTATING_SPRITES_BIGPAL, tatsumi_rotating_sprites_bigpal_device)
 
 #endif // MAME_TATSUMI_TATSUMI_ROTATING_SPRITES_H
