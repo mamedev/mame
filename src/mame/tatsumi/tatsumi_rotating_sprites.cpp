@@ -13,8 +13,8 @@ tatsumi_rotating_sprites_device::tatsumi_rotating_sprites_device(const machine_c
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this)
 	, m_fakepalette(*this, "fakepalette")
-	, m_basepalette(*this, "^palette")
-	, m_spriteram(*this, "^spriteram")
+	, m_basepalette(*this, finder_base::DUMMY_TAG)
+	, m_spriteram(*this, finder_base::DUMMY_TAG)
 	, m_sprites_l_rom(*this, "sprites_l")
 	, m_sprites_h_rom(*this, "sprites_h")
 {
@@ -34,6 +34,8 @@ tatsumi_rotating_sprites_bigpal_device::tatsumi_rotating_sprites_bigpal_device(c
 
 void tatsumi_rotating_sprites_device::common_init()
 {
+	m_rom_clut_offset = memregion("sprites_l")->bytes() - m_rom_clut_size;
+
 	m_shadow_pen_array = make_unique_clear<uint8_t[]>(8192);
 	m_temp_bitmap.allocate(512, 512);
 }
