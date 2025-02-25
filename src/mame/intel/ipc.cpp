@@ -27,7 +27,9 @@
 
 
         Preliminary Memory Map
-        E800-F7FF BIOS ROM area
+        0000-7FFF Onboard RAM (IPB & IPC)
+        8000-F7FF Onboard RAM (IPC only)
+        E800-EFFF Bootstrap & diagnostic ROM
         F800-FFFF Monitor ROM (or other user interface)
 
         I/O F4/F5 main console input and output
@@ -35,7 +37,7 @@
 
         ToDo:
         - Everything!
-        - iPC - Find missing rom F800-FFFF
+        - Switch between bootstrap ROM area and high RAM at runtime
 
 ****************************************************************************/
 
@@ -71,7 +73,8 @@ void ipc_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0xdfff).ram();
-	map(0xe800, 0xffff).rom().region("roms", 0);
+	map(0xe800, 0xefff).rom().region("roms", 0);
+	map(0xf800, 0xffff).rom().region("roms", 0x800);
 }
 
 void ipc_state::io_map(address_map &map)
@@ -133,15 +136,14 @@ void ipc_state::ipc(machine_config &config)
 
 /* ROM definition */
 ROM_START( ipb )
-	ROM_REGION( 0x1800, "roms", 0 )
+	ROM_REGION( 0x1000, "roms", 0 )
 	ROM_LOAD( "ipb_e8_v1.3.bin", 0x0000, 0x0800, CRC(fc9d4703) SHA1(2ce078e1bcd8b24217830c54bcf04c5d146d1b76) )
-	ROM_LOAD( "ipb_f8_v1.3.bin", 0x1000, 0x0800, CRC(966ba421) SHA1(d6a904c7d992a05ed0f451d7d34c1fc8de9547ee) )
+	ROM_LOAD( "ipb_f8_v1.3.bin", 0x0800, 0x0800, CRC(966ba421) SHA1(d6a904c7d992a05ed0f451d7d34c1fc8de9547ee) )
 ROM_END
 
 ROM_START( ipc )
-	ROM_REGION( 0x1800, "roms", ROMREGION_ERASEFF )
+	ROM_REGION( 0x1000, "roms", 0 )
 	ROM_LOAD( "ipc_v1.3_104584-001.u82", 0x0000, 0x1000, CRC(0889394f) SHA1(b7525baf1884a7d67402dea4b5566016a9861ef2) )
-	ROM_LOAD( "ipc_f8_v1.3.bin", 0x1000, 0x0800, NO_DUMP )   // rom name unknown
 ROM_END
 
 } // anonymous namespace
@@ -151,4 +153,4 @@ ROM_END
 
 /*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY  FULLNAME  FLAGS */
 COMP( 19??, ipb,  0,      0,      ipc,     ipc,   ipc_state, empty_init, "Intel", "iPB",    MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
-COMP( 19??, ipc,  ipb,    0,      ipc,     ipc,   ipc_state, empty_init, "Intel", "iPC",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 19??, ipc,  ipb,    0,      ipc,     ipc,   ipc_state, empty_init, "Intel", "iPC",    MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
