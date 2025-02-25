@@ -13,8 +13,7 @@ class tatsumi_rotating_sprites_device : public device_t
 public:
 	tatsumi_rotating_sprites_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_rom_clut_offset(int rom_clut_offset) { m_rom_clut_offset = rom_clut_offset; }
-	void set_rom_clut_size(int rom_clut_size) { m_rom_clut_size = rom_clut_size; }
+	void set_rom_clut_offset(int rom_clut_offset) { m_rom_clut_offset = rom_clut_offset - m_rom_clut_size; }
 	void set_sprite_palette_base(int sprite_palette_base) { m_sprite_palette_base = sprite_palette_base; }
 
 	void draw_sprites(bitmap_rgb32& bitmap, const rectangle& cliprect, int write_priority_only, int rambank);
@@ -30,6 +29,8 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
+	int m_rom_clut_size;
+
 	required_device<palette_device> m_fakepalette;
 
 private:
@@ -38,7 +39,6 @@ private:
 	bitmap_rgb32 m_temp_bitmap;
 
 	int m_rom_clut_offset;
-	int m_rom_clut_size;
 	int m_sprite_palette_base;
 
 	void mycopyrozbitmap_core(bitmap_ind8 &bitmap, const bitmap_rgb32 &srcbitmap,

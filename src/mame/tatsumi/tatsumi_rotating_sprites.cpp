@@ -23,11 +23,13 @@ tatsumi_rotating_sprites_device::tatsumi_rotating_sprites_device(const machine_c
 tatsumi_rotating_sprites_device::tatsumi_rotating_sprites_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tatsumi_rotating_sprites_device(mconfig, TATSUMI_ROTATING_SPRITES, tag, owner, clock)
 {
+	m_rom_clut_size = 0x800;
 }
 
 tatsumi_rotating_sprites_bigpal_device::tatsumi_rotating_sprites_bigpal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tatsumi_rotating_sprites_device(mconfig, TATSUMI_ROTATING_SPRITES_BIGPAL, tag, owner, clock)
 {
+	m_rom_clut_size = 0x1000;
 }
 
 void tatsumi_rotating_sprites_device::device_start()

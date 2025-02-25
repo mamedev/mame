@@ -29,7 +29,6 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_spritegfxdecode(*this, "spritegfxdecode")
 		, m_palette(*this, "palette")
-		, m_fakepalette(*this, "fakepalette")
 		, m_videoram(*this, "videoram")
 		, m_sharedram(*this, "sharedram")
 		, m_sprite_control_ram(*this, "obj_ctrl_ram")
@@ -54,7 +53,6 @@ protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<gfxdecode_device> m_spritegfxdecode;
 	required_device<palette_device> m_palette;
-	required_device<palette_device> m_fakepalette;
 
 	optional_shared_ptr<uint16_t> m_videoram;
 	optional_shared_ptr<uint16_t> m_sharedram;

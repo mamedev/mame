@@ -908,14 +908,12 @@ void apache3_state::apache3(machine_config &config)
 	screen.set_screen_update(FUNC(apache3_state::screen_update_apache3));
 
 	TATSUMI_ROTATING_SPRITES(config, m_rotatingsprites, 0);
-	m_rotatingsprites->set_rom_clut_offset(0x100000 - 0x800);
-	m_rotatingsprites->set_rom_clut_size(0x800);
+	m_rotatingsprites->set_rom_clut_offset(0x100000);
 	m_rotatingsprites->set_sprite_palette_base(0);
 
-	GFXDECODE(config, m_spritegfxdecode, m_fakepalette, gfx_apache3_sprites);
+	GFXDECODE(config, m_spritegfxdecode, "rotatingsprites:fakepalette", gfx_apache3_sprites);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_apache3);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048); // 2048 real colours
-	PALETTE(config, m_fakepalette).set_format(palette_device::xRGB_555, 4096); // 4096 arranged as series of CLUTs
 
 	/* apache 3 schematics state
 	bit 4:  250
@@ -967,16 +965,13 @@ void roundup5_state::roundup5(machine_config &config)
 	screen.set_screen_update(FUNC(roundup5_state::screen_update_roundup5));
 
 	TATSUMI_ROTATING_SPRITES(config, m_rotatingsprites, 0);
-	m_rotatingsprites->set_rom_clut_offset(0xc0000 - 0x800);
-	m_rotatingsprites->set_rom_clut_size(0x800);
+	m_rotatingsprites->set_rom_clut_offset(0xc0000);
 	m_rotatingsprites->set_sprite_palette_base(512);
 
-	GFXDECODE(config, m_spritegfxdecode, m_fakepalette, gfx_apache3_sprites);
+	GFXDECODE(config, m_spritegfxdecode, "rotatingsprites:fakepalette", gfx_apache3_sprites);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_roundup5);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024); // 1024 real colours
 	m_palette->set_membits(8).set_endianness(ENDIANNESS_BIG);
-	PALETTE(config, m_fakepalette).set_format(palette_device::xRGB_555, 4096); // 4096 arranged as series of CLUTs
-	m_fakepalette->set_membits(8).set_endianness(ENDIANNESS_BIG);
 
 	MCFG_VIDEO_START_OVERRIDE(roundup5_state,roundup5)
 
@@ -1056,14 +1051,12 @@ void cyclwarr_state::cyclwarr(machine_config &config)
 	screen.set_screen_update(FUNC(cyclwarr_state::screen_update_cyclwarr));
 
 	TATSUMI_ROTATING_SPRITES_BIGPAL(config, m_rotatingsprites, 0);
-	m_rotatingsprites->set_rom_clut_offset(0x100000 - 0x1000);
-	m_rotatingsprites->set_rom_clut_size(0x1000);
+	m_rotatingsprites->set_rom_clut_offset(0x100000);
 	m_rotatingsprites->set_sprite_palette_base(4096);
 
-	GFXDECODE(config, m_spritegfxdecode, m_fakepalette, gfx_cyclwarr_sprites);
+	GFXDECODE(config, m_spritegfxdecode, "rotatingsprites:fakepalette", gfx_cyclwarr_sprites);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cyclwarr);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 8192);
-	PALETTE(config, m_fakepalette).set_format(palette_device::xRGB_555, 8192);
 
 	MCFG_VIDEO_START_OVERRIDE(cyclwarr_state, cyclwarr)
 
@@ -1090,7 +1083,7 @@ void cyclwarr_state::bigfight(machine_config &config)
 
 	// TODO: it's same video HW, we don't know how/where video registers are mapped
 //  subdevice<screen_device>("screen")->set_screen_update(FUNC(cyclwarr_state::screen_update_bigfight));
-	m_rotatingsprites->set_rom_clut_offset(0x200000 - 0x1000);
+	m_rotatingsprites->set_rom_clut_offset(0x200000);
 
 	MCFG_VIDEO_START_OVERRIDE(cyclwarr_state, bigfight)
 
