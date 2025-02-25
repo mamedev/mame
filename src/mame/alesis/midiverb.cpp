@@ -141,10 +141,11 @@ void midiverb_dsp_device::device_start()
 	save_item(NAME(m_ram));
 }
 
-#define LOG_DSP(...) do { \
-	if (sample_i < DEBUG_SAMPLES) \
-		LOGMASKED(LOG_DSP_EXECUTION, __VA_ARGS__); \
-} while(0)
+#define LOG_DSP(...) \
+		do { \
+			if (sample_i < DEBUG_SAMPLES) \
+				LOGMASKED(LOG_DSP_EXECUTION, __VA_ARGS__); \
+		} while(0)
 
 void midiverb_dsp_device::sound_stream_update(sound_stream &stream, const std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs)
 {

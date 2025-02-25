@@ -49,7 +49,7 @@ public:
 	ibm3477_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		{ }
+	{ }
 
 	void ibm3477(machine_config &config);
 
@@ -109,5 +109,5 @@ ROM_END
 } // anonymous namespace
 
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY  FULLNAME               FLAGS
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY  FULLNAME           FLAGS
 COMP( 1998, ibm3477, 0,      0,      ibm3477, ibm3477, ibm3477_state, empty_init, "IBM",   "InfoWindow 3477", MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // Spanish ROMs?

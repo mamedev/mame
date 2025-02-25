@@ -6,7 +6,7 @@ The PAiA midi2cv8 is an 8-channel MIDI-to-CV converter. It is a module for
 the PAiA 9700 Series modular system, but can be used as a standalone MIDI-to-CV
 converter.
 
-Dipswitches control the MIDI channel to listen to, and the operating mode.
+DIP switches control the MIDI channel to listen to, and the operating mode.
 Depending on that mode, each of the 8 outputs produces control voltage (CV),
 trigger, or gate signals in response to MIDI messages.
 
@@ -393,4 +393,3 @@ ROM_END
 
 SYST(1997, midi2cv8, 0, 0, midi2cv8, midi2cv8, midi2cv8_state, empty_init, "PAiA Electronics", "midi2cv8", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE)
 SYST(1997, midi2cv8_vhz, 0, 0, midi2cv8_vhz, midi2cv8, midi2cv8_vhz_state, empty_init, "PAiA Electronics", "midi2cv8 V/Hz", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE)
-

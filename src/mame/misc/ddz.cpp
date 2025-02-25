@@ -15,7 +15,7 @@
 
 Haze's notes:
 
-fwiw, it's probably same PCB as the non-working 'ddz' in MAME, but different game.
+FWIW, it's probably same PCB as the non-working 'ddz' in MAME, but different game.
 
 there's some kind of encryption/scrambling going on, at the very least
 
@@ -38,7 +38,7 @@ if you reverse the letters you get 'bug in vfprintf : bad base'
 
 so I suspect the data is in reverse order and maybe some blocks scrambled about.
 
-trivia: TJF is an acronym for Tai Ji Feng
+trivia: TJF stands for Tai Ji Feng
 ****************************************************************************/
 
 #include "emu.h"
@@ -227,7 +227,7 @@ void ddz_state::init_ddz()
 } // anonymous namespace
 
 
-GAME( 200?, ddz,      0, ddz, ddz, ddz_state, init_ddz,   ROT0, "IGS?", "Dou Di Zhu",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, ddz,      0, ddz, ddz, ddz_state, init_ddz,   ROT0, "IGS?", "Dou Dizhu",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 200?, crzclass, 0, ddz, ddz, ddz_state, init_ddz,   ROT0, "TJF",  "Zhaoji Fengdou",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // 'Crazy Class'
 GAME( 200?, baibians, 0, ddz, ddz, ddz_state, init_ddz,   ROT0, "TJF",  "Baibian Shuangkou", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 200?, cjmx,     0, ddz, ddz, ddz_state, init_ddz,   ROT0, "TJF",  "Chaoji Mingxing",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
