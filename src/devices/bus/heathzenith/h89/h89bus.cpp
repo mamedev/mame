@@ -46,13 +46,22 @@
 #define LOG_MEM_READ      (1U << 3)
 #define LOG_MEM_WRITE     (1U << 4)
 
-#define VERBOSE (LOG_PORT_READ | LOG_PORT_WRITE)
+#define LOG_GPP_WRITE     (1U << 5)
+
+#define VERBOSE (LOG_PORT_READ | LOG_PORT_WRITE | LOG_GPP_WRITE)
 #include "logmacro.h"
 
 #define LOGPORTREAD(...)     LOGMASKED(LOG_PORT_READ,    __VA_ARGS__)
 #define LOGPORTWRITE(...)    LOGMASKED(LOG_PORT_WRITE,   __VA_ARGS__)
 #define LOGMEMREAD(...)      LOGMASKED(LOG_MEM_READ,     __VA_ARGS__)
 #define LOGMEMWRITE(...)     LOGMASKED(LOG_MEM_WRITE,    __VA_ARGS__)
+#define LOGGPPWRITE(...)     LOGMASKED(LOG_GPP_WRITE,    __VA_ARGS__)
+
+#ifdef _MSC_VER
+#define FUNCNAME __func__
+#else
+#define FUNCNAME __PRETTY_FUNCTION__
+#endif
 
 
 DEFINE_DEVICE_TYPE(H89BUS_LEFT_SLOT, h89bus_left_slot_device, "h89bus_lslot", "H-89 left (memory) slot")
@@ -346,7 +355,17 @@ u8 h89bus_device::mem_m1_r(offs_t offset)
 //
 void h89bus_device::update_gpp(u8 gpp)
 {
+	// a write always clears the interrupt.
+	m_out_clear_timer_intr(0);
+
 	u8 changed_gpp = gpp ^ m_gpp;
+
+	if (!changed_gpp)
+	{
+		return;
+	}
+
+	LOGGPPWRITE("%s: Update gpp: new: %02x changed: %02x\n", FUNCNAME, gpp, changed_gpp);
 
 	m_gpp = gpp;
 
@@ -356,8 +375,6 @@ void h89bus_device::update_gpp(u8 gpp)
 	m_io1 = BIT(m_gpp, GPP_IO1_BIT);
 	m_rsv0 = BIT(m_gpp, GPP_RSV0_BIT);
 	m_rsv1 = BIT(m_gpp, GPP_RSV1_BIT);
-
-	m_out_clear_timer_intr(0);
 
 	m_out_timer_intr_cb(BIT(m_gpp, GPP_ENABLE_TIMER_INTERRUPT_BIT));
 
