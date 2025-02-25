@@ -806,17 +806,6 @@ INPUT_PORTS_END
 
 /******************************************************************************/
 
-static const gfx_layout spritelayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ 8,12,0,4, 24,28,16,20 },
-	{ STEP8(0,4*8) },
-	32*8
-};
-
 static const gfx_layout roundup5_vramlayout =
 {
 	8,8,
@@ -827,16 +816,6 @@ static const gfx_layout roundup5_vramlayout =
 	{ STEP8(0,8) },
 	8*8
 };
-
-static GFXDECODE_START( gfx_apache3_sprites )
-	GFXDECODE_ENTRY( "rotatingsprites:sprites_l", 0, spritelayout,    0, 256)
-	GFXDECODE_ENTRY( "rotatingsprites:sprites_h", 0, spritelayout,    0, 256)
-GFXDECODE_END
-
-static GFXDECODE_START( gfx_cyclwarr_sprites )
-	GFXDECODE_ENTRY( "rotatingsprites:sprites_l", 0, spritelayout,  0, 512)
-	GFXDECODE_ENTRY( "rotatingsprites:sprites_h", 0, spritelayout,  0, 512)
-GFXDECODE_END
 
 static GFXDECODE_START( gfx_apache3 )
 	GFXDECODE_ENTRY( "text",    0, gfx_8x8x3_planar, 768,  16)
@@ -910,8 +889,8 @@ void apache3_state::apache3(machine_config &config)
 	TATSUMI_ROTATING_SPRITES(config, m_rotatingsprites, 0);
 	m_rotatingsprites->set_rom_clut_offset(0x100000);
 	m_rotatingsprites->set_sprite_palette_base(0);
+	m_rotatingsprites->set_palette("rotatingsprites:fakepalette");
 
-	GFXDECODE(config, m_spritegfxdecode, "rotatingsprites:fakepalette", gfx_apache3_sprites);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_apache3);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048); // 2048 real colours
 
@@ -967,8 +946,8 @@ void roundup5_state::roundup5(machine_config &config)
 	TATSUMI_ROTATING_SPRITES(config, m_rotatingsprites, 0);
 	m_rotatingsprites->set_rom_clut_offset(0xc0000);
 	m_rotatingsprites->set_sprite_palette_base(512);
+	m_rotatingsprites->set_palette("rotatingsprites:fakepalette");
 
-	GFXDECODE(config, m_spritegfxdecode, "rotatingsprites:fakepalette", gfx_apache3_sprites);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_roundup5);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024); // 1024 real colours
 	m_palette->set_membits(8).set_endianness(ENDIANNESS_BIG);
@@ -1053,8 +1032,8 @@ void cyclwarr_state::cyclwarr(machine_config &config)
 	TATSUMI_ROTATING_SPRITES_BIGPAL(config, m_rotatingsprites, 0);
 	m_rotatingsprites->set_rom_clut_offset(0x100000);
 	m_rotatingsprites->set_sprite_palette_base(4096);
+	m_rotatingsprites->set_palette("rotatingsprites:fakepalette");
 
-	GFXDECODE(config, m_spritegfxdecode, "rotatingsprites:fakepalette", gfx_cyclwarr_sprites);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cyclwarr);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 8192);
 

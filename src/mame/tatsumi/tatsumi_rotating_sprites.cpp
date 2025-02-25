@@ -11,9 +11,9 @@ DEFINE_DEVICE_TYPE(TATSUMI_ROTATING_SPRITES_BIGPAL, tatsumi_rotating_sprites_big
 
 tatsumi_rotating_sprites_device::tatsumi_rotating_sprites_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
+	, device_gfx_interface(mconfig, *this)
 	, m_fakepalette(*this, "fakepalette")
-	, m_palette(*this, "^palette")
-	, m_spritegfxdecode(*this, "^spritegfxdecode")
+	, m_basepalette(*this, "^palette")
 	, m_spriteram(*this, "^spriteram")
 	, m_sprites_l_rom(*this, "sprites_l")
 	, m_sprites_h_rom(*this, "sprites_h")
@@ -32,10 +32,43 @@ tatsumi_rotating_sprites_bigpal_device::tatsumi_rotating_sprites_bigpal_device(c
 	m_rom_clut_size = 0x1000;
 }
 
-void tatsumi_rotating_sprites_device::device_start()
+void tatsumi_rotating_sprites_device::common_init()
 {
 	m_shadow_pen_array = make_unique_clear<uint8_t[]>(8192);
 	m_temp_bitmap.allocate(512, 512);
+}
+
+static const gfx_layout spritelayout =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	4,
+	{ STEP4(0,1) },
+	{ 8,12,0,4, 24,28,16,20 },
+	{ STEP8(0,4*8) },
+	32*8
+};
+
+GFXDECODE_MEMBER( tatsumi_rotating_sprites_device::gfxinfo )
+	GFXDECODE_DEVICE("sprites_l", 0, spritelayout, 0, 256)
+	GFXDECODE_DEVICE("sprites_h", 0, spritelayout, 0, 256)
+GFXDECODE_END
+
+GFXDECODE_MEMBER( tatsumi_rotating_sprites_bigpal_device::gfxinfo_big )
+	GFXDECODE_DEVICE("sprites_l", 0, spritelayout, 0, 512)
+	GFXDECODE_DEVICE("sprites_h", 0, spritelayout, 0, 512)
+GFXDECODE_END
+
+void tatsumi_rotating_sprites_device::device_start()
+{
+	common_init();
+	decode_gfx(gfxinfo);
+}
+
+void tatsumi_rotating_sprites_bigpal_device::device_start()
+{
+	common_init();
+	decode_gfx(gfxinfo_big);
 }
 
 void tatsumi_rotating_sprites_device::device_reset()
@@ -411,13 +444,13 @@ void tatsumi_rotating_sprites_device::draw_sprites_main(BitmapClass &bitmap, con
 				for (int w = 0; w < x_width; w++) {
 					if (rotate)
 						roundupt_drawgfxzoomrotate(
-								m_temp_bitmap,cliprect,m_spritegfxdecode->gfx(0 + (base & 1)),
+								m_temp_bitmap,cliprect,gfx(0 + (base & 1)),
 								base >> 1,
 								color,flip_x,flip_y,x_pos,render_y,
 								scale,scale,0,write_priority_only);
 					else
 						roundupt_drawgfxzoomrotate(
-								bitmap,cliprect,m_spritegfxdecode->gfx(0 + (base & 1)),
+								bitmap,cliprect,gfx(0 + (base & 1)),
 								base >> 1,
 								color,flip_x,flip_y,x_pos,render_y,
 								scale,scale,0,write_priority_only);
@@ -493,22 +526,22 @@ void tatsumi_rotating_sprites_device::update_cluts()
 	const uint8_t* bank2 = m_sprites_h_rom + m_rom_clut_offset;
 	for (int i=0; i<length; i+=8)
 	{
-		m_fakepalette->set_pen_color(i+0,m_palette->pen_color(bank1[1]+m_sprite_palette_base));
+		m_fakepalette->set_pen_color(i+0,m_basepalette->pen_color(bank1[1]+m_sprite_palette_base));
 		m_shadow_pen_array[i+0]=(bank1[1]==255);
-		m_fakepalette->set_pen_color(i+1,m_palette->pen_color(bank1[0]+m_sprite_palette_base));
+		m_fakepalette->set_pen_color(i+1,m_basepalette->pen_color(bank1[0]+m_sprite_palette_base));
 		m_shadow_pen_array[i+1]=(bank1[0]==255);
-		m_fakepalette->set_pen_color(i+2,m_palette->pen_color(bank1[3]+m_sprite_palette_base));
+		m_fakepalette->set_pen_color(i+2,m_basepalette->pen_color(bank1[3]+m_sprite_palette_base));
 		m_shadow_pen_array[i+2]=(bank1[3]==255);
-		m_fakepalette->set_pen_color(i+3,m_palette->pen_color(bank1[2]+m_sprite_palette_base));
+		m_fakepalette->set_pen_color(i+3,m_basepalette->pen_color(bank1[2]+m_sprite_palette_base));
 		m_shadow_pen_array[i+3]=(bank1[2]==255);
 
-		m_fakepalette->set_pen_color(i+4,m_palette->pen_color(bank2[1]+m_sprite_palette_base));
+		m_fakepalette->set_pen_color(i+4,m_basepalette->pen_color(bank2[1]+m_sprite_palette_base));
 		m_shadow_pen_array[i+4]=(bank2[1]==255);
-		m_fakepalette->set_pen_color(i+5,m_palette->pen_color(bank2[0]+m_sprite_palette_base));
+		m_fakepalette->set_pen_color(i+5,m_basepalette->pen_color(bank2[0]+m_sprite_palette_base));
 		m_shadow_pen_array[i+5]=(bank2[0]==255);
-		m_fakepalette->set_pen_color(i+6,m_palette->pen_color(bank2[3]+m_sprite_palette_base));
+		m_fakepalette->set_pen_color(i+6,m_basepalette->pen_color(bank2[3]+m_sprite_palette_base));
 		m_shadow_pen_array[i+6]=(bank2[3]==255);
-		m_fakepalette->set_pen_color(i+7,m_palette->pen_color(bank2[2]+m_sprite_palette_base));
+		m_fakepalette->set_pen_color(i+7,m_basepalette->pen_color(bank2[2]+m_sprite_palette_base));
 		m_shadow_pen_array[i+7]=(bank2[2]==255);
 
 		bank1+=4;

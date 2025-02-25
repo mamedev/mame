@@ -27,7 +27,6 @@ public:
 		, m_oki(*this, "oki")
 		, m_rotatingsprites(*this, "rotatingsprites")
 		, m_gfxdecode(*this, "gfxdecode")
-		, m_spritegfxdecode(*this, "spritegfxdecode")
 		, m_palette(*this, "palette")
 		, m_videoram(*this, "videoram")
 		, m_sharedram(*this, "sharedram")
@@ -51,7 +50,6 @@ protected:
 	required_device<okim6295_device> m_oki;
 	required_device<tatsumi_rotating_sprites_device> m_rotatingsprites;
 	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<gfxdecode_device> m_spritegfxdecode;
 	required_device<palette_device> m_palette;
 
 	optional_shared_ptr<uint16_t> m_videoram;
