@@ -53,6 +53,8 @@ protected:
 private:
 	sound_stream *m_stream = nullptr;
 
+	static constexpr bool TEST_LOOPING = false;
+
 	struct xavix_voice {
 		bool enabled[2]{};
 		uint32_t position[2]{};
@@ -61,6 +63,10 @@ private:
 		int type = 0;
 		int rate = 0;
 		int vol = 0;
+
+		uint32_t previousreadpos[2]{};
+		int8_t currentsample[2]{};
+		int loopstage[2]{};
 	};
 
 	devcb_read8 m_readregs_cb;

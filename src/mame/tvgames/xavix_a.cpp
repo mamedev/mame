@@ -36,6 +36,11 @@ void xavix_sound_device::device_reset()
 		m_voice[v].position[0] = 0x00;
 		m_voice[v].position[1] = 0x00;
 		m_voice[v].bank = 0x00;
+
+		m_voice[v].previousreadpos[0] = 0;
+		m_voice[v].previousreadpos[1] = 0;
+		m_voice[v].currentsample[0] = 0;
+		m_voice[v].currentsample[1] = 0;
 	}
 }
 
@@ -60,29 +65,55 @@ void xavix_sound_device::sound_stream_update(sound_stream &stream, std::vector<r
 					// 2 is looping? 3 is single shot? 0/1 are something else?
 					if (m_voice[v].type == 2 || m_voice[v].type == 3)
 					{
+						bool newsample = false;
 						uint32_t pos = (m_voice[v].bank << 16) | (m_voice[v].position[channel] >> 14);
-						int8_t sample = m_readsamples_cb(pos);
 
-						if ((uint8_t)sample == 0x80) // would both channels stop / loop or just one?, Yellow submarine indicates just one, but might be running in some interleaved mode?
+						if (pos != m_voice[v].previousreadpos[channel])
 						{
-							//if (m_voice[v].type == 3)
-							{
-								m_voice[v].enabled[channel] = false;
-								break;
-							}
-							/* need envelopes or some of these loop forever!
-							else if (m_voice[v].type == 2)
-							{
-							    m_voice[v].position[channel] = m_voice[v].startposition[channel];
-							    // presumably don't want to play 0x80 byte, so read in a new one
-							    pos = (m_voice[v].bank << 16) | (m_voice[v].position[channel] >> 14);
-							    sample = m_readsamples_cb(pos);
-							}
-							*/
+							m_voice[v].previousreadpos[channel] = pos;
+							m_voice[v].currentsample[channel] = m_readsamples_cb(pos);
+							newsample = true;
 						}
 
-						outputs[channel].add_int(outpos, sample * (m_voice[v].vol + 1), 32768);
-						m_voice[v].position[channel] += m_voice[v].rate;
+						if (newsample)
+						{
+							if ((uint8_t)m_voice[v].currentsample[channel] == 0x80) // would both channels stop / loop or just one?, Yellow submarine indicates just one, but might be running in some interleaved mode?
+							{
+								m_voice[v].currentsample[channel] = 0x00; // don't play 0x80 bytes
+
+								if (TEST_LOOPING == false)
+								{
+									m_voice[v].enabled[channel] = false;
+									break;
+								}
+								else
+								{
+									if (m_voice[v].type == 3)
+									{
+										// type 3 - one-shot / non-looping sample, just stop when hitting 0x80
+										m_voice[v].enabled[channel] = false;
+										break;
+									}
+									else
+									{
+										// type 2 - looping / envelope samples
+										if (m_voice[v].loopstage[channel] == 0) // 1st end marker
+										{
+											m_voice[v].loopstage[channel] = 1;
+											m_voice[v].startposition[channel] = m_voice[v].position[channel];
+										}
+										else if (m_voice[v].loopstage[channel] == 1) // 2nd end marker
+										{
+											m_voice[v].loopstage[channel] = 0;
+											m_voice[v].position[channel] = m_voice[v].startposition[channel];
+										}
+									}
+								}
+							}
+						}
+
+						outputs[channel].add_int(outpos, m_voice[v].currentsample[channel] * (m_voice[v].vol + 1), 32768);
+						m_voice[v].position[channel] += m_voice[v].rate;			
 					}
 					else
 					{
@@ -90,6 +121,8 @@ void xavix_sound_device::sound_stream_update(sound_stream &stream, std::vector<r
 						m_voice[v].enabled[channel] = false;
 					}
 				}
+
+				
 			}
 		}
 		outpos++;
@@ -197,6 +230,13 @@ void xavix_sound_device::enable_voice(int voice, bool update_only)
 		m_voice[voice].startposition[0] = m_voice[voice].position[0]; // for looping
 		m_voice[voice].startposition[1] = m_voice[voice].position[1];
 	}
+
+	m_voice[voice].previousreadpos[0] = 0;
+	m_voice[voice].currentsample[0] = 0;
+	m_voice[voice].previousreadpos[1] = 0;
+	m_voice[voice].currentsample[1] = 0;
+	m_voice[voice].loopstage[0] = 0;
+	m_voice[voice].loopstage[1] = 0;
 
 	// 0320 (800) == 8000hz
 	// 4000 (16384) == 163840hz ? = 163.840kHz
