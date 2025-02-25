@@ -48,7 +48,7 @@
 
 #define LOG_GPP_WRITE     (1U << 5)
 
-#define VERBOSE (LOG_PORT_READ | LOG_PORT_WRITE | LOG_GPP_WRITE)
+//#define VERBOSE (LOG_PORT_READ | LOG_PORT_WRITE | LOG_GPP_WRITE)
 #include "logmacro.h"
 
 #define LOGPORTREAD(...)     LOGMASKED(LOG_PORT_READ,    __VA_ARGS__)
@@ -435,14 +435,14 @@ u8 h89bus_device::io_dispatch_r(offs_t offset)
 	}
 
 done:
-	LOGPORTREAD("port read - offset: 0x%02x - 0x%02x\n", offset, retval);
+	LOGPORTREAD("%s: offset: 0x%02x - 0x%02x\n", FUNCNAME, offset, retval);
 
 	return retval;
 }
 
 void h89bus_device::io_dispatch_w(offs_t offset, u8 data)
 {
-	LOGPORTWRITE("port write - offset: 0x%02x - 0x%02x\n", offset, data);
+	LOGPORTWRITE("%s: offset: 0x%02x - 0x%02x\n", FUNCNAME, offset, data);
 
 	u8 decode = m_io_decode_prom[offset] ^ 0xff;
 
@@ -520,6 +520,47 @@ void h89bus_device::io_dispatch_w(offs_t offset, u8 data)
   |    ROM    |        +------>  |    RAM    |
   -------------  0k              -------------  0k
 
+  Primary Memory Decoder PROM input
+
+    A7 - MEM 1 H     ORG 0 enabled
+    A6 - JJ502       Memory size jumper settings on CPU board
+    A5 - JJ501       Memory size jumper settings on CPU board
+    A4 - BRD L       Read operation
+    A3 - BRFSH L     DRAM Refresh
+    A2 - Z80 A15
+    A1 - Z80 A14
+    A0 - Z80 A13
+
+  Primary Memory Decoder PROM output
+
+    D7 - WE L
+    D6 - RD5 L
+    D5 - RD6 L
+    D4 - RAS2 L
+    D3 - RAS1 L
+    D2 - RAS0 L
+    D1 - No Memory L
+    D0 - U516 L      Secondary Memory Decoder
+
+  Secondary Memmory Decoder PROM input
+
+    A4 - FMWE H      Floppy Memory Write Enable
+    A3 - WE L        From U517 (Primary Memory Decoder) output D7.
+    A2 - Z80 A12
+    A1 - Z80 A11
+    A0 - Z80 A10
+
+  Secondary Memory Decoder PROM output
+
+    D7 - WE L
+    D6 - <unused>
+    D5 - <unused>
+    D4 - Floppy ROM L
+    D3 - Floppy RAM L
+    D2 - Opt RAM L
+    D1 - Opt ROM L
+    D0 - System ROM L
+
 */
 u8 h89bus_device::mem_dispatch_r(offs_t offset)
 {
@@ -529,13 +570,13 @@ u8 h89bus_device::mem_dispatch_r(offs_t offset)
 	u8 val = (m_mem1 << 7) | jj501_502 | 0x08 | BIT(offset, 13, 3);
 	u8 decode = m_mem_primary_decode_prom[val] ^ 0xff;
 
-	LOGMEMREAD("mem_r - offset: 0x%04x val: 0x%02x decode: 0x%02x\n", offset, val, decode);
+	LOGMEMREAD("%s: offset: 0x%04x val: 0x%02x decode: 0x%02x\n", FUNCNAME, offset, val, decode);
 
 	if (decode)
 	{
 		if (decode & H89_MEM_PRI_NOMEM)
 		{
-			LOGMEMREAD("mem_r - PRI_NOMEM\n");
+			LOGMEMREAD("%s: PRI_NOMEM\n", FUNCNAME);
 			// return default 0.
 			goto done;
 		}
@@ -543,7 +584,7 @@ u8 h89bus_device::mem_dispatch_r(offs_t offset)
 		{
 			u8 sec_val = (m_fmwe << 4) | ((BIT(decode, 7) ^ 1) << 3) | BIT(offset, 10, 3);
 			u8 sec_decode = m_mem_secondary_decode_prom[sec_val] ^ 0xff;
-			LOGMEMREAD("mem_r - PRI_U516 - sec_val: 0x%02x sec_decode: 0x%02x\n", sec_decode, sec_val);
+			LOGMEMREAD("%s: PRI_U516 - sec_val: 0x%02x sec_decode: 0x%02x\n", FUNCNAME, sec_decode, sec_val);
 
 			for (device_h89bus_left_card_interface &entry : m_left_device_list)
 			{
@@ -553,27 +594,27 @@ u8 h89bus_device::mem_dispatch_r(offs_t offset)
 
 			if (sec_decode & H89_MEM_SEC_SYS_ROM)
 			{
-				LOGMEMREAD("mem_r - SEC_SYS_ROM\n");
+				LOGMEMREAD("%s: SEC_SYS_ROM\n", FUNCNAME);
 				retval = m_in_sys_rom_cb(offset & 0x1fff);
 			}
 			if (sec_decode & H89_MEM_SEC_OPT_ROM)
 			{
-				LOGMEMREAD("mem_r - SEC_OPT_ROM\n");
+				LOGMEMREAD("%s: SEC_OPT_ROM\n", FUNCNAME);
 				retval = m_in_opt_rom_cb(offset & 0x1fff);
 			}
 			if (sec_decode & H89_MEM_SEC_OPT_RAM)
 			{
-				LOGMEMREAD("mem_r - SEC_OPT_RAM\n");
+				LOGMEMREAD("%s: SEC_OPT_RAM\n", FUNCNAME);
 				retval = m_in_opt_ram_cb(offset & 0x1fff);
 			}
 			if (sec_decode & H89_MEM_SEC_FPY_RAM)
 			{
-				LOGMEMREAD("mem_r - SEC_FPY_RAM\n");
+				LOGMEMREAD("%s: SEC_FPY_RAM\n", FUNCNAME);
 				retval = m_in_flpy_ram_cb(offset & 0x1fff);
 			}
 			if (sec_decode & H89_MEM_SEC_FPY_ROM)
 			{
-				LOGMEMREAD("mem_r - SEC_FPY_ROM\n");
+				LOGMEMREAD("%s: SEC_FPY_ROM\n", FUNCNAME);
 				retval = m_in_flpy_rom_cb(offset & 0x1fff);
 			}
 		}
@@ -590,23 +631,23 @@ u8 h89bus_device::mem_dispatch_r(offs_t offset)
 
 		if (decode & H89_MEM_PRI_RAS0)
 		{
-			LOGMEMREAD("mem_r - PRI_RAS0\n");
+			LOGMEMREAD("%s: PRI_RAS0\n", FUNCNAME);
 			retval = m_in_bank0_cb(offset & 0x3fff);
 		}
 		if (decode & H89_MEM_PRI_RAS1)
 		{
-			LOGMEMREAD("mem_r - PRI_RAS1\n");
+			LOGMEMREAD("%s: PRI_RAS1\n", FUNCNAME);
 			retval = m_in_bank1_cb(offset & 0x3fff);
 		}
 		if (decode & H89_MEM_PRI_RAS2)
 		{
-			LOGMEMREAD("mem_r - PRI_RAS2\n");
+			LOGMEMREAD("%s: PRI_RAS2\n", FUNCNAME);
 			retval = m_in_bank2_cb(offset & 0x3fff);
 		}
 	}
 
 done:
-	LOGMEMREAD("mem_r - retval: decode: 0x%02x\n", retval);
+	LOGMEMREAD("%s: retval: 0x%02x\n", FUNCNAME, retval);
 
 	return retval;
 }
@@ -617,7 +658,7 @@ void h89bus_device::mem_dispatch_w(offs_t offset, u8 data)
 	u8 decode = m_mem_primary_decode_prom[val] ^ 0xff;
 	bool checkedCards = false;
 
-	LOGMEMWRITE("mem_w - offset: 0x%04x decode: 0x%02x data: 0x%02x\n", offset, decode, data);
+	LOGMEMWRITE("%s: offset: 0x%04x decode: 0x%02x data: 0x%02x\n", FUNCNAME, offset, decode, data);
 
 	if (decode)
 	{
@@ -630,7 +671,7 @@ void h89bus_device::mem_dispatch_w(offs_t offset, u8 data)
 		{
 			u8 sec_val = (m_fmwe << 4) | ((BIT(decode, 7) ^ 1) << 3) | BIT(offset, 10, 3);
 			u8 sec_decode = m_mem_secondary_decode_prom[sec_val] ^ 0xff;
-			LOGMEMWRITE("mem_w - PRI_U516 - sec_decode: 0x%02x sec_decode: 0x%02x\n", sec_decode, sec_val);
+			LOGMEMWRITE("%s: PRI_U516 - sec_decode: 0x%02x sec_val: 0x%02x\n", FUNCNAME, sec_decode, sec_val);
 
 			for (device_h89bus_left_card_interface &entry : m_left_device_list)
 			{
@@ -640,12 +681,12 @@ void h89bus_device::mem_dispatch_w(offs_t offset, u8 data)
 
 			if (sec_decode & H89_MEM_SEC_OPT_RAM)
 			{
-				LOGMEMWRITE("mem_w - SEC_OPT_RAM\n");
+				LOGMEMWRITE("%s: SEC_OPT_RAM\n", FUNCNAME);
 				m_out_opt_ram_cb(offset & 0x1fff, data);
 			}
 			if (sec_decode & H89_MEM_SEC_FPY_RAM)
 			{
-				LOGMEMWRITE("mem_w - SEC_FPY_RAM\n");
+				LOGMEMWRITE("%s: SEC_FPY_RAM\n", FUNCNAME);
 				m_out_flpy_ram_cb(offset & 0x1fff, data);
 			}
 		}
@@ -662,17 +703,17 @@ void h89bus_device::mem_dispatch_w(offs_t offset, u8 data)
 
 		if (decode & H89_MEM_PRI_RAS0)
 		{
-			LOGMEMWRITE("mem_w - PRI_RAS0\n");
+			LOGMEMWRITE("%s: PRI_RAS0\n", FUNCNAME);
 			m_out_bank0_cb(offset & 0x3fff, data);
 		}
 		if (decode & H89_MEM_PRI_RAS1)
 		{
-			LOGMEMWRITE("mem_w - PRI_RAS1\n");
+			LOGMEMWRITE("%s: PRI_RAS1\n", FUNCNAME);
 			m_out_bank1_cb(offset & 0x3fff, data);
 		}
 		if (decode & H89_MEM_PRI_RAS2)
 		{
-			LOGMEMWRITE("mem_w - PRI_RAS2\n");
+			LOGMEMWRITE("%s: PRI_RAS2\n", FUNCNAME);
 			m_out_bank2_cb(offset & 0x3fff, data);
 		}
 	}
