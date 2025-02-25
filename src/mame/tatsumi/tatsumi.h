@@ -24,6 +24,7 @@ public:
 		, m_ym2151(*this, "ymsnd")
 		, m_oki(*this, "oki")
 		, m_gfxdecode(*this, "gfxdecode")
+		, m_spritegfxdecode(*this, "spritegfxdecode")
 		, m_palette(*this, "palette")
 		, m_videoram(*this, "videoram")
 		, m_sharedram(*this, "sharedram")
@@ -44,6 +45,7 @@ protected:
 	optional_device<ym2151_device> m_ym2151;
 	required_device<okim6295_device> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<gfxdecode_device> m_spritegfxdecode;
 	required_device<palette_device> m_palette;
 
 	optional_shared_ptr<uint16_t> m_videoram;

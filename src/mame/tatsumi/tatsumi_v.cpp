@@ -85,7 +85,7 @@ void tatsumi_state::text_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 TILE_GET_INFO_MEMBER(tatsumi_state::get_text_tile_info)
 {
 	int tile = m_videoram[tile_index];
-	tileinfo.set(1,
+	tileinfo.set(0,
 			tile & 0xfff,
 			tile >> 12,
 			0);
@@ -449,14 +449,14 @@ void tatsumi_state::draw_sprites(BitmapClass &bitmap, const rectangle &cliprect,
 				for (int w = 0; w < x_width; w++) {
 					if (rotate)
 						roundupt_drawgfxzoomrotate(
-								m_temp_bitmap,cliprect,m_gfxdecode->gfx(0),
-								base,
+								m_temp_bitmap,cliprect,m_spritegfxdecode->gfx(0 + (base & 1)),
+								base >> 1,
 								color,flip_x,flip_y,x_pos,render_y,
 								scale,scale,0,write_priority_only);
 					else
 						roundupt_drawgfxzoomrotate(
-								bitmap,cliprect,m_gfxdecode->gfx(0),
-								base,
+								bitmap,cliprect,m_spritegfxdecode->gfx(0 + (base & 1)),
+								base >> 1,
 								color,flip_x,flip_y,x_pos,render_y,
 								scale,scale,0,write_priority_only);
 					base++;
@@ -571,7 +571,7 @@ void apache3_state::draw_sky(bitmap_rgb32 &bitmap,const rectangle &cliprect, int
 
 	start_offset=-start_offset;
 
-start_offset-=48;
+	start_offset-=48;
 	for (int y=0; y<256; y++) {
 		for (int x=0; x<320; x++) {
 			int col=palette_base + y + start_offset;
@@ -706,7 +706,7 @@ void roundup5_state::gfxdata_w(offs_t offset, uint8_t data)
 
 	offset=offset%0x8000;
 
-	m_gfxdecode->gfx(1)->mark_dirty(offset/8);
+	m_gfxdecode->gfx(0)->mark_dirty(offset/8);
 }
 
 VIDEO_START_MEMBER(roundup5_state,roundup5)
@@ -718,7 +718,7 @@ VIDEO_START_MEMBER(roundup5_state,roundup5)
 
 	m_tx_layer->set_transparent_pen(0);
 
-	m_gfxdecode->gfx(1)->set_source(m_tx_gfxram.get());
+	m_gfxdecode->gfx(0)->set_source(m_tx_gfxram.get());
 
 	save_pointer(NAME(m_tx_gfxram), 0x20000);
 	save_pointer(NAME(m_bg_gfxram), 0x20000);
@@ -1065,7 +1065,7 @@ TILE_GET_INFO_MEMBER(cyclwarr_state::get_tile_info_bigfight)
 	// bit 14: ignore transparency on this tile
 	int opaque = ((tile >> 14) & 1) == 1;
 
-	tileinfo.set(1,
+	tileinfo.set(0,
 						 tileno,
 						 color,
 						opaque ? TILE_FORCE_LAYER0 : 0);
@@ -1088,7 +1088,7 @@ TILE_GET_INFO_MEMBER(cyclwarr_state::get_tile_info_cyclwarr_road)
 	color |= 4;
 	int opaque = ((tile >> 14) & 1) == 1;
 
-	tileinfo.set(1,
+	tileinfo.set(0,
 						 tileno,
 						 color | m_road_color_bank,
 						 opaque ? TILE_FORCE_LAYER0 : 0);
@@ -1103,7 +1103,7 @@ void cyclwarr_state::tile_expand()
 	    Each tile (0x4000 of them) has a lookup table in ROM to build an individual 3-bit palette
 	    from sets of 8 bit palettes!
 	*/
-	gfx_element *gx0 = m_gfxdecode->gfx(1);
+	gfx_element *gx0 = m_gfxdecode->gfx(0);
 	m_mask.resize(gx0->elements() << 3,0);
 	uint8_t *dest;
 

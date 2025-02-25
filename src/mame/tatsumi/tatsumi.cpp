@@ -828,18 +828,25 @@ static const gfx_layout roundup5_vramlayout =
 	8*8
 };
 
+static GFXDECODE_START( gfx_apache3_sprites )
+	GFXDECODE_ENTRY( "sprites_l", 0, spritelayout,    1024, 256)
+	GFXDECODE_ENTRY( "sprites_h", 0, spritelayout,    1024, 256)
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_cyclwarr_sprites )
+	GFXDECODE_ENTRY( "sprites_l", 0, spritelayout,  8192, 512)
+	GFXDECODE_ENTRY( "sprites_h", 0, spritelayout,  8192, 512)
+GFXDECODE_END
+
 static GFXDECODE_START( gfx_apache3 )
-	GFXDECODE_ENTRY( "sprites", 0, spritelayout,    1024, 256)
 	GFXDECODE_ENTRY( "text",    0, gfx_8x8x3_planar, 768,  16)
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_roundup5 )
-	GFXDECODE_ENTRY( "sprites", 0, spritelayout,     1024, 256)
 	GFXDECODE_RAM(   nullptr,   0, roundup5_vramlayout, 0,  16)
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_cyclwarr )
-	GFXDECODE_ENTRY( "sprites", 0, spritelayout,  8192, 512)
 	GFXDECODE_ENTRY( "tilerom", 0, gfx_8x8x3_planar, 0,  16)
 GFXDECODE_END
 
@@ -900,6 +907,7 @@ void apache3_state::apache3(machine_config &config)
 	screen.set_raw(CLOCK_2 / 8, 400, 0, 320, 272, 0, 240); // TODO: Hook up CRTC
 	screen.set_screen_update(FUNC(apache3_state::screen_update_apache3));
 
+	GFXDECODE(config, m_spritegfxdecode, m_palette, gfx_apache3_sprites);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_apache3);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024 + 4096); // 1024 real colours, and 4096 arranged as series of CLUTs
 
@@ -952,6 +960,7 @@ void roundup5_state::roundup5(machine_config &config)
 	screen.set_raw(CLOCK_2 / 8, 400, 0, 320, 272, 0, 240); // TODO: Hook up CRTC
 	screen.set_screen_update(FUNC(roundup5_state::screen_update_roundup5));
 
+	GFXDECODE(config, m_spritegfxdecode, m_palette, gfx_apache3_sprites);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_roundup5);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024 + 4096); // 1024 real colours, and 4096 arranged as series of CLUTs
 	m_palette->set_membits(8).set_endianness(ENDIANNESS_BIG);
@@ -1033,6 +1042,7 @@ void cyclwarr_state::cyclwarr(machine_config &config)
 	screen.set_raw(CLOCK_2 / 8, 400, 0, 320, 272, 0, 240); // TODO: Hook up CRTC
 	screen.set_screen_update(FUNC(cyclwarr_state::screen_update_cyclwarr));
 
+	GFXDECODE(config, m_spritegfxdecode, m_palette, gfx_cyclwarr_sprites);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cyclwarr);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 8192 + 8192);
 
@@ -1087,9 +1097,6 @@ ROM_START( apache3 )
 	ROM_REGION( 0x10000, "sound_rom", 0 ) /* 64k code for sound V20 */
 	ROM_LOAD( "ap-27d.151",   0x00000, 0x10000, CRC(294b4d79) SHA1(2b03418a12a2aaf3919b98161d8d0ce6ae29a2bb) )
 
-	ROM_REGION( 0x200000, "sprites", ROMREGION_ERASE00 )
-	/* Filled in by both regions below */
-
 	ROM_REGION( 0x100000, "sprites_l", 0)
 	ROM_LOAD32_BYTE( "ap-00c.15",   0x000000, 0x20000, CRC(ad1ddc2b) SHA1(81f64663c4892ab5fb0e2dc99513dbfee73f15b8) )
 	ROM_LOAD32_BYTE( "ap-01c.22",   0x000001, 0x20000, CRC(6286ff00) SHA1(920da4a3a441dbf54ad86c0f4fb6f47a867e9cda) )
@@ -1138,9 +1145,6 @@ ROM_START( apache3a )
 
 	ROM_REGION( 0x10000, "sound_rom", 0 ) /* 64k code for sound V20 */
 	ROM_LOAD( "ap-27d.151",   0x00000, 0x10000, CRC(294b4d79) SHA1(2b03418a12a2aaf3919b98161d8d0ce6ae29a2bb) )
-
-	ROM_REGION( 0x200000, "sprites", ROMREGION_ERASE00 )
-	/* Filled in by both regions below */
 
 	ROM_REGION( 0x100000, "sprites_l", 0)
 	ROM_LOAD32_BYTE( "ap-00c.15",   0x000000, 0x20000, CRC(ad1ddc2b) SHA1(81f64663c4892ab5fb0e2dc99513dbfee73f15b8) )
@@ -1191,9 +1195,6 @@ ROM_START( apache3b )
 	ROM_REGION( 0x10000, "sound_rom", 0 ) /* 64k code for sound V20 */
 	ROM_LOAD( "ap-27d.151",   0x00000, 0x10000, CRC(294b4d79) SHA1(2b03418a12a2aaf3919b98161d8d0ce6ae29a2bb) )
 
-	ROM_REGION( 0x200000, "sprites", ROMREGION_ERASE00 )
-	/* Filled in by both regions below */
-
 	ROM_REGION( 0x100000, "sprites_l", 0)
 	ROM_LOAD32_BYTE( "ap-00c.15",   0x000000, 0x20000, CRC(ad1ddc2b) SHA1(81f64663c4892ab5fb0e2dc99513dbfee73f15b8) )
 	ROM_LOAD32_BYTE( "ap-01c.22",   0x000001, 0x20000, CRC(6286ff00) SHA1(920da4a3a441dbf54ad86c0f4fb6f47a867e9cda) )
@@ -1243,9 +1244,6 @@ ROM_START( roundup5 )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "ru-28d",   0x000000, 0x10000, CRC(df36c6c5) SHA1(c046482043f6b54c55696ba3d339ffb11d78f674) )
 
-	ROM_REGION( 0x180000, "sprites", ROMREGION_ERASE00 )
-	/* Filled in by both regions below */
-
 	ROM_REGION( 0x0c0000, "sprites_l", 0)
 	ROM_LOAD32_BYTE( "ru-00b",   0x000000, 0x20000, CRC(388a0647) SHA1(e4ab43832872f44c0fe1aaede4372cc00ca7d32b) )
 	ROM_LOAD32_BYTE( "ru-02b",   0x000001, 0x20000, CRC(eff33945) SHA1(3f4c3aaa11ccf945c2f898dfdf815705d8539e21) )
@@ -1294,9 +1292,6 @@ ROM_START( cyclwarr )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "cw26a.ic91", 0x000000, 0x10000, CRC(f7a70e3a) SHA1(5581633bf1f15d7f5c1e03de897d65d60f9f1e33) )
-
-	ROM_REGION( 0x200000, "sprites", ROMREGION_ERASE00 )
-	/* Filled in by both regions below */
 
 	ROM_REGION( 0x100000, "sprites_l", 0)
 	ROM_LOAD32_BYTE( "cw00a.ic26", 0x000000, 0x20000, CRC(058a77f1) SHA1(93f99fcf6ce6714d76af6f6e930115516f0379d3) )
@@ -1355,9 +1350,6 @@ ROM_START( cyclwarra )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "cw26a.ic91", 0x000000, 0x10000, CRC(f7a70e3a) SHA1(5581633bf1f15d7f5c1e03de897d65d60f9f1e33) )
 
-	ROM_REGION( 0x200000, "sprites", ROMREGION_ERASE00 )
-	/* Filled in by both regions below */
-
 	ROM_REGION( 0x100000, "sprites_l", 0)
 	ROM_LOAD32_BYTE( "cw00a.ic26", 0x000000, 0x20000, CRC(058a77f1) SHA1(93f99fcf6ce6714d76af6f6e930115516f0379d3) )
 	ROM_LOAD32_BYTE( "cw08a.ic45", 0x000001, 0x20000, CRC(f53993e7) SHA1(ef2d502ab180d2bc0bdb698c2878fdee9a2c33a8) )
@@ -1415,9 +1407,6 @@ ROM_START( cyclwarrb )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "cw26.ic91", 0x000000, 0x10000, CRC(a6485a3a) SHA1(b4fcf541efe48b3ca32065221fe2f59476a4f96a) )
 
-	ROM_REGION( 0x200000, "sprites", ROMREGION_ERASE00 )
-	/* Filled in by both regions below */
-
 	ROM_REGION( 0x100000, "sprites_l", 0)
 	ROM_LOAD32_BYTE( "cw00.ic26", 0x000000, 0x20000, CRC(ba00c582) SHA1(2cd645b828595acbe62e2f7aad037fcbdc5a543f) )
 	ROM_LOAD32_BYTE( "cw08.ic45", 0x000001, 0x20000, CRC(1583e576) SHA1(646762d1d181231090a18698378f60d09f26f49f) )
@@ -1467,9 +1456,6 @@ ROM_START( bigfight )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "rom20.ic91",   0x000000, 0x10000, CRC(b3add091) SHA1(8a67bfff75c13fe4d9b89d30449199200d11cea7) ) // == bf36b.ic91
 
-	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASE00 )
-	/* Filled in by both regions below */
-
 	ROM_REGION( 0x200000, "sprites_l", 0 )
 	ROM_LOAD32_BYTE( "rom0.ic26",   0x000000, 0x80000, CRC(a4a3c8d6) SHA1(b5365d9bc6068260c23ba9d5971c7c7d7cc07a97) )
 	ROM_LOAD32_BYTE( "rom8.ic45",   0x000001, 0x80000, CRC(220956ed) SHA1(68e0ba1e850101b4cc2778819dfa76f04d88d2d6) )
@@ -1518,9 +1504,6 @@ ROM_START( bigfightj ) // ABA-011 main board + ABA-012 daughter board
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "bf36b.ic91", 0x000000, 0x10000, CRC(b3add091) SHA1(8a67bfff75c13fe4d9b89d30449199200d11cea7) ) // rev B
 
-	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASE00 )
-	/* Filled in by both regions below */
-
 	ROM_REGION( 0x200000, "sprites_l", 0 )
 	ROM_LOAD32_BYTE( "bf00d.ic26", 0x000000, 0x40000, CRC(f506d508) SHA1(86255631ac139f1b5c0f5d6e54a0858625497a1e) ) // all rev D
 	ROM_LOAD32_BYTE( "bf08d.ic45", 0x000001, 0x40000, CRC(4bf948b9) SHA1(c65b95c454d04c7e4a0cf426ac2d45ddc5e8885e) )
@@ -1560,20 +1543,6 @@ ROM_END
 
 void apache3_state::init_apache3()
 {
-	uint8_t *dst = memregion("sprites")->base();
-	uint8_t *src1 = memregion("sprites_l")->base();
-	uint8_t *src2 = memregion("sprites_h")->base();
-
-	for (int i = 0; i < 0x100000; i += 32)
-	{
-		memcpy(dst,src1,32);
-		src1+=32;
-		dst+=32;
-		memcpy(dst,src2,32);
-		dst+=32;
-		src2+=32;
-	}
-
 	// Copy sprite & palette data out of GFX rom area
 	m_rom_sprite_lookup[0] = memregion("sprites_l")->base();
 	m_rom_sprite_lookup[1] = memregion("sprites_h")->base();
@@ -1592,20 +1561,6 @@ void apache3_state::init_apache3()
 
 void roundup5_state::init_roundup5()
 {
-	uint8_t *dst = memregion("sprites")->base();
-	uint8_t *src1 = memregion("sprites_l")->base();
-	uint8_t *src2 = memregion("sprites_h")->base();
-
-	for (int i = 0; i < 0xc0000; i += 32)
-	{
-		memcpy(dst,src1,32);
-		src1+=32;
-		dst+=32;
-		memcpy(dst,src2,32);
-		dst+=32;
-		src2+=32;
-	}
-
 	// Copy sprite & palette data out of GFX rom area
 	m_rom_sprite_lookup[0] = memregion("sprites_l")->base();
 	m_rom_sprite_lookup[1] = memregion("sprites_h")->base();
@@ -1617,21 +1572,8 @@ void roundup5_state::init_roundup5()
 
 void cyclwarr_state::init_cyclwarr()
 {
-	uint8_t *dst = memregion("sprites")->base();
-	uint8_t *src1 = memregion("sprites_l")->base();
 	int len1 = memregion("sprites_l")->bytes();
-	uint8_t *src2 = memregion("sprites_h")->base();
 	int len2 = memregion("sprites_h")->bytes();
-
-	for (int i = 0; i < len1; i += 32)
-	{
-		memcpy(dst,src1,32);
-		src1+=32;
-		dst+=32;
-		memcpy(dst,src2,32);
-		dst+=32;
-		src2+=32;
-	}
 
 	// Copy sprite & palette data out of GFX rom area
 	m_rom_sprite_lookup[0] = memregion("sprites_l")->base();
@@ -1650,9 +1592,12 @@ void cyclwarr_state::init_cyclwarr()
 GAME( 1988, apache3,   0,        apache3,   apache3,  apache3_state,  init_apache3,  ROT0, "Tatsumi", "Apache 3 (rev F)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // Rev F CPU code
 GAME( 1988, apache3a,  apache3,  apache3,   apache3,  apache3_state,  init_apache3,  ROT0, "Tatsumi", "Apache 3 (rev E)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // Rev C & E CPU code
 GAME( 1988, apache3b,  apache3,  apache3,   apache3,  apache3_state,  init_apache3,  ROT0, "Tatsumi (Kana Corporation license)", "Apache 3 (Kana Corporation license, rev G)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // Rev C & G CPU code
+
 GAMEL(1989, roundup5,  0,        roundup5,  roundup5, roundup5_state, init_roundup5, ROT0, "Tatsumi", "Round Up 5 - Super Delta Force", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING, layout_roundup5 )
+
 GAME( 1991, cyclwarr,  0,        cyclwarr,  cyclwarr, cyclwarr_state, init_cyclwarr, ROT0, "Tatsumi", "Cycle Warriors (rev C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // Rev C & B CPU code
 GAME( 1991, cyclwarra, cyclwarr, cyclwarr,  cyclwarb, cyclwarr_state, init_cyclwarr, ROT0, "Tatsumi", "Cycle Warriors (rev B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // Rev B & A CPU code
 GAME( 1991, cyclwarrb, cyclwarr, cyclwarr,  cyclwarb, cyclwarr_state, init_cyclwarr, ROT0, "Tatsumi", "Cycle Warriors", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // Original version with no Rev roms
+
 GAME( 1992, bigfight,  0,        bigfight,  bigfight, cyclwarr_state, init_cyclwarr, ROT0, "Tatsumi", "Big Fight - Big Trouble In The Atlantic Ocean", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1992, bigfightj, bigfight, bigfight,  bigfight, cyclwarr_state, init_cyclwarr, ROT0, "Tatsumi", "Big Fight - Big Trouble In The Atlantic Ocean (Japan, rev F)", MACHINE_IMPERFECT_GRAPHICS ) // Rev D through F CPU codes
