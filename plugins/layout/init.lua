@@ -48,7 +48,8 @@ function layout.startplugin()
 			string = string,
 			tonumber = tonumber,
 			tostring = tostring,
-			table = table }
+			table = table,
+			slider_manager = require("layout/sliders") }
 		local script, err = load(script, script, "t", env)
 		if not script then
 			emu.print_warning("error loading layout script " .. err)
