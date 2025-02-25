@@ -515,29 +515,29 @@ void tatsumi_state::draw_sprites(BitmapClass &bitmap, const rectangle &cliprect,
  *  We update 'Mame palettes' from the clut here in order to simplify the
  *  draw routines.  We also note down any uses of the 'shadow' pen (index 255).
  */
-void tatsumi_state::update_cluts(int object_base)
+void tatsumi_state::update_cluts()
 {
 	const int length = m_rom_clut_size * 2;
 	const uint8_t* bank1 = m_sprites_l_rom + m_rom_clut_offset;
 	const uint8_t* bank2 = m_sprites_h_rom + m_rom_clut_offset;
 	for (int i=0; i<length; i+=8)
 	{
-		m_fakepalette->set_pen_color(i+0,m_palette->pen_color(bank1[1]+object_base));
+		m_fakepalette->set_pen_color(i+0,m_palette->pen_color(bank1[1]+m_sprite_palette_base));
 		m_shadow_pen_array[i+0]=(bank1[1]==255);
-		m_fakepalette->set_pen_color(i+1,m_palette->pen_color(bank1[0]+object_base));
+		m_fakepalette->set_pen_color(i+1,m_palette->pen_color(bank1[0]+m_sprite_palette_base));
 		m_shadow_pen_array[i+1]=(bank1[0]==255);
-		m_fakepalette->set_pen_color(i+2,m_palette->pen_color(bank1[3]+object_base));
+		m_fakepalette->set_pen_color(i+2,m_palette->pen_color(bank1[3]+m_sprite_palette_base));
 		m_shadow_pen_array[i+2]=(bank1[3]==255);
-		m_fakepalette->set_pen_color(i+3,m_palette->pen_color(bank1[2]+object_base));
+		m_fakepalette->set_pen_color(i+3,m_palette->pen_color(bank1[2]+m_sprite_palette_base));
 		m_shadow_pen_array[i+3]=(bank1[2]==255);
 
-		m_fakepalette->set_pen_color(i+4,m_palette->pen_color(bank2[1]+object_base));
+		m_fakepalette->set_pen_color(i+4,m_palette->pen_color(bank2[1]+m_sprite_palette_base));
 		m_shadow_pen_array[i+4]=(bank2[1]==255);
-		m_fakepalette->set_pen_color(i+5,m_palette->pen_color(bank2[0]+object_base));
+		m_fakepalette->set_pen_color(i+5,m_palette->pen_color(bank2[0]+m_sprite_palette_base));
 		m_shadow_pen_array[i+5]=(bank2[0]==255);
-		m_fakepalette->set_pen_color(i+6,m_palette->pen_color(bank2[3]+object_base));
+		m_fakepalette->set_pen_color(i+6,m_palette->pen_color(bank2[3]+m_sprite_palette_base));
 		m_shadow_pen_array[i+6]=(bank2[3]==255);
-		m_fakepalette->set_pen_color(i+7,m_palette->pen_color(bank2[2]+object_base));
+		m_fakepalette->set_pen_color(i+7,m_palette->pen_color(bank2[2]+m_sprite_palette_base));
 		m_shadow_pen_array[i+7]=(bank2[2]==255);
 
 		bank1+=4;
@@ -654,7 +654,7 @@ VIDEO_START_MEMBER(apache3_state,apache3)
 
 uint32_t apache3_state::screen_update_apache3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	update_cluts(0);
+	update_cluts();
 
 	m_tx_layer->set_scrollx(0,24);
 
@@ -986,7 +986,7 @@ uint32_t roundup5_state::screen_update_roundup5(screen_device &screen, bitmap_rg
 	tx_start_addr = (m_hd6445_reg[0xc] << 8) | (m_hd6445_reg[0xd]);
 	tx_start_addr &= 0x3fff;
 
-	update_cluts(512);
+	update_cluts();
 
 	m_tx_layer->set_scrollx(0,24);
 	m_tx_layer->set_scrolly(0,(tx_start_addr >> 4) | m_hd6445_reg[0x1d]);
@@ -1260,7 +1260,7 @@ uint32_t cyclwarr_state::screen_update_cyclwarr(screen_device &screen, bitmap_rg
 		}
 		m_bigfight_last_bank=m_bigfight_bank;
 	}
-	update_cluts(4096);
+	update_cluts();
 
 	bitmap.fill(m_palette->pen(0), cliprect);
 
