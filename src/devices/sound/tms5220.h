@@ -97,7 +97,7 @@ private:
 	int16_t clip_analog(int16_t cliptemp) const;
 	int32_t matrix_multiply(int32_t a, int32_t b) const;
 	int32_t lattice_filter();
-	void process_command(unsigned char cmd);
+	void process_command(uint8_t cmd);
 	void parse_frame();
 	void set_interrupt_state(int state);
 	void update_ready_state();
@@ -156,6 +156,12 @@ private:
 	bool m_buffer_empty;        /* If 1, FIFO is empty */
 	bool m_irq_pin;             /* state of the IRQ pin (output) */
 	bool m_ready_pin;           /* state of the READY pin (output) */
+
+	/* Currently processed command */
+	uint8_t m_command_register;
+
+	/* Indicates a value latched from the data lines and not yet processed */
+	bool m_data_latched;
 
 	/* these contain data describing the current and previous voice frames */
 	bool m_OLDE;

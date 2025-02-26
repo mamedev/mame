@@ -397,8 +397,10 @@ emulating the tms5220 in MCU code). Look for a 16-pin chip at U6 labeled
 #define LOG_IO_READY (1U << 14)
 // debugs the tms5220_data_r and data_w access methods which actually respect rs and ws
 #define LOG_RS_WS (1U << 15)
+// shows the byte being written by the CPU to the VSP
+#define LOG_DATA_W (1U << 16)
 
-//#define VERBOSE (LOG_GENERAL | LOG_DUMP_INPUT_DATA | LOG_FIFO | LOG_PARSE_FRAME_DUMP_HEX | LOG_FRAME_ERRORS | LOG_COMMAND_DUMP | LOG_COMMAND_VERBOSE | LOG_PIN_READS | LOG_GENERATION | LOG_GENERATION_VERBOSE | LOG_LATTICE | LOG_CLIP | LOG_IO_READY | LOG_RS_WS)
+//#define VERBOSE (LOG_GENERAL | LOG_DUMP_INPUT_DATA | LOG_FIFO | LOG_PARSE_FRAME_DUMP_HEX | LOG_FRAME_ERRORS | LOG_COMMAND_DUMP | LOG_COMMAND_VERBOSE | LOG_PIN_READS | LOG_GENERATION | LOG_GENERATION_VERBOSE | LOG_LATTICE | LOG_CLIP | LOG_IO_READY | LOG_RS_WS | LOG_DATA_W)
 #include "logmacro.h"
 
 #define MAX_SAMPLE_CHUNK    512
@@ -437,6 +439,8 @@ emulating the tms5220 in MCU code). Look for a 16-pin chip at U6 labeled
 #define CTL_STATE_NEXT_OUTPUT         (4)
 
 static const uint8_t reload_table[4] = { 0, 2, 4, 6 }; //sample count reload for 5220c and cd2501ecd only; 5200 and 5220 always reload with 0; keep in mind this is loaded on IP=0 PC=12 subcycle=1 so it immediately will increment after one sample, effectively being 1,3,5,7 as in the comments above.
+
+#define NOCOMMAND 0xff
 
 // Pull in the ROM tables
 #include "tms5110r.hxx"
@@ -479,6 +483,9 @@ void tms5220_device::register_for_save_states()
 	save_item(NAME(m_buffer_empty));
 	save_item(NAME(m_irq_pin));
 	save_item(NAME(m_ready_pin));
+
+	save_item(NAME(m_command_register));
+	save_item(NAME(m_data_latched));
 
 	// current and previous frames
 	save_item(NAME(m_OLDE));
@@ -663,12 +670,14 @@ void tms5220_device::data_write(int data)
 			LOGMASKED(LOG_FIFO, "data_write: Ran out of room in the tms52xx FIFO! this should never happen!\n");
 			// at this point, /READY should remain HIGH/inactive until the FIFO has at least one byte open in it.
 		}
-
-
+		m_data_latched = false;
 	}
 	else //(! m_DDIS)
 		// R Nabet : we parse commands at once.  It is necessary for such commands as read.
 		process_command(data);
+
+	if (!m_data_latched)
+		m_io_ready = true;
 }
 
 /**********************************************************************************************
@@ -736,9 +745,30 @@ void tms5220_device::update_fifo_status_and_ints()
 	// also, in this case, regardless if DDIS was set, unset it.
 	if (m_previous_talk_status && !talk_status())
 	{
-		LOG("Talk status WAS 1, is now 0, unsetting DDIS and firing an interrupt!\n");
+		LOG("Talk status 1 -> 0, unsetting DDIS and firing an interrupt.\n");
 		set_interrupt_state(1);
 		m_DDIS = false;
+
+		m_previous_talk_status = false;
+
+		// Is there a command stuck in the command register due to speech output?
+		// Then resume it.
+		if (m_command_register != NOCOMMAND)
+		{
+			LOGMASKED(LOG_COMMAND_DUMP, "Resume command execution: %02X\n", m_command_register);
+			process_command(m_command_register);
+
+			// Is there another data transfer pending? Resume it as well.
+			if (m_data_latched)
+			{
+				LOGMASKED(LOG_COMMAND_DUMP, "Pending byte write: %02X\n", m_write_latch);
+				m_timer_io_ready->adjust(clocks_to_attotime(16), 1);
+			}
+			else
+				m_io_ready = true;
+
+			update_ready_state();
+		}
 	}
 	m_previous_talk_status = talk_status();
 
@@ -1296,13 +1326,26 @@ int32_t tms5220_device::lattice_filter()
 
 /**********************************************************************************************
 
-     process_command -- extract a byte from the FIFO and interpret it as a command
+     process_command -- decode byte and run the command
+
+     During SPEAK, the address counter is locked against modification by
+     LOAD_ADDRESS. In that time, a LOAD_ADDRESS command does not terminate but
+     remains in the command register.
+     When another command is fed into the speech processor, the READY line is
+     lowered until the command register is cleared, then the new command is
+     loaded into the command register.
+
+     Note that the running SPEAK command does not block the command register;
+     it is a command that attempts to change the address during the SPEAK
+     process. [mz]
 
 ***********************************************************************************************/
 
-void tms5220_device::process_command(unsigned char cmd)
+void tms5220_device::process_command(uint8_t cmd)
 {
 	LOGMASKED(LOG_COMMAND_DUMP, "process_command called with parameter %02X\n", cmd);
+
+	m_command_register = cmd;
 
 	/* parse the command */
 	switch (cmd & 0x70)
@@ -1320,12 +1363,14 @@ void tms5220_device::process_command(unsigned char cmd)
 			if (m_speechrom)
 				m_read_byte_register = m_speechrom->read(8);    /* read one byte from speech ROM... */
 			m_RDB_flag = true;
+			m_command_register = NOCOMMAND;
 		}
 		else
-			LOGMASKED(LOG_COMMAND_VERBOSE, "Read Byte command received during TALK state, ignoring!\n");
+			LOGMASKED(LOG_COMMAND_VERBOSE, "Read Byte command received during TALK state, suspended.\n");
 		break;
 
-	case 0x00: case 0x20: /* set rate (tms5220c and cd2501ecd only), otherwise NOP */
+	case 0x00:
+	case 0x20: /* set rate (tms5220c and cd2501ecd only), otherwise NOP */
 		if (TMS5220_HAS_RATE_CONTROL)
 		{
 			LOGMASKED(LOG_COMMAND_VERBOSE, "Set Rate (or NOP) command received\n");
@@ -1333,6 +1378,8 @@ void tms5220_device::process_command(unsigned char cmd)
 		}
 		else
 			LOGMASKED(LOG_COMMAND_VERBOSE, "NOP command received\n");
+
+		m_command_register = NOCOMMAND;
 		break;
 
 	case 0x30 : /* read and branch */
@@ -1342,21 +1389,28 @@ void tms5220_device::process_command(unsigned char cmd)
 			m_RDB_flag = false;
 			if (m_speechrom)
 				m_speechrom->read_and_branch();
+			m_command_register = NOCOMMAND;
 		}
 		break;
 
 	case 0x40 : /* load address */
-		LOGMASKED(LOG_COMMAND_VERBOSE, "Load Address command received\n");
 		if (!talk_status()) /* TALKST must be clear for LA */
 		{
+			LOGMASKED(LOG_COMMAND_VERBOSE, "Load Address command received\n");
 			/* tms5220 data sheet says that if we load only one 4-bit nibble, it won't work.
 			   This code does not care about this. */
 			if (m_speechrom)
 				m_speechrom->load_address(cmd & 0x0f);
 			m_schedule_dummy_read = true;
+			m_command_register = NOCOMMAND;
 		}
 		else
-			LOGMASKED(LOG_COMMAND_VERBOSE, "Load Address command received during TALK state, ignoring!\n");
+		{
+			// The Load Address command is not ignored during speech output,
+			// as tests show. In fact, it is normally executed when the speech
+			// terminates.
+			LOGMASKED(LOG_COMMAND_VERBOSE, "Load Address command received during TALK state, suspended.\n");
+		}
 		break;
 
 	case 0x50 : /* speak */
@@ -1389,6 +1443,8 @@ void tms5220_device::process_command(unsigned char cmd)
 			m_new_frame_k_idx[i] = 0xF;
 		for (int i = 7; i < m_coeff->num_k; i++)
 			m_new_frame_k_idx[i] = 0x7;
+
+		m_command_register = NOCOMMAND;
 		break;
 
 	case 0x60 : /* speak external */
@@ -1417,6 +1473,8 @@ void tms5220_device::process_command(unsigned char cmd)
 		for (int i = 7; i < m_coeff->num_k; i++)
 			m_new_frame_k_idx[i] = 0x7;
 		m_RDB_flag = false;
+
+		m_command_register = NOCOMMAND;
 		break;
 
 	case 0x70 : /* reset */
@@ -1428,6 +1486,7 @@ void tms5220_device::process_command(unsigned char cmd)
 				m_speechrom->read(1);
 		}
 		reset();
+		m_command_register = NOCOMMAND;
 		break;
 	}
 
@@ -1666,6 +1725,9 @@ void tms5220_device::device_reset()
 	update_ready_state();
 	m_buffer_empty = m_buffer_low = true;
 
+	m_command_register = NOCOMMAND;
+	m_data_latched = false;
+
 	m_RDB_flag = false;
 
 	/* initialize the energy/pitch/k states */
@@ -1716,6 +1778,7 @@ TIMER_CALLBACK_MEMBER(tms5220_device::set_io_ready)
 {
 	/* bring up to date first */
 	m_stream->update();
+
 	LOGMASKED(LOG_IO_READY, "m_timer_io_ready timer fired, param = %02x, m_rs_ws = %02x\n", param, m_rs_ws);
 	if (param) // low->high ready state
 	{
@@ -1732,24 +1795,34 @@ TIMER_CALLBACK_MEMBER(tms5220_device::set_io_ready)
 			}
 			else
 			{
-				LOGMASKED(LOG_IO_READY, "m_timer_io_ready: Serviced write: %02x\n", m_write_latch);
-				data_write(m_write_latch);
-				m_io_ready = param;
+				if (m_command_register != NOCOMMAND)
+				{
+					// The command register is still busy; do not activate /READY
+					// and keep the data latch
+					LOGMASKED(LOG_IO_READY, "m_timer_io_ready: Command register not ready\n");
+				}
+				else
+				{
+					LOGMASKED(LOG_IO_READY, "m_timer_io_ready: Serviced write: %02X\n", m_write_latch);
+					m_data_latched = false;
+					data_write(m_write_latch);
+				}
+
 				break;
 			}
 		case 0x01:
 			/* Read */
 			m_read_latch = status_read(true);
-			LOGMASKED(LOG_IO_READY, "m_timer_io_ready: Serviced read, returning %02x\n", m_read_latch);
-			m_io_ready = param;
+			LOGMASKED(LOG_IO_READY, "m_timer_io_ready: Serviced read, returning %02X\n", m_read_latch);
+			m_io_ready = true;
 			break;
 		case 0x03:
 			/* High Impedance */
-			m_io_ready = param;
+			m_io_ready = true;
 			break;
 		case 0x00:
 			/* illegal */
-			m_io_ready = param;
+			m_io_ready = true;
 			break;
 		}
 	}
@@ -1940,10 +2013,12 @@ void tms5220_device::combined_rsq_wsq_w(u8 data)
 
 void tms5220_device::data_w(uint8_t data)
 {
-	LOGMASKED(LOG_RS_WS, "tms5220_write_data: data %02x\n", data);
+	LOGMASKED(LOG_DATA_W, "tms5220_write_data: data %02X\n", data);
 	/* bring up to date first */
 	m_stream->update();
 	m_write_latch = data;
+	m_data_latched = true;
+
 	if (!m_true_timing) // if we're in the default hacky mode where we don't bother with rsq_w and wsq_w...
 		data_write(m_write_latch); // ...force the write through instantly.
 	else
