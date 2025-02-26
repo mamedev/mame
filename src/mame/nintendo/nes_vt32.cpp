@@ -361,6 +361,12 @@ ROM_START( dgunl3202 )
 	ROM_IGNORE(0x100)
 ROM_END
 
+ROM_START( myaass )
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "s29gl256.u2", 0x00000, 0x2000000, CRC(71a3298d) SHA1(5a2441ae5a8bf3e5efe9f22843ad2b8ef2df0f40) )
+ROM_END
+
+
 ROM_START( fcpocket )
 	ROM_REGION( 0x8000000, "mainrom", 0 )
 	ROM_LOAD( "s29gl01gp.bin", 0x00000, 0x8000000, CRC(8703b18a) SHA1(07943443294e80ca93f83181c8bdbf950b87c52f) ) // 2nd half = 0x00 (so 64MByte of content)
@@ -386,6 +392,9 @@ CONS( 2015, rminitv,   0,  0,  nes_vt32_pal_32mb, nes_vt32, nes_vt32_unk_state, 
 CONS( 201?, dgunl3201, 0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init, "dreamGEAR", "My Arcade Data East Classics - Pixel Classic (308-in-1) (DGUNL-3201)", MACHINE_NOT_WORKING ) // from a UK unit, single 32Mbyte bank!
 CONS( 201?, dgunl3202, 0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init, "dreamGEAR", "My Arcade Data East Classics - Pixel Player (308-in-1) (DGUNL-3202)", MACHINE_NOT_WORKING ) // from a US unit single 32Mbyte bank!
 // There was also a 34-in-1 version of the Data East Classics in a mini-cabinet, NOT running on VT hardware, but using proper arcade ROMs, that one is reportedly running an old MAME build on an ARM SoC (although some sources say FBA)
+
+// many of the games don't work, is the dump OK? maybe different banking?
+CONS( 201?, myaass,    0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init, "dreamGEAR", "My Arcade All Star Stadium - Pocket Player (307-in-1)", MACHINE_NOT_WORKING )
 
 CONS( 2021, matet300,  0,         0,  nes_vt32_32mb,     nes_vt32, nes_vt32_unk_state, empty_init, "dreamGEAR", "My Arcade Tetris (DGUNL-7029, Go Gamer, with 300 bonus games)", MACHINE_NOT_WORKING )
 
