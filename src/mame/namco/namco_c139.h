@@ -65,7 +65,6 @@ private:
 	char m_remotehost[256]{};
 	uint8_t m_buffer0[0x200]{};
 	uint8_t m_buffer1[0x200]{};
-	uint8_t m_framesync;
 
 	uint16_t m_linktimer = 0;
 	uint8_t m_linkid = 0;
