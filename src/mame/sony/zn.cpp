@@ -6097,7 +6097,7 @@ GAME( 1996, coh1002e,  0,        coh1002e,  znt2p,    raizing_zn_state, empty_in
 GAME( 1997, beastrzr,  coh1002e, coh1002e,  znt2p,    raizing_zn_state, empty_init, ROT0, "Eighting / Raizing",      "Beastorizer (USA, Sep 22 1997)",                           MACHINE_SUPPORTS_SAVE )
 GAME( 1997, beastrzra, beastrzr, coh1002e,  znt2p,    raizing_zn_state, empty_init, ROT0, "Eighting / Raizing",      "Beastorizer (USA, Jun 21 1997)",                           MACHINE_SUPPORTS_SAVE )
 GAME( 1997, bldyroar,  beastrzr, coh1002e,  znt2p,    raizing_zn_state, empty_init, ROT0, "Eighting / Raizing",      "Bloody Roar (Japan, Jun 21 1997)",                         MACHINE_SUPPORTS_SAVE )
-GAME( 1997, beastrzrb, beastrzr, beastrzrb, znt2p,    beastrzrb_state,  empty_init, ROT0, "bootleg",                 "Beastorizer (USA bootleg)",                                MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, beastrzrb, beastrzr, beastrzrb, znt2p,    beastrzrb_state,  empty_init, ROT0, "bootleg",                 "Beastorizer (USA bootleg)",                                MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 
 // Eighting / Raizing ZN-1 (PS9805)
 GAME( 1998, bldyror2,  coh1002e, coh1002e,  bldyror2, raizing_zn_state, empty_init, ROT0, "Eighting / Raizing",      "Bloody Roar 2 (World)",                                    MACHINE_SUPPORTS_SAVE )
