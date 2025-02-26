@@ -59,12 +59,11 @@ void mcd212_device::update_matte_arrays()
 	uint8_t latched_wfb = m_weight_factor[1][0];
 	const int width = get_screen_width();
 
-	int x = 0;
 	const int num_mattes = BIT(m_image_coding_method, ICM_NM_BIT) ? 2 : 1;
 	const bool matte_flag = BIT(m_matte_control[0], MC_MF_BIT); // MF bit must be the same. See 5.10.2 Matte Commands
 	
 	int matte_idx = 0;
-	for (; x < width; x++)
+	for (int x = 0; x < width; x++)
 	{
 		for (int f1 = 0; f1 < num_mattes; f1++)
 		{
