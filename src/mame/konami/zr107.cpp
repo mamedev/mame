@@ -251,7 +251,7 @@ protected:
 	required_ioport_array<5> m_in;
 	required_ioport m_out4, m_eepromout;
 	optional_ioport_array<3> m_analog;
-	output_finder<2> m_pcb_digit;
+	output_finder<3> m_pcb_digit;
 
 	int32_t m_ccu_vcth = 0;
 	int32_t m_ccu_vctl = 0;
@@ -404,6 +404,7 @@ void zr107_state::sysreg_w(offs_t offset, uint8_t data)
 
 		case 2: // Parallel data register
 			LOGSYSREG("Parallel data = %02X\n", data);
+			m_pcb_digit[offset] = data;
 			break;
 
 		case 3: // System Register 0
