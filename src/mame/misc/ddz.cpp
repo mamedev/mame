@@ -181,7 +181,7 @@ ROM_START( crzclass )
 	// rom4 not populated
 ROM_END
 
-ROM_START( baibians ) // same PCB as crzclass
+ROM_START( baibians ) // 百变双扣, same PCB as crzclass
 	ROM_REGION32_LE( 0x1000000, "ipl", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x1000000, "enc_data", ROMREGION_ERASEFF )
@@ -191,7 +191,7 @@ ROM_START( baibians ) // same PCB as crzclass
 	// rom4 not populated
 ROM_END
 
-ROM_START( cjmx ) // same PCB as crzclass, but this one has an Amazon LF instead of the VRenderZero
+ROM_START( cjmx ) // 超级明星, same PCB as crzclass, but this one has an Amazon LF instead of the VRenderZero
 	ROM_REGION32_LE( 0x1000000, "ipl", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x1000000, "enc_data", ROMREGION_ERASEFF )
