@@ -1,12 +1,7 @@
 // license: BSD-3-Clause
-// copyright-holders: Charles MacDonald, Devin Hill, Fabio Dalla Libera
+// copyright-holders: Fabio Dalla Libera (fabiodl)
 
 /*
-    license:BSD-3-Clause
-    Charles MacDonald
-    Devin Hill
-    Fabio Dalla Libera
-
     Sega SP-400 Plotter
 
     6805 dumped using https://github.com/charlesmacd/HD6805_Reader
@@ -54,14 +49,12 @@ public:
 
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
-	virtual void device_reset_after_children() override ATTR_COLD;
 
 	const tiny_rom_entry * device_rom_region() const override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
-	virtual void input_data (int state) override { m_data = state; }
-	virtual int output_busy () override { return m_busy; }
+	virtual void input_data(int state) override { m_data = state; }
+	virtual int output_busy() override { return m_busy; }
 
 private:
 	void dser_map(address_map &map);
@@ -80,10 +73,10 @@ private:
 	required_device<i8035_device> m_dsercpu;     // "deserializer cpu"
 	required_device<m6805_hmos_device> m_motcpu; // "motor cpu"
 
-	int m_data, m_busy;
-	int m_dserdataout, m_dserstrobe;
-	int m_motbusy, m_motPenUp, m_motPenDown;
-	int m_pendown;
+	u8 m_data, m_busy;
+	u8 m_dserdataout, m_dserstrobe;
+	u8 m_motbusy, m_motpenup, m_motpendown;
+	u8 m_pendown;
 
 	required_ioport m_buttons;
 };
@@ -95,13 +88,13 @@ sp400_printer_device::sp400_printer_device(const machine_config &mconfig, const 
 	m_motcpu(*this, "motcpu"),
 	m_data(0),
 	m_busy(1),
-	m_dserdataout(0xFF),
+	m_dserdataout(0xff),
 	m_dserstrobe(1),
 	m_motbusy(0),
-	m_motPenUp(1),
-	m_motPenDown(1),
+	m_motpenup(1),
+	m_motpendown(1),
 	m_pendown(0),
-	m_buttons(*this, "BUTTONS")
+	m_buttons(*this, "buttons")
 {
 }
 
@@ -112,17 +105,9 @@ void sp400_printer_device::device_start()
 	save_item(NAME(m_dserdataout));
 	save_item(NAME(m_dserstrobe));
 	save_item(NAME(m_motbusy));
-	save_item(NAME(m_motPenUp));
-	save_item(NAME(m_motPenDown));
+	save_item(NAME(m_motpenup));
+	save_item(NAME(m_motpendown));
 	save_item(NAME(m_pendown));
-}
-
-void sp400_printer_device::device_reset()
-{
-}
-
-void sp400_printer_device::device_reset_after_children()
-{
 }
 
 void sp400_printer_device::dser_map(address_map &map)
@@ -175,8 +160,8 @@ void sp400_printer_device::mot_pb_w(uint8_t data)
 uint8_t sp400_printer_device::mot_pc_r()
 {
 	return
-		(m_motPenUp   << 0) |
-		(m_motPenDown << 1) |
+		(m_motpenup   << 0) |
+		(m_motpendown << 1) |
 		(1 << 2) |
 		(pen_sensor() << 3) |
 		(m_motbusy    << 4) |
@@ -185,8 +170,8 @@ uint8_t sp400_printer_device::mot_pc_r()
 
 void sp400_printer_device::mot_pc_w(uint8_t data)
 {
-	m_motPenUp   = BIT(data, 0);
-	m_motPenDown = BIT(data, 1);
+	m_motpenup   = BIT(data, 0);
+	m_motpendown = BIT(data, 1);
 	m_motbusy    = BIT(data, 4);
 	update_pen_state(data);
 }
@@ -231,11 +216,11 @@ const tiny_rom_entry * sp400_printer_device::device_rom_region() const
 	return ROM_NAME( sp400 );
 }
 
-static INPUT_PORTS_START( sp400 )
-	PORT_START("BUTTONS")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Color Select") PORT_CODE(KEYCODE_2_PAD)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Line Feed")    PORT_CODE(KEYCODE_1_PAD)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Pen Change")   PORT_CODE(KEYCODE_3_PAD)
+INPUT_PORTS_START( sp400 )
+	PORT_START("buttons")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Color Select") PORT_CODE(KEYCODE_2_PAD)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Line Feed")    PORT_CODE(KEYCODE_1_PAD)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Pen Change")   PORT_CODE(KEYCODE_3_PAD)
 INPUT_PORTS_END
 
 ioport_constructor sp400_printer_device::device_input_ports() const
@@ -245,5 +230,5 @@ ioport_constructor sp400_printer_device::device_input_ports() const
 
 } // anonymous namespace
 
-DEFINE_DEVICE_TYPE_PRIVATE(SP400_PRINTER, device_sk1100_printer_port_interface, sp400_printer_device, "sega_sp400", "SP-400 Plotter")
+DEFINE_DEVICE_TYPE_PRIVATE(SP400_PRINTER, device_sk1100_printer_port_interface, sp400_printer_device, "sega_sp400", "Sega SP-400 Plotter")
 
