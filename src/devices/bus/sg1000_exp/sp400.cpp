@@ -1,5 +1,5 @@
 // license: BSD-3-Clause
-// copyright-holders: Fabio Dalla Libera (fabiodl)
+// copyright-holders: Fabio Dalla Libera
 
 /*
     Sega SP-400 Plotter
@@ -34,23 +34,23 @@
 #include "emu.h"
 #include "sp400.h"
 
-#include "cpu/mcs48/mcs48.h"
 #include "cpu/m6805/m68705.h"
+#include "cpu/mcs48/mcs48.h"
+
 
 namespace {
 
-class sp400_printer_device : public device_t,
-	public device_sk1100_printer_port_interface
+class sp400_printer_device : public device_t, public device_sk1100_printer_port_interface
 {
 public:
-	sp400_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
 	static constexpr feature_type unemulated_features() { return feature::PRINTER; }
+
+	sp400_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 
-	const tiny_rom_entry * device_rom_region() const override ATTR_COLD;
+	const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	virtual void input_data(int state) override { m_data = state; }
@@ -70,8 +70,8 @@ private:
 	void update_pen_state(uint8_t data);
 	uint8_t pen_sensor() { return 0; }  // not currently hooked up
 
-	required_device<i8035_device> m_dsercpu;     // "deserializer cpu"
-	required_device<m6805_hmos_device> m_motcpu; // "motor cpu"
+	required_device<i8035_device> m_dsercpu;     // "deserializer CPU"
+	required_device<m6805_hmos_device> m_motcpu; // "motor CPU"
 
 	uint8_t m_data, m_busy;
 	uint8_t m_dserdataout, m_dserstrobe;
@@ -81,7 +81,7 @@ private:
 	required_ioport m_buttons;
 };
 
-sp400_printer_device::sp400_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock):
+sp400_printer_device::sp400_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SP400_PRINTER, tag, owner, clock),
 	device_sk1100_printer_port_interface(mconfig, *this),
 	m_dsercpu(*this, "dsercpu"),
@@ -94,7 +94,7 @@ sp400_printer_device::sp400_printer_device(const machine_config &mconfig, const 
 	m_motpenup(1),
 	m_motpendown(1),
 	m_pendown(0),
-	m_buttons(*this, "buttons")
+	m_buttons(*this, "BUTTONS")
 {
 }
 
@@ -130,25 +130,25 @@ void sp400_printer_device::dser_p2_w(uint8_t data)
 uint8_t sp400_printer_device::dser_p2_r()
 {
 	return
-		(m_motbusy << 7) |
-		(m_dserstrobe << 6) |
-		(m_busy << 5) |
-		(m_data << 4) |
-		(1 << 3) |
-		(1 << 2) |
-		(1 << 1) |
-		(1 << 0);
+			(m_motbusy << 7) |
+			(m_dserstrobe << 6) |
+			(m_busy << 5) |
+			(m_data << 4) |
+			(1 << 3) |
+			(1 << 2) |
+			(1 << 1) |
+			(1 << 0);
 }
 
 uint8_t sp400_printer_device::mot_pa_r()
 {
 	return
-		(0 << 0) |
-		(0 << 1) |
-		(m_buttons->read() << 2) |  // bits 2..4
-		(0 << 5) |
-		(0 << 6) |
-		(1 << 7);
+			(0 << 0) |
+			(0 << 1) |
+			(m_buttons->read() << 2) |  // bits 2..4
+			(0 << 5) |
+			(0 << 6) |
+			(1 << 7);
 }
 
 void sp400_printer_device::mot_pb_w(uint8_t data)
@@ -160,12 +160,12 @@ void sp400_printer_device::mot_pb_w(uint8_t data)
 uint8_t sp400_printer_device::mot_pc_r()
 {
 	return
-		(m_motpenup   << 0) |
-		(m_motpendown << 1) |
-		(1 << 2) |
-		(pen_sensor() << 3) |
-		(m_motbusy    << 4) |
-		(1 << 5) | (1 << 6) | (1 << 7); //unconfirmed
+			(m_motpenup   << 0) |
+			(m_motpendown << 1) |
+			(1 << 2) |
+			(pen_sensor() << 3) |
+			(m_motbusy    << 4) |
+			(1 << 5) | (1 << 6) | (1 << 7); // unconfirmed
 }
 
 void sp400_printer_device::mot_pc_w(uint8_t data)
@@ -211,13 +211,13 @@ ROM_START( sp400 )
 	ROM_LOAD( "sp400_hd6805v1.bin", 0x0000, 0x1000, CRC(aa073745) SHA1(65016f3b022af30cc6b084af1e43b29168721a60) )
 ROM_END
 
-const tiny_rom_entry * sp400_printer_device::device_rom_region() const
+const tiny_rom_entry *sp400_printer_device::device_rom_region() const
 {
 	return ROM_NAME( sp400 );
 }
 
 INPUT_PORTS_START( sp400 )
-	PORT_START("buttons")
+	PORT_START("BUTTONS")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Color Select") PORT_CODE(KEYCODE_2_PAD)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Line Feed")    PORT_CODE(KEYCODE_1_PAD)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Pen Change")   PORT_CODE(KEYCODE_3_PAD)
@@ -231,4 +231,3 @@ ioport_constructor sp400_printer_device::device_input_ports() const
 } // anonymous namespace
 
 DEFINE_DEVICE_TYPE_PRIVATE(SP400_PRINTER, device_sk1100_printer_port_interface, sp400_printer_device, "sega_sp400", "Sega SP-400 Plotter")
-
