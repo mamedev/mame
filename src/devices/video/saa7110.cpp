@@ -30,12 +30,14 @@ saa7110a_device::saa7110a_device(const machine_config &mconfig, const char *tag,
 	: device_t(mconfig, SAA7110A, tag, owner, clock)
 	, i2c_hle_interface(mconfig, *this, 0x9c >> 1)
 	, device_memory_interface(mconfig, *this)
+	//, m_out_vs_cb(*this)
 {
 	m_space_config = address_space_config("regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(saa7110a_device::regs_map), this));
 }
 
 void saa7110a_device::device_start()
 {
+	//m_href_timer = timer_alloc(FUNC(saa7110a_device::href_cb), this);
 	save_item(NAME(m_secs));
 	save_item(NAME(m_sstb));
 	save_item(NAME(m_hrmv));
@@ -46,6 +48,8 @@ void saa7110a_device::device_start()
 void saa7110a_device::device_reset()
 {
 	m_secs = m_sstb = m_hrmv = m_rtse = m_vtrc = false;
+	//m_current_href = 0;
+	//m_href_timer->adjust(attotime::from_hz(15734), 0, attotime::from_hz(15734));
 }
 
 device_memory_interface::space_config_vector saa7110a_device::memory_space_config() const
@@ -140,8 +144,14 @@ void saa7110a_device::regs_map(address_map &map)
 	map(0x2b, 0x2b).lw8(NAME([this] (offs_t offset, u8 data) { LOG("SU2B: Gain control analog #3 %02x\n", data); }));
 	map(0x2c, 0x2c).lw8(NAME([this] (offs_t offset, u8 data) { LOG("SU2C: Mixer control #2 %02x\n", data); }));
 	map(0x2d, 0x2d).lw8(NAME([this] (offs_t offset, u8 data) { LOG("SU2D: Integration value gain %02x\n", data); }));
-	map(0x2e, 0x2e).lw8(NAME([this] (offs_t offset, u8 data) { LOG("SU2E: Vertical blanking pulse set %02x\n", data); }));
-	map(0x2f, 0x2f).lw8(NAME([this] (offs_t offset, u8 data) { LOG("SU2F: Vertical blanking pulse reset %02x\n", data); }));
+	map(0x2e, 0x2e).lw8(NAME([this] (offs_t offset, u8 data) {
+		m_vbps = data;
+		LOG("SU2E: Vertical blanking pulse set %02x\n", data);
+	}));
+	map(0x2f, 0x2f).lw8(NAME([this] (offs_t offset, u8 data) {
+		m_vbpr = data;
+		LOG("SU2F: Vertical blanking pulse reset %02x\n", data);
+	}));
 	map(0x30, 0x30).lw8(NAME([this] (offs_t offset, u8 data) { LOG("SU30: ADCs gain control %02x\n", data); }));
 	map(0x31, 0x31).lw8(NAME([this] (offs_t offset, u8 data) { LOG("SU31: Mixer control #3 %02x\n", data); }));
 	map(0x32, 0x32).lw8(NAME([this] (offs_t offset, u8 data) { LOG("SU32: Integration value white peak %02x\n", data); }));
@@ -149,3 +159,19 @@ void saa7110a_device::regs_map(address_map &map)
 	map(0x34, 0x34).lw8(NAME([this] (offs_t offset, u8 data) { LOG("SU34: Gain update level %02x\n", data); }));
 }
 
+//TIMER_CALLBACK_MEMBER(saa7110a_device::href_cb)
+//{
+//  if (m_vbpr == m_vbps)
+//      return;
+//  m_current_href ++;
+//  if (m_current_href == m_vbps * 2)
+//  {
+//      m_out_vs_cb(1);
+//  }
+//  if (m_current_href == m_vbpr * 2)
+//  {
+//      m_out_vs_cb(0);
+//  }
+//  m_current_href %= 262;
+//}
+//

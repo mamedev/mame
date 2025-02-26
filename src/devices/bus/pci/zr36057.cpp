@@ -19,6 +19,7 @@ TODO:
 - Hookup busmaster;
 - What are i2c 0x8e >> 1 address device checks for?
 \- Can't be adv7175 (0xd4 >> 1) nor adv7176 (0x54 >> 1)
+- Noisy on undocumented guest ID 7 once VidCap capturing is enabled;
 ...
 - Soft Reset & Write lock mechanisms (each register have separate macro-groups);
 - GuestBus slot mechanism (relevant when multiple devices are hooked);
@@ -85,6 +86,7 @@ void zr36057_device::device_add_mconfig(machine_config &config)
 
 	SAA7110A(config, m_decoder, XTAL(26'800'000));
 	m_decoder->sda_callback().set([this](int state) { m_decoder_sdao_state = state; });
+	//m_decoder->vs_callback().set(FUNC(zr36057_device::girq1_w));
 
 	//ADV7176(config, m_encoder, XTAL(27'000'000));
 
@@ -158,6 +160,17 @@ void zr36057_device::software_reset()
 	m_vfe.ovl_enable = false;
 	m_vfe.mask_stride = 0xff;
 
+	// TODO: these also go in process_reset fn
+	// defaults in MPEG mode
+	m_jpeg.mode = false;
+	m_jpeg.sub_mode = 3;
+	m_jpeg.rtbsy_fb = m_jpeg.go_en = m_jpeg.sync_mstr = m_jpeg.fld_per_buff = false;
+	m_jpeg.vfifo_fb = m_jpeg.cfifo_fb = false;
+	m_jpeg.still_lendian = true;
+	m_jpeg.p_reset = true;
+	m_jpeg.cod_trns_en = false;
+	m_jpeg.active = false;
+
 	m_sync_gen.vsync_size = 6;
 	m_sync_gen.vtotal = 525;
 	m_sync_gen.hsync_start = 640;
@@ -169,6 +182,9 @@ void zr36057_device::software_reset()
 	m_active_area.pay = 240;
 	m_active_area.odd = true;
 
+	m_jpeg.guest_id = 4;
+	m_jpeg.guest_reg = 0;
+
 	m_irq_status = m_irq_enable = 0;
 	m_inta_pin_enable = false;
 
@@ -178,9 +194,6 @@ void zr36057_device::software_reset()
 	// m_gpio_data = 0xf0;
 	for (int i = 0; i < 4; i++)
 		m_guestbus.time[i] = 0;
-
-	m_jpeg_guest_id = 4;
-	m_jpeg_guest_reg = 0;
 
 	m_po.pending = false;
 	m_po.time_out = false;
@@ -337,7 +350,7 @@ void zr36057_device::asr_map(address_map &map)
 			// Not a mistake: min_pix overlaps with the /Triton setting
 			m_vfe.min_pix = (m_vfe.display_config >> 24) & 0x7f;
 			m_vfe.triton = !!BIT(~m_vfe.display_config, 24);
-			LOGVFE("\tVidEn %d, MinPix %d, Triton %s Controller"
+			LOGVFE("\tVidEn %d, MinPix %d, Triton %s Controller\n"
 				, m_vfe.vid_en
 				, m_vfe.min_pix
 				, m_vfe.triton ? "Intel 'Triton' Bridge" : "Other PCI Bridge"
@@ -453,6 +466,7 @@ void zr36057_device::asr_map(address_map &map)
 			{
 				m_irq_status &= ~data;
 				m_irq_status &= 0x7800'0000;
+				update_irq_status();
 			}
 		})
 	);
@@ -474,6 +488,7 @@ void zr36057_device::asr_map(address_map &map)
 					, BIT(data, 28)
 					, BIT(data, 27)
 				);
+				update_irq_status();
 			}
 		})
 	);
@@ -493,8 +508,71 @@ void zr36057_device::asr_map(address_map &map)
 			}
 		})
 	);
-//  map(0x100, 0x103) JPEG Mode and Control
-//  map(0x104, 0x107) JPEG Process Control
+	map(0x100, 0x103).lrw32(
+		NAME([this] (offs_t offset) {
+			LOG("JPEG Mode and Control R\n");
+			return (m_jpeg.mode << 31) | (m_jpeg.sub_mode << 29)
+				| (m_jpeg.rtbsy_fb << 6) | (m_jpeg.go_en << 5) | (m_jpeg.sync_mstr << 4)
+				| (m_jpeg.fld_per_buff << 3) | (m_jpeg.vfifo_fb << 2)
+				| (m_jpeg.cfifo_fb << 1) | (m_jpeg.still_lendian << 0);
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			LOG("JPEG Mode and Control W %08x & %08x\n", data, mem_mask);
+			if (ACCESSING_BITS_24_31)
+			{
+				m_jpeg.mode = !!BIT(data, 31);
+				// --x- (0) Still Image (1) Motion Video
+				// ---x (0) Decompression (1) Compression
+				m_jpeg.sub_mode = (data >> 29) & 3;
+				LOG("\tJPG %s Mode, JPGMode %d\n"
+					, m_jpeg.mode ? "JPEG" : "MPEG"
+					, m_jpeg.sub_mode
+				);
+			}
+
+			if (ACCESSING_BITS_0_7)
+			{
+				m_jpeg.rtbsy_fb = !!BIT(data, 6);
+				m_jpeg.go_en = !!BIT(data, 5);
+				m_jpeg.sync_mstr = !!BIT(data, 4);
+				m_jpeg.fld_per_buff = !!BIT(data, 3);
+				m_jpeg.vfifo_fb = !!BIT(data, 2);
+				m_jpeg.cfifo_fb = !!BIT(data, 1);
+				m_jpeg.still_lendian = !!BIT(data, 0);
+				LOG("\tRTBSY_FB %d, Go_en %d, SyncMstr %d, Fld_per_buff %s, VFIFO_FB %d, CFIFO_FB %d, Still_LitEndian %s\n"
+					, m_jpeg.rtbsy_fb
+					, m_jpeg.go_en
+					, m_jpeg.sync_mstr
+					, m_jpeg.fld_per_buff ? "1 (One code field)" : "0 (Two code fields, one code frame)"
+					, m_jpeg.vfifo_fb
+					, m_jpeg.cfifo_fb
+					, m_jpeg.still_lendian ? "Little" : "Gib"
+				);
+				if (m_jpeg.go_en)
+					popmessage("zr36057.cpp: go_en enabled");
+			}
+		})
+	);
+	map(0x104, 0x107).lrw32(
+		NAME([this] (offs_t offset) {
+			LOG("JPEG Process Control R\n");
+			return (m_jpeg.p_reset << 7) | (m_jpeg.cod_trns_en << 5) | (m_jpeg.active << 0);
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			LOG("JPEG Process Control W %08x & %08x\n", data, mem_mask);
+			if (ACCESSING_BITS_0_7)
+			{
+				m_jpeg.p_reset = !!BIT(data, 7);
+				m_jpeg.cod_trns_en = !!BIT(data, 5);
+				m_jpeg.active = !!BIT(data, 0);
+				LOG("\tP_reset %d, CodTrnsEn %d, Active %d\n"
+					, m_jpeg.p_reset
+					, m_jpeg.cod_trns_en
+					, m_jpeg.active
+				);
+			}
+		})
+	);
 	map(0x108, 0x10b).lrw32(
 		NAME([this] (offs_t offset) {
 			LOGSYNC("Vertical Sync Parameters R\n");
@@ -594,11 +672,11 @@ void zr36057_device::asr_map(address_map &map)
 	map(0x124, 0x124).lrw8(
 		NAME([this] (offs_t offset) {
 			LOG("JPEG Codec Guest ID R\n");
-			return (m_jpeg_guest_id << 4) | (m_jpeg_guest_reg << 0);
+			return (m_jpeg.guest_id << 4) | (m_jpeg.guest_reg << 0);
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			m_jpeg_guest_id = (data >> 4) & 7;
-			m_jpeg_guest_reg = (data >> 0) & 7;
+			m_jpeg.guest_id = (data >> 4) & 7;
+			m_jpeg.guest_reg = (data >> 0) & 7;
 			LOG("JPEG Codec Guest ID W %02x\n", data);
 		})
 	);
@@ -689,5 +767,13 @@ void zr36057_device::postoffice_w(offs_t offset, u32 data, u32 mem_mask)
 	{
 		m_po.time_out = true;
 		LOGWARN("Warning: PO access unmapped POGuestID write %d %02x\n", m_po.guest_id, m_po.guest_reg);
+	}
+}
+
+void zr36057_device::update_irq_status()
+{
+	if (m_inta_pin_enable)
+	{
+		irq_pin_w(0, m_irq_status & m_irq_enable);
 	}
 }
