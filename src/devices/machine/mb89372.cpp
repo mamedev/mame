@@ -31,7 +31,7 @@
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(MB89372, mb89372_device, "mb89372", "MB89372 Multi-Protocol Controller")
+DEFINE_DEVICE_TYPE(MB89372, mb89372_device, "mb89372", "Fujitsu MB89372 Multi-Protocol Controller")
 
 //-------------------------------------------------
 //  mb89372_device - constructor

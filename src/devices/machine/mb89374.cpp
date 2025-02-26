@@ -17,7 +17,7 @@
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(MB89374, mb89374_device, "mb89374", "MB89374 Data Link Controller")
+DEFINE_DEVICE_TYPE(MB89374, mb89374_device, "mb89374", "Fujitsu MB89374 Data Link Controller")
 
 
 enum
