@@ -359,6 +359,7 @@ const double XTAL::known_xtals[] = {
 	 22'680'000, // 22.680_MHz_XTAL        HDS200 80-columns display clock
 	 22'896'000, // 22.896_MHz_XTAL        DEC VT220 132-column display clock
 	 23'200'000, // 23.2_MHz_XTAL          Roland JV-80 & JV-880 PCM clock
+	 23'400'000, // 23.4_MHz_XTAL          Intel Integrated Processor Board (IPB) from iMDS2
 	 23'814'000, // 23.814_MHz_XTAL        TeleVideo TVI-912, 920 & 950
 	 23'961'600, // 23.9616_MHz_XTAL       Osborne 4 (Vixen)
 	 24'000'000, // 24_MHz_XTAL            Mario, 80's Data East games, 80's Konami games
