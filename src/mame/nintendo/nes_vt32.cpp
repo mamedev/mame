@@ -393,7 +393,7 @@ CONS( 201?, dgunl3201, 0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empt
 CONS( 201?, dgunl3202, 0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init, "dreamGEAR", "My Arcade Data East Classics - Pixel Player (308-in-1) (DGUNL-3202)", MACHINE_NOT_WORKING ) // from a US unit single 32Mbyte bank!
 // There was also a 34-in-1 version of the Data East Classics in a mini-cabinet, NOT running on VT hardware, but using proper arcade ROMs, that one is reportedly running an old MAME build on an ARM SoC (although some sources say FBA)
 
-// many of the games don't work, is the dump OK? maybe different banking?
+// many of the games don't work or have scrambled graphics, it writes 0xc0 to vtfp_411e_encryption_state_w in such cases
 CONS( 201?, myaass,    0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init, "dreamGEAR", "My Arcade All Star Stadium - Pocket Player (307-in-1)", MACHINE_NOT_WORKING )
 
 CONS( 2021, matet300,  0,         0,  nes_vt32_32mb,     nes_vt32, nes_vt32_unk_state, empty_init, "dreamGEAR", "My Arcade Tetris (DGUNL-7029, Go Gamer, with 300 bonus games)", MACHINE_NOT_WORKING )

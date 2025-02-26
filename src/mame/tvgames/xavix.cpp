@@ -2815,7 +2815,7 @@ ROM_END
 // product code 80-32705.
 // Some sites say 1997, but 1999 is what SSD had listed, and seems more fitting.
 // Also exists as
-// 80-32703 Hippo's Alphabet Adventure(UK)
+// 80-32703 Hippo's Alphabet Adventure (UK)
 // 80-32700 ABC Jungle Fun (US?)
 CONS( 1999, hippofr,  0,          0,  xavix_2mb, xavix,xavix_state,      init_xavix,    "VTech",             "Hippo: et la formidable aventure des lettres (France)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // needs keyboard emulating
 
