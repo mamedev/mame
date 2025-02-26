@@ -57,9 +57,12 @@ public:
 	ipc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_ipcctrl(*this, "ipcctrl")
+		, m_boot(*this, "boot")
 	{ }
 
 	void ipc(machine_config &config);
+	void ipb(machine_config &config);
 
 private:
 	void board_common(machine_config &config);
@@ -197,6 +200,8 @@ void ipc_state::board_common(machine_config &config)
 	rs232b.rxd_handler().set("uart2", FUNC(i8251_device::write_rxd));
 	rs232b.dsr_handler().set("uart2", FUNC(i8251_device::write_dsr));
 	rs232b.cts_handler().set("uart2", FUNC(i8251_device::write_cts));
+
+	LS259(config, m_ipcctrl);
 }
 
 /* ROM definition */
