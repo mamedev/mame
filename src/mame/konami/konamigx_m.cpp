@@ -53,8 +53,8 @@ uint16_t konamigx_state::K055550_word_r(offs_t offset)
 void konamigx_state::K055550_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	auto &mspace = m_maincpu->space(AS_PROGRAM);
-	uint32_t adr, bsize, count, i, lim;
-	int src, tgt, srcend, tgtend, skip, cx1, sx1, wx1, cy1, sy1, wy1, cz1, sz1, wz1, c2, s2, w2;
+	uint32_t adr, bsize, count, i, lim, src, dst;
+	int tgt, srcend, tgtend, skip, cx1, sx1, wx1, cy1, sy1, wy1, cz1, sz1, wz1, c2, s2, w2;
 	int dx, dy, angle;
 
 	COMBINE_DATA(m_prot_data+offset);
@@ -76,20 +76,18 @@ void konamigx_state::K055550_word_w(offs_t offset, uint16_t data, uint16_t mem_m
 			break;
 
 			case 0x98: // memcpy of some kind. incomplete
-			{
 				// known use cases:
 				// viostorm: transfer "color check" palette
 
-				const u32 dst = (m_prot_data[7] << 16) | m_prot_data[8];
-				const u32 src = (m_prot_data[2] << 16) | m_prot_data[3];
-				const u32 count = m_prot_data[10] << 16 | m_prot_data[11] >> 2;
+				dst = (m_prot_data[7] << 16) | m_prot_data[8];
+				src = (m_prot_data[2] << 16) | m_prot_data[3];
+				count = (m_prot_data[10] << 16 | m_prot_data[11]) >> 2;
 
 				for(int x = 0; x < count; ++x)
 				{
 					const u32 src_data = mspace.read_dword(src + x * 8);
 					mspace.write_dword(dst + x *4, src_data);
 				}
-			}
 			break;
 
 			// WARNING: The following cases are speculation based with questionable accuracy!(AAT)

@@ -251,14 +251,14 @@ void konamigx_state::set_brightness(int layer)
 {
 	const u8 bri_mode = (m_k055555->K055555_read_register(K55_VBRI) >> layer * 2) & 0b11;
 
-	const u8 new_brightness = (bri_mode) ? m_brightness[bri_mode - 1] : 0xff;
+	const u8 new_brightness = bri_mode ? m_brightness[bri_mode - 1] : 0xff;
 
 	if (m_current_brightness != new_brightness)
 	{
 		m_current_brightness = new_brightness;
 		for (int y = 0; y < 2048; ++y)
 		{
-			m_palette->set_pen_contrast(y,m_current_brightness / 255.0);
+			m_palette->set_pen_contrast(y, m_current_brightness / 255.0);
 		}
 	}
 }
