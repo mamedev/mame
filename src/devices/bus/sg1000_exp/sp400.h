@@ -1,5 +1,5 @@
 // license: BSD-3-Clause
-// copyright-holders: Charles MacDonald, Devin Hill, Fabio Dalla Libera
+// copyright-holders: Fabio Dalla Libera
 
 #ifndef MAME_BUS_SG1000_EXP_SP400_H
 #define MAME_BUS_SG1000_EXP_SP400_H
