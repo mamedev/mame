@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Ariane Fugmann
-#ifndef MAME_MACHINE_YBDCOMM_H
-#define MAME_MACHINE_YBDCOMM_H
+#ifndef MAME_SEGA_YBDCOMM_H
+#define MAME_SEGA_YBDCOMM_H
 
 #pragma once
 
