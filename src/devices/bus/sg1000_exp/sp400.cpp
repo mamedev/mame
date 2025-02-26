@@ -67,16 +67,16 @@ private:
 	uint8_t mot_pc_r();
 	void mot_pc_w(uint8_t data);
 	uint8_t mot_pd_r();
-	void update_pen_state(u8 data);
-	u8 pen_sensor() { return 0; }  // not currently hooked up
+	void update_pen_state(uint8_t data);
+	uint8_t pen_sensor() { return 0; }  // not currently hooked up
 
 	required_device<i8035_device> m_dsercpu;     // "deserializer cpu"
 	required_device<m6805_hmos_device> m_motcpu; // "motor cpu"
 
-	u8 m_data, m_busy;
-	u8 m_dserdataout, m_dserstrobe;
-	u8 m_motbusy, m_motpenup, m_motpendown;
-	u8 m_pendown;
+	uint8_t m_data, m_busy;
+	uint8_t m_dserdataout, m_dserstrobe;
+	uint8_t m_motbusy, m_motpenup, m_motpendown;
+	uint8_t m_pendown;
 
 	required_ioport m_buttons;
 };
@@ -181,7 +181,7 @@ uint8_t sp400_printer_device::mot_pd_r()
 	return sp400_printer_device::m_dserdataout;
 }
 
-void sp400_printer_device::update_pen_state(u8 data)
+void sp400_printer_device::update_pen_state(uint8_t data)
 {
 	if (!BIT(data, 0)) m_pendown = 0;
 	if (!BIT(data, 1)) m_pendown = 1;
