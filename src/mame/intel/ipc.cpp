@@ -71,6 +71,7 @@ private:
 	void ipc_mem_map(address_map &map) ATTR_COLD;
 
 	virtual void machine_reset() override ATTR_COLD;
+	virtual void driver_reset() override;
 	void ipc_control_w(uint8_t data);
 	required_device<cpu_device> m_maincpu;
 	required_device<ls259_device> m_ipcctrl;
@@ -84,7 +85,7 @@ void ipc_state::ipb_mem_map(address_map &map)
 	map(0x0000, 0x7fff).ram();
 
 	// selectively map the boot/diagnostic segment
-	map(0x0000, 0x7fff).view(m_boot);
+	map(0x0000, 0xefff).view(m_boot);
 
 	// SEL_BOOT/ == 0 and START_UP/ == 0
 	m_boot[0](0x0000, 0x07ff).rom().region("roms", 0);
@@ -133,6 +134,11 @@ INPUT_PORTS_END
 void ipc_state::machine_reset()
 {
 	m_maincpu->set_state_int(i8085a_cpu_device::I8085_PC, 0xE800);
+}
+
+void ipc_state::driver_reset()
+{
+	m_boot.select(0);
 }
 
 void ipc_state::ipc_control_w(uint8_t data)
