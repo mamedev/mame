@@ -2203,7 +2203,7 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/mb89371.h,MACHINES["mb89372"] = true
+--@src/devices/machine/mb89372.h,MACHINES["mb89372"] = true
 ---------------------------------------------------
 
 if (MACHINES["mb89372"]~=null) then
