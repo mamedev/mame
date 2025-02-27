@@ -159,7 +159,7 @@ void ipc_state::ipc_control_w(uint8_t data)
 void ipc_state::ipc(machine_config &config)
 {
 	/* basic machine hardware */
-	I8085A(config, m_maincpu, XTAL(8'000'000) / 2);
+	I8085A(config, m_maincpu, XTAL(8'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &ipc_state::ipc_mem_map);
 	m_maincpu->set_addrmap(AS_IO, &ipc_state::io_map);
 	board_common(config);
