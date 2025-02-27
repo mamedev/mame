@@ -28,12 +28,12 @@ bitmap_argb32 gfx_writer::getBitmap(int xCells, int yCells, gfx_viewer::gfxset::
 		rectangle cellBounds{ 0, bitmap.width() - 1, y * cellYpix, (y + 1) * cellYpix - 1 };
 
 		// only display if there is data to show
-		if (set.m_offset + y * xCells < gfx.elements())
+		if (y * xCells < gfx.elements())
 		{
 			// draw the individual cells
 			for (int x{ 0 }; x < xCells; ++x)
 			{
-				int index{ set.m_offset + y * xCells + x };
+				int index{ y * xCells + x };
 
 				// update the bounds for this cell
 				cellBounds.min_x = x * cellXpix;
