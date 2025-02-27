@@ -222,10 +222,18 @@ ROM_START( ipb )
 	ROM_SYSTEM_BIOS(1, "mon12", "Series II Monitor v1.2")
 	ROMX_LOAD( "ipb_e8_v1.2.bin", 0x0000, 0x0800, CRC(6496efaf) SHA1(1a9c0f1b19c1807803db3f1543f51349d7fd693a), ROM_BIOS(1) )
 	ROMX_LOAD( "ipb_f8_v1.2.bin", 0x0800, 0x0800, CRC(258dc9a6) SHA1(3fde993aee06d9af5093d7a2d9a8cbd71fed0951), ROM_BIOS(1) )
+	// 2x2716 Copyright 1978 (overwritten in F8 ROM by new code)
+	// this version was discovered in an IPB with Siemens branding, saved from e-waste - it's unofficial, but is definitely out there
+	// it's an adaptation to work with a 600 baud teleprinter with slow carriage return
+	// the names are derived from the chips' markings ("BOOT 600Bd" and "MON 2 600Bd")
+	// note: expect checksum messages from this ROM set, as whoever made it never bothered to correct the checksums
+	ROM_SYSTEM_BIOS(2, "mon12_600bd", "Series II Monitor v1.2 - 600 baud teleprinter version")
+	ROMX_LOAD( "ipb_e8_v1.2_boot_600bd.bin", 0x0000, 0x0800, CRC(6bf62535) SHA1(40ac2546c816884dffdaa0ed2c6e41eb8523dcd6), ROM_BIOS(2) )
+	ROMX_LOAD( "ipb_f8_v1.2_mon_2_600bd.bin", 0x0800, 0x0800, CRC(d5ace425) SHA1(d39cd3522ffd1d334f6eb128990e488ce07243ab), ROM_BIOS(2) )
 	// 2x2716 Copyright 1977
-	ROM_SYSTEM_BIOS(2, "mon11", "Series II Monitor v1.1")
-	ROMX_LOAD( "ipb_e8_v1.1.bin", 0x0000, 0x0800, CRC(ffb7c036) SHA1(6f60cdfe20621c4b633c972adcb644a1c02eaa39), ROM_BIOS(2) )
-	ROMX_LOAD( "ipb_e8_v1.1.bin", 0x0800, 0x0800, CRC(3696ff28) SHA1(38b435e10a81629430275aec051fb0a55ec1f6fd), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS(3, "mon11", "Series II Monitor v1.1")
+	ROMX_LOAD( "ipb_e8_v1.1.bin", 0x0000, 0x0800, CRC(ffb7c036) SHA1(6f60cdfe20621c4b633c972adcb644a1c02eaa39), ROM_BIOS(3) )
+	ROMX_LOAD( "ipb_e8_v1.1.bin", 0x0800, 0x0800, CRC(3696ff28) SHA1(38b435e10a81629430275aec051fb0a55ec1f6fd), ROM_BIOS(3) )
 ROM_END
 
 ROM_START( ipc )
