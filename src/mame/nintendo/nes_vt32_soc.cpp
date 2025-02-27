@@ -59,8 +59,24 @@ void nes_vt32_soc_device::vtfp_411e_encryption_state_w(uint8_t data)
 	}
 	else if (data == 0xc0)
 	{
-		// this seems to turn off the code encryption
-		// but turns on some kind of PPU data bitswap? myaass uses it on several games
+		/* this seems to turn off the code encryption
+		   but turns on some kind of PPU data bitswap? myaass uses it on several games
+
+		in VRAM -> should be in VRAM
+		80 -> 08
+		40 -> 20
+		20- > 40
+		10 -> 01
+		08 -> 80
+		04 -> 02
+		02 -> 04
+		01 -> 10
+
+		it is unclear if this affects reads from ROM, or directly alters reads or
+		writes involving the VRAM
+
+		*/
+
 		downcast<rp2a03_vtscr&>(*m_maincpu).set_next_scramble(false);
 	}
 }
