@@ -24,7 +24,6 @@
     Known bugs:
         * pdrift & clones lock up issues after m68k rewrite, TAS opcode?
           Perfect quantum or changing IRQ2 timing won't fix it, see MT8783.
-        * pdriftl's comms don't work
 
 ****************************************************************************
 
@@ -813,7 +812,7 @@ void segaybd_state::sound_portmap(address_map &map)
 
 uint16_t segaybd_state::pdriftl_excs_r(offs_t offset)
 {
-	return 0xFF00 | m_ybdcomm->ex_r(offset);
+	return 0xff00 | m_ybdcomm->ex_r(offset);
 }
 
 void segaybd_state::pdriftl_excs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -2924,7 +2923,7 @@ GAMEL(1988, pdrifta,   pdrift,   yboard,        pdrift,   segaybd_state, init_pd
 GAMEL(1988, pdrifte,   pdrift,   yboard,        pdrifte,  segaybd_state, init_pdrift,  ROT0,   "Sega", "Power Drift (World, Earlier)", MACHINE_SUPPORTS_SAVE, layout_pdrift )
 GAMEL(1988, pdriftj,   pdrift,   yboard,        pdriftj,  segaybd_state, init_pdrift,  ROT0,   "Sega", "Power Drift (Japan)", MACHINE_SUPPORTS_SAVE, layout_pdrift )
 
-GAMEL(1988, pdriftl,   0,        yboard_link,   pdriftl,  segaybd_state, init_pdrift,  ROT0,   "Sega", "Power Drift - Link Version (Japan, Rev A)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_pdrift )
+GAMEL(1988, pdriftl,   0,        yboard_link,   pdriftl,  segaybd_state, init_pdrift,  ROT0,   "Sega", "Power Drift - Link Version (Japan, Rev A)", MACHINE_SUPPORTS_SAVE, layout_pdrift )
 
 GAME( 1991, rchase,    0,        yboard,        rchase,   segaybd_state, init_rchase,  ROT0,   "Sega", "Rail Chase (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, rchasej,   rchase,   yboard,        rchase,   segaybd_state, init_rchase,  ROT0,   "Sega", "Rail Chase (Japan)", MACHINE_SUPPORTS_SAVE )

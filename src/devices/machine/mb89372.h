@@ -94,7 +94,7 @@ private:
 	devcb_write8     m_out_memw_cb;
 
 	// ints
-	void checkInts();
+	void check_ints();
 
 	// dma
 	struct
@@ -107,7 +107,7 @@ private:
 	} m_channel[4];
 	int m_current_channel;
 	int m_last_channel;
-	void checkDma();
+	void check_dma();
 
 	uint16_t m_dma_delay;
 	uint16_t m_intr_delay;
@@ -121,19 +121,19 @@ private:
 	uint8_t  m_tx_buffer[0x200];
 	uint16_t m_tx_offset;
 
-	void    rxReset();
-	uint8_t rxRead();
+	void    rx_reset();
+	uint8_t rx_read();
 
-	void txReset();
-	void txWrite(uint8_t data);
-	void txComplete();
+	void tx_reset();
+	void tx_write(uint8_t data);
+	void tx_complete();
 
 	osd_file::ptr m_line_rx;
 	osd_file::ptr m_line_tx;
 	char m_localhost[256];
 	char m_remotehost[256];
 	uint8_t m_socket_buffer[0x200];
-	void checkSockets();
+	void check_sockets();
 };
 
 

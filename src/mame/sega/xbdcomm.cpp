@@ -131,9 +131,18 @@ xbdcomm_device::xbdcomm_device(const machine_config &mconfig, const char *tag, d
 
 void xbdcomm_device::device_start()
 {
-	m_ex_page = 0;
-	m_xbd_stat = 0;
-	m_z80_stat = 0;
+	// state saving
+	save_item(NAME(m_ex_page));
+	save_item(NAME(m_xbd_stat));
+	save_item(NAME(m_z80_stat));
+
+#ifdef XBDCOMM_SIMULATION
+	save_item(NAME(m_linkenable));
+	save_item(NAME(m_linktimer));
+	save_item(NAME(m_linkalive));
+	save_item(NAME(m_linkid));
+	save_item(NAME(m_linkcount));
+#endif
 }
 
 //-------------------------------------------------
@@ -142,6 +151,15 @@ void xbdcomm_device::device_start()
 
 void xbdcomm_device::device_reset()
 {
+	m_ex_page = 0;
+	m_xbd_stat = 0;
+	m_z80_stat = 0;
+
+	m_linkenable = 0;
+	m_linktimer = 0;
+	m_linkalive = 0;
+	m_linkid = 0;
+	m_linkcount = 0;
 }
 
 void xbdcomm_device::device_reset_after_children()
@@ -256,6 +274,7 @@ void xbdcomm_device::ex_w(offs_t offset, uint8_t data)
 
 		default:
 			logerror("xbdcomm-ex_w: %02x %02x\n", offset, data);
+			break;
 	}
 }
 
@@ -309,6 +328,7 @@ void xbdcomm_device::comm_tick()
 	if (m_linkenable == 0x01)
 	{
 		std::error_condition filerr;
+		uint64_t filesize; // unused
 
 		uint8_t cabIdx = mpc_mem_r(0x4000);
 		uint8_t cabCnt = mpc_mem_r(0x4001);
@@ -367,7 +387,6 @@ void xbdcomm_device::comm_tick()
 			if (!m_line_rx)
 			{
 				osd_printf_verbose("XBDCOMM: listen on %s\n", m_localhost);
-				uint64_t filesize; // unused
 				filerr = osd_file::open(m_localhost, OPEN_FLAG_CREATE, m_line_rx, filesize);
 				if (filerr.value() != 0)
 				{
@@ -380,7 +399,6 @@ void xbdcomm_device::comm_tick()
 			if (!m_line_tx)
 			{
 				osd_printf_verbose("XBDCOMM: connect to %s\n", m_remotehost);
-				uint64_t filesize; // unused
 				filerr = osd_file::open(m_remotehost, 0, m_line_tx, filesize);
 				if (filerr.value() != 0)
 				{
@@ -399,7 +417,7 @@ void xbdcomm_device::comm_tick()
 					// check message id
 					idx = m_buffer0[0];
 
-					// 0xFF - link id
+					// 0xff - link id
 					if (idx == 0xff)
 					{
 						if (isMaster)
@@ -423,7 +441,7 @@ void xbdcomm_device::comm_tick()
 						}
 					}
 
-					// 0xFE - link size
+					// 0xfe - link size
 					else if (idx == 0xfe)
 					{
 						if (isSlave || isRelay)
@@ -538,7 +556,7 @@ void xbdcomm_device::comm_tick()
 			}
 
 			// clear ready-to-send flag
-			m_xbd_stat &= 0xFE;
+			m_xbd_stat &= 0xfe;
 		}
 	}
 }
@@ -549,7 +567,7 @@ int xbdcomm_device::read_frame(int dataSize)
 		return 0;
 
 	// try to read a message
-	std::uint32_t recv = 0;
+	uint32_t recv = 0;
 	std::error_condition filerr = m_line_rx->read(m_buffer0, 0, dataSize, recv);
 	if (recv > 0)
 	{
@@ -557,7 +575,7 @@ int xbdcomm_device::read_frame(int dataSize)
 		if (recv != dataSize)
 		{
 			// only part of a message - read on
-			std::uint32_t togo = dataSize - recv;
+			uint32_t togo = dataSize - recv;
 			int offset = recv;
 			while (togo > 0)
 			{
@@ -604,7 +622,7 @@ void xbdcomm_device::send_frame(int dataSize){
 	if (!m_line_tx)
 		return;
 
-	std::uint32_t written;
+	uint32_t written;
 	std::error_condition filerr = m_line_tx->write(&m_buffer0, 0, dataSize, written);
 	if (filerr)
 	{

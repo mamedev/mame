@@ -7,7 +7,7 @@
  **/
 
 /*
-    based on guesswork!
+    registers are based on guesswork!
     port 00-0f - SIU A
     port 10-1f - SIU B
     port 20-2f - DMA A-D
@@ -150,7 +150,7 @@ void mb89372_device::execute_run()
 		else 
 		{
 			//m_intr_delay = 0x04;
-			checkInts();
+			check_ints();
 		}
 
 		if (m_sock_delay > 0)
@@ -160,7 +160,7 @@ void mb89372_device::execute_run()
 		else
 		{
 			m_sock_delay = 0x20;
-			checkSockets();
+			check_sockets();
 		}
 
 		if (m_dma_delay > 0)
@@ -169,7 +169,7 @@ void mb89372_device::execute_run()
 		}
 		else
 		{
-			checkDma();
+			check_dma();
 		}
 
 		m_icount--;
@@ -191,7 +191,7 @@ uint8_t mb89372_device::read(offs_t offset)
 			break;
 
 		case 0x0f:
-			data = rxRead();
+			data = rx_read();
 			break;
 
 		default:
@@ -250,7 +250,7 @@ void mb89372_device::hack_w(int state)
 //**************************************************************************
 //  int logic
 //**************************************************************************
-void mb89372_device::checkInts()
+void mb89372_device::check_ints()
 {
 	int active = (m_reg[0x23] & 0x01) | (m_reg[0x27] & 0x01);
 	set_irq(active);
@@ -260,7 +260,7 @@ void mb89372_device::checkInts()
 //**************************************************************************
 //  dma logic
 //**************************************************************************
-void mb89372_device::checkDma()
+void mb89372_device::check_dma()
 {
 	if (m_current_channel != -1)
 	{
@@ -325,7 +325,7 @@ void mb89372_device::checkDma()
 				{
 					if (m_channel[m_current_channel].m_count > 0)
 					{
-						m_out_memw_cb(m_channel[m_current_channel].m_address, rxRead());
+						m_out_memw_cb(m_channel[m_current_channel].m_address, rx_read());
 						m_channel[m_current_channel].m_address++;
 						m_channel[m_current_channel].m_count--;
 						m_dma_delay = 4;
@@ -346,7 +346,7 @@ void mb89372_device::checkDma()
 				{
 					if (m_channel[m_current_channel].m_count > 0)
 					{
-						txWrite(m_in_memr_cb(m_channel[m_current_channel].m_address));
+						tx_write(m_in_memr_cb(m_channel[m_current_channel].m_address));
 						m_channel[m_current_channel].m_address++;
 						m_channel[m_current_channel].m_count--;
 						m_dma_delay = 4;
@@ -354,7 +354,7 @@ void mb89372_device::checkDma()
 					}
 					else
 					{
-						txComplete();
+						tx_complete();
 						m_channel[m_current_channel].m_state = 6;
 						logerror("tc %01x\n", m_current_channel);
 					}
@@ -382,6 +382,10 @@ void mb89372_device::checkDma()
 					m_current_channel = -1;
 					set_hreq(0);
 				}
+				break;
+
+			default:
+					logerror("unknown state?! %01x = %02x\n", m_current_channel, m_channel[m_current_channel].m_state);
 				break;
 		}
 	}
@@ -411,13 +415,13 @@ void mb89372_device::checkDma()
 //  buffer logic
 //**************************************************************************
 
-void mb89372_device::rxReset()
+void mb89372_device::rx_reset()
 {
 	m_rx_length = 0;
 	m_rx_offset = 0;
 }
 
-uint8_t mb89372_device::rxRead()
+uint8_t mb89372_device::rx_read()
 {
 	uint8_t data = m_rx_buffer[m_rx_offset];
 	m_rx_offset++;
@@ -428,17 +432,17 @@ uint8_t mb89372_device::rxRead()
 	*/
 
 	if (m_rx_offset >= m_rx_length)
-		rxReset();
+		rx_reset();
 	return data;
 }
 
-void mb89372_device::txReset()
+void mb89372_device::tx_reset()
 {
 	m_tx_offset = 0;
 	//m_txsr |= 0x05;
 }
 
-void mb89372_device::txWrite(uint8_t data)
+void mb89372_device::tx_write(uint8_t data)
 {
 	m_tx_buffer[m_tx_offset] = data;
 	m_tx_offset++;
@@ -449,7 +453,7 @@ void mb89372_device::txWrite(uint8_t data)
 		m_tx_offset = 0x0eff;
 }
 
-void mb89372_device::txComplete()
+void mb89372_device::tx_complete()
 {
 	if (m_tx_offset > 0)
 	{
@@ -462,8 +466,8 @@ void mb89372_device::txComplete()
 				m_socket_buffer[i + 2] = m_tx_buffer[i];
 			}
 
-			std::uint32_t dataSize = m_tx_offset + 2;
-			std::uint32_t written;
+			uint32_t dataSize = m_tx_offset + 2;
+			uint32_t written;
 
 			m_line_tx->write(&m_socket_buffer, 0, dataSize, written);
 		}
@@ -471,10 +475,10 @@ void mb89372_device::txComplete()
 
 	//m_txsr = 0x6f;
 
-	txReset();
+	tx_reset();
 }
 
-void mb89372_device::checkSockets()
+void mb89372_device::check_sockets()
 {
 	// check rx socket
 	if (!m_line_rx)
@@ -499,7 +503,7 @@ void mb89372_device::checkSockets()
 		{
 			if (m_rx_length == 0)
 			{
-				std::uint32_t recv = 0;
+				uint32_t recv = 0;
 				m_line_rx->read(m_socket_buffer, 0, 2, recv);
 				if (recv > 0)
 				{

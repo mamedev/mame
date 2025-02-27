@@ -99,7 +99,6 @@ namco_c139_device::namco_c139_device(const machine_config &mconfig, const char *
 	: device_t(mconfig, NAMCO_C139, tag, owner, clock)
 	, m_irq_cb(*this)
 {
-#ifdef C139_SIMULATION
 	// prepare localhost "filename"
 	m_localhost[0] = 0;
 	strcat(m_localhost, "socket.");
@@ -118,12 +117,10 @@ namco_c139_device::namco_c139_device(const machine_config &mconfig, const char *
 	m_linkid = 0;
 	for (int x = 0; x < sizeof(m_remotehost) && m_remotehost[x] != 0; x++)
 	{
-
 		m_linkid ^= m_remotehost[x];
 	}
 
 	osd_printf_verbose("C139: ID byte = %02d\n", m_linkid);
-#endif
 }
 
 
@@ -135,6 +132,17 @@ void namco_c139_device::device_start()
 {
 	m_tick_timer = timer_alloc(FUNC(namco_c139_device::tick_timer_callback), this);
 	m_tick_timer->adjust(attotime::never);
+
+	// state saving
+	save_item(NAME(m_ram));
+	save_item(NAME(m_reg));
+
+	save_item(NAME(m_linktimer));
+	save_item(NAME(m_linkid));
+
+	save_item(NAME(m_txsize));
+	save_item(NAME(m_txblock));
+	save_item(NAME(m_reg_f3));
 }
 
 
@@ -144,7 +152,14 @@ void namco_c139_device::device_start()
 
 void namco_c139_device::device_reset()
 {
+	std::fill(std::begin(m_ram), std::end(m_ram), 0);
+	std::fill(std::begin(m_reg), std::end(m_reg), 0);
+
 	m_linktimer = 0x0000;
+
+	m_txsize = 0x00;
+	m_txblock = 0x00;
+	m_reg_f3 = 0x00;
 
 	m_tick_timer->adjust(attotime::from_hz(600),0,attotime::from_hz(600));
 }
@@ -162,17 +177,14 @@ uint16_t namco_c139_device::ram_r(offs_t offset)
 void namco_c139_device::ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_ram[offset]);
-
 	m_txsize = offset;
 }
 
 uint16_t namco_c139_device::reg_r(offs_t offset)
 {
 	uint16_t result = m_reg[offset];
-
 	if (!machine().side_effects_disabled())
 		osd_printf_verbose("C139: reg_r[%02x] = %04x\n", offset, result);
-
 	return result;
 }
 
@@ -180,7 +192,6 @@ void namco_c139_device::reg_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (!machine().side_effects_disabled())
 		osd_printf_verbose("C139: reg_w[%02x] = %04x\n", offset, data);
-
 	m_reg[offset] = data;
 
 	// status reset / irq ack?
@@ -216,9 +227,7 @@ void namco_c139_device::reg_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		if (data == 1)
 			m_txsize = 0;
 		if (data == 3)
-		{
 			m_reg[REG_5_TXSIZE] = m_txsize + 2;
-		}
 	}
 }
 
@@ -244,6 +253,10 @@ void namco_c139_device::sci_de_hack(uint8_t data)
 			strcat(m_localhost, "15114");
 			strcat(m_remotehost, "15112");
 			break;
+		default:
+			strcat(m_localhost, "15112");
+			strcat(m_remotehost, "15112");
+			break;
 	}
 
 	// come up with some magic number for identification
@@ -257,7 +270,6 @@ void namco_c139_device::sci_de_hack(uint8_t data)
 	osd_printf_verbose("C139: ID byte = %02d\n", m_linkid);
 }
 
-#ifdef C139_SIMULATION
 TIMER_CALLBACK_MEMBER(namco_c139_device::tick_timer_callback)
 {
 	comm_tick();
@@ -271,12 +283,12 @@ void namco_c139_device::comm_tick()
 	if (m_linktimer == 0x0000)
 	{
 		std::error_condition filerr;
+		uint64_t filesize; // unused
 
 		// check rx socket
 		if (!m_line_rx)
 		{
 			osd_printf_verbose("C139: listen on %d\n", m_localhost);
-			uint64_t filesize; // unused
 			filerr = osd_file::open(m_localhost, OPEN_FLAG_CREATE, m_line_rx, filesize);
 			if (filerr.value() != 0)
 			{
@@ -290,7 +302,6 @@ void namco_c139_device::comm_tick()
 		if (!m_line_tx)
 		{
 			osd_printf_verbose("C139: connect to %s\n", m_remotehost);
-			uint64_t filesize; // unused
 			filerr = osd_file::open(m_remotehost, 0, m_line_tx, filesize);
 			if (filerr.value() != 0)
 			{
@@ -343,7 +354,11 @@ void namco_c139_device::comm_tick()
 
 				case 0x0f:
 					// init / reset
-					return;
+					break;
+
+				default:
+					// unknown mode
+					break;
 			}
 		}
 	}
@@ -389,7 +404,7 @@ void namco_c139_device::read_data(int dataSize)
 			else
 			{
 				if (m_reg[REG_1_MODE] == 0x09)
-					m_reg[REG_5_TXSIZE] = 0x00; //m_txblock = 0x00;
+					m_reg[REG_5_TXSIZE] = 0x00;
 			}
 
 			// update regs
@@ -424,7 +439,7 @@ int namco_c139_device::read_frame(int dataSize)
 		return 0;
 
 	// try to read a message
-	std::uint32_t recv = 0;
+	uint32_t recv = 0;
 	std::error_condition filerr = m_line_rx->read(m_buffer0, 0, dataSize, recv);
 	if (recv > 0)
 	{
@@ -432,7 +447,7 @@ int namco_c139_device::read_frame(int dataSize)
 		if (recv != dataSize)
 		{
 			// only part of a message - read on
-			std::uint32_t togo = dataSize - recv;
+			uint32_t togo = dataSize - recv;
 			int offset = recv;
 			while (togo > 0)
 			{
@@ -523,6 +538,9 @@ void namco_c139_device::send_data(int dataSize)
 			m_reg[REG_5_TXSIZE] = 0;
 			m_txblock = 0x01;
 			break;
+		default:
+			// do nothing
+			break;
 	}
 
 	m_txsize = 0;
@@ -534,7 +552,7 @@ void namco_c139_device::send_frame(int dataSize)
 	if (!m_line_tx)
 		return;
 
-	std::uint32_t written;
+	uint32_t written;
 	std::error_condition filerr = m_line_tx->write(&m_buffer0, 0, dataSize, written);
 	if (filerr)
 	{
@@ -567,4 +585,3 @@ int namco_c139_device::find_sync_bit(int txOffset, int txMask)
 	}
 	return 0;
 }
-#endif

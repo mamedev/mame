@@ -182,12 +182,19 @@ ybdcomm_device::ybdcomm_device(const machine_config &mconfig, const char *tag, d
 
 void ybdcomm_device::device_start()
 {
-	m_ybd_stat = 0;
-	m_z80_stat = 0;
+	// state saving
+	save_item(NAME(m_ybd_stat));
+	save_item(NAME(m_z80_stat));
 
 #ifdef YBDCOMM_SIMULATION
 	m_tick_timer = timer_alloc(FUNC(ybdcomm_device::tick_timer), this);
 	m_tick_timer->adjust(attotime::from_hz(600), 0, attotime::from_hz(600));
+
+	save_item(NAME(m_linkenable));
+	save_item(NAME(m_linktimer));
+	save_item(NAME(m_linkalive));
+	save_item(NAME(m_linkid));
+	save_item(NAME(m_linkcount));
 #endif
 }
 
@@ -197,6 +204,16 @@ void ybdcomm_device::device_start()
 
 void ybdcomm_device::device_reset()
 {
+	m_ybd_stat = 0;
+	m_z80_stat = 0;
+
+#ifdef YBDCOMM_SIMULATION
+	m_linkenable = 0;
+	m_linktimer = 0;
+	m_linkalive = 0;
+	m_linkid = 0;
+	m_linkcount = 0;
+#endif
 }
 
 void ybdcomm_device::device_reset_after_children()
@@ -297,6 +314,7 @@ void ybdcomm_device::ex_w(offs_t offset, uint8_t data)
 			break;
 		default:
 			logerror("ybdcomm-ex_w: %02x %02x\n", offset, data);
+			break;
 	}
 }
 
@@ -353,7 +371,6 @@ int ybdcomm_device::comm_frameOffset(uint8_t cabIdx)
 
 		case 2:
 			return 0x4190;
-
 		case 3:
 			return 0x41c0;
 		case 4:
@@ -398,6 +415,8 @@ void ybdcomm_device::comm_tick()
 	if (m_linkenable == 0x01)
 	{
 		std::error_condition filerr;
+		uint64_t filesize; // unused
+
 		uint8_t cabIdx = mpc_mem_r(0x4000);
 
 		int frameSize;
@@ -426,7 +445,6 @@ void ybdcomm_device::comm_tick()
 			if (!m_line_rx)
 			{
 				osd_printf_verbose("YBDCOMM: listen on %s\n", m_localhost);
-				uint64_t filesize; // unused
 				filerr = osd_file::open(m_localhost, OPEN_FLAG_CREATE, m_line_rx, filesize);
 				if (filerr.value() != 0)
 				{
@@ -439,7 +457,6 @@ void ybdcomm_device::comm_tick()
 			if (!m_line_tx)
 			{
 				osd_printf_verbose("YBDCOMM: connect to %s\n", m_remotehost);
-				uint64_t filesize; // unused
 				filerr = osd_file::open(m_remotehost, 0, m_line_tx, filesize);
 				if (filerr.value() != 0)
 				{
@@ -458,7 +475,7 @@ void ybdcomm_device::comm_tick()
 					// check message id
 					idx = m_buffer0[0];
 
-					// 0xFF - link id
+					// 0xff - link id
 					if (idx == 0xff)
 					{
 						if (isMaster)
@@ -482,7 +499,7 @@ void ybdcomm_device::comm_tick()
 						}
 					}
 
-					// 0xFE - link size
+					// 0xfe - link size
 					else if (idx == 0xfe)
 					{
 						if (isSlave || isRelay)
@@ -572,7 +589,7 @@ void ybdcomm_device::comm_tick()
 						}
 						else
 						{
-							m_z80_stat &= 0x7F;
+							m_z80_stat &= 0x7f;
 							m_linktimer = 0x00;
 						}
 					}
@@ -603,7 +620,7 @@ void ybdcomm_device::comm_tick()
 			}
 
 			// clear ready-to-send flag
-			m_ybd_stat &= 0xFE;
+			m_ybd_stat &= 0xfe;
 		}
 	}
 }
@@ -614,7 +631,7 @@ int ybdcomm_device::read_frame(int dataSize)
 		return 0;
 
 	// try to read a message
-	std::uint32_t recv = 0;
+	uint32_t recv = 0;
 	std::error_condition filerr = m_line_rx->read(m_buffer0, 0, dataSize, recv);
 	if (recv > 0)
 	{
@@ -622,7 +639,7 @@ int ybdcomm_device::read_frame(int dataSize)
 		if (recv != dataSize)
 		{
 			// only part of a message - read on
-			std::uint32_t togo = dataSize - recv;
+			uint32_t togo = dataSize - recv;
 			int offset = recv;
 			while (togo > 0)
 			{
@@ -670,7 +687,7 @@ void ybdcomm_device::send_frame(int dataSize)
 	if (!m_line_tx)
 		return;
 
-	std::uint32_t written;
+	uint32_t written;
 	std::error_condition filerr = m_line_tx->write(&m_buffer0, 0, dataSize, written);
 	if (filerr)
 	{

@@ -10,8 +10,6 @@
 
 #pragma once
 
-#define C139_SIMULATION
-
 #include "osdfile.h"
 
 
@@ -58,7 +56,6 @@ private:
 	uint16_t m_ram[0x2000]{};
 	uint16_t m_reg[0x0010]{};
 
-#ifdef C139_SIMULATION
 	osd_file::ptr m_line_rx;
 	osd_file::ptr m_line_tx;
 	char m_localhost[256]{};
@@ -81,7 +78,6 @@ private:
 	int find_sync_bit(int txOffset, int txMask);
 	void send_data(int dataSize);
 	void send_frame(int dataSize);
-#endif
 };
 
 

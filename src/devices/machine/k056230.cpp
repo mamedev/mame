@@ -62,23 +62,32 @@ k056230_device::k056230_device(const machine_config &mconfig, const char *tag, d
 
 void k056230_device::device_start()
 {
+	// state saving
 	save_item(NAME(m_irq_state));
+	save_item(NAME(m_ctrl_reg));
 	save_item(NAME(m_status));
 
-	// todo save comm stuff
+	save_item(NAME(m_linkenable));
+	save_item(NAME(m_linkid));
+	save_item(NAME(m_txmode));
 }
 
 void k056230_device::device_reset()
 {
 	m_irq_state = CLEAR_LINE;
-	m_status = 0x08;
+	m_ctrl_reg = 0;
+	m_status = 0;
+
+	m_linkenable = 0;
+	m_linkid = 0;
+	m_txmode = 0;
 }
 
 void k056230_device::regs_map(address_map &map)
 {
 	map(0x00, 0x00).lrw8(
 		NAME([this] (offs_t offset) {
-			uint8_t data = 0x08 | m_status;
+			u8 data = 0x08 | m_status;
 			LOGMASKED(LOG_REG_READS, "%s: Status Register read %02x\n", machine().describe_context(), data);
 			return data;
 		}),
@@ -146,6 +155,10 @@ void k056230_device::set_mode(u8 data)
 		case 0x20:
 			m_linkid = data & 0x0f;
 			break;
+
+		default:
+			logerror("k056230-set_mode: %02x\n", data);
+			break;
 	}
 }
 
@@ -183,6 +196,10 @@ void k056230_device::set_ctrl(u8 data)
 			m_txmode = 0x00;
 			comm_tick();
 			break;
+
+		default:
+			logerror("k056230-set_ctrl: %02x\n", data);
+			break;
 	}
 }
 
@@ -191,12 +208,12 @@ void k056230_device::comm_tick()
 	if (m_linkenable == 0x01)
 	{
 		std::error_condition filerr;
+		u64 filesize; // unused
 
 		// check rx socket
 		if (!m_line_rx)
 		{
 			osd_printf_verbose("k056230: listen on %s\n", m_localhost);
-			uint64_t filesize; // unused
 			filerr = osd_file::open(m_localhost, OPEN_FLAG_CREATE, m_line_rx, filesize);
 			if (filerr.value() != 0)
 			{
@@ -209,7 +226,6 @@ void k056230_device::comm_tick()
 		if ((!m_line_tx) && (m_txmode == 0x01))
 		{
 			osd_printf_verbose("k056230: connect to %s\n", m_remotehost);
-			uint64_t filesize; // unused
 			filerr = osd_file::open(m_remotehost, 0, m_line_tx, filesize);
 			if (filerr.value() != 0)
 			{
@@ -239,7 +255,7 @@ void k056230_device::comm_tick()
 				{
 					// check if valid id
 					idx = m_buffer0[0];
-					if (idx <= 0x0E)
+					if (idx <= 0x0e)
 					{
 						if (idx != m_linkid)
 						{
@@ -295,7 +311,7 @@ int k056230_device::read_frame(int dataSize)
 		return 0;
 
 	// try to read a message
-	std::uint32_t recv = 0;
+	u32 recv = 0;
 	std::error_condition filerr = m_line_rx->read(m_buffer0, 0, dataSize, recv);
 	if (recv > 0)
 	{
@@ -303,7 +319,7 @@ int k056230_device::read_frame(int dataSize)
 		if (recv != dataSize)
 		{
 			// only part of a message - read on
-			std::uint32_t togo = dataSize - recv;
+			u32 togo = dataSize - recv;
 			int offset = recv;
 			while (togo > 0)
 			{
@@ -335,7 +351,7 @@ void k056230_device::send_frame(int dataSize)
 	if (!m_line_tx)
 		return;
 
-	std::uint32_t written;
+	u32 written;
 	std::error_condition filerr = m_line_tx->write(&m_buffer0, 0, dataSize, written);
 	if (filerr)
 	{
