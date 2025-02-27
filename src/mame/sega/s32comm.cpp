@@ -33,7 +33,7 @@ Sega System 32 Comm PCB 837-9409
         15612.17    F1 Super Lap
 
 Sega System Multi32 Comm PCB 837-8792-91
-( http://images.arianchen.de/sega-comm/orunners-front.jpg )
+( http://images.arianchen.de/sega-comm/orunners-front.jpg / http://images.arianchen.de/sega-comm/orunners-back.jpg )
 |--------------------------------------------------------------------------------|
 | |---------------------------------|   |---------------------------------|      |
 | |---------------------------------|   |---------------------------------|      |
@@ -287,21 +287,22 @@ int s32comm_device::read_frame(int dataSize)
 					togo -= recv;
 					offset += recv;
 				}
-				else if (!filerr && recv == 0)
+				if ((!filerr && recv == 0) || (filerr && std::errc::operation_would_block != filerr))
 				{
 					togo = 0;
 				}
 			}
 		}
 	}
-	else if (!filerr && recv == 0)
+	if ((!filerr && recv == 0) || (filerr && std::errc::operation_would_block != filerr))
 	{
+		osd_printf_verbose("S32COMM: rx connection error\n");
+		m_line_rx.reset();
 		if (m_linkalive == 0x01)
 		{
 			osd_printf_verbose("S32COMM: rx connection lost\n");
 			m_linkalive = 0x02;
 			m_linktimer = 0x00;
-			m_line_rx.reset();
 		}
 	}
 	return recv;
@@ -322,21 +323,21 @@ void s32comm_device::send_frame(int dataSize){
 	if (!m_line_tx)
 		return;
 
-	std::error_condition filerr;
-	std::uint32_t written;
-
-	filerr = m_line_tx->write(&m_buffer0, 0, dataSize, written);
+	std::uint32_t written = 0;
+	std::error_condition filerr = m_line_tx->write(&m_buffer0, 0, dataSize, written);
 	if (filerr)
 	{
+		osd_printf_verbose("S32COMM: tx connection error\n");
+		m_line_tx.reset();
 		if (m_linkalive == 0x01)
 		{
 			osd_printf_verbose("S32COMM: tx connection lost\n");
 			m_linkalive = 0x02;
 			m_linktimer = 0x00;
-			m_line_tx.reset();
 		}
 	}
 }
+
 void s32comm_device::comm_tick_14084()
 {
 	// m_shared[0] = node count
@@ -346,6 +347,9 @@ void s32comm_device::comm_tick_14084()
 	// m_shared[4] = node link status (0 = offline, 1 = online)
 	if (m_linkenable == 0x01)
 	{
+		std::error_condition filerr;
+		uint64_t filesize; // unused
+
 		int frameStart = 0x0480;
 		int frameOffset = 0x0000;
 		int frameSize = 0x0080;
@@ -372,16 +376,24 @@ void s32comm_device::comm_tick_14084()
 			if (!m_line_rx)
 			{
 				osd_printf_verbose("S32COMM: listen on %s\n", m_localhost);
-				uint64_t filesize; // unused
-				osd_file::open(m_localhost, OPEN_FLAG_CREATE, m_line_rx, filesize);
+				filerr = osd_file::open(m_localhost, OPEN_FLAG_CREATE, m_line_rx, filesize);
+				if (filerr.value() != 0)
+				{
+					osd_printf_verbose("S32COMM: rx connection failed\n");
+					m_line_rx.reset();
+				}
 			}
 
 			// check tx socket
 			if (!m_line_tx)
 			{
 				osd_printf_verbose("S32COMM: connect to %s\n", m_remotehost);
-				uint64_t filesize; // unused
-				osd_file::open(m_remotehost, 0, m_line_tx, filesize);
+				filerr = osd_file::open(m_remotehost, 0, m_line_tx, filesize);
+				if (filerr.value() != 0)
+				{
+					osd_printf_verbose("S32COMM: tx connection failed\n");
+					m_line_tx.reset();
+				}
 			}
 
 			// if both sockets are there check ring
@@ -590,6 +602,9 @@ void s32comm_device::comm_tick_15033()
 	// m_shared[4] = node link status (0 = offline, 1 = online)
 	if (m_linkenable == 0x01)
 	{
+		std::error_condition filerr;
+		uint64_t filesize; // unused
+
 		int frameStartTX = 0x0710;
 		int frameStartRX = 0x0010;
 		int frameOffset = 0x0000;
@@ -629,16 +644,24 @@ void s32comm_device::comm_tick_15033()
 			if (!m_line_rx)
 			{
 				osd_printf_verbose("S32COMM: listen on %s\n", m_localhost);
-				uint64_t filesize; // unused
-				osd_file::open(m_localhost, OPEN_FLAG_CREATE, m_line_rx, filesize);
+				filerr = osd_file::open(m_localhost, OPEN_FLAG_CREATE, m_line_rx, filesize);
+				if (filerr.value() != 0)
+				{
+					osd_printf_verbose("S32COMM: rx connection failed\n");
+					m_line_rx.reset();
+				}
 			}
 
 			// check tx socket
 			if (!m_line_tx)
 			{
 				osd_printf_verbose("S32COMM: connect to %s\n", m_remotehost);
-				uint64_t filesize; // unused
-				osd_file::open(m_remotehost, 0, m_line_tx, filesize);
+				filerr = osd_file::open(m_remotehost, 0, m_line_tx, filesize);
+				if (filerr.value() != 0)
+				{
+					osd_printf_verbose("S32COMM: tx connection failed\n");
+					m_line_tx.reset();
+				}
 			}
 
 			// if both sockets are there check ring
@@ -846,6 +869,9 @@ void s32comm_device::comm_tick_15612()
 	// m_shared[4] = ready-to-send
 	if (m_linkenable == 0x01)
 	{
+		std::error_condition filerr;
+		uint64_t filesize; // unused
+
 		int frameStart = 0x0010;
 		int frameOffset = 0x0000;
 		int frameSize = 0x00E0;
@@ -872,16 +898,24 @@ void s32comm_device::comm_tick_15612()
 			if (!m_line_rx)
 			{
 				osd_printf_verbose("S32COMM: listen on %s\n", m_localhost);
-				uint64_t filesize; // unused
-				osd_file::open(m_localhost, OPEN_FLAG_CREATE, m_line_rx, filesize);
+				filerr = osd_file::open(m_localhost, OPEN_FLAG_CREATE, m_line_rx, filesize);
+				if (filerr.value() != 0)
+				{
+					osd_printf_verbose("S32COMM: rx connection failed\n");
+					m_line_rx.reset();
+				}
 			}
 
 			// check tx socket
 			if (!m_line_tx)
 			{
 				osd_printf_verbose("S32COMM: connect to %s\n", m_remotehost);
-				uint64_t filesize; // unused
-				osd_file::open(m_remotehost, 0, m_line_tx, filesize);
+				filerr = osd_file::open(m_remotehost, 0, m_line_tx, filesize);
+				if (filerr.value() != 0)
+				{
+					osd_printf_verbose("S32COMM: tx connection failed\n");
+					m_line_tx.reset();
+				}
 			}
 
 			// if both sockets are there check ring

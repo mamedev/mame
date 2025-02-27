@@ -6,6 +6,7 @@ Comm PCB
 --------
 
 MODEL-1 COMMUNICATION BD 837-8842 171-6293B (C) SEGA 1992
+( http://images.arianchen.de/sega-comm/model1-front.jpg / http://images.arianchen.de/sega-comm/model1-back.jpg )
 |--------------------------------------------------------------------------------|
 |                                                                                |
 |    MB89237A            MB89374                                                 |
@@ -315,6 +316,9 @@ void m1comm_device::comm_tick()
 {
 	if (m_linkenable == 0x01)
 	{
+		std::error_condition filerr;
+		uint64_t filesize; // unused
+
 		int frameStart = 0x0010;
 		int frameOffset = 0x0000;
 		int frameSize = 0x01c4;
@@ -341,16 +345,24 @@ void m1comm_device::comm_tick()
 			if (!m_line_rx)
 			{
 				osd_printf_verbose("M1COMM: listen on %s\n", m_localhost);
-				uint64_t filesize; // unused
-				osd_file::open(m_localhost, OPEN_FLAG_CREATE, m_line_rx, filesize);
+				filerr = osd_file::open(m_localhost, OPEN_FLAG_CREATE, m_line_rx, filesize);
+				if (filerr)
+				{
+					osd_printf_verbose("M1COMM: rx connection failed\n");
+					m_line_rx.reset();
+				}
 			}
 
 			// check tx socket
 			if (!m_line_tx)
 			{
 				osd_printf_verbose("M1COMM: connect to %s\n", m_remotehost);
-				uint64_t filesize; // unused
-				osd_file::open(m_remotehost, 0, m_line_tx, filesize);
+				filerr = osd_file::open(m_remotehost, 0, m_line_tx, filesize);
+				if (filerr)
+				{
+					osd_printf_verbose("M1COMM: tx connection failed\n");
+					m_line_tx.reset();
+				}
 			}
 
 			// if both sockets are there check ring
@@ -581,25 +593,22 @@ int m1comm_device::read_frame(int dataSize)
 					togo -= recv;
 					offset += recv;
 				}
-				else if (!filerr && recv == 0)
+				if ((!filerr && recv == 0) || (filerr && std::errc::operation_would_block != filerr))
 				{
 					togo = 0;
 				}
 			}
 		}
 	}
-	else if (!filerr && recv == 0)
+	if ((!filerr && recv == 0) || (filerr && std::errc::operation_would_block != filerr))
 	{
+		osd_printf_verbose("M1COMM: rx connection error\n");
+		m_line_rx.reset();
 		if (m_linkalive == 0x01)
 		{
 			osd_printf_verbose("M1COMM: rx connection lost\n");
 			m_linkalive = 0x02;
 			m_linktimer = 0x00;
-
-			m_shared[0] = 0xff;
-
-			m_line_rx.reset();
-			m_line_tx.reset();
 		}
 	}
 	return recv;
@@ -619,22 +628,17 @@ void m1comm_device::send_frame(int dataSize){
 	if (!m_line_tx)
 		return;
 
-	std::error_condition filerr;
-	std::uint32_t written;
-
-	filerr = m_line_tx->write(&m_buffer0, 0, dataSize, written);
+	std::uint32_t written = 0;
+	std::error_condition filerr = m_line_tx->write(&m_buffer0, 0, dataSize, written);
 	if (filerr)
 	{
+		osd_printf_verbose("M1COMM: tx connection error\n");
+		m_line_tx.reset();
 		if (m_linkalive == 0x01)
 		{
 			osd_printf_verbose("M1COMM: tx connection lost\n");
 			m_linkalive = 0x02;
 			m_linktimer = 0x00;
-
-			m_shared[0] = 0xff;
-
-			m_line_rx.reset();
-			m_line_tx.reset();
 		}
 	}
 }
