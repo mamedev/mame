@@ -27,7 +27,7 @@
   company in 1981 and changed its name to IGT.
 
 
-  Coinage:			   
+  Coinage:
 
     DSW#3      OFF        ON         OFF       ON
     DSW#4      OFF        OFF        ON        ON
@@ -95,22 +95,31 @@
   - Added hopper device.
   - Added default init for video memory.
   - Fixed a bug in read NVRAM decode.
-  - Added AY-8910 callback for the DIP switch. 
+  - Added AY-8910 callback for the DIP switch.
   - Added support for Wild 1 cocktail mode.
   - Added button-lamps clickable layout for both games.
   - System is playable with almost complete functionality.
 
+  Updates [2025-02-27]
+
+  - Fixed inputs polarity: No more credits triggered at reset.
+  - Found the "Pair of Aces" DIP switch.
+  - Fixed hopper DIP switch polarity.
+  - Fixed hopper coin out signal.
+  - Reverse-engineered the whole DIP switches bank.
+  - Rewrote I/O handlers to simplify the if/then nested scheme toward switch statements.
+  - Reworked coin inputs per game.
+  - Promoted Draw 80 Poker (Minn) to working.
+  - Promoted Wild 1 (Quick Change Kit) to working.
+  
 
   TODO:
 
-  - Find the unknown remaining DIP switches.
-  - Fix the credits addition after each reset.
   - Support for the IGT ABC type coin acceptor.
-  - Reversed and find the unknown port access via P1 and P2.
-  - Rewrite I/O handlers to simplify the if/then nested scheme toward switch statements.
+  - Reverse and find the unknown port access via P1.5 and P1.2.
   - Find the coin lock line for documentation.
   - Find if there is a diverter or weight sensor line.
-  - Fix the coin in line for drw80pkr.
+  - Reverse the behaviour of the port line access called "attract mode".
 
 
 *******************************************************************************************************/
@@ -143,10 +152,10 @@ public:
 		m_mainbank(*this, "mainbank"),
 		m_hopper(*this, "hopper"),
 		m_lamps(*this, "lamp%u", 0U)
-	
+
 	{ }
 
-	void init_drw80pkr(); 
+	void init_drw80pkr();
 	void drw80pkr(machine_config &config);
 
 protected:
@@ -235,7 +244,6 @@ void drw80pkr_state::prog_w(int state)
 	if (m_prog == 0x01)
 	{
 		m_active_bank = m_active_bank ^ 0x01;
-
 		m_mainbank->set_entry(m_active_bank);
 	}
 }
@@ -248,81 +256,61 @@ void drw80pkr_state::bus_w(uint8_t data)
 void drw80pkr_state::io_w(offs_t offset, uint8_t data)
 {
 	uint16_t n_offs;
-	
-	if (m_p2 == 0x3f || m_p2 == 0x7f)
-	{
-		n_offs = ((m_p1 & 0xc0) << 2 ) + offset;
 
-		if (m_p2 == 0x3f)
+	switch (m_p2)
+	{
+		case 0x3f:
 		{
+			n_offs = ((m_p1 & 0xc0) << 2 ) + offset;
 			m_video_ram[n_offs] = data;  // low address
+			m_bg_tilemap->mark_tile_dirty(n_offs);
+			break;
 		}
-		else 
+		case 0x7f:
 		{
+			n_offs = ((m_p1 & 0xc0) << 2 ) + offset;
 			m_color_ram[n_offs] = data & 0x0f;  // color palette
 			m_video_ram[n_offs] += ((data & 0xf0) << 4 );  // high address
-			
+			m_bg_tilemap->mark_tile_dirty(n_offs);
+			break;
 		}
-
-		m_bg_tilemap->mark_tile_dirty(n_offs);
-	}
-
-	if (m_p2 == 0xc7)
-		m_crtc->address_w(data);
-
-	if (m_p2 == 0xd7)
-		m_crtc->register_w(data);
-
-	if (m_p2 == 0xfb)
-	{
-		m_pkr_io_ram[offset] = data;
-	}
-
-	if (m_p2 == 0xff)
-	{
-		if (m_p1 == 0xdb || m_p1 == 0xef || m_p1 == 0xf7 || m_p1 == 0xfb)  
+		case 0xc7: m_crtc->address_w(data); break;
+		case 0xd7: m_crtc->register_w(data); break;
+		case 0xfb: m_pkr_io_ram[offset] = data; break;
+		case 0xff:
 		{
-			// unknown, most likely lamps, meters, hopper etc.
+			switch (m_p1)
+			{
+				case 0xf7:
+				{
+					machine().bookkeeping().coin_counter_w(0, data & 0x01);  // coin in counter
+					machine().bookkeeping().coin_counter_w(1, data & 0x02);  // credits paid
+					machine().bookkeeping().coin_counter_w(2, data & 0x04);  // credits bet
+					machine().bookkeeping().coin_counter_w(3, data & 0x08);  // coin out counter
+					m_hopper->motor_w(BIT(data, 4) && BIT(data, 5));
+					m_lamps[7] = BIT(data, 4) && BIT(data, 5);               // for testing purpose
+					break;
+				}
+				case 0xef:
+				{
+					m_lamps[0] = BIT(data, 0);  // bet lamp
+					m_lamps[1] = BIT(data, 1);  // start (deal/draw)
+					m_lamps[2] = BIT(data, 2);  // hold
+					m_lamps[3] = BIT(data, 3);  // hold
+					m_lamps[4] = BIT(data, 4);  // hold
+					m_lamps[5] = BIT(data, 5);  // hold
+					m_lamps[6] = BIT(data, 6);  // hold
+					break;
+				}
+				case 0xdf: m_attract_mode = data; break;  // unknown port access via P1.5
+				case 0xfc: m_aysnd->address_w(data); break;
+				case 0xfe: m_aysnd->data_w(data); break;
+				case 0xfb: break;  // unknown port access via P1.2
+				case 0xdb: break;  // unknown port access via P1.5 and P1.2
+				//default: logerror("%s - Unknown I8039 - IO_W with Port 1:%02x access - data:%02x\n", machine().describe_context(), m_p1, data);
+			} break;
 		}
-
-		// rewrite output decoder
-		if (m_p1 == 0xf7 || m_p1 == 0xef || m_p1 == 0xdf)
-		{
-			// to rewrite with switch 
-			if(m_p1 == 0xf7)  //  /P1.3
-			{
-				machine().bookkeeping().coin_counter_w(0, data & 0x01);  // coin in counter
-				machine().bookkeeping().coin_counter_w(1, data & 0x02);  // credits paid
-				machine().bookkeeping().coin_counter_w(2, data & 0x04);  // credits bet
-				machine().bookkeeping().coin_counter_w(3, data & 0x08);  // coin out counter
-				m_hopper->motor_w(BIT(data, 4) && BIT(data, 5));
-			}
-				
-			if(m_p1 == 0xef)  //   /P1.4
-			{
-				m_lamps[0] = BIT(data, 0);  // bet lamp
-				m_lamps[1] = BIT(data, 1);  // start (deal/draw)
-				m_lamps[2] = BIT(data, 2);  // hold
-				m_lamps[3] = BIT(data, 3);  // hold
-				m_lamps[4] = BIT(data, 4);  // hold
-				m_lamps[5] = BIT(data, 5);  // hold 
-				m_lamps[6] = BIT(data, 6);  // hold
-				m_lamps[7] = BIT(data, 7);  // unknown
-			}
-
-			if(m_p1 == 0xdf)  //  /P1.5  
-			{
-				m_attract_mode = data;  // latch this for use in input reads (0x01 = attract mode, 0x00 = game in progress)
-			}	
-		}
-
-		// ay8910 control port
-		if (m_p1 == 0xfc)
-			m_aysnd->address_w(data);
-
-		// ay8910_write_port_0_w
-		if (m_p1 == 0xfe)
-			m_aysnd->data_w(data);
+		//default: logerror("%s - Unknown I8039 - IO_W with Port 2:%02x access - data:%02x\n", machine().describe_context(), m_p2, data);
 	}
 }
 
@@ -358,70 +346,75 @@ uint8_t drw80pkr_state::bus_r()
 
 uint8_t drw80pkr_state::io_r(offs_t offset)
 {
-	uint8_t ret;
-	
-	ret = 0x00;
+	uint8_t ret = 0;
 
-	if (m_p2 == 0x3b)
+	switch (m_p2)
 	{
-		// unknown
-	}
-
-	if (m_p2 == 0xf7)
-	{
-		// unknown
-	}
-
-	if ((m_p2 == 0xfb) | (m_p2 == 0x7b)) // Some reads done with extra P2.7 low, but nvram access requires only P2.2 low.(some bug?)
-										 // Writes don't have this behaviour.
-	{
-		ret = m_pkr_io_ram[offset];
-	}
-
-	if (m_p2 == 0xff)
-	{
-		if (m_p1 == 0x5f || m_p1 == 0x9f || m_p1 == 0xdb)
+		case 0x3b: break;  // dummy read done by "orl  p2,#$FF" instruction.
+		case 0xf7: break;  // dummy read done by "orl  p2,#$FF" instruction.
+		case 0x7b:         // some program bug, but ignored by real hardware.
+		case 0xfb: ret = m_pkr_io_ram[offset]; break;
+		case 0xff:
 		{
-			// unknown
-		}
-
-		if (m_p1 == 0xfe)
-		{
-			return m_aysnd->data_r(); 
-			// DIP switches tied to sound chip
-		}
-		
-		if ((m_attract_mode == 0x01 && m_p1 == 0xef) || m_p1 == 0xf7)
-		{
-			if(m_p1 == 0xef)
-				return ioport("IN1")->read();
-			
-			if(m_p1 == 0xf7)	
-			{	
-				switch (ioport("IN2")->read())
+			switch (m_p1)
+			{
+				case 0xdb:
+				case 0x5f:
+				case 0x9f: break;  // dummy reads done by "orl  p1,#$FF" instruction.
+				case 0xfe: ret = m_aysnd->data_r(); break;
+				case 0xef:
 				{
-					case 0x0000: ret = 0x80; break;
-					case 0x0001: ret = 0x81; break;  // HOLD 4 P1
-					case 0x0002: ret = 0x82; break;  // HOLD 3 P1
-					case 0x0004: ret = 0x83; break;  // HOLD 2 P1
-					case 0x0008: ret = 0x84; break;  // HOLD 1 P1
-					case 0x0010: ret = 0x85; break;  // START  P1
-					case 0x0020: ret = 0x86; break;  // BET    P1
-					case 0x0040: ret = 0x87; break;  // HOLD 5 P1
-					case 0x0080: ret = 0x88; break;  // HOLD 4 P2
-					case 0x0100: ret = 0x90; break;  // HOLD 3 P2
-					case 0x0200: ret = 0x98; break;  // HOLD 2 P2
-					case 0x0400: ret = 0xa0; break;  // HOLD 1 P2
-					case 0x0800: ret = 0xa8; break;  // START  P2 
-					case 0x1000: ret = 0xb0; break;  // BET    P2
-					case 0x2000: ret = 0xb8; break;  // HOLD   P2
-					case 0x4000: ret = 0x40; break;  // Hopper coin out
-					case 0x8000: ret = 0x00; break;  // Books/Door
+					switch (ioport("IN1")->read())
+					{
+						// Encoded bits 0, 1, 2
+						case 0x00: ret = 0xc0; break;  // A Default port value                  11-000-000
+						case 0x01: ret = 0xc4; break;  //   Keyout                              11-000-100
+						case 0x02: ret = 0xc6; break;  // A KeyIn A (Coinage x 1 ) No timeout   11-000-110
+						// Direct bits 3, 4, 5
+						case 0x04: ret = 0xc8; break;  // 5 Coin (Timeout) (Coin_A Sequencer)   11-001-000 - Coin option only for drw80wld
+						case 0x08: ret = 0xd0; break;  // 6 x              (Coin_B Sequencer)   11-010-000
+						case 0x10: ret = 0xe0; break;  // 7 x              (Coin_C Sequencer)   11-100-000
+						// Direct Bits 6, 7
+						case 0x20: ret = 0x80; break;  // S Key In B (Coinage x 4)  No Timeout  10-000-000
+						case 0x40: ret = 0x40; break;  // D Key In C (Coinage x 20) No Timeout  01-000-000
+					}
+					break;
 				}
-				return ret;
+				case 0xf7:
+				{
+					switch (ioport("IN2")->read())
+					{
+						case 0x0000: ret = 0x80; break;
+						case 0x0001: ret = 0x81; break;  // HOLD 4 P1
+						case 0x0002: ret = 0x82; break;  // HOLD 3 P1
+						case 0x0004: ret = 0x83; break;  // HOLD 2 P1
+						case 0x0008: ret = 0x84; break;  // HOLD 1 P1
+						case 0x0010: ret = 0x85; break;  // START  P1
+						case 0x0020: ret = 0x86; break;  // BET    P1
+						case 0x0040: ret = 0x87; break;  // HOLD 5 P1
+						case 0x0080: ret = 0x88; break;  // HOLD 4 P2
+						case 0x0100: ret = 0x90; break;  // HOLD 3 P2
+						case 0x0200: ret = 0x98; break;  // HOLD 2 P2
+						case 0x0400: ret = 0xa0; break;  // HOLD 1 P2
+						case 0x0800: ret = 0xa8; break;  // START  P2
+						case 0x1000: ret = 0xb0; break;  // BET    P2
+						case 0x2000: ret = 0xb8; break;  // HOLD   P2
+						case 0x4000: ret = 0xc0; break;  // Hopper coin out
+						case 0x8000: ret = 0x00; break;  // Books/Door
+					} break;
+				}
+				default:
+				{
+					//logerror("%s - Unknown I8039 - I/O with Port 1:%02x access\n", machine().describe_context(), m_p1);
+					ret = 0;
+				}
 			}
+		} break;
+		default:
+		{
+			//logerror("%s - Unknown I8039 - I/O with Port 2:%02x access\n", machine().describe_context(), m_p2);
+			ret = 0;
 		}
-		ret = 0x00;
 	}
 	return ret;
 }
@@ -532,14 +525,13 @@ void drw80pkr_state::io_map(address_map &map)
 static INPUT_PORTS_START( drw80pkr )
 
 	PORT_START("IN1")  //$EF
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(2) 
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_GAMBLE_PAYOUT )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )       // coin sequencer A 
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )       // coin sequencer B 
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )       // coin sequencer C
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_IMPULSE(2)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_IMPULSE(2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_GAMBLE_KEYOUT )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("KeyIn x01") // KeyIn A (Coinage x 1 )  No timeout
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("KeyIn x04") // Key In B (Coinage x 4)  No Timeout
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_NAME("KeyIn x20") // Key In C (Coinage x 20) No Timeout
 
 	PORT_START("IN2")  //$F7
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_POKER_HOLD4 ) PORT_IMPULSE(2)
@@ -557,7 +549,7 @@ static INPUT_PORTS_START( drw80pkr )
 	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_UNUSED )  // unsupported cocktail mode deal/draw
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_UNUSED )  // unsupported cocktail mode bet
 	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_UNUSED )  // unsupported cocktail mode hold 5
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r)) 
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_GAMBLE_BOOK )
 
 	PORT_START("DSW1")
@@ -567,15 +559,14 @@ static INPUT_PORTS_START( drw80pkr )
 	PORT_DIPNAME( 0x02, 0x02, "Joker Enable" )        PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x02, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x04, 0x04, "Double-Up" )           PORT_DIPLOCATION("SW1:6") 
+	PORT_DIPNAME( 0x04, 0x04, "Double-Up" )           PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x04, "Enabled" )
 	PORT_DIPSETTING(    0x00, "Disabled" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )    PORT_DIPLOCATION("SW1:5")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Payout Type" )         PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(    0x10, "Cash" )
-	PORT_DIPSETTING(    0x00, "Credits" )
+	PORT_DIPNAME( 0x18, 0x00, "Payout Type" )         PORT_DIPLOCATION("SW1:4,5")
+	PORT_DIPSETTING(    0x00, "Cash" )
+	PORT_DIPSETTING(    0x08, "Credits" )
+	PORT_DIPSETTING(    0x10, "Credits" )
+	PORT_DIPSETTING(    0x18, "Credits" )
 	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Coinage ) )    PORT_DIPLOCATION("SW1:3,2")
 	PORT_DIPSETTING(    0x60, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) )
@@ -583,7 +574,7 @@ static INPUT_PORTS_START( drw80pkr )
 	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )
 	PORT_DIPNAME( 0x80, 0x00, "Coin Acceptor Type" )  PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x80, "Type ABC" )
-	PORT_DIPSETTING(    0x00, "Single Pulse" )		
+	PORT_DIPSETTING(    0x00, "Single Pulse" )
 INPUT_PORTS_END
 
 
@@ -591,13 +582,13 @@ static INPUT_PORTS_START( drw80wld )
 	PORT_INCLUDE( drw80pkr )
 
 	PORT_MODIFY("IN1")  //$EF
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("0-1") PORT_CODE(KEYCODE_A)  
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("0-2") PORT_CODE(KEYCODE_S) 
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(2)                       // coin sequencer A 
-	PORT_BIT( 0x10, IP_ACTIVE_LOW , IPT_COIN2 )                                       // coin sequencer B 
-	PORT_BIT( 0x20, IP_ACTIVE_LOW , IPT_COIN3 )                                       // coin sequencer C
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("0-7") PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("0-8") PORT_CODE(KEYCODE_H) 
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_GAMBLE_KEYOUT )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("KeyIn x01") PORT_CODE(KEYCODE_A) // KeyIn A (Coinage x 1 )  No timeout
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )  // coin sequencer A  Or Coin Switch (DSW_1 Selector)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )	 // coin sequencer B
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN3 )	 // coin sequencer C
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("KeyIn x04") PORT_CODE(KEYCODE_S) // Key In B (Coinage x 4)  No Timeout
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("KeyIn x20") PORT_CODE(KEYCODE_D) // Key In C (Coinage x 20) No Timeout
 
 	PORT_MODIFY("IN2")
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_R) PORT_NAME("Hold 4 (cocktail mode)") PORT_IMPULSE(2)  // cocktail mode hold 4
@@ -653,7 +644,7 @@ void drw80pkr_state::drw80pkr(machine_config &config)
 
 	AY8912(config, m_aysnd, 20000000/12).add_route(ALL_OUTPUTS, "mono", 0.75);
 	m_aysnd->port_a_read_callback().set_ioport("DSW1");
-	
+
 	HOPPER(config, m_hopper, attotime::from_msec(150));
 }
 
@@ -695,6 +686,6 @@ ROM_END
 *              Game Drivers              *
 *****************************************/
 
-//     YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT           ROT     COMPANY                                FULLNAME                    FLAGS                LAYOUT
-GAMEL( 1983, drw80pkr, 0,      drw80pkr, drw80pkr, drw80pkr_state, init_drw80pkr, ROT0,  "IGT - International Game Technology", "Draw 80 Poker (Minn)",      MACHINE_NOT_WORKING, layout_drw80pkr)
-GAMEL( 1982, drw80wld, 0,      drw80pkr, drw80wld, drw80pkr_state, init_drw80pkr, ROT0,  "IGT - International Game Technology", "Wild 1 (Quick Change Kit)", MACHINE_NOT_WORKING, layout_drw80pkr)
+//     YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT           ROT     COMPANY                                FULLNAME                    FLAGS     LAYOUT
+GAMEL( 1983, drw80pkr, 0,      drw80pkr, drw80pkr, drw80pkr_state, init_drw80pkr, ROT0,  "IGT - International Game Technology", "Draw 80 Poker (Minn)",      0,        layout_drw80pkr)
+GAMEL( 1982, drw80wld, 0,      drw80pkr, drw80wld, drw80pkr_state, init_drw80pkr, ROT0,  "IGT - International Game Technology", "Wild 1 (Quick Change Kit)", 0,        layout_drw80pkr)
