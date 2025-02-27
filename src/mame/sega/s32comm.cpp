@@ -265,7 +265,7 @@ int s32comm_device::read_frame(int dataSize)
 		return 0;
 
 	// try to read a message
-	std::uint32_t recv = 0;
+	uint32_t recv = 0;
 	std::error_condition filerr = m_line_rx->read(m_buffer0, 0, dataSize, recv);
 	if (recv > 0)
 	{
@@ -273,7 +273,7 @@ int s32comm_device::read_frame(int dataSize)
 		if (recv != dataSize)
 		{
 			// only part of a message - read on
-			std::uint32_t togo = dataSize - recv;
+			uint32_t togo = dataSize - recv;
 			int offset = recv;
 			while (togo > 0)
 			{
@@ -323,7 +323,7 @@ void s32comm_device::send_frame(int dataSize){
 	if (!m_line_tx)
 		return;
 
-	std::uint32_t written = 0;
+	uint32_t written = 0;
 	std::error_condition filerr = m_line_tx->write(&m_buffer0, 0, dataSize, written);
 	if (filerr)
 	{
