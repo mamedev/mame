@@ -1123,8 +1123,6 @@ if (SOUNDS["TMS5220"]~=null) then
 		MAME_DIR .. "src/devices/sound/tms5220.cpp",
 		MAME_DIR .. "src/devices/sound/tms5220.h",
 		MAME_DIR .. "src/devices/sound/tms5110r.hxx",
-		MAME_DIR .. "src/devices/machine/spchrom.cpp",
-		MAME_DIR .. "src/devices/machine/spchrom.h",
 	}
 end
 

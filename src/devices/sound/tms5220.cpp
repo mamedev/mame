@@ -366,41 +366,69 @@ emulating the tms5220 in MCU code). Look for a 16-pin chip at U6 labeled
    one B cycle per interpolation step) */
 #define FORCE_SUBC_RELOAD 1
 
-
 /* *****debugging defines***** */
 /* 5220 only; above dumps the data written to the tms52xx to the error log, useful
    for making logged data dumps for real hardware tests */
 #define LOG_DUMP_INPUT_DATA (1U << 1)
+
 // 5220 only; above debugs FIFO stuff: writes, reads and flag updates
 #define LOG_FIFO (1U << 2)
+
+// Show parsing events
+#define LOG_PARSE (1U << 3)
+
 // dumps each speech frame as binary
-#define LOG_PARSE_FRAME_DUMP_BIN (1U << 3)
+#define LOG_PARSE_FRAME_DUMP_BIN (1U << 4)
+
 // dumps each speech frame as hex
-#define LOG_PARSE_FRAME_DUMP_HEX (1U << 4)
+#define LOG_PARSE_FRAME_DUMP_HEX (1U << 5)
+
 // dumps info if a frame ran out of data
 #define LOG_FRAME_ERRORS (1U << 6)
-// dumps all non-speech-data command writes
-#define LOG_COMMAND_DUMP (1U << 7)
-// dumps decoded info about command writes
-#define LOG_COMMAND_VERBOSE (1U << 8)
-// spams the error log with i/o ready messages whenever the ready or irq pin is read
-#define LOG_PIN_READS (1U << 9)
-// dumps debug information related to the sample generation loop, i.e. whether interpolation is inhibited or not, and what the current and target values for each frame are.
-#define LOG_GENERATION (1U << 10)
-// dumps MUCH MORE debug information related to the sample generation loop, namely the excitation, energy, pitch, k*, and output values for EVERY SINGLE SAMPLE during a frame.
-#define LOG_GENERATION_VERBOSE (1U << 11)
-// dumps the lattice filter state data each sample.
-#define LOG_LATTICE (1U << 12)
-// dumps info to the error log whenever the analog clip hardware is (or would be) clipping the signal.
-#define LOG_CLIP (1U << 13)
-// debugs the io ready callback timer
-#define LOG_IO_READY (1U << 14)
-// debugs the tms5220_data_r and data_w access methods which actually respect rs and ws
-#define LOG_RS_WS (1U << 15)
-// shows the byte being written by the CPU to the VSP
-#define LOG_DATA_W (1U << 16)
 
-//#define VERBOSE (LOG_GENERAL | LOG_DUMP_INPUT_DATA | LOG_FIFO | LOG_PARSE_FRAME_DUMP_HEX | LOG_FRAME_ERRORS | LOG_COMMAND_DUMP | LOG_COMMAND_VERBOSE | LOG_PIN_READS | LOG_GENERATION | LOG_GENERATION_VERBOSE | LOG_LATTICE | LOG_CLIP | LOG_IO_READY | LOG_RS_WS | LOG_DATA_W)
+// dumps all non-speech-data command writes
+#define LOG_COMMAND (1U << 7)
+
+// Additional information about command processing
+#define LOG_COMMAND_VERBOSE (1U << 8)
+
+// Show NOP command (tends to be noisy)
+#define LOG_COMMAND_NOP (1U << 9)
+
+// spams the error log with i/o ready messages whenever the ready or irq pin is read
+#define LOG_PIN_READS (1U << 10)
+
+// dumps debug information related to the sample generation loop, i.e. whether interpolation is inhibited or not, and what the current and target values for each frame are.
+#define LOG_GENERATION (1U << 11)
+
+// dumps MUCH MORE debug information related to the sample generation loop, namely the excitation, energy, pitch, k*, and output values for EVERY SINGLE SAMPLE during a frame.
+#define LOG_GENERATION_VERBOSE (1U << 12)
+
+// dumps the lattice filter state data each sample.
+#define LOG_LATTICE (1U << 13)
+
+// Show errors in matrix multiplication
+#define LOG_MULTIPLY (1U << 14)
+
+// dumps info to the error log whenever the analog clip hardware is (or would be) clipping the signal.
+#define LOG_CLIP (1U << 15)
+
+// debugs the io ready callback timer
+#define LOG_IO_READY (1U << 16)
+
+// debugs the tms5220_data_r and data_w access methods which actually respect rs and ws
+#define LOG_RS_WS (1U << 17)
+
+// Show the byte being written by the CPU to the VSP
+#define LOG_DATA_W (1U << 18)
+
+// Show interactions with speech rom
+#define LOG_VSM (1U << 19)
+
+// Show state changes
+#define LOG_STATE (1U << 20)
+
+#define VERBOSE ( LOG_GENERAL )
 #include "logmacro.h"
 
 #define MAX_SAMPLE_CHUNK    512
@@ -570,10 +598,10 @@ void tms5220_device::printbits(long data, int num)
 
 /**********************************************************************************************
 
-    tms5220_device::new_int_write -- wrap a write to the VSM
+    tms5220_device::vsm_write -- wrap a write sent to the VSM
 
 ***********************************************************************************************/
-void tms5220_device::new_int_write(uint8_t rc, uint8_t m0, uint8_t m1, uint8_t addr)
+void tms5220_device::vsm_write(uint8_t rc, uint8_t m0, uint8_t m1, uint8_t addr)
 {
 	m_m0_cb(m0);
 	m_m1_cb(m1);
@@ -587,32 +615,52 @@ void tms5220_device::new_int_write(uint8_t rc, uint8_t m0, uint8_t m1, uint8_t a
 
 /**********************************************************************************************
 
-    tms5220_device::new_int_write_addr -- wrap a 'load address' set of writes to the VSM
+    tms5220_device::vsm_write_addr -- wrap a 'load address' set of writes sent to the VSM
 
 ***********************************************************************************************/
-void tms5220_device::new_int_write_addr(uint8_t addr)
+void tms5220_device::vsm_write_addr(uint8_t addr)
 {
-	new_int_write(1, 0, 1, addr); // romclk 1, m0 0, m1 1, addr bus nybble = xxxx
-	new_int_write(0, 0, 1, addr); // romclk 0, m0 0, m1 1, addr bus nybble = xxxx
-	new_int_write(1, 0, 0, addr); // romclk 1, m0 0, m1 0, addr bus nybble = xxxx
-	new_int_write(0, 0, 0, addr); // romclk 0, m0 0, m1 0, addr bus nybble = xxxx
+	vsm_write(1, 0, 1, addr); // romclk 1, m0 0, m1 1, addr bus nybble = xxxx
+	vsm_write(0, 0, 1, addr); // romclk 0, m0 0, m1 1, addr bus nybble = xxxx
+	vsm_write(1, 0, 0, addr); // romclk 1, m0 0, m1 0, addr bus nybble = xxxx
+	vsm_write(0, 0, 0, addr); // romclk 0, m0 0, m1 0, addr bus nybble = xxxx
 }
 
 /**********************************************************************************************
 
-    tms5220_device::new_int_write_addr -- wrap a 'read bit' set of writes to the VSM
+    tms5220_device::vsm_read -- wrap a 'read bit' set of writes sent to the VSM
 
 ***********************************************************************************************/
-uint8_t tms5220_device::new_int_read()
+uint8_t tms5220_device::vsm_read()
 {
-	new_int_write(1, 1, 0, 0); // romclk 1, m0 1, m1 0, addr bus nybble = 0/open bus
-	new_int_write(0, 1, 0, 0); // romclk 0, m0 1, m1 0, addr bus nybble = 0/open bus
-	new_int_write(1, 0, 0, 0); // romclk 1, m0 0, m1 0, addr bus nybble = 0/open bus
-	new_int_write(0, 0, 0, 0); // romclk 0, m0 0, m1 0, addr bus nybble = 0/open bus
+	vsm_write(1, 1, 0, 0); // romclk 1, m0 1, m1 0, addr bus nybble = 0/open bus
+	vsm_write(0, 1, 0, 0); // romclk 0, m0 1, m1 0, addr bus nybble = 0/open bus
+	vsm_write(1, 0, 0, 0); // romclk 1, m0 0, m1 0, addr bus nybble = 0/open bus
+	vsm_write(0, 0, 0, 0); // romclk 0, m0 0, m1 0, addr bus nybble = 0/open bus
+
+	uint8_t val = 0;
+
 	if (!m_data_cb.isunset())
-		return m_data_cb();
-	LOG("WARNING: CALLBACK MISSING, RETURNING 0!\n");
-	return 0;
+		val = m_data_cb();
+	else
+		LOGMASKED(LOG_VSM, "Warning: No speech memory attached, returning 0.\n");
+
+	return val;
+}
+
+/**********************************************************************************************
+
+    tms5220_device::vsm_read_and_branch -- wrap a 'read-and-branch' set of writes sent to the VSM
+
+***********************************************************************************************/
+void tms5220_device::vsm_read_and_branch()
+{
+	vsm_write(0, 1, 1, 0); // see tms5110.cpp
+	vsm_write(1, 1, 1, 0); // romclk 1, m0 1, m1 1, addr bus nybble = 0/open bus
+	vsm_write(0, 1, 1, 0); // romclk 0, m0 1, m1 1, addr bus nybble = 0/open bus
+	vsm_write(0, 0, 0, 0); // see tms5110.cpp
+	vsm_write(1, 0, 0, 0); // romclk 1, m0 0, m1 0, addr bus nybble = 0/open bus
+	vsm_write(0, 0, 0, 0); // romclk 0, m0 0, m1 0, addr bus nybble = 0/open bus
 }
 
 /**********************************************************************************************
@@ -745,7 +793,7 @@ void tms5220_device::update_fifo_status_and_ints()
 	// also, in this case, regardless if DDIS was set, unset it.
 	if (m_previous_talk_status && !talk_status())
 	{
-		LOG("Talk status 1 -> 0, unsetting DDIS and firing an interrupt.\n");
+		LOGMASKED(LOG_STATE, "Talk status 1 -> 0, unsetting DDIS and firing an interrupt.\n");
 		set_interrupt_state(1);
 		m_DDIS = false;
 
@@ -755,13 +803,13 @@ void tms5220_device::update_fifo_status_and_ints()
 		// Then resume it.
 		if (m_command_register != NOCOMMAND)
 		{
-			LOGMASKED(LOG_COMMAND_DUMP, "Resume command execution: %02X\n", m_command_register);
+			LOGMASKED(LOG_STATE, "Resume command execution: %02X\n", m_command_register);
 			process_command(m_command_register);
 
 			// Is there another data transfer pending? Resume it as well.
 			if (m_data_latched)
 			{
-				LOGMASKED(LOG_COMMAND_DUMP, "Pending byte write: %02X\n", m_write_latch);
+				LOGMASKED(LOG_STATE, "Pending byte write: %02X\n", m_write_latch);
 				m_timer_io_ready->adjust(clocks_to_attotime(16), 1);
 			}
 			else
@@ -806,32 +854,33 @@ int tms5220_device::read_bits(int count)
 	}
 	else
 	{
-#ifndef USE_NEW_TMS6100_CODE
-/** TODO: get rid of this old code */
-		// extract from VSM (speech ROM)
-		if (m_speechrom)
-			val = m_speechrom->read(count);
-		else
-			val = (1<<count)-1; // assume the input floats high if nothing is connected, so a spurious speak vsm command will eventually return a 0xF (STOP) frame which will halt speech
-#else
-		while (count--)
+		if (!m_m0_cb.isunset())
 		{
-			val = (val << 1) | new_int_read();
-			LOG("bit read: %d\n", val&1);
+			while (count--)
+			{
+				val = (val << 1) | vsm_read();
+				LOGMASKED(LOG_VSM, "bit read: %d\n", val&1);
+			}
 		}
-#endif
+		else
+		{
+			// assume the input floats high if nothing is connected, so a
+			// spurious speak vsm command will eventually return a 0xF (STOP)
+			// frame which will halt speech
+			val = (1<<count)-1;
+		}
 	}
 	return val;
 }
 
-/** TODO: dummy reads should be auto-done for tms52xx for the first read after an address load, but not tms51xx where they need to be done manually, if needed */
 void tms5220_device::perform_dummy_read()
 {
-	if (m_schedule_dummy_read)
+	m_schedule_dummy_read = false;
+	if (!m_m0_cb.isunset())
 	{
-		int data = new_int_read();
-		LOG("TMS5110 performing dummy read; value read = %1i\n", data & 1);
-		m_schedule_dummy_read = false;
+		LOGMASKED(LOG_VSM, "TMS52xx performing dummy read\n");
+		vsm_write_addr(0);
+		vsm_read();
 	}
 }
 
@@ -1243,8 +1292,8 @@ int32_t tms5220_device::matrix_multiply(int32_t a, int32_t b) const
 	while (b>16383) { b-=32768; }
 	while (b<-16384) { b+=32768; }
 	result = ((a*b)>>9); /** TODO: this isn't technically right to the chip, which truncates the lowest result bit, but it causes glitches otherwise. **/
-	if (result>16383) LOG("matrix multiplier overflowed! a: %x, b: %x, result: %x", a, b, result);
-	if (result<-16384) LOG("matrix multiplier underflowed! a: %x, b: %x, result: %x", a, b, result);
+	if (result>16383) LOGMASKED(LOG_MULTIPLY, "matrix multiplier overflowed! a: %x, b: %x, result: %x", a, b, result);
+	if (result<-16384) LOGMASKED(LOG_MULTIPLY, "matrix multiplier underflowed! a: %x, b: %x, result: %x", a, b, result);
 	return result;
 }
 
@@ -1343,25 +1392,22 @@ int32_t tms5220_device::lattice_filter()
 
 void tms5220_device::process_command(uint8_t cmd)
 {
-	LOGMASKED(LOG_COMMAND_DUMP, "process_command called with parameter %02X\n", cmd);
-
 	m_command_register = cmd;
 
 	/* parse the command */
 	switch (cmd & 0x70)
 	{
 	case 0x10 : /* read byte */
-		LOGMASKED(LOG_COMMAND_VERBOSE, "Read Byte command received\n");
+		LOGMASKED(LOG_COMMAND, "Read Byte command received (%02X)\n", cmd);
 		if (!talk_status()) /* TALKST must be clear for RDBY */
 		{
 			if (m_schedule_dummy_read)
 			{
 				m_schedule_dummy_read = false;
-				if (m_speechrom)
-					m_speechrom->read(1);
+				perform_dummy_read();
 			}
-			if (m_speechrom)
-				m_read_byte_register = m_speechrom->read(8);    /* read one byte from speech ROM... */
+
+			m_read_byte_register = read_bits(8);
 			m_RDB_flag = true;
 			m_command_register = NOCOMMAND;
 		}
@@ -1373,11 +1419,11 @@ void tms5220_device::process_command(uint8_t cmd)
 	case 0x20: /* set rate (tms5220c and cd2501ecd only), otherwise NOP */
 		if (TMS5220_HAS_RATE_CONTROL)
 		{
-			LOGMASKED(LOG_COMMAND_VERBOSE, "Set Rate (or NOP) command received\n");
+			LOGMASKED(LOG_COMMAND_NOP, "Set Rate (or NOP) command received (%02X)\n", cmd);
 			m_c_variant_rate = cmd&0x0F;
 		}
 		else
-			LOGMASKED(LOG_COMMAND_VERBOSE, "NOP command received\n");
+			LOGMASKED(LOG_COMMAND_NOP, "NOP command received (%02X)\n", cmd);
 
 		m_command_register = NOCOMMAND;
 		break;
@@ -1385,10 +1431,20 @@ void tms5220_device::process_command(uint8_t cmd)
 	case 0x30 : /* read and branch */
 		if (!talk_status()) /* TALKST must be clear for RB */
 		{
-			LOGMASKED(LOG_COMMAND_VERBOSE, "Read and Branch command received\n");
+			LOGMASKED(LOG_COMMAND, "Read and Branch command received (%02X)\n", cmd);
 			m_RDB_flag = false;
-			if (m_speechrom)
-				m_speechrom->read_and_branch();
+
+			if (m_schedule_dummy_read)
+			{
+				m_schedule_dummy_read = false;
+				perform_dummy_read();
+			}
+
+			if (!m_m0_cb.isunset())
+				vsm_read_and_branch();
+			else
+				LOGMASKED(LOG_VSM, "WARNING: Read-and-branch: No memory attached to VSP\n");
+
 			m_command_register = NOCOMMAND;
 		}
 		break;
@@ -1396,11 +1452,13 @@ void tms5220_device::process_command(uint8_t cmd)
 	case 0x40 : /* load address */
 		if (!talk_status()) /* TALKST must be clear for LA */
 		{
-			LOGMASKED(LOG_COMMAND_VERBOSE, "Load Address command received\n");
-			/* tms5220 data sheet says that if we load only one 4-bit nibble, it won't work.
-			   This code does not care about this. */
-			if (m_speechrom)
-				m_speechrom->load_address(cmd & 0x0f);
+			LOGMASKED(LOG_COMMAND, "Load Address command received (%02X)\n", cmd);
+
+			// tms5220 data sheet says that if we load only one 4-bit nibble,
+			// it won't work. This code does not care about this.
+			if (!m_m0_cb.isunset())
+				vsm_write_addr(cmd & 0x0f);
+
 			m_schedule_dummy_read = true;
 			m_command_register = NOCOMMAND;
 		}
@@ -1414,13 +1472,13 @@ void tms5220_device::process_command(uint8_t cmd)
 		break;
 
 	case 0x50 : /* speak */
-		LOGMASKED(LOG_COMMAND_VERBOSE, "Speak (VSM) command received\n");
+		LOGMASKED(LOG_COMMAND, "Speak (VSM) command received (%02X)\n", cmd);
 		if (m_schedule_dummy_read)
 		{
 			m_schedule_dummy_read = false;
-			if (m_speechrom)
-				m_speechrom->read(1);
+			perform_dummy_read();
 		}
+
 		m_SPEN = 1;
 #ifdef FAST_START_HACK
 		m_TALK = 1;
@@ -1448,7 +1506,7 @@ void tms5220_device::process_command(uint8_t cmd)
 		break;
 
 	case 0x60 : /* speak external */
-		LOGMASKED(LOG_COMMAND_VERBOSE, "Speak External command received\n");
+		LOGMASKED(LOG_COMMAND, "Speak External command received (%02X)\n", cmd);
 
 		// SPKEXT going active asserts /SPKEE for 2 clocks, which clears the FIFO and its counters
 		std::fill(std::begin(m_fifo), std::end(m_fifo), 0);
@@ -1478,13 +1536,13 @@ void tms5220_device::process_command(uint8_t cmd)
 		break;
 
 	case 0x70 : /* reset */
-		LOGMASKED(LOG_COMMAND_VERBOSE, "Reset command received\n");
+		LOGMASKED(LOG_COMMAND, "Reset command received (%02X)\n", cmd);
 		if (m_schedule_dummy_read)
 		{
 			m_schedule_dummy_read = false;
-			if (m_speechrom)
-				m_speechrom->read(1);
+			perform_dummy_read();
 		}
+
 		reset();
 		m_command_register = NOCOMMAND;
 		break;
@@ -1595,9 +1653,9 @@ void tms5220_device::parse_frame()
 	LOGMASKED(LOG_PARSE_FRAME_DUMP_BIN | LOG_PARSE_FRAME_DUMP_HEX, "\n");
 
 	if (m_DDIS)
-		LOG("Parsed a frame successfully in FIFO - %d bits remaining\n", (m_fifo_count*8)-(m_fifo_bits_taken));
+		LOGMASKED(LOG_PARSE, "Parsed a frame successfully in FIFO - %d bits remaining\n", (m_fifo_count*8)-(m_fifo_bits_taken));
 	else
-		LOG("Parsed a frame successfully in ROM\n");
+		LOGMASKED(LOG_PARSE, "Parsed a frame successfully in ROM\n");
 	return;
 
 	ranout:
@@ -1648,19 +1706,6 @@ void tms5220_device::update_ready_state()
 
 void tms5220_device::device_start()
 {
-	if (m_speechrom_tag)
-	{
-		m_speechrom = siblingdevice<speechrom_device>( m_speechrom_tag );
-		if( !m_speechrom )
-		{
-			throw new emu_fatalerror("Error: %s '%s' can't find speechrom '%s'\n", shortname(), tag(), m_speechrom_tag );
-		}
-	}
-	else
-	{
-		m_speechrom = nullptr;
-	}
-
 	switch (m_variant)
 	{
 	case TMS5220_IS_TMC0281:
@@ -1751,18 +1796,8 @@ void tms5220_device::device_reset()
 	m_RNG = 0x1FFF;
 	std::fill(std::begin(m_u), std::end(m_u), 0);
 	std::fill(std::begin(m_x), std::end(m_x), 0);
-	m_schedule_dummy_read = false;
 
-	if (m_speechrom)
-	{
-		m_speechrom->load_address(0);
-		// MZ: Do the dummy read immediately. The previous line will cause a
-		// shift in the address pointer in the VSM. When the next command is a
-		// load_address, no dummy read will occur, hence the address will be
-		// incorrectly shifted.
-		m_speechrom->read(1);
-		m_schedule_dummy_read = false;
-	}
+	perform_dummy_read();
 
 	// 5110 specific stuff
 	m_PDC = 0;
@@ -2160,7 +2195,6 @@ tms5220_device::tms5220_device(const machine_config &mconfig, device_type type, 
 	, m_variant(variant)
 	, m_irq_handler(*this)
 	, m_readyq_handler(*this)
-	, m_speechrom_tag(nullptr)
 	, m_m0_cb(*this)
 	, m_m1_cb(*this)
 	, m_addr_cb(*this)

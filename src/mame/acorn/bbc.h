@@ -27,6 +27,7 @@
 #include "machine/i2cmem.h"
 #include "machine/bankdev.h"
 #include "machine/input_merger.h"
+#include "machine/tms6100.h"
 #include "video/mc6845.h"
 #include "video/saa5050.h"
 #include "sound/sn76496.h"
