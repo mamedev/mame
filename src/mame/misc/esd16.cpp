@@ -971,7 +971,7 @@ void esd16_state::machine_start()
 {
 	if (m_audiobank)
 	{
-		u8* audiorom = memregion("audiocpu")->base();
+		u8 *const audiorom = memregion("audiocpu")->base();
 		m_audiobank->configure_entries(0, 16, &audiorom[0x0000], 0x4000);
 	}
 

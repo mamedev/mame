@@ -23,6 +23,7 @@
 
 #include "emu.h"
 #include "spchsyn.h"
+
 #include "speaker.h"
 
 #define LOG_WARN        (1U << 1)    // Warnings

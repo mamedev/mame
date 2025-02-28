@@ -395,7 +395,7 @@ emulating the tms5220 in MCU code). Look for a 16-pin chip at U6 labeled
 // Show NOP command (tends to be noisy)
 #define LOG_COMMAND_NOP (1U << 9)
 
-// spams the error log with i/o ready messages whenever the ready or irq pin is read
+// spams the error log with I/O ready messages whenever the ready or IRQ pin is read
 #define LOG_PIN_READS (1U << 10)
 
 // dumps debug information related to the sample generation loop, i.e. whether interpolation is inhibited or not, and what the current and target values for each frame are.
@@ -428,7 +428,7 @@ emulating the tms5220 in MCU code). Look for a 16-pin chip at U6 labeled
 // Show state changes
 #define LOG_STATE (1U << 20)
 
-#define VERBOSE ( LOG_GENERAL )
+//#define VERBOSE (LOG_FIFO | LOG_PARSE | LOG_FRAME_ERRORS | LOG_COMMAND | LOG_GENERATION | LOG_DATA_W | LOG_STATE)
 #include "logmacro.h"
 
 #define MAX_SAMPLE_CHUNK    512

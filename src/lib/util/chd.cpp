@@ -3108,31 +3108,25 @@ std::error_condition chd_file_compressor::compress_continue(double &progress, do
 			if (!err && codec == CHD_CODEC_NONE) // TODO: report error?
 				m_total_out += m_hunkbytes;
 		}
+		else if (uint64_t const selfhunk = m_current_map.find(item.m_hash[0].m_crc16, item.m_hash[0].m_sha1); selfhunk != hashmap::NOT_FOUND)
+		{
+			// the hunk is in the self map
+			hunk_copy_from_self(item.m_hunknum, selfhunk);
+		}
 		else
 		{
-			// for compressing, process the result
-
-			// first see if the hunk is in the parent or self maps
-			uint64_t selfhunk = m_current_map.find(item.m_hash[0].m_crc16, item.m_hash[0].m_sha1);
-			if (selfhunk != hashmap::NOT_FOUND)
+			// if not, see if it's in the parent map
+			uint64_t const parentunit = m_parent ? m_parent_map.find(item.m_hash[0].m_crc16, item.m_hash[0].m_sha1) : hashmap::NOT_FOUND;
+			if (parentunit != hashmap::NOT_FOUND)
 			{
-				hunk_copy_from_self(item.m_hunknum, selfhunk);
+				hunk_copy_from_parent(item.m_hunknum, parentunit);
 			}
 			else
 			{
-				// if not, see if it's in the parent map
-				uint64_t const parentunit = m_parent ? m_parent_map.find(item.m_hash[0].m_crc16, item.m_hash[0].m_sha1) : hashmap::NOT_FOUND;
-				if (parentunit != hashmap::NOT_FOUND)
-				{
-					hunk_copy_from_parent(item.m_hunknum, parentunit);
-				}
-				else
-				{
-					// otherwise, append it compressed and add to the self map
-					hunk_write_compressed(item.m_hunknum, item.m_compression, item.m_compressed, item.m_complen, item.m_hash[0].m_crc16);
-					m_total_out += item.m_complen;
-					m_current_map.add(item.m_hunknum, item.m_hash[0].m_crc16, item.m_hash[0].m_sha1);
-				}
+				// otherwise, append it compressed and add to the self map
+				hunk_write_compressed(item.m_hunknum, item.m_compression, item.m_compressed, item.m_complen, item.m_hash[0].m_crc16);
+				m_total_out += item.m_complen;
+				m_current_map.add(item.m_hunknum, item.m_hash[0].m_crc16, item.m_hash[0].m_sha1);
 			}
 		}
 

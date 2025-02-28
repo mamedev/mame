@@ -45,15 +45,18 @@
 
 #include "emu.h"
 #include "bbc.h"
+
+#include "imagedev/cassette.h"
+#include "machine/tms6100.h"
+
 #include "softlist_dev.h"
 #include "speaker.h"
 
 #include "formats/acorn_dsk.h"
+#include "formats/csw_cas.h"
 #include "formats/fsd_dsk.h"
 #include "formats/pc_dsk.h"
-#include "imagedev/cassette.h"
 #include "formats/uef_cas.h"
-#include "formats/csw_cas.h"
 
 #include "utf8.h"
 
