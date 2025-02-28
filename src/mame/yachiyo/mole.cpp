@@ -60,6 +60,8 @@
 #include "tilemap.h"
 
 #include <algorithm>
+
+
 namespace {
 
 class mole_state : public driver_device
@@ -94,6 +96,7 @@ private:
 	uint8_t protection_r(offs_t offset);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	void main_map(address_map &map) ATTR_COLD;
 };
 
@@ -320,7 +323,7 @@ GFXDECODE_END
 void mole_state::mole(machine_config &config)
 {
 	/* basic machine hardware */
-	M6502(config, m_maincpu, 2000000); // ???
+	M6502(config, m_maincpu, 2'000'000); // ???
 	m_maincpu->set_addrmap(AS_PROGRAM, &mole_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(mole_state::irq0_line_assert));
 
