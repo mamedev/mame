@@ -5927,16 +5927,17 @@ Z84C015 - Toshiba TMPZ84C015BF-6 Z80 compatible CPU
 ROM_START( mjelctrb )
 	ROM_REGION( 0x50000, "maincpu", 0 ) // Z80 Code
 	ROM_LOAD( "prog.u27", 0x00000, 0x20000, CRC(688990ca) SHA1(34825cee8f76de93f12ccf2a1021f9c5369da46a) )
-	ROM_RELOAD(          0x28000, 0x08000 )
-	ROM_CONTINUE(        0x20000, 0x08000 )
-	ROM_CONTINUE(        0x18000, 0x08000 )
-	ROM_CONTINUE(        0x10000, 0x08000 )
+	ROM_RELOAD(           0x28000, 0x08000 )
+	ROM_CONTINUE(         0x20000, 0x08000 )
+	ROM_CONTINUE(         0x18000, 0x08000 )
+	ROM_CONTINUE(         0x10000, 0x08000 )
 
 	ROM_REGION( 0x200000, "blitter", 0 )   // blitter data
 	ROM_LOAD( "eb-01.rom", 0x000000, 0x100000, CRC(e5c41448) SHA1(b8322e32b0cb3d771316c9c4f7be91de6e422a24) )
 	ROM_LOAD( "eb-02.rom", 0x100000, 0x080000, CRC(e1f1b431) SHA1(04a612aff4c30cb8ea741f228bfa7e4289acfee8) )
 ROM_END
 
+// bootleg PCB with TMPZ84C015 with flying wire to the program ROM, AL9106 custom, GM68B45S, YM2149F, CCX413-2, 4 banks of 8 DIP switches
 ROM_START( mjelct3bl )
 	ROM_REGION( 0x50000, "maincpu", 0 ) // Z80 Code
 	ROM_LOAD( "rom.u3", 0x00000, 0x20000, CRC(2cc0bbd8) SHA1(0653de340d470d209649b82b1844c3c3da5c545a) )
@@ -5947,8 +5948,8 @@ ROM_START( mjelct3bl )
 	ROM_CONTINUE(       0x18000, 0x08000 )
 
 	ROM_REGION( 0x200000, "blitter", 0 )   // blitter data, not dumped for this set
-	ROM_LOAD( "eb-01.rom", 0x000000, 0x100000, BAD_DUMP CRC(e5c41448) SHA1(b8322e32b0cb3d771316c9c4f7be91de6e422a24) )
-	ROM_LOAD( "eb-02.rom", 0x100000, 0x080000, BAD_DUMP CRC(e1f1b431) SHA1(04a612aff4c30cb8ea741f228bfa7e4289acfee8) )
+	ROM_LOAD( "e1.u82", 0x000000, 0x100000, BAD_DUMP CRC(e5c41448) SHA1(b8322e32b0cb3d771316c9c4f7be91de6e422a24) )
+	ROM_LOAD( "e2.u83", 0x100000, 0x080000, BAD_DUMP CRC(e1f1b431) SHA1(04a612aff4c30cb8ea741f228bfa7e4289acfee8) )
 ROM_END
 
 /***************************************************************************

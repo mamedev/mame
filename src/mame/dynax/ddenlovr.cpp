@@ -11769,6 +11769,24 @@ ROM_START( mjmyuniv )
 	ROM_LOAD( "1.1e", 0x00000, 0x20000, CRC(09b7a9b2) SHA1(64d9ccbb726bb6c5b362afc92bca2e3db87fd454) )
 ROM_END
 
+// 麻雀 龍兄虎弟
+// CS166P001 PCB (very similar to mjmyuniv's one). Dump was presented as a bootleg but the PCB has all Dynax / Nakanihon original customs.
+ROM_START( mjmyunivbl )
+	ROM_REGION( 0x90000 + 0x1000*8, "maincpu", 0 )  // Z80 Code + space for banked RAM
+	ROM_LOAD( "rom.u42", 0x00000, 0x40000, CRC(8000eec3) SHA1(e2a4a46ebb8e152956f469382bde73b983090c01) )
+	ROM_RELOAD(          0x10000, 0x40000 )
+
+	ROM_REGION( 0xc00000, "blitter", ROMREGION_ERASE00 )
+	// gap
+	ROM_LOAD( "rom.u59", 0x800000, 0x080000, CRC(a287589a) SHA1(58659dd7e019d1d32efeaec548c84a7ded637c50) )
+	ROM_LOAD( "rom.u60", 0x880000, 0x080000, CRC(33dc6d59) SHA1(68440591ff194b444336a6d6abe599eee56d91c7) )
+	ROM_LOAD( "rom.u57", 0x900000, 0x080000, BAD_DUMP CRC(f45c24d6) SHA1(0eca68f2ca5722717f27ac0839359966daa2715b) ) // damaged ROM, using the one from mjmyuniv for now
+	ROM_LOAD( "rom.u58", 0x980000, 0x080000, CRC(9af9a939) SHA1(3ce67bb71b6dcf8535b6eba03622eaf53cdd3363) )
+
+	ROM_REGION( 0x40000, "oki", 0 )  // samples
+	ROM_LOAD( "rom.u30", 0x000000, 0x040000, CRC(30e496a6) SHA1(c7ea23079bd4acb6e06af954fafe8462d5576b0e) )
+ROM_END
+
 /***************************************************************************
 
 Panel & Variety Akamaru Q Joushou Dont-R
@@ -12650,6 +12668,7 @@ GAME( 1994, mjmywrld,    mjmyster, mjmywrld,  mjmyster,   ddenlovr_state, empty_
 GAME( 1994, hginga,      0,        hginga,    hginga,     ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Hanafuda Hana Ginga (Japan)",                                    MACHINE_NO_COCKTAIL  )
 
 GAME( 1994, mjmyuniv,    0,        mjmyuniv,  mjmyster,   ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Mysterious Universe (Japan, D85)",                   MACHINE_NO_COCKTAIL  )
+GAME( 1995, mjmyunivbl,  mjmyuniv, mjmyuniv,  mjmyster,   ddenlovr_state, empty_init,    ROT0, "bootleg",                                     "Maque Long Xiong Hu Di (Taiwan?, D106T)",                        MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL ) // One GFX ROM isn't dumped
 
 GAME( 1994, quiz365,     0,        quiz365,   quiz365,    ddenlovr_state, empty_init,    ROT0, "Nakanihon",                                   "Quiz 365 (Japan)",                                               MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )
 GAME( 1994, quiz365t,    quiz365,  quiz365,   quiz365,    ddenlovr_state, empty_init,    ROT0, "Nakanihon / Taito",                           "Quiz 365 (Hong Kong & Taiwan)",                                  MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )
