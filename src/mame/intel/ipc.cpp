@@ -81,7 +81,7 @@ private:
 
 void ipc_state::ipb_mem_map(address_map &map)
 {
-	map.unmap_value_high();
+	map.unmap_value_low();
 	map(0x0000, 0x7fff).ram();
 
 	// selectively map the boot/diagnostic segment
@@ -100,7 +100,7 @@ void ipc_state::ipb_mem_map(address_map &map)
 
 void ipc_state::ipc_mem_map(address_map &map)
 {
-	map.unmap_value_high();
+	map.unmap_value_low();
 	map(0x0000, 0xffff).ram();
 
 	// selectively map the boot/diagnostic segment
@@ -118,7 +118,7 @@ void ipc_state::ipc_mem_map(address_map &map)
 
 void ipc_state::io_map(address_map &map)
 {
-	map.unmap_value_high();
+	map.unmap_value_low();
 	map.global_mask(0xff);
 	map(0xf0, 0xf3).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0xf4, 0xf5).rw("uart1", FUNC(i8251_device::read), FUNC(i8251_device::write));
