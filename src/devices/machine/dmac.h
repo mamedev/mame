@@ -19,8 +19,6 @@
 class amiga_dmac_device : public device_t, public amiga_autoconfig
 {
 public:
-	amiga_dmac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
 	// callbacks
 	auto cfgout_cb() { return m_cfgout_cb.bind(); }
 	auto int_cb() { return m_int_cb.bind(); }
@@ -48,6 +46,8 @@ public:
 	void xdreq_w(int state);
 
 protected:
+	amiga_dmac_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool rev1);
+
 	virtual void device_start() override ATTR_COLD;
 
 	// amiga_autoconfig overrides
@@ -81,14 +81,18 @@ private:
 	void csx1_w(offs_t offset, uint8_t data);
 
 	// strobe register
-	uint16_t st_dma_r(offs_t offset, uint16_t mem_mask);
-	void st_dma_w(offs_t offset, uint16_t data, uint16_t mem_mask);
-	uint16_t sp_dma_r(offs_t offset, uint16_t mem_mask);
-	void sp_dma_w(offs_t offset, uint16_t data, uint16_t mem_mask);
-	uint16_t cint_r(offs_t offset, uint16_t mem_mask);
-	void cint_w(offs_t offset, uint16_t data, uint16_t mem_mask);
-	uint16_t flush_r(offs_t offset, uint16_t mem_mask);
-	void flush_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	void st_dma();
+	uint16_t st_dma_r(offs_t offset, uint16_t mem_mask) { st_dma(); return 0; };
+	void st_dma_w(offs_t offset, uint16_t data, uint16_t mem_mask) { st_dma(); };
+	void sp_dma();
+	uint16_t sp_dma_r(offs_t offset, uint16_t mem_mask) { sp_dma(); return 0; };
+	void sp_dma_w(offs_t offset, uint16_t data, uint16_t mem_mask) { sp_dma(); };
+	void cint();
+	uint16_t cint_r(offs_t offset, uint16_t mem_mask) { cint(); return 0; };
+	void cint_w(offs_t offset, uint16_t data, uint16_t mem_mask) { cint(); };
+	void flush();
+	uint16_t flush_r(offs_t offset, uint16_t mem_mask) { flush(); return 0; };
+	void flush_w(offs_t offset, uint16_t data, uint16_t mem_mask) { flush(); };
 
 	// control register definitions
 	static constexpr uint16_t CNTR_TCEN = 0x80;  // terminal count enable
@@ -127,6 +131,7 @@ private:
 	address_space *m_space;
 	uint16_t *m_ram;
 	int m_ram_size;
+	bool m_rev1;
 
 	// internal registers
 	uint16_t m_cntr; // control register
@@ -148,7 +153,20 @@ private:
 	offs_t m_ram_address;
 };
 
+class amiga_dmac_rev1_device : public amiga_dmac_device
+{
+public:
+	amiga_dmac_rev1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+class amiga_dmac_rev2_device : public amiga_dmac_device
+{
+public:
+	amiga_dmac_rev2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
 // device type definition
-DECLARE_DEVICE_TYPE(AMIGA_DMAC, amiga_dmac_device)
+DECLARE_DEVICE_TYPE(AMIGA_DMAC_REV1, amiga_dmac_rev1_device)
+DECLARE_DEVICE_TYPE(AMIGA_DMAC_REV2, amiga_dmac_rev2_device)
 
 #endif // MAME_MACHINE_DMAC_H

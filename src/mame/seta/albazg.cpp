@@ -98,7 +98,7 @@ private:
 
 	tilemap_t *m_tilemap = nullptr;
 	uint8_t m_port_select = 0;
-	uint8_t m_prot_lock = 0;
+	uint8_t m_prot_unlock = 0;
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_custom_ram;
@@ -165,7 +165,7 @@ uint8_t albazg_state::custom_ram_r(offs_t offset)
 void albazg_state::custom_ram_w(offs_t offset, uint8_t data)
 {
 	LOGPROTRAM("Custom RAM write at %02x : %02x PC = %x\n", offset + 0xaf80, data, m_maincpu->pc());
-	if (m_prot_lock)
+	if (m_prot_unlock)
 		m_custom_ram[offset] = data;
 }
 
@@ -173,7 +173,7 @@ void albazg_state::custom_ram_w(offs_t offset, uint8_t data)
 void albazg_state::prot_lock_w(uint8_t data)
 {
 	LOGPROTRAM("PC %04x Prot lock value written %02x\n", m_maincpu->pc(), data);
-	m_prot_lock = data;
+	m_prot_unlock = data;
 }
 
 uint8_t albazg_state::key_matrix_r()
@@ -348,13 +348,13 @@ void albazg_state::machine_start()
 	m_rombank->configure_entries(0, 4, memregion("maincpu")->base() + 0x8000, 0x2000);
 
 	save_item(NAME(m_port_select));
-	save_item(NAME(m_prot_lock));
+	save_item(NAME(m_prot_unlock));
 }
 
 void albazg_state::machine_reset()
 {
 	m_port_select = 0;
-	m_prot_lock = 0;
+	m_prot_unlock = 0;
 }
 
 void albazg_state::yumefuda(machine_config &config)

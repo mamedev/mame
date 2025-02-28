@@ -24,7 +24,6 @@
 #include "emu.h"
 #include "spchsyn.h"
 
-#include "machine/spchrom.h"
 #include "speaker.h"
 
 #define LOG_WARN        (1U << 1)    // Warnings
@@ -154,22 +153,18 @@ ROM_END
 
 void ti_speech_synthesizer_device::device_add_mconfig(machine_config& config)
 {
-	SPEECHROM(config, "vsm", 0).set_reverse_bit_order(true);
 	SPEAKER(config, "speech_out").front_center();
 	CD2501E(config, m_vsp, 640000L);
-	m_vsp->set_speechrom_tag("vsm");
+
 	m_vsp->ready_cb().set(FUNC(ti_speech_synthesizer_device::speech_ready));
 	m_vsp->add_route(ALL_OUTPUTS, "speech_out", 0.50);
 
-/*
-    // FIXME: Make it work. Guess we need two VSM circuits @16K.
-    TMS6100(config, "vsm", 640_kHz_XTAL/4);
-    m_vsp->m0_cb().set("vsm", FUNC(tms6100_device::m0_w));
-    m_vsp->m1_cb().set("vsm", FUNC(tms6100_device::m1_w));
-    m_vsp->addr_cb().set("vsm", FUNC(tms6100_device::add_w));
-    m_vsp->data_cb().set("vsm", FUNC(tms6100_device::data_line_r));
-    m_vsp->romclk_cb().set("vsm", FUNC(tms6100_device::clk_w));
-*/
+	TMS6100(config, "vsm", 0);
+	m_vsp->m0_cb().set("vsm", FUNC(tms6100_device::m0_w));
+	m_vsp->m1_cb().set("vsm", FUNC(tms6100_device::m1_w));
+	m_vsp->addr_cb().set("vsm", FUNC(tms6100_device::add_w));
+	m_vsp->data_cb().set("vsm", FUNC(tms6100_device::data_line_r));
+	m_vsp->romclk_cb().set("vsm", FUNC(tms6100_device::clk_w));
 }
 
 INPUT_PORTS_START( ti99_speech )

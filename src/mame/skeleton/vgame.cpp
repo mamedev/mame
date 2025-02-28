@@ -2,7 +2,7 @@
 // copyright-holders:
 
 /*
-Video slots by VGame.
+Video slots / mahjongs by VGame.
 
 The main components are:
 rectangular 128-pin chip, marked VGAME-007 (probably CPU)
@@ -13,7 +13,7 @@ LY62256SL SRAM (near VGAME-007)
 U6295 sound chip
 2 banks of 8 DIP switches
 
-TODO: everything. CPU core isn't identified and code is encrypted.
+TODO: everything. CPU core isn't identified and code is encrypted. Possibly internal ROM?
 */
 
 
@@ -122,8 +122,9 @@ static INPUT_PORTS_START( hilice )
 INPUT_PORTS_END
 
 
-// TODO
+// TODO: wrong, just enough to glimpse some alphanumerics
 static GFXDECODE_START( gfx_vgame )
+	GFXDECODE_ENTRY( "gfx", 0, gfx_16x16x4_packed_lsb, 0, 1 )
 GFXDECODE_END
 
 
@@ -149,17 +150,31 @@ void vgame_state::vgame(machine_config &config)
 	OKIM6295(config, "oki", 44_MHz_XTAL / 44, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // pin 7 and clock not verified
 }
 
-
+// VGAME-0030-02-AI PCB
 ROM_START( hilice )
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "hi_lice_v102fa.u13", 0x000000, 0x200000, CRC(4da87481) SHA1(5a20b254cfe8a2f087faa0dd17f682218a2ca1b2) )
 
 	ROM_REGION( 0x400000, "gfx", 0 )
-	ROM_LOAD( "hi_lice_cg_01fu3.u3", 0x000000, 0x200000, CRC(8ad6b233) SHA1(deaffd391265c885afb2f171089c1b33429470f1) )
-	ROM_LOAD( "hi_lice_cg_01fu8.u8", 0x200000, 0x200000, BAD_DUMP CRC(b1070209) SHA1(4568977fca2ff96b756a9600ad9a4730a6f8749a) ) // didn't give consistent reads
+	ROM_LOAD16_BYTE( "hi_lice_cg_01fu3.u3", 0x000000, 0x200000, CRC(8ad6b233) SHA1(deaffd391265c885afb2f171089c1b33429470f1) )
+	ROM_LOAD16_BYTE( "hi_lice_cg_01fu8.u8", 0x000001, 0x200000, BAD_DUMP CRC(b1070209) SHA1(4568977fca2ff96b756a9600ad9a4730a6f8749a) ) // didn't give consistent reads
 
 	ROM_REGION( 0x200000, "oki", 0 )
 	ROM_LOAD( "hi_lice_sp_100f.u45", 0x000000, 0x200000, CRC(b2588f54) SHA1(0d046e56596611954a9d2a9a30746d8aa370431b) ) // 1xxxxxxxxxxxxxxxxxxxx = 0x00
+ROM_END
+
+// VGAME-0030-02-AG PCB, almost identical to the hilice one.
+// while all labels have 麻將學園 (Mahjong School) prepended to what's below, title screen shows 麻將學園 2 - Mahjong School 2
+ROM_START( mjxy2 )
+	ROM_REGION( 0x200000, "maincpu", 0 ) // dumped as EV29LV160 (same rare ROM as some IGS titles)
+	ROM_LOAD( "u12_v108tw.u12", 0x000000, 0x200000, CRC(a6d99849) SHA1(c280635517d5ffded524e15048568817bd927bf9) )
+
+	ROM_REGION( 0x400000, "gfx", 0 ) // dumped as EV29LV160 (same rare ROM as some IGS titles)
+	ROM_LOAD16_BYTE( "u3_cg_v105.u3", 0x000000, 0x200000, CRC(fda38fb1) SHA1(7bd744e42f619254ebad2fb60f3851f61073fe8c) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
+	ROM_LOAD16_BYTE( "u7_cg_v105.u7", 0x000001, 0x200000, CRC(5acf5b99) SHA1(ee638635c25ab9d392b8a7ff79209e657ccfd5c0) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "u43_sp_v105.u43", 0x000000, 0x200000, CRC(5d1ab8f1) SHA1(56473b632dfdb210208ce3b35cb6861f07861cd7) )
 ROM_END
 
 
@@ -171,4 +186,5 @@ void vgame_state::init_hilice()
 } // anonymous namespace
 
 
-GAME( 200?, hilice,  0, vgame, hilice, vgame_state, init_hilice, ROT0, "VGame", "Hi Lice (V102FA)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, hilice,  0, vgame, hilice, vgame_state, init_hilice, ROT0, "VGame", "Hi Lice (V102FA)",                              MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, mjxy2,   0, vgame, hilice, vgame_state, init_hilice, ROT0, "VGame", "Majiang Xueyuan 2 - Mahjong School (V108TW)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

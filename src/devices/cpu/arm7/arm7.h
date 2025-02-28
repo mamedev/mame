@@ -725,6 +725,13 @@ public:
 	pxa270_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
+class sa1100_cpu_device : public arm7_cpu_device
+{
+public:
+	// construction/destruction
+	sa1100_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
 class sa1110_cpu_device : public arm7_cpu_device
 {
 public:
@@ -745,6 +752,7 @@ DECLARE_DEVICE_TYPE(ARM1176JZF_S, arm1176jzf_s_cpu_device)
 DECLARE_DEVICE_TYPE(PXA250,       pxa250_cpu_device)
 DECLARE_DEVICE_TYPE(PXA255,       pxa255_cpu_device)
 DECLARE_DEVICE_TYPE(PXA270,       pxa270_cpu_device)
+DECLARE_DEVICE_TYPE(SA1100,       sa1100_cpu_device)
 DECLARE_DEVICE_TYPE(SA1110,       sa1110_cpu_device)
 DECLARE_DEVICE_TYPE(IGS036,       igs036_cpu_device)
 

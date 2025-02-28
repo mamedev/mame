@@ -33,10 +33,12 @@ pseudovia_device::pseudovia_device(const machine_config &mconfig, const char *ta
 	m_in_b_handler(*this, 0),
 	m_in_config_handler(*this, 0),
 	m_in_video_handler(*this, 0),
+	m_in_msc_handler(*this, 0),
 	m_out_a_handler(*this),
 	m_out_b_handler(*this),
 	m_out_config_handler(*this),
 	m_out_video_handler(*this),
+	m_out_msc_handler(*this),
 	m_pseudovia_ier(0),
 	m_pseudovia_ifr(0)
 {
@@ -181,6 +183,11 @@ uint8_t pseudovia_device::read(offs_t offset)
 		{
 			data &= ~0x80;
 		}
+
+		if ((offset >= 0x20) && (offset <= 0x2f))
+		{
+			data = m_in_msc_handler(offset & 0xf);
+		}
 	}
 	else
 	{
@@ -272,6 +279,10 @@ void pseudovia_device::write(offs_t offset, uint8_t data)
 			break;
 
 		default:
+			if ((offset >= 0x20) && (offset <= 0x2f))
+			{
+				m_out_msc_handler(offset & 0xf, data);
+			}
 			m_pseudovia_regs[offset] = data;
 			break;
 		}

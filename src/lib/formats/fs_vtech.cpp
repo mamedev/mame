@@ -38,20 +38,20 @@ public:
 	virtual ~vtech_impl() = default;
 
 	virtual meta_data volume_metadata() override;
-	virtual err_t volume_metadata_change(const meta_data &info) override;
-	virtual std::pair<err_t, meta_data> metadata(const std::vector<std::string> &path) override;
-	virtual err_t metadata_change(const std::vector<std::string> &path, const meta_data &meta) override;
+	virtual std::error_condition volume_metadata_change(const meta_data &info) override;
+	virtual std::pair<std::error_condition, meta_data> metadata(const std::vector<std::string> &path) override;
+	virtual std::error_condition metadata_change(const std::vector<std::string> &path, const meta_data &meta) override;
 
-	virtual std::pair<err_t, std::vector<dir_entry>> directory_contents(const std::vector<std::string> &path) override;
-	virtual err_t rename(const std::vector<std::string> &opath, const std::vector<std::string> &npath) override;
-	virtual err_t remove(const std::vector<std::string> &path) override;
+	virtual std::pair<std::error_condition, std::vector<dir_entry>> directory_contents(const std::vector<std::string> &path) override;
+	virtual std::error_condition rename(const std::vector<std::string> &opath, const std::vector<std::string> &npath) override;
+	virtual std::error_condition remove(const std::vector<std::string> &path) override;
 
-	virtual err_t file_create(const std::vector<std::string> &path, const meta_data &meta) override;
+	virtual std::error_condition file_create(const std::vector<std::string> &path, const meta_data &meta) override;
 
-	virtual std::pair<err_t, std::vector<u8>> file_read(const std::vector<std::string> &path) override;
-	virtual err_t file_write(const std::vector<std::string> &path, const std::vector<u8> &data) override;
+	virtual std::pair<std::error_condition, std::vector<u8>> file_read(const std::vector<std::string> &path) override;
+	virtual std::error_condition file_write(const std::vector<std::string> &path, const std::vector<u8> &data) override;
 
-	virtual err_t format(const meta_data &meta) override;
+	virtual std::error_condition format(const meta_data &meta) override;
 
 private:
 	meta_data file_metadata(const u8 *entry);
@@ -124,10 +124,10 @@ vtech_impl::vtech_impl(fsblk_t &blockdev) : filesystem_t(blockdev, 128)
 {
 }
 
-err_t vtech_impl::format(const meta_data &meta)
+std::error_condition vtech_impl::format(const meta_data &meta)
 {
 	m_blockdev.fill(0);
-	return ERR_OK;
+	return std::error_condition();
 }
 
 meta_data vtech_impl::volume_metadata()
@@ -135,9 +135,9 @@ meta_data vtech_impl::volume_metadata()
 	return meta_data();
 }
 
-err_t vtech_impl::volume_metadata_change(const meta_data &meta)
+std::error_condition vtech_impl::volume_metadata_change(const meta_data &meta)
 {
-	return ERR_OK;
+	return std::error_condition();
 }
 
 meta_data vtech_impl::file_metadata(const u8 *entry)
@@ -171,26 +171,26 @@ std::tuple<fsblk_t::block_t, u32> vtech_impl::file_find(std::string_view name)
 	return std::make_tuple(fsblk_t::block_t(), 0xffffffff);
 }
 
-std::pair<err_t, meta_data> vtech_impl::metadata(const std::vector<std::string> &path)
+std::pair<std::error_condition, meta_data> vtech_impl::metadata(const std::vector<std::string> &path)
 {
 	if(path.size() != 1)
-		return std::make_pair(ERR_NOT_FOUND, meta_data());
+		return std::make_pair(error::not_found, meta_data());
 
 	auto [bdir, off] = file_find(path[0]);
 	if(off == 0xffffffff)
-		return std::make_pair(ERR_NOT_FOUND, meta_data());
+		return std::make_pair(error::not_found, meta_data());
 
-	return std::make_pair(ERR_OK, file_metadata(bdir.rodata() + off));
+	return std::make_pair(std::error_condition(), file_metadata(bdir.rodata() + off));
 }
 
-err_t vtech_impl::metadata_change(const std::vector<std::string> &path, const meta_data &meta)
+std::error_condition vtech_impl::metadata_change(const std::vector<std::string> &path, const meta_data &meta)
 {
 	if(path.size() != 1)
-		return ERR_NOT_FOUND;
+		return error::not_found;
 
 	auto [bdir, off] = file_find(path[0]);
 	if(off == 0xffffffff)
-		return ERR_NOT_FOUND;
+		return error::not_found;
 
 	u8 *entry = bdir.data() + off;
 	if(meta.has(meta_name::file_type))
@@ -207,19 +207,19 @@ err_t vtech_impl::metadata_change(const std::vector<std::string> &path, const me
 		put_u16le(entry + 0xe, new_end);
 	}
 
-	return ERR_OK;
+	return std::error_condition();
 }
 
-std::pair<err_t, std::vector<dir_entry>> vtech_impl::directory_contents(const std::vector<std::string> &path)
+std::pair<std::error_condition, std::vector<dir_entry>> vtech_impl::directory_contents(const std::vector<std::string> &path)
 {
-	std::pair<err_t, std::vector<dir_entry>> res;
+	std::pair<std::error_condition, std::vector<dir_entry>> res;
 
 	if(path.size() != 0) {
-		res.first = ERR_NOT_FOUND;
+		res.first = error::not_found;
 		return res;
 	}
 
-	res.first = ERR_OK;
+	res.first = std::error_condition();
 
 	for(int sect = 0; sect != 14; sect++) {
 		auto bdir = m_blockdev.get(sect);
@@ -237,32 +237,32 @@ std::pair<err_t, std::vector<dir_entry>> vtech_impl::directory_contents(const st
 	return res;
 }
 
-err_t vtech_impl::rename(const std::vector<std::string> &opath, const std::vector<std::string> &npath)
+std::error_condition vtech_impl::rename(const std::vector<std::string> &opath, const std::vector<std::string> &npath)
 {
 	if(opath.size() != 1 || npath.size() != 1)
-		return ERR_NOT_FOUND;
+		return error::not_found;
 
 	auto [bdir, off] = file_find(opath[0]);
 	if(off == 0xffffffff)
-		return ERR_NOT_FOUND;
+		return error::not_found;
 
 	std::string name = npath[0];
 	name.resize(8, ' ');
 	wstr(bdir.data() + off + 2, name);
 
-	return ERR_OK;
+	return std::error_condition();
 }
 
-err_t vtech_impl::remove(const std::vector<std::string> &path)
+std::error_condition vtech_impl::remove(const std::vector<std::string> &path)
 {
-	return ERR_NOT_FOUND;
+	return error::unsupported;
 }
 
 
-err_t vtech_impl::file_create(const std::vector<std::string> &path, const meta_data &meta)
+std::error_condition vtech_impl::file_create(const std::vector<std::string> &path, const meta_data &meta)
 {
 	if(path.size() != 0)
-		return ERR_NOT_FOUND;
+		return error::not_found;
 
 	// Find the key for the next unused entry
 	for(int sect = 0; sect != 14; sect++) {
@@ -281,23 +281,23 @@ err_t vtech_impl::file_create(const std::vector<std::string> &path, const meta_d
 				bdir.w8  (off+0xb, 0x00);
 				bdir.w16l(off+0xc, meta.get_number(meta_name::loading_address, 0x7ae9));
 				bdir.w16l(off+0xe, bdir.r16l(off+0xc)); // Size 0 initially
-				return ERR_OK;
+				return std::error_condition();
 			}
 		}
 	}
-	return ERR_NO_SPACE;
+	return error::no_space;
 }
 
-std::pair<err_t, std::vector<u8>> vtech_impl::file_read(const std::vector<std::string> &path)
+std::pair<std::error_condition, std::vector<u8>> vtech_impl::file_read(const std::vector<std::string> &path)
 {
 	std::vector<u8> data;
 
 	if(path.size() != 1)
-		return std::make_pair(ERR_NOT_FOUND, data);
+		return std::make_pair(error::not_found, data);
 
 	auto [bdir, off] = file_find(path[0]);
 	if(off == 0xffffffff)
-		return std::make_pair(ERR_NOT_FOUND, data);
+		return std::make_pair(error::not_found, data);
 
 	const u8 *entry = bdir.rodata() + off;
 
@@ -319,17 +319,17 @@ std::pair<err_t, std::vector<u8>> vtech_impl::file_read(const std::vector<std::s
 		track = dblk.r8(126);
 		sector = dblk.r8(127);
 	}
-	return std::make_pair(ERR_OK, data);
+	return std::make_pair(std::error_condition(), data);
 }
 
-err_t vtech_impl::file_write(const std::vector<std::string> &path, const std::vector<u8> &data)
+std::error_condition vtech_impl::file_write(const std::vector<std::string> &path, const std::vector<u8> &data)
 {
 	if(path.size() != 1)
-		return ERR_NOT_FOUND;
+		return error::not_found;
 
 	auto [bdir, off] = file_find(path[0]);
 	if(off == 0xffffffff)
-		return ERR_NOT_FOUND;
+		return error::not_found;
 
 	u8 *entry = bdir.data() + off;
 
@@ -342,7 +342,7 @@ err_t vtech_impl::file_write(const std::vector<std::string> &path, const std::ve
 
 	// Enough space?
 	if(cur_ns < need_ns && free_block_count() < need_ns - cur_ns)
-		return ERR_NO_SPACE;
+		return error::no_space;
 
 	u8 track = entry[0xa];
 	u8 sector = entry[0xb];
@@ -380,7 +380,7 @@ err_t vtech_impl::file_write(const std::vector<std::string> &path, const std::ve
 	} else
 		put_u16le(entry + 0xa, 0);
 
-	return ERR_OK;
+	return std::error_condition();
 }
 
 std::vector<std::pair<u8, u8>> vtech_impl::allocate_blocks(u32 count)

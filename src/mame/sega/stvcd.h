@@ -1,8 +1,8 @@
 // license:LGPL-2.1+
 // copyright-holders:Angelo Salese, R. Belmont
 
-#ifndef MAME_MACHINE_STVCD_H
-#define MAME_MACHINE_STVCD_H
+#ifndef MAME_SEGA_STVCD_H
+#define MAME_SEGA_STVCD_H
 
 #pragma once
 
@@ -277,4 +277,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(STVCD, stvcd_device)
 
-#endif // MAME_MACHINE_STVCD_H
+#endif // MAME_SEGA_STVCD_H

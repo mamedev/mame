@@ -268,6 +268,10 @@ Raine source has standard Asuka/Mofflot sprite/tile priority:
 Raine simply kludges in this value, failing to read it from a
 register. So what is controlling priority.
 
+Sound routing is wrong: according to schematics, msm0 goes to tc0060dca0 input 0,
+msm1 goes to tc0060dca0 input 1. ym2151 (mono) and tc0060dca0 outputs go to
+tc0060dca1 inputs. The 2nd tc0060dca is for total volume (opwolf_adpcm_d_w and
+opwolf_adpcm_e_w), outputs go to left/right speakers.
 
 ***************************************************************************/
 
@@ -276,6 +280,7 @@ register. So what is controlling priority.
 #include "taitosnd.h"
 #include "taitoipt.h"
 #include "taitocchip.h"
+#include "tc0060dca.h"
 #include "pc080sn.h"
 #include "pc090oj.h"
 
@@ -314,6 +319,7 @@ public:
 		m_pc080sn(*this, "pc080sn"),
 		m_pc090oj(*this, "pc090oj"),
 		m_msm(*this, "msm%u", 0),
+		m_tc0060dca(*this, "tc0060dca%u", 0),
 		m_lspeaker(*this, "lspeaker"),
 		m_rspeaker(*this, "rspeaker"),
 		m_z80bank(*this, "z80bank"),
@@ -384,6 +390,7 @@ private:
 	required_device<pc080sn_device> m_pc080sn;
 	required_device<pc090oj_device> m_pc090oj;
 	required_device_array<msm5205_device, 2> m_msm;
+	required_device_array<tc0060dca_device, 2> m_tc0060dca;
 	required_device<speaker_device> m_lspeaker;
 	required_device<speaker_device> m_rspeaker;
 	required_memory_bank m_z80bank;
@@ -755,7 +762,7 @@ void opwolf_state::opwolf_adpcm_b_w(offs_t offset, uint8_t data)
 		m_adpcm_pos[0] = start;
 		m_adpcm_end[0] = end;
 		m_msm[0]->reset_w(0);
-		m_msm[0]->set_output_gain(0, m_adpcm_b[5] / 255.0);
+		m_tc0060dca[0]->level_w(3, m_adpcm_b[5]);
 		//logerror("TRIGGER MSM1\n");
 	}
 
@@ -778,7 +785,7 @@ void opwolf_state::opwolf_adpcm_c_w(offs_t offset, uint8_t data)
 		m_adpcm_pos[1] = start;
 		m_adpcm_end[1] = end;
 		m_msm[1]->reset_w(0);
-		m_msm[1]->set_output_gain(0, m_adpcm_c[5] / 255.0);
+		m_tc0060dca[1]->level_w(3, m_adpcm_c[5]);
 		//logerror("TRIGGER MSM2\n");
 	}
 
@@ -931,17 +938,25 @@ void opwolf_state::opwolf(machine_config &config)
 	ymsnd.add_route(0, "lspeaker", 1.0);
 	ymsnd.add_route(1, "rspeaker", 1.0);
 
+	TC0060DCA(config, m_tc0060dca[0]);
+	m_tc0060dca[0]->add_route(0, "lspeaker", 1.0);
+	m_tc0060dca[0]->add_route(1, "rspeaker", 1.0);
+
 	MSM5205(config, m_msm[0], 384000);
 	m_msm[0]->vck_legacy_callback().set(FUNC(opwolf_state::msm5205_vck_w<0>));
 	m_msm[0]->set_prescaler_selector(msm5205_device::S48_4B);   /* 8 kHz */
-	m_msm[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_msm[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_msm[0]->add_route(ALL_OUTPUTS, m_tc0060dca[0], 1.0);
+	m_msm[0]->add_route(ALL_OUTPUTS, m_tc0060dca[0], 1.0);
+
+	TC0060DCA(config, m_tc0060dca[1]);
+	m_tc0060dca[1]->add_route(0, "lspeaker", 1.0);
+	m_tc0060dca[1]->add_route(1, "rspeaker", 1.0);
 
 	MSM5205(config, m_msm[1], 384000);
 	m_msm[1]->vck_legacy_callback().set(FUNC(opwolf_state::msm5205_vck_w<1>));
 	m_msm[1]->set_prescaler_selector(msm5205_device::S48_4B);   /* 8 kHz */
-	m_msm[1]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_msm[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_msm[1]->add_route(ALL_OUTPUTS, m_tc0060dca[1], 1.0);
+	m_msm[1]->add_route(ALL_OUTPUTS, m_tc0060dca[1], 1.0);
 
 	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
 	ciu.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
@@ -1002,17 +1017,25 @@ void opwolf_state::opwolfb(machine_config &config) /* OSC clocks unknown for the
 	ymsnd.add_route(0, "lspeaker", 1.0);
 	ymsnd.add_route(1, "rspeaker", 1.0);
 
+	TC0060DCA(config, m_tc0060dca[0]);
+	m_tc0060dca[0]->add_route(0, "lspeaker", 1.0);
+	m_tc0060dca[0]->add_route(1, "rspeaker", 1.0);
+
 	MSM5205(config, m_msm[0], 384000);
 	m_msm[0]->vck_legacy_callback().set(FUNC(opwolf_state::msm5205_vck_w<0>));
-	m_msm[0]->set_prescaler_selector(msm5205_device::S48_4B);   /* 8 kHz */
-	m_msm[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_msm[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_msm[0]->set_prescaler_selector(msm5205_device::S48_4B); /* 8 kHz */
+	m_msm[0]->add_route(ALL_OUTPUTS, m_tc0060dca[0], 1.0);
+	m_msm[0]->add_route(ALL_OUTPUTS, m_tc0060dca[0], 1.0);
+
+	TC0060DCA(config, m_tc0060dca[1]);
+	m_tc0060dca[1]->add_route(0, "lspeaker", 1.0);
+	m_tc0060dca[1]->add_route(1, "rspeaker", 1.0);
 
 	MSM5205(config, m_msm[1], 384000);
 	m_msm[1]->vck_legacy_callback().set(FUNC(opwolf_state::msm5205_vck_w<1>));
-	m_msm[1]->set_prescaler_selector(msm5205_device::S48_4B);   /* 8 kHz */
-	m_msm[1]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_msm[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_msm[1]->set_prescaler_selector(msm5205_device::S48_4B); /* 8 kHz */
+	m_msm[1]->add_route(ALL_OUTPUTS, m_tc0060dca[1], 1.0);
+	m_msm[1]->add_route(ALL_OUTPUTS, m_tc0060dca[1], 1.0);
 
 	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
 	ciu.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);

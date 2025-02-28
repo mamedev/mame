@@ -14,17 +14,28 @@
 //#include "pc80s31k.h"
 #include "pc88va_sgp.h"
 
+#include "bus/cbus/pc9801_cbus.h"
 #include "bus/msx/ctrl/ctrl.h"
 #include "cpu/nec/v5x.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/floppy.h"
 #include "machine/bankdev.h"
 #include "machine/i8255.h"
+#include "machine/input_merger.h"
 #include "machine/pic8259.h"
 #include "machine/timer.h"
 #include "machine/upd1990a.h"
 #include "machine/upd765.h"
 #include "sound/ymopn.h"
+
+//#include "bus/cbus/amd98.h"
+//#include "bus/cbus/pc9801_26.h"
+#include "bus/cbus/pc9801_55.h"
+//#include "bus/cbus/pc9801_86.h"
+//#include "bus/cbus/pc9801_118.h"
+#include "bus/cbus/mpu_pc98.h"
+//#include "bus/cbus/sb16_ct2720.h"
+
 
 #include "emupal.h"
 #include "screen.h"
@@ -46,6 +57,7 @@ public:
 		, m_fdd(*this, "upd765:%u", 0U)
 		, m_pic2(*this, "pic8259_slave")
 		, m_rtc(*this, "rtc")
+		, m_cbus(*this, "cbus%d", 0)
 		, m_mouse_port(*this, "mouseport") // labelled "マウス" (mouse) - can't use "mouse" because of core -mouse option
 		, m_opna(*this, "opna")
 		, m_lspeaker(*this, "lspeaker")
@@ -97,6 +109,9 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 	void palette_init(palette_device &palette) const;
 
+protected:
+	void pc88va_cbus(machine_config &config);
+
 private:
 
 	required_device<v50_device> m_maincpu;
@@ -107,6 +122,7 @@ private:
 //  required_device<pic8259_device> m_pic1;
 	required_device<pic8259_device> m_pic2;
 	required_device<upd4990a_device> m_rtc;
+	required_device_array<pc9801_slot_device, 2> m_cbus;
 	required_device<msx_general_purpose_port_device> m_mouse_port;
 	required_device<ym2608_device> m_opna;
 	required_device<speaker_device> m_lspeaker;

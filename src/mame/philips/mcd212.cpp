@@ -42,175 +42,165 @@ TODO:
 // device type definition
 DEFINE_DEVICE_TYPE(MCD212, mcd212_device, "mcd212", "MCD212 VDSC")
 
-inline ATTR_FORCE_INLINE uint8_t mcd212_device::get_weight_factor(const uint32_t region_idx)
+inline ATTR_FORCE_INLINE uint8_t mcd212_device::get_weight_factor(const uint32_t matte_idx)
 {
-	return (uint8_t)((m_region_control[region_idx] & RC_WF) >> RC_WF_SHIFT);
+	return (uint8_t)((m_matte_control[matte_idx] & MC_WF) >> MC_WF_SHIFT);
 }
 
-inline ATTR_FORCE_INLINE uint8_t mcd212_device::get_region_op(const uint32_t region_idx)
+inline ATTR_FORCE_INLINE uint8_t mcd212_device::get_matte_op(const uint32_t matte_idx)
 {
-	return (m_region_control[region_idx] & RC_OP) >> RC_OP_SHIFT;
+	return (m_matte_control[matte_idx] & MC_OP) >> MC_OP_SHIFT;
 }
 
-void mcd212_device::update_region_arrays()
+void mcd212_device::update_matte_arrays()
 {
-	bool latched_rf[2]{ false, false };
+	bool latched_mf[2]{ false, false };
 	uint8_t latched_wfa = m_weight_factor[0][0];
 	uint8_t latched_wfb = m_weight_factor[1][0];
 	const int width = get_screen_width();
 
-	if (BIT(m_image_coding_method, ICM_NR_BIT))
+	const int num_mattes = BIT(m_image_coding_method, ICM_NM_BIT) ? 2 : 1;
+	const bool matte_flag = BIT(m_matte_control[0], MC_MF_BIT); // MF bit must be the same. See 5.10.2 Matte Commands
+	
+	int x = 0;
+	int matte_idx = 0;
+	for (; x < width; x++)
 	{
-		if (get_region_op(0) == 0 && get_region_op(4) == 0)
+		for (int f1 = 0; f1 < num_mattes; f1++)
 		{
-			std::fill_n(m_weight_factor[0], std::size(m_weight_factor[0]), latched_wfa);
-			std::fill_n(m_weight_factor[1], std::size(m_weight_factor[1]), latched_wfb);
-			std::fill_n(m_region_flag[0], std::size(m_region_flag[0]), false);
-			std::fill_n(m_region_flag[1], std::size(m_region_flag[1]), false);
-			return;
-		}
-
-		for (int x = 0; x < width; x++)
-		{
-			for (int flag = 0; flag < 2; flag++)
+			const int max_matte_id = (0x10 >> num_mattes) + (f1 << 2);
+			const int flag = (num_mattes == 2) ? f1 : matte_flag;
+			if (num_mattes == 2)
 			{
-				for (int region = 0; region < 4; region++)
+				for (int matte = 0; matte < max_matte_id; matte++)
 				{
-					const int region_idx = (flag << 2) + region;
-					const uint32_t region_ctrl = m_region_control[region_idx];
-					const uint32_t region_op = get_region_op(region_idx);
-					if (region_op == 0)
+					const int matte_idx = (flag << 2) + matte;
+					const uint32_t matte_ctrl = m_matte_control[matte_idx];
+					const uint32_t matte_op = get_matte_op(matte_idx);
+					if (matte_op == 0)
 					{
 						break;
 					}
-					if (x == (region_ctrl & RC_X))
+					if (x == (matte_ctrl & MC_X))
 					{
-						switch (region_op)
+						switch (matte_op)
 						{
-							case 0: // End of region control for line
-								break;
-							case 1:
-							case 2:
-							case 3: // Not used
-								break;
-							case 4: // Change weight of plane A
-								latched_wfa = get_weight_factor(region_idx);
-								break;
-							case 5: // Not used
-								break;
-							case 6: // Change weight of plane B
-								latched_wfb = get_weight_factor(region_idx);
-								break;
-							case 7: // Not used
-								break;
-							case 8: // Reset region flag
-								latched_rf[flag] = false;
-								break;
-							case 9: // Set region flag
-								latched_rf[flag] = true;
-								break;
-							case 10:    // Not used
-							case 11:    // Not used
-								break;
-							case 12: // Reset region flag and change weight of plane A
-								latched_wfa = get_weight_factor(region_idx);
-								latched_rf[flag] = false;
-								break;
-							case 13: // Set region flag and change weight of plane A
-								latched_wfa = get_weight_factor(region_idx);
-								latched_rf[flag] = true;
-								break;
-							case 14: // Reset region flag and change weight of plane B
-								latched_wfb = get_weight_factor(region_idx);
-								latched_rf[flag] = false;
-								break;
-							case 15: // Set region flag and change weight of plane B
-								latched_wfb = get_weight_factor(region_idx);
-								latched_rf[flag] = true;
-								break;
-						}
-					}
-				}
-			}
-			m_weight_factor[0][x] = latched_wfa;
-			m_weight_factor[1][x] = latched_wfb;
-			m_region_flag[0][x] = latched_rf[0];
-			m_region_flag[1][x] = latched_rf[1];
-		}
-	}
-	else
-	{
-		int region_idx = 0;
-		for (int x = 0; x < width; x++)
-		{
-			if (region_idx < 8)
-			{
-				const int flag = BIT(m_region_control[region_idx], RC_RF_BIT);
-				const uint32_t region_ctrl = m_region_control[region_idx];
-				const uint32_t region_op = get_region_op(region_idx);
-				if (region_op == 0)
-				{
-					std::fill_n(m_weight_factor[0] + x, std::size(m_weight_factor[0]) - x, latched_wfa);
-					std::fill_n(m_weight_factor[1] + x, std::size(m_weight_factor[1]) - x, latched_wfb);
-					std::fill_n(m_region_flag[0] + x, std::size(m_region_flag[0]) - x, latched_rf[0]);
-					std::fill_n(m_region_flag[1] + x, std::size(m_region_flag[1]) - x, latched_rf[1]);
-					return;
-				}
-				if (x == (region_ctrl & RC_X))
-				{
-					switch (region_op)
-					{
-						case 0: // End of region control for line
+						case 0: // End of matte control for line
 							break;
 						case 1:
 						case 2:
 						case 3: // Not used
 							break;
 						case 4: // Change weight of plane A
-							latched_wfa = get_weight_factor(region_idx);
+							latched_wfa = get_weight_factor(matte_idx);
 							break;
 						case 5: // Not used
 							break;
 						case 6: // Change weight of plane B
-							latched_wfb = get_weight_factor(region_idx);
+							latched_wfb = get_weight_factor(matte_idx);
 							break;
 						case 7: // Not used
 							break;
-						case 8: // Reset region flag
-							latched_rf[flag] = false;
+						case 8: // Reset matte flag
+							latched_mf[flag] = false;
 							break;
-						case 9: // Set region flag
-							latched_rf[flag] = true;
+						case 9: // Set matte flag
+							latched_mf[flag] = true;
 							break;
 						case 10:    // Not used
 						case 11:    // Not used
 							break;
-						case 12: // Reset region flag and change weight of plane A
-							latched_wfa = get_weight_factor(region_idx);
-							latched_rf[flag] = false;
+						case 12: // Reset matte flag and change weight of plane A
+							latched_wfa = get_weight_factor(matte_idx);
+							latched_mf[flag] = false;
 							break;
-						case 13: // Set region flag and change weight of plane A
-							latched_wfa = get_weight_factor(region_idx);
-							latched_rf[flag] = true;
+						case 13: // Set matte flag and change weight of plane A
+							latched_wfa = get_weight_factor(matte_idx);
+							latched_mf[flag] = true;
 							break;
-						case 14: // Reset region flag and change weight of plane B
-							latched_wfb = get_weight_factor(region_idx);
-							latched_rf[flag] = false;
+						case 14: // Reset matte flag and change weight of plane B
+							latched_wfb = get_weight_factor(matte_idx);
+							latched_mf[flag] = false;
 							break;
-						case 15: // Set region flag and change weight of plane B
-							latched_wfb = get_weight_factor(region_idx);
-							latched_rf[flag] = true;
+						case 15: // Set matte flag and change weight of plane B
+							latched_wfb = get_weight_factor(matte_idx);
+							latched_mf[flag] = true;
 							break;
+						}
 					}
-					region_idx++;
 				}
 			}
-			m_weight_factor[0][x] = latched_wfa;
-			m_weight_factor[1][x] = latched_wfb;
-			m_region_flag[0][x] = latched_rf[0];
-			m_region_flag[1][x] = latched_rf[1];
+			else
+			{
+				if (matte_idx < max_matte_id)
+				{
+					const uint32_t matte_ctrl = m_matte_control[matte_idx];
+					const uint32_t matte_op = get_matte_op(matte_idx);
+					if (matte_op == 0)
+					{
+						break;
+					}
+					if (x == (matte_ctrl & MC_X))
+					{
+						switch (matte_op)
+						{
+						case 0: // End of matte control for line
+							break;
+						case 1:
+						case 2:
+						case 3: // Not used
+							break;
+						case 4: // Change weight of plane A
+							latched_wfa = get_weight_factor(matte_idx);
+							break;
+						case 5: // Not used
+							break;
+						case 6: // Change weight of plane B
+							latched_wfb = get_weight_factor(matte_idx);
+							break;
+						case 7: // Not used
+							break;
+						case 8: // Reset matte flag
+							latched_mf[flag] = false;
+							break;
+						case 9: // Set matte flag
+							latched_mf[flag] = true;
+							break;
+						case 10:    // Not used
+						case 11:    // Not used
+							break;
+						case 12: // Reset matte flag and change weight of plane A
+							latched_wfa = get_weight_factor(matte_idx);
+							latched_mf[flag] = false;
+							break;
+						case 13: // Set matte flag and change weight of plane A
+							latched_wfa = get_weight_factor(matte_idx);
+							latched_mf[flag] = true;
+							break;
+						case 14: // Reset matte flag and change weight of plane B
+							latched_wfb = get_weight_factor(matte_idx);
+							latched_mf[flag] = false;
+							break;
+						case 15: // Set matte flag and change weight of plane B
+							latched_wfb = get_weight_factor(matte_idx);
+							latched_mf[flag] = true;
+							break;
+						}
+						matte_idx++;
+					}
+				}
+			}
 		}
+		m_weight_factor[0][x] = latched_wfa;
+		m_weight_factor[1][x] = latched_wfb;
+		m_matte_flag[0][x] = latched_mf[0];
+		m_matte_flag[1][x] = latched_mf[1];
 	}
+	// Fill the remainder.
+	std::fill_n(m_weight_factor[0] + x, std::size(m_weight_factor[0]) - x, latched_wfa);
+	std::fill_n(m_weight_factor[1] + x, std::size(m_weight_factor[1]) - x, latched_wfb);
+	std::fill_n(m_matte_flag[0] + x, std::size(m_matte_flag[0]) - x, latched_mf[0]);
+	std::fill_n(m_matte_flag[1] + x, std::size(m_matte_flag[1]) - x, latched_mf[1]);
 }
 
 template <int Path>
@@ -320,7 +310,7 @@ void mcd212_device::set_register(uint8_t reg, uint32_t value)
 				m_cursor_pattern[(value >> 16) & 0x000f] = value & 0x0000ffff;
 			}
 			break;
-		case 0xd0: // Region Control 0-7
+		case 0xd0: // matte Control 0-7
 		case 0xd1:
 		case 0xd2:
 		case 0xd3:
@@ -328,9 +318,9 @@ void mcd212_device::set_register(uint8_t reg, uint32_t value)
 		case 0xd5:
 		case 0xd6:
 		case 0xd7:
-			LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Path %d: Region Control %d = %08x\n", machine().describe_context(), screen().vpos(), Path, reg & 7, value);
-			m_region_control[reg & 7] = value;
-			update_region_arrays();
+			LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Path %d: matte Control %d = %08x\n", machine().describe_context(), screen().vpos(), Path, reg & 7, value);
+			m_matte_control[reg & 7] = value;
+			update_matte_arrays();
 			break;
 		case 0xd8: // Backdrop Color
 			if (Path == 0)
@@ -358,7 +348,7 @@ void mcd212_device::set_register(uint8_t reg, uint32_t value)
 			{
 				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Path 0: Weight Factor A = %08x\n", machine().describe_context(), screen().vpos(), value);
 				m_weight_factor[0][0] = (uint8_t)value;
-				update_region_arrays();
+				update_matte_arrays();
 			}
 			break;
 		case 0xdc: // Weight Factor B
@@ -366,7 +356,7 @@ void mcd212_device::set_register(uint8_t reg, uint32_t value)
 			{
 				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Path 1: Weight Factor B = %08x\n", machine().describe_context(), screen().vpos(), value);
 				m_weight_factor[1][0] = (uint8_t)value;
-				update_region_arrays();
+				update_matte_arrays();
 			}
 			break;
 	}
@@ -569,14 +559,7 @@ static inline uint8_t BYTE_TO_CLUT(int icm, uint8_t byte)
 		case 1:
 			return byte;
 		case 3:
-			if (Path == 1)
-			{
-				return 0x80 + (byte & 0x7f);
-			}
-			else
-			{
-				return byte & 0x7f;
-			}
+			return (Path ? 0x80 : 0) | (byte & 0x7f);
 		case 4:
 			if (Path == 0)
 			{
@@ -584,14 +567,7 @@ static inline uint8_t BYTE_TO_CLUT(int icm, uint8_t byte)
 			}
 			break;
 		case 11:
-			if (Path == 1)
-			{
-				return 0x80 + (byte & 0x0f);
-			}
-			else
-			{
-				return byte & 0x0f;
-			}
+			return (Path ? 0x80 : 0) | (byte & 0x0f);
 		default:
 			break;
 	}
@@ -622,16 +598,6 @@ template <int Path>
 inline ATTR_FORCE_INLINE uint8_t mcd212_device::get_mosaic_factor()
 {
 	return 1 << (((m_ddr[Path] & DDR_MT) >> DDR_MT_SHIFT) + 1);
-}
-
-template <int Path>
-int mcd212_device::get_plane_width()
-{
-	const int width = get_screen_width();
-	const uint8_t icm = get_icm<Path>();
-	if (icm == ICM_CLUT4)
-		return width;
-	return width >> 1;
 }
 
 template <int Path>
@@ -670,11 +636,11 @@ void mcd212_device::process_vsr(uint32_t *pixels, bool *transparent)
 	const bool use_rgb_tp_bit = (tp_ctrl_type == TCR_RGB);
 	const bool tp_check_parity = !BIT(tp_ctrl, 3);
 	const bool tp_always = ((tp_ctrl_type == TCR_ALWAYS) && tp_check_parity);
-	const int region_flag_index = BIT(~tp_ctrl_type, 0);
-	const bool *const region_flags = m_region_flag[region_flag_index];
-	const bool use_region_flag = (tp_ctrl_type >= TCR_RF0 && tp_ctrl_type <= TCR_RF1_KEY1);
+	const int matte_flag_index = BIT(~tp_ctrl_type, 0);
+	const bool *const matte_flags = m_matte_flag[matte_flag_index];
+	const bool use_matte_flag = (tp_ctrl_type >= TCR_MF0 && tp_ctrl_type <= TCR_MF1_KEY1);
 	const bool is_dyuv_rgb = (icm == ICM_DYUV) || ((icm == ICM_RGB555) && (Path == 1)); // DYUV and RGB do not have access to color key.
-	const bool use_color_key = !is_dyuv_rgb && ((tp_ctrl_type == TCR_KEY) || (tp_ctrl_type == TCR_RF0_KEY1) || (tp_ctrl_type == TCR_RF1_KEY1));
+	const bool use_color_key = !is_dyuv_rgb && ((tp_ctrl_type == TCR_KEY) || (tp_ctrl_type == TCR_MF0_KEY1) || (tp_ctrl_type == TCR_MF1_KEY1));
 
 	LOGMASKED(LOG_VSR, "Scanline %d: VSR Path %d, ICM (%02x), VSR (%08x)\n", screen().vpos(), Path, icm, vsr);
 
@@ -708,10 +674,10 @@ void mcd212_device::process_vsr(uint32_t *pixels, bool *transparent)
 			pixels[x + 1] = color0;
 			pixels[x + 2] = color1;
 			pixels[x + 3] = color1;
-			transparent[x    ] = tp_always || (use_region_flag && (region_flags[x    ] == tp_check_parity));
-			transparent[x + 1] = tp_always || (use_region_flag && (region_flags[x + 1] == tp_check_parity));
-			transparent[x + 2] = tp_always || (use_region_flag && (region_flags[x + 2] == tp_check_parity));
-			transparent[x + 3] = tp_always || (use_region_flag && (region_flags[x + 3] == tp_check_parity));
+			transparent[x    ] = tp_always || (use_matte_flag && (matte_flags[x    ] == tp_check_parity));
+			transparent[x + 1] = tp_always || (use_matte_flag && (matte_flags[x + 1] == tp_check_parity));
+			transparent[x + 2] = tp_always || (use_matte_flag && (matte_flags[x + 2] == tp_check_parity));
+			transparent[x + 3] = tp_always || (use_matte_flag && (matte_flags[x + 3] == tp_check_parity));
 			x += 4;
 		}
 		else
@@ -750,8 +716,8 @@ void mcd212_device::process_vsr(uint32_t *pixels, bool *transparent)
 			{
 				pixels[rl_index    ] = color0;
 				pixels[rl_index + 1] = color1;
-				transparent[rl_index    ] = tp_always || rgb_tp_bit || (use_color_key && color_match0) || (use_region_flag && (region_flags[rl_index    ] == tp_check_parity));
-				transparent[rl_index + 1] = tp_always || rgb_tp_bit || (use_color_key && color_match1) || (use_region_flag && (region_flags[rl_index + 1] == tp_check_parity));
+				transparent[rl_index    ] = tp_always || rgb_tp_bit || (use_color_key && color_match0) || (use_matte_flag && (matte_flags[rl_index    ] == tp_check_parity));
+				transparent[rl_index + 1] = tp_always || rgb_tp_bit || (use_color_key && color_match1) || (use_matte_flag && (matte_flags[rl_index + 1] == tp_check_parity));
 			}
 			x = end;
 		}
@@ -778,98 +744,73 @@ void mcd212_device::mix_lines(uint32_t *plane_a, bool *transparent_a, uint32_t *
 	uint8_t *weight_a = &m_weight_factor[0][0];
 	uint8_t *weight_b = &m_weight_factor[1][0];
 
-	if (!(m_transparency_control & TCR_DISABLE_MX))
+	for (int x = 0; x < width; x++)
 	{
-		for (int x = 0; x < width; x++, weight_a++, transparent_a++, weight_b++, transparent_b++)
+		const uint32_t plane_a_cur = MosaicA ? plane_a[x - (x % mosaic_count_a)] : plane_a[x];
+		const uint32_t plane_b_cur = MosaicB ? plane_b[x - (x % mosaic_count_b)] : plane_b[x];
+		if (!(m_transparency_control & TCR_DISABLE_MX))
 		{
-			const uint8_t weight_a_cur = *weight_a;
-			const uint8_t weight_b_cur = *weight_b;
-
-			const uint32_t plane_a_cur = plane_a[x];
-			const uint32_t plane_b_cur = plane_b[x];
-
-			const int32_t plane_a_r = (int32_t)(uint8_t)(plane_a_cur >> 16);
-			const int32_t plane_b_r = (int32_t)(uint8_t)(plane_b_cur >> 16);
-			const int32_t plane_a_g = (int32_t)(uint8_t)(plane_a_cur >> 8);
-			const int32_t plane_b_g = (int32_t)(uint8_t)(plane_b_cur >> 8);
-			const int32_t plane_a_b = (int32_t)(uint8_t)plane_a_cur;
-			const int32_t plane_b_b = (int32_t)(uint8_t)plane_b_cur;
-			const int32_t weighted_a_r = (plane_a_r > 16) ? (((plane_a_r - 16) * weight_a_cur) >> 6) : 0;
-			const int32_t weighted_a_g = (plane_a_g > 16) ? (((plane_a_g - 16) * weight_a_cur) >> 6) : 0;
-			const int32_t weighted_a_b = (plane_a_b > 16) ? (((plane_a_b - 16) * weight_a_cur) >> 6) : 0;
-			const int32_t weighted_b_r = ((plane_b_r > 16) ? (((plane_b_r - 16) * weight_b_cur) >> 6) : 0) + weighted_a_r;
-			const int32_t weighted_b_g = ((plane_b_g > 16) ? (((plane_b_g - 16) * weight_b_cur) >> 6) : 0) + weighted_a_g;
-			const int32_t weighted_b_b = ((plane_b_b > 16) ? (((plane_b_b - 16) * weight_b_cur) >> 6) : 0) + weighted_a_b;
+			const int32_t plane_a_r = 0xff & (plane_a[x] >> 16);
+			const int32_t plane_b_r = 0xff & (plane_b[x] >> 16);
+			const int32_t plane_a_g = 0xff & (plane_a[x] >> 8);
+			const int32_t plane_b_g = 0xff & (plane_b[x] >> 8);
+			const int32_t plane_a_b = 0xff &  plane_a[x];
+			const int32_t plane_b_b = 0xff &  plane_b[x];
+			const int32_t weighted_a_r =  (plane_a_r > 16) ? (((plane_a_r - 16) * weight_a[x]) >> 6) : 0;
+			const int32_t weighted_a_g =  (plane_a_g > 16) ? (((plane_a_g - 16) * weight_a[x]) >> 6) : 0;
+			const int32_t weighted_a_b =  (plane_a_b > 16) ? (((plane_a_b - 16) * weight_a[x]) >> 6) : 0;
+			const int32_t weighted_b_r = ((plane_b_r > 16) ? (((plane_b_r - 16) * weight_b[x]) >> 6) : 0) + weighted_a_r;
+			const int32_t weighted_b_g = ((plane_b_g > 16) ? (((plane_b_g - 16) * weight_b[x]) >> 6) : 0) + weighted_a_g;
+			const int32_t weighted_b_b = ((plane_b_b > 16) ? (((plane_b_b - 16) * weight_b[x]) >> 6) : 0) + weighted_a_b;
 			const uint8_t out_r = (weighted_b_r > 255) ? 255 : (uint8_t)weighted_b_r;
 			const uint8_t out_g = (weighted_b_g > 255) ? 255 : (uint8_t)weighted_b_g;
 			const uint8_t out_b = (weighted_b_b > 255) ? 255 : (uint8_t)weighted_b_b;
-			*out++ = 0xff000000 | (out_r << 16) | (out_g << 8) | out_b;
+			out[x] = 0xff000000 | (out_r << 16) | (out_g << 8) | out_b;
 		}
-	}
-	else
-	{
-		for (int x = 0; x < width; x++, weight_a++, transparent_a++, weight_b++, transparent_b++)
+		else
 		{
+			const int32_t plane_a_r = 0xff & (plane_a_cur >> 16);
+			const int32_t plane_a_g = 0xff & (plane_a_cur >> 8);
+			const int32_t plane_a_b = 0xff &  plane_a_cur;
+			const int32_t plane_b_r = 0xff & (plane_b_cur >> 16);
+			const int32_t plane_b_g = 0xff & (plane_b_cur >> 8);
+			const int32_t plane_b_b = 0xff &  plane_b_cur;
+
+			const uint8_t weighted_a_r = std::clamp(((plane_a_r > 16) ? (((plane_a_r - 16) * weight_a[x]) >> 6) : 0) + 16, 0, 255);
+			const uint8_t weighted_a_g = std::clamp(((plane_a_g > 16) ? (((plane_a_g - 16) * weight_a[x]) >> 6) : 0) + 16, 0, 255);
+			const uint8_t weighted_a_b = std::clamp(((plane_a_b > 16) ? (((plane_a_b - 16) * weight_a[x]) >> 6) : 0) + 16, 0, 255);
+			const uint8_t weighted_b_r = std::clamp(((plane_b_r > 16) ? (((plane_b_r - 16) * weight_b[x]) >> 6) : 0) + 16, 0, 255);
+			const uint8_t weighted_b_g = std::clamp(((plane_b_g > 16) ? (((plane_b_g - 16) * weight_b[x]) >> 6) : 0) + 16, 0, 255);
+			const uint8_t weighted_b_b = std::clamp(((plane_b_b > 16) ? (((plane_b_b - 16) * weight_b[x]) >> 6) : 0) + 16, 0, 255);
+
 			if (OrderAB)
 			{
-				if (!(*transparent_a))
+				if (!transparent_a[x])
 				{
-					const uint32_t plane_a_cur = MosaicA ? plane_a[x - (x % mosaic_count_a)] : plane_a[x];
-					const uint8_t weight_a_cur = *weight_a;
-					const int32_t plane_a_r = (int32_t)(uint8_t)(plane_a_cur >> 16);
-					const int32_t plane_a_g = (int32_t)(uint8_t)(plane_a_cur >> 8);
-					const int32_t plane_a_b = (int32_t)(uint8_t)plane_a_cur;
-					const uint8_t weighted_a_r = std::clamp(((plane_a_r > 16) ? (((plane_a_r - 16) * weight_a_cur) >> 6) : 0) + 16, 0, 255);
-					const uint8_t weighted_a_g = std::clamp(((plane_a_g > 16) ? (((plane_a_g - 16) * weight_a_cur) >> 6) : 0) + 16, 0, 255);
-					const uint8_t weighted_a_b = std::clamp(((plane_a_b > 16) ? (((plane_a_b - 16) * weight_a_cur) >> 6) : 0) + 16, 0, 255);
-					*out++ = 0xff000000 | (weighted_a_r << 16) | (weighted_a_g << 8) | weighted_a_b;
+					out[x] = 0xff000000 | (weighted_a_r << 16) | (weighted_a_g << 8) | weighted_a_b;
 				}
-				else if (!(*transparent_b))
+				else if (!transparent_b[x])
 				{
-					const uint32_t plane_b_cur = MosaicB ? plane_b[x - (x % mosaic_count_b)] : plane_b[x];
-					const uint8_t weight_b_cur = *weight_b;
-					const int32_t plane_b_r = (int32_t)(uint8_t)(plane_b_cur >> 16);
-					const int32_t plane_b_g = (int32_t)(uint8_t)(plane_b_cur >> 8);
-					const int32_t plane_b_b = (int32_t)(uint8_t)plane_b_cur;
-					const uint8_t weighted_b_r = std::clamp(((plane_b_r > 16) ? (((plane_b_r - 16) * weight_b_cur) >> 6) : 0) + 16, 0, 255);
-					const uint8_t weighted_b_g = std::clamp(((plane_b_g > 16) ? (((plane_b_g - 16) * weight_b_cur) >> 6) : 0) + 16, 0, 255);
-					const uint8_t weighted_b_b = std::clamp(((plane_b_b > 16) ? (((plane_b_b - 16) * weight_b_cur) >> 6) : 0) + 16, 0, 255);
-					*out++ = 0xff000000 | (weighted_b_r << 16) | (weighted_b_g << 8) | weighted_b_b;
+					out[x] = 0xff000000 | (weighted_b_r << 16) | (weighted_b_g << 8) | weighted_b_b;
 				}
 				else
 				{
-					*out++ = backdrop;
+					out[x] = backdrop;
 				}
 			}
 			else
 			{
-				if (!(*transparent_b))
+				if (!transparent_b[x])
 				{
-					const uint32_t plane_b_cur = MosaicB ? plane_b[x - (x % mosaic_count_b)] : plane_b[x];
-					const uint8_t weight_b_cur = *weight_b;
-					const int32_t plane_b_r = (int32_t)(uint8_t)(plane_b_cur >> 16);
-					const int32_t plane_b_g = (int32_t)(uint8_t)(plane_b_cur >> 8);
-					const int32_t plane_b_b = (int32_t)(uint8_t)plane_b_cur;
-					const uint8_t weighted_b_r = std::clamp(((plane_b_r > 16) ? (((plane_b_r - 16) * weight_b_cur) >> 6) : 0) + 16, 0, 255);
-					const uint8_t weighted_b_g = std::clamp(((plane_b_g > 16) ? (((plane_b_g - 16) * weight_b_cur) >> 6) : 0) + 16, 0, 255);
-					const uint8_t weighted_b_b = std::clamp(((plane_b_b > 16) ? (((plane_b_b - 16) * weight_b_cur) >> 6) : 0) + 16, 0, 255);
-					*out++ = 0xff000000 | (weighted_b_r << 16) | (weighted_b_g << 8) | weighted_b_b;
+					out[x] = 0xff000000 | (weighted_b_r << 16) | (weighted_b_g << 8) | weighted_b_b;
 				}
-				else if (!(*transparent_a))
+				else if (!transparent_a[x])
 				{
-					const uint32_t plane_a_cur = MosaicA ? plane_a[x - (x % mosaic_count_a)] : plane_a[x];
-					const uint8_t weight_a_cur = *weight_a;
-					const int32_t plane_a_r = (int32_t)(uint8_t)(plane_a_cur >> 16);
-					const int32_t plane_a_g = (int32_t)(uint8_t)(plane_a_cur >> 8);
-					const int32_t plane_a_b = (int32_t)(uint8_t)plane_a_cur;
-					const uint8_t weighted_a_r = std::clamp(((plane_a_r > 16) ? (((plane_a_r - 16) * weight_a_cur) >> 6) : 0) + 16, 0, 255);
-					const uint8_t weighted_a_g = std::clamp(((plane_a_g > 16) ? (((plane_a_g - 16) * weight_a_cur) >> 6) : 0) + 16, 0, 255);
-					const uint8_t weighted_a_b = std::clamp(((plane_a_b > 16) ? (((plane_a_b - 16) * weight_a_cur) >> 6) : 0) + 16, 0, 255);
-					*out++ = 0xff000000 | (weighted_a_r << 16) | (weighted_a_g << 8) | weighted_a_b;
+					out[x] = 0xff000000 | (weighted_a_r << 16) | (weighted_a_g << 8) | weighted_a_b;
 				}
 				else
 				{
-					*out++ = backdrop;
+					out[x] = backdrop;
 				}
 			}
 		}
@@ -877,44 +818,46 @@ void mcd212_device::mix_lines(uint32_t *plane_a, bool *transparent_a, uint32_t *
 
 	if (border_width)
 	{
-		std::fill_n(out, border_width, 0xff101010);
+		std::fill_n(&out[width], border_width, s_4bpp_color[0]);
 	}
 }
 
 void mcd212_device::draw_cursor(uint32_t *scanline)
 {
-	if (m_cursor_control & CURCNT_EN)
+	if (!(m_cursor_control & CURCNT_EN))
 	{
-		uint16_t y = (uint16_t)screen().vpos();
-		const uint16_t cursor_x =  m_cursor_position & 0x3ff;
-		const uint16_t cursor_y = ((m_cursor_position >> 12) & 0x3ff) + m_ica_height;
-		if (y >= cursor_y && y < (cursor_y + 16))
+		return;
+	}
+
+	uint16_t y = (uint16_t)screen().vpos();
+	const uint16_t cursor_x =  m_cursor_position & 0x3ff;
+	const uint16_t cursor_y = ((m_cursor_position >> 12) & 0x3ff) + m_ica_height;
+	if (y >= cursor_y && y < (cursor_y + 16))
+	{
+		const int width = get_screen_width();
+		uint32_t color = s_4bpp_color[m_cursor_control & CURCNT_COLOR];
+		y -= cursor_y;
+		if (m_cursor_control & CURCNT_CUW)
 		{
-			const int width = get_screen_width();
-			uint32_t color = s_4bpp_color[m_cursor_control & CURCNT_COLOR];
-			y -= cursor_y;
-			if (m_cursor_control & CURCNT_CUW)
+			for (int x = cursor_x; x < cursor_x + 64 && x < width; x++)
 			{
-				for (int x = cursor_x; x < cursor_x + 64 && x < width; x++)
+				if (m_cursor_pattern[y] & (1 << (15 - ((x - cursor_x) >> 2))))
 				{
-					if (m_cursor_pattern[y] & (1 << (15 - ((x - cursor_x) >> 2))))
-					{
-						scanline[x++] = color;
-						scanline[x++] = color;
-						scanline[x++] = color;
-						scanline[x] = color;
-					}
+					scanline[x++] = color;
+					scanline[x++] = color;
+					scanline[x++] = color;
+					scanline[x] = color;
 				}
 			}
-			else
+		}
+		else
+		{
+			for (int x = cursor_x; x < cursor_x + 32 && x < width; x++)
 			{
-				for (int x = cursor_x; x < cursor_x + 32 && x < width; x++)
+				if (m_cursor_pattern[y] & (1 << (15 - ((x - cursor_x) >> 1))))
 				{
-					if (m_cursor_pattern[y] & (1 << (15 - ((x - cursor_x) >> 1))))
-					{
-						scanline[x++] = color;
-						scanline[x] = color;
-					}
+					scanline[x++] = color;
+					scanline[x] = color;
 				}
 			}
 		}
@@ -1253,13 +1196,13 @@ void mcd212_device::device_reset()
 	m_cursor_position = 0;
 	m_cursor_control = 0;
 	std::fill_n(m_cursor_pattern, std::size(m_cursor_pattern), 0);
-	std::fill_n(m_region_control, 8, 0);
+	std::fill_n(m_matte_control, 8, 0);
 	m_backdrop_color = 0;
 	std::fill_n(m_mosaic_hold, 2, 0);
 	std::fill_n(m_weight_factor[0], std::size(m_weight_factor[0]), 0);
 	std::fill_n(m_weight_factor[1], std::size(m_weight_factor[1]), 0);
-	std::fill_n(m_region_flag[0], std::size(m_region_flag[0]), false);
-	std::fill_n(m_region_flag[1], std::size(m_region_flag[1]), false);
+	std::fill_n(m_matte_flag[0], std::size(m_matte_flag[0]), false);
+	std::fill_n(m_matte_flag[1], std::size(m_matte_flag[1]), false);
 
 	m_ica_height = 32;
 	m_total_height = 312;
@@ -1311,8 +1254,8 @@ void mcd212_device::device_start()
 		m_dyuv_v_to_r[sw] = (351 * (sw - 128)) / 256;
 	}
 
-	save_item(NAME(m_region_flag[0]));
-	save_item(NAME(m_region_flag[1]));
+	save_item(NAME(m_matte_flag[0]));
+	save_item(NAME(m_matte_flag[1]));
 	save_item(NAME(m_ica_height));
 	save_item(NAME(m_total_height));
 	save_item(NAME(m_csrr));
@@ -1333,7 +1276,7 @@ void mcd212_device::device_start()
 	save_item(NAME(m_cursor_position));
 	save_item(NAME(m_cursor_control));
 	save_item(NAME(m_cursor_pattern));
-	save_item(NAME(m_region_control));
+	save_item(NAME(m_matte_control));
 	save_item(NAME(m_backdrop_color));
 	save_item(NAME(m_mosaic_hold));
 	save_item(NAME(m_weight_factor[0]));

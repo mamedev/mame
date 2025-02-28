@@ -56,6 +56,7 @@ void multibus_device::pio_map(address_map &map)
 multibus_slot_device::multibus_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MULTIBUS_SLOT, tag, owner, clock)
 	, device_slot_interface(mconfig, *this)
+	, m_bus(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -72,21 +73,21 @@ device_multibus_interface::device_multibus_interface(machine_config const &mconf
 
 void device_multibus_interface::interface_config_complete()
 {
+	// FIXME: avoid listxml crash caused by owner device not being a slot
 	if (device().owner() && device().owner()->owner())
 	{
-		multibus_device *const bus = downcast<multibus_device *>(device().owner()->owner());
-
-		m_bus.set_tag(*bus);
+		m_bus.set_tag(downcast<multibus_slot_device &>(*device().owner()).bus());
+		multibus_device &bus(*m_bus.lookup());
 
 		// route incoming interrupt requests to all cards
-		bus->int_callback<0>().append([this](int state) { m_int[0](state); });
-		bus->int_callback<1>().append([this](int state) { m_int[1](state); });
-		bus->int_callback<2>().append([this](int state) { m_int[2](state); });
-		bus->int_callback<3>().append([this](int state) { m_int[3](state); });
-		bus->int_callback<4>().append([this](int state) { m_int[4](state); });
-		bus->int_callback<5>().append([this](int state) { m_int[5](state); });
-		bus->int_callback<6>().append([this](int state) { m_int[6](state); });
-		bus->int_callback<7>().append([this](int state) { m_int[7](state); });
+		bus.int_callback<0>().append([this](int state) { m_int[0](state); });
+		bus.int_callback<1>().append([this](int state) { m_int[1](state); });
+		bus.int_callback<2>().append([this](int state) { m_int[2](state); });
+		bus.int_callback<3>().append([this](int state) { m_int[3](state); });
+		bus.int_callback<4>().append([this](int state) { m_int[4](state); });
+		bus.int_callback<5>().append([this](int state) { m_int[5](state); });
+		bus.int_callback<6>().append([this](int state) { m_int[6](state); });
+		bus.int_callback<7>().append([this](int state) { m_int[7](state); });
 	}
 }
 

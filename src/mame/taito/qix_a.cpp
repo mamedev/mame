@@ -10,17 +10,19 @@
 #include "qix.h"
 
 #include "cpu/m6800/m6800.h"
+
 #include "machine/input_merger.h"
+
 #include "sound/discrete.h"
+
 #include "speaker.h"
 
 
-
 /* Discrete Sound Input Nodes */
-#define QIX_DAC_DATA        NODE_01
-#define QIX_VOL_DATA        NODE_02
-#define QIX_VOL_DATA_L      NODE_03
-#define QIX_VOL_DATA_R      NODE_04
+static constexpr uint32_t QIX_DAC_DATA   = NODE_01;
+static constexpr uint32_t QIX_VOL_DATA   = NODE_02;
+static constexpr uint32_t QIX_VOL_DATA_L = NODE_03;
+static constexpr uint32_t QIX_VOL_DATA_R = NODE_04;
 
 
 
@@ -28,12 +30,12 @@
 Audio handlers
 ***************************************************************************/
 
-void qix_state::qix_dac_w(uint8_t data)
+void qix_state::dac_w(uint8_t data)
 {
 	m_discrete->write(QIX_DAC_DATA, data);
 }
 
-void qix_state::qix_vol_w(uint8_t data)
+void qix_state::vol_w(uint8_t data)
 {
 	m_discrete->write(QIX_VOL_DATA, data);
 }
@@ -105,7 +107,7 @@ void qix_state::sndpia_2_warning_w(uint8_t data)
 
 TIMER_CALLBACK_MEMBER(qix_state::deferred_sndpia1_porta_w)
 {
-	m_sndpia1->porta_w(param);
+	m_sndpia[1]->porta_w(param);
 }
 
 
@@ -125,11 +127,10 @@ void qix_state::sync_sndpia1_porta_w(uint8_t data)
 
 void qix_state::audio_map(address_map &map)
 {
-	map(0x2000, 0x2003).mirror(0x5ffc).rw(m_sndpia2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x4000, 0x4003).mirror(0x3ffc).rw(m_sndpia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x2000, 0x2003).mirror(0x5ffc).rw(m_sndpia[2], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x4000, 0x4003).mirror(0x3ffc).rw(m_sndpia[1], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xd000, 0xffff).rom();
 }
-
 
 
 
@@ -141,6 +142,8 @@ void qix_state::audio_map(address_map &map)
 
 void qix_state::qix_audio(machine_config &config)
 {
+	constexpr XTAL SOUND_CLOCK_OSC = XTAL(7'372'800);     /* 7.3728 MHz */
+
 	M6802(config, m_audiocpu, SOUND_CLOCK_OSC/2); /* 0.92 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &qix_state::audio_map);
 
@@ -150,28 +153,28 @@ void qix_state::qix_audio(machine_config &config)
 	// SINT is connected to the sound CPU's IRQ line
 	INPUT_MERGER_ANY_HIGH(config, "sint").output_handler().set_inputline(m_audiocpu, M6802_IRQ_LINE);
 
-	PIA6821(config, m_sndpia0);
-	m_sndpia0->writepa_handler().set(FUNC(qix_state::sync_sndpia1_porta_w));
-	m_sndpia0->writepb_handler().set(FUNC(qix_state::qix_vol_w));
-	m_sndpia0->tspb_handler().set_constant(0xff);
-	m_sndpia0->ca2_handler().set("sndpia1", FUNC(pia6821_device::ca1_w));
-	m_sndpia0->cb2_handler().set(FUNC(qix_state::qix_flip_screen_w));
-	m_sndpia0->irqa_handler().set("dint", FUNC(input_merger_device::in_w<0>));
-	m_sndpia0->irqb_handler().set("dint", FUNC(input_merger_device::in_w<1>));
+	PIA6821(config, m_sndpia[0]);
+	m_sndpia[0]->writepa_handler().set(FUNC(qix_state::sync_sndpia1_porta_w));
+	m_sndpia[0]->writepb_handler().set(FUNC(qix_state::vol_w));
+	m_sndpia[0]->tspb_handler().set_constant(0xff);
+	m_sndpia[0]->ca2_handler().set(m_sndpia[1], FUNC(pia6821_device::ca1_w));
+	m_sndpia[0]->cb2_handler().set(FUNC(qix_state::flip_screen_w));
+	m_sndpia[0]->irqa_handler().set("dint", FUNC(input_merger_device::in_w<0>));
+	m_sndpia[0]->irqb_handler().set("dint", FUNC(input_merger_device::in_w<1>));
 
-	PIA6821(config, m_sndpia1);
-	m_sndpia1->writepa_handler().set("sndpia0", FUNC(pia6821_device::porta_w));
-	m_sndpia1->writepb_handler().set(FUNC(qix_state::qix_dac_w));
-	m_sndpia1->tspb_handler().set_constant(0);
-	m_sndpia1->ca2_handler().set("sndpia0", FUNC(pia6821_device::ca1_w));
-	m_sndpia1->irqa_handler().set("sint", FUNC(input_merger_device::in_w<0>));
-	m_sndpia1->irqb_handler().set("sint", FUNC(input_merger_device::in_w<1>));
+	PIA6821(config, m_sndpia[1]);
+	m_sndpia[1]->writepa_handler().set(m_sndpia[0], FUNC(pia6821_device::porta_w));
+	m_sndpia[1]->writepb_handler().set(FUNC(qix_state::dac_w));
+	m_sndpia[1]->tspb_handler().set_constant(0);
+	m_sndpia[1]->ca2_handler().set(m_sndpia[0], FUNC(pia6821_device::ca1_w));
+	m_sndpia[1]->irqa_handler().set("sint", FUNC(input_merger_device::in_w<0>));
+	m_sndpia[1]->irqb_handler().set("sint", FUNC(input_merger_device::in_w<1>));
 
-	PIA6821(config, m_sndpia2);
-	m_sndpia2->writepa_handler().set(FUNC(qix_state::sndpia_2_warning_w));
-	m_sndpia2->writepb_handler().set(FUNC(qix_state::sndpia_2_warning_w));
-	m_sndpia2->ca2_handler().set(FUNC(qix_state::sndpia_2_warning_w));
-	m_sndpia2->cb2_handler().set(FUNC(qix_state::sndpia_2_warning_w));
+	PIA6821(config, m_sndpia[2]);
+	m_sndpia[2]->writepa_handler().set(FUNC(qix_state::sndpia_2_warning_w));
+	m_sndpia[2]->writepb_handler().set(FUNC(qix_state::sndpia_2_warning_w));
+	m_sndpia[2]->ca2_handler().set(FUNC(qix_state::sndpia_2_warning_w));
+	m_sndpia[2]->cb2_handler().set(FUNC(qix_state::sndpia_2_warning_w));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -181,26 +184,26 @@ void qix_state::qix_audio(machine_config &config)
 	m_discrete->add_route(1, "rspeaker", 1.0);
 }
 
-void slither_state::slither_audio(machine_config &config)
+void slither_state::audio(machine_config &config)
 {
 	// DINT is connected to the data CPU's IRQ line
 	INPUT_MERGER_ANY_HIGH(config, "dint").output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 
-	PIA6821(config, m_sndpia0);
-	m_sndpia0->readpa_handler().set_ioport("P2");
-	m_sndpia0->writepb_handler().set(FUNC(slither_state::slither_coinctl_w));
-	m_sndpia0->tspb_handler().set_constant(0x0f);
-	m_sndpia0->cb2_handler().set(FUNC(slither_state::qix_flip_screen_w));
-	m_sndpia0->irqa_handler().set("dint", FUNC(input_merger_device::in_w<0>));
-	m_sndpia0->irqb_handler().set("dint", FUNC(input_merger_device::in_w<1>));
+	PIA6821(config, m_sndpia[0]);
+	m_sndpia[0]->readpa_handler().set_ioport("P2");
+	m_sndpia[0]->writepb_handler().set(FUNC(slither_state::slither_coinctr_w));
+	m_sndpia[0]->tspb_handler().set_constant(0x0f);
+	m_sndpia[0]->cb2_handler().set(FUNC(slither_state::flip_screen_w));
+	m_sndpia[0]->irqa_handler().set("dint", FUNC(input_merger_device::in_w<0>));
+	m_sndpia[0]->irqb_handler().set("dint", FUNC(input_merger_device::in_w<1>));
 
 	SPEAKER(config, "mono").front_center();
 
 	SN76489(config, m_sn[0], SLITHER_CLOCK_OSC/4/4);
 	m_sn[0]->add_route(ALL_OUTPUTS, "mono", 0.50);
-	m_sn[0]->ready_cb().set(m_pia1, FUNC(pia6821_device::cb1_w));
+	m_sn[0]->ready_cb().set(m_pia[1], FUNC(pia6821_device::cb1_w));
 
 	SN76489(config, m_sn[1], SLITHER_CLOCK_OSC/4/4);
 	m_sn[1]->add_route(ALL_OUTPUTS, "mono", 0.50);
-	m_sn[1]->ready_cb().set(m_pia2, FUNC(pia6821_device::cb1_w));
+	m_sn[1]->ready_cb().set(m_pia[2], FUNC(pia6821_device::cb1_w));
 }

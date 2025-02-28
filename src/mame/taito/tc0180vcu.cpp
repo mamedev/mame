@@ -39,11 +39,11 @@ GFXDECODE_END
 
 void tc0180vcu_device::tc0180vcu_memrw(address_map &map)
 {
-	map(0x00000, 0x0ffff).ram().w(FUNC(tc0180vcu_device::word_w)).share("vram");
-	map(0x10000, 0x1197f).ram().share("spriteram");
+	map(0x00000, 0x0ffff).ram().w(FUNC(tc0180vcu_device::word_w)).share(m_vram);
+	map(0x10000, 0x1197f).ram().share(m_spriteram);
 	map(0x11980, 0x137ff).ram();
-	map(0x13800, 0x13fff).ram().share("scrollram");
-	map(0x18000, 0x1801f).ram().w(FUNC(tc0180vcu_device::ctrl_w)).share("ctrl");
+	map(0x13800, 0x13fff).ram().share(m_scrollram);
+	map(0x18000, 0x1801f).ram().w(FUNC(tc0180vcu_device::ctrl_w)).share(m_ctrl);
 	map(0x40000, 0x7ffff).rw(FUNC(tc0180vcu_device::framebuffer_word_r), FUNC(tc0180vcu_device::framebuffer_word_w));
 }
 
@@ -85,8 +85,8 @@ void tc0180vcu_device::device_start()
 	m_tilemap[1]->set_transparent_pen(0);
 	m_tilemap[2]->set_transparent_pen(0);
 
-	m_framebuffer[0] = std::make_unique<bitmap_ind16>(512, 256);
-	m_framebuffer[1] = std::make_unique<bitmap_ind16>(512, 256);
+	m_framebuffer[0].allocate(512, 256);
+	m_framebuffer[1].allocate(512, 256);
 
 	screen().register_vblank_callback(vblank_state_delegate(&tc0180vcu_device::vblank_callback, this));
 	m_intl_timer = timer_alloc(FUNC(tc0180vcu_device::update_intl), this);
@@ -99,8 +99,8 @@ void tc0180vcu_device::device_start()
 
 	save_item(NAME(m_video_control));
 
-	save_item(NAME(*m_framebuffer[0]));
-	save_item(NAME(*m_framebuffer[1]));
+	save_item(NAME(m_framebuffer[0]));
+	save_item(NAME(m_framebuffer[1]));
 }
 
 //-------------------------------------------------
@@ -109,9 +109,7 @@ void tc0180vcu_device::device_start()
 
 void tc0180vcu_device::device_reset()
 {
-	int i;
-
-	for (i = 0; i < 0x10; i++)
+	for (int i = 0; i < 0x10; i++)
 		m_ctrl[i] = 0;
 
 	m_bg_rambank[0] = 0;
@@ -207,7 +205,7 @@ TIMER_CALLBACK_MEMBER(tc0180vcu_device::update_intl)
 *
 */
 
-void tc0180vcu_device::video_control( uint8_t data )
+void tc0180vcu_device::video_control(uint8_t data)
 {
 #if 0
 	if (data != m_video_control)
@@ -216,15 +214,15 @@ void tc0180vcu_device::video_control( uint8_t data )
 
 	m_video_control = data;
 
-	if (m_video_control & 0x80)
+	if (BIT(m_video_control, 7))
 		m_framebuffer_page = BIT(~m_video_control, 6);
 
-	machine().tilemap().set_flip_all((m_video_control & 0x10) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0 );
+	machine().tilemap().set_flip_all(BIT(m_video_control, 4) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0 );
 }
 
 void tc0180vcu_device::ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	uint16_t oldword = m_ctrl[offset];
+	uint16_t const oldword = m_ctrl[offset];
 
 	COMBINE_DATA (&m_ctrl[offset]);
 
@@ -264,27 +262,27 @@ void tc0180vcu_device::ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 uint16_t tc0180vcu_device::framebuffer_word_r(offs_t offset)
 {
-	int sy = offset >> 8;
-	int sx = 2 * (offset & 0xff);
+	int const sy = offset >> 8;
+	int const sx = 2 * (offset & 0xff);
 
-	return (m_framebuffer[sy >> 8]->pix(sy & 0xff, sx + 0) << 8) | m_framebuffer[sy >> 8]->pix(sy & 0xff, sx + 1);
+	return (m_framebuffer[sy >> 8].pix(sy & 0xff, sx + 0) << 8) | m_framebuffer[sy >> 8].pix(sy & 0xff, sx + 1);
 }
 
 void tc0180vcu_device::framebuffer_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	int sy = offset >> 8;
-	int sx = 2 * (offset & 0xff);
+	int const sy = offset >> 8;
+	int const sx = 2 * (offset & 0xff);
 
 	if (ACCESSING_BITS_8_15)
-		m_framebuffer[sy >> 8]->pix(sy & 0xff, sx + 0) = data >> 8;
+		m_framebuffer[sy >> 8].pix(sy & 0xff, sx + 0) = data >> 8;
 	if (ACCESSING_BITS_0_7)
-		m_framebuffer[sy >> 8]->pix(sy & 0xff, sx + 1) = data & 0xff;
+		m_framebuffer[sy >> 8].pix(sy & 0xff, sx + 1) = data & 0xff;
 }
 
 TILE_GET_INFO_MEMBER(tc0180vcu_device::get_bg_tile_info)
 {
-	int tile  = m_vram[tile_index + m_bg_rambank[0]];
-	int color = m_vram[tile_index + m_bg_rambank[1]];
+	int const tile  = m_vram[tile_index + m_bg_rambank[0]];
+	int const color = m_vram[tile_index + m_bg_rambank[1]];
 
 	tileinfo.set(1, tile,
 		m_bg_color_base + (color & 0x3f),
@@ -293,8 +291,8 @@ TILE_GET_INFO_MEMBER(tc0180vcu_device::get_bg_tile_info)
 
 TILE_GET_INFO_MEMBER(tc0180vcu_device::get_fg_tile_info)
 {
-	int tile  = m_vram[tile_index + m_fg_rambank[0]];
-	int color = m_vram[tile_index + m_fg_rambank[1]];
+	int const tile  = m_vram[tile_index + m_fg_rambank[0]];
+	int const color = m_vram[tile_index + m_fg_rambank[1]];
 
 	tileinfo.set(1, tile,
 		m_fg_color_base + (color & 0x3f),
@@ -303,10 +301,10 @@ TILE_GET_INFO_MEMBER(tc0180vcu_device::get_fg_tile_info)
 
 TILE_GET_INFO_MEMBER(tc0180vcu_device::get_tx_tile_info)
 {
-	int tile = m_vram[tile_index + m_tx_rambank];
+	int const tile = m_vram[tile_index + m_tx_rambank];
 
 	tileinfo.set(0,
-		(tile & 0x07ff) | ((m_ctrl[4 + ((tile & 0x800) >> 11)]>>8) << 11),
+		(tile & 0x07ff) | ((m_ctrl[4 + BIT(tile, 11)] >> 8) << 11),
 		m_tx_color_base + ((tile >> 12) & 0x0f),
 		0);
 }
@@ -325,7 +323,7 @@ void tc0180vcu_device::word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		m_tilemap[2]->mark_tile_dirty(offset & 0x7ff);
 }
 
-void tc0180vcu_device::tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tmap_num, int plane )
+void tc0180vcu_device::tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tmap_num, int plane)
 {
 	assert(tmap_num < 3);
 
@@ -336,26 +334,22 @@ void tc0180vcu_device::tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap
 		/*plane = 0 fg tilemap*/
 		/*plane = 1 bg tilemap*/
 		rectangle my_clip;
-		int i;
-		int scrollx, scrolly;
-		int lines_per_block;    /* number of lines scrolled by the same amount (per one scroll value) */
-		int number_of_blocks;   /* number of such blocks per _screen_ (256 lines) */
 
-		lines_per_block = 256 - (m_ctrl[2 + plane] >> 8);
-		number_of_blocks = 256 / lines_per_block;
+		int const lines_per_block = 256 - (m_ctrl[2 + plane] >> 8);    /* number of lines scrolled by the same amount (per one scroll value) */
+		int const number_of_blocks = 256 / lines_per_block;   /* number of such blocks per _screen_ (256 lines) */
 
 		my_clip.min_x = cliprect.min_x;
 		my_clip.max_x = cliprect.max_x;
 
-		for (i = 0; i < number_of_blocks; i++)
+		for (int i = 0; i < number_of_blocks; i++)
 		{
-			scrollx = m_scrollram[plane * 0x200 + i * 2 * lines_per_block];
-			scrolly = m_scrollram[plane * 0x200 + i * 2 * lines_per_block + 1];
+			int const scrollx = m_scrollram[plane * 0x200 + i * 2 * lines_per_block];
+			int const scrolly = m_scrollram[plane * 0x200 + i * 2 * lines_per_block + 1];
 
 			my_clip.min_y = i * lines_per_block;
 			my_clip.max_y = (i + 1) * lines_per_block - 1;
 
-			if (m_video_control & 0x10)   /*flip screen*/
+			if (BIT(m_video_control, 4))   /*flip screen*/
 			{
 				my_clip.min_y = bitmap.height() - 1 - (i + 1) * lines_per_block - 1;
 				my_clip.max_y = bitmap.height() - 1 - i * lines_per_block;
@@ -373,7 +367,7 @@ void tc0180vcu_device::tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap
 	}
 }
 
-void tc0180vcu_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
+void tc0180vcu_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 /*  Sprite format: (16 bytes per sprite)
   offs:             bits:
@@ -404,17 +398,17 @@ void tc0180vcu_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clip
   000c - 000f: unused
 */
 
-	int x, y, xlatch = 0, ylatch = 0, x_no = 0, y_no = 0, x_num = 0, y_num = 0, big_sprite = 0;
-	int offs, code, color, flipx, flipy;
-	uint32_t data, zoomx, zoomy, zx, zy, zoomxlatch = 0, zoomylatch = 0;
+	int xlatch = 0, ylatch = 0, x_no = 0, y_no = 0, x_num = 0, y_num = 0;
+	uint32_t zoomxlatch = 0, zoomylatch = 0;
+	bool big_sprite = false;
 
-	for (offs = (0x1980 - 16) / 2; offs >=0; offs -= 8)
+	for (int offs = (0x1980 - 16) / 2; offs >=0; offs -= 8)
 	{
-		code = m_spriteram[offs];
+		int code = m_spriteram[offs];
 
-		color = m_spriteram[offs + 1];
-		flipx = color & 0x4000;
-		flipy = color & 0x8000;
+		int color = m_spriteram[offs + 1];
+		bool const flipx = BIT(color, 14);
+		bool const flipy = BIT(color, 15);
 #if 0
 		/*check the unknown bits*/
 		if (color & 0x3fc0)
@@ -425,12 +419,12 @@ void tc0180vcu_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clip
 #endif
 		color = (color & 0x3f) * 16;
 
-		x = m_spriteram[offs + 2] & 0x3ff;
-		y = m_spriteram[offs + 3] & 0x3ff;
+		int x = m_spriteram[offs + 2] & 0x3ff;
+		int y = m_spriteram[offs + 3] & 0x3ff;
 		if (x >= 0x200)  x -= 0x400;
 		if (y >= 0x200)  y -= 0x400;
 
-		data = m_spriteram[offs + 5];
+		uint32_t data = m_spriteram[offs + 5];
 		if (data)
 		{
 			if (!big_sprite)
@@ -444,22 +438,22 @@ void tc0180vcu_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clip
 				data = m_spriteram[offs + 4];
 				zoomxlatch = (data >> 8) & 0xff;
 				zoomylatch = (data >> 0) & 0xff;
-				big_sprite = 1;
+				big_sprite = true;
 			}
 		}
 
 		data = m_spriteram[offs + 4];
-		zoomx = (data >> 8) & 0xff;
-		zoomy = (data >> 0) & 0xff;
-		zx = (0x100 - zoomx) / 16;
-		zy = (0x100 - zoomy) / 16;
+		uint32_t zoomx = (data >> 8) & 0xff;
+		uint32_t zoomy = (data >> 0) & 0xff;
+		uint32_t zx = (0x100 - zoomx) / 16;
+		uint32_t zy = (0x100 - zoomy) / 16;
 
 		if (big_sprite)
 		{
 			zoomx = zoomxlatch;
 			zoomy = zoomylatch;
 
-			/* Note: like taito_f2.cpp, this zoom implementation is wrong,
+			/* Note: like taito/taito_f2.cpp, this zoom implementation is wrong,
 			chopped up into 16x16 sections instead of one sprite. This
 			is especially visible in rambo3. */
 
@@ -475,16 +469,16 @@ void tc0180vcu_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clip
 				x_no++;
 
 				if (x_no > x_num)
-					big_sprite = 0;
+					big_sprite = false;
 			}
 		}
 
-		if ( zoomx || zoomy )
+		if (zoomx || zoomy)
 		{
 			gfx(1)->zoom_transpen_raw(bitmap,cliprect,
 				code,
 				color,
-				flipx,flipy,
+				flipx, flipy,
 				x,y,
 				(zx << 16) / 16,(zy << 16) / 16,0);
 		}
@@ -493,14 +487,14 @@ void tc0180vcu_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clip
 			gfx(1)->transpen_raw(bitmap,cliprect,
 				code,
 				color,
-				flipx,flipy,
+				flipx, flipy,
 				x,y,
 				0);
 		}
 	}
 }
 
-void tc0180vcu_device::draw_framebuffer( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
+void tc0180vcu_device::draw_framebuffer(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority)
 {
 	rectangle myclip = cliprect;
 
@@ -508,17 +502,17 @@ void tc0180vcu_device::draw_framebuffer( bitmap_ind16 &bitmap, const rectangle &
 
 	priority <<= 4;
 
-	if (m_video_control & 0x08)
+	if (BIT(m_video_control, 3))
 	{
 		if (priority)
 			return;
 
-		if (m_video_control & 0x10)   /*flip screen*/
+		if (BIT(m_video_control, 4))   /*flip screen*/
 		{
 			/*popmessage("1. X[%3i;%3i] Y[%3i;%3i]", myclip.min_x, myclip.max_x, myclip.min_y, myclip.max_y);*/
 			for (int y = myclip.min_y; y <= myclip.max_y; y++)
 			{
-				uint16_t const *src = &m_framebuffer[m_framebuffer_page]->pix(y, myclip.min_x);
+				uint16_t const *src = &m_framebuffer[m_framebuffer_page].pix(y, myclip.min_x);
 				uint16_t *dst = &bitmap.pix(bitmap.height()-1-y, myclip.max_x);
 
 				for (int x = myclip.min_x; x <= myclip.max_x; x++)
@@ -536,7 +530,7 @@ void tc0180vcu_device::draw_framebuffer( bitmap_ind16 &bitmap, const rectangle &
 		{
 			for (int y = myclip.min_y; y <= myclip.max_y; y++)
 			{
-				uint16_t const *src = &m_framebuffer[m_framebuffer_page]->pix(y, myclip.min_x);
+				uint16_t const *src = &m_framebuffer[m_framebuffer_page].pix(y, myclip.min_x);
 				uint16_t *dst = &bitmap.pix(y, myclip.min_x);
 
 				for (int x = myclip.min_x; x <= myclip.max_x; x++)
@@ -553,12 +547,12 @@ void tc0180vcu_device::draw_framebuffer( bitmap_ind16 &bitmap, const rectangle &
 	}
 	else
 	{
-		if (m_video_control & 0x10)   /*flip screen*/
+		if (BIT(m_video_control, 4))   /*flip screen*/
 		{
 			/*popmessage("3. X[%3i;%3i] Y[%3i;%3i]", myclip.min_x, myclip.max_x, myclip.min_y, myclip.max_y);*/
 			for (int y = myclip.min_y ;y <= myclip.max_y; y++)
 			{
-				uint16_t const *src = &m_framebuffer[m_framebuffer_page]->pix(y, myclip.min_x);
+				uint16_t const *src = &m_framebuffer[m_framebuffer_page].pix(y, myclip.min_x);
 				uint16_t *dst = &bitmap.pix(bitmap.height()-1-y, myclip.max_x);
 
 				for (int x = myclip.min_x; x <= myclip.max_x; x++)
@@ -576,7 +570,7 @@ void tc0180vcu_device::draw_framebuffer( bitmap_ind16 &bitmap, const rectangle &
 		{
 			for (int y = myclip.min_y; y <= myclip.max_y; y++)
 			{
-				uint16_t const *src = &m_framebuffer[m_framebuffer_page]->pix(y, myclip.min_x);
+				uint16_t const *src = &m_framebuffer[m_framebuffer_page].pix(y, myclip.min_x);
 				uint16_t *dst = &bitmap.pix(y, myclip.min_x);
 
 				for (int x = myclip.min_x; x <= myclip.max_x; x++)
@@ -595,11 +589,11 @@ void tc0180vcu_device::draw_framebuffer( bitmap_ind16 &bitmap, const rectangle &
 
 void tc0180vcu_device::vblank_update()
 {
-	if (~m_video_control & 0x01)
-		m_framebuffer[m_framebuffer_page]->fill(0, screen().visible_area());
+	if (BIT(~m_video_control, 0))
+		m_framebuffer[m_framebuffer_page].fill(0, screen().visible_area());
 
-	if (~m_video_control & 0x80)
+	if (BIT(~m_video_control, 7))
 		m_framebuffer_page ^= 1;
 
-	draw_sprites(*m_framebuffer[m_framebuffer_page], screen().visible_area());
+	draw_sprites(m_framebuffer[m_framebuffer_page], screen().visible_area());
 }

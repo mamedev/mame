@@ -12,7 +12,7 @@
 #define LOG_WRITEDATA (1U << 7)
 #define LOG_WRITECOMPLETED (1U << 8)
 
-//#define VERBOSE (LOG_GENERAL | LOG_COMMAND | LOG_READ | LOG_WRITE | LOG_READCOMPLETED | LOG_WRITECOMPLETED)
+//#define VERBOSE (LOG_GENERAL | LOG_COMMAND | LOG_READ | /* LOG_READDATA | LOG_READSTATUS | */ LOG_READCOMPLETED | LOG_WRITE | /* LOG_WRITEDATA | */ LOG_WRITECOMPLETED)
 //#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
@@ -519,7 +519,7 @@ uint16_t ata_hle_device_base::dma_r()
 			if ((m_status & IDE_STATUS_DRQ) && single_word_dma_mode() >= 0)
 				set_dmarq(ASSERT_LINE);
 
-			LOGREADDATA("%s device %d dma_r 0x%04x\n", data);
+			LOGREADDATA("%s device %d dma_r 0x%04x\n", machine().describe_context(), m_csel, data);
 			return data;
 		}
 	}
@@ -571,7 +571,7 @@ uint16_t ata_hle_device_base::command_r(offs_t offset)
 				else
 				{
 					uint16_t data = device_selected() ? read_data() : 0xffff;
-					LOGREADDATA("%s device %d cs0_r data 0x%04x\n", data);
+					LOGREADDATA("%s device %d cs0_r data 0x%04x\n", machine().describe_context(), m_csel, data);
 					return data;
 				}
 				break;
@@ -668,16 +668,16 @@ uint16_t ata_hle_device_base::control_r(offs_t offset)
 
 				/*
 
-					bit     description
+				    bit     description
 
-					0       master active
-					1       slave active
-					2       complement of active disk head bit 0
-					3       complement of active disk head bit 1
-					4       complement of active disk head bit 2
-					5       complement of active disk head bit 3
-					6       write in progress
-					7       floppy present (unused)
+				    0       master active
+				    1       slave active
+				    2       complement of active disk head bit 0
+				    3       complement of active disk head bit 1
+				    4       complement of active disk head bit 2
+				    5       complement of active disk head bit 3
+				    6       write in progress
+				    7       floppy present (unused)
 
 				*/
 
@@ -727,9 +727,9 @@ void ata_hle_device_base::dma_w(uint16_t data)
 
 void ata_hle_device_base::command_w(offs_t offset, uint16_t data)
 {
-	if ((m_status & (IDE_STATUS_DRQ | IDE_STATUS_BSY)) && offset != IDE_CS0_DATA_RW)
+	if ((m_status & IDE_STATUS_DRQ) && offset != IDE_CS0_DATA_RW && (offset != IDE_CS0_DEVICE_HEAD_RW || data != m_device_head))
 	{
-		LOGREADCOMPLETED("%s device %d cs0_w (0x%x) aborted after %d bytes\n", machine().describe_context(), m_csel, offset, m_buffer_offset);
+		LOG("%s device %d cs0_w (0x%x) aborted after %d bytes (%02x)\n", machine().describe_context(), m_csel, offset, m_buffer_offset, m_command);
 		stop_busy();
 		m_status &= ~IDE_STATUS_DRQ;
 		set_dmarq(CLEAR_LINE);
@@ -737,7 +737,9 @@ void ata_hle_device_base::command_w(offs_t offset, uint16_t data)
 		m_error = IDE_ERROR_ABRT;
 	}
 
-	if (m_dmack)
+	if (m_status & IDE_STATUS_BSY)
+		LOG("%s device %d cs0_w (0x%x) 0x%04x (ignored BSY)\n", machine().describe_context(), m_csel, offset, data);
+	else if (m_dmack)
 		LOG("%s device %d cs0_w (0x%x) 0x%04x (ignored DMACK)\n", machine().describe_context(), m_csel, offset, data);
 	else
 	{
@@ -748,10 +750,9 @@ void ata_hle_device_base::command_w(offs_t offset, uint16_t data)
 			{
 				if (!device_selected())
 					LOG("%s device %d cs0_w data 0x%04x (ignored !selected)\n", machine().describe_context(), m_csel, data);
-				else if (m_status & IDE_STATUS_BSY)
-					LOG("%s device %d cs0_w data 0x%04x (ignored BSY)\n", machine().describe_context(), m_csel, data);
 				else if (!(m_status & IDE_STATUS_DRQ))
 					LOG("%s device %d cs0_w data 0x%04x (ignored !DRQ)\n", machine().describe_context(), m_csel, data);
+				else
 				{
 					LOGWRITEDATA("%s device %d cs0_w data 0x%04x\n", machine().describe_context(), m_csel, data);
 					write_data(data);

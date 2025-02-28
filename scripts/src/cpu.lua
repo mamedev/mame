@@ -2012,6 +2012,8 @@ if CPUS["M6805"] then
 		MAME_DIR .. "src/devices/cpu/m6805/m68hc05.h",
 		MAME_DIR .. "src/devices/cpu/m6805/m68hc05e1.cpp",
 		MAME_DIR .. "src/devices/cpu/m6805/m68hc05e1.h",
+		MAME_DIR .. "src/devices/cpu/m6805/m68hc05pge.cpp",
+		MAME_DIR .. "src/devices/cpu/m6805/m68hc05pge.h",
 	}
 end
 
@@ -2980,6 +2982,8 @@ if CPUS["TLCS900"] then
 		MAME_DIR .. "src/devices/cpu/tlcs900/tlcs900.h",
 		MAME_DIR .. "src/devices/cpu/tlcs900/900tbl.hxx",
 		MAME_DIR .. "src/devices/cpu/tlcs900/900htbl.hxx",
+		MAME_DIR .. "src/devices/cpu/tlcs900/tmp94c241.cpp",
+		MAME_DIR .. "src/devices/cpu/tlcs900/tmp94c241.h",
 		MAME_DIR .. "src/devices/cpu/tlcs900/tmp95c061.cpp",
 		MAME_DIR .. "src/devices/cpu/tlcs900/tmp95c061.h",
 		MAME_DIR .. "src/devices/cpu/tlcs900/tmp95c063.cpp",

@@ -5,14 +5,17 @@
 
 #pragma once
 
+#include "m6502_swap_op_d5_d6.h"
 #include "nes_vt09_soc.h"
+#include "rp2a03_vtscr.h"
+
 #include "cpu/m6502/rp2a03.h"
 #include "sound/nes_apu_vt.h"
-#include "m6502_vtscr.h"
-#include "m6502_swap_op_d5_d6.h"
 #include "video/ppu2c0x_vt.h"
+
 #include "screen.h"
 #include "speaker.h"
+
 
 class nes_vt32_soc_device : public nes_vt09_soc_device
 {
@@ -22,7 +25,7 @@ public:
 protected:
 	nes_vt32_soc_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock);
 
-	virtual void device_add_mconfig(machine_config& config) override;
+	virtual void device_add_mconfig(machine_config& config) override ATTR_COLD;
 
 	void nes_vt_fp_map(address_map &map) ATTR_COLD;
 
@@ -42,7 +45,7 @@ public:
 	nes_vt32_soc_pal_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
 
 protected:
-	virtual void device_add_mconfig(machine_config& config) override;
+	virtual void device_add_mconfig(machine_config& config) override ATTR_COLD;
 };
 
 

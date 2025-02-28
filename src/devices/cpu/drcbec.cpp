@@ -9,12 +9,18 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "debug/debugcpu.h"
 #include "drcbec.h"
+
+#include "drcbeut.h"
+
+#include "debug/debugcpu.h"
 
 #include <cmath>
 
+
 namespace drc {
+
+namespace {
 
 using namespace uml;
 
@@ -24,22 +30,22 @@ using namespace uml;
 //**************************************************************************
 
 // define a bit to match each possible condition, starting at bit 12
-#define ZBIT            (0x1000 << (COND_Z & 15))
-#define NZBIT           (0x1000 << (COND_NZ & 15))
-#define SBIT            (0x1000 << (COND_S & 15))
-#define NSBIT           (0x1000 << (COND_NS & 15))
-#define CBIT            (0x1000 << (COND_C & 15))
-#define NCBIT           (0x1000 << (COND_NC & 15))
-#define VBIT            (0x1000 << (COND_V & 15))
-#define NVBIT           (0x1000 << (COND_NV & 15))
-#define UBIT            (0x1000 << (COND_U & 15))
-#define NUBIT           (0x1000 << (COND_NU & 15))
-#define ABIT            (0x1000 << (COND_A & 15))
-#define BEBIT           (0x1000 << (COND_BE & 15))
-#define GBIT            (0x1000 << (COND_G & 15))
-#define GEBIT           (0x1000 << (COND_GE & 15))
-#define LBIT            (0x1000 << (COND_L & 15))
-#define LEBIT           (0x1000 << (COND_LE & 15))
+constexpr uint32_t ZBIT  = 0x1000 << (COND_Z & 15);
+constexpr uint32_t NZBIT = 0x1000 << (COND_NZ & 15);
+constexpr uint32_t SBIT  = 0x1000 << (COND_S & 15);
+constexpr uint32_t NSBIT = 0x1000 << (COND_NS & 15);
+constexpr uint32_t CBIT  = 0x1000 << (COND_C & 15);
+constexpr uint32_t NCBIT = 0x1000 << (COND_NC & 15);
+constexpr uint32_t VBIT  = 0x1000 << (COND_V & 15);
+constexpr uint32_t NVBIT = 0x1000 << (COND_NV & 15);
+constexpr uint32_t UBIT  = 0x1000 << (COND_U & 15);
+constexpr uint32_t NUBIT = 0x1000 << (COND_NU & 15);
+constexpr uint32_t ABIT  = 0x1000 << (COND_A & 15);
+constexpr uint32_t BEBIT = 0x1000 << (COND_BE & 15);
+constexpr uint32_t GBIT  = 0x1000 << (COND_G & 15);
+constexpr uint32_t GEBIT = 0x1000 << (COND_GE & 15);
+constexpr uint32_t LBIT  = 0x1000 << (COND_L & 15);
+constexpr uint32_t LEBIT = 0x1000 << (COND_LE & 15);
 
 
 // internal opcodes
@@ -207,6 +213,121 @@ enum
 #define FLAGS64_NZCV_SUBC(r,a,b,c)  (FLAGS64_NZ(r) | FLAGS64_C_SUBC(a,b,c) | FLAGS64_V_SUB(r,a,b))
 
 
+//-------------------------------------------------
+//  dmulu - perform a double-wide unsigned multiply
+//-------------------------------------------------
+
+inline int dmulu(uint64_t &dstlo, uint64_t &dsthi, uint64_t src1, uint64_t src2, bool flags)
+{
+	// shortcut if we don't care about the high bits or the flags
+	if (&dstlo == &dsthi && !flags)
+	{
+		dstlo = src1 * src2;
+		return 0;
+	}
+
+	// fetch source values
+	uint64_t a = src1;
+	uint64_t b = src2;
+	if (a == 0 || b == 0)
+	{
+		dsthi = dstlo = 0;
+		return FLAG_Z;
+	}
+
+	// compute high and low parts first
+	uint64_t lo = uint64_t(uint32_t(a >> 0))  * uint64_t(uint32_t(b >> 0));
+	uint64_t hi = uint64_t(uint32_t(a >> 32)) * uint64_t(uint32_t(b >> 32));
+
+	// compute middle parts
+	uint64_t prevlo = lo;
+	uint64_t temp = uint64_t(uint32_t(a >> 32)) * uint64_t(uint32_t(b >> 0));
+	lo += temp << 32;
+	hi += (temp >> 32) + (lo < prevlo);
+
+	prevlo = lo;
+	temp = uint64_t(uint32_t(a >> 0)) * uint64_t(uint32_t(b >> 32));
+	lo += temp << 32;
+	hi += (temp >> 32) + (lo < prevlo);
+
+	// store the results
+	dsthi = hi;
+	dstlo = lo;
+	return ((hi >> 60) & FLAG_S) | ((hi != 0) << 1);
+}
+
+
+//-------------------------------------------------
+//  dmuls - perform a double-wide signed multiply
+//-------------------------------------------------
+
+inline int dmuls(uint64_t &dstlo, uint64_t &dsthi, int64_t src1, int64_t src2, bool flags)
+{
+	// shortcut if we don't care about the high bits or the flags
+	if (&dstlo == &dsthi && !flags)
+	{
+		dstlo = src1 * src2;
+		return 0;
+	}
+
+	// fetch absolute source values
+	uint64_t a = src1; if (int64_t(a) < 0) a = -a;
+	uint64_t b = src2; if (int64_t(b) < 0) b = -b;
+	if (a == 0 || b == 0)
+	{
+		dsthi = dstlo = 0;
+		return FLAG_Z;
+	}
+
+	// compute high and low parts first
+	uint64_t lo = uint64_t(uint32_t(a >> 0))  * uint64_t(uint32_t(b >> 0));
+	uint64_t hi = uint64_t(uint32_t(a >> 32)) * uint64_t(uint32_t(b >> 32));
+
+	// compute middle parts
+	uint64_t prevlo = lo;
+	uint64_t temp = uint64_t(uint32_t(a >> 32)) * uint64_t(uint32_t(b >> 0));
+	lo += temp << 32;
+	hi += (temp >> 32) + (lo < prevlo);
+
+	prevlo = lo;
+	temp = uint64_t(uint32_t(a >> 0)) * uint64_t(uint32_t(b >> 32));
+	lo += temp << 32;
+	hi += (temp >> 32) + (lo < prevlo);
+
+	// adjust for signage
+	if (int64_t(src1 ^ src2) < 0)
+	{
+		hi = ~hi + ((lo == 0) ? 1 : 0);
+		lo = ~lo + 1;
+	}
+
+	// store the results
+	dsthi = hi;
+	dstlo = lo;
+	return ((hi >> 60) & FLAG_S) | ((hi != (int64_t(lo) >> 63)) << 1);
+}
+
+inline uint32_t tzcount32(uint32_t value)
+{
+	for (int i = 0; i < 32; i++)
+	{
+		if (value & (uint32_t(1) << i))
+			return i;
+	}
+	return 32;
+}
+
+inline uint64_t tzcount64(uint64_t value)
+{
+	for (int i = 0; i < 64; i++)
+	{
+		if (value & (uint64_t(1) << i))
+			return i;
+	}
+	return 64;
+}
+
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -233,6 +354,36 @@ union drcbec_instruction
 	const code_handle * handle;
 	const drcbec_instruction *inst;
 	const drcbec_instruction **pinst;
+};
+
+
+class drcbe_c : public drcbe_interface
+{
+public:
+	// construction/destruction
+	drcbe_c(drcuml_state &drcuml, device_t &device, drc_cache &cache, uint32_t flags, int modes, int addrbits, int ignorebits);
+	virtual ~drcbe_c();
+
+	// required overrides
+	virtual void reset() override;
+	virtual int execute(uml::code_handle &entry) override;
+	virtual void generate(drcuml_block &block, const uml::instruction *instlist, uint32_t numinst) override;
+	virtual bool hash_exists(uint32_t mode, uint32_t pc) override;
+	virtual void get_info(drcbe_info &info) override;
+
+private:
+	// helpers
+	void output_parameter(drcbec_instruction **dstptr, void **immedptr, int size, const uml::parameter &param);
+	void fixup_label(void *parameter, drccodeptr labelcodeptr);
+
+	// internal state
+	drc_hash_table          m_hash;                 // hash table state
+	drc_map_variables       m_map;                  // code map
+	drc_label_list          m_labels;               // label list
+	drc_label_fixup_delegate m_fixup_delegate;      // precomputed delegate
+
+	static const uint32_t     s_condition_map[32];
+	static uint64_t           s_immediate_zero;
 };
 
 
@@ -289,12 +440,12 @@ const uint32_t drcbe_c::s_condition_map[] =
 //  drcbe_c - constructor
 //-------------------------------------------------
 
-drcbe_c::drcbe_c(drcuml_state &drcuml, device_t &device, drc_cache &cache, uint32_t flags, int modes, int addrbits, int ignorebits)
-	: drcbe_interface(drcuml, cache, device),
-		m_hash(cache, modes, addrbits, ignorebits),
-		m_map(cache, 0xaaaaaaaa55555555),
-		m_labels(cache),
-		m_fixup_delegate(&drcbe_c::fixup_label, this)
+drcbe_c::drcbe_c(drcuml_state &drcuml, device_t &device, drc_cache &cache, uint32_t flags, int modes, int addrbits, int ignorebits) :
+	drcbe_interface(drcuml, cache, device),
+	m_hash(cache, modes, addrbits, ignorebits),
+	m_map(cache, 0xaaaaaaaa55555555),
+	m_labels(cache),
+	m_fixup_delegate(&drcbe_c::fixup_label, this)
 {
 }
 
@@ -2324,119 +2475,19 @@ void drcbe_c::fixup_label(void *parameter, drccodeptr labelcodeptr)
 	dst->inst = (drcbec_instruction *)labelcodeptr;
 }
 
+} // anonymous namespace
 
-//-------------------------------------------------
-//  dmulu - perform a double-wide unsigned multiply
-//-------------------------------------------------
 
-int drcbe_c::dmulu(uint64_t &dstlo, uint64_t &dsthi, uint64_t src1, uint64_t src2, bool flags)
+std::unique_ptr<drcbe_interface> make_drcbe_c(
+		drcuml_state &drcuml,
+		device_t &device,
+		drc_cache &cache,
+		uint32_t flags,
+		int modes,
+		int addrbits,
+		int ignorebits)
 {
-	// shortcut if we don't care about the high bits or the flags
-	if (&dstlo == &dsthi && flags == false)
-	{
-		dstlo = src1 * src2;
-		return 0;
-	}
-
-	// fetch source values
-	uint64_t a = src1;
-	uint64_t b = src2;
-	if (a == 0 || b == 0)
-	{
-		dsthi = dstlo = 0;
-		return FLAG_Z;
-	}
-
-	// compute high and low parts first
-	uint64_t lo = (uint64_t)(uint32_t)(a >> 0)  * (uint64_t)(uint32_t)(b >> 0);
-	uint64_t hi = (uint64_t)(uint32_t)(a >> 32) * (uint64_t)(uint32_t)(b >> 32);
-
-	// compute middle parts
-	uint64_t prevlo = lo;
-	uint64_t temp = (uint64_t)(uint32_t)(a >> 32)  * (uint64_t)(uint32_t)(b >> 0);
-	lo += temp << 32;
-	hi += (temp >> 32) + (lo < prevlo);
-
-	prevlo = lo;
-	temp = (uint64_t)(uint32_t)(a >> 0)  * (uint64_t)(uint32_t)(b >> 32);
-	lo += temp << 32;
-	hi += (temp >> 32) + (lo < prevlo);
-
-	// store the results
-	dsthi = hi;
-	dstlo = lo;
-	return ((hi >> 60) & FLAG_S) | ((hi != 0) << 1);
-}
-
-
-//-------------------------------------------------
-//  dmuls - perform a double-wide signed multiply
-//-------------------------------------------------
-
-int drcbe_c::dmuls(uint64_t &dstlo, uint64_t &dsthi, int64_t src1, int64_t src2, bool flags)
-{
-	// shortcut if we don't care about the high bits or the flags
-	if (&dstlo == &dsthi && flags == false)
-	{
-		dstlo = src1 * src2;
-		return 0;
-	}
-
-	// fetch absolute source values
-	uint64_t a = src1; if ((int64_t)a < 0) a = -a;
-	uint64_t b = src2; if ((int64_t)b < 0) b = -b;
-	if (a == 0 || b == 0)
-	{
-		dsthi = dstlo = 0;
-		return FLAG_Z;
-	}
-
-	// compute high and low parts first
-	uint64_t lo = (uint64_t)(uint32_t)(a >> 0)  * (uint64_t)(uint32_t)(b >> 0);
-	uint64_t hi = (uint64_t)(uint32_t)(a >> 32) * (uint64_t)(uint32_t)(b >> 32);
-
-	// compute middle parts
-	uint64_t prevlo = lo;
-	uint64_t temp = (uint64_t)(uint32_t)(a >> 32)  * (uint64_t)(uint32_t)(b >> 0);
-	lo += temp << 32;
-	hi += (temp >> 32) + (lo < prevlo);
-
-	prevlo = lo;
-	temp = (uint64_t)(uint32_t)(a >> 0)  * (uint64_t)(uint32_t)(b >> 32);
-	lo += temp << 32;
-	hi += (temp >> 32) + (lo < prevlo);
-
-	// adjust for signage
-	if ((int64_t)(src1 ^ src2) < 0)
-	{
-		hi = ~hi + (lo == 0);
-		lo = ~lo + 1;
-	}
-
-	// store the results
-	dsthi = hi;
-	dstlo = lo;
-	return ((hi >> 60) & FLAG_S) | ((hi != ((int64_t)lo >> 63)) << 1);
-}
-
-uint32_t drcbe_c::tzcount32(uint32_t value)
-{
-	for (int i = 0; i < 32; i++)
-	{
-		if (value & (1 << i))
-			return i;
-	}
-	return 32;
-}
-
-uint64_t drcbe_c::tzcount64(uint64_t value)
-{
-	for (int i = 0; i < 64; i++)
-	{
-		if (value & ((uint64_t)(1) << i))
-			return i;
-	}
-	return 64;
+	return std::unique_ptr<drcbe_interface>(new drcbe_c(drcuml, device, cache, flags, modes, addrbits, ignorebits));
 }
 
 } // namespace drc

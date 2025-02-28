@@ -34,7 +34,7 @@ TODO:
   verification is wanted for: bassmate, gnw_bfightn, gnw_bjack, gnw_bsweep,
   gnw_climbern, gnw_dkcirc, gnw_dkhockey, gnw_dkjrp, gnw_dkong3, gnw_gcliff,
   gnw_mariocmt, gnw_mariocmta, gnw_mariotj, gnw_mbaway, gnw_mmousep,
-  gnw_pinball, gnw_popeyep, gnw_sbuster, gnw_snoopyp, gnw_zelda
+  gnw_pinball, gnw_popeyep, gnw_sbuster, gnw_snoopyp, gnw_zelda, trspacadv
 
 ================================================================================
 
@@ -5575,12 +5575,16 @@ ROM_END
 
 /*******************************************************************************
 
-  Konami Bill Elliott's NASCAR Racing (model 13010)
-  * PCB label: BH010
-  * Sharp SM511 under epoxy (die label KMS73B, 783)
+  Konami Bill Elliott's NASCAR Racing (model 13010), Chequered Flag
+  * PCB label:
+    BH010 (Bill Elliott's NASCAR Racing)
+    BH016 (Chequered Flag)
+  * Sharp SM511 under epoxy
+    die label KMS73B, 783 (Bill Elliott's NASCAR Racing)
   * lcd screen with custom segments, 1-bit sound
 
-  Chequered Flag is presumed to have the same MCU ROM.
+  Chequered Flag is presumed to have the same MCU ROM as Bill Elliott's NASCAR
+  Racing. The MCU was not decapped, so it's not 100% certain.
 
 *******************************************************************************/
 
@@ -5592,6 +5596,7 @@ public:
 	{ }
 
 	void knascar(machine_config &config);
+	void kchqflag(machine_config &config);
 };
 
 // inputs
@@ -5620,6 +5625,11 @@ void knascar_state::knascar(machine_config &config)
 	sm511_common(config, 1491, 1080);
 }
 
+void knascar_state::kchqflag(machine_config &config)
+{
+	sm511_common(config, 1482, 1080);
+}
+
 // roms
 
 ROM_START( knascar )
@@ -5627,12 +5637,22 @@ ROM_START( knascar )
 	ROM_LOAD( "783.program", 0x0000, 0x1000, CRC(0a08536a) SHA1(199203fad96e0d2b173b876b9746064b0c30dc7b) )
 
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "783.melody", 0x000, 0x100, CRC(ffeef4bc) SHA1(a3b21eefb170aa54eb53cf56f88b0c00dd29703f))
+	ROM_LOAD( "783.melody", 0x000, 0x100, CRC(ffeef4bc) SHA1(a3b21eefb170aa54eb53cf56f88b0c00dd29703f) )
 
 	ROM_REGION( 474061, "screen", 0)
 	ROM_LOAD( "knascar.svg", 0, 474061, CRC(d30f639a) SHA1(6fd061eda61f925a9f85cf5fb4b7024f15e1e1fe) )
 ROM_END
 
+ROM_START( kchqflag )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "783.program", 0x0000, 0x1000, CRC(0a08536a) SHA1(199203fad96e0d2b173b876b9746064b0c30dc7b) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "783.melody", 0x000, 0x100, CRC(ffeef4bc) SHA1(a3b21eefb170aa54eb53cf56f88b0c00dd29703f) )
+
+	ROM_REGION( 439251, "screen", 0)
+	ROM_LOAD( "kchqflag.svg", 0, 439251, CRC(8d477ab1) SHA1(eb0fe02a4f285081f0fd422df17bca48498112de) )
+ROM_END
 
 
 
@@ -11405,6 +11425,11 @@ static INPUT_PORTS_START( trshutvoy )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
 	PORT_START("FAKE") // Up/Sound are electronically the same button
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
@@ -11682,6 +11707,108 @@ ROM_START( trspider )
 
 	ROM_REGION( 130534, "screen", 0)
 	ROM_LOAD( "trspider.svg", 0, 130534, CRC(d3f00245) SHA1(348c47dbe87ce8537c9b1c91d0d8bbf0809546e8) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Tronica: Space Adventure (model SA-12)
+  * PCB labels: SA-12 111182 32-523-1
+  * Sharp SM511 label 1112 237C TRONICA (no decap)
+  * lcd screen with custom segments, 1-bit sound
+
+*******************************************************************************/
+
+class trspacadv_state : public hh_sm510_state
+{
+public:
+	trspacadv_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void trspacadv(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( trspacadv )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("0")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("1")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("2")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("3")
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("4")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("5")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("6")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("7")
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("8")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("9")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME(".")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("=")
+
+	PORT_START("IN.3") // S4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("+")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("-")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_CHANGED_CB(input_changed) PORT_NAME(u8"×")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME(u8"÷")
+
+	PORT_START("IN.4") // S5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_CHANGED_CB(input_changed) PORT_NAME("ALM")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_CHANGED_CB(input_changed) PORT_NAME("%")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL) PORT_CHANGED_CB(input_changed) PORT_NAME("C")
+
+	PORT_START("IN.5") // S6
+	PORT_BIT( 0x01, 0x01, IPT_CUSTOM ) PORT_CONDITION("FAKE", 0x03, NOTEQUALS, 0x00) // Left/Sound
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Fire") // F
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.6") // S7
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.7") // S8
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_CHANGED_CB(input_changed) PORT_NAME("Mode")
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("FAKE") // Left/Sound are electronically the same button
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
+INPUT_PORTS_END
+
+// config
+
+void trspacadv_state::trspacadv(machine_config &config)
+{
+	sm511_common(config, 1532, 1080);
+}
+
+// roms
+
+ROM_START( trspacadv )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "1112_237c.program", 0x0000, 0x1000, CRC(7c863fbc) SHA1(1c65f9f8166162c2cd203967ae3d0d49cc14baf7) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "1112_237c.melody", 0x000, 0x100, BAD_DUMP CRC(685a3305) SHA1(31b948dbd0fbae3517db505bc58904092c2b077f) ) // decap needed for verification
+
+	ROM_REGION( 117824, "screen", 0)
+	ROM_LOAD( "trspacadv.svg", 0, 117824, CRC(5b7c7f28) SHA1(3851eb2221660a33c521bbd3b01d7a76a558d07c) )
 ROM_END
 
 
@@ -11993,6 +12120,7 @@ SYST( 1990, kbilly,       0,           0,      kbilly,       kbilly,       kbill
 SYST( 1990, kbottom9,     0,           0,      kbottom9,     kbottom9,     kbottom9_state,     empty_init, "Konami", "Bottom of the Ninth (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1990, kloneran,     0,           0,      kloneran,     kloneran,     kloneran_state,     empty_init, "Konami", "The Lone Ranger (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1990, knascar,      0,           0,      knascar,      knascar,      knascar_state,      empty_init, "Konami", "Bill Elliott's NASCAR Racing (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1990, kchqflag,     knascar,     0,      kchqflag,     knascar,      knascar_state,      empty_init, "Konami", "Chequered Flag (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1990, kblades,      0,           0,      kblades,      kblades,      kblades_state,      empty_init, "Konami", "Blades of Steel (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1990, ktmnt2,       0,           0,      ktmnt2,       ktmnt2,       ktmnt2_state,       empty_init, "Konami", "Teenage Mutant Ninja Turtles II: Splinter Speaks (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_IMPERFECT_SOUND )
 SYST( 1990, knfl,         0,           0,      knfl,         knfl,         knfl_state,         empty_init, "Konami", "NFL Football (Konami, handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
@@ -12078,6 +12206,7 @@ SYST( 1983, trthuball,    trsrescue,   0,      trthuball,    trsrescue,    trsre
 SYST( 1983, trsgkeep,     0,           0,      trsgkeep,     trsgkeep,     trsgkeep_state,     empty_init, "Tronica", "Super Goal Keeper", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1982, trspacmis,    0,           0,      trspacmis,    trspacmis,    trspacmis_state,    empty_init, "Tronica", "Space Mission (Tronica)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1982, trspider,     trspacmis,   0,      trspider,     trspacmis,    trspacmis_state,    empty_init, "Tronica", "Spider (Tronica)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1982, trspacadv,    0,           0,      trspacadv,    trspacadv,    trspacadv_state,    empty_init, "Tronica", "Space Adventure", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1983, trdivadv,     0,           0,      trdivadv,     trdivadv,     trdivadv_state,     empty_init, "Tronica", "Diver's Adventure", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1983, trclchick,    trdivadv,    0,      trclchick,    trclchick,    trdivadv_state,     empty_init, "Tronica", "Clever Chicken", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 

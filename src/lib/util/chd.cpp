@@ -3047,12 +3047,11 @@ std::error_condition chd_file_compressor::compress_continue(double &progress, do
 	while (m_read_queue_offset < m_logicalbytes && osd_work_queue_items(m_read_queue) < 2)
 	{
 		// see if we have enough free work items to read the next half of a buffer
-		uint32_t startitem = m_read_queue_offset / hunk_bytes();
-		uint32_t enditem = startitem + WORK_BUFFER_HUNKS / 2;
-		uint32_t curitem;
-		for (curitem = startitem; curitem < enditem; curitem++)
-			if (m_work_item[curitem % WORK_BUFFER_HUNKS].m_status != WS_READY)
-				break;
+		uint32_t const startitem = m_read_queue_offset / hunk_bytes();
+		uint32_t const enditem = startitem + WORK_BUFFER_HUNKS / 2;
+		uint32_t curitem = startitem;
+		while ((curitem < enditem) && (m_work_item[curitem % WORK_BUFFER_HUNKS].m_status == WS_READY))
+			++curitem;
 
 		// if it's not all clear, defer
 		if (curitem != enditem)
@@ -3076,20 +3075,24 @@ std::error_condition chd_file_compressor::compress_continue(double &progress, do
 		work_item &item = m_work_item[m_write_hunk % WORK_BUFFER_HUNKS];
 
 		// free any OSD work item
-		if (item.m_osd != nullptr)
+		if (item.m_osd)
+		{
 			osd_work_item_release(item.m_osd);
-		item.m_osd = nullptr;
+			item.m_osd = nullptr;
+		}
 
 		if (m_walking_parent)
 		{
 			// for parent walking, just add to the hashmap
-			uint32_t uph = hunk_bytes() / unit_bytes();
+			uint32_t const uph = hunk_bytes() / unit_bytes();
 			uint32_t units = uph;
 			if (item.m_hunknum == hunk_count() - 1 || !compressed())
 				units = 1;
 			for (uint32_t unit = 0; unit < units; unit++)
+			{
 				if (m_parent_map.find(item.m_hash[unit].m_crc16, item.m_hash[unit].m_sha1) == hashmap::NOT_FOUND)
 					m_parent_map.add(item.m_hunknum * uph + unit, item.m_hash[unit].m_crc16, item.m_hash[unit].m_sha1);
+			}
 		}
 		else if (!compressed())
 		{
@@ -3105,34 +3108,27 @@ std::error_condition chd_file_compressor::compress_continue(double &progress, do
 			if (!err && codec == CHD_CODEC_NONE) // TODO: report error?
 				m_total_out += m_hunkbytes;
 		}
-		else do
+		else if (uint64_t const selfhunk = m_current_map.find(item.m_hash[0].m_crc16, item.m_hash[0].m_sha1); selfhunk != hashmap::NOT_FOUND)
 		{
-			// for compressing, process the result
-
-			// first see if the hunk is in the parent or self maps
-			uint64_t selfhunk = m_current_map.find(item.m_hash[0].m_crc16, item.m_hash[0].m_sha1);
-			if (selfhunk != hashmap::NOT_FOUND)
-			{
-				hunk_copy_from_self(item.m_hunknum, selfhunk);
-				break;
-			}
-
+			// the hunk is in the self map
+			hunk_copy_from_self(item.m_hunknum, selfhunk);
+		}
+		else
+		{
 			// if not, see if it's in the parent map
-			if (m_parent)
+			uint64_t const parentunit = m_parent ? m_parent_map.find(item.m_hash[0].m_crc16, item.m_hash[0].m_sha1) : hashmap::NOT_FOUND;
+			if (parentunit != hashmap::NOT_FOUND)
 			{
-				uint64_t parentunit = m_parent_map.find(item.m_hash[0].m_crc16, item.m_hash[0].m_sha1);
-				if (parentunit != hashmap::NOT_FOUND)
-				{
-					hunk_copy_from_parent(item.m_hunknum, parentunit);
-					break;
-				}
+				hunk_copy_from_parent(item.m_hunknum, parentunit);
 			}
-
-			// otherwise, append it compressed and add to the self map
-			hunk_write_compressed(item.m_hunknum, item.m_compression, item.m_compressed, item.m_complen, item.m_hash[0].m_crc16);
-			m_total_out += item.m_complen;
-			m_current_map.add(item.m_hunknum, item.m_hash[0].m_crc16, item.m_hash[0].m_sha1);
-		} while (false);
+			else
+			{
+				// otherwise, append it compressed and add to the self map
+				hunk_write_compressed(item.m_hunknum, item.m_compression, item.m_compressed, item.m_complen, item.m_hash[0].m_crc16);
+				m_total_out += item.m_complen;
+				m_current_map.add(item.m_hunknum, item.m_hash[0].m_crc16, item.m_hash[0].m_sha1);
+			}
+		}
 
 		// reset the item and advance
 		item.m_status = WS_READY;
@@ -3141,19 +3137,18 @@ std::error_condition chd_file_compressor::compress_continue(double &progress, do
 		// if we hit the end, finalize
 		if (m_write_hunk == m_hunkcount)
 		{
-			// if this is just walking the parent, reset and get ready for compression
 			if (m_walking_parent)
 			{
+				// if this is just walking the parent, reset and get ready for compression
 				m_walking_parent = false;
 				m_read_queue_offset = m_read_done_offset = 0;
 				m_write_hunk = 0;
-				for (auto & elem : m_work_item)
+				for (auto &elem : m_work_item)
 					elem.m_status = WS_READY;
 			}
-
-			// wait for all reads to finish and if we're compressed, write the final SHA1 and map
 			else
 			{
+				// wait for all reads to finish and if we're compressed, write the final SHA1 and map
 				osd_work_queue_wait(m_read_queue, 30 * osd_ticks_per_second());
 				if (!compressed())
 					return std::error_condition();
@@ -3306,29 +3301,34 @@ void chd_file_compressor::async_read()
 		return;
 
 	// determine parameters for the read
-	uint32_t work_buffer_bytes = WORK_BUFFER_HUNKS * hunk_bytes();
+	uint32_t const work_buffer_bytes = WORK_BUFFER_HUNKS * hunk_bytes();
 	uint32_t numbytes = work_buffer_bytes / 2;
-	if (m_read_done_offset + numbytes > logical_bytes())
+	if ((m_read_done_offset + numbytes) > logical_bytes())
 		numbytes = logical_bytes() - m_read_done_offset;
+
+	uint8_t *const dest = &m_work_buffer[0] + (m_read_done_offset % work_buffer_bytes);
+	assert((&m_work_buffer[0] == dest) || (&m_work_buffer[work_buffer_bytes / 2] == dest));
+	assert(!(m_read_done_offset % hunk_bytes()));
+	uint64_t const end_offset = m_read_done_offset + numbytes;
 
 	// catch any exceptions coming out of here
 	try
 	{
 		// do the read
-		uint8_t *dest = &m_work_buffer[0] + (m_read_done_offset % work_buffer_bytes);
-		assert(dest == &m_work_buffer[0] || dest == &m_work_buffer[work_buffer_bytes / 2]);
-		uint64_t end_offset = m_read_done_offset + numbytes;
-
 		if (m_walking_parent)
 		{
 			// if walking the parent, read in hunks from the parent CHD
+			uint64_t curoffs = m_read_done_offset;
 			uint8_t *curdest = dest;
-			for (uint64_t curoffs = m_read_done_offset; curoffs < end_offset + 1; curoffs += hunk_bytes())
+			uint32_t curhunk = m_read_done_offset / hunk_bytes();
+			while (curoffs < end_offset + 1)
 			{
-				std::error_condition err = m_parent->read_hunk(curoffs / hunk_bytes(), curdest);
-				if (err)
+				std::error_condition err = m_parent->read_hunk(curhunk, curdest);
+				if (err && (error::HUNK_OUT_OF_RANGE != err)) // FIXME: fix the code so it doesn't depend on trying to read past the end of the parent CHD
 					throw err;
+				curoffs += hunk_bytes();
 				curdest += hunk_bytes();
+				++curhunk;
 			}
 		}
 		else

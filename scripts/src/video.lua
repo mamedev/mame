@@ -1114,6 +1114,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/saa7110.h,VIDEOS["SAA7110"] = true
+--------------------------------------------------
+
+if (VIDEOS["SAA7110"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/saa7110.cpp",
+		MAME_DIR .. "src/devices/video/saa7110.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/sn74s262.h,VIDEOS["SN74S262"] = true
 --------------------------------------------------
 
@@ -1682,6 +1694,18 @@ if (VIDEOS["X1_001"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/x1_001.cpp",
 		MAME_DIR .. "src/devices/video/x1_001.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/zr36060.h,VIDEOS["ZR36060"] = true
+--------------------------------------------------
+
+if (VIDEOS["ZR36060"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/zr36060.cpp",
+		MAME_DIR .. "src/devices/video/zr36060.h",
 	}
 end
 

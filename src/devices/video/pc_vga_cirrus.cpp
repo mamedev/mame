@@ -7,9 +7,7 @@
  * TODO:
  * - Original Acumos AVGA1/2 chipsets (Cirrus Logic eventually bought Acumos and rebranded);
  * - Fix or implement hidden DAC modes (15bpp + mixed, true color, others);
- * - bebox: logo at startup is squashed;
  * - zorro/picasso2: many blitting errors, verify HW cursor;
- * - zorro/picasso2: segmentation fault on exit
  * - Merge with trs/vis.cpp implementation (CL-GD5200 RAMDAC with custom VGA controller)
  *
  */
@@ -20,14 +18,14 @@
 #include "screen.h"
 
 
-#define LOG_REG  (1U << 1)
+#define LOG_REGS (1U << 1)
 #define LOG_BLIT (1U << 2)
 #define LOG_HDAC (1U << 3) // log hidden DAC
 #define LOG_BANK (1U << 4) // log offset registers
 #define LOG_PLL  (1U << 5)
 
-#define VERBOSE (LOG_GENERAL | LOG_HDAC | LOG_REG | LOG_BLIT)
-//#define LOG_OUTPUT_FUNC osd_printf_info
+#define VERBOSE (LOG_GENERAL | LOG_HDAC | LOG_REGS | LOG_BLIT)
+#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 
@@ -193,7 +191,7 @@ void cirrus_gd5428_vga_device::crtc_map(address_map &map)
 			return m_cr19;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			LOGMASKED(LOG_REG, "CR19: Interlace End %02x\n", data);
+			LOGMASKED(LOG_REGS, "CR19: Interlace End %02x\n", data);
 			m_cr19 = data;
 		})
 	);
@@ -202,7 +200,7 @@ void cirrus_gd5428_vga_device::crtc_map(address_map &map)
 			return m_cr1a;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			LOGMASKED(LOG_REG, "CR1A: Interlace Control %02x\n", data);
+			LOGMASKED(LOG_REGS, "CR1A: Interlace Control %02x\n", data);
 			m_cr1a = data;
 			vga.crtc.horz_blank_end = (vga.crtc.horz_blank_end & 0xff3f) | ((data & 0x30) << 2);
 			vga.crtc.vert_blank_end = (vga.crtc.vert_blank_end & 0xfcff) | ((data & 0xc0) << 2);
@@ -214,7 +212,7 @@ void cirrus_gd5428_vga_device::crtc_map(address_map &map)
 			return m_cr1b;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			LOGMASKED(LOG_REG, "CR1B: Extended Display Controls %02x\n", data);
+			LOGMASKED(LOG_REGS, "CR1B: Extended Display Controls %02x\n", data);
 			m_cr1b = data;
 			vga.crtc.start_addr_latch &= ~0x070000;
 			vga.crtc.start_addr_latch |= ((data & 0x01) << 16);
@@ -226,7 +224,8 @@ void cirrus_gd5428_vga_device::crtc_map(address_map &map)
 //  map(0x25, 0x25) PSR Part Status (r/o, "factory testing and internal tracking only")
 	map(0x27, 0x27).lr8(
 		NAME([this] (offs_t offset) {
-			LOGMASKED(LOG_REG, "CR27: Read ID\n");
+			// NOTE: verbose
+			//LOGMASKED(LOG_REGS, "CR27: Read ID\n");
 			return m_chip_id;
 		})
 	);
@@ -292,6 +291,7 @@ void cirrus_gd5428_vga_device::gc_map(address_map &map)
 			return gc_mode_ext;
 		}),
 		NAME([this](offs_t offset, u8 data) {
+			LOGMASKED(LOG_REGS, "GRB: Graphics Controller Mode Extensions %02x\n", data);
 			gc_mode_ext = data;
 			if(!(data & 0x04))
 			{
@@ -525,12 +525,18 @@ void cirrus_gd5428_vga_device::sequencer_map(address_map &map)
 			recompute_params();
 		})
 	);
-	map(0x07, 0x07).lw8(
+	map(0x07, 0x07).lrw8(
+		NAME([this] (offs_t offset) {
+			return vga.sequencer.data[0x07];
+		}),
 		NAME([this] (offs_t offset, u8 data) {
-			// TODO: bebox startup enables this
-			if((data & 0xf0) != 0)
-				popmessage("pc_vga_cirrus: 1MB framebuffer window enabled at %iMB (%02x)",data >> 4,data);
+			// xxxx ---- Memory Segment
+			// 0000 ---- VGA segmenting
+			// llll ---- (any other value) Linear addressing
+			// ---- -xx- CRTC Character Clock Divider
+			// ---- ---x Select 8bpp High Resolution Mode
 			vga.sequencer.data[0x07] = data;
+			LOGMASKED(LOG_REGS, "SR7: Extended Sequencer Mode %02x\n", data);
 			recompute_params();
 		})
 	);
@@ -1121,14 +1127,14 @@ void cirrus_gd5428_vga_device::copy_pixel(uint8_t src, uint8_t dst)
 		res = 0xff;
 		break;
 	case 0x50:  // DSna / DPna
-		// used by picasso2, unknown purpose
+		// used by zorro2:picasso2p, unknown purpose
 		res = (dst & (~src));
 		break;
 	case 0x59:  // SRCINVERT
 		res = src ^ dst;
 		break;
 	case 0x6d:  // SRCPAINT / DSo
-		// picasso2 on VGA Workbench (upper right icon)
+		// zorro2:picasso2p on VGA Workbench (upper right icon)
 		res = src | dst;
 		break;
 	default:
@@ -1188,10 +1194,10 @@ uint8_t cirrus_gd5428_vga_device::mem_r(offs_t offset)
 
 	const uint8_t bank = offset_select(offset);
 
-	// FIXME: workaround crash behaviour in picasso2
-	// it will otherwise provide an offset of 0x1fxxxx in the gc_locked below
-	// causing a crash during adapter init
-	if(svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en)
+	// TODO: incomplete, just enough for zorro2:picasso2p to not outright crash at display init
+	// value should be a base to apply, also GRB[5] remaps banking granularity
+	// NOTE: bebox also wants this
+	if(vga.sequencer.data[0x07] & 0xf0)
 	{
 		return svga_device::mem_linear_r((offset & 0xffff) + bank * 0x10000);
 	}
@@ -1349,8 +1355,8 @@ void cirrus_gd5428_vga_device::mem_w(offs_t offset, uint8_t data)
 
 	const uint8_t bank = offset_select(offset);
 
-	// FIXME: as above
-	if(svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en)
+	// TODO: as above
+	if(vga.sequencer.data[0x07] & 0xf0)
 	{
 		svga_device::mem_linear_w((offset + bank * 0x10000), data);
 		return;
@@ -1519,7 +1525,7 @@ void cirrus_gd5430_vga_device::crtc_map(address_map &map)
 			return m_cr1d;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			LOGMASKED(LOG_REG, "CR1D: Overlay Extended Control %02x\n", data);
+			LOGMASKED(LOG_REGS, "CR1D: Overlay Extended Control %02x\n", data);
 			m_cr1d = data;
 			// TODO: '34/'36 onward
 			vga.crtc.start_addr_latch = (vga.crtc.start_addr_latch & 0xf7ffff) | (BIT(data, 7) << 19);

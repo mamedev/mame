@@ -366,6 +366,11 @@ ROM_START( fcpocket )
 	ROM_LOAD( "s29gl01gp.bin", 0x00000, 0x8000000, CRC(8703b18a) SHA1(07943443294e80ca93f83181c8bdbf950b87c52f) ) // 2nd half = 0x00 (so 64MByte of content)
 ROM_END
 
+ROM_START( matet300 )
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "tetris.bin", 0x00000, 0x2000000, CRC(73cbd40a) SHA1(5996c97cebd6cec42a0ba1fba9517adf1af00098) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -380,8 +385,9 @@ CONS( 2015, rminitv,   0,  0,  nes_vt32_pal_32mb, nes_vt32, nes_vt32_unk_state, 
 // However, sometimes the different models use the same background as this one (confirmed on one Pixel Classic at least), so there doesn't appear to be a clear way of knowing without powering them on
 CONS( 201?, dgunl3201, 0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init, "dreamGEAR", "My Arcade Data East Classics - Pixel Classic (308-in-1) (DGUNL-3201)", MACHINE_NOT_WORKING ) // from a UK unit, single 32Mbyte bank!
 CONS( 201?, dgunl3202, 0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init, "dreamGEAR", "My Arcade Data East Classics - Pixel Player (308-in-1) (DGUNL-3202)", MACHINE_NOT_WORKING ) // from a US unit single 32Mbyte bank!
-
 // There was also a 34-in-1 version of the Data East Classics in a mini-cabinet, NOT running on VT hardware, but using proper arcade ROMs, that one is reportedly running an old MAME build on an ARM SoC (although some sources say FBA)
+
+CONS( 2021, matet300,  0,         0,  nes_vt32_32mb,     nes_vt32, nes_vt32_unk_state, empty_init, "dreamGEAR", "My Arcade Tetris (DGUNL-7029, Go Gamer, with 300 bonus games)", MACHINE_NOT_WORKING )
 
 // Use DIP switch to select console or cartridge, as cartridge is fake and just toggles a GPIO
 CONS( 2016, fcpocket,  0,  0,  nes_vt32_4x16mb,   nes_vt32_fp, nes_vt32_unk_state, empty_init, "<unknown>",   "FC Pocket 600 in 1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )  // has external banking (2x 32mbyte banks)

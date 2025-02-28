@@ -441,21 +441,17 @@ uint16_t md_base_state::megadriv_68k_check_z80_bus(offs_t offset, uint16_t mem_m
 TIMER_CALLBACK_MEMBER(md_base_state::megadriv_z80_run_state)
 {
 	/* Is the z80 RESET line pulled? */
-	// TODO: Z80 /RESET
 	if (m_genz80.z80_is_reset)
 	{
-		m_z80snd->reset();
-		m_z80snd->suspend(SUSPEND_REASON_HALT, 1);
+		m_z80snd->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 		m_ymsnd->reset();
 	}
 	else
 	{
+		m_z80snd->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+
 		/* Check if z80 has the bus */
-		// TODO: Z80 /BUSREQ
-		if (m_genz80.z80_has_bus)
-			m_z80snd->resume(SUSPEND_REASON_HALT);
-		else
-			m_z80snd->suspend(SUSPEND_REASON_HALT, 1);
+		m_z80snd->set_input_line(Z80_INPUT_LINE_BUSRQ, m_genz80.z80_has_bus ? CLEAR_LINE : ASSERT_LINE);
 	}
 }
 

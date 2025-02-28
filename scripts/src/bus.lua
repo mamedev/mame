@@ -3304,6 +3304,8 @@ if (BUSES["CENTRONICS"]~=null) then
 		MAME_DIR .. "src/devices/bus/centronics/epson_lx800.h",
 		MAME_DIR .. "src/devices/bus/centronics/epson_lx810l.cpp",
 		MAME_DIR .. "src/devices/bus/centronics/epson_lx810l.h",
+		MAME_DIR .. "src/devices/bus/centronics/epson_rx80.cpp",
+		MAME_DIR .. "src/devices/bus/centronics/epson_rx80.h",
 		MAME_DIR .. "src/devices/bus/centronics/nec_p72.cpp",
 		MAME_DIR .. "src/devices/bus/centronics/nec_p72.h",
 		MAME_DIR .. "src/devices/bus/centronics/nlq401.cpp",
@@ -3926,16 +3928,18 @@ end
 
 if (BUSES["SG1000_EXP"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/bus/sg1000_exp/sg1000exp.cpp",
-		MAME_DIR .. "src/devices/bus/sg1000_exp/sg1000exp.h",
 		MAME_DIR .. "src/devices/bus/sg1000_exp/fm_unit.cpp",
 		MAME_DIR .. "src/devices/bus/sg1000_exp/fm_unit.h",
+		MAME_DIR .. "src/devices/bus/sg1000_exp/kblink.cpp",
+		MAME_DIR .. "src/devices/bus/sg1000_exp/kblink.h",
+		MAME_DIR .. "src/devices/bus/sg1000_exp/sg1000exp.cpp",
+		MAME_DIR .. "src/devices/bus/sg1000_exp/sg1000exp.h",
 		MAME_DIR .. "src/devices/bus/sg1000_exp/sk1100.cpp",
 		MAME_DIR .. "src/devices/bus/sg1000_exp/sk1100.h",
 		MAME_DIR .. "src/devices/bus/sg1000_exp/sk1100prn.cpp",
 		MAME_DIR .. "src/devices/bus/sg1000_exp/sk1100prn.h",
-		MAME_DIR .. "src/devices/bus/sg1000_exp/kblink.cpp",
-		MAME_DIR .. "src/devices/bus/sg1000_exp/kblink.h",
+		MAME_DIR .. "src/devices/bus/sg1000_exp/sp400.cpp",
+		MAME_DIR .. "src/devices/bus/sg1000_exp/sp400.h",
 	}
 end
 
@@ -4790,6 +4794,8 @@ if (BUSES["QBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/qbus/qg640.h",
 		MAME_DIR .. "src/devices/bus/qbus/qtx.cpp",
 		MAME_DIR .. "src/devices/bus/qbus/qtx.h",
+		MAME_DIR .. "src/devices/bus/qbus/tdl12.cpp",
+		MAME_DIR .. "src/devices/bus/qbus/tdl12.h",
 		MAME_DIR .. "src/devices/bus/qbus/uknc_kmd.cpp",
 		MAME_DIR .. "src/devices/bus/qbus/uknc_kmd.h",
 	}
@@ -5835,6 +5841,8 @@ if (BUSES["AMIGA_CPUSLOT"]~=null) then
 		MAME_DIR .. "src/devices/bus/amiga/cpuslot/cpuslot.h",
 		MAME_DIR .. "src/devices/bus/amiga/cpuslot/cards.cpp",
 		MAME_DIR .. "src/devices/bus/amiga/cpuslot/cards.h",
+		MAME_DIR .. "src/devices/bus/amiga/cpuslot/a570.cpp",
+		MAME_DIR .. "src/devices/bus/amiga/cpuslot/a570.h",
 		MAME_DIR .. "src/devices/bus/amiga/cpuslot/a590.cpp",
 		MAME_DIR .. "src/devices/bus/amiga/cpuslot/a590.h",
 		MAME_DIR .. "src/devices/bus/amiga/cpuslot/action_replay.cpp",
