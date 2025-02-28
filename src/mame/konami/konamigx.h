@@ -144,6 +144,7 @@ public:
 	void konamigx_precache_registers(void);
 
 	void wipezbuf(int noshadow);
+	void set_brightness(int layer);
 
 	void dmastart_callback(int data);
 
@@ -246,6 +247,9 @@ protected:
 
 	uint16_t *m_gx_spriteram = nullptr;
 	std::unique_ptr<uint16_t[]> m_gx_spriteram_alloc;
+
+	u8 m_current_brightness = 0xff;
+	u8 m_brightness[3]{};
 
 	// mirrored K054338 settings
 	int *m_K054338_shdRGB = nullptr;
