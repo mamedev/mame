@@ -135,8 +135,10 @@ mfabfz85 -bios 0, 3 and 4 work; others produce rubbish.
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 #include "machine/clock.h"
 #include "machine/i8251.h"
+#include "machine/wd_fdc.h"
 #include "bus/rs232/rs232.h"
 #include "speaker.h"
 #include "softlist_dev.h"
@@ -186,6 +188,9 @@ public:
 		, m_bootview(*this, "bootview") // see memory map
 		, m_uart(*this, "uart2")
 		, m_bankswitch(*this, "bank_address")
+		, m_fdc(*this, "fdc")
+		, m_floppy0(*this, "fdc:0")
+		, m_floppy1(*this, "fdc:1")
 	{ }
 
 	void mfacpm(machine_config &config);
@@ -202,6 +207,9 @@ private:
 	required_device<i8251_device> m_uart;
 	required_ioport m_bankswitch;
 	uint8_t *m_ram_ptr;
+	required_device<fd1793_device> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
 };
 
 uint8_t mfacpm_state::ram_r(offs_t offset)
@@ -260,16 +268,32 @@ void mfacpm_state::mfacpm_io(address_map &map)
 	map.global_mask(0xff);
 	map(0x90, 0x9f).rw("uart2", FUNC(i8251_device::read), FUNC(i8251_device::write)); // secondary serial port
 	map(0xa0, 0xaf).rw("uart1", FUNC(i8251_device::read), FUNC(i8251_device::write)); // Terminal and data transfer
-	// map(0xc0, 0xc3).rw // Floppy port, 0xc0 ... 0xc3 and 0xc8 are used with a WD1793 floppy controller, 80 tracks, 9 sectors on 3.5" DD media
-	// for the open CP/M, 40 tracks, 8 sectors on 3.5" DD media for the original CP/M
+	
+/* Floppy interface, needed for CP/M, supported in MAT32K und MAT85+
+https://oldcomputers.dyndns.org/public/pub/rechner/mfa_mikrocomputer_fuer_ausbildung/mfa_floppy_controller_4.7b_and_drive/mfa_-_floppy_disk(seiten_einzeln).pdf
+Motor works on both drives simultaneously, and is triggered for three seconds by every operation of 
+the control port. Three seconds after the last operation on the control port, the motors are switched off.
+DRQ and INTRQ are used to synchronize the data transfer. The floppy controller is connected to RST5.5, although solder bridges can alter this to RST6.5 or 7.5.
+
+	0xc0 write to the command register / read from the status register
+	0xc1 track register
+	0xc2 sector register
+	0xc3 data register
+	0xc4 control register, write only, Bit 0=1: Drive A select, Bit 1=1: Drive B select, Bit 2=0: double density, Bit 3: side select
+	0xc8 halt CPU via the READY signal, regardless of the content of the accumulator
+*/	
+	map(0xc0, 0xc3).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
+	// map(0xc4, 0xc4).rw(m_fdc, FUNC(fd1793_device::write));
+	// map(0xc8, 0xc8).rw(m_fdc, FUNC(fd1793_device::write)); 
 	// map(0xe0, 0xef).rw // Centronics printer card
 	// map(0xf0, 0xff).rw // tertiary serial port
 }
-/* Floppy interface, needed for CP/M
-https://oldcomputers.dyndns.org/public/pub/rechner/mfa_mikrocomputer_fuer_ausbildung/mfa_floppy_controller_4.7b_and_drive/mfa_-_floppy_disk(seiten_einzeln).pdf
-The floppy interface at 0xc0 is based on the WD1793 floppy controller. IO lines 0xc0 ... 0xc3 are used for communication,
-0xc8 halts the processor via the CPU's READY line. DRQ and INTRQ are used to synchronize the data transfer.
-The floppy controller responds to RST5.5. */
+
+
+static void mfacpm_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd", FLOPPY_35_DD);
+}
 
 /* The parallel printer card uses a non-standard cable to connect to printers with a Centronics interface
 https://oldcomputers.dyndns.org/public/pub/rechner/mfa_mikrocomputer_fuer_ausbildung/mfa_programmable_parallel_&_eprommer_4.3b/mfa_-_programmable_parallel_&_eprommer_4.3.pdf
@@ -507,7 +531,11 @@ void mfacpm_state::mfacpm(machine_config &config)
 	// uart2 - cassette - clock comes from 2MHz through a divider consisting of 4 chips and some jumpers.
 	I8251(config, m_uart, 4_MHz_XTAL / 2);
 
-	// Needs at least a floppy at 0xc0
+	
+	/* floppy disk */
+	FD1793(config, m_fdc, 4_MHz_XTAL / 4);
+	FLOPPY_CONNECTOR(config, "fdc:0", mfacpm_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", mfacpm_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	SOFTWARE_LIST(config, "floppy_list").set_original("mfacpm");
 }
