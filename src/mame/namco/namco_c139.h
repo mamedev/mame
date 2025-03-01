@@ -58,8 +58,8 @@ private:
 
 	osd_file::ptr m_line_rx;
 	osd_file::ptr m_line_tx;
-	char m_localhost[256]{};
-	char m_remotehost[256]{};
+	std::string m_localhost;
+	std::string m_remotehost;
 	uint8_t m_buffer0[0x200]{};
 	uint8_t m_buffer1[0x200]{};
 
@@ -73,11 +73,11 @@ private:
 	TIMER_CALLBACK_MEMBER(tick_timer_callback);
 
 	void comm_tick();
-	void read_data(int dataSize);
-	int read_frame(int dataSize);
-	int find_sync_bit(int txOffset, int txMask);
-	void send_data(int dataSize);
-	void send_frame(int dataSize);
+	void read_data(int data_size);
+	int read_frame(int data_size);
+	int find_sync_bit(int tx_offset, int tx_mask);
+	void send_data(int data_size);
+	void send_frame(int data_size);
 };
 
 

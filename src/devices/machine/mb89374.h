@@ -129,19 +129,20 @@ private:
 	uint8_t  m_tx_buffer[0x200];
 	uint16_t m_tx_offset;
 
+	osd_file::ptr m_line_rx;
+	osd_file::ptr m_line_tx;
+	std::string m_localhost;
+	std::string m_remotehost;
+	uint8_t m_socket_buffer[0x200];
+
+	void checkSockets();
+
 	void    rxReset();
 	uint8_t rxRead();
 
 	void txReset();
 	void txWrite(uint8_t data);
 	void txComplete();
-
-	osd_file::ptr m_line_rx;
-	osd_file::ptr m_line_tx;
-	char m_localhost[256];
-	char m_remotehost[256];
-	uint8_t m_socket_buffer[0x200];
-	void checkSockets();
 };
 
 

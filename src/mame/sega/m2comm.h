@@ -16,7 +16,6 @@
 class m2comm_device : public device_t
 {
 public:
-	// construction/destruction
 	m2comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// single bit registers (74LS74)
@@ -45,7 +44,6 @@ public:
 	void set_frameoffset(uint16_t offset) { m_frameoffset = offset; }
 
 protected:
-	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -58,8 +56,8 @@ private:
 
 	osd_file::ptr m_line_rx;  // rx line - can be either differential, simple serial or toslink
 	osd_file::ptr m_line_tx;  // tx line - is differential, simple serial and toslink
-	char m_localhost[256]{};
-	char m_remotehost[256]{};
+	std::string m_localhost;
+	std::string m_remotehost;
 	uint8_t m_buffer0[0x1000]{};
 	uint8_t m_buffer1[0x1000]{};
 	uint8_t m_framesync;
@@ -75,9 +73,9 @@ private:
 
 	void comm_tick();
 	void read_fg();
-	int read_frame(int dataSize);
-	void send_data(uint8_t frameType, int frameStart, int frameSize, int dataSize);
-	void send_frame(int dataSize);
+	int read_frame(int data_size);
+	void send_data(uint8_t frame_type, int frame_start, int frame_size, int data_size);
+	void send_frame(int data_size);
 #endif
 };
 

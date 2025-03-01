@@ -23,13 +23,13 @@ Notes:
 */
 
 #include "emu.h"
-#include "emuopts.h"
 #include "xbdcomm.h"
-
-#define Z80_TAG     "commcpu"
+#include "emuopts.h"
 
 #define VERBOSE 0
 #include "logmacro.h"
+
+#define Z80_TAG "commcpu"
 
 /*************************************
  *  XBDCOMM Memory Map
@@ -73,13 +73,13 @@ DEFINE_DEVICE_TYPE(XBDCOMM, xbdcomm_device, "xbdcomm", "Sega X-Board Communicati
 
 void xbdcomm_device::device_add_mconfig(machine_config &config)
 {
-	Z80(config, m_cpu, 8000000); // 16 MHz / 2
+	Z80(config, m_cpu, 16_MHz_XTAL / 2);
 	m_cpu->set_memory_map(&xbdcomm_device::xbdcomm_mem);
 	m_cpu->set_io_map(&xbdcomm_device::xbdcomm_io);
 
 	MB8421(config, m_dpram).intl_callback().set(FUNC(xbdcomm_device::dpram_int5_w));
 
-	MB89372(config, m_mpc, 8000000); // 16 MHz / 2
+	MB89372(config, m_mpc, 16_MHz_XTAL / 2);
 	m_mpc->out_hreq_callback().set(FUNC(xbdcomm_device::mpc_hreq_w));
 	m_mpc->out_irq_callback().set(FUNC(xbdcomm_device::mpc_int7_w));
 	m_mpc->in_memr_callback().set(FUNC(xbdcomm_device::mpc_mem_r));
@@ -109,19 +109,9 @@ xbdcomm_device::xbdcomm_device(const machine_config &mconfig, const char *tag, d
 	m_mpc(*this, "commmpc")
 {
 #ifdef XBDCOMM_SIMULATION
-	// prepare localhost "filename"
-	m_localhost[0] = 0;
-	strcat(m_localhost, "socket.");
-	strcat(m_localhost, mconfig.options().comm_localhost());
-	strcat(m_localhost, ":");
-	strcat(m_localhost, mconfig.options().comm_localport());
-
-	// prepare remotehost "filename"
-	m_remotehost[0] = 0;
-	strcat(m_remotehost, "socket.");
-	strcat(m_remotehost, mconfig.options().comm_remotehost());
-	strcat(m_remotehost, ":");
-	strcat(m_remotehost, mconfig.options().comm_remoteport());
+	// prepare "filenames"
+	m_localhost = util::string_format("socket.%s:%s", mconfig.options().comm_localhost(), mconfig.options().comm_localport());
+	m_remotehost = util::string_format("socket.%s:%s", mconfig.options().comm_remotehost(), mconfig.options().comm_remoteport());
 #endif
 }
 
@@ -188,14 +178,16 @@ uint8_t xbdcomm_device::ex_r(offs_t offset)
 
 		case 0x10:
 			// status register?
-			LOG("xbdcomm-ex_r: %02x %02x\n", offset, m_z80_stat);
+			if (!machine().side_effects_disabled())
+				LOG("xbdcomm-ex_r: %02x %02x\n", offset, m_z80_stat);
 #ifdef XBDCOMM_SIMULATION
 			comm_tick();
 #endif
 			return m_z80_stat;
 
 		default:
-			logerror("xbdcomm-ex_r: %02x\n", offset);
+			if (!machine().side_effects_disabled())
+				logerror("xbdcomm-ex_r: %02x\n", offset);
 			return 0xff;
 }	}
 
@@ -327,50 +319,44 @@ void xbdcomm_device::comm_tick()
 {
 	if (m_linkenable == 0x01)
 	{
-		std::error_condition filerr;
-		uint64_t filesize; // unused
+		uint8_t cab_index = mpc_mem_r(0x4000);
+		uint8_t cab_count = mpc_mem_r(0x4001);
 
-		uint8_t cabIdx = mpc_mem_r(0x4000);
-		uint8_t cabCnt = mpc_mem_r(0x4001);
-
-		int frameStartTx = 0x4010;
-		int frameStartRx = 0x4310;
-		int frameSize;
-		switch (cabCnt)
+		int frame_start_tx = 0x4010;
+		int frame_start_rx = 0x4310;
+		int frame_size = 0;
+		switch (cab_count)
 		{
 			case 1:
-				frameSize = 0x300;
+				frame_size = 0x300;
 				break;
 			case 2:
-				frameSize = 0x180;
+				frame_size = 0x180;
 				break;
 			case 3:
-				frameSize = 0x110;
+				frame_size = 0x110;
 				break;
 			case 4:
-				frameSize = 0x0c0;
+				frame_size = 0x0c0;
 				break;
 			case 5:
 			case 6:
-				frameSize = 0x080;
+				frame_size = 0x080;
 				break;
 			case 7:
 			case 8:
-				frameSize = 0x060;
+				frame_size = 0x060;
 				break;
 			default:
-				frameSize = 0x000;
+				frame_size = 0x000;
 				break;
 		}
-		int frameOffset = frameStartTx + (frameSize * (cabIdx - 1));
 
-		int dataSize = frameSize + 1;
-		int recv = 0;
-		int idx = 0;
+		int data_size = frame_size + 1;
 
-		bool isMaster = (cabIdx == 0x01);
-		bool isSlave = (cabIdx > 0x01);
-		bool isRelay = (cabIdx == 0x00);
+		bool is_master = (cab_index == 0x01);
+		bool is_slave = (cab_index > 0x01);
+		bool is_relay = (cab_index == 0x00);
 
 		if (m_linkalive == 0x02)
 		{
@@ -386,11 +372,12 @@ void xbdcomm_device::comm_tick()
 			// check rx socket
 			if (!m_line_rx)
 			{
-				osd_printf_verbose("XBDCOMM: listen on %s\n", m_localhost);
-				filerr = osd_file::open(m_localhost, OPEN_FLAG_CREATE, m_line_rx, filesize);
+				osd_printf_verbose("XBDCOMM: rx listen on %s\n", m_localhost);
+				uint64_t filesize; // unused
+				std::error_condition filerr = osd_file::open(m_localhost, OPEN_FLAG_CREATE, m_line_rx, filesize);
 				if (filerr.value() != 0)
 				{
-					osd_printf_verbose("XBDCOMM: rx connection failed\n");
+					osd_printf_verbose("XBDCOMM: rx connection failed - %02x, %s\n", filerr.value(), filerr.message());
 					m_line_rx.reset();
 				}
 			}
@@ -398,11 +385,12 @@ void xbdcomm_device::comm_tick()
 			// check tx socket
 			if (!m_line_tx)
 			{
-				osd_printf_verbose("XBDCOMM: connect to %s\n", m_remotehost);
-				filerr = osd_file::open(m_remotehost, 0, m_line_tx, filesize);
+				osd_printf_verbose("XBDCOMM: tx connect to %s\n", m_remotehost);
+				uint64_t filesize; // unused
+				std::error_condition filerr = osd_file::open(m_remotehost, 0, m_line_tx, filesize);
 				if (filerr.value() != 0)
 				{
-					osd_printf_verbose("XBDCOMM: tx connection failed\n");
+					osd_printf_verbose("XBDCOMM: tx connection failed - %02x, %s\n", filerr.value(), filerr.message());
 					m_line_tx.reset();
 				}
 			}
@@ -411,16 +399,16 @@ void xbdcomm_device::comm_tick()
 			if (m_line_rx && m_line_tx)
 			{
 				// try to read one message
-				recv = read_frame(dataSize);
+				int recv = read_frame(data_size);
 				while (recv > 0)
 				{
 					// check message id
-					idx = m_buffer0[0];
+					uint8_t idx = m_buffer0[0];
 
 					// 0xff - link id
 					if (idx == 0xff)
 					{
-						if (isMaster)
+						if (is_master)
 						{
 							// master gets first id and starts next state
 							m_linkid = 0x01;
@@ -430,26 +418,26 @@ void xbdcomm_device::comm_tick()
 						else
 						{
 							// slave get own id, relay does nothing
-							if (isSlave)
+							if (is_slave)
 							{
 								m_buffer0[1]++;
 								m_linkid = m_buffer0[1];
 							}
 
 							// forward message to other nodes
-							send_frame(dataSize);
+							send_frame(data_size);
 						}
 					}
 
 					// 0xfe - link size
 					else if (idx == 0xfe)
 					{
-						if (isSlave || isRelay)
+						if (is_slave || is_relay)
 						{
 							m_linkcount = m_buffer0[1];
 
 							// forward message to other nodes
-							send_frame(dataSize);
+							send_frame(data_size);
 						}
 
 						// consider it done
@@ -462,20 +450,20 @@ void xbdcomm_device::comm_tick()
 
 
 					if (m_linkalive == 0x00)
-						recv = read_frame(dataSize);
+						recv = read_frame(data_size);
 					else
 						recv = 0;
 				}
 
 				// if we are master and link is not yet established
-				if (isMaster && (m_linkalive == 0x00))
+				if (is_master && (m_linkalive == 0x00))
 				{
 					// send first packet
 					if (m_linktimer == 0x01)
 					{
 						m_buffer0[0] = 0xff;
 						m_buffer0[1] = 0x01;
-						send_frame(dataSize);
+						send_frame(data_size);
 					}
 
 					// send second packet
@@ -483,7 +471,7 @@ void xbdcomm_device::comm_tick()
 					{
 						m_buffer0[0] = 0xfe;
 						m_buffer0[1] = m_linkcount;
-						send_frame(dataSize);
+						send_frame(data_size);
 
 						// consider it done
 						osd_printf_verbose("XBDCOMM: link established - id %02x of %02x\n", m_linkid, m_linkcount);
@@ -506,25 +494,25 @@ void xbdcomm_device::comm_tick()
 		{
 			// link established
 			// try to read a message
-			recv = read_frame(dataSize);
+			int recv = read_frame(data_size);
 			while (recv > 0)
 			{
 				// check if valid id
-				idx = m_buffer0[0];
+				uint8_t idx = m_buffer0[0];
 				if (idx > 0 && idx <= m_linkcount)
 				{
 					// save message to "ring buffer"
-					frameOffset = frameStartTx + ((idx - 1) * frameSize);
-					for (int j = 0x00 ; j < frameSize ; j++)
+					int frame_offset = frame_start_tx + ((idx - 1) * frame_size);
+					for (int j = 0x00 ; j < frame_size ; j++)
 					{
-						mpc_mem_w(frameOffset + j, m_buffer0[1 + j]);
+						mpc_mem_w(frame_offset + j, m_buffer0[1 + j]);
 					}
 
 					// if not own message
-					if (idx != cabIdx)
+					if (idx != cab_index)
 					{
 						// forward message to other nodes
-						send_frame(dataSize);
+						send_frame(data_size);
 					}
 					else
 					{
@@ -533,24 +521,24 @@ void xbdcomm_device::comm_tick()
 				}
 
 				// try to read another message
-				recv = read_frame(dataSize);
+				recv = read_frame(data_size);
 			}
 
 			// update buffers... guesswork
 			for (int j = 0x00 ; j < 0x300 ; j++)
 			{
-				mpc_mem_w(frameStartRx + j, mpc_mem_r(frameStartTx + j));
+				mpc_mem_w(frame_start_rx + j, mpc_mem_r(frame_start_tx + j));
 			}
 
 			// update "ring buffer" if link established
 			// live relay does not send data
-			if (cabIdx != 0x00)
+			if (cab_index != 0x00)
 			{
 				// check ready-to-send flag
 				if (m_xbd_stat & 0x01)
 				{
-					frameOffset = frameStartTx + ((cabIdx - 1) * frameSize);
-					send_data(cabIdx, frameOffset, frameSize, dataSize);
+					int frame_offset = frame_start_tx + ((cab_index - 1) * frame_size);
+					send_data(cab_index, frame_offset, frame_size, data_size);
 					m_z80_stat = 0x01;
 				}
 			}
@@ -561,21 +549,21 @@ void xbdcomm_device::comm_tick()
 	}
 }
 
-int xbdcomm_device::read_frame(int dataSize)
+int xbdcomm_device::read_frame(int data_size)
 {
 	if (!m_line_rx)
 		return 0;
 
 	// try to read a message
 	uint32_t recv = 0;
-	std::error_condition filerr = m_line_rx->read(m_buffer0, 0, dataSize, recv);
+	std::error_condition filerr = m_line_rx->read(m_buffer0, 0, data_size, recv);
 	if (recv > 0)
 	{
 		// check if message complete
-		if (recv != dataSize)
+		if (recv != data_size)
 		{
 			// only part of a message - read on
-			uint32_t togo = dataSize - recv;
+			uint32_t togo = data_size - recv;
 			int offset = recv;
 			while (togo > 0)
 			{
@@ -596,10 +584,11 @@ int xbdcomm_device::read_frame(int dataSize)
 	}
 	if ((!filerr && recv == 0) || (filerr && std::errc::operation_would_block != filerr))
 	{
-		osd_printf_verbose("XBDCOMM: rx connection error\n");
+		osd_printf_verbose("XBDCOMM: rx connection failed - %02x, %s\n", filerr.value(), filerr.message());
 		m_line_rx.reset();
 		if (m_linkalive == 0x01)
 		{
+			osd_printf_verbose("XBDCOMM: link lost\n");
 			m_linkalive = 0x02;
 			m_linktimer = 0x00;
 			m_z80_stat = 0xff;
@@ -608,28 +597,29 @@ int xbdcomm_device::read_frame(int dataSize)
 	return recv;
 }
 
-void xbdcomm_device::send_data(uint8_t frameType, int frameOffset, int frameSize, int dataSize)
+void xbdcomm_device::send_data(uint8_t frame_type, int frame_offset, int frame_size, int data_size)
 {
-	m_buffer0[0] = frameType;
-	for (int i = 0x00 ; i < frameSize ; i++)
+	m_buffer0[0] = frame_type;
+	for (int i = 0x00 ; i < frame_size ; i++)
 	{
-		m_buffer0[1 + i] = mpc_mem_r(frameOffset + i);
+		m_buffer0[1 + i] = mpc_mem_r(frame_offset + i);
 	}
-	send_frame(dataSize);
+	send_frame(data_size);
 }
 
-void xbdcomm_device::send_frame(int dataSize){
+void xbdcomm_device::send_frame(int data_size){
 	if (!m_line_tx)
 		return;
 
 	uint32_t written;
-	std::error_condition filerr = m_line_tx->write(&m_buffer0, 0, dataSize, written);
+	std::error_condition filerr = m_line_tx->write(&m_buffer0, 0, data_size, written);
 	if (filerr)
 	{
-		osd_printf_verbose("XBDCOMM: tx connection error\n");
+		osd_printf_verbose("XBDCOMM: tx connection failed - %02x, %s\n", filerr.value(), filerr.message());
 		m_line_tx.reset();
 		if (m_linkalive == 0x01)
 		{
+			osd_printf_verbose("XBDCOMM: link lost\n");
 			m_linkalive = 0x02;
 			m_linktimer = 0x00;
 			m_z80_stat = 0xff;

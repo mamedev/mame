@@ -43,8 +43,8 @@ protected:
 private:
 	osd_file::ptr m_line_rx; // "fake" RX line, real hardware is half-duplex
 	osd_file::ptr m_line_tx; // "fake" TX line, real hardware is half-duplex
-	char m_localhost[256]{};
-	char m_remotehost[256]{};
+	std::string m_localhost;
+	std::string m_remotehost;
 	u8 m_buffer0[0x201]{};
 	u8 m_buffer1[0x201]{};
 	u8 m_linkenable = 0;
@@ -54,8 +54,8 @@ private:
 	void set_mode(u8 data);
 	void set_ctrl(u8 data);
 	void comm_tick();
-	int read_frame(int dataSize);
-	void send_frame(int dataSize);
+	int read_frame(int data_size);
+	void send_frame(int data_size);
 };
 
 class k056230_viper_device : public k056230_device

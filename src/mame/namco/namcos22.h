@@ -11,14 +11,16 @@
 
 #pragma once
 
+#include "namcomcu.h"
+#include "namco_c139.h"
+
 #include "machine/eeprompar.h"
 #include "machine/mb87078.h"
-#include "namcomcu.h"
 #include "machine/timer.h"
 #include "sound/c352.h"
-#include "namco_c139.h"
-#include "video/rgbutil.h"
 #include "video/poly.h"
+
+#include "video/rgbutil.h"
 
 #include "emupal.h"
 #include "screen.h"

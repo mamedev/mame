@@ -67,8 +67,8 @@ Sega System Multi32 Comm PCB 837-8792-91
 */
 
 #include "emu.h"
-#include "emuopts.h"
 #include "s32comm.h"
+#include "emuopts.h"
 
 #define VERBOSE 0
 #include "logmacro.h"
@@ -101,19 +101,9 @@ s32comm_device::s32comm_device(const machine_config &mconfig, const char *tag, d
 {
 	std::fill(std::begin(m_shared), std::end(m_shared), 0);
 
-	// prepare localhost "filename"
-	m_localhost[0] = 0;
-	strcat(m_localhost, "socket.");
-	strcat(m_localhost, mconfig.options().comm_localhost());
-	strcat(m_localhost, ":");
-	strcat(m_localhost, mconfig.options().comm_localport());
-
-	// prepare remotehost "filename"
-	m_remotehost[0] = 0;
-	strcat(m_remotehost, "socket.");
-	strcat(m_remotehost, mconfig.options().comm_remotehost());
-	strcat(m_remotehost, ":");
-	strcat(m_remotehost, mconfig.options().comm_remoteport());
+	// prepare "filenames"
+	m_localhost = util::string_format("socket.%s:%s", mconfig.options().comm_localhost(), mconfig.options().comm_localport());
+	m_remotehost = util::string_format("socket.%s:%s", mconfig.options().comm_remotehost(), mconfig.options().comm_remoteport());
 
 	m_framesync = mconfig.options().comm_framesync() ? 0x01 : 0x00;
 }
@@ -140,7 +130,8 @@ void s32comm_device::device_reset()
 uint8_t s32comm_device::zfg_r(offs_t offset)
 {
 	uint8_t result = m_zfg | 0xFE;
-	LOG("s32comm-zfg_r: read register %02x for value %02x\n", offset, result);
+	if (!machine().side_effects_disabled())
+		LOG("s32comm-zfg_r: read register %02x for value %02x\n", offset, result);
 	return result;
 }
 
@@ -153,7 +144,8 @@ void s32comm_device::zfg_w(uint8_t data)
 uint8_t s32comm_device::share_r(offs_t offset)
 {
 	uint8_t result = m_shared[offset];
-	LOG("s32comm-share_r: read shared memory %02x for value %02x\n", offset, result);
+	if (!machine().side_effects_disabled())
+		LOG("s32comm-share_r: read shared memory %02x for value %02x\n", offset, result);
 	return result;
 }
 
@@ -227,15 +219,18 @@ void s32comm_device::set_linktype(uint16_t linktype)
 	{
 		case 14084:
 			// Rad Rally
-			osd_printf_verbose("S32COMM: set mode 'EPR-14084 - Rad Rally'\n");
+			LOG("S32COMM: set mode 'EPR-14084 - Rad Rally'\n");
 			break;
 		case 15033:
 			// Stadium Cross / OutRunners
-			osd_printf_verbose("S32COMM: set mode 'EPR-15033 - Stadium Cross / OutRunners'\n");
+			LOG("S32COMM: set mode 'EPR-15033 - Stadium Cross / OutRunners'\n");
 			break;
 		case 15612:
 			// F1 Super Lap
-			osd_printf_verbose("S32COMM: set mode 'EPR-15612 - F1 Super Lap'\n");
+			LOG("S32COMM: set mode 'EPR-15612 - F1 Super Lap'\n");
+			break;
+		default:
+			logerror("S32COMM-set_linktype: unknown linktype %d\n", linktype);
 			break;
 	}
 }
@@ -256,24 +251,27 @@ void s32comm_device::comm_tick()
 			// F1 Super Lap
 			comm_tick_15612();
 			break;
+		default:
+			// do nothing
+			break;
 	}
 }
 
-int s32comm_device::read_frame(int dataSize)
+int s32comm_device::read_frame(int data_size)
 {
 	if (!m_line_rx)
 		return 0;
 
 	// try to read a message
 	uint32_t recv = 0;
-	std::error_condition filerr = m_line_rx->read(m_buffer0, 0, dataSize, recv);
+	std::error_condition filerr = m_line_rx->read(m_buffer0, 0, data_size, recv);
 	if (recv > 0)
 	{
 		// check if message complete
-		if (recv != dataSize)
+		if (recv != data_size)
 		{
 			// only part of a message - read on
-			uint32_t togo = dataSize - recv;
+			uint32_t togo = data_size - recv;
 			int offset = recv;
 			while (togo > 0)
 			{
@@ -296,11 +294,11 @@ int s32comm_device::read_frame(int dataSize)
 	}
 	if ((!filerr && recv == 0) || (filerr && std::errc::operation_would_block != filerr))
 	{
-		osd_printf_verbose("S32COMM: rx connection error\n");
+		osd_printf_verbose("S32COMM: rx connection failed - %02x, %s\n", filerr.value(), filerr.message());
 		m_line_rx.reset();
 		if (m_linkalive == 0x01)
 		{
-			osd_printf_verbose("S32COMM: rx connection lost\n");
+			osd_printf_verbose("S32COMM: link lost\n");
 			m_linkalive = 0x02;
 			m_linktimer = 0x00;
 		}
@@ -308,30 +306,30 @@ int s32comm_device::read_frame(int dataSize)
 	return recv;
 }
 
-void s32comm_device::send_data(uint8_t frameType, int frameStart, int frameSize, int dataSize)
+void s32comm_device::send_data(uint8_t frame_type, int frame_start, int frame_size, int data_size)
 {
-	m_buffer0[0] = frameType;
-	for (int i = 0x00 ; i < frameSize ; i++)
+	m_buffer0[0] = frame_type;
+	for (int i = 0x00 ; i < frame_size ; i++)
 	{
-		m_buffer0[1 + i] = m_shared[frameStart + i];
+		m_buffer0[1 + i] = m_shared[frame_start + i];
 	}
 	// forward message to next node
-	send_frame(dataSize);
+	send_frame(data_size);
 }
 
-void s32comm_device::send_frame(int dataSize){
+void s32comm_device::send_frame(int data_size){
 	if (!m_line_tx)
 		return;
 
 	uint32_t written = 0;
-	std::error_condition filerr = m_line_tx->write(&m_buffer0, 0, dataSize, written);
+	std::error_condition filerr = m_line_tx->write(&m_buffer0, 0, data_size, written);
 	if (filerr)
 	{
-		osd_printf_verbose("S32COMM: tx connection error\n");
+		osd_printf_verbose("S32COMM: tx connection failed - %02x, %s\n", filerr.value(), filerr.message());
 		m_line_tx.reset();
 		if (m_linkalive == 0x01)
 		{
-			osd_printf_verbose("S32COMM: tx connection lost\n");
+			osd_printf_verbose("S32COMM: link lost\n");
 			m_linkalive = 0x02;
 			m_linktimer = 0x00;
 		}
@@ -347,19 +345,12 @@ void s32comm_device::comm_tick_14084()
 	// m_shared[4] = node link status (0 = offline, 1 = online)
 	if (m_linkenable == 0x01)
 	{
-		std::error_condition filerr;
-		uint64_t filesize; // unused
+		int frame_size = 0x0080;
+		int data_size = frame_size + 1;
 
-		int frameStart = 0x0480;
-		int frameOffset = 0x0000;
-		int frameSize = 0x0080;
-		int dataSize = frameSize + 1;
-		int recv = 0;
-		int idx = 0;
-
-		bool isMaster = (m_shared[2] == 0x01);
-		bool isSlave = (m_shared[2] == 0x00);
-		bool isRelay = (m_shared[2] == 0xFF);
+		bool is_master = (m_shared[2] == 0x01);
+		bool is_slave = (m_shared[2] == 0x00);
+		bool is_relay = (m_shared[2] == 0xFF);
 
 		if (m_linkalive == 0x02)
 		{
@@ -375,11 +366,12 @@ void s32comm_device::comm_tick_14084()
 			// check rx socket
 			if (!m_line_rx)
 			{
-				osd_printf_verbose("S32COMM: listen on %s\n", m_localhost);
-				filerr = osd_file::open(m_localhost, OPEN_FLAG_CREATE, m_line_rx, filesize);
+				osd_printf_verbose("S32COMM: rx listen on %s\n", m_localhost);
+				uint64_t filesize; // unused
+				std::error_condition filerr = osd_file::open(m_localhost, OPEN_FLAG_CREATE, m_line_rx, filesize);
 				if (filerr.value() != 0)
 				{
-					osd_printf_verbose("S32COMM: rx connection failed\n");
+					osd_printf_verbose("S32COMM: rx connection failed - %02x, %s\n", filerr.value(), filerr.message());
 					m_line_rx.reset();
 				}
 			}
@@ -387,11 +379,12 @@ void s32comm_device::comm_tick_14084()
 			// check tx socket
 			if (!m_line_tx)
 			{
-				osd_printf_verbose("S32COMM: connect to %s\n", m_remotehost);
-				filerr = osd_file::open(m_remotehost, 0, m_line_tx, filesize);
+				osd_printf_verbose("S32COMM: tx connect to %s\n", m_remotehost);
+				uint64_t filesize; // unused
+				std::error_condition filerr = osd_file::open(m_remotehost, 0, m_line_tx, filesize);
 				if (filerr.value() != 0)
 				{
-					osd_printf_verbose("S32COMM: tx connection failed\n");
+					osd_printf_verbose("S32COMM: tx connection failed - %02x, %s\n", filerr.value(), filerr.message());
 					m_line_tx.reset();
 				}
 			}
@@ -400,45 +393,45 @@ void s32comm_device::comm_tick_14084()
 			if (m_line_rx && m_line_tx)
 			{
 				// try to read one message
-				recv = read_frame(dataSize);
+				int recv = read_frame(data_size);
 				while (recv > 0)
 				{
 					// check if message id
-					idx = m_buffer0[0];
+					uint8_t idx = m_buffer0[0];
 
-					// 0xFF - link id
+					// 0xff - link id
 					if (idx == 0xff)
 					{
-						if (isMaster)
+						if (is_master)
 						{
 							// master gets first id and starts next state
 							m_linkid = 0x01;
 							m_linkcount = m_buffer0[1];
 							m_linktimer = 0x00;
 						}
-						else if (isSlave || isRelay)
+						else if (is_slave || is_relay)
 						{
 							// slave gets own id
-							if (isSlave)
+							if (is_slave)
 							{
 								m_buffer0[1]++;
 								m_linkid = m_buffer0[1];
 							}
 
 							// slave and relay forward message
-							send_frame(dataSize);
+							send_frame(data_size);
 						}
 					}
 
-					// 0xFE - link size
+					// 0xfe - link size
 					else if (idx == 0xfe)
 					{
-						if (isSlave || isRelay)
+						if (is_slave || is_relay)
 						{
 							m_linkcount = m_buffer0[1];
 
 							// slave and relay forward message
-							send_frame(dataSize);
+							send_frame(data_size);
 						}
 
 						// consider it done
@@ -452,20 +445,20 @@ void s32comm_device::comm_tick_14084()
 					}
 
 					if (m_linkalive == 0x00)
-						recv = read_frame(dataSize);
+						recv = read_frame(data_size);
 					else
 						recv = 0;
 				}
 
 				// if we are master and link is not yet established
-				if (isMaster && (m_linkalive == 0x00))
+				if (is_master && (m_linkalive == 0x00))
 				{
 					// send first packet
 					if (m_linktimer == 0x01)
 					{
 						m_buffer0[0] = 0xff;
 						m_buffer0[1] = 0x01;
-						send_frame(dataSize);
+						send_frame(data_size);
 					}
 
 					// send second packet
@@ -473,7 +466,7 @@ void s32comm_device::comm_tick_14084()
 					{
 						m_buffer0[0] = 0xfe;
 						m_buffer0[1] = m_linkcount;
-						send_frame(dataSize);
+						send_frame(data_size);
 
 						// consider it done
 						osd_printf_verbose("S32COMM: link established - id %02x of %02x\n", m_linkid, m_linkcount);
@@ -500,57 +493,57 @@ void s32comm_device::comm_tick_14084()
 			do
 			{
 				// try to read one message
-				recv = read_frame(dataSize);
+				int recv = read_frame(data_size);
 				while (recv > 0)
 				{
 					// check if valid id
-					idx = m_buffer0[0];
+					uint8_t idx = m_buffer0[0];
 					if (idx > 0 && idx <= m_linkcount)
 					{
 						// if not own message
 						if (idx != m_linkid)
 						{
 							// save message to "ring buffer"
-							frameOffset = idx * frameSize;
-							for (int j = 0x00 ; j < frameSize ; j++)
+							int frame_offset = idx * frame_size;
+							for (int j = 0x00 ; j < frame_size ; j++)
 							{
-								m_shared[frameOffset + j] = m_buffer0[1 + j];
+								m_shared[frame_offset + j] = m_buffer0[1 + j];
 							}
 
 							// forward message to other nodes
-							send_frame(dataSize);
+							send_frame(data_size);
 						}
 					}
 					else
 					{
 						if (idx == 0xfc)
 						{
-							// 0xFC - VSYNC
+							// 0xfc - VSYNC
 							m_linktimer = 0x00;
-							if (!isMaster)
+							if (!is_master)
 								// forward message to other nodes
-								send_frame(dataSize);
+								send_frame(data_size);
 						}
 						if (idx == 0xfd)
 						{
-							// 0xFD - master addional bytes
-							if (!isMaster)
+							// 0xfd - master addional bytes
+							if (!is_master)
 							{
 								// save message to "ring buffer"
-								frameOffset = 0x05;
+								int frame_offset = 0x05;
 								for (int j = 0x00 ; j < 0x0b ; j++)
 								{
-									m_shared[frameOffset + j] = m_buffer0[1 + j];
+									m_shared[frame_offset + j] = m_buffer0[1 + j];
 								}
 
 								// forward message to other nodes
-								send_frame(dataSize);
+								send_frame(data_size);
 							}
 						}
 					}
 
 					// try to read another message
-					recv = read_frame(dataSize);
+					recv = read_frame(data_size);
 				}
 			}
 			while (m_linktimer == 0x01);
@@ -565,25 +558,26 @@ void s32comm_device::comm_tick_14084()
 				// check ready-to-send flag
 				if (m_shared[3] != 0x00)
 				{
-					send_data(m_linkid, frameStart, frameSize, dataSize);
+					int frame_start = 0x0480;
+					send_data(m_linkid, frame_start, frame_size, data_size);
 
 					// save message to "ring buffer"
-					frameOffset = m_linkid * frameSize;
-					for (int j = 0x00 ; j < frameSize ; j++)
+					int frame_offset = m_linkid * frame_size;
+					for (int j = 0x00 ; j < frame_size ; j++)
 					{
-						m_shared[frameOffset + j] = m_buffer0[1 + j];
+						m_shared[frame_offset + j] = m_buffer0[1 + j];
 					}
 				}
 
-				if (isMaster)
+				if (is_master)
 				{
 					// master sends some additional status bytes
-					send_data(0xfd, 0x05, 0x0b, dataSize);
+					send_data(0xfd, 0x05, 0x0b, data_size);
 
 					// send vsync
 					m_buffer0[0] = 0xfc;
 					m_buffer0[1] = 0x01;
-					send_frame(dataSize);
+					send_frame(data_size);
 				}
 			}
 
@@ -602,20 +596,12 @@ void s32comm_device::comm_tick_15033()
 	// m_shared[4] = node link status (0 = offline, 1 = online)
 	if (m_linkenable == 0x01)
 	{
-		std::error_condition filerr;
-		uint64_t filesize; // unused
+		int frame_size = 0x00E0;
+		int data_size = frame_size + 1;
 
-		int frameStartTX = 0x0710;
-		int frameStartRX = 0x0010;
-		int frameOffset = 0x0000;
-		int frameSize = 0x00E0;
-		int dataSize = frameSize + 1;
-		int recv = 0;
-		int idx = 0;
-
-		bool isMaster = (m_shared[2] == 0x01);
-		bool isSlave = (m_shared[2] == 0x00);
-		bool isRelay = (m_shared[2] == 0x02);
+		bool is_master = (m_shared[2] == 0x01);
+		bool is_slave = (m_shared[2] == 0x00);
+		bool is_relay = (m_shared[2] == 0x02);
 
 		if (m_linkalive == 0x02)
 		{
@@ -643,11 +629,12 @@ void s32comm_device::comm_tick_15033()
 			// check rx socket
 			if (!m_line_rx)
 			{
-				osd_printf_verbose("S32COMM: listen on %s\n", m_localhost);
-				filerr = osd_file::open(m_localhost, OPEN_FLAG_CREATE, m_line_rx, filesize);
+				osd_printf_verbose("S32COMM: rx listen on %s\n", m_localhost);
+				uint64_t filesize; // unused
+				std::error_condition filerr = osd_file::open(m_localhost, OPEN_FLAG_CREATE, m_line_rx, filesize);
 				if (filerr.value() != 0)
 				{
-					osd_printf_verbose("S32COMM: rx connection failed\n");
+					osd_printf_verbose("S32COMM: rx connection failed - %02x, %s\n", filerr.value(), filerr.message());
 					m_line_rx.reset();
 				}
 			}
@@ -655,11 +642,12 @@ void s32comm_device::comm_tick_15033()
 			// check tx socket
 			if (!m_line_tx)
 			{
-				osd_printf_verbose("S32COMM: connect to %s\n", m_remotehost);
-				filerr = osd_file::open(m_remotehost, 0, m_line_tx, filesize);
+				osd_printf_verbose("S32COMM: x connect to %s\n", m_remotehost);
+				uint64_t filesize; // unused
+				std::error_condition filerr = osd_file::open(m_remotehost, 0, m_line_tx, filesize);
 				if (filerr.value() != 0)
 				{
-					osd_printf_verbose("S32COMM: tx connection failed\n");
+					osd_printf_verbose("S32COMM: tx connection failed - %02x, %s\n", filerr.value(), filerr.message());
 					m_line_tx.reset();
 				}
 			}
@@ -668,45 +656,45 @@ void s32comm_device::comm_tick_15033()
 			if (m_line_rx && m_line_tx)
 			{
 				// try to read one messages
-				recv = read_frame(dataSize);
+				int recv = read_frame(data_size);
 				while (recv > 0)
 				{
 					// check if message id
-					idx = m_buffer0[0];
+					uint8_t idx = m_buffer0[0];
 
-					// 0xFF - link id
+					// 0xff - link id
 					if (idx == 0xff)
 					{
-						if (isMaster)
+						if (is_master)
 						{
 							// master gets first id and starts next state
 							m_linkid = 0x01;
 							m_linkcount = m_buffer0[1];
 							m_linktimer = 0x00;
 						}
-						else if (isSlave || isRelay)
+						else if (is_slave || is_relay)
 						{
 							// slave gets own id
-							if (isSlave)
+							if (is_slave)
 							{
 								m_buffer0[1]++;
 								m_linkid = m_buffer0[1];
 							}
 
 							// slave and relay forward message
-							send_frame(dataSize);
+							send_frame(data_size);
 						}
 					}
 
-					// 0xFE - link size
+					// 0xfe - link size
 					else if (idx == 0xfe)
 					{
-						if (isSlave || isRelay)
+						if (is_slave || is_relay)
 						{
 							m_linkcount = m_buffer0[1];
 
 							// slave and relay forward message
-							send_frame(dataSize);
+							send_frame(data_size);
 						}
 
 						// consider it done
@@ -720,20 +708,20 @@ void s32comm_device::comm_tick_15033()
 					}
 
 					if (m_linkalive == 0x00)
-						recv = read_frame(dataSize);
+						recv = read_frame(data_size);
 					else
 						recv = 0;
 				}
 
 				// if we are master and link is not yet established
-				if (isMaster && (m_linkalive == 0x00))
+				if (is_master && (m_linkalive == 0x00))
 				{
 					// send first packet
 					if (m_linktimer == 0x01)
 					{
 						m_buffer0[0] = 0xff;
 						m_buffer0[1] = 0x01;
-						send_frame(dataSize);
+						send_frame(data_size);
 					}
 
 					// send second packet
@@ -741,7 +729,7 @@ void s32comm_device::comm_tick_15033()
 					{
 						m_buffer0[0] = 0xfe;
 						m_buffer0[1] = m_linkcount;
-						send_frame(dataSize);
+						send_frame(data_size);
 
 						// consider it done
 						osd_printf_verbose("S32COMM: link established - id %02x of %02x\n", m_linkid, m_linkcount);
@@ -765,60 +753,63 @@ void s32comm_device::comm_tick_15033()
 		// if link established
 		if (m_linkalive == 0x01)
 		{
+			int frame_start_rx = 0x0010;
+			int frame_start_tx = 0x0710;
+
 			do
 			{
 				// try to read a message
-				recv = read_frame(dataSize);
+				int recv = read_frame(data_size);
 				while (recv > 0)
 				{
 					// check if valid id
-					idx = m_buffer0[0];
+					uint8_t idx = m_buffer0[0];
 					if (idx > 0 && idx <= m_linkcount)
 					{
 						// if not own message
 						if (idx != m_linkid)
 						{
 							// save message to "ring buffer"
-							frameOffset = frameStartRX + ((idx - 1) * frameSize);
-							for (int j = 0x00 ; j < frameSize ; j++)
+							int frame_offset = frame_start_rx + ((idx - 1) * frame_size);
+							for (int j = 0x00 ; j < frame_size ; j++)
 							{
-								m_shared[frameOffset + j] = m_buffer0[1 + j];
+								m_shared[frame_offset + j] = m_buffer0[1 + j];
 							}
 
 							// forward message to other nodes
-							send_frame(dataSize);
+							send_frame(data_size);
 						}
 					}
 					else
 					{
 						if (idx == 0xfc)
 						{
-							// 0xFC - VSYNC
+							// 0xfc - VSYNC
 							m_linktimer = 0x00;
-							if (!isMaster)
+							if (!is_master)
 								// forward message to other nodes
-								send_frame(dataSize);
+								send_frame(data_size);
 						}
 						if (idx == 0xfd)
 						{
-							// 0xFD - master addional bytes
-							if (!isMaster)
+							// 0xfd - master addional bytes
+							if (!is_master)
 							{
 								// save message to "ring buffer"
-								frameOffset = 0x05;
+								int frame_offset = 0x05;
 								for (int j = 0x00 ; j < 0x0b ; j++)
 								{
-									m_shared[frameOffset + j] = m_buffer0[1 + j];
+									m_shared[frame_offset + j] = m_buffer0[1 + j];
 								}
 
 								// forward message to other nodes
-								send_frame(dataSize);
+								send_frame(data_size);
 							}
 						}
 					}
 
 					// try to read another message
-					recv = read_frame(dataSize);
+					recv = read_frame(data_size);
 				}
 			}
 			while (m_linktimer == 0x01);
@@ -833,24 +824,24 @@ void s32comm_device::comm_tick_15033()
 				// check ready-to-send flag
 				if (m_shared[3] != 0x00)
 				{
-					send_data(m_linkid, frameStartTX, frameSize, dataSize);
+					send_data(m_linkid, frame_start_tx, frame_size, data_size);
 
 					// save message to "ring buffer"
-					frameOffset = frameStartRX + ((m_linkid - 1) * frameSize);
-					for (int j = 0x00 ; j < frameSize ; j++)
+					int frame_offset = frame_start_rx + ((m_linkid - 1) * frame_size);
+					for (int j = 0x00 ; j < frame_size ; j++)
 					{
-						m_shared[frameOffset + j] = m_buffer0[1 + j];
+						m_shared[frame_offset + j] = m_buffer0[1 + j];
 					}
 				}
 
-				if (isMaster){
+				if (is_master){
 					// master sends some additional status bytes
-					send_data(0xfd, 0x05, 0x0b, dataSize);
+					send_data(0xfd, 0x05, 0x0b, data_size);
 
 					// send vsync
 					m_buffer0[0] = 0xfc;
 					m_buffer0[1] = 0x01;
-					send_frame(dataSize);
+					send_frame(data_size);
 				}
 			}
 
@@ -869,19 +860,12 @@ void s32comm_device::comm_tick_15612()
 	// m_shared[4] = ready-to-send
 	if (m_linkenable == 0x01)
 	{
-		std::error_condition filerr;
-		uint64_t filesize; // unused
+		int frame_size = 0x00E0;
+		int data_size = frame_size + 1;
 
-		int frameStart = 0x0010;
-		int frameOffset = 0x0000;
-		int frameSize = 0x00E0;
-		int dataSize = frameSize + 1;
-		int recv = 0;
-		int idx = 0;
-
-		bool isMaster = (m_shared[1] == 0x01);
-		bool isSlave = (m_shared[1] == 0x02);
-		bool isRelay = (m_shared[1] == 0x00);
+		bool is_master = (m_shared[1] == 0x01);
+		bool is_slave = (m_shared[1] == 0x02);
+		bool is_relay = (m_shared[1] == 0x00);
 
 		if (m_linkalive == 0x02)
 		{
@@ -897,11 +881,12 @@ void s32comm_device::comm_tick_15612()
 			// check rx socket
 			if (!m_line_rx)
 			{
-				osd_printf_verbose("S32COMM: listen on %s\n", m_localhost);
-				filerr = osd_file::open(m_localhost, OPEN_FLAG_CREATE, m_line_rx, filesize);
+				osd_printf_verbose("S32COMM: rx listen on %s\n", m_localhost);
+				uint64_t filesize; // unused
+				std::error_condition filerr = osd_file::open(m_localhost, OPEN_FLAG_CREATE, m_line_rx, filesize);
 				if (filerr.value() != 0)
 				{
-					osd_printf_verbose("S32COMM: rx connection failed\n");
+					osd_printf_verbose("S32COMM: rx connection failed - %02x, %s\n", filerr.value(), filerr.message());
 					m_line_rx.reset();
 				}
 			}
@@ -909,11 +894,12 @@ void s32comm_device::comm_tick_15612()
 			// check tx socket
 			if (!m_line_tx)
 			{
-				osd_printf_verbose("S32COMM: connect to %s\n", m_remotehost);
-				filerr = osd_file::open(m_remotehost, 0, m_line_tx, filesize);
+				osd_printf_verbose("S32COMM: tx connect to %s\n", m_remotehost);
+				uint64_t filesize; // unused
+				std::error_condition filerr = osd_file::open(m_remotehost, 0, m_line_tx, filesize);
 				if (filerr.value() != 0)
 				{
-					osd_printf_verbose("S32COMM: tx connection failed\n");
+					osd_printf_verbose("S32COMM: tx connection failed - %02x, %s\n", filerr.value(), filerr.message());
 					m_line_tx.reset();
 				}
 			}
@@ -922,45 +908,45 @@ void s32comm_device::comm_tick_15612()
 			if (m_line_rx && m_line_tx)
 			{
 				// try to read one message
-				recv = read_frame(dataSize);
+				int recv = read_frame(data_size);
 				while (recv > 0)
 				{
 					// check if message id
-					idx = m_buffer0[0];
+					uint8_t idx = m_buffer0[0];
 
-					// 0xFF - link id
+					// 0xff - link id
 					if (idx == 0xff)
 					{
-						if (isMaster)
+						if (is_master)
 						{
 							// master gets first id and starts next state
 							m_linkid = 0x01;
 							m_linkcount = m_buffer0[1];
 							m_linktimer = 0x00;
 						}
-						else if (isSlave || isRelay)
+						else if (is_slave || is_relay)
 						{
 							// slave gets own id
-							if (isSlave)
+							if (is_slave)
 							{
 								m_buffer0[1]++;
 								m_linkid = m_buffer0[1];
 							}
 
 							// slave and relay forward message
-							send_frame(dataSize);
+							send_frame(data_size);
 						}
 					}
 
-					// 0xFE - link size
+					// 0xfe - link size
 					else if (idx == 0xfe)
 					{
-						if (isSlave || isRelay)
+						if (is_slave || is_relay)
 						{
 							m_linkcount = m_buffer0[1];
 
 							// slave and relay forward message
-							send_frame(dataSize);
+							send_frame(data_size);
 						}
 
 						// consider it done
@@ -974,20 +960,20 @@ void s32comm_device::comm_tick_15612()
 					}
 
 					if (m_linkalive == 0x00)
-						recv = read_frame(dataSize);
+						recv = read_frame(data_size);
 					else
 						recv = 0;
 				}
 
 				// if we are master and link is not yet established
-				if (isMaster && (m_linkalive == 0x00))
+				if (is_master && (m_linkalive == 0x00))
 				{
 					// send first packet
 					if (m_linktimer == 0x01)
 					{
 						m_buffer0[0] = 0xFF;
 						m_buffer0[1] = 0x01;
-						send_frame(dataSize);
+						send_frame(data_size);
 					}
 
 					// send second packet
@@ -995,7 +981,7 @@ void s32comm_device::comm_tick_15612()
 					{
 						m_buffer0[0] = 0xFE;
 						m_buffer0[1] = m_linkcount;
-						send_frame(dataSize);
+						send_frame(data_size);
 
 						// consider it done
 						osd_printf_verbose("S32COMM: link established - id %02x of %02x\n", m_linkid, m_linkcount);
@@ -1019,60 +1005,62 @@ void s32comm_device::comm_tick_15612()
 		// update "ring buffer" if link established
 		if (m_linkalive == 0x01)
 		{
+			int frame_start = 0x0010;
+
 			do
 			{
 				// try to read a message
-				recv = read_frame(dataSize);
+				int recv = read_frame(data_size);
 				while (recv > 0)
 				{
 					// check if valid id
-					idx = m_buffer0[0];
+					uint8_t idx = m_buffer0[0];
 					if (idx > 0 && idx <= m_linkcount)
 					{
 						// if not own message
 						if (idx != m_linkid)
 						{
 							// save message to "ring buffer"
-							frameOffset = frameStart + (idx * frameSize);
-							for (int j = 0x00 ; j < frameSize ; j++)
+							int frame_offset = frame_start + (idx * frame_size);
+							for (int j = 0x00 ; j < frame_size ; j++)
 							{
-								m_shared[frameOffset + j] = m_buffer0[1 + j];
+								m_shared[frame_offset + j] = m_buffer0[1 + j];
 							}
 
 							// forward message to other nodes
-							send_frame(dataSize);
+							send_frame(data_size);
 						}
 					}
 					else
 					{
 						if (idx == 0xfc)
 						{
-							// 0xFC - VSYNC
+							// 0xfc - VSYNC
 							m_linktimer = 0x00;
-							if (!isMaster)
+							if (!is_master)
 								// forward message to other nodes
-								send_frame(dataSize);
+								send_frame(data_size);
 						}
 						if (idx == 0xfd)
 						{
-							// 0xFD - master addional bytes
-							if (!isMaster)
+							// 0xfd - master addional bytes
+							if (!is_master)
 							{
 								// save message to "ring buffer"
-								frameOffset = 0x05;
+								int frame_offset = 0x05;
 								for (int j = 0x00 ; j < 0x0b ; j++)
 								{
-									m_shared[frameOffset + j] = m_buffer0[1 + j];
+									m_shared[frame_offset + j] = m_buffer0[1 + j];
 								}
 
 								// forward message to other nodes
-								send_frame(dataSize);
+								send_frame(data_size);
 							}
 						}
 					}
 
 					// try to read another message
-					recv = read_frame(dataSize);
+					recv = read_frame(data_size);
 				}
 			}
 			while (m_linktimer == 0x01);
@@ -1087,26 +1075,26 @@ void s32comm_device::comm_tick_15612()
 				// check ready-to-send flag
 				if (m_shared[4] != 0x00)
 				{
-					send_data(m_linkid, frameStart, frameSize, dataSize);
+					send_data(m_linkid, frame_start, frame_size, data_size);
 
 					// save message to "ring buffer"
-					frameOffset = frameStart + (m_linkid * frameSize);
-					for (int j = 0x00 ; j < frameSize ; j++)
+					int frame_offset = frame_start + (m_linkid * frame_size);
+					for (int j = 0x00 ; j < frame_size ; j++)
 					{
-						m_shared[frameOffset + j] = m_buffer0[1 + j];
+						m_shared[frame_offset + j] = m_buffer0[1 + j];
 					}
 				}
 
-				if (isMaster)
+				if (is_master)
 				{
 					// master sends some additional status bytes
 					// master sends additional status bytes
-					send_data(0xfd, 0x05, 0x0b, dataSize);
+					send_data(0xfd, 0x05, 0x0b, data_size);
 
 					// send vsync
 					m_buffer0[0] = 0xfc;
 					m_buffer0[1] = 0x01;
-					send_frame(dataSize);
+					send_frame(data_size);
 				}
 			}
 

@@ -1124,12 +1124,11 @@ Notes:
 
 void namcos22_state::sci_int_w(int state)
 {
-	logerror("sci_int_w: %02x\n", state);
 	int line = 0x04;
 	if (m_irq_enabled & line)
 	{
 		m_irq_state |= line;
-		m_maincpu->set_input_line(m_syscontrol[2] & 7, ASSERT_LINE); // SCI IRQ
+		m_maincpu->set_input_line(m_syscontrol[2] & 7, state ? ASSERT_LINE : CLEAR_LINE); // SCI IRQ
 	}
 }
 

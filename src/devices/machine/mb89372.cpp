@@ -47,19 +47,9 @@ mb89372_device::mb89372_device( const machine_config &mconfig, const char *tag, 
 	m_in_memr_cb(*this, 0),
 	m_out_memw_cb(*this)
 {
-	// prepare localhost "filename"
-	m_localhost[0] = 0;
-	strcat(m_localhost, "socket.");
-	strcat(m_localhost, mconfig.options().comm_localhost());
-	strcat(m_localhost, ":");
-	strcat(m_localhost, mconfig.options().comm_localport());
-
-	// prepare remotehost "filename"
-	m_remotehost[0] = 0;
-	strcat(m_remotehost, "socket.");
-	strcat(m_remotehost, mconfig.options().comm_remotehost());
-	strcat(m_remotehost, ":");
-	strcat(m_remotehost, mconfig.options().comm_remoteport());
+	// prepare "filenames"
+	m_localhost = util::string_format("socket.%s:%s", mconfig.options().comm_localhost(), mconfig.options().comm_localport());
+	m_remotehost = util::string_format("socket.%s:%s", mconfig.options().comm_remotehost(), mconfig.options().comm_remoteport());
 }
 
 
@@ -196,7 +186,8 @@ uint8_t mb89372_device::read(offs_t offset)
 
 		default:
 			data = m_reg[offset & 0x3f];
-			logerror("MB89372 unimplemented register read @%02X\n", offset);
+			if (!machine().side_effects_disabled())
+				logerror("MB89372 unimplemented register read @%02X\n", offset);
 	}
 	return data;
 }
@@ -483,17 +474,27 @@ void mb89372_device::check_sockets()
 	// check rx socket
 	if (!m_line_rx)
 	{
-		osd_printf_verbose("MB89372 listen on %s\n", m_localhost);
+		osd_printf_verbose("MB89372: rx listen on %s\n", m_localhost);
 		uint64_t filesize; // unused
-		osd_file::open(m_localhost, OPEN_FLAG_CREATE, m_line_rx, filesize);
+		std::error_condition filerr = osd_file::open(m_localhost, OPEN_FLAG_CREATE, m_line_rx, filesize);
+		if (filerr.value() != 0)
+		{
+			osd_printf_verbose("MB89372: tx connection failed - %02x, %s\n", filerr.value(), filerr.message());
+			m_line_rx.reset();
+		}
 	}
 
 	// check tx socket
 	if (!m_line_tx)
 	{
-		osd_printf_verbose("MB89372 connect to %s\n", m_remotehost);
+		osd_printf_verbose("MB89372: tx connect to %s\n", m_remotehost);
 		uint64_t filesize; // unused
-		osd_file::open(m_remotehost, 0, m_line_tx, filesize);
+		std::error_condition filerr = osd_file::open(m_remotehost, 0, m_line_tx, filesize);
+		if (filerr.value() != 0)
+		{
+			osd_printf_verbose("MB89372: tx connection failed - %02x, %s\n", filerr.value(), filerr.message());
+			m_line_tx.reset();
+		}
 	}
 
 	if (m_line_rx && m_line_tx)

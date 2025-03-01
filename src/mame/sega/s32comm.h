@@ -17,7 +17,6 @@
 class s32comm_device : public device_t
 {
 public:
-	// construction/destruction
 	s32comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// single bit registers (74LS74)
@@ -47,10 +46,9 @@ public:
 #endif
 
 protected:
-	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
-	// optional information overrides
+
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
@@ -61,8 +59,8 @@ private:
 
 	osd_file::ptr m_line_rx; // rx line - can be either differential, simple serial or toslink
 	osd_file::ptr m_line_tx; // tx line - is differential, simple serial and toslink
-	char m_localhost[256]{};
-	char m_remotehost[256]{};
+	std::string m_localhost;
+	std::string m_remotehost;
 	uint8_t m_buffer0[0x100]{};
 	uint8_t m_buffer1[0x100]{};
 	uint8_t m_framesync = 0;
@@ -76,9 +74,9 @@ private:
 	uint16_t m_linktype = 0;
 
 	void comm_tick();
-	int read_frame(int dataSize);
-	void send_data(uint8_t frameType, int frameStart, int frameSize, int dataSize);
-	void send_frame(int dataSize);
+	int read_frame(int data_size);
+	void send_data(uint8_t frame_type, int frame_start, int frame_size, int data_size);
+	void send_frame(int data_size);
 
 	void comm_tick_14084();
 	void comm_tick_15033();
