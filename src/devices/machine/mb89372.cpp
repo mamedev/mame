@@ -137,7 +137,7 @@ void mb89372_device::execute_run()
 		{
 			m_intr_delay--;
 		}
-		else 
+		else
 		{
 			//m_intr_delay = 0x04;
 			check_ints();
@@ -419,7 +419,7 @@ uint8_t mb89372_device::rx_read()
 
 	/*
 	if (m_rx_offset == m_rx_length)
-		m_rxsr0 |= 0x40; // EOF
+	    m_rxsr0 |= 0x40; // EOF
 	*/
 
 	if (m_rx_offset >= m_rx_length)
@@ -536,7 +536,7 @@ void mb89372_device::check_sockets()
 
 					/*
 					if (m_rx_offset + 1 == m_rx_length)
-						m_rxsr0 |= 0x40; // EOF
+					    m_rxsr0 |= 0x40; // EOF
 					*/
 
 					//m_rxsr1 = 0xc8;

@@ -203,15 +203,15 @@ void namco_c139_device::reg_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	}
 
 	// mode 09 tx trigger
-	if (offset == REG_1_MODE && data == 0x09 && m_txsize > 0) 
+	if (offset == REG_1_MODE && data == 0x09 && m_txsize > 0)
 		m_txblock = 0x00;
 
 	// mode 08 & 0c tx trigger
-	if (offset == REG_2_CONTROL && data == 0x03) 
+	if (offset == REG_2_CONTROL && data == 0x03)
 		m_txblock = 0x00;
 
 	// mode 0d tx trigger
-	if (offset == REG_5_TXSIZE && data > 0) 
+	if (offset == REG_5_TXSIZE && data > 0)
 		m_txblock = 0x00;
 
 	// hack to get raverace working

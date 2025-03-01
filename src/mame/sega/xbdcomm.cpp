@@ -189,7 +189,8 @@ uint8_t xbdcomm_device::ex_r(offs_t offset)
 			if (!machine().side_effects_disabled())
 				logerror("xbdcomm-ex_r: %02x\n", offset);
 			return 0xff;
-}	}
+	}
+}
 
 
 void xbdcomm_device::ex_w(offs_t offset, uint8_t data)
