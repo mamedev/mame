@@ -256,9 +256,9 @@ void konamigx_state::set_brightness(int layer)
 	if (m_current_brightness != new_brightness)
 	{
 		m_current_brightness = new_brightness;
-		for (int y = 0; y < 2048; ++y)
+		for (int x = 0; x < m_palette->entries(); ++x)
 		{
-			m_palette->set_pen_contrast(y, m_current_brightness / 255.0);
+			m_palette->set_pen_contrast(x, m_current_brightness / 255.0);
 		}
 	}
 }
@@ -1157,6 +1157,8 @@ void konamigx_state::common_init()
 	save_item(NAME(m_vmixon));
 	save_item(NAME(m_osinmix));
 	save_item(NAME(m_osmixon));
+	save_item(NAME(m_current_brightness));
+	save_item(NAME(m_brightness));
 
 	m_gx_tilemode = 0;
 
