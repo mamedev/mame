@@ -39,7 +39,7 @@ EPR-12028 - 27C256 EPROM
 /*************************************
  *  YBDCOMM Memory Map
  *************************************/
-void ybdcomm_device::ybdcomm_mem(address_map &map)
+void sega_ybdcomm_device::ybdcomm_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x3fff).ram();
@@ -49,12 +49,12 @@ void ybdcomm_device::ybdcomm_mem(address_map &map)
 /*************************************
  *  YBDCOMM I/O Map
  *************************************/
-void ybdcomm_device::ybdcomm_io(address_map &map)
+void sega_ybdcomm_device::ybdcomm_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x3f).rw(m_mpc, FUNC(mb89372_device::read), FUNC(mb89372_device::write));
-	map(0x40, 0x40).r(FUNC(ybdcomm_device::z80_stat_r));
-	map(0x80, 0x80).w(FUNC(ybdcomm_device::z80_stat_w));
+	map(0x40, 0x40).r(FUNC(sega_ybdcomm_device::z80_stat_r));
+	map(0x80, 0x80).w(FUNC(sega_ybdcomm_device::z80_stat_w));
 	map(0xc0, 0xc0).portr("Link_SW1");
 }
 
@@ -92,33 +92,33 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(YBDCOMM, ybdcomm_device, "ybdcomm", "Sega Y-Board Communication Board")
+DEFINE_DEVICE_TYPE(SEGA_YBOARD_COMM, sega_ybdcomm_device, "ybdcomm", "Sega Y-Board Communication Board")
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void ybdcomm_device::device_add_mconfig(machine_config &config)
+void sega_ybdcomm_device::device_add_mconfig(machine_config &config)
 {
 	Z80(config, m_cpu, 16_MHz_XTAL / 2);
-	m_cpu->set_memory_map(&ybdcomm_device::ybdcomm_mem);
-	m_cpu->set_io_map(&ybdcomm_device::ybdcomm_io);
+	m_cpu->set_memory_map(&sega_ybdcomm_device::ybdcomm_mem);
+	m_cpu->set_io_map(&sega_ybdcomm_device::ybdcomm_io);
 
-	MB8421(config, m_dpram).intl_callback().set(FUNC(ybdcomm_device::dpram_int5_w));
+	MB8421(config, m_dpram).intl_callback().set(FUNC(sega_ybdcomm_device::dpram_int5_w));
 
 	MB89372(config, m_mpc, 16_MHz_XTAL / 2);
-	m_mpc->out_hreq_callback().set(FUNC(ybdcomm_device::mpc_hreq_w));
-	m_mpc->out_irq_callback().set(FUNC(ybdcomm_device::mpc_int7_w));
-	m_mpc->in_memr_callback().set(FUNC(ybdcomm_device::mpc_mem_r));
-	m_mpc->out_memw_callback().set(FUNC(ybdcomm_device::mpc_mem_w));
+	m_mpc->out_hreq_callback().set(FUNC(sega_ybdcomm_device::mpc_hreq_w));
+	m_mpc->out_irq_callback().set(FUNC(sega_ybdcomm_device::mpc_int7_w));
+	m_mpc->in_memr_callback().set(FUNC(sega_ybdcomm_device::mpc_mem_r));
+	m_mpc->out_memw_callback().set(FUNC(sega_ybdcomm_device::mpc_mem_w));
 }
 
-ioport_constructor ybdcomm_device::device_input_ports() const
+ioport_constructor sega_ybdcomm_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( ybdcomm );
 }
 
-const tiny_rom_entry *ybdcomm_device::device_rom_region() const
+const tiny_rom_entry *sega_ybdcomm_device::device_rom_region() const
 {
 	return ROM_NAME( ybdcomm );
 }
@@ -128,11 +128,11 @@ const tiny_rom_entry *ybdcomm_device::device_rom_region() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  ybdcomm_device - constructor
+//  sega_ybdcomm_device - constructor
 //-------------------------------------------------
 
-ybdcomm_device::ybdcomm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, YBDCOMM, tag, owner, clock),
+sega_ybdcomm_device::sega_ybdcomm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, SEGA_YBOARD_COMM, tag, owner, clock),
 	m_cpu(*this, Z80_TAG),
 	m_dpram(*this, "dpram"),
 	m_mpc(*this, "commmpc"),
@@ -151,14 +151,14 @@ ybdcomm_device::ybdcomm_device(const machine_config &mconfig, const char *tag, d
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void ybdcomm_device::device_start()
+void sega_ybdcomm_device::device_start()
 {
 	// state saving
 	save_item(NAME(m_ybd_stat));
 	save_item(NAME(m_z80_stat));
 
 #ifdef YBDCOMM_SIMULATION
-	m_tick_timer = timer_alloc(FUNC(ybdcomm_device::tick_timer), this);
+	m_tick_timer = timer_alloc(FUNC(sega_ybdcomm_device::tick_timer), this);
 	m_tick_timer->adjust(attotime::from_hz(600), 0, attotime::from_hz(600));
 
 	save_item(NAME(m_linkenable));
@@ -173,7 +173,7 @@ void ybdcomm_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void ybdcomm_device::device_reset()
+void sega_ybdcomm_device::device_reset()
 {
 	m_ybd_stat = 0;
 	m_z80_stat = 0;
@@ -187,13 +187,13 @@ void ybdcomm_device::device_reset()
 #endif
 }
 
-void ybdcomm_device::device_reset_after_children()
+void sega_ybdcomm_device::device_reset_after_children()
 {
 	m_cpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_mpc->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-uint8_t ybdcomm_device::ex_r(offs_t offset)
+uint8_t sega_ybdcomm_device::ex_r(offs_t offset)
 {
 	int bank = offset >> 11;
 
@@ -221,7 +221,7 @@ uint8_t ybdcomm_device::ex_r(offs_t offset)
 }
 
 
-void ybdcomm_device::ex_w(offs_t offset, uint8_t data)
+void sega_ybdcomm_device::ex_w(offs_t offset, uint8_t data)
 {
 	int bank = offset >> 11;
 
@@ -293,51 +293,51 @@ void ybdcomm_device::ex_w(offs_t offset, uint8_t data)
 	}
 }
 
-void ybdcomm_device::mpc_hreq_w(int state)
+void sega_ybdcomm_device::mpc_hreq_w(int state)
 {
 	m_cpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 	m_mpc->hack_w(state);
 }
 
-void ybdcomm_device::dpram_int5_w(int state)
+void sega_ybdcomm_device::dpram_int5_w(int state)
 {
 	m_cpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0xef); // Z80 INT5
 }
 
-void ybdcomm_device::mpc_int7_w(int state)
+void sega_ybdcomm_device::mpc_int7_w(int state)
 {
 	logerror("mpc_int7_w: %02x\n", state);
 	m_cpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0xff); // Z80 INT7
 }
 
-uint8_t ybdcomm_device::mpc_mem_r(offs_t offset)
+uint8_t sega_ybdcomm_device::mpc_mem_r(offs_t offset)
 {
 	return m_cpu->space(AS_PROGRAM).read_byte(offset);
 }
 
-void ybdcomm_device::mpc_mem_w(offs_t offset, uint8_t data)
+void sega_ybdcomm_device::mpc_mem_w(offs_t offset, uint8_t data)
 {
 	m_cpu->space(AS_PROGRAM).write_byte(offset, data);
 }
 
-uint8_t ybdcomm_device::z80_stat_r()
+uint8_t sega_ybdcomm_device::z80_stat_r()
 {
 	return m_ybd_stat;
 }
 
-void ybdcomm_device::z80_stat_w(uint8_t data)
+void sega_ybdcomm_device::z80_stat_w(uint8_t data)
 {
 	m_z80_stat = data;
 }
 
 
 #ifdef YBDCOMM_SIMULATION
-TIMER_CALLBACK_MEMBER(ybdcomm_device::tick_timer)
+TIMER_CALLBACK_MEMBER(sega_ybdcomm_device::tick_timer)
 {
 	comm_tick();
 }
 
-int ybdcomm_device::comm_frame_offset(uint8_t cab_index)
+int sega_ybdcomm_device::comm_frame_offset(uint8_t cab_index)
 {
 	switch (cab_index)
 	{
@@ -364,7 +364,7 @@ int ybdcomm_device::comm_frame_offset(uint8_t cab_index)
 	}
 }
 
-int ybdcomm_device::comm_frame_size(uint8_t cab_index)
+int sega_ybdcomm_device::comm_frame_size(uint8_t cab_index)
 {
 	switch (cab_index)
 	{
@@ -385,7 +385,7 @@ int ybdcomm_device::comm_frame_size(uint8_t cab_index)
 	}
 }
 
-void ybdcomm_device::comm_tick()
+void sega_ybdcomm_device::comm_tick()
 {
 	if (m_linkenable == 0x01)
 	{
@@ -594,7 +594,7 @@ void ybdcomm_device::comm_tick()
 	}
 }
 
-int ybdcomm_device::read_frame(int data_size)
+int sega_ybdcomm_device::read_frame(int data_size)
 {
 	if (!m_line_rx)
 		return 0;
@@ -642,7 +642,7 @@ int ybdcomm_device::read_frame(int data_size)
 	return recv;
 }
 
-void ybdcomm_device::send_data(uint8_t frame_type, int frame_offset, int frame_size, int data_size)
+void sega_ybdcomm_device::send_data(uint8_t frame_type, int frame_offset, int frame_size, int data_size)
 {
 	m_buffer0[0] = frame_type;
 	for (int i = 0x00 ; i < frame_size ; i++)
@@ -652,7 +652,7 @@ void ybdcomm_device::send_data(uint8_t frame_type, int frame_offset, int frame_s
 	send_frame(data_size);
 }
 
-void ybdcomm_device::send_frame(int data_size)
+void sega_ybdcomm_device::send_frame(int data_size)
 {
 	if (!m_line_tx)
 		return;

@@ -13,10 +13,10 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class m2comm_device : public device_t
+class sega_m2comm_device : public device_t
 {
 public:
-	m2comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega_m2comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// single bit registers (74LS74)
 	uint8_t zfg_r(offs_t offset);
@@ -80,6 +80,6 @@ private:
 };
 
 // device type definition
-DECLARE_DEVICE_TYPE(M2COMM, m2comm_device)
+DECLARE_DEVICE_TYPE(SEGA_MODEL2_COMM, sega_m2comm_device)
 
 #endif  // MAME_SEGA_M2COMM_H

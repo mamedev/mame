@@ -1405,7 +1405,7 @@ void segaybd_state::yboard_link(machine_config &config)
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &segaybd_state::main_map_link);
 
-	YBDCOMM(config, "ybdcomm", 0);
+	SEGA_YBOARD_COMM(config, "ybdcomm", 0);
 }
 
 void segaybd_state::yboard_deluxe(machine_config &config)

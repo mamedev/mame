@@ -34,7 +34,7 @@ Notes:
 /*************************************
  *  XBDCOMM Memory Map
  *************************************/
-void xbdcomm_device::xbdcomm_mem(address_map &map)
+void sega_xbdcomm_device::xbdcomm_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x3fff).ram();
@@ -44,12 +44,12 @@ void xbdcomm_device::xbdcomm_mem(address_map &map)
 /*************************************
  *  XBDCOMM I/O Map
  *************************************/
-void xbdcomm_device::xbdcomm_io(address_map &map)
+void sega_xbdcomm_device::xbdcomm_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x3f).rw(m_mpc, FUNC(mb89372_device::read), FUNC(mb89372_device::write));
-	map(0x40, 0x40).rw(FUNC(xbdcomm_device::z80_stat_r), FUNC(xbdcomm_device::z80_debug_w));
-	map(0x80, 0x80).w(FUNC(xbdcomm_device::z80_stat_w));
+	map(0x40, 0x40).rw(FUNC(sega_xbdcomm_device::z80_stat_r), FUNC(sega_xbdcomm_device::z80_debug_w));
+	map(0x80, 0x80).w(FUNC(sega_xbdcomm_device::z80_stat_w));
 }
 
 ROM_START( xbdcomm )
@@ -65,31 +65,31 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(XBDCOMM, xbdcomm_device, "xbdcomm", "Sega X-Board Communication Board")
+DEFINE_DEVICE_TYPE(SEGA_XBOARD_COMM, sega_xbdcomm_device, "xbdcomm", "Sega X-Board Communication Board")
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void xbdcomm_device::device_add_mconfig(machine_config &config)
+void sega_xbdcomm_device::device_add_mconfig(machine_config &config)
 {
 	Z80(config, m_cpu, 16_MHz_XTAL / 2);
-	m_cpu->set_memory_map(&xbdcomm_device::xbdcomm_mem);
-	m_cpu->set_io_map(&xbdcomm_device::xbdcomm_io);
+	m_cpu->set_memory_map(&sega_xbdcomm_device::xbdcomm_mem);
+	m_cpu->set_io_map(&sega_xbdcomm_device::xbdcomm_io);
 
-	MB8421(config, m_dpram).intl_callback().set(FUNC(xbdcomm_device::dpram_int5_w));
+	MB8421(config, m_dpram).intl_callback().set(FUNC(sega_xbdcomm_device::dpram_int5_w));
 
 	MB89372(config, m_mpc, 16_MHz_XTAL / 2);
-	m_mpc->out_hreq_callback().set(FUNC(xbdcomm_device::mpc_hreq_w));
-	m_mpc->out_irq_callback().set(FUNC(xbdcomm_device::mpc_int7_w));
-	m_mpc->in_memr_callback().set(FUNC(xbdcomm_device::mpc_mem_r));
-	m_mpc->out_memw_callback().set(FUNC(xbdcomm_device::mpc_mem_w));
+	m_mpc->out_hreq_callback().set(FUNC(sega_xbdcomm_device::mpc_hreq_w));
+	m_mpc->out_irq_callback().set(FUNC(sega_xbdcomm_device::mpc_int7_w));
+	m_mpc->in_memr_callback().set(FUNC(sega_xbdcomm_device::mpc_mem_r));
+	m_mpc->out_memw_callback().set(FUNC(sega_xbdcomm_device::mpc_mem_w));
 }
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
-const tiny_rom_entry *xbdcomm_device::device_rom_region() const
+const tiny_rom_entry *sega_xbdcomm_device::device_rom_region() const
 {
 	return ROM_NAME( xbdcomm );
 }
@@ -99,11 +99,11 @@ const tiny_rom_entry *xbdcomm_device::device_rom_region() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  xbdcomm_device - constructor
+//  sega_xbdcomm_device - constructor
 //-------------------------------------------------
 
-xbdcomm_device::xbdcomm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, XBDCOMM, tag, owner, clock),
+sega_xbdcomm_device::sega_xbdcomm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, SEGA_XBOARD_COMM, tag, owner, clock),
 	m_cpu(*this, Z80_TAG),
 	m_dpram(*this, "dpram"),
 	m_mpc(*this, "commmpc")
@@ -119,7 +119,7 @@ xbdcomm_device::xbdcomm_device(const machine_config &mconfig, const char *tag, d
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void xbdcomm_device::device_start()
+void sega_xbdcomm_device::device_start()
 {
 	// state saving
 	save_item(NAME(m_ex_page));
@@ -139,7 +139,7 @@ void xbdcomm_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void xbdcomm_device::device_reset()
+void sega_xbdcomm_device::device_reset()
 {
 	m_ex_page = 0;
 	m_xbd_stat = 0;
@@ -152,13 +152,13 @@ void xbdcomm_device::device_reset()
 	m_linkcount = 0;
 }
 
-void xbdcomm_device::device_reset_after_children()
+void sega_xbdcomm_device::device_reset_after_children()
 {
 	m_cpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_mpc->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-uint8_t xbdcomm_device::ex_r(offs_t offset)
+uint8_t sega_xbdcomm_device::ex_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -193,7 +193,7 @@ uint8_t xbdcomm_device::ex_r(offs_t offset)
 }
 
 
-void xbdcomm_device::ex_w(offs_t offset, uint8_t data)
+void sega_xbdcomm_device::ex_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -271,44 +271,44 @@ void xbdcomm_device::ex_w(offs_t offset, uint8_t data)
 	}
 }
 
-void xbdcomm_device::mpc_hreq_w(int state)
+void sega_xbdcomm_device::mpc_hreq_w(int state)
 {
 	m_cpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 	m_mpc->hack_w(state);
 }
 
-void xbdcomm_device::dpram_int5_w(int state)
+void sega_xbdcomm_device::dpram_int5_w(int state)
 {
 	m_cpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0xef); // Z80 INT5
 }
 
-void xbdcomm_device::mpc_int7_w(int state)
+void sega_xbdcomm_device::mpc_int7_w(int state)
 {
 	logerror("mpc_int7_w: %02x\n", state);
 	m_cpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0xff); // Z80 INT7
 }
 
-uint8_t xbdcomm_device::mpc_mem_r(offs_t offset)
+uint8_t sega_xbdcomm_device::mpc_mem_r(offs_t offset)
 {
 	return m_cpu->space(AS_PROGRAM).read_byte(offset);
 }
 
-void xbdcomm_device::mpc_mem_w(offs_t offset, uint8_t data)
+void sega_xbdcomm_device::mpc_mem_w(offs_t offset, uint8_t data)
 {
 	m_cpu->space(AS_PROGRAM).write_byte(offset, data);
 }
 
-uint8_t xbdcomm_device::z80_stat_r()
+uint8_t sega_xbdcomm_device::z80_stat_r()
 {
 	return m_xbd_stat;
 }
 
-void xbdcomm_device::z80_stat_w(uint8_t data)
+void sega_xbdcomm_device::z80_stat_w(uint8_t data)
 {
 	m_z80_stat = data;
 }
 
-void xbdcomm_device::z80_debug_w(uint8_t data)
+void sega_xbdcomm_device::z80_debug_w(uint8_t data)
 {
 	m_ex_page = data;
 	m_z80_stat = 0;
@@ -316,7 +316,7 @@ void xbdcomm_device::z80_debug_w(uint8_t data)
 
 
 #ifdef XBDCOMM_SIMULATION
-void xbdcomm_device::comm_tick()
+void sega_xbdcomm_device::comm_tick()
 {
 	if (m_linkenable == 0x01)
 	{
@@ -550,7 +550,7 @@ void xbdcomm_device::comm_tick()
 	}
 }
 
-int xbdcomm_device::read_frame(int data_size)
+int sega_xbdcomm_device::read_frame(int data_size)
 {
 	if (!m_line_rx)
 		return 0;
@@ -598,7 +598,7 @@ int xbdcomm_device::read_frame(int data_size)
 	return recv;
 }
 
-void xbdcomm_device::send_data(uint8_t frame_type, int frame_offset, int frame_size, int data_size)
+void sega_xbdcomm_device::send_data(uint8_t frame_type, int frame_offset, int frame_size, int data_size)
 {
 	m_buffer0[0] = frame_type;
 	for (int i = 0x00 ; i < frame_size ; i++)
@@ -608,7 +608,7 @@ void xbdcomm_device::send_data(uint8_t frame_type, int frame_offset, int frame_s
 	send_frame(data_size);
 }
 
-void xbdcomm_device::send_frame(int data_size){
+void sega_xbdcomm_device::send_frame(int data_size){
 	if (!m_line_tx)
 		return;
 

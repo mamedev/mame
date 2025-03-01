@@ -14,10 +14,10 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class s32comm_device : public device_t
+class sega_s32comm_device : public device_t
 {
 public:
-	s32comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega_s32comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// single bit registers (74LS74)
 	uint8_t zfg_r(offs_t offset);
@@ -85,6 +85,6 @@ private:
 };
 
 // device type definition
-DECLARE_DEVICE_TYPE(S32COMM, s32comm_device)
+DECLARE_DEVICE_TYPE(SEGA_SYSTEM32_COMM, sega_s32comm_device)
 
 #endif // MAME_SEGA_S32COMM_H

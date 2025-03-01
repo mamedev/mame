@@ -78,13 +78,13 @@ Sega System Multi32 Comm PCB 837-8792-91
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(S32COMM, s32comm_device, "s32comm", "System 32 Communication Board")
+DEFINE_DEVICE_TYPE(SEGA_SYSTEM32_COMM, sega_s32comm_device, "s32comm", "Sega System 32 Communication Board")
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void s32comm_device::device_add_mconfig(machine_config &config)
+void sega_s32comm_device::device_add_mconfig(machine_config &config)
 {
 }
 
@@ -93,11 +93,11 @@ void s32comm_device::device_add_mconfig(machine_config &config)
 //**************************************************************************
 
 //-------------------------------------------------
-//  s32comm_device - constructor
+//  sega_s32comm_device - constructor
 //-------------------------------------------------
 
-s32comm_device::s32comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, S32COMM, tag, owner, clock)
+sega_s32comm_device::sega_s32comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, SEGA_SYSTEM32_COMM, tag, owner, clock)
 {
 	std::fill(std::begin(m_shared), std::end(m_shared), 0);
 
@@ -112,7 +112,7 @@ s32comm_device::s32comm_device(const machine_config &mconfig, const char *tag, d
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void s32comm_device::device_start()
+void sega_s32comm_device::device_start()
 {
 }
 
@@ -120,14 +120,14 @@ void s32comm_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void s32comm_device::device_reset()
+void sega_s32comm_device::device_reset()
 {
 	m_zfg = 0;
 	m_cn = 0;
 	m_fg = 0;
 }
 
-uint8_t s32comm_device::zfg_r(offs_t offset)
+uint8_t sega_s32comm_device::zfg_r(offs_t offset)
 {
 	uint8_t result = m_zfg | 0xFE;
 	if (!machine().side_effects_disabled())
@@ -135,13 +135,13 @@ uint8_t s32comm_device::zfg_r(offs_t offset)
 	return result;
 }
 
-void s32comm_device::zfg_w(uint8_t data)
+void sega_s32comm_device::zfg_w(uint8_t data)
 {
 	LOG("s32comm-zfg_w: %02x\n", data);
 	m_zfg = data & 0x01;
 }
 
-uint8_t s32comm_device::share_r(offs_t offset)
+uint8_t sega_s32comm_device::share_r(offs_t offset)
 {
 	uint8_t result = m_shared[offset];
 	if (!machine().side_effects_disabled())
@@ -149,18 +149,18 @@ uint8_t s32comm_device::share_r(offs_t offset)
 	return result;
 }
 
-void s32comm_device::share_w(offs_t offset, uint8_t data)
+void sega_s32comm_device::share_w(offs_t offset, uint8_t data)
 {
 	LOG("s32comm-share_w: %02x %02x\n", offset, data);
 	m_shared[offset] = data;
 }
 
-uint8_t s32comm_device::cn_r()
+uint8_t sega_s32comm_device::cn_r()
 {
 	return m_cn | 0xFE;
 }
 
-void s32comm_device::cn_w(uint8_t data)
+void sega_s32comm_device::cn_w(uint8_t data)
 {
 	m_cn = data & 0x01;
 
@@ -189,12 +189,12 @@ void s32comm_device::cn_w(uint8_t data)
 #endif
 }
 
-uint8_t s32comm_device::fg_r()
+uint8_t sega_s32comm_device::fg_r()
 {
 	return m_fg | (~m_zfg << 7) | 0x7E;
 }
 
-void s32comm_device::fg_w(uint8_t data)
+void sega_s32comm_device::fg_w(uint8_t data)
 {
 	if (!m_cn)
 		return;
@@ -202,7 +202,7 @@ void s32comm_device::fg_w(uint8_t data)
 	m_fg = data & 0x01;
 }
 
-void s32comm_device::check_vint_irq()
+void sega_s32comm_device::check_vint_irq()
 {
 #ifndef S32COMM_SIMULATION
 #else
@@ -211,7 +211,7 @@ void s32comm_device::check_vint_irq()
 }
 
 #ifdef S32COMM_SIMULATION
-void s32comm_device::set_linktype(uint16_t linktype)
+void sega_s32comm_device::set_linktype(uint16_t linktype)
 {
 	m_linktype = linktype;
 
@@ -235,7 +235,7 @@ void s32comm_device::set_linktype(uint16_t linktype)
 	}
 }
 
-void s32comm_device::comm_tick()
+void sega_s32comm_device::comm_tick()
 {
 	switch (m_linktype)
 	{
@@ -257,7 +257,7 @@ void s32comm_device::comm_tick()
 	}
 }
 
-int s32comm_device::read_frame(int data_size)
+int sega_s32comm_device::read_frame(int data_size)
 {
 	if (!m_line_rx)
 		return 0;
@@ -306,7 +306,7 @@ int s32comm_device::read_frame(int data_size)
 	return recv;
 }
 
-void s32comm_device::send_data(uint8_t frame_type, int frame_start, int frame_size, int data_size)
+void sega_s32comm_device::send_data(uint8_t frame_type, int frame_start, int frame_size, int data_size)
 {
 	m_buffer0[0] = frame_type;
 	for (int i = 0x00 ; i < frame_size ; i++)
@@ -317,7 +317,7 @@ void s32comm_device::send_data(uint8_t frame_type, int frame_start, int frame_si
 	send_frame(data_size);
 }
 
-void s32comm_device::send_frame(int data_size){
+void sega_s32comm_device::send_frame(int data_size){
 	if (!m_line_tx)
 		return;
 
@@ -336,7 +336,7 @@ void s32comm_device::send_frame(int data_size){
 	}
 }
 
-void s32comm_device::comm_tick_14084()
+void sega_s32comm_device::comm_tick_14084()
 {
 	// m_shared[0] = node count
 	// m_shared[1] = node id
@@ -587,7 +587,7 @@ void s32comm_device::comm_tick_14084()
 	}
 }
 
-void s32comm_device::comm_tick_15033()
+void sega_s32comm_device::comm_tick_15033()
 {
 	// m_shared[0] = node count
 	// m_shared[1] = node id
@@ -851,7 +851,7 @@ void s32comm_device::comm_tick_15033()
 	}
 }
 
-void s32comm_device::comm_tick_15612()
+void sega_s32comm_device::comm_tick_15612()
 {
 	// m_shared[0] = node link status (5 = linking, 1 = online)
 	// m_shared[1] = node mode (0 = relay, 1 = master, 2 = slave)

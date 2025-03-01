@@ -10,12 +10,13 @@
 
 #pragma once
 
+#include "sega16sp.h"
+#include "segaic16.h"
+#include "ybdcomm.h"
+
 #include "cpu/m68000/m68000musashi.h"
 #include "cpu/z80/z80.h"
 #include "machine/mb3773.h"
-#include "segaic16.h"
-#include "sega16sp.h"
-#include "ybdcomm.h"
 #include "screen.h"
 
 
@@ -126,7 +127,7 @@ private:
 	required_device<sega_sys16b_sprite_device> m_bsprites;
 	required_device<sega_yboard_sprite_device> m_ysprites;
 	required_device<segaic16_video_device> m_segaic16vid;
-	optional_device<ybdcomm_device> m_ybdcomm;
+	optional_device<sega_ybdcomm_device> m_ybdcomm;
 
 	// input ports
 	optional_ioport_array<6> m_adc_ports;

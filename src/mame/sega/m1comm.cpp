@@ -64,23 +64,23 @@ Notes:
 /*************************************
  *  M1COMM Memory Map
  *************************************/
-void m1comm_device::m1comm_mem(address_map &map)
+void sega_m1comm_device::m1comm_mem(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).ram();
-	map(0xc000, 0xffff).mask(0x0fff).rw(FUNC(m1comm_device::share_r), FUNC(m1comm_device::share_w));
+	map(0xc000, 0xffff).mask(0x0fff).rw(FUNC(sega_m1comm_device::share_r), FUNC(sega_m1comm_device::share_w));
 }
 
 /*************************************
  *  M1COMM I/O Map
  *************************************/
-void m1comm_device::m1comm_io(address_map &map)
+void sega_m1comm_device::m1comm_io(address_map &map)
 {
 	map.global_mask(0x7f);
 	map(0x00, 0x1f).rw(m_dlc, FUNC(mb89374_device::read), FUNC(mb89374_device::write));
 	map(0x20, 0x2f).rw(m_dma, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
-	map(0x40, 0x5f).mask(0x01).rw(FUNC(m1comm_device::syn_r), FUNC(m1comm_device::syn_w));
-	map(0x60, 0x7f).mask(0x01).rw(FUNC(m1comm_device::zfg_r), FUNC(m1comm_device::zfg_w));
+	map(0x40, 0x5f).mask(0x01).rw(FUNC(sega_m1comm_device::syn_r), FUNC(sega_m1comm_device::syn_w));
+	map(0x60, 0x7f).mask(0x01).rw(FUNC(sega_m1comm_device::zfg_r), FUNC(sega_m1comm_device::zfg_w));
 }
 
 ROM_START( m1comm )
@@ -100,22 +100,22 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(M1COMM, m1comm_device, "m1comm", "Model-1 Communication Board")
+DEFINE_DEVICE_TYPE(SEGA_MODEL1_COMM, sega_m1comm_device, "m1comm", "Sega Model-1 Communication Board")
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void m1comm_device::device_add_mconfig(machine_config &config)
+void sega_m1comm_device::device_add_mconfig(machine_config &config)
 {
 	Z80(config, m_cpu, 32_MHz_XTAL / 4);
-	m_cpu->set_memory_map(&m1comm_device::m1comm_mem);
-	m_cpu->set_io_map(&m1comm_device::m1comm_io);
+	m_cpu->set_memory_map(&sega_m1comm_device::m1comm_mem);
+	m_cpu->set_io_map(&sega_m1comm_device::m1comm_io);
 
 	AM9517A(config, m_dma, 32_MHz_XTAL / 4);
-	m_dma->out_hreq_callback().set(FUNC(m1comm_device::dma_hreq_w));
-	m_dma->in_memr_callback().set(FUNC(m1comm_device::dma_mem_r));
-	m_dma->out_memw_callback().set(FUNC(m1comm_device::dma_mem_w));
+	m_dma->out_hreq_callback().set(FUNC(sega_m1comm_device::dma_hreq_w));
+	m_dma->in_memr_callback().set(FUNC(sega_m1comm_device::dma_mem_r));
+	m_dma->out_memw_callback().set(FUNC(sega_m1comm_device::dma_mem_w));
 	m_dma->out_dack_callback<2>().set(m_dlc, FUNC(mb89374_device::pi3_w));
 	m_dma->out_dack_callback<3>().set(m_dlc, FUNC(mb89374_device::pi2_w));
 	m_dma->out_eop_callback().set(m_dlc, FUNC(mb89374_device::ci_w));
@@ -125,13 +125,13 @@ void m1comm_device::device_add_mconfig(machine_config &config)
 	MB89374(config, m_dlc, 32_MHz_XTAL / 4);
 	m_dlc->out_po_callback<2>().set(m_dma, FUNC(am9517a_device::dreq3_w));
 	m_dlc->out_po_callback<3>().set(m_dma, FUNC(am9517a_device::dreq2_w));
-	m_dlc->out_irq_callback().set(FUNC(m1comm_device::dlc_int7_w));
+	m_dlc->out_irq_callback().set(FUNC(sega_m1comm_device::dlc_int7_w));
 }
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
-const tiny_rom_entry *m1comm_device::device_rom_region() const
+const tiny_rom_entry *sega_m1comm_device::device_rom_region() const
 {
 	return ROM_NAME( m1comm );
 }
@@ -141,11 +141,11 @@ const tiny_rom_entry *m1comm_device::device_rom_region() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  m1comm_device - constructor
+//  sega_m1comm_device - constructor
 //-------------------------------------------------
 
-m1comm_device::m1comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, M1COMM, tag, owner, clock),
+sega_m1comm_device::sega_m1comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, SEGA_MODEL1_COMM, tag, owner, clock),
 	m_cpu(*this, Z80_TAG),
 	m_dma(*this, "commdma"),
 	m_dlc(*this, "commdlc")
@@ -163,7 +163,7 @@ m1comm_device::m1comm_device(const machine_config &mconfig, const char *tag, dev
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void m1comm_device::device_start()
+void sega_m1comm_device::device_start()
 {
 }
 
@@ -171,7 +171,7 @@ void m1comm_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void m1comm_device::device_reset()
+void sega_m1comm_device::device_reset()
 {
 	m_syn = 0;
 	m_zfg = 0;
@@ -179,70 +179,70 @@ void m1comm_device::device_reset()
 	m_fg = 0;
 }
 
-void m1comm_device::device_reset_after_children()
+void sega_m1comm_device::device_reset_after_children()
 {
 	m_cpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_dma->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_dlc->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-void m1comm_device::dma_hreq_w(int state)
+void sega_m1comm_device::dma_hreq_w(int state)
 {
 	m_cpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 	m_dma->hack_w(state);
 }
 
-uint8_t m1comm_device::dma_mem_r(offs_t offset)
+uint8_t sega_m1comm_device::dma_mem_r(offs_t offset)
 {
 	return m_cpu->space(AS_PROGRAM).read_byte(offset);
 }
 
-void m1comm_device::dma_mem_w(offs_t offset, uint8_t data)
+void sega_m1comm_device::dma_mem_w(offs_t offset, uint8_t data)
 {
 	m_cpu->space(AS_PROGRAM).write_byte(offset, data);
 }
 
-void m1comm_device::dlc_int7_w(int state)
+void sega_m1comm_device::dlc_int7_w(int state)
 {
 	m_cpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0xff); // Z80
 }
 
-uint8_t m1comm_device::syn_r()
+uint8_t sega_m1comm_device::syn_r()
 {
 	return m_syn | 0xfc;
 }
 
-void m1comm_device::syn_w(uint8_t data)
+void sega_m1comm_device::syn_w(uint8_t data)
 {
 	m_syn = data & 0x03;
 }
 
-uint8_t m1comm_device::zfg_r()
+uint8_t sega_m1comm_device::zfg_r()
 {
 	return m_zfg | (~m_fg << 7) | 0x7e;
 }
 
-void m1comm_device::zfg_w(uint8_t data)
+void sega_m1comm_device::zfg_w(uint8_t data)
 {
 	m_zfg = data & 0x01;
 }
 
-uint8_t m1comm_device::share_r(offs_t offset)
+uint8_t sega_m1comm_device::share_r(offs_t offset)
 {
 	return m_shared[offset];
 }
 
-void m1comm_device::share_w(offs_t offset, uint8_t data)
+void sega_m1comm_device::share_w(offs_t offset, uint8_t data)
 {
 	m_shared[offset] = data;
 }
 
-uint8_t m1comm_device::cn_r()
+uint8_t sega_m1comm_device::cn_r()
 {
 	return m_cn | 0xfe;
 }
 
-void m1comm_device::cn_w(uint8_t data)
+void sega_m1comm_device::cn_w(uint8_t data)
 {
 	m_cn = data & 0x01;
 
@@ -279,12 +279,12 @@ void m1comm_device::cn_w(uint8_t data)
 #endif
 }
 
-uint8_t m1comm_device::fg_r()
+uint8_t sega_m1comm_device::fg_r()
 {
 	return m_fg | (~m_zfg << 7) | 0x7e;
 }
 
-void m1comm_device::fg_w(uint8_t data)
+void sega_m1comm_device::fg_w(uint8_t data)
 {
 	if (!m_cn)
 		return;
@@ -292,7 +292,7 @@ void m1comm_device::fg_w(uint8_t data)
 	m_fg = data & 0x01;
 }
 
-void m1comm_device::check_vint_irq()
+void sega_m1comm_device::check_vint_irq()
 {
 #ifndef M1COMM_SIMULATION
 	if (m_syn & 0x02)
@@ -305,7 +305,7 @@ void m1comm_device::check_vint_irq()
 }
 
 #ifdef M1COMM_SIMULATION
-void m1comm_device::comm_tick()
+void sega_m1comm_device::comm_tick()
 {
 	if (m_linkenable == 0x01)
 	{
@@ -555,7 +555,7 @@ void m1comm_device::comm_tick()
 	}
 }
 
-int m1comm_device::read_frame(int data_size)
+int sega_m1comm_device::read_frame(int data_size)
 {
 	if (!m_line_rx)
 		return 0;
@@ -604,7 +604,7 @@ int m1comm_device::read_frame(int data_size)
 	return recv;
 }
 
-void m1comm_device::send_data(uint8_t frame_type, int frame_start, int frame_size, int data_size)
+void sega_m1comm_device::send_data(uint8_t frame_type, int frame_start, int frame_size, int data_size)
 {
 	m_buffer0[0] = frame_type;
 	for (int i = 0x00 ; i < frame_size ; i++)
@@ -614,7 +614,7 @@ void m1comm_device::send_data(uint8_t frame_type, int frame_start, int frame_siz
 	send_frame(data_size);
 }
 
-void m1comm_device::send_frame(int data_size){
+void sega_m1comm_device::send_frame(int data_size){
 	if (!m_line_tx)
 		return;
 
