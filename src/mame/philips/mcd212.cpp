@@ -689,12 +689,14 @@ void mcd212_device::mix_lines(uint32_t *plane_a, bool *transparent_a, uint32_t *
 		uint32_t plane_b_cur = MosaicB ? plane_b[x - (x % mosaic_count_b)] : plane_b[x];
 		if (transparent_a[x]) {
 			plane_a_cur = 0;
-		} else if (m_transparency_control & TCR_DISABLE_MX) {
+		} else if (OrderAB && m_transparency_control & TCR_DISABLE_MX) {
 			plane_b_cur = 0;
 		}
 	
 		if (transparent_b[x]) {
 			plane_b_cur = 0;
+		} else if (!OrderAB && m_transparency_control & TCR_DISABLE_MX) {
+			plane_a_cur = 0;
 		}
 
 		const int32_t plane_a_r = 0xff & (plane_a_cur >> 16);
@@ -716,32 +718,6 @@ void mcd212_device::mix_lines(uint32_t *plane_a, bool *transparent_a, uint32_t *
 		const uint8_t out_g = std::clamp(weighted_a_g + weighted_b_g + 16, 0, 255);
 		const uint8_t out_b = std::clamp(weighted_a_b + weighted_b_b + 16, 0, 255);
 		out[x] = 0xff000000 | (out_r << 16) | (out_g << 8) | out_b;
-
-		if (m_transparency_control & TCR_DISABLE_MX)
-		{
-			if (OrderAB)
-			{
-				if (!transparent_a[x])
-				{
-					out[x] = 0xff000000 | (weighted_a_r << 16) | (weighted_a_g << 8) | weighted_a_b;
-				}
-				else if (!transparent_b[x])
-				{
-					out[x] = 0xff000000 | (weighted_b_r << 16) | (weighted_b_g << 8) | weighted_b_b;
-				}
-			}
-			else
-			{
-				if (!transparent_b[x])
-				{
-					out[x] = 0xff000000 | (weighted_b_r << 16) | (weighted_b_g << 8) | weighted_b_b;
-				}
-				else if (!transparent_a[x])
-				{
-					out[x] = 0xff000000 | (weighted_a_r << 16) | (weighted_a_g << 8) | weighted_a_b;
-				}
-			}
-		}
 	}
 
 	if (border_width)
