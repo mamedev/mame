@@ -129,11 +129,11 @@ public:
 	int get_mem0();
 	int get_mem1();
 
-	virtual u8 read(u8 offset) { return 0; };
-	virtual void write(u8 offset, u8 data) {};
+	virtual u8 read(u8 offset) { return 0; }
+	virtual void write(u8 offset, u8 data) {}
 
-	virtual u8 mem_read(u8 &pri_select_lines, u8 &sec_select_lines, u16 offset) { return 0; };
-	virtual void mem_write(u8 &pri_select_lines, u8 &sec_select_lines, u16 offset, u8 data) {};
+	virtual u8 mem_read(u8 &pri_select_lines, u8 &sec_select_lines, u16 offset) { return 0; }
+	virtual void mem_write(u8 &pri_select_lines, u8 &sec_select_lines, u16 offset, u8 data) {}
 
 protected:
 	device_h89bus_left_card_interface(const machine_config &mconfig, device_t &device);
@@ -157,8 +157,8 @@ public:
 	int get_io0();
 	int get_io1();
 
-	virtual u8 read(u8 select_lines, u8 offset) { return 0; };
-	virtual void write(u8 select_lines, u8 offset, u8 data) {};
+	virtual u8 read(u8 select_lines, u8 offset) { return 0; }
+	virtual void write(u8 select_lines, u8 offset, u8 data) {}
 
 	void set_p506_signalling(bool val)
 	{

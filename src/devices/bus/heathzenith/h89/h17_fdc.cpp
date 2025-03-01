@@ -46,6 +46,8 @@ namespace {
 class heath_h17_fdc_device : public device_t, public device_h89bus_right_card_interface
 {
 public:
+	static constexpr feature_type unemulated_features() { return feature::DISK; }
+
 	heath_h17_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	auto floppy_ram_wp_cb() { return m_floppy_ram_wp.bind(); }
@@ -54,8 +56,6 @@ public:
 	virtual u8 read(u8 select_lines, u8 offset) override;
 
 	[[maybe_unused]] void side_select_w(int state);
-
-	static constexpr feature_type unemulated_features() { return feature::DISK; }
 
 protected:
 	static constexpr u8 MAX_FLOPPY_DRIVES = 3;

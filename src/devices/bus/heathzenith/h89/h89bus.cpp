@@ -163,6 +163,30 @@ DEFINE_DEVICE_TYPE(H89BUS, h89bus_device, "h89bus", "H-89/Z-90 bus")
 //  General purpose port         |    F2 |     362
 //  NMI                          | FA-FB | 372-373
 //
+//                                  PORT
+//        MMS 444-61C            |  Hex  |  Octal
+// ------------------------------+-------+---------
+//  Not specified, available     |  0-37 |   0- 67
+//  MMS 77316 DD FDC             | 38-3F |  70- 77
+//  MMS Internal test fixtures   | 40-47 | 100-107
+//  MMS 77317 ACT/XCOMP I/O      | 48-4F | 110-117
+//  MMS 77315 CAMEO I/O          | 50-56 | 120-126
+//  Unused                       |    57 |     127
+//  MMS 77314 Corvus I/O         | 58-59 | 130-131
+//  MMS 77314 REMEX I/O          | 5A-5B | 132-133
+//  MMS 77314,15,17 Conf Port    |    5C |     134
+//  Unused                       | 5D-77 | 135-167
+//  Disk I/O #1                  | 78-7B | 170-173
+//  Disk I/O #2                  | 7C-7F | 174-177
+//  HDOS reserved                | 80-CF | 200-317
+//  DCE Serial I/O               | D0-D7 | 320-327
+//  DTE Serial I/O               | D8-DF | 330-337
+//  DCE Serial I/O               | EO-E7 | 340-347
+//  Console I/O                  | E8-EF | 350-357
+//  NMI                          | F0-F1 | 360-361
+//  General purpose port         |    F2 |     362
+//  NMI                          | FA-FB | 372-373
+//
 ROM_START(h89bus)
 
 	// I/O Decoder
