@@ -33,12 +33,9 @@ PCBoards:
 
 Usage:
 
-The driver includes a (mostly) interactive layout, including buttons, LEDs and
-sliders. The only non-interactive widgets right now are the knobs (such as
-tuning and volume). Those will display their current value, but they can only
-be modified by the Slider Control menu.
+The driver includes an interactive layout.
 
-Since there is no audio, the driver logs triggers and other info. To see these
+Since there is no audio, the driver logs triggers and other info. To see those,
 run the driver with `-log`:
 ./mame -window linndrum -log
 
