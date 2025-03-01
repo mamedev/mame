@@ -671,7 +671,6 @@ const uint32_t mcd212_device::s_4bpp_color[16] =
 template <bool MosaicA, bool MosaicB, bool OrderAB>
 void mcd212_device::mix_lines(uint32_t *plane_a, bool *transparent_a, uint32_t *plane_b, bool *transparent_b, uint32_t *out)
 {
-	const uint32_t backdrop = s_4bpp_color[m_backdrop_color];
 	const uint8_t mosaic_count_a = (m_mosaic_hold[0] & 0x0000ff) << 1;
 	const uint8_t mosaic_count_b = (m_mosaic_hold[1] & 0x0000ff) << 1;
 	const int width = get_screen_width();
@@ -682,43 +681,44 @@ void mcd212_device::mix_lines(uint32_t *plane_a, bool *transparent_a, uint32_t *
 
 	for (int x = 0; x < width; x++)
 	{
-		const uint32_t plane_a_cur = MosaicA ? plane_a[x - (x % mosaic_count_a)] : plane_a[x];
-		const uint32_t plane_b_cur = MosaicB ? plane_b[x - (x % mosaic_count_b)] : plane_b[x];
-		if (!(m_transparency_control & TCR_DISABLE_MX))
-		{
-			const int32_t plane_a_r = 0xff & (plane_a[x] >> 16);
-			const int32_t plane_b_r = 0xff & (plane_b[x] >> 16);
-			const int32_t plane_a_g = 0xff & (plane_a[x] >> 8);
-			const int32_t plane_b_g = 0xff & (plane_b[x] >> 8);
-			const int32_t plane_a_b = 0xff &  plane_a[x];
-			const int32_t plane_b_b = 0xff &  plane_b[x];
-			const int32_t weighted_a_r =  (plane_a_r > 16) ? (((plane_a_r - 16) * weight_a[x]) >> 6) : 0;
-			const int32_t weighted_a_g =  (plane_a_g > 16) ? (((plane_a_g - 16) * weight_a[x]) >> 6) : 0;
-			const int32_t weighted_a_b =  (plane_a_b > 16) ? (((plane_a_b - 16) * weight_a[x]) >> 6) : 0;
-			const int32_t weighted_b_r = ((plane_b_r > 16) ? (((plane_b_r - 16) * weight_b[x]) >> 6) : 0) + weighted_a_r;
-			const int32_t weighted_b_g = ((plane_b_g > 16) ? (((plane_b_g - 16) * weight_b[x]) >> 6) : 0) + weighted_a_g;
-			const int32_t weighted_b_b = ((plane_b_b > 16) ? (((plane_b_b - 16) * weight_b[x]) >> 6) : 0) + weighted_a_b;
-			const uint8_t out_r = (weighted_b_r > 255) ? 255 : (uint8_t)weighted_b_r;
-			const uint8_t out_g = (weighted_b_g > 255) ? 255 : (uint8_t)weighted_b_g;
-			const uint8_t out_b = (weighted_b_b > 255) ? 255 : (uint8_t)weighted_b_b;
-			out[x] = 0xff000000 | (out_r << 16) | (out_g << 8) | out_b;
+		if (transparent_a[x] && transparent_b[x]) {
+			out[x] = s_4bpp_color[m_backdrop_color];
+			continue;
 		}
-		else
+		uint32_t plane_a_cur = MosaicA ? plane_a[x - (x % mosaic_count_a)] : plane_a[x];
+		uint32_t plane_b_cur = MosaicB ? plane_b[x - (x % mosaic_count_b)] : plane_b[x];
+		if (transparent_a[x]) {
+			plane_a_cur = 0;
+		} else if (m_transparency_control & TCR_DISABLE_MX) {
+			plane_b_cur = 0;
+		}
+	
+		if (transparent_b[x]) {
+			plane_b_cur = 0;
+		}
+
+		const int32_t plane_a_r = 0xff & (plane_a_cur >> 16);
+		const int32_t plane_a_g = 0xff & (plane_a_cur >> 8);
+		const int32_t plane_a_b = 0xff & plane_a_cur;
+		const int32_t plane_b_r = 0xff & (plane_b_cur >> 16);
+		const int32_t plane_b_g = 0xff & (plane_b_cur >> 8);
+		const int32_t plane_b_b = 0xff & plane_b_cur;
+
+		const int32_t weighted_a_r = std::clamp((std::clamp(plane_a_r - 16, 0, 255) * weight_a[x]) >> 6, 0, 255);
+		const int32_t weighted_a_g = std::clamp((std::clamp(plane_a_g - 16, 0, 255) * weight_a[x]) >> 6, 0, 255);
+		const int32_t weighted_a_b = std::clamp((std::clamp(plane_a_b - 16, 0, 255) * weight_a[x]) >> 6, 0, 255);
+
+		const int32_t weighted_b_r = std::clamp((std::clamp(plane_b_r - 16, 0, 255) * weight_b[x]) >> 6, 0, 255);
+		const int32_t weighted_b_g = std::clamp((std::clamp(plane_b_g - 16, 0, 255) * weight_b[x]) >> 6, 0, 255);
+		const int32_t weighted_b_b = std::clamp((std::clamp(plane_b_b - 16, 0, 255) * weight_b[x]) >> 6, 0, 255);
+
+		const uint8_t out_r = std::clamp(weighted_a_r + weighted_b_r + 16, 0, 255);
+		const uint8_t out_g = std::clamp(weighted_a_g + weighted_b_g + 16, 0, 255);
+		const uint8_t out_b = std::clamp(weighted_a_b + weighted_b_b + 16, 0, 255);
+		out[x] = 0xff000000 | (out_r << 16) | (out_g << 8) | out_b;
+
+		if (m_transparency_control & TCR_DISABLE_MX)
 		{
-			const int32_t plane_a_r = 0xff & (plane_a_cur >> 16);
-			const int32_t plane_a_g = 0xff & (plane_a_cur >> 8);
-			const int32_t plane_a_b = 0xff &  plane_a_cur;
-			const int32_t plane_b_r = 0xff & (plane_b_cur >> 16);
-			const int32_t plane_b_g = 0xff & (plane_b_cur >> 8);
-			const int32_t plane_b_b = 0xff &  plane_b_cur;
-
-			const uint8_t weighted_a_r = std::clamp(((plane_a_r > 16) ? (((plane_a_r - 16) * weight_a[x]) >> 6) : 0) + 16, 0, 255);
-			const uint8_t weighted_a_g = std::clamp(((plane_a_g > 16) ? (((plane_a_g - 16) * weight_a[x]) >> 6) : 0) + 16, 0, 255);
-			const uint8_t weighted_a_b = std::clamp(((plane_a_b > 16) ? (((plane_a_b - 16) * weight_a[x]) >> 6) : 0) + 16, 0, 255);
-			const uint8_t weighted_b_r = std::clamp(((plane_b_r > 16) ? (((plane_b_r - 16) * weight_b[x]) >> 6) : 0) + 16, 0, 255);
-			const uint8_t weighted_b_g = std::clamp(((plane_b_g > 16) ? (((plane_b_g - 16) * weight_b[x]) >> 6) : 0) + 16, 0, 255);
-			const uint8_t weighted_b_b = std::clamp(((plane_b_b > 16) ? (((plane_b_b - 16) * weight_b[x]) >> 6) : 0) + 16, 0, 255);
-
 			if (OrderAB)
 			{
 				if (!transparent_a[x])
@@ -728,10 +728,6 @@ void mcd212_device::mix_lines(uint32_t *plane_a, bool *transparent_a, uint32_t *
 				else if (!transparent_b[x])
 				{
 					out[x] = 0xff000000 | (weighted_b_r << 16) | (weighted_b_g << 8) | weighted_b_b;
-				}
-				else
-				{
-					out[x] = backdrop;
 				}
 			}
 			else
@@ -743,10 +739,6 @@ void mcd212_device::mix_lines(uint32_t *plane_a, bool *transparent_a, uint32_t *
 				else if (!transparent_a[x])
 				{
 					out[x] = 0xff000000 | (weighted_a_r << 16) | (weighted_a_g << 8) | weighted_a_b;
-				}
-				else
-				{
-					out[x] = backdrop;
 				}
 			}
 		}
