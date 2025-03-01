@@ -1063,7 +1063,7 @@ static INPUT_PORTS_START( racedrivc )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("mainpcb:8BADC.6")        /* b00000 - 8 bit ADC 6 - force brake */
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(40) PORT_REVERSE PORT_NAME("Force Brake")
+	PORT_BIT( 0xff, 0x20, IPT_PEDAL2 ) PORT_MINMAX(0x20, 0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(40) PORT_REVERSE PORT_NAME("Force Brake") /* Added port_minmax to keep brake calibration within range in test menu */
 
 	PORT_START("mainpcb:8BADC.7")        /* b00000 - 8 bit ADC 7 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -4751,10 +4751,10 @@ ROM_START( hdrivairp )
 	ROM_LOAD16_BYTE( "dskpics.lo",  0x00001, 0x80000, CRC(8c6f0750) SHA1(4cb23cedc500c1509dc875c3291a5771c8473f73) )
 
 	ROM_REGION32_LE( 0x200000, "mainpcb:user4", 0 )/* 2MB for ASIC61 ROMs */
-	ROM_LOAD16_BYTE( "roads.0",     0x000000, 0x80000, CRC(cab2e335) SHA1(914996c5b7905f1c20fcda6972af88debbee59cd) )
-	ROM_LOAD16_BYTE( "roads.1",     0x000001, 0x80000, CRC(62c244ba) SHA1(f041a269f35a9d187c90241c5b64173663ad5268) )
-	ROM_LOAD16_BYTE( "roads.2",     0x000002, 0x80000, CRC(ba57f415) SHA1(1daf5a014e9bef15466b282bcca2395fec2b0628) )
-	ROM_LOAD16_BYTE( "roads.3",     0x000003, 0x80000, CRC(1e6a4ca0) SHA1(2cf06d6c73be11cf10515246fca2baa05ce5091b) )
+	ROM_LOAD32_BYTE( "roads.0",     0x000000, 0x80000, CRC(cab2e335) SHA1(914996c5b7905f1c20fcda6972af88debbee59cd) ) /* Changed these from ROM_LOAD16_BYTE to ROM_LOAD32_BYTE to load track collision detection properly */
+	ROM_LOAD32_BYTE( "roads.1",     0x000001, 0x80000, CRC(62c244ba) SHA1(f041a269f35a9d187c90241c5b64173663ad5268) )
+	ROM_LOAD32_BYTE( "roads.2",     0x000002, 0x80000, CRC(ba57f415) SHA1(1daf5a014e9bef15466b282bcca2395fec2b0628) )
+	ROM_LOAD32_BYTE( "roads.3",     0x000003, 0x80000, CRC(1e6a4ca0) SHA1(2cf06d6c73be11cf10515246fca2baa05ce5091b) )
 
 	ROM_REGION( 0x10000, "mainpcb:ds3sdsp", 0 ) /* DS IV sound ADSP-2105 */
 	ROM_LOAD( "sboota.bin", 0x00000, 0x10000, CRC(3ef819cd) SHA1(c547b869a3a37a82fb46584fe0ef0cfe21a4f882) )
