@@ -146,9 +146,17 @@ void tc0080vco_device::device_start()
 	m_tilemap[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(tc0080vco_device::get_bg0_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 	m_tilemap[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(tc0080vco_device::get_bg1_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 
-	m_tilemap[0]->set_transparent_pen(0);
-	m_tilemap[1]->set_transparent_pen(0);
+//	m_tilemap[0]->set_transparent_pen(0);
+//	m_tilemap[1]->set_transparent_pen(0);
 
+	// ainferno expects upper color bank to be transparent for hud and landing monitor to display properly.
+	// This is drawn with bit 15, is it expecting some kind of shadowing/blending? The PCB refs doesn't seem to show anything of the like.
+	// The only other place that sets upper color bank is tetristh, and doesn't seem to have any real effect.
+	// TODO: this arrangement may be controlled by m_scroll_ram[0] bits 7 and 6, which is either b11 or b00.
+	m_tilemap[0]->set_transmask(0, 0x0001, 0xfffe);
+	m_tilemap[0]->set_transmask(1, 0x8001, 0x7ffe);
+	m_tilemap[1]->set_transmask(0, 0x0001, 0xfffe);
+	m_tilemap[1]->set_transmask(1, 0x8001, 0x7ffe);
 	m_tilemap[0]->set_scrolldx(m_bg_xoffs, 512);
 	m_tilemap[1]->set_scrolldx(m_bg_xoffs, 512);
 	m_tilemap[0]->set_scrolldy(m_bg_yoffs, m_bg_flip_yoffs);
@@ -325,7 +333,7 @@ TILE_GET_INFO_MEMBER(tc0080vco_device::get_bg0_tile_info)
 	color = m_bg0_ram_1[tile_index] & 0x001f;
 	tile  = m_bg0_ram_0[tile_index] & 0x7fff;
 
-	tileinfo.category = 0;
+	tileinfo.group = color >> 4;
 
 	tileinfo.set(0,
 			tile,
@@ -340,7 +348,7 @@ TILE_GET_INFO_MEMBER(tc0080vco_device::get_bg1_tile_info)
 	color = m_bg1_ram_1[tile_index] & 0x001f;
 	tile  = m_bg1_ram_0[tile_index] & 0x7fff;
 
-	tileinfo.category = 0;
+	tileinfo.group = color >> 4;
 
 	tileinfo.set(0,
 			tile,
