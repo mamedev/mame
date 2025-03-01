@@ -45,6 +45,7 @@ Mephisto Explorer:
 - PCB label: 51CT09-01001L
 - Hitachi H8/3212 MCU (QFP), 10MHz XTAL, same ROM contents as Barracuda
 - LCD layout is slightly different, symbols are on the right side
+- no board edge LEDs, LCD backlight via P51
 
 H8/323 A13 MCU is used in:
 - Saitek GK 2000 (1992 version, 86071220X12)
