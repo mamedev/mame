@@ -681,22 +681,22 @@ void mcd212_device::mix_lines(uint32_t *plane_a, bool *transparent_a, uint32_t *
 
 	for (int x = 0; x < width; x++)
 	{
-		if (transparent_a[x] && transparent_b[x]) {
+		if (transparent_a[x] && transparent_b[x])
+		{
 			out[x] = s_4bpp_color[m_backdrop_color];
 			continue;
 		}
 		uint32_t plane_a_cur = MosaicA ? plane_a[x - (x % mosaic_count_a)] : plane_a[x];
 		uint32_t plane_b_cur = MosaicB ? plane_b[x - (x % mosaic_count_b)] : plane_b[x];
-		if (transparent_a[x]) {
+
+		if (transparent_a[x] || (!OrderAB && (m_transparency_control & TCR_DISABLE_MX)))
+		{
 			plane_a_cur = 0;
-		} else if (OrderAB && m_transparency_control & TCR_DISABLE_MX) {
-			plane_b_cur = 0;
 		}
-	
-		if (transparent_b[x]) {
+
+		if (transparent_b[x] || ( OrderAB && (m_transparency_control & TCR_DISABLE_MX)))
+		{
 			plane_b_cur = 0;
-		} else if (!OrderAB && m_transparency_control & TCR_DISABLE_MX) {
-			plane_a_cur = 0;
 		}
 
 		const int32_t plane_a_r = 0xff & (plane_a_cur >> 16);
