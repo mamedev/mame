@@ -79,8 +79,8 @@ protected:
 	virtual bool get_save_window_arrangement() const override { return m_save_windows; }
 	virtual void set_save_window_arrangement(bool save) override { m_save_windows = save; }
 	virtual bool get_group_windows() const override { return m_group_windows; }
-	virtual bool get_group_windows_setting() const { return m_group_windows_setting; }
-	virtual void set_group_windows_setting(bool group) { m_group_windows_setting = group; }
+	virtual bool get_group_windows_setting() const override { return m_group_windows_setting; }
+	virtual void set_group_windows_setting(bool group) override { m_group_windows_setting = group; }
 
 	virtual bool const &waiting_for_debugger() const override { return m_waiting_for_debugger; }
 	virtual bool seq_pressed() const override;
