@@ -128,18 +128,18 @@ public:
 		m_spriteram(*this, "spriteram", 0x1000U, ENDIANNESS_LITTLE)
 	{ }
 
-	void joemacr(machine_config &config);
-	void magdrop(machine_config &config);
-	void chainrec(machine_config &config);
-	void mitchell156(machine_config &config);
-	void magdropp(machine_config &config);
+	void joemacr(machine_config &config) ATTR_COLD;
+	void magdrop(machine_config &config) ATTR_COLD;
+	void chainrec(machine_config &config) ATTR_COLD;
+	void mitchell156(machine_config &config) ATTR_COLD;
+	void magdropp(machine_config &config) ATTR_COLD;
 
-	void init_simpl156();
-	void init_joemacr();
-	void init_charlien();
-	void init_prtytime();
-	void init_osman();
-	void init_chainrec();
+	void init_simpl156() ATTR_COLD;
+	void init_joemacr() ATTR_COLD;
+	void init_charlien() ATTR_COLD;
+	void init_prtytime() ATTR_COLD;
+	void init_osman() ATTR_COLD;
+	void init_chainrec() ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
