@@ -62,133 +62,69 @@ void mcd212_device::update_matte_arrays()
 	const int num_mattes = BIT(m_image_coding_method, ICM_NM_BIT) ? 2 : 1;
 	const bool matte_flag = BIT(m_matte_control[0], MC_MF_BIT); // MF bit must be the same. See 5.10.2 Matte Commands
 	
+	int matte_idx[2] = { 0, 4 };
 	int x = 0;
-	int matte_idx = 0;
 	for (; x < width; x++)
 	{
-		for (int f1 = 0; f1 < num_mattes; f1++)
+		for (int matte = 0; matte < num_mattes; matte++)
 		{
-			const int max_matte_id = (0x10 >> num_mattes) + (f1 << 2);
-			const int flag = (num_mattes == 2) ? f1 : matte_flag;
-			if (num_mattes == 2)
+			const int max_matte_id = (num_mattes == 2 ? 4 : 8) + (matte ? 4 : 0);
+			if (matte_idx[matte] >= max_matte_id)
 			{
-				for (int matte = 0; matte < max_matte_id; matte++)
-				{
-					const int matte_idx = (flag << 2) + matte;
-					const uint32_t matte_ctrl = m_matte_control[matte_idx];
-					const uint32_t matte_op = get_matte_op(matte_idx);
-					if (matte_op == 0)
-					{
-						break;
-					}
-					if (x == (matte_ctrl & MC_X))
-					{
-						switch (matte_op)
-						{
-						case 0: // End of matte control for line
-							break;
-						case 1:
-						case 2:
-						case 3: // Not used
-							break;
-						case 4: // Change weight of plane A
-							latched_wfa = get_weight_factor(matte_idx);
-							break;
-						case 5: // Not used
-							break;
-						case 6: // Change weight of plane B
-							latched_wfb = get_weight_factor(matte_idx);
-							break;
-						case 7: // Not used
-							break;
-						case 8: // Reset matte flag
-							latched_mf[flag] = false;
-							break;
-						case 9: // Set matte flag
-							latched_mf[flag] = true;
-							break;
-						case 10:    // Not used
-						case 11:    // Not used
-							break;
-						case 12: // Reset matte flag and change weight of plane A
-							latched_wfa = get_weight_factor(matte_idx);
-							latched_mf[flag] = false;
-							break;
-						case 13: // Set matte flag and change weight of plane A
-							latched_wfa = get_weight_factor(matte_idx);
-							latched_mf[flag] = true;
-							break;
-						case 14: // Reset matte flag and change weight of plane B
-							latched_wfb = get_weight_factor(matte_idx);
-							latched_mf[flag] = false;
-							break;
-						case 15: // Set matte flag and change weight of plane B
-							latched_wfb = get_weight_factor(matte_idx);
-							latched_mf[flag] = true;
-							break;
-						}
-					}
-				}
+				continue;
 			}
-			else
+			const uint32_t matte_ctrl = m_matte_control[matte_idx[matte]];
+			const uint32_t matte_op = get_matte_op(matte_idx[matte]);
+			const int flag = (num_mattes == 2) ? matte : matte_flag;
+
+			if (x == (matte_ctrl & MC_X))
 			{
-				if (matte_idx < max_matte_id)
+				switch (matte_op)
 				{
-					const uint32_t matte_ctrl = m_matte_control[matte_idx];
-					const uint32_t matte_op = get_matte_op(matte_idx);
-					if (matte_op == 0)
-					{
-						break;
-					}
-					if (x == (matte_ctrl & MC_X))
-					{
-						switch (matte_op)
-						{
-						case 0: // End of matte control for line
-							break;
-						case 1:
-						case 2:
-						case 3: // Not used
-							break;
-						case 4: // Change weight of plane A
-							latched_wfa = get_weight_factor(matte_idx);
-							break;
-						case 5: // Not used
-							break;
-						case 6: // Change weight of plane B
-							latched_wfb = get_weight_factor(matte_idx);
-							break;
-						case 7: // Not used
-							break;
-						case 8: // Reset matte flag
-							latched_mf[flag] = false;
-							break;
-						case 9: // Set matte flag
-							latched_mf[flag] = true;
-							break;
-						case 10:    // Not used
-						case 11:    // Not used
-							break;
-						case 12: // Reset matte flag and change weight of plane A
-							latched_wfa = get_weight_factor(matte_idx);
-							latched_mf[flag] = false;
-							break;
-						case 13: // Set matte flag and change weight of plane A
-							latched_wfa = get_weight_factor(matte_idx);
-							latched_mf[flag] = true;
-							break;
-						case 14: // Reset matte flag and change weight of plane B
-							latched_wfb = get_weight_factor(matte_idx);
-							latched_mf[flag] = false;
-							break;
-						case 15: // Set matte flag and change weight of plane B
-							latched_wfb = get_weight_factor(matte_idx);
-							latched_mf[flag] = true;
-							break;
-						}
-						matte_idx++;
-					}
+				case 0: // Disregard all commands in higher registers. See 5.10.2
+					matte_idx[matte] = max_matte_id;
+					break;
+				case 1:
+				case 2:
+				case 3: // Not used
+					break;
+				case 4: // Change weight of plane A
+					latched_wfa = get_weight_factor(matte_idx[matte]);
+					break;
+				case 5: // Not used
+					break;
+				case 6: // Change weight of plane B
+					latched_wfb = get_weight_factor(matte_idx[matte]);
+					break;
+				case 7: // Not used
+					break;
+				case 8: // Reset matte flag
+					latched_mf[flag] = false;
+					break;
+				case 9: // Set matte flag
+					latched_mf[flag] = true;
+					break;
+				case 10:    // Not used
+				case 11:    // Not used
+					break;
+				case 12: // Reset matte flag and change weight of plane A
+					latched_wfa = get_weight_factor(matte_idx[matte]);
+					latched_mf[flag] = false;
+					break;
+				case 13: // Set matte flag and change weight of plane A
+					latched_wfa = get_weight_factor(matte_idx[matte]);
+					latched_mf[flag] = true;
+					break;
+				case 14: // Reset matte flag and change weight of plane B
+					latched_wfb = get_weight_factor(matte_idx[matte]);
+					latched_mf[flag] = false;
+					break;
+				case 15: // Set matte flag and change weight of plane B
+					latched_wfb = get_weight_factor(matte_idx[matte]);
+					latched_mf[flag] = true;
+					break;
 				}
+				matte_idx[matte]++;
 			}
 		}
 		m_weight_factor[0][x] = latched_wfa;
