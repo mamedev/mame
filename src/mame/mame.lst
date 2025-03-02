@@ -43172,6 +43172,10 @@ prose2ko
 @source:skeleton/tulip1.cpp
 tulip1
 
+@source:skeleton/turnierdart.cpp
+turnierd
+turnierda
+
 @source:skeleton/tvcobrasd.cpp
 cobrasd
 cobrasda
