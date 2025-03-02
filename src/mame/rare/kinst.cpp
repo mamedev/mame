@@ -505,7 +505,8 @@ uint32_t kinst_state::rom_r(offs_t offset)
 {
 	// add RdRdy clocks on EPROM access
 	// bootup sequence takes approx. 6 seconds, and it's not a CPU clock divider
-	m_maincpu->adjust_icount(-128);
+	if (!machine().side_effects_disabled())
+		m_maincpu->adjust_icount(-128);
 
 	return m_rombase[offset];
 }
