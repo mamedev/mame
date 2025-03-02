@@ -6,6 +6,7 @@ Comm PCB
 --------
 
 MODEL-1 COMMUNICATION BD 837-8842 171-6293B (C) SEGA 1992
+( http://images.arianchen.de/sega-comm/model1-front.jpg / http://images.arianchen.de/sega-comm/model1-back.jpg )
 |--------------------------------------------------------------------------------|
 |                                                                                |
 |    MB89237A            MB89374                                                 |
@@ -55,28 +56,31 @@ Notes:
 #include "m1comm.h"
 #include "emuopts.h"
 
-#define Z80_TAG     "commcpu"
+#define VERBOSE 0
+#include "logmacro.h"
+
+#define Z80_TAG "commcpu"
 
 /*************************************
  *  M1COMM Memory Map
  *************************************/
-void m1comm_device::m1comm_mem(address_map &map)
+void sega_m1comm_device::m1comm_mem(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).ram();
-	map(0xc000, 0xffff).mask(0x0fff).rw(FUNC(m1comm_device::share_r), FUNC(m1comm_device::share_w));
+	map(0xc000, 0xffff).mask(0x0fff).rw(FUNC(sega_m1comm_device::share_r), FUNC(sega_m1comm_device::share_w));
 }
 
 /*************************************
  *  M1COMM I/O Map
  *************************************/
-void m1comm_device::m1comm_io(address_map &map)
+void sega_m1comm_device::m1comm_io(address_map &map)
 {
 	map.global_mask(0x7f);
 	map(0x00, 0x1f).rw(m_dlc, FUNC(mb89374_device::read), FUNC(mb89374_device::write));
 	map(0x20, 0x2f).rw(m_dma, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
-	map(0x40, 0x5f).mask(0x01).rw(FUNC(m1comm_device::syn_r), FUNC(m1comm_device::syn_w));
-	map(0x60, 0x7f).mask(0x01).rw(FUNC(m1comm_device::zfg_r), FUNC(m1comm_device::zfg_w));
+	map(0x40, 0x5f).mask(0x01).rw(FUNC(sega_m1comm_device::syn_r), FUNC(sega_m1comm_device::syn_w));
+	map(0x60, 0x7f).mask(0x01).rw(FUNC(sega_m1comm_device::zfg_r), FUNC(sega_m1comm_device::zfg_w));
 }
 
 ROM_START( m1comm )
@@ -96,38 +100,38 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(M1COMM, m1comm_device, "m1comm", "Model-1 Communication Board")
+DEFINE_DEVICE_TYPE(SEGA_MODEL1_COMM, sega_m1comm_device, "m1comm", "Sega Model-1 Communication Board")
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void m1comm_device::device_add_mconfig(machine_config &config)
+void sega_m1comm_device::device_add_mconfig(machine_config &config)
 {
-	Z80(config, m_cpu, 8000000); // 32 MHz / 4
-	m_cpu->set_memory_map(&m1comm_device::m1comm_mem);
-	m_cpu->set_io_map(&m1comm_device::m1comm_io);
+	Z80(config, m_cpu, 32_MHz_XTAL / 4);
+	m_cpu->set_memory_map(&sega_m1comm_device::m1comm_mem);
+	m_cpu->set_io_map(&sega_m1comm_device::m1comm_io);
 
-	AM9517A(config, m_dma, 8000000); // 32 MHz / 4
-	m_dma->out_hreq_callback().set(FUNC(m1comm_device::dma_hreq_w));
-	m_dma->in_memr_callback().set(FUNC(m1comm_device::dma_mem_r));
-	m_dma->out_memw_callback().set(FUNC(m1comm_device::dma_mem_w));
+	AM9517A(config, m_dma, 32_MHz_XTAL / 4);
+	m_dma->out_hreq_callback().set(FUNC(sega_m1comm_device::dma_hreq_w));
+	m_dma->in_memr_callback().set(FUNC(sega_m1comm_device::dma_mem_r));
+	m_dma->out_memw_callback().set(FUNC(sega_m1comm_device::dma_mem_w));
 	m_dma->out_dack_callback<2>().set(m_dlc, FUNC(mb89374_device::pi3_w));
 	m_dma->out_dack_callback<3>().set(m_dlc, FUNC(mb89374_device::pi2_w));
 	m_dma->out_eop_callback().set(m_dlc, FUNC(mb89374_device::ci_w));
 	m_dma->in_ior_callback<2>().set(m_dlc, FUNC(mb89374_device::dma_r));
 	m_dma->out_iow_callback<3>().set(m_dlc, FUNC(mb89374_device::dma_w));
 
-	MB89374(config, m_dlc, 8000000); // 32 MHz / 4
+	MB89374(config, m_dlc, 32_MHz_XTAL / 4);
 	m_dlc->out_po_callback<2>().set(m_dma, FUNC(am9517a_device::dreq3_w));
 	m_dlc->out_po_callback<3>().set(m_dma, FUNC(am9517a_device::dreq2_w));
-	m_dlc->out_irq_callback().set(FUNC(m1comm_device::dlc_int7_w));
+	m_dlc->out_irq_callback().set(FUNC(sega_m1comm_device::dlc_int7_w));
 }
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
-const tiny_rom_entry *m1comm_device::device_rom_region() const
+const tiny_rom_entry *sega_m1comm_device::device_rom_region() const
 {
 	return ROM_NAME( m1comm );
 }
@@ -137,29 +141,19 @@ const tiny_rom_entry *m1comm_device::device_rom_region() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  m1comm_device - constructor
+//  sega_m1comm_device - constructor
 //-------------------------------------------------
 
-m1comm_device::m1comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, M1COMM, tag, owner, clock),
+sega_m1comm_device::sega_m1comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, SEGA_MODEL1_COMM, tag, owner, clock),
 	m_cpu(*this, Z80_TAG),
 	m_dma(*this, "commdma"),
 	m_dlc(*this, "commdlc")
 {
 #ifdef M1COMM_SIMULATION
-	// prepare localhost "filename"
-	m_localhost[0] = 0;
-	strcat(m_localhost, "socket.");
-	strcat(m_localhost, mconfig.options().comm_localhost());
-	strcat(m_localhost, ":");
-	strcat(m_localhost, mconfig.options().comm_localport());
-
-	// prepare remotehost "filename"
-	m_remotehost[0] = 0;
-	strcat(m_remotehost, "socket.");
-	strcat(m_remotehost, mconfig.options().comm_remotehost());
-	strcat(m_remotehost, ":");
-	strcat(m_remotehost, mconfig.options().comm_remoteport());
+	// prepare "filenames"
+	m_localhost = util::string_format("socket.%s:%s", mconfig.options().comm_localhost(), mconfig.options().comm_localport());
+	m_remotehost = util::string_format("socket.%s:%s", mconfig.options().comm_remotehost(), mconfig.options().comm_remoteport());
 
 	m_framesync = mconfig.options().comm_framesync() ? 0x01 : 0x00;
 #endif
@@ -169,7 +163,7 @@ m1comm_device::m1comm_device(const machine_config &mconfig, const char *tag, dev
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void m1comm_device::device_start()
+void sega_m1comm_device::device_start()
 {
 }
 
@@ -177,7 +171,7 @@ void m1comm_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void m1comm_device::device_reset()
+void sega_m1comm_device::device_reset()
 {
 	m_syn = 0;
 	m_zfg = 0;
@@ -185,70 +179,70 @@ void m1comm_device::device_reset()
 	m_fg = 0;
 }
 
-void m1comm_device::device_reset_after_children()
+void sega_m1comm_device::device_reset_after_children()
 {
 	m_cpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_dma->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_dlc->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-void m1comm_device::dma_hreq_w(int state)
+void sega_m1comm_device::dma_hreq_w(int state)
 {
 	m_cpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 	m_dma->hack_w(state);
 }
 
-uint8_t m1comm_device::dma_mem_r(offs_t offset)
+uint8_t sega_m1comm_device::dma_mem_r(offs_t offset)
 {
 	return m_cpu->space(AS_PROGRAM).read_byte(offset);
 }
 
-void m1comm_device::dma_mem_w(offs_t offset, uint8_t data)
+void sega_m1comm_device::dma_mem_w(offs_t offset, uint8_t data)
 {
 	m_cpu->space(AS_PROGRAM).write_byte(offset, data);
 }
 
-void m1comm_device::dlc_int7_w(int state)
+void sega_m1comm_device::dlc_int7_w(int state)
 {
 	m_cpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0xff); // Z80
 }
 
-uint8_t m1comm_device::syn_r()
+uint8_t sega_m1comm_device::syn_r()
 {
 	return m_syn | 0xfc;
 }
 
-void m1comm_device::syn_w(uint8_t data)
+void sega_m1comm_device::syn_w(uint8_t data)
 {
 	m_syn = data & 0x03;
 }
 
-uint8_t m1comm_device::zfg_r()
+uint8_t sega_m1comm_device::zfg_r()
 {
 	return m_zfg | (~m_fg << 7) | 0x7e;
 }
 
-void m1comm_device::zfg_w(uint8_t data)
+void sega_m1comm_device::zfg_w(uint8_t data)
 {
 	m_zfg = data & 0x01;
 }
 
-uint8_t m1comm_device::share_r(offs_t offset)
+uint8_t sega_m1comm_device::share_r(offs_t offset)
 {
 	return m_shared[offset];
 }
 
-void m1comm_device::share_w(offs_t offset, uint8_t data)
+void sega_m1comm_device::share_w(offs_t offset, uint8_t data)
 {
 	m_shared[offset] = data;
 }
 
-uint8_t m1comm_device::cn_r()
+uint8_t sega_m1comm_device::cn_r()
 {
 	return m_cn | 0xfe;
 }
 
-void m1comm_device::cn_w(uint8_t data)
+void sega_m1comm_device::cn_w(uint8_t data)
 {
 	m_cn = data & 0x01;
 
@@ -285,12 +279,12 @@ void m1comm_device::cn_w(uint8_t data)
 #endif
 }
 
-uint8_t m1comm_device::fg_r()
+uint8_t sega_m1comm_device::fg_r()
 {
 	return m_fg | (~m_zfg << 7) | 0x7e;
 }
 
-void m1comm_device::fg_w(uint8_t data)
+void sega_m1comm_device::fg_w(uint8_t data)
 {
 	if (!m_cn)
 		return;
@@ -298,7 +292,7 @@ void m1comm_device::fg_w(uint8_t data)
 	m_fg = data & 0x01;
 }
 
-void m1comm_device::check_vint_irq()
+void sega_m1comm_device::check_vint_irq()
 {
 #ifndef M1COMM_SIMULATION
 	if (m_syn & 0x02)
@@ -311,20 +305,16 @@ void m1comm_device::check_vint_irq()
 }
 
 #ifdef M1COMM_SIMULATION
-void m1comm_device::comm_tick()
+void sega_m1comm_device::comm_tick()
 {
 	if (m_linkenable == 0x01)
 	{
-		int frameStart = 0x0010;
-		int frameOffset = 0x0000;
-		int frameSize = 0x01c4;
-		int dataSize = frameSize + 1;
-		int recv = 0;
-		int idx = 0;
+		int frame_size = 0x01c4;
+		int data_size = frame_size + 1;
 
-		bool isMaster = (m_shared[1] == 0x01);
-		bool isSlave = (m_shared[1] == 0x02);
-		bool isRelay = (m_shared[1] == 0x00);
+		bool is_master = (m_shared[1] == 0x01);
+		bool is_slave = (m_shared[1] == 0x02);
+		bool is_relay = (m_shared[1] == 0x00);
 
 		if (m_linkalive == 0x02)
 		{
@@ -340,33 +330,43 @@ void m1comm_device::comm_tick()
 			// check rx socket
 			if (!m_line_rx)
 			{
-				osd_printf_verbose("M1COMM: listen on %s\n", m_localhost);
+				osd_printf_verbose("M1COMM: rx listen on %s\n", m_localhost);
 				uint64_t filesize; // unused
-				osd_file::open(m_localhost, OPEN_FLAG_CREATE, m_line_rx, filesize);
+				std::error_condition filerr = osd_file::open(m_localhost, OPEN_FLAG_CREATE, m_line_rx, filesize);
+				if (filerr)
+				{
+					osd_printf_verbose("M1COMM: rx connection failed - %02x, %s\n", filerr.value(), filerr.message());
+					m_line_rx.reset();
+				}
 			}
 
 			// check tx socket
 			if (!m_line_tx)
 			{
-				osd_printf_verbose("M1COMM: connect to %s\n", m_remotehost);
+				osd_printf_verbose("M1COMM: tx connect to %s\n", m_remotehost);
 				uint64_t filesize; // unused
-				osd_file::open(m_remotehost, 0, m_line_tx, filesize);
+				std::error_condition filerr = osd_file::open(m_remotehost, 0, m_line_tx, filesize);
+				if (filerr)
+				{
+					osd_printf_verbose("M1COMM: tx connection failed - %02x, %s\n", filerr.value(), filerr.message());
+					m_line_tx.reset();
+				}
 			}
 
 			// if both sockets are there check ring
 			if (m_line_rx && m_line_tx)
 			{
 				// try to read one message
-				recv = read_frame(dataSize);
+				int recv = read_frame(data_size);
 				while (recv > 0)
 				{
 					// check message id
-					idx = m_buffer0[0];
+					uint8_t idx = m_buffer0[0];
 
 					// 0xFF - link id
 					if (idx == 0xff)
 					{
-						if (isMaster)
+						if (is_master)
 						{
 							// master gets first id and starts next state
 							m_linkid = 0x01;
@@ -376,30 +376,30 @@ void m1comm_device::comm_tick()
 						else
 						{
 							// slave get own id, relay does nothing
-							if (isSlave)
+							if (is_slave)
 							{
 								m_buffer0[1]++;
 								m_linkid = m_buffer0[1];
 							}
 
 							// forward message to other nodes
-							send_frame(dataSize);
+							send_frame(data_size);
 						}
 					}
 
 					// 0xFE - link size
 					else if (idx == 0xfe)
 					{
-						if (isSlave || isRelay)
+						if (is_slave || is_relay)
 						{
 							m_linkcount = m_buffer0[1];
 
 							// forward message to other nodes
-							send_frame(dataSize);
+							send_frame(data_size);
 						}
 
 						// consider it done
-						osd_printf_verbose("M1COMM: link established - id %02x of %02x\n", m_linkid, m_linkcount);
+						LOG("M1COMM: link established - id %02x of %02x\n", m_linkid, m_linkcount);
 						m_linkalive = 0x01;
 						m_zfg = 0x01;
 
@@ -411,20 +411,20 @@ void m1comm_device::comm_tick()
 
 
 					if (m_linkalive == 0x00)
-						recv = read_frame(dataSize);
+						recv = read_frame(data_size);
 					else
 						recv = 0;
 				}
 
 				// if we are master and link is not yet established
-				if (isMaster && (m_linkalive == 0x00))
+				if (is_master && (m_linkalive == 0x00))
 				{
 					// send first packet
 					if (m_linktimer == 0x01)
 					{
 						m_buffer0[0] = 0xff;
 						m_buffer0[1] = 0x01;
-						send_frame(dataSize);
+						send_frame(data_size);
 					}
 
 					// send second packet
@@ -432,10 +432,10 @@ void m1comm_device::comm_tick()
 					{
 						m_buffer0[0] = 0xfe;
 						m_buffer0[1] = m_linkcount;
-						send_frame(dataSize);
+						send_frame(data_size);
 
 						// consider it done
-						osd_printf_verbose("M1COMM: link established - id %02x of %02x\n", m_linkid, m_linkcount);
+						LOG("M1COMM: link established - id %02x of %02x\n", m_linkid, m_linkcount);
 						m_linkalive = 0x01;
 						m_zfg = 0x01;
 
@@ -457,28 +457,30 @@ void m1comm_device::comm_tick()
 		if (m_linkalive == 0x01)
 		{
 			// link established
+			int frame_start = 0x0010;
+
 			do
 			{
 				// try to read a message
-				recv = read_frame(dataSize);
+				int recv = read_frame(data_size);
 				while (recv > 0)
 				{
 					// check if valid id
-					idx = m_buffer0[0];
+					uint8_t idx = m_buffer0[0];
 					if (idx > 0 && idx <= m_linkcount)
 					{
 						// if not own message
 						if (idx != m_linkid)
 						{
 							// save message to "ring buffer"
-							frameOffset = frameStart + (idx * frameSize);
-							for (int j = 0x00 ; j < frameSize ; j++)
+							int frame_offset = frame_start + (idx * frame_size);
+							for (int j = 0x00 ; j < frame_size ; j++)
 							{
-								m_shared[frameOffset + j] = m_buffer0[1 + j];
+								m_shared[frame_offset + j] = m_buffer0[1 + j];
 							}
 
 							// forward message to other nodes
-							send_frame(dataSize);
+							send_frame(data_size);
 						}
 					}
 					else
@@ -487,30 +489,30 @@ void m1comm_device::comm_tick()
 						{
 							// 0xFC - VSYNC
 							m_linktimer = 0x00;
-							if (!isMaster)
+							if (!is_master)
 								// forward message to other nodes
-								send_frame(dataSize);
+								send_frame(data_size);
 						}
 						if (idx == 0xfd)
 						{
 							// 0xFD - master addional bytes
-							if (!isMaster)
+							if (!is_master)
 							{
 								// save message to "ring buffer"
-								frameOffset = 0x06;
+								int frame_offset = 0x06;
 								for (int j = 0x00 ; j < 0x0a ; j++)
 								{
-									m_shared[frameOffset + j] = m_buffer0[1 + j];
+									m_shared[frame_offset + j] = m_buffer0[1 + j];
 								}
 
 								// forward message to other nodes
-								send_frame(dataSize);
+								send_frame(data_size);
 							}
 						}
 					}
 
 					// try to read another message
-					recv = read_frame(dataSize);
+					recv = read_frame(data_size);
 				}
 			}
 			while (m_linktimer == 0x01);
@@ -525,25 +527,25 @@ void m1comm_device::comm_tick()
 				// check ready-to-send flag
 				if (m_shared[4] != 0x00)
 				{
-					send_data(m_linkid, frameStart, frameSize, dataSize);
+					send_data(m_linkid, frame_start, frame_size, data_size);
 
 					// save message to "ring buffer"
-					frameOffset = frameStart + (m_linkid * frameSize);
-					for (int j = 0x00 ; j < frameSize ; j++)
+					int frame_offset = frame_start + (m_linkid * frame_size);
+					for (int j = 0x00 ; j < frame_size ; j++)
 					{
-						m_shared[frameOffset + j] = m_buffer0[1 + j];
+						m_shared[frame_offset + j] = m_buffer0[1 + j];
 					}
 				}
 
-				if (isMaster)
+				if (is_master)
 				{
 					// master sends additional status bytes
-					send_data(0xfd, 0x06, 0x0a, dataSize);
+					send_data(0xfd, 0x06, 0x0a, data_size);
 
 					// send vsync
 					m_buffer0[0] = 0xfc;
 					m_buffer0[1] = 0x01;
-					send_frame(dataSize);
+					send_frame(data_size);
 				}
 			}
 
@@ -553,21 +555,21 @@ void m1comm_device::comm_tick()
 	}
 }
 
-int m1comm_device::read_frame(int dataSize)
+int sega_m1comm_device::read_frame(int data_size)
 {
 	if (!m_line_rx)
 		return 0;
 
 	// try to read a message
-	std::uint32_t recv = 0;
-	std::error_condition filerr = m_line_rx->read(m_buffer0, 0, dataSize, recv);
+	uint32_t recv = 0;
+	std::error_condition filerr = m_line_rx->read(m_buffer0, 0, data_size, recv);
 	if (recv > 0)
 	{
 		// check if message complete
-		if (recv != dataSize)
+		if (recv != data_size)
 		{
 			// only part of a message - read on
-			std::uint32_t togo = dataSize - recv;
+			uint32_t togo = data_size - recv;
 			int offset = recv;
 			while (togo > 0)
 			{
@@ -581,60 +583,52 @@ int m1comm_device::read_frame(int dataSize)
 					togo -= recv;
 					offset += recv;
 				}
-				else if (!filerr && recv == 0)
+				if ((!filerr && recv == 0) || (filerr && std::errc::operation_would_block != filerr))
 				{
 					togo = 0;
 				}
 			}
 		}
 	}
-	else if (!filerr && recv == 0)
+	if ((!filerr && recv == 0) || (filerr && std::errc::operation_would_block != filerr))
 	{
+		osd_printf_verbose("M1COMM: rx connection failed - %02x, %s\n", filerr.value(), filerr.message());
+		m_line_rx.reset();
 		if (m_linkalive == 0x01)
 		{
-			osd_printf_verbose("M1COMM: rx connection lost\n");
+			osd_printf_verbose("M1COMM: link lost\n");
 			m_linkalive = 0x02;
 			m_linktimer = 0x00;
-
-			m_shared[0] = 0xff;
-
-			m_line_rx.reset();
-			m_line_tx.reset();
 		}
 	}
 	return recv;
 }
 
-void m1comm_device::send_data(uint8_t frameType, int frameStart, int frameSize, int dataSize)
+void sega_m1comm_device::send_data(uint8_t frame_type, int frame_start, int frame_size, int data_size)
 {
-	m_buffer0[0] = frameType;
-	for (int i = 0x00 ; i < frameSize ; i++)
+	m_buffer0[0] = frame_type;
+	for (int i = 0x00 ; i < frame_size ; i++)
 	{
-		m_buffer0[1 + i] = m_shared[frameStart + i];
+		m_buffer0[1 + i] = m_shared[frame_start + i];
 	}
-	send_frame(dataSize);
+	send_frame(data_size);
 }
 
-void m1comm_device::send_frame(int dataSize){
+void sega_m1comm_device::send_frame(int data_size){
 	if (!m_line_tx)
 		return;
 
-	std::error_condition filerr;
-	std::uint32_t written;
-
-	filerr = m_line_tx->write(&m_buffer0, 0, dataSize, written);
+	uint32_t written = 0;
+	std::error_condition filerr = m_line_tx->write(&m_buffer0, 0, data_size, written);
 	if (filerr)
 	{
+		osd_printf_verbose("M1COMM: tx connection failed - %02x, %s\n", filerr.value(), filerr.message());
+		m_line_tx.reset();
 		if (m_linkalive == 0x01)
 		{
-			osd_printf_verbose("M1COMM: tx connection lost\n");
+			osd_printf_verbose("M1COMM: link lost\n");
 			m_linkalive = 0x02;
 			m_linktimer = 0x00;
-
-			m_shared[0] = 0xff;
-
-			m_line_rx.reset();
-			m_line_tx.reset();
 		}
 	}
 }

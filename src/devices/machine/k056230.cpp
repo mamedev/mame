@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Fabio Priuli
+// copyright-holders:Fabio Priuli, Ariane Fugmann
 /**************************************************************************************************
 
 Konami IC 056230 (LANC)
@@ -19,8 +19,8 @@ TODO:
 **************************************************************************************************/
 
 #include "emu.h"
-
 #include "k056230.h"
+#include "emuopts.h"
 
 #define LOG_REG_READS   (1U << 1)
 #define LOG_REG_WRITES  (1U << 2)
@@ -45,39 +45,58 @@ k056230_device::k056230_device(const machine_config &mconfig, device_type type, 
 k056230_device::k056230_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: k056230_device(mconfig, K056230, tag, owner, clock)
 {
+	// prepare "filenames"
+	m_localhost = util::string_format("socket.%s:%s", mconfig.options().comm_localhost(), mconfig.options().comm_localport());
+	m_remotehost = util::string_format("socket.%s:%s", mconfig.options().comm_remotehost(), mconfig.options().comm_remoteport());
 }
 
 void k056230_device::device_start()
 {
+	// state saving
 	save_item(NAME(m_irq_state));
+	save_item(NAME(m_ctrl_reg));
 	save_item(NAME(m_status));
+
+	save_item(NAME(m_linkenable));
+	save_item(NAME(m_linkid));
+	save_item(NAME(m_txmode));
 }
 
 void k056230_device::device_reset()
 {
 	m_irq_state = CLEAR_LINE;
-	m_status = 0x08;
+	m_ctrl_reg = 0;
+	m_status = 0;
+
+	m_linkenable = 0;
+	m_linkid = 0;
+	m_txmode = 0;
 }
 
 void k056230_device::regs_map(address_map &map)
 {
 	map(0x00, 0x00).lrw8(
 		NAME([this] (offs_t offset) {
-			LOGMASKED(LOG_REG_READS, "%s: Status Register read %02x\n", machine().describe_context(), m_status);
-			return m_status;
+			u8 data = 0x08 | m_status;
+			if (!machine().side_effects_disabled())
+				LOGMASKED(LOG_REG_READS, "%s: Status Register read %02x\n", machine().describe_context(), data);
+			return data;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			LOGMASKED(LOG_REG_WRITES, "%s: Mode Register read %02x\n", machine().describe_context(), data);
+			LOGMASKED(LOG_REG_WRITES, "%s: Mode Register write %02x\n", machine().describe_context(), data);
+			set_mode(data);
 		})
 	),
 	map(0x01, 0x01).lrw8(
 		NAME([this] (offs_t offset) {
 			const u8 res = 0x00;
-			LOGMASKED(LOG_REG_READS, "%s: CRC Error Register read %02x\n", machine().describe_context(), res);
+			if (!machine().side_effects_disabled())
+				LOGMASKED(LOG_REG_READS, "%s: CRC Error Register read %02x\n", machine().describe_context(), res);
 			return res;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
 			LOGMASKED(LOG_REG_WRITES, "%s: Control Register write %02x\n", machine().describe_context(), data);
+			set_ctrl(data);
 			// TODO: This is a literal translation of the previous device behaviour, and is incorrect.
 			// Namely it can't possibly ping irq state on the fly, needs some transaction from the receiver.
 			const int old_state = m_irq_state;
@@ -108,7 +127,8 @@ u32 k056230_device::ram_r(offs_t offset, u32 mem_mask)
 {
 	const auto lanc_ram = util::big_endian_cast<const u32>(m_ram.target());
 	u32 data = lanc_ram[offset & 0x7ff];
-	LOGMASKED(LOG_RAM_READS, "%s: Network RAM read [%04x (%03x)]: %08x & %08x\n", machine().describe_context(), offset << 2, (offset & 0x7ff) << 2, data, mem_mask);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_RAM_READS, "%s: Network RAM read [%04x (%03x)]: %08x & %08x\n", machine().describe_context(), offset << 2, (offset & 0x7ff) << 2, data, mem_mask);
 	return data;
 }
 
@@ -118,6 +138,215 @@ void k056230_device::ram_w(offs_t offset, u32 data, u32 mem_mask)
 	LOGMASKED(LOG_RAM_WRITES, "%s: Network RAM write [%04x (%03x)] = %08x & %08x\n", machine().describe_context(), offset << 2, (offset & 0x7ff) << 2, data, mem_mask);
 	COMBINE_DATA(&lanc_ram[offset & 0x7ff]);
 }
+
+
+void k056230_device::set_mode(u8 data)
+{
+	switch (data & 0xf0)
+	{
+		case 0x00:
+		case 0x20:
+			m_linkid = data & 0x0f;
+			break;
+
+		default:
+			logerror("k056230-set_mode: %02x\n", data);
+			break;
+	}
+}
+
+void k056230_device::set_ctrl(u8 data)
+{
+
+	m_linkenable = data && 0x10;
+
+	switch (data)
+	{
+		case 0x10:
+		case 0x18:
+			// prepare for tx?
+			break;
+
+		case 0x14:
+		case 0x1c:
+			// prepare for rx? - clear bit5
+			m_status = 0x00;
+			break;
+
+		case 0x36:
+		case 0x3e:
+			// plygonet, polynetw, gticlub = 36, midnrun 3e
+			// tx mode?
+			m_txmode = 0x01;
+			comm_tick();
+			break;
+
+		case 0x37:
+		case 0x3f:
+			// rx mode? - set bit 5
+			// plygonet, polynetw, gticlub = 37, midnrun 3f
+			m_status = 0x20;
+			m_txmode = 0x00;
+			comm_tick();
+			break;
+
+		default:
+			logerror("k056230-set_ctrl: %02x\n", data);
+			break;
+	}
+}
+
+void k056230_device::comm_tick()
+{
+	if (m_linkenable == 0x01)
+	{
+		// check rx socket
+		if (!m_line_rx)
+		{
+			osd_printf_verbose("k056230: rx listen on %s\n", m_localhost);
+			u64 filesize; // unused
+			std::error_condition filerr = osd_file::open(m_localhost, OPEN_FLAG_CREATE, m_line_rx, filesize);
+			if (filerr.value() != 0)
+			{
+				osd_printf_verbose("k056230: rx connection failed - %02x, %s\n", filerr.value(), filerr.message());
+				m_line_rx.reset();
+			}
+		}
+
+		// check tx socket
+		if ((!m_line_tx) && (m_txmode == 0x01))
+		{
+			osd_printf_verbose("k056230: tx connect to %s\n", m_remotehost);
+			u64 filesize; // unused
+			std::error_condition filerr = osd_file::open(m_remotehost, 0, m_line_tx, filesize);
+			if (filerr.value() != 0)
+			{
+				osd_printf_verbose("k056230: tx connection failed - %02x, %s\n", filerr.value(), filerr.message());
+				m_line_tx.reset();
+			}
+		}
+
+		// if both sockets are there check ring
+		if (m_line_rx && m_line_tx)
+		{
+			int data_size = 0x201;
+
+			if (m_txmode == 0x00)
+			{
+				// try to read one message
+				int recv = read_frame(data_size);
+				while (recv > 0)
+				{
+					// check if valid id
+					u8 idx = m_buffer0[0];
+					if (idx <= 0x0e)
+					{
+						if (idx != m_linkid)
+						{
+							// save message to ram
+							int frame_start = (idx & 0x07) * 0x0100;
+							int frame_size = (idx & 0x08) ? 0x0200 : 0x0100;
+							int frame_offset = 0;
+							u32 frame_data = 0;
+
+							for (int j = 0x00 ; j < frame_size ; j += 4)
+							{
+								frame_offset = (frame_start + j) / 4;
+								frame_data = m_buffer0[4 + j] |  m_buffer0[3 + j] << 8 |  m_buffer0[2 + j] << 16 |  m_buffer0[1 + j] << 24;
+								ram_w(frame_offset, frame_data, 0xffffffff);
+							}
+
+							// forward message to other nodes
+							send_frame(data_size);
+						}
+					}
+
+					// try to read another message
+					recv = read_frame(data_size);
+				}
+			}
+			else if (m_txmode == 0x01)
+			{
+				// send local data to network (once)
+				int frame_start = (m_linkid & 0x07) * 0x100;
+				int frame_size = (m_linkid & 0x08) ? 0x200 : 0x100;
+
+				int frame_offset = 0;
+				u32 frame_data = 0;
+
+				m_buffer0[0] = m_linkid;
+				for (int i = 0x00 ; i < frame_size ; i += 4)
+				{
+					frame_offset = (frame_start + i) / 4;
+					frame_data = ram_r(frame_offset, 0xffffffff);
+					m_buffer0[4 + i] = frame_data & 0xff;
+					m_buffer0[3 + i] = (frame_data >> 8) & 0xff;
+					m_buffer0[2 + i] = (frame_data >> 16) & 0xff;
+					m_buffer0[1 + i] = (frame_data >> 24) & 0xff;
+				}
+
+				send_frame(data_size);
+				m_txmode = 0x02;
+			}
+		}
+	}
+}
+
+int k056230_device::read_frame(int data_size)
+{
+	if (!m_line_rx)
+		return 0;
+
+	// try to read a message
+	u32 recv = 0;
+	std::error_condition filerr = m_line_rx->read(m_buffer0, 0, data_size, recv);
+	if (recv > 0)
+	{
+		// check if message complete
+		if (recv != data_size)
+		{
+			// only part of a message - read on
+			u32 togo = data_size - recv;
+			int offset = recv;
+			while (togo > 0)
+			{
+				filerr = m_line_rx->read(m_buffer1, 0, togo, recv);
+				if (recv > 0)
+				{
+					for (int i = 0 ; i < recv ; i++)
+					{
+						m_buffer0[offset + i] = m_buffer1[i];
+					}
+					togo -= recv;
+					offset += recv;
+				}
+				if ((!filerr && recv == 0) || (filerr && std::errc::operation_would_block != filerr))
+					togo = 0;
+			}
+		}
+	}
+	if ((!filerr && recv == 0) || (filerr && std::errc::operation_would_block != filerr))
+	{
+		osd_printf_verbose("k056230: rx connection failed - %02x, %s\n", filerr.value(), filerr.message());
+		m_line_rx.reset();
+	}
+	return recv;
+}
+
+void k056230_device::send_frame(int data_size)
+{
+	if (!m_line_tx)
+		return;
+
+	u32 written;
+	std::error_condition filerr = m_line_tx->write(&m_buffer0, 0, data_size, written);
+	if (filerr)
+	{
+		osd_printf_verbose("k056230: tx connection failed - %02x, %s\n", filerr.value(), filerr.message());
+		m_line_tx.reset();
+	}
+}
+
 
 /****************************************
  *
@@ -171,14 +400,16 @@ void k056230_viper_device::regs_map(address_map &map)
 	);
 	map(0x02, 0x02).lr8(
 		NAME([this] (offs_t offset) {
-			LOGMASKED(LOG_REG_READS, "%s: status_r: %02x\n", machine().describe_context(), m_status);
+			if (!machine().side_effects_disabled())
+				LOGMASKED(LOG_REG_READS, "%s: status_r: %02x\n", machine().describe_context(), m_status);
 			return m_status;
 		})
 	);
 	// TODO: unknown regs
 	map(0x03, 0x04).lrw8(
 		NAME([this] (offs_t offset) {
-			LOGMASKED(LOG_REG_READS, "%s: unk%d_r\n", machine().describe_context(), offset + 3, m_unk[offset]);
+			if (!machine().side_effects_disabled())
+				LOGMASKED(LOG_REG_READS, "%s: unk%d_r\n", machine().describe_context(), offset + 3, m_unk[offset]);
 			return m_unk[offset];
 		}),
 		NAME([this] (offs_t offset, u8 data) {
@@ -194,4 +425,3 @@ void k056230_viper_device::regs_map(address_map &map)
 		})
 	);
 }
-

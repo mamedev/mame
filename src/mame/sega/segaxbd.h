@@ -10,9 +10,11 @@
 
 #pragma once
 
-#include "segaic16.h"
-#include "segaic16_road.h"
 #include "sega16sp.h"
+#include "segaic16.h"
+#include "segaic16_m.h"
+#include "segaic16_road.h"
+#include "xbdcomm.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
@@ -21,7 +23,6 @@
 #include "machine/i8251.h"
 #include "machine/mb3773.h"
 #include "machine/mb8421.h"
-#include "segaic16_m.h"
 #include "video/resnet.h"
 #include "emupal.h"
 #include "screen.h"
@@ -112,6 +113,7 @@ protected:
 	required_device<segaic16_video_device> m_segaic16vid;
 	required_device<segaic16_road_device> m_segaic16road;
 	required_shared_ptr<uint16_t> m_subram0;
+	optional_device<sega_xbdcomm_device> m_xbdcomm;
 
 	// configuration
 	bool            m_adc_reverse[8]{};
