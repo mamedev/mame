@@ -1,9 +1,9 @@
 // license:LGPL-2.1+
 // copyright-holders:Michael Zapf
 /****************************************************************************
-    
-    I/O port splitter 
-   
+
+    I/O port splitter
+
     This plugs into the I/O port of the console as an
     ioport_attached_device, and it offers two new I/O ports.
 
@@ -14,7 +14,7 @@
 
 #pragma once
 
-#include "ioport.h" 
+#include "ioport.h"
 
 namespace bus::ti99::internal {
 
@@ -49,10 +49,10 @@ protected:
 	// Callbacks from the two ports
 	template<int port> void extint(int state);
 	template<int port> void ready(int state);
-	
+
 	int m_inta_flag;
 	int m_ready_flag;
-	
+
 private:
 	required_device<ioport_device>     m_port1;
 	required_device<ioport_device>     m_port2;
@@ -62,4 +62,4 @@ private:
 
 DECLARE_DEVICE_TYPE_NS(TI99_IOSPLIT, bus::ti99::internal, ioport_splitter_device)
 
-#endif /* __TI99SPLITTER__ */
+#endif /* MAME_BUS_TI99_INTERNAL_SPLITTER_H */

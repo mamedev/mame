@@ -6,7 +6,7 @@
      The I/O port splitter connects to the TI-99/4(A) console at its I/O port
      and provides two I/O ports. That way, two Peripheral Expansion boxes or
      one PEB and a sidecar chain may be connected.
-     
+
                             | Port 2
                             v
                           +---+
@@ -16,9 +16,9 @@
      | oooooooooo |   |----------+
      | oooooooooo |   |
      +-----------------
-     
+
      The splitter was designed 2015 by Jim Fetzner (as Tekumel Software)
-     
+
      March 2025, Michael Zapf
 
 *****************************************************************************/
@@ -33,7 +33,7 @@
 #define LOG_INT         (1U << 3)
 #define LOG_READY       (1U << 4)
 
-#define VERBOSE (LOG_CONFIG | LOG_WARN)
+// #define VERBOSE (LOG_CONFIG | LOG_WARN)
 
 #include "logmacro.h"
 
@@ -139,7 +139,7 @@ void ioport_splitter_device::reset_in(int state)
 		m_port2->reset_in(state);
 }
 
-template<int port> 
+template<int port>
 void ioport_splitter_device::extint(int state)
 {
 	LOGMASKED(LOG_INT, "propagating INTA from port %d to console: %d\n", port, state);
@@ -147,11 +147,11 @@ void ioport_splitter_device::extint(int state)
 		m_inta_flag |= port;  // 1 or 2
 	else
 		m_inta_flag &= ~port;  // 1 or 2
-                                              
+
 	set_extint((m_inta_flag != 0)? ASSERT_LINE : CLEAR_LINE);
 }
 
-template<int port> 
+template<int port>
 void ioport_splitter_device::ready(int state)
 {
 	LOGMASKED(LOG_READY, "Incoming READY=%d from port %d\n", state, port);
@@ -180,7 +180,7 @@ void ioport_splitter_device::device_add_mconfig(machine_config &config)
 {
 	TI99_IOPORT(config, m_port1, 1, ti99_ioport_options_evpc1, nullptr);
 	TI99_IOPORT(config, m_port2, 2, ti99_ioport_options_evpc1, nullptr);
-	
+
 	m_port1->extint_cb().set(FUNC(ioport_splitter_device::extint<1>));
 	m_port2->extint_cb().set(FUNC(ioport_splitter_device::extint<2>));
 	m_port1->ready_cb().set(FUNC(ioport_splitter_device::ready<1>));

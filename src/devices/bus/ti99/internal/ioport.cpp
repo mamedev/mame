@@ -80,6 +80,7 @@
 #include "ioport.h"
 #include "splitter.h"
 #include "bus/ti99/peb/peribox.h"
+#include "bus/ti99/sidecar/arcturus.h"
 
 DEFINE_DEVICE_TYPE(TI99_IOPORT, bus::ti99::internal::ioport_device, "ti99_ioport", "TI-99 I/O Port")
 
@@ -176,12 +177,14 @@ void ti99_ioport_options_plain(device_slot_interface &device)
 {
 	device.option_add("peb", TI99_PERIBOX);
 	device.option_add("splitter", TI99_IOSPLIT);
+	device.option_add("arcturus", TI99_ARCTURUS);
 }
 
 void ti99_ioport_options_evpc(device_slot_interface &device)
 {
 	device.option_add("peb", TI99_PERIBOX_EV);
 	device.option_add("splitter", TI99_IOSPLIT);
+	device.option_add("arcturus", TI99_ARCTURUS);
 }
 
 // Used for the splitter (to avoid getting multiple EVPCs in the system)
@@ -189,4 +192,5 @@ void ti99_ioport_options_evpc1(device_slot_interface &device)
 {
 	device.option_add("peb", TI99_PERIBOX_EV1);
 	device.option_add("splitter", TI99_IOSPLIT);
+	device.option_add("arcturus", TI99_ARCTURUS);
 }

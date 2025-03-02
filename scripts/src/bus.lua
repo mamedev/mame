@@ -4188,6 +4188,8 @@ if (BUSES["TI99"]~=null) then
 		MAME_DIR .. "src/devices/bus/ti99/peb/tn_ide.h",
 		MAME_DIR .. "src/devices/bus/ti99/peb/tn_usbsm.cpp",
 		MAME_DIR .. "src/devices/bus/ti99/peb/tn_usbsm.h",
+		MAME_DIR .. "src/devices/bus/ti99/sidecar/arcturus.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/sidecar/arcturus.h",
 	}
 end
 
