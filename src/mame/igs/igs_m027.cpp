@@ -181,6 +181,8 @@ public:
 	void init_tripslot() ATTR_COLD;
 	void init_extradrw() ATTR_COLD;
 	void init_chessc2() ATTR_COLD;
+	void init_tct2p() ATTR_COLD;
+	void init_xypdk() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -3018,6 +3020,71 @@ ROM_START( mgcs3 )
 	ROM_LOAD( "sp.u5", 0x00000, 0x200000, CRC(eb27b166) SHA1(eb9641516245d9094861d6ba6e902eac62019968) )
 ROM_END
 
+/*
+Tarzan Chuǎng Tiānguān 2 Jiāqiáng Bǎn
+泰山闯天关 2 加强版
+IGS, 2003
+
+PCB: IGS PCB-0489-07-FM-1
+IGS027 Sticker: T8
+ROM String: TARZAN_CHINA_V300CN
+            THU JUN 19 14:13:23 2003
+
+Oki Clock (from PAL): 1.000MHz [22/22]
+Oki Pin 7: High
+*/
+
+ROM_START( tct2p )
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	// Internal ROM of IGS027A type G ARM based MCU
+	ROM_LOAD( "t8_027a.bin", 0x0000, 0x4000, CRC(a5f0be90) SHA1(f2318cf324749831d8e1b766ae5646dcfdd955c6) )
+
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "v-306cn.u17", 0x00000, 0x80000, CRC(c479e5ac) SHA1(4d8273f7425cdc3293c5b43219e021303c53cbad) )
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD16_WORD_SWAP( "text.u27", 0x00000, 0x80000, CRC(d0e20214) SHA1(90f9b2d7ab0f2c0f99277df7c9ff24ea54b65709) )
+
+	ROM_REGION( 0x480000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "a4202.u28", 0x000000, 0x400000, CRC(97a68f85) SHA1(177c8c23fd0d585b24a71359ede005ac9a2e4d4d) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
+	ROM_LOAD( "cg.u31",    0x400000, 0x080000, CRC(808b38d1) SHA1(60cc441d863d26c44c0353770367f2b2ef7c8de7) ) // FIXED BITS (xxxxxxxx0xxxxxxx) 1xxxxxxxxxxxxxxxxxx = 0x00
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "sp.u5", 0x000000, 0x200000, CRC(4b04e89e) SHA1(4c29381cd272daaa3a3fb627024d25609f8b5f8a) ) // BADADDR   --xxxxxxxxxxxxxxxxxxx
+ROM_END
+
+/*
+Xìngyùn Pǎo de Kuài
+幸运跑的快
+IGS, 2005
+
+PCB: IGS PCB-0489-07-FM-1
+IGS027 Sticker: I8
+ROM String: FRI OCT 7 17:22:46 2005
+            LUCKY_FASTER
+
+Oki Clock (from PAL): 2.000MHz [22/11]
+Oki Pin 7: Low
+*/
+
+ROM_START( xypdk )
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	// Internal ROM of IGS027A type G ARM based MCU
+	ROM_LOAD( "i8_027a.bin", 0x0000, 0x4000, CRC(af7889a5) SHA1(cd38b79a3e47deb32be779d2d860216d37ee9916) )
+
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "v-306cn.u17", 0x00000, 0x80000, CRC(f78d2a7c) SHA1(84fce4424edb2bd7ccc02f7c937686016ddce21b) )
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD16_WORD_SWAP( "text.u27", 0x00000, 0x80000, CRC(b2b20a55) SHA1(1e5e883ee588805d68ad9d312f0884a428eff31c) )
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "cg.u28", 0x000000, 0x400000, CRC(b0835036) SHA1(bae50688ea20572c0d71ff50066b79b6654d9b93) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "sp.u5", 0x000000, 0x200000, CRC(e5ba3abe) SHA1(e5d191bcfd8180dde4576523cee3f502b03013c2) )
+ROM_END
+
 ROM_START( extradrw ) // IGS PCB 0326-05-DV-1
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal rom of IGS027A ARM based MCU
@@ -3236,6 +3303,21 @@ void igs_m027_state::init_chessc2()
 	ROM2[(0x168/4)] ^= 0x10000000;
 }
 
+void igs_m027_state::init_tct2p()
+{
+	tct2p_decrypt(machine());
+	m_igs017_igs031->sdwx_gfx_decrypt();
+	m_igs017_igs031->tarzan_decrypt_sprites(0x400000, 0x400000);
+	// the sprite ROM at 0x400000 doesn't require decryption
+}
+
+void igs_m027_state::init_xypdk()
+{
+	xypdk_decrypt(machine());
+	m_igs017_igs031->sdwx_gfx_decrypt();
+	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
+}
+
 } // anonymous namespace
 
 
@@ -3259,6 +3341,7 @@ GAME(  2004, lhzb4dhb,      0,        lhzb4,        lhzb4,         igs_m027_stat
 GAME(  1999, lthyp,         0,        lthyp,        lthyp,         igs_m027_state, init_lthyp,    ROT0, "IGS", "Long Teng Hu Yao Duizhan Jiaqiang Ban (S104CN)", MACHINE_NODEVICE_LAN )
 GAME(  2000, zhongguo,      0,        zhongguo,     zhongguo,      igs_m027_state, init_zhongguo, ROT0, "IGS", "Zhongguo Chu Da D (V102C)", 0 )
 GAMEL( 2001, jking02,       0,        jking02,      jking02,       igs_m027_state, init_jking02,  ROT0, "IGS", "Jungle King 2002 (V209US)", MACHINE_NODEVICE_LAN, layout_jking02 ) // shows V212US in bookkeeping menu
+GAMEL( 2003, tct2p,         0,        jking02,      jking02,       igs_m027_state, init_tct2p,    ROT0, "IGS", "Tarzan Chuang Tianguan 2 Jiaqiang Ban (V306CN)", MACHINE_NOT_WORKING, layout_jking02 ) // needs inputs
 GAME(  2003, mgzz,          0,        mgzz,         mgzz101cn,     igs_m027_state, init_mgzz,     ROT0, "IGS", "Manguan Zhizun (V101CN)", 0 )
 GAME(  2003, mgzz100cn,     mgzz,     mgzz,         mgzz100cn,     igs_m027_state, init_mgzz,     ROT0, "IGS", "Manguan Zhizun (V100CN)", 0 )
 GAME(  2007, mgcs3,         0,        lhzb4,        mgcs3,         igs_m027_state, init_mgcs3,    ROT0, "IGS", "Manguan Caishen 3 (V101CN)", 0 )
@@ -3272,6 +3355,7 @@ GAME(  2004, cjddz215cn,    cjddz,    cjddz,        cjddz,         igs_m027_stat
 GAME(  2004, cjddzp,        0,        cjddz,        cjddzp,        igs_m027_state, init_cjddzp,   ROT0, "IGS", "Chaoji Dou Dizhu Jiaqiang Ban (S300CN)", MACHINE_NODEVICE_LAN ) // 2004 date in internal ROM
 GAME(  2005, cjddzlf,       0,        cjddz,        cjddz,         igs_m027_state, init_cjddzlf,  ROT0, "IGS", "Chaoji Dou Dizhu Liang Fu Pai (V109CN)", 0 ) // 2005 date in internal ROM
 GAME(  2005, cjtljp,        0,        cjtljp,       lhzb4,         igs_m027_state, init_cjtljp,   ROT0, "IGS", "Chaoji Tuolaji Jiaqiang Ban (V206CN)", 0 ) // 2005 date in internal ROM
+GAME(  2005, xypdk,         0,        cjddz,        cjddz,         igs_m027_state, init_xypdk,    ROT0, "IGS", "Xingyun Pao De Kuai (V106CN)", MACHINE_NOT_WORKING ) // needs inputs
 GAMEL( 2007, tripslot,      0,        tripslot,     tripslot,      igs_m027_state, init_tripslot, ROT0, "IGS", "Triple Slot (V200VE)", 0, layout_tripslot ) // 2007 date in internal ROM at least, could be later, default settings password is all 'start 1'
 // this has a 2nd 8255
 GAME(  2001, extradrw,      0,        extradrw,     base,          igs_m027_state, init_extradrw, ROT0, "IGS", "Extra Draw (V100VE)", MACHINE_NOT_WORKING )
