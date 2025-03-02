@@ -46,6 +46,8 @@ namespace {
 class heath_h17_fdc_device : public device_t, public device_h89bus_right_card_interface
 {
 public:
+	static constexpr feature_type unemulated_features() { return feature::DISK; }
+
 	heath_h17_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	auto floppy_ram_wp_cb() { return m_floppy_ram_wp.bind(); }
@@ -118,7 +120,7 @@ heath_h17_fdc_device::heath_h17_fdc_device(const machine_config &mconfig, const 
 
 void heath_h17_fdc_device::write(u8 select_lines, u8 offset, u8 data)
 {
-	if (!(select_lines & h89bus_device::H89_FLPY))
+	if (!(select_lines & h89bus_device::H89_IO_FLPY))
 	{
 		return;
 	}
@@ -250,7 +252,7 @@ void heath_h17_fdc_device::ctrl_w(u8 val)
 
 u8 heath_h17_fdc_device::read(u8 select_lines, u8 offset)
 {
-	if (!(select_lines & h89bus_device::H89_FLPY))
+	if (!(select_lines & h89bus_device::H89_IO_FLPY))
 	{
 		return 0;
 	}
