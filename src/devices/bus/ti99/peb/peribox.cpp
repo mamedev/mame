@@ -216,7 +216,10 @@ CRUCLK*  51||52  DBIN
 DEFINE_DEVICE_TYPE(TI99_PERIBOX,      bus::ti99::peb::peribox_device,      "peribox",      "Peripheral expansion box")
 
 // Peripheral box which has a EVPC card in slot 2 (for use with the ti99_4ev)
-DEFINE_DEVICE_TYPE(TI99_PERIBOX_EV,   bus::ti99::peb::peribox_ev_device,   "peribox_ev",   "Peripheral expansion box with EVPC")
+DEFINE_DEVICE_TYPE(TI99_PERIBOX_EV,   bus::ti99::peb::peribox_ev_device,   "peribox_ev",   "Peripheral expansion box with EVPC inserted")
+
+// Peripheral box with EVPC (for use with the ti99_4ev with the port splitter)
+DEFINE_DEVICE_TYPE(TI99_PERIBOX_EV1,   bus::ti99::peb::peribox_ev1_device,   "peribox_ev1",   "Peripheral expansion box with EVPC")
 
 // Peripheral box which hosts the SGCPU card in slot 1
 DEFINE_DEVICE_TYPE(TI99_PERIBOX_SG,   bus::ti99::peb::peribox_sg_device,   "peribox_sg",   "Peripheral expansion box SGCPU")
@@ -476,29 +479,52 @@ void peribox_device::device_config_complete()
 	m_ready_flag = 0;
 }
 
-void ti99_peribox_slot_standard(device_slot_interface &device)
+// Slot options that work with TI-99/4A (with and without EVPC), SGCPU, Geneve,
+// and TI-99/8 (untested)
+void peribox_common_slots(device_slot_interface &device)
 {
-	device.option_add("32kmem",   TI99_32KMEM);
-	device.option_add("myarcmem", TI99_MYARCMEM);
-	device.option_add("samsmem",  TI99_SAMSMEM);
-	device.option_add("pcode",    TI99_P_CODE);
-	device.option_add("hsgpl",    TI99_HSGPL);
 	device.option_add("tirs232",  TI99_RS232);
 	device.option_add("speech",   TI99_SPEECH);
 	device.option_add("horizon",  TI99_HORIZON);
-	device.option_add("pgram",    TI99_PGRAM);
 	device.option_add("ide",      TI99_IDE);
 	device.option_add("usbsm",    TI99_USBSM);
-	device.option_add("bwg",      TI99_BWG);
 	device.option_add("hfdc",     TI99_HFDC);
 	device.option_add("tifdc",    TI99_FDC);
 	device.option_add("ccdcc",    TI99_CCDCC);
 	device.option_add("ccfdc",    TI99_CCFDC);
 	device.option_add("ddcc1",    TI99_DDCC1);
 	device.option_add("forti",    TI99_FORTI);
-	device.option_add("sidmaster", TI99_SIDMASTER);
 	device.option_add("whtscsi",  TI99_WHTSCSI);
 	device.option_add("tipi",     TI99_TIPI);
+}
+
+// Slot options for TI-99/4A with or without EVPC and SGCPU
+// The BwG controller will not run with the Geneve due to its wait state
+// logic (see bwg.cpp)
+// The SID master card may have trouble with the Geneve because of its CRU
+// handling (see sidmaster.cpp)
+void peribox_ti99_slots(device_slot_interface &device)
+{
+	device.option_add("myarcmem", TI99_MYARCMEM);
+	device.option_add("samsmem",  TI99_SAMSMEM);
+	device.option_add("pcode",    TI99_P_CODE);
+	device.option_add("hsgpl",    TI99_HSGPL);
+	device.option_add("bwg",      TI99_BWG);
+	device.option_add("sidmaster", TI99_SIDMASTER);
+	peribox_common_slots(device);
+}
+
+// Geneve and SGCPU do not work with these memory expansions
+void peribox_std_slots(device_slot_interface &device)
+{
+	device.option_add("32kmem",   TI99_32KMEM);
+	device.option_add("pgram",    TI99_PGRAM);
+	peribox_ti99_slots(device);
+}
+
+void ti99_peribox_slot_standard(device_slot_interface &device)
+{
+	peribox_std_slots(device);
 }
 
 void peribox_device::device_add_mconfig(machine_config &config)
@@ -524,28 +550,8 @@ peribox_ev_device::peribox_ev_device(const machine_config &mconfig, const char *
 
 void ti99_peribox_slot_evpc(device_slot_interface &device)
 {
-	device.option_add("evpc",     TI99_EVPC);
-	device.option_add("32kmem",   TI99_32KMEM);
-	device.option_add("myarcmem", TI99_MYARCMEM);
-	device.option_add("samsmem",  TI99_SAMSMEM);
-	device.option_add("pcode",    TI99_P_CODE);
-	device.option_add("hsgpl",    TI99_HSGPL);
-	device.option_add("tirs232",  TI99_RS232);
-	device.option_add("speech",   TI99_SPEECH);
-	device.option_add("horizon",  TI99_HORIZON);
-	device.option_add("pgram",    TI99_PGRAM);
-	device.option_add("ide",      TI99_IDE);
-	device.option_add("usbsm",    TI99_USBSM);
-	device.option_add("bwg",      TI99_BWG);
-	device.option_add("hfdc",     TI99_HFDC);
-	device.option_add("tifdc",    TI99_FDC);
-	device.option_add("ccdcc",    TI99_CCDCC);
-	device.option_add("ccfdc",    TI99_CCFDC);
-	device.option_add("ddcc1",    TI99_DDCC1);
-	device.option_add("forti",    TI99_FORTI);
-	device.option_add("sidmaster", TI99_SIDMASTER);
-	device.option_add("whtscsi",  TI99_WHTSCSI);
-	device.option_add("tipi",     TI99_TIPI);
+	device.option_add("evpc", TI99_EVPC);
+	peribox_std_slots(device);
 }
 
 void peribox_ev_device::device_add_mconfig(machine_config &config)
@@ -558,6 +564,28 @@ void peribox_ev_device::device_add_mconfig(machine_config &config)
 	TI99_PERIBOX_SLOT(config, m_slot7, 7, ti99_peribox_slot_evpc, nullptr);
 	TI99_PERIBOX_SLOT(config, m_slot8, 8, ti99_peribox_slot_evpc, nullptr);
 }
+
+/****************************************************************************
+    A variant of the box used for the TI-99/4A with EVPC, not inserted
+*****************************************************************************/
+
+peribox_ev1_device::peribox_ev1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: peribox_device(mconfig, TI99_PERIBOX_EV1, tag, owner, clock)
+{
+	m_address_prefix = 0x70000;
+}
+
+void peribox_ev1_device::device_add_mconfig(machine_config &config)
+{
+	TI99_PERIBOX_SLOT(config, m_slot2, 2, ti99_peribox_slot_evpc, nullptr);
+	TI99_PERIBOX_SLOT(config, m_slot3, 3, ti99_peribox_slot_evpc, nullptr);
+	TI99_PERIBOX_SLOT(config, m_slot4, 4, ti99_peribox_slot_evpc, nullptr);
+	TI99_PERIBOX_SLOT(config, m_slot5, 5, ti99_peribox_slot_evpc, nullptr);
+	TI99_PERIBOX_SLOT(config, m_slot6, 6, ti99_peribox_slot_evpc, nullptr);
+	TI99_PERIBOX_SLOT(config, m_slot7, 7, ti99_peribox_slot_evpc, nullptr);
+	TI99_PERIBOX_SLOT(config, m_slot8, 8, ti99_peribox_slot_evpc, nullptr);
+}
+
 
 /****************************************************************************
     A variant of the box used for the Geneve.
@@ -582,28 +610,11 @@ peribox_genmod_device::peribox_genmod_device(const machine_config &mconfig, cons
 {
 }
 
-// The BwG controller will not run with the Geneve due to its wait state
-// logic (see bwg.cpp)
-// The SID master card may have trouble with the Geneve because of its CRU
-// handling (see sidmaster.cpp)
-
+// All common slot options plus Memex.
 void ti99_peribox_slot_geneve(device_slot_interface &device)
 {
-	device.option_add("memex",    TI99_MEMEX);
-	device.option_add("tirs232",  TI99_RS232);
-	device.option_add("speech",   TI99_SPEECH);
-	device.option_add("horizon",  TI99_HORIZON);
-	device.option_add("ide",      TI99_IDE);
-	device.option_add("usbsm",    TI99_USBSM);
-	device.option_add("hfdc",     TI99_HFDC);
-	device.option_add("tifdc",    TI99_FDC);
-	device.option_add("ccdcc",    TI99_CCDCC);
-	device.option_add("ccfdc",    TI99_CCFDC);
-	device.option_add("ddcc1",    TI99_DDCC1);
-	device.option_add("forti",    TI99_FORTI);
-	device.option_add("sidmaster", TI99_SIDMASTER);
-	device.option_add("whtscsi",  TI99_WHTSCSI);
-	device.option_add("tipi",     TI99_TIPI);
+	device.option_add("memex", TI99_MEMEX);
+	peribox_common_slots(device);
 }
 
 void peribox_gen_device::device_add_mconfig(machine_config &config)
@@ -642,26 +653,8 @@ peribox_sg_device::peribox_sg_device(const machine_config &mconfig, const char *
 
 void ti99_peribox_slot_sgcpu(device_slot_interface &device)
 {
-	device.option_add("evpc",     TI99_EVPC);
-	device.option_add("myarcmem", TI99_MYARCMEM);
-	device.option_add("samsmem",  TI99_SAMSMEM);
-	device.option_add("pcode",    TI99_P_CODE);
-	device.option_add("hsgpl",    TI99_HSGPL);
-	device.option_add("tirs232",  TI99_RS232);
-	device.option_add("speech",   TI99_SPEECH);
-	device.option_add("horizon",  TI99_HORIZON);
-	device.option_add("ide",      TI99_IDE);
-	device.option_add("usbsm",    TI99_USBSM);
-	device.option_add("bwg",      TI99_BWG);
-	device.option_add("hfdc",     TI99_HFDC);
-	device.option_add("tifdc",    TI99_FDC);
-	device.option_add("ccdcc",    TI99_CCDCC);
-	device.option_add("ccfdc",    TI99_CCFDC);
-	device.option_add("ddcc1",    TI99_DDCC1);
-	device.option_add("forti",    TI99_FORTI);
-	device.option_add("sidmaster", TI99_SIDMASTER);
-	device.option_add("whtscsi",  TI99_WHTSCSI);
-	device.option_add("tipi",     TI99_TIPI);
+	device.option_add("evpc", TI99_EVPC);
+	peribox_ti99_slots(device);
 }
 
 void peribox_sg_device::device_add_mconfig(machine_config &config)

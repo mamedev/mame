@@ -103,5 +103,6 @@ DECLARE_DEVICE_TYPE_NS(TI99_IOPORT, bus::ti99::internal, ioport_device)
 
 void ti99_ioport_options_plain(device_slot_interface &device);
 void ti99_ioport_options_evpc(device_slot_interface &device);
+void ti99_ioport_options_evpc1(device_slot_interface &device);
 
 #endif /* __TI99IOPORT__ */
