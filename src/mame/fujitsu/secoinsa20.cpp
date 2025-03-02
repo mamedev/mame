@@ -623,4 +623,4 @@ ROM_END
 } // Anonymous namespace
 
 //    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT        COMPANY     FULLNAME    FLAGS
-COMP( 1981, secoinsa20, 0,      0,      secoinsa20, secoinsa20, secoinsa20_state, empty_init, "Secoinsa", "Serie 20", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 1981, secoinsa20, 0,      0,      secoinsa20, secoinsa20, secoinsa20_state, empty_init, "Secoinsa", "Serie 20", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
