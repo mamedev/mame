@@ -29,6 +29,7 @@
 #define CLOCK_1     XTAL(16'000'000)
 #define CLOCK_2     XTAL(50'000'000)
 
+namespace {
 
 class roundup5_state : public tatsumi_state
 {
@@ -46,7 +47,7 @@ public:
 	{
 	}
 
-	void roundup5(machine_config &config);
+	void roundup5(machine_config &config) ATTR_COLD;
 
 
 private:
@@ -776,5 +777,7 @@ ROM_START( roundup5 )
 	ROM_LOAD( "ru-17b",   0x000000, 0x20000, CRC(82391b47) SHA1(6b1977522c6e906503abc50bdd24c4c38cdc9bdb) )
 	ROM_LOAD( "ru-16b",   0x020000, 0x10000, CRC(374fe170) SHA1(5d190a2735698b0384948bfdb1a900f56f0d7ebc) )
 ROM_END
+
+} // anonymous namespace
 
 GAMEL(1989, roundup5,  0,        roundup5,  roundup5, roundup5_state, init_tatsumi, ROT0, "Tatsumi", "Round Up 5 - Super Delta Force", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING, layout_roundup5 )

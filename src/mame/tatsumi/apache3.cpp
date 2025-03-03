@@ -21,6 +21,8 @@
 #define CLOCK_1     XTAL(16'000'000)
 #define CLOCK_2     XTAL(50'000'000)
 
+namespace {
+
 class apache3_state : public tatsumi_state
 {
 public:
@@ -34,9 +36,9 @@ public:
 	{
 	}
 
-	void apache3(machine_config &config);
+	void apache3(machine_config &config) ATTR_COLD;
 
-	void init_apache3();
+	void init_apache3() ATTR_COLD;
 
 private:
 	virtual void video_start() override ATTR_COLD;
@@ -63,7 +65,7 @@ private:
 	void apache3_z80_map(address_map &map) ATTR_COLD;
 
 	void draw_sky(bitmap_rgb32 &bitmap, const rectangle &cliprect, int palette_base, int start_offset);
-	void draw_ground(bitmap_rgb32 &dst, const rectangle &cliprect);
+	[[maybe_unused]] void draw_ground(bitmap_rgb32 &dst, const rectangle &cliprect);
 
 	required_device<cpu_device> m_subcpu2;
 
@@ -278,7 +280,7 @@ void apache3_state::video_start()
 	m_tx_layer->set_transparent_pen(0);
 }
 
-uint32_t apache3_state::screen_update_apache3(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
+uint32_t apache3_state::screen_update_apache3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_rotatingsprites->update_cluts();
 
@@ -658,6 +660,8 @@ void apache3_state::init_apache3()
 
 	// TODO: ym2151_set_port_write_handler for CT1/CT2 outputs
 }
+
+} // anonymous namespace
 
 GAME( 1988, apache3,   0,        apache3,   apache3,  apache3_state,  init_apache3,  ROT0, "Tatsumi", "Apache 3 (rev F)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // Rev F CPU code
 GAME( 1988, apache3a,  apache3,  apache3,   apache3,  apache3_state,  init_apache3,  ROT0, "Tatsumi", "Apache 3 (rev E)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // Rev C & E CPU code

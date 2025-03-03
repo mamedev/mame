@@ -22,8 +22,6 @@ public:
 
 	void update_cluts();
 
-	DECLARE_GFXDECODE_MEMBER(gfxinfo);
-
 protected:
 	tatsumi_rotating_sprites_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -32,7 +30,7 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	void common_init();
+	void common_init() ATTR_COLD;
 
 	int m_rom_clut_size;
 	int m_rom_clut_offset;
@@ -41,11 +39,7 @@ protected:
 	required_device<palette_device> m_basepalette;
 
 private:
-	std::unique_ptr<uint8_t[]> m_shadow_pen_array;
-
-	bitmap_rgb32 m_temp_bitmap;
-
-	int m_sprite_palette_base;
+	DECLARE_GFXDECODE_MEMBER(gfxinfo);
 
 	void mycopyrozbitmap_core(bitmap_ind8 &bitmap, const bitmap_rgb32 &srcbitmap,
 			int dstx, int dsty, int srcwidth, int srcheight, int incxx, int incxy, int incyx, int incyy,
@@ -59,9 +53,15 @@ private:
 		gfx_element *gfx, uint32_t code,uint32_t color,int flipx,int flipy,uint32_t ssx,uint32_t ssy,
 		int scalex, int scaley, int rotate, int write_priority_only );
 
+	std::unique_ptr<uint8_t[]> m_shadow_pen_array;
+	bitmap_rgb32 m_temp_bitmap;
+
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_region_ptr<uint8_t> m_sprites_l_rom;
 	required_region_ptr<uint8_t> m_sprites_h_rom;
+
+	// config
+	int m_sprite_palette_base;
 };
 
 class tatsumi_rotating_sprites_bigpal_device : public tatsumi_rotating_sprites_device
@@ -69,12 +69,11 @@ class tatsumi_rotating_sprites_bigpal_device : public tatsumi_rotating_sprites_d
 public:
 	tatsumi_rotating_sprites_bigpal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_GFXDECODE_MEMBER(gfxinfo_big);
-
 protected:
-	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
-
 	virtual void device_start() override ATTR_COLD;
+
+private:
+	DECLARE_GFXDECODE_MEMBER(gfxinfo_big);
 };
 
 

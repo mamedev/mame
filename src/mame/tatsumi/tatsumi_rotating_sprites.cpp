@@ -79,12 +79,7 @@ void tatsumi_rotating_sprites_device::device_reset()
 
 void tatsumi_rotating_sprites_device::device_add_mconfig(machine_config &config)
 {
-	PALETTE(config, m_fakepalette).set_format(palette_device::xRGB_555, 4096); // 4096 arranged as series of CLUTs
-}
-
-void tatsumi_rotating_sprites_bigpal_device::device_add_mconfig(machine_config &config)
-{
-	PALETTE(config, m_fakepalette).set_format(palette_device::xRGB_555, 8192); // 8192 arranged as series of CLUTs
+	PALETTE(config, m_fakepalette).set_format(palette_device::xRGB_555, m_rom_clut_size * 2); // 4096 or 8192 arranged as series of CLUTs
 }
 
 void tatsumi_rotating_sprites_device::mycopyrozbitmap_core(bitmap_ind8 &bitmap, const bitmap_rgb32 &srcbitmap,

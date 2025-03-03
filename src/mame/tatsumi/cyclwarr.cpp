@@ -133,6 +133,7 @@
 #define CLOCK_1     XTAL(16'000'000)
 #define CLOCK_2     XTAL(50'000'000)
 
+namespace {
 
 class cyclwarr_state : public tatsumi_state
 {
@@ -147,8 +148,7 @@ public:
 	{
 	}
 
-	void cyclwarr(machine_config &config);
-	void bigfight(machine_config &config);
+	void cyclwarr(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_reset() override ATTR_COLD;
@@ -211,7 +211,7 @@ public:
 	{
 	}
 
-	void bigfight(machine_config &config);
+	void bigfight(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -481,14 +481,9 @@ void cyclwarr_state::cyclwarr_control_w(uint8_t data)
 
 //  if ((m_control_word&0xfe) != (m_last_control&0xfe))
 //      logerror("%s  control_w %04x\n", m_maincpu->pc(), data);
-
 /*
-
 0x1 - watchdog
 0x4 - cpu bus lock
-
-
-
 */
 
 	if ((m_control_word & 4) == 4 && (m_last_control & 4) == 0)
@@ -517,20 +512,6 @@ uint8_t cyclwarr_state::oki_status_xor_r()
 	// fwiw returning normal oki status doesn't work at all, both games don't make any sound.
 	// TODO: verify with HW
 	return (r ^ 0xff);
-#if 0
-	// old hack left for reference
-
-	if (m_audiocpu->pc()==0x2b70 || m_audiocpu->pc()==0x2bb5
-		|| m_audiocpu->pc()==0x2acc
-		|| m_audiocpu->pc()==0x1c79 // BigFight
-		|| m_audiocpu->pc()==0x1cbe // BigFight
-		|| m_audiocpu->pc()==0xf9881)
-		return 0xf;
-	if (m_audiocpu->pc()==0x2ba3 || m_audiocpu->pc()==0x2a9b || m_audiocpu->pc()==0x2adc
-		|| m_audiocpu->pc()==0x1cac) // BigFight
-		return 0;
-	return r;
-#endif
 }
 
 
@@ -566,16 +547,16 @@ template<int Bank>
 void cyclwarr_state::cyclwarr_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_cyclwarr_videoram[Bank][offset]);
-	m_layer[(Bank<<1)|0]->mark_tile_dirty(offset);
-	m_layer[(Bank<<1)|1]->mark_tile_dirty(offset);
+	m_layer[(Bank << 1) | 0]->mark_tile_dirty(offset);
+	m_layer[(Bank << 1) | 1]->mark_tile_dirty(offset);
 }
 
 void cyclwarr_state::output_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 	machine().bookkeeping().coin_counter_w(1, data & 2);
-	if(data & 0xfffc)
-		logerror("output_w = %04x & %04x\n",data,mem_mask);
+	if (data & 0xfffc)
+		logerror("output_w = %04x & %04x\n", data, mem_mask);
 }
 
 
@@ -1271,6 +1252,8 @@ ROM_START( bigfightj ) // ABA-011 main board + ABA-012 daughter board
 	ROM_LOAD( "bf24.ic39", 0x000000, 0x20000, CRC(9db80c8a) SHA1(9ce64713758ebab559a0cacc7f7501e5a1a0133a) )
 	ROM_LOAD( "bf25.ic40", 0x020000, 0x20000, CRC(630154c4) SHA1(05902371b62a11c13f2582faa591945c037c6311) )
 ROM_END
+
+} // anonymous namespace
 
 GAME( 1991, cyclwarr,  0,        cyclwarr,  cyclwarr, cyclwarr_state, init_tatsumi, ROT0, "Tatsumi", "Cycle Warriors (rev C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // Rev C & B CPU code
 GAME( 1991, cyclwarra, cyclwarr, cyclwarr,  cyclwarb, cyclwarr_state, init_tatsumi, ROT0, "Tatsumi", "Cycle Warriors (rev B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // Rev B & A CPU code
