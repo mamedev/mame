@@ -98,8 +98,8 @@ void css11501sk9_state::machine_start()
 void css11501sk9_state::css11501sk9(machine_config &config)
 {
 	// basic machine hardware
-	RM7000BE(config, m_maincpu, 400'000'000); // Main CPU
-	RM7000BE(config, m_sslcpu, 400'000'000); // SSL CPU
+	RM7000BE(config, m_maincpu, 400'000'000); // Main CPU, PMC RM7000A 400T
+	RM7000BE(config, m_sslcpu, 400'000'000); // SSL CPU, PMC RM7000A 400T
 }
 
 
