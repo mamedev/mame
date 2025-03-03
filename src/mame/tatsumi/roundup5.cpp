@@ -50,6 +50,8 @@ public:
 
 
 private:
+	virtual void video_start() override ATTR_COLD;
+
 	uint16_t roundup_v30_z80_r(offs_t offset);
 	void roundup_v30_z80_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void roundup5_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -58,14 +60,11 @@ private:
 	void gfxdata_w(offs_t offset, uint8_t data);
 	void output_w(uint8_t data);
 
-	DECLARE_VIDEO_START(roundup5);
 	uint32_t screen_update_roundup5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void roundup5_68000_map(address_map &map) ATTR_COLD;
 	void roundup5_v30_map(address_map &map) ATTR_COLD;
 	void roundup5_z80_map(address_map &map) ATTR_COLD;
-
-//  virtual void machine_reset() override ATTR_COLD;
 
 	void draw_road(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_landscape(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t type);
@@ -221,7 +220,7 @@ void roundup5_state::gfxdata_w(offs_t offset, uint8_t data)
 	m_gfxdecode->gfx(0)->mark_dirty(offset/8);
 }
 
-VIDEO_START_MEMBER(roundup5_state,roundup5)
+void roundup5_state::video_start()
 {
 	m_tx_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tatsumi_state::get_text_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 128,64);
 	m_tx_gfxram = std::make_unique<uint8_t[]>(0x20000);
@@ -721,8 +720,6 @@ void roundup5_state::roundup5(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_roundup5);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024); // 1024 real colours
 	m_palette->set_membits(8).set_endianness(ENDIANNESS_BIG);
-
-	MCFG_VIDEO_START_OVERRIDE(roundup5_state,roundup5)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

@@ -13,14 +13,6 @@
 #include "speaker.h"
 
 /* TODO:
-    - (fixed) Cycle Warriors: transparent road layer on sidelines, wrong mask_data?
-    - (fixed) Missing BG layer (Round Up 5) - banked VRAM data from somewhere!?
-    - (fixed?) Cycle Warriors: test mode text does not appear as it needs a -256 Y
-      scroll offset from somewhere.
-    - (fixed) Cycle Warriors: sometimes it draws garbage on character select or even hangs
-      depending on where player coins up, most likely caused by miscommunication with sub CPU?
-    - (fixed) Cycle Warriors: ranking screen is completely wrong;
-    - (fixed) Cycle Warriors: ugly orange color on character select and briefing screens, layer disable?
     - Combine Big Fight & CycleWarriors video routines - currently each
       game uses different sized tilemaps - these are probably software
       controlled rather than hardwired, but I don't think either game
@@ -160,8 +152,8 @@ public:
 
 protected:
 	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
-private:
 	uint16_t cyclwarr_sprite_r(offs_t offset);
 	void cyclwarr_sprite_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void video_config_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -177,8 +169,7 @@ private:
 
 	template<int Bank> TILE_GET_INFO_MEMBER(get_tile_info_bigfight);
 	template<int Bank> TILE_GET_INFO_MEMBER(get_tile_info_cyclwarr_road);
-	DECLARE_VIDEO_START(cyclwarr);
-	DECLARE_VIDEO_START(bigfight);
+
 	uint32_t screen_update_cyclwarr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void common_map(address_map &map) ATTR_COLD;
@@ -212,6 +203,19 @@ private:
 	void apply_highlight_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &highlight_bitmap);
 };
 
+class bigfight_state : public cyclwarr_state
+{
+public:
+	bigfight_state(const machine_config &mconfig, device_type type, const char *tag)
+		: cyclwarr_state(mconfig, type, tag)
+	{
+	}
+
+	void bigfight(machine_config &config);
+
+protected:
+	virtual void video_start() override ATTR_COLD;
+};
 
 /*
  * these video registers never changes
@@ -246,9 +250,9 @@ void cyclwarr_state::mixing_control_w(offs_t offset, uint16_t data, uint16_t mem
 template<int Bank>
 TILE_GET_INFO_MEMBER(cyclwarr_state::get_tile_info_bigfight)
 {
-	int tile = m_cyclwarr_videoram[Bank >> 1][tile_index&0x7fff];
-	int bank = (m_bigfight_a40000[0] >> (((tile&0xc00)>>10)*4))&0xf;
-	uint16_t tileno = (tile&0x3ff)|(bank<<10);
+	int tile = m_cyclwarr_videoram[Bank >> 1][tile_index & 0x7fff];
+	int bank = (m_bigfight_a40000[0] >> (((tile & 0xc00) >> 10) * 4)) & 0xf;
+	uint16_t tileno = (tile & 0x3ff) | (bank << 10);
 	// color is bits 12-13
 	uint8_t color = (tile >> 12) & 0x3;
 
@@ -256,19 +260,16 @@ TILE_GET_INFO_MEMBER(cyclwarr_state::get_tile_info_bigfight)
 	// a similar result is obtainable with priority bit, but then it's wrong for
 	// Big Fight CRT test (dark red background) and character name bio in attract mode (reference shows it doesn't fade in like rest of text)
 	// TODO: likely an HW config sets this up
-	if(Bank != 0)
+	if (Bank != 0)
 		color |= 4;
 	// bit 14: ignore transparency on this tile
 	int opaque = ((tile >> 14) & 1) == 1;
 
-	tileinfo.set(0,
-						 tileno,
-						 color,
-						opaque ? TILE_FORCE_LAYER0 : 0);
+	tileinfo.set(0, tileno, color, opaque ? TILE_FORCE_LAYER0 : 0);
 
 	// bit 15: tile appears in front of sprites
 	tileinfo.category = (tile >> 15) & 1;
-	tileinfo.mask_data = &m_mask[tileno<<3];
+	tileinfo.mask_data = &m_mask[tileno << 3];
 }
 
 // same as above but additionally apply per-scanline color banking
@@ -276,32 +277,29 @@ TILE_GET_INFO_MEMBER(cyclwarr_state::get_tile_info_bigfight)
 template<int Bank>
 TILE_GET_INFO_MEMBER(cyclwarr_state::get_tile_info_cyclwarr_road)
 {
-	int tile = m_cyclwarr_videoram[Bank >> 1][tile_index&0x7fff];
-	int bank = (m_bigfight_a40000[0] >> (((tile&0xc00)>>10)*4))&0xf;
-	uint16_t tileno = (tile&0x3ff)|(bank<<10);
+	int tile = m_cyclwarr_videoram[Bank >> 1][tile_index & 0x7fff];
+	int bank = (m_bigfight_a40000[0] >> (((tile & 0xc00) >> 10) * 4)) & 0xf;
+	uint16_t tileno = (tile & 0x3ff) | (bank << 10);
 	uint8_t color = (tile >> 12) & 0x3;
-//  if(Bank != 0)
+
 	color |= 4;
 	int opaque = ((tile >> 14) & 1) == 1;
 
-	tileinfo.set(0,
-						 tileno,
-						 color | m_road_color_bank,
-						 opaque ? TILE_FORCE_LAYER0 : 0);
+	tileinfo.set(0, tileno, color | m_road_color_bank, opaque ? TILE_FORCE_LAYER0 : 0);
 
 	tileinfo.category = (tile >> 15) & 1;
-	tileinfo.mask_data = &m_mask[((tile&0x3ff)|(bank<<10))<<3];
+	tileinfo.mask_data = &m_mask[((tile & 0x3ff) | (bank << 10)) << 3];
 }
 
 void cyclwarr_state::tile_expand()
 {
 	/*
-	    Each tile (0x4000 of them) has a lookup table in ROM to build an individual 3-bit palette
-	    from sets of 8 bit palettes!
+		Each tile (0x4000 of them) has a lookup table in ROM to build an individual 3-bit palette
+		from sets of 8 bit palettes!
 	*/
-	gfx_element *gx0 = m_gfxdecode->gfx(0);
-	m_mask.resize(gx0->elements() << 3,0);
-	uint8_t *dest;
+	gfx_element* gx0 = m_gfxdecode->gfx(0);
+	m_mask.resize(gx0->elements() << 3, 0);
+	uint8_t* dest;
 
 	// allocate memory for the assembled data
 	m_decoded_gfx = std::make_unique<uint8_t[]>(gx0->elements() * gx0->width() * gx0->height());
@@ -310,20 +308,20 @@ void cyclwarr_state::tile_expand()
 	dest = m_decoded_gfx.get();
 	for (int c = 0; c < gx0->elements(); c++)
 	{
-		const uint8_t *c0base = gx0->get_data(c);
+		const uint8_t* c0base = gx0->get_data(c);
 
 		// loop over height
 		for (int y = 0; y < gx0->height(); y++)
 		{
-			const uint8_t *c0 = c0base;
+			const uint8_t* c0 = c0base;
 
 			for (int x = 0; x < gx0->width(); x++)
 			{
 				uint8_t pix = (*c0++ & 7);
-				uint8_t respix = m_cyclwarr_tileclut[(c << 3)|pix];
+				uint8_t respix = m_cyclwarr_tileclut[(c << 3) | pix];
 				*dest++ = respix;
 				// Transparent pixels are set by both the tile pixel data==0 AND colour palette & 7 == 0
-				m_mask[(c << 3) | (y & 7)] |= ((pix&0x7)!=0 || ((pix&0x7)==0 && (respix&0x7)!=0)) ? (0x80 >> (x & 7)) : 0;
+				m_mask[(c << 3) | (y & 7)] |= ((pix & 0x7) != 0 || ((pix & 0x7) == 0 && (respix & 0x7) != 0)) ? (0x80 >> (x & 7)) : 0;
 			}
 			c0base += gx0->rowbytes();
 		}
@@ -334,51 +332,51 @@ void cyclwarr_state::tile_expand()
 }
 
 
-VIDEO_START_MEMBER(cyclwarr_state,cyclwarr)
+void cyclwarr_state::video_start()
 {
 	tile_expand();
-	m_layer[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cyclwarr_state::get_tile_info_bigfight<0>)),      TILEMAP_SCAN_ROWS, 8,8,  64,512);
-	m_layer[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cyclwarr_state::get_tile_info_cyclwarr_road<1>)), TILEMAP_SCAN_ROWS, 8,8, 128,256);
-	m_layer[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cyclwarr_state::get_tile_info_bigfight<2>)),      TILEMAP_SCAN_ROWS, 8,8,  64,512);
-	m_layer[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cyclwarr_state::get_tile_info_bigfight<3>)),      TILEMAP_SCAN_ROWS, 8,8,  64,512);
+	m_layer[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cyclwarr_state::get_tile_info_bigfight<0>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 512);
+	m_layer[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cyclwarr_state::get_tile_info_cyclwarr_road<1>)), TILEMAP_SCAN_ROWS, 8, 8, 128, 256);
+	m_layer[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cyclwarr_state::get_tile_info_bigfight<2>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 512);
+	m_layer[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cyclwarr_state::get_tile_info_bigfight<3>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 512);
 
 
 	// set up scroll bases
 	// TODO: more HW configs
-	m_layer[3]->set_scrolldx(-8,-8);
+	m_layer[3]->set_scrolldx(-8, -8);
 	m_layer_page_size[3] = 0x200;
-	m_layer[2]->set_scrolldx(-8,-8);
+	m_layer[2]->set_scrolldx(-8, -8);
 	m_layer_page_size[2] = 0x200;
-	m_layer[1]->set_scrolldx(-8,-8);
+	m_layer[1]->set_scrolldx(-8, -8);
 	m_layer_page_size[1] = 0x200;
-	m_layer[0]->set_scrolldx(-0x10,-0x10);
+	m_layer[0]->set_scrolldx(-0x10, -0x10);
 	m_layer_page_size[0] = 0x100;
 
 	m_layer1_can_be_road = true;
 }
 
-VIDEO_START_MEMBER(cyclwarr_state,bigfight)
+void bigfight_state::video_start()
 {
 	tile_expand();
-	m_layer[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cyclwarr_state::get_tile_info_bigfight<0>)), TILEMAP_SCAN_ROWS, 8,8, 128,256);
-	m_layer[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cyclwarr_state::get_tile_info_bigfight<1>)), TILEMAP_SCAN_ROWS, 8,8, 128,256);
-	m_layer[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cyclwarr_state::get_tile_info_bigfight<2>)), TILEMAP_SCAN_ROWS, 8,8, 128,256);
-	m_layer[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cyclwarr_state::get_tile_info_bigfight<3>)), TILEMAP_SCAN_ROWS, 8,8, 128,256);
+	m_layer[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cyclwarr_state::get_tile_info_bigfight<0>)), TILEMAP_SCAN_ROWS, 8, 8, 128, 256);
+	m_layer[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cyclwarr_state::get_tile_info_bigfight<1>)), TILEMAP_SCAN_ROWS, 8, 8, 128, 256);
+	m_layer[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cyclwarr_state::get_tile_info_bigfight<2>)), TILEMAP_SCAN_ROWS, 8, 8, 128, 256);
+	m_layer[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cyclwarr_state::get_tile_info_bigfight<3>)), TILEMAP_SCAN_ROWS, 8, 8, 128, 256);
 
 	// set up scroll bases
 	// TODO: more HW configs
-	m_layer[3]->set_scrolldx(-8,-8);
-	m_layer[2]->set_scrolldx(-8,-8);
-	m_layer[1]->set_scrolldx(-8,-8);
-	m_layer[0]->set_scrolldx(-0x10,-0x10);
-	for(int i=0;i<4;i++)
+	m_layer[3]->set_scrolldx(-8, -8);
+	m_layer[2]->set_scrolldx(-8, -8);
+	m_layer[1]->set_scrolldx(-8, -8);
+	m_layer[0]->set_scrolldx(-0x10, -0x10);
+	for (int i = 0; i < 4; i++)
 		m_layer_page_size[i] = 0x200;
 
 	m_layer1_can_be_road = false;
 }
 
 
-void cyclwarr_state::draw_bg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *src, const uint16_t* scrollx, const uint16_t* scrolly, const uint16_t layer_page_size, bool is_road, int hi_priority)
+void cyclwarr_state::draw_bg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t* src, const uint16_t* scrollx, const uint16_t* scrolly, const uint16_t layer_page_size, bool is_road, int hi_priority)
 {
 	rectangle clip;
 	clip.min_x = cliprect.min_x;
@@ -390,7 +388,7 @@ void cyclwarr_state::draw_bg(screen_device &screen, bitmap_rgb32 &bitmap, const 
 	// TODO: Actually scrolly registers 0xf0 to 0xff are used (can split the tilemap furthermore?)
 	uint16_t page_select = scrolly[0xff];
 
-	for (int y=cliprect.min_y; y<=cliprect.max_y; y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		clip.min_y = clip.max_y = y;
 		int y_base = rowscroll_enable ? y : 0;
@@ -403,9 +401,9 @@ void cyclwarr_state::draw_bg(screen_device &screen, bitmap_rgb32 &bitmap, const 
 
 		// special handling for cycle warriors road: it reads in scrolly table bits 15-13 an
 		// additional tile color bank and per scanline.
-		if(is_road == true)
+		if (is_road == true)
 		{
-			if(scrolly[y_base] & 0x8000)
+			if (scrolly[y_base] & 0x8000)
 			{
 				m_road_color_bank = (scrolly[y_base] >> 13) & 3;
 				// road mode disables page wraparound
@@ -414,7 +412,7 @@ void cyclwarr_state::draw_bg(screen_device &screen, bitmap_rgb32 &bitmap, const 
 			else
 				m_road_color_bank = 0;
 
-			if(m_road_color_bank != m_prev_road_bank)
+			if (m_road_color_bank != m_prev_road_bank)
 			{
 				m_prev_road_bank = m_road_color_bank;
 				src->mark_all_dirty();
@@ -425,11 +423,11 @@ void cyclwarr_state::draw_bg(screen_device &screen, bitmap_rgb32 &bitmap, const 
 		// cfr. Cycle Warriors scrolling text (ranking, ending), backgrounds when uphill,
 		// Big Fight vertical scrolling in the morning Funnel stage (not the one chosen at start),
 		// also Big Fight text garbage in the stage after Mevella joins you (forgot the name)
-		if((cur_page - page_select) >= layer_page_size && page_disable == 0)
+		if ((cur_page - page_select) >= layer_page_size && page_disable == 0)
 			src_y -= layer_page_size;
 
-		src->set_scrollx(0,src_x);
-		src->set_scrolly(0,src_y);
+		src->set_scrollx(0, src_x);
+		src->set_scrolly(0, src_y);
 		src->draw(screen, bitmap, clip, TILEMAP_DRAW_CATEGORY(hi_priority), 0);
 	}
 }
@@ -444,14 +442,14 @@ void cyclwarr_state::draw_bg_layers(screen_device &screen, bitmap_rgb32 &bitmap,
 
 uint32_t cyclwarr_state::screen_update_cyclwarr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	m_bigfight_bank=m_bigfight_a40000[0];
-	if (m_bigfight_bank!=m_bigfight_last_bank)
+	m_bigfight_bank = m_bigfight_a40000[0];
+	if (m_bigfight_bank != m_bigfight_last_bank)
 	{
 		for (int i = 0; i < 4; i++)
 		{
 			m_layer[i]->mark_all_dirty();
 		}
-		m_bigfight_last_bank=m_bigfight_bank;
+		m_bigfight_last_bank = m_bigfight_bank;
 	}
 	m_rotatingsprites->update_cluts();
 
@@ -459,19 +457,19 @@ uint32_t cyclwarr_state::screen_update_cyclwarr(screen_device &screen, bitmap_rg
 
 #if 0
 	popmessage("%04x %04x (%04x)|%04x %04x (%04x)|%04x %04x (%04x)|%04x %04x (%04x)"
-														,m_cyclwarr_videoram[1][0x000],m_cyclwarr_videoram[1][0x100],m_cyclwarr_videoram[1][0x1ff]
-														,m_cyclwarr_videoram[1][0x200],m_cyclwarr_videoram[1][0x300],m_cyclwarr_videoram[1][0x3ff]
-														,m_cyclwarr_videoram[0][0x000],m_cyclwarr_videoram[0][0x100],m_cyclwarr_videoram[0][0x1ff]
-														,m_cyclwarr_videoram[0][0x200],m_cyclwarr_videoram[0][0x300],m_cyclwarr_videoram[0][0x3ff]);
+		, m_cyclwarr_videoram[1][0x000], m_cyclwarr_videoram[1][0x100], m_cyclwarr_videoram[1][0x1ff]
+		, m_cyclwarr_videoram[1][0x200], m_cyclwarr_videoram[1][0x300], m_cyclwarr_videoram[1][0x3ff]
+		, m_cyclwarr_videoram[0][0x000], m_cyclwarr_videoram[0][0x100], m_cyclwarr_videoram[0][0x1ff]
+		, m_cyclwarr_videoram[0][0x200], m_cyclwarr_videoram[0][0x300], m_cyclwarr_videoram[0][0x3ff]);
 #endif
 
-//  popmessage("%04x %04x %04x %04x",m_video_config[0],m_video_config[1],m_video_config[2],m_video_config[3]);
+	//  popmessage("%04x %04x %04x %04x",m_video_config[0],m_video_config[1],m_video_config[2],m_video_config[3]);
 
 	screen.priority().fill(0, cliprect);
-	m_rotatingsprites->draw_sprites(screen.priority(),cliprect,1,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Alpha pass only
+	m_rotatingsprites->draw_sprites(screen.priority(), cliprect, 1, (m_sprite_control_ram[0xe0] & 0x1000) ? 0x1000 : 0); // Alpha pass only
 	draw_bg_layers(screen, bitmap, cliprect, 0);
-	apply_shadow_bitmap(bitmap,cliprect,screen.priority(), m_mixing_control & 1);
-	m_rotatingsprites->draw_sprites(bitmap,cliprect,0,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0);
+	apply_shadow_bitmap(bitmap, cliprect, screen.priority(), m_mixing_control & 1);
+	m_rotatingsprites->draw_sprites(bitmap, cliprect, 0, (m_sprite_control_ram[0xe0] & 0x1000) ? 0x1000 : 0);
 	draw_bg_layers(screen, bitmap, cliprect, 1);
 	return 0;
 }
@@ -974,8 +972,6 @@ void cyclwarr_state::cyclwarr(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cyclwarr);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 8192);
 
-	MCFG_VIDEO_START_OVERRIDE(cyclwarr_state, cyclwarr)
-
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -993,14 +989,12 @@ void cyclwarr_state::cyclwarr(machine_config &config)
 	m_oki->add_route(ALL_OUTPUTS, "rspeaker", 0.75);
 }
 
-void cyclwarr_state::bigfight(machine_config &config)
+void bigfight_state::bigfight(machine_config &config)
 {
 	cyclwarr(config);
 
 	// TODO: it's same video HW, we don't know how/where video registers are mapped
 //  subdevice<screen_device>("screen")->set_screen_update(FUNC(cyclwarr_state::screen_update_bigfight));
-
-	MCFG_VIDEO_START_OVERRIDE(cyclwarr_state, bigfight)
 
 	/* sound hardware */
 	// TODO: 2MHz was too fast. Can the clock be software controlled?
@@ -1282,5 +1276,5 @@ GAME( 1991, cyclwarr,  0,        cyclwarr,  cyclwarr, cyclwarr_state, init_tatsu
 GAME( 1991, cyclwarra, cyclwarr, cyclwarr,  cyclwarb, cyclwarr_state, init_tatsumi, ROT0, "Tatsumi", "Cycle Warriors (rev B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // Rev B & A CPU code
 GAME( 1991, cyclwarrb, cyclwarr, cyclwarr,  cyclwarb, cyclwarr_state, init_tatsumi, ROT0, "Tatsumi", "Cycle Warriors", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // Original version with no Rev roms
 
-GAME( 1992, bigfight,  0,        bigfight,  bigfight, cyclwarr_state, init_tatsumi, ROT0, "Tatsumi", "Big Fight - Big Trouble In The Atlantic Ocean", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, bigfightj, bigfight, bigfight,  bigfight, cyclwarr_state, init_tatsumi, ROT0, "Tatsumi", "Big Fight - Big Trouble In The Atlantic Ocean (Japan, rev F)", MACHINE_IMPERFECT_GRAPHICS ) // Rev D through F CPU codes
+GAME( 1992, bigfight,  0,        bigfight,  bigfight, bigfight_state, init_tatsumi, ROT0, "Tatsumi", "Big Fight - Big Trouble In The Atlantic Ocean", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, bigfightj, bigfight, bigfight,  bigfight, bigfight_state, init_tatsumi, ROT0, "Tatsumi", "Big Fight - Big Trouble In The Atlantic Ocean (Japan, rev F)", MACHINE_IMPERFECT_GRAPHICS ) // Rev D through F CPU codes

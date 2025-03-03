@@ -93,26 +93,26 @@ void tatsumi_rotating_sprites_device::mycopyrozbitmap_core(bitmap_ind8 &bitmap, 
 { }
 
 void tatsumi_rotating_sprites_device::mycopyrozbitmap_core(bitmap_rgb32 &bitmap, const bitmap_rgb32 &srcbitmap,
-		int dstx, int dsty, int srcwidth, int srcheight, int incxx, int incxy, int incyx, int incyy,
-		const rectangle &clip, int transparent_color)
+	int dstx, int dsty, int srcwidth, int srcheight, int incxx, int incxy, int incyx, int incyy,
+	const rectangle &clip, int transparent_color)
 {
-//  const int xmask = srcbitmap.width()-1;
-//  const int ymask = srcbitmap.height()-1;
+	//  const int xmask = srcbitmap.width()-1;
+	//  const int ymask = srcbitmap.height()-1;
 	const int widthshifted = srcwidth << 16;
 	const int heightshifted = srcheight << 16;
 
-	uint32_t startx=0;
-	uint32_t starty=0;
+	uint32_t startx = 0;
+	uint32_t starty = 0;
 
 	int sx = dstx;
 	int sy = dsty;
 	int ex = dstx + srcwidth;
 	int ey = dsty + srcheight;
 
-	if (sx<clip.min_x) sx=clip.min_x;
-	if (ex>clip.max_x) ex=clip.max_x;
-	if (sy<clip.min_y) sy=clip.min_y;
-	if (ey>clip.max_y) ey=clip.max_y;
+	if (sx < clip.min_x) sx = clip.min_x;
+	if (ex > clip.max_x) ex = clip.max_x;
+	if (sy < clip.min_y) sy = clip.min_y;
+	if (ey > clip.max_y) ey = clip.max_y;
 
 	if (sx <= ex)
 	{
@@ -121,7 +121,7 @@ void tatsumi_rotating_sprites_device::mycopyrozbitmap_core(bitmap_rgb32 &bitmap,
 			int x = sx;
 			uint32_t cx = startx;
 			uint32_t cy = starty;
-			uint32_t *dest = &bitmap.pix(sy, sx);
+			uint32_t* dest = &bitmap.pix(sy, sx);
 
 			while (x <= ex)
 			{
@@ -506,12 +506,12 @@ void tatsumi_rotating_sprites_device::draw_sprites_main(BitmapClass &bitmap, con
 	}
 }
 
-void tatsumi_rotating_sprites_device::draw_sprites(bitmap_rgb32& bitmap, const rectangle& cliprect, int write_priority_only, int rambank)
+void tatsumi_rotating_sprites_device::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, int write_priority_only, int rambank)
 {
 	draw_sprites_main(bitmap, cliprect, write_priority_only, rambank);
 }
 
-void tatsumi_rotating_sprites_device::draw_sprites(bitmap_ind8& bitmap, const rectangle& cliprect, int write_priority_only, int rambank)
+void tatsumi_rotating_sprites_device::draw_sprites(bitmap_ind8& bitmap, const rectangle &cliprect, int write_priority_only, int rambank)
 {
 	draw_sprites_main(bitmap, cliprect, write_priority_only, rambank);
 }

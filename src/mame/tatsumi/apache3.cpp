@@ -39,6 +39,9 @@ public:
 	void init_apache3();
 
 private:
+	virtual void video_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
 	uint16_t apache3_bank_r();
 	void apache3_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void apache3_z80_ctrl_w(uint16_t data);
@@ -51,8 +54,6 @@ private:
 	void apache3_road_z_w(uint16_t data);
 	void apache3_road_x_w(offs_t offset, uint8_t data);
 
-	DECLARE_MACHINE_RESET(apache3);
-	DECLARE_VIDEO_START(apache3);
 	uint32_t screen_update_apache3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void apache3_68000_reset(int state);
 
@@ -269,28 +270,28 @@ void apache3_state::draw_ground(bitmap_rgb32 &dst, const rectangle &cliprect)
 }
 
 
-VIDEO_START_MEMBER(apache3_state,apache3)
+void apache3_state::video_start()
 {
-	m_tx_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tatsumi_state::get_text_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 64,64);
+	m_tx_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tatsumi_state::get_text_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_apache3_road_x_ram = std::make_unique<uint8_t[]>(512);
 
 	m_tx_layer->set_transparent_pen(0);
 }
 
-uint32_t apache3_state::screen_update_apache3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t apache3_state::screen_update_apache3(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
 {
 	m_rotatingsprites->update_cluts();
 
-	m_tx_layer->set_scrollx(0,24);
+	m_tx_layer->set_scrollx(0, 24);
 
 	bitmap.fill(m_palette->pen(0), cliprect);
 	screen.priority().fill(0, cliprect);
-	m_rotatingsprites->draw_sprites(screen.priority(),cliprect,1,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Alpha pass only
+	m_rotatingsprites->draw_sprites(screen.priority(), cliprect, 1, (m_sprite_control_ram[0xe0] & 0x1000) ? 0x1000 : 0); // Alpha pass only
 	draw_sky(bitmap, cliprect, 256, m_apache3_rotate_ctrl[1]);
-	apply_shadow_bitmap(bitmap,cliprect,screen.priority(), 0);
-//  draw_ground(bitmap, cliprect);
-	m_rotatingsprites->draw_sprites(bitmap,cliprect,0, (m_sprite_control_ram[0x20]&0x1000) ? 0x1000 : 0);
-	m_tx_layer->draw(screen, bitmap, cliprect, 0,0);
+	apply_shadow_bitmap(bitmap, cliprect, screen.priority(), 0);
+	//draw_ground(bitmap, cliprect);
+	m_rotatingsprites->draw_sprites(bitmap, cliprect, 0, (m_sprite_control_ram[0x20] & 0x1000) ? 0x1000 : 0);
+	m_tx_layer->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -422,7 +423,7 @@ void apache3_state::apache3_68000_reset(int state)
 	m_subcpu2->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
-MACHINE_RESET_MEMBER(apache3_state,apache3)
+void apache3_state::machine_reset()
 {
 	m_subcpu2->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // TODO
 }
@@ -449,7 +450,6 @@ void apache3_state::apache3(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-	MCFG_MACHINE_RESET_OVERRIDE(apache3_state, apache3)
 
 	m58990_device &adc(M58990(config, "adc", 1000000)); // unknown clock
 	adc.in_callback<0>().set_ioport("STICK_X");
@@ -483,8 +483,6 @@ void apache3_state::apache3(machine_config &config)
 	bit 1:  2k
 	bit 0:  3.9kOhm resistor
 	*/
-
-	MCFG_VIDEO_START_OVERRIDE(apache3_state, apache3)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
