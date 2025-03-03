@@ -73,7 +73,7 @@ public:
 
 	private:
 		const impl &                    m_fs;
-		fsblk_t::block_t                m_block;
+		fsblk_t::block_t::ptr           m_block;
 		std::set<std::tuple<u8, u8>>    m_visited_set;
 		u8                              m_track;
 		u8                              m_sector;
@@ -124,7 +124,7 @@ private:
 	static const u8 s_data_track_order[MAX_TRACKS - 1];
 	u8 m_max_track;
 
-	fsblk_t::block_t read_sector(int track, int sector) const;
+	fsblk_t::block_t::ptr read_sector(int track, int sector) const;
 	std::optional<cbmdos_dirent> dirent_from_path(const std::vector<std::string> &path) const;
 	void iterate_directory_entries(const std::function<bool(u8 track, u8 sector, u8 file_index, const cbmdos_dirent &dirent)> &callback) const;
 	void iterate_all_directory_entries(const std::function<bool(u8 track, u8 sector, u8 file_index, const cbmdos_dirent &dirent)> &callback) const;
@@ -305,7 +305,7 @@ impl::impl(fsblk_t &blockdev)
 meta_data impl::volume_metadata()
 {
 	auto bam_block = read_sector(DIRECTORY_TRACK, BAM_SECTOR);
-	std::string_view disk_name = std::string_view((const char *) bam_block.rodata() + 0x90, 16);
+	std::string_view disk_name = bam_block->rstr(0x90, 16);
 
 	meta_data results;
 	results.set(meta_name::name, strtrimright_cbm(disk_name));
@@ -397,7 +397,7 @@ std::error_condition impl::file_create(const std::vector<std::string> &path, con
 			return err;
 		auto new_block = read_sector(DIRECTORY_TRACK, new_sector);
 		for (int i = 2; i < BLOCK_SIZE; i++)
-			new_block.w8(i, 0);
+			new_block->w8(i, 0);
 		// Find last directory sector
 		u8 last_sector = 0;
 		block_iterator iter(*this, DIRECTORY_TRACK, FIRST_DIRECTORY_SECTOR);
@@ -405,8 +405,8 @@ std::error_condition impl::file_create(const std::vector<std::string> &path, con
 			last_sector = iter.sector();
 		// Update chain on last directory sector
 		auto last_dir_block = read_sector(DIRECTORY_TRACK, last_sector);
-		last_dir_block.w8(OFFSET_CHAIN_TRACK, DIRECTORY_TRACK);
-		last_dir_block.w8(OFFSET_CHAIN_SECTOR, new_sector);
+		last_dir_block->w8(OFFSET_CHAIN_TRACK, DIRECTORY_TRACK);
+		last_dir_block->w8(OFFSET_CHAIN_SECTOR, new_sector);
 		track = DIRECTORY_TRACK;
 		sector = new_sector;
 	}
@@ -419,11 +419,11 @@ std::error_condition impl::file_create(const std::vector<std::string> &path, con
 	auto dirblk = read_sector(track, sector);
 	u32 offset = file_index * DIRECTORY_ENTRY_SIZE;
 	for (int i = 0; i < DIRECTORY_ENTRY_SIZE; i++)
-		dirblk.w8(offset + i, (i >= 5 && i < 5 + 16) ? 0xa0 : 0x00);
-	dirblk.w8(offset + OFFSET_FILE_TYPE, FILE_TYPE_PRG);
-	dirblk.w8(offset + OFFSET_FILE_FIRST_TRACK, file_track);
-	dirblk.w8(offset + OFFSET_FILE_FIRST_SECTOR, file_sector);
-	dirblk.wstr(offset + OFFSET_FILE_NAME, filename);
+		dirblk->w8(offset + i, (i >= 5 && i < 5 + 16) ? 0xa0 : 0x00);
+	dirblk->w8(offset + OFFSET_FILE_TYPE, FILE_TYPE_PRG);
+	dirblk->w8(offset + OFFSET_FILE_FIRST_TRACK, file_track);
+	dirblk->w8(offset + OFFSET_FILE_FIRST_SECTOR, file_sector);
+	dirblk->wstr(offset + OFFSET_FILE_NAME, filename);
 	// TODO set first side sector block track (rel file)
 	// TODO set first side sector block sector (rel file)
 	// TODO set rel file record length
@@ -470,18 +470,18 @@ std::error_condition impl::file_write(const std::vector<std::string> &path, cons
 	{
 		auto datablk = read_sector(data_track, data_sector);
 		u8 bytes = (data_length - offset) > SECTOR_DATA_BYTES ? SECTOR_DATA_BYTES : data_length - offset;
-		memcpy(datablk.data() + 2, data.data() + offset, bytes);
+		datablk->write(2, data.data() + offset, bytes);
 		offset += SECTOR_DATA_BYTES;
 		sector_count++;
-		if (datablk.r8(OFFSET_CHAIN_TRACK) == CHAIN_END)
+		if (datablk->r8(OFFSET_CHAIN_TRACK) == CHAIN_END)
 		{
 			if (offset < data_length)
 			{
 				auto [err, next_track, next_sector] = claim_sector();
 				if (err)
 					return err;
-				datablk.w8(OFFSET_CHAIN_TRACK, next_track);
-				datablk.w8(OFFSET_CHAIN_SECTOR, next_sector);
+				datablk->w8(OFFSET_CHAIN_TRACK, next_track);
+				datablk->w8(OFFSET_CHAIN_SECTOR, next_sector);
 				data_track = next_track;
 				data_sector = next_sector;
 			}
@@ -490,14 +490,14 @@ std::error_condition impl::file_write(const std::vector<std::string> &path, cons
 		{
 			if (offset < data_length)
 			{
-				data_track = datablk.r8(OFFSET_CHAIN_TRACK);
-				data_sector = datablk.r8(OFFSET_CHAIN_SECTOR);
+				data_track = datablk->r8(OFFSET_CHAIN_TRACK);
+				data_sector = datablk->r8(OFFSET_CHAIN_SECTOR);
 			}
 			else
 			{
 				// Free the rest of the chain
-				u8 track_to_free = datablk.r8(OFFSET_CHAIN_TRACK);
-				u8 sector_to_free = datablk.r8(OFFSET_CHAIN_SECTOR);
+				u8 track_to_free = datablk->r8(OFFSET_CHAIN_TRACK);
+				u8 sector_to_free = datablk->r8(OFFSET_CHAIN_SECTOR);
 
 				while (track_to_free != CHAIN_END)
 				{
@@ -505,15 +505,15 @@ std::error_condition impl::file_write(const std::vector<std::string> &path, cons
 					if (err)
 						return err;
 					datablk = read_sector(track_to_free, sector_to_free);
-					track_to_free = datablk.r8(OFFSET_CHAIN_TRACK);
-					sector_to_free = datablk.r8(OFFSET_CHAIN_SECTOR);
+					track_to_free = datablk->r8(OFFSET_CHAIN_TRACK);
+					sector_to_free = datablk->r8(OFFSET_CHAIN_SECTOR);
 				}
 			}
 		}
 		if (offset >= data_length)
 		{
-			datablk.w8(OFFSET_CHAIN_TRACK, CHAIN_END);
-			datablk.w8(OFFSET_CHAIN_SECTOR, bytes + 1);
+			datablk->w8(OFFSET_CHAIN_TRACK, CHAIN_END);
+			datablk->w8(OFFSET_CHAIN_SECTOR, bytes + 1);
 		}
 	}
 
@@ -523,17 +523,17 @@ std::error_condition impl::file_write(const std::vector<std::string> &path, cons
 	if (file_type == FILE_TYPE_DEL)
 	{
 		// Free sector, update first file sector to 00
-		u8 file_track = dirblk.r8(DIRECTORY_ENTRY_SIZE * dir_file_index + OFFSET_FILE_FIRST_TRACK);
-		u8 file_sector = dirblk.r8(DIRECTORY_ENTRY_SIZE * dir_file_index + OFFSET_FILE_FIRST_SECTOR);
+		u8 file_track = dirblk->r8(DIRECTORY_ENTRY_SIZE * dir_file_index + OFFSET_FILE_FIRST_TRACK);
+		u8 file_sector = dirblk->r8(DIRECTORY_ENTRY_SIZE * dir_file_index + OFFSET_FILE_FIRST_SECTOR);
 		std::error_condition err = free_sector(file_track, file_sector);
 		if (err)
 			return err;
-		dirblk.w8(DIRECTORY_ENTRY_SIZE * dir_file_index + OFFSET_FILE_FIRST_TRACK, 0);
-		dirblk.w8(DIRECTORY_ENTRY_SIZE * dir_file_index + OFFSET_FILE_FIRST_SECTOR, 0);
+		dirblk->w8(DIRECTORY_ENTRY_SIZE * dir_file_index + OFFSET_FILE_FIRST_TRACK, 0);
+		dirblk->w8(DIRECTORY_ENTRY_SIZE * dir_file_index + OFFSET_FILE_FIRST_SECTOR, 0);
 		sector_count = 0;
 	}
-	dirblk.w8(DIRECTORY_ENTRY_SIZE * dir_file_index + OFFSET_FILE_TYPE, file_type);
-	dirblk.w16l(DIRECTORY_ENTRY_SIZE * dir_file_index + OFFSET_SECTOR_COUNT, sector_count);
+	dirblk->w8(DIRECTORY_ENTRY_SIZE * dir_file_index + OFFSET_FILE_TYPE, file_type);
+	dirblk->w16l(DIRECTORY_ENTRY_SIZE * dir_file_index + OFFSET_SECTOR_COUNT, sector_count);
 
 	return std::error_condition();
 }
@@ -568,8 +568,8 @@ std::pair<std::error_condition, u8> impl::claim_track_sector(u8 track) const
 		return std::make_pair(error::invalid_block, 0);
 
 	auto bamblk = read_sector(DIRECTORY_TRACK, BAM_SECTOR);
-	u8 free_count = bamblk.r8(4 * track);
-	u32 free_bitmap = bamblk.r24l(4 * track + 1);
+	u8 free_count = bamblk->r8(4 * track);
+	u32 free_bitmap = bamblk->r24l(4 * track + 1);
 
 	for (int s = 0; s < MAX_SECTORS; s++)
 	{
@@ -578,12 +578,12 @@ std::pair<std::error_condition, u8> impl::claim_track_sector(u8 track) const
 		{
 			free_bitmap &= ~(1 << sector);
 			free_count--;
-			bamblk.w8(4 * track, free_count);
-			bamblk.w24l(4 * track + 1, free_bitmap);
+			bamblk->w8(4 * track, free_count);
+			bamblk->w24l(4 * track + 1, free_bitmap);
 			// Write chain end marker in new sector
 			auto claimedlk = read_sector(track, sector);
-			claimedlk.w8(OFFSET_CHAIN_TRACK, CHAIN_END);
-			claimedlk.w8(OFFSET_CHAIN_SECTOR, 0xff);
+			claimedlk->w8(OFFSET_CHAIN_TRACK, CHAIN_END);
+			claimedlk->w8(OFFSET_CHAIN_SECTOR, 0xff);
 			return std::make_pair(std::error_condition(), sector);
 		}
 	}
@@ -611,12 +611,12 @@ std::error_condition impl::free_sector(u8 track, u8 sector) const
 		return error::invalid_block;
 
 	auto bamblk = read_sector(DIRECTORY_TRACK, BAM_SECTOR);
-	u8 free_count = bamblk.r8(4 * track);
-	u32 free_bitmap = bamblk.r24l(4 * track + 1);
+	u8 free_count = bamblk->r8(4 * track);
+	u32 free_bitmap = bamblk->r24l(4 * track + 1);
 	free_bitmap |= (1 << sector);
 	free_count++;
-	bamblk.w8(4 * track, free_count);
-	bamblk.w24l(4 * track + 1, free_bitmap);
+	bamblk->w8(4 * track, free_count);
+	bamblk->w24l(4 * track + 1, free_bitmap);
 	return std::error_condition();
 }
 
@@ -625,7 +625,7 @@ std::error_condition impl::free_sector(u8 track, u8 sector) const
 //  impl::read_sector
 //-------------------------------------------------
 
-fsblk_t::block_t impl::read_sector(int track, int sector) const
+fsblk_t::block_t::ptr impl::read_sector(int track, int sector) const
 {
 	// CBM thinks in terms of tracks/sectors, but we have a block device abstraction
 	u32 block = 0;
@@ -776,8 +776,8 @@ bool impl::block_iterator::next()
 
 		// with that out of the way, proceed
 		m_block = m_fs.read_sector(m_next_track, m_next_sector);
-		m_next_track = m_block.r8(OFFSET_CHAIN_TRACK);
-		m_next_sector = m_block.r8(OFFSET_CHAIN_SECTOR);
+		m_next_track = m_block->r8(OFFSET_CHAIN_TRACK);
+		m_next_sector = m_block->r8(OFFSET_CHAIN_SECTOR);
 		result = true;
 	}
 	else
@@ -795,7 +795,7 @@ bool impl::block_iterator::next()
 
 const void *impl::block_iterator::data() const
 {
-	return m_block.rodata() + 2;
+	return m_block->rodata() + 2;
 }
 
 
@@ -805,7 +805,7 @@ const void *impl::block_iterator::data() const
 
 const std::array<impl::cbmdos_dirent, impl::SECTOR_DIRECTORY_COUNT> &impl::block_iterator::dirent_data() const
 {
-	return *reinterpret_cast<const std::array<impl::cbmdos_dirent, SECTOR_DIRECTORY_COUNT> *>(m_block.rodata());
+	return *reinterpret_cast<const std::array<impl::cbmdos_dirent, SECTOR_DIRECTORY_COUNT> *>(m_block->rodata());
 }
 
 

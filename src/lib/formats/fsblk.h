@@ -10,6 +10,7 @@
 
 #include "fsmeta.h"
 
+#include <memory>
 #include <string>
 #include <string_view>
 #include <system_error>
@@ -33,103 +34,6 @@ enum class error : int {
 	already_exists,
 };
 
-template<typename T> class refcounted_outer {
-public:
-	refcounted_outer(bool weak) :  m_object(nullptr), m_is_weak_ref(weak) {}
-	refcounted_outer(T *object, bool weak) : m_object(object), m_is_weak_ref(weak) {
-		ref();
-	}
-
-	refcounted_outer(const refcounted_outer &cref) {
-		m_object = cref.m_object;
-		m_is_weak_ref = cref.m_is_weak_ref;
-		ref();
-	}
-
-	refcounted_outer(refcounted_outer &&cref) {
-		m_object = cref.m_object;
-		m_is_weak_ref = cref.m_is_weak_ref;
-		cref.m_object = nullptr;
-	}
-
-	~refcounted_outer() {
-		unref();
-	}
-
-	refcounted_outer<T> &operator =(T *dir) {
-		if(m_object != dir) {
-			unref();
-			m_object = dir;
-			ref();
-		}
-		return *this;
-	}
-
-	refcounted_outer<T> &operator =(const refcounted_outer<T> &cref) {
-		if(m_object != cref.m_object) {
-			unref();
-			m_object = cref.m_object;
-			ref();
-		}
-		return *this;
-	}
-
-	refcounted_outer<T> &operator =(refcounted_outer<T> &&cref) {
-		if(m_object != cref.m_object) {
-			unref();
-			m_object = cref.m_object;
-			ref();
-		} else if(m_is_weak_ref != cref.m_is_weak_ref) {
-			ref();
-			cref.unref();
-			m_object = cref.m_object; // In case the object got deleted (when going from strong ref to weak on the last strong)
-		}
-		cref.m_object = nullptr;
-		return *this;
-	}
-
-	operator bool() const { return m_object != nullptr; }
-
-protected:
-	T *m_object;
-	bool m_is_weak_ref;
-
-private:
-	void ref() {
-		if(m_object) {
-			if(m_is_weak_ref)
-				m_object->ref_weak();
-			else
-				m_object->ref();
-		}
-	}
-
-	void unref() {
-		if(m_object) {
-			bool del = m_is_weak_ref ? m_object->unref_weak() : m_object->unref();
-			if(del)
-				m_object = nullptr;
-		}
-	}
-};
-
-
-class refcounted_inner {
-public:
-	refcounted_inner() : m_ref(0), m_weak_ref(0) {}
-	virtual ~refcounted_inner() = default;
-
-	void ref();
-	void ref_weak();
-	bool unref();
-	bool unref_weak();
-
-	virtual void drop_weak_references() = 0;
-
-public:
-	u32 m_ref, m_weak_ref;
-};
-
 enum class dir_entry_type {
 	dir,
 	file,
@@ -144,51 +48,32 @@ struct dir_entry {
 };
 
 class fsblk_t {
-protected:
-	class iblock_t : public refcounted_inner {
+public:
+	class block_t {
 	public:
-		iblock_t(u32 size) : refcounted_inner(), m_size(size) {}
-		virtual ~iblock_t() = default;
+		using ptr = std::shared_ptr<block_t>;
+
+		block_t(u32 size) : m_size(size) {}
+		virtual ~block_t() = default;
 
 		u32 size() const { return m_size; }
 
-		virtual const u8 *rodata() = 0;
+		virtual const u8 *rodata() const = 0;
 		virtual u8 *data() = 0;
-		u8 *offset(const char *function, u32 off, u32 size);
-		const u8 *rooffset(const char *function, u32 off, u32 size);
 
-	protected:
-		u32 m_size;
-	};
+		void write(u32 offset, const u8 *src, u32 size);
+		void fill(             u8 data);
+		void fill( u32 offset, u8 data, u32 size);
+		void wstr( u32 offset, std::string_view str);
+		void w8(   u32 offset, u8 data);
+		void w16b( u32 offset, u16 data);
+		void w24b( u32 offset, u32 data);
+		void w32b( u32 offset, u32 data);
+		void w16l( u32 offset, u16 data);
+		void w24l( u32 offset, u32 data);
+		void w32l( u32 offset, u32 data);
 
-
-public:
-	class block_t : public refcounted_outer<iblock_t> {
-	public:
-		block_t(bool weak = false) :  refcounted_outer<iblock_t>(weak) {}
-		block_t(iblock_t *block, bool weak = true) : refcounted_outer(block, weak) {}
-		virtual ~block_t() = default;
-
-		block_t strong() { return block_t(m_object, false); }
-		block_t weak() { return block_t(m_object, true); }
-
-		u32 size() const { return m_object->size(); }
-
-		const u8 *rodata() const { return m_object->rodata(); }
-		u8 *data() { return m_object->data(); }
-
-		void copy(u32 offset, const u8 *src, u32 size);
-		void fill(            u8 data);
-		void fill(u32 offset, u8 data, u32 size);
-		void wstr(u32 offset, std::string_view str);
-		void w8(  u32 offset, u8 data);
-		void w16b(u32 offset, u16 data);
-		void w24b(u32 offset, u32 data);
-		void w32b(u32 offset, u32 data);
-		void w16l(u32 offset, u16 data);
-		void w24l(u32 offset, u32 data);
-		void w32l(u32 offset, u32 data);
-
+		void read(u32 offset, u8 *dst, u32 size) const;
 		std::string_view rstr(u32 offset, u32 size) const;
 		u8  r8(  u32 offset) const;
 		u16 r16b(u32 offset) const;
@@ -197,6 +82,13 @@ public:
 		u16 r16l(u32 offset) const;
 		u32 r24l(u32 offset) const;
 		u32 r32l(u32 offset) const;
+
+	protected:
+		u32 m_size;
+
+	private:
+		const u8 *roffs(const char *function, u32 off, u32 size) const;
+		u8 *woffs(const char *function, u32 off, u32 size);
 	};
 
 	fsblk_t() : m_block_size(0) {}
@@ -204,8 +96,8 @@ public:
 
 	virtual void set_block_size(u32 block_size);
 	virtual u32 block_count() const = 0;
-	virtual block_t get(u32 id) = 0;
-	virtual void fill(u8 data) = 0;
+	virtual block_t::ptr get(u32 id) = 0;
+	virtual void fill_all(u8 data) = 0;
 
 protected:
 	u32 m_block_size;
