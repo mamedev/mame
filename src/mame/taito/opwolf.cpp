@@ -330,8 +330,6 @@ protected:
 private:
 	uint16_t cchip_r(offs_t offset);
 	void cchip_w(offs_t offset, uint16_t data);
-	void opwolf_adpcm_d_w(uint8_t data);
-	void opwolf_adpcm_e_w(uint8_t data);
 	void opwolf_spritectrl_w(offs_t offset, uint16_t data);
 	void opwolf_adpcm_b_w(offs_t offset, uint8_t data);
 	void opwolf_adpcm_c_w(offs_t offset, uint8_t data);
@@ -466,8 +464,8 @@ void opwolf_state::opwolf_sound_z80_map(address_map &map)
 	map(0xa001, 0xa001).rw("ciu", FUNC(pc060ha_device::slave_comm_r), FUNC(pc060ha_device::slave_comm_w));
 	map(0xb000, 0xb006).w(FUNC(opwolf_state::opwolf_adpcm_b_w));
 	map(0xc000, 0xc006).w(FUNC(opwolf_state::opwolf_adpcm_c_w));
-	map(0xd000, 0xd000).w(FUNC(opwolf_state::opwolf_adpcm_d_w));
-	map(0xe000, 0xe000).w(FUNC(opwolf_state::opwolf_adpcm_e_w));
+	map(0xd000, 0xd000).w(m_tc0060dca[1], FUNC(tc0060dca_device::volume1_w));
+	map(0xe000, 0xe000).w(m_tc0060dca[1], FUNC(tc0060dca_device::volume2_w));
 }
 
 // this extra z80 substitutes for the c-chip in the bootleg
@@ -737,16 +735,16 @@ void opwolf_state::opwolf_adpcm_b_w(offs_t offset, uint8_t data)
 
 	m_adpcm_b[offset] = data;
 
-	if (offset == 0x04) //trigger ?
+	if (offset == 0x04) // trigger?
 	{
 		start = m_adpcm_b[0] + m_adpcm_b[1] * 256;
-		end   = m_adpcm_b[2] + m_adpcm_b[3] * 256;
+		end = m_adpcm_b[2] + m_adpcm_b[3] * 256;
 		start *= 16;
-		end   *= 16;
+		end *= 16;
 		m_adpcm_pos[0] = start;
 		m_adpcm_end[0] = end;
 		m_msm[0]->reset_w(0);
-		m_tc0060dca[0]->level_w(1, m_adpcm_b[5]);
+		m_tc0060dca[0]->volume1_w(m_adpcm_b[5]);
 		//logerror("TRIGGER MSM1\n");
 	}
 
@@ -760,32 +758,20 @@ void opwolf_state::opwolf_adpcm_c_w(offs_t offset, uint8_t data)
 
 	m_adpcm_c[offset] = data;
 
-	if (offset == 0x04) //trigger ?
+	if (offset == 0x04) // trigger?
 	{
 		start = m_adpcm_c[0] + m_adpcm_c[1] * 256;
-		end   = m_adpcm_c[2] + m_adpcm_c[3] * 256;
+		end = m_adpcm_c[2] + m_adpcm_c[3] * 256;
 		start *= 16;
-		end   *= 16;
+		end *= 16;
 		m_adpcm_pos[1] = start;
 		m_adpcm_end[1] = end;
 		m_msm[1]->reset_w(0);
-		m_tc0060dca[0]->level_w(2, m_adpcm_c[5]);
+		m_tc0060dca[0]->volume2_w(m_adpcm_c[5]);
 		//logerror("TRIGGER MSM2\n");
 	}
 
 	//logerror("CPU #1     c00%i-data=%2x   pc=%4x\n",offset,data,m_audiocpu->pc() );
-}
-
-void opwolf_state::opwolf_adpcm_d_w(uint8_t data)
-{
-	// total volume (speaker 1)
-	m_tc0060dca[1]->level_w(1, data);
-}
-
-void opwolf_state::opwolf_adpcm_e_w(uint8_t data)
-{
-	// total volume (speaker 2)
-	m_tc0060dca[1]->level_w(2, data);
 }
 
 
