@@ -358,10 +358,10 @@ void cyclwarr_state::video_start()
 void bigfight_state::video_start()
 {
 	tile_expand();
-	m_layer[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cyclwarr_state::get_tile_info_bigfight<0>)), TILEMAP_SCAN_ROWS, 8, 8, 128, 256);
-	m_layer[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cyclwarr_state::get_tile_info_bigfight<1>)), TILEMAP_SCAN_ROWS, 8, 8, 128, 256);
-	m_layer[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cyclwarr_state::get_tile_info_bigfight<2>)), TILEMAP_SCAN_ROWS, 8, 8, 128, 256);
-	m_layer[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cyclwarr_state::get_tile_info_bigfight<3>)), TILEMAP_SCAN_ROWS, 8, 8, 128, 256);
+	m_layer[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bigfight_state::get_tile_info_bigfight<0>)), TILEMAP_SCAN_ROWS, 8, 8, 128, 256);
+	m_layer[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bigfight_state::get_tile_info_bigfight<1>)), TILEMAP_SCAN_ROWS, 8, 8, 128, 256);
+	m_layer[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bigfight_state::get_tile_info_bigfight<2>)), TILEMAP_SCAN_ROWS, 8, 8, 128, 256);
+	m_layer[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bigfight_state::get_tile_info_bigfight<3>)), TILEMAP_SCAN_ROWS, 8, 8, 128, 256);
 
 	// set up scroll bases
 	// TODO: more HW configs
