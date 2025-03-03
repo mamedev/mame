@@ -1,24 +1,37 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
-/***************************************************************************
+/**************************************************************************************************
 
 PowerVu D9234 STB (c) 1997 Scientific Atlanta
 
 20-mar-2010 skeleton driver
 
-http://www.vetrun.net/forums/showthread.php?t=395
-http://colibri.net63.net/powervu.htm
-http://www.growl.de/d9234/
+References:
+- http://www.vetrun.net/forums/showthread.php?t=395
+- http://colibri.net63.net/powervu.htm
+- http://www.growl.de/d9234/
 
-Google 'powervu 9234' for plenty more info.
+TODO:
+- everything, including PCB pictures and user manual;
+- Probably shared with other PowerVu DVB-S STB models;
+
+Front Panel:
+- On/standby / Signal on left
+- arrow keys with select in the middle, next to DVB logo
+
+Back Panel:
+- CH3 / CH4 dip;
+- Ant In and Tv Out UHF connectors, near composite audio/video jacks
+- Satellite LNB PWR +13/+19V 250mA
+- LNB PWR ON / OFF dip;
+- AC IN, 100V-240V, 50/60Hz
+
+===================================================================================================
 
 Meant for payTV providers to decrypt signals from the satellite and pump
 them out on a local cable network. The powervu encryption is very secure.
 
-There is a menu system, and with the right equipment, many secrets can
-be found!
-
-****************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
@@ -45,9 +58,9 @@ private:
 	void debug1_w(uint32_t data);
 	void debug2_w(uint32_t data);
 
-	uint32_t screen_update_pv9234(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void pv9234_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
@@ -55,6 +68,15 @@ private:
 	required_shared_ptr<uint32_t> m_p_ram;
 	required_device<cpu_device> m_maincpu;
 };
+
+void pv9234_state::video_start()
+{
+}
+
+uint32_t pv9234_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	return 0;
+}
 
 
 /*
@@ -83,7 +105,7 @@ void pv9234_state::debug_w(uint32_t data)
 {
 	if (data)
 	{
-		printf("%02x %c\n",data,data); // this prints 'Start' to the console.
+		//printf("%02x %c\n",data,data); // this prints 'Start' to the console.
 		logerror("debug=%02x %c\n",data,data);
 	}
 }
@@ -110,7 +132,7 @@ void pv9234_state::debug2_w(uint32_t data)
 		logerror("debug2=%02x\n",data); // ignore the huge amount of zeroes here
 }
 
-void pv9234_state::pv9234_map(address_map &map)
+void pv9234_state::main_map(address_map &map)
 {
 	map(0x00000000, 0x0007ffff).rom().region("maincpu", 0); //FLASH ROM!
 	// map(0x00000000, 0x00000033).w(FUNC(pv9234_state::)); something
@@ -142,28 +164,19 @@ void pv9234_state::machine_reset()
 		m_p_ram[i] = 0;
 }
 
-void pv9234_state::video_start()
-{
-}
-
-uint32_t pv9234_state::screen_update_pv9234(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	return 0;
-}
-
 void pv9234_state::pv9234(machine_config &config)
 {
 	/* basic machine hardware */
-	ARM7(config, m_maincpu, 4915000); //probably a more powerful clone.
-	m_maincpu->set_addrmap(AS_PROGRAM, &pv9234_state::pv9234_map);
+	ARM7(config, m_maincpu, 4915000); // TODO: unknown type
+	m_maincpu->set_addrmap(AS_PROGRAM, &pv9234_state::main_map);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 640-1, 0, 480-1);
-	screen.set_screen_update(FUNC(pv9234_state::screen_update_pv9234));
+	screen.set_screen_update(FUNC(pv9234_state::screen_update));
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
@@ -181,7 +194,4 @@ ROM_END
 } // anonymous namespace
 
 
-/* Driver */
-
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY               FULLNAME         FLAGS
-SYST( 1997, pv9234, 0,      0,      pv9234,  pv9234, pv9234_state, empty_init, "Scientific Atlanta", "PowerVu D9234", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+SYST( 1997, pv9234, 0,      0,      pv9234,  pv9234, pv9234_state, empty_init, "Scientific Atlanta", "PowerVu D9234 Business Satellite Receiver", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
