@@ -4,6 +4,10 @@
 
   Micronics Technology's WIN89
 
+  WIN89 provided a parallel port and hard-drive interface
+
+  The add-on board has an "ISA" slot (most pins are hard-wired) and utilizes
+  a Everex EV-390 hard drive controller.
 
 ****************************************************************************/
 
@@ -48,7 +52,6 @@ public:
 	virtual u8 mem_read(u8 &pri_select_lines, u8 &sec_select_lines, u16 offset) override;
 
 protected:
-	mt_win89_parallel_port(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;

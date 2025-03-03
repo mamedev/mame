@@ -23,7 +23,7 @@
 #define LOG_WAIT  (1U << 6)    // wait mode
 #define LOG_DATA  (1U << 7)    // data read/writes
 
-#define VERBOSE (0xff)
+//#define VERBOSE (0xff)
 
 #include "logmacro.h"
 
