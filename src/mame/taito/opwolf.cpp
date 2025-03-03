@@ -260,18 +260,10 @@ There are a few unmapped writes for the sound Z80 in the log.
 
 Unknown writes to the MSM5205 control addresses (RUN/RES implementation is wrong)
 
-Sound volume filtering is imperfect. Notably the coin insert sound:
-MSM1 rings it at volume 0xa8, MSM2 echos it at volume 0x84 but should be more muffled.
-
 Raine source has standard Asuka/Mofflot sprite/tile priority:
 0x2000 in sprite_ctrl puts all sprites under top bg layer. But
 Raine simply kludges in this value, failing to read it from a
 register. So what is controlling priority.
-
-Sound routing is wrong: according to schematics, msm0 goes to tc0060dca0 input 0,
-msm1 goes to tc0060dca0 input 1. ym2151 (mono) and tc0060dca0 outputs go to
-tc0060dca1 inputs. The 2nd tc0060dca is for total volume (opwolf_adpcm_d_w and
-opwolf_adpcm_e_w), outputs go to left/right speakers.
 
 ***************************************************************************/
 
@@ -287,6 +279,7 @@ opwolf_adpcm_e_w), outputs go to left/right speakers.
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/timer.h"
+#include "sound/mixer.h"
 #include "sound/msm5205.h"
 #include "sound/ymopm.h"
 
@@ -296,11 +289,6 @@ opwolf_adpcm_e_w), outputs go to left/right speakers.
 
 
 namespace {
-
-/* Define clocks based on actual OSC on the PCB */
-
-#define CPU_CLOCK       (XTAL(16'000'000) / 2)    /* clock for 68000 */
-#define SOUND_CPU_CLOCK     (XTAL(8'000'000) / 2)     /* clock for Z80 sound CPU */
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -320,8 +308,6 @@ public:
 		m_pc090oj(*this, "pc090oj"),
 		m_msm(*this, "msm%u", 0),
 		m_tc0060dca(*this, "tc0060dca%u", 0),
-		m_lspeaker(*this, "lspeaker"),
-		m_rspeaker(*this, "rspeaker"),
 		m_z80bank(*this, "z80bank"),
 		m_recoil(*this, "Player%u_Recoil_Piston", 1U)
 	{ }
@@ -369,18 +355,18 @@ private:
 	optional_shared_ptr<uint8_t> m_cchip_ram;
 
 	/* video-related */
-	uint16_t       m_sprite_ctrl;
-	uint16_t       m_sprites_flipscreen;
+	uint16_t m_sprite_ctrl = 0;
+	uint16_t m_sprites_flipscreen = 0;
 
 	/* misc */
-	uint8_t        m_adpcm_b[0x08];
-	uint8_t        m_adpcm_c[0x08];
-	uint32_t       m_adpcm_pos[2];
-	uint32_t       m_adpcm_end[2];
-	int          m_adpcm_data[2];
+	uint8_t m_adpcm_b[0x08] = { };
+	uint8_t m_adpcm_c[0x08] = { };
+	uint32_t m_adpcm_pos[2] = { };
+	uint32_t m_adpcm_end[2] = { };
+	int m_adpcm_data[2] = { };
 
-	int          m_opwolf_gun_xoffs;
-	int          m_opwolf_gun_yoffs;
+	int m_opwolf_gun_xoffs = 0;
+	int m_opwolf_gun_yoffs = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -391,8 +377,6 @@ private:
 	required_device<pc090oj_device> m_pc090oj;
 	required_device_array<msm5205_device, 2> m_msm;
 	required_device_array<tc0060dca_device, 2> m_tc0060dca;
-	required_device<speaker_device> m_lspeaker;
-	required_device<speaker_device> m_rspeaker;
 	required_memory_bank m_z80bank;
 	output_finder<1> m_recoil;
 };
@@ -619,7 +603,7 @@ static INPUT_PORTS_START( opwolfb )
 	PORT_INCLUDE( opwolf )
 
 	PORT_MODIFY( "DSWB" )
-	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )                        /* see notes */
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW ) /* see notes */
 INPUT_PORTS_END
 
 
@@ -695,8 +679,8 @@ uint32_t opwolf_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 	m_pc090oj->draw_sprites(screen, bitmap, cliprect);
 
-//  if (ioport("P1X")->read())
-//  popmessage("%d %d", machine(), "P1X"), ioport("P1Y")->read());
+	//if (ioport("P1X")->read())
+	//popmessage("%d %d", machine(), "P1X"), ioport("P1Y")->read());
 
 	return 0;
 }
@@ -762,11 +746,11 @@ void opwolf_state::opwolf_adpcm_b_w(offs_t offset, uint8_t data)
 		m_adpcm_pos[0] = start;
 		m_adpcm_end[0] = end;
 		m_msm[0]->reset_w(0);
-		m_tc0060dca[0]->level_w(3, m_adpcm_b[5]);
+		m_tc0060dca[0]->level_w(1, m_adpcm_b[5]);
 		//logerror("TRIGGER MSM1\n");
 	}
 
-//  logerror("CPU #1     b00%i-data=%2x   pc=%4x\n",offset,data,m_audiocpu->pc() );
+	//logerror("CPU #1     b00%i-data=%2x   pc=%4x\n",offset,data,m_audiocpu->pc() );
 }
 
 void opwolf_state::opwolf_adpcm_c_w(offs_t offset, uint8_t data)
@@ -785,25 +769,23 @@ void opwolf_state::opwolf_adpcm_c_w(offs_t offset, uint8_t data)
 		m_adpcm_pos[1] = start;
 		m_adpcm_end[1] = end;
 		m_msm[1]->reset_w(0);
-		m_tc0060dca[1]->level_w(3, m_adpcm_c[5]);
+		m_tc0060dca[0]->level_w(2, m_adpcm_c[5]);
 		//logerror("TRIGGER MSM2\n");
 	}
 
-//  logerror("CPU #1     c00%i-data=%2x   pc=%4x\n",offset,data,m_audiocpu->pc() );
+	//logerror("CPU #1     c00%i-data=%2x   pc=%4x\n",offset,data,m_audiocpu->pc() );
 }
 
 void opwolf_state::opwolf_adpcm_d_w(uint8_t data)
 {
 	// total volume (speaker 1)
-	for (int i = 0; i <= 2; i++)
-		m_lspeaker->set_input_gain(i, data / 255.0);
+	m_tc0060dca[1]->level_w(1, data);
 }
 
 void opwolf_state::opwolf_adpcm_e_w(uint8_t data)
 {
 	// total volume (speaker 2)
-	for (int i = 0; i <= 2; i++)
-		m_rspeaker->set_input_gain(i, data / 255.0);
+	m_tc0060dca[1]->level_w(2, data);
 }
 
 
@@ -870,12 +852,13 @@ uint16_t opwolf_state::cchip_r(offs_t offset)
 
 void opwolf_state::cchip_w(offs_t offset, uint16_t data)
 {
-	m_cchip_ram[offset] = data &0xff;
+	m_cchip_ram[offset] = data & 0xff;
 }
 
 INTERRUPT_GEN_MEMBER(opwolf_state::interrupt)
 {
 	m_maincpu->set_input_line(5, HOLD_LINE);
+
 	if (m_cchip)
 		m_cchip->ext_interrupt(ASSERT_LINE);
 	if (m_cchip_irq_clear)
@@ -895,11 +878,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(opwolf_state::cchip_irq_clear_cb)
 void opwolf_state::opwolf(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, CPU_CLOCK); /* 8 MHz */
+	M68000(config, m_maincpu, 16_MHz_XTAL / 2); /* 8 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &opwolf_state::opwolf_map);
 	m_maincpu->set_vblank_int("screen", FUNC(opwolf_state::interrupt));
 
-	Z80(config, m_audiocpu, SOUND_CPU_CLOCK);   /* 4 MHz */
+	Z80(config, m_audiocpu, 8_MHz_XTAL / 2); /* 4 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &opwolf_state::opwolf_sound_z80_map);
 
 	TAITO_CCHIP(config, m_cchip, 12_MHz_XTAL); /* 12MHz measured on pin 20 */
@@ -909,7 +892,11 @@ void opwolf_state::opwolf(machine_config &config)
 
 	TIMER(config, "cchip_irq_clear").configure_generic(FUNC(opwolf_state::cchip_irq_clear_cb));
 
-	config.set_maximum_quantum(attotime::from_hz(600));  /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
+	config.set_maximum_quantum(attotime::from_hz(600)); /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
+
+	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	ciu.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	ciu.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -932,35 +919,31 @@ void opwolf_state::opwolf(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", SOUND_CPU_CLOCK));  /* 4 MHz */
+	mixer_device &mixer = MIXER(config, "mixer");
+	mixer.add_route(0, m_tc0060dca[1], 1.0);
+	mixer.add_route(0, m_tc0060dca[1], 1.0);
+
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 8_MHz_XTAL / 2)); /* 4 MHz */
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.port_write_handler().set_membank(m_z80bank).mask(0x03);
-	ymsnd.add_route(0, "lspeaker", 1.0);
-	ymsnd.add_route(1, "rspeaker", 1.0);
+	ymsnd.add_route(ALL_OUTPUTS, "mixer", 0.35);
+
+	MSM5205(config, m_msm[0], 384_kHz_XTAL);
+	m_msm[0]->vck_legacy_callback().set(FUNC(opwolf_state::msm5205_vck_w<0>));
+	m_msm[0]->set_prescaler_selector(msm5205_device::S48_4B); /* 8 kHz */
+	m_msm[0]->add_route(0, m_tc0060dca[0], 1.0, 0);
+
+	MSM5205(config, m_msm[1], 384_kHz_XTAL);
+	m_msm[1]->vck_legacy_callback().set(FUNC(opwolf_state::msm5205_vck_w<1>));
+	m_msm[1]->set_prescaler_selector(msm5205_device::S48_4B); /* 8 kHz */
+	m_msm[1]->add_route(0, m_tc0060dca[0], 1.0, 1);
 
 	TC0060DCA(config, m_tc0060dca[0]);
-	m_tc0060dca[0]->add_route(0, "lspeaker", 1.0);
-	m_tc0060dca[0]->add_route(1, "rspeaker", 1.0);
-
-	MSM5205(config, m_msm[0], 384000);
-	m_msm[0]->vck_legacy_callback().set(FUNC(opwolf_state::msm5205_vck_w<0>));
-	m_msm[0]->set_prescaler_selector(msm5205_device::S48_4B);   /* 8 kHz */
-	m_msm[0]->add_route(ALL_OUTPUTS, m_tc0060dca[0], 1.0);
-	m_msm[0]->add_route(ALL_OUTPUTS, m_tc0060dca[0], 1.0);
+	m_tc0060dca[0]->add_route(ALL_OUTPUTS, "mixer", 1.0);
 
 	TC0060DCA(config, m_tc0060dca[1]);
 	m_tc0060dca[1]->add_route(0, "lspeaker", 1.0);
 	m_tc0060dca[1]->add_route(1, "rspeaker", 1.0);
-
-	MSM5205(config, m_msm[1], 384000);
-	m_msm[1]->vck_legacy_callback().set(FUNC(opwolf_state::msm5205_vck_w<1>));
-	m_msm[1]->set_prescaler_selector(msm5205_device::S48_4B);   /* 8 kHz */
-	m_msm[1]->add_route(ALL_OUTPUTS, m_tc0060dca[1], 1.0);
-	m_msm[1]->add_route(ALL_OUTPUTS, m_tc0060dca[1], 1.0);
-
-	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
-	ciu.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
-	ciu.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
 
 void opwolf_state::opwolfp(machine_config &config)
@@ -976,70 +959,15 @@ void opwolf_state::opwolfp(machine_config &config)
 
 void opwolf_state::opwolfb(machine_config &config) /* OSC clocks unknown for the bootleg, but changed to match original sets */
 {
+	opwolfp(config);
+
 	/* basic machine hardware */
-	M68000(config, m_maincpu, CPU_CLOCK); /* 8 MHz ??? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &opwolf_state::opwolfb_map);
 	m_maincpu->set_vblank_int("screen", FUNC(opwolf_state::irq5_line_hold));
 
-	Z80(config, m_audiocpu, SOUND_CPU_CLOCK); /* 4 MHz ??? */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &opwolf_state::opwolf_sound_z80_map);
-
-	z80_device &sub(Z80(config, "sub", SOUND_CPU_CLOCK));   /* 4 MHz ??? */
+	z80_device &sub(Z80(config, "sub", 8_MHz_XTAL / 2)); /* 4 MHz ??? */
 	sub.set_addrmap(AS_PROGRAM, &opwolf_state::opwolfb_sub_z80_map);
 	sub.set_vblank_int("screen", FUNC(opwolf_state::irq0_line_hold));
-
-	config.set_maximum_quantum(attotime::from_hz(600));  /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(40*8, 32*8);
-	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
-	screen.set_screen_update(FUNC(opwolf_state::screen_update));
-	screen.set_palette("palette");
-
-	PALETTE(config, "palette").set_format(palette_device::xRGBRRRRGGGGBBBB_bit0, 2048);
-
-	PC080SN(config, m_pc080sn, 0, "palette", gfx_opwolf);
-
-	PC090OJ(config, m_pc090oj, 0);
-	m_pc090oj->set_palette("palette");
-	m_pc090oj->set_colpri_callback(FUNC(opwolf_state::opwolf_colpri_cb));
-
-	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", SOUND_CPU_CLOCK));
-	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.port_write_handler().set_membank(m_z80bank).mask(0x03);
-	ymsnd.add_route(0, "lspeaker", 1.0);
-	ymsnd.add_route(1, "rspeaker", 1.0);
-
-	TC0060DCA(config, m_tc0060dca[0]);
-	m_tc0060dca[0]->add_route(0, "lspeaker", 1.0);
-	m_tc0060dca[0]->add_route(1, "rspeaker", 1.0);
-
-	MSM5205(config, m_msm[0], 384000);
-	m_msm[0]->vck_legacy_callback().set(FUNC(opwolf_state::msm5205_vck_w<0>));
-	m_msm[0]->set_prescaler_selector(msm5205_device::S48_4B); /* 8 kHz */
-	m_msm[0]->add_route(ALL_OUTPUTS, m_tc0060dca[0], 1.0);
-	m_msm[0]->add_route(ALL_OUTPUTS, m_tc0060dca[0], 1.0);
-
-	TC0060DCA(config, m_tc0060dca[1]);
-	m_tc0060dca[1]->add_route(0, "lspeaker", 1.0);
-	m_tc0060dca[1]->add_route(1, "rspeaker", 1.0);
-
-	MSM5205(config, m_msm[1], 384000);
-	m_msm[1]->vck_legacy_callback().set(FUNC(opwolf_state::msm5205_vck_w<1>));
-	m_msm[1]->set_prescaler_selector(msm5205_device::S48_4B); /* 8 kHz */
-	m_msm[1]->add_route(ALL_OUTPUTS, m_tc0060dca[1], 1.0);
-	m_msm[1]->add_route(ALL_OUTPUTS, m_tc0060dca[1], 1.0);
-
-	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
-	ciu.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
-	ciu.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
 
 
