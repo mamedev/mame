@@ -320,8 +320,8 @@ public:
 	void init_opwolfb();
 	void init_opwolfp();
 
-	ioport_value opwolf_gun_x_r();
-	ioport_value opwolf_gun_y_r();
+	ioport_value gun_x_r();
+	ioport_value gun_y_r();
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -330,17 +330,16 @@ protected:
 private:
 	uint16_t cchip_r(offs_t offset);
 	void cchip_w(offs_t offset, uint16_t data);
-	void opwolf_spritectrl_w(offs_t offset, uint16_t data);
-	void opwolf_adpcm_b_w(offs_t offset, uint8_t data);
-	void opwolf_adpcm_c_w(offs_t offset, uint8_t data);
+	void spritectrl_w(offs_t offset, uint16_t data);
+	template<int N> void adpcm_w(offs_t offset, uint8_t data);
 	void counters_w(uint8_t data);
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(cchip_irq_clear_cb);
 
-	void opwolf_colpri_cb(u32 &sprite_colbank, u32 &pri_mask, u16 sprite_ctrl);
+	void colpri_cb(u32 &sprite_colbank, u32 &pri_mask, u16 sprite_ctrl);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void opwolf_msm5205_vck(msm5205_device *device, int chip);
+	void msm5205_vck(msm5205_device *device, int chip);
 	template<int N> void msm5205_vck_w(int state);
 
 	void opwolf_map(address_map &map) ATTR_COLD;
@@ -357,14 +356,13 @@ private:
 	uint16_t m_sprites_flipscreen = 0;
 
 	/* misc */
-	uint8_t m_adpcm_b[0x08] = { };
-	uint8_t m_adpcm_c[0x08] = { };
+	uint8_t m_adpcm_regs[2][8] = { };
 	uint32_t m_adpcm_pos[2] = { };
 	uint32_t m_adpcm_end[2] = { };
 	int m_adpcm_data[2] = { };
 
-	int m_opwolf_gun_xoffs = 0;
-	int m_opwolf_gun_yoffs = 0;
+	int m_gun_xoffs = 0;
+	int m_gun_yoffs = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -393,7 +391,7 @@ void opwolf_state::opwolf_map(address_map &map)
 	map(0x200000, 0x200fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x380000, 0x380001).portr("DSWA");
 	map(0x380002, 0x380003).portr("DSWB");
-	map(0x380000, 0x380003).w(FUNC(opwolf_state::opwolf_spritectrl_w));  // usually 0x4, changes when you fire
+	map(0x380000, 0x380003).w(FUNC(opwolf_state::spritectrl_w));  // usually 0x4, changes when you fire
 	map(0x3a0000, 0x3a0001).portr("IN2"); /* lightgun, read at $11e0/6 */
 	map(0x3a0002, 0x3a0003).portr("IN3");
 	map(0x3c0000, 0x3c0001).nopw();                    /* watchdog ?? */
@@ -416,7 +414,7 @@ void opwolf_state::opwolfb_map(address_map &map)
 	map(0x200000, 0x200fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x380000, 0x380001).portr("DSWA");
 	map(0x380002, 0x380003).portr("DSWB");
-	map(0x380000, 0x380003).w(FUNC(opwolf_state::opwolf_spritectrl_w));  // usually 0x4, changes when you fire
+	map(0x380000, 0x380003).w(FUNC(opwolf_state::spritectrl_w));  // usually 0x4, changes when you fire
 	map(0x3a0000, 0x3a0001).portr("IN2"); /* lightgun, read at $11e0/6 */
 	map(0x3a0002, 0x3a0003).portr("IN3");
 	map(0x3c0000, 0x3c0001).nopw();                    /* watchdog ?? */
@@ -438,7 +436,7 @@ void opwolf_state::opwolfp_map(address_map &map)
 	map(0x200000, 0x200fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x380000, 0x380001).portr("DSWA");
 	map(0x380002, 0x380003).portr("DSWB");
-	map(0x380000, 0x380003).w(FUNC(opwolf_state::opwolf_spritectrl_w));  // usually 0x4, changes when you fire
+	map(0x380000, 0x380003).w(FUNC(opwolf_state::spritectrl_w));  // usually 0x4, changes when you fire
 	map(0x3a0000, 0x3a0001).portr("IN2"); /* lightgun, read at $11e0/6 (AND INPUTS) */
 	map(0x3a0002, 0x3a0003).portr("IN3");
 	map(0x3c0000, 0x3c0001).nopw();                    /* watchdog ?? */
@@ -462,8 +460,8 @@ void opwolf_state::opwolf_sound_z80_map(address_map &map)
 	map(0x9002, 0x9100).nopr();
 	map(0xa000, 0xa000).w("ciu", FUNC(pc060ha_device::slave_port_w));
 	map(0xa001, 0xa001).rw("ciu", FUNC(pc060ha_device::slave_comm_r), FUNC(pc060ha_device::slave_comm_w));
-	map(0xb000, 0xb006).w(FUNC(opwolf_state::opwolf_adpcm_b_w));
-	map(0xc000, 0xc006).w(FUNC(opwolf_state::opwolf_adpcm_c_w));
+	map(0xb000, 0xb006).w(FUNC(opwolf_state::adpcm_w<0>));
+	map(0xc000, 0xc006).w(FUNC(opwolf_state::adpcm_w<1>));
 	map(0xd000, 0xd000).w(m_tc0060dca[1], FUNC(tc0060dca_device::volume1_w));
 	map(0xe000, 0xe000).w(m_tc0060dca[1], FUNC(tc0060dca_device::volume2_w));
 }
@@ -538,11 +536,11 @@ static INPUT_PORTS_START( opwolf )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01ff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(opwolf_state::opwolf_gun_x_r))
+	PORT_BIT( 0x01ff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(opwolf_state::gun_x_r))
 	PORT_BIT( 0xfe00, IP_ACTIVE_LOW,  IPT_UNUSED )
 
 	PORT_START("IN3")
-	PORT_BIT( 0x01ff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(opwolf_state::opwolf_gun_y_r))
+	PORT_BIT( 0x01ff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(opwolf_state::gun_y_r))
 	PORT_BIT( 0xfe00, IP_ACTIVE_LOW,  IPT_UNUSED )
 
 	PORT_START(P1X_PORT_TAG)  /* P1X (span allows you to shoot enemies behind status bar) */
@@ -617,16 +615,16 @@ void opwolf_state::counters_w(uint8_t data)
 	machine().bookkeeping().coin_counter_w(0, ~data & 0x10);
 }
 
-ioport_value opwolf_state::opwolf_gun_x_r()
+ioport_value opwolf_state::gun_x_r()
 {
 	/* P1X - Have to remap 8 bit input value, into 0-319 visible range */
 	int scaled = (ioport(P1X_PORT_TAG)->read() * 320 ) / 256;
-	return (scaled + 0x15 + m_opwolf_gun_xoffs);
+	return (scaled + 0x15 + m_gun_xoffs);
 }
 
-ioport_value opwolf_state::opwolf_gun_y_r()
+ioport_value opwolf_state::gun_y_r()
 {
-	return (ioport(P1Y_PORT_TAG)->read() - 0x24 + m_opwolf_gun_yoffs);
+	return (ioport(P1Y_PORT_TAG)->read() - 0x24 + m_gun_yoffs);
 }
 
 
@@ -634,9 +632,9 @@ ioport_value opwolf_state::opwolf_gun_y_r()
 //  VIDEO
 //**************************************************************************
 
-void opwolf_state::opwolf_spritectrl_w(offs_t offset, uint16_t data)
+void opwolf_state::spritectrl_w(offs_t offset, uint16_t data)
 {
-	// popmessage("opwolf_spritectrl_w ctrl = %4x", data);
+	// popmessage("spritectrl_w ctrl = %4x", data);
 	if (offset == 0)
 	{
 		// bit 0 -> MOTOR1 transistor
@@ -653,7 +651,7 @@ void opwolf_state::opwolf_spritectrl_w(offs_t offset, uint16_t data)
 	}
 }
 
-void opwolf_state::opwolf_colpri_cb(u32 &sprite_colbank, u32 &pri_mask, u16 sprite_ctrl)
+void opwolf_state::colpri_cb(u32 &sprite_colbank, u32 &pri_mask, u16 sprite_ctrl)
 {
 	sprite_colbank = (sprite_ctrl & 0xe0) >> 1;
 	pri_mask = 0xfc; // sprites under top bg layer
@@ -689,7 +687,7 @@ uint32_t opwolf_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 //**************************************************************************
 
 static GFXDECODE_START( gfx_opwolf )
-	GFXDECODE_ENTRY( "pc080sn", 0, gfx_8x8x4_packed_msb,   0, 128 )   /* scr tiles */
+	GFXDECODE_ENTRY( "pc080sn", 0, gfx_8x8x4_packed_msb, 0, 128 ) /* scr tiles */
 GFXDECODE_END
 
 
@@ -706,6 +704,30 @@ GFXDECODE_END
 //5 - VOL, sample volume
 //6 - RES
 //7 - N/C
+
+template<int N>
+void opwolf_state::adpcm_w(offs_t offset, uint8_t data)
+{
+	m_adpcm_regs[N][offset] = data;
+
+	if (offset == 0x04) // trigger?
+	{
+		uint16_t start = m_adpcm_regs[N][1] << 8 | m_adpcm_regs[N][0];
+		uint16_t end = m_adpcm_regs[N][3] << 8 | m_adpcm_regs[N][2];
+		m_adpcm_pos[N] = start << 4;
+		m_adpcm_end[N] = end << 4;
+		m_msm[N]->reset_w(0);
+
+		if (N)
+			m_tc0060dca[0]->volume2_w(m_adpcm_regs[N][5]);
+		else
+			m_tc0060dca[0]->volume1_w(m_adpcm_regs[N][5]);
+
+		//logerror("TRIGGER MSM%d\n", N + 1);
+	}
+
+	//logerror("CPU #1     %c00%i-data=%2x   pc=%4x\n", 'b' + N, offset, data, m_audiocpu->pc());
+}
 
 template<int N>
 void opwolf_state::msm5205_vck_w(int state)
@@ -728,52 +750,6 @@ void opwolf_state::msm5205_vck_w(int state)
 	}
 }
 
-void opwolf_state::opwolf_adpcm_b_w(offs_t offset, uint8_t data)
-{
-	int start;
-	int end;
-
-	m_adpcm_b[offset] = data;
-
-	if (offset == 0x04) // trigger?
-	{
-		start = m_adpcm_b[0] + m_adpcm_b[1] * 256;
-		end = m_adpcm_b[2] + m_adpcm_b[3] * 256;
-		start *= 16;
-		end *= 16;
-		m_adpcm_pos[0] = start;
-		m_adpcm_end[0] = end;
-		m_msm[0]->reset_w(0);
-		m_tc0060dca[0]->volume1_w(m_adpcm_b[5]);
-		//logerror("TRIGGER MSM1\n");
-	}
-
-	//logerror("CPU #1     b00%i-data=%2x   pc=%4x\n",offset,data,m_audiocpu->pc() );
-}
-
-void opwolf_state::opwolf_adpcm_c_w(offs_t offset, uint8_t data)
-{
-	int start;
-	int end;
-
-	m_adpcm_c[offset] = data;
-
-	if (offset == 0x04) // trigger?
-	{
-		start = m_adpcm_c[0] + m_adpcm_c[1] * 256;
-		end = m_adpcm_c[2] + m_adpcm_c[3] * 256;
-		start *= 16;
-		end *= 16;
-		m_adpcm_pos[1] = start;
-		m_adpcm_end[1] = end;
-		m_msm[1]->reset_w(0);
-		m_tc0060dca[0]->volume2_w(m_adpcm_c[5]);
-		//logerror("TRIGGER MSM2\n");
-	}
-
-	//logerror("CPU #1     c00%i-data=%2x   pc=%4x\n",offset,data,m_audiocpu->pc() );
-}
-
 
 //**************************************************************************
 //  MACHINE EMULATION
@@ -784,21 +760,21 @@ void opwolf_state::init_opwolf()
 	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
 
 	// World & US version have different gun offsets, presumably slightly different gun hardware
-	m_opwolf_gun_xoffs = 0xec - (rom[0x03ffb0 / 2] & 0xff);
-	m_opwolf_gun_yoffs = 0x1c - (rom[0x03ffae / 2] & 0xff);
+	m_gun_xoffs = 0xec - (rom[0x03ffb0 / 2] & 0xff);
+	m_gun_yoffs = 0x1c - (rom[0x03ffae / 2] & 0xff);
 }
 
 void opwolf_state::init_opwolfb()
 {
 	/* bootleg needs different range of raw gun coords */
-	m_opwolf_gun_xoffs = -2;
-	m_opwolf_gun_yoffs = 17;
+	m_gun_xoffs = -2;
+	m_gun_yoffs = 17;
 }
 
 void opwolf_state::init_opwolfp()
 {
-	m_opwolf_gun_xoffs = 5;
-	m_opwolf_gun_yoffs = 30;
+	m_gun_xoffs = 5;
+	m_gun_yoffs = 30;
 }
 
 void opwolf_state::machine_start()
@@ -807,19 +783,17 @@ void opwolf_state::machine_start()
 
 	m_z80bank->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
 
-	save_item(NAME(m_sprite_ctrl));
-	save_item(NAME(m_sprites_flipscreen));
-
-	save_item(NAME(m_adpcm_b));
-	save_item(NAME(m_adpcm_c));
+	save_item(NAME(m_adpcm_regs));
 	save_item(NAME(m_adpcm_pos));
 	save_item(NAME(m_adpcm_end));
+	save_item(NAME(m_adpcm_data));
+
+	save_item(NAME(m_sprite_ctrl));
+	save_item(NAME(m_sprites_flipscreen));
 }
 
 void opwolf_state::machine_reset()
 {
-	m_adpcm_b[0] = m_adpcm_b[1] = 0;
-	m_adpcm_c[0] = m_adpcm_c[1] = 0;
 	m_adpcm_pos[0] = m_adpcm_pos[1] = 0;
 	m_adpcm_end[0] = m_adpcm_end[1] = 0;
 	m_adpcm_data[0] = m_adpcm_data[1] = -1;
@@ -899,7 +873,7 @@ void opwolf_state::opwolf(machine_config &config)
 
 	PC090OJ(config, m_pc090oj, 0);
 	m_pc090oj->set_palette("palette");
-	m_pc090oj->set_colpri_callback(FUNC(opwolf_state::opwolf_colpri_cb));
+	m_pc090oj->set_colpri_callback(FUNC(opwolf_state::colpri_cb));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
