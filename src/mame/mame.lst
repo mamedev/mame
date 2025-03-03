@@ -1251,6 +1251,7 @@ holdrma6
 holdrma6a
 househrt
 househrta
+hrtantny
 incachf
 indream
 indreama
@@ -1292,6 +1293,7 @@ mnytreea
 moonfire
 moonwalt
 mrwoo
+mrwoou
 mskitty
 mystarr
 mysteycm
@@ -15143,6 +15145,7 @@ bmcpokr
 fengyunh
 mjmaglmp
 shendeng
+xyddzhh
 
 @source:bmc/koftball.cpp
 jxzh
@@ -15164,6 +15167,36 @@ bw2
 
 @source:booth/apexc.cpp
 apexc
+
+@source:bordun/att.cpp
+lianhp2
+lianhp3
+
+@source:bordun/skylncr.cpp
+bdream97
+blshark
+butrfly
+butrflybl
+gallag50
+leader
+leadera
+madzoo
+mbutrfly
+miaction
+neraidou
+olymp
+rolla
+score5
+seadevil
+skylncr
+sonikfig
+spcliner
+speedway
+speedwaya
+sstar97
+superb2k
+tigerslt
+
 
 @source:brother/ax145.cpp
 ax145
@@ -20491,6 +20524,7 @@ amazonia
 amazonkp
 chessc2
 cjddz
+cjddz213cn
 cjddz215cn
 cjddz217cn
 cjddzlf
@@ -32386,31 +32420,6 @@ skimaxx
 
 @source:misc/skyarmy.cpp
 skyarmy
-
-@source:misc/skylncr.cpp
-bdream97
-blshark
-butrfly
-butrflybl
-gallag50
-leader
-leadera
-madzoo
-mbutrfly
-miaction
-neraidou
-olymp
-rolla
-score5
-seadevil
-skylncr
-sonikfig
-spcliner
-speedway
-speedwaya
-sstar97
-superb2k
-tigerslt
 
 @source:misc/sliver.cpp
 sliver

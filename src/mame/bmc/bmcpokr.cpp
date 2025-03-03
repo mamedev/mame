@@ -17,6 +17,7 @@ TODO:
  * Hopper hookup doesn't work properly.  MAME counts far more "tickets
    dispensed" than the number of coins/tickets the games are supposed to
    pay out.
+ * xyddzhh: Hook up mahjong-style inputs and improve DSW definitions
 
 ***************************************************************************/
 
@@ -60,13 +61,14 @@ public:
 
 	int hopper_r();
 
-	void bmcpokr(machine_config &config);
-	void fengyunh(machine_config &config);
-	void mjmaglmp(machine_config &config);
-	void shendeng(machine_config &config);
+	void bmcpokr(machine_config &config) ATTR_COLD;
+	void fengyunh(machine_config &config) ATTR_COLD;
+	void mjmaglmp(machine_config &config) ATTR_COLD;
+	void shendeng(machine_config &config) ATTR_COLD;
+	void xyddzhh(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void device_post_load() override;
+	virtual void device_post_load() override ATTR_COLD;
 	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
@@ -88,6 +90,7 @@ private:
 	uint16_t bmcpokr_prot_r();
 	uint16_t fengyunh_prot_r();
 	uint16_t shendeng_prot_r();
+	uint16_t xyddzhh_prot_r();
 	void prot_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t unk_r();
 
@@ -100,6 +103,7 @@ private:
 	uint16_t dsw_r();
 	uint16_t mjmaglmp_dsw_r();
 	uint16_t mjmaglmp_key_r();
+	uint16_t xyddzhh_dsw_r();
 
 	// Interrupts
 	uint8_t m_irq_enable = 0;
@@ -126,6 +130,7 @@ private:
 	void mjmaglmp_map(address_map &map) ATTR_COLD;
 	void ramdac_map(address_map &map) ATTR_COLD;
 	void shendeng_map(address_map &map) ATTR_COLD;
+	void xyddzhh_map(address_map &map) ATTR_COLD;
 };
 
 /***************************************************************************
@@ -352,6 +357,17 @@ uint16_t bmcpokr_state::shendeng_prot_r()
 	return 0x00 << 8;
 }
 
+uint16_t bmcpokr_state::xyddzhh_prot_r()
+{
+	switch (m_prot_val >> 8)
+	{
+		case 0x00:  return 0x56 << 8;
+		// TODO: other cases, if they exist
+	}
+	logerror("unk prot r %x %x\n", m_prot_val, m_maincpu->pcbase());
+	return 0x00 << 8;
+}
+
 void bmcpokr_state::prot_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_prot_val);
@@ -444,6 +460,27 @@ void bmcpokr_state::bmcpokr_mem(address_map &map)
 	map(0x398001, 0x398001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
 	map(0x3b0000, 0x3b0001).portr("INPUTS2");
+}
+
+uint16_t bmcpokr_state::xyddzhh_dsw_r()
+{
+	switch ((m_mux >> 4) & 3)
+	{
+		case 0x00: return m_dsw[3]->read() << 8;
+		case 0x01: return m_dsw[2]->read() << 8;
+		case 0x02: return m_dsw[1]->read() << 8;
+		case 0x03: return m_dsw[0]->read() << 8;
+	}
+	return 0xff << 8;
+}
+
+void bmcpokr_state::xyddzhh_map(address_map &map)
+{
+	bmcpokr_mem(map);
+
+	map(0x330000, 0x330001).r(FUNC(bmcpokr_state::xyddzhh_prot_r));
+	map(0x340009, 0x340009).lr8(NAME([] () -> uint8_t { return 0xff; })); // andi.b  #$7f, so returning 0x00 stops it from working
+	map(0x360000, 0x360001).r(FUNC(bmcpokr_state::xyddzhh_dsw_r));
 }
 
 
@@ -1090,6 +1127,136 @@ static INPUT_PORTS_START( shendeng )
 	// Coin           Cash Out      | Cash Out        Coin
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( xyddzhh )
+	PORT_START("INPUTS")
+	// Entertainment controls:
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1         ) // PORT_CONDITION("DSW2",0x01,EQUALS,0x00)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) // PORT_CONDITION("DSW2",0x01,EQUALS,0x00)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) // PORT_CONDITION("DSW2",0x01,EQUALS,0x00)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) // PORT_CONDITION("DSW2",0x01,EQUALS,0x00)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) // PORT_CONDITION("DSW2",0x01,EQUALS,0x00)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 )        // PORT_CONDITION("DSW2",0x01,EQUALS,0x00) // choose
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN   ) // PORT_CONDITION("DSW2",0x01,EQUALS,0x00)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT  ) // PORT_CONDITION("DSW2",0x01,EQUALS,0x00)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_OTHER          ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O) // PAY  // PORT_CONDITION("DSW2",0x01,EQUALS,0x00)
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH,IPT_CUSTOM         ) PORT_READ_LINE_MEMBER(FUNC(bmcpokr_state::hopper_r)) // TODO: verify?
+	PORT_SERVICE_NO_TOGGLE( 0x0400, IP_ACTIVE_LOW       ) // PORT_CONDITION("DSW2",0x01,EQUALS,0x00)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE1       ) // PORT_CONDITION("DSW2",0x01,EQUALS,0x00)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNUSED         ) // PORT_CONDITION("DSW2",0x01,EQUALS,0x00) // no effect in test mode
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_GAMBLE_BET     ) // PORT_CONDITION("DSW2",0x01,EQUALS,0x00)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2        ) // PORT_CONDITION("DSW2",0x01,EQUALS,0x00) // pass
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN1          ) // PORT_CONDITION("DSW2",0x01,EQUALS,0x00) PORT_IMPULSE(5)
+
+	// TODO: Mahjong controls:
+
+	PORT_START("INPUTS2")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	// Maximum Bet is fixed to 40 according to test mode (no DIP determines it)
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("DIP1:1")
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
+	PORT_DIPNAME( 0x02, 0x02, "Key Out Table as" ) PORT_DIPLOCATION("DIP1:2")
+	PORT_DIPSETTING(    0x00, "Coin" )
+	PORT_DIPSETTING(    0x02, "Key In" )
+	PORT_DIPNAME( 0x04, 0x04, "Coin Out" ) PORT_DIPLOCATION("DIP1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x08, 0x08, "Alarm Sound Effect" ) PORT_DIPLOCATION("DIP1:4")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Automatic Pass" ) PORT_DIPLOCATION("DIP1:5")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0xe0, 0xe0, "Performance Breaking Table" ) PORT_DIPLOCATION("DIP1:6,7,8")
+	PORT_DIPSETTING(    0xc0, "5000" )
+	PORT_DIPSETTING(    0xe0, "10000" )
+	PORT_DIPSETTING(    0xa0, "15000" )
+	PORT_DIPSETTING(    0x80, "20000" )
+	PORT_DIPSETTING(    0x60, "25000" )
+	PORT_DIPSETTING(    0x40, "30000" )
+	PORT_DIPSETTING(    0x20, "40000" )
+	PORT_DIPSETTING(    0x00, "50000" )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x00, "Controls" ) PORT_DIPLOCATION("DIP2:1")
+	PORT_DIPSETTING(    0x01, "Mahjong" )
+	PORT_DIPSETTING(    0x00, "Entertainment" )
+	PORT_DIPNAME( 0x06, 0x06, "Play Expiration" ) PORT_DIPLOCATION("DIP2:2,3")
+	PORT_DIPSETTING(    0x06, "3000" )
+	PORT_DIPSETTING(    0x04, "4000" )
+	PORT_DIPSETTING(    0x02, "5000" )
+	PORT_DIPSETTING(    0x01, "6000" )
+	PORT_DIPNAME( 0x08, 0x08, "Accumulated Bonus" ) PORT_DIPLOCATION("DIP2:4")
+	PORT_DIPSETTING(    0x08, "300" )
+	PORT_DIPSETTING(    0x00, "400" )
+	PORT_DIPNAME( 0x70, 0x70, "Continuing Play Rate" ) PORT_DIPLOCATION("DIP2:5,6,7")
+	PORT_DIPSETTING(    0x60, "92" )
+	PORT_DIPSETTING(    0x50, "93" )
+	PORT_DIPSETTING(    0x40, "94" )
+	PORT_DIPSETTING(    0x70, "95" )
+	PORT_DIPSETTING(    0x30, "96" )
+	PORT_DIPSETTING(    0x20, "97" )
+	PORT_DIPSETTING(    0x10, "98" )
+	PORT_DIPSETTING(    0x00, "99" )
+	PORT_DIPNAME( 0x80, 0x80, "Continue Play" ) PORT_DIPLOCATION("DIP2:8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("DSW3")
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage) ) PORT_DIPLOCATION("DIP3:1,2,3")
+	PORT_DIPSETTING(    0x06, "1" )
+	PORT_DIPSETTING(    0x05, "2" )
+	PORT_DIPSETTING(    0x04, "5" )
+	PORT_DIPSETTING(    0x03, "10" )
+	PORT_DIPSETTING(    0x02, "15" )
+	PORT_DIPSETTING(    0x01, "50" )
+	PORT_DIPSETTING(    0x07, "100" )
+	PORT_DIPSETTING(    0x00, "200" )
+	PORT_DIPNAME( 0x38, 0x38, "Key In" ) PORT_DIPLOCATION("DIP3:4,5,6")
+	PORT_DIPSETTING(    0x30, "40" )
+	PORT_DIPSETTING(    0x28, "50" )
+	PORT_DIPSETTING(    0x38, "100" )
+	PORT_DIPSETTING(    0x20, "200" )
+	PORT_DIPSETTING(    0x18, "300" )
+	PORT_DIPSETTING(    0x10, "500" )
+	PORT_DIPSETTING(    0x08, "1000" )
+	PORT_DIPSETTING(    0x00, "2000" )
+	PORT_DIPNAME( 0x40, 0x40, "Points Limit" ) PORT_DIPLOCATION("DIP3:7")
+	PORT_DIPSETTING(    0x00, "10000" )
+	PORT_DIPSETTING(    0x40, "99000" )
+	PORT_DIPNAME( 0x80, 0x80, "Card Type" ) PORT_DIPLOCATION("DIP3:8")
+	PORT_DIPSETTING(    0x80, DEF_STR ( Normal ) )
+	PORT_DIPSETTING(    0x00, "Graphics" )
+
+	PORT_START("DSW4")
+	PORT_DIPNAME( 0x07, 0x07, "Min Bet" ) PORT_DIPLOCATION("DIP4:1,2,3")
+	PORT_DIPSETTING(    0x06, "1" )
+	PORT_DIPSETTING(    0x05, "2" )
+	PORT_DIPSETTING(    0x04, "3" )
+	PORT_DIPSETTING(    0x07, "5" )
+	PORT_DIPSETTING(    0x03, "10" )
+	PORT_DIPSETTING(    0x02, "15" )
+	PORT_DIPSETTING(    0x01, "20" )
+	PORT_DIPSETTING(    0x00, "40" )
+	PORT_DIPNAME( 0x38, 0x38, "Game Odds" ) PORT_DIPLOCATION("DIP4:4,5,6")
+	PORT_DIPSETTING(    0x30, "90" )
+	PORT_DIPSETTING(    0x28, "91" )
+	PORT_DIPSETTING(    0x20, "92" )
+	PORT_DIPSETTING(    0x18, "93" )
+	PORT_DIPSETTING(    0x38, "94" )
+	PORT_DIPSETTING(    0x10, "95" )
+	PORT_DIPSETTING(    0x08, "96" )
+	PORT_DIPSETTING(    0x00, "97" )
+	PORT_DIPNAME( 0x40, 0x40, "Market Setting" ) PORT_DIPLOCATION("DIP4:7")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "System Breakdown" ) PORT_DIPLOCATION("DIP4:8")
+	PORT_DIPSETTING(    0x00, "50000" )
+	PORT_DIPSETTING(    0x80, "100000" )
+INPUT_PORTS_END
+
 
 /***************************************************************************
                                 Graphics Layout
@@ -1187,6 +1354,12 @@ void bmcpokr_state::shendeng(machine_config &config)
 {
 	bmcpokr(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &bmcpokr_state::shendeng_map);
+}
+
+void bmcpokr_state::xyddzhh(machine_config &config)
+{
+	bmcpokr(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bmcpokr_state::xyddzhh_map);
 }
 
 /***************************************************************************
@@ -1386,6 +1559,27 @@ ROM_START( bmcpokr )
 	ROM_LOAD( "ch-m-701.u10", 0x00000, 0x40000,  CRC(e01be644) SHA1(b68682786d5b40cb5672cfd7f717adcfb8fac7d3) )
 ROM_END
 
+/*
+幸运斗地主 (Xìngyùn Dòu Dìzhǔ - Lucky Dou Dizhu), Herb Home, 2006
+PCB Number: BMC-A81210
+PCB is identical to BMC-A81212 (documented)
+*/
+
+ROM_START( xyddzhh )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 Code
+	ROM_LOAD16_BYTE( "c1-a-601.u13", 0x000000, 0x20000, CRC(7f06ba9f) SHA1(747110ebc674867f858348d41f3e5b8b8167a816) )
+	ROM_LOAD16_BYTE( "c1-a-501.u12", 0x000001, 0x20000, CRC(1522fe48) SHA1(7636c00f8735ec031b0218a2ed348c7d4fa3f66d) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "c4-a-101.u39", 0x000000, 0x80000, CRC(28e945b6) SHA1(cee74fa35234d7b2d19ca4354b17a4223f28a153) )
+	ROM_LOAD16_BYTE( "c4-a-201.u40", 0x000001, 0x80000, CRC(b2730f93) SHA1(f002cf6e632ce46ce3a5a2293748dfc2f5b47563) )
+	ROM_LOAD16_BYTE( "c4-a-301.u45", 0x100000, 0x80000, CRC(02dd38d5) SHA1(bc563b6f556c790667efef6e6af09fb76cae50e6) )
+	ROM_LOAD16_BYTE( "c4-a-401.u29", 0x100001, 0x80000, CRC(24c2f883) SHA1(275fb3d47447d524994ca5ee26be8c8a2b69608c) )
+
+	ROM_REGION( 0x80000, "oki", 0 ) // Samples
+	ROM_LOAD( "c4-a-701.u10", 0x00000, 0x80000, CRC(f22dacfe) SHA1(0a085419b04a6eba0d30064fae4678e1523e4e15) )
+ROM_END
+
 /***************************************************************************
 
 Mahou no Lamp (BMC, 2000)
@@ -1442,7 +1636,8 @@ ROM_END
 
 } // anonymous namespace
 
-GAME( 1998, fengyunh, 0,        fengyunh, fengyunh, bmcpokr_state, empty_init, ROT0, "BMC", "Fengyun Hui",              MACHINE_SUPPORTS_SAVE )
-GAME( 1998, shendeng, mjmaglmp, shendeng, shendeng, bmcpokr_state, empty_init, ROT0, "BMC", "Pili Shen Deng",           MACHINE_SUPPORTS_SAVE )
-GAME( 1999, bmcpokr,  0,        bmcpokr,  bmcpokr,  bmcpokr_state, empty_init, ROT0, "BMC", "Dongfang Shenlong",        MACHINE_SUPPORTS_SAVE )
-GAME( 2000, mjmaglmp, 0,        mjmaglmp, mjmaglmp, bmcpokr_state, empty_init, ROT0, "BMC", "Mahou no Lamp (v. JAA02)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, fengyunh, 0,        fengyunh, fengyunh, bmcpokr_state, empty_init, ROT0, "BMC",       "Fengyun Hui",              MACHINE_SUPPORTS_SAVE )
+GAME( 1998, shendeng, mjmaglmp, shendeng, shendeng, bmcpokr_state, empty_init, ROT0, "BMC",       "Pili Shen Deng",           MACHINE_SUPPORTS_SAVE )
+GAME( 1999, bmcpokr,  0,        bmcpokr,  bmcpokr,  bmcpokr_state, empty_init, ROT0, "BMC",       "Dongfang Shenlong",        MACHINE_SUPPORTS_SAVE )
+GAME( 2000, mjmaglmp, 0,        mjmaglmp, mjmaglmp, bmcpokr_state, empty_init, ROT0, "BMC",       "Mahou no Lamp (v. JAA02)", MACHINE_SUPPORTS_SAVE )
+GAME( 2006, xyddzhh,  0,        xyddzhh,  xyddzhh,  bmcpokr_state, empty_init, ROT0, "Herb Home", "Xingyun Dou Dizhu",        MACHINE_SUPPORTS_SAVE )

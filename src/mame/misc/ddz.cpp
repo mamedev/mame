@@ -3,7 +3,7 @@
 
 /****************************************************************************
 
-    招级疯斗 - "Zhaoji Fengdou" - "Crazy Class" HW
+    招级疯斗 - "Chaoji Fengdou" - "Crazy Class" HW
 
     driver by Angelo Salese, based off original ddz.cpp by ElSemi
 
@@ -144,7 +144,7 @@ ROM_START( ddz )
 	ROM_LOAD("ddz.003.rom",  0x800000, 0x400000, CRC(61c9b5c9) SHA1(0438417398403456a1c49408881797a94aa86f49) )
 ROM_END
 
-/* "Zhaoji Fengdou" PCB
+/* "Chaoji Fengdou" PCB
      ______________________________________________________________
     |                             _________  ____________________  |
   __|                            HD74HC245P |ROM1 H28F320BDJ-TTL80 |
@@ -171,7 +171,7 @@ ROM_END
     |       _____       ___     JAMMA               _____   Switch |
     |______|     |_|_| |   |_|_|_|_|_|_|_|_|_|_|_|_|     |_________|
 */
-ROM_START( crzclass )
+ROM_START( crzclass ) // 超级疯斗
 	ROM_REGION32_LE( 0x1000000, "ipl", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x1000000, "enc_data", ROMREGION_ERASEFF )
@@ -228,7 +228,7 @@ void ddz_state::init_ddz()
 
 
 GAME( 200?, ddz,      0, ddz, ddz, ddz_state, init_ddz,   ROT0, "IGS?", "Dou Dizhu",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 200?, crzclass, 0, ddz, ddz, ddz_state, init_ddz,   ROT0, "TJF",  "Zhaoji Fengdou",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // 'Crazy Class'
+GAME( 200?, crzclass, 0, ddz, ddz, ddz_state, init_ddz,   ROT0, "TJF",  "Chaoji Fengdou",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // 'Crazy Class'
 GAME( 200?, baibians, 0, ddz, ddz, ddz_state, init_ddz,   ROT0, "TJF",  "Baibian Shuangkou", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 200?, cjmx,     0, ddz, ddz, ddz_state, init_ddz,   ROT0, "TJF",  "Chaoji Mingxing",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2005, btlfront, 0, ddz, ddz, ddz_state, empty_init, ROT0, "TJF",  "BattleFront",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // encrypted, V133F?
