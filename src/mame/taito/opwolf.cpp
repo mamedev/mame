@@ -879,10 +879,6 @@ void opwolf_state::opwolf(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	mixer_device &mixer = MIXER(config, "mixer");
-	mixer.add_route(0, m_tc0060dca[1], 1.0);
-	mixer.add_route(0, m_tc0060dca[1], 1.0);
-
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 8_MHz_XTAL / 2)); /* 4 MHz */
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.port_write_handler().set_membank(m_z80bank).mask(0x03);
@@ -900,6 +896,10 @@ void opwolf_state::opwolf(machine_config &config)
 
 	TC0060DCA(config, m_tc0060dca[0]);
 	m_tc0060dca[0]->add_route(ALL_OUTPUTS, "mixer", 1.0);
+
+	mixer_device &mixer = MIXER(config, "mixer");
+	mixer.add_route(0, m_tc0060dca[1], 1.0);
+	mixer.add_route(0, m_tc0060dca[1], 1.0);
 
 	TC0060DCA(config, m_tc0060dca[1]);
 	m_tc0060dca[1]->add_route(0, "lspeaker", 1.0);
