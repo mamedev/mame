@@ -19,11 +19,14 @@ Dips verified for Neratte Chu (nratechu) from manual
 */
 
 #include "emu.h"
+
+#include "st0016.h"
+
 #include "cpu/v810/v810.h"
 #include "cpu/z80/z80.h"
-#include "st0016.h"
 #include "machine/timer.h"
 #include "sound/st0016.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -411,6 +414,36 @@ static INPUT_PORTS_START( nratechu )
 	PORT_SERVICE_DIPLOC(  0x80, IP_ACTIVE_LOW, "SW2:8" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( crownpkr )
+	PORT_INCLUDE( st0016 )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME( "Hold 3 / Low" )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) // TODO: hopper
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) // TODO: hopper full
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME( "Hold 2 / High" ) // also Meter Key in test mode
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) // also Reset Key in test mode
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) // Last Game Key in test mode
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
+
+	PORT_MODIFY("SYSTEM")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(5)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(5)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(10) // TODO: simulate coin drop sensor
+	PORT_SERVICE( 0x08, IP_ACTIVE_LOW ) // only works if pressed during boot
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( mayjisn2 )
 	PORT_INCLUDE( st0016 )
 
@@ -613,10 +646,18 @@ ROM_START( renju ) // PCB E51-00001-A
 ROM_END
 
 // ねらってチュー (Neratte Chū) / NERATTE CHU
-ROM_START( nratechu ) // PCB E56-00002 (almost identical to above)
+ROM_START( nratechu ) // PCB E56-00002 (almost identical to above). "1.10 1996/05/25 21:05 Programming by ITEC" string
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "sx012-01.u31", 0x000000, 0x080000, CRC(6ca01d57) SHA1(065848f19ecf2dc1f7bbc7ddd87bca502e4b8b16) )
 	ROM_LOAD( "sx012-02.u32", 0x100000, 0x100000, CRC(40a4e354) SHA1(8120ce8deee6805050a5b083a334c3743c09566b) )
+	// U33 not populated
+	// U34 not populated
+ROM_END
+
+ROM_START( crownpkr ) // PCB E56-00002. "1.20 1997/05/30 19:00 Programming by K&S string"
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD( "cpu120.u31", 0x000000, 0x080000, CRC(9c47920b) SHA1(bdc3f16cc7bf84102a24e6f58a1fb329bf90920b) ) // hand written label NEC D27C4000D / AMD 27C400
+	// U32 not populated
 	// U33 not populated
 	// U34 not populated
 ROM_END
@@ -788,7 +829,7 @@ void st0016_state::init_mayjisn2()
 	m_maincpu->set_game_flag(4);
 }
 
-} // Anonymous namespace
+} // anonymous namespace
 
 
 /*************************************
@@ -797,13 +838,14 @@ void st0016_state::init_mayjisn2()
  *
  *************************************/
 
-GAME( 1994, renju,      0,      renju,    renju,    st0016_state, init_renju,    ROT0, "Visco",            "Renju Kizoku - Kira Kira Gomoku Narabe", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, nratechu,   0,      st0016,   nratechu, st0016_state, init_nratechu, ROT0, "Seta",             "Neratte Chu",                            MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, mayjisn2,   0,      mayjinsn, mayjisn2, st0016_state, init_mayjisn2, ROT0, "Seta",             "Mayjinsen 2",                            MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, koikois,    0,      st0016,   koikois,  st0016_state, init_renju,    ROT0, "Visco",            "Koi Koi Shimasho - Super Real Hanafuda", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 2001, gostop,     0,      st0016,   gostop,   st0016_state, init_renju,    ROT0, "Visco",            "Kankoku Hanafuda Go-Stop",               MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, renju,      0,      renju,    renju,    st0016_state, init_renju,    ROT0, "Visco",            "Renju Kizoku - Kira Kira Gomoku Narabe (ver. 1.0)",  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, nratechu,   0,      st0016,   nratechu, st0016_state, init_nratechu, ROT0, "Seta",             "Neratte Chu (ver. 1.10)",                            MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mayjisn2,   0,      mayjinsn, mayjisn2, st0016_state, init_mayjisn2, ROT0, "Seta",             "Mayjinsen 2",                                        MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, koikois,    0,      st0016,   koikois,  st0016_state, init_renju,    ROT0, "Visco",            "Koi Koi Shimasho - Super Real Hanafuda",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 2001, gostop,     0,      st0016,   gostop,   st0016_state, init_renju,    ROT0, "Visco",            "Kankoku Hanafuda Go-Stop",                           MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
 // Not working
-GAME( 1994, mayjinsn,   0,      mayjinsn, st0016,   st0016_state, init_mayjinsn, ROT0, "Seta",             "Mayjinsen",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, dcrown,     0,      st0016,   renju,    st0016_state, init_renju,    ROT0, "Nippon Data Kiki", "Dream Crown (set 1)", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // (c) 1994 Nippon Data Kiki is uploaded near the Japanese Insert coin text
-GAME( 1994, dcrowna,    dcrown, st0016,   renju,    st0016_state, init_renju,    ROT0, "Nippon Data Kiki", "Dream Crown (set 2)", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // the Insert Coin text has been translated to English and no (c) is uploaded
+GAME( 1994, mayjinsn,   0,      mayjinsn, st0016,   st0016_state, init_mayjinsn, ROT0, "Seta",             "Mayjinsen",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, crownpkr,   0,      st0016,   crownpkr, st0016_state, init_nratechu, ROT0, "Unknown",          "Crown Poker (ver. 1.20)", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // coining in doesn't work
+GAME( 1994, dcrown,     0,      st0016,   renju,    st0016_state, init_renju,    ROT0, "Nippon Data Kiki", "Dream Crown (set 1)",     MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // (c) 1994 Nippon Data Kiki is uploaded near the Japanese Insert coin text
+GAME( 1994, dcrowna,    dcrown, st0016,   renju,    st0016_state, init_renju,    ROT0, "Nippon Data Kiki", "Dream Crown (set 2)",     MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // the Insert Coin text has been translated to English and no (c) is uploaded
