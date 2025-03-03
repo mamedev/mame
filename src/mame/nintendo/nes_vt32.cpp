@@ -377,7 +377,7 @@ ROM_START( matet300 )
 	ROM_LOAD( "tetris.bin", 0x00000, 0x2000000, CRC(73cbd40a) SHA1(5996c97cebd6cec42a0ba1fba9517adf1af00098) )
 ROM_END
 
-ROM_START( matet200 )
+ROM_START( matet220 )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
 	ROM_LOAD( "gamervtetris_s29gl128n10tfi01_0001227e.bin", 0x00000, 0x1000000, CRC(ac244e56) SHA1(89897f5f65f55a46bf0d6b5ca534ca31c79a0658) )
 	ROM_IGNORE(0x100)
@@ -405,7 +405,7 @@ CONS( 201?, myaass,    0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empt
 CONS( 2021, matet300,  0,         0,  nes_vt32_32mb,     nes_vt32, nes_vt32_unk_state, empty_init, "dreamGEAR", "My Arcade Tetris (DGUNL-7029, Go Gamer, with 300 bonus games)", MACHINE_NOT_WORKING )
 
 // some games (eg F22) are scrambled like in myaass
-CONS( 2021, matet200,  0,         0,  nes_vt32_32mb,     nes_vt32, nes_vt32_unk_state, empty_init, "dreamGEAR", "My Arcade Tetris (DGUNL-7030, Gamer V, with 200 bonus games)", MACHINE_NOT_WORKING )
+CONS( 2021, matet220,  0,         0,  nes_vt32_32mb,     nes_vt32, nes_vt32_unk_state, empty_init, "dreamGEAR", "My Arcade Tetris (DGUNL-7030, Gamer V, with 220 bonus games)", MACHINE_NOT_WORKING )
 
 // Use DIP switch to select console or cartridge, as cartridge is fake and just toggles a GPIO
 CONS( 2016, fcpocket,  0,  0,  nes_vt32_4x16mb,   nes_vt32_fp, nes_vt32_unk_state, empty_init, "<unknown>",   "FC Pocket 600 in 1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )  // has external banking (2x 32mbyte banks)
