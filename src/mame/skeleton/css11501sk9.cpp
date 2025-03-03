@@ -68,7 +68,7 @@ public:
 	css11501sk9_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_subcpu(*this, "subcpu")
+		, m_sslcpu(*this, "sslcpu")
 	{ }
 
 	void css11501sk9(machine_config &config);
@@ -78,7 +78,7 @@ private:
 	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_subcpu;
+	required_device<cpu_device> m_sslcpu;
 };
 
 
@@ -99,7 +99,7 @@ void css11501sk9_state::css11501sk9(machine_config &config)
 {
 	// basic machine hardware
 	RM7000BE(config, m_maincpu, 400'000'000); // Main CPU
-	RM7000BE(config, m_subcpu, 400'000'000); // SSL CPU
+	RM7000BE(config, m_sslcpu, 400'000'000); // SSL CPU
 }
 
 
@@ -107,7 +107,7 @@ ROM_START( css11501sk9 )
 	ROM_REGION(0x410000, "maincpu", 0) // Main
 	ROM_LOAD( "css11501s-k9_73-8174-04_17-7009-03_cs-a393_0514_hm_am29lv320db.u46",      0x000000, 0x410000, CRC(fdc00a8f) SHA1(cc89c39462e783d874abebbed2a80bd9ec095047) )
 
-	ROM_REGION(0x200000, "subcpu", 0) // SSL
+	ROM_REGION(0x200000, "sslcpu", 0) // SSL
 	ROM_LOAD( "css11501s-k9_73-6917-06_17-6860-03_cs-7edd_0525_am29lv160db.u36",         0x000000, 0x200000, CRC(6dfe6620) SHA1(06cc9015907c74284a6b85393c0024729146a19b) )
 
 	ROM_REGION(0x001eb3, "plds", 0)
@@ -126,8 +126,13 @@ ROM_START( css11501sk9 )
 	ROM_LOAD( "css11501s-k9_73-6917-06_24c02n.u8",                                       0x000000, 0x000100, CRC(dcbe3083) SHA1(81934196733a8878cc19ced4f1791dfaa4da494a) ) // 24C02N SEEPROM between the BCM5700C2KPB, the 71V546S133PF, and the XC2S50, on SSL sub-board
 
 	ROM_REGION(0x004400, "pic", 0)
-	ROM_LOAD( "css11501s-k9_73-8174-04_17-6486-03_2605_27af12_pic16lf877pt.u35",         0x000000, 0x004400, CRC(7a036c0c) SHA1(e6cb12ec8603ee53c12a96013e0b257631930a67) ) // PIC16LF877, on main PCB
-	ROM_LOAD( "css11501s-k9_73-8174-04_17-6494-02_1605_92817_pic16lf872.u7",             0x000000, 0x004280, CRC(c8687ac4) SHA1(7285b7ccd29061645e88561e35c5168010ba4fb8) ) // PIC16LF872, on SSL sub-board
+	// CONFIG = 3eh, ID = ff3fff3fff3fff3fh
+	ROM_LOAD( "css11501s-k9_73-8174-04_17-6486-03_2605_27af12_pic16lf877pt_user.u35",    0x000000, 0x004000, CRC(22b03fe9) SHA1(984c14fb013763aa4fb981888480d19a6058843b) ) // PIC16LF877, on main PCB
+	ROM_LOAD( "css11501s-k9_73-8174-04_17-6486-03_2605_27af12_pic16lf877pt_data.u35",    0x000000, 0x000200, CRC(14bfe63a) SHA1(ebe833da793930303ac57c873a97f8383494a939) ) // PIC16LF877, on main PCB
+
+	// CONFIG = 3eh, ID = 7f007f007f007f00h
+	ROM_LOAD( "css11501s-k9_73-8174-04_17-6494-02_1605_92817_pic16lf872_user.u7",        0x000000, 0x001000, CRC(6deebf3a) SHA1(c8f030657b7959c6d3aa5b1583786eb84ed199c1) ) // PIC16LF872, on SSL sub-board
+	ROM_LOAD( "css11501s-k9_73-8174-04_17-6494-02_1605_92817_pic16lf872_data.u7",        0x000000, 0x000080, CRC(903500ff) SHA1(d33277afda835773cfcc9bc137690cbe79943f0f) ) // PIC16LF872, on SSL sub-board
 ROM_END
 
 } // Anonymous namespace
