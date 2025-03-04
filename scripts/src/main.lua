@@ -156,6 +156,7 @@ if (MACHINES["NETLIST"]~=null) then
 end
 	links {
 		"utils",
+		"mame_srcdbg_static",
 		ext_lib("expat"),
 		"softfloat",
 		"softfloat3",

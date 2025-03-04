@@ -20,6 +20,7 @@
 namespace osd::debugger::qt {
 
 class DasmDockWidget;
+class SrcdbgDockWidget;
 class ProcessorDockWidget;
 
 
@@ -47,11 +48,18 @@ protected:
 	// Used to intercept the user hitting the up arrow in the input widget
 	virtual bool eventFilter(QObject *obj, QEvent *event) override;
 
+protected slots:
+	// Overrides allow different behavior when source-level debugging is active
+	virtual void debugActStepInto() override;
+	virtual void debugActStepOver() override;
+	virtual void debugActStepOut() override;
+
 private slots:
 	void toggleBreakpointAtCursor(bool changedTo);
 	void enableBreakpointAtCursor(bool changedTo);
 	void runToCursor(bool changedTo);
 	void rightBarChanged(QAction *changedTo);
+	void srcdbgBarChanged(QAction *changedTo);
 
 	void executeCommandSlot();
 	void commandEditedSlot(QString const &text);
@@ -59,22 +67,34 @@ private slots:
 	void mountImage(bool changedTo);
 	void unmountImage(bool changedTo);
 
-	void dasmViewUpdated();
+	void codeViewUpdated();
 
 	// Closing the main window hides the debugger and runs the emulated system
 	virtual void debugActClose() override;
 	virtual void debuggerExit() override;
 
 private:
+	enum
+	{
+		MENU_SHOW_SOURCE,
+		MENU_SHOW_DISASM
+	};
+
 	void createImagesMenu();
 
 	void executeCommand(bool withClear);
 
+	bool sourceFrameActive() const;
+	bool addressFromCursor(offs_t & address) const;
+	const debug_breakpoint * breakpointFromAddress(offs_t address) const;
+
 	// Widgets and docks
+	QDockWidget *m_codeDock;            // A dock that shows disassembly or source code
 	QLineEdit *m_inputEdit;
 	DebuggerView *m_consoleView;
 	ProcessorDockWidget *m_procFrame;
 	DasmDockWidget *m_dasmFrame;
+	SrcdbgDockWidget *m_srcdbgFrame;
 
 	// Menu items
 	QAction *m_breakpointToggleAct;
@@ -121,6 +141,35 @@ private:
 	running_machine &m_machine;
 
 	DebuggerView *m_dasmView;
+};
+
+
+//============================================================
+//  Docks with the Main Window.  Source-level view.
+//============================================================
+class SrcdbgDockWidget : public QWidget
+{
+	Q_OBJECT
+
+public:
+	SrcdbgDockWidget(running_machine &machine, QWidget *parent = nullptr);
+	virtual ~SrcdbgDockWidget();
+
+	DebuggerView *view() { return m_srcdbgView; }
+
+	QSize minimumSizeHint() const { return QSize(150, 150); }
+	QSize sizeHint() const { return QSize(150, 200); }
+
+	void updateComboSelection();
+
+private slots:
+	void srcfileChanged(int index);
+
+private:
+	running_machine &m_machine;
+
+	QComboBox *m_srcdbgCombo;
+	DebuggerView *m_srcdbgView;
 };
 
 
