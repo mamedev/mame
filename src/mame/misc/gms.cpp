@@ -142,7 +142,7 @@ public:
 	void super555(machine_config &config) ATTR_COLD;
 
 	void init_ballch() ATTR_COLD;
-	void init_cjldz() ATTR_COLD;
+	void init_cjdlz() ATTR_COLD;
 	void init_cots() ATTR_COLD;
 	void init_hgly() ATTR_COLD;
 	void init_rbspm() ATTR_COLD;
@@ -1781,9 +1781,9 @@ static INPUT_PORTS_START( cjdlz ) // TODO
 	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:7")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, "Controls" ) PORT_DIPLOCATION("DSW1:8") // should default to keyboard, but set on joystick since the former isn't emulated yet
-	PORT_DIPSETTING(      0x0080, DEF_STR( Joystick ) )
-	PORT_DIPSETTING(      0x0000, "Keyboard" )
+	PORT_DIPNAME( 0x0080, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0100, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW4:1")
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -1832,9 +1832,9 @@ static INPUT_PORTS_START( cjdlz ) // TODO
 	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:7")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:8")
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, "Controls" ) PORT_DIPLOCATION("DSW2:8") // should default to keyboard, but set on joystick since the former isn't emulated yet
+	PORT_DIPSETTING(      0x0080, DEF_STR( Joystick ) )
+	PORT_DIPSETTING(      0x0000, "Keyboard" )
 	PORT_DIPNAME( 0x0100, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW5:1")
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -1921,14 +1921,14 @@ static INPUT_PORTS_START( hgly )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "Paytable" )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no evident effect
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME( "Start Slot" )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(4)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(4)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(4)
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(4)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no evident effect
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no evident effect
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no evident effect
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no evident effect
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no evident effect
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no evident effect
 
 	PORT_START("IN2")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
@@ -1992,10 +1992,10 @@ static INPUT_PORTS_START( hgly )
 	PORT_DIPSETTING(      0x1000, "10000" )
 	PORT_DIPSETTING(      0x2000, "30000" )
 	PORT_DIPSETTING(      0x3000, "50000" )
-	PORT_DIPNAME( 0x4000, 0x0000, "Double Explosive Machine" ) PORT_DIPLOCATION("DSW4:7") // TODO: fishy machine translations
+	PORT_DIPNAME( 0x4000, 0x0000, "Double-Up Game Jackpot" ) PORT_DIPLOCATION("DSW4:7")
 	PORT_DIPSETTING(      0x4000, "10000" )
 	PORT_DIPSETTING(      0x0000, "Unlimited" )
-	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW4:8") // not definition in test mode
+	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW4:8") // not defined in test mode
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
@@ -2063,13 +2063,13 @@ static INPUT_PORTS_START( hgly )
 	PORT_DIPNAME( 0x0010, 0x0000, "Bet Every Time" ) PORT_DIPLOCATION("DSW3:5") // hard-coded
 	PORT_DIPSETTING(      0x0010, "4" )
 	PORT_DIPSETTING(      0x0000, "4 (duplicate)" )
-	PORT_DIPNAME( 0x0020, 0x0000, "Scoring" ) PORT_DIPLOCATION("DSW3:6") // TODO: fishy machine translations
+	PORT_DIPNAME( 0x0020, 0x0000, "Scoring" ) PORT_DIPLOCATION("DSW3:6")
 	PORT_DIPSETTING(      0x0020, "Numbers" )
-	PORT_DIPSETTING(      0x0000, "Tubes" )
-	PORT_DIPNAME( 0x0040, 0x0040, "Controls" ) PORT_DIPLOCATION("DSW3:7") // should default to keyboard, but set on joystick since the former isn't emulated yet
-	PORT_DIPSETTING(      0x0040, DEF_STR( Joystick ) )
-	PORT_DIPSETTING(      0x0000, "Keyboard" )
-	PORT_DIPNAME( 0x0080, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW3:8") // not definition in test mode
+	PORT_DIPSETTING(      0x0000, "Circle Tiles" )
+	PORT_DIPNAME( 0x0040, 0x0000, "Controls" ) PORT_DIPLOCATION("DSW3:7")
+	PORT_DIPSETTING(      0x0000, DEF_STR( Joystick ) )
+	PORT_DIPSETTING(      0x0040, "Keyboard" )
+	PORT_DIPNAME( 0x0080, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW3:8") // not defined in test mode
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0100, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW6:1")
@@ -2803,8 +2803,8 @@ ROM_START( cjdlz )
 	ROM_REGION( 0x080000, "oki", 0 )
 	ROM_LOAD( "mj-s1-s03.u83", 0x00000, 0x80000, CRC(27cf4e44) SHA1(ee7f3fbc0c9cc777cc4f5ef730c30b952ad61fbf) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "mj-a1-a07.u41", 0x00000, 0x80000, CRC(8f16d01b) SHA1(7dc0bb4ee230e1f1d61d055574e6790284369b8c) )
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD( "mj-a1-a07.u41", 0x000000, 0x100000, CRC(868a9599) SHA1(53fc6d0169ee83e7f911f64b447e4fe7c9fe1f9d) )
 
 	ROM_REGION( 0xc0000, "gfx2", 0)
 	ROM_LOAD( "rmj-t1-t05.u39", 0x00000, 0x80000, CRC(30638e20) SHA1(8082b7616ef759823be4265e902b503d15916197) )
@@ -2967,7 +2967,7 @@ void gms_2layers_state::init_sscs()
 	rom[0x19c1a / 2] = 0x6000; // U85 ERROR
 }
 
-void gms_2layers_state::init_cjldz()
+void gms_2layers_state::init_cjdlz()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
@@ -2997,7 +2997,7 @@ void gms_2layers_state::init_hgly()
 GAME( 1998, rbmk,     0, rbmk,     rbmk,     gms_2layers_state, empty_init,    ROT0,  "GMS", "Shizhan Majiang Wang (Version 8.8)",                    MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // misses YM2151 hookup
 GAME( 1998, rbspm,    0, rbspm,    rbspm,    gms_2layers_state, init_rbspm,    ROT0,  "GMS", "Shizhan Ding Huang Maque (Version 4.1)",                MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now. Misses YM2151 hookup
 GAME( 1998, ssanguoj, 0, ssanguoj, ssanguoj, gms_2layers_state, init_ssanguoj, ROT0,  "GMS", "Shizhan Sanguo Ji Jiaqiang Ban (Version 8.9 980413)",   MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now. YM3812 isn't hooked up (goes through undumped MCU).
-GAME( 1999, cjdlz,    0, super555, cjdlz,    gms_2layers_state, init_cjldz,    ROT0,  "GMS", "Chaoji Da Lianzhuang (Version 1.1)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // stops during boot, patched for now. Also needs EEPROM support.
+GAME( 1999, cjdlz,    0, super555, cjdlz,    gms_2layers_state, init_cjdlz,    ROT0,  "GMS", "Chaoji Da Lianzhuang (Version 1.1)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // stops during boot, patched for now. Also needs EEPROM support.
 GAME( 2005, yyhm,     0, magslot,  yyhm,     gms_3layers_state, init_yyhm,     ROT0,  "GMS", "Yuanyang Hudie Meng (Version 8.8A 2005-09-25)",         MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now. Also needs EEPROM support.
 
 // card games
