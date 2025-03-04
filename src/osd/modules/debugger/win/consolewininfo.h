@@ -22,13 +22,16 @@ class consolewin_info : public disasmbasewin_info
 public:
 	consolewin_info(debugger_windows_interface &debugger);
 	virtual ~consolewin_info();
+	virtual bool handle_key(WPARAM wparam, LPARAM lparam) override;
 
 	void set_cpu(device_t &device);
 
 protected:
+	virtual int expression_view_index() const override;
 	virtual void recompute_children() override;
 	virtual void update_menu() override;
 	virtual bool handle_command(WPARAM wparam, LPARAM lparam) override;
+	virtual bool source_stepping_active() override;
 	virtual void save_configuration_to_node(util::xml::data_node &node) override;
 
 private:
@@ -50,6 +53,7 @@ private:
 
 	enum
 	{
+		VIEW_IDX_SOURCE,
 		VIEW_IDX_DISASM,
 		VIEW_IDX_STATE,
 		VIEW_IDX_CONSOLE,
@@ -61,10 +65,13 @@ private:
 	void open_image_file(device_image_interface &device);
 	void create_image_file(device_image_interface &device);
 	bool get_softlist_info(device_image_interface &img);
+	bool show_src_window();
+	void hide_src_window();
 
 	device_t *m_current_cpu;
 	HMENU m_devices_menu;
 	std::map<std::string,std::string> slmap;
+	HWND m_filecombownd;
 };
 
 } // namespace osd::debugger::win

@@ -58,9 +58,9 @@ protected slots:
 	void debugActRunToNextCpu();
 	void debugActRunNextInt();
 	void debugActRunNextVBlank();
-	void debugActStepInto();
-	void debugActStepOver();
-	void debugActStepOut();
+	virtual void debugActStepInto();
+	virtual void debugActStepOver();
+	virtual void debugActStepOut();
 	void debugActSoftReset();
 	void debugActHardReset();
 	virtual void debugActClose();

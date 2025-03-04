@@ -14,8 +14,8 @@
 
 namespace osd::debugger::win {
 
-disasmview_info::disasmview_info(debugger_windows_interface &debugger, debugwin_info &owner, HWND parent) :
-	debugview_info(debugger, owner, parent, DVT_DISASSEMBLY)
+disasmview_info::disasmview_info(debugger_windows_interface &debugger, debugwin_info &owner, HWND parent, bool source_code_debugging /* = false */) :
+	debugview_info(debugger, owner, parent, source_code_debugging ? DVT_SOURCE : DVT_DISASSEMBLY)
 {
 }
 
@@ -36,10 +36,9 @@ disasm_right_column disasmview_info::right_column() const
 	return view<debug_view_disasm>()->right_column();
 }
 
-
-offs_t disasmview_info::selected_address() const
+std::optional<offs_t> disasmview_info::selected_address() const
 {
-	return view<debug_view_disasm>()->selected_address();
+	return std::optional<offs_t>(view<debug_view_disasm>()->selected_address());
 }
 
 
