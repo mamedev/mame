@@ -7,7 +7,7 @@ Skeleton driver for Honeywell CAMIR-F1 wireless passive
 infrared motion sensor with built-in colour camera.
 
 Hardware based on a PIC18LF26K22 as main CPU with a Conexant
-CX93610 (DIFT JPEG Encoder with a 656 Camera Interface and
+CX93610 (DIFT JPEG Encoder with a BT.656 Camera Interface and
 Optional Microphone Input) and a IS25LQ040 Serial Flash.
 
 PCB:
@@ -38,6 +38,7 @@ PCB:
 *************************************************************/
 
 #include "emu.h"
+#include "cpu/pic16x8x/pic16x8x.h"
 
 namespace {
 
@@ -47,9 +48,13 @@ class camirf1_state : public driver_device
 public:
 	camirf1_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 	{ }
 
 	void camirf1(machine_config &config) ATTR_COLD;
+
+private:
+	required_device<cpu_device> m_maincpu;
 };
 
 INPUT_PORTS_START( camirf1 )
@@ -57,12 +62,12 @@ INPUT_PORTS_END
 
 void camirf1_state::camirf1(machine_config &config)
 {
-	// PIC18LF26K22
+	PIC16F84(config, m_maincpu, 16_MHz_XTAL); // Actually a PIC18LF26K22
 }
 
 ROM_START( camirf1 )
 	// ID = 00000000ffffffffh, CONFIG = 28130e003d81000fc00fe00fh
-	ROM_REGION( 0x01000, "maincpu", 0 )
+	ROM_REGION( 0x04280, "maincpu", 0 )
 	ROM_LOAD( "pic18lf26k22_user.bin", 0x00000, 0x01000, CRC(47e4e6c6) SHA1(e0b1d0690cf991803673e9bcf2d244aa15c42feb) )
 	ROM_LOAD( "pic18lf26k22_data.bin", 0x00000, 0x00400, CRC(b15001ef) SHA1(6d722abfb433fbf76f2a53b015febc42f4d638c2) )
 
