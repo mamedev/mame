@@ -298,24 +298,22 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 - (void)update {
 	// resize our frame if the total size has changed
 	debug_view_xy const newSize = view->total_size();
-	BOOL const resized = (newSize.x != totalWidth) || (newSize.y != totalHeight);
-	if (resized)
+
+	NSScrollView *const scroller = [self enclosingScrollView];
+	if (scroller)
 	{
-		NSScrollView *const scroller = [self enclosingScrollView];
-		if (scroller)
-		{
-			NSSize const clip = [[scroller contentView] bounds].size;
-			NSSize content = NSMakeSize((fontWidth * newSize.x) + (2 * [textContainer lineFragmentPadding]),
-										fontHeight * newSize.y);
-			if (wholeLineScroll)
-				content.height += (fontHeight * 2) - 1;
-			[self setFrameSize:NSMakeSize(ceil(std::max(clip.width, content.width)),
-										  ceil(std::max(clip.height, content.height)))];
-			[scroller reflectScrolledClipView:[scroller contentView]];
-		}
-		totalWidth = newSize.x;
-		totalHeight = newSize.y;
+		NSSize const clip = [[scroller contentView] bounds].size;
+		NSSize content = NSMakeSize((fontWidth * newSize.x) + (2 * [textContainer lineFragmentPadding]),
+									fontHeight * newSize.y);
+		if (wholeLineScroll)
+			content.height += (fontHeight * 2) - 1;
+		[self setFrameSize:NSMakeSize(ceil(std::max(clip.width, content.width)),
+									  ceil(std::max(clip.height, content.height)))];
+		[scroller reflectScrolledClipView:[scroller contentView]];
 	}
+
+	totalWidth = newSize.x;
+	totalHeight = newSize.y;
 
 	// scroll the view if we're being told to
 	debug_view_xy const newOrigin = view->visible_position();

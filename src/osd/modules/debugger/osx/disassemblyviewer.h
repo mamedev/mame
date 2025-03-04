@@ -14,19 +14,27 @@
 #import <Cocoa/Cocoa.h>
 
 
-@class MAMEDebugConsole, MAMEDisassemblyView;
+@class MAMEDebugConsole, MAMEDisassemblyView, MAMESrcDebugView;
 
-@interface MAMEDisassemblyViewer : MAMEExpressionAuxiliaryDebugWindowHandler
+@interface MAMEDisassemblyViewer : MAMEExpressionAuxiliaryDebugWindowHandler <MAMEDebugViewDisasemblyContainer>
 {
 	MAMEDisassemblyView *dasmView;
 	NSPopUpButton       *subviewButton;
+	NSView				*dissasemblyGroupView;
+	MAMESrcDebugView	*srcdbgView;
+	NSView				*srcdbgGroupView;
+	NSPopUpButton		*sourceButton;
 }
 
 - (id)initWithMachine:(running_machine &)m console:(MAMEDebugConsole *)c;
 
 - (BOOL)selectSubviewForDevice:(device_t *)device;
 - (BOOL)selectSubviewForSpace:(address_space *)space;
+- (void)setDisasemblyView:(BOOL)value;
+- (BOOL) getDisasemblyView;
 
+- (void) setSourceButton:(int)index;
+- (IBAction)sourceDebugBarChanged:(id)sender;
 - (IBAction)debugToggleBreakpoint:(id)sender;
 - (IBAction)debugToggleBreakpointEnable:(id)sender;
 - (IBAction)debugRunToCursor:(id)sender;
