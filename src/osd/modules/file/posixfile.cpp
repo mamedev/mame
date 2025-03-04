@@ -380,7 +380,7 @@ std::unique_ptr<osd::directory::entry> osd_stat(const std::string &path)
 
 	// create an osd_directory_entry; be sure to make sure that the caller can
 	// free all resources by just freeing the resulting osd_directory_entry
-	auto const result = reinterpret_cast<osd::directory::entry *>(::operator new(sizeof(osd::directory::entry) + path.length() + 1), std::nothrow);
+	auto const result = reinterpret_cast<osd::directory::entry *>(::operator new(sizeof(osd::directory::entry) + path.length() + 1, std::nothrow));
 	if (!result) return nullptr;
 	new (result) osd::directory::entry;
 
