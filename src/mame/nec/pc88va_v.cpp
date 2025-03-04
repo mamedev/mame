@@ -1697,7 +1697,7 @@ u8 pc88va_state::gvram_multiplane_r(offs_t offset)
 			}
 		}
 
-		// flip register indices on 16-bit mode
+		// flip register write index on 16-bit mode
 		if ((m_multiplane.pmod & 5) == 5 && !machine().side_effects_disabled())
 		{
 			m_multiplane.prwp ^= 0xf;
@@ -1706,7 +1706,7 @@ u8 pc88va_state::gvram_multiplane_r(offs_t offset)
 		return res;
 	}
 
-	return gvram_singleplane_r(offset);
+	return m_gvram[offset];
 }
 
 void pc88va_state::gvram_multiplane_w(offs_t offset, u8 data)
@@ -1763,7 +1763,7 @@ void pc88va_state::gvram_multiplane_w(offs_t offset, u8 data)
 		return;
 	}
 
-	gvram_singleplane_w(offset, data);
+	m_gvram[offset] = data;
 }
 
 u8 pc88va_state::gvram_singleplane_r(offs_t offset)
