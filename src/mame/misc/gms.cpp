@@ -79,6 +79,7 @@ TODO:
   knows how to play)
 - game logic in baile seems broken (you always win), maybe due to the patches?
 - broken title GFX in yyhm (transparent pen problem?)
+- broken title GFX in cjdlz. How should the extra ROM be loaded?
 - the newer games seem to use range 0x9e1000-0x9e1fff during gameplay
 
 Video references:
@@ -141,7 +142,9 @@ public:
 	void super555(machine_config &config) ATTR_COLD;
 
 	void init_ballch() ATTR_COLD;
+	void init_cjldz() ATTR_COLD;
 	void init_cots() ATTR_COLD;
+	void init_hgly() ATTR_COLD;
 	void init_rbspm() ATTR_COLD;
 	void init_sball2k1() ATTR_COLD;
 	void init_ssanguoj() ATTR_COLD;
@@ -1717,6 +1720,384 @@ static INPUT_PORTS_START( sball2k1 ) // default password for accessing game sett
 	PORT_DIPUNKNOWN_DIPLOC( 0x0080, 0x0080, "SW3:8" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( cjdlz ) // TODO
+	PORT_START("IN1")   // 16bit
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT  )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_MAHJONG_BET )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN2")   // 16bit
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_TOGGLE
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) PORT_TOGGLE
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
+
+	// Only 4 DIP banks are actually populated on PCBs, but test mode reads all 6.
+	// TODO: dips
+	PORT_START("DSW1")   // 16bit, in test mode first 8 are recognized as dsw1, second 8 as dsw4.
+	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:2")
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:3")
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:5")
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:7")
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, "Controls" ) PORT_DIPLOCATION("DSW1:8") // should default to keyboard, but set on joystick since the former isn't emulated yet
+	PORT_DIPSETTING(      0x0080, DEF_STR( Joystick ) )
+	PORT_DIPSETTING(      0x0000, "Keyboard" )
+	PORT_DIPNAME( 0x0100, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW4:1")
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW4:2")
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW4:3")
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW4:4")
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW4:5")
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW4:6")
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW4:7")
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW4:8")
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+
+	PORT_START("DSW2")   // 16bit, in test mode first 8 are recognized as dsw2, second 8 as dsw5
+	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:1")
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:2")
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:3")
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:4")
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:5")
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:6")
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:7")
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:8")
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW5:1")
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW5:2")
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW5:3")
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW5:4")
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW5:5")
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW5:6")
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW5:7")
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW5:8")
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("DSW3")      // 16bit, in test mode first 8 are recognized as dsw3, second 8 as dsw6
+	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW3:1")
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW3:2")
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW3:3")
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW3:4")
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW3:5")
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW3:6")
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW3:7")
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW3:8")
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW6:1")
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW6:2")
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW6:3")
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW6:4")
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW6:5")
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW6:6")
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW6:7")
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW6:8")
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( hgly )
+	PORT_START("IN1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_SERVICE_NO_TOGGLE(0x02, IP_ACTIVE_LOW)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START1 ) // start in test mode
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "Paytable" )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME( "Start Slot" )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(4)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(4)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(4)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(4)
+
+	PORT_START("IN2")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MEMORY_RESET )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	//PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read)) // TODO: verify
+
+	// Only 4 DIP banks are actually populated on PCBs but test mode reads all 6.
+	// TODO: DIPs
+	PORT_START("DSW1")   // 16bit, in test mode first 8 are recognized as dsw1, second 8 as dsw4.
+	PORT_DIPNAME( 0x0007, 0x0000, "Card Play Rate" ) PORT_DIPLOCATION("DSW1:1,2,3")
+	PORT_DIPSETTING(      0x0001, "91" )
+	PORT_DIPSETTING(      0x0002, "92" )
+	PORT_DIPSETTING(      0x0003, "93" )
+	PORT_DIPSETTING(      0x0004, "94" )
+	PORT_DIPSETTING(      0x0005, "95" )
+	PORT_DIPSETTING(      0x0000, "96" )
+	PORT_DIPSETTING(      0x0006, "97" )
+	PORT_DIPSETTING(      0x0007, "98" )
+	PORT_DIPNAME( 0x0008, 0x0000, "Hold Card" ) PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0000, "Direct Double Up" ) PORT_DIPLOCATION("DSW1:5")
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0000, "Double Up Option" ) PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00c0, 0x0000, "Double Up Probability" ) PORT_DIPLOCATION("DSW1:7,8")
+	PORT_DIPSETTING(      0x0040, DEF_STR( Easy ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Medium ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Difficult ) )
+	PORT_DIPSETTING(      0x00c0, DEF_STR( Very_Difficult ) )
+	PORT_DIPNAME( 0x0100, 0x0000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("DSW4:1")
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0e00, 0x0000, "Break Taiwan Restrictions" ) PORT_DIPLOCATION("DSW4:2,3,4") // TODO: fishy machine translations
+	PORT_DIPSETTING(      0x0600, "5000" )
+	PORT_DIPSETTING(      0x0800, "10000" )
+	PORT_DIPSETTING(      0x0a00, "20000" )
+	PORT_DIPSETTING(      0x0000, "30000" )
+	PORT_DIPSETTING(      0x0c00, "50000" )
+	PORT_DIPSETTING(      0x0e00, "90000" )
+	PORT_DIPSETTING(      0x0200, "200000" )
+	PORT_DIPSETTING(      0x0400, "500000" )
+	PORT_DIPNAME( 0x3000, 0x0000, "Score Limit" ) PORT_DIPLOCATION("DSW4:5,6")
+	PORT_DIPSETTING(      0x0000, "5000" )
+	PORT_DIPSETTING(      0x1000, "10000" )
+	PORT_DIPSETTING(      0x2000, "30000" )
+	PORT_DIPSETTING(      0x3000, "50000" )
+	PORT_DIPNAME( 0x4000, 0x0000, "Double Explosive Machine" ) PORT_DIPLOCATION("DSW4:7") // TODO: fishy machine translations
+	PORT_DIPSETTING(      0x4000, "10000" )
+	PORT_DIPSETTING(      0x0000, "Unlimited" )
+	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW4:8") // not definition in test mode
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+
+	PORT_START("DSW2")   // 16bit, in test mode first 8 are recognized as dsw2, second 8 as dsw5
+	PORT_DIPNAME( 0x0007, 0x0000, "Coin Ratio" ) PORT_DIPLOCATION("DSW2:1,2,3")
+	PORT_DIPSETTING(      0x0001, "1" )
+	PORT_DIPSETTING(      0x0002, "2" )
+	PORT_DIPSETTING(      0x0003, "5" )
+	PORT_DIPSETTING(      0x0000, "10" )
+	PORT_DIPSETTING(      0x0004, "20" )
+	PORT_DIPSETTING(      0x0005, "50" )
+	PORT_DIPSETTING(      0x0006, "100" )
+	PORT_DIPSETTING(      0x0007, "300" )
+	PORT_DIPNAME( 0x0018, 0x0000, "Coin x Score Multiplier" ) PORT_DIPLOCATION("DSW2:4,5")
+	PORT_DIPSETTING(      0x0008, "2" )
+	PORT_DIPSETTING(      0x0010, "5" )
+	PORT_DIPSETTING(      0x0000, "10" )
+	PORT_DIPSETTING(      0x0018, "20" )
+	PORT_DIPNAME( 0x0020, 0x0000, "Bonus Minimum Bet" ) PORT_DIPLOCATION("DSW2:6")
+	PORT_DIPSETTING(      0x0000, "32" )
+	PORT_DIPSETTING(      0x0020, "64" )
+	PORT_DIPNAME( 0x0040, 0x0000, "Payout Model" ) PORT_DIPLOCATION("DSW2:7")
+	PORT_DIPSETTING(      0x0040, "Key Out" )
+	PORT_DIPSETTING(      0x0000, "Coin" )
+	PORT_DIPNAME( 0x0080, 0x0000, "Pool Initial Score" ) PORT_DIPLOCATION("DSW2:8")
+	PORT_DIPSETTING(      0x0080, "500" )
+	PORT_DIPSETTING(      0x0000, "1000" )
+	PORT_DIPNAME( 0x0100, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW5:1")
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW5:2")
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW5:3")
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW5:4")
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW5:5")
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW5:6")
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW5:7")
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW5:8")
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("DSW3")      // 16bit, in test mode first 8 are recognized as dsw3, second 8 as dsw6
+	PORT_DIPNAME( 0x0003, 0x0000, "Minimum Bet" ) PORT_DIPLOCATION("DSW3:1,2") // hard-coded
+	PORT_DIPSETTING(      0x0000, "32" )
+	PORT_DIPSETTING(      0x0001, "32 (duplicate)" )
+	PORT_DIPSETTING(      0x0002, "32 (duplicate)" )
+	PORT_DIPSETTING(      0x0003, "32 (duplicate)" )
+	PORT_DIPNAME( 0x000c, 0x0000, "Minimum Bet" ) PORT_DIPLOCATION("DSW3:3,4") // semi hard-coded
+	PORT_DIPSETTING(      0x0000, "200" )
+	PORT_DIPSETTING(      0x0004, "200 (duplicate)" )
+	PORT_DIPSETTING(      0x0008, "200 (duplicate)" )
+	PORT_DIPSETTING(      0x000c, "360" )
+	PORT_DIPNAME( 0x0010, 0x0000, "Bet Every Time" ) PORT_DIPLOCATION("DSW3:5") // hard-coded
+	PORT_DIPSETTING(      0x0010, "4" )
+	PORT_DIPSETTING(      0x0000, "4 (duplicate)" )
+	PORT_DIPNAME( 0x0020, 0x0000, "Scoring" ) PORT_DIPLOCATION("DSW3:6") // TODO: fishy machine translations
+	PORT_DIPSETTING(      0x0020, "Numbers" )
+	PORT_DIPSETTING(      0x0000, "Tubes" )
+	PORT_DIPNAME( 0x0040, 0x0040, "Controls" ) PORT_DIPLOCATION("DSW3:7") // should default to keyboard, but set on joystick since the former isn't emulated yet
+	PORT_DIPSETTING(      0x0040, DEF_STR( Joystick ) )
+	PORT_DIPSETTING(      0x0000, "Keyboard" )
+	PORT_DIPNAME( 0x0080, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW3:8") // not definition in test mode
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW6:1")
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW6:2")
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW6:3")
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW6:4")
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW6:5")
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW6:6")
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW6:7")
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW6:8")
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
+
 
 static const gfx_layout rbmk32_layout =
 {
@@ -2334,6 +2715,105 @@ ROM_START( ballch )
 	ROM_LOAD( "b.challenge_t1_f4cb.u39", 0x00000, 0x80000,  CRC(a401072a) SHA1(f80ed4ef873393c36bb0446445bfb3a45e3efb97) )
 ROM_END
 
+/*
+皇冠樂園 Huáng Guàn Lè Yuán (Crown Amusement Park), GMS, 1999
+超级大连庄 Chāojí Dà Liánzhuāng, GMS, 1999
+Hardware info by Guru
+---------------------
+
+GMS PCB 98-9-1 for Huang Guan Le Yuan (this layout below)
+GMS PCB 98-8-2 for Chao Ji Da Lian Zhuang. 99.9% same board with minor part shuffling.
+   |---------|        |-------------------|
+|--|  10WAY  |--------|      18WAY        |--------------|
+|UPC1241H VOL                                 14.31818MHz|
+|                            S2.U72  |-----|     A2.U22  |
+|                      PAL   S1.U83  | GMS |     A1.U41  |
+|                     M6295          | M06 |             |
+|                                    |-----|             |
+|            ULN2003                               6116  |
+|J           ULN2003                 T518B         6116  |
+|A           SW1                                   6116  |
+|M                                                 6116  |
+|M           SW2                                   6116  |
+|A                                        PAL            |
+|            SW3                |-------|                |
+|                               |GMS-A69|                |
+|            SW4                |QFP100 |                |
+|                   6116        |       |        T2.U29  |
+|                   6116        |-------|                |
+|                                                T1.U39  |
+|                   24L257      |-------|                |
+|                   24L257      |  GMS  |                |
+|         68000         22MHz   |99A-A1 |  93C46    7805 |
+| BATT         P1.U64           |  A66  |                |
+|-------------------------------|-------|----------------|
+Notes:
+        68000 - Motorola MC68000FN-10 CPU. Clock 11.0MHz [22/2]
+         6116 - 2kB x8-bit SRAM
+       24L257 - Winbond W24L257 Low Voltage 32kB x8-bit SRAM (both chips are battery-backed)
+        M6295 - OKI M6295 4-Channel ADPCM Voice Synthesis LSI. Clock input 1.100MHz [22/20]. Pin 7 HIGH
+       GMSM06 - 89C51 microcontroller (or some variant of it) rebadged 'GMS M06'.
+                Clock input 14.31818MHz on pins 20 and 21 (clock pins match 89C51/89C52/8751/8051)
+                Note game is fully playable without this chip so maybe it's being used for payout or similar functions?
+        93C46 - 93C46 EEPROM. The DI / DO pins are connected to custom chip GMS-99A-A1 A66
+      ULN2003 - ULN2003 7-Channel Darlington Transistor Array
+        T518B - Mitsumi PST518B Master Reset IC (TO92)
+        SW1-4 - 8-position DIP Switch
+     uPC1241H - NEC uPC1241H Audio Power Amp
+         7805 - LM7805 5V Linear Regulator
+         BATT - 3.6V Ni-Cad Battery. Maintains power to both 24L257 RAMs when main power supply is off.
+                Note there is a position for a memory reset switch but it's not populated.
+           P1 - 27C4096 (Main PRG)
+  A1/A2/T1/T2 - 27C020/27C040 or 2M/4M mask ROM (GFX)
+           S1 - 27C040 or 4M mask ROM (OKI samples)
+           S2 - Not populated
+           A2 - Not populated on Chao Ji Da Lian Zhuang
+           T2 - Not populated on Huang Guan Le Yuan
+      GMS-A69 - Custom graphics chip (QFP100)
+                On Huang Guan Le Yuan this is GMS-A68 (PLCC84)
+      GMS-99A - PLCC44 custom chip. Seems to be different for each GMS game that uses this chip and is likely
+                to be a microcontroller with internal ROM. When identically marked chips are swapped between
+                these two games the POST reports an error with this chip. When the chip is swapped back to
+                the correct board it works fine. The same chip was also swapped from San Se Caishen and also
+                shows this chip with a POST error.
+*/
+
+ROM_START( hgly )
+	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD( "p1.u64", 0x00000, 0x80000, CRC(047c59f8) SHA1(f0dd39add2d28e80628e621c8c7053bde312ccd5) ) // 1xxxxxxxxxxxxxxxxxx = 0x00
+
+	ROM_REGION( 0x080000, "oki", 0 )
+	ROM_LOAD( "s1.u83", 0x00000, 0x80000, CRC(980ef3a3) SHA1(bf75e693ed25aa3ff704409491be7a399f7a9e08) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD( "a1.u41", 0x00000, 0x80000, CRC(179e85d6) SHA1(5224aced4769f1c7e43512650e5b67cc26210abe) )
+	ROM_LOAD( "a2.u22", 0x80000, 0x80000, CRC(34f4449b) SHA1(797233bb9e8dcda7c07401414a3ed7f8a564e985) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD( "t1.u39", 0x00000, 0x80000, CRC(272945c8) SHA1(89db8e23c58b185c1b4e44f74bcfef9b8c0baa04) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD_SWAP( "93c46.u136", 0x00, 0x080, CRC(7372eba5) SHA1(2ccaa4e4ffb8f3ff38f75f286e0ff8dc595a1541) )
+ROM_END
+
+ROM_START( cjdlz )
+	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD( "p1.u64", 0x00000, 0x80000, CRC(e3379fff) SHA1(913bdb0f8bc2545bcd94a5738ec9190d55485961) )
+
+	ROM_REGION( 0x080000, "oki", 0 )
+	ROM_LOAD( "mj-s1-s03.u83", 0x00000, 0x80000, CRC(27cf4e44) SHA1(ee7f3fbc0c9cc777cc4f5ef730c30b952ad61fbf) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD( "mj-a1-a07.u41", 0x00000, 0x80000, CRC(8f16d01b) SHA1(7dc0bb4ee230e1f1d61d055574e6790284369b8c) )
+
+	ROM_REGION( 0xc0000, "gfx2", 0)
+	ROM_LOAD( "rmj-t1-t05.u39", 0x00000, 0x80000, CRC(30638e20) SHA1(8082b7616ef759823be4265e902b503d15916197) )
+	ROM_LOAD( "t2.u29",         0x80000, 0x40000, CRC(a7417ce3) SHA1(fb2a789169149f22af62d0c73cd2d652c7005f3e) ) // TODO: actually overlayed?
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD_SWAP( "93c46.u136", 0x00, 0x080, CRC(28d0db8c) SHA1(fb214d10f1c3a1f2e38cb22c620dcc314896ee54) )
+ROM_END
+
 
 	// the following inits patch out protection (?) checks to allow for testing
 	// unfortunately the various U errors shown don't always correspond to correct PCB locations
@@ -2487,6 +2967,29 @@ void gms_2layers_state::init_sscs()
 	rom[0x19c1a / 2] = 0x6000; // U85 ERROR
 }
 
+void gms_2layers_state::init_cjldz()
+{
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+
+
+	rom[0x00518 / 2] = 0x4e71; // 0xD REPAIR
+	rom[0x0c628 / 2] = 0x6000; // 0x99 REPAIR
+	rom[0x0c8e6 / 2] = 0x4e71; // loop
+	rom[0x0ca00 / 2] = 0x6000; // 0xA REPAIR
+	rom[0x0ca24 / 2] = 0x4e71; // 0xE REPAIR
+	rom[0x38664 / 2] = 0x6000; // 0xD REPAIR
+	rom[0x38980 / 2] = 0x6000; // 0xD REPAIR
+}
+
+void gms_2layers_state::init_hgly()
+{
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+
+	rom[0x0feda / 2] = 0x6004; // U35 ERROR
+	rom[0x10128 / 2] = 0x6004; // U36 ERROR
+	rom[0x1393e / 2] = 0x6000; // U64 ERROR
+}
+
 } // anonymous namespace
 
 
@@ -2494,6 +2997,7 @@ void gms_2layers_state::init_sscs()
 GAME( 1998, rbmk,     0, rbmk,     rbmk,     gms_2layers_state, empty_init,    ROT0,  "GMS", "Shizhan Majiang Wang (Version 8.8)",                    MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // misses YM2151 hookup
 GAME( 1998, rbspm,    0, rbspm,    rbspm,    gms_2layers_state, init_rbspm,    ROT0,  "GMS", "Shizhan Ding Huang Maque (Version 4.1)",                MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now. Misses YM2151 hookup
 GAME( 1998, ssanguoj, 0, ssanguoj, ssanguoj, gms_2layers_state, init_ssanguoj, ROT0,  "GMS", "Shizhan Sanguo Ji Jiaqiang Ban (Version 8.9 980413)",   MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now. YM3812 isn't hooked up (goes through undumped MCU).
+GAME( 1999, cjdlz,    0, super555, cjdlz,    gms_2layers_state, init_cjldz,    ROT0,  "GMS", "Chaoji Da Lianzhuang (Version 1.1)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // stops during boot, patched for now. Also needs EEPROM support.
 GAME( 2005, yyhm,     0, magslot,  yyhm,     gms_3layers_state, init_yyhm,     ROT0,  "GMS", "Yuanyang Hudie Meng (Version 8.8A 2005-09-25)",         MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now. Also needs EEPROM support.
 
 // card games
@@ -2504,9 +3008,10 @@ GAME( 2001, sc2in1,   0, magslot,  sc2in1,   gms_3layers_state, init_sc2in1,   R
 GAME( 2004, jinpaish, 0, magslot,  jinpaish, gms_3layers_state, init_jinpaish, ROT0,  "GMS", "Jinpai Suoha - Show Hand (Chinese version 2004-09-22)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // stops during boot, patched for now. Also needs EEPROM support. Also needs correct controls.
 GAME( 2005, baile,    0, magslot,  baile,    gms_3layers_state, init_baile,    ROT0,  "GMS", "Baile 2005 (V3.2 2005-01-12)",                          MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // stops during boot, patched for now. Also needs EEPROM support.
 
-// slot, on slightly different PCB
+// slots
 GAME( 2003, magslot,  0, magslot,  magslot,  gms_3layers_state, empty_init,    ROT0,  "GMS", "Magic Slot (normal 1.0C)",                              MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // reel / tilemaps priorities are wrong, inputs to be verified. Also needs EEPROM support.
 
 // train games
+GAME( 1999, hgly,     0, super555, hgly,     gms_2layers_state, init_hgly,     ROT0,  "GMS", "Huang Guan Le Yuan (990726 CRG1.1)",                    MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // stops during boot, patched for now. Also needs EEPROM support.
 GAME( 2002, ballch,   0, super555, ballch,   gms_2layers_state, init_ballch,   ROT0,  "TVE", "Ball Challenge (20020607 1.0 OVERSEA)",                 MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // stops during boot, patched for now. Also needs EEPROM support.
 GAME( 2005, cots,     0, super555, cots,     gms_2layers_state, init_cots,     ROT0,  "ECM", "Creatures of the Sea (20050328 USA 6.3)",               MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // stops during boot, patched for now. Also needs EEPROM support.

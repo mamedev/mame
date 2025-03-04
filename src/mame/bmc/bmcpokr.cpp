@@ -464,14 +464,7 @@ void bmcpokr_state::bmcpokr_mem(address_map &map)
 
 uint16_t bmcpokr_state::xyddzhh_dsw_r()
 {
-	switch ((m_mux >> 4) & 3)
-	{
-		case 0x00: return m_dsw[3]->read() << 8;
-		case 0x01: return m_dsw[2]->read() << 8;
-		case 0x02: return m_dsw[1]->read() << 8;
-		case 0x03: return m_dsw[0]->read() << 8;
-	}
-	return 0xff << 8;
+	return m_dsw[(~m_mux >> 4) & 3]->read() << 8;
 }
 
 void bmcpokr_state::xyddzhh_map(address_map &map)
@@ -1191,7 +1184,7 @@ static INPUT_PORTS_START( xyddzhh )
 	PORT_DIPNAME( 0x08, 0x08, "Accumulated Bonus" ) PORT_DIPLOCATION("DIP2:4")
 	PORT_DIPSETTING(    0x08, "300" )
 	PORT_DIPSETTING(    0x00, "400" )
-	PORT_DIPNAME( 0x70, 0x70, "Continuing Play Rate" ) PORT_DIPLOCATION("DIP2:5,6,7")
+	PORT_DIPNAME( 0x70, 0x70, "Double_up Rate" ) PORT_DIPLOCATION("DIP2:5,6,7")
 	PORT_DIPSETTING(    0x60, "92" )
 	PORT_DIPSETTING(    0x50, "93" )
 	PORT_DIPSETTING(    0x40, "94" )
@@ -1200,7 +1193,7 @@ static INPUT_PORTS_START( xyddzhh )
 	PORT_DIPSETTING(    0x20, "97" )
 	PORT_DIPSETTING(    0x10, "98" )
 	PORT_DIPSETTING(    0x00, "99" )
-	PORT_DIPNAME( 0x80, 0x80, "Continue Play" ) PORT_DIPLOCATION("DIP2:8")
+	PORT_DIPNAME( 0x80, 0x80, "Double-Up" ) PORT_DIPLOCATION("DIP2:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 

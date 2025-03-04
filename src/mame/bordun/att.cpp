@@ -9,7 +9,10 @@ TODO:
 * this is basically misc/skylncr.cpp without reels and PPIs and with more advanced sound. Merge?
 * outputs
 * lianhp3: title screen says 2003TM but PCB is from 2010? Was this really released in 2003?
-* NVRAM at 0x8000-0x8777
+
+BTANB:
+* sound test for lianhp3 doesn't work. It's still coded to send sound commands to 0xd0, but this games
+  doesn't have an audio CPU.
 */
 
 
@@ -150,7 +153,7 @@ void att_state::att3_io_map(address_map &map)
 	map(0x41, 0x41).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x42, 0x42).w("ramdac", FUNC(ramdac_device::mask_w));
 	map(0x70, 0x70).nopw();  // TODO: NMI clear? NOPed for now as it spams the log
-	// map(0xf6, 0xf6).w // TODO: Oki bank select?
+	map(0xf6, 0xf6).lw8(NAME([this] (uint8_t data) { if (data != 0x00) logerror("Oki bank: %02x\n", data); }));  // TODO: Oki bank select?
 	map(0xf7, 0xf7).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
 
@@ -193,20 +196,20 @@ static INPUT_PORTS_START( lianhp2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no evident effect
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no evident effect
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(4)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(4)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(4)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(4)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no evident effect
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no evident effect
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no evident effect
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no evident effect
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no evident effect
 
 	// SW1 on PCB is the reset button and SW2-5 are the DIP switches
 	// test mode shows SW1-4 for the DIPs

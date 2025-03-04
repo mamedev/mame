@@ -46,14 +46,15 @@ public:
 		m_dsw(*this, "DSW%u", 1U)
 	{ }
 
-	void st0016(machine_config &config);
-	void renju(machine_config &config);
-	void mayjinsn(machine_config &config);
+	void st0016(machine_config &config) ATTR_COLD;
+	void renju(machine_config &config) ATTR_COLD;
+	void mayjinsn(machine_config &config) ATTR_COLD;
 
-	void init_nratechu();
-	void init_mayjinsn();
-	void init_mayjisn2();
-	void init_renju();
+	void init_crownpkr() ATTR_COLD;
+	void init_nratechu() ATTR_COLD;
+	void init_mayjinsn() ATTR_COLD;
+	void init_mayjisn2() ATTR_COLD;
+	void init_renju() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -419,7 +420,7 @@ static INPUT_PORTS_START( crownpkr )
 
 	PORT_MODIFY("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME( "Hold 3 / Low" )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
@@ -433,9 +434,9 @@ static INPUT_PORTS_START( crownpkr )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME( "Hold 2 / High" ) // also Meter Key in test mode
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) // also Reset Key in test mode
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) // Last Game Key in test mode
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
 
 	PORT_MODIFY("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(5)
@@ -819,6 +820,11 @@ void st0016_state::init_nratechu()
 	m_maincpu->set_game_flag(1);
 }
 
+void st0016_state::init_crownpkr()
+{
+	m_maincpu->set_game_flag(2);
+}
+
 void st0016_state::init_mayjinsn()
 {
 	m_maincpu->set_game_flag(4 /*| 0x80*/);
@@ -846,6 +852,6 @@ GAME( 2001, gostop,     0,      st0016,   gostop,   st0016_state, init_renju,   
 
 // Not working
 GAME( 1994, mayjinsn,   0,      mayjinsn, st0016,   st0016_state, init_mayjinsn, ROT0, "Seta",             "Mayjinsen",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, crownpkr,   0,      st0016,   crownpkr, st0016_state, init_nratechu, ROT0, "Unknown",          "Crown Poker (ver. 1.20)", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // coining in doesn't work
-GAME( 1994, dcrown,     0,      st0016,   renju,    st0016_state, init_renju,    ROT0, "Nippon Data Kiki", "Dream Crown (set 1)",     MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // (c) 1994 Nippon Data Kiki is uploaded near the Japanese Insert coin text
-GAME( 1994, dcrowna,    dcrown, st0016,   renju,    st0016_state, init_renju,    ROT0, "Nippon Data Kiki", "Dream Crown (set 2)",     MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // the Insert Coin text has been translated to English and no (c) is uploaded
+GAME( 1997, crownpkr,   0,      st0016,   crownpkr, st0016_state, init_crownpkr, ROT0, "<unknown>",        "Crown Poker (ver. 1.20)", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // coining in doesn't work
+GAME( 1994, dcrown,     0,      st0016,   crownpkr, st0016_state, init_crownpkr, ROT0, "Nippon Data Kiki", "Dream Crown (set 1)",     MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // (c) 1994 Nippon Data Kiki is uploaded near the Japanese Insert coin text
+GAME( 1994, dcrowna,    dcrown, st0016,   crownpkr, st0016_state, init_crownpkr, ROT0, "Nippon Data Kiki", "Dream Crown (set 2)",     MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // the Insert Coin text has been translated to English and no (c) is uploaded
