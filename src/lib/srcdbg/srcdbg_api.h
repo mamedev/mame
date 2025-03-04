@@ -107,7 +107,7 @@ extern "C" {
 
 /*********************************************************************
   Symbol flags
-  
+
   Flags passed to mame_srcdbg_simp_add_global_fixed_symbol to
   customize symbol behavior
 **********************************************************************/
@@ -167,7 +167,7 @@ LIB_PUBLIC int mame_srcdbg_simp_add_line_mapping(void * srcdbg_simp_state, unsig
     [in] srcdbg_simp_state - Handle to source-debugging information file generation, as returned by mame_srcdbg_simp_open_new
     [in] symbol_name - Name of symbol
     [in] symbol_value - Value of symbol (such as an address)
-	[in] symbol_flags - Bitmask from MAME_SRCDBG_SYMFLAG_* values above
+    [in] symbol_flags - Bitmask from MAME_SRCDBG_SYMFLAG_* values above
 */
 LIB_PUBLIC int mame_srcdbg_simp_add_global_fixed_symbol(void * srcdbg_simp_state, const char * symbol_name, int symbol_value, unsigned int symbol_flags);
 

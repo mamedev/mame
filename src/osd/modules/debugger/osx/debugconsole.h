@@ -24,10 +24,10 @@
 	NSSplitView             *regSplit, *dasmSplit;
 	MAMERegistersView       *regView;
 	MAMEDisassemblyView     *dasmView;
-	NSScrollView		    *dasmScroll;
+	NSScrollView            *dasmScroll;
 	MAMESrcDebugView        *srcdbgView;
-	NSPopUpButton			*sourceButton;
-	NSView					*srcdbgContainerView;
+	NSPopUpButton           *sourceButton;
+	NSView                  *srcdbgContainerView;
 	MAMEDebugView           *consoleView;
 	NSTextField             *commandField;
 }

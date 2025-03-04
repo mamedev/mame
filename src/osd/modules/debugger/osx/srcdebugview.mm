@@ -45,7 +45,7 @@
 
 
 - (void)setSourceIndex:(int)index {
- 	debug_view_sourcecode *dv_source = downcast<debug_view_sourcecode *>(view);
+	debug_view_sourcecode *dv_source = downcast<debug_view_sourcecode *>(view);
 	dv_source->set_src_index(index);
 }
 

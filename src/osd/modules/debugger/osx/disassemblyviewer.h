@@ -20,10 +20,10 @@
 {
 	MAMEDisassemblyView *dasmView;
 	NSPopUpButton       *subviewButton;
-	NSView				*dissasemblyGroupView;
-	MAMESrcDebugView	*srcdbgView;
-	NSView				*srcdbgGroupView;
-	NSPopUpButton		*sourceButton;
+	NSView              *dissasemblyGroupView;
+	MAMESrcDebugView    *srcdbgView;
+	NSView              *srcdbgGroupView;
+	NSPopUpButton       *sourceButton;
 }
 
 - (id)initWithMachine:(running_machine &)m console:(MAMEDebugConsole *)c;

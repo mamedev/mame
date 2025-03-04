@@ -339,7 +339,7 @@ void MainWindow::runToCursor(bool changedTo)
 
 bool MainWindow::addressFromCursor(offs_t & address) const
 {
-	debug_view_disasm *const dasmView = 
+	debug_view_disasm *const dasmView =
 		sourceFrameActive() ?
 			m_srcdbgFrame->view()->view<debug_view_disasm>() :
 			m_dasmFrame->view()->view<debug_view_disasm>();
@@ -360,7 +360,7 @@ bool MainWindow::addressFromCursor(offs_t & address) const
 
 const debug_breakpoint * MainWindow::breakpointFromAddress(offs_t address) const
 {
-	debug_view_disasm *const dasmView = 
+	debug_view_disasm *const dasmView =
 		sourceFrameActive() ?
 			m_srcdbgFrame->view()->view<debug_view_disasm>() :
 			m_dasmFrame->view()->view<debug_view_disasm>();
@@ -518,7 +518,7 @@ void MainWindow::unmountImage(bool changedTo)
 
 void MainWindow::codeViewUpdated()
 {
-	debug_view_disasm *const dasmView = 
+	debug_view_disasm *const dasmView =
 		sourceFrameActive() ?
 			m_srcdbgFrame->view()->view<debug_view_disasm>() :
 			m_dasmFrame->view()->view<debug_view_disasm>();

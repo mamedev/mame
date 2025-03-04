@@ -58,7 +58,7 @@ static void normalize_path_map(std::string & path_map)
 			"Invalid value found for option %s: '%s'\n"
 			"There must be an even number of paths, with (an odd number of) semicolons between them",
 			OPTION_SRCDBGPREFIXMAP,
-			path_map);			
+			path_map);
 	}
 
 	normalize_path_separators(path_map);

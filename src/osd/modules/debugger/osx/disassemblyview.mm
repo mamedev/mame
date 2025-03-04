@@ -39,7 +39,7 @@
 		return YES;
 	}
 	else if (action == @selector(sourceDebugChanged:))
-    {
+	{
 		NSWindow *window = [self window];
 		id delegate = [window delegate];
 		BOOL which = [delegate getDisasemblyView];
@@ -52,7 +52,7 @@
 			[item setState:NSControlStateValueOff];
 		}
 
-    	return YES;
+		return YES;
 	}
 	else
 	{
@@ -248,7 +248,7 @@
 - (IBAction)sourceDebugChanged:(id)sender {
 	if ([sender tag] == MENU_SHOW_SOURCE)
 	{
-// 		m_codeDock->setWidget(m_srcdbgFrame);
+//      m_codeDock->setWidget(m_srcdbgFrame);
 		NSWindow *window = [self window];
 		id del = [window delegate];
 		[del setDisasemblyView:true];
@@ -256,7 +256,7 @@
 	}
 	else
 	{
-// 		m_codeDock->setWidget(m_dasmFrame);
+//      m_codeDock->setWidget(m_dasmFrame);
 		NSWindow *window = [self window];
 		id del = [window delegate];
 		[del setDisasemblyView:false];
@@ -317,7 +317,7 @@
 	[menu insertItem:[NSMenuItem separatorItem] atIndex:index++];
 
 	NSMenuItem *showSource = [menu insertItemWithTitle:@"Show Source"
-											    action:@selector(sourceDebugChanged:)
+												action:@selector(sourceDebugChanged:)
 										 keyEquivalent:@"u"
 											   atIndex:index++ ];
 
