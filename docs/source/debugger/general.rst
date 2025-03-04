@@ -43,6 +43,8 @@ General Debugger Commands
     read commands from file and executes them one by one
 :ref:`debugger-command-time`
     prints the current machine time to the console
+:ref:`debugger-command-sdoffset`
+    sets the address offset to be used by source-level debugging
 :ref:`debugger-command-quit`
     exit the debugger and end the emulation session
 
@@ -100,8 +102,10 @@ symlist
 
 Lists registered symbols and their values.  If **<cpu>** is not
 specified, symbols in the global symbol table are displayed; otherwise,
-symbols specific to the device **<cpu>** are displayed.  Symbols are
-listed alphabetically.  Read-only symbols are noted.  See
+symbols specific to the device **<cpu>** are displayed. If a **<cpu>**
+is specified, and :ref:`Source-Level Debugging <srcdbg>` is enabled on that
+CPU, then :ref:`source-level symbols <srcdbg_symbols>` are listed as well.
+Symbols are listed alphabetically.  Read-only symbols are noted.  See
 :ref:`debugger-devicespec` for details on how to specify a CPU.
 
 Examples:
@@ -564,6 +568,23 @@ Examples:
 
 ``time``
     Prints the elapsed emulated time.
+
+Back to :ref:`debugger-general-list`
+
+
+.. _debugger-command-sdoffset:
+
+sdoffset
+--------
+
+Sets the :ref:`address offset <srcdbg_offsets>` to be used by
+:ref:`source-level debugging <srcdbg>`
+
+Examples:
+
+``sdoffset E000``
+    Apply an offset of $E000 to all addresses present
+    in the :ref:`MAME Debugging Information File <srcdbg_mdi>`.
 
 Back to :ref:`debugger-general-list`
 
