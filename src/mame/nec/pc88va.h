@@ -66,10 +66,10 @@ public:
 		, m_sysbank(*this, "sysbank")
 		, m_workram(*this, "workram")
 		, m_tvram(*this, "tvram")
-		, m_gvram(*this, "gvram")
 		, m_fb_regs(*this, "fb_regs")
-		, m_kanji_rom(*this, "kanji")
 		, m_sgp(*this, "sgp")
+		, m_gmsp_view(*this, "gmsp_view")
+		, m_kanji_rom(*this, "kanji")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 	{ }
@@ -107,6 +107,7 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
+	virtual void video_reset() override ATTR_COLD;
 	void palette_init(palette_device &palette) const;
 
 protected:
@@ -131,11 +132,12 @@ private:
 	required_device<address_map_bank_device> m_sysbank;
 	required_shared_ptr<uint16_t> m_workram;
 	required_shared_ptr<uint16_t> m_tvram;
-	required_shared_ptr<uint16_t> m_gvram;
+	std::unique_ptr<uint8_t[]> m_gvram;
 	required_shared_ptr<uint16_t> m_fb_regs;
-	required_region_ptr<u16> m_kanji_rom;
 	required_device<pc88va_sgp_device> m_sgp;
-	std::unique_ptr<uint8_t[]> m_kanjiram;
+	memory_view m_gmsp_view;
+	required_region_ptr<u16> m_kanji_rom;
+	std::unique_ptr<uint8_t[]> m_kanji_ram;
 
 	uint16_t m_bank_reg = 0;
 	uint8_t m_timer3_io_reg = 0;
@@ -191,19 +193,47 @@ private:
 	void r232_ctrl_portc_w(uint8_t data);
 	uint8_t get_slave_ack(offs_t offset);
 
-	uint16_t m_video_pri_reg[2]{};
+	uint16_t m_video_pri_reg[2];
 
-	u16 m_screen_ctrl_reg = 0;
-	bool m_dm = false;
-	bool m_ymmd = false;
-	u16 m_gfx_ctrl_reg = 0;
+	u16 m_screen_ctrl_reg;
+	bool m_dm;
+	bool m_ymmd;
+	u16 m_gfx_ctrl_reg;
 
-	u16 m_color_mode = 0;
-	u8 m_pltm, m_pltp = 0;
+	u16 m_color_mode;
+	u8 m_pltm, m_pltp;
 
-	u16 m_text_transpen = 0;
-	bool m_td = false;
+	u16 m_text_transpen;
+	bool m_td;
 	bitmap_rgb32 m_graphic_bitmap[2];
+
+	struct {
+		bool aacc;
+		u8 gmap;
+		u8 xrpm, xwpm;
+		//bool rbusy;
+		bool cmpen;
+		u8 wss;
+		u8 pmod;
+		u8 rop[4];
+
+		u8 cmpr[4];
+		u8 patr[4][2];
+		u8 prrp, prwp;
+	} m_multiplane;
+
+	struct {
+		//bool rbusy;
+		u8 wss;
+		u8 patr[2];
+		u8 rop[2];
+	} m_singleplane;
+
+	u8 rop_execute(u8 plane_rop, u8 src, u8 dst, u8 pat);
+	u8 gvram_singleplane_r(offs_t offset);
+	void gvram_singleplane_w(offs_t offset, u8 data);
+	u8 gvram_multiplane_r(offs_t offset);
+	void gvram_multiplane_w(offs_t offset, u8 data);
 
 	u16 screen_ctrl_r();
 	void screen_ctrl_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -272,11 +302,11 @@ private:
 
 	void sgp_map(address_map &map) ATTR_COLD;
 
+// TODO: stuff backported from PC8801 as QoL that should really be common
 protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-// TODO: stuff backported from PC8801 as QoL that should really be common
 private:
 	uint8_t misc_ctrl_r();
 	void misc_ctrl_w(uint8_t data);

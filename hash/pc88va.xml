@@ -82,7 +82,7 @@ Operating Systems
 -->
 
 
-<!-- Demos and Utilities -->
+<!-- !Demos -->
 
 	<!-- These three demos all have the same sequences, mislabeled? -->
 	<software name="pc88vad" cloneof="88va2d" supported="no">
@@ -139,6 +139,8 @@ Transition between 3rd and 4th sequences don't look right, [IDP]
 			</dataarea>
 		</part>
 	</software>
+
+<!-- !Applications -->
 
 	<software name="animefrm" supported="no">
 		<!-- PS88-VA101-HMW subtitle on cover -->
@@ -204,6 +206,8 @@ Has unsupported MIF-201 [MIDI] interface cfr. http://www.pc88.gr.jp/vafaq/view.p
 		</part>
 	</software>
 
+<!-- !Operating Systems -->
+
 	<software name="pceva2tb" supported="no">
 		<description>PC-Engine (VA2 Tenpu-ban)</description>
 		<year>1988</year>
@@ -239,7 +243,7 @@ Untested directory NEC_SAMP (cannot type [keyboard] underscore char)
 	</software>
 
 
-<!-- Games -->
+<!-- !Games -->
 
 	<software name="famista" supported="no">
 		<description>Family Stadium</description>
@@ -345,7 +349,7 @@ Winning newspaper screen has [OFX/OFY] bug
 		<year>198?</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<notes><![CDATA[
-Main menu clearing artifacts [ROP]
+Currently conceals/wipes out [GVRAM] display
 ]]></notes>
 		<info name="alt_title" value="マイトアンドマジック" />
 		<info name="usage" value="Boot with Disk C in drive 1"/>
@@ -520,6 +524,7 @@ Needs graphic [OFX/OFY] scroll
 		<year>198?</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<notes><![CDATA[
+Currently conceals/wipes out [GVRAM] display
 Burps on [FDC] access after disk swap with program and player disks, trying to scan chrn=(38, 0, 1, 256)
 ]]></notes>
 		<info name="alt_title" value="ローグアライアンス" />
@@ -876,18 +881,21 @@ Optionally wants kana lock enabled for entering a name for new game [keyboard] i
 
 		<!-- status: baddump for non-factory save 1 -->
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1281968">
 				<rom name="xak 2 (disk 1).d88" size="1281968" crc="cd855b7a" sha1="508e25ca306631be64e69e476d49116e7ac04bce" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1281968">
 				<rom name="xak 2 (disk 2).d88" size="1281968" crc="3927cdcf" sha1="555daba18a61ea2219b5685a850b512dea085cf2" status="baddump"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size="1281968">
 				<rom name="xak 2 (disk 3).d88" size="1281968" crc="42e25779" sha1="897b62c7fdb604f5bb729e0aeb183566e08c4e33" status="baddump"/>
 			</dataarea>
@@ -899,7 +907,7 @@ Optionally wants kana lock enabled for entering a name for new game [keyboard] i
 		<year>1991</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
 		<notes><![CDATA[
-Heavy [ROP] artifacts on intro
+Heavy [ROP] artifacts on intro, runs incredibly slow
 Sprites don't draw properly during gameplay [ROP]
 Ugly pitch for [OPNA] voice samples on intro
 [gfx]s have halved height
@@ -909,24 +917,28 @@ Ugly pitch for [OPNA] voice samples on intro
 		<info name="usage" value="Boot with disk 2 in drive A: for gameplay"/>
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1261568">
 				<rom name="fray - in magical adventure (disk 1).fdi" size="1261568" crc="3a88990a" sha1="252e2589bb8c12800cdd678508b0abd868d0ab83"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1261568">
 				<rom name="fray - in magical adventure (disk 2).fdi" size="1261568" crc="9cbfb7b4" sha1="b040e4ed4e3e516effb1f6997b0f766f4b376ab4"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size="1261568">
 				<rom name="fray - in magical adventure (disk 3).fdi" size="1261568" crc="9f79f4bb" sha1="2d3ebbaa844bd451190d899a7f53829b07b830eb"/>
 			</dataarea>
 		</part>
 
 		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4" />
 			<dataarea name="flop" size="1261568">
 				<rom name="fray - in magical adventure (disk 4).fdi" size="1261568" crc="c074800a" sha1="bf114221bdcc8e6545c4566ae58cea1af324aa9a"/>
 			</dataarea>
@@ -1229,7 +1241,7 @@ All disks fail initial bootstrap [FDC]
 	</software>
 
 
-<!-- Doujin -->
+<!-- !Doujinshi -->
 
 	<software name="ballbrkr" supported="no">
 		<description>Balloon Breaker</description>
@@ -1334,7 +1346,7 @@ Gameplay don't mask bullets on right side, [cliprect]
 [SGP] and [ROP] issues on gameplay
 ]]></notes>
 		<info name="developer" value="Shinra" />
-		<info name="usage" value="Boot a PC Engine OS disk, then swap with this disk and type BASIC PACMAN.BAS to load" />
+		<info name="usage" value="Boot a PC-Engine OS disk, then swap with this disk and type BASIC PACMAN.BAS to load" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1331888">
 				<rom name="pacman.d88" size="1331888" crc="9198eae1" sha1="2abf462b72c29e2ff56ea7c1401836f01b97dfe1"/>
@@ -1342,7 +1354,7 @@ Gameplay don't mask bullets on right side, [cliprect]
 		</part>
 	</software>
 
-	<!-- autobootable version of above, with PC Engine OS embedded -->
+	<!-- autobootable version of above, with PC-Engine OS embedded -->
 	<software name="pacmana" cloneof="pacman" supported="no">
 		<description>Pac-Man (auto-bootable)</description>
 		<year>19??</year>

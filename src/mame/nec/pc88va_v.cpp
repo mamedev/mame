@@ -28,10 +28,14 @@
 
 void pc88va_state::video_start()
 {
+	const u32 gvram_size = 0x40000;
+	m_gvram = std::make_unique<uint8_t[]>(gvram_size);
+	std::fill_n(m_gvram.get(), gvram_size, 0);
+
 	const u32 kanjiram_size = 0x4000;
-	m_kanjiram = std::make_unique<uint8_t[]>(kanjiram_size);
-	m_gfxdecode->gfx(2)->set_source(m_kanjiram.get());
-	m_gfxdecode->gfx(3)->set_source(m_kanjiram.get());
+	m_kanji_ram = std::make_unique<uint8_t[]>(kanjiram_size);
+	m_gfxdecode->gfx(2)->set_source(m_kanji_ram.get());
+	m_gfxdecode->gfx(3)->set_source(m_kanji_ram.get());
 	m_vrtc_irq_line = 432;
 
 	for (int i = 0; i < 2; i++)
@@ -45,9 +49,15 @@ void pc88va_state::video_start()
 
 	save_item(NAME(m_text_transpen));
 	save_pointer(NAME(m_video_pri_reg), 2);
-	save_pointer(NAME(m_kanjiram), kanjiram_size);
+	save_pointer(NAME(m_gvram), gvram_size);
+	save_pointer(NAME(m_kanji_ram), kanjiram_size);
 
 	save_item(NAME(m_vrtc_irq_line));
+}
+
+void pc88va_state::video_reset()
+{
+	m_text_transpen = 0;
 }
 
 void pc88va_state::palette_init(palette_device &palette) const
@@ -68,7 +78,6 @@ void pc88va_state::palette_init(palette_device &palette) const
 			palette.set_pen_color(i + pal_base * 16, r, g, b);
 	}
 }
-
 
 uint32_t pc88va_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -607,7 +616,7 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 							if(!split_cliprect.contains(res_x, res_y))
 								continue;
 
-							int pen = m_kanjiram[(( yi * 2 ) + lr_half_gfx) + tile_num] >> (7 - xi) & 1;
+							int pen = m_kanji_ram[(( yi * 2 ) + lr_half_gfx) + tile_num] >> (7 - xi) & 1;
 
 							if(reverse)
 								pen = pen & 1 ? bg_col : fg_col;
@@ -795,8 +804,6 @@ void pc88va_state::draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cli
 
 void pc88va_state::draw_indexed_gfx_1bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u8 pal_base)
 {
-	uint8_t *gvram = (uint8_t *)m_gvram.target();
-
 	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		const u32 line_offset = (((y * 640) / 8) + fb_start_offset) & 0x3ffff;
@@ -808,7 +815,7 @@ void pc88va_state::draw_indexed_gfx_1bpp(bitmap_rgb32 &bitmap, const rectangle &
 
 			for (int xi = 0; xi < 8; xi ++)
 			{
-				uint32_t color = (gvram[bitmap_offset] >> (7 - xi)) & 1;
+				uint32_t color = (m_gvram[bitmap_offset] >> (7 - xi)) & 1;
 				int res_x = x + xi;
 
 				if(color && cliprect.contains(res_x, y))
@@ -820,8 +827,6 @@ void pc88va_state::draw_indexed_gfx_1bpp(bitmap_rgb32 &bitmap, const rectangle &
 
 void pc88va_state::draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u32 display_start_offset, u8 pal_base, u16 fb_width, u16 fb_height)
 {
-	uint8_t *gvram = (uint8_t *)m_gvram.target();
-
 //  const u16 y_min = std::max(cliprect.min_y, y_start);
 //  const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
 
@@ -838,7 +843,7 @@ void pc88va_state::draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &
 
 			for (int xi = 0; xi < 2; xi ++)
 			{
-				u8 color = (gvram[bitmap_offset] >> (xi ? 0 : 4)) & 0xf;
+				u8 color = (m_gvram[bitmap_offset] >> (xi ? 0 : 4)) & 0xf;
 
 				if(color && cliprect.contains(x + xi, y))
 					bitmap.pix(y, x + xi) = m_palette->pen(color + pal_base);
@@ -849,8 +854,6 @@ void pc88va_state::draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &
 
 void pc88va_state::draw_packed_gfx_5bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u32 display_start_offset, u8 pal_base, u16 fb_width, u16 fb_height)
 {
-	uint8_t *gvram = (uint8_t *)m_gvram.target();
-
 //  const u16 y_min = std::max(cliprect.min_y, y_start);
 //  const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
 
@@ -864,7 +867,7 @@ void pc88va_state::draw_packed_gfx_5bpp(bitmap_rgb32 &bitmap, const rectangle &c
 		{
 			u32 bitmap_offset = line_offset + x;
 
-			u8 color = gvram[bitmap_offset] & 0x1f;
+			u8 color = m_gvram[bitmap_offset] & 0x1f;
 
 			if(color && cliprect.contains(x, y))
 				bitmap.pix(y, x) = m_palette->pen(color);
@@ -874,8 +877,6 @@ void pc88va_state::draw_packed_gfx_5bpp(bitmap_rgb32 &bitmap, const rectangle &c
 
 void pc88va_state::draw_direct_gfx_8bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u16 fb_width, u16 fb_height)
 {
-	uint8_t *gvram = (uint8_t *)m_gvram.target();
-
 //  const u16 y_min = std::max(cliprect.min_y, y_start);
 //  const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
 
@@ -887,7 +888,7 @@ void pc88va_state::draw_direct_gfx_8bpp(bitmap_rgb32 &bitmap, const rectangle &c
 		{
 			u32 bitmap_offset = line_offset + x;
 
-			uint32_t color = (gvram[bitmap_offset] & 0xff);
+			uint32_t color = (m_gvram[bitmap_offset] & 0xff);
 
 			// boomer suggests that transparency is calculated over just color = 0, may be settable?
 			// TODO: may not be clamped to palNbit
@@ -904,8 +905,6 @@ void pc88va_state::draw_direct_gfx_8bpp(bitmap_rgb32 &bitmap, const rectangle &c
 
 void pc88va_state::draw_direct_gfx_rgb565(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u16 fb_width, u16 fb_height)
 {
-	uint8_t *gvram = (uint8_t *)m_gvram.target();
-
 //  const u16 y_min = std::max(cliprect.min_y, y_start);
 //  const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
 
@@ -917,7 +916,7 @@ void pc88va_state::draw_direct_gfx_rgb565(bitmap_rgb32 &bitmap, const rectangle 
 		{
 			u32 bitmap_offset = (line_offset + x) << 1;
 
-			uint16_t color = (gvram[bitmap_offset] & 0xff) | (gvram[bitmap_offset + 1] << 8);
+			uint16_t color = (m_gvram[bitmap_offset] & 0xff) | (m_gvram[bitmap_offset + 1] << 8);
 
 			if(cliprect.contains(x, y))
 			{
@@ -932,8 +931,6 @@ void pc88va_state::draw_direct_gfx_rgb565(bitmap_rgb32 &bitmap, const rectangle 
 
 void pc88va_state::draw_packed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u32 display_start_offset, u8 pal_base, u16 fb_width, u16 fb_height)
 {
-	uint8_t *gvram = (uint8_t *)m_gvram.target();
-
 //  const u16 y_min = std::max(cliprect.min_y, y_start);
 //  const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
 
@@ -950,7 +947,7 @@ void pc88va_state::draw_packed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &c
 			{
 				u8 color = 0;
 				for (int bank_num = 0; bank_num < 4; bank_num ++)
-					color |= ((gvram[bitmap_offset + bank_num * 0x10000] >> (7 - xi)) & 1) << bank_num;
+					color |= ((m_gvram[bitmap_offset + bank_num * 0x10000] >> (7 - xi)) & 1) << bank_num;
 
 				if(color && cliprect.contains(x + xi, y))
 					bitmap.pix(y, x + xi) = m_palette->pen(color + pal_base);
@@ -1615,7 +1612,7 @@ u8 pc88va_state::kanji_cg_r()
 		// jis2 = 0x21 / 0x22 "PC" on hovered top status bar for animefrm
 		// NB: software reverts the two chars once it gets upped to bitmap layer.
 		const u32 pcg_addr = ((m_kanji_cg_jis[1] & 0x1f) + ((m_kanji_cg_jis[1] & 0x60) << 1)) * 0x20;
-		return m_kanjiram[pcg_addr + (m_kanji_cg_line << 1) + (m_kanji_cg_lr ^ 1)];
+		return m_kanji_ram[pcg_addr + (m_kanji_cg_line << 1) + (m_kanji_cg_lr ^ 1)];
 	}
 
 	const u32 kanji_address = calc_kanji_rom_addr(m_kanji_cg_jis[0] + 0x20, m_kanji_cg_jis[1], 0, 0);
@@ -1652,3 +1649,157 @@ void pc88va_state::text_control_1_w(u8 data)
 	if ((data & 0x7d) != 1)
 		LOG("I/O $148 write %02x\n", data);
 }
+
+
+/****************************************
+ * GVRAM
+ ***************************************/
+
+u8 pc88va_state::rop_execute(u8 plane_rop, u8 src, u8 dst, u8 pat)
+{
+	u8 res = 0;
+
+	for (int i = 0; i < 8; i++)
+	{
+		if (BIT(plane_rop, i))
+		{
+			u8 src_data = BIT(i, 0) ? src : ~src;
+			u8 dst_data = BIT(i, 1) ? dst : ~dst;
+			u8 pat_data = BIT(i, 2) ? pat : ~pat;
+			res |= src_data & dst_data & pat_data;
+		}
+	}
+	return res;
+}
+
+u8 pc88va_state::gvram_multiplane_r(offs_t offset)
+{
+	if (m_multiplane.aacc)
+	{
+		u32 address = (offset & 0x7fff) | (m_multiplane.gmap << 15);
+		u8 res = 0xff;
+		for (int plane = 0; plane < 4; plane++)
+		{
+			if (!BIT(m_multiplane.xrpm, plane))
+			{
+				const u8 src = m_gvram[address | plane * 0x10000];
+				// Comparison enable
+				if (m_multiplane.cmpen)
+					res &= ~(src ^ m_multiplane.cmpr[plane]);
+				else
+					res &= src;
+
+				// update on reads
+				if (BIT(m_multiplane.pmod, 0) && !machine().side_effects_disabled())
+				{
+					m_multiplane.patr[plane][BIT(m_multiplane.prwp, plane)] = src;
+				}
+			}
+		}
+
+		// flip register indices on 16-bit mode
+		if ((m_multiplane.pmod & 5) == 5 && !machine().side_effects_disabled())
+		{
+			m_multiplane.prwp ^= 0xf;
+		}
+
+		return res;
+	}
+
+	return gvram_singleplane_r(offset);
+}
+
+void pc88va_state::gvram_multiplane_w(offs_t offset, u8 data)
+{
+	if (m_multiplane.aacc)
+	{
+		u32 address = (offset & 0x7fff) | (m_multiplane.gmap << 15);
+		for (int plane = 0; plane < 4; plane++)
+		{
+			if (!BIT(m_multiplane.xwpm, plane))
+			{
+				switch(m_multiplane.wss & 3)
+				{
+					// ROP
+					case 0:
+					{
+						const u8 src = m_gvram[address | plane * 0x10000];
+						m_gvram[address | plane * 0x10000] = rop_execute(
+							m_multiplane.rop[plane],
+							src,
+							data,
+							m_multiplane.patr[plane][BIT(m_multiplane.prrp, plane)]
+						);
+
+						// update pattern on writes
+						if (BIT(m_multiplane.pmod, 1))
+						{
+							m_multiplane.patr[plane][BIT(m_multiplane.prwp, plane)] = src;
+						}
+						break;
+					}
+					// Pattern
+					case 1:
+						m_gvram[address | plane * 0x10000] = m_multiplane.patr[plane][BIT(m_multiplane.prrp, plane)];
+						break;
+					// Normal writes
+					case 2:
+						m_gvram[address | plane * 0x10000] = data;
+						break;
+					// NOP
+					case 3:
+						break;
+				}
+			}
+		}
+
+		// flip register indices on 16-bit mode
+		if (BIT(m_multiplane.pmod, 2))
+		{
+			m_multiplane.prrp ^= 0xf;
+			if (BIT(m_multiplane.pmod, 1))
+				m_multiplane.prwp ^= 0xf;
+		}
+		return;
+	}
+
+	gvram_singleplane_w(offset, data);
+}
+
+u8 pc88va_state::gvram_singleplane_r(offs_t offset)
+{
+	// apparently no side effects on reads
+	return m_gvram[offset];
+}
+
+void pc88va_state::gvram_singleplane_w(offs_t offset, u8 data)
+{
+	const u8 page_bank = BIT(offset, 17);
+	switch(m_singleplane.wss & 3)
+	{
+		// ROP
+		case 0:
+		{
+			const u8 src = m_gvram[offset];
+			m_gvram[offset] = rop_execute(
+				m_singleplane.rop[page_bank],
+				src,
+				data,
+				m_singleplane.patr[page_bank]
+			);
+			break;
+		}
+		// Pattern
+		case 1:
+			m_gvram[offset] = m_singleplane.patr[page_bank];
+			break;
+		// Normal writes
+		case 2:
+			m_gvram[offset] = data;
+			break;
+		// NOP
+		case 3:
+			break;
+	}
+}
+

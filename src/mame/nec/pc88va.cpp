@@ -9,44 +9,44 @@ Here be dragons, a mostly compatible PC-8801 with extra V3 Mode for superset.
 
 TODO:
 - pc88va (stock version) has two bogus opcodes.
-	One is at 0xf0b15 (0x0f 0xfe), another at 0xf0b31 (br 1000h:0c003h).
-	Latter will make the program flow to jump to lalaland.
-	This also happens if you load a regular V1/V2 game assuming you have FDC PIO properly
-	hooked up, is the first opcode actually a Z80 mode switch?
+  One is at 0xf0b15 (0x0f 0xfe), another at 0xf0b31 (br 1000h:0c003h).
+  Latter will make the program flow to jump to lalaland.
+  This also happens if you load a regular V1/V2 game assuming you have FDC PIO properly
+  hooked up, is the first opcode actually a Z80 mode switch?
 - pc88va is also known to have a slightly different banking scheme and
-	regular YM2203 as default sound board.
+  regular YM2203 as default sound board.
 - video emulation is lacking many features, cfr. pc88va_v.cpp;
 - keyboard runs on undumped MCU, we currently stick irqs together on
-	selected keys in order to have an easier QoL while testing this.
+  selected keys in order to have an easier QoL while testing this.
 - Backport from PC-8801 main map, apply supersets where applicable;
-	\- IDP has EMUL for upd3301
-	\- In emulation mode HW still relies to a i8214, so it bridges thru
-		main ICU in cascaded mode via IRQ7;
-	\- beeper or dac1bit (to be confirmed);
-	\- (other stuff ...)
+  \- IDP has EMUL for upd3301
+  \- In emulation mode HW still relies to a i8214, so it bridges thru
+     main ICU in cascaded mode via IRQ7;
+  \- beeper or dac1bit (to be confirmed);
+  \- (other stuff ...)
 - Convert FDC usage to pc88va2_fd_if_device, we also need PIO comms for sorcer anyway;
 - irq dispatch needs to be revisited, too many instances of sound irq failing for example.
-	The current hook-ups aren't legal, V50 core bug?
+  The current hook-ups aren't legal, V50 core bug?
 - Very inconsistent SW boot behaviours, either down to:
-	\- the current hack in FDC PIO port returning RNG;
-	\- V50 timings;
-	\- FDC;
+  \- the current hack in FDC PIO port returning RNG;
+  \- V50 timings;
+  \- FDC;
 - Every PC Engine OS boot tries to write TVRAM ASCII data on every boot to
-	$exxxx ROM region, banking bug?
+  $exxxx ROM region, banking bug?
 - all N88 BASIC entries tries to do stuff with EMM, more banking?
 - Convert SASI from PC-9801 to a shared C-Bus device, apparently it's same i/f;
 - Is C-Bus I/O space shifted by +$200, as per micromus MIDI access at $e2d2?
 
 (old notes, to be reordered)
 - fdc "intelligent mode" has 0x7f as irq vector ... 0x7f is ld a,a and it IS NOT correctly
-	hooked up by the current z80 core
+  hooked up by the current z80 core
 - Fix floppy motor hook-up (floppy believes to be always in even if empty drive);
 - Support for PC8801 compatible mode & PC80S31K (floppy interface);
 
 Notes:
 - hold F8 at POST to bring software dip settings menu
 - PC-88VA-91 is a ROM upgrade kit for a PC-88VA -> VA2/VA3.
-	Has four roms, marked by VAEG as VUROM00.ROM, VUROM08.ROM, VUROM1.ROM, VUDIC.ROM.
+  Has four roms, marked by VAEG as VUROM00.ROM, VUROM08.ROM, VUROM1.ROM, VUDIC.ROM.
 
 References:
 - PC-88VAテクニカルマニュアル
@@ -89,16 +89,18 @@ brk 8Ch AH=02h read calendar clock -> CH = hour, CL = minutes, DH = seconds, DL 
 #include <iostream>
 #include "utf8.h"
 
-#define LOG_FDC     (1U << 2) // $1b0-$1b2 accesses
-#define LOG_FDC2    (1U << 3) // $1b4-$1b6 accesses (verbose)
+#define LOG_FDC      (1U << 2) // $1b0-$1b2 accesses
+#define LOG_FDC2     (1U << 3) // $1b4-$1b6 accesses (verbose)
+#define LOG_GFXCTRL  (1U << 4) // $5xx accesses
 
-#define VERBOSE (LOG_GENERAL | LOG_FDC)
+#define VERBOSE (LOG_GENERAL | LOG_FDC | LOG_GFXCTRL)
 //#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
 
 #define LOGFDC(...)      LOGMASKED(LOG_FDC, __VA_ARGS__)
 #define LOGFDC2(...)     LOGMASKED(LOG_FDC2, __VA_ARGS__)
+#define LOGGFXCTRL(...)  LOGMASKED(LOG_GFXCTRL, __VA_ARGS__)
 
 // TODO: verify clocks
 #define MASTER_CLOCK    XTAL(8'000'000) // may be XTAL(31'948'800) / 4? (based on PC-8801 and PC-9801)
@@ -108,13 +110,13 @@ brk 8Ch AH=02h read calendar clock -> CH = hour, CL = minutes, DH = seconds, DL 
 
 uint8_t pc88va_state::kanji_ram_r(offs_t offset)
 {
-	return m_kanjiram[offset];
+	return m_kanji_ram[offset];
 }
 
 // TODO: settings area should be write protected depending on the m_backupram_wp bit, separate from this
 void pc88va_state::kanji_ram_w(offs_t offset, uint8_t data)
 {
-	m_kanjiram[offset] = data;
+	m_kanji_ram[offset] = data;
 	m_gfxdecode->gfx(2)->mark_dirty(offset / 8);
 	m_gfxdecode->gfx(3)->mark_dirty(offset / 32);
 }
@@ -185,6 +187,7 @@ void pc88va_state::rtc_w(offs_t offset, u8 data)
 void pc88va_state::bios_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bank_reg);
+	m_gmsp_view.select(BIT(m_bank_reg, 12));
 
 	/* SMBC */
 	m_sysbank->set_bank((m_bank_reg & 0xf00) >> 8);
@@ -510,9 +513,9 @@ TIMER_CALLBACK_MEMBER(pc88va_state::t3_mouse_callback)
 uint8_t pc88va_state::backupram_dsw_r(offs_t offset)
 {
 	if(offset == 0)
-		return m_kanjiram[0x1fc2 / 2] & 0xff;
+		return m_kanji_ram[0x1fc2 / 2] & 0xff;
 
-	return m_kanjiram[0x1fc6 / 2] & 0xff;
+	return m_kanji_ram[0x1fc6 / 2] & 0xff;
 }
 
 // TODO: pc8801_state::port31_w
@@ -552,13 +555,15 @@ void pc88va_state::main_map(address_map &map)
 
 void pc88va_state::sysbank_map(address_map &map)
 {
-	// 0 select bus slot
+	// 0 select C-bus slot
 	// 1 tvram
 	map(0x040000, 0x04ffff).ram().share("tvram");
 	// FIXME: BASIC and pacmana expects to r/w to 0x60000-0x7ffff on loading, assume mirror if not a core bug.
 	map(0x050000, 0x07ffff).ram();
 	// 4 gvram
-	map(0x100000, 0x13ffff).ram().share("gvram");
+	map(0x100000, 0x13ffff).view(m_gmsp_view);
+	m_gmsp_view[0](0x100000, 0x13ffff).rw(FUNC(pc88va_state::gvram_multiplane_r), FUNC(pc88va_state::gvram_multiplane_w));
+	m_gmsp_view[1](0x100000, 0x13ffff).rw(FUNC(pc88va_state::gvram_singleplane_r), FUNC(pc88va_state::gvram_singleplane_w));
 	// 8-9 kanji
 	// Kanji ROM
 	map(0x200000, 0x23ffff).rom().region("kanji", 0x00000);
@@ -580,7 +585,11 @@ void pc88va_state::sgp_map(address_map &map)
 	map(0x140000, 0x14ffff).rom().region("kanji", 0x40000);
 	map(0x150000, 0x153fff).rw(FUNC(pc88va_state::kanji_ram_r),FUNC(pc88va_state::kanji_ram_w));
 	map(0x180000, 0x18ffff).ram().share("tvram");
-	map(0x200000, 0x23ffff).ram().share("gvram");
+	// Assume just raw writes to GVRAM
+	map(0x200000, 0x23ffff).lrw8(
+		NAME([this] (offs_t offset) { return m_gvram[offset]; }),
+		NAME([this] (offs_t offset, u8 data) { m_gvram[offset] = data; })
+	);
 }
 
 // TODO: I/O 0x00xx is almost same as pc8801
@@ -661,22 +670,155 @@ void pc88va_state::io_map(address_map &map)
 
 	map(0x0500, 0x0507).m(m_sgp, FUNC(pc88va_sgp_device::sgp_io));
 	// GVRAM multiplane access regs (ROP section)
-//  map(0x0510, 0x0510) AACC extend access mode
-//  map(0x0512, 0x0512) GMAP block switch
-//  map(0x0514, 0x0514) XRPMn plane readback select
-//  map(0x0516, 0x0516) XWPMn plane write select
-//  map(0x0518, 0x0518) multiplane enable
-//  map(0x0520, 0x0527).umask16(0x00ff) extended access bit comparison
+	// TODO: register are locked with GMSP = 1
+	map(0x0510, 0x0510).lrw8(
+		NAME([this] (offs_t offset) {
+			LOGGFXCTRL("AACC extend access mode R\n");
+			return m_multiplane.aacc;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_multiplane.aacc = !!BIT(data, 0);
+			LOGGFXCTRL("AACC extend access mode W %02x\n", data);
+		})
+	);
+	map(0x0512, 0x0512).lrw8(
+		NAME([this] (offs_t offset) {
+			LOGGFXCTRL("GMAP block switch R\n");
+			return m_multiplane.gmap;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOGGFXCTRL("GMAP block switch W %02x\n", data);
+			m_multiplane.gmap = !!BIT(data, 0);
+		})
+	);
+	map(0x0514, 0x0514).lrw8(
+		NAME([this] (offs_t offset) {
+			LOGGFXCTRL("XRPMn plane readback select R\n");
+			return m_multiplane.xrpm | 0xf0;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOGGFXCTRL("XRPMn plane readback select W %02x\n", data);
+			m_multiplane.xrpm = data & 0xf;
+		})
+	);
+	map(0x0516, 0x0516).lrw8(
+		NAME([this] (offs_t offset) {
+			LOGGFXCTRL("XWPMn plane write select R\n");
+			return m_multiplane.xwpm | 0xf0;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOGGFXCTRL("XWPMn plane write select W %02x\n", data);
+			m_multiplane.xwpm = data & 0xf;
+		})
+	);
+	map(0x0518, 0x0518).lrw8(
+		NAME([this] (offs_t offset) {
+			// TODO: rbusy reads (bit 7)
+			return (m_multiplane.cmpen << 5) | (m_multiplane.wss << 3) | (m_multiplane.pmod << 0);
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOGGFXCTRL("Multiplane Mode W %02x\n", data);
+			// PMOD bit 2 1 -> 0 transitions resets pattern pointers
+			if (BIT(m_multiplane.pmod, 2) && !BIT(data, 2))
+			{
+				m_multiplane.prrp = 0;
+				m_multiplane.prwp = 0;
+			}
+
+			m_multiplane.cmpen = !!BIT(data, 5);
+			m_multiplane.wss = (data >> 3) & 3;
+			m_multiplane.pmod = (data >> 0) & 7;
+		})
+	);
+	map(0x0520, 0x0527).umask16(0x00ff).lrw8(
+		NAME([this] (offs_t offset) {
+			LOGGFXCTRL("CMPR extended access bit comparison R\n");
+			return m_multiplane.cmpr[offset];
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOGGFXCTRL("CMPR extended access bit comparison W %02x\n", data);
+			m_multiplane.cmpr[offset] = data;
+		})
+	);
 //  map(0x0528, 0x0528) extended access plane comparison
-//  map(0x0530, 0x0537).umask16(0x00ff) extended access pattern low byte
-//  map(0x0540, 0x0547).umask16(0x00ff) extended access pattern high byte
-//  map(0x0550, 0x0550) PRRPn plane pattern usage start byte on read
-//  map(0x0552, 0x0552) PRWPn plane pattern usage start byte on write
-//  map(0x0560, 0x0567).umask16(0x00ff) ROP plane code
+	map(0x0530, 0x0537).umask16(0x00ff).lrw8(
+		NAME([this] (offs_t offset) {
+			LOGGFXCTRL("Multiplane PATRL%d R\n", offset);
+			return m_multiplane.patr[offset][0];
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOGGFXCTRL("Multiplane PATRL%d W %02x\n", offset, data);
+			m_multiplane.patr[offset][0] = data;
+		})
+	);
+	map(0x0540, 0x0547).umask16(0x00ff).lrw8(
+		NAME([this] (offs_t offset) {
+			LOGGFXCTRL("PATRH%d R\n", offset);
+			return m_multiplane.patr[offset][1];
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOGGFXCTRL("PATRH%d W %02x\n", offset, data);
+			m_multiplane.patr[offset][1] = data;
+		})
+	);
+	map(0x0550, 0x0550).umask16(0x00ff).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_multiplane.prrp | 0xf0;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOGGFXCTRL("PRRPn plane pattern usage start byte on read %02x\n", data);
+			m_multiplane.prrp = data & 0xf;
+		})
+	);
+	map(0x0552, 0x0552).umask16(0x00ff).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_multiplane.prwp | 0xf0;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOGGFXCTRL("PRWPn plane pattern usage start byte on write %02x\n", data);
+			m_multiplane.prwp = data & 0xf;
+		})
+	);
+	map(0x0560, 0x0567).umask16(0x00ff).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_multiplane.rop[offset];
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOGGFXCTRL("Multiplane ROP %d W %02x\n", offset, data);
+			m_multiplane.rop[offset] = data;
+		})
+	);
 	// GVRAM single plane access regs
-//  map(0x0580, 0x0580) single plane enable
-//  map(0x0590, 0x0593) GVRAM pattern register settings
-//  map(0x05a0, 0x05a3) ROP plane code
+	// TODO: register are locked with GMSP = 0
+	map(0x0580, 0x0580).lrw8(
+		NAME([this] (offs_t offset) {
+			// TODO: rbusy reads (bit 7)
+			return (m_singleplane.wss << 3);
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOGGFXCTRL("Singleplane Mode W %02x\n", data);
+			m_singleplane.wss = (data >> 3) & 3;
+		})
+	);
+	map(0x0590, 0x0593).umask16(0x00ff).lrw8(
+		NAME([this] (offs_t offset) {
+			LOGGFXCTRL("Singleplane PATRL%d R\n", offset);
+			return m_singleplane.patr[offset];
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOGGFXCTRL("Singleplane PATRL%d W %02x\n", offset, data);
+			m_singleplane.patr[offset] = data;
+		})
+	);
+	map(0x05a0, 0x05a3).umask16(0x00ff).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_singleplane.rop[offset];
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOGGFXCTRL("Singleplane ROP %d W %02x\n", offset, data);
+			m_singleplane.rop[offset] = data;
+		})
+	);
 
 //  map(0x1000, 0xfeff) PC-88VA expansion boards
 //  map(0xe2d2, 0xe2d2) MIDI status in micromus
