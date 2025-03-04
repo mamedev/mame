@@ -21,7 +21,7 @@
 #define TI99_CARTSC_C000 "memc000"
 #define TI99_CARTSC_RAM "ram"
 
-DEFINE_DEVICE_TYPE(TI99_ARCTURUS, bus::ti99::sidecar::arcturus_device, "arcturus", "Arcturus sidecar cartridge")
+DEFINE_DEVICE_TYPE(TI99_ARCTURUS, bus::ti99::sidecar::arcturus_device, "ti99_arcturus", "Arcturus sidecar cartridge")
 
 namespace bus::ti99::sidecar {
 
