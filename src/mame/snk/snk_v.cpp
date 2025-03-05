@@ -671,9 +671,15 @@ void bermudat_state::tdfever_spriteram_w(offs_t offset, uint8_t data)
 
 /**************************************************************************************/
 
-void marvins_state::marvins_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, const int scrollx, const int scrolly, const int from, const int to)
+void marvins_state::marvins_draw_sprites(
+		bitmap_ind16 &bitmap,
+		const rectangle &cliprect,
+		const int scrollx,
+		const int scrolly,
+		const int from,
+		const int to)
 {
-	gfx_element *gfx = m_gfxdecode->gfx(3);
+	gfx_element *const gfx = m_gfxdecode->gfx(3);
 
 	const uint8_t *source = m_spriteram + from * 4;
 	const uint8_t *finish = m_spriteram + to * 4;
@@ -715,7 +721,7 @@ void marvins_state::marvins_draw_sprites(bitmap_ind16 &bitmap, const rectangle &
 
 void snk_state::tnk3_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, const int xscroll, const int yscroll)
 {
-	gfx_element *gfx = m_gfxdecode->gfx(2);
+	gfx_element *const gfx = m_gfxdecode->gfx(2);
 	const int size = gfx->width();
 
 	/* jcross and sgladiat have only 25 sprites, the others 50 */
@@ -773,9 +779,16 @@ void snk_state::tnk3_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 }
 
 
-void ikari_state::ikari_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, const int start, const int xscroll, const int yscroll, const uint8_t *source, const int gfxnum )
+void ikari_state::ikari_draw_sprites(
+		bitmap_ind16 &bitmap,
+		const rectangle &cliprect,
+		const int start,
+		const int xscroll,
+		const int yscroll,
+		const uint8_t *source,
+		const int gfxnum)
 {
-	gfx_element *gfx = m_gfxdecode->gfx(gfxnum);
+	gfx_element *const gfx = m_gfxdecode->gfx(gfxnum);
 	const int size = gfx->width();
 
 	const int finish = (start + 25) * 4;
@@ -841,10 +854,18 @@ byte3: attributes
     -xx-x--- (bank number)
     x------- (x offset bit8)
 */
-void bermudat_state::tdfever_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,   const int xscroll, const int yscroll, const uint8_t *source, const int gfxnum,
-										const bool hw_xflip, const int from, const int to)
+void bermudat_state::tdfever_draw_sprites(
+		bitmap_ind16 &bitmap,
+		const rectangle &cliprect,
+		const int xscroll,
+		const int yscroll,
+		const uint8_t *source,
+		const int gfxnum,
+		const bool hw_xflip,
+		const int from,
+		const int to)
 {
-	gfx_element *gfx = m_gfxdecode->gfx(gfxnum);
+	gfx_element *const gfx = m_gfxdecode->gfx(gfxnum);
 	const int size = gfx->width();
 
 	for (int which = from * 4; which < to * 4; which += 4)
