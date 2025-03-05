@@ -2772,7 +2772,7 @@ Notes:
                 to be a microcontroller with internal ROM. When identically marked chips are swapped between
                 these two games the POST reports an error with this chip. When the chip is swapped back to
                 the correct board it works fine. The same chip was also swapped from San Se Caishen and also
-                shows this chip with a POST error.
+                shows this chip with a POST error. This has been verified not to be an 8x51 or MX10EXA.
 */
 
 ROM_START( hgly )

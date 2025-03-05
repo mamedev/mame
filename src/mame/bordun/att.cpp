@@ -6,7 +6,7 @@ Bordun poker games on ATT / ATT III PCBs
 
 
 TODO:
-* this is basically misc/skylncr.cpp without reels and PPIs and with more advanced sound. Merge?
+* this is basically bordun/skylncr.cpp without reels and PPIs and with more advanced sound. Merge?
 * outputs
 * lianhp3: title screen says 2003TM but PCB is from 2010? Was this really released in 2003?
 

@@ -18,6 +18,7 @@ TODO:
    dispensed" than the number of coins/tickets the games are supposed to
    pay out.
  * xyddzhh: Hook up mahjong-style inputs and improve DSW definitions
+ * xyddzhh: Add Oki banking
 
 ***************************************************************************/
 
@@ -471,6 +472,7 @@ void bmcpokr_state::xyddzhh_map(address_map &map)
 {
 	bmcpokr_mem(map);
 
+	map(0x00eec6, 0x00eec9).nopw(); // bug in the code?
 	map(0x330000, 0x330001).r(FUNC(bmcpokr_state::xyddzhh_prot_r));
 	map(0x340009, 0x340009).lr8(NAME([] () -> uint8_t { return 0xff; })); // andi.b  #$7f, so returning 0x00 stops it from working
 	map(0x360000, 0x360001).r(FUNC(bmcpokr_state::xyddzhh_dsw_r));
@@ -1633,4 +1635,4 @@ GAME( 1998, fengyunh, 0,        fengyunh, fengyunh, bmcpokr_state, empty_init, R
 GAME( 1998, shendeng, mjmaglmp, shendeng, shendeng, bmcpokr_state, empty_init, ROT0, "BMC",       "Pili Shen Deng",           MACHINE_SUPPORTS_SAVE )
 GAME( 1999, bmcpokr,  0,        bmcpokr,  bmcpokr,  bmcpokr_state, empty_init, ROT0, "BMC",       "Dongfang Shenlong",        MACHINE_SUPPORTS_SAVE )
 GAME( 2000, mjmaglmp, 0,        mjmaglmp, mjmaglmp, bmcpokr_state, empty_init, ROT0, "BMC",       "Mahou no Lamp (v. JAA02)", MACHINE_SUPPORTS_SAVE )
-GAME( 2006, xyddzhh,  0,        xyddzhh,  xyddzhh,  bmcpokr_state, empty_init, ROT0, "Herb Home", "Xingyun Dou Dizhu",        MACHINE_SUPPORTS_SAVE )
+GAME( 2006, xyddzhh,  0,        xyddzhh,  xyddzhh,  bmcpokr_state, empty_init, ROT0, "Herb Home", "Xingyun Dou Dizhu",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

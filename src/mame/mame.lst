@@ -20514,6 +20514,10 @@ tarzanb
 tarzanc
 tjsb
 
+@source:igs/igs_68k_023vid.cpp
+xypmd
+xypmda
+
 @source:igs/igs_fear.cpp
 fearless
 icescape
@@ -42760,6 +42764,9 @@ hprotr8a
 @source:skeleton/ht68k.cpp
 ht68k
 
+@source:skeleton/huangyeh_m68k.cpp
+wlzb
+
 @source:skeleton/hudson_poems.cpp
 marimba
 poembase
@@ -43071,6 +43078,9 @@ semcrossw
 
 @source:skeleton/seoul88.cpp
 seoul88
+
+@source:skeleton/sgm.cpp
+wpddz
 
 @source:skeleton/sh4robot.cpp
 sh4robot
