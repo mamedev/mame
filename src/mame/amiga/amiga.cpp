@@ -354,13 +354,6 @@ public:
 	u16 clock_r(offs_t offset);
 	void clock_w(offs_t offset, u16 data);
 
-	uint8_t dmac_scsi_data_read(offs_t offset);
-	void dmac_scsi_data_write(offs_t offset, uint8_t data);
-	void dmac_int_w(int state);
-
-	void tpi_port_b_write(uint8_t data);
-	void tpi_int_w(int state);
-
 	void cdtv(machine_config &config);
 	void cdtvn(machine_config &config);
 	void cdtv_mem(address_map &map) ATTR_COLD;
@@ -369,21 +362,30 @@ public:
 protected:
 	// driver_device overrides
 	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// amiga_state overrides
 	virtual bool int2_pending() override;
 	virtual bool int6_pending() override;
 
 private:
-	// devices
+	void dmac_int_w(int state);
+
+	void tpi_portb_w(uint8_t data);
+	void tpi_int_w(int state);
+
+	void sten_w(int state);
+	void drq_w(int state);
+
 	required_device<msm6242_device> m_rtc;
-	required_device<amiga_dmac_rev1_device> m_dmac;
+	required_device<amiga_dmac_rev2_device> m_dmac;
 	required_device<tpi6525_device> m_tpi;
 	required_device<cr511b_device> m_cdrom;
 
 	// internal state
 	int m_dmac_irq;
 	int m_tpi_irq;
+	bool m_sten;
 };
 
 class a3000_state : public amiga_state
@@ -640,43 +642,6 @@ u16 a500p_state::clock_r(offs_t offset)
 void a500p_state::clock_w(offs_t offset, u16 data)
 {
 	m_rtc->write(offset / 2, data);
-}
-
-
-//**************************************************************************
-//  CD-ROM CONTROLLER
-//**************************************************************************
-
-uint8_t cdtv_state::dmac_scsi_data_read(offs_t offset)
-{
-	if (offset >= 0xb0 && offset <= 0xbf)
-		return m_tpi->read(offset);
-
-	return 0xff;
-}
-
-void cdtv_state::dmac_scsi_data_write(offs_t offset, uint8_t data)
-{
-	if (offset >= 0xb0 && offset <= 0xbf)
-		m_tpi->write(offset, data);
-}
-
-void cdtv_state::dmac_int_w(int state)
-{
-	m_dmac_irq = state;
-	update_int2();
-}
-
-void cdtv_state::tpi_port_b_write(uint8_t data)
-{
-	m_cdrom->cmd_w(BIT(data, 0));
-	m_cdrom->enable_w(BIT(data, 1));
-}
-
-void cdtv_state::tpi_int_w(int state)
-{
-	m_tpi_irq = state;
-	update_int2();
 }
 
 
@@ -949,6 +914,15 @@ void cdtv_state::machine_start()
 	m_dmac->ramsz_w(0);
 }
 
+void cdtv_state::machine_reset()
+{
+	amiga_state::machine_reset();
+
+	// start autoconfig
+	m_dmac->configin_w(0);
+	m_dmac->configin_w(1);
+}
+
 bool cdtv_state::int2_pending()
 {
 	return m_cia_0_irq || m_dmac_irq || m_tpi_irq;
@@ -957,6 +931,35 @@ bool cdtv_state::int2_pending()
 bool cdtv_state::int6_pending()
 {
 	return m_cia_1_irq;
+}
+
+void cdtv_state::dmac_int_w(int state)
+{
+	m_dmac_irq = state;
+	update_int2();
+}
+
+void cdtv_state::tpi_portb_w(uint8_t data)
+{
+	m_cdrom->enable_w(BIT(data, 1));
+	m_cdrom->cmd_w(BIT(data, 0));
+}
+
+void cdtv_state::tpi_int_w(int state)
+{
+	m_tpi_irq = state;
+	update_int2();
+}
+
+void cdtv_state::sten_w(int state)
+{
+	m_sten = bool(state);
+}
+
+void cdtv_state::drq_w(int state)
+{
+	if (m_sten)
+		m_dmac->xdreq_w(state);
 }
 
 u32 a3000_state::scsi_r(offs_t offset, u32 mem_mask)
@@ -1961,31 +1964,30 @@ void cdtv_state::cdtv(machine_config &config)
 	// 256kb memory card
 	NVRAM(config, "memcard", nvram_device::DEFAULT_ALL_0);
 
-	// real-time clock
 	MSM6242(config, m_rtc, XTAL(32'768));
 
-	// cd-rom controller
-	AMIGA_DMAC_REV1(config, m_dmac, amiga_state::CLK_7M_PAL);
-	m_dmac->css_read_cb().set(FUNC(cdtv_state::dmac_scsi_data_read));
-	m_dmac->css_write_cb().set(FUNC(cdtv_state::dmac_scsi_data_write));
+	AMIGA_DMAC_REV2(config, m_dmac, amiga_state::CLK_7M_PAL);
+	m_dmac->int_cb().set(FUNC(cdtv_state::dmac_int_w));
 	m_dmac->csx0_read_cb().set(m_cdrom, FUNC(cr511b_device::read));
 	m_dmac->csx0_write_cb().set(m_cdrom, FUNC(cr511b_device::write));
-	m_dmac->int_cb().set(FUNC(cdtv_state::dmac_int_w));
+	m_dmac->csx0_a4_read_cb().set(m_tpi, FUNC(tpi6525_device::read));
+	m_dmac->csx0_a4_write_cb().set(m_tpi, FUNC(tpi6525_device::write));
+	m_dmac->xdack_read_cb().set(m_cdrom, FUNC(cr511b_device::read));
 
 	TPI6525(config, m_tpi, 0);
 	m_tpi->out_irq_cb().set(FUNC(cdtv_state::tpi_int_w));
-	m_tpi->out_pb_cb().set(FUNC(cdtv_state::tpi_port_b_write));
+	m_tpi->out_pb_cb().set(FUNC(cdtv_state::tpi_portb_w));
 
-	// cd-rom
 	CR511B(config, m_cdrom, 0);
-	m_cdrom->scor_handler().set(m_tpi, FUNC(tpi6525_device::i1_w)).invert();
-	m_cdrom->stch_handler().set(m_tpi, FUNC(tpi6525_device::i2_w)).invert();
-	m_cdrom->sten_handler().set(m_tpi, FUNC(tpi6525_device::i3_w));
-	m_cdrom->xaen_handler().set(m_tpi, FUNC(tpi6525_device::pb2_w));
-	m_cdrom->drq_handler().set(m_dmac, FUNC(amiga_dmac_device::xdreq_w));
-	m_cdrom->dten_handler().set(m_dmac, FUNC(amiga_dmac_device::xdreq_w));
+	m_cdrom->add_route(0, "lspeaker", 1.0);
+	m_cdrom->add_route(1, "rspeaker", 1.0);
+	m_cdrom->scor_cb().set(m_tpi, FUNC(tpi6525_device::i1_w)).invert();
+	m_cdrom->stch_cb().set(m_tpi, FUNC(tpi6525_device::i2_w)).invert();
+	m_cdrom->sten_cb().set(m_tpi, FUNC(tpi6525_device::i3_w));
+	m_cdrom->sten_cb().append(FUNC(cdtv_state::sten_w));
+	m_cdrom->drq_cb().set(m_tpi, FUNC(tpi6525_device::i4_w));
+	m_cdrom->drq_cb().append(FUNC(cdtv_state::drq_w));
 
-	// software
 	SOFTWARE_LIST(config, "cd_list").set_original("cdtv");
 }
 
