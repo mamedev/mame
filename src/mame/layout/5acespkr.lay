@@ -116,10 +116,10 @@ copyright-holders: Roberto Fresca, Grull Osgo.
 		</element>
 
 		<!-- Bet button-lamp -->
-		<element name="lamp7" ref="buttonedge_w" inputtag="IN0" inputmask="0x02">
+		<element name="lamp8" ref="buttonedge_w" inputtag="IN0" inputmask="0x02">
 			<bounds x="0.775" y="3.50" width="0.35" height="0.30" />
 		</element>
-		<element name="lamp7" ref="L7" inputtag="IN0" inputmask="0x02">
+		<element name="lamp8" ref="L7" inputtag="IN0" inputmask="0x02">
 			<bounds x="0.795" y="3.52" width="0.31" height="0.26" />
 		</element>
 

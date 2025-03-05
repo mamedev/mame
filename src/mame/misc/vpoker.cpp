@@ -142,16 +142,25 @@
   - Promoted 5acespkr to working.
   - Added technical notes.
 
+  Updates [2025-03-06]:
+
+  - Rewrote the lamps scheme.
+  - Fixed the button-lamps layouts.
+  - Added workaround for the NMI routine (vpoker).
+  - Fixed vpoker NVRAM issues.
+  - Fixed mech counters support per game.
+
 
   TODO:
 
-  - Check NVRAM issues.
+  - Add workaround for the NMI routine (5acespkr).
+  - Fix the 5acespkr NVRAM issues.
   - Find why vectors are changed in 5acespkr.
   - Investigate about what seems to be a custom processor
     due to the weird routines related to interrupts, and the
     complete lack of SWI triggers.	
 
-  
+
 **************************************************************************************************************/
 
 
@@ -194,11 +203,14 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
+	uint8_t nvram_r(offs_t offset);
+	void nvram_w(offs_t offset, u8 data);
 	std::unique_ptr<uint8_t[]> m_videoram;
 	uint8_t m_blit_ram[8];
 	uint8_t blitter_r(offs_t offset);
 	void blitter_w(offs_t offset, uint8_t data);
 	void ptm_irq(int state);
+	void ptm_5_irq(int state);
 	void swi_int(int state);
 	uint32_t screen_update_vpoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
@@ -209,6 +221,8 @@ private:
 	required_ioport m_in1;
 	output_finder<9> m_lamps;
 	void main_map(address_map &map) ATTR_COLD;
+	
+	std::unique_ptr<u8[]> m_nvram_data;
 };
 
 
@@ -263,9 +277,9 @@ void vpoker_state::blitter_w(offs_t offset, uint8_t data)
 	if(offset == 1)
 	{
 		machine().bookkeeping().coin_counter_w(0, BIT(data, 5));  // coin_in
-		machine().bookkeeping().coin_counter_w(1, BIT(data, 4));  // coin_out
-
-		m_lamps[7] = BIT(data, 7);  // bet lamp
+		machine().bookkeeping().coin_counter_w(1, BIT(data, 4));  // coin_out (5aces)
+		machine().bookkeeping().coin_counter_w(1, BIT(data, 6));  // coin_out (vpoker)
+		m_lamps[8] = BIT(data, 7);  // bet lamp
 	}
 	if(offset == 2)
 	{
@@ -276,18 +290,29 @@ void vpoker_state::blitter_w(offs_t offset, uint8_t data)
 	}
 	if(offset == 3)
 	{
-		m_lamps[0] = BIT(data, 0);  // hold 1 lamp
-		m_lamps[1] = BIT(data, 1);  // hold 2 lamp
-		m_lamps[2] = BIT(data, 2);  // hold 3 lamp
-		m_lamps[3] = BIT(data, 3);  // hold 4 lamp
-		m_lamps[4] = BIT(data, 4);  // hold 5 lamp
-		m_lamps[5] = BIT(data, 5);  // deal lamp
-		m_lamps[6] = BIT(data, 6);  // draw lamp
+		m_lamps[0] = BIT(data, 0);  // hold 1 lamp    (5acespkr)
+		m_lamps[1] = BIT(data, 1);  // hold 2 lamp    (5acespkr)
+		m_lamps[2] = BIT(data, 2);  // hold 3 lamp    (5acespkr)
+		m_lamps[3] = BIT(data, 3);  // hold 4 lamp    (5acespkr)
+		m_lamps[4] = BIT(data, 4);  // hold 5 lamp    (5acespkr)
+		m_lamps[5] = BIT(data, 5);  // deal lamp      (common)
+		m_lamps[6] = BIT(data, 6);  // draw lamp      (common)
+		m_lamps[7] = BIT(data, 7);  // holds + cancel (vpoker)
 	}
 	else
 	{
 		// logerror("blitter_w: offs:%02x - data:%02x\n", offset, data);
 	}
+}
+
+uint8_t vpoker_state::nvram_r(offs_t offset)
+{
+	return m_nvram_data[offset];
+}
+
+void vpoker_state::nvram_w(offs_t offset, u8 data)
+{
+	m_nvram_data[offset] = data;
 }
 
 
@@ -297,6 +322,9 @@ void vpoker_state::blitter_w(offs_t offset, uint8_t data)
 
 void vpoker_state::machine_start()
 {
+	m_nvram_data = make_unique_clear<u8[]>(0x200);
+	subdevice<nvram_device>("nvram")->set_base(&m_nvram_data[0], 0x200);
+	save_pointer(NAME(m_nvram_data), 0x200);
 	m_lamps.resolve();
 }
 
@@ -308,7 +336,7 @@ void vpoker_state::machine_start()
 void vpoker_state::main_map(address_map &map)
 {
 	map.global_mask(0x3fff);
-	map(0x0000, 0x01ff).ram().share("nvram");     // vpoker has 0x100, 5acespkr has 0x200
+	map(0x0000, 0x01ff).rw(FUNC(vpoker_state::nvram_r), FUNC(vpoker_state::nvram_w));
 	map(0x0400, 0x0407).rw("6840ptm", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
 	map(0x0800, 0x0807).r(FUNC(vpoker_state::blitter_r)).w(FUNC(vpoker_state::blitter_w));
 	map(0x2000, 0x3fff).rom();
@@ -397,14 +425,34 @@ GFXDECODE_END
 void vpoker_state::ptm_irq(int state)
 {
 	m_maincpu->set_input_line(M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	if(state == 0)
+	{
+		// do de job that must be done by NMI.
+		uint8_t sum = 0;
+		nvram_w(0x4f, 0x5a);
+		nvram_w(0x91, 0xa5);
+		nvram_w(0x9f, 0x00);
+
+		for(int i = 0x40; i < 0xa0; i++)
+			sum +=  nvram_r(i);
+
+		sum = ~sum + 1;
+		nvram_w(0x9f, sum);
+		sum = 0;
+	}
 }
+
+void vpoker_state::ptm_5_irq(int state)
+{
+	m_maincpu->set_input_line(M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
 
 void vpoker_state::swi_int(int state)
 {
 	if(m_in0->read() == 0xfe) 
 		m_maincpu->set_input_line(M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
-
 
 
 /*****************************************
@@ -416,7 +464,6 @@ void vpoker_state::vpoker(machine_config &config)
 	// basic machine hardware
 	MC6809(config, m_maincpu, XTAL(4'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &vpoker_state::main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(vpoker_state::irq0_line_assert));
 	
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -468,7 +515,7 @@ void vpoker_state::fiveaces(machine_config &config)
 	// 6840 PTM
 	ptm6840_device &ptm(PTM6840(config, "6840ptm", XTAL(4'000'000) / 4));
 	ptm.set_external_clocks(500, 0, 1000000);
-	ptm.irq_callback().set(FUNC(vpoker_state::ptm_irq));
+	ptm.irq_callback().set(FUNC(vpoker_state::ptm_5_irq));
 	ptm.o2_callback().set("dac", FUNC(dac_1bit_device::data_w));
 
 	// sound hardware

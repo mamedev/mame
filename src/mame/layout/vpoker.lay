@@ -117,42 +117,42 @@ copyright-holders: Roberto Fresca, Grull Osgo.
 	<!-- define button-lamps -->
 
 		<!-- Hold 1 button-lamp -->
-		<element name="lamp6" ref="buttonedge_w" inputtag="IN1" inputmask="0x01">
+		<element name="lamp7" ref="buttonedge_w" inputtag="IN1" inputmask="0x01">
 			<bounds x="0.425" y="3.10" width="0.35" height="0.30" />
 		</element>
-		<element name="lamp6" ref="L0" inputtag="IN1" inputmask="0x01">
+		<element name="lamp7" ref="L0" inputtag="IN1" inputmask="0x01">
 			<bounds x="0.445" y="3.12" width="0.31" height="0.26" />
 		</element>
 
 		<!-- Bet button-lamp -->
-		<element name="lamp7" ref="buttonedge_w" inputtag="IN0" inputmask="0x02">
+		<element name="lamp8" ref="buttonedge_w" inputtag="IN0" inputmask="0x02">
 			<bounds x="0.775" y="3.50" width="0.35" height="0.30" />
 		</element>
-		<element name="lamp7" ref="L6" inputtag="IN0" inputmask="0x02">
+		<element name="lamp8" ref="L6" inputtag="IN0" inputmask="0x02">
 			<bounds x="0.795" y="3.52" width="0.31" height="0.26" />
 		</element>
 
 		<!-- Hold 2 button-lamp -->
-		<element name="lamp6" ref="buttonedge_w" inputtag="IN1" inputmask="0x02">
+		<element name="lamp7" ref="buttonedge_w" inputtag="IN1" inputmask="0x02">
 			<bounds x="1.125" y="3.10" width="0.35" height="0.30" />
 		</element>
-		<element name="lamp6" ref="L1" inputtag="IN1" inputmask="0x02">
+		<element name="lamp7" ref="L1" inputtag="IN1" inputmask="0x02">
 			<bounds x="1.145" y="3.12" width="0.31" height="0.26" />
 		</element>
 
 		<!-- Cancel button-lamp -->
-		<element name="lamp6" ref="buttonedge_w" inputtag="IN1" inputmask="0x80">
+		<element name="lamp7" ref="buttonedge_w" inputtag="IN1" inputmask="0x80">
 			<bounds x="1.475" y="3.50" width="0.35" height="0.30" />
 		</element>
-		<element name="lamp6" ref="L5" inputtag="IN1" inputmask="0x80">
+		<element name="lamp7" ref="L5" inputtag="IN1" inputmask="0x80">
 			<bounds x="1.495" y="3.52" width="0.31" height="0.26" />
 		</element>
 
 		<!-- Hold 3 button-lamp -->
-		<element name="lamp6" ref="buttonedge_w" inputtag="IN1" inputmask="0x04">
+		<element name="lamp7" ref="buttonedge_w" inputtag="IN1" inputmask="0x04">
 			<bounds x="1.825" y="3.10" width="0.35" height="0.30" />
 		</element>
-		<element name="lamp6" ref="L2" inputtag="IN1" inputmask="0x04">
+		<element name="lamp7" ref="L2" inputtag="IN1" inputmask="0x04">
 			<bounds x="1.845" y="3.12" width="0.31" height="0.26" />
 		</element>
 
@@ -165,10 +165,10 @@ copyright-holders: Roberto Fresca, Grull Osgo.
 		</element>
 
 		<!-- Hold 4 button-lamp -->
-		<element name="lamp6" ref="buttonedge_w" inputtag="IN1" inputmask="0x08">
+		<element name="lamp7" ref="buttonedge_w" inputtag="IN1" inputmask="0x08">
 			<bounds x="2.525" y="3.10" width="0.35" height="0.30" />
 		</element>
-		<element name="lamp6" ref="L3" inputtag="IN1" inputmask="0x08">
+		<element name="lamp7" ref="L3" inputtag="IN1" inputmask="0x08">
 			<bounds x="2.545" y="3.12" width="0.31" height="0.26" />
 		</element>
 		
@@ -181,10 +181,10 @@ copyright-holders: Roberto Fresca, Grull Osgo.
 		</element>
 
 		<!-- Hold 5 button-lamp -->
-		<element name="lamp6" ref="buttonedge_w" inputtag="IN1" inputmask="0x10">
+		<element name="lamp7" ref="buttonedge_w" inputtag="IN1" inputmask="0x10">
 			<bounds x="3.225" y="3.10" width="0.35" height="0.30" />
 		</element>
-		<element name="lamp6" ref="L4" inputtag="IN1" inputmask="0x10">
+		<element name="lamp7" ref="L4" inputtag="IN1" inputmask="0x10">
 			<bounds x="3.245" y="3.12" width="0.31" height="0.26" />
 		</element>
 
