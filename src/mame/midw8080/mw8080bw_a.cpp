@@ -120,7 +120,7 @@ discrete_op_amp_osc_info const invaders_saucer_hit_osc =
 
 discrete_op_amp_osc_info const invaders_saucer_hit_vco =
 {
-	DISC_OP_AMP_OSCILLATOR_VCO_1 | DISC_OP_AMP_IS_NORTON | DISC_OP_AMP_OSCILLATOR_OUT_SQW,
+	DISC_OP_AMP_OSCILLATOR_VCO_1 | DISC_OP_AMP_IS_NORTON | DISC_OP_AMP_OSCILLATOR_OUT_CAP,
 	RES_M(1),       // R65
 	RES_K(470),     // R66
 	RES_K(680),     // R67
@@ -324,7 +324,7 @@ discrete_op_amp_1sht_info const invaders_missle_1sht =
 	RES_M(1),                           // R31
 	RES_M(1),                           // R33
 	RES_M(2.2),                         // R34
-	CAP_U(1),                           // C12, CAP_U(0.22) on Taito PCB
+	CAP_U(0.22),                        // C12, CAP_U(1) on Midway PCB
 	CAP_P(470),                         // C15
 	0,                                  // vN
 	12                                  // vP
@@ -351,9 +351,9 @@ discrete_op_amp_osc_info const invaders_missle_op_amp_osc =
 	RES_M(2.2),                         // R19
 	RES_M(1),                           // R16
 	RES_M(4.7),                         // R14
-	RES_M(3.3),                         // R13, RES_M(2.2) on Taito PCB
+	RES_M(3.3),                         // R13
 	0,                                  // no r8
-	CAP_P(330),                         // C58
+	CAP_P(330),                         // C10, CAP_P(300) on Taito PCB C58 (but it seems to different as real with the output sound)
 	12,                                 // vP
 };
 
@@ -3237,7 +3237,7 @@ static const discrete_op_amp_osc_info invaders_invader_hit_osc =
 	0,              // no r6
 	0,              // no r7
 	0,              // no r8
-	CAP_U(0.1),     // C16
+	CAP_U(0.22),    // C16, CAP_U(0.1) on Midway PCB C21
 	12,             // vP
 };
 
@@ -3299,7 +3299,7 @@ void invaders_audio_device::device_add_mconfig(machine_config &config)
 	m_sn->set_noise_params(0, 0, 0);
 	m_sn->set_decay_res(0);
 	m_sn->set_attack_params(0, RES_K(100));
-	m_sn->set_amp_res(RES_K(56));
+	m_sn->set_amp_res(RES_K(150));
 	m_sn->set_feedback_res(RES_K(10));
 	m_sn->set_vco_params(0, CAP_U(0.1), RES_K(8.2));
 	m_sn->set_pitch_voltage(5.0);
@@ -3512,7 +3512,7 @@ void invad2ct_audio_device::device_add_mconfig(machine_config &config)
 	m_sn[0]->set_noise_params(0, 0, 0);
 	m_sn[0]->set_decay_res(0);
 	m_sn[0]->set_attack_params(0, RES_K(100));
-	m_sn[0]->set_amp_res(RES_K(56));
+	m_sn[0]->set_amp_res(RES_K(150));
 	m_sn[0]->set_feedback_res(RES_K(10));
 	m_sn[0]->set_vco_params(0, CAP_U(0.1), RES_K(8.2));
 	m_sn[0]->set_pitch_voltage(5.0);
@@ -3528,7 +3528,7 @@ void invad2ct_audio_device::device_add_mconfig(machine_config &config)
 	m_sn[1]->set_noise_params(0, 0, 0);
 	m_sn[1]->set_decay_res(0);
 	m_sn[1]->set_attack_params(0, RES_K(100));
-	m_sn[1]->set_amp_res(RES_K(56));
+	m_sn[1]->set_amp_res(RES_K(150));
 	m_sn[1]->set_feedback_res(RES_K(10));
 	m_sn[1]->set_vco_params(0, CAP_U(0.047),  RES_K(39));
 	m_sn[1]->set_pitch_voltage(5.0);
