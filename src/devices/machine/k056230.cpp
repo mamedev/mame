@@ -208,7 +208,7 @@ void k056230_device::comm_tick()
 			std::error_condition filerr = osd_file::open(m_localhost, OPEN_FLAG_CREATE, m_line_rx, filesize);
 			if (filerr.value() != 0)
 			{
-				osd_printf_verbose("k056230: rx connection failed - %02x, %s\n", filerr.value(), filerr.message());
+				osd_printf_verbose("k056230: rx connection failed - %s:%d %s\n", filerr.category().name(), filerr.value(), filerr.message());
 				m_line_rx.reset();
 			}
 		}
@@ -221,7 +221,7 @@ void k056230_device::comm_tick()
 			std::error_condition filerr = osd_file::open(m_remotehost, 0, m_line_tx, filesize);
 			if (filerr.value() != 0)
 			{
-				osd_printf_verbose("k056230: tx connection failed - %02x, %s\n", filerr.value(), filerr.message());
+				osd_printf_verbose("k056230: tx connection failed - %s:%d %s\n", filerr.category().name(), filerr.value(), filerr.message());
 				m_line_tx.reset();
 			}
 		}
@@ -297,40 +297,28 @@ int k056230_device::read_frame(int data_size)
 	if (!m_line_rx)
 		return 0;
 
-	// try to read a message
-	u32 recv = 0;
-	std::error_condition filerr = m_line_rx->read(m_buffer0, 0, data_size, recv);
-	if (recv > 0)
+	// try to read a message (handling partial reads)
+	u32 bytes_total = 0;
+	u32 bytes_read = 0;
+	while (bytes_total < data_size)
 	{
-		// check if message complete
-		if (recv != data_size)
+		std::error_condition filerr = m_line_rx->read(&m_buffer0[bytes_total], 0, data_size - bytes_total, bytes_read);
+		if (filerr)
 		{
-			// only part of a message - read on
-			u32 togo = data_size - recv;
-			int offset = recv;
-			while (togo > 0)
-			{
-				filerr = m_line_rx->read(m_buffer1, 0, togo, recv);
-				if (recv > 0)
-				{
-					for (int i = 0 ; i < recv ; i++)
-					{
-						m_buffer0[offset + i] = m_buffer1[i];
-					}
-					togo -= recv;
-					offset += recv;
-				}
-				if ((!filerr && recv == 0) || (filerr && std::errc::operation_would_block != filerr))
-					togo = 0;
-			}
+			bytes_read = 0;
+			// special case if first read returned "no data"
+			if (bytes_total == 0 && std::errc::operation_would_block == filerr)
+				return 0;
 		}
+		if ((!filerr && bytes_read == 0) || (filerr && std::errc::operation_would_block != filerr))
+		{
+			osd_printf_verbose("k056230: rx connection failed - %s:%d %s\n", filerr.category().name(), filerr.value(), filerr.message());
+			m_line_rx.reset();
+			return 0;
+		}
+		bytes_total += bytes_read;
 	}
-	if ((!filerr && recv == 0) || (filerr && std::errc::operation_would_block != filerr))
-	{
-		osd_printf_verbose("k056230: rx connection failed - %02x, %s\n", filerr.value(), filerr.message());
-		m_line_rx.reset();
-	}
-	return recv;
+	return data_size;
 }
 
 void k056230_device::send_frame(int data_size)
@@ -338,12 +326,19 @@ void k056230_device::send_frame(int data_size)
 	if (!m_line_tx)
 		return;
 
-	u32 written;
-	std::error_condition filerr = m_line_tx->write(&m_buffer0, 0, data_size, written);
-	if (filerr)
+	// try to send a message (handling partial writes)
+	u32 bytes_total = 0;
+	u32 bytes_sent = 0;
+	while (bytes_total < data_size)
 	{
-		osd_printf_verbose("k056230: tx connection failed - %02x, %s\n", filerr.value(), filerr.message());
-		m_line_tx.reset();
+		std::error_condition filerr = m_line_tx->write(&m_buffer0[bytes_total], 0, data_size - bytes_total, bytes_sent);
+		if (filerr)
+		{
+			osd_printf_verbose("k056230: tx connection failed - %s:%d %s\n", filerr.category().name(), filerr.value(), filerr.message());
+			m_line_tx.reset();
+			return;
+		}
+		bytes_total += bytes_sent;
 	}
 }
 

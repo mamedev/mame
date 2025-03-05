@@ -500,7 +500,7 @@ void mb89374_device::checkSockets()
 		std::error_condition filerr = osd_file::open(m_localhost, OPEN_FLAG_CREATE, m_line_rx, filesize);
 		if (filerr.value() != 0)
 		{
-			osd_printf_verbose("MB89374: rx connection failed - %02x, %s\n", filerr.value(), filerr.message());
+			osd_printf_verbose("MB89374: rx connection failed - %s:%d %s\n", filerr.category().name(), filerr.value(), filerr.message());
 			m_line_rx.reset();
 		}
 	}
@@ -513,7 +513,7 @@ void mb89374_device::checkSockets()
 		std::error_condition filerr = osd_file::open(m_remotehost, 0, m_line_tx, filesize);
 		if (filerr.value() != 0)
 		{
-			osd_printf_verbose("MB89374: tx connection failed - %02x, %s\n", filerr.value(), filerr.message());
+			osd_printf_verbose("MB89374: tx connection failed - %s:%d %s\n", filerr.category().name(), filerr.value(), filerr.message());
 			m_line_tx.reset();
 		}
 	}

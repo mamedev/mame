@@ -278,7 +278,7 @@ void namco_c139_device::comm_tick()
 			std::error_condition filerr = osd_file::open(m_localhost, OPEN_FLAG_CREATE, m_line_rx, filesize);
 			if (filerr.value() != 0)
 			{
-				osd_printf_verbose("C139: rx connection failed - %02x, %s\n", filerr.value(), filerr.message());
+				osd_printf_verbose("C139: rx connection failed - %s:%d %s\n", filerr.category().name(), filerr.value(), filerr.message());
 				m_line_tx.reset();
 				m_linktimer = 0x0100;
 			}
@@ -292,7 +292,7 @@ void namco_c139_device::comm_tick()
 			std::error_condition filerr = osd_file::open(m_remotehost, 0, m_line_tx, filesize);
 			if (filerr.value() != 0)
 			{
-				osd_printf_verbose("C139: tx connection failed - %02x, %s\n", filerr.value(), filerr.message());
+				osd_printf_verbose("C139: tx connection failed - %s:%d %s\n", filerr.category().name(), filerr.value(), filerr.message());
 				m_line_tx.reset();
 				m_linktimer = 0x0100;
 			}
@@ -420,42 +420,30 @@ int namco_c139_device::read_frame(int data_size)
 	if (m_reg[REG_0_STATUS] == 0x06)
 		return 0;
 
-	// try to read a message
-	uint32_t recv = 0;
-	std::error_condition filerr = m_line_rx->read(m_buffer0, 0, data_size, recv);
-	if (recv > 0)
+	// try to read a message (handling partial reads)
+	uint32_t bytes_total = 0;
+	uint32_t bytes_read = 0;
+	while (bytes_total < data_size)
 	{
-		// check if message complete
-		if (recv != data_size)
+		std::error_condition filerr = m_line_rx->read(&m_buffer0[bytes_total], 0, data_size - bytes_total, bytes_read);
+		if (filerr)
 		{
-			// only part of a message - read on
-			uint32_t togo = data_size - recv;
-			int offset = recv;
-			while (togo > 0)
-			{
-				filerr = m_line_rx->read(m_buffer1, 0, togo, recv);
-				if (recv > 0)
-				{
-					for (int i = 0 ; i < recv ; i++)
-					{
-						m_buffer0[offset + i] = m_buffer1[i];
-					}
-					togo -= recv;
-					offset += recv;
-				}
-				if ((!filerr && recv == 0) || (filerr && std::errc::operation_would_block != filerr))
-					togo = 0;
-			}
+			bytes_read = 0;
+			// special case if first read returned "no data"
+			if (bytes_total == 0 && std::errc::operation_would_block == filerr)
+				return 0;
 		}
+		if ((!filerr && bytes_read == 0) || (filerr && std::errc::operation_would_block != filerr))
+		{
+			osd_printf_verbose("C139: rx connection failed - %s:%d %s\n", filerr.category().name(), filerr.value(), filerr.message());
+			m_line_rx.reset();
+			m_linktimer = 0x0200;
+			m_txblock = 0x00;
+			return 0;
+		}
+		bytes_total += bytes_read;
 	}
-	if ((!filerr && recv == 0) || (filerr && std::errc::operation_would_block != filerr))
-	{
-		osd_printf_verbose("C139: rx connection failed - %02x, %s\n", filerr.value(), filerr.message());
-		m_line_rx.reset();
-		m_linktimer = 0x0200;
-		m_txblock = 0x00;
-	}
-	return recv;
+	return data_size;
 }
 
 void namco_c139_device::send_data(int data_size)
@@ -533,14 +521,21 @@ void namco_c139_device::send_frame(int data_size)
 	if (!m_line_tx)
 		return;
 
-	uint32_t written;
-	std::error_condition filerr = m_line_tx->write(&m_buffer0, 0, data_size, written);
-	if (filerr)
+	// try to send a message (handling partial writes)
+	uint32_t bytes_total = 0;
+	uint32_t bytes_sent = 0;
+	while (bytes_total < data_size)
 	{
-		osd_printf_verbose("C139: tx connection failed - %02x, %s\n", filerr.value(), filerr.message());
-		m_line_tx.reset();
-		m_linktimer = 0x0200;
-		m_txblock = 0x00;
+		std::error_condition filerr = m_line_tx->write(&m_buffer0[bytes_total], 0, data_size - bytes_total, bytes_sent);
+		if (filerr)
+		{
+			osd_printf_verbose("C139: tx connection failed - %s:%d %s\n", filerr.category().name(), filerr.value(), filerr.message());
+			m_line_tx.reset();
+			m_linktimer = 0x0200;
+			m_txblock = 0x00;
+			return;
+		}
+		bytes_total += bytes_sent;
 	}
 }
 

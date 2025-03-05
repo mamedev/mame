@@ -416,7 +416,7 @@ void sega_ybdcomm_device::comm_tick()
 				std::error_condition filerr = osd_file::open(m_localhost, OPEN_FLAG_CREATE, m_line_rx, filesize);
 				if (filerr.value() != 0)
 				{
-					osd_printf_verbose("YBDCOMM: rx connection failed - %02x, %s\n", filerr.value(), filerr.message());
+					osd_printf_verbose("YBDCOMM: rx connection failed - %s:%d %s\n", filerr.category().name(), filerr.value(), filerr.message());
 					m_line_rx.reset();
 				}
 			}
@@ -429,7 +429,7 @@ void sega_ybdcomm_device::comm_tick()
 				std::error_condition filerr = osd_file::open(m_remotehost, 0, m_line_tx, filesize);
 				if (filerr.value() != 0)
 				{
-					osd_printf_verbose("YBDCOMM: tx connection failed - %02x, %s\n", filerr.value(), filerr.message());
+					osd_printf_verbose("YBDCOMM: tx connection failed - %s:%d %s\n", filerr.category().name(), filerr.value(), filerr.message());
 					m_line_tx.reset();
 				}
 			}
@@ -599,47 +599,35 @@ int sega_ybdcomm_device::read_frame(int data_size)
 	if (!m_line_rx)
 		return 0;
 
-	// try to read a message
-	uint32_t recv = 0;
-	std::error_condition filerr = m_line_rx->read(m_buffer0, 0, data_size, recv);
-	if (recv > 0)
+	// try to read a message (handling partial reads)
+	uint32_t bytes_total = 0;
+	uint32_t bytes_read = 0;
+	while (bytes_total < data_size)
 	{
-		// check if message complete
-		if (recv != data_size)
+		std::error_condition filerr = m_line_rx->read(&m_buffer0[bytes_total], 0, data_size - bytes_total, bytes_read);
+		if (filerr)
 		{
-			// only part of a message - read on
-			uint32_t togo = data_size - recv;
-			int offset = recv;
-			while (togo > 0)
+			bytes_read = 0;
+			// special case if first read returned "no data"
+			if (bytes_total == 0 && std::errc::operation_would_block == filerr)
+				return 0;
+		}
+		if ((!filerr && bytes_read == 0) || (filerr && std::errc::operation_would_block != filerr))
+		{
+			osd_printf_verbose("YBDCOMM: rx connection failed - %02x, %s\n", filerr.value(), filerr.message());
+			m_line_rx.reset();
+			if (m_linkalive == 0x01)
 			{
-				filerr = m_line_rx->read(m_buffer1, 0, togo, recv);
-				if (recv > 0)
-				{
-					for (int i = 0 ; i < recv ; i++)
-					{
-						m_buffer0[offset + i] = m_buffer1[i];
-					}
-					togo -= recv;
-					offset += recv;
-				}
-				if ((!filerr && recv == 0) || (filerr && std::errc::operation_would_block != filerr))
-					togo = 0;
+				osd_printf_verbose("YBDCOMM: link lost\n");
+				m_linkalive = 0x02;
+				m_linktimer = 0x00;
+				m_z80_stat = 0xff;
 			}
+			return 0;
 		}
+		bytes_total += bytes_read;
 	}
-	if ((!filerr && recv == 0) || (filerr && std::errc::operation_would_block != filerr))
-	{
-		osd_printf_verbose("YBDCOMM: rx connection failed - %02x, %s\n", filerr.value(), filerr.message());
-		m_line_rx.reset();
-		if (m_linkalive == 0x01)
-		{
-			osd_printf_verbose("YBDCOMM: link lost\n");
-			m_linkalive = 0x02;
-			m_linktimer = 0x00;
-			m_z80_stat = 0xff;
-		}
-	}
-	return recv;
+	return data_size;
 }
 
 void sega_ybdcomm_device::send_data(uint8_t frame_type, int frame_offset, int frame_size, int data_size)
@@ -657,19 +645,26 @@ void sega_ybdcomm_device::send_frame(int data_size)
 	if (!m_line_tx)
 		return;
 
-	uint32_t written;
-	std::error_condition filerr = m_line_tx->write(&m_buffer0, 0, data_size, written);
-	if (filerr)
+	// try to send a message (handling partial writes)
+	uint32_t bytes_total = 0;
+	uint32_t bytes_sent = 0;
+	while (bytes_total < data_size)
 	{
-		osd_printf_verbose("YBDCOMM: tx connection failed - %02x, %s\n", filerr.value(), filerr.message());
-		m_line_tx.reset();
-		if (m_linkalive == 0x01)
+		std::error_condition filerr = m_line_tx->write(&m_buffer0[bytes_total], 0, data_size - bytes_total, bytes_sent);
+		if (filerr)
 		{
-			osd_printf_verbose("YBDCOMM: link lost\n");
-			m_linkalive = 0x02;
-			m_linktimer = 0x00;
-			m_z80_stat = 0xff;
+			osd_printf_verbose("YBDCOMM: tx connection failed - %02x, %s\n", filerr.value(), filerr.message());
+			m_line_tx.reset();
+			if (m_linkalive == 0x01)
+			{
+				osd_printf_verbose("YBDCOMM: link lost\n");
+				m_linkalive = 0x02;
+				m_linktimer = 0x00;
+				m_z80_stat = 0xff;
+			}
+			return;
 		}
+		bytes_total += bytes_sent;
 	}
 }
 #endif
