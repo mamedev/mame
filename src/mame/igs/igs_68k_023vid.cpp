@@ -43,7 +43,6 @@ public:
 
 private:
 	u16 unknown_r() { return (machine().rand() & 0x0010) | 0xffcf; } // 0x0010 seems to be sound CPU status
-	u16 unknown2_r() { return ioport("IN1")->read(); }
 
 	void screen_vblank(int state);
 	void screen_vblank_xypmda(int state);
