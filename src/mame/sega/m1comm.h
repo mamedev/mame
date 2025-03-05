@@ -88,7 +88,6 @@ private:
 	std::string m_localhost;
 	std::string m_remotehost;
 	uint8_t m_buffer0[0x200]{};
-	uint8_t m_buffer1[0x200]{};
 	uint8_t m_framesync;
 
 	uint8_t m_linkenable = 0;

@@ -46,7 +46,6 @@ private:
 	std::string m_localhost;
 	std::string m_remotehost;
 	u8 m_buffer0[0x201]{};
-	u8 m_buffer1[0x201]{};
 	u8 m_linkenable = 0;
 	u8 m_linkid = 0;
 	u8 m_txmode = 0;

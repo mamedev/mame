@@ -59,7 +59,6 @@ private:
 	std::string m_localhost;
 	std::string m_remotehost;
 	uint8_t m_buffer0[0x1000]{};
-	uint8_t m_buffer1[0x1000]{};
 	uint8_t m_framesync;
 	uint16_t m_frameoffset;
 

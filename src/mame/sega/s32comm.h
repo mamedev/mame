@@ -62,7 +62,6 @@ private:
 	std::string m_localhost;
 	std::string m_remotehost;
 	uint8_t m_buffer0[0x100]{};
-	uint8_t m_buffer1[0x100]{};
 	uint8_t m_framesync = 0;
 
 #ifdef S32COMM_SIMULATION
