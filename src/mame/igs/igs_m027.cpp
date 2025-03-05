@@ -749,6 +749,7 @@ INPUT_PORTS_START( jking02 )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( tct2p )
+	// uses the kan/pon/chi/reach/ron buttons as the main controls in mahjong panel mode
 	IGS_MAHJONG_MATRIX_CONDITIONAL("DSW2", 0x01, 0x00)
 
 	PORT_START("PORTB")

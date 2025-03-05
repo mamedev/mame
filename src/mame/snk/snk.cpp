@@ -1104,14 +1104,14 @@ template <bool Small, unsigned Num>
 uint8_t bermudat_state::turbofront_check8()
 {
 	return
-		(turbofront_check(Small, (num * 8) + 0) << 0) |
-		(turbofront_check(Small, (num * 8) + 1) << 1) |
-		(turbofront_check(Small, (num * 8) + 2) << 2) |
-		(turbofront_check(Small, (num * 8) + 3) << 3) |
-		(turbofront_check(Small, (num * 8) + 4) << 4) |
-		(turbofront_check(Small, (num * 8) + 5) << 5) |
-		(turbofront_check(Small, (num * 8) + 6) << 6) |
-		(turbofront_check(Small, (num * 8) + 7) << 7);
+		(turbofront_check(Small, (Num * 8) + 0) << 0) |
+		(turbofront_check(Small, (Num * 8) + 1) << 1) |
+		(turbofront_check(Small, (Num * 8) + 2) << 2) |
+		(turbofront_check(Small, (Num * 8) + 3) << 3) |
+		(turbofront_check(Small, (Num * 8) + 4) << 4) |
+		(turbofront_check(Small, (Num * 8) + 5) << 5) |
+		(turbofront_check(Small, (Num * 8) + 6) << 6) |
+		(turbofront_check(Small, (Num * 8) + 7) << 7);
 }
 
 
