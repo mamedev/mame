@@ -35,14 +35,14 @@ public:
 		m_bonus_io(*this, "BONUS")
 	{ }
 
-	void fitegolf(machine_config &config);
-	void aso(machine_config &config);
-	void fitegolf2(machine_config &config);
-	void jcross(machine_config &config);
-	void tnk3(machine_config &config);
-	void hal21(machine_config &config);
-	void athena(machine_config &config);
-	void sgladiat(machine_config &config);
+	void fitegolf(machine_config &config) ATTR_COLD;
+	void aso(machine_config &config) ATTR_COLD;
+	void fitegolf2(machine_config &config) ATTR_COLD;
+	void jcross(machine_config &config) ATTR_COLD;
+	void tnk3(machine_config &config) ATTR_COLD;
+	void hal21(machine_config &config) ATTR_COLD;
+	void athena(machine_config &config) ATTR_COLD;
+	void sgladiat(machine_config &config) ATTR_COLD;
 
 	int sound_busy_r();
 	template <int Mask> ioport_value snk_bonus_r();
@@ -119,7 +119,7 @@ protected:
 	void tnk3_videoattrs_w(uint8_t data);
 	void aso_bg_bank_w(uint8_t data);
 
-	void register_save_state();
+	void register_save_state() ATTR_COLD;
 	TILEMAP_MAPPER_MEMBER(marvins_tx_scan_cols);
 	TILE_GET_INFO_MEMBER(marvins_get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(aso_get_bg_tile_info);
@@ -170,9 +170,9 @@ public:
 		m_fg_videoram(*this, "fg_videoram")
 	{ }
 
-	void madcrush(machine_config &config);
-	void marvins(machine_config &config);
-	void vangrd2(machine_config &config);
+	void madcrush(machine_config &config) ATTR_COLD;
+	void marvins(machine_config &config) ATTR_COLD;
+	void vangrd2(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -217,7 +217,7 @@ public:
 		m_trackball_y_io(*this, "TRACKBALLY%u", 1U)
 	{ }
 
-	void countryc(machine_config &config);
+	void countryc(machine_config &config) ATTR_COLD;
 
 	ioport_value countryc_trackball_x();
 	ioport_value countryc_trackball_y();
@@ -243,8 +243,8 @@ public:
 		snk_state(mconfig, type, tag)
 	{ }
 
-	void ikari(machine_config &config);
-	void victroad(machine_config &config);
+	void ikari(machine_config &config) ATTR_COLD;
+	void victroad(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -288,12 +288,12 @@ public:
 		snk_state(mconfig, type, tag)
 	{ }
 
-	void bermudat(machine_config &config);
-	void chopper1(machine_config &config);
-	void choppera(machine_config &config);
-	void psychos(machine_config &config);
-	void tdfever(machine_config &config);
-	void tdfever2(machine_config &config);
+	void bermudat(machine_config &config) ATTR_COLD;
+	void chopper1(machine_config &config) ATTR_COLD;
+	void choppera(machine_config &config) ATTR_COLD;
+	void psychos(machine_config &config) ATTR_COLD;
+	void tdfever(machine_config &config) ATTR_COLD;
+	void tdfever2(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -364,8 +364,8 @@ public:
 		m_rot_io(*this, "P%uROT", 1U)
 	{ }
 
-	void gwar(machine_config &config);
-	void gwara(machine_config &config);
+	void gwar(machine_config &config) ATTR_COLD;
+	void gwara(machine_config &config) ATTR_COLD;
 
 	template <int Which> ioport_value gwar_rotary();
 
@@ -391,7 +391,7 @@ public:
 		m_joymode_io(*this, "JOYSTICK_MODE")
 	{ }
 
-	template <int Which> ioport_value gwarb_rotary();
+	template <int Which> ioport_value gwarb_rotary() ATTR_COLD;
 
 private:
 	required_ioport m_joymode_io;
