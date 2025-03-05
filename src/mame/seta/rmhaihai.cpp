@@ -418,10 +418,10 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( rmhaihai )
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "Unknown 2-1" )
+	PORT_DIPNAME( 0x01, 0x01, "Unknown 2-1" ) //NOT USED //DSW2-8 OFF
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0xfe, 0xfe, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0xfe, 0xfe, DEF_STR( Difficulty ) ) //レベル設定コンビュータのあがる確率//20%DSW2(1-7) All OFF----90%DSW2-7 ON(弱い----強い)//DSW2(1-7)
 	PORT_DIPSETTING(    0xfe, "1 (Easy)" )
 	PORT_DIPSETTING(    0x7e, "2" )
 	PORT_DIPSETTING(    0xbe, "3" )
@@ -432,25 +432,27 @@ static INPUT_PORTS_START( rmhaihai )
 	PORT_DIPSETTING(    0xfc, "8 (Difficult)" )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Free_Play ) )  //フリープレイDSW1-8
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x02, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x00, "A 2/1 B 1/2" )
-	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x04, "A 1/2 B 2/1" )
-	PORT_DIPSETTING(    0x08, "A 1/3 B 3/1" )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x01,0x01"Test Mode" )   //テストモードDSW1-7
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coinage ) ) //プレイ料金DSW1(5-6)
+	PORT_DIPSETTING(    0x00, "A 2/1 B 1/2" ) //1Coin/2Credit
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )  //1Coin/1Credit
+	PORT_DIPSETTING(    0x04, "A 1/2 B 2/1" )  //2Coin/1Credit
+	PORT_DIPSETTING(    0x08, "A 1/3 B 3/1" )  //1Coin/3Credit
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Demo_Sounds ) ) //DEMO音楽DSW1-4
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) ) //画面反轉DSW1-3
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x80, 0x80, "Medal" )
+	PORT_DIPNAME( 0x40, 0x00, "Style"  ) )  //スタイルDSW1-2
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )  //アップライト
+	PORT_DIPSETTING(    0x40, DEF_STR( Table ) )  //テープル
+	PORT_DIPNAME( 0x80, 0x80, "Medal" )  //NOT USED //DSW1-1 OFF
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
