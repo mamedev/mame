@@ -1,11 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders: Angelo Salese
+// thanks-to: vidpro1
 /**************************************************************************************************
 
 Prize Zone (c) 199? Lazer-Tron
 
 TODO:
-- identify proper motherboard/BIOS;
+- hookup proper motherboard type, MSI MS-5169 with ALADDiN V ATX chipset (ALi M1541 / M1543C);
 - hookup vibra16 ISA card in place of sblaster_16;
 - Printer error B0 keeps popping in attract/game select (disable in service mode as workaround);
 - Trackball in place of PS/2 mouse (doesn't seem to use serial);
@@ -247,7 +248,7 @@ void przone_state::smc_superio_config(device_t *device)
 
 void przone_state::przone(machine_config &config)
 {
-	// unknown CPU, lowered to PCI clock for ViRGE being really the bottleneck here.
+	// Socket 7 CPU, lowered to PCI clock for ViRGE being really the bottleneck here.
 	pentium_device &maincpu(PENTIUM(config, "maincpu", 33'333'333));
 	maincpu.set_addrmap(AS_PROGRAM, &przone_state::main_map);
 	maincpu.set_addrmap(AS_IO, &przone_state::main_io);
@@ -255,7 +256,7 @@ void przone_state::przone(machine_config &config)
 	maincpu.smiact().set("pci:00.0", FUNC(i82439hx_host_device::smi_act_w));
 
 	PCI_ROOT(config, "pci", 0);
-	// TODO: confirm size
+	// 256MB on vidpro1's board, may ship with less RAM
 	I82439HX(config, "pci:00.0", 0, "maincpu", 256*1024*1024);
 
 	i82371sb_isa_device &isa(I82371SB_ISA(config, "pci:07.0", 0, "maincpu"));
@@ -272,6 +273,7 @@ void przone_state::przone(machine_config &config)
 	PCI_SLOT(config, "pci:1", pci_cards, 15, 0, 1, 2, 3, nullptr);
 	PCI_SLOT(config, "pci:2", pci_cards, 16, 1, 2, 3, 0, nullptr);
 	PCI_SLOT(config, "pci:3", pci_cards, 17, 2, 3, 0, 1, nullptr);
+	// TODO: virgevx
 	PCI_SLOT(config, "pci:4", pci_cards, 18, 3, 0, 1, 2, "virge");
 
 	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "fdc37c93x", true).set_option_machine_config("fdc37c93x", smc_superio_config);
