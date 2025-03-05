@@ -43,6 +43,7 @@ public:
 
 private:
 	u16 unknown_r() { return (machine().rand() & 0x0010) | 0xffcf; } // 0x0010 seems to be sound CPU status
+	u16 unknown2_r() { return 0xffff; }
 
 	void screen_vblank(int state);
 	void screen_vblank_xypmda(int state);
@@ -124,8 +125,8 @@ void igs_68k_023vid_state::main_program_xypmda_map(address_map &map)
 	map(0x080120, 0x080121).portr("IN1");
 	map(0x080200, 0x080201).nopw();
 
-	map(0x0a0000, 0x0a0001).nopr();
-	map(0x0a0002, 0x0a0003).nopr();
+	map(0x0a0000, 0x0a0001).r(FUNC(igs_68k_023vid_state::unknown2_r));
+	map(0x0a0002, 0x0a0003).r(FUNC(igs_68k_023vid_state::unknown2_r));
 
 	// definitely the same as 0x0c0000 on the parent
 	map(0x0e0000, 0x0e0001).nopr().nopw();
@@ -342,4 +343,4 @@ ROM_END
 
 
 GAME( 2003, xypmd,  0,     xypmd,  xypmd, igs_68k_023vid_state, empty_init, ROT0, "IGS", "Xing Yun Pao Ma Di Super (V401CN)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2003, xypmda, xypmd, xypmda, xypmd, igs_68k_023vid_state, empty_init, ROT0, "IGS", "Xing Yun Pao Ma Di (unknown ver)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1999, xypmda, xypmd, xypmda, xypmd, igs_68k_023vid_state, empty_init, ROT0, "IGS", "Xing Yun Pao Ma Di (unknown ver)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
