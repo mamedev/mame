@@ -260,12 +260,6 @@ private:
 	void hardflags_scrollx_w(uint8_t data);
 	void hardflags_scrolly_w(uint8_t data);
 	void hardflags_scroll_msb_w(uint8_t data);
-	uint8_t hardflags1_r();
-	uint8_t hardflags2_r();
-	uint8_t hardflags3_r();
-	uint8_t hardflags4_r();
-	uint8_t hardflags5_r();
-	uint8_t hardflags6_r();
 	uint8_t hardflags7_r();
 
 	TILE_GET_INFO_MEMBER(ikari_get_tx_tile_info);
@@ -273,7 +267,7 @@ private:
 	uint32_t screen_update_ikari(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void ikari_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, const int start, const int xscroll, const int yscroll, const uint8_t *source, const int gfxnum );
 	int hardflags_check(int num);
-	int hardflags_check8(int num);
+	template <unsigned Num> uint8_t hardflags_check8();
 
 	void ikari_common_map(address_map &map) ATTR_COLD;
 	void ikari_cpuA_map(address_map &map) ATTR_COLD;
@@ -317,20 +311,8 @@ protected:
 	void turbocheck32_1_w(uint8_t data);
 	void turbocheck32_2_w(uint8_t data);
 	void turbocheck_msb_w(uint8_t data);
-	uint8_t turbocheck16_1_r();
-	uint8_t turbocheck16_2_r();
-	uint8_t turbocheck16_3_r();
-	uint8_t turbocheck16_4_r();
-	uint8_t turbocheck16_5_r();
-	uint8_t turbocheck16_6_r();
-	uint8_t turbocheck16_7_r();
-	uint8_t turbocheck16_8_r();
-	uint8_t turbocheck32_1_r();
-	uint8_t turbocheck32_2_r();
-	uint8_t turbocheck32_3_r();
-	uint8_t turbocheck32_4_r();
 	int turbofront_check(bool small, int num);
-	int turbofront_check8(bool small, int num);
+	template <bool Small, unsigned Num> uint8_t turbofront_check8();
 
 	TILE_GET_INFO_MEMBER(gwar_get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(gwar_get_bg_tile_info);
