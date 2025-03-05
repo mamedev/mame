@@ -19,7 +19,7 @@ TODO:
 #include "emu.h"
 #include "pc88va_sgp.h"
 
-#include <iostream>
+//#include <iostream>
 
 
 #define LOG_COMMAND     (1U << 1)
@@ -32,7 +32,7 @@ TODO:
 #define LOGCOMMAND(...)       LOGMASKED(LOG_COMMAND, __VA_ARGS__)
 
 // device type definition
-DEFINE_DEVICE_TYPE(PC88VA_SGP, pc88va_sgp_device, "pc88va_sgp", "NEC PC88VA Super Graphic Processor")
+DEFINE_DEVICE_TYPE(PC88VA_SGP, pc88va_sgp_device, "pc88va_sgp", "NEC PC-88VA Super Graphic Processor")
 
 pc88va_sgp_device::pc88va_sgp_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, PC88VA_SGP, tag, owner, clock),
@@ -374,30 +374,48 @@ void pc88va_sgp_device::cmd_blit(u16 draw_mode, bool is_patblt)
 		return;
 	}
 
+	const u8 hsize_shift = m_src.pixel_mode == 1 ? 1 : 0;
+
 	for (int yi = 0; yi < m_src.vsize; yi ++)
 	{
 		u32 src_address = m_src.address + (yi * m_src.fb_pitch);
 		u32 dst_address = m_dst.address + (yi * m_dst.fb_pitch);
 
-		for (int xi = 0; xi < (m_src.hsize >> 2); xi ++)
+		for (int xi = 0; xi < (m_src.hsize >> hsize_shift); xi ++)
 		{
 			// TODO: not very efficient, we need a cleaner per-pixel RMW phase
-			const u16 src_dot = m_data->read_word(src_address);
-			const u16 dst_dot = m_data->read_word(dst_address);
-			u16 result = 0;
+			const u8 src_dot = m_data->read_byte(src_address);
+			const u8 dst_dot = m_data->read_byte(dst_address);
+			u8 result = 0;
 
-			for (int pixi = 0; pixi < 4; pixi ++)
+			switch(m_src.pixel_mode)
 			{
-				u8 cur_pixel = (src_dot & 0xf);
-				if (cur_pixel || tp_mod == 0)
-					result |= (src_dot & 0xf) << (pixi * 4);
-				else
-					result |= (dst_dot & 0xf) << (pixi * 4);
+				// 4bpp (shinraba)
+				case 1:
+					for (int pixi = 0; pixi < 2; pixi ++)
+					{
+						u8 cur_pixel = (src_dot & 0xf);
+						if (cur_pixel || tp_mod == 0)
+							result |= (src_dot & 0xf) << (pixi * 4);
+						else
+							result |= (dst_dot & 0xf) << (pixi * 4);
+					}
+					break;
+
+				// 8bpp (tetris)
+				case 2:
+					u8 cur_pixel = (src_dot & 0xff);
+					if (cur_pixel || tp_mod == 0)
+						result |= (cur_pixel & 0xff);
+					else
+						result |= (dst_dot & 0xff);
+
+					break;
 			}
 
-			m_data->write_word(dst_address, result);
-			src_address += 2;
-			dst_address += 2;
+			m_data->write_byte(dst_address, result);
+			src_address ++;
+			dst_address ++;
 		}
 	}
 }
