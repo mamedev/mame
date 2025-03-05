@@ -1025,7 +1025,7 @@ uint8_t ikari_state::hardflags_check8()
 		(hardflags_check((Num * 8) + 4) << 4) |
 		(hardflags_check((Num * 8) + 5) << 5) |
 		(hardflags_check((Num * 8) + 6) << 6) |
-		(hardflags_check(num + 7) << 7);
+		(hardflags_check((Num * 8) + 7) << 7);
 }
 
 uint8_t ikari_state::hardflags7_r()
