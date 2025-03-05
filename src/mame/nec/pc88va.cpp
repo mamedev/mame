@@ -753,11 +753,11 @@ void pc88va_state::io_map(address_map &map)
 	);
 	map(0x0540, 0x0547).umask16(0x00ff).lrw8(
 		NAME([this] (offs_t offset) {
-			LOGGFXCTRL("PATRH%d R\n", offset);
+			LOGGFXCTRL("Multiplane PATRH%d R\n", offset);
 			return m_multiplane.patr[offset][1];
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			LOGGFXCTRL("PATRH%d W %02x\n", offset, data);
+			LOGGFXCTRL("Multiplane PATRH%d W %02x\n", offset, data);
 			m_multiplane.patr[offset][1] = data;
 		})
 	);
@@ -802,11 +802,11 @@ void pc88va_state::io_map(address_map &map)
 	);
 	map(0x0590, 0x0593).umask16(0x00ff).lrw8(
 		NAME([this] (offs_t offset) {
-			LOGGFXCTRL("Singleplane PATRL%d R\n", offset);
+			LOGGFXCTRL("Singleplane PATR%d R\n", offset);
 			return m_singleplane.patr[offset];
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			LOGGFXCTRL("Singleplane PATRL%d W %02x\n", offset, data);
+			LOGGFXCTRL("Singleplane PATR%d W %02x\n", offset, data);
 			m_singleplane.patr[offset] = data;
 		})
 	);
@@ -1265,6 +1265,7 @@ static void pc88va_cbus_devices(device_slot_interface &device)
 {
 	device.option_add("pc9801_55u", PC9801_55U);
 	device.option_add("pc9801_55l", PC9801_55L);
+	device.option_add("mif_201",    MIF201);
 	device.option_add("mpu_pc98",   MPU_PC98);
 }
 

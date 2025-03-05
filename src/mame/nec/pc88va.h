@@ -29,11 +29,12 @@
 #include "sound/ymopn.h"
 
 //#include "bus/cbus/amd98.h"
+#include "bus/cbus/mif201.h"
+#include "bus/cbus/mpu_pc98.h"
 //#include "bus/cbus/pc9801_26.h"
 #include "bus/cbus/pc9801_55.h"
 //#include "bus/cbus/pc9801_86.h"
 //#include "bus/cbus/pc9801_118.h"
-#include "bus/cbus/mpu_pc98.h"
 //#include "bus/cbus/sb16_ct2720.h"
 
 
