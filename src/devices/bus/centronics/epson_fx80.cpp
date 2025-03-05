@@ -66,8 +66,6 @@ public:
 	void slave_w(offs_t offset, uint8_t data);
 	uint8_t slave_p1_r();
 	void slave_p2_w(uint8_t data);
-	uint8_t slave_t0_r();
-	uint8_t slave_t1_r();
 	uint8_t centronics_data_r(offs_t offset);
 
 protected:
