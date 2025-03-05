@@ -1014,25 +1014,20 @@ int ikari_state::hardflags_check(int num)
 		return 1;
 }
 
-int ikari_state::hardflags_check8(int num)
+template <unsigned Num>
+uint8_t ikari_state::hardflags_check8()
 {
 	return
-		(hardflags_check(num + 0) << 0) |
-		(hardflags_check(num + 1) << 1) |
-		(hardflags_check(num + 2) << 2) |
-		(hardflags_check(num + 3) << 3) |
-		(hardflags_check(num + 4) << 4) |
-		(hardflags_check(num + 5) << 5) |
-		(hardflags_check(num + 6) << 6) |
+		(hardflags_check((Num * 8) + 0) << 0) |
+		(hardflags_check((Num * 8) + 1) << 1) |
+		(hardflags_check((Num * 8) + 2) << 2) |
+		(hardflags_check((Num * 8) + 3) << 3) |
+		(hardflags_check((Num * 8) + 4) << 4) |
+		(hardflags_check((Num * 8) + 5) << 5) |
+		(hardflags_check((Num * 8) + 6) << 6) |
 		(hardflags_check(num + 7) << 7);
 }
 
-uint8_t ikari_state::hardflags1_r() { return hardflags_check8(0*8); }
-uint8_t ikari_state::hardflags2_r() { return hardflags_check8(1*8); }
-uint8_t ikari_state::hardflags3_r() { return hardflags_check8(2*8); }
-uint8_t ikari_state::hardflags4_r() { return hardflags_check8(3*8); }
-uint8_t ikari_state::hardflags5_r() { return hardflags_check8(4*8); }
-uint8_t ikari_state::hardflags6_r() { return hardflags_check8(5*8); }
 uint8_t ikari_state::hardflags7_r()
 {
 	// apparently the startup tests use bits 0&1 while the game uses bits 4&5
@@ -1105,31 +1100,19 @@ int bermudat_state::turbofront_check(bool small, int num)
 		return 1;
 }
 
-int bermudat_state::turbofront_check8(bool small, int num)
+template <bool Small, unsigned Num>
+uint8_t bermudat_state::turbofront_check8()
 {
 	return
-		(turbofront_check(small, num + 0) << 0) |
-		(turbofront_check(small, num + 1) << 1) |
-		(turbofront_check(small, num + 2) << 2) |
-		(turbofront_check(small, num + 3) << 3) |
-		(turbofront_check(small, num + 4) << 4) |
-		(turbofront_check(small, num + 5) << 5) |
-		(turbofront_check(small, num + 6) << 6) |
-		(turbofront_check(small, num + 7) << 7);
+		(turbofront_check(Small, (num * 8) + 0) << 0) |
+		(turbofront_check(Small, (num * 8) + 1) << 1) |
+		(turbofront_check(Small, (num * 8) + 2) << 2) |
+		(turbofront_check(Small, (num * 8) + 3) << 3) |
+		(turbofront_check(Small, (num * 8) + 4) << 4) |
+		(turbofront_check(Small, (num * 8) + 5) << 5) |
+		(turbofront_check(Small, (num * 8) + 6) << 6) |
+		(turbofront_check(Small, (num * 8) + 7) << 7);
 }
-
-uint8_t bermudat_state::turbocheck16_1_r() { return turbofront_check8(true, 0*8); }
-uint8_t bermudat_state::turbocheck16_2_r() { return turbofront_check8(true, 1*8); }
-uint8_t bermudat_state::turbocheck16_3_r() { return turbofront_check8(true, 2*8); }
-uint8_t bermudat_state::turbocheck16_4_r() { return turbofront_check8(true, 3*8); }
-uint8_t bermudat_state::turbocheck16_5_r() { return turbofront_check8(true, 4*8); }
-uint8_t bermudat_state::turbocheck16_6_r() { return turbofront_check8(true, 5*8); }
-uint8_t bermudat_state::turbocheck16_7_r() { return turbofront_check8(true, 6*8); }
-uint8_t bermudat_state::turbocheck16_8_r() { return turbofront_check8(true, 7*8); }
-uint8_t bermudat_state::turbocheck32_1_r() { return turbofront_check8(false, 0*8); }
-uint8_t bermudat_state::turbocheck32_2_r() { return turbofront_check8(false, 1*8); }
-uint8_t bermudat_state::turbocheck32_3_r() { return turbofront_check8(false, 2*8); }
-uint8_t bermudat_state::turbocheck32_4_r() { return turbofront_check8(false, 3*8); }
 
 
 
@@ -1579,12 +1562,12 @@ void ikari_state::ikari_common_map(address_map &map)
 	map(0xcc00, 0xcc00).w(FUNC(ikari_state::hardflags_scrolly_w));
 	map(0xcc80, 0xcc80).w(FUNC(ikari_state::hardflags_scrollx_w));
 	map(0xcd80, 0xcd80).w(FUNC(ikari_state::hardflags_scroll_msb_w));
-	map(0xce00, 0xce00).r(FUNC(ikari_state::hardflags1_r));
-	map(0xce20, 0xce20).r(FUNC(ikari_state::hardflags2_r));
-	map(0xce40, 0xce40).r(FUNC(ikari_state::hardflags3_r));
-	map(0xce60, 0xce60).r(FUNC(ikari_state::hardflags4_r));
-	map(0xce80, 0xce80).r(FUNC(ikari_state::hardflags5_r));
-	map(0xcea0, 0xcea0).r(FUNC(ikari_state::hardflags6_r));
+	map(0xce00, 0xce00).r(FUNC(ikari_state::hardflags_check8<0>));
+	map(0xce20, 0xce20).r(FUNC(ikari_state::hardflags_check8<1>));
+	map(0xce40, 0xce40).r(FUNC(ikari_state::hardflags_check8<2>));
+	map(0xce60, 0xce60).r(FUNC(ikari_state::hardflags_check8<3>));
+	map(0xce80, 0xce80).r(FUNC(ikari_state::hardflags_check8<4>));
+	map(0xcea0, 0xcea0).r(FUNC(ikari_state::hardflags_check8<5>));
 	map(0xcee0, 0xcee0).r(FUNC(ikari_state::hardflags7_r));
 	// note the mirror. ikari and victroad use d800, ikarijp uses d000
 	map(0xd000, 0xd7ff).ram().w(FUNC(ikari_state::bg_videoram_w)).mirror(0x0800).share(m_bg_videoram);
@@ -1655,21 +1638,21 @@ void bermudat_state::bermudat_cpuA_map(address_map &map)
 	map(0xca00, 0xca00).w(FUNC(bermudat_state::turbocheck16_1_w));
 	map(0xca40, 0xca40).w(FUNC(bermudat_state::turbocheck16_2_w));
 	map(0xcac0, 0xcac0).w(FUNC(bermudat_state::sprite_split_point_w));
-	map(0xcb00, 0xcb00).r(FUNC(bermudat_state::turbocheck16_1_r));
-	map(0xcb10, 0xcb10).r(FUNC(bermudat_state::turbocheck16_2_r));
-	map(0xcb20, 0xcb20).r(FUNC(bermudat_state::turbocheck16_3_r));
-	map(0xcb30, 0xcb30).r(FUNC(bermudat_state::turbocheck16_4_r));
-	map(0xcb40, 0xcb40).r(FUNC(bermudat_state::turbocheck16_5_r));
-	map(0xcb50, 0xcb50).r(FUNC(bermudat_state::turbocheck16_6_r));
-	map(0xcb60, 0xcb60).r(FUNC(bermudat_state::turbocheck16_7_r));
-	map(0xcb70, 0xcb70).r(FUNC(bermudat_state::turbocheck16_8_r));
+	map(0xcb00, 0xcb00).r(NAME((&bermudat_state::turbofront_check8<true, 0>)));
+	map(0xcb10, 0xcb10).r(NAME((&bermudat_state::turbofront_check8<true, 1>)));
+	map(0xcb20, 0xcb20).r(NAME((&bermudat_state::turbofront_check8<true, 2>)));
+	map(0xcb30, 0xcb30).r(NAME((&bermudat_state::turbofront_check8<true, 3>)));
+	map(0xcb40, 0xcb40).r(NAME((&bermudat_state::turbofront_check8<true, 4>)));
+	map(0xcb50, 0xcb50).r(NAME((&bermudat_state::turbofront_check8<true, 5>)));
+	map(0xcb60, 0xcb60).r(NAME((&bermudat_state::turbofront_check8<true, 6>)));
+	map(0xcb70, 0xcb70).r(NAME((&bermudat_state::turbofront_check8<true, 7>)));
 	map(0xcc00, 0xcc00).w(FUNC(bermudat_state::turbocheck32_1_w));
 	map(0xcc40, 0xcc40).w(FUNC(bermudat_state::turbocheck32_2_w));
 	map(0xcc80, 0xcc80).w(FUNC(bermudat_state::turbocheck_msb_w));
-	map(0xccc0, 0xccc0).r(FUNC(bermudat_state::turbocheck32_1_r));
-	map(0xccd0, 0xccd0).r(FUNC(bermudat_state::turbocheck32_2_r));
-	map(0xcce0, 0xcce0).r(FUNC(bermudat_state::turbocheck32_3_r));
-	map(0xccf0, 0xccf0).r(FUNC(bermudat_state::turbocheck32_4_r));
+	map(0xccc0, 0xccc0).r(NAME((&bermudat_state::turbofront_check8<false, 0>)));
+	map(0xccd0, 0xccd0).r(NAME((&bermudat_state::turbofront_check8<false, 1>)));
+	map(0xcce0, 0xcce0).r(NAME((&bermudat_state::turbofront_check8<false, 2>)));
+	map(0xccf0, 0xccf0).r(NAME((&bermudat_state::turbofront_check8<false, 3>)));
 }
 
 void bermudat_state::bermudat_cpuB_map(address_map &map)
