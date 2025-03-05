@@ -132,10 +132,12 @@ void munchmo_state::palette(palette_device &palette) const
 
 	for (int i = 0; i < palette.entries(); i++)
 	{
+		int bit0, bit1, bit2;
+
 		// red component
-		int bit0 = BIT(color_prom[i], 0);
-		int bit1 = BIT(color_prom[i], 1);
-		int bit2 = BIT(color_prom[i], 2);
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
 		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		// green component
