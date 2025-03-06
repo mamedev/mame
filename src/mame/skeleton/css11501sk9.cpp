@@ -14,7 +14,7 @@ Main board.
  -Sipex SP3243ECA Intelligent RS-232 Transceiver.
  -Crystal CrystalLAN CS8900A Ethernet ISA LAN Controller.
  -Exar ST16C1551 UART.
- -Microchip PIC16LF877PT next to a 10 MHz cristal (U35).
+ -Microchip PIC16LF877PT next to a 10 MHz crystal (U35).
  -Xilinx Spartan XC2S50 (U23).
  -Atmel 24C02N SEEPROM (U11) next to the Xilinx Spartan XC2S50 at U23.
  -Two PCMCIA slots for Microdrive or Flash Drive.
