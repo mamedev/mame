@@ -463,8 +463,8 @@ void k053247_device::zdrawgfxzoom32GP(
 	// alpha blend check: cull if 0% opaque, or skip alpha blending if 100% opaque
 	if (drawmode & 2)
 	{
-		if (alpha <= 0) return;
-		if (alpha >= 255) drawmode &= ~2;
+		if (!alpha) return;
+		if (alpha == 255) drawmode &= ~2;
 	}
 
 	rectangle dst_rect = rectangle {sx, 0, sy, 0};
@@ -537,7 +537,31 @@ void k053247_device::zdrawgfxzoom32GP(
 				const u8 pal_idx = src_base[(x_off + y_off * 16) ^ flip_mask];
 				if (!pal_idx || (drawmode & 0b01 && pal_idx >= shdpen) || ozbuf_ptr[x + y * GX_ZBUFW] < z8) continue;
 				ozbuf_ptr[x + y * GX_ZBUFW] = z8;
-				dst_ptr[x + y * dst_pitch] = (drawmode & 0b10) ? alpha_blend_r32(dst_ptr[x + y * dst_pitch], pal_base[pal_idx], alpha) : pal_base[pal_idx];
+
+				if ((drawmode & 0b10) == 0) // solid sprite
+				{
+					dst_ptr[x + y * dst_pitch] = pal_base[pal_idx];
+				}
+				else // alpha blended sprite
+				{
+					const u8 alpha_level = alpha;
+					const bool additive_mode = alpha & (1 << 8);
+					// todo: use mix_pri to flip src & dst
+					// const bool mix_pri = alpha & (1 << 9);
+
+					const u32 src = pal_base[pal_idx];
+					const u32 dst = dst_ptr[x + y * dst_pitch];
+
+					if (additive_mode)
+					{
+						const u32 temp = alpha_blend_r32(src, 0, alpha_level);
+						dst_ptr[x + y * dst_pitch] = add_blend_r32(dst, temp);
+					}
+					else
+					{
+						dst_ptr[x + y * dst_pitch] = alpha_blend_r32(dst, src, alpha_level);
+					}
+				}
 			}
 		}
 	}

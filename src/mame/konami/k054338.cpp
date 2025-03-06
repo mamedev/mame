@@ -151,7 +151,7 @@ int k054338_device::set_alpha_level(int pblend)
 	pblend &= 0b11;
 
 	const u8 mixset = m_regs[K338_REG_PBLEND + (pblend >> 1 & 1)] >> (~pblend << 3 & 8);
-	u8 mixlv  = mixset & 0x1f;
+	int mixlv  = mixset & 0x1f;
 
 	if (m_alpha_inv) mixlv = 0x1f - mixlv;
 

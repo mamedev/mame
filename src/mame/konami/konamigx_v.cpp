@@ -867,7 +867,7 @@ void konamigx_state::konamigx_mixer_draw(screen_device &screen, bitmap_rgb32 &bi
 			if (drawmode & 2)
 			{
 				alpha = color>>K055555_MIXSHIFT & 3;
-				if (alpha) alpha = m_k054338->set_alpha_level(alpha) & 0xFF;
+				if (alpha) alpha = m_k054338->set_alpha_level(alpha);
 				if (alpha <= 0) continue;
 			}
 			color &= K055555_COLORMASK;
