@@ -703,7 +703,7 @@ void konamigx_state::gx_draw_basic_tilemaps(screen_device &screen, bitmap_rgb32 
 		*/
 		if (temp1!=0xff && temp2 /*&& temp3==3*/)
 		{
-			temp4 = m_k054338->set_alpha_level(temp2);
+			temp4 = m_k054338->set_alpha_level(temp2) & 0xFF;
 
 			if (temp4 <= 0) return;
 			if (temp4 < 255) k = TILEMAP_DRAW_ALPHA(temp4);
@@ -738,7 +738,7 @@ void konamigx_state::gx_draw_basic_extended_tilemaps_1(screen_device &screen, bi
 
 		if (temp1!=0xff && temp2 /*&& temp3==3*/)
 		{
-			alpha = temp4 = m_k054338->set_alpha_level(temp2);
+			alpha = temp4 = m_k054338->set_alpha_level(temp2) & 0xFF;
 
 			if (temp4 <= 0) return;
 			if (temp4 < 255) k = 1;
@@ -786,7 +786,7 @@ void konamigx_state::gx_draw_basic_extended_tilemaps_2(screen_device &screen, bi
 		if (temp1!=0xff && temp2 /*&& temp3==3*/)
 		{
 			//alpha =
-			temp4 = m_k054338->set_alpha_level(temp2);
+			temp4 = m_k054338->set_alpha_level(temp2) & 0xFF;
 
 			if (temp4 <= 0) return;
 			//if (temp4 < 255) k = 1;
@@ -867,7 +867,7 @@ void konamigx_state::konamigx_mixer_draw(screen_device &screen, bitmap_rgb32 &bi
 			if (drawmode & 2)
 			{
 				alpha = color>>K055555_MIXSHIFT & 3;
-				if (alpha) alpha = m_k054338->set_alpha_level(alpha);
+				if (alpha) alpha = m_k054338->set_alpha_level(alpha) & 0xFF;
 				if (alpha <= 0) continue;
 			}
 			color &= K055555_COLORMASK;
