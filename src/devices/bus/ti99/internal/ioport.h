@@ -38,6 +38,7 @@ public:
 	virtual void msast_in(int state) { }
 	virtual void clock_in(int state) { }
 	virtual void reset_in(int state) { }
+	virtual void sbe(int state) { }
 
 	void set_ioport(ioport_device* ioport) { m_ioport = ioport; }
 
@@ -80,6 +81,7 @@ public:
 	void msast_in(int state);
 	void clock_in(int state);
 	void reset_in(int state);
+	void sbe(int state);
 
 	// Callbacks
 	auto extint_cb() { return m_console_extint.bind(); }
