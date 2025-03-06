@@ -14,7 +14,6 @@ public:
 
 	// configuration
 	template <typename T> void set_spriteram_tag(T &&tag) { m_spriteram.set_tag(std::forward<T>(tag)); }
-	template <typename T> void set_scaletable_tag(T &&tag) { m_scale_table.set_tag(std::forward<T>(tag)); }
 
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
