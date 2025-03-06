@@ -131,8 +131,8 @@ public:
 		m_spriteram(*this, "spriteram%u", 1U),
 		m_soundlatch(*this, "soundlatch%u", 1U),
 		m_tx_vram(*this, "tx_videoram"),
-		m_pf_vram(*this, "pf%u_data", 1U),
-		m_pf_scroll_ram(*this, "pf%u_scroll_data", 1U),
+		m_pf_vram(*this, "pf%u_vram", 1U),
+		m_pf_scroll_reg(*this, "pf%u_scroll_reg", 1U),
 		m_gun_recoil(*this, "Player%u_Gun_Recoil", 1U),
 		m_eprom_data(*this, "eeprom")
 	{ }
@@ -154,7 +154,7 @@ private:
 
 	required_shared_ptr<uint16_t> m_tx_vram;
 	required_shared_ptr_array<uint16_t, 2> m_pf_vram;
-	required_shared_ptr_array<uint16_t, 2> m_pf_scroll_ram;
+	required_shared_ptr_array<uint16_t, 2> m_pf_scroll_reg;
 
 	output_finder<3> m_gun_recoil;
 	required_shared_ptr<uint16_t> m_eprom_data;
@@ -292,10 +292,10 @@ uint32_t bbusters_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_sprites[1]->draw_sprites(m_bitmap_sprites[1], cliprect);
 	m_sprites[0]->draw_sprites(m_bitmap_sprites[0], cliprect);
 
-	m_pf_tilemap[0]->set_scrollx(0, m_pf_scroll_ram[0][0]);
-	m_pf_tilemap[0]->set_scrolly(0, m_pf_scroll_ram[0][1]);
-	m_pf_tilemap[1]->set_scrollx(0, m_pf_scroll_ram[1][0]);
-	m_pf_tilemap[1]->set_scrolly(0, m_pf_scroll_ram[1][1]);
+	m_pf_tilemap[0]->set_scrollx(0, m_pf_scroll_reg[0][0]);
+	m_pf_tilemap[0]->set_scrolly(0, m_pf_scroll_reg[0][1]);
+	m_pf_tilemap[1]->set_scrollx(0, m_pf_scroll_reg[1][0]);
+	m_pf_tilemap[1]->set_scrolly(0, m_pf_scroll_reg[1][1]);
 
 	m_pf_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
 
@@ -324,8 +324,8 @@ void bbusters_state::main_map(address_map &map)
 	map(0x0b0000, 0x0b1fff).ram().w(FUNC(bbusters_state::pf_vram_w<0>)).share(m_pf_vram[0]);
 	map(0x0b2000, 0x0b3fff).ram().w(FUNC(bbusters_state::pf_vram_w<1>)).share(m_pf_vram[1]);
 	map(0x0b4000, 0x0b5fff).ram();     /* service mode */
-	map(0x0b8000, 0x0b8003).writeonly().share(m_pf_scroll_ram[0]);
-	map(0x0b8008, 0x0b800b).writeonly().share(m_pf_scroll_ram[1]);
+	map(0x0b8000, 0x0b8003).writeonly().share(m_pf_scroll_reg[0]);
+	map(0x0b8008, 0x0b800b).writeonly().share(m_pf_scroll_reg[1]);
 	map(0x0d0000, 0x0d0fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x0e0000, 0x0e0001).portr("COINS");  /* Coins */
 	map(0x0e0002, 0x0e0003).portr("IN0");    /* Player 1 & 2 */

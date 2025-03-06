@@ -160,8 +160,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_soundlatch(*this, "soundlatch%u", 1U),
 		m_tx_vram(*this, "tx_videoram"),
-		m_pf_vram(*this, "pf%u_data", 1U),
-		m_pf_scroll_ram(*this, "pf%u_scroll_data", 1U),
+		m_pf_vram(*this, "pf%u_vram", 1U),
+		m_pf_scroll_reg(*this, "pf%u_scroll_reg", 1U),
 		m_gun_io(*this, { "GUNX1", "GUNY1", "GUNX2", "GUNY2" }),
 		m_gun_recoil(*this, "Player%u_Gun_Recoil", 1U)
 	{ }
@@ -182,7 +182,7 @@ private:
 	required_device_array<generic_latch_8_device, 2> m_soundlatch;
 	required_shared_ptr<uint16_t> m_tx_vram;
 	required_shared_ptr_array<uint16_t, 2> m_pf_vram;
-	required_shared_ptr_array<uint16_t, 2> m_pf_scroll_ram;
+	required_shared_ptr_array<uint16_t, 2> m_pf_scroll_reg;
 	required_ioport_array<4> m_gun_io;
 	output_finder<2> m_gun_recoil;
 
@@ -297,10 +297,10 @@ uint32_t mechatt_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	m_bitmap_sprites.fill(0xffff);
 	m_sprites->draw_sprites(m_bitmap_sprites, cliprect);
 
-	m_pf_tilemap[0]->set_scrollx(0, m_pf_scroll_ram[0][0]);
-	m_pf_tilemap[0]->set_scrolly(0, m_pf_scroll_ram[0][1]);
-	m_pf_tilemap[1]->set_scrollx(0, m_pf_scroll_ram[1][0]);
-	m_pf_tilemap[1]->set_scrolly(0, m_pf_scroll_ram[1][1]);
+	m_pf_tilemap[0]->set_scrollx(0, m_pf_scroll_reg[0][0]);
+	m_pf_tilemap[0]->set_scrolly(0, m_pf_scroll_reg[0][1]);
+	m_pf_tilemap[1]->set_scrollx(0, m_pf_scroll_reg[1][0]);
+	m_pf_tilemap[1]->set_scrolly(0, m_pf_scroll_reg[1][1]);
 
 	m_pf_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
 
@@ -342,9 +342,9 @@ void mechatt_state::main_map(address_map &map)
 	map(0x0a0000, 0x0a0fff).ram().share("spriteram");
 	map(0x0a1000, 0x0a7fff).nopw();
 	map(0x0b0000, 0x0b3fff).ram().w(FUNC(mechatt_state::pf_vram_w<0>)).share(m_pf_vram[0]);
-	map(0x0b8000, 0x0b8003).writeonly().share(m_pf_scroll_ram[0]);
+	map(0x0b8000, 0x0b8003).writeonly().share(m_pf_scroll_reg[0]);
 	map(0x0c0000, 0x0c3fff).ram().w(FUNC(mechatt_state::pf_vram_w<1>)).share(m_pf_vram[1]);
-	map(0x0c8000, 0x0c8003).writeonly().share(m_pf_scroll_ram[1]);
+	map(0x0c8000, 0x0c8003).writeonly().share(m_pf_scroll_reg[1]);
 	map(0x0d0000, 0x0d07ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x0e0000, 0x0e0001).portr("IN0");
 	map(0x0e0002, 0x0e0003).portr("DSW1");
