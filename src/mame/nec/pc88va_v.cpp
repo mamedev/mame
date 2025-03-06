@@ -4,7 +4,7 @@
 #include "emu.h"
 #include "pc88va.h"
 
-#include <iostream>
+//#include <iostream>
 
 
 #define LOG_IDP     (1U << 1) // TSP data
@@ -58,11 +58,14 @@ void pc88va_state::video_start()
 void pc88va_state::video_reset()
 {
 	m_text_transpen = 0;
+	m_screen_ctrl_reg = 0;
+	m_color_mode = 0;
+	m_pltm = 0;
+	m_pltp = 0;
 }
 
 void pc88va_state::palette_init(palette_device &palette) const
 {
-	// default palette
 	const u16 default_palette[16] = {
 		0x0000, 0x001f, 0x03e0, 0x03ff, 0xfc00, 0xfc1f, 0xffe0, 0xffff,
 		0x7def, 0x0015, 0x02a0, 0x02b5, 0xac00, 0xac15, 0xaea0, 0xaeb5
@@ -1138,21 +1141,29 @@ void pc88va_state::execute_sync_cmd()
 	// olteus will punt loading on PC Engine OS if the vblank bit is completely off
 	// illcity expects the actual IDP vblank bit to work, from setup menu to opening transition PC=0x418f6
 	// upo wants precise vblank bit readouts plus something else (SGP irq?)
-
-	rectangle visarea;
-	attoseconds_t refresh;
-
+	// TODO: verify fray
 	LOGCRTC("IDP SYNC: ");
 
 	for (int i = 0; i < 15; i++)
+	{
 		LOGCRTC("%02x ", m_buf_ram[i]);
+		m_crtc_regs[i] = m_buf_ram[i];
+	}
 
-	const u8 h_blank_start = (m_buf_ram[0x02] & 0x3f) + 1;
-	const u8 h_border_start = (m_buf_ram[0x03] & 0x3f) + 1;
-	const u16 h_vis_area = (m_buf_ram[0x04] + 1) * 4;
-	const u8 h_border_end = (m_buf_ram[0x05] & 0x3f) + 1;
-	const u8 h_blank_end = (m_buf_ram[0x06] & 0x3f) + 1;
-	const u8 h_sync = (m_buf_ram[0x07] & 0x3f) + 1;
+	recompute_parameters();
+}
+
+void pc88va_state::recompute_parameters()
+{
+	rectangle visarea;
+	attoseconds_t refresh;
+
+	const u8 h_blank_start = (m_crtc_regs[0x02] & 0x3f) + 1;
+	const u8 h_border_start = (m_crtc_regs[0x03] & 0x3f) + 1;
+	const u16 h_vis_area = (m_crtc_regs[0x04] + 1) * 4;
+	const u8 h_border_end = (m_crtc_regs[0x05] & 0x3f) + 1;
+	const u8 h_blank_end = (m_crtc_regs[0x06] & 0x3f) + 1;
+	const u8 h_sync = (m_crtc_regs[0x07] & 0x3f) + 1;
 
 	LOGCRTC("\n\t");
 	LOGCRTC("H blank start %d - end %d|", h_blank_start, h_blank_end);
@@ -1167,23 +1178,32 @@ void pc88va_state::execute_sync_cmd()
 	LOGCRTC("H Total calc = %d", h_total);
 	LOGCRTC("\n\t");
 
-	const u8 v_blank_start = m_buf_ram[0x08] & 0x3f;
-	const u8 v_border_start = m_buf_ram[0x09] & 0x3f;
-	const u16 v_vis_area = (m_buf_ram[0x0a]) | ((m_buf_ram[0x0b] & 0x40) << 2);
-	const u8 v_border_end = m_buf_ram[0x0b] & 0x3f;
-	const u8 v_blank_end = m_buf_ram[0x0c] & 0x3f;
-	const u8 v_sync = (m_buf_ram[0x0d] & 0x3f);
+	const u8 v_blank_start = m_crtc_regs[0x08] & 0x3f;
+	const u8 v_border_start = m_crtc_regs[0x09] & 0x3f;
+	u16 v_vis_area = (m_crtc_regs[0x0a]) | ((m_crtc_regs[0x0b] & 0x40) << 2);
+	const u8 v_border_end = m_crtc_regs[0x0b] & 0x3f;
+	const u8 v_blank_end = m_crtc_regs[0x0c] & 0x3f;
+	const u8 v_sync = (m_crtc_regs[0x0d] & 0x3f);
 
 	LOGCRTC("V blank start %d - end %d|", v_blank_start,  v_blank_end);
 	LOGCRTC("V visible area: %d|", v_vis_area);
-	LOGCRTC("V border start: %d - end %d|", v_border_start,  v_border_end);
+	LOGCRTC("V border start %d - end %d|", v_border_start,  v_border_end);
 	LOGCRTC("V sync: %d", v_sync);
 
 	LOGCRTC("\n\t");
 	m_vrtc_irq_line = v_blank_start + v_blank_end + v_vis_area + v_border_start + v_border_end;
-	const u16 v_total = m_vrtc_irq_line + v_sync;
+	u16 v_total = m_vrtc_irq_line + v_sync;
 
-	LOGCRTC("V Total calc = %d (VRTC %d)\n", v_total, m_vrtc_irq_line);
+	LOGCRTC("V Total calc = %d (VRTC %d)", v_total, m_vrtc_irq_line);
+
+	if (BIT(m_screen_ctrl_reg, 7))
+	{
+		m_vrtc_irq_line <<= 1;
+		v_total <<= 1;
+		v_vis_area <<= 1;
+		LOGCRTC(" (Interlace)");
+	}
+	LOGCRTC("\n");
 
 	// punt with message if values are off (shouldn't happen)
 	// TODO: more validation:
@@ -1202,9 +1222,9 @@ void pc88va_state::execute_sync_cmd()
 
 	visarea.set(0, h_vis_area - 1, 0, v_vis_area - 1);
 
-	// TODO: interlace / vertical magnify, bit 7
+	// TODO: vertical magnify, bit 7
 	// TODO: actual clock source must be external, assume known PC-88 XTALs, a bit off compared to PC-88 with the values above
-	const int clock_speed = BIT(m_buf_ram[0x00], 6) ? (31'948'800 / 4) : (28'636'363 / 2);
+	const int clock_speed = BIT(m_crtc_regs[0x00], 6) ? (31'948'800 / 4) : (28'636'363 / 2);
 
 	refresh = HZ_TO_ATTOSECONDS(clock_speed) * h_vis_area * v_vis_area;
 
@@ -1459,6 +1479,12 @@ void pc88va_state::idp_param_w(uint8_t data)
  */
 void pc88va_state::screen_ctrl_w(offs_t offset, u16 data, u16 mem_mask)
 {
+	// Interlace mode (inufuto games), cheat for now.
+	if (BIT(data, 7) != BIT(m_screen_ctrl_reg, 7))
+	{
+		recompute_parameters();
+	}
+
 	COMBINE_DATA(&m_screen_ctrl_reg);
 
 	m_ymmd = bool(BIT(m_screen_ctrl_reg, 11));

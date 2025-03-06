@@ -278,6 +278,7 @@ private:
 	uint8_t m_buf_size = 0;
 	uint8_t m_buf_index = 0;
 	uint8_t m_buf_ram[16]{};
+	u8 m_crtc_regs[15]{};
 	u16 m_vrtc_irq_line = 432;
 
 	uint8_t idp_status_r();
@@ -295,6 +296,8 @@ private:
 	void execute_spron_cmd();
 	void execute_sprsw_cmd();
 	void execute_spwr_cmd(u8 data);
+
+	void recompute_parameters();
 
 	void main_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
