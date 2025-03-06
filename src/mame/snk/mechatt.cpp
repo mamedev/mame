@@ -196,7 +196,7 @@ private:
 
 	void sound_cpu_w(uint8_t data);
 	void tx_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	template<int Layer> void pf_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	template <int Layer> void pf_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void coin_counter_w(uint8_t data);
 
 	void gun_output_w(uint16_t data);
@@ -272,8 +272,6 @@ void mechatt_state::video_start()
 
 	m_screen->register_screen_bitmap(m_bitmap_sprites);
 	m_bitmap_sprites.fill(0xffff);
-
-	save_item(NAME(m_bitmap_sprites));
 }
 
 template <typename Proc>
@@ -282,7 +280,7 @@ void mechatt_state::mix_sprites(bitmap_ind16 &bitmap, bitmap_ind16 &srcbitmap, c
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		uint16_t const *const srcbuf = &srcbitmap.pix(y);
-		uint16_t *dstbuf = &bitmap.pix(y);
+		uint16_t *const dstbuf = &bitmap.pix(y);
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			uint16_t const srcdat = srcbuf[x];
@@ -513,6 +511,7 @@ void mechatt_state::mechatt(machine_config &config)
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
 	SNK_BBUSTERS_SPR(config, m_sprites, 0);
+	m_sprites->set_scaletable_tag("sprites:scale_table");
 	m_sprites->set_palette("palette");
 	m_sprites->set_spriteram_tag("spriteram");
 
