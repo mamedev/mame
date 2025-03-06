@@ -137,7 +137,7 @@ public:
 		m_eprom_data(*this, "eeprom")
 	{ }
 
-	void bbusters(machine_config &config);
+	void bbusters(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -169,7 +169,7 @@ private:
 
 	void sound_cpu_w(uint8_t data);
 	void tx_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	template<int Layer> void pf_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	template <int Layer> void pf_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void coin_counter_w(uint8_t data);
 
 	uint16_t eprom_r(offs_t offset);
@@ -256,12 +256,10 @@ void bbusters_state::video_start()
 
 	m_pf_tilemap[0]->set_transparent_pen(15);
 
-	for (int i = 0; i < 2; i++)
+	for (auto &bitmap : m_bitmap_sprites)
 	{
-		m_screen->register_screen_bitmap(m_bitmap_sprites[i]);
-		m_bitmap_sprites[i].fill(0xffff);
-
-		save_item(NAME(m_bitmap_sprites[i]), i);
+		m_screen->register_screen_bitmap(bitmap);
+		bitmap.fill(0xffff);
 	}
 }
 
@@ -275,7 +273,7 @@ void bbusters_state::mix_sprites(bitmap_ind16 &bitmap, bitmap_ind16 &srcbitmap, 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		uint16_t const *const srcbuf = &srcbitmap.pix(y);
-		uint16_t *dstbuf = &bitmap.pix(y);
+		uint16_t *const dstbuf = &bitmap.pix(y);
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			uint16_t const srcdat = srcbuf[x];
@@ -506,10 +504,12 @@ void bbusters_state::bbusters(machine_config &config)
 	PALETTE(config, "palette").set_format(palette_device::RGBx_444, 2048);
 
 	SNK_BBUSTERS_SPR(config, m_sprites[0], 0);
+	m_sprites[0]->set_scaletable_tag("sprites1:scale_table");
 	m_sprites[0]->set_palette("palette");
 	m_sprites[0]->set_spriteram_tag("spriteram1");
 
 	SNK_BBUSTERS_SPR(config, m_sprites[1], 0);
+	m_sprites[1]->set_scaletable_tag("sprites2:scale_table");
 	m_sprites[1]->set_palette("palette");
 	m_sprites[1]->set_spriteram_tag("spriteram2");
 
