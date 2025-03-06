@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders: David Haywood
 
 /*
 IGS games based on M68000 + IGS023 for video.
@@ -149,39 +149,39 @@ void igs_68k_023vid_state::sub_program_map(address_map &map)
 static INPUT_PORTS_START( xypmd )
 	PORT_START("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
 	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW1:1")
@@ -208,7 +208,7 @@ INPUT_PORTS_END
 void igs_68k_023vid_state::xypmd(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 20_MHz_XTAL / 2);
+	M68000(config, m_maincpu, 20_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_68k_023vid_state::main_program_xypmd_map);
 
 	m6502_device &subcpu(M6502(config, "subcpu", 8_MHz_XTAL)); // TODO: something M6502 derived (data.u13 is M6502 derived code)
@@ -239,12 +239,13 @@ void igs_68k_023vid_state::xypmd(machine_config &config)
 void igs_68k_023vid_state::xypmda(machine_config &config)
 {
 	xypmd(config);
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_68k_023vid_state::main_program_xypmda_map);
 
 	m_screen->screen_vblank().set(FUNC(igs_68k_023vid_state::screen_vblank_xypmda));
 }
 /*
-Xing Yun Pao Ma Di, IGS, 2003
+Xing Yun Pao Ma Di Super, IGS, 2003
 Hardware Info By Guru
 ---------------------
 
@@ -252,7 +253,7 @@ IGS PCB NO-0255-1
   |----------------------------------------------|
   | IDC34    SOCKET.U11     |------|  TL082  VOL |
 |-|                         |NOVATEK      OM8383S|
-|1  TLF521(x23)        8MHz |NT3570F     TL082   |
+|1  TLP521(x23)        8MHz |NT3570F     TL082   |
 |8           DATA.U13       |------|             |
 |W                                               |
 |A                          |------|      7805   |
@@ -266,15 +267,36 @@ IGS PCB NO-0255-1
 |W  CG.U7    |         | |-----|          24258  |
 |A           |---------| |IGS025  20MHz      BATT|
 |Y         DSW1     50MHz| S8  |             SW3 |
-|-|ULN2004 DSW2          |-----|   TLF521(x17)   |
-  | TLF521(x6)  |--|       JAMMA          |--|   |
+|-|ULN2004 DSW2          |-----|   TLP521(x17)   |
+  | TLP521(x6)  |--|       JAMMA          |--|   |
   |-------------|  |----------------------|  |---|
 Notes:
-      68000 - Clock 20MHz
-      24257 - 32kB x8-bit SRAM
-      24258 - 32kB x8-bit SRAM
+      68000 - Motorola MC68000FN20 CPU. Clock Input 20MHz
+              Note: This is a 20MHz part without clock divider and runs at 20MHz.
+      24257 - Winbond W24257AJ-8N 32kB x8-bit SRAM (VRAM)
+      24258 - Winbond W24258S-55LL 32kB x8-bit SRAM (Work RAM)
      IGS023 - Custom IGS023 Graphics Chip (also used on IGS PGM)
      IGS025 - Custom IGS025 Chip with Sticker 'S8'
+    V-401CN - 27C4096 EPROM (main program)
+    TEXT.U5 - 27C160 EPROM
+      CG.U6 - 27C4096 EPROM
+      CG.U7 - 27C160 EPROM
+       DATA - 27512 Mask ROM
+ SOCKET.U11 - Empty Socket. ROM is likely to be missing as the socket is clean. PCB printed 'MUSIC1' and '27C080'.
+              There is space for another unpopulated ROM below this one marked 'MUSIC2' and '27C080'.
+      IDC34 - IDC34 34-Pin Flat Cable Connector for I/O and Control Expansion (same connector seen on PGM)
+    NT3580F - Novatek NT3580F-AM019 QFP100 Sound CPU with 6502 Core. Clock Input 8.000MHz. DATA ROM connects to this chip.
+    NT3570F - Novatek NT3570F QFP80 Sound Chip. Clock Input 8.000MHz. This chip connects to the opamps so this is the sound chip.
+              ROM U11 connects to this chip. Both Novatek chips are dated 1999.
+      T518B - Mitsumi T518B Reset Chip
+       7805 - LM7805 5V Linear Voltage Regulator
+     TLP521 - Toshiba TLP521 Opto-Coupler
+       BATT - 3.6V Ni-Cad Battery (both W24258 RAMs are battery-backed)
+        SW3 - Toggle Switch for NVRAM Clear and Reset
+     DSW1/2 - 8-Position DIP Switch
+    ULN2003 - ULN2003 7-Channel Darlington Transistor Array
+      TL082 - Texas Instruments TL082 JFET Input Dual Operational Amplifier
+    OM8383S - Philips OM8383S Audio Power Amplifier
 */
 
 ROM_START( xypmd )
@@ -342,5 +364,5 @@ ROM_END
 
 
 
-GAME( 2003, xypmd,  0,     xypmd,  xypmd, igs_68k_023vid_state, empty_init, ROT0, "IGS", "Xing Yun Pao Ma Di Super (V401CN)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1999, xypmda, xypmd, xypmda, xypmd, igs_68k_023vid_state, empty_init, ROT0, "IGS", "Xing Yun Pao Ma Di (unknown ver)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2003, xypmd,  0,     xypmd,  xypmd, igs_68k_023vid_state, empty_init, ROT0, "IGS", "Xing Yun Pao Ma Di Super (V401CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1999, xypmda, xypmd, xypmda, xypmd, igs_68k_023vid_state, empty_init, ROT0, "IGS", "Xing Yun Pao Ma Di (unknown ver)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
