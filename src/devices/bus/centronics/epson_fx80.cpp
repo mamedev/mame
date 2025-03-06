@@ -30,10 +30,10 @@ namespace {
 class epson_fx80_device : public device_t, public device_centronics_peripheral_interface
 {
 public:
+	static constexpr feature_type unemulated_features() { return feature::PRINTER; }
+
 	// construction/destruction
 	epson_fx80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	static constexpr feature_type unemulated_features() { return feature::PRINTER; }
 
 	/* Centronics stuff */
 	virtual void input_init(int state) override;
@@ -61,18 +61,16 @@ protected:
 
 	void epson_fx80_mem(address_map &map) ATTR_COLD;
 
-public:
 	uint8_t slave_r(offs_t offset);
 	void slave_w(offs_t offset, uint8_t data);
 	uint8_t slave_p1_r();
 	void slave_p2_w(uint8_t data);
 	uint8_t centronics_data_r(offs_t offset);
 
-protected:
 	TIMER_CALLBACK_MEMBER(slave_write_sync);
 
-	uint8_t pts_sensor() { return 0; };
-	uint8_t home_sensor() { return 0; };
+	uint8_t pts_sensor() { return 0; }
+	uint8_t home_sensor() { return 0; }
 
 	required_device<upd7810_device> m_maincpu;
 	required_device<i8042ah_device> m_slavecpu;
@@ -112,7 +110,7 @@ ROM_START( epson_fx80 )
 ROM_END
 
 ROM_START( epson_jx80 )
-	ROM_REGION(0x4000, "jx80", 0)  // JX-80 rom
+	ROM_REGION(0x4000, "maincpu", 0)  // JX-80 rom
 	ROM_LOAD("jx80_a4_fs5_27128.bin", 0x0000, 0x4000, CRC(2925a47b) SHA1(1864d3561491d7dca78ac2cd13a023460f551184))
 
 	ROM_REGION(0x800, "slavecpu", 0)  // 2K rom for 8042
@@ -126,12 +124,12 @@ ROM_END
 
 const tiny_rom_entry *epson_fx80_device::device_rom_region() const
 {
-	return ROM_NAME( epson_fx80 );
+	return ROM_NAME(epson_fx80);
 }
 
 const tiny_rom_entry *epson_jx80_device::device_rom_region() const
 {
-	return ROM_NAME( epson_jx80 );
+	return ROM_NAME(epson_jx80);
 }
 
 //-------------------------------------------------
@@ -148,7 +146,7 @@ void epson_fx80_device::epson_fx80_mem(address_map &map)
 
 void epson_jx80_device::epson_jx80_mem(address_map &map)
 {
-	map(0x0000, 0x3fff).rom().region("jx80", 0);
+	map(0x0000, 0x3fff).rom().region("maincpu", 0);
 	map(0x6000, 0x7fff).ram(); // external RAM VXOB board
 	map(0x8000, 0x97ff).ram(); // external RAM 4K + 2K = 0x1800
 	map(0xc800, 0xc801).rw(FUNC(epson_jx80_device::vxob_r), FUNC(epson_jx80_device::vxob_w));
@@ -195,7 +193,7 @@ INPUT_PORTS_END
 
 ioport_constructor epson_fx80_device::device_input_ports() const
 {
-	return INPUT_PORTS_NAME( epson_fx80 );
+	return INPUT_PORTS_NAME(epson_fx80);
 }
 
 //-------------------------------------------------
@@ -230,6 +228,7 @@ epson_jx80_device::epson_jx80_device(const machine_config &mconfig, const char *
 
 void epson_fx80_device::device_start()
 {
+	save_item(NAME(m_centronics_data));
 }
 
 //-------------------------------------------------
@@ -253,7 +252,8 @@ void epson_fx80_device::slave_w(offs_t offset, uint8_t data)
 {
 	// pass offset and data packed into param
 	machine().scheduler().synchronize(
-		timer_expired_delegate(FUNC(epson_fx80_device::slave_write_sync), this), (offset << 8) | data);
+			timer_expired_delegate(FUNC(epson_fx80_device::slave_write_sync), this),
+			(offset << 8) | data);
 }
 
 TIMER_CALLBACK_MEMBER(epson_fx80_device::slave_write_sync)
