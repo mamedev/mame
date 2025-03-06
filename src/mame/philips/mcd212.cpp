@@ -68,7 +68,7 @@ void mcd212_device::update_matte_arrays()
 	{
 		for (int matte = 0; matte < num_mattes; matte++)
 		{
-			const int max_matte_id = (num_mattes == 2 ? 4 : 8) + (matte ? 4 : 0);
+			const int max_matte_id = ((num_mattes == 2) ? 4 : 8) + (matte ? 4 : 0);
 			if (matte_idx[matte] >= max_matte_id)
 			{
 				continue;
