@@ -150,8 +150,8 @@ void epson_jx80_device::epson_jx80_mem(address_map &map)
 	map(0x6000, 0x7fff).ram(); // external RAM VXOB board
 	map(0x8000, 0x97ff).ram(); // external RAM 4K + 2K = 0x1800
 	map(0xc800, 0xc801).rw(FUNC(epson_jx80_device::vxob_r), FUNC(epson_jx80_device::vxob_w));
-	map(0xd000, 0xd001).mirror(0x08fe).rw(FUNC(epson_fx80_device::slave_r), FUNC(epson_fx80_device::slave_w));
-	map(0xd800, 0xd800).r(FUNC(epson_fx80_device::centronics_data_r));
+	map(0xd000, 0xd001).mirror(0x08fe).rw(FUNC(epson_jx80_device::slave_r), FUNC(epson_jx80_device::slave_w));
+	map(0xd800, 0xd800).r(FUNC(epson_jx80_device::centronics_data_r));
 }
 
 
