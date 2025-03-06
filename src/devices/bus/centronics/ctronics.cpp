@@ -120,6 +120,7 @@ device_centronics_peripheral_interface::~device_centronics_peripheral_interface(
 #include "adaptator.h"
 #include "comxpl80.h"
 #include "epson_ex800.h"
+#include "epson_fx80.h"
 #include "epson_lx800.h"
 #include "epson_lx810l.h"
 #include "epson_rx80.h"
@@ -137,6 +138,8 @@ void centronics_devices(device_slot_interface &device)
 	device.option_add("adaptator", ADAPTATOR_MULTITAP);
 	device.option_add("pl80", COMX_PL80);
 	device.option_add("ex800", EPSON_EX800);
+	device.option_add("fx80", EPSON_FX80);
+	device.option_add("jx80", EPSON_JX80);
 	device.option_add("lx800", EPSON_LX800);
 	device.option_add("lx810l", EPSON_LX810L);
 	device.option_add("ap2000", EPSON_AP2000);
