@@ -40,7 +40,7 @@ public:
 
 	void vgame(machine_config &config) ATTR_COLD;
 
-	void init_hilice() ATTR_COLD;
+	void init_vgame() ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -152,12 +152,13 @@ void vgame_state::vgame(machine_config &config)
 
 // VGAME-0030-02-AI PCB
 ROM_START( hilice )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	ROM_LOAD( "hi_lice_v102fa.u13", 0x000000, 0x200000, CRC(4da87481) SHA1(5a20b254cfe8a2f087faa0dd17f682218a2ca1b2) )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "hi_lice_v102fa.u13", 0x000000, 0x100000, BAD_DUMP CRC(4da87481) SHA1(5a20b254cfe8a2f087faa0dd17f682218a2ca1b2) ) // probably read as wrong ROM type
+	ROM_CONTINUE(                               0x000000, 0x100000 )
 
 	ROM_REGION( 0x400000, "gfx", 0 )
-	ROM_LOAD16_BYTE( "hi_lice_cg_01fu3.u3", 0x000000, 0x200000, CRC(8ad6b233) SHA1(deaffd391265c885afb2f171089c1b33429470f1) )
-	ROM_LOAD16_BYTE( "hi_lice_cg_01fu8.u8", 0x000001, 0x200000, BAD_DUMP CRC(b1070209) SHA1(4568977fca2ff96b756a9600ad9a4730a6f8749a) ) // didn't give consistent reads
+	ROM_LOAD16_BYTE( "hi_lice_cg_01fu3.u3", 0x000000, 0x200000, BAD_DUMP CRC(8ad6b233) SHA1(deaffd391265c885afb2f171089c1b33429470f1) ) // probably read as wrong ROM type
+	ROM_LOAD16_BYTE( "hi_lice_cg_01fu8.u8", 0x000001, 0x200000, BAD_DUMP CRC(b1070209) SHA1(4568977fca2ff96b756a9600ad9a4730a6f8749a) ) // probably read as wrong ROM type + didn't give consistent reads
 
 	ROM_REGION( 0x200000, "oki", 0 )
 	ROM_LOAD( "hi_lice_sp_100f.u45", 0x000000, 0x200000, CRC(b2588f54) SHA1(0d046e56596611954a9d2a9a30746d8aa370431b) ) // 1xxxxxxxxxxxxxxxxxxxx = 0x00
@@ -167,7 +168,7 @@ ROM_END
 // while all labels have 麻將學園 (Mahjong School) prepended to what's below, title screen shows 麻將學園 2 - Mahjong School 2
 ROM_START( mjxy2 )
 	ROM_REGION( 0x200000, "maincpu", 0 ) // dumped as EV29LV160 (same rare ROM as some IGS titles)
-	ROM_LOAD( "u12_v108tw.u12", 0x000000, 0x200000, CRC(a6d99849) SHA1(c280635517d5ffded524e15048568817bd927bf9) )
+	ROM_LOAD16_WORD_SWAP( "u12_v108tw.u12", 0x000000, 0x200000, CRC(a6d99849) SHA1(c280635517d5ffded524e15048568817bd927bf9) )
 
 	ROM_REGION( 0x400000, "gfx", 0 ) // dumped as EV29LV160 (same rare ROM as some IGS titles)
 	ROM_LOAD16_BYTE( "u3_cg_v105.u3", 0x000000, 0x200000, CRC(fda38fb1) SHA1(7bd744e42f619254ebad2fb60f3851f61073fe8c) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
@@ -177,14 +178,63 @@ ROM_START( mjxy2 )
 	ROM_LOAD( "u43_sp_v105.u43", 0x000000, 0x200000, CRC(5d1ab8f1) SHA1(56473b632dfdb210208ce3b35cb6861f07861cd7) )
 ROM_END
 
+ROM_START( cjdn ) // Oct  1 2008 15:58:54 string in ROM
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "v305cn.u8", 0x000000, 0x200000, CRC(bffb20c0) SHA1(bf2293bfc4711d0b930c491f579418d5e7c0800f) )
 
-void vgame_state::init_hilice()
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "gfx_flashrom", 0x000000, 0x400000, NO_DUMP ) // not dumped yet
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "sp_101g.u24", 0x000000, 0x200000, CRC(f361a725) SHA1(9404f955126f16c7f4a2c52e799791f6f2703b5f) )
+ROM_END
+
+ROM_START( cjsjh ) // Nov  2 2007 16:05:26 string in ROM
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "vxxxcn.u8", 0x000000, 0x200000, CRC(911d8dce) SHA1(1d9386c4a9e118d02b5b29f9e9ce90ef1d6f419f) ) // label not readable
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "gfx_flashrom", 0x000000, 0x400000, NO_DUMP ) // not dumped yet
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "sp.u24", 0x000000, 0x200000, CRC(ad11c8b9) SHA1(0547a57ff2183e65fa1d51234799a3d521b018c5) )
+ROM_END
+
+
+// TODO: very incomplete, just enough to show some strings
+void vgame_state::init_vgame()
 {
-	// TODO: decryption
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (int i = 0; i < 0x200000; i += 2)
+	{
+		switch (i & 0x6232)
+		{
+			case 0x0000: rom[i] ^= 0x00; break;
+			case 0x0002: rom[i] ^= 0x20; break;
+			case 0x0010: rom[i] ^= 0x02; break;
+			case 0x0012: rom[i] ^= 0x22; break;
+			case 0x0020: rom[i] ^= 0x20; break;
+			case 0x0022: rom[i] ^= 0x20; break;
+			case 0x0030: rom[i] ^= 0x22; break;
+			case 0x0032: rom[i] ^= 0x22; break;
+			case 0x0200: rom[i] ^= 0x00; break;
+			case 0x0202: rom[i] ^= 0x00; break;
+			case 0x0210: rom[i] ^= 0x02; break;
+			case 0x0212: rom[i] ^= 0x02; break;
+			case 0x0220: rom[i] ^= 0x20; break;
+			case 0x0222: rom[i] ^= 0x20; break;
+			case 0x0230: rom[i] ^= 0x22; break;
+			case 0x0232: rom[i] ^= 0x22; break;
+			default: rom[i] ^= 0x22;
+		}
+	}
 }
 
 } // anonymous namespace
 
 
-GAME( 200?, hilice,  0, vgame, hilice, vgame_state, init_hilice, ROT0, "VGame", "Hi Lice (V102FA)",                              MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 200?, mjxy2,   0, vgame, hilice, vgame_state, init_hilice, ROT0, "VGame", "Majiang Xueyuan 2 - Mahjong School (V108TW)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, hilice,  0, vgame, hilice, vgame_state, init_vgame, ROT0, "VGame", "Hi Lice (V102FA)",                              MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, mjxy2,   0, vgame, hilice, vgame_state, init_vgame, ROT0, "VGame", "Majiang Xueyuan 2 - Mahjong School (V108TW)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2008, cjdn,    0, vgame, hilice, vgame_state, init_vgame, ROT0, "VGame", "Chao Ji Dou Niu (V305CN)",                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2007, cjsjh,   0, vgame, hilice, vgame_state, init_vgame, ROT0, "VGame", "Chao Ji Sai Jin Hua (V201CN)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
