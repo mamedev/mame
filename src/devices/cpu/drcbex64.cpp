@@ -2850,7 +2850,6 @@ void drcbe_x64::op_read(Assembler &a, const instruction &inst)
 				a.mov(Gpq(REG_PARAM1), ptr(rax, Gpd(REG_PARAM2), 3));                            // load dispatch table entry
 				if (accessors.specific.low_bits)
 					a.mov(Gpd(REG_PARAM2), r10d);                                                // restore masked address
-
 			}
 			else
 			{

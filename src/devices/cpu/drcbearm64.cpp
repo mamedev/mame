@@ -422,6 +422,29 @@ private:
 		be_parameter_value  m_value;
 	};
 
+	struct near_state
+	{
+		uint32_t emulated_flags;
+	};
+
+	using opcode_generate_func = void (drcbe_arm64::*)(asmjit::a64::Assembler &, const uml::instruction &);
+	struct opcode_table_entry
+	{
+		uml::opcode_t opcode;
+		opcode_generate_func func;
+	};
+
+	struct memory_accessors
+	{
+		resolved_memory_accessors resolved;
+		address_space::specific_access_info specific;
+		offs_t address_mask;
+		u8 high_bits;
+		bool no_mask;
+		bool mask_simple;
+		bool mask_high_bits;
+	};
+
 	void op_handle(asmjit::a64::Assembler &a, const uml::instruction &inst);
 	void op_hash(asmjit::a64::Assembler &a, const uml::instruction &inst);
 	void op_label(asmjit::a64::Assembler &a, const uml::instruction &inst);
@@ -556,26 +579,11 @@ private:
 
 	uint8_t *m_baseptr;
 
-	struct near_state
-	{
-		uint32_t emulated_flags;
-	};
 	near_state &m_near;
 
-	using opcode_generate_func = void (drcbe_arm64::*)(asmjit::a64::Assembler &, const uml::instruction &);
-	struct opcode_table_entry
-	{
-		uml::opcode_t opcode;
-		opcode_generate_func func;
-	};
 	static const opcode_table_entry s_opcode_table_source[];
 	static opcode_generate_func s_opcode_table[uml::OP_MAX];
 
-	struct memory_accessors
-	{
-		resolved_memory_accessors resolved;
-		address_space::specific_access_info specific;
-	};
 	resolved_member_function m_debug_cpu_instruction_hook;
 	resolved_member_function m_drcmap_get_value;
 	std::vector<memory_accessors> m_memory_accessors;
@@ -1245,8 +1253,16 @@ drcbe_arm64::drcbe_arm64(drcuml_state &drcuml, device_t &device, drc_cache &cach
 	{
 		if (m_space[space])
 		{
-			m_memory_accessors[space].resolved.set(*m_space[space]);
-			m_memory_accessors[space].specific = m_space[space]->specific_accessors();
+			auto &accessors = m_memory_accessors[space];
+			accessors.resolved.set(*m_space[space]);
+			accessors.specific = m_space[space]->specific_accessors();
+			accessors.address_mask = m_space[space]->addrmask() & make_bitmask<offs_t>(accessors.specific.address_width) & ~make_bitmask<offs_t>(accessors.specific.native_mask_bits);
+			offs_t const shiftedmask = accessors.address_mask >> accessors.specific.low_bits;
+			offs_t const nomask = ~offs_t(0);
+			accessors.high_bits = 32 - count_leading_zeros_32(shiftedmask);
+			accessors.no_mask = nomask == accessors.address_mask;
+			accessors.mask_simple = !accessors.no_mask && is_valid_immediate_mask(accessors.address_mask, 4);
+			accessors.mask_high_bits = (shiftedmask & (shiftedmask + 1)) != 0;
 		}
 	}
 }

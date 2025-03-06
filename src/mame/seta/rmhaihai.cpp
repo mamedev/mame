@@ -31,10 +31,12 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -56,11 +58,15 @@ public:
 		m_key(*this, "KEY%u", 0)
 	{ }
 
-	void init_rmhaihai();
-	void rmhaihai(machine_config &config);
-	void rmhaibl(machine_config &config);
+	void rmhaihai(machine_config &config) ATTR_COLD;
+	void rmhaisei(machine_config &config);
+	void rmhaibl(machine_config &config) ATTR_COLD;
+
+	void init_rmhaihai() ATTR_COLD;
 
 protected:
+	virtual void video_start() override ATTR_COLD;
+
 	void videoram_w(offs_t offset, uint8_t data);
 	void colorram_w(offs_t offset, uint8_t data);
 	uint8_t keyboard_r();
@@ -68,8 +74,6 @@ protected:
 	void keyboard_w(uint8_t data);
 	void ctrl_w(uint8_t data);
 	void adpcm_w(uint8_t data);
-
-	virtual void video_start() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -94,14 +98,6 @@ protected:
 };
 
 
-class rmhaisei_state : public rmhaihai_state
-{
-public:
-	using rmhaihai_state::rmhaihai_state;
-	void rmhaisei(machine_config &config);
-};
-
-
 class themj_state : public rmhaihai_state
 {
 public:
@@ -110,18 +106,18 @@ public:
 		m_cpubank(*this, "cpubank%u", 1)
 	{ }
 
-	void themj(machine_config &config);
+	void themj(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	required_memory_bank_array<2> m_cpubank;
-
 	void themj_io_map(address_map &map) ATTR_COLD;
 	void themj_map(address_map &map) ATTR_COLD;
 	void themj_rombank_w(uint8_t data);
+
+	required_memory_bank_array<2> m_cpubank;
 };
 
 
@@ -179,7 +175,7 @@ uint8_t rmhaihai_state::keyboard_r()
 		{
 			for (int i = 0; i < 31; i++)
 			{
-				if (m_key[i/16]->read() & (1 << (i & 15))) return i+1;
+				if (BIT(m_key[i >> 4]->read(), i & 0x0f)) return i+1;
 			}
 			if (m_key[1]->read() & 0x8000) return 0x80;   // coin
 			return 0;
@@ -189,7 +185,6 @@ uint8_t rmhaihai_state::keyboard_r()
 		case 0x5950:    // rmhaihib
 		case 0x5bf3:    // themj, but the test is NOPed out!
 			return 0xcc;    // keyboard_cmd = 0xcb
-
 
 		case 0x13a: // additional checks done by rmhaijin
 			if (m_keyboard_cmd == 0x3b) return 0xdd;
@@ -418,41 +413,41 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( rmhaihai )
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "Unknown 2-1" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0xfe, 0xfe, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0xfe, "1 (Easy)" )
-	PORT_DIPSETTING(    0x7e, "2" )
-	PORT_DIPSETTING(    0xbe, "3" )
-	PORT_DIPSETTING(    0xde, "4" )
-	PORT_DIPSETTING(    0xee, "5" )
-	PORT_DIPSETTING(    0xf6, "6" )
-	PORT_DIPSETTING(    0xfa, "7" )
-	PORT_DIPSETTING(    0xfc, "8 (Difficult)" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "D. SW2:8" )                                                   // NOT USED
+	PORT_DIPNAME( 0xfe, 0xfe, "Computer Win Probability" )   PORT_DIPLOCATION("D. SW2:7,6,5,4,3,2,1")  // レベル設定コンピュータのあがる確率
+	PORT_DIPSETTING(    0xfe, "20% (Weak)" )                                                           // 弱い
+	PORT_DIPSETTING(    0x7e, "30%" )
+	PORT_DIPSETTING(    0xbe, "40%" )
+	PORT_DIPSETTING(    0xde, "50%" )
+	PORT_DIPSETTING(    0xee, "60%" )
+	PORT_DIPSETTING(    0xf6, "70&%" )
+	PORT_DIPSETTING(    0xfa, "80%" )
+	PORT_DIPSETTING(    0xfc, "90% (Strong)" )                                                         // 強い
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Free_Play ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x02, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x00, "A 2/1 B 1/2" )
-	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x04, "A 1/2 B 2/1" )
-	PORT_DIPSETTING(    0x08, "A 1/3 B 3/1" )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x80, 0x80, "Medal" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR(Free_Play) )           PORT_DIPLOCATION("D. SW1:8")              // フリープレイ
+	PORT_DIPSETTING(    0x01, DEF_STR(Off) )                                                           // ノーマル
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                            // フリープレイ
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR(Service_Mode) )        PORT_DIPLOCATION("D. SW1:7")              // テストモード
+	PORT_DIPSETTING(    0x02, DEF_STR(Off) )                                                           // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                            // 有
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR(Coinage) )             PORT_DIPLOCATION("D. SW1:6,5")            // プレイ料金
+	PORT_DIPSETTING(    0x00, "A 2/1 B 1/2" )                                                          // ２コイン１クレジット
+	PORT_DIPSETTING(    0x0c, DEF_STR(1C_1C) )                                                         // １コイン１クレジット
+	PORT_DIPSETTING(    0x04, "A 1/2 B 2/1" )                                                          // １コイン２クレジット
+	PORT_DIPSETTING(    0x08, "A 1/3 B 3/1" )                                                          // １コイン３クレジット
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR(Demo_Sounds) )         PORT_DIPLOCATION("D. SW1:4")              // ＤＥＭＯ音楽
+	PORT_DIPSETTING(    0x10, DEF_STR(Off) )                                                           // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                            // 有
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR(Flip_Screen) )         PORT_DIPLOCATION("D. SW1:3")              // 画面反転
+	PORT_DIPSETTING(    0x20, DEF_STR(Off) )                                                           // ノーマル
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                            // 反転
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR(Cabinet) )             PORT_DIPLOCATION("D. SW1:2")              // スタイル
+	PORT_DIPSETTING(    0x40, DEF_STR(Cocktail) )                                                      // テーブル
+	PORT_DIPSETTING(    0x00, DEF_STR(Upright) )                                                       // アップライト
+	PORT_DIPNAME( 0x80, 0x80, "Medal" )                      PORT_DIPLOCATION("D. SW1:1")              // NOT USED
+	PORT_DIPSETTING(    0x80, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
 
 	PORT_INCLUDE( mjctrl )
 INPUT_PORTS_END
@@ -601,7 +596,7 @@ void rmhaihai_state::rmhaibl(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &rmhaihai_state::rmhaihaibl_io_map);
 }
 
-void rmhaisei_state::rmhaisei(machine_config &config)
+void rmhaihai_state::rmhaisei(machine_config &config)
 {
 	rmhaihai(config);
 
@@ -876,6 +871,6 @@ GAME( 1985, rmhaihai2,  rmhaihai, rmhaihai, rmhaihai, rmhaihai_state, init_rmhai
 GAME( 1985, rmhaihaibl, rmhaihai, rmhaibl,  rmhaibl,  rmhaihai_state, init_rmhaihai, ROT0, "bootleg", "Real Mahjong Haihai (Japan, bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, rmhaihib,   rmhaihai, rmhaihai, rmhaihib, rmhaihai_state, init_rmhaihai, ROT0, "Alba",    "Real Mahjong Haihai (Japan, medal)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, rmhaijin,   0,        rmhaihai, rmhaihai, rmhaihai_state, init_rmhaihai, ROT0, "Alba",    "Real Mahjong Haihai Jinji Idou Hen (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rmhaisei,   0,        rmhaisei, rmhaihai, rmhaisei_state, init_rmhaihai, ROT0, "Visco",   "Real Mahjong Haihai Seichouhen (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rmhaisei,   0,        rmhaisei, rmhaihai, rmhaihai_state, init_rmhaihai, ROT0, "Visco",   "Real Mahjong Haihai Seichouhen (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, themj,      0,        themj,    rmhaihai, themj_state,    init_rmhaihai, ROT0, "Visco",   "The Mah-jong (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, themj2,     themj,    themj,    rmhaihai, themj_state,    init_rmhaihai, ROT0, "Visco",   "The Mah-jong (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
