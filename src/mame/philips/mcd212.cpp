@@ -62,133 +62,69 @@ void mcd212_device::update_matte_arrays()
 	const int num_mattes = BIT(m_image_coding_method, ICM_NM_BIT) ? 2 : 1;
 	const bool matte_flag = BIT(m_matte_control[0], MC_MF_BIT); // MF bit must be the same. See 5.10.2 Matte Commands
 	
+	int matte_idx[2] = { 0, 4 };
 	int x = 0;
-	int matte_idx = 0;
 	for (; x < width; x++)
 	{
-		for (int f1 = 0; f1 < num_mattes; f1++)
+		for (int matte = 0; matte < num_mattes; matte++)
 		{
-			const int max_matte_id = (0x10 >> num_mattes) + (f1 << 2);
-			const int flag = (num_mattes == 2) ? f1 : matte_flag;
-			if (num_mattes == 2)
+			const int max_matte_id = ((num_mattes == 2) ? 4 : 8) + (matte ? 4 : 0);
+			if (matte_idx[matte] >= max_matte_id)
 			{
-				for (int matte = 0; matte < max_matte_id; matte++)
-				{
-					const int matte_idx = (flag << 2) + matte;
-					const uint32_t matte_ctrl = m_matte_control[matte_idx];
-					const uint32_t matte_op = get_matte_op(matte_idx);
-					if (matte_op == 0)
-					{
-						break;
-					}
-					if (x == (matte_ctrl & MC_X))
-					{
-						switch (matte_op)
-						{
-						case 0: // End of matte control for line
-							break;
-						case 1:
-						case 2:
-						case 3: // Not used
-							break;
-						case 4: // Change weight of plane A
-							latched_wfa = get_weight_factor(matte_idx);
-							break;
-						case 5: // Not used
-							break;
-						case 6: // Change weight of plane B
-							latched_wfb = get_weight_factor(matte_idx);
-							break;
-						case 7: // Not used
-							break;
-						case 8: // Reset matte flag
-							latched_mf[flag] = false;
-							break;
-						case 9: // Set matte flag
-							latched_mf[flag] = true;
-							break;
-						case 10:    // Not used
-						case 11:    // Not used
-							break;
-						case 12: // Reset matte flag and change weight of plane A
-							latched_wfa = get_weight_factor(matte_idx);
-							latched_mf[flag] = false;
-							break;
-						case 13: // Set matte flag and change weight of plane A
-							latched_wfa = get_weight_factor(matte_idx);
-							latched_mf[flag] = true;
-							break;
-						case 14: // Reset matte flag and change weight of plane B
-							latched_wfb = get_weight_factor(matte_idx);
-							latched_mf[flag] = false;
-							break;
-						case 15: // Set matte flag and change weight of plane B
-							latched_wfb = get_weight_factor(matte_idx);
-							latched_mf[flag] = true;
-							break;
-						}
-					}
-				}
+				continue;
 			}
-			else
+			const uint32_t matte_ctrl = m_matte_control[matte_idx[matte]];
+			const uint32_t matte_op = get_matte_op(matte_idx[matte]);
+			const int flag = (num_mattes == 2) ? matte : matte_flag;
+
+			if (x == (matte_ctrl & MC_X))
 			{
-				if (matte_idx < max_matte_id)
+				switch (matte_op)
 				{
-					const uint32_t matte_ctrl = m_matte_control[matte_idx];
-					const uint32_t matte_op = get_matte_op(matte_idx);
-					if (matte_op == 0)
-					{
-						break;
-					}
-					if (x == (matte_ctrl & MC_X))
-					{
-						switch (matte_op)
-						{
-						case 0: // End of matte control for line
-							break;
-						case 1:
-						case 2:
-						case 3: // Not used
-							break;
-						case 4: // Change weight of plane A
-							latched_wfa = get_weight_factor(matte_idx);
-							break;
-						case 5: // Not used
-							break;
-						case 6: // Change weight of plane B
-							latched_wfb = get_weight_factor(matte_idx);
-							break;
-						case 7: // Not used
-							break;
-						case 8: // Reset matte flag
-							latched_mf[flag] = false;
-							break;
-						case 9: // Set matte flag
-							latched_mf[flag] = true;
-							break;
-						case 10:    // Not used
-						case 11:    // Not used
-							break;
-						case 12: // Reset matte flag and change weight of plane A
-							latched_wfa = get_weight_factor(matte_idx);
-							latched_mf[flag] = false;
-							break;
-						case 13: // Set matte flag and change weight of plane A
-							latched_wfa = get_weight_factor(matte_idx);
-							latched_mf[flag] = true;
-							break;
-						case 14: // Reset matte flag and change weight of plane B
-							latched_wfb = get_weight_factor(matte_idx);
-							latched_mf[flag] = false;
-							break;
-						case 15: // Set matte flag and change weight of plane B
-							latched_wfb = get_weight_factor(matte_idx);
-							latched_mf[flag] = true;
-							break;
-						}
-						matte_idx++;
-					}
+				case 0: // Disregard all commands in higher registers. See 5.10.2
+					matte_idx[matte] = max_matte_id;
+					break;
+				case 1:
+				case 2:
+				case 3: // Not used
+					break;
+				case 4: // Change weight of plane A
+					latched_wfa = get_weight_factor(matte_idx[matte]);
+					break;
+				case 5: // Not used
+					break;
+				case 6: // Change weight of plane B
+					latched_wfb = get_weight_factor(matte_idx[matte]);
+					break;
+				case 7: // Not used
+					break;
+				case 8: // Reset matte flag
+					latched_mf[flag] = false;
+					break;
+				case 9: // Set matte flag
+					latched_mf[flag] = true;
+					break;
+				case 10:    // Not used
+				case 11:    // Not used
+					break;
+				case 12: // Reset matte flag and change weight of plane A
+					latched_wfa = get_weight_factor(matte_idx[matte]);
+					latched_mf[flag] = false;
+					break;
+				case 13: // Set matte flag and change weight of plane A
+					latched_wfa = get_weight_factor(matte_idx[matte]);
+					latched_mf[flag] = true;
+					break;
+				case 14: // Reset matte flag and change weight of plane B
+					latched_wfb = get_weight_factor(matte_idx[matte]);
+					latched_mf[flag] = false;
+					break;
+				case 15: // Set matte flag and change weight of plane B
+					latched_wfb = get_weight_factor(matte_idx[matte]);
+					latched_mf[flag] = true;
+					break;
 				}
+				matte_idx[matte]++;
 			}
 		}
 		m_weight_factor[0][x] = latched_wfa;
@@ -735,7 +671,6 @@ const uint32_t mcd212_device::s_4bpp_color[16] =
 template <bool MosaicA, bool MosaicB, bool OrderAB>
 void mcd212_device::mix_lines(uint32_t *plane_a, bool *transparent_a, uint32_t *plane_b, bool *transparent_b, uint32_t *out)
 {
-	const uint32_t backdrop = s_4bpp_color[m_backdrop_color];
 	const uint8_t mosaic_count_a = (m_mosaic_hold[0] & 0x0000ff) << 1;
 	const uint8_t mosaic_count_b = (m_mosaic_hold[1] & 0x0000ff) << 1;
 	const int width = get_screen_width();
@@ -746,74 +681,51 @@ void mcd212_device::mix_lines(uint32_t *plane_a, bool *transparent_a, uint32_t *
 
 	for (int x = 0; x < width; x++)
 	{
-		const uint32_t plane_a_cur = MosaicA ? plane_a[x - (x % mosaic_count_a)] : plane_a[x];
-		const uint32_t plane_b_cur = MosaicB ? plane_b[x - (x % mosaic_count_b)] : plane_b[x];
-		if (!(m_transparency_control & TCR_DISABLE_MX))
+		if (transparent_a[x] && transparent_b[x])
 		{
-			const int32_t plane_a_r = 0xff & (plane_a[x] >> 16);
-			const int32_t plane_b_r = 0xff & (plane_b[x] >> 16);
-			const int32_t plane_a_g = 0xff & (plane_a[x] >> 8);
-			const int32_t plane_b_g = 0xff & (plane_b[x] >> 8);
-			const int32_t plane_a_b = 0xff &  plane_a[x];
-			const int32_t plane_b_b = 0xff &  plane_b[x];
-			const int32_t weighted_a_r =  (plane_a_r > 16) ? (((plane_a_r - 16) * weight_a[x]) >> 6) : 0;
-			const int32_t weighted_a_g =  (plane_a_g > 16) ? (((plane_a_g - 16) * weight_a[x]) >> 6) : 0;
-			const int32_t weighted_a_b =  (plane_a_b > 16) ? (((plane_a_b - 16) * weight_a[x]) >> 6) : 0;
-			const int32_t weighted_b_r = ((plane_b_r > 16) ? (((plane_b_r - 16) * weight_b[x]) >> 6) : 0) + weighted_a_r;
-			const int32_t weighted_b_g = ((plane_b_g > 16) ? (((plane_b_g - 16) * weight_b[x]) >> 6) : 0) + weighted_a_g;
-			const int32_t weighted_b_b = ((plane_b_b > 16) ? (((plane_b_b - 16) * weight_b[x]) >> 6) : 0) + weighted_a_b;
-			const uint8_t out_r = (weighted_b_r > 255) ? 255 : (uint8_t)weighted_b_r;
-			const uint8_t out_g = (weighted_b_g > 255) ? 255 : (uint8_t)weighted_b_g;
-			const uint8_t out_b = (weighted_b_b > 255) ? 255 : (uint8_t)weighted_b_b;
-			out[x] = 0xff000000 | (out_r << 16) | (out_g << 8) | out_b;
+			out[x] = s_4bpp_color[m_backdrop_color];
+			continue;
 		}
-		else
+		uint32_t plane_a_cur = MosaicA ? plane_a[x - (x % mosaic_count_a)] : plane_a[x];
+		uint32_t plane_b_cur = MosaicB ? plane_b[x - (x % mosaic_count_b)] : plane_b[x];
+
+		if (transparent_a[x])
 		{
-			const int32_t plane_a_r = 0xff & (plane_a_cur >> 16);
-			const int32_t plane_a_g = 0xff & (plane_a_cur >> 8);
-			const int32_t plane_a_b = 0xff &  plane_a_cur;
-			const int32_t plane_b_r = 0xff & (plane_b_cur >> 16);
-			const int32_t plane_b_g = 0xff & (plane_b_cur >> 8);
-			const int32_t plane_b_b = 0xff &  plane_b_cur;
-
-			const uint8_t weighted_a_r = std::clamp(((plane_a_r > 16) ? (((plane_a_r - 16) * weight_a[x]) >> 6) : 0) + 16, 0, 255);
-			const uint8_t weighted_a_g = std::clamp(((plane_a_g > 16) ? (((plane_a_g - 16) * weight_a[x]) >> 6) : 0) + 16, 0, 255);
-			const uint8_t weighted_a_b = std::clamp(((plane_a_b > 16) ? (((plane_a_b - 16) * weight_a[x]) >> 6) : 0) + 16, 0, 255);
-			const uint8_t weighted_b_r = std::clamp(((plane_b_r > 16) ? (((plane_b_r - 16) * weight_b[x]) >> 6) : 0) + 16, 0, 255);
-			const uint8_t weighted_b_g = std::clamp(((plane_b_g > 16) ? (((plane_b_g - 16) * weight_b[x]) >> 6) : 0) + 16, 0, 255);
-			const uint8_t weighted_b_b = std::clamp(((plane_b_b > 16) ? (((plane_b_b - 16) * weight_b[x]) >> 6) : 0) + 16, 0, 255);
-
-			if (OrderAB)
-			{
-				if (!transparent_a[x])
-				{
-					out[x] = 0xff000000 | (weighted_a_r << 16) | (weighted_a_g << 8) | weighted_a_b;
-				}
-				else if (!transparent_b[x])
-				{
-					out[x] = 0xff000000 | (weighted_b_r << 16) | (weighted_b_g << 8) | weighted_b_b;
-				}
-				else
-				{
-					out[x] = backdrop;
-				}
-			}
-			else
-			{
-				if (!transparent_b[x])
-				{
-					out[x] = 0xff000000 | (weighted_b_r << 16) | (weighted_b_g << 8) | weighted_b_b;
-				}
-				else if (!transparent_a[x])
-				{
-					out[x] = 0xff000000 | (weighted_a_r << 16) | (weighted_a_g << 8) | weighted_a_b;
-				}
-				else
-				{
-					out[x] = backdrop;
-				}
-			}
+			plane_a_cur = 0;
 		}
+		else if (OrderAB && (m_transparency_control & TCR_DISABLE_MX))
+		{
+			plane_b_cur = 0;
+		}
+
+		if (transparent_b[x])
+		{
+			plane_b_cur = 0;
+		}
+		else if (!OrderAB && (m_transparency_control & TCR_DISABLE_MX))
+		{
+			plane_a_cur = 0;
+		}
+
+		const int32_t plane_a_r = 0xff & (plane_a_cur >> 16);
+		const int32_t plane_a_g = 0xff & (plane_a_cur >> 8);
+		const int32_t plane_a_b = 0xff & plane_a_cur;
+		const int32_t plane_b_r = 0xff & (plane_b_cur >> 16);
+		const int32_t plane_b_g = 0xff & (plane_b_cur >> 8);
+		const int32_t plane_b_b = 0xff & plane_b_cur;
+
+		const int32_t weighted_a_r = std::clamp((std::clamp(plane_a_r - 16, 0, 255) * weight_a[x]) >> 6, 0, 255);
+		const int32_t weighted_a_g = std::clamp((std::clamp(plane_a_g - 16, 0, 255) * weight_a[x]) >> 6, 0, 255);
+		const int32_t weighted_a_b = std::clamp((std::clamp(plane_a_b - 16, 0, 255) * weight_a[x]) >> 6, 0, 255);
+
+		const int32_t weighted_b_r = std::clamp((std::clamp(plane_b_r - 16, 0, 255) * weight_b[x]) >> 6, 0, 255);
+		const int32_t weighted_b_g = std::clamp((std::clamp(plane_b_g - 16, 0, 255) * weight_b[x]) >> 6, 0, 255);
+		const int32_t weighted_b_b = std::clamp((std::clamp(plane_b_b - 16, 0, 255) * weight_b[x]) >> 6, 0, 255);
+
+		const uint8_t out_r = std::clamp(weighted_a_r + weighted_b_r + 16, 0, 255);
+		const uint8_t out_g = std::clamp(weighted_a_g + weighted_b_g + 16, 0, 255);
+		const uint8_t out_b = std::clamp(weighted_a_b + weighted_b_b + 16, 0, 255);
+		out[x] = 0xff000000 | (out_r << 16) | (out_g << 8) | out_b;
 	}
 
 	if (border_width)
