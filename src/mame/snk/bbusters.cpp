@@ -130,14 +130,14 @@ public:
 		m_sprites(*this, "sprites%u", 1U),
 		m_spriteram(*this, "spriteram%u", 1U),
 		m_soundlatch(*this, "soundlatch%u", 1U),
-		m_tx_videoram(*this, "tx_videoram"),
-		m_pf_data(*this, "pf%u_data", 1U),
-		m_pf_scroll_data(*this, "pf%u_scroll_data", 1U),
+		m_tx_vram(*this, "tx_videoram"),
+		m_pf_vram(*this, "pf%u_vram", 1U),
+		m_pf_scroll_reg(*this, "pf%u_scroll_reg", 1U),
 		m_gun_recoil(*this, "Player%u_Gun_Recoil", 1U),
 		m_eprom_data(*this, "eeprom")
 	{ }
 
-	void bbusters(machine_config &config);
+	void bbusters(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -152,9 +152,9 @@ private:
 	required_device_array<buffered_spriteram16_device, 2> m_spriteram;
 	required_device_array<generic_latch_8_device, 2> m_soundlatch;
 
-	required_shared_ptr<uint16_t> m_tx_videoram;
-	required_shared_ptr_array<uint16_t, 2> m_pf_data;
-	required_shared_ptr_array<uint16_t, 2> m_pf_scroll_data;
+	required_shared_ptr<uint16_t> m_tx_vram;
+	required_shared_ptr_array<uint16_t, 2> m_pf_vram;
+	required_shared_ptr_array<uint16_t, 2> m_pf_scroll_reg;
 
 	output_finder<3> m_gun_recoil;
 	required_shared_ptr<uint16_t> m_eprom_data;
@@ -162,29 +162,27 @@ private:
 	tilemap_t *m_fix_tilemap = nullptr;
 	tilemap_t *m_pf_tilemap[2]{};
 
+	bitmap_ind16 m_bitmap_sprites[2];
+
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	template <int Layer, int Gfx> TILE_GET_INFO_MEMBER(get_pf_tile_info);
 
 	void sound_cpu_w(uint8_t data);
-	void video_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	template<int Layer> void pf_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void tx_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	template <int Layer> void pf_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void coin_counter_w(uint8_t data);
 
-	void bbusters_map(address_map &map) ATTR_COLD;
-	void sound_map(address_map &map) ATTR_COLD;
-	void sound_portmap(address_map &map) ATTR_COLD;
-
 	uint16_t eprom_r(offs_t offset);
-	void three_gun_output_w(uint16_t data);
-
-	void mixlow(bitmap_ind16 &bitmap, bitmap_ind16 &srcbitmap, const rectangle &cliprect);
-	void mix(bitmap_ind16 &bitmap, bitmap_ind16 &srcbitmap, const rectangle &cliprect);
+	void gun_output_w(uint16_t data);
 
 	template <typename Proc>
 	void mix_sprites(bitmap_ind16 &bitmap, bitmap_ind16 &srcbitmap, const rectangle &cliprect, Proc MIX);
 
-	bitmap_ind16 m_bitmap_sprites[2];
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sound_portmap(address_map &map) ATTR_COLD;
 };
 
 void bbusters_state::machine_start()
@@ -204,16 +202,16 @@ uint16_t bbusters_state::eprom_r(offs_t offset)
 	return (m_eprom_data[offset] & 0xff) | 0xff00;
 }
 
-void bbusters_state::three_gun_output_w(uint16_t data)
+void bbusters_state::gun_output_w(uint16_t data)
 {
 	for (int i = 0; i < 3; i++)
 		m_gun_recoil[i] = BIT(data, i);
 }
 
 template <int Layer>
-void bbusters_state::pf_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void bbusters_state::pf_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	COMBINE_DATA(&m_pf_data[Layer][offset]);
+	COMBINE_DATA(&m_pf_vram[Layer][offset]);
 	m_pf_tilemap[Layer]->mark_tile_dirty(offset);
 }
 
@@ -226,22 +224,22 @@ void bbusters_state::coin_counter_w(uint8_t data)
 
 TILE_GET_INFO_MEMBER(bbusters_state::get_tile_info)
 {
-	uint16_t tile = m_tx_videoram[tile_index];
+	uint16_t const tile = m_tx_vram[tile_index];
 
-	tileinfo.set(0, tile&0xfff, tile>>12, 0);
+	tileinfo.set(0, tile & 0xfff, tile >> 12, 0);
 }
 
 template <int Layer, int Gfx>
 TILE_GET_INFO_MEMBER(bbusters_state::get_pf_tile_info)
 {
-	uint16_t tile = m_pf_data[Layer][tile_index];
+	uint16_t const tile = m_pf_vram[Layer][tile_index];
 
-	tileinfo.set(Gfx, tile&0xfff, tile>>12, 0);
+	tileinfo.set(Gfx, tile & 0xfff, tile >> 12, 0);
 }
 
-void bbusters_state::video_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void bbusters_state::tx_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	COMBINE_DATA(&m_tx_videoram[offset]);
+	COMBINE_DATA(&m_tx_vram[offset]);
 	m_fix_tilemap->mark_tile_dirty(offset);
 }
 
@@ -258,12 +256,11 @@ void bbusters_state::video_start()
 
 	m_pf_tilemap[0]->set_transparent_pen(15);
 
-	for (int i = 0; i < 2; i++)
+	for (auto &bitmap : m_bitmap_sprites)
 	{
-		m_screen->register_screen_bitmap(m_bitmap_sprites[i]);
-		m_bitmap_sprites[i].fill(0xffff);
+		m_screen->register_screen_bitmap(bitmap);
+		bitmap.fill(0xffff);
 	}
-
 }
 
 /******************************************************************************/
@@ -275,11 +272,11 @@ void bbusters_state::mix_sprites(bitmap_ind16 &bitmap, bitmap_ind16 &srcbitmap, 
 {
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		uint16_t *srcbuf = &srcbitmap.pix(y);
-		uint16_t *dstbuf = &bitmap.pix(y);
+		uint16_t const *const srcbuf = &srcbitmap.pix(y);
+		uint16_t *const dstbuf = &bitmap.pix(y);
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			uint16_t srcdat = srcbuf[x];
+			uint16_t const srcdat = srcbuf[x];
 			if ((srcdat & 0xf) != 0xf)
 				MIX(srcdat, x, dstbuf);
 		}
@@ -293,10 +290,10 @@ uint32_t bbusters_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_sprites[1]->draw_sprites(m_bitmap_sprites[1], cliprect);
 	m_sprites[0]->draw_sprites(m_bitmap_sprites[0], cliprect);
 
-	m_pf_tilemap[0]->set_scrollx(0, m_pf_scroll_data[0][0]);
-	m_pf_tilemap[0]->set_scrolly(0, m_pf_scroll_data[0][1]);
-	m_pf_tilemap[1]->set_scrollx(0, m_pf_scroll_data[1][0]);
-	m_pf_tilemap[1]->set_scrolly(0, m_pf_scroll_data[1][1]);
+	m_pf_tilemap[0]->set_scrollx(0, m_pf_scroll_reg[0][0]);
+	m_pf_tilemap[0]->set_scrolly(0, m_pf_scroll_reg[0][1]);
+	m_pf_tilemap[1]->set_scrollx(0, m_pf_scroll_reg[1][0]);
+	m_pf_tilemap[1]->set_scrolly(0, m_pf_scroll_reg[1][1]);
 
 	m_pf_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
 
@@ -313,20 +310,20 @@ uint32_t bbusters_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 /*******************************************************************************/
 
-void bbusters_state::bbusters_map(address_map &map)
+void bbusters_state::main_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x080000, 0x08ffff).ram().share("ram");
-	map(0x090000, 0x090fff).ram().w(FUNC(bbusters_state::video_w)).share("tx_videoram");
+	map(0x080000, 0x08ffff).ram();
+	map(0x090000, 0x090fff).ram().w(FUNC(bbusters_state::tx_vram_w)).share(m_tx_vram);
 	map(0x0a0000, 0x0a0fff).ram().share("spriteram1");
 	map(0x0a1000, 0x0a7fff).ram();     /* service mode */
 	map(0x0a8000, 0x0a8fff).ram().share("spriteram2");
 	map(0x0a9000, 0x0affff).ram();     /* service mode */
-	map(0x0b0000, 0x0b1fff).ram().w(FUNC(bbusters_state::pf_w<0>)).share("pf1_data");
-	map(0x0b2000, 0x0b3fff).ram().w(FUNC(bbusters_state::pf_w<1>)).share("pf2_data");
+	map(0x0b0000, 0x0b1fff).ram().w(FUNC(bbusters_state::pf_vram_w<0>)).share(m_pf_vram[0]);
+	map(0x0b2000, 0x0b3fff).ram().w(FUNC(bbusters_state::pf_vram_w<1>)).share(m_pf_vram[1]);
 	map(0x0b4000, 0x0b5fff).ram();     /* service mode */
-	map(0x0b8000, 0x0b8003).writeonly().share("pf1_scroll_data");
-	map(0x0b8008, 0x0b800b).writeonly().share("pf2_scroll_data");
+	map(0x0b8000, 0x0b8003).writeonly().share(m_pf_scroll_reg[0]);
+	map(0x0b8008, 0x0b800b).writeonly().share(m_pf_scroll_reg[1]);
 	map(0x0d0000, 0x0d0fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x0e0000, 0x0e0001).portr("COINS");  /* Coins */
 	map(0x0e0002, 0x0e0003).portr("IN0");    /* Player 1 & 2 */
@@ -336,9 +333,9 @@ void bbusters_state::bbusters_map(address_map &map)
 	map(0x0e0019, 0x0e0019).r(m_soundlatch[1], FUNC(generic_latch_8_device::read));
 	map(0x0e8000, 0x0e8003).rw("adc", FUNC(upd7004_device::read), FUNC(upd7004_device::write)).umask16(0x00ff);
 	map(0x0f0000, 0x0f0001).w(FUNC(bbusters_state::coin_counter_w));
-	map(0x0f0008, 0x0f0009).w(FUNC(bbusters_state::three_gun_output_w));
+	map(0x0f0008, 0x0f0009).w(FUNC(bbusters_state::gun_output_w));
 	map(0x0f0019, 0x0f0019).w(FUNC(bbusters_state::sound_cpu_w));
-	map(0x0f8000, 0x0f80ff).r(FUNC(bbusters_state::eprom_r)).writeonly().share("eeprom"); /* Eeprom */
+	map(0x0f8000, 0x0f80ff).r(FUNC(bbusters_state::eprom_r)).writeonly().share(m_eprom_data); /* Eeprom */
 }
 
 /*******************************************************************************/
@@ -464,9 +461,9 @@ INPUT_PORTS_END
 /******************************************************************************/
 
 static GFXDECODE_START( gfx_bbusters )
-	GFXDECODE_ENTRY( "tx_tiles", 0, gfx_8x8x4_packed_msb,                      0, 16 )
-	GFXDECODE_ENTRY( "gfx4", 0,     gfx_8x8x4_col_2x2_group_packed_msb,      768, 16 )
-	GFXDECODE_ENTRY( "gfx5", 0,     gfx_8x8x4_col_2x2_group_packed_msb, 1024+256, 16 )
+	GFXDECODE_ENTRY( "tx_tiles",  0, gfx_8x8x4_packed_msb,                      0, 16 )
+	GFXDECODE_ENTRY( "bg1_tiles", 0, gfx_8x8x4_col_2x2_group_packed_msb,      768, 16 )
+	GFXDECODE_ENTRY( "bg2_tiles", 0, gfx_8x8x4_col_2x2_group_packed_msb, 1024+256, 16 )
 GFXDECODE_END
 
 /******************************************************************************/
@@ -475,7 +472,7 @@ void bbusters_state::bbusters(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 12000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &bbusters_state::bbusters_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bbusters_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(bbusters_state::irq6_line_hold));
 
 	Z80(config, m_audiocpu, 4000000); // Accurate
@@ -561,10 +558,10 @@ ROM_START( bbusters )
 	ROM_LOAD16_WORD_SWAP( "bb-f23.l13",  0x100000, 0x80000, CRC(c89fe0da) SHA1(92be860a7191e7473c42aa2da981eda873219d3d) )
 	ROM_LOAD16_WORD_SWAP( "bb-f24.l15",  0x180000, 0x80000, CRC(e0d81359) SHA1(2213c17651b6c023a456447f352b0739439f913a) )
 
-	ROM_REGION( 0x80000, "gfx4", 0 )
+	ROM_REGION( 0x80000, "bg1_tiles", 0 )
 	ROM_LOAD( "bb-back1.m4", 0x000000, 0x80000, CRC(b5445313) SHA1(3c99b557b2af30ff0fbc8a7dc6c40448c4f327db) )
 
-	ROM_REGION( 0x80000, "gfx5", 0 )
+	ROM_REGION( 0x80000, "bg2_tiles", 0 )
 	ROM_LOAD( "bb-back2.m6", 0x000000, 0x80000, CRC(8be996f6) SHA1(1e2c56f4c24793f806d7b366b92edc03145ae94c) )
 
 	ROM_REGION( 0x10000, "sprites1:scale_table", 0 ) /* Zoom table - same rom exists in 4 different locations on the board */
@@ -607,10 +604,10 @@ ROM_START( bbustersu )
 	ROM_LOAD16_WORD_SWAP( "bb-f23.l13",  0x100000, 0x80000, CRC(c89fe0da) SHA1(92be860a7191e7473c42aa2da981eda873219d3d) )
 	ROM_LOAD16_WORD_SWAP( "bb-f24.l15",  0x180000, 0x80000, CRC(e0d81359) SHA1(2213c17651b6c023a456447f352b0739439f913a) )
 
-	ROM_REGION( 0x80000, "gfx4", 0 )
+	ROM_REGION( 0x80000, "bg1_tiles", 0 )
 	ROM_LOAD( "bb-back1.m4", 0x000000, 0x80000, CRC(b5445313) SHA1(3c99b557b2af30ff0fbc8a7dc6c40448c4f327db) )
 
-	ROM_REGION( 0x80000, "gfx5", 0 )
+	ROM_REGION( 0x80000, "bg2_tiles", 0 )
 	ROM_LOAD( "bb-back2.m6", 0x000000, 0x80000, CRC(8be996f6) SHA1(1e2c56f4c24793f806d7b366b92edc03145ae94c) )
 
 	ROM_REGION( 0x10000, "sprites1:scale_table", 0 ) /* Zoom table - same rom exists in 4 different locations on the board */
@@ -653,10 +650,10 @@ ROM_START( bbustersua )
 	ROM_LOAD16_WORD_SWAP( "bb-f23.l13",  0x100000, 0x80000, CRC(c89fe0da) SHA1(92be860a7191e7473c42aa2da981eda873219d3d) )
 	ROM_LOAD16_WORD_SWAP( "bb-f24.l15",  0x180000, 0x80000, CRC(e0d81359) SHA1(2213c17651b6c023a456447f352b0739439f913a) )
 
-	ROM_REGION( 0x80000, "gfx4", 0 )
+	ROM_REGION( 0x80000, "bg1_tiles", 0 )
 	ROM_LOAD( "bb-back1.m4", 0x000000, 0x80000, CRC(b5445313) SHA1(3c99b557b2af30ff0fbc8a7dc6c40448c4f327db) )
 
-	ROM_REGION( 0x80000, "gfx5", 0 )
+	ROM_REGION( 0x80000, "bg2_tiles", 0 )
 	ROM_LOAD( "bb-back2.m6", 0x000000, 0x80000, CRC(8be996f6) SHA1(1e2c56f4c24793f806d7b366b92edc03145ae94c) )
 
 	ROM_REGION( 0x10000, "sprites1:scale_table", 0 ) /* Zoom table - same rom exists in 4 different locations on the board */
@@ -699,10 +696,10 @@ ROM_START( bbustersj )
 	ROM_LOAD16_WORD_SWAP( "bb-f23.l13",  0x100000, 0x80000, CRC(c89fe0da) SHA1(92be860a7191e7473c42aa2da981eda873219d3d) )
 	ROM_LOAD16_WORD_SWAP( "bb-f24.l15",  0x180000, 0x80000, CRC(e0d81359) SHA1(2213c17651b6c023a456447f352b0739439f913a) )
 
-	ROM_REGION( 0x80000, "gfx4", 0 )
+	ROM_REGION( 0x80000, "bg1_tiles", 0 )
 	ROM_LOAD( "bb-back1.m4", 0x000000, 0x80000, CRC(b5445313) SHA1(3c99b557b2af30ff0fbc8a7dc6c40448c4f327db) )
 
-	ROM_REGION( 0x80000, "gfx5", 0 )
+	ROM_REGION( 0x80000, "bg2_tiles", 0 )
 	ROM_LOAD( "bb-back2.m6", 0x000000, 0x80000, CRC(8be996f6) SHA1(1e2c56f4c24793f806d7b366b92edc03145ae94c) )
 
 	ROM_REGION( 0x10000, "sprites1:scale_table", 0 ) /* Zoom table - same rom exists in 4 different locations on the board */
@@ -745,10 +742,10 @@ ROM_START( bbustersja )
 	ROM_LOAD16_WORD_SWAP( "bb-f23.l13",  0x100000, 0x80000, CRC(c89fe0da) SHA1(92be860a7191e7473c42aa2da981eda873219d3d) )
 	ROM_LOAD16_WORD_SWAP( "bb-f24.l15",  0x180000, 0x80000, CRC(e0d81359) SHA1(2213c17651b6c023a456447f352b0739439f913a) )
 
-	ROM_REGION( 0x80000, "gfx4", 0 )
+	ROM_REGION( 0x80000, "bg1_tiles", 0 )
 	ROM_LOAD( "bb-back1.m4", 0x000000, 0x80000, CRC(b5445313) SHA1(3c99b557b2af30ff0fbc8a7dc6c40448c4f327db) )
 
-	ROM_REGION( 0x80000, "gfx5", 0 )
+	ROM_REGION( 0x80000, "bg2_tiles", 0 )
 	ROM_LOAD( "bb-back2.m6", 0x000000, 0x80000, CRC(8be996f6) SHA1(1e2c56f4c24793f806d7b366b92edc03145ae94c) )
 
 	ROM_REGION( 0x10000, "sprites1:scale_table", 0 ) /* Zoom table - same rom exists in 4 different locations on the board */
