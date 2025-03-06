@@ -26,7 +26,7 @@ DEFINE_DEVICE_TYPE(SNK_BBUSTERS_SPR, snk_bbusters_spr_device, "snk_bbusters_spr"
 snk_bbusters_spr_device::snk_bbusters_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, SNK_BBUSTERS_SPR, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this, gfxinfo)
-	, m_scale_table(*this, "scale_table")
+	, m_scale_table(*this, finder_base::DUMMY_TAG)
 	, m_spriteram(*this, finder_base::DUMMY_TAG)
 {
 }
