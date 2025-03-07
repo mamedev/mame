@@ -887,8 +887,8 @@ cassette_image::error cassette_image::legacy_construct(const LegacyWaveFiller *l
 		without knowing how much data available in the image. Having wrong header with size bigger than image couses illegal
 		access beyond image data.
 		Desired state is:
-			length = args.fill_wave(&samples[pos], args.chunk_size, chunk.get());
-			aslo the fix for tap is commented out in 'tap_cas_fill_wave'
+		    length = args.fill_wave(&samples[pos], args.chunk_size, chunk.get());
+		    aslo the fix for tap is commented out in 'tap_cas_fill_wave'
 		*/
 		length = args.fill_wave(&samples[pos], sample_count - pos, chunk.get());
 		if (length < 0)

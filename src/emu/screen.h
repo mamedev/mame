@@ -461,7 +461,7 @@ private:
 	screen_update_rgb32_delegate m_screen_update_rgb32; // screen update callback (32-bit RGB)
 	devcb_write_line    m_screen_vblank;            // screen vblank line callback
 	devcb_write32       m_scanline_cb;              // screen scanline callback
-	optional_device<device_palette_interface> m_palette;      // our palette
+	optional_device<device_palette_interface> m_palette; // our palette
 	u32                 m_video_attributes;         // flags describing the video system
 	optional_memory_region m_svg_region;            // the region in which the svg data is in
 
@@ -485,6 +485,7 @@ private:
 	u8                  m_curbitmap;                // current bitmap index
 	u8                  m_curtexture;               // current texture index
 	bool                m_changed;                  // has this bitmap changed?
+	attotime            m_last_partial_reset;       // last time partial updates were reset
 	s32                 m_last_partial_scan;        // scanline of last partial update
 	s32                 m_partial_scan_hpos;        // horizontal pixel last rendered on this partial scanline
 	bitmap_argb32       m_screen_overlay_bitmap;    // screen overlay bitmap
@@ -504,7 +505,7 @@ private:
 	emu_timer *         m_scanline0_timer;          // scanline 0 timer
 	emu_timer *         m_scanline_timer;           // scanline timer
 	u64                 m_frame_number;             // the current frame number
-	u32                 m_partial_updates_this_frame;// partial update counter this frame
+	u32                 m_partial_updates_this_frame; // partial update counter this frame
 
 	bool                m_is_primary_screen;
 
@@ -517,7 +518,7 @@ private:
 
 		vblank_state_delegate       m_callback;
 	};
-	std::vector<std::unique_ptr<callback_item>> m_callback_list;     // list of VBLANK callbacks
+	std::vector<std::unique_ptr<callback_item>> m_callback_list; // list of VBLANK callbacks
 
 	// auto-sizing bitmaps
 	class auto_bitmap_item

@@ -1155,6 +1155,9 @@ ROM_START( zaxxon2 )
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "mro16.u76",   0x0000, 0x0100, CRC(6cc6695b) SHA1(01ae8450ccc302e1a5ae74230d44f6f531a962e2) ) /* BPROM from TI stamped as J214A2  MRO16 */
 	ROM_LOAD( "mro17.u41",   0x0100, 0x0100, CRC(a9e1fb43) SHA1(57dbcfe2438fd090c08594818549aeea6339eab2) ) /* BPROM from TI stamped as J214A2  MRO17 */
+
+	ROM_REGION( 0x117, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "pal16l8cn.bin", 0x000, 0x117, CRC(a3e8657c) SHA1(4af9e8b0cace64639ccac5039c8d1b1774dc2787) )
 ROM_END
 
 ROM_START( zaxxon3 )

@@ -32,29 +32,15 @@ ToDo:
 /* Address maps */
 void pp01_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x0fff).bankrw("bank0");
-	map(0x1000, 0x1fff).bankrw("bank1");
-	map(0x2000, 0x2fff).bankrw("bank2");
-	map(0x3000, 0x3fff).bankrw("bank3");
-	map(0x4000, 0x4fff).bankrw("bank4");
-	map(0x5000, 0x5fff).bankrw("bank5");
-	map(0x6000, 0x6fff).bankrw("bank6");
-	map(0x7000, 0x7fff).bankrw("bank7");
-	map(0x8000, 0x8fff).bankrw("bank8");
-	map(0x9000, 0x9fff).bankrw("bank9");
-	map(0xa000, 0xafff).bankrw("bank10");
-	map(0xb000, 0xbfff).bankrw("bank11");
-	map(0xc000, 0xcfff).bankrw("bank12");
-	map(0xd000, 0xdfff).bankrw("bank13");
-	map(0xe000, 0xefff).bankrw("bank14");
-	map(0xf000, 0xffff).bankrw("bank15");
+	for (int i = 0; i < 16; i++)
+		map(i << 12, (i << 12) | 0xfff).bankrw(m_bank[i]);
 }
 
 void pp01_state::io_map(address_map &map)
 {
-	map(0xc0, 0xc3).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write)); // system
-	map(0xc4, 0xc7).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write)); // user
-	map(0xc8, 0xc9).mirror(2).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0xc0, 0xc3).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write)); // system
+	map(0xc4, 0xc7).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write)); // user
+	map(0xc8, 0xc9).mirror(2).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0xcc, 0xcf).w(FUNC(pp01_state::video_write_mode_w));
 	map(0xd0, 0xd3).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	//map(0xd4, 0xd7). MH3214 interrupt controller
@@ -195,7 +181,7 @@ void pp01_state::pp01(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(256, 256);
 	screen.set_visarea(0, 256-1, 0, 256-1);
-	screen.set_screen_update(FUNC(pp01_state::screen_update_pp01));
+	screen.set_screen_update(FUNC(pp01_state::screen_update));
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(pp01_state::pp01_palette), 8);
@@ -214,15 +200,15 @@ void pp01_state::pp01(machine_config &config)
 	m_pit->set_clk<2>(2000000);
 	m_pit->out_handler<2>().set(FUNC(pp01_state::z2_w));
 
-	I8255A(config, m_ppi1);
-	m_ppi1->in_pa_callback().set(FUNC(pp01_state::ppi1_porta_r));
-	m_ppi1->out_pa_callback().set(FUNC(pp01_state::ppi1_porta_w));
-	m_ppi1->in_pb_callback().set(FUNC(pp01_state::ppi1_portb_r));
-	m_ppi1->out_pb_callback().set(FUNC(pp01_state::ppi1_portb_w));
-	m_ppi1->in_pc_callback().set(FUNC(pp01_state::ppi1_portc_r));
-	m_ppi1->out_pc_callback().set(FUNC(pp01_state::ppi1_portc_w));
+	I8255A(config, m_ppi[0]);
+	m_ppi[0]->in_pa_callback().set(FUNC(pp01_state::ppi1_porta_r));
+	m_ppi[0]->out_pa_callback().set(FUNC(pp01_state::ppi1_porta_w));
+	m_ppi[0]->in_pb_callback().set(FUNC(pp01_state::ppi1_portb_r));
+	m_ppi[0]->out_pb_callback().set(FUNC(pp01_state::ppi1_portb_w));
+	m_ppi[0]->in_pc_callback().set(FUNC(pp01_state::ppi1_portc_r));
+	m_ppi[0]->out_pc_callback().set(FUNC(pp01_state::ppi1_portc_w));
 
-	I8255A(config, m_ppi2);
+	I8255A(config, m_ppi[1]);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K").set_default_value(0x00);

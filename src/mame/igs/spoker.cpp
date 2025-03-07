@@ -24,7 +24,8 @@
   TODO:
 
   - Understand how to reset NVRAM
-  - Map DSW (Operator mode doesn't help)
+  - Verify / complete DSW for spk sets where operator mode doesn't help
+     (every one but 100, 102u, 102ua, 114it, 130, 200, 200ua, 201ua, 203us)
   - Verify LEDs and coin counters (should be ok)
   - 3super8 randomly crashes
   - 3super8 doesn't have the 8x32 tilemap, change the video emulation accordingly
@@ -703,6 +704,136 @@ static INPUT_PORTS_START( spoker ) // this has every hold key which also does an
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( spk203us )
+	PORT_INCLUDE(spoker)
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME(    0x01, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(       0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(       0x00, DEF_STR( On ) )
+	PORT_DIPNAME(    0x02, 0x02, "Hold Mode" ) PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(       0x02, "Hold Win" )
+	PORT_DIPSETTING(       0x00, "Auto Hold" )
+	PORT_DIPNAME(    0x1c, 0x1c, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:3,4,5")
+	PORT_DIPSETTING(       0x1c, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(       0x18, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(       0x14, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(       0x10, "1 Coin/10 Credits" )
+	PORT_DIPSETTING(       0x0c, "1 Coin/20 Credits" )
+	PORT_DIPSETTING(       0x08, "1 Coin/40 Credits" )
+	PORT_DIPSETTING(       0x04, "1 Coin/50 Credits" )
+	PORT_DIPSETTING(       0x00, "1 Coin/100 Credits" )
+	PORT_DIPNAME(    0x60, 0x60, "Max Bet" ) PORT_DIPLOCATION("SW1:6,7")
+	PORT_DIPSETTING(       0x60, "8" )
+	PORT_DIPSETTING(       0x40, "10" )
+	PORT_DIPSETTING(       0x20, "50" )
+	PORT_DIPSETTING(       0x00, "100" )
+	PORT_DIPNAME(    0x80, 0x80, "Hopper" ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(       0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(       0x00, DEF_STR( On ) )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME(    0x03, 0x03, "Min Bet" ) PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(       0x03, "1" )
+	PORT_DIPSETTING(       0x02, "5" )
+	PORT_DIPSETTING(       0x01, "10" )
+	PORT_DIPSETTING(       0x00, "20" )
+	PORT_DIPNAME(    0x1c, 0x1c, "Key In" ) PORT_DIPLOCATION("SW2:3,4,5")
+	PORT_DIPSETTING(       0x1c, "10 Credits" )
+	PORT_DIPSETTING(       0x18, "20 Credits" )
+	PORT_DIPSETTING(       0x14, "40 Credits" )
+	PORT_DIPSETTING(       0x10, "50 Credits" )
+	PORT_DIPSETTING(       0x0c, "100 Credits" )
+	PORT_DIPSETTING(       0x08, "200 Credits" )
+	PORT_DIPSETTING(       0x04, "250 Credits" )
+	PORT_DIPSETTING(       0x00, "500 Credits" )
+	PORT_DIPNAME(    0x60, 0x60, "Key Out" ) PORT_DIPLOCATION("SW2:6,7")
+	PORT_DIPSETTING(       0x60, "1 Credit" )
+	PORT_DIPSETTING(       0x40, "10 Credits" )
+	PORT_DIPSETTING(       0x20, "100 Credits" )
+	PORT_DIPSETTING(       0x00, "500 Credits" )
+	PORT_DIPNAME(    0x80, 0x80, "Payout Mode" ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(       0x80, "Manual" )
+	PORT_DIPSETTING(       0x00, "Auto" )
+
+	PORT_MODIFY("DSW3")
+	PORT_DIPNAME(    0x01, 0x01, "System Ltd." ) PORT_DIPLOCATION("SW3:1")
+	PORT_DIPSETTING(       0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(       0x00, "7500" )
+	PORT_DIPNAME(    0x02, 0x02, "Show Discard" ) PORT_DIPLOCATION("SW3:2")
+	PORT_DIPSETTING(       0x02, "Hold" )
+	PORT_DIPSETTING(       0x00, "Discard" )
+	PORT_DIPNAME(    0x04, 0x04, "Password" ) PORT_DIPLOCATION("SW3:3")
+	PORT_DIPSETTING(       0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(       0x00, DEF_STR( On ) )
+	PORT_DIPNAME(    0x38, 0x38, "Main Rate" ) PORT_DIPLOCATION("SW3:4,5,6")
+	PORT_DIPSETTING(       0x38, "50%" )
+	PORT_DIPSETTING(       0x30, "60%" )
+	PORT_DIPSETTING(       0x28, "65%" )
+	PORT_DIPSETTING(       0x20, "70%" )
+	PORT_DIPSETTING(       0x18, "75%" )
+	PORT_DIPSETTING(       0x10, "80%" )
+	PORT_DIPSETTING(       0x08, "85%" )
+	PORT_DIPSETTING(       0x00, "90%" )
+	PORT_DIPNAME(    0xc0, 0xc0, "W-Up Rate" ) PORT_DIPLOCATION("SW3:7,8")
+	PORT_DIPSETTING(       0xc0, "75%" )
+	PORT_DIPSETTING(       0x80, "80%" )
+	PORT_DIPSETTING(       0x40, "85%" )
+	PORT_DIPSETTING(       0x00, "90%" )
+
+	PORT_MODIFY("DSW4")
+	PORT_DIPNAME(    0x01, 0x01, "W-Up Game" ) PORT_DIPLOCATION("SW4:1")
+	PORT_DIPSETTING(       0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(       0x00, DEF_STR( On ) )
+	PORT_DIPUNKNOWN( 0x02, 0x02 ) PORT_DIPLOCATION("SW4:2") // from here on, not shown / listed in test mode
+	PORT_DIPUNKNOWN( 0x04, 0x04 ) PORT_DIPLOCATION("SW4:3")
+	PORT_DIPUNKNOWN( 0x08, 0x08 ) PORT_DIPLOCATION("SW4:4")
+	PORT_DIPUNKNOWN( 0x10, 0x10 ) PORT_DIPLOCATION("SW4:5")
+	PORT_DIPUNKNOWN( 0x20, 0x20 ) PORT_DIPLOCATION("SW4:6")
+	PORT_DIPUNKNOWN( 0x40, 0x40 ) PORT_DIPLOCATION("SW4:7")
+	PORT_DIPUNKNOWN( 0x80, 0x80 ) PORT_DIPLOCATION("SW4:8")
+
+	PORT_MODIFY("DSW5") // present on PCB, but not shown / listed in test mode
+	PORT_DIPUNKNOWN( 0x01, 0x01 ) PORT_DIPLOCATION("SW5:1")
+	PORT_DIPUNKNOWN( 0x02, 0x02 ) PORT_DIPLOCATION("SW5:2")
+	PORT_DIPUNKNOWN( 0x04, 0x04 ) PORT_DIPLOCATION("SW5:3")
+	PORT_DIPUNKNOWN( 0x08, 0x08 ) PORT_DIPLOCATION("SW5:4")
+	PORT_DIPUNKNOWN( 0x10, 0x10 ) PORT_DIPLOCATION("SW5:5")
+	PORT_DIPUNKNOWN( 0x20, 0x20 ) PORT_DIPLOCATION("SW5:6")
+	PORT_DIPUNKNOWN( 0x40, 0x40 ) PORT_DIPLOCATION("SW5:7")
+	PORT_DIPUNKNOWN( 0x80, 0x80 ) PORT_DIPLOCATION("SW5:8")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( spk201ua )
+	PORT_INCLUDE(spk203us)
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME(    0x60, 0x60, "Key Out" ) PORT_DIPLOCATION("SW2:6,7")
+	PORT_DIPSETTING(       0x60, "1 Credit" )
+	PORT_DIPSETTING(       0x40, "10 Credits" )
+	PORT_DIPSETTING(       0x20, "100 Credits" )
+	PORT_DIPSETTING(       0x00, "100 Credits (duplicate)" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( spk200ua )
+	PORT_INCLUDE(spk201ua)
+
+	PORT_MODIFY("DSW4")
+	PORT_DIPUNKNOWN( 0x01, 0x01 ) PORT_DIPLOCATION("SW4:1") // from here on, not shown / listed in test mode
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( spk102ua )
+	PORT_INCLUDE(spk200ua)
+
+	PORT_MODIFY("DSW3")
+	PORT_DIPUNKNOWN( 0x04, 0x04 ) PORT_DIPLOCATION("SW3:3") // from here on, not shown / listed in test mode
+	PORT_DIPUNKNOWN( 0x08, 0x08 ) PORT_DIPLOCATION("SW3:4")
+	PORT_DIPUNKNOWN( 0x10, 0x10 ) PORT_DIPLOCATION("SW3:5")
+	PORT_DIPUNKNOWN( 0x20, 0x20 ) PORT_DIPLOCATION("SW3:6")
+	PORT_DIPUNKNOWN( 0x40, 0x40 ) PORT_DIPLOCATION("SW3:7")
+	PORT_DIPUNKNOWN( 0x80, 0x80 ) PORT_DIPLOCATION("SW3:8")
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( spk114it ) // this has dedicated keys for every function
 	PORT_INCLUDE(spoker)
 
@@ -724,9 +855,139 @@ static INPUT_PORTS_START( spk114it ) // this has dedicated keys for every functi
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) // Big
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME(    0x01, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(       0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(       0x00, DEF_STR( On ) )
+	PORT_DIPNAME(    0x02, 0x02, "Hold Mode" ) PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(       0x02, "Hold Win" )
+	PORT_DIPSETTING(       0x00, "Auto Hold" )
+	PORT_DIPNAME(    0x1c, 0x1c, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:3,4,5")
+	PORT_DIPSETTING(       0x1c, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(       0x18, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(       0x14, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(       0x10, "1 Coin/10 Credits" )
+	PORT_DIPSETTING(       0x0c, "1 Coin/20 Credits" )
+	PORT_DIPSETTING(       0x08, "1 Coin/40 Credits" )
+	PORT_DIPSETTING(       0x04, "1 Coin/50 Credits" )
+	PORT_DIPSETTING(       0x00, "1 Coin/100 Credits" )
+	PORT_DIPNAME(    0x20, 0x20, "Hopper" ) PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(       0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(       0x00, DEF_STR( On ) )
+	PORT_DIPUNKNOWN( 0x40, 0x40 ) PORT_DIPLOCATION("SW1:7") // not shown / listed in test mode
+	PORT_DIPUNKNOWN( 0x80, 0x80 ) PORT_DIPLOCATION("SW1:8") // not shown / listed in test mode
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME(    0x03, 0x03, "Min Bet" ) PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(       0x03, "1" )
+	PORT_DIPSETTING(       0x02, "5" )
+	PORT_DIPSETTING(       0x01, "10" )
+	PORT_DIPSETTING(       0x00, "20" )
+	PORT_DIPNAME(    0x1c, 0x1c, "Key In" ) PORT_DIPLOCATION("SW2:3,4,5")
+	PORT_DIPSETTING(       0x1c, "10 Credits" )
+	PORT_DIPSETTING(       0x18, "20 Credits" )
+	PORT_DIPSETTING(       0x14, "40 Credits" )
+	PORT_DIPSETTING(       0x10, "50 Credits" )
+	PORT_DIPSETTING(       0x0c, "100 Credits" )
+	PORT_DIPSETTING(       0x08, "200 Credits" )
+	PORT_DIPSETTING(       0x04, "250 Credits" )
+	PORT_DIPSETTING(       0x00, "500 Credits" )
+	PORT_DIPNAME(    0x20, 0x20, "Key Out" ) PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(       0x20, "10 Credits" )
+	PORT_DIPSETTING(       0x00, "100 Credits" )
+	PORT_DIPNAME(    0x40, 0x40, "W-Up Ltd." ) PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(       0x40, "3500" )
+	PORT_DIPSETTING(       0x00, "5000" )
+	PORT_DIPNAME(    0x80, 0x80, "Payout Mode" ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(       0x80, "Manual" )
+	PORT_DIPSETTING(       0x00, "Auto" )
+
+	PORT_MODIFY("DSW3")
+	PORT_DIPNAME(    0x03, 0x03, "W-Up B_Base" ) PORT_DIPLOCATION("SW3:1,2")
+	PORT_DIPSETTING(       0x03, "100" )
+	PORT_DIPSETTING(       0x02, "200" )
+	PORT_DIPSETTING(       0x01, "300" )
+	PORT_DIPSETTING(       0x00, "400" )
+	PORT_DIPNAME(    0x0c, 0x0c, "W-Up Pool" ) PORT_DIPLOCATION("SW3:3,4")
+	PORT_DIPSETTING(       0x0c, "300" )
+	PORT_DIPSETTING(       0x08, "500" )
+	PORT_DIPSETTING(       0x04, "800" )
+	PORT_DIPSETTING(       0x00, "800 (duplicate)" )
+	PORT_DIPNAME(    0x30, 0x30, "System Ltd." ) PORT_DIPLOCATION("SW3:5,6")
+	PORT_DIPSETTING(       0x30, "20000" )
+	PORT_DIPSETTING(       0x20, "30000" )
+	PORT_DIPSETTING(       0x10, "40000" )
+	PORT_DIPSETTING(       0x00, "50000" )
+	PORT_DIPUNKNOWN( 0x40, 0x40 ) PORT_DIPLOCATION("SW3:7") // not shown / listed in test mode
+	PORT_DIPUNKNOWN( 0x80, 0x80 ) PORT_DIPLOCATION("SW3:8") // not shown / listed in test mode
+
+	PORT_MODIFY("DSW4")
+	PORT_DIPNAME(    0x01, 0x01, "Payout Kind" ) PORT_DIPLOCATION("SW4:1")
+	PORT_DIPSETTING(       0x01, "Hopper" )
+	PORT_DIPSETTING(       0x00, "Ticket" )
+	PORT_DIPNAME(    0x06, 0x06, "Ticket Rate" ) PORT_DIPLOCATION("SW4:2,3")
+	PORT_DIPSETTING(       0x06, "10:1" )
+	PORT_DIPSETTING(       0x04, "20:1" )
+	PORT_DIPSETTING(       0x02, "50:1" )
+	PORT_DIPSETTING(       0x00, "100:1" )
+	PORT_DIPUNKNOWN( 0x08, 0x08 ) PORT_DIPLOCATION("SW4:4") // not shown / listed in test mode// from here on, not shown / listed in test mode
+	PORT_DIPUNKNOWN( 0x10, 0x10 ) PORT_DIPLOCATION("SW4:5")
+	PORT_DIPUNKNOWN( 0x20, 0x20 ) PORT_DIPLOCATION("SW4:6")
+	PORT_DIPUNKNOWN( 0x40, 0x40 ) PORT_DIPLOCATION("SW4:7")
+	PORT_DIPUNKNOWN( 0x80, 0x80 ) PORT_DIPLOCATION("SW4:8")
+
+	PORT_MODIFY("DSW5") // present on PCB, but not shown / listed in test mode
+	PORT_DIPUNKNOWN( 0x01, 0x01 ) PORT_DIPLOCATION("SW5:1")
+	PORT_DIPUNKNOWN( 0x02, 0x02 ) PORT_DIPLOCATION("SW5:2")
+	PORT_DIPUNKNOWN( 0x04, 0x04 ) PORT_DIPLOCATION("SW5:3")
+	PORT_DIPUNKNOWN( 0x08, 0x08 ) PORT_DIPLOCATION("SW5:4")
+	PORT_DIPUNKNOWN( 0x10, 0x10 ) PORT_DIPLOCATION("SW5:5")
+	PORT_DIPUNKNOWN( 0x20, 0x20 ) PORT_DIPLOCATION("SW5:6")
+	PORT_DIPUNKNOWN( 0x40, 0x40 ) PORT_DIPLOCATION("SW5:7")
+	PORT_DIPUNKNOWN( 0x80, 0x80 ) PORT_DIPLOCATION("SW5:8")
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( spk100 )
+	PORT_INCLUDE(spk114it)
 
+	PORT_MODIFY("BUTTONS1")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Hold 5 / Bet") // Only works as Hold 5 in test mode, but also works as bet in game
+
+	PORT_MODIFY("BUTTONS2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) // this works as Bet in key test but not in game? Probably BTANB
+
+	PORT_MODIFY("DSW4") // not shown / listed in test mode
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW4:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW4:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW4:3" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( spk130 )
+	PORT_INCLUDE(spk100)
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME(    0x40, 0x40, "W-Up Ltd." ) PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(       0x40, "1750" )
+	PORT_DIPSETTING(       0x00, "2500" )
+
+	PORT_MODIFY("DSW3")
+	PORT_DIPNAME(    0x03, 0x03, "W-Up B_Base" ) PORT_DIPLOCATION("SW3:1,2")
+	PORT_DIPSETTING(       0x03, "50" )
+	PORT_DIPSETTING(       0x02, "100" )
+	PORT_DIPSETTING(       0x01, "150" )
+	PORT_DIPSETTING(       0x00, "200" )
+	PORT_DIPNAME(    0x0c, 0x0c, "W-Up Pool" ) PORT_DIPLOCATION("SW3:3,4")
+	PORT_DIPSETTING(       0x0c, "150" )
+	PORT_DIPSETTING(       0x08, "250" )
+	PORT_DIPSETTING(       0x04, "400" )
+	PORT_DIPSETTING(       0x00, "400 (duplicate)" )
+	PORT_DIPNAME(    0x30, 0x30, "System Ltd." ) PORT_DIPLOCATION("SW3:5,6")
+	PORT_DIPSETTING(       0x30, "10000" )
+	PORT_DIPSETTING(       0x20, "15000" )
+	PORT_DIPSETTING(       0x10, "20000" )
+	PORT_DIPSETTING(       0x00, "25000" )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( 3super8 )
 	PORT_START("DSW1")
@@ -811,7 +1072,6 @@ static INPUT_PORTS_START( 3super8 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 INPUT_PORTS_END
-
 
 // TODO: copied over from older versions in igs/igs009.cpp. Verify if dips are the same. Inputs are verified the same.
 static INPUT_PORTS_START( jb )
@@ -1284,6 +1544,38 @@ ROM_START( spk200ua )
 	ROM_LOAD( "mx28f2000p_v200_uasp.u34",   0x0000, 0x40000, CRC(33e6089d) SHA1(cd1ad01e92c18bbeab3fe3ea9152f8b0a3eb1b29) )
 ROM_END
 
+ROM_START( spk200 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "u44",   0x0000, 0x10000, CRC(75dac1bd) SHA1(06cbed9cf9956af47aadb44e467c1952f16cc3e5) )
+
+	ROM_REGION( 0xc0000, "gfx1", 0 )
+	ROM_LOAD( "u25",  0x00000, 0x40000, CRC(7cf1327b) SHA1(afeaa975e63cff2f6ae52650cf77b125593efbbc) )
+	ROM_LOAD( "u24",  0x40000, 0x40000, CRC(15095525) SHA1(480c17eec6079f7bf12026a9bb1c14fb52db8d45) )
+	ROM_LOAD( "u23",  0x80000, 0x40000, CRC(b1538860) SHA1(0de12b91db25281025059429fac07d235071ea21) )
+
+	ROM_REGION( 0x30000, "gfx2", 0 )
+	ROM_FILL(                              0x0000, 0x30000, 0xff ) // filling the whole bank
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "u38",   0x0000, 0x40000, CRC(33e6089d) SHA1(cd1ad01e92c18bbeab3fe3ea9152f8b0a3eb1b29) )
+ROM_END
+
+ROM_START( spk130 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "u44",   0x0000, 0x10000, CRC(1a76b7f1) SHA1(6d83b0841991bc86179b98267ecb5949641932fe) )
+
+	ROM_REGION( 0xc0000, "gfx1", 0 )
+	ROM_LOAD( "u25",  0x00000, 0x40000, CRC(7cf1327b) SHA1(afeaa975e63cff2f6ae52650cf77b125593efbbc) )
+	ROM_LOAD( "u24",  0x40000, 0x40000, CRC(15095525) SHA1(480c17eec6079f7bf12026a9bb1c14fb52db8d45) )
+	ROM_LOAD( "u23",  0x80000, 0x40000, CRC(b1538860) SHA1(0de12b91db25281025059429fac07d235071ea21) )
+
+	ROM_REGION( 0x30000, "gfx2", 0 )
+	ROM_FILL(                              0x0000, 0x30000, 0xff ) // filling the whole bank
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "u38",   0x0000, 0x40000, CRC(33e6089d) SHA1(cd1ad01e92c18bbeab3fe3ea9152f8b0a3eb1b29) )
+ROM_END
+
 ROM_START( spk102ua )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "27c512_v102_ua.u27",   0x0000, 0x10000, CRC(ec5e9f6d) SHA1(5d7a86f8faef7a4b7a9dde040b00b987ffb09479) )
@@ -1300,7 +1592,23 @@ ROM_START( spk102ua )
 	ROM_LOAD( "mx28f2000p_v102_uasp.u34",   0x0000, 0x40000, CRC(33e6089d) SHA1(cd1ad01e92c18bbeab3fe3ea9152f8b0a3eb1b29) )
 ROM_END
 
-ROM_START( spk100 ) // no labels on the ROMs
+ROM_START( spk102u )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "u44", 0x0000, 0x10000, CRC(51e392e7) SHA1(da76cdfbdc84234ee6d3dd360871d892a8a1c5e2) )
+
+	ROM_REGION( 0xc0000, "gfx1", 0 )
+	ROM_LOAD( "u25",  0x00000, 0x40000, CRC(67f2a1d6) SHA1(115655cf4718105e7ff054dd662d9d53e9ea91e0) )
+	ROM_LOAD( "u24",  0x40000, 0x40000, CRC(fb9d8c09) SHA1(6cbefa90f6b866ee682f7981d6f5d30e9346a123) )
+	ROM_LOAD( "u23",  0x80000, 0x40000, CRC(98b71478) SHA1(b5bd9eef91f5cc2e9628e5181fbbd6fd453487f0) )
+
+	ROM_REGION( 0x30000, "gfx2", 0 )
+	ROM_FILL(                              0x0000, 0x30000, 0xff ) // filling the whole bank
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "u38",   0x0000, 0x40000, CRC(33e6089d) SHA1(cd1ad01e92c18bbeab3fe3ea9152f8b0a3eb1b29) )
+ROM_END
+
+ROM_START( spk100 ) // no labels on the ROMs. This version has also been found with GFX ROMs from the spk200 set
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "u43",   0x0000, 0x10000, CRC(7c17bf58) SHA1(dd16b9f52d8c08a61fe234978cc84b95c25c5dec) )
 
@@ -1682,16 +1990,19 @@ void spoker_state::init_3super8()
 //    YEAR   NAME        PARENT    MACHINE   INPUT     STATE           INIT           ROT    COMPANY      FULLNAME                    FLAGS
 GAME( 1996,  spk306us,   0,        spokeru,  spoker,   spokeru_state,  init_spokeru,  ROT0,  "IGS",       "Super Poker (v306US)",     MACHINE_SUPPORTS_SAVE )
 GAME( 1996,  spk205us,   spk306us, spokeru,  spoker,   spokeru_state,  init_spokeru,  ROT0,  "IGS",       "Super Poker (v205US)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1996,  spk203us,   spk306us, spokeru,  spoker,   spokeru_state,  init_spokeru,  ROT0,  "IGS",       "Super Poker (v203US)",     MACHINE_SUPPORTS_SAVE ) // LS1. 8 203US in test mode
-GAME( 1996,  spk201ua,   spk306us, spokeru,  spoker,   spokeru_state,  init_spokeru,  ROT0,  "IGS",       "Super Poker (v201UA)",     MACHINE_SUPPORTS_SAVE ) // still shows 200UA in test mode
-GAME( 1996,  spk200ua,   spk306us, spokeru,  spoker,   spokeru_state,  init_spokeru,  ROT0,  "IGS",       "Super Poker (v200UA)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1996,  spk203us,   spk306us, spokeru,  spk203us, spokeru_state,  init_spokeru,  ROT0,  "IGS",       "Super Poker (v203US)",     MACHINE_SUPPORTS_SAVE ) // LS1. 8 203US in test mode
+GAME( 1996,  spk201ua,   spk306us, spokeru,  spk201ua, spokeru_state,  init_spokeru,  ROT0,  "IGS",       "Super Poker (v201UA)",     MACHINE_SUPPORTS_SAVE ) // still shows 200UA in test mode
+GAME( 1996,  spk200ua,   spk306us, spokeru,  spk200ua, spokeru_state,  init_spokeru,  ROT0,  "IGS",       "Super Poker (v200UA)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1996,  spk200,     spk306us, spoker,   spk100,   spoker_state,   init_spk100,   ROT0,  "IGS",       "Super Poker (v200)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1996,  spk130,     spk306us, spoker,   spk130,   spoker_state,   init_spk100,   ROT0,  "IGS",       "Super Poker (v130)",       MACHINE_SUPPORTS_SAVE )
 GAME( 1996,  spk120in,   spk306us, spoker,   spoker,   spoker_state,   init_spk120in, ROT0,  "IGS",       "Super Poker (v120IN)",     MACHINE_SUPPORTS_SAVE )
 GAME( 1996,  spk116it,   spk306us, spoker,   spoker,   spoker_state,   init_spk116it, ROT0,  "IGS",       "Super Poker (v116IT)",     MACHINE_SUPPORTS_SAVE )
 GAME( 1996,  spk116itmx, spk306us, spoker,   spoker,   spoker_state,   init_spk114it, ROT0,  "IGS",       "Super Poker (v116IT-MX)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1996,  spk115it,   spk306us, spoker,   spoker,   spoker_state,   init_spk116it, ROT0,  "IGS",       "Super Poker (v115IT)",     MACHINE_SUPPORTS_SAVE )
 GAME( 1996,  spk114it,   spk306us, spoker,   spk114it, spoker_state,   init_spk114it, ROT0,  "IGS",       "Super Poker (v114IT)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1996,  spk102ua,   spk306us, spokeru,  spoker,   spokeru_state,  init_spokeru,  ROT0,  "IGS",       "Super Poker (v102UA)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1996,  spk100,     spk306us, spoker,   spk114it, spoker_state,   init_spk100,   ROT0,  "IGS",       "Super Poker (v100)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1996,  spk102ua,   spk306us, spokeru,  spk102ua, spokeru_state,  init_spokeru,  ROT0,  "IGS",       "Super Poker (v102UA)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1996,  spk102u,    spk306us, spoker,   spk102ua, spoker_state,   init_spk100,   ROT0,  "IGS",       "Super Poker (v102U)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1996,  spk100,     spk306us, spoker,   spk100,   spoker_state,   init_spk100,   ROT0,  "IGS",       "Super Poker (v100)",       MACHINE_SUPPORTS_SAVE )
 GAME( 1993?, 3super8,    0,        _3super8, 3super8,  spoker_state,   init_3super8,  ROT0,  "<unknown>", "3 Super 8 (Italy)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // ROMs are badly dumped
 GAME( 1997,  jbell,      0,        jb,       jb,       jb_state,       init_spokeru,  ROT0,  "IGS",       "Jingle Bell (v200US)",     MACHINE_SUPPORTS_SAVE )
 GAME( 1995,  jinhulu2,   0,        jinhulu2, spoker,   jinhulu2_state, init_jinhulu2, ROT0,  "IGS",       "Jin Hu Lu 2 (v412GS)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // tries to link to something?

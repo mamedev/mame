@@ -305,8 +305,8 @@ void tp84_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 		int const code = m_spriteram[offs + 1];
 		int const color = palette_base | (m_spriteram[offs + 2] & 0x0f);
-		int const flip_x = ~m_spriteram[offs + 2] & 0x40;
-		int const flip_y =  m_spriteram[offs + 2] & 0x80;
+		int const flip_x = BIT(~m_spriteram[offs + 2], 6);
+		int const flip_y = BIT( m_spriteram[offs + 2], 7);
 
 		m_gfxdecode->gfx(1)->transmask(bitmap, cliprect, code, color, flip_x, flip_y, x, y,
 				m_palette->transpen_mask(*m_gfxdecode->gfx(1), color, palette_base));
@@ -405,28 +405,26 @@ uint8_t tp84_state::sh_timer_r()
 
 void tp84_state::filter_w(offs_t offset, uint8_t data)
 {
-	int C;
-
 	// 76489 #0
-	C = 0;
-	if (offset & 0x008) C +=  47000;    //  47000pF = 0.047uF
-	if (offset & 0x010) C += 470000;    // 470000pF = 0.47uF
+	int C = 0;
+	if (BIT(offset, 3)) C +=  47000;    //  47000pF = 0.047uF
+	if (BIT(offset, 4)) C += 470000;    // 470000pF = 0.47uF
 	m_filter[0]->filter_rc_set_RC(filter_rc_device::LOWPASS_3R, 1000, 2200, 1000, CAP_P(C));
 
 	// 76489 #1 (optional)
 	C = 0;
-	if (offset & 0x020) C +=  47000;    //  47000pF = 0.047uF
-	if (offset & 0x040) C += 470000;    // 470000pF = 0.47uF
+	if (BIT(offset, 5)) C +=  47000;    //  47000pF = 0.047uF
+	if (BIT(offset, 6)) C += 470000;    // 470000pF = 0.47uF
 	//m_filter[1]->filter_rc_set_RC(filter_rc_device::LOWPASS_3R, 1000, 2200, 1000, CAP_P(C));
 
 	// 76489 #2
 	C = 0;
-	if (offset & 0x080) C += 470000;    // 470000pF = 0.47uF
+	if (BIT(offset, 7)) C += 470000;    // 470000pF = 0.47uF
 	m_filter[1]->filter_rc_set_RC(filter_rc_device::LOWPASS_3R, 1000, 2200, 1000, CAP_P(C));
 
 	// 76489 #3
 	C = 0;
-	if (offset & 0x100) C += 470000;    // 470000pF = 0.47uF
+	if (BIT(offset, 8)) C += 470000;    // 470000pF = 0.47uF
 	m_filter[2]->filter_rc_set_RC(filter_rc_device::LOWPASS_3R, 1000, 2200, 1000, CAP_P(C));
 }
 
@@ -454,7 +452,7 @@ void tp84_state::tp84_cpu1_map(address_map &map)
 	map(0x4400, 0x47ff).ram().share(m_fg_videoram);
 	map(0x4800, 0x4bff).ram().share(m_bg_colorram);
 	map(0x4c00, 0x4fff).ram().share(m_fg_colorram);
-	map(0x5000, 0x57ff).ram().share("cpu1_2");
+	map(0x5000, 0x57ff).ram().share("sharedram");
 	map(0x8000, 0xffff).rom();
 }
 
@@ -464,7 +462,7 @@ void tp84_state::tp84b_cpu1_map(address_map &map)
 	map(0x0400, 0x07ff).ram().share(m_fg_videoram);
 	map(0x0800, 0x0bff).ram().share(m_bg_colorram);
 	map(0x0c00, 0x0fff).ram().share(m_fg_colorram);
-	map(0x1000, 0x17ff).ram().share("cpu1_2");
+	map(0x1000, 0x17ff).ram().share("sharedram");
 	map(0x1800, 0x1800).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x1a00, 0x1a00).portr("SYSTEM").writeonly().share(m_palette_bank);
 	map(0x1a20, 0x1a20).portr("P1");
@@ -495,7 +493,7 @@ void tp84_state::cpu2_map(address_map &map)
 	map(0x4000, 0x4000).w(FUNC(tp84_state::sub_irq_mask_w));
 	map(0x6000, 0x679f).ram();
 	map(0x67a0, 0x67ff).ram().w(FUNC(tp84_state::spriteram_w)).share(m_spriteram);
-	map(0x8000, 0x87ff).ram().share("cpu1_2");
+	map(0x8000, 0x87ff).ram().share("sharedram");
 	map(0xe000, 0xffff).rom();
 }
 
@@ -571,9 +569,9 @@ static const gfx_layout charlayout =
 	RGN_FRAC(1,1),
 	2,
 	{ 4, 0 },
-	{  0, 1, 2, 3, 8*8+0, 8*8+1, 8*8+2, 8*8+3 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	16*8
+	{ STEP4(0,1), STEP4(8*8,1) },
+	{ STEP8(0,8) },
+	8*8*2
 };
 
 static const gfx_layout spritelayout =
@@ -582,11 +580,9 @@ static const gfx_layout spritelayout =
 	RGN_FRAC(1,2),
 	4,
 	{ RGN_FRAC(1,2)+4, RGN_FRAC(1,2)+0, 4 ,0 },
-	{ 0, 1, 2, 3, 8*8+0, 8*8+1, 8*8+2, 8*8+3,
-			16*8+0, 16*8+1, 16*8+2, 16*8+3, 24*8+0, 24*8+1, 24*8+2, 24*8+3 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-			32*8, 33*8, 34*8, 35*8, 36*8, 37*8, 38*8, 39*8 },
-	64*8
+	{ STEP4(0,1), STEP4(8*8*1,1), STEP4(8*8*2,1), STEP4(8*8*3,1) },
+	{ STEP8(0,8), STEP8(8*8*4,8) },
+	16*16*2
 };
 
 static GFXDECODE_START( gfx_tp84 )
@@ -660,7 +656,7 @@ void tp84_state::tp84b(machine_config &config)
 ***************************************************************************/
 
 ROM_START( tp84 )
-	ROM_REGION( 0x10000, "cpu1", 0 )
+	ROM_REGION( 0x10000, "cpu1", ROMREGION_ERASE00 )
 	ROM_LOAD( "388_f04.7j",  0x8000, 0x2000, CRC(605f61c7) SHA1(6848ef35ec7f92cccefb0fb2de42c4b0e9ec476f) )
 	ROM_LOAD( "388_05.8j",   0xa000, 0x2000, CRC(4b4629a4) SHA1(f3bb1ee66c9e47d050370ac9ca74f3020cb9cfa3) )
 	ROM_LOAD( "388_f06.9j",  0xc000, 0x2000, CRC(dbd5333b) SHA1(65dee1fd4c940a5423d57cb55a7f2ad89c59c5c6) )
@@ -669,7 +665,7 @@ ROM_START( tp84 )
 	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "388_f08.10d", 0xe000, 0x2000, CRC(36462ff1) SHA1(118a1b46ee01a583e6cf39af59b073321c76dbff) ) // E08?
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x4000, "audiocpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "388j13.6a",   0x0000, 0x2000, CRC(c44414da) SHA1(981289f5bdf7dc1348f4ca547ac933ef503b6588) )
 
 	ROM_REGION( 0x4000, "tiles", 0 )
@@ -691,7 +687,7 @@ ROM_START( tp84 )
 ROM_END
 
 ROM_START( tp84a )
-	ROM_REGION( 0x10000, "cpu1", 0 )
+	ROM_REGION( 0x10000, "cpu1", ROMREGION_ERASE00 )
 	ROM_LOAD( "388_f04.7j",  0x8000, 0x2000, CRC(605f61c7) SHA1(6848ef35ec7f92cccefb0fb2de42c4b0e9ec476f) )
 	ROM_LOAD( "388_f05.8j",  0xa000, 0x2000, CRC(e97d5093) SHA1(c76c119574d19d2ac10e6987150744542803ef5b) )
 	ROM_LOAD( "388_f06.9j",  0xc000, 0x2000, CRC(dbd5333b) SHA1(65dee1fd4c940a5423d57cb55a7f2ad89c59c5c6) )
@@ -700,7 +696,7 @@ ROM_START( tp84a )
 	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "388_f08.10d", 0xe000, 0x2000, CRC(36462ff1) SHA1(118a1b46ee01a583e6cf39af59b073321c76dbff) ) // E08?
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x4000, "audiocpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "388j13.6a",   0x0000, 0x2000, CRC(c44414da) SHA1(981289f5bdf7dc1348f4ca547ac933ef503b6588) )
 
 	ROM_REGION( 0x4000, "tiles", 0 )
@@ -722,7 +718,7 @@ ROM_START( tp84a )
 ROM_END
 
 ROM_START( tp84b )
-	ROM_REGION( 0x10000, "cpu1", 0 )
+	ROM_REGION( 0x10000, "cpu1", ROMREGION_ERASE00 )
 	// 0x6000 - 0x7fff space for diagnostic ROM
 	ROM_LOAD( "388j05.8j",   0x8000, 0x4000, CRC(a59e2fda) SHA1(7d776d5d3fcfbe81d42580cfe93614dc4618a440) )
 	ROM_LOAD( "388j07.10j",  0xc000, 0x4000, CRC(d25d18e6) SHA1(043f515cc66f6af004be81d6a6b5a92b553107ff) )
@@ -730,7 +726,7 @@ ROM_START( tp84b )
 	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "388j08.10d", 0xe000, 0x2000, CRC(2aea6b42) SHA1(58c3b4852f22a766f440b98904b73c00a31eae01) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x4000, "audiocpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "388j13.6a", 0x0000, 0x2000, CRC(c44414da) SHA1(981289f5bdf7dc1348f4ca547ac933ef503b6588) )
 
 	ROM_REGION( 0x4000, "tiles", 0 )

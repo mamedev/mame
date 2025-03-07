@@ -83,6 +83,11 @@ class multibus_device
 public:
 	multibus_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
+	enum flags : u16
+	{
+		FLAG_UNMAPPED = 0x0001,
+	};
+
 	// interrupt interface
 	template <unsigned I> auto int_callback() { return m_int_cb[I].bind(); }
 	template <unsigned I> void int_w(int state) { m_int_cb[I](state); }
@@ -100,6 +105,9 @@ protected:
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
 
+	void mem_map(address_map &map);
+	void pio_map(address_map &map);
+
 private:
 	address_space_config const m_mem_config;
 	address_space_config const m_pio_config;
@@ -113,22 +121,24 @@ class multibus_slot_device
 	, public device_slot_interface
 {
 public:
-	multibus_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	multibus_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = DERIVED_CLOCK(1, 1));
 
 	template <typename T, typename U>
 	multibus_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&bus_tag, U &&slot_options, char const *default_option, bool const fixed)
 		: multibus_slot_device(mconfig, tag, owner, DERIVED_CLOCK(1,1))
 	{
 		m_bus.set_tag(std::forward<T>(bus_tag));
+
 		option_reset();
 		slot_options(*this);
 		set_default_option(default_option);
 		set_fixed(fixed);
 	}
 
+	auto bus() const { return m_bus; }
+
 protected:
 	virtual void device_start() override ATTR_COLD;
-	virtual void device_resolve_objects() override ATTR_COLD;
 
 private:
 	required_device<multibus_device> m_bus;
@@ -137,22 +147,29 @@ private:
 class device_multibus_interface : public device_interface
 {
 protected:
-	friend class multibus_slot_device;
-
 	device_multibus_interface(machine_config const &mconfig, device_t &device);
 
-	void set_bus_device(multibus_device &bus_device);
+	// configuration
+	template <unsigned I> auto int_callback() { return m_int[I].bind(); }
 
+	// device_interface implementation
+	virtual void interface_config_complete() override ATTR_COLD;
+
+	// runtime
 	template <unsigned I> void int_w(int state) { m_bus->int_w<I>(state); }
 	void int_w(unsigned number, int state);
 
 	void xack_w(int state) { m_bus->xack_w(state); }
+	void unmap(int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmirror = 0U);
 
-	multibus_device *m_bus;
+	required_device<multibus_device> m_bus;
+
+private:
+	devcb_write_line::array<8> m_int;
 };
 
 // device type declaration
 DECLARE_DEVICE_TYPE(MULTIBUS, multibus_device)
 DECLARE_DEVICE_TYPE(MULTIBUS_SLOT, multibus_slot_device)
 
-#endif /* MAME_BUS_MULTIBUS_MULTIBUS_H */
+#endif // MAME_BUS_MULTIBUS_MULTIBUS_H

@@ -56,7 +56,9 @@ public:
 		m_main_console(nullptr),
 		m_next_window_pos{ 0, 0 },
 		m_config(),
-		m_save_windows(true)
+		m_save_windows(true),
+		m_group_windows(true),
+		m_group_windows_setting(true)
 	{
 	}
 
@@ -76,6 +78,9 @@ protected:
 	virtual void set_color_theme(int index) override;
 	virtual bool get_save_window_arrangement() const override { return m_save_windows; }
 	virtual void set_save_window_arrangement(bool save) override { m_save_windows = save; }
+	virtual bool get_group_windows() const override { return m_group_windows; }
+	virtual bool get_group_windows_setting() const override { return m_group_windows_setting; }
+	virtual void set_group_windows_setting(bool group) override { m_group_windows_setting = group; }
 
 	virtual bool const &waiting_for_debugger() const override { return m_waiting_for_debugger; }
 	virtual bool seq_pressed() const override;
@@ -111,6 +116,8 @@ private:
 
 	util::xml::file::ptr m_config;
 	bool m_save_windows;
+	bool m_group_windows;
+	bool m_group_windows_setting;
 };
 
 
@@ -395,6 +402,7 @@ void debugger_windows::config_load(config_type cfgtype, config_level cfglevel, u
 		if (config_type::DEFAULT == cfgtype)
 		{
 			m_save_windows = 0 != parentnode->get_attribute_int(debugger::ATTR_DEBUGGER_SAVE_WINDOWS, m_save_windows ? 1 : 0);
+			m_group_windows = m_group_windows_setting = 0 != parentnode->get_attribute_int(debugger::ATTR_DEBUGGER_GROUP_WINDOWS, m_group_windows ? 1 : 0);
 			util::xml::data_node const *const colors = parentnode->get_child(debugger::NODE_COLORS);
 			if (colors)
 				m_metrics->set_color_theme(colors->get_attribute_int(debugger::ATTR_COLORS_THEME, m_metrics->get_color_theme()));
@@ -421,6 +429,7 @@ void debugger_windows::config_save(config_type cfgtype, util::xml::data_node *pa
 	if (config_type::DEFAULT == cfgtype)
 	{
 		parentnode->set_attribute_int(debugger::ATTR_DEBUGGER_SAVE_WINDOWS, m_save_windows ? 1 : 0);
+		parentnode->set_attribute_int(debugger::ATTR_DEBUGGER_GROUP_WINDOWS, m_group_windows_setting ? 1 : 0);
 		util::xml::data_node *const colors = parentnode->add_child(debugger::NODE_COLORS, nullptr);
 		if (colors)
 			colors->set_attribute_int(debugger::ATTR_COLORS_THEME, m_metrics->get_color_theme());

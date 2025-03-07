@@ -3741,4 +3741,52 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="kr_vol2">
+		<description>i-Singer Volume 2 (Korea)</description>
+		<year>2002</year>
+		<publisher>Takara / Sonokong</publisher>
+		<sharedfeat name="compatibility" value="ISINGER"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="kr-ec002.u1" size="0x100000" crc="0c060c0f" sha1="82e0757a380617008b7313cf6b380e16804f7862"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kr_vol3">
+		<description>i-Singer Volume 3 (Korea)</description>
+		<year>2002</year>
+		<publisher>Takara / Sonokong</publisher>
+		<sharedfeat name="compatibility" value="ISINGER"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="kr-ec003.u1" size="0x100000" crc="928b97a6" sha1="5900cda733298b258b114c5452e1c02b0d90cee4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kr_vol11">
+		<description>i-Singer Volume 11 (Korea)</description>
+		<year>2002</year>
+		<publisher>Takara / Sonokong</publisher>
+		<sharedfeat name="compatibility" value="ISINGER"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="kr-ec011.u1" size="0x100000" crc="effe2356" sha1="57417803b25273439fb5537a7d5aca340988eea8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kr_vol14">
+		<description>i-Singer Volume 14 (Korea)</description>
+		<year>2002</year>
+		<publisher>Takara / Sonokong</publisher>
+		<sharedfeat name="compatibility" value="ISINGER"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="kr-s001.u1" size="0x100000" crc="8a43e1b6" sha1="69eae20a395aee941a5da3a02e6c2dc6feee2391"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

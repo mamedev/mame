@@ -1983,6 +1983,35 @@ ROM_START( kovqhsgs )
 	ROM_IGNORE( 0x400000 )  // c00000-ffffff empty
 ROM_END
 
+ROM_START( kovqhsgs302 ) // cart with 2010--04--16 main PCB and 2009-09-01 ROM PCB
+	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code, on main PCB */
+	PGM_68K_BIOS
+	ROM_LOAD16_WORD_SWAP( "27c322.u3", 0x100000, 0x400000, CRC(4018559f) SHA1(e7e97ce89e1f563e8e08501ec3c2be6d81107253) ) // V300CN V302CN Dec 29 2010 16:31:32
+
+	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom (NXP LPC2132 ARM7 TDMI-S CPU with 64kB internal flash ROM on main PCB)  */
+	ROM_LOAD( "qhsg_prot.c51", 0x000000, 0x04000, BAD_DUMP CRC(0f09a5c1) SHA1(621b38c05f33277608d58b49822aebc930ae4870) ) // not dumped for this set
+
+	ROM_REGION( 0xa00000, "igs023",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles, on main PCB */
+	PGM_VIDEO_BIOS
+	ROM_LOAD( "t01.u8",0x180000, 0x800000, CRC(d498d97f) SHA1(97a7b6d2ed1170449e7c2899448af7cbbca4c94f) )
+	ROM_IGNORE(                  0x800000 )  // 1ST AND 2ND HALF IDENTICAL
+
+	ROM_REGION16_LE( 0x4000000, "igs023:sprcol", 0 ) /* Sprite Colour Data, on ROM PCB */
+	ROM_LOAD( "a01.u8",  0x0000000, 0x1000000, CRC(25ae3efd) SHA1(083d977602ddb5ad54fbdcba000cd4287de8d463) )
+	ROM_LOAD( "a23.u9",  0x1000000, 0x1000000, CRC(1f51c140) SHA1(638a7449449716a2ae862a11b4333c09d369050a) )
+	ROM_LOAD( "a45.u10", 0x2000000, 0x1000000, CRC(5e44fd82) SHA1(bb7b9258a37a7fc7caf14ac5b606dd0ce6d43135) ) // 1ST AND 2ND HALF IDENTICAL
+
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes, on ROM PCB */
+	ROM_LOAD( "b01.u6", 0x0000000, 0x1000000, CRC(779825d3) SHA1(eb179111eb4f0c98d502622f094b1e5aa1f98225) )
+
+	ROM_REGION( 0xc00000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) -, on ROM PCB */
+	PGM_AUDIO_BIOS
+	ROM_LOAD( "m01.u5",0x400000, 0x400000, CRC(af5e9be0) SHA1(be9da327f2a26bf14a6bc1c0b2dd114ac13b8c74) )
+	ROM_IGNORE(                  0x400000 )  // 400000-7fffff almost completely empty
+	ROM_CONTINUE(      0x800000, 0x400000 )
+	ROM_IGNORE(                  0x400000 )  // c00000-ffffff almost completely empty
+ROM_END
+
 
 /*
 
@@ -5467,6 +5496,7 @@ GAME( 1999, kovsh100,     kovsh,     pgm_arm_type1,          kovsh,     pgm_arm_
 // 拳皇三国特別版/Quánhuáng sānguó Tèbié bǎn
 // nasty modern asian bootleg of Knights of Valour Super Heroes with characters ripped from SNK's The King of Fighters series!
 GAME( 2008, kovqhsgs,     kovsh,     pgm_arm_type1,          kovsh,     pgm_arm_type1_state, init_kovqhsgs,   ROT0,   "bootleg", "Quanhuang Sanguo Tebie Ban (bootleg of Knights of Valour Super Heroes, V303CN, Nov 21 2008 19:03:49)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2010, kovqhsgs302,  kovsh,     pgm_arm_type1,          kovsh,     pgm_arm_type1_state, init_kovqhsgs,   ROT0,   "bootleg", "Quanhuang Sanguo Tebie Ban (bootleg of Knights of Valour Super Heroes, V302CN, Dec 29 2010 16:31:32)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // needs decryption, actual title is probably different
 
 //三國戰紀2/Sānguó zhàn jì 2 (Traditional Chinese only in title screen)
 // region provided by internal ARM rom

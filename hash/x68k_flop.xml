@@ -1304,30 +1304,32 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<!-- boot OK, weapon menu has random horizontal lines -->
-	<software name="aquales" supported="partial">
+	<software name="aquales" supported="yes">
 		<description>Aquales</description>
 		<year>1991</year>
 		<publisher>エグザクト (Exact)</publisher>
+		<notes><![CDATA[
+If autoboot doesn't work, delete nvram
+]]></notes>
 		<info name="alt_title" value="アクアレス" />
 		<info name="release" value="19910912" />
-		<info name="usage" value="Requires Disk 1 and Disk 3 mounted to boot" />
+		<info name="usage" value="Boot with flop1 and flop2 for gameplay, flop3 for opening" />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1" />
+			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261824">
 				<rom name="aquales (1991)(exact)(disk 1 of 3).dim" size="1261824" crc="c03bb393" sha1="f752eb5b7c56f96a466c1f1da26682e2142c33a8" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2" />
+			<feature name="part_id" value="Data Disk" />
 			<dataarea name="flop" size="1261824">
-				<rom name="aquales (1991)(exact)(disk 2 of 3).dim" size="1261824" crc="d178d948" sha1="35fe019806f31906baade488f3c9714328f6d430" />
+				<rom name="aquales (1991)(exact)(disk 3 of 3).dim" size="1261824" crc="5954a3e4" sha1="510755526ecce6589a60ace5f3fe0332d91723c0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3" />
+			<feature name="part_id" value="Opening Disk" />
 			<dataarea name="flop" size="1261824">
-				<rom name="aquales (1991)(exact)(disk 3 of 3).dim" size="1261824" crc="5954a3e4" sha1="510755526ecce6589a60ace5f3fe0332d91723c0" />
+				<rom name="aquales (1991)(exact)(disk 2 of 3).dim" size="1261824" crc="d178d948" sha1="35fe019806f31906baade488f3c9714328f6d430" />
 			</dataarea>
 		</part>
 	</software>
@@ -27605,6 +27607,19 @@ No sound (verify)
 		</part>
 	</software>
 
+	<!-- boot OK -->
+	<software name="lforce" supported="yes">
+		<description>Last Force - The Virtual Battle in 1930's</description>
+		<year>1993</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Hong Kong Project" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1281968">
+				<rom name="last force - the virtual battle in 1930's (1993)(hong kong project).d88" size="1281968" crc="5df0a3d1" sha1="c2ef029af1b619d4fab9ca441f122e848aa5824a" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lastpic2">
 		<description>Last Piece II</description>
 		<year>1990</year>
@@ -33056,6 +33071,19 @@ Has no title screen/intro GFXs
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="xadlak (1991)(sprite).dim" size="1261824" crc="8b032e29" sha1="02f4e8d3a43488d6c1bcf6e3f915a3766fb6e71a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- boot OK -->
+	<software name="xadlakp" supported="yes">
+		<description>Xadlak Plus</description>
+		<year>1996</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Sprite" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="xadlak plus (1996)(sprite).2hd" size="1261568" crc="c5e16cff" sha1="c122a3060f70a813a554e9e3c38b3373351e75d1" />
 			</dataarea>
 		</part>
 	</software>

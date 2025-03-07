@@ -115,29 +115,6 @@ Notes:
  SPR - Sprites
  FG0 - Foreground / Text Layer
 
-********************************************************************************
-
- Change Log:
- 03 Jun 2005 - Pierpaolo Prazzoli
-             | Fixed VBlank (i disagree ;-)
-             | Fixed some bad sprites
- 04 Mar 2002 | Fixed Dip Switches and Inputs    (Steph)
-             | Fixed screen flipping by using similar routine to the one
-             | in src/video/wwfwfest.c        (Steph)
- 18 Jun 2001 | Changed Interrupt Function .. it's not fully understood what
-             | is meant to be going on ..
- 15 Jun 2001 | Cleaned up Sprite Drawing a bit, correcting some clipping probs,
-             | mapped DSW's
- 15 Jun 2001 | First Submission of Driver,
- 14 Jun 2001 | Started Driver, using Raine Source as a reference for getting it
-             | up and running
-
-********************************************************************************
-
- Notes:
-
- - Scrolling *might* be slightly off, I'm not sure
-
 *******************************************************************************/
 
 #include "emu.h"
@@ -171,7 +148,8 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_spriteram(*this, "spriteram"),
 		m_fg0_videoram(*this, "fg0_videoram"),
-		m_bg0_videoram(*this, "bg0_videoram")
+		m_bg0_videoram(*this, "bg0_videoram"),
+		m_scroll(*this, "scroll")
 	{ }
 
 	void wwfsstar(machine_config &config);
@@ -193,14 +171,12 @@ private:
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_shared_ptr<uint16_t> m_fg0_videoram;
 	required_shared_ptr<uint16_t> m_bg0_videoram;
+	required_shared_ptr<uint16_t> m_scroll;
 
 	uint8_t m_vblank = 0U;
-	uint16_t m_scrollx = 0U;
-	uint16_t m_scrolly = 0U;
 	tilemap_t *m_fg0_tilemap = nullptr;
 	tilemap_t *m_bg0_tilemap = nullptr;
 
-	void scroll_w(offs_t offset, uint16_t data);
 	void flipscreen_w(uint16_t data);
 	void irqack_w(offs_t offset, uint16_t data);
 	void fg0_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -261,7 +237,7 @@ TILE_GET_INFO_MEMBER(wwfsstar_state::get_fg0_tile_info)
 
 	**- End of Comments -*/
 
-	uint16_t *tilebase =  &m_fg0_videoram[tile_index * 2];
+	uint16_t *tilebase = &m_fg0_videoram[tile_index * 2];
 	int tileno = (tilebase[1] & 0x00ff) | ((tilebase[0] & 0x000f) << 8);
 	int colbank = (tilebase[0] & 0x00f0) >> 4;
 	tileinfo.set(0, tileno, colbank, 0);
@@ -290,7 +266,7 @@ TILE_GET_INFO_MEMBER(wwfsstar_state::get_bg0_tile_info)
 
 	**- End of Comments -*/
 
-	uint16_t *tilebase =  &m_bg0_videoram[tile_index * 2];
+	uint16_t *tilebase = &m_bg0_videoram[tile_index * 2];
 	int tileno = (tilebase[1] & 0x00ff) | ((tilebase[0] & 0x000f) << 8);
 	int colbank = (tilebase[0] & 0x0070) >> 4;
 	int flipx = (tilebase[0] & 0x0080) >> 7;
@@ -397,14 +373,12 @@ void wwfsstar_state::video_start()
 	m_fg0_tilemap->set_transparent_pen(0);
 
 	save_item(NAME(m_vblank));
-	save_item(NAME(m_scrollx));
-	save_item(NAME(m_scrolly));
 }
 
 uint32_t wwfsstar_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg0_tilemap->set_scrolly(0, m_scrolly);
-	m_bg0_tilemap->set_scrollx(0, m_scrollx);
+	m_bg0_tilemap->set_scrollx(0, m_scroll[0]);
+	m_bg0_tilemap->set_scrolly(0, m_scroll[1]);
 
 	m_bg0_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);
@@ -426,12 +400,12 @@ void wwfsstar_state::main_map(address_map &map)
 	map(0x080000, 0x080fff).ram().w(FUNC(wwfsstar_state::fg0_videoram_w)).share(m_fg0_videoram);
 	map(0x0c0000, 0x0c0fff).ram().w(FUNC(wwfsstar_state::bg0_videoram_w)).share(m_bg0_videoram);
 	map(0x100000, 0x1003ff).ram().share(m_spriteram);
-	map(0x140000, 0x140fff).w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x140000, 0x1402ff).w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x180000, 0x180003).w(FUNC(wwfsstar_state::irqack_w));
 	map(0x180000, 0x180001).portr("DSW1");
 	map(0x180002, 0x180003).portr("DSW2");
 	map(0x180004, 0x180005).portr("P1");
-	map(0x180004, 0x180007).w(FUNC(wwfsstar_state::scroll_w));
+	map(0x180004, 0x180007).writeonly().share(m_scroll);
 	map(0x180006, 0x180007).portr("P2");
 	map(0x180008, 0x180009).portr("SYSTEM");
 	map(0x180009, 0x180009).w(m_soundlatch, FUNC(generic_latch_8_device::write));
@@ -466,19 +440,6 @@ void wwfsstar_state::bootleg_sound_map(address_map &map)
  as used by the above memory map
 *******************************************************************************/
 
-void wwfsstar_state::scroll_w(offs_t offset, uint16_t data)
-{
-	switch (offset)
-	{
-		case 0x00:
-			m_scrollx = data;
-			break;
-		case 0x01:
-			m_scrolly = data;
-			break;
-	}
-}
-
 void wwfsstar_state::flipscreen_w(uint16_t data)
 {
 	flip_screen_set(data & 1);
@@ -488,38 +449,19 @@ void wwfsstar_state::irqack_w(offs_t offset, uint16_t data)
 {
 	if (offset == 0)
 		m_maincpu->set_input_line(6, CLEAR_LINE);
-
 	else
 		m_maincpu->set_input_line(5, CLEAR_LINE);
 }
 
-
-/*
-    Interrupt behaviour verified from actual PCB.
-
-    After the post third match intermission, there's a tight loop
-    which polls the vblank input bit until it is active.
-    The subsequent vblank ISR does not complete during the vblank
-    duration. On the real PCB, the 68000 would catch the active
-    vblank value before the interrupt was taken. The MAME
-    implementation does not and thus hangs.
-
-    A hack is required: raise the vblank bit a scanline early.
-*/
-
 TIMER_DEVICE_CALLBACK_MEMBER(wwfsstar_state::scanline)
 {
+	// Interrupt behaviour verified from actual PCB
 	int scanline = param;
 
 	// Vblank is lowered on scanline 0
 	if (scanline == 0)
 	{
 		m_vblank = 0;
-	}
-	// Hack
-	else if (scanline == (240-1))       // -1 is an hack needed to avoid deadlocks
-	{
-		m_vblank = 1;
 	}
 
 	// An interrupt is generated every 16 scanlines
@@ -533,6 +475,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(wwfsstar_state::scanline)
 	// Vblank is raised on scanline 240
 	if (scanline == 240)
 	{
+		m_vblank = 1;
 		m_screen->update_partial(scanline - 1);
 		m_maincpu->set_input_line(6, ASSERT_LINE);
 	}
@@ -663,9 +606,9 @@ static const gfx_layout tiles16x16_layout =
 };
 
 static GFXDECODE_START( gfx_wwfsstar )
-	GFXDECODE_ENTRY( "fgtiles", 0, tiles8x8_layout,     0, 16 )    // colors   0-255
-	GFXDECODE_ENTRY( "sprites", 0, tiles16x16_layout, 128, 16 )    // colors   128-383
-	GFXDECODE_ENTRY( "bgtiles", 0, tiles16x16_layout, 256,  8 )    // colors   256-383
+	GFXDECODE_ENTRY( "fgtiles", 0, tiles8x8_layout,     0, 16 ) // colors 0-255
+	GFXDECODE_ENTRY( "sprites", 0, tiles16x16_layout, 128, 16 ) // colors 128-383
+	GFXDECODE_ENTRY( "bgtiles", 0, tiles16x16_layout, 256,  8 ) // colors 256-383
 GFXDECODE_END
 
 
@@ -754,6 +697,7 @@ void wwfsstar_state::wwfsstarb2(machine_config &config)
 	okim6295_device &oki(OKIM6295(config, "oki", 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH));
 	oki.add_route(ALL_OUTPUTS, "mono", 0.47);
 }
+
 
 /*******************************************************************************
  Rom Loaders / Game Drivers

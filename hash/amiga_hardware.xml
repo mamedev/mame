@@ -18,53 +18,78 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="a590">
-		<!-- For Epson SCSI (P/N: 312711-01) -->
-		<description>A590 Setup Disk 1.1 (SCSI Harddisk)</description>
+	<!-- For use with Epson XT drives -->
+	<software name="a590_epson">
+		<description>A590 Setup Disk 1.1 (Epson Hard Disk)</description>
 		<year>1989</year>
 		<publisher>Commodore</publisher>
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="A590 Setup Disk 1.1 (SCSI Harddisk)" />
 			<dataarea name="flop" size="901120">
-				<rom name="317734-01_a590_scsi.adf" size="901120" crc="a560a938" sha1="9c6136c6580779a948cd1c0b50cb229512af415c"/>
+				<rom name="317734-01_a590_epson.adf" size="901120" crc="a560a938" sha1="9c6136c6580779a948cd1c0b50cb229512af415c" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="a590_wd" cloneof="a590">
-		<!-- Earlier version P/N: 317734-02? -->
-		<!-- For WD93028-X-A (P/N: 312711-03) -->
-		<!-- Cylinders 782 (615), Heads 2 (4), Sectors/Track 27, Precomp 784, LZone 781, Bytes/Sector 512 -->
-		<description>A590 Setup Disk 1.23 (Western Digital Harddisk)</description>
+	<!-- For use with Western Digital XT drives -->
+	<!-- Modified "Drive definitions" file -->
+	<software name="a590_wd17" cloneof="a590_epson">
+		<description>A590 Setup Disk 1.7 (Western Digital Hard Disk)</description>
+		<year>1989</year>
+		<publisher>Commodore</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="901120">
+				<rom name="317734-02_a590_wd.adf" size="901120" crc="8337cc98" sha1="fd9f80cf6f18bc97161e867bde55724193cd2802" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- For use with Western Digital XT drives -->
+	<software name="a590_wd123" cloneof="a590_epson">
+		<description>A590 Setup Disk 1.23 (Western Digital Hard Disk)</description>
 		<year>1990</year>
 		<publisher>Commodore</publisher>
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="A590 Setup Disk 1.23 (Western Digital Harddisk)" />
 			<dataarea name="flop" size="901120">
-				<rom name="317734-03_a590_wd.adf" size="901120" crc="a88fda41" sha1="7424f8645e1903e3e4ec8bb824186868319be1f3"/>
+				<rom name="317734-03_a590_wd.adf" size="901120" crc="a88fda41" sha1="7424f8645e1903e3e4ec8bb824186868319be1f3" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="a590_seagate" cloneof="a590">
-		<description>A590 Setup Disk 1.23 (Seagate Harddisk)</description>
-		<year>1988</year>
+	<!-- For use with Seagate XT drives -->
+	<software name="a590_seagate" cloneof="a590_epson">
+		<description>A590 Setup Disk 1.23 (Seagate Hard Disk)</description>
+		<year>1990</year>
 		<publisher>Commodore</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="901120">
-				<rom name="317734-04.adf" size="901120" crc="7f1623a7" sha1="1f3e20206eb83f60745e19538de3123089c8da24"/>
+				<rom name="317734-04_a590_seagate.adf" size="901120" crc="7f1623a7" sha1="1f3e20206eb83f60745e19538de3123089c8da24" />
 			</dataarea>
 		</part>
 	</software>
+
+	<!-- Missing: 317734-05 A590 Setup Disk (Western Digital Hard Disk) -->
+
+	<!-- For use with SCSI drives -->
+	<!--
+	<software name="a590_scsi">
+	    <description>A590 Setup Disk (SCSI Hard Disk)</description>
+	    <year>1991</year>
+	    <publisher>Commodore</publisher>
+	    <part name="flop1" interface="floppy_3_5">
+	        <dataarea name="flop" size="901120">
+	            <rom name="317734-06_a590_scsi.adf" size="901120" status="nodump" />
+	        </dataarea>
+	    </part>
+	</software>
+	-->
 
 	<software name="a590_ram">
 		<description>A590 RAM Test Software</description>
 		<year>1990</year>
 		<publisher>Commodore</publisher>
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="A590 RAM Test Software" />
 			<dataarea name="flop" size="901120">
-				<rom name="317830-01_a590_ram_test.adf" size="901120" crc="6583d1d0" sha1="7779b825b8555956d341ff7e909ab71d89e2321c"/>
+				<rom name="317830-01_a590_ram_test.adf" size="901120" crc="6583d1d0" sha1="7779b825b8555956d341ff7e909ab71d89e2321c" />
 			</dataarea>
 		</part>
 	</software>
@@ -74,35 +99,47 @@ license:CC0-1.0
 		<year>1988</year>
 		<publisher>Commodore</publisher>
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="A2024 JumpStart" />
 			<dataarea name="flop" size="901120">
-				<rom name="317809-01_a2024_jumpstart.adf" size="901120" crc="dad46588" sha1="30c2c1f1d98bd008b2c67f3b23480181935d4b01"/>
+				<rom name="317809-01_a2024_jumpstart.adf" size="901120" crc="dad46588" sha1="30c2c1f1d98bd008b2c67f3b23480181935d4b01" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="a2091">
-		<!-- From service manual: Install (US): 317806-01, Install (De): 317807-01 (earlier versions?) -->
-		<!-- Harddisk: 313440-01 SCSI Quantum -->
+	<!-- Missing: 317806-01 A2091 Setup Disk (referenced in the service manual) -->
+	<!-- Missing: 317806-02 A2091 Setup Disk (if it exists) -->
+
+	<!-- Modified "Drive definitions" file -->
+	<software name="a2091_127">
+		<description>A2091 Setup Disk 1.27</description>
+		<year>1990</year>
+		<publisher>Commodore</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="901120">
+				<rom name="317806-03_a2091_setup.adf" size="901120" crc="1ec584cf" sha1="d3de14c860d56679e645d28ef5b30d54ec95cc07" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="a2091_130" cloneof="a2091_127">
 		<description>A2091 Setup Disk 1.30</description>
 		<year>1991</year>
 		<publisher>Commodore</publisher>
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="A2091 Setup Disk 1.30" />
 			<dataarea name="flop" size="901120">
-				<rom name="317806-04_a2091_setup.adf" size="901120" crc="122c8f93" sha1="603e106c1a44a209171610af8d48bc35ad31c9bc"/>
+				<rom name="317806-04_a2091_setup.adf" size="901120" crc="122c8f93" sha1="603e106c1a44a209171610af8d48bc35ad31c9bc" />
 			</dataarea>
 		</part>
 	</software>
+
+	<!-- Missing: 317807-01 A2091 Setup Disk (De) (referenced in the service manual) -->
 
 	<software name="a2058">
 		<description>A2058 RAM Test Disk</description>
 		<year>1988</year>
 		<publisher>Commodore</publisher>
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="A2058 RAM Test Disk" />
 			<dataarea name="flop" size="901120">
-				<rom name="317719-01_a2058_ram_test.adf" size="901120" crc="5dba7fc3" sha1="76fbce4bef7df0f6042c85376d9bdfd4d4911e74"/>
+				<rom name="317719-01_a2058_ram_test.adf" size="901120" crc="5dba7fc3" sha1="76fbce4bef7df0f6042c85376d9bdfd4d4911e74" />
 			</dataarea>
 		</part>
 	</software>
@@ -112,9 +149,8 @@ license:CC0-1.0
 		<year>1990</year>
 		<publisher>Commodore</publisher>
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="A2232 Install" />
 			<dataarea name="flop" size="901120">
-				<rom name="317769-01_a2232_install.adf" size="901120" crc="3caa21b7" sha1="24f47f6f88712f046303b8812a598043440a5e6d"/>
+				<rom name="317769-01_a2232_install.adf" size="901120" crc="3caa21b7" sha1="24f47f6f88712f046303b8812a598043440a5e6d" />
 			</dataarea>
 		</part>
 	</software>
@@ -124,9 +160,8 @@ license:CC0-1.0
 		<year>1990</year>
 		<publisher>Commodore</publisher>
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="A2300 Genlock Demo" />
 			<dataarea name="flop" size="901120">
-				<rom name="317718-02_a2300_genlock_demo.adf" size="901120" crc="464ff0f6" sha1="26b94e8d52d35e2746b74610bb9b65eb2f899297"/>
+				<rom name="317718-02_a2300_genlock_demo.adf" size="901120" crc="464ff0f6" sha1="26b94e8d52d35e2746b74610bb9b65eb2f899297" />
 			</dataarea>
 		</part>
 	</software>
@@ -136,9 +171,63 @@ license:CC0-1.0
 		<year>1990</year>
 		<publisher>Commodore</publisher>
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="A2232 Test / Demo" />
 			<dataarea name="flop" size="901120">
-				<rom name="317210-01_a2320_test_demo.adf" size="901120" crc="cff98aae" sha1="f46f7de0d908ed68abfd784d84b964cbce7dc503"/>
+				<rom name="317210-01_a2320_test_demo.adf" size="901120" crc="cff98aae" sha1="f46f7de0d908ed68abfd784d84b964cbce7dc503" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bscscsi13">
+		<description>bsc SCSI Installation Disk Version 1.3</description>
+		<year>1992</year>
+		<publisher>bsc</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="901120">
+				<rom name="bsc_scsi_13.adf" size="901120" crc="9fa2502f" sha1="b46433831367d29bf1ac0903c8622ecef9f1325a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bschdinst24">
+		<description>bsc HDInstTools Version 2.4 + GigaMem Version 3.0</description>
+		<year>1993</year>
+		<publisher>bsc</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="901120">
+				<rom name="bsc_hdinst_24.adf" size="901120" crc="fd9e6961" sha1="c68fa9e8be5aff5ef87db8eaf9d66c5ce894ed5d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bschdinst215">
+		<description>bsc HDInstTools Version 2.15 + GigaMem Version 3.0</description>
+		<year>1993</year>
+		<publisher>bsc</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="901120">
+				<rom name="bsc_hdinst_215.adf" size="901120" crc="eabbd380" sha1="48927e29663c6c1752fd0277e6f23dfcc06b7443" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bschdinst32">
+		<description>bsc HDInstTools Version 3.2 + GigaMem Version 3.0</description>
+		<year>1994</year>
+		<publisher>bsc</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="901120">
+				<rom name="bsc_hdinst_32.adf" size="901120" crc="f94b1a39" sha1="b825eeeeba3118d1ca8993561e606bc7e190bf3c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bschdinst35">
+		<description>bsc HDInstTools Version 3.5 + GigaMem Version 3.0</description>
+		<year>1995</year>
+		<publisher>bsc</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="901120">
+				<rom name="bsc_hdinst_35.adf" size="901120" crc="f6e0bb86" sha1="69fb58385cb7caf4e11c337872c3764b22301462" />
 			</dataarea>
 		</part>
 	</software>
@@ -150,7 +239,7 @@ license:CC0-1.0
 		<info name="usage" value="Requires FrameMaster Zorro card and FPU" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="901120">
-				<rom name="rainbow2_diashow.adf" size="901120" crc="201b34eb" sha1="7d8d4e4b58f438d25b32f78106c944f7d264de17"/>
+				<rom name="rainbow2_diashow.adf" size="901120" crc="201b34eb" sha1="7d8d4e4b58f438d25b32f78106c944f7d264de17" />
 			</dataarea>
 		</part>
 	</software>
@@ -162,7 +251,7 @@ license:CC0-1.0
 		<info name="usage" value="Requires FrameMaster Zorro card and FPU" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="901120">
-				<rom name="rainbowpainter.adf" size="901120" crc="bda4991f" sha1="4b8d73487fcc92a2f8d21bf24c42ad373c28bc5f"/>
+				<rom name="rainbowpainter.adf" size="901120" crc="bda4991f" sha1="4b8d73487fcc92a2f8d21bf24c42ad373c28bc5f" />
 			</dataarea>
 		</part>
 	</software>

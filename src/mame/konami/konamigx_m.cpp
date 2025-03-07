@@ -53,8 +53,8 @@ uint16_t konamigx_state::K055550_word_r(offs_t offset)
 void konamigx_state::K055550_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	auto &mspace = m_maincpu->space(AS_PROGRAM);
-	uint32_t adr, bsize, count, i, lim;
-	int src, tgt, srcend, tgtend, skip, cx1, sx1, wx1, cy1, sy1, wy1, cz1, sz1, wz1, c2, s2, w2;
+	uint32_t adr, bsize, count, i, lim, src, dst;
+	int tgt, srcend, tgtend, skip, cx1, sx1, wx1, cy1, sy1, wy1, cz1, sz1, wz1, c2, s2, w2;
 	int dx, dy, angle;
 
 	COMBINE_DATA(m_prot_data+offset);
@@ -71,8 +71,23 @@ void konamigx_state::K055550_word_w(offs_t offset, uint16_t data, uint16_t mem_m
 				count = (m_prot_data[0] & 0xff) + 1;
 
 				lim = adr+bsize*count;
-				for(i=adr; i<lim; i+=2)
+				for (i = adr; i < lim; i += 2)
 					mspace.write_word(i, m_prot_data[0x1a/2]);
+			break;
+
+			case 0x98: // memcpy of some kind. incomplete
+				// known use cases:
+				// viostorm: transfer "color check" palette
+
+				dst = (m_prot_data[7] << 16) | m_prot_data[8];
+				src = (m_prot_data[2] << 16) | m_prot_data[3];
+				count = (m_prot_data[10] << 16 | m_prot_data[11]) >> 2;
+
+				for (int x = 0; x < count; ++x)
+				{
+					const u32 src_data = mspace.read_dword(src + x * 8);
+					mspace.write_dword(dst + x * 4, src_data);
+				}
 			break;
 
 			// WARNING: The following cases are speculation based with questionable accuracy!(AAT)
@@ -101,7 +116,7 @@ void konamigx_state::K055550_word_w(offs_t offset, uint16_t data, uint16_t mem_m
 				tgtend = srcend + bsize;
 
 				// let's hope GCC will inline the mem24bew calls
-				for (src=adr; src<srcend; src+=bsize)
+				for (src = adr; src < srcend; src += bsize)
 				{
 					cx1 = (short)mspace.read_word(src);
 					sx1 = (short)mspace.read_word(src + 2);
@@ -118,24 +133,24 @@ void konamigx_state::K055550_word_w(offs_t offset, uint16_t data, uint16_t mem_m
 					count = i = src + skip;
 					tgt = src + bsize;
 
-					for (; count<tgt; count++) mspace.write_byte(count, 0);
+					for (; count < tgt; count++) mspace.write_byte(count, 0);
 
-					for (; tgt<tgtend; i++, tgt+=bsize)
+					for (; tgt < tgtend; i++, tgt += bsize)
 					{
 						c2 = (short)mspace.read_word(tgt);
 						s2 = (short)mspace.read_word(tgt + 2);
 						w2 = (short)mspace.read_word(tgt + 4);
-						if (abs((cx1+sx1)-(c2+s2))>=wx1+w2) continue; // X rejection
+						if (abs((cx1 + sx1) - (c2 + s2)) >= wx1 + w2) continue; // X rejection
 
 						c2 = (short)mspace.read_word(tgt + 6);
 						s2 = (short)mspace.read_word(tgt + 8);
 						w2 = (short)mspace.read_word(tgt +10);
-						if (abs((cy1+sy1)-(c2+s2))>=wy1+w2) continue; // Y rejection
+						if (abs((cy1 + sy1) - (c2 + s2)) >= wy1 + w2) continue; // Y rejection
 
 						c2 = (short)mspace.read_word(tgt +12);
 						s2 = (short)mspace.read_word(tgt +14);
 						w2 = (short)mspace.read_word(tgt +16);
-						if (abs((cz1+sz1)-(c2+s2))>=wz1+w2) continue; // Z rejection
+						if (abs((cz1 + sz1) - (c2 + s2)) >= wz1 + w2) continue; // Z rejection
 
 						mspace.write_byte(i, 0x80); // collision confirmed
 					}
@@ -211,13 +226,13 @@ void konamigx_state::K053990_martchmp_word_w(offs_t offset, uint16_t data, uint1
 				dst_skip += element_size;
 
 				if (element_size == 1)
-				for (i=src_count; i; i--)
+				for (i = src_count; i; i--)
 				{
 					mspace.write_byte(dst_addr, mspace.read_byte(src_addr));
 					src_addr += src_skip;
 					dst_addr += dst_skip;
 				}
-				else for (i=src_count; i; i--)
+				else for (i = src_count; i; i--)
 				{
 					mspace.write_word(dst_addr, mspace.read_word(src_addr));
 					src_addr += src_skip;
@@ -387,7 +402,7 @@ if((data1=obj[0])&0x80000000)\
 				case 0x11010010: i = 5; vmask = 0x1ff; break;
 				case 0x01111018: i = 4; break;
 				case 0x10010011: i = 3;
-					if ((srcbase[0x1c75]&0xff)==32) m_k055555->K055555_write_reg(K55_BLEND_ENABLES,36); // (TEMPORARY)
+					if ((srcbase[0x1c75] & 0xff) == 32) m_k055555->K055555_write_reg(K55_BLEND_ENABLES,36); // (TEMPORARY)
 				break;
 				case 0x11010811: i = 2; break;
 				case 0x10000010: i = 1; break;
@@ -424,8 +439,8 @@ if((data1=obj[0])&0x80000000)\
 		// decode Lord British (the designer must be a Richard Garriot fan too:)
 		if (srcbase[0x0848/4] & 0x0000ffff)
 		{
-			hoffs = srcbase[0x08b0/4]>>16;
-			voffs = srcbase[0x08b4/4]>>16;
+			hoffs = srcbase[0x08b0/4] >> 16;
+			voffs = srcbase[0x08b4/4] >> 16;
 			hoffs -= hcorr;
 			voffs -= vcorr;
 			obj = &srcbase[0x084c/4];
@@ -445,8 +460,8 @@ if((data1=obj[0])&0x80000000)\
 			i = src[7] & 0xf;
 			if (!i) continue; // reject retired or zero-element groups
 			i <<= 2;
-			hoffs = src[5]>>16;
-			voffs = src[6]>>16;
+			hoffs = src[5] >> 16;
+			voffs = src[6] >> 16;
 			hoffs -= hcorr;
 			voffs -= vcorr;
 			obj = src + 8;
@@ -456,9 +471,9 @@ if((data1=obj[0])&0x80000000)\
 			{
 				EXTRACT_EVEN
 			}
-			while ((obj+=4)<objend);
+			while ((obj += 4) < objend);
 		}
-		while ((src+=0x30)<srcend);
+		while ((src += 0x30) < srcend);
 
 		// clear residual data
 		if (j) do { *dst = 0; dst += 8; } while (--j);
@@ -480,7 +495,7 @@ void konamigx_state::fantjour_dma_w(offs_t offset, uint32_t data, uint32_t mem_m
 {
 	auto &mspace = m_maincpu->space(AS_PROGRAM);
 	COMBINE_DATA(m_fantjour_dma + offset);
-	if(!offset && ACCESSING_BITS_24_31) {
+	if (!offset && ACCESSING_BITS_24_31) {
 		uint32_t sa = m_fantjour_dma[1];
 		//      uint16_t ss = (m_fantjour_dma[2] & 0xffff0000) >> 16;
 		//      uint32_t sb = ((m_fantjour_dma[2] & 0xffff) << 16) | ((m_fantjour_dma[3] & 0xffff0000) >> 16);
@@ -496,16 +511,18 @@ void konamigx_state::fantjour_dma_w(offs_t offset, uint32_t data, uint32_t mem_m
 		uint32_t x   = m_fantjour_dma[6];
 		uint32_t i1, i2;
 
-		if(mode == 0x93)
-			for(i1=0; i1 <= sz2; i1++)
-				for(i2=0; i2 < db; i2+=4) {
+		if (mode == 0x93)
+			for (i1 = 0; i1 <= sz2; i1++)
+				for (i2 = 0; i2 < db; i2 += 4)
+				{
 					mspace.write_dword(da, mspace.read_dword(sa) ^ x);
 					da += 4;
 					sa += 4;
 				}
-		else if(mode == 0x8f)
-			for(i1=0; i1 <= sz2; i1++)
-				for(i2=0; i2 < db; i2+=4) {
+		else if (mode == 0x8f)
+			for (i1 = 0; i1 <= sz2; i1++)
+				for (i2 = 0; i2 < db; i2 += 4)
+				{
 					mspace.write_dword(da, x);
 					da += 4;
 				}

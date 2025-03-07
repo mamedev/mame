@@ -114,7 +114,7 @@ void taito_zoom_device::tms_ctrl_w(uint8_t data)
 void taito_zoom_device::taitozoom_mn_map(address_map &map)
 {
 	if(m_use_flash) {
-		map(0x080000, 0x0fffff).r(":pgmflash", FUNC(intelfsh16_device::read));
+		map(0x080000, 0x0fffff).r(":zoomprog", FUNC(intelfsh16_device::read));
 	} else {
 		map(0x080000, 0x0fffff).rom().region("mn10200", 0);
 	}

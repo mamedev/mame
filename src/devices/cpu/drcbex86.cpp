@@ -85,22 +85,26 @@
 #include "emu.h"
 #include "drcbex86.h"
 
+#include "drcbeut.h"
+#include "x86log.h"
+
 #include "debug/debugcpu.h"
 #include "emuopts.h"
-#include "drcuml.h"
+
+#include "asmjit/src/asmjit/asmjit.h"
 
 #include <cstddef>
 
 
 namespace drc {
 
+namespace {
+
 using namespace uml;
 
 using namespace asmjit;
 using namespace asmjit::x86;
 
-
-namespace {
 
 //**************************************************************************
 //  DEBUGGING
@@ -113,6 +117,12 @@ namespace {
 //**************************************************************************
 //  CONSTANTS
 //**************************************************************************
+
+#ifdef _WIN32
+constexpr bool USE_THISCALL = true;
+#else
+constexpr bool USE_THISCALL = false;
+#endif
 
 const uint32_t PTYPE_M    = 1 << parameter::PTYPE_MEMORY;
 const uint32_t PTYPE_I    = 1 << parameter::PTYPE_IMMEDIATE;
@@ -184,6 +194,202 @@ const uint16_t fp_control[4] =
 
 
 
+//**************************************************************************
+//  MISCELLAENOUS FUNCTIONS
+//**************************************************************************
+
+void calculate_status_flags(Assembler &a, Operand const &dst, u8 flags)
+{
+	// calculate status flags in a way that does not modify any other status flags
+	uint32_t flagmask = 0;
+
+	if (flags & FLAG_C) flagmask |= 0x001;
+	if (flags & FLAG_V) flagmask |= 0x800;
+	if (flags & FLAG_Z) flagmask |= 0x040;
+	if (flags & FLAG_S) flagmask |= 0x080;
+	if (flags & FLAG_U) flagmask |= 0x004;
+
+	if ((flags & (FLAG_Z | FLAG_S)) == flags)
+	{
+		Gp tempreg = dst.isMem() ? eax : dst.as<Gpd>().id() == ebx.id() ? eax : ebx;
+		Gp tempreg2 = dst.isMem() ? edx : dst.as<Gpd>().id() == ecx.id() ? edx : ecx;
+
+		if (dst.isMem())
+		{
+			a.push(tempreg2);
+			a.mov(tempreg2, dst.as<Mem>());
+		}
+
+		a.push(tempreg);
+
+		a.pushfd();
+		a.pop(tempreg);
+		a.and_(tempreg, ~flagmask);
+
+		a.add(dst.isMem() ? tempreg2.as<Gpd>() : dst.as<Gpd>(), 0);
+
+		a.pushfd();
+		a.and_(dword_ptr(esp), flagmask);
+		a.or_(dword_ptr(esp), tempreg);
+		a.popfd();
+
+		a.pop(tempreg);
+
+		if (dst.isMem())
+			a.pop(tempreg2);
+	}
+	else
+	{
+		fatalerror("drcbe_x86::calculate_status_flags: unknown flag combination requested: %02x\n", flags);
+	}
+}
+
+
+//-------------------------------------------------
+//  dmulu - perform a double-wide unsigned multiply
+//-------------------------------------------------
+
+int dmulu(uint64_t &dstlo, uint64_t &dsthi, uint64_t src1, uint64_t src2, bool flags, bool halfmul_flags)
+{
+	// shortcut if we don't care about the high bits or the flags
+	if (&dstlo == &dsthi && !flags)
+	{
+		dstlo = src1 * src2;
+		return 0;
+	}
+
+	// fetch source values
+	uint64_t a = src1;
+	uint64_t b = src2;
+	if (a == 0 || b == 0)
+	{
+		dsthi = dstlo = 0;
+		return FLAG_Z;
+	}
+
+	// compute high and low parts first
+	uint64_t lo = uint64_t(uint32_t(a >> 0))  * uint64_t(uint32_t(b >> 0));
+	uint64_t hi = uint64_t(uint32_t(a >> 32)) * uint64_t(uint32_t(b >> 32));
+
+	// compute middle parts
+	uint64_t prevlo = lo;
+	uint64_t temp = uint64_t(uint32_t(a >> 32)) * uint64_t(uint32_t(b >> 0));
+	lo += temp << 32;
+	hi += (temp >> 32) + (lo < prevlo);
+
+	prevlo = lo;
+	temp = uint64_t(uint32_t(a >> 0)) * uint64_t(uint32_t(b >> 32));
+	lo += temp << 32;
+	hi += (temp >> 32) + (lo < prevlo);
+
+	// store the results
+	dsthi = hi;
+	dstlo = lo;
+
+	if (halfmul_flags)
+		return ((lo >> 60) & FLAG_S) | ((hi != 0) << 1) | ((dstlo == 0) << 2);
+
+	return ((hi >> 60) & FLAG_S) | ((hi != 0) << 1) | ((dsthi == 0 && dstlo == 0) << 2);
+}
+
+
+//-------------------------------------------------
+//  dmuls - perform a double-wide signed multiply
+//-------------------------------------------------
+
+int dmuls(uint64_t &dstlo, uint64_t &dsthi, int64_t src1, int64_t src2, bool flags, bool halfmul_flags)
+{
+	uint64_t lo, hi, prevlo;
+	uint64_t a, b, temp;
+
+	// shortcut if we don't care about the high bits or the flags
+	if (&dstlo == &dsthi && !flags)
+	{
+		dstlo = src1 * src2;
+		return 0;
+	}
+
+	// fetch absolute source values
+	a = src1; if (int64_t(a) < 0) a = -a;
+	b = src2; if (int64_t(b) < 0) b = -b;
+	if (a == 0 || b == 0)
+	{
+		dsthi = dstlo = 0;
+		return FLAG_Z;
+	}
+
+	// compute high and low parts first
+	lo = uint64_t(uint32_t(a >> 0))  * uint64_t(uint32_t(b >> 0));
+	hi = uint64_t(uint32_t(a >> 32)) * uint64_t(uint32_t(b >> 32));
+
+	// compute middle parts
+	prevlo = lo;
+	temp = uint64_t(uint32_t(a >> 32)) * uint64_t(uint32_t(b >> 0));
+	lo += temp << 32;
+	hi += (temp >> 32) + (lo < prevlo);
+
+	prevlo = lo;
+	temp = uint64_t(uint32_t(a >> 0)) * uint64_t(uint32_t(b >> 32));
+	lo += temp << 32;
+	hi += (temp >> 32) + (lo < prevlo);
+
+	// adjust for signage
+	if (int64_t(src1 ^ src2) < 0)
+	{
+		hi = ~hi + (lo == 0);
+		lo = ~lo + 1;
+	}
+
+	// store the results
+	dsthi = hi;
+	dstlo = lo;
+
+	if (halfmul_flags)
+		return ((lo >> 60) & FLAG_S) | ((hi != (int64_t(lo) >> 63)) << 1) | ((dstlo == 0) << 2);
+
+	return ((hi >> 60) & FLAG_S) | ((hi != (int64_t(lo) >> 63)) << 1) | ((dsthi == 0 && dstlo == 0) << 2);
+}
+
+
+//-------------------------------------------------
+//  ddivu - perform a double-wide unsigned divide
+//-------------------------------------------------
+
+int ddivu(uint64_t &dstlo, uint64_t &dsthi, uint64_t src1, uint64_t src2)
+{
+	// do nothing if src2 == 0
+	if (src2 == 0)
+		return FLAG_V;
+
+	dstlo = src1 / src2;
+	if (&dstlo != &dsthi)
+		dsthi = src1 % src2;
+	return ((dstlo == 0) << 2) | ((dstlo >> 60) & FLAG_S);
+}
+
+
+//-------------------------------------------------
+//  ddivs - perform a double-wide signed divide
+//-------------------------------------------------
+
+int ddivs(uint64_t &dstlo, uint64_t &dsthi, int64_t src1, int64_t src2)
+{
+	// do nothing if src2 == 0
+	if (src2 == 0)
+		return FLAG_V;
+
+	dstlo = src1 / src2;
+	if (&dstlo != &dsthi)
+		dsthi = src1 % src2;
+	return ((dstlo == 0) << 2) | ((dstlo >> 60) & FLAG_S);
+}
+
+
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
 class ThrowableErrorHandler : public ErrorHandler
 {
 public:
@@ -193,7 +399,279 @@ public:
 	}
 };
 
-} // anonymous namespace
+
+class drcbe_x86 : public drcbe_interface
+{
+	using x86_entry_point_func = uint32_t (*)(x86code *entry);
+
+public:
+	// construction/destruction
+	drcbe_x86(drcuml_state &drcuml, device_t &device, drc_cache &cache, uint32_t flags, int modes, int addrbits, int ignorebits);
+	virtual ~drcbe_x86();
+
+	// required overrides
+	virtual void reset() override;
+	virtual int execute(uml::code_handle &entry) override;
+	virtual void generate(drcuml_block &block, const uml::instruction *instlist, uint32_t numinst) override;
+	virtual bool hash_exists(uint32_t mode, uint32_t pc) override;
+	virtual void get_info(drcbe_info &info) override;
+	virtual bool logging() const override { return m_log != nullptr; }
+
+private:
+	// HACK: leftover from x86emit
+	static inline constexpr int REG_MAX = 16;
+
+	// a be_parameter is similar to a uml::parameter but maps to native registers/memory
+	class be_parameter
+	{
+	public:
+		// parameter types
+		enum be_parameter_type
+		{
+			PTYPE_NONE = 0,                     // invalid
+			PTYPE_IMMEDIATE,                    // immediate; value = sign-extended to 64 bits
+			PTYPE_INT_REGISTER,                 // integer register; value = 0-REG_MAX
+			PTYPE_FLOAT_REGISTER,               // floating point register; value = 0-REG_MAX
+			PTYPE_MEMORY,                       // memory; value = pointer to memory
+			PTYPE_MAX
+		};
+
+		// represents the value of a parameter
+		typedef uint64_t be_parameter_value;
+
+		// construction
+		be_parameter() : m_type(PTYPE_NONE), m_value(0) { }
+		be_parameter(uint64_t val) : m_type(PTYPE_IMMEDIATE), m_value(val) { }
+		be_parameter(drcbe_x86 &drcbe, const uml::parameter &param, uint32_t allowed);
+		be_parameter(const be_parameter &param) = default;
+
+		// creators for types that don't safely default
+		static be_parameter make_ireg(int regnum) { assert(regnum >= 0 && regnum < REG_MAX); return be_parameter(PTYPE_INT_REGISTER, regnum); }
+		static be_parameter make_freg(int regnum) { assert(regnum >= 0 && regnum < REG_MAX); return be_parameter(PTYPE_FLOAT_REGISTER, regnum); }
+		static be_parameter make_memory(void *base) { return be_parameter(PTYPE_MEMORY, reinterpret_cast<be_parameter_value>(base)); }
+		static be_parameter make_memory(const void *base) { return be_parameter(PTYPE_MEMORY, reinterpret_cast<be_parameter_value>(const_cast<void *>(base))); }
+
+		// operators
+		bool operator==(be_parameter const &rhs) const { return (m_type == rhs.m_type && m_value == rhs.m_value); }
+		bool operator!=(be_parameter const &rhs) const { return (m_type != rhs.m_type || m_value != rhs.m_value); }
+
+		// getters
+		be_parameter_type type() const { return m_type; }
+		uint64_t immediate() const { assert(m_type == PTYPE_IMMEDIATE); return m_value; }
+		uint32_t ireg() const { assert(m_type == PTYPE_INT_REGISTER); assert(m_value < REG_MAX); return m_value; }
+		uint32_t freg() const { assert(m_type == PTYPE_FLOAT_REGISTER); assert(m_value < REG_MAX); return m_value; }
+		void *memory(uint32_t offset = 0) const { assert(m_type == PTYPE_MEMORY); return reinterpret_cast<void *>(m_value + offset); }
+
+		// type queries
+		bool is_immediate() const { return (m_type == PTYPE_IMMEDIATE); }
+		bool is_int_register() const { return (m_type == PTYPE_INT_REGISTER); }
+		bool is_float_register() const { return (m_type == PTYPE_FLOAT_REGISTER); }
+		bool is_memory() const { return (m_type == PTYPE_MEMORY); }
+
+		// other queries
+		bool is_immediate_value(uint64_t value) const { return (m_type == PTYPE_IMMEDIATE && m_value == value); }
+
+		// helpers
+		asmjit::x86::Gpd select_register(asmjit::x86::Gpd const &defreg) const;
+		asmjit::x86::Xmm select_register(asmjit::x86::Xmm defreg) const;
+		template <typename T> T select_register(T defreg, be_parameter const &checkparam) const;
+		template <typename T> T select_register(T defreg, be_parameter const &checkparam, be_parameter const &checkparam2) const;
+
+	private:
+		// private constructor
+		be_parameter(be_parameter_type type, be_parameter_value value) : m_type(type), m_value(value) { }
+
+		// internals
+		be_parameter_type   m_type;             // parameter type
+		be_parameter_value  m_value;            // parameter value
+	};
+
+	// helpers
+	asmjit::x86::Mem MABS(void const *base, u32 const size = 0) const { return asmjit::x86::Mem(u64(base), size); }
+	void normalize_commutative(be_parameter &inner, be_parameter &outer);
+	void emit_combine_z_flags(asmjit::x86::Assembler &a);
+	void emit_combine_zs_flags(asmjit::x86::Assembler &a);
+	void emit_combine_z_shl_flags(asmjit::x86::Assembler &a);
+	void reset_last_upper_lower_reg();
+	void set_last_lower_reg(asmjit::x86::Assembler &a, be_parameter const &param, asmjit::x86::Gp const &reglo);
+	void set_last_upper_reg(asmjit::x86::Assembler &a, be_parameter const &param, asmjit::x86::Gp const &reghi);
+	bool can_skip_lower_load(asmjit::x86::Assembler &a, uint32_t *memref, asmjit::x86::Gp const &reglo);
+	bool can_skip_upper_load(asmjit::x86::Assembler &a, uint32_t *memref, asmjit::x86::Gp const &reghi);
+
+	static void debug_log_hashjmp(int mode, offs_t pc);
+
+	// code generators
+	void op_handle(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_hash(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_label(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_comment(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_mapvar(asmjit::x86::Assembler &a, const uml::instruction &inst);
+
+	void op_nop(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_break(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_debug(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_exit(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_hashjmp(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_jmp(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_exh(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_callh(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_ret(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_callc(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_recover(asmjit::x86::Assembler &a, const uml::instruction &inst);
+
+	void op_setfmod(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_getfmod(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_getexp(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_getflgs(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_setflgs(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_save(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_restore(asmjit::x86::Assembler &a, const uml::instruction &inst);
+
+	void op_load(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_loads(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_store(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_read(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_readm(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_write(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_writem(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_carry(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_set(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_mov(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_sext(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_roland(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_rolins(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_add(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_addc(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_sub(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_subc(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_cmp(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_mulu(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_mululw(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_muls(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_mulslw(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_divu(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_divs(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_and(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_test(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_or(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_xor(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_lzcnt(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_tzcnt(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_bswap(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_shl(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_shr(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_sar(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_ror(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_rol(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_rorc(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_rolc(asmjit::x86::Assembler &a, const uml::instruction &inst);
+
+	void op_fload(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_fstore(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_fread(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_fwrite(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_fmov(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_ftoint(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_ffrint(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_ffrflt(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_frnds(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_fadd(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_fsub(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_fcmp(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_fmul(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_fdiv(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_fneg(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_fabs(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_fsqrt(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_frecip(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_frsqrt(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_fcopyi(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_icopyf(asmjit::x86::Assembler &a, const uml::instruction &inst);
+
+	// 32-bit code emission helpers
+	void emit_mov_r32_p32(asmjit::x86::Assembler &a, asmjit::x86::Gp const &reg, be_parameter const &param);
+	void emit_mov_r32_p32_keepflags(asmjit::x86::Assembler &a, asmjit::x86::Gp const &reg, be_parameter const &param);
+	void emit_mov_m32_p32(asmjit::x86::Assembler &a, asmjit::x86::Mem memref, be_parameter const &param);
+	void emit_mov_p32_r32(asmjit::x86::Assembler &a, be_parameter const &param, asmjit::x86::Gp const &reg);
+
+	void alu_op_param(asmjit::x86::Assembler &a, asmjit::x86::Inst::Id const opcode, asmjit::Operand const &dst, be_parameter const &param, std::function<bool(asmjit::x86::Assembler &a, asmjit::Operand const &dst, be_parameter const &src)> optimize = [](asmjit::x86::Assembler &a, asmjit::Operand dst, be_parameter const &src) { return false; });
+	void shift_op_param(asmjit::x86::Assembler &a, asmjit::x86::Inst::Id const opcode, size_t opsize, asmjit::Operand const &dst, be_parameter const &param, std::function<bool(asmjit::x86::Assembler &a, asmjit::Operand const &dst, be_parameter const &src)> optimize, bool update_flags);
+
+	// 64-bit code emission helpers
+	void emit_mov_r64_p64(asmjit::x86::Assembler &a, asmjit::x86::Gp const &reglo, asmjit::x86::Gp const &reghi, be_parameter const &param);
+	void emit_mov_r64_p64_keepflags(asmjit::x86::Assembler &a, asmjit::x86::Gp const &reglo, asmjit::x86::Gp const &reghi, be_parameter const &param);
+	void emit_mov_m64_p64(asmjit::x86::Assembler &a, asmjit::x86::Mem const &memref, be_parameter const &param);
+	void emit_mov_p64_r64(asmjit::x86::Assembler &a, be_parameter const &param, asmjit::x86::Gp const &reglo, asmjit::x86::Gp const &reghi);
+	void emit_and_r64_p64(asmjit::x86::Assembler &a, asmjit::x86::Gp const &reglo, asmjit::x86::Gp const &reghi, be_parameter const &param, const uml::instruction &inst);
+	void emit_and_m64_p64(asmjit::x86::Assembler &a, asmjit::x86::Mem const &memref_lo, asmjit::x86::Mem const &memref_hi, be_parameter const &param, const uml::instruction &inst);
+	void emit_or_r64_p64(asmjit::x86::Assembler &a, asmjit::x86::Gp const &reglo, asmjit::x86::Gp const &reghi, be_parameter const &param, const uml::instruction &inst);
+	void emit_or_m64_p64(asmjit::x86::Assembler &a, asmjit::x86::Mem const &memref_lo, asmjit::x86::Mem const &memref_hi, be_parameter const &param, const uml::instruction &inst);
+	void emit_xor_r64_p64(asmjit::x86::Assembler &a, asmjit::x86::Gp const &reglo, asmjit::x86::Gp const &reghi, be_parameter const &param, const uml::instruction &inst);
+	void emit_xor_m64_p64(asmjit::x86::Assembler &a, asmjit::x86::Mem const &memref_lo, asmjit::x86::Mem const &memref_hi, be_parameter const &param, const uml::instruction &inst);
+	void emit_shl_r64_p64(asmjit::x86::Assembler &a, asmjit::x86::Gp const &reglo, asmjit::x86::Gp const &reghi, be_parameter const &param, const uml::instruction &inst);
+	void emit_shr_r64_p64(asmjit::x86::Assembler &a, asmjit::x86::Gp const &reglo, asmjit::x86::Gp const &reghi, be_parameter const &param, const uml::instruction &inst);
+	void emit_sar_r64_p64(asmjit::x86::Assembler &a, asmjit::x86::Gp const &reglo, asmjit::x86::Gp const &reghi, be_parameter const &param, const uml::instruction &inst);
+	void emit_rol_r64_p64(asmjit::x86::Assembler &a, asmjit::x86::Gp const &reglo, asmjit::x86::Gp const &reghi, be_parameter const &param, const uml::instruction &inst);
+	void emit_ror_r64_p64(asmjit::x86::Assembler &a, asmjit::x86::Gp const &reglo, asmjit::x86::Gp const &reghi, be_parameter const &param, const uml::instruction &inst);
+	void emit_rcl_r64_p64(asmjit::x86::Assembler &a, asmjit::x86::Gp const &reglo, asmjit::x86::Gp const &reghi, be_parameter const &param, const uml::instruction &inst);
+	void emit_rcr_r64_p64(asmjit::x86::Assembler &a, asmjit::x86::Gp const &reglo, asmjit::x86::Gp const &reghi, be_parameter const &param, const uml::instruction &inst);
+
+	void alu_op_param(asmjit::x86::Assembler &a, asmjit::x86::Inst::Id const opcode_lo, asmjit::x86::Inst::Id const opcode_hi, asmjit::x86::Gp const &lo, asmjit::x86::Gp const &hi, be_parameter const &param, bool const saveflags);
+	void alu_op_param(asmjit::x86::Assembler &a, asmjit::x86::Inst::Id const opcode_lo, asmjit::x86::Inst::Id const opcode_hi, asmjit::x86::Mem const &lo, asmjit::x86::Mem const &hi, be_parameter const &param, bool const saveflags);
+
+	// floating-point code emission helpers
+	void emit_fld_p(asmjit::x86::Assembler &a, int size, be_parameter const &param);
+	void emit_fstp_p(asmjit::x86::Assembler &a, int size, be_parameter const &param);
+
+	size_t emit(asmjit::CodeHolder &ch);
+
+	// internal state
+	drc_hash_table          m_hash;                 // hash table state
+	drc_map_variables       m_map;                  // code map
+	x86log_context *        m_log;                  // logging
+	FILE *                  m_log_asmjit;
+	bool                    m_logged_common;        // logged common code already?
+	bool const              m_sse3;                 // do we have SSE3 support?
+
+	x86_entry_point_func    m_entry;                // entry point
+	x86code *               m_exit;                 // exit point
+	x86code *               m_nocode;               // nocode handler
+	x86code *               m_save;                 // save handler
+	x86code *               m_restore;              // restore handler
+
+	uint32_t *              m_reglo[REG_MAX];       // pointer to low part of data for each register
+	uint32_t *              m_reghi[REG_MAX];       // pointer to high part of data for each register
+	asmjit::x86::Gp         m_last_lower_reg;       // last register we stored a lower from
+	x86code *               m_last_lower_pc;        // PC after instruction where we last stored a lower register
+	uint32_t *              m_last_lower_addr;      // address where we last stored an lower register
+	asmjit::x86::Gp         m_last_upper_reg;       // last register we stored an upper from
+	x86code *               m_last_upper_pc;        // PC after instruction where we last stored an upper register
+	uint32_t *              m_last_upper_addr;      // address where we last stored an upper register
+	double                  m_fptemp;               // temporary storage for floating point
+
+	uint16_t                m_fpumode;              // saved FPU mode
+	uint16_t                m_fmodesave;            // temporary location for saving
+
+	void *                  m_stacksave;            // saved stack pointer
+	void *                  m_hashstacksave;        // saved stack pointer for hashjmp
+	uint64_t                m_reslo;                // extended low result
+	uint64_t                m_reshi;                // extended high result
+
+	// resolved memory handler functions
+	resolved_member_function m_debug_cpu_instruction_hook;
+	resolved_member_function m_drcmap_get_value;
+	resolved_memory_accessors_vector m_memory_accessors;
+
+	// globals
+	typedef void (drcbe_x86::*opcode_generate_func)(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	struct opcode_table_entry
+	{
+		uml::opcode_t           opcode;             // opcode in question
+		opcode_generate_func    func;               // function pointer to the work
+	};
+	static const opcode_table_entry s_opcode_table_source[];
+	static opcode_generate_func s_opcode_table[uml::OP_MAX];
+};
 
 
 
@@ -538,32 +1016,32 @@ inline bool drcbe_x86::can_skip_upper_load(Assembler &a, uint32_t *memref, Gp co
 //  drcbe_x86 - constructor
 //-------------------------------------------------
 
-drcbe_x86::drcbe_x86(drcuml_state &drcuml, device_t &device, drc_cache &cache, uint32_t flags, int modes, int addrbits, int ignorebits)
-	: drcbe_interface(drcuml, cache, device),
-		m_hash(cache, modes, addrbits, ignorebits),
-		m_map(cache, 0),
-		m_log(nullptr),
-		m_log_asmjit(nullptr),
-		m_logged_common(false),
-		m_sse3(CpuInfo::host().features().x86().hasSSE3()),
-		m_entry(nullptr),
-		m_exit(nullptr),
-		m_nocode(nullptr),
-		m_save(nullptr),
-		m_restore(nullptr),
-		m_last_lower_reg(Gp()),
-		m_last_lower_pc(nullptr),
-		m_last_lower_addr(nullptr),
-		m_last_upper_reg(Gp()),
-		m_last_upper_pc(nullptr),
-		m_last_upper_addr(nullptr),
-		m_fptemp(0),
-		m_fpumode(0),
-		m_fmodesave(0),
-		m_stacksave(nullptr),
-		m_hashstacksave(nullptr),
-		m_reslo(0),
-		m_reshi(0)
+drcbe_x86::drcbe_x86(drcuml_state &drcuml, device_t &device, drc_cache &cache, uint32_t flags, int modes, int addrbits, int ignorebits) :
+	drcbe_interface(drcuml, cache, device)
+	, m_hash(cache, modes, addrbits, ignorebits)
+	, m_map(cache, 0)
+	, m_log(nullptr)
+	, m_log_asmjit(nullptr)
+	, m_logged_common(false)
+	, m_sse3(CpuInfo::host().features().x86().hasSSE3())
+	, m_entry(nullptr)
+	, m_exit(nullptr)
+	, m_nocode(nullptr)
+	, m_save(nullptr)
+	, m_restore(nullptr)
+	, m_last_lower_reg(Gp())
+	, m_last_lower_pc(nullptr)
+	, m_last_lower_addr(nullptr)
+	, m_last_upper_reg(Gp())
+	, m_last_upper_pc(nullptr)
+	, m_last_upper_addr(nullptr)
+	, m_fptemp(0)
+	, m_fpumode(0)
+	, m_fmodesave(0)
+	, m_stacksave(nullptr)
+	, m_hashstacksave(nullptr)
+	, m_reslo(0)
+	, m_reshi(0)
 {
 	// compute hi pointers for each register
 	for (int regnum = 0; regnum < std::size(int_register_map); regnum++)
@@ -593,6 +1071,17 @@ drcbe_x86::drcbe_x86(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 		if (entry & FLAG_S) flags |= 0x080;
 		if (entry & FLAG_V) flags |= 0x800;
 		flags_unmap[entry] = flags;
+	}
+
+	// resolve the actual addresses of member functions we need to call
+	m_drcmap_get_value.set(m_map, &drc_map_variables::get_value);
+	if (!m_drcmap_get_value)
+		throw emu_fatalerror("Error resolving map variable get value function!\n");
+	m_memory_accessors.resize(m_space.size());
+	for (int space = 0; m_space.size() > space; ++space)
+	{
+		if (m_space[space])
+			m_memory_accessors[space].set(*m_space[space]);
 	}
 
 	// build the opcode table (static but it doesn't hurt to regenerate it)
@@ -842,6 +1331,14 @@ int drcbe_x86::execute(code_handle &entry)
 
 void drcbe_x86::generate(drcuml_block &block, const instruction *instlist, uint32_t numinst)
 {
+	// do this here because device.debug() isn't initialised at construction time
+	if (!m_debug_cpu_instruction_hook && (m_device.machine().debug_flags & DEBUG_FLAG_ENABLED))
+	{
+		m_debug_cpu_instruction_hook.set(*m_device.debug(), &device_debug::instruction_hook);
+		if (!m_debug_cpu_instruction_hook)
+			throw emu_fatalerror("Error resolving debugger instruction hook member function!\n");
+	}
+
 	// tell all of our utility objects that a block is beginning
 	m_hash.block_begin(block, instlist, numinst);
 	m_map.block_begin(block);
@@ -1070,52 +1567,6 @@ void drcbe_x86::alu_op_param(Assembler &a, Inst::Id const opcode, Operand const 
 	}
 	else if (param.is_int_register())
 		a.emit(opcode, dst, Gpd(param.ireg()));                                         // op    dst,param
-}
-
-void drcbe_x86::calculate_status_flags(Assembler &a, Operand const &dst, u8 flags)
-{
-	// calculate status flags in a way that does not modify any other status flags
-	uint32_t flagmask = 0;
-
-	if (flags & FLAG_C) flagmask |= 0x001;
-	if (flags & FLAG_V) flagmask |= 0x800;
-	if (flags & FLAG_Z) flagmask |= 0x040;
-	if (flags & FLAG_S) flagmask |= 0x080;
-	if (flags & FLAG_U) flagmask |= 0x004;
-
-	if ((flags & (FLAG_Z | FLAG_S)) == flags)
-	{
-		Gp tempreg = dst.isMem() ? eax : dst.as<Gpd>().id() == ebx.id() ? eax : ebx;
-		Gp tempreg2 = dst.isMem() ? edx : dst.as<Gpd>().id() == ecx.id() ? edx : ecx;
-
-		if (dst.isMem())
-		{
-			a.push(tempreg2);
-			a.mov(tempreg2, dst.as<Mem>());
-		}
-
-		a.push(tempreg);
-
-		a.pushfd();
-		a.pop(tempreg);
-		a.and_(tempreg, ~flagmask);
-
-		a.add(dst.isMem() ? tempreg2.as<Gpd>() : dst.as<Gpd>(), 0);
-
-		a.pushfd();
-		a.and_(dword_ptr(esp), flagmask);
-		a.or_(dword_ptr(esp), tempreg);
-		a.popfd();
-
-		a.pop(tempreg);
-
-		if (dst.isMem())
-			a.pop(tempreg2);
-	}
-	else
-	{
-		fatalerror("drcbe_x86::calculate_status_flags: unknown flag combination requested: %02x\n", flags);
-	}
 }
 
 void drcbe_x86::shift_op_param(Assembler &a, Inst::Id const opcode, size_t opsize, Operand const &dst, be_parameter const &param, std::function<bool(Assembler &a, Operand const &dst, be_parameter const &src)> optimize, bool update_flags)
@@ -2521,25 +2972,27 @@ void drcbe_x86::op_debug(Assembler &a, const instruction &inst)
 	assert_no_condition(inst);
 	assert_no_flags(inst);
 
-	using debugger_hook_func = void (*)(device_debug *, offs_t);
-	static const debugger_hook_func debugger_inst_hook = [] (device_debug *dbg, offs_t pc) { dbg->instruction_hook(pc); }; // TODO: kill trampoline if possible
-
 	if ((m_device.machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
 		// normalize parameters
 		be_parameter const pcp(*this, inst.param(0), PTYPE_MRI);
 
 		// test and branch
-		a.test(MABS(&m_device.machine().debug_flags, 4), DEBUG_FLAG_CALL_HOOK);         // test  [debug_flags],DEBUG_FLAG_CALL_HOOK
+		a.test(MABS(&m_device.machine().debug_flags, 4), DEBUG_FLAG_CALL_HOOK);
 		Label skip = a.newLabel();
-		a.short_().jz(skip);                                                            // jz    skip
+		a.short_().jz(skip);
 
 		// push the parameter
-		emit_mov_m32_p32(a, dword_ptr(esp, 4), pcp);                                    // mov   [esp+4],pcp
-		a.mov(dword_ptr(esp, 0), imm(m_device.debug()));                                // mov   [esp],device.debug
-		a.call(imm(debugger_inst_hook));                                                // call  debugger_inst_hook
+		emit_mov_m32_p32(a, dword_ptr(esp, USE_THISCALL ? 0 : 4), pcp);
+		if (USE_THISCALL)
+			a.mov(ecx, imm(m_debug_cpu_instruction_hook.obj));
+		else
+			a.mov(dword_ptr(esp, 0), imm(m_debug_cpu_instruction_hook.obj));
+		a.call(imm(m_debug_cpu_instruction_hook.func));
+		if (USE_THISCALL)
+			a.sub(esp, 4);
 
-		a.bind(skip);                                                               // skip:
+		a.bind(skip);
 		reset_last_upper_lower_reg();
 	}
 }
@@ -2842,14 +3295,19 @@ void drcbe_x86::op_recover(Assembler &a, const instruction &inst)
 	be_parameter dstp(*this, inst.param(0), PTYPE_MR);
 
 	// call the recovery code
-	a.mov(eax, MABS(&m_stacksave));                                                     // mov   eax,stacksave
-	a.mov(eax, ptr(eax, -4));                                                           // mov   eax,[eax-4]
-	a.sub(eax, 1);                                                                      // sub   eax,1
-	a.mov(dword_ptr(esp, 8), inst.param(1).mapvar());                                   // mov   [esp+8],param1
-	a.mov(ptr(esp, 4), eax);                                                            // mov   [esp+4],eax
-	a.mov(dword_ptr(esp, 0), imm(&m_map));                                              // mov   [esp],m_map
-	a.call(imm(&drc_map_variables::static_get_value));                                  // call  drcmap_get_value
-	emit_mov_p32_r32(a, dstp, eax);                                                     // mov   dstp,eax
+	a.mov(eax, MABS(&m_stacksave));
+	a.mov(eax, ptr(eax, -4));
+	a.sub(eax, 1);
+	a.mov(dword_ptr(esp, USE_THISCALL ? 4 : 8), inst.param(1).mapvar());
+	a.mov(ptr(esp, USE_THISCALL ? 0 : 4), eax);
+	if (USE_THISCALL)
+		a.mov(ecx, imm(m_drcmap_get_value.obj));
+	else
+		a.mov(dword_ptr(esp, 0), imm(m_drcmap_get_value.obj));
+	a.call(imm(m_drcmap_get_value.func));
+	if (USE_THISCALL)
+		a.sub(esp, 8);
+	emit_mov_p32_r32(a, dstp, eax);
 }
 
 
@@ -3448,52 +3906,75 @@ void drcbe_x86::op_read(Assembler &a, const instruction &inst)
 	// pick a target register for the general case
 	Gp const dstreg = dstp.select_register(eax);
 
-	// set up a call to the read byte handler
-	emit_mov_m32_p32(a, dword_ptr(esp, 4), addrp);                                      // mov    [esp+4],addrp
-	a.mov(dword_ptr(esp, 0), imm(m_space[spacesizep.space()]));                         // mov    [esp],space
+	// set up a call to the read handler
+	auto const &accessors = m_memory_accessors[spacesizep.space()];
+	emit_mov_m32_p32(a, dword_ptr(esp, USE_THISCALL ? 0 : 4), addrp);
 	if (spacesizep.size() == SIZE_BYTE)
 	{
-		a.call(imm(m_accessors[spacesizep.space()].read_byte));                         // call   read_byte
-		a.movzx(dstreg, al);                                                            // movzx  dstreg,al
+		if (USE_THISCALL)
+			a.mov(ecx, imm(accessors.read_byte.obj));
+		else
+			a.mov(dword_ptr(esp, 0), imm(accessors.read_byte.obj));
+		a.call(imm(accessors.read_byte.func));
+		if (USE_THISCALL)
+			a.sub(esp, 4);
+		a.movzx(dstreg, al);
 	}
 	else if (spacesizep.size() == SIZE_WORD)
 	{
-		a.call(imm(m_accessors[spacesizep.space()].read_word));                         // call   read_word
-		a.movzx(dstreg, ax);                                                            // movzx  dstreg,ax
+		if (USE_THISCALL)
+			a.mov(ecx, imm(accessors.read_word.obj));
+		else
+			a.mov(dword_ptr(esp, 0), imm(accessors.read_word.obj));
+		a.call(imm(accessors.read_word.func));
+		if (USE_THISCALL)
+			a.sub(esp, 4);
+		a.movzx(dstreg, ax);
 	}
 	else if (spacesizep.size() == SIZE_DWORD)
 	{
-		a.call(imm(m_accessors[spacesizep.space()].read_dword));                        // call   read_dword
-		a.mov(dstreg, eax);                                                             // mov    dstreg,eax
+		if (USE_THISCALL)
+			a.mov(ecx, imm(accessors.read_dword.obj));
+		else
+			a.mov(dword_ptr(esp, 0), imm(accessors.read_dword.obj));
+		a.call(imm(accessors.read_dword.func));
+		if (USE_THISCALL)
+			a.sub(esp, 4);
+		a.mov(dstreg, eax);
 	}
 	else if (spacesizep.size() == SIZE_QWORD)
 	{
-		a.call(imm(m_accessors[spacesizep.space()].read_qword));                        // call   read_qword
-		a.mov(dstreg, eax);                                                             // mov    dstreg,eax
+		if (USE_THISCALL)
+			a.mov(ecx, imm(accessors.read_qword.obj));
+		else
+			a.mov(dword_ptr(esp, 0), imm(accessors.read_qword.obj));
+		a.call(imm(accessors.read_qword.func));
+		if (USE_THISCALL)
+			a.sub(esp, 4);
+		a.mov(dstreg, eax);
 	}
 
 	// store low 32 bits
-	emit_mov_p32_r32(a, dstp, dstreg);                                                  // mov    dstp,dstreg
+	emit_mov_p32_r32(a, dstp, dstreg);
 
 	// 64-bit form stores upper 32 bits
 	if (inst.size() == 8)
 	{
-		// 1, 2, or 4-byte case
 		if (spacesizep.size() != SIZE_QWORD)
 		{
+			// 1, 2, or 4-byte case
 			if (dstp.is_memory())
-				a.mov(MABS(dstp.memory(4), 4), 0);                                      // mov   [dstp+4],0
+				a.mov(MABS(dstp.memory(4), 4), 0);
 			else if (dstp.is_int_register())
-				a.mov(MABS(m_reghi[dstp.ireg()], 4), 0);                                // mov   [reghi],0
+				a.mov(MABS(m_reghi[dstp.ireg()], 4), 0);
 		}
-
-		// 8-byte case
 		else
 		{
+			// 8-byte case
 			if (dstp.is_memory())
-				a.mov(MABS(dstp.memory(4)), edx);                                       // mov   [dstp+4],edx
+				a.mov(MABS(dstp.memory(4)), edx);
 			else if (dstp.is_int_register())
-				a.mov(MABS(m_reghi[dstp.ireg()]), edx);                                 // mov   [reghi],edx
+				a.mov(MABS(m_reghi[dstp.ireg()]), edx);
 		}
 	}
 }
@@ -3521,55 +4002,78 @@ void drcbe_x86::op_readm(Assembler &a, const instruction &inst)
 	Gp const dstreg = dstp.select_register(eax);
 
 	// set up a call to the read byte handler
+	auto const &accessors = m_memory_accessors[spacesizep.space()];
 	if (spacesizep.size() != SIZE_QWORD)
-		emit_mov_m32_p32(a, dword_ptr(esp, 8), maskp);                                  // mov    [esp+8],maskp
+		emit_mov_m32_p32(a, dword_ptr(esp, USE_THISCALL ? 4 : 8), maskp);
 	else
-		emit_mov_m64_p64(a, qword_ptr(esp, 8), maskp);                                  // mov    [esp+8],maskp
-	emit_mov_m32_p32(a, dword_ptr(esp, 4), addrp);                                      // mov    [esp+4],addrp
-	a.mov(dword_ptr(esp, 0), imm(m_space[spacesizep.space()]));                         // mov    [esp],space
+		emit_mov_m64_p64(a, qword_ptr(esp, USE_THISCALL ? 4 : 8), maskp);
+	emit_mov_m32_p32(a, dword_ptr(esp, USE_THISCALL ? 0 : 4), addrp);
 	if (spacesizep.size() == SIZE_BYTE)
 	{
-		a.call(imm(m_accessors[spacesizep.space()].read_byte_masked));                  // call   read_byte_masked
-		a.movzx(dstreg, al);                                                            // movzx  dstreg,al
+		if (USE_THISCALL)
+			a.mov(ecx, imm(accessors.read_byte_masked.obj));
+		else
+			a.mov(dword_ptr(esp, 0), imm(accessors.read_byte_masked.obj));
+		a.call(imm(accessors.read_byte_masked.func));
+		if (USE_THISCALL)
+			a.sub(esp, 8);
+		a.movzx(dstreg, al);
 	}
 	else if (spacesizep.size() == SIZE_WORD)
 	{
-		a.call(imm(m_accessors[spacesizep.space()].read_word_masked));                  // call   read_word_masked
-		a.movzx(dstreg, ax);                                                            // movzx  dstreg,ax
+		if (USE_THISCALL)
+			a.mov(ecx, imm(accessors.read_word_masked.obj));
+		else
+			a.mov(dword_ptr(esp, 0), imm(accessors.read_word_masked.obj));
+		a.call(imm(accessors.read_word_masked.func));
+		if (USE_THISCALL)
+			a.sub(esp, 8);
+		a.movzx(dstreg, ax);
 	}
 	else if (spacesizep.size() == SIZE_DWORD)
 	{
-		a.call(imm(m_accessors[spacesizep.space()].read_dword_masked));                 // call   read_dword_masked
-		a.mov(dstreg, eax);                                                             // mov    dstreg,eax
+		if (USE_THISCALL)
+			a.mov(ecx, imm(accessors.read_dword_masked.obj));
+		else
+			a.mov(dword_ptr(esp, 0), imm(accessors.read_dword_masked.obj));
+		a.call(imm(accessors.read_dword_masked.func));
+		if (USE_THISCALL)
+			a.sub(esp, 8);
+		a.mov(dstreg, eax);
 	}
 	else if (spacesizep.size() == SIZE_QWORD)
 	{
-		a.call(imm(m_accessors[spacesizep.space()].read_qword_masked));                 // call   read_qword_masked
-		a.mov(dstreg, eax);                                                             // mov    dstreg,eax
+		if (USE_THISCALL)
+			a.mov(ecx, imm(accessors.read_qword_masked.obj));
+		else
+			a.mov(dword_ptr(esp, 0), imm(accessors.read_qword_masked.obj));
+		a.call(imm(accessors.read_qword_masked.func));
+		if (USE_THISCALL)
+			a.sub(esp, 12);
+		a.mov(dstreg, eax);
 	}
 
 	// store low 32 bits
-	emit_mov_p32_r32(a, dstp, dstreg);                                                  // mov    dstp,dstreg
+	emit_mov_p32_r32(a, dstp, dstreg);
 
 	// 64-bit form stores upper 32 bits
 	if (inst.size() == 8)
 	{
-		// 1, 2, or 4-byte case
 		if (spacesizep.size() != SIZE_QWORD)
 		{
+			// 1, 2, or 4-byte case
 			if (dstp.is_memory())
-				a.mov(MABS(dstp.memory(4), 4), 0);                                      // mov   [dstp+4],0
+				a.mov(MABS(dstp.memory(4), 4), 0);
 			else if (dstp.is_int_register())
-				a.mov(MABS(m_reghi[dstp.ireg()], 4), 0);                                // mov   [reghi],0
+				a.mov(MABS(m_reghi[dstp.ireg()], 4), 0);
 		}
-
-		// 8-byte case
 		else
 		{
+			// 8-byte case
 			if (dstp.is_memory())
-				a.mov(MABS(dstp.memory(4)), edx);                                       // mov   [dstp+4],edx
+				a.mov(MABS(dstp.memory(4)), edx);
 			else if (dstp.is_int_register())
-				a.mov(MABS(m_reghi[dstp.ireg()]), edx);                                 // mov   [reghi],edx
+				a.mov(MABS(m_reghi[dstp.ireg()]), edx);
 		}
 	}
 }
@@ -3593,20 +4097,52 @@ void drcbe_x86::op_write(Assembler &a, const instruction &inst)
 	assert(spacesizep.is_size_space());
 
 	// set up a call to the write byte handler
+	auto const &accessors = m_memory_accessors[spacesizep.space()];
 	if (spacesizep.size() != SIZE_QWORD)
-		emit_mov_m32_p32(a, dword_ptr(esp, 8), srcp);                                   // mov    [esp+8],srcp
+		emit_mov_m32_p32(a, dword_ptr(esp, USE_THISCALL ? 4 : 8), srcp);
 	else
-		emit_mov_m64_p64(a, qword_ptr(esp, 8), srcp);                                   // mov    [esp+8],srcp
-	emit_mov_m32_p32(a, dword_ptr(esp, 4), addrp);                                      // mov    [esp+4],addrp
-	a.mov(dword_ptr(esp, 0), imm(m_space[spacesizep.space()]));                         // mov    [esp],space
+		emit_mov_m64_p64(a, qword_ptr(esp, USE_THISCALL ? 4 : 8), srcp);
+	emit_mov_m32_p32(a, dword_ptr(esp, USE_THISCALL ? 0 : 4), addrp);
 	if (spacesizep.size() == SIZE_BYTE)
-		a.call(imm(m_accessors[spacesizep.space()].write_byte));                        // call   write_byte
+	{
+		if (USE_THISCALL)
+			a.mov(ecx, imm(accessors.write_byte.obj));
+		else
+			a.mov(dword_ptr(esp, 0), imm(accessors.write_byte.obj));
+		a.call(imm(accessors.write_byte.func));
+		if (USE_THISCALL)
+			a.sub(esp, 8);
+	}
 	else if (spacesizep.size() == SIZE_WORD)
-		a.call(imm(m_accessors[spacesizep.space()].write_word));                        // call   write_word
+	{
+		if (USE_THISCALL)
+			a.mov(ecx, imm(accessors.write_word.obj));
+		else
+			a.mov(dword_ptr(esp, 0), imm(accessors.write_word.obj));
+		a.call(imm(accessors.write_word.func));
+		if (USE_THISCALL)
+			a.sub(esp, 8);
+	}
 	else if (spacesizep.size() == SIZE_DWORD)
-		a.call(imm(m_accessors[spacesizep.space()].write_dword));                       // call   write_dword
+	{
+		if (USE_THISCALL)
+			a.mov(ecx, imm(accessors.write_dword.obj));
+		else
+			a.mov(dword_ptr(esp, 0), imm(accessors.write_dword.obj));
+		a.call(imm(accessors.write_dword.func));
+		if (USE_THISCALL)
+			a.sub(esp, 8);
+	}
 	else if (spacesizep.size() == SIZE_QWORD)
-		a.call(imm(m_accessors[spacesizep.space()].write_qword));                       // call   write_qword
+	{
+		if (USE_THISCALL)
+			a.mov(ecx, imm(accessors.write_qword.obj));
+		else
+			a.mov(dword_ptr(esp, 0), imm(accessors.write_qword.obj));
+		a.call(imm(accessors.write_qword.func));
+		if (USE_THISCALL)
+			a.sub(esp, 12);
+	}
 }
 
 
@@ -3629,26 +4165,58 @@ void drcbe_x86::op_writem(Assembler &a, const instruction &inst)
 	assert(spacesizep.is_size_space());
 
 	// set up a call to the write byte handler
+	auto const &accessors = m_memory_accessors[spacesizep.space()];
 	if (spacesizep.size() != SIZE_QWORD)
 	{
-		emit_mov_m32_p32(a, dword_ptr(esp, 12), maskp);                                 // mov    [esp+12],maskp
-		emit_mov_m32_p32(a, dword_ptr(esp, 8), srcp);                                   // mov    [esp+8],srcp
+		emit_mov_m32_p32(a, dword_ptr(esp, USE_THISCALL ? 8 : 12), maskp);
+		emit_mov_m32_p32(a, dword_ptr(esp, USE_THISCALL ? 4 : 8), srcp);
 	}
 	else
 	{
-		emit_mov_m64_p64(a, qword_ptr(esp, 16), maskp);                                 // mov    [esp+16],maskp
-		emit_mov_m64_p64(a, qword_ptr(esp, 8), srcp);                                   // mov    [esp+8],srcp
+		emit_mov_m64_p64(a, qword_ptr(esp, USE_THISCALL ? 12 : 16), maskp);
+		emit_mov_m64_p64(a, qword_ptr(esp, USE_THISCALL ? 4 : 8), srcp);
 	}
-	emit_mov_m32_p32(a, dword_ptr(esp, 4), addrp);                                      // mov    [esp+4],addrp
-	a.mov(dword_ptr(esp, 0), imm(m_space[spacesizep.space()]));                         // mov    [esp],space
+	emit_mov_m32_p32(a, dword_ptr(esp, USE_THISCALL ? 0 : 4), addrp);
 	if (spacesizep.size() == SIZE_BYTE)
-		a.call(imm(m_accessors[spacesizep.space()].write_byte_masked));                 // call   write_byte_masked
+	{
+		if (USE_THISCALL)
+			a.mov(ecx, imm(accessors.write_byte_masked.obj));
+		else
+			a.mov(dword_ptr(esp, 0), imm(accessors.write_byte_masked.obj));
+		a.call(imm(accessors.write_byte_masked.func));
+		if (USE_THISCALL)
+			a.sub(esp, 12);
+	}
 	else if (spacesizep.size() == SIZE_WORD)
-		a.call(imm(m_accessors[spacesizep.space()].write_word_masked));                 // call   write_word_masked
+	{
+		if (USE_THISCALL)
+			a.mov(ecx, imm(accessors.write_word_masked.obj));
+		else
+			a.mov(dword_ptr(esp, 0), imm(accessors.write_word_masked.obj));
+		a.call(imm(accessors.write_word_masked.func));
+		if (USE_THISCALL)
+			a.sub(esp, 12);
+	}
 	else if (spacesizep.size() == SIZE_DWORD)
-		a.call(imm(m_accessors[spacesizep.space()].write_dword_masked));                // call   write_dword_masked
+	{
+		if (USE_THISCALL)
+			a.mov(ecx, imm(accessors.write_dword_masked.obj));
+		else
+			a.mov(dword_ptr(esp, 0), imm(accessors.write_dword_masked.obj));
+		a.call(imm(accessors.write_dword_masked.func));
+		if (USE_THISCALL)
+			a.sub(esp, 12);
+	}
 	else if (spacesizep.size() == SIZE_QWORD)
-		a.call(imm(m_accessors[spacesizep.space()].write_qword_masked));                // call   write_qword_masked
+	{
+		if (USE_THISCALL)
+			a.mov(ecx, imm(accessors.write_qword_masked.obj));
+		else
+			a.mov(dword_ptr(esp, 0), imm(accessors.write_qword_masked.obj));
+		a.call(imm(accessors.write_qword_masked.func));
+		if (USE_THISCALL)
+			a.sub(esp, 20);
+	}
 }
 
 
@@ -6066,18 +6634,22 @@ void drcbe_x86::op_fread(Assembler &a, const instruction &inst)
 	assert((1 << spacep.size()) == inst.size());
 
 	// set up a call to the read dword/qword handler
-	emit_mov_m32_p32(a, dword_ptr(esp, 4), addrp);                                      // mov    [esp+4],addrp
-	a.mov(dword_ptr(esp, 0), imm(m_space[spacep.space()]));                             // mov    [esp],space
-	if (inst.size() == 4)
-		a.call(imm(m_accessors[spacep.space()].read_dword));                            // call   read_dword
-	else if (inst.size() == 8)
-		a.call(imm(m_accessors[spacep.space()].read_qword));                            // call   read_qword
+	auto const &accessors = m_memory_accessors[spacep.space()];
+	auto const &accessor = (inst.size() == 4) ? accessors.read_dword : accessors.read_qword;
+	emit_mov_m32_p32(a, dword_ptr(esp, USE_THISCALL ? 0 : 4), addrp);
+	if (USE_THISCALL)
+		a.mov(ecx, imm(accessor.obj));
+	else
+		a.mov(dword_ptr(esp, 0), imm(accessor.obj));
+	a.call(imm(accessor.func));
+	if (USE_THISCALL)
+		a.sub(esp, 4);
 
 	// store result
 	if (inst.size() == 4)
-		emit_mov_p32_r32(a, dstp, eax);                                                 // mov   dstp,eax
+		emit_mov_p32_r32(a, dstp, eax);
 	else if (inst.size() == 8)
-		emit_mov_p64_r64(a, dstp, eax, edx);                                            // mov   dstp,edx:eax
+		emit_mov_p64_r64(a, dstp, eax, edx);
 }
 
 
@@ -6100,16 +6672,20 @@ void drcbe_x86::op_fwrite(Assembler &a, const instruction &inst)
 	assert((1 << spacep.size()) == inst.size());
 
 	// set up a call to the write dword/qword handler
+	auto const &accessors = m_memory_accessors[spacep.space()];
+	auto const &accessor = (inst.size() == 4) ? accessors.write_dword : accessors.write_qword;
 	if (inst.size() == 4)
-		emit_mov_m32_p32(a, dword_ptr(esp, 8), srcp);                                   // mov    [esp+8],srcp
+		emit_mov_m32_p32(a, dword_ptr(esp, USE_THISCALL ? 4 : 8), srcp);
 	else if (inst.size() == 8)
-		emit_mov_m64_p64(a, qword_ptr(esp, 8), srcp);                                   // mov    [esp+8],srcp
-	emit_mov_m32_p32(a, dword_ptr(esp, 4), addrp);                                      // mov    [esp+4],addrp
-	a.mov(dword_ptr(esp, 0), imm(m_space[spacep.space()]));                             // mov    [esp],space
-	if (inst.size() == 4)
-		a.call(imm(m_accessors[spacep.space()].write_dword));                           // call   write_dword
-	else if (inst.size() == 8)
-		a.call(imm(m_accessors[spacep.space()].write_qword));                           // call   write_qword
+		emit_mov_m64_p64(a, qword_ptr(esp, USE_THISCALL ? 4 : 8), srcp);
+	emit_mov_m32_p32(a, dword_ptr(esp, USE_THISCALL ? 0 : 4), addrp);
+	if (USE_THISCALL)
+		a.mov(ecx, imm(accessor.obj));
+	else
+		a.mov(dword_ptr(esp, 0), imm(accessor.obj));
+	a.call(imm(accessor.func));
+	if (USE_THISCALL)
+		a.sub(esp, (inst.size() == 4) ? 8 : 12);
 }
 
 
@@ -6667,149 +7243,19 @@ void drcbe_x86::op_icopyf(Assembler &a, const instruction &inst)
 	}
 }
 
+} // anonymous namespace
 
 
-//**************************************************************************
-//  MISCELLAENOUS FUNCTIONS
-//**************************************************************************
-
-//-------------------------------------------------
-//  dmulu - perform a double-wide unsigned multiply
-//-------------------------------------------------
-
-int drcbe_x86::dmulu(uint64_t &dstlo, uint64_t &dsthi, uint64_t src1, uint64_t src2, bool flags, bool halfmul_flags)
+std::unique_ptr<drcbe_interface> make_drcbe_x86(
+		drcuml_state &drcuml,
+		device_t &device,
+		drc_cache &cache,
+		uint32_t flags,
+		int modes,
+		int addrbits,
+		int ignorebits)
 {
-	// shortcut if we don't care about the high bits or the flags
-	if (&dstlo == &dsthi && flags == false)
-	{
-		dstlo = src1 * src2;
-		return 0;
-	}
-
-	// fetch source values
-	uint64_t a = src1;
-	uint64_t b = src2;
-	if (a == 0 || b == 0)
-	{
-		dsthi = dstlo = 0;
-		return FLAG_Z;
-	}
-
-	// compute high and low parts first
-	uint64_t lo = (uint64_t)(uint32_t)(a >> 0)  * (uint64_t)(uint32_t)(b >> 0);
-	uint64_t hi = (uint64_t)(uint32_t)(a >> 32) * (uint64_t)(uint32_t)(b >> 32);
-
-	// compute middle parts
-	uint64_t prevlo = lo;
-	uint64_t temp = (uint64_t)(uint32_t)(a >> 32)  * (uint64_t)(uint32_t)(b >> 0);
-	lo += temp << 32;
-	hi += (temp >> 32) + (lo < prevlo);
-
-	prevlo = lo;
-	temp = (uint64_t)(uint32_t)(a >> 0)  * (uint64_t)(uint32_t)(b >> 32);
-	lo += temp << 32;
-	hi += (temp >> 32) + (lo < prevlo);
-
-	// store the results
-	dsthi = hi;
-	dstlo = lo;
-
-	if (halfmul_flags)
-		return ((lo >> 60) & FLAG_S) | ((hi != 0) << 1) | ((dstlo == 0) << 2);
-
-	return ((hi >> 60) & FLAG_S) | ((hi != 0) << 1) | ((dsthi == 0 && dstlo == 0) << 2);
-}
-
-
-//-------------------------------------------------
-//  dmuls - perform a double-wide signed multiply
-//-------------------------------------------------
-
-int drcbe_x86::dmuls(uint64_t &dstlo, uint64_t &dsthi, int64_t src1, int64_t src2, bool flags, bool halfmul_flags)
-{
-	uint64_t lo, hi, prevlo;
-	uint64_t a, b, temp;
-
-	// shortcut if we don't care about the high bits or the flags
-	if (&dstlo == &dsthi && flags == false)
-	{
-		dstlo = src1 * src2;
-		return 0;
-	}
-
-	// fetch absolute source values
-	a = src1; if ((int64_t)a < 0) a = -a;
-	b = src2; if ((int64_t)b < 0) b = -b;
-	if (a == 0 || b == 0)
-	{
-		dsthi = dstlo = 0;
-		return FLAG_Z;
-	}
-
-	// compute high and low parts first
-	lo = (uint64_t)(uint32_t)(a >> 0)  * (uint64_t)(uint32_t)(b >> 0);
-	hi = (uint64_t)(uint32_t)(a >> 32) * (uint64_t)(uint32_t)(b >> 32);
-
-	// compute middle parts
-	prevlo = lo;
-	temp = (uint64_t)(uint32_t)(a >> 32)  * (uint64_t)(uint32_t)(b >> 0);
-	lo += temp << 32;
-	hi += (temp >> 32) + (lo < prevlo);
-
-	prevlo = lo;
-	temp = (uint64_t)(uint32_t)(a >> 0)  * (uint64_t)(uint32_t)(b >> 32);
-	lo += temp << 32;
-	hi += (temp >> 32) + (lo < prevlo);
-
-	// adjust for signage
-	if ((int64_t)(src1 ^ src2) < 0)
-	{
-		hi = ~hi + (lo == 0);
-		lo = ~lo + 1;
-	}
-
-	// store the results
-	dsthi = hi;
-	dstlo = lo;
-
-	if (halfmul_flags)
-		return ((lo >> 60) & FLAG_S) | ((hi != ((int64_t)lo >> 63)) << 1) | ((dstlo == 0) << 2);
-
-	return ((hi >> 60) & FLAG_S) | ((hi != ((int64_t)lo >> 63)) << 1) | ((dsthi == 0 && dstlo == 0) << 2);
-}
-
-
-//-------------------------------------------------
-//  ddivu - perform a double-wide unsigned divide
-//-------------------------------------------------
-
-int drcbe_x86::ddivu(uint64_t &dstlo, uint64_t &dsthi, uint64_t src1, uint64_t src2)
-{
-	// do nothing if src2 == 0
-	if (src2 == 0)
-		return FLAG_V;
-
-	dstlo = src1 / src2;
-	if (&dstlo != &dsthi)
-		dsthi = src1 % src2;
-	return ((dstlo == 0) << 2) | ((dstlo >> 60) & FLAG_S);
-}
-
-
-//-------------------------------------------------
-//  ddivs - perform a double-wide signed divide
-//-------------------------------------------------
-
-int drcbe_x86::ddivs(uint64_t &dstlo, uint64_t &dsthi, int64_t src1, int64_t src2)
-{
-	// do nothing if src2 == 0
-	if (src2 == 0)
-		return FLAG_V;
-
-	dstlo = src1 / src2;
-	if (&dstlo != &dsthi)
-		dsthi = src1 % src2;
-	return ((dstlo == 0) << 2) | ((dstlo >> 60) & FLAG_S);
+	return std::unique_ptr<drcbe_interface>(new drcbe_x86(drcuml, device, cache, flags, modes, addrbits, ignorebits));
 }
 
 } // namespace drc

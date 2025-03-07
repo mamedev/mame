@@ -107,8 +107,23 @@
 
 #include "emu.h"
 
+#include "bus/archimedes/econet/slot.h"
+#include "bus/archimedes/podule/slot.h"
+//#include "bus/archimedes/test/slot.h"
+#include "bus/centronics/ctronics.h"
+#include "bus/centronics/spjoy.h"
+#include "bus/econet/econet.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
+#include "bus/nscsi/devices.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/arm/arm.h"
-
+#include "formats/acorn_dsk.h"
+#include "formats/apd_dsk.h"
+#include "formats/jfd_dsk.h"
+#include "formats/st_dsk.h"
+#include "imagedev/floppy.h"
+#include "imagedev/harddriv.h"
 #include "machine/acorn_bmu.h"
 #include "machine/acorn_ioc.h"
 #include "machine/acorn_lc.h"
@@ -128,22 +143,7 @@
 #include "machine/wd_fdc.h"
 #include "machine/wd33c9x.h"
 #include "machine/z80scc.h"
-#include "bus/archimedes/econet/slot.h"
-#include "bus/archimedes/podule/slot.h"
-//#include "bus/archimedes/test/slot.h"
-#include "bus/centronics/ctronics.h"
-#include "bus/centronics/spjoy.h"
-#include "bus/econet/econet.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
-#include "bus/nscsi/devices.h"
-#include "bus/rs232/rs232.h"
-#include "imagedev/floppy.h"
-#include "imagedev/harddriv.h"
-#include "formats/acorn_dsk.h"
-#include "formats/apd_dsk.h"
-#include "formats/jfd_dsk.h"
-#include "formats/st_dsk.h"
+
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -269,6 +269,7 @@ public:
 	void ar225(machine_config &config);
 	void ar260(machine_config &config);
 	void aa3000(machine_config &config);
+	void av20dev(machine_config &config);
 
 protected:
 	virtual void machine_reset() override ATTR_COLD;
@@ -406,8 +407,11 @@ void aabase_state::init_r225()
 
 	cmos[0x30] = 0x20; // *Configure Autoboot On
 	cmos[0x36] = 0x01; // *Configure Netboot On
+	cmos[0x45] = 0x17; // *Configure FileSystem Ram
+	cmos[0x50] = 0x90; // *Configure Boot
 	cmos[0xb4] = 0x24; // *Configure Romboard 1 1 1024  *Configure Romboard 1 2 1024
 	cmos[0xc7] = 0x00; // *Configure Floppies 0
+	cmos[0xd0] = 0x08; // *Configure RamFSSize 256K
 }
 
 void aabase_state::init_flop()
@@ -517,6 +521,7 @@ void aa310_state::peripheral5_w(offs_t offset, u32 data)
 				// --x- ---- Floppy motor
 				// ---x ---- Side select
 				// ---- xxxx Floppy disc select
+		m_selected_floppy = nullptr;
 		if (!BIT(data, 0)) m_selected_floppy = m_floppy[0]->get_device();
 		if (!BIT(data, 1)) m_selected_floppy = m_floppy[1]->get_device();
 		if (!BIT(data, 2)) m_selected_floppy = m_floppy[2]->get_device();
@@ -602,7 +607,7 @@ void aa500_state::peripheral6_w(offs_t offset, u32 data)
 				// --x- ---- Motor on/off control
 				// ---x ---- Side Select
 				// ---- xxxx Floppy Disc select
-
+		m_selected_floppy = nullptr;
 		if (!BIT(data, 0)) m_selected_floppy = m_floppy[0]->get_device();
 		if (!BIT(data, 1)) m_selected_floppy = m_floppy[1]->get_device();
 		if (!BIT(data, 2)) m_selected_floppy = nullptr;
@@ -666,6 +671,7 @@ void aa680_state::peripheral5_w(offs_t offset, u32 data)
 				// ---- x--- Density
 				// ---- -x-- Not used
 				// ---- --xx Floppy disc select
+		m_selected_floppy = nullptr;
 		if (!BIT(data, 0)) m_selected_floppy = m_floppy[0]->get_device();
 		if (!BIT(data, 1)) m_selected_floppy = m_floppy[1]->get_device();
 
@@ -1480,6 +1486,26 @@ void aa310_state::ar260(machine_config &config)
 	m_podule[3]->set_default_option(nullptr);
 }
 
+void aa310_state::av20dev(machine_config &config)
+{
+	// This is an internal development machine based on a R225/A540, used for testing
+	// the new VIDC20 video controller.
+	aa540(config);
+
+	ARM_VIDC20(config.replace(), m_vidc, 24_MHz_XTAL);
+	m_vidc->set_screen("screen");
+	m_vidc->vblank().set(m_memc, FUNC(acorn_memc_device::vidrq_w));
+	m_vidc->sound_drq().set(m_memc, FUNC(acorn_memc_device::sndrq_w));
+
+	m_ram->set_default_size("4M").set_extra_options("8M,16M");
+
+	// expansion slots - 4-card backplane
+	m_podule[0]->set_default_option(nullptr);
+	m_podule[1]->set_default_option(nullptr);
+	m_podule[2]->set_default_option(nullptr);
+	m_podule[3]->set_default_option(nullptr);
+}
+
 void aa4000_state::aa3010(machine_config &config)
 {
 	aabase(config);
@@ -2004,6 +2030,18 @@ ROM_END
 
 #define rom_aa4000 rom_aa3020
 
+ROM_START( av20dev )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_SYSTEM_BIOS( 0, "320", "RISC OS 3.20 (10 Sep 1992)" )
+	ROMX_LOAD( "riscos_vidc20-2_0.rom", 0x000000, 0x80000, CRC(2cdaa10b) SHA1(172bc66124da68e0556878945bfc7e6611cde38f), ROM_BIOS(0) | ROM_SKIP(3) )
+	ROMX_LOAD( "riscos_vidc20-2_1.rom", 0x000001, 0x80000, CRC(2dd7404e) SHA1(a4be1d6874650815435a7c02fb3c681f04b05a4d), ROM_BIOS(0) | ROM_SKIP(3) )
+	ROMX_LOAD( "riscos_vidc20-2_2.rom", 0x000002, 0x80000, CRC(7e9e307a) SHA1(c64d6bda19aedf1e009da6537c019b02666155ff), ROM_BIOS(0) | ROM_SKIP(3) )
+	ROMX_LOAD( "riscos_vidc20-2_3.rom", 0x000003, 0x80000, CRC(dc59924c) SHA1(ebd0bdc07ef200640b39b90bd9f89c15ca396089), ROM_BIOS(0) | ROM_SKIP(3) )
+
+	ROM_REGION( 0x100, "i2cmem", ROMREGION_ERASE00 )
+	ROMX_LOAD( "cmos_riscos3.bin", 0x0000, 0x0100, CRC(96ed59b2) SHA1(9dab30b4c3305e1142819687889fca334b532679), ROM_BIOS(0) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -2023,6 +2061,7 @@ COMP( 1989, ar140,     aa310,  0,      ar140,   0,        aa310_state,  init_hd,
 COMP( 1990, aa540,     aa310,  0,      aa540,   0,        aa310_state,  init_scsi,  "Acorn Computers", "Archimedes 540",                         MACHINE_NOT_WORKING )
 COMP( 1990, ar225,     aa310,  0,      ar225,   0,        aa310_state,  init_r225,  "Acorn Computers", "Acorn R225",                             MACHINE_NOT_WORKING )
 COMP( 1990, ar260,     aa310,  0,      ar260,   0,        aa310_state,  init_scsi,  "Acorn Computers", "Acorn R260",                             MACHINE_NOT_WORKING )
+COMP( 1992, av20dev,   aa310,  0,      av20dev, 0,        aa310_state,  init_scsi,  "Acorn Computers", "Acorn V20 (Development)",                MACHINE_NOT_WORKING )
 COMP( 1991, aa5000,    0,      0,      aa5000,  0,        aa5000_state, init_ide,   "Acorn Computers", "Acorn A5000",                            MACHINE_NOT_WORKING )
 COMP( 1992, aa4,       aa5000, 0,      aa4,     0,        aa4_state,    init_a4,    "Acorn Computers", "Acorn A4",                               MACHINE_NOT_WORKING )
 COMP( 1992, aa3010,    0,      0,      aa3010,  aa3010,   aa4000_state, init_flop,  "Acorn Computers", "Acorn A3010",                            MACHINE_NOT_WORKING )

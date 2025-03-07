@@ -96,7 +96,7 @@ U.S. Navy (Japan 901012)                                           89625B-1   CA
 
 Nemo (World 901109)                                          1990  89624B-3   NM24B            IOB1  88622-C-5    CPS-B-15  DL-0411-10010  None
 Nemo (World 901130)                                                89624B-3   NM24B            IOB1  88622-C-5    CPS-B-15  DL-0411-10010  None
-Nemo (Japan 901120)                                                89622B-3   NM22B            LWIO  88622-C-5    CPS-B-15  DL-0411-10010  None
+Nemo (Japan 901120)                                                88622B-3   NM22B            LWIO  88622-C-5    CPS-B-15  DL-0411-10010  None
 Nemo (Japan 901120)                                                89625B-1   NM22B            IOB1  88622-C-5    CPS-B-15  DL-0411-10010  None
 
 Street Fighter II: The World Warrior (World 910129)          1991  90629B-2   STF29            IOB1  90632C-1     CPS-B-17  DL-0411-10012  C632
@@ -411,8 +411,8 @@ maps for every game.
 Known Bug List
 ==============
 CPS2:
-* CPS2 can do raster effects, certainly used by ssf2 (Cammy, DeeJay, T.Hawk levels),
-  msh (lava level, early in attract mode) and maybe others (xmcotaj, vsavj).
+* CPS2 can do raster effects, certainly used by ssf2 (Cammy, DeeJay, T.Hawk stages),
+  msh (Blackheart lava stage) and maybe others (xmcotaj, vsavj).
   IRQ4 is some sort of scanline interrupt used for that purpose.
 
 * Its unknown what CPS2_OBJ_BASE register (0x400000) does but it is not a object base
@@ -1853,6 +1853,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"3wondersu",   CPS_B_21_BT1, mapper_RT24B },
 	{"wonder3",     CPS_B_21_BT1, mapper_RT22B },   // equivalent to RT24B
 	{"3wondersb",   CPS_B_21_BT1, mapper_RT24B,  0x36, 0, 0, 0x88 }, // same as 3wonders except some registers are hard wired rather than written to
+	{"3wondersbi",  CPS_B_21_BT1, mapper_RT24B,  0x36, 0, 0, 0x88 }, // same as 3wonders except some registers are hard wired rather than written to
 	{"3wondersh",   HACK_B_2,     mapper_RT24B },  // one port is changed from 3wonders, and no protection
 	{"kod",         CPS_B_21_BT2, mapper_KD29B,  0x36, 0, 0x34 },
 	{"kodr1",       CPS_B_21_BT2, mapper_KD29B,  0x36, 0, 0x34 },

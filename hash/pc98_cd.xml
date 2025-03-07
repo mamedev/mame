@@ -16,7 +16,33 @@ license:CC0-1.0
 
 	-->
 
-<!--  OS disks  -->
+<!-- !Operating System disks -->
+
+	<software name="freebsd21" supported="no">
+		<!--
+		Origin: private dump (sampson)
+		<rom name="FreeBSD.bin" size="758814000" crc="b3b9fa4d" md5="2e3e4dbb8be25fc0f6c5e72c96bbfd46" sha1="60a27b813432d879bb8bb8f50b0203c289e5c242" />
+		-->
+		<!-- "XFree86 3.1.2 Beta(98) Version PL.0" printed on CD -->
+		<!-- "ISO 9660 / Rock Ridge extension" printed on CD -->
+		<!-- 07/1996 as per file timestamps -->
+		<description>FreeBSD(98) Nyuumon Kit (2.1.0R)</description>
+		<year>1996</year>
+		<publisher>Shuwa System</publisher>
+		<notes><![CDATA[
+boot.flp: cannot read CD-ROM device at install time
+atapi.flp: cannot read HDD device when partitioning
+Fumbles HDD detection at Heads greater than 8, Sectors greater than 17
+]]></notes>
+		<info name="alt_title" value="FreeBSD(98) 入門キット" />
+		<info name="serial" value="V008-SSUN" />
+		<info name="usage" value="Needs boot.flp or atapi.flp formatted with 2HC spec, use hidden command format /6 from MS-DOS then use rawrite.exe provided from disk" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="freebsd" sha1="9a1b03c223be4a1e12d7d99654f84f5d11edf75f" />
+			</diskarea>
+		</part>
+	</software>
 
 	<software name="os2warp3" supported="no">
 		<!--
@@ -484,7 +510,7 @@ Has [PC9801-86] DAC FIFO issues
 	</software>
 
 
-<!--  Game disks  -->
+<!-- !Game disks -->
 
 	<software name="aitd2">
 		<!--

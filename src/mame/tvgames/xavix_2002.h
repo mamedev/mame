@@ -120,8 +120,6 @@ public:
 	superxavix_i2c_bowl_state(const machine_config &mconfig, device_type type, const char *tag)
 		: superxavix_i2c_state(mconfig, type, tag)
 	{ }
-
-	int camera_r();
 };
 
 

@@ -143,6 +143,7 @@ we have no way of knowing which is the later/corrected version.
 #include "machine/eepromser.h"
 #include "sound/k054539.h"
 #include "sound/okim6295.h"
+
 #include "speaker.h"
 
 
@@ -154,7 +155,7 @@ uint16_t mystwarr_state::eeprom_r(offs_t offset, uint16_t mem_mask)
 		return ioport("IN1")->read();
 	}
 
-//  logerror("msb access to eeprom port\n");
+	//logerror("msb access to eeprom port\n");
 
 	return 0;
 }
@@ -166,8 +167,7 @@ void mystwarr_state::mweeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		ioport("EEPROMOUT")->write(data, 0xffff);
 	}
 
-//  logerror("unknown LSB write %x to eeprom\n", data);
-
+	//logerror("unknown LSB write %x to eeprom\n", data);
 }
 
 uint16_t mystwarr_state::dddeeprom_r(offs_t offset, uint16_t mem_mask)
@@ -198,14 +198,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(mystwarr_state::mystwarr_interrupt)
 
 	if (!(m_mw_irq_control & 0x01)) return;
 
-	if(scanline == 240)
+	if (scanline == 240)
 		m_maincpu->set_input_line(M68K_IRQ_2, HOLD_LINE);
 
-	if(scanline == 0)
+	if (scanline == 0)
 		m_maincpu->set_input_line(M68K_IRQ_4, HOLD_LINE);
 
 	/* writes to LSB of 0x410000 port and clears a work RAM flag, almost likely not really necessary. */
-//  m_maincpu->set_input_line(M68K_IRQ_6, HOLD_LINE);
+	//m_maincpu->set_input_line(M68K_IRQ_6, HOLD_LINE);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(mystwarr_state::metamrph_interrupt)
@@ -213,12 +213,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(mystwarr_state::metamrph_interrupt)
 	int scanline = param;
 
 	/* irq 4 has an irq routine in metamrph, but it's not really called */
-//  m_maincpu->set_input_line(M68K_IRQ_4, HOLD_LINE);
+	//m_maincpu->set_input_line(M68K_IRQ_4, HOLD_LINE);
 
-	if(scanline == 24)
+	if (scanline == 24)
 		m_maincpu->set_input_line(M68K_IRQ_6, HOLD_LINE);
 
-	if(scanline == 248)
+	if (scanline == 248)
 		if (m_k055673->k053246_is_irq_enabled()) m_maincpu->set_input_line(M68K_IRQ_5, HOLD_LINE);
 }
 
@@ -228,12 +228,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(mystwarr_state::mchamp_interrupt)
 
 	if (!(m_mw_irq_control & 0x40)) return;
 
-	if(scanline == 247)
+	if (scanline == 247)
 	{
 		if (m_k055673->k053246_is_irq_enabled()) m_maincpu->set_input_line(M68K_IRQ_6, HOLD_LINE);
 	}
 
-	if(scanline == 23)
+	if (scanline == 23)
 		m_maincpu->set_input_line(M68K_IRQ_2, HOLD_LINE);
 }
 
@@ -256,10 +256,9 @@ void mystwarr_state::irq_ack_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 	if (offset == 3 && ACCESSING_BITS_0_7)
 	{
-		m_mw_irq_control = data&0xff;
+		m_mw_irq_control = data & 0xff;
 
-//      if ((data &0xf0) != 0xd0) logerror("Unknown write to IRQ reg: %x\n", data);
-
+		//if ((data &0xf0) != 0xd0) logerror("Unknown write to IRQ reg: %x\n", data);
 	}
 }
 
@@ -280,7 +279,7 @@ void mystwarr_state::k053247_scattered_word_w(offs_t offset, uint16_t data, uint
 {
 	if (offset & 0x0078)
 	{
-//      osd_printf_debug("spr write %x to %x (PC=%x)\n", data, offset, m_maincpu->pc());
+		//osd_printf_debug("spr write %x to %x (PC=%x)\n", data, offset, m_maincpu->pc());
 		COMBINE_DATA(&m_spriteram[offset]);
 	}
 	else
@@ -440,7 +439,6 @@ void mystwarr_state::k053247_martchmp_word_w(offs_t offset, uint16_t data, uint1
 	else
 	{
 		offset = (offset & 0x0007) | ((offset & 0x1fe0) >> 2);
-
 		m_k055673->k053247_word_w(offset,data,mem_mask);
 	}
 }
@@ -461,7 +459,7 @@ void mystwarr_state::mccontrol_w(offs_t offset, uint16_t data, uint16_t mem_mask
 
 		m_k055673->k053246_set_objcha_line((data&0x04) ? ASSERT_LINE : CLEAR_LINE);
 	}
-//  else logerror("write %x to LSB of mccontrol\n", data);
+	//else logerror("write %x to LSB of mccontrol\n", data);
 }
 
 void mystwarr_state::mceeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -478,7 +476,7 @@ void mystwarr_state::mceeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		// bit 6 VINTEN
 		ioport("EEPROMOUT")->write(data, 0xffff);
 	}
-	//  logerror("unknown LSB write %x to eeprom\n", data);
+	//logerror("unknown LSB write %x to eeprom\n", data);
 }
 
 /* Martial Champion */
@@ -886,25 +884,21 @@ MACHINE_START_MEMBER(mystwarr_state,mystwarr)
 
 MACHINE_RESET_MEMBER(mystwarr_state,mystwarr)
 {
-	int i;
-
 	// soften chorus(chip 0 channel 0-3), boost voice(chip 0 channel 4-7)
-	for (i=0; i<=3; i++)
+	for (int i = 0; i <= 3; i++)
 	{
 		m_k054539_1->set_gain(i, 0.8);
 		m_k054539_1->set_gain(i+4, 2.0);
 	}
 
 	// soften percussions(chip 1 channel 0-7)
-	for (i=0; i<=7; i++) m_k054539_2->set_gain(i, 0.5);
+	for (int i = 0; i <= 7; i++) m_k054539_2->set_gain(i, 0.5);
 }
 
 MACHINE_RESET_MEMBER(mystwarr_state,dadandrn)
 {
-	int i;
-
 	// boost voice(chip 0 channel 4-7)
-	for (i=4; i<=7; i++) m_k054539_1->set_gain(i, 2.0);
+	for (int i = 4; i <= 7; i++) m_k054539_1->set_gain(i, 2.0);
 }
 
 MACHINE_START_MEMBER(mystwarr_state,viostormbl)
@@ -922,15 +916,13 @@ MACHINE_START_MEMBER(mystwarr_state,viostormbl)
 MACHINE_RESET_MEMBER(mystwarr_state,viostorm)
 {
 	if (m_k054539_1.found())
-		for (int i=4; i<=7; i++) m_k054539_1->set_gain(i, 2.0); // boost voice(chip 0 channel 4-7)
+		for (int i = 4; i <= 7; i++) m_k054539_1->set_gain(i, 2.0); // boost voice(chip 0 channel 4-7)
 }
 
 MACHINE_RESET_MEMBER(mystwarr_state,metamrph)
 {
-	int i;
-
 	// boost voice(chip 0 channel 4-7) and soften other channels
-	for (i=0; i<=3; i++)
+	for (int i = 0; i <= 3; i++)
 	{
 		m_k054539_1->set_gain(i,   0.8);
 		m_k054539_1->set_gain(i+4, 1.8);
@@ -941,18 +933,14 @@ MACHINE_RESET_MEMBER(mystwarr_state,metamrph)
 
 MACHINE_RESET_MEMBER(mystwarr_state,martchmp)
 {
-	int i;
-
 	// boost voice(chip 0 channel 4-7)
-	for (i=4; i<=7; i++) m_k054539_1->set_gain(i, 1.4);
+	for (int i = 4; i <= 7; i++) m_k054539_1->set_gain(i, 1.4);
 }
 
 MACHINE_RESET_MEMBER(mystwarr_state,gaiapols)
 {
-	int i;
-
 	// boost voice(chip 0 channel 5-7)
-	for (i=5; i<=7; i++) m_k054539_1->set_gain(i, 2.0);
+	for (int i = 5; i <= 7; i++) m_k054539_1->set_gain(i, 2.0);
 }
 
 
@@ -1125,7 +1113,7 @@ void mystwarr_state::dadandrn(machine_config &config)
 
 	m_k056832->set_tile_callback(FUNC(mystwarr_state::game5bpp_tile_callback));
 
-	m_k055673->set_sprite_callback(FUNC(mystwarr_state::gaiapols_sprite_callback));
+	m_k055673->set_sprite_callback(FUNC(mystwarr_state::mystwarr_sprite_callback));
 	m_k055673->set_config(K055673_LAYOUT_GX, -42, -22);
 }
 

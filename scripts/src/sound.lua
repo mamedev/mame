@@ -1123,8 +1123,6 @@ if (SOUNDS["TMS5220"]~=null) then
 		MAME_DIR .. "src/devices/sound/tms5220.cpp",
 		MAME_DIR .. "src/devices/sound/tms5220.h",
 		MAME_DIR .. "src/devices/sound/tms5110r.hxx",
-		MAME_DIR .. "src/devices/machine/spchrom.cpp",
-		MAME_DIR .. "src/devices/machine/spchrom.h",
 	}
 end
 
@@ -1764,5 +1762,17 @@ if (SOUNDS["UPD65043GFU01"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/upd65043gfu01.cpp",
 		MAME_DIR .. "src/devices/sound/upd65043gfu01.h",
+	}
+end
+
+---------------------------------------------------
+-- Casio GT155
+--@src/devices/sound/gt155.h,SOUNDS["GT155"] = true
+---------------------------------------------------
+
+if (SOUNDS["GT155"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/gt155.cpp",
+		MAME_DIR .. "src/devices/sound/gt155.h",
 	}
 end

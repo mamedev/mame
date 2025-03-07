@@ -425,12 +425,13 @@ test1f diagnostic hacks:
 #include "emu.h"
 #include "saturn.h"
 
+#include "saturn_cdb.h"
+#include "stvcd.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/scudsp/scudsp.h"
 #include "machine/nvram.h"
 #include "machine/smpc.h"
-#include "machine/stvcd.h"
-#include "saturn_cdb.h"
 
 #include "bus/saturn/bram.h"
 #include "bus/saturn/dram.h"
@@ -899,6 +900,7 @@ void sat_console_state::saturnus(machine_config &config)
 	SATURN_CDB(config, "saturn_cdb", 16000000);
 
 	SOFTWARE_LIST(config, "cd_list").set_original("saturn").set_filter("NTSC-U");
+	SOFTWARE_LIST(config, "photocd_list").set_compatible("photo_cd");
 
 	SATURN_CART_SLOT(config, "exp", saturn_cart, nullptr);
 	SOFTWARE_LIST(config, "cart_list").set_original("sat_cart");
@@ -912,6 +914,7 @@ void sat_console_state::saturneu(machine_config &config)
 	SATURN_CDB(config, "saturn_cdb", 16000000);
 
 	SOFTWARE_LIST(config, "cd_list").set_original("saturn").set_filter("PAL");
+	SOFTWARE_LIST(config, "photocd_list").set_compatible("photo_cd");
 
 	SATURN_CART_SLOT(config, "exp", saturn_cart, nullptr);
 	SOFTWARE_LIST(config, "cart_list").set_original("sat_cart");
@@ -925,6 +928,7 @@ void sat_console_state::saturnjp(machine_config &config)
 	SATURN_CDB(config, "saturn_cdb", 16000000);
 
 	SOFTWARE_LIST(config, "cd_list").set_original("saturn").set_filter("NTSC-J");
+	SOFTWARE_LIST(config, "photocd_list").set_compatible("photo_cd");
 
 	SATURN_CART_SLOT(config, "exp", saturn_cart, nullptr);
 	SOFTWARE_LIST(config, "cart_list").set_original("sat_cart");

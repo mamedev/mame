@@ -2,14 +2,15 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    drcbeut.c
-
     Utility functions for dynamic recompiling backends.
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "drcbeut.h"
+
+#include <algorithm>
+
 
 namespace drc {
 
@@ -199,11 +200,11 @@ bool drc_hash_table::set_codeptr(uint32_t mode, uint32_t pc, drccodeptr code)
 //  drc_map_variables - constructor
 //-------------------------------------------------
 
-drc_map_variables::drc_map_variables(drc_cache &cache, uint64_t uniquevalue)
-	: m_cache(cache),
-		m_uniquevalue(uniquevalue)
+drc_map_variables::drc_map_variables(drc_cache &cache, uint64_t uniquevalue) :
+	m_cache(cache),
+	m_uniquevalue(uniquevalue)
 {
-	memset(m_mapvalue, 0, sizeof(m_mapvalue));
+	std::fill(std::begin(m_mapvalue), std::end(m_mapvalue), 0);
 }
 
 
@@ -213,9 +214,6 @@ drc_map_variables::drc_map_variables(drc_cache &cache, uint64_t uniquevalue)
 
 drc_map_variables::~drc_map_variables()
 {
-	// must detach all items from the entry list so that the list object
-	// doesn't try to free them on exit
-	m_entry_list.detach_all();
 }
 
 
@@ -226,12 +224,11 @@ drc_map_variables::~drc_map_variables()
 void drc_map_variables::block_begin(drcuml_block &block)
 {
 	// release any remaining live entries
-	map_entry *entry;
-	while ((entry = m_entry_list.detach_head()) != nullptr)
-		m_cache.dealloc(entry, sizeof(*entry));
+	m_entry_list.clear();
+	m_entry_list.reserve(128);
 
 	// reset the variable values
-	memset(m_mapvalue, 0, sizeof(m_mapvalue));
+	std::fill(std::begin(m_mapvalue), std::end(m_mapvalue), 0);
 }
 
 
@@ -242,71 +239,80 @@ void drc_map_variables::block_begin(drcuml_block &block)
 void drc_map_variables::block_end(drcuml_block &block)
 {
 	// only process if we have data
-	if (m_entry_list.first() == nullptr)
+	if (m_entry_list.empty())
 		return;
 
 	// begin "code generation" aligned to an 8-byte boundary
-	drccodeptr *top = m_cache.begin_codegen(sizeof(uint64_t) + sizeof(uint32_t) + 2 * sizeof(uint32_t) * m_entry_list.count());
-	if (top == nullptr)
+	drccodeptr *top = m_cache.begin_codegen(sizeof(uint64_t) + sizeof(uint32_t) + 2 * sizeof(uint32_t) * m_entry_list.size());
+	if (!top)
 		block.abort();
-	uint32_t *dest = (uint32_t *)(((uintptr_t)*top + 7) & ~7);
+	auto dest = reinterpret_cast<uint32_t *>((uintptr_t(*top) + 7) & ~uintptr_t(7));
 
 	// store the cookie first
 	*(uint64_t *)dest = m_uniquevalue;
 	dest += 2;
 
 	// get the pointer to the first item and store an initial backwards offset
-	drccodeptr lastptr = m_entry_list.first()->m_codeptr;
-	*dest = (drccodeptr)dest - lastptr;
+	drccodeptr lastptr = m_entry_list.front().codeptr;
+	*dest = drccodeptr(dest) - lastptr;
 	dest++;
 
 	// now iterate over entries and store them
-	uint32_t curvalue[MAPVAR_COUNT] = { 0 };
-	bool changed[MAPVAR_COUNT] = { false };
-	for (map_entry *entry = m_entry_list.first(); entry != nullptr; entry = entry->next())
+	std::array<uint32_t, MAPVAR_COUNT> curvalue;
+	std::array<bool, MAPVAR_COUNT> changed;
+	std::fill(curvalue.begin(), curvalue.end(), 0);
+	std::fill(changed.begin(), changed.end(), false);
+	auto entry = m_entry_list.begin();
+	while (m_entry_list.end() != entry)
 	{
 		// update the current value of the variable and detect changes
-		if (curvalue[entry->m_mapvar] != entry->m_newval)
+		if (curvalue[entry->mapvar] != entry->newval)
 		{
-			curvalue[entry->m_mapvar] = entry->m_newval;
-			changed[entry->m_mapvar] = true;
+			curvalue[entry->mapvar] = entry->newval;
+			changed[entry->mapvar] = true;
 		}
 
 		// if the next code pointer is different, or if we're at the end, flush changes
-		if (entry->next() == nullptr || entry->next()->m_codeptr != entry->m_codeptr)
+		auto const next = std::next(entry);
+		if ((m_entry_list.end() == next) || (next->codeptr != entry->codeptr))
 		{
 			// build a mask of changed variables
 			int numchanged = 0;
 			uint32_t varmask = 0;
 			for (int varnum = 0; varnum < std::size(changed); varnum++)
+			{
 				if (changed[varnum])
 				{
 					changed[varnum] = false;
 					varmask |= 1 << varnum;
 					numchanged++;
 				}
+			}
 
 			// if nothing really changed, skip it
-			if (numchanged == 0)
-				continue;
-
-			// first word is a code delta plus mask of changed variables
-			uint32_t codedelta = entry->m_codeptr - lastptr;
-			while (codedelta > 0xffff)
+			if (numchanged)
 			{
-				*dest++ = 0xffff << 16;
-				codedelta -= 0xffff;
+				// first word is a code delta plus mask of changed variables
+				uint32_t codedelta = entry->codeptr - lastptr;
+				while (codedelta > 0xffff)
+				{
+					*dest++ = uint32_t(0xffff) << 16;
+					codedelta -= 0xffff;
+				}
+				*dest++ = (codedelta << 16) | (varmask << 4) | numchanged;
+
+				// now output updated variable values
+				for (int varnum = 0; varnum < changed.size(); varnum++)
+				{
+					if (BIT(varmask, varnum))
+						*dest++ = curvalue[varnum];
+				}
+
+				// remember our lastptr
+				lastptr = entry->codeptr;
 			}
-			*dest++ = (codedelta << 16) | (varmask << 4) | numchanged;
-
-			// now output updated variable values
-			for (int varnum = 0; varnum < std::size(changed); varnum++)
-				if ((varmask >> varnum) & 1)
-					*dest++ = curvalue[varnum];
-
-			// remember our lastptr
-			lastptr = entry->m_codeptr;
 		}
+		entry = next;
 	}
 
 	// add a terminator
@@ -325,21 +331,17 @@ void drc_map_variables::block_end(drcuml_block &block)
 
 void drc_map_variables::set_value(drccodeptr codebase, uint32_t mapvar, uint32_t newvalue)
 {
-	assert(mapvar >= MAPVAR_M0 && mapvar < MAPVAR_END);
+	assert((mapvar >= MAPVAR_M0) && (mapvar < MAPVAR_END));
 
 	// if this value isn't different, skip it
 	if (m_mapvalue[mapvar - MAPVAR_M0] == newvalue)
 		return;
 
 	// allocate a new entry and fill it in
-	map_entry *entry = (map_entry *)m_cache.alloc(sizeof(*entry));
-	entry->m_next = nullptr;
-	entry->m_codeptr = codebase;
-	entry->m_mapvar = mapvar - MAPVAR_M0;
-	entry->m_newval = newvalue;
-
-	// hook us into the end of the list
-	m_entry_list.append(*entry);
+	auto &entry = m_entry_list.emplace_back();
+	entry.codeptr = codebase;
+	entry.mapvar = mapvar - MAPVAR_M0;
+	entry.newval = newvalue;
 
 	// update our state in the table as well
 	m_mapvalue[mapvar - MAPVAR_M0] = newvalue;
@@ -353,27 +355,27 @@ void drc_map_variables::set_value(drccodeptr codebase, uint32_t mapvar, uint32_t
 
 uint32_t drc_map_variables::get_value(drccodeptr codebase, uint32_t mapvar) const
 {
-	assert(mapvar >= MAPVAR_M0 && mapvar < MAPVAR_END);
+	assert((mapvar >= MAPVAR_M0) && (mapvar < MAPVAR_END));
 	mapvar -= MAPVAR_M0;
 
 	// get an aligned pointer to start scanning
-	uint64_t *curscan = (uint64_t *)(((uintptr_t)codebase | 7) + 1);
-	uint64_t *endscan = (uint64_t *)m_cache.top();
+	auto curscan = reinterpret_cast<uint64_t const *>((uintptr_t(codebase) | 7) + 1);
+	auto const endscan = reinterpret_cast<uint64_t const *>(m_cache.top());
 
 	// look for the signature
-	while (curscan < endscan && *curscan++ != m_uniquevalue) {};
+	while ((curscan < endscan) && (*curscan++ != m_uniquevalue)) { }
 	if (curscan >= endscan)
 		return 0;
 
 	// switch to 32-bit pointers for processing the rest
-	uint32_t *data = (uint32_t *)curscan;
+	auto data = reinterpret_cast<uint32_t const *>(curscan);
 
 	// first get the 32-bit starting offset to the code
 	drccodeptr curcode = (drccodeptr)data - *data;
 	data++;
 
 	// now loop until we advance past our target
-	uint32_t varmask = 0x10 << mapvar;
+	uint32_t const varmask = 0x10 << mapvar;
 	uint32_t result = 0;
 	while (true)
 	{
@@ -388,7 +390,7 @@ uint32_t drc_map_variables::get_value(drccodeptr codebase, uint32_t mapvar) cons
 			break;
 
 		// if our mapvar has changed, process this word
-		if ((controlword & varmask) != 0)
+		if (controlword & varmask)
 		{
 			// count how many words precede the one we care about
 			int dataoffs = 0;
@@ -405,11 +407,6 @@ uint32_t drc_map_variables::get_value(drccodeptr codebase, uint32_t mapvar) cons
 	if (LOG_RECOVER)
 		printf("recover %d @ %p = %08X\n", mapvar, codebase, result);
 	return result;
-}
-
-uint32_t drc_map_variables::static_get_value(drc_map_variables &map, drccodeptr codebase, uint32_t mapvar)
-{
-	return map.get_value(codebase, mapvar);
 }
 
 
@@ -435,9 +432,9 @@ uint32_t drc_map_variables::get_last_value(uint32_t mapvar)
 //  drc_label_list - constructor
 //-------------------------------------------------
 
-drc_label_list::drc_label_list(drc_cache &cache)
-	: m_cache(cache),
-		m_oob_callback_delegate(&drc_label_list::oob_callback, this)
+drc_label_list::drc_label_list(drc_cache &cache) :
+	m_cache(cache),
+	m_oob_callback_delegate(&drc_label_list::oob_callback, this)
 {
 }
 
@@ -448,9 +445,6 @@ drc_label_list::drc_label_list(drc_cache &cache)
 
 drc_label_list::~drc_label_list()
 {
-	// must detach all items from the entry list so that the list object
-	// doesn't try to free them on exit
-	m_list.detach_all();
 }
 
 
@@ -475,12 +469,7 @@ void drc_label_list::block_end(drcuml_block &block)
 	assert(!m_cache.generating_code());
 
 	// free all of the pending fixup requests
-	label_fixup *fixup;
-	while ((fixup = m_fixup_list.detach_head()) != nullptr)
-	{
-		fixup->~label_fixup();
-		m_cache.dealloc(fixup, sizeof(*fixup));
-	}
+	m_free_fixups.splice(m_free_fixups.begin(), m_fixup_list);
 
 	// make sure the label list is clear, and fatalerror if we missed anything
 	reset(true);
@@ -495,18 +484,22 @@ void drc_label_list::block_end(drcuml_block &block)
 
 drccodeptr drc_label_list::get_codeptr(uml::code_label label, drc_label_fixup_delegate const &callback, void *param)
 {
-	label_entry *const curlabel = find_or_allocate(label);
+	label_entry &curlabel = find_or_allocate(label);
 
 	// if no code pointer, request an OOB callback
-	if (!curlabel->m_codeptr && !callback.isnull())
+	if (!curlabel.codeptr && !callback.isnull())
 	{
-		label_fixup *fixup = reinterpret_cast<label_fixup *>(m_cache.alloc(sizeof(*fixup)));
-		new (fixup) label_fixup{ nullptr, curlabel, callback };
-		m_fixup_list.append(*fixup);
-		m_cache.request_oob_codegen(drc_oob_delegate(m_oob_callback_delegate), fixup, param);
+		label_fixup_list::iterator fixup = m_free_fixups.begin();
+		if (m_free_fixups.end() == fixup)
+			fixup = m_fixup_list.emplace(m_fixup_list.end());
+		else
+			m_fixup_list.splice(m_fixup_list.end(), m_free_fixups, fixup);
+		fixup->label = &curlabel;
+		fixup->callback = callback;
+		m_cache.request_oob_codegen(drc_oob_delegate(m_oob_callback_delegate), &*fixup, param);
 	}
 
-	return curlabel->m_codeptr;
+	return curlabel.codeptr;
 }
 
 
@@ -517,9 +510,9 @@ drccodeptr drc_label_list::get_codeptr(uml::code_label label, drc_label_fixup_de
 void drc_label_list::set_codeptr(uml::code_label label, drccodeptr codeptr)
 {
 	// set the code pointer
-	label_entry *curlabel = find_or_allocate(label);
-	assert(curlabel->m_codeptr == nullptr);
-	curlabel->m_codeptr = codeptr;
+	label_entry &curlabel = find_or_allocate(label);
+	assert(!curlabel.codeptr);
+	curlabel.codeptr = codeptr;
 }
 
 
@@ -531,15 +524,14 @@ void drc_label_list::set_codeptr(uml::code_label label, drccodeptr codeptr)
 void drc_label_list::reset(bool fatal_on_leftovers)
 {
 	// loop until out of labels
-	label_entry *curlabel;
-	while ((curlabel = m_list.detach_head()) != nullptr)
+	while (!m_list.empty())
 	{
 		// fatal if we were a leftover
-		if (fatal_on_leftovers && curlabel->m_codeptr == nullptr)
-			fatalerror("Label %08X never defined!\n", curlabel->m_label.label());
+		if (fatal_on_leftovers && !m_list.front().codeptr)
+			throw emu_fatalerror("Label %08X never defined!\n", m_list.front().label.label());
 
 		// free the label
-		m_cache.dealloc(curlabel, sizeof(*curlabel));
+		m_free_labels.splice(m_free_labels.begin(), m_list, m_list.begin());
 	}
 }
 
@@ -549,23 +541,24 @@ void drc_label_list::reset(bool fatal_on_leftovers)
 //  allocate a new one if not found
 //-------------------------------------------------
 
-drc_label_list::label_entry *drc_label_list::find_or_allocate(uml::code_label label)
+drc_label_list::label_entry &drc_label_list::find_or_allocate(uml::code_label label)
 {
 	// find the label, or else allocate a new one
-	label_entry *curlabel;
-	for (curlabel = m_list.first(); curlabel != nullptr; curlabel = curlabel->next())
-		if (curlabel->m_label == label)
-			break;
+	for (auto curlabel = m_list.begin(); m_list.end() != curlabel; ++curlabel)
+	{
+		if (curlabel->label == label)
+			return *curlabel;
+	}
 
 	// if none found, allocate
-	if (curlabel == nullptr)
-	{
-		curlabel = (label_entry *)m_cache.alloc(sizeof(*curlabel));
-		curlabel->m_label = label;
-		curlabel->m_codeptr = nullptr;
-		m_list.append(*curlabel);
-	}
-	return curlabel;
+	auto newlabel = m_free_labels.begin();
+	if (m_free_labels.end() == newlabel)
+		newlabel = m_list.emplace(m_list.end());
+	else
+		m_list.splice(m_list.end(), m_free_labels, newlabel);
+	newlabel->label = label;
+	newlabel->codeptr = nullptr;
+	return *newlabel;
 }
 
 
@@ -577,7 +570,7 @@ drc_label_list::label_entry *drc_label_list::find_or_allocate(uml::code_label la
 void drc_label_list::oob_callback(drccodeptr *codeptr, void *param1, void *param2)
 {
 	label_fixup *fixup = reinterpret_cast<label_fixup *>(param1);
-	fixup->m_callback(param2, fixup->m_label->m_codeptr);
+	fixup->callback(param2, fixup->label->codeptr);
 }
 
 
@@ -590,7 +583,7 @@ void drc_label_list::oob_callback(drccodeptr *codeptr, void *param1, void *param
 //  set - bind to address space
 //-------------------------------------------------
 
-void resolved_memory_accessors::set(address_space &space) noexcept
+void resolved_memory_accessors::set(address_space &space)
 {
 	read_byte          .set(space, static_cast<u8  (address_space::*)(offs_t)     >(&address_space::read_byte));
 	read_byte_masked   .set(space, static_cast<u8  (address_space::*)(offs_t, u8) >(&address_space::read_byte));
@@ -609,6 +602,15 @@ void resolved_memory_accessors::set(address_space &space) noexcept
 	write_dword_masked .set(space, static_cast<void (address_space::*)(offs_t, u32, u32)>(&address_space::write_dword));
 	write_qword        .set(space, static_cast<void (address_space::*)(offs_t, u64)     >(&address_space::write_qword));
 	write_qword_masked .set(space, static_cast<void (address_space::*)(offs_t, u64, u64)>(&address_space::write_qword));
+
+	if (
+			!read_byte  || !read_byte_masked  || !write_byte  || !write_byte_masked  ||
+			!read_word  || !read_word_masked  || !write_word  || !write_word_masked  ||
+			!read_dword || !read_dword_masked || !write_dword || !write_dword_masked ||
+			!read_qword || !read_qword_masked || !write_qword || !write_qword_masked)
+	{
+		throw emu_fatalerror("Error resolving address space accessor member functions!\n");
+	}
 }
 
 } // namespace drc

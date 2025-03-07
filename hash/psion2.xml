@@ -169,9 +169,16 @@ Undumped datapack:
 		<year>1989</year>
 		<publisher>Maritek</publisher>
 		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
-		<part name="cart" interface="psion_pack">
+		<part name="cart1" interface="psion_pack">
+			<feature name="part_id" value="Coastal Procedures - Slot C" />
 			<dataarea name="rom" size="25888">
 				<rom name="coastal31.opk" size="25888" crc="87b055bf" sha1="1ca616d5a31a6589de7cb206cba84054ee921627" />
+			</dataarea>
+		</part>
+		<part name="cart2" interface="psion_pack">
+			<feature name="part_id" value="Coastal Data - Slot B" />
+			<dataarea name="rom" size="6729">
+				<rom name="coastal31d.opk" size="6729" crc="845e7718" sha1="589b5d697856489648b400fbf8f8c0885187c1d1" />
 			</dataarea>
 		</part>
 	</software>
@@ -209,6 +216,25 @@ Undumped datapack:
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="65537">
 				<rom name="spllchk2.opk" size="65537" crc="8d23cb58" sha1="1cdf200e3361fd6dd4a64d56fc94397002084cfb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cutdata">
+		<description>Cutdata</description>
+		<year>1990</year>
+		<publisher>Stellram</publisher>
+		<sharedfeat name="compatibility" value="XP"/>
+		<part name="cart1" interface="psion_pack">
+			<feature name="part_id" value="Prog v3.57" />
+			<dataarea name="rom" size="31956">
+				<rom name="cutdataprog357.opk" size="31956" crc="ee29a2c7" sha1="20eab9a59117d9f6331c95d2f5464d3db0c9ccb3" />
+			</dataarea>
+		</part>
+		<part name="cart2" interface="psion_pack">
+			<feature name="part_id" value="File v1.20" />
+			<dataarea name="rom" size="30634">
+				<rom name="cutdatafile12.opk" size="30634" crc="1891900e" sha1="6a19e6310dd62a405ab1545ae2daa5e45ccd5a63" />
 			</dataarea>
 		</part>
 	</software>
@@ -261,6 +287,30 @@ Undumped datapack:
 		</part>
 	</software>
 
+	<software name="demopack">
+		<description>Demo Pack</description>
+		<year>198?</year>
+		<publisher>Psion</publisher>
+		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="14201">
+				<rom name="demopack.opk" size="14201" crc="2b215ca3" sha1="5f38050023a714a67602fd41ac032356f18d6ef3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="easybar">
+		<description>Easybar Plus</description>
+		<year>1993</year>
+		<publisher>Paradigm Technology</publisher>
+		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="16367">
+				<rom name="easybar.opk" size="16367" crc="df42fd06" sha1="82d9c2db3657a12ac37e9f6892135905c8eca96a" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ferreth">
 		<description>Ferret Helper v5.1N</description>
 		<year>198?</year>
@@ -305,6 +355,18 @@ Undumped datapack:
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16194">
 				<rom name="filemaster3762.opk" size="16194" crc="f626ed8a" sha1="08d70630ecf3b0160ee7a5c509bece1e1cc5bc39" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fm45">
+		<description>FileMaster v4.5</description>
+		<year>1989</year>
+		<publisher>Widget Software</publisher>
+		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="15939">
+				<rom name="filemaster45.opk" size="15939" crc="b2a2e502" sha1="74a5870d93d81d1be29ff1b1a0823a1486c6835d" />
 			</dataarea>
 		</part>
 	</software>
@@ -468,10 +530,34 @@ Undumped datapack:
 		</part>
 	</software>
 
-	<software name="fpakdriv">
+	<software name="flashpak12" cloneof="flashpak">
+		<description>Flash Datapak Formatter v1.2</description>
+		<year>1990</year>
+		<publisher>Psion</publisher>
+		<sharedfeat name="compatibility" value="XP,LZ"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="6701">
+				<rom name="flashpak12.opk" size="6701" crc="9bdebeb1" sha1="87a16a0b6b83fe42807e48c963f57676c28ecc70" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flashpak17" cloneof="flashpak">
+		<description>Flash Datapak Formatter v1.7</description>
+		<year>1990</year>
+		<publisher>Psion</publisher>
+		<sharedfeat name="compatibility" value="XP,LZ"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="7128">
+				<rom name="flashpak17.opk" size="7128" crc="28fc3a76" sha1="35ec116aed32a3bb180c1282a19e5b83f843f8c6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flashpak">
 		<!-- A datapak with the flashpak driver, which can be used to reformat a flashpak in the other slot. -->
 		<description>Flash Datapak Formatter v1.9</description>
-		<year>198?</year>
+		<year>1993</year>
 		<publisher>Psion</publisher>
 		<sharedfeat name="compatibility" value="XP,LZ"/>
 		<part name="cart" interface="psion_pack">
@@ -579,6 +665,18 @@ Undumped datapack:
 		</part>
 	</software>
 
+	<software name="hangman">
+		<description>Hangman</description>
+		<year>198?</year>
+		<publisher>Global Software</publisher>
+		<sharedfeat name="compatibility" value="XP"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="16026">
+				<rom name="hangman.opk" size="16026" crc="21396632" sha1="fb59178ee628736c18aaf127293a01e83252ca04" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="schip12">
 		<description>Harvester Superchip v1.2</description>
 		<year>1987</year>
@@ -611,6 +709,18 @@ Undumped datapack:
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="40884">
 				<rom name="hvsc12i.opk" size="40884" crc="55b1083b" sha1="e4b1cd281a10afb6d2c971331c64aa565a7f2c17" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hbgames">
+		<description>HB Games Pack</description>
+		<year>1990</year>
+		<publisher>HB Consultants</publisher>
+		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="11987">
+				<rom name="hbgames.opk" size="11987" crc="ae53057c" sha1="99c5d3bf249c0f4a7cbe4b7abf7467fdfce39455" />
 			</dataarea>
 		</part>
 	</software>
@@ -687,6 +797,18 @@ Undumped datapack:
 		</part>
 	</software>
 
+	<software name="looksat">
+		<description>Looksat</description>
+		<year>19??</year>
+		<publisher>BroadOak Computing</publisher>
+		<sharedfeat name="compatibility" value="CM,XP"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="4094">
+				<rom name="looksat.opk" size="4094" crc="80290022" sha1="3df6f96576444779e8bcb0ca32fff80bdf553014" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="maths">
 		<description>Maths Pack</description>
 		<year>1986</year>
@@ -695,6 +817,18 @@ Undumped datapack:
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16089">
 				<rom name="maths.opk" size="16089" crc="8cce0583" sha1="9b847068e2f6af575b1ba760245007f436bdf1dd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="murray">
+		<description>Murray Citi Rate v1.00</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="CM,XP"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="89721">
+				<rom name="murray1.opk" size="89721" crc="bbc3d015" sha1="1db30a0b4aa29745b4b7cca162e2aba8bbf33356" />
 			</dataarea>
 		</part>
 	</software>
@@ -723,6 +857,18 @@ Undumped datapack:
 		</part>
 	</software>
 
+	<software name="obase">
+		<description>OBase</description>
+		<year>19??</year>
+		<publisher>Transform</publisher>
+		<sharedfeat name="compatibility" value="CM,XP"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="32754">
+				<rom name="obase.opk" size="32754" crc="2aa4c542" sha1="6fdf3a465d2291dd4bd9b0ac911d5c275e214c60" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="persfin">
 		<description>Personal Finance</description>
 		<year>1987</year>
@@ -731,6 +877,18 @@ Undumped datapack:
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16179">
 				<rom name="persfin.opk" size="16179" crc="2fb0f433" sha1="21bedf9bd3de307650c9b6cad3f11dc9094d0a92" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="persfin2">
+		<description>Personal Finance II</description>
+		<year>19??</year>
+		<publisher>Willow Enterprises</publisher>
+		<sharedfeat name="compatibility" value="CM,XP"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="32769">
+				<rom name="persfin2.opk" size="32769" crc="56526806" sha1="cedc06e015e2b54418b1a1b66f97c00ddf5763c8" />
 			</dataarea>
 		</part>
 	</software>
@@ -756,6 +914,18 @@ Undumped datapack:
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16388">
 				<rom name="purfin.opk" size="16388" crc="0f7c25df" sha1="3c04b2273029cf0df4c7535c78e36afea06b52c4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prakenpr">
+		<description>Prakpak English Practice I</description>
+		<year>1988</year>
+		<publisher>Mackay Language Software</publisher>
+		<sharedfeat name="compatibility" value="CM,XP"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="32053">
+				<rom name="prakpake.opk" size="32053" crc="97e91085" sha1="db17ead54ce54660dadf60ddb0fec9feb6cd4359" />
 			</dataarea>
 		</part>
 	</software>
@@ -942,6 +1112,25 @@ Undumped datapack:
 		</part>
 	</software>
 
+	<software name="tidal30">
+		<description>Tidal Height</description>
+		<year>1992</year>
+		<publisher>Maritek</publisher>
+		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
+		<part name="cart1" interface="psion_pack">
+			<feature name="part_id" value="Tidal Procedures - Slot C" />
+			<dataarea name="rom" size="10864">
+				<rom name="tidal30.opk" size="10864" crc="a06dea13" sha1="0734182ada140a3bbdee826f66ae618934384980" />
+			</dataarea>
+		</part>
+		<part name="cart2" interface="psion_pack">
+			<feature name="part_id" value="Tidal Data - Slot B" />
+			<dataarea name="rom" size="13976">
+				<rom name="tidal30d.opk" size="13976" crc="f5f0a14a" sha1="e4c421b811230313786ab2c8e5653bbae4b66a74" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="topfin21">
 		<description>Top Finance v2.1</description>
 		<year>1988</year>
@@ -962,6 +1151,18 @@ Undumped datapack:
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16350">
 				<rom name="topfin22.opk" size="16350" crc="8bfbfc3f" sha1="add342d0125896f802908bd6b6a13aa13a942311" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="topo">
+		<description>Topo Set</description>
+		<year>19??</year>
+		<publisher>Sokkia</publisher>
+		<sharedfeat name="compatibility" value="CM,XP"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="59507">
+				<rom name="topo.opk" size="59507" crc="18172df8" sha1="78a18e1c2abeadeb66f3b08eb68a1630ad166021" />
 			</dataarea>
 		</part>
 	</software>
@@ -1000,7 +1201,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="65535">
-				<rom name="travel20.opk" size="65535" crc="2f00fb63" sha1="ec1898eb489ba01c137d712d9dd604f4da699124" />
+				<rom name="travel20.opk" size="65535" crc="3d957211" sha1="b2830639d7e8c457007d60d3fa8d9ab1da60e3e1" />
 			</dataarea>
 		</part>
 	</software>
@@ -1123,6 +1324,19 @@ Undumped datapack:
 		</part>
 	</software>
 
+	<software name="intelkey" supported="no">
+		<!-- Driver and software to control the Intellikey RAK device (which does not have built-in ROM software). -->
+		<description>Intellikey RAK</description>
+		<year>1992</year>
+		<publisher>Intellikey Corp.</publisher>
+		<sharedfeat name="compatibility" value="CM,XP"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="6414">
+				<rom name="intelkey.opk" size="6414" crc="317ebafa" sha1="d75323c3686ce661004d93584d1998f0dc41288a" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="plink22f" supported="no">
 		<!-- French language software for use with versions of the Paralink that did not have the software built in. -->
 		<description>Paralink 2.2 (French)</description>
@@ -1178,6 +1392,19 @@ Undumped datapack:
 		</part>
 	</software>
 
+	<software name="sartech" supported="no">
+		<!-- Software used for controlling the Arg5410 Beacon Tester (which does not have built-in ROM software). -->
+		<description>Sartech Arg5410 Beacon Tester</description>
+		<year>1994</year>
+		<publisher>Sartech</publisher>
+		<sharedfeat name="compatibility" value="LZ"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="28908">
+				<rom name="sartech.opk" size="28908" crc="453addfe" sha1="75b6c940486f2bffbea5d152c641eb764415d38a" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sigset20">
 		<!-- Software used for programming type 141 Traffic Light Controllers -->
 		<!-- which are connected through the Comms Link. -->
@@ -1192,16 +1419,393 @@ Undumped datapack:
 		</part>
 	</software>
 
-	<software name="sonylisa">
+	<software name="sony011a" supported="no">
+		<!-- EVR software for the CCD-V88E / CCD-F335E / CCD-F250E / CCD-TR55E -->
+		<description>Sony EVR Alignment v1.1a</description>
+		<year>199?</year>
+		<publisher>Sony</publisher>
+		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="28815">
+				<rom name="sony011a.opk" size="28815" crc="8d933146" sha1="08c7407afd696473a902ff14da0846efa954e88a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sony011b" supported="no">
+		<!-- EVR software for the CCD-V88E / CCD-F335E / CCD-F250E / CCD-TR55E -->
+		<description>Sony EVR Alignment v1.1b</description>
+		<year>199?</year>
+		<publisher>Sony</publisher>
+		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="28744">
+				<rom name="sony011b.opk" size="28744" crc="d84a7a31" sha1="ee080f7f142fae6628a4d0581ae079c3a5dc2d3c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sony021" supported="no">
+		<!-- EVR software for the CCD-V900E / CCD-V5000E / CCD-F380E / CCD-F370E / CCD-F350E / CCD-F355E -->
+		<description>Sony EVR Alignment v2.1</description>
+		<year>199?</year>
+		<publisher>Sony</publisher>
+		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="27679">
+				<rom name="sony021.opk" size="27679" crc="6fbc089f" sha1="3ab25742170cc5565a4758cc19721cd7b6394095" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sony030a" supported="no">
 		<!-- Software to control the Sony Lisa-1 device (which does not have built-in ROM software). -->
-		<!-- This pack image is for use with TR45E and TR75E camcorders. -->
-		<description>Sony Lisa-1 v3.0</description>
-		<year>198?</year>
+		<!-- EVR software for the CCD-TR45E / CCD-TR75E -->
+		<description>Sony EVR Alignment v3.0a</description>
+		<year>199?</year>
 		<publisher>Sony</publisher>
 		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16521">
-				<rom name="sony_lisa1.opk" size="16521" crc="417a9b34" sha1="b2747bcf6be33f0c27f263dbbdfe2512e68e1810" />
+				<rom name="sony030a.opk" size="16521" crc="417a9b34" sha1="b2747bcf6be33f0c27f263dbbdfe2512e68e1810" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sony030b" supported="no">
+		<!-- EVR software for the CCD-TR45E / CCD-TR75E / CCD-TR50E / CCD-TR60E -->
+		<description>Sony EVR Alignment v3.0b</description>
+		<year>199?</year>
+		<publisher>Sony</publisher>
+		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="16831">
+				<rom name="sony030b.opk" size="16831" crc="dcd39db1" sha1="03f95e0a6d462ce53a1488b2f05707ea8cd19e51" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sony040" supported="no">
+		<!-- EVR software for the CCD-V700E / CCD-F550E / CCD-F450E -->
+		<description>Sony EVR Alignment v4.0</description>
+		<year>199?</year>
+		<publisher>Sony</publisher>
+		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="19738">
+				<rom name="sony040.opk" size="19738" crc="59111b9a" sha1="2a85def0f01543402695cb8eb7aa8abe6c604f34" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sony041a" supported="no">
+		<!-- EVR software for the CCD-V700E / CCD-F550E / CCD-F450E / CCD-V800E -->
+		<description>Sony EVR Alignment v4.1a</description>
+		<year>199?</year>
+		<publisher>Sony</publisher>
+		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="29114">
+				<rom name="sony041a.opk" size="29114" crc="75376250" sha1="69ebdabefdbfac7cf6e37a509bc9e5ad32519ca1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sony041b" supported="no">
+		<!-- EVR software for the CCD-V700E / CCD-F550E / CCD-F450E / CCD-V800E -->
+		<description>Sony EVR Alignment v4.1b</description>
+		<year>199?</year>
+		<publisher>Sony</publisher>
+		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="29018">
+				<rom name="sony041b.opk" size="29018" crc="789e8285" sha1="386ab050f66ea8191ab314cacb7333a9a973cc00" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sony050" supported="no">
+		<!-- EVR software for the CCD-V600E / CCD-F455E / CCD-F555E / CCD-F375E -->
+		<description>Sony EVR Alignment v5.0</description>
+		<year>199?</year>
+		<publisher>Sony</publisher>
+		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="31338">
+				<rom name="sony050.opk" size="31338" crc="5f800aeb" sha1="1c2c04a4508a164cedb1dae0f98419fb8b08a723" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sony051" supported="no">
+		<!-- EVR software for the CCD-V600E / CCD-F455E / CCD-F555E / CCD-F375E / CCD-F385E / CCD-V6000E -->
+		<description>Sony EVR Alignment v5.1</description>
+		<year>199?</year>
+		<publisher>Sony</publisher>
+		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="31994">
+				<rom name="sony051.opk" size="31994" crc="7806a871" sha1="bc14cb68d974d614c45ea260cb9f295b97796c9c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sony061" supported="no">
+		<!-- EVR software for the CCD-TR105E / CCD-TR705E -->
+		<description>Sony EVR Alignment v6.1</description>
+		<year>199?</year>
+		<publisher>Sony</publisher>
+		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="28900">
+				<rom name="sony061.opk" size="28900" crc="3f3951be" sha1="7aad7d94a16fd006cf54ad50d93f065394048a21" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sony070a" supported="no">
+		<!-- EVR software for the CCD-FX300E / CCD-FX400E / CCD-FX500E -->
+		<description>Sony EVR Alignment v7.0a</description>
+		<year>199?</year>
+		<publisher>Sony</publisher>
+		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="30817">
+				<rom name="sony070a.opk" size="30817" crc="f2fc2087" sha1="3ec814266c08b4441b3d79ae500b3754e50ac21e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sony070b" supported="no">
+		<!-- EVR software for the CCD-FX300E / CCD-FX400E / CCD-FX500E -->
+		<description>Sony EVR Alignment v7.0b</description>
+		<year>199?</year>
+		<publisher>Sony</publisher>
+		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="30819">
+				<rom name="sony070b.opk" size="30819" crc="8ef60c8d" sha1="fddaf5bec74ff5955c4b5572698df6507d06fc7a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sony080a" supported="no">
+		<!-- EVR software for the CCD-TR805E / CCD-TR305E / CCD-TR505E / CCD-TR303E / CCD-TR333E -->
+		<description>Sony EVR Alignment v8.0a</description>
+		<year>199?</year>
+		<publisher>Sony</publisher>
+		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="31072">
+				<rom name="sony080a.opk" size="31072" crc="053361b7" sha1="3814da1ba260f2cbf962f6c191722dc4750778a4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sony080b" supported="no">
+		<!-- EVR software for the CCD-TR805E / CCD-TR305E / CCD-TR505E / CCD-TR303E / CCD-TR333E -->
+		<description>Sony EVR Alignment v8.0b</description>
+		<year>199?</year>
+		<publisher>Sony</publisher>
+		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="31065">
+				<rom name="sony080b.opk" size="31065" crc="ef496565" sha1="18f9f42c984da4fc07fb82a18bff1b1ba278e2c5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sony090a" supported="no">
+		<!-- EVR software for the CCD-TR8E / CCD-TR1E / CCD-TR18E -->
+		<description>Sony EVR Alignment v9.0a</description>
+		<year>199?</year>
+		<publisher>Sony</publisher>
+		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="26765">
+				<rom name="sony090a.opk" size="26765" crc="577df31c" sha1="f56c346f6fbcae4c872675e05b9c288af75b1ff3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sony090b" supported="no">
+		<!-- EVR software for the CCD-TR8E / CCD-TR1E / CCD-TR18E -->
+		<description>Sony EVR Alignment v9.0b</description>
+		<year>199?</year>
+		<publisher>Sony</publisher>
+		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="26763">
+				<rom name="sony090b.opk" size="26763" crc="13ef4c10" sha1="cd9477881d45df5db67f235902b0272f5a8e7b5e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sony100" supported="no">
+		<!-- EVR software for the CCD-FX700E -->
+		<description>Sony EVR Alignment v10.0</description>
+		<year>199?</year>
+		<publisher>Sony</publisher>
+		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="26872">
+				<rom name="sony100.opk" size="26872" crc="8ebe66cd" sha1="02272d79160296973df0e96d8792fdda94afd0a4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sony110" supported="no">
+		<!-- EVR software for the CCD-VX1E -->
+		<description>Sony EVR Alignment v11.0</description>
+		<year>199?</year>
+		<publisher>Sony</publisher>
+		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="29984">
+				<rom name="sony110.opk" size="29984" crc="f133b01f" sha1="6d90cea4cbfa00630dc92978ecf67623359249da" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sony111" supported="no">
+		<!-- EVR software for the CCD-VX1E -->
+		<description>Sony EVR Alignment v11.1</description>
+		<year>199?</year>
+		<publisher>Sony</publisher>
+		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="28478">
+				<rom name="sony111.opk" size="28478" crc="0c17a8d5" sha1="6699b08045be3f27b6656c8c7a91ad0dd44d8fde" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sony120" supported="no">
+		<!-- EVR software for the CCD-TR606E / CCD-SC5E -->
+		<description>Sony EVR Alignment v12.0</description>
+		<year>199?</year>
+		<publisher>Sony</publisher>
+		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="31988">
+				<rom name="sony120.opk" size="31988" crc="af30a08e" sha1="df82f7e30b9d9a3420283ed74c00175260fcf0d3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sony130" supported="no">
+		<!-- EVR software for the CCD-TR3E / CCD-TR2000E / CCD-SC7E -->
+		<description>Sony EVR Alignment v13.0</description>
+		<year>199?</year>
+		<publisher>Sony</publisher>
+		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="31267">
+				<rom name="sony130.opk" size="31267" crc="9e32000a" sha1="9916860161e1a16547179de9f53c6ffbe4f9adf1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sony140" supported="no">
+		<!-- EVR software for the CCD-TR150E / CCD-TR650E / CCD-TR530E/TR550E/TR570E/TR750E -->
+		<description>Sony EVR Alignment v14.0</description>
+		<year>199?</year>
+		<publisher>Sony</publisher>
+		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="30228">
+				<rom name="sony140.opk" size="30228" crc="99410c29" sha1="6a62294b758b18f8a2f6a2121328aa9e7240c54c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sony150" supported="no">
+		<!-- EVR software for the CCD-SC6E / CCD-SC8E / CCD-FX280E / CCD-FX730VE / CCD-FX830VE -->
+		<description>Sony EVR Alignment v15.0</description>
+		<year>199?</year>
+		<publisher>Sony</publisher>
+		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="31910">
+				<rom name="sony150.opk" size="31910" crc="5f693124" sha1="217bcfd54dacaac54cf643e9d0c5c80757296bf0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sony160" supported="no">
+		<!-- EVR software for the CCD-TR580E / CCD-TR680E / CCD-TR780E / CCD-TRV30E / CCD-TRV70E -->
+		<description>Sony EVR Alignment v16.0</description>
+		<year>199?</year>
+		<publisher>Sony</publisher>
+		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="31993">
+				<rom name="sony160.opk" size="31993" crc="70d08065" sha1="e84033e3df1e499dea2b8b2c3f57ffb9230081ce" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sony170" supported="no">
+		<!-- EVR software for the CCD-TR420E / CCD-TR440E / CCD-TR510E -->
+		<description>Sony EVR Alignment v17.0</description>
+		<year>199?</year>
+		<publisher>Sony</publisher>
+		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="32774">
+				<rom name="sony170.opk" size="32774" crc="829142a0" sha1="89d022158ad718f281a15c1415deba8aec3dea63" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sony180" supported="no">
+		<!-- EVR software for the CCD-TR3000E / CCD-TRV100E -->
+		<description>Sony EVR Alignment v18.0</description>
+		<year>199?</year>
+		<publisher>Sony</publisher>
+		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="32774">
+				<rom name="sony180.opk" size="32774" crc="12dac96c" sha1="5137efa272cd4afe0da62a98f62bde3345afe5fe" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sony190" supported="no">
+		<!-- EVR software for the CCD-TR610E / CCD-TR760E / CCD-TR810E / CCD-TR2200E / CCD-TR3300E -->
+		<description>Sony EVR Alignment v19.0</description>
+		<year>199?</year>
+		<publisher>Sony</publisher>
+		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="32774">
+				<rom name="sony190.opk" size="32774" crc="acfd2e84" sha1="a6c4f917d44ebab8b025dd45c49ea4a77319b0ec" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sony200" supported="no">
+		<!-- EVR software for the CCD-SC55E / CCD-TRV31E / CCD-TRV51E / CCD-TRV61E / CCD-TRV91E -->
+		<description>Sony EVR Alignment v20.0</description>
+		<year>199?</year>
+		<publisher>Sony</publisher>
+		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="27289">
+				<rom name="sony200.opk" size="27289" crc="aea488af" sha1="c3f9717ba3fc9a43ef572f5c1176ff89165881d6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="snpixrep" supported="no">
+		<!-- Pixel repair software for the CCD-VX1E -->
+		<description>Sony CCD-VX1E Pixel Repair v1.0</description>
+		<year>199?</year>
+		<publisher>Sony</publisher>
+		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="25407">
+				<rom name="snpixrep.opk" size="25407" crc="d9b4f043" sha1="f04702e659f6fa0931266b63827e06f2d3331c2f" />
 			</dataarea>
 		</part>
 	</software>
@@ -1209,7 +1813,7 @@ Undumped datapack:
 	<software name="sonyprm" supported="no">
 		<!-- Software to control the Sony PRM-1 device (which does not have built-in ROM software). -->
 		<description>Sony Dealer Commander v2.2</description>
-		<year>198?</year>
+		<year>199?</year>
 		<publisher>Sony</publisher>
 		<sharedfeat name="compatibility" value="CM,XP"/>
 		<part name="cart" interface="psion_pack">
@@ -1232,7 +1836,7 @@ Undumped datapack:
 		</part>
 	</software>
 
-	<!-- Devices -->
+	<!-- Top-Slot Devices -->
 
 	<software name="rs232l11" supported="no">
 		<!-- Early version of Comms Link. Has no Psion protocol. -->
@@ -1343,6 +1947,18 @@ Undumped datapack:
 		<part name="cart" interface="psion_topslot">
 			<dataarea name="rom" size="46397">
 				<rom name="extprt43.opk" size="46397" crc="443d0905" sha1="10a3576786f5ac65082b2856bc1578373f30d6fc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dynabar43" supported="no">
+		<!-- The Dynasys Dynabar 232 M contains Comms Link version 4.3 together with the Bar Code Reader driver. -->
+		<description>Dynabar 232 M 4.3</description>
+		<year>198?</year>
+		<publisher>Dynasys Technologies</publisher>
+		<part name="cart" interface="psion_topslot">
+			<dataarea name="rom" size="54738">
+				<rom name="dynabar43.opk" size="54738" crc="dbaedef0" sha1="a701a7a99d9508a563ea8e70c2b260ba158ea3e2" />
 			</dataarea>
 		</part>
 	</software>
@@ -1538,6 +2154,17 @@ Undumped datapack:
 		<part name="cart" interface="psion_topslot">
 			<dataarea name="rom" size="60686">
 				<rom name="cnf41_10.opk" size="60686" crc="720be551" sha1="74b7162acbada7f35a77010c201cf5506d909aae" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="speech" supported="no">
+		<description>Speech Synthesiser 1.4</description>
+		<year>1991</year>
+		<publisher>Rovoreed</publisher>
+		<part name="cart" interface="psion_topslot">
+			<dataarea name="rom" size="24770">
+				<rom name="speech.opk" size="24770" crc="7c227b1f" sha1="8298eb68337d9447289a5b4c2f272807060023f1" />
 			</dataarea>
 		</part>
 	</software>

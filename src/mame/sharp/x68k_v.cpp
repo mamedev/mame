@@ -215,7 +215,7 @@ bool x68k_state::draw_gfx_scanline( bitmap_ind16 &bitmap, rectangle cliprect, ui
 	uint16_t xscr,yscr;
 	uint16_t colour = 0;
 	int shift;
-	bool blend, ret = false;
+	bool blend, ret = (m_video.reg[2] & 0x1a00) == 0x1a00;
 	uint16_t *pal = (uint16_t *)m_gfxpalette->basemem().base();
 	int divisor = 1;
 	if(m_crtc->gfx_double_scan())
@@ -262,6 +262,7 @@ bool x68k_state::draw_gfx_scanline( bitmap_ind16 &bitmap, rectangle cliprect, ui
 					loc++;
 					loc &= 0x3ff;
 				}
+				ret = false;
 			}
 		}
 		else  // else 512x512 "real" screen size
@@ -278,8 +279,6 @@ bool x68k_state::draw_gfx_scanline( bitmap_ind16 &bitmap, rectangle cliprect, ui
 					lineoffset = (((scanline - m_crtc->vbegin() / divisor) + yscr) & 0x1ff) * 512;
 					loc = xscr & 0x1ff;
 					shift = 4;
-					if((m_video.reg[2] & 0x1a00) == 0x1a00)
-						ret = true;
 					for(pixel=m_crtc->hbegin();pixel<=m_crtc->hend();pixel++)
 					{
 						colour = ((m_gvram[lineoffset + loc] >> page*shift) & 0x000f);
@@ -332,8 +331,6 @@ bool x68k_state::draw_gfx_scanline( bitmap_ind16 &bitmap, rectangle cliprect, ui
 						lineoffset1 = (((scanline - m_crtc->vbegin() / divisor) + yscr1) & 0x1ff) * 512;
 						loc1 = xscr1 & 0x1ff;
 						shift = 4;
-						if((m_video.reg[2] & 0x1a00) == 0x1a00)
-							ret = true;
 						for(pixel=m_crtc->hbegin();pixel<=m_crtc->hend();pixel++)
 						{
 							colour = ((m_gvram[lineoffset0 + loc0] >> page*shift) & 0x000f);
@@ -387,6 +384,7 @@ bool x68k_state::draw_gfx_scanline( bitmap_ind16 &bitmap, rectangle cliprect, ui
 						loc++;
 						loc &= 0x1ff;
 					}
+					ret = false;
 					break;
 				}
 			}
@@ -765,7 +763,7 @@ uint32_t x68k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 			pcgprio = currprio;
 			currprio++;
 		}
-		if((m_video.gfx_pri == priority) && !m_crtc->gfx_layer_buffer())
+		if((m_video.gfx_pri == priority) && !m_crtc->gfx_layer_buffer() && (m_video.reg[2] & 0x1f))
 		{
 			gfxprio = currprio;
 			currprio++;
