@@ -240,6 +240,7 @@ private:
 	bool    m_z80_m1;
 	offs_t  m_z80_addr;
 	u8      m_z80_data;
+	u8      m_z80_data_odd;
 	bool    m_deferring;
 	bool    m_skip_write;
 	std::list<std::pair<u16, u16>> m_ints;
@@ -986,6 +987,10 @@ void sprinter_state::check_accel(bool is_read, offs_t offset, u8 &data)
 		if (data == 0x1f && is_ram)
 			data = 0x0f;
 		m_in_out_cmd = false;
+	}
+
+	if (~offset & 1) {
+		m_z80_data_odd = data;
 	}
 
 	const bool accel_go_case = m_access_state == ACCEL_OFF && !m_z80_m1 && m_acc_dir && acc_ena();
