@@ -441,7 +441,7 @@ void gticlub_base_state::sysreg_w(offs_t offset, uint8_t data)
 			break;
 
 		case 2: // drive commands
-			m_pcb_digit[offset];
+			m_pcb_digit[offset] = data;
 			break;
 
 		case 3:
