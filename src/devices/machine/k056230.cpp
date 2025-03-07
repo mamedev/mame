@@ -223,6 +223,8 @@ void k056230_device::comm_tick()
 			{
 				osd_printf_verbose("k056230: tx connection failed - %s:%d %s\n", filerr.category().name(), filerr.value(), filerr.message());
 				m_line_tx.reset();
+				// prevent another connection request for some time.
+				m_txmode = 0x02;
 			}
 		}
 

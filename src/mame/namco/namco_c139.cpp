@@ -52,6 +52,8 @@
     TODO:
     - hook a real chip and test in detail
     - mode 0x0d shows 1 machine in service mode and attract mode, however most games seem to work "okay" in multiplayer.
+    - C422 seems to be a pin compatible upgrade to C139, probably supporting higher clock speeds? hook up c139 in system23
+    - mode 0x0b is used by s23 games to test interrupts.
 
 ***************************************************************************/
 

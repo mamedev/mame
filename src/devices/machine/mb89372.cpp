@@ -394,7 +394,6 @@ void mb89372_device::check_dma()
 			{
 				m_channel[channel].m_state = 1;
 				m_current_channel = channel;
-				logerror("meep... %01x\n", channel);
 				return;
 			}
 		}
