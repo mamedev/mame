@@ -66,6 +66,7 @@ by the otherwise seemingly unnecessary internal ROMs.
 ************************************************************************************************************/
 
 #include "emu.h"
+
 #include "subsino_crypt.h"
 #include "subsino_io.h"
 
@@ -78,6 +79,7 @@ by the otherwise seemingly unnecessary internal ROMs.
 #include "sound/okim6295.h"
 #include "sound/ymopl.h"
 #include "video/ramdac.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -132,23 +134,25 @@ public:
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
-	void bishjan(machine_config &config);
-	void xiaoao(machine_config &config);
-	void saklove(machine_config &config);
-	void mtrain(machine_config &config);
-	void tbonusal(machine_config &config);
-	void humlan(machine_config &config);
-	void new2001(machine_config &config);
-	void expcard(machine_config &config);
-	void xplan(machine_config &config);
-	void xtrain(machine_config &config);
-	void ptrain(machine_config &config);
+	void bishjan(machine_config &config) ATTR_COLD;
+	void xiaoao(machine_config &config) ATTR_COLD;
+	void saklove(machine_config &config) ATTR_COLD;
+	void mtrain(machine_config &config) ATTR_COLD;
+	void tbonusal(machine_config &config) ATTR_COLD;
+	void humlan(machine_config &config) ATTR_COLD;
+	void queenbn(machine_config &config) ATTR_COLD;
+	void new2001(machine_config &config) ATTR_COLD;
+	void expcard(machine_config &config) ATTR_COLD;
+	void xplan(machine_config &config) ATTR_COLD;
+	void xtrain(machine_config &config) ATTR_COLD;
+	void ptrain(machine_config &config) ATTR_COLD;
 
-	void init_wtrnymph();
-	void init_mtrain();
-	void init_tbonusal();
+	void init_wtrnymph() ATTR_COLD;
+	void init_mtrain() ATTR_COLD;
+	void init_tbonusal() ATTR_COLD;
 
 protected:
+	virtual void machine_start() override ATTR_COLD { m_leds.resolve(); }
 	virtual void video_start() override ATTR_COLD;
 
 private:
@@ -225,7 +229,7 @@ private:
 
 	TILE_GET_INFO_MEMBER(ss9601_get_tile_info_0);
 	TILE_GET_INFO_MEMBER(ss9601_get_tile_info_1);
-	uint32_t screen_update_subsino2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void bishjan_map(address_map &map) ATTR_COLD;
 	void mtrain_io(address_map &map) ATTR_COLD;
@@ -238,8 +242,6 @@ private:
 	void saklove_map(address_map &map) ATTR_COLD;
 	void xplan_io(address_map &map) ATTR_COLD;
 	void xplan_map(address_map &map) ATTR_COLD;
-
-	virtual void machine_start() override { m_leds.resolve(); }
 
 	layer_t m_layers[2];
 	uint8_t m_ss9601_byte_lo;
@@ -745,7 +747,7 @@ void subsino2_state::video_start()
 	save_item(NAME(m_bishjan_input));
 }
 
-uint32_t subsino2_state::screen_update_subsino2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t subsino2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layers_ctrl = ~m_ss9601_disable;
 	int y;
@@ -2807,7 +2809,7 @@ void subsino2_state::bishjan(machine_config &config)
 	m_screen->set_size(512, 256);
 	m_screen->set_visarea(0, 512-1, 0, 256-16-1);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_screen_update(FUNC(subsino2_state::screen_update_subsino2));
+	m_screen->set_screen_update(FUNC(subsino2_state::screen_update));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set_inputline(m_maincpu, 0); // edge-triggered interrupt
 
@@ -2868,6 +2870,13 @@ void subsino2_state::humlan(machine_config &config)
 	// SS9804
 }
 
+void subsino2_state::queenbn(machine_config &config)
+{
+	humlan(config);
+
+	m_maincpu->set_clock(48.94_MHz_XTAL / 3);
+}
+
 /***************************************************************************
                                 Magic Train
 ***************************************************************************/
@@ -2902,7 +2911,7 @@ void subsino2_state::mtrain(machine_config &config)
 	m_screen->set_visarea(0, 512-1, 0, 256-32-1);
 	m_screen->set_refresh_hz(58.7270);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);   // game reads vblank state
-	m_screen->set_screen_update(FUNC(subsino2_state::screen_update_subsino2));
+	m_screen->set_screen_update(FUNC(subsino2_state::screen_update));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ss9601);
@@ -2962,7 +2971,7 @@ void subsino2_state::saklove(machine_config &config)
 	m_screen->set_visarea(0, 512-1, 0, 256-16-1);
 	m_screen->set_refresh_hz(58.7270);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);   // game reads vblank state
-	m_screen->set_screen_update(FUNC(subsino2_state::screen_update_subsino2));
+	m_screen->set_screen_update(FUNC(subsino2_state::screen_update));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ss9601);
@@ -3013,7 +3022,7 @@ void subsino2_state::xplan(machine_config &config)
 	m_screen->set_visarea(0, 512-1, 0, 256-16-1);
 	m_screen->set_refresh_hz(58.7270);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);   // game reads vblank state
-	m_screen->set_screen_update(FUNC(subsino2_state::screen_update_subsino2));
+	m_screen->set_screen_update(FUNC(subsino2_state::screen_update));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set("maincpu", FUNC(am188em_device::int0_w));
 
@@ -3126,7 +3135,7 @@ Notes:
                 Xiao Ao Jiang Hu uses 44.1MHz Crystal
                 Queen Bee New uses 48.94MHz Crystal
     DS1230.Q3 - Dallas DS1230A 1-Wire EEPROM (TO92). Hidden among other parts disguised as a transistor.
-                Each game has different EEPROM data used for protection. 
+                Each game has different EEPROM data used for protection.
                 All these have the surface scratched and the part location is marked Q3.
      PROG.U21 - 27C020 or 27C040 EPROM (main program)
       SND.U10 - 27C080 or 27C040 EPROM. Game boots to I/O test screen if this ROM is not present so this is a program ROM for
@@ -4056,18 +4065,18 @@ GAME( 2000, new2001,     0,        new2001,  new2001,  subsino2_state, empty_ini
 
 GAME( 2006, xplan,       0,        xplan,    xplan,    subsino2_state, empty_init,    ROT0, "Subsino",                          "X-Plan (Ver. 101)",                     MACHINE_NOT_WORKING )
 
-GAME( 2001, queenbee,    0,        humlan,   queenbee, subsino2_state, empty_init,    ROT0, "Subsino (American Alpha license)", "Queen Bee (Ver. 114)",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // severe timing issues
-GAME( 2001, queenbeeb,   queenbee, humlan,   queenbee, subsino2_state, empty_init,    ROT0, "Subsino",                          "Queen Bee (Brazil, Ver. 202)",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // severe timing issues, only program ROM available
-GAME( 2001, queenbeei,   queenbee, humlan,   queenbee, subsino2_state, empty_init,    ROT0, "Subsino",                          "Queen Bee (Israel, Ver. 100)",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // severe timing issues, only program ROM available
-GAME( 2001, queenbeesa,  queenbee, humlan,   queenbee, subsino2_state, empty_init,    ROT0, "Subsino",                          "Queen Bee (SA-101-HARD)",               MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // severe timing issues, only program ROM available
+GAME( 2001, queenbee,    0,        humlan,   queenbee, subsino2_state, empty_init,    ROT0, "Subsino (American Alpha license)", "Queen Bee (Ver. 114)",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING ) // severe timing issues
+GAME( 2001, queenbeeb,   queenbee, humlan,   queenbee, subsino2_state, empty_init,    ROT0, "Subsino",                          "Queen Bee (Brazil, Ver. 202)",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING ) // severe timing issues, only program ROM available
+GAME( 2001, queenbeei,   queenbee, humlan,   queenbee, subsino2_state, empty_init,    ROT0, "Subsino",                          "Queen Bee (Israel, Ver. 100)",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING ) // severe timing issues, only program ROM available
+GAME( 2001, queenbeesa,  queenbee, humlan,   queenbee, subsino2_state, empty_init,    ROT0, "Subsino",                          "Queen Bee (SA-101-HARD)",               MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING ) // severe timing issues, only program ROM available
 
-GAME( 2001, humlan,      queenbee, humlan,   humlan,   subsino2_state, empty_init,    ROT0, "Subsino (Truemax license)",        "Humlan's Lyckohjul (Sweden, Ver. 402)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // severe timing issues
+GAME( 2001, humlan,      queenbee, humlan,   humlan,   subsino2_state, empty_init,    ROT0, "Subsino (Truemax license)",        "Humlan's Lyckohjul (Sweden, Ver. 402)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING ) // severe timing issues
 
-GAME( 2002, queenbn,     0,        humlan,   humlan,   subsino2_state, empty_init,    ROT0, "Subsino",                          "Nu Wang Feng New / Queen Bee New (China, Ver. 1.10)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // severe timing issues
+GAME( 2002, queenbn,     0,        queenbn,  humlan,   subsino2_state, empty_init,    ROT0, "Subsino",                          "Nv Wang Feng New / Queen Bee New (China, Ver. 1.10)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING ) // severe timing issues
 
-GAME( 2002, xreel,       queenbee, humlan,   humlan,   subsino2_state, empty_init,    ROT0, "Subsino (ECM license)",            "X-Reel",                                MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // severe timing issues
+GAME( 2002, xreel,       queenbee, humlan,   humlan,   subsino2_state, empty_init,    ROT0, "Subsino (ECM license)",            "X-Reel",                                MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING ) // severe timing issues
 
-GAME( 2002, squeenb,     0,        humlan,   humlan,   subsino2_state, empty_init,    ROT0, "Subsino",                          "Super Queen Bee (Ver. 101)",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // severe timing issues
+GAME( 2002, squeenb,     0,        humlan,   humlan,   subsino2_state, empty_init,    ROT0, "Subsino",                          "Super Queen Bee (Ver. 101)",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING ) // severe timing issues
 
 GAME( 2003, qbeebing,    0,        humlan,   qbeebing, subsino2_state, empty_init,    ROT0, "Subsino",                          "Queen Bee Bingo",                       MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 

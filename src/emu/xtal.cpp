@@ -476,6 +476,7 @@ const double XTAL::known_xtals[] = {
 	 48'556'800, // 48.5568_MHz_XTAL       Wyse WY-85
 	 48'654'000, // 48.654_MHz_XTAL        Qume QVT-201
 	 48'660'000, // 48.66_MHz_XTAL         Zaxxon
+	 48'940'000, // 48.94_MHz_XTAL         Queen Bee New
 	 49'152'000, // 49.152_MHz_XTAL        Used on some Namco PCBs, Baraduke h/w, System 21, Super System 22
 	 49'423'500, // 49.4235_MHz_XTAL       Wyse WY-185
 	 50'000'000, // 50_MHz_XTAL            Williams/Midway T/W/V-unit system
