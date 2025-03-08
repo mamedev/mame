@@ -197,8 +197,10 @@ private:
 	uint16_t m_video_pri_reg[2];
 
 	u16 m_screen_ctrl_reg;
+	bool m_gden0;
 	bool m_dm;
 	bool m_ymmd;
+	u8 m_vw;
 	u16 m_gfx_ctrl_reg;
 
 	u16 m_color_mode;

@@ -404,10 +404,10 @@ void pc88va_sgp_device::execute_blit(u16 draw_mode, bool is_patblt)
 
 	if (draw_mode & 0xfc00)
 	{
-		popmessage("SGP: draw_mode = %04x (HD %d VD %d SF %d)", draw_mode, BIT(draw_mode, 10), BIT(draw_mode, 11), BIT(draw_mode, 12));
+		popmessage("SGP: Warning draw_mode = %04x (HD %d VD %d SF %d)", draw_mode, BIT(draw_mode, 10), BIT(draw_mode, 11), BIT(draw_mode, 12));
 	}
 
-	// TODO: boomer title screen
+	// boomer title screen just sets the same h/v size, irrelevant
 	if (is_patblt == true)
 	{
 		LOG("PATBLT\n");
@@ -416,25 +416,22 @@ void pc88va_sgp_device::execute_blit(u16 draw_mode, bool is_patblt)
 
 	if (m_src.hsize != m_dst.hsize || m_src.vsize != m_dst.vsize)
 	{
-		LOG("BITBLT non-even sizes (%d x %d) x (%d x %d)\n", m_src.hsize, m_src.vsize, m_dst.hsize, m_dst.vsize);
+		LOG("SGP: Warning BITBLT non-even sizes (%d x %d) x (%d x %d)\n", m_src.hsize, m_src.vsize, m_dst.hsize, m_dst.vsize);
 		return;
 	}
 
 	if (m_src.pixel_mode == 0 || m_src.pixel_mode == 3 || m_src.pixel_mode != m_dst.pixel_mode)
 	{
-		LOG("BITBLT pixel mode %d x %d\n", m_src.pixel_mode, m_dst.pixel_mode);
+		LOG("SGP: Warning BITBLT pixel mode %d x %d\n", m_src.pixel_mode, m_dst.pixel_mode);
 		return;
 	}
-
-	//static const u8 shift_table = { 3, 1, 0, -1 };
-	//const u8 hsize_shift = m_src.pixel_mode == 1 ? 1 : 0;
 
 	for (int yi = 0; yi < m_src.vsize; yi ++)
 	{
 		u32 src_address = m_src.address + (yi * m_src.fb_pitch);
 		u32 dst_address = m_dst.address + (yi * m_dst.fb_pitch);
 
-		// TODO: should fetch on demand, depending on what's the color mode/the start dot etc.
+		// TODO: should fetch on demand, depending on color mode/start dot etc.
 		for (int xi = 0; xi < m_src.hsize; xi ++)
 		{
 			switch(m_src.pixel_mode)
@@ -443,14 +440,16 @@ void pc88va_sgp_device::execute_blit(u16 draw_mode, bool is_patblt)
 				case 1:
 				{
 					const u8 nibble = xi & 1;
+					const u32 dst_offset = dst_address + ((xi + m_dst.start_dot) >> 1);
+
 					u8 src = (m_data->read_byte(src_address + (xi >> 1)) >> (nibble * 4)) & 0xf;
-					u8 dst = m_data->read_byte(dst_address + (xi >> 1));
+					u8 dst = m_data->read_byte(dst_offset);
 					u8 result = dst & (nibble ? 0x0f : 0xf0);
 
 					if ((this->*tpmod_table[tp_mod])(src, dst))
 					{
 						result |= (this->*rop_table[logical_op])(src, dst) << (nibble * 4);
-						m_data->write_byte(dst_address + (xi >> 1), result);
+						m_data->write_byte(dst_offset, result);
 					}
 
 					break;
@@ -459,14 +458,16 @@ void pc88va_sgp_device::execute_blit(u16 draw_mode, bool is_patblt)
 				// 8bpp (tetris)
 				case 2:
 				{
+					const u32 dst_offset = dst_address + (xi + m_dst.start_dot);
+
 					u8 src = m_data->read_byte(src_address + xi) & 0xff;
-					u8 dst = m_data->read_byte(dst_address + xi) & 0xff;
+					u8 dst = m_data->read_byte(dst_offset) & 0xff;
 					u8 result = dst;
 
 					if ((this->*tpmod_table[tp_mod])(src, dst))
 					{
 						result = (this->*rop_table[logical_op])(src, dst);
-						m_data->write_byte(dst_address + xi, result);
+						m_data->write_byte(dst_offset, result);
 					}
 
 					break;
