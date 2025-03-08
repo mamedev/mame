@@ -3522,6 +3522,16 @@ if opt_tool(CPUS, "SIGMA2") then
 end
 
 --------------------------------------------------
+-- Control Data Corporation 160 (disassembler only)
+--@src/devices/cpu/cdc160/cdc160.h,CPUS["CDC160"] = true
+--------------------------------------------------
+
+if opt_tool(CPUS, "CDC160") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/cdc160/cdc160d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/cdc160/cdc160d.h")
+end
+
+--------------------------------------------------
 -- Control Data Corporation 1700 (disassembler only)
 --@src/devices/cpu/cdc1700/cdc1700.h,CPUS["CDC1700"] = true
 --------------------------------------------------
