@@ -680,6 +680,84 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 		);
 }
 
+void konamigx_state::konamigx_mixer_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect,
+					tilemap_t *sub1, int sub1flags,
+					tilemap_t *sub2, int sub2flags,
+					int mixerflags, bitmap_ind16 *extra_bitmap, int rushingheroes_hack,
+
+					/* passed from above function */
+					GX_OBJ *objpool,
+					u16 *objbuf,
+					int nobj
+					)
+{
+	// traverse draw list
+	int disp = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
+
+	for (int count=0; count<nobj; count++)
+	{
+		GX_OBJ *objptr = objpool + objbuf[count];
+		int order  = objptr->order;
+		int offs   = objptr->offs;
+		int code   = objptr->code;
+		int color  = objptr->color;
+
+		/* entries >=0 in our list are sprites */
+		if (offs >= 0)
+		{
+			if (!(disp & K55_INP_OBJ)) continue;
+
+			int drawmode = order>>4 & 0xf;
+
+			int alpha = 255;
+			int pri = 0;
+			int zcode = -1; // negative zcode values turn off z-buffering
+
+			if (drawmode & 2)
+			{
+				alpha = color>>K055555_MIXSHIFT & 3;
+				if (alpha) alpha = m_k054338->set_alpha_level(alpha);
+				if (alpha <= 0) continue;
+			}
+			color &= K055555_COLORMASK;
+
+			if (drawmode >= 4) m_palette->set_shadow_mode(order & 0x0f);
+
+			if (!(mixerflags & GXMIX_NOZBUF))
+			{
+				zcode = order>>16 & 0xff;
+				pri = order>>24 & 0xff;
+			}
+
+			m_k055673->k053247_draw_single_sprite_gxcore(bitmap, cliprect,
+				m_gx_objzbuf, m_gx_shdzbuf.get(), code, m_gx_spriteram, offs,
+				color, alpha, drawmode, zcode, pri,
+				/* non-gx only */
+				0,0,nullptr,nullptr,0
+				);
+		}
+		/* the rest are tilemaps of various kinda */
+		else
+		{
+			switch (offs)
+			{
+				case -1:
+					gx_draw_basic_tilemaps(screen, bitmap, cliprect, mixerflags, code);
+					continue;
+				case -2:
+				case -4:
+					gx_draw_basic_extended_tilemaps_1(screen, bitmap, cliprect, mixerflags, code, sub1, sub1flags, rushingheroes_hack, offs);
+				continue;
+				case -3:
+				case -5:
+					gx_draw_basic_extended_tilemaps_2(screen, bitmap, cliprect, mixerflags, code, sub2, sub2flags, extra_bitmap, offs);
+				continue;
+			}
+			continue;
+		}
+	}
+}
+
 void konamigx_state::gx_draw_basic_tilemaps(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, int code)
 {
 	int temp1,temp2,temp3,temp4;
@@ -836,91 +914,6 @@ void konamigx_state::gx_draw_basic_extended_tilemaps_2(screen_device &screen, bi
 			m_k053250_2->draw(bitmap, cliprect, m_vcblk[5]<<l, 0, screen.priority(), 0);
 	}
 }
-
-void konamigx_state::konamigx_mixer_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect,
-					tilemap_t *sub1, int sub1flags,
-					tilemap_t *sub2, int sub2flags,
-					int mixerflags, bitmap_ind16 *extra_bitmap, int rushingheroes_hack,
-
-					/* passed from above function */
-					GX_OBJ *objpool,
-					u16 *objbuf,
-					int nobj
-					)
-{
-	// traverse draw list
-	int disp = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
-
-	for (int count=0; count<nobj; count++)
-	{
-		GX_OBJ *objptr = objpool + objbuf[count];
-		int order  = objptr->order;
-		int offs   = objptr->offs;
-		int code   = objptr->code;
-		int color  = objptr->color;
-
-		/* entries >=0 in our list are sprites */
-		if (offs >= 0)
-		{
-			if (!(disp & K55_INP_OBJ)) continue;
-
-			int drawmode = order>>4 & 0xf;
-
-			int alpha = 255;
-			int pri = 0;
-			int zcode = -1; // negative zcode values turn off z-buffering
-
-			if (drawmode & 2)
-			{
-				alpha = color>>K055555_MIXSHIFT & 3;
-				if (alpha) alpha = m_k054338->set_alpha_level(alpha);
-				if (alpha <= 0) continue;
-			}
-			color &= K055555_COLORMASK;
-
-			if (drawmode >= 4) m_palette->set_shadow_mode(order & 0x0f);
-
-			if (!(mixerflags & GXMIX_NOZBUF))
-			{
-				zcode = order>>16 & 0xff;
-				pri = order>>24 & 0xff;
-			}
-
-
-
-
-			m_k055673->k053247_draw_single_sprite_gxcore(bitmap, cliprect,
-				m_gx_objzbuf, m_gx_shdzbuf.get(), code, m_gx_spriteram, offs,
-				color, alpha, drawmode, zcode, pri,
-				/* non-gx only */
-				0,0,nullptr,nullptr,0
-				);
-		}
-		/* the rest are tilemaps of various kinda */
-		else
-		{
-			switch (offs)
-			{
-				case -1:
-					gx_draw_basic_tilemaps(screen, bitmap, cliprect, mixerflags, code);
-					continue;
-				case -2:
-				case -4:
-					gx_draw_basic_extended_tilemaps_1(screen, bitmap, cliprect, mixerflags, code, sub1, sub1flags, rushingheroes_hack, offs);
-				continue;
-				case -3:
-				case -5:
-					gx_draw_basic_extended_tilemaps_2(screen, bitmap, cliprect, mixerflags, code, sub2, sub2flags, extra_bitmap, offs);
-				continue;
-			}
-			continue;
-		}
-
-
-
-	}
-}
-
 
 /* Run and Gun 2 / Rushing Heroes */
 TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac_tile_info)
