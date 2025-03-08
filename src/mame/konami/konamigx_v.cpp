@@ -458,9 +458,7 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 	}
 
 	// build object database and create indices
-	GX_OBJ *objptr = objpool;
 	u16 nobj = 0;
-	u16 objbuf[GX_MAX_OBJECTS];
 
 	for (int i=5; i>=0; i--)
 	{
@@ -493,25 +491,18 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 
 		if (offs != -128)
 		{
-			objptr->order = layerpri[i]<<24;
-			objptr->code  = code;
-			objptr->offs = offs;
-			objptr++;
-
-			objbuf[nobj] = nobj;
+			objpool[nobj].order = layerpri[i]<<24;
+			objpool[nobj].code  = code;
+			objpool[nobj].offs = offs;
 			nobj++;
 		}
 	}
 
-//  i = j = 0xff;
-	int l = 0;
-
 	const u32 start_addr = m_type3_spriteram_bank ? 0x800 : 0;
-	const u32 end_addr = start_addr + 0x800;
 
-
-	for (int offs=start_addr; offs<end_addr; offs+=8)
+	for (int x = 0; x < 256; ++x)
 	{
+		const u16 offs = start_addr + x * 8;
 		int pri = 0;
 
 		if (!(m_gx_spriteram[offs] & 0x8000)) continue;
@@ -523,7 +514,7 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 
 		int code  = m_gx_spriteram[offs+1];
 		int color = k = m_gx_spriteram[offs+6];
-		l     = m_gx_spriteram[offs+7];
+		// int l     = m_gx_spriteram[offs+7];
 
 		m_k055673->m_k053247_cb(&code, &color, &pri);
 
@@ -625,13 +616,10 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 		{
 			// add objects with solid or alpha pens
 			u32 order = pri<<24 | zcode<<16 | offs<<(8-3) | temp2<<4;
-			objptr->order = order;
-			objptr->offs  = offs;
-			objptr->code  = code;
-			objptr->color = color;
-			objptr++;
-
-			objbuf[nobj] = nobj;
+			objpool[nobj].order = order;
+			objpool[nobj].offs  = offs;
+			objpool[nobj].code  = code;
+			objpool[nobj].color = color;
 			nobj++;
 		}
 
@@ -639,43 +627,22 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 		{
 			// add objects with shadows if enabled
 			u32 order = spri<<24 | zcode<<16 | offs<<(8-3) | temp4<<4 | shadow;
-			objptr->order = order;
-			objptr->offs  = offs;
-			objptr->code  = code;
-			objptr->color = color;
-			objptr++;
-
-			objbuf[nobj] = nobj;
+			objpool[nobj].order = order;
+			objpool[nobj].offs  = offs;
+			objpool[nobj].code  = code;
+			objpool[nobj].color = color;
 			nobj++;
 		}
 	}
 
 	// sort objects in decending order (SLOW)
-	k = nobj;
-	l = nobj - 1;
-
-	for (int j=0; j<l; j++)
-	{
-		u16 temp1 = objbuf[j];
-		u32 temp2 = objpool[temp1].order;
-		for (int i=j+1; i<k; i++)
-		{
-			const u16 temp3 = objbuf[i];
-			const u32 temp4 = objpool[temp3].order;
-			if (temp2 <= temp4)
-			{
-				temp2 = temp4;
-				objbuf[i] = temp1;
-				temp1 = temp3;
-				objbuf[j] = temp1;
-			}
-		}
-	}
-
+	std::reverse(objpool, objpool + nobj);
+	std::stable_sort(objpool, objpool + nobj, [](const GX_OBJ &a, const GX_OBJ &b){
+		return a.order > b.order;
+	});
 
 	konamigx_mixer_draw(screen,bitmap,cliprect,sub1,sub1flags,sub2,sub2flags,mixerflags,extra_bitmap,rushingheroes_hack,
 		objpool,
-		objbuf,
 		nobj
 		);
 }
@@ -687,20 +654,18 @@ void konamigx_state::konamigx_mixer_draw(screen_device &screen, bitmap_rgb32 &bi
 
 					/* passed from above function */
 					GX_OBJ *objpool,
-					u16 *objbuf,
-					int nobj
+					u16 nobj
 					)
 {
 	// traverse draw list
-	int disp = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
+	const u8 disp = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
 
 	for (int count=0; count<nobj; count++)
 	{
-		GX_OBJ *objptr = objpool + objbuf[count];
-		int order  = objptr->order;
-		int offs   = objptr->offs;
-		int code   = objptr->code;
-		int color  = objptr->color;
+		const u32 order  = objpool[count].order;
+		const int offs   = objpool[count].offs;
+		const int code   = objpool[count].code;
+		int color        = objpool[count].color;
 
 		/* entries >=0 in our list are sprites */
 		if (offs >= 0)

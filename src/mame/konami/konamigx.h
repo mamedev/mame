@@ -135,8 +135,7 @@ public:
 						tilemap_t *sub2, int sub2flags,
 						int mixerflags, bitmap_ind16 *extra_bitmap, int rushingheroes_hack,
 						GX_OBJ *objpool,
-						u16 *objbuf,
-						int nobj
+						u16 nobj
 						);
 
 
