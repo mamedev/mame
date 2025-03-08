@@ -291,7 +291,7 @@ void konamigx_state::set_brightness(int layer)
  * shadow enables transparent shadows. Note that it applies to the last sprite pen ONLY.
  * The rest of the sprite remains normal.
  */
-#define GX_MAX_SPRITES 512*2
+#define GX_MAX_SPRITES 256*2 // 256 sprites + 256 shadows
 #define GX_MAX_LAYERS  6
 #define GX_MAX_OBJECTS (GX_MAX_SPRITES + GX_MAX_LAYERS)
 
@@ -337,17 +337,13 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 					tilemap_t *sub2, int sub2flags,
 					int mixerflags, bitmap_ind16 *extra_bitmap, int rushingheroes_hack)
 {
-	int objbuf[GX_MAX_OBJECTS];
-	int shadowon[3], shdpri[3], layerid[6], layerpri[6];
-
-	GX_OBJ *objpool, *objptr;
-	int cltc_shdpri, /*prflp,*/ disp;
+	// int prflp;
 
 	// buffer can move when it's resized, so refresh the pointer
 	m_gx_objzbuf = &screen.priority().pix(0);
 
 	// abort if object database failed to initialize
-	objpool = m_gx_objpool.get();
+	GX_OBJ *objpool = m_gx_objpool.get();
 	if (!objpool) return;
 
 	// clear screen with backcolor and update flicker pulse
@@ -360,9 +356,9 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 		m_k054338->fill_solid_bg(bitmap, cliprect);
 
 	// abort if video has been disabled
-	disp = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
+	const u8 disp = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
 	if (!disp) return;
-	cltc_shdpri = m_k054338->register_r(K338_REG_CONTROL);
+	u16 cltc_shdpri = m_k054338->register_r(K338_REG_CONTROL);
 
 
 	if (!rushingheroes_hack) // Slam Dunk 2 never sets this.  It's either part of the protection, or type4 doesn't use it
@@ -384,12 +380,13 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 	konamigx_precache_registers();
 
 	// init OBJSET2 and mixer parameters (see p.51 and chapter 7)
-	layerid[0] = 0; layerid[1] = 1; layerid[2] = 2; layerid[3] = 3; layerid[4] = 4; layerid[5] = 5;
+	u8 layerid[6] = {0, 1, 2, 3, 4, 5};
 
 
 	// invert layer priority when this flag is set (not used by any GX game?)
 	//prflp = K055555_read_register(K55_CONTROL) & K55_CTL_FLIPPRI;
 
+	u8 layerpri[6];
 	layerpri[0] = m_k055555->K055555_read_register(K55_PRIINP_0);
 	layerpri[1] = m_k055555->K055555_read_register(K55_PRIINP_3);
 	layerpri[3] = m_k055555->K055555_read_register(K55_PRIINP_7);
@@ -411,10 +408,12 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 	}
 
 	// SHDPRISEL filters shadows by different priority comparison methods (UNIMPLEMENTED, see detail on p.66)
+	bool shadowon[3];
 	if (!(shdprisel & 0x03)) shadowon[0] = 0;
 	if (!(shdprisel & 0x0c)) shadowon[1] = 0;
 	if (!(shdprisel & 0x30)) shadowon[2] = 0;
 
+	u8 shdpri[3];
 	shdpri[0]   = m_k055555->K055555_read_register(K55_SHAD1_PRI);
 	shdpri[1]   = m_k055555->K055555_read_register(K55_SHAD2_PRI);
 	shdpri[2]   = m_k055555->K055555_read_register(K55_SHAD3_PRI);
@@ -459,14 +458,15 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 	}
 
 	// build object database and create indices
-	objptr = objpool;
-	int nobj = 0;
+	GX_OBJ *objptr = objpool;
+	u16 nobj = 0;
+	u16 objbuf[GX_MAX_OBJECTS];
 
 	for (int i=5; i>=0; i--)
 	{
 		int offs;
 
-		int code = layerid[i];
+		const u8 code = layerid[i];
 		switch (code)
 		{
 			/*
@@ -506,8 +506,8 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 //  i = j = 0xff;
 	int l = 0;
 
-	u32 start_addr = m_type3_spriteram_bank ? 0x800 : 0;
-	u32 end_addr = start_addr + 0x800;
+	const u32 start_addr = m_type3_spriteram_bank ? 0x800 : 0;
+	const u32 end_addr = start_addr + 0x800;
 
 
 	for (int offs=start_addr; offs<end_addr; offs+=8)
@@ -516,7 +516,7 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 
 		if (!(m_gx_spriteram[offs] & 0x8000)) continue;
 
-		int zcode = m_gx_spriteram[offs] & 0xff;
+		u8 zcode = m_gx_spriteram[offs] & 0xff;
 
 		// invert z-order when opset_pri is set (see p.51 OPSET PRI)
 		if (m_k053247_opset & 0x10) zcode = 0xff - zcode;
@@ -528,17 +528,17 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 		m_k055673->m_k053247_cb(&code, &color, &pri);
 
 		/*
-		    shadow = shadow code
-		    spri   = shadow priority
-		    temp1  = add solid object
-		    temp2  = solid pens draw mode
-		    temp3  = add shadow object
-		    temp4  = shadow pens draw mode
+		    shadow     = shadow code
+		    spri       = shadow priority
+		    add_solid  = add solid object
+		    temp2      = solid pens draw mode
+		    add_shadow = add shadow object
+		    temp4      = shadow pens draw mode
 		*/
 		int temp4 = 0;
-		int temp3 = 0;
+		bool add_shadow = 0;
 		int temp2 = 0;
-		int temp1 = 0;
+		bool add_solid = 0;
 		int spri = 0;
 		int shadow = 0;
 
@@ -546,7 +546,7 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 		{
 			shadow = 3; // use default intensity and color
 			spri = pri; // retain host priority
-			temp3 = 1; // add shadow
+			add_shadow = 1;
 			temp4 = 5; // draw full shadow
 		}
 		else
@@ -558,11 +558,11 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 				if (shadow != 1 || k053246_objset1 & 0x20)
 				{
 					shadow--;
-					temp1 = 1; // add solid
+					add_solid = 1; // add solid
 					temp2 = 1; // draw partial solid
 					if (shadowon[shadow])
 					{
-						temp3 = 1; // add shadow
+						add_shadow = 1;
 						temp4 = 4; // draw partial shadow
 					}
 				}
@@ -571,23 +571,23 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 					// drop the entire sprite to shadow if its shadow code is 1 and SD0EN is off (see p.48)
 					shadow = 0;
 					if (!shadowon[0]) continue;
-					temp3 = 1; // add shadow
+					add_shadow = 1;
 					temp4 = 5; // draw full shadow
 				}
 			}
 			else
 			{
-				temp1 = 1; // add solid
+				add_solid = 1; // add solid
 				temp2 = 0; // draw full solid
 			}
 
-			if (temp1)
+			if (add_solid)
 			{
 				// tag sprite for alpha blending
 				if (color>>K055555_MIXSHIFT & 3) temp2 |= 2;
 			}
 
-			if (temp3)
+			if (add_shadow)
 			{
 				// determine shadow priority
 				spri = (m_k053247_opset & 0x20) ? pri : shdpri[shadow]; // (see p.51 OPSET SDSEL)
@@ -621,10 +621,10 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 		    ------------------------xxxx---- (shadow mode)
 		    ----------------------------xxxx (shadow code)
 		*/
-		if (temp1)
+		if (add_solid)
 		{
 			// add objects with solid or alpha pens
-			int order = pri<<24 | zcode<<16 | offs<<(8-3) | temp2<<4;
+			u32 order = pri<<24 | zcode<<16 | offs<<(8-3) | temp2<<4;
 			objptr->order = order;
 			objptr->offs  = offs;
 			objptr->code  = code;
@@ -635,10 +635,10 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 			nobj++;
 		}
 
-		if (temp3 && !(color & K055555_SKIPSHADOW) && !(mixerflags & GXMIX_NOSHADOW))
+		if (add_shadow && !(color & K055555_SKIPSHADOW) && !(mixerflags & GXMIX_NOSHADOW))
 		{
 			// add objects with shadows if enabled
-			int order = spri<<24 | zcode<<16 | offs<<(8-3) | temp4<<4 | shadow;
+			u32 order = spri<<24 | zcode<<16 | offs<<(8-3) | temp4<<4 | shadow;
 			objptr->order = order;
 			objptr->offs  = offs;
 			objptr->code  = code;
@@ -656,13 +656,19 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 
 	for (int j=0; j<l; j++)
 	{
-		int temp1 = objbuf[j];
-		int temp2 = objpool[temp1].order;
+		u16 temp1 = objbuf[j];
+		u32 temp2 = objpool[temp1].order;
 		for (int i=j+1; i<k; i++)
 		{
-			int temp3 = objbuf[i];
-			int temp4 = objpool[temp3].order;
-			if ((uint32_t)temp2 <= (uint32_t)temp4) { temp2 = temp4; objbuf[i] = temp1; objbuf[j] = temp1 = temp3; }
+			const u16 temp3 = objbuf[i];
+			const u32 temp4 = objpool[temp3].order;
+			if (temp2 <= temp4)
+			{
+				temp2 = temp4;
+				objbuf[i] = temp1;
+				temp1 = temp3;
+				objbuf[j] = temp1;
+			}
 		}
 	}
 
@@ -838,7 +844,7 @@ void konamigx_state::konamigx_mixer_draw(screen_device &screen, bitmap_rgb32 &bi
 
 					/* passed from above function */
 					GX_OBJ *objpool,
-					int *objbuf,
+					u16 *objbuf,
 					int nobj
 					)
 {

@@ -121,7 +121,11 @@ public:
 	K055673_CB_MEMBER(salmndr2_sprite_callback);
 	K055673_CB_MEMBER(le2_sprite_callback);
 
-	struct GX_OBJ { int order = 0, offs = 0, code = 0, color = 0; };
+	struct GX_OBJ
+	{
+		u32 order = 0;
+		int offs = 0, code = 0, color = 0;
+	};
 
 	void common_init();
 	uint32_t k_6bpp_rom_long_r(offs_t offset, uint32_t mem_mask = ~0);
@@ -131,7 +135,7 @@ public:
 						tilemap_t *sub2, int sub2flags,
 						int mixerflags, bitmap_ind16 *extra_bitmap, int rushingheroes_hack,
 						GX_OBJ *objpool,
-						int *objbuf,
+						u16 *objbuf,
 						int nobj
 						);
 
