@@ -246,6 +246,7 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 			}
 		}
 
+		// TODO: std::function
 		if(md) // 1bpp mode
 		{
 			int fg_col = (tvram[(offs + i + 6) / 2] & 0xf0) >> 4;
@@ -268,11 +269,7 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 					for(int x_s = 0; x_s < 16; x_s++)
 					{
 						int res_x = xp + x_i + x_s;
-						// TODO: MG actually doubles Y size
 						int res_y = (yp + y_i) << m_tsp.spr_mg;
-
-						if (!cliprect.contains(res_x, res_y))
-							continue;
 
 						const u32 data_offset = ((spda + spr_count) & 0xffff) / 2;
 						u8 pen = (bitswap<16>(tvram[data_offset],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8) >> (15 - x_s)) & 1;
@@ -280,7 +277,14 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 						pen = pen & 1 ? fg_col : (bc) ? 8 : 0;
 
 						if(pen != 0)
-							bitmap.pix(res_y, res_x) = m_palette->pen(pen + layer_pal_bank);
+						{
+							for (int mg = 0; mg < m_tsp.spr_mg + 1; mg ++)
+							{
+								if (!cliprect.contains(res_x, res_y + mg))
+									continue;
+								bitmap.pix(res_y + mg, res_x) = m_palette->pen(pen + layer_pal_bank);
+							}
+						}
 					}
 
 					spr_count += 2;
@@ -304,16 +308,20 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 						int res_x = xp + x_i + x_s;
 						int res_y = (yp + y_i) << m_tsp.spr_mg;
 
-						if (!cliprect.contains(res_x, res_y))
-							continue;
-
 						const u32 data_offset = ((spda + spr_count) & 0xffff) / 2;
 
 						int pen = (bitswap<16>(tvram[data_offset],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8)) >> (12 - (x_s * 4)) & 0xf;
 
 						//if (pen != 0 && pen != m_text_transpen)
 						if (pen != 0)
-							bitmap.pix(res_y, res_x) = m_palette->pen(pen + layer_pal_bank);
+						{
+							for (int mg = 0; mg < m_tsp.spr_mg + 1; mg ++)
+							{
+								if (!cliprect.contains(res_x, res_y + mg))
+									continue;
+								bitmap.pix(res_y + mg, res_x) = m_palette->pen(pen + layer_pal_bank);
+							}
+						}
 					}
 
 					spr_count += 2;
@@ -725,7 +733,7 @@ void pc88va_state::draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cli
 		, layer_pal_bank
 	);
 
-//	m_graphic_bitmap[which].fill(m_palette->pen(layer_pal_bank), cliprect);
+//  m_graphic_bitmap[which].fill(m_palette->pen(layer_pal_bank), cliprect);
 	m_graphic_bitmap[which].fill(0, cliprect);
 
 	const int layer_inc = (!is_5bpp) + 1;
