@@ -194,7 +194,7 @@ ROM_START( cjsjh ) // Nov  2 2007 16:05:26 string in ROM
 	ROM_LOAD16_WORD_SWAP( "vxxxcn.u8", 0x000000, 0x200000, CRC(911d8dce) SHA1(1d9386c4a9e118d02b5b29f9e9ce90ef1d6f419f) ) // label not readable
 
 	ROM_REGION( 0x400000, "gfx", 0 )
-	ROM_LOAD( "gfx_flashrom", 0x000000, 0x400000, NO_DUMP ) // not dumped yet
+	ROM_LOAD( "gfx.u2", 0x000000, 0x400000, CRC(e2964db3) SHA1(21e021c88136083445b430c618a8eb74e2147d4f ) )
 
 	ROM_REGION( 0x200000, "oki", 0 )
 	ROM_LOAD( "sp.u24", 0x000000, 0x200000, CRC(ad11c8b9) SHA1(0547a57ff2183e65fa1d51234799a3d521b018c5) )

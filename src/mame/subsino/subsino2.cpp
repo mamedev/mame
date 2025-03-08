@@ -3182,7 +3182,7 @@ ROM_START( xiaoao )
 	ROM_LOAD( "xiaoaojianghu-ds2430a.q3", 0x00, 0x28, CRC(518e4ba3) SHA1(704fb6f8ff9966d1b90af849b2b7c6df06d3e4a0) )
 ROM_END
 
-ROM_START( queenbn )
+ROM_START( queenbn ) // PCB has been hacked to make it work with Queen Bee New instead of Bishou Jan
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "ss9689_6433044a22f.u16", 0x000000, 0x008000, CRC(ece09075) SHA1(a8bc3aa44f30a6f919f4151c6093fb52e5da2f40) )
 	ROM_LOAD( "prg.u21",                0x080000, 0x040000, CRC(e04e5926) SHA1(e17d0015742f9646a6702f8e45845b0c537064e8) )
