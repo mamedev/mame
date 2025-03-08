@@ -1963,24 +1963,24 @@ ROM_END
 
 /*********************************************************************************
 
-Jin Hu Lu 2, IGS, 1995
-Hu Lu Wang II, IGS, 1995
+金葫蘆 II - Jin Hu Lu II, IGS, 1995 (v412GS, Link Version)
+金葫蘆 II - Jin Hu Lu II, IGS, 1995 (v120GI, Stand-Alone Version)
 These are Poker / Card games.
 Board is a mix of through-hole and surface mounted parts (lots of SMD logic).
 Hardware Info By Guru
 ---------------------
 
-IGS PCB NO-0202-
-IGS PCB NO-0202-2
+IGS PCB NO-0202-  (for v412GS)
+IGS PCB NO-0202-2 (for v120GI)
   |------------------------------------------|
   |     BATT     12MHz                   P1  |
 |-|  SW4                               Z180  |
-|18                                          |
-|OR     T518B                         PRG.U40|
-|22   TLP521(x20)               PAL          |
-|WAY                            PAL     6264*|
-|           2149C               PAL          |
-|-|                             PAL     PAL  |
+|2                                           |
+|2      T518B                         PRG.U40|
+|W    TLP521(x20)               PAL          |
+|A                              PAL     6264*|
+|Y          2149C               PAL          |
+|-|                             PAL     PALx |
   |         IGS-003C                         |
 |-| ULN2004                                  |
 |1                                  |------| |
@@ -2003,6 +2003,8 @@ Notes:
     ULN2004 - ULN2004 7-Channel Darlington Transistor Array
     SW1/2/3 - 8-Position DIP Switch
         SW4 - Toggle Switch for NVRAM Clear and Reset
+        PAL - These PALs match on both boards.
+       PALx - This PAL is different on both boards (i.e. game-specific)
          P1 - 4-Pin Link Connector
        BATT - 3.6V Ni-Cad Battery
     PRG.U40 - 27C512 EPROM (main program)
