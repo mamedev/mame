@@ -1320,24 +1320,6 @@ Needs [OFX/OFY] on gameplay
 		</part>
 	</software>
 
-	<software name="upo" supported="no">
-		<description>Saishuu Heiki UPO (Pre-Release)</description>
-		<year>1992</year>
-		<publisher>&lt;doujin&gt;</publisher>
-		<notes><![CDATA[
-Broken Upyolic logo [ROP]
-Needs joystick in otherwise it loops on title screen
-Gameplay don't mask bullets on right side, [cliprect]
-]]></notes>
-		<info name="developer" value="Upyolic Soft" />
-		<info name="alt_title" value="最終平気UPOプレリリース" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1289040">
-				<rom name="upo.d88" size="1289040" crc="cfbcfdda" sha1="0b57d9c9df6c4186339f484794905417ea0dccb4"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="pacman" supported="no">
 		<description>Pac-Man</description>
 		<year>19??</year>
@@ -1370,8 +1352,259 @@ Gameplay don't mask bullets on right side, [cliprect]
 		</part>
 	</software>
 
+	<software name="upo" supported="no">
+		<description>Saishuu Heiki UPO (Pre-Release)</description>
+		<year>1992</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<notes><![CDATA[
+Broken Upyolic logo [ROP]
+Needs joystick in otherwise it loops on title screen
+Gameplay don't mask bullets on right side, [cliprect]
+]]></notes>
+		<info name="developer" value="Upyolic Soft" />
+		<info name="alt_title" value="最終平気UPOプレリリース" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1289040">
+				<rom name="upo.d88" size="1289040" crc="cfbcfdda" sha1="0b57d9c9df6c4186339f484794905417ea0dccb4"/>
+			</dataarea>
+		</part>
+	</software>
 
-<!-- PC88 Images which have been patched to work on the VA? -->
+<!-- !Inufuto -->
+
+	<software name="aerial" supported="no">
+		<description>Aerial</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
+		<notes><![CDATA[
+[gfx] Requires fractional scrolling (horizontal)
+[gfx] Should require primask for right panel score display
+https://youtu.be/7ltdrUPz91w
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="761008">
+				<rom name="aerial.d88" size="761008" crc="e10f8f49" sha1="e02e56d202b1d99165ec6fc9958a28613a14af18"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="antiair" supported="partial">
+		<description>AntiAir</description>
+		<year>2024</year>
+		<publisher>Inufuto</publisher>
+		<notes><![CDATA[
+https://youtu.be/ygLhn4H-3Ao
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="761008">
+				<rom name="antiair.d88" size="761008" crc="9f95b94d" sha1="9f23858356ba48532a05b7b0c9ca648491fe8231"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ascend" supported="no">
+		<description>Ascend</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
+		<notes><![CDATA[
+[gfx] background blacked out
+https://youtu.be/JyGXxxOpMos
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="761008">
+				<rom name="ascend.d88" size="761008" crc="1e1d4dda" sha1="0da760e99c22fdf3cdbeaed5810728db726ec2cb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="battlot" supported="no">
+		<description>Battlot</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
+		<notes><![CDATA[
+[DE-9] keeps shooting when player press button first time around
+https://youtu.be/STaoHIbmCFY
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="761008">
+				<rom name="Battlot.d88" size="761008" crc="2084f423" sha1="65e5bc5a778dbc2bcb30176906106c010d7aec86"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bootskell" supported="partial">
+		<description>Bootskell</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
+		<notes><![CDATA[
+https://youtu.be/GHJy6X21B3I
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="761008">
+				<rom name="bootskell.d88" size="761008" crc="7fc74622" sha1="6230a3aadabb7340c1d460017547fddad4d5e320"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cacorm" supported="partial">
+		<description>Cacorm</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
+		<notes><![CDATA[
+https://youtu.be/qRZHbiBbqwU
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="761008">
+				<rom name="cacorm.d88" size="761008" crc="52345a89" sha1="d2d6e557851532157dc866f7bf1be9b654a3b230"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavit" supported="partial">
+		<description>Cavit</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
+		<notes><![CDATA[
+https://youtu.be/oDb9-Bbwe6Q
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="761008">
+				<rom name="cavit.d88" size="761008" crc="40a303d1" sha1="427da321340b012a1447c1e3b641453e18c667e4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cracky" supported="partial">
+		<description>Cracky</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
+		<notes><![CDATA[
+https://youtu.be/oJEUR7FhVlU
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="761008">
+				<rom name="cracky.d88" size="761008" crc="8c4280aa" sha1="22ef6e02d38daca0f874aeec8fee3811e90afe76"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="guntus" supported="partial">
+		<description>Guntus</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
+		<notes><![CDATA[
+https://youtu.be/zMWhBRD8cdM
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="761008">
+				<rom name="guntus.d88" size="761008" crc="55e693e5" sha1="b889c511fa7cecfdb7002e284388d4b685d45dd5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hopman" supported="no">
+		<description>Hopman</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
+		<notes><![CDATA[
+Runs too slow
+https://youtu.be/zxy8lTZ_w_k
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="761008">
+				<rom name="hopman.d88" size="761008" crc="4428efdf" sha1="3d7be02ca18ada3ac5cc619ea05a2962ee10b03a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="impetus" supported="no">
+		<description>Impetus</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
+		<notes><![CDATA[
+[gfx] wrong palette bank
+[gfx] Requires fractional scrolling (vertical)
+https://youtu.be/JIK3ruhURG4
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="761008">
+				<rom name="impetus.d88" size="761008" crc="2d8297b7" sha1="964f3dc7da3ca9b1813c5b962b8d7af8b6aada45"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lift" supported="partial">
+		<description>Lift</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
+		<notes><![CDATA[
+https://youtu.be/ggtnO4vv_l8
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="761008">
+				<rom name="lift.d88" size="761008" crc="10ff7af8" sha1="c33269e3aff36f3b7ed79e1298c9f722f43a8317"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="neuras" supported="partial">
+		<description>Neuras</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
+		<notes><![CDATA[
+https://youtu.be/LnvQwy62YZ4
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="761008">
+				<rom name="neuras.d88" size="761008" crc="252d2e71" sha1="8c122404d2491ca2b8b591bea7faeec12fb16fd5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="osotos" supported="partial">
+		<description>Osotos</description>
+		<year>2024</year>
+		<publisher>Inufuto</publisher>
+		<notes><![CDATA[
+https://youtu.be/yLf945xs23Y
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="761008">
+				<rom name="osotos.d88" size="761008" crc="536eced5" sha1="06dd908b2f0b2ce8c288f33bfa4a0e7074b3d880"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ruptus" supported="no">
+		<description>Ruptus</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
+		<notes><![CDATA[
+[gfx] wrong palette bank
+https://youtu.be/JtRkC5ffaYc
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="761008">
+				<rom name="ruptus.d88" size="761008" crc="5acfb8ab" sha1="cf65558877a76668fa3d4e0037b49a337e686d00"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yewdow" supported="partial">
+		<description>Yewdow</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
+		<notes><![CDATA[
+https://youtu.be/HlUe7QijzaA
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="761008">
+				<rom name="yewdow.d88" size="761008" crc="0155838b" sha1="8b2cdf3a52312e2ee0aecb1d4f7c3a6c936127d8"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!-- !Hacked PC88 Images which have been patched to work on the VA? -->
 	<!-- is this legit? -->
 	<!-- TODO: None of the disks are bootable from V3 Mode, boots from pc8801ma by quick glance so likely belongs to pc8801_flop.xml, move once we have working V2 emulation mode -->
 	<software name="midgarts" supported="no">
