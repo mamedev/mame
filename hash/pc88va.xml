@@ -144,8 +144,9 @@ Transition between 3rd and 4th sequences don't look right, [IDP]
 		<notes><![CDATA[
 [gfx] status bar has wrong colors [OFX/OFY]
 ]]></notes>
-		<sharedfeat name="mouseport_default" value="mouse"/>
 		<info name="alt_title" value="アニメフレーマー" />
+		<sharedfeat name="mouseport_default" value="mouse"/>
+
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Program Disk" />
 			<dataarea name="flop" size="1338960">
@@ -216,8 +217,9 @@ PLAYR.BAT has offset [IDP] text display
 SKYBD.BAT wants a radio cassette player and a PC-KD861 color monitor for audio sampling thru OPNA EOS
 VIDEO.BAT has various superimpose effects, requires dedicated board
 ]]></notes>
-		<sharedfeat name="mouseport_default" value="mouse"/>
 		<info name="alt_title" value="PC-Engine(VA2添付版)" />
+		<sharedfeat name="mouseport_default" value="mouse"/>
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1338960">
 				<rom name="pc-engine (va2 tenpu-ban).d88" size="1338960" crc="3c2cf3c5" sha1="e92694e060f46037fd2cdf11ad1f2d75c5121de2"/>
@@ -233,6 +235,7 @@ VIDEO.BAT has various superimpose effects, requires dedicated board
 (same as pceva2tb)
 ]]></notes>
 		<sharedfeat name="mouseport_default" value="mouse"/>
+
 		<!-- baddump: NEC_SAMP directory edited in 2010 (no active changes inside, remnants of a deleted file?) -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1331888">
@@ -381,8 +384,9 @@ Needs [IDP] text display to go off for bottommost row
 		<notes><![CDATA[
 Burps on [FDC] access after disk swap with program and player disks, trying to scan chrn=(4, 0, 1, 256)
 ]]></notes>
-		<sharedfeat name="mouseport_default" value="mouse"/>
 		<info name="alt_title" value="マイトアンドマジック2" />
+		<sharedfeat name="mouseport_default" value="mouse"/>
+
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Boot Disk" />
 			<dataarea name="flop" size="1296112">
@@ -522,8 +526,8 @@ Needs graphic [OFX/OFY] scroll
 		<notes><![CDATA[
 Burps on [FDC] access after disk swap with program and player disks, trying to scan chrn=(38, 0, 1, 256)
 ]]></notes>
-		<sharedfeat name="mouseport_default" value="mouse"/>
 		<info name="alt_title" value="ローグアライアンス" />
+		<sharedfeat name="mouseport_default" value="mouse"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Boot Disk" />
@@ -557,8 +561,9 @@ May crash with disk error when entering winning animation (verify)
 Winning animation is glitchy [OFX/OFY]?, uses [IDP] text transpen with upper bits set (for flame effect?), press mouse left button to return to game
 [OPNA] seems to cut off shortly on intro and winning screen compared to VAEG
 ]]></notes>
-		<sharedfeat name="mouseport_default" value="mouse"/>
 		<info name="alt_title" value="上海" />
+		<sharedfeat name="mouseport_default" value="mouse"/>
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1296112">
 				<rom name="shang-hai (system soft).d88" size="1296112" crc="b567190e" sha1="68ca3d14e0ea12637c5f7b1c2244f0370c3abc5e"/>
