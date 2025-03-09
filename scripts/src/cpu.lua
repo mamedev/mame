@@ -3742,7 +3742,7 @@ if opt_tool(CPUS, "DSP56000") then
 end
 
 --------------------------------------------------
--- DEC VAX, disassembler only
+-- DEC VAX
 --@src/devices/cpu/vax/vax.h,CPUS["VAX"] = true
 --------------------------------------------------
 
