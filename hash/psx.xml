@@ -23576,7 +23576,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="Smurf Racer! (USA) (En,Fr,Es)" sha1="2552c9f065582ad4959d46d022d1a714d8d5e27c"/>
+				<disk name="Smurf Racer (USA) (En,Fr,Es)" sha1="2552c9f065582ad4959d46d022d1a714d8d5e27c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -57392,7 +57392,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="Transport Tycoon 3D - SL Kara Hajimeyou!! (Japan)" sha1="d89014b41550799753f54d3f70fb81687cbf3618" />
+				<disk name="Transport Tycoon 3D - SL Kara Hajimeyou (Japan)" sha1="d89014b41550799753f54d3f70fb81687cbf3618" />
 			</diskarea>
 		</part>
 	</software>
@@ -59835,7 +59835,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="3, 2, 1, Smurf! My First Racing Game (Europe) (En,Fr,De,Es,It,Nl)" sha1="4ec0f3c19c735742afdb69bf0222451b2e702b28"/>
+				<disk name="3, 2, 1, Smurf My First Racing Game (Europe) (En,Fr,De,Es,It,Nl)" sha1="4ec0f3c19c735742afdb69bf0222451b2e702b28"/>
 			</diskarea>
 		</part>
 	</software>
