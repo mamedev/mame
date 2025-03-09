@@ -9066,23 +9066,6 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		</part>
 	</software>
 
-	<software name="fifa2k2w">
-		<!-- Original images (Redump)
-		<rom name="2002 FIFA World Cup (USA) (En,Es).cue" size="99" crc="ce349b32" sha1="57df3eb3cfcd44be5f422c13ad181b53460dfe90"/>
-		<rom name="2002 FIFA World Cup (USA) (En,Es).bin" size="514612896" crc="472333bc" sha1="720c8613669d684be002e1f454acc532a98eb241"/>
-		-->
-		<description>2002 FIFA World Cup (USA)</description>
-		<year>2002</year>
-		<publisher>Electronic Arts</publisher>
-		<info name="serial" value="SLUS-01449"/>
-		<sharedfeat name="compatibility" value="NTSC-U"/>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="2002 fifa world cup (usa) (en,es)" sha1="94ed77c9560169b79a0ea310e4c0e8f3919a0055"/>
-			</diskarea>
-		</part>
-	</software>
-
 	<software name="fifa2k3">
 		<!-- Original images (Redump)
 		<rom name="FIFA Soccer 2003 (USA).cue" size="88" crc="54f0c567" sha1="52e3165ff2251d71c707fe40a8b35cccfea927a3"/>
@@ -60123,7 +60106,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<description>Bedlam (Europe)</description>
 		<year>1997</year>
 		<publisher>GT Interactive</publisher>
-		<notes>Scrambed graphics</notes>
+		<notes>Scrambled graphics</notes>
 		<info name="developer" value="Mirage Technologies"/>
 		<info name="language" value="Dutch/English/French/German/Italian/Spanish" />
 		<info name="redump.org" value="1034" />
