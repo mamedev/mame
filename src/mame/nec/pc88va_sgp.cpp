@@ -21,9 +21,9 @@ TODO:
 #include "emu.h"
 #include "pc88va_sgp.h"
 
-//#include <iostream>
-
 #define LOG_COMMAND     (1U << 1)
+
+//#include <iostream>
 
 #define VERBOSE (LOG_GENERAL)
 //#define LOG_OUTPUT_STREAM std::cout
@@ -420,9 +420,12 @@ void pc88va_sgp_device::execute_blit(u16 draw_mode, bool is_patblt)
 		return;
 	}
 
-	if (m_src.pixel_mode == 0 || m_src.pixel_mode == 3 || m_src.pixel_mode != m_dst.pixel_mode)
+	// TODO: pceva2tb:SKYBD.BAT wants a 1bpp to 4bpp translation
+	if (m_src.pixel_mode == 0 || m_src.pixel_mode != m_dst.pixel_mode)
 	{
-		LOG("SGP: Warning BITBLT pixel mode %d x %d\n", m_src.pixel_mode, m_dst.pixel_mode);
+		static const char *const pixel_mode[] = { "1bpp", "4bpp", "8bpp", "rgb565" };
+
+		LOG("SGP: Warning BITBLT pixel mode src %s against dst %s\n", pixel_mode[m_src.pixel_mode], pixel_mode[m_dst.pixel_mode]);
 		return;
 	}
 
@@ -468,6 +471,24 @@ void pc88va_sgp_device::execute_blit(u16 draw_mode, bool is_patblt)
 					{
 						result = (this->*rop_table[logical_op])(src, dst);
 						m_data->write_byte(dst_offset, result);
+					}
+
+					break;
+				}
+
+				// RGB565 (ballbrkr title)
+				case 3:
+				{
+					const u32 dst_offset = dst_address + ((xi + m_dst.start_dot) << 1);
+
+					u16 src = m_data->read_word(src_address + (xi << 1)) & 0xffff;
+					u16 dst = m_data->read_word(dst_offset) & 0xffff;
+					u16 result = dst;
+
+					if ((this->*tpmod_table[tp_mod])(src, dst))
+					{
+						result = (this->*rop_table[logical_op])(src, dst);
+						m_data->write_word(dst_offset, result);
 					}
 
 					break;

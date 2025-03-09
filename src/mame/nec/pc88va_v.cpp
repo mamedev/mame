@@ -4,8 +4,6 @@
 #include "emu.h"
 #include "pc88va.h"
 
-//#include <iostream>
-
 
 #define LOG_IDP     (1U << 1) // TSP data
 #define LOG_FB      (1U << 2) // framebuffer strips (verbose)
@@ -13,6 +11,8 @@
 #define LOG_CRTC    (1U << 4)
 #define LOG_COLOR   (1U << 5) // current color mode
 #define LOG_TEXT    (1U << 6) // text strips (verbose)
+
+//#include <iostream>
 
 #define VERBOSE (LOG_GENERAL | LOG_IDP)
 //#define LOG_OUTPUT_STREAM std::cout
@@ -29,11 +29,11 @@
 void pc88va_state::video_start()
 {
 	const u32 gvram_size = 0x40000;
-	m_gvram = std::make_unique<uint8_t[]>(gvram_size);
+	m_gvram = make_unique_clear<uint8_t[]>(gvram_size);
 	std::fill_n(m_gvram.get(), gvram_size, 0);
 
 	const u32 kanjiram_size = 0x4000;
-	m_kanji_ram = std::make_unique<uint8_t[]>(kanjiram_size);
+	m_kanji_ram = make_unique_clear<uint8_t[]>(kanjiram_size);
 	m_gfxdecode->gfx(2)->set_source(m_kanji_ram.get());
 	m_gfxdecode->gfx(3)->set_source(m_kanji_ram.get());
 	m_vrtc_irq_line = 432;
@@ -55,6 +55,7 @@ void pc88va_state::video_start()
 	save_item(NAME(m_vrtc_irq_line));
 }
 
+// TODO: all needs to be verified
 void pc88va_state::video_reset()
 {
 	m_gden0 = false;
@@ -63,6 +64,7 @@ void pc88va_state::video_reset()
 	m_color_mode = 0;
 	m_pltm = 0;
 	m_pltp = 0;
+	m_video_pri_reg[0] = m_video_pri_reg[1] = 0;
 }
 
 void pc88va_state::palette_init(palette_device &palette) const
@@ -810,7 +812,7 @@ void pc88va_state::draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cli
 						draw_packed_gfx_5bpp(m_graphic_bitmap[which], split_cliprect, fsa, dsa, layer_pal_bank, fbw, fbl);
 					}
 					else
-						draw_direct_gfx_8bpp(m_graphic_bitmap[which], split_cliprect, fsa, fbw, fbl);
+						draw_direct_gfx_8bpp(m_graphic_bitmap[which], split_cliprect, fsa, dsa, fbw, fbl);
 					break;
 				case 3: draw_direct_gfx_rgb565(m_graphic_bitmap[which], split_cliprect, fsa, fbw, fbl); break;
 				default:
@@ -902,7 +904,7 @@ void pc88va_state::draw_packed_gfx_5bpp(bitmap_rgb32 &bitmap, const rectangle &c
 	}
 }
 
-void pc88va_state::draw_direct_gfx_8bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u16 fb_width, u16 fb_height)
+void pc88va_state::draw_direct_gfx_8bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u32 display_start_offset, u16 fb_width, u16 fb_height)
 {
 //  const u16 y_min = std::max(cliprect.min_y, y_start);
 //  const u16 y_max = std::min(cliprect.max_y, y_min + fb_height);
@@ -913,7 +915,7 @@ void pc88va_state::draw_direct_gfx_8bpp(bitmap_rgb32 &bitmap, const rectangle &c
 
 		for(int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			u32 bitmap_offset = line_offset + x;
+			u32 bitmap_offset = (line_offset + x) & 0x3ffff;
 
 			uint32_t color = (m_gvram[bitmap_offset] & 0xff);
 
@@ -937,7 +939,8 @@ void pc88va_state::draw_direct_gfx_rgb565(bitmap_rgb32 &bitmap, const rectangle 
 
 	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		const u32 line_offset = ((y * fb_width) + fb_start_offset) & 0x3ffff;
+		// pc88vad requires halved pitch for first screen
+		const u32 line_offset = ((y * fb_width >> 1) + fb_start_offset) & 0x3ffff;
 
 		for(int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
@@ -956,6 +959,7 @@ void pc88va_state::draw_direct_gfx_rgb565(bitmap_rgb32 &bitmap, const rectangle 
 	}
 }
 
+// famista, probably all inufuto games
 void pc88va_state::draw_packed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u32 display_start_offset, u8 pal_base, u16 fb_width, u16 fb_height)
 {
 //  const u16 y_min = std::max(cliprect.min_y, y_start);
@@ -968,7 +972,7 @@ void pc88va_state::draw_packed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &c
 		for(int x = cliprect.min_x; x <= cliprect.max_x; x += 8)
 		{
 			u16 x_char = (x >> 3);
-			u32 bitmap_offset = line_offset + x_char;
+			u32 bitmap_offset = (line_offset + x_char + (display_start_offset >> 2)) & 0x0ffff;
 
 			for (int xi = 0; xi < 8; xi ++)
 			{
