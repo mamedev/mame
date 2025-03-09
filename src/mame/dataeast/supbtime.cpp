@@ -9,8 +9,7 @@
 
   These games all run on the DE-0343 board.
 
-  CPU: Custom 68000 Data East 55 (Super Burger Time, China Town) or Data East
-  56 (Tumble Pop) clocked at 21.422 MHz / 2.
+  CPU: Custom 68000 Data East 59 clocked at 21.422 MHz / 2.
 
   Sound: Data East 45, YM2151, Oki ADPCM - NOTE! The sound program writes to the
   address of a YM2203 and a 2nd Oki chip but the board does _not_ have them. The
