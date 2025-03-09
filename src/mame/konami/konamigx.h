@@ -134,8 +134,7 @@ public:
 						tilemap_t *sub1, int sub1flags,
 						tilemap_t *sub2, int sub2flags,
 						int mixerflags, bitmap_ind16 *extra_bitmap, int rushingheroes_hack,
-						GX_OBJ *objpool,
-						u16 nobj
+						const std::vector<GX_OBJ> &objpool
 						);
 
 
@@ -303,8 +302,6 @@ protected:
 	std::unique_ptr<bitmap_ind16> m_gxtype1_roz_dstbitmap;
 	std::unique_ptr<bitmap_ind16> m_gxtype1_roz_dstbitmap2;
 	rectangle m_gxtype1_roz_dstbitmapclip;
-
-	std::unique_ptr<GX_OBJ[]> m_gx_objpool;
 
 	u8 m_type3_psac2_bank = 0;
 	u8 m_type3_spriteram_bank = 0;

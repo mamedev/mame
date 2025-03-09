@@ -302,7 +302,6 @@ void konamigx_state::konamigx_mixer_init(screen_device &screen, int objdma)
 
 	m_gx_objzbuf = &screen.priority().pix(0);
 	m_gx_shdzbuf = std::make_unique<uint8_t[]>(GX_ZBUFSIZE);
-	m_gx_objpool = std::make_unique<GX_OBJ[]>(GX_MAX_OBJECTS);
 
 	m_k054338->export_config(&m_K054338_shdRGB);
 
@@ -341,10 +340,6 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 
 	// buffer can move when it's resized, so refresh the pointer
 	m_gx_objzbuf = &screen.priority().pix(0);
-
-	// abort if object database failed to initialize
-	GX_OBJ *objpool = m_gx_objpool.get();
-	if (!objpool) return;
 
 	// clear screen with backcolor and update flicker pulse
 	if (m_gx_wrport1_0 & 0x20)
@@ -445,20 +440,18 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 	// pre-sort layers
 	for (int j=0; j<5; j++)
 	{
-		int temp1 = layerpri[j];
 		for (int i=j+1; i<6; i++)
 		{
-			int temp2 = layerpri[i];
-			if ((uint32_t)temp1 <= (uint32_t)temp2)
+			if (layerpri[j] <= layerpri[i])
 			{
-				layerpri[i] = temp1; layerpri[j] = temp1 = temp2;
-				temp2 = layerid[i]; layerid[i] = layerid[j]; layerid[j] = temp2;
+				std::swap(layerpri[j], layerpri[i]);
+				std::swap(layerid[j], layerid[i]);
 			}
 		}
 	}
 
 	// build object database and create indices
-	u16 nobj = 0;
+	std::vector<GX_OBJ> objpool; // max size: 6 layers + 256 sprites + 256 shadows
 
 	for (int i=5; i>=0; i--)
 	{
@@ -491,10 +484,9 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 
 		if (offs != -128)
 		{
-			objpool[nobj].order = layerpri[i]<<24;
-			objpool[nobj].code  = code;
-			objpool[nobj].offs = offs;
-			nobj++;
+			const u32 order = layerpri[i] << 24;
+			const int color = 0;
+			objpool.push_back(GX_OBJ{order, offs, code, color});
 		}
 	}
 
@@ -518,27 +510,19 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 
 		m_k055673->m_k053247_cb(&code, &color, &pri);
 
-		/*
-		    shadow     = shadow code
-		    spri       = shadow priority
-		    add_solid  = add solid object
-		    temp2      = solid pens draw mode
-		    add_shadow = add shadow object
-		    temp4      = shadow pens draw mode
-		*/
-		int temp4 = 0;
-		bool add_shadow = 0;
-		int temp2 = 0;
-		bool add_solid = 0;
-		int spri = 0;
-		int shadow = 0;
+		u8 shadow_draw_mode = 0; // shadow pens draw mode (4-5)
+		bool add_shadow = 0;     // add shadow object
+		u8 solid_draw_mode = 0;  // solid pens draw mode (0-3)
+		bool add_solid = 0;      // add solid object
+		u8 spri = 0;             // shadow priority
+		u8 shadow = 0;           // shadow code
 
 		if (color & K055555_FULLSHADOW)
 		{
 			shadow = 3; // use default intensity and color
 			spri = pri; // retain host priority
 			add_shadow = 1;
-			temp4 = 5; // draw full shadow
+			shadow_draw_mode = 5; // draw full shadow
 		}
 		else
 		{
@@ -550,11 +534,11 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 				{
 					shadow--;
 					add_solid = 1; // add solid
-					temp2 = 1; // draw partial solid
+					solid_draw_mode = 1; // draw partial solid
 					if (shadowon[shadow])
 					{
 						add_shadow = 1;
-						temp4 = 4; // draw partial shadow
+						shadow_draw_mode = 4; // draw partial shadow
 					}
 				}
 				else
@@ -563,19 +547,19 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 					shadow = 0;
 					if (!shadowon[0]) continue;
 					add_shadow = 1;
-					temp4 = 5; // draw full shadow
+					shadow_draw_mode = 5; // draw full shadow
 				}
 			}
 			else
 			{
 				add_solid = 1; // add solid
-				temp2 = 0; // draw full solid
+				solid_draw_mode = 0; // draw full solid
 			}
 
 			if (add_solid)
 			{
 				// tag sprite for alpha blending
-				if (color>>K055555_MIXSHIFT & 3) temp2 |= 2;
+				if (color>>K055555_MIXSHIFT & 3) solid_draw_mode |= 2;
 			}
 
 			if (add_shadow)
@@ -615,35 +599,27 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 		if (add_solid)
 		{
 			// add objects with solid or alpha pens
-			u32 order = pri<<24 | zcode<<16 | offs<<(8-3) | temp2<<4;
-			objpool[nobj].order = order;
-			objpool[nobj].offs  = offs;
-			objpool[nobj].code  = code;
-			objpool[nobj].color = color;
-			nobj++;
+			u32 order = pri<<24 | zcode<<16 | offs<<(8-3) | solid_draw_mode<<4;
+			objpool.push_back(GX_OBJ{order, offs, code, color});
 		}
 
 		if (add_shadow && !(color & K055555_SKIPSHADOW) && !(mixerflags & GXMIX_NOSHADOW))
 		{
 			// add objects with shadows if enabled
-			u32 order = spri<<24 | zcode<<16 | offs<<(8-3) | temp4<<4 | shadow;
-			objpool[nobj].order = order;
-			objpool[nobj].offs  = offs;
-			objpool[nobj].code  = code;
-			objpool[nobj].color = color;
-			nobj++;
+			u32 order = spri<<24 | zcode<<16 | offs<<(8-3) | shadow_draw_mode<<4 | shadow;
+			objpool.push_back(GX_OBJ{ order, offs, code, color});
 		}
 	}
 
-	// sort objects in decending order (SLOW)
-	std::reverse(objpool, objpool + nobj);
-	std::stable_sort(objpool, objpool + nobj, [](const GX_OBJ &a, const GX_OBJ &b){
+	// sort objects in descending order (SLOW)
+	// reverse objpool to retain order in case of ties
+	std::reverse(objpool.begin(), objpool.end());
+	std::stable_sort(objpool.begin(), objpool.end(), [](const GX_OBJ &a, const GX_OBJ &b){
 		return a.order > b.order;
 	});
 
 	konamigx_mixer_draw(screen,bitmap,cliprect,sub1,sub1flags,sub2,sub2flags,mixerflags,extra_bitmap,rushingheroes_hack,
-		objpool,
-		nobj
+		objpool
 		);
 }
 
@@ -653,14 +629,13 @@ void konamigx_state::konamigx_mixer_draw(screen_device &screen, bitmap_rgb32 &bi
 					int mixerflags, bitmap_ind16 *extra_bitmap, int rushingheroes_hack,
 
 					/* passed from above function */
-					GX_OBJ *objpool,
-					u16 nobj
+					const std::vector<GX_OBJ> &objpool
 					)
 {
 	// traverse draw list
 	const u8 disp = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
 
-	for (int count=0; count<nobj; count++)
+	for (int count=0; count<objpool.size(); count++)
 	{
 		const u32 order  = objpool[count].order;
 		const int offs   = objpool[count].offs;
