@@ -21,6 +21,7 @@
  * - Fix PLL calculation for 1k+ width VESA modes (tends to either be too fast or too slow);
  * - 1600x1200x4 needs line compare fix in downstream pc_vga (cuts too early);
  * - 1280x1024x16 draws 256 H and stupid high refresh rate;
+ * - virgevx: stub, uses a beefier RAMDAC (can do up to 1600x1200x16 / 1280x1024x24)
  *
  * Notes:
  * - Most Windows s3dsdk demos starts in software render (at least with win98se base S3 drivers,
@@ -58,6 +59,7 @@
 #define CRTC_PORT_ADDR ((vga.miscellaneous_output & 1) ? 0x3d0 : 0x3b0)
 
 DEFINE_DEVICE_TYPE(S3VIRGE,    s3virge_vga_device,        "virge_vga",      "S3 86C325 VGA core")
+DEFINE_DEVICE_TYPE(S3VIRGEVX,  s3virgevx_vga_device,      "virgevx_vga",    "S3 86C988 VGA core")
 DEFINE_DEVICE_TYPE(S3VIRGEDX,  s3virgedx_vga_device,      "virgedx_vga",    "S3 86C375 VGA core")
 DEFINE_DEVICE_TYPE(S3VIRGEDX1, s3virgedx_rev1_vga_device, "virgedx_vga_r1", "S3 86C375 (rev 1) VGA core")
 
@@ -72,6 +74,13 @@ s3virge_vga_device::s3virge_vga_device(const machine_config &mconfig, device_typ
 	: s3trio64_vga_device(mconfig, type, tag, owner, clock)
 	, m_linear_config_changed_cb(*this)
 {
+}
+
+s3virgevx_vga_device::s3virgevx_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: s3virge_vga_device(mconfig, S3VIRGEVX, tag, owner, clock)
+{
+	m_crtc_space_config = address_space_config("crtc_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(s3virgevx_vga_device::crtc_map), this));
+	m_seq_space_config = address_space_config("sequencer_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(s3virgevx_vga_device::sequencer_map), this));
 }
 
 s3virgedx_vga_device::s3virgedx_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -139,6 +148,17 @@ void s3virge_vga_device::device_start()
 	s3.id_cr30 = 0xe1;  // CR30
 }
 
+void s3virgevx_vga_device::device_start()
+{
+	s3virge_vga_device::device_start();
+
+	// set device ID
+	s3.id_high = 0x88;  // CR2D
+	s3.id_low = 0x3d;   // CR2E
+	s3.revision = 0x00; // CR2F  (value unknown)
+	s3.id_cr30 = 0xe1;  // CR30
+}
+
 void s3virgedx_vga_device::device_start()
 {
 	s3virge_vga_device::device_start();
@@ -188,6 +208,13 @@ void s3virge_vga_device::device_reset()
 	s3.strapping = 0x000f0912;
 
 	s3d_reset();
+}
+
+void s3virgevx_vga_device::device_reset()
+{
+	s3virge_vga_device::device_reset();
+	// TODO: unverified
+	s3.strapping = 0x000f0912;
 }
 
 void s3virgedx_vga_device::device_reset()
@@ -430,6 +457,8 @@ void s3virge_vga_device::s3_define_video_mode()
 		svga.rgb16_en = 0;
 		svga.rgb24_en = 0;
 		svga.rgb32_en = 0;
+		// TODO: virgevx has upgraded RAMDAC
+		// (overhauls color modes for accomodating 1600x1200 resolutions)
 		switch((s3.ext_misc_ctrl_2) >> 4)
 		{
 			case 0x01: svga.rgb8_en = 1; break;
