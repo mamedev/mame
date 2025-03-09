@@ -3111,7 +3111,7 @@ static INPUT_PORTS_START(aerofgts)
 	PORT_DIPSETTING(0x00, DEF_STR(No)) // NG
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( bam2 )
+static INPUT_PORTS_START(bam2)
 	PORT_INCLUDE(zn2p)
 
 	PORT_MODIFY("P1")
@@ -3148,15 +3148,15 @@ static INPUT_PORTS_START( bam2 )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_SERVICE2) PORT_CONDITION("DSW", 0x01, EQUALS, 0x00) // START2
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_START2) PORT_CONDITION("DSW", 0x01, EQUALS, 0x01) // START2
 
-    PORT_MODIFY("DSW")
-    PORT_DIPNAME( 0x01, 0x00, "Cabinet Type" ) PORT_DIPLOCATION("S551:1")
-    PORT_DIPSETTING(    0x01, "Generic Cab" )
-    PORT_DIPSETTING(    0x00, "Dedicated Cab" )
-    PORT_DIPNAME(0x0c, 0x0c, "Region")
-    PORT_DIPSETTING(0x00, "English")
-    PORT_DIPSETTING(0x04, "Japanese (2)")
-    PORT_DIPSETTING(0x08, "Korean")
-    PORT_DIPSETTING(0x0c, "Japanese")
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME(0x01, 0x00, "Cabinet Type") PORT_DIPLOCATION("S551:1")
+	PORT_DIPSETTING(0x01, "Generic Cab")
+	PORT_DIPSETTING(0x00, "Dedicated Cab")
+	PORT_DIPNAME(0x0c, 0x0c, "Region")
+	PORT_DIPSETTING(0x00, "English")
+	PORT_DIPSETTING(0x04, "Japanese (2)")
+	PORT_DIPSETTING(0x08, "Korean")
+	PORT_DIPSETTING(0x0c, "Japanese")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(bldyror2)
@@ -4710,7 +4710,7 @@ ROM_START( cbajbl )
 	ROM_LOAD( "uo220.bin",         0x1400000, 0x200000, BAD_DUMP CRC(19102f15) SHA1(b7964e0cb53b608b775d7a713b63f13307b1b532) ) // cb-04.220 [1/2] 2 bits different
 	ROM_LOAD( "uo220h.bin",        0x1600000, 0x200000, BAD_DUMP CRC(e7b94df3) SHA1(07b5d85e1a337f10c25cebdb0f3f893e38a1db6c) ) // cb-04.220 [2/2] 5 bits different
 	ROM_LOAD( "uo221.bin",         0x1800000, 0x200000, CRC(701d7c4e) SHA1(b06c2db7e06d453991f9872bcb62951eb62b5d56) ) // cb-05.221 [1/2]
-	ROM_LOAD( "uo221h.bin"     ,   0x1a00000, 0x200000, CRC(5e93c0d6) SHA1(2ec5afd53eee9e8e6e2ac91a269a5ec55cef4da1) ) // cb-05.221 [2/2]
+	ROM_LOAD( "uo221h.bin",        0x1a00000, 0x200000, CRC(5e93c0d6) SHA1(2ec5afd53eee9e8e6e2ac91a269a5ec55cef4da1) ) // cb-05.221 [2/2]
 	ROM_LOAD( "uo222.bin",         0x1c00000, 0x200000, CRC(76ad7801) SHA1(9cb38aff86f3f8151145f2661bf1261adbd2ec1c) ) // cb-06.222 [1/2]
 	ROM_LOAD( "uo222h.bin",        0x1e00000, 0x200000, CRC(34561670) SHA1(2131fcbbc8bc3da31cd4ef027ec6688af212b7c1) ) // cb-06.222 [2/2]
 	ROM_LOAD( "uo223.bin",         0x2000000, 0x200000, CRC(d4a80392) SHA1(d8d69e8a15910471b718dc6531e4470fc35365cc) ) // cb-07.223 [1/2]
@@ -4727,7 +4727,7 @@ ROM_START( cbajbl )
 
 	// TODO: hook up bootleg protection
 	ROM_REGION( 0x800000, "blprot", 0 )
-	ROM_LOAD( "near_a1020b.bin", 0x000000, 0x020000, CRC(d4a68a96) SHA1(178a7e06381c2fa70c3dffd191facd96a39ff7d2) ) 
+	ROM_LOAD( "near_a1020b.bin", 0x000000, 0x020000, CRC(d4a68a96) SHA1(178a7e06381c2fa70c3dffd191facd96a39ff7d2) )
 
 	ROM_REGION( 0x000008, "cat702_2", 0 )
 	ROM_LOAD( "mg03", 0x000000, 0x000008, CRC(8be79633) SHA1(f38f881b6139eb8368e593904cb50b6e68bdf2e9) )
@@ -6088,7 +6088,7 @@ GAME( 1996, hvnsgate,  coh1001l, coh1001l,  zn2p,     atlus_zn_state,   empty_in
 
 // Video System ZN-1 (VS34)
 GAME( 1996, coh1002v,  0,        coh1002v,  zn,       visco_zn_state,   empty_init, ROT0, "Video System Co.",        "Video System ZN-1",                 MACHINE_IS_BIOS_ROOT | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, aerofgts,  coh1002v, coh1002v,  aerofgts, visco_zn_state,   empty_init, ROT270, "McO'River, Inc.",       "Aero Fighters Special (USA)",                              MACHINE_SUPPORTS_SAVE )
+GAME( 1996, aerofgts,  coh1002v, coh1002v,  aerofgts, visco_zn_state,   empty_init, ROT270, "McO'River, Inc.",       "Aero Fighters Special (USA)",                              MACHINE_SUPPORTS_SAVE ) // McO'River = Video System USA
 GAME( 1996, aerofgtst, aerofgts, coh1002v,  aerofgts, visco_zn_state,   empty_init, ROT270, "Video System Co.",      "Aero Fighters Special (Taiwan)",                           MACHINE_SUPPORTS_SAVE )
 GAME( 1996, sncwgltd,  aerofgts, coh1002v,  aerofgts, visco_zn_state,   empty_init, ROT270, "Video System Co.",      "Sonic Wings Limited (Japan)",                              MACHINE_SUPPORTS_SAVE )
 
@@ -6097,7 +6097,7 @@ GAME( 1996, coh1002e,  0,        coh1002e,  znt2p,    raizing_zn_state, empty_in
 GAME( 1997, beastrzr,  coh1002e, coh1002e,  znt2p,    raizing_zn_state, empty_init, ROT0, "Eighting / Raizing",      "Beastorizer (USA, Sep 22 1997)",                           MACHINE_SUPPORTS_SAVE )
 GAME( 1997, beastrzra, beastrzr, coh1002e,  znt2p,    raizing_zn_state, empty_init, ROT0, "Eighting / Raizing",      "Beastorizer (USA, Jun 21 1997)",                           MACHINE_SUPPORTS_SAVE )
 GAME( 1997, bldyroar,  beastrzr, coh1002e,  znt2p,    raizing_zn_state, empty_init, ROT0, "Eighting / Raizing",      "Bloody Roar (Japan, Jun 21 1997)",                         MACHINE_SUPPORTS_SAVE )
-GAME( 1997, beastrzrb, beastrzr, beastrzrb, znt2p,    beastrzrb_state,  empty_init, ROT0, "bootleg",                 "Beastorizer (USA bootleg)",                                MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, beastrzrb, beastrzr, beastrzrb, znt2p,    beastrzrb_state,  empty_init, ROT0, "bootleg",                 "Beastorizer (USA bootleg)",                                MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 
 // Eighting / Raizing ZN-1 (PS9805)
 GAME( 1998, bldyror2,  coh1002e, coh1002e,  bldyror2, raizing_zn_state, empty_init, ROT0, "Eighting / Raizing",      "Bloody Roar 2 (World)",                                    MACHINE_SUPPORTS_SAVE )
@@ -6151,7 +6151,7 @@ GAME( 1997, glpracr2l, glpracr2, coh1002ml, glpracr2, glpracr2l_state,  empty_in
 GAME( 1998, doapp,     coh1002m, coh1002m,  zn2p,     tecmo_zn_state,   empty_init, ROT0, "Tecmo",                   "Dead Or Alive ++ (Japan/USA/Export)",                      MACHINE_SUPPORTS_SAVE ) // region set under GAME OPTIONS, then NATION
 GAME( 1998, doappk,    doapp,    coh1002m,  zn2p,     tecmo_zn_state,   empty_init, ROT0, "Tecmo",                   "Dead Or Alive ++ (Korea)",                                 MACHINE_SUPPORTS_SAVE )
 GAME( 1998, cbaj,      coh1002m, cbaj,      zn1p,     cbaj_state,       empty_init, ROT0, "UEP Systems",             "Cool Boarders Arcade Jam (Export)",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1998, cbajbl,    cbaj,     cbaj,      zn1p,     cbaj_state,       empty_init, ROT0, "UEP Systems",             "Cool Boarders Arcade Jam Bootleg (Export)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1998, cbajbl,    cbaj,     cbaj,      zn1p,     cbaj_state,       empty_init, ROT0, "bootleg",                 "Cool Boarders Arcade Jam (Export bootleg)",                MACHINE_SUPPORTS_SAVE )
 GAME( 1998, shngmtkb,  coh1002m, coh1002m,  zn2p,     tecmo_zn_state,   empty_init, ROT0, "Sunsoft / Activision",    "Shanghai Matekibuyuu (Japan)",                             MACHINE_SUPPORTS_SAVE )
 GAME( 1999, tondemo,   coh1002m, coh1002m,  zn1p,     tecmo_zn_state,   empty_init, ROT0, "Tecmo",                   "Tondemo Crisis (Japan)",                                   MACHINE_SUPPORTS_SAVE )
 GAME( 1999, glpracr3,  coh1002m, coh1002m,  glpracr2, tecmo_zn_state,   empty_init, ROT0, "Tecmo",                   "Gallop Racer 3 (Export)",                                  MACHINE_SUPPORTS_SAVE )

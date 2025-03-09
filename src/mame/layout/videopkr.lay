@@ -198,25 +198,25 @@ copyright-holders: Roberto Fresca, Grull Osgo.
 
 	<!--
 
-		// define diverter pulse
-		<element name="lamp7" ref="DSKV">
-			<bounds x="0.02" y="3.02" width="0.08" height="0.08" />
-		</element>
+	    // define diverter pulse
+	    <element name="lamp7" ref="DSKV">
+	        <bounds x="0.02" y="3.02" width="0.08" height="0.08" />
+	    </element>
 
-		// define hopper signal 1 
-		<element name="lamp5" ref="DSKR">
-			<bounds x="0.12" y="3.02" width="0.08" height="0.08" />
-		</element>
+	    // define hopper signal 1
+	    <element name="lamp5" ref="DSKR">
+	        <bounds x="0.12" y="3.02" width="0.08" height="0.08" />
+	    </element>
 
-		// define hopper signal 2
-		<element name="lamp6" ref="DSKR">
-			<bounds x="0.22" y="3.02" width="0.08" height="0.08" />
-		</element>
+	    // define hopper signal 2
+	    <element name="lamp6" ref="DSKR">
+	        <bounds x="0.22" y="3.02" width="0.08" height="0.08" />
+	    </element>
 
-		// define coin accepted pulse 
-		<element name="lamp13" ref="DSKA">
-			<bounds x="0.32" y="3.02" width="0.08" height="0.08" />
-		</element>
+	    // define coin accepted pulse
+	    <element name="lamp13" ref="DSKA">
+	        <bounds x="0.32" y="3.02" width="0.08" height="0.08" />
+	    </element>
 
 	-->
 

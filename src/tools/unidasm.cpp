@@ -30,6 +30,7 @@ using util::BIT;
 #include "cpu/c33/c33dasm.h"
 #include "cpu/capricorn/capricorn_dasm.h"
 #include "cpu/ccpu/ccpudasm.h"
+#include "cpu/cdc160/cdc160d.h"
 #include "cpu/cdc1700/cdc1700d.h"
 #include "cpu/clipper/clipperd.h"
 #include "cpu/cop400/cop410ds.h"
@@ -423,6 +424,8 @@ static const dasm_table_entry dasm_table[] =
 	{ "c33",             le,  0, []() -> util::disasm_interface * { return new c33_disassembler; } },
 	{ "capricorn",       le,  0, []() -> util::disasm_interface * { return new capricorn_disassembler; } },
 	{ "ccpu",            le,  0, []() -> util::disasm_interface * { return new ccpu_disassembler; } },
+	{ "cdc160",          be, -1, []() -> util::disasm_interface * { return new cdc160_disassembler; } },
+	{ "cdc160a",         be, -1, []() -> util::disasm_interface * { return new cdc160a_disassembler; } },
 	{ "cdc1700",         be, -1, []() -> util::disasm_interface * { return new cdc1700_disassembler; } },
 	{ "cdp1801",         le,  0, []() -> util::disasm_interface * { return new cosmac_disassembler(cosmac_disassembler::TYPE_1801); } },
 	{ "cdp1802",         le,  0, []() -> util::disasm_interface * { return new cosmac_disassembler(cosmac_disassembler::TYPE_1802); } },

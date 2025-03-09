@@ -113,10 +113,11 @@ license:CC0-1.0
 		<description>Gauntlet</description>
 		<year>1988</year>
 		<publisher>Mindscape</publisher>
+		<info name="developer" value="Atari Games" />
 		<info name="usage" value="Requires a 256K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2021-05-02 -->
-		<!-- action game -->
+		<!-- arcade game -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1317604">
 				<rom name="gauntlet iigs.woz" size="1317604" crc="fbeb429a" sha1="4df82855dd2924509681ea5a9a138aa7edce8b53" />
@@ -693,7 +694,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="sshockey">
+	<software name="ssicehock">
 		<description>Superstar Ice Hockey</description>
 		<year>1988</year>
 		<publisher>Mindscape</publisher>
@@ -822,6 +823,22 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 2 - Program disk" />
 			<dataarea name="flop" size="1361855">
 				<rom name="deja vu iigs - disk 2 - program disk.woz" size="1361855" crc="88fcacca" sha1="4d1adbb4f4b351657fbe3d874d3d8bdf40ad2e42" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dejavu2">
+		<description>Déjà Vu II: Lost in Las Vegas</description>
+		<year>1989</year>
+		<publisher>Mindscape</publisher>
+		<info name="programmer" value="Fred Allen, David Marsh, Michael Manning, Todd Squires, David Feldman, Paul Snively, Brian Baker, Karl Roelofs, Ed Dluzen, Darin Adler, Jay Zipnick, Waldemar Horwat, Julia Ulano, Tod Zipnick, and Mitch Adler" />
+		<info name="usage" value="Requires a 768K Apple IIgs." />
+		<sharedfeat name="compatibility" value="A2GS" />
+		<!-- Dump released: 2021-06-01 -->
+		<!-- adventure game -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1361905">
+				<rom name="deja vu ii lost in last vegas iigs.woz" size="1361905" crc="55d9e932" sha1="9a82f93d0a200435f05d0b1a0a9d37d4c1978c20" />
 			</dataarea>
 		</part>
 	</software>
@@ -964,7 +981,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="silpheed">
-		<description>Silpheed</description>
+		<description>Silpheed - Super Dogfighter</description>
 		<year>1987</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="programmer" value="John Rettig, Stuart Goldstein, Mark Seibert, Satoshi Uesaki, Nobuyuki Ogawa, Akira Eye, Fumihito Kasatani, Nobuyuki Aoshima, Hiromi Ohba, Takeshi Miyaji, Osamu Harada, and Youichi Miyaji" />
@@ -986,7 +1003,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="spquest">
+	<software name="squest">
 		<description>Space Quest: The Sarien Encounter</description>
 		<year>1987</year>
 		<publisher>Sierra On-Line</publisher>
@@ -1005,6 +1022,29 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1296257">
 				<rom name="space quest iigs - disk 2.woz" size="1296257" crc="dc9f2e0d" sha1="49714165313ee908fc309970544659322dca1bd0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="squest2">
+		<description>Space Quest II: Vohaul's Revenge</description>
+		<year>1988</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="programmer" value="Mark Crowe, Scott Murphy, Jeff Stephenson, Chris Iden, Robert Heitman, and Carlos Escobar" />
+		<info name="usage" value="Requires a 512K Apple IIgs." />
+		<sharedfeat name="compatibility" value="A2GS" />
+		<!-- Dump released: 2021-05-28 -->
+		<!-- adventure game -->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1296282">
+				<rom name="space quest ii iigs - disk 1.woz" size="1296282" crc="34a62868" sha1="53340223e323e9b1e56e3c82b100cfd2869799bf" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1296282">
+				<rom name="space quest ii iigs - disk 2.woz" size="1296282" crc="f5cce30c" sha1="6684e98df5c3d88f44099abaeabe4b8396e0c7f3" />
 			</dataarea>
 		</part>
 	</software>
@@ -1078,7 +1118,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="windwlkr">
+	<software name="wndwlkr">
 		<description>Windwalker</description>
 		<year>1990</year>
 		<publisher>Origin Systems</publisher>
@@ -1086,7 +1126,7 @@ license:CC0-1.0
 		<info name="usage" value="Requires a 768K Apple IIgs ROM01 or later." />
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2021-05-27 -->
-		<!-- roleplaying game -->
+		<!-- role-playing game -->
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1329100">
@@ -1236,30 +1276,55 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="spquest2">
-		<description>Space Quest II: Vohaul's Revenge</description>
-		<year>1988</year>
+	<software name="kquest">
+		<description>King's Quest: Quest for the Crown</description>
+		<year>1987</year>
 		<publisher>Sierra On-Line</publisher>
-		<info name="programmer" value="Mark Crowe, Scott Murphy, Jeff Stephenson, Chris Iden, Robert Heitman, and Carlos Escobar" />
+		<info name="author" value="Roberta Williams, Al Lowe, Charles Tingley, Ken MacNeill, Chris Iden, Doug MacNeill, Greg Rowland, and Chris Iden" />
+		<info name="programmer" value="Carlos Escobar" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS" />
-		<!-- Dump released: 2021-05-28 -->
+		<!-- Dump released: 2021-10-09 -->
 		<!-- adventure game -->
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1296282">
-				<rom name="space quest ii iigs - disk 1.woz" size="1296282" crc="34a62868" sha1="53340223e323e9b1e56e3c82b100cfd2869799bf" />
+				<rom name="king's quest iigs - disk 1.woz" size="1296282" crc="813e5b11" sha1="8e61a96821460da26d8e9c567e358ec18d15c535" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2" />
-			<dataarea name="flop" size="1296282">
-				<rom name="space quest ii iigs - disk 2.woz" size="1296282" crc="f5cce30c" sha1="6684e98df5c3d88f44099abaeabe4b8396e0c7f3" />
+			<dataarea name="flop" size="1298330">
+				<rom name="king's quest iigs - disk 2.woz" size="1298330" crc="832a3043" sha1="7fe827331b55408b478ffb45330a09de73234ebb" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="kingqst3">
+	<software name="kquest2">
+		<description>King's Quest II: Romancing the Throne (version 2.0A)</description>
+		<year>1987</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="programmer" value="Roberta Williams, Jeff Stephenson, Chris Iden, Robert Heitman, Ken Williams, Sol Ackerman, Scott Murphy, Doug MacNeill, Mark Crowe, and Al Lowe" />
+		<info name="usage" value="Requires a 512K Apple IIgs." />
+		<info name="version" value="2.0A" />
+		<sharedfeat name="compatibility" value="A2GS" />
+		<!-- Dump released: 2021-09-28 -->
+		<!-- adventure game -->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1312707">
+				<rom name="king's quest ii iigs - disk 1.woz" size="1312707" crc="df46df6b" sha1="bc29f617b36e77f064f13b371db1a0ed6e8cc1de" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1312707">
+				<rom name="king's quest ii iigs - disk 2.woz" size="1312707" crc="23294f32" sha1="e0e383b140d7eafd3b94faeb12074564a8d0a24b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kquest3">
 		<description>King's Quest III: To Heir is Human</description>
 		<year>1988</year>
 		<publisher>Sierra On-Line</publisher>
@@ -1278,96 +1343,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1296426">
 				<rom name="king's quest iii iigs - disk 2.woz" size="1296426" crc="738e9164" sha1="ef78a433efc4b54aa3014facb3bc4fdb0e3446cf" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="gwshoot">
-		<description>Great Western Shootout</description>
-		<year>1989</year>
-		<publisher>Britannica Software</publisher>
-		<info name="programmer" value="Scott Patterson and Matt Crysdale" />
-		<info name="usage" value="Requires a 512K Apple IIgs." />
-		<sharedfeat name="compatibility" value="A2GS" />
-		<!-- Dump released: 2021-05-28 -->
-		<!-- action game -->
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
-			<dataarea name="flop" size="1296194">
-				<rom name="great western shootout iigs - disk 1.woz" size="1296194" crc="65d9538c" sha1="c41a1a7796c4d67432b546cebc7997d9a5cfb22d" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2" />
-			<dataarea name="flop" size="1296194">
-				<rom name="great western shootout iigs - disk 2.woz" size="1296194" crc="8e664521" sha1="aa738a532332574481bcadb9c071e0dfe0730e24" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="lslarry">
-		<description>Leisure Suit Larry in the Land of the Lounge Lizards</description>
-		<year>1987</year>
-		<publisher>Sierra On-Line</publisher>
-		<info name="programmer" value="Al Lowe, Chuck Benton, Mark Crowe, Jeff Stephenson, Chris Iden, Bob Heitman, Ken Williams, and Carlos Escobar" />
-		<info name="usage" value="Requires a 512K Apple IIgs." />
-		<sharedfeat name="compatibility" value="A2GS" />
-		<!-- Dump released: 2021-05-28 -->
-		<!-- adventure game -->
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
-			<dataarea name="flop" size="1312662">
-				<rom name="leisure suit larry in the land of the lounge lizards iigs - disk 1.woz" size="1312662" crc="31bf3aad" sha1="f1daad9a5a04cd2ae82c5fa3a315741a66a64126" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2" />
-			<dataarea name="flop" size="1312662">
-				<rom name="leisure suit larry in the land of the lounge lizards iigs - disk 2.woz" size="1312662" crc="b990e5bd" sha1="022bc36381aaa325153139cbc04da276fb8e1fbe" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bcauldrn">
-		<description>The Black Cauldron</description>
-		<year>1987</year>
-		<publisher>Sierra On-Line</publisher>
-		<info name="programmer" value="Al Lowe, Roberta Williams, Elaine Boulay, Nancy Casolaro, Melissa Haldeman, Scott Murphy, Sol Ackerman, Ken Williams, Jeff Stephenson, Chris Iden, and Bob Heitman" />
-		<info name="usage" value="Requires a 512K Apple IIgs." />
-		<sharedfeat name="compatibility" value="A2GS" />
-		<!-- Dump released: 2021-05-28 -->
-		<!-- adventure game -->
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
-			<dataarea name="flop" size="1296327">
-				<rom name="the black cauldron iigs - disk 1.woz" size="1296327" crc="def8c641" sha1="951544d592da8c0203ceec45f3f6e45ec44b98e9" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2" />
-			<dataarea name="flop" size="1296327">
-				<rom name="the black cauldron iigs - disk 2.woz" size="1296327" crc="f66ab4ff" sha1="32f51302f4c3458f2134dea823d30f411a8f250e" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="kingchgo">
-		<description>The King of Chicago</description>
-		<year>1988</year>
-		<publisher>Cinemaware</publisher>
-		<info name="programmer" value="Doug Sharp" />
-		<info name="usage" value="Requires a 768K Apple IIgs ROM01 or later." />
-		<sharedfeat name="compatibility" value="A2GS" />
-		<!-- Dump released: 2021-05-28 -->
-		<!-- adventure game -->
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1296682">
-				<rom name="the king of chicago iigs - reel 1.woz" size="1296682" crc="41530912" sha1="85fb08f8da981e9cc87edf8446e722ab7eefae91" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size="1296170">
-				<rom name="the king of chicago iigs - reel 2.woz" size="1296170" crc="a53c37c0" sha1="ff0519cf1b17e77587d82a41c12c836f44e21ab5" />
 			</dataarea>
 		</part>
 	</software>
@@ -1401,6 +1376,98 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="gwshoot">
+		<description>Great Western Shootout</description>
+		<year>1989</year>
+		<publisher>Britannica Software</publisher>
+		<info name="programmer" value="Scott Patterson and Matt Crysdale" />
+		<info name="usage" value="Requires a 512K Apple IIgs." />
+		<sharedfeat name="compatibility" value="A2GS" />
+		<!-- Dump released: 2021-05-28 -->
+		<!-- action game -->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1296194">
+				<rom name="great western shootout iigs - disk 1.woz" size="1296194" crc="65d9538c" sha1="c41a1a7796c4d67432b546cebc7997d9a5cfb22d" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1296194">
+				<rom name="great western shootout iigs - disk 2.woz" size="1296194" crc="8e664521" sha1="aa738a532332574481bcadb9c071e0dfe0730e24" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lsl1">
+		<description>Leisure Suit Larry in The Land of the Lounge Lizards</description>
+		<year>1987</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="programmer" value="Al Lowe, Chuck Benton, Mark Crowe, Jeff Stephenson, Chris Iden, Bob Heitman, Ken Williams, and Carlos Escobar" />
+		<info name="usage" value="Requires a 512K Apple IIgs." />
+		<sharedfeat name="compatibility" value="A2GS" />
+		<!-- Dump released: 2021-05-28 -->
+		<!-- adventure game -->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1312662">
+				<rom name="leisure suit larry in the land of the lounge lizards iigs - disk 1.woz" size="1312662" crc="31bf3aad" sha1="f1daad9a5a04cd2ae82c5fa3a315741a66a64126" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1312662">
+				<rom name="leisure suit larry in the land of the lounge lizards iigs - disk 2.woz" size="1312662" crc="b990e5bd" sha1="022bc36381aaa325153139cbc04da276fb8e1fbe" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blkcauld">
+		<description>The Black Cauldron</description>
+		<year>1987</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="programmer" value="Al Lowe, Roberta Williams, Elaine Boulay, Nancy Casolaro, Melissa Haldeman, Scott Murphy, Sol Ackerman, Ken Williams, Jeff Stephenson, Chris Iden, and Bob Heitman" />
+		<info name="usage" value="Requires a 512K Apple IIgs." />
+		<sharedfeat name="compatibility" value="A2GS" />
+		<!-- Dump released: 2021-05-28 -->
+		<!-- adventure game -->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1296327">
+				<rom name="the black cauldron iigs - disk 1.woz" size="1296327" crc="def8c641" sha1="951544d592da8c0203ceec45f3f6e45ec44b98e9" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1296327">
+				<rom name="the black cauldron iigs - disk 2.woz" size="1296327" crc="f66ab4ff" sha1="32f51302f4c3458f2134dea823d30f411a8f250e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kingchgo">
+		<description>The King of Chicago</description>
+		<year>1988</year>
+		<publisher>Cinemaware</publisher>
+		<info name="programmer" value="Doug Sharp" />
+		<info name="usage" value="Requires a 768K Apple IIgs ROM01 or later." />
+		<sharedfeat name="compatibility" value="A2GS" />
+		<!-- Dump released: 2021-05-28 -->
+		<!-- adventure game -->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Reel 1"/>
+			<dataarea name="flop" size="1296682">
+				<rom name="the king of chicago iigs - reel 1.woz" size="1296682" crc="41530912" sha1="85fb08f8da981e9cc87edf8446e722ab7eefae91" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Reel 2"/>
+			<dataarea name="flop" size="1296170">
+				<rom name="the king of chicago iigs - reel 2.woz" size="1296170" crc="a53c37c0" sha1="ff0519cf1b17e77587d82a41c12c836f44e21ab5" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="starsg1">
 		<description>Star Saga: One - Beyond The Boundary (version 1.1)</description>
 		<year>1987</year>
@@ -1414,22 +1481,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1296274">
 				<rom name="star saga one iigs.woz" size="1296274" crc="e96de728" sha1="d00257002b10a75f5418e53bf96aa33df914cd2b" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="dejavu2">
-		<description>Déjà Vu II: Lost in Las Vegas</description>
-		<year>1989</year>
-		<publisher>Mindscape</publisher>
-		<info name="programmer" value="Fred Allen, David Marsh, Michael Manning, Todd Squires, David Feldman, Paul Snively, Brian Baker, Karl Roelofs, Ed Dluzen, Darin Adler, Jay Zipnick, Waldemar Horwat, Julia Ulano, Tod Zipnick, and Mitch Adler" />
-		<info name="usage" value="Requires a 768K Apple IIgs." />
-		<sharedfeat name="compatibility" value="A2GS" />
-		<!-- Dump released: 2021-06-01 -->
-		<!-- adventure game -->
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1361905">
-				<rom name="deja vu ii lost in last vegas iigs.woz" size="1361905" crc="55d9e932" sha1="9a82f93d0a200435f05d0b1a0a9d37d4c1978c20" />
 			</dataarea>
 		</part>
 	</software>
@@ -2198,7 +2249,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="prntshcm">
+	<software name="prshcomp">
 		<description>The Print Shop Companion</description>
 		<year>1990</year>
 		<publisher>Brøderbund Software</publisher>
@@ -2206,7 +2257,7 @@ license:CC0-1.0
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2021-06-07 -->
-		<!-- graphics program -->
+		<!-- graphics utility -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1296229">
 				<rom name="the print shop companion iigs.woz" size="1296229" crc="9a1893da" sha1="bb43dbf428eb45b147a9726b71ff2d38a5f48b87" />
@@ -2214,7 +2265,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="fantavsn">
+	<software name="fantvisn">
 		<description>Fantavision</description>
 		<year>1987</year>
 		<publisher>Brøderbund Software</publisher>
@@ -2691,11 +2742,11 @@ license:CC0-1.0
 		<info name="programmer" value="Richard Hefter, David Cunningham, and Susan Dubicki" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS" />
-		<!-- Dump released: 2021-06-16 -->
+		<!-- Dump released: 2021-06-16. Updated 2024-12-27 to update software description. -->
 		<!-- educational program -->
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1286466">
-				<rom name="stickybear shapes iigs.woz" size="1286466" crc="1d44fbc7" sha1="8b1c33ed774c590557bc2eff7f5758819b33092c" />
+			<dataarea name="flop" size="1286482">
+				<rom name="the new talking stickybear shapes iigs.woz" size="1286482" crc="f4735894" sha1="d581afae032dd0ea847d25eedfc90d5adba65d45" />
 			</dataarea>
 		</part>
 	</software>
@@ -3397,7 +3448,7 @@ license:CC0-1.0
 		<info name="usage" value="Requires a 256K Apple IIgs ROM 01." />
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2021-07-02 -->
-		<!-- action game -->
+		<!-- arcade game -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1305356">
 				<rom name="paperboy iigs.woz" size="1305356" crc="8fdf4e3c" sha1="4409b0d1168e0a693f82bf1fc7366cfe65595443" />
@@ -3569,30 +3620,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="kquest2">
-		<description>King's Quest II: Romancing the Throne (version 2.0A)</description>
-		<year>1987</year>
-		<publisher>Sierra On-Line</publisher>
-		<info name="programmer" value="Roberta Williams, Jeff Stephenson, Chris Iden, Robert Heitman, Ken Williams, Sol Ackerman, Scott Murphy, Doug MacNeill, Mark Crowe, and Al Lowe" />
-		<info name="usage" value="Requires a 512K Apple IIgs." />
-		<info name="version" value="2.0A" />
-		<sharedfeat name="compatibility" value="A2GS" />
-		<!-- Dump released: 2021-09-28 -->
-		<!-- adventure game -->
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
-			<dataarea name="flop" size="1312707">
-				<rom name="king's quest ii iigs - disk 1.woz" size="1312707" crc="df46df6b" sha1="bc29f617b36e77f064f13b371db1a0ed6e8cc1de" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2" />
-			<dataarea name="flop" size="1312707">
-				<rom name="king's quest ii iigs - disk 2.woz" size="1312707" crc="23294f32" sha1="e0e383b140d7eafd3b94faeb12074564a8d0a24b" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="sltroyal">
 		<description>Solitaire Royale (version 1.0)</description>
 		<year>1989</year>
@@ -3606,30 +3633,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1361746">
 				<rom name="solitaire royale iigs.woz" size="1361746" crc="0a8a99ba" sha1="e3693a5d5f3534b4eb1a7ccc6ab8e96463fa0a28" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="kingqst">
-		<description>King's Quest: Quest for the Crown</description>
-		<year>1987</year>
-		<publisher>Sierra On-Line</publisher>
-		<info name="author" value="Roberta Williams, Al Lowe, Charles Tingley, Ken MacNeill, Chris Iden, Doug MacNeill, Greg Rowland, and Chris Iden" />
-		<info name="programmer" value="Carlos Escobar" />
-		<info name="usage" value="Requires a 512K Apple IIgs." />
-		<sharedfeat name="compatibility" value="A2GS" />
-		<!-- Dump released: 2021-10-09 -->
-		<!-- adventure game -->
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
-			<dataarea name="flop" size="1296282">
-				<rom name="king's quest iigs - disk 1.woz" size="1296282" crc="813e5b11" sha1="8e61a96821460da26d8e9c567e358ec18d15c535" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2" />
-			<dataarea name="flop" size="1298330">
-				<rom name="king's quest iigs - disk 2.woz" size="1298330" crc="832a3043" sha1="7fe827331b55408b478ffb45330a09de73234ebb" />
 			</dataarea>
 		</part>
 	</software>
@@ -3681,7 +3684,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="mixdupmg20a">
+	<software name="mixdupmg">
 		<description>Mixed-Up Mother Goose (version 2.0A)</description>
 		<year>1987</year>
 		<publisher>Sierra On-Line</publisher>
@@ -3761,8 +3764,8 @@ license:CC0-1.0
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2022-3-30 -->
 		<!-- action game -->
-		<!--  After booting your Apple IIgs with a system disk, or autobooting from a hard drive, insert Dragon's Lair disk #1 and double click the DragonsLair icon to begin the game. -->
-		<!--  To install Dragon's Lair on a hard drive, create a DragonsLair folder on your hard drive and copy the content of the 7 disks into it. To run Dragon's Lair from your hard drive, double click on the DragonsLair directory icon on your hard drive then double click on the DragonsLair Icon. -->
+		<!-- After booting your Apple IIgs with a system disk, or autobooting from a hard drive, insert Dragon's Lair disk #1 and double click the DragonsLair icon to begin the game. -->
+		<!-- To install Dragon's Lair on a hard drive, create a DragonsLair folder on your hard drive and copy the content of the 7 disks into it. To run Dragon's Lair from your hard drive, double click on the DragonsLair directory icon on your hard drive then double click on the DragonsLair Icon. -->
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="819200">
@@ -3816,8 +3819,8 @@ license:CC0-1.0
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2022-4-30 -->
 		<!-- action game -->
-		<!--  After booting your Apple IIgs with a system disk, or autobooting from a hard drive, insert Dragon's Lair disk #1 and double click the DragonsLair1 icon to begin the game. -->
-		<!--  To install Dragon's Lair 1 on a hard drive, create a DragonsLair1 folder on your hard drive and copy the content of the 8 disks into it. To run Dragon's Lair 1 from your hard drive, double click on the DragonsLair1 directory icon on your hard drive then double click on the DragonsLair1 Icon. -->
+		<!-- After booting your Apple IIgs with a system disk, or autobooting from a hard drive, insert Dragon's Lair disk #1 and double click the DragonsLair1 icon to begin the game. -->
+		<!-- To install Dragon's Lair 1 on a hard drive, create a DragonsLair1 folder on your hard drive and copy the content of the 8 disks into it. To run Dragon's Lair 1 from your hard drive, double click on the DragonsLair1 directory icon on your hard drive then double click on the DragonsLair1 Icon. -->
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="819200">
@@ -3877,8 +3880,8 @@ license:CC0-1.0
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2022-5-30 -->
 		<!-- action game -->
-		<!--  After booting your Apple IIgs with a system disk, or autobooting from a hard drive, insert Dragon's Lair 2 disk #1 and double click the DragonsLair2 icon to begin the game. -->
-		<!--  To install Dragon's Lair 2 on a hard drive, create a DragonsLair2 folder on your hard drive and copy the content of the 8 disks into it. To run Dragon's Lair 2 from your hard drive, double click on the DragonsLair2 directory icon on your hard drive then double click on the DragonsLair2 Icon. -->
+		<!-- After booting your Apple IIgs with a system disk, or autobooting from a hard drive, insert Dragon's Lair 2 disk #1 and double click the DragonsLair2 icon to begin the game. -->
+		<!-- To install Dragon's Lair 2 on a hard drive, create a DragonsLair2 folder on your hard drive and copy the content of the 8 disks into it. To run Dragon's Lair 2 from your hard drive, double click on the DragonsLair2 directory icon on your hard drive then double click on the DragonsLair2 Icon. -->
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="819200">
@@ -3938,8 +3941,8 @@ license:CC0-1.0
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2022-6-30 -->
 		<!-- action game -->
-		<!--  After booting your Apple IIgs with a system disk, or autobooting from a hard drive, insert Dragon's Lair 3 disk #1 and double click the DragonsLair3 icon to begin the game. -->
-		<!--  To install Dragon's Lair 3 on a hard drive, create a DragonsLair3 folder on your hard drive and copy the content of the 11 disks into it. To run Dragon's Lair 3 from your hard drive, double click on the DragonsLair3 directory icon on your hard drive then double click on the DragonsLair3 Icon -->
+		<!-- After booting your Apple IIgs with a system disk, or autobooting from a hard drive, insert Dragon's Lair 3 disk #1 and double click the DragonsLair3 icon to begin the game. -->
+		<!-- To install Dragon's Lair 3 on a hard drive, create a DragonsLair3 folder on your hard drive and copy the content of the 11 disks into it. To run Dragon's Lair 3 from your hard drive, double click on the DragonsLair3 directory icon on your hard drive then double click on the DragonsLair3 Icon -->
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="819200">
@@ -4034,8 +4037,8 @@ license:CC0-1.0
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2022-7-30 -->
 		<!-- action game -->
-		<!--  After booting your Apple IIgs with a system disk, or autobooting from a hard drive, insert Space Ace disk #1 and double click the SpaceAce icon to begin the game. -->
-		<!--  To install Space Ace on a hard drive, create a SpaceAce folder on your hard drive and copy the content of the 7 disks into it. To run Space Ace from your hard drive, double click on the SpaceAce directory icon on your hard drive then double click on the SpaceAce Icon. -->
+		<!-- After booting your Apple IIgs with a system disk, or autobooting from a hard drive, insert Space Ace disk #1 and double click the SpaceAce icon to begin the game. -->
+		<!-- To install Space Ace on a hard drive, create a SpaceAce folder on your hard drive and copy the content of the 7 disks into it. To run Space Ace from your hard drive, double click on the SpaceAce directory icon on your hard drive then double click on the SpaceAce Icon. -->
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="819200">
@@ -4089,8 +4092,8 @@ license:CC0-1.0
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2022-8-30 -->
 		<!-- action game -->
-		<!--  After booting your Apple IIgs with a system disk, or autobooting from a hard drive, insert Space Ace 2 disk #1 and double click the SpaceAce2 icon to begin the game. -->
-		<!--  To install Space Ace 2 on a hard drive, create a SpaceAce2 folder on your hard drive and copy the content of the 8 disks into it. To run Space Ace 2 from your hard drive, double click on the SpaceAce2 directory icon on your hard drive then double click on the SpaceAce2 Icon. -->
+		<!-- After booting your Apple IIgs with a system disk, or autobooting from a hard drive, insert Space Ace 2 disk #1 and double click the SpaceAce2 icon to begin the game. -->
+		<!-- To install Space Ace 2 on a hard drive, create a SpaceAce2 folder on your hard drive and copy the content of the 8 disks into it. To run Space Ace 2 from your hard drive, double click on the SpaceAce2 directory icon on your hard drive then double click on the SpaceAce2 Icon. -->
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="819200">

@@ -70,16 +70,18 @@ license:CC0-1.0
 	<!-- Missing: 317734-05 A590 Setup Disk (Western Digital Hard Disk) -->
 
 	<!-- For use with SCSI drives -->
+	<!--
 	<software name="a590_scsi">
-		<description>A590 Setup Disk (SCSI Hard Disk)</description>
-		<year>1991</year>
-		<publisher>Commodore</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="901120">
-				<rom name="317734-06_a590_scsi.adf" size="901120" status="nodump" />
-			</dataarea>
-		</part>
+	    <description>A590 Setup Disk (SCSI Hard Disk)</description>
+	    <year>1991</year>
+	    <publisher>Commodore</publisher>
+	    <part name="flop1" interface="floppy_3_5">
+	        <dataarea name="flop" size="901120">
+	            <rom name="317734-06_a590_scsi.adf" size="901120" status="nodump" />
+	        </dataarea>
+	    </part>
 	</software>
+	-->
 
 	<software name="a590_ram">
 		<description>A590 RAM Test Software</description>

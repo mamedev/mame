@@ -107,17 +107,17 @@ namespace {
 
 		virtual meta_data volume_metadata() override;
 
-		virtual std::pair<err_t, meta_data> metadata(const std::vector<std::string> &path) override;
+		virtual std::pair<std::error_condition, meta_data> metadata(const std::vector<std::string> &path) override;
 
-		virtual std::pair<err_t, std::vector<dir_entry>> directory_contents(const std::vector<std::string> &path) override;
+		virtual std::pair<std::error_condition, std::vector<dir_entry>> directory_contents(const std::vector<std::string> &path) override;
 
-		virtual err_t file_create(const std::vector<std::string> &path, const meta_data &meta) override;
+		virtual std::error_condition file_create(const std::vector<std::string> &path, const meta_data &meta) override;
 
-		virtual std::pair<err_t, std::vector<u8>> file_read(const std::vector<std::string> &path) override;
+		virtual std::pair<std::error_condition, std::vector<u8>> file_read(const std::vector<std::string> &path) override;
 
-		virtual err_t file_write(const std::vector<std::string> &path, const std::vector<u8> &data) override;
+		virtual std::error_condition file_write(const std::vector<std::string> &path, const std::vector<u8> &data) override;
 
-		virtual err_t format(const meta_data &meta) override;
+		virtual std::error_condition format(const meta_data &meta) override;
 
 	private:
 		// Map of used/free sectors
@@ -202,7 +202,7 @@ namespace {
 
 		using dir_t = std::vector<entry>;
 
-		err_t parse_filename(const std::string& name, std::string& basename, int& bpr, u8& file_type) const;
+		std::error_condition parse_filename(const std::string& name, std::string& basename, int& bpr, u8& file_type) const;
 		bool validate_filename(const std::string& s) const;
 		void ensure_dir_loaded();
 		std::pair<dir_t, sect_map> decode_dir() const;
@@ -323,10 +323,10 @@ meta_data hp98x5_impl::volume_metadata()
 	return res;
 }
 
-std::pair<err_t, meta_data> hp98x5_impl::metadata(const std::vector<std::string> &path)
+std::pair<std::error_condition, meta_data> hp98x5_impl::metadata(const std::vector<std::string> &path)
 {
 	if (path.size() != 1) {
-		return std::make_pair(ERR_NOT_FOUND, meta_data{});
+		return std::make_pair(error::not_found, meta_data{});
 	}
 
 	std::string basename;
@@ -334,21 +334,21 @@ std::pair<err_t, meta_data> hp98x5_impl::metadata(const std::vector<std::string>
 	u8 file_type;
 
 	auto err = parse_filename(path.front(), basename, bpr, file_type);
-	if (err != ERR_OK) {
-		return std::make_pair(ERR_NOT_FOUND, meta_data{});
+	if (err) {
+		return std::make_pair(error::not_found, meta_data{});
 	}
 
 	ensure_dir_loaded();
 	auto it = scan_dir(m_dir, basename);
 	if (it == m_dir.end()) {
-		return std::make_pair(ERR_NOT_FOUND, meta_data{});
+		return std::make_pair(error::not_found, meta_data{});
 	}
 
 	auto meta = get_metadata(*it);
-	return std::make_pair(ERR_OK, std::move(meta));
+	return std::make_pair(std::error_condition(), std::move(meta));
 }
 
-std::pair<err_t, std::vector<dir_entry>> hp98x5_impl::directory_contents(const std::vector<std::string> &path)
+std::pair<std::error_condition, std::vector<dir_entry>> hp98x5_impl::directory_contents(const std::vector<std::string> &path)
 {
 	if (path.empty()) {
 		ensure_dir_loaded();
@@ -360,16 +360,16 @@ std::pair<err_t, std::vector<dir_entry>> hp98x5_impl::directory_contents(const s
 				dir_entries.emplace_back(dir_entry_type::file, std::move(meta));
 			}
 		}
-		return std::make_pair(ERR_OK, dir_entries);
+		return std::make_pair(std::error_condition(), dir_entries);
 	} else {
-		return std::make_pair(ERR_NOT_FOUND, std::vector<dir_entry>{});
+		return std::make_pair(error::not_found, std::vector<dir_entry>{});
 	}
 }
 
-err_t hp98x5_impl::file_create(const std::vector<std::string> &path, const meta_data &meta)
+std::error_condition hp98x5_impl::file_create(const std::vector<std::string> &path, const meta_data &meta)
 {
 	if (!path.empty()) {
-		return ERR_INVALID;
+		return error::invalid_name;
 	}
 
 	auto name = meta.get_string(meta_name::name);
@@ -381,9 +381,13 @@ err_t hp98x5_impl::file_create(const std::vector<std::string> &path, const meta_
 	// Parse & validate filename
 	// Extension must be specified
 	auto err = parse_filename(name, basename, bpr, file_type);
-	if (err != ERR_OK || file_type == NO_FILE_TYPE) {
-		return ERR_INVALID;
+	if (err) {
+		return err;
 	}
+	if (file_type == NO_FILE_TYPE) {
+		return error::invalid_name;
+	}
+
 	if (bpr < 0) {
 		// Use default bpr when not specified
 		bpr = DEF_BPR;
@@ -393,7 +397,7 @@ err_t hp98x5_impl::file_create(const std::vector<std::string> &path, const meta_
 	ensure_dir_loaded();
 	auto it = scan_dir(m_dir, basename);
 	if (it != m_dir.end()) {
-		return ERR_INVALID;
+		return error::already_exists;
 	}
 
 	// Find a free entry in directory
@@ -404,7 +408,7 @@ err_t hp98x5_impl::file_create(const std::vector<std::string> &path, const meta_
 			m_dir.emplace_back(entry());
 			it2 = m_dir.end() - 1;
 		} else {
-			return ERR_NO_SPACE;
+			return error::no_space;
 		}
 	}
 
@@ -421,13 +425,13 @@ err_t hp98x5_impl::file_create(const std::vector<std::string> &path, const meta_
 
 	store_dir_map();
 
-	return ERR_OK;
+	return std::error_condition();
 }
 
-std::pair<err_t, std::vector<u8>> hp98x5_impl::file_read(const std::vector<std::string> &path)
+std::pair<std::error_condition, std::vector<u8>> hp98x5_impl::file_read(const std::vector<std::string> &path)
 {
 	if (path.size() != 1) {
-		return std::make_pair(ERR_NOT_FOUND, std::vector<u8>{});
+		return std::make_pair(error::not_found, std::vector<u8>{});
 	}
 	std::string basename;
 	int bpr;
@@ -435,10 +439,10 @@ std::pair<err_t, std::vector<u8>> hp98x5_impl::file_read(const std::vector<std::
 
 	auto err = parse_filename(path.front(), basename, bpr, file_type);
 
-	if (err == ERR_OK) {
+	if (!err) {
 		auto it = find_file(basename, bpr, file_type);
 		if (it == m_dir.end()) {
-			err = ERR_NOT_FOUND;
+			err = error::not_found;
 		} else {
 			auto file_data = get_sector_range(it->m_1st_sect, it->m_sectors);
 			if (file_type == TEXT_TYPE) {
@@ -446,16 +450,16 @@ std::pair<err_t, std::vector<u8>> hp98x5_impl::file_read(const std::vector<std::
 			} else {
 				file_data.resize(it->m_size);
 			}
-			return std::make_pair(ERR_OK, std::move(file_data));
+			return std::make_pair(std::error_condition(), std::move(file_data));
 		}
 	}
 	return std::make_pair(err, std::vector<u8>{});
 }
 
-err_t hp98x5_impl::file_write(const std::vector<std::string> &path, const std::vector<u8> &data)
+std::error_condition hp98x5_impl::file_write(const std::vector<std::string> &path, const std::vector<u8> &data)
 {
 	if (path.size() != 1) {
-		return ERR_NOT_FOUND;
+		return error::not_found;
 	}
 
 	std::string basename;
@@ -463,13 +467,13 @@ err_t hp98x5_impl::file_write(const std::vector<std::string> &path, const std::v
 	u8 file_type;
 
 	auto err = parse_filename(path.front(), basename, bpr, file_type);
-	if (err != ERR_OK) {
+	if (err) {
 		return err;
 	}
 	// Check that file already exists
 	auto it = find_file(basename, bpr, file_type);
 	if (it == m_dir.end()) {
-		return ERR_NOT_FOUND;
+		return error::not_found;
 	}
 
 	// De-allocate current blocks
@@ -488,7 +492,7 @@ err_t hp98x5_impl::file_write(const std::vector<std::string> &path, const std::v
 	// Allocate space
 	it->m_sectors = (data_ptr->size() + SECTOR_SIZE - 1) / SECTOR_SIZE;
 	if (!allocate(it->m_sectors, it->m_1st_sect)) {
-		return ERR_NO_SPACE;
+		return error::no_space;
 	}
 
 	// Store file content
@@ -498,10 +502,10 @@ err_t hp98x5_impl::file_write(const std::vector<std::string> &path, const std::v
 	// Update directory & map
 	store_dir_map();
 
-	return ERR_OK;
+	return std::error_condition();
 }
 
-err_t hp98x5_impl::format(const meta_data &meta)
+std::error_condition hp98x5_impl::format(const meta_data &meta)
 {
 	bool is_ds = m_blockdev.block_count() == DS_SECTORS;
 
@@ -540,11 +544,11 @@ err_t hp98x5_impl::format(const meta_data &meta)
 	// Interleave factor
 	w16b(out_ins, m_fmt_interleave[ m_fs_type ]);
 
-	m_blockdev.get(0).copy(0, sys_rec.data(), sys_rec.size());
+	m_blockdev.get(0)->write(0, sys_rec.data(), sys_rec.size());
 
 	// 9825 & 9831 have a backup copy of system record in spare track but 9845 hasn't, go figure
 	if (m_fs_type != FS_TYPE_9845) {
-		m_blockdev.get(m_spare_start).copy(0, sys_rec.data(), sys_rec.size());
+		m_blockdev.get(m_spare_start)->write(0, sys_rec.data(), sys_rec.size());
 	}
 
 	m_dir.clear();
@@ -553,10 +557,10 @@ err_t hp98x5_impl::format(const meta_data &meta)
 
 	store_dir_map();
 
-	return ERR_OK;
+	return std::error_condition();
 }
 
-err_t hp98x5_impl::parse_filename(const std::string& name, std::string& basename, int& bpr, u8& file_type) const
+std::error_condition hp98x5_impl::parse_filename(const std::string& name, std::string& basename, int& bpr, u8& file_type) const
 {
 	// General form of filenames:
 	// basename[[.&bpr].ext]
@@ -579,18 +583,18 @@ err_t hp98x5_impl::parse_filename(const std::string& name, std::string& basename
 		if (p2 != std::string::npos) {
 			// [p1+1 p2) should have "&bpr"
 			if (name[ p1 + 1 ] != '&') {
-				return ERR_INVALID;
+				return error::invalid_name;
 			}
 			if (!std::all_of(name.cbegin() + p1 + 2, name.cbegin() + p2, [](char c) { return c >= '0' && c <= '9'; })) {
-				return ERR_INVALID;
+				return error::invalid_name;
 			}
 			try {
 				bpr = std::stoul(std::string{name, p1 + 2, p2 - p1 - 2});
 			} catch (...) {
-				return ERR_INVALID;
+				return error::invalid_name;
 			}
 			if (bpr < 4 || bpr > 32767 || (bpr & 1) != 0) {
-				return ERR_INVALID;
+				return error::invalid_name;
 			}
 		} else {
 			p2 = p1;
@@ -607,7 +611,7 @@ err_t hp98x5_impl::parse_filename(const std::string& name, std::string& basename
 				}
 			}
 			if (file_type == NO_FILE_TYPE) {
-				return ERR_INVALID;
+				return error::invalid_name;
 			}
 		}
 	}
@@ -615,9 +619,9 @@ err_t hp98x5_impl::parse_filename(const std::string& name, std::string& basename
 	// [0 p1) has "basename"
 	basename = std::string(name, 0, p1);
 	if (validate_filename(basename)) {
-		return ERR_OK;
+		return std::error_condition();
 	} else {
-		return ERR_INVALID;
+		return error::invalid_name;
 	}
 }
 
@@ -659,14 +663,14 @@ void hp98x5_impl::ensure_dir_loaded()
 	// 8        Count of data tracks
 	// 9        Interleave factor
 	// 10..127  N/U
-	u16 sects_per_track = sys_rec.r16b(2);
-	u16 tot_tracks      = sys_rec.r16b(4);
-	u16 spare_track     = sys_rec.r16b(6);
-	u16 dir_start       = sys_rec.r16b(8);
-	u16 av_start        = sys_rec.r16b(10);
-	u16 av_end          = sys_rec.r16b(12);
-	u16 sys_tracks      = sys_rec.r16b(14);
-	u16 data_tracks     = sys_rec.r16b(16);
+	u16 sects_per_track = sys_rec->r16b(2);
+	u16 tot_tracks      = sys_rec->r16b(4);
+	u16 spare_track     = sys_rec->r16b(6);
+	u16 dir_start       = sys_rec->r16b(8);
+	u16 av_start        = sys_rec->r16b(10);
+	u16 av_end          = sys_rec->r16b(12);
+	u16 sys_tracks      = sys_rec->r16b(14);
+	u16 data_tracks     = sys_rec->r16b(16);
 
 	m_img_tracks = m_blockdev.block_count() / SECTORS;
 
@@ -1155,7 +1159,7 @@ std::vector<u8> hp98x5_impl::get_sector_range(lba_t first, unsigned size) const
 
 	for (lba_t idx = first; idx < first + size; idx++) {
 		auto data_sect = m_blockdev.get(u32(idx));
-		memcpy(ptr, data_sect.rodata(), SECTOR_SIZE);
+		data_sect->read(0, ptr, SECTOR_SIZE);
 		ptr += SECTOR_SIZE;
 	}
 	return res;
@@ -1169,7 +1173,7 @@ void hp98x5_impl::store_sector_range(lba_t first, const std::vector<u8>& data)
 	for (lba_t idx = first; idx < first + sects; idx++) {
 		u32 count = std::min<u32>(to_go, SECTOR_SIZE);
 		auto blk = m_blockdev.get(u32(idx));
-		blk.copy(0, ptr, count);
+		blk->write(0, ptr, count);
 		ptr += count;
 		to_go -= count;
 	}

@@ -1572,6 +1572,54 @@ void jking02_decrypt(running_machine &machine)
 	}
 }
 
+// JUN 19 14:13:22 2003 TARZAN_CHINA_V300CN
+void tct2p_decrypt(running_machine &machine)
+{
+	memory_region *const region = machine.root_device().memregion("user1");
+	auto const src = util::little_endian_cast<u16>(reinterpret_cast<u32 *>(region->base()));
+	auto const rom_size = region->bytes();
+
+	for (int i = 0; i < rom_size / 2; i++)
+	{
+		uint16_t x = 0;
+
+		IGS27_CRYPT1
+		IGS27_CRYPT2
+		IGS27_CRYPT3
+		IGS27_CRYPT4
+		IGS27_CRYPT5_ALT
+		IGS27_CRYPT6
+		IGS27_CRYPT7
+		IGS27_CRYPT8
+
+		src[i] ^= x;
+	}
+}
+
+// FRI OCT 07 17:22:46 2005 LUCKY_FASTER
+void xypdk_decrypt(running_machine &machine)
+{
+	memory_region *const region = machine.root_device().memregion("user1");
+	auto const src = util::little_endian_cast<u16>(reinterpret_cast<u32 *>(region->base()));
+	auto const rom_size = region->bytes();
+
+	for (int i = 0; i < rom_size / 2; i++)
+	{
+		uint16_t x = 0;
+
+		IGS27_CRYPT1_ALT
+		IGS27_CRYPT2_ALT
+		IGS27_CRYPT3
+		IGS27_CRYPT4
+		IGS27_CRYPT5_ALT
+		IGS27_CRYPT6_ALT
+		IGS27_CRYPT7_ALT
+		IGS27_CRYPT8
+
+		src[i] ^= x;
+	}
+}
+
 static const uint8_t luckycrs_tab[0x100] = {
 	0x4b, 0x99, 0xa3, 0xa6, 0x69, 0xad, 0xb2, 0x1e, 0x42, 0x9a, 0x02, 0x91, 0x04, 0x90, 0x64, 0xcf,
 	0x68, 0xe0, 0xa3, 0x8e, 0x1b, 0x53, 0x8d, 0xe6, 0x6f, 0xcd, 0x40, 0x09, 0x42, 0x23, 0xb7, 0x47,

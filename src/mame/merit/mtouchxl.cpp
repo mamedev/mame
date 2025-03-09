@@ -203,7 +203,7 @@ void mtxl_state::machine_reset()
 #ifndef REAL_PCI_CHIPSET
 static void mt6k_ata_devices(device_slot_interface &device)
 {
-	device.option_add("cdrom", ATAPI_FIXED_CDROM);
+	device.option_add("cdrom", ATAPI_CDROM);
 	device.option_add("hdd", IDE_HARDDISK);
 }
 
@@ -213,11 +213,6 @@ void mtxl_state::cdrom(device_t *device)
 	ide0->option_reset();
 	mt6k_ata_devices(*ide0);
 	ide0->set_default_option("cdrom");
-	ide0->set_fixed(true);
-
-	auto ide1 = dynamic_cast<device_slot_interface *>(device->subdevice("ide:1"));
-	ide1->set_default_option("hdd");
-	ide1->set_fixed(true);
 }
 
 void mtxl_state::hdd(device_t *device)
@@ -226,11 +221,6 @@ void mtxl_state::hdd(device_t *device)
 	ide0->option_reset();
 	mt6k_ata_devices(*ide0);
 	ide0->set_default_option("hdd");
-	ide0->set_fixed(true);
-
-	auto ide1 = dynamic_cast<device_slot_interface *>(device->subdevice("ide:1"));
-	ide1->set_default_option("cdrom");
-	ide1->set_fixed(true);
 }
 #endif
 

@@ -43,11 +43,11 @@
 // This must be outside of the namespace
 DECLARE_DEVICE_TYPE(STINGNET_ATAPI_CDROM, stingnet_cdr)
 
-class stingnet_cdr : public atapi_fixed_cdrom_device
+class stingnet_cdr : public atapi_cdrom_device
 {
 public:
 	stingnet_cdr(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: atapi_fixed_cdrom_device(mconfig, STINGNET_ATAPI_CDROM, tag, owner, clock)
+		: atapi_cdrom_device(mconfig, STINGNET_ATAPI_CDROM, tag, owner, clock)
 	{
 	}
 
@@ -56,7 +56,7 @@ public:
 		m_sector_timer = timer_alloc(FUNC(stingnet_cdr::sector_tick), this);
 		m_sector_timer->adjust(attotime::never);
 
-		atapi_fixed_cdrom_device::device_start();
+		atapi_cdrom_device::device_start();
 	}
 
 	// atapicdr has zero delay between the end of a sector and the completion of the next.
@@ -75,7 +75,7 @@ public:
 	TIMER_CALLBACK_MEMBER(sector_tick)
 	{
 		m_sector_timer->adjust(attotime::never);
-		atapi_fixed_cdrom_device::fill_buffer();
+		atapi_cdrom_device::fill_buffer();
 	}
 
 private:

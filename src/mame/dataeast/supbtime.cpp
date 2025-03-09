@@ -9,10 +9,13 @@
 
   These games all run on the DE-0343 board.
 
-  Sound:  YM2151, Oki ADPCM - NOTE!  The sound program writes to the address
-of a YM2203 and a 2nd Oki chip but the board does _not_ have them.  The sound
-program is simply the 'generic' Data East sound program unmodified for this cut
-down hardware (it doesn't write any good sound data btw, mostly zeros).
+  CPU: Custom 68000 Data East 55 (Super Burger Time, China Town) or Data East
+  56 (Tumble Pop) clocked at 21.422 MHz / 2.
+
+  Sound: Data East 45, YM2151, Oki ADPCM - NOTE! The sound program writes to the
+  address of a YM2203 and a 2nd Oki chip but the board does _not_ have them. The
+  sound program is simply the 'generic' Data East sound program unmodified for
+  this cut down hardware (it doesn't write any good sound data btw, mostly zeros).
 
   Super Burgertime has a few bugs:
 
@@ -119,6 +122,8 @@ private:
 	void tumblep_map(address_map &map) ATTR_COLD;
 };
 
+#define TUMBLEP_HACK 0
+
 
 /***************************************************************************
 
@@ -184,9 +189,6 @@ uint32_t supbtime_state::screen_update_tumblep(screen_device &screen, bitmap_ind
 
 	return 0;
 }
-
-
-#define TUMBLEP_HACK 0
 
 
 //**************************************************************************
@@ -281,7 +283,9 @@ void supbtime_state::vblank_w(int state)
 
 uint16_t supbtime_state::vblank_ack_r()
 {
-	m_maincpu->set_input_line(M68K_IRQ_6, CLEAR_LINE);
+	if (!machine().side_effects_disabled())
+		m_maincpu->set_input_line(M68K_IRQ_6, CLEAR_LINE);
+
 	return 0xffff;
 }
 
@@ -453,16 +457,16 @@ GFXDECODE_END
 
 void supbtime_state::supbtime(machine_config &config)
 {
-	M68000(config, m_maincpu, XTAL(21'477'272) / 2);
+	M68000(config, m_maincpu, 21.477272_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &supbtime_state::supbtime_map);
 
-	H6280(config, m_audiocpu, XTAL(32'220'000) / 4);
+	H6280(config, m_audiocpu, 32.22_MHz_XTAL / 4);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &supbtime_state::sound_map);
 	m_audiocpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248);
+	screen.set_raw(28_MHz_XTAL / 4, 442, 0, 320, 274, 8, 248);
 	screen.screen_vblank().set(FUNC(supbtime_state::vblank_w));
 	screen.set_screen_update(FUNC(supbtime_state::screen_update_supbtime));
 	screen.set_palette("palette");
@@ -488,12 +492,13 @@ void supbtime_state::supbtime(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(32'220'000) / 9));
-	ymsnd.irq_handler().set_inputline(m_audiocpu, 1);    /* IRQ2 */
-	ymsnd.add_route(0, "mono", 0.45);
-	ymsnd.add_route(1, "mono", 0.45);
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 32.22_MHz_XTAL / 9));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 1); // IRQ2
+	ymsnd.add_route(0, "mono", 0.25);
+	ymsnd.add_route(1, "mono", 0.25);
 
-	OKIM6295(config, "oki", XTAL(21'477'272) / 20, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.50); // clock frequency & pin 7 not verified
+	okim6295_device &oki(OKIM6295(config, "oki", 32.22_MHz_XTAL / 32, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
+	oki.add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 void supbtime_state::chinatwn(machine_config &config)
@@ -510,6 +515,9 @@ void supbtime_state::tumblep(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &supbtime_state::tumblep_map);
 
 	subdevice<screen_device>("screen")->set_screen_update(FUNC(supbtime_state::screen_update_tumblep));
+
+	// tumblep oki is a bit higher pitched, clock frequency & pin 7 not verified
+	subdevice<okim6295_device>("oki")->set_clock(21.477272_MHz_XTAL / 20);
 }
 
 

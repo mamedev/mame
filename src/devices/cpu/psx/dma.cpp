@@ -84,13 +84,9 @@ void psxdma_device::dma_timer_adjust(int index)
 	psx_dma_channel *dma = &m_channel[index];
 
 	if (dma->b_running)
-	{
 		dma_start_timer(index, dma->n_ticks);
-	}
 	else
-	{
 		dma_stop_timer(index);
-	}
 }
 
 void psxdma_device::dma_interrupt_update()
@@ -228,14 +224,17 @@ void psxdma_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 			LOGWRITE("%s dmabase( %d ) = %08x\n", machine().describe_context(), index, data);
 			dma->n_base = data;
 			break;
+
 		case 1:
 			LOGWRITE("%s dmablockcontrol( %d ) = %08x\n", machine().describe_context(), index, data);
 			dma->n_blockcontrol = data;
 			break;
+
 		case 2:
 		case 3:
 			LOGWRITE("%s dmachannelcontrol( %d ) = %08x\n", machine().describe_context(), index, data);
 			dma->n_channelcontrol = data;
+
 			if ((dma->n_channelcontrol & (1L << 0x18)) != 0 && (m_dpcp & (1 << (3 + (index * 4)))) != 0)
 			{
 				int32_t n_size;
@@ -252,9 +251,7 @@ void psxdma_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 					uint32_t n_ba;
 					n_ba = dma->n_blockcontrol >> 16;
 					if (n_ba == 0)
-					{
 						n_ba = 0x10000;
-					}
 					n_size = (n_size & 0xffff) * n_ba;
 				}
 
@@ -284,19 +281,15 @@ void psxdma_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 					LOGDMA("%s dma %d read block %08x %08x\n", machine().describe_context(), index, n_address, n_size);
 					dma->fn_read(m_ram, n_address, n_size);
 					if (index == 1)
-					{
 						dma_start_timer(index, 26000);
-					}
 					else
-					{
 						dma_finished(index);
-					}
 				}
 				else if (dma->n_channelcontrol == 0x01000201 &&
 					!dma->fn_write.isnull())
 				{
 					if (index == 4)
-						dma_start_timer(index, 25000);
+						dma_start_timer(index, 24000);
 					else
 						dma_finished(index);
 				}
@@ -343,14 +336,10 @@ void psxdma_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 					dma_start_timer(index, 2150);
 				}
 				else
-				{
 					LOGDMA("%s dma %d unknown mode %08x\n", machine().describe_context(), index, dma->n_channelcontrol);
-				}
 			}
 			else if (dma->n_channelcontrol != 0)
-			{
 				LOGDMA("%s psx_dma_w( %04x, %08x, %08x ) channel not enabled\n", machine().describe_context(), offset, dma->n_channelcontrol, mem_mask);
-			}
 			break;
 		}
 	}
@@ -364,9 +353,9 @@ void psxdma_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 			break;
 		case 0x1:
 			{
-				uint32_t dicr = (m_dicr & (0x80000000 | ~mem_mask)) |
-					(m_dicr & ~data & 0x7f000000 & mem_mask) |
-					(data & 0x00ffffff & mem_mask);
+				uint32_t dicr = (m_dicr & 0x80000000) |
+					(m_dicr & ~data & 0x7f000000) |
+					(data & 0xff803f);
 
 				LOGWRITE("%s dicr_w(0x%08x) 0x%08x -> 0x%08x\n", machine().describe_context(), data, m_dicr, dicr);
 				m_dicr = dicr;
@@ -396,10 +385,12 @@ uint32_t psxdma_device::read(offs_t offset, uint32_t mem_mask)
 			if (!machine().side_effects_disabled())
 				LOGREAD("%s psx_dma_r dmabase[ %d ] ( %08x )\n", machine().describe_context(), index, dma->n_base);
 			return dma->n_base;
+
 		case 1:
 			if (!machine().side_effects_disabled())
 				LOGREAD("%s psx_dma_r dmablockcontrol[ %d ] ( %08x )\n", machine().describe_context(), index, dma->n_blockcontrol);
 			return dma->n_blockcontrol;
+
 		case 2:
 		case 3:
 			if (!machine().side_effects_disabled())
@@ -415,12 +406,14 @@ uint32_t psxdma_device::read(offs_t offset, uint32_t mem_mask)
 			if (!machine().side_effects_disabled())
 				LOGREAD("%s dpcr_r() 0x%08x\n", machine().describe_context(), m_dpcp);
 			return m_dpcp;
+
 		case 0x1:
 			if (!machine().side_effects_disabled())
 				LOGREAD("%s dicr_r() 0x%08x\n", machine().describe_context(), m_dicr);
 			return m_dicr;
 		}
 	}
+
 	return 0;
 }
 

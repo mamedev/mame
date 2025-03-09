@@ -51,12 +51,14 @@ until a restart or reset (F3).
 */
 
 #include "emu.h"
-#include "attotime.h"
+
 #include "cpu/mcs51/mcs51.h"
 #include "bus/midi/midiinport.h"
 #include "bus/midi/midioutport.h"
 #include "machine/rescap.h"
 #include "video/pwm.h"
+
+#include "attotime.h"
 
 #include "paia_fatman.lh"
 

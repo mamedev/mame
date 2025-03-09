@@ -2990,8 +2990,8 @@ To load and run a tape:
 		<info name="programmer" value="Danielle Bunten Berry" />
 		<info name="usage" value="Requires a 16K Apple ][ or later. Shipped with special hardware controllers, but joystick or paddeles can be used by defining directional movement (not button press) to each player." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2024-05-09-->
-		<!--simulation game-->
+		<!-- Dump released: 2024-05-09 -->
+		<!-- simulation game -->
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Wheeler Dealers" />
 			<dataarea name="cass" size="6462138">

@@ -11,12 +11,13 @@
     - Commodore supplied XT drives: Epson HMD-755 or WD WD93028-X-A
 
     TODO:
+    - 20/40 MB jumper
     - DIP switch order/polarity
     - JP3/JP4 switches (not really needed)
     - Bootrom disable
     - SCSI drives (fatalerrors early if you enable a drive)
     - The XT drive should be a slot option
-    - Data corruption when installing WB31 (DMAC issue?)
+    - Only DMAC Rev. 1: Data corruption when installing wb31
 
 ***************************************************************************/
 
@@ -110,7 +111,9 @@ ROM_START( firmware )
 	ROMX_LOAD("390388-01.u12", 0x4001, 0x2000, CRC(4d1b9757) SHA1(43ff80f7c5770566012d87118552842bb01010f5), ROM_SKIP(1) | ROM_BIOS(0))
 
 	ROM_SYSTEM_BIOS(1, "v46", "Version 4.6")
+	// 390389-02  ©1989 CBM  V4.6 0703
 	ROMX_LOAD("390389-02.u13", 0x0000, 0x2000, CRC(26013266) SHA1(60dedda8d406b2762ad1504a88a4d6e29c0fb10d), ROM_SKIP(1) | ROM_BIOS(1))
+	// 390388-02  ©1989 CBM  V4.6 E7E4
 	ROMX_LOAD("390388-02.u12", 0x0001, 0x2000, CRC(6c9cb089) SHA1(bd8c6bb79ae91a4d1b9ee76fdd11aaf97ca4358b), ROM_SKIP(1) | ROM_BIOS(1))
 	ROMX_LOAD("390389-02.u13", 0x4000, 0x2000, CRC(26013266) SHA1(60dedda8d406b2762ad1504a88a4d6e29c0fb10d), ROM_SKIP(1) | ROM_BIOS(1))
 	ROMX_LOAD("390388-02.u12", 0x4001, 0x2000, CRC(6c9cb089) SHA1(bd8c6bb79ae91a4d1b9ee76fdd11aaf97ca4358b), ROM_SKIP(1) | ROM_BIOS(1))
@@ -124,7 +127,9 @@ ROM_START( firmware )
 	ROMX_LOAD("390388-03.u12", 0x4001, 0x2000, CRC(b0b8cf24) SHA1(fcf4017505f4d441814b45d559c19eab43816b30), ROM_SKIP(1) | ROM_BIOS(2))
 
 	ROM_SYSTEM_BIOS(3, "v61", "Version 6.1")
+	// COPYRIGHT ©1990 CBM  ALL RIGHTS RESERVED  390721-01 V6.1 F4B8
 	ROMX_LOAD("390721-01.u13", 0x0000, 0x2000, CRC(00dbf615) SHA1(503940d04fb3b49eaa61100fd3a487018b35e25a), ROM_SKIP(1) | ROM_BIOS(3))
+	// COPYRIGHT ©1990 CBM  ALL RIGHTS RESERVED  390722-01 V6.1 088B
 	ROMX_LOAD("390722-01.u12", 0x0001, 0x2000, CRC(c460cfdb) SHA1(0de457daec3b84f75e8fb344defe24ce56cda3e0), ROM_SKIP(1) | ROM_BIOS(3))
 	ROMX_LOAD("390721-01.u13", 0x4000, 0x2000, CRC(00dbf615) SHA1(503940d04fb3b49eaa61100fd3a487018b35e25a), ROM_SKIP(1) | ROM_BIOS(3))
 	ROMX_LOAD("390722-01.u12", 0x4001, 0x2000, CRC(c460cfdb) SHA1(0de457daec3b84f75e8fb344defe24ce56cda3e0), ROM_SKIP(1) | ROM_BIOS(3))
@@ -171,7 +176,7 @@ void a590_device::wd33c93_config(device_t *device)
 
 void a590_device::device_add_mconfig(machine_config &config)
 {
-	AMIGA_DMAC(config, m_dmac, 28.37516_MHz_XTAL / 4); // 7M
+	AMIGA_DMAC_REV2(config, m_dmac, 28.37516_MHz_XTAL / 4); // 7M
 	m_dmac->set_rom("bootrom");
 	m_dmac->cfgout_cb().set([this] (int state) { m_host->cfgout_w(state); });
 	m_dmac->int_cb().set([this] (int state) { m_host->int2_w(state); });

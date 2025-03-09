@@ -555,6 +555,7 @@ screen_device::screen_device(const machine_config &mconfig, const char *tag, dev
 	, m_curbitmap(0)
 	, m_curtexture(0)
 	, m_changed(true)
+	, m_last_partial_reset(attotime::zero)
 	, m_last_partial_scan(0)
 	, m_partial_scan_hpos(0)
 	, m_color(rgb_t(0xff, 0xff, 0xff, 0xff))
@@ -877,6 +878,7 @@ void screen_device::device_start()
 	save_item(NAME(m_visarea.min_y));
 	save_item(NAME(m_visarea.max_x));
 	save_item(NAME(m_visarea.max_y));
+	save_item(NAME(m_last_partial_reset));
 	save_item(NAME(m_last_partial_scan));
 	save_item(NAME(m_frame_period));
 	save_item(NAME(m_brightness));
@@ -1040,19 +1042,19 @@ void screen_device::reset_origin(int beamy, int beamx)
 	m_vblank_end_time = curtime - attotime(0, beamy * m_scantime + beamx * m_pixeltime);
 	m_vblank_start_time = m_vblank_end_time - attotime(0, m_vblank_period);
 
-	// if we are resetting relative to (0,0) == VBLANK end, call the
-	// scanline 0 timer by hand now; otherwise, adjust it for the future
-	if (beamy == 0 && beamx == 0)
-		reset_partial_updates();
-	else
-		m_scanline0_timer->adjust(time_until_pos(0));
-
 	// if we are resetting relative to (visarea.bottom() + 1, 0) == VBLANK start,
 	// call the VBLANK start timer now; otherwise, adjust it for the future
 	if (beamy == ((m_visarea.bottom() + 1) % m_height) && beamx == 0)
 		vblank_begin(0);
 	else
 		m_vblank_begin_timer->adjust(time_until_vblank_start());
+
+	// if we are resetting relative to (0,0) == VBLANK end, call the
+	// scanline 0 timer by hand now; otherwise, adjust it for the future
+	if (beamy == 0 && beamx == 0)
+		reset_partial_updates();
+	else
+		m_scanline0_timer->adjust(time_until_pos(0));
 }
 
 
@@ -1169,6 +1171,14 @@ bool screen_device::update_partial(int scanline)
 		return false;
 	}
 
+	// skip if we already rendered this frame
+	// this can happen if a cpu timeslice that called update_partial is in the previous frame while scanline 0 already started
+	if (m_last_partial_scan == 0 && m_last_partial_reset > machine().time())
+	{
+		LOG_PARTIAL_UPDATES(("skipped because frame was already rendered\n"));
+		return false;
+	}
+
 	// set the range of scanlines to render
 	rectangle clip(m_visarea);
 	clip.sety((std::max)(clip.top(), m_last_partial_scan), (std::min)(clip.bottom(), scanline));
@@ -1276,6 +1286,14 @@ void screen_device::update_now()
 	if (current_vpos == m_last_partial_scan && current_hpos == m_partial_scan_hpos)
 	{
 		LOG_PARTIAL_UPDATES(("skipped because beam position is unchanged\n"));
+		return;
+	}
+
+	// skip if we already rendered this frame
+	// this can happen if a cpu timeslice that called update_now is in the previous frame while scanline 0 already started
+	if (m_last_partial_scan == 0 && m_partial_scan_hpos == 0 && m_last_partial_reset > machine().time())
+	{
+		LOG_PARTIAL_UPDATES(("skipped because frame was already rendered\n"));
 		return;
 	}
 
@@ -1394,6 +1412,7 @@ void screen_device::update_now()
 
 void screen_device::reset_partial_updates()
 {
+	m_last_partial_reset = machine().time();
 	m_last_partial_scan = 0;
 	m_partial_scan_hpos = 0;
 	m_partial_updates_this_frame = 0;

@@ -8,11 +8,16 @@
 
 #define QSOUND_LLE
 
-#include "imagedev/snapquik.h"
+#include "mega32x.h"
+#include "vboysound.h"
+#include "wswansound.h"
 
 #include "cpu/h6280/h6280.h"
 #include "cpu/m6502/rp2a03.h"
 #include "cpu/m68000/m68000.h"
+
+#include "imagedev/snapquik.h"
+
 #include "sound/ay8910.h"
 #include "sound/c140.h"
 #include "sound/c352.h"
@@ -43,11 +48,6 @@
 #include "sound/ymopn.h"
 #include "sound/ymz280b.h"
 
-#include "mega32x.h"
-#include "vboysound.h"
-#include "wswansound.h"
-
-#include "vgmplay.lh"
 #include "debugger.h"
 #include "softlist_dev.h"
 #include "speaker.h"
@@ -61,6 +61,8 @@
 #include <queue>
 #include <utility>
 #include <vector>
+
+#include "vgmplay.lh"
 
 #define AS_IO16LE           1
 #define AS_IO16BE           4
@@ -278,7 +280,7 @@ public:
 	void pause();
 	bool paused() const { return m_paused; }
 	void play();
-	void toggle_loop() { m_loop = !m_loop; }
+	void toggle_loop() { m_loop = !m_loop; m_loop_led = m_loop ? 1 : 0; }
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -337,6 +339,8 @@ private:
 	uint32_t handle_pcm_write(uint32_t address);
 	void blocks_clear();
 
+	output_finder<> m_playing_led;
+	output_finder<> m_loop_led;
 	output_finder<CT_COUNT> m_act_leds;
 	led_expiry_list m_act_led_expiries;
 	std::unique_ptr<led_expiry_iterator[]> m_act_led_index;
@@ -537,6 +541,8 @@ private:
 
 vgmplay_device::vgmplay_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	cpu_device(mconfig, VGMPLAY, tag, owner, clock),
+	m_playing_led(*this, "playing"),
+	m_loop_led(*this, "loop"),
 	m_act_leds(*this, "led_act_%u", 0U),
 	m_file_config("file", ENDIANNESS_LITTLE, 8, 32),
 	m_io_config("io", ENDIANNESS_LITTLE, 8, 32),
@@ -553,6 +559,8 @@ void vgmplay_device::device_start()
 	m_io16le = &space(AS_IO16LE);
 	m_io16be = &space(AS_IO16BE);
 
+	m_playing_led.resolve();
+	m_loop_led.resolve();
 	m_act_leds.resolve();
 	m_act_led_index = std::make_unique<led_expiry_iterator[]>(CT_COUNT);
 	for (vgm_chip led = vgm_chip(0); led != CT_COUNT; led = vgm_chip(led + 1))
@@ -574,6 +582,8 @@ void vgmplay_device::device_reset()
 {
 	m_state = RESET;
 	m_paused = false;
+	m_playing_led = 1;
+	m_loop_led = m_loop ? 1 : 0;
 
 	m_ym2612_stream_offset = 0;
 	std::fill(std::begin(m_upd7759_bank), std::end(m_upd7759_bank), 0);
@@ -638,19 +648,26 @@ void vgmplay_device::stop()
 {
 	device_reset();
 	m_paused = true;
+	m_playing_led = 0;
 }
 
 void vgmplay_device::pause()
 {
 	m_paused = !m_paused;
+	m_playing_led = m_paused ? 0 : 1;
 }
 
 void vgmplay_device::play()
 {
 	if (m_paused && m_state != DONE)
+	{
 		m_paused = false;
+		m_playing_led = 1;
+	}
 	else
+	{
 		device_reset();
+	}
 }
 
 uint32_t vgmplay_device::execute_min_cycles() const noexcept

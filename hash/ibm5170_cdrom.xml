@@ -9475,6 +9475,24 @@ Installation and Open Circulation CDs are bootable.
 		</part>
 	</software>
 
+	<!-- Windows 9x/NT -->
+	<software name="dc10plus" supported="no">
+		<description>miroVIDEO Studio DC10 Plus (V. 1.04, 160657)</description>
+		<year>1998</year>
+		<publisher>Pinnacle Systems</publisher>
+		<notes><![CDATA[
+Video editing software for [ZR36067]-based PCI card, can also detect [DC30] and [DC50]
+Has an HW tester, DirectDraw fails to enable overlay with [ViRGE] Scenic Highway interface
+]]></notes>
+		<!-- Serial number: 3920519554 -->
+		<info name="language" value="Deutsch/Dutch/English"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="pinnacle-studio-dc10-plus" sha1="1530776b913e21774ade2b160960f2fe70bf4c6b"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- DOS -->
 	<software name="div103b" supported="partial">
 		<description>DIV Games Studio (English, v1.03b)</description>

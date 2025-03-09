@@ -468,12 +468,12 @@ void hrdvd_state::tmp68301_parallel_port_w(uint16_t data)
 
 static void atapi_devs(device_slot_interface &device)
 {
-	device.option_add("dvdrom", ATAPI_FIXED_DVDROM);
+	device.option_add("dvdrom", ATAPI_DVDROM);
 }
 
 void hrdvd_state::dvdrom_config(device_t *device)
 {
-	auto *drive = downcast<atapi_fixed_dvdrom_device *>(device);
+	auto *drive = downcast<atapi_dvdrom_device *>(device);
 	drive->set_model("PIONEER        DVD-A01  1.17"); // Wants firmware version between 1.14 and 1.19
 }
 

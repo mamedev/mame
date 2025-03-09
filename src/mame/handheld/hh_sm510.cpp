@@ -5575,12 +5575,16 @@ ROM_END
 
 /*******************************************************************************
 
-  Konami Bill Elliott's NASCAR Racing (model 13010)
-  * PCB label: BH010
-  * Sharp SM511 under epoxy (die label KMS73B, 783)
+  Konami Bill Elliott's NASCAR Racing (model 13010), Chequered Flag
+  * PCB label:
+    BH010 (Bill Elliott's NASCAR Racing)
+    BH016 (Chequered Flag)
+  * Sharp SM511 under epoxy
+    die label KMS73B, 783 (Bill Elliott's NASCAR Racing)
   * lcd screen with custom segments, 1-bit sound
 
-  Chequered Flag is presumed to have the same MCU ROM.
+  Chequered Flag is presumed to have the same MCU ROM as Bill Elliott's NASCAR
+  Racing. The MCU was not decapped, so it's not 100% certain.
 
 *******************************************************************************/
 
@@ -5592,6 +5596,7 @@ public:
 	{ }
 
 	void knascar(machine_config &config);
+	void kchqflag(machine_config &config);
 };
 
 // inputs
@@ -5620,6 +5625,11 @@ void knascar_state::knascar(machine_config &config)
 	sm511_common(config, 1491, 1080);
 }
 
+void knascar_state::kchqflag(machine_config &config)
+{
+	sm511_common(config, 1482, 1080);
+}
+
 // roms
 
 ROM_START( knascar )
@@ -5627,12 +5637,22 @@ ROM_START( knascar )
 	ROM_LOAD( "783.program", 0x0000, 0x1000, CRC(0a08536a) SHA1(199203fad96e0d2b173b876b9746064b0c30dc7b) )
 
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "783.melody", 0x000, 0x100, CRC(ffeef4bc) SHA1(a3b21eefb170aa54eb53cf56f88b0c00dd29703f))
+	ROM_LOAD( "783.melody", 0x000, 0x100, CRC(ffeef4bc) SHA1(a3b21eefb170aa54eb53cf56f88b0c00dd29703f) )
 
 	ROM_REGION( 474061, "screen", 0)
 	ROM_LOAD( "knascar.svg", 0, 474061, CRC(d30f639a) SHA1(6fd061eda61f925a9f85cf5fb4b7024f15e1e1fe) )
 ROM_END
 
+ROM_START( kchqflag )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "783.program", 0x0000, 0x1000, CRC(0a08536a) SHA1(199203fad96e0d2b173b876b9746064b0c30dc7b) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "783.melody", 0x000, 0x100, CRC(ffeef4bc) SHA1(a3b21eefb170aa54eb53cf56f88b0c00dd29703f) )
+
+	ROM_REGION( 439251, "screen", 0)
+	ROM_LOAD( "kchqflag.svg", 0, 439251, CRC(8d477ab1) SHA1(eb0fe02a4f285081f0fd422df17bca48498112de) )
+ROM_END
 
 
 
@@ -12100,6 +12120,7 @@ SYST( 1990, kbilly,       0,           0,      kbilly,       kbilly,       kbill
 SYST( 1990, kbottom9,     0,           0,      kbottom9,     kbottom9,     kbottom9_state,     empty_init, "Konami", "Bottom of the Ninth (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1990, kloneran,     0,           0,      kloneran,     kloneran,     kloneran_state,     empty_init, "Konami", "The Lone Ranger (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1990, knascar,      0,           0,      knascar,      knascar,      knascar_state,      empty_init, "Konami", "Bill Elliott's NASCAR Racing (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1990, kchqflag,     knascar,     0,      kchqflag,     knascar,      knascar_state,      empty_init, "Konami", "Chequered Flag (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1990, kblades,      0,           0,      kblades,      kblades,      kblades_state,      empty_init, "Konami", "Blades of Steel (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1990, ktmnt2,       0,           0,      ktmnt2,       ktmnt2,       ktmnt2_state,       empty_init, "Konami", "Teenage Mutant Ninja Turtles II: Splinter Speaks (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_IMPERFECT_SOUND )
 SYST( 1990, knfl,         0,           0,      knfl,         knfl,         knfl_state,         empty_init, "Konami", "NFL Football (Konami, handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )

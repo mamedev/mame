@@ -302,7 +302,7 @@ static void dir_scan(fs::filesystem_t *fs, u32 depth, const std::vector<std::str
 		head += "  ";
 	auto [err, contents] = fs->directory_contents(path);
 	if(err)
-		return;
+		return; // FIXME: don't swallow errors
 	for(const auto &c : contents) {
 		size_t id = entries.size();
 		entries.resize(id+1);
@@ -472,10 +472,7 @@ static int generic_read(image_handler &ih, const char *srcpath, const char *dstp
 	std::vector<std::string> path = ih.path_split(srcpath);
 	auto [err, dfork] = fs->file_read(path);
 	if(err) {
-		if(err == fs::ERR_NOT_FOUND)
-			fprintf(stderr, "File not found.\n");
-		else
-			fprintf(stderr, "Unknown error (%d).\n", err);
+		fprintf(stderr, "File reading failed: %s\n", err.message().c_str());
 		return 1;
 	}
 
@@ -568,14 +565,14 @@ static int generic_write(image_handler &ih, const char *srcpath, const char *dst
 	auto [err, meta] = fs->metadata(path);
 	std::ignore = meta;
 
-	if(err) {
+	if(err == fs::error::not_found) {
 		fs::meta_data meta;
 		meta.set(fs::meta_name::name, path.back());
 		auto dpath = path;
 		dpath.pop_back();
 		err = fs->file_create(dpath, meta);
 		if(err) {
-			fprintf(stderr, "File creation failure.\n");
+			fprintf(stderr, "File creation failed: %s\n", err.message().c_str());
 			return 1;
 		}
 	}
@@ -583,7 +580,7 @@ static int generic_write(image_handler &ih, const char *srcpath, const char *dst
 	auto dfork = image_handler::fload(srcpath);
 	err = fs->file_write(path, dfork);
 	if(err) {
-		fprintf(stderr, "File writing failure.\n");
+		fprintf(stderr, "File writing failed: %s\n", err.message().c_str());
 		return 1;
 	}
 
@@ -594,7 +591,7 @@ static int generic_write(image_handler &ih, const char *srcpath, const char *dst
 			auto rfork = image_handler::fload_rsrc(rpath);
 			if(!rfork.empty()) {
 				err = fs->file_rsrc_write(path, rfork);
-				fprintf(stderr, "File resource fork writing failure.\n");
+				fprintf(stderr, "File resource fork writing failed: %s\n", err.message().c_str());
 				return 1;
 			}
 		}

@@ -2982,6 +2982,8 @@ if CPUS["TLCS900"] then
 		MAME_DIR .. "src/devices/cpu/tlcs900/tlcs900.h",
 		MAME_DIR .. "src/devices/cpu/tlcs900/900tbl.hxx",
 		MAME_DIR .. "src/devices/cpu/tlcs900/900htbl.hxx",
+		MAME_DIR .. "src/devices/cpu/tlcs900/tmp94c241.cpp",
+		MAME_DIR .. "src/devices/cpu/tlcs900/tmp94c241.h",
 		MAME_DIR .. "src/devices/cpu/tlcs900/tmp95c061.cpp",
 		MAME_DIR .. "src/devices/cpu/tlcs900/tmp95c061.h",
 		MAME_DIR .. "src/devices/cpu/tlcs900/tmp95c063.cpp",
@@ -3517,6 +3519,16 @@ end
 if opt_tool(CPUS, "SIGMA2") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/sigma2/sigma2d.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/sigma2/sigma2d.h")
+end
+
+--------------------------------------------------
+-- Control Data Corporation 160 (disassembler only)
+--@src/devices/cpu/cdc160/cdc160.h,CPUS["CDC160"] = true
+--------------------------------------------------
+
+if opt_tool(CPUS, "CDC160") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/cdc160/cdc160d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/cdc160/cdc160d.h")
 end
 
 --------------------------------------------------

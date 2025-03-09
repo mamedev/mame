@@ -12289,7 +12289,7 @@ RAMs
 1x D4016C-1     u23
 
 PLDs
-1x unknowun Cl-001 (QFP144)  CY144A    read protected
+1x unknown Cl-001 (QFP144)  CY144A     read protected
 4x GAL20V8A-15LNC  pl1, pl4, pl5, pl6  read protected
 2x PALCE20V8H-25PC/4   u2,u?           read protected
 1x PALCE22V10H-25PC/4  u?              read protected

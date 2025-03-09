@@ -152,23 +152,24 @@ public:
 		m_decrypted_opcodes(*this, "decrypted_opcodes")
 	{ }
 
-	void neraidou(machine_config &config);
-	void sstar97(machine_config &config);
-	void bdream97(machine_config &config);
-	void skylncr(machine_config &config);
-	void mbutrfly(machine_config &config);
-	void olymp(machine_config &config);
+	void neraidou(machine_config &config) ATTR_COLD;
+	void sstar97(machine_config &config) ATTR_COLD;
+	void bdream97(machine_config &config) ATTR_COLD;
+	void skylncr(machine_config &config) ATTR_COLD;
+	void mbutrfly(machine_config &config) ATTR_COLD;
+	void olymp(machine_config &config) ATTR_COLD;
 
-	void init_blshark();
-	void init_butrfly();
-	void init_leadera();
-	void init_mbutrfly() { save_item(NAME(m_mbutrfly_prot)); }
-	void init_miaction();
-	void init_olymp();
-	void init_sonikfig();
-	void init_speedway();
-	void init_speedwaya();
-	void init_superb2k();
+	void init_blshark() ATTR_COLD;
+	void init_butrfly() ATTR_COLD;
+	void init_leadera() ATTR_COLD;
+	void init_mbutrfly() ATTR_COLD { save_item(NAME(m_mbutrfly_prot)); }
+	void init_miaction() ATTR_COLD;
+	void init_olymp() ATTR_COLD;
+	void init_sonikfig() ATTR_COLD;
+	void init_speedway() ATTR_COLD;
+	void init_speedwaya() ATTR_COLD;
+	void init_sstar97a() ATTR_COLD;
+	void init_superb2k() ATTR_COLD;
 
 	int mbutrfly_prot_r();
 
@@ -2053,9 +2054,9 @@ ROM_END
 
 */
 ROM_START( sstar97 )
-	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "27256.u15",    0x0000, 0x8000, CRC(a5da4f92) SHA1(82ac70bd379649f130db017aa226d0247db0f3cd) )
-	ROM_LOAD( "unknown.u48",  0x8000, 0x8000, BAD_DUMP CRC(9f4c02e3) SHA1(05975184130ea7dd3bb5d32eff77b585bd53e6b5) )   // palette borrowed from other game
+	ROM_LOAD( "unknown.u48",  0xc000, 0x4000, CRC(39df04c6) SHA1(1056b1ecb60f69fa1d4bcf1629913d21f5ce6f50) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )    // All ROMs are 28-pins mask ROMs dumped as Fujitsu MB831000 or TC531000 (mask ROM).
 	ROM_LOAD16_BYTE( "bor_dun_4.u23", 0x00000, 0x20000, CRC(d0d0ead1) SHA1(00bfe691cb9020c5d7e21d80a1e059ea2155aad8) )
@@ -2068,6 +2069,72 @@ ROM_START( sstar97 )
 	ROM_LOAD16_BYTE( "bor_dun_6.u21", 0x00001, 0x20000, CRC(37be2cbe) SHA1(78acda58aab605cb992c3b9fbaf18d38f768ed1a) )
 	ROM_LOAD16_BYTE( "bor_dun_7.u20", 0x40000, 0x20000, CRC(43908665) SHA1(41b9cee0723d9da6934ab7934012fb1625a8f080) )
 	ROM_LOAD16_BYTE( "bor_dun_5.u22", 0x40001, 0x20000, CRC(ca17a632) SHA1(d491310ccdbe9b59a1e607f9254646f20700d79d) )
+ROM_END
+
+/*
+明星 97 (Ming Xing 97) /Super Star 97, Bordun, 1997
+Hardware Info by Guru
+---------------------
+
+PCB#: BORDUN SUPER STAR 97
+  |--------------------------------------------|
+  |                        6116   101.U26      |
+|-|TA8201   VOL                                |
+|1                         6116   102.U25      |
+|0                                             |
+|W   KC89C72               6116   103.U24      |
+|A                                             |
+|Y                         6116   104.U23      |
+|-|           SW4          6116                |
+  |                     |------|  105.U22      |
+|-|           SW3       |XILINX|               |
+|M                      |XC2064|  106.U21      |
+|A            SW2       |      |               |
+|H   M5M82C255          |------|  107.U20      |
+|J            SW1        PAL16V8H              |
+|O                                108.U19      |
+|N            110.U48 6116                     |
+|G       T518B      GAL20V8B      KDA0476 12MHz|
+|-|   BATT                        KDA0476      |
+  |SW5          Z80               109.U15*     |
+  |--------------------------------------------|
+Notes:
+          Z80 - NEC D780C-2 Z80B CPU. Clock 3.0000MHz [12/4]
+      KC89C72 - Clone of AY-3-8910. Clock 1.500MHz [12/8]
+    M5M82C255 - Mitsubishi M5M82C255 CMOS Programmable Peripheral Interface. Equivalent to 2x 82C55.
+       XC2064 - Xilinx XC2064 FPGA
+         6116 - 2kB x8-bit SRAM. Note 6116 near U48 is battery-backed.
+      KDA0476 - Samsung KDA0476BCN-66 Color Palette With Triple 6-Bit DAC (same as HMC HM86171-80)
+                Note there are 2 chips on this PCB.
+       TA8201 - Toshiba TA8201 17W BTL Audio Power Amplifier
+        T518B - Mitsumi T518B Reset Chip (TO92)
+         BATT - 3.6V Nicad Barrel Battery. Provides power to 6116 near U48.
+        SW1-4 - 8-Position DIP Switch
+          SW5 - Push button for Reset and NVRAM Clear
+      101-108 - Macronix MX28F1000 128kB x8-bit EEPROM (Graphics)
+          109 - 27C512 on plug-in daughterboard with two PALs (Main Program)
+          110 - 27C128 16kB x8-bit EPROM (Palette)
+*/
+
+ROM_START( sstar97a )
+	ROM_REGION( 0x14000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "109.u15", 0x04000, 0x04000, CRC(ed3a645a) SHA1(daffc12574491ee6aacc144e633792d9eab6eb6e) ) // TODO: decrambling not correct, seems two contain two programs
+	ROM_CONTINUE(        0x00000, 0x04000 )
+	ROM_CONTINUE(        0x0c000, 0x04000 )
+	ROM_CONTINUE(        0x08000, 0x04000 )
+	ROM_LOAD( "110.u48", 0x10000, 0x04000, CRC(39df04c6) SHA1(1056b1ecb60f69fa1d4bcf1629913d21f5ce6f50) ) // TODO: load this correctly once descrambling of the first ROM is figured out
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "104.u23", 0x00000, 0x20000, CRC(d0d0ead1) SHA1(00bfe691cb9020c5d7e21d80a1e059ea2155aad8) )
+	ROM_LOAD16_BYTE( "102.u25", 0x00001, 0x20000, CRC(2b0f07b5) SHA1(9bcde623e53697c4b68d2f083f6254596aee64eb) )
+	ROM_LOAD16_BYTE( "103.u24", 0x40000, 0x20000, CRC(3c7da3f1) SHA1(8098b33a779fb697984b97f2d7edb9874e6e19d9) )
+	ROM_LOAD16_BYTE( "101.u26", 0x40001, 0x20000, CRC(36efdca6) SHA1(e614fbba77e5c7a1e7a1d2970b4f945ee0468196) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "108.u19", 0x00000, 0x20000, CRC(adf0b7ce) SHA1(41d9fb16eb20e1fd2960117b7e4ea23a97b88961) )
+	ROM_LOAD16_BYTE( "106.u21", 0x00001, 0x20000, CRC(37be2cbe) SHA1(78acda58aab605cb992c3b9fbaf18d38f768ed1a) )
+	ROM_LOAD16_BYTE( "107.u20", 0x40000, 0x20000, CRC(43908665) SHA1(41b9cee0723d9da6934ab7934012fb1625a8f080) )
+	ROM_LOAD16_BYTE( "105.u22", 0x40001, 0x20000, CRC(ca17a632) SHA1(d491310ccdbe9b59a1e607f9254646f20700d79d) )
 ROM_END
 
 /*
@@ -2319,6 +2386,17 @@ void skylncr_state::init_sonikfig()
 	}
 }
 
+void skylncr_state::init_sstar97a()
+{
+	uint8_t *const ROM = memregion("maincpu")->base();
+	for (unsigned x = 0; x < 0x10000; x += 4)
+	{
+		std::swap(ROM[x + 0], ROM[x + 2]);
+		std::swap(ROM[x + 1], ROM[x + 3]);
+	}
+}
+
+
 void skylncr_state::init_miaction()
 /*
   Encryption:
@@ -2508,6 +2586,7 @@ GAME( 199?, neraidou,  0,        neraidou, neraidou, skylncr_state,  empty_init,
 GAME( 199?, miaction,  0,        skylncr,  skylncr,  skylncr_state,  init_miaction,  ROT0, "Vegas",                "Missing In Action",                              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 199?, tigerslt,  0,        skylncr,  skylncr,  skylncr_state,  init_miaction,  ROT0, "bootleg",              "Tiger (slot)",                                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE  )
 GAME( 199?, sstar97,   0,        sstar97,  sstar97,  skylncr_state,  empty_init,     ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 (version V153B)",   MACHINE_SUPPORTS_SAVE )
+GAME( 199?, sstar97a,  sstar97,  sstar97,  sstar97,  skylncr_state,  init_sstar97a,  ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 (version V168A)",   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1995, bdream97,  0,        bdream97, skylncr,  skylncr_state,  empty_init,     ROT0, "bootleg (KKK)",        "Hudie Meng 97",                                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 2000?,olymp,     0,        olymp,    skylncr,  skylncr_state,  init_olymp,     ROT0, "Z Games",              "Olympus (Z Games, version 10)",                  MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // Still has Bordun International 1992 strings
 GAME( 2000, sonikfig,  0,        skylncr,  sonikfig, skylncr_state,  init_sonikfig,  ROT0, "Z Games",              "Sonik Fighter (version 02, encrypted)",          MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

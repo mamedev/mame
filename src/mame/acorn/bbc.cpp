@@ -45,15 +45,18 @@
 
 #include "emu.h"
 #include "bbc.h"
+
+#include "imagedev/cassette.h"
+#include "machine/tms6100.h"
+
 #include "softlist_dev.h"
 #include "speaker.h"
 
 #include "formats/acorn_dsk.h"
+#include "formats/csw_cas.h"
 #include "formats/fsd_dsk.h"
 #include "formats/pc_dsk.h"
-#include "imagedev/cassette.h"
 #include "formats/uef_cas.h"
-#include "formats/csw_cas.h"
 
 #include "utf8.h"
 
@@ -1201,10 +1204,15 @@ void bbc_state::bbcb(machine_config &config)
 	m_ram->set_default_size("32K");
 
 	/* speech hardware */
-	SPEECHROM(config, "vsm", 0);
 	TMS5220(config, m_tms, 640000);
-	m_tms->set_speechrom_tag("vsm");
 	m_tms->add_route(ALL_OUTPUTS, "mono", 1.0);
+
+	TMS6100(config, "vsm", 0);
+	m_tms->m0_cb().set("vsm", FUNC(tms6100_device::m0_w));
+	m_tms->m1_cb().set("vsm", FUNC(tms6100_device::m1_w));
+	m_tms->addr_cb().set("vsm", FUNC(tms6100_device::add_w));
+	m_tms->data_cb().set("vsm", FUNC(tms6100_device::data_line_r));
+	m_tms->romclk_cb().set("vsm", FUNC(tms6100_device::clk_w));
 
 	/* user via */
 	MOS6522(config, m_via6522_1, 16_MHz_XTAL / 16);

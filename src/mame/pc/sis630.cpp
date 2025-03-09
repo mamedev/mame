@@ -151,6 +151,24 @@ Notes on possible shutms11 BIOS bugs:
     80000000       00000000       00000000       B8BA1941       00038881
     C0000000       00000000       00000000       B8BA1941       00038881
 
+
+    The JAMMA adaptor is a small external PCB from Azkoyen with an MCU (unknown type):
+                                _______________         _______
+     ____--__-- _______________|   DB-25      |________| DB-9 |_____
+    |   |__||__| <-Jacks       |______________|        |______|    |
+    | _________                                               ___  |
+    ||o o o o |<-Power                     ________________  |  |  |
+    |                                     | MCU           |  | <-MAX232N
+    |                                     |_______________|  |__|  |
+    |                                      _________   Xtal        |
+    |                                     |DIPS x 8|   6 MHz       |
+    |                                                              |
+    |    Test sw->(o)         _________   _________   _________    |
+    | Service sw->(o)         SN74HC245N  SN74HC245N  SN74HC245N   |
+    |_________                                          ___________|
+             |_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|
+                               JAMMA
+
 **************************************************************************************************/
 
 #include "emu.h"
@@ -400,9 +418,8 @@ ROM_START(zidav630e)
 //  ROMX_LOAD( "V630e104.bin",     0x040000, 0x040000, CRC(?) SHA1(?), ROM_BIOS(1) )
 ROM_END
 
-/*
- * Arcade based GameCristal
- */
+
+// GameCristal - PC-based multigame arcade (with an unknown emulator).
 
 ROM_START(gamecstl)
 	ROM_REGION32_LE(0x80000, "flash", ROMREGION_ERASEFF )
@@ -412,6 +429,9 @@ ROM_START(gamecstl)
 
 	DISK_REGION( "pci:00.1:ide1:0:hdd" )
 	DISK_IMAGE( "gamecstl", 0, SHA1(b431af3c42c48ba07972d77a3d24e60ee1e4359e) )
+
+	ROM_REGION( 0x2000, "mcu", 0 )
+	ROM_LOAD( "gamecristal_datasat.bin", 0x0000, 0x2000, NO_DUMP ) // MCU on the JAMMA interface PCB, unknown type and ROM size
 ROM_END
 
 ROM_START(gamecst2)
@@ -421,15 +441,18 @@ ROM_START(gamecst2)
 
 	DISK_REGION( "pci:00.1:ide1:0:hdd" )
 	DISK_IMAGE( "gamecst2", 0, SHA1(14e1b311cb474801c7bdda3164a0c220fb102159) )
+
+	ROM_REGION( 0x2000, "mcu", 0 )
+	ROM_LOAD( "gamecristal_datasat.bin", 0x0000, 0x2000, NO_DUMP ) // MCU on the JAMMA interface PCB, unknown type and ROM size
 ROM_END
 
 } // anonymous namespace
 
 
-COMP( 2000, shutms11,  0,      0,      sis630,   sis630, sis630_state, empty_init, "Shuttle", "MS11 PC (SiS630 chipset)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 2001, asuspolo,  0,      0,      asuspolo, sis630, sis630_state, empty_init, "Asus", "Polo \"Genie\" (SiS630 chipset)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // hangs at CMOS check first time, corrupts flash ROM on successive boots
-COMP( 2001, asuscusc,  0,      0,      asuscusc, sis630, sis630_state, empty_init, "Asus", "Terminator P-3 \"Cusc\" (SiS630 chipset)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // fails CMOS test, does crc with I/O accesses at $c00
-COMP( 2001, zidav630e, 0,      0,      zidav630e,sis630, sis630_state, empty_init, "Zida", "V630E Baby AT (SiS630 chipset)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // Flash ROM corrupts often, otherwise same-y as shutms11
+COMP( 2000, shutms11,  0, 0, sis630,   sis630, sis630_state, empty_init, "Shuttle", "MS11 PC (SiS630 chipset)",                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 2001, asuspolo,  0, 0, asuspolo, sis630, sis630_state, empty_init, "Asus",    "Polo \"Genie\" (SiS630 chipset)",          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // hangs at CMOS check first time, corrupts flash ROM on successive boots
+COMP( 2001, asuscusc,  0, 0, asuscusc, sis630, sis630_state, empty_init, "Asus",    "Terminator P-3 \"Cusc\" (SiS630 chipset)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // fails CMOS test, does crc with I/O accesses at $c00
+COMP( 2001, zidav630e, 0, 0, zidav630e,sis630, sis630_state, empty_init, "Zida",    "V630E Baby AT (SiS630 chipset)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // Flash ROM corrupts often, otherwise same-y as shutms11
 
 
 // Arcade based games
