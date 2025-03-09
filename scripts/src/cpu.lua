@@ -3746,6 +3746,13 @@ end
 --@src/devices/cpu/vax/vax.h,CPUS["VAX"] = true
 --------------------------------------------------
 
+if CPUS["VAX"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/vax/vax.cpp",
+		MAME_DIR .. "src/devices/cpu/vax/vax.h",
+	}
+end
+
 if opt_tool(CPUS, "VAX") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/vax/vaxdasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/vax/vaxdasm.h")

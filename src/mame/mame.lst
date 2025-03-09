@@ -17488,6 +17488,16 @@ rainbow
 rainbow100a
 rainbow190
 
+@source:dec/uvax1.cpp
+uvax1
+
+@source:dec/uvax2.cpp
+uvax2
+
+@source:dec/uvax3.cpp
+mv3400
+mv3500
+
 @source:dec/vax11.cpp
 vax785
 
