@@ -24,7 +24,7 @@ disasmwin_info::disasmwin_info(debugger_windows_interface &debugger) :
 	disasmbasewin_info(debugger, false, "Disassembly", nullptr),
 	m_combownd(nullptr)
 {
-	if ((window() == nullptr) || (m_views[0] == nullptr))
+	if ((window() == nullptr) || (m_views[VIEW_IDX_DISASM] == nullptr))
 		return;
 
 	// set up the view to track the initial expression
@@ -33,7 +33,7 @@ disasmwin_info::disasmwin_info(debugger_windows_interface &debugger) :
 	editwnd_select_all();
 
 	// create a combo box
-	m_combownd = m_views[0]->create_source_combobox(window(), (LONG_PTR)this);
+	m_combownd = m_views[VIEW_IDX_DISASM]->create_source_combobox(window(), (LONG_PTR)this);
 
 	// set the caption
 	update_caption();
@@ -60,7 +60,7 @@ void disasmwin_info::recompute_children()
 	// compute a client rect
 	RECT bounds;
 	bounds.top = bounds.left = 0;
-	bounds.right = m_views[0]->prefwidth() + (2 * EDGE_WIDTH);
+	bounds.right = m_views[VIEW_IDX_DISASM]->prefwidth() + (2 * EDGE_WIDTH);
 	bounds.bottom = 200;
 	AdjustWindowRectEx(&bounds, DEBUG_WINDOW_STYLE, FALSE, DEBUG_WINDOW_STYLE_EX);
 
@@ -93,7 +93,7 @@ void disasmwin_info::recompute_children()
 	dasmrect.right = parent.right - EDGE_WIDTH;
 
 	// set the bounds of things
-	m_views[0]->set_bounds(dasmrect);
+	m_views[VIEW_IDX_DISASM]->set_bounds(dasmrect);
 	set_editwnd_bounds(editrect);
 	smart_set_window_bounds(m_combownd, window(), comborect);
 }
@@ -109,7 +109,7 @@ bool disasmwin_info::handle_command(WPARAM wparam, LPARAM lparam)
 			int const sel = SendMessage((HWND)lparam, CB_GETCURSEL, 0, 0);
 			if (sel != CB_ERR)
 			{
-				m_views[0]->set_source_index(sel);
+				m_views[VIEW_IDX_DISASM]->set_source_index(sel);
 				update_caption();
 
 				// reset the focus
@@ -134,7 +134,7 @@ void disasmwin_info::draw_contents(HDC dc)
 void disasmwin_info::process_string(const std::string &string)
 {
 	// set the string to the disasm view
-	downcast<disasmview_info *>(m_views[0].get())->set_expression(string);
+	downcast<disasmview_info *>(m_views[VIEW_IDX_DISASM].get())->set_expression(string);
 
 	// select everything in the edit text box
 	editwnd_select_all();
@@ -146,14 +146,14 @@ void disasmwin_info::process_string(const std::string &string)
 
 void disasmwin_info::update_caption()
 {
-	win_set_window_text_utf8(window(), std::string("Disassembly: ").append(m_views[0]->source_name()).c_str());
+	win_set_window_text_utf8(window(), std::string("Disassembly: ").append(m_views[VIEW_IDX_DISASM]->source_name()).c_str());
 }
 
 
 void disasmwin_info::restore_configuration_from_node(util::xml::data_node const &node)
 {
-	m_views[0]->set_source_index(node.get_attribute_int(ATTR_WINDOW_DISASSEMBLY_CPU, m_views[0]->source_index()));
-	int const cursource = m_views[0]->source_index();
+	m_views[VIEW_IDX_DISASM]->set_source_index(node.get_attribute_int(ATTR_WINDOW_DISASSEMBLY_CPU, m_views[VIEW_IDX_DISASM]->source_index()));
+	int const cursource = m_views[VIEW_IDX_DISASM]->source_index();
 	if (0 <= cursource)
 		SendMessage(m_combownd, CB_SETCURSEL, cursource, 0);
 	update_caption();
@@ -174,8 +174,8 @@ void disasmwin_info::save_configuration_to_node(util::xml::data_node &node)
 	disasmbasewin_info::save_configuration_to_node(node);
 
 	node.set_attribute_int(ATTR_WINDOW_TYPE, WINDOW_TYPE_DISASSEMBLY_VIEWER);
-	node.set_attribute_int(ATTR_WINDOW_DISASSEMBLY_CPU, m_views[0]->source_index());
-	node.add_child(NODE_WINDOW_EXPRESSION, downcast<disasmview_info *>(m_views[0].get())->expression());
+	node.set_attribute_int(ATTR_WINDOW_DISASSEMBLY_CPU, m_views[VIEW_IDX_DISASM]->source_index());
+	node.add_child(NODE_WINDOW_EXPRESSION, downcast<disasmview_info *>(m_views[VIEW_IDX_DISASM].get())->expression());
 }
 
 } // namespace osd::debugger::win
