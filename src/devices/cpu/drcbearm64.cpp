@@ -541,6 +541,7 @@ private:
 	void emit_float_str_mem(asmjit::a64::Assembler &a, const asmjit::a64::Vec &reg, const void *ptr) const;
 
 	void emit_memaccess_setup(asmjit::a64::Assembler &a, const be_parameter &addrp, const memory_accessors &accessors, const address_space::specific_access_info::side &side) const;
+	void emit_narrow_memwrite(asmjit::a64::Assembler &a, const be_parameter &addrp, const parameter &spacesizep, const memory_accessors &accessors) const;
 
 	void get_carry(asmjit::a64::Assembler &a, const asmjit::a64::Gp &reg, bool inverted = false) const;
 	void load_carry(asmjit::a64::Assembler &a, bool inverted = false) const;
@@ -947,6 +948,98 @@ void drcbe_arm64::emit_memaccess_setup(asmjit::a64::Assembler &a, const be_param
 	// adjusted dispatch table entry pointer in REG_PARAM1
 	// masked address in REG_PARAM2
 	// x8, x7 and potentially x6 clobbered
+}
+
+void drcbe_arm64::emit_narrow_memwrite(asmjit::a64::Assembler &a, const be_parameter &addrp, const parameter &spacesizep, const memory_accessors &accessors) const
+{
+	// expects data in REG_PARAM3 and mask in REG_PARAM4
+
+	address_space &space = *m_space[spacesizep.space()];
+	auto const addrreg = (accessors.no_mask || accessors.mask_simple) ? REG_PARAM2 : a64::x5;
+	mov_reg_param(a, 4, addrreg, addrp);
+	get_imm_relative(a, a64::x8, uintptr_t(accessors.specific.write.dispatch));
+
+	// get the shift count for the data and offset in w7
+	int const shift = space.addr_shift() - 3;
+	uint32_t const shiftmask = (accessors.specific.native_bytes - (1 << spacesizep.size())) << 3;
+	if (space.endianness() != ENDIANNESS_LITTLE)
+	{
+		// swizzle for big Endian spaces
+		bool const smallshift = (shift <= 0) && (shift >= -3);
+		if (!smallshift)
+		{
+			if (shift < 0)
+				a.lsl(a64::w6, addrreg.w(), -shift);
+			else
+				a.lsr(a64::w6, addrreg.w(), shift);
+		}
+		a.mov(a64::w7, shiftmask);
+		if (smallshift)
+			a.bic(a64::w7, a64::w7, addrreg.w(), -shift);
+		else
+			a.bic(a64::w7, a64::w7, a64::w6);
+	}
+	else
+	{
+		if (!shift)
+		{
+			a.and_(a64::w7, addrreg.w(), shiftmask);
+		}
+		else
+		{
+			if (shift < 0)
+				a.lsl(a64::w7, addrreg.w(), -shift);
+			else
+				a.lsr(a64::w7, addrreg.w(), shift);
+			a.and_(a64::w7, a64::w7, shiftmask);
+		}
+	}
+
+	// if the high bits aren't affected by the global mask, extract them early
+	if (accessors.high_bits && !accessors.mask_high_bits)
+		a.ubfx(a64::w6, addrreg.w(), accessors.specific.low_bits, accessors.high_bits);
+
+	if (accessors.mask_simple)
+		a.and_(REG_PARAM2.w(), addrreg.w(), accessors.address_mask);
+	else if (!accessors.no_mask)
+		a.mov(REG_PARAM2.w(), accessors.address_mask); // 32-bit value, no more than two instructions
+
+	// if the high address bits aren't affected by the global mask, load the dispatch table entry now
+	if (!accessors.high_bits)
+		a.ldr(REG_PARAM1, a64::Mem(a64::x8));
+	else if (!accessors.mask_high_bits)
+		a.ldr(REG_PARAM1, a64::Mem(a64::x8, a64::x6, arm::Shift(arm::ShiftOp::kLSL, 3)));
+
+	// apply non-trivial global mask if necessary
+	if (!accessors.no_mask && !accessors.mask_simple)
+		a.and_(REG_PARAM2.w(), REG_PARAM2.w(), addrreg.w());
+
+	// if the high address bits are affected by the global mask, load the dispatch table entry now
+	if (accessors.mask_high_bits)
+	{
+		a.lsr(a64::w6, REG_PARAM2.w(), accessors.specific.low_bits);
+		a.ldr(REG_PARAM1, a64::Mem(a64::x8, a64::x6, arm::Shift(arm::ShiftOp::kLSL, 3)));
+	}
+
+	// apply this pointer displacement if necessary
+	if (accessors.specific.write.displacement)
+		a.add(REG_PARAM1, REG_PARAM1, accessors.specific.write.displacement); // assume less than 4K
+
+	// shift the data and mask
+	a.lsl(REG_PARAM3, REG_PARAM3, a64::x7);
+	a.lsl(REG_PARAM4, REG_PARAM4, a64::x7);
+
+	// call the write function
+	if (accessors.specific.write.is_virtual)
+	{
+		a.ldr(a64::x8, a64::Mem(REG_PARAM1));
+		a.ldr(a64::x8, a64::Mem(a64::x8, accessors.specific.write.function)); // assume no more than 4096 vtable entries
+		a.blr(a64::x8);
+	}
+	else
+	{
+		call_arm_addr(a, (const void *)accessors.specific.write.function);
+	}
 }
 
 void drcbe_arm64::mov_reg_param(a64::Assembler &a, uint32_t regsize, const a64::Gp &dst, const be_parameter &src) const
@@ -2509,6 +2602,12 @@ void drcbe_arm64::op_write(a64::Assembler &a, const uml::instruction &inst)
 		else
 			call_arm_addr(a, (const void *)accessors.specific.write.function);
 	}
+	else if (have_specific && ((1 << spacesizep.size()) < accessors.specific.native_bytes))
+	{
+		mov_reg_param(a, inst.size(), REG_PARAM3, srcp);
+		a.mov(REG_PARAM4, make_bitmask<uint64_t>(8 << spacesizep.size()));
+		emit_narrow_memwrite(a, addrp, spacesizep, accessors);
+	}
 	else
 	{
 		mov_reg_param(a, 4, REG_PARAM2, addrp);
@@ -2567,6 +2666,12 @@ void drcbe_arm64::op_writem(a64::Assembler &a, const uml::instruction &inst)
 			a.blr(a64::x8);
 		else
 			call_arm_addr(a, (const void *)accessors.specific.write.function);
+	}
+	else if (have_specific && ((1 << spacesizep.size()) < accessors.specific.native_bytes))
+	{
+		mov_reg_param(a, inst.size(), REG_PARAM3, srcp);
+		mov_reg_param(a, inst.size(), REG_PARAM4, maskp);
+		emit_narrow_memwrite(a, addrp, spacesizep, accessors);
 	}
 	else
 	{
