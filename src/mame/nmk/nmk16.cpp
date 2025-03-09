@@ -1795,9 +1795,6 @@ static INPUT_PORTS_START( mustang )
 	PORT_DIPSETTING(      0xc000, "3" )
 	PORT_DIPSETTING(      0x8000, "4" )
 	PORT_DIPSETTING(      0x0000, "5" )
-
-	PORT_START("COIN")  // referenced by Seibu sound board
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( hachamf_prot )
@@ -2092,13 +2089,6 @@ static INPUT_PORTS_START( strahl )
 	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW2:8" )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( strahljbl )
-	PORT_INCLUDE(strahl)
-
-	PORT_START("COIN")  // referenced by Seibu sound board
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-INPUT_PORTS_END
-
 static INPUT_PORTS_START( acrobatm )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -2205,9 +2195,6 @@ static INPUT_PORTS_START( acrobatmbl )
 	PORT_DIPSETTING(      0x6000, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0xa000, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x2000, DEF_STR( 1C_4C ) )
-
-	PORT_START("COIN")  // referenced by Seibu sound board
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bioship )
@@ -2471,9 +2458,6 @@ static INPUT_PORTS_START( tdragonb )
 	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unused ) )   PORT_DIPLOCATION("SW2:8") // The manual states this dip is "Unused"
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-
-	PORT_START("COIN")  // referenced by Seibu sound board
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tdragonb2 )
@@ -4669,8 +4653,9 @@ void nmk16_state::mustangb(machine_config &config)
 
 	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound", 0));
 	seibu_sound.int_callback().set_inputline(m_audiocpu, 0);
+	seibu_sound.coin_io_callback().set_constant(0xff); // unused
 	seibu_sound.set_rom_tag("audiocpu");
-	seibu_sound.set_rombank_tag("seibu_bank1");
+	seibu_sound.set_rombank_tag("seibu_bank");
 	seibu_sound.ym_read_callback().set("ymsnd", FUNC(ym3812_device::read));
 	seibu_sound.ym_write_callback().set("ymsnd", FUNC(ym3812_device::write));
 }
@@ -4888,8 +4873,9 @@ void nmk16_state::acrobatmbl(machine_config &config)
 
 	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound", 0));
 	seibu_sound.int_callback().set_inputline(m_audiocpu, 0);
+	seibu_sound.coin_io_callback().set_constant(0xff); // unused
 	seibu_sound.set_rom_tag("audiocpu");
-	seibu_sound.set_rombank_tag("seibu_bank1");
+	seibu_sound.set_rombank_tag("seibu_bank");
 	seibu_sound.ym_read_callback().set("ymsnd", FUNC(ym3812_device::read));
 	seibu_sound.ym_write_callback().set("ymsnd", FUNC(ym3812_device::write));
 }
@@ -4925,8 +4911,9 @@ void nmk16_state::tdragonb(machine_config &config)    // bootleg using Raiden so
 
 	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound", 0));
 	seibu_sound.int_callback().set_inputline(m_audiocpu, 0);
+	seibu_sound.coin_io_callback().set_constant(0xff); // unused
 	seibu_sound.set_rom_tag("audiocpu");
-	seibu_sound.set_rombank_tag("seibu_bank1");
+	seibu_sound.set_rombank_tag("seibu_bank");
 	seibu_sound.ym_read_callback().set("ymsnd", FUNC(ym3812_device::read));
 	seibu_sound.ym_write_callback().set("ymsnd", FUNC(ym3812_device::write));
 }
@@ -5201,8 +5188,9 @@ void nmk16_state::strahljbl(machine_config &config)
 
 	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound", 0));
 	seibu_sound.int_callback().set_inputline(m_audiocpu, 0);
+	seibu_sound.coin_io_callback().set_constant(0xff); // unused
 	seibu_sound.set_rom_tag("audiocpu");
-	seibu_sound.set_rombank_tag("seibu_bank1");
+	seibu_sound.set_rombank_tag("seibu_bank");
 	seibu_sound.ym_read_callback().set("ymsnd", FUNC(ym3812_device::read));
 	seibu_sound.ym_write_callback().set("ymsnd", FUNC(ym3812_device::write));
 }
@@ -10632,7 +10620,7 @@ GAME( 1990, mustangb2,  mustang,  mustangb,     mustang,      nmk16_state, empty
 GAME( 1991, acrobatmbl, acrobatm, acrobatmbl,   acrobatmbl,   nmk16_state, init_acrobatmbl,      ROT270, "bootleg",                       "Acrobat Mission (bootleg with Raiden sounds)", 0 )
 GAME( 1991, tdragonb,   tdragon,  tdragonb,     tdragonb,     nmk16_state, init_tdragonb,        ROT270, "bootleg",                       "Thunder Dragon (bootleg with Raiden sounds, encrypted)", 0 )
 GAME( 1991, tdragonb3,  tdragon,  tdragonb3,    tdragonb,     nmk16_state, empty_init,           ROT270, "bootleg",                       "Thunder Dragon (bootleg with Raiden sounds, unencrypted)", 0 )
-GAME( 1992, strahljbl,  strahl,   strahljbl,    strahljbl,    nmk16_state, empty_init,           ROT0,   "bootleg",                       "Koutetsu Yousai Strahl (Japan, bootleg)", 0 )
+GAME( 1992, strahljbl,  strahl,   strahljbl,    strahl,       nmk16_state, empty_init,           ROT0,   "bootleg",                       "Koutetsu Yousai Strahl (Japan, bootleg)", 0 )
 
 // these are bootlegs with tharrier like sound hw
 GAME( 1990, mustangb3,  mustang,  mustangb3,    mustang,      nmk16_state,     empty_init,       ROT0,   "bootleg (Lettering)",           "US AAF Mustang (Lettering bootleg)", 0 )
