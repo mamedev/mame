@@ -2024,7 +2024,7 @@ ROM_START( cadashs ) // no labels on the program ROMs
 	ROM_LOAD( "pal20l8b-c21-12.ic47",   0x0600, 0x0144, CRC(bbc2cc97) SHA1(d4a68f28e0d3f5a3b39ecc25640bc9197ad0260b) )
 ROM_END
 
-ROM_START( cadashso )
+ROM_START( cadashso ) // Taito PCB: K1100526A / J1100218A
 	ROM_REGION( 0x80000, "maincpu", 0 )     // 512k for 68000 code
 	ROM_LOAD16_BYTE( "conchimatic_c_31.ic11", 0x00000, 0x20000, CRC(091e71de) SHA1(b4b7346538866866ab92b59fad00d0ba7747d115) )
 	ROM_LOAD16_BYTE( "conchimatic_c_33.ic15", 0x00001, 0x20000, CRC(64722757) SHA1(c59dd101d7b2bd3c23672faeac53a5ffcd25cfc3) )
