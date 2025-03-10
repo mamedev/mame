@@ -2,10 +2,10 @@
 // copyright-holders:
 /***********************************************************************************************************************
 
-  Skeleton driver for DEC MicroVAX 3100
+  Skeleton driver for DEC MicroVAX 3100 models.
 
 
-  Hardhare for Model 10:
+  Hardhare for MicroVAX 3100 Model 10:
                                                                          ____
   Main PCB:         _________________    _____    _____    _____    _    |   |            ___   ___________
    ________________|                |___|    |___|    |___|    |___| |___|   |___________|  |__|          |_____
@@ -95,7 +95,7 @@
 ***********************************************************************************************************************/
 
 #include "emu.h"
-#include "cpu/t11/t11.h"
+#include "cpu/vax/vax.h"
 
 #include "machine/am79c90.h"
 //#include "machine/ncr5380.h"
@@ -105,32 +105,33 @@
 
 namespace {
 
-class microvax3100_state : public driver_device
+class uvax3100_state : public driver_device
 {
 public:
-	microvax3100_state(const machine_config &mconfig, device_type type, const char *tag)
+	uvax3100_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_terminal(*this, "terminal")
 	{ }
 
-	void microvax3100(machine_config &config);
+	void uvax3100(machine_config &config);
 
 private:
-	required_device<t11_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 };
 
 
 // Input ports
-static INPUT_PORTS_START( microvax3100 )
+static INPUT_PORTS_START( uvax3100 )
 INPUT_PORTS_END
 
 
-void microvax3100_state::microvax3100(machine_config &config)
+// Model 10
+void uvax3100_state::uvax3100(machine_config &config)
 {
 	// Basic machine hardware
-	T11(config, m_maincpu, 66.6667_MHz_XTAL); // Need proper CPU here
+	DC341(config, m_maincpu, 66.6667_MHz_XTAL / 6); // CPU CVAX 21-24674-17 11.11 MHz
 
 	AM7990(config, "lance1", 0); // AMD AM7990PC/80
 
@@ -142,7 +143,7 @@ void microvax3100_state::microvax3100(machine_config &config)
 	GENERIC_TERMINAL(config, m_terminal, 0);
 }
 
-ROM_START( mvax3100m10 )
+ROM_START( mv3100m10 )
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "dec89_23-117e8-00_system_rom_hi_word.e25", 0x00000, 0x20000, CRC(df572ac3) SHA1(5e91d0f4fc8442e3ebc2424d9f85078ba00d2de5) )
 	ROM_LOAD16_BYTE( "dec89_23-116e8-00_system_rom_lo_word.e24", 0x00001, 0x20000, CRC(69ef8cf5) SHA1(a59a500921278dc356a519cb435641426c844779) )
@@ -168,5 +169,5 @@ ROM_END
 } // anonymous namespace
 
 
-//    YEAR  NAME         PARENT  COMPAT  MACHINE       INPUT         STATE               INIT        COMPANY                          FULLNAME                  FLAGS
-COMP( 1989, mvax3100m10, 0,      0,      microvax3100, microvax3100, microvax3100_state, empty_init, "Digital Equipment Corporation", "MicroVAX 3100 Model 10", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME       PARENT  COMPAT  MACHINE   INPUT     STATE           INIT        COMPANY                          FULLNAME                  FLAGS
+COMP( 1989, mv3100m10, 0,      0,      uvax3100, uvax3100, uvax3100_state, empty_init, "Digital Equipment Corporation", "MicroVAX 3100 Model 10", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
