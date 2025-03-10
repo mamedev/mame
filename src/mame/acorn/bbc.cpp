@@ -2134,6 +2134,39 @@ void bbcm_state::autoc15(machine_config &config)
 }
 
 
+/***************************************************************************
+
+    CUBE EuroBEEB Single Board Computer PCB from Control Universal Ltd
+
+****************************************************************************/
+
+void bbc_state::eurobeeb(machine_config &config)
+{
+	bbca(config);
+
+	/* TODO: CUBE EuroBEEB hardware
+	    -65C02 CPU
+	    -2 x 8k RAM (battery backed)
+	    -16k EPROM
+	    -6551 ACIA
+	    -6522 VIA
+	    -uEM M3002 RTC
+	*/
+	//M3002(config, m_rtc_2, 1.8432_MHz_XTAL); // uEM M-3002-16PI RTC, unknown xtal
+
+	/* TODO: Add Keypad PCB as a device
+	    -R6501AQ CPU
+	    -16k EPROM
+	    -2 x relays
+	    -2 x RS422/485 drivers
+	    -AMPAL16L8
+	    -Misc 74 and 4000 series logic
+	    -7 x 2N7000 MOSFETs
+	*/
+	//M6500_1(config, m_mcu, 2_MHz_XTAL); // Rockwell R6501AQ
+}
+
+
 
 ROM_START(bbca)
 	ROM_REGION(0x44000, "swr", ROMREGION_ERASEFF) /* Sideways ROMs */
@@ -2783,6 +2816,31 @@ ROM_START(autoc15)
 	ROM_COPY("swr", 0x40000, 0, 0x4000)
 ROM_END
 
+ROM_START(eurobeeb)
+	ROM_REGION(0x44000, "swr", ROMREGION_ERASEFF) // Sideways ROMs
+	ROM_DEFAULT_BIOS("cmx419")
+	ROM_SYSTEM_BIOS(0, "cmx419", "CUBE MOSB X4.19")
+	ROMX_LOAD("auto_4_19.m0", 0x40000, 0x4000, CRC(38a3b7b4) SHA1(269f008fa92345c8c82ff0bbeb41a0f74511757a), ROM_BIOS(0))
+	ROMX_LOAD("basic.m1", 0x0c000, 0x4000, BAD_DUMP CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281), ROM_BIOS(0)) // Not dumped on this PCB
+	ROM_RELOAD( 0x04000, 0x4000 )
+	ROM_RELOAD( 0x08000, 0x4000 )
+	ROM_RELOAD( 0x0c000, 0x4000 )
+
+	ROM_REGION(0x4000, "mos", 0)
+	ROM_COPY("swr", 0x40000, 0, 0x4000)
+
+	ROM_REGION(0x00200, "proms", 0)
+	ROM_LOAD( "82s147n.ic9",  0x0000, 0x0200, CRC(56922417) SHA1(8614af73792a0f155e4bd835a804d37e7589bb6a) ) // For address decoding
+	ROM_LOAD( "82s147n.ic10", 0x0000, 0x0200, CRC(401fa579) SHA1(e6320f70da9dfed0daae47af7b6cf9f3a62313b2) ) // For address decoding
+
+	// TODO: Move these keypad ROMs to the device once coded
+
+	ROM_REGION(0x04000, "keypad", 0)
+	ROM_LOAD( "keypad_rev3_aux_card_13-04-87.bin", 0x0000, 0x4000, CRC(8aec91af) SHA1(379b6eed22bcce3a367c8d1acccce206e761d9a4) )
+
+	ROM_REGION(0x0104, "pld", 0)
+	ROM_LOAD( "ms10_1100_ampal16l8.ic7", 0x0000, 0x0104, CRC(2c7e0651) SHA1(ba9111003d8e0d2fd4ce8130b77d4191f731fbcd) ) // On Keypad PCB
+ROM_END
 
 ROM_START(daisy)
 	ROM_REGION(0x44000, "swr", ROMREGION_ERASEFF) /* Sideways ROMs */
@@ -3123,6 +3181,7 @@ COMP( 1988, discmate,   bbcm,   0,     discmate,   bbcm,   bbcm_state,   init_bb
 COMP( 198?, sist1,      bbcb,   0,     sist1,      bbcb,   bbc_state,    init_bbc,  "Cisco Systems",               "Cisco SIST1 Terminal",               MACHINE_NOT_WORKING )
 COMP( 1985, ltmpbp,     bbcbp,  0,     bbcbp,      ltmpbp, bbcbp_state,  init_ltmp, "Lawrie T&M Ltd.",             "LTM Portable (B+)",                  MACHINE_IMPERFECT_GRAPHICS )
 COMP( 1986, ltmpm,      bbcm,   0,     bbcm,       ltmpm,  bbcm_state,   init_ltmp, "Lawrie T&M Ltd.",             "LTM Portable (Master)",              MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1986, eurobeeb,   bbcb,   0,     eurobeeb,   bbcb,   bbc_state,    init_bbc,  "Control Universal",           "CUBE EuroBEEB",                      MACHINE_NOT_WORKING )
 COMP( 1987, daisy,      bbcm,   0,     daisy,      bbcm,   bbcm_state,   init_bbc,  "Comus Instruments Ltd.",      "Comus Daisy",                        MACHINE_NOT_WORKING )
 COMP( 198?, cfa3000bp,  bbcbp,  0,     cfa3000bp,  bbcbp,  bbcbp_state,  init_cfa,  "Tinsley Medical Instruments", "Henson CFA 3000 (B+)",               MACHINE_NOT_WORKING )
 COMP( 1989, cfa3000,    bbcm,   0,     cfa3000,    bbcm,   bbcm_state,   init_cfa,  "Tinsley Medical Instruments", "Henson CFA 3000 (Master)",           MACHINE_NOT_WORKING )

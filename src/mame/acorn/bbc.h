@@ -197,6 +197,7 @@ public:
 	void bbcb(machine_config &config);
 	void bbcb_de(machine_config &config);
 	void bbcb_us(machine_config &config);
+	void eurobeeb(machine_config &config);
 	void sist1(machine_config &config);
 
 	void bbca_mem(address_map &map) ATTR_COLD;

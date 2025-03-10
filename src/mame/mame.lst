@@ -322,6 +322,7 @@ atomeb
 abc110
 abc310
 acw443
+autoc15
 bbca
 bbcb
 bbcb_de
@@ -342,14 +343,14 @@ cfa3000
 daisy
 discmon
 discmate
+econx25
+eurobeeb
+ltmpbp
+ltmpm
 mpc800
 mpc900
 mpc900gx
-econx25
-ltmpbp
-ltmpm
 pro128s
-autoc15
 reutapm
 sist1
 torchf
@@ -20544,9 +20545,6 @@ cjddz215cn
 cjddz217cn
 cjddzlf
 cjddzp
-cjddzps
-cjddzs
-cjddzsa
 cjtljp
 extradrw
 fruitpar
@@ -42980,6 +42978,9 @@ nordle2x
 @source:skeleton/onyx.cpp
 c5000
 c8002
+
+@source:skeleton/optomaxv.cpp
+optomaxv
 
 @source:skeleton/p8k.cpp
 p8000
