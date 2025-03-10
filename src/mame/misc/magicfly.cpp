@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Roberto Fresca
+// copyright-holders: Roberto Fresca
 // thanks-to:Iris Falbala, Rob Ragon
 /******************************************************************************
 
@@ -429,12 +429,16 @@
     - Added proper palette. Now the game seems to get accurate colors.
     - Added some notes.
 
+    [2025-03-10]
+	- Bonne Chance chars and tiles both 3bpp.
+	- New TILE_GET_INFO and video start for Bonne Chance.
+    - Reworked the Bonne Chance and 7mezzo color palette.
+
 
     TODO:
 
     - Figure out how the palette is generated, to avoid a custom palette.
-	- Fix the color issues in Bonne Chance (color codes 00 & 08 for the
-      cards corners numbers).
+	- Find a board to investigate if the chars GFX are 1bpp or 3bpp.
 
 
 *******************************************************************************/
@@ -466,12 +470,14 @@ public:
 		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
 		m_dac(*this, "dac"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette")
+
 	{ }
 
-	void bchance(machine_config &config);
 	void magicfly(machine_config &config);
 	void _7mezzo(machine_config &config);
+	void bchance(machine_config &config);
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -484,6 +490,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_bit_interface> m_dac;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 	void magicfly_videoram_w(offs_t offset, uint8_t data);
 	void magicfly_colorram_w(offs_t offset, uint8_t data);
@@ -491,9 +498,12 @@ private:
 	void mux_port_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_magicfly_tile_info);
 	TILE_GET_INFO_MEMBER(get_7mezzo_tile_info);
+	TILE_GET_INFO_MEMBER(get_bchance_tile_info);
 	void magicfly_palette(palette_device &palette) const;
+	void _7mezzo_palette(palette_device &palette) const;
 	void bchance_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(7mezzo);
+	DECLARE_VIDEO_START(bchance);
 	uint32_t screen_update_magicfly(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void magicfly_map(address_map &map) ATTR_COLD;
 };
@@ -531,7 +541,7 @@ TILE_GET_INFO_MEMBER(magicfly_state::get_magicfly_tile_info)
 	int attr = m_colorram[tile_index];
 	int code = m_videoram[tile_index];
 	int bank = (attr & 0x10) >> 4;   // bit 4 switch the gfx banks
-	int color = attr & 0x07;         // bits 0-2 for color
+	int color = attr & 0x0f;         // bits 0-2 for color
 
 	// Seems that bit 7 is mirrored from bit 3 to have a normal boot
 	// Boot only check the first color RAM offset
@@ -559,10 +569,10 @@ TILE_GET_INFO_MEMBER(magicfly_state::get_7mezzo_tile_info)
     x--- ----   Mirrored from bit 2. The code check this one to boot the game.
 
 */
-	int const attr = m_colorram[tile_index];
-	int const code = m_videoram[tile_index];
-	int const bank = (attr & 0x10) >> 4;    // bit 4 switch the gfx banks
-	int const color = attr & 0x07;          // bits 0-2 for color
+	int attr = m_colorram[tile_index];
+	int code = m_videoram[tile_index];
+	int bank = (attr & 0x10) >> 4;    // bit 4 switch the gfx banks
+	int color = attr & 0x07;          // bits 0-2 for color
 
 	// Seems that bit 7 is mirrored from bit 2 to have a normal boot
 	// Boot only check the first color RAM offset
@@ -576,6 +586,37 @@ TILE_GET_INFO_MEMBER(magicfly_state::get_7mezzo_tile_info)
 VIDEO_START_MEMBER(magicfly_state, 7mezzo)
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(magicfly_state::get_7mezzo_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 29);
+}
+
+
+TILE_GET_INFO_MEMBER(magicfly_state::get_bchance_tile_info)
+{
+/*  - bits -
+    7654 3210
+    ---- xxxx   Tiles color.
+    ---x ----   Tiles bank.
+    -xx- ----   Apparently not used.
+    x--- ----   Mirrored from bit 3. The code check this one to boot the game.
+
+*/
+	int attr = m_colorram[tile_index];
+	int code = ((attr & 1) << 8) | m_videoram[tile_index];
+
+	int bank = (attr & 0x10) >> 4;   // bit 4 switch the gfx banks
+	int color = attr & 0x0f;         // bits 0-3 for color
+
+	// Seems that bit 7 is mirrored from bit 3 to have a normal boot
+	// Boot only check the first color RAM offset
+
+	m_colorram[0] = m_colorram[0] | ((m_colorram[0] & 0x08) << 4);  // only for 1st offset
+	//m_colorram[tile_index] = attr | ((attr & 0x08) << 4);         // for the whole color RAM
+
+	tileinfo.set(bank, code, color, 0);
+}
+
+VIDEO_START_MEMBER(magicfly_state, bchance)
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(magicfly_state::get_bchance_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 29);
 }
 
 
@@ -599,16 +640,16 @@ void magicfly_state::magicfly_palette(palette_device &palette) const
 	palette.set_pen_color(14, rgb_t(0x00, 0x00, 0x00));
 
 	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0x00));
-	palette.set_pen_color(3, rgb_t(0xff, 0x00, 0x00));
+	palette.set_pen_color(3, rgb_t(0xff, 0x00, 0x00));  // yellow in 7mezzo.
 	palette.set_pen_color(5, rgb_t(0x00, 0xff, 0x00));
-	palette.set_pen_color(7, rgb_t(0xff, 0xff, 0x00));
+	palette.set_pen_color(7, rgb_t(0xff, 0xff, 0x00));  // red in 7mezzo.
 	palette.set_pen_color(9, rgb_t(0x00, 0x00, 0xff));
 	palette.set_pen_color(11, rgb_t(0xff, 0x00, 0xff));
 	palette.set_pen_color(13, rgb_t(0x00, 0xff, 0xff));
 	palette.set_pen_color(15, rgb_t(0xff, 0xff, 0xff));
 }
 
-void magicfly_state::bchance_palette(palette_device &palette) const
+void magicfly_state::_7mezzo_palette(palette_device &palette) const
 {
 	// 1st gfx bank
 	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00));
@@ -621,19 +662,42 @@ void magicfly_state::bchance_palette(palette_device &palette) const
 	palette.set_pen_color(14, rgb_t(0x00, 0x00, 0x00));
 
 	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0x00));
-	palette.set_pen_color(3, rgb_t(0xff, 0x00, 0x00));
+	palette.set_pen_color(3, rgb_t(0xff, 0xff, 0x00));  // red in magicfly
 	palette.set_pen_color(5, rgb_t(0x00, 0xff, 0x00));
-	palette.set_pen_color(7, rgb_t(0xff, 0xff, 0x00));
+	palette.set_pen_color(7, rgb_t(0xff, 0x00, 0x00));  // yellow in magicfly
 	palette.set_pen_color(9, rgb_t(0x00, 0x00, 0xff));
 	palette.set_pen_color(11, rgb_t(0xff, 0x00, 0xff));
 	palette.set_pen_color(13, rgb_t(0x00, 0xff, 0xff));
 	palette.set_pen_color(15, rgb_t(0xff, 0xff, 0xff));
+}
 
-	palette.set_pen_color(0x08 , rgb_t(0xff, 0xff, 0xff));    // white for the cards back logo background.
-	palette.set_pen_color(0x12 , rgb_t(0x00, 0x00, 0x00));    // black for the cards corners (should be transparent)
+void magicfly_state::bchance_palette(palette_device &palette) const
+{
+	palette.set_pen_color(0*8 + 1, rgb_t(0x00, 0x00, 0x00));
+	palette.set_pen_color(1*8 + 1, rgb_t(0xff, 0x00, 0x00));
+	palette.set_pen_color(3*8 + 1, rgb_t(0xff, 0xff, 0x00));
+	palette.set_pen_color(4*8 + 0, rgb_t(0xff, 0xff, 0xff));   //back card bg   (white)
+	palette.set_pen_color(4*8 + 1, rgb_t(0x00, 0x00, 0xff));   //back card fg   (blue)
+	palette.set_pen_color(5*8 + 1, rgb_t(0xff, 0x00, 0xff));
+	palette.set_pen_color(6*8 + 1, rgb_t(0x00, 0xff, 0xff));
+	palette.set_pen_color(7*8 + 1, rgb_t(0xff, 0xff, 0xff));
+	palette.set_pen_color(0xa*8 + 1, rgb_t(0x00, 0xff, 0x00)); // credits       (green)
+	palette.set_pen_color(0xb*8 + 1, rgb_t(0xff, 0xff, 0x00)); // odds + bet    (yell)
+	palette.set_pen_color(0xd*8 + 1, rgb_t(0xff, 0x00, 0xff)); // push deal     (mag)	
+	palette.set_pen_color(0xe*8 + 1, rgb_t(0x00, 0xff, 0xff)); // big good luck (cyan)
+	palette.set_pen_color(0xf*8 + 1, rgb_t(0xff, 0xff, 0xff)); // odds          (white)  
+	
+	// color code 7 all black
+	for(int i=0; i < 0x8; i++)
+	{
+		palette.set_pen_color(7*8 + i, rgb_t(0x00, 0x00, 0x00));
+	}
 
-//  Bonne Chance cards are using color code 08. For red cards this code is accurate.
-//  But when cards are black, the numbers at the corners use color code 00 (that should turn them black)
+	// all code+2 colors black (corners)	
+	for(int i=0; i < 0x10; i++)
+	{
+		palette.set_pen_color(i*8 + 2, rgb_t(0x00, 0x00, 0x00));
+	}
 }
 
 
@@ -911,12 +975,23 @@ static const gfx_layout tilelayout =
 	8*8
 };
 
-static const gfx_layout charlayout =
+static const gfx_layout charlayout_1bpp =
 {
 	8, 8,
 	RGN_FRAC(1,1),
 	1,
 	{ 0 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8
+};
+
+static const gfx_layout charlayout_3bpp =
+{
+	8, 8,
+	RGN_FRAC(1,3),
+	3,
+	{ 0, RGN_FRAC(1,3), RGN_FRAC(2,3) },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*8
@@ -928,8 +1003,13 @@ static const gfx_layout charlayout =
 **************************************************/
 
 static GFXDECODE_START( gfx_magicfly )
-	GFXDECODE_ENTRY( "gfxbnk1", 0, tilelayout, 16, 1 )
-	GFXDECODE_ENTRY( "gfxbnk0", 0, charlayout, 0, 8 )
+	GFXDECODE_ENTRY( "gfxbnk1", 0, tilelayout,      16, 1 )
+	GFXDECODE_ENTRY( "gfxbnk0", 0, charlayout_1bpp,  0, 8 )
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_bchance )
+	GFXDECODE_ENTRY( "gfxbnk1", 0, tilelayout,       0, 16 )
+	GFXDECODE_ENTRY( "gfxbnk0", 0, charlayout_3bpp,  0, 16 )
 GFXDECODE_END
 
 
@@ -974,6 +1054,7 @@ void magicfly_state::_7mezzo(machine_config &config)
 
 	// video hardware
 	MCFG_VIDEO_START_OVERRIDE(magicfly_state, 7mezzo)
+	PALETTE(config.replace(), "palette", FUNC(magicfly_state::_7mezzo_palette), 32);
 }
 
 
@@ -981,8 +1062,10 @@ void magicfly_state::bchance(machine_config &config)
 {
 	magicfly(config);
 
-	// video hardware
-	subdevice<palette_device>("palette")->set_init(FUNC(magicfly_state::bchance_palette));
+	MCFG_VIDEO_START_OVERRIDE(magicfly_state, bchance)
+
+	GFXDECODE(config.replace(), m_gfxdecode, "palette", gfx_bchance);
+	PALETTE(config.replace(), "palette", FUNC(magicfly_state::bchance_palette), 128);
 }
 
 
@@ -1041,8 +1124,9 @@ ROM_START( bchance )
 	ROM_LOAD( "n-pk-1.bin", 0x2000, 0x2000, CRC(e35cebd6) SHA1(b0dd86fd4c06f98e486b04e09808985bfa4f0e9c) )
 	ROM_LOAD( "n-pk-0.bin", 0x4000, 0x2000, CRC(3c64edc4) SHA1(97b677b7c4999b502ab4b4f70c33b40050843796) )
 
-	ROM_REGION( 0x0800, "gfxbnk0", 0 )
-	ROM_COPY( "gfx",    0x1800, 0x0000, 0x0800 )  // chars
+	ROM_REGION( 0x1800, "gfxbnk0", 0 )
+	ROM_FILL(            0x0000, 0x1000, 0x00 )  // filling the R-G bitplanes.
+	ROM_COPY( "gfx",     0x1800, 0x1000, 0x0800 )  // chars
 
 	ROM_REGION( 0x1800, "gfxbnk1", 0 )
 	ROM_COPY( "gfx",    0x1000, 0x0000, 0x0800 )  // 3bpp tiles, bitplane 1
@@ -1063,4 +1147,4 @@ ROM_END
 //    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT        ROT   COMPANY      FULLNAME                          FLAGS
 GAME( 198?, magicfly, 0,      magicfly, magicfly, magicfly_state, empty_init, ROT0, "P&A Games", "Magic Fly",                      0 )
 GAME( 198?, 7mezzo,   0,      _7mezzo,  7mezzo,   magicfly_state, empty_init, ROT0, "<unknown>", "7 e Mezzo",                      0 )
-GAME( 198?, bchance,  0,      bchance,  bchance,  magicfly_state, empty_init, ROT0, "<unknown>", "Bonne Chance! (French/English)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 198?, bchance,  0,      bchance,  bchance,  magicfly_state, empty_init, ROT0, "<unknown>", "Bonne Chance! (French/English)", 0 )
