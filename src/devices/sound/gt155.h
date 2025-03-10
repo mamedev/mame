@@ -60,7 +60,7 @@ private:
 
 		u32 m_filter_gain = 0;
 		u16 m_filter = 0;
-		s16 m_filter_out = 0;
+		s32 m_filter_out = 0;
 		u16 m_filter_unk = 0;
 
 		s16 m_sample_last = 0;
