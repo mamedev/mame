@@ -23,7 +23,7 @@
 #define LOG_WAIT  (1U << 6)    // wait mode
 #define LOG_DATA  (1U << 7)    // data read/writes
 
-#define VERBOSE (0xff)
+//#define VERBOSE (0xff)
 
 #include "logmacro.h"
 
@@ -47,13 +47,13 @@ namespace {
 class cdr_fdc_880h_device : public device_t, public device_h89bus_right_card_interface
 {
 public:
+	// The controller has two 16L8 PALs which are not dumped (z15 and z20 from schematics).
+	static constexpr feature_type unemulated_features() { return feature::DISK; }
+
 	cdr_fdc_880h_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	virtual void write(u8 select_lines, u8 offset, u8 data) override;
 	virtual u8 read(u8 select_lines, u8 offset) override;
-
-	// The controller has two 16L8 PALs which are not dumped (z15 and z20 from schematics).
-	static constexpr feature_type unemulated_features() { return feature::DISK; }
 
 protected:
 
@@ -176,7 +176,7 @@ void cdr_fdc_880h_device::data_w(u8 val)
 
 void cdr_fdc_880h_device::write(u8 select_lines, u8 offset, u8 data)
 {
-	if (!(select_lines & h89bus_device::H89_CASS))
+	if (!(select_lines & h89bus_device::H89_IO_CASS))
 	{
 		return;
 	}
@@ -265,7 +265,7 @@ u8 cdr_fdc_880h_device::data_r()
 
 u8 cdr_fdc_880h_device::read(u8 select_lines, u8 offset)
 {
-	if (!(select_lines & h89bus_device::H89_CASS))
+	if (!(select_lines & h89bus_device::H89_IO_CASS))
 	{
 		return 0;
 	}
@@ -394,6 +394,7 @@ void cdr_fdc_880h_device::set_drq(int state)
 	}
 
 }
-}
 
-DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_CDR_FDC_880H, device_h89bus_right_card_interface, cdr_fdc_880h_device, "cdr_fdc_880h", "CDR FDC-880H Soft-sectored Controller");
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_CDR_FDC_880H, device_h89bus_right_card_interface, cdr_fdc_880h_device, "h89_cdr_fdc_880h", "CDR FDC-880H Soft-sectored Controller");

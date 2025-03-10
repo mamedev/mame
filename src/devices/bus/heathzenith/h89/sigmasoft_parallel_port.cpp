@@ -50,20 +50,18 @@ sigmasoft_parallel_port::sigmasoft_parallel_port(const machine_config &mconfig, 
 {
 }
 
-inline bool sigmasoft_parallel_port::card_selected(u8 select_lines, u16 offset)
+inline bool sigmasoft_parallel_port::card_selected(u16 offset)
 {
-	return m_enabled &&
-		(select_lines & h89bus_device::H89_IO) &&
-		((offset & SELECT_ADDR_MASK) == m_base_addr);
+	return m_enabled && ((offset & SELECT_ADDR_MASK) == m_base_addr);
 }
 
 void sigmasoft_parallel_port::igc_w(u8 offset, u8 val)
 {
 }
 
-void sigmasoft_parallel_port::write(u8 select_lines, u16 offset, u8 data)
+void sigmasoft_parallel_port::write(u8 offset, u8 data)
 {
-	if (!card_selected(select_lines, offset))
+	if (!card_selected(offset))
 	{
 		return;
 	}
@@ -96,11 +94,11 @@ u8 sigmasoft_parallel_port::igc_r(u8 offset)
 	return 0;
 }
 
-u8 sigmasoft_parallel_port::read(u8 select_lines, u16 offset)
+u8 sigmasoft_parallel_port::read(u8 offset)
 {
 	u8 value = 0;
 
-	if (!card_selected(select_lines, offset))
+	if (!card_selected(offset))
 	{
 		return value;
 	}
@@ -202,5 +200,5 @@ void sigmasoft_parallel_port_igc::device_reset()
 }
 
 
-DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_SIGMASOFT_PARALLEL, device_h89bus_left_card_interface, sigmasoft_parallel_port, "sigmasoft_parallel_port", "SigmaSoft Universal Parallel Board");
-DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_SIGMASOFT_PARALLEL_IGC, device_h89bus_left_card_interface, sigmasoft_parallel_port_igc, "sigmasoft_parallel_port_igc", "SigmaSoft Universal Parallel Board connected to SigmaSoft IGC");
+DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_SIGMASOFT_PARALLEL, device_h89bus_left_card_interface, sigmasoft_parallel_port, "h89_sigma_par_port", "SigmaSoft Universal Parallel Board");
+DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_SIGMASOFT_PARALLEL_IGC, device_h89bus_left_card_interface, sigmasoft_parallel_port_igc, "h89_sigma_par_port_igc", "SigmaSoft Universal Parallel Board connected to SigmaSoft IGC");
