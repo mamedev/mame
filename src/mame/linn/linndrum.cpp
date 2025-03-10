@@ -270,7 +270,7 @@ void linndrum_audio_device::strobe_tom_w(u8 data)
 		m_tom_counter = 0;
 
 	m_tom_selected = BIT(data, 1);  // Play tom instead of conga.
-	m_tom_variation = (data >> 2) && 0x03;  // D3, D2.
+	m_tom_variation = (data >> 2) & 0x03;  // D3, D2.
 
 	LOGMASKED(LOG_STROBES, "Strobed tom / conga: %02x\n", data);
 }
