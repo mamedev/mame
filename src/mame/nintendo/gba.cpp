@@ -334,11 +334,11 @@ void gba_state::audio_tick(int ref)
 
 			if (SOUNDCNT_H & 0x200)
 			{
-				m_ldaca->write(m_fifo_a[m_fifo_a_ptr]);
+				m_ldac[0]->write(m_fifo_a[m_fifo_a_ptr]);
 			}
 			if (SOUNDCNT_H & 0x100)
 			{
-				m_rdaca->write(m_fifo_a[m_fifo_a_ptr]);
+				m_rdac[0]->write(m_fifo_a[m_fifo_a_ptr]);
 			}
 			m_fifo_a_ptr++;
 		}
@@ -370,11 +370,11 @@ void gba_state::audio_tick(int ref)
 
 			if (SOUNDCNT_H & 0x2000)
 			{
-				m_ldacb->write(m_fifo_b[m_fifo_b_ptr]);
+				m_ldac[1]->write(m_fifo_b[m_fifo_b_ptr]);
 			}
 			if (SOUNDCNT_H & 0x1000)
 			{
-				m_rdacb->write(m_fifo_b[m_fifo_b_ptr]);
+				m_rdac[1]->write(m_fifo_b[m_fifo_b_ptr]);
 			}
 			m_fifo_b_ptr++;
 		}
@@ -865,13 +865,19 @@ void gba_state::gba_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 			if (ACCESSING_BITS_16_31)
 			{
+				// master volume, ((data >> 16) & 3) == 3 is prohibited?
+				m_gbsound->set_output_gain(ALL_OUTPUTS, float(1 << ((data >> 16) & 3)) / 4.0f);
+				m_ldac[0]->set_output_gain(ALL_OUTPUTS, float(1 + BIT(data, 18)) / 2.0f);
+				m_rdac[0]->set_output_gain(ALL_OUTPUTS, float(1 + BIT(data, 18)) / 2.0f);
+				m_ldac[1]->set_output_gain(ALL_OUTPUTS, float(1 + BIT(data, 19)) / 2.0f);
+				m_rdac[1]->set_output_gain(ALL_OUTPUTS, float(1 + BIT(data, 19)) / 2.0f);
 				// DAC A reset?
 				if (data & 0x08000000)
 				{
 					m_fifo_a_ptr = 17;
 					m_fifo_a_in = 17;
-					m_ldaca->write(0);
-					m_rdaca->write(0);
+					m_ldac[0]->write(0);
+					m_rdac[0]->write(0);
 				}
 
 				// DAC B reset?
@@ -879,8 +885,8 @@ void gba_state::gba_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 				{
 					m_fifo_b_ptr = 17;
 					m_fifo_b_in = 17;
-					m_ldacb->write(0);
-					m_rdacb->write(0);
+					m_ldac[1]->write(0);
+					m_rdac[1]->write(0);
 				}
 			}
 			break;
@@ -892,10 +898,10 @@ void gba_state::gba_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 				{
 					m_fifo_a_ptr = m_fifo_a_in = 17;
 					m_fifo_b_ptr = m_fifo_b_in = 17;
-					m_ldaca->write(0);
-					m_rdaca->write(0);
-					m_ldacb->write(0);
-					m_rdacb->write(0);
+					m_ldac[0]->write(0);
+					m_rdac[0]->write(0);
+					m_ldac[1]->write(0);
+					m_rdac[1]->write(0);
 				}
 			}
 			break;
@@ -1318,10 +1324,10 @@ void gba_state::machine_reset()
 	m_fifo_a_in = m_fifo_b_in = 17;
 
 	// and clear the DACs
-	m_ldaca->write(0);
-	m_rdaca->write(0);
-	m_ldacb->write(0);
-	m_rdacb->write(0);
+	m_ldac[0]->write(0);
+	m_rdac[0]->write(0);
+	m_ldac[1]->write(0);
+	m_rdac[1]->write(0);
 }
 
 void gba_state::machine_start()
@@ -1470,10 +1476,10 @@ void gba_state::gbadv(machine_config &config)
 	m_gbsound->add_route(0, "lspeaker", 0.5);
 	m_gbsound->add_route(1, "rspeaker", 0.5);
 
-	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, m_ldaca, 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5); // unknown DAC
-	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, m_rdaca, 0).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // unknown DAC
-	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, m_ldacb, 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5); // unknown DAC
-	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, m_rdacb, 0).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // unknown DAC
+	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, m_ldac[0], 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5); // unknown DAC
+	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, m_rdac[0], 0).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // unknown DAC
+	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, m_ldac[1], 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5); // unknown DAC
+	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, m_rdac[1], 0).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // unknown DAC
 
 }
 
