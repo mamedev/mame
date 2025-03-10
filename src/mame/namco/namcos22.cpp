@@ -2785,6 +2785,7 @@ void namcos22_state::handle_driving_io()
 		m_shareram[0x034/2] = gas;
 		m_shareram[0x036/2] = brake;
 		handle_coinage(flags);
+		handle_output_io();
 	}
 }
 
@@ -2800,9 +2801,18 @@ void namcos22_state::handle_cybrcomm_io()
 		m_shareram[0x036/2] = m_adc_ports[2]->read() * 0x10;
 		m_shareram[0x038/2] = m_adc_ports[3]->read() * 0x10;
 		handle_coinage(flags);
+		handle_output_io();
 	}
 }
 
+/* TODO: REMOVE (THIS IS HANDLED BY "IOMCU") */
+void namcos22_state::handle_output_io()
+{
+	// outputs
+	m_mcu_out[0] = m_shareram[0x20/2] & 0xff; // lamps, coin counters
+	m_mcu_out[1] = m_shareram[0x40/2] & 0xff; // drive commands (raverace, acedrive, victlap)
+	m_mcu_out[2] = m_shareram[0x42/2] & 0xff; // led outputs (acedrive, victlap)
+}
 
 // Alpine skiing games
 
