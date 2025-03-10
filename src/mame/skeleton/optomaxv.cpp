@@ -1,7 +1,7 @@
-/********************************************************************************************************
+/*********************************************************************************************************
 
 Optomax V image analyser, from AMS (Analytical Measuring Systems Ltd.).
-The machine internally uses a Euro Beeb CUBE BBC Micro compatible computer (PCBs B6 and B7).
+The machine internally uses a CUBE EuroBEEB Single Board Computer (BBC Micro compatible) (PCBs B6 and B7).
 
 Back panel:
  - Camera input connector (DIN).
@@ -37,7 +37,7 @@ Front panel:
 
 Six PCBs connected with two backplanes (Motorola VME 9 conns and a custom one with 13 conns):
             
-OSD PCB (B6) (EURO-BEEB 65, BBC Micro compatible CUBE System CPU Board)
+OSD PCB (B6) (EURO-BEEB 65, CUBE EuroBEEB Single Board Computer PCB from Control Universal Ltd.)
  - Rockwell R6551AP ACIA
  - Rockwell R6522AP VIA
  - Toshiba TC5565PL SRAM
@@ -80,7 +80,8 @@ OSD PCB (B6) (EURO-BEEB 65, BBC Micro compatible CUBE System CPU Board)
    |______|
 
 
- TELETEXT PCB (B5) (this PCB lacks the buzzer present on other revisions)
+ TELETEXT PCB (B5) (CUBE TELETEXT Colour Video Interface from Control Universal Ltd.)
+(this PCB lacks the buzzer present on other revisions)
  - Hitachi HD68B45SP CRT Controller
  - Xtal 6.000
  - 2 x NEC uPD2114LC SRAM
@@ -268,7 +269,7 @@ PCB VIDEO (B1) (labeled "OPTOMAX VIDEO PCB 9000-0022-2/2")
   |   Xtal (labeled "Hy-O 2562-50 GE01S")                                     |
   |___________________________________________________________________________|
 
-********************************************************************************************************/
+*********************************************************************************************************/
 
 #include "emu.h"
 
@@ -384,7 +385,7 @@ void optomaxv_state::optomaxv(machine_config &config)
 
 	PIT68230(config, m_pit_1, 1.8432_MHz_XTAL); // Motorola MC68230L8
 
-	// OSD PCB (B6) (BBC Micro compatible Euro-Beeb CUBE System CPU board)
+	// OSD PCB (B6) (CUBE EuroBEEB System CPU board)
 
 	M6502(config, m_bbccpu, 1.8432_MHz_XTAL); // Rockwell R6502AP
 
@@ -393,7 +394,7 @@ void optomaxv_state::optomaxv(machine_config &config)
 
 	M3002(config, m_rtc_2, 1.8432_MHz_XTAL); // uEM M-3002-16PI Real Time Clock
 
-	// Teletext PCB (B5) (BBC Micro compatible Euro-Beeb CUBE System Teletext Graphics board)
+	// Teletext PCB (B5) (BBC Micro compatible CUBE EuroBEEB System Teletext Video Card)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(16_MHz_XTAL, 1024, 0, 640, 312, 0, 256);
@@ -463,4 +464,4 @@ ROM_END
 
 } // anonymous namespace
 
-SYST( 1999, optomaxv, bbcb, 0, optomaxv, optomaxv, optomaxv_state, empty_init, "AMS", "Optomax V", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING ) // Marked as clone of BBC Micro
+SYST( 1986, optomaxv, bbcb, 0, optomaxv, optomaxv, optomaxv_state, empty_init, "AMS", "Optomax V", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING ) // Hardware from 1985, software on ROM from 1096. Marked as clone of BBC Micro.
