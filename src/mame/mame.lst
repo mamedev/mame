@@ -17498,6 +17498,9 @@ uvax2
 mv3400
 mv3500
 
+@source:dec/uvax3100.cpp
+mv3100m10
+
 @source:dec/vax11.cpp
 vax785
 
