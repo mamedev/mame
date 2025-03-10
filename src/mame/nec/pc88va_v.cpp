@@ -442,20 +442,24 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 		rectangle split_cliprect(rxp, rxp + rw - 1, ryp, ryp + rh - 1);
 		split_cliprect &= cliprect;
 
+		const int line_height = m_tsp.line_height;
+
+		if (line_height < 8)
+			continue;
+
 		for(int y = 0; y < vh; y++)
 		{
-			int y_base = y * 16 + ryp - raster_offset;
+			int y_base = y * line_height + ryp - raster_offset;
 
-			// TODO: consult with OG
 			if (!split_cliprect.contains(rxp, y_base) &&
-				!split_cliprect.contains(rxp, y_base + 16))
+				!split_cliprect.contains(rxp, y_base + line_height))
 				continue;
 
 			for(int x = 0; x < vw; x++)
 			{
 				int x_base = x * 8;
 				if (!split_cliprect.contains(x_base, y_base) &&
-					!split_cliprect.contains(x_base, y_base + 16))
+					!split_cliprect.contains(x_base, y_base + line_height))
 					continue;
 
 				// TODO: understand where VSA comes into equation
@@ -1310,7 +1314,7 @@ void pc88va_state::execute_dspdef_cmd()
 	m_tsp.blink = (m_buf_ram[5] & 0xf8);
 	if (m_tsp.blink == 0)
 		m_tsp.blink = 0x100;
-	LOGIDP("DSPDEF (%02x %02x %02x %02x %02x %02x) %05x ATTR | %02x pitch | %02x line height| %02x hline | %d blink rate\n"
+	LOGIDP("DSPDEF (%02x %02x %02x %02x %02x %02x) %05x ATTR | %d pitch | %d line height| %d hline | %d blink rate\n"
 		, m_buf_ram[0], m_buf_ram[1], m_buf_ram[2], m_buf_ram[3], m_buf_ram[4], m_buf_ram[5]
 		, m_tsp.attr_offset | 0x40000
 		, m_tsp.pitch
