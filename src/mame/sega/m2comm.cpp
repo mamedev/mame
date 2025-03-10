@@ -3,7 +3,7 @@
 
 /*
 Sega MODEL2 COMMUNICATION BOARD 837-10537
-( http://images.arianchen.de/sega-comm/daytona_comm.jpg )
+( http://images.arianchen.de/sega-comm/model2-front.jpg / http://images.arianchen.de/sega-comm/model2-back.jpg )
 |-----------------------------------------------------------------------------|
 | |-------------------|                             |-------------------|     |
 | |-------------------|                             |-------------------|     |
@@ -42,7 +42,7 @@ Sega MODEL2 COMMUNICATION BOARD 837-10537
 
 
 Sega PC BD MODEL2 A-CRX COMMUNICATION 837-11525
-( http://images.arianchen.de/sega-comm/srally_comm.jpg )
+( http://images.arianchen.de/sega-comm/model2a-front.jpg / http://images.arianchen.de/sega-comm/model2a-back.jpg )
 |-------------------------------------------------------------------------------------------|
 | |-------------------|                             |-------------------|    |---------|    |
 | |-------------------|                             |-------------------|    |---------|    |
@@ -84,7 +84,7 @@ Sega PC BD MODEL2 A-CRX COMMUNICATION 837-11525
 
 
 Sega PC BD MODEL2 B-CRX COMMUNICATION 837-11615
-( http://images.arianchen.de/sega-comm/model2b-com_top.jpg )
+( http://images.arianchen.de/sega-comm/model2b-com_top.jpg / http://images.arianchen.de/sega-comm/model2b-com_bot.jpg )
 |-------------------------------------------------------------------------------------------|
 |                                                                                           |
 |  --                                                                                       |
@@ -127,6 +127,7 @@ Sega PC BD MODEL2 B-CRX COMMUNICATION 837-11615
 
 
 Sega PC BD MODEL2 C-CRX COMMUNICATION 837-12839
+( http://images.arianchen.de/sega-comm/model2c-com_top.jpg )
 |-------------------------------------------------------------------------------------------|
 |                                                                                           |
 |  --                                                                                       |
@@ -165,8 +166,8 @@ Sega PC BD MODEL2 C-CRX COMMUNICATION 837-12839
 */
 
 #include "emu.h"
-#include "emuopts.h"
 #include "m2comm.h"
+#include "emuopts.h"
 
 #define VERBOSE 0
 #include "logmacro.h"
@@ -176,13 +177,13 @@ Sega PC BD MODEL2 C-CRX COMMUNICATION 837-12839
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(M2COMM, m2comm_device, "m2comm", "Model 2 Communication Board")
+DEFINE_DEVICE_TYPE(SEGA_MODEL2_COMM, sega_m2comm_device, "m2comm", "Sega Model2 Communication Board")
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void m2comm_device::device_add_mconfig(machine_config &config)
+void sega_m2comm_device::device_add_mconfig(machine_config &config)
 {
 }
 
@@ -191,25 +192,15 @@ void m2comm_device::device_add_mconfig(machine_config &config)
 //**************************************************************************
 
 //-------------------------------------------------
-//  m2comm_device - constructor
+//  sega_m2comm_device - constructor
 //-------------------------------------------------
 
-m2comm_device::m2comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, M2COMM, tag, owner, clock)
+sega_m2comm_device::sega_m2comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, SEGA_MODEL2_COMM, tag, owner, clock)
 {
-	// prepare localhost "filename"
-	m_localhost[0] = 0;
-	strcat(m_localhost, "socket.");
-	strcat(m_localhost, mconfig.options().comm_localhost());
-	strcat(m_localhost, ":");
-	strcat(m_localhost, mconfig.options().comm_localport());
-
-	// prepare remotehost "filename"
-	m_remotehost[0] = 0;
-	strcat(m_remotehost, "socket.");
-	strcat(m_remotehost, mconfig.options().comm_remotehost());
-	strcat(m_remotehost, ":");
-	strcat(m_remotehost, mconfig.options().comm_remoteport());
+	// prepare "filenames"
+	m_localhost = util::string_format("socket.%s:%s", mconfig.options().comm_localhost(), mconfig.options().comm_localport());
+	m_remotehost = util::string_format("socket.%s:%s", mconfig.options().comm_remotehost(), mconfig.options().comm_remoteport());
 
 	m_framesync = mconfig.options().comm_framesync() ? 0x01 : 0x00;
 
@@ -220,7 +211,7 @@ m2comm_device::m2comm_device(const machine_config &mconfig, const char *tag, dev
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void m2comm_device::device_start()
+void sega_m2comm_device::device_start()
 {
 }
 
@@ -228,45 +219,45 @@ void m2comm_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void m2comm_device::device_reset()
+void sega_m2comm_device::device_reset()
 {
 	m_zfg = 0;
 	m_cn = 0;
 	m_fg = 0;
 }
 
-uint8_t m2comm_device::zfg_r(offs_t offset)
+uint8_t sega_m2comm_device::zfg_r(offs_t offset)
 {
 	uint8_t result = m_zfg | (~m_fg << 7) | 0x7e;
 	LOG("m2comm-zfg_r: read register %02x for value %02x\n", offset, result);
 	return result;
 }
 
-void m2comm_device::zfg_w(uint8_t data)
+void sega_m2comm_device::zfg_w(uint8_t data)
 {
 	LOG("m2comm-zfg_w: %02x\n", data);
 	m_zfg = data & 0x01;
 }
 
-uint8_t m2comm_device::share_r(offs_t offset)
+uint8_t sega_m2comm_device::share_r(offs_t offset)
 {
 	uint8_t result = m_shared[offset];
 	LOG("m2comm-share_r: read shared memory %02x for value %02x\n", offset, result);
 	return result;
 }
 
-void m2comm_device::share_w(offs_t offset, uint8_t data)
+void sega_m2comm_device::share_w(offs_t offset, uint8_t data)
 {
 	LOG("m2comm-share_w: %02x %02x\n", offset, data);
 	m_shared[offset] = data;
 }
 
-uint8_t m2comm_device::cn_r()
+uint8_t sega_m2comm_device::cn_r()
 {
 	return m_cn | 0xfe;
 }
 
-void m2comm_device::cn_w(uint8_t data)
+void sega_m2comm_device::cn_w(uint8_t data)
 {
 	m_cn = data & 0x01;
 
@@ -303,11 +294,11 @@ void m2comm_device::cn_w(uint8_t data)
 		// TODO - check EPR-16726 on Daytona USA and Sega Rally Championship
 		// EPR-18643(A) - these are accessed by VirtuaON and Sega Touring Car Championship
 
-		// frameSize - 0x0e00. is it = frameoffset*8 ? if true - it should be 0xC00 for Power Sled
+		// frame_size - 0x0e00. is it = frameoffset*8 ? if true - it should be 0xc00 for Power Sled
 		m_shared[0x12] = 0x00;
 		m_shared[0x13] = 0x0e;
 
-		// frameOffset - 0x01c0 in most games or 0x180 in Power Sled
+		// frame_offset - 0x01c0 in most games or 0x180 in Power Sled
 		m_shared[0x14] = m_frameoffset & 0xff;
 		m_shared[0x15] = m_frameoffset >> 8;
 
@@ -316,7 +307,7 @@ void m2comm_device::cn_w(uint8_t data)
 #endif
 }
 
-uint8_t m2comm_device::fg_r()
+uint8_t sega_m2comm_device::fg_r()
 {
 #ifdef M2COMM_SIMULATION
 	read_fg();
@@ -324,12 +315,12 @@ uint8_t m2comm_device::fg_r()
 	return m_fg | (~m_zfg << 7) | 0x7e;
 }
 
-void m2comm_device::fg_w(uint8_t data)
+void sega_m2comm_device::fg_w(uint8_t data)
 {
 	m_fg = data & 0x01;
 }
 
-void m2comm_device::check_vint_irq()
+void sega_m2comm_device::check_vint_irq()
 {
 #ifndef M2COMM_SIMULATION
 #else
@@ -338,23 +329,18 @@ void m2comm_device::check_vint_irq()
 }
 
 #ifdef M2COMM_SIMULATION
-void m2comm_device::comm_tick()
+void sega_m2comm_device::comm_tick()
 {
 	if (m_linkenable == 0x01)
 	{
-		int frameStart = 0x2000;
-		int frameSize = m_shared[0x13] << 8 | m_shared[0x12];
-		int frameOffset = frameStart | m_shared[0x15] << 8 | m_shared[0x14];
-
-		int dataSize = frameSize + 1;
-		int recv = 0;
-		int idx = 0;
+		int frame_size = m_shared[0x13] << 8 | m_shared[0x12];
+		int data_size = frame_size + 1;
 
 		// EPR-16726 uses m_fg for Master/Slave
 		// EPR-18643(A) seems to check m_shared[1], with a fallback to m_fg
-		bool isMaster = (m_fg == 0x01 || m_shared[1] == 0x01);
-		bool isSlave = (m_fg == 0x00 && m_shared[1] == 0x02);
-		bool isRelay = (m_fg == 0x00 && m_shared[1] == 0x00);
+		bool is_master = (m_fg == 0x01 || m_shared[1] == 0x01);
+		bool is_slave = (m_fg == 0x00 && m_shared[1] == 0x02);
+		bool is_relay = (m_fg == 0x00 && m_shared[1] == 0x00);
 
 		if (m_linkalive == 0x02)
 		{
@@ -372,17 +358,27 @@ void m2comm_device::comm_tick()
 			// check rx socket
 			if (!m_line_rx)
 			{
-				osd_printf_verbose("M2COMM: listen on %s\n", m_localhost);
+				osd_printf_verbose("M2COMM: rx listen on %s\n", m_localhost);
 				uint64_t filesize; // unused
-				osd_file::open(m_localhost, OPEN_FLAG_CREATE, m_line_rx, filesize);
+				std::error_condition filerr = osd_file::open(m_localhost, OPEN_FLAG_CREATE, m_line_rx, filesize);
+				if (filerr.value() != 0)
+				{
+					osd_printf_verbose("M2COMM: rx connection failed - %s:%d %s\n", filerr.category().name(), filerr.value(), filerr.message());
+					m_line_rx.reset();
+				}
 			}
 
 			// check tx socket
 			if (!m_line_tx)
 			{
-				osd_printf_verbose("M2COMM: connect to %s\n", m_remotehost);
+				osd_printf_verbose("M2COMM: tx connect to %s\n", m_remotehost);
 				uint64_t filesize; // unused
-				osd_file::open(m_remotehost, 0, m_line_tx, filesize);
+				std::error_condition filerr = osd_file::open(m_remotehost, 0, m_line_tx, filesize);
+				if (filerr.value() != 0)
+				{
+					osd_printf_verbose("M2COMM: tx connection failed - %s:%d %s\n", filerr.category().name(), filerr.value(), filerr.message());
+					m_line_tx.reset();
+				}
 			}
 
 			// if both sockets are there check ring
@@ -391,16 +387,16 @@ void m2comm_device::comm_tick()
 				m_zfg ^= 0x01;
 
 				// try to read one message
-				recv = read_frame(dataSize);
+				int recv = read_frame(data_size);
 				while (recv > 0)
 				{
 					// check if message id
-					idx = m_buffer0[0];
+					uint8_t idx = m_buffer0[0];
 
 					// 0xFF - link id
 					if (idx == 0xff)
 					{
-						if (isMaster)
+						if (is_master)
 						{
 							// master gets first id and starts next state
 							m_linkid = 0x01;
@@ -410,20 +406,20 @@ void m2comm_device::comm_tick()
 						else
 						{
 							// slave get own id, relay does nothing
-							if (isSlave)
+							if (is_slave)
 							{
 								m_buffer0[1]++;
 							}
 
 							// forward message to other nodes
-							send_frame(dataSize);
+							send_frame(data_size);
 						}
 					}
 
 					// 0xFE - link size
 					else if (idx == 0xfe)
 					{
-						if (isSlave)
+						if (is_slave)
 						{
 							// fetch linkid and linkcount, then decrease linkid
 							m_linkid = m_buffer0[1];
@@ -431,16 +427,16 @@ void m2comm_device::comm_tick()
 							m_buffer0[1]--;
 
 							// forward message to other nodes
-							send_frame(dataSize);
+							send_frame(data_size);
 						}
-						else if (isRelay)
+						else if (is_relay)
 						{
 							// fetch linkid and linkcount, then decrease linkid
 							m_linkid = 0x00;
 							m_linkcount = m_buffer0[2];
 
 							// forward message to other nodes
-							send_frame(dataSize);
+							send_frame(data_size);
 						}
 
 						// consider it done
@@ -454,13 +450,13 @@ void m2comm_device::comm_tick()
 					}
 
 					if (m_linkalive == 0x00)
-						recv = read_frame(dataSize);
+						recv = read_frame(data_size);
 					else
 						recv = 0;
 				}
 
 				// if we are master and link is not yet established
-				if (isMaster && (m_linkalive == 0x00))
+				if (is_master && (m_linkalive == 0x00))
 				{
 					// send first packet
 					if (m_linktimer == 0x01)
@@ -468,7 +464,7 @@ void m2comm_device::comm_tick()
 						m_buffer0[0] = 0xff;
 						m_buffer0[1] = 0x01;
 						m_buffer0[2] = 0x00;
-						send_frame(dataSize);
+						send_frame(data_size);
 					}
 
 					// send second packet
@@ -477,7 +473,7 @@ void m2comm_device::comm_tick()
 						m_buffer0[0] = 0xfe;
 						m_buffer0[1] = m_linkcount;
 						m_buffer0[2] = m_linkcount;
-						send_frame(dataSize);
+						send_frame(data_size);
 
 						// consider it done
 						osd_printf_verbose("M2COMM: link established - id %02x of %02x\n", m_linkid, m_linkcount);
@@ -501,26 +497,29 @@ void m2comm_device::comm_tick()
 		// if link established
 		if (m_linkalive == 0x01)
 		{
+			int frame_start = 0x2000;
+			int frame_offset = frame_start | m_shared[0x15] << 8 | m_shared[0x14];
+
 			do
 			{
 				// try to read a message
-				recv = read_frame(dataSize);
+				int recv = read_frame(data_size);
 				while (recv > 0)
 				{
 					// check if valid id
-					idx = m_buffer0[0];
+					uint8_t idx = m_buffer0[0];
 					if (idx >= 0 && idx <= m_linkcount)
 					{
 						// save message to "ring buffer"
-						for (int j = 0x00 ; j < frameSize ; j++)
+						for (int j = 0x00 ; j < frame_size ; j++)
 						{
-							m_shared[frameOffset + j] = m_buffer0[1 + j];
+							m_shared[frame_offset + j] = m_buffer0[1 + j];
 						}
 						m_zfg ^= 0x01;
-						if (isSlave)
-							send_data(m_linkid, frameStart, frameSize, dataSize);
-						else if (isRelay)
-							send_frame(dataSize);
+						if (is_slave)
+							send_data(m_linkid, frame_start, frame_size, data_size);
+						else if (is_relay)
+							send_frame(data_size);
 					}
 					else
 					{
@@ -529,14 +528,14 @@ void m2comm_device::comm_tick()
 							// 0xFC - VSYNC
 							m_linktimer = 0x00;
 
-							if (!isMaster)
+							if (!is_master)
 								// forward message to other nodes
-								send_frame(dataSize);
+								send_frame(data_size);
 						}
 					}
 
 					// try to read another message
-					recv = read_frame(dataSize);
+					recv = read_frame(data_size);
 				}
 			}
 			while (m_linktimer == 0x01);
@@ -544,15 +543,15 @@ void m2comm_device::comm_tick()
 			// enable wait for vsync
 			m_linktimer = m_framesync;
 
-			if (isMaster)
+			if (is_master)
 			{
 				// update "ring buffer" if link established
-				send_data(m_linkid, frameStart, frameSize, dataSize);
+				send_data(m_linkid, frame_start, frame_size, data_size);
 
 				// send vsync
 				m_buffer0[0] = 0xfc;
 				m_buffer0[1] = 0x01;
-				send_frame(dataSize);
+				send_frame(data_size);
 			}
 
 			m_zfg_delay = 0x02;
@@ -560,7 +559,7 @@ void m2comm_device::comm_tick()
 	}
 }
 
-void m2comm_device::read_fg()
+void sega_m2comm_device::read_fg()
 {
 	if (m_zfg_delay > 0x00)
 	{
@@ -569,40 +568,38 @@ void m2comm_device::read_fg()
 	}
 	if (m_linkalive == 0x01)
 	{
-		int frameStart = 0x2000;
-		int frameSize = m_shared[0x13] << 8 | m_shared[0x12];
-		int frameOffset = frameStart | m_shared[0x15] << 8 | m_shared[0x14];
+		int frame_start = 0x2000;
+		int frame_offset = frame_start | m_shared[0x15] << 8 | m_shared[0x14];
 
-		int dataSize = frameSize + 1;
-		int recv = 0;
-		int idx = 0;
+		int frame_size = m_shared[0x13] << 8 | m_shared[0x12];
+		int data_size = frame_size + 1;
 
 		// EPR-16726 uses m_fg for Master/Slave
 		// EPR-18643(A) seems to check m_shared[1], with a fallback to m_fg
-		bool isMaster = (m_fg == 0x01 || m_shared[1] == 0x01);
-		bool isSlave = (m_fg == 0x00 && m_shared[1] == 0x02);
-		bool isRelay = (m_fg == 0x00 && m_shared[1] == 0x00);
+		bool is_master = (m_fg == 0x01 || m_shared[1] == 0x01);
+		bool is_slave = (m_fg == 0x00 && m_shared[1] == 0x02);
+		bool is_relay = (m_fg == 0x00 && m_shared[1] == 0x00);
 
 		do
 		{
 			// try to read a message
-			recv = read_frame(dataSize);
+			int recv = read_frame(data_size);
 			while (recv > 0)
 			{
 				// check if valid id
-				idx = m_buffer0[0];
+				uint8_t idx = m_buffer0[0];
 				if (idx >= 0 && idx <= m_linkcount)
 				{
 					// save message to "ring buffer"
-					for (int j = 0x00 ; j < frameSize ; j++)
+					for (int j = 0x00 ; j < frame_size ; j++)
 					{
-						m_shared[frameOffset + j] = m_buffer0[1 + j];
+						m_shared[frame_offset + j] = m_buffer0[1 + j];
 					}
 					m_zfg ^= 0x01;
-					if (isSlave)
-						send_data(m_linkid, frameStart, frameSize, dataSize);
-					else if (isRelay)
-						send_frame(dataSize);
+					if (is_slave)
+						send_data(m_linkid, frame_start, frame_size, data_size);
+					else if (is_relay)
+						send_frame(data_size);
 				}
 				else
 				{
@@ -611,95 +608,88 @@ void m2comm_device::read_fg()
 						// 0xFC - VSYNC
 						m_linktimer = 0x00;
 
-						if (!isMaster)
+						if (!is_master)
 							// forward message to other nodes
-							send_frame(dataSize);
+							send_frame(data_size);
 					}
 				}
 
 				// try to read another message
-				recv = read_frame(dataSize);
+				recv = read_frame(data_size);
 			}
 		}
 		while (m_linktimer == 0x01);
 	}
 }
 
-int m2comm_device::read_frame(int dataSize)
+int sega_m2comm_device::read_frame(int data_size)
 {
 	if (!m_line_rx)
 		return 0;
 
-	// try to read a message
-	std::uint32_t recv = 0;
-	std::error_condition filerr = m_line_rx->read(m_buffer0, 0, dataSize, recv);
-	if (recv > 0)
+	// try to read a message (handling partial reads)
+	uint32_t bytes_total = 0;
+	uint32_t bytes_read = 0;
+	while (bytes_total < data_size)
 	{
-		// check if message complete
-		if (recv != dataSize)
+		std::error_condition filerr = m_line_rx->read(&m_buffer0[bytes_total], 0, data_size - bytes_total, bytes_read);
+		if (filerr)
 		{
-			// only part of a message - read on
-			std::uint32_t togo = dataSize - recv;
-			int offset = recv;
-			while (togo > 0)
-			{
-				filerr = m_line_rx->read(m_buffer1, 0, togo, recv);
-				if (recv > 0)
-				{
-					for (int i = 0 ; i < recv ; i++)
-					{
-						m_buffer0[offset + i] = m_buffer1[i];
-					}
-					togo -= recv;
-					offset += recv;
-				}
-				else if (!filerr && recv == 0)
-				{
-					togo = 0;
-				}
-			}
+			bytes_read = 0;
+			// special case if first read returned "no data"
+			if (bytes_total == 0 && std::errc::operation_would_block == filerr)
+				return 0;
 		}
-	}
-	else if (!filerr && recv == 0)
-	{
-		if (m_linkalive == 0x01)
+		if ((!filerr && bytes_read == 0) || (filerr && std::errc::operation_would_block != filerr))
 		{
-			osd_printf_verbose("M2COMM: rx connection lost\n");
-			m_linkalive = 0x02;
-			m_linktimer = 0x00;
+			osd_printf_verbose("M2COMM: rx connection failed - %s:%d %s\n", filerr.category().name(), filerr.value(), filerr.message());
 			m_line_rx.reset();
+			if (m_linkalive == 0x01)
+			{
+				osd_printf_verbose("M2COMM: link lost\n");
+				m_linkalive = 0x02;
+				m_linktimer = 0x00;
+			}
+			return 0;
 		}
+		bytes_total += bytes_read;
 	}
-	return recv;
+	return data_size;
 }
 
-void m2comm_device::send_data(uint8_t frameType, int frameStart, int frameSize, int dataSize)
+void sega_m2comm_device::send_data(uint8_t frame_type, int frame_start, int frame_size, int data_size)
 {
-	m_buffer0[0] = frameType;
-	for (int i = 0x0000 ; i < frameSize ; i++)
+	m_buffer0[0] = frame_type;
+	for (int i = 0x0000 ; i < frame_size ; i++)
 	{
-		m_buffer0[1 + i] = m_shared[frameStart + i];
+		m_buffer0[1 + i] = m_shared[frame_start + i];
 	}
-	send_frame(dataSize);
+	send_frame(data_size);
 }
 
-void m2comm_device::send_frame(int dataSize){
+void sega_m2comm_device::send_frame(int data_size){
 	if (!m_line_tx)
 		return;
 
-	std::error_condition filerr;
-	std::uint32_t written;
-
-	filerr = m_line_tx->write(&m_buffer0, 0, dataSize, written);
-	if (filerr)
+	// try to send a message (handling partial writes)
+	uint32_t bytes_total = 0;
+	uint32_t bytes_sent = 0;
+	while (bytes_total < data_size)
 	{
-		if (m_linkalive == 0x01)
+		std::error_condition filerr = m_line_tx->write(&m_buffer0[bytes_total], 0, data_size - bytes_total, bytes_sent);
+		if (filerr)
 		{
-			osd_printf_verbose("M2COMM: tx connection lost\n");
-			m_linkalive = 0x02;
-			m_linktimer = 0x00;
+			osd_printf_verbose("M2COMM: tx connection failed - %s:%d %s\n", filerr.category().name(), filerr.value(), filerr.message());
 			m_line_tx.reset();
+			if (m_linkalive == 0x01)
+			{
+				osd_printf_verbose("M2COMM: link lost\n");
+				m_linkalive = 0x02;
+				m_linktimer = 0x00;
+			}
+			return;
 		}
+		bytes_total += bytes_sent;
 	}
 }
 #endif
