@@ -76,10 +76,10 @@ Audio inputs are emulated using MAME's sample playback mechanism.
 
 // Emulation of the MIDIverb DSP circuit, built out of discrete logic
 // components.
-class midiverb_dsp : public device_t, public device_sound_interface
+class midiverb_dsp_device : public device_t, public device_sound_interface
 {
 public:
-	midiverb_dsp(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0) ATTR_COLD;
+	midiverb_dsp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0) ATTR_COLD;
 
 	void program_select_w(u8 data);
 
@@ -106,9 +106,9 @@ private:
 	static constexpr const float DAC_MAX_V = 4.8F;
 };
 
-DEFINE_DEVICE_TYPE(MIDIVERB_DSP, midiverb_dsp, "midiverb_dsp", "MIDIverb discrete DSP");
+DEFINE_DEVICE_TYPE(MIDIVERB_DSP, midiverb_dsp_device, "midiverb_dsp", "MIDIverb discrete DSP");
 
-midiverb_dsp::midiverb_dsp(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+midiverb_dsp_device::midiverb_dsp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MIDIVERB_DSP, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_microcode(*this, ":dsp_microcode")
@@ -116,7 +116,7 @@ midiverb_dsp::midiverb_dsp(const machine_config &mconfig, const char *tag, devic
 {
 }
 
-void midiverb_dsp::program_select_w(u8 data)
+void midiverb_dsp_device::program_select_w(u8 data)
 {
 	const u8 new_program = data & 0x3f;
 	if (m_program == new_program)
@@ -127,7 +127,7 @@ void midiverb_dsp::program_select_w(u8 data)
 	LOGMASKED(LOG_PROGRAM_CHANGE, "DSP: Program changed to: %d\n", m_program);
 }
 
-void midiverb_dsp::device_start()
+void midiverb_dsp_device::device_start()
 {
 	// The actual sample rate works out to 23,437.5 KHz. But stream_alloc takes
 	// a u32, and .value() will round it down to 23,437 KHz.
@@ -141,12 +141,13 @@ void midiverb_dsp::device_start()
 	save_item(NAME(m_ram));
 }
 
-#define LOG_DSP(...) do { \
-	if (sample_i < DEBUG_SAMPLES) \
-		LOGMASKED(LOG_DSP_EXECUTION, __VA_ARGS__); \
-} while(0)
+#define LOG_DSP(...) \
+		do { \
+			if (sample_i < DEBUG_SAMPLES) \
+				LOGMASKED(LOG_DSP_EXECUTION, __VA_ARGS__); \
+		} while(0)
 
-void midiverb_dsp::sound_stream_update(sound_stream &stream, const std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs)
+void midiverb_dsp_device::sound_stream_update(sound_stream &stream, const std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs)
 {
 	static constexpr const u8 MAX_PC = 0x7f;
 	static constexpr const int DEBUG_SAMPLES = 2;
@@ -244,8 +245,8 @@ void midiverb_dsp::sound_stream_update(sound_stream &stream, const std::vector<r
 			}
 
 			LOG_DSP("%04X %02x - DSP OP: %d %s (%04x), A: %6d, R: %6d, bus: %6d, ram: %6d @ %04x",
-			        rom_address, pc, op, OP_NAME[op], ram_offset_delta, m_accum,
-			        m_reg, bus_value, m_ram[m_ram_offset], m_ram_offset);
+					rom_address, pc, op, OP_NAME[op], ram_offset_delta, m_accum,
+					m_reg, bus_value, m_ram[m_ram_offset], m_ram_offset);
 			if (mode_rc0)
 				LOG_DSP(" [ADC]");
 			if (ld_dac)
@@ -264,7 +265,7 @@ void midiverb_dsp::sound_stream_update(sound_stream &stream, const std::vector<r
 	LOGMASKED(LOG_DSP_EXECUTION, "\n");
 }
 
-u16 midiverb_dsp::analog_to_digital(float sample) const
+u16 midiverb_dsp_device::analog_to_digital(float sample) const
 {
 	// Analog-to-digital conversion is done with a 12-bit DAC+SAR.
 	// Note that samples in the stream are treated as voltages (see
@@ -279,7 +280,7 @@ u16 midiverb_dsp::analog_to_digital(float sample) const
 	return static_cast<u16>(quantized);
 }
 
-float midiverb_dsp::digital_to_analog(u16 sample) const
+float midiverb_dsp_device::digital_to_analog(u16 sample) const
 {
 	// Digital-to-analog conversion uses the 12-bit DAC and 1 extra bit
 	// (LSB), for a total of 13 bits. The extra bit is implemented by
@@ -342,7 +343,7 @@ private:
 	required_ioport m_mix;
 	required_ioport m_input_level;
 	required_device<samples_device> m_audio_in;
-	required_device<midiverb_dsp> m_dsp;
+	required_device<midiverb_dsp_device> m_dsp;
 	required_device<mixer_device> m_left_out;
 	required_device<mixer_device> m_right_out;
 
@@ -580,7 +581,7 @@ void midiverb_state::midiverb(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &midiverb_state::external_memory_map);
 
 	m_maincpu->port_out_cb<1>().set(FUNC(midiverb_state::digit_select_w)).mask(0x03);  // P1.0-P1.1
-	m_maincpu->port_out_cb<1>().append(m_dsp, FUNC(midiverb_dsp::program_select_w)).rshift(2);  // P1.2-P1.7
+	m_maincpu->port_out_cb<1>().append(m_dsp, FUNC(midiverb_dsp_device::program_select_w)).rshift(2);  // P1.2-P1.7
 	m_maincpu->port_in_cb<3>().set(FUNC(midiverb_state::midi_rxd_r)).mask(0x01);  // P3.0
 	m_maincpu->port_in_cb<3>().append_ioport("buttons").lshift(2).mask(0x3c);  // P3.2-P3.5
 

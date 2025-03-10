@@ -270,20 +270,22 @@ void psikyo_state::sound_bankswitch_w(u8 data)
 	m_audiobank->set_entry((data >> Shift) & 0x03);
 }
 
+template <uint8_t Which>
 void psikyo_state::s1945bl_okibank_w(u8 data)
 {
 	// not at all sure about this, it seems to write 0 too often
 	if (data < 5)
-		m_okibank->set_entry(data);
+		m_okibank[Which]->set_entry(data);
 }
 
+template <uint8_t Which>
 void psikyo_state::s1945bl_oki_map(address_map &map)
 {
 	map(0x00000, 0x2ffff).rom();
-	map(0x30000, 0x3ffff).bankr("okibank");
+	map(0x30000, 0x3ffff).bankr(m_okibank[Which]);
 }
 
-void psikyo_state::psikyo_bootleg_map(address_map &map)
+void psikyo_state::s1945bl_bootleg_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();                                                                 // ROM (not all used)
 	map(0x200000, 0x200fff).ram().share("boot_spritebuf");              // RAM (it copies the spritelist here, the HW probably doesn't have automatic buffering like the originals?
@@ -295,12 +297,36 @@ void psikyo_state::psikyo_bootleg_map(address_map &map)
 	map(0x804000, 0x807fff).ram().share("vregs");                                                  // RAM + Vregs
 	map(0xc00000, 0xc0000b).r(FUNC(psikyo_state::gunbird_input_r));                                // input ports
 
-	map(0xc00018, 0xc00018).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xc00019, 0xc00019).w(FUNC(psikyo_state::s1945bl_okibank_w));
+	map(0xc00018, 0xc00018).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xc00019, 0xc00019).w(FUNC(psikyo_state::s1945bl_okibank_w<0>));
 
 	map(0xfe0000, 0xffffff).ram();                                                                 // RAM
 
 }
+
+// TODO: different video regs / sprite RAM
+void psikyo_state::tengaibl_bootleg_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x200000, 0x200fff).ram().share("boot_spritebuf");
+
+	map(0x400000, 0x401fff).ram().share("spriteram");
+	map(0x604000, 0x605fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0x800000, 0x801fff).rw(FUNC(psikyo_state::vram_r<0>), FUNC(psikyo_state::vram_w<0>));
+	map(0x802000, 0x803fff).rw(FUNC(psikyo_state::vram_r<1>), FUNC(psikyo_state::vram_w<1>));
+	map(0x804000, 0x807fff).ram().share("vregs");
+	map(0xc00000, 0xc0000b).r(FUNC(psikyo_state::gunbird_input_r));
+
+	map(0xc00014, 0xc00014).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xc00015, 0xc00015).w(FUNC(psikyo_state::s1945bl_okibank_w<0>));
+
+	map(0xc00018, 0xc00018).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xc00019, 0xc00019).w(FUNC(psikyo_state::s1945bl_okibank_w<1>));
+
+	map(0xfe0000, 0xffffff).ram();
+
+}
+
 
 /***************************************************************************
                         Sengoku Ace / Samurai Aces
@@ -982,6 +1008,14 @@ static INPUT_PORTS_START( tengaij )
 	PORT_CONFSETTING(          0x0000000e, DEF_STR( World ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( tengaibl )
+	PORT_INCLUDE( tengai )
+
+	PORT_MODIFY("P1_P2")
+	PORT_BIT( 0x00000004, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+INPUT_PORTS_END
+
 
 /***************************************************************************
 
@@ -1113,7 +1147,7 @@ void psikyo_state::s1945bl(machine_config &config) /* Bootleg hardware based on 
 {
 	/* basic machine hardware */
 	M68EC020(config, m_maincpu, 16000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &psikyo_state::psikyo_bootleg_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &psikyo_state::s1945bl_bootleg_map);
 	m_maincpu->set_vblank_int("screen", FUNC(psikyo_state::irq1_line_hold));
 
 	/* video hardware */
@@ -1123,8 +1157,8 @@ void psikyo_state::s1945bl(machine_config &config) /* Bootleg hardware based on 
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_size(320, 256);
 	m_screen->set_visarea(0, 320-1, 0, 256-32-1);
-	m_screen->set_screen_update(FUNC(psikyo_state::screen_update_bootleg));
-	m_screen->screen_vblank().set(FUNC(psikyo_state::screen_vblank_bootleg));
+	m_screen->set_screen_update(FUNC(psikyo_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(psikyo_state::screen_vblank));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_psikyo);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x1000);
@@ -1135,9 +1169,25 @@ void psikyo_state::s1945bl(machine_config &config) /* Bootleg hardware based on 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, m_oki, XTAL(16'000'000)/16, okim6295_device::PIN7_LOW); // ?? clock
-	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
-	m_oki->set_addrmap(0, &psikyo_state::s1945bl_oki_map);
+	okim6295_device &oki1(OKIM6295(config, "oki1", XTAL(16'000'000)/16, okim6295_device::PIN7_LOW)); // ?? clock
+	oki1.add_route(ALL_OUTPUTS, "mono", 1.0);
+	oki1.set_addrmap(0, &psikyo_state::s1945bl_oki_map<0>);
+}
+
+void psikyo_state::tengaibl(machine_config &config)
+{
+	s1945bl(config);
+
+	m_maincpu->set_clock(28.636363_MHz_XTAL / 2 ); // divider not verified
+	m_maincpu->set_addrmap(AS_PROGRAM, &psikyo_state::tengaibl_bootleg_map);
+
+	okim6295_device &oki1(OKIM6295(config.replace(), "oki1", 1'000'000, okim6295_device::PIN7_LOW)); // clock and pin 7 not verified
+	oki1.add_route(ALL_OUTPUTS, "mono", 1.0);
+	oki1.set_addrmap(0, &psikyo_state::s1945bl_oki_map<0>);
+
+	okim6295_device &oki2(OKIM6295(config, "oki2", 1'000'000, okim6295_device::PIN7_LOW)); // clock and pin 7 not verified
+	oki2.add_route(ALL_OUTPUTS, "mono", 1.0);
+	oki2.set_addrmap(0, &psikyo_state::s1945bl_oki_map<1>);
 }
 
 
@@ -1530,7 +1580,7 @@ ROM_START( s1945bl ) /* closely based on s1945nj set, unsurprising because it's 
 	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layer 0 + 1 */
 	ROM_LOAD16_WORD_SWAP( "rv27c1600.m1",  0x000000, 0x200000, CRC(aaf83e23) SHA1(1c75d09ff42c0c215f8c66c699ca75688c95a05e) )
 
-	ROM_REGION( 0x100000, "oki", 0 )    /* OKI Samples */
+	ROM_REGION( 0x100000, "oki1", 0 )    /* OKI Samples */
 	ROM_LOAD( "rv27c040.m6",  0x000000, 0x080000, CRC(c22e5b65) SHA1(d807bd7c136d6b51f54258b44ebf3eecbd5b35fa) )
 
 	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  /* */
@@ -1820,6 +1870,36 @@ ROM_START( tengaij )
 	ROM_LOAD( "u1.bin",  0x000000, 0x040000, CRC(681d7d55) SHA1(b0b28471440d747adbc4d22d1918f89f6ede1615) )
 ROM_END
 
+ROM_START( tengaibl ) // SK000701 PCB. Has 2 AD-65 (M6295 comp.) instead of YM. XTALs are 28'636'360 and 19'660'800
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD32_WORD_SWAP( "4_sk000701-upd27c4096.bin", 0x00000, 0x80000, CRC(1519c1c4) SHA1(7e8ff112c8d943d55797e32fe02bbce4ebd5c7b5) )
+	ROM_LOAD32_WORD_SWAP( "5_sk000701-upd27c4096.bin", 0x00002, 0x80000, CRC(4f638dca) SHA1(cc15785a2acf6e45ca3ce13367d5d94f9a066a03) )
+
+	// GFX ROMs are 5x MX29F1610MC-12. They are soldered and weren't dumped. Using the ones from the original for now.
+	ROM_REGION( 0x600000, "gfx1", 0 )
+	ROM_LOAD( "u20.bin", 0x000000, 0x200000, BAD_DUMP CRC(ed42ef73) SHA1(74693fcc83a2654ddb18fd513d528033863d6116) )
+	ROM_LOAD( "u22.bin", 0x200000, 0x200000, BAD_DUMP CRC(8d21caee) SHA1(2a68af8b2be2158dcb152c434e91a75871478d41) )
+	ROM_LOAD( "u21.bin", 0x400000, 0x200000, BAD_DUMP CRC(efe34eed) SHA1(7891495b443a5acc7b2f17fe694584f6cb0afacc) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 )
+	ROM_LOAD( "u34.bin", 0x000000, 0x400000, BAD_DUMP CRC(2a2e2eeb) SHA1(f1d99353c0affc5c908985e6f2a5724e5223cccc) )
+
+	ROM_REGION( 0x80000, "oki1", 0 )
+	ROM_LOAD( "1_sk000701-mx27c4000.bin", 0x00000, 0x80000, CRC(769f4c92) SHA1(a6ef5b180f691655a64f6121b1d00344c36a0ced) )
+
+	ROM_REGION( 0x80000, "oki2", 0 )
+	ROM_LOAD( "2_sk000701-mx27c4000.bin", 0x00000, 0x80000, CRC(f06f0a00) SHA1(2f8e216ef710f501d7a0a962ce82cca87f90611d) )
+
+	ROM_REGION16_LE( 0x40000, "spritelut", 0 )
+	ROM_LOAD( "3_sk000701-tms27c240.bin", 0x00000, 0x40000, CRC(cf44d2ba) SHA1(6e48b540c70050a7385d5a3fb412fd25aad923bb) ) // 1ST AND 2ND HALF IDENTICAL, otherwise identical to the original
+	ROM_IGNORE(                                    0x40000 )
+
+	ROM_REGION( 0x600, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "gal20v8b_1", 0x000, 0x157, NO_DUMP )
+	ROM_LOAD( "gal20v8b_2", 0x200, 0x157, NO_DUMP )
+	ROM_LOAD( "gal16v8d",   0x400, 0x117, NO_DUMP )
+ROM_END
+
 /***************************************************************************
 
 
@@ -1946,8 +2026,19 @@ void psikyo_state::init_s1945bl()
 {
 	m_ka302c_banking = true;
 
-	m_okibank->configure_entries(0, 5, memregion("oki")->base() + 0x30000, 0x10000);
-	m_okibank->set_entry(0);
+	m_okibank[0]->configure_entries(0, 5, memregion("oki1")->base() + 0x30000, 0x10000);
+	m_okibank[0]->set_entry(0);
+}
+
+void psikyo_state::init_tengaibl()
+{
+	m_ka302c_banking = true;
+
+	m_okibank[0]->configure_entries(0, 5, memregion("oki1")->base() + 0x30000, 0x10000);
+	m_okibank[0]->set_entry(0);
+
+	m_okibank[1]->configure_entries(0, 5, memregion("oki2")->base() + 0x30000, 0x10000);
+	m_okibank[1]->set_entry(0);
 }
 
 
@@ -1980,3 +2071,4 @@ GAME( 1995, s1945bl,   s1945,    s1945bl,  s1945bl,   psikyo_state, init_s1945bl
 
 GAME( 1996, tengai,    0,        s1945,    tengai,    psikyo_state, init_tengai,   ROT0,   "Psikyo",  "Tengai (World)",                                                 MACHINE_SUPPORTS_SAVE )
 GAME( 1996, tengaij,   tengai,   s1945,    tengaij,   psikyo_state, init_tengai,   ROT0,   "Psikyo",  "Sengoku Blade: Sengoku Ace Episode II (Japan) / Tengai (World)", MACHINE_SUPPORTS_SAVE ) // Region dip - 0x0f=Japan, anything else=World
+GAME( 1996, tengaibl,  tengai,   tengaibl, tengaibl,  psikyo_state, init_tengaibl, ROT0,   "Psikyo",  "Tengai (bootleg)",                                               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

@@ -46,7 +46,7 @@ private:
 	void xt_w(offs_t offset, uint8_t data);
 
 	required_device<input_merger_any_high_device> m_irq;
-	required_device<amiga_dmac_device> m_dmac;
+	required_device<amiga_dmac_rev2_device> m_dmac;
 	required_device<wd33c93a_device> m_wdc;
 	required_device<xt_hdc_device> m_xt;
 	required_ioport m_jp1;

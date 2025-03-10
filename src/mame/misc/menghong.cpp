@@ -17,63 +17,79 @@
 
 =============================================================================
 
-Crazy Dou Di Zhu II
-Sealy, 2006
-
-PCB Layout
-----------
+Meng Hong Lou (Dream of the Red Chamber), Sealy, 2008
+Crazy Dou Di Zhu II, Sealy, 2006
+Hardware Info By Guru
+---------------------
 
 070405-fd-VER1.2
-|--------------------------------------|
-|       PAL        27C322.U36          |
-|                               BATTERY|
-|    M59PW1282     62256  14.31818MHz  |
-|                             W9864G66 |
-|                                      |
-|J                     VRENDERZERO+    |
-|A            W9864G66                 |
-|M                            W9864G66 |
-|M              8MHz                   |
-|A    HY04    0260F8A                  |
-|                     28.63636MHz      |
-|                                      |
-|                 VR1       TLDA1311   |
-|                               TDA1519|
-|  18WAY                  VOL  10WAY   |
-|--------------------------------------|
+   |-----------------------------------|
+|--| 1086M33       EPROM.U49  SW1      |
+|       GAL  LVC16245    U36    BATTERY|
+|                  62256  14.31818MHz  |
+|    M59PW1282          T518B W9864G66 |
+|            LVC16245    |--------|    |
+|J 817(x26)              |VRENDER |    |
+|A            W9864G66   |ZERO+   |    |
+|M     LVC16245          |MAGICEYES    |
+|M              8MHz     |--------|    |
+|A           |------|         W9864G66 |
+|     HY04   |0260F8A  28.63636MHz     |
+|            |      |                  |
+|            |------|    TDA1311A      |
+|                 VR1      VOL  TDA1519|
+|--|    18WAY      |-------|  10WAY |--|
+   |---------------|       |--------|
 Notes:
-      0260F8A   - unknown TQFP44
-      HY04      - rebadged DIP8 PIC - type unknown *
-      W9864G66  - Winbond 64MBit DRAM
-      M59PW1282 - ST Microelectronics 128MBit SOP44 FlashROM.
-                  This is two 64MB SOP44 ROMs in one package
+      VRENDERZERO+ - MagicEyes VRENDERZERO+ EISC System-On-A-Chip.
+                     CPU Clock Input Pins 6 & 7 - 14.31818MHz
+                     Video Clock Input Pin 103 - 28.63636MHz
+                     Another identical PCB has this chip marked "ADC Amazon-LF EISC" so these are 100% compatible.
+           0260F8A - unknown TQFP44 (Microcontroller?). Clock Input 8.000MHz
+              HY04 - rebadged DIP8 PIC - type unknown (*). PCB marked "SAM1"
+                     Some chips are marked "SL01". Chip data is unique to each game but different
+                     versions of the same game work ok with swapped HY04 or swapped main program EPROM.
+                     Clock and data pis are connected to unknown IC 0260F8A.
+             62256 - 32kB x8-bit SRAM (battery-backed)
+          W9864G66 - Winbond 1MB x4-Banks x16-bit (64MBit) SDRAM
+          TDA1311A - Philips TDA1311A Stereo DAC. VRENDERZERO+ outputs digital audio directly into this
+                     chip on pin 3.
+           TDA1519 - Philips TDA1519C 22W BTL Stereo Power Amplifier
+               VR1 - Potentiometer to adjust brightness
+               VOL - Potentiometer to adjust audio volume
+               817 - Sharp PC817 Optocoupler
+             T518B - Mitsumi T518B System Reset IC
+           1086M33 - Toshiba LM1086M33 3.3V Linear Regulator
+               GAL - Atmel ATF16V8B-15PC GAL
+           BATTERY - 3.6V Ni-Cad Battery
+               SW1 = Push Button. Does nothing when pressed. Connected to unknown IC 0260F8A.
+          LVC16245 - Texas Instruments LVC16245 16-bit Bus Transceiver
+         EPROM.U49 - 27C160 or 27C322 EPROM (main program)
+               U36 - Alternative position for a different type of EPROM (not populated)
+         M59PW1282 - ST Microelectronics 128Mbit SOP44 Flash ROM (= 2x 64Mbit SOP44 ROMs in one chip)
 
 * The pins are:
-  1 ground
-  2 nothing
-  3 data (only active for 1/4 second when the playing cards or "PASS" shows in game next to each player)
-  4 nothing
-  5 nothing
-  6 clock
-  7 +5V (could be VPP for programming voltage)
-  8 +5V
-
-=====
-
-Meng Hong Lou (Dream of the Red Chamber)
-Sealy, 2004?
-
-Red PCB, very similar to crzyddz2
+  1 Ground
+  2 -
+  3 Data (only active for 1/4 second when the playing cards or "PASS" shows in game next to each player)
+    This pin is connected to 0260F8A.
+  4 -
+  5 -
+  6 Clock. This pin is connected to 0260F8A.
+  7 High
+  8 VCC
 
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/se3208/se3208.h"
 #include "machine/ds1302.h"
 #include "machine/eepromser.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "machine/vrender0.h"
+
 #include "emupal.h"
 
 #include <algorithm>
@@ -99,8 +115,8 @@ public:
 	{ }
 
 
-	void crzyddz2(machine_config &config);
-	void menghong(machine_config &config);
+	void crzyddz2(machine_config &config) ATTR_COLD;
+	void menghong(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -492,8 +508,24 @@ ROM_START( menghong )
 	ROM_LOAD( "rom.u48", 0x000000, 0x1000000, CRC(e24257c4) SHA1(569d79a61ff6d35100ba5727069363146df9e0b7) )
 
 	ROM_REGION( 0x0400000, "maincpu", 0 )
-	ROM_LOAD( "060511_08-01-18.u49",  0x0000000, 0x0200000, CRC(b0c12107) SHA1(b1753757bbdb7d996df563ac6abdc6b46676704b) ) // 27C160
+	ROM_LOAD( "060511_08-01-18.u49",  0x0000000, 0x0200000, CRC(b0c12107) SHA1(b1753757bbdb7d996df563ac6abdc6b46676704b) ) // 27C160, also found with mhl_29-4-2008 label and same content
 	ROM_RELOAD(                       0x0200000, 0x0200000 )
+
+	ROM_REGION( 0x4280, "pic", 0 ) // hy04
+	ROM_LOAD("menghong_hy04", 0x000000, 0x4280, NO_DUMP )
+
+	ROM_REGION( 0x0100, "pic_data", ROMREGION_ERASEFF )
+	ROM_LOAD("hy04_fake_data.bin", 0, 0x100, BAD_DUMP CRC(73cc964b) SHA1(39d223c550e38c97135322e43ccabb70f04964b9) )
+ROM_END
+
+
+ROM_START( menghonga )
+	ROM_REGION32_LE( 0x1000000, "flash", 0 ) // Flash
+	ROM_LOAD( "rom.u48", 0x000000, 0x1000000, CRC(e24257c4) SHA1(569d79a61ff6d35100ba5727069363146df9e0b7) )
+
+	ROM_REGION( 0x0400000, "maincpu", 0 )
+	ROM_LOAD( "mhl_4-1-2008.u46",  0x0000000, 0x0200000, CRC(68246e07) SHA1(6732b017d274bc47a6b9bae144c54937e24152ee) )
+	ROM_RELOAD(                    0x0200000, 0x0200000 )
 
 	ROM_REGION( 0x4280, "pic", 0 ) // hy04
 	ROM_LOAD("menghong_hy04", 0x000000, 0x4280, NO_DUMP )
@@ -515,8 +547,9 @@ ROM_START( crzyddz2 )
 	ROM_REGION( 0x0100, "pic_data", ROMREGION_ERASEFF )
 ROM_END
 
-} // Anonymous namespace
+} // anonymous namespace
 
 
-GAME( 2004?,menghong, 0,        menghong, crzyddz2, menghong_state, empty_init,    ROT0, "Sealy", "Meng Hong Lou", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2006, crzyddz2, 0,        crzyddz2, crzyddz2, menghong_state, empty_init,    ROT0, "Sealy", "Crazy Dou Di Zhu II", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2004?, menghong,  0,        menghong, crzyddz2, menghong_state, empty_init,    ROT0, "Sealy", "Meng Hong Lou",           MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2004?, menghonga, menghong, menghong, crzyddz2, menghong_state, empty_init,    ROT0, "Sealy", "Meng Hong Lou (earlier)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2006,  crzyddz2,  0,        crzyddz2, crzyddz2, menghong_state, empty_init,    ROT0, "Sealy", "Crazy Dou Di Zhu II",     MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )

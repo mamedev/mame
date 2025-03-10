@@ -3,6 +3,7 @@
 /***************************************************************************
 
 Asterix
+Konami GX068 PCB
 
 TODO:
  - the konami logo: in the original the outline is drawn, then there's a slight

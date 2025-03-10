@@ -870,7 +870,7 @@ static int tap_cas_fill_wave(int16_t *buffer, int length, const uint8_t *bytes)
 		length -= data_size;
 		if (length < 0)
 		{
-			data_size += length; // Take as much as we can.
+		    data_size += length; // Take as much as we can.
 		}
 		*/
 		size += tzx_cas_handle_block(&p, bytes, 1000, data_size, 2168, pilot_length, 667, 735, 855, 1710, 8);

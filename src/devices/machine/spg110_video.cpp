@@ -482,7 +482,7 @@ void spg110_video_device::huereference_203c_w(uint16_t data)
 {
 	// 0006 on startup, twice
 	LOG("%s: huereference_203c_w: %04x\n", machine().describe_context(), data);
-} 
+}
 
 void spg110_video_device::lum_adjust_203d_w(uint16_t data)
 {

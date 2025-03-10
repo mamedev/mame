@@ -108,7 +108,6 @@ void namco_audio_device::device_start()
 	if (m_wave_ptr == nullptr)
 		save_pointer(NAME(m_wavedata), 0x400);
 
-	save_item(NAME(m_voices));
 	save_item(NAME(m_sound_enable));
 	for (int v = 0; v < MAX_VOLUME; v++)
 		save_pointer(NAME(m_waveform[v]), 32 * 8 * (1+m_wave_size), v);

@@ -86,7 +86,7 @@ known chips:
   B63     HD44820  1986, CXG Pocketchess -> cxg/pchess.cpp
 
  *A13     HD44840  1982, CXG Computachess II
- *A14     HD44840  1982, CXG Computachess II / Advanced Portachess
+  A14     HD44840  1982, CXG Computachess II -> cxg/computachess2.cpp
 
   B29     HD44860  1987, Micro-Concepts Diamond Bridge Computer -> handheld/dbridgec.cpp
  *B55     HD44860  1987, Saitek Pro Bridge 100 (have dump)

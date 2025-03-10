@@ -2668,7 +2668,7 @@ void towns_state::towns_base(machine_config &config)
 	SOFTWARE_LIST(config, "fd_list_cracked").set_original("fmtowns_flop_cracked");
 	SOFTWARE_LIST(config, "fd_list_misc").set_original("fmtowns_flop_misc");
 
-	CDROM(config, m_cdrom, 0).set_interface("fmt_cdrom");
+	CDROM(config, m_cdrom).set_interface("cdrom");
 	m_cdda->set_cdrom_tag(m_cdrom);
 	SOFTWARE_LIST(config, "cd_list").set_original("fmtowns_cd");
 

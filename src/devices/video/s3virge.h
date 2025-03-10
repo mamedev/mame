@@ -195,6 +195,21 @@ private:
 };
 
 
+// ======================> s3virgevx_vga_device
+
+class s3virgevx_vga_device :  public s3virge_vga_device
+{
+public:
+	s3virgevx_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+//	s3virgevx_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+};
+
+
 // ======================> s3virgedx_vga_device
 
 class s3virgedx_vga_device :  public s3virge_vga_device
@@ -211,7 +226,7 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 };
 
-// ======================> s3virgedx_vga_device
+// ======================> s3virgedx_rev1_vga_device
 
 class s3virgedx_rev1_vga_device :  public s3virgedx_vga_device
 {
@@ -227,6 +242,7 @@ protected:
 
 // device type definition
 DECLARE_DEVICE_TYPE(S3VIRGE,    s3virge_vga_device)
+DECLARE_DEVICE_TYPE(S3VIRGEVX,  s3virgevx_vga_device)
 DECLARE_DEVICE_TYPE(S3VIRGEDX,  s3virgedx_vga_device)
 DECLARE_DEVICE_TYPE(S3VIRGEDX1, s3virgedx_rev1_vga_device)
 
