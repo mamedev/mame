@@ -13,13 +13,13 @@ LY62256SL SRAM (near VGAME-007)
 U6295 sound chip
 2 banks of 8 DIP switches
 
-TODO: everything. CPU core isn't identified and code is encrypted. Possibly internal ROM?
+TODO: everything. CPU core is only tentatively identified and code is encrypted. Possibly internal ROM?
 */
 
 
 #include "emu.h"
 
-#include "cpu/m68000/m68000.h"
+#include "cpu/arm7/arm7.h"
 #include "sound/okim6295.h"
 
 #include "emupal.h"
@@ -130,7 +130,7 @@ GFXDECODE_END
 
 void vgame_state::vgame(machine_config &config)
 {
-	M68000(config, m_maincpu, 44_MHz_XTAL); // CPU core and divider unknown
+	ARM7(config, m_maincpu, 44_MHz_XTAL); // CPU core and divider unknown; ROMs seem to contain at least some ARM or Thumb code
 	m_maincpu->set_addrmap(AS_PROGRAM, &vgame_state::program_map);
 	// m_maincpu->set_vblank_int("screen", FUNC(vgame_state::irq0_line_hold));
 
@@ -153,7 +153,7 @@ void vgame_state::vgame(machine_config &config)
 // VGAME-0030-02-AI PCB
 ROM_START( hilice )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "hi_lice_v102fa.u13", 0x000000, 0x100000, BAD_DUMP CRC(4da87481) SHA1(5a20b254cfe8a2f087faa0dd17f682218a2ca1b2) ) // probably read as wrong ROM type
+	ROM_LOAD( "hi_lice_v102fa.u13", 0x000000, 0x100000, BAD_DUMP CRC(4da87481) SHA1(5a20b254cfe8a2f087faa0dd17f682218a2ca1b2) ) // probably read as wrong ROM type
 	ROM_CONTINUE(                               0x000000, 0x100000 )
 
 	ROM_REGION( 0x400000, "gfx", 0 )
@@ -168,7 +168,7 @@ ROM_END
 // while all labels have 麻將學園 (Mahjong School) prepended to what's below, title screen shows 麻將學園 2 - Mahjong School 2
 ROM_START( mjxy2 )
 	ROM_REGION( 0x200000, "maincpu", 0 ) // dumped as EV29LV160 (same rare ROM as some IGS titles)
-	ROM_LOAD16_WORD_SWAP( "u12_v108tw.u12", 0x000000, 0x200000, CRC(a6d99849) SHA1(c280635517d5ffded524e15048568817bd927bf9) )
+	ROM_LOAD( "u12_v108tw.u12", 0x000000, 0x200000, CRC(a6d99849) SHA1(c280635517d5ffded524e15048568817bd927bf9) )
 
 	ROM_REGION( 0x400000, "gfx", 0 ) // dumped as EV29LV160 (same rare ROM as some IGS titles)
 	ROM_LOAD16_BYTE( "u3_cg_v105.u3", 0x000000, 0x200000, CRC(fda38fb1) SHA1(7bd744e42f619254ebad2fb60f3851f61073fe8c) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
@@ -180,7 +180,7 @@ ROM_END
 
 ROM_START( cjdn ) // Oct  1 2008 15:58:54 string in ROM
 	ROM_REGION( 0x200000, "maincpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "v305cn.u8", 0x000000, 0x200000, CRC(bffb20c0) SHA1(bf2293bfc4711d0b930c491f579418d5e7c0800f) )
+	ROM_LOAD( "v305cn.u8", 0x000000, 0x200000, CRC(bffb20c0) SHA1(bf2293bfc4711d0b930c491f579418d5e7c0800f) )
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "gfx_flashrom", 0x000000, 0x400000, CRC(4018790e) SHA1(2b292d4cbfa5d7c3129a7e0c8012bde519e85ef1) )  // FIXED BITS (xxxxxxxx0xxxxxxx)
@@ -191,7 +191,7 @@ ROM_END
 
 ROM_START( cjsjh ) // Nov  2 2007 16:05:26 string in ROM
 	ROM_REGION( 0x200000, "maincpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "vxxxcn.u8", 0x000000, 0x200000, CRC(911d8dce) SHA1(1d9386c4a9e118d02b5b29f9e9ce90ef1d6f419f) ) // label not readable
+	ROM_LOAD( "vxxxcn.u8", 0x000000, 0x200000, CRC(911d8dce) SHA1(1d9386c4a9e118d02b5b29f9e9ce90ef1d6f419f) ) // label not readable
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "gfx.u2", 0x000000, 0x400000, CRC(e2964db3) SHA1(21e021c88136083445b430c618a8eb74e2147d4f ) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
