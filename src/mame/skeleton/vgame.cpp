@@ -11,6 +11,7 @@ square 208-pin chip, marked VGAME-008 (probably video chip)
 LY62256SL SRAM (near VGAME-007)
 2x LY61L256JL SRAM (near VGAME-008)
 U6295 sound chip
+93C66 EEPROM
 2 banks of 8 DIP switches
 
 TODO: everything. CPU core is only tentatively identified and code is encrypted. Possibly internal ROM?
@@ -20,6 +21,7 @@ TODO: everything. CPU core is only tentatively identified and code is encrypted.
 #include "emu.h"
 
 #include "cpu/arm7/arm7.h"
+#include "machine/eepromser.h"
 #include "sound/okim6295.h"
 
 #include "emupal.h"
