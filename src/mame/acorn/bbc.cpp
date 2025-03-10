@@ -2162,6 +2162,7 @@ void bbc_state::eurobeeb(machine_config &config)
 	    -AMPAL16L8
 	    -Misc 74 and 4000 series logic
 	    -7 x 2N7000 MOSFETs
+	    -Buzzer
 	*/
 	//M6500_1(config, m_mcu, 2_MHz_XTAL); // Rockwell R6501AQ
 }
