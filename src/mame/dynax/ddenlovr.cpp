@@ -198,6 +198,7 @@ public:
 	void ddenlovrk(machine_config &config) ATTR_COLD;
 	void quizchq(machine_config &config) ATTR_COLD;
 	void mjmyuniv(machine_config &config) ATTR_COLD;
+	void mjmyunivbl2(machine_config &config) ATTR_COLD;
 	void dtoyoken(machine_config &config) ATTR_COLD;
 	void hgokou(machine_config &config) ATTR_COLD;
 	void seljan2(machine_config &config) ATTR_COLD;
@@ -301,7 +302,6 @@ private:
 protected:
 	void mjmyster_rambank_w(uint8_t data);
 private:
-	void mjmyster_rombank_w(uint8_t data);
 	void mjmyster_select2_w(uint8_t data);
 	uint8_t mjmyster_coins_r();
 	uint8_t mjmyster_keyb_r();
@@ -396,6 +396,7 @@ private:
 	void mjflove_portmap(address_map &map) ATTR_COLD;
 	void mjmyorntr_portmap(address_map &map) ATTR_COLD;
 	void mjmyster_map(address_map &map) ATTR_COLD;
+	void mjmyunivbl2_map(address_map &map) ATTR_COLD;
 	void mjmyster_portmap(address_map &map) ATTR_COLD;
 	void mjmywrld_portmap(address_map &map) ATTR_COLD;
 	void mjschuka_portmap(address_map &map) ATTR_COLD;
@@ -3210,9 +3211,14 @@ void ddenlovr_state::mjmyster_map(address_map &map)
 	map(0xf200, 0xffff).nopw();                        // ""
 }
 
-void ddenlovr_state::mjmyster_rombank_w(uint8_t data)
+void ddenlovr_state::mjmyunivbl2_map(address_map &map)
 {
-	membank("bank1")->set_entry(data & 0x7);
+	map(0x0000, 0x5fff).rom();                         // ROM
+	map(0x6000, 0x6fff).ram();                         // RAM
+	map(0x7000, 0x7fff).bankrw("bank2");               // RAM (Banked)
+	map(0x8000, 0xffff).bankr("bank1");                // ROM/RAM (Banked)
+	map(0xe000, 0xe1ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w));   // RAM enabled by bit 4 of rombank
+	map(0xe200, 0xefff).nopw();                        // ""
 }
 
 void ddenlovr_state::mjmyster_rambank_w(uint8_t data)
@@ -9576,7 +9582,7 @@ void ddenlovr_state::mjmyorntr(machine_config &config)
 	tmpz84c015_device &tmpz(*subdevice<tmpz84c015_device>("maincpu"));
 	tmpz.set_addrmap(AS_IO, &ddenlovr_state::mjmyorntr_portmap);
 	tmpz.out_pa_callback().set(FUNC(ddenlovr_state::mjmyster_rambank_w));
-	tmpz.out_pb_callback().set(FUNC(ddenlovr_state::mjmyster_rombank_w));
+	tmpz.out_pb_callback().set_membank("bank1").mask(0x07);
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,hparadis)
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,ddenlovr)
@@ -9603,7 +9609,7 @@ void ddenlovr_state::mjmyster(machine_config &config)
 	maincpu.set_addrmap(AS_IO, &ddenlovr_state::mjmyster_portmap);
 	maincpu.in_pa_callback().set_constant(0);
 	maincpu.out_pa_callback().set(FUNC(ddenlovr_state::mjmyster_rambank_w));
-	maincpu.out_pb_callback().set(FUNC(ddenlovr_state::mjmyster_rombank_w));
+	maincpu.out_pb_callback().set_membank("bank1").mask(0x07);
 
 	m_screen->screen_vblank().set(m_maincpu, FUNC(tmpz84c015_device::trg0)).invert();
 
@@ -9716,7 +9722,7 @@ void ddenlovr_state::mjmyuniv(machine_config &config)
 	maincpu.set_addrmap(AS_IO, &ddenlovr_state::mjmyster_portmap);
 	maincpu.in_pa_callback().set_constant(0);
 	maincpu.out_pa_callback().set(FUNC(ddenlovr_state::mjmyster_rambank_w));
-	maincpu.out_pb_callback().set(FUNC(ddenlovr_state::mjmyster_rombank_w));
+	maincpu.out_pb_callback().set_membank("bank1").mask(0x07);
 
 	m_screen->screen_vblank().set(m_maincpu, FUNC(tmpz84c015_device::trg0)).invert();
 
@@ -9732,6 +9738,13 @@ void ddenlovr_state::mjmyuniv(machine_config &config)
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.30);
 }
 
+void ddenlovr_state::mjmyunivbl2(machine_config &config)
+{
+	mjmyuniv(config);
+
+	subdevice<tmpz84c015_device>("maincpu")->set_addrmap(AS_PROGRAM, &ddenlovr_state::mjmyunivbl2_map);
+}
+
 void ddenlovr_state::mjmyornt(machine_config &config)
 {
 	quizchq(config);
@@ -9742,7 +9755,7 @@ void ddenlovr_state::mjmyornt(machine_config &config)
 	maincpu.set_addrmap(AS_IO, &ddenlovr_state::mjmyster_portmap);
 	maincpu.in_pa_callback().set_constant(0);
 	maincpu.out_pa_callback().set(FUNC(ddenlovr_state::mjmyster_rambank_w));
-	maincpu.out_pb_callback().set(FUNC(ddenlovr_state::mjmyster_rombank_w));
+	maincpu.out_pb_callback().set_membank("bank1").mask(0x07);
 
 	m_screen->screen_vblank().set(m_maincpu, FUNC(tmpz84c015_device::trg0)).invert();
 	m_screen->set_visarea(0, 336-1, 4, 256-16+4-1);
@@ -11787,6 +11800,24 @@ ROM_START( mjmyunivbl )
 	ROM_LOAD( "rom.u30", 0x000000, 0x040000, CRC(30e496a6) SHA1(c7ea23079bd4acb6e06af954fafe8462d5576b0e) )
 ROM_END
 
+// 麻雀 財会赢
+// also CS166P001 PCB
+ROM_START( mjmyunivbl2 )
+	ROM_REGION( 0x90000 + 0x1000*8, "maincpu", 0 )  // Z80 Code + space for banked RAM
+	ROM_LOAD( "romb.u47", 0x00000, 0x40000, CRC(eb447ce4) SHA1(8b38cedd83dbc3dd1dff7f4a60658c1a9ef50428) )
+	ROM_RELOAD(           0x10000, 0x40000 )
+
+	ROM_REGION( 0x400000, "blitter", ROMREGION_ERASE00 )
+	// gap
+	ROM_LOAD( "romf.u60", 0x200000, 0x080000, CRC(a287589a) SHA1(58659dd7e019d1d32efeaec548c84a7ded637c50) )
+	ROM_LOAD( "rome.u59", 0x280000, 0x080000, CRC(a3475059) SHA1(ec86dcea3314b65d391a970680c021899c16449e) )
+	ROM_LOAD( "romd.u58", 0x300000, 0x080000, CRC(f45c24d6) SHA1(0eca68f2ca5722717f27ac0839359966daa2715b) )
+	ROM_LOAD( "romc.u57", 0x380000, 0x080000, CRC(d9e4a01e) SHA1(0a0320cea0581c4278d120752997f67537c46531) )
+
+	ROM_REGION( 0x40000, "oki", 0 )  // samples
+	ROM_LOAD( "roma.u30", 0x000000, 0x040000, CRC(f9bf11fa) SHA1(3e781db107d24f456b48a99987c45727454d0a69) )
+ROM_END
+
 /***************************************************************************
 
 Panel & Variety Akamaru Q Joushou Dont-R
@@ -12669,6 +12700,7 @@ GAME( 1994, hginga,      0,        hginga,    hginga,     ddenlovr_state, empty_
 
 GAME( 1994, mjmyuniv,    0,        mjmyuniv,  mjmyster,   ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Mysterious Universe (Japan, D85)",                   MACHINE_NO_COCKTAIL  )
 GAME( 1995, mjmyunivbl,  mjmyuniv, mjmyuniv,  mjmyster,   ddenlovr_state, empty_init,    ROT0, "bootleg",                                     "Maque Long Xiong Hu Di (Taiwan?, D106T)",                        MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL ) // One GFX ROM isn't dumped
+GAME( 1996, mjmyunivbl2, mjmyuniv, mjmyunivbl2, mjmyster, ddenlovr_state, empty_init,    ROT0, "bootleg",                                     "Majiang Caihui Ying (ver 2.20)",                                 MACHINE_NO_COCKTAIL )
 
 GAME( 1994, quiz365,     0,        quiz365,   quiz365,    ddenlovr_state, empty_init,    ROT0, "Nakanihon",                                   "Quiz 365 (Japan)",                                               MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )
 GAME( 1994, quiz365t,    quiz365,  quiz365,   quiz365,    ddenlovr_state, empty_init,    ROT0, "Nakanihon / Taito",                           "Quiz 365 (Hong Kong & Taiwan)",                                  MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )
