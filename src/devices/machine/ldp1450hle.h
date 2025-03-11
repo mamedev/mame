@@ -7,8 +7,8 @@
 
 *************************************************************************/
 
-#ifndef MAME_MACHINE_LDP1450_H
-#define MAME_MACHINE_LDP1450_H
+#ifndef MAME_MACHINE_LDP1450HLE_H
+#define MAME_MACHINE_LDP1450HLE_H
 
 #pragma once
 
@@ -202,4 +202,4 @@ private:
 
 };
 
-#endif // MAME_MACHINE_LDP1450_H
+#endif // MAME_MACHINE_LDP1450HLE_H
