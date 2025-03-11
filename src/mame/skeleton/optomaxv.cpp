@@ -464,4 +464,4 @@ ROM_END
 
 } // anonymous namespace
 
-SYST( 1986, optomaxv, 0, 0, optomaxv, optomaxv, optomaxv_state, empty_init, "AMS", "Optomax V", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING ) // Hardware from 1985, software on ROM from 1096.
+SYST( 1986, optomaxv, 0, 0, optomaxv, optomaxv, optomaxv_state, empty_init, "AMS", "Optomax V", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING ) // Hardware from 1985, software on ROM from 1986.
