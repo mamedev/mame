@@ -1223,6 +1223,7 @@ void drcbe_x64::generate(drcuml_block &block, const instruction *instlist, uint3
 	}
 
 	Assembler a(&ch);
+	a.addEncodingOptions(EncodingOptions::kOptimizedAlign);
 	if (logger.file())
 		a.addDiagnosticOptions(DiagnosticOptions::kValidateIntermediate);
 
@@ -1730,6 +1731,7 @@ void drcbe_x64::op_handle(Assembler &a, const instruction &inst)
 	// emit a jump around the stack adjust in case code falls through here
 	Label skip = a.newLabel();
 	a.short_().jmp(skip);
+	a.align(AlignMode::kCode, 16);
 
 	// register the current pointer for the handle
 	inst.param(0).handle().set_codeptr(drccodeptr(a.code()->baseAddress() + a.offset()));
@@ -2890,7 +2892,7 @@ void drcbe_x64::op_read(Assembler &a, const instruction &inst)
 
 		int const shift = m_space[spacesizep.space()]->addr_shift() - 3;
 		if (m_space[spacesizep.space()]->endianness() != ENDIANNESS_LITTLE)
-			a.not_(ecx);                                                                         // swizzle address for bit Endian spaces
+			a.not_(ecx);                                                                         // swizzle address for big Endian spaces
 		if (accessors.has_high_bits && !accessors.mask_high_bits)
 			a.shr(r10d, accessors.specific.low_bits);                                            // shift off low bits
 		mov_r64_imm(a, rax, uintptr_t(accessors.specific.read.dispatch));                        // load dispatch table pointer
@@ -3089,7 +3091,7 @@ void drcbe_x64::op_readm(Assembler &a, const instruction &inst)
 
 		int const shift = m_space[spacesizep.space()]->addr_shift() - 3;
 		if (m_space[spacesizep.space()]->endianness() != ENDIANNESS_LITTLE)
-			a.not_(ecx);                                                                         // swizzle address for bit Endian spaces
+			a.not_(ecx);                                                                         // swizzle address for big Endian spaces
 		if (accessors.has_high_bits && !accessors.mask_high_bits)
 			a.shr(r10d, accessors.specific.low_bits);                                            // shift off low bits
 		mov_r64_imm(a, rax, uintptr_t(accessors.specific.read.dispatch));                        // load dispatch table pointer
@@ -3285,7 +3287,7 @@ void drcbe_x64::op_write(Assembler &a, const instruction &inst)
 
 		int const shift = m_space[spacesizep.space()]->addr_shift() - 3;
 		if (m_space[spacesizep.space()]->endianness() != ENDIANNESS_LITTLE)
-			a.not_(ecx);                                                                         // swizzle address for bit Endian spaces
+			a.not_(ecx);                                                                         // swizzle address for big Endian spaces
 		if (accessors.has_high_bits && !accessors.mask_high_bits)
 			a.shr(r10d, accessors.specific.low_bits);                                            // shift off low bits
 		mov_r64_imm(a, rax, uintptr_t(accessors.specific.write.dispatch));                       // load dispatch table pointer
@@ -3455,7 +3457,7 @@ void drcbe_x64::op_writem(Assembler &a, const instruction &inst)
 
 		int const shift = m_space[spacesizep.space()]->addr_shift() - 3;
 		if (m_space[spacesizep.space()]->endianness() != ENDIANNESS_LITTLE)
-			a.not_(ecx);                                                                         // swizzle address for bit Endian spaces
+			a.not_(ecx);                                                                         // swizzle address for big Endian spaces
 		if (accessors.has_high_bits && !accessors.mask_high_bits)
 			a.shr(r10d, accessors.specific.low_bits);                                            // shift off low bits
 		mov_r64_imm(a, rax, uintptr_t(accessors.specific.write.dispatch));                       // load dispatch table pointer
