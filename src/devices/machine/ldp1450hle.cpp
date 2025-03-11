@@ -12,7 +12,7 @@
 
     To do:
 
-        * On-screen display support 
+        * On-screen display support needs aligning with real hardware
         * Better CLV support
         * Chapter-search support
         * Repeat support (we only store the command)
@@ -29,7 +29,7 @@
         * Still step back and forth in Time Traveler glitches
           - (level select doesn't stay in place)
 		* resizing, positioning of OSD bitmaps is not optimal
-		  - only 16x16 is correctly supported, resizing seems off
+		  - 16x16 is supported, but native size and location may be wrong
 *************************************************************************/
 
 #include "emu.h"
@@ -233,7 +233,6 @@ void sony_ldp1450hle_device::overlay_draw_group(bitmap_yuy16 &bitmap, const uint
 
 	u8 char_height = text_size[(m_user_index_mode >> 2) & 0x03];
 
-
 	float xstart_normalised = (bitmap.width()/2/ 64) * xstart;
 	float ystart_normalised = (bitmap.height()/ 64) * ystart;
 
@@ -296,11 +295,6 @@ void sony_ldp1450hle_device::overlay_draw_char(bitmap_yuy16 &bitmap, uint8_t ch,
 
 	// m_user_index_mode >> 5 & 0x04: 0,2 = normal, 1 = 1px shadow, 3 = grey box 
 
-	// u32 xminbase = uint32_t(xstart * 256.0f * float(bitmap.width()));
-	// u32 xsize = uint32_t(OVERLAY_PIXEL_WIDTH * 256.0f * float(bitmap.width()));
-
-	// fatalerror("W %f Start %f , Base %d, Size %d", bitmap.width(),bitmap.height());
-
 	uint16_t white = 0xeb80;
 	uint16_t black = 0x0080;
 
@@ -343,7 +337,6 @@ void sony_ldp1450hle_device::overlay_draw_char(bitmap_yuy16 &bitmap, uint8_t ch,
 			u32 xmin = xstart + x;
 			for (u32 yy = 0; yy < OVERLAY_PIXEL_HEIGHT; yy++)
 			{
-				// printf("%04x %04x\n", ystart + (y + 1) * OVERLAY_PIXEL_HEIGHT + yy , xmin);
 				if (char_bmp.pix(y,x) != black)
 				{	
 					bitmap.pix(ystart + (y + 1) * OVERLAY_PIXEL_HEIGHT + yy, xmin) = char_bmp.pix(y,x);
