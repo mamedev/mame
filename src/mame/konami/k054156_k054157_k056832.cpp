@@ -1878,6 +1878,51 @@ u16 k056832_device::b_word_r(offs_t offset)
 	return (m_regsb[offset]);
 }   // VSCCS (board dependent)
 
+u8 k056832_device::get_mix_bits(u8 layer) {
+	// there can be several pages associated with a layer
+	// check all of them? unless there's a way to tell which specific page to check
+	std::vector<u8> pages;
+
+	for (int page = 0; page < 16; ++page) {
+		if (layer == m_layer_assoc_with_page[page]) {
+			pages.push_back(page);
+		}
+	}
+
+	// first visible pixels on screen
+	const u8 visible_x = 24;
+	const u8 visible_y = 16;
+
+	const u8 x_tile_scroll_offset = ((m_regs[0x14 + layer] + visible_x) & 0x1FF) / 8;
+	const u8 y_tile_scroll_offset = ((m_regs[0x10 + layer] + visible_y) & 0xFF) / 8;
+
+	for (auto page : pages) {
+		// 36 * 32 tiles = 288 * 256 pixels = visible area
+		const u8 scan_range_x = 36;
+		const u8 scan_range_y = 32;
+
+		for (int y = 0; y < scan_range_y; ++y) {
+			for (int x = 0; x < scan_range_x; ++x) {
+				const u8 page_tile_width = 64;
+				const u8 page_tile_height = 32;
+
+				const u8 x_tile_offset = (x + x_tile_scroll_offset) & page_tile_width - 1;
+				const u8 y_tile_offset = (y + y_tile_scroll_offset) & page_tile_height - 1;
+
+				const u32 offset = ((x_tile_offset * 2) + (y_tile_offset * 0x80)) | (page << 12);
+				const u8 bits = (m_videoram[offset] >> 2) & 0b11; // mystwarr
+				// const u8 bits = (m_videoram[offset] >> 6) & 0b11; // sexyparo
+
+				if (bits) {
+					return bits;
+				}
+			}
+		}
+	}
+
+	return 0;
+}
+
 /*
 
   some drivers still rely on this non-device implementation, this should be collapsed into the device.

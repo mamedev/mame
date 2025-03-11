@@ -546,7 +546,8 @@ void k053247_device::zdrawgfxzoom32GP(
 				{
 					const u8 alpha_level = alpha;
 					const bool additive_mode = alpha & (1 << 8);
-					// todo: use mix_pri to flip src & dst
+					// mix_pri flips src & dst
+					// todo: find a game that exhibits this behavior
 					// const bool mix_pri = alpha & (1 << 9);
 
 					const u32 src = pal_base[pal_idx];

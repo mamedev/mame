@@ -698,25 +698,42 @@ void konamigx_state::konamigx_mixer_draw(screen_device &screen, bitmap_rgb32 &bi
 	}
 }
 
-void konamigx_state::gx_draw_basic_tilemaps(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, int code)
+void konamigx_state::gx_draw_basic_tilemaps(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, u8 layer)
 {
-	int temp1,temp2,temp3,temp4;
-	int i = code<<1;
-	int j = mixerflags>>i & 3;
-	int k = 0;
+	const u8 disp = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
 
-	int disp = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
-	if (disp & (1<<code))
+	if (disp & (1 << layer))
 	{
-		set_brightness(code);
+		set_brightness(layer);
 
-		if (j == GXMIX_BLEND_NONE)  { temp1 = 0xff; temp2 = temp3 = 0; } else
-		if (j == GXMIX_BLEND_FORCE) { temp1 = 0x00; temp2 = mixerflags>>(i+16); temp3 = 3; }
+		const u8 layer2 = layer << 1;
+		const u8 j = mixerflags >> layer2 & 0b11;
+		u8 mix_mode_bits = 0;
+
+		if (j == GXMIX_BLEND_NONE) // hack
+		{
+			mix_mode_bits = 0;
+		}
+		else if (j == GXMIX_BLEND_FORCE) // hack
+		{
+			mix_mode_bits = mixerflags >> (layer2 + 16) & 0b11;
+		}
 		else
 		{
-			temp1 = m_vinmix;
-			temp2 = m_vinmix>>i & 3;
-			temp3 = m_vmixon>>i & 3;
+			const u8 v_inmix_layer = m_vinmix >> layer2 & 0b11;
+			const u8 v_inmix_on_layer = m_vmixon >> layer2 & 0b11;
+
+			// scan tilemaps for mixing mode bits if v_inmix_on_layer is 0.
+			// this probably needs to be done if v_inmix_on_layer != 0b11.
+			// todo: find a game that exhibits this behavior.
+			if (!v_inmix_on_layer)
+			{
+				mix_mode_bits = m_k056832->get_mix_bits(layer);
+			}
+			else
+			{
+				mix_mode_bits = v_inmix_layer;
+			}
 		}
 
 		/* blend layer only when:
@@ -725,17 +742,17 @@ void konamigx_state::gx_draw_basic_tilemaps(screen_device &screen, bitmap_rgb32 
 		    3) all mix code bits are internal(overridden until tile blending has been implemented)
 		    4) 0 > alpha < 255;
 		*/
-		if (temp1!=0xff && temp2 /*&& temp3==3*/)
-		{
-			temp4 = m_k054338->set_alpha_level(temp2) & 0xFF;
 
-			if (temp4 <= 0) return;
-			if (temp4 < 255) k = TILEMAP_DRAW_ALPHA(temp4);
+		int k = 0;
+
+		if (const int alpha = m_k054338->set_alpha_level(mix_mode_bits) & 0xFF; alpha < 255)
+		{
+			k = TILEMAP_DRAW_ALPHA(alpha);
 		}
 
-		if (mixerflags & 1<<(code+12)) k |= K056382_DRAW_FLAG_FORCE_XYSCROLL;
+		if (mixerflags & 1 << (layer + 12)) k |= K056382_DRAW_FLAG_FORCE_XYSCROLL;
 
-		m_k056832->m_tilemap_draw(screen, bitmap, cliprect, code, k, 0);
+		m_k056832->m_tilemap_draw(screen, bitmap, cliprect, layer, k, 0);
 	}
 }
 

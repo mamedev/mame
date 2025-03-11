@@ -59,15 +59,6 @@ void mystwarr_state::decode_tiles()
 // Mystic Warriors requires tile based blending.
 K056832_CB_MEMBER(mystwarr_state::mystwarr_tile_callback)
 {
-	if (layer == 1)
-	{
-		//* water hack (TEMPORARY)
-		if ((*code & 0xff00) + (*color) == 0x4101)
-			m_cbparam++;
-		else
-			m_cbparam--;
-	}
-
 	*color = m_layer_colorbase[layer] | (*color >> 1 & 0x1e);
 }
 
@@ -262,14 +253,6 @@ VIDEO_START_MEMBER(mystwarr_state, martchmp)
 
 uint32_t mystwarr_state::screen_update_mystwarr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int blendmode = 0;
-
-	//* water hack (TEMPORARY)
-	if (m_cbparam < 0)
-		m_cbparam = 0;
-	else if (m_cbparam >= 32)
-		blendmode = (1 << 16 | GXMIX_BLEND_FORCE) << 2;
-
 	for (int i = 0; i < 4; i++)
 	{
 		int old = m_layer_colorbase[i];
@@ -279,7 +262,7 @@ uint32_t mystwarr_state::screen_update_mystwarr(screen_device &screen, bitmap_rg
 
 	m_sprite_colorbase = m_k055555->K055555_get_palette_index(4) << 5;
 
-	konamigx_mixer(screen, bitmap, cliprect, nullptr, 0, nullptr, 0, blendmode, nullptr, 0);
+	konamigx_mixer(screen, bitmap, cliprect, nullptr, 0, nullptr, 0, 0, nullptr, 0);
 	return 0;
 }
 
