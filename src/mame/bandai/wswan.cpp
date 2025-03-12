@@ -35,7 +35,6 @@
 #include "machine/nvram.h"
 #include "bus/wswan/slot.h"
 #include "bus/wswan/rom.h"
-#include "emupal.h"
 #include "render.h"
 #include "screen.h"
 #include "softlist_dev.h"
@@ -150,7 +149,6 @@ protected:
 	void common_start();
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
-	void palette(palette_device &palette) const;
 
 	void io_map(address_map &map) ATTR_COLD;
 	void mem_map(address_map &map) ATTR_COLD;
@@ -175,7 +173,6 @@ public:
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	void mem_map(address_map &map) ATTR_COLD;
-	void palette(palette_device &palette) const;
 	virtual u16 get_internal_eeprom_address() override;
 };
 
@@ -227,33 +224,6 @@ static INPUT_PORTS_START(wswan)
 INPUT_PORTS_END
 
 
-static GFXDECODE_START(gfx_wswan)
-GFXDECODE_END
-
-
-/* WonderSwan can display 16 shades of grey */
-void wswan_state::palette(palette_device &palette) const
-{
-	for (int i = 0; i < 16; i++)
-	{
-		u8 const shade = i * (256 / 16);
-		palette.set_pen_color(15 - i, shade, shade, shade);
-	}
-}
-
-
-void wscolor_state::palette(palette_device &palette) const
-{
-	for (int i = 0; i < 4096; i++)
-	{
-		int const r = (i & 0x0f00) >> 8;
-		int const g = (i & 0x00f0) >> 4;
-		int const b = i & 0x000f;
-		palette.set_pen_color(i, r << 4, g << 4, b << 4);
-	}
-}
-
-
 static void wswan_cart(device_slot_interface &device)
 {
 	device.option_add_internal("ws_rom",     WS_ROM_STD);
@@ -273,7 +243,6 @@ void wswan_state::wswan_base(machine_config &config)
 
 	WSWAN_VIDEO(config, m_vdp, X1 / 4);
 	m_vdp->set_screen("screen");
-	m_vdp->set_vdp_type(wswan_video_device::VDP_TYPE_WSWAN);
 	m_vdp->set_irq_callback(FUNC(wswan_state::set_irq_line));
 	m_vdp->set_dmasnd_callback(FUNC(wswan_state::dma_sound_cb));
 	m_vdp->icons_cb().set(FUNC(wswan_state::set_icons));
@@ -281,16 +250,13 @@ void wswan_state::wswan_base(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_screen_update("vdp", FUNC(wswan_video_device::screen_update));
 	screen.set_raw(X1 / 4, 256, 0, wswan_video_device::WSWAN_X_PIXELS, 159, 0, wswan_video_device::WSWAN_Y_PIXELS);
-	screen.set_palette("palette");
+	screen.set_palette("vdp");
 
 	config.set_default_layout(layout_wswan);
 
 	config.set_maximum_quantum(attotime::from_hz(60));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-
-	GFXDECODE(config, "gfxdecode", "palette", gfx_wswan);
-	PALETTE(config, "palette", FUNC(wswan_state::palette), 16);
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
@@ -330,11 +296,11 @@ void wscolor_state::wscolor(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &wscolor_state::mem_map);
 
-	m_vdp->set_vdp_type(wswan_video_device::VDP_TYPE_WSC);
-
-	auto &palette(*subdevice<palette_device>("palette"));
-	palette.set_entries(4096);
-	palette.set_init(FUNC(wscolor_state::palette));
+	WSWAN_COLOR_VIDEO(config.replace(), m_vdp, X1 / 4);
+	m_vdp->set_screen("screen");
+	m_vdp->set_irq_callback(FUNC(wscolor_state::set_irq_line));
+	m_vdp->set_dmasnd_callback(FUNC(wscolor_state::dma_sound_cb));
+	m_vdp->icons_cb().set(FUNC(wscolor_state::set_icons));
 
 	// software lists
 	config.device_remove("wsc_list");
@@ -597,13 +563,13 @@ u16 wswan_state::port_r(offs_t offset, u16 mem_mask)
 			{
 			case 0x10:  // Read Y cursors: Y1 - Y2 - Y3 - Y4
 				{
-					u8 input = m_cursy->read();
+					u8 const input = m_cursy->read();
 					if (m_rotate) // reorient controls if the console is rotated
 					{
-						if (input & 0x01) value |= 0x0200;
-						if (input & 0x02) value |= 0x0400;
-						if (input & 0x04) value |= 0x0800;
-						if (input & 0x08) value |= 0x0100;
+						if (BIT(input, 0)) value |= 0x0200;
+						if (BIT(input, 1)) value |= 0x0400;
+						if (BIT(input, 2)) value |= 0x0800;
+						if (BIT(input, 3)) value |= 0x0100;
 					}
 					else
 						value = value | (input << 8);
@@ -611,13 +577,13 @@ u16 wswan_state::port_r(offs_t offset, u16 mem_mask)
 				break;
 			case 0x20:  // Read X cursors: X1 - X2 - X3 - X4
 				{
-					u8 input = m_cursx->read();
+					u8 const input = m_cursx->read();
 					if (m_rotate) // reorient controls if the console is rotated
 					{
-						if (input & 0x01) value |= 0x0200;
-						if (input & 0x02) value |= 0x0400;
-						if (input & 0x04) value |= 0x0800;
-						if (input & 0x08) value |= 0x0100;
+						if (BIT(input, 0)) value |= 0x0200;
+						if (BIT(input, 1)) value |= 0x0400;
+						if (BIT(input, 2)) value |= 0x0800;
+						if (BIT(input, 3)) value |= 0x0100;
 					}
 					else
 						value = value | (input << 8);
@@ -892,14 +858,14 @@ void wswan_state::port_w(offs_t offset, u16 data, u16 mem_mask)
 				m_internal_eeprom_command = data & 0xfc;
 				if (m_internal_eeprom_command & 0x20)
 				{
-					u16 addr = get_internal_eeprom_address();
+					u16 const addr = get_internal_eeprom_address();
 					m_internal_eeprom[addr] = m_internal_eeprom_data & 0xff;
 					m_internal_eeprom[addr + 1] = m_internal_eeprom_data >> 8;
 					m_internal_eeprom_command |= 0x02;
 				}
 				else if (m_internal_eeprom_command & 0x10)
 				{
-					u16 addr = get_internal_eeprom_address();
+					u16 const addr = get_internal_eeprom_address();
 					m_internal_eeprom_data = m_internal_eeprom[addr] | (m_internal_eeprom[addr + 1] << 8);
 					m_internal_eeprom_command |= 0x01;
 				}
@@ -942,7 +908,7 @@ void wswan_state::set_icons(u8 data)
 		m_icons[i] = BIT(data, i);
 	}
 
-	u8 old_rotate = m_rotate;
+	u8 const old_rotate = m_rotate;
 
 	if ((!BIT(data, 2) && BIT(data, 1)) || (BIT(data, 2) && !BIT(data, 1)))
 	{
@@ -950,7 +916,7 @@ void wswan_state::set_icons(u8 data)
 
 		if (old_rotate != m_rotate)
 		{
-				set_rotate_view();
+			set_rotate_view();
 		}
 	}
 }
