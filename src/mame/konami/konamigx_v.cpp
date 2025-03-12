@@ -728,7 +728,7 @@ void konamigx_state::gx_draw_basic_tilemaps(screen_device &screen, bitmap_rgb32 
 			{
 				// if v_inmix_on_layer == 0, the mix mode bits are are taken from the tiles.
 				// this probably needs to be done if v_inmix_on_layer != 0b11, not just v_inmix_on_layer == 0b00?
-				// todo: find a game that sets v_inmix_on to 0b01 or 0b10. 
+				// todo: find a game that sets v_inmix_on to 0b01 or 0b10.
 				mix_mode_bits2 = u32(mixerflags) >> 30;
 			}
 			else
