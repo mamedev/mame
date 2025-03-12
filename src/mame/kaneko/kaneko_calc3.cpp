@@ -19,7 +19,7 @@
     - Supply code / data snippets to the 68000 by decrypting them from ROM
 
 
-    may also be responsible for the hit detection (kaneko_hit.c)
+    may also be responsible for the hit detection (kaneko/kaneko_hit.cpp)
 
 */
 
@@ -36,7 +36,8 @@ kaneko_calc3_device::kaneko_calc3_device(const machine_config &mconfig, const ch
 	, m_maincpu(*this, finder_base::DUMMY_TAG)
 	, m_eeprom(*this, finder_base::DUMMY_TAG)
 	, m_calc3_region(*this, finder_base::DUMMY_TAG)
-	, m_mcuram(*this, ":mcuram")
+	, m_mcuram(*this, finder_base::DUMMY_TAG)
+	, m_dsw_port(*this, finder_base::DUMMY_TAG)
 	, m_mcu_status(0)
 	, m_mcu_command_offset(0)
 	, m_mcu_crc(0)
@@ -1215,7 +1216,7 @@ const int16_t kaneko_calc3_device::s_keydata[] = {
 	-1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
 };
 
-uint8_t kaneko_calc3_device::shift_bits(uint8_t dat, int bits)
+uint8_t kaneko_calc3_device::rotate_bits(uint8_t dat, int bits)
 {
 	return (dat << (bits & 7)) | (dat >> (8 - (bits & 7)));
 }
@@ -1368,7 +1369,7 @@ int kaneko_calc3_device::decompress_table(int tabnum, uint8_t* dstram, int dstof
 								uint8_t inlinet = datarom[inline_table_base + (i % inline_table_size)];
 								dat = datarom[offset + i];
 								dat -= inlinet;
-								dat = shift_bits(dat, m_shift);
+								dat = rotate_bits(dat, m_shift);
 							}
 							else
 							{
@@ -1386,7 +1387,7 @@ int kaneko_calc3_device::decompress_table(int tabnum, uint8_t* dstram, int dstof
 									dat += extra[(i%inline_table_size)>>1];
 								}
 
-								dat = shift_bits(dat, 8-m_shift);
+								dat = rotate_bits(dat, 8-m_shift);
 							}
 						}
 						else
@@ -1396,7 +1397,7 @@ int kaneko_calc3_device::decompress_table(int tabnum, uint8_t* dstram, int dstof
 								uint8_t inlinet = datarom[inline_table_base + (i % inline_table_size)];
 								dat = datarom[offset + i];
 								dat -= inlinet;
-								dat = shift_bits(dat, m_shift);
+								dat = rotate_bits(dat, m_shift);
 							}
 							else
 							{
@@ -1410,7 +1411,7 @@ int kaneko_calc3_device::decompress_table(int tabnum, uint8_t* dstram, int dstof
 								{
 									dat += extra2[(i % inline_table_size) >> 1];
 								}
-								dat = shift_bits(dat, 8 - m_shift);
+								dat = rotate_bits(dat, 8 - m_shift);
 							}
 						}
 					}
@@ -1467,22 +1468,22 @@ int kaneko_calc3_device::decompress_table(int tabnum, uint8_t* dstram, int dstof
 
 						if (m_alternateswaps == 0)
 						{
-							if ((i & 1) == 0) dat = shift_bits(dat, 8 - m_shift);
-							else              dat = shift_bits(dat, m_shift);
+							if ((i & 1) == 0) dat = rotate_bits(dat, 8 - m_shift);
+							else              dat = rotate_bits(dat, m_shift);
 						}
 						else if (m_alternateswaps == 1)
 						{
-							dat = shift_bits(dat, 8 - m_shift);
+							dat = rotate_bits(dat, 8 - m_shift);
 						}
 						else if (m_alternateswaps == 2)
 						{
-							dat = shift_bits(dat, m_shift);
+							dat = rotate_bits(dat, m_shift);
 						}
 						else if (m_alternateswaps == 3)
 						{
 							// same as 0
-							if ((i & 1) == 0) dat = shift_bits(dat, 8 - m_shift);
-							else              dat = shift_bits(dat, m_shift);
+							if ((i & 1) == 0) dat = rotate_bits(dat, 8 - m_shift);
+							else              dat = rotate_bits(dat, m_shift);
 						}
 					}
 
@@ -1519,7 +1520,7 @@ int kaneko_calc3_device::decompress_table(int tabnum, uint8_t* dstram, int dstof
 
 void kaneko_calc3_device::initial_scan_tables()
 {
-	uint8_t* datarom = memregion(":calc3_rom")->base();
+	uint8_t* datarom = m_calc3_region->base();
 
 	m_mcu_crc = 0;
 	for (int x=0;x<0x20000;x++)
@@ -1589,7 +1590,7 @@ void kaneko_calc3_device::mcu_run()
 	if (m_mcu_status != (1|2|4|8))
 		return;
 
-	if (m_dsw_addr) space.write_byte(m_dsw_addr + 0x200000, (~ioport(":DSW1")->read()) & 0xff); // // DSW // dsw actually updates in realtime - mcu reads+writes it every frame
+	if (m_dsw_addr) space.write_byte(m_dsw_addr + 0x200000, (~m_dsw_port->read()) & 0xff); // // DSW // dsw actually updates in realtime - mcu reads+writes it every frame
 
 
 	//m_mcu_status = 0;
@@ -1627,7 +1628,7 @@ void kaneko_calc3_device::mcu_run()
 			printf("Calc 3 Init Command - %04x ROM Checksum Address\n",  m_checksumaddress);
 			printf("Calc 3 Init Command - %08x Data Write Address\n",  m_writeaddress);
 #endif
-	//      space.write_byte(m_dsw_addr+0x200000, ( ~ioport("DSW1")->read())&0xff); // // DSW // dsw actually updates in realtime - mcu reads+writes it every frame
+	//      space.write_byte(m_dsw_addr+0x200000, ( ~m_dsw_port->read())&0xff); // // DSW // dsw actually updates in realtime - mcu reads+writes it every frame
 
 			m_mcuram[m_checksumaddress / 2] = m_mcu_crc;              // MCU Rom Checksum!
 
