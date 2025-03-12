@@ -394,7 +394,7 @@ void optomaxv_state::optomaxv(machine_config &config)
 
 	M3002(config, m_rtc_2, 1.8432_MHz_XTAL); // uEM M-3002-16PI Real Time Clock
 
-	// Teletext PCB (B5) (BBC Micro compatible CUBE EuroBEEB System Teletext Video Card)
+	// Teletext PCB (B5) (CUBE EuroBEEB System Teletext Video Card)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(16_MHz_XTAL, 1024, 0, 640, 312, 0, 256);
@@ -446,8 +446,8 @@ ROM_START(optomaxv)
 	ROM_LOAD( "b1_9000-vs-1.1_d2716d.ic46",             0x00000, 0x00800, CRC(ebaefb94) SHA1(ca6d194926a98b846443ce7393e3b44d3e5199f9) ) // On Video PCB (B1)
 
 	ROM_REGION(0x00200, "proms", 0)
-	ROM_LOAD( "b6_sp007mp_82s147n.ic9",                 0x00000, 0x00200, CRC(35aaa7a3) SHA1(ebc977ff748a19cd0e9d0626cf7cf97d07656f80) ) // On OSD PCB (B6), for BBC CPU address decoding
-	ROM_LOAD( "b6_502_82s147.ic10",                     0x00000, 0x00200, CRC(401fa579) SHA1(e6320f70da9dfed0daae47af7b6cf9f3a62313b2) ) // On OSD PCB (B6), for BBC CPU address decoding. Same as the standard EURO-BEEB
+	ROM_LOAD( "b6_sp007mp_82s147n.ic9",                 0x00000, 0x00200, CRC(35aaa7a3) SHA1(ebc977ff748a19cd0e9d0626cf7cf97d07656f80) ) // On OSD PCB (B6), for CPU address decoding
+	ROM_LOAD( "b6_502_82s147.ic10",                     0x00000, 0x00200, CRC(401fa579) SHA1(e6320f70da9dfed0daae47af7b6cf9f3a62313b2) ) // On OSD PCB (B6), for CPU address decoding. Same as the standard EURO-BEEB
 	ROM_LOAD( "b3_b515c1-1.ic15",                       0x00000, 0x00200, CRC(c4b02b5f) SHA1(e7b3363974b8a1b61169f543a672dff37e8e0e11) ) // On PCB (B3)
 	ROM_LOAD( "b2_cpi-sl-1.3_am27s21a.ic29",            0x00000, 0x00100, CRC(897071f9) SHA1(912154fd24d3601bcfd7fbd61be5c1ade62c12f3) ) // On Measurement PCB (B2)
 	ROM_LOAD( "b2_hb-11.2_mb7124h.ic6",                 0x00000, 0x00200, CRC(78bab798) SHA1(f5b88db41efed9c540801c367047d608fb086094) ) // On Measurement PCB (B2)
