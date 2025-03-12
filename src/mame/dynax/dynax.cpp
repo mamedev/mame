@@ -3596,9 +3596,11 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( mjreach )
 	// The manual provides two sets of standard settings:
-	//       標準設定　シングル向け                        標準設定　メダルコーナー向け
+	//       標準設定　シングル向け                        標準設定　メダルコーナー向け(*工場出荷時は、標準設定メダルコーナー向けに設定してあります。)
 	// SW 1  OFF OFF OFF  ON  ON  ON OFF  ON  ON OFF       OFF OFF OFF  ON  ON  ON OFF  ON  ON OFF
 	// SW 2  OFF OFF OFF OFF OFF OFF  ON  ON  ON  ON       OFF OFF OFF OFF  ON OFF OFF OFF  ON  ON
+    // SW 3  OFF OFF ON	 ON	 ON	 ON   ON  ON ON	ON         OFF	OFF	ON	ON	ON	ON	ON	ON	ON	ON
+    // SW 4  OFF ON	ON	ON	ON	ON	ON	OFF	OFF	OFF        ON	ON	ON	OFF	ON	ON	ON	OFF	ON	OFF
 
 	PORT_START("DSW0")
 	MAHJONG_PAYOUT_RATE(0, "DIP-SW1:1,2,3,4")
@@ -3623,8 +3625,8 @@ static INPUT_PORTS_START( mjreach )
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, "Payout Mode" )                   PORT_DIPLOCATION("DIP-SW3:1")      // ゲーム仕様
-	PORT_DIPSETTING(    0x01, "Key-out" )                                                          // クレジット式
-	PORT_DIPSETTING(    0x00, "Hopper" )                                                           // ホッパー式
+	PORT_DIPSETTING(    0x01, "Key-out" )                                                          // クレジット式//(注1)ホッパーコントロール基板をメインボード上の8Pよりコントロールするタイプ(例 当社オリジナル基板D28H-CON)の筐体はホッパータイプに設定してください。
+	PORT_DIPSETTING(    0x00, "Hopper" )                                                           // ホッパー式//(注2)マルチ「MEDAL」筐体(アウトカウンター出力よりホッパーをコントロールする基板「ホッパーサブ」が付いている筐体)はクレジットタイプに設定してください。
 	PORT_DIPNAME( 0x02, 0x02, "Hopper Polarity" )               PORT_DIPLOCATION("DIP-SW3:2")      // ホッパーアクティブ
 	PORT_DIPSETTING(    0x02, DEF_STR(Normal) )                                                    // 通常
 	PORT_DIPSETTING(    0x00, "Inverted" )                                                         // 反転
@@ -3686,12 +3688,13 @@ static INPUT_PORTS_START( mjreach )
 	PORT_DIPSETTING(    0x10, DEF_STR(Off) )                                                       // 無
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                        // 有
 	PORT_DIPNAME( 0x20, 0x00, "Payout Variation" )              PORT_DIPLOCATION("DIP-SW3:10")     // 配当の波
-	PORT_DIPSETTING(    0x20, "Small" )                                                            // 小さい
+	PORT_DIPSETTING(    0x20, "Small" )                                                            // 小さい//(注3)配当の波は、スーバーリボルバーが有の状態の時に作動します。
+PAY-OUT·RATEが設定置よりも高くなる場合はOFFとしてください。
 	PORT_DIPSETTING(    0x00, DEF_STR(Normal) )                                                    // 通常
 	PORT_DIPNAME( 0x40, 0x40, "Renchan Gal Display" )           PORT_DIPLOCATION("DIP-SW4:9")      // 連荘ギャルの表示の方式
-	PORT_DIPSETTING(    0x40, "After Each Win" )                                                   // 勝つごとに表示 (= On according to manual page?)
-	PORT_DIPSETTING(    0x00, "After 3 Consecutive Wins" )                                         // ３連荘のみ表示 (= Off according to manual page?)
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR(Unknown) )                PORT_DIPLOCATION("DIP-SW4:10")     // ＯＦＦ固定
+	PORT_DIPSETTING(    0x40, "After Each Win" )                                                   // 勝つごとに表示 ON （default）
+	PORT_DIPSETTING(    0x00, "Only After 3 Renso" )                                         // ３連荘後のみ表示 OFF
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR(Unknown) )                PORT_DIPLOCATION("DIP-SW4:10")     // ＯＦＦ固定 （SELECT MENU?）
 	PORT_DIPSETTING(    0x80, DEF_STR(Off) )
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )
 
