@@ -26,7 +26,11 @@
 #include "emu.h"
 #include "kaneko_calc3.h"
 
-#define VERBOSE_OUTPUT 0
+//#define VERBOSE 1
+#include "logmacro.h"
+
+
+#define DUMP_TABLES 0
 
 
 DEFINE_DEVICE_TYPE(KANEKO_CALC3, kaneko_calc3_device, "kaneko_calc3", "Kaneko CALC3 MCU")
@@ -1216,7 +1220,7 @@ const int16_t kaneko_calc3_device::s_keydata[] = {
 	-1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
 };
 
-uint8_t kaneko_calc3_device::rotate_bits(uint8_t dat, int bits)
+constexpr uint8_t calc3_rotate_bits(uint8_t dat, int bits)
 {
 	return (dat << (bits & 7)) | (dat >> (8 - (bits & 7)));
 }
@@ -1224,7 +1228,7 @@ uint8_t kaneko_calc3_device::rotate_bits(uint8_t dat, int bits)
 int kaneko_calc3_device::decompress_table(int tabnum, uint8_t* dstram, int dstoffset)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	uint8_t* datarom = m_calc3_region->base();
+	uint8_t *datarom = m_calc3_region->base();
 
 	uint16_t length;
 	int local_counter=0;
@@ -1244,9 +1248,9 @@ int kaneko_calc3_device::decompress_table(int tabnum, uint8_t* dstram, int dstof
 	for (int x = 0; x < tabnum; x++)
 	{
 		uint8_t blocksize_offset = datarom[offset+0]; // location of the 'block length'
-		offset+= blocksize_offset+1;
-		length = datarom[offset+0] | (datarom[offset+1]<<8);
-		offset+=length+2;
+		offset += blocksize_offset + 1;
+		length = datarom[offset + 0] | (datarom[offset + 1] << 8);
+		offset += length + 2;
 	}
 
 	// we're at the start of the block, get the info about it
@@ -1256,13 +1260,13 @@ int kaneko_calc3_device::decompress_table(int tabnum, uint8_t* dstram, int dstof
 		m_database = offset;
 		m_blocksize_offset =    datarom[offset+0]; // location of the 'block length'
 		m_mode =                datarom[offset+1];
-		m_alternateswaps =             datarom[offset+2];
-		m_shift = (m_alternateswaps &0xf0)>>4;
-		m_subtracttype = (m_alternateswaps &0x03);
+		m_alternateswaps =      datarom[offset+2];
+		m_shift = (m_alternateswaps & 0xf0) >> 4;
+		m_subtracttype = (m_alternateswaps & 0x03);
 		m_alternateswaps &= 0x0c;
-		m_alternateswaps >>=2;
+		m_alternateswaps >>= 2;
 
-		m_decryption_key_byte = datarom[offset+3];
+		m_decryption_key_byte = datarom[offset + 3];
 
 
 		// if blocksize_offset > 3, it appears to specify the encryption table as 'inline' which can be of any size (odd or even) and loops over the bytes to decrypt
@@ -1273,20 +1277,20 @@ int kaneko_calc3_device::decompress_table(int tabnum, uint8_t* dstram, int dstof
 			inline_table_size = m_blocksize_offset-3;
 		}
 
-		offset+= m_blocksize_offset+1;
+		offset += m_blocksize_offset+1;
 		length = datarom[offset+0] | (datarom[offset+1]<<8);
-		offset+=2;
+		offset +=2;
 
-#if VERBOSE_OUTPUT
 		if (inline_table_size)
 		{
-			printf("Block %02x Found Base %04x - Inline Encryption (size %02x) - Mode? %02x Shift %01x Subtract Type %01x AltSwaps %01x Key (unused?) %02x Length %04x\n", tabnum, m_database, inline_table_size, m_shift, m_mode, m_subtracttype, m_alternateswaps, m_decryption_key_byte, length);
+			LOG("Block %02x Found Base %04x - Inline Encryption (size %02x) - Mode? %02x Shift %01x Subtract Type %01x AltSwaps %01x Key (unused?) %02x Length %04x\n",
+					tabnum, m_database, inline_table_size, m_shift, m_mode, m_subtracttype, m_alternateswaps, m_decryption_key_byte, length);
 		}
 		else
 		{
-			printf("Block %02x Found Base %04x - Mode? %02x Shift %01x Subtract Type %01x AltSwaps %01x Key %02x Length %04x\n", tabnum, m_database, m_mode, m_shift, m_subtracttype, m_alternateswaps, m_decryption_key_byte, length);
+			LOG("Block %02x Found Base %04x - Mode? %02x Shift %01x Subtract Type %01x AltSwaps %01x Key %02x Length %04x\n",
+					tabnum, m_database, m_mode, m_shift, m_subtracttype, m_alternateswaps, m_decryption_key_byte, length);
 		}
-#endif
 		// copy + decrypt the table to the specified memory area
 		//if (dstram)
 		{
@@ -1369,7 +1373,7 @@ int kaneko_calc3_device::decompress_table(int tabnum, uint8_t* dstram, int dstof
 								uint8_t inlinet = datarom[inline_table_base + (i % inline_table_size)];
 								dat = datarom[offset + i];
 								dat -= inlinet;
-								dat = rotate_bits(dat, m_shift);
+								dat = calc3_rotate_bits(dat, m_shift);
 							}
 							else
 							{
@@ -1387,7 +1391,7 @@ int kaneko_calc3_device::decompress_table(int tabnum, uint8_t* dstram, int dstof
 									dat += extra[(i%inline_table_size)>>1];
 								}
 
-								dat = rotate_bits(dat, 8-m_shift);
+								dat = calc3_rotate_bits(dat, 8 - m_shift);
 							}
 						}
 						else
@@ -1397,7 +1401,7 @@ int kaneko_calc3_device::decompress_table(int tabnum, uint8_t* dstram, int dstof
 								uint8_t inlinet = datarom[inline_table_base + (i % inline_table_size)];
 								dat = datarom[offset + i];
 								dat -= inlinet;
-								dat = rotate_bits(dat, m_shift);
+								dat = calc3_rotate_bits(dat, m_shift);
 							}
 							else
 							{
@@ -1411,7 +1415,7 @@ int kaneko_calc3_device::decompress_table(int tabnum, uint8_t* dstram, int dstof
 								{
 									dat += extra2[(i % inline_table_size) >> 1];
 								}
-								dat = rotate_bits(dat, 8 - m_shift);
+								dat = calc3_rotate_bits(dat, 8 - m_shift);
 							}
 						}
 					}
@@ -1434,7 +1438,7 @@ int kaneko_calc3_device::decompress_table(int tabnum, uint8_t* dstram, int dstof
 			}
 			else
 			{
-				const int16_t* key = s_keydata + (m_decryption_key_byte * 0x40);
+				const int16_t *const key = s_keydata + (m_decryption_key_byte * 0x40);
 
 				if (key[0] == -1)
 				{
@@ -1453,12 +1457,12 @@ int kaneko_calc3_device::decompress_table(int tabnum, uint8_t* dstram, int dstof
 						}
 						else if (m_subtracttype == 1)
 						{
-							if ((i&1)==1) dat += keydat;
+							if (i & 1) dat += keydat;
 							else dat -= keydat;
 						}
 						else if (m_subtracttype == 2)
 						{
-							if ((i&1)==0) dat += keydat;
+							if (!(i & 1)) dat += keydat;
 							else dat -= keydat;
 						}
 						else if (m_subtracttype == 3)
@@ -1468,22 +1472,22 @@ int kaneko_calc3_device::decompress_table(int tabnum, uint8_t* dstram, int dstof
 
 						if (m_alternateswaps == 0)
 						{
-							if ((i & 1) == 0) dat = rotate_bits(dat, 8 - m_shift);
-							else              dat = rotate_bits(dat, m_shift);
+							if (!(i & 1)) dat = calc3_rotate_bits(dat, 8 - m_shift);
+							else          dat = calc3_rotate_bits(dat, m_shift);
 						}
 						else if (m_alternateswaps == 1)
 						{
-							dat = rotate_bits(dat, 8 - m_shift);
+							dat = calc3_rotate_bits(dat, 8 - m_shift);
 						}
 						else if (m_alternateswaps == 2)
 						{
-							dat = rotate_bits(dat, m_shift);
+							dat = calc3_rotate_bits(dat, m_shift);
 						}
 						else if (m_alternateswaps == 3)
 						{
 							// same as 0
-							if ((i & 1) == 0) dat = rotate_bits(dat, 8 - m_shift);
-							else              dat = rotate_bits(dat, m_shift);
+							if (!(i & 1)) dat = calc3_rotate_bits(dat, 8 - m_shift);
+							else          dat = calc3_rotate_bits(dat, m_shift);
 						}
 					}
 
@@ -1512,7 +1516,7 @@ int kaneko_calc3_device::decompress_table(int tabnum, uint8_t* dstram, int dstof
 		m_dataend = offset+length+1;
 	}
 
-	//printf("data base %04x data end %04x\n", m_database, m_dataend);
+	//logerror("data base %04x data end %04x\n", m_database, m_dataend);
 
 	return length;
 
@@ -1520,16 +1524,16 @@ int kaneko_calc3_device::decompress_table(int tabnum, uint8_t* dstram, int dstof
 
 void kaneko_calc3_device::initial_scan_tables()
 {
-	uint8_t* datarom = m_calc3_region->base();
+	uint8_t *datarom = m_calc3_region->base();
 
 	m_mcu_crc = 0;
 	for (int x=0;x<0x20000;x++)
 	{
 		m_mcu_crc+=datarom[x];
 	}
-	//printf("crc %04x\n",m_mcu_crc);
+	//logerror("crc %04x\n",m_mcu_crc);
 
-#if VERBOSE_OUTPUT
+#if DUMP_TABLES
 	uint8_t numregions = datarom[0];
 
 	for (int x=0; x<numregions; x++)
@@ -1570,7 +1574,7 @@ void kaneko_calc3_device::initial_scan_tables()
 	// to that extra block of data
 
 	// dump out the 0x1000 sized block at the end
-#if VERBOSE_OUTPUT
+#if DUMP_TABLES
 	{
 		auto filename = util::string_format("data_%s_finalblock", machine().system().name);
 		auto fp = fopen(filename.c_str(), "w+b");
@@ -1590,7 +1594,7 @@ void kaneko_calc3_device::mcu_run()
 	if (m_mcu_status != (1|2|4|8))
 		return;
 
-	if (m_dsw_addr) space.write_byte(m_dsw_addr + 0x200000, (~m_dsw_port->read()) & 0xff); // // DSW // dsw actually updates in realtime - mcu reads+writes it every frame
+	if (m_dsw_addr) space.write_byte(m_dsw_addr + 0x200000, ~m_dsw_port->read() & 0xff); // // DSW // dsw actually updates in realtime - mcu reads+writes it every frame
 
 
 	//m_mcu_status = 0;
@@ -1600,12 +1604,12 @@ void kaneko_calc3_device::mcu_run()
 	if (mcu_command == 0) return;
 
 	logerror("%s : MCU executed command at %04X: %04X\n",
-		machine().describe_context(),m_mcu_command_offset,mcu_command);
+			machine().describe_context(), m_mcu_command_offset, mcu_command);
 
 
 	if (mcu_command > 0)
 	{
-		/* 0xff is a special 'init' command */
+		// 0xff is a special 'init' command
 		if (mcu_command == 0xff)
 		{
 			// clear old command (handshake to main cpu)
@@ -1620,15 +1624,15 @@ void kaneko_calc3_device::mcu_run()
 
 			// set our current write / stack pointer to the address specified
 			m_writeaddress_current = m_writeaddress;
-#if VERBOSE_OUTPUT
-			printf("Calc 3 Init Command - %04x DSW addr\n",  m_dsw_addr);
-			printf("Calc 3 Init Command - %04x Eeprom Address\n",  m_eeprom_addr);
-			printf("Calc 3 Init Command - %04x Future Commands Base\n",  m_mcu_command_offset);
-			printf("Calc 3 Init Command - %04x Poll / Busy Address\n",  m_poll_addr);
-			printf("Calc 3 Init Command - %04x ROM Checksum Address\n",  m_checksumaddress);
-			printf("Calc 3 Init Command - %08x Data Write Address\n",  m_writeaddress);
-#endif
-	//      space.write_byte(m_dsw_addr+0x200000, ( ~m_dsw_port->read())&0xff); // // DSW // dsw actually updates in realtime - mcu reads+writes it every frame
+			LOG(
+					"Calc 3 Init Command - %04x DSW addr\n"
+					"Calc 3 Init Command - %04x Eeprom Address\n"
+					"Calc 3 Init Command - %04x Future Commands Base\n"
+					"Calc 3 Init Command - %04x Poll / Busy Address\n"
+					"Calc 3 Init Command - %04x ROM Checksum Address\n"
+					"Calc 3 Init Command - %08x Data Write Address\n",
+					m_dsw_addr, m_eeprom_addr, m_mcu_command_offset, m_poll_addr, m_checksumaddress, m_writeaddress);
+			//space.write_byte(m_dsw_addr+0x200000, ~m_dsw_port->read() & 0xff); // // DSW // dsw actually updates in realtime - mcu reads+writes it every frame
 
 			m_mcuram[m_checksumaddress / 2] = m_mcu_crc;              // MCU Rom Checksum!
 
@@ -1638,19 +1642,15 @@ void kaneko_calc3_device::mcu_run()
 				m_mcuram[(m_eeprom_addr / 2) + i] = kaneko16_eeprom_data[i];//((eepromData[i]&0xff00)>>8) |  ((eepromData[i]&0x00ff)<<8);
 			}
 #endif
+			for (int i = 0; i < 0x40; i++)
 			{
-				for (int i = 0; i < 0x40; i++)
-				{
-					space.write_word(m_eeprom_addr + 0x200000 + 2 * i, m_eeprom->internal_read(i));
-				}
-
+				space.write_word(m_eeprom_addr + 0x200000 + 2 * i, m_eeprom->internal_read(i));
 			}
-
 		}
-		/* otherwise the command number is the number of transfer operations to perform */
 		else
 		{
-			int num_transfers = mcu_command;
+			// otherwise the command number is the number of transfer operations to perform
+			const int num_transfers = mcu_command;
 
 			// clear old command (handshake to main cpu)
 			m_mcuram[m_mcu_command_offset>>1] = 0x0000;
@@ -1664,27 +1664,21 @@ void kaneko_calc3_device::mcu_run()
 				uint8_t  commandtabl = (param1 & 0xff00) >> 8;
 				uint16_t commandaddr = param2;// (param1&0x00ff) | (param2&0xff00);
 				uint8_t  commandunk =  (param1 & 0x00ff); // brap boys sets.. seems to cause further writebasck address displacement?? (when tested on hw it looked like a simple +, but that doesn't work for brapboys...)
-#if VERBOSE_OUTPUT
-				printf("transfer %d table %02x writeback address %04x unknown %02x\n", i, commandtabl, commandaddr, commandunk);
-#endif
+				LOG("transfer %d table %02x writeback address %04x unknown %02x\n", i, commandtabl, commandaddr, commandunk);
+
+				const int length = decompress_table(commandtabl, nullptr, m_writeaddress_current - 2);
+				if (length)
 				{
-					int length = decompress_table(commandtabl, nullptr, m_writeaddress_current - 2);
-					if (length)
-					{
-						int write = commandaddr;
-#if VERBOSE_OUTPUT
-						printf("writing back address %08x to %08x %08x\n", m_writeaddress_current, commandaddr,write);
-#endif
-						space.write_byte(write + 0x200000, m_data_header[0]);
-						space.write_byte(write + 0x200001, m_data_header[1]);
+					int write = commandaddr;
+					LOG("writing back address %08x to %08x %08x\n", m_writeaddress_current, commandaddr, write);
+					space.write_byte(write + 0x200000, m_data_header[0]);
+					space.write_byte(write + 0x200001, m_data_header[1]);
 
-						write=commandaddr+(char)commandunk;
-						space.write_word(write + 0x200000, (m_writeaddress_current >> 16) & 0xffff);
-						space.write_word(write + 0x200002, (m_writeaddress_current & 0xffff));
+					write = commandaddr + (char)commandunk;
+					space.write_word(write + 0x200000, (m_writeaddress_current >> 16) & 0xffff);
+					space.write_word(write + 0x200002, (m_writeaddress_current & 0xffff));
 
-						m_writeaddress_current += ((length + 3) & ~1);
-					}
-
+					m_writeaddress_current += (length + 3) & ~1;
 				}
 			}
 		}
