@@ -103,8 +103,8 @@ brk 8Ch AH=02h read calendar clock -> CH = hour, CL = minutes, DH = seconds, DL 
 #define LOGGFXCTRL(...)  LOGMASKED(LOG_GFXCTRL, __VA_ARGS__)
 
 // TODO: verify clocks
-#define MASTER_CLOCK    XTAL(8'000'000) // may be XTAL(31'948'800) / 4? (based on PC-8801 and PC-9801)
-#define FM_CLOCK        (XTAL(31'948'800) / 4) // 3993600
+#define MASTER_CLOCK    (XTAL(31'948'800) / 4) // (based on PC-8801 and PC-9801)
+#define FM_CLOCK        (XTAL(31'948'800) / 4) // 3993600, / 8 for regular pc88va
 
 
 
@@ -1366,6 +1366,7 @@ void pc88va_state::pc88va(machine_config &config)
 	SPEAKER(config, m_lspeaker).front_left();
 	SPEAKER(config, m_rspeaker).front_right();
 
+	// TODO: YM2203 for vanilla pc88va
 	// PC-88VA-12 "Sound Board II", YM2608B
 	YM2608(config, m_opna, FM_CLOCK);
 	m_opna->set_addrmap(0, &pc88va_state::opna_map);
