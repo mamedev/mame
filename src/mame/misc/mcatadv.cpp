@@ -68,7 +68,7 @@ NOS-B1-00.U60 /
 NOS-B1-01.U61-
 
 YMF286-K is compatible to YM2610 - see psikyo/psikyo.cpp driver
-038 9320EX702 / 038 9330EX705    - see misc/cave.cpp driver
+038 9320EX702 / 038 9330EX705    - see atlus/cave.cpp driver
 
 Note # = Pin #1    PCB Layout:
 
