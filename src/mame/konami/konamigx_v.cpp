@@ -709,6 +709,7 @@ void konamigx_state::gx_draw_basic_tilemaps(screen_device &screen, bitmap_rgb32 
 		const u8 layer2 = layer << 1;
 		const u8 j = mixerflags >> layer2 & 0b11;
 		u8 mix_mode_bits = 0;
+		u8 mix_mode_bits2 = 0;
 
 		if (j == GXMIX_BLEND_NONE) // hack
 		{
@@ -723,12 +724,9 @@ void konamigx_state::gx_draw_basic_tilemaps(screen_device &screen, bitmap_rgb32 
 			const u8 v_inmix_layer = m_vinmix >> layer2 & 0b11;
 			const u8 v_inmix_on_layer = m_vmixon >> layer2 & 0b11;
 
-			// scan tilemaps for mixing mode bits if v_inmix_on_layer is 0.
-			// this probably needs to be done if v_inmix_on_layer != 0b11.
-			// todo: find a game that exhibits this behavior.
 			if (!v_inmix_on_layer)
 			{
-				mix_mode_bits = m_k056832->get_mix_bits(layer);
+				mix_mode_bits2 = u32(mixerflags) >> 30;
 			}
 			else
 			{
@@ -743,16 +741,28 @@ void konamigx_state::gx_draw_basic_tilemaps(screen_device &screen, bitmap_rgb32 
 		    4) 0 > alpha < 255;
 		*/
 
-		int k = 0;
+		int flags = 0, flags2 = 0;
 
 		if (const int alpha = m_k054338->set_alpha_level(mix_mode_bits) & 0xFF; alpha < 255)
 		{
-			k = TILEMAP_DRAW_ALPHA(alpha);
+			flags = TILEMAP_DRAW_ALPHA(alpha);
 		}
 
-		if (mixerflags & 1 << (layer + 12)) k |= K056382_DRAW_FLAG_FORCE_XYSCROLL;
+		if (const int alpha = m_k054338->set_alpha_level(mix_mode_bits2) & 0xFF; alpha < 255)
+		{
+			flags2 = TILEMAP_DRAW_ALPHA(alpha);
+		}
 
-		m_k056832->m_tilemap_draw(screen, bitmap, cliprect, layer, k, 0);
+		if (mixerflags & 1 << (layer + 12))
+		{
+			flags |= K056382_DRAW_FLAG_FORCE_XYSCROLL;
+			flags2 |= K056382_DRAW_FLAG_FORCE_XYSCROLL;
+		}
+
+		m_k056832->m_tilemap_draw(screen, bitmap, cliprect, layer, flags, 0);
+
+		// category 1 contains tiles with a mix code
+		m_k056832->m_tilemap_draw(screen, bitmap, cliprect, layer, flags2 | 1, 0);
 	}
 }
 
@@ -1057,6 +1067,12 @@ K056832_CB_MEMBER(konamigx_state::alpha_tile_callback)
 
 		if (VERBOSE)
 			popmessage("skipped alpha tile(layer=%d mix=%d)", layer, mixcode);
+	}
+
+	const u8 mix_code = (*flags >> (8 + 6)) & 0b11;
+	if (mix_code) {
+		*priority = 1;
+		m_last_alpha_tile_mix_code = mix_code;
 	}
 }
 
@@ -1446,6 +1462,9 @@ uint32_t konamigx_state::screen_update_konamigx(screen_device &screen, bitmap_rg
 	else
 	{
 		konamigx_mixer(screen, bitmap, cliprect, nullptr, 0, nullptr, 0, 0, nullptr, m_gx_rushingheroes_hack);
+
+		int mixerflags = m_last_alpha_tile_mix_code << 30;
+		konamigx_mixer(screen, bitmap, cliprect, nullptr, 0, nullptr, 0, mixerflags, nullptr, m_gx_rushingheroes_hack);
 	}
 
 	// HACK: draw type-1 roz layer here for testing purposes only

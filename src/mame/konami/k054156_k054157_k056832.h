@@ -103,8 +103,6 @@ public:
 	u16 word_r(offs_t offset);        // VACSET
 	u16 b_word_r(offs_t offset);      // VSCCS  (board dependent)
 
-	u8 get_mix_bits(u8 layer);
-
 
 protected:
 	// device-level overrides

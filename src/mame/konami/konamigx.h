@@ -253,6 +253,8 @@ protected:
 	u8 m_current_brightness = 0xff;
 	u8 m_brightness[3]{};
 
+	u8 m_last_alpha_tile_mix_code = 0;
+
 	// mirrored K054338 settings
 	int *m_K054338_shdRGB = nullptr;
 
