@@ -739,7 +739,8 @@ void konamigx_state::gx_draw_basic_tilemaps(screen_device &screen, bitmap_rgb32 
 			}
 		}
 
-		int flags = 0, flags2 = 0;
+		int flags = TILEMAP_DRAW_CATEGORY(0);
+		int flags2 = TILEMAP_DRAW_CATEGORY(1);
 
 		if (const int alpha = m_k054338->set_alpha_level(mix_mode_bits) & 0xFF; alpha < 255)
 		{
@@ -1459,8 +1460,6 @@ uint32_t konamigx_state::screen_update_konamigx(screen_device &screen, bitmap_rg
 	}
 	else
 	{
-		konamigx_mixer(screen, bitmap, cliprect, nullptr, 0, nullptr, 0, 0, nullptr, m_gx_rushingheroes_hack);
-
 		int mixerflags = m_last_alpha_tile_mix_code << 30;
 		konamigx_mixer(screen, bitmap, cliprect, nullptr, 0, nullptr, 0, mixerflags, nullptr, m_gx_rushingheroes_hack);
 	}
