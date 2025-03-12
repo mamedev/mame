@@ -22,8 +22,10 @@ project "expat"
 	-- fake out the enough of expat_config.h to get by
 	-- could possibly add more defines here for specific targets
 	defines {
+		"HAVE_CXX11",
 		"HAVE_MEMMOVE",
 		"HAVE_STDINT_H",
+		"HAVE_STDIO_H",
 		"HAVE_STDLIB_H",
 		"HAVE_STRING_H",
 		"PACKAGE=\"expat\"",
@@ -37,6 +39,7 @@ project "expat"
 		"VERSION=\"2.2.10\"",
 		"XML_CONTEXT_BYTES=1024",
 		"XML_DTD",
+		"XML_GE=1",
 		"XML_NS",
 	}
 if _OPTIONS["BIGENDIAN"]=="1" then
@@ -47,6 +50,11 @@ if _OPTIONS["BIGENDIAN"]=="1" then
 else
 	defines {
 		"BYTEORDER=1234",
+	}
+end
+if _OPTIONS["targetos"]=="windows" then
+	defines {
+		"__USE_MINGW_ANSI_STDIO=0",
 	}
 end
 if _OPTIONS["targetos"]=="macosx" or _OPTIONS["targetos"]=="freebsd" then
@@ -88,7 +96,7 @@ if _OPTIONS["gcc"]~=nil then
 
 	else
 		buildoptions_c {
-			"-Wno-maybe-uninitialized", -- expat in GCC 11.1
+			"-Wno-error=maybe-uninitialized", -- expat in GCC 11.1
 		}
 	end
 end
