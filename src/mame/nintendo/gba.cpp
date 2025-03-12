@@ -749,6 +749,8 @@ void gba_state::gba_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	uint8_t soundcnt_x = SOUNDCNT_X;
 	uint16_t siocnt = SIOCNT;
 	uint16_t dmachcnt[4] = { DMACNT_H(0), DMACNT_H(1), DMACNT_H(2), DMACNT_H(3) };
+	static const float dac_gain_table[2] = { 0.5f, 1.0f };
+	static const float psg_gain_table[4] = { 0.25f, 0.5f, 1.0f, 1.0f/* prohibited? */ };
 
 	COMBINE_DATA(&m_regs[offset]);
 
@@ -865,12 +867,15 @@ void gba_state::gba_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 			if (ACCESSING_BITS_16_31)
 			{
-				// master volume, ((data >> 16) & 3) == 3 is prohibited?
-				m_gbsound->set_output_gain(ALL_OUTPUTS, float(1 << ((data >> 16) & 3)) / 4.0f);
-				m_ldac[0]->set_output_gain(ALL_OUTPUTS, float(1 + BIT(data, 18)) / 2.0f);
-				m_rdac[0]->set_output_gain(ALL_OUTPUTS, float(1 + BIT(data, 18)) / 2.0f);
-				m_ldac[1]->set_output_gain(ALL_OUTPUTS, float(1 + BIT(data, 19)) / 2.0f);
-				m_rdac[1]->set_output_gain(ALL_OUTPUTS, float(1 + BIT(data, 19)) / 2.0f);
+				// master volume
+				if (((data >> 16) & 3) == 3)
+					logerror("%s: Using prohibited PSG Master volume value\n", machine().describe_context());
+
+				m_gbsound->set_output_gain(ALL_OUTPUTS, psg_gain_table[(data >> 16) & 3]);
+				m_ldac[0]->set_output_gain(ALL_OUTPUTS, dac_gain_table[BIT(data, 18)]);
+				m_rdac[0]->set_output_gain(ALL_OUTPUTS, dac_gain_table[BIT(data, 18)]);
+				m_ldac[1]->set_output_gain(ALL_OUTPUTS, dac_gain_table[BIT(data, 19)]);
+				m_rdac[1]->set_output_gain(ALL_OUTPUTS, dac_gain_table[BIT(data, 19)]);
 				// DAC A reset?
 				if (data & 0x08000000)
 				{
