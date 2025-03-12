@@ -17,8 +17,8 @@
 #include "wswan_v.h"
 #include "screen.h"
 
-DEFINE_DEVICE_TYPE(WSWAN_VIDEO, wswan_video_device, "wswan_video", "Bandai WonderSwam VDP")
-DEFINE_DEVICE_TYPE(WSWAN_COLOR_VIDEO, wswan_color_video_device, "wscolor_video", "Bandai WonderSwam Color VDP")
+DEFINE_DEVICE_TYPE(WSWAN_VIDEO, wswan_video_device, "wswan_video", "Bandai WonderSwan VDP")
+DEFINE_DEVICE_TYPE(WSWAN_COLOR_VIDEO, wswan_color_video_device, "wscolor_video", "Bandai WonderSwan Color VDP")
 
 
 wswan_video_device::wswan_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
