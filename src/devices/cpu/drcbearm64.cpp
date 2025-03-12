@@ -540,6 +540,9 @@ private:
 	void emit_float_ldr_mem(asmjit::a64::Assembler &a, const asmjit::a64::Vec &reg, const void *ptr) const;
 	void emit_float_str_mem(asmjit::a64::Assembler &a, const asmjit::a64::Vec &reg, const void *ptr) const;
 
+	void emit_memaccess_setup(asmjit::a64::Assembler &a, const be_parameter &addrp, const memory_accessors &accessors, const address_space::specific_access_info::side &side) const;
+	void emit_narrow_memwrite(asmjit::a64::Assembler &a, const be_parameter &addrp, const parameter &spacesizep, const memory_accessors &accessors) const;
+
 	void get_carry(asmjit::a64::Assembler &a, const asmjit::a64::Gp &reg, bool inverted = false) const;
 	void load_carry(asmjit::a64::Assembler &a, bool inverted = false) const;
 	void store_carry(asmjit::a64::Assembler &a, bool inverted = false) const;
@@ -905,6 +908,139 @@ void drcbe_arm64::emit_strh_mem(a64::Assembler &a, const a64::Gp &reg, const voi
 
 void drcbe_arm64::emit_float_ldr_mem(a64::Assembler &a, const a64::Vec &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdLdr_v, reg, reg.isVecS() ? 2 : 3, ptr); }
 void drcbe_arm64::emit_float_str_mem(a64::Assembler &a, const a64::Vec &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdStr_v, reg, reg.isVecS() ? 2 : 3, ptr); }
+
+void drcbe_arm64::emit_memaccess_setup(asmjit::a64::Assembler &a, const be_parameter &addrp, const memory_accessors &accessors, const address_space::specific_access_info::side &side) const
+{
+	auto const addrreg = (accessors.no_mask || accessors.mask_simple) ? REG_PARAM2 : a64::x6;
+	mov_reg_param(a, 4, addrreg, addrp);
+	get_imm_relative(a, a64::x8, uintptr_t(side.dispatch));
+
+	// if the high bits aren't affected by the global mask, extract them early
+	if (accessors.high_bits && !accessors.mask_high_bits)
+		a.ubfx(a64::w7, addrreg.w(), accessors.specific.low_bits, accessors.high_bits);
+
+	if (accessors.mask_simple)
+		a.and_(REG_PARAM2.w(), addrreg.w(), accessors.address_mask);
+	else if (!accessors.no_mask)
+		a.mov(REG_PARAM2.w(), accessors.address_mask); // 32-bit value, no more than two instructions
+
+	// if the high address bits aren't affected by the global mask, load the dispatch table entry now
+	if (!accessors.high_bits)
+		a.ldr(REG_PARAM1, a64::Mem(a64::x8));
+	else if (!accessors.mask_high_bits)
+		a.ldr(REG_PARAM1, a64::Mem(a64::x8, a64::x7, arm::Shift(arm::ShiftOp::kLSL, 3)));
+
+	// apply non-trivial global mask if necessary
+	if (!accessors.no_mask && !accessors.mask_simple)
+		a.and_(REG_PARAM2.w(), REG_PARAM2.w(), addrreg.w());
+
+	// if the high address bits are affected by the global mask, load the dispatch table entry now
+	if (accessors.mask_high_bits)
+	{
+		a.lsr(a64::w7, REG_PARAM2.w(), accessors.specific.low_bits);
+		a.ldr(REG_PARAM1, a64::Mem(a64::x8, a64::x7, arm::Shift(arm::ShiftOp::kLSL, 3)));
+	}
+
+	// apply this pointer displacement if necessary
+	if (side.displacement)
+		a.add(REG_PARAM1, REG_PARAM1, side.displacement); // assume less than 4K
+
+	// adjusted dispatch table entry pointer in REG_PARAM1
+	// masked address in REG_PARAM2
+	// x8, x7 and potentially x6 clobbered
+}
+
+void drcbe_arm64::emit_narrow_memwrite(asmjit::a64::Assembler &a, const be_parameter &addrp, const parameter &spacesizep, const memory_accessors &accessors) const
+{
+	// expects data in REG_PARAM3 and mask in REG_PARAM4
+
+	address_space &space = *m_space[spacesizep.space()];
+	auto const addrreg = (accessors.no_mask || accessors.mask_simple) ? REG_PARAM2 : a64::x5;
+	mov_reg_param(a, 4, addrreg, addrp);
+	get_imm_relative(a, a64::x8, uintptr_t(accessors.specific.write.dispatch));
+
+	// get the shift count for the data and offset in w7
+	int const shift = space.addr_shift() - 3;
+	uint32_t const shiftmask = (accessors.specific.native_bytes - (1 << spacesizep.size())) << 3;
+	if (space.endianness() != ENDIANNESS_LITTLE)
+	{
+		// swizzle for big Endian spaces
+		bool const smallshift = (shift <= 0) && (shift >= -3);
+		if (!smallshift)
+		{
+			if (shift < 0)
+				a.lsl(a64::w6, addrreg.w(), -shift);
+			else
+				a.lsr(a64::w6, addrreg.w(), shift);
+		}
+		a.mov(a64::w7, shiftmask);
+		if (smallshift)
+			a.bic(a64::w7, a64::w7, addrreg.w(), -shift);
+		else
+			a.bic(a64::w7, a64::w7, a64::w6);
+	}
+	else
+	{
+		if (!shift)
+		{
+			a.and_(a64::w7, addrreg.w(), shiftmask);
+		}
+		else
+		{
+			if (shift < 0)
+				a.lsl(a64::w7, addrreg.w(), -shift);
+			else
+				a.lsr(a64::w7, addrreg.w(), shift);
+			a.and_(a64::w7, a64::w7, shiftmask);
+		}
+	}
+
+	// if the high bits aren't affected by the global mask, extract them early
+	if (accessors.high_bits && !accessors.mask_high_bits)
+		a.ubfx(a64::w6, addrreg.w(), accessors.specific.low_bits, accessors.high_bits);
+
+	if (accessors.mask_simple)
+		a.and_(REG_PARAM2.w(), addrreg.w(), accessors.address_mask);
+	else if (!accessors.no_mask)
+		a.mov(REG_PARAM2.w(), accessors.address_mask); // 32-bit value, no more than two instructions
+
+	// if the high address bits aren't affected by the global mask, load the dispatch table entry now
+	if (!accessors.high_bits)
+		a.ldr(REG_PARAM1, a64::Mem(a64::x8));
+	else if (!accessors.mask_high_bits)
+		a.ldr(REG_PARAM1, a64::Mem(a64::x8, a64::x6, arm::Shift(arm::ShiftOp::kLSL, 3)));
+
+	// apply non-trivial global mask if necessary
+	if (!accessors.no_mask && !accessors.mask_simple)
+		a.and_(REG_PARAM2.w(), REG_PARAM2.w(), addrreg.w());
+
+	// if the high address bits are affected by the global mask, load the dispatch table entry now
+	if (accessors.mask_high_bits)
+	{
+		a.lsr(a64::w6, REG_PARAM2.w(), accessors.specific.low_bits);
+		a.ldr(REG_PARAM1, a64::Mem(a64::x8, a64::x6, arm::Shift(arm::ShiftOp::kLSL, 3)));
+	}
+
+	// apply this pointer displacement if necessary
+	if (accessors.specific.write.displacement)
+		a.add(REG_PARAM1, REG_PARAM1, accessors.specific.write.displacement); // assume less than 4K
+
+	// shift the data and mask
+	a.lsl(REG_PARAM3, REG_PARAM3, a64::x7);
+	a.lsl(REG_PARAM4, REG_PARAM4, a64::x7);
+
+	// call the write function
+	if (accessors.specific.write.is_virtual)
+	{
+		a.ldr(a64::x8, a64::Mem(REG_PARAM1));
+		a.ldr(a64::x8, a64::Mem(a64::x8, accessors.specific.write.function)); // assume no more than 4096 vtable entries
+		a.blr(a64::x8);
+	}
+	else
+	{
+		call_arm_addr(a, (const void *)accessors.specific.write.function);
+	}
+}
 
 void drcbe_arm64::mov_reg_param(a64::Assembler &a, uint32_t regsize, const a64::Gp &dst, const be_parameter &src) const
 {
@@ -2332,28 +2468,46 @@ void drcbe_arm64::op_read(a64::Assembler &a, const uml::instruction &inst)
 	assert(spacesizep.is_size_space());
 
 	auto const &accessors = m_memory_accessors[spacesizep.space()];
+	bool const have_specific = (uintptr_t(nullptr) != accessors.specific.read.function) || accessors.specific.read.is_virtual;
 
-	mov_reg_param(a, 4, REG_PARAM2, addrp);
+	if (have_specific && ((1 << spacesizep.size()) == accessors.specific.native_bytes))
+	{
+		emit_memaccess_setup(a, addrp, accessors, accessors.specific.read);
+		if (accessors.specific.read.is_virtual)
+		{
+			a.ldr(a64::x8, a64::Mem(REG_PARAM1));
+			a.ldr(a64::x8, a64::Mem(a64::x8, accessors.specific.read.function)); // assume no more than 4096 vtable entries
+		}
+		a.mov(REG_PARAM3, make_bitmask<uint64_t>(accessors.specific.native_bytes << 3));
+		if (accessors.specific.read.is_virtual)
+			a.blr(a64::x8);
+		else
+			call_arm_addr(a, (const void *)accessors.specific.read.function);
+	}
+	else
+	{
+		mov_reg_param(a, 4, REG_PARAM2, addrp);
 
-	if (spacesizep.size() == SIZE_BYTE)
-	{
-		get_imm_relative(a, REG_PARAM1, accessors.resolved.read_byte.obj);
-		call_arm_addr(a, accessors.resolved.read_byte.func);
-	}
-	else if (spacesizep.size() == SIZE_WORD)
-	{
-		get_imm_relative(a, REG_PARAM1, accessors.resolved.read_word.obj);
-		call_arm_addr(a, accessors.resolved.read_word.func);
-	}
-	else if (spacesizep.size() == SIZE_DWORD)
-	{
-		get_imm_relative(a, REG_PARAM1, accessors.resolved.read_dword.obj);
-		call_arm_addr(a, accessors.resolved.read_dword.func);
-	}
-	else if (spacesizep.size() == SIZE_QWORD)
-	{
-		get_imm_relative(a, REG_PARAM1, accessors.resolved.read_qword.obj);
-		call_arm_addr(a, accessors.resolved.read_qword.func);
+		if (spacesizep.size() == SIZE_BYTE)
+		{
+			get_imm_relative(a, REG_PARAM1, accessors.resolved.read_byte.obj);
+			call_arm_addr(a, accessors.resolved.read_byte.func);
+		}
+		else if (spacesizep.size() == SIZE_WORD)
+		{
+			get_imm_relative(a, REG_PARAM1, accessors.resolved.read_word.obj);
+			call_arm_addr(a, accessors.resolved.read_word.func);
+		}
+		else if (spacesizep.size() == SIZE_DWORD)
+		{
+			get_imm_relative(a, REG_PARAM1, accessors.resolved.read_dword.obj);
+			call_arm_addr(a, accessors.resolved.read_dword.func);
+		}
+		else if (spacesizep.size() == SIZE_QWORD)
+		{
+			get_imm_relative(a, REG_PARAM1, accessors.resolved.read_qword.obj);
+			call_arm_addr(a, accessors.resolved.read_qword.func);
+		}
 	}
 
 	mov_param_reg(a, inst.size(), dstp, REG_PARAM1);
@@ -2372,29 +2526,48 @@ void drcbe_arm64::op_readm(a64::Assembler &a, const uml::instruction &inst)
 	assert(spacesizep.is_size_space());
 
 	auto const &accessors = m_memory_accessors[spacesizep.space()];
+	bool const have_specific = (uintptr_t(nullptr) != accessors.specific.read.function) || accessors.specific.read.is_virtual;
 
-	mov_reg_param(a, 4, REG_PARAM2, addrp);
-	mov_reg_param(a, inst.size(), REG_PARAM3, maskp);
+	if (have_specific && ((1 << spacesizep.size()) == accessors.specific.native_bytes))
+	{
+		emit_memaccess_setup(a, addrp, accessors, accessors.specific.read);
+		mov_reg_param(a, inst.size(), REG_PARAM3, maskp);
+		if (accessors.specific.read.is_virtual)
+		{
+			a.ldr(a64::x8, a64::Mem(REG_PARAM1));
+			a.ldr(a64::x8, a64::Mem(a64::x8, accessors.specific.read.function)); // assume no more than 4096 vtable entries
+			a.blr(a64::x8);
+		}
+		else
+		{
+			call_arm_addr(a, (const void *)accessors.specific.read.function);
+		}
+	}
+	else
+	{
+		mov_reg_param(a, 4, REG_PARAM2, addrp);
+		mov_reg_param(a, inst.size(), REG_PARAM3, maskp);
 
-	if (spacesizep.size() == SIZE_BYTE)
-	{
-		get_imm_relative(a, REG_PARAM1, accessors.resolved.read_byte_masked.obj);
-		call_arm_addr(a, accessors.resolved.read_byte_masked.func);
-	}
-	else if (spacesizep.size() == SIZE_WORD)
-	{
-		get_imm_relative(a, REG_PARAM1, accessors.resolved.read_word_masked.obj);
-		call_arm_addr(a, accessors.resolved.read_word_masked.func);
-	}
-	else if (spacesizep.size() == SIZE_DWORD)
-	{
-		get_imm_relative(a, REG_PARAM1, accessors.resolved.read_dword_masked.obj);
-		call_arm_addr(a, accessors.resolved.read_dword_masked.func);
-	}
-	else if (spacesizep.size() == SIZE_QWORD)
-	{
-		get_imm_relative(a, REG_PARAM1, accessors.resolved.read_qword_masked.obj);
-		call_arm_addr(a, accessors.resolved.read_qword_masked.func);
+		if (spacesizep.size() == SIZE_BYTE)
+		{
+			get_imm_relative(a, REG_PARAM1, accessors.resolved.read_byte_masked.obj);
+			call_arm_addr(a, accessors.resolved.read_byte_masked.func);
+		}
+		else if (spacesizep.size() == SIZE_WORD)
+		{
+			get_imm_relative(a, REG_PARAM1, accessors.resolved.read_word_masked.obj);
+			call_arm_addr(a, accessors.resolved.read_word_masked.func);
+		}
+		else if (spacesizep.size() == SIZE_DWORD)
+		{
+			get_imm_relative(a, REG_PARAM1, accessors.resolved.read_dword_masked.obj);
+			call_arm_addr(a, accessors.resolved.read_dword_masked.func);
+		}
+		else if (spacesizep.size() == SIZE_QWORD)
+		{
+			get_imm_relative(a, REG_PARAM1, accessors.resolved.read_qword_masked.obj);
+			call_arm_addr(a, accessors.resolved.read_qword_masked.func);
+		}
 	}
 
 	mov_param_reg(a, inst.size(), dstp, REG_PARAM1);
@@ -2412,29 +2585,54 @@ void drcbe_arm64::op_write(a64::Assembler &a, const uml::instruction &inst)
 	assert(spacesizep.is_size_space());
 
 	auto const &accessors = m_memory_accessors[spacesizep.space()];
+	bool const have_specific = (uintptr_t(nullptr) != accessors.specific.write.function) || accessors.specific.write.is_virtual;
 
-	mov_reg_param(a, 4, REG_PARAM2, addrp);
-	mov_reg_param(a, inst.size(), REG_PARAM3, srcp);
+	if (have_specific && ((1 << spacesizep.size()) == accessors.specific.native_bytes))
+	{
+		emit_memaccess_setup(a, addrp, accessors, accessors.specific.write);
+		mov_reg_param(a, inst.size(), REG_PARAM3, srcp);
+		if (accessors.specific.write.is_virtual)
+		{
+			a.ldr(a64::x8, a64::Mem(REG_PARAM1));
+			a.ldr(a64::x8, a64::Mem(a64::x8, accessors.specific.write.function)); // assume no more than 4096 vtable entries
+		}
+		a.mov(REG_PARAM4, make_bitmask<uint64_t>(accessors.specific.native_bytes << 3));
+		if (accessors.specific.write.is_virtual)
+			a.blr(a64::x8);
+		else
+			call_arm_addr(a, (const void *)accessors.specific.write.function);
+	}
+	else if (have_specific && ((1 << spacesizep.size()) < accessors.specific.native_bytes))
+	{
+		mov_reg_param(a, inst.size(), REG_PARAM3, srcp);
+		a.mov(REG_PARAM4, make_bitmask<uint64_t>(8 << spacesizep.size()));
+		emit_narrow_memwrite(a, addrp, spacesizep, accessors);
+	}
+	else
+	{
+		mov_reg_param(a, 4, REG_PARAM2, addrp);
+		mov_reg_param(a, inst.size(), REG_PARAM3, srcp);
 
-	if (spacesizep.size() == SIZE_BYTE)
-	{
-		get_imm_relative(a, REG_PARAM1, accessors.resolved.write_byte.obj);
-		call_arm_addr(a, accessors.resolved.write_byte.func);
-	}
-	else if (spacesizep.size() == SIZE_WORD)
-	{
-		get_imm_relative(a, REG_PARAM1, accessors.resolved.write_word.obj);
-		call_arm_addr(a, accessors.resolved.write_word.func);
-	}
-	else if (spacesizep.size() == SIZE_DWORD)
-	{
-		get_imm_relative(a, REG_PARAM1, accessors.resolved.write_dword.obj);
-		call_arm_addr(a, accessors.resolved.write_dword.func);
-	}
-	else if (spacesizep.size() == SIZE_QWORD)
-	{
-		get_imm_relative(a, REG_PARAM1, accessors.resolved.write_qword.obj);
-		call_arm_addr(a, accessors.resolved.write_qword.func);
+		if (spacesizep.size() == SIZE_BYTE)
+		{
+			get_imm_relative(a, REG_PARAM1, accessors.resolved.write_byte.obj);
+			call_arm_addr(a, accessors.resolved.write_byte.func);
+		}
+		else if (spacesizep.size() == SIZE_WORD)
+		{
+			get_imm_relative(a, REG_PARAM1, accessors.resolved.write_word.obj);
+			call_arm_addr(a, accessors.resolved.write_word.func);
+		}
+		else if (spacesizep.size() == SIZE_DWORD)
+		{
+			get_imm_relative(a, REG_PARAM1, accessors.resolved.write_dword.obj);
+			call_arm_addr(a, accessors.resolved.write_dword.func);
+		}
+		else if (spacesizep.size() == SIZE_QWORD)
+		{
+			get_imm_relative(a, REG_PARAM1, accessors.resolved.write_qword.obj);
+			call_arm_addr(a, accessors.resolved.write_qword.func);
+		}
 	}
 }
 
@@ -2452,30 +2650,55 @@ void drcbe_arm64::op_writem(a64::Assembler &a, const uml::instruction &inst)
 
 	// set up a call to the write handler
 	auto const &accessors = m_memory_accessors[spacesizep.space()];
+	bool const have_specific = (uintptr_t(nullptr) != accessors.specific.write.function) || accessors.specific.write.is_virtual;
 
-	mov_reg_param(a, 4, REG_PARAM2, addrp);
-	mov_reg_param(a, inst.size(), REG_PARAM3, srcp);
-	mov_reg_param(a, inst.size(), REG_PARAM4, maskp);
+	if (have_specific && ((1 << spacesizep.size()) == accessors.specific.native_bytes))
+	{
+		emit_memaccess_setup(a, addrp, accessors, accessors.specific.write);
+		mov_reg_param(a, inst.size(), REG_PARAM3, srcp);
+		if (accessors.specific.write.is_virtual)
+		{
+			a.ldr(a64::x8, a64::Mem(REG_PARAM1));
+			a.ldr(a64::x8, a64::Mem(a64::x8, accessors.specific.write.function)); // assume no more than 4096 vtable entries
+		}
+		mov_reg_param(a, inst.size(), REG_PARAM4, maskp);
+		if (accessors.specific.write.is_virtual)
+			a.blr(a64::x8);
+		else
+			call_arm_addr(a, (const void *)accessors.specific.write.function);
+	}
+	else if (have_specific && ((1 << spacesizep.size()) < accessors.specific.native_bytes))
+	{
+		mov_reg_param(a, inst.size(), REG_PARAM3, srcp);
+		mov_reg_param(a, inst.size(), REG_PARAM4, maskp);
+		emit_narrow_memwrite(a, addrp, spacesizep, accessors);
+	}
+	else
+	{
+		mov_reg_param(a, 4, REG_PARAM2, addrp);
+		mov_reg_param(a, inst.size(), REG_PARAM3, srcp);
+		mov_reg_param(a, inst.size(), REG_PARAM4, maskp);
 
-	if (spacesizep.size() == SIZE_BYTE)
-	{
-		get_imm_relative(a, REG_PARAM1, accessors.resolved.write_byte_masked.obj);
-		call_arm_addr(a, accessors.resolved.write_byte_masked.func);
-	}
-	else if (spacesizep.size() == SIZE_WORD)
-	{
-		get_imm_relative(a, REG_PARAM1, accessors.resolved.write_word_masked.obj);
-		call_arm_addr(a, accessors.resolved.write_word_masked.func);
-	}
-	else if (spacesizep.size() == SIZE_DWORD)
-	{
-		get_imm_relative(a, REG_PARAM1, accessors.resolved.write_dword_masked.obj);
-		call_arm_addr(a, accessors.resolved.write_dword_masked.func);
-	}
-	else if (spacesizep.size() == SIZE_QWORD)
-	{
-		get_imm_relative(a, REG_PARAM1, accessors.resolved.write_qword_masked.obj);
-		call_arm_addr(a, accessors.resolved.write_qword_masked.func);
+		if (spacesizep.size() == SIZE_BYTE)
+		{
+			get_imm_relative(a, REG_PARAM1, accessors.resolved.write_byte_masked.obj);
+			call_arm_addr(a, accessors.resolved.write_byte_masked.func);
+		}
+		else if (spacesizep.size() == SIZE_WORD)
+		{
+			get_imm_relative(a, REG_PARAM1, accessors.resolved.write_word_masked.obj);
+			call_arm_addr(a, accessors.resolved.write_word_masked.func);
+		}
+		else if (spacesizep.size() == SIZE_DWORD)
+		{
+			get_imm_relative(a, REG_PARAM1, accessors.resolved.write_dword_masked.obj);
+			call_arm_addr(a, accessors.resolved.write_dword_masked.func);
+		}
+		else if (spacesizep.size() == SIZE_QWORD)
+		{
+			get_imm_relative(a, REG_PARAM1, accessors.resolved.write_qword_masked.obj);
+			call_arm_addr(a, accessors.resolved.write_qword_masked.func);
+		}
 	}
 }
 
