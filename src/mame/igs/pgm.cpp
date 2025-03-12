@@ -5495,7 +5495,7 @@ GAME( 1999, kovsh101,     kovsh,     pgm_arm_type1,          kovsh,     pgm_arm_
 GAME( 1999, kovsh100,     kovsh,     pgm_arm_type1,          kovsh,     pgm_arm_type1_state, init_kovsh,      ROT0,   "IGS", "Knights of Valour Super Heroes / Sanguo Zhan Ji Fengyun Zaiqi / Sangoku Senki Super Heroes (ver. 100, CN)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 68k: SANGO EX V100 12/06/99 13:36:04, ARM: China internal ROM
 // 拳皇三国特別版/Quánhuáng sānguó Tèbié bǎn
 // nasty modern asian bootleg of Knights of Valour Super Heroes with characters ripped from SNK's The King of Fighters series!
-GAME( 2008, kovqhsgs,     kovsh,     pgm_arm_type1,          kovsh,     pgm_arm_type1_state, init_kovqhsgs,   ROT0,   "bootleg", "Quanhuang Sanguo Tebie Ban (bootleg of Knights of Valour Super Heroes, V303CN, Nov 21 2008 19:03:49)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2008, kovqhsgs,     kovsh,     pgm_arm_type1,          kovsh,     pgm_arm_type1_state, init_kovqhsgs,   ROT0,   "bootleg (WDF)", "Quanhuang Sanguo Tebie Ban (bootleg of Knights of Valour Super Heroes, V303CN, Nov 21 2008 19:03:49)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 //三國戰紀2/Sānguó zhàn jì 2 (Traditional Chinese only in title screen)
 // region provided by internal ARM rom
@@ -5730,4 +5730,4 @@ GAME( 200?, kovlsqh2,     kovshp,    pgm_arm_type1,          kovsh,     pgm_arm_
 GAME( 200?, kovlsjb,      kovshp,    pgm_arm_type1,          kovsh,     pgm_arm_type1_state, init_kovlsqh2, ROT0,   "bootleg", "Luanshi Jie Ba (bootleg of Knights of Valour Super Heroes Plus, ver. 200CN, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 GAME( 200?, kovlsjba,     kovshp,    pgm_arm_type1,          kovsh,     pgm_arm_type1_state, init_kovlsqh2, ROT0,   "bootleg", "Luanshi Jie Ba (bootleg of Knights of Valour Super Heroes Plus, ver. 200CN, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 
-GAME( 2010, kovgsyx,      kovshp,    pgm_arm_type1,          kovsh,     pgm_arm_type1_state, init_kovqhsgs, ROT0,   "bootleg", "Gaishi Xingxiong Tebie Ban (bootleg of Knights of Valour Super Heroes Plus, V302CN, Dec 29 2010 16:31:32)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // needs decryption and IGS027A simulation adaptation
+GAME( 2010, kovgsyx,      kovshp,    pgm_arm_type1,          kovsh,     pgm_arm_type1_state, init_kovqhsgs, ROT0,   "bootleg (WDF)", "Gaishi Xingxiong Tebie Ban (bootleg of Knights of Valour Super Heroes Plus, V302CN, Dec 29 2010 16:31:32)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // needs decryption and IGS027A simulation adaptation

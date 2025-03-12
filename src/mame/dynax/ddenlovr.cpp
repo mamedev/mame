@@ -12699,8 +12699,8 @@ GAME( 1994, mjmywrld,    mjmyster, mjmywrld,  mjmyster,   ddenlovr_state, empty_
 GAME( 1994, hginga,      0,        hginga,    hginga,     ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Hanafuda Hana Ginga (Japan)",                                    MACHINE_NO_COCKTAIL  )
 
 GAME( 1994, mjmyuniv,    0,        mjmyuniv,  mjmyster,   ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Mysterious Universe (Japan, D85)",                   MACHINE_NO_COCKTAIL  )
-GAME( 1995, mjmyunivbl,  mjmyuniv, mjmyuniv,  mjmyster,   ddenlovr_state, empty_init,    ROT0, "bootleg",                                     "Maque Long Xiong Hu Di (Taiwan?, D106T)",                        MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL ) // One GFX ROM isn't dumped
-GAME( 1996, mjmyunivbl2, mjmyuniv, mjmyunivbl2, mjmyster, ddenlovr_state, empty_init,    ROT0, "bootleg",                                     "Majiang Caihui Ying (ver 2.20)",                                 MACHINE_NO_COCKTAIL )
+GAME( 1995, mjmyunivbl,  mjmyuniv, mjmyuniv,  mjmyster,   ddenlovr_state, empty_init,    ROT0, "bootleg",                                     "Maque Long Xiong Hu Di (Hong Kong, D106T)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL ) // One GFX ROM isn't dumped
+GAME( 1996, mjmyunivbl2, mjmyuniv, mjmyunivbl2, mjmyster, ddenlovr_state, empty_init,    ROT0, "bootleg",                                     "Maque Caihui Ying (Taiwan, ver 2.20)",                           MACHINE_NO_COCKTAIL )
 
 GAME( 1994, quiz365,     0,        quiz365,   quiz365,    ddenlovr_state, empty_init,    ROT0, "Nakanihon",                                   "Quiz 365 (Japan)",                                               MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )
 GAME( 1994, quiz365t,    quiz365,  quiz365,   quiz365,    ddenlovr_state, empty_init,    ROT0, "Nakanihon / Taito",                           "Quiz 365 (Hong Kong & Taiwan)",                                  MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )
