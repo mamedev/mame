@@ -721,36 +721,34 @@ void konamigx_state::gx_draw_basic_tilemaps(screen_device &screen, bitmap_rgb32 
 		}
 		else
 		{
-			const u8 v_inmix_layer = m_vinmix >> layer2 & 0b11;
 			const u8 v_inmix_on_layer = m_vmixon >> layer2 & 0b11;
+			const u8 v_inmix_layer = m_vinmix >> layer2 & 0b11;
 
 			if (!v_inmix_on_layer)
 			{
+				// if v_inmix_on_layer == 0, the mix mode bits are are taken from the tiles.
+				// this probably needs to be done if v_inmix_on_layer != 0b11, not just v_inmix_on_layer == 0b00?
+				// todo: find a game that sets v_inmix_on to 0b01 or 0b10. 
 				mix_mode_bits2 = u32(mixerflags) >> 30;
 			}
 			else
 			{
+				// v_inmix_on_layer == 0b11 (also 0b01, 0b10 currently)
+				// get mix mode bits from v_inmix
 				mix_mode_bits = v_inmix_layer;
 			}
 		}
-
-		/* blend layer only when:
-		    1) m_vinmix != 0xff
-		    2) its internal mix code is set
-		    3) all mix code bits are internal(overridden until tile blending has been implemented)
-		    4) 0 > alpha < 255;
-		*/
 
 		int flags = 0, flags2 = 0;
 
 		if (const int alpha = m_k054338->set_alpha_level(mix_mode_bits) & 0xFF; alpha < 255)
 		{
-			flags = TILEMAP_DRAW_ALPHA(alpha);
+			flags |= TILEMAP_DRAW_ALPHA(alpha);
 		}
 
 		if (const int alpha = m_k054338->set_alpha_level(mix_mode_bits2) & 0xFF; alpha < 255)
 		{
-			flags2 = TILEMAP_DRAW_ALPHA(alpha);
+			flags2 |= TILEMAP_DRAW_ALPHA(alpha);
 		}
 
 		if (mixerflags & 1 << (layer + 12))
@@ -761,8 +759,8 @@ void konamigx_state::gx_draw_basic_tilemaps(screen_device &screen, bitmap_rgb32 
 
 		m_k056832->m_tilemap_draw(screen, bitmap, cliprect, layer, flags, 0);
 
-		// category 1 contains tiles with a mix code
-		m_k056832->m_tilemap_draw(screen, bitmap, cliprect, layer, flags2 | 1, 0);
+		// category 1 is tiles with a mix code
+		m_k056832->m_tilemap_draw(screen, bitmap, cliprect, layer, flags2, 0);
 	}
 }
 

@@ -206,8 +206,6 @@ VIDEO_START_MEMBER(mystwarr_state, mystwarr)
 	m_k056832->set_layer_offs(1,  0-3, 0);
 	m_k056832->set_layer_offs(2,  2-3, 0);
 	m_k056832->set_layer_offs(3,  3-3, 0);
-
-	m_cbparam = 0;
 }
 
 VIDEO_START_MEMBER(mystwarr_state, metamrph)
