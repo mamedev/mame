@@ -67,7 +67,6 @@ private:
 	void mcu_init();
 	void initial_scan_tables();
 	void mcu_com_w(offs_t offset, uint16_t data, uint16_t mem_mask, int _n_);
-	uint8_t rotate_bits(uint8_t dat, int bits);
 	int decompress_table(int tabnum, uint8_t* dstram, int dstoffset);
 
 	static const int16_t s_keydata[0x40*0x100];
