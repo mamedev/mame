@@ -183,19 +183,12 @@ void kaneko16_berlwall_state::render_15bpp_bitmap(bitmap_rgb32 &bitmap, const re
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		u16 const *srcbitmap;
-		if (!flip)  srcbitmap = &m_bg15_bitmap[screen].pix(       (y - scrolly) & 0xff );
-		else        srcbitmap = &m_bg15_bitmap[screen].pix(255 - ((y - scrolly) & 0xff));
-
+		u16 const *const srcbitmap = &m_bg15_bitmap[screen].pix((flip ? ~(y - scrolly) : (y - scrolly)) & 0xff);
 		u32 *const dstbitmap = &bitmap.pix(y);
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			u16 pix;
-
-			if (!flip)  pix = srcbitmap[       (x - scrollx) & 0xff ];
-			else        pix = srcbitmap[255 - ((x - scrollx) & 0xff)];
-
+			const u16 pix = srcbitmap[(flip ? ~(x - scrollx) : (x - scrollx)) & 0xff];
 			dstbitmap[x] = pal[pix];
 		}
 	}
