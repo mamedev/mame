@@ -58,10 +58,10 @@ public:
 	{
 	}
 
-	void init_bakubrkr();
+	void init_bakubrkr() ATTR_COLD;
 
-	void bakubrkr(machine_config &config);
-	void mgcrystl(machine_config &config);
+	void bakubrkr(machine_config &config) ATTR_COLD;
+	void mgcrystl(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -92,22 +92,22 @@ protected:
 
 	int m_VIEW2_2_pri = 0;
 
-	virtual void common_oki_bank_install(int bankno, size_t fixedsize, size_t bankedsize);
+	virtual void common_oki_bank_install(int bankno, size_t fixedsize, size_t bankedsize) ATTR_COLD;
 	void coin_lockout_w(u8 data);
 	void bloodwar_coin_lockout_w(u8 data);
 
 	void display_enable_w(offs_t offset, u16 data, u16 mem_mask = ~0); // (u16 data, u16 mem_mask = ~0);
 
-	template<unsigned Chip> u16 ym2149_r(offs_t offset);
-	template<unsigned Chip> void ym2149_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	template<unsigned Mask> void oki_bank0_w(u8 data);
-	template<unsigned Mask> void oki_bank1_w(u8 data);
+	template <unsigned Chip> u16 ym2149_r(offs_t offset);
+	template <unsigned Chip> void ym2149_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	template <unsigned Mask> void oki_bank0_w(u8 data);
+	template <unsigned Mask> void oki_bank1_w(u8 data);
 
 	DECLARE_MACHINE_RESET(gtmr);
 	DECLARE_MACHINE_RESET(mgcrystl);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	template<class BitmapClass>
+	template <class BitmapClass>
 	u32 screen_update_common(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
@@ -140,8 +140,8 @@ public:
 	{
 	}
 
-	void wingforc(machine_config &config);
-	void blazeon(machine_config &config);
+	void wingforc(machine_config &config) ATTR_COLD;
+	void blazeon(machine_config &config) ATTR_COLD;
 
 private:
 	required_device<z80_device> m_audiocpu;
@@ -167,15 +167,16 @@ public:
 	{
 	}
 
-	void init_gtmr();
-	void bonkadv(machine_config &config);
-	void gtmr(machine_config &config);
-	void gtmr2(machine_config &config);
-	void gtmre(machine_config &config);
-	void bloodwar(machine_config &config);
+	void init_gtmr() ATTR_COLD;
+
+	void bonkadv(machine_config &config) ATTR_COLD;
+	void gtmr(machine_config &config) ATTR_COLD;
+	void gtmr2(machine_config &config) ATTR_COLD;
+	void gtmre(machine_config &config) ATTR_COLD;
+	void bloodwar(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void common_oki_bank_install(int bankno, size_t fixedsize, size_t bankedsize) override;
+	virtual void common_oki_bank_install(int bankno, size_t fixedsize, size_t bankedsize) override ATTR_COLD;
 
 private:
 	required_device<kaneko_toybox_device> m_toybox;
@@ -204,11 +205,12 @@ public:
 	{
 	}
 
-	void init_berlwall();
-	void init_berlwallk();
-	void init_berlwallt();
-	void init_berlwall_common();
-	void berlwall(machine_config &config);
+	void init_berlwall() ATTR_COLD;
+	void init_berlwallk() ATTR_COLD;
+	void init_berlwallt() ATTR_COLD;
+	void init_berlwall_common() ATTR_COLD;
+
+	void berlwall(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -218,6 +220,9 @@ private:
 	required_device<palette_device> m_bgpalette;
 
 	bitmap_ind16 m_bg15_bitmap[32];
+
+	u8 m_bg15_select = 0U;
+	u8 m_bg15_bright = 0U;
 
 	u8 bg15_select_r();
 	void bg15_select_w(u8 data);
@@ -231,13 +236,10 @@ private:
 	u16 berlwall_spriteregs_r(offs_t offset);
 	void berlwall_spriteregs_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	u8 m_bg15_select = 0U;
-	u8 m_bg15_bright = 0U;
-
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void render_15bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void patch_protection(u32 bra_offset,u16 bra_value,u16 checksum);
+	void patch_protection(u32 bra_offset,u16 bra_value,u16 checksum) ATTR_COLD;
 	void berlwall_map(address_map &map) ATTR_COLD;
 };
 
@@ -250,11 +252,12 @@ public:
 		m_calc3_prot(*this, "calc3_prot")
 	{
 	}
-	void init_shogwarr();
-	void init_brapboys();
 
-	void shogwarr(machine_config &config);
-	void brapboys(machine_config &config);
+	void init_shogwarr() ATTR_COLD;
+	void init_brapboys() ATTR_COLD;
+
+	void shogwarr(machine_config &config) ATTR_COLD;
+	void brapboys(machine_config &config) ATTR_COLD;
 
 private:
 	required_device<kaneko_calc3_device> m_calc3_prot;
