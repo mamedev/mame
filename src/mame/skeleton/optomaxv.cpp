@@ -1,7 +1,7 @@
 /*********************************************************************************************************
 
 Optomax V image analyser, from AMS (Analytical Measuring Systems Ltd.).
-The machine internally uses a CUBE EuroBEEB Single Board Computer (BBC Micro compatible) (PCBs B6 and B7).
+The machine internally uses a CUBE EuroBEEB Single Board Computer (PCBs B6 and B7).
 
 Back panel:
  - Camera input connector (DIN).
