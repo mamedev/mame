@@ -1201,4 +1201,4 @@ GAME( 1989, wgpj,    wgp, wgp,  wgpj,   wgp_state, init_wgp,  ROT0, "Taito Corpo
 GAME( 1989, wgpjoy,  wgp, wgp,  wgpjoy, wgp_state, init_wgp,  ROT0, "Taito Corporation",         "WGP: Real Race Feeling (joystick version) (Japan, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, wgpjoya, wgp, wgp,  wgpjoy, wgp_state, init_wgp,  ROT0, "Taito Corporation",         "WGP: Real Race Feeling (joystick version) (Japan, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, wgp,     0,   wgp2, wgp2,   wgp_state, init_wgp2, ROT0, "Taito Corporation",         "WGP 2: Real Race Feeling (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, wgp2,    0,   wgp2, wgp2,   wgp_state, init_wgp2, ROT0, "Taito Corporation",         "WGP 2: Real Race Feeling (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
