@@ -52,8 +52,8 @@ protected:
 	virtual u32 palette_indirect_entries() const noexcept override { return 8 + 1; }
 
 	virtual u32 vram_size() const noexcept { return 0x4000 >> 1; }
-	virtual u32 bg_color() const noexcept { return BG_COLOR; } 
-	virtual u32 lcd_off_color() const noexcept { return BG_COLOR + 1; } 
+	virtual u32 bg_color() const noexcept { return BG_COLOR; }
+	virtual u32 lcd_off_color() const noexcept { return BG_COLOR + 1; }
 
 	virtual void init_palettes();
 	virtual void setup_palettes();
