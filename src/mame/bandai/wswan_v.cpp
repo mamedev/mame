@@ -37,7 +37,7 @@ wswan_video_device::wswan_video_device(const machine_config &mconfig, const char
 }
 
 wswan_color_video_device::wswan_color_video_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: wswan_video_device(mconfig, WSWAN_COLOR_VIDEO, tag, owner, clock, wswan_video_device::VDP_TYPE_WSC)
+	: wswan_video_device(mconfig, WSWAN_COLOR_VIDEO, tag, owner, clock, VDP_TYPE_WSC)
 {
 }
 
@@ -307,7 +307,7 @@ inline void wswan_video_device::draw_pixel(int x_offset, u8 tile_palette, u8 pix
 
 void wswan_video_device::draw_background()
 {
-	const u16 map_addr = m_layer_bg_address + (((m_current_line + m_layer_bg_scroll_y) & 0xf8) << 2);
+	const u16 map_addr = (m_layer_bg_address & (m_color_mode ? 0x3fff : 0x1fff)) + (((m_current_line + m_layer_bg_scroll_y) & 0xf8) << 2);
 	const u8 start_column = (m_layer_bg_scroll_x >> 3);
 
 	for (int column = 0; column < 29; column++)
@@ -332,7 +332,7 @@ void wswan_video_device::draw_background()
 
 void wswan_video_device::draw_foreground_0()
 {
-	const u16 map_addr = m_layer_fg_address + (((m_current_line + m_layer_fg_scroll_y) & 0xf8) << 2);
+	const u16 map_addr = (m_layer_fg_address & (m_color_mode ? 0x3fff : 0x1fff)) + (((m_current_line + m_layer_fg_scroll_y) & 0xf8) << 2);
 	const u8 start_column = (m_layer_fg_scroll_x >> 3);
 
 	for (int column = 0; column < 29; column++)
@@ -357,7 +357,7 @@ void wswan_video_device::draw_foreground_0()
 
 void wswan_video_device::draw_foreground_2()
 {
-	const u16 map_addr = m_layer_fg_address + (((m_current_line + m_layer_fg_scroll_y) & 0xf8) << 2);
+	const u16 map_addr = (m_layer_fg_address & (m_color_mode ? 0x3fff : 0x1fff)) + (((m_current_line + m_layer_fg_scroll_y) & 0xf8) << 2);
 	const u8 start_column = (m_layer_fg_scroll_x >> 3);
 
 	for (int column = 0; column < 29; column++)
@@ -382,7 +382,7 @@ void wswan_video_device::draw_foreground_2()
 
 void wswan_video_device::draw_foreground_3()
 {
-	const u16 map_addr = m_layer_fg_address + (((m_current_line + m_layer_fg_scroll_y) & 0xf8) << 2);
+	const u16 map_addr = (m_layer_fg_address & (m_color_mode ? 0x3fff : 0x1fff)) + (((m_current_line + m_layer_fg_scroll_y) & 0xf8) << 2);
 	const u8 start_column = (m_layer_fg_scroll_x >> 3);
 
 	for (int column = 0; column < 29; column++)
@@ -622,8 +622,8 @@ void wswan_video_device::reg_w(offs_t offset, u16 data, u16 mem_mask)
 			// Bit 12-15 - Determine foreground table base address 0xxxx000 00000000 (in bytes)
 			if (ACCESSING_BITS_8_15)
 			{
-				m_layer_bg_address = (data & (m_vdp_type == wswan_video_device::VDP_TYPE_WSC ? 0x0f00 : 0x0700)) << 2;
-				m_layer_fg_address = (data & (m_vdp_type == wswan_video_device::VDP_TYPE_WSC ? 0xf000 : 0x7000)) >> 2;
+				m_layer_bg_address = (data & (m_vdp_type == VDP_TYPE_WSC ? 0x0f00 : 0x0700)) << 2;
+				m_layer_fg_address = (data & (m_vdp_type == VDP_TYPE_WSC ? 0xf000 : 0x7000)) >> 2;
 			}
 			break;
 		case 0x08 / 2:
