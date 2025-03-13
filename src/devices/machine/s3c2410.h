@@ -543,7 +543,7 @@ private:
 
 		lcd_regs_t regs;
 		emu_timer *timer;
-		std::unique_ptr<bitmap_rgb32> bitmap[2];
+		bitmap_rgb32 bitmap[2];
 		uint32_t vramaddr_cur;
 		uint32_t vramaddr_max;
 		uint32_t offsize;
