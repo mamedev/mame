@@ -830,7 +830,8 @@ void output_one_device(std::ostream &out, machine_config &config, device_t &devi
 			overall_unemulated |= dev.type().unemulated_features();
 			overall_imperfect |= dev.type().imperfect_features();
 
-			devtypes->insert(&device.type());
+			if (devtypes)
+				devtypes->insert(&device.type());
 		}
 	}
 
