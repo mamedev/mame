@@ -234,7 +234,7 @@ inline void wswan_video_device::get_planes(bool base, u32 number, int line, u32 
 	}
 	else
 	{
-		const u16 tile_address = 0x1000 + (number * 8) + line;
+		const u16 tile_address = ((m_color_mode && base) ? 0x2000 : 0x1000) + (number * 8) + line;
 		if (m_tile_packed)
 		{
 			plane0 = m_vram[tile_address];
