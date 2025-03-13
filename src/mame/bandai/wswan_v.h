@@ -42,7 +42,7 @@ public:
 	static const u16 WSWAN_Y_PIXELS = (18*8);
 
 protected:
-	wswan_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	wswan_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int vdp_type);
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
@@ -57,9 +57,11 @@ protected:
 
 	virtual void init_palettes();
 	virtual void setup_palettes();
-	virtual void get_planes(bool base, u32 number, int line, u32 &plane0, u32 &plane1, u32 &plane2, u32 &plane3);
-	virtual u8 extract_planes(u32 &plane0, u32 &plane1, u32 &plane2, u32 &plane3);
-	virtual void draw_pixel(int x_offset, u8 tile_palette, u8 pixel);
+	void get_tile_data(u16 map_addr, u8 scrolly, u16 &data, u16 &number, u16 &palette, int &line);
+	void get_planes(bool base, u32 number, int line, u32 &plane0, u32 &plane1, u32 &plane2, u32 &plane3);
+	u8 extract_planes(u32 &plane0, u32 &plane1, u32 &plane2, u32 &plane3);
+	int get_xoffset(bool hflip, int x, int column, u8 scrollx);
+	void draw_pixel(int x_offset, u8 tile_palette, u8 pixel);
 	void draw_background();
 	void draw_foreground_0();
 	void draw_foreground_2();
@@ -98,6 +100,9 @@ protected:
 	u8 m_layer_fg_scroll_x;        // Foreground layer X scroll
 	u8 m_layer_fg_scroll_y;        // Foreground layer Y scroll
 	u8 m_lcd_control;              // LCD on/off
+	bool m_color_mode;             // monochrome/color mode
+	bool m_colors_16;              // 4/16 colors mode
+	bool m_tile_packed;            // layered/packed tile mode switch
 	bool m_timer_hblank_enable;    // Horizontal blank interrupt on/off
 	bool m_timer_hblank_mode;      // Horizontal blank timer mode
 	u16 m_timer_hblank_reload;     // Horizontal blank timer reload value
@@ -114,6 +119,7 @@ protected:
 
 	irq_cb_delegate m_set_irq_cb;
 	dmasnd_cb_delegate m_snd_dma_cb;
+	const int m_vdp_type;
 
 	devcb_write8 m_icons_cb;
 
@@ -124,7 +130,16 @@ protected:
 	static constexpr u8 WSWAN_VIDEO_IFLAG_VBL    = 0x40;
 	static constexpr u8 WSWAN_VIDEO_IFLAG_HBLTMR = 0x80;
 
+	static constexpr size_t WSC_VRAM_PALETTE = 0xfe00 >> 1;
+
 	static constexpr u16 BG_COLOR = 64; // background color of wonderswan mono
+	static constexpr u16 COLOR_12BIT = 8; // 12 bit color table of wonderswan color
+
+	enum
+	{
+		VDP_TYPE_WSWAN = 0,
+		VDP_TYPE_WSC
+	};
 };
 
 class wswan_color_video_device : public wswan_video_device
@@ -132,13 +147,8 @@ class wswan_color_video_device : public wswan_video_device
 public:
 	wswan_color_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void reg_w(offs_t offset, u16 data, u16 mem_mask) override;
-
 protected:
 	// device-level overrides
-	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
-
 	virtual u32 palette_entries() const noexcept override { return 2 + 256; }
 	virtual u32 palette_indirect_entries() const noexcept override { return 8 + 4096; }
 
@@ -147,20 +157,6 @@ protected:
 	virtual u32 lcd_off_color() const noexcept override { return 256 + (m_color_mode ? 1 : 0); }
 
 	virtual void init_palettes() override;
-	virtual void setup_palettes() override;
-	virtual void get_planes(bool base, u32 number, int line, u32 &plane0, u32 &plane1, u32 &plane2, u32 &plane3) override;
-	virtual u8 extract_planes(u32 &plane0, u32 &plane1, u32 &plane2, u32 &plane3) override;
-	virtual void draw_pixel(int x_offset, u8 tile_palette, u8 pixel) override;
-
-private:
-	bool m_color_mode;               // monochrome/color mode
-	bool m_colors_16;                // 4/16 colors mode
-	bool m_tile_packed;              // layered/packed tile mode switch
-	u16 *m_palette_vram;
-
-	static constexpr size_t WSC_VRAM_PALETTE = 0xfe00 >> 1;
-
-	static constexpr u16 COLOR_12BIT = 8; // 12 bit color table of wonderswan color
 };
 
 DECLARE_DEVICE_TYPE(WSWAN_VIDEO, wswan_video_device)
