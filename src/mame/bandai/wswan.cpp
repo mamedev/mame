@@ -95,7 +95,7 @@ protected:
 	// Labeled 12.3FXA on wonderswan color pcb
 	static constexpr XTAL X1 = 12.288_MHz_XTAL;
 
-	enum enum_system { TYPE_WSWAN=0, TYPE_WSC };
+	enum enum_system { TYPE_WSWAN = 0, TYPE_WSC };
 
 	struct sound_dma_t
 	{
@@ -244,7 +244,6 @@ void wswan_state::wswan_base(machine_config &config)
 	WSWAN_VIDEO(config, m_vdp, X1 / 4);
 	m_vdp->set_screen("screen");
 	m_vdp->set_irq_callback(FUNC(wswan_state::set_irq_line));
-	m_vdp->set_dmasnd_callback(FUNC(wswan_state::dma_sound_cb));
 	m_vdp->icons_cb().set(FUNC(wswan_state::set_icons));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
@@ -374,7 +373,7 @@ void wswan_state::dma_sound_cb()
 	{
 		address_space &space = m_maincpu->space(AS_PROGRAM);
 		/* TODO: Output sound DMA byte */
-		port_w(0x88 > 2, space.read_byte(m_sound_dma.source) << 8, 0xff00);
+		port_w(0x88 / 2, space.read_byte(m_sound_dma.source) << 8, 0xff00);
 		m_sound_dma.size--;
 		m_sound_dma.source = (m_sound_dma.source + 1) & 0x0fffff;
 		if (m_sound_dma.size == 0)
@@ -515,27 +514,53 @@ u16 wswan_state::port_r(offs_t offset, u16 mem_mask)
 	switch (offset)
 	{
 		case 0x40 / 2:  // DMA source address
-			return m_dma_source_offset;
+			if (m_vdp->color_mode())
+				return m_dma_source_offset;
+			break;
 		case 0x42 / 2:  // DMA source bank/segment
-			return m_dma_source_segment;
+			if (m_vdp->color_mode())
+				return m_dma_source_segment;
+			break;
 		case 0x44 / 2:  // DMA destination address
-			return m_dma_destination;
+			if (m_vdp->color_mode())
+				return m_dma_destination;
+			break;
 		case 0x46 / 2:  // DMA size (in bytes)
-			return m_dma_length;
+			if (m_vdp->color_mode())
+				return m_dma_length;
+			break;
 		case 0x48 / 2:  // DMA control
-			return m_dma_control;
+			if (m_vdp->color_mode())
+				return m_dma_control;
+			break;
 		case 0x4a / 2:
-			// Sound DMA source address
-			return m_sound_dma.source & 0xffff;
+			if (m_vdp->color_mode())
+			{
+				// Sound DMA source address
+				return m_sound_dma.source & 0xffff;
+			}
+			break;
 		case 0x4c / 2:
-			// Sound DMA source memory segment
-			return (m_sound_dma.source >> 16) & 0xffff;
+			if (m_vdp->color_mode())
+			{
+				// Sound DMA source memory segment
+				return (m_sound_dma.source >> 16) & 0xffff;
+			}
+			break;
 		case 0x4e / 2:
-			// Sound DMA transfer size
-			return m_sound_dma.size;
+			if (m_vdp->color_mode())
+			{
+				// Sound DMA transfer size
+				return m_sound_dma.size;
+			}
+			break;
 		case 0x52 / 2:
-			// Sound DMA start/stop
-			return m_sound_dma.enable;
+			if (m_vdp->color_mode())
+			{
+				// Sound DMA start/stop
+				return m_sound_dma.enable;
+			}
+			break;
 		case 0x60 / 2:
 			return m_vdp->reg_r(offset, mem_mask);
 		case 0xa0 / 2:
@@ -628,73 +653,98 @@ void wswan_state::port_w(offs_t offset, u16 data, u16 mem_mask)
 	switch (offset)
 	{
 		case 0x40 / 2:  // DMA source address
-			COMBINE_DATA(&m_dma_source_offset);
-			m_dma_source_offset &= 0xfffe;
+			if (m_vdp->color_mode())
+			{
+				COMBINE_DATA(&m_dma_source_offset);
+				m_dma_source_offset &= 0xfffe;
+			}
 			break;
 		case 0x42 / 2:  // DMA source bank/segment
-			COMBINE_DATA(&m_dma_source_segment);
-			m_dma_source_segment &= 0x000f;
+			if (m_vdp->color_mode())
+			{
+				COMBINE_DATA(&m_dma_source_segment);
+				m_dma_source_segment &= 0x000f;
+			}
 			break;
 		case 0x44 / 2:  // DMA destination address
-			COMBINE_DATA(&m_dma_destination);
-			m_dma_destination &= 0xfffe;
+			if (m_vdp->color_mode())
+			{
+				COMBINE_DATA(&m_dma_destination);
+				m_dma_destination &= 0xfffe;
+			}
 			break;
 		case 0x46 / 2:  // DMA size (in bytes)
-			COMBINE_DATA(&m_dma_length);
+			if (m_vdp->color_mode())
+				COMBINE_DATA(&m_dma_length);
 			break;
 		case 0x48 / 2:  // DMA control
-			// Bit 0-6 - Unknown
-			// Bit 7   - DMA stop/start
-			if (ACCESSING_BITS_0_7)
+			if (m_vdp->color_mode())
 			{
-				if (data & 0x80)
+				// Bit 0-6 - Unknown
+				// Bit 7   - DMA stop/start
+				if (ACCESSING_BITS_0_7)
 				{
-					address_space &mem = m_maincpu->space(AS_PROGRAM);
-					u32 src = m_dma_source_offset | (m_dma_source_segment << 16);
-					u32 dst = m_dma_destination;
-					u16 length = m_dma_length;
-					if (length)
-						m_maincpu->adjust_icount(-(5 + length));
-					for ( ; length > 0; length -= 2)
+					if (data & 0x80)
 					{
-						mem.write_word(dst, mem.read_word(src));
-						src += 2;
-						dst += 2;
+						address_space &mem = m_maincpu->space(AS_PROGRAM);
+						u32 src = m_dma_source_offset | (m_dma_source_segment << 16);
+						u32 dst = m_dma_destination;
+						u16 length = m_dma_length;
+						if (length)
+							m_maincpu->adjust_icount(-(5 + length));
+						for ( ; length > 0; length -= 2)
+						{
+							mem.write_word(dst, mem.read_word(src));
+							src += 2;
+							dst += 2;
+						}
+						m_dma_source_offset = src & 0xffff;
+						m_dma_source_segment = src >> 16;
+						m_dma_destination = dst & 0xffff;
+						m_dma_length = length & 0xffff;
+						data &= 0x7f;
+						m_dma_control = data;
 					}
-					m_dma_source_offset = src & 0xffff;
-					m_dma_source_segment = src >> 16;
-					m_dma_destination = dst & 0xffff;
-					m_dma_length = length & 0xffff;
-					data &= 0x7f;
-					m_dma_control = data;
 				}
 			}
 			break;
 		case 0x4a / 2:
-			// Sound DMA source address (low)
-			if (ACCESSING_BITS_0_7)
-				m_sound_dma.source = (m_sound_dma.source & 0x0fff00) | (data & 0xff);
-			// Sound DMA source address (high)
-			if (ACCESSING_BITS_8_15)
-				m_sound_dma.source = (m_sound_dma.source & 0x0f00ff) | (data & 0xff00);
+			if (m_vdp->color_mode())
+			{
+				// Sound DMA source address (low)
+				if (ACCESSING_BITS_0_7)
+					m_sound_dma.source = (m_sound_dma.source & 0x0fff00) | (data & 0xff);
+				// Sound DMA source address (high)
+				if (ACCESSING_BITS_8_15)
+					m_sound_dma.source = (m_sound_dma.source & 0x0f00ff) | (data & 0xff00);
+			}
 			break;
 		case 0x4c / 2:
-			// Sound DMA source memory segment
-			// Bit 0-3 - Sound DMA source address segment
-			// Bit 4-7 - Unknown
-			if (ACCESSING_BITS_0_7)
-				m_sound_dma.source = (m_sound_dma.source & 0xffff) | ((data & 0x0f) << 16);
+			if (m_vdp->color_mode())
+			{
+				// Sound DMA source memory segment
+				// Bit 0-3 - Sound DMA source address segment
+				// Bit 4-7 - Unknown
+				if (ACCESSING_BITS_0_7)
+					m_sound_dma.source = (m_sound_dma.source & 0xffff) | ((data & 0x0f) << 16);
+			}
 			break;
 		case 0x4e / 2:
-			// Sound DMA transfer size
-			COMBINE_DATA(&m_sound_dma.size);
+			if (m_vdp->color_mode())
+			{
+				// Sound DMA transfer size
+				COMBINE_DATA(&m_sound_dma.size);
+			}
 			break;
 		case 0x52 / 2:
-			// Sound DMA start/stop
-			// Bit 0-6 - Unknown
-			// Bit 7   - Sound DMA stop/start
-			if (ACCESSING_BITS_0_7)
-				m_sound_dma.enable = data & 0xff;
+			if (m_vdp->color_mode())
+			{
+				// Sound DMA start/stop
+				// Bit 0-6 - Unknown
+				// Bit 7   - Sound DMA stop/start
+				if (ACCESSING_BITS_0_7)
+					m_sound_dma.enable = data & 0xff;
+			}
 			break;
 		case 0x60 / 2:
 			m_vdp->reg_w(offset, data, mem_mask);

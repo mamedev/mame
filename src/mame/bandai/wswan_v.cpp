@@ -819,7 +819,8 @@ TIMER_CALLBACK_MEMBER(wswan_video_device::scanline_interrupt)
 	}
 
 	// Handle Sound DMA
-	m_snd_dma_cb();
+	if ((!m_snd_dma_cb.isnull()) && m_color_mode)
+		m_snd_dma_cb();
 
 	if (m_current_line == 144) // buffer sprite table
 	{
@@ -856,11 +857,14 @@ TIMER_CALLBACK_MEMBER(wswan_video_device::scanline_interrupt)
 
 u16 wswan_video_device::vram_r(offs_t offset, u16 mem_mask)
 {
-	return m_vram[offset];
+	return ((!m_color_mode) && (offset >= (0x4000 >> 1))) ? 0x90 : m_vram[offset];
 }
 
 
 void wswan_video_device::vram_w(offs_t offset, u16 data, u16 mem_mask)
 {
+	if ((!m_color_mode) && (offset >= (0x4000 >> 1)))
+		return;
+
 	COMBINE_DATA(&m_vram[offset]);
 }

@@ -38,6 +38,8 @@ public:
 
 	auto icons_cb() { return m_icons_cb.bind(); }
 
+	bool color_mode() { return m_color_mode; }
+
 	static const u16 WSWAN_X_PIXELS = (28*8);
 	static const u16 WSWAN_Y_PIXELS = (18*8);
 
