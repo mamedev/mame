@@ -383,11 +383,11 @@ void turrett_state::turrett(machine_config &config)
 
 
 
-	/*************************************
-	*
-	*  ROM definition
-	*
-	*************************************/
+/*************************************
+ *
+ *  ROM definition
+ *
+ *************************************/
 
 ROM_START( turrett )
 	ROM_REGION( 0x200000, "maincpu", 0 )
