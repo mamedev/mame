@@ -32,7 +32,7 @@ wswan_video_device::wswan_video_device(const machine_config &mconfig, device_typ
 }
 
 wswan_video_device::wswan_video_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: wswan_video_device(mconfig, WSWAN_VIDEO, tag, owner, clock, wswan_video_device::VDP_TYPE_WSWAN)
+	: wswan_video_device(mconfig, WSWAN_VIDEO, tag, owner, clock, VDP_TYPE_WSWAN)
 {
 }
 
