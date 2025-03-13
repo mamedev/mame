@@ -30,6 +30,7 @@ private:
 
 	u16 m_vdp_address[2]{};
 	u32 m_work_address = 0;
+	u16 m_color_code;
 
 	struct BufferArea {
 		u8 start_dot = 0;

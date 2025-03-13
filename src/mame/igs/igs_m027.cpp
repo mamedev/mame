@@ -3670,9 +3670,9 @@ GAME(  2001, extradrw,      0,        extradrw,     base,          igs_m027_stat
 GAME(  2002, chessc2,       0,        chessc2,      chessc2,       igs_m027_state, init_chessc2,  ROT0, "IGS", "Chess Challenge II (ver. 1445A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 
 // these can select between two different games via DIP switch (currently unemulated feature)
-GAME(  2007, cjddzs,        0,        cjddz,        cjddz,         igs_m027_state, init_cjddzs,   ROT0, "bootleg", "Chaoji Dou Dizhu (V219CN) / Chaoji Dou Dizhu Jianan Ban (V302CN)", MACHINE_NOT_WORKING )
-GAME(  2009, cjddzsa,       cjddzs,   cjddz,        cjddz,         igs_m027_state, init_cjddzs,   ROT0, "bootleg", "Chaoji Dou Dizhu (V219CN) / Chaoji Dou Dizhu Jianan Ban (V405CN)", MACHINE_NOT_WORKING )
-GAME(  200?, cjddzps,       0,        cjddz,        cjddzp,        igs_m027_state, init_cjddzps,  ROT0, "bootleg", "Chaoji Dou Dizhu Jiaqiang Ban (S300CN) / unknown second set", MACHINE_NOT_WORKING )
+GAME(  2007, cjddzs,        0,        cjddz,        cjddz,         igs_m027_state, init_cjddzs,   ROT0, "bootleg (WDF)", "Chaoji Dou Dizhu (V219CN) / Chaoji Dou Dizhu Jianan Ban (V302CN)", MACHINE_NOT_WORKING )
+GAME(  2009, cjddzsa,       cjddzs,   cjddz,        cjddz,         igs_m027_state, init_cjddzs,   ROT0, "bootleg (WDF)", "Chaoji Dou Dizhu (V219CN) / Chaoji Dou Dizhu Jianan Ban (V405CN)", MACHINE_NOT_WORKING )
+GAME(  200?, cjddzps,       0,        cjddz,        cjddzp,        igs_m027_state, init_cjddzps,  ROT0, "bootleg (WDF)", "Chaoji Dou Dizhu Jiaqiang Ban (S300CN) / unknown second set", MACHINE_NOT_WORKING )
 
 // Incomplete dumps
 GAME(  1999, amazonia,      0,        m027_1ppi<false>, amazonia, igs_m027_state, init_amazonia, ROT0, "IGS", "Amazonia King (V104BR)", MACHINE_NOT_WORKING )

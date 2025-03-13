@@ -6,7 +6,6 @@ IGS games based on M68000 + IGS023 for video.
 PGM-like but with different sound hardware.
 
 TODO:
-* currently stuck at ACK 2 error during boot (IGS025?)
 * identify sound hardware
 * identify where the M6502 core is contained
 */
