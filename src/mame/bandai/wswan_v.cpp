@@ -856,7 +856,7 @@ void wswan_color_video_device::reg_w(offs_t offset, u16 data, u16 mem_mask)
 			// Bit 6-7 - Unknown
 			if (ACCESSING_BITS_0_7)
 			{
-				if (!m_color_mode)
+				if (m_color_mode)
 					m_sprite_table_address = (data & 0x3f) << 8;
 				else
 					m_sprite_table_address = (data & 0x1f) << 8;
