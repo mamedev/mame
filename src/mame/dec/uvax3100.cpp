@@ -2,7 +2,7 @@
 // copyright-holders:
 /***********************************************************************************************************************
 
-  Skeleton driver for DEC MicroVAX 3100 models.
+  Skeleton driver for first-generation (CVAX-based) DEC MicroVAX 3100 models.
 
 
   Hardhare for MicroVAX 3100 Model 10:
@@ -114,12 +114,20 @@ public:
 		, m_terminal(*this, "terminal")
 	{ }
 
-	void uvax3100(machine_config &config);
+	void uvax3100(machine_config &config) ATTR_COLD;
 
 private:
+	void mem_map(address_map &map) ATTR_COLD;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 };
+
+
+void uvax3100_state::mem_map(address_map &map)
+{
+	map(0x20040000, 0x2007ffff).rom().region("maincpu", 0);
+}
 
 
 // Input ports
@@ -132,6 +140,7 @@ void uvax3100_state::uvax3100(machine_config &config)
 {
 	// Basic machine hardware
 	DC341(config, m_maincpu, 66.6667_MHz_XTAL / 6); // CPU CVAX 21-24674-17 11.11 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &uvax3100_state::mem_map);
 
 	AM7990(config, "lance1", 0); // AMD AM7990PC/80
 
@@ -145,8 +154,8 @@ void uvax3100_state::uvax3100(machine_config &config)
 
 ROM_START( mv3100m10 )
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "dec89_23-117e8-00_system_rom_hi_word.e25", 0x00000, 0x20000, CRC(df572ac3) SHA1(5e91d0f4fc8442e3ebc2424d9f85078ba00d2de5) )
-	ROM_LOAD16_BYTE( "dec89_23-116e8-00_system_rom_lo_word.e24", 0x00001, 0x20000, CRC(69ef8cf5) SHA1(a59a500921278dc356a519cb435641426c844779) )
+	ROM_LOAD32_WORD( "dec89_23-116e8-00_system_rom_lo_word.e24", 0x00000, 0x20000, CRC(69ef8cf5) SHA1(a59a500921278dc356a519cb435641426c844779) )
+	ROM_LOAD32_WORD( "dec89_23-117e8-00_system_rom_hi_word.e25", 0x00002, 0x20000, CRC(df572ac3) SHA1(5e91d0f4fc8442e3ebc2424d9f85078ba00d2de5) )
 
 	ROM_REGION( 0x20000, "scsi", ROMREGION_ERASEFF )
 	ROM_LOAD(  "dec89_23-061e8-00_scsi_rom.e98",      0x00000, 0x20000, CRC(51fb8268) SHA1(a930869dce955b9b7a2b0fb68840e863c74e6512) )
