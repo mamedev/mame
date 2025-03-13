@@ -723,34 +723,17 @@ void konamigx_state::gx_draw_basic_tilemaps(screen_device &screen, bitmap_rgb32 
 		{
 			const u8 v_inmix_on_layer = m_vmixon >> layer2 & 0b11;
 			const u8 v_inmix_layer = m_vinmix >> layer2 & 0b11;
+			const u8 tile_mix_code = u32(mixerflags) >> 30;
 
-			if (!v_inmix_on_layer)
-			{
-				// if v_inmix_on_layer == 0, the mix mode bits are are taken from the tiles.
-				// this probably needs to be done if v_inmix_on_layer != 0b11, not just v_inmix_on_layer == 0b00?
-				// todo: find a game that sets v_inmix_on to 0b01 or 0b10.
-				mix_mode_bits2 = u32(mixerflags) >> 30;
-			}
-			else
-			{
-				// v_inmix_on_layer == 0b11 (also 0b01, 0b10 currently)
-				// get mix mode bits from v_inmix
-				mix_mode_bits = v_inmix_layer;
-			}
+			mix_mode_bits = v_inmix_layer & v_inmix_on_layer;
+			mix_mode_bits2 = tile_mix_code & ~v_inmix_on_layer;
+
+			// todo: comment here
+			// mix_mode_bits3 = mix_mode_bits | mix_mode_bits2;
 		}
 
 		int flags = TILEMAP_DRAW_CATEGORY(0);
 		int flags2 = TILEMAP_DRAW_CATEGORY(1);
-
-		if (const int alpha = m_k054338->set_alpha_level(mix_mode_bits) & 0xFF; alpha < 255)
-		{
-			flags |= TILEMAP_DRAW_ALPHA(alpha);
-		}
-
-		if (const int alpha = m_k054338->set_alpha_level(mix_mode_bits2) & 0xFF; alpha < 255)
-		{
-			flags2 |= TILEMAP_DRAW_ALPHA(alpha);
-		}
 
 		if (mixerflags & 1 << (layer + 12))
 		{
@@ -758,10 +741,32 @@ void konamigx_state::gx_draw_basic_tilemaps(screen_device &screen, bitmap_rgb32 
 			flags2 |= K056382_DRAW_FLAG_FORCE_XYSCROLL;
 		}
 
-		m_k056832->m_tilemap_draw(screen, bitmap, cliprect, layer, flags, 0);
+		const int alpha = m_k054338->set_alpha_level(mix_mode_bits) & 0xFF;
+		const int alpha2 = m_k054338->set_alpha_level(mix_mode_bits2) & 0xFF;
 
-		// category 1 is tiles with a mix code
-		m_k056832->m_tilemap_draw(screen, bitmap, cliprect, layer, flags2, 0);
+		if (alpha < 255)
+		{
+			flags |= TILEMAP_DRAW_ALPHA(alpha);
+		}
+
+		if (alpha2 < 255)
+		{
+			flags2 |= TILEMAP_DRAW_ALPHA(alpha2);
+		}
+
+
+
+		if (alpha2 < 255)
+		{
+			m_k056832->m_tilemap_draw(screen, bitmap, cliprect, layer, flags2, 0);
+		}
+		else
+		{
+			// if no alpha is being used for category 1 (tile mix code) tiles,
+			// draw all tiles with one m_tilemap_draw call
+			flags |= TILEMAP_DRAW_ALL_CATEGORIES;
+		}
+		m_k056832->m_tilemap_draw(screen, bitmap, cliprect, layer, flags, 0);
 	}
 }
 
@@ -1046,6 +1051,20 @@ K056832_CB_MEMBER(konamigx_state::type2_tile_callback)
 
 	*code = (m_gx_tilebanks[(d & 0xe000)>>13]<<13) + (d & 0x1fff);
 	K055555GX_decode_vmixcolor(layer, color);
+}
+
+K056832_CB_MEMBER(konamigx_state::salmndr2_tile_callback)
+{
+	int d = *code;
+
+	*code = (m_gx_tilebanks[(d & 0xe000)>>13]<<13) + (d & 0x1fff);
+	K055555GX_decode_vmixcolor(layer, color);
+
+	const u8 mix_code = (*flags >> (8 + 4)) & 0b11;
+	if (mix_code) {
+		*priority = 1;
+		m_last_alpha_tile_mix_code = mix_code;
+	}
 }
 
 K056832_CB_MEMBER(konamigx_state::alpha_tile_callback)

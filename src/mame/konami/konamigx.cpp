@@ -1831,6 +1831,8 @@ void konamigx_state::salmndr2(machine_config &config)
 	konamigx(config);
 	m_k056832->set_config(K056832_BPP_6, 1, 0);
 
+	m_k056832->set_tile_callback(FUNC(konamigx_state::salmndr2_tile_callback));
+
 	m_k055673->set_sprite_callback(FUNC(konamigx_state::salmndr2_sprite_callback));
 	m_k055673->set_config(K055673_LAYOUT_GX6, -48, -23);
 }

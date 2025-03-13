@@ -115,6 +115,7 @@ public:
 	TIMER_CALLBACK_MEMBER(boothack_callback);
 	double adc0834_callback(uint8_t input);
 	K056832_CB_MEMBER(type2_tile_callback);
+	K056832_CB_MEMBER(salmndr2_tile_callback);
 	K056832_CB_MEMBER(alpha_tile_callback);
 	K055673_CB_MEMBER(type2_sprite_callback);
 	K055673_CB_MEMBER(dragoonj_sprite_callback);

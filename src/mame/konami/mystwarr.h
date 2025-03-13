@@ -105,6 +105,7 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(metamrph_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(mchamp_interrupt);
 	K056832_CB_MEMBER(mystwarr_tile_callback);
+	K056832_CB_MEMBER(viostorm_tile_callback);
 	K056832_CB_MEMBER(game5bpp_tile_callback);
 	K056832_CB_MEMBER(game4bpp_tile_callback);
 	K055673_CB_MEMBER(mystwarr_sprite_callback);

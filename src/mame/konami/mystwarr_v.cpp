@@ -68,6 +68,17 @@ K056832_CB_MEMBER(mystwarr_state::mystwarr_tile_callback)
 	*color = m_layer_colorbase[layer] | (*color >> 1 & 0x1e);
 }
 
+K056832_CB_MEMBER(mystwarr_state::viostorm_tile_callback)
+{
+	const u8 mix_code = (*flags >> 8) & 0b11;
+	if (mix_code) {
+		*priority = 1;
+		m_last_alpha_tile_mix_code = mix_code;
+	}
+
+	*color = m_layer_colorbase[layer] | (*color >> 2 & 0x0f);
+}
+
 // for games with 5bpp tile data
 K056832_CB_MEMBER(mystwarr_state::game5bpp_tile_callback)
 {
@@ -282,7 +293,8 @@ uint32_t mystwarr_state::screen_update_metamrph(screen_device &screen, bitmap_rg
 
 	m_sprite_colorbase = m_k055555->K055555_get_palette_index(4) << 4;
 
-	konamigx_mixer(screen, bitmap, cliprect, nullptr, GXSUB_K053250 | GXSUB_4BPP, nullptr, 0, 0, nullptr, 0);
+	int mixerflags = m_last_alpha_tile_mix_code << 30;
+	konamigx_mixer(screen, bitmap, cliprect, nullptr, GXSUB_K053250 | GXSUB_4BPP, nullptr, 0, mixerflags, nullptr, 0);
 	return 0;
 }
 
