@@ -51,7 +51,7 @@ protected:
 	virtual u32 palette_entries() const noexcept override { return 2 + 64; }
 	virtual u32 palette_indirect_entries() const noexcept override { return 8 + 1; }
 
-	virtual u32 vram_size() const noexcept { return 0x4000; }
+	virtual u32 vram_size() const noexcept { return 0x4000 >> 1; }
 	virtual u32 bg_color() const noexcept { return BG_COLOR; } 
 	virtual u32 lcd_off_color() const noexcept { return BG_COLOR + 1; } 
 
@@ -67,7 +67,6 @@ protected:
 	void handle_sprites(bool mask);
 	void refresh_scanline();
 	TIMER_CALLBACK_MEMBER(scanline_interrupt);
-	virtual void common_save();
 
 	bitmap_ind16 m_bitmap;
 	bool m_layer_bg_enable;        // Background layer on/off
@@ -143,7 +142,7 @@ protected:
 	virtual u32 palette_entries() const noexcept override { return 2 + 256; }
 	virtual u32 palette_indirect_entries() const noexcept override { return 8 + 4096; }
 
-	virtual u32 vram_size() const noexcept override { return 0x10000; }
+	virtual u32 vram_size() const noexcept override { return 0x10000 >> 1; }
 	virtual u32 bg_color() const noexcept override { return m_color_mode ? m_bg_control : BG_COLOR; } 
 	virtual u32 lcd_off_color() const noexcept override { return 256 + (m_color_mode ? 1 : 0); }
 
@@ -152,7 +151,6 @@ protected:
 	virtual void get_planes(bool base, u32 number, int line, u32 &plane0, u32 &plane1, u32 &plane2, u32 &plane3) override;
 	virtual u8 extract_planes(u32 &plane0, u32 &plane1, u32 &plane2, u32 &plane3) override;
 	virtual void draw_pixel(int x_offset, u8 tile_palette, u8 pixel) override;
-	virtual void common_save() override;
 
 private:
 	bool m_color_mode;               // monochrome/color mode

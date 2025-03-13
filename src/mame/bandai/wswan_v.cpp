@@ -8,7 +8,6 @@
  Wilbert Pol
 
  TODO:
-   - split the Color VDP from the Mono VDP
    - Add support for WSC high/low contrast (register 14, bit 1)
 
  ***************************************************************************/
@@ -46,8 +45,20 @@ wswan_video_device::~wswan_video_device()
 }
 
 
-void wswan_video_device::common_save()
+void wswan_video_device::device_start()
 {
+	init_palettes();
+	screen().register_screen_bitmap(m_bitmap);
+
+	m_timer = timer_alloc(FUNC(wswan_video_device::scanline_interrupt), this);
+	m_timer->adjust(attotime::from_ticks(256, clock()), 0, attotime::from_ticks(256, clock()));
+
+	// bind callbacks
+	m_set_irq_cb.resolve();
+	m_snd_dma_cb.resolve();
+
+	m_vram = make_unique_clear<u16 []>(vram_size());
+
 	save_item(NAME(m_bitmap));
 	save_pointer(NAME(m_vram), vram_size());
 	save_item(NAME(m_palette_port));
@@ -92,37 +103,15 @@ void wswan_video_device::common_save()
 	save_item(NAME(m_timer_vblank_count));
 }
 
-void wswan_color_video_device::common_save()
-{
-	wswan_video_device::common_save();
-
-	save_item(NAME(m_color_mode));
-	save_item(NAME(m_colors_16));
-	save_item(NAME(m_tile_packed));
-}
-
-void wswan_video_device::device_start()
-{
-	init_palettes();
-	screen().register_screen_bitmap(m_bitmap);
-
-	m_timer = timer_alloc(FUNC(wswan_video_device::scanline_interrupt), this);
-	m_timer->adjust(attotime::from_ticks(256, clock()), 0, attotime::from_ticks(256, clock()));
-
-	// bind callbacks
-	m_set_irq_cb.resolve();
-	m_snd_dma_cb.resolve();
-
-	m_vram = make_unique_clear<u16 []>(vram_size());
-
-	common_save();
-}
-
 void wswan_color_video_device::device_start()
 {
 	wswan_video_device::device_start();
 
 	m_palette_vram = &m_vram[WSC_VRAM_PALETTE];
+
+	save_item(NAME(m_color_mode));
+	save_item(NAME(m_colors_16));
+	save_item(NAME(m_tile_packed));
 }
 
 
