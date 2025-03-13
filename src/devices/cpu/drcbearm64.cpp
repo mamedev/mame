@@ -574,7 +574,7 @@ private:
 
 	drc_hash_table m_hash;
 	drc_map_variables m_map;
-	FILE * m_log_asmjit;
+	FILE *m_log_asmjit;
 
 	arm64_entry_point_func m_entry;
 	drccodeptr m_exit;
@@ -1559,6 +1559,16 @@ void drcbe_arm64::generate(drcuml_block &block, const instruction *instlist, uin
 	{
 		const instruction &inst = instlist[inum];
 		assert(inst.opcode() < std::size(s_opcode_table));
+
+		// must remain in scope until output
+		std::string dasm;
+
+		// add a comment
+		if (logger.file())
+		{
+			dasm = inst.disasm(&m_drcuml);
+			a.setInlineComment(dasm.c_str());
+		}
 
 		// generate code
 		(this->*s_opcode_table[inst.opcode()])(a, inst);
