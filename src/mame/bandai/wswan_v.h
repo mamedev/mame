@@ -37,6 +37,7 @@ public:
 	void reg_w(offs_t offset, u16 data, u16 mem_mask);
 
 	auto icons_cb() { return m_icons_cb.bind(); }
+	auto color_mode_cb() { return m_color_mode_cb.bind(); }
 
 	bool color_mode() { return m_color_mode; }
 
@@ -124,6 +125,7 @@ protected:
 	const int m_vdp_type;
 
 	devcb_write8 m_icons_cb;
+	devcb_write_line m_color_mode_cb;
 
 	// interrupt flags
 	// these are the same as the bandai/wswan.cpp ones

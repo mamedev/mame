@@ -67,6 +67,9 @@ public:
 	void pockchv2(machine_config &config);
 
 protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
 	void wswan_base(machine_config &config);
 
 	// Interrupt flags
@@ -97,30 +100,21 @@ protected:
 
 	enum enum_system { TYPE_WSWAN = 0, TYPE_WSC };
 
-	struct sound_dma_t
-	{
-		sound_dma_t() { }
-
-		u32  source = 0; // Source address
-		u16  size = 0;   // Size
-		u8   enable = 0; // Enabled
-	};
-
 	required_device<v30mz_cpu_device> m_maincpu;
 	required_device<wswan_video_device> m_vdp;
 	required_device<wswan_sound_device> m_sound;
 	required_device<ws_cart_slot_device> m_cart;
 
+	required_memory_region m_region_maincpu;
+	required_ioport m_cursx;
+	required_ioport m_cursy;
+	required_ioport m_buttons;
+	output_finder<6> m_icons;
+
 	u16 m_ws_portram[128] = { };
 	u8 m_internal_eeprom[INTERNAL_EEPROM_SIZE * 2] = { };
 	u8 m_system_type = 0;
-	sound_dma_t m_sound_dma;
-	u16 m_dma_source_offset = 0;
-	u16 m_dma_source_segment = 0;
-	u16 m_dma_destination = 0;
-	u16 m_dma_length = 0;
-	u16 m_dma_control = 0;
-	u8 m_bios_disabled = 0;
+	bool m_bios_disabled = false;
 	u8 m_rotate = 0;
 	u32 m_vector = 0;
 	u8 m_sys_control = 0;
@@ -134,46 +128,67 @@ protected:
 	u8 m_internal_eeprom_command = 0;
 	u8 m_keypad = 0;
 
-	required_memory_region m_region_maincpu;
-	required_ioport m_cursx;
-	required_ioport m_cursy;
-	required_ioport m_buttons;
-	output_finder<6> m_icons;
-
 	u16 bios_r(offs_t offset, u16 mem_mask);
 	u16 port_r(offs_t offset, u16 mem_mask);
 	void port_w(offs_t offset, u16 data, u16 mem_mask);
 
 	void set_irq_line(int irq);
-	void dma_sound_cb();
 	void common_start();
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 
-	void io_map(address_map &map) ATTR_COLD;
-	void mem_map(address_map &map) ATTR_COLD;
-	void snd_map(address_map &map) ATTR_COLD;
-
-	void register_save();
 	void handle_irqs();
 	void clear_irq_line(int irq);
 	virtual u16 get_internal_eeprom_address();
 	u32 get_vector() { return m_vector; }
 	void set_icons(u8 data);
 	void set_rotate_view();
+
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
+	void snd_map(address_map &map) ATTR_COLD;
 };
 
 
 class wscolor_state : public wswan_state
 {
 public:
-	using wswan_state::wswan_state;
+	wscolor_state(const machine_config &mconfig, device_type type, const char *tag) :
+		wswan_state(mconfig, type, tag),
+		m_dma_view(*this, "dma_view")
+	{ }
+
 	void wscolor(machine_config &config);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	void mem_map(address_map &map) ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
 	virtual u16 get_internal_eeprom_address() override;
+
+private:
+	memory_view m_dma_view;
+
+	struct sound_dma_t
+	{
+		sound_dma_t() { }
+
+		u32  source = 0; // Source address
+		u16  size = 0;   // Size
+		u8   enable = 0; // Enabled
+	};
+	sound_dma_t m_sound_dma;
+	u16 m_dma_source_offset = 0;
+	u16 m_dma_source_segment = 0;
+	u16 m_dma_destination = 0;
+	u16 m_dma_length = 0;
+	u16 m_dma_control = 0;
+
+	u16 dma_r(offs_t offset, u16 mem_mask);
+	void dma_w(offs_t offset, u16 data, u16 mem_mask);
+	void dma_view_w(int state);
+	void dma_sound_cb();
+
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -187,7 +202,7 @@ void wswan_state::mem_map(address_map &map)
 
 void wscolor_state::mem_map(address_map &map)
 {
-	map(0x00000, 0x0ffff).rw(m_vdp, FUNC(wswan_video_device::vram_r), FUNC(wswan_video_device::vram_w));       // 16kb RAM / 4 colour tiles, 16 colour tiles + palettes
+	map(0x00000, 0x0ffff).rw(m_vdp, FUNC(wswan_video_device::vram_r), FUNC(wswan_video_device::vram_w));       // 16/64kb RAM / 4 colour tiles, 16 colour tiles + palettes
 	map(0xf0000, 0xfffff).r(FUNC(wscolor_state::bios_r));
 }
 
@@ -195,6 +210,14 @@ void wscolor_state::mem_map(address_map &map)
 void wswan_state::io_map(address_map &map)
 {
 	map(0x00, 0xff).rw(FUNC(wswan_state::port_r), FUNC(wswan_state::port_w));   // I/O ports
+}
+
+
+void wscolor_state::io_map(address_map &map)
+{
+	map(0x00, 0xff).rw(FUNC(wscolor_state::port_r), FUNC(wscolor_state::port_w));   // I/O ports
+	map(0x40, 0x53).view(m_dma_view);
+	m_dma_view[0](0x40, 0x53).rw(FUNC(wscolor_state::dma_r), FUNC(wscolor_state::dma_w));
 }
 
 
@@ -294,12 +317,14 @@ void wscolor_state::wscolor(machine_config &config)
 	wswan(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &wscolor_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &wscolor_state::io_map);
 
 	WSWAN_COLOR_VIDEO(config.replace(), m_vdp, X1 / 4);
 	m_vdp->set_screen("screen");
 	m_vdp->set_irq_callback(FUNC(wscolor_state::set_irq_line));
 	m_vdp->set_dmasnd_callback(FUNC(wscolor_state::dma_sound_cb));
 	m_vdp->icons_cb().set(FUNC(wscolor_state::set_icons));
+	m_vdp->color_mode_cb().set(FUNC(wscolor_state::dma_view_w));
 
 	// software lists
 	config.device_remove("wsc_list");
@@ -367,7 +392,7 @@ void wswan_state::set_irq_line(int irq)
 }
 
 
-void wswan_state::dma_sound_cb()
+void wscolor_state::dma_sound_cb()
 {
 	if ((m_sound_dma.enable & 0x88) == 0x80)
 	{
@@ -391,42 +416,10 @@ void wswan_state::clear_irq_line(int irq)
 }
 
 
-void wswan_state::register_save()
-{
-	save_item(NAME(m_ws_portram));
-	save_item(NAME(m_internal_eeprom));
-	save_item(NAME(m_bios_disabled));
-	save_item(NAME(m_rotate));
-
-	save_item(NAME(m_sound_dma.source));
-	save_item(NAME(m_sound_dma.size));
-	save_item(NAME(m_sound_dma.enable));
-	save_item(NAME(m_vector));
-
-	save_item(NAME(m_dma_source_offset));
-	save_item(NAME(m_dma_source_segment));
-	save_item(NAME(m_dma_destination));
-	save_item(NAME(m_dma_length));
-	save_item(NAME(m_dma_control));
-	save_item(NAME(m_sys_control));
-	save_item(NAME(m_irq_vector_base));
-	save_item(NAME(m_serial_data));
-	save_item(NAME(m_serial_control));
-	save_item(NAME(m_irq_enable));
-	save_item(NAME(m_irq_active));
-	save_item(NAME(m_internal_eeprom_data));
-	save_item(NAME(m_internal_eeprom_address));
-	save_item(NAME(m_internal_eeprom_command));
-	save_item(NAME(m_keypad));
-
-	if (m_cart->exists())
-		m_cart->save_nvram();
-}
-
-
 void wswan_state::common_start()
 {
-	register_save();
+	if (m_cart->exists())
+		m_cart->save_nvram();
 
 	m_icons.resolve();
 
@@ -444,6 +437,24 @@ void wswan_state::common_start()
 			m_maincpu->space(AS_PROGRAM).install_write_handler(0x10000, 0x1ffff, write16s_delegate(*m_cart, FUNC(ws_cart_slot_device::write_ram)));
 		}
 	}
+
+	save_item(NAME(m_ws_portram));
+	save_item(NAME(m_internal_eeprom));
+	save_item(NAME(m_bios_disabled));
+	save_item(NAME(m_rotate));
+
+	save_item(NAME(m_vector));
+
+	save_item(NAME(m_sys_control));
+	save_item(NAME(m_irq_vector_base));
+	save_item(NAME(m_serial_data));
+	save_item(NAME(m_serial_control));
+	save_item(NAME(m_irq_enable));
+	save_item(NAME(m_irq_active));
+	save_item(NAME(m_internal_eeprom_data));
+	save_item(NAME(m_internal_eeprom_address));
+	save_item(NAME(m_internal_eeprom_command));
+	save_item(NAME(m_keypad));
 }
 
 
@@ -460,12 +471,22 @@ void wscolor_state::machine_start()
 	common_start();
 	subdevice<nvram_device>("nvram")->set_base(m_internal_eeprom, INTERNAL_EEPROM_SIZE * 2);
 	m_system_type = TYPE_WSC;
+
+	save_item(NAME(m_sound_dma.source));
+	save_item(NAME(m_sound_dma.size));
+	save_item(NAME(m_sound_dma.enable));
+
+	save_item(NAME(m_dma_source_offset));
+	save_item(NAME(m_dma_source_segment));
+	save_item(NAME(m_dma_destination));
+	save_item(NAME(m_dma_length));
+	save_item(NAME(m_dma_control));
 }
 
 
 void wswan_state::machine_reset()
 {
-	m_bios_disabled = 0;
+	m_bios_disabled = false;
 
 	m_rotate = 0;
 
@@ -483,9 +504,25 @@ void wswan_state::machine_reset()
 	std::fill(std::begin(m_ws_portram), std::end(m_ws_portram), 0);
 
 	set_rotate_view();
+}
+
+void wscolor_state::machine_reset()
+{
+	wswan_state::machine_reset();
+
+	m_dma_view.disable();
 
 	/* Initialize sound DMA */
 	m_sound_dma = sound_dma_t();
+}
+
+
+void wscolor_state::dma_view_w(int state)
+{
+	if (state)
+		m_dma_view.select(0);
+	else
+		m_dma_view.disable();
 }
 
 
@@ -513,54 +550,6 @@ u16 wswan_state::port_r(offs_t offset, u16 mem_mask)
 
 	switch (offset)
 	{
-		case 0x40 / 2:  // DMA source address
-			if (m_vdp->color_mode())
-				return m_dma_source_offset;
-			break;
-		case 0x42 / 2:  // DMA source bank/segment
-			if (m_vdp->color_mode())
-				return m_dma_source_segment;
-			break;
-		case 0x44 / 2:  // DMA destination address
-			if (m_vdp->color_mode())
-				return m_dma_destination;
-			break;
-		case 0x46 / 2:  // DMA size (in bytes)
-			if (m_vdp->color_mode())
-				return m_dma_length;
-			break;
-		case 0x48 / 2:  // DMA control
-			if (m_vdp->color_mode())
-				return m_dma_control;
-			break;
-		case 0x4a / 2:
-			if (m_vdp->color_mode())
-			{
-				// Sound DMA source address
-				return m_sound_dma.source & 0xffff;
-			}
-			break;
-		case 0x4c / 2:
-			if (m_vdp->color_mode())
-			{
-				// Sound DMA source memory segment
-				return (m_sound_dma.source >> 16) & 0xffff;
-			}
-			break;
-		case 0x4e / 2:
-			if (m_vdp->color_mode())
-			{
-				// Sound DMA transfer size
-				return m_sound_dma.size;
-			}
-			break;
-		case 0x52 / 2:
-			if (m_vdp->color_mode())
-			{
-				// Sound DMA start/stop
-				return m_sound_dma.enable;
-			}
-			break;
 		case 0x60 / 2:
 			return m_vdp->reg_r(offset, mem_mask);
 		case 0xa0 / 2:
@@ -652,100 +641,6 @@ void wswan_state::port_w(offs_t offset, u16 data, u16 mem_mask)
 
 	switch (offset)
 	{
-		case 0x40 / 2:  // DMA source address
-			if (m_vdp->color_mode())
-			{
-				COMBINE_DATA(&m_dma_source_offset);
-				m_dma_source_offset &= 0xfffe;
-			}
-			break;
-		case 0x42 / 2:  // DMA source bank/segment
-			if (m_vdp->color_mode())
-			{
-				COMBINE_DATA(&m_dma_source_segment);
-				m_dma_source_segment &= 0x000f;
-			}
-			break;
-		case 0x44 / 2:  // DMA destination address
-			if (m_vdp->color_mode())
-			{
-				COMBINE_DATA(&m_dma_destination);
-				m_dma_destination &= 0xfffe;
-			}
-			break;
-		case 0x46 / 2:  // DMA size (in bytes)
-			if (m_vdp->color_mode())
-				COMBINE_DATA(&m_dma_length);
-			break;
-		case 0x48 / 2:  // DMA control
-			if (m_vdp->color_mode())
-			{
-				// Bit 0-6 - Unknown
-				// Bit 7   - DMA stop/start
-				if (ACCESSING_BITS_0_7)
-				{
-					if (data & 0x80)
-					{
-						address_space &mem = m_maincpu->space(AS_PROGRAM);
-						u32 src = m_dma_source_offset | (m_dma_source_segment << 16);
-						u32 dst = m_dma_destination;
-						u16 length = m_dma_length;
-						if (length)
-							m_maincpu->adjust_icount(-(5 + length));
-						for ( ; length > 0; length -= 2)
-						{
-							mem.write_word(dst, mem.read_word(src));
-							src += 2;
-							dst += 2;
-						}
-						m_dma_source_offset = src & 0xffff;
-						m_dma_source_segment = src >> 16;
-						m_dma_destination = dst & 0xffff;
-						m_dma_length = length & 0xffff;
-						data &= 0x7f;
-						m_dma_control = data;
-					}
-				}
-			}
-			break;
-		case 0x4a / 2:
-			if (m_vdp->color_mode())
-			{
-				// Sound DMA source address (low)
-				if (ACCESSING_BITS_0_7)
-					m_sound_dma.source = (m_sound_dma.source & 0x0fff00) | (data & 0xff);
-				// Sound DMA source address (high)
-				if (ACCESSING_BITS_8_15)
-					m_sound_dma.source = (m_sound_dma.source & 0x0f00ff) | (data & 0xff00);
-			}
-			break;
-		case 0x4c / 2:
-			if (m_vdp->color_mode())
-			{
-				// Sound DMA source memory segment
-				// Bit 0-3 - Sound DMA source address segment
-				// Bit 4-7 - Unknown
-				if (ACCESSING_BITS_0_7)
-					m_sound_dma.source = (m_sound_dma.source & 0xffff) | ((data & 0x0f) << 16);
-			}
-			break;
-		case 0x4e / 2:
-			if (m_vdp->color_mode())
-			{
-				// Sound DMA transfer size
-				COMBINE_DATA(&m_sound_dma.size);
-			}
-			break;
-		case 0x52 / 2:
-			if (m_vdp->color_mode())
-			{
-				// Sound DMA start/stop
-				// Bit 0-6 - Unknown
-				// Bit 7   - Sound DMA stop/start
-				if (ACCESSING_BITS_0_7)
-					m_sound_dma.enable = data & 0xff;
-			}
-			break;
 		case 0x60 / 2:
 			m_vdp->reg_w(offset, data, mem_mask);
 			break;
@@ -811,9 +706,9 @@ void wswan_state::port_w(offs_t offset, u16 data, u16 mem_mask)
 			if (ACCESSING_BITS_0_7)
 			{
 				m_sys_control = (data & 0xfd) | ((m_system_type == TYPE_WSC) ? 2 : 0);
-				if ((data & 0x01) && !m_bios_disabled)
+				if (BIT(data, 0) && !m_bios_disabled)
 				{
-					m_bios_disabled = 1;
+					m_bios_disabled = true;
 					if (m_cart->exists())
 						m_maincpu->space(AS_PROGRAM).install_read_handler(0x40000, 0xfffff, read16s_delegate(*m_cart, FUNC(ws_cart_slot_device::read_rom40)));
 				}
@@ -852,12 +747,12 @@ void wswan_state::port_w(offs_t offset, u16 data, u16 mem_mask)
 			{
 				m_serial_data = 0xff;
 				m_serial_control = data >> 8;
-				if (m_serial_control & 0x80)
+				if (BIT(m_serial_control, 7))
 				{
 					//              m_serial_data = 0x00;
 					m_serial_control |= 0x04;
 				}
-				if (m_serial_control & 0x20)
+				if (BIT(m_serial_control, 5))
 				{
 					//              m_serial_control |= 0x01;
 				}
@@ -906,14 +801,14 @@ void wswan_state::port_w(offs_t offset, u16 data, u16 mem_mask)
 			if (ACCESSING_BITS_0_7)
 			{
 				m_internal_eeprom_command = data & 0xfc;
-				if (m_internal_eeprom_command & 0x20)
+				if (BIT(m_internal_eeprom_command, 5))
 				{
 					u16 const addr = get_internal_eeprom_address();
 					m_internal_eeprom[addr] = m_internal_eeprom_data & 0xff;
 					m_internal_eeprom[addr + 1] = m_internal_eeprom_data >> 8;
 					m_internal_eeprom_command |= 0x02;
 				}
-				else if (m_internal_eeprom_command & 0x10)
+				else if (BIT(m_internal_eeprom_command, 4))
 				{
 					u16 const addr = get_internal_eeprom_address();
 					m_internal_eeprom_data = m_internal_eeprom[addr] | (m_internal_eeprom[addr + 1] << 8);
@@ -940,6 +835,123 @@ void wswan_state::port_w(offs_t offset, u16 data, u16 mem_mask)
 			break;
 	}
 
+	// Update the port value
+	COMBINE_DATA(&m_ws_portram[offset]);
+}
+
+
+u16 wscolor_state::dma_r(offs_t offset, u16 mem_mask)
+{
+	offset += 0x40 / 2;
+	u16 const value = m_ws_portram[offset];
+
+	switch (offset)
+	{
+		case 0x40 / 2:  // DMA source address
+			return m_dma_source_offset;
+		case 0x42 / 2:  // DMA source bank/segment
+			return m_dma_source_segment;
+		case 0x44 / 2:  // DMA destination address
+			return m_dma_destination;
+		case 0x46 / 2:  // DMA size (in bytes)
+			return m_dma_length;
+		case 0x48 / 2:  // DMA control
+			return m_dma_control;
+		case 0x4a / 2:
+			// Sound DMA source address
+			return m_sound_dma.source & 0xffff;
+		case 0x4c / 2:
+			// Sound DMA source memory segment
+			return (m_sound_dma.source >> 16) & 0xffff;
+		case 0x4e / 2:
+			// Sound DMA transfer size
+			return m_sound_dma.size;
+		case 0x52 / 2:
+			// Sound DMA start/stop
+			return m_sound_dma.enable;
+	}
+	return value;
+}
+
+
+void wscolor_state::dma_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	offset += 0x40 / 2;
+	switch (offset)
+	{
+		case 0x40 / 2:  // DMA source address
+			COMBINE_DATA(&m_dma_source_offset);
+			m_dma_source_offset &= 0xfffe;
+			break;
+		case 0x42 / 2:  // DMA source bank/segment
+			COMBINE_DATA(&m_dma_source_segment);
+			m_dma_source_segment &= 0x000f;
+			break;
+		case 0x44 / 2:  // DMA destination address
+			COMBINE_DATA(&m_dma_destination);
+			m_dma_destination &= 0xfffe;
+			break;
+		case 0x46 / 2:  // DMA size (in bytes)
+			COMBINE_DATA(&m_dma_length);
+			break;
+		case 0x48 / 2:  // DMA control
+			// Bit 0-6 - Unknown
+			// Bit 7   - DMA stop/start
+			if (ACCESSING_BITS_0_7)
+			{
+				if (BIT(data, 7))
+				{
+					address_space &mem = m_maincpu->space(AS_PROGRAM);
+					u32 src = m_dma_source_offset | (m_dma_source_segment << 16);
+					u32 dst = m_dma_destination;
+					u16 length = m_dma_length;
+					if (length)
+						m_maincpu->adjust_icount(-(5 + length));
+					for ( ; length > 0; length -= 2)
+					{
+						mem.write_word(dst, mem.read_word(src));
+						src += 2;
+						dst += 2;
+					}
+					m_dma_source_offset = src & 0xffff;
+					m_dma_source_segment = src >> 16;
+					m_dma_destination = dst & 0xffff;
+					m_dma_length = length & 0xffff;
+					data &= 0x7f;
+					m_dma_control = data;
+				}
+			}
+			break;
+		case 0x4a / 2:
+			// Sound DMA source address (low)
+			if (ACCESSING_BITS_0_7)
+				m_sound_dma.source = (m_sound_dma.source & 0x0fff00) | (data & 0xff);
+			// Sound DMA source address (high)
+			if (ACCESSING_BITS_8_15)
+				m_sound_dma.source = (m_sound_dma.source & 0x0f00ff) | (data & 0xff00);
+			break;
+		case 0x4c / 2:
+			// Sound DMA source memory segment
+			// Bit 0-3 - Sound DMA source address segment
+			// Bit 4-7 - Unknown
+			if (ACCESSING_BITS_0_7)
+				m_sound_dma.source = (m_sound_dma.source & 0xffff) | ((data & 0x0f) << 16);
+			break;
+		case 0x4e / 2:
+			// Sound DMA transfer size
+			COMBINE_DATA(&m_sound_dma.size);
+			break;
+		case 0x52 / 2:
+			// Sound DMA start/stop
+			// Bit 0-6 - Unknown
+			// Bit 7   - Sound DMA stop/start
+			if (ACCESSING_BITS_0_7)
+				m_sound_dma.enable = data & 0xff;
+			break;
+		default:
+			logerror("Write to unsupported port: %x - %x\n", offset, data);
+			break;
+	}
 	// Update the port value
 	COMBINE_DATA(&m_ws_portram[offset]);
 }

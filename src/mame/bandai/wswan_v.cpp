@@ -28,6 +28,7 @@ wswan_video_device::wswan_video_device(const machine_config &mconfig, device_typ
 	, m_snd_dma_cb(*this)
 	, m_vdp_type(vdp_type)
 	, m_icons_cb(*this)
+	, m_color_mode_cb(*this)
 {
 }
 
@@ -767,6 +768,7 @@ void wswan_video_device::reg_w(offs_t offset, u16 data, u16 mem_mask)
 				m_color_mode = BIT(data, 7);
 				m_colors_16 = BIT(data, 6);
 				m_tile_packed = BIT(data, 5);
+				m_color_mode_cb(m_color_mode);
 			}
 			break;
 		case 0xa2 / 2:
