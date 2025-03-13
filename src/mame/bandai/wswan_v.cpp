@@ -618,14 +618,12 @@ void wswan_video_device::reg_w(offs_t offset, u16 data, u16 mem_mask)
 			if (ACCESSING_BITS_0_7)
 				m_sprite_count_latch = data & 0xff;
 			// Background/Foreground table base addresses
-			// Bit 8-10  - Determine background table base address 00xxx000 00000000 (in bytes)
-			// Bit 11    - Unknown
-			// Bit 12-14 - Determine foreground table base address 00xxx000 00000000 (in bytes)
-			// Bit 15    - Unknown
+			// Bit 8-11  - Determine background table base address 0xxxx000 00000000 (in bytes)
+			// Bit 12-15 - Determine foreground table base address 0xxxx000 00000000 (in bytes)
 			if (ACCESSING_BITS_8_15)
 			{
-				m_layer_bg_address = (data & 0x0700) << 2;
-				m_layer_fg_address = (data & 0x7000) >> 2;
+				m_layer_bg_address = (data & (m_vdp_type == wswan_video_device::VDP_TYPE_WSC ? 0x0f00 : 0x0700)) << 2;
+				m_layer_fg_address = (data & (m_vdp_type == wswan_video_device::VDP_TYPE_WSC ? 0xf000 : 0x7000)) >> 2;
 			}
 			break;
 		case 0x08 / 2:
