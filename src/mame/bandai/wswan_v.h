@@ -34,7 +34,7 @@ public:
 	u16 vram_r(offs_t offset, u16 mem_mask);
 	void vram_w(offs_t offset, u16 data, u16 mem_mask);
 	u16 reg_r(offs_t offset, u16 mem_mesk);
-	virtual void reg_w(offs_t offset, u16 data, u16 mem_mask);
+	void reg_w(offs_t offset, u16 data, u16 mem_mask);
 
 	auto icons_cb() { return m_icons_cb.bind(); }
 
