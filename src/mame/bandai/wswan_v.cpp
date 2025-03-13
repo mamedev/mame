@@ -859,7 +859,7 @@ TIMER_CALLBACK_MEMBER(wswan_video_device::scanline_interrupt)
 
 u16 wswan_video_device::vram_r(offs_t offset, u16 mem_mask)
 {
-	return ((!m_color_mode) && (offset >= (0x4000 >> 1))) ? 0x90 : m_vram[offset];
+	return ((!m_color_mode) && (offset >= (0x4000 >> 1))) ? 0x9090 : m_vram[offset];
 }
 
 
