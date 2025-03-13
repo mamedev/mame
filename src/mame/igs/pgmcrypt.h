@@ -64,5 +64,6 @@ void extradrw_decrypt(running_machine &machine) ATTR_COLD;
 void cjddzlf_decrypt(running_machine &machine) ATTR_COLD;
 void cjtljp_decrypt(running_machine& machine) ATTR_COLD;
 void mxsqy_decrypt(running_machine& machine) ATTR_COLD;
+void flowerw3_decrypt(running_machine& machine) ATTR_COLD;
 
 #endif // MAME_IGS_PGMCRYPT_H

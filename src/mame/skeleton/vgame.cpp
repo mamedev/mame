@@ -120,7 +120,7 @@ GFXDECODE_END
 
 void vgame_state::vgame(machine_config &config)
 {
-	ARM7(config, m_maincpu, 44_MHz_XTAL); // CPU core and divider unknown; ROMs seem to contain at least some ARM or Thumb code
+	ARM7(config, m_maincpu, 44_MHz_XTAL); // CPU core unknown; ROMs seem to contain at least some ARM or Thumb code
 	m_maincpu->set_addrmap(AS_PROGRAM, &vgame_state::program_map);
 	// m_maincpu->set_vblank_int("screen", FUNC(vgame_state::irq0_line_hold));
 
@@ -139,7 +139,7 @@ void vgame_state::vgame(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, "oki", 44_MHz_XTAL / 44, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // pin 7 and clock not verified
+	OKIM6295(config, "oki", 44_MHz_XTAL / 44, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 // VGAME-0030-02-AI PCB
@@ -181,7 +181,7 @@ same text font but with a simpler modern design using mostly surface-mounted par
 similar format to IGS PCBs. It is possible VGAME is an IGS company or it was run by ex-IGS employees who set
 up their own company doing the same thing using knowledge gained from working at IGS.
 
-The CPU is a QFP128 which is an unusual footprint for a CPU and appears to be similar (bot not identical) to
+The CPU is a QFP128 which is an unusual footprint for a CPU and appears to be similar (but not identical) to
 the special IGS027A used by lhzb3sjb. The same pin that was found to be the serial port when trojaning
 lhzb3sjb goes to a connector on the edge of the board and appears to be the debug/programming port. When the
 program ROM is removed the message that shows on screen from the internal ROM is very similar to the messages
@@ -224,7 +224,7 @@ Notes:
                   "VGAME-007" - Chao Ji Dou Niu
                   007 also seen on Mahjong School 2 and Chaoji Laizi Dou Dizhu so these might use the same internal ROM.
       VGAME-003 - QFP240 Custom Graphics Chip. Possibly similar to IGS023 or IGS031. Chip has additional
-                  logic and other functions such providing the 1MHz clock for the M6295.
+                  logic and other functions such as providing the 1MHz clock for the M6295.
                   The same type of chip exists on Mahjong School 2 and Chaoji Laizi Dou Dizhu marked "VGAME-008"
            6295 - OKI M6295 4-Channel ADPCM Voice Synthesis LSI. Clock Input 1.000MHz [44/44]. Pin 7 HIGH
                   1MHz clock comes from VGAME-003.

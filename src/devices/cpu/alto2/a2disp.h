@@ -193,6 +193,17 @@
 #ifndef MAME_CPU_ALTO2_A2DISP_H
 #define MAME_CPU_ALTO2_A2DISP_H
 struct {
+
+	void clear()
+	{
+		state = hlc = setmode = inverse = scanline = 0;
+		halfclock = vblank = false;
+		std::fill(std::begin(fifo), std::end(fifo), 0);
+		wa = ra = a63 = a66 = 0;
+		dht_blocks = dwt_blocks = curt_blocks = curt_wakeup = false;
+		xpreg = csr = 0;
+	}
+
 	uint32_t state;                         //!< current state of the display_state_machine()
 	uint32_t hlc;                           //!< horizontal line counter
 	uint32_t setmode;                       //!< value written by last SETMODE<-
