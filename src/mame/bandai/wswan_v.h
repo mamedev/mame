@@ -58,7 +58,7 @@ protected:
 	virtual void init_palettes();
 	virtual void setup_palettes();
 	void get_tile_data(u16 map_addr, u8 scrolly, u16 &data, u16 &number, u16 &palette, int &line);
-	void get_planes(bool base, u32 number, int line, u32 &plane0, u32 &plane1, u32 &plane2, u32 &plane3);
+	void get_planes(bool bank, u32 number, int line, u32 &plane0, u32 &plane1, u32 &plane2, u32 &plane3);
 	u8 extract_planes(u32 &plane0, u32 &plane1, u32 &plane2, u32 &plane3);
 	int get_xoffset(bool hflip, int x, int column, u8 scrollx);
 	void draw_pixel(int x_offset, u8 tile_palette, u8 pixel);

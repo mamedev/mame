@@ -215,11 +215,11 @@ inline void wswan_video_device::get_tile_data(u16 map_addr, u8 scrolly, u16 &dat
 		line = 7 - line;
 }
 
-inline void wswan_video_device::get_planes(bool base, u32 number, int line, u32 &plane0, u32 &plane1, u32 &plane2, u32 &plane3)
+inline void wswan_video_device::get_planes(bool bank, u32 number, int line, u32 &plane0, u32 &plane1, u32 &plane2, u32 &plane3)
 {
 	if (m_colors_16)
 	{
-		const u16 tile_address = (base ? 0x4000 : 0x2000) + (number * 16) + (line << 1);
+		const u16 tile_address = (bank ? 0x4000 : 0x2000) + (number * 16) + (line << 1);
 		if (m_tile_packed)
 		{
 			plane0 = (swapendian_int16(m_vram[tile_address]) << 16) | swapendian_int16(m_vram[tile_address + 1]);
@@ -234,7 +234,7 @@ inline void wswan_video_device::get_planes(bool base, u32 number, int line, u32 
 	}
 	else
 	{
-		const u16 tile_address = ((m_color_mode && base) ? 0x2000 : 0x1000) + (number * 8) + line;
+		const u16 tile_address = ((m_color_mode && bank) ? 0x2000 : 0x1000) + (number * 8) + line;
 		if (m_tile_packed)
 		{
 			plane0 = m_vram[tile_address];
