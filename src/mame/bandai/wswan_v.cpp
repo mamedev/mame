@@ -59,10 +59,11 @@ void wswan_video_device::device_start()
 	m_set_irq_cb.resolve();
 	m_snd_dma_cb.resolve();
 
-	m_vram = make_unique_clear<u16 []>(vram_size());
+	const size_t vram_size = (is_color_vdp() ? 0x10000 : 0x4000) >> 1;
+	m_vram = make_unique_clear<u16 []>(vram_size);
 
 	save_item(NAME(m_bitmap));
-	save_pointer(NAME(m_vram), vram_size());
+	save_pointer(NAME(m_vram), vram_size);
 	save_item(NAME(m_palette_port));
 	save_item(NAME(m_regs));
 
@@ -163,31 +164,29 @@ void wswan_video_device::init_palettes()
 	{
 		set_indirect_color(i, rgb_t::white());
 	}
-	// background color if LCD off
-	set_indirect_color(8, rgb_t::white());
-	set_pen_indirect(BG_COLOR + 1, 8);
-}
-
-void wswan_color_video_device::init_palettes()
-{
-	for (int i = 0; i < 8; i++)
+	if (is_color_vdp())
 	{
-		set_indirect_color(i, rgb_t::white());
+		for (int i = 0; i < 4096; i++)
+		{
+			u16 const r = (i & 0x0f00) >> 8;
+			u16 const g = (i & 0x00f0) >> 4;
+			u16 const b = i & 0x000f;
+			set_indirect_color(COLOR_12BIT + i, rgb_t(pal4bit(r), pal4bit(g), pal4bit(b)));
+		}
+		set_pen_indirect(256, COLOR_12BIT + 0xfff); // background color for mono mode if LCD off
+		set_pen_indirect(256 + 1, COLOR_12BIT); // background color for color mode if LCD off
 	}
-	for (int i = 0; i < 4096; i++)
+	else
 	{
-		u16 const r = (i & 0x0f00) >> 8;
-		u16 const g = (i & 0x00f0) >> 4;
-		u16 const b = i & 0x000f;
-		set_indirect_color(COLOR_12BIT + i, rgb_t(pal4bit(r), pal4bit(g), pal4bit(b)));
+		// background color if LCD off
+		set_indirect_color(8, rgb_t::white());
+		set_pen_indirect(BG_COLOR + 1, 8);
 	}
-	set_pen_indirect(256, COLOR_12BIT + 0xfff); // background color for mono mode if LCD off
-	set_pen_indirect(256 + 1, COLOR_12BIT); // background color for color mode if LCD off
 }
 
 void wswan_video_device::setup_palettes()
 {
-	if (m_color_mode)
+	if (is_color_vdp() && m_color_mode)
 	{
 		for (int i = 0; i < 256; i++)
 			set_pen_indirect(i, COLOR_12BIT + (m_vram[WSC_VRAM_PALETTE + i] & 0x0fff));
@@ -490,11 +489,11 @@ void wswan_video_device::refresh_scanline()
 	rectangle rec(0, WSWAN_X_PIXELS, m_current_line, m_current_line);
 	if (m_lcd_control)
 	{
-		m_bitmap.fill(bg_color(), rec);
+		m_bitmap.fill(m_color_mode ? m_bg_control : BG_COLOR, rec);
 	}
 	else
 	{
-		m_bitmap.fill(lcd_off_color(), rec);
+		m_bitmap.fill(is_color_vdp() ? (256 + (m_color_mode ? 1 : 0)) : (BG_COLOR + 1), rec);
 		return;
 	}
 
@@ -609,7 +608,7 @@ void wswan_video_device::reg_w(offs_t offset, u16 data, u16 mem_mask)
 			// Bit 0-5 - Determine sprite table base address 0 0xxxxxx0 00000000
 			// Bit 6-7 - Unknown
 			if (ACCESSING_BITS_0_7)
-				m_sprite_table_address = (data & (m_vdp_type == VDP_TYPE_WSC ? 0x3f : 0x1f)) << 8;
+				m_sprite_table_address = (data & (is_color_vdp() ? 0x3f : 0x1f)) << 8;
 			// First sprite number (the one we start drawing with)
 			if (ACCESSING_BITS_8_15)
 				m_sprite_first_latch = data >> 8;
@@ -623,8 +622,8 @@ void wswan_video_device::reg_w(offs_t offset, u16 data, u16 mem_mask)
 			// Bit 12-15 - Determine foreground table base address 0xxxx000 00000000 (in bytes)
 			if (ACCESSING_BITS_8_15)
 			{
-				m_layer_bg_address = (data & (m_vdp_type == VDP_TYPE_WSC ? 0x0f00 : 0x0700)) << 2;
-				m_layer_fg_address = (data & (m_vdp_type == VDP_TYPE_WSC ? 0xf000 : 0x7000)) >> 2;
+				m_layer_bg_address = (data & (is_color_vdp() ? 0x0f00 : 0x0700)) << 2;
+				m_layer_fg_address = (data & (is_color_vdp() ? 0xf000 : 0x7000)) >> 2;
 			}
 			break;
 		case 0x08 / 2:
@@ -763,7 +762,7 @@ void wswan_video_device::reg_w(offs_t offset, u16 data, u16 mem_mask)
 			//    010  - not packed, 16 color , use 4000/8000, monochrome
 			//    001  - packed, 4 color, use 2000, monochrome
 			//    000  - not packed, 4 color, use 2000, monochrome - Regular WS monochrome
-			if ((m_vdp_type == VDP_TYPE_WSC) && ACCESSING_BITS_0_7)
+			if (is_color_vdp() && ACCESSING_BITS_0_7)
 			{
 				m_color_mode = BIT(data, 7);
 				m_colors_16 = BIT(data, 6);

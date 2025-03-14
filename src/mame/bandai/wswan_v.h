@@ -54,12 +54,10 @@ protected:
 	virtual u32 palette_entries() const noexcept override { return 2 + 64; }
 	virtual u32 palette_indirect_entries() const noexcept override { return 8 + 1; }
 
-	virtual u32 vram_size() const noexcept { return 0x4000 >> 1; }
-	virtual u32 bg_color() const noexcept { return BG_COLOR; }
-	virtual u32 lcd_off_color() const noexcept { return BG_COLOR + 1; }
+	bool is_color_vdp() { return m_vdp_type == VDP_TYPE_WSC; }
 
-	virtual void init_palettes();
-	virtual void setup_palettes();
+	void init_palettes();
+	void setup_palettes();
 	void get_tile_data(u16 map_addr, u8 scrolly, u16 &data, u16 &number, u16 &palette, int &line);
 	void get_planes(bool bank, u32 number, int line, u32 &plane0, u32 &plane1, u32 &plane2, u32 &plane3);
 	u8 extract_planes(u32 &plane0, u32 &plane1, u32 &plane2, u32 &plane3);
@@ -155,12 +153,6 @@ protected:
 	// device-level overrides
 	virtual u32 palette_entries() const noexcept override { return 2 + 256; }
 	virtual u32 palette_indirect_entries() const noexcept override { return 8 + 4096; }
-
-	virtual u32 vram_size() const noexcept override { return 0x10000 >> 1; }
-	virtual u32 bg_color() const noexcept override { return m_color_mode ? m_bg_control : BG_COLOR; }
-	virtual u32 lcd_off_color() const noexcept override { return 256 + (m_color_mode ? 1 : 0); }
-
-	virtual void init_palettes() override;
 };
 
 DECLARE_DEVICE_TYPE(WSWAN_VIDEO, wswan_video_device)
