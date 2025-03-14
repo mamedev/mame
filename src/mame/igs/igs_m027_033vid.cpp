@@ -16,7 +16,8 @@ Main components for the IGS PCB-0405-02-FZ are:
 TODO:
  - IGS 033 appears to encapsulate the behavior of the video/interface chip found in igspoker.cpp
    so could be turned into a device, possibly shared
-
+ - inputs / outputs
+ - Oki banking
 */
 
 #include "emu.h"
@@ -38,6 +39,16 @@ TODO:
 #include "endianness.h"
 
 #include <algorithm>
+
+
+// configurable logging
+#define LOG_PORTS     (1U << 1)
+
+//#define VERBOSE (LOG_GENERAL | LOG_PORTS)
+
+#include "logmacro.h"
+
+#define LOGPORTS(...)     LOGMASKED(LOG_PORTS,     __VA_ARGS__)
 
 
 namespace {
@@ -63,7 +74,6 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:
@@ -87,15 +97,12 @@ private:
 	void bg_videoram_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 	void bg_attr_videoram_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 
-	u32 gpio_r() { return 0xffffffff; };
 	u32 unknown_4000_r() { return 0xffffffff; };
-	u32 unknown_5030_r() { return 0xffffffff; };
 
 	u32 external_rom_r(offs_t offset);
 	void xor_table_w(offs_t offset, u8 data);
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_vblank(int state);
 
 	void m027_map(address_map &map) ATTR_COLD;
 };
@@ -106,10 +113,6 @@ void igs_m027_033vid_state::machine_start()
 	std::fill(std::begin(m_xor_table), std::end(m_xor_table), 0);
 
 	save_item(NAME(m_xor_table));
-}
-
-void igs_m027_033vid_state::machine_reset()
-{
 }
 
 void igs_m027_033vid_state::video_start()
@@ -123,15 +126,11 @@ u32 igs_m027_033vid_state::screen_update(screen_device &screen, bitmap_ind16 &bi
 	return 0;
 }
 
-void igs_m027_033vid_state::screen_vblank(int state)
-{
-}
-
 TILE_GET_INFO_MEMBER(igs_m027_033vid_state::get_bg_tile_info)
 {
-	int tileno = m_bg_videoram[tile_index/4];
+	int tileno = m_bg_videoram[tile_index / 4];
 	tileno = tileno >> (8 * (tile_index & 3)) & 0xff;
-	int attr = m_bg_attr_videoram[tile_index/4];
+	int attr = m_bg_attr_videoram[tile_index / 4];
 	attr = attr >> (8 * (tile_index & 3)) & 0xff;
 
 	tileno |= ((attr & 0x1f) << 8);
@@ -179,11 +178,12 @@ void igs_m027_033vid_state::m027_map(address_map &map) // TODO: everything to be
 	map(0x3800'3000, 0x3800'30ff).ram().w(m_palette, FUNC(palette_device::write32_ext)).share("palette_ext");
 
 	map(0x3800'4000, 0x3800'4003).r(FUNC(igs_m027_033vid_state::unknown_4000_r));
-	map(0x3800'5030, 0x3800'5033).r(FUNC(igs_m027_033vid_state::unknown_5030_r));
+	map(0x3800'5010, 0x3800'5013).umask32(0x0000'00ff).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x3800'5030, 0x3800'5033).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 
 	map(0x3800'7000, 0x3800'77ff).ram().w(FUNC(igs_m027_033vid_state::bg_videoram_w)).share(m_bg_videoram);
 	map(0x3800'7800, 0x3800'7fff).ram().w(FUNC(igs_m027_033vid_state::bg_attr_videoram_w)).share(m_bg_attr_videoram);
-	
+
 	map(0x5000'0000, 0x5000'03ff).umask32(0x0000'00ff).w(FUNC(igs_m027_033vid_state::xor_table_w)); // uploads XOR table to external ROM here
 }
 
@@ -196,7 +196,34 @@ void igs_m027_033vid_state::m027_map(address_map &map) // TODO: everything to be
 
 INPUT_PORTS_START( flowerw3 )
 	PORT_START("IN0")
-	PORT_BIT(0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
 	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW1:1")
@@ -276,9 +303,21 @@ void igs_m027_033vid_state::m027_033vid(machine_config &config)
 {
 	IGS027A(config, m_maincpu, 24_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_033vid_state::m027_map);
-	m_maincpu->in_port().set(FUNC(igs_m027_033vid_state::gpio_r));
+	m_maincpu->in_port().set([this] () { LOGPORTS("%s IGS027A in port r\n", machine().describe_context()); return 0xffffffff; });
+	m_maincpu->out_port().set([this] (uint8_t data) { LOGPORTS("%s IGS027A out port w: %02X\n", machine().describe_context(), data); });
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
+	i8255_device &ppi(I8255A(config, "ppi"));
+	ppi.tri_pa_callback().set_constant(0x00);
+	ppi.tri_pb_callback().set_constant(0x00);
+	ppi.tri_pc_callback().set_constant(0x00);
+	ppi.in_pa_callback().set_ioport("IN0");
+	ppi.in_pb_callback().set_ioport("IN1");
+	ppi.in_pc_callback().set_ioport("IN2");
+	ppi.out_pa_callback().set([this] (uint8_t data) { LOGPORTS("%s: PPI port A write %02x\n", machine().describe_context(), data); });
+	ppi.out_pb_callback().set([this] (uint8_t data) { LOGPORTS("%s: PPI port B write %02x\n", machine().describe_context(), data); });
+	ppi.out_pc_callback().set([this] (uint8_t data) { LOGPORTS("%s: PPI port C write %02x\n", machine().describe_context(), data); });
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -287,7 +326,6 @@ void igs_m027_033vid_state::m027_033vid(machine_config &config)
 	m_screen->set_visarea(0, 512-1, 0, 256-1);
 	m_screen->set_screen_update(FUNC(igs_m027_033vid_state::screen_update));
 	m_screen->set_palette(m_palette);
-	m_screen->screen_vblank().set(FUNC(igs_m027_033vid_state::screen_vblank));
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x100);
 	m_palette->set_membits(8);
@@ -317,12 +355,11 @@ ROM_START( flowerw3 )
 	// Internal rom of IGS027A ARM based MCU
 	ROM_LOAD( "f8_027a.bin", 0x0000, 0x4000, CRC(4662f015) SHA1(c10889964b675f5c11ea1571332f3eec418c9a28) )
 
-	ROM_REGION32_LE( 0x80000, "user1", ROMREGION_ERASEFF ) // external ARM data / prg
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "v118.u12", 0x00000, 0x80000, CRC(c2729fbe) SHA1(2153675a1161bd6aea6367c55fcf801c7fb0dd3a) )
 
 	ROM_REGION( 0x80000, "igs033", 0 )
-	// could be a slight encryption, but looks more like a bad read
-	ROM_LOAD( "7e.u20",  0x000000, 0x080000, BAD_DUMP CRC(a7b65af6) SHA1(bef13d38eb793b2860c2922f0cfb4b011fd9991b) )
+	ROM_LOAD( "7e.u20",  0x000000, 0x080000, CRC(8362eeff) SHA1(1babebe872d253d9131131658e701fbf270d42e2) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "sp.3", 0x00000, 0x80000, CRC(06b70fe9) SHA1(5df34f870d32893b5c3095fb9653954209712cdb) )
