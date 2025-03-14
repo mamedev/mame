@@ -171,8 +171,6 @@ private:
 
 	struct sound_dma_t
 	{
-		sound_dma_t() { }
-
 		emu_timer *timer = nullptr;  // Timer
 		u32       source = 0;        // Source address
 		u32       source_reload = 0; // Source address, Value for reload
