@@ -173,7 +173,7 @@ void wswan_video_device::init_palettes()
 			u16 const b = i & 0x000f;
 			set_indirect_color(COLOR_12BIT + i, rgb_t(pal4bit(r), pal4bit(g), pal4bit(b)));
 		}
-		set_pen_indirect(256, COLOR_12BIT + 0xfff); // background color for mono mode if LCD off
+		set_pen_indirect(256, COLOR_12BIT + 0xfff); // background color for monochrome mode if LCD off
 		set_pen_indirect(256 + 1, COLOR_12BIT); // background color for color mode if LCD off
 	}
 	else
