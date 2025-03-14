@@ -29,7 +29,7 @@ protected:
 	{
 		CHAN() :
 		freq(0),
-		period(0),
+		period(2048),
 		pos(0),
 		vol_left(0),
 		vol_right(0),

@@ -35,7 +35,7 @@ wswan_sound_device::wswan_sound_device(const machine_config &mconfig, const char
 		device_rom_interface(mconfig, *this),
 		m_channel(nullptr),
 		m_sweep_step(0),
-		m_sweep_time(0),
+		m_sweep_time(8192),
 		m_sweep_count(0),
 		m_noise_type(0),
 		m_noise_reset(0),
@@ -54,7 +54,7 @@ wswan_sound_device::wswan_sound_device(const machine_config &mconfig, const char
 {
 }
 
-static constexpr int clk_div = 64;
+static constexpr int clk_div = 128;
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -138,9 +138,9 @@ void wswan_sound_device::sound_stream_update(sound_stream &stream, std::vector<r
 
 		if (m_audio[0].on)
 		{
-			s32 sample = m_audio[0].signal;
+			s32 const sample = m_audio[0].signal;
 			m_audio[0].pos += clk_div;
-			if (m_audio[0].pos >= m_audio[0].period)
+			while (m_audio[0].pos >= m_audio[0].period)
 			{
 				m_audio[0].pos -= m_audio[0].period;
 				m_audio[0].signal = fetch_sample(0, m_audio[0].offset++);
@@ -153,15 +153,15 @@ void wswan_sound_device::sound_stream_update(sound_stream &stream, std::vector<r
 		{
 			if (m_audio2_voice)
 			{
-				u8 voice_data = (m_audio[1].vol_left << 4) | m_audio[1].vol_right;
+				u8 const voice_data = (m_audio[1].vol_left << 4) | m_audio[1].vol_right;
 				left += voice_data * (m_master_volume & 0x0f);
 				right += voice_data * (m_master_volume & 0x0f);
 			}
 			else
 			{
-				s32 sample = m_audio[1].signal;
+				s32 const sample = m_audio[1].signal;
 				m_audio[1].pos += clk_div;
-				if (m_audio[1].pos >= m_audio[1].period)
+				while (m_audio[1].pos >= m_audio[1].period)
 				{
 					m_audio[1].pos -= m_audio[1].period;
 					m_audio[1].signal = fetch_sample(1, m_audio[1].offset++);
@@ -173,9 +173,9 @@ void wswan_sound_device::sound_stream_update(sound_stream &stream, std::vector<r
 
 		if (m_audio[2].on)
 		{
-			s32 sample = m_audio[2].signal;
+			s32 const sample = m_audio[2].signal;
 			m_audio[2].pos += clk_div;
-			if (m_audio[2].pos >= m_audio[2].period)
+			while (m_audio[2].pos >= m_audio[2].period)
 			{
 				m_audio[2].pos -= m_audio[2].period;
 				m_audio[2].signal = fetch_sample(2, m_audio[2].offset++);
@@ -183,7 +183,7 @@ void wswan_sound_device::sound_stream_update(sound_stream &stream, std::vector<r
 			if (m_audio3_sweep && m_sweep_time)
 			{
 				m_sweep_count += clk_div;
-				if (m_sweep_count >= m_sweep_time)
+				while (m_sweep_count >= m_sweep_time)
 				{
 					m_sweep_count -= m_sweep_time;
 					m_audio[2].freq += m_sweep_step;
@@ -197,9 +197,9 @@ void wswan_sound_device::sound_stream_update(sound_stream &stream, std::vector<r
 
 		if (m_audio[3].on)
 		{
-			s32 sample = m_audio[3].signal;
+			s32 const sample = m_audio[3].signal;
 			m_audio[3].pos += clk_div;
-			if (m_audio[3].pos >= m_audio[3].period)
+			while (m_audio[3].pos >= m_audio[3].period)
 			{
 				if (m_audio4_noise)
 					m_audio[3].signal = m_noise_output ? 0xf : 0;
@@ -323,7 +323,7 @@ void wswan_sound_device::port_w(offs_t offset, u16 data, u16 mem_mask)
 			// Sweep step
 			if (ACCESSING_BITS_0_7)
 			{
-				m_sweep_step = (int8_t)(data & 0xff);
+				m_sweep_step = s8(data & 0xff);
 			}
 			// Sweep time
 			if (ACCESSING_BITS_8_15)
