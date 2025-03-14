@@ -491,7 +491,7 @@ private:
 	void op_roland(asmjit::a64::Assembler &a, const uml::instruction &inst);
 	void op_rolins(asmjit::a64::Assembler &a, const uml::instruction &inst);
 	template <asmjit::a64::Inst::Id Opcode> void op_add(asmjit::a64::Assembler &a, const uml::instruction &inst);
-	template <asmjit::a64::Inst::Id Opcode> void op_sub(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	template <bool CarryIn> void op_sub(asmjit::a64::Assembler &a, const uml::instruction &inst);
 	void op_cmp(asmjit::a64::Assembler &a, const uml::instruction &inst);
 	void op_mulu(asmjit::a64::Assembler &a, const uml::instruction &inst);
 	void op_mululw(asmjit::a64::Assembler &a, const uml::instruction &inst);
@@ -648,8 +648,8 @@ const drcbe_arm64::opcode_table_entry drcbe_arm64::s_opcode_table_source[] =
 	{ uml::OP_ROLINS,  &drcbe_arm64::op_rolins },                   // ROLINS  dst,src1,src2,src3
 	{ uml::OP_ADD,     &drcbe_arm64::op_add<a64::Inst::kIdAdds> },  // ADD     dst,src1,src2[,f]
 	{ uml::OP_ADDC,    &drcbe_arm64::op_add<a64::Inst::kIdAdcs> },  // ADDC    dst,src1,src2[,f]
-	{ uml::OP_SUB,     &drcbe_arm64::op_sub<a64::Inst::kIdSubs> },  // SUB     dst,src1,src2[,f]
-	{ uml::OP_SUBB,    &drcbe_arm64::op_sub<a64::Inst::kIdSbcs> },  // SUBB    dst,src1,src2[,f]
+	{ uml::OP_SUB,     &drcbe_arm64::op_sub<false> },               // SUB     dst,src1,src2[,f]
+	{ uml::OP_SUBB,    &drcbe_arm64::op_sub<true> },                // SUBB    dst,src1,src2[,f]
 	{ uml::OP_CMP,     &drcbe_arm64::op_cmp },                      // CMP     src1,src2[,f]
 	{ uml::OP_MULU,    &drcbe_arm64::op_mulu },                     // MULU    dst,edst,src1,src2[,f]
 	{ uml::OP_MULULW,  &drcbe_arm64::op_mululw },                   // MULULW   dst,src1,src2[,f]
@@ -3278,40 +3278,90 @@ template <a64::Inst::Id Opcode> void drcbe_arm64::op_add(a64::Assembler &a, cons
 	store_carry(a);
 }
 
-template <a64::Inst::Id Opcode> void drcbe_arm64::op_sub(a64::Assembler &a, const uml::instruction &inst)
+template <bool CarryIn> void drcbe_arm64::op_sub(a64::Assembler &a, const uml::instruction &inst)
 {
 	assert(inst.size() == 4 || inst.size() == 8);
 	assert_no_condition(inst);
 	assert_flags(inst, FLAG_C | FLAG_V | FLAG_Z | FLAG_S);
 
+	const a64::Inst::Id opcode = CarryIn ? a64::Inst::kIdSbcs : a64::Inst::kIdSubs;
+
 	be_parameter dstp(*this, inst.param(0), PTYPE_MR);
 	be_parameter src1p(*this, inst.param(1), PTYPE_MRI);
 	be_parameter src2p(*this, inst.param(2), PTYPE_MRI);
 
-	if (Opcode == a64::Inst::kIdSbcs)
+	if (CarryIn)
 		load_carry(a, true);
 
+	const a64::Gp zero = select_register(a64::xzr, inst.size());
+	const a64::Gp src1 = src1p.select_register(TEMP_REG1, inst.size());
 	const a64::Gp output = dstp.select_register(TEMP_REG3, inst.size());
 
-	if (src2p.is_immediate() && is_valid_immediate_addsub(src2p.immediate()))
+	if (src2p.is_immediate_value(0))
 	{
-		const a64::Gp src = select_register(TEMP_REG1, inst.size());
-
-		mov_reg_param(a, inst.size(), src, src1p);
-		if (src2p.is_immediate_value(0))
-			a.emit(Opcode, output, src, select_register(a64::xzr, inst.size()));
+		if (src1p.is_immediate_value(0))
+		{
+			if (CarryIn)
+			{
+				a.emit(opcode, output, zero, zero);
+				mov_param_reg(a, inst.size(), dstp, output);
+			}
+			else
+			{
+				mov_param_reg(a, inst.size(), dstp, zero);
+				a.emit(opcode, zero, zero, zero);
+			}
+		}
 		else
-			a.emit(Opcode, output, src, src2p.immediate());
+		{
+			mov_reg_param(a, inst.size(), src1, src1p);
+			if (CarryIn)
+			{
+				a.emit(opcode, output, src1, zero);
+				mov_param_reg(a, inst.size(), dstp, output);
+			}
+			else
+			{
+				mov_param_reg(a, inst.size(), dstp, src1);
+				a.emit(opcode, zero, src1, zero);
+			}
+		}
+	}
+	else if (!CarryIn && src2p.is_immediate() && is_valid_immediate_addsub(src2p.immediate()))
+	{
+		if (src1p.is_immediate_value(0))
+		{
+			a.emit(opcode, output, zero, src2p.immediate());
+		}
+		else
+		{
+			mov_reg_param(a, inst.size(), src1, src1p);
+			a.emit(opcode, output, src1, src2p.immediate());
+		}
+		mov_param_reg(a, inst.size(), dstp, output);
+	}
+	else if (!CarryIn && (!inst.flags() || src1p.is_immediate_value(0)) && src2p.is_immediate() && is_valid_immediate(src2p.immediate(), 24))
+	{
+		if (src1p.is_immediate_value(0))
+		{
+			a.emit(opcode, output, zero, src2p.immediate() & (util::make_bitmask<uint64_t>(12) << 12));
+		}
+		else
+		{
+			// will still alter flags, but carry and overflow values will be incorrect for this path
+			mov_reg_param(a, inst.size(), src1, src1p);
+			a.emit(opcode, output, src1, src2p.immediate() & (util::make_bitmask<uint64_t>(12) << 12));
+		}
+		a.emit(opcode, output, output, src2p.immediate() & util::make_bitmask<uint64_t>(12));
 		mov_param_reg(a, inst.size(), dstp, output);
 	}
 	else
 	{
-		const a64::Gp src1 = select_register(TEMP_REG1, inst.size());
 		const a64::Gp src2 = select_register(TEMP_REG2, inst.size());
 
 		mov_reg_param(a, inst.size(), src1, src1p);
 		mov_reg_param(a, inst.size(), src2, src2p);
-		a.emit(Opcode, output, src1, src2);
+		a.emit(opcode, output, src1, src2);
 		mov_param_reg(a, inst.size(), dstp, output);
 	}
 
