@@ -91,6 +91,7 @@ private:
 	u32 m_xor_table[0x100];
 	tilemap_t *m_bg_tilemap = nullptr;
 	u8 m_tilebank = 0;
+	u8 m_video_enable = 0;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
@@ -115,6 +116,7 @@ void igs_m027_033vid_state::machine_start()
 
 	save_item(NAME(m_xor_table));
 	save_item(NAME(m_tilebank));
+	save_item(NAME(m_video_enable));
 }
 
 void igs_m027_033vid_state::video_start()
@@ -124,7 +126,9 @@ void igs_m027_033vid_state::video_start()
 
 u32 igs_m027_033vid_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	if (m_video_enable)
+		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
 	return 0;
 }
 
@@ -140,7 +144,7 @@ TILE_GET_INFO_MEMBER(igs_m027_033vid_state::get_bg_tile_info)
 	int col = (attr & 0xe0) >> 5;
 	col <<= 1; // gfx are 4bpp, every other set of colours is unused
 
-	tileno |= (m_tilebank << 13); // bank not hooked up (where is it, when is it used, not in attract, probably D-UP game)
+	tileno |= (m_tilebank << 13);
 
 	tileinfo.set(0, tileno, col, 0);
 }
@@ -166,7 +170,10 @@ void igs_m027_033vid_state::bg_attr_videoram_w(offs_t offset, u32 data, u32 mem_
 
 void igs_m027_033vid_state::out_port_w(u8 data)
 {
-	LOGPORTS("%s IGS027A out port w: %02X\n", machine().describe_context(), data);
+	if (data & 0xea)
+		logerror("%s IGS027A out port w: %02X\n", machine().describe_context(), data);
+
+	m_video_enable = BIT(data, 0);
 
 	m_oki->set_rom_bank(BIT(data, 2));
 
@@ -182,7 +189,7 @@ void igs_m027_033vid_state::out_port_w(u8 data)
 
 ***************************************************************************/
 
-void igs_m027_033vid_state::m027_map(address_map &map) // TODO: everything to be verified
+void igs_m027_033vid_state::m027_map(address_map &map) // TODO: some unknown writes
 {
 	map(0x0800'0000, 0x0807'ffff).r(FUNC(igs_m027_033vid_state::external_rom_r)); // Game ROM
 
