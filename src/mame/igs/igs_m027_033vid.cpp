@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders: David Haywood
 
 /*
 IGS ARM7 (IGS027A) based mahjong / gambling platform(s),
@@ -16,8 +16,7 @@ Main components for the IGS PCB-0405-02-FZ are:
 TODO:
  - IGS 033 appears to encapsulate the behavior of the video/interface chip found in igspoker.cpp
    so could be turned into a device, possibly shared
- - inputs / outputs
- - Oki banking
+ - complete inputs / outputs / hopper
 */
 
 #include "emu.h"
@@ -44,7 +43,7 @@ TODO:
 // configurable logging
 #define LOG_PORTS     (1U << 1)
 
-//#define VERBOSE (LOG_GENERAL | LOG_PORTS)
+// #define VERBOSE (LOG_GENERAL | LOG_PORTS)
 
 #include "logmacro.h"
 
@@ -64,13 +63,14 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_gfxdecode(*this, "gfxdecode"),
+		m_oki(*this, "oki"),
 		m_bg_videoram(*this, "bg_videoram"),
 		m_bg_attr_videoram(*this, "bg_attr_videoram")
 	{ }
 
 	void m027_033vid(machine_config &config) ATTR_COLD;
 
-	void init_flowerw3() ATTR_COLD;
+	void init_qiji6() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -84,24 +84,25 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
-	required_shared_ptr<uint32_t> m_bg_videoram;
-	required_shared_ptr<uint32_t> m_bg_attr_videoram;
+	required_device<okim6295_device> m_oki;
+	required_shared_ptr<u32> m_bg_videoram;
+	required_shared_ptr<u32> m_bg_attr_videoram;
 
 	u32 m_xor_table[0x100];
 	tilemap_t *m_bg_tilemap = nullptr;
+	u8 m_tilebank = 0;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	void bg_videoram_w(offs_t offset, uint32_t data, uint32_t mem_mask);
-	void bg_attr_videoram_w(offs_t offset, uint32_t data, uint32_t mem_mask);
-
-	u32 unknown_4000_r() { return 0xffffffff; };
+	void bg_videoram_w(offs_t offset, u32 data, u32 mem_mask);
+	void bg_attr_videoram_w(offs_t offset, u32 data, u32 mem_mask);
 
 	u32 external_rom_r(offs_t offset);
 	void xor_table_w(offs_t offset, u8 data);
 
+	void out_port_w(u8 data);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void m027_map(address_map &map) ATTR_COLD;
@@ -113,6 +114,7 @@ void igs_m027_033vid_state::machine_start()
 	std::fill(std::begin(m_xor_table), std::end(m_xor_table), 0);
 
 	save_item(NAME(m_xor_table));
+	save_item(NAME(m_tilebank));
 }
 
 void igs_m027_033vid_state::video_start()
@@ -138,13 +140,13 @@ TILE_GET_INFO_MEMBER(igs_m027_033vid_state::get_bg_tile_info)
 	int col = (attr & 0xe0) >> 5;
 	col <<= 1; // gfx are 4bpp, every other set of colours is unused
 
-	tileno |= 0x2000; // bank not hooked up (where is it, when is it used, not in attract, probably D-UP game)
+	tileno |= (m_tilebank << 13); // bank not hooked up (where is it, when is it used, not in attract, probably D-UP game)
 
 	tileinfo.set(0, tileno, col, 0);
 }
 
 // TODO: convert to 8-bit handlers and 8-bit RAM?
-void igs_m027_033vid_state::bg_videoram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void igs_m027_033vid_state::bg_videoram_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_bg_videoram[offset]);
 	m_bg_tilemap->mark_tile_dirty((offset * 4) + 0);
@@ -153,7 +155,7 @@ void igs_m027_033vid_state::bg_videoram_w(offs_t offset, uint32_t data, uint32_t
 	m_bg_tilemap->mark_tile_dirty((offset * 4) + 3);
 }
 
-void igs_m027_033vid_state::bg_attr_videoram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void igs_m027_033vid_state::bg_attr_videoram_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_bg_attr_videoram[offset]);
 	m_bg_tilemap->mark_tile_dirty((offset * 4) + 0);
@@ -161,6 +163,18 @@ void igs_m027_033vid_state::bg_attr_videoram_w(offs_t offset, uint32_t data, uin
 	m_bg_tilemap->mark_tile_dirty((offset * 4) + 2);
 	m_bg_tilemap->mark_tile_dirty((offset * 4) + 3);
 }
+
+void igs_m027_033vid_state::out_port_w(u8 data)
+{
+	LOGPORTS("%s IGS027A out port w: %02X\n", machine().describe_context(), data);
+
+	m_oki->set_rom_bank(BIT(data, 2));
+
+	m_tilebank = BIT(data, 4);
+
+	m_bg_tilemap->mark_all_dirty();
+}
+
 
 /***************************************************************************
 
@@ -177,7 +191,7 @@ void igs_m027_033vid_state::m027_map(address_map &map) // TODO: everything to be
 	map(0x3800'2000, 0x3800'20ff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0x3800'3000, 0x3800'30ff).ram().w(m_palette, FUNC(palette_device::write32_ext)).share("palette_ext");
 
-	map(0x3800'4000, 0x3800'4003).r(FUNC(igs_m027_033vid_state::unknown_4000_r));
+	map(0x3800'4000, 0x3800'4003).portr("DSW");
 	map(0x3800'5010, 0x3800'5013).umask32(0x0000'00ff).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x3800'5030, 0x3800'5033).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 
@@ -194,66 +208,96 @@ void igs_m027_033vid_state::m027_map(address_map &map) // TODO: everything to be
 
 ***************************************************************************/
 
-INPUT_PORTS_START( flowerw3 )
+INPUT_PORTS_START( qiji6 ) // TODO: complete
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("DSW1")
-	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW1:1")
-	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW1:2")
-	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW1:3")
-	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW1:4")
-	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW1:5")
-	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW1:6")
-	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW1:7")
-	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW1:8")
-
-	PORT_START("DSW2")
-	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW2:1")
-	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW2:2")
-	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW2:3")
-	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW2:4")
-	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW2:5")
-	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW2:6")
-	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW2:7")
-	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW2:8")
-
-	PORT_START("DSW3")
-	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW3:1")
-	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW3:2")
-	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW3:3")
-	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW3:4")
-	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW3:5")
-	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW3:6")
-	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW3:7")
-	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW3:8")
+	// most settings are done on the software side. Password is all Start
+	PORT_START("DSW")
+	PORT_DIPNAME(          0x0000001f, 0x0000001f, "Secondary Machine Number" ) PORT_DIPLOCATION("SW1:1,2,3,4,5")
+	PORT_DIPSETTING(                   0x0000001f, "1" )
+	PORT_DIPSETTING(                   0x0000001e, "2" )
+	PORT_DIPSETTING(                   0x0000001d, "3" )
+	PORT_DIPSETTING(                   0x0000001c, "4" )
+	PORT_DIPSETTING(                   0x0000001b, "5" )
+	PORT_DIPSETTING(                   0x0000001a, "6" )
+	PORT_DIPSETTING(                   0x00000019, "7" )
+	PORT_DIPSETTING(                   0x00000018, "8" )
+	PORT_DIPSETTING(                   0x00000017, "9" )
+	PORT_DIPSETTING(                   0x00000016, "10" )
+	PORT_DIPSETTING(                   0x00000015, "11" )
+	PORT_DIPSETTING(                   0x00000014, "12" )
+	PORT_DIPSETTING(                   0x00000013, "13" )
+	PORT_DIPSETTING(                   0x00000012, "14" )
+	PORT_DIPSETTING(                   0x00000011, "15" )
+	PORT_DIPSETTING(                   0x00000010, "16" )
+	PORT_DIPSETTING(                   0x0000000f, "17" )
+	PORT_DIPSETTING(                   0x0000000e, "18" )
+	PORT_DIPSETTING(                   0x0000000d, "19" )
+	PORT_DIPSETTING(                   0x0000000c, "20" )
+	PORT_DIPSETTING(                   0x0000000b, "20 (duplicate)" )
+	PORT_DIPSETTING(                   0x0000000a, "20 (duplicate)" )
+	PORT_DIPSETTING(                   0x00000009, "20 (duplicate)" )
+	PORT_DIPSETTING(                   0x00000008, "20 (duplicate)" )
+	PORT_DIPSETTING(                   0x00000007, "20 (duplicate)" )
+	PORT_DIPSETTING(                   0x00000006, "20 (duplicate)" )
+	PORT_DIPSETTING(                   0x00000005, "20 (duplicate)" )
+	PORT_DIPSETTING(                   0x00000004, "20 (duplicate)" )
+	PORT_DIPSETTING(                   0x00000003, "20 (duplicate)" )
+	PORT_DIPSETTING(                   0x00000002, "20 (duplicate)" )
+	PORT_DIPSETTING(                   0x00000001, "20 (duplicate)" )
+	PORT_DIPSETTING(                   0x00000000, "00" )
+	PORT_DIPUNKNOWN_DIPLOC(0x00000020, 0x00000020, "SW1:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x00000040, 0x00000040, "SW1:7")
+	PORT_DIPNAME(          0x00000080, 0x00000080, "Link Mode" ) PORT_DIPLOCATION("SW1:8") // Hard-coded?
+	PORT_DIPSETTING(                   0x00000080, "Single Machine" )
+	PORT_DIPSETTING(                   0x00000000, "Single Machine (duplicate)" )
+	PORT_DIPUNKNOWN_DIPLOC(0x00000100, 0x00000100, "SW3:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x00000200, 0x00000200, "SW3:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x00000400, 0x00000400, "SW3:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x00000800, 0x00000800, "SW3:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x00001000, 0x00001000, "SW3:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x00002000, 0x00002000, "SW3:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x00004000, 0x00004000, "SW3:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x00008000, 0x00008000, "SW3:8")
+	PORT_DIPNAME(          0x00010000, 0x00000000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(                   0x00010000, DEF_STR( Off ) )
+	PORT_DIPSETTING(                   0x00000000, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC(0x00020000, 0x00020000, "SW2:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x00040000, 0x00040000, "SW2:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x00080000, 0x00080000, "SW2:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x00100000, 0x00100000, "SW2:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x00200000, 0x00200000, "SW2:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x00400000, 0x00400000, "SW2:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x00800000, 0x00800000, "SW2:8")
+	PORT_BIT( 0xff000000, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static const gfx_layout tiles8x8x4_layout =
@@ -303,8 +347,8 @@ void igs_m027_033vid_state::m027_033vid(machine_config &config)
 {
 	IGS027A(config, m_maincpu, 24_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_033vid_state::m027_map);
-	m_maincpu->in_port().set([this] () { LOGPORTS("%s IGS027A in port r\n", machine().describe_context()); return 0xffffffff; });
-	m_maincpu->out_port().set([this] (uint8_t data) { LOGPORTS("%s IGS027A out port w: %02X\n", machine().describe_context(), data); });
+	m_maincpu->in_port().set([this] () { LOGPORTS("%s IGS027A in port r\n", machine().describe_context()); return 0xffffffff; }); // TODO: read continuously, what's here?
+	m_maincpu->out_port().set(FUNC(igs_m027_033vid_state::out_port_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -315,9 +359,10 @@ void igs_m027_033vid_state::m027_033vid(machine_config &config)
 	ppi.in_pa_callback().set_ioport("IN0");
 	ppi.in_pb_callback().set_ioport("IN1");
 	ppi.in_pc_callback().set_ioport("IN2");
-	ppi.out_pa_callback().set([this] (uint8_t data) { LOGPORTS("%s: PPI port A write %02x\n", machine().describe_context(), data); });
-	ppi.out_pb_callback().set([this] (uint8_t data) { LOGPORTS("%s: PPI port B write %02x\n", machine().describe_context(), data); });
-	ppi.out_pc_callback().set([this] (uint8_t data) { LOGPORTS("%s: PPI port C write %02x\n", machine().describe_context(), data); });
+	// the out ports seem unused
+	ppi.out_pa_callback().set([this] (u8 data) { LOGPORTS("%s: PPI port A write %02x\n", machine().describe_context(), data); });
+	ppi.out_pb_callback().set([this] (u8 data) { LOGPORTS("%s: PPI port B write %02x\n", machine().describe_context(), data); });
+	ppi.out_pc_callback().set([this] (u8 data) { LOGPORTS("%s: PPI port C write %02x\n", machine().describe_context(), data); });
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -337,7 +382,7 @@ void igs_m027_033vid_state::m027_033vid(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, "oki", 24_MHz_XTAL / 24, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5); // divider and pin 7 not verified
+	OKIM6295(config, m_oki, 24_MHz_XTAL / 24, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5); // divider and pin 7 not verified
 }
 
 
@@ -349,8 +394,8 @@ void igs_m027_033vid_state::m027_033vid(machine_config &config)
 
 
 // IGS PCB-0405-02-FZ
-// SP and IGS027A ROMs have original labels with '花花世界3'
-ROM_START( flowerw3 )
+// SP and IGS027A ROMs have original labels with '花花世界3', but it seems the external program ROM and GFX ROM got changed
+ROM_START( qiji6 )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	// Internal rom of IGS027A ARM based MCU
 	ROM_LOAD( "f8_027a.bin", 0x0000, 0x4000, CRC(4662f015) SHA1(c10889964b675f5c11ea1571332f3eec418c9a28) )
@@ -366,9 +411,9 @@ ROM_START( flowerw3 )
 ROM_END
 
 
-void igs_m027_033vid_state::init_flowerw3()
+void igs_m027_033vid_state::init_qiji6()
 {
-	flowerw3_decrypt(machine());
+	qiji6_decrypt(machine());
 }
 
 } // anonymous namespace
@@ -381,4 +426,4 @@ void igs_m027_033vid_state::init_flowerw3()
 ***************************************************************************/
 
 // internal ROM date is 2002, external software revision could be later
-GAME( 2002, flowerw3, 0, m027_033vid, flowerw3, igs_m027_033vid_state, init_flowerw3, ROT0, "IGS", "Flower World 3 (V118CN)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // title to be adjusted once it works
+GAME( 2002, qiji6, 0, m027_033vid, qiji6, igs_m027_033vid_state, init_qiji6, ROT0, "IGS", "Qiji 6 (V118CN)", MACHINE_NOT_WORKING ) // lacks hopper support

@@ -1970,7 +1970,7 @@ void mxsqy_decrypt(running_machine &machine)
 	}
 }
 
-void flowerw3_decrypt(running_machine &machine)
+void qiji6_decrypt(running_machine &machine)
 {
 	memory_region *const region = machine.root_device().memregion("user1");
 	auto const src = util::little_endian_cast<u16>(reinterpret_cast<u32 *>(region->base()));
