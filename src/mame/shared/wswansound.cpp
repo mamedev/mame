@@ -50,7 +50,7 @@ wswan_sound_device::wswan_sound_device(const machine_config &mconfig, const char
 		m_external_stereo(0),
 		m_external_speaker(0),
 		m_noise_shift(0),
-		m_master_volume(0)
+		m_sample_volume(0)
 {
 }
 
@@ -79,7 +79,7 @@ void wswan_sound_device::device_start()
 	save_item(NAME(m_external_stereo));
 	save_item(NAME(m_external_speaker));
 	save_item(NAME(m_noise_shift));
-	save_item(NAME(m_master_volume));
+	save_item(NAME(m_sample_volume));
 	save_item(NAME(m_system_volume));
 	save_item(STRUCT_MEMBER(m_audio, freq));
 	save_item(STRUCT_MEMBER(m_audio, period));
@@ -154,8 +154,10 @@ void wswan_sound_device::sound_stream_update(sound_stream &stream, std::vector<r
 			if (m_audio2_voice)
 			{
 				u8 const voice_data = (m_audio[1].vol_left << 4) | m_audio[1].vol_right;
-				left += voice_data * (m_master_volume & 0x0f);
-				right += voice_data * (m_master_volume & 0x0f);
+				if (m_sample_volume & 0xc)
+					left += voice_data >> u8(BIT(m_sample_volume, 3) ? 0 : (BIT(m_sample_volume, 2) ? 1 : ~0));
+				if (m_sample_volume & 0x3)
+					right += voice_data >> u8(BIT(m_sample_volume, 1) ? 0 : (BIT(m_sample_volume, 0) ? 1 : ~0));
 			}
 			else
 			{
@@ -267,7 +269,7 @@ u16 wswan_sound_device::port_r(offs_t offset, u16 mem_mask)
 		case 0x92 / 2:
 			return m_noise_shift;
 		case 0x94 / 2:
-			return m_master_volume;
+			return m_sample_volume;
 		case 0x9e / 2:
 			return m_system_volume;
 	}
@@ -374,9 +376,11 @@ void wswan_sound_device::port_w(offs_t offset, u16 data, u16 mem_mask)
 			m_noise_shift &= 0x7fff;
 			break;
 
-		case 0x94 / 2:              // Master volume
+		case 0x94 / 2:              // Sample volume
 			if (ACCESSING_BITS_0_7)
-				m_master_volume = data & 0xff;
+				m_sample_volume = data & 0xff;
+			if (ACCESSING_BITS_8_15)
+				logerror("%s: Sound Test bit set %02x\n", machine().describe_context(), (data >> 8) & 0xff);
 			break;
 
 		case 0x9e / 2:              // WSC volume setting (0, 1, 2, 3) (TODO)

@@ -78,7 +78,7 @@ private:
 	u8   m_external_stereo;
 	u8   m_external_speaker;
 	u16  m_noise_shift;
-	u8   m_master_volume;
+	u8   m_sample_volume;
 	u8   m_system_volume = 0;
 };
 
