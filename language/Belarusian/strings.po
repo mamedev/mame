@@ -401,7 +401,7 @@ msgstr "Пацвярджаць выхад з эмуляцыі"
 
 #: src/frontend/mame/ui/submenu.cpp:40
 msgid "Skip system information screen"
-msgstr "Прапускаць экран інфармацыі аб сістэме"
+msgstr "Прапускаць экран звестак аб сістэме"
 
 #: src/frontend/mame/ui/submenu.cpp:41
 msgid "Force 4:3 aspect for snapshot display"
@@ -421,7 +421,7 @@ msgstr "Прапускаць меню выбару часткі праграмн
 
 #: src/frontend/mame/ui/submenu.cpp:45
 msgid "Info auto audit"
-msgstr "Інфармацыя аб аўтаматычным аўдыце"
+msgstr "Аўтаматычны аўдыт"
 
 #: src/frontend/mame/ui/submenu.cpp:46
 msgid "Hide romless machine from available list"
@@ -1077,7 +1077,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:633
 msgid "Media Image Information"
-msgstr "Інфармацыя аб вобразе носьбіта"
+msgstr "Вобраз носьбіта"
 
 #: src/frontend/mame/ui/info.cpp:681
 msgid "Not supported"
@@ -1536,7 +1536,7 @@ msgstr "Спіс/элемент праграмнага забеспячэння"
 
 #: src/frontend/mame/ui/datmenu.cpp:88 src/frontend/mame/ui/selmenu.cpp:2752
 msgid "Software List Info"
-msgstr "Інфармацыя пра спіс праграмнага забеспячэння"
+msgstr "Спіс праграмнага забеспячэння"
 
 #: src/frontend/mame/ui/datmenu.cpp:307
 #, c-format
@@ -2043,7 +2043,7 @@ msgstr ""
 "ini.\n"
 "\n"
 "Калі вы выкарыстоўваеце %2$s упершыню, калі ласка, звярніцеся да файла %2$s.pdf у "
-"тэчцы docs для інфармацыі аб усталёўцы і выкарыстанні %2$s."
+"тэчцы docs для звестак аб усталёўцы і выкарыстанні %2$s."
 
 #: src/frontend/mame/ui/simpleselgame.cpp:329
 #, c-format
@@ -2539,7 +2539,7 @@ msgstr "Схаваць фільтры"
 
 #: src/frontend/mame/ui/custui.cpp:56
 msgid "Hide Info/Image"
-msgstr "Схаваць інфармацыю/відарыс"
+msgstr "Схаваць звесткі/відарыс"
 
 #: src/frontend/mame/ui/custui.cpp:57
 msgid "Hide Both"
@@ -2599,7 +2599,7 @@ msgstr "Радкі"
 
 #: src/frontend/mame/ui/custui.cpp:523
 msgid "Infos text size"
-msgstr "Памер тэксту інфармацыі"
+msgstr "Памер тэксту звестак"
 
 #: src/frontend/mame/ui/custui.cpp:547
 msgid "Sample text - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
@@ -2926,22 +2926,22 @@ msgstr "Канфігурацыя машыны"
 #: src/frontend/mame/ui/mainmenu.cpp:122
 msgctxt "menu-main"
 msgid "Bookkeeping Info"
-msgstr "Інфармацыя аб статыстыцы"
+msgstr "Статыстыка"
 
 #: src/frontend/mame/ui/mainmenu.cpp:124
 msgctxt "menu-main"
 msgid "System Information"
-msgstr "Інфармацыя аб сістэме"
+msgstr "Звесткі аб Сістэме"
 
 #: src/frontend/mame/ui/mainmenu.cpp:127
 msgctxt "menu-main"
 msgid "Warning Information"
-msgstr "Інфармацыя аб папярэджаннях"
+msgstr "Папярэджанні"
 
 #: src/frontend/mame/ui/mainmenu.cpp:133
 msgctxt "menu-main"
 msgid "Media Image Information"
-msgstr "Інфармацыя аб выявах носьбітаў"
+msgstr "Звесткі аб выявах носьбітаў"
 
 #: src/frontend/mame/ui/mainmenu.cpp:135
 msgctxt "menu-main"
@@ -3045,7 +3045,7 @@ msgstr "Выявы"
 
 #: src/frontend/mame/ui/selmenu.cpp:56
 msgid "Info"
-msgstr "Інфармацыя"
+msgstr "Звесткі"
 
 #: src/frontend/mame/ui/selmenu.cpp:83
 msgctxt "selmenu-artwork"
@@ -3244,7 +3244,7 @@ msgstr "Націсніце любую клавішу, каб працягнуц�
 
 #: src/frontend/mame/ui/selmenu.cpp:2789
 msgid "General Info"
-msgstr "Агульная інфармацыя"
+msgstr "Агульныя звесткі"
 
 #: src/frontend/mame/ui/selmenu.cpp:2935
 #, c-format
@@ -6485,7 +6485,7 @@ msgstr ""
 #: plugins/data/data_sysinfo.lua:16
 msgctxt "plugin-data"
 msgid "Sysinfo"
-msgstr "Сістэмная інфармацыя"
+msgstr "Сістэмная звесткі"
 
 #: plugins/data/data_hiscore.lua:1220 plugins/data/data_hiscore.lua:1268
 msgctxt "plugin-data"
@@ -6517,7 +6517,7 @@ msgid ""
 msgstr ""
 "\n"
 "\n"
-"--- ІНФАРМАЦЫЯ АБ ДРАЙВЕРЫ ---\n"
+"--- ЗВЕСТКІ АБ ДРАЙВЕРЫ ---\n"
 "Драйвер: "
 
 #: plugins/data/data_messinfo.lua:24
