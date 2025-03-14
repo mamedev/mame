@@ -330,7 +330,7 @@ void wswan_sound_device::port_w(offs_t offset, u16 data, u16 mem_mask)
 			// Sweep time
 			if (ACCESSING_BITS_8_15)
 			{
-				m_sweep_time = 8192 * ((data >> 8) + 1);
+				m_sweep_time = 8192 * (((data >> 8) & 0x1f) + 1);
 			}
 			break;
 
