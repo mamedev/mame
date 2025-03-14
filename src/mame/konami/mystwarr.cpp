@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont, Phil Stroffolino, Acho A. Tang, Nicola Salmoria
 /**************************************************************************
- * Mystic Warrior (c) 1993 Konami
+ * Mystic Warriors (c) 1993 Konami
  * Metamorphic Force (c) 1993 Konami
  * Violent Storm (c) 1993 Konami
  * Martial Champion (c) 1993 Konami
@@ -2358,11 +2358,11 @@ ROM_START( dadandrn )
 ROM_END
 
 //    YEAR  NAME          PARENT    MACHINE     INPUT     STATE
-GAME( 1993, mystwarr,     0,        mystwarr,   mystwarr, mystwarr_state, empty_init, ROT0,  "Konami",  "Mystic Warriors (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, mystwarru,    mystwarr, mystwarr,   mystwarr, mystwarr_state, empty_init, ROT0,  "Konami",  "Mystic Warriors (ver UAA)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, mystwarrj,    mystwarr, mystwarr,   mystwarr, mystwarr_state, empty_init, ROT0,  "Konami",  "Mystic Warriors (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, mystwarra,    mystwarr, mystwarr,   mystwarr, mystwarr_state, empty_init, ROT0,  "Konami",  "Mystic Warriors (ver AAB)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, mystwarraa,   mystwarr, mystwarr,   mystwarr, mystwarr_state, empty_init, ROT0,  "Konami",  "Mystic Warriors (ver AAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, mystwarr,     0,        mystwarr,   mystwarr, mystwarr_state, empty_init, ROT0,  "Konami",  "Mystic Warriors: Wrath of the Ninjas (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, mystwarru,    mystwarr, mystwarr,   mystwarr, mystwarr_state, empty_init, ROT0,  "Konami",  "Mystic Warriors: Wrath of the Ninjas (ver UAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, mystwarrj,    mystwarr, mystwarr,   mystwarr, mystwarr_state, empty_init, ROT0,  "Konami",  "Mystic Warriors: Ikari no Ninja (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, mystwarra,    mystwarr, mystwarr,   mystwarr, mystwarr_state, empty_init, ROT0,  "Konami",  "Mystic Warriors: Wrath of the Ninjas (ver AAB)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, mystwarraa,   mystwarr, mystwarr,   mystwarr, mystwarr_state, empty_init, ROT0,  "Konami",  "Mystic Warriors: Wrath of the Ninjas (ver AAA)", MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1993, mmaulers,     0,        dadandrn,   dadandrn, mystwarr_state, empty_init, ROT0,  "Konami",  "Monster Maulers (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1993, dadandrn,     mmaulers, dadandrn,   dadandrn, mystwarr_state, empty_init, ROT0,  "Konami",  "Kyukyoku Sentai Dadandarn (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
