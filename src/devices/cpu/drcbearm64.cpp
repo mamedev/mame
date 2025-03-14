@@ -251,6 +251,12 @@ inline bool is_valid_immediate(uint64_t val, size_t bits)
 	return val < (uint64_t(1) << bits);
 }
 
+constexpr bool is_valid_immediate_addsub(uint64_t val)
+{
+	// 12-bit unsigned immediate value, optionally left-shifted by 12 bits
+	return !(val & ~util::make_bitmask<uint64_t>(12)) || !(val & ~(util::make_bitmask<uint64_t>(12) << 12));
+}
+
 inline constexpr bool is_valid_immediate_signed(int64_t val, size_t bits)
 {
 	return util::sext(val, bits) == val;
@@ -752,18 +758,20 @@ a64::Vec drcbe_arm64::be_parameter::select_register(a64::Vec const &reg, uint32_
 {
 	if (m_type == PTYPE_FLOAT_REGISTER)
 		return get_register_float(regsize);
-	if (regsize == 4)
+	else if (regsize == 4)
 		return reg.s();
-	return reg.d();
+	else
+		return reg.d();
 }
 
 a64::Gp drcbe_arm64::be_parameter::select_register(a64::Gp const &reg, uint32_t regsize) const
 {
 	if (m_type == PTYPE_INT_REGISTER)
 		return get_register_int(regsize);
-	if (regsize == 4)
+	else if (regsize == 4)
 		return reg.w();
-	return reg.x();
+	else
+		return reg.x();
 }
 
 void drcbe_arm64::get_imm_relative(a64::Assembler &a, const a64::Gp &reg, const uint64_t val) const
@@ -3234,7 +3242,7 @@ template <a64::Inst::Id Opcode> void drcbe_arm64::op_add(a64::Assembler &a, cons
 	if (Opcode == a64::Inst::kIdAdcs)
 		load_carry(a);
 
-	if (src1p.is_immediate() && is_valid_immediate(src1p.immediate(), 11))
+	if (src1p.is_immediate() && is_valid_immediate_addsub(src1p.immediate()))
 	{
 		const a64::Gp src = src2p.select_register(TEMP_REG2, inst.size());
 
@@ -3245,7 +3253,7 @@ template <a64::Inst::Id Opcode> void drcbe_arm64::op_add(a64::Assembler &a, cons
 			a.emit(Opcode, output, src, src1p.immediate());
 		mov_param_reg(a, inst.size(), dstp, output);
 	}
-	else if (src2p.is_immediate() && is_valid_immediate(src2p.immediate(), 11))
+	else if (src2p.is_immediate() && is_valid_immediate_addsub(src2p.immediate()))
 	{
 		const a64::Gp src = src1p.select_register(TEMP_REG1, inst.size());
 
@@ -3285,7 +3293,7 @@ template <a64::Inst::Id Opcode> void drcbe_arm64::op_sub(a64::Assembler &a, cons
 
 	const a64::Gp output = dstp.select_register(TEMP_REG3, inst.size());
 
-	if (src2p.is_immediate() && is_valid_immediate(src2p.immediate(), 11))
+	if (src2p.is_immediate() && is_valid_immediate_addsub(src2p.immediate()))
 	{
 		const a64::Gp src = select_register(TEMP_REG1, inst.size());
 
@@ -3319,22 +3327,23 @@ void drcbe_arm64::op_cmp(a64::Assembler &a, const uml::instruction &inst)
 	be_parameter src1p(*this, inst.param(0), PTYPE_MRI);
 	be_parameter src2p(*this, inst.param(1), PTYPE_MRI);
 
-	const a64::Gp temp = select_register(TEMP_REG1, inst.size());
-	const a64::Gp temp2 = select_register(TEMP_REG2, inst.size());
+	const a64::Gp src1 = src1p.select_register(TEMP_REG1, inst.size());
 
-	mov_reg_param(a, inst.size(), temp, src1p);
+	mov_reg_param(a, inst.size(), src1, src1p);
 
-	if (src2p.is_immediate() && is_valid_immediate(src2p.immediate(), 11))
+	if (src2p.is_immediate() && is_valid_immediate_addsub(src2p.immediate()))
 	{
 		if (src2p.is_immediate_value(0))
-			a.cmp(temp, select_register(a64::xzr, inst.size()));
+			a.cmp(src1, select_register(a64::xzr, inst.size()));
 		else
-			a.cmp(temp, src2p.immediate());
+			a.cmp(src1, src2p.immediate());
 	}
 	else
 	{
-		mov_reg_param(a, inst.size(), temp2, src2p);
-		a.cmp(temp, temp2);
+		const a64::Gp src2 = src2p.select_register(TEMP_REG2, inst.size());
+
+		mov_reg_param(a, inst.size(), src2, src2p);
+		a.cmp(src1, src2);
 	}
 
 	store_carry(a, true);
@@ -3728,17 +3737,35 @@ void drcbe_arm64::op_test(a64::Assembler &a, const uml::instruction &inst)
 	const a64::Gp src1 = src1p.select_register(TEMP_REG1, inst.size());
 	const a64::Gp src2 = src2p.select_register(TEMP_REG2, inst.size());
 
-	mov_reg_param(a, inst.size(), src1, src1p);
-
-	if (src2p.is_immediate() && is_valid_immediate_mask(src2p.immediate(), inst.size()))
+	if (src1p.is_immediate_value(0) || src2p.is_immediate_value(0))
 	{
-		if (src2p.is_immediate_value(0))
-			a.tst(src1, select_register(a64::xzr, inst.size()));
-		else
-			a.tst(src1, src2p.immediate());
+		const a64::Gp zero = select_register(a64::xzr, inst.size());
+
+		a.tst(zero, zero);
+	}
+	else if (src2p.is_immediate_value(util::make_bitmask<uint64_t>(inst.size() * 8)))
+	{
+		mov_reg_param(a, inst.size(), src1, src1p);
+		a.tst(src1, src1);
+	}
+	else if (src1p.is_immediate_value(util::make_bitmask<uint64_t>(inst.size() * 8)))
+	{
+		mov_reg_param(a, inst.size(), src2, src2p);
+		a.tst(src2, src2);
+	}
+	else if (src2p.is_immediate() && is_valid_immediate_mask(src2p.immediate(), inst.size()))
+	{
+		mov_reg_param(a, inst.size(), src1, src1p);
+		a.tst(src1, src2p.immediate());
+	}
+	else if (src1p.is_immediate() && is_valid_immediate_mask(src1p.immediate(), inst.size()))
+	{
+		mov_reg_param(a, inst.size(), src2, src2p);
+		a.tst(src2, src1p.immediate());
 	}
 	else
 	{
+		mov_reg_param(a, inst.size(), src1, src1p);
 		mov_reg_param(a, inst.size(), src2, src2p);
 		a.tst(src1, src2);
 	}

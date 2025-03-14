@@ -1021,32 +1021,30 @@ void ppc_device::static_generate_memory_accessor(int mode, int size, int iswrite
 	/* check for unaligned accesses and break into two */
 	if (!ismasked && size != 1)
 	{
-		/* in little-endian mode, anything misaligned generates an exception */
 		if ((mode & MODE_LITTLE_ENDIAN) || masked == nullptr || !(m_cap & PPCCAP_MISALIGNED))
 		{
+			/* in little-endian mode, anything misaligned generates an exception */
 			UML_TEST(block, I0, size - 1);                                      // test    i0,size-1
-			UML_JMPc(block, COND_NZ, alignex = label++);                                        // jmp     alignex,nz
+			UML_JMPc(block, COND_NZ, alignex = label++);                        // jmp     alignex,nz
 		}
-
-		/* in big-endian mode, it's more complicated */
 		else
 		{
-			/* 8-byte accesses must be word-aligned */
+			/* in big-endian mode, it's more complicated */
 			if (size == 8)
 			{
+				/* 8-byte accesses must be word-aligned */
 				UML_TEST(block, I0, 3);                                         // test    i0,3
-				UML_JMPc(block, COND_NZ, alignex = label++);                                    // jmp     alignex,nz
+				UML_JMPc(block, COND_NZ, alignex = label++);                    // jmp     alignex,nz
 
 				/* word aligned accesses need to be broken up */
 				UML_TEST(block, I0, 4);                                         // test    i0,4
 				UML_JMPc(block, COND_NZ, unaligned = label++);                  // jmp     unaligned, nz
 			}
-
-			/* unaligned 2 and 4 byte accesses need to be broken up */
 			else
 			{
+				/* unaligned 2 and 4 byte accesses need to be broken up */
 				UML_TEST(block, I0, size - 1);                                  // test    i0,size-1
-				UML_JMPc(block, COND_NZ, unaligned = label++);                              // jmp     unaligned,nz
+				UML_JMPc(block, COND_NZ, unaligned = label++);                  // jmp     unaligned,nz
 			}
 		}
 	}
@@ -1054,12 +1052,12 @@ void ppc_device::static_generate_memory_accessor(int mode, int size, int iswrite
 	/* general case: assume paging and perform a translation */
 	if (((m_cap & PPCCAP_OEA) && (mode & MODE_DATA_TRANSLATION)) || (iswrite && (m_cap & PPCCAP_4XX) && (mode & MODE_PROTECTION)))
 	{
-		UML_SHR(block, I3, I0, 12);                                         // shr     i3,i0,12
-		UML_LOAD(block, I3, (void *)vtlb_table(), I3, SIZE_DWORD, SCALE_x4);// load    i3,[vtlb],i3,dword
-		UML_TEST(block, I3, (uint64_t)1 << translate_type);                           // test    i3,1 << translate_type
-		UML_JMPc(block, COND_Z, tlbmiss = label++);                                         // jmp     tlbmiss,z
-		UML_LABEL(block, tlbreturn = label++);                                          // tlbreturn:
-		UML_ROLINS(block, I0, I3, 0, 0xfffff000);                       // rolins  i0,i3,0,0xfffff000
+		UML_SHR(block, I3, I0, 12);                                             // shr     i3,i0,12
+		UML_LOAD(block, I3, (void *)vtlb_table(), I3, SIZE_DWORD, SCALE_x4);    // load    i3,[vtlb],i3,dword
+		UML_TEST(block, I3, (uint64_t)1 << translate_type);                     // test    i3,1 << translate_type
+		UML_JMPc(block, COND_Z, tlbmiss = label++);                             // jmp     tlbmiss,z
+		UML_LABEL(block, tlbreturn = label++);                                  // tlbreturn:
+		UML_ROLINS(block, I0, I3, 0, 0xfffff000);                               // rolins  i0,i3,0,0xfffff000
 	}
 	else if (m_cap & PPCCAP_4XX)
 		UML_AND(block, I0, I0, 0x7fffffff);                                 // and     i0,i0,0x7fffffff
