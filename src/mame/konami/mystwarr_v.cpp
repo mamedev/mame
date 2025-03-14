@@ -65,7 +65,7 @@ K056832_CB_MEMBER(mystwarr_state::mystwarr_tile_callback)
 		m_last_alpha_tile_mix_code = mix_code;
 	}
 
-	*color = m_layer_colorbase[layer] | (*color >> 1 & 0x1e);
+	*color = m_layer_colorbase[layer] | (*color >> 1 & 0x0f);
 }
 
 K056832_CB_MEMBER(mystwarr_state::viostorm_tile_callback)
