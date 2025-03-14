@@ -27,7 +27,6 @@ public:
 
 	// static configuration
 	template <typename... T> void set_irq_callback(T &&... args) { m_set_irq_cb.set(std::forward<T>(args)...); }
-	template <typename... T> void set_dmasnd_callback(T &&... args) { m_snd_dma_cb.set(std::forward<T>(args)...); }
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -119,7 +118,6 @@ protected:
 	u16 m_regs[128];
 
 	irq_cb_delegate m_set_irq_cb;
-	dmasnd_cb_delegate m_snd_dma_cb;
 	const int m_vdp_type;
 
 	devcb_write8 m_icons_cb;

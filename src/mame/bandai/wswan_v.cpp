@@ -25,7 +25,6 @@ wswan_video_device::wswan_video_device(const machine_config &mconfig, device_typ
 	, device_video_interface(mconfig, *this)
 	, device_palette_interface(mconfig, *this)
 	, m_set_irq_cb(*this)
-	, m_snd_dma_cb(*this)
 	, m_vdp_type(vdp_type)
 	, m_icons_cb(*this)
 	, m_color_mode_cb(*this)
@@ -57,7 +56,6 @@ void wswan_video_device::device_start()
 
 	// bind callbacks
 	m_set_irq_cb.resolve();
-	m_snd_dma_cb.resolve();
 
 	const size_t vram_size = (is_color_vdp() ? 0x10000 : 0x4000) >> 1;
 	m_vram = make_unique_clear<u16 []>(vram_size);
@@ -818,10 +816,6 @@ TIMER_CALLBACK_MEMBER(wswan_video_device::scanline_interrupt)
 			m_set_irq_cb(WSWAN_VIDEO_IFLAG_HBLTMR);
 		}
 	}
-
-	// Handle Sound DMA
-	if ((!m_snd_dma_cb.isnull()) && m_color_mode)
-		m_snd_dma_cb();
 
 	if (m_current_line == 144) // buffer sprite table
 	{
