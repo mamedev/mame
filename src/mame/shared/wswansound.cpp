@@ -514,7 +514,6 @@ void wswan_sound_device::port_w(offs_t offset, u16 data, u16 mem_mask)
 			if (ACCESSING_BITS_0_7)
 			{
 				m_noise_type = data & 0x07;
-				m_noise_reset = BIT(data, 3);
 				m_noise_enable = BIT(data, 4);
 				if (BIT(data, 3))
 					m_noise_shift = m_noise_output = 0;
