@@ -17,6 +17,18 @@ The noise taps and behavior are the same as the Virtual Boy.
 #include "wswansound.h"
 
 
+#define LOG_UNKNOWN    (1 << 1)
+#define LOG_HYPERVOICE (1 << 2)
+
+#define LOG_ALL        (LOG_UNKNOWN | LOG_HYPERVOICE)
+
+#define VERBOSE        (0)
+
+#include "logmacro.h"
+
+#define LOGUNKNOWN(...)    LOGMASKED(LOG_UNKNOWN, __VA_ARGS__)
+#define LOGHYPERVOICE(...) LOGMASKED(LOG_HYPERVOICE, __VA_ARGS__)
+
 // device type definition
 DEFINE_DEVICE_TYPE(WSWAN_SND, wswan_sound_device, "wswan_sound", "WonderSwan Custom Sound")
 
@@ -45,12 +57,15 @@ wswan_sound_device::wswan_sound_device(const machine_config &mconfig, const char
 		m_audio2_voice(0),
 		m_audio3_sweep(0),
 		m_audio4_noise(0),
-		m_mono(0),
-		m_output_volume(0),
-		m_external_stereo(0),
-		m_external_speaker(0),
+		m_speaker_enable(0),
+		m_speaker_volume(0),
+		m_headphone_enable(0),
+		m_headphone_connected(0),
 		m_noise_shift(0),
-		m_sample_volume(0)
+		m_sample_volume(0),
+		m_system_volume(0),
+		m_loutput(0),
+		m_routput(0)
 {
 }
 
@@ -74,13 +89,15 @@ void wswan_sound_device::device_start()
 	save_item(NAME(m_audio2_voice));
 	save_item(NAME(m_audio3_sweep));
 	save_item(NAME(m_audio4_noise));
-	save_item(NAME(m_mono));
-	save_item(NAME(m_output_volume));
-	save_item(NAME(m_external_stereo));
-	save_item(NAME(m_external_speaker));
+	save_item(NAME(m_speaker_enable));
+	save_item(NAME(m_speaker_volume));
+	save_item(NAME(m_headphone_enable));
+	save_item(NAME(m_headphone_connected));
 	save_item(NAME(m_noise_shift));
 	save_item(NAME(m_sample_volume));
 	save_item(NAME(m_system_volume));
+	save_item(NAME(m_loutput));
+	save_item(NAME(m_routput));
 	save_item(STRUCT_MEMBER(m_audio, freq));
 	save_item(STRUCT_MEMBER(m_audio, period));
 	save_item(STRUCT_MEMBER(m_audio, pos));
@@ -89,6 +106,18 @@ void wswan_sound_device::device_start()
 	save_item(STRUCT_MEMBER(m_audio, on));
 	save_item(STRUCT_MEMBER(m_audio, offset));
 	save_item(STRUCT_MEMBER(m_audio, signal));
+	save_item(NAME(m_hypervoice.loutput));
+	save_item(NAME(m_hypervoice.routput));
+	save_item(NAME(m_hypervoice.linput));
+	save_item(NAME(m_hypervoice.rinput));
+	save_item(NAME(m_hypervoice.input_channel));
+	save_item(NAME(m_hypervoice.volume));
+	save_item(NAME(m_hypervoice.scale_mode));
+	save_item(NAME(m_hypervoice.div));
+	save_item(NAME(m_hypervoice.counter));
+	save_item(NAME(m_hypervoice.enable));
+	save_item(NAME(m_hypervoice.reset));
+	save_item(NAME(m_hypervoice.channel_mode));
 }
 
 void wswan_sound_device::device_clock_changed()
@@ -109,17 +138,18 @@ void wswan_sound_device::device_reset()
 {
 	for (int i = 0; i < 4; i++)
 	{
-		m_audio[i].on = 0;
+		m_audio[i].on = false;
 		m_audio[i].signal = 0;
 		m_audio[i].offset = 0;
 		m_audio[i].pos = 0;
 	}
 	m_noise_output = 0;
+	m_hypervoice.enable = false;
 }
 
-int wswan_sound_device::fetch_sample(int channel, int offset)
+u8 wswan_sound_device::fetch_sample(int channel, int offset)
 {
-	u16 w = read_word(m_sample_address + ((channel & 3) << 4) + ((offset >> 1) & 0x0e));
+	u16 const w = read_word(m_sample_address + ((channel & 3) << 4) + ((offset >> 1) & 0x0e));
 
 	return (w >> ((offset & 0x03) * 4)) & 0x0f;
 }
@@ -134,103 +164,249 @@ void wswan_sound_device::sound_stream_update(sound_stream &stream, std::vector<r
 	auto &outputr = outputs[1];
 	for (int sampindex = 0; sampindex < outputl.samples(); sampindex++)
 	{
-		s32 left = 0, right = 0;
-
-		if (m_audio[0].on)
+		m_loutput = m_routput = 0;
+		if (m_headphone_connected ? m_headphone_enable : m_speaker_enable)
 		{
-			s32 const sample = m_audio[0].signal;
-			m_audio[0].pos += clk_div;
-			while (m_audio[0].pos >= m_audio[0].period)
+			if (m_audio[0].on)
 			{
-				m_audio[0].pos -= m_audio[0].period;
-				m_audio[0].signal = fetch_sample(0, m_audio[0].offset++);
+				u8 const sample = m_audio[0].signal;
+				m_audio[0].pos += clk_div;
+				while (m_audio[0].pos >= m_audio[0].period)
+				{
+					m_audio[0].pos -= m_audio[0].period;
+					m_audio[0].signal = fetch_sample(0, m_audio[0].offset++);
+				}
+				m_loutput += m_audio[0].vol_left * sample;
+				m_routput += m_audio[0].vol_right * sample;
 			}
-			left += m_audio[0].vol_left * sample;
-			right += m_audio[0].vol_right * sample;
-		}
 
-		if (m_audio[1].on)
-		{
-			if (m_audio2_voice)
+			if (m_audio[1].on)
 			{
-				u8 const voice_data = (m_audio[1].vol_left << 4) | m_audio[1].vol_right;
-				if (m_sample_volume & 0xc)
-					left += voice_data >> u8(BIT(m_sample_volume, 3) ? 0 : (BIT(m_sample_volume, 2) ? 1 : ~0));
-				if (m_sample_volume & 0x3)
-					right += voice_data >> u8(BIT(m_sample_volume, 1) ? 0 : (BIT(m_sample_volume, 0) ? 1 : ~0));
+				if (m_audio2_voice)
+				{
+					u8 const voice_data = (m_audio[1].vol_left << 4) | m_audio[1].vol_right;
+					if (m_sample_volume & 0xc)
+						m_loutput += voice_data >> u8(BIT(m_sample_volume, 3) ? 0 : (BIT(m_sample_volume, 2) ? 1 : ~0));
+					if (m_sample_volume & 0x3)
+						m_routput += voice_data >> u8(BIT(m_sample_volume, 1) ? 0 : (BIT(m_sample_volume, 0) ? 1 : ~0));
+				}
+				else
+				{
+					u8 const sample = m_audio[1].signal;
+					m_audio[1].pos += clk_div;
+					while (m_audio[1].pos >= m_audio[1].period)
+					{
+						m_audio[1].pos -= m_audio[1].period;
+						m_audio[1].signal = fetch_sample(1, m_audio[1].offset++);
+					}
+					m_loutput += m_audio[1].vol_left * sample;
+					m_routput += m_audio[1].vol_right * sample;
+				}
+			}
+
+			if (m_audio[2].on)
+			{
+				u8 const sample = m_audio[2].signal;
+				m_audio[2].pos += clk_div;
+				while (m_audio[2].pos >= m_audio[2].period)
+				{
+					m_audio[2].pos -= m_audio[2].period;
+					m_audio[2].signal = fetch_sample(2, m_audio[2].offset++);
+				}
+				if (m_audio3_sweep && m_sweep_time)
+				{
+					m_sweep_count += clk_div;
+					while (m_sweep_count >= m_sweep_time)
+					{
+						m_sweep_count -= m_sweep_time;
+						m_audio[2].freq += m_sweep_step;
+						m_audio[2].freq &= 0x7ff;
+						m_audio[2].period = 2048 - m_audio[2].freq;
+					}
+				}
+				m_loutput += m_audio[2].vol_left * sample;
+				m_routput += m_audio[2].vol_right * sample;
+			}
+
+			if (m_audio[3].on)
+			{
+				u8 const sample = m_audio[3].signal;
+				m_audio[3].pos += clk_div;
+				while (m_audio[3].pos >= m_audio[3].period)
+				{
+					if (m_audio4_noise)
+						m_audio[3].signal = m_noise_output ? 0xf : 0;
+					else
+						m_audio[3].signal = fetch_sample(3, m_audio[3].offset++);
+
+					m_audio[3].pos -= m_audio[3].period;
+
+					if (m_noise_reset)
+					{
+						m_noise_reset = 0;
+						m_noise_shift = 0;
+						m_noise_output = 0;
+					}
+
+					if (m_noise_enable)
+					{
+						static const int shift_bit[] = { 14, 10, 13, 4, 8, 6, 9, 11 };
+
+						m_noise_output = (1 ^ (m_noise_shift >> 7) ^ (m_noise_shift >> shift_bit[m_noise_type])) & 1;
+						m_noise_shift = m_noise_shift << 1 | m_noise_output;
+					}
+				}
+				m_loutput += m_audio[3].vol_left * sample;
+				m_routput += m_audio[3].vol_right * sample;
+			}
+			if (m_headphone_connected)
+			{
+				s32 left = m_loutput << 5;
+				s32 right = m_routput << 5;
+				if (m_hypervoice.enable)
+				{
+					static const u8 hypervoice_div[8] = {1, 2, 3, 4, 5, 6, 8, 12};
+
+					left += m_hypervoice.loutput;
+					right += m_hypervoice.routput;
+					if (++m_hypervoice.counter >= hypervoice_div[m_hypervoice.div])
+					{
+						m_hypervoice.loutput = m_hypervoice.scale(m_hypervoice.linput);
+						m_hypervoice.routput = m_hypervoice.scale(m_hypervoice.rinput);
+						m_hypervoice.counter = 0;
+					}
+				}
+				// TODO: clamped?
+				outputl.put_int_clamp(sampindex, left, 32768);
+				outputr.put_int_clamp(sampindex, right, 32768);
 			}
 			else
 			{
-				s32 const sample = m_audio[1].signal;
-				m_audio[1].pos += clk_div;
-				while (m_audio[1].pos >= m_audio[1].period)
-				{
-					m_audio[1].pos -= m_audio[1].period;
-					m_audio[1].signal = fetch_sample(1, m_audio[1].offset++);
-				}
-				left += m_audio[1].vol_left * sample;
-				right += m_audio[1].vol_right * sample;
+				u8 const mono = (((m_loutput & 0x3ff) + (m_routput & 0x3ff)) >> m_speaker_volume) & 0xff;
+				outputl.put_int(sampindex, mono, 256);
+				outputr.put_int(sampindex, mono, 256);
 			}
 		}
-
-		if (m_audio[2].on)
+		else
 		{
-			s32 const sample = m_audio[2].signal;
-			m_audio[2].pos += clk_div;
-			while (m_audio[2].pos >= m_audio[2].period)
-			{
-				m_audio[2].pos -= m_audio[2].period;
-				m_audio[2].signal = fetch_sample(2, m_audio[2].offset++);
-			}
-			if (m_audio3_sweep && m_sweep_time)
-			{
-				m_sweep_count += clk_div;
-				while (m_sweep_count >= m_sweep_time)
-				{
-					m_sweep_count -= m_sweep_time;
-					m_audio[2].freq += m_sweep_step;
-					m_audio[2].freq &= 0x7ff;
-					m_audio[2].period = 2048 - m_audio[2].freq;
-				}
-			}
-			left += m_audio[2].vol_left * sample;
-			right += m_audio[2].vol_right * sample;
+			outputl.put(sampindex, 0.0);
+			outputr.put(sampindex, 0.0);
 		}
+	}
+}
 
-		if (m_audio[3].on)
-		{
-			s32 const sample = m_audio[3].signal;
-			m_audio[3].pos += clk_div;
-			while (m_audio[3].pos >= m_audio[3].period)
+
+void wswan_sound_device::hypervoice_t::input(u8 input)
+{
+	if (input_channel) // Right input
+		rinput = input;
+	else // Left input
+		linput = input;
+}
+
+
+s32 wswan_sound_device::hypervoice_t::scale(u8 input)
+{
+	s32 output = 0;
+	switch (scale_mode)
+	{
+		case 0x00: // Unsigned
+			output = input << 8;
+			break;
+		case 0x01: // Unsigned negated
+			output = 0xffff0000 | (input << 8);
+			break;
+		case 0x02: // Signed
+			output = s32(s8(input)) << 8;
+			break;
+		case 0x03: // None
+			output = s16(input << 8);
+			break;
+	}
+	return (scale_mode == 0x03) ? output : (output >> volume);
+}
+
+
+void wswan_sound_device::hypervoice_dma_w(u8 data)
+{
+	switch (m_hypervoice.channel_mode)
+	{
+		case 0x00: // Stereo
+			hypervoice_w(0x68 / 2, data << 8, 0xff00);
+			break;
+		case 0x01: // Mono, Left
+			m_hypervoice.linput = data;
+			break;
+		case 0x02: // Mono, Right
+			m_hypervoice.rinput = data;
+			break;
+		case 0x03: // Mono, Both
+			m_hypervoice.linput = m_hypervoice.rinput = data;
+			break;
+	}
+}
+
+
+u16 wswan_sound_device::hypervoice_r(offs_t offset, u16 mem_mask)
+{
+	offset += 0x64 / 2;
+	m_channel->update();
+	switch (offset)
+	{
+		case 0x6a / 2: // Control
+			return (m_hypervoice.volume) |
+				(m_hypervoice.scale_mode << 2) |
+				(m_hypervoice.div << 4) |
+				(m_hypervoice.enable ? 0x0080 : 0x0000) |
+				(m_hypervoice.reset ? 0x1000 : 0x0000) |
+				(m_hypervoice.channel_mode << 13);
+		default:
+			if (!machine().side_effects_disabled())
+				LOGHYPERVOICE("%s: Unknown hypervoice port read %02x & %04x", machine().describe_context(), offset << 1, mem_mask);
+			break;
+	}
+	return 0;
+}
+
+void wswan_sound_device::hypervoice_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	offset += 0x64 / 2;
+	m_channel->update();
+
+	switch (offset)
+	{
+		case 0x64 / 2: // Left output
+			COMBINE_DATA(&m_hypervoice.loutput);
+			break;
+		case 0x66 / 2: // Right output
+			COMBINE_DATA(&m_hypervoice.routput);
+			break;
+		case 0x68 / 2: // Input
+			if (ACCESSING_BITS_8_15)
 			{
-				if (m_audio4_noise)
-					m_audio[3].signal = m_noise_output ? 0xf : 0;
-				else
-					m_audio[3].signal = fetch_sample(3, m_audio[3].offset++);
-
-				m_audio[3].pos -= m_audio[3].period;
-
-				if (m_noise_reset)
-				{
-					m_noise_reset = 0;
-					m_noise_shift = 0;
-					m_noise_output = 0;
-				}
-
-				if (m_noise_enable)
-				{
-					static int shift_bit[] = { 14, 10, 13, 4, 8, 6, 9, 11 };
-
-					m_noise_output = (1 ^ (m_noise_shift >> 7) ^ (m_noise_shift >> shift_bit[m_noise_type])) & 1;
-					m_noise_shift = m_noise_shift << 1 | m_noise_output;
-				}
+				m_hypervoice.input((data >> 8) & 0xff);
+				m_hypervoice.input_channel = !m_hypervoice.input_channel;
 			}
-			left += m_audio[3].vol_left * sample;
-			right += m_audio[3].vol_right * sample;
-		}
-
-		outputl.put_int(sampindex, left, 32768 >> 5);
-		outputr.put_int(sampindex, right, 32768 >> 5);
+			break;
+		case 0x6a / 2: // Control
+			if (ACCESSING_BITS_0_7)
+			{
+				m_hypervoice.volume = data & 3;
+				m_hypervoice.scale_mode = (data >> 2) & 3;
+				m_hypervoice.div = (data >> 4) & 7;
+				m_hypervoice.enable = BIT(data, 7);
+			}
+			if (ACCESSING_BITS_8_15)
+			{
+				m_hypervoice.reset = BIT(data, 12);
+				m_hypervoice.channel_mode = (data >> 13) & 3;
+				if (m_hypervoice.reset)
+					m_hypervoice.input_channel = false;
+			}
+			break;
+		default:
+			LOGHYPERVOICE("%s: Unknown hypervoice port write %02x - %04x & %04x", machine().describe_context(), offset << 1, data, mem_mask);
+			break;
 	}
 }
 
@@ -238,7 +414,8 @@ void wswan_sound_device::sound_stream_update(sound_stream &stream, std::vector<r
 u16 wswan_sound_device::port_r(offs_t offset, u16 mem_mask)
 {
 	m_channel->update();
-	switch (offset) {
+	switch (offset)
+	{
 		case 0x80 / 2:
 		case 0x82 / 2:
 		case 0x84 / 2:
@@ -263,15 +440,25 @@ u16 wswan_sound_device::port_r(offs_t offset, u16 mem_mask)
 				(m_audio2_voice ? 0x20 : 0x00) |
 				(m_audio3_sweep ? 0x40 : 0x00) |
 				(m_audio4_noise ? 0x80 : 0x00) |
-				(m_mono ? 0x0100 : 0x00) | (m_output_volume << 9) |
-				(m_external_stereo ? 0x0800 : 0x00) |
-				(m_external_speaker ? 0x00 : 0x00); // TODO 0x80 is set when external speaker is connected
+				(m_speaker_enable ? 0x0100 : 0x0000) | (m_speaker_volume << 9) |
+				(m_headphone_enable ? 0x0800 : 0x0000) |
+				(m_headphone_connected ? 0x8000 : 0x0000);
 		case 0x92 / 2:
 			return m_noise_shift;
 		case 0x94 / 2:
 			return m_sample_volume;
+		case 0x96 / 2:
+			return m_loutput & 0x3ff;
+		case 0x98 / 2:
+			return m_routput & 0x3ff;
+		case 0x9a / 2:
+			return (m_loutput & 0x3ff) + (m_routput & 0x3ff);
 		case 0x9e / 2:
 			return m_system_volume;
+		default:
+			if (!machine().side_effects_disabled())
+				LOGUNKNOWN("%s: Unknown sound port read %02x & %04x", machine().describe_context(), offset << 1, mem_mask);
+			break;
 	}
 	return 0;
 }
@@ -364,10 +551,9 @@ void wswan_sound_device::port_w(offs_t offset, u16 data, u16 mem_mask)
 			// Audio output
 			if (ACCESSING_BITS_8_15)
 			{
-				m_mono = BIT(data, 8);
-				m_output_volume = ((data >> 9) & 0x03);
-				m_external_stereo = BIT(data, 11);
-				m_external_speaker = 1;
+				m_speaker_enable = BIT(data, 8);
+				m_speaker_volume = ((data >> 9) & 0x03);
+				m_headphone_enable = BIT(data, 11);
 			}
 			break;
 
@@ -378,14 +564,17 @@ void wswan_sound_device::port_w(offs_t offset, u16 data, u16 mem_mask)
 
 		case 0x94 / 2:              // Sample volume
 			if (ACCESSING_BITS_0_7)
-				m_sample_volume = data & 0xff;
+				m_sample_volume = data & 0x0f;
 			if (ACCESSING_BITS_8_15)
-				logerror("%s: Sound Test bit set %02x\n", machine().describe_context(), (data >> 8) & 0xff);
+				LOGUNKNOWN("%s: Sound Test bit set %02x\n", machine().describe_context(), (data >> 8) & 0xff);
 			break;
 
 		case 0x9e / 2:              // WSC volume setting (0, 1, 2, 3) (TODO)
 			if (ACCESSING_BITS_0_7)
 				m_system_volume = data & 0x03;
+			break;
+		default:
+			LOGUNKNOWN("%s: Unknown hypervoice port write %02x - %04x & %04x", machine().describe_context(), offset << 1, data, mem_mask);
 			break;
 	}
 }
