@@ -50,7 +50,6 @@ wswan_sound_device::wswan_sound_device(const machine_config &mconfig, const char
 		m_sweep_time(8192),
 		m_sweep_count(0),
 		m_noise_type(0),
-		m_noise_reset(0),
 		m_noise_enable(0),
 		m_noise_output(0),
 		m_sample_address(0),
@@ -83,7 +82,6 @@ void wswan_sound_device::device_start()
 	save_item(NAME(m_sweep_time));
 	save_item(NAME(m_sweep_count));
 	save_item(NAME(m_noise_type));
-	save_item(NAME(m_noise_reset));
 	save_item(NAME(m_noise_enable));
 	save_item(NAME(m_sample_address));
 	save_item(NAME(m_audio2_voice));
@@ -116,7 +114,6 @@ void wswan_sound_device::device_start()
 	save_item(NAME(m_hypervoice.div));
 	save_item(NAME(m_hypervoice.counter));
 	save_item(NAME(m_hypervoice.enable));
-	save_item(NAME(m_hypervoice.reset));
 	save_item(NAME(m_hypervoice.channel_mode));
 }
 
@@ -241,14 +238,7 @@ void wswan_sound_device::sound_stream_update(sound_stream &stream, std::vector<r
 
 					m_audio[3].pos -= m_audio[3].period;
 
-					if (m_noise_reset)
-					{
-						m_noise_reset = 0;
-						m_noise_shift = 0;
-						m_noise_output = 0;
-					}
-
-					if (m_noise_enable)
+					if (m_audio4_noise && m_noise_enable)
 					{
 						static const int shift_bit[] = { 14, 10, 13, 4, 8, 6, 9, 11 };
 
@@ -358,7 +348,6 @@ u16 wswan_sound_device::hypervoice_r(offs_t offset, u16 mem_mask)
 				(m_hypervoice.scale_mode << 2) |
 				(m_hypervoice.div << 4) |
 				(m_hypervoice.enable ? 0x0080 : 0x0000) |
-				(m_hypervoice.reset ? 0x1000 : 0x0000) |
 				(m_hypervoice.channel_mode << 13);
 		default:
 			if (!machine().side_effects_disabled())
@@ -398,9 +387,8 @@ void wswan_sound_device::hypervoice_w(offs_t offset, u16 data, u16 mem_mask)
 			}
 			if (ACCESSING_BITS_8_15)
 			{
-				m_hypervoice.reset = BIT(data, 12);
 				m_hypervoice.channel_mode = (data >> 13) & 3;
-				if (m_hypervoice.reset)
+				if (BIT(data, 12))
 					m_hypervoice.input_channel = false;
 			}
 			break;
@@ -430,7 +418,7 @@ u16 wswan_sound_device::port_r(offs_t offset, u16 mem_mask)
 		case 0x8c / 2:
 			return m_sweep_step | (((m_sweep_time / 8192) - 1) << 8);
 		case 0x8e / 2:
-			return m_noise_type | (m_noise_reset ? 0x08 : 0x00) | (m_noise_enable ? 0x10 : 0x00) |
+			return m_noise_type | (m_noise_enable ? 0x10 : 0x00) |
 				((m_sample_address << 2) & 0xff00);
 		case 0x90 / 2:
 			return (m_audio[0].on ? 0x01 : 0x00) |
@@ -528,6 +516,8 @@ void wswan_sound_device::port_w(offs_t offset, u16 data, u16 mem_mask)
 				m_noise_type = data & 0x07;
 				m_noise_reset = BIT(data, 3);
 				m_noise_enable = BIT(data, 4);
+				if (BIT(data, 3))
+					m_noise_shift = m_noise_output = 0;
 			}
 			// Sample location
 			if (ACCESSING_BITS_8_15)

@@ -94,7 +94,6 @@ private:
 		u8   div;
 		u8   counter;
 		bool enable;
-		bool reset;
 		u8   channel_mode;
 	} m_hypervoice;
 
@@ -106,7 +105,6 @@ private:
 	u32       m_sweep_time;
 	u32       m_sweep_count;
 	u8        m_noise_type;
-	u8        m_noise_reset;
 	u8        m_noise_enable;
 	u8        m_noise_output;
 	u16       m_sample_address;
