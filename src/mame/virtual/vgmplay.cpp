@@ -3481,6 +3481,8 @@ void vgmplay_state::soundchips16le_map(address_map &map)
 	map(vgmplay_device::A_C352_1, vgmplay_device::A_C352_1 + 0x7fff).w(m_c352[1], FUNC(c352_device::write));
 	map(vgmplay_device::A_WSWAN_0, vgmplay_device::A_WSWAN_0 + 0xff).w(m_wswan[0], FUNC(wswan_sound_device::port_w));
 	map(vgmplay_device::A_WSWAN_1, vgmplay_device::A_WSWAN_1 + 0xff).w(m_wswan[1], FUNC(wswan_sound_device::port_w));
+	map(vgmplay_device::A_WSWAN_0 + 0x64, vgmplay_device::A_WSWAN_0 + 0x6b).w(m_wswan[0], FUNC(wswan_sound_device::hypervoice_w));
+	map(vgmplay_device::A_WSWAN_1 + 0x64, vgmplay_device::A_WSWAN_1 + 0x6b).w(m_wswan[1], FUNC(wswan_sound_device::hypervoice_w));
 	map(vgmplay_device::A_WSWAN_RAM_0, vgmplay_device::A_WSWAN_RAM_0 + 0x3fff).ram().share("wswan_ram.0");
 	map(vgmplay_device::A_WSWAN_RAM_1, vgmplay_device::A_WSWAN_RAM_1 + 0x3fff).ram().share("wswan_ram.1");
 }
@@ -4005,11 +4007,13 @@ void vgmplay_state::vgmplay(machine_config &config)
 	m_scsp[1]->add_route(1, m_mixer, 1, AUTO_ALLOC_INPUT, 1);
 
 	WSWAN_SND(config, m_wswan[0], 0);
+	m_wswan[0]->set_headphone_connected(true);
 	m_wswan[0]->set_addrmap(0, &vgmplay_state::wswan_map<0>);
 	m_wswan[0]->add_route(0, m_mixer, 0.50, AUTO_ALLOC_INPUT, 0);
 	m_wswan[0]->add_route(1, m_mixer, 0.50, AUTO_ALLOC_INPUT, 1);
 
 	WSWAN_SND(config, m_wswan[1], 0);
+	m_wswan[1]->set_headphone_connected(true);
 	m_wswan[1]->set_addrmap(0, &vgmplay_state::wswan_map<1>);
 	m_wswan[1]->add_route(0, m_mixer, 0.50, AUTO_ALLOC_INPUT, 0);
 	m_wswan[1]->add_route(1, m_mixer, 0.50, AUTO_ALLOC_INPUT, 1);
