@@ -1287,6 +1287,9 @@ void drcbe_arm64::set_flags(asmjit::a64::Assembler &a) const
 	a.bfi(TEMP_REG1, TEMP_REG2, 28, 4);
 
 	a.msr(a64::Predicate::SysReg::kNZCV, TEMP_REG1);
+
+	a.mov(TEMP_REG2, FLAG_C | FLAG_U);
+	a.and_(FLAGS_REG, FLAGS_REG, TEMP_REG2);
 }
 
 void drcbe_arm64::calculate_carry_shift_left(a64::Assembler &a, const a64::Gp &reg, const a64::Gp &shift, int maxBits) const
@@ -2081,7 +2084,7 @@ void drcbe_arm64::op_setfmod(a64::Assembler &a, const uml::instruction &inst)
 	}
 	else
 	{
-		const a64::Gp src = srcp.select_register(TEMP_REG1, inst.size());
+		const a64::Gp src = srcp.select_register(FUNC_SCRATCH_REG, inst.size());
 
 		mov_reg_param(a, inst.size(), src, srcp);
 		a.and_(scratch, src, 3);
@@ -2128,34 +2131,75 @@ void drcbe_arm64::op_getflgs(a64::Assembler &a, const uml::instruction &inst)
 
 	const a64::Gp dst = dstp.select_register(TEMP_REG1, 8);
 
-	a.mov(dst, a64::xzr);
+	bool first = true;
 
 	if (maskp.immediate() & FLAG_C)
+	{
 		a.and_(dst, FLAGS_REG, FLAG_C);
+		first = false;
+	}
 
 	if (maskp.immediate() & FLAG_V)
 	{
-		a.cset(SCRATCH_REG1, a64::CondCode::kVS);
-		a.orr(dst, dst, SCRATCH_REG1, FLAG_BIT_V);
+		if (first)
+		{
+			a.cset(dst, a64::CondCode::kVS);
+			a.lsl(dst, dst, FLAG_BIT_V);
+			first = false;
+		}
+		else
+		{
+			a.cset(SCRATCH_REG1, a64::CondCode::kVS);
+			a.orr(dst, dst, SCRATCH_REG1, FLAG_BIT_V);
+		}
 	}
 
 	if (maskp.immediate() & FLAG_Z)
 	{
-		a.cset(SCRATCH_REG1, a64::CondCode::kEQ);
-		a.orr(dst, dst, SCRATCH_REG1, FLAG_BIT_Z);
+		if (first)
+		{
+			a.cset(dst, a64::CondCode::kEQ);
+			a.lsl(dst, dst, FLAG_BIT_Z);
+			first = false;
+		}
+		else
+		{
+			a.cset(SCRATCH_REG1, a64::CondCode::kEQ);
+			a.orr(dst, dst, SCRATCH_REG1, FLAG_BIT_Z);
+		}
 	}
 
 	if (maskp.immediate() & FLAG_S)
 	{
-		a.cset(SCRATCH_REG1, a64::CondCode::kMI);
-		a.orr(dst, dst, SCRATCH_REG1, FLAG_BIT_S);
+		if (first)
+		{
+			a.cset(dst, a64::CondCode::kMI);
+			a.lsl(dst, dst, FLAG_BIT_S);
+			first = false;
+		}
+		else
+		{
+			a.cset(SCRATCH_REG1, a64::CondCode::kMI);
+			a.orr(dst, dst, SCRATCH_REG1, FLAG_BIT_S);
+		}
 	}
 
 	if (maskp.immediate() & FLAG_U)
 	{
-		get_unordered(a, SCRATCH_REG1);
-		a.orr(dst, dst, SCRATCH_REG1, FLAG_BIT_U);
+		if (first)
+		{
+			a.and_(dst, FLAGS_REG, FLAG_U);
+			first = false;
+		}
+		else
+		{
+			a.and_(SCRATCH_REG1, FLAGS_REG, FLAG_U);
+			a.orr(dst, dst, SCRATCH_REG1);
+		}
 	}
+
+	if (first)
+		a.mov(dst, a64::xzr);
 
 	mov_param_reg(a, inst.size(), dstp, dst);
 }
@@ -2813,6 +2857,7 @@ void drcbe_arm64::op_mov(a64::Assembler &a, const uml::instruction &inst)
 	be_parameter srcp(*this, inst.param(1), PTYPE_MRI);
 
 	// add a conditional branch unless a conditional move is possible
+	// TODO: optimise to use csel if the source and destination are both kept in host registers
 	Label skip;
 
 	if (inst.condition() != uml::COND_ALWAYS)
@@ -3001,23 +3046,31 @@ void drcbe_arm64::op_roland(a64::Assembler &a, const uml::instruction &inst)
 		}
 
 		// srcp and the results of the rors above are already going to the output register, so if the mask is all 1s this can all be skipped
+		const a64::Inst::Id maskop = inst.flags() ? a64::Inst::kIdAnds : a64::Inst::kIdAnd;
 		if (maskp.is_immediate() && is_valid_immediate_mask(maskp.immediate(), inst.size()))
 		{
-			a.ands(output, output, maskp.immediate());
+			a.emit(maskop, output, output, maskp.immediate());
 		}
 		else if (!maskp.is_immediate() || maskp.immediate() != util::make_bitmask<uint64_t>(instbits))
 		{
 			const a64::Gp mask = maskp.select_register(TEMP_REG2, inst.size());
 			mov_reg_param(a, inst.size(), mask, maskp);
 
-			a.ands(output, output, mask);
+			a.emit(maskop, output, output, mask);
+		}
+		else
+		{
+			optimized = true; // need explicit tst if flags are requested
 		}
 	}
 
 	mov_param_reg(a, inst.size(), dstp, output);
 
 	if (inst.flags())
-		a.tst(output, output);
+	{
+		if (optimized)
+			a.tst(output, output);
+	}
 }
 
 void drcbe_arm64::op_rolins(a64::Assembler &a, const uml::instruction &inst)
@@ -3230,7 +3283,9 @@ template <bool CarryIn> void drcbe_arm64::op_add(a64::Assembler &a, const uml::i
 	assert_no_condition(inst);
 	assert_flags(inst, FLAG_C | FLAG_V | FLAG_Z | FLAG_S);
 
-	const a64::Inst::Id opcode = CarryIn ? a64::Inst::kIdAdcs : a64::Inst::kIdAdds;
+	const a64::Inst::Id opcode = CarryIn
+			? (inst.flags() ? a64::Inst::kIdAdcs : a64::Inst::kIdAdc)
+			: (inst.flags() ? a64::Inst::kIdAdds : a64::Inst::kIdAdd);
 
 	be_parameter dstp(*this, inst.param(0), PTYPE_MR);
 	be_parameter src1p(*this, inst.param(1), PTYPE_MRI);
@@ -3333,7 +3388,8 @@ template <bool CarryIn> void drcbe_arm64::op_add(a64::Assembler &a, const uml::i
 		mov_param_reg(a, inst.size(), dstp, output);
 	}
 
-	store_carry(a);
+	if (inst.flags())
+		store_carry(a);
 }
 
 template <bool CarryIn> void drcbe_arm64::op_sub(a64::Assembler &a, const uml::instruction &inst)
@@ -3342,7 +3398,9 @@ template <bool CarryIn> void drcbe_arm64::op_sub(a64::Assembler &a, const uml::i
 	assert_no_condition(inst);
 	assert_flags(inst, FLAG_C | FLAG_V | FLAG_Z | FLAG_S);
 
-	const a64::Inst::Id opcode = CarryIn ? a64::Inst::kIdSbcs : a64::Inst::kIdSubs;
+	const a64::Inst::Id opcode = CarryIn
+			? (inst.flags() ? a64::Inst::kIdSbcs : a64::Inst::kIdSbc)
+			: (inst.flags() ? a64::Inst::kIdSubs : a64::Inst::kIdSub);
 
 	be_parameter dstp(*this, inst.param(0), PTYPE_MR);
 	be_parameter src1p(*this, inst.param(1), PTYPE_MRI);
@@ -3423,7 +3481,8 @@ template <bool CarryIn> void drcbe_arm64::op_sub(a64::Assembler &a, const uml::i
 		mov_param_reg(a, inst.size(), dstp, output);
 	}
 
-	store_carry(a, true);
+	if (inst.flags())
+		store_carry(a, true);
 }
 
 void drcbe_arm64::op_cmp(a64::Assembler &a, const uml::instruction &inst)
@@ -3786,6 +3845,8 @@ void drcbe_arm64::op_and(a64::Assembler &a, const uml::instruction &inst)
 	assert_no_condition(inst);
 	assert_flags(inst, FLAG_Z | FLAG_S);
 
+	const a64::Inst::Id opcode = inst.flags() ? a64::Inst::kIdAnds : a64::Inst::kIdAnd;
+
 	be_parameter dstp(*this, inst.param(0), PTYPE_MR);
 	be_parameter src1p(*this, inst.param(1), PTYPE_MRI);
 	be_parameter src2p(*this, inst.param(2), PTYPE_MRI);
@@ -3811,7 +3872,7 @@ void drcbe_arm64::op_and(a64::Assembler &a, const uml::instruction &inst)
 		const a64::Gp src1 = src1p.select_register(TEMP_REG1, inst.size());
 		mov_reg_param(a, inst.size(), src1, src1p);
 
-		a.ands(dst, src1, src2p.immediate());
+		a.emit(opcode, dst, src1, src2p.immediate());
 	}
 	else if (!inst.flags() && (inst.size() == 8) && src2p.is_immediate() && is_valid_immediate_mask(src2p.immediate(), 4))
 	{
@@ -3827,7 +3888,7 @@ void drcbe_arm64::op_and(a64::Assembler &a, const uml::instruction &inst)
 		mov_reg_param(a, inst.size(), src1, src1p);
 		mov_reg_param(a, inst.size(), src2, src2p);
 
-		a.ands(dst, src1, src2);
+		a.emit(opcode, dst, src1, src2);
 	}
 
 	mov_param_reg(a, inst.size(), dstp, dst);
@@ -4490,6 +4551,7 @@ void drcbe_arm64::op_fmov(a64::Assembler &a, const uml::instruction &inst)
 	be_parameter dstp(*this, inst.param(0), PTYPE_MF);
 	be_parameter srcp(*this, inst.param(1), PTYPE_MF);
 
+	// TODO: optimise to use fcsel if the source and destination are both kept in host registers
 	Label skip;
 	if (inst.condition() != uml::COND_ALWAYS)
 	{
