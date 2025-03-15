@@ -190,11 +190,11 @@ void pc88va_sgp_device::start_exec()
 				ptr->hsize = m_data->read_word(vdp_pointer + 4) & 0x0fff;
 				ptr->vsize = m_data->read_word(vdp_pointer + 6) & 0x0fff;
 				// NOTE: & 0xfffc causes pitch issues in boomer intro/title text, shinraba gameplay
-				ptr->fb_pitch = m_data->read_word(vdp_pointer + 8) & 0xfffe;
+				ptr->fb_pitch = (s16)(m_data->read_word(vdp_pointer + 8) & 0xfffe);
 				ptr->address = (m_data->read_word(vdp_pointer + 10) & 0xfffe)
 					| (m_data->read_word(vdp_pointer + 12) << 16);
 
-				LOGCOMMAND("SGP: (PC=%08x) SET %s %02x|H %4u|V %4u|Pitch %5u| address %08x\n"
+				LOGCOMMAND("SGP: (PC=%08x) SET %s %02x|H %4u|V %4u|Pitch %5d| address %08x\n"
 					, vdp_pointer
 					, mode ? "DESTINATION" : "SOURCE     "
 					, param1
@@ -246,7 +246,7 @@ void pc88va_sgp_device::start_exec()
 				// in pixels
 				const u16 h_size = m_data->read_word(vdp_pointer + 6);
 				const u16 v_size = m_data->read_word(vdp_pointer + 8);
-				const u16 fb_pitch = m_data->read_word(vdp_pointer + 10) & 0xfffe;
+				const s16 fb_pitch = m_data->read_word(vdp_pointer + 10) & 0xfffe;
 				const u32 src_address = (m_data->read_word(vdp_pointer + 12) & 0xfffe)
 					| (m_data->read_word(vdp_pointer + 14) << 16);
 
@@ -398,14 +398,14 @@ void pc88va_sgp_device::execute_blit(u16 draw_mode, bool is_patblt)
 {
 	const u8 logical_op = draw_mode & 0xf;
 	const u8 tp_mod = (draw_mode >> 8) & 0x3;
-//	const bool hd = !!BIT(draw_mode, 10);
+	const bool hd = !!BIT(draw_mode, 10);
 	// TODO: rtype gameplay enables VD
-//	const bool vd = !!BIT(draw_mode, 11);
-//	const bool sf = !!BIT(draw_mode, 12);
+	const bool vd = !!BIT(draw_mode, 11);
+	const bool sf = !!BIT(draw_mode, 12);
 
-	if (draw_mode & 0xfc00)
+	if (hd || vd || sf)
 	{
-		popmessage("SGP: Warning draw_mode = %04x (HD %d VD %d SF %d)", draw_mode, BIT(draw_mode, 10), BIT(draw_mode, 11), BIT(draw_mode, 12));
+		popmessage("SGP: Warning draw_mode = %04x (HD %d VD %d SF %d)", draw_mode, hd, vd, sf);
 	}
 
 	// boomer title screen just sets the same h/v size, irrelevant

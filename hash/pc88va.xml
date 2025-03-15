@@ -581,6 +581,8 @@ Omake: if sound irqs don't run then needs to press key 0 pad to move on
 ]]></notes>
 		<info name="alt_title" value="神羅万象"/>
 		<info name="usage" value="Hold enter at boot to skip intro, press F2 on title screen to load a game, press F5 for sound test" />
+
+		<!-- baddump: non-factory save -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1331888">
@@ -591,7 +593,7 @@ Omake: if sound irqs don't run then needs to press key 0 pad to move on
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1296112">
-				<rom name="shinra bansho(diskb) (nihon telenet).d88" size="1296112" crc="1ee8acdf" sha1="4e0cab59ec6707f848b28b056040be835e2357ed"/>
+				<rom name="shinra bansho(diskb) (nihon telenet).d88" size="1296112" crc="1ee8acdf" sha1="4e0cab59ec6707f848b28b056040be835e2357ed" status="baddump" />
 			</dataarea>
 		</part>
 	</software>

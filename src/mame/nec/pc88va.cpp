@@ -44,7 +44,7 @@ TODO:
 - Support for PC8801 compatible mode & PC80S31K (floppy interface);
 
 Notes:
-- hold F8 at POST to bring software dip settings menu
+- hold F8 at POST to bring software dip settings menu, F5 to cycle between pages;
 - PC-88VA-91 is a ROM upgrade kit for a PC-88VA -> VA2/VA3.
   Has four roms, marked by VAEG as VUROM00.ROM, VUROM08.ROM, VUROM1.ROM, VUDIC.ROM.
 
@@ -632,7 +632,7 @@ void pc88va_state::io_map(address_map &map)
 //  map(0x0124, 0x0125) ? (related to Transparent Color of Graphic Screen 0)
 //  map(0x0126, 0x0127) ? (related to Transparent Color of Graphic Screen 1)
 	map(0x012e, 0x012f).w(FUNC(pc88va_state::text_transpen_w));
-//  map(0x0130, 0x0137) Picture Mask Parameter (global cliprect, olteus gameplay)
+	map(0x0130, 0x0137).w(FUNC(pc88va_state::picture_mask_w));
 	map(0x0142, 0x0142).rw(FUNC(pc88va_state::idp_status_r), FUNC(pc88va_state::idp_command_w)); //Text Controller (IDP) - (R) Status (W) command
 	map(0x0146, 0x0146).w(FUNC(pc88va_state::idp_param_w)); //Text Controller (IDP) - (R/W) Parameter
 	map(0x0148, 0x0148).w(FUNC(pc88va_state::text_control_1_w));
