@@ -17,6 +17,8 @@ TODO:
  - IGS 033 appears to encapsulate the behavior of the video/interface chip found in igspoker.cpp
    so could be turned into a device, possibly shared
  - complete inputs / outputs / hopper
+ - colors are wrong if cards are used (enter Test Mode, press Hold 3, enter pw, press Start,
+   press Hold 3, change 4th setting in the right column, press Bet, press Start)
 */
 
 #include "emu.h"
@@ -248,7 +250,7 @@ INPUT_PORTS_START( qiji6 ) // TODO: complete
 
 	// most settings are done on the software side. Password is all Start
 	PORT_START("DSW")
-	PORT_DIPNAME(          0x0000001f, 0x0000001f, "Secondary Machine Number" ) PORT_DIPLOCATION("SW1:1,2,3,4,5")
+	PORT_DIPNAME(          0x0000001f, 0x0000001f, "Satellite Machine Number" ) PORT_DIPLOCATION("SW1:1,2,3,4,5")
 	PORT_DIPSETTING(                   0x0000001f, "1" )
 	PORT_DIPSETTING(                   0x0000001e, "2" )
 	PORT_DIPSETTING(                   0x0000001d, "3" )
@@ -280,7 +282,7 @@ INPUT_PORTS_START( qiji6 ) // TODO: complete
 	PORT_DIPSETTING(                   0x00000003, "20 (duplicate)" )
 	PORT_DIPSETTING(                   0x00000002, "20 (duplicate)" )
 	PORT_DIPSETTING(                   0x00000001, "20 (duplicate)" )
-	PORT_DIPSETTING(                   0x00000000, "00" )
+	PORT_DIPSETTING(                   0x00000000, "20" )
 	PORT_DIPUNKNOWN_DIPLOC(0x00000020, 0x00000020, "SW1:6")
 	PORT_DIPUNKNOWN_DIPLOC(0x00000040, 0x00000040, "SW1:7")
 	PORT_DIPNAME(          0x00000080, 0x00000080, "Link Mode" ) PORT_DIPLOCATION("SW1:8") // Hard-coded?
@@ -433,4 +435,4 @@ void igs_m027_033vid_state::init_qiji6()
 ***************************************************************************/
 
 // internal ROM date is 2002, external software revision could be later
-GAME( 2002, qiji6, 0, m027_033vid, qiji6, igs_m027_033vid_state, init_qiji6, ROT0, "IGS", "Qiji 6 (V118CN)", MACHINE_NOT_WORKING ) // lacks hopper support
+GAME( 2002, qiji6, 0, m027_033vid, qiji6, igs_m027_033vid_state, init_qiji6, ROT0, "IGS", "Qiji 6 (V118CN)", MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING ) // lacks hopper support
