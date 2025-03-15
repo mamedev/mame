@@ -16,6 +16,18 @@
 #include "wswan_v.h"
 #include "screen.h"
 
+#define LOG_UNKNOWN    (1 << 1)
+#define LOG_SCANLINE   (1 << 2)
+
+#define LOG_ALL        (LOG_UNKNOWN | LOG_SCANLINE)
+
+#define VERBOSE        (0)
+
+#include "logmacro.h"
+
+#define LOGUNKNOWN(...)  LOGMASKED(LOG_UNKNOWN, __VA_ARGS__)
+#define LOGSCANLINE(...) LOGMASKED(LOG_SCANLINE, __VA_ARGS__)
+
 DEFINE_DEVICE_TYPE(WSWAN_VIDEO, wswan_video_device, "wswan_video", "Bandai WonderSwan VDP")
 DEFINE_DEVICE_TYPE(WSWAN_COLOR_VIDEO, wswan_color_video_device, "wscolor_video", "Bandai WonderSwan Color VDP")
 
@@ -512,7 +524,7 @@ void wswan_video_device::refresh_scanline()
 				draw_foreground_0();
 				break;
 			case 1: // ???
-				logerror("Unknown foreground mode 1 set\n");
+				LOGUNKNOWN("Unknown foreground mode 1 set\n");
 				break;
 			case 2: // FG only inside window area
 				if (m_current_line >= m_window_fg_top && m_current_line <= m_window_fg_bottom)
@@ -596,7 +608,7 @@ void wswan_video_device::reg_w(offs_t offset, u16 data, u16 mem_mask)
 		case 0x02 / 2:
 			// Current scanline (read-only)
 			if (ACCESSING_BITS_0_7)
-				logerror("Write to current scanline! Current value: %d  Data to write: %d\n", m_current_line, data);
+				LOGSCANLINE("Write to current scanline! Current value: %d  Data to write: %d\n", m_current_line, data);
 			// Line compare
 			if (ACCESSING_BITS_8_15)
 				m_line_compare = data >> 8;
