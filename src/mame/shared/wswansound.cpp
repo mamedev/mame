@@ -243,7 +243,7 @@ void wswan_sound_device::sound_stream_update(sound_stream &stream, std::vector<r
 
 					if (m_audio4_noise && m_noise_enable)
 					{
-						static const int shift_bit[] = { 14, 10, 13, 4, 8, 6, 9, 11 };
+						static const int shift_bit[8] = { 14, 10, 13, 4, 8, 6, 9, 11 };
 
 						m_noise_output = (1 ^ (m_noise_shift >> 7) ^ (m_noise_shift >> shift_bit[m_noise_type])) & 1;
 						m_noise_shift = m_noise_shift << 1 | m_noise_output;
@@ -258,7 +258,7 @@ void wswan_sound_device::sound_stream_update(sound_stream &stream, std::vector<r
 				s32 right = m_routput << 5;
 				if (m_hypervoice.enable)
 				{
-					static const u8 hypervoice_div[8] = {1, 2, 3, 4, 5, 6, 8, 12};
+					static const u8 hypervoice_div[8] = { 1, 2, 3, 4, 5, 6, 8, 12 };
 
 					left += m_hypervoice.loutput;
 					right += m_hypervoice.routput;
