@@ -142,6 +142,9 @@ void wswan_sound_device::device_reset()
 	}
 	m_noise_output = 0;
 	m_hypervoice.enable = false;
+	m_hypervoice.counter = 0;
+	m_hypervoice.loutput = m_hypervoice.routput = m_hypervoice.linput = m_hypervoice.rinput = 0;
+	m_hypervoice.input_channel = false;
 }
 
 u8 wswan_sound_device::fetch_sample(int channel, int offset)
