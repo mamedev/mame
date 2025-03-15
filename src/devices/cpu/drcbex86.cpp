@@ -413,9 +413,9 @@ public:
 	virtual void reset() override;
 	virtual int execute(uml::code_handle &entry) override;
 	virtual void generate(drcuml_block &block, const uml::instruction *instlist, uint32_t numinst) override;
-	virtual bool hash_exists(uint32_t mode, uint32_t pc) override;
-	virtual void get_info(drcbe_info &info) override;
-	virtual bool logging() const override { return m_log != nullptr; }
+	virtual bool hash_exists(uint32_t mode, uint32_t pc) const noexcept override;
+	virtual void get_info(drcbe_info &info) const noexcept override;
+	virtual bool logging() const noexcept override { return m_log != nullptr; }
 
 private:
 	// HACK: leftover from x86emit
@@ -1427,7 +1427,7 @@ void drcbe_x86::generate(drcuml_block &block, const instruction *instlist, uint3
 //  given mode/pc exists in the hash table
 //-------------------------------------------------
 
-bool drcbe_x86::hash_exists(uint32_t mode, uint32_t pc)
+bool drcbe_x86::hash_exists(uint32_t mode, uint32_t pc) const noexcept
 {
 	return m_hash.code_exists(mode, pc);
 }
@@ -1438,7 +1438,7 @@ bool drcbe_x86::hash_exists(uint32_t mode, uint32_t pc)
 //  the back-end implementation
 //-------------------------------------------------
 
-void drcbe_x86::get_info(drcbe_info &info)
+void drcbe_x86::get_info(drcbe_info &info) const noexcept
 {
 	for (info.direct_iregs = 0; info.direct_iregs < REG_I_COUNT; info.direct_iregs++)
 		if (int_register_map[info.direct_iregs] == 0)

@@ -96,7 +96,7 @@ public:
 		, m_oki(*this, "oki")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
-		, m_spr_old(*this, "vsystem_spr_old%u", 1)
+		, m_spr(*this, "spr%u", 1)
 		, m_vram(*this, "vram.%u", 0)
 		, m_rasterram(*this, "rasterram")
 		, m_sprlookupram(*this, "sprlookupram%u", 1)
@@ -111,7 +111,7 @@ public:
 	void aerfboo2(machine_config &config) ATTR_COLD;
 
 protected:
-	uint32_t pspikes_old_tile_callback(uint32_t code);
+	uint32_t pspikes_tile_callback(uint32_t code);
 
 	// handlers
 	template<int Layer> void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -135,7 +135,7 @@ protected:
 	uint32_t screen_update_pspikesb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_aerfboot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_aerfboo2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void pspikes_register_state_globals();
+	void register_state_globals();
 	void setbank(int layer, int num, int bank);
 	void aerfboo2_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int chip, int chip_disabled_pri);
 	void pspikesb_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -152,7 +152,7 @@ protected:
 	optional_device<okim6295_device> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	optional_device_array<vsystem_spr2_device, 2> m_spr_old;
+	optional_device_array<vsystem_spr2_device, 2> m_spr;
 
 	// memory pointers
 	optional_shared_ptr_array<uint16_t, 2> m_vram;
@@ -169,9 +169,9 @@ protected:
 	uint16_t    m_scrollx[2]{};
 	uint16_t    m_scrolly[2]{};
 	bool        m_flip_screen = false;
-	int       m_charpalettebank = 0;
-	int       m_spritepalettebank = 0;
-	int       m_sprite_gfx = 0;
+	uint32_t    m_charpalettebank = 0;
+	uint32_t    m_spritepalettebank = 0;
+	int         m_sprite_gfx = 0;
 };
 
 
@@ -199,7 +199,7 @@ protected:
 	void karatblz_gfxbank_w(uint8_t data);
 	void kickball_gfxbank_w(uint8_t data);
 
-	uint32_t pspikes_ol2_tile_callback(uint32_t code);
+	uint32_t pspikes_tile2_callback(uint32_t code);
 
 	uint32_t screen_update_karatblz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -407,7 +407,7 @@ TILE_GET_INFO_MEMBER(pspikes_base_state::get_tile_info)
 ***************************************************************************/
 
 
-void pspikes_base_state::pspikes_register_state_globals()
+void pspikes_base_state::register_state_globals()
 {
 	save_item(NAME(m_gfxbank));
 	save_item(NAME(m_bank));
@@ -426,7 +426,7 @@ VIDEO_START_MEMBER(pspikes_base_state,pspikes)
 	m_sprite_gfx = 1;
 	m_charpalettebank = 0;
 
-	pspikes_register_state_globals();
+	register_state_globals();
 }
 
 void spikes91_state::video_start()
@@ -447,7 +447,7 @@ VIDEO_START_MEMBER(pspikes_base_state,karatblz)
 	m_spritepalettebank = 0;
 	m_sprite_gfx = 2;
 
-	pspikes_register_state_globals();
+	register_state_globals();
 }
 
 VIDEO_START_MEMBER(pspikes_banked_sound_state,spinlbrk)
@@ -462,7 +462,7 @@ VIDEO_START_MEMBER(pspikes_banked_sound_state,spinlbrk)
 
 	// sprite maps are hardcoded in this game
 
-	pspikes_register_state_globals();
+	register_state_globals();
 }
 
 VIDEO_START_MEMBER(pspikes_base_state,turbofrc)
@@ -475,7 +475,7 @@ VIDEO_START_MEMBER(pspikes_base_state,turbofrc)
 	m_spritepalettebank = 0;
 	m_sprite_gfx = 2;
 
-	pspikes_register_state_globals();
+	register_state_globals();
 }
 
 VIDEO_START_MEMBER(pspikes_base_state,aerofgtb)
@@ -487,12 +487,12 @@ VIDEO_START_MEMBER(pspikes_base_state,aerofgtb)
 }
 
 
-uint32_t pspikes_base_state::pspikes_old_tile_callback(uint32_t code)
+uint32_t pspikes_base_state::pspikes_tile_callback(uint32_t code)
 {
 	return m_sprlookupram[0][code % (m_sprlookupram[0].bytes()/2)];
 }
 
-uint32_t pspikes_sound_cpu_state::pspikes_ol2_tile_callback(uint32_t code)
+uint32_t pspikes_sound_cpu_state::pspikes_tile2_callback(uint32_t code)
 {
 	return m_sprlookupram[1][code % (m_sprlookupram[1].bytes()/2)];
 }
@@ -604,8 +604,8 @@ uint32_t pspikes_base_state::screen_update_pspikes(screen_device &screen, bitmap
 	screen.priority().fill(0, cliprect);
 
 	m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
-	m_spr_old[0]->draw_sprites(m_spriteram,m_spriteram.bytes(),m_spritepalettebank, bitmap, cliprect, screen.priority(), 1, m_flip_screen);
-	m_spr_old[0]->draw_sprites(m_spriteram,m_spriteram.bytes(),m_spritepalettebank, bitmap, cliprect, screen.priority(), 0, m_flip_screen);
+	m_spr[0]->draw_sprites(m_spriteram,m_spriteram.bytes(),m_spritepalettebank, bitmap, cliprect, screen.priority(), 1, m_flip_screen);
+	m_spr[0]->draw_sprites(m_spriteram,m_spriteram.bytes(),m_spritepalettebank, bitmap, cliprect, screen.priority(), 0, m_flip_screen);
 	return 0;
 }
 
@@ -623,11 +623,11 @@ uint32_t pspikes_sound_cpu_state::screen_update_karatblz(screen_device &screen, 
 	m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
 
 	// we use the priority buffer so sprites are drawn front to back
-	m_spr_old[1]->draw_sprites(m_spriteram+0x200,m_spriteram.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 1, m_flip_screen);
-	m_spr_old[1]->draw_sprites(m_spriteram+0x200,m_spriteram.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 0, m_flip_screen);
+	m_spr[1]->draw_sprites(m_spriteram+0x200,m_spriteram.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 1, m_flip_screen);
+	m_spr[1]->draw_sprites(m_spriteram+0x200,m_spriteram.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 0, m_flip_screen);
 
-	m_spr_old[0]->draw_sprites(m_spriteram+0x000,m_spriteram.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 1, m_flip_screen);
-	m_spr_old[0]->draw_sprites(m_spriteram+0x000,m_spriteram.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 0, m_flip_screen);
+	m_spr[0]->draw_sprites(m_spriteram+0x000,m_spriteram.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 1, m_flip_screen);
+	m_spr[0]->draw_sprites(m_spriteram+0x000,m_spriteram.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 0, m_flip_screen);
 
 	return 0;
 }
@@ -648,11 +648,11 @@ uint32_t pspikes_banked_sound_state::screen_update_spinlbrk(screen_device &scree
 	m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 1);
 
 	// we use the priority buffer so sprites are drawn front to back
-	m_spr_old[0]->draw_sprites(m_spriteram+0x000,m_spriteram.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 0, m_flip_screen);
-	m_spr_old[0]->draw_sprites(m_spriteram+0x000,m_spriteram.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 1, m_flip_screen);
+	m_spr[0]->draw_sprites(m_spriteram+0x000,m_spriteram.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 0, m_flip_screen);
+	m_spr[0]->draw_sprites(m_spriteram+0x000,m_spriteram.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 1, m_flip_screen);
 
-	m_spr_old[1]->draw_sprites(m_spriteram+0x200,m_spriteram.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 0, m_flip_screen);
-	m_spr_old[1]->draw_sprites(m_spriteram+0x200,m_spriteram.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 1, m_flip_screen);
+	m_spr[1]->draw_sprites(m_spriteram+0x200,m_spriteram.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 0, m_flip_screen);
+	m_spr[1]->draw_sprites(m_spriteram+0x200,m_spriteram.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 1, m_flip_screen);
 
 	return 0;
 }
@@ -674,11 +674,11 @@ uint32_t pspikes_banked_sound_state::screen_update_turbofrc(screen_device &scree
 	m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 1);
 
 	// we use the priority buffer so sprites are drawn front to back
-	m_spr_old[1]->draw_sprites(m_spriteram+0x200,m_spriteram.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 1, m_flip_screen); //ship
-	m_spr_old[1]->draw_sprites(m_spriteram+0x200,m_spriteram.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 0, m_flip_screen); //intro
+	m_spr[1]->draw_sprites(m_spriteram+0x200,m_spriteram.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 1, m_flip_screen); //ship
+	m_spr[1]->draw_sprites(m_spriteram+0x200,m_spriteram.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 0, m_flip_screen); //intro
 
-	m_spr_old[0]->draw_sprites(m_spriteram+0x000,m_spriteram.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 1, m_flip_screen); //enemy
-	m_spr_old[0]->draw_sprites(m_spriteram+0x000,m_spriteram.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 0, m_flip_screen); //enemy
+	m_spr[0]->draw_sprites(m_spriteram+0x000,m_spriteram.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 1, m_flip_screen); //enemy
+	m_spr[0]->draw_sprites(m_spriteram+0x000,m_spriteram.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 0, m_flip_screen); //enemy
 
 	return 0;
 }
@@ -700,7 +700,7 @@ void wbbc97_state::video_start()
 
 	m_sprite_gfx = 1;
 
-	pspikes_register_state_globals();
+	register_state_globals();
 
 	save_item(NAME(m_bitmap_enable));
 }
@@ -1083,8 +1083,8 @@ uint32_t wbbc97_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 		m_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	}
 
-	m_spr_old[0]->draw_sprites(m_spriteram,m_spriteram.bytes(),m_spritepalettebank, bitmap, cliprect, screen.priority(), 1, m_flip_screen);
-	m_spr_old[0]->draw_sprites(m_spriteram,m_spriteram.bytes(),m_spritepalettebank, bitmap, cliprect, screen.priority(), 0, m_flip_screen);
+	m_spr[0]->draw_sprites(m_spriteram,m_spriteram.bytes(),m_spritepalettebank, bitmap, cliprect, screen.priority(), 1, m_flip_screen);
+	m_spr[0]->draw_sprites(m_spriteram,m_spriteram.bytes(),m_spritepalettebank, bitmap, cliprect, screen.priority(), 0, m_flip_screen);
 	return 0;
 }
 
@@ -2301,8 +2301,8 @@ void pspikes_banked_sound_state::pspikes(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pspikes);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
-	VSYSTEM_SPR2(config, m_spr_old[0], 0, m_palette, gfx_pspikes_spr);
-	m_spr_old[0]->set_tile_indirect_cb(FUNC(pspikes_banked_sound_state::pspikes_old_tile_callback));
+	VSYSTEM_SPR2(config, m_spr[0], 0, m_palette, gfx_pspikes_spr);
+	m_spr[0]->set_tile_indirect_cb(FUNC(pspikes_banked_sound_state::pspikes_tile_callback));
 
 	VSYSTEM_GGA(config, "gga", XTAL(14'318'181) / 2); // divider not verified
 
@@ -2420,8 +2420,8 @@ void pspikes_sound_cpu_state::kickball(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pspikes);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
-	VSYSTEM_SPR2(config, m_spr_old[0], 0, m_palette, gfx_kickball_spr);
-	m_spr_old[0]->set_tile_indirect_cb(FUNC(pspikes_sound_cpu_state::pspikes_old_tile_callback));
+	VSYSTEM_SPR2(config, m_spr[0], 0, m_palette, gfx_kickball_spr);
+	m_spr[0]->set_tile_indirect_cb(FUNC(pspikes_sound_cpu_state::pspikes_tile_callback));
 
 	//VSYSTEM_GGA(config, "gga", 0); // still accessed as if it exists, in clone hardware?
 
@@ -2463,8 +2463,8 @@ void pspikes_base_state::pspikesc(machine_config &config)
 
 	//VSYSTEM_GGA(config, "gga", 0);
 
-	VSYSTEM_SPR2(config, m_spr_old[0], 0, m_palette, gfx_pspikes_spr);
-	m_spr_old[0]->set_tile_indirect_cb(FUNC(pspikes_base_state::pspikes_old_tile_callback));
+	VSYSTEM_SPR2(config, m_spr[0], 0, m_palette, gfx_pspikes_spr);
+	m_spr[0]->set_tile_indirect_cb(FUNC(pspikes_base_state::pspikes_tile_callback));
 
 	MCFG_VIDEO_START_OVERRIDE(pspikes_base_state,pspikes)
 
@@ -2501,11 +2501,11 @@ void pspikes_banked_sound_state::karatblz(machine_config &config)
 
 	VSYSTEM_GGA(config, "gga", XTAL(14'318'181) / 2); // divider not verified
 
-	VSYSTEM_SPR2(config, m_spr_old[0], 0, m_palette, gfx_turbofrc_spr1);
-	m_spr_old[0]->set_tile_indirect_cb(FUNC(pspikes_banked_sound_state::pspikes_old_tile_callback));
+	VSYSTEM_SPR2(config, m_spr[0], 0, m_palette, gfx_turbofrc_spr1);
+	m_spr[0]->set_tile_indirect_cb(FUNC(pspikes_banked_sound_state::pspikes_tile_callback));
 
-	VSYSTEM_SPR2(config, m_spr_old[1], 0, m_palette, gfx_turbofrc_spr2);
-	m_spr_old[1]->set_tile_indirect_cb(FUNC(pspikes_banked_sound_state::pspikes_ol2_tile_callback));
+	VSYSTEM_SPR2(config, m_spr[1], 0, m_palette, gfx_turbofrc_spr2);
+	m_spr[1]->set_tile_indirect_cb(FUNC(pspikes_banked_sound_state::pspikes_tile2_callback));
 
 	MCFG_VIDEO_START_OVERRIDE(pspikes_banked_sound_state,karatblz)
 
@@ -2548,11 +2548,11 @@ void karatblzbl_state::karatblzbl(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_turbofrc);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024);
 
-	VSYSTEM_SPR2(config, m_spr_old[0], 0, m_palette, gfx_turbofrc_spr1);
-	m_spr_old[0]->set_tile_indirect_cb(FUNC(karatblzbl_state::pspikes_old_tile_callback));
+	VSYSTEM_SPR2(config, m_spr[0], 0, m_palette, gfx_turbofrc_spr1);
+	m_spr[0]->set_tile_indirect_cb(FUNC(karatblzbl_state::pspikes_tile_callback));
 
-	VSYSTEM_SPR2(config, m_spr_old[1], 0, m_palette, gfx_turbofrc_spr2);
-	m_spr_old[1]->set_tile_indirect_cb(FUNC(karatblzbl_state::pspikes_ol2_tile_callback));
+	VSYSTEM_SPR2(config, m_spr[1], 0, m_palette, gfx_turbofrc_spr2);
+	m_spr[1]->set_tile_indirect_cb(FUNC(karatblzbl_state::pspikes_tile2_callback));
 
 	//VSYSTEM_GGA(config, "gga", 0);
 
@@ -2598,12 +2598,12 @@ void pspikes_banked_sound_state::spinlbrk(machine_config &config)
 
 	VSYSTEM_GGA(config, "gga", XTAL(14'318'181) / 2); // divider not verified
 
-	VSYSTEM_SPR2(config, m_spr_old[0], 0, m_palette, gfx_turbofrc_spr1);
-	m_spr_old[0]->set_pritype(1);
+	VSYSTEM_SPR2(config, m_spr[0], 0, m_palette, gfx_turbofrc_spr1);
+	m_spr[0]->set_pritype(1);
 
-	VSYSTEM_SPR2(config, m_spr_old[1], 0, m_palette, gfx_turbofrc_spr2);
-	m_spr_old[1]->set_tile_indirect_cb(FUNC(pspikes_banked_sound_state::spinbrk_tile_callback)); // rom lookup
-	m_spr_old[1]->set_pritype(1);
+	VSYSTEM_SPR2(config, m_spr[1], 0, m_palette, gfx_turbofrc_spr2);
+	m_spr[1]->set_tile_indirect_cb(FUNC(pspikes_banked_sound_state::spinbrk_tile_callback)); // rom lookup
+	m_spr[1]->set_pritype(1);
 
 	MCFG_VIDEO_START_OVERRIDE(pspikes_banked_sound_state,spinlbrk)
 
@@ -2648,11 +2648,11 @@ void pspikes_banked_sound_state::turbofrc(machine_config &config)
 
 	VSYSTEM_GGA(config, "gga", XTAL(14'318'181) / 2); // divider not verified
 
-	VSYSTEM_SPR2(config, m_spr_old[0], 0, m_palette, gfx_turbofrc_spr1);
-	m_spr_old[0]->set_tile_indirect_cb(FUNC(pspikes_banked_sound_state::pspikes_old_tile_callback));
+	VSYSTEM_SPR2(config, m_spr[0], 0, m_palette, gfx_turbofrc_spr1);
+	m_spr[0]->set_tile_indirect_cb(FUNC(pspikes_banked_sound_state::pspikes_tile_callback));
 
-	VSYSTEM_SPR2(config, m_spr_old[1], 0, m_palette, gfx_turbofrc_spr2);
-	m_spr_old[1]->set_tile_indirect_cb(FUNC(pspikes_banked_sound_state::pspikes_ol2_tile_callback));
+	VSYSTEM_SPR2(config, m_spr[1], 0, m_palette, gfx_turbofrc_spr2);
+	m_spr[1]->set_tile_indirect_cb(FUNC(pspikes_banked_sound_state::pspikes_tile2_callback));
 
 	MCFG_VIDEO_START_OVERRIDE(pspikes_banked_sound_state,turbofrc)
 
@@ -2697,13 +2697,13 @@ void pspikes_banked_sound_state::aerofgtb(machine_config &config)
 
 	VSYSTEM_GGA(config, "gga", XTAL(14'318'181) / 2); // divider not verified
 
-	VSYSTEM_SPR2(config, m_spr_old[0], 0, m_palette, gfx_turbofrc_spr1);
-	m_spr_old[0]->set_tile_indirect_cb(FUNC(pspikes_banked_sound_state::pspikes_old_tile_callback));
-	m_spr_old[0]->set_offsets(3, -1);
+	VSYSTEM_SPR2(config, m_spr[0], 0, m_palette, gfx_turbofrc_spr1);
+	m_spr[0]->set_tile_indirect_cb(FUNC(pspikes_banked_sound_state::pspikes_tile_callback));
+	m_spr[0]->set_offsets(3, -1);
 
-	VSYSTEM_SPR2(config, m_spr_old[1], 0, m_palette, gfx_turbofrc_spr2);
-	m_spr_old[1]->set_tile_indirect_cb(FUNC(pspikes_banked_sound_state::pspikes_ol2_tile_callback));
-	m_spr_old[1]->set_offsets(3, -1);
+	VSYSTEM_SPR2(config, m_spr[1], 0, m_palette, gfx_turbofrc_spr2);
+	m_spr[1]->set_tile_indirect_cb(FUNC(pspikes_banked_sound_state::pspikes_tile2_callback));
+	m_spr[1]->set_offsets(3, -1);
 
 	MCFG_VIDEO_START_OVERRIDE(pspikes_banked_sound_state,aerofgtb)
 
@@ -2813,8 +2813,8 @@ void wbbc97_state::wbbc97(machine_config &config)
 
 	//VSYSTEM_GGA(config, "gga", 0);
 
-	VSYSTEM_SPR2(config, m_spr_old[0], 0, m_palette, gfx_pspikes_spr);
-	m_spr_old[0]->set_tile_indirect_cb(FUNC(wbbc97_state::pspikes_old_tile_callback));
+	VSYSTEM_SPR2(config, m_spr[0], 0, m_palette, gfx_pspikes_spr);
+	m_spr[0]->set_tile_indirect_cb(FUNC(wbbc97_state::pspikes_tile_callback));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

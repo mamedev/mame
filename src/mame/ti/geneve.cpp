@@ -210,6 +210,7 @@ namespace {
 
 #define GENEVE_SRAM_TAG  "sram"
 #define GENEVE_SRAMX_TAG "sramexp"
+#define GENEVE_SRAMU_TAG "sramult"
 #define GENEVE_DRAM_TAG  "dram"
 #define GENEVE_CLOCK_TAG "mm58274c"
 #define GENEVE_SOUNDCHIP_TAG   "soundchip"
@@ -224,6 +225,13 @@ enum
 	AMA = 8,
 	FULLGEN = 63,  // AMC,AMB,AMA,AB0,AB1,AB2
 	FULLGNM = 255  // AME,AMD,FULLGEN
+};
+
+enum
+{
+	SRAM32 = 0,
+	SRAM64 = 1,
+	SRAM384 = 2
 };
 
 void geneve_xt_keyboards(device_slot_interface &device)
@@ -246,6 +254,7 @@ public:
 		m_dram(*this, GENEVE_DRAM_TAG),
 		m_sram(*this, GENEVE_SRAM_TAG),
 		m_sramx(*this, GENEVE_SRAMX_TAG),
+		m_sramu(*this, GENEVE_SRAMU_TAG),
 		m_gatearray(*this, GENEVE_GATE_ARRAY_TAG),
 		m_genmod_decoder(*this, GENMOD_DECODER_TAG),
 		m_pal(*this, GENEVE_PAL_TAG),
@@ -258,7 +267,7 @@ public:
 		m_left_button(0),
 		m_pfm_prefix(0),
 		m_pfm_oe(true),
-		m_sram_exp(true),
+		m_sram_size(SRAM64),
 		m_genmod(false)
 	{
 	}
@@ -305,6 +314,7 @@ private:
 	required_device<ram_device>         m_dram;
 	required_device<ram_device>         m_sram;
 	required_device<ram_device>         m_sramx;
+	required_device<ram_device>         m_sramu;
 
 	required_device<bus::ti99::internal::geneve_gate_array_device> m_gatearray;
 	optional_device<bus::ti99::internal::genmod_decoder_device> m_genmod_decoder;
@@ -362,7 +372,7 @@ private:
 
 	// Settings
 	int m_boot_rom = 0;     // Kind of boot ROM (EPROM or PFM512 or PFM512A)
-	bool m_sram_exp;
+	int m_sram_size = SRAM64;
 
 	// Genmod modifications
 	bool m_genmod;
@@ -415,9 +425,10 @@ static INPUT_PORTS_START(geneve)
 	PORT_INCLUDE(geneve_common)
 
 	PORT_START( "SRAM" )
-	PORT_CONFNAME( 0x03, 0x01, "SRAM expansion 32K" )
-		PORT_CONFSETTING( 0x00, "off" )
-		PORT_CONFSETTING( 0x01, "on" )
+	PORT_CONFNAME( 0x03, 0x01, "SRAM size" )
+		PORT_CONFSETTING( SRAM32, "32 KiB" )
+		PORT_CONFSETTING( SRAM64, "64 KiB" )
+		PORT_CONFSETTING( SRAM384, "384 KiB" )
 
 INPUT_PORTS_END
 
@@ -596,19 +607,29 @@ uint8_t geneve_state::memread(offs_t offset)
 	}
 
 	// Expanded SRAM 32K (not in Genmod)
-	if (!m_genmod)
+	if (!m_genmod && m_gatearray->ramenx_out()==ASSERT_LINE)
 	{
-		if (m_gatearray->ramenx_out()==ASSERT_LINE)
+		if (m_sram_size != SRAM32)
 		{
-			if (m_sram_exp)
-			{
-				sramadd = m_gatearray->get_prefix(AB1 | AB2) | addr13;
-				value = m_sramx->pointer()[sramadd];
-				LOGMASKED(LOG_READ, "SRAMX %02x:%04x -> %02x\n", page, addr13, value);
-			}
-			else
-				LOGMASKED(LOG_WARN, "Access to SRAMX page %02x, but no SRAM expansion available\n", page);
+			sramadd = m_gatearray->get_prefix(AB1 | AB2) | addr13;
+			value = m_sramx->pointer()[sramadd];
+			LOGMASKED(LOG_READ, "SRAMX %02x:%04x -> %02x\n", page, addr13, value);
 		}
+		else
+			LOGMASKED(LOG_WARN, "Access to SRAMX page %02x, but no SRAM expansion available\n", page);
+	}
+
+	// Ultimate SRAM expansion (not in Genmod)
+	if (!m_genmod && m_gatearray->ramenu_out()==ASSERT_LINE)
+	{
+		if (m_sram_size == SRAM384)
+		{
+			sramadd = m_gatearray->get_prefix(FULLGEN) | addr13;
+			value = m_sramu->pointer()[sramadd];
+			LOGMASKED(LOG_READ, "SRAMU %02x:%04x -> %02x\n", page, addr13, value);
+		}
+		else
+			LOGMASKED(LOG_WARN, "Access to SRAMU page %02x, but no 384K SRAM expansion available\n", page);
 	}
 
 	// Peripheral box
@@ -703,20 +724,30 @@ void geneve_state::memwrite(offs_t offset, uint8_t data)
 		m_sram->pointer()[sramadd] = data;
 	}
 
-	// Expanded SRAM
-	if (!m_genmod)
+	// Expanded SRAM (not in Genmod)
+	if (!m_genmod && m_gatearray->ramenx_out()==ASSERT_LINE)
 	{
-		if (m_gatearray->ramenx_out()==ASSERT_LINE)
+		if (m_sram_size != SRAM32)
 		{
-			if (m_sram_exp)
-			{
-				sramadd = m_gatearray->get_prefix(AB1 | AB2) | addr13;
-				LOGMASKED(LOG_WRITE, "SRAMX %02x:%04x <- %02x\n", page, addr13, data);
-				m_sramx->pointer()[sramadd] = data;
-			}
-			else
-				LOGMASKED(LOG_WARN, "Access to SRAMX page %02x, but no SRAM expansion available\n", page);
+			sramadd = m_gatearray->get_prefix(AB1 | AB2) | addr13;
+			LOGMASKED(LOG_WRITE, "SRAMX %02x:%04x <- %02x\n", page, addr13, data);
+			m_sramx->pointer()[sramadd] = data;
 		}
+		else
+			LOGMASKED(LOG_WARN, "Access to SRAMX page %02x, but no SRAM expansion available\n", page);
+	}
+
+	// Ultimate SRAM expansion (not in Genmod)
+	if (!m_genmod && m_gatearray->ramenu_out()==ASSERT_LINE)
+	{
+		if (m_sram_size == SRAM384)
+		{
+			sramadd = m_gatearray->get_prefix(FULLGEN) | addr13;
+			LOGMASKED(LOG_READ, "SRAMU %02x:%04x -> %02x\n", page, addr13, data);
+			m_sramu->pointer()[sramadd] = data;
+		}
+		else
+			LOGMASKED(LOG_WARN, "Access to SRAMU page %02x, but no 384K SRAM expansion available\n", page);
 	}
 
 	// Peripheral box
@@ -1120,16 +1151,14 @@ void geneve_state::machine_reset()
 
 	if (m_genmod)
 	{
-		m_sram_exp = false;
 		m_genmod_decoder->set_turbo((ioport("GENMODDIPS")->read() & GENEVE_GM_TURBO)!=0);
 		m_genmod_decoder->set_timode((ioport("GENMODDIPS")->read() & GENEVE_GM_TIM)!=0);
 	}
 	else
 	{
 		// SRAM expansion
-		// Only separately handled for the standard Geneve; Genmod uses
-		// the Memex instead
-		m_sram_exp = (ioport("SRAM")->read()!=0);
+		// Only applies to the standard Geneve; Genmod uses the Memex instead
+		m_sram_size = (ioport("SRAM")->read());
 	}
 }
 
@@ -1242,6 +1271,9 @@ void geneve_state::geneve_common(machine_config &config)
 	// SRAM
 	RAM(config, GENEVE_SRAM_TAG).set_default_size("32K").set_default_value(0);
 	RAM(config, GENEVE_SRAMX_TAG).set_default_size("32K").set_default_value(0);
+
+	// Ultimate SRAM expansion
+	RAM(config, GENEVE_SRAMU_TAG).set_default_size("384K").set_default_value(0);
 }
 
 /*

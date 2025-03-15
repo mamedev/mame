@@ -368,9 +368,9 @@ public:
 	virtual void reset() override;
 	virtual int execute(uml::code_handle &entry) override;
 	virtual void generate(drcuml_block &block, const uml::instruction *instlist, uint32_t numinst) override;
-	virtual bool hash_exists(uint32_t mode, uint32_t pc) override;
-	virtual void get_info(drcbe_info &info) override;
-	virtual bool logging() const override { return m_log != nullptr; }
+	virtual bool hash_exists(uint32_t mode, uint32_t pc) const noexcept override;
+	virtual void get_info(drcbe_info &info) const noexcept override;
+	virtual bool logging() const noexcept override { return m_log != nullptr; }
 
 private:
 	// a be_parameter is similar to a uml::parameter but maps to native registers/memory
@@ -1223,6 +1223,7 @@ void drcbe_x64::generate(drcuml_block &block, const instruction *instlist, uint3
 	}
 
 	Assembler a(&ch);
+	a.addEncodingOptions(EncodingOptions::kOptimizedAlign);
 	if (logger.file())
 		a.addDiagnosticOptions(DiagnosticOptions::kValidateIntermediate);
 
@@ -1278,7 +1279,7 @@ void drcbe_x64::generate(drcuml_block &block, const instruction *instlist, uint3
 //  exists in the hash table
 //-------------------------------------------------
 
-bool drcbe_x64::hash_exists(uint32_t mode, uint32_t pc)
+bool drcbe_x64::hash_exists(uint32_t mode, uint32_t pc) const noexcept
 {
 	return m_hash.code_exists(mode, pc);
 }
@@ -1289,7 +1290,7 @@ bool drcbe_x64::hash_exists(uint32_t mode, uint32_t pc)
 //  back-end implementation
 //-------------------------------------------------
 
-void drcbe_x64::get_info(drcbe_info &info)
+void drcbe_x64::get_info(drcbe_info &info) const noexcept
 {
 	for (info.direct_iregs = 0; info.direct_iregs < REG_I_COUNT; info.direct_iregs++)
 		if (int_register_map[info.direct_iregs] == 0)
@@ -1730,6 +1731,7 @@ void drcbe_x64::op_handle(Assembler &a, const instruction &inst)
 	// emit a jump around the stack adjust in case code falls through here
 	Label skip = a.newLabel();
 	a.short_().jmp(skip);
+	a.align(AlignMode::kCode, 16);
 
 	// register the current pointer for the handle
 	inst.param(0).handle().set_codeptr(drccodeptr(a.code()->baseAddress() + a.offset()));
@@ -2850,7 +2852,6 @@ void drcbe_x64::op_read(Assembler &a, const instruction &inst)
 				a.mov(Gpq(REG_PARAM1), ptr(rax, Gpd(REG_PARAM2), 3));                            // load dispatch table entry
 				if (accessors.specific.low_bits)
 					a.mov(Gpd(REG_PARAM2), r10d);                                                // restore masked address
-
 			}
 			else
 			{
@@ -2891,7 +2892,7 @@ void drcbe_x64::op_read(Assembler &a, const instruction &inst)
 
 		int const shift = m_space[spacesizep.space()]->addr_shift() - 3;
 		if (m_space[spacesizep.space()]->endianness() != ENDIANNESS_LITTLE)
-			a.not_(ecx);                                                                         // swizzle address for bit Endian spaces
+			a.not_(ecx);                                                                         // swizzle address for big Endian spaces
 		if (accessors.has_high_bits && !accessors.mask_high_bits)
 			a.shr(r10d, accessors.specific.low_bits);                                            // shift off low bits
 		mov_r64_imm(a, rax, uintptr_t(accessors.specific.read.dispatch));                        // load dispatch table pointer
@@ -3090,7 +3091,7 @@ void drcbe_x64::op_readm(Assembler &a, const instruction &inst)
 
 		int const shift = m_space[spacesizep.space()]->addr_shift() - 3;
 		if (m_space[spacesizep.space()]->endianness() != ENDIANNESS_LITTLE)
-			a.not_(ecx);                                                                         // swizzle address for bit Endian spaces
+			a.not_(ecx);                                                                         // swizzle address for big Endian spaces
 		if (accessors.has_high_bits && !accessors.mask_high_bits)
 			a.shr(r10d, accessors.specific.low_bits);                                            // shift off low bits
 		mov_r64_imm(a, rax, uintptr_t(accessors.specific.read.dispatch));                        // load dispatch table pointer
@@ -3286,7 +3287,7 @@ void drcbe_x64::op_write(Assembler &a, const instruction &inst)
 
 		int const shift = m_space[spacesizep.space()]->addr_shift() - 3;
 		if (m_space[spacesizep.space()]->endianness() != ENDIANNESS_LITTLE)
-			a.not_(ecx);                                                                         // swizzle address for bit Endian spaces
+			a.not_(ecx);                                                                         // swizzle address for big Endian spaces
 		if (accessors.has_high_bits && !accessors.mask_high_bits)
 			a.shr(r10d, accessors.specific.low_bits);                                            // shift off low bits
 		mov_r64_imm(a, rax, uintptr_t(accessors.specific.write.dispatch));                       // load dispatch table pointer
@@ -3456,7 +3457,7 @@ void drcbe_x64::op_writem(Assembler &a, const instruction &inst)
 
 		int const shift = m_space[spacesizep.space()]->addr_shift() - 3;
 		if (m_space[spacesizep.space()]->endianness() != ENDIANNESS_LITTLE)
-			a.not_(ecx);                                                                         // swizzle address for bit Endian spaces
+			a.not_(ecx);                                                                         // swizzle address for big Endian spaces
 		if (accessors.has_high_bits && !accessors.mask_high_bits)
 			a.shr(r10d, accessors.specific.low_bits);                                            // shift off low bits
 		mov_r64_imm(a, rax, uintptr_t(accessors.specific.write.dispatch));                       // load dispatch table pointer

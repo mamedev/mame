@@ -224,7 +224,7 @@ copyright-holders:m1macrophage
 		<simplecounter maxstate="100" digits="1"><color red="1.0" green="0.5" blue="0.2"/></simplecounter>
 	</element>
 	<group name="knob">
-		<element ref="knob_outer"><bounds x="0" y="0" width="68" height="68"/></element>
+		<element ref="knob_outer" id="knob_~knob_input~"><bounds x="0" y="0" width="68" height="68"/></element>
 		<element ref="knob_inner"><bounds x="9" y="9" width="50" height="50"/></element>
 		<element ref="knob_value_background" clickthrough="no">
 			<bounds x="17" y="22" width="34" height="24"/>
@@ -594,121 +594,167 @@ copyright-holders:m1macrophage
 	<script><![CDATA[
 		file:set_resolve_tags_callback(
 			function()
-				local id_port_index <const> = string.len("slider_knob_") + 1
-
-				-- State used by pointer handlers.
-				local sliders = {}  -- Info about all sliders (constant after initialization).
-				local pointers = {}  -- Pointer tracking state.
-
-				-- Gather relevant elements and inputs into `sliders`.
 				local view = file.views["Default Layout"]
-				for i = 1, #view.items do
-					local item = view.items:at(i)
-					if item.id ~= nil and string.find(item.id, "slider_knob_") == 1 then
-						local slider_id = string.sub(item.id, id_port_index)
+				install_slider_callbacks(view)
 
-						local port = file.device:ioport(slider_id)
-						local field = nil
-						if port ~= nil then
-							for k, val in pairs(port.fields) do
-								field = val
-								break
-							end
-							if field == nil then
-								print("LAYOUT ERROR - Port does not have a field: " .. slider_id)
-							end
-						else
-							print("LAYOUT ERROR - Port not found: " .. slider_id)
-						end
-
-						local slider = view.items["slider_" .. slider_id]
-						if slider == nil then
-							print("LAYOUT ERROR - Element: 'slider_" .. slider_id .. "' does not exist.")
-						end
-
-						local slider_info = {}
-						slider_info.slider = slider
-						slider_info.knob = item
-						slider_info.field = field
-						table.insert(sliders, slider_info)
-					end
+				local sweep_scale = 1.2
+				add_simplecounter_knob(view, "knob_pot_tempo", "pot_tempo", sweep_scale)
+				add_simplecounter_knob(view, "knob_pot_volume", "pot_volume", sweep_scale)
+				for i = 1, 7 do
+					local knob_input = "pot_tuning_" .. i
+					add_simplecounter_knob(view, "knob_" .. knob_input, knob_input, sweep_scale)
 				end
 
-				local function forget_pointers()
-					pointers = {}
+				for i = 1, 16 do
+					local pan_input = "pot_pan_" .. i
+					add_vertical_slider(view, "slider_" .. pan_input, "slider_knob_" .. pan_input, pan_input)
+					local gain_input = "pot_gain_" .. i
+					add_vertical_slider(view, "slider_" .. gain_input, "slider_knob_" .. gain_input, gain_input)
 				end
-
-				local function pointer_lost(type, id, dev, x, y, up, cnt)
-					pointers[id] = nil
-				end
-
-				local function pointer_updated(type, id, dev, x, y, btn, dn, up, cnt)
-					-- Button not pressed? Reset state of current pointer.
-					if btn & 1 == 0 then
-						pointers[id] = nil
-						return
-					end
-
-					-- Button just pressed? Find affected slider, if any.
-					if dn & 1 ~= 0 then
-						for i = 1, #sliders do
-							if sliders[i].knob.bounds:includes(x, y) then
-								local pointer = {}
-								pointer.selected_slider = i
-								pointer.relative = true
-								pointer.start_y = y
-								pointer.start_value = sliders[i].field.user_value
-								pointers[id] = pointer
-								break
-							elseif sliders[i].slider.bounds:includes(x, y) then
-								local pointer = {}
-								pointer.selected_slider = i
-								pointer.relative = false
-								pointers[id] = pointer
-								break
-							end
-						end
-					end
-
-					-- No slider selected by current pointer? Nothing to do.
-					if pointers[id] == nil then
-						return
-					end
-
-					-- A slider is selected. Update state and, indirectly,
-					-- slider knob position, based on the pointer's Y position.
-					-- It is assumed the attached IO field is an IPT_ADJUSTER
-					-- with a range of 0-100 (the default).
-
-					local pointer = pointers[id]
-					local slider_info = sliders[pointer.selected_slider]
-
-					local knob_half_height = slider_info.knob.bounds.height / 2
-					local min_y = slider_info.slider.bounds.y0 + knob_half_height
-					local max_y = slider_info.slider.bounds.y1 - knob_half_height
-
-					local new_value = 0
-					if pointer.relative then
-						-- User clicked on the knob. New value depends on how
-						-- much the knob was dragged.
-						new_value = pointer.start_value - 100 * (y - pointer.start_y) / (max_y - min_y)
-					else
-						-- User clicked elsewhere on the slider. New value
-						-- depends on the absolute position of the click.
-						new_value = 100 - 100 * (y - min_y) / (max_y - min_y)
-					end
-
-					new_value = math.floor(new_value + 0.5)
-					if new_value < 0 then new_value = 0 end
-					if new_value > 100 then new_value = 100 end
-					slider_info.field.user_value = new_value
-				end
-
-				view:set_pointer_updated_callback(pointer_updated)
-				view:set_pointer_left_callback(pointer_lost)
-				view:set_pointer_aborted_callback(pointer_lost)
-				view:set_forget_pointers_callback(forget_pointers)
 			end)
+
+		-----------------------------------------------------------------------
+		-- Slider and knob library starts.
+		-- Can be copied as-is to other layouts.
+		-----------------------------------------------------------------------
+		local widgets = {}   -- Stores slider and knob information.
+		local pointers = {}  -- Tracks pointer state.
+
+		-- The knob's Y position must be animated using <animate inputtag="{port_name}">.
+		-- The click area's vertical size must exactly span the range of the
+		-- knob's movement.
+		function add_vertical_slider(view, clickarea_id, knob_id, port_name)
+			table.insert(widgets, {
+				clickarea   = get_layout_item(view, clickarea_id),
+				slider_knob = get_layout_item(view, knob_id),
+				field       = get_port_field(port_name),
+				is_knob     = false })
+		end
+
+		-- A sweep between 0 and 100 requires moving the pointer by
+		-- `scale * clickarea.height` pixes.
+		function add_simplecounter_knob(view, clickarea_id, port_name, scale)
+			table.insert(widgets, {
+				clickarea = get_layout_item(view, clickarea_id),
+				field     = get_port_field(port_name),
+				is_knob   = true,
+				scale     = scale })
+		end
+
+		function get_layout_item(view, item_id)
+			local item = view.items[item_id]
+			if item == nil then
+				emu.print_error("Layout element: '" .. item_id .. "' not found.")
+			end
+			return item
+		end
+
+		function get_port_field(port_name)
+			local port = file.device:ioport(port_name)
+			if port == nil then
+				emu.print_error("Port: '" .. port_name .. "' not found.")
+				return nil
+			end
+			local field = nil
+			for k, val in pairs(port.fields) do
+				field = val
+				break
+			end
+			if field == nil then
+				emu.print_error("Port: '" .. port_name .."' does not seem to be an IPT_ADJUSTER.")
+				return nil
+			end
+			return field
+		end
+
+		local function pointer_updated(type, id, dev, x, y, btn, dn, up, cnt)
+			-- If a button is not pressed, reset the state of the current pointer.
+			if btn & 1 == 0 then
+				pointers[id] = nil
+				return
+			end
+
+			-- If a button was just pressed, find the affected widget, if any.
+			if dn & 1 ~= 0 then
+				for i = 1, #widgets do
+					local found, relative
+					if widgets[i].slider_knob and widgets[i].slider_knob.bounds:includes(x, y) then
+						found = true
+						relative = true
+					elseif widgets[i].clickarea.bounds:includes(x, y) then
+						found = true
+						relative = false
+					end
+					if found then
+						pointers[id] = {
+							selected_widget = i,
+							relative = relative,
+							start_y = y,
+							start_value = widgets[i].field.user_value }
+						break
+					end
+				end
+			end
+
+			-- If there is no widget selected by the current pointer, we are done.
+			if pointers[id] == nil then
+				return
+			end
+
+			-- A widget is selected. Update its state based on the pointer's Y
+			-- position. It is assumed the attached IO field is an
+			-- IPT_ADJUSTER with a range of 0-100 (the default).
+
+			local pointer = pointers[id]
+			local widget = widgets[pointer.selected_widget]
+
+			local new_value
+			if widget.is_knob then
+				local step_y = 100.0 / (widget.scale * widget.clickarea.bounds.height)
+				new_value = pointer.start_value + (pointer.start_y - y) * step_y
+			else
+				local knob_half_height = widget.slider_knob.bounds.height / 2
+				local min_y = widget.clickarea.bounds.y0 + knob_half_height
+				local max_y = widget.clickarea.bounds.y1 - knob_half_height
+
+				if pointer.relative then
+					-- User clicked on the knob. The new value will depend on how
+					--  much the knob was dragged.
+					new_value = pointer.start_value - 100 * (y - pointer.start_y) / (max_y - min_y)
+				else
+					-- User clicked elsewhere on the slider. The new value will depend on
+					-- the absolute position of the click.
+					new_value = 100 - 100 * (y - min_y) / (max_y - min_y)
+				end
+			end
+
+			new_value = math.floor(new_value + 0.5)
+			if new_value < 0 then new_value = 0 end
+			if new_value > 100 then new_value = 100 end
+			widget.field.user_value = new_value
+		end
+
+		local function pointer_left(type, id, dev, x, y, up, cnt)
+			pointers[id] = nil
+		end
+
+		local function pointer_aborted(type, id, dev, x, y, up, cnt)
+			pointers[id] = nil
+		end
+
+		local function forget_pointers()
+			pointers = {}
+		end
+
+		function install_slider_callbacks(view)
+			view:set_pointer_updated_callback(pointer_updated)
+			view:set_pointer_left_callback(pointer_left)
+			view:set_pointer_aborted_callback(pointer_aborted)
+			view:set_forget_pointers_callback(forget_pointers)
+		end
+		-----------------------------------------------------------------------
+		-- Slider and knob library ends.
+		-----------------------------------------------------------------------
 	]]></script>
 </mamelayout>
 

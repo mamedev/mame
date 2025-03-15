@@ -16,6 +16,8 @@ class saa7110a_device :
 public:
 	saa7110a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	//auto vs_callback() { return m_out_vs_cb.bind(); }
+
 protected:
 // saa7110a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	virtual void device_start() override ATTR_COLD;
@@ -28,8 +30,14 @@ private:
 	virtual void write_data(u16 offset, u8 data) override;
 
 	address_space_config m_space_config;
+//  devcb_write_line m_out_vs_cb;
 
 	bool m_secs, m_sstb, m_hrmv, m_rtse, m_vtrc;
+	u8 m_vbps, m_vbpr;
+//  int m_current_href;
+
+//  TIMER_CALLBACK_MEMBER(href_cb);
+//  emu_timer *m_href_timer;
 };
 
 DECLARE_DEVICE_TYPE(SAA7110A, saa7110a_device)

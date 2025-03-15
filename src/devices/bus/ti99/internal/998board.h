@@ -25,6 +25,7 @@
 #include "machine/ram.h"
 #include "machine/tmc0430.h"
 #include "machine/tms9901.h"
+#include "machine/tms6100.h"
 #include "sound/sn76496.h"
 #include "sound/tms5220.h"
 #include "video/tms9928a.h"

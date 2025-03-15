@@ -1736,7 +1736,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		</part>
 	</software>
 
-	<software name="blckhole">
+	<software name="blackhj" cloneof="blackh">
 		<!-- source toseciso
 		<rom name="Black Hole Assault (1992)(Micronet)(NTSC)(JP)[!].cue" size="3363" crc="8739246c" />
 		<rom name="Black Hole Assault (1992)(Micronet)(NTSC)(JP)(Track 01 of 23)[!].iso" size="12238848" crc="ae2463cc" />
@@ -3303,7 +3303,7 @@ Requires [32X] add-on
 		<rom name="Cadillacs and Dinosaurs - The Second Cataclysm (1994)(Sega - Tec Toy)(NTSC)(Br)(en)(Track 1 of 2)[!].iso" size="567900160" crc="0def7fd1" />
 		<rom name="Cadillacs and Dinosaurs - The Second Cataclysm (1994)(Sega - Tec Toy)(NTSC)(Br)(en)(Track 2 of 2)[!].wav" size="877340" crc="4e0b4ee8" />
 		-->
-		<description>Cadillacs and Dinosaurs - The Second Cataclysm (Bra)</description>
+		<description>Cadillacs and Dinosaurs - The Second Cataclysm (Brazil)</description>
 		<year>1994</year>
 		<publisher>Tec Toy</publisher>
 		<info name="serial" value="063496"/>
@@ -10199,7 +10199,7 @@ Requires [disc swap]
 		<rom name="Media (CD-ROM)\Night Trap (Rerelease) (1994)(Digital Pictures)(US) - (Disc 2 of 2).img" size="517830432" crc="7d03c12f" md5="765aa3e041b84aa867052d00d347afdb" sha1="6a119169b3ce0ed59afe9c63240f7a446206fdf1"/>
 		<rom name="Media (CD-ROM)\Night Trap (Rerelease) (1994)(Digital Pictures)(US) - (Disc 2 of 2).sub" size="21135936" crc="7a7d2c9e" md5="e70ac43455d2ac0d3a09c8d93a073a8e" sha1="da0b4fad1a393f9fa4b8f3f580e9af42c7695189"/>
 		-->
-		<description>Night Trap (USA, Re-Release)</description>
+		<description>Night Trap (USA, re-release)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
@@ -12920,7 +12920,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Silpheed (Japan) (Demo) (Fixed Dump) (Track 1).bin" size="369174624" crc="6b59f551" />
 		<rom name="Silpheed (Japan) (Demo) (Fixed Dump) (Track 2).bin" size="1058400" crc="648c227c" />
 		-->
-		<description>Silpheed Hibaihin (Japan) (fixed)</description>
+		<description>Silpheed Hibaihin (Japan, fixed)</description>
 		<year>1993</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="ST-45054"/>

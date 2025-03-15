@@ -33,6 +33,9 @@
     out: CSR*: v9938 read
 
     out: RAMENX*: SRAM expansion
+    out: RAMENU*: Ultimate SRAM expansion. This is actually done by a small
+         daughterboard, not directly in the Gate Array.
+
     out: RAMEN*:  SRAM
     out: ROMEN*:  EPROM
     out: AB0, AB1, AB2: Mapped address bits (2^15, 2^14, 2^13)
@@ -145,9 +148,9 @@
     1 0111 110. .... .... ....   address block cxxx
     1 0111 111. .... .... ....   address block exxx
 
-    1 1... .... .... .... .... on-board bus or external bus (unclear)
-    1 10.. .... .... .... .... Future expansion
-    1 1100 .... .... .... .... Future expansion
+    1 1... .... .... .... .... on-board bus
+    1 10.. .... .... .... .... Future expansion (Ultimate SRAM expansion)
+    1 1100 .... .... .... .... Future expansion (Ultimate SRAM expansion)
 
     1 1101 0... .... .... .... on-board sram (32K) - Optional 32 KiB expansion, 0 WS
     1 1101 1... .... .... .... on-board sram (32K) - stock 32 KiB SRAM, 0 WS
@@ -738,8 +741,8 @@ const geneve_gate_array_device::physentry_t geneve_gate_array_device::s_physmap[
 {
 	{ 0x00, 0x3f, MPDRAM,  "DRAM" },
 	{ 0x40, 0x3f, MPEXP,  "Future exp (on-board)" },
-	{ 0xc0, 0x1f, MPSRAMF,  "Future SRAM exp" },
-	{ 0xe0, 0x07, MPSRAMF,  "Future SRAM exp" },
+	{ 0xc0, 0x1f, MPSRAMU,  "Ultimate SRAM exp" },
+	{ 0xe0, 0x07, MPSRAMU,  "Ultimate SRAM exp" },
 	{ 0xe8, 0x03, MPSRAMX,  "SRAM exp" },
 	{ 0xec, 0x03, MPSRAM,  "SRAM" },
 	{ 0xf0, 0x0f, MPEPROM,  "Boot ROM/PFM" },
@@ -816,7 +819,7 @@ bool geneve_gate_array_device::accessing_dram_s(int function)
 
 bool geneve_gate_array_device::accessing_sram_s(int function)
 {
-	return (function == MPSRAM) || (function == MPSRAMX) || (function == MPSRAMF);
+	return (function == MPSRAM) || (function == MPSRAMX) || (function == MPSRAMU);
 }
 
 bool geneve_gate_array_device::accessing_devs_s(int function)
@@ -951,6 +954,12 @@ int geneve_gate_array_device::ramenx_out()
 {
 	decdata* dec = (m_debug)? &m_decdebug : &m_decoded;
 	return (dec->function == MPSRAMX)? ASSERT_LINE : CLEAR_LINE;
+}
+
+int geneve_gate_array_device::ramenu_out()
+{
+	decdata* dec = (m_debug)? &m_decdebug : &m_decoded;
+	return (dec->function == MPSRAMU)? ASSERT_LINE : CLEAR_LINE;
 }
 
 int geneve_gate_array_device::rtcen_out()

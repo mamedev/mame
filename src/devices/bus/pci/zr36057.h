@@ -70,13 +70,27 @@ private:
 		u8 mask_stride;
 	} m_vfe;
 
-	u8 m_jpeg_guest_id, m_jpeg_guest_reg;
-
 	bool m_softreset;
 	u8 m_gpio_ddr, m_pci_waitstate_control;
 
+	// NOTE: these are technically external/public pins.
+	void girq1_w(int state) { m_irq_status |= 1 << 30; update_irq_status(); }
+	void girq0_w(int state) { m_irq_status |= 1 << 29; update_irq_status(); }
+	void cod_rep_irq_w(int state) { m_irq_status |= 1 << 28; update_irq_status(); }
+	void jpeg_rep_irq_w(int state) { m_irq_status |= 1 << 27; update_irq_status(); }
+
+	void update_irq_status();
 	u32 m_irq_status, m_irq_enable;
 	bool m_inta_pin_enable;
+	int m_decoder_sdao_state;
+
+	struct {
+		u8 guest_id, guest_reg;
+		bool mode;
+		u8 sub_mode;
+		bool rtbsy_fb, go_en, sync_mstr, fld_per_buff, vfifo_fb, cfifo_fb, still_lendian;
+		bool p_reset, cod_trns_en, active;
+	} m_jpeg;
 
 	struct {
 		u8 vsync_size;
@@ -100,8 +114,6 @@ private:
 		u8 guest_id;
 		u8 guest_reg;
 	} m_po; /**< PostOffice */
-
-	int m_decoder_sdao_state;
 };
 
 DECLARE_DEVICE_TYPE(ZR36057_PCI, zr36057_device)

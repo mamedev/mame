@@ -2107,6 +2107,27 @@ ROM_START( toffy )
 	ROM_LOAD( "5-27512.rom", 0x10000, 0x10000, CRC(4f91eec6) SHA1(18a5f98dfba33837b73d032a6153eeb03263684b) )
 ROM_END
 
+ROM_START( toffya ) // original Midas board with original ROM stickers
+	ROM_REGION( 0x30000, "maincpu", 0 )
+	ROM_LOAD( "mde2.u70", 0x00000, 0x10000, CRC(a27f1b49) SHA1(26aa1bc5af09f22207d764a598d99fa9218608e9) )
+	ROM_RELOAD(           0x10000, 0x10000 )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "mde1.u142", 0x00000, 0x10000, CRC(541bd7f0) SHA1(3f0097f5877eae50651f94d46d7dd9127037eb6e) ) // 1ST AND 2ND HALF IDENTICAL
+
+	ROM_REGION( 0x10000, "chars", 0 )
+	ROM_LOAD( "mde7.u35", 0x00000, 0x10000, CRC(6ddc2867) SHA1(9b3c053048efea768651633a76cb636f40289b79) ) // 1xxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x20000, "tiles", 0 )
+	// the same as 'Dangerous Dungeons' once decrypted
+	ROM_LOAD( "mde4.u78", 0x00000, 0x10000, CRC(9506b10d) SHA1(1a205a519fdbb7a3149c2e72c8620e79caa32f0d) ) // 1xxxxxxxxxxxxxxx = 0x00
+	ROM_LOAD( "mde3.u77", 0x10000, 0x10000, CRC(77c097cc) SHA1(569b36a2be149d9c8b361a4a73c628c3c7471db4) ) // 1xxxxxxxxxxxxxxx = 0x00
+
+	ROM_REGION( 0x20000, "sprites", 0 )
+	ROM_LOAD( "mde6.u80", 0x00000, 0x10000, CRC(aeef092a) SHA1(520148f663695207567f25fbb0634a650c7986e5) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD( "mde5.u79", 0x10000, 0x10000, CRC(14b52f76) SHA1(8d94bb1b404c483c0dbd69d40d9095fb97bd2faa) ) // 1ST AND 2ND HALF IDENTICAL
+ROM_END
+
 ROM_START( stoffy )
 	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "2.u70", 0x00000, 0x10000, CRC(6203aeb5) SHA1(e57aa520e8096df01461b235f77557c267571a57) )
@@ -2211,6 +2232,7 @@ void toffy_state::init_toffy()
 	}
 
 	// should the sound ROM be bitswapped too?
+	// probably not, as the unencrypted set's sound ROM matches
 }
 
 void ddragon_state::init_ddragon6809()
@@ -2267,7 +2289,8 @@ GAME( 1992, ddungeone,    ddungeon, darktowr,    ddungeon, darktowr_state, init_
 GAME( 1992, darktowr,     0,        darktowr,    darktowr, darktowr_state, init_darktowr,    ROT0, "The Game Room",           "Dark Tower",                    MACHINE_SUPPORTS_SAVE )
 
 // these run on their own board, but are basically the same game. Toffy even has 'Dangerous Dungeons' text in it
-GAME( 1993, toffy,        0,         toffy,      toffy,    toffy_state,    init_toffy,       ROT0, "Midas",                   "Toffy",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1993, toffy,        0,         toffy,      toffy,    toffy_state,    init_toffy,       ROT0, "Midas",                   "Toffy (encrypted)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1993, toffya,       toffy,     toffy,      toffy,    toffy_state,    empty_init,       ROT0, "Midas",                   "Toffy (unencrypted)",           MACHINE_SUPPORTS_SAVE )
 
 GAME( 1994, stoffy,       0,         toffy,      toffy,    toffy_state,    init_toffy,       ROT0, "Midas",                   "Super Toffy",                   MACHINE_SUPPORTS_SAVE )
 GAME( 1994, stoffyu,      stoffy,    toffy,      toffy,    toffy_state,    init_toffy,       ROT0, "Midas (Unico license)",   "Super Toffy (Unico license)",   MACHINE_SUPPORTS_SAVE )
