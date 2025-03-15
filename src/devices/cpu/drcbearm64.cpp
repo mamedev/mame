@@ -180,6 +180,13 @@ const a64::CondCode condition_map[uml::COND_MAX - uml::COND_Z] =
 	a64::CondCode::kGE,    // COND_GE,          requires SV
 };
 
+// UML flag bit numbers
+constexpr unsigned FLAG_BIT_C = 0;
+constexpr unsigned FLAG_BIT_V = 1;
+constexpr unsigned FLAG_BIT_Z = 2;
+constexpr unsigned FLAG_BIT_S = 3;
+constexpr unsigned FLAG_BIT_U = 4;
+
 // masks for immediate values that can be generated with movz instructions
 constexpr uint64_t LSL0_MASK = 0x00000000'0000ffff;
 constexpr uint64_t LSL16_MASK = 0x00000000'ffff0000;
@@ -187,8 +194,8 @@ constexpr uint64_t LSL32_MASK = 0x0000ffff'00000000;
 constexpr uint64_t LSL48_MASK = 0xffff0000'00000000;
 
 
-#define ARM_CONDITION(a, condition)        (condition_map[condition - COND_Z])
-#define ARM_NOT_CONDITION(a, condition)    (negateCond(condition_map[condition - COND_Z]))
+#define ARM_CONDITION(condition)        (condition_map[condition - COND_Z])
+#define ARM_NOT_CONDITION(condition)    (negateCond(condition_map[condition - COND_Z]))
 
 #define assert_no_condition(inst)       assert((inst).condition() == uml::COND_ALWAYS)
 #define assert_any_condition(inst)      assert((inst).condition() == uml::COND_ALWAYS || ((inst).condition() >= uml::COND_Z && (inst).condition() < uml::COND_MAX))
@@ -289,7 +296,7 @@ inline bool is_simple_mov_immediate(uint64_t val, size_t bytes)
 inline bool emit_add_optimized(a64::Assembler &a, const a64::Gp &dst, const a64::Gp &src, int64_t val)
 {
 	// If the bottom 12 bits are 0s then an optimized form can be used if the remaining bits are <= 12
-	if (is_valid_immediate(val, 12) || (!(val & 0xfff) && is_valid_immediate(val, 12 + 12)))
+	if (is_valid_immediate_addsub(val))
 	{
 		a.add(dst, src, val);
 		return true;
@@ -304,7 +311,7 @@ inline bool emit_sub_optimized(a64::Assembler &a, const a64::Gp &dst, const a64:
 		val = -val;
 
 	// If the bottom 12 bits are 0s then an optimized form can be used if the remaining bits are <= 12
-	if (is_valid_immediate(val, 12) || ((val & 0xfff) == 0 && is_valid_immediate(val >> 12, 12)))
+	if (is_valid_immediate_addsub(val))
 	{
 		a.sub(dst, src, val);
 		return true;
@@ -355,11 +362,49 @@ void get_imm_absolute(a64::Assembler &a, const a64::Gp &reg, const uint64_t val)
 	a.mov(reg, val);
 }
 
+void store_unordered(a64::Assembler &a)
+{
+	a.cset(SCRATCH_REG1, a64::CondCode::kPL);
+	a.cset(SCRATCH_REG2, a64::CondCode::kNE);
+	a.and_(SCRATCH_REG1, SCRATCH_REG1, SCRATCH_REG2);
+	a.cset(SCRATCH_REG2, a64::CondCode::kCS);
+	a.and_(SCRATCH_REG1, SCRATCH_REG1, SCRATCH_REG2);
+	a.cset(SCRATCH_REG2, a64::CondCode::kVS);
+	a.and_(SCRATCH_REG1, SCRATCH_REG1, SCRATCH_REG2);
+	a.bfi(FLAGS_REG, SCRATCH_REG2, FLAG_BIT_U, 1);
+}
+
+inline void get_unordered(a64::Assembler &a, const a64::Gp &reg)
+{
+	a.ubfx(reg.x(), FLAGS_REG, FLAG_BIT_U, 1);
+}
+
+inline void check_unordered_condition(a64::Assembler &a, uml::condition_t cond, const Label &condition_met, bool not_equal)
+{
+	assert((cond == uml::COND_U) || (cond == uml::COND_NU));
+
+	const a64::Inst::Id opcode = ((uml::COND_U == cond) == not_equal) ? a64::Inst::kIdCbz : a64::Inst::kIdCbnz;
+
+	get_unordered(a, SCRATCH_REG1);
+	a.emit(opcode, SCRATCH_REG1, condition_met);
+}
+
+inline void store_carry_reg(a64::Assembler &a, const a64::Gp &reg)
+{
+	a.bfi(FLAGS_REG, reg.x(), FLAG_BIT_C, 1);
+}
+
+inline void get_carry(a64::Assembler &a, const a64::Gp &reg, bool inverted = false)
+{
+	a.and_(reg.x(), FLAGS_REG, 1);
+
+	if (inverted)
+		a.eor(reg.x(), reg.x(), 1);
+}
+
 
 class drcbe_arm64 : public drcbe_interface
 {
-	using arm64_entry_point_func = uint32_t (*)(void *entry);
-
 public:
 	drcbe_arm64(drcuml_state &drcuml, device_t &device, drc_cache &cache, uint32_t flags, int modes, int addrbits, int ignorebits);
 	virtual ~drcbe_arm64();
@@ -367,9 +412,9 @@ public:
 	virtual void reset() override;
 	virtual int execute(uml::code_handle &entry) override;
 	virtual void generate(drcuml_block &block, const uml::instruction *instlist, uint32_t numinst) override;
-	virtual bool hash_exists(uint32_t mode, uint32_t pc) override;
-	virtual void get_info(drcbe_info &info) override;
-	virtual bool logging() const override { return false; }
+	virtual bool hash_exists(uint32_t mode, uint32_t pc) const noexcept override;
+	virtual void get_info(drcbe_info &info) const noexcept override;
+	virtual bool logging() const noexcept override { return false; }
 
 private:
 	class be_parameter
@@ -450,6 +495,8 @@ private:
 		bool mask_simple;
 		bool mask_high_bits;
 	};
+
+	using arm64_entry_point_func = uint32_t (*)(void *entry);
 
 	void op_handle(asmjit::a64::Assembler &a, const uml::instruction &inst);
 	void op_hash(asmjit::a64::Assembler &a, const uml::instruction &inst);
@@ -549,14 +596,9 @@ private:
 	void emit_memaccess_setup(asmjit::a64::Assembler &a, const be_parameter &addrp, const memory_accessors &accessors, const address_space::specific_access_info::side &side) const;
 	void emit_narrow_memwrite(asmjit::a64::Assembler &a, const be_parameter &addrp, const parameter &spacesizep, const memory_accessors &accessors) const;
 
-	void get_carry(asmjit::a64::Assembler &a, const asmjit::a64::Gp &reg, bool inverted = false) const;
-	void load_carry(asmjit::a64::Assembler &a, bool inverted = false) const;
 	void store_carry(asmjit::a64::Assembler &a, bool inverted = false) const;
-	void store_carry_reg(asmjit::a64::Assembler &a, const asmjit::a64::Gp &reg) const;
-
-	void store_unordered(asmjit::a64::Assembler &a) const;
-	void get_unordered(asmjit::a64::Assembler &a, const asmjit::a64::Gp &reg) const;
-	void check_unordered_condition(asmjit::a64::Assembler &a, uml::condition_t cond, asmjit::Label condition_met, bool not_equal) const;
+	void load_carry(asmjit::a64::Assembler &a, bool inverted = false) const;
+	void set_flags(asmjit::a64::Assembler &a) const;
 
 	void calculate_carry_shift_left(asmjit::a64::Assembler &a, const asmjit::a64::Gp &reg, const asmjit::a64::Gp &shift, int maxBits) const;
 	void calculate_carry_shift_left_imm(asmjit::a64::Assembler &a, const asmjit::a64::Gp &reg, const int shift, int maxBits) const;
@@ -590,12 +632,12 @@ private:
 
 	near_state &m_near;
 
-	static const opcode_table_entry s_opcode_table_source[];
-	static opcode_generate_func s_opcode_table[uml::OP_MAX];
-
 	resolved_member_function m_debug_cpu_instruction_hook;
 	resolved_member_function m_drcmap_get_value;
 	std::vector<memory_accessors> m_memory_accessors;
+
+	static const opcode_table_entry s_opcode_table_source[];
+	static opcode_generate_func s_opcode_table[uml::OP_MAX];
 };
 
 
@@ -698,8 +740,6 @@ const drcbe_arm64::opcode_table_entry drcbe_arm64::s_opcode_table_source[] =
 
 drcbe_arm64::be_parameter::be_parameter(drcbe_arm64 &drcbe, const parameter &param, uint32_t allowed)
 {
-	int regnum;
-
 	switch (param.type())
 	{
 		// immediates pass through
@@ -718,8 +758,7 @@ drcbe_arm64::be_parameter::be_parameter(drcbe_arm64 &drcbe, const parameter &par
 		case parameter::PTYPE_INT_REGISTER:
 			assert(allowed & PTYPE_R);
 			assert(allowed & PTYPE_M);
-			regnum = int_register_map[param.ireg() - REG_I0];
-			if (regnum != 0)
+			if (int regnum = int_register_map[param.ireg() - REG_I0]; regnum != 0)
 				*this = make_ireg(regnum);
 			else
 				*this = make_memory(&drcbe.m_state.r[param.ireg() - REG_I0]);
@@ -729,8 +768,7 @@ drcbe_arm64::be_parameter::be_parameter(drcbe_arm64 &drcbe, const parameter &par
 		case parameter::PTYPE_FLOAT_REGISTER:
 			assert(allowed & PTYPE_F);
 			assert(allowed & PTYPE_M);
-			regnum = float_register_map[param.freg() - REG_F0];
-			if (regnum != 0)
+			if (int regnum = float_register_map[param.freg() - REG_F0]; regnum != 0)
 				*this = make_freg(regnum);
 			else
 				*this = make_memory(&drcbe.m_state.f[param.freg() - REG_F0]);
@@ -826,7 +864,7 @@ void drcbe_arm64::get_imm_relative(a64::Assembler &a, const a64::Gp &reg, const 
 inline void drcbe_arm64::emit_ldr_str_base_mem(a64::Assembler &a, a64::Inst::Id opcode, const a64::Reg &reg, int max_shift, const void *ptr) const
 {
 	// If it can fit as an immediate offset
-	const int64_t diff = (int64_t)ptr - (int64_t)m_baseptr;
+	const int64_t diff = int64_t(ptr) - int64_t(m_baseptr);
 	if (is_valid_offset(diff, max_shift))
 	{
 		a.emit(opcode, reg, arm::Mem(BASE_REG, diff));
@@ -835,7 +873,7 @@ inline void drcbe_arm64::emit_ldr_str_base_mem(a64::Assembler &a, a64::Inst::Id 
 
 	// If it can fit as an offset relative to PC
 	const uint64_t codeoffs = a.code()->baseAddress() + a.offset();
-	const int64_t reloffs = (int64_t)ptr - codeoffs;
+	const int64_t reloffs = int64_t(ptr) - codeoffs;
 	if (is_valid_immediate_signed(reloffs, 21))
 	{
 		a.adr(MEM_SCRATCH_REG, ptr);
@@ -899,7 +937,7 @@ inline void drcbe_arm64::emit_ldr_str_base_mem(a64::Assembler &a, a64::Inst::Id 
 		}
 	}
 
-	// Can't optimize it at all, most likely becomes 4 MOV commands
+	// Can't optimize it at all, most likely becomes 4 MOV instructions
 	a.mov(MEM_SCRATCH_REG, ptr);
 	a.emit(opcode, reg, arm::Mem(MEM_SCRATCH_REG));
 }
@@ -1064,17 +1102,14 @@ void drcbe_arm64::mov_mem_param(a64::Assembler &a, uint32_t regsize, void *dst, 
 {
 	const a64::Gp scratch = select_register(SCRATCH_REG2, regsize);
 
-	if (src.is_immediate())
+	if (src.is_immediate_value(0))
 	{
-		if (src.is_immediate_value(0))
-		{
-			emit_str_mem(a, select_register(a64::xzr, regsize), dst);
-		}
-		else
-		{
-			get_imm_relative(a, scratch.x(), src.immediate());
-			emit_str_mem(a, scratch, dst);
-		}
+		emit_str_mem(a, select_register(a64::xzr, regsize), dst);
+	}
+	else if (src.is_immediate())
+	{
+		get_imm_relative(a, scratch.x(), src.immediate());
+		emit_str_mem(a, scratch, dst);
 	}
 	else if (src.is_memory())
 	{
@@ -1208,7 +1243,7 @@ void drcbe_arm64::mov_float_param_param(a64::Assembler &a, uint32_t regsize, con
 void drcbe_arm64::call_arm_addr(a64::Assembler &a, const void *offs) const
 {
 	const uint64_t codeoffs = a.code()->baseAddress() + a.offset();
-	const int64_t reloffs = (int64_t)offs - codeoffs;
+	const int64_t reloffs = int64_t(offs) - codeoffs;
 	if (is_valid_immediate_signed(reloffs, 26 + 2))
 	{
 		a.bl(offs);
@@ -1218,51 +1253,6 @@ void drcbe_arm64::call_arm_addr(a64::Assembler &a, const void *offs) const
 		get_imm_relative(a, SCRATCH_REG1, uintptr_t(offs));
 		a.blr(SCRATCH_REG1);
 	}
-}
-
-void drcbe_arm64::check_unordered_condition(a64::Assembler &a, uml::condition_t cond, Label condition_met, bool not_equal) const
-{
-	if (cond != uml::COND_U && cond != uml::COND_NU)
-		return;
-
-	get_unordered(a, SCRATCH_REG1);
-
-	if (cond == uml::COND_U)
-	{
-		if (not_equal)
-			a.cbz(SCRATCH_REG1, condition_met);
-		else
-			a.cbnz(SCRATCH_REG1, condition_met);
-	}
-	else
-	{
-		if (not_equal)
-			a.cbnz(SCRATCH_REG1, condition_met);
-		else
-			a.cbz(SCRATCH_REG1, condition_met);
-	}
-}
-
-void drcbe_arm64::store_unordered(a64::Assembler &a) const
-{
-	a.cset(SCRATCH_REG1, a64::CondCode::kPL);
-	a.cset(SCRATCH_REG2, a64::CondCode::kNE);
-	a.and_(SCRATCH_REG1, SCRATCH_REG1, SCRATCH_REG2);
-	a.cset(SCRATCH_REG2, a64::CondCode::kCS);
-	a.and_(SCRATCH_REG1, SCRATCH_REG1, SCRATCH_REG2);
-	a.cset(SCRATCH_REG2, a64::CondCode::kVS);
-	a.and_(SCRATCH_REG1, SCRATCH_REG1, SCRATCH_REG2);
-	a.bfi(FLAGS_REG, SCRATCH_REG2, 4, 1);
-}
-
-void drcbe_arm64::get_unordered(a64::Assembler &a, const a64::Gp &reg) const
-{
-	a.ubfx(reg.x(), FLAGS_REG, 4, 1);
-}
-
-void drcbe_arm64::store_carry_reg(a64::Assembler &a, const a64::Gp &reg) const
-{
-	a.bfi(FLAGS_REG, reg.x(), 0, 1);
 }
 
 void drcbe_arm64::store_carry(a64::Assembler &a, bool inverted) const
@@ -1275,14 +1265,6 @@ void drcbe_arm64::store_carry(a64::Assembler &a, bool inverted) const
 	store_carry_reg(a, SCRATCH_REG1);
 }
 
-void drcbe_arm64::get_carry(a64::Assembler &a, const a64::Gp &reg, bool inverted) const
-{
-	a.and_(reg.x(), FLAGS_REG, 1);
-
-	if (inverted)
-		a.eor(reg.x(), reg.x(), 1);
-}
-
 void drcbe_arm64::load_carry(a64::Assembler &a, bool inverted) const
 {
 	a.mrs(SCRATCH_REG1, a64::Predicate::SysReg::kNZCV);
@@ -1292,6 +1274,19 @@ void drcbe_arm64::load_carry(a64::Assembler &a, bool inverted) const
 		a.eor(SCRATCH_REG1, SCRATCH_REG1, 1 << 29);
 
 	a.msr(a64::Predicate::SysReg::kNZCV, SCRATCH_REG1);
+}
+
+void drcbe_arm64::set_flags(asmjit::a64::Assembler &a) const
+{
+	// Set native condition codes after loading flags register
+	a.mrs(TEMP_REG1, a64::Predicate::SysReg::kNZCV);
+
+	a.and_(TEMP_REG2, FLAGS_REG, 0b1100); // zero + sign
+	a.ubfx(TEMP_REG3, FLAGS_REG, FLAG_BIT_V, 1); // overflow flag
+	a.orr(TEMP_REG2, TEMP_REG2, TEMP_REG3);
+	a.bfi(TEMP_REG1, TEMP_REG2, 28, 4);
+
+	a.msr(a64::Predicate::SysReg::kNZCV, TEMP_REG1);
 }
 
 void drcbe_arm64::calculate_carry_shift_left(a64::Assembler &a, const a64::Gp &reg, const a64::Gp &shift, int maxBits) const
@@ -1424,9 +1419,9 @@ size_t drcbe_arm64::emit(CodeHolder &ch)
 	size_t const alignment = ch.baseAddress() - uint64_t(m_cache.top());
 	size_t const code_size = ch.codeSize();
 
-	// test if enough room remains in drc cache
+	// test if enough room remains in the DRC cache
 	drccodeptr *cachetop = m_cache.begin_codegen(alignment + code_size);
-	if (cachetop == nullptr)
+	if (!cachetop)
 		return 0;
 
 	err = ch.copyFlattenedData(drccodeptr(ch.baseAddress()), code_size, CopySectionFlags::kPadTargetBuffer);
@@ -1593,12 +1588,12 @@ void drcbe_arm64::generate(drcuml_block &block, const instruction *instlist, uin
 	m_map.block_end(block);
 }
 
-bool drcbe_arm64::hash_exists(uint32_t mode, uint32_t pc)
+bool drcbe_arm64::hash_exists(uint32_t mode, uint32_t pc) const noexcept
 {
 	return m_hash.code_exists(mode, pc);
 }
 
-void drcbe_arm64::get_info(drcbe_info &info)
+void drcbe_arm64::get_info(drcbe_info &info) const noexcept
 {
 	for (info.direct_iregs = 0; info.direct_iregs < REG_I_COUNT; info.direct_iregs++)
 	{
@@ -1709,10 +1704,10 @@ void drcbe_arm64::op_debug(a64::Assembler &a, const uml::instruction &inst)
 	assert_no_condition(inst);
 	assert_no_flags(inst);
 
-	const a64::Gp temp = TEMP_REG1.w();
-
 	if (m_device.machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
+		const a64::Gp temp = TEMP_REG1.w();
+
 		be_parameter pcp(*this, inst.param(0), PTYPE_MRI);
 
 		Label skip = a.newLabel();
@@ -1752,7 +1747,7 @@ void drcbe_arm64::op_exit(a64::Assembler &a, const uml::instruction &inst)
 	}
 	else
 	{
-		a.b(ARM_CONDITION(a, inst.condition()), m_exit);
+		a.b(ARM_CONDITION(inst.condition()), m_exit);
 	}
 }
 
@@ -1878,16 +1873,19 @@ void drcbe_arm64::op_jmp(a64::Assembler &a, const uml::instruction &inst)
 		jmptarget = a.newNamedLabel(labelName.c_str());
 
 	if (inst.condition() == uml::COND_ALWAYS)
+	{
 		a.b(jmptarget);
+	}
+	else if (inst.condition() == uml::COND_U || inst.condition() == uml::COND_NU)
+	{
+		check_unordered_condition(a, inst.condition(), jmptarget, false);
+	}
 	else
 	{
 		if (inst.condition() == COND_C || inst.condition() == COND_NC || inst.condition() == COND_A || inst.condition() == COND_BE)
 			load_carry(a, true);
 
-		if (inst.condition() == uml::COND_U || inst.condition() == uml::COND_NU)
-			check_unordered_condition(a, inst.condition(), jmptarget, false);
-		else
-			a.b(ARM_CONDITION(a, inst.condition()), jmptarget);
+		a.b(ARM_CONDITION(inst.condition()), jmptarget);
 	}
 }
 
@@ -1906,13 +1904,17 @@ void drcbe_arm64::op_exh(a64::Assembler &a, const uml::instruction &inst)
 	{
 		no_exception = a.newLabel();
 
-		if (inst.condition() == COND_C || inst.condition() == COND_NC || inst.condition() == COND_A || inst.condition() == COND_BE)
-			load_carry(a, true);
-
 		if (inst.condition() == uml::COND_U || inst.condition() == uml::COND_NU)
+		{
 			check_unordered_condition(a, inst.condition(), no_exception, true);
+		}
 		else
-			a.b(ARM_NOT_CONDITION(a, inst.condition()), no_exception);
+		{
+			if (inst.condition() == COND_C || inst.condition() == COND_NC || inst.condition() == COND_A || inst.condition() == COND_BE)
+				load_carry(a, true);
+
+			a.b(ARM_NOT_CONDITION(inst.condition()), no_exception);
+		}
 	}
 
 	mov_mem_param(a, 4, &m_state.exp, exp);
@@ -1946,13 +1948,17 @@ void drcbe_arm64::op_callh(a64::Assembler &a, const uml::instruction &inst)
 	{
 		skip = a.newLabel();
 
-		if (inst.condition() == COND_C || inst.condition() == COND_NC || inst.condition() == COND_A || inst.condition() == COND_BE)
-			load_carry(a, true);
-
 		if (inst.condition() == uml::COND_U || inst.condition() == uml::COND_NU)
+		{
 			check_unordered_condition(a, inst.condition(), skip, true);
+		}
 		else
-			a.b(ARM_NOT_CONDITION(a, inst.condition()), skip);
+		{
+			if (inst.condition() == COND_C || inst.condition() == COND_NC || inst.condition() == COND_A || inst.condition() == COND_BE)
+				load_carry(a, true);
+
+			a.b(ARM_NOT_CONDITION(inst.condition()), skip);
+		}
 	}
 
 	drccodeptr *const targetptr = handp.handle().codeptr_addr();
@@ -1982,13 +1988,17 @@ void drcbe_arm64::op_ret(a64::Assembler &a, const uml::instruction &inst)
 	{
 		skip = a.newLabel();
 
-		if (inst.condition() == COND_C || inst.condition() == COND_NC || inst.condition() == COND_A || inst.condition() == COND_BE)
-			load_carry(a, true);
-
 		if (inst.condition() == uml::COND_U || inst.condition() == uml::COND_NU)
+		{
 			check_unordered_condition(a, inst.condition(), skip, true);
+		}
 		else
-			a.b(ARM_NOT_CONDITION(a, inst.condition()), skip);
+		{
+			if (inst.condition() == COND_C || inst.condition() == COND_NC || inst.condition() == COND_A || inst.condition() == COND_BE)
+				load_carry(a, true);
+
+			a.b(ARM_NOT_CONDITION(inst.condition()), skip);
+		}
 	}
 
 	a.ldp(a64::x29, a64::x30, arm::Mem(a64::sp).post(16));
@@ -2013,13 +2023,17 @@ void drcbe_arm64::op_callc(a64::Assembler &a, const uml::instruction &inst)
 	{
 		skip = a.newLabel();
 
-		if (inst.condition() == COND_C || inst.condition() == COND_NC || inst.condition() == COND_A || inst.condition() == COND_BE)
-			load_carry(a, true);
-
 		if (inst.condition() == uml::COND_U || inst.condition() == uml::COND_NU)
+		{
 			check_unordered_condition(a, inst.condition(), skip, true);
+		}
 		else
-			a.b(ARM_NOT_CONDITION(a, inst.condition()), skip);
+		{
+			if (inst.condition() == COND_C || inst.condition() == COND_NC || inst.condition() == COND_A || inst.condition() == COND_BE)
+				load_carry(a, true);
+
+			a.b(ARM_NOT_CONDITION(inst.condition()), skip);
+		}
 	}
 
 	emit_str_mem(a, FLAGS_REG.w(), &m_near.emulated_flags);
@@ -2059,7 +2073,6 @@ void drcbe_arm64::op_setfmod(a64::Assembler &a, const uml::instruction &inst)
 	assert_no_flags(inst);
 
 	be_parameter srcp(*this, inst.param(0), PTYPE_MRI);
-	const a64::Gp src = srcp.select_register(TEMP_REG1, inst.size());
 	const a64::Gp scratch = select_register(FUNC_SCRATCH_REG, inst.size());
 
 	if (srcp.is_immediate())
@@ -2068,6 +2081,8 @@ void drcbe_arm64::op_setfmod(a64::Assembler &a, const uml::instruction &inst)
 	}
 	else
 	{
+		const a64::Gp src = srcp.select_register(TEMP_REG1, inst.size());
+
 		mov_reg_param(a, inst.size(), src, srcp);
 		a.and_(scratch, src, 3);
 	}
@@ -2116,30 +2131,30 @@ void drcbe_arm64::op_getflgs(a64::Assembler &a, const uml::instruction &inst)
 	a.mov(dst, a64::xzr);
 
 	if (maskp.immediate() & FLAG_C)
-		a.and_(dst, FLAGS_REG, 1);
+		a.and_(dst, FLAGS_REG, FLAG_C);
 
 	if (maskp.immediate() & FLAG_V)
 	{
 		a.cset(SCRATCH_REG1, a64::CondCode::kVS);
-		a.orr(dst, dst, SCRATCH_REG1, 1);
+		a.orr(dst, dst, SCRATCH_REG1, FLAG_BIT_V);
 	}
 
 	if (maskp.immediate() & FLAG_Z)
 	{
 		a.cset(SCRATCH_REG1, a64::CondCode::kEQ);
-		a.orr(dst, dst, SCRATCH_REG1, 2);
+		a.orr(dst, dst, SCRATCH_REG1, FLAG_BIT_Z);
 	}
 
 	if (maskp.immediate() & FLAG_S)
 	{
 		a.cset(SCRATCH_REG1, a64::CondCode::kMI);
-		a.orr(dst, dst, SCRATCH_REG1, 3);
+		a.orr(dst, dst, SCRATCH_REG1, FLAG_BIT_S);
 	}
 
 	if (maskp.immediate() & FLAG_U)
 	{
 		get_unordered(a, SCRATCH_REG1);
-		a.orr(dst, dst, SCRATCH_REG1, 4);
+		a.orr(dst, dst, SCRATCH_REG1, FLAG_BIT_U);
 	}
 
 	mov_param_reg(a, inst.size(), dstp, dst);
@@ -2153,15 +2168,7 @@ void drcbe_arm64::op_setflgs(a64::Assembler &a, const uml::instruction &inst)
 	be_parameter flagsp(*this, inst.param(0), PTYPE_MRI);
 
 	mov_reg_param(a, inst.size(), FLAGS_REG, flagsp);
-
-	a.mrs(TEMP_REG1, a64::Predicate::SysReg::kNZCV);
-
-	a.and_(TEMP_REG2, FLAGS_REG, 0b1100); // zero + sign
-	a.ubfx(TEMP_REG3, FLAGS_REG, 1, 1); // overflow flag
-	a.orr(TEMP_REG2, TEMP_REG2, TEMP_REG3);
-	a.bfi(TEMP_REG1, TEMP_REG2, 28, 4);
-
-	a.msr(a64::Predicate::SysReg::kNZCV, TEMP_REG1);
+	set_flags(a);
 }
 
 void drcbe_arm64::op_save(a64::Assembler &a, const uml::instruction &inst)
@@ -2183,7 +2190,7 @@ void drcbe_arm64::op_save(a64::Assembler &a, const uml::instruction &inst)
 	a.and_(TEMP_REG2, TEMP_REG1, 0b1100); // zero + sign
 	a.orr(TEMP_REG2, TEMP_REG2, FLAGS_REG); // carry + unordered flags
 
-	a.bfi(TEMP_REG2, TEMP_REG1, 1, 1); // overflow flag
+	a.bfi(TEMP_REG2, TEMP_REG1, FLAG_BIT_V, 1); // overflow flag
 
 	a.strb(TEMP_REG2.w(), arm::Mem(membase, offsetof(drcuml_machine_state, flags)));
 
@@ -2268,15 +2275,7 @@ void drcbe_arm64::op_restore(a64::Assembler &a, const uml::instruction &inst)
 	emit_str_mem(a, TEMP_REG1.w(), &m_state.exp);
 
 	a.ldrb(FLAGS_REG.w(), arm::Mem(membase, offsetof(drcuml_machine_state, flags)));
-
-	a.mrs(TEMP_REG1, a64::Predicate::SysReg::kNZCV);
-
-	a.and_(TEMP_REG2, FLAGS_REG, 0b1100); // zero + sign
-	a.ubfx(TEMP_REG3, FLAGS_REG, 1, 1); // overflow flag
-	a.orr(TEMP_REG2, TEMP_REG2, TEMP_REG3);
-	a.bfi(TEMP_REG1, TEMP_REG2, 28, 4);
-
-	a.msr(a64::Predicate::SysReg::kNZCV, TEMP_REG1);
+	set_flags(a);
 }
 
 void drcbe_arm64::op_load(a64::Assembler &a, const uml::instruction &inst)
@@ -2361,18 +2360,18 @@ void drcbe_arm64::op_loads(a64::Assembler &a, const uml::instruction &inst)
 	const a64::Gp basereg = TEMP_REG1;
 	const a64::Gp dstreg = dstp.select_register(TEMP_REG2, inst.size());
 
-	const int32_t offset = indp.is_immediate() ? indp.immediate() << scalesizep.scale() : 0;
+	const int32_t offset = indp.is_immediate() ? (indp.immediate() << scalesizep.scale()) : 0;
 	if (indp.is_immediate() && is_valid_immediate(offset, 15))
 	{
 		// immediate index
 		if (size == SIZE_BYTE)
-			emit_ldrsb_mem(a, dstreg.x(), (uint8_t*)basep.memory() + offset);
+			emit_ldrsb_mem(a, dstreg.x(), (uint8_t *)basep.memory() + offset);
 		else if (size == SIZE_WORD)
-			emit_ldrsh_mem(a, dstreg.x(), (uint8_t*)basep.memory() + offset);
+			emit_ldrsh_mem(a, dstreg.x(), (uint8_t *)basep.memory() + offset);
 		else if (size == SIZE_DWORD)
-			emit_ldrsw_mem(a, dstreg.x(), (uint8_t*)basep.memory() + offset);
+			emit_ldrsw_mem(a, dstreg.x(), (uint8_t *)basep.memory() + offset);
 		else
-			emit_ldr_mem(a, dstreg.x(), (uint8_t*)basep.memory() + offset);
+			emit_ldr_mem(a, dstreg.x(), (uint8_t *)basep.memory() + offset);
 	}
 	else
 	{
@@ -2738,7 +2737,7 @@ void drcbe_arm64::op_carry(a64::Assembler &a, const uml::instruction &inst)
 	if (srcp.is_immediate() && bitp.is_immediate())
 	{
 		a.mov(scratch, BIT(srcp.immediate(), bitp.immediate()));
-		a.bfi(FLAGS_REG, scratch.x(), 0, 1);
+		store_carry_reg(a, scratch);
 	}
 	else if (bitp.is_immediate())
 	{
@@ -2785,25 +2784,23 @@ void drcbe_arm64::op_set(a64::Assembler &a, const uml::instruction &inst)
 		mov_param_imm(a, inst.size(), dstp, 1);
 		return;
 	}
-	else
+
+	const a64::Gp dst = dstp.select_register(TEMP_REG1, inst.size());
+
+	if (inst.condition() == COND_C || inst.condition() == COND_NC || inst.condition() == COND_A || inst.condition() == COND_BE)
+		load_carry(a, true);
+
+	if (inst.condition() == uml::COND_U || inst.condition() == uml::COND_NU)
 	{
-		const a64::Gp dst = dstp.select_register(TEMP_REG1, inst.size());
+		get_unordered(a, dst);
 
-		if (inst.condition() == COND_C || inst.condition() == COND_NC || inst.condition() == COND_A || inst.condition() == COND_BE)
-			load_carry(a, true);
-
-		if (inst.condition() == uml::COND_U || inst.condition() == uml::COND_NU)
-		{
-			get_unordered(a, dst);
-
-			if (inst.condition() == uml::COND_NU)
-				a.eor(dst, dst, 1);
-		}
-		else
-			a.cset(dst, ARM_CONDITION(a, inst.condition()));
-
-		mov_param_reg(a, inst.size(), dstp, dst);
+		if (inst.condition() == uml::COND_NU)
+			a.eor(dst, dst, 1);
 	}
+	else
+		a.cset(dst, ARM_CONDITION(inst.condition()));
+
+	mov_param_reg(a, inst.size(), dstp, dst);
 }
 
 void drcbe_arm64::op_mov(a64::Assembler &a, const uml::instruction &inst)
@@ -2828,7 +2825,7 @@ void drcbe_arm64::op_mov(a64::Assembler &a, const uml::instruction &inst)
 		if (inst.condition() == uml::COND_U || inst.condition() == uml::COND_NU)
 			check_unordered_condition(a, inst.condition(), skip, true);
 		else
-			a.b(ARM_NOT_CONDITION(a, inst.condition()), skip);
+			a.b(ARM_NOT_CONDITION(inst.condition()), skip);
 	}
 
 	mov_param_param(a, inst.size(), dstp, srcp);
@@ -4504,7 +4501,7 @@ void drcbe_arm64::op_fmov(a64::Assembler &a, const uml::instruction &inst)
 		if (inst.condition() == uml::COND_U || inst.condition() == uml::COND_NU)
 			check_unordered_condition(a, inst.condition(), skip, true);
 		else
-			a.b(ARM_NOT_CONDITION(a, inst.condition()), skip);
+			a.b(ARM_NOT_CONDITION(inst.condition()), skip);
 	}
 
 	mov_float_param_param(a, inst.size(), dstp, srcp);
