@@ -78,7 +78,6 @@ private:
 		div(0),
 		counter(0),
 		enable(false),
-		reset(false),
 		channel_mode(0) {}
 
 		void input(u8 input);
