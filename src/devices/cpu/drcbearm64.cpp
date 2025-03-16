@@ -2939,15 +2939,92 @@ void drcbe_arm64::op_mov(a64::Assembler &a, const uml::instruction &inst)
 	be_parameter dstp(*this, inst.param(0), PTYPE_MR);
 	be_parameter srcp(*this, inst.param(1), PTYPE_MRI);
 
-	// add a conditional branch unless a conditional move is possible
-	// TODO: optimise to use csel if the source and destination are both kept in host registers
-	Label skip;
-	emit_skip(a, inst.condition(), skip);
+	// decide whether a conditional select will be efficient
+	bool usesel = dstp.is_int_register() && (srcp.is_int_register() || (srcp.is_immediate() && is_simple_mov_immediate(srcp.immediate(), inst.size())));
+	switch (inst.condition())
+	{
+		case uml::COND_ALWAYS:
+		case uml::COND_U:
+		case uml::COND_NU:
+			usesel = false;
+			break;
+		case uml::COND_C:
+		case uml::COND_NC:
+			switch (m_carry_state)
+			{
+				case carry_state::CANONICAL:
+				case carry_state::LOGICAL:
+					break;
+				default:
+					usesel = false;
+			}
+			break;
+		default:
+			break;
+	}
 
-	mov_param_param(a, inst.size(), dstp, srcp);
+	if (usesel)
+	{
+		const bool srczero = srcp.is_immediate_value(0);
+		const bool srcone = srcp.is_immediate_value(1);
+		const bool srcnegone = srcp.is_immediate_value(util::make_bitmask<uint64_t>(inst.size() * 8));
+		const bool srcspecial = srczero || srcone || srcnegone;
 
-	if (inst.condition() != uml::COND_ALWAYS)
-		a.bind(skip);
+		const a64::Gp dst = dstp.select_register(TEMP_REG1, inst.size());
+		const a64::Gp src = srcspecial ? select_register(a64::xzr, inst.size()) : srcp.select_register(TEMP_REG2, inst.size());
+
+		mov_reg_param(a, inst.size(), dst, dstp);
+		if (!srcspecial)
+			mov_reg_param(a, inst.size(), src, srcp);
+
+		switch (inst.condition())
+		{
+			case uml::COND_C:
+			case uml::COND_NC:
+				if (m_carry_state == carry_state::CANONICAL)
+				{
+					if (srcone)
+						a.csinc(dst, dst, src, ARM_CONDITION(inst.condition()));
+					else if (srcnegone)
+						a.csinv(dst, dst, src, ARM_CONDITION(inst.condition()));
+					else
+						a.csel(dst, src, dst, ARM_NOT_CONDITION(inst.condition()));
+				}
+				else
+				{
+					if (srcone)
+						a.csinc(dst, dst, src, ARM_NOT_CONDITION(inst.condition()));
+					else if (srcnegone)
+						a.csinv(dst, dst, src, ARM_NOT_CONDITION(inst.condition()));
+					else
+						a.csel(dst, src, dst, ARM_CONDITION(inst.condition()));
+				}
+				break;
+			case uml::COND_A:
+			case uml::COND_BE:
+				load_carry(a, true);
+				[[fallthrough]];
+			default:
+				if (srcone)
+					a.csinc(dst, dst, src, ARM_NOT_CONDITION(inst.condition()));
+				else if (srcnegone)
+					a.csinv(dst, dst, src, ARM_NOT_CONDITION(inst.condition()));
+				else
+					a.csel(dst, src, dst, ARM_CONDITION(inst.condition()));
+		}
+
+		mov_param_reg(a, inst.size(), dstp, dst);
+	}
+	else
+	{
+		Label skip;
+		emit_skip(a, inst.condition(), skip);
+
+		mov_param_param(a, inst.size(), dstp, srcp);
+
+		if (inst.condition() != uml::COND_ALWAYS)
+			a.bind(skip);
+	}
 }
 
 void drcbe_arm64::op_sext(a64::Assembler &a, const uml::instruction &inst)
@@ -4679,14 +4756,67 @@ void drcbe_arm64::op_fmov(a64::Assembler &a, const uml::instruction &inst)
 	be_parameter dstp(*this, inst.param(0), PTYPE_MF);
 	be_parameter srcp(*this, inst.param(1), PTYPE_MF);
 
-	// TODO: optimise to use fcsel if the source and destination are both kept in host registers
-	Label skip;
-	emit_skip(a, inst.condition(), skip);
+	// decide whether a conditional select will be efficient
+	bool usesel = dstp.is_float_register() && srcp.is_float_register();
+	switch (inst.condition())
+	{
+		case uml::COND_ALWAYS:
+		case uml::COND_U:
+		case uml::COND_NU:
+			usesel = false;
+			break;
+		case uml::COND_C:
+		case uml::COND_NC:
+			switch (m_carry_state)
+			{
+				case carry_state::CANONICAL:
+				case carry_state::LOGICAL:
+					break;
+				default:
+					usesel = false;
+			}
+			break;
+		default:
+			break;
+	}
 
-	mov_float_param_param(a, inst.size(), dstp, srcp);
+	if (usesel)
+	{
+		const a64::Vec dstreg = dstp.select_register(TEMPF_REG1, inst.size());
+		const a64::Vec srcreg = srcp.select_register(TEMPF_REG2, inst.size());
 
-	if (inst.condition() != uml::COND_ALWAYS)
-		a.bind(skip);
+		mov_float_reg_param(a, inst.size(), dstreg, dstp);
+		mov_float_reg_param(a, inst.size(), srcreg, srcp);
+
+		switch (inst.condition())
+		{
+			case uml::COND_C:
+			case uml::COND_NC:
+				if (m_carry_state == carry_state::CANONICAL)
+					a.fcsel(dstreg, srcreg, dstreg, ARM_NOT_CONDITION(inst.condition()));
+				else
+					a.fcsel(dstreg, srcreg, dstreg, ARM_CONDITION(inst.condition()));
+				break;
+			case uml::COND_A:
+			case uml::COND_BE:
+				load_carry(a, true);
+				[[fallthrough]];
+			default:
+				a.fcsel(dstreg, srcreg, dstreg, ARM_CONDITION(inst.condition()));
+		}
+
+		mov_float_param_reg(a, inst.size(), dstp, dstreg);
+	}
+	else
+	{
+		Label skip;
+		emit_skip(a, inst.condition(), skip);
+
+		mov_float_param_param(a, inst.size(), dstp, srcp);
+
+		if (inst.condition() != uml::COND_ALWAYS)
+			a.bind(skip);
+	}
 }
 
 void drcbe_arm64::op_ftoint(a64::Assembler &a, const uml::instruction &inst)
