@@ -75,7 +75,7 @@ protected:
 	};
 
 	static const unsigned int FRAME_CYCLES = 8192;
-	static const int wave_duty_table[4][8];
+	static const int wave_duty_table[4];
 
 	sound_stream *m_channel;
 
@@ -89,17 +89,17 @@ protected:
 		uint8_t  length_mask;
 		bool   length_counting;
 		bool   length_enabled;
-		/* Mode 1, 2, 3 */
+		/* Channel 1, 2, 3 */
 		int64_t cycles_left;
 		int8_t   duty;
-		/* Mode 1, 2, 4 */
+		/* Channel 1, 2, 4 */
 		bool   envelope_enabled;
 		int8_t   envelope_value;
 		int8_t   envelope_direction;
 		uint8_t  envelope_time;
 		uint8_t  envelope_count;
 		int8_t   signal;
-		/* Mode 1 */
+		/* Channel 1 */
 		uint16_t frequency;
 		uint16_t frequency_counter;
 		bool   sweep_enabled;
@@ -108,7 +108,7 @@ protected:
 		int32_t  sweep_direction;
 		uint8_t  sweep_time;
 		uint8_t  sweep_count;
-		/* Mode 3 */
+		/* Channel 3 */
 		uint8_t size; // AGB specific
 		uint8_t bank; // AGB specific
 		uint8_t  level;
@@ -116,29 +116,20 @@ protected:
 		uint32_t duty_count;
 		int8_t   current_sample;
 		bool   sample_reading;
-		/* Mode 4 */
+		/* Channel 4 */
 		bool   noise_short;
 		uint16_t noise_lfsr;
 	};
 
-	SOUND  m_snd_1;
-	SOUND  m_snd_2;
-	SOUND  m_snd_3;
-	SOUND  m_snd_4;
+	SOUND  m_snd[4];
 
 	struct
 	{
-		uint8_t on;
+		bool on;
 		uint8_t vol_left;
 		uint8_t vol_right;
-		uint8_t mode1_left;
-		uint8_t mode1_right;
-		uint8_t mode2_left;
-		uint8_t mode2_right;
-		uint8_t mode3_left;
-		uint8_t mode3_right;
-		uint8_t mode4_left;
-		uint8_t mode4_right;
+		bool chan_left[4];
+		bool chan_right[4];
 		uint64_t cycles;
 		bool wave_ram_locked;
 	} m_snd_control;
