@@ -11,7 +11,7 @@
 #include "machine/am9517a.h"
 #include "machine/mb89374.h"
 
-#include "osdfile.h"
+#include "asio.h"
 
 
 //**************************************************************************
@@ -42,6 +42,7 @@ public:
 	void check_vint_irq();
 protected:
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_reset_after_children() override;
 
@@ -83,10 +84,16 @@ private:
 	uint8_t m_fg = 0;             // flip gate, bit0 is stored, bit7 is connected to ZFG bit 0
 
 #ifdef M1COMM_SIMULATION
-	osd_file::ptr m_line_rx;  // rx line - can be either differential, simple serial or toslink
-	osd_file::ptr m_line_tx;  // tx line - is differential, simple serial and toslink
-	std::string m_localhost;
-	std::string m_remotehost;
+	asio::io_context m_ioctx;
+	std::optional<asio::ip::tcp::endpoint> m_localaddr;
+	std::optional<asio::ip::tcp::endpoint> m_remoteaddr;
+	asio::ip::tcp::acceptor m_acceptor;
+	asio::ip::tcp::socket m_sock_rx;
+	asio::ip::tcp::socket m_sock_tx;
+	asio::steady_timer m_tx_timeout;
+	uint8_t m_rx_state;
+	uint8_t m_tx_state;
+
 	uint8_t m_buffer0[0x200]{};
 	uint8_t m_framesync;
 
@@ -96,10 +103,13 @@ private:
 	uint8_t m_linkid = 0;
 	uint8_t m_linkcount = 0;
 
+	void check_sockets();
+	void comm_start();
+	void comm_stop();
 	void comm_tick();
-	int read_frame(int data_size);
-	void send_data(uint8_t frame_type, int frame_start, int frame_size, int data_size);
-	void send_frame(int data_size);
+	unsigned read_frame(unsigned data_size);
+	void send_data(uint8_t frame_type, unsigned frame_start, unsigned frame_size, unsigned data_size);
+	void send_frame(unsigned data_size);
 #endif
 };
 
