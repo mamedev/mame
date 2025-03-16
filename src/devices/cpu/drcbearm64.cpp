@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:windyfairy
+// copyright-holders:windyfairy, Vas Crabb
 /***************************************************************************
 
 Register use:
@@ -379,16 +379,6 @@ inline void get_unordered(a64::Assembler &a, const a64::Gp &reg)
 	a.ubfx(reg.x(), FLAGS_REG, FLAG_BIT_U, 1);
 }
 
-inline void check_unordered_condition(a64::Assembler &a, uml::condition_t cond, const Label &condition_met, bool not_equal)
-{
-	assert((cond == uml::COND_U) || (cond == uml::COND_NU));
-
-	const a64::Inst::Id opcode = ((uml::COND_U == cond) == not_equal) ? a64::Inst::kIdCbz : a64::Inst::kIdCbnz;
-
-	get_unordered(a, SCRATCH_REG1);
-	a.emit(opcode, SCRATCH_REG1, condition_met);
-}
-
 inline void store_carry_reg(a64::Assembler &a, const a64::Gp &reg)
 {
 	a.bfi(FLAGS_REG, reg.x(), FLAG_BIT_C, 1);
@@ -417,6 +407,13 @@ public:
 	virtual bool logging() const noexcept override { return false; }
 
 private:
+	enum class carry_state
+	{
+		POISON,     // does not correspond to UML carry flag
+		CANONICAL,  // corresponds directly to UML carry flag
+		LOGICAL     // logical borrow state
+	};
+
 	class be_parameter
 	{
 		static inline constexpr int REG_MAX = 30;
@@ -593,18 +590,20 @@ private:
 	void emit_float_ldr_mem(asmjit::a64::Assembler &a, const asmjit::a64::Vec &reg, const void *ptr) const;
 	void emit_float_str_mem(asmjit::a64::Assembler &a, const asmjit::a64::Vec &reg, const void *ptr) const;
 
+	void emit_skip(a64::Assembler &a, uml::condition_t cond, Label &skip);
+
 	void emit_memaccess_setup(asmjit::a64::Assembler &a, const be_parameter &addrp, const memory_accessors &accessors, const address_space::specific_access_info::side &side) const;
 	void emit_narrow_memwrite(asmjit::a64::Assembler &a, const be_parameter &addrp, const parameter &spacesizep, const memory_accessors &accessors) const;
 
-	void store_carry(asmjit::a64::Assembler &a, bool inverted = false) const;
-	void load_carry(asmjit::a64::Assembler &a, bool inverted = false) const;
-	void set_flags(asmjit::a64::Assembler &a) const;
+	void store_carry(asmjit::a64::Assembler &a, bool inverted = false);
+	void load_carry(asmjit::a64::Assembler &a, bool inverted = false);
+	void set_flags(asmjit::a64::Assembler &a);
 
-	void calculate_carry_shift_left(asmjit::a64::Assembler &a, const asmjit::a64::Gp &reg, const asmjit::a64::Gp &shift, int maxBits) const;
-	void calculate_carry_shift_left_imm(asmjit::a64::Assembler &a, const asmjit::a64::Gp &reg, const int shift, int maxBits) const;
+	void calculate_carry_shift_left(asmjit::a64::Assembler &a, const asmjit::a64::Gp &reg, const asmjit::a64::Gp &shift, int maxBits);
+	void calculate_carry_shift_left_imm(asmjit::a64::Assembler &a, const asmjit::a64::Gp &reg, const int shift, int maxBits);
 
-	void calculate_carry_shift_right(asmjit::a64::Assembler &a, const asmjit::a64::Gp &reg, const asmjit::a64::Gp &shift) const;
-	void calculate_carry_shift_right_imm(asmjit::a64::Assembler &a, const asmjit::a64::Gp &reg, const int shift) const;
+	void calculate_carry_shift_right(asmjit::a64::Assembler &a, const asmjit::a64::Gp &reg, const asmjit::a64::Gp &shift);
+	void calculate_carry_shift_right_imm(asmjit::a64::Assembler &a, const asmjit::a64::Gp &reg, const int shift);
 
 	void mov_float_reg_param(asmjit::a64::Assembler &a, uint32_t regsize, asmjit::a64::Vec const &dst, const be_parameter &src) const;
 	void mov_float_param_param(asmjit::a64::Assembler &a, uint32_t regsize, const be_parameter &dst, const be_parameter &src) const;
@@ -623,6 +622,7 @@ private:
 	drc_hash_table m_hash;
 	drc_map_variables m_map;
 	FILE *m_log_asmjit;
+	carry_state m_carry_state;
 
 	arm64_entry_point_func m_entry;
 	drccodeptr m_exit;
@@ -955,6 +955,45 @@ void drcbe_arm64::emit_strh_mem(a64::Assembler &a, const a64::Gp &reg, const voi
 void drcbe_arm64::emit_float_ldr_mem(a64::Assembler &a, const a64::Vec &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdLdr_v, reg, reg.isVecS() ? 2 : 3, ptr); }
 void drcbe_arm64::emit_float_str_mem(a64::Assembler &a, const a64::Vec &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdStr_v, reg, reg.isVecS() ? 2 : 3, ptr); }
 
+void drcbe_arm64::emit_skip(a64::Assembler &a, uml::condition_t cond, Label &skip)
+{
+	// Nothing to do if the instruction is unconditional
+	if (cond == uml::COND_ALWAYS)
+		return;
+
+	// Branch to the skip point if the condition is not met
+	skip = a.newLabel();
+	switch (cond)
+	{
+		case uml::COND_U:
+			a.tbz(FLAGS_REG, FLAG_BIT_U, skip);
+			break;
+		case uml::COND_NU:
+			a.tbnz(FLAGS_REG, FLAG_BIT_U, skip);
+			break;
+		case uml::COND_C:
+		case uml::COND_NC:
+			switch (m_carry_state)
+			{
+				case carry_state::CANONICAL:
+					a.b(ARM_CONDITION(cond), skip);
+					break;
+				case carry_state::LOGICAL:
+					a.b(ARM_NOT_CONDITION(cond), skip);
+					break;
+				default:
+					a.emit((cond == uml::COND_C) ? a64::Inst::kIdTbz : a64::Inst::kIdTbnz, FLAGS_REG, FLAG_BIT_C, skip);
+			}
+			break;
+		case uml::COND_A:
+		case uml::COND_BE:
+			load_carry(a, true);
+			[[fallthrough]];
+		default:
+			a.b(ARM_NOT_CONDITION(cond), skip);
+	}
+}
+
 void drcbe_arm64::emit_memaccess_setup(asmjit::a64::Assembler &a, const be_parameter &addrp, const memory_accessors &accessors, const address_space::specific_access_info::side &side) const
 {
 	auto const addrreg = (accessors.no_mask || accessors.mask_simple) ? REG_PARAM2 : a64::x6;
@@ -1255,8 +1294,10 @@ void drcbe_arm64::call_arm_addr(a64::Assembler &a, const void *offs) const
 	}
 }
 
-void drcbe_arm64::store_carry(a64::Assembler &a, bool inverted) const
+void drcbe_arm64::store_carry(a64::Assembler &a, bool inverted)
 {
+	m_carry_state = inverted ? carry_state::LOGICAL : carry_state::CANONICAL;
+
 	if (inverted)
 		a.cset(SCRATCH_REG1, a64::CondCode::kCC);
 	else
@@ -1265,20 +1306,28 @@ void drcbe_arm64::store_carry(a64::Assembler &a, bool inverted) const
 	store_carry_reg(a, SCRATCH_REG1);
 }
 
-void drcbe_arm64::load_carry(a64::Assembler &a, bool inverted) const
+void drcbe_arm64::load_carry(a64::Assembler &a, bool inverted)
 {
-	a.mrs(SCRATCH_REG1, a64::Predicate::SysReg::kNZCV);
-	a.bfi(SCRATCH_REG1, FLAGS_REG, 29, 1);
+	const carry_state desired = inverted ? carry_state::LOGICAL : carry_state::CANONICAL;
+	if (desired != m_carry_state)
+	{
+		m_carry_state = desired;
 
-	if (inverted)
-		a.eor(SCRATCH_REG1, SCRATCH_REG1, 1 << 29);
+		a.mrs(SCRATCH_REG1, a64::Predicate::SysReg::kNZCV);
+		a.bfi(SCRATCH_REG1, FLAGS_REG, 29, 1);
 
-	a.msr(a64::Predicate::SysReg::kNZCV, SCRATCH_REG1);
+		if (inverted)
+			a.eor(SCRATCH_REG1, SCRATCH_REG1, 1 << 29);
+
+		a.msr(a64::Predicate::SysReg::kNZCV, SCRATCH_REG1);
+	}
 }
 
-void drcbe_arm64::set_flags(asmjit::a64::Assembler &a) const
+void drcbe_arm64::set_flags(asmjit::a64::Assembler &a)
 {
 	// Set native condition codes after loading flags register
+	m_carry_state = carry_state::POISON; // TODO: take a bet they'll try a conditional branch and set the C flag?
+
 	a.mrs(TEMP_REG1, a64::Predicate::SysReg::kNZCV);
 
 	a.and_(TEMP_REG2, FLAGS_REG, 0b1100); // zero + sign
@@ -1292,8 +1341,10 @@ void drcbe_arm64::set_flags(asmjit::a64::Assembler &a) const
 	a.and_(FLAGS_REG, FLAGS_REG, TEMP_REG2);
 }
 
-void drcbe_arm64::calculate_carry_shift_left(a64::Assembler &a, const a64::Gp &reg, const a64::Gp &shift, int maxBits) const
+void drcbe_arm64::calculate_carry_shift_left(a64::Assembler &a, const a64::Gp &reg, const a64::Gp &shift, int maxBits)
 {
+	m_carry_state = carry_state::POISON;
+
 	Label calc = a.newLabel();
 	Label end = a.newLabel();
 
@@ -1313,8 +1364,10 @@ void drcbe_arm64::calculate_carry_shift_left(a64::Assembler &a, const a64::Gp &r
 	a.bind(end);
 }
 
-void drcbe_arm64::calculate_carry_shift_left_imm(a64::Assembler &a, const a64::Gp &reg, const int shift, int maxBits) const
+void drcbe_arm64::calculate_carry_shift_left_imm(a64::Assembler &a, const a64::Gp &reg, const int shift, int maxBits)
 {
+	m_carry_state = carry_state::POISON;
+
 	if (shift == 0)
 	{
 		store_carry_reg(a, a64::xzr);
@@ -1328,8 +1381,10 @@ void drcbe_arm64::calculate_carry_shift_left_imm(a64::Assembler &a, const a64::G
 	store_carry_reg(a, scratch);
 }
 
-void drcbe_arm64::calculate_carry_shift_right(a64::Assembler &a, const a64::Gp &reg, const a64::Gp &shift) const
+void drcbe_arm64::calculate_carry_shift_right(a64::Assembler &a, const a64::Gp &reg, const a64::Gp &shift)
 {
+	m_carry_state = carry_state::POISON;
+
 	Label calc = a.newLabel();
 	Label end = a.newLabel();
 
@@ -1348,8 +1403,10 @@ void drcbe_arm64::calculate_carry_shift_right(a64::Assembler &a, const a64::Gp &
 	a.bind(end);
 }
 
-void drcbe_arm64::calculate_carry_shift_right_imm(a64::Assembler &a, const a64::Gp &reg, const int shift) const
+void drcbe_arm64::calculate_carry_shift_right_imm(a64::Assembler &a, const a64::Gp &reg, const int shift)
 {
+	m_carry_state = carry_state::POISON;
+
 	if (shift == 0)
 	{
 		store_carry_reg(a, a64::xzr);
@@ -1368,6 +1425,7 @@ drcbe_arm64::drcbe_arm64(drcuml_state &drcuml, device_t &device, drc_cache &cach
 	, m_hash(cache, modes, addrbits, ignorebits)
 	, m_map(cache, 0xaaaaaaaa5555)
 	, m_log_asmjit(nullptr)
+	, m_carry_state(carry_state::POISON)
 	, m_entry(nullptr)
 	, m_exit(nullptr)
 	, m_nocode(nullptr)
@@ -1503,8 +1561,9 @@ void drcbe_arm64::reset()
 
 	// reset our hash tables
 	m_hash.reset();
-
 	m_hash.set_default_codeptr(m_nocode);
+
+	m_carry_state = carry_state::POISON;
 }
 
 int drcbe_arm64::execute(code_handle &entry)
@@ -1526,6 +1585,7 @@ void drcbe_arm64::generate(drcuml_block &block, const instruction *instlist, uin
 	// tell all of our utility objects that a block is beginning
 	m_hash.block_begin(block, instlist, numinst);
 	m_map.block_begin(block);
+	m_carry_state = carry_state::POISON;
 
 	// compute the base by aligning the cache top to a cache line
 	auto [err, linesize] = osd_get_cache_line_size();
@@ -1618,6 +1678,8 @@ void drcbe_arm64::op_handle(a64::Assembler &a, const uml::instruction &inst)
 	assert(inst.numparams() == 1);
 	assert(inst.param(0).is_code_handle());
 
+	m_carry_state = carry_state::POISON;
+
 	// make a label for documentation
 	Label handle = a.newNamedLabel(inst.param(0).handle().string());
 	a.bind(handle);
@@ -1642,6 +1704,8 @@ void drcbe_arm64::op_hash(a64::Assembler &a, const uml::instruction &inst)
 	assert(inst.param(0).is_immediate());
 	assert(inst.param(1).is_immediate());
 
+	m_carry_state = carry_state::POISON;
+
 	const uint64_t mode = inst.param(0).immediate();
 	const uint64_t pc = inst.param(1).immediate();
 
@@ -1654,6 +1718,8 @@ void drcbe_arm64::op_label(a64::Assembler &a, const uml::instruction &inst)
 	assert_no_flags(inst);
 	assert(inst.numparams() == 1);
 	assert(inst.param(0).is_code_label());
+
+	m_carry_state = carry_state::POISON;
 
 	std::string labelName = util::string_format("PC$%x", inst.param(0).label());
 	Label label = a.labelByName(labelName.c_str());
@@ -1696,6 +1762,8 @@ void drcbe_arm64::op_break(a64::Assembler &a, const uml::instruction &inst)
 	assert_no_condition(inst);
 	assert_no_flags(inst);
 
+	m_carry_state = carry_state::POISON;
+
 	static const char *const message = "break from drc";
 	get_imm_relative(a, REG_PARAM1, (uintptr_t)message);
 	call_arm_addr(a, (const void *)&osd_break_into_debugger);
@@ -1709,6 +1777,8 @@ void drcbe_arm64::op_debug(a64::Assembler &a, const uml::instruction &inst)
 
 	if (m_device.machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
+		m_carry_state = carry_state::POISON;
+
 		const a64::Gp temp = TEMP_REG1.w();
 
 		be_parameter pcp(*this, inst.param(0), PTYPE_MRI);
@@ -1735,23 +1805,14 @@ void drcbe_arm64::op_exit(a64::Assembler &a, const uml::instruction &inst)
 
 	be_parameter retp(*this, inst.param(0), PTYPE_MRI);
 
-	mov_reg_param(a, 4, REG_PARAM1, retp);
+	Label skip;
+	emit_skip(a, inst.condition(), skip);
 
-	if (inst.condition() == uml::COND_ALWAYS)
-	{
-		a.b(m_exit);
-	}
-	else if (inst.condition() == uml::COND_U || inst.condition() == uml::COND_NU)
-	{
-		Label skip = a.newLabel();
-		check_unordered_condition(a, inst.condition(), skip, false);
-		a.b(m_exit);
+	mov_reg_param(a, 4, REG_PARAM1, retp);
+	a.b(m_exit);
+
+	if (inst.condition() != uml::COND_ALWAYS)
 		a.bind(skip);
-	}
-	else
-	{
-		a.b(ARM_CONDITION(inst.condition()), m_exit);
-	}
 }
 
 void drcbe_arm64::op_hashjmp(a64::Assembler &a, const uml::instruction &inst)
@@ -1859,6 +1920,8 @@ void drcbe_arm64::op_hashjmp(a64::Assembler &a, const uml::instruction &inst)
 		emit_ldr_mem(a, SCRATCH_REG1, targetptr);
 		a.blr(SCRATCH_REG1);
 	}
+
+	m_carry_state = carry_state::POISON;
 }
 
 void drcbe_arm64::op_jmp(a64::Assembler &a, const uml::instruction &inst)
@@ -1878,17 +1941,60 @@ void drcbe_arm64::op_jmp(a64::Assembler &a, const uml::instruction &inst)
 	if (inst.condition() == uml::COND_ALWAYS)
 	{
 		a.b(jmptarget);
+		return;
 	}
-	else if (inst.condition() == uml::COND_U || inst.condition() == uml::COND_NU)
-	{
-		check_unordered_condition(a, inst.condition(), jmptarget, false);
-	}
-	else
-	{
-		if (inst.condition() == COND_C || inst.condition() == COND_NC || inst.condition() == COND_A || inst.condition() == COND_BE)
-			load_carry(a, true);
 
-		a.b(ARM_CONDITION(inst.condition()), jmptarget);
+	const bool bound = a.code()->isLabelBound(jmptarget);
+	const uint64_t targetoffs = a.code()->baseAddress() + a.code()->labelOffset(jmptarget);
+	const uint64_t codeoffs = a.code()->baseAddress() + a.offset();
+	const bool tbnzrange = bound && is_valid_immediate_signed(int64_t(targetoffs) - codeoffs, 14 + 2);
+
+	switch (inst.condition())
+	{
+		case uml::COND_U:
+		case uml::COND_NU:
+			if (tbnzrange)
+			{
+				const a64::Inst::Id opcode = (inst.condition() == uml::COND_U) ? a64::Inst::kIdTbnz : a64::Inst::kIdTbz;
+				a.emit(opcode, FLAGS_REG, FLAG_BIT_U, jmptarget);
+			}
+			else
+			{
+				const a64::Inst::Id opcode = (inst.condition() == uml::COND_U) ? a64::Inst::kIdCbnz : a64::Inst::kIdCbz;
+				get_unordered(a, SCRATCH_REG1);
+				a.emit(opcode, SCRATCH_REG1, jmptarget);
+			}
+			break;
+		case uml::COND_C:
+		case uml::COND_NC:
+			switch (m_carry_state)
+			{
+				case carry_state::CANONICAL:
+					a.b(ARM_NOT_CONDITION(inst.condition()), jmptarget);
+					break;
+				case carry_state::LOGICAL:
+					a.b(ARM_CONDITION(inst.condition()), jmptarget);
+					break;
+				default:
+					if (tbnzrange)
+					{
+						const a64::Inst::Id opcode = (inst.condition() == uml::COND_C) ? a64::Inst::kIdTbnz : a64::Inst::kIdTbz;
+						a.emit(opcode, FLAGS_REG, FLAG_BIT_C, jmptarget);
+					}
+					else
+					{
+						const a64::Inst::Id opcode = (inst.condition() == uml::COND_C) ? a64::Inst::kIdCbnz : a64::Inst::kIdCbz;
+						get_carry(a, SCRATCH_REG1);
+						a.emit(opcode, SCRATCH_REG1, jmptarget);
+					}
+			}
+			break;
+		case uml::COND_A:
+		case uml::COND_BE:
+			load_carry(a, true);
+			[[fallthrough]];
+		default:
+			a.b(ARM_CONDITION(inst.condition()), jmptarget);
 	}
 }
 
@@ -1903,22 +2009,7 @@ void drcbe_arm64::op_exh(a64::Assembler &a, const uml::instruction &inst)
 
 	// perform the exception processing
 	Label no_exception;
-	if (inst.condition() != uml::COND_ALWAYS)
-	{
-		no_exception = a.newLabel();
-
-		if (inst.condition() == uml::COND_U || inst.condition() == uml::COND_NU)
-		{
-			check_unordered_condition(a, inst.condition(), no_exception, true);
-		}
-		else
-		{
-			if (inst.condition() == COND_C || inst.condition() == COND_NC || inst.condition() == COND_A || inst.condition() == COND_BE)
-				load_carry(a, true);
-
-			a.b(ARM_NOT_CONDITION(inst.condition()), no_exception);
-		}
-	}
+	emit_skip(a, inst.condition(), no_exception);
 
 	mov_mem_param(a, 4, &m_state.exp, exp);
 
@@ -1935,6 +2026,8 @@ void drcbe_arm64::op_exh(a64::Assembler &a, const uml::instruction &inst)
 
 	if (inst.condition() != uml::COND_ALWAYS)
 		a.bind(no_exception);
+
+	m_carry_state = carry_state::POISON;
 }
 
 void drcbe_arm64::op_callh(a64::Assembler &a, const uml::instruction &inst)
@@ -1947,22 +2040,7 @@ void drcbe_arm64::op_callh(a64::Assembler &a, const uml::instruction &inst)
 	assert(handp.is_code_handle());
 
 	Label skip;
-	if (inst.condition() != uml::COND_ALWAYS)
-	{
-		skip = a.newLabel();
-
-		if (inst.condition() == uml::COND_U || inst.condition() == uml::COND_NU)
-		{
-			check_unordered_condition(a, inst.condition(), skip, true);
-		}
-		else
-		{
-			if (inst.condition() == COND_C || inst.condition() == COND_NC || inst.condition() == COND_A || inst.condition() == COND_BE)
-				load_carry(a, true);
-
-			a.b(ARM_NOT_CONDITION(inst.condition()), skip);
-		}
-	}
+	emit_skip(a, inst.condition(), skip);
 
 	drccodeptr *const targetptr = handp.handle().codeptr_addr();
 	if (*targetptr != nullptr)
@@ -1977,6 +2055,8 @@ void drcbe_arm64::op_callh(a64::Assembler &a, const uml::instruction &inst)
 
 	if (inst.condition() != uml::COND_ALWAYS)
 		a.bind(skip);
+
+	m_carry_state = carry_state::POISON;
 }
 
 void drcbe_arm64::op_ret(a64::Assembler &a, const uml::instruction &inst)
@@ -1987,22 +2067,7 @@ void drcbe_arm64::op_ret(a64::Assembler &a, const uml::instruction &inst)
 	assert(inst.numparams() == 0);
 
 	Label skip;
-	if (inst.condition() != uml::COND_ALWAYS)
-	{
-		skip = a.newLabel();
-
-		if (inst.condition() == uml::COND_U || inst.condition() == uml::COND_NU)
-		{
-			check_unordered_condition(a, inst.condition(), skip, true);
-		}
-		else
-		{
-			if (inst.condition() == COND_C || inst.condition() == COND_NC || inst.condition() == COND_A || inst.condition() == COND_BE)
-				load_carry(a, true);
-
-			a.b(ARM_NOT_CONDITION(inst.condition()), skip);
-		}
-	}
+	emit_skip(a, inst.condition(), skip);
 
 	a.ldp(a64::x29, a64::x30, arm::Mem(a64::sp).post(16));
 	a.ret(a64::x30);
@@ -2022,22 +2087,7 @@ void drcbe_arm64::op_callc(a64::Assembler &a, const uml::instruction &inst)
 	be_parameter paramp(*this, inst.param(1), PTYPE_M);
 
 	Label skip;
-	if (inst.condition() != uml::COND_ALWAYS)
-	{
-		skip = a.newLabel();
-
-		if (inst.condition() == uml::COND_U || inst.condition() == uml::COND_NU)
-		{
-			check_unordered_condition(a, inst.condition(), skip, true);
-		}
-		else
-		{
-			if (inst.condition() == COND_C || inst.condition() == COND_NC || inst.condition() == COND_A || inst.condition() == COND_BE)
-				load_carry(a, true);
-
-			a.b(ARM_NOT_CONDITION(inst.condition()), skip);
-		}
-	}
+	emit_skip(a, inst.condition(), skip);
 
 	emit_str_mem(a, FLAGS_REG.w(), &m_near.emulated_flags);
 
@@ -2049,6 +2099,8 @@ void drcbe_arm64::op_callc(a64::Assembler &a, const uml::instruction &inst)
 
 	if (inst.condition() != uml::COND_ALWAYS)
 		a.bind(skip);
+
+	m_carry_state = carry_state::POISON;
 }
 
 void drcbe_arm64::op_recover(a64::Assembler &a, const uml::instruction &inst)
@@ -2056,6 +2108,8 @@ void drcbe_arm64::op_recover(a64::Assembler &a, const uml::instruction &inst)
 	assert(inst.size() == 4);
 	assert_no_condition(inst);
 	assert_no_flags(inst);
+
+	m_carry_state = carry_state::POISON;
 
 	be_parameter dstp(*this, inst.param(0), PTYPE_MR);
 
@@ -2523,6 +2577,8 @@ void drcbe_arm64::op_read(a64::Assembler &a, const uml::instruction &inst)
 	assert_no_condition(inst);
 	assert_no_flags(inst);
 
+	m_carry_state = carry_state::POISON;
+
 	be_parameter dstp(*this, inst.param(0), PTYPE_MR);
 	be_parameter addrp(*this, inst.param(1), PTYPE_MRI);
 	const parameter &spacesizep = inst.param(2);
@@ -2579,6 +2635,8 @@ void drcbe_arm64::op_readm(a64::Assembler &a, const uml::instruction &inst)
 	assert(inst.size() == 4 || inst.size() == 8);
 	assert_no_condition(inst);
 	assert_no_flags(inst);
+
+	m_carry_state = carry_state::POISON;
 
 	be_parameter dstp(*this, inst.param(0), PTYPE_MR);
 	be_parameter addrp(*this, inst.param(1), PTYPE_MRI);
@@ -2639,6 +2697,8 @@ void drcbe_arm64::op_write(a64::Assembler &a, const uml::instruction &inst)
 	assert(inst.size() == 4 || inst.size() == 8);
 	assert_no_condition(inst);
 	assert_no_flags(inst);
+
+	m_carry_state = carry_state::POISON;
 
 	be_parameter addrp(*this, inst.param(0), PTYPE_MRI);
 	be_parameter srcp(*this, inst.param(1), PTYPE_MRI);
@@ -2702,6 +2762,8 @@ void drcbe_arm64::op_writem(a64::Assembler &a, const uml::instruction &inst)
 	assert(inst.size() == 4 || inst.size() == 8);
 	assert_no_condition(inst);
 	assert_no_flags(inst);
+
+	m_carry_state = carry_state::POISON;
 
 	be_parameter addrp(*this, inst.param(0), PTYPE_MRI);
 	be_parameter srcp(*this, inst.param(1), PTYPE_MRI);
@@ -2769,6 +2831,8 @@ void drcbe_arm64::op_carry(a64::Assembler &a, const uml::instruction &inst)
 	assert_no_condition(inst);
 	assert_flags(inst, FLAG_C);
 
+	m_carry_state = carry_state::POISON;
+
 	be_parameter srcp(*this, inst.param(0), PTYPE_MRI);
 	be_parameter bitp(*this, inst.param(1), PTYPE_MRI);
 
@@ -2831,18 +2895,37 @@ void drcbe_arm64::op_set(a64::Assembler &a, const uml::instruction &inst)
 
 	const a64::Gp dst = dstp.select_register(TEMP_REG1, inst.size());
 
-	if (inst.condition() == COND_C || inst.condition() == COND_NC || inst.condition() == COND_A || inst.condition() == COND_BE)
-		load_carry(a, true);
-
-	if (inst.condition() == uml::COND_U || inst.condition() == uml::COND_NU)
+	switch (inst.condition())
 	{
-		get_unordered(a, dst);
-
-		if (inst.condition() == uml::COND_NU)
-			a.eor(dst, dst, 1);
+		case uml::COND_U:
+		case uml::COND_NU:
+			get_unordered(a, dst);
+			if (inst.condition() == uml::COND_NU)
+				a.eor(dst, dst, 1);
+			break;
+		case uml::COND_C:
+		case uml::COND_NC:
+			switch (m_carry_state)
+			{
+				case carry_state::CANONICAL:
+					a.cset(dst, ARM_NOT_CONDITION(inst.condition()));
+					break;
+				case carry_state::LOGICAL:
+					a.cset(dst, ARM_CONDITION(inst.condition()));
+					break;
+				default:
+					get_carry(a, dst);
+					if (inst.condition() == uml::COND_NC)
+						a.eor(dst, dst, 1);
+			}
+			break;
+		case uml::COND_A:
+		case uml::COND_BE:
+			load_carry(a, true);
+			[[fallthrough]];
+		default:
+			a.cset(dst, ARM_CONDITION(inst.condition()));
 	}
-	else
-		a.cset(dst, ARM_CONDITION(inst.condition()));
 
 	mov_param_reg(a, inst.size(), dstp, dst);
 }
@@ -2856,27 +2939,92 @@ void drcbe_arm64::op_mov(a64::Assembler &a, const uml::instruction &inst)
 	be_parameter dstp(*this, inst.param(0), PTYPE_MR);
 	be_parameter srcp(*this, inst.param(1), PTYPE_MRI);
 
-	// add a conditional branch unless a conditional move is possible
-	// TODO: optimise to use csel if the source and destination are both kept in host registers
-	Label skip;
-
-	if (inst.condition() != uml::COND_ALWAYS)
+	// decide whether a conditional select will be efficient
+	bool usesel = dstp.is_int_register() && (srcp.is_int_register() || (srcp.is_immediate() && is_simple_mov_immediate(srcp.immediate(), inst.size())));
+	switch (inst.condition())
 	{
-		skip = a.newLabel();
-
-		if (inst.condition() == COND_C || inst.condition() == COND_NC || inst.condition() == COND_A || inst.condition() == COND_BE)
-			load_carry(a, true);
-
-		if (inst.condition() == uml::COND_U || inst.condition() == uml::COND_NU)
-			check_unordered_condition(a, inst.condition(), skip, true);
-		else
-			a.b(ARM_NOT_CONDITION(inst.condition()), skip);
+		case uml::COND_ALWAYS:
+		case uml::COND_U:
+		case uml::COND_NU:
+			usesel = false;
+			break;
+		case uml::COND_C:
+		case uml::COND_NC:
+			switch (m_carry_state)
+			{
+				case carry_state::CANONICAL:
+				case carry_state::LOGICAL:
+					break;
+				default:
+					usesel = false;
+			}
+			break;
+		default:
+			break;
 	}
 
-	mov_param_param(a, inst.size(), dstp, srcp);
+	if (usesel)
+	{
+		const bool srczero = srcp.is_immediate_value(0);
+		const bool srcone = srcp.is_immediate_value(1);
+		const bool srcnegone = srcp.is_immediate_value(util::make_bitmask<uint64_t>(inst.size() * 8));
+		const bool srcspecial = srczero || srcone || srcnegone;
 
-	if (inst.condition() != uml::COND_ALWAYS)
-		a.bind(skip);
+		const a64::Gp dst = dstp.select_register(TEMP_REG1, inst.size());
+		const a64::Gp src = srcspecial ? select_register(a64::xzr, inst.size()) : srcp.select_register(TEMP_REG2, inst.size());
+
+		mov_reg_param(a, inst.size(), dst, dstp);
+		if (!srcspecial)
+			mov_reg_param(a, inst.size(), src, srcp);
+
+		switch (inst.condition())
+		{
+			case uml::COND_C:
+			case uml::COND_NC:
+				if (m_carry_state == carry_state::CANONICAL)
+				{
+					if (srcone)
+						a.csinc(dst, dst, src, ARM_CONDITION(inst.condition()));
+					else if (srcnegone)
+						a.csinv(dst, dst, src, ARM_CONDITION(inst.condition()));
+					else
+						a.csel(dst, src, dst, ARM_NOT_CONDITION(inst.condition()));
+				}
+				else
+				{
+					if (srcone)
+						a.csinc(dst, dst, src, ARM_NOT_CONDITION(inst.condition()));
+					else if (srcnegone)
+						a.csinv(dst, dst, src, ARM_NOT_CONDITION(inst.condition()));
+					else
+						a.csel(dst, src, dst, ARM_CONDITION(inst.condition()));
+				}
+				break;
+			case uml::COND_A:
+			case uml::COND_BE:
+				load_carry(a, true);
+				[[fallthrough]];
+			default:
+				if (srcone)
+					a.csinc(dst, dst, src, ARM_NOT_CONDITION(inst.condition()));
+				else if (srcnegone)
+					a.csinv(dst, dst, src, ARM_NOT_CONDITION(inst.condition()));
+				else
+					a.csel(dst, src, dst, ARM_CONDITION(inst.condition()));
+		}
+
+		mov_param_reg(a, inst.size(), dstp, dst);
+	}
+	else
+	{
+		Label skip;
+		emit_skip(a, inst.condition(), skip);
+
+		mov_param_param(a, inst.size(), dstp, srcp);
+
+		if (inst.condition() != uml::COND_ALWAYS)
+			a.bind(skip);
+	}
 }
 
 void drcbe_arm64::op_sext(a64::Assembler &a, const uml::instruction &inst)
@@ -2927,7 +3075,10 @@ void drcbe_arm64::op_sext(a64::Assembler &a, const uml::instruction &inst)
 	}
 
 	if (inst.flags())
+	{
 		a.tst(dstreg, dstreg);
+		m_carry_state = carry_state::POISON;
+	}
 }
 
 void drcbe_arm64::op_roland(a64::Assembler &a, const uml::instruction &inst)
@@ -2954,7 +3105,10 @@ void drcbe_arm64::op_roland(a64::Assembler &a, const uml::instruction &inst)
 		mov_param_reg(a, inst.size(), dstp, zero);
 
 		if (inst.flags())
+		{
 			a.tst(zero, zero);
+			m_carry_state = carry_state::POISON;
+		}
 
 		return;
 	}
@@ -3070,6 +3224,8 @@ void drcbe_arm64::op_roland(a64::Assembler &a, const uml::instruction &inst)
 	{
 		if (optimized)
 			a.tst(output, output);
+
+		m_carry_state = carry_state::POISON;
 	}
 }
 
@@ -3095,6 +3251,7 @@ void drcbe_arm64::op_rolins(a64::Assembler &a, const uml::instruction &inst)
 			dst = dstp.select_register(TEMP_REG2, inst.size());
 			mov_reg_param(a, inst.size(), dst, dstp);
 			a.tst(dst, dst);
+			m_carry_state = carry_state::POISON;
 		}
 
 		return;
@@ -3274,7 +3431,10 @@ void drcbe_arm64::op_rolins(a64::Assembler &a, const uml::instruction &inst)
 	mov_param_reg(a, inst.size(), dstp, dst);
 
 	if (inst.flags())
+	{
 		a.tst(dst, dst);
+		m_carry_state = carry_state::POISON;
+	}
 }
 
 template <bool CarryIn> void drcbe_arm64::op_add(a64::Assembler &a, const uml::instruction &inst)
@@ -3292,8 +3452,6 @@ template <bool CarryIn> void drcbe_arm64::op_add(a64::Assembler &a, const uml::i
 	be_parameter src2p(*this, inst.param(2), PTYPE_MRI);
 
 	const a64::Gp zero = select_register(a64::xzr, inst.size());
-	const a64::Gp src1 = src1p.select_register(TEMP_REG1, inst.size());
-	const a64::Gp src2 = src2p.select_register(TEMP_REG2, inst.size());
 	const a64::Gp output = dstp.select_register(TEMP_REG3, inst.size());
 
 	if (CarryIn)
@@ -3316,19 +3474,22 @@ template <bool CarryIn> void drcbe_arm64::op_add(a64::Assembler &a, const uml::i
 		}
 		else if (!CarryIn && src2p.is_immediate() && is_valid_immediate_addsub(src2p.immediate()))
 		{
-			a.emit(opcode, output, zero, src2p.immediate());
+			a.mov(output, zero);
+			a.emit(opcode, output, output, src2p.immediate());
 			mov_param_reg(a, inst.size(), dstp, output);
 		}
 		else if (!CarryIn && src2p.is_immediate() && is_valid_immediate(src2p.immediate(), 24))
 		{
-			a.emit(opcode, output, zero, src2p.immediate() & (util::make_bitmask<uint64_t>(12) << 12));
-			a.emit(opcode, output, output, src2p.immediate() & util::make_bitmask<uint64_t>(12));
+			a.mov(output, src2p.immediate() & util::make_bitmask<uint64_t>(12));
+			a.emit(opcode, output, output, src2p.immediate() & (util::make_bitmask<uint64_t>(12) << 12));
 			mov_param_reg(a, inst.size(), dstp, output);
 		}
 		else
 		{
-			mov_reg_param(a, inst.size(), src2, src2p);
-			a.emit(opcode, output, src2, zero);
+			const a64::Gp src = src2p.select_register(output, inst.size());
+
+			mov_reg_param(a, inst.size(), src, src2p);
+			a.emit(opcode, output, src, zero);
 			mov_param_reg(a, inst.size(), dstp, output);
 		}
 	}
@@ -3336,52 +3497,64 @@ template <bool CarryIn> void drcbe_arm64::op_add(a64::Assembler &a, const uml::i
 	{
 		if (!CarryIn && src1p.is_immediate() && is_valid_immediate_addsub(src1p.immediate()))
 		{
-			a.emit(opcode, output, zero, src1p.immediate());
+			a.mov(output, zero);
+			a.emit(opcode, output, output, src1p.immediate());
 			mov_param_reg(a, inst.size(), dstp, output);
 		}
 		else if (!CarryIn && src1p.is_immediate() && is_valid_immediate(src1p.immediate(), 24))
 		{
-			a.emit(opcode, output, zero, src1p.immediate() & (util::make_bitmask<uint64_t>(12) << 12));
-			a.emit(opcode, output, output, src1p.immediate() & util::make_bitmask<uint64_t>(12));
+			a.mov(output, src1p.immediate() & util::make_bitmask<uint64_t>(12));
+			a.emit(opcode, output, output, src1p.immediate() & (util::make_bitmask<uint64_t>(12) << 12));
 			mov_param_reg(a, inst.size(), dstp, output);
 		}
 		else
 		{
-			mov_reg_param(a, inst.size(), src1, src1p);
-			a.emit(opcode, output, src1, zero);
+			const a64::Gp src = src1p.select_register(output, inst.size());
+
+			mov_reg_param(a, inst.size(), src, src1p);
+			a.emit(opcode, output, src, zero);
 			mov_param_reg(a, inst.size(), dstp, output);
 		}
 	}
 	else if (!CarryIn && src1p.is_immediate() && is_valid_immediate_addsub(src1p.immediate()))
 	{
-		mov_reg_param(a, inst.size(), src2, src2p);
-		a.emit(opcode, output, src2, src1p.immediate());
+		const a64::Gp src = src2p.select_register(output, inst.size());
+
+		mov_reg_param(a, inst.size(), src, src2p);
+		a.emit(opcode, output, src, src1p.immediate());
 		mov_param_reg(a, inst.size(), dstp, output);
 	}
 	else if (!CarryIn && src2p.is_immediate() && is_valid_immediate_addsub(src2p.immediate()))
 	{
-		mov_reg_param(a, inst.size(), src1, src1p);
-		a.emit(opcode, output, src1, src2p.immediate());
+		const a64::Gp src = src1p.select_register(output, inst.size());
+
+		mov_reg_param(a, inst.size(), src, src1p);
+		a.emit(opcode, output, src, src2p.immediate());
 		mov_param_reg(a, inst.size(), dstp, output);
 	}
 	else if (!CarryIn && !inst.flags() && src1p.is_immediate() && is_valid_immediate(src1p.immediate(), 24))
 	{
-		// will still alter flags, but carry and overflow values will be incorrect for this path
-		mov_reg_param(a, inst.size(), src2, src2p);
-		a.emit(opcode, output, src2, src1p.immediate() & (util::make_bitmask<uint64_t>(12) << 12));
-		a.emit(opcode, output, output, src1p.immediate() & util::make_bitmask<uint64_t>(12));
+		const a64::Gp src = src2p.select_register(output, inst.size());
+
+		mov_reg_param(a, inst.size(), src, src2p);
+		a.emit(opcode, output, src, src1p.immediate() & util::make_bitmask<uint64_t>(12));
+		a.emit(opcode, output, output, src1p.immediate() & (util::make_bitmask<uint64_t>(12) << 12));
 		mov_param_reg(a, inst.size(), dstp, output);
 	}
 	else if (!CarryIn && !inst.flags() && src2p.is_immediate() && is_valid_immediate(src2p.immediate(), 24))
 	{
-		// will still alter flags, but carry and overflow values will be incorrect for this path
-		mov_reg_param(a, inst.size(), src1, src1p);
-		a.emit(opcode, output, src1, src2p.immediate() & (util::make_bitmask<uint64_t>(12) << 12));
-		a.emit(opcode, output, output, src2p.immediate() & util::make_bitmask<uint64_t>(12));
+		const a64::Gp src = src1p.select_register(output, inst.size());
+
+		mov_reg_param(a, inst.size(), src, src1p);
+		a.emit(opcode, output, src, src2p.immediate() & util::make_bitmask<uint64_t>(12));
+		a.emit(opcode, output, output, src2p.immediate() & (util::make_bitmask<uint64_t>(12) << 12));
 		mov_param_reg(a, inst.size(), dstp, output);
 	}
 	else
 	{
+		const a64::Gp src1 = src1p.select_register(TEMP_REG1, inst.size());
+		const a64::Gp src2 = src2p.select_register(TEMP_REG2, inst.size());
+
 		mov_reg_param(a, inst.size(), src1, src1p);
 		mov_reg_param(a, inst.size(), src2, src2p);
 		a.emit(opcode, output, src1, src2);
@@ -3410,7 +3583,6 @@ template <bool CarryIn> void drcbe_arm64::op_sub(a64::Assembler &a, const uml::i
 		load_carry(a, true);
 
 	const a64::Gp zero = select_register(a64::xzr, inst.size());
-	const a64::Gp src1 = src1p.select_register(TEMP_REG1, inst.size());
 	const a64::Gp output = dstp.select_register(TEMP_REG3, inst.size());
 
 	if (src2p.is_immediate_value(0))
@@ -3430,50 +3602,42 @@ template <bool CarryIn> void drcbe_arm64::op_sub(a64::Assembler &a, const uml::i
 		}
 		else
 		{
-			mov_reg_param(a, inst.size(), src1, src1p);
+			const a64::Gp src = src1p.select_register(output, inst.size());
+
+			mov_reg_param(a, inst.size(), src, src1p);
 			if (CarryIn)
 			{
-				a.emit(opcode, output, src1, zero);
+				a.emit(opcode, output, src, zero);
 				mov_param_reg(a, inst.size(), dstp, output);
 			}
 			else
 			{
-				mov_param_reg(a, inst.size(), dstp, src1);
-				a.emit(opcode, zero, src1, zero);
+				mov_param_reg(a, inst.size(), dstp, src);
+				a.emit(opcode, zero, src, zero);
 			}
 		}
 	}
 	else if (!CarryIn && src2p.is_immediate() && is_valid_immediate_addsub(src2p.immediate()))
 	{
-		if (src1p.is_immediate_value(0))
-		{
-			a.emit(opcode, output, zero, src2p.immediate());
-		}
-		else
-		{
-			mov_reg_param(a, inst.size(), src1, src1p);
-			a.emit(opcode, output, src1, src2p.immediate());
-		}
+		const a64::Gp src = src1p.select_register(output, inst.size());
+
+		mov_reg_param(a, inst.size(), src, src1p);
+		a.emit(opcode, output, src, src2p.immediate());
 		mov_param_reg(a, inst.size(), dstp, output);
 	}
 	else if (!CarryIn && (!inst.flags() || src1p.is_immediate_value(0)) && src2p.is_immediate() && is_valid_immediate(src2p.immediate(), 24))
 	{
-		if (src1p.is_immediate_value(0))
-		{
-			a.emit(opcode, output, zero, src2p.immediate() & (util::make_bitmask<uint64_t>(12) << 12));
-		}
-		else
-		{
-			// will still alter flags, but carry and overflow values will be incorrect for this path
-			mov_reg_param(a, inst.size(), src1, src1p);
-			a.emit(opcode, output, src1, src2p.immediate() & (util::make_bitmask<uint64_t>(12) << 12));
-		}
-		a.emit(opcode, output, output, src2p.immediate() & util::make_bitmask<uint64_t>(12));
+		const a64::Gp src = src1p.select_register(output, inst.size());
+
+		mov_reg_param(a, inst.size(), src, src1p);
+		a.emit(opcode, output, src, src2p.immediate() & util::make_bitmask<uint64_t>(12));
+		a.emit(opcode, output, output, src2p.immediate() & (util::make_bitmask<uint64_t>(12) << 12));
 		mov_param_reg(a, inst.size(), dstp, output);
 	}
 	else
 	{
-		const a64::Gp src2 = select_register(TEMP_REG2, inst.size());
+		const a64::Gp src1 = src1p.select_register(TEMP_REG1, inst.size());
+		const a64::Gp src2 = src2p.select_register(TEMP_REG2, inst.size());
 
 		mov_reg_param(a, inst.size(), src1, src1p);
 		mov_reg_param(a, inst.size(), src2, src2p);
@@ -3578,6 +3742,8 @@ void drcbe_arm64::op_mulu(a64::Assembler &a, const uml::instruction &inst)
 		a.bfi(SCRATCH_REG1, TEMP_REG3, 31, 1); // sign flag
 
 		a.msr(a64::Predicate::SysReg::kNZCV, SCRATCH_REG1);
+
+		m_carry_state = carry_state::POISON;
 	}
 }
 
@@ -3636,6 +3802,8 @@ void drcbe_arm64::op_mululw(a64::Assembler &a, const uml::instruction &inst)
 		a.bfi(TEMP_REG1, SCRATCH_REG1, 31, 1); // sign flag
 
 		a.msr(a64::Predicate::SysReg::kNZCV, TEMP_REG1);
+
+		m_carry_state = carry_state::POISON;
 	}
 }
 
@@ -3711,6 +3879,8 @@ void drcbe_arm64::op_muls(a64::Assembler &a, const uml::instruction &inst)
 		a.bfi(SCRATCH_REG1, TEMP_REG1, 31, 1); // sign flag
 
 		a.msr(a64::Predicate::SysReg::kNZCV, SCRATCH_REG1);
+
+		m_carry_state = carry_state::POISON;
 	}
 }
 
@@ -3782,6 +3952,8 @@ void drcbe_arm64::op_mulslw(a64::Assembler &a, const uml::instruction &inst)
 		a.bfi(SCRATCH_REG1, TEMP_REG1, 31, 1); // sign flag
 
 		a.msr(a64::Predicate::SysReg::kNZCV, SCRATCH_REG1);
+
+		m_carry_state = carry_state::POISON;
 	}
 }
 
@@ -3837,6 +4009,7 @@ template <a64::Inst::Id Opcode> void drcbe_arm64::op_div(a64::Assembler &a, cons
 		a.mov(SCRATCH_REG1, 1 << 28); // set overflow flag
 		a.msr(a64::Predicate::SysReg::kNZCV, SCRATCH_REG1);
 	}
+	m_carry_state = carry_state::POISON;
 }
 
 void drcbe_arm64::op_and(a64::Assembler &a, const uml::instruction &inst)
@@ -3867,6 +4040,13 @@ void drcbe_arm64::op_and(a64::Assembler &a, const uml::instruction &inst)
 		if (inst.flags())
 			a.tst(dst, dst);
 	}
+	else if (src1p.is_immediate() && is_valid_immediate_mask(src1p.immediate(), inst.size()))
+	{
+		const a64::Gp src2 = src2p.select_register(TEMP_REG1, inst.size());
+		mov_reg_param(a, inst.size(), src2, src2p);
+
+		a.emit(opcode, dst, src2, src1p.immediate());
+	}
 	else if (src2p.is_immediate() && is_valid_immediate_mask(src2p.immediate(), inst.size()))
 	{
 		const a64::Gp src1 = src1p.select_register(TEMP_REG1, inst.size());
@@ -3874,12 +4054,19 @@ void drcbe_arm64::op_and(a64::Assembler &a, const uml::instruction &inst)
 
 		a.emit(opcode, dst, src1, src2p.immediate());
 	}
-	else if (!inst.flags() && (inst.size() == 8) && src2p.is_immediate() && is_valid_immediate_mask(src2p.immediate(), 4))
+	else if ((inst.size() == 8) && src1p.is_immediate() && is_valid_immediate_mask(src1p.immediate(), 4) && (!inst.flags() || !BIT(src1p.immediate(), 31)))
+	{
+		const a64::Gp src2 = src2p.select_register(TEMP_REG1, inst.size());
+		mov_reg_param(a, inst.size(), src2, src2p);
+
+		a.emit(opcode, dst.w(), src2.w(), src1p.immediate());
+	}
+	else if ((inst.size() == 8) && src2p.is_immediate() && is_valid_immediate_mask(src2p.immediate(), 4) && (!inst.flags() || !BIT(src2p.immediate(), 31)))
 	{
 		const a64::Gp src1 = src1p.select_register(TEMP_REG1, inst.size());
 		mov_reg_param(a, inst.size(), src1, src1p);
 
-		a.and_(dst.w(), src1.w(), src2p.immediate());
+		a.emit(opcode, dst.w(), src1.w(), src2p.immediate());
 	}
 	else
 	{
@@ -3892,6 +4079,9 @@ void drcbe_arm64::op_and(a64::Assembler &a, const uml::instruction &inst)
 	}
 
 	mov_param_reg(a, inst.size(), dstp, dst);
+
+	if (inst.flags())
+		m_carry_state = carry_state::POISON;
 }
 
 void drcbe_arm64::op_test(a64::Assembler &a, const uml::instruction &inst)
@@ -3938,6 +4128,8 @@ void drcbe_arm64::op_test(a64::Assembler &a, const uml::instruction &inst)
 		mov_reg_param(a, inst.size(), src2, src2p);
 		a.tst(src1, src2);
 	}
+
+	m_carry_state = carry_state::POISON;
 }
 
 void drcbe_arm64::op_or(a64::Assembler &a, const uml::instruction &inst)
@@ -3988,7 +4180,10 @@ void drcbe_arm64::op_or(a64::Assembler &a, const uml::instruction &inst)
 	mov_param_reg(a, inst.size(), dstp, dst);
 
 	if (inst.flags())
+	{
 		a.tst(dst, dst);
+		m_carry_state = carry_state::POISON;
+	}
 }
 
 void drcbe_arm64::op_xor(a64::Assembler &a, const uml::instruction &inst)
@@ -4034,7 +4229,10 @@ void drcbe_arm64::op_xor(a64::Assembler &a, const uml::instruction &inst)
 	mov_param_reg(a, inst.size(), dstp, dst);
 
 	if (inst.flags())
+	{
 		a.tst(dst, dst);
+		m_carry_state = carry_state::POISON;
+	}
 }
 
 void drcbe_arm64::op_lzcnt(a64::Assembler &a, const uml::instruction &inst)
@@ -4056,7 +4254,10 @@ void drcbe_arm64::op_lzcnt(a64::Assembler &a, const uml::instruction &inst)
 	mov_param_reg(a, inst.size(), dstp, dst);
 
 	if (inst.flags())
+	{
 		a.tst(dst, dst);
+		m_carry_state = carry_state::POISON;
+	}
 }
 
 void drcbe_arm64::op_tzcnt(a64::Assembler &a, const uml::instruction &inst)
@@ -4083,6 +4284,7 @@ void drcbe_arm64::op_tzcnt(a64::Assembler &a, const uml::instruction &inst)
 	{
 		a.eor(temp, dst, inst.size() * 8);
 		a.tst(temp, temp);
+		m_carry_state = carry_state::POISON;
 	}
 }
 
@@ -4108,7 +4310,10 @@ void drcbe_arm64::op_bswap(a64::Assembler &a, const uml::instruction &inst)
 	mov_param_reg(a, inst.size(), dstp, dst);
 
 	if (inst.flags())
+	{
 		a.tst(dst, dst);
+		m_carry_state = carry_state::POISON;
+	}
 }
 
 
@@ -4165,7 +4370,10 @@ template <a64::Inst::Id Opcode> void drcbe_arm64::op_shift(a64::Assembler &a, co
 	}
 
 	if (inst.flags())
+	{
 		a.tst(dst, dst);
+		m_carry_state = carry_state::POISON;
+	}
 
 	// save dst after using inputs for calculations so the registers have no chance of being overwritten
 	mov_param_reg(a, inst.size(), dstp, dst);
@@ -4227,7 +4435,10 @@ void drcbe_arm64::op_rol(a64::Assembler &a, const uml::instruction &inst)
 	}
 
 	if (inst.flags())
+	{
 		a.tst(output, output);
+		m_carry_state = carry_state::POISON;
+	}
 
 	mov_param_reg(a, inst.size(), dstp, output);
 }
@@ -4321,6 +4532,8 @@ void drcbe_arm64::op_rolc(a64::Assembler &a, const uml::instruction &inst)
 		a.tst(output, output);
 
 	mov_param_reg(a, inst.size(), dstp, output);
+
+	m_carry_state = carry_state::POISON;
 }
 
 void drcbe_arm64::op_rorc(a64::Assembler &a, const uml::instruction &inst)
@@ -4415,6 +4628,8 @@ void drcbe_arm64::op_rorc(a64::Assembler &a, const uml::instruction &inst)
 		a.tst(output, output);
 
 	mov_param_reg(a, inst.size(), dstp, output);
+
+	m_carry_state = carry_state::POISON;
 }
 
 void drcbe_arm64::op_fload(a64::Assembler &a, const uml::instruction &inst)
@@ -4485,6 +4700,8 @@ void drcbe_arm64::op_fread(a64::Assembler &a, const uml::instruction &inst)
 	assert_no_condition(inst);
 	assert_no_flags(inst);
 
+	m_carry_state = carry_state::POISON;
+
 	be_parameter dstp(*this, inst.param(0), PTYPE_MR);
 	be_parameter addrp(*this, inst.param(1), PTYPE_MRI);
 	const parameter &spacesizep = inst.param(2);
@@ -4516,6 +4733,8 @@ void drcbe_arm64::op_fwrite(a64::Assembler &a, const uml::instruction &inst)
 	assert(inst.size() == 4 || inst.size() == 8);
 	assert_no_condition(inst);
 	assert_no_flags(inst);
+
+	m_carry_state = carry_state::POISON;
 
 	be_parameter addrp(*this, inst.param(0), PTYPE_MRI);
 	be_parameter srcp(*this, inst.param(1), PTYPE_MF);
@@ -4551,25 +4770,67 @@ void drcbe_arm64::op_fmov(a64::Assembler &a, const uml::instruction &inst)
 	be_parameter dstp(*this, inst.param(0), PTYPE_MF);
 	be_parameter srcp(*this, inst.param(1), PTYPE_MF);
 
-	// TODO: optimise to use fcsel if the source and destination are both kept in host registers
-	Label skip;
-	if (inst.condition() != uml::COND_ALWAYS)
+	// decide whether a conditional select will be efficient
+	bool usesel = dstp.is_float_register() && srcp.is_float_register();
+	switch (inst.condition())
 	{
-		skip = a.newLabel();
-
-		if (inst.condition() == COND_C || inst.condition() == COND_NC || inst.condition() == COND_A || inst.condition() == COND_BE)
-			load_carry(a, true);
-
-		if (inst.condition() == uml::COND_U || inst.condition() == uml::COND_NU)
-			check_unordered_condition(a, inst.condition(), skip, true);
-		else
-			a.b(ARM_NOT_CONDITION(inst.condition()), skip);
+		case uml::COND_ALWAYS:
+		case uml::COND_U:
+		case uml::COND_NU:
+			usesel = false;
+			break;
+		case uml::COND_C:
+		case uml::COND_NC:
+			switch (m_carry_state)
+			{
+				case carry_state::CANONICAL:
+				case carry_state::LOGICAL:
+					break;
+				default:
+					usesel = false;
+			}
+			break;
+		default:
+			break;
 	}
 
-	mov_float_param_param(a, inst.size(), dstp, srcp);
+	if (usesel)
+	{
+		const a64::Vec dstreg = dstp.select_register(TEMPF_REG1, inst.size());
+		const a64::Vec srcreg = srcp.select_register(TEMPF_REG2, inst.size());
 
-	if (inst.condition() != uml::COND_ALWAYS)
-		a.bind(skip);
+		mov_float_reg_param(a, inst.size(), dstreg, dstp);
+		mov_float_reg_param(a, inst.size(), srcreg, srcp);
+
+		switch (inst.condition())
+		{
+			case uml::COND_C:
+			case uml::COND_NC:
+				if (m_carry_state == carry_state::CANONICAL)
+					a.fcsel(dstreg, srcreg, dstreg, ARM_NOT_CONDITION(inst.condition()));
+				else
+					a.fcsel(dstreg, srcreg, dstreg, ARM_CONDITION(inst.condition()));
+				break;
+			case uml::COND_A:
+			case uml::COND_BE:
+				load_carry(a, true);
+				[[fallthrough]];
+			default:
+				a.fcsel(dstreg, srcreg, dstreg, ARM_CONDITION(inst.condition()));
+		}
+
+		mov_float_param_reg(a, inst.size(), dstp, dstreg);
+	}
+	else
+	{
+		Label skip;
+		emit_skip(a, inst.condition(), skip);
+
+		mov_float_param_param(a, inst.size(), dstp, srcp);
+
+		if (inst.condition() != uml::COND_ALWAYS)
+			a.bind(skip);
+	}
 }
 
 void drcbe_arm64::op_ftoint(a64::Assembler &a, const uml::instruction &inst)
