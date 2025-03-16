@@ -3375,8 +3375,6 @@ template <bool CarryIn> void drcbe_arm64::op_add(a64::Assembler &a, const uml::i
 	be_parameter src2p(*this, inst.param(2), PTYPE_MRI);
 
 	const a64::Gp zero = select_register(a64::xzr, inst.size());
-	const a64::Gp src1 = src1p.select_register(TEMP_REG1, inst.size());
-	const a64::Gp src2 = src2p.select_register(TEMP_REG2, inst.size());
 	const a64::Gp output = dstp.select_register(TEMP_REG3, inst.size());
 
 	if (CarryIn)
@@ -3399,19 +3397,22 @@ template <bool CarryIn> void drcbe_arm64::op_add(a64::Assembler &a, const uml::i
 		}
 		else if (!CarryIn && src2p.is_immediate() && is_valid_immediate_addsub(src2p.immediate()))
 		{
-			a.emit(opcode, output, zero, src2p.immediate());
+			a.mov(output, zero);
+			a.emit(opcode, output, output, src2p.immediate());
 			mov_param_reg(a, inst.size(), dstp, output);
 		}
 		else if (!CarryIn && src2p.is_immediate() && is_valid_immediate(src2p.immediate(), 24))
 		{
-			a.emit(opcode, output, zero, src2p.immediate() & (util::make_bitmask<uint64_t>(12) << 12));
-			a.emit(opcode, output, output, src2p.immediate() & util::make_bitmask<uint64_t>(12));
+			a.mov(output, src2p.immediate() & util::make_bitmask<uint64_t>(12));
+			a.emit(opcode, output, output, src2p.immediate() & (util::make_bitmask<uint64_t>(12) << 12));
 			mov_param_reg(a, inst.size(), dstp, output);
 		}
 		else
 		{
-			mov_reg_param(a, inst.size(), src2, src2p);
-			a.emit(opcode, output, src2, zero);
+			const a64::Gp src = src2p.select_register(output, inst.size());
+
+			mov_reg_param(a, inst.size(), src, src2p);
+			a.emit(opcode, output, src, zero);
 			mov_param_reg(a, inst.size(), dstp, output);
 		}
 	}
@@ -3419,52 +3420,64 @@ template <bool CarryIn> void drcbe_arm64::op_add(a64::Assembler &a, const uml::i
 	{
 		if (!CarryIn && src1p.is_immediate() && is_valid_immediate_addsub(src1p.immediate()))
 		{
-			a.emit(opcode, output, zero, src1p.immediate());
+			a.mov(output, zero);
+			a.emit(opcode, output, output, src1p.immediate());
 			mov_param_reg(a, inst.size(), dstp, output);
 		}
 		else if (!CarryIn && src1p.is_immediate() && is_valid_immediate(src1p.immediate(), 24))
 		{
-			a.emit(opcode, output, zero, src1p.immediate() & (util::make_bitmask<uint64_t>(12) << 12));
-			a.emit(opcode, output, output, src1p.immediate() & util::make_bitmask<uint64_t>(12));
+			a.mov(output, src1p.immediate() & util::make_bitmask<uint64_t>(12));
+			a.emit(opcode, output, output, src1p.immediate() & (util::make_bitmask<uint64_t>(12) << 12));
 			mov_param_reg(a, inst.size(), dstp, output);
 		}
 		else
 		{
-			mov_reg_param(a, inst.size(), src1, src1p);
-			a.emit(opcode, output, src1, zero);
+			const a64::Gp src = src1p.select_register(output, inst.size());
+
+			mov_reg_param(a, inst.size(), src, src1p);
+			a.emit(opcode, output, src, zero);
 			mov_param_reg(a, inst.size(), dstp, output);
 		}
 	}
 	else if (!CarryIn && src1p.is_immediate() && is_valid_immediate_addsub(src1p.immediate()))
 	{
-		mov_reg_param(a, inst.size(), src2, src2p);
-		a.emit(opcode, output, src2, src1p.immediate());
+		const a64::Gp src = src2p.select_register(output, inst.size());
+
+		mov_reg_param(a, inst.size(), src, src2p);
+		a.emit(opcode, output, src, src1p.immediate());
 		mov_param_reg(a, inst.size(), dstp, output);
 	}
 	else if (!CarryIn && src2p.is_immediate() && is_valid_immediate_addsub(src2p.immediate()))
 	{
-		mov_reg_param(a, inst.size(), src1, src1p);
-		a.emit(opcode, output, src1, src2p.immediate());
+		const a64::Gp src = src1p.select_register(output, inst.size());
+
+		mov_reg_param(a, inst.size(), src, src1p);
+		a.emit(opcode, output, src, src2p.immediate());
 		mov_param_reg(a, inst.size(), dstp, output);
 	}
 	else if (!CarryIn && !inst.flags() && src1p.is_immediate() && is_valid_immediate(src1p.immediate(), 24))
 	{
-		// will still alter flags, but carry and overflow values will be incorrect for this path
-		mov_reg_param(a, inst.size(), src2, src2p);
-		a.emit(opcode, output, src2, src1p.immediate() & (util::make_bitmask<uint64_t>(12) << 12));
-		a.emit(opcode, output, output, src1p.immediate() & util::make_bitmask<uint64_t>(12));
+		const a64::Gp src = src2p.select_register(output, inst.size());
+
+		mov_reg_param(a, inst.size(), src, src2p);
+		a.emit(opcode, output, src, src1p.immediate() & util::make_bitmask<uint64_t>(12));
+		a.emit(opcode, output, output, src1p.immediate() & (util::make_bitmask<uint64_t>(12) << 12));
 		mov_param_reg(a, inst.size(), dstp, output);
 	}
 	else if (!CarryIn && !inst.flags() && src2p.is_immediate() && is_valid_immediate(src2p.immediate(), 24))
 	{
-		// will still alter flags, but carry and overflow values will be incorrect for this path
-		mov_reg_param(a, inst.size(), src1, src1p);
-		a.emit(opcode, output, src1, src2p.immediate() & (util::make_bitmask<uint64_t>(12) << 12));
-		a.emit(opcode, output, output, src2p.immediate() & util::make_bitmask<uint64_t>(12));
+		const a64::Gp src = src1p.select_register(output, inst.size());
+
+		mov_reg_param(a, inst.size(), src, src1p);
+		a.emit(opcode, output, src, src2p.immediate() & util::make_bitmask<uint64_t>(12));
+		a.emit(opcode, output, output, src2p.immediate() & (util::make_bitmask<uint64_t>(12) << 12));
 		mov_param_reg(a, inst.size(), dstp, output);
 	}
 	else
 	{
+		const a64::Gp src1 = src1p.select_register(TEMP_REG1, inst.size());
+		const a64::Gp src2 = src2p.select_register(TEMP_REG2, inst.size());
+
 		mov_reg_param(a, inst.size(), src1, src1p);
 		mov_reg_param(a, inst.size(), src2, src2p);
 		a.emit(opcode, output, src1, src2);
@@ -3493,7 +3506,6 @@ template <bool CarryIn> void drcbe_arm64::op_sub(a64::Assembler &a, const uml::i
 		load_carry(a, true);
 
 	const a64::Gp zero = select_register(a64::xzr, inst.size());
-	const a64::Gp src1 = src1p.select_register(TEMP_REG1, inst.size());
 	const a64::Gp output = dstp.select_register(TEMP_REG3, inst.size());
 
 	if (src2p.is_immediate_value(0))
@@ -3513,50 +3525,42 @@ template <bool CarryIn> void drcbe_arm64::op_sub(a64::Assembler &a, const uml::i
 		}
 		else
 		{
-			mov_reg_param(a, inst.size(), src1, src1p);
+			const a64::Gp src = src1p.select_register(output, inst.size());
+
+			mov_reg_param(a, inst.size(), src, src1p);
 			if (CarryIn)
 			{
-				a.emit(opcode, output, src1, zero);
+				a.emit(opcode, output, src, zero);
 				mov_param_reg(a, inst.size(), dstp, output);
 			}
 			else
 			{
-				mov_param_reg(a, inst.size(), dstp, src1);
-				a.emit(opcode, zero, src1, zero);
+				mov_param_reg(a, inst.size(), dstp, src);
+				a.emit(opcode, zero, src, zero);
 			}
 		}
 	}
 	else if (!CarryIn && src2p.is_immediate() && is_valid_immediate_addsub(src2p.immediate()))
 	{
-		if (src1p.is_immediate_value(0))
-		{
-			a.emit(opcode, output, zero, src2p.immediate());
-		}
-		else
-		{
-			mov_reg_param(a, inst.size(), src1, src1p);
-			a.emit(opcode, output, src1, src2p.immediate());
-		}
+		const a64::Gp src = src1p.select_register(output, inst.size());
+
+		mov_reg_param(a, inst.size(), src, src1p);
+		a.emit(opcode, output, src, src2p.immediate());
 		mov_param_reg(a, inst.size(), dstp, output);
 	}
 	else if (!CarryIn && (!inst.flags() || src1p.is_immediate_value(0)) && src2p.is_immediate() && is_valid_immediate(src2p.immediate(), 24))
 	{
-		if (src1p.is_immediate_value(0))
-		{
-			a.emit(opcode, output, zero, src2p.immediate() & (util::make_bitmask<uint64_t>(12) << 12));
-		}
-		else
-		{
-			// will still alter flags, but carry and overflow values will be incorrect for this path
-			mov_reg_param(a, inst.size(), src1, src1p);
-			a.emit(opcode, output, src1, src2p.immediate() & (util::make_bitmask<uint64_t>(12) << 12));
-		}
-		a.emit(opcode, output, output, src2p.immediate() & util::make_bitmask<uint64_t>(12));
+		const a64::Gp src = src1p.select_register(output, inst.size());
+
+		mov_reg_param(a, inst.size(), src, src1p);
+		a.emit(opcode, output, src, src2p.immediate() & util::make_bitmask<uint64_t>(12));
+		a.emit(opcode, output, output, src2p.immediate() & (util::make_bitmask<uint64_t>(12) << 12));
 		mov_param_reg(a, inst.size(), dstp, output);
 	}
 	else
 	{
-		const a64::Gp src2 = select_register(TEMP_REG2, inst.size());
+		const a64::Gp src1 = src1p.select_register(TEMP_REG1, inst.size());
+		const a64::Gp src2 = src2p.select_register(TEMP_REG2, inst.size());
 
 		mov_reg_param(a, inst.size(), src1, src1p);
 		mov_reg_param(a, inst.size(), src2, src2p);
