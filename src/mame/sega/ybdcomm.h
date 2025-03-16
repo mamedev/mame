@@ -11,7 +11,7 @@
 #include "machine/mb8421.h"
 #include "machine/mb89372.h"
 
-#include "osdfile.h"
+#include "asio.h"
 
 
 //**************************************************************************
@@ -29,6 +29,7 @@ public:
 
 protected:
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_reset_after_children() override;
 
@@ -64,10 +65,16 @@ private:
 #ifdef YBDCOMM_SIMULATION
 	emu_timer *m_tick_timer;
 
-	osd_file::ptr m_line_rx; // rx line - can be either differential, simple serial or toslink
-	osd_file::ptr m_line_tx; // tx line - is differential, simple serial and toslink
-	std::string m_localhost;
-	std::string m_remotehost;
+	asio::io_context m_ioctx;
+	std::optional<asio::ip::tcp::endpoint> m_localaddr;
+	std::optional<asio::ip::tcp::endpoint> m_remoteaddr;
+	asio::ip::tcp::acceptor m_acceptor;
+	asio::ip::tcp::socket m_sock_rx;
+	asio::ip::tcp::socket m_sock_tx;
+	asio::steady_timer m_tx_timeout;
+	uint8_t m_rx_state;
+	uint8_t m_tx_state;
+
 	uint8_t m_buffer0[0x200]{};
 	uint8_t m_framesync;
 
@@ -79,12 +86,15 @@ private:
 
 	TIMER_CALLBACK_MEMBER(tick_timer);
 
-	int comm_frame_offset(uint8_t cab_index);
-	int comm_frame_size(uint8_t cab_index);
+	unsigned comm_frame_offset(uint8_t cab_index);
+	unsigned comm_frame_size(uint8_t cab_index);
+	void check_sockets();
+	void comm_start();
+	void comm_stop();
 	void comm_tick();
-	int read_frame(int data_size);
-	void send_data(uint8_t frame_type, int frame_offset, int frame_size, int data_size);
-	void send_frame(int data_size);
+	unsigned read_frame(unsigned data_size);
+	void send_data(uint8_t frame_type, unsigned frame_offset, unsigned frame_size, unsigned data_size);
+	void send_frame(unsigned data_size);
 #endif
 };
 

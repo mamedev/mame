@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "osdfile.h"
+#include "asio.h"
 
 
 //**************************************************************************
@@ -48,6 +48,7 @@ protected:
 	// device-level overrides
 //  virtual void device_validity_check(validity_checker &valid) const;
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
 	devcb_write_line m_irq_cb;
@@ -56,10 +57,21 @@ private:
 	uint16_t m_ram[0x2000]{};
 	uint16_t m_reg[0x0010]{};
 
-	osd_file::ptr m_line_rx;
-	osd_file::ptr m_line_tx;
 	std::string m_localhost;
+	std::string m_localport;
 	std::string m_remotehost;
+	std::string m_remoteport;
+
+	asio::io_context m_ioctx;
+	std::optional<asio::ip::tcp::endpoint> m_localaddr;
+	std::optional<asio::ip::tcp::endpoint> m_remoteaddr;
+	asio::ip::tcp::acceptor m_acceptor;
+	asio::ip::tcp::socket m_sock_rx;
+	asio::ip::tcp::socket m_sock_tx;
+	asio::steady_timer m_tx_timeout;
+	uint8_t m_rx_state;
+	uint8_t m_tx_state;
+
 	uint8_t m_buffer0[0x200]{};
 
 	uint16_t m_linktimer = 0;
@@ -71,12 +83,15 @@ private:
 	emu_timer *m_tick_timer = nullptr;
 	TIMER_CALLBACK_MEMBER(tick_timer_callback);
 
+	void check_sockets();
+	void comm_start();
+	void comm_stop();
 	void comm_tick();
-	void read_data(int data_size);
-	int read_frame(int data_size);
-	int find_sync_bit(int tx_offset, int tx_mask);
-	void send_data(int data_size);
-	void send_frame(int data_size);
+	void read_data(unsigned data_size);
+	unsigned read_frame(unsigned data_size);
+	unsigned find_sync_bit(unsigned tx_offset, unsigned tx_mask);
+	void send_data(unsigned data_size);
+	void send_frame(unsigned data_size);
 };
 
 

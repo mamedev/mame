@@ -12,12 +12,14 @@
 
 #include "sega16sp.h"
 #include "segaic16.h"
-#include "ybdcomm.h"
 
 #include "cpu/m68000/m68000musashi.h"
 #include "cpu/z80/z80.h"
 #include "machine/mb3773.h"
 #include "screen.h"
+
+// prevent compiler errors by including here
+#include "ybdcomm.h"
 
 
 // ======================> segaybd_state

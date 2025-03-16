@@ -20,6 +20,7 @@ TODO:
 
 #include "emu.h"
 #include "k056230.h"
+
 #include "emuopts.h"
 
 #define LOG_REG_READS   (1U << 1)
@@ -39,15 +40,16 @@ k056230_device::k056230_device(const machine_config &mconfig, device_type type, 
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_ram(*this, "lanc_ram", 0x800U * 4, ENDIANNESS_BIG)
 	, m_irq_cb(*this)
+	, m_acceptor(m_ioctx)
+	, m_sock_rx(m_ioctx)
+	, m_sock_tx(m_ioctx)
+	, m_tx_timeout(m_ioctx)
 {
 }
 
 k056230_device::k056230_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: k056230_device(mconfig, K056230, tag, owner, clock)
 {
-	// prepare "filenames"
-	m_localhost = util::string_format("socket.%s:%s", mconfig.options().comm_localhost(), mconfig.options().comm_localport());
-	m_remotehost = util::string_format("socket.%s:%s", mconfig.options().comm_remotehost(), mconfig.options().comm_remoteport());
 }
 
 void k056230_device::device_start()
@@ -68,9 +70,18 @@ void k056230_device::device_reset()
 	m_ctrl_reg = 0;
 	m_status = 0;
 
+	m_tx_state = 0;
+	m_rx_state = 0;
+	comm_start();
+
 	m_linkenable = 0;
 	m_linkid = 0;
 	m_txmode = 0;
+}
+
+void k056230_device::device_stop()
+{
+	comm_stop();
 }
 
 void k056230_device::regs_map(address_map &map)
@@ -195,48 +206,160 @@ void k056230_device::set_ctrl(u8 data)
 			break;
 	}
 }
+void k056230_device::check_sockets()
+{
+	// if async operation in progress, poll context
+	if ((m_rx_state == 1) || (m_tx_state == 1))
+		m_ioctx.poll();
+
+	// start acceptor if needed
+	if (m_localaddr && m_rx_state == 0)
+	{
+		std::error_code err;
+		m_acceptor.open(m_localaddr->protocol(), err);
+		m_acceptor.set_option(asio::ip::tcp::acceptor::reuse_address(true));
+		if (!err)
+		{
+			m_acceptor.bind(*m_localaddr, err);
+			if (!err)
+			{
+				m_acceptor.listen(1, err);
+				if (!err)
+				{
+					osd_printf_verbose("k056230: RX listen on %s\n", *m_localaddr);
+					m_acceptor.async_accept(
+							[this] (std::error_code const &err, asio::ip::tcp::socket sock)
+							{
+								if (err)
+								{
+									LOG("k056230: RX error accepting - %d %s\n", err.value(), err.message());
+									std::error_code e;
+									m_acceptor.close(e);
+									m_rx_state = 0;
+								}
+								else
+								{
+									LOG("k056230: RX connection from %s\n", sock.remote_endpoint());
+									std::error_code e;
+									m_acceptor.close(e);
+									m_sock_rx = std::move(sock);
+									m_sock_rx.non_blocking(true);
+									m_sock_rx.set_option(asio::socket_base::receive_buffer_size(524288));
+									m_sock_rx.set_option(asio::socket_base::keep_alive(true));
+									m_rx_state = 2;
+								}
+							});
+					m_rx_state = 1;
+				}
+			}
+		}
+		if (err)
+		{
+			LOG("k056230: RX failed - %d %s\n", err.value(), err.message());
+		}
+	}
+
+	// connect socket if needed
+	if (m_remoteaddr && m_tx_state == 0)
+	{
+		std::error_code err;
+		if (m_sock_tx.is_open())
+			m_sock_tx.close(err);
+		m_sock_tx.open(m_remoteaddr->protocol(), err);
+		if (!err)
+		{
+			m_sock_tx.non_blocking(true);
+			m_sock_tx.set_option(asio::ip::tcp::no_delay(true));
+			m_sock_tx.set_option(asio::socket_base::send_buffer_size(65536));
+			m_sock_tx.set_option(asio::socket_base::keep_alive(true));
+			osd_printf_verbose("k056230: TX connecting to %s\n", *m_remoteaddr);
+			m_tx_timeout.expires_after(std::chrono::seconds(10));
+			m_tx_timeout.async_wait(
+					[this] (std::error_code const &err)
+					{
+						if (!err && m_tx_state == 1)
+						{
+							osd_printf_verbose("k056230: TX connect timed out\n");
+							std::error_code e;
+							m_sock_tx.close(e);
+							m_tx_state = 0;
+						}
+					});
+			m_sock_tx.async_connect(
+					*m_remoteaddr,
+					[this] (std::error_code const &err)
+					{
+						m_tx_timeout.cancel();
+						if (err)
+						{
+							osd_printf_verbose("k056230: TX connect error - %d %s\n", err.value(), err.message());
+							std::error_code e;
+							m_sock_tx.close(e);
+							m_tx_state = 0;
+						}
+						else
+						{
+							LOG("k056230: TX connection established\n");
+							m_tx_state = 2;
+						}
+					});
+			m_tx_state = 1;
+		}
+	}
+}
+
+void k056230_device::comm_start()
+{
+	auto const &opts = mconfig().options();
+	std::error_code err;
+	asio::ip::tcp::resolver resolver(m_ioctx);
+
+	for (auto &&resolveIte : resolver.resolve(opts.comm_localhost(), opts.comm_localport(), asio::ip::tcp::resolver::flags::address_configured, err))
+	{
+		m_localaddr = resolveIte.endpoint();
+		LOG("k056230: localhost = %s\n", *m_localaddr);
+	}
+	if (err) {
+		LOG("k056230: localhost resolve error: %s\n", err.message());
+	}
+
+	for (auto &&resolveIte : resolver.resolve(opts.comm_remotehost(), opts.comm_remoteport(), asio::ip::tcp::resolver::flags::address_configured, err))
+	{
+		m_remoteaddr = resolveIte.endpoint();
+		LOG("k056230: remotehost = %s\n", *m_remoteaddr);
+	}
+	if (err) {
+		LOG("k056230: remotehost resolve error: %s\n", err.message());
+	}
+}
+
+void k056230_device::comm_stop()
+{
+	std::error_code err;
+	if (m_acceptor.is_open())
+		m_acceptor.close(err);
+	if (m_sock_rx.is_open())
+		m_sock_rx.close(err);
+	if (m_sock_tx.is_open())
+		m_sock_tx.close(err);
+	m_tx_timeout.cancel();
+}
 
 void k056230_device::comm_tick()
 {
+	check_sockets();
+
 	if (m_linkenable == 0x01)
 	{
-		// check rx socket
-		if (!m_line_rx)
-		{
-			osd_printf_verbose("k056230: rx listen on %s\n", m_localhost);
-			u64 filesize; // unused
-			std::error_condition filerr = osd_file::open(m_localhost, OPEN_FLAG_CREATE, m_line_rx, filesize);
-			if (filerr.value() != 0)
-			{
-				osd_printf_verbose("k056230: rx connection failed - %s:%d %s\n", filerr.category().name(), filerr.value(), filerr.message());
-				m_line_rx.reset();
-			}
-		}
-
-		// check tx socket
-		if ((!m_line_tx) && (m_txmode == 0x01))
-		{
-			osd_printf_verbose("k056230: tx connect to %s\n", m_remotehost);
-			u64 filesize; // unused
-			std::error_condition filerr = osd_file::open(m_remotehost, 0, m_line_tx, filesize);
-			if (filerr.value() != 0)
-			{
-				osd_printf_verbose("k056230: tx connection failed - %s:%d %s\n", filerr.category().name(), filerr.value(), filerr.message());
-				m_line_tx.reset();
-				// prevent another connection request for some time.
-				m_txmode = 0x02;
-			}
-		}
-
 		// if both sockets are there check ring
-		if (m_line_rx && m_line_tx)
+		if (m_rx_state == 2 && m_tx_state == 2)
 		{
-			int data_size = 0x201;
+			unsigned data_size = 0x201;
 
 			if (m_txmode == 0x00)
 			{
 				// try to read one message
-				int recv = read_frame(data_size);
+				unsigned recv = read_frame(data_size);
 				while (recv > 0)
 				{
 					// check if valid id
@@ -246,12 +369,12 @@ void k056230_device::comm_tick()
 						if (idx != m_linkid)
 						{
 							// save message to ram
-							int frame_start = (idx & 0x07) * 0x0100;
-							int frame_size = (idx & 0x08) ? 0x0200 : 0x0100;
-							int frame_offset = 0;
+							unsigned frame_start = (idx & 0x07) * 0x0100;
+							unsigned frame_size = (idx & 0x08) ? 0x0200 : 0x0100;
+							unsigned frame_offset = 0;
 							u32 frame_data = 0;
 
-							for (int j = 0x00 ; j < frame_size ; j += 4)
+							for (unsigned j = 0x00 ; j < frame_size ; j += 4)
 							{
 								frame_offset = (frame_start + j) / 4;
 								frame_data = m_buffer0[4 + j] |  m_buffer0[3 + j] << 8 |  m_buffer0[2 + j] << 16 |  m_buffer0[1 + j] << 24;
@@ -270,14 +393,14 @@ void k056230_device::comm_tick()
 			else if (m_txmode == 0x01)
 			{
 				// send local data to network (once)
-				int frame_start = (m_linkid & 0x07) * 0x100;
-				int frame_size = (m_linkid & 0x08) ? 0x200 : 0x100;
+				unsigned frame_start = (m_linkid & 0x07) * 0x100;
+				unsigned frame_size = (m_linkid & 0x08) ? 0x200 : 0x100;
 
-				int frame_offset = 0;
+				unsigned frame_offset = 0;
 				u32 frame_data = 0;
 
 				m_buffer0[0] = m_linkid;
-				for (int i = 0x00 ; i < frame_size ; i += 4)
+				for (unsigned i = 0x00 ; i < frame_size ; i += 4)
 				{
 					frame_offset = (frame_start + i) / 4;
 					frame_data = ram_r(frame_offset, 0xffffffff);
@@ -294,53 +417,44 @@ void k056230_device::comm_tick()
 	}
 }
 
-int k056230_device::read_frame(int data_size)
+unsigned k056230_device::read_frame(unsigned data_size)
 {
-	if (!m_line_rx)
+	if (m_rx_state != 2)
 		return 0;
 
-	// try to read a message (handling partial reads)
-	u32 bytes_total = 0;
-	u32 bytes_read = 0;
-	while (bytes_total < data_size)
+	std::error_code err;
+	std::size_t bytes_read = m_sock_rx.receive(asio::buffer(&m_buffer0[0], data_size), asio::socket_base::message_peek, err);
+	if (err == asio::error::would_block)
+		return 0;
+
+	if (bytes_read == data_size)
+		bytes_read = m_sock_rx.receive(asio::buffer(&m_buffer0[0], data_size), 0, err);
+
+	if (err)
 	{
-		std::error_condition filerr = m_line_rx->read(&m_buffer0[bytes_total], 0, data_size - bytes_total, bytes_read);
-		if (filerr)
-		{
-			bytes_read = 0;
-			// special case if first read returned "no data"
-			if (bytes_total == 0 && std::errc::operation_would_block == filerr)
-				return 0;
-		}
-		if ((!filerr && bytes_read == 0) || (filerr && std::errc::operation_would_block != filerr))
-		{
-			osd_printf_verbose("k056230: rx connection failed - %s:%d %s\n", filerr.category().name(), filerr.value(), filerr.message());
-			m_line_rx.reset();
-			return 0;
-		}
-		bytes_total += bytes_read;
+		osd_printf_verbose("k056230: RX error receiving - %d %s\n", err.value(), err.message());
+		m_sock_rx.close(err);
+		m_rx_state = 0;
+		return 0;
 	}
-	return data_size;
+
+	if (bytes_read == data_size)
+		return bytes_read;
+	return 0;
 }
 
-void k056230_device::send_frame(int data_size)
+void k056230_device::send_frame(unsigned data_size)
 {
-	if (!m_line_tx)
+	if (m_tx_state != 2)
 		return;
 
-	// try to send a message (handling partial writes)
-	u32 bytes_total = 0;
-	u32 bytes_sent = 0;
-	while (bytes_total < data_size)
+	std::error_code err;
+	std::size_t bytes_sent = m_sock_tx.send(asio::buffer(&m_buffer0[0], data_size), 0, err);
+	if (err || bytes_sent != data_size)
 	{
-		std::error_condition filerr = m_line_tx->write(&m_buffer0[bytes_total], 0, data_size - bytes_total, bytes_sent);
-		if (filerr)
-		{
-			osd_printf_verbose("k056230: tx connection failed - %s:%d %s\n", filerr.category().name(), filerr.value(), filerr.message());
-			m_line_tx.reset();
-			return;
-		}
-		bytes_total += bytes_sent;
+		osd_printf_verbose("k056230: TX error sending - %d %s\n", err.value(), err.message());
+		m_sock_tx.close(err);
+		m_tx_state = 0;
 	}
 }
 

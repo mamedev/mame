@@ -7,7 +7,8 @@
 
 #define M2COMM_SIMULATION
 
-#include "osdfile.h"
+#include "asio.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -45,6 +46,7 @@ public:
 
 protected:
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
@@ -54,15 +56,22 @@ private:
 	uint8_t m_cn = 0;             // bit0 is used to enable/disable the comm board
 	uint8_t m_fg = 0;             // i960 flip gate - bit0 is stored, bit7 is connected to ZFG bit 0
 
-	osd_file::ptr m_line_rx;  // rx line - can be either differential, simple serial or toslink
-	osd_file::ptr m_line_tx;  // tx line - is differential, simple serial and toslink
-	std::string m_localhost;
-	std::string m_remotehost;
-	uint8_t m_buffer0[0x1000]{};
-	uint8_t m_framesync;
 	uint16_t m_frameoffset;
 
 #ifdef M2COMM_SIMULATION
+	asio::io_context m_ioctx;
+	std::optional<asio::ip::tcp::endpoint> m_localaddr;
+	std::optional<asio::ip::tcp::endpoint> m_remoteaddr;
+	asio::ip::tcp::acceptor m_acceptor;
+	asio::ip::tcp::socket m_sock_rx;
+	asio::ip::tcp::socket m_sock_tx;
+	asio::steady_timer m_tx_timeout;
+	uint8_t m_rx_state;
+	uint8_t m_tx_state;
+
+	uint8_t m_buffer0[0x1000]{};
+	uint8_t m_framesync;
+
 	uint8_t m_linkenable = 0;
 	uint16_t m_linktimer = 0;
 	uint8_t m_linkalive = 0;
@@ -70,11 +79,14 @@ private:
 	uint8_t m_linkcount = 0;
 	uint8_t m_zfg_delay = 0;
 
+	void check_sockets();
+	void comm_start();
+	void comm_stop();
 	void comm_tick();
 	void read_fg();
-	int read_frame(int data_size);
-	void send_data(uint8_t frame_type, int frame_start, int frame_size, int data_size);
-	void send_frame(int data_size);
+	unsigned read_frame(unsigned data_size);
+	void send_data(uint8_t frame_type, unsigned frame_start, unsigned frame_size, unsigned data_size);
+	void send_frame(unsigned data_size);
 #endif
 };
 

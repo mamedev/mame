@@ -1091,11 +1091,7 @@ Notes:
 #include "emu.h"
 #include "namcos22.h"
 
-#include "namco_dsp.h"
 
-#include "cpu/m68000/m68020.h"
-#include "cpu/tms32025/tms32025.h"
-#include "speaker.h"
 
 // 51.2MHz XTAL on video board, pixel clock of 12.8MHz (doubled in MAME because of unemulated interlacing)
 // HSync - 15.7248 kHz -> htotal = 814.001

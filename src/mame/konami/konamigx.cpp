@@ -99,16 +99,6 @@
 #include "emu.h"
 #include "konamigx.h"
 
-#include "cpu/m68000/m68000.h"
-#include "cpu/m68000/m68020.h"
-#include "cpu/tms57002/tms57002.h"
-#include "cpu/z80/z80.h"
-#include "machine/eepromser.h"
-#include "sound/k054539.h"
-#include "sound/k056800.h"
-#include "sound/okim6295.h"
-#include "speaker.h"
-
 #include "layout/generic.h"
 
 

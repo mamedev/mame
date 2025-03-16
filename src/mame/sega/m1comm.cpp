@@ -393,7 +393,7 @@ void sega_m1comm_device::check_sockets()
 			m_sock_tx.set_option(asio::ip::tcp::no_delay(true));
 			m_sock_tx.set_option(asio::socket_base::send_buffer_size(65536));
 			m_sock_tx.set_option(asio::socket_base::keep_alive(true));
-			
+			osd_printf_verbose("M1COMM: TX connecting to %s\n", *m_remoteaddr);
 			m_tx_timeout.expires_after(std::chrono::seconds(10));
 			m_tx_timeout.async_wait(
 					[this] (std::error_code const &err)

@@ -8,7 +8,6 @@
 #include "315-5881_crypt.h"
 #include "315-5838_317-0229_comp.h"
 #include "dsbz80.h"
-#include "m2comm.h"
 #include "segabill.h"
 #include "segaic24.h"
 
@@ -27,6 +26,9 @@
 
 #include "emupal.h"
 #include "screen.h"
+
+// prevent compiler errors by including here
+#include "m2comm.h"
 
 #include <algorithm>
 

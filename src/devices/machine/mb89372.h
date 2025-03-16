@@ -44,7 +44,7 @@ Multi-Protocol Controller
 
 #pragma once
 
-#include "osdfile.h"
+#include "asio.h"
 
 
 class mb89372_device : public device_t,
@@ -69,6 +69,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void execute_run() override;
 
@@ -121,10 +122,15 @@ private:
 	uint8_t  m_tx_buffer[0x200];
 	uint16_t m_tx_offset;
 
-	osd_file::ptr m_line_rx;
-	osd_file::ptr m_line_tx;
-	std::string m_localhost;
-	std::string m_remotehost;
+	asio::io_context m_ioctx;
+	std::optional<asio::ip::tcp::endpoint> m_localaddr;
+	std::optional<asio::ip::tcp::endpoint> m_remoteaddr;
+	asio::ip::tcp::acceptor m_acceptor;
+	asio::ip::tcp::socket m_sock_rx;
+	asio::ip::tcp::socket m_sock_tx;
+	asio::steady_timer m_tx_timeout;
+	uint8_t m_rx_state;
+	uint8_t m_tx_state;
 	uint8_t m_socket_buffer[0x200];
 
 	void check_sockets();
@@ -134,6 +140,11 @@ private:
 	void tx_reset();
 	void tx_write(uint8_t data);
 	void tx_complete();
+
+	void comm_start();
+	void comm_stop();
+	unsigned read_frame();
+	void send_frame(unsigned data_size);
 };
 
 
