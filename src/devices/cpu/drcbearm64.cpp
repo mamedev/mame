@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:windyfairy
+// copyright-holders:windyfairy, Vas Crabb
 /***************************************************************************
 
 Register use:
@@ -4040,6 +4040,13 @@ void drcbe_arm64::op_and(a64::Assembler &a, const uml::instruction &inst)
 		if (inst.flags())
 			a.tst(dst, dst);
 	}
+	else if (src1p.is_immediate() && is_valid_immediate_mask(src1p.immediate(), inst.size()))
+	{
+		const a64::Gp src2 = src2p.select_register(TEMP_REG1, inst.size());
+		mov_reg_param(a, inst.size(), src2, src2p);
+
+		a.emit(opcode, dst, src2, src1p.immediate());
+	}
 	else if (src2p.is_immediate() && is_valid_immediate_mask(src2p.immediate(), inst.size()))
 	{
 		const a64::Gp src1 = src1p.select_register(TEMP_REG1, inst.size());
@@ -4047,12 +4054,19 @@ void drcbe_arm64::op_and(a64::Assembler &a, const uml::instruction &inst)
 
 		a.emit(opcode, dst, src1, src2p.immediate());
 	}
-	else if (!inst.flags() && (inst.size() == 8) && src2p.is_immediate() && is_valid_immediate_mask(src2p.immediate(), 4))
+	else if ((inst.size() == 8) && src1p.is_immediate() && is_valid_immediate_mask(src1p.immediate(), 4) && (!inst.flags() || !BIT(src1p.immediate(), 31)))
+	{
+		const a64::Gp src2 = src2p.select_register(TEMP_REG1, inst.size());
+		mov_reg_param(a, inst.size(), src2, src2p);
+
+		a.emit(opcode, dst.w(), src2.w(), src1p.immediate());
+	}
+	else if ((inst.size() == 8) && src2p.is_immediate() && is_valid_immediate_mask(src2p.immediate(), 4) && (!inst.flags() || !BIT(src2p.immediate(), 31)))
 	{
 		const a64::Gp src1 = src1p.select_register(TEMP_REG1, inst.size());
 		mov_reg_param(a, inst.size(), src1, src1p);
 
-		a.and_(dst.w(), src1.w(), src2p.immediate());
+		a.emit(opcode, dst.w(), src1.w(), src2p.immediate());
 	}
 	else
 	{
