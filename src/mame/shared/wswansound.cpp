@@ -325,7 +325,8 @@ void wswan_sound_device::hypervoice_dma_w(u8 data)
 	switch (m_hypervoice.channel_mode)
 	{
 		case 0x00: // Stereo
-			hypervoice_w(0x68 / 2, data << 8, 0xff00);
+			m_hypervoice.input(data);
+			m_hypervoice.input_channel = !m_hypervoice.input_channel;
 			break;
 		case 0x01: // Mono, Left
 			m_hypervoice.linput = data;
