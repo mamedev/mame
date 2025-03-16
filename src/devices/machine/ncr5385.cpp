@@ -275,7 +275,7 @@ u8 ncr5385_device::int_status_r()
 	// tek4404 reads this reg from inside IRQ3, clear its flag ($2c3) and then spinloops waiting for it to be set by an IRQ
 	// the update_int() above has happened too fast
 	if (m_state != IDLE)
-		m_state_timer->adjust(attotime::from_usec(80));
+		m_state_timer->adjust(attotime::from_usec(1024));
 
 	return data;
 }
@@ -318,7 +318,7 @@ void ncr5385_device::dat_w(u8 data)
 
 void ncr5385_device::cmd_w(u8 data)
 {
-	LOGMASKED(LOG_REGW, "cmd_w 0x%02x (%s)\n", data, machine().describe_context());
+	LOGMASKED(LOG_REGW, "%10s: cmd_w 0x%02x (%s)\n", machine().time().as_string(8), data, machine().describe_context());
 	if (!(data & 0x18))
 	{
 		// immediate commands
@@ -767,7 +767,7 @@ int ncr5385_device::state_step()
 			else
 				m_sbx = false;
 
-			delay = 3'500;		// >=3.5us delay works, < 3.5us fails
+			delay = 3'600;		// >=3.5us delay works, < 3.5us fails
 			LOGMASKED(LOG_STATE, "%10s: XFI_OUT_ACK delay %d\n", machine().time().as_string(8), delay);
 			
 			// clear data and ACK
