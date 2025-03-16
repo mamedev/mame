@@ -294,7 +294,7 @@ void k1ge_device::draw_sprite_plane(u16 *p, u16 priority, int line, int scroll_x
 
 void k1ge_device::draw(int line)
 {
-	u16 *const p = &m_bitmap->pix(line);
+	u16 *const p = &m_bitmap.pix(line);
 	u16 const oowcol = OOW_COLOR;
 
 	if (line < m_wba_v || line >= m_wba_v + m_wsi_v)
@@ -631,7 +631,7 @@ void k2ge_device::k1ge_draw_sprite_plane(u16 *p, u16 priority, int line, int scr
 
 void k2ge_device::draw(int line)
 {
-	u16 *const p = &m_bitmap->pix(line);
+	u16 *const p = &m_bitmap.pix(line);
 	u16 const oowcol = OOW_COLOR;
 
 	if (line < m_wba_v || line >= m_wba_v + m_wsi_v)
@@ -795,7 +795,7 @@ TIMER_CALLBACK_MEMBER(k1ge_device::timer_callback)
 
 u32 k1ge_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	copybitmap(bitmap, *m_bitmap, 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }
 
@@ -809,13 +809,14 @@ void k1ge_device::device_start()
 	m_timer = timer_alloc(FUNC(k1ge_device::timer_callback), this);
 	m_hblank_on_timer = timer_alloc(FUNC(k1ge_device::hblank_on_timer_callback), this);
 	m_vram = make_unique_clear<u8[]>(0x4000);
-	m_bitmap = std::make_unique<bitmap_ind16>(screen().width(), screen().height());
+	screen().register_screen_bitmap(m_bitmap);
 
 	save_pointer(NAME(m_vram), 0x4000);
 	save_item(NAME(m_wba_h));
 	save_item(NAME(m_wba_v));
 	save_item(NAME(m_wsi_h));
 	save_item(NAME(m_wsi_v));
+	save_item(NAME(m_bitmap));
 
 	palette_init();
 }

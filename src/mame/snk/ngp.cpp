@@ -559,7 +559,7 @@ void ngp_state::flash1_w(offs_t offset, uint8_t data)
 void ngp_state::main_mem(address_map &map)
 {
 	map(0x000080, 0x0000bf).rw(FUNC(ngp_state::io_r), FUNC(ngp_state::io_w));                        /* ngp/c specific i/o */
-	map(0x004000, 0x006fff).ram().share("mainram");                              /* work ram */
+	map(0x004000, 0x006fff).ram().share(m_mainram);                              /* work ram */
 	map(0x007000, 0x007fff).ram().share("soundram");                             /* shared with sound cpu */
 	map(0x008000, 0x00bfff).rw(m_k1ge, FUNC(k1ge_device::read), FUNC(k1ge_device::write));       /* video chip */
 	map(0x200000, 0x3fffff).w(FUNC(ngp_state::flash0_w));   /* cart area #1 */
