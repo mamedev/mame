@@ -138,7 +138,7 @@ void k2ge_device::write(offs_t offset, u8 data)
 	}
 
 	/* Only the lower 4 bits of the palette entry high bytes can be written */
-	if (offset >= 0x0200 && offset < 0x0400 && (offset & 1))
+	if (offset >= 0x0200 && offset < 0x0400 && BIT(offset, 0))
 	{
 		data &= 0x0f;
 	}
