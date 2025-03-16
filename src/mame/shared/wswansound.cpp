@@ -289,12 +289,13 @@ void wswan_sound_device::sound_stream_update(sound_stream &stream, std::vector<r
 }
 
 
-void wswan_sound_device::hypervoice_t::input(u8 input)
+void wswan_sound_device::hypervoice_t::stereo_input(u8 input)
 {
 	if (input_channel) // Right input
 		rinput = input;
 	else // Left input
 		linput = input;
+	input_channel = !input_channel;
 }
 
 
@@ -325,8 +326,7 @@ void wswan_sound_device::hypervoice_dma_w(u8 data)
 	switch (m_hypervoice.channel_mode)
 	{
 		case 0x00: // Stereo
-			m_hypervoice.input(data);
-			m_hypervoice.input_channel = !m_hypervoice.input_channel;
+			m_hypervoice.stereo_input(data);
 			break;
 		case 0x01: // Mono, Left
 			m_hypervoice.linput = data;
@@ -377,8 +377,7 @@ void wswan_sound_device::hypervoice_w(offs_t offset, u16 data, u16 mem_mask)
 		case 0x68 / 2: // Input
 			if (ACCESSING_BITS_8_15)
 			{
-				m_hypervoice.input((data >> 8) & 0xff);
-				m_hypervoice.input_channel = !m_hypervoice.input_channel;
+				m_hypervoice.stereo_input((data >> 8) & 0xff);
 			}
 			break;
 		case 0x6a / 2: // Control

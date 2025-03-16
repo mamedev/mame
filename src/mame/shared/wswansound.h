@@ -80,7 +80,7 @@ private:
 		enable(false),
 		channel_mode(0) {}
 
-		void input(u8 input);
+		void stereo_input(u8 input);
 		s32 scale(u8 input);
 
 		s32  loutput;
