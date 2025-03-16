@@ -164,22 +164,11 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override ATTR_COLD;
 
+	virtual void nvram_default() override;
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
+
 private:
-
-	uint8_t m_io_reg[0x40] = { };
-	uint8_t m_old_to3 = 0;
-	emu_timer* m_seconds_timer = nullptr;
-
-	struct {
-		int       present = 0;
-		uint8_t   manufacturer_id = 0;
-		uint8_t   device_id = 0;
-		uint8_t   *data = nullptr;
-		uint8_t   org_data[16] = { };
-		int       state = F_READ;
-		uint8_t   command[2] = { };
-	} m_flash_chip[2];
-
 	required_device<tmp95c061_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<cpu_device> m_z80;
@@ -189,6 +178,24 @@ private:
 	required_device<generic_slot_device> m_cart;
 	required_shared_ptr<uint8_t> m_mainram;
 	required_device<k1ge_device> m_k1ge;
+	required_ioport m_io_controls;
+	required_ioport m_io_power;
+
+	uint8_t m_io_reg[0x40] = { };
+	uint8_t m_old_to3 = 0;
+	emu_timer* m_seconds_timer = nullptr;
+
+	struct {
+		bool      present = false;
+		uint8_t   manufacturer_id = 0;
+		uint8_t   device_id = 0;
+		uint8_t   *data = nullptr;
+		uint8_t   org_data[16] = { };
+		int32_t   state = F_READ;
+		uint8_t   command[2] = { };
+	} m_flash_chip[2];
+
+	bool m_nvram_loaded = false;
 
 	uint8_t io_r(offs_t offset);
 	void io_w(offs_t offset, uint8_t data);
@@ -214,14 +221,6 @@ private:
 	void main_mem(address_map &map) ATTR_COLD;
 	void z80_io(address_map &map) ATTR_COLD;
 	void z80_mem(address_map &map) ATTR_COLD;
-
-	bool m_nvram_loaded = false;
-	required_ioport m_io_controls;
-	required_ioport m_io_power;
-
-	virtual void nvram_default() override;
-	virtual bool nvram_read(util::read_stream &file) override;
-	virtual bool nvram_write(util::write_stream &file) override;
 };
 
 
@@ -757,7 +756,7 @@ DEVICE_IMAGE_LOAD_MEMBER(ngp_state::load_ngp_cart)
 	//printf("%2x%2x - %x - %x\n", (unsigned int) memregion("cart")->u8(0x20), (unsigned int) memregion("cart")->u8(0x21),
 	//        (unsigned int) memregion("cart")->u8(0x22), (unsigned int) memregion("cart")->u8(0x23));
 	m_flash_chip[0].manufacturer_id = 0x98;
-	m_flash_chip[0].present = 1;
+	m_flash_chip[0].present = true;
 	m_flash_chip[0].state = F_READ;
 
 	switch (size)
@@ -779,7 +778,7 @@ DEVICE_IMAGE_LOAD_MEMBER(ngp_state::load_ngp_cart)
 	{
 		m_flash_chip[1].manufacturer_id = 0x98;
 		m_flash_chip[1].device_id = 0x2f;
-		m_flash_chip[1].present = 1;
+		m_flash_chip[1].present = true;
 		m_flash_chip[1].state = F_READ;
 	}
 
@@ -789,10 +788,10 @@ DEVICE_IMAGE_LOAD_MEMBER(ngp_state::load_ngp_cart)
 
 DEVICE_IMAGE_UNLOAD_MEMBER(ngp_state::unload_ngp_cart)
 {
-	m_flash_chip[0].present = 0;
+	m_flash_chip[0].present = false;
 	m_flash_chip[0].state = F_READ;
 
-	m_flash_chip[1].present = 0;
+	m_flash_chip[1].present = false;
 	m_flash_chip[1].state = F_READ;
 }
 
