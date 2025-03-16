@@ -278,6 +278,10 @@ void tsconf_state::tsconf(machine_config &config)
 
 	m_maincpu->set_vblank_int("screen", FUNC(tsconf_state::tsconf_vblank_interrupt));
 
+	SPI_SDCARD(config, m_sdcard, 0);
+	m_sdcard->set_prefer_sdhc();
+	m_sdcard->spi_miso_callback().set(FUNC(tsconf_state::tsconf_spi_miso_w));
+
 	zxbus_device &zxbus(ZXBUS(config, "zxbus", 0));
 	zxbus.set_iospace("maincpu", AS_IO);
 	ZXBUS_SLOT(config, "zxbus1", 0, "zxbus", zxbus_cards, nullptr);
@@ -296,10 +300,6 @@ void tsconf_state::tsconf(machine_config &config)
 	m_dma->on_ready_callback().set(FUNC(tsconf_state::dma_ready));
 
 	BETA_DISK(config, m_beta, 0);
-	SPI_SDCARD(config, m_sdcard, 0);
-	m_sdcard->set_prefer_sdhc();
-	m_sdcard->spi_miso_callback().set(FUNC(tsconf_state::tsconf_spi_miso_w));
-
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
