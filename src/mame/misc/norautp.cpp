@@ -558,6 +558,24 @@
      through a DIP switch.
 
 
+  [2025-03]
+
+  - Consolidate driver in one file.
+  - New palette for drhl and drhla.
+  - Added new test functions for drhl, drhla, dphl, and dphla.
+  - Cleaned all the conditional unused things.
+  - Rewrote inputs for different sets.
+  - DIP switches improvements for norautp, norautrh, 
+  - New inputs for norautua, dphla, drhl, ssjkrpkr.
+  - New portmap for dphl, dphla.
+  - Added Interrupts through vertical sync for all sets based on i8080.
+  - Fixed norautua and norautub table for bin to bcd conversion.
+  - New button-lamps layout with 10 buttons for dphl, dphla, dphljp,
+    drhl, drhla, and ssjkrpkr.
+  - Clickable buttons for all former buttons-lamps layouts. 	
+  - Promoted drhl, drhla, norautua, norautub, and ssjkrpkr to working.
+
+
   TODO:
 
   - Check the 3rd PPI device at 0xc0-0xc3 (VRAM).
@@ -570,25 +588,135 @@
   - Parent/clone relationship.
 
 
+  issues...
+
+  - norautua: overflow drawing cards (possible straight draw).
+              changing one card, draw a 6th card at the right.
+
+  - dphl behaviour is close to dphlunkb.
+  
+  - dphla is working, but when pay a hand is stuck spitting "call attendant".
+
+
 *******************************************************************************/
 
 #include "emu.h"
-#include "norautp.h"
 
 #include "cpu/i8085/i8085.h"
 #include "cpu/z80/z80.h"
+#include "machine/i8255.h"
 #include "machine/nvram.h"
+#include "sound/discrete.h"
+#include "emupal.h"
+#include "screen.h"
 
 #include "speaker.h"
 
 #include "noraut11.lh"
 #include "noraut12.lh"
+#include "noraut10.lh"
 
 
 #define NORAUT_MASTER_CLOCK     XTAL(18'432'000)
 #define DPHL_MASTER_CLOCK       XTAL(18'000'000)
 #define NORAUT_CPU_CLOCK        NORAUT_MASTER_CLOCK / 8     // 2.30275 MHz - Measured: 2.305 MHz
 #define DPHL_CPU_CLOCK          DPHL_MASTER_CLOCK / 9       // 2 MHz (from 8224)
+
+// Discrete Sound Input Nodes
+#define NORAUTP_SND_EN                  NODE_01
+#define NORAUTP_FREQ_DATA               NODE_02
+
+
+class norautp_state : public driver_device
+{
+public:
+	norautp_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_ppi8255(*this, "ppi8255_%u", 0),
+		m_discrete(*this, "discrete"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
+		m_decrypted_opcodes(*this, "decrypted_opcodes"),
+		m_lamps(*this, "lamp%u", 0U)
+	{ }
+
+	void noraut_base(machine_config &config);
+	void kimble(machine_config &config);
+	void kimbldhl(machine_config &config);
+	void norautp(machine_config &config);
+	void norautu(machine_config &config);
+	void norautx4(machine_config &config);
+	void norautpl(machine_config &config);
+	void newhilop(machine_config &config);
+	void dphltest(machine_config &config);
+	void nortest1(machine_config &config);
+	void ssjkrpkr(machine_config &config);
+	void dphl(machine_config &config);
+	void dphla(machine_config &config);
+	void drhl(machine_config &config);
+	void norautxp(machine_config &config);
+	void noraut3(machine_config &config);
+	void cgidjp(machine_config &config);
+	void cdrawpkr(machine_config &config);
+
+	void init_ssa();
+	void init_enc();
+	void init_deb();
+
+protected:
+	virtual void machine_start() override { m_lamps.resolve(); }
+	virtual void video_start() override ATTR_COLD;
+
+private:
+	void ppi2_obf_w(int state);
+	TIMER_CALLBACK_MEMBER(ppi2_ack);
+	uint8_t test2_r();
+	uint8_t test3_r();
+	uint8_t test4_r();
+	void mainlamps_w(uint8_t data);
+	void soundlamps_w(uint8_t data);
+	void counterlamps_w(uint8_t data);
+	void norautp_palette(palette_device &palette) const;
+	void drhl_palette(palette_device &palette) const;
+	uint32_t screen_update_norautp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void cgidjp_map(address_map &map) ATTR_COLD;
+	void cgidjp_opcodes_map(address_map &map) ATTR_COLD;
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void dphl_map(address_map &map) ATTR_COLD;
+	void dphl_portmap(address_map &map) ATTR_COLD;
+	void dphla_portmap(address_map &map) ATTR_COLD;
+	void dphla_map(address_map &map) ATTR_COLD;
+	void drhl_portmap(address_map &map) ATTR_COLD;
+	void dphltest_map(address_map &map) ATTR_COLD;
+	void drhl_map(address_map &map) ATTR_COLD;
+	void kimbldhl_map(address_map &map) ATTR_COLD;
+	void kimble_map(address_map &map) ATTR_COLD;
+	void newhilop_map(address_map &map) ATTR_COLD;
+	void noraut3_map(address_map &map) ATTR_COLD;
+	void noraut3_decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void norautp_map(address_map &map) ATTR_COLD;
+	void norautp_portmap(address_map &map) ATTR_COLD;
+	void norautx4_map(address_map &map) ATTR_COLD;
+	void norautx8_map(address_map &map) ATTR_COLD;
+	void norautxp_map(address_map &map) ATTR_COLD;
+	void norautxp_portmap(address_map &map) ATTR_COLD;
+	void nortest1_map(address_map &map) ATTR_COLD;
+	void ssjkrpkr_map(address_map &map) ATTR_COLD;
+
+	std::unique_ptr<uint16_t[]> m_np_vram;
+	required_device<cpu_device> m_maincpu;
+	required_device_array<i8255_device, 3> m_ppi8255;
+	required_device<discrete_sound_device> m_discrete;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
+	output_finder<12> m_lamps;
+	
+	int m_test3 = 1;
+};
 
 
 /*********************************************
@@ -653,6 +781,19 @@ void norautp_state::norautp_palette(palette_device &palette) const
 	palette.set_pen_color(5, rgb_t(0xff, 0x00, 0x00));    // red
 	palette.set_pen_color(6, rgb_t(0xff, 0xff, 0xff));    // white
 	palette.set_pen_color(7, rgb_t(0x00, 0x00, 0x00));    // black
+}
+
+void norautp_state::drhl_palette(palette_device &palette) const
+{
+	// 1st gfx bank  paleeta para drhl
+	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00));    // black (blue)
+	palette.set_pen_color(1, rgb_t(0xff, 0xff, 0xff));    // white (yellow)
+	palette.set_pen_color(2, rgb_t(0xff, 0x00, 0x00));    // red   (blue)
+	palette.set_pen_color(3, rgb_t(0xff, 0xff, 0xff));    // white (white)
+	palette.set_pen_color(4, rgb_t(0xff, 0xff, 0xff));    // white
+	palette.set_pen_color(5, rgb_t(0x00, 0x00, 0xff));    // red
+	palette.set_pen_color(6, rgb_t(0xff, 0xff, 0x00));    // yellow (white)
+	palette.set_pen_color(7, rgb_t(0x00, 0x00, 0xff));    // blue   (black)
 }
 
 
@@ -734,22 +875,6 @@ void norautp_state::counterlamps_w(uint8_t data)
 }
 
 
-/* Game waits for bit 7 (0x80) to be set.
-   This should be the /OBF line (PC7) from PPI-2 (handshake).
-   PC0-PC2 could be set as input or output.
-*/
-
-//uint8_t norautp_state::ppi2_portc_r()
-//{
-//  return;
-//}
-
-//void norautp_state::ppi2_portc_w(uint8_t data)
-//{
-//  // PC0-PC2 don't seems to be connected to any output
-//}
-
-
 void norautp_state::ppi2_obf_w(int state)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(norautp_state::ppi2_ack), this), state);
@@ -766,38 +891,34 @@ TIMER_CALLBACK_MEMBER(norautp_state::ppi2_ack)
 	}
 }
 
-#ifdef UNUSED_FUNCTION // old implementation
-// game waits for /OBF signal (bit 7) to be set.
-uint8_t norautp_state::test_r()
-{
-	return 0xff;
-}
-
-uint8_t norautp_state::vram_data_r()
-{
-	return m_np_vram[m_np_addr];
-}
-
-void norautp_state::vram_data_w(uint8_t data)
-{
-	m_np_vram[m_np_addr] = data & 0xff;
-
-	// trigger 8255-2 port C bit 7 (/OBF)
-	// m_ppi8255_2->set_pc_bit(7, 0);
-	// m_ppi8255_2->set_pc_bit(7, 1);
-
-}
-
-void norautp_state::vram_addr_w(uint8_t data)
-{
-	m_np_addr = data;
-}
-#endif
 
 // game waits for bit 4 (0x10) to be reset.
 uint8_t norautp_state::test2_r()
 {
 	return 0x00;
+}
+
+uint8_t norautp_state::test3_r()
+{
+//	return machine().rand() & 0xff;
+
+	if(m_maincpu->pc() == 0x187a)
+		return 0x02 + (machine().rand() & 0x0f);
+	if(m_maincpu->pc() == 0x1881)
+		return 0x00 + (machine().rand() & 0x0f);
+	if(m_maincpu->pc() == 0x188d)
+		return 0x02 + (machine().rand() & 0x0f);
+	m_test3 = (~m_test3 & 0x01);
+
+	logerror("test3: pc:%04x - data:%02x\n", m_maincpu->pc(), m_test3);
+	return m_test3;
+
+}
+
+uint8_t norautp_state::test4_r()
+{
+	m_test3 = (~m_test3 & 0x01) + 0x14;
+	return m_test3;
 }
 
 
@@ -872,15 +993,13 @@ void norautp_state::decrypted_opcodes_map(address_map &map)
 	map(0x0000, 0x1fff).rom().share(m_decrypted_opcodes);
 }
 
+
 void norautp_state::norautp_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x60, 0x63).mirror(0x1c).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xa0, 0xa3).mirror(0x1c).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xc0, 0xc3).mirror(0x3c).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	//map(0xc0, 0xc0).mirror(0x3c).rw(FUNC(norautp_state::vram_data_r), FUNC(norautp_state::vram_data_w));
-	//map(0xc1, 0xc1).mirror(0x3c).w(FUNC(norautp_state::vram_addr_w));
-	//map(0xc2, 0xc2).mirror(0x3c).r(FUNC(norautp_state::test_r));
 	map(0xef, 0xef).r(FUNC(norautp_state::test2_r));
 }
 
@@ -919,14 +1038,6 @@ void norautp_state::norautx4_map(address_map &map)
 	map(0x6000, 0x67ff).ram().share("nvram");  // 6116
 }
 
-#ifdef UNUSED_CODE
-void norautp_state::norautx8_map(address_map &map)
-{
-	map(0x0000, 0x7fff).rom();  // need to be checked
-	map(0xc000, 0xc7ff).ram().share("nvram");  // 6116
-}
-#endif
-
 void norautp_state::noraut3_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom().region("maincpu", 0x4000);
@@ -944,15 +1055,8 @@ void norautp_state::kimble_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xc7ff).ram().share("nvram");
-	map(0xc800, 0xc9ff).ram();  // working RAM?
+	map(0xc800, 0xcfff).ram();  // working RAM?
 }
-
-#ifdef UNUSED_CODE
-void norautp_state::norautxp_portmap(address_map &map)
-{
-	map.global_mask(0xff);
-}
-#endif
 
 void norautp_state::newhilop_map(address_map &map)
 {
@@ -1033,6 +1137,35 @@ void norautp_state::drhl_map(address_map &map)
 }
 
 
+void norautp_state::dphla_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x60, 0x63).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xa0, 0xa3).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xc0, 0xc3).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xef, 0xef).r(FUNC(norautp_state::test3_r));
+}
+
+
+void norautp_state::dphl_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x7c, 0x7f).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xbc, 0xbf).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xdc, 0xdf).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xef, 0xef).r(FUNC(norautp_state::test3_r));
+}
+
+void norautp_state::drhl_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x7c, 0x7f).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xbc, 0xbf).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xdc, 0xdf).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xef, 0xef).r(FUNC(norautp_state::test4_r));
+}
+
+
 /*********************************************
 *                Input Ports                 *
 *********************************************/
@@ -1044,7 +1177,7 @@ static INPUT_PORTS_START( norautp )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )  PORT_NAME("Bet / Collect")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)  // Coin A
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)  // Coin B
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_K) PORT_NAME("IN0-5")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )  // PORT_CODE(KEYCODE_K) PORT_NAME("IN0-5")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Hi")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )  PORT_NAME("Lo")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
@@ -1065,28 +1198,28 @@ static INPUT_PORTS_START( norautp )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_L) PORT_NAME("Low Level Hopper")
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW1:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW1:7")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW1:6")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x08, 0x08, "Random Raise Bet" )    PORT_DIPLOCATION("DSW1:5")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW1:4")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Coinage ) )    PORT_DIPLOCATION("DSW1:3")
 	PORT_DIPSETTING(    0x20, "A=5; B=25; C=1" )
 	PORT_DIPSETTING(    0x00, "A=50; B=25; C=5" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW1:2")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Set Value" )
+	PORT_DIPNAME( 0x80, 0x80, "Set Value" )           PORT_DIPLOCATION("DSW1:1")
 	PORT_DIPSETTING(    0x80, "2 Pence" )
 	PORT_DIPSETTING(    0x00, "10 Pence" )
 INPUT_PORTS_END
@@ -1120,15 +1253,19 @@ static INPUT_PORTS_START( norautrh )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
+	// to find the function...
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW1:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW1:7")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Bet Max" )           PORT_DIPLOCATION("DSW1:6")
-	PORT_DIPSETTING(    0x04, "5" )
-	PORT_DIPSETTING(    0x00, "25" )
+
+	PORT_DIPNAME( 0x04, 0x04, "Bet Max" )           PORT_DIPLOCATION("DSW1:6")  
+	PORT_DIPSETTING(    0x04, "1" )           PORT_CONDITION("DSW1", 0x80, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, "20" )          PORT_CONDITION("DSW1", 0x80, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x04, "5 " )          PORT_CONDITION("DSW1", 0x80, EQUALS, 0x80)
+	PORT_DIPSETTING(    0x00, "25" )          PORT_CONDITION("DSW1", 0x80, EQUALS, 0x80)
 	PORT_DIPNAME( 0x08, 0x08, "Raise Ante" )        PORT_DIPLOCATION("DSW1:5")
 	PORT_DIPSETTING(    0x08, "Random" )
 	PORT_DIPSETTING(    0x00, "Always" )
@@ -1137,8 +1274,8 @@ static INPUT_PORTS_START( norautrh )
 	PORT_DIPSETTING(    0x00, "Joker Poker" )
 	PORT_DIPNAME( 0xa0, 0x20, DEF_STR( Coinage ) )  PORT_DIPLOCATION("DSW1:3,1")
 	PORT_DIPSETTING(    0x00, "A=1; B=5" )
-	PORT_DIPSETTING(    0xa0, "A=5; B=25" )
 	PORT_DIPSETTING(    0x20, "A=10; B=5" )
+	PORT_DIPSETTING(    0xa0, "A=5; B=25" )
 	PORT_DIPSETTING(    0x80, "A=50; B=25" )
 	PORT_DIPNAME( 0x40, 0x00, "Show Bet")           PORT_DIPLOCATION("DSW1:2")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
@@ -1353,6 +1490,149 @@ static INPUT_PORTS_START( noraut3 )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( norautua )
+
+	PORT_INCLUDE( norautrh )
+
+	PORT_MODIFY("DSW1")
+	// to find the function...
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW1:7")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_DIPNAME( 0x04, 0x04, "Bet Max" )           PORT_DIPLOCATION("DSW1:6")  
+	PORT_DIPSETTING(    0x04, "1" )           PORT_CONDITION("DSW1", 0x80, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, "20" )          PORT_CONDITION("DSW1", 0x80, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x04, "5 " )          PORT_CONDITION("DSW1", 0x80, EQUALS, 0x80)
+	PORT_DIPSETTING(    0x00, "25" )          PORT_CONDITION("DSW1", 0x80, EQUALS, 0x80)
+	PORT_DIPNAME( 0xa0, 0x20, DEF_STR( Coinage ) )  PORT_DIPLOCATION("DSW1:3,1")
+	PORT_DIPSETTING(    0x00, "A=1; B=5" )
+	PORT_DIPSETTING(    0x20, "A=10; B=5" )
+	PORT_DIPSETTING(    0x80, "A=5; B=25" )
+	PORT_DIPSETTING(    0xa0, "A=50; B=25" )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( dphla )
+
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )       PORT_NAME("Deal")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )   PORT_NAME("Bet / Collect")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)  // Coin A  OK
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("IN0-5") PORT_CODE(KEYCODE_K)  // give "ERROR" in some games
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )  PORT_NAME("Hi")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )   PORT_NAME("Lo")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Stand")PORT_CODE(KEYCODE_D)  // Stand: keep the hand
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )  PORT_NAME("Draw")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
+
+	PORT_START("IN2") // unused
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )  // PPI set for PORT C all outputs
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW1:7")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW1:5")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Cards to discard" )    PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPSETTING(    0x10, "All 5 cards" )
+	PORT_DIPSETTING(    0x00, "Max 3 cards" )
+	PORT_DIPNAME( 0x60, 0x60, "2 Jokers in Deck" )    PORT_DIPLOCATION("DSW1:2,3")
+	PORT_DIPSETTING(    0x60, "Never"  )
+	PORT_DIPSETTING(    0x40, "When 8 or more is bet" )
+	PORT_DIPSETTING(    0x20, "When 4 or more is bet" )
+	PORT_DIPSETTING(    0x00, "Always" )
+	PORT_DIPNAME( 0x80, 0x80, "Test Mode" )           PORT_DIPLOCATION("DSW1:1") 
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( drhl )
+
+	PORT_INCLUDE( dphla )
+
+	PORT_MODIFY("DSW1")
+	// to find the function...
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW1:7")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Test Mode" )           PORT_DIPLOCATION("DSW1:5")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x30, "Max Bet" )             PORT_DIPLOCATION("DSW1:3,4")
+	PORT_DIPSETTING(    0x10, "10" )
+	PORT_DIPSETTING(    0x00, "20" )
+	PORT_DIPSETTING(    0x30, "30" )
+	PORT_DIPSETTING(    0x20, "30" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Coinage ) )    PORT_DIPLOCATION("DSW1:2")
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )
+	PORT_DIPNAME( 0x80, 0x80, "Bonus" )               PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( ssjkrpkr )
+
+	PORT_INCLUDE( dphla )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Cards to Discard" )    PORT_DIPLOCATION("DSW1:7")
+	PORT_DIPSETTING(    0x02, "All 5 cards" )
+	PORT_DIPSETTING(    0x00, "Max 3 cards" )
+	PORT_DIPNAME( 0x04, 0x00, "Double-Up" )           PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x18, 0x10, "Max Bet" )             PORT_DIPLOCATION("DSW1:4,5")
+	PORT_DIPSETTING(    0x18, "1" )
+	PORT_DIPSETTING(    0x08, "4" )
+	PORT_DIPSETTING(    0x00, "9" )
+	PORT_DIPSETTING(    0x10, "25" )
+
+	PORT_DIPNAME( 0x20, 0x00, "Break Game (set ON)" ) PORT_DIPLOCATION("DSW1:3")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Coinage ) )    PORT_DIPLOCATION("DSW1:2")
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )
+
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW1:1") 
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
 /*********************************************
 *              Graphics Layouts              *
 *********************************************/
@@ -1395,6 +1675,97 @@ static GFXDECODE_START( gfx_norautp )
 	GFXDECODE_ENTRY( "gfx", 0x800, charlayout,      0, 4 )
 	GFXDECODE_ENTRY( "gfx", 0x800, charlayout32x32, 0, 4 )
 GFXDECODE_END
+
+
+/**************************************************
+*             Discrete Sound Hardware             *
+**************************************************/
+
+static const discrete_555_desc desc_norautp_555 =
+{
+	DISC_555_OUT_ENERGY | DISC_555_OUT_AC,
+	5,              // B+ voltage of 555
+	DEFAULT_555_VALUES
+};
+
+
+#define NORAUTP_SOUND_CIRCUIT(_name, _r1, _r2, _c1, _c2, _c3, _c4)          \
+static const discrete_comp_adder_table desc_##_name##_caps =                \
+{                                                                           \
+	DISC_COMP_P_CAPACITOR, _c4, 3,                                          \
+	{                                                                       \
+		_c3, _c2, _c1                                                       \
+	}                                                                       \
+};                                                                          \
+																			\
+DISCRETE_SOUND_START( _name##_discrete )                                    \
+	/************************************************                       \
+	 * Input register mapping                                               \
+	 ************************************************/                      \
+	DISCRETE_INPUT_LOGIC(NORAUTP_SND_EN)                                    \
+	DISCRETE_INPUT_DATA (NORAUTP_FREQ_DATA)                                 \
+																			\
+	/************************************************                       \
+	 * Tone Generator                                                       \
+	 ************************************************/                      \
+	DISCRETE_COMP_ADDER(NODE_20, NORAUTP_FREQ_DATA, &desc_##_name##_caps)   \
+	DISCRETE_555_ASTABLE(NODE_21,                                           \
+							NORAUTP_SND_EN,                 /* RESET */     \
+							_r2, _r1, NODE_20, &desc_norautp_555)           \
+																			\
+	DISCRETE_OUTPUT(NODE_21, 65000.0/3.8)                                   \
+DISCRETE_SOUND_END
+
+
+/***** Noraut Poker *****/
+
+/* Parts List - Resistors */
+#define NORAUTP_R1      RES_K(120)
+#define NORAUTP_R2      RES_K(2.2)
+
+/* Parts List - Capacitors */
+#define NORAUTP_C1      CAP_U(.01)
+#define NORAUTP_C2      CAP_U(.022)
+#define NORAUTP_C3      CAP_U(.047)
+#define NORAUTP_C4      CAP_U(.01)
+
+NORAUTP_SOUND_CIRCUIT(norautp,
+	NORAUTP_R1, NORAUTP_R2,
+	NORAUTP_C1, NORAUTP_C2, NORAUTP_C3, NORAUTP_C4)
+
+
+/***** Draw Poker HI-LO *****/
+
+/* Parts List - Resistors */
+#define DPHL_R1     RES_K(120)
+#define DPHL_R2     RES_K(1)
+
+/* Parts List - Capacitors */
+#define DPHL_C1     CAP_U(.01)
+#define DPHL_C2     CAP_U(.022)
+#define DPHL_C3     CAP_U(.05)
+#define DPHL_C4     CAP_U(.01)
+
+NORAUTP_SOUND_CIRCUIT(dphl,
+	DPHL_R1, DPHL_R2,
+	DPHL_C1, DPHL_C2, DPHL_C3, DPHL_C4)
+
+
+/***** Kimble Double HI-LO *****/
+
+/* Parts List - Resistors */
+#define KIMBLE_R1       RES_K(100)
+#define KIMBLE_R2       RES_K(1)
+
+/* Parts List - Capacitors */
+#define KIMBLE_C1       CAP_U(.01)
+#define KIMBLE_C2       CAP_U(.022)
+#define KIMBLE_C3       CAP_U(.047)
+#define KIMBLE_C4       CAP_U(.01)
+
+NORAUTP_SOUND_CIRCUIT(kimble,
+	KIMBLE_R1, KIMBLE_R2,
+	KIMBLE_C1, KIMBLE_C2, KIMBLE_C3, KIMBLE_C4)
 
 
 /*********************************************
@@ -1502,17 +1873,6 @@ void norautp_state::norautx4(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(norautp_state::irq0_line_hold));
 }
 
-#ifdef UNUSED_CODE
-void norautp_state::norautx8(machine_config &config)
-{
-	noraut_base(config);
-
-	// basic machine hardware
-	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::norautx8_map);
-	m_maincpu->set_vblank_int("screen", FUNC(norautp_state::irq0_line_hold));
-}
-#endif
-
 void norautp_state::noraut3(machine_config &config)
 {
 	noraut_base(config);
@@ -1573,7 +1933,8 @@ void norautp_state::dphl(machine_config &config)
 	// basic machine hardware
 	I8080(config.replace(), m_maincpu, DPHL_CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::dphl_map);
-	m_maincpu->set_addrmap(AS_IO, &norautp_state::norautp_portmap);
+	m_maincpu->set_addrmap(AS_IO, &norautp_state::dphl_portmap);
+	m_maincpu->set_vblank_int("screen", FUNC(norautp_state::irq0_line_hold));
 
 	// sound hardware
 	m_discrete->set_intf(dphl_discrete);
@@ -1586,7 +1947,8 @@ void norautp_state::dphla(machine_config &config)
 	// basic machine hardware
 	I8080(config.replace(), m_maincpu, DPHL_CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::dphla_map);
-	m_maincpu->set_addrmap(AS_IO, &norautp_state::norautp_portmap);
+	m_maincpu->set_addrmap(AS_IO, &norautp_state::dphla_portmap);
+	m_maincpu->set_vblank_int("screen", FUNC(norautp_state::irq0_line_hold));
 
 	// sound hardware
 	m_discrete->set_intf(dphl_discrete);
@@ -1600,6 +1962,7 @@ void norautp_state::kimbldhl(machine_config &config)
 	I8080(config.replace(), m_maincpu, DPHL_CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::kimbldhl_map);
 	m_maincpu->set_addrmap(AS_IO, &norautp_state::norautp_portmap);
+	m_maincpu->set_vblank_int("screen", FUNC(norautp_state::irq0_line_hold));
 
 	// sound hardware
 	m_discrete->set_intf(kimble_discrete);
@@ -1613,6 +1976,7 @@ void norautp_state::dphltest(machine_config &config)
 	I8080(config.replace(), m_maincpu, DPHL_CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::dphltest_map);
 	m_maincpu->set_addrmap(AS_IO, &norautp_state::norautp_portmap);
+	m_maincpu->set_vblank_int("screen", FUNC(norautp_state::irq0_line_hold));
 
 	// sound hardware
 	m_discrete->set_intf(dphl_discrete);
@@ -1625,7 +1989,10 @@ void norautp_state::drhl(machine_config &config)
 	// basic machine hardware
 	I8080(config.replace(), m_maincpu, DPHL_CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::drhl_map);
-	m_maincpu->set_addrmap(AS_IO, &norautp_state::norautp_portmap);
+	m_maincpu->set_addrmap(AS_IO, &norautp_state::drhl_portmap);
+	m_maincpu->set_vblank_int("screen", FUNC(norautp_state::irq0_line_hold));
+
+	PALETTE(config.replace(), "palette", FUNC(norautp_state::drhl_palette), 8);
 
 	// sound hardware
 	m_discrete->set_intf(dphl_discrete);
@@ -1639,6 +2006,7 @@ void norautp_state::ssjkrpkr(machine_config &config)
 	I8080(config.replace(), m_maincpu, DPHL_CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::ssjkrpkr_map);
 	m_maincpu->set_addrmap(AS_IO, &norautp_state::norautp_portmap);
+	m_maincpu->set_vblank_int("screen", FUNC(norautp_state::irq0_line_hold));
 
 	// sound hardware
 	m_discrete->set_intf(dphl_discrete);
@@ -3597,10 +3965,12 @@ ROM_START( ssjkrpkr )
 	ROM_LOAD( "oc.u11", 0x0000, 0x1000, CRC(b9072aa5) SHA1(bfa3df090e1030aaebbb784cb5e686f4f84f2263) )
 	ROM_LOAD( "oc.u10", 0x1000, 0x1000, CRC(8652ebb9) SHA1(e907df4f8da99b42c425ed58da3cda9943c89fb7) )
 
-	// All garbage inside. Replaced with generic GFX ROM from DPHLA set, modified to support the "'" char
+	// The ROM is broken and can't get a consistent dump. All is garbage inside.
+	// So, we are using a generic GFX ROM (from DPHLA set), modified to support
+	// the apostrophe, question mark, and arrow down symbols needed for the game.
 	ROM_REGION( 0x1000,  "gfx", 0 )
 	ROM_FILL(           0x0000, 0x0800, 0xff )
-	ROM_LOAD( "oc.u27", 0x0800, 0x0800, BAD_DUMP CRC(ac8e9f2c) SHA1(25ab615de3055e5be78d409194edf7e3c03fe9b9) )
+	ROM_LOAD( "oc.u27", 0x0800, 0x0800, BAD_DUMP CRC(6de843f8) SHA1(4403178b491ba3d8115ebb631450d094be730edc) )
 ROM_END
 
 
@@ -3615,7 +3985,7 @@ ROM_END
   The set was found as 'fastdraw'. No other info.
   Maybe is the poker conversion kit released by Stern as 'Fast Draw':
 
-  http://www.arcadeflyers.com/?page=thumbs&db=videodb&id=4602
+  https://flyers.arcade-museum.com/videogames/show/4362
 
 */
 
@@ -4513,7 +4883,19 @@ void norautp_state::init_enc()
 			case 0x0f: rom[i] = data_sub_table_0f[x]; break;
 		}
 	}
+
+	uint8_t *ROM = memregion("maincpu")->base();
+	// fix table for bin to bcd conversion
+	ROM[0x1da0] = 0x10; // 10.000
+	ROM[0x1da1] = 0x27;
+	ROM[0x1da2] = 0xe8; // 1.000
+	ROM[0x1da3] = 0x03;	
+	ROM[0x1da4] = 0x64; // 100
+	ROM[0x1da5] = 0x00;
+	ROM[0x1da6] = 0x0a; // 10
+	ROM[0x1da7] = 0x00;
 }
+
 
 void norautp_state::init_deb()
 // Just for debugging purposes
@@ -4524,6 +4906,7 @@ void norautp_state::init_deb()
 	ROM[0x02f8] = 0x18;
 	ROM[0x206c] = 0xff;
 }
+
 
 void norautp_state::init_ssa()
 /* Passing the video PPI handshaking lines */
@@ -4549,61 +4932,61 @@ void norautp_state::init_ssa()
 //*  The following ones are 'Draw Poker HI-LO' type, running in a Z80 based hardware   *
 //**************************************************************************************
 
-//     YEAR  NAME      PARENT   MACHINE   INPUT     CLASS          INIT        ROT   COMPANY                     FULLNAME                                        FLAGS                 LAYOUT
-GAMEL( 1988, norautp,  0,       norautp,  norautp,  norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Poker",                                 0,                    layout_noraut11 )
-GAMEL( 198?, norautdx, 0,       norautp,  norautpn, norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Deluxe Poker (console)",                0,                    layout_noraut12 )
-GAMEL( 198?, norautpn, norautp, norautp,  norautpn, norautp_state, empty_init, ROT0, "bootleg",                  "Noraut Deluxe Poker (bootleg)",                0,                    layout_noraut12 )
-GAMEL( 198?, norautjo, 0,       norautp,  mainline, norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Joker Poker (original)",                0,                    layout_noraut12 )
-GAMEL( 198?, norautpl, 0,       norautpl, mainline, norautp_state, empty_init, ROT0, "Video Fun Games Ltd.",     "Noraut Joker Poker (Prologic HW)",             0,                    layout_noraut12 )
-GAMEL( 1988, norautjp, norautp, norautp,  norautp,  norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Joker Poker (alt)",                     0,                    layout_noraut11 )
-GAMEL( 1988, norautrh, 0,       norautp,  norautrh, norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Red Hot Joker Poker",                   0,                    layout_noraut12 )
-GAMEL( 198?, norautra, 0,       norautp,  norautrh, norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Red Hot Joker Poker (alt HW)",          0,                    layout_noraut12 ) // 1-bet?? where??...
-GAME(  1988, norautu,  0,       norautxp, norautp,  norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Poker (NTX10A)",                        MACHINE_NOT_WORKING )
-GAMEL( 2002, noraut3a, 0,       noraut3,  noraut3,  norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Jacks Plus / Joker Poker (V3.010a)",    MACHINE_NOT_WORKING,  layout_noraut12 )
-GAMEL( 2003, noraut3b, 0,       noraut3,  noraut3,  norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Jacks Plus / Joker Poker (V3.011a)",    MACHINE_NOT_WORKING,  layout_noraut12 )
-GAMEL( 198?, norautua, 0,       norautu,  norautp,  norautp_state, init_enc,   ROT0, "Noraut Ltd.",              "Noraut Joker Poker (console, set 1)",          MACHINE_NOT_WORKING,  layout_noraut12 )
-GAMEL( 198?, norautub, 0,       norautu,  norautp,  norautp_state, init_enc,   ROT0, "Noraut Ltd.",              "Noraut Joker Poker (console, set 2)",          MACHINE_NOT_WORKING,  layout_noraut12 )
-GAMEL( 198?, mainline, 0,       norautp,  mainline, norautp_state, empty_init, ROT0, "Mainline London",          "Mainline Double Joker Poker",                  0,                    layout_noraut12 )
-GAMEL( 199?, df_djpkr, 0,       norautp,  mainline, norautp_state, empty_init, ROT0, "DellFern Ltd.",            "Double Joker Poker (45%-75% payout)",          0,                    layout_noraut12 )
-GAMEL( 2005, ndxron10, 0,       norautp,  ndxron10, norautp_state, empty_init, ROT0, "<unknown>",                "Royal on Ten (hack of Noraut Deluxe Poker)",   0,                    layout_noraut12 )
-GAMEL( 1999, cgip30cs, 0,       norautx4, norautkl, norautp_state, init_deb,   ROT0, "CGI",                      "Credit Poker (ver.30c, standard)",             0,                    layout_noraut12 ) // CGI - Credit Poker, VERSION 30C, 21/12/99
-GAMEL( 1999, cgip30b,  cgip30cs,norautx4, norautkl, norautp_state, empty_init, ROT0, "CGI",                      "Credit Poker (ver.30b, 7 & 9 bonus)",          0,                    layout_noraut12 ) // CGI - Credit Poker, VERSION 30B, 7 &9 BONUS, 21/12/99 BY V.S. for CGI
-GAMEL( 1998, cgip23b,  cgip30cs,norautx4, norautkl, norautp_state, empty_init, ROT0, "CGI",                      "Credit Poker (ver.23b, 7 & 9 bonus)",          0,                    layout_noraut12 ) // CGI - Credit Poker, VERSION 23B, 7 &9 BONUS, 31.03.98. BY V.S.
-GAMEL( 19??, cgidjp,   0,       cgidjp,   mainline, norautp_state, empty_init, ROT0, "CGI",                      "Double Joker Poker (CGI)",                     0,                    layout_noraut12 ) // very similar to df_djpkr
-GAME(  198?, kimblz80, 0,       kimble,   norautp,  norautp_state, empty_init, ROT0, "Kimble Ireland",           "Kimble Double HI-LO (z80 version)",            MACHINE_NOT_WORKING )
-GAME(  1983, pma,      0,       nortest1, norautp,  norautp_state, empty_init, ROT0, "PMA",                      "PMA Poker",                                    MACHINE_NOT_WORKING )
-GAMEL( 198?, bjpoker,  0,       norautxp, norautrh, norautp_state, empty_init, ROT0, "M.Kramer Manufacturing.",  "Poker / Black Jack (Model 7521)",              MACHINE_NOT_WORKING,  layout_noraut12 )
-GAME(  19??, newhilop, 0,       newhilop, norautp,  norautp_state, empty_init, ROT0, "Song Won?",                "New Hi-Low Poker",                             MACHINE_NOT_WORKING )
-GAMEL( 1984, cdrawpkr, 0,       cdrawpkr, cdrawpkr, norautp_state, empty_init, ROT0, "Coinmaster",               "Draw Poker (Joker Poker V.01)",                0,                    layout_noraut11 )
+//     YEAR  NAME      PARENT    MACHINE   INPUT     CLASS          INIT        ROT   COMPANY                     FULLNAME                                        FLAGS                 LAYOUT
+GAMEL( 1988, norautp,  0,        norautp,  norautp,  norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Poker",                                 0,                    layout_noraut11 )
+GAMEL( 198?, norautdx, 0,        norautp,  norautpn, norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Deluxe Poker (console)",                0,                    layout_noraut12 )
+GAMEL( 198?, norautpn, norautp,  norautp,  norautpn, norautp_state, empty_init, ROT0, "bootleg",                  "Noraut Deluxe Poker (bootleg)",                0,                    layout_noraut12 )
+GAMEL( 198?, norautjo, 0,        norautp,  mainline, norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Joker Poker (original)",                0,                    layout_noraut12 )
+GAMEL( 198?, norautpl, 0,        norautpl, mainline, norautp_state, empty_init, ROT0, "Video Fun Games Ltd.",     "Noraut Joker Poker (Prologic HW)",             0,                    layout_noraut12 )
+GAMEL( 1988, norautjp, norautp,  norautp,  norautp,  norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Joker Poker (alt)",                     0,                    layout_noraut11 )
+GAMEL( 1988, norautrh, 0,        norautp,  norautrh, norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Red Hot Joker Poker",                   0,                    layout_noraut12 )
+GAMEL( 198?, norautra, 0,        norautp,  norautrh, norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Red Hot Joker Poker (alt HW)",          0,                    layout_noraut12 )
+GAME(  1988, norautu,  0,        norautxp, norautp,  norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Poker (NTX10A)",                        MACHINE_NOT_WORKING )
+GAMEL( 2002, noraut3a, 0,        noraut3,  noraut3,  norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Jacks Plus / Joker Poker (V3.010a)",    MACHINE_NOT_WORKING,  layout_noraut12 )
+GAMEL( 2003, noraut3b, 0,        noraut3,  noraut3,  norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Jacks Plus / Joker Poker (V3.011a)",    MACHINE_NOT_WORKING,  layout_noraut12 )
+GAMEL( 198?, norautua, 0,        norautu,  norautua, norautp_state, init_enc,   ROT0, "Noraut Ltd.",              "Noraut Joker Poker (console, set 1)",          MACHINE_IMPERFECT_GRAPHICS,  layout_noraut12 )  // sometimes draw a repeated card
+GAMEL( 198?, norautub, norautua, norautu,  norautua, norautp_state, init_enc,   ROT0, "Noraut Ltd.",              "Noraut Joker Poker (console, set 2)",          0,                    layout_noraut12 )
+GAMEL( 198?, mainline, 0,        norautp,  mainline, norautp_state, empty_init, ROT0, "Mainline London",          "Mainline Double Joker Poker",                  0,                    layout_noraut12 )
+GAMEL( 199?, df_djpkr, 0,        norautp,  mainline, norautp_state, empty_init, ROT0, "DellFern Ltd.",            "Double Joker Poker (45%-75% payout)",          0,                    layout_noraut12 )
+GAMEL( 2005, ndxron10, 0,        norautp,  ndxron10, norautp_state, empty_init, ROT0, "<unknown>",                "Royal on Ten (hack of Noraut Deluxe Poker)",   0,                    layout_noraut12 )
+GAMEL( 1999, cgip30cs, 0,        norautx4, norautkl, norautp_state, init_deb,   ROT0, "CGI",                      "Credit Poker (ver.30c, standard)",             0,                    layout_noraut12 ) // CGI - Credit Poker, VERSION 30C, 21/12/99
+GAMEL( 1999, cgip30b,  cgip30cs, norautx4, norautkl, norautp_state, empty_init, ROT0, "CGI",                      "Credit Poker (ver.30b, 7 & 9 bonus)",          0,                    layout_noraut12 ) // CGI - Credit Poker, VERSION 30B, 7 &9 BONUS, 21/12/99 BY V.S. for CGI
+GAMEL( 1998, cgip23b,  cgip30cs, norautx4, norautkl, norautp_state, empty_init, ROT0, "CGI",                      "Credit Poker (ver.23b, 7 & 9 bonus)",          0,                    layout_noraut12 ) // CGI - Credit Poker, VERSION 23B, 7 &9 BONUS, 31.03.98. BY V.S.
+GAMEL( 19??, cgidjp,   0,        cgidjp,   mainline, norautp_state, empty_init, ROT0, "CGI",                      "Double Joker Poker (CGI)",                     0,                    layout_noraut12 ) // very similar to df_djpkr
+GAME(  198?, kimblz80, 0,        kimble,   norautp,  norautp_state, empty_init, ROT0, "Kimble Ireland",           "Kimble Double HI-LO (z80 version)",            MACHINE_NOT_WORKING )
+GAME(  1983, pma,      0,        nortest1, norautp,  norautp_state, empty_init, ROT0, "PMA",                      "PMA Poker",                                    MACHINE_NOT_WORKING )
+GAMEL( 198?, bjpoker,  0,        norautxp, norautrh, norautp_state, empty_init, ROT0, "M.Kramer Manufacturing.",  "Poker / Black Jack (Model 7521)",              MACHINE_NOT_WORKING,  layout_noraut12 )
+GAME(  19??, newhilop, 0,        newhilop, norautp,  norautp_state, empty_init, ROT0, "Song Won?",                "New Hi-Low Poker",                             MACHINE_NOT_WORKING )
+GAMEL( 1984, cdrawpkr, 0,        cdrawpkr, cdrawpkr, norautp_state, empty_init, ROT0, "Coinmaster",               "Draw Poker (Joker Poker V.01)",                0,                    layout_noraut11 )
 
 
 //************************************* 8080 sets **************************************
-//*  The following ones are 'Draw Poker HI-LO' type, running in a 8080 based hardware  *
+//*  The following ones are 'Draw Poker HI-LO' type, running in a i8080 based hardware  *
 //**************************************************************************************
 
-//     YEAR  NAME      PARENT   MACHINE   INPUT    STATE          INIT        ROT   COMPANY                        FULLNAME                            FLAGS                 LAYOUT
-GAME(  1983, dphl,     0,       dphl,     norautp, norautp_state, empty_init, ROT0, "M.Kramer Manufacturing.",     "Draw Poker HI-LO (M.Kramer)",      MACHINE_NOT_WORKING )
-GAME(  1983, dphla,    0,       dphla,    norautp, norautp_state, empty_init, ROT0, "<unknown>",                   "Draw Poker HI-LO (Alt)",           MACHINE_NOT_WORKING )
-GAME(  1983, dphljp,   0,       dphl,     norautp, norautp_state, empty_init, ROT0, "<unknown>",                   "Draw Poker HI-LO (Japanese)",      MACHINE_NOT_WORKING )
-GAME(  198?, kimbldhl, 0,       kimbldhl, norautp, norautp_state, empty_init, ROT0, "Kimble Ireland",              "Kimble Double HI-LO",              MACHINE_NOT_WORKING )
-GAME(  1983, gtipoker, 0,       dphl,     norautp, norautp_state, empty_init, ROT0, "GTI Inc",                     "GTI Poker",                        MACHINE_NOT_WORKING )
-GAME(  1983, gtipokra, 0,       dphla,    norautp, norautp_state, empty_init, ROT0, "GTI Inc",                     "GTI Poker? (SMS hardware)",        MACHINE_NOT_WORKING )
-GAME(  1983, smshilo,  0,       dphla,    norautp, norautp_state, empty_init, ROT0, "SMS Manufacturing Corp.",     "HI-LO Double Up Joker Poker",      MACHINE_NOT_WORKING )
-GAME(  1986, drhl,     0,       drhl,     norautp, norautp_state, empty_init, ROT0, "Drews Inc.",                  "Drews Revenge (v.2.89, set 1)",    MACHINE_NOT_WORKING )
-GAME(  1986, drhla,    drhl,    drhl,     norautp, norautp_state, empty_init, ROT0, "Drews Inc.",                  "Drews Revenge (v.2.89, set 2)",    MACHINE_NOT_WORKING )
-GAME(  1982, ssjkrpkr, 0,       ssjkrpkr, norautp, norautp_state, init_ssa,   ROT0, "Southern Systems & Assembly", "Southern Systems Joker Poker",     MACHINE_NOT_WORKING )
+//     YEAR  NAME      PARENT    MACHINE   INPUT     STATE          INIT        ROT   COMPANY                        FULLNAME                            FLAGS                  LAYOUT
+GAMEL( 1983, dphl,     0,        dphl,     dphla,    norautp_state, empty_init, ROT0, "M.Kramer Manufacturing.",     "Draw Poker HI-LO (M.Kramer)",      MACHINE_NOT_WORKING,   layout_noraut10 )
+GAMEL( 1983, dphla,    0,        dphla,    dphla,    norautp_state, empty_init, ROT0, "<unknown>",                   "Joker Poker (Kramer, Alt)",        MACHINE_NOT_WORKING,   layout_noraut10 )  // call attendant
+GAMEL( 1983, dphljp,   0,        dphl,     dphla,    norautp_state, empty_init, ROT0, "<unknown>",                   "Draw Poker HI-LO (Japanese)",      MACHINE_NOT_WORKING,   layout_noraut10 )
+GAME(  198?, kimbldhl, 0,        kimbldhl, norautp,  norautp_state, empty_init, ROT0, "Kimble Ireland",              "Kimble Double HI-LO",              MACHINE_NOT_WORKING )
+GAME(  1983, gtipoker, 0,        dphl,     norautp,  norautp_state, empty_init, ROT0, "GTI Inc",                     "GTI Poker",                        MACHINE_NOT_WORKING )
+GAME(  1983, gtipokra, 0,        dphla,    norautp,  norautp_state, empty_init, ROT0, "GTI Inc",                     "GTI Poker? (SMS hardware)",        MACHINE_NOT_WORKING )
+GAME(  1983, smshilo,  0,        dphla,    norautp,  norautp_state, empty_init, ROT0, "SMS Manufacturing Corp.",     "HI-LO Double Up Joker Poker",      MACHINE_NOT_WORKING )
+GAMEL( 1986, drhl,     0,        drhl,     drhl,     norautp_state, empty_init, ROT0, "Drews Inc.",                  "Drews Revenge (v.2.89, set 1)",    0,                     layout_noraut10 )
+GAMEL( 1986, drhla,    drhl,     drhl,     drhl,     norautp_state, empty_init, ROT0, "Drews Inc.",                  "Drews Revenge (v.2.89, set 2)",    0,                     layout_noraut10 )
+GAMEL( 1982, ssjkrpkr, 0,        ssjkrpkr, ssjkrpkr, norautp_state, init_ssa,   ROT0, "Southern Systems & Assembly", "Southern Systems Joker Poker",     0,                     layout_noraut10 )
 
 // The following one also has a custom 68705 MCU
-GAME(  1993, tpoker2,  0,       dphltest, norautp, norautp_state, empty_init, ROT0, "Micro Manufacturing",         "Turbo Poker 2",                    MACHINE_NOT_WORKING )
+GAME(  1993, tpoker2,  0,        dphltest, norautp, norautp_state, empty_init, ROT0, "Micro Manufacturing",          "Turbo Poker 2",                    MACHINE_NOT_WORKING )
 
 
 //************************************ unknown sets ************************************
 //* The following ones are still unknown. No info about name, CPU, manufacturer, or HW *
 //**************************************************************************************
 
-//     YEAR  NAME      PARENT   MACHINE   INPUT    STATE          INIT        ROT   COMPANY                     FULLNAME                               FLAGS                 LAYOUT
-GAME(  198?, fastdrwp, 0,       dphl,     norautp, norautp_state, empty_init, ROT0, "Stern Electronics?",       "Fast Draw (poker conversion kit)?",   MACHINE_NOT_WORKING )
-GAME(  198?, dphlunka, 0,       dphl,     norautp, norautp_state, empty_init, ROT0, "SMS Manufacturing Corp.",  "Draw Poker HI-LO (unknown, rev 1)",   MACHINE_NOT_WORKING )
-GAME(  198?, dphlunkb, 0,       dphl,     norautp, norautp_state, empty_init, ROT0, "SMS Manufacturing Corp.",  "Draw Poker HI-LO (unknown, rev 2)",   MACHINE_NOT_WORKING )
-GAME(  198?, pkii_dm,  0,       nortest1, norautp, norautp_state, empty_init, ROT0, "<unknown>",                "unknown poker game PKII/DM",          MACHINE_NOT_WORKING )
-GAME(  1989, unkljfpk, 0,       nortest1, norautp, norautp_state, empty_init, ROT0, "LJF Corporation",          "unknown LJF Corporation poker game",  MACHINE_NOT_WORKING )
+//     YEAR  NAME      PARENT    MACHINE   INPUT    STATE          INIT        ROT   COMPANY                     FULLNAME                               FLAGS                 LAYOUT
+GAME(  198?, fastdrwp, 0,        dphl,     norautp, norautp_state, empty_init, ROT0, "Stern Electronics?",       "Fast Draw (poker conversion kit)?",   MACHINE_NOT_WORKING )
+GAME(  198?, dphlunka, 0,        dphl,     norautp, norautp_state, empty_init, ROT0, "SMS Manufacturing Corp.",  "Draw Poker HI-LO (unknown, rev 1)",   MACHINE_NOT_WORKING )
+GAME(  198?, dphlunkb, 0,        dphl,     norautp, norautp_state, empty_init, ROT0, "SMS Manufacturing Corp.",  "Draw Poker HI-LO (unknown, rev 2)",   MACHINE_NOT_WORKING )
+GAME(  198?, pkii_dm,  0,        nortest1, norautp, norautp_state, empty_init, ROT0, "<unknown>",                "unknown poker game PKII/DM",          MACHINE_NOT_WORKING )
+GAME(  1989, unkljfpk, 0,        nortest1, norautp, norautp_state, empty_init, ROT0, "LJF Corporation",          "unknown LJF Corporation poker game",  MACHINE_NOT_WORKING )
