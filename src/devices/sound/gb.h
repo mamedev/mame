@@ -9,7 +9,7 @@ class gameboy_sound_device : public device_t,
 							public device_sound_interface
 {
 public:
-	static constexpr feature_type imperfect_features() { return feature::SOUND; } // incorrect sound pitch
+	static constexpr feature_type imperfect_features() { return feature::SOUND; }
 
 	gameboy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
