@@ -687,7 +687,7 @@ void s_dsp_device::dsp_update( s16 *sound_ptr )
 		else
 		{
 			if (outl > 32767)
-					*sound_ptr = 32767;
+				*sound_ptr = 32767;
 			else if (outl < -32768)
 				*sound_ptr = -32768;
 			else
@@ -696,7 +696,7 @@ void s_dsp_device::dsp_update( s16 *sound_ptr )
 			sound_ptr++;
 
 			if (outr > 32767)
-					*sound_ptr = 32767;
+				*sound_ptr = 32767;
 			else if (outr < -32768)
 				*sound_ptr = -32768;
 			else
