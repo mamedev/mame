@@ -1,4 +1,5 @@
 // license:BSD-3-Clause
+// copyright-holders:J.Wallace
 
 /*************************************************************************
 
@@ -64,6 +65,7 @@ protected:
 	void overlay_draw_group(bitmap_yuy16 &bitmap, const uint8_t *text, int start, int xstart, int ystart, int mode);
 	void overlay_draw_char(bitmap_yuy16 &bitmap, uint8_t ch, float xstart, int ystart, int char_width, int char_height);
 	void overlay_fill(bitmap_yuy16 &bitmap, uint8_t yval, uint8_t cr, uint8_t cb);
+	bitmap_yuy16 osd_char_gen(uint8_t idx);
 
 private:
 	enum player_command : u16
@@ -199,7 +201,8 @@ private:
 	u8             m_user_index_char_idx=0;
 	u8             m_user_index_window_idx=0;
 	u8	           m_user_index_chars[32];
-
+	bitmap_yuy16   m_osd_font[96];
+	
 };
 
 #endif // MAME_MACHINE_LDP1450HLE_H

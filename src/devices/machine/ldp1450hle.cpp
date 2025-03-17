@@ -1,4 +1,5 @@
 // license:BSD-3-Clause
+// copyright-holders:J.Wallace
 
 /*************************************************************************
 
@@ -201,7 +202,7 @@ static const u16 text_bitmap[0x60][0x10] =
 	{0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x1ff8,0x1ff8,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000}, // -
 };
 
-#define OVERLAY_PIXEL_WIDTH             (1.3f / 720.0f)
+#define OVERLAY_PIXEL_WIDTH             1+(1.3f / 720.0f)
 #define OVERLAY_PIXEL_HEIGHT            1
 
 //-------------------------------------------------
@@ -228,7 +229,6 @@ void sony_ldp1450hle_device::overlay_fill(bitmap_yuy16 &bitmap, uint8_t yval, ui
 
 void sony_ldp1450hle_device::overlay_draw_group(bitmap_yuy16 &bitmap, const uint8_t *text, int start, int xstart, int ystart, int mode)
 {
-
 	u8 char_width = text_size[m_user_index_mode & 0x03];
 
 	u8 char_height = text_size[(m_user_index_mode >> 2) & 0x03];
@@ -236,7 +236,7 @@ void sony_ldp1450hle_device::overlay_draw_group(bitmap_yuy16 &bitmap, const uint
 	float xstart_normalised = (bitmap.width()/2/ 64) * xstart;
 	float ystart_normalised = (bitmap.height()/ 64) * ystart;
 
-	if (m_user_index_mode & 0x80)
+	if (m_user_index_mode & 0x80) //blue screen
 	{
 		overlay_fill(bitmap, 0x28, 0x6d, 0xf0);
 	}
@@ -294,42 +294,10 @@ void sony_ldp1450hle_device::overlay_draw_char(bitmap_yuy16 &bitmap, uint8_t ch,
 {
 
 	// m_user_index_mode >> 5 & 0x04: 0,2 = normal, 1 = 1px shadow, 3 = grey box 
-
-	uint16_t white = 0xeb80;
 	uint16_t black = 0x0080;
-
-	bitmap_yuy16 char_bmp = bitmap_yuy16(16,16);
 
 	u8 modeval= (m_user_index_mode >> 5) & 0x04;
 	
-	if (modeval==0x03)
-	{
-		overlay_fill(char_bmp, 0x9a, 0x80, 0x80);
-	}
-	else
-	{
-		overlay_fill(char_bmp, 0x00, 0x80, 0x80);
-	}
-
-	// iterate over pixels
-	const u16 *chdataptr = &text_bitmap[ch][0];
-
-	for (u8 y = 0; y < 16; y++)
-	{
-		u16 chdata = *chdataptr++;
-
-		for (u8 x = 0; x < 16; x++, chdata >>= 1)
-		{
-			if (chdata & 0x01)
-			{
-				char_bmp.pix(y, x) = white;
-			}
-		}
-	}
-
-	char_bmp.resize(char_width, char_height);
-
-
 	for (u32 y = 0; y < char_height; y++)
 	{
 		for (u8 x = 0; x < char_width; x++)
@@ -337,9 +305,18 @@ void sony_ldp1450hle_device::overlay_draw_char(bitmap_yuy16 &bitmap, uint8_t ch,
 			u32 xmin = xstart + x;
 			for (u32 yy = 0; yy < OVERLAY_PIXEL_HEIGHT; yy++)
 			{
-				if (char_bmp.pix(y,x) != black)
-				{	
-					bitmap.pix(ystart + (y + 1) * OVERLAY_PIXEL_HEIGHT + yy, xmin) = char_bmp.pix(y,x);
+
+				for (u32 xx = 0; xx < OVERLAY_PIXEL_WIDTH; xx++)
+				{
+					if (modeval==0x03)
+					{
+						//fill with grey	
+					}
+
+					if (m_osd_font[ch].pix(y,x) != black)
+					{	
+						bitmap.pix(ystart + (y + 1) * OVERLAY_PIXEL_HEIGHT + yy, xmin+xx) = m_osd_font[ch].pix(y,x);
+					}
 				}
 			}
 		}
@@ -844,19 +821,18 @@ void sony_ldp1450hle_device::add_command_byte(u8 command)
 				break;
 
 			case CMD_USER_INDEX_ON:
-			{
-//				popmessage("X %x Y %x M%x (Start %x)", m_user_index_x, m_user_index_y, m_user_index_mode, m_user_index_window_idx);
-				m_user_index_flag = true;
-				queue_reply(0x0a, 0.4);
-				break;
-			}
+				{
+					m_user_index_flag = true;
+					queue_reply(0x0a, 0.4);
+					break;
+				}
 
 			case CMD_USER_INDEX_OFF:
-			{
-				m_user_index_flag = false;
-				queue_reply(0x0a, 0.4);
-				break;
-			}
+				{
+					m_user_index_flag = false;
+					queue_reply(0x0a, 0.4);
+					break;
+				}
 
 			default:
 				popmessage("no implementation cmd %x", command);
@@ -920,6 +896,35 @@ void sony_ldp1450hle_device::update_video_enable()
 }
 
 
+bitmap_yuy16 sony_ldp1450hle_device::osd_char_gen(uint8_t idx)
+{
+	uint16_t white = 0xeb80;
+	uint16_t black = 0x0080;
+
+	// iterate over pixels
+	const u16 *chdataptr = &text_bitmap[idx][0];
+
+	bitmap_yuy16 char_bmp = bitmap_yuy16(16,16);
+	for (u8 y = 0; y < 16; y++)
+	{
+		u16 chdata = *chdataptr++;
+
+		for (u8 x = 0; x < 16; x++, chdata >>= 1)
+		{
+			if (chdata & 0x01)
+			{
+				char_bmp.pix(y, x) = white;
+			}
+			else
+			{
+				char_bmp.pix(y, x) = black;
+			}
+		}
+	}
+	return char_bmp;
+}
+
+
 //-------------------------------------------------
 //  device_start - device initialization
 //-------------------------------------------------
@@ -971,6 +976,11 @@ void sony_ldp1450hle_device::device_start()
 	save_item(NAME(m_user_index_window_idx));
 	save_item(NAME(m_user_index_chars));
 
+
+	for (u8 chr_idx = 0; chr_idx < 96; chr_idx ++)
+	{
+		m_osd_font[chr_idx] = osd_char_gen(chr_idx);
+	}	
 
 }
 
