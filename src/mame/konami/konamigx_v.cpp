@@ -1057,30 +1057,29 @@ K056832_CB_MEMBER(konamigx_state::type2_tile_callback)
 
 K056832_CB_MEMBER(konamigx_state::salmndr2_tile_callback)
 {
-	int d = *code;
-
-	*code = (m_gx_tilebanks[(d & 0xe000)>>13]<<13) + (d & 0x1fff);
-	K055555GX_decode_vmixcolor(layer, color);
-
-	const u8 mix_code = (*flags >> (8 + 4)) & 0b11;
+	const u8 mix_code = attr >> 4 & 0b11;
 	if (mix_code) {
 		*priority = 1;
 		m_last_alpha_tile_mix_code = mix_code;
 	}
+
+	int d = *code;
+
+	*code = (m_gx_tilebanks[(d & 0xe000)>>13]<<13) + (d & 0x1fff);
+	K055555GX_decode_vmixcolor(layer, color);
 }
 
 K056832_CB_MEMBER(konamigx_state::alpha_tile_callback)
 {
-	int d = *code;
-
-	*code = (m_gx_tilebanks[(d & 0xe000)>>13]<<13) + (d & 0x1fff);
-	K055555GX_decode_vmixcolor(layer, color);
-
-	const u8 mix_code = (*flags >> (8 + 6)) & 0b11;
+	const u8 mix_code = attr >> 6 & 0b11;
 	if (mix_code) {
 		*priority = 1;
 		m_last_alpha_tile_mix_code = mix_code;
 	}
+	int d = *code;
+
+	*code = (m_gx_tilebanks[(d & 0xe000)>>13]<<13) + (d & 0x1fff);
+	K055555GX_decode_vmixcolor(layer, color);
 }
 
 /*
