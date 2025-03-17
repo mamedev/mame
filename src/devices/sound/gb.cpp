@@ -328,6 +328,7 @@ void gameboy_sound_device::apply_next_sweep(SOUND &snd)
 	{
 		snd.frequency = new_frequency;
 		snd.reg[3] = snd.frequency & 0xff;
+		snd.reg[4] = (snd.reg[4] & ~0x7) | ((snd.frequency >> 8) & 0x7);
 	}
 }
 
