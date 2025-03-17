@@ -17,8 +17,6 @@ TODO:
  - IGS 033 appears to encapsulate the behavior of the video/interface chip found in igspoker.cpp
    so could be turned into a device, possibly shared
  - complete inputs / outputs / hopper
- - colors are wrong if cards are used (enter Test Mode, press Hold 3, enter pw, press Start,
-   press Hold 3, change 4th setting in the right column, press Bet, press Start)
 */
 
 #include "emu.h"
@@ -314,7 +312,7 @@ static const gfx_layout tiles8x8x4_layout =
 	8, 8,
 	RGN_FRAC(1,1),
 	4,
-	{ 24,16,8,0 },
+	{ 24, 8, 16, 0 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
 	32*8
@@ -435,4 +433,4 @@ void igs_m027_033vid_state::init_qiji6()
 ***************************************************************************/
 
 // internal ROM date is 2002, external software revision could be later
-GAME( 2002, qiji6, 0, m027_033vid, qiji6, igs_m027_033vid_state, init_qiji6, ROT0, "IGS", "Qiji 6 (V118CN)", MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING ) // lacks hopper support
+GAME( 2002, qiji6, 0, m027_033vid, qiji6, igs_m027_033vid_state, init_qiji6, ROT0, "IGS", "Qiji 6 (V118CN)", MACHINE_NOT_WORKING ) // lacks hopper support
