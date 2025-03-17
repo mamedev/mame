@@ -368,161 +368,161 @@ void s_dsp_device::dsp_update( s16 *sound_ptr )
 #ifdef DBG_PMOD
 			logerror("Pitch Modulating voice %d, outx=%ld, old pitch=%d, ", v, outx, vp->pitch);
 #endif
-			vp->pitch = (vp->pitch * (outx + 32768)) >> 15;
-			}
+			vp->pitch += (outx >> 5) * vp->pitch >> 10;
+		}
 #endif
 
 #ifdef DBG_PMOD
-			logerror("pitch=%d\n", vp->pitch);
+		logerror("pitch=%d\n", vp->pitch);
 #endif
 
-			for ( ; vp->mixfrac >= 0; vp->mixfrac -= 4096)
+		for ( ; vp->mixfrac >= 0; vp->mixfrac -= 4096)
+		{
+			/* This part performs the BRR decode 'on-the-fly'.  This is more
+			correct than the old way, which could be fooled if the data and/or
+			the loop point changed while the sample was playing, or if the BRR
+			decode didn't produce the same result every loop because of the
+			filters.  The event interface still has no chance of keeping up
+			with those kinds of tricks, though. */
+			if (!vp->header_cnt)
 			{
-				/* This part performs the BRR decode 'on-the-fly'.  This is more
-				correct than the old way, which could be fooled if the data and/or
-				the loop point changed while the sample was playing, or if the BRR
-				decode didn't produce the same result every loop because of the
-				filters.  The event interface still has no chance of keeping up
-				with those kinds of tricks, though. */
-				if (!vp->header_cnt)
+				if (vp->end & 1)
 				{
-					if (vp->end & 1)
+					/* Docs say ENDX bit is set when decode of block with source
+					end flag set is done.  Does this apply to looping samples?
+					Some info I've seen suggests yes. */
+					m_dsp_regs[0x7c] |= m;
+					if (vp->end & 2)
 					{
-						/* Docs say ENDX bit is set when decode of block with source
-						end flag set is done.  Does this apply to looping samples?
-						Some info I've seen suggests yes. */
-						m_dsp_regs[0x7c] |= m;
-						if (vp->end & 2)
-						{
-							vp->mem_ptr = lptr(sd, V);
+						vp->mem_ptr = lptr(sd, V);
 
 #ifdef DBG_BRR
-							logerror("BRR looping to 0x%04X\n", vp->mem_ptr);
+						logerror("BRR looping to 0x%04X\n", vp->mem_ptr);
 #endif
-						}
-						else
-						{
-#ifdef DBG_KEY
-							logerror("BRR decode end, voice %d\n", v);
-#endif
-
-							m_keys &= ~m;
-							m_dsp_regs[V + 8] = 0;
-							vp->envx         = 0;
-							while (vp->mixfrac >= 0)
-							{
-								vp->sampbuf[vp->sampptr] = 0;
-								outx         = 0;
-								vp->sampptr  = (vp->sampptr + 1) & 3;
-								vp->mixfrac -= 4096;
-							}
-							break;
-						}
 					}
-
-					vp->header_cnt = 8;
-					vl = (u8)read_byte(vp->mem_ptr++);
-					vp->range  = vl >> 4;
-					vp->end    = vl & 3;
-					vp->filter = (vl & 12) >> 2;
-
-#ifdef DBG_BRR
-					logerror("V%d: header read, range=%d, end=%d, filter=%d\n", v, vp->range, vp->end, vp->filter);
-#endif
-				}
-
-				if (vp->half == 0)
-				{
-					vp->half = 1;
-					outx     = ((s8)read_byte(vp->mem_ptr)) >> 4;
-				}
-				else
-				{
-					vp->half = 0;
-					/* Funkiness to get 4-bit signed to carry through */
-					outx   = (s8)(read_byte(vp->mem_ptr++) << 4);
-					outx >>= 4;
-					vp->header_cnt--;
-				}
-
-#ifdef DBG_BRR
-				logerror("V%d: nybble=%X, ptr=%04X, smp1=%d, smp2=%d\n", v, outx & 0x0f, vp->mem_ptr, vp->smp1, vp->smp2);
+					else
+					{
+#ifdef DBG_KEY
+						logerror("BRR decode end, voice %d\n", v);
 #endif
 
-				/* For invalid ranges (D,E,F): if the nybble is negative, the result
-				is F000.  If positive, 0000.  Nothing else like previous range,
-				etc. seems to have any effect.  If range is valid, do the shift
-				normally.  Note these are both shifted right once to do the filters
-				properly, but the output will be shifted back again at the end. */
-				if (vp->range <= 0xc)
-				{
-					outx = (outx << vp->range) >> 1;
+						m_keys &= ~m;
+						m_dsp_regs[V + 8] = 0;
+						vp->envx         = 0;
+						while (vp->mixfrac >= 0)
+						{
+							vp->sampbuf[vp->sampptr] = 0;
+							outx         = 0;
+							vp->sampptr  = (vp->sampptr + 1) & 3;
+							vp->mixfrac -= 4096;
+						}
+						break;
+					}
 				}
-				else
-				{
-					outx &= ~0x7ff;
+
+				vp->header_cnt = 8;
+				vl = (u8)read_byte(vp->mem_ptr++);
+				vp->range  = vl >> 4;
+				vp->end    = vl & 3;
+				vp->filter = (vl & 12) >> 2;
 
 #ifdef DBG_BRR
-					logerror("V%d: invalid range! (%X)\n", v, vp->range);
+				logerror("V%d: header read, range=%d, end=%d, filter=%d\n", v, vp->range, vp->end, vp->filter);
 #endif
-				}
-
-#ifdef DBG_BRR
-				logerror("V%d: shifted delta=%04X\n", v, (u16)outx);
-#endif
-
-				switch (vp->filter)
-				{
-				case 0:
-					break;
-
-				case 1:
-					outx += (vp->smp1 >> 1) + ((-vp->smp1) >> 5);
-					break;
-
-				case 2:
-					outx += vp->smp1 + ((-(vp->smp1 + (vp->smp1 >> 1))) >> 5) - (vp->smp2 >> 1) + (vp->smp2 >> 5);
-					break;
-
-				case 3:
-					outx += vp->smp1 + ((-(vp->smp1 + (vp->smp1 << 2) + (vp->smp1 << 3))) >> 7)
-							- (vp->smp2 >> 1) + ((vp->smp2 + (vp->smp2 >> 1)) >> 4);
-					break;
-				}
-
-				if (outx < (s16)0x8000)
-				{
-					outx = (s16)0x8000;
-				}
-				else if (outx > (s16)0x7fff)
-				{
-					outx = (s16)0x7fff;
-				}
-
-#ifdef DBG_BRR
-				logerror("V%d: filter + delta=%04X\n", v, (u16)outx);
-#endif
-
-				vp->smp2 = (s16)vp->smp1;
-				vp->smp1 = (s16)(outx << 1);
-				vp->sampbuf[vp->sampptr] = vp->smp1;
-
-#ifdef DBG_BRR
-				logerror("V%d: final output: %04X\n", v, vp->sampbuf[vp->sampptr]);
-#endif
-
-				vp->sampptr = (vp->sampptr + 1) & 3;
 			}
 
-			if (m_dsp_regs[0x3d] & m)
+			if (vp->half == 0)
 			{
-#ifdef DBG_PMOD
-				logerror("Noise enabled, voice %d\n", v);
-#endif
-				outx = (s16)(m_noise_lev << 1);
+				vp->half = 1;
+				outx     = ((s8)read_byte(vp->mem_ptr)) >> 4;
 			}
 			else
 			{
+				vp->half = 0;
+				/* Funkiness to get 4-bit signed to carry through */
+				outx   = (s8)(read_byte(vp->mem_ptr++) << 4);
+				outx >>= 4;
+				vp->header_cnt--;
+			}
+
+#ifdef DBG_BRR
+			logerror("V%d: nybble=%X, ptr=%04X, smp1=%d, smp2=%d\n", v, outx & 0x0f, vp->mem_ptr, vp->smp1, vp->smp2);
+#endif
+
+			/* For invalid ranges (D,E,F): if the nybble is negative, the result
+			is F000.  If positive, 0000.  Nothing else like previous range,
+			etc. seems to have any effect.  If range is valid, do the shift
+			normally.  Note these are both shifted right once to do the filters
+			properly, but the output will be shifted back again at the end. */
+			if (vp->range <= 0xc)
+			{
+				outx = (outx << vp->range) >> 1;
+			}
+			else
+			{
+				outx &= ~0x7ff;
+
+#ifdef DBG_BRR
+				logerror("V%d: invalid range! (%X)\n", v, vp->range);
+#endif
+			}
+
+#ifdef DBG_BRR
+			logerror("V%d: shifted delta=%04X\n", v, (u16)outx);
+#endif
+
+			switch (vp->filter)
+			{
+			case 0:
+				break;
+
+			case 1:
+				outx += (vp->smp1 >> 1) + ((-vp->smp1) >> 5);
+				break;
+
+			case 2:
+				outx += vp->smp1 + ((-(vp->smp1 + (vp->smp1 >> 1))) >> 5) - (vp->smp2 >> 1) + (vp->smp2 >> 5);
+				break;
+
+			case 3:
+				outx += vp->smp1 + ((-(vp->smp1 + (vp->smp1 << 2) + (vp->smp1 << 3))) >> 7)
+						- (vp->smp2 >> 1) + ((vp->smp2 + (vp->smp2 >> 1)) >> 4);
+				break;
+			}
+
+			if (outx < (s16)0x8000)
+			{
+				outx = (s16)0x8000;
+			}
+			else if (outx > (s16)0x7fff)
+			{
+				outx = (s16)0x7fff;
+			}
+
+#ifdef DBG_BRR
+			logerror("V%d: filter + delta=%04X\n", v, (u16)outx);
+#endif
+
+			vp->smp2 = (s16)vp->smp1;
+			vp->smp1 = (s16)(outx << 1);
+			vp->sampbuf[vp->sampptr] = vp->smp1;
+
+#ifdef DBG_BRR
+			logerror("V%d: final output: %04X\n", v, vp->sampbuf[vp->sampptr]);
+#endif
+
+			vp->sampptr = (vp->sampptr + 1) & 3;
+		}
+
+		if (m_dsp_regs[0x3d] & m)
+		{
+#ifdef DBG_PMOD
+			logerror("Noise enabled, voice %d\n", v);
+#endif
+			outx = (s16)(m_noise_lev << 1);
+		}
+		else
+		{
 			/* Perform 4-Point Gaussian interpolation.  Take an approximation of a
 			Gaussian bell-curve, and move it through the sample data at a rate
 			determined by the pitch.  The sample output at any given time is
@@ -592,7 +592,7 @@ void s_dsp_device::dsp_update( s16 *sound_ptr )
 		((s8)m_dsp_regs[0x0d] * 100) / 0x7f);
 #endif
 
-	int echo_base = ((m_dsp_regs[0x6d] << 8) + m_echo_ptr) & 0xffff;
+	const u16 echo_base = ((m_dsp_regs[0x6d] << 8) + m_echo_ptr) & 0xffff;
 	m_fir_lbuf[m_fir_ptr] = (s16)read_word(echo_base);
 	m_fir_rbuf[m_fir_ptr] = (s16)read_word(echo_base + sizeof(s16));
 

@@ -92,20 +92,20 @@ private:
 	u8                    m_dsp_addr;
 	u8                    m_dsp_regs[256];      /* DSP registers */
 
-	int                   m_keyed_on;
-	int                   m_keys;               /* 8-bits for 8 voices */
+	u8                    m_keyed_on;
+	u8                    m_keys;               /* 8-bits for 8 voices */
 	voice_state_type      m_voice_state[8];
 
 	/* Noise stuff */
-	int                   m_noise_cnt;
-	int                   m_noise_lev;
+	u32                   m_noise_cnt;
+	u32                   m_noise_lev;
 
 	/* These are for the FIR echo filter */
 #ifndef NO_ECHO
 	s16                   m_fir_lbuf[8];
 	s16                   m_fir_rbuf[8];
-	int                   m_fir_ptr;
-	int                   m_echo_ptr;
+	u8                    m_fir_ptr;
+	u16                   m_echo_ptr;
 #endif
 
 };
