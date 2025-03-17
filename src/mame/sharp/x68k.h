@@ -248,7 +248,6 @@ protected:
 	uint8_t iack1();
 	uint8_t iack2();
 	uint8_t iack4();
-	uint8_t iack5();
 
 	void x68k_base_map(address_map &map) ATTR_COLD;
 	void x68k_map(address_map &map) ATTR_COLD;

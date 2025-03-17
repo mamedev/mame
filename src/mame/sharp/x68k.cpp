@@ -366,10 +366,10 @@ template <unsigned N> void x68k_state::ioc_irq(int state)
 		m_ioc.irqstatus &= ~(1U << N);
 
 	bool const irq_state =
-		BIT(m_ioc.irqstatus, IOC_HDD_INT) && BIT(m_ioc.irqstatus, IOC_HDD_IEN) ||
-		BIT(m_ioc.irqstatus, IOC_PRT_INT) && BIT(m_ioc.irqstatus, IOC_PRT_IEN) ||
-		BIT(m_ioc.irqstatus, IOC_FDD_INT) && BIT(m_ioc.irqstatus, IOC_FDD_IEN) ||
-		BIT(m_ioc.irqstatus, IOC_FDC_INT) && BIT(m_ioc.irqstatus, IOC_FDC_IEN);
+		(BIT(m_ioc.irqstatus, IOC_HDD_INT) && BIT(m_ioc.irqstatus, IOC_HDD_IEN)) ||
+		(BIT(m_ioc.irqstatus, IOC_PRT_INT) && BIT(m_ioc.irqstatus, IOC_PRT_IEN)) ||
+		(BIT(m_ioc.irqstatus, IOC_FDD_INT) && BIT(m_ioc.irqstatus, IOC_FDD_IEN)) ||
+		(BIT(m_ioc.irqstatus, IOC_FDC_INT) && BIT(m_ioc.irqstatus, IOC_FDC_IEN));
 
 	m_maincpu->set_input_line(INPUT_LINE_IRQ1, irq_state ? ASSERT_LINE : CLEAR_LINE);
 }
