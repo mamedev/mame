@@ -141,6 +141,8 @@ void gameboy_sound_device::device_start()
 	save_item(STRUCT_MEMBER(m_snd, length_mask));
 	save_item(STRUCT_MEMBER(m_snd, length_counting));
 	save_item(STRUCT_MEMBER(m_snd, length_enabled));
+	save_item(STRUCT_MEMBER(m_snd, frequency));
+	save_item(STRUCT_MEMBER(m_snd, frequency_counter));
 	save_item(STRUCT_MEMBER(m_snd, cycles_left));
 	save_item(STRUCT_MEMBER(m_snd, duty));
 	save_item(STRUCT_MEMBER(m_snd, envelope_enabled));
@@ -149,8 +151,7 @@ void gameboy_sound_device::device_start()
 	save_item(STRUCT_MEMBER(m_snd, envelope_time));
 	save_item(STRUCT_MEMBER(m_snd, envelope_count));
 	save_item(STRUCT_MEMBER(m_snd, signal));
-	save_item(STRUCT_MEMBER(m_snd, frequency));
-	save_item(STRUCT_MEMBER(m_snd, frequency_counter));
+	save_item(STRUCT_MEMBER(m_snd, frequency_shadow));
 	save_item(STRUCT_MEMBER(m_snd, sweep_enabled));
 	save_item(STRUCT_MEMBER(m_snd, sweep_neg_mode_used));
 	save_item(STRUCT_MEMBER(m_snd, sweep_shift));
@@ -309,7 +310,7 @@ void gameboy_sound_device::tick_length(SOUND &snd)
 int32_t gameboy_sound_device::calculate_next_sweep(SOUND &snd)
 {
 	snd.sweep_neg_mode_used = (snd.sweep_direction < 0);
-	const int32_t new_frequency = snd.frequency + snd.sweep_direction * (snd.frequency >> snd.sweep_shift);
+	const int32_t new_frequency = snd.frequency_shadow + snd.sweep_direction * (snd.frequency_shadow >> snd.sweep_shift);
 
 	if (new_frequency > 0x7ff)
 	{
@@ -327,6 +328,7 @@ void gameboy_sound_device::apply_next_sweep(SOUND &snd)
 	if (snd.on && snd.sweep_shift > 0)
 	{
 		snd.frequency = new_frequency;
+		snd.frequency_shadow = snd.frequency;
 		snd.reg[3] = snd.frequency & 0xff;
 		snd.reg[4] = (snd.reg[4] & ~0x7) | ((snd.frequency >> 8) & 0x7);
 	}
@@ -921,6 +923,7 @@ void gameboy_sound_device::sound_w_internal( int offset, uint8_t data )
 				m_snd[0].length_counting = true;
 				m_snd[0].frequency = ((m_snd[0].reg[4] & 0x7) << 8) | m_snd[0].reg[3];
 				m_snd[0].frequency_counter = m_snd[0].frequency;
+				m_snd[0].frequency_shadow = m_snd[0].frequency;
 				m_snd[0].cycles_left = 0;
 				m_snd[0].duty_count = 0;
 				m_snd[0].sweep_enabled = (m_snd[0].sweep_shift != 0) || (m_snd[0].sweep_time != 0);
@@ -1214,6 +1217,7 @@ void dmg_apu_device::apu_power_off()
 	sound_w_internal(NR12, 0x00);
 	sound_w_internal(NR13, 0x00);
 	sound_w_internal(NR14, 0x00);
+	m_snd[0].frequency_shadow = 0;
 	m_snd[0].length_counting = false;
 	m_snd[0].sweep_neg_mode_used = false;
 

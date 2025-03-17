@@ -89,6 +89,8 @@ protected:
 		uint8_t  length_mask;
 		bool   length_counting;
 		bool   length_enabled;
+		uint16_t frequency;
+		uint16_t frequency_counter;
 		/* Channel 1, 2, 3 */
 		int64_t cycles_left;
 		int8_t   duty;
@@ -100,8 +102,7 @@ protected:
 		uint8_t  envelope_count;
 		int8_t   signal;
 		/* Channel 1 */
-		uint16_t frequency;
-		uint16_t frequency_counter;
+		uint16_t frequency_shadow;
 		bool   sweep_enabled;
 		bool   sweep_neg_mode_used;
 		uint8_t  sweep_shift;
