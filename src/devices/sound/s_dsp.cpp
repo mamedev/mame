@@ -30,6 +30,8 @@
 #include "emu.h"
 #include "s_dsp.h"
 
+#include <algorithm>
+
 /***************************************************************************
  CONSTANTS AND MACROS
 ***************************************************************************/
@@ -243,16 +245,11 @@ void s_dsp_device::dsp_reset()
  to mix audio into
 -------------------------------------------------*/
 
-void s_dsp_device::dsp_update( s16 *sound_ptr )
+void s_dsp_device::dsp_update(s16 *sound_ptr)
 {
-	int V;
-
 	int envx;
-	int m;
-	int v;
-	int vl;
-	voice_state_type * vp;
-	int vr;
+	s32 vl;
+	s32 vr;
 
 	const u16 sd = m_dsp_regs[0x5d];
 
@@ -285,17 +282,17 @@ void s_dsp_device::dsp_update( s16 *sound_ptr )
 		m_noise_lev = (((m_noise_lev << 13) ^ (m_noise_lev << 14)) & 0x4000) | (m_noise_lev >> 1);
 	}
 
-	int outl  = 0;
-	int outr  = 0;
+	s32 outl  = 0;
+	s32 outr  = 0;
 
 #ifndef NO_ECHO
-	int echol = 0;
-	int echor = 0;
+	s32 echol = 0;
+	s32 echor = 0;
 #endif
 
-	for (v = 0, m = 1, V = 0; v < 8; v++, V += 16, m <<= 1)
+	for (int v = 0, m = 1, V = 0; v < 8; v++, V += 16, m <<= 1)
 	{
-		vp = &m_voice_state[v];
+		voice_state_type * vp = &m_voice_state[v];
 
 		if (vp->on_cnt && (--vp->on_cnt == 0))
 		{
@@ -313,7 +310,7 @@ void s_dsp_device::dsp_update( s16 *sound_ptr )
 #endif
 
 			vp->header_cnt = 0;
-			vp->half       = 0;
+			vp->half       = false;
 			vp->envx       = 0;
 			vp->end        = 0;
 			vp->sampptr    = 0;
@@ -376,7 +373,7 @@ void s_dsp_device::dsp_update( s16 *sound_ptr )
 		logerror("pitch=%d\n", vp->pitch);
 #endif
 
-		for ( ; vp->mixfrac >= 0; vp->mixfrac -= 4096)
+		for (; vp->mixfrac >= 0; vp->mixfrac -= 4096)
 		{
 			/* This part performs the BRR decode 'on-the-fly'.  This is more
 			correct than the old way, which could be fooled if the data and/or
@@ -431,14 +428,14 @@ void s_dsp_device::dsp_update( s16 *sound_ptr )
 #endif
 			}
 
-			if (vp->half == 0)
+			if (!vp->half)
 			{
-				vp->half = 1;
+				vp->half = true;
 				outx     = ((s8)read_byte(vp->mem_ptr)) >> 4;
 			}
 			else
 			{
-				vp->half = 0;
+				vp->half = false;
 				/* Funkiness to get 4-bit signed to carry through */
 				outx   = (s8)(read_byte(vp->mem_ptr++) << 4);
 				outx >>= 4;
@@ -529,9 +526,9 @@ void s_dsp_device::dsp_update( s16 *sound_ptr )
 			the sum of the products of each input sample point with the value
 			of the bell-curve corresponding to that point. */
 			vl  = vp->mixfrac >> 4;
-			vr  = ((G4[-vl-1] * vp->sampbuf[vp->sampptr]) >> 11 ) & ~1;
+			vr  = ((G4[-vl-1] * vp->sampbuf[vp->sampptr]) >> 11) & ~1;
 			vr += ((G3[-vl] * vp->sampbuf[(vp->sampptr + 1) & 3]) >> 11) & ~1;
-			vr += ((G2[vl] * vp->sampbuf[(vp->sampptr + 2) & 3]) >> 11 ) & ~1;
+			vr += ((G2[vl] * vp->sampbuf[(vp->sampptr + 2) & 3]) >> 11) & ~1;
 
 			/* This is to do the wrapping properly.  Based on my tests with the
 			SNES, it appears clipping is done only if it is the fourth addition
@@ -567,8 +564,8 @@ void s_dsp_device::dsp_update( s16 *sound_ptr )
 		outx = ((outx * envx) >> 11) & ~1;
 		m_dsp_regs[V + 9] = outx >> 8;
 
-		vl = (((int)(s8)m_dsp_regs[V    ]) * outx) >> 7;
-		vr = (((int)(s8)m_dsp_regs[V + 1]) * outx) >> 7;
+		vl = (((s32)(s8)m_dsp_regs[V    ]) * outx) >> 7;
+		vr = (((s32)(s8)m_dsp_regs[V + 1]) * outx) >> 7;
 		outl += vl;
 		outr += vr;
 
@@ -641,18 +638,10 @@ void s_dsp_device::dsp_update( s16 *sound_ptr )
 	{
 		/* Add the echo feedback back into the original result, and save that into memory for use later. */
 		echol += vl * (s8)m_dsp_regs[0x0d] >> 14;
+		echor += vr * (s8)m_dsp_regs[0x0d] >> 14;
 
-		if (echol > 32767)
-			echol = 32767;
-		else if (echol < -32768)
-			echol = -32768;
-
-		echor += vr * (s8)m_dsp_regs[0x0D ] >> 14;
-
-		if (echor > 32767)
-			echor = 32767;
-		else if (echor < -32768)
-			echor = -32768;
+		echol = std::clamp(echol, -0x8000, 0x7fff);
+		echor = std::clamp(echol, -0x8000, 0x7fff);
 
 #ifdef DBG_ECHO
 		logerror("Echo: Writing %04X,%04X at location %04X\n", (u16)echol, (u16)echor, echo_base);
@@ -668,7 +657,7 @@ void s_dsp_device::dsp_update( s16 *sound_ptr )
 	{
 		m_echo_ptr = 0;
 	}
-#endif                              /* !defined( NO_ECHO ) */
+#endif                              /* !defined(NO_ECHO) */
 
 	if (sound_ptr != nullptr)
 	{
@@ -686,22 +675,9 @@ void s_dsp_device::dsp_update( s16 *sound_ptr )
 		}
 		else
 		{
-			if (outl > 32767)
-				*sound_ptr = 32767;
-			else if (outl < -32768)
-				*sound_ptr = -32768;
-			else
-				*sound_ptr = outl;
-
+			*sound_ptr = std::clamp(outl, -0x8000, 0x7fff);
 			sound_ptr++;
-
-			if (outr > 32767)
-				*sound_ptr = 32767;
-			else if (outr < -32768)
-				*sound_ptr = -32768;
-			else
-				*sound_ptr = outr;
-
+			*sound_ptr = std::clamp(outr, -0x8000, 0x7fff);
 			sound_ptr++;
 		}
 	}
@@ -715,7 +691,7 @@ void s_dsp_device::dsp_update( s16 *sound_ptr )
  to process envelope for.
 -------------------------------------------------*/
 
-int s_dsp_device::advance_envelope( int v )
+int s_dsp_device::advance_envelope(int v)
 {
 	int t;
 
@@ -760,7 +736,7 @@ int s_dsp_device::advance_envelope( int v )
 			time ATTACK is updated, and that's what I'm going to implement. */
 			t = adsr1 & 0x0f;
 
-				if (t == 0x0f)
+			if (t == 0x0f)
 			{
 #ifdef DBG_ENV
 				logerror("ENV voice %d: instant attack\n", v);
@@ -1074,7 +1050,7 @@ void s_dsp_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 		dsp_update(mix);
 
 		/* Update the buffers */
-		outputs[0].put_int(i, (s32)mix[0], 32768);
-		outputs[1].put_int(i, (s32)mix[1], 32768);
+		outputs[0].put_int_clamp(i, (s32)mix[0], 32768);
+		outputs[1].put_int_clamp(i, (s32)mix[1], 32768);
 	}
 }
