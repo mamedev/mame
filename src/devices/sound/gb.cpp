@@ -685,7 +685,7 @@ u8 agb_apu_device::wave_r(offs_t offset)
 
 	if (m_snd[2].on)
 	{
-		return m_wave_ram[m_snd[2].bank ^ 1][(m_snd[2].offset / 2) & 0xf];
+		return 0xff;
 	}
 
 	return m_wave_ram[m_snd[2].bank ^ 1][offset & 0xf];
@@ -790,11 +790,7 @@ void agb_apu_device::wave_w(offs_t offset, u8 data)
 	m_channel->update();
 	update_state();
 
-	if (m_snd[2].on)
-	{
-		m_wave_ram[m_snd[2].bank ^ 1][(m_snd[2].offset / 2) & 0xf] = data;
-	}
-	else
+	if (!m_snd[2].on)
 	{
 		m_wave_ram[m_snd[2].bank ^ 1][offset & 0xf] = data;
 	}
