@@ -241,7 +241,7 @@ void wswan_sound_device::sound_stream_update(sound_stream &stream, std::vector<r
 
 					m_audio[3].pos -= m_audio[3].period;
 
-					if (m_audio4_noise && m_noise_enable)
+					if (m_noise_enable)
 					{
 						static const int shift_bit[8] = { 14, 10, 13, 4, 8, 6, 9, 11 };
 
