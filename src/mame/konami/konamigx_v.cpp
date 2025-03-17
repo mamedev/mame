@@ -533,7 +533,7 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 				if (shadow != 1 || k053246_objset1 & 0x20)
 				{
 					shadow--;
-					add_solid = 1; // add solid
+					add_solid = 1;
 					solid_draw_mode = 1; // draw partial solid
 					if (shadowon[shadow])
 					{
@@ -552,7 +552,7 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 			}
 			else
 			{
-				add_solid = 1; // add solid
+				add_solid = 1;
 				solid_draw_mode = 0; // draw full solid
 			}
 
@@ -637,10 +637,10 @@ void konamigx_state::konamigx_mixer_draw(screen_device &screen, bitmap_rgb32 &bi
 
 	for (int count=0; count<objpool.size(); count++)
 	{
-		const u32 order  = objpool[count].order;
-		const int offs   = objpool[count].offs;
-		const int code   = objpool[count].code;
-		int color        = objpool[count].color;
+		const u32 order = objpool[count].order;
+		const int offs  = objpool[count].offs;
+		const int code  = objpool[count].code;
+		int color       = objpool[count].color;
 
 		/* entries >=0 in our list are sprites */
 		if (offs >= 0)
