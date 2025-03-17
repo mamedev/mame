@@ -81,10 +81,14 @@ the location FP points to.
 #include "debug/debugcpu.h"
 #include "emuopts.h"
 
+#include "mfpresolve.h"
+
 #include "asmjit/src/asmjit/asmjit.h"
 #include "asmjit/src/asmjit/a64.h"
 
 #include <cstddef>
+#include <cstdio>
+#include <cstdlib>
 #include <vector>
 
 
@@ -619,6 +623,8 @@ private:
 
 	void call_arm_addr(asmjit::a64::Assembler &a, const void *offs) const;
 
+	[[noreturn]] void end_of_block() const;
+
 	drc_hash_table m_hash;
 	drc_map_variables m_map;
 	FILE *m_log_asmjit;
@@ -627,6 +633,7 @@ private:
 	arm64_entry_point_func m_entry;
 	drccodeptr m_exit;
 	drccodeptr m_nocode;
+	drccodeptr m_endofblock;
 
 	uint8_t *m_baseptr;
 
@@ -1429,6 +1436,7 @@ drcbe_arm64::drcbe_arm64(drcuml_state &drcuml, device_t &device, drc_cache &cach
 	, m_entry(nullptr)
 	, m_exit(nullptr)
 	, m_nocode(nullptr)
+	, m_endofblock(nullptr)
 	, m_baseptr(cache.near() + 0x100)
 	, m_near(*(near_state *)cache.alloc_near(sizeof(m_near)))
 {
@@ -1556,6 +1564,13 @@ void drcbe_arm64::reset()
 	a.bind(a.newNamedLabel("nocode_point"));
 	a.br(REG_PARAM1);
 
+	// generate an end-of-block handler point
+	m_endofblock = dst + a.offset();
+	a.bind(a.newNamedLabel("end_of_block_point"));
+	auto const [entrypoint, adjusted] = util::resolve_member_function(&drcbe_arm64::end_of_block, *this);
+	get_imm_relative(a, REG_PARAM1, adjusted);
+	call_arm_addr(a, (const void *)entrypoint);
+
 	// emit the generated code
 	emit(ch);
 
@@ -1640,7 +1655,10 @@ void drcbe_arm64::generate(drcuml_block &block, const instruction *instlist, uin
 		(this->*s_opcode_table[inst.opcode()])(a, inst);
 	}
 
-	emit_str_mem(a, FLAGS_REG.w(), &m_near.emulated_flags);
+	// catch falling off the end of a block
+	if (logger.file())
+		a.setInlineComment("end of block");
+	a.b(m_endofblock);
 
 	// emit the generated code
 	if (!emit(ch))
@@ -1670,6 +1688,16 @@ void drcbe_arm64::get_info(drcbe_info &info) const noexcept
 			break;
 	}
 }
+
+
+[[noreturn]] void drcbe_arm64::end_of_block() const
+{
+	osd_printf_error("drcbe_arm64(%s): fell off the end of a generated code block!\n", m_device.tag());
+	std::fflush(stdout);
+	std::fflush(stderr);
+	std::abort();
+}
+
 
 void drcbe_arm64::op_handle(a64::Assembler &a, const uml::instruction &inst)
 {
@@ -1753,7 +1781,8 @@ void drcbe_arm64::op_mapvar(a64::Assembler &a, const uml::instruction &inst)
 
 void drcbe_arm64::op_nop(a64::Assembler &a, const uml::instruction &inst)
 {
-	a.nop();
+	// nothing
+	//a.nop();
 }
 
 void drcbe_arm64::op_break(a64::Assembler &a, const uml::instruction &inst)

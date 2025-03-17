@@ -91,9 +91,13 @@
 #include "debug/debugcpu.h"
 #include "emuopts.h"
 
+#include "mfpresolve.h"
+
 #include "asmjit/src/asmjit/asmjit.h"
 
 #include <cstddef>
+#include <cstdio>
+#include <cstdlib>
 
 
 namespace drc {
@@ -498,6 +502,7 @@ private:
 	bool can_skip_lower_load(asmjit::x86::Assembler &a, uint32_t *memref, asmjit::x86::Gp const &reglo);
 	bool can_skip_upper_load(asmjit::x86::Assembler &a, uint32_t *memref, asmjit::x86::Gp const &reghi);
 
+	[[noreturn]] void end_of_block() const;
 	static void debug_log_hashjmp(int mode, offs_t pc);
 
 	// code generators
@@ -636,6 +641,7 @@ private:
 	x86_entry_point_func    m_entry;                // entry point
 	x86code *               m_exit;                 // exit point
 	x86code *               m_nocode;               // nocode handler
+	x86code *               m_endofblock;           // end of block handler
 	x86code *               m_save;                 // save handler
 	x86code *               m_restore;              // restore handler
 
@@ -1027,6 +1033,7 @@ drcbe_x86::drcbe_x86(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 	, m_entry(nullptr)
 	, m_exit(nullptr)
 	, m_nocode(nullptr)
+	, m_endofblock(nullptr)
 	, m_save(nullptr)
 	, m_restore(nullptr)
 	, m_last_lower_reg(Gp())
@@ -1217,6 +1224,18 @@ void drcbe_x86::reset()
 	a.bind(a.newNamedLabel("nocode_point"));
 	a.ret();                                                                            // ret
 
+	// generate an end-of-block handler point
+	m_endofblock = dst + a.offset();
+	a.bind(a.newNamedLabel("end_of_block_point"));
+	auto const [entrypoint, adjusted] = util::resolve_member_function(&drcbe_x86::end_of_block, *this);
+	if (USE_THISCALL)
+		a.mov(ecx, imm(adjusted));
+	else
+		a.mov(dword_ptr(esp, 0), imm(adjusted));
+	a.call(imm(entrypoint));
+	if (USE_THISCALL)
+		a.sub(esp, 4);
+
 	// generate a save subroutine
 	m_save = dst + a.offset();
 	a.bind(a.newNamedLabel("save"));
@@ -1299,7 +1318,8 @@ void drcbe_x86::reset()
 	{
 		x86log_disasm_code_range(m_log, "entry_point", dst, m_exit);
 		x86log_disasm_code_range(m_log, "exit_point", m_exit, m_nocode);
-		x86log_disasm_code_range(m_log, "nocode_point", m_nocode, m_save);
+		x86log_disasm_code_range(m_log, "nocode_point", m_nocode, m_endofblock);
+		x86log_disasm_code_range(m_log, "end_of_block", m_endofblock, m_save);
 		x86log_disasm_code_range(m_log, "save", m_save, m_restore);
 		x86log_disasm_code_range(m_log, "restore", m_restore, dst + bytes);
 
@@ -1387,7 +1407,7 @@ void drcbe_x86::generate(drcuml_block &block, const instruction *instlist, uint3
 		std::string dasm;
 
 		// add a comment
-		if (m_log != nullptr)
+		if (m_log)
 		{
 			dasm = inst.disasm(&m_drcuml);
 			x86log_add_comment(m_log, dst + a.offset(), "%s", dasm.c_str());
@@ -1407,13 +1427,21 @@ void drcbe_x86::generate(drcuml_block &block, const instruction *instlist, uint3
 		(this->*s_opcode_table[inst.opcode()])(a, inst);
 	}
 
+	// catch falling off the end of a block
+	if (m_log)
+	{
+		x86log_add_comment(m_log, dst + a.offset(), "%s", "end of block");
+		a.setInlineComment("end of block");
+	}
+	a.jmp(imm(m_endofblock));
+
 	// emit the generated code
 	size_t const bytes = emit(ch);
 	if (!bytes)
 		block.abort();
 
 	// log it
-	if (m_log != nullptr)
+	if (m_log)
 		x86log_disasm_code_range(m_log, (blockname.empty()) ? "Unknown block" : blockname.c_str(), dst, dst + bytes);
 
 	// tell all of our utility objects that the block is finished
@@ -2817,13 +2845,27 @@ void drcbe_x86::emit_fstp_p(Assembler &a, int size, be_parameter const &param)
 //**************************************************************************
 
 //-------------------------------------------------
+//  end_of_block - function to catch falling off
+//  the end of a generated code block
+//-------------------------------------------------
+
+[[noreturn]] void drcbe_x86::end_of_block() const
+{
+	osd_printf_error("drcbe_x86(%s): fell off the end of a generated code block!\n", m_device.tag());
+	std::fflush(stdout);
+	std::fflush(stderr);
+	std::abort();
+}
+
+
+//-------------------------------------------------
 //  debug_log_hashjmp - callback to handle
 //  logging of hashjmps
 //-------------------------------------------------
 
 void drcbe_x86::debug_log_hashjmp(int mode, offs_t pc)
 {
-	printf("mode=%d PC=%08X\n", mode, pc);
+	std::printf("mode=%d PC=%08X\n", mode, pc);
 }
 
 
