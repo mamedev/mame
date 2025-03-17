@@ -729,7 +729,7 @@ void x68k_state::irq2_line(int state)
 {
 	m_exp_irq2[N] = (state != CLEAR_LINE);
 	LOGMASKED(LOG_IRQ, "IRQ2-%d %s\n", N + 1, m_exp_irq2[N] ? "asserted" : "cleared");
-	m_maincpu->set_input_line(INPUT_LINE_IRQ2, (m_exp_irq2[0] || m_exp_irq2[1]) ? ASSERT_LINE : CLEAR_LINE)
+	m_maincpu->set_input_line(INPUT_LINE_IRQ2, (m_exp_irq2[0] || m_exp_irq2[1]) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 template <int N>
@@ -737,7 +737,7 @@ void x68k_state::irq4_line(int state)
 {
 	m_exp_irq4[N] = (state != CLEAR_LINE);
 	LOGMASKED(LOG_IRQ, "IRQ4-%d %s\n", N + 1, m_exp_irq4[N] ? "asserted" : "cleared");
-	m_maincpu->set_input_line(INPUT_LINE_IRQ4, (m_exp_irq4[0] || m_exp_irq4[1]) ? ASSERT_LINE : CLEAR_LINE)
+	m_maincpu->set_input_line(INPUT_LINE_IRQ4, (m_exp_irq4[0] || m_exp_irq4[1]) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 uint8_t x68k_state::iack2()
