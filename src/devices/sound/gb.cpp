@@ -1069,7 +1069,7 @@ void gameboy_sound_device::sound_w_internal( int offset, uint8_t data )
 				m_snd[2].frequency = ((m_snd[2].reg[4] & 0x7) << 8) | m_snd[2].reg[3];
 				m_snd[2].frequency_counter = m_snd[2].frequency;
 				// There is a tiny bit of delay in starting up the wave channel
-				m_snd[2].cycles_left = -6;
+				m_snd[2].cycles_left = -3;
 				m_snd[2].sample_reading = false;
 
 				if (!dac_enabled(m_snd[2]))
