@@ -446,12 +446,11 @@ void dmg_apu_device::update_wave_channel(SOUND &snd, uint64_t cycles)
 				}
 				snd.current_sample &= 0x0f;
 
-				snd.signal = level ? (snd.current_sample >> (level - 1)) : 0;
-
 				// Reload frequency counter
 				snd.frequency_counter = snd.frequency;
 			}
 		}
+		snd.signal = level ? (snd.current_sample >> (level - 1)) : 0;
 	}
 }
 
@@ -483,7 +482,6 @@ void cgb04_apu_device::update_wave_channel(SOUND &snd, uint64_t cycles)
 				snd.current_sample >>= 4;
 			}
 			snd.current_sample &= 0x0f;
-			snd.signal = level ? (snd.current_sample >> (level - 1)) : 0;
 
 			cycles %= distance;
 			snd.sample_reading = !cycles;
@@ -494,6 +492,7 @@ void cgb04_apu_device::update_wave_channel(SOUND &snd, uint64_t cycles)
 		{
 			snd.frequency_counter += cycles;
 		}
+		snd.signal = level ? (snd.current_sample >> (level - 1)) : 0;
 	}
 }
 
@@ -527,7 +526,6 @@ void agb_apu_device::update_wave_channel(SOUND &snd, uint64_t cycles)
 				snd.current_sample >>= 4;
 			}
 			snd.current_sample &= 0x0f;
-			snd.signal = level ? ((snd.current_sample * level) / 4) : 0;
 
 			cycles %= distance;
 			snd.sample_reading = !cycles;
@@ -538,6 +536,7 @@ void agb_apu_device::update_wave_channel(SOUND &snd, uint64_t cycles)
 		{
 			snd.frequency_counter += cycles;
 		}
+		snd.signal = level ? ((snd.current_sample * level) / 4) : 0;
 	}
 }
 
@@ -1070,6 +1069,7 @@ void gameboy_sound_device::sound_w_internal( int offset, uint8_t data )
 				m_snd[2].frequency_counter = m_snd[2].frequency;
 				// There is a tiny bit of delay in starting up the wave channel
 				m_snd[2].cycles_left = -6;
+				m_snd[2].current_sample = 0;
 				m_snd[2].sample_reading = false;
 
 				if (!dac_enabled(m_snd[2]))
