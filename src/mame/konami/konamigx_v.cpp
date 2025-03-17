@@ -749,17 +749,12 @@ void konamigx_state::gx_draw_basic_tilemaps(screen_device &screen, bitmap_rgb32 
 			flags |= TILEMAP_DRAW_ALPHA(alpha);
 		}
 
-		if (alpha2 < 255)
-		{
-			flags2 |= TILEMAP_DRAW_ALPHA(alpha2);
-		}
-
-
-
-		if (alpha2 < 255)
+		if (alpha2 < 255 && mix_mode_bits != 0b11)
 		{
 			// tiles with mix codes are put into category 1.
 			// draw them in a separate pass for per-tile blending if necessary.
+
+			flags2 |= TILEMAP_DRAW_ALPHA(alpha2);
 			m_k056832->m_tilemap_draw(screen, bitmap, cliprect, layer, flags2, 0);
 		}
 		else

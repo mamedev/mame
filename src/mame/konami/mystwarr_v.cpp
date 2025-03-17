@@ -70,6 +70,7 @@ K056832_CB_MEMBER(mystwarr_state::mystwarr_tile_callback)
 
 K056832_CB_MEMBER(mystwarr_state::viostorm_tile_callback)
 {
+	// metamrph either uses bits 0-1 or 4-5, not sure which
 	const u8 mix_code = attr & 0b11;
 	if (mix_code) {
 		*priority = 1;
