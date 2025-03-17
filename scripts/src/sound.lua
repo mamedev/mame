@@ -1776,3 +1776,15 @@ if (SOUNDS["GT155"]~=null) then
 		MAME_DIR .. "src/devices/sound/gt155.h",
 	}
 end
+
+---------------------------------------------------
+-- Nintendo MMC5 Sound
+--@src/devices/sound/mmc5.h,SOUNDS["MMC5"] = true
+---------------------------------------------------
+
+if (SOUNDS["MMC5"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/mmc5.cpp",
+		MAME_DIR .. "src/devices/sound/mmc5.h",
+	}
+end
