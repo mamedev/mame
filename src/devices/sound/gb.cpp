@@ -827,7 +827,7 @@ void cgb04_apu_device::sound_w(offs_t offset, u8 data)
 
 void dmg_apu_device::corrupt_wave_ram()
 {
-	if (m_snd[2].offset < 8)
+	if (m_snd[2].offset < 4)
 	{
 		m_wave_ram[0][0x0] = m_wave_ram[0][(m_snd[2].offset / 2)];
 	}
