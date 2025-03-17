@@ -292,7 +292,7 @@ void s_dsp_device::dsp_update(s16 *sound_ptr)
 
 	for (int v = 0, m = 1, V = 0; v < 8; v++, V += 16, m <<= 1)
 	{
-		voice_state_type * vp = &m_voice_state[v];
+		voice_state_type *vp = &m_voice_state[v];
 
 		if (vp->on_cnt && (--vp->on_cnt == 0))
 		{
@@ -383,13 +383,13 @@ void s_dsp_device::dsp_update(s16 *sound_ptr)
 			with those kinds of tricks, though. */
 			if (!vp->header_cnt)
 			{
-				if (vp->end & 1)
+				if (BIT(vp->end, 0))
 				{
 					/* Docs say ENDX bit is set when decode of block with source
 					end flag set is done.  Does this apply to looping samples?
 					Some info I've seen suggests yes. */
 					m_dsp_regs[0x7c] |= m;
-					if (vp->end & 2)
+					if (BIT(vp->end, 1))
 					{
 						vp->mem_ptr = lptr(sd, V);
 
@@ -487,14 +487,7 @@ void s_dsp_device::dsp_update(s16 *sound_ptr)
 				break;
 			}
 
-			if (outx < (s16)0x8000)
-			{
-				outx = (s16)0x8000;
-			}
-			else if (outx > (s16)0x7fff)
-			{
-				outx = (s16)0x7fff;
-			}
+			outx = std::clamp(outx, -0x8000, 0x7fff);
 
 #ifdef DBG_BRR
 			logerror("V%d: filter + delta=%04X\n", v, (u16)outx);
@@ -537,10 +530,7 @@ void s_dsp_device::dsp_update(s16 *sound_ptr)
 			vr  = (s16)vr;
 			vr += ((G1[vl] * vp->sampbuf[(vp->sampptr + 3) & 3]) >> 11) & ~1;
 
-			if (vr > 32767)
-				vr = 32767;
-			else if (vr < -32768)
-				vr = -32768;
+			vr = std::clamp(vr, -0x8000, 0x7fff);
 
 			outx = (s16)vr;
 
@@ -634,7 +624,7 @@ void s_dsp_device::dsp_update(s16 *sound_ptr)
 	outl += vl * (s8)m_dsp_regs[0x2c] >> 14;
 	outr += vr * (s8)m_dsp_regs[0x3c] >> 14;
 
-	if (!(m_dsp_regs[0x6c] & 0x20))
+	if (BIT(~m_dsp_regs[0x6c], 5))
 	{
 		/* Add the echo feedback back into the original result, and save that into memory for use later. */
 		echol += vl * (s8)m_dsp_regs[0x0d] >> 14;
@@ -661,7 +651,7 @@ void s_dsp_device::dsp_update(s16 *sound_ptr)
 
 	if (sound_ptr != nullptr)
 	{
-		if (m_dsp_regs[0x6c] & 0x40)
+		if (BIT(m_dsp_regs[0x6c], 6))
 		{
 			/* MUTE */
 #ifdef MAME_DEBUG
