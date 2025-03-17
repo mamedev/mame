@@ -758,11 +758,13 @@ void konamigx_state::gx_draw_basic_tilemaps(screen_device &screen, bitmap_rgb32 
 
 		if (alpha2 < 255)
 		{
+			// tiles with mix codes are put into category 1.
+			// draw them in a separate pass for per-tile blending if necessary.
 			m_k056832->m_tilemap_draw(screen, bitmap, cliprect, layer, flags2, 0);
 		}
 		else
 		{
-			// if no alpha is being used for category 1 (tile mix code) tiles,
+			// if no alpha is being applied to category 1 (tile mix code) tiles,
 			// draw all tiles with one m_tilemap_draw call
 			flags |= TILEMAP_DRAW_ALL_CATEGORIES;
 		}
@@ -1069,23 +1071,10 @@ K056832_CB_MEMBER(konamigx_state::salmndr2_tile_callback)
 
 K056832_CB_MEMBER(konamigx_state::alpha_tile_callback)
 {
-	int mixcode;
 	int d = *code;
 
-	mixcode = K055555GX_decode_vmixcolor(layer, color);
-
-	if (mixcode < 0)
-		*code = (m_gx_tilebanks[(d & 0xe000)>>13]<<13) + (d & 0x1fff);
-	else
-	{
-		/* save mixcode and mark tile alpha (unimplemented) */
-		// Daisu-Kiss stage presentation
-		// Sexy Parodius level 3b
-		*code =  (m_gx_tilebanks[(d & 0xe000)>>13]<<13) + (d & 0x1fff);
-
-		if (VERBOSE)
-			popmessage("skipped alpha tile(layer=%d mix=%d)", layer, mixcode);
-	}
+	*code = (m_gx_tilebanks[(d & 0xe000)>>13]<<13) + (d & 0x1fff);
+	K055555GX_decode_vmixcolor(layer, color);
 
 	const u8 mix_code = (*flags >> (8 + 6)) & 0b11;
 	if (mix_code) {
