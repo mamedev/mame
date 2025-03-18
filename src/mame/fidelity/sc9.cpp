@@ -38,7 +38,7 @@ Known modules (*denotes undumped):
 - *CG64: 64 Greatest Games
 - DVC: Sicilan Varation (prototype)
 - EOA-EOE: Chess Encyclopedia Volume A-E (5 modules, needs 7seg display)
-- *TDF: Tarrasch Defense to the Queen's Gambit
+- *TDF: Tarrasch Defence to the Queen's Gambit
 
 The edge connector has D0-D7, A0-A13, 2 chip select lines, read/write lines, IRQ
 line. IRQ and write strobe are unused. Maximum known size is 16KB.
