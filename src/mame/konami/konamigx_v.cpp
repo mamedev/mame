@@ -733,8 +733,13 @@ void konamigx_state::gx_draw_basic_tilemaps(screen_device &screen, bitmap_rgb32 
 			flags2 |= K056382_DRAW_FLAG_FORCE_XYSCROLL;
 		}
 
-		const int alpha = m_k054338->set_alpha_level(mix_mode_internal) & 0xFF;
-		const int alpha2 = m_k054338->set_alpha_level(mix_mode_external) & 0xFF;
+		// hack: mask out mixpri bit. if additive bit set, mask it out and invert alpha.
+		// this makes additive alpha effects look OK until they are properly handled.
+		int alpha = m_k054338->set_alpha_level(mix_mode_internal) & 0x1FF;
+		if (alpha & 0x100) alpha = ~alpha & 0xFF;
+
+		int alpha2 = m_k054338->set_alpha_level(mix_mode_external) & 0x1FF;
+		if (alpha2 & 0x100) alpha2 = ~alpha2 & 0xFF;
 
 		if (alpha < 255) flags |= TILEMAP_DRAW_ALPHA(alpha);
 
