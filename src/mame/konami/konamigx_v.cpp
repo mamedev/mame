@@ -708,28 +708,20 @@ void konamigx_state::gx_draw_basic_tilemaps(screen_device &screen, bitmap_rgb32 
 
 		const u8 layer2 = layer << 1;
 		const u8 j = mixerflags >> layer2 & 0b11;
-		u8 mix_mode_bits = 0;
-		u8 mix_mode_bits2 = 0;
 
-		if (j == GXMIX_BLEND_NONE) // hack
-		{
-			mix_mode_bits = 0;
-		}
-		else if (j == GXMIX_BLEND_FORCE) // hack
-		{
-			mix_mode_bits = mixerflags >> (layer2 + 16) & 0b11;
-		}
+		// keep internal and external mix codes separated, so the external mix code can be applied to category 1 tiles
+		u8 mix_mode_internal = 0;
+		u8 mix_mode_external = 0;
+
+		if (j == GXMIX_BLEND_FORCE) mix_mode_internal = mixerflags >> (layer2 + 16) & 0b11; // hack
 		else
 		{
 			const u8 v_inmix_on_layer = m_vmixon >> layer2 & 0b11;
 			const u8 v_inmix_layer = m_vinmix >> layer2 & 0b11;
 			const u8 tile_mix_code = u32(mixerflags) >> 30;
 
-			mix_mode_bits = v_inmix_layer & v_inmix_on_layer;
-			mix_mode_bits2 = tile_mix_code & ~v_inmix_on_layer;
-
-			// todo: comment here
-			// mix_mode_bits3 = mix_mode_bits | mix_mode_bits2;
+			mix_mode_internal = v_inmix_layer & v_inmix_on_layer;
+			mix_mode_external = tile_mix_code & ~v_inmix_on_layer;
 		}
 
 		int flags = TILEMAP_DRAW_CATEGORY(0);
@@ -741,19 +733,15 @@ void konamigx_state::gx_draw_basic_tilemaps(screen_device &screen, bitmap_rgb32 
 			flags2 |= K056382_DRAW_FLAG_FORCE_XYSCROLL;
 		}
 
-		const int alpha = m_k054338->set_alpha_level(mix_mode_bits) & 0xFF;
-		const int alpha2 = m_k054338->set_alpha_level(mix_mode_bits2) & 0xFF;
+		const int alpha = m_k054338->set_alpha_level(mix_mode_internal) & 0xFF;
+		const int alpha2 = m_k054338->set_alpha_level(mix_mode_external) & 0xFF;
 
-		if (alpha < 255)
-		{
-			flags |= TILEMAP_DRAW_ALPHA(alpha);
-		}
+		if (alpha < 255) flags |= TILEMAP_DRAW_ALPHA(alpha);
 
-		if (alpha2 < 255 && mix_mode_bits != 0b11)
+		if (alpha2 < 255)
 		{
 			// tiles with mix codes are put into category 1.
 			// draw them in a separate pass for per-tile blending if necessary.
-
 			flags2 |= TILEMAP_DRAW_ALPHA(alpha2);
 			m_k056832->m_tilemap_draw(screen, bitmap, cliprect, layer, flags2, 0);
 		}

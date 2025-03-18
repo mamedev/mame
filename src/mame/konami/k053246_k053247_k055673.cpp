@@ -555,6 +555,7 @@ void k053247_device::zdrawgfxzoom32GP(
 
 					if (additive_mode)
 					{
+						// todo: improve additive blend calculation
 						const u32 temp = alpha_blend_r32(src, 0, alpha_level);
 						dst_ptr[x + y * dst_pitch] = add_blend_r32(dst, temp);
 					}
