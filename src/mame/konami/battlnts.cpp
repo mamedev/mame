@@ -331,6 +331,8 @@ void battlnts_state::battlnts(machine_config &config)
 
 	K007342(config, m_k007342, 0, "palette", gfx_battlnts_tiles);
 	m_k007342->set_tile_callback(FUNC(battlnts_state::tile_callback));
+	m_k007342->flipscreen_cb().set(m_k007420, FUNC(k007420_device::set_flipscreen));
+	m_k007342->sprite_wrap_y_cb().set(m_k007420, FUNC(k007420_device::set_wrap_y));
 
 	K007420(config, m_k007420, 0, "palette", gfx_battlnts_spr);
 	m_k007420->set_bank_limit(0x3ff);
@@ -452,9 +454,9 @@ ROM_END
  *
  *************************************/
 
-GAME( 1987, battlnts,  0,        battlnts, battlnts, battlnts_state, empty_init, ROT90, "Konami", "Battlantis (program code G)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1987, battlntsa, battlnts, battlnts, battlnts, battlnts_state, empty_init, ROT90, "Konami", "Battlantis (program code F)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1987, battlntsj, battlnts, battlnts, battlnts, battlnts_state, empty_init, ROT90, "Konami", "Battlantis (Japan, program code E)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1987, rackemup,  0,        battlnts, rackemup, battlnts_state, empty_init, ROT90, "Konami", "Rack 'em Up (program code L)",        MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, thehustl,  rackemup, battlnts, thehustl, battlnts_state, empty_init, ROT90, "Konami", "The Hustler (Japan, program code M)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, thehustlj, rackemup, battlnts, thehustl, battlnts_state, empty_init, ROT90, "Konami", "The Hustler (Japan, program code J)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, battlnts,  0,        battlnts, battlnts, battlnts_state, empty_init, ROT90, "Konami", "Battlantis (version G)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, battlntsa, battlnts, battlnts, battlnts, battlnts_state, empty_init, ROT90, "Konami", "Battlantis (version F)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, battlntsj, battlnts, battlnts, battlnts, battlnts_state, empty_init, ROT90, "Konami", "Battlantis (Japan, version E)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rackemup,  0,        battlnts, rackemup, battlnts_state, empty_init, ROT90, "Konami", "Rack 'em Up (version L)",        MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, thehustl,  rackemup, battlnts, thehustl, battlnts_state, empty_init, ROT90, "Konami", "The Hustler (Japan, version M)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, thehustlj, rackemup, battlnts, thehustl, battlnts_state, empty_init, ROT90, "Konami", "The Hustler (Japan, version J)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

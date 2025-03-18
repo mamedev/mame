@@ -16,7 +16,7 @@
 #include "cpu/m68000/m68000.h"
 #include "imagedev/floppy.h"
 #include "machine/6850acia.h"
-#include "machine/8530scc.h"
+#include "machine/z80scc.h"
 #include "machine/clock.h"
 #include "machine/input_merger.h"
 #include "machine/mc68901.h"
@@ -1012,7 +1012,7 @@ void stbook_state::stbook_map(address_map &map)
 
 static INPUT_PORTS_START( st )
 	PORT_START("config")
-	PORT_CONFNAME( 0x80, 0x80, "Monitor") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, st_state, write_monochrome)
+	PORT_CONFNAME( 0x80, 0x80, "Monitor") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, FUNC(st_state::write_monochrome))
 	PORT_CONFSETTING( 0x00, "Monochrome (Atari SM124)" )
 	PORT_CONFSETTING( 0x80, "Color (Atari SC1224)" )
 INPUT_PORTS_END
@@ -1024,7 +1024,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( ste )
 	PORT_START("config")
-	PORT_CONFNAME( 0x80, 0x80, "Monitor") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, ste_state, write_monochrome)
+	PORT_CONFNAME( 0x80, 0x80, "Monitor") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, FUNC(ste_state::write_monochrome))
 	PORT_CONFSETTING( 0x00, "Monochrome (Atari SM124)" )
 	PORT_CONFSETTING( 0x80, "Color (Atari SC1435)" )
 

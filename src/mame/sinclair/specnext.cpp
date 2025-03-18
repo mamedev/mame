@@ -2609,7 +2609,8 @@ void specnext_state::map_io(address_map &map)
 		return /*m_nr_d8_io_trap_fdc_en ? ... :*/ 0x00;
 	}), NAME([this](u8 data) {
 		if (m_nr_d8_io_trap_fdc_en)
-			;
+		{
+		}
 	}));
 
 
@@ -2783,8 +2784,8 @@ INPUT_PORTS_START(specnext)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON6) PORT_NAME("Middle mouse button") PORT_CODE(MOUSECODE_BUTTON3)
 
 	PORT_MODIFY("NMI")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("NMI MF") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, specnext_state, on_mf_nmi, 0)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("NMI DivMMC") PORT_CODE(KEYCODE_F11) PORT_CHANGED_MEMBER(DEVICE_SELF, specnext_state, on_divmmc_nmi, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("NMI MF") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(specnext_state::on_mf_nmi), 0)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("NMI DivMMC") PORT_CODE(KEYCODE_F11) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(specnext_state::on_divmmc_nmi), 0)
 INPUT_PORTS_END
 
 void specnext_state::machine_start()

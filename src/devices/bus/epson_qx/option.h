@@ -97,8 +97,8 @@
     |---|  |---|  |---|  |---|  |---|
 
 */
-#ifndef MAME_BUS_EPSON_QX_BUS_H
-#define MAME_BUS_EPSON_QX_BUS_H
+#ifndef MAME_BUS_EPSON_QX_OPTION_H
+#define MAME_BUS_EPSON_QX_OPTION_H
 
 #pragma once
 
@@ -277,4 +277,4 @@ void option_bus_devices(device_slot_interface &device);
 DECLARE_DEVICE_TYPE_NS(EPSON_QX_OPTION_BUS_SLOT, bus::epson_qx, option_slot_device)
 DECLARE_DEVICE_TYPE_NS(EPSON_QX_OPTION_BUS, bus::epson_qx, option_bus_device)
 
-#endif
+#endif // MAME_BUS_EPSON_QX_OPTION_H

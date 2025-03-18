@@ -47,6 +47,9 @@ FEB-2003 AAT
 
 Notes:
 
+  The main board of Side Arms has an unpopulated position reserved for a
+  8751 protection MCU.
+
   Unknown PROMs are mostly used for timing. Only the first four sprite
   encoding parameters have been identified, the other 28(!) are
   believed to be line-buffer controls.
@@ -102,7 +105,7 @@ void sidearms_state::sidearms_map(address_map &map)
 	map(0xc801, 0xc801).portr("P1").w(FUNC(sidearms_state::bankswitch_w));
 	map(0xc802, 0xc802).portr("P2").w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0xc803, 0xc803).portr("DSW0");
-	map(0xc804, 0xc804).portr("DSW1").w(FUNC(sidearms_state::c804_w));
+	map(0xc804, 0xc804).portr("DSW1").w(FUNC(sidearms_state::control_w));
 	map(0xc805, 0xc805).portr("DSW2").w(FUNC(sidearms_state::star_scrollx_w));
 	map(0xc806, 0xc806).w(FUNC(sidearms_state::star_scrolly_w));
 	map(0xc808, 0xc809).writeonly().share("bg_scrollx");
@@ -126,7 +129,7 @@ void sidearms_state::turtship_map(address_map &map)
 	map(0xe800, 0xe800).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xe801, 0xe801).w(FUNC(sidearms_state::bankswitch_w));
 	map(0xe802, 0xe802).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0xe804, 0xe804).w(FUNC(sidearms_state::c804_w));
+	map(0xe804, 0xe804).w(FUNC(sidearms_state::control_w));
 	map(0xe805, 0xe805).w(FUNC(sidearms_state::star_scrollx_w));
 	map(0xe806, 0xe806).w(FUNC(sidearms_state::star_scrolly_w));
 	map(0xe808, 0xe809).writeonly().share("bg_scrollx");
@@ -170,7 +173,7 @@ void sidearms_state::whizz_map(address_map &map)
 	map(0xc801, 0xc801).portr("DSW1").w(FUNC(sidearms_state::whizz_bankswitch_w));
 	map(0xc802, 0xc802).portr("DSW2").w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0xc803, 0xc803).portr("IN0").nopw();
-	map(0xc804, 0xc804).portr("IN1").w(FUNC(sidearms_state::c804_w));
+	map(0xc804, 0xc804).portr("IN1").w(FUNC(sidearms_state::control_w));
 	map(0xc805, 0xc805).portr("IN2").nopw();
 	map(0xc806, 0xc806).portr("IN3");
 	map(0xc807, 0xc807).portr("IN4");
@@ -284,7 +287,7 @@ static INPUT_PORTS_START( sidearms )
 
 	PORT_START("DSW2")
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")     /* not sure, but likely */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))     /* not sure, but likely */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( turtship )
@@ -516,7 +519,7 @@ static INPUT_PORTS_START( whizz )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH,IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH,IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -630,10 +633,7 @@ void sidearms_state::sidearms(machine_config &config)
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(8*8, (64-8)*8-1, 2*8, 30*8-1);
+	screen.set_raw(16_MHz_XTAL / 2, 64*8, 8*8, (64-8)*8, 32*8, 2*8, 30*8);
 	screen.set_screen_update(FUNC(sidearms_state::screen_update));
 	screen.screen_vblank().set("spriteram", FUNC(buffered_spriteram8_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
@@ -676,10 +676,7 @@ void sidearms_state::turtship(machine_config &config)
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(61.0338);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(8*8, (64-8)*8-1, 2*8, 30*8-1);
+	screen.set_raw(16_MHz_XTAL / 2, 64*8, 8*8, (64-8)*8, 32*8, 2*8, 30*8); // 61.0338 Hz measured
 	screen.screen_vblank().set("spriteram", FUNC(buffered_spriteram8_device::vblank_copy_rising));
 	screen.set_screen_update(FUNC(sidearms_state::screen_update));
 	screen.set_palette(m_palette);
@@ -725,10 +722,7 @@ void sidearms_state::whizz(machine_config &config)
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(8*8, (64-8)*8-1, 2*8, 30*8-1);
+	screen.set_raw(16_MHz_XTAL / 2, 64*8, 8*8, (64-8)*8, 32*8, 2*8, 30*8);
 	screen.set_screen_update(FUNC(sidearms_state::screen_update));
 	screen.screen_vblank().set("spriteram", FUNC(buffered_spriteram8_device::vblank_copy_rising));
 	screen.set_palette(m_palette);

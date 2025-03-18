@@ -303,10 +303,10 @@ INPUT_CHANGED_MEMBER(ceres1_state::mouse_y)
 
 static INPUT_PORTS_START(ceres1)
 	PORT_START("mouse_x")
-	PORT_BIT(0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, ceres1_state, mouse_x, 0)
+	PORT_BIT(0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ceres1_state::mouse_x), 0)
 
 	PORT_START("mouse_y")
-	PORT_BIT(0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, ceres1_state, mouse_y, 0)
+	PORT_BIT(0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ceres1_state::mouse_y), 0)
 
 	PORT_START("mouse_buttons")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Mouse Left Button")   PORT_CODE(MOUSECODE_BUTTON1)
@@ -369,7 +369,7 @@ void ceres1_state::ceres1(machine_config &config)
 	m_serial->dsr_handler().set(m_uart, FUNC(scn2681_device::ip2_w));
 
 	// TODO: RS-485 ports "na" and "nb"
-	SCC8530N(config, m_scc, 6_MHz_XTAL);
+	SCC8530(config, m_scc, 6_MHz_XTAL);
 	m_scc->configure_channels(m_uart->clock(), 0, m_uart->clock(), 0);
 	m_scc->out_int_callback().set(m_icu, FUNC(am9519_device::ireq1_w)).invert();
 

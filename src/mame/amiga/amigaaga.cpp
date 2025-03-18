@@ -14,13 +14,15 @@ Done:
     - preliminary sprites
 
 TODO:
-    - Merge with base OCS/ECS Denise video emulation, use virtual overrides where applicable;
-    - High bits sprite collisions;
-    - SHRES video mode;
-    - Confirm diwstrt/diwstop values;
-    - Add custom screen geometry registers (specific to AGA chipset, $1c0-$1ef, most are shared
-      with Agnus/Alice really);
-    - Remaining unemulated new registers (ZD pin, SOG pin, SSCAN2, BRDRBLNK, BRDRSPRT, BPLAMx);
+- Merge with base OCS Denise video emulation, use virtual overrides where applicable;
+- Downport ECS Denise features;
+- High bits sprite collisions;
+- SHRES video mode;
+- Confirm diwstrt/diwstop values;
+- Add custom screen geometry registers (ECS/AGA chipsets, $1c0-$1ef, most are shared
+    with Agnus/Alice really);
+- Implement SPRES0/1 (sprite resolutions)
+- Remaining unemulated new registers (ZD pin, SOG pin, SSCAN2, BRDRSPRT, BPLAMx);
 
 **************************************************************************************************/
 
@@ -39,7 +41,26 @@ TODO:
  *
  *************************************/
 
-void amiga_state::aga_palette_write(int color_reg, uint16_t data)
+u16 amiga_state::aga_palette_read(offs_t color_reg)
+{
+	u8 pal_bank = (CUSTOM_REG(REG_BPLCON3) >> 13) & 0x07;
+
+	int color = (pal_bank * 32) + color_reg;
+
+	u8 cr = m_aga_palette[color].r();
+	u8 cg = m_aga_palette[color].g();
+	u8 cb = m_aga_palette[color].b();
+
+	// LOCT
+	if (BIT(CUSTOM_REG(REG_BPLCON3),9))
+	{
+		return ((cr & 0xf) << 8) | ((cg & 0xf) << 4) | ((cb & 0xf) << 0);
+	}
+
+	return ((cr & 0xf0) << 4) | (cg & 0xf0) | ((cb & 0xf0) >> 4);
+}
+
+void amiga_state::aga_palette_write(offs_t color_reg, uint16_t data)
 {
 	int r,g,b;
 	int cr,cg,cb;
@@ -66,7 +87,9 @@ void amiga_state::aga_palette_write(int color_reg, uint16_t data)
 		cr = (r << 4) | r;
 		cg = (g << 4) | g;
 		cb = (b << 4) | b;
+		// TODO: transparency, bit 15
 	}
+
 	m_aga_palette[color] = rgb_t(cr, cg, cb);
 	// make a copy for Extra Half Brite mode
 	if (pal_bank == 0)
@@ -84,15 +107,25 @@ void amiga_state::aga_palette_write(int color_reg, uint16_t data)
 
 VIDEO_START_MEMBER(amiga_state,amiga_aga)
 {
-	VIDEO_START_CALL_MEMBER( amiga );
+	video_start_common();
 
-	for (int j = 0; j < 256; j++)
+	// fill the AGA dblpf table, taking bplcon3:pf2ofx into account for offset values
+	m_separate_bitplanes[0].resize(256 * 8);
+	m_separate_bitplanes[1].resize(256 * 8);
+
+	static const int dblpfofs[] = { 0, 2, 4, 8, 16, 32, 64, 128 };
+
+	for (int offset_index = 0; offset_index < 8; offset_index ++)
 	{
-		int pf1pix = ((j >> 0) & 1) | ((j >> 1) & 2) | ((j >> 2) & 4) | ((j >> 3) & 8);
-		int pf2pix = ((j >> 1) & 1) | ((j >> 2) & 2) | ((j >> 3) & 4) | ((j >> 4) & 8);
+		int offset_value = dblpfofs[offset_index];
+		for (int j = 0; j < 256; j++)
+		{
+			int pf1pix = ((j >> 0) & 1) | ((j >> 1) & 2) | ((j >> 2) & 4) | ((j >> 3) & 8);
+			int pf2pix = ((j >> 1) & 1) | ((j >> 2) & 2) | ((j >> 3) & 4) | ((j >> 4) & 8);
 
-		m_separate_bitplanes[0][j] = (pf1pix || !pf2pix) ? pf1pix : (pf2pix + 16);
-		m_separate_bitplanes[1][j] = pf2pix ? (pf2pix + 16) : pf1pix;
+			m_separate_bitplanes[0][j + (offset_index << 8)] = (pf1pix || !pf2pix) ? pf1pix : (pf2pix + offset_value);
+			m_separate_bitplanes[1][j + (offset_index << 8)] = pf2pix ? (pf2pix + offset_value) : pf1pix;
+		}
 	}
 
 	m_aga_diwhigh_written = 0;
@@ -153,10 +186,10 @@ void amiga_state::aga_fetch_sprite_data(int scanline, int sprite)
 	m_aga_sprite_dma_used_words[sprite] = 0;
 }
 
-void amiga_state::aga_update_sprite_dma(int scanline)
+void amiga_state::aga_update_sprite_dma(int scanline, int num)
 {
 	int dmaenable = (CUSTOM_REG(REG_DMACON) & (DMACON_SPREN | DMACON_DMAEN)) == (DMACON_SPREN | DMACON_DMAEN);
-	int num, maxdma;
+	int maxdma;
 	const u16 sprctl_offs[4] = {2, 4, 4, 8};
 	const u16 spr_fmode_inc = sprctl_offs[(CUSTOM_REG(REG_FMODE) >> 2) & 0x03];
 
@@ -165,63 +198,62 @@ void amiga_state::aga_update_sprite_dma(int scanline)
 	if (maxdma > 8)
 		maxdma = 8;
 
-	/* loop over sprite channels */
-	for (num = 0; num < maxdma; num++)
+	if (num >= maxdma)
+		return;
+
+	int bitmask = 1 << num;
+	int vstart, vstop;
+
+	/* if we are == VSTOP, fetch new control words */
+	if (dmaenable && (m_sprite_dma_live_mask & bitmask) && (m_sprite_dma_reload_mask & bitmask) && !(m_sprite_ctl_written & bitmask))
 	{
-		int bitmask = 1 << num;
-		int vstart, vstop;
+		/* disable the sprite */
+		m_sprite_comparitor_enable_mask &= ~bitmask;
+		m_sprite_dma_reload_mask &= ~bitmask;
 
-		/* if we are == VSTOP, fetch new control words */
-		if (dmaenable && (m_sprite_dma_live_mask & bitmask) && (m_sprite_dma_reload_mask & bitmask) && !(m_sprite_ctl_written & bitmask))
-		{
-			/* disable the sprite */
-			m_sprite_comparitor_enable_mask &= ~bitmask;
-			m_sprite_dma_reload_mask &= ~bitmask;
+		/* fetch data into the control words */
+		CUSTOM_REG(REG_SPR0POS + 4 * num) = read_chip_ram(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) + 0);
+		// diggers AGA suggests that the fmode increments with ctl are interleaved,
+		// otherwise no sprites are drawn.
+		// (it enables sprite 0 only, and +8 for the vstop values)
+		CUSTOM_REG(REG_SPR0CTL + 4 * num) = read_chip_ram(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) + spr_fmode_inc);
+		CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) += 2 * spr_fmode_inc;
+		LOGMASKED(LOG_SPRITE_DMA, "%3d:sprite %d fetch: pos=%04X ctl=%04X\n", scanline, num, CUSTOM_REG(REG_SPR0POS + 4 * num), CUSTOM_REG(REG_SPR0CTL + 4 * num));
+	}
 
-			/* fetch data into the control words */
-			CUSTOM_REG(REG_SPR0POS + 4 * num) = read_chip_ram(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) + 0);
-			// diggers AGA suggests that the fmode increments with ctl are interleaved,
-			// otherwise no sprites are drawn.
-			// (it enables sprite 0 only, and +8 for the vstop values)
-			CUSTOM_REG(REG_SPR0CTL + 4 * num) = read_chip_ram(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) + spr_fmode_inc);
-			CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) += 2 * spr_fmode_inc;
-			LOGMASKED(LOG_SPRITE_DMA, "%3d:sprite %d fetch: pos=%04X ctl=%04X\n", scanline, num, CUSTOM_REG(REG_SPR0POS + 4 * num), CUSTOM_REG(REG_SPR0CTL + 4 * num));
-		}
+	u16 spr0ctl = CUSTOM_REG(REG_SPR0CTL + 4 * num);
+	/* compute vstart/vstop */
+	// bits 6 and 5 are respectively vstart bit 9 and vstop bit 9
+	// TODO: do they disable with non-AGA modes?
+	vstart = (CUSTOM_REG(REG_SPR0POS + 4 * num) >> 8);
+	vstart |= (spr0ctl & 0x04) ? 0x100 : 0;
+	vstart |= (spr0ctl & 0x40) ? 0x200 : 0;
+	vstop = (spr0ctl >> 8);
+	vstop |= (spr0ctl & 0x02) ? 0x100 : 0;
+	vstop |= (spr0ctl & 0x20) ? 0x200 : 0;
 
-		u16 spr0ctl = CUSTOM_REG(REG_SPR0CTL + 4 * num);
-		/* compute vstart/vstop */
-		// bits 6 and 5 are respectively vstart bit 9 and vstop bit 9
-		// TODO: do they disable with non-AGA modes?
-		vstart = (CUSTOM_REG(REG_SPR0POS + 4 * num) >> 8);
-		vstart |= (spr0ctl & 0x04) ? 0x100 : 0;
-		vstart |= (spr0ctl & 0x40) ? 0x200 : 0;
-		vstop = (spr0ctl >> 8);
-		vstop |= (spr0ctl & 0x02) ? 0x100 : 0;
-		vstop |= (spr0ctl & 0x20) ? 0x200 : 0;
+	/* if we hit vstart, enable the comparitor */
+	if (scanline == vstart)
+	{
+		m_sprite_comparitor_enable_mask |= 1 << num;
+		LOGMASKED(LOG_SPRITE_DMA, "%3d:sprite %d comparitor enable\n", scanline, num);
+	}
 
-		/* if we hit vstart, enable the comparitor */
-		if (scanline == vstart)
-		{
-			m_sprite_comparitor_enable_mask |= 1 << num;
-			LOGMASKED(LOG_SPRITE_DMA, "%3d:sprite %d comparitor enable\n", scanline, num);
-		}
+	/* if we hit vstop, disable the comparitor and trigger a reload for the next scanline */
+	if (scanline == vstop)
+	{
+		m_sprite_ctl_written &= ~bitmask;
+		m_sprite_comparitor_enable_mask &= ~bitmask;
+		m_sprite_dma_reload_mask |= 1 << num;
+		CUSTOM_REG(REG_SPR0DATA + 4 * num) = 0;     /* just a guess */
+		CUSTOM_REG(REG_SPR0DATB + 4 * num) = 0;
+		LOGMASKED(LOG_SPRITE_DMA, "%3d:sprite %d comparitor disable, prepare for reload\n", scanline, num);
+	}
 
-		/* if we hit vstop, disable the comparitor and trigger a reload for the next scanline */
-		if (scanline == vstop)
-		{
-			m_sprite_ctl_written &= ~bitmask;
-			m_sprite_comparitor_enable_mask &= ~bitmask;
-			m_sprite_dma_reload_mask |= 1 << num;
-			CUSTOM_REG(REG_SPR0DATA + 4 * num) = 0;     /* just a guess */
-			CUSTOM_REG(REG_SPR0DATB + 4 * num) = 0;
-			LOGMASKED(LOG_SPRITE_DMA, "%3d:sprite %d comparitor disable, prepare for reload\n", scanline, num);
-		}
-
-		/* fetch data if this sprite is enabled */
-		if (dmaenable && (m_sprite_dma_live_mask & bitmask) && (m_sprite_comparitor_enable_mask & bitmask))
-		{
-			aga_fetch_sprite_data(scanline, num);
-		}
+	/* fetch data if this sprite is enabled */
+	if (dmaenable && (m_sprite_dma_live_mask & bitmask) && (m_sprite_comparitor_enable_mask & bitmask))
+	{
+		aga_fetch_sprite_data(scanline, num);
 	}
 }
 
@@ -462,6 +494,9 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 	int hires = 0, dualpf = 0, ham = 0, ehb = 0;
 	int pf1pri = 0, pf2pri = 0;
 	int planes = 0;
+	int raw_scanline = 0;
+	u8 bplam = 0;
+	u16 pf2ofx = 0;
 
 	uint32_t *dst = nullptr;
 	int ebitoffs = 0, obitoffs = 0;
@@ -471,6 +506,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 	int pl;
 	int defbitoffs = 0;
 	rgb_t *aga_palette = m_aga_palette;
+	bool bitplane_dma_enabled = false;
 
 	int save_scanline = scanline;
 
@@ -483,7 +519,8 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 		if (CUSTOM_REG(REG_BPLCON0) & BPLCON0_LACE)
 			CUSTOM_REG(REG_VPOSR) ^= VPOSR_LOF;
 
-		m_copper->vblank_sync();
+		m_copper->vblank_sync(true);
+		// TODO: shouldn't be raw color ...
 		m_ham_color = CUSTOM_REG(REG_COLOR00);
 	}
 
@@ -512,13 +549,14 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 		}
 	}
 
+	raw_scanline = scanline;
+
 	scanline /= 2;
 
-	m_last_scanline = scanline;
+	if (scanline == get_screen_vblank_line())
+		m_copper->vblank_sync(false);
 
-	/* update sprite data fetching */
-	// FIXME: verify and apply same logic as per OCS
-	aga_update_sprite_dma(scanline);
+	m_last_scanline = scanline;
 
 	/* all sprites off at the start of the line */
 	memset(m_sprite_remain, 0, sizeof(m_sprite_remain));
@@ -528,48 +566,91 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 		CUSTOM_REG(REG_COLOR00) = m_genlock_color;
 
 	/* loop over the line */
-	/* copper runs on odd timeslots */
-	// TODO: diverges wrt OCS, is this right?
-	next_copper_x = 2;
+	// TODO: copper runs on odd timeslots
+	next_copper_x = m_copper->restore_offset();
+
+	const bool ecsena = !!BIT(CUSTOM_REG(REG_BPLCON0), 0);
+	// BRDRBLNK, 17bitlv6:3871 C42 Demo enables this
+	const rgb_t border_color = ecsena && BIT(CUSTOM_REG(REG_BPLCON3), 5) ? rgb_t(0, 0, 0) : aga_palette[0];
+
 	// TODO: verify where we're missing pixels here for the GFX pitch bitplane corruptions
-	// - wbenc30 scrolling in lores mode (fmode=3, expects a +58!, verify ddfstrt)
-	// - roadkill title (fmode=3, max +14), gameplay uses fmode=1
+	// Update 2025: check and resort all these entries
+	// - wbenc30 scrolling in lores mode (fmode=3, expects a +58!, verify ddfstrt / delays)
 	// - sockid_a, alfred gameplay (fmode=1)
-	// - virocp_a (fmode=1, +26)
 	// - ssf2t (fmode=3, wants >+100, scrolling is very offset)
-	// - turbojam gameplay
-	//   (fmode=3, unaffected here, may be missing ddfstop bits given the screen masking)
 	// - watchtow gameplay (fmode=3, copper timings)
 	// - cd32 cdtv:insidino copyright screen (fmode=3)
 	// - cd32 cdtv:labytime intro/tutorial screens
 	//   (swaps between fmode=1 and 3, verify ddfstrt / ddfstop)
-	const int offset_hack[] = { 10, 11, 11, 13 };
-	const u8 bitplane_fmode = CUSTOM_REG(REG_FMODE) & 0x3;
+
+	const int offset_hack[] = {
+		11,
+		// fmode 1: virocp_a (copyright) +26
+		11,
+		11,
+		// fmode 3: dxgalaga (title) wants +20, fatman_a (title) +24
+		24
+	};
+	const int default_bit_offset[] = { 15, 31, 31, 63 };
+
+	const int ddf_start_offset_lores[] = { 17, 17, 17, 17 };
+	const int ddf_stop_offset_lores[] = {
+		17 + 15,
+		// fmode 1:
+		// TODO: roadkill gameplay expects an extra +15 somewhere for scrolling to work to the right
+		// that breaks pbillusn main menu
+		17 + 31,
+		17 + 31,
+		17 + 63
+	};
+
+	const int ddf_start_offset_hires[] = {
+		9,
+		9,
+		9,
+		// fmode 3: wbenc30/kangfu/pbillusn (F10 key)/cd32 (CD splash loading) all expects a +8 offset
+		9 + 8
+	};
+	const int ddf_stop_offset_hires[] = {
+		9 + 15,
+		9 + 15,
+		9 + 15,
+		// fmode 3: kangfu/pballdmg wants an extra +16
+		9 + 8 + 16
+	};
+	// TODO: move this to inner block as const
+	// atm the assignment is here just for the hack to work
+	// Alice seems to expect to change it in mid-scanline for bitplane pointers to work
+	// - amiga_cd:bigred would otherwise offset the intro
+	u8 bitplane_fmode = CUSTOM_REG(REG_FMODE) & 0x3;
 
 	for (int x = 0; x < (amiga_state::SCREEN_WIDTH / 2) + offset_hack[bitplane_fmode]; x++)
 	{
 		int sprpix;
+		const bool out_of_beam = x >= amiga_state::SCREEN_WIDTH / 2;
 
 		/* time to execute the copper? */
-		if (x == next_copper_x)
+		if (x == next_copper_x && !out_of_beam)
 		{
+			planes = (CUSTOM_REG(REG_BPLCON0) & (BPLCON0_BPU0 | BPLCON0_BPU1 | BPLCON0_BPU2)) >> 12;
+			// TODO: verify number of planes that doesn't go beyond 8
+			if ( CUSTOM_REG(REG_BPLCON0) & BPLCON0_BPU3 )
+				planes |= 8;
+			bitplane_fmode = CUSTOM_REG(REG_FMODE) & 0x3;
+
 			/* execute the next batch, restoring and re-saving color 0 around it */
 			CUSTOM_REG(REG_COLOR00) = save_color0;
 			next_copper_x = m_copper->execute_next(
 				x,
 				m_last_scanline & 0xff,
-				bool(BIT(CUSTOM_REG(REG_DMACON), 14)) // BBUSY
+				bool(BIT(CUSTOM_REG(REG_DMACON), 14)), // BBUSY
+				planes
 			);
 			save_color0 = CUSTOM_REG(REG_COLOR00);
 			if (m_genlock_color != 0xffff)
 				CUSTOM_REG(REG_COLOR00) = m_genlock_color;
 
 			/* compute update-related register values */
-			planes = (CUSTOM_REG(REG_BPLCON0) & (BPLCON0_BPU0 | BPLCON0_BPU1 | BPLCON0_BPU2)) >> 12;
-			// TODO: verify number of planes that doesn't go beyond 8
-			if ( CUSTOM_REG(REG_BPLCON0) & BPLCON0_BPU3 )
-				planes |= 8;
-
 			hires = CUSTOM_REG(REG_BPLCON0) & BPLCON0_HIRES;
 			ham = CUSTOM_REG(REG_BPLCON0) & BPLCON0_HOMOD;
 			dualpf = CUSTOM_REG(REG_BPLCON0) & BPLCON0_DBLPF;
@@ -580,6 +661,17 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 			// In practice we need to separate bitplane delays & drawing first.
 			//shres = CUSTOM_REG(REG_BPLCON0) & 0x0040;
 
+			// offset table for pf2 when in dualpf
+			// - alfred_a, gameplay background
+			// - slamtilt, main menu cursor
+			// NOTE: val << 8 so we don't need to adjust per-pixel
+			pf2ofx = ((CUSTOM_REG(REG_BPLCON3) >> 10) & 7) << 8;
+
+			// bplam applies xor to bitplane colors (i.e. acting as pal bank)
+			// - aladdin, status bar in gameplay
+			// TODO: implement for ham and dualpf, below
+			bplam = CUSTOM_REG(REG_BPLCON4) >> 8;
+
 			// In AGA Extra Half-Brite applies if this condition is satisfied
 			// (bit 9 of BPLCON2 is KILLEHB)
 			// cfr. bblow_a main menu
@@ -588,24 +680,25 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 			ehb = (CUSTOM_REG(REG_BPLCON0) & 0x7c10) == 0x6000 && !bool(BIT(CUSTOM_REG(REG_BPLCON2), 9));
 
 			/* get default bitoffset */
-			switch(bitplane_fmode)
-			{
-				case 0: defbitoffs = 15; break;
-				case 1:
-				case 2: defbitoffs = 31; break;
-				case 3: defbitoffs = 63; break;
-			}
+			defbitoffs = default_bit_offset[bitplane_fmode];
 
 			/* compute the pixel fetch parameters */
-			// FIXME: offsets applied are definitely not right
-			// does ddf_start_pixel offsets with fmode != 0?
-			// wbenc30 expects a +8 to align the screen with fmode == 3, which may or may not be right
-			ddf_start_pixel = ( CUSTOM_REG(REG_DDFSTRT) & 0xfc ) * 2 + (hires ? 9 : 17);
-			ddf_stop_pixel = ( CUSTOM_REG(REG_DDFSTOP) & 0xfc ) * 2 + (hires ? (9 + defbitoffs - ((defbitoffs >= 31) ? 16 : 0)) : (17 + defbitoffs));
+			// TODO: ECS/AGA can put bit 1 in play here
+			ddf_start_pixel = ( CUSTOM_REG(REG_DDFSTRT) & 0xf8 ) * 2;
+			ddf_start_pixel += hires ? ddf_start_offset_hires[bitplane_fmode] : ddf_start_offset_lores[bitplane_fmode];
+			ddf_stop_pixel = ( CUSTOM_REG(REG_DDFSTOP) & 0xf8 ) * 2;
+			ddf_stop_pixel += hires ? ddf_stop_offset_hires[bitplane_fmode] : ddf_stop_offset_lores[bitplane_fmode];
 
-			// FIXME: as like OCS/ECS Amiga verify this one
-			if ( ( CUSTOM_REG(REG_DDFSTRT) ^ CUSTOM_REG(REG_DDFSTOP) ) & 0x04 )
-				ddf_stop_pixel += 8;
+			// - https://github.com/dirkwhoffmann/vAmigaTS/blob/master/Agnus/DDF/DDF/ddf1/ddf1_A500_ECS.JPG
+			// - turbojam (gameplay) fmode 3 18 9a lores, particularly when scrolling left (+15 isn't enough).
+			// - aladdin 38 ca fmode 3 lores
+			// - fbglory (main menu) 28 a4 lores
+			// - amigames:Burnout.lha 34 b8 fmode 3 hires
+			// - amigames:Wendetta.lha 28 d4 fmode 1 lores
+			if ( (CUSTOM_REG(REG_DDFSTRT) & 6) != (CUSTOM_REG(REG_DDFSTOP) & 6))
+			{
+				ddf_stop_pixel += defbitoffs;
+			}
 
 			// display window
 			update_display_window();
@@ -616,19 +709,37 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 
 			/* extract collision masks */
 			ocolmask = (CUSTOM_REG(REG_CLXCON) >> 6) & 0x15;
+			ocolmask |= m_aga_clxcon2 & 0x40;
 			ecolmask = (CUSTOM_REG(REG_CLXCON) >> 6) & 0x2a;
+			ecolmask |= m_aga_clxcon2 & 0x80;
+		}
+
+		//if ((raw_scanline & 1) == 0)
+		{
+			const int min_x = 0x18 << 1;
+			const int max_x = 0x34 << 1;
+
+			// TODO: refine, merge with OCS version
+			if (x >= min_x && x <= max_x && (x & 7) == 0)
+			{
+				int num = (x - min_x) >> 3;
+				//printf("%d %02x\n", num, x);
+				aga_update_sprite_dma(raw_scanline >> 1, num);
+			}
 		}
 
 		/* clear the target pixels to the background color as a starting point */
-		if (dst != nullptr)
+		if (dst != nullptr && !out_of_beam)
 			dst[x*2+0] =
-			dst[x*2+1] = aga_palette[0];
+			dst[x*2+1] = border_color;
 
 		/* if we hit the first fetch pixel, reset the counters and latch the delays */
 		if (x == ddf_start_pixel)
 		{
 			odelay = CUSTOM_REG(REG_BPLCON1) & 0xf;
 			edelay = ( CUSTOM_REG(REG_BPLCON1) >> 4 ) & 0x0f;
+
+			//printf("%04x %d %04x %d %d (%02x %02x)\n", CUSTOM_REG(REG_BPLCON1), scanline, bitplane_fmode, ddf_start_pixel, ddf_stop_pixel, CUSTOM_REG(REG_DDFSTRT), CUSTOM_REG(REG_DDFSTOP));
 			// extended delays for AGA
 			// FIXME: check above table for implications about this
 			switch( bitplane_fmode )
@@ -637,8 +748,12 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 				case 2:
 					odelay += (CUSTOM_REG(REG_BPLCON1) & 0x0400) >> 6;
 					edelay += (CUSTOM_REG(REG_BPLCON1) & 0x4000) >> 10;
-					odelay ^= 0x10;
-					edelay ^= 0x10;
+
+					// NOTE: breaks exile_a gameplay with this enabled
+					//odelay ^= 0x10;
+					//edelay ^= 0x10;
+					// TODO: amiga_cd:finlodys offset intro, particularly here with 0xffff writes
+					// (alternates fmode 1 and 3)
 					break;
 				case 3:
 					odelay += (CUSTOM_REG(REG_BPLCON1) & 0x0400) >> 6;
@@ -647,13 +762,14 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 						odelay ^= 0x20;
 					if (CUSTOM_REG(REG_BPLCON1) & 0x8000)
 						edelay ^= 0x20;
+
 					break;
 			}
 
 			if ( hires )
 			{
-				obitoffs = defbitoffs + ( odelay << 1 );
-				ebitoffs = defbitoffs + ( edelay << 1 );
+				obitoffs = (defbitoffs + ( odelay << 1 ));
+				ebitoffs = (defbitoffs + ( edelay << 1 ));
 			}
 			else
 			{
@@ -674,10 +790,11 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 		/* need to run the sprite engine every pixel to ensure display */
 		sprpix = aga_get_sprite_pixel(x);
 
+		bitplane_dma_enabled = (CUSTOM_REG(REG_DMACON) & (DMACON_BPLEN | DMACON_DMAEN)) == (DMACON_BPLEN | DMACON_DMAEN);
+
 		/* to render, we must have bitplane DMA enabled, at least 1 plane, and be within the */
 		/* vertical display window */
-		if ((CUSTOM_REG(REG_DMACON) & (DMACON_BPLEN | DMACON_DMAEN)) == (DMACON_BPLEN | DMACON_DMAEN) &&
-			planes > 0 && scanline >= m_diw.top() && scanline < m_diw.bottom())
+		if (planes > 0 && scanline >= m_diw.top() && scanline < m_diw.bottom())
 		{
 			int pfpix0 = 0, pfpix1 = 0, collide;
 
@@ -685,7 +802,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 			if (x >= ddf_start_pixel && x <= ddf_stop_pixel + odelay)
 			{
 				/* if we need to fetch more data, do it now */
-				if (obitoffs == defbitoffs)
+				if (obitoffs == defbitoffs && bitplane_dma_enabled)
 				{
 					for (pl = 0; pl < planes; pl += 2)
 					{
@@ -701,7 +818,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 				if (hires)
 				{
 					/* reset bit offsets and fetch more data if needed */
-					if (obitoffs < 0)
+					if (obitoffs < 0 && bitplane_dma_enabled)
 					{
 						obitoffs = defbitoffs;
 
@@ -726,7 +843,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 			if (x >= ddf_start_pixel && x <= ddf_stop_pixel + edelay)
 			{
 				/* if we need to fetch more data, do it now */
-				if (ebitoffs == defbitoffs)
+				if (ebitoffs == defbitoffs && bitplane_dma_enabled)
 				{
 					for (pl = 1; pl < planes; pl += 2)
 					{
@@ -742,7 +859,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 				if (hires)
 				{
 					/* reset bit offsets and fetch more data if needed */
-					if (ebitoffs < 0)
+					if (ebitoffs < 0 && bitplane_dma_enabled)
 					{
 						ebitoffs = defbitoffs;
 
@@ -764,26 +881,31 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 			}
 
 			/* compute playfield/sprite collisions for first pixel */
-			collide = pfpix0 ^ CUSTOM_REG(REG_CLXCON);
+			// NOTE: need to << 2 to please the upgraded get_sprite_pixel bitmask
+			// - dxgalaga player sprite collisions
+			// TODO: verify CLXCON2 match semantics
+			// - roadkill writes 0xc0
+			// - amigames:Wendetta*.lha writes 0x41 (planes offset below)
+			const u16 clxcon_match = (CUSTOM_REG(REG_CLXCON) | (m_aga_clxcon2 & 0x3) << 6);
+			collide = pfpix0 ^ clxcon_match;
 			if ((collide & ocolmask) == 0)
-				CUSTOM_REG(REG_CLXDAT) |= (sprpix >> 5) & 0x01e;
+				CUSTOM_REG(REG_CLXDAT) |= (sprpix >> (5 + 2)) & 0x01e;
 			if ((collide & ecolmask) == 0)
-				CUSTOM_REG(REG_CLXDAT) |= (sprpix >> 1) & 0x1e0;
+				CUSTOM_REG(REG_CLXDAT) |= (sprpix >> (1 + 2)) & 0x1e0;
 			if ((collide & (ecolmask | ocolmask)) == 0)
 				CUSTOM_REG(REG_CLXDAT) |= 0x001;
 
 			/* compute playfield/sprite collisions for second pixel */
-			collide = pfpix1 ^ CUSTOM_REG(REG_CLXCON);
+			collide = pfpix1 ^ clxcon_match;
 			if ((collide & ocolmask) == 0)
-				CUSTOM_REG(REG_CLXDAT) |= (sprpix >> 5) & 0x01e;
+				CUSTOM_REG(REG_CLXDAT) |= (sprpix >> (5 + 2)) & 0x01e;
 			if ((collide & ecolmask) == 0)
-				CUSTOM_REG(REG_CLXDAT) |= (sprpix >> 1) & 0x1e0;
+				CUSTOM_REG(REG_CLXDAT) |= (sprpix >> (1 + 2)) & 0x1e0;
 			if ((collide & (ecolmask | ocolmask)) == 0)
 				CUSTOM_REG(REG_CLXDAT) |= 0x001;
-			// TODO: CLXCON2
 
 			/* if we are within the display region, render */
-			if (dst != nullptr && x >= m_diw.left() && x < m_diw.right())
+			if (dst != nullptr && x >= m_diw.left() && x < m_diw.right() && !out_of_beam)
 			{
 				int pix, pri;
 
@@ -815,6 +937,8 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 				/* dual playfield mode */
 				else if (dualpf)
 				{
+					// pf2pri really, overshadows above (i.e. pf1pri -> pf1p2:0)
+					const u8 pf_layer_pri = BIT(CUSTOM_REG(REG_BPLCON2), 6);
 					/* mask out the sprite if it doesn't have priority */
 					pix = sprpix & 0xff;
 					pri = (sprpix >> 12);
@@ -830,7 +954,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 					if (pix)
 						dst[x*2+0] = aga_palette[pix];
 					else
-						dst[x*2+0] = aga_palette[m_separate_bitplanes[(CUSTOM_REG(REG_BPLCON2) >> 6) & 1][pfpix0]];
+						dst[x*2+0] = aga_palette[m_separate_bitplanes[pf_layer_pri][pfpix0 | pf2ofx]];
 
 					/* mask out the sprite if it doesn't have priority */
 					pix = sprpix & 0xff;
@@ -846,7 +970,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 					if (pix)
 						dst[x*2+1] = aga_palette[pix];
 					else
-						dst[x*2+1] = aga_palette[m_separate_bitplanes[(CUSTOM_REG(REG_BPLCON2) >> 6) & 1][pfpix1]];
+						dst[x*2+1] = aga_palette[m_separate_bitplanes[pf_layer_pri][pfpix1 | pf2ofx]];
 				}
 
 				/* single playfield mode */
@@ -856,6 +980,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 					pri = (sprpix >> 12);
 
 					/* sprite has priority */
+					// TODO: porting OCS alfred fix to AGA will break OCS rodland status bar (!?)
 					if (sprpix && pf1pri > pri)
 					{
 						dst[x*2+0] =
@@ -867,14 +992,15 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 					{
 						// TODO: does it applies to sprites too?
 						rgb_t *dst_palette = ehb ? m_aga_ehb_palette : aga_palette;
-						dst[x*2+0] = dst_palette[pfpix0];
-						dst[x*2+1] = dst_palette[pfpix1];
+						dst[x*2+0] = dst_palette[pfpix0 ^ bplam];
+						dst[x*2+1] = dst_palette[pfpix1 ^ bplam];
 					}
 				}
 			}
 		}
 	}
 
+// TODO: move to debugger command
 #if 0
 	if ( m_screen->frame_number() % 16 == 0 && scanline == 250 )
 	{
@@ -882,24 +1008,24 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 		const char *m_hires = "HIRES";
 		const char *m_ham = "HAM";
 		const char *m_dualpf = "DUALPF";
-		const char *m_lace = "LACE";
-		const char *m_hilace = "HI-LACE";
+		//const char *m_lace = "LACE";
+		//const char *m_hilace = "HI-LACE";
 		const char *p = m_lores;
 
 		if ( hires ) p = m_hires;
 		if ( ham ) p = m_ham;
 		if ( dualpf ) p = m_dualpf;
-		if ( lace ) p = m_lace;
+		//if ( lace ) p = m_lace;
 
-		if ( hires && lace ) p = m_hilace;
+		//if ( hires && lace ) p = m_hilace;
 
-		popmessage("%s(%d pl od=%02x ed=%02x start=%d stop=%d hstart=%04x hstop=%04x diwhigh=%04x fetchbits=%d )", p, planes, odelay, edelay, ddf_start_pixel, ddf_stop_pixel, CUSTOM_REG(REG_DIWSTRT), CUSTOM_REG(REG_DIWSTOP), CUSTOM_REG(REG_DIWHIGH), defbitoffs );
+		popmessage("%s(%d pl od=%02x ed=%02x start=%d stop=%d (%d %d H %d %d V) fetchbits=%d )", p, planes, odelay, edelay, ddf_start_pixel, ddf_stop_pixel, m_diw.min_x, m_diw.max_x, m_diw.min_y, m_diw.max_y, defbitoffs );
 		//popmessage("%s(%d pl bplpt1=%06X, bpl1mod=%04x, offset=%x)", p, planes, CUSTOM_REG_LONG(REG_BPL1PTH), CUSTOM_REG(REG_BPL1MOD), hires_modulo_offset );
 	}
 #endif
 
 	/* end of the line: time to add the modulos */
-	if (scanline >= m_diw.top() && scanline < m_diw.bottom())
+	if (scanline >= m_diw.top() && scanline < m_diw.bottom() && bitplane_dma_enabled)
 	{
 		int16_t odd_modulo = CUSTOM_REG_SIGNED(REG_BPL1MOD);
 		int16_t even_modulo = CUSTOM_REG_SIGNED(REG_BPL2MOD);
@@ -924,6 +1050,8 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 				CUSTOM_REG_LONG(REG_BPL1PTH + pl * 2) += even_modulo;
 		}
 	}
+
+	m_copper->suspend_offset(next_copper_x, amiga_state::SCREEN_WIDTH / 2);
 
 	/* restore color00 */
 	CUSTOM_REG(REG_COLOR00) = save_color0;

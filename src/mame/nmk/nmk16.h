@@ -12,6 +12,7 @@
 
 #include "seibusound.h"
 
+#include "cpu/m6805/m68705.h"
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "sound/okim6295.h"
@@ -62,6 +63,7 @@ public:
 	void gunnailb(machine_config &config);
 	void hachamf(machine_config &config);
 	void bjtwin(machine_config &config);
+	void cactus(machine_config &config);
 	void ssmissin(machine_config &config);
 	void bioship(machine_config &config);
 	void macross2(machine_config &config);
@@ -103,22 +105,6 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	TIMER_DEVICE_CALLBACK_MEMBER(nmk16_scanline);
-	TIMER_DEVICE_CALLBACK_MEMBER(nmk16_hacky_scanline);
-	u32 screen_update_macross(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	void txvideoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void flipscreen_w(u8 data);
-	void vandyke_flipscreen_w(u8 data);
-	void tilebank_w(u8 data);
-
-	void macross2_sound_reset_w(u16 data);
-	void macross2_audiobank_w(u8 data);
-	void ssmissin_okibank_w(u8 data);
-	void powerinsa_okibank_w(u8 data);
-	template<unsigned Chip> void tharrier_okibank_w(u8 data);
-	u8 powerins_bootleg_fake_ym2203_r();
-
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device_array<okim6295_device, 2> m_oki;
@@ -144,19 +130,18 @@ protected:
 	optional_ioport_array<2> m_dsw_io;
 	optional_ioport_array<3> m_in_io;
 
-	int m_tilerambank = 0;
+	u32 m_tilerambank = 0;
 	int m_sprdma_base = 0;
-	int mask[4*2]{};
 	std::unique_ptr<u16[]> m_spriteram_old;
 	std::unique_ptr<u16[]> m_spriteram_old2;
-	int m_bgbank = 0;
-	int m_bioship_background_bank = 0;
+	u8 m_bgbank = 0;
+	u8 m_bioship_background_bank = 0;
 	tilemap_t *m_bg_tilemap[2]{};
 	tilemap_t *m_tx_tilemap = nullptr;
-	int m_mustang_bg_xscroll = 0;
+	s32 m_mustang_bg_xscroll = 0;
 	u8 m_scroll[2][4]{};
 	u16 m_vscroll[4]{};
-	int m_prot_count = 0;
+	u8 m_prot_count = 0;
 	u8 m_vtiming_val = 0;
 
 	void mainram_strange_w(offs_t offset, u16 data/*, u16 mem_mask = ~0*/);
@@ -166,6 +151,11 @@ protected:
 	u16 tharrier_mcu_r(offs_t offset, u16 mem_mask = ~0);
 	u16 vandykeb_r();
 	u16 tdragonb_prot_r();
+
+	void flipscreen_w(u8 data);
+	void vandyke_flipscreen_w(u8 data);
+
+	void txvideoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	template<unsigned Layer> void bgvideoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void mustang_scroll_w(u16 data);
 	void raphero_scroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -174,15 +164,28 @@ protected:
 	void vandyke_scroll_w(offs_t offset, u16 data);
 	void vandykeb_scroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void manybloc_scroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void tilebank_w(u8 data);
 	void bioship_bank_w(u8 data);
 	void nmk004_x0016_w(u16 data);
 	void nmk004_bioship_x0016_w(u16 data);
+
+	void macross2_sound_reset_w(u16 data);
+	void macross2_audiobank_w(u8 data);
+	void ssmissin_okibank_w(u8 data);
+	void powerinsa_okibank_w(u8 data);
+	template<unsigned Chip> void tharrier_okibank_w(u8 data);
+	u8 powerins_bootleg_fake_ym2203_r();
 
 	void set_interrupt_timing(machine_config &config);
 	void set_hacky_interrupt_timing(machine_config &config);
 	void set_screen_lowres(machine_config &config);
 	void set_screen_midres(machine_config &config);
 	void set_screen_hires(machine_config &config);
+
+	void configure_nmk004(machine_config &config);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(nmk16_scanline);
+	TIMER_DEVICE_CALLBACK_MEMBER(nmk16_hacky_scanline);
 
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_pages);
 	template<unsigned Layer, unsigned Gfx> TILE_GET_INFO_MEMBER(common_get_bg_tile_info);
@@ -202,6 +205,7 @@ protected:
 	void get_colour_6bit(u32 &colour, u32 &pri_mask);
 	void get_sprite_flip(u16 attr, int &flipx, int &flipy, int &code);
 	void get_flip_extcode_powerins(u16 attr, int &flipx, int &flipy, int &code);
+	u32 screen_update_macross(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_tharrier(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_strahl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_bjtwin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -379,9 +383,9 @@ private:
 	void redhawki_video_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void afega_map(address_map &map) ATTR_COLD;
-	void afega_sound_cpu(address_map &map) ATTR_COLD;
+	void afega_sound_map(address_map &map) ATTR_COLD;
 	void firehawk_map(address_map &map) ATTR_COLD;
-	void firehawk_sound_cpu(address_map &map) ATTR_COLD;
+	void firehawk_sound_map(address_map &map) ATTR_COLD;
 };
 
 class nmk16_tomagic_state : public nmk16_state
@@ -399,6 +403,46 @@ private:
 	void tomagic_map(address_map &map) ATTR_COLD;
 	void tomagic_sound_map(address_map &map) ATTR_COLD;
 	void tomagic_sound_io_map(address_map &map) ATTR_COLD;
+};
+
+class tharrierb_state : public nmk16_state
+{
+public:
+	tharrierb_state(const machine_config &mconfig, device_type type, const char *tag) :
+		nmk16_state(mconfig, type, tag),
+		m_mcu(*this, "mcu"),
+		m_inputs(*this, { "DSW1", "DSW2", "BUTTONS", "P1", "P2" })
+	{}
+
+	void tharrierb(machine_config &config);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
+private:
+	required_device<m68705r_device> m_mcu;
+	required_ioport_array<5> m_inputs;
+
+	u8 m_mcu_out_latch_msb = 0;
+	u8 m_mcu_out_latch_lsb = 0;
+	u8 m_mcu_in_latch = 0;
+
+	u8 m_mcu_portc = 0;
+
+	void tharrierb_map(address_map &map) ATTR_COLD;
+
+	// maincpu access
+	u16 mcu_status_r(offs_t offset, u16 mem_mask);
+	u16 mcu_data_r(offs_t offset, u16 mem_mask);
+	void mcu_control_w(offs_t offset, u16 data, u16 mem_mask);
+	void mcu_data_w(offs_t offset, u16 data, u16 mem_mask);
+
+	// 68705 mcu access
+	void mcu_porta_w(u8 data);
+	u8 mcu_portb_r();
+	void mcu_portb_w(u8 data);
+	void mcu_portc_w(u8 data);
+	u8 mcu_portd_r();
 };
 
 #endif //MAME_NMK_NMK16_H

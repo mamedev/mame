@@ -186,13 +186,13 @@ ROM_END
 /* System Drivers */
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS          INIT        COMPANY   FULLNAME                       FLAGS
-CONS( 200?, st1700h, 0,      0,      st17xx,  st17xx, st17xx_state,  empty_init, "Saturn", "ST-1700 (headphone version)", MACHINE_IS_SKELETON )
-CONS( 200?, st1701,  0,      0,      st17xx,  st17xx, st17xx_state,  empty_init, "Saturn", "ST-1701",                     MACHINE_IS_SKELETON )
-CONS( 200?, st1702,  0,      0,      st17xx,  st17xx, st17xx_state,  empty_init, "Saturn", "ST-1702",                     MACHINE_IS_SKELETON )
-CONS( 200?, st1703,  0,      0,      st17xx,  st17xx, st17xx_state,  empty_init, "Saturn", "ST-1703",                     MACHINE_IS_SKELETON )
-CONS( 200?, st1704,  0,      0,      st17xx,  st17xx, st17xx_state,  empty_init, "Saturn", "ST-1704",                     MACHINE_IS_SKELETON )
-CONS( 200?, st1705,  0,      0,      st17xx,  st17xx, st17xx_state,  empty_init, "Saturn", "ST-1705",                     MACHINE_IS_SKELETON )
-CONS( 200?, st1706,  0,      0,      st17xx,  st17xx, st17xx_state,  empty_init, "Saturn", "ST-1706",                     MACHINE_IS_SKELETON )
-CONS( 200?, st1707,  0,      0,      st17xx,  st17xx, st17xx_state,  empty_init, "Saturn", "ST-1707",                     MACHINE_IS_SKELETON )
-CONS( 200?, st1708,  0,      0,      st17xx,  st17xx, st17xx_state,  empty_init, "Saturn", "ST-1708",                     MACHINE_IS_SKELETON )
-CONS( 200?, st1714,  0,      0,      st17xx,  st17xx, st17xx_state,  empty_init, "Saturn", "ST-1714",                     MACHINE_IS_SKELETON )
+CONS( 200?, st1700h, 0,      0,      st17xx,  st17xx, st17xx_state,  empty_init, "Saturn", "ST-1700 (headphone version)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 200?, st1701,  0,      0,      st17xx,  st17xx, st17xx_state,  empty_init, "Saturn", "ST-1701",                     MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 200?, st1702,  0,      0,      st17xx,  st17xx, st17xx_state,  empty_init, "Saturn", "ST-1702",                     MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 200?, st1703,  0,      0,      st17xx,  st17xx, st17xx_state,  empty_init, "Saturn", "ST-1703",                     MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 200?, st1704,  0,      0,      st17xx,  st17xx, st17xx_state,  empty_init, "Saturn", "ST-1704",                     MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 200?, st1705,  0,      0,      st17xx,  st17xx, st17xx_state,  empty_init, "Saturn", "ST-1705",                     MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 200?, st1706,  0,      0,      st17xx,  st17xx, st17xx_state,  empty_init, "Saturn", "ST-1706",                     MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 200?, st1707,  0,      0,      st17xx,  st17xx, st17xx_state,  empty_init, "Saturn", "ST-1707",                     MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 200?, st1708,  0,      0,      st17xx,  st17xx, st17xx_state,  empty_init, "Saturn", "ST-1708",                     MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 200?, st1714,  0,      0,      st17xx,  st17xx, st17xx_state,  empty_init, "Saturn", "ST-1714",                     MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

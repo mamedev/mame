@@ -15,7 +15,8 @@ Dallas 68020:
 - rest is similar to 16-bit version
 
 TODO:
-- waitstates, same as glasgow.cpp
+- does it have DTACK wait states? surely the PCB supports LDS/UDS wait states
+  just like Glasgow, but it's probably disabled due to faster EPROMs
 
 *******************************************************************************/
 
@@ -70,21 +71,18 @@ private:
 	u8 keys_r();
 };
 
-INPUT_CHANGED_MEMBER(amsterdam_state::reset_button)
-{
-	// RES buttons in serial tied to CPU RESET
-	if (m_reset->read() == 3)
-	{
-		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
-		m_display->reset();
-	}
-}
-
 
 
 /*******************************************************************************
     I/O
 *******************************************************************************/
+
+INPUT_CHANGED_MEMBER(amsterdam_state::reset_button)
+{
+	// RES buttons in serial tied to CPU RESET
+	if (m_reset->read() == 3)
+		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+}
 
 void amsterdam_state::led_w(offs_t offset, u8 data)
 {
@@ -166,8 +164,8 @@ static INPUT_PORTS_START( amsterdam )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Right / White / 0") PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_CODE(KEYCODE_RIGHT)
 
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RES 1") PORT_CODE(KEYCODE_Z) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, amsterdam_state, reset_button, 0)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RES 2") PORT_CODE(KEYCODE_X) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, amsterdam_state, reset_button, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RES 1") PORT_CODE(KEYCODE_Z) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(amsterdam_state::reset_button), 0)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RES 2") PORT_CODE(KEYCODE_X) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(amsterdam_state::reset_button), 0)
 INPUT_PORTS_END
 
 

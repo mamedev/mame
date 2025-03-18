@@ -58,6 +58,7 @@ protected:
   ASMJIT_API Error _grow(ZoneAllocator* allocator, uint32_t sizeOfT, uint32_t n) noexcept;
   ASMJIT_API Error _resize(ZoneAllocator* allocator, uint32_t sizeOfT, uint32_t n) noexcept;
   ASMJIT_API Error _reserve(ZoneAllocator* allocator, uint32_t sizeOfT, uint32_t n) noexcept;
+  ASMJIT_API Error _growingReserve(ZoneAllocator* allocator, uint32_t sizeOfT, uint32_t n) noexcept;
 
   inline void _swap(ZoneVectorBase& other) noexcept {
     std::swap(_data, other._data);
@@ -414,7 +415,21 @@ public:
 
   //! Reallocates the internal array to fit at least `n` items.
   inline Error reserve(ZoneAllocator* allocator, uint32_t n) noexcept {
-    return n > _capacity ? ZoneVectorBase::_reserve(allocator, sizeof(T), n) : Error(kErrorOk);
+    if (ASMJIT_UNLIKELY(n > _capacity))
+      return ZoneVectorBase::_reserve(allocator, sizeof(T), n);
+    else
+      return Error(kErrorOk);
+  }
+
+  //! Reallocates the internal array to fit at least `n` items with growing semantics.
+  //!
+  //! If the vector is smaller than `n` the same growing calculations will be used as if N items were appended
+  //! to an empty vector, which means reserving additional space for more append operations that could follow.
+  inline Error growingReserve(ZoneAllocator* allocator, uint32_t n) noexcept {
+    if (ASMJIT_UNLIKELY(n > _capacity))
+      return ZoneVectorBase::_growingReserve(allocator, sizeof(T), n);
+    else
+      return Error(kErrorOk);
   }
 
   inline Error willGrow(ZoneAllocator* allocator, uint32_t n = 1) noexcept {

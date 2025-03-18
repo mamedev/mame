@@ -157,7 +157,7 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 200?, unkfr004,  0,        fr004, fr004, novadesitec_fr004_state, empty_init, ROT0, "Nova Desitec", "unknown game on FR004 hardware (set 1)",  MACHINE_IS_SKELETON ) // possibly Halloween II (wild guesswork due to HII label on Oki ROM)
-GAME( 200?, unkfr004a, unkfr004, fr004, fr004, novadesitec_fr004_state, empty_init, ROT0, "Nova Desitec", "unknown game on FR004 hardware (set 2)",  MACHINE_IS_SKELETON )
-GAME( 200?, unkfr004b, unkfr004, fr004, fr004, novadesitec_fr004_state, empty_init, ROT0, "Nova Desitec", "unknown game on FR004 hardware (set 3)",  MACHINE_IS_SKELETON )
-GAME( 200?, unkfr004c, unkfr004, fr004, fr004, novadesitec_fr004_state, empty_init, ROT0, "Nova Desitec", "unknown game on FR004 hardware (set 4)",  MACHINE_IS_SKELETON ) // possibly Halloween II (wild guesswork due to HII label on Oki ROM)
+GAME( 200?, unkfr004,  0,        fr004, fr004, novadesitec_fr004_state, empty_init, ROT0, "Nova Desitec", "unknown game on FR004 hardware (set 1)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // possibly Halloween II (wild guesswork due to HII label on Oki ROM)
+GAME( 200?, unkfr004a, unkfr004, fr004, fr004, novadesitec_fr004_state, empty_init, ROT0, "Nova Desitec", "unknown game on FR004 hardware (set 2)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, unkfr004b, unkfr004, fr004, fr004, novadesitec_fr004_state, empty_init, ROT0, "Nova Desitec", "unknown game on FR004 hardware (set 3)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, unkfr004c, unkfr004, fr004, fr004, novadesitec_fr004_state, empty_init, ROT0, "Nova Desitec", "unknown game on FR004 hardware (set 4)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // possibly Halloween II (wild guesswork due to HII label on Oki ROM)

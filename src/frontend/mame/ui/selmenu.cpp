@@ -1361,10 +1361,10 @@ bool menu_select_launch::scale_icon(bitmap_argb32 &&src, texture_and_bitmap &dst
 	assert(dst.texture);
 	if (src.valid())
 	{
-		// reduce the source bitmap if it's too big
+		// scale the source bitmap
 		bitmap_argb32 tmp;
-		float const ratio((std::min)({ float(m_icon_height) / src.height(), float(m_icon_width) / src.width(), 1.0F }));
-		if (1.0F > ratio)
+		float const ratio((std::min)(float(m_icon_height) / src.height(), float(m_icon_width) / src.width()));
+		if ((1.0F > ratio) || (1.2F < ratio))
 		{
 			float const pix_height(std::ceil(src.height() * ratio));
 			float const pix_width(std::ceil(src.width() * ratio));
@@ -1733,7 +1733,7 @@ bool menu_select_launch::handle_events(u32 flags, event &ev)
 
 		// text input goes to the search field unless there's an error message displayed
 		case ui_event::type::IME_CHAR:
-			if (!pointer_idle())
+			if (have_pointer() && !pointer_idle())
 				break;
 
 			if (exclusive_input_pressed(ev.iptkey, IPT_UI_FOCUS_NEXT, 0) || exclusive_input_pressed(ev.iptkey, IPT_UI_FOCUS_PREV, 0))

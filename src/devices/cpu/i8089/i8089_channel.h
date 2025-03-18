@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_CPU_I8080_I8089_CHANNEL_H
-#define MAME_CPU_I8080_I8089_CHANNEL_H
+#ifndef MAME_CPU_I8089_I8089_CHANNEL_H
+#define MAME_CPU_I8089_I8089_CHANNEL_H
 
 #pragma once
 
@@ -206,4 +206,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(I8089_CHANNEL, i8089_channel_device)
 
-#endif // MAME_CPU_I8080_I8089_CHANNEL_H
+#endif // MAME_CPU_I8089_I8089_CHANNEL_H

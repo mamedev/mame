@@ -138,7 +138,7 @@ void tlcs900_device::device_start()
 	save_item( NAME(m_dmac) );
 	save_item( NAME(m_dmam) );
 	save_item( NAME(m_timer_pre) );
-	save_item( NAME(m_timer) );
+	save_item( NAME(m_timer_8) );
 	save_item( NAME(m_timer_change) );
 	save_item( NAME(m_level) );
 	save_item( NAME(m_check_irqs) );
@@ -277,14 +277,15 @@ void tlcs900_device::execute_run()
 			m_check_irqs = 0;
 		}
 
-		debugger_instruction_hook( m_pc.d );
-
 		if ( m_halted )
 		{
+			debugger_wait_hook();
 			m_cycles += 8;
 		}
 		else
 		{
+			debugger_instruction_hook( m_pc.d );
+
 			m_op = RDOP();
 			inst = &m_mnemonic[m_op];
 			prepare_operands( inst );

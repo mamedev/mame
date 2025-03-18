@@ -501,7 +501,7 @@ uint32_t magictg_state::zr36120_r(offs_t offset)
 	}
 	else
 	{
-		/* Post office */
+		// PostOffice reads
 		res = 0;//mame_rand(machine);//m_zr36120.as_regs[0x48/4];
 	}
 	logerror("PINKEYE_R[%x]\n", offset);
@@ -529,6 +529,9 @@ void magictg_state::zr36120_w(offs_t offset, uint32_t data)
 	}
 	else
 	{
+		// PostOffice writes
+		// - Takes 32 PCI clocks for time out to happen compared to 64 in ZR36067
+		// - Has 4 guests instead of 8
 		uint32_t guest = (data >> 20) & 3;
 		uint32_t g_data = data & 0xff;
 		uint32_t g_reg = (data >> 16) & 7;

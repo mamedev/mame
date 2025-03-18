@@ -121,6 +121,7 @@ public:
 	void set_emmu_enable(bool enable);
 	bool get_pmmu_enable() const {return m_pmmu_enabled;}
 	void set_fpu_enable(bool enable);
+	bool get_fpu_enable() const { return m_has_fpu; }
 	void set_buserror_details(u32 fault_addr, u8 rw, u8 fc, bool rerun = false);
 	void restart_this_instruction();
 
@@ -171,7 +172,7 @@ protected:
 	bool m_pmmu_enabled; /* Indicates if the PMMU is enabled */
 	int m_hmmu_enabled;  /* Indicates if the HMMU is enabled */
 	bool m_emmu_enabled; /* Indicates if external MMU is enabled */
-	bool m_instruction_restart; /* Save DA regs for potential instruction restart */
+	bool m_can_instruction_restart; /* Save DA regs for potential instruction restart */
 	bool m_fpu_just_reset; /* Indicates the FPU was just reset */
 	bool m_restart_instruction; /* Indicates the instruction should be restarted */
 
@@ -219,7 +220,9 @@ protected:
 	void init8(address_space &space, address_space &ospace);
 	void init16(address_space &space, address_space &ospace);
 	void init32(address_space &space, address_space &ospace);
+	void init32_no_smear(address_space &space, address_space &ospace);
 	void init32mmu(address_space &space, address_space &ospace);
+	void init32mmu_no_smear(address_space &space, address_space &ospace);
 	void init32hmmu(address_space &space, address_space &ospace);
 
 	std::function<u16 (offs_t)> m_readimm16;      // Immediate read 16 bit
@@ -353,13 +356,13 @@ protected:
 	u16 READ_EA_16(int ea);
 	u32 READ_EA_32(int ea);
 	u64 READ_EA_64(int ea);
-	extFloat80_t READ_EA_FPE(int mode, int reg, uint32_t di_mode_ea);
+	extFloat80_t READ_EA_FPE(int mode, int reg, uint32_t offset);
 	extFloat80_t READ_EA_PACK(int ea);
 	void WRITE_EA_8(int ea, u8 data);
 	void WRITE_EA_16(int ea, u16 data);
 	void WRITE_EA_32(int ea, u32 data);
 	void WRITE_EA_64(int ea, u64 data);
-	void WRITE_EA_FPE(int mode, int reg, extFloat80_t fpr, uint32_t di_mode_ea);
+	void WRITE_EA_FPE(int mode, int reg, extFloat80_t fpr, uint32_t offset);
 	void WRITE_EA_PACK(int ea, int k, extFloat80_t fpr);
 	void fpgen_rm_reg(u16 w2);
 	void fmove_reg_mem(u16 w2);
@@ -375,6 +378,8 @@ protected:
 	void m68040_do_frestore(u32 addr, int reg);
 	void m68040_fpu_op1();
 	void m68881_ftrap();
+	u32 m6888x_read_cir(offs_t offset);
+	void m6888x_write_cir(offs_t offset, u32 data);
 };
 
 #endif // MAME_CPU_M68000_M68KMUSASHI_H

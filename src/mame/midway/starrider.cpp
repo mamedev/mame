@@ -916,7 +916,7 @@ INPUT_PORTS_START(starrider)
 
 	PORT_START("SW1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW,  IPT_SERVICE3)                 PORT_NAME("Sound Test")
-													 PORT_CHANGED_MEMBER(DEVICE_SELF, sr_state, sound_sw1_changed, 0)
+													 PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sr_state::sound_sw1_changed), 0)
 INPUT_PORTS_END
 
 
@@ -1110,5 +1110,5 @@ ROM_END
 /***********************************************************************
     Machine definitions
 ***********************************************************************/
-GAME( 1984, starridr,   0,        starrider, starrider, sr_state, empty_init, ROT0, "Williams", "Star Rider (REV 1)",   MACHINE_IS_SKELETON )
-GAME( 1984, starridrp3, starridr, starrider, starrider, sr_state, empty_init, ROT0, "Williams", "Star Rider (PROTO 3)", MACHINE_IS_SKELETON )
+GAME( 1984, starridr,   0,        starrider, starrider, sr_state, empty_init, ROT0, "Williams", "Star Rider (REV 1)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1984, starridrp3, starridr, starrider, starrider, sr_state, empty_init, ROT0, "Williams", "Star Rider (PROTO 3)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

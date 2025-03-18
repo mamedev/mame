@@ -2,14 +2,14 @@
 // copyright-holders:Ernesto Corvi
 /***************************************************************************
 
-    mb88xx.cpp
     Core implementation for the portable Fujitsu MB88xx series MCU emulator.
 
     Written by Ernesto Corvi
 
     TODO:
-    - Add support for the timer
-    - Add support for the serial interface
+    - Verify timer, Bosconian voice samples are currently a good test case,
+      and they match PCB recordings.
+    - Improve support for the serial interface.
     - Split the core to support multiple CPU types?
 
 ***************************************************************************/
@@ -62,8 +62,6 @@ DEFINE_DEVICE_TYPE(MB8844,  mb8844_cpu_device,  "mb8844",  "Fujitsu MB8844")
 
 #define UPDATE_CF(v)        m_cf = ((v & 0x10) == 0) ? 0 : 1
 #define UPDATE_ZF(v)        m_zf = (v != 0) ? 0 : 1
-
-#define CYCLES(x)           do { m_icount -= (x); } while (0)
 
 #define GETPC()             (((int)m_PA << 6) + m_PC)
 #define GETEA()             ((m_X << 4) + m_Y)
@@ -122,7 +120,8 @@ mb88_cpu_device::mb88_cpu_device(const machine_config &mconfig, device_type type
 			(data_width == 5) ? address_map_constructor(FUNC(mb88_cpu_device::data_5bit), this) :
 			(data_width == 6) ? address_map_constructor(FUNC(mb88_cpu_device::data_6bit), this) :
 			address_map_constructor(FUNC(mb88_cpu_device::data_7bit), this))
-	, m_PLA(nullptr)
+	, m_pla_data(nullptr)
+	, m_pla_bits(8)
 	, m_read_k(*this, 0)
 	, m_write_o(*this)
 	, m_write_p(*this)
@@ -193,7 +192,9 @@ void mb88_cpu_device::device_start()
 
 	m_serial = timer_alloc(FUNC(mb88_cpu_device::serial_timer), this);
 
+	m_if = 0;
 	m_ctr = 0;
+	m_o_output = 0;
 
 	save_item(NAME(m_PC));
 	save_item(NAME(m_PA));
@@ -215,19 +216,20 @@ void mb88_cpu_device::device_start()
 	save_item(NAME(m_ctr));
 	save_item(NAME(m_SB));
 	save_item(NAME(m_SBcount));
-	save_item(NAME(m_pending_interrupt));
+	save_item(NAME(m_o_output));
+	save_item(NAME(m_pending_irq));
 	save_item(NAME(m_in_irq));
 
-	state_add(MB88_PC,  "PC",  m_PC).formatstr("%02X");
-	state_add(MB88_PA,  "PA",  m_PA).formatstr("%02X");
-	state_add(MB88_SI,  "SI",  m_SI).formatstr("%01X");
-	state_add(MB88_A,   "A",   m_A).formatstr("%01X");
-	state_add(MB88_X,   "X",   m_X).formatstr("%01X");
-	state_add(MB88_Y,   "Y",   m_Y).formatstr("%01X");
-	state_add(MB88_PIO, "PIO", m_pio).formatstr("%02X");
-	state_add(MB88_TH,  "TH",  m_TH).formatstr("%01X");
-	state_add(MB88_TL,  "TL",  m_TL).formatstr("%01X");
-	state_add(MB88_SB,  "SB",  m_SB).formatstr("%01X");
+	state_add(MB88XX_PC,  "PC",  m_PC).formatstr("%02X");
+	state_add(MB88XX_PA,  "PA",  m_PA).formatstr("%02X");
+	state_add(MB88XX_SI,  "SI",  m_SI).formatstr("%01X");
+	state_add(MB88XX_A,   "A",   m_A).formatstr("%01X");
+	state_add(MB88XX_X,   "X",   m_X).formatstr("%01X");
+	state_add(MB88XX_Y,   "Y",   m_Y).formatstr("%01X");
+	state_add(MB88XX_PIO, "PIO", m_pio).formatstr("%02X");
+	state_add(MB88XX_TH,  "TH",  m_TH).formatstr("%01X");
+	state_add(MB88XX_TL,  "TL",  m_TL).formatstr("%01X");
+	state_add(MB88XX_SB,  "SB",  m_SB).formatstr("%01X");
 
 	state_add(STATE_GENPC, "GENPC", m_debugger_pc).callimport().callexport().noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_debugger_pc).callimport().callexport().noshow();
@@ -313,14 +315,13 @@ void mb88_cpu_device::device_reset()
 	m_cf = 0;
 	m_vf = 0;
 	m_sf = 0;
-	m_if = 0;
 	m_pio = 0;
 	m_TH = 0;
 	m_TL = 0;
 	m_TP = 0;
 	m_SB = 0;
 	m_SBcount = 0;
-	m_pending_interrupt = 0;
+	m_pending_irq = 0;
 	m_in_irq = 0;
 }
 
@@ -345,35 +346,62 @@ TIMER_CALLBACK_MEMBER(mb88_cpu_device::serial_timer)
 		if (m_SBcount >= 4)
 		{
 			m_sf = 1;
-			m_pending_interrupt |= INT_CAUSE_SERIAL;
+			m_pending_irq |= INT_CAUSE_SERIAL;
 		}
 	}
-
 }
 
-int mb88_cpu_device::pla(int inA, int inB)
+void mb88_cpu_device::write_pla(u8 index)
 {
-	int index = ((inB & 1) << 4) | (inA & 0x0f);
+	u8 mask = 0xff;
 
-	if (m_PLA)
-		return m_PLA[index];
+	if (m_pla_bits == 8)
+	{
+		const u8 shift = (index & 0x10) ? 4 : 0;
+		mask = 0xf << shift;
+		m_o_output = (m_o_output & ~mask) | (index << shift & mask);
+	}
+	else
+	{
+		// if the driver hasn't supplied PLA data, just output the index
+		if (m_pla_data)
+			m_o_output = m_pla_data[index];
+		else
+			m_o_output = index;
+	}
 
-	return index;
+	m_write_o(0, m_o_output, mask);
 }
 
 void mb88_cpu_device::execute_set_input(int inputnum, int state)
 {
-	// On rising edge trigger interrupt.
-	// Note this is a logical level, the actual pin is high-to-low voltage triggered.
-	if ((m_pio & INT_CAUSE_EXTERNAL) && !m_if && state != CLEAR_LINE)
-	{
-		m_pending_interrupt |= INT_CAUSE_EXTERNAL;
-	}
+	state = state ? 1 : 0;
 
-	m_if = state != CLEAR_LINE;
+	switch (inputnum)
+	{
+		case MB88XX_IRQ_LINE:
+			// On rising edge trigger interrupt.
+			// Note this is a logical level, the actual pin is high-to-low voltage triggered.
+			if (!m_if && state && (m_pio & INT_CAUSE_EXTERNAL))
+				m_pending_irq |= INT_CAUSE_EXTERNAL;
+
+			m_if = state;
+			break;
+
+		case MB88XX_TC_LINE:
+			// on a falling clock, increment the timer, but only if enabled
+			if (m_ctr && !state && (m_pio & 0x40))
+				increment_timer();
+
+			m_ctr = state;
+			break;
+
+		default:
+			break;
+	}
 }
 
-void mb88_cpu_device::update_pio_enable(u8 newpio)
+void mb88_cpu_device::pio_enable(u8 newpio)
 {
 	// if the serial state has changed, configure the timer
 	if ((m_pio ^ newpio) & 0x30)
@@ -383,7 +411,7 @@ void mb88_cpu_device::update_pio_enable(u8 newpio)
 		else if ((newpio & 0x30) == 0x20)
 			m_serial->adjust(attotime::from_hz(clock() / SERIAL_PRESCALE), 0, attotime::from_hz(clock() / SERIAL_PRESCALE));
 		else
-			fatalerror("mb88xx: update_pio_enable set serial enable to unsupported value %02X\n", newpio & 0x30);
+			fatalerror("mb88xx: pio_enable set serial enable to unsupported value %02X\n", newpio & 0x30);
 	}
 
 	m_pio = newpio;
@@ -398,14 +426,14 @@ void mb88_cpu_device::increment_timer()
 		if (m_TH == 0)
 		{
 			m_vf = 1;
-			m_pending_interrupt |= INT_CAUSE_TIMER;
+			m_pending_irq |= INT_CAUSE_TIMER;
 		}
 	}
 }
 
-void mb88_cpu_device::update_pio(int cycles)
+void mb88_cpu_device::burn_cycles(int cycles)
 {
-	// TODO: improve/validate serial and timer support
+	m_icount -= cycles;
 
 	// internal clock enable
 	if (m_pio & 0x80)
@@ -419,7 +447,7 @@ void mb88_cpu_device::update_pio(int cycles)
 	}
 
 	// process pending interrupts
-	if (!m_in_irq && m_pending_interrupt & m_pio)
+	if (!m_in_irq && m_pending_irq & m_pio)
 	{
 		m_in_irq = true;
 		u16 intpc = GETPC();
@@ -431,18 +459,17 @@ void mb88_cpu_device::update_pio(int cycles)
 		m_SI = (m_SI + 1) & 3;
 
 		// the datasheet doesn't mention interrupt vectors but the Arabian MCU program expects the following
-		if (m_pending_interrupt & m_pio & INT_CAUSE_EXTERNAL)
+		if (m_pending_irq & m_pio & INT_CAUSE_EXTERNAL)
 		{
-			// if we have a live external source, call the irqcallback
 			standard_irq_callback(0, intpc);
 			m_PC = 0x02;
 		}
-		else if (m_pending_interrupt & m_pio & INT_CAUSE_TIMER)
+		else if (m_pending_irq & m_pio & INT_CAUSE_TIMER)
 		{
 			standard_irq_callback(1, intpc);
 			m_PC = 0x04;
 		}
-		else if (m_pending_interrupt & m_pio & INT_CAUSE_SERIAL)
+		else if (m_pending_irq & m_pio & INT_CAUSE_SERIAL)
 		{
 			standard_irq_callback(2, intpc);
 			m_PC = 0x06;
@@ -450,21 +477,9 @@ void mb88_cpu_device::update_pio(int cycles)
 
 		m_PA = 0x00;
 		m_st = 1;
-		m_pending_interrupt = 0;
+		m_pending_irq = 0;
 
-		CYCLES(3); // ?
-	}
-}
-
-void mb88_cpu_device::clock_w(int state)
-{
-	if (state != m_ctr)
-	{
-		m_ctr = state;
-
-		// on a falling clock, increment the timer, but only if enabled
-		if (m_ctr == 0 && (m_pio & 0x40))
-			increment_timer();
+		burn_cycles(3); // ?
 	}
 }
 
@@ -492,7 +507,7 @@ void mb88_cpu_device::execute_run()
 				break;
 
 			case 0x01: // outO ZCS:...
-				m_write_o(pla(m_A, TEST_CF()));
+				write_pla(TEST_CF() << 4 | m_A);
 				m_st = 1;
 				break;
 
@@ -829,21 +844,21 @@ void mb88_cpu_device::execute_run()
 			case 0x3d: // jpa imm ZCS:..x
 				m_PA = READOP(GETPC()) & 0x1f;
 				m_PC = m_A * 4;
-				oc = 2;
+				oc++;
 				m_st = 1;
 				break;
 
 			case 0x3e: // en imm ZCS:...
-				update_pio_enable(m_pio | READOP(GETPC()));
+				pio_enable(m_pio | READOP(GETPC()));
 				INCPC();
-				oc = 2;
+				oc++;
 				m_st = 1;
 				break;
 
 			case 0x3f: // dis imm ZCS:...
-				update_pio_enable(m_pio & ~(READOP(GETPC())));
+				pio_enable(m_pio & ~(READOP(GETPC())));
 				INCPC();
-				oc = 2;
+				oc++;
 				m_st = 1;
 				break;
 
@@ -897,7 +912,7 @@ void mb88_cpu_device::execute_run()
 			case 0x64: case 0x65: case 0x66: case 0x67: // call imm ZCS:..x
 				arg = READOP(GETPC());
 				INCPC();
-				oc = 2;
+				oc++;
 				if (TEST_ST())
 				{
 					m_SP[m_SI] = GETPC();
@@ -912,7 +927,7 @@ void mb88_cpu_device::execute_run()
 			case 0x6c: case 0x6d: case 0x6e: case 0x6f: // jpl imm ZCS:..x
 				arg = READOP(GETPC());
 				INCPC();
-				oc = 2;
+				oc++;
 				if (TEST_ST())
 				{
 					m_PC = arg & 0x3f;
@@ -980,10 +995,7 @@ void mb88_cpu_device::execute_run()
 				break;
 		}
 
-		// update cycle counts
-		CYCLES(oc);
-
-		// update interrupts, serial and timer flags
-		update_pio(oc);
+		// update cycle count, also update interrupts, serial and timer flags
+		burn_cycles(oc);
 	}
 }

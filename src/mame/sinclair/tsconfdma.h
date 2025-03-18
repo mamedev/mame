@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_SINCLAIR_TSCONF_DMA_H
-#define MAME_SINCLAIR_TSCONF_DMA_H
+#ifndef MAME_SINCLAIR_TSCONFDMA_H
+#define MAME_SINCLAIR_TSCONFDMA_H
 
 #pragma once
 
@@ -74,4 +74,4 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(TSCONF_DMA, tsconfdma_device)
-#endif // MAME_SINCLAIR_TSCONF_DMA_H
+#endif // MAME_SINCLAIR_TSCONFDMA_H

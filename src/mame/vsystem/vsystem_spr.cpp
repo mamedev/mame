@@ -29,7 +29,7 @@
 - 5 bit of palette selection for the mixer
 - Scaling (x/y)
 - Flipping
-- Indipendent sorting list
+- Independent sorting list
 - 1 bit of pri for the mixer
 
 Note that this chip can be connected to a VS9210 which adds a level of indirection for

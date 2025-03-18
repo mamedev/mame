@@ -14,6 +14,7 @@
 
 #pragma once
 
+#include <algorithm>
 
 
 // IRQ Lines
@@ -33,15 +34,22 @@ class dsp56156_device;
 // 5-4 Host Interface
 struct dsp56156_host_interface
 {
+	dsp56156_host_interface()
+		: hcr(nullptr), hsr(nullptr), htrx(nullptr)
+		, icr(0), cvr(0), isr(0), ivr(0), trxh(0), trxl(0)
+		, bootstrap_offset(0)
+	{
+	}
+
 	// **** DSP56156 side **** //
 	// Host Control Register
-	uint16_t* hcr;
+	uint16_t *hcr;
 
 	// Host Status Register
-	uint16_t* hsr;
+	uint16_t *hsr;
 
 	// Host Transmit/Receive Data
-	uint16_t* htrx;
+	uint16_t *htrx;
 
 	// **** Host CPU side **** //
 	// Interrupt Control Register
@@ -62,12 +70,19 @@ struct dsp56156_host_interface
 
 	// HACK - Host interface bootstrap write offset
 	uint16_t bootstrap_offset;
-
 };
 
 // 1-9 ALU
 struct dsp56156_data_alu
 {
+	dsp56156_data_alu()
+	{
+		x.d = 0;
+		y.d = 0;
+		a.q = 0;
+		b.q = 0;
+	}
+
 	// Four 16-bit input registers (can be accessed as 2 32-bit registers)
 	PAIR x;
 	PAIR y;
@@ -85,6 +100,14 @@ struct dsp56156_data_alu
 // 1-10 Address Generation Unit (AGU)
 struct dsp56156_agu
 {
+	dsp56156_agu()
+		: r0(0), r1(0), r2(0), r3(0)
+		, n0(0), n1(0), n2(0), n3(0)
+		, m0(0), m1(0), m2(0), m3(0)
+		, temp(0)
+	{
+	}
+
 	// Four address registers
 	uint16_t r0;
 	uint16_t r1;
@@ -115,26 +138,24 @@ struct dsp56156_agu
 // 1-11 Program Control Unit (PCU)
 struct dsp56156_pcu
 {
-	// Program Counter
-	uint16_t pc;
+	dsp56156_pcu()
+		: pc(0), la(0), lc(0), sr(0), omr(0), sp(0)
+		, service_interrupts(nullptr)
+		, reset_vector(0)
+		, ipc(0)
+	{
+		for (auto &s : ss)
+			s.d = 0;
+		std::fill(std::begin(pending_interrupts), std::end(pending_interrupts), 0);
+	}
 
-	// Loop Address
-	uint16_t la;
-
-	// Loop Counter
-	uint16_t lc;
-
-	// Status Register
-	uint16_t sr;
-
-	// Operating Mode Register
-	uint16_t omr;
-
-	// Stack Pointer
-	uint16_t sp;
-
-	// Stack (TODO: 15-level?)
-	PAIR ss[16];
+	uint16_t pc;     // Program Counter
+	uint16_t la;     // Loop Address
+	uint16_t lc;     // Loop Counter
+	uint16_t sr;     // Status Register
+	uint16_t omr;    // Operating Mode Register
+	uint16_t sp;     // Stack Pointer
+	PAIR     ss[16]; // Stack (TODO: 15-level?)
 
 	// Controls IRQ processing
 	void (*service_interrupts)(void);
@@ -152,6 +173,21 @@ struct dsp56156_pcu
 // 1-8 The dsp56156 CORE
 struct dsp56156_core
 {
+	dsp56156_core()
+		: modA_state(false), modB_state(false), modC_state(false), reset_state(false)
+		, bootstrap_mode(0)
+		, repFlag(0), repAddr(0)
+		, icount(0)
+		, ppc(0)
+		, op(0)
+		, interrupt_cycles(0)
+		, output_pins_changed(nullptr)
+		, device(nullptr)
+		, program_ram(nullptr)
+	{
+		std::fill(std::begin(peripheral_ram), std::end(peripheral_ram), 0);
+	}
+
 	// PROGRAM CONTROLLER
 	dsp56156_pcu PCU;
 

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef MAME_BUS_ASTROCADE_RAM_H
-#define MAME_BUS_ASTROCADE_RAM_H
+#ifndef MAME_BUS_ASTROCDE_RAM_H
+#define MAME_BUS_ASTROCDE_RAM_H
 
 #pragma once
 
@@ -150,4 +150,4 @@ DECLARE_DEVICE_TYPE(ASTROCADE_WHITERAM,    astrocade_whiteram_device)
 DECLARE_DEVICE_TYPE(ASTROCADE_RL64RAM,     astrocade_rl64ram_device)
 
 
-#endif // MAME_BUS_ASTROCADE_RAM_H
+#endif // MAME_BUS_ASTROCDE_RAM_H

@@ -8,6 +8,8 @@
 
 #include "pci_slot.h"
 
+#include "machine/eepromser.h"
+
 class aha2940au_scsi_device : public pci_card_device
 {
 public:
@@ -29,10 +31,15 @@ protected:
 
 	virtual void config_map(address_map &map) override ATTR_COLD;
 
-	required_memory_region m_scsi_rom;
+	virtual u8 capptr_r() override;
+
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
 
 private:
-	// ...
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
+
+	required_memory_region m_scsi_rom;
 };
 
 DECLARE_DEVICE_TYPE(AHA2940AU, aha2940au_scsi_device)

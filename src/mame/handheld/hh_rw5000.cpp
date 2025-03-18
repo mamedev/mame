@@ -153,7 +153,8 @@ INPUT_CHANGED_MEMBER(hh_rw5000_state::power_button)
   handheld game overall. Hardware design (even the MCU) and programming
   was done at Rockwell.
 
-  A European version was released as "Ski Slalom", except it's upside-down.
+  A European version was released as "Ski Slalom" (model 8290), except it's
+  upside-down.
 
 *******************************************************************************/
 
@@ -201,11 +202,11 @@ static INPUT_PORTS_START( autorace )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 
 	PORT_START("POWER") // power switch
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_rw5000_state, power_button, 0) PORT_NAME("Start / Reset")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hh_rw5000_state::power_button), 0) PORT_NAME("Start / Reset")
 
 	PORT_START("SWITCH") // fake
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_rw5000_state, switch_prev<0>, 0x0c) PORT_NAME("Gear Switch Down")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_rw5000_state, switch_next<0>, 0x0c) PORT_NAME("Gear Switch Up")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hh_rw5000_state::switch_prev<0>), 0x0c) PORT_NAME("Gear Switch Down")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hh_rw5000_state::switch_next<0>), 0x0c) PORT_NAME("Gear Switch Up")
 INPUT_PORTS_END
 
 // config
@@ -297,7 +298,7 @@ static INPUT_PORTS_START( misatk )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 
 	PORT_START("POWER") // power switch
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_rw5000_state, power_button, 0) PORT_NAME("Arm / Off")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hh_rw5000_state::power_button), 0) PORT_NAME("Arm / Off")
 INPUT_PORTS_END
 
 // config
@@ -395,7 +396,7 @@ static INPUT_PORTS_START( mfootb )
 	PORT_CONFNAME( 0x01, 0x01, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x01, "1" ) // PRO 1
 	PORT_CONFSETTING(    0x00, "2" ) // PRO 2
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_NAME("Score") PORT_CHANGED_MEMBER(DEVICE_SELF, mfootb_state, score_button, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_NAME("Score") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mfootb_state::score_button), 0)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Status")
 	PORT_CONFNAME( 0x08, 0x00, "Factory Test" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
@@ -734,7 +735,7 @@ ROM_END
 /*******************************************************************************
 
   Rockwell 8R "Automatic Percent", Rockwell 18R "Memory"
-  * B5000 MCU (label B5000CC, die label B5000)
+  * B5000 MCU (label B5000CB/CC, die label B5000)
   * 8-digit 7seg LED display
 
   This MCU was used in Rockwell 8R, 18R, and 9TR. It was also sold by

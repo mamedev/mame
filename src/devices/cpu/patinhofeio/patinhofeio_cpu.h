@@ -1,7 +1,7 @@
 // license:GPL-2.0+
 // copyright-holders:Felipe Sanches
-#ifndef MAME_DEVICES_CPU_PATINHOFEIO_CPU_H
-#define MAME_DEVICES_CPU_PATINHOFEIO_CPU_H
+#ifndef MAME_CPU_PATINHOFEIO_PATINHOFEIO_CPU_H
+#define MAME_CPU_PATINHOFEIO_PATINHOFEIO_CPU_H
 
 #pragma once
 
@@ -132,4 +132,4 @@ private:
 
 DECLARE_DEVICE_TYPE(PATO_FEIO_CPU, patinho_feio_cpu_device)
 
-#endif // MAME_DEVICES_CPU_PATINHOFEIO_CPU_H
+#endif // MAME_CPU_PATINHOFEIO_PATINHOFEIO_CPU_H

@@ -62,47 +62,6 @@ static const floppy_error_map errmap[] =
     IMPLEMENTATION
 ***************************************************************************/
 
-
-floppy_image_legacy *legacy_floppy_image_device::flopimg_get_image()
-{
-	return m_floppy;
-}
-
-int legacy_floppy_image_device::flopimg_get_sectors_per_track(int side)
-{
-	floperr_t err;
-	int sector_count;
-
-	if (!m_floppy)
-		return 0;
-
-	err = floppy_get_sector_count(m_floppy, side, m_track, &sector_count);
-	if (err)
-		return 0;
-	return sector_count;
-}
-
-void legacy_floppy_image_device::flopimg_get_id_callback(chrn_id *id, int id_index, int side)
-{
-	int cylinder, sector, N;
-	unsigned long flags;
-	uint32_t sector_length;
-
-	if (!m_floppy)
-		return;
-
-	floppy_get_indexed_sector_info(m_floppy, side, m_track, id_index, &cylinder, &side, &sector, &sector_length, &flags);
-
-	N = compute_log2(sector_length);
-
-	id->C = cylinder;
-	id->H = side;
-	id->R = sector;
-	id->data_id = id_index;
-	id->flags = flags;
-	id->N = ((N >= 7) && (N <= 10)) ? N - 7 : 0;
-}
-
 void legacy_floppy_image_device::log_readwrite(const char *name, int head, int track, int sector, const char *buf, int length)
 {
 	char membuf[1024];
@@ -134,8 +93,6 @@ void legacy_floppy_image_device::floppy_drive_init()
 
 	floppy_drive_set_geometry(m_config->floppy_type);
 
-	/* initialise id index - not so important */
-	m_id_index = 0;
 	/* initialise track */
 	m_current_track = 0;
 
@@ -143,8 +100,6 @@ void legacy_floppy_image_device::floppy_drive_init()
 	m_rpm = 300;
 
 	m_controller = nullptr;
-
-	m_floppy_drive_type = FLOPPY_TYPE_REGULAR;
 }
 
 /* index pulses at rpm/60 Hz, and stays high 1/20th of time */
@@ -282,73 +237,6 @@ void legacy_floppy_image_device::floppy_drive_seek(signed int signed_tracks)
 	/* inform disk image of step operation so it can cache information */
 	if (exists())
 		m_track = m_current_track;
-
-	m_id_index = 0;
-}
-
-
-/* this is not accurate. But it will do for now */
-int legacy_floppy_image_device::floppy_drive_get_next_id(int side, chrn_id *id)
-{
-	int spt;
-
-	/* get sectors per track */
-	spt = flopimg_get_sectors_per_track(side);
-
-	/* set index */
-	if ((m_id_index==(spt-1)) || (spt==0))
-	{
-		floppy_drive_set_flag_state(FLOPPY_DRIVE_INDEX, 1);
-	}
-	else
-	{
-		floppy_drive_set_flag_state(FLOPPY_DRIVE_INDEX, 0);
-	}
-
-	/* get id */
-	if (spt!=0)
-	{
-		flopimg_get_id_callback(id, m_id_index, side);
-	}
-
-	m_id_index++;
-	if (spt!=0)
-		m_id_index %= spt;
-	else
-		m_id_index = 0;
-
-	return (spt == 0) ? 0 : 1;
-}
-
-void legacy_floppy_image_device::floppy_drive_read_track_data_info_buffer(int side, void *ptr, int *length )
-{
-	if (exists())
-	{
-		if (!m_floppy)
-			return;
-
-		floppy_read_track_data(m_floppy, side, m_track, ptr, *length);
-	}
-}
-
-void legacy_floppy_image_device::floppy_drive_write_track_data_info_buffer(int side, const void *ptr, int *length )
-{
-	if (exists())
-	{
-		if (!m_floppy)
-			return;
-
-		floppy_write_track_data(m_floppy, side, m_track, ptr, *length);
-	}
-}
-
-void legacy_floppy_image_device::floppy_drive_format_sector(int side, int sector_index,int c,int h, int r, int n, int filler)
-{
-	if (exists())
-	{
-/*      if (m_interface_.format_sector)
-            m_interface_.format_sector(img, side, sector_index,c, h, r, n, filler);*/
-	}
 }
 
 void legacy_floppy_image_device::floppy_drive_read_sector_data(int side, int index1, void *ptr, int length)
@@ -390,26 +278,9 @@ void legacy_floppy_image_device::floppy_install_unload_proc(void (*proc)(device_
 	m_unload_proc = proc;
 }
 
-/* set the callback for the index pulse */
-void legacy_floppy_image_device::floppy_drive_set_index_pulse_callback(void (*callback)(device_t *controller, device_t *img, int state))
-{
-	m_index_pulse_callback = callback;
-}
-
 int legacy_floppy_image_device::floppy_drive_get_current_track()
 {
 	return m_current_track;
-}
-
-uint64_t legacy_floppy_image_device::floppy_drive_get_current_track_size(int head)
-{
-	int size = 0;
-	if (exists())
-	{
-		size = floppy_get_track_size(m_floppy, head, m_current_track);
-	}
-
-	return size;
 }
 
 void legacy_floppy_image_device::floppy_drive_set_rpm(float rpm)
@@ -478,17 +349,6 @@ TIMER_CALLBACK_MEMBER( legacy_floppy_image_device::set_wpt )
 	//m_out_wpt_func(param);
 }
 
-int legacy_floppy_image_device::floppy_get_drive_type()
-{
-	return m_floppy_drive_type;
-}
-
-void legacy_floppy_image_device::floppy_set_type(int ftype)
-{
-	m_floppy_drive_type = ftype;
-}
-
-
 /* drive select */
 void legacy_floppy_image_device::floppy_ds_w(int state)
 {
@@ -520,11 +380,6 @@ void legacy_floppy_image_device::floppy_mon_w(int state)
 void legacy_floppy_image_device::floppy_drtn_w(int state)
 {
 	m_drtn = state;
-}
-
-/* write data */
-void legacy_floppy_image_device::floppy_wtd_w(int state)
-{
 }
 
 /* step */
@@ -570,31 +425,10 @@ void legacy_floppy_image_device::floppy_wtg_w(int state)
 	m_wtg = state;
 }
 
-/* write protect signal, active low */
-int legacy_floppy_image_device::floppy_wpt_r()
-{
-	return m_wpt;
-}
-
 /* track 0 detect */
 int legacy_floppy_image_device::floppy_tk00_r()
 {
 	return m_tk00;
-}
-
-/* disk changed */
-int legacy_floppy_image_device::floppy_dskchg_r()
-{
-	return m_dskchg;
-}
-
-/* 2-sided disk */
-int legacy_floppy_image_device::floppy_twosid_r()
-{
-	if (m_floppy == nullptr)
-		return 1;
-	else
-		return !floppy_get_heads_per_disk(m_floppy);
 }
 
 int legacy_floppy_image_device::floppy_index_r()
@@ -630,7 +464,6 @@ legacy_floppy_image_device::legacy_floppy_image_device(const machine_config &mco
 		m_idx(0),
 		m_tk00(0),
 		m_wpt(0),
-		m_rdy(0),
 		m_dskchg(0),
 		m_active(0),
 		m_config(nullptr),
@@ -641,13 +474,11 @@ legacy_floppy_image_device::legacy_floppy_image_device(const machine_config &mco
 		m_index_timer(nullptr),
 		m_index_pulse_callback(nullptr),
 		m_rpm(0.0f),
-		m_id_index(0),
 		m_controller(nullptr),
 		m_floppy(nullptr),
 		m_track(0),
 		m_load_proc(nullptr),
-		m_unload_proc(nullptr),
-		m_floppy_drive_type(0)
+		m_unload_proc(nullptr)
 {
 	memset(&m_extension_list,0,sizeof(m_extension_list));
 }

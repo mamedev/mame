@@ -928,4 +928,4 @@ ROM_END
 } // anonymous namespace
 
 
-CONS( 2000, ps2, 0, 0, ps2sony, ps2sony, ps2sony_state, empty_init, "Sony", "PlayStation 2", MACHINE_IS_SKELETON )
+CONS( 2000, ps2, 0, 0, ps2sony, ps2sony, ps2sony_state, empty_init, "Sony", "PlayStation 2", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -145,4 +145,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1978, aid80f, 0, 0, aid80f, aid80f, aid80f_state, empty_init, "Mostek", "AID-80F Development System", MACHINE_IS_SKELETON)
+COMP(1978, aid80f, 0, 0, aid80f, aid80f, aid80f_state, empty_init, "Mostek", "AID-80F Development System", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

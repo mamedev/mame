@@ -8,7 +8,7 @@
 
     Games supported:
         * F-15 Strike Eagle [3 sets]
-        * B.O.T.S.S. - Battle of the Solar System [2 sets]
+        * B.O.T.S.S.: Battle of the Solar System [2 sets]
         * Tank Battle (prototype)
         * Super Tank Attack (prototype)
 
@@ -27,6 +27,7 @@
 #include "emu.h"
 #include "micro3d.h"
 #include "micro3d_a.h"
+
 #include "cpu/am29000/am29000.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
@@ -80,7 +81,7 @@ static INPUT_PORTS_START( micro3d )
 	PORT_DIPSETTING(    0x0000, DEF_STR(On) )
 
 	PORT_START("SOUND_SW")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Sound PCB Test SW") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Sound PCB Test SW") PORT_CODE(KEYCODE_F1)
 
 	PORT_START("VOLUME")
 	PORT_ADJUSTER(100, "Volume")
@@ -108,17 +109,17 @@ static INPUT_PORTS_START( f15se )
 	PORT_BIT( 0xfff, 0x000, IPT_AD_STICK_X ) PORT_MINMAX(0xf5a, 0x0a6) PORT_SENSITIVITY(25) PORT_KEYDELTA(50) PORT_REVERSE
 
 	PORT_START("JOYSTICK_Y")
-	PORT_BIT(0xfff, 0x000, IPT_AD_STICK_Y ) PORT_MINMAX(0xf5a, 0x0a6) PORT_SENSITIVITY(25) PORT_KEYDELTA(50)
+	PORT_BIT( 0xfff, 0x000, IPT_AD_STICK_Y ) PORT_MINMAX(0xf5a, 0x0a6) PORT_SENSITIVITY(25) PORT_KEYDELTA(50)
 
 	PORT_START("THROTTLE")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Z ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_NAME("Throttle")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Z ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_REVERSE PORT_NAME("Throttle")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( botss )
 	PORT_INCLUDE( micro3d )
 
 	PORT_MODIFY("INPUTS_A_B")
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(micro3d_state, botss_hwchk_r)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(micro3d_state::botss_hwchk_r))
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON3 )  PORT_NAME("Shield")
 	PORT_SERVICE( 0x0400, IP_ACTIVE_LOW )
@@ -135,10 +136,10 @@ static INPUT_PORTS_START( botss )
 	PORT_BIT( 0xfff, 0x000, IPT_AD_STICK_X ) PORT_MINMAX(0xf5a, 0x0a6) PORT_SENSITIVITY(25) PORT_KEYDELTA(50) PORT_REVERSE
 
 	PORT_START("JOYSTICK_Y")
-	PORT_BIT(0xfff, 0x000, IPT_AD_STICK_Y ) PORT_MINMAX(0xf5a, 0x0a6) PORT_SENSITIVITY(25) PORT_KEYDELTA(50)
+	PORT_BIT( 0xfff, 0x000, IPT_AD_STICK_Y ) PORT_MINMAX(0xf5a, 0x0a6) PORT_SENSITIVITY(25) PORT_KEYDELTA(50)
 
 	PORT_START("THROTTLE")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Z ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_NAME("Throttle")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Z ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_REVERSE PORT_NAME("Throttle")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( botss11 )
@@ -154,8 +155,8 @@ static INPUT_PORTS_START( botss11 )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 
 	PORT_START("INPUTS_C_D")
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Throttle up")
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Throttle down")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Throttle Up")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Throttle Down")
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Trigger")
@@ -215,11 +216,17 @@ void micro3d_state::hostmem(address_map &map)
 	map(0x960000, 0x960001).w(FUNC(micro3d_state::reset_w));
 	map(0x980001, 0x980001).rw("adc", FUNC(adc0844_device::read), FUNC(adc0844_device::write));
 	map(0x9a0000, 0x9a0007).rw(m_vgb, FUNC(tms34010_device::host_r), FUNC(tms34010_device::host_w));
-	map(0x9c0000, 0x9c0001).noprw();                 // Lamps
+	map(0x9c0000, 0x9c0001).noprw(); // Lamps
 	map(0x9e0000, 0x9e002f).rw("mfp", FUNC(mc68901_device::read), FUNC(mc68901_device::write)).umask16(0xff00);
 	map(0xa00000, 0xa0003f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0xff00);
 	map(0xa20000, 0xa20001).r(FUNC(micro3d_state::encoder_h_r));
 	map(0xa40002, 0xa40003).r(FUNC(micro3d_state::encoder_l_r));
+}
+
+void micro3d_state::cpu_space_map(address_map &map)
+{
+	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
+	map(0xfffff6, 0xfffff7).lr16(NAME([this] () -> u16 { return m_duart->get_irq_vector(); }));
 }
 
 
@@ -272,6 +279,7 @@ void micro3d_state::drmath_data(address_map &map)
 	map(0x03fffff0, 0x03ffffff).rw("scc", FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask32(0x000000ff);
 }
 
+
 /*************************************
  *
  *  Sound memory map
@@ -290,12 +298,6 @@ void micro3d_state::soundmem_io(address_map &map)
 	map(0xfe00, 0xfe00).w(FUNC(micro3d_state::upd7759_w));
 	map(0xff00, 0xff00).w(FUNC(micro3d_state::snd_dac_a));
 	map(0xff01, 0xff01).w(FUNC(micro3d_state::snd_dac_b));
-}
-
-void micro3d_state::cpu_space_map(address_map &map)
-{
-	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
-	map(0xfffff6, 0xfffff7).lr16(NAME([this] () -> u16 { return m_duart->get_irq_vector(); }));
 }
 
 
@@ -325,10 +327,10 @@ void micro3d_state::micro3d(machine_config &config)
 	m_drmath->set_addrmap(AS_PROGRAM, &micro3d_state::drmath_prg);
 	m_drmath->set_addrmap(AS_DATA, &micro3d_state::drmath_data);
 
-	scc8530_device &scc(SCC8530N(config, "scc", 32_MHz_XTAL / 2 / 2));
+	scc8530_device &scc(SCC8530(config, "scc", 32_MHz_XTAL / 2 / 2));
 	scc.out_txdb_callback().set("monitor_drmath", FUNC(rs232_port_device::write_txd));
 
-	I8051(config, m_audiocpu, 11.0592_MHz_XTAL);
+	I80C31(config, m_audiocpu, 11.0592_MHz_XTAL);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &micro3d_state::soundmem_prg);
 	m_audiocpu->set_addrmap(AS_IO, &micro3d_state::soundmem_io);
 	m_audiocpu->port_in_cb<1>().set(FUNC(micro3d_state::sound_p1_r));
@@ -337,7 +339,7 @@ void micro3d_state::micro3d(machine_config &config)
 	m_audiocpu->port_out_cb<3>().set(FUNC(micro3d_state::sound_p3_w));
 
 	MC68681(config, m_duart, 3.6864_MHz_XTAL);
-	m_duart->irq_cb().set(FUNC(micro3d_state::duart_irq_handler));
+	m_duart->irq_cb().set_inputline("maincpu", M68K_IRQ_3);
 	m_duart->a_tx_cb().set("monitor_host", FUNC(rs232_port_device::write_txd));
 	m_duart->b_tx_cb().set(FUNC(micro3d_state::duart_txb));
 	m_duart->inport_cb().set(FUNC(micro3d_state::duart_input_r));
@@ -478,7 +480,7 @@ ROM_START( f15se22 )
 	ROM_LOAD16_BYTE( "110-00001-007.u94", 0x0c0000, 0x20000, CRC(36e06cba) SHA1(5ffee5da6f475978be10fa5e1a2c24f00497ea5f) )
 	ROM_LOAD16_BYTE( "110-00001-008.u71", 0x100001, 0x20000, CRC(d96fd4e2) SHA1(001af758da437e955b4ee914eabeb9739ebc4454) )
 	ROM_LOAD16_BYTE( "110-00001-009.u95", 0x100000, 0x20000, CRC(33e3b473) SHA1(66deda79ba94f0ed722b399b3fc6062dcdd1a6c9) )
-	ROM_FILL(                    0x140000, 0x40000, 0xff )
+	ROM_FILL(                             0x140000, 0x40000, 0xff )
 
 	// Dr Math PCB (MPG 010-00002-001)
 	ROM_REGION32_BE( 0x100000, "drmath", 0 )

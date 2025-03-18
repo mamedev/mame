@@ -751,10 +751,11 @@ protected:
 // 1146 mclks from the rising edge of /HSYNC.
 #define NEOGEO_VBLANK_RELOAD_HTIM (attotime::from_ticks(1146, NEOGEO_MASTER_CLOCK))
 
-#define IRQ2CTRL_ENABLE             (0x10)
-#define IRQ2CTRL_LOAD_RELATIVE      (0x20)
-#define IRQ2CTRL_AUTOLOAD_VBLANK    (0x40)
-#define IRQ2CTRL_AUTOLOAD_REPEAT    (0x80)
+static constexpr unsigned IRQ2CTRL_ENABLE          = 4;
+static constexpr unsigned IRQ2CTRL_LOAD_RELATIVE   = 5;
+static constexpr unsigned IRQ2CTRL_AUTOLOAD_VBLANK = 6;
+static constexpr unsigned IRQ2CTRL_AUTOLOAD_REPEAT = 7;
+
 
 void neogeo_base_state::adjust_display_position_interrupt_timer()
 {
@@ -785,7 +786,7 @@ void neogeo_base_state::set_display_counter_lsb(uint16_t data)
 
 	LOGMASKED(LOG_VIDEO_SYSTEM, "PC %06x: set_display_counter %08x\n", m_maincpu->pc(), m_display_counter);
 
-	if (m_display_position_interrupt_control & IRQ2CTRL_LOAD_RELATIVE)
+	if (BIT(m_display_position_interrupt_control, IRQ2CTRL_LOAD_RELATIVE))
 	{
 		LOGMASKED(LOG_VIDEO_SYSTEM, "AUTOLOAD_RELATIVE ");
 		adjust_display_position_interrupt_timer();
@@ -803,11 +804,11 @@ void neogeo_base_state::update_interrupts()
 
 void neogeo_base_state::acknowledge_interrupt(uint16_t data)
 {
-	if (data & 0x01)
+	if (BIT(data, 0))
 		m_irq3_pending = 0;
-	if (data & 0x02)
+	if (BIT(data, 1))
 		m_display_position_interrupt_pending = 0;
-	if (data & 0x04)
+	if (BIT(data, 2))
 		m_vblank_interrupt_pending = 0;
 
 	update_interrupts();
@@ -818,7 +819,7 @@ TIMER_CALLBACK_MEMBER(neogeo_base_state::display_position_interrupt_callback)
 {
 	LOGMASKED(LOG_VIDEO_SYSTEM, "--- Scanline @ %d,%d\n", m_screen->vpos(), m_screen->hpos());
 
-	if (m_display_position_interrupt_control & IRQ2CTRL_ENABLE)
+	if (BIT(m_display_position_interrupt_control, IRQ2CTRL_ENABLE))
 	{
 		LOGMASKED(LOG_VIDEO_SYSTEM, "*** Scanline interrupt (IRQ2) ***  y: %02x  x: %02x\n", m_screen->vpos(), m_screen->hpos());
 		m_display_position_interrupt_pending = 1;
@@ -826,7 +827,7 @@ TIMER_CALLBACK_MEMBER(neogeo_base_state::display_position_interrupt_callback)
 		update_interrupts();
 	}
 
-	if (m_display_position_interrupt_control & IRQ2CTRL_AUTOLOAD_REPEAT)
+	if (BIT(m_display_position_interrupt_control, IRQ2CTRL_AUTOLOAD_REPEAT))
 	{
 		LOGMASKED(LOG_VIDEO_SYSTEM, "AUTOLOAD_REPEAT ");
 		adjust_display_position_interrupt_timer();
@@ -836,7 +837,7 @@ TIMER_CALLBACK_MEMBER(neogeo_base_state::display_position_interrupt_callback)
 
 TIMER_CALLBACK_MEMBER(neogeo_base_state::display_position_vblank_callback)
 {
-	if (m_display_position_interrupt_control & IRQ2CTRL_AUTOLOAD_VBLANK)
+	if (BIT(m_display_position_interrupt_control, IRQ2CTRL_AUTOLOAD_VBLANK))
 	{
 		LOGMASKED(LOG_VIDEO_SYSTEM, "AUTOLOAD_VBLANK ");
 		adjust_display_position_interrupt_timer();
@@ -1069,7 +1070,8 @@ ioport_value neogeo_base_state::get_memcard_status()
 
 uint16_t neogeo_base_state::memcard_r(offs_t offset, uint16_t mem_mask)
 {
-	m_maincpu->eat_cycles(2); // insert waitstate
+	if (!machine().side_effects_disabled())
+		m_maincpu->eat_cycles(2); // insert waitstate
 
 	// memory card enabled by /UDS
 	if (ACCESSING_BITS_8_15 && m_memcard->present())
@@ -1097,9 +1099,7 @@ void neogeo_base_state::memcard_w(offs_t offset, uint16_t data, uint16_t mem_mas
 
 ioport_value neogeo_base_state::get_audio_result()
 {
-	uint8_t ret = m_soundlatch2->read();
-
-	return ret;
+	return m_soundlatch2->read();
 }
 
 
@@ -1111,7 +1111,8 @@ ioport_value neogeo_base_state::get_audio_result()
 
 uint8_t neogeo_base_state::audio_cpu_bank_select_r(offs_t offset)
 {
-	m_bank_audio_cart[offset & 3]->set_entry(offset >> 8);
+	if (!machine().side_effects_disabled())
+		m_bank_audio_cart[offset & 3]->set_entry(offset >> 8);
 
 	return 0;
 }
@@ -1132,14 +1133,14 @@ void neogeo_base_state::set_use_cart_vectors(int state)
 void neogeo_base_state::set_use_cart_audio(int state)
 {
 	m_use_cart_audio = state;
-	m_sprgen->neogeo_set_fixed_layer_source(state);
+	m_sprgen->set_fixed_layer_source(state);
 	m_bank_audio_main->set_entry(m_use_cart_audio);
 }
 
 
 void neogeo_base_state::write_banksel(uint16_t data)
 {
-	uint32_t len = (!m_slots[m_curr_slot] || m_slots[m_curr_slot]->get_rom_size() == 0) ? m_region_maincpu->bytes() : m_slots[m_curr_slot]->get_rom_size();
+	uint32_t const len = (!m_slots[m_curr_slot] || m_slots[m_curr_slot]->get_rom_size() == 0) ? m_region_maincpu->bytes() : m_slots[m_curr_slot]->get_rom_size();
 
 	if ((len <= 0x100000) && (data & 0x07))
 		logerror("PC %06x: warning: bankswitch to %02x but no banks available\n", m_maincpu->pc(), data);
@@ -1299,7 +1300,7 @@ uint16_t neogeo_base_state::read_lorom_kof10th(offs_t offset)
 void neogeo_base_state::init_cpu()
 {
 	uint8_t *ROM = (!m_slots[m_curr_slot] || m_slots[m_curr_slot]->get_rom_size() == 0) ? m_region_maincpu->base() : (uint8_t *)m_slots[m_curr_slot]->get_rom_base();
-	uint32_t len = (!m_slots[m_curr_slot] || m_slots[m_curr_slot]->get_rom_size() == 0) ? m_region_maincpu->bytes() : m_slots[m_curr_slot]->get_rom_size();
+	uint32_t const len = (!m_slots[m_curr_slot] || m_slots[m_curr_slot]->get_rom_size() == 0) ? m_region_maincpu->bytes() : m_slots[m_curr_slot]->get_rom_size();
 
 	if (len > 0x100000)
 		m_bank_base = 0x100000;
@@ -1312,8 +1313,7 @@ void neogeo_base_state::init_cpu()
 void neogeo_base_state::init_audio()
 {
 	uint8_t *ROM = (!m_slots[m_curr_slot] || m_slots[m_curr_slot]->get_audio_size() == 0) ? m_region_audiocpu->base() : m_slots[m_curr_slot]->get_audio_base();
-	uint32_t len = (!m_slots[m_curr_slot] || m_slots[m_curr_slot]->get_audio_size() == 0) ? m_region_audiocpu->bytes() : m_slots[m_curr_slot]->get_audio_size();
-	uint32_t address_mask;
+	uint32_t const len = (!m_slots[m_curr_slot] || m_slots[m_curr_slot]->get_audio_size() == 0) ? m_region_audiocpu->bytes() : m_slots[m_curr_slot]->get_audio_size();
 
 	/* audio bios/cartridge selection */
 	m_bank_audio_main->configure_entry(0, (m_region_audiobios != nullptr) ? m_region_audiobios->base() : ROM); /* on hardware with no SM1 ROM, the cart ROM is always enabled */
@@ -1326,12 +1326,12 @@ void neogeo_base_state::init_audio()
 	m_bank_audio_cart[2] = membank("audio_c000");
 	m_bank_audio_cart[3] = membank("audio_8000");
 
-	address_mask = (len - 0x10000 - 1) & 0x3ffff;
+	uint32_t const address_mask = (len - 0x10000 - 1) & 0x3ffff;
 	for (int region = 0; region < 4; region++)
 	{
 		for (int bank = 0xff; bank >= 0; bank--)
 		{
-			uint32_t bank_address = 0x10000 + ((bank << (11 + region)) & address_mask);
+			uint32_t const bank_address = 0x10000 + ((bank << (11 + region)) & address_mask);
 			m_bank_audio_cart[region]->configure_entry(bank, &ROM[bank_address]);
 		}
 	}
@@ -1379,7 +1379,7 @@ void neogeo_base_state::init_sprites()
 			m_sprgen->optimize_sprite_data();
 		else
 			m_sprgen->set_optimized_sprite_data(m_slots[m_curr_slot]->get_sprites_opt_base(), m_slots[m_curr_slot]->get_sprites_opt_size() - 1);
-		m_sprgen->m_fixed_layer_bank_type = m_slots[m_curr_slot]->get_fixed_bank_type();
+		m_sprgen->set_fixed_layer_bank_type(m_slots[m_curr_slot]->get_fixed_bank_type());
 	}
 	else
 	{
@@ -1424,7 +1424,7 @@ void neogeo_base_state::set_slot_idx(int slot)
 		if (!m_slots[m_curr_slot]->user_loadable())
 			m_slots[m_curr_slot]->set_cart_type(m_slots[m_curr_slot]->default_option());
 
-		int type = m_slots[m_curr_slot]->get_type();
+		int const type = m_slots[m_curr_slot]->get_type();
 		switch (type)
 		{
 		case NEOGEO_FATFURY2:
@@ -1608,7 +1608,7 @@ void mvs_state::machine_start()
 {
 	ngarcade_base_state::machine_start();
 
-	m_sprgen->m_fixed_layer_bank_type = 0;
+	m_sprgen->set_fixed_layer_bank_type(neosprite_base_device::FIX_BANKTYPE_STD);
 
 	m_curr_slot = -1;
 	set_slot_idx(0);
@@ -1780,7 +1780,7 @@ void aes_state::aes_main_map(address_map &map)
 
 void neogeo_base_state::audio_map(address_map &map)
 {
-	map(0x0000, 0x7fff).bankr("audio_main");
+	map(0x0000, 0x7fff).bankr(m_bank_audio_main);
 	map(0x8000, 0xbfff).bankr("audio_8000");
 	map(0xc000, 0xdfff).bankr("audio_c000");
 	map(0xe000, 0xefff).bankr("audio_e000");
@@ -1842,8 +1842,8 @@ INPUT_PORTS_START( neogeo )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0f00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(ngarcade_base_state, startsel_edge_joy_r)
-	PORT_BIT( 0x7000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(neogeo_base_state, get_memcard_status)
+	PORT_BIT( 0x0f00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(ngarcade_base_state::startsel_edge_joy_r))
+	PORT_BIT( 0x7000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(neogeo_base_state::get_memcard_status))
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_CUSTOM ) // Hardware type (AES=0, MVS=1). Some games check this and show a piracy warning screen if the hardware and BIOS don't match
 
 	PORT_START("AUDIO_COIN")
@@ -1852,9 +1852,9 @@ INPUT_PORTS_START( neogeo )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0018, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_CUSTOM ) // sense: 4-slot
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("upd4990a", upd1990a_device, tp_r)
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("upd4990a", upd1990a_device, data_out_r)
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(neogeo_base_state, get_audio_result)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("upd4990a", FUNC(upd1990a_device::tp_r))
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("upd4990a", FUNC(upd1990a_device::data_out_r))
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(neogeo_base_state::get_audio_result))
 
 	PORT_START("TEST")
 	PORT_BIT( 0x003f, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -1867,7 +1867,7 @@ static INPUT_PORTS_START( neogeo_mvs )
 	PORT_INCLUDE( neogeo )
 
 	PORT_MODIFY("SYSTEM")
-	PORT_BIT( 0x0500, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(ngarcade_base_state, startsel_edge_joy_r)
+	PORT_BIT( 0x0500, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(ngarcade_base_state::startsel_edge_joy_r))
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Next Game") PORT_CODE(KEYCODE_3)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Previous Game") PORT_CODE(KEYCODE_4)
 
@@ -1892,17 +1892,17 @@ INPUT_PORTS_START( aes )
 	PORT_START("IN2")
 	PORT_BIT( 0x0fff, IP_ACTIVE_LOW, IPT_UNUSED )
 	// Start & Select are read from controller slot device
-	PORT_BIT( 0x7000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(neogeo_base_state, get_memcard_status)
+	PORT_BIT( 0x7000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(neogeo_base_state::get_memcard_status))
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) /* Hardware type (AES=0, MVS=1) Some games check this and show a piracy warning screen if the hardware and BIOS don't match */
 
 	PORT_START("AUDIO")
 	PORT_BIT( 0x0007, IP_ACTIVE_HIGH, IPT_UNUSED )  /* AES has no coin slots, it's a console */
 	PORT_BIT( 0x0018, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* what is this? Universe BIOS uses these bits to detect MVS or AES hardware */
 	PORT_BIT( 0x00e0, IP_ACTIVE_HIGH, IPT_UNUSED )  /* AES has no upd4990a */
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(neogeo_base_state, get_audio_result)
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(neogeo_base_state::get_audio_result))
 
 	PORT_START("JP") // JP1 and JP2 are jumpers or solderpads depending on AES board revision, intended for use on the Development BIOS
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Short JP1 (Debug Monitor)") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, aes_base_state, aes_jp1, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Short JP1 (Debug Monitor)") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(aes_base_state::aes_jp1), 0)
 //  PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) // what is JP2 for? somehow related to system reset, disable watchdog?
 INPUT_PORTS_END
 
@@ -2130,7 +2130,7 @@ void aes_base_state::machine_start()
 {
 	neogeo_base_state::machine_start();
 
-	m_sprgen->m_fixed_layer_bank_type = 0;
+	m_sprgen->set_fixed_layer_bank_type(neosprite_base_device::FIX_BANKTYPE_STD);
 }
 
 void aes_state::machine_start()
@@ -2141,7 +2141,7 @@ void aes_state::machine_start()
 	set_slot_idx(0);
 
 	// AES has no SFIX ROM and always uses the cartridge's
-	m_sprgen->neogeo_set_fixed_layer_source(1);
+	m_sprgen->set_fixed_layer_source(1);
 }
 
 void aes_state::device_post_load()
@@ -3294,8 +3294,9 @@ ROM_START( ridhero ) /* MVS AND AES VERSION */
 	ROM_REGION( 0x100000, "cslot1:maincpu", ROMREGION_BE|ROMREGION_16BIT )
 	ROM_LOAD16_WORD_SWAP( "006-p1.p1", 0x000000, 0x080000, CRC(d4aaf597) SHA1(34d35b71adb5bd06f4f1b50ffd9c58ab9c440a84) ) /* MB834200 */
 
+	// dumped from a prototype with external ROM, not 100% confirmed as being the same on a final, or other games (lbowling, trally)
 	ROM_REGION( 0x2000, "mcu", 0 )    /* Hitachi HD6301V1 MCU */
-	ROM_LOAD( "rhcom.bin", 0x0000, 0x2000, CRC(e5cd6306) SHA1(f6bbb8ae562804d67e137290c765c3589fa334c0) ) // dumped from a prototype with external ROM, not 100% confirmed as being the same on a final, or other games (lbowling, trally)
+	ROM_LOAD( "hd6301v1p_k78.com", 0x0000, 0x2000, CRC(e5cd6306) SHA1(f6bbb8ae562804d67e137290c765c3589fa334c0) )
 
 	NEO_SFIX_128K( "006-s1.s1", CRC(eb5189f0) SHA1(0239c342ea62e73140a2306052f226226461a478) ) /* TC531000 */
 
@@ -3323,8 +3324,9 @@ ROM_START( ridheroh )
 	ROM_LOAD16_WORD_SWAP( "006-pg1.p1", 0x000000, 0x080000, BAD_DUMP CRC(52445646) SHA1(647bb31f2f68453c1366cb6e2e867e37d1df7a54) )
 	/* Chip label p1h does not exist, renamed temporarily to pg1, marked BAD_DUMP. This needs to be verified. */
 
+	// dumped from a prototype with external ROM, not 100% confirmed as being the same on a final, or other games (lbowling, trally)
 	ROM_REGION( 0x2000, "mcu", 0 )    /* Hitachi HD6301V1 MCU */
-	ROM_LOAD( "rhcom.bin", 0x0000, 0x2000, CRC(e5cd6306) SHA1(f6bbb8ae562804d67e137290c765c3589fa334c0) ) // dumped from a prototype with external ROM, not 100% confirmed as being the same on a final, or other games (lbowling, trally)
+	ROM_LOAD( "hd6301v1p_k78.com", 0x0000, 0x2000, CRC(e5cd6306) SHA1(f6bbb8ae562804d67e137290c765c3589fa334c0) )
 
 	NEO_SFIX_128K( "006-s1.s1", CRC(eb5189f0) SHA1(0239c342ea62e73140a2306052f226226461a478) ) /* TC531000 */
 
@@ -3822,7 +3824,7 @@ ROM_START( lbowling ) /* MVS AND AES VERSION */
 	ROM_LOAD16_WORD_SWAP( "019-p1.p1", 0x000000, 0x080000, CRC(a2de8445) SHA1(893d7ae72b4644123469de143fa35fac1cbcd61e) ) /* TC534200 */
 
 	ROM_REGION( 0x1000, "mcu", 0 )    /* Hitachi HD6301V1 MCU */
-	ROM_LOAD( "hd6301v1p.com", 0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "hd6301v1p_k78.com", 0x0000, 0x1000, NO_DUMP )
 
 	NEO_SFIX_128K( "019-s1.s1", CRC(5fcdc0ed) SHA1(86415077e7adc3ba6153eeb4fb0c62cf36e903fa) ) /* TC531000 */
 
@@ -4485,7 +4487,7 @@ ROM_START( trally ) /* MVS AND AES VERSION */
 	ROM_LOAD16_WORD_SWAP( "038-p2.p2", 0x080000, 0x080000, CRC(a5193e2f) SHA1(96803480439e90da23cdca70d59ff519ee85beeb) ) /* TC534200 */
 
 	ROM_REGION( 0x1000, "mcu", 0 )    /* Hitachi HD6301V1 MCU */
-	ROM_LOAD( "hd6301v1p.hd6301v1", 0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "hd6301v1p_m58_neo-coma", 0x0000, 0x1000, NO_DUMP )
 
 	NEO_SFIX_128K( "038-s1.s1", CRC(fff62ae3) SHA1(6510a762ea41557a8938cbfc0557cd5921306061) ) /* TC531000 */
 
@@ -4726,6 +4728,7 @@ ROM_START( aof ) /* MVS AND AES VERSION */
 	ROM_REGION( 0x400000, "cslot1:ymsnd:adpcma", 0 )
 	ROM_LOAD( "044-v2.v2", 0x000000, 0x200000, CRC(3ec632ea) SHA1(e3f413f580b57f70d2dae16dbdacb797884d3fce) ) /* TC5316200 */
 	ROM_LOAD( "044-v4.v4", 0x200000, 0x200000, CRC(4b0f8e23) SHA1(105da0cc5ba19869c7147fba8b177500758c232b) ) /* TC5316200 */
+	/* Also found MVS set with different label: 044-v2.v1 and 044-v4.v2 */
 
 	ROM_REGION( 0x800000, "cslot1:sprites", 0 )
 	ROM_LOAD16_BYTE( "044-c1.c1", 0x000000, 0x100000, CRC(ddab98a7) SHA1(f20eb81ec431268798c142c482146c1545af1c24) ) /* Plane 0,1 */ /* TC5316200 */
@@ -4856,6 +4859,7 @@ ROM_END
  ID-0047
  . NGM-047
  NEO-MVS PROG-G2 (SNK-9201) / NEO-MVS CHA42G-1
+ NEO-MVS PROG-G2 (SNK-9201) / NEO-MVS CHA42G-2
  . NGH-047
  NEO-AEG PROG-G2 (PRO-CT0) / NEO-AEG CHA42G-2B
  NEO-AEG PROG-G2 (PRO-CT0) / NEO-AEG CHA42G-2
@@ -4864,7 +4868,7 @@ ROM_END
 ROM_START( fatfury2 ) /* MVS AND AES VERSION */
 	ROM_REGION( 0x100000, "cslot1:maincpu", ROMREGION_BE|ROMREGION_16BIT )
 	ROM_LOAD16_WORD_SWAP( "047-p1.p1", 0x000000, 0x100000, CRC(ecfdbb69) SHA1(59e2f137c6eaf043df4ddae865a9159a10265c60) ) /* TC538200 */
-	/* The original P1 is 8mbit; also found sets with P1 / P2 4mbit on eprom. */
+	/* The original P1 is 8mbit; also found sets with EP1 / EP2 4mbit on eprom. */
 
 	NEO_SFIX_128K( "047-s1.s1", CRC(d7dbbf39) SHA1(29253e596f475ebd41a6e3bb53952e3a0ccd2eed) ) /* TC531000 */
 
@@ -5284,6 +5288,7 @@ ROM_START( fatfursp ) /* MVS AND AES VERSION */
 	ROM_REGION( 0x180000, "cslot1:maincpu", ROMREGION_BE|ROMREGION_16BIT )
 	ROM_LOAD16_WORD_SWAP( "058-p1.p1",  0x000000, 0x100000, CRC(2f585ba2) SHA1(429b4bf43fb9b1082c15d645ca328f9d175b976b) ) /* mask rom TC538200 */
 	ROM_LOAD16_WORD_SWAP( "058-p2.sp2", 0x100000, 0x080000, CRC(d7c71a6b) SHA1(b3428063031a2e5857da40a5d2ffa87fb550c1bb) ) /* mask rom TC534200 */
+	/* also found MVS set with EP1 / EP2 / SP2 on eprom; correct chip label unknown */
 
 	NEO_SFIX_128K( "058-s1.s1", CRC(2df03197) SHA1(24083cfc97e720ac9e131c9fe37df57e27c49294) ) /* mask rom TC531000 */
 
@@ -5414,6 +5419,7 @@ ROM_END
  ID-0061
  . NGM-061
  NEO-MVS PROGGSC / NEO-MVS CHA256
+ NEO-MVS PROGGSC / NEO-MVS CHA256B
  NEO-MVS PROGTOP / NEO-MVS CHA256
  NEO-MVS PROG 4096 B / NEO-MVS CHA256
  . NGH-061
@@ -6071,6 +6077,7 @@ ROM_END
  NEO-MVS PROGBK1 / NEO-MVS CHA256
  NEO-MVS PROGTOP / NEO-MVS CHA256B
  NEO-MVS PROG 4096 B / NEO-MVS CHA 42G-3
+ NEO-MVS PROGGSC / NEO-MVS CHA 42G-3B
  . NGH-082
  NEO-AEG PROGTOP2 / NEO-AEG CHA256 B
 ****************************************/
@@ -7849,6 +7856,7 @@ ROM_END
  ID-0233
  . NGM-2330
  NEO-MVS PROGBK1 / NEO-MVS CHA256
+ NEO-MVS PROGBK1 / NEO-MVS CHA256B
  . NGH-2330
  NEO-AEG PROGBK1Y / NEO-AEG CHA256RY
 ****************************************/

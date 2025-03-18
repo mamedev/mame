@@ -453,7 +453,9 @@ void dc_cons_state::dc(machine_config &config)
 	dc_controller_device &dcctrl3(DC_CONTROLLER(config, "dcctrl3", 0, m_maple, 3));
 	dcctrl3.set_port_tags("P4:0", "P4:1", "P4:A0", "P4:A1", "P4:A2", "P4:A3", "P4:A4", "P4:A5");
 
-	SOFTWARE_LIST(config, "cd_list").set_original("dc");
+	SOFTWARE_LIST(config, "gdrom_list").set_original("dc");
+	// TODO: hookup Mil-CD/multisession CD-ROMs SW list (later DC models don't support this)
+	// TODO: hookup Video CD SW list (thru DreamMovie VCD/MP3 player disc + remote dongle)
 }
 
 void dc_cons_state::dc_fish(machine_config &config)

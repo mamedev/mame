@@ -20,6 +20,8 @@ public:
 
 	void map(address_map &map) ATTR_COLD;
 
+	void set_default_spriteramaddr(uint8_t spriteramaddr) { m_default_spriteramaddr = spriteramaddr; }
+
 	void set_tilerambase(int tilerambase) { m_tilerambase = tilerambase; }
 
 	void video_start();
@@ -95,6 +97,8 @@ private:
 	int m_spriterambase = 0;
 
 	bitmap_ind8 m_prioritybitmap;
+
+	uint8_t m_default_spriteramaddr = 0x14;
 };
 
 DECLARE_DEVICE_TYPE(ELAN_EU3A14_VID, elan_eu3a14vid_device)

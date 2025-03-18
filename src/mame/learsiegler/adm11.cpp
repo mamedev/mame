@@ -199,4 +199,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1984, adm12, 0, 0, adm12, adm12, adm11_state, empty_init, "Lear Siegler", "ADM 12 Video Display Terminal", MACHINE_IS_SKELETON)
+COMP(1984, adm12, 0, 0, adm12, adm12, adm11_state, empty_init, "Lear Siegler", "ADM 12 Video Display Terminal", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

@@ -112,5 +112,5 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(2001, trmavia, 0, 0, cit1500, cit1500, cit1500_state, empty_init, "Alcatel / Telefonica", "TRMA VIA", MACHINE_IS_SKELETON)
-SYST(2000, teletup, 0, 0, cit1500, cit1500, cit1500_state, empty_init, "Alcatel / Telefonica", "TeleTUP", MACHINE_IS_SKELETON)
+SYST(2001, trmavia, 0, 0, cit1500, cit1500, cit1500_state, empty_init, "Alcatel / Telefonica", "TRMA VIA", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(2000, teletup, 0, 0, cit1500, cit1500, cit1500_state, empty_init, "Alcatel / Telefonica", "TeleTUP", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

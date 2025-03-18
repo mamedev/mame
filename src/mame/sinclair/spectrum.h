@@ -122,7 +122,7 @@ protected:
 
 	uint8_t pre_opcode_fetch_r(offs_t offset);
 	void spectrum_rom_w(offs_t offset, uint8_t data);
-	uint8_t spectrum_rom_r(offs_t offset);
+	virtual uint8_t spectrum_rom_r(offs_t offset);
 	uint8_t spectrum_data_r(offs_t offset);
 	void spectrum_data_w(offs_t offset, uint8_t data);
 	virtual bool is_contended(offs_t offset);

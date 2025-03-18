@@ -187,12 +187,20 @@ public:
 		, m_palette(*this, "palette")
 		, m_screen(*this, "screen")
 		, m_k054321(*this, "k054321")
+		, m_system(*this, "SYSTEM")
+		, m_p1(*this, "P1")
+		, m_p2(*this, "P2")
+		, m_eeprom(*this, "EEPROM")
 	{
 	}
 
 	void xexex(machine_config &config);
 
-	void init_xexex();
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+	virtual void device_post_load() override { parse_control2(); }
 
 private:
 	/* memory pointers */
@@ -209,8 +217,7 @@ private:
 	int        m_cur_alpha = 0;
 
 	/* misc */
-	uint16_t     m_cur_control2 = 0;
-	int32_t      m_strip_0x1a = 0;
+	uint16_t   m_cur_control2 = 0;
 	int        m_suspension_active = 0;
 	int        m_resume_trigger = 0;
 	emu_timer  *m_dmadelay_timer = nullptr;
@@ -231,6 +238,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 	required_device<k054321_device> m_k054321;
+	required_ioport m_system, m_p1, m_p2, m_eeprom;
 
 	uint16_t spriteram_mirror_r(offs_t offset);
 	void spriteram_mirror_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -240,13 +248,9 @@ private:
 	void sound_irq_w(uint16_t data);
 	void sound_bankswitch_w(uint8_t data);
 
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update_xexex(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(dmaend_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(xexex_interrupt);
-	void xexex_postload();
 	void xexex_objdma(int limiter);
 	void parse_control2();
 	K056832_CB_MEMBER(tile_callback);
@@ -320,7 +324,7 @@ uint32_t xexex_state::screen_update_xexex(screen_device &screen, bitmap_rgb32 &b
 		if (m_layer_colorbase[plane] != new_colorbase)
 		{
 			m_layer_colorbase[plane] = new_colorbase;
-			m_k056832->mark_plane_dirty( plane);
+			m_k056832->mark_plane_dirty(plane);
 		}
 	}
 
@@ -356,7 +360,7 @@ uint32_t xexex_state::screen_update_xexex(screen_device &screen, bitmap_rgb32 &b
 		}
 	}
 
-	m_k053246->k053247_sprites_draw( bitmap, cliprect);
+	m_k053246->k053247_sprites_draw(bitmap, cliprect);
 
 	if (m_cur_alpha)
 	{
@@ -402,7 +406,7 @@ void xexex_state::k053247_scattered_word_w(offs_t offset, uint16_t data, uint16_
 #endif
 
 
-void xexex_state::xexex_objdma( int limiter )
+void xexex_state::xexex_objdma(int limiter)
 {
 	int counter, num_inactive;
 	uint16_t *src, *dst;
@@ -412,7 +416,7 @@ void xexex_state::xexex_objdma( int limiter )
 	if (limiter && counter == m_frame)
 		return; // make sure we only do DMA transfer once per frame
 
-	m_k053246->k053247_get_ram( &dst);
+	m_k053246->k053247_get_ram(&dst);
 	counter = m_k053246->k053247_get_dy();
 	src = m_spriteram;
 	num_inactive = counter = 256;
@@ -457,7 +461,7 @@ uint16_t xexex_state::xexex_waitskip_r()
 }
 
 
-void xexex_state::parse_control2(  )
+void xexex_state::parse_control2()
 {
 	/* bit 0  is data */
 	/* bit 1  is cs (active low) */
@@ -468,7 +472,7 @@ void xexex_state::parse_control2(  )
 	ioport("EEPROMOUT")->write(m_cur_control2, 0xff);
 
 	/* bit 8 = enable sprite ROM reading */
-	m_k053246->k053246_set_objcha_line( (m_cur_control2 & 0x0100) ? ASSERT_LINE : CLEAR_LINE);
+	m_k053246->k053246_set_objcha_line((m_cur_control2 & 0x0100) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* bit 9 = disable alpha channel on K054157 plane 0 (under investigation) */
 	m_cur_alpha = !(m_cur_control2 & 0x200);
@@ -531,15 +535,15 @@ TIMER_DEVICE_CALLBACK_MEMBER(xexex_state::xexex_interrupt)
 		machine().scheduler().trigger(m_resume_trigger);
 	}
 
-	if(scanline == 0)
+	if (scanline == 0)
 	{
 		// IRQ 6 is for test mode only
-			if (m_cur_control2 & 0x0020)
-				m_maincpu->set_input_line(6, HOLD_LINE);
+		if (m_cur_control2 & 0x0020)
+			m_maincpu->set_input_line(6, HOLD_LINE);
 	}
 
 	/* TODO: vblank is at 256! (enable CCU then have fun in fixing offsetted layers) */
-	if(scanline == 128)
+	if (scanline == 128)
 	{
 		if (m_k053246->k053246_is_irq_enabled())
 		{
@@ -580,10 +584,10 @@ void xexex_state::main_map(address_map &map)
 	map(0x0d4000, 0x0d4001).w(FUNC(xexex_state::sound_irq_w));
 	map(0x0d6000, 0x0d601f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0x00ff);
 	map(0x0d8000, 0x0d8007).w(m_k056832, FUNC(k056832_device::b_word_w));                // VSCCS regs
-	map(0x0da000, 0x0da001).portr("P1");
-	map(0x0da002, 0x0da003).portr("P2");
-	map(0x0dc000, 0x0dc001).portr("SYSTEM");
-	map(0x0dc002, 0x0dc003).portr("EEPROM");
+	map(0x0da000, 0x0da001).portr(m_p1);
+	map(0x0da002, 0x0da003).portr(m_p2);
+	map(0x0dc000, 0x0dc001).portr(m_system);
+	map(0x0dc002, 0x0dc003).portr(m_eeprom);
 	map(0x0de000, 0x0de001).rw(FUNC(xexex_state::control2_r), FUNC(xexex_state::control2_w));
 	map(0x100000, 0x17ffff).rom();
 	map(0x180000, 0x181fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
@@ -634,24 +638,19 @@ static INPUT_PORTS_START( xexex )
 	KONAMI16_LSB(2, IPT_UNKNOWN, IPT_START2 )
 
 	PORT_START("EEPROM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::do_read))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::ready_read))
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, di_write)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, cs_write)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, clk_write)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::di_write))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::cs_write))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::clk_write))
 INPUT_PORTS_END
 
 
-
-void xexex_state::xexex_postload()
-{
-	parse_control2();
-}
 
 void xexex_state::machine_start()
 {
@@ -667,16 +666,13 @@ void xexex_state::machine_start()
 	save_item(NAME(m_frame));
 
 	save_item(NAME(m_cur_control2));
-	machine().save().register_postload(save_prepost_delegate(FUNC(xexex_state::xexex_postload), this));
 
 	m_dmadelay_timer = timer_alloc(FUNC(xexex_state::dmaend_callback), this);
 }
 
 void xexex_state::machine_reset()
 {
-	int i;
-
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		m_layerpri[i] = 0;
 		m_layer_colorbase[i] = 0;
@@ -887,22 +883,9 @@ ROM_START( xexexj ) /* Japan, Version AA */
 ROM_END
 
 
-void xexex_state::init_xexex()
-{
-	m_strip_0x1a = 0;
-
-	if (!strcmp(machine().system().name, "xexex"))
-	{
-		// Invulnerability
-//      *(uint16_t *)(memregion("maincpu")->base() + 0x648d4) = 0x4a79;
-//      *(uint16_t *)(memregion("maincpu")->base() + 0x00008) = 0x5500;
-		m_strip_0x1a = 1;
-	}
-}
-
 } // anonymous namespace
 
-GAME( 1991, xexex,  0,     xexex, xexex, xexex_state, init_xexex, ROT0, "Konami", "Xexex (ver EAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, orius,  xexex, xexex, xexex, xexex_state, init_xexex, ROT0, "Konami", "Orius (ver UAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, xexexa, xexex, xexex, xexex, xexex_state, init_xexex, ROT0, "Konami", "Xexex (ver AAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, xexexj, xexex, xexex, xexex, xexex_state, init_xexex, ROT0, "Konami", "Xexex (ver JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, xexex,  0,     xexex, xexex, xexex_state, empty_init, ROT0, "Konami", "Xexex (ver EAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, orius,  xexex, xexex, xexex, xexex_state, empty_init, ROT0, "Konami", "Orius (ver UAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, xexexa, xexex, xexex, xexex, xexex_state, empty_init, ROT0, "Konami", "Xexex (ver AAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, xexexj, xexex, xexex, xexex, xexex_state, empty_init, ROT0, "Konami", "Xexex (ver JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

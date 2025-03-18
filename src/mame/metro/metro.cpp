@@ -1156,7 +1156,7 @@ void vmetal_state::main_map(address_map &map)
 	PORT_BIT(  0x0010, IP_ACTIVE_LOW,  IPT_START1   ) \
 	PORT_BIT(  0x0020, IP_ACTIVE_LOW,  IPT_START2   ) \
 	PORT_BIT(  0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN  ) \
-	PORT_BIT(  0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_READ_LINE_MEMBER(metro_upd7810_state, custom_soundstatus_r)   /* From Sound CPU */
+	PORT_BIT(  0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_READ_LINE_MEMBER(FUNC(metro_upd7810_state::custom_soundstatus_r))   /* From Sound CPU */
 
 
 #define COINAGE_SERVICE_LOC(DIPBANK) \
@@ -1734,7 +1734,7 @@ static INPUT_PORTS_START( daitorid )
 	PORT_INCLUDE( daitoa )
 
 	PORT_MODIFY("IN0") // $c00000
-	PORT_BIT(  0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_READ_LINE_MEMBER(metro_upd7810_state, custom_soundstatus_r)   // From Sound CPU
+	PORT_BIT(  0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_READ_LINE_MEMBER(FUNC(metro_upd7810_state::custom_soundstatus_r))   // From Sound CPU
 INPUT_PORTS_END
 
 
@@ -3526,7 +3526,7 @@ void metro_state::puzzlet(machine_config &config)
 	maincpu.write_portb().set(FUNC(metro_state::puzzlet_portb_w));
 
 	// Coins/service
-	z8_device &coinmcu(Z86E02(config, "coinmcu", 20_MHz_XTAL/5)); // clock divider guessed
+	z8_device &coinmcu(Z86E02(config, "coinmcu", 20_MHz_XTAL / 3));
 	coinmcu.p0_in_cb().set_ioport("COIN");
 	coinmcu.p2_in_cb().set_ioport("START");
 	coinmcu.p2_out_cb().set(maincpu, FUNC(h83007_device::sci_rx_w<1>)).bit(6);
@@ -3545,8 +3545,8 @@ void metro_state::puzzlet(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	OKIM6295(config, m_oki, 20_MHz_XTAL/5, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.50);
-	YM2413(config, m_ymsnd, 20_MHz_XTAL/5).add_route(0, "mono", 0.90);
+	OKIM6295(config, m_oki, 4_MHz_XTAL, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.50);
+	YM2413(config, m_ymsnd, 3.58_MHz_XTAL).add_route(0, "mono", 0.90);
 }
 
 
@@ -4920,14 +4920,14 @@ VG2200-(B)
 |--------------------------------------------|
 Notes:
       H8/3007   - Hitachi HD6413007F20 CPU. Clock 20MHz
-      M6295     - Clock 4MHz [20/5]. Pin7 LOW
+      M6295     - Clock 4MHz resonator. Pin7 LOW
       I4300     - Imagetek I4300 Graphics Generator IC
       VSync     - 58Hz
       HSync     - 15.26kHz
-      Z86E02    - DIP18 surface scratched, decapping reveals Zilog Z8 MCU
+      Z86E02    - DIP18 surface scratched, decapping reveals Zilog Z8 MCU. Clock input 6.666666MHz [20/3]
       HM6216255 - Hitachi 4M high speed SRAM (256-kword x16-bit)
       CY7C199   - 32k x8 SRAM
-      YM2413B   - Clock 4MHz [20/5]
+      YM2413B   - Clock 3.58MHz resonator
       MM1035    - System Reset IC with Watchdog Timer
       TD62307   - 7 Channel Low Saturation Driver
       TD62064   - 4 Channel High Current Darlington Driver
@@ -5320,6 +5320,24 @@ ROM_START( toride2j )
 	ROM_LOAD( "tr2_ja_7.3g", 0x000000, 0x020000, CRC(6ee32315) SHA1(ef4d59576929deab0aa459a67be21d97c2803dea) )
 ROM_END
 
+ROM_START( toride2ji )
+	ROM_REGION( 0x080000, "maincpu", 0 )        // 68000 Code
+	ROM_LOAD16_BYTE( "tr2_ji-5.20e", 0x000000, 0x040000, CRC(15906855) SHA1(ac905ed62a0a3cd951146224acc4dab75d730237) )
+	ROM_LOAD16_BYTE( "tr2_ji-6.20c", 0x000001, 0x040000, CRC(e71e291e) SHA1(5ac5043208237d2b1ee45d34e5ad74ba2f821cd3) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )       // NEC78C10 Code
+	ROM_LOAD( "tr2_jb-8.3i", 0x000000, 0x020000, CRC(0168f46f) SHA1(01bf4cc425d72936897c3c572f6c0b1366fe4041) )
+
+	ROM_REGION( 0x200000, "vdp2", 0 )   // Gfx + Data (Addressable by CPU & Blitter)
+	ROM_LOAD64_WORD( "tr2_jb-2.14i", 0x000000, 0x080000, CRC(b31754dc) SHA1(be2423bafbf07c93c3d222e907190b44616014f0) )
+	ROM_LOAD64_WORD( "tr2_jb-4.18i", 0x000002, 0x080000, CRC(a855c3fa) SHA1(eca3e235256df7e6ae66ecbe43bc0edb974af503) )
+	ROM_LOAD64_WORD( "tr2_jb-1.12i", 0x000004, 0x080000, CRC(856f40b7) SHA1(99aca5472b991cd08e9c2128ffdd40675a3b968d) )
+	ROM_LOAD64_WORD( "tr2_jb-3.16i", 0x000006, 0x080000, CRC(78ba205f) SHA1(1069a362e60747aaa284c0d9bb7718013df347f3) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) // Samples
+	ROM_LOAD( "tr2_ja_7.3g", 0x000000, 0x020000, CRC(6ee32315) SHA1(ef4d59576929deab0aa459a67be21d97c2803dea) )
+ROM_END
+
 /***************************************************************************
 
 Varia Metal
@@ -5488,7 +5506,8 @@ GAME( 1994, dharmak,   dharma,   dharma,    dharma,     metro_upd7810_state, ini
 GAME( 1994, toride2g,  0,        toride2g,  toride2g,   metro_upd7810_state, empty_init,    ROT0,   "Metro",                                           "Toride II Adauchi Gaiden", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1994, toride2gg, toride2g, toride2g,  toride2g,   metro_upd7810_state, empty_init,    ROT0,   "Metro",                                           "Toride II Adauchi Gaiden (German)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1994, toride2gk, toride2g, toride2g,  toride2g,   metro_upd7810_state, empty_init,    ROT0,   "Metro",                                           "Toride II Bok Su Oi Jeon Adauchi Gaiden (Korea)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, toride2j,  toride2g, toride2g,  toride2g,   metro_upd7810_state, empty_init,    ROT0,   "Metro",                                           "Toride II (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, toride2j,  toride2g, toride2g,  toride2g,   metro_upd7810_state, empty_init,    ROT0,   "Metro",                                           "Toride II (Japan, revision K)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, toride2ji, toride2g, toride2g,  toride2g,   metro_upd7810_state, empty_init,    ROT0,   "Metro",                                           "Toride II (Japan, revision I)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1994, gunmast,   0,        pururun,   gunmast,    metro_upd7810_state, empty_init,    ROT0,   "Metro",                                           "Gun Master", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, daitorid,  0,        daitorid,  daitorid,   metro_upd7810_state, empty_init,    ROT0,   "Metro",                                           "Daitoride", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1995, pururun,   0,        pururun,   pururun,    metro_upd7810_state, empty_init,    ROT0,   "Metro / Banpresto",                               "Pururun (set 1)", MACHINE_SUPPORTS_SAVE )

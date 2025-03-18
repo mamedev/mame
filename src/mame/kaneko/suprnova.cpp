@@ -554,12 +554,12 @@ static INPUT_PORTS_START( skns )        /* 3 buttons, 2 players */
 	PORT_DIPNAME( 0x00000080, 0x00000080, "Freeze" )
 	PORT_DIPSETTING(          0x00000000, "Freezes the game")
 	PORT_DIPSETTING(          0x00000080, "Right value")
-	PORT_BIT( 0x0000ff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(skns_state, paddle_r<2>) // Paddle C
-	PORT_BIT( 0x00ff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(skns_state, paddle_r<1>) // Paddle B
-	PORT_BIT( 0xff000000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(skns_state, paddle_r<0>) // Paddle A
+	PORT_BIT( 0x0000ff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(skns_state::paddle_r<2>)) // Paddle C
+	PORT_BIT( 0x00ff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(skns_state::paddle_r<1>)) // Paddle B
+	PORT_BIT( 0xff000000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(skns_state::paddle_r<0>)) // Paddle A
 
 	PORT_START("40000c")
-	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(skns_state, paddle_r<3>) // Paddle D
+	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(skns_state::paddle_r<3>)) // Paddle D
 	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("Paddle.A")

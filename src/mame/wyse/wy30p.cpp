@@ -162,4 +162,4 @@ void wy30p_state::driver_start()
 } // anonymous namespace
 
 
-COMP(1992, wy30p, 0, 0, wy30p, wy30p, wy30p_state, empty_init, "Wyse Technology", "WY-30+ (v1.8)", MACHINE_IS_SKELETON)
+COMP(1992, wy30p, 0, 0, wy30p, wy30p, wy30p_state, empty_init, "Wyse Technology", "WY-30+ (v1.8)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

@@ -29,7 +29,6 @@ TODO:
 - ISA memory slots
 - fully untied from Spectrum parent
 - better rendering (currently not fully discovered) in Game Configuration
-- ? detect loading Configuration by checksum, not by presents in fastram
 
 *******************************************************************************************/
 
@@ -50,6 +49,7 @@ TODO:
 #include "bus/spectrum/zxbus.h"
 #include "cpu/z80/z84c015.h"
 #include "machine/ds128x.h"
+#include "machine/input_merger.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 
@@ -81,6 +81,7 @@ public:
 		: spectrum_128_state(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_isa(*this, "isa%u", 0U)
+		, m_irqs(*this, "irqs")
 		, m_rtc(*this, "rtc")
 		, m_ata(*this, "ata%u", 1U)
 		, m_beta(*this, BETA_DISK_TAG)
@@ -115,6 +116,9 @@ protected:
 	void map_mem(address_map &map) ATTR_COLD;
 	void map_fetch(address_map &map) ATTR_COLD;
 	u8 m1_r(offs_t offset);
+	void cio_dtrb_w(int state);
+	u8 joy_ctrl_r(int num);
+	void pio_b_w(int state);
 
 	void init_taps();
 
@@ -205,6 +209,7 @@ private:
 	u8 kbd_fe_r(offs_t offset);
 	void on_kbd_data(int state);
 
+	required_device<input_merger_device> m_irqs;
 	required_device<ds12885_device> m_rtc;
 	required_device_array<ata_interface_device, 2> m_ata;
 	required_device<beta_disk_device> m_beta;
@@ -237,12 +242,16 @@ private:
 	offs_t  m_z80_addr;
 	u8      m_z80_data;
 	bool    m_deferring;
-	bool	m_skip_write;
+	bool    m_skip_write;
 	std::list<std::pair<u16, u16>> m_ints;
+	u8      m_joy1_ctrl;
+	u8      m_joy2_ctrl;
 
 	u8 m_conf;
 	bool m_conf_loading;
 	bool m_starting;
+	u16 m_bitstream_count;
+	u32 m_bitstream_hash;
 	bool m_dos; // 0-on, 1-off
 	bool m_cash_on;
 
@@ -289,7 +298,6 @@ private:
 	bool m_cbl_wae;
 	emu_timer *m_cbl_timer = nullptr;
 	emu_timer *m_acc_timer = nullptr;
-	bool m_hold_irq;
 };
 
 void sprinter_state::update_memory()
@@ -418,7 +426,7 @@ void sprinter_state::draw_tile(u8* mode, bitmap_ind16 &bitmap, const rectangle &
 	{
 		for (auto dx = cliprect.left(); dx <= cliprect.right(); dx++)
 		{
-			const u8 color = m_vram[(y + (((dy - m_hold.second) & 7) >> lowres)) * 1024 + x + (((dx - m_hold.first) & 15) >> (1 + lowres))];
+			const u8 color = m_vram[(y + (((dy - m_hold.second) & 7) >> (lowres ? 1 : 0))) * 1024 + x + (((dx - m_hold.first) & 15) >> (1 + lowres))];
 			*pix++ = pal + (BIT(mode[0], 5) ? color : (((dx - m_hold.first) & 1) ? (color & 0x0f) : (color >> 4)));
 		}
 		pix += SPRINT_WIDTH - cliprect.width();
@@ -578,7 +586,7 @@ u8 sprinter_state::dcp_r(offs_t offset)
 		data = m_beta->data_r();
 		break;
 	case 0x15:
-		data = m_beta->state_r() & m_io_joy1->read();
+		data = m_beta->state_r() & joy_ctrl_r(1);
 		break;
 
 	case 0x1c:
@@ -710,9 +718,13 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 
 	case 0x1b:
 		if (data & 0x80)
-			; // RESET
+		{
+			// RESET
+		}
 		if (data & 0x40)
-			; // AEN
+		{
+			// AEN
+		}
 		m_isa_addr_ext = data & 0x3f;
 		break;
 
@@ -748,13 +760,9 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 		update_video(dcpp & 1);
 		break;
 	case 0x2e:
-		if (m_conf)
-			machine().schedule_hard_reset();
-		else
-		{
-			m_conf_loading = 1;
-			machine().schedule_soft_reset();
-		}
+		m_conf = 0;
+		m_conf_loading = 1;
+		machine().schedule_soft_reset();
 		break;
 
 	case 0x88:
@@ -774,7 +782,16 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 		m_cbl_wa = 0;
 		m_cbl_wae = cbl_mode16();
 		const u8 divs[16] = {13, 9, 0, 0, 0, 0, 0, 0, 27, 19, 13, 9, 6, 4, 3, 1};
-		const attotime rate = (cbl_mode() && divs[m_cbl_xx & 15]) ? attotime::from_ticks(divs[m_cbl_xx & 15] + 1, X_SP / 192) : attotime::never;
+		attotime rate;
+		if (cbl_mode() && divs[m_cbl_xx & 15])
+		{
+			rate = attotime::from_ticks(divs[m_cbl_xx & 15] + 1, X_SP / 192);
+		}
+		else
+		{
+			rate = attotime::never;
+			m_irqs->in_clear<2>();
+		}
 		m_cbl_timer->adjust(rate, 0, rate);
 		break;
 	}
@@ -919,7 +936,7 @@ void sprinter_state::accel_control_r(u8 data)
 
 TIMER_CALLBACK_MEMBER(sprinter_state::acc_tick)
 {
-	const bool is_block_op = BIT(m_acc_dir, 2);
+	bool is_block_op = BIT(m_acc_dir, 2);
 	if (m_access_state == ACCEL_GO)
 	{
 		m_acc_cnt = m_rgacc;
@@ -929,7 +946,14 @@ TIMER_CALLBACK_MEMBER(sprinter_state::acc_tick)
 	const bool is_read = param & 1;
 	if (is_block_op)
 	{
-		do_accel_block(is_read);
+		if (m_pages[BIT(m_z80_addr, 14, 2)] & BANK_RAM_MASK)
+		{
+			do_accel_block(is_read);
+		}
+		else
+		{
+			is_block_op = false;
+		}
 	}
 	if (BIT(m_acc_dir, 3))
 	{
@@ -1098,15 +1122,23 @@ u8 sprinter_state::bootstrap_r(offs_t offset)
 
 void sprinter_state::bootstrap_w(offs_t offset, u8 data)
 {
-	if (m_conf_loading)
+	if (!m_conf_loading)
 	{
-		m_conf_loading = 0;
-		m_conf = !(m_maincpu->csbr_r() & 0x0f); // cs0 disabled => loader reads config from fastram (which is Game Config)
-		m_ram_pages[0x2e] = m_conf ? 0x41 : 0x00;
-		machine().schedule_soft_reset();
+		m_program.write_byte(0x10000 | u16(offset), data);
 	}
 	else
-		m_program.write_byte(0x10000 | u16(offset), data);
+	{
+		m_fastram[offset & 0xffff] = data;
+		m_bitstream_hash += data << (8 * (m_bitstream_count % 4));
+		if (++m_bitstream_count > 0xfff)
+		{
+			m_conf_loading = 0;
+			m_conf = !(m_maincpu->csbr_r() & 0x0f); // cs0 disabled => loader reads config from fastram
+			m_conf &= m_bitstream_hash == 0x3861cfa4; // Game Config
+			m_ram_pages[0x2e] = m_conf ? 0x41 : 0x00;
+			machine().schedule_soft_reset();
+		}
+	}
 }
 
 u8 sprinter_state::ram_r(offs_t offset)
@@ -1253,6 +1285,52 @@ u8 sprinter_state::m1_r(offs_t offset)
 	return data;
 }
 
+void sprinter_state::cio_dtrb_w(int state)
+{
+	if ((state ^ m_joy1_ctrl) & 1)
+	{
+		++m_joy1_ctrl;
+	}
+}
+
+void sprinter_state::pio_b_w(int state)
+{
+	if (((m_maincpu->pb_r() >> 7) ^ m_joy2_ctrl) & 1)
+	{
+		++m_joy2_ctrl;
+	}
+}
+
+u8 sprinter_state::joy_ctrl_r(int num)
+{
+	const bool is_joy2 = num == 2;
+	u16 joy_data = is_joy2 ? m_io_joy2->read() : m_io_joy1->read();
+	switch (is_joy2 ? m_joy2_ctrl : m_joy1_ctrl)
+	{
+		case 0b001:
+			joy_data = (joy_data >> 6) | 0x03;
+			break;
+		case 0b101:
+			joy_data = (joy_data >> 6) | 0x0f;
+			break;
+		case 0b110:
+			joy_data = joy_data >> 12;
+			break;
+		case 0b111:
+			joy_data = (joy_data >> 6) & 0x30;
+			break;
+		default:
+			break;
+	}
+
+	joy_data |= 0xc0;
+	if (is_joy2)
+	{
+		joy_data ^= 0xff;
+	}
+	return joy_data;
+}
+
 void sprinter_state::map_fetch(address_map &map)
 {
 	// Overlap with previous because we want real addresses on the 3e00-3fff range
@@ -1335,8 +1413,12 @@ void sprinter_state::machine_start()
 	save_item(NAME(m_z80_data));
 	save_item(NAME(m_deferring));
 	save_item(NAME(m_skip_write));
+	save_item(NAME(m_joy1_ctrl));
+	save_item(NAME(m_joy2_ctrl));
 	save_item(NAME(m_conf));
 	save_item(NAME(m_conf_loading));
+	save_item(NAME(m_bitstream_count));
+	save_item(NAME(m_bitstream_hash));
 	save_item(NAME(m_starting));
 	save_item(NAME(m_dos));
 	save_item(NAME(m_cash_on));
@@ -1376,7 +1458,6 @@ void sprinter_state::machine_start()
 	save_item(NAME(m_cbl_cnt));
 	save_item(NAME(m_cbl_wa));
 	save_item(NAME(m_cbl_wae));
-	save_item(NAME(m_hold_irq));
 
 	m_beta->enable();
 
@@ -1427,6 +1508,7 @@ void sprinter_state::machine_reset()
 	m_rom_rg = 0x00;
 	m_cash_on = 0;
 	m_isa_addr_ext = 0;
+	m_joy1_ctrl = m_joy2_ctrl = 0;
 
 	m_access_state = ACCEL_OFF;
 	m_prf_d = false;
@@ -1435,7 +1517,6 @@ void sprinter_state::machine_reset()
 
 	m_cbl_xx = 0;
 	m_cbl_wa = 0;
-	m_hold_irq = 0;
 
 	m_ata_selected = 0;
 
@@ -1445,6 +1526,8 @@ void sprinter_state::machine_reset()
 
 	if (m_conf_loading)
 	{
+		m_bitstream_count = 0;
+		m_bitstream_hash = 0;
 		m_bank_rom[0]->set_entry(0x0c);
 		m_bank_view0.select(1);
 		m_bank_view3.disable();
@@ -1512,8 +1595,8 @@ void sprinter_state::video_start()
 static void sprinter_ata_devices(device_slot_interface &device)
 {
 	device.option_add("hdd", IDE_HARDDISK);
-	device.option_add("cdrom", ATAPI_FIXED_CDROM); // TODO must be ATAPI_CDROM
-	device.option_add("dvdrom", ATAPI_FIXED_DVDROM);
+	device.option_add("cdrom", ATAPI_CDROM);
+	device.option_add("dvdrom", ATAPI_DVDROM);
 }
 
 u8 sprinter_state::kbd_fe_r(offs_t offset)
@@ -1560,7 +1643,10 @@ void sprinter_state::on_kbd_data(int state)
 		m_kbd_data_cnt++;
 		m_kbd_data_cnt %= 11;
 		if (!m_kbd_data_cnt)
-			irq_on(0);
+		{
+			m_irqs->in_set<1>();
+			m_irq_off_timer->adjust(attotime::from_ticks(32, m_maincpu->unscaled_clock()));
+		}
 	}
 }
 
@@ -1576,19 +1662,17 @@ void sprinter_state::do_mem_wait(u8 cpu_taken = 0)
 
 TIMER_CALLBACK_MEMBER(sprinter_state::irq_on)
 {
-	if (!m_hold_irq)
-	{
-		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
-		m_irq_off_timer->adjust(attotime::from_ticks(32, m_maincpu->unscaled_clock()));
-	}
+	m_irqs->in_set<0>();
+	m_irq_off_timer->adjust(attotime::from_ticks(32, m_maincpu->unscaled_clock()));
+
+	m_joy1_ctrl = m_joy2_ctrl = 0;
 	update_int(false);
 }
 
 TIMER_CALLBACK_MEMBER(sprinter_state::irq_off)
 {
-	m_irq_off_timer->reset(); // in case it's called from INT Ack, not by timer itself
-	m_hold_irq = 0;
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+	m_irqs->in_clear<0>(); // screen
+	m_irqs->in_clear<1>(); // keyboard
 }
 
 TIMER_CALLBACK_MEMBER(sprinter_state::cbl_tick)
@@ -1605,9 +1689,8 @@ TIMER_CALLBACK_MEMBER(sprinter_state::cbl_tick)
 
 	if (cbl_int_ena() && !(m_cbl_cnt & 0x7f))
 	{
-		m_hold_irq = 1;
-		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
-		m_irq_off_timer->reset();
+		m_cbl_wa = m_cbl_cnt ^ 0x80;
+		m_irqs->in_set<2>();
 	}
 }
 
@@ -1623,7 +1706,7 @@ INPUT_PORTS_START( sprinter )
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CAPS SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)  PORT_CHAR(UCHAR_SHIFT_1) PORT_CHAR(UCHAR_SHIFT_2)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("z    Z    :      LN       BEEP   COPY") PORT_CODE(KEYCODE_Z)      PORT_CHAR('z') PORT_CHAR('Z') PORT_CHAR(':')
 																	 PORT_CODE(KEYCODE_BACKSLASH)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"x    X    £      EXP      INK    CLEAR") PORT_CODE(KEYCODE_X)   PORT_CHAR('x') PORT_CHAR('X') PORT_CHAR(U'£')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("x    X    $      EXP      INK    CLEAR") PORT_CODE(KEYCODE_X)     PORT_CHAR('x') PORT_CHAR('X') PORT_CHAR('$')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("c    C    ?      LPRINT   PAPER  CONT") PORT_CODE(KEYCODE_C)      PORT_CHAR('c') PORT_CHAR('C') PORT_CHAR('?')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("v    V    /      LLIST    FLASH  CLS") PORT_CODE(KEYCODE_V)       PORT_CHAR('v') PORT_CHAR('V') PORT_CHAR('/')
 																	 PORT_CODE(KEYCODE_SLASH) PORT_CODE(KEYCODE_SLASH_PAD)
@@ -1739,10 +1822,10 @@ INPUT_PORTS_START( sprinter )
 
 
 	PORT_START("mouse_input1")
-	PORT_BIT(0xff, 0, IPT_MOUSE_X) PORT_SENSITIVITY(30)
+	PORT_BIT(0xff, 0, IPT_MOUSE_X) PORT_SENSITIVITY(60)
 
 	PORT_START("mouse_input2")
-	PORT_BIT(0xff, 0, IPT_MOUSE_Y) PORT_INVERT PORT_SENSITIVITY(30)
+	PORT_BIT(0xff, 0, IPT_MOUSE_Y) PORT_INVERT PORT_SENSITIVITY(60)
 
 	PORT_START("mouse_input3")
 	PORT_BIT(0xf8, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -1751,16 +1834,42 @@ INPUT_PORTS_START( sprinter )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON6) PORT_NAME("Middle mouse button") PORT_CODE(MOUSECODE_BUTTON3)
 
 	PORT_START("JOY1")
-	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_8WAY PORT_PLAYER(1) PORT_CODE(JOYCODE_X_RIGHT_SWITCH)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT)  PORT_8WAY PORT_PLAYER(1) PORT_CODE(JOYCODE_X_LEFT_SWITCH)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN)  PORT_8WAY PORT_PLAYER(1) PORT_CODE(JOYCODE_Y_DOWN_SWITCH)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP)    PORT_8WAY PORT_PLAYER(1) PORT_CODE(JOYCODE_Y_UP_SWITCH)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON1)        PORT_PLAYER(1) PORT_CODE(JOYCODE_BUTTON1)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_BUTTON2)        PORT_PLAYER(1) PORT_CODE(JOYCODE_BUTTON2)
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_PLAYER(1) PORT_CODE(JOYCODE_HAT1RIGHT) PORT_CODE(JOYCODE_X_RIGHT_SWITCH) PORT_8WAY
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT)  PORT_PLAYER(1) PORT_CODE(JOYCODE_HAT1LEFT) PORT_CODE(JOYCODE_X_LEFT_SWITCH) PORT_8WAY
+	PORT_BIT(0x0104, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN)  PORT_PLAYER(1) PORT_CODE(JOYCODE_HAT1DOWN) PORT_CODE(JOYCODE_Y_DOWN_SWITCH) PORT_8WAY
+	PORT_BIT(0x0208, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP)    PORT_PLAYER(1) PORT_CODE(JOYCODE_HAT1UP) PORT_CODE(JOYCODE_Y_UP_SWITCH) PORT_8WAY
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_BUTTON2)        PORT_PLAYER(1) PORT_CODE(JOYCODE_BUTTON2) PORT_NAME("%p B")
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_BUTTON5)        PORT_PLAYER(1) PORT_CODE(JOYCODE_BUTTON5) PORT_NAME("%p C")
+	PORT_BIT(0x00c0, IP_ACTIVE_LOW,  IPT_UNUSED)
+
+	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_BUTTON1)        PORT_PLAYER(1) PORT_CODE(JOYCODE_BUTTON1) PORT_NAME("%p A")
+	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_BUTTON8)        PORT_PLAYER(1) PORT_CODE(JOYCODE_BUTTON8) PORT_NAME("%p Start")
+
+	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_BUTTON7)        PORT_PLAYER(1) PORT_CODE(JOYCODE_BUTTON7) PORT_NAME("%p Select")
+	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_BUTTON3)        PORT_PLAYER(1) PORT_CODE(JOYCODE_BUTTON3) PORT_NAME("%p X")
+	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_BUTTON4)        PORT_PLAYER(1) PORT_CODE(JOYCODE_BUTTON4) PORT_NAME("%p Y")
+	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_BUTTON6)        PORT_PLAYER(1) PORT_CODE(JOYCODE_BUTTON6) PORT_NAME("%p Z")
+
+	PORT_START("JOY2")
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_PLAYER(2) PORT_CODE(JOYCODE_HAT1RIGHT) PORT_CODE(JOYCODE_X_RIGHT_SWITCH) PORT_8WAY
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT)  PORT_PLAYER(2) PORT_CODE(JOYCODE_HAT1LEFT) PORT_CODE(JOYCODE_X_LEFT_SWITCH) PORT_8WAY
+	PORT_BIT(0x0104, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN)  PORT_PLAYER(2) PORT_CODE(JOYCODE_HAT1DOWN) PORT_CODE(JOYCODE_Y_DOWN_SWITCH) PORT_8WAY
+	PORT_BIT(0x0208, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP)    PORT_PLAYER(2) PORT_CODE(JOYCODE_HAT1UP) PORT_CODE(JOYCODE_Y_UP_SWITCH) PORT_8WAY
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_BUTTON2)        PORT_PLAYER(2) PORT_CODE(JOYCODE_BUTTON2) PORT_NAME("%p B")
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_BUTTON5)        PORT_PLAYER(2) PORT_CODE(JOYCODE_BUTTON5) PORT_NAME("%p C")
+	PORT_BIT(0x00c0, IP_ACTIVE_LOW,  IPT_UNUSED)
+
+	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_BUTTON1)        PORT_PLAYER(2) PORT_CODE(JOYCODE_BUTTON1) PORT_NAME("%p A")
+	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_BUTTON8)        PORT_PLAYER(2) PORT_CODE(JOYCODE_BUTTON8) PORT_NAME("%p Start")
+
+	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_BUTTON7)        PORT_PLAYER(2) PORT_CODE(JOYCODE_BUTTON7) PORT_NAME("%p Select")
+	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_BUTTON3)        PORT_PLAYER(2) PORT_CODE(JOYCODE_BUTTON3) PORT_NAME("%p X")
+	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_BUTTON4)        PORT_PLAYER(2) PORT_CODE(JOYCODE_BUTTON4) PORT_NAME("%p Y")
+	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_BUTTON6)        PORT_PLAYER(2) PORT_CODE(JOYCODE_BUTTON6) PORT_NAME("%p Z")
+
 
 	PORT_START("TURBO")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("TURBO") PORT_CODE(KEYCODE_F12) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, sprinter_state, turbo_changed, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("TURBO") PORT_CODE(KEYCODE_F12) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sprinter_state::turbo_changed), 0)
 INPUT_PORTS_END
 
 void sprinter_state::sprinter(machine_config &config)
@@ -1771,13 +1880,23 @@ void sprinter_state::sprinter(machine_config &config)
 
 	m_ram->set_default_size("64M");
 
+	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+
 	Z84C015(config.replace(), m_maincpu, X_SP / 12); // 3.5MHz default
 	m_maincpu->set_m1_map(&sprinter_state::map_fetch);
 	m_maincpu->set_memory_map(&sprinter_state::map_mem);
 	m_maincpu->set_io_map(&sprinter_state::map_io);
 	m_maincpu->nomreq_cb().set_nop();
 	m_maincpu->set_irq_acknowledge_callback(NAME([](device_t &, int){ return 0xff; }));
-	m_maincpu->irqack_cb().set(FUNC(sprinter_state::irq_off));
+	m_maincpu->irqack_cb().set(m_irqs, FUNC(input_merger_any_high_device::in_clear<2>));
+	m_maincpu->irqack_cb().append(m_irqs, FUNC(input_merger_any_high_device::in_clear<1>));
+	m_maincpu->irqack_cb().append(m_irqs, FUNC(input_merger_any_high_device::in_clear<0>));
+
+	DS12885(config, m_rtc, XTAL(32'768)); // should be DS12887A
+	ATA_INTERFACE(config, m_ata[0]).options(sprinter_ata_devices, "hdd", "hdd", false);
+	ATA_INTERFACE(config, m_ata[1]).options(sprinter_ata_devices, "hdd", "hdd", false);
+
+	BETA_DISK(config, m_beta, 0);
 
 	ISA8(config, m_isa[0], X_SP / 5);
 	m_isa[0]->set_custom_spaces();
@@ -1803,6 +1922,9 @@ void sprinter_state::sprinter(machine_config &config)
 	m_maincpu->set_clk_trg<0>(X_SP / 48);
 	m_maincpu->set_clk_trg<1>(X_SP / 48);
 	m_maincpu->set_clk_trg<2>(X_SP / 48);
+	m_maincpu->out_dtrb_callback().set(FUNC(sprinter_state::cio_dtrb_w)); // joy1 ctrl
+	m_maincpu->out_pb_callback().set(FUNC(sprinter_state::pio_b_w)); // joy2 ctrl
+	m_maincpu->in_pa_callback().set([this]() { return joy_ctrl_r(2); });
 
 	rs232_port_device &m_rs232(RS232_PORT(config, "rs232", default_rs232_devices, "microsoft_mouse"));
 	m_rs232.option_add("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE);
@@ -1813,12 +1935,6 @@ void sprinter_state::sprinter(machine_config &config)
 	m_maincpu->zc_callback<0>().set(m_maincpu, FUNC(z84c015_device::rxcb_w)); // CLK_COM1
 	m_maincpu->zc_callback<0>().append(m_maincpu, FUNC(z84c015_device::txcb_w));
 	m_maincpu->zc_callback<2>().set(m_maincpu, FUNC(z84c015_device::trg3));
-
-	DS12885(config, m_rtc, XTAL(32'768)); // should be DS12887A
-	ATA_INTERFACE(config, m_ata[0]).options(sprinter_ata_devices, "hdd", "hdd", false);
-	ATA_INTERFACE(config, m_ata[1]).options(sprinter_ata_devices, "hdd", "hdd", false);
-
-	BETA_DISK(config, m_beta, 0);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

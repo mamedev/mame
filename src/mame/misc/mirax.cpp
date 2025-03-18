@@ -15,6 +15,7 @@ TODO:
 - score / credits display should stay above the sprites?
 
 ====================================================
+Current CT8052 PCB
 
 CPU: Ceramic potted module, Z80C
 Sound: AY-3-8912 (x2)
@@ -221,7 +222,7 @@ void mirax_state::mirax_palette(palette_device &palette) const
 		// blue component
 		bit0 = BIT(color_prom[i], 6);
 		bit1 = BIT(color_prom[i], 7);
-		int const b = 0x4f * bit0 + 0xa8 * bit1;
+		int const b = 0x52 * bit0 + 0xad * bit1;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -328,7 +329,7 @@ void mirax_state::sound_cmd_w(uint8_t data)
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-template<unsigned Which> 
+template<unsigned Which>
 void mirax_state::coin_counter_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(Which, state);

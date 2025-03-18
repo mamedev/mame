@@ -1,8 +1,8 @@
 // license: BSD-3-Clause
 // copyright-holders: Angelo Salese
 
-#ifndef MAME_MACHINE_SIS630_VGA_H
-#define MAME_MACHINE_SIS630_VGA_H
+#ifndef MAME_MACHINE_MEDIAGX_CS5530_VIDEO_H
+#define MAME_MACHINE_MEDIAGX_CS5530_VIDEO_H
 
 #pragma once
 
@@ -26,4 +26,4 @@ protected:
 DECLARE_DEVICE_TYPE(MEDIAGX_CS5530_VIDEO, mediagx_cs5530_video_device)
 
 
-#endif
+#endif // MAME_MACHINE_MEDIAGX_CS5530_VIDEO_H

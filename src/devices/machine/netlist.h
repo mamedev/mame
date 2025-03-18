@@ -37,13 +37,13 @@ namespace netlist {
 // MAME specific configuration
 
 #define NETLIST_LOGIC_PORT_CHANGED(_base, _tag)                                     \
-	PORT_CHANGED_MEMBER(_base ":" _tag, netlist_mame_logic_input_device, input_changed, 0)
+	PORT_CHANGED_MEMBER(_base ":" _tag, FUNC(netlist_mame_logic_input_device::input_changed), 0)
 
 #define NETLIST_INT_PORT_CHANGED(_base, _tag)                                     \
-	PORT_CHANGED_MEMBER(_base ":" _tag, netlist_mame_logic_input_device, input_changed, 0)
+	PORT_CHANGED_MEMBER(_base ":" _tag, FUNC(netlist_mame_logic_input_device::input_changed), 0)
 
 #define NETLIST_ANALOG_PORT_CHANGED(_base, _tag)                                    \
-	PORT_CHANGED_MEMBER(_base ":" _tag, netlist_mame_analog_input_device, input_changed, 0)
+	PORT_CHANGED_MEMBER(_base ":" _tag, FUNC(netlist_mame_analog_input_device::input_changed), 0)
 
 /* This macro can only be called from device member */
 

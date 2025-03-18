@@ -173,6 +173,7 @@ uint32_t bladestl_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_k007342->tilemap_draw(screen, bitmap, cliprect, 1, 1 | TILEMAP_DRAW_OPAQUE, 0);
 	m_k007342->tilemap_draw(screen, bitmap, cliprect, 0, 0 ,0);
 	m_k007342->tilemap_draw(screen, bitmap, cliprect, 0, 1 ,0);
+
 	return 0;
 }
 
@@ -446,6 +447,8 @@ void bladestl_state::bladestl(machine_config &config)
 
 	K007342(config, m_k007342, 0, "palette", gfx_bladestl_tiles);
 	m_k007342->set_tile_callback(FUNC(bladestl_state::tile_callback));
+	m_k007342->flipscreen_cb().set(m_k007420, FUNC(k007420_device::set_flipscreen));
+	m_k007342->sprite_wrap_y_cb().set(m_k007420, FUNC(k007420_device::set_wrap_y));
 
 	K007420(config, m_k007420, 0, "palette", gfx_bladestl_spr);
 	m_k007420->set_bank_limit(0x3ff);

@@ -8,9 +8,10 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_BBC_TUBE_TUBE_ZEP100_H
+#define MAME_BUS_BBC_TUBE_TUBE_ZEP100_H
 
-#ifndef MAME_BUS_BBC_TUBE_ZEP100_H
-#define MAME_BUS_BBC_TUBE_ZEP100_H
+#pragma once
 
 #include "tube.h"
 #include "cpu/z80/z80.h"
@@ -104,5 +105,4 @@ DECLARE_DEVICE_TYPE(BBC_TUBE_ZEP100L, bbc_tube_zep100l_device)
 DECLARE_DEVICE_TYPE(BBC_TUBE_ZEP100W, bbc_tube_zep100w_device)
 DECLARE_DEVICE_TYPE(BBC_TUBE_ZEP100M, bbc_tube_zep100m_device)
 
-
-#endif /* MAME_BUS_BBC_TUBE_ZEP100_H */
+#endif // MAME_BUS_BBC_TUBE_TUBE_ZEP100_H

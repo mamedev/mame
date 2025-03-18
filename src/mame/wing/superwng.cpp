@@ -223,7 +223,7 @@ void superwng_state::palette(palette_device &palette) const
 
 		bit0 = BIT(colors[i], 6);
 		bit1 = BIT(colors[i], 7);
-		int const b = 0x4f * bit0 + 0xa8 * bit1;
+		int const b = 0x52 * bit0 + 0xad * bit1;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}

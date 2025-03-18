@@ -73,19 +73,18 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 private:
-	required_address_space m_space;
-
-	u32 m_dmalist_address = 0;
-
-	TIMER_CALLBACK_MEMBER(execute_cb);
-	typedef enum {
+	enum dma_state_t : u8 {
 		COPY,
 		MIX,
 		SWAP,
 		FILL,
 		IDLE,
 		FETCH_PARAMS
-	} dma_state_t;
+	};
+
+	required_address_space m_space;
+
+	u32 m_dmalist_address = 0;
 
 	dma_state_t m_state;
 	u32 m_src, m_dst, m_length, m_command, m_modulo;
@@ -93,10 +92,15 @@ private:
 	bool m_chained_transfer;
 
 	emu_timer *m_dma_timer;
+
+	TIMER_CALLBACK_MEMBER(execute_cb);
+
 	void check_state(int next_cycles);
 	void increment_src();
 	void increment_dst();
 };
+
+ALLOW_SAVE_TYPE(dmagic_f018_device::dma_state_t)
 
 // CSG 390957-01
 DEFINE_DEVICE_TYPE(DMAGIC_F018, dmagic_f018_device, "dmagic_f018", "DMAgic F018 Gate Array")
@@ -110,7 +114,7 @@ dmagic_f018_device::dmagic_f018_device(const machine_config &mconfig, const char
 void dmagic_f018_device::device_start()
 {
 	save_item(NAME(m_dmalist_address));
-	//save_item(NAME(m_state));
+	save_item(NAME(m_state));
 
 	m_dma_timer = timer_alloc(FUNC(dmagic_f018_device::execute_cb), this);
 }

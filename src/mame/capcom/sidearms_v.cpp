@@ -23,7 +23,7 @@ void sidearms_state::colorram_w(offs_t offset, uint8_t data)
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-void sidearms_state::c804_w(uint8_t data)
+void sidearms_state::control_w(uint8_t data)
 {
 	/* bits 0 and 1 are coin counters */
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);

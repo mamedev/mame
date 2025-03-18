@@ -25,10 +25,12 @@ Others:
 */
 
 #include "emu.h"
+
+#include "cpu/h8/h83048.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-#include "cpu/h8/h83048.h"
 
 
 namespace {
@@ -38,7 +40,7 @@ class winbingo_state : public driver_device
 public:
 	winbingo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-	{}
+	{ }
 
 	void wbingo06(machine_config &config);
 
@@ -116,4 +118,4 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 2006, wbingo06, 0, wbingo06, wbingo06, winbingo_state, empty_init, ROT0, "<unknown>", "Win Bingo 2006", MACHINE_IS_SKELETON )
+GAME( 2006, wbingo06, 0, wbingo06, wbingo06, winbingo_state, empty_init, ROT0, "<unknown>", "Win Bingo 2006", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -41,7 +41,7 @@
 //**************************************************************************
 
 #define UPD7220_DISPLAY_PIXELS_MEMBER(_name) void _name(bitmap_rgb32 &bitmap, int y, int x, uint32_t address)
-#define UPD7220_DRAW_TEXT_LINE_MEMBER(_name) void _name(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd, int pitch, int lr, int cursor_on, int cursor_addr)
+#define UPD7220_DRAW_TEXT_LINE_MEMBER(_name) void _name(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd, int pitch, int lr, int cursor_on, int cursor_addr, int cursor_bot, int cursor_top)
 
 
 //**************************************************************************
@@ -57,10 +57,18 @@ class upd7220_device :  public device_t,
 {
 public:
 	using display_pixels_delegate = device_delegate<void (bitmap_rgb32 &bitmap, int y, int x, uint32_t address)>;
-	using draw_text_delegate = device_delegate<void (bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd, int pitch, int lr, int cursor_on, int cursor_addr)>;
+	using draw_text_delegate = device_delegate<void (bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd, int pitch, int lr, int cursor_on, int cursor_addr, int cursor_bot, int cursor_top)>;
 
 	// construction/destruction
 	upd7220_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	template <typename T>
+	upd7220_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&screen_tag)
+		: upd7220_device(mconfig, tag, owner, clock)
+	{
+		set_screen(std::forward<T>(screen_tag));
+	}
+
 
 	template <typename... T> void set_display_pixels(T &&... args) { m_display_cb.set(std::forward<T>(args)...); }
 	template <typename... T> void set_draw_text(T &&... args) { m_draw_text_cb.set(std::forward<T>(args)...); }
@@ -79,6 +87,8 @@ public:
 	void ext_sync_w(int state);
 	void lpen_w(int state);
 
+	std::tuple<u32, u16, u8> get_area_partition_props(int line);
+
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
@@ -92,6 +102,7 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	virtual int translate_command(uint8_t data);
+	virtual void device_clock_changed() override;
 
 	TIMER_CALLBACK_MEMBER(hsync_update);
 	TIMER_CALLBACK_MEMBER(vsync_update);

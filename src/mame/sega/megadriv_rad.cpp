@@ -524,6 +524,11 @@ ROM_START( rad_sf2uk )
 	ROM_LOAD16_WORD_SWAP( "radica_megadrive_streetfighter2_uk.bin", 0x000000, 0x400000,  CRC(868afb44) SHA1(f4339e36272c18b1d49aa4095127ed18e0961df6) )
 ROM_END
 
+ROM_START( mdtvp3j )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "playtv_vol3.bin", 0x000000, 0x400000,  CRC(d2daf376) SHA1(147b88d7aff834146c649077b43312c71b973298) )
+ROM_END
+
 ROM_START( rad_gen1 )
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "radica_megadrive_vol1_blue_usa.bin", 0x000000, 0x400000,  CRC(3b4c8438) SHA1(5ed9c053f9ebc8d4bf571d57e562cf347585d158) )
@@ -554,6 +559,11 @@ ROM_START( rad_md2uk )
 	ROM_LOAD16_WORD_SWAP( "radica_megadrive_vol2_red_uk.bin", 0x000000, 0x400000, CRC(b68fd025) SHA1(b8f9c505653d6dd2b62840f078f828360faf8abc) )
 ROM_END
 
+ROM_START( mdtvp2j )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "playtv_vol2.bin", 0x000000, 0x400000, CRC(4d887d12) SHA1(b7f70abd12c3a3c68d1ad127a1475b704e898f51) )
+ROM_END
+
 ROM_START( rad_ssoc )
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD( "radica_sensiblesoccer_uk.bin", 0x000000, 0x400000,  CRC(b8745ab3) SHA1(0ab3f26e5ffd288e5a3a5db676951b9095299eb0) ) // should be byteswapped?
@@ -576,6 +586,12 @@ ROM_START( rad_orun )
 	ROM_LOAD16_WORD_SWAP( "outrun.bin", 0x000000, 0x100000, CRC(4fd6d653) SHA1(57f0e4550ff883e4bb7857caef2c893c21f80b42) )
 ROM_END
 
+ROM_START( rad_mncr )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	// radica_menacer_byteswapped.bin = mpr-15075-f.u1        megadriv:menacer  Menacer 6-Game Cartridge (Europe, USA)
+	ROM_LOAD16_WORD_SWAP( "radica_menacer.bin", 0x000000, 0x100000, CRC(5f9ef4a4) SHA1(f28350e7325cb7469d760d97ee452a9d846eb3d4) )
+ROM_END
+
 ROM_START( msi_sf2 )
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	// The first part of the ROM seems to be a boot ROM for the enhanced MD clone menus, even if it does nothing here
@@ -590,9 +606,31 @@ ROM_START( dgunl3227 )
 	// populated in init function
 
 	ROM_REGION( 0x400000, "rom", 0 )
+	ROM_LOAD16_WORD_SWAP( "pacmantc58fvm5t2a.bin", 0x000000, 0x400000, CRC(b09fa599) SHA1(3cc50bee7ef91608848fb34185a0723d2b82b46f) )
+ROM_END
+
+ROM_START( dgunl3227a )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	// populated in init function
+
+	ROM_REGION( 0x400000, "rom", 0 )
 	ROM_LOAD16_WORD_SWAP( "myarcadepacman_s99jl032hbt1_9991227e_as_s29jl032h55tai01.bin", 0x000000, 0x400000, CRC(ecead966) SHA1(971e8da6eb720f670f4148c7e07922e4f24eb609) )
 ROM_END
 
+ROM_START( matet )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "tetrismyarcade_s29gl032n90tfi04_0001227e.bin", 0x000000, 0x400000, CRC(09b5af89) SHA1(85e506923fd803f05cc8f579f37331b608fea744) )
+	ROM_IGNORE(0x100)
+ROM_END
+
+
+ROM_START( atgame40 )
+	ROM_REGION( 0x1000000, "rom", 0 )
+	ROM_LOAD16_WORD_SWAP( "40bonusgamesin1.bin", 0x000000, 0x1000000, CRC(4eba6e83) SHA1(b8edf1b6ecb70a136b551f1454ba8afa45bd8bc1) )
+
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_COPY( "rom", 0x800000, 0, 0x400000 )
+ROM_END
 
 
 ROM_START( ra145 )
@@ -709,7 +747,6 @@ void megadriv_ra145_state::init_ra145()
 // US versions show 'Genesis' on the menu,    show a www.radicagames.com splash screen, and use NTSC versions of the ROMs, sometimes region locked
 // EU versions show 'Mega Drive' on the menu, show a www.radicagames.com splash screen, and use PAL versions of the ROMs, sometimes region locked
 // UK versions show "Mega Drive' on the menu, show a www.radicauk.com splash screen,    and use PAL versions of the ROMs, sometimes region locked
-// Japanese releases have been seen for at least one of these Radica collections (SF2), those presumably have a different ROM too (NTSC, locked to Japan?)
 
 CONS( 2004, rad_gen1,  0,        0, megadriv_radica_3button_ntsc, radica_3button_1player, megadriv_radica_state, init_megadriv, "Radica / Sega",                     "Genesis Collection Volume 1 (Radica, Arcade Legends) (USA)", 0)
 CONS( 2004, rad_md1,   rad_gen1, 0, megadriv_radica_3button_pal,  radica_3button_1player, megadriv_radica_state, init_megadrie, "Radica / Sega",                     "Mega Drive Collection Volume 1 (Radica, Arcade Legends) (Europe)", 0)
@@ -719,6 +756,7 @@ CONS( 2004, mdtvp1j,   rad_gen1, 0, megadriv_radica_3button_ntsc, radica_3button
 CONS( 2004, rad_gen2,  0,        0, megadriv_radica_3button_ntsc, radica_3button_1player, megadriv_radica_state, init_megadriv, "Radica / Sega",                     "Genesis Collection Volume 2 (Radica, Arcade Legends) (USA)", 0)
 CONS( 2004, rad_md2uk, rad_gen2, 0, megadriv_radica_3button_pal,  radica_3button_1player, megadriv_radica_state, init_megadrie, "Radica / Sega",                     "Mega Drive Collection Volume 2 (Radica, Arcade Legends) (UK)", 0)
 // is there a Europe version with Radica Games boot screen and Mega Drive text?
+CONS( 2004, mdtvp2j,   rad_gen2, 0, megadriv_radica_3button_ntsc, radica_3button_1player, megadriv_radica_state, init_megadriv, "Sega Toys",                         "Mega Drive Play TV 2 (Japan)", 0)
 
 // box calls this Volume 3
 CONS( 2004, rad_sonic,  0,        0, megadriv_radica_3button_ntsc, radica_3button_1player, megadriv_radica_state, init_megadriv, "Radica / Sega",                     "Super Sonic Gold (Radica Plug & Play) (USA)", 0)
@@ -728,6 +766,7 @@ CONS( 2004, rad_sonicuk,rad_sonic,0, megadriv_radica_3button_pal,  radica_3butto
 CONS( 2004, rad_sf2,   0,        0, megadriv_radica_6button_ntsc, radica_6button,         megadriv_radica_state, init_megadriv, "Radica / Capcom / Sega",            "Street Fighter II: Special Champion Edition [Ghouls'n Ghosts] (Radica, Arcade Legends) (USA)", 0)
 CONS( 2004, rad_sf2uk, rad_sf2,  0, megadriv_radica_6button_pal,  radica_6button,         megadriv_radica_state, init_megadrie, "Radica / Capcom / Sega",            "Street Fighter II: Special Champion Edition [Ghouls'n Ghosts] (Radica, Arcade Legends) (UK)", 0)
 // is there a Europe version with Radica Games boot screen and Mega Drive text?
+CONS( 2004, mdtvp3j,   rad_sf2,  0, megadriv_radica_6button_ntsc, radica_6button,         megadriv_radica_state, init_megadriv, "Sega Toys",                         "Mega Drive Play TV 3 (Japan)", 0) // This one does contain the Japanese ROM for SF2 (but the World release of GnG) so SF2 runs in Japanese, but GnG runs in English
 
 // still branded as Arcade Legends even if none of these were ever arcade games, European exclusive
 CONS( 2004, rad_ssoc,  0,        0, megadriv_radica_3button_pal,  radica_3button,         megadriv_radica_state, init_megadrie, "Radica / Sensible Software / Sega", "Sensible Soccer plus [Cannon Fodder, Mega lo Mania] (Radica, Arcade Legends) (UK)", 0)
@@ -735,6 +774,10 @@ CONS( 2004, rad_ssoc,  0,        0, megadriv_radica_3button_pal,  radica_3button
 
 // not region locked, no Radica logos, uncertain if other regions would differ
 CONS( 2004, rad_orun,  0,        0, megadriv_radica_3button_pal,  radica_3button_1player, megadriv_radica_state, init_megadrie, "Radica / Sega",                     "Out Run 2019 (Radica Plug & Play, UK)", 0)
+
+// this has been verified as identical to the 6-in-1 cartridge that came with the Menacer gun for the MD
+CONS( 2004, rad_mncr,  0,        0, megadriv_radica_3button_ntsc, radica_3button_1player, megadriv_radica_state, init_megadriv, "Radica / Sega",                     "Menacer (Radica Plug & Play)", MACHINE_NOT_WORKING )
+
 
 // From a European unit but NTSC? - code is hacked from original USA Genesis game with region check still intact? (does the clone hardware always identify as such? or does the bypassed boot code skip the check?)
 // TODO: move out of here eventually once the enhanced MD part is emulated rather than bypassed (it's probably the same as the 145-in-1 multigame unit, but modified to only include this single game)
@@ -748,7 +791,18 @@ CONS( 2018, msi_sf2,   0,        0, megadriv_radica_6button_ntsc, msi_6button,  
 // It is also confirmed from real hardware videos that these units do not have the usual sprite limits (so masking effect on Sonic title screen fails)
 
 // this is the only 'Pocket Player' unit to use Genesis on a Chip tech, the others are NES on a chip.
-// some versions of this unit have an additional "Add Credits with 'A' or 'B'" screen after you select Pac-Man, this version does not.
-CONS( 2018, dgunl3227, 0,        0, megadriv_dgunl_ntsc, dgunl_1player,         megadriv_dgunl_state, init_dgunl3227,    "dreamGEAR",            "My Arcade Pac-Man Pocket Player (DGUNL-3227)", 0 )
+// the parent set has updated software explaining how to insert coins in Pac-Man as well as an updated copyright string
+CONS( 2018, dgunl3227,  0,        0, megadriv_dgunl_ntsc, dgunl_1player,         megadriv_dgunl_state, init_dgunl3227,    "dreamGEAR",            "My Arcade Pac-Man Pocket Player (DGUNL-3227)", 0 )
+CONS( 2018, dgunl3227a, dgunl3227,0, megadriv_dgunl_ntsc, dgunl_1player,         megadriv_dgunl_state, init_dgunl3227,    "dreamGEAR",            "My Arcade Pac-Man Pocket Player (DGUNL-3227, older)", 0 )
+
+CONS( 2021, matet,      0,        0, megadriv_radica_3button_ntsc,  radica_3button, megadriv_radica_state, init_megadriv, "dreamGEAR",            "My Arcade Tetris (DGUNL-7028, Pocket Player Pro)", MACHINE_NOT_WORKING)
 
 CONS( 2018, ra145,     0,        0, megadriv_ra145_ntsc, msi_6button,           megadriv_ra145_state, init_ra145,        "<unknown>",            "Retro Arcade 16 Bits Classic Edition Mini TV Game Console - 145 Classic Games - TV Arcade Plug and Play (Mega Drive bootlegs)", MACHINE_NOT_WORKING )
+
+// Technically this is a MD type cartridge, but it doesn't seem to be designed for use with a standard MD as it contains
+// nothing but the 16Mbyte ROM and a 5v to 3.3v converter yet the code clearly requires some extensive banking logic.
+// Testing it on a real MD shows nothing, not even the menu.
+//
+// We don't seem to emulate the system it's designed for, so for now just treat it as its own thing (which may become
+// the basis of a driver for that console)
+CONS( 2012, atgame40,  0,        0, megadriv_radica_3button_pal,  radica_3button, megadriv_radica_state, init_megadrie, "AtGames",               "40 Bonus Games in 1 (AtGames)", MACHINE_NOT_WORKING)

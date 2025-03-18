@@ -145,14 +145,17 @@ uint32_t aliens_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 void aliens_state::coin_counter_w(uint8_t data)
 {
 	// bits 0-1 = coin counters
-	machine().bookkeeping().coin_counter_w(0, data & 0x01);
-	machine().bookkeeping().coin_counter_w(1, data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 
 	// bit 5 = select work RAM or palette
-	m_paletteram_view.select((data & 0x20) >> 5);
+	if (BIT(data, 5))
+		m_paletteram_view.select(0);
+	else
+		m_paletteram_view.disable();
 
 	// bit 6 = enable char ROM reading through the video RAM
-	m_k052109->set_rmrd_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+	m_k052109->set_rmrd_line(BIT(data, 6) ? ASSERT_LINE : CLEAR_LINE);
 
 	// other bits unknown
 }
@@ -196,10 +199,9 @@ void aliens_state::k052109_051960_w(offs_t offset, uint8_t data)
 
 void aliens_state::main_map(address_map &map)
 {
+	map(0x0000, 0x1fff).ram();
 	map(0x0000, 0x03ff).view(m_paletteram_view);
-	m_paletteram_view[0](0x0000, 0x03ff).ram();
-	m_paletteram_view[1](0x0000, 0x03ff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
-	map(0x0400, 0x1fff).ram();
+	m_paletteram_view[0](0x0000, 0x03ff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 	map(0x2000, 0x3fff).bankr(m_rombank);
 	map(0x4000, 0x7fff).rw(FUNC(aliens_state::k052109_051960_r), FUNC(aliens_state::k052109_051960_w));
 	map(0x5f80, 0x5f80).portr("DSW3");
@@ -287,6 +289,8 @@ void aliens_state::machine_start()
 {
 	m_rombank->configure_entries(0, 24, memregion("maincpu")->base(), 0x2000);
 	m_rombank->set_entry(0);
+
+	m_paletteram_view.disable();
 }
 
 void aliens_state::aliens(machine_config &config)
@@ -391,7 +395,6 @@ ROM_START( aliens2 )
 	// second half empty
 	ROM_LOAD32_WORD( "875b08.j19", 0x100002, 0x40000, CRC(f9387966) SHA1(470ecc4a5a3edd08d5e0ab10b0c590db1968fb0a) )
 	// second half empty
-
 
 	ROM_REGION( 0x200000, "k051960", 0 )    // sprites
 	ROM_LOAD32_WORD( "875b10.k08", 0x000000, 0x80000, CRC(0b1035b1) SHA1(db04020761386e79249762cd1540208375c38c7f) )

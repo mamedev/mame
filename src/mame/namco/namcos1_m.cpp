@@ -3,6 +3,8 @@
 #include "emu.h"
 #include "namcos1.h"
 
+#include <algorithm>
+
 
 /*******************************************************************************
 *                                                                              *
@@ -12,8 +14,8 @@
 
 void namcos1_state::_3dcs_w(offs_t offset, u8 data)
 {
-	if (offset & 1) popmessage("LEFT");
-	else            popmessage("RIGHT");
+	if (BIT(offset, 0)) popmessage("LEFT");
+	else                popmessage("RIGHT");
 }
 
 
@@ -130,13 +132,13 @@ CPU #0 PC e3d4: keychip read 0003     [AND #$37 = key no.]
 */
 u8 namcos1_state::key_type1_r(offs_t offset)
 {
-//  logerror("%s: keychip read %04x\n", machine().describe_context(), offset);
+	//logerror("%s: keychip read %04x\n", machine().describe_context(), offset);
 
 	if (offset < 3)
 	{
-		int d = m_key[0];
-		int n = (m_key[1] << 8) | m_key[2];
-		int q,r;
+		const int d = m_key[0];
+		const int n = (m_key[1] << 8) | m_key[2];
+		int q, r;
 
 		if (d)
 		{
@@ -161,7 +163,7 @@ u8 namcos1_state::key_type1_r(offs_t offset)
 
 void namcos1_state::key_type1_w(offs_t offset, u8 data)
 {
-//  logerror("%s: keychip write %04x=%02x\n", machine().describe_context(), offset, data);
+	//logerror("%s: keychip write %04x=%02x\n", machine().describe_context(), offset, data);
 
 	if (offset < 4)
 		m_key[offset] = data;
@@ -313,7 +315,7 @@ CPU #0 PC e574: keychip read 0001
 
 u8 namcos1_state::key_type2_r(offs_t offset)
 {
-//  logerror("%s: keychip read %04x\n", machine().describe_context(), offset);
+	//logerror("%s: keychip read %04x\n", machine().describe_context(), offset);
 
 	m_key_numerator_high_word = 0;
 
@@ -332,7 +334,7 @@ u8 namcos1_state::key_type2_r(offs_t offset)
 
 void namcos1_state::key_type2_w(offs_t offset, u8 data)
 {
-//  logerror("%s: keychip write %04x=%02x\n", machine().describe_context(), offset, data);
+	//logerror("%s: keychip write %04x=%02x\n", machine().describe_context(), offset, data);
 
 	if (offset < 5)
 	{
@@ -340,8 +342,8 @@ void namcos1_state::key_type2_w(offs_t offset, u8 data)
 
 		if (offset == 3)
 		{
-			u32 d = (m_key[0] << 8) | m_key[1];
-			u32 n = (m_key_numerator_high_word << 16) | (m_key[2] << 8) | m_key[3];
+			const u32 d = (m_key[0] << 8) | m_key[1];
+			const u32 n = (m_key_numerator_high_word << 16) | (m_key[2] << 8) | m_key[3];
 
 			if (d)
 			{
@@ -354,7 +356,7 @@ void namcos1_state::key_type2_w(offs_t offset, u8 data)
 				m_key_reminder = 0x0000;
 			}
 
-//  logerror("calculating division: %08x / %04x = %04x, %04x\n", n, d, key_quotient, m_key_reminder);
+			//logerror("calculating division: %08x / %04x = %04x, %04x\n", n, d, key_quotient, m_key_reminder);
 
 			m_key_numerator_high_word = (m_key[2] << 8) | m_key[3];
 		}
@@ -439,7 +441,7 @@ CPU #0 PC e45a: keychip read 0030     [discarded]
 
 u8 namcos1_state::key_type3_r(offs_t offset)
 {
-//  logerror("%s: keychip read %04x\n", machine().describe_context(), offset);
+	//logerror("%s: keychip read %04x\n", machine().describe_context(), offset);
 
 	/* I need to handle blastoff's read from 0858. The game previously writes to 0858,
 	   using it as temporary storage, so maybe it expects to act as RAM, however
@@ -463,7 +465,7 @@ u8 namcos1_state::key_type3_r(offs_t offset)
 
 void namcos1_state::key_type3_w(offs_t offset, u8 data)
 {
-//  logerror("%s: keychip write %04x=%02x\n", machine().describe_context(), offset, data);
+	//logerror("%s: keychip write %04x=%02x\n", machine().describe_context(), offset, data);
 
 	m_key[(offset & 0x70) >> 4] = data;
 }
@@ -491,7 +493,8 @@ void namcos1_state::sound_bankswitch_w(u8 data)
 
 void namcos1_state::subres_w(int state)
 {
-//  logerror("reset control %s %02x\n",machine().describe_context(),data);
+	//logerror("reset control %s %02x\n",machine().describe_context(),data);
+
 	if (state != m_reset)
 	{
 		m_mcu_patch_data = 0;
@@ -524,10 +527,17 @@ void namcos1_state::machine_reset()
 	/* mcu patch data clear */
 	m_mcu_patch_data = 0;
 
-	memset(m_key, 0, sizeof(m_key));
+	std::fill(std::begin(m_key), std::end(m_key), 0);
 	m_key_quotient = 0;
 	m_key_reminder = 0;
 	m_key_numerator_high_word = 0;
+}
+
+void quester_state::machine_start()
+{
+	namcos1_state::machine_start();
+	m_strobe = 0;
+	save_item(NAME(m_strobe));
 }
 
 
@@ -584,6 +594,7 @@ void namcos1_state::mcu_bankswitch_w(u8 data)
 void namcos1_state::mcu_patch_w(u8 data)
 {
 	//logerror("mcu C000 write %s data=%02x\n",machine().describe_context(),data);
+
 	if (m_mcu_patch_data == 0xa6) return;
 	m_mcu_patch_data = data;
 	m_triram[0] = data;
@@ -599,11 +610,11 @@ void namcos1_state::mcu_patch_w(u8 data)
 void namcos1_state::driver_init()
 {
 	// bit 16 of the address is inverted for PRG7 (and bits 17,18 just not connected)
-	for (int i = 0x380000;i < 0x400000;i++)
+	for (int i = 0x380000; i < 0x400000; i++)
 	{
 		if ((i & 0x010000) == 0)
 		{
-			u8 t = m_rom[i];
+			const u8 t = m_rom[i];
 			m_rom[i] = m_rom[i + 0x010000];
 			m_rom[i + 0x010000] = t;
 		}
@@ -800,6 +811,7 @@ void namcos1_state::init_tankfrc4()
 
 	m_mcu->space(AS_PROGRAM).install_read_handler(0x1400, 0x1401, read8sm_delegate(*this, FUNC(namcos1_state::faceoff_inputs_r)));
 	save_item(NAME(m_input_count));
+	save_item(NAME(m_strobe_count));
 	save_item(NAME(m_stored_input));
 }
 
@@ -844,18 +856,19 @@ void namcos1_state::init_soukobdx()
 /*******************************************************************************
 *   Quester specific                                                           *
 *******************************************************************************/
-u8 namcos1_state::quester_paddle_r(offs_t offset)
+u8 quester_state::paddle_r(offs_t offset)
 {
 	if (offset == 0)
 	{
 		int ret;
 
-		if (!(m_strobe & 0x20))
-			ret = (m_io_control[0]->read()&0x90) | (m_strobe & 0x40) | (m_io_paddle[0]->read()&0x0f);
+		if (BIT(~m_strobe, 5))
+			ret = (m_io_control[0]->read() & 0x90) | (m_strobe & 0x40) | (m_io_paddle[0]->read() & 0x0f);
 		else
-			ret = (m_io_control[0]->read()&0x90) | (m_strobe & 0x40) | (m_io_paddle[1]->read()&0x0f);
+			ret = (m_io_control[0]->read() & 0x90) | (m_strobe & 0x40) | (m_io_paddle[1]->read() & 0x0f);
 
-		m_strobe ^= 0x40;
+		if (!machine().side_effects_disabled())
+			m_strobe ^= 0x40;
 
 		return ret;
 	}
@@ -863,23 +876,24 @@ u8 namcos1_state::quester_paddle_r(offs_t offset)
 	{
 		int ret;
 
-		if (!(m_strobe & 0x20))
-			ret = (m_io_control[1]->read()&0x90) | 0x00 | (m_io_paddle[0]->read()>>4);
+		if (BIT(~m_strobe, 5))
+			ret = (m_io_control[1]->read() & 0x90) | 0x00 | (m_io_paddle[0]->read() >> 4);
 		else
-			ret = (m_io_control[1]->read()&0x90) | 0x20 | (m_io_paddle[1]->read()>>4);
+			ret = (m_io_control[1]->read() & 0x90) | 0x20 | (m_io_paddle[1]->read() >> 4);
 
-		if (!(m_strobe & 0x40)) m_strobe ^= 0x20;
+		if (BIT(~m_strobe, 6))
+		{
+			if (!machine().side_effects_disabled())
+				m_strobe ^= 0x20;
+		}
 
 		return ret;
 	}
 }
 
-void namcos1_state::init_quester()
+void quester_state::init_quester()
 {
-	m_strobe = 0;
 	driver_init();
-	m_mcu->space(AS_PROGRAM).install_read_handler(0x1400, 0x1401, read8sm_delegate(*this, FUNC(namcos1_state::quester_paddle_r)));
-	save_item(NAME(m_strobe));
 }
 
 
@@ -894,7 +908,7 @@ u8 namcos1_state::berabohm_buttons_r(offs_t offset)
 
 	if (offset == 0)
 	{
-		int inp = m_input_count;
+		const int inp = m_input_count;
 
 		if (inp == 4) res = m_io_control[0]->read();
 		else
@@ -903,17 +917,17 @@ u8 namcos1_state::berabohm_buttons_r(offs_t offset)
 			static int counter[4];
 
 			res = m_io_in[inp]->read();   /* IN0-IN3 */
-			if (res & 0x80)
+			if (BIT(res, 7))
 			{
 				if (counter[inp] >= 0)
 					res = 0x40 | counter[inp];
 				else
 				{
-					if (res & 0x40) res = 0x40;
+					if (BIT(res, 6)) res = 0x40;
 					else res = 0x00;
 				}
 			}
-			else if (res & 0x40)
+			else if (BIT(res, 6))
 			{
 				if (counter[inp] < 0x3f)
 				{
@@ -926,9 +940,9 @@ u8 namcos1_state::berabohm_buttons_r(offs_t offset)
 				counter[inp] = -1;
 #else
 			res = m_io_in[inp]->read();   /* IN0-IN3 */
-			if (res & 1) res = 0x7f;        /* weak */
-			else if (res & 2) res = 0x48;   /* medium */
-			else if (res & 4) res = 0x40;   /* strong */
+			if (BIT(res, 0)) res = 0x7f;        /* weak */
+			else if (BIT(res, 1)) res = 0x48;   /* medium */
+			else if (BIT(res, 2)) res = 0x40;   /* strong */
 #endif
 		}
 
@@ -942,17 +956,27 @@ u8 namcos1_state::berabohm_buttons_r(offs_t offset)
 		   much time reading the inputs and won't have enough cycles to play two
 		   digital sounds at once. This value is enough to read all inputs at least
 		   once per frame */
-		if (++m_strobe_count > 4)
+		u8 strobe_count = m_strobe_count + 1;
+		u8 strobe = m_strobe;
+		u8 input_count = m_input_count;
+		if (strobe_count > 4)
 		{
-			m_strobe_count = 0;
-			m_strobe ^= 0x40;
-			if (m_strobe == 0)
-				m_input_count = (m_input_count + 1) % 5;
+			strobe_count = 0;
+			strobe ^= 0x40;
+			if (!strobe)
+				input_count = (input_count + 1) % 5;
 		}
 
 		// status bit, used to signal end of pressure sensitive button reads
-		if (m_input_count == 3) res |= 0x10;
-		res |= m_strobe;
+		if (input_count == 3) res |= 0x10;
+		res |= strobe;
+
+		if (!machine().side_effects_disabled())
+		{
+			m_strobe_count = strobe_count;
+			m_strobe = strobe;
+			m_input_count = input_count;
+		}
 
 		return res;
 	}
@@ -996,40 +1020,46 @@ u8 namcos1_state::faceoff_inputs_r(offs_t offset)
 		   much time reading the inputs and won't have enough cycles to play two
 		   digital sounds at once. This value is enough to read all inputs at least
 		   once per frame */
-		if (++m_strobe_count > 8)
+		u8 strobe_count = m_strobe_count + 1;
+		if (strobe_count > 8)
 		{
-			m_strobe_count = 0;
+			strobe_count = 0;
 
 			res |= m_input_count;
 
-			switch (m_input_count)
+			if (!machine().side_effects_disabled())
 			{
-				case 0:
-					m_stored_input[0] = m_io_in[0]->read() & 0x1f;
-					m_stored_input[1] = (m_io_in[3]->read() & 0x07) << 3;
-					break;
+				switch (m_input_count)
+				{
+					case 0:
+						m_stored_input[0] = m_io_in[0]->read() & 0x1f;
+						m_stored_input[1] = (m_io_in[3]->read() & 0x07) << 3;
+						break;
 
-				case 3:
-					m_stored_input[0] = m_io_in[2]->read() & 0x1f;
-					break;
+					case 3:
+						m_stored_input[0] = m_io_in[2]->read() & 0x1f;
+						break;
 
-				case 4:
-					m_stored_input[0] = m_io_in[1]->read() & 0x1f;
-					m_stored_input[1] = m_io_in[3]->read() & 0x18;
-					break;
+					case 4:
+						m_stored_input[0] = m_io_in[1]->read() & 0x1f;
+						m_stored_input[1] = m_io_in[3]->read() & 0x18;
+						break;
 
-				default:
-					m_stored_input[0] = 0x1f;
-					m_stored_input[1] = 0x1f;
-					break;
+					default:
+						m_stored_input[0] = 0x1f;
+						m_stored_input[1] = 0x1f;
+						break;
+				}
+				m_input_count = (m_input_count + 1) & 7;
 			}
-
-			m_input_count = (m_input_count + 1) & 7;
 		}
 		else
 		{
 			res |= 0x40 | m_stored_input[1];
 		}
+
+		if (!machine().side_effects_disabled())
+			m_strobe_count = strobe_count;
 
 		return res;
 	}
@@ -1045,5 +1075,6 @@ void namcos1_state::init_faceoff()
 	driver_init();
 	m_mcu->space(AS_PROGRAM).install_read_handler(0x1400, 0x1401, read8sm_delegate(*this, FUNC(namcos1_state::faceoff_inputs_r)));
 	save_item(NAME(m_input_count));
+	save_item(NAME(m_strobe_count));
 	save_item(NAME(m_stored_input));
 }

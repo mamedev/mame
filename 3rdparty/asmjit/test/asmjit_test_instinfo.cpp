@@ -151,6 +151,7 @@ static void testX86Arch() {
   Arch arch = Arch::kX64;
 
   printInfoSimple(arch, Inst::kIdAdd, InstOptions::kNone, eax, ebx);
+  printInfoSimple(arch, Inst::kIdXor, InstOptions::kNone, eax, eax);
   printInfoSimple(arch, Inst::kIdLods, InstOptions::kNone, eax, dword_ptr(rsi));
 
   printInfoSimple(arch, Inst::kIdPshufd, InstOptions::kNone, xmm0, xmm1, imm(0));
@@ -166,6 +167,9 @@ static void testX86Arch() {
   printInfoSimple(arch, Inst::kIdVaddpd, InstOptions::kNone, ymm0, ymm1, ymm2);
   printInfoSimple(arch, Inst::kIdVaddpd, InstOptions::kNone, ymm0, ymm30, ymm31);
   printInfoSimple(arch, Inst::kIdVaddpd, InstOptions::kNone, zmm0, zmm1, zmm2);
+
+  printInfoSimple(arch, Inst::kIdVpternlogd, InstOptions::kNone, zmm0, zmm0, zmm0, imm(0xFF));
+  printInfoSimple(arch, Inst::kIdVpternlogq, InstOptions::kNone, zmm0, zmm1, zmm2, imm(0x33));
 
   printInfoExtra(arch, Inst::kIdVaddpd, InstOptions::kNone, k1, zmm0, zmm1, zmm2);
   printInfoExtra(arch, Inst::kIdVaddpd, InstOptions::kX86_ZMask, k1, zmm0, zmm1, zmm2);

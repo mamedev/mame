@@ -3,25 +3,25 @@
 The cmake based buildsystem for expat works on Windows (cygwin, mingw, Visual
 Studio) and should work on all other platform cmake supports.
 
-Assuming ~/expat-2.2.10 is the source directory of expat, add a subdirectory
+Assuming ~/expat-2.6.4 is the source directory of expat, add a subdirectory
 build and change into that directory:
-~/expat-2.2.10$ mkdir build && cd build
-~/expat-2.2.10/build$
+~/expat-2.6.4$ mkdir build && cd build
+~/expat-2.6.4/build$
 
 From that directory, call cmake first, then call make, make test and
 make install in the usual way:
-~/expat-2.2.10/build$ cmake ..
+~/expat-2.6.4/build$ cmake ..
 -- The C compiler identification is GNU
 -- The CXX compiler identification is GNU
 ....
 -- Configuring done
 -- Generating done
--- Build files have been written to: /home/patrick/expat-2.2.10/build
+-- Build files have been written to: /home/patrick/expat-2.6.4/build
 
 If you want to specify the install location for your files, append
 -DCMAKE_INSTALL_PREFIX=/your/install/path to the cmake call.
 
-~/expat-2.2.10/build$ make && make test && make install
+~/expat-2.6.4/build$ make && make test && make install
 Scanning dependencies of target expat
 [  5%] Building C object CMakeFiles/expat.dir/lib/xmlparse.c.o
 [ 11%] Building C object CMakeFiles/expat.dir/lib/xmlrole.c.o
@@ -36,7 +36,7 @@ Visual Studio Command Prompt or when using mingw, you must open a cmd.exe and
 make sure that gcc can be called. On Windows, you also might want to specify a
 special Generator for CMake:
 for Visual Studio builds do:
-cmake .. -G "Visual Studio 15 2017" && msbuild /m expat.sln
+cmake .. -G "Visual Studio 16 2019" && msbuild /m expat.sln
 for mingw builds do:
 cmake .. -G "MinGW Makefiles" -DCMAKE_INSTALL_PREFIX=D:\expat-install
     && gmake && gmake install

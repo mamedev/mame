@@ -782,3 +782,9 @@ std::unique_ptr<osd::midi_output_port> osd_common_t::create_midi_output(std::str
 {
 	return m_midi->create_output(name);
 }
+
+std::vector<osd::midi_port_info> osd_common_t::list_midi_ports()
+{
+	return m_midi->list_midi_ports();
+}
+

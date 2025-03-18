@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_BUS_HP_9845_IO_98035_H
-#define MAME_BUS_HP_9845_IO_98035_H
+#ifndef MAME_BUS_HP9845_IO_98035_H
+#define MAME_BUS_HP9845_IO_98035_H
 
 #pragma once
 
@@ -125,4 +125,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(HP98035_IO_CARD, hp98035_io_card_device)
 
-#endif // MAME_BUS_HP_9845_IO_98035_H
+#endif // MAME_BUS_HP9845_IO_98035_H

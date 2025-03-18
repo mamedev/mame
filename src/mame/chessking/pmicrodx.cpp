@@ -64,6 +64,7 @@ private:
 	u8 m_lcd_com = 0;
 	u64 m_lcd_segs = 0;
 
+	// I/O handlers
 	void update_lcd();
 	template<int N> void seg_w(u8 data);
 	u8 read_buttons();
@@ -74,6 +75,7 @@ private:
 
 void pmicrodx_state::machine_start()
 {
+	// register for savestates
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_lcd_com));
 	save_item(NAME(m_lcd_segs));
@@ -155,7 +157,7 @@ void pmicrodx_state::control_w(u16 data)
 *******************************************************************************/
 
 #define INPUT_CHANGED(x) \
-	PORT_CHANGED_MEMBER(DEVICE_SELF, pmicrodx_state, input_changed, x)
+	PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(pmicrodx_state::input_changed), x)
 
 static INPUT_PORTS_START( pmicrodx )
 	PORT_START("IN.0")

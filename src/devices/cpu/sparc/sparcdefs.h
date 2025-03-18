@@ -7,10 +7,10 @@
 //
 //================================================================
 
-#pragma once
+#ifndef MAME_CPU_SPARC_SPARCDEFS_H
+#define MAME_CPU_SPARC_SPARCDEFS_H
 
-#ifndef CPU_SPARC_SPARC_DEFS_H
-#define CPU_SPARC_SPARC_DEFS_H
+#pragma once
 
 #define PSR_CWP_MASK        0x0000001f
 #define PSR_ET_SHIFT        5
@@ -485,4 +485,4 @@
 #define FPOP_FCMPED         0x056
 #define FPOP_FCMPEX         0x057
 
-#endif // CPU_SPARC_SPARC_DEFS_H
+#endif // MAME_CPU_SPARC_SPARCDEFS_H

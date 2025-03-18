@@ -53,11 +53,11 @@ Namco System 1 Video Hardware
 
 ***************************************************************************/
 
-void namcos1_state::TilemapCB(u16 code, int *tile, int *mask)
+void namcos1_state::TilemapCB(u16 code, int &tile, int &mask)
 {
 	code &= 0x3fff;
-	*tile = code;
-	*mask = code;
+	tile = code;
+	mask = code;
 }
 
 /***************************************************************************
@@ -68,18 +68,16 @@ void namcos1_state::TilemapCB(u16 code, int *tile, int *mask)
 
 void namcos1_state::video_start()
 {
-	int i;
-
-	/* set table for sprite color == 0x7f */
-	for (i = 0;i < 15;i++)
+	// set table for sprite color == 0x7f
+	for (int i = 0; i < 15; i++)
 		m_drawmode_table[i] = DRAWMODE_SHADOW;
 	m_drawmode_table[15] = DRAWMODE_NONE;
 
-	/* all palette entries are not affected by shadow sprites... */
-	for (i = 0;i < 0x2000;i++)
+	// all palette entries are not affected by shadow sprites...
+	for (int i = 0; i < 0x2000; i++)
 		m_c116->shadow_table()[i] = i;
-	/* ... except for tilemap colors */
-	for (i = 0x0800;i < 0x1000;i++)
+	// ... except for tilemap colors
+	for (int i = 0x0800; i < 0x1000; i++)
 		m_c116->shadow_table()[i] = i + 0x0800;
 
 	m_copy_sprites = false;
@@ -97,11 +95,11 @@ void namcos1_state::video_start()
 
 void namcos1_state::spriteram_w(offs_t offset, u8 data)
 {
-	/* 0000-07ff work ram */
-	/* 0800-0fff sprite ram */
+	// 0000-07ff work ram
+	// 0800-0fff sprite ram
 	m_spriteram[offset] = data;
 
-	/* a write to this offset tells the sprite chip to buffer the sprite list */
+	// a write to this offset tells the sprite chip to buffer the sprite list
 	if (offset == 0x0ff2)
 		m_copy_sprites = true;
 }
@@ -137,7 +135,7 @@ sprite format:
 void namcos1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	u8 *spriteram = m_spriteram + 0x800;
-	const u8 *source = &spriteram[0x800-0x20];   /* the last is NOT a sprite */
+	const u8 *source = &spriteram[0x800-0x20]; // the last is NOT a sprite
 	const u8 *finish = &spriteram[0];
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 
@@ -150,8 +148,8 @@ void namcos1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 		const u8 attr1 = source[10];
 		const u8 attr2 = source[14];
 		u32 color = source[12];
-		int flipx = (attr1 & 0x20) >> 5;
-		int flipy = (attr2 & 0x01);
+		bool flipx = BIT(attr1, 5);
+		bool flipy = BIT(attr2, 0);
 		const u16 sizex = sprite_size[(attr1 & 0xc0) >> 6];
 		const u16 sizey = sprite_size[(attr2 & 0x06) >> 1];
 		const u16 tx = (attr1 & 0x18) & (~(sizex - 1));
@@ -173,11 +171,11 @@ void namcos1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 		{
 			sx = -sx - sizex;
 			sy = -sy - sizey;
-			flipx ^= 1;
-			flipy ^= 1;
+			flipx = !flipx;
+			flipy = !flipy;
 		}
 
-		sy++;   /* sprites are buffered and delayed by one scanline */
+		sy++; // sprites are buffered and delayed by one scanline
 
 		gfx->set_source_clip(tx, sizex, ty, sizey);
 		if (color != 0x7f)
@@ -207,17 +205,16 @@ void namcos1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 
 u32 namcos1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int i;
 	rectangle new_clip = cliprect;
 
-	/* flip screen is embedded in the sprite control registers */
+	// flip screen is embedded in the sprite control registers
 	flip_screen_set(m_spriteram[0x0ff6] & 1);
 
-	/* background color */
+	// background color
 	bitmap.fill(m_c116->black_pen(), cliprect);
 
-	/* berabohm uses asymmetrical visibility windows to iris on the character */
-	i = m_c116->get_reg(0) - 1;                         // min x
+	// berabohm uses asymmetrical visibility windows to iris on the character
+	int i = m_c116->get_reg(0) - 1;                     // min x
 	if (new_clip.min_x < i) new_clip.min_x = i;
 	i = m_c116->get_reg(1) - 1 - 1;                     // max x
 	if (new_clip.max_x > i) new_clip.max_x = i;
@@ -233,8 +230,8 @@ u32 namcos1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 
 	screen.priority().fill(0, new_clip);
 
-	/* bit 0-2 priority */
-	/* bit 3   disable  */
+	// bit 0-2 priority
+	// bit 3   disable
 	for (int priority = 0; priority < 8; priority++)
 	{
 		m_c123tmap->draw(screen, bitmap, new_clip, priority, priority, 0);
@@ -247,9 +244,9 @@ u32 namcos1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 
 void namcos1_state::screen_vblank(int state)
 {
-	// rising edge
 	if (state)
 	{
+		// rising edge
 		if (m_copy_sprites)
 		{
 			u8 *spriteram = m_spriteram + 0x800;
@@ -262,8 +259,14 @@ void namcos1_state::screen_vblank(int state)
 
 			m_copy_sprites = false;
 		}
+
 		m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 		m_subcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
+	}
+	else
+	{
+		// falling edge
+		// splatter 2nd bossfight music fails if audiocpu irq is at the same time as main/sub irq
 		m_audiocpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 		m_mcu->set_input_line(HD6301_IRQ1_LINE, ASSERT_LINE);
 	}

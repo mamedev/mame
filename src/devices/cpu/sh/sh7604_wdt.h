@@ -6,11 +6,10 @@
 
 ***************************************************************************/
 
-#ifndef MAME_CPU_SH7604_WDT_H
-#define MAME_CPU_SH7604_WDT_H
+#ifndef MAME_CPU_SH_SH7604_WDT_H
+#define MAME_CPU_SH_SH7604_WDT_H
 
 #pragma once
-
 
 
 //**************************************************************************
@@ -44,4 +43,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(SH7604_WDT, sh7604_wdt_device)
 
-#endif // MAME_CPU_SH7604_WDT_H
+#endif // MAME_CPU_SH_SH7604_WDT_H

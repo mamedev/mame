@@ -82,7 +82,6 @@ public:
 		m_ram_ptr(nullptr), m_rom_ptr(nullptr),
 		m_ram_mask(0), m_ram_size(0), m_rom_size(0),
 		m_overlay(0),
-		m_6015_timer(nullptr),
 		m_via2_ca1_hack(0),
 		m_nubus_irq_state(0),
 		m_via_interrupt(0), m_via2_interrupt(0), m_scc_interrupt(0), m_last_taken_interrupt(0)
@@ -152,11 +151,8 @@ private:
 	void devsel_w(u8 devsel);
 
 	u8 m_mac[6];
-	emu_timer *m_6015_timer;
 	int m_via2_ca1_hack, m_nubus_irq_state;
 	int m_via_interrupt, m_via2_interrupt, m_scc_interrupt, m_last_taken_interrupt;
-
-	TIMER_CALLBACK_MEMBER(mac_6015_tick);
 };
 
 class spike_state : public quadrax00_state
@@ -280,9 +276,6 @@ void quadrax00_state::machine_start()
 	m_via_interrupt = m_via2_interrupt = m_scc_interrupt = 0;
 	m_last_taken_interrupt = -1;
 
-	m_6015_timer = timer_alloc(FUNC(quadrax00_state::mac_6015_tick), this);
-	m_6015_timer->adjust(attotime::never);
-
 	save_item(NAME(m_via2_ca1_hack));
 	save_item(NAME(m_nubus_irq_state));
 	save_item(NAME(m_adb_irq_pending));
@@ -312,9 +305,6 @@ void quadrax00_state::machine_reset()
 
 	space.unmap_write(0x00000000, memory_end);
 	space.install_rom(0x00000000, memory_end & ~memory_mirror, memory_mirror, m_rom_ptr);
-
-	// start 60.15 Hz timer
-	m_6015_timer->adjust(attotime::from_hz(60.15), 0, attotime::from_hz(60.15));
 }
 
 void eclipse_state::machine_start()
@@ -554,12 +544,6 @@ u8 quadrax00_state::ethernet_mac_r(offs_t offset)
 	return 0;
 }
 
-TIMER_CALLBACK_MEMBER(quadrax00_state::mac_6015_tick)
-{
-	/* handle ADB keyboard/mouse */
-	m_macadb->adb_vblank();
-}
-
 /***************************************************************************
     ADDRESS MAPS
 ***************************************************************************/
@@ -753,7 +737,7 @@ void eclipse_state::via2_out_b_q900(u8 data)
 		applefdintf_device::add_35_hd(config, m_floppy[0]);
 		applefdintf_device::add_35_nc(config, m_floppy[1]);
 
-		SCC8530N(config, m_scc, C7M);
+		SCC8530(config, m_scc, C7M);
 		m_scc->configure_channels(3'686'400, 3'686'400, 3'686'400, 3'686'400);
 		m_scc->out_txda_callback().set("printer", FUNC(rs232_port_device::write_txd));
 		m_scc->out_txdb_callback().set("modem", FUNC(rs232_port_device::write_txd));
@@ -794,6 +778,7 @@ void eclipse_state::via2_out_b_q900(u8 data)
 
 		nubus_device &nubus(NUBUS(config, "nubus", 40_MHz_XTAL / 4));
 		nubus.set_space(m_maincpu, AS_PROGRAM);
+		nubus.set_bus_mode(nubus_device::nubus_mode_t::QUADRA_DAFB);
 		nubus.out_irq9_callback().set(FUNC(quadrax00_state::nubus_irq_9_w));
 		nubus.out_irqa_callback().set(FUNC(quadrax00_state::nubus_irq_a_w));
 		nubus.out_irqb_callback().set(FUNC(quadrax00_state::nubus_irq_b_w));

@@ -560,7 +560,7 @@ static INPUT_PORTS_START( abc1600 )
 	// keyboard inputs defined in machine/abc99.cpp
 
 	PORT_START("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, abc1600_state, reset, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(abc1600_state::reset), 0)
 INPUT_PORTS_END
 
 
@@ -986,7 +986,7 @@ void abc1600_state::abc1600(machine_config &config)
 	//rs232pr.rts_handler().set(m_dart, FUNC(z80dart_device::ctsa_w));
 	//rs232pr.dtr_handler().set(m_dart, FUNC(z80dart_device::dcda_w));
 
-	SCC8530N(config, m_scc, 64_MHz_XTAL / 16);
+	SCC8530(config, m_scc, 64_MHz_XTAL / 16);
 	m_scc->out_int_callback().set(FUNC(abc1600_state::scc_irq_w));
 	m_scc->out_wreqa_callback().set(FUNC(abc1600_state::sccrq_a_w));
 	m_scc->out_wreqb_callback().set(FUNC(abc1600_state::sccrq_b_w));

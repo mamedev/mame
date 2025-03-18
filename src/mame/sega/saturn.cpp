@@ -425,12 +425,13 @@ test1f diagnostic hacks:
 #include "emu.h"
 #include "saturn.h"
 
+#include "saturn_cdb.h"
+#include "stvcd.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/scudsp/scudsp.h"
 #include "machine/nvram.h"
 #include "machine/smpc.h"
-#include "machine/stvcd.h"
-#include "saturn_cdb.h"
 
 #include "bus/saturn/bram.h"
 #include "bus/saturn/dram.h"
@@ -600,9 +601,9 @@ INPUT_CHANGED_MEMBER(sat_console_state::tray_close)
 
 static INPUT_PORTS_START( saturn )
 	PORT_START("RESET") /* hardwired buttons */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED_MEMBER("smpc", smpc_hle_device, trigger_nmi_r, 0) PORT_NAME("Reset Button")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, sat_console_state, tray_open,0) PORT_NAME("Tray Open Button")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, sat_console_state, tray_close,0) PORT_NAME("Tray Close")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED_MEMBER("smpc", FUNC(smpc_hle_device::trigger_nmi_r), 0) PORT_NAME("Reset Button")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sat_console_state::tray_open), 0) PORT_NAME("Tray Open Button")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sat_console_state::tray_close), 0) PORT_NAME("Tray Close")
 
 	PORT_START("fake")
 	PORT_CONFNAME(0x01,0x00,"Master-Slave Comms")
@@ -899,6 +900,7 @@ void sat_console_state::saturnus(machine_config &config)
 	SATURN_CDB(config, "saturn_cdb", 16000000);
 
 	SOFTWARE_LIST(config, "cd_list").set_original("saturn").set_filter("NTSC-U");
+	SOFTWARE_LIST(config, "photocd_list").set_compatible("photo_cd");
 
 	SATURN_CART_SLOT(config, "exp", saturn_cart, nullptr);
 	SOFTWARE_LIST(config, "cart_list").set_original("sat_cart");
@@ -912,6 +914,7 @@ void sat_console_state::saturneu(machine_config &config)
 	SATURN_CDB(config, "saturn_cdb", 16000000);
 
 	SOFTWARE_LIST(config, "cd_list").set_original("saturn").set_filter("PAL");
+	SOFTWARE_LIST(config, "photocd_list").set_compatible("photo_cd");
 
 	SATURN_CART_SLOT(config, "exp", saturn_cart, nullptr);
 	SOFTWARE_LIST(config, "cart_list").set_original("sat_cart");
@@ -925,6 +928,7 @@ void sat_console_state::saturnjp(machine_config &config)
 	SATURN_CDB(config, "saturn_cdb", 16000000);
 
 	SOFTWARE_LIST(config, "cd_list").set_original("saturn").set_filter("NTSC-J");
+	SOFTWARE_LIST(config, "photocd_list").set_compatible("photo_cd");
 
 	SATURN_CART_SLOT(config, "exp", saturn_cart, nullptr);
 	SOFTWARE_LIST(config, "cart_list").set_original("sat_cart");

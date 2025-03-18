@@ -1244,7 +1244,7 @@ void hng64_state::hng_map(address_map &map)
 
 static INPUT_PORTS_START( hng64 ) // base port, for debugging
 	PORT_START("VBLANK")
-	PORT_BIT( 0xffffffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0xffffffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	PORT_START("IN0")
 	PORT_DIPNAME( 0x01, 0x01, "IN0" )

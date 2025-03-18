@@ -382,7 +382,7 @@ static INPUT_PORTS_START( mlc )
 	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_COIN4 )
 	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_SERVICE2 )
-	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1057,7 +1057,7 @@ void deco_mlc_state::init_mlc()
 	/* The timing in the ARM core isn't as accurate as it should be, so bump up the
 	    effective clock rate here to compensate otherwise we have slowdowns in
 	    Skull Fang where there probably shouldn't be. */
-	m_maincpu->set_clock_scale(2.0f);
+	m_maincpu->set_clock_scale(2.0);
 	m_irqLevel = ARM_IRQ_LINE;
 	deco156_decrypt(machine());
 	descramble_sound();
@@ -1065,7 +1065,7 @@ void deco_mlc_state::init_mlc()
 
 void deco_mlc_state::init_acchi() // sound ROMs don't appear to be scrambled
 {
-	m_maincpu->set_clock_scale(2.0f);  // avoids hangs in attract mode / end of round, see init_mlc()
+	m_maincpu->set_clock_scale(2.0); // avoids hangs in attract mode / end of round, see init_mlc()
 	m_irqLevel = ARM_IRQ_LINE;
 	deco156_decrypt(machine());
 }

@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /*************************************************************************
 
-    Cinemat/Leland driver
+    Cinematronics / Leland Cinemat System driver
 
 *************************************************************************/
 #ifndef MAME_CINEMATRONICS_LELAND_H
@@ -164,7 +164,6 @@ private:
 	u8 m_sound_port_bank = 0U;
 	u8 m_alternate_bank = 0U;
 	u8 m_gfxbank = 0U;
-	u16 m_last_scanline = 0U;
 	emu_timer *m_scanline_timer = nullptr;
 
 	u8 cerberus_dial_1_r();

@@ -371,4 +371,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 1982, molecula, 0, 0, molecula, molecula, molecula_state, empty_init, "MOLECULAR", "MOLECULAR Computer", MACHINE_IS_SKELETON )
+COMP( 1982, molecula, 0, 0, molecula, molecula, molecula_state, empty_init, "MOLECULAR", "MOLECULAR Computer", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

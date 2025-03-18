@@ -23,22 +23,23 @@
 
   List of encrypted games currently known:
 
- CPU Part #         Game                   Comments
-  315-5136      New Lucky 8 Lines (set 7, W-4, encrypted)
-  315-5162      4D Warriors &          used I'm Sorry for k.p.a.
+ CPU Part #     Game                       Comments
+  315-5136      New Lucky 8 Lines
+                (set 7, W-4, encrypted)
+  315-5162      4D Warriors &              used I'm Sorry for k.p.a.
                 Rafflesia &
                 Wonder Boy (set 4)
   315-5176      Wonder Boy (system 2 hardware, set 2)
   315-5177      Astro Flash &
                 Wonder Boy (set 1)
-  315-5178      Wonder Boy (set 2)     unencrypted version available
+  315-5178      Wonder Boy (set 2)         unencrypted version available
   315-5179      Robo-Wrestle 2001
-  317-5000      Fantasy Zone (Sound CPU)  same key as 315-5177
+  317-5000      Fantasy Zone (Sound CPU)   same key as 315-5177
 
   The following games seem to use the same algorithm as the above ones, but
   using a key which almost doesn't change
 
-  317-0004      Calorie Kun            unencrypted bootleg available
+  317-0004      Calorie Kun                unencrypted bootleg available
   317-0005      Space Position
   317-0006      Gardia (set 1)
   317-0007      Gardia (set 2)
@@ -79,7 +80,7 @@ static void decode(uint8_t *rom, uint8_t *decrypted, const uint8_t xor_table[128
 }
 
 
-DEFINE_DEVICE_TYPE(NEC_315_5136,  nec_315_5136_device,  "nec_315_5136",  "Nec 315-5136")
+DEFINE_DEVICE_TYPE(NEC_315_5136,  nec_315_5136_device,  "nec_315_5136",  "NEC 315-5136")
 DEFINE_DEVICE_TYPE(SEGA_315_5179, sega_315_5179_device, "sega_315_5179", "Sega 315-5179")
 DEFINE_DEVICE_TYPE(SEGA_315_5178, sega_315_5178_device, "sega_315_5178", "Sega 315-5178")
 DEFINE_DEVICE_TYPE(SEGA_315_5177, sega_315_5177_device, "sega_315_5177", "Sega 315-5177") // also seen as 317-5000

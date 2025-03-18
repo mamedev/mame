@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_BUS_MC10_MC10CART_H
-#define MAME_BUS_MC10_MC10CART_H
+#ifndef MAME_BUS_MC10_MC10_CART_H
+#define MAME_BUS_MC10_MC10_CART_H
 
 #pragma once
 
@@ -107,4 +107,4 @@ void mc10_cart_add_basic_devices(device_slot_interface &device);
 void alice_cart_add_basic_devices(device_slot_interface &device);
 void alice32_cart_add_basic_devices(device_slot_interface &device);
 
-#endif // MAME_BUS_MC10_MC10CART_H
+#endif // MAME_BUS_MC10_MC10_CART_H

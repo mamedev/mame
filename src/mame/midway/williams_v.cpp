@@ -160,26 +160,16 @@ The full silkscreen markings of SC2 (under the "Special Chip 2" sticker, if it i
  *
  *************************************/
 
-void williams_state::state_save_register()
-{
-	save_item(NAME(m_blitter_window_enable));
-	save_item(NAME(m_cocktail));
-	save_item(NAME(m_blitterram));
-	save_item(NAME(m_blitter_remap_index));
-}
-
-
 void williams_state::video_start()
 {
-	blitter_init(m_blitter_config, nullptr);
-	state_save_register();
+	save_item(NAME(m_cocktail));
 }
 
 
 void blaster_state::video_start()
 {
-	blitter_init(m_blitter_config, memregion("proms")->base());
-	state_save_register();
+	williams_state::video_start();
+
 	save_item(NAME(m_color0));
 	save_item(NAME(m_video_control));
 }
@@ -187,13 +177,12 @@ void blaster_state::video_start()
 
 void williams2_state::video_start()
 {
-	blitter_init(m_blitter_config, nullptr);
+	williams_state::video_start();
 
-	/* create the tilemap */
+	// create the tilemap
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(williams2_state::get_tile_info)), TILEMAP_SCAN_COLS, 24,16, 128,16);
 	m_bg_tilemap->set_scrolldx(2, 0);
 
-	state_save_register();
 	save_item(NAME(m_tilemap_xscroll));
 	save_item(NAME(m_fg_color));
 	save_item(NAME(m_gain));
@@ -239,35 +228,35 @@ uint32_t blaster_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	uint8_t const *const scanline_control = &m_videoram[0xbc00];
 	rgb_t pens[16];
 
-	/* precompute the palette */
+	// precompute the palette
 	for (int x = 0; x < 16; x++)
 		pens[x] = m_palette->pen_color(m_paletteram[x]);
 
-	/* if we're blitting from the top, start with a 0 for color 0 */
+	// if we're blitting from the top, start with a 0 for color 0
 	if (cliprect.min_y == screen.visible_area().min_y || !(m_video_control & 1))
 		m_color0 = m_palette->pen_color(palette_0[0] ^ 0xff);
 
-	/* loop over rows */
+	// loop over rows
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		int const erase_behind = m_video_control & scanline_control[y] & 2;
 		uint8_t *const source = &m_videoram[y];
 		uint32_t *const dest = &bitmap.pix(y);
 
-		/* latch a new color0 pen? */
+		// latch a new color0 pen?
 		if (m_video_control & scanline_control[y] & 1)
 			m_color0 = m_palette->pen_color(palette_0[y] ^ 0xff);
 
-		/* loop over columns */
+		// loop over columns
 		for (int x = cliprect.min_x & ~1; x <= cliprect.max_x; x += 2)
 		{
 			uint8_t const pix = source[(x/2) * 256];
 
-			/* clear behind us if requested */
+			// clear behind us if requested
 			if (erase_behind)
 				source[(x/2) * 256] = 0;
 
-			/* now draw */
+			// now draw
 			dest[x+0] = (pix & 0xf0) ? pens[pix >> 4] : rgb_t(m_color0 | pens[0]);
 			dest[x+1] = (pix & 0x0f) ? pens[pix & 0x0f] : rgb_t(m_color0 | pens[0]);
 		}
@@ -280,20 +269,20 @@ uint32_t williams2_state::screen_update(screen_device &screen, bitmap_rgb32 &bit
 {
 	rgb_t pens[16];
 
-	/* draw the background */
+	// draw the background
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
-	/* fetch the relevant pens */
+	// fetch the relevant pens
 	for (int x = 1; x < 16; x++)
 		pens[x] = m_palette->pen_color(m_fg_color * 16 + x);
 
-	/* loop over rows */
+	// loop over rows
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		uint8_t const *const source = &m_videoram[y];
 		uint32_t *const dest = &bitmap.pix(y);
 
-		/* loop over columns */
+		// loop over columns
 		for (int x = cliprect.min_x & ~1; x <= cliprect.max_x; x += 2)
 		{
 			uint8_t const pix = source[(x/2) * 256];
@@ -312,22 +301,21 @@ uint32_t mysticm_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 {
 	rgb_t pens[16];
 
-	/* draw the background */
-	//printf("y %d %d %d\n", cliprect.min_y, cliprect.max_y, m_screen->vpos());
+	// draw the background
 	m_bg_tilemap->mark_all_dirty();
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES, 0);
 
-	/* loop over rows */
+	// loop over rows
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		/* fetch the relevant pens */
+		// fetch the relevant pens
 		for (int x = 1; x < 16; x++)
 			pens[x] = m_palette->pen_color(color_decode(m_fg_color, 1, y) * 16 + x);
 
 		uint8_t const *const source = &m_videoram[y];
 		uint32_t *const dest = &bitmap.pix(y);
 
-		/* loop over columns */
+		// loop over columns
 		for (int x = cliprect.min_x & ~1; x <= cliprect.max_x; x += 2)
 		{
 			uint8_t const pix = source[(x/2) * 256];
@@ -435,7 +423,6 @@ rgb_t williams2_state::calc_col(uint16_t lo, uint16_t hi)
 	};
 
 	// update the palette entry
-
 	const uint16_t i =  (hi >> 4) & 15;
 	const uint16_t ub = (hi >> 0) & 15;
 	const uint16_t ug = (lo >> 4) & 15;
@@ -462,10 +449,10 @@ rgb_t williams2_state::calc_col(uint16_t lo, uint16_t hi)
 
 void williams2_state::paletteram_w(offs_t offset, u8 data)
 {
-	/* set the new value */
+	// set the new value
 	m_paletteram[offset] = data;
 
-	/* pull the associated low/high bytes */
+	// pull the associated low/high bytes
 	uint16_t entry_lo = m_paletteram[offset & ~1];
 	uint16_t entry_hi = m_paletteram[offset |  1];
 
@@ -523,7 +510,7 @@ TILE_GET_INFO_MEMBER(williams2_state::get_tile_info)
 	int const data = m_tileram[tile_index];
 	int const y = (tile_index >> 1) & 7;
 
-	/* On tshoot and inferno, IC79 is a 74LS157 selector jumpered to be enabled */
+	// On tshoot and inferno, IC79 is a 74LS157 selector jumpered to be enabled
 	int const color = y;
 
 	tileinfo.set(0, data & mask, color, (data & ~mask) ? TILE_FLIPX : 0);
@@ -552,7 +539,7 @@ int mysticm_state::color_decode(uint8_t base_col, int sig_J1, int y)
 
 	// FIXME: Investigate further.
 
-	/* IC79 is a 74LS85 comparator that controls the low bit */
+	// IC79 is a 74LS85 comparator that controls the low bit
 	int const a = 1 | ((base_col & 1) << 2) | ((base_col & 1) << 3);
 	int const b = (sig_W12 << 0) | (sig_W13 << 1) | (0 << 2) | (sig_J1 << 3);
 	int const color = (a > b) || ((a == b) && !sig_W11);
@@ -588,31 +575,31 @@ TILE_GET_INFO_MEMBER(joust2_state::get_tile_info)
 	int const mask = m_gfxdecode->gfx(0)->elements() - 1;
 	int const data = m_tileram[tile_index];
 
-	/* IC79 is a 74LS157 selector jumpered to be disabled */
+	// IC79 is a 74LS157 selector jumpered to be disabled
 	int const color = 0;
 
 	tileinfo.set(0, data & mask, color, (data & ~mask) ? TILE_FLIPX : 0);
 }
 
-/* based on the board type, only certain bits are used */
-/* the rest are determined by other factors */
+// based on the board type, only certain bits are used
+// the rest are determined by other factors
 
 void williams2_state::bg_select_w(u8 data)
 {
-	/* IC79 is a 74LS157 selector jumpered to be enabled */
+	// IC79 is a 74LS157 selector jumpered to be enabled
 	m_bg_tilemap->set_palette_offset((data & 0x38) << 4);
 }
 
 void mysticm_state::bg_select_w(u8 data)
 {
-	/* IC79 is a 74LS85 comparator that controls the low bit */
+	// IC79 is a 74LS85 comparator that controls the low bit
 	m_bg_color = data;
 	m_bg_tilemap->mark_all_dirty();
 }
 
 void joust2_state::bg_select_w(u8 data)
 {
-	/* IC79 is a 74LS157 selector jumpered to be disabled */
+	// IC79 is a 74LS157 selector jumpered to be disabled
 	m_bg_tilemap->set_palette_offset((data & 0x3f) << 4);
 }
 
@@ -634,215 +621,4 @@ void williams2_state::xscroll_high_w(u8 data)
 {
 	m_tilemap_xscroll = (m_tilemap_xscroll & 0x00f) | (data << 4);
 	m_bg_tilemap->set_scrollx(0, (m_tilemap_xscroll & 7) + ((m_tilemap_xscroll >> 3) * 6));
-}
-
-
-
-/*************************************
- *
- *  Blaster-specific enhancements
- *
- *************************************/
-
-void blaster_state::remap_select_w(u8 data)
-{
-	m_blitter_remap_index = data;
-	m_blitter_remap = m_blitter_remap_lookup.get() + data * 256;
-}
-
-
-void blaster_state::video_control_w(u8 data)
-{
-	m_video_control = data;
-}
-
-
-
-/*************************************
- *
- *  Blitter setup and control
- *
- *************************************/
-
-void williams_state::blitter_init(int blitter_config, const uint8_t *remap_prom)
-{
-	std::fill(std::begin(m_blitterram), std::end(m_blitterram), 0);
-	static const uint8_t dummy_table[] = { 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 };
-
-	/* by default, there is no clipping window - this will be touched only by games that have one */
-	m_blitter_window_enable = 0;
-
-	/* switch off the video config */
-	m_blitter_xor = (blitter_config == WILLIAMS_BLITTER_SC1) ? 4 : 0;
-
-	/* create the remap table; if no PROM, make an identity remap table */
-	m_blitter_remap_lookup = std::make_unique<uint8_t[]>(256 * 256);
-	m_blitter_remap_index = 0;
-	m_blitter_remap = m_blitter_remap_lookup.get();
-	for (int i = 0; i < 256; i++)
-	{
-		const uint8_t *table = remap_prom ? (remap_prom + (i & 0x7f) * 16) : dummy_table;
-		for (int j = 0; j < 256; j++)
-			m_blitter_remap_lookup[i * 256 + j] = (table[j >> 4] << 4) | table[j & 0x0f];
-	}
-}
-
-
-void williams_state::blitter_w(address_space &space, offs_t offset, u8 data)
-{
-	/* store the data */
-	m_blitterram[offset] = data;
-
-	/* only writes to location 0 trigger the blit */
-	if (offset != 0)
-		return;
-
-	/* compute the starting locations */
-	int sstart = (m_blitterram[2] << 8) + m_blitterram[3];
-	int dstart = (m_blitterram[4] << 8) + m_blitterram[5];
-
-	/* compute the width and height */
-	int w = m_blitterram[6] ^ m_blitter_xor;
-	int h = m_blitterram[7] ^ m_blitter_xor;
-
-	/* adjust the width and height */
-	if (w == 0) w = 1;
-	if (h == 0) h = 1;
-
-	/* do the actual blit */
-	int const accesses = blitter_core(space, sstart, dstart, w, h, data);
-
-	/* based on the number of memory accesses needed to do the blit, compute how long the blit will take */
-	int estimated_clocks_at_4MHz = 4;
-	if(data & WMS_BLITTER_CONTROLBYTE_SLOW)
-	{
-		estimated_clocks_at_4MHz += 4 * (accesses + 2);
-	}
-	else
-	{
-		estimated_clocks_at_4MHz += 2 * (accesses + 3);
-	}
-
-	m_maincpu->adjust_icount(-((estimated_clocks_at_4MHz + 3) / 4));
-
-	/* Log blits */
-	logerror("%04X:Blit @ %3d : %02X%02X -> %02X%02X, %3dx%3d, mask=%02X, flags=%02X, icount=%d, win=%d\n",
-			m_maincpu->pc(), m_screen->vpos(),
-			m_blitterram[2], m_blitterram[3],
-			m_blitterram[4], m_blitterram[5],
-			m_blitterram[6], m_blitterram[7],
-			m_blitterram[1], m_blitterram[0],
-			((estimated_clocks_at_4MHz + 3) / 4), m_blitter_window_enable);
-}
-
-
-void williams2_state::blit_window_enable_w(u8 data)
-{
-	m_blitter_window_enable = BIT(data, 0);
-}
-
-
-
-/*************************************
- *
- *  Blitter core
- *
- *************************************/
-
-inline void williams_state::blit_pixel(address_space &space, int dstaddr, int srcdata, int controlbyte)
-{
-	/* always read from video RAM regardless of the bank setting */
-	int curpix = (dstaddr < 0xc000) ? m_videoram[dstaddr] : space.read_byte(dstaddr); // current pixel values at dest
-
-	int const solid = m_blitterram[1];
-	unsigned char keepmask = 0xff; // what part of original dst byte should be kept, based on NO_EVEN and NO_ODD flags
-
-	// even pixel (D7-D4)
-	if((controlbyte & WMS_BLITTER_CONTROLBYTE_FOREGROUND_ONLY) && !(srcdata & 0xf0)) // FG only and src even pixel=0
-	{
-		if(controlbyte & WMS_BLITTER_CONTROLBYTE_NO_EVEN)
-			keepmask &= 0x0f;
-	}
-	else
-	{
-		if(!(controlbyte & WMS_BLITTER_CONTROLBYTE_NO_EVEN))
-			keepmask &= 0x0f;
-	}
-
-	// odd pixel (D3-D0)
-	if((controlbyte & WMS_BLITTER_CONTROLBYTE_FOREGROUND_ONLY) && !(srcdata & 0x0f)) // FG only and src odd pixel=0
-	{
-		if(controlbyte & WMS_BLITTER_CONTROLBYTE_NO_ODD)
-			keepmask &= 0xf0;
-	}
-	else
-	{
-		if(!(controlbyte & WMS_BLITTER_CONTROLBYTE_NO_ODD))
-			keepmask &= 0xf0;
-	}
-
-	curpix &= keepmask;
-	if(controlbyte & WMS_BLITTER_CONTROLBYTE_SOLID)
-		curpix |= (solid & ~keepmask);
-	else
-		curpix |= (srcdata & ~keepmask);
-
-	/* if the window is enabled, only blit to videoram below the clipping address */
-	/* note that we have to allow blits to non-video RAM (e.g. tileram, Sinistar $DXXX SRAM) because those */
-	/* are not blocked by the window enable */
-	if (!m_blitter_window_enable || dstaddr < m_blitter_clip_address || dstaddr >= 0xc000)
-		space.write_byte(dstaddr, curpix);
-}
-
-
-int williams_state::blitter_core(address_space &space, int sstart, int dstart, int w, int h, int controlbyte)
-{
-	int accesses = 0;
-
-	/* compute how much to advance in the x and y loops */
-	int const sxadv = (controlbyte & WMS_BLITTER_CONTROLBYTE_SRC_STRIDE_256) ? 0x100 : 1;
-	int const syadv = (controlbyte & WMS_BLITTER_CONTROLBYTE_SRC_STRIDE_256) ? 1 : w;
-	int const dxadv = (controlbyte & WMS_BLITTER_CONTROLBYTE_DST_STRIDE_256) ? 0x100 : 1;
-	int const dyadv = (controlbyte & WMS_BLITTER_CONTROLBYTE_DST_STRIDE_256) ? 1 : w;
-
-	int pixdata = 0;
-
-	/* loop over the height */
-	for (int y = 0; y < h; y++)
-	{
-		int source = sstart & 0xffff;
-		int dest = dstart & 0xffff;
-
-		/* loop over the width */
-		for (int x = 0; x < w; x++)
-		{
-			if (!(controlbyte & WMS_BLITTER_CONTROLBYTE_SHIFT)) // no shift
-			{
-				blit_pixel(space, dest, m_blitter_remap[space.read_byte(source)], controlbyte);
-			}
-			else
-			{
-				// shift one pixel right
-				pixdata = (pixdata << 8) | m_blitter_remap[space.read_byte(source)];
-				blit_pixel(space, dest, (pixdata >> 4) & 0xff, controlbyte);
-			}
-			accesses += 2;
-
-			/* advance src and dst pointers */
-			source = (source + sxadv) & 0xffff;
-			dest   = (dest + dxadv) & 0xffff;
-		}
-
-		/* note that PlayBall! indicates the X coordinate doesn't wrap */
-		if (controlbyte & WMS_BLITTER_CONTROLBYTE_DST_STRIDE_256)
-			dstart = (dstart & 0xff00) | ((dstart + dyadv) & 0xff);
-		else
-			dstart += dyadv;
-
-		if (controlbyte & WMS_BLITTER_CONTROLBYTE_SRC_STRIDE_256)
-			sstart = (sstart & 0xff00) | ((sstart + syadv) & 0xff);
-		else
-			sstart += syadv;
-	}
-	return accesses;
 }

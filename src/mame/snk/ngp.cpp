@@ -630,7 +630,7 @@ static INPUT_PORTS_START(ngp)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("Power")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_POWER_ON) PORT_CHANGED_MEMBER(DEVICE_SELF, ngp_state, power_callback, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_POWER_ON) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ngp_state::power_callback), 0)
 INPUT_PORTS_END
 
 
@@ -895,7 +895,7 @@ void ngp_state::ngp(machine_config &config)
 	m_k1ge->vblank_callback().set(FUNC(ngp_state::ngp_vblank_pin_w));
 	m_k1ge->hblank_callback().set(FUNC(ngp_state::ngp_hblank_pin_w));
 
-	m_screen->set_palette("k1ge:palette");
+	m_screen->set_palette(m_k1ge);
 
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "ngp_cart", "bin,ngp,npc,ngc"));
 	cartslot.set_device_load(FUNC(ngp_state::load_ngp_cart));
@@ -913,7 +913,7 @@ void ngp_state::ngpc(machine_config &config)
 	m_k1ge->vblank_callback().set(FUNC(ngp_state::ngp_vblank_pin_w));
 	m_k1ge->hblank_callback().set(FUNC(ngp_state::ngp_hblank_pin_w));
 
-	m_screen->set_palette("k1ge:palette");
+	m_screen->set_palette(m_k1ge);
 
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "ngp_cart", "bin,ngp,npc,ngc"));
 	cartslot.set_device_load(FUNC(ngp_state::load_ngp_cart));

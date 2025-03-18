@@ -20,6 +20,7 @@
 #include "formats/dsk_dsk.h"
 #include "formats/pc_dsk.h"
 #include "formats/ipf_dsk.h"
+#include "formats/86f_dsk.h"
 
 #include "formats/fs_unformatted.h"
 #include "formats/fsblk_vec.h"
@@ -164,6 +165,7 @@ void format_registration::add_fm_containers()
 	add(FLOPPY_MFM_FORMAT);
 	add(FLOPPY_TD0_FORMAT);
 	add(FLOPPY_IMD_FORMAT);
+	add(FLOPPY_86F_FORMAT);
 }
 
 void format_registration::add_mfm_containers()
@@ -608,7 +610,10 @@ std::pair<std::error_condition, const floppy_image_format_t *> floppy_image_devi
 		}
 	}
 
-	return{ std::error_condition(), best_format };
+	if(best_format)
+		return{ std::error_condition(), best_format };
+	else
+		return{ image_error::INVALIDIMAGE, nullptr };
 }
 
 void floppy_image_device::init_floppy_load(bool write_supported)
@@ -630,6 +635,8 @@ void floppy_image_device::init_floppy_load(bool write_supported)
 	if (m_motor_always_on) {
 		// When disk is inserted, start motor
 		mon_w(0);
+		m_ready_counter = 2;
+
 	} else if(!m_mon)
 		m_ready_counter = 2;
 

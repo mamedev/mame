@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef MAME_DEVICES_MACHINE_UPD765_H
-#define MAME_DEVICES_MACHINE_UPD765_H
+#ifndef MAME_MACHINE_UPD765_H
+#define MAME_MACHINE_UPD765_H
 
 #pragma once
 
@@ -635,4 +635,4 @@ DECLARE_DEVICE_TYPE(MCS3201,        mcs3201_device)
 DECLARE_DEVICE_TYPE(TC8566AF,       tc8566af_device)
 DECLARE_DEVICE_TYPE(HD63266F,       hd63266f_device)
 
-#endif // MAME_DEVICES_MACHINE_UPD765_H
+#endif // MAME_MACHINE_UPD765_H

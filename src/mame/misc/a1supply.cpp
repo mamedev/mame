@@ -156,6 +156,6 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 197?, tv21,    0, a1supply, 0, a1supply_state, empty_init, ROT0, "A-1 Supply", "T.V. 21",     MACHINE_IS_SKELETON )
-GAME( 197?, tv21_3,  0, a1supply, 0, a1supply_state, empty_init, ROT0, "A-1 Supply", "T.V. 21 III", MACHINE_IS_SKELETON )
-GAME( 197?, tvpoker, 0, a1supply, 0, a1supply_state, empty_init, ROT0, "A-1 Supply", "T.V. Poker",  MACHINE_IS_SKELETON )
+GAME( 197?, tv21,    0, a1supply, 0, a1supply_state, empty_init, ROT0, "A-1 Supply", "T.V. 21",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 197?, tv21_3,  0, a1supply, 0, a1supply_state, empty_init, ROT0, "A-1 Supply", "T.V. 21 III", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 197?, tvpoker, 0, a1supply, 0, a1supply_state, empty_init, ROT0, "A-1 Supply", "T.V. Poker",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -102,4 +102,4 @@ ROM_END
 } // Anonymous namespace
 
 //   YEAR  NAME       PARENT  MACHINE   INPUT     CLASS           INIT        ROT   COMPANY                    FULLNAME               FLAGS
-GAME(200?, onlinertp, 0,      conliner, conliner, conliner_state, empty_init, ROT0, "Comatel / Atata Systems", "Onliner Touch Party", MACHINE_IS_SKELETON) // v4.222.493, with v4.44.450 update
+GAME(200?, onlinertp, 0,      conliner, conliner, conliner_state, empty_init, ROT0, "Comatel / Atata Systems", "Onliner Touch Party", MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // v4.222.493, with v4.44.450 update

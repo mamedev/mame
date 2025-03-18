@@ -2,8 +2,6 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    chd.h
-
     MAME Compressed Hunks of Data file format
 
 ***************************************************************************/
@@ -309,18 +307,18 @@ public:
 	uint32_t hunk_count() const noexcept { return m_hunkcount; }
 	uint32_t unit_bytes() const noexcept { return m_unitbytes; }
 	uint64_t unit_count() const noexcept { return m_unitcount; }
-	bool compressed() const { return (m_compression[0] != CHD_CODEC_NONE); }
+	bool compressed() const noexcept { return (m_compression[0] != CHD_CODEC_NONE); }
 	chd_codec_type compression(int index) const noexcept { return m_compression[index]; }
 	chd_file *parent() const noexcept { return m_parent.get(); }
 	bool parent_missing() const noexcept;
-	util::sha1_t sha1();
-	util::sha1_t raw_sha1();
-	util::sha1_t parent_sha1();
+	util::sha1_t sha1() const noexcept;
+	util::sha1_t raw_sha1() const noexcept;
+	util::sha1_t parent_sha1() const noexcept;
 	std::error_condition hunk_info(uint32_t hunknum, chd_codec_type &compressor, uint32_t &compbytes);
 
 	// setters
-	void set_raw_sha1(util::sha1_t rawdata);
-	void set_parent_sha1(util::sha1_t parent);
+	std::error_condition set_raw_sha1(util::sha1_t rawdata) noexcept;
+	std::error_condition set_parent_sha1(util::sha1_t parent) noexcept;
 
 	// file create
 	std::error_condition create(std::string_view filename, uint64_t logicalbytes, uint32_t hunkbytes, uint32_t unitbytes, const chd_codec_type (&compression)[4]);
@@ -336,6 +334,7 @@ public:
 	void close();
 
 	// read/write
+	std::error_condition codec_process_hunk(uint32_t hunknum);
 	std::error_condition read_hunk(uint32_t hunknum, void *buffer);
 	std::error_condition write_hunk(uint32_t hunknum, const void *buffer);
 	std::error_condition read_units(uint64_t unitnum, void *buffer, uint32_t count = 1);
@@ -361,23 +360,23 @@ public:
 	std::error_condition codec_configure(chd_codec_type codec, int param, void *config);
 
 	// typing
-	bool is_hd() const;
-	bool is_cd() const;
-	bool is_gd() const;
-	bool is_dvd() const;
-	bool is_av() const;
+	std::error_condition check_is_hd() const noexcept;
+	std::error_condition check_is_cd() const noexcept;
+	std::error_condition check_is_gd() const noexcept;
+	std::error_condition check_is_dvd() const noexcept;
+	std::error_condition check_is_av() const noexcept;
 
 private:
 	struct metadata_entry;
 	struct metadata_hash;
 
 	// inline helpers
-	util::sha1_t be_read_sha1(const uint8_t *base) const;
-	void be_write_sha1(uint8_t *base, util::sha1_t value);
-	void file_read(uint64_t offset, void *dest, uint32_t length) const;
-	void file_write(uint64_t offset, const void *source, uint32_t length);
+	util::sha1_t be_read_sha1(const uint8_t *base) const noexcept;
+	void be_write_sha1(uint8_t *base, util::sha1_t value) noexcept;
+	std::error_condition file_read(uint64_t offset, void *dest, uint32_t length) const noexcept;
+	std::error_condition file_write(uint64_t offset, const void *source, uint32_t length) noexcept;
 	uint64_t file_append(const void *source, uint32_t length, uint32_t alignment = 0);
-	uint8_t bits_for_value(uint64_t value);
+	static uint8_t bits_for_value(uint64_t value) noexcept;
 
 	// internal helpers
 	uint32_t guess_unitbytes();
@@ -389,12 +388,12 @@ private:
 	std::error_condition create_common();
 	std::error_condition open_common(bool writeable, const open_parent_func &open_parent);
 	void create_open_common();
-	void verify_proper_compression_append(uint32_t hunknum);
+	std::error_condition verify_proper_compression_append(uint32_t hunknum) const noexcept;
 	void hunk_write_compressed(uint32_t hunknum, int8_t compression, const uint8_t *compressed, uint32_t complength, util::crc16_t crc16);
 	void hunk_copy_from_self(uint32_t hunknum, uint32_t otherhunk);
 	void hunk_copy_from_parent(uint32_t hunknum, uint64_t parentunit);
-	bool metadata_find(chd_metadata_tag metatag, int32_t metaindex, metadata_entry &metaentry, bool resume = false) const;
-	void metadata_set_previous_next(uint64_t prevoffset, uint64_t nextoffset);
+	std::error_condition metadata_find(chd_metadata_tag metatag, int32_t metaindex, metadata_entry &metaentry, bool resume = false) const noexcept;
+	std::error_condition metadata_set_previous_next(uint64_t prevoffset, uint64_t nextoffset) noexcept;
 	void metadata_update_hash();
 	static int CLIB_DECL metadata_hash_compare(const void *elem1, const void *elem2);
 
@@ -466,7 +465,7 @@ private:
 
 		// operations
 		void reset();
-		uint64_t find(util::crc16_t crc16, util::sha1_t sha1);
+		uint64_t find(util::crc16_t crc16, util::sha1_t sha1) const noexcept;
 		void add(uint64_t itemnum, util::crc16_t crc16, util::sha1_t sha1);
 
 		// constants
@@ -563,7 +562,7 @@ private:
 	osd_work_queue *        m_read_queue;       // work queue for reading
 	uint64_t                m_read_queue_offset;// next offset to enqueue
 	uint64_t                m_read_done_offset; // next offset that will complete
-	bool                    m_read_error;       // error during reading?
+	std::error_condition    m_read_error;       // error during reading, if any
 
 	// work item thread
 	static constexpr int WORK_BUFFER_HUNKS = 256;

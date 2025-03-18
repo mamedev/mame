@@ -228,22 +228,29 @@ void xmen6p_state::video_start()
 
 uint32_t xmen_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int const bg_colorbase = m_k053251->get_palette_index(k053251_device::CI4);
+	// update color info and refresh tilemaps
+	static const int K053251_CI[3] = { k053251_device::CI3, k053251_device::CI0, k053251_device::CI2 };
+	const int bg_colorbase = m_k053251->get_palette_index(k053251_device::CI4);
 	m_sprite_colorbase = m_k053251->get_palette_index(k053251_device::CI1);
-	m_layer_colorbase[0] = m_k053251->get_palette_index(k053251_device::CI3);
-	m_layer_colorbase[1] = m_k053251->get_palette_index(k053251_device::CI0);
-	m_layer_colorbase[2] = m_k053251->get_palette_index(k053251_device::CI2);
+
+	for (int i = 0; i < 3; i++)
+	{
+		int prev_colorbase = m_layer_colorbase[i];
+		m_layer_colorbase[i] = m_k053251->get_palette_index(K053251_CI[i]);
+
+		if (m_layer_colorbase[i] != prev_colorbase)
+			m_k052109->mark_tilemap_dirty(i);
+	}
 
 	m_k052109->tilemap_update();
 
+	// sort layers and draw
 	int layer[3];
-
-	layer[0] = 0;
-	m_layerpri[0] = m_k053251->get_priority(k053251_device::CI3);
-	layer[1] = 1;
-	m_layerpri[1] = m_k053251->get_priority(k053251_device::CI0);
-	layer[2] = 2;
-	m_layerpri[2] = m_k053251->get_priority(k053251_device::CI2);
+	for (int i = 0; i < 3; i++)
+	{
+		layer[i] = i;
+		m_layerpri[i] = m_k053251->get_priority(K053251_CI[i]);
+	}
 
 	konami_sortlayers3(layer, m_layerpri);
 
@@ -305,22 +312,29 @@ void xmen6p_state::screen_vblank(int state)
 				m_k052109->write(offset, m_tilemap[index][offset] & 0x00ff);
 		}
 
-		int const bg_colorbase = m_k053251->get_palette_index(k053251_device::CI4);
+		// update color info and refresh tilemaps
+		static const int K053251_CI[3] = { k053251_device::CI3, k053251_device::CI0, k053251_device::CI2 };
+		const int bg_colorbase = m_k053251->get_palette_index(k053251_device::CI4);
 		m_sprite_colorbase = m_k053251->get_palette_index(k053251_device::CI1);
-		m_layer_colorbase[0] = m_k053251->get_palette_index(k053251_device::CI3);
-		m_layer_colorbase[1] = m_k053251->get_palette_index(k053251_device::CI0);
-		m_layer_colorbase[2] = m_k053251->get_palette_index(k053251_device::CI2);
+
+		for (int i = 0; i < 3; i++)
+		{
+			int prev_colorbase = m_layer_colorbase[i];
+			m_layer_colorbase[i] = m_k053251->get_palette_index(K053251_CI[i]);
+
+			if (m_layer_colorbase[i] != prev_colorbase)
+				m_k052109->mark_tilemap_dirty(i);
+		}
 
 		m_k052109->tilemap_update();
 
+		// sort layers and draw
 		int layer[3];
-
-		m_layerpri[0] = m_k053251->get_priority(k053251_device::CI3);
-		layer[0] = 0;
-		m_layerpri[1] = m_k053251->get_priority(k053251_device::CI0);
-		layer[1] = 1;
-		m_layerpri[2] = m_k053251->get_priority(k053251_device::CI2);
-		layer[2] = 2;
+		for (int i = 0; i < 3; i++)
+		{
+			layer[i] = i;
+			m_layerpri[i] = m_k053251->get_priority(K053251_CI[i]);
+		}
 
 		konami_sortlayers3(layer, m_layerpri);
 
@@ -515,8 +529,8 @@ static INPUT_PORTS_START( xmen )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE3 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE4 )
 	PORT_BIT( 0x0030, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::do_read))
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::ready_read))
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START3 )
@@ -526,9 +540,9 @@ static INPUT_PORTS_START( xmen )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )  // unused?
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, di_write)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, clk_write)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, cs_write)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::di_write))
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::clk_write))
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::cs_write))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( xmen2p )
@@ -544,8 +558,8 @@ static INPUT_PORTS_START( xmen2p )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE2 )
 	PORT_BIT( 0x003c, IP_ACTIVE_LOW, IPT_UNKNOWN )  // unused?
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::do_read))
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::ready_read))
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -555,9 +569,9 @@ static INPUT_PORTS_START( xmen2p )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )  // unused?
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, di_write)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, clk_write)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, cs_write)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::di_write))
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::clk_write))
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::cs_write))
 INPUT_PORTS_END
 
 int xmen6p_state::frame_r()
@@ -580,8 +594,8 @@ static INPUT_PORTS_START( xmen6p )
 
 	PORT_START("EEPROM")
 	PORT_BIT( 0x003f, IP_ACTIVE_LOW, IPT_UNKNOWN )  // unused?
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::do_read))
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::ready_read))
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START3 )
@@ -589,12 +603,12 @@ static INPUT_PORTS_START( xmen6p )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_START5 ) // not verified
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_START6 ) // not verified
 	PORT_SERVICE_NO_TOGGLE( 0x4000, IP_ACTIVE_LOW )
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(xmen6p_state, frame_r)  // screen indicator?
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(xmen6p_state::frame_r))  // screen indicator?
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, di_write)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, clk_write)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, cs_write)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::di_write))
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::clk_write))
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::cs_write))
 INPUT_PORTS_END
 
 

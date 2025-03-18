@@ -20,8 +20,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_DEVICES_MACHINE_ADC0844_H
-#define MAME_DEVICES_MACHINE_ADC0844_H
+#ifndef MAME_MACHINE_ADC0844_H
+#define MAME_MACHINE_ADC0844_H
 
 #pragma once
 
@@ -92,4 +92,4 @@ private:
 DECLARE_DEVICE_TYPE(ADC0844, adc0844_device)
 DECLARE_DEVICE_TYPE(ADC0848, adc0848_device)
 
-#endif // MAME_DEVICES_MACHINE_ADC0844_H
+#endif // MAME_MACHINE_ADC0844_H

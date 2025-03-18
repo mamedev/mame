@@ -23,24 +23,25 @@ suggest 3 versions of SC9(C01) total: 1.5MHz, 1.6MHz, and 1.9MHz.
 
 I/O is via TTL, not further documented here
 
-3 versions were available, the newest "B" version was 2MHz and included the Budapest program.
-The Playmatic S was only released in Germany, it's basically a 'deluxe' version of SC9
-with magnet sensors and came with CB9 and CB16.
+3 versions were available, the newest "B" version was 2MHz and included the Budapest
+program. The Playmatic S was only released in Germany, it's basically a 'deluxe'
+version of SC9 with magnet sensors and came with CB9 and CB16.
 
 ================================================================================
 
-Starting with SC9, Fidelity added a cartridge slot to their chess computers, meant for
-extra book opening databases and recorded games.
+Starting with SC9, Fidelity added a cartridge slot to their chess computers, meant
+for extra book opening databases and recorded games.
 
 Known modules (*denotes undumped):
-- CB9: Challenger Book Openings 1
-- CB16: Challenger Book Openings 2
+- CB9: Book Openings 1
+- CB16: Book Openings 2
 - *CG64: 64 Greatest Games
-- *EOA-EOE: Challenger Book Openings: Chess Encyclopedia Volume A-E (5 modules)
-- *TDF: Challenger Book Openings: Tarrasch Defense to the Queen's Gambit
+- DVC: Sicilan Varation (prototype)
+- EOA-EOE: Chess Encyclopedia Volume A-E (5 modules, needs 7seg display)
+- *TDF: Tarrasch Defence to the Queen's Gambit
 
-The edge connector has D0-D7, A0-A13, 2 chip select lines, read/write lines, IRQ line.
-IRQ and write strobe are unused. Maximum known size is 16KB.
+The edge connector has D0-D7, A0-A13, 2 chip select lines, read/write lines, IRQ
+line. IRQ and write strobe are unused. Maximum known size is 16KB.
 
 *******************************************************************************/
 
@@ -217,7 +218,7 @@ static INPUT_PORTS_START( sc9c )
 	PORT_INCLUDE( sc9 )
 
 	PORT_START("CPU")
-	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, sc9_state, sc9c_change_cpu_freq, 0) // factory set
+	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sc9_state::sc9c_change_cpu_freq), 0) // factory set
 	PORT_CONFSETTING(    0x00, "1.5MHz" )
 	PORT_CONFSETTING(    0x01, "1.6MHz" )
 	PORT_CONFSETTING(    0x02, "1.9MHz" )

@@ -1,10 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:Krzysztof Strzecha
-/*****************************************************************************
- *
- * includes/primo.h
- *
- ****************************************************************************/
 
 #ifndef MAME_MICROKEY_PRIMO_H
 #define MAME_MICROKEY_PRIMO_H
@@ -39,8 +34,6 @@ public:
 		, m_vram(*this, "videoram")
 	{ }
 
-	void init_primo();
-
 	void primob32(machine_config &config);
 	void primob64(machine_config &config);
 	void primoa32(machine_config &config);
@@ -49,15 +42,16 @@ public:
 	void primoc64(machine_config &config);
 	void primoa48(machine_config &config);
 
+protected:
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+
 private:
 	uint8_t be_1_r(offs_t offset);
 	uint8_t be_2_r();
 	void ki_1_w(uint8_t data);
 	void ki_2_w(uint8_t data);
-	void FD_w(uint8_t data);
-	void machine_reset() override ATTR_COLD;
-	void machine_start() override ATTR_COLD;
-	DECLARE_MACHINE_RESET(primob);
+	void fd_w(uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vblank_irq(int state);
 	void update_memory();
@@ -89,9 +83,9 @@ private:
 	memory_region *m_cart1_rom = nullptr;
 	memory_region *m_cart2_rom = nullptr;
 
-	uint16_t m_video_memory_base = 0;
-	uint8_t m_port_FD = 0;
-	int m_nmi = 0;
+	uint16_t m_video_memory_base = 0x2800;
+	uint8_t m_port_fd = 0;
+	uint8_t m_nmi = 0;
 };
 
 

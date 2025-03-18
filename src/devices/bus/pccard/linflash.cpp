@@ -81,7 +81,7 @@ namespace {
 
 static INPUT_PORTS_START(linflash)
 	PORT_START("CONF")
-	PORT_CONFNAME(0x01, 0x00, "Write Protect")  PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, linear_flash_pccard_device, update_wp)
+	PORT_CONFNAME(0x01, 0x00, "Write Protect")  PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, FUNC(linear_flash_pccard_device::update_wp))
 	PORT_CONFSETTING(   0x01, DEF_STR(Yes))
 	PORT_CONFSETTING(   0x00, DEF_STR(No))
 INPUT_PORTS_END

@@ -889,6 +889,7 @@ void lua_engine::initialize()
 	// TODO: stuff below here needs to be rationalised
 	emu["app_name"] = &emulator_info::get_appname_lower;
 	emu["app_version"] = &emulator_info::get_bare_build_version;
+	emu["app_build"] = &emulator_info::get_build_version;
 	emu["gamename"] = [this] () { return machine().system().type.fullname(); };
 	emu["romname"] = [this] () { return machine().basename(); };
 	emu["softname"] = [this] () { return machine().options().software_name(); };
@@ -1461,6 +1462,19 @@ void lua_engine::initialize()
 	machine_type["cassettes"] = sol::property([] (running_machine &m) { return devenum<cassette_device_enumerator>(m.root_device()); });
 	machine_type["images"] = sol::property([] (running_machine &m) { return devenum<image_interface_enumerator>(m.root_device()); });
 	machine_type["slots"] = sol::property([](running_machine &m) { return devenum<slot_interface_enumerator>(m.root_device()); });
+	machine_type["phase"] = sol::property(
+			[] (running_machine const &m) -> char const *
+			{
+				switch (m.phase())
+				{
+				case machine_phase::PREINIT:    return "preinit";
+				case machine_phase::INIT:       return "init";
+				case machine_phase::RESET:      return "reset";
+				case machine_phase::RUNNING:    return "running";
+				case machine_phase::EXIT:       return "exit";
+				}
+				return nullptr;
+			});
 
 
 	auto game_driver_type = sol().registry().new_usertype<game_driver>("game_driver", sol::no_constructor);
@@ -2097,6 +2111,9 @@ void lua_engine::initialize()
 	ui_type["show_fps"] = sol::property(&mame_ui_manager::show_fps, &mame_ui_manager::set_show_fps);
 	ui_type["show_profiler"] = sol::property(&mame_ui_manager::show_profiler, &mame_ui_manager::set_show_profiler);
 	ui_type["image_display_enabled"] = sol::property(&mame_ui_manager::image_display_enabled, &mame_ui_manager::set_image_display_enabled);
+
+	// undocumented/unsupported
+	ui_type["show_menu"] = &mame_ui_manager::show_menu; // FIXME: this is dangerous - it doesn't give a proper chance for the current UI handler to clean up
 
 
 /* rom_entry library

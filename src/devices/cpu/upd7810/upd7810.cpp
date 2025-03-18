@@ -623,25 +623,7 @@ uint8_t upd7810_device::RP(offs_t port)
 		data = (m_pb_in & m_mb) | (m_pb_out & ~m_mb);
 		break;
 	case UPD7810_PORTC:
-		if (m_mc && !m_pc_in_cb.isunset())  // NS20031301 no need to read if the port is set as output
-			m_pc_in = m_pc_in_cb(0, m_mc);
-		data = (m_pc_in & m_mc) | (m_pc_out & ~m_mc);
-		if (m_mcc & 0x01)   /* PC0 = TxD output */
-			data = (data & ~0x01) | (m_txd & 1 ? 0x01 : 0x00);
-		if (m_mcc & 0x02)   /* PC1 = RxD input */
-			data = (data & ~0x02) | (m_rxd & 1 ? 0x02 : 0x00);
-		if (m_mcc & 0x04)   /* PC2 = SCK input/output */
-			data = (data & ~0x04) | (m_sck & 1 ? 0x04 : 0x00);
-		if (m_mcc & 0x08)   /* PC3 = TI/INT2 input */
-			data = (data & ~0x08) | (m_int2 & 1 ? 0x08 : 0x00);
-		if (m_mcc & 0x10)   /* PC4 = TO output */
-			data = (data & ~0x10) | (m_to & 1 ? 0x10 : 0x00);
-		if (m_mcc & 0x20)   /* PC5 = CI input */
-			data = (data & ~0x20) | (m_ci & 1 ? 0x20 : 0x00);
-		if (m_mcc & 0x40)   /* PC6 = CO0 output */
-			data = (data & ~0x40) | (m_co0 & 1 ? 0x40 : 0x00);
-		if (m_mcc & 0x80)   /* PC7 = CO1 output */
-			data = (data & ~0x80) | (m_co1 & 1 ? 0x80 : 0x00);
+		data = read_pc();
 		break;
 	case UPD7810_PORTD:
 		if (!m_pd_in_cb.isunset())
@@ -689,6 +671,42 @@ uint8_t upd7810_device::RP(offs_t port)
 	return data;
 }
 
+uint8_t upd7810_device::read_pc()
+{
+	if (m_mc && !m_pc_in_cb.isunset())  // NS20031301 no need to read if the port is set as output
+		m_pc_in = m_pc_in_cb(0, m_mc);
+	uint8_t data = (m_pc_in & m_mc) | (m_pc_out & ~m_mc);
+	if (m_mcc & 0x01)   /* PC0 = TxD output */
+		data = (data & ~0x01) | (m_txd & 1 ? 0x01 : 0x00);
+	if (m_mcc & 0x02)   /* PC1 = RxD input */
+		data = (data & ~0x02) | (m_rxd & 1 ? 0x02 : 0x00);
+	if (m_mcc & 0x04)   /* PC2 = SCK input/output */
+		data = (data & ~0x04) | (m_sck & 1 ? 0x04 : 0x00);
+	if (m_mcc & 0x08)   /* PC3 = TI/INT2 input */
+		data = (data & ~0x08) | (m_int2 & 1 ? 0x08 : 0x00);
+	if (m_mcc & 0x10)   /* PC4 = TO output */
+		data = (data & ~0x10) | (m_to & 1 ? 0x10 : 0x00);
+	if (m_mcc & 0x20)   /* PC5 = CI input */
+		data = (data & ~0x20) | (m_ci & 1 ? 0x20 : 0x00);
+	if (m_mcc & 0x40)   /* PC6 = CO0 output */
+		data = (data & ~0x40) | (m_co0 & 1 ? 0x40 : 0x00);
+	if (m_mcc & 0x80)   /* PC7 = CO1 output */
+		data = (data & ~0x80) | (m_co1 & 1 ? 0x80 : 0x00);
+	return data;
+}
+
+uint8_t upd7801_device::read_pc()
+{
+	if ((m_mc & 0x87) && !m_pc_in_cb.isunset())  // NS20031301 no need to read if the port is set as output
+		m_pc_in = m_pc_in_cb(0, 0x84 | (m_mc & 0x03));
+	uint8_t data = (m_pc_in & 0x87) | (m_pc_out & ~0x87);
+	if (!BIT(m_mc, 2))  /* TODO PC2 = -SCS input */
+		data = (data & ~0x04) | 0x04;
+	if (!BIT(m_mc, 7))  /* TODO PC7 = HOLD input */
+		data = (data & ~0x80);
+	return data;
+}
+
 void upd7810_device::WP(offs_t port, uint8_t data)
 {
 	switch (port)
@@ -705,24 +723,7 @@ void upd7810_device::WP(offs_t port, uint8_t data)
 		break;
 	case UPD7810_PORTC:
 		m_pc_out = data;
-		data = (data & ~m_mc) | (m_pc_pullups & m_mc);
-		if (m_mcc & 0x01)   /* PC0 = TxD output */
-			data = (data & ~0x01) | (m_txd & 1 ? 0x01 : 0x00);
-		if (m_mcc & 0x02)   /* PC1 = RxD input */
-			data = (data & ~0x02) | (m_rxd & 1 ? 0x02 : 0x00);
-		if (m_mcc & 0x04)   /* PC2 = SCK input/output */
-			data = (data & ~0x04) | (m_sck & 1 ? 0x04 : 0x00);
-		if (m_mcc & 0x08)   /* PC3 = TI/INT2 input */
-			data = (data & ~0x08) | (m_int2 & 1 ? 0x08 : 0x00);
-		if (m_mcc & 0x10)   /* PC4 = TO output */
-			data = (data & ~0x10) | (m_to & 1 ? 0x10 : 0x00);
-		if (m_mcc & 0x20)   /* PC5 = CI input */
-			data = (data & ~0x20) | (m_ci & 1 ? 0x20 : 0x00);
-		if (m_mcc & 0x40)   /* PC6 = CO0 output */
-			data = (data & ~0x40) | (m_co0 & 1 ? 0x40 : 0x00);
-		if (m_mcc & 0x80)   /* PC7 = CO1 output */
-			data = (data & ~0x80) | (m_co1 & 1 ? 0x80 : 0x00);
-		m_pc_out_cb(data);
+		write_pc(data);
 		break;
 	case UPD7810_PORTD:
 		m_pd_out = data;
@@ -761,6 +762,42 @@ void upd7810_device::WP(offs_t port, uint8_t data)
 	default:
 		logerror("uPD7810 internal error: RP() called with invalid port number\n");
 	}
+}
+
+void upd7810_device::write_pc(uint8_t data)
+{
+	data = (data & ~m_mc) | (m_pc_pullups & m_mc);
+	if (m_mcc & 0x01)   /* PC0 = TxD output */
+		data = (data & ~0x01) | (m_txd & 1 ? 0x01 : 0x00);
+	if (m_mcc & 0x02)   /* PC1 = RxD input */
+		data = (data & ~0x02) | (m_rxd & 1 ? 0x02 : 0x00);
+	if (m_mcc & 0x04)   /* PC2 = SCK input/output */
+		data = (data & ~0x04) | (m_sck & 1 ? 0x04 : 0x00);
+	if (m_mcc & 0x08)   /* PC3 = TI/INT2 input */
+		data = (data & ~0x08) | (m_int2 & 1 ? 0x08 : 0x00);
+	if (m_mcc & 0x10)   /* PC4 = TO output */
+		data = (data & ~0x10) | (m_to & 1 ? 0x10 : 0x00);
+	if (m_mcc & 0x20)   /* PC5 = CI input */
+		data = (data & ~0x20) | (m_ci & 1 ? 0x20 : 0x00);
+	if (m_mcc & 0x40)   /* PC6 = CO0 output */
+		data = (data & ~0x40) | (m_co0 & 1 ? 0x40 : 0x00);
+	if (m_mcc & 0x80)   /* PC7 = CO1 output */
+		data = (data & ~0x80) | (m_co1 & 1 ? 0x80 : 0x00);
+	m_pc_out_cb(data);
+}
+
+void upd7801_device::write_pc(uint8_t data)
+{
+	data = (data & 0x78) | (m_pc_pullups & ~0x78);
+	if (!BIT(m_mc, 3))  /* TODO PC3 = SAK output */
+		data = (data & ~0x08);
+	if (!BIT(m_mc, 4))  /* PC4 = TO output */
+		data = (data & ~0x10) | (m_to & 1 ? 0x10 : 0x00);
+	if (!BIT(m_mc, 5))  /* TODO PC5 = IO/-M input */
+		data = (data & ~0x20);
+	if (!BIT(m_mc, 6))  /* TODO PC6 = HLDA output */
+		data = (data & ~0x40);
+	m_pc_out_cb(data);
 }
 
 void upd7810_device::upd7810_take_irq()

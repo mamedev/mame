@@ -64,17 +64,17 @@
 
 DEFINE_DEVICE_TYPE(APPLE_OMEGA, omega_device, "aplomega", "Apple Omega PLL Clock Synthesizer")
 
-omega_device::omega_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, APPLE_OMEGA, tag, owner, clock),
-	  m_write_pclock(*this),
-	  m_data(false),
-	  m_clock(false),
-	  m_latch(false),
-	  m_latch_byte(0),
-	  m_N(0),
-	  m_D(0),
-	  m_P(0),
-	  m_bit(0)
+omega_device::omega_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, APPLE_OMEGA, tag, owner, clock),
+	m_write_pclock(*this),
+	m_data(false),
+	m_clock(false),
+	m_latch(false),
+	m_latch_byte(0),
+	m_N(0),
+	m_D(0),
+	m_P(0),
+	m_bit(0)
 {
 }
 

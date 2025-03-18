@@ -152,12 +152,12 @@ static int apf_cpf_handle_cassette(int16_t *buffer, const uint8_t *bytes)
    Generate samples for the tape image
 ********************************************************************/
 
-static int apf_apt_fill_wave(int16_t *buffer, int length, uint8_t *bytes)
+static int apf_apt_fill_wave(int16_t *buffer, int length, const uint8_t *bytes)
 {
 	return apf_apt_handle_cassette(buffer, bytes);
 }
 
-static int apf_cpf_fill_wave(int16_t *buffer, int length, uint8_t *bytes)
+static int apf_cpf_fill_wave(int16_t *buffer, int length, const uint8_t *bytes)
 {
 	return apf_cpf_handle_cassette(buffer, bytes);
 }

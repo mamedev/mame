@@ -20,7 +20,7 @@ DEFINE_DEVICE_TYPE(VCS_WHEEL, vcs_wheel_device, "vcs_wheel", "Atari / CBM Drivin
 
 static INPUT_PORTS_START( vcs_wheel )
 	PORT_START("JOY")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_WRITE_LINE_MEMBER(vcs_wheel_device, trigger_w) // Pin 6
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_WRITE_LINE_MEMBER(FUNC(vcs_wheel_device::trigger_w)) // Pin 6
 	PORT_BIT( 0xdc, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("WHEEL")

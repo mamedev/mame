@@ -169,7 +169,7 @@ private:
 
 #define SOURCE_OPTIONS(prtname, dflt, cnfname) \
 		PORT_START(prtname) \
-		PORT_CONFNAME(0x0f, dflt, cnfname) PORT_CHANGED_MEMBER(DEVICE_SELF, rs232_patch_box_device, source_changed, dflt) \
+		PORT_CONFNAME(0x0f, dflt, cnfname) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(rs232_patch_box_device::source_changed), dflt) \
 		PORT_CONFSETTING(TXD,      "TxD") \
 		PORT_CONFSETTING(RXD,      "RxD") \
 		PORT_CONFSETTING(RTS,      "RTS") \

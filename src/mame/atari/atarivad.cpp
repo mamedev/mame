@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    atarivad.h
+    atarivad.cpp
 
     Atari VAD video controller device.
 
@@ -69,7 +69,8 @@ void atari_vad_device::control_write(offs_t offset, uint16_t data, uint16_t mem_
 
 uint16_t atari_vad_device::control_read(offs_t offset)
 {
-	logerror("vc_r(%02X)\n", offset);
+	if (!machine().side_effects_disabled())
+		logerror("vc_r(%02X)\n", offset);
 
 	// a read from offset 0 returns the current scanline
 	// also sets bit 0x4000 if we're in VBLANK
@@ -119,7 +120,7 @@ void atari_vad_device::playfield_upper_w(offs_t offset, uint16_t data, uint16_t 
 void atari_vad_device::playfield_latched_lsb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_playfield_tilemap->write16(offset, data, mem_mask);
-	if ((m_control[0x0a] & 0x80) != 0)
+	if (BIT(m_control[0x0a], 7))
 		m_playfield_tilemap->write16_ext(offset, m_control[0x1d], uint16_t(0x00ff));
 }
 
@@ -133,7 +134,7 @@ void atari_vad_device::playfield_latched_lsb_w(offs_t offset, uint16_t data, uin
 void atari_vad_device::playfield_latched_msb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_playfield_tilemap->write16(offset, data, mem_mask);
-	if ((m_control[0x0a] & 0x80) != 0)
+	if (BIT(m_control[0x0a], 7))
 		m_playfield_tilemap->write16_ext(offset, m_control[0x1c], uint16_t(0xff00));
 }
 
@@ -147,7 +148,7 @@ void atari_vad_device::playfield_latched_msb_w(offs_t offset, uint16_t data, uin
 void atari_vad_device::playfield2_latched_msb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_playfield2_tilemap->write16(offset, data, mem_mask);
-	if ((m_control[0x0a] & 0x80) != 0)
+	if (BIT(m_control[0x0a], 7))
 		m_playfield2_tilemap->write16_ext(offset, m_control[0x1c], uint16_t(0xff00));
 }
 
@@ -223,7 +224,7 @@ TIMER_CALLBACK_MEMBER(atari_vad_device::scanline_int)
 void atari_vad_device::internal_control_write(offs_t offset, uint16_t newword)
 {
 	// switch off the offset
-	uint16_t oldword = m_control[offset];
+	uint16_t const oldword = m_control[offset];
 	m_control[offset] = newword;
 	switch (offset)
 	{
@@ -312,10 +313,10 @@ void atari_vad_device::internal_control_write(offs_t offset, uint16_t newword)
 		// latch enable
 		case 0x0a:
 			// check for palette banking
-			if (m_palette_bank != (((newword & 0x0400) >> 10) ^ 1))
+			if (m_palette_bank != BIT(~newword, 10))
 			{
 				screen().update_partial(screen().vpos());
-				m_palette_bank = ((newword & 0x0400) >> 10) ^ 1;
+				m_palette_bank = BIT(~newword, 10);
 			}
 //if ((oldword & ~0x0080) != (newword & ~0x0080)) printf("Latch control = %04X\n", newword);
 			break;
@@ -410,7 +411,7 @@ TIMER_CALLBACK_MEMBER(atari_vad_device::update_tilerow)
 	int scanline = param;
 
 	// skip if out of bounds, or not enabled
-	if (scanline <= screen().visible_area().bottom() && (m_control[0x0a] & 0x2000) != 0 && m_alpha_tilemap != nullptr)
+	if (scanline <= screen().visible_area().bottom() && BIT(m_control[0x0a], 13) && m_alpha_tilemap != nullptr)
 	{
 		// iterate over non-visible alpha tiles in this row
 		int offset = scanline / 8 * 64 + 48 + 2 * (scanline % 8);
@@ -429,7 +430,7 @@ TIMER_CALLBACK_MEMBER(atari_vad_device::update_tilerow)
 	}
 
 	// update the timer to go off at the start of the next row
-	scanline += ((m_control[0x0a] & 0x2000) != 0) ? 1 : 8;
+	scanline += BIT(m_control[0x0a], 13) ? 1 : 8;
 	if (scanline >= screen().height())
 		scanline = 0;
 	m_tilerow_update_timer->adjust(screen().time_until_pos(scanline), scanline);

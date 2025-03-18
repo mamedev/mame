@@ -573,6 +573,10 @@ u32 m68000_musashi_device::READ_EA_32(int ea)
 		{
 			return REG_D()[reg];
 		}
+		case 1: // An
+		{
+			return REG_A()[reg];
+		}
 		case 2:     // (An)
 		{
 			u32 ea = REG_A()[reg];
@@ -723,7 +727,7 @@ u64 m68000_musashi_device::READ_EA_64(int ea)
 	return 0;
 }
 
-extFloat80_t m68000_musashi_device::READ_EA_FPE(int mode, int reg, uint32_t di_mode_ea)
+extFloat80_t m68000_musashi_device::READ_EA_FPE(int mode, int reg, uint32_t offset)
 {
 	extFloat80_t fpr;
 
@@ -732,7 +736,7 @@ extFloat80_t m68000_musashi_device::READ_EA_FPE(int mode, int reg, uint32_t di_m
 		case 2:     // (An)
 		{
 			u32 ea = REG_A()[reg];
-			fpr = load_extended_float80(ea);
+			fpr = load_extended_float80(ea + offset);
 			break;
 		}
 
@@ -752,14 +756,20 @@ extFloat80_t m68000_musashi_device::READ_EA_FPE(int mode, int reg, uint32_t di_m
 		}
 		case 5:     // (d16, An)
 		{
-			fpr = load_extended_float80(di_mode_ea);
+			u32 ea = REG_A()[reg];
+			fpr = load_extended_float80(ea + offset);
 			break;
 		}
+#if 0
+		// FIXME: this addressing mode is broken, and fixing it so it works properly
+		// for FMOVEM is quite challenging; disabling it for now.
 		case 6:     // (An) + (Xn) + d8
 		{
-			fpr = load_extended_float80(di_mode_ea);
+			u32 ea = REG_A()[reg];
+			fpr = load_extended_float80(ea + offset);
 			break;
 		}
+#endif
 
 		case 7: // extended modes
 		{
@@ -1143,22 +1153,20 @@ void m68000_musashi_device::WRITE_EA_64(int ea, u64 data)
 	}
 }
 
-void m68000_musashi_device::WRITE_EA_FPE(int mode, int reg, extFloat80_t fpr, uint32_t di_mode_ea)
+void m68000_musashi_device::WRITE_EA_FPE(int mode, int reg, extFloat80_t fpr, uint32_t offset)
 {
 	switch (mode)
 	{
 		case 2:     // (An)
 		{
-			u32 ea;
-			ea = REG_A()[reg];
-			store_extended_float80(ea, fpr);
+			u32 ea = REG_A()[reg];
+			store_extended_float80(ea + offset, fpr);
 			break;
 		}
 
 		case 3:     // (An)+
 		{
-			u32 ea;
-			ea = REG_A()[reg];
+			u32 ea = REG_A()[reg];
 			store_extended_float80(ea, fpr);
 			REG_A()[reg] += 12;
 			break;
@@ -1166,18 +1174,16 @@ void m68000_musashi_device::WRITE_EA_FPE(int mode, int reg, extFloat80_t fpr, ui
 
 		case 4:     // -(An)
 		{
-			u32 ea;
 			REG_A()[reg] -= 12;
-			ea = REG_A()[reg];
+			u32 ea = REG_A()[reg];
 			store_extended_float80(ea, fpr);
 			break;
 		}
 
 		case 5:     // (d16,An)
 		{
-			// EA_AY_DI_32() should not be done here because fmovem would increase
-			// PC each time, reading incorrect displacement & advancing PC too much.
-			store_extended_float80(di_mode_ea, fpr);
+			u32 ea = REG_A()[reg];
+			store_extended_float80(ea + offset, fpr);
 			break;
 		}
 
@@ -1268,8 +1274,8 @@ void m68000_musashi_device::fpgen_rm_reg(u16 w2)
 			{
 				int imode = (ea >> 3) & 0x7;
 				int reg = (ea & 0x7);
-				uint32_t di_mode_ea = imode == 5 ? (REG_A()[reg] + MAKE_INT_16(m68ki_read_imm_16())) : 0;
-				source = READ_EA_FPE(imode, reg, di_mode_ea);
+				uint32_t offset = (imode == 5) ? MAKE_INT_16(m68ki_read_imm_16()) : 0;
+				source = READ_EA_FPE(imode, reg, offset);
 				break;
 			}
 			case 3:     // Packed-decimal Real
@@ -1738,6 +1744,42 @@ void m68000_musashi_device::fpgen_rm_reg(u16 w2)
 			m_icount -= 56;
 			break;
 		}
+		case 0x08: // FETOXM1
+		{
+			m_fpr[dst] = extF80_sub(extFloat80_etox(source), i32_to_extF80(1));
+			set_condition_codes(m_fpr[dst]);
+			sync_exception_flags(source, dstCopy, EXC_ENB_UNDFLOW);
+			LOGMASKED(LOG_INSTRUCTIONS_VERBOSE, "FETOXM1: e ** %f - 1 = %f\n", fx80_to_double(source), fx80_to_double(m_fpr[dst]));
+			m_icount -= 568;
+			break;
+		}
+		case 0x10: // FETOX
+		{
+			m_fpr[dst] = extFloat80_etox(source);
+			set_condition_codes(m_fpr[dst]);
+			sync_exception_flags(source, dstCopy, EXC_ENB_UNDFLOW);
+			LOGMASKED(LOG_INSTRUCTIONS_VERBOSE, "FETOX: e ** %f = %f\n", fx80_to_double(source), fx80_to_double(m_fpr[dst]));
+			m_icount -= 520;
+			break;
+		}
+		case 0x11: // FTWOTOX
+		{
+			m_fpr[dst] = extFloat80_2tox(source);
+			set_condition_codes(m_fpr[dst]);
+			sync_exception_flags(source, dstCopy, EXC_ENB_UNDFLOW);
+			printf("FTWOTOX: 2 ** %f = %f\n", fx80_to_double(source), fx80_to_double(m_fpr[dst]));
+			m_icount -= 590;
+			break;
+		}
+		case 0x12: // FTENTOX
+		{
+			m_fpr[dst] = extFloat80_10tox(source);
+			set_condition_codes(m_fpr[dst]);
+			sync_exception_flags(source, dstCopy, EXC_ENB_UNDFLOW);
+			LOGMASKED(LOG_INSTRUCTIONS_VERBOSE, "FTENTOX: 10 ** %f = %f\n", fx80_to_double(source), fx80_to_double(m_fpr[dst]));
+			m_icount -= 590;
+			break;
+		}
 
 		default:    fatalerror("fpgen_rm_reg: unimplemented opmode %02X at %08X\n", opmode, m_ppc);
 	}
@@ -1770,9 +1812,9 @@ void m68000_musashi_device::fmove_reg_mem(u16 w2)
 		{
 			int mode = (ea >> 3) & 0x7;
 			int reg = (ea & 0x7);
-			uint32_t di_mode_ea = mode == 5 ? (REG_A()[reg] + MAKE_INT_16(m68ki_read_imm_16())) : 0;
+			uint32_t offset = (mode == 5) ? MAKE_INT_16(m68ki_read_imm_16()) : 0;
 
-			WRITE_EA_FPE(mode, reg, m_fpr[src], di_mode_ea);
+			WRITE_EA_FPE(mode, reg, m_fpr[src], offset);
 			break;
 		}
 		case 3:     // Packed-decimal Real with Static K-factor
@@ -1829,20 +1871,7 @@ void m68000_musashi_device::fmove_fpcr(u16 w2)
 	switch (mode)
 	{
 	case 0:     // Dn
-	#if 0
-		if (dir)
-		{
-			if (regsel & 4) WRITE_EA_32(ea, m_fpcr);
-			if (regsel & 2) WRITE_EA_32(ea, m_fpsr);
-			if (regsel & 1) WRITE_EA_32(ea, m_fpiar);
-		}
-		else
-		{
-			if (regsel & 4) m_fpcr = READ_EA_32(ea);
-			if (regsel & 2) m_fpsr = READ_EA_32(ea);
-			if (regsel & 1) m_fpiar = READ_EA_32(ea);
-		}
-	#endif
+	case 1:     // An
 		break;
 
 	case 2: // (An)
@@ -1907,6 +1936,7 @@ void m68000_musashi_device::fmove_fpcr(u16 w2)
 	switch (mode)
 	{
 	case 0: // Dn
+	case 1: // An
 	case 3: // (An)+
 	case 4: // -(An)
 		if (dir)    // From system control reg to <ea>
@@ -2024,11 +2054,10 @@ void m68000_musashi_device::fmovem(u16 w2)
 	{
 		switch (mode)
 		{
-			case 1: // Dynamic register list, postincrement or control addressing mode.
-				// FIXME: not really tested, but seems to work
+			case 1: // dynamic register list, predecrement addressing mode
 				reglist = REG_D()[(reglist >> 4) & 7];
 				[[fallthrough]];
-			case 0:     // Static register list, predecrement or control addressing mode
+			case 0: // static register list, predecrement addressing mode
 			{
 				// the "di_mode_ea" parameter kludge is required here else WRITE_EA_FPE would have
 				// to call EA_AY_DI_32() (that advances PC & reads displacement) each time
@@ -2036,18 +2065,14 @@ void m68000_musashi_device::fmovem(u16 w2)
 				// this forces to pre-read the mode (named "imode") so we can decide to read displacement, only once
 				int imode = (ea >> 3) & 0x7;
 				int reg = (ea & 0x7);
-				int di_mode = imode == 5;
-				uint32_t di_mode_ea = di_mode ? (REG_A()[reg] + MAKE_INT_16(m68ki_read_imm_16())) : 0;
+				uint32_t offset = (imode == 5) ? MAKE_INT_16(m68ki_read_imm_16()) : 0;
 
 				for (i=0; i < 8; i++)
 				{
 					if (reglist & (1 << i))
 					{
-						WRITE_EA_FPE(imode, reg, m_fpr[i], di_mode_ea);
-						if (di_mode)
-						{
-							di_mode_ea += 12;
-						}
+						WRITE_EA_FPE(imode, reg, m_fpr[i], offset);
+						offset += 12;
 
 						m_icount -= 2;
 					}
@@ -2055,27 +2080,21 @@ void m68000_musashi_device::fmovem(u16 w2)
 				break;
 			}
 
-			case 3: // Dynamic register list, postincrement or control addressing mode.
-				// FIXME: not really tested, but seems to work
+			case 3: // dynamic register list, postincrement or control addressing mode
 				reglist = REG_D()[(reglist >> 4) & 7];
 				[[fallthrough]];
-			case 2:     // Static register list, postdecrement or control addressing mode
+			case 2: // static register list, postincrement or control addressing mode
 			{
 				int imode = (ea >> 3) & 0x7;
 				int reg = (ea & 0x7);
-				int di_mode = imode == 5;
-
-				uint32_t di_mode_ea = di_mode ? (REG_A()[reg] + MAKE_INT_16(m68ki_read_imm_16())) : 0;
+				uint32_t offset = (imode == 5) ? MAKE_INT_16(m68ki_read_imm_16()) : 0;
 
 				for (i=0; i < 8; i++)
 				{
 					if (reglist & (1 << i))
 					{
-						WRITE_EA_FPE(imode, reg, m_fpr[7 - i], di_mode_ea);
-						if (di_mode)
-						{
-							di_mode_ea += 12;
-						}
+						WRITE_EA_FPE(imode, reg, m_fpr[7 - i], offset);
+						offset += 12;
 
 						m_icount -= 2;
 					}
@@ -2090,26 +2109,22 @@ void m68000_musashi_device::fmovem(u16 w2)
 	{
 		switch (mode)
 		{
-			case 3: // Dynamic register list, predecrement addressing mode.
+			case 3: // dynamic register list, postincrement or control addressing mode
 				// FIXME: not really tested, but seems to work
 				reglist = REG_D()[(reglist >> 4) & 7];
 				[[fallthrough]];
-			case 2:     // Static register list, postincrement or control addressing mode
+			case 2: // static register list, postincrement or control addressing mode
 			{
 				int imode = (ea >> 3) & 0x7;
 				int reg = (ea & 0x7);
-				int di_mode = imode == 5;
-				uint32_t di_mode_ea = di_mode ? (REG_A()[reg] + MAKE_INT_16(m68ki_read_imm_16())) : 0;
+				uint32_t offset = (imode == 5) ? MAKE_INT_16(m68ki_read_imm_16()) : 0;
 
 				for (i=0; i < 8; i++)
 				{
 					if (reglist & (1 << i))
 					{
-						m_fpr[7 - i] = READ_EA_FPE(imode, reg, di_mode_ea);
-						if (di_mode)
-						{
-							di_mode_ea += 12;
-						}
+						m_fpr[7 - i] = READ_EA_FPE(imode, reg, offset);
+						offset += 12;
 
 						m_icount -= 2;
 					}
@@ -2511,4 +2526,45 @@ void m68000_musashi_device::m68881_ftrap()
 				break;
 		}
 	}
+}
+
+// Read the FPU's Coprocessor Interface Registers (CIRs).
+// References: MC68881/68882 Coprocessor User's Manual 1st Edition,
+// pages 7-1 to 7-8 and M68030 User's Manual 3rd Edition page 7-69.
+u32 m68000_musashi_device::m6888x_read_cir(offs_t offset)
+{
+	// If no FPU is present, reading any CIRs causes a bus error.
+	// Pre-1992 Macintosh ROMs use this method to detect the presence
+	// of an FPU.  1992 and later ROMs just execute FNOP and check for
+	// an F-line trap, because this mechanism does not exist on the 68040.
+	if (!m_has_fpu)
+	{
+		m68k_cause_bus_error();
+	}
+
+	// TODO: actually try to return meaningful values?
+	// offset   function
+	// 0x00     Response            read-only       16 bit (value in D31-D16)
+	// 0x02     Control             write-only      16
+	// 0x04     Save                read            16
+	// 0x06     Restore             read/write      16
+	// 0x08     Operation Word      read/write      16
+	// 0x0a     Command             write-only      16
+	// 0x0c     (reserved)          N/A             16
+	// 0x0e     Condition           write-only      16
+	// 0x10     Operand             read/write      32 bit
+	// 0x14     Register Select     read-only       16
+	// 0x18     Instruction Address write-only      32
+	// 0x1c     Operand Address     read/write      32
+	return 0;
+}
+
+void m68000_musashi_device::m6888x_write_cir(offs_t offset, u32 data)
+{
+	if (!m_has_fpu)
+	{
+		m68k_cause_bus_error();
+	}
+
+	// TODO: actually do something with these values?
 }

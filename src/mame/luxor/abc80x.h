@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#ifndef MAME_LUXOR_ABC800_H
-#define MAME_LUXOR_ABC800_H
+#ifndef MAME_LUXOR_ABC80X_H
+#define MAME_LUXOR_ABC80X_H
 
 #pragma once
 
@@ -63,9 +63,9 @@
 #define Z80SIO_TAG          "z80sio"
 #define Z80DART_TAG         "z80dart"
 #define DISCRETE_TAG        "discrete"
-#define CASSETTE_TAG        "cassette"
-#define RS232_A_TAG         "rs232a"
-#define RS232_B_TAG         "rs232b"
+#define CASSETTE_TAG        "cas"
+#define RS232_A_TAG         "pr"
+#define RS232_B_TAG         "v24"
 #define ABC_KEYBOARD_PORT_TAG   "kb"
 #define TIMER_CTC_TAG       "timer_ctc"
 #define TIMER_CASSETTE_TAG  "timer_cass"
@@ -355,4 +355,4 @@ public:
 	void abc806_mem(address_map &map) ATTR_COLD;
 };
 
-#endif // MAME_LUXOR_ABC800_H
+#endif // MAME_LUXOR_ABC80X_H

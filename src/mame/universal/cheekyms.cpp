@@ -2,8 +2,9 @@
 // copyright-holders: Lee Taylor, Chris Moore
 
 /*************************************************************************
+
     Universal Cheeky Mouse Driver
-    (c)Lee Taylor May/June 1998, All rights reserved.
+    (c)Lee Taylor May/June 1998
 
 **************************************************************************/
 
@@ -327,7 +328,7 @@ static INPUT_PORTS_START( cheekyms )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cheekyms_state, coin_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(cheekyms_state::coin_inserted), 0)
 INPUT_PORTS_END
 
 

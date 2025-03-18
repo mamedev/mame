@@ -95,4 +95,4 @@ ROM_END
 
 
 // 'STELLA DICE MASTER F2' and 'COPYRIGHT BY ADP LUEBBECKE GERMANY 1993' in ROM
-GAME( 1993, dicemstr, 0, dicemstr, dicemstr, stella8085_state, empty_init, ROT0, "Stella", "Dice Master", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1993, dicemstr, 0, dicemstr, dicemstr, stella8085_state, empty_init, ROT0, "Stella", "Dice Master", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

@@ -385,4 +385,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT            COMPANY      FULLNAME  FLAGS
-COMP( 1984, s3670, 0,      0,      symbolics, symbolics, symbolics_state, init_symbolics, "Symbolics", "3670",   MACHINE_IS_SKELETON )
+COMP( 1984, s3670, 0,      0,      symbolics, symbolics, symbolics_state, init_symbolics, "Symbolics", "3670",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

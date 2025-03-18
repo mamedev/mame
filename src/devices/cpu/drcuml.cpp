@@ -37,8 +37,11 @@
 #include "emuopts.h"
 #include "drcbec.h"
 #ifdef NATIVE_DRC
+#ifndef ASMJIT_NO_X86
 #include "drcbex86.h"
 #include "drcbex64.h"
+#endif
+#include "drcbearm64.h"
 #endif
 
 #include <fstream>
@@ -55,15 +58,16 @@
 
 
 //**************************************************************************
-//  TYPE DEFINITIONS
+//  MACROS
 //**************************************************************************
 
 // determine the type of the native DRC, falling back to C
 #ifndef NATIVE_DRC
-typedef drcbe_c drcbe_native;
-#else
-typedef NATIVE_DRC drcbe_native;
+#define NATIVE_DRC drcbe_c
 #endif
+#define MAKE_DRCBE_IMPL(name) make_##name
+#define MAKE_DRCBE(name) MAKE_DRCBE_IMPL(name)
+#define make_drcbe_native MAKE_DRCBE(NATIVE_DRC)
 
 
 // structure describing back-end validation test
@@ -92,7 +96,6 @@ drcbe_interface::drcbe_interface(drcuml_state &drcuml, drc_cache &cache, device_
 	, m_device(device)
 	, m_space()
 	, m_state(*reinterpret_cast<drcuml_machine_state *>(cache.alloc_near(sizeof(m_state))))
-	, m_accessors(nullptr)
 {
 	// reset the machine state
 	memset(&m_state, 0, sizeof(m_state));
@@ -102,17 +105,12 @@ drcbe_interface::drcbe_interface(drcuml_state &drcuml, drc_cache &cache, device_
 	if (device.interface(memory))
 	{
 		int const count = memory->max_space_count();
-		m_accessors = reinterpret_cast<data_accessors *>(cache.alloc_near(sizeof(*m_accessors) * count));
-		memset(m_accessors, 0, sizeof(*m_accessors) * count);
 		m_space.resize(count, nullptr);
 
 		for (int spacenum = 0; spacenum < count; ++spacenum)
 		{
 			if (memory->has_space(spacenum))
-			{
 				m_space[spacenum] = &memory->space(spacenum);
-				m_space[spacenum]->accessors(m_accessors[spacenum]);
-			}
 		}
 	}
 }
@@ -140,8 +138,8 @@ drcuml_state::drcuml_state(device_t &device, drc_cache &cache, u32 flags, int mo
 	: m_device(device)
 	, m_cache(cache)
 	, m_beintf(device.machine().options().drc_use_c()
-			? std::unique_ptr<drcbe_interface>{ new drcbe_c(*this, device, cache, flags, modes, addrbits, ignorebits) }
-			: std::unique_ptr<drcbe_interface>{ new drcbe_native(*this, device, cache, flags, modes, addrbits, ignorebits) })
+			? drc::make_drcbe_c(*this, device, cache, flags, modes, addrbits, ignorebits)
+			: drc::make_drcbe_native(*this, device, cache, flags, modes, addrbits, ignorebits))
 	, m_umllog(device.machine().options().drc_log_uml()
 			? new std::ofstream(util::string_format("drcuml_%s.asm", device.shortname()))
 			: nullptr)

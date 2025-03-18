@@ -174,11 +174,11 @@ uint32_t n64_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	if (m_rcp_periphs->is_interlace_mode())
 	{
 		m_rcp_periphs->video_update(m_interlace_bitmap[m_rcp_periphs->get_current_field()]);
-		for (int y=cliprect.min_y; y <= cliprect.max_y; y ++)
+		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
 			const u8 line_field = y & 1;
 			const u16 y_field_line = y >> 1;
-			for (int x = cliprect.min_x; x<=cliprect.max_x; x++)
+			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
 				bitmap.pix(y, x) = m_interlace_bitmap[line_field].pix(y_field_line, x);
 			}

@@ -12,7 +12,7 @@
 #pragma once
 
 #include "cbmiec.h"
-#include "cpu/m6502/m65c02.h"
+#include "cpu/m6502/w65c02.h"
 #include "imagedev/floppy.h"
 #include "machine/6522via.h"
 #include "machine/upd765.h"
@@ -58,7 +58,7 @@ protected:
 
 	void add_common_devices(machine_config &config);
 
-	required_device<m65c02_device> m_maincpu;
+	required_device<w65c02_device> m_maincpu;
 	required_device<upd765_family_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 

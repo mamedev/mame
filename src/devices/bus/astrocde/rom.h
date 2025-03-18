@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef MAME_BUS_ASTROCADE_ROM_H
-#define MAME_BUS_ASTROCADE_ROM_H
+#ifndef MAME_BUS_ASTROCDE_ROM_H
+#define MAME_BUS_ASTROCDE_ROM_H
 
 #pragma once
 
@@ -91,4 +91,4 @@ DECLARE_DEVICE_TYPE(ASTROCADE_ROM_256K, astrocade_rom_256k_device)
 DECLARE_DEVICE_TYPE(ASTROCADE_ROM_512K, astrocade_rom_512k_device)
 DECLARE_DEVICE_TYPE(ASTROCADE_ROM_CASS, astrocade_rom_cass_device)
 
-#endif // MAME_BUS_ASTROCADE_ROM_H
+#endif // MAME_BUS_ASTROCDE_ROM_H

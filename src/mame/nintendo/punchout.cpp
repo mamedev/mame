@@ -329,7 +329,7 @@ static INPUT_PORTS_START( punchout )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x0f, DEF_STR( Free_Play ) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("vlm", vlm5030_device, bsy) /* VLM5030 busy signal */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("vlm", FUNC(vlm5030_device::bsy)) /* VLM5030 busy signal */
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x00, "R18:!1" )       /* Not documented, R18 resistor */
 	PORT_DIPNAME( 0x80, 0x00, "Copyright" )             PORT_DIPLOCATION("R19:!1") /* Not documented, R19 resistor */
@@ -562,7 +562,7 @@ bit 3210 5432  L  R  C
 	PORT_DIPSETTING(    0x0d, "1101" )
 	PORT_DIPSETTING(    0x0e, "1110" )
 	PORT_DIPSETTING(    0x0f, "1111" )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("vlm", vlm5030_device, bsy) /* VLM5030 busy signal */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("vlm", FUNC(vlm5030_device::bsy)) /* VLM5030 busy signal */
 	PORT_DIPNAME( 0x40, 0x00, "Coin Slots" )            PORT_DIPLOCATION("R18:!1") /* R18 resistor */
 	PORT_DIPSETTING(    0x40, "1" )
 	PORT_DIPSETTING(    0x00, "2" )

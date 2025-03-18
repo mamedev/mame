@@ -6,9 +6,8 @@
 
 ***************************************************************************/
 
-
-#ifndef MAME_NABUPC_KEYBOARD_DEVICE_H
-#define MAME_NABUPC_KEYBOARD_DEVICE_H
+#ifndef MAME_MISC_NABUPC_KBD_H
+#define MAME_MISC_NABUPC_KBD_H
 
 #pragma once
 
@@ -63,4 +62,4 @@ private:
 
 DECLARE_DEVICE_TYPE(NABUPC_KEYBOARD, nabupc_keyboard_device)
 
-#endif // MAME_NABUPC_KEYBOARD_DEVICE_H
+#endif // MAME_MISC_NABUPC_KBD_H

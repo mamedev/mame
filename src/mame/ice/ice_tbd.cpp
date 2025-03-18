@@ -91,4 +91,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1988, ice_tbd, 0, ice_tbd, ice_tbd, ice_tbd_state, empty_init, ROT0, "Innovative Creations in Entertainment", "Turbo Drive (ICE)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1988, ice_tbd, 0, ice_tbd, ice_tbd, ice_tbd_state, empty_init, ROT0, "Innovative Creations in Entertainment", "Turbo Drive (ICE)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

@@ -6,29 +6,33 @@
 
  The 156 Chip is used on the following games:
 
- deco_mlc.c
+ dataeast/deco_mlc.cpp
 
- Stadium Hero 96 (stadhr96, stadh96a)
- Skull Fang (skullfng)
- Dunk Dream '95 / Hoops '96 (ddream95, hoops96)
+ Stadium Hero 96 (stadhr96*)
+ Skull Fang (skullfng*)
+ Dunk Dream '95 / Hoops / Hoops '96 (ddream95, hoops95, hoops96)
+ Janken Game Acchi Muite Hoi! (acchi)
 
- deco32.c
+ dataeast/deco32.cpp
 
- Night Slashers (nslasher, nslashej)
+ Night Slashers (nslasher*)
 
- simpl156
+ dataeast/simpl156.cpp
 
  Charlie Ninja (charlien)
- Magical Drop / Magical Drop Plus / Chain Reaction (magdrop, magdropp, chainrec)
- Joe & Mac Returns (joemacr, joemacra)
+ Magical Drop / Magical Drop Plus 1 / Chain Reaction (magdrop, magdropp, chainrec)
+ Joe & Mac Returns (joemacr*)
  Party Time / Ganbare! Gonta!! 2 (prtytime, gangonta)
+ Osman / Cannon Dancer (osman, candance)
 
- deco156.c
+ dataeast/deco156.cpp
 
- Osman (osman)
- Heavy Smash (hvysmsh)
- World Cup Volly '95 (wcvol95)
- Backfire!! (backfire, backfira)
+ Heavy Smash (hvysmsh*)
+ World Cup Volley '95 (wcvol95*)
+
+ dataeast/backfire.cpp
+
+ Backfire! (backfire*)
 
 */
 
@@ -38,13 +42,9 @@
 
 static void decrypt(uint32_t *src, uint32_t *dst, int length)
 {
-	int a;
-
-	for (a = 0; a < length/4; a++)
+	for (int a = 0; a < length / 4; a++)
 	{
-		int addr, dword;
-
-		addr = (a & 0xff0000) | 0x92c6;
+		int addr = (a & 0xff0000) | 0x92c6;
 
 		if (a & 0x0001) addr ^= 0xce4a;
 		if (a & 0x0002) addr ^= 0x4db2;
@@ -63,7 +63,7 @@ static void decrypt(uint32_t *src, uint32_t *dst, int length)
 		if (a & 0x4000) addr ^= 0x1eef;
 		if (a & 0x8000) addr ^= 0xf5a5;
 
-		dword = src[addr];
+		uint32_t dword = src[addr];
 
 		// note that each of the following lines affects exactly two bits
 
@@ -87,35 +87,35 @@ static void decrypt(uint32_t *src, uint32_t *dst, int length)
 		switch (a & 3)
 		{
 			case 0:
-				dword = bitswap<32>( dword ^ 0xec63197a,
-						1,   4,  7, 28, 22, 18, 20,  9,
+				dword = bitswap<32>(dword ^ 0xec63197a,
+					 1,  4,  7, 28, 22, 18, 20,  9,
 					16, 10, 30,  2, 31, 24, 19, 29,
-						6,  21, 23, 11, 12, 13,  5,  0,
-						8,  26, 27, 15, 14, 17, 25,  3 );
+					 6, 21, 23, 11, 12, 13,  5,  0,
+					 8, 26, 27, 15, 14, 17, 25,  3);
 				break;
 
 			case 1:
-				dword = bitswap<32>( dword ^ 0x58a5a55f,
+				dword = bitswap<32>(dword ^ 0x58a5a55f,
 					14, 23, 28, 29,  6, 24, 10,  1,
-						5,  16,  7,  2, 30,  8, 18,  3,
+					 5, 16,  7,  2, 30,  8, 18,  3,
 					31, 22, 25, 20, 17,  0, 19, 27,
-						9,  12, 21, 15, 26, 13,  4, 11 );
+					 9, 12, 21, 15, 26, 13,  4, 11);
 				break;
 
 			case 2:
-				dword = bitswap<32>( dword ^ 0xe3a65f16,
+				dword = bitswap<32>(dword ^ 0xe3a65f16,
 					19, 30, 21,  4,  2, 18, 15,  1,
 					12, 25,  8,  0, 24, 20, 17, 23,
 					22, 26, 28, 16,  9, 27,  6, 11,
-					31, 10,  3, 13, 14,  7, 29,  5 );
+					31, 10,  3, 13, 14,  7, 29,  5);
 				break;
 
 			case 3:
-				dword = bitswap<32>( dword ^ 0x28d93783,
+				dword = bitswap<32>(dword ^ 0x28d93783,
 					30,  6, 15,  0, 31, 18, 26, 22,
 					14, 23, 19, 17, 10,  8, 11, 20,
-						1,  28,  2,  4,  9, 24, 25, 27,
-						7,  21, 13, 29,  5,  3, 16, 12 );
+					 1, 28,  2,  4,  9, 24, 25, 27,
+					 7, 21, 13, 29,  5,  3, 16, 12);
 				break;
 		}
 
@@ -127,8 +127,8 @@ static void decrypt(uint32_t *src, uint32_t *dst, int length)
 void deco156_decrypt(running_machine &machine)
 {
 	uint32_t *rom = (uint32_t *)machine.root_device().memregion("maincpu")->base();
-	int length = machine.root_device().memregion("maincpu")->bytes();
-	std::vector<uint32_t> buf(length/4);
+	int const length = machine.root_device().memregion("maincpu")->bytes();
+	std::vector<uint32_t> buf(length / 4);
 
 	memcpy(&buf[0], rom, length);
 	decrypt(&buf[0], rom, length);

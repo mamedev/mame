@@ -123,4 +123,4 @@ ROM_END
 
 } // anonymous namespace
 
-SYST(1994, hohnadam, 0, 0, hohnadam, hohnadam, hohnadam_state, empty_init, "Hohner", "ADAM Advanced Digital/Analog Musical Instrument", MACHINE_IS_SKELETON)
+SYST(1994, hohnadam, 0, 0, hohnadam, hohnadam, hohnadam_state, empty_init, "Hohner", "ADAM Advanced Digital/Analog Musical Instrument", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

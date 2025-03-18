@@ -34,9 +34,10 @@ protected:
 
 	// device helpers
 	void initialize();
-	void update_interrupts();
+	void interrupt(s32 param);
+	void update_interrupts(attotime const delay = attotime::zero);
 	int receive(u8 *buf, int length);
-	TIMER_CALLBACK_MEMBER(transmit_poll);
+	void transmit_poll(s32 param);
 	void transmit();
 	bool address_filter(u8 *buf);
 
@@ -163,6 +164,7 @@ private:
 	u8 m_tx_ring_pos;
 	u16 m_tx_md[4];
 
+	emu_timer *m_interrupt;
 	emu_timer *m_transmit_poll;
 	int m_intr_out_state;
 	bool m_idon;

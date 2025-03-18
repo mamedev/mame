@@ -119,7 +119,7 @@ private:
 static INPUT_PORTS_START( ibmpcjr )
 	PORT_START("IN0") /* IN0 */
 	PORT_BIT ( 0xf0, 0xf0,   IPT_UNUSED )
-	PORT_BIT ( 0x08, 0x08,   IPT_CUSTOM ) PORT_VBLANK("pcvideo_pcjr:screen")
+	PORT_BIT ( 0x08, 0x08,   IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("pcvideo_pcjr:screen", FUNC(screen_device::vblank))
 	PORT_BIT ( 0x07, 0x07,   IPT_UNUSED )
 INPUT_PORTS_END
 

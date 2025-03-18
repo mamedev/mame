@@ -74,6 +74,7 @@ public:
 		m_scc(*this, "scc"),
 		m_egret(*this, "egret"),
 		m_cuda(*this, "cuda"),
+		m_config(*this, "config"),
 		m_cur_floppy(nullptr),
 		m_hdsel(0)
 	{
@@ -102,8 +103,10 @@ private:
 	required_device<z80scc_device> m_scc;
 	optional_device<egret_device> m_egret;
 	optional_device<cuda_device> m_cuda;
+	optional_ioport m_config;
 
 	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	u16 scc_r(offs_t offset)
 	{
@@ -157,6 +160,14 @@ void maclc_state::machine_start()
 	m_v8->set_ram_info((u32 *) m_ram->pointer(), m_ram->size());
 
 	save_item(NAME(m_hdsel));
+}
+
+void maclc_state::machine_reset()
+{
+	if (m_config)
+	{
+		m_maincpu->set_fpu_enable(BIT(m_config->read(), 0));
+	}
 }
 
 /***************************************************************************
@@ -306,6 +317,14 @@ void maclc_state::hdsel_w(int state)
 ***************************************************************************/
 
 static INPUT_PORTS_START( maclc )
+	PORT_START("config")
+	PORT_CONFNAME(0x01, 0x00, "FPU")
+	PORT_CONFSETTING(0x00, "No FPU")
+	PORT_CONFSETTING(0x01, "FPU Present")
+INPUT_PORTS_END
+
+// mactv doesn't have a way to add an FPU
+static INPUT_PORTS_START( mactv )
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -385,9 +404,10 @@ void maclc_state::maclc_base(machine_config &config)
 	nubus_device &nubus(NUBUS(config, "pds", 0));
 	nubus.set_space(m_maincpu, AS_PROGRAM);
 	nubus.set_address_mask(0x80ffffff);
+	nubus.set_bus_mode(nubus_device::nubus_mode_t::LC_PDS);
 	// V8 supports interrupts for slots $C, $D, and $E, but the LC, LC II, and Color Classic
-	// only hook the slot $E IRQ up to the PDS slot.
-	nubus.out_irqe_callback().set(m_v8, FUNC(v8_device::slot_irq_w<0x20>));
+	// only hook the slot $E IRQ up to the PDS slot.  ($C/$D/$E are 0/1/2 on the schematics).
+	nubus.out_irqe_callback().set(m_v8, FUNC(v8_device::slot2_irq_w));
 
 	MACADB(config, m_macadb, C15M);
 
@@ -461,7 +481,9 @@ void maclc_state::maccclas(machine_config &config)
 	m_cuda->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
 	m_cuda->via_clock_callback().set(m_v8, FUNC(v8_device::cb1_w));
 	m_cuda->via_data_callback().set(m_v8, FUNC(v8_device::cb2_w));
+	m_cuda->nmi_callback().set_inputline(m_maincpu, M68K_IRQ_7);
 	m_macadb->adb_data_callback().set(m_cuda, FUNC(cuda_device::set_adb_line));
+	m_macadb->adb_power_callback().set(m_cuda, FUNC(cuda_device::set_adb_power));
 	config.set_perfect_quantum(m_maincpu);
 
 	SPICE(config.replace(), m_v8, C15M);
@@ -491,6 +513,7 @@ void maclc_state::mactv(machine_config &config)
 	maclc_base(config);
 
 	M68030(config.replace(), m_maincpu, C32M);
+	m_maincpu->set_fpu_enable(false);   // this machine has no FPU and no ability to add one
 	m_maincpu->set_addrmap(AS_PROGRAM, &maclc_state::maccclassic_map);
 	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
@@ -498,12 +521,14 @@ void maclc_state::mactv(machine_config &config)
 	config.device_remove("fdc");
 
 	CUDA_V2XX(config, m_cuda, XTAL(32'768));
-	m_cuda->set_default_bios_tag("341s0788");   // TODO: 0789 freezes during boot, possible VIA bug or 6522/6523 difference?
+	m_cuda->set_default_bios_tag("341s0789");
 	m_cuda->reset_callback().set(FUNC(maclc_state::egret_reset_w));
 	m_cuda->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
 	m_cuda->via_clock_callback().set(m_v8, FUNC(v8_device::cb1_w));
 	m_cuda->via_data_callback().set(m_v8, FUNC(v8_device::cb2_w));
+	m_cuda->nmi_callback().set_inputline(m_maincpu, M68K_IRQ_7);
 	m_macadb->adb_data_callback().set(m_cuda, FUNC(cuda_device::set_adb_line));
+	m_macadb->adb_power_callback().set(m_cuda, FUNC(cuda_device::set_adb_power));
 	config.set_perfect_quantum(m_maincpu);
 
 	TINKERBELL(config.replace(), m_v8, C15M);
@@ -577,6 +602,24 @@ ROM_START( macclas2 )
 	ROM_LOAD32_BYTE( "341-0866__5be9__=c=apple_91.rommh.27c010.u24", 0x000001, 0x020000, CRC(eae68c36) SHA1(e6ce79647dfe7e66590a012836d0b6e985ff672b) )
 	ROM_LOAD32_BYTE( "341-0865__821e__=c=apple_91.romml.27c010.u23", 0x000002, 0x020000, CRC(cb306c01) SHA1(4d6e409995fd9a4aa9afda0fd790a5b09b1c2aca) )
 	ROM_LOAD32_BYTE( "341-0864__6fc6__=c=apple_91.romll.27c010.u22", 0x000003, 0x020000, CRC(21a51e72) SHA1(bb513c1a5b8a41c7534d66aeacaeea47f58dae92) )
+
+	/*
+	    There is a genuine bug in this ROM where a JMP through a table uses an index past the size of the
+	    table and the processor ends up in the middle of another instruction.  On a real 68030, the resulting
+	    illegal instruction does some still-not-100%-understood things to the registers that cause things to
+	    work by accident.  While that is still being investigated, we can at least patch the ROM so that
+	    booting when the system is in 32-bit mode works properly.
+
+	    This first patch changes the bad table JMP to an RTS; the ROM in the IIvx and IIvi has the correct
+	    number of table entries for the Classic II's boxflag and shows that the desired result is to do
+	    nothing.
+	*/
+	ROM_FILL(0x43b6e, 1, 0x4e)
+	ROM_FILL(0x43b6f, 1, 0x75)
+
+	// This second patch fixes the ROM checksum to compensate for the patch we just made.
+	ROM_FILL(0x00002, 1, 0x66)
+	ROM_FILL(0x00003, 1, 0x88)
 ROM_END
 
 ROM_START(maccclas)
@@ -595,4 +638,4 @@ COMP(1990, maclc,  0, 0, maclc,  maclc, maclc_state, empty_init, "Apple Computer
 COMP(1991, maclc2, 0, 0, maclc2, maclc, maclc_state, empty_init, "Apple Computer", "Macintosh LC II", MACHINE_SUPPORTS_SAVE)
 COMP(1991, macclas2, 0, 0, macclas2, maclc, maclc_state, empty_init, "Apple Computer", "Macintosh Classic II", MACHINE_SUPPORTS_SAVE)
 COMP(1993, maccclas, 0, 0, maccclas, maclc, maclc_state, empty_init, "Apple Computer", "Macintosh Color Classic", MACHINE_SUPPORTS_SAVE)
-COMP(1994, mactv, 0, 0, mactv, maclc, maclc_state, empty_init, "Apple Computer", "Macintosh TV", MACHINE_SUPPORTS_SAVE)
+COMP(1994, mactv, 0, 0, mactv, mactv, maclc_state, empty_init, "Apple Computer", "Macintosh TV", MACHINE_SUPPORTS_SAVE)

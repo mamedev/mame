@@ -90,10 +90,6 @@ Notes:
 #include "speaker.h"
 
 
-#define oki_time_base 0x08
-
-
-
 
 /**************************************************************************
    This table converts commands sent from the main CPU, into sample numbers

@@ -92,4 +92,4 @@ ROM_END
 
 } // anonymous namespace
 
-SYST(1998, airbase99, 0, 0, airbase99, airbase99, airbase99_state, empty_init, "JoMoX", "AiRBase 99", MACHINE_IS_SKELETON)
+SYST(1998, airbase99, 0, 0, airbase99, airbase99, airbase99_state, empty_init, "JoMoX", "AiRBase 99", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

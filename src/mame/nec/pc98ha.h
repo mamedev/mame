@@ -64,6 +64,8 @@ private:
 
 	u8 m_floppy_mode = 0;
 	u8 m_fdc_ctrl = 0;
+
+	virtual void uart_irq_check() override;
 };
 
 class pc98ha_state : public pc98lt_state

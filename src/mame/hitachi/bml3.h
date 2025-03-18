@@ -9,6 +9,7 @@
 #include "bus/bml3/bml3bus.h"
 #include "imagedev/cassette.h"
 #include "machine/6850acia.h"
+#include "machine/clock.h"
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
 #include "sound/ymopn.h"
@@ -72,6 +73,7 @@ public:
 		, m_speaker(*this, "speaker")
 		, m_ym2203(*this, "ym2203")
 		, m_acia(*this, "acia")
+		, m_acia_clock(*this, "acia_clock")
 		, m_io_keyboard(*this, "X%u", 0U)
 	{ }
 
@@ -111,6 +113,7 @@ private:
 	required_device<speaker_sound_device> m_speaker;
 	optional_device<ym2203_device> m_ym2203;
 	required_device<acia6850_device> m_acia;
+	required_device<clock_device> m_acia_clock;
 	//memory_view m_bank4;
 	required_ioport_array<4> m_io_keyboard;
 
@@ -119,6 +122,8 @@ private:
 	uint8_t kb_sel_r();
 	void kb_sel_w(u8 data);
 	void mode_sel_w(u8 data);
+	uint8_t baud_sel_r();
+	void baud_sel_w(u8 data);
 	void interlace_sel_w(u8 data);
 	[[maybe_unused]] uint8_t psg_latch_r();
 	[[maybe_unused]] void psg_latch_w(u8 data);
@@ -165,6 +170,7 @@ private:
 	u8 m_firq_mask = 0U;
 	u8 m_firq_status = 0U;
 	u8 m_nmi = 0U;
+	u8 m_baud_sel = 0U;
 };
 
 class bml3mk2_state : public bml3_state

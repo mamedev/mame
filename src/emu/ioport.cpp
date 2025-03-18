@@ -740,8 +740,8 @@ ioport_field::ioport_field(ioport_port &port, ioport_type type, ioport_value def
 	for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
 		m_seq[seqtype].set_default();
 
-	for (int i = 0; i < std::size(m_chars); i++)
-		std::fill(std::begin(m_chars[i]), std::end(m_chars[i]), char32_t(0));
+	for (auto &chars : m_chars)
+		std::fill(std::begin(chars), std::end(chars), UCHAR_INVALID);
 
 	// for DIP switches and configs, look for a default value from the owner
 	if (type == IPT_DIPSWITCH || type == IPT_CONFIG)
@@ -909,11 +909,8 @@ std::vector<char32_t> ioport_field::keyboard_codes(int which) const
 	if (which >= std::size(m_chars))
 		throw emu_fatalerror("Tried to access keyboard_code with out-of-range index %d\n", which);
 
-	std::vector<char32_t> result;
-	for (int i = 0; i < std::size(m_chars[which]) && m_chars[which][i] != 0; i++)
-		result.push_back(m_chars[which][i]);
-
-	return result;
+	auto &chars = m_chars[which];
+	return std::vector<char32_t>(std::begin(chars), std::find(std::begin(chars), std::end(chars), UCHAR_INVALID));
 }
 
 
@@ -3289,7 +3286,8 @@ ioport_configurer::ioport_configurer(device_t &owner, ioport_list &portlist, std
 	m_errorbuf(errorbuf),
 	m_curport(nullptr),
 	m_curfield(nullptr),
-	m_cursetting(nullptr)
+	m_cursetting(nullptr),
+	m_curshift(0)
 {
 }
 
@@ -3394,6 +3392,7 @@ ioport_configurer& ioport_configurer::field_alloc(ioport_type type, ioport_value
 
 	// reset the current setting
 	m_cursetting = nullptr;
+	m_curshift = 0;
 	return *this;
 }
 
@@ -3404,16 +3403,17 @@ ioport_configurer& ioport_configurer::field_alloc(ioport_type type, ioport_value
 
 ioport_configurer& ioport_configurer::field_add_char(std::initializer_list<char32_t> charlist)
 {
-	for (int index = 0; index < std::size(m_curfield->m_chars); index++)
-		if (m_curfield->m_chars[index][0] == 0)
-		{
-			const size_t char_count = std::size(m_curfield->m_chars[index]);
-			assert(charlist.size() > 0 && charlist.size() <= char_count);
+	if (m_curshift < std::size(m_curfield->m_chars))
+	{
+		auto &chars = m_curfield->m_chars[m_curshift++];
+		assert(chars[0] == UCHAR_INVALID);
+		assert(charlist.size() <= std::size(chars));
 
-			for (size_t i = 0; i < char_count; i++)
-				m_curfield->m_chars[index][i] = i < charlist.size() ? *(charlist.begin() + i) : 0;
-			return *this;
-		}
+		std::copy(charlist.begin(), charlist.end(), std::begin(chars));
+		std::fill(std::begin(chars) + charlist.size(), std::end(chars), UCHAR_INVALID);
+
+		return *this;
+	}
 
 	std::ostringstream s;
 	bool is_first = true;

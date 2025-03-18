@@ -2,10 +2,10 @@
 // copyright-holders:Steve Ellenoff,R. Belmont,Ryan Holtz
 /*****************************************************************************
  *
- *   arm7.c
+ *   arm7.cpp
  *   Portable CPU Emulator for 32-bit ARM v3/4/5/6
  *
- *   Copyright Steve Ellenoff, all rights reserved.
+ *   Copyright Steve Ellenoff
  *   Thumb, DSP, and MMU support and many bugfixes by R. Belmont and Ryan Holtz.
  *
  *  This work is based on:
@@ -79,6 +79,7 @@ DEFINE_DEVICE_TYPE(ARM1176JZF_S, arm1176jzf_s_cpu_device, "arm1176jzf_s", "ARM11
 DEFINE_DEVICE_TYPE(PXA250,       pxa250_cpu_device,       "pxa250",       "Intel XScale PXA250")
 DEFINE_DEVICE_TYPE(PXA255,       pxa255_cpu_device,       "pxa255",       "Intel XScale PXA255")
 DEFINE_DEVICE_TYPE(PXA270,       pxa270_cpu_device,       "pxa270",       "Intel XScale PXA270")
+DEFINE_DEVICE_TYPE(SA1100,       sa1100_cpu_device,       "sa1100",       "Intel StrongARM SA-1100")
 DEFINE_DEVICE_TYPE(SA1110,       sa1110_cpu_device,       "sa1110",       "Intel StrongARM SA-1110")
 DEFINE_DEVICE_TYPE(IGS036,       igs036_cpu_device,       "igs036",       "IGS036")
 
@@ -288,6 +289,16 @@ pxa270_cpu_device::pxa270_cpu_device(const machine_config &mconfig, const char *
 			   | ARM9_COPRO_ID_ARCH_V5TE
 			   | ARM9_COPRO_ID_PART_PXA270
 			   | ARM9_COPRO_ID_STEP_PXA255_A0;
+}
+
+sa1100_cpu_device::sa1100_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: arm7_cpu_device(mconfig, SA1100, tag, owner, clock, 4, ARCHFLAG_SA, ENDIANNESS_LITTLE)
+	// has StrongARM, no Thumb, no Enhanced DSP
+{
+	m_copro_id = ARM9_COPRO_ID_MFR_DEC
+			   | ARM9_COPRO_ID_ARCH_V4
+			   | ARM9_COPRO_ID_PART_SA1100
+			   | ARM9_COPRO_ID_STEP_SA1100_A;
 }
 
 sa1110_cpu_device::sa1110_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

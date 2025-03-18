@@ -24,8 +24,8 @@
 
 *******************************************************************************/
 
-#ifndef MAME_BUS_SAITEKOSA_EXPANSION_H
-#define MAME_BUS_SAITEKOSA_EXPANSION_H
+#ifndef MAME_BUS_SAITEK_OSA_EXPANSION_H
+#define MAME_BUS_SAITEK_OSA_EXPANSION_H
 
 #pragma once
 
@@ -123,5 +123,4 @@ protected:
 
 void saitekosa_expansion_modules(device_slot_interface &device);
 
-
-#endif // MAME_BUS_SAITEKOSA_EXPANSION_H
+#endif // MAME_BUS_SAITEK_OSA_EXPANSION_H

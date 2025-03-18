@@ -446,7 +446,7 @@ INPUT_PORTS_START(msxtr)
 	PORT_INCLUDE(msx2jp)
 
 	PORT_START("PAUSE")
-	PORT_CONFNAME(0x01, 0x00, "Pause") PORT_CHANGED_MEMBER("s1990", msx_s1990_device, pause_callback, 0)
+	PORT_CONFNAME(0x01, 0x00, "Pause") PORT_CHANGED_MEMBER("s1990", FUNC(msx_s1990_device::pause_callback), 0)
 	PORT_CONFSETTING(0x00, "off")
 	PORT_CONFSETTING(0x01, "on")
 

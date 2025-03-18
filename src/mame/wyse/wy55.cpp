@@ -177,6 +177,6 @@ void wy55_state::driver_start()
 
 } // anonymous namespace
 
-COMP(1991, wy185es, 0, 0, wy185es, wy55, wy55_state, empty_init, "Wyse Technology", "WY-185ES (v2.0)", MACHINE_IS_SKELETON)
-COMP(1993, wy55,    0, 0, wy55,    wy55, wy55_state, empty_init, "Wyse Technology", "WY-55 (v2.1)", MACHINE_IS_SKELETON)
-COMP(1996, wy65,    0, 0, wy65,    wy55, wy55_state, empty_init, "Wyse Technology", "WY-65 (v2.1)", MACHINE_IS_SKELETON)
+COMP(1991, wy185es, 0, 0, wy185es, wy55, wy55_state, empty_init, "Wyse Technology", "WY-185ES (v2.0)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP(1993, wy55,    0, 0, wy55,    wy55, wy55_state, empty_init, "Wyse Technology", "WY-55 (v2.1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP(1996, wy65,    0, 0, wy65,    wy55, wy55_state, empty_init, "Wyse Technology", "WY-65 (v2.1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

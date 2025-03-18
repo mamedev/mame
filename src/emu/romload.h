@@ -461,8 +461,9 @@ private:
 	int rom_fread(emu_file *file, u8 *buffer, int length, const rom_entry *parent_region);
 	int read_rom_data(emu_file *file, memory_region &region, const rom_entry *parent_region, const rom_entry *romp);
 	void fill_rom_data(memory_region &region, const rom_entry *romp);
-	void copy_rom_data(memory_region &region, const rom_entry *romp);
+	void copy_rom_data(device_t &device, memory_region &region, const rom_entry *romp);
 	void process_rom_entries(
+			device_t &device,
 			const std::vector<std::string> &searchpath,
 			u8 bios,
 			memory_region &region,

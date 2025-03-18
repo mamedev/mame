@@ -90,7 +90,7 @@ struct namcos22_scenenode
 			int cz_type;
 			int cz_adjust;
 			int objectflags;
-			int direct;
+			bool direct;
 			namcos22_polyvertex v[4];
 		} quad;
 
@@ -275,7 +275,6 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
-	virtual void device_post_load() override;
 
 	void namcos22_textram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	u16 namcos22_tilemapattr_r(offs_t offset);
@@ -389,7 +388,7 @@ protected:
 	void draw_direct_poly(const u16 *src);
 	void draw_polygons();
 	void draw_sprites();
-	void draw_sprite_group(const u32 *src, const u32 *attr, int num_sprites, int deltax, int deltay, int y_lowres);
+	void draw_sprite_group(const u32 *src, const u32 *attr, int num_sprites, int deltax, int deltay, bool y_lowres);
 	void namcos22_mix_text_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void install_c74_speedup();
@@ -483,7 +482,7 @@ protected:
 	std::unique_ptr<u8[]> m_dirtypal;
 	std::unique_ptr<bitmap_ind16> m_mix_bitmap;
 
-	tilemap_t *m_bgtilemap;
+	tilemap_t *m_text_tilemap;
 	u16 m_tilemapattr[8] = { };
 	u16 m_rowscroll[480] = { };
 	u16 m_lastrow = 0;

@@ -431,4 +431,4 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1993, kpontoon,  0, kpontoon, kpontoon, kpontoon_state, empty_init, ROT0, "Konami", "Pontoon (Konami)", MACHINE_IS_SKELETON )
+GAME( 1993, kpontoon,  0, kpontoon, kpontoon, kpontoon_state, empty_init, ROT0, "Konami", "Pontoon (Konami)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

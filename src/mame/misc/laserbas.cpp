@@ -520,8 +520,21 @@ ROM_START( futflash )
 	ROM_LOAD( "ff.8",         0xf000, 0x0800, CRC(623f558f) SHA1(be6c6565df658555f21c43a8c2459cf399794a84) )
 ROM_END
 
+ROM_START( futflasha ) // XBC-101-02-1 + XBC-102-02-1 PCBs. This set shows blue instead of black backgrounds. Seems an earlier release.
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.a8",  0x0000, 0x1000, CRC(c41fcd92) SHA1(3981aaf9486b2c8b8467d5ac4768bdded3e27586) )
+	ROM_LOAD( "2.a9",  0x1000, 0x1000, CRC(4375ecb4) SHA1(20e5a19f4835622337bd8fc8f367a8d18f386606) )
+	ROM_LOAD( "3.a10", 0x2000, 0x1000, CRC(da415ea9) SHA1(c1f76b3d72dc162ff65676a03bc502ba5732283d) )
+	ROM_LOAD( "4.a11", 0x3000, 0x1000, CRC(16c8fd53) SHA1(1c05ef472ce326069b1e33bd041eb3f02bf66b32) )
+	ROM_LOAD( "5.a12", 0xc000, 0x1000, CRC(6459073e) SHA1(78b8a23534826dd2d3b3c6c5d5708c8a78a4b6bf) ) // same as set 1
+	ROM_LOAD( "6.b8",  0xd000, 0x1000, CRC(ddf623ee) SHA1(5640071eb01c5102f1df0f58f1493617adbe370a) )
+	ROM_LOAD( "7.b9",  0xe000, 0x1000, CRC(9d2148d7) SHA1(24954d82a09d9fcfdc61e91b7c824daa5dd701c3) ) // same as set 1
+	ROM_LOAD( "8.b10", 0xf000, 0x0800, CRC(a539dd18) SHA1(3d8a23aeab7cb907fcd9f7d416527dcad3f84d1f) )
+ROM_END
+
 } // anonymous namespace
 
-GAME( 1980, futflash,  0,        laserbas, laserbas, laserbas_state, empty_init, ROT270, "Hoei",                  "Future Flash",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, laserbas,  futflash, laserbas, laserbas, laserbas_state, empty_init, ROT270, "Hoei (Amstar license)", "Laser Base (set 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, laserbasa, futflash, laserbas, laserbas, laserbas_state, empty_init, ROT270, "Hoei (Amstar license)", "Laser Base (set 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, futflash,  0,        laserbas, laserbas, laserbas_state, empty_init, ROT270, "Hoei",                  "Future Flash (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, futflasha, futflash, laserbas, laserbas, laserbas_state, empty_init, ROT270, "Hoei",                  "Future Flash (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, laserbas,  futflash, laserbas, laserbas, laserbas_state, empty_init, ROT270, "Hoei (Amstar license)", "Laser Base (set 1)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, laserbasa, futflash, laserbas, laserbas, laserbas_state, empty_init, ROT270, "Hoei (Amstar license)", "Laser Base (set 2)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

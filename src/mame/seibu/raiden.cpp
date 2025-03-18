@@ -561,7 +561,7 @@ void raiden_state::raiden_sound_map(address_map &map)
 	map(0x4008, 0x4009).rw(m_seibu_sound, FUNC(seibu_sound_device::ym_r), FUNC(seibu_sound_device::ym_w));
 	map(0x4010, 0x4011).r(m_seibu_sound, FUNC(seibu_sound_device::soundlatch_r));
 	map(0x4012, 0x4012).r(m_seibu_sound, FUNC(seibu_sound_device::main_data_pending_r));
-	map(0x4013, 0x4013).portr("COIN");
+	map(0x4013, 0x4013).r(m_seibu_sound, FUNC(seibu_sound_device::coin_r));
 	map(0x4018, 0x4019).w(m_seibu_sound, FUNC(seibu_sound_device::main_data_w));
 	map(0x401b, 0x401b).w(m_seibu_sound, FUNC(seibu_sound_device::coin_w));
 	map(0x6000, 0x6000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
@@ -575,7 +575,7 @@ void raiden_state::raiden_sound_decrypted_opcodes_map(address_map &map)
 void raiden_state::sei80bu_encrypted_full_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("audiocpu", 0);
-	map(0x8000, 0xffff).bankr("seibu_bank1");
+	map(0x8000, 0xffff).bankr("seibu_bank");
 }
 
 
@@ -713,13 +713,13 @@ void raiden_state::vblank_irq(int state)
 void raiden_state::raiden(machine_config &config)
 {
 	// basic machine hardware
-	V30(config, m_maincpu, XTAL(20'000'000) / 2); // NEC V30 CPU, 20MHz verified on PCB
+	V30(config, m_maincpu, 20_MHz_XTAL / 2); // NEC V30 CPU, 20MHz verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &raiden_state::main_map);
 
-	V30(config, m_subcpu, XTAL(20'000'000) / 2); // NEC V30 CPU, 20MHz verified on PCB
+	V30(config, m_subcpu, 20_MHz_XTAL / 2); // NEC V30 CPU, 20MHz verified on PCB
 	m_subcpu->set_addrmap(AS_PROGRAM, &raiden_state::sub_map);
 
-	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(14'318'181) / 4)); // verified on PCB
+	z80_device &audiocpu(Z80(config, "audiocpu", 14.318181_MHz_XTAL / 4)); // verified on PCB
 	audiocpu.set_addrmap(AS_PROGRAM, &raiden_state::seibu_sound_map);
 	audiocpu.set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
@@ -744,17 +744,18 @@ void raiden_state::raiden(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(14'318'181) / 4));
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", 14.318181_MHz_XTAL / 4));
 	ymsnd.irq_handler().set("seibu_sound", FUNC(seibu_sound_device::fm_irqhandler));
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	okim6295_device &oki(OKIM6295(config, "oki", XTAL(12'000'000) / 12, okim6295_device::PIN7_HIGH)); // frequency and pin 7 verified
+	okim6295_device &oki(OKIM6295(config, "oki", 12_MHz_XTAL / 12, okim6295_device::PIN7_HIGH)); // frequency and pin 7 verified
 	oki.add_route(ALL_OUTPUTS, "mono", 0.75);
 
 	SEIBU_SOUND(config, m_seibu_sound, 0);
 	m_seibu_sound->int_callback().set_inputline("audiocpu", 0);
+	m_seibu_sound->coin_io_callback().set_ioport("COIN");
 	m_seibu_sound->set_rom_tag("audiocpu");
-	m_seibu_sound->set_rombank_tag("seibu_bank1");
+	m_seibu_sound->set_rombank_tag("seibu_bank");
 	m_seibu_sound->ym_read_callback().set("ymsnd", FUNC(ym3812_device::read));
 	m_seibu_sound->ym_write_callback().set("ymsnd", FUNC(ym3812_device::write));
 }
@@ -784,8 +785,8 @@ void raidenb_state::layer_scroll_w(offs_t offset, u16 data, u16 mem_mask)
 void raiden_state::raidenkb(machine_config &config)
 {
 	raiden(config);
-	m_maincpu->set_clock(XTAL(32'000'000) / 4); // Xtal and clock verified
-	m_subcpu->set_clock(XTAL(32'000'000) / 4); // Xtal and clock verified
+	m_maincpu->set_clock(32_MHz_XTAL / 4); // Xtal and clock verified
+	m_subcpu->set_clock(32_MHz_XTAL / 4); // Xtal and clock verified
 }
 
 void raidenb_state::raidenb(machine_config &config)

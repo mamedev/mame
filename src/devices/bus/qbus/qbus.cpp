@@ -11,12 +11,14 @@
 #include "qbus.h"
 
 // Peripheral boards
+#include "bk_kmd.h"
 #include "dsd4432.h"
 #include "dvk_kgd.h"
 #include "dvk_mx.h"
 #include "pc11.h"
 #include "qg640.h"
 #include "qtx.h"
+#include "tdl12.h"
 #include "uknc_kmd.h"
 
 
@@ -29,6 +31,8 @@ void qbus_cards(device_slot_interface &device)
 	device.option_add("mx", DVK_MX);
 	device.option_add("mz", UKNC_KMD);
 	device.option_add("qg640", MATROX_QG640);
+	device.option_add("by", BK_KMD);
+	device.option_add("tdl12", TDL12);
 }
 
 

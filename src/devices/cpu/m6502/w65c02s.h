@@ -12,9 +12,9 @@
 #ifndef MAME_CPU_M6502_W65C02S_H
 #define MAME_CPU_M6502_W65C02S_H
 
-#include "m65c02.h"
+#include "w65c02.h"
 
-class w65c02s_device : public m65c02_device {
+class w65c02s_device : public w65c02_device {
 public:
 	w65c02s_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 

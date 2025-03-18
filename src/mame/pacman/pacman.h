@@ -37,11 +37,11 @@ public:
 		, m_rocktrv2_prot_data(*this, "rocktrv2_prot")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
+		, m_screen(*this, "screen")
 	{ }
 
 protected:
 	void _8bpm_portmap(address_map &map) ATTR_COLD;
-	void alibaba_map(address_map &map) ATTR_COLD;
 	void bigbucks_map(address_map &map) ATTR_COLD;
 	void bigbucks_portmap(address_map &map) ATTR_COLD;
 	void birdiy_map(address_map &map) ATTR_COLD;
@@ -82,9 +82,9 @@ protected:
 	optional_shared_ptr<uint8_t> m_rocktrv2_prot_data;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
 
 	uint8_t m_cannonb_bit_to_read = 0;
-	int m_mystery = 0;
 	uint8_t m_counter = 0;
 	int m_bigbucks_bank = 0;
 	uint8_t m_rocktrv2_question_bank = 0;
@@ -111,9 +111,6 @@ protected:
 	IRQ_CALLBACK_MEMBER(interrupt_vector_r);
 	void coin_counter_w(int state);
 	void coin_lockout_global_w(int state);
-	void alibaba_sound_w(offs_t offset, uint8_t data);
-	uint8_t alibaba_mystery_1_r();
-	uint8_t alibaba_mystery_2_r();
 	void maketrax_protection_w(uint8_t data);
 	uint8_t mbrush_prot_r(offs_t offset);
 	uint8_t maketrax_special_port2_r(offs_t offset);
@@ -133,16 +130,10 @@ protected:
 	void rocktrv2_question_bank_w(uint8_t data);
 	uint8_t rocktrv2_question_r(offs_t offset);
 	uint8_t pacman_read_nop();
-	uint8_t mspacman_disable_decode_r_0x0038(offs_t offset);
-	uint8_t mspacman_disable_decode_r_0x03b0(offs_t offset);
-	uint8_t mspacman_disable_decode_r_0x1600(offs_t offset);
-	uint8_t mspacman_disable_decode_r_0x2120(offs_t offset);
-	uint8_t mspacman_disable_decode_r_0x3ff0(offs_t offset);
-	uint8_t mspacman_disable_decode_r_0x8000(offs_t offset);
-	uint8_t mspacman_disable_decode_r_0x97f0(offs_t offset);
-	void mspacman_disable_decode_w(uint8_t data);
-	uint8_t mspacman_enable_decode_r_0x3ff8(offs_t offset);
-	void mspacman_enable_decode_w(uint8_t data);
+	template<unsigned Delta> uint8_t mspacman_disable_decode_r(offs_t offset);
+	void mspacman_disable_decode_w(uint8_t data = 0);
+	template<unsigned Delta> uint8_t mspacman_enable_decode_r(offs_t offset);
+	void mspacman_enable_decode_w(uint8_t data = 0);
 	void irq_mask_w(int state);
 	void nmi_mask_w(int state);
 	uint8_t mspacii_protection_r(offs_t offset);
@@ -200,6 +191,7 @@ protected:
 	DECLARE_MACHINE_RESET(maketrax);
 	DECLARE_VIDEO_START(pengo);
 	DECLARE_VIDEO_START(jrpacman);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_pacman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_s2650games(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vblank_irq(int state);
@@ -236,7 +228,6 @@ public:
 	void _8bpm(machine_config &config);
 	void crush2(machine_config &config);
 	void korosuke(machine_config &config);
-	void alibaba(machine_config &config);
 	void drivfrcp(machine_config &config);
 	void pengojpm(machine_config &config);
 	void piranha(machine_config &config);
@@ -252,10 +243,43 @@ private:
 };
 
 
+class alibaba_state : public pacman_state
+{
+public:
+	alibaba_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pacman_state(mconfig, type, tag)
+	{ }
+
+	void alibaba(machine_config &config);
+
+	void init_alibaba();
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
+private:
+	uint8_t m_mystery_control = 0;
+	uint8_t m_mystery_clock = 0;
+	uint8_t m_mystery_prescaler = 0;
+
+	void mystery_tick(int state);
+	uint8_t mystery_1_r();
+	uint8_t mystery_2_r();
+	void mystery_w(uint8_t data);
+	void sound_w(offs_t offset, uint8_t data);
+
+	void alibaba_map(address_map &map) ATTR_COLD;
+
+	void draw_clock(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+};
+
 class epospm_state : public pacman_state
 {
 public:
-	using pacman_state::pacman_state;
+	epospm_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pacman_state(mconfig, type, tag)
+	{ }
 
 	void acitya(machine_config &config);
 	void theglobp(machine_config &config);
@@ -303,7 +327,6 @@ class mspactwin_state : public clubpacm_state
 public:
 	mspactwin_state(const machine_config &mconfig, device_type type, const char *tag)
 		: clubpacm_state(mconfig, type, tag)
-		, m_screen(*this, "screen")
 		, m_decrypted_opcodes(*this, "decrypted_opcodes")
 		, m_decrypted_opcodes_high(*this, "decrypted_opcodes_high")
 	{ }
@@ -313,9 +336,6 @@ public:
 	void init_mspactwin();
 
 	void flipscreen_w(int state);
-
-private:
-	required_device<screen_device> m_screen;
 
 protected:
 	void mspactwin_map(address_map &map) ATTR_COLD;

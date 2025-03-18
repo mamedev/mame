@@ -80,6 +80,7 @@ static int pushglobalfuncname (lua_State *L, lua_Debug *ar) {
   int top = lua_gettop(L);
   lua_getinfo(L, "f", ar);  /* push function */
   lua_getfield(L, LUA_REGISTRYINDEX, LUA_LOADED_TABLE);
+  luaL_checkstack(L, 6, "not enough stack");  /* slots for 'findfield' */
   if (findfield(L, top + 1, 2)) {
     const char *name = lua_tostring(L, -1);
     if (strncmp(name, LUA_GNAME ".", 3) == 0) {  /* name start with '_G.'? */
@@ -249,11 +250,13 @@ LUALIB_API int luaL_fileresult (lua_State *L, int stat, const char *fname) {
     return 1;
   }
   else {
+    const char *msg;
     luaL_pushfail(L);
+    msg = (en != 0) ? strerror(en) : "(no extra info)";
     if (fname)
-      lua_pushfstring(L, "%s: %s", fname, strerror(en));
+      lua_pushfstring(L, "%s: %s", fname, msg);
     else
-      lua_pushstring(L, strerror(en));
+      lua_pushstring(L, msg);
     lua_pushinteger(L, en);
     return 3;
   }
@@ -526,13 +529,14 @@ static void newbox (lua_State *L) {
 
 /*
 ** Compute new size for buffer 'B', enough to accommodate extra 'sz'
-** bytes.
+** bytes. (The test for "not big enough" also gets the case when the
+** computation of 'newsize' overflows.)
 */
 static size_t newbuffsize (luaL_Buffer *B, size_t sz) {
-  size_t newsize = B->size * 2;  /* double buffer size */
+  size_t newsize = (B->size / 2) * 3;  /* buffer size * 1.5 */
   if (l_unlikely(MAX_SIZET - sz < B->n))  /* overflow in (B->n + sz)? */
     return luaL_error(B->L, "buffer too large");
-  if (newsize < B->n + sz)  /* double is not big enough? */
+  if (newsize < B->n + sz)  /* not big enough? */
     newsize = B->n + sz;
   return newsize;
 }
@@ -611,7 +615,7 @@ LUALIB_API void luaL_pushresultsize (luaL_Buffer *B, size_t sz) {
 ** box (if existent) is not on the top of the stack. So, instead of
 ** calling 'luaL_addlstring', it replicates the code using -2 as the
 ** last argument to 'prepbuffsize', signaling that the box is (or will
-** be) bellow the string being added to the buffer. (Box creation can
+** be) below the string being added to the buffer. (Box creation can
 ** trigger an emergency GC, so we should not remove the string from the
 ** stack before we have the space guaranteed.)
 */
@@ -731,25 +735,29 @@ static const char *getF (lua_State *L, void *ud, size_t *size) {
 
 
 static int errfile (lua_State *L, const char *what, int fnameindex) {
-  const char *serr = strerror(errno);
+  int err = errno;
   const char *filename = lua_tostring(L, fnameindex) + 1;
-  lua_pushfstring(L, "cannot %s %s: %s", what, filename, serr);
+  if (err != 0)
+    lua_pushfstring(L, "cannot %s %s: %s", what, filename, strerror(err));
+  else
+    lua_pushfstring(L, "cannot %s %s", what, filename);
   lua_remove(L, fnameindex);
   return LUA_ERRFILE;
 }
 
 
-static int skipBOM (LoadF *lf) {
-  const char *p = "\xEF\xBB\xBF";  /* UTF-8 BOM mark */
-  int c;
-  lf->n = 0;
-  do {
-    c = getc(lf->f);
-    if (c == EOF || c != *(const unsigned char *)p++) return c;
-    lf->buff[lf->n++] = c;  /* to be read by the parser */
-  } while (*p != '\0');
-  lf->n = 0;  /* prefix matched; discard it */
-  return getc(lf->f);  /* return next character */
+/*
+** Skip an optional BOM at the start of a stream. If there is an
+** incomplete BOM (the first character is correct but the rest is
+** not), returns the first character anyway to force an error
+** (as no chunk can start with 0xEF).
+*/
+static int skipBOM (FILE *f) {
+  int c = getc(f);  /* read first character */
+  if (c == 0xEF && getc(f) == 0xBB && getc(f) == 0xBF)  /* correct BOM? */
+    return getc(f);  /* ignore BOM and return next char */
+  else  /* no (valid) BOM */
+    return c;  /* return first character */
 }
 
 
@@ -760,13 +768,13 @@ static int skipBOM (LoadF *lf) {
 ** first "valid" character of the file (after the optional BOM and
 ** a first-line comment).
 */
-static int skipcomment (LoadF *lf, int *cp) {
-  int c = *cp = skipBOM(lf);
+static int skipcomment (FILE *f, int *cp) {
+  int c = *cp = skipBOM(f);
   if (c == '#') {  /* first line is a comment (Unix exec. file)? */
     do {  /* skip first line */
-      c = getc(lf->f);
+      c = getc(f);
     } while (c != EOF && c != '\n');
-    *cp = getc(lf->f);  /* skip end-of-line, if present */
+    *cp = getc(f);  /* next character after comment, if present */
     return 1;  /* there was a comment */
   }
   else return 0;  /* no comment */
@@ -785,18 +793,25 @@ LUALIB_API int luaL_loadfilex (lua_State *L, const char *filename,
   }
   else {
     lua_pushfstring(L, "@%s", filename);
+    errno = 0;
     lf.f = fopen(filename, "r");
     if (lf.f == NULL) return errfile(L, "open", fnameindex);
   }
-  if (skipcomment(&lf, &c))  /* read initial portion */
-    lf.buff[lf.n++] = '\n';  /* add line to correct line numbers */
-  if (c == LUA_SIGNATURE[0] && filename) {  /* binary file? */
-    lf.f = freopen(filename, "rb", lf.f);  /* reopen in binary mode */
-    if (lf.f == NULL) return errfile(L, "reopen", fnameindex);
-    skipcomment(&lf, &c);  /* re-read initial portion */
+  lf.n = 0;
+  if (skipcomment(lf.f, &c))  /* read initial portion */
+    lf.buff[lf.n++] = '\n';  /* add newline to correct line numbers */
+  if (c == LUA_SIGNATURE[0]) {  /* binary file? */
+    lf.n = 0;  /* remove possible newline */
+    if (filename) {  /* "real" file? */
+      errno = 0;
+      lf.f = freopen(filename, "rb", lf.f);  /* reopen in binary mode */
+      if (lf.f == NULL) return errfile(L, "reopen", fnameindex);
+      skipcomment(lf.f, &c);  /* re-read initial portion */
+    }
   }
   if (c != EOF)
     lf.buff[lf.n++] = c;  /* 'c' is the first character of the stream */
+  errno = 0;
   status = lua_load(L, getF, &lf, lua_tostring(L, -1), mode);
   readstatus = ferror(lf.f);
   if (filename) fclose(lf.f);  /* close file (even in case of errors) */
@@ -927,7 +942,7 @@ LUALIB_API const char *luaL_tolstring (lua_State *L, int idx, size_t *len) {
 LUALIB_API void luaL_setfuncs (lua_State *L, const luaL_Reg *l, int nup) {
   luaL_checkstack(L, nup, "too many upvalues");
   for (; l->name != NULL; l++) {  /* fill the table with given functions */
-    if (l->func == NULL)  /* place holder? */
+    if (l->func == NULL)  /* placeholder? */
       lua_pushboolean(L, 0);
     else {
       int i;
@@ -1019,9 +1034,14 @@ static void *l_alloc (void *ud, void *ptr, size_t osize, size_t nsize) {
 }
 
 
+/*
+** Standard panic funcion just prints an error message. The test
+** with 'lua_type' avoids possible memory errors in 'lua_tostring'.
+*/
 static int panic (lua_State *L) {
-  const char *msg = lua_tostring(L, -1);
-  if (msg == NULL) msg = "error object is not a string";
+  const char *msg = (lua_type(L, -1) == LUA_TSTRING)
+                  ? lua_tostring(L, -1)
+                  : "error object is not a string";
   lua_writestringerror("PANIC: unprotected error in call to Lua API (%s)\n",
                         msg);
   return 0;  /* return to Lua to abort */

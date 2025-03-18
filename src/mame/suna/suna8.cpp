@@ -1701,7 +1701,7 @@ static INPUT_PORTS_START( hardhea2 )
 	PORT_BIT(  0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT(  0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT(  0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT(  0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT(  0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT(  0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 INPUT_PORTS_END
@@ -1777,7 +1777,7 @@ static INPUT_PORTS_START( starfigh )
 	PORT_CONFSETTING(    0x00, "Blue" )
 	PORT_BIT(  0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT(  0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT(  0x40, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_VBLANK("screen")    // 0 = skip color cycling (red)
+	PORT_BIT(  0x40, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))    // 0 = skip color cycling (red)
 	PORT_BIT(  0x80, IP_ACTIVE_LOW,  IPT_CUSTOM )  // read in protection check, see code at 787
 
 INPUT_PORTS_END
@@ -1908,23 +1908,20 @@ GFXDECODE_END
 void suna8_state::hardhead(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, XTAL(24'000'000) / 4);    // verified on pcb
+	Z80(config, m_maincpu, 24_MHz_XTAL / 4);    // verified on pcb
 	m_maincpu->set_addrmap(AS_PROGRAM, &suna8_state::hardhead_map);
 	m_maincpu->set_addrmap(AS_IO, &suna8_state::hardhead_io_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &suna8_state::decrypted_opcodes_map);
 	m_maincpu->set_vblank_int("screen", FUNC(suna8_state::irq0_line_hold));      // No NMI
 
-	Z80(config, m_audiocpu, XTAL(24'000'000) / 8);   // verified on pcb
+	Z80(config, m_audiocpu, 24_MHz_XTAL / 8);   // verified on pcb
 	m_audiocpu->set_addrmap(AS_PROGRAM, &suna8_state::hardhead_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &suna8_state::hardhead_sound_io_map);
 	m_audiocpu->set_periodic_int(FUNC(suna8_state::irq0_line_hold), attotime::from_hz(4*60));     // No NMI
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(59.10);  // verified on pcb
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(256, 256);
-	m_screen->set_visarea(0, 256-1, 0+16, 256-16-1);
+	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0, 256, 264, 16, 240);  // parameters assumed; 59.10 Hz refresh verified on pcb
 	m_screen->set_screen_update(FUNC(suna8_state::screen_update));
 	m_screen->set_palette(m_palette);
 
@@ -1940,9 +1937,9 @@ void suna8_state::hardhead(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	YM3812(config, "ymsnd", XTAL(24'000'000) / 8).add_route(ALL_OUTPUTS, "speaker", 1.0); // clock verified on pcb
+	YM3812(config, "ymsnd", 24_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "speaker", 1.0); // clock verified on pcb
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL(24'000'000) / 16));    // clock verified on pcb
+	ay8910_device &aysnd(AY8910(config, "aysnd", 24_MHz_XTAL / 16));    // clock verified on pcb
 	aysnd.port_a_write_callback().set(FUNC(suna8_state::play_samples_w));
 	aysnd.port_b_write_callback().set(FUNC(suna8_state::samples_number_w));
 	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.3);
@@ -1964,12 +1961,12 @@ void suna8_state::hardhead(machine_config &config)
 void suna8_state::rranger(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, XTAL(24'000'000) / 4); // ?
+	Z80(config, m_maincpu, 24_MHz_XTAL / 4); // ?
 	m_maincpu->set_addrmap(AS_PROGRAM, &suna8_state::rranger_map);
 	m_maincpu->set_addrmap(AS_IO, &suna8_state::rranger_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(suna8_state::irq0_line_hold));  // IRQ & NMI !
 
-	Z80(config, m_audiocpu, XTAL(24'000'000) / 8); // clock verified on pcb
+	Z80(config, m_audiocpu, 24_MHz_XTAL / 8); // clock verified on pcb
 	m_audiocpu->set_addrmap(AS_PROGRAM, &suna8_state::rranger_sound_map);
 	m_audiocpu->set_periodic_int(FUNC(suna8_state::irq0_line_hold), attotime::from_hz(4*60)); // NMI = retn
 
@@ -1977,10 +1974,7 @@ void suna8_state::rranger(machine_config &config)
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(59.1);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(256, 256);
-	m_screen->set_visarea(0, 256-1, 0+16, 256-16-1);
+	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0, 256, 264, 16, 240);  // parameters assumed
 	m_screen->set_screen_update(FUNC(suna8_state::screen_update));
 	m_screen->set_palette(m_palette);
 
@@ -1996,12 +1990,12 @@ void suna8_state::rranger(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	ym2203_device &ym1(YM2203(config, "ym1", XTAL(24'000'000) / 16));    // verified on pcb
+	ym2203_device &ym1(YM2203(config, "ym1", 24_MHz_XTAL / 16));    // verified on pcb
 	ym1.port_a_write_callback().set(FUNC(suna8_state::rranger_play_samples_w));
 	ym1.port_b_write_callback().set(FUNC(suna8_state::samples_number_w));
 	ym1.add_route(ALL_OUTPUTS, "speaker", 0.9);
 
-	YM2203(config, "ym2", XTAL(24'000'000) / 16).add_route(ALL_OUTPUTS, "speaker", 0.9);  // verified on pcb
+	YM2203(config, "ym2", 24_MHz_XTAL / 16).add_route(ALL_OUTPUTS, "speaker", 0.9);  // verified on pcb
 
 	SAMPLES(config, m_samples);
 	m_samples->set_channels(1);
@@ -2029,14 +2023,14 @@ MACHINE_RESET_MEMBER(suna8_state,brickzn)
 void suna8_state::brickzn11(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, XTAL(24'000'000) / 4); // SUNA PROTECTION BLOCK
+	Z80(config, m_maincpu, 24_MHz_XTAL / 4); // SUNA PROTECTION BLOCK
 	m_maincpu->set_addrmap(AS_PROGRAM, &suna8_state::brickzn11_map);
 	m_maincpu->set_vblank_int("screen", FUNC(suna8_state::irq0_line_hold));  // nmi breaks ramtest but is needed!
 
-	Z80(config, m_audiocpu, XTAL(24'000'000) / 4); // Z0840006PSC - 6MHz (measured)
+	Z80(config, m_audiocpu, 24_MHz_XTAL / 4); // Z0840006PSC - 6MHz (measured)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &suna8_state::brickzn_sound_map);
 
-	z80_device &pcm(Z80(config, "pcm", XTAL(24'000'000) / 4));    // Z0840006PSC - 6MHz (measured)
+	z80_device &pcm(Z80(config, "pcm", 24_MHz_XTAL / 4));    // Z0840006PSC - 6MHz (measured)
 	pcm.set_addrmap(AS_PROGRAM, &suna8_state::brickzn_pcm_map);
 	pcm.set_addrmap(AS_IO, &suna8_state::brickzn_pcm_io_map);
 
@@ -2044,10 +2038,7 @@ void suna8_state::brickzn11(machine_config &config)
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate, we're using PORT_VBLANK
-	m_screen->set_size(256, 256);
-	m_screen->set_visarea(0, 256-1, 0+16, 256-16-1);
+	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0, 256, 264, 16, 240);  // parameters assumed
 	m_screen->set_screen_update(FUNC(suna8_state::screen_update));
 	m_screen->set_palette(m_palette);
 
@@ -2063,11 +2054,11 @@ void suna8_state::brickzn11(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(24'000'000) / 8));     // 3MHz (measured)
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", 24_MHz_XTAL / 8));     // 3MHz (measured)
 	ymsnd.irq_handler().set_inputline("audiocpu", 0);
 	ymsnd.add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	AY8910(config, "aysnd", XTAL(24'000'000) / 16).add_route(ALL_OUTPUTS, "speaker", 0.33);    // 1.5MHz (measured)
+	AY8910(config, "aysnd", 24_MHz_XTAL / 16).add_route(ALL_OUTPUTS, "speaker", 0.33);    // 1.5MHz (measured)
 
 	DAC_4BIT_R2R(config, "ldac", 0).add_route(ALL_OUTPUTS, "speaker", 0.17);  // unknown DAC
 	DAC_4BIT_R2R(config, "rdac", 0).add_route(ALL_OUTPUTS, "speaker", 0.17);  // unknown DAC
@@ -2108,7 +2099,7 @@ MACHINE_RESET_MEMBER(suna8_state,hardhea2)
 void suna8_state::hardhea2(machine_config &config)
 {
 	brickzn(config);
-	Z80(config.replace(), m_maincpu, XTAL(24'000'000) / 4); // SUNA T568009
+	Z80(config.replace(), m_maincpu, 24_MHz_XTAL / 4); // SUNA T568009
 	m_maincpu->set_addrmap(AS_PROGRAM, &suna8_state::hardhea2_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &suna8_state::decrypted_opcodes_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(suna8_state::hardhea2_interrupt), "screen", 0, 1);
@@ -2122,7 +2113,7 @@ void suna8_state::hardhea2(machine_config &config)
 void suna8_state::hardhea2b(machine_config &config)
 {
 	hardhea2(config);
-	Z80(config.replace(), m_maincpu, XTAL(24'000'000) / 4); //bootleg clock not verified (?)
+	Z80(config.replace(), m_maincpu, 24_MHz_XTAL / 4); //bootleg clock not verified (?)
 	m_maincpu->set_addrmap(AS_PROGRAM, &suna8_state::hardhea2b_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &suna8_state::hardhea2b_decrypted_opcodes_map);
 }
@@ -2135,23 +2126,20 @@ void suna8_state::hardhea2b(machine_config &config)
 void suna8_state::starfigh(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, XTAL(24'000'000) / 4); // ?
+	Z80(config, m_maincpu, 24_MHz_XTAL / 4); // ?
 	m_maincpu->set_addrmap(AS_PROGRAM, &suna8_state::starfigh_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &suna8_state::decrypted_opcodes_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(suna8_state::hardhea2_interrupt), "screen", 0, 1);
 
 	// The sound section is identical to that of hardhead
-	Z80(config, m_audiocpu, XTAL(24'000'000) / 4); // ?
+	Z80(config, m_audiocpu, 24_MHz_XTAL / 4); // ?
 	m_audiocpu->set_addrmap(AS_PROGRAM, &suna8_state::hardhead_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &suna8_state::hardhead_sound_io_map);
 	m_audiocpu->set_periodic_int(FUNC(suna8_state::irq0_line_hold), attotime::from_hz(4*60)); // No NMI
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
-	m_screen->set_size(256, 256);
-	m_screen->set_visarea(0, 256-1, 0+16, 256-16-1);
+	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0, 256, 264, 16, 240);  // parameters assumed
 	m_screen->set_screen_update(FUNC(suna8_state::screen_update));
 	m_screen->set_palette(m_palette);
 
@@ -2167,9 +2155,9 @@ void suna8_state::starfigh(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	YM3812(config, "ymsnd", XTAL(24'000'000) / 8).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	YM3812(config, "ymsnd", 24_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL(24'000'000) / 16));
+	ay8910_device &aysnd(AY8910(config, "aysnd", 24_MHz_XTAL / 16));
 	aysnd.port_a_write_callback().set(FUNC(suna8_state::play_samples_w));
 	aysnd.port_b_write_callback().set(FUNC(suna8_state::samples_number_w));
 	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.5);
@@ -2188,22 +2176,19 @@ void suna8_state::starfigh(machine_config &config)
 void suna8_state::sparkman(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, XTAL(24'000'000) / 4); // ?
+	Z80(config, m_maincpu, 24_MHz_XTAL / 4); // ?
 	m_maincpu->set_addrmap(AS_PROGRAM, &suna8_state::sparkman_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &suna8_state::decrypted_opcodes_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(suna8_state::hardhea2_interrupt), "screen", 0, 1);
 
-	Z80(config, m_audiocpu, XTAL(24'000'000) / 4); // ?
+	Z80(config, m_audiocpu, 24_MHz_XTAL / 4); // ?
 	m_audiocpu->set_addrmap(AS_PROGRAM, &suna8_state::hardhead_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &suna8_state::hardhead_sound_io_map);
 	m_audiocpu->set_periodic_int(FUNC(suna8_state::irq0_line_hold), attotime::from_hz(4*60)); // No NMI
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(256, 256);
-	m_screen->set_visarea(0, 256-1, 0+16, 256-16-1);
+	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0, 256, 264, 16, 240);  // parameters assumed
 	m_screen->set_screen_update(FUNC(suna8_state::screen_update));
 	m_screen->set_palette(m_palette);
 
@@ -2219,9 +2204,9 @@ void suna8_state::sparkman(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	YM3812(config, "ymsnd", XTAL(24'000'000) / 8).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	YM3812(config, "ymsnd", 24_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL(24'000'000) / 16));
+	ay8910_device &aysnd(AY8910(config, "aysnd", 24_MHz_XTAL / 16));
 	aysnd.port_a_write_callback().set(FUNC(suna8_state::play_samples_w));  // two sample roms
 	aysnd.port_b_write_callback().set(FUNC(suna8_state::samples_number_w));
 	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.3);

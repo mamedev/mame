@@ -14,33 +14,33 @@
 
 /* ----------------------------------------------------------------------- */
 
-int64_t filter_get_info_int(filter_getinfoproc get_info, uint32_t state)
+int64_t filter_get_info_int(imgtool::filter_getinfoproc get_info, uint32_t state)
 {
-	union filterinfo info;
+	imgtool::filterinfo info;
 	info.i = 0;
 	get_info(state, &info);
 	return info.i;
 }
 
-void *filter_get_info_ptr(filter_getinfoproc get_info, uint32_t state)
+void *filter_get_info_ptr(imgtool::filter_getinfoproc get_info, uint32_t state)
 {
-	union filterinfo info;
+	imgtool::filterinfo info;
 	info.p = nullptr;
 	get_info(state, &info);
 	return info.p;
 }
 
-void *filter_get_info_fct(filter_getinfoproc get_info, uint32_t state)
+void *filter_get_info_fct(imgtool::filter_getinfoproc get_info, uint32_t state)
 {
-	union filterinfo info;
+	imgtool::filterinfo info;
 	info.f = nullptr;
 	get_info(state, &info);
 	return info.f;
 }
 
-const char *filter_get_info_string(filter_getinfoproc get_info, uint32_t state)
+const char *filter_get_info_string(imgtool::filter_getinfoproc get_info, uint32_t state)
 {
-	union filterinfo info;
+	imgtool::filterinfo info;
 	info.s = nullptr;
 	get_info(state, &info);
 	return info.s;
@@ -48,7 +48,7 @@ const char *filter_get_info_string(filter_getinfoproc get_info, uint32_t state)
 
 /* ----------------------------------------------------------------------- */
 
-const filter_getinfoproc filters[] =
+const imgtool::filter_getinfoproc filters[] =
 {
 	filter_eoln_getinfo,
 	filter_cocobas_getinfo,
@@ -66,14 +66,11 @@ const filter_getinfoproc filters[] =
 
 
 
-filter_getinfoproc filter_lookup(const char *name)
+imgtool::filter_getinfoproc filter_lookup(const char *name)
 {
-	int i;
-	const char *filter_name;
-
-	for (i = 0; filters[i]; i++)
+	for (int i = 0; filters[i]; i++)
 	{
-		filter_name = filter_get_info_string(filters[i], FILTINFO_STR_NAME);
+		char const *const filter_name = filter_get_info_string(filters[i], FILTINFO_STR_NAME);
 		if (!strcmp(name, filter_name))
 			return filters[i];
 	}

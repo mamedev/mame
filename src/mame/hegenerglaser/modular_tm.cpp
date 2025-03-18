@@ -89,7 +89,7 @@ private:
 	u8 nvram_r(offs_t offset) { return m_nvram[offset]; }
 	void nvram_w(offs_t offset, u8 data) { m_nvram[offset] = data; }
 
-	TIMER_CALLBACK_MEMBER(disable_bootrom) { m_boot_view.select(1); }
+	TIMER_CALLBACK_MEMBER(disable_bootrom) { m_boot_view.disable(); }
 };
 
 
@@ -130,9 +130,9 @@ INPUT_CHANGED_MEMBER(mmtm_state::change_cpu_freq)
 
 void mmtm_state::mmtm_2m_map(address_map &map)
 {
+	map(0x00000000, 0x0003ffff).ram();
 	map(0x00000000, 0x0003ffff).view(m_boot_view);
 	m_boot_view[0](0x00000000, 0x0003ffff).rom().region("maincpu", 0);
-	m_boot_view[1](0x00000000, 0x0003ffff).ram();
 
 	map(0x80000000, 0x801fffff).ram();
 	map(0xf0000000, 0xf003ffff).rom().region("maincpu", 0);
@@ -177,7 +177,7 @@ static INPUT_PORTS_START( mmtm_t )
 	PORT_INCLUDE( mmtm_v )
 
 	PORT_START("CPU")
-	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, mmtm_state, change_cpu_freq, 0)
+	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mmtm_state::change_cpu_freq), 0)
 	PORT_CONFSETTING(    0x00, "50MHz" )
 	PORT_CONFSETTING(    0x01, "60MHz" )
 	PORT_CONFSETTING(    0x02, "66MHz" )

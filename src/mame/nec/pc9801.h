@@ -21,6 +21,7 @@
 #include "machine/am9517a.h"
 #include "machine/bankdev.h"
 #include "machine/buffer.h"
+#include "machine/clock.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/output_latch.h"
@@ -33,6 +34,7 @@
 #include "machine/upd4991a.h"
 #include "machine/upd765.h"
 
+#include "bus/rs232/rs232.h"
 #include "bus/scsi/pc9801_sasi.h"
 #include "bus/scsi/scsi.h"
 #include "bus/scsi/scsihd.h"
@@ -44,13 +46,15 @@
 
 #include "video/upd7220.h"
 
+#include "bus/cbus/amd98.h"
 #include "bus/cbus/pc9801_26.h"
 #include "bus/cbus/pc9801_55.h"
 #include "bus/cbus/pc9801_86.h"
 #include "bus/cbus/pc9801_118.h"
-#include "bus/cbus/pc9801_amd98.h"
 #include "bus/cbus/mpu_pc98.h"
 #include "bus/cbus/pc9801_cbus.h"
+#include "bus/cbus/sb16_ct2720.h"
+
 #include "pc9801_kbd.h"
 #include "pc9801_cd.h"
 
@@ -71,13 +75,13 @@
 #include "formats/nfd_dsk.h"
 
 #define RTC_TAG      "rtc"
-#define UPD8251_TAG  "upd8251"
 #define SASIBUS_TAG  "sasi"
 
 #define ATTRSEL_REG 0
 #define WIDTH40_REG 2
 #define FONTSEL_REG 3
 #define INTERLACE_REG 4
+#define KAC_REG 5
 #define MEMSW_REG   6
 #define DISPLAY_REG 7
 
@@ -98,6 +102,8 @@ public:
 		, m_ppi_sys(*this, "ppi_sys")
 		, m_ppi_prn(*this, "ppi_prn")
 		, m_beeper(*this, "beeper")
+		, m_sio_rs(*this, "sio_rs")
+		, m_sio_kbd(*this, "sio_kbd")
 	{
 	}
 
@@ -112,13 +118,21 @@ protected:
 	required_device<i8255_device> m_ppi_sys;
 	required_device<i8255_device> m_ppi_prn;
 	optional_device<beep_device> m_beeper;
+	required_device<i8251_device> m_sio_rs;
+	required_device<i8251_device> m_sio_kbd;
 
 	void rtc_w(uint8_t data);
 	void ppi_sys_beep_portc_w(uint8_t data);
 
+	virtual void uart_irq_check() = 0;
+	template <unsigned N> void update_uart_irq(int state);
+
+	void pc9801_serial(machine_config &config);
+
 	static void floppy_formats(format_registration &fr);
 
 	u8 m_sys_type = 0;
+	u8 m_uart_irq_mask = 0, m_uart_irq_pending = 0;
 };
 
 class pc9801_state : public pc98_base_state
@@ -142,7 +156,6 @@ public:
 		, m_pic1(*this, "pic8259_master")
 		, m_pic2(*this, "pic8259_slave")
 		, m_memsw(*this, "memsw")
-		, m_sio(*this, UPD8251_TAG)
 		, m_sasibus(*this, SASIBUS_TAG)
 		, m_sasi_data_out(*this, "sasi_data_out")
 		, m_sasi_data_in(*this, "sasi_data_in")
@@ -175,7 +188,6 @@ protected:
 	required_device<pic8259_device> m_pic2;
 private:
 	required_device<pc9801_memsw_device> m_memsw;
-	required_device<i8251_device> m_sio;
 	optional_device<scsi_port_device> m_sasibus;
 	optional_device<output_latch_device> m_sasi_data_out;
 	optional_device<input_buffer_device> m_sasi_data_in;
@@ -222,7 +234,7 @@ private:
 	void write_sasi_req(int state);
 	uint8_t sasi_status_r();
 	void sasi_ctrl_w(uint8_t data);
-	void draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd, int pitch, int lr, int cursor_on, int cursor_addr, bool lower);
+	void draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd, int pitch, int lr, int cursor_on, int cursor_addr, int cursor_bot, int cursor_top, bool lower);
 
 //  uint8_t winram_r();
 //  void winram_w(uint8_t data);
@@ -310,6 +322,8 @@ protected:
 	u8 m_vram_bank = 0;
 	u8 m_vram_disp = 0;
 
+	virtual void border_color_w(offs_t offset, u8 data);
+
 private:
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
 
@@ -350,6 +364,10 @@ private:
 	void ppi_mouse_portc_w(uint8_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER( mouse_irq_cb );
+
+// UART SIO
+protected:
+	virtual void uart_irq_check() override;
 };
 
 /**********************************************************
@@ -403,6 +421,8 @@ protected:
 	void pc9801rs_video_ff_w(offs_t offset, uint8_t data);
 	void pc9801rs_a0_w(offs_t offset, uint8_t data);
 
+	virtual void border_color_w(offs_t offset, u8 data) override;
+
 	uint8_t ide_ctrl_r();
 	void ide_ctrl_w(uint8_t data);
 	uint16_t ide_cs0_r(offs_t offset, uint16_t mem_mask = ~0);
@@ -413,6 +433,7 @@ protected:
 	void dmapg8_w(offs_t offset, uint8_t data);
 
 	uint16_t timestamp_r(offs_t offset);
+	void artic_wait_w(u8 data);
 
 	void ppi_sys_dac_portc_w(uint8_t data);
 	virtual u8 ppi_prn_portb_r() override;
@@ -476,9 +497,11 @@ private:
 		uint16_t pat[4]{};
 		uint16_t src[4]{};
 		int16_t count = 0;
+		uint16_t mask;
 		uint16_t leftover[4]{};
 		bool first = false;
-		bool init = false;
+		bool start = false;
+		bool loaded = false;
 	} m_egc;
 
 protected:

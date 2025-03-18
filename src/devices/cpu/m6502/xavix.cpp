@@ -106,24 +106,52 @@ xavix_device::mi_xavix::mi_xavix(xavix_device *_base)
 	base = _base;
 }
 
-void xavix_device::write_special_stack(uint8_t data)
+void xavix_device::write_special_stack(uint32_t addr, uint8_t data)
 {
-	m_special_stack[m_special_stackpos&0xff] = data;
+	if (m_use_private_stack_for_extra_callf_byte)
+	{
+		m_special_stack[m_special_stackpos & 0xff] = data;
+	}
+	else
+	{
+		write_stack(addr, data);
+	}
 }
 
 void xavix_device::dec_special_stack()
 {
-	m_special_stackpos--;
+	if (m_use_private_stack_for_extra_callf_byte)
+	{
+		m_special_stackpos--;
+	}
+	else
+	{
+		dec_SP();
+	}
 }
 
 void xavix_device::inc_special_stack()
 {
-	m_special_stackpos++;
+	if (m_use_private_stack_for_extra_callf_byte)
+	{
+		m_special_stackpos++;
+	}
+	else
+	{
+		inc_SP();
+	}
 }
 
-uint8_t xavix_device::read_special_stack()
+uint8_t xavix_device::read_special_stack(uint32_t addr)
 {
-	return m_special_stack[m_special_stackpos&0xff];
+	if (m_use_private_stack_for_extra_callf_byte)
+	{
+		return m_special_stack[m_special_stackpos & 0xff];
+	}
+	else
+	{
+		return read_stack(addr);
+	}
 }
 
 
@@ -152,12 +180,12 @@ inline uint8_t xavix_device::read_full_data(uint8_t databank, uint16_t adr)
 		}
 		else
 		{
-			return m_extbus_space->read_byte((databank << 16) | adr);
+			return m_extbus_space->read_byte(((databank << 16) | adr) & 0x7fffff );
 		}
 	}
 	else
 	{
-		return m_extbus_space->read_byte((databank << 16) | adr);
+		return m_extbus_space->read_byte(((databank << 16) | adr) & 0x7fffff );
 	}
 }
 
@@ -257,12 +285,12 @@ inline void xavix_device::write_full_data(uint8_t databank, uint16_t adr, uint8_
 		}
 		else
 		{
-			m_extbus_space->write_byte((databank << 16) | adr, val);
+			m_extbus_space->write_byte(((databank << 16) | adr) & 0x7fffff, val);
 		}
 	}
 	else
 	{
-		m_extbus_space->write_byte((databank << 16) | adr, val);
+		m_extbus_space->write_byte(((databank << 16) | adr) & 0x7fffff, val);
 	}
 }
 
@@ -342,7 +370,6 @@ void xavix_device::state_string_export(const device_state_entry &entry, std::str
 		break;
 	}
 }
-
 
 
 

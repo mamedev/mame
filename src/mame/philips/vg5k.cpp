@@ -323,7 +323,7 @@ static INPUT_PORTS_START( vg5k )
 		PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 		PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_START("direct")
-		PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)        PORT_CODE(KEYCODE_END)                              PORT_NAME("DELTA")          PORT_CHANGED_MEMBER(DEVICE_SELF, vg5k_state, delta_button, 0)
+		PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)        PORT_CODE(KEYCODE_END)                              PORT_NAME("DELTA")          PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(vg5k_state::delta_button), 0)
 INPUT_PORTS_END
 
 

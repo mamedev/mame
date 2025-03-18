@@ -6,9 +6,10 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_BBC_INTERNAL_MORLEYAA_H
+#define MAME_BUS_BBC_INTERNAL_MORLEYAA_H
 
-#ifndef MAME_BUS_BBC_INTERNAL_MORLEY_H
-#define MAME_BUS_BBC_INTERNAL_MORLEY_H
+#pragma once
 
 #include "internal.h"
 
@@ -51,4 +52,4 @@ private:
 DECLARE_DEVICE_TYPE(BBC_MORLEYAA, bbc_morleyaa_device);
 
 
-#endif /* MAME_BUS_BBC_INTERNAL_MORLEY_H */
+#endif // MAME_BUS_BBC_INTERNAL_MORLEYAA_H

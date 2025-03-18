@@ -485,6 +485,73 @@ static INPUT_PORTS_START( spg2xx ) // base structure for easy debugging / figuri
 	PORT_DIPSETTING(      0x8000, "8000" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( epo_tetr ) // all inputs verified against hidden test mode
+	PORT_INCLUDE( spg2xx )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 A")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 B")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 L")
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P1 R")
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0xfc00, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("P3")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("EXTRA")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 L")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 R")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 B")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 A")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( dmbtjunc )
+	PORT_INCLUDE( spg2xx )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Red")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Green")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 Blue")
+	// there's a 2nd set of buttons for P2, where do they map?
+	// battery state is likely in here too
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( ban_krkk )
+	// inputs shown in hidden text mode, although it refers to the physical placement of the each button on the mat rather than the colours / symbols
+	PORT_INCLUDE( spg2xx )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Blue/Top-Left")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Yellow/Top-Right")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Red/Bottom-Left")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("P1 Green/Bottom-Right")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("P1 Select")
+
+	PORT_MODIFY("P3")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Blue/Top-Left")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Yellow/Top-Right")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Red/Bottom-Left")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 Green/Bottom-Right")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2) PORT_NAME("P2 Select")
+
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_CUSTOM ) // Battery State
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( drumsups )
 	PORT_INCLUDE( spg2xx )
 
@@ -495,7 +562,6 @@ static INPUT_PORTS_START( drumsups )
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Drum pad 3: Purple")
 	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Drum pad 4: Red")
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Drum pad 5: Green")
-
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( lexiart )
@@ -741,10 +807,10 @@ static INPUT_PORTS_START( fordrace )
 	PORT_BIT(0x0fff, 0x0000, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_MINMAX(0x00,0x0fff)
 
 	PORT_START("AD2") // 12-bit port, Wheel is split across 2 ports, value added together?
-	PORT_BIT( 0x0fff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(spg2xx_game_fordrace_state, wheel2_r)
+	PORT_BIT( 0x0fff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(spg2xx_game_fordrace_state::wheel2_r))
 
 	PORT_START("AD3") // 12-bit port, Wheel (see above)
-	PORT_BIT( 0x0fff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(spg2xx_game_fordrace_state, wheel_r)
+	PORT_BIT( 0x0fff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(spg2xx_game_fordrace_state::wheel_r))
 
 	PORT_START("WHEEL_REAL")
 	PORT_BIT(0x1fff, 0x0000, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_MINMAX(0x00,0x1fff) PORT_NAME("Wheel")
@@ -1355,6 +1421,29 @@ static INPUT_PORTS_START( ddr33v )
 
 INPUT_PORTS_END
 
+
+static const ioport_value handle_table[3] =
+{
+	0x00, 0x01, 0x03,
+};
+
+// the on/off slider has 3 positions; off, on (low sound), on (high sound) but this seems to be a hardware feature, not read by the code
+static INPUT_PORTS_START( prail )
+	PORT_INCLUDE( spg2xx )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Doors")
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Horn")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Lights")
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Conductor")
+	PORT_BIT( 0xc000, 0x0000, IPT_POSITIONAL_V ) PORT_POSITIONS(3) PORT_REMAP_TABLE(handle_table) PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_PLAYER(1)
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) // battery state
+
+	PORT_MODIFY("P3")
+	PORT_BIT( 0x0003, 0x0000, IPT_POSITIONAL_V ) PORT_POSITIONS(3) PORT_REMAP_TABLE(handle_table) PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_PLAYER(2)
+INPUT_PORTS_END
 
 void spg2xx_game_state::machine_start()
 {
@@ -2052,6 +2141,34 @@ void spg2xx_game_doraphone_state::doraphone(machine_config &config)
 	m_maincpu->portc_in().set(FUNC(spg2xx_game_doraphone_state::base_portc_r));
 }
 
+void spg2xx_game_prail_state::prail_portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	if (mem_mask & 0x0f)
+	{
+		uint8_t const bank = bitswap<4>(data, 3, 2, 0, 1);
+		switch_bank(bank);
+	}
+
+	portb_w(offset, data & ~0x000f, mem_mask & ~0x000f);
+}
+
+void spg2xx_game_prail_state::prail(machine_config &config)
+{
+	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen); // SPG243
+	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_prail_state::mem_map_4m);
+
+	spg2xx_base(config);
+	m_maincpu->porta_in().set(FUNC(spg2xx_game_prail_state::base_porta_r));
+	m_maincpu->portb_in().set(FUNC(spg2xx_game_prail_state::base_portb_r));
+	m_maincpu->portc_in().set(FUNC(spg2xx_game_prail_state::base_portc_r));
+
+	m_maincpu->portb_out().set(FUNC(spg2xx_game_prail_state::prail_portb_w));
+
+	// TODO: this is not currently hooked up, it's used to store the unlock states for the gallery
+	I2C_24C02(config, "i2cmem", 0); // ATMLH13402C (24C02 compatible)
+}
+
+
 void spg2xx_game_doraphone_state::doraphonep(machine_config &config)
 {
 	doraphone(config);
@@ -2059,6 +2176,80 @@ void spg2xx_game_doraphone_state::doraphonep(machine_config &config)
 	m_maincpu->set_pal(true);
 	m_screen->set_refresh_hz(50);
 }
+
+
+void epo_tetr_game_state::machine_start()
+{
+	spg2xx_game_state::machine_start();
+
+	save_item(NAME(m_old_portb_data));
+	save_item(NAME(m_old_portb_extra_latch));
+}
+
+void epo_tetr_game_state::machine_reset()
+{
+	spg2xx_game_state::machine_reset();
+
+	m_old_portb_data = 0;
+	m_old_portb_extra_latch = 0;
+}
+
+uint16_t epo_tetr_game_state::epo_tetr_r(offs_t offset, uint16_t mem_mask)
+{
+	uint16_t data = 0;
+
+	int eeprom = m_i2cmem->read_sda();
+	data |= (eeprom << 1);
+
+	int p2 = m_old_portb_extra_latch & 1;
+	data |= (p2 << 6);
+
+	if (!machine().side_effects_disabled())
+		logerror("%s: epo_tetr_r: %04x (%04x)\n", machine().describe_context(), data, mem_mask);
+
+	return data;
+}
+
+void epo_tetr_game_state::epo_tetr_portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	portb_w(offset, data, mem_mask);
+
+	if (BIT(mem_mask, 0))
+		m_i2cmem->write_scl(BIT(data, 0));
+	if (BIT(mem_mask, 1))
+		m_i2cmem->write_sda(BIT(data, 1));
+
+	if (BIT(mem_mask, 4))
+	{
+		if ((BIT(data, 4)) && (!(BIT(m_old_portb_data, 4))))
+		{
+			m_old_portb_extra_latch = m_ioextra->read();
+		}
+	}
+
+	if (BIT(mem_mask, 5))
+	{
+		if ((BIT(data, 5)) && (!(BIT(m_old_portb_data, 5))))
+		{
+			m_old_portb_extra_latch >>= 1;
+		}
+	}
+
+	m_old_portb_data = data;
+}
+
+
+void epo_tetr_game_state::epo_tetr(machine_config& config)
+{
+	spg2xx(config);
+
+	I2C_24C02(config, "i2cmem", 0); // S24CS02A
+
+	m_maincpu->portb_in().set(FUNC(epo_tetr_game_state::epo_tetr_r));
+	m_maincpu->portb_out().set(FUNC(epo_tetr_game_state::epo_tetr_portb_w));
+}
+
+
 
 void spg2xx_game_ddr33v_state::init_ddr33v()
 {
@@ -2282,6 +2473,11 @@ ROM_START( wfcentro )
 	ROM_LOAD16_WORD_SWAP( "winfuncentro.bin", 0x000000, 0x800000, CRC(fd6ad052) SHA1(78af844729bf4843dc70531349e38a8c25caf748) )
 ROM_END
 
+ROM_START( wfart )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "artstudio.bin", 0x000000, 0x800000, CRC(f5fd657e) SHA1(0005826a5b22a17cafffaf7328092c8d84217398) )
+ROM_END
+
 ROM_START( lexiart )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "lexibookartstudio.u3", 0x000000, 0x800000, CRC(fc417abb) SHA1(c0a18a2cf11c47086722f0ec88410614fed7c6f7) )
@@ -2323,6 +2519,32 @@ ROM_END
 ROM_START( ddr33v )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "ddr33v.bin", 0x000000, 0x800000, CRC(56c7015c) SHA1(a1faef2ab6eb191dea1497f8cfd4ccbd8c504e6d) )
+ROM_END
+
+ROM_START( anpantv )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "anpanman_tv.bin", 0x000000, 0x800000, CRC(5e32dc1a) SHA1(bae260ffc56f5315cdafd5bc40966ec6d31e267f) )
+ROM_END
+
+ROM_START( dmbtjunc )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "battlejunction.u3", 0x000000, 0x800000, CRC(31471c53) SHA1(94fdd8c4c67914054e304a55042c10710af2e596) )
+ROM_END
+
+ROM_START( ban_krkk )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "quiz.bin", 0x000000, 0x400000, CRC(6f51180a) SHA1(38017ecaae4eead38482aeb04c90b5a5eeebd6ca) )
+ROM_END
+
+ROM_START( epo_tetr )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "mx29lv320mb.bin", 0x000000, 0x400000, CRC(b4ad30e0) SHA1(83e30e199854c647f9a197562d1bf1f3bc847fff) )
+ROM_END
+
+
+ROM_START( prail )
+	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "traingame.u1", 0x000000, 0x8000000, CRC(5c96d526) SHA1(cda0280b320762bda7a7358ec7ce29690aa815fb) )
 ROM_END
 
 
@@ -2476,7 +2698,7 @@ CONS( 2006, pballpup,   0,        0, pballpup,  pballpup,  spg2xx_game_pballpup_
 CONS( 2007, dreamlss,   0,        0, dreamlss,  dreamlss,  spg2xx_game_dreamlss_state, empty_init,    "Hasbro / Tiger Electronics",                             "Dream Life Superstar (Version 0.3, Mar 16 2007)",                       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // Needs a hack to not show garbage sprite on startup
-CONS( 2008, swclone,    0,        0, swclone,   swclone,   spg2xx_game_swclone_state,  init_swclone,  "Hasbro / Tiger Electronics",                             "Star Wars - The Clone Wars",                                            MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2008, swclone,    0,        0, swclone,   swclone,   spg2xx_game_swclone_state,  init_swclone,  "Hasbro / Tiger Electronics",                             "Star Wars: The Clone Wars - Clone Trooper Blaster Game",                MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // Mattel games
 CONS( 2005, mattelcs,   0,        0, rad_skat,  mattelcs,  spg2xx_game_state,          empty_init,    "Mattel",                                                 "Mattel Classic Sports",                                                 MACHINE_IMPERFECT_SOUND )
@@ -2488,7 +2710,8 @@ CONS( 2006, hotwhl2p,   0,        0, hotwheels, hotwheels, spg2xx_game_hotwheels
 CONS( 2007, ordentv,    0,        0, ordentv,   ordentv,   spg2xx_game_ordentv_state,  init_ordentv,  "Taikee / V-Tac",                                         "Ordenador-TV (Spain)",                                                  MACHINE_NOT_WORKING )
 CONS( 2007, jeuint,     ordentv,  0, ordentv,   ordentv,   spg2xx_game_ordentv_state,  init_jeuint,   "Taikee / V-Tac",                                         u8"Jeu Intéractif TV (France)",                                          MACHINE_NOT_WORKING)
 
-CONS( 200?, wfcentro,   0,        0, wfcentro,  spg2xx,    spg2xx_game_wfcentro_state, empty_init,    "WinFun",                                                 "Centro TV de Diseno Artistico (Spain)",                                 MACHINE_NOT_WORKING )
+CONS( 200?, wfart,      0,        0, wfcentro,  spg2xx,    spg2xx_game_wfcentro_state, empty_init,    "WinFun",                                                 "TV Art Design Center",                                                  MACHINE_NOT_WORKING )
+CONS( 200?, wfcentro,   wfart,    0, wfcentro,  spg2xx,    spg2xx_game_wfcentro_state, empty_init,    "WinFun",                                                 "Centro TV de Diseno Artistico (Spain)",                                 MACHINE_NOT_WORKING )
 
 CONS( 200?, lexiart,    0,        0, lexiart,   lexiart,   spg2xx_game_lexiart_state,  empty_init,    "Lexibook",                                               "Lexibook Junior My 1st Drawing Studio",                                 MACHINE_NOT_WORKING )
 
@@ -2503,3 +2726,26 @@ CONS( 200?, virtten,    0,        0, spg2xx,    virtten,   spg2xx_game_state,   
 // 2007 ingame, 2008 on box.  Hyperkin is mentioned as being the registered trademark holder alongside DDRGame on the box.
 // Songs "composed by Kenneth Baylon"
 CONS( 2008, ddr33v,     0,        0, spg2xx,    ddr33v,    spg2xx_game_ddr33v_state,   init_ddr33v,   "DDRGame / Hyperkin",                                    "16-bit TV Dance Pad with 15 songs / Dance Dance Party Mix (DDRGame)",   MACHINE_IMPERFECT_SOUND )
+
+// PCB has 'Anpanman TV 2006 Ver 1.4' printed on it, ROM has SPG260 header.  Uses custom built-in keyboard, no display built into the unit.
+CONS( 2006, anpantv,    0,        0, spg2xx,    spg2xx,    spg2xx_game_state,          empty_init,    "Bandai",                                                "Anpanman TV (Japan)",                                                   MACHINE_NOT_WORKING )
+
+// Has an AT24C08, not currently hooked up (probably for storing database unlocks)
+//
+// There is also a card reader/scanner which can read barcodes from Digimon cards
+// and IR connectivity which allowed for data exchange with various services using
+// an external device, including transfering characters to/from an arcade game.
+// Neither is currently emulated
+//
+// Will report 'ERROR' sometimes, maybe as a result of these not being hooked up.
+CONS( 2006, dmbtjunc,   0,        0, spg2xx,    dmbtjunc,  spg2xx_game_state,          empty_init,    "Bandai",                                                "Let's! TV Play Digital Monster Battle Junction (Japan)",                MACHINE_NOT_WORKING )
+
+// Let's!TVプレイ 脳と体を鍛える 体感頭脳ファミリーマットレ  - Let's! TV Play branding appears on the box
+CONS( 2006, ban_krkk,   0,        0, spg2xx,    ban_krkk,  spg2xx_game_state,          init_crc,      "Bandai",                                                "Let's! TV Play Nou to Karada o Kitaeru Taikan Zunou Family Mattore (Japan)", MACHINE_IMPERFECT_SOUND )
+
+CONS( 2007, epo_tetr,   0,        0, epo_tetr,  epo_tetr,  epo_tetr_game_state,          empty_init,    "Epoch",                                                "Minna no Tetris (Japan)", MACHINE_IMPERFECT_SOUND )
+
+// Train Game V1.4 2012-08-15 on PCB. SPG243 headers in each chunk.
+// Last few bytes of SEEPROM have 'JUNGT' in them, is this developed by JungleSoft/JungleTac?
+CONS( 2012, prail,      0,        0, prail,     prail,     spg2xx_game_prail_state,    empty_init,   "Takara Tomy",                                            "Boku wa Plarail Untenshi - Shinkansen de Ikou! (Japan)",                MACHINE_IMPERFECT_SOUND )
+// the 'plus' version from 2015 runs on newer hardware, see generalplus_gpl16250_spi.cpp

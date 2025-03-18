@@ -363,16 +363,16 @@ ROM_END
 } // Anonymous namespace
 
 // From Cirsa
-GAME( 1981,  luckyplr,  0, missbamby,  missbamby, missbamby_state, empty_init, ROT0, "Cirsa",              "Lucky Player",      MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1981,  minisupf,  0, missbamby,  c_810601a, missbamby_state, empty_init, ROT0, "Cirsa",              "Mini Super Fruits", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1981,  luckyplr,  0, missbamby,  missbamby, missbamby_state, empty_init, ROT0, "Cirsa",              "Lucky Player",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1981,  minisupf,  0, missbamby,  c_810601a, missbamby_state, empty_init, ROT0, "Cirsa",              "Mini Super Fruits", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
 
 // Clones
-GAME( 198?,  goldfrts,  0, missbamby,  c_810601a, missbamby_state, empty_init, ROT0, "Video Game",         "Golden Fruits",     MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1983,  gwinner,   0, gldwinner,  missbamby, missbamby_state, empty_init, ROT0, "Reben SA",           "Golden Winner",     MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1989?, miniazard, 0, gldwinner,  missbamby, missbamby_state, empty_init, ROT0, "Arfyc",              "Mini Azar D",       MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 198?,  msbamby,   0, missbamby,  missbamby, missbamby_state, empty_init, ROT0, "Automatics Pasqual", "Miss Bamby",        MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 198?,  goldfrts,  0, missbamby,  c_810601a, missbamby_state, empty_init, ROT0, "Video Game",         "Golden Fruits",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1983,  gwinner,   0, gldwinner,  missbamby, missbamby_state, empty_init, ROT0, "Reben SA",           "Golden Winner",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1989?, miniazard, 0, gldwinner,  missbamby, missbamby_state, empty_init, ROT0, "Arfyc",              "Mini Azar D",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 198?,  msbamby,   0, missbamby,  missbamby, missbamby_state, empty_init, ROT0, "Automatics Pasqual", "Miss Bamby",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
 
 // Similar hardware
-GAME( 1987?, basket,    0, igoabasket, missbamby, missbamby_state, empty_init, ROT0, "Igoa S.A.",          "Basket",            MACHINE_IS_SKELETON_MECHANICAL ) // v2.0 on ROM string, v2.81 on EPROM label
-GAME( 1987,  multy,     0, missbamby,  missbamby, missbamby_state, empty_init, ROT0, "Deta",               "Multy",             MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1985,  trebol,    0, missbamby,  missbamby, missbamby_state, empty_init, ROT0, "Regama",             "Trebol",            MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1987?, basket,    0, igoabasket, missbamby, missbamby_state, empty_init, ROT0, "Igoa S.A.",          "Basket",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // v2.0 on ROM string, v2.81 on EPROM label
+GAME( 1987,  multy,     0, missbamby,  missbamby, missbamby_state, empty_init, ROT0, "Deta",               "Multy",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1985,  trebol,    0, missbamby,  missbamby, missbamby_state, empty_init, ROT0, "Regama",             "Trebol",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

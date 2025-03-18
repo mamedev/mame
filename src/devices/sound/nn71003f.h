@@ -3,8 +3,8 @@
 
 // Nippon Steel Corp NN71003F mpeg audio decoder
 
-#ifndef DEVICES_SOUND_NN71003F_H
-#define DEVICES_SOUND_NN71003F_H
+#ifndef MAME_SOUND_NN71003F_H
+#define MAME_SOUND_NN71003F_H
 
 #pragma once
 
@@ -39,4 +39,4 @@ private:
 
 DECLARE_DEVICE_TYPE(NN71003F, nn71003f_device)
 
-#endif
+#endif // MAME_SOUND_NN71003F_H

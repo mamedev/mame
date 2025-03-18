@@ -260,9 +260,9 @@ INPUT_PORTS_END
  */
 void vme_sys68k_cpu1_card_device::centronics_ack_w(int state)
 {
-		LOG("%s(%d)\n", FUNCNAME, state);
-		m_centronics_ack = state;
-		m_pit->h1_set (state);
+	LOG("%s(%d)\n", FUNCNAME, state);
+	m_centronics_ack = state;
+	m_pit->h1_set(state);
 }
 
 /* Centronics BUSY handler
@@ -270,8 +270,8 @@ void vme_sys68k_cpu1_card_device::centronics_ack_w(int state)
  */
 void vme_sys68k_cpu1_card_device::centronics_busy_w(int state)
 {
-		LOG("%s(%d)\n", FUNCNAME, state);
-		m_centronics_busy = state;
+	LOG("%s(%d)\n", FUNCNAME, state);
+	m_centronics_busy = state;
 }
 
 /* Centronics PERROR handler
@@ -279,8 +279,8 @@ void vme_sys68k_cpu1_card_device::centronics_busy_w(int state)
  */
 void vme_sys68k_cpu1_card_device::centronics_perror_w(int state)
 {
-		LOG("%s(%d)\n", FUNCNAME, state);
-		m_centronics_perror = state;
+	LOG("%s(%d)\n", FUNCNAME, state);
+	m_centronics_perror = state;
 }
 
 /* Centronics SELECT handler
@@ -288,20 +288,20 @@ void vme_sys68k_cpu1_card_device::centronics_perror_w(int state)
  */
 void vme_sys68k_cpu1_card_device::centronics_select_w(int state)
 {
-		LOG("%s(%d)\n", FUNCNAME, state);
-		m_centronics_select = state;
-		m_pit->portb_setbit (0, state);
+	LOG("%s(%d)\n", FUNCNAME, state);
+	m_centronics_select = state;
+	m_pit->portb_setbit(0, state);
 }
 
 /* Start it up */
-void vme_sys68k_cpu1_card_device::device_start ()
+void vme_sys68k_cpu1_card_device::device_start()
 {
 	LOG("%s\n", FUNCNAME);
 
-	save_item (NAME (m_centronics_busy));
-	save_item (NAME (m_centronics_ack));
-	save_item (NAME (m_centronics_select));
-	save_item (NAME (m_centronics_perror));
+	save_item(NAME(m_centronics_busy));
+	save_item(NAME(m_centronics_ack));
+	save_item(NAME(m_centronics_select));
+	save_item(NAME(m_centronics_perror));
 
 	/* Map user ROM/RAM socket(s) */
 	if (m_cart->exists())
@@ -316,13 +316,13 @@ void vme_sys68k_cpu1_card_device::device_start ()
 }
 
 /* Reset it */
-void vme_sys68k_cpu1_card_device::device_reset ()
+void vme_sys68k_cpu1_card_device::device_reset()
 {
 	LOG("%s\n", FUNCNAME);
 
 	// Set up the BRG divider. RSA is a jumper setting and RSB is always set High
-	m_brg->rsa_w( m_serial_brf->read() == 0x80 ? ASSERT_LINE : CLEAR_LINE );
-	m_brg->rsb_w( ASSERT_LINE);
+	m_brg->rsa_w(m_serial_brf->read() == 0x80 ? ASSERT_LINE : CLEAR_LINE);
+	m_brg->rsb_w(ASSERT_LINE);
 
 	// Disable all configured timers, only enabling the used ones
 	m_brg->timer_disable_all();
@@ -344,7 +344,8 @@ void vme_sys68k_cpu1_card_device::device_reset ()
 }
 
 /* A very inefficient User cart emulation of two 8 bit sockets (odd and even) */
-uint16_t vme_sys68k_cpu1_card_device::read16_rom(offs_t offset){
+uint16_t vme_sys68k_cpu1_card_device::read16_rom(offs_t offset)
+{
 	offset = offset % m_cart->common_get_size("rom"); // Don't read outside buffer...
 	return swapendian_int16(m_usrrom [offset]);
 }
@@ -663,8 +664,8 @@ ioport_constructor vme_sys68k_cpu1_card_device::device_input_ports() const
 /* Driver */
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                 FULLNAME          FLAGS */
 //COMP( 1983, fccpu1,   0,      0,      fccpu1,   force68k, vme_sys68k_cpu1_card_device, empty_init, "Force Computers GmbH", "SYS68K/CPU-1",   MACHINE_NO_SOUND_HW )
-//COMP( 1989, fccpu6,   0,      0,      fccpu6,   force68k, vme_sys68k_cpu1_card_device, empty_init, "Force Computers GmbH", "SYS68K/CPU-6",   MACHINE_IS_SKELETON )
-//COMP( 1989, fccpu6a,  0,      0,      fccpu6a,  force68k, vme_sys68k_cpu1_card_device, empty_init, "Force Computers GmbH", "SYS68K/CPU-6a",  MACHINE_IS_SKELETON )
-//COMP( 1989, fccpu6v,  0,      0,      fccpu6v,  force68k, vme_sys68k_cpu1_card_device, empty_init, "Force Computers GmbH", "SYS68K/CPU-6v",  MACHINE_IS_SKELETON )
-//COMP( 1989, fccpu6va, 0,      0,      fccpu6va, force68k, vme_sys68k_cpu1_card_device, empty_init, "Force Computers GmbH", "SYS68K/CPU-6va", MACHINE_IS_SKELETON )
-//COMP( 1989, fccpu6vb, 0,      0,      fccpu6vb, force68k, vme_sys68k_cpu1_card_device, empty_init, "Force Computers GmbH", "SYS68K/CPU-6vb", MACHINE_IS_SKELETON )
+//COMP( 1989, fccpu6,   0,      0,      fccpu6,   force68k, vme_sys68k_cpu1_card_device, empty_init, "Force Computers GmbH", "SYS68K/CPU-6",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//COMP( 1989, fccpu6a,  0,      0,      fccpu6a,  force68k, vme_sys68k_cpu1_card_device, empty_init, "Force Computers GmbH", "SYS68K/CPU-6a",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//COMP( 1989, fccpu6v,  0,      0,      fccpu6v,  force68k, vme_sys68k_cpu1_card_device, empty_init, "Force Computers GmbH", "SYS68K/CPU-6v",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//COMP( 1989, fccpu6va, 0,      0,      fccpu6va, force68k, vme_sys68k_cpu1_card_device, empty_init, "Force Computers GmbH", "SYS68K/CPU-6va", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//COMP( 1989, fccpu6vb, 0,      0,      fccpu6vb, force68k, vme_sys68k_cpu1_card_device, empty_init, "Force Computers GmbH", "SYS68K/CPU-6vb", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

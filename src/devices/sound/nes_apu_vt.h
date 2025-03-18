@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_AUDIO_NES_VT_APU_H
-#define MAME_AUDIO_NES_VT_APU_H
+#ifndef MAME_SOUND_NES_APU_VT_H
+#define MAME_SOUND_NES_APU_VT_H
 
 #pragma once
 
@@ -23,4 +23,4 @@ protected:
 private:
 };
 
-#endif // MAME_AUDIO_NES_VT_APU_H
+#endif // MAME_SOUND_NES_APU_VT_H

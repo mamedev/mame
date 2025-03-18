@@ -33,11 +33,13 @@
 ******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/msm5205.h"
 #include "sound/ay8910.h"
 #include "video/resnet.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -308,7 +310,7 @@ void dacholer_state::snd_ack_w(uint8_t data)
 
 int dacholer_state::snd_ack_r()
 {
-	return m_snd_ack;       //guess ...
+	return m_snd_ack; // guess ...
 }
 
 void dacholer_state::snd_irq_w(uint8_t data)
@@ -386,7 +388,7 @@ static INPUT_PORTS_START( dacholer )
 	PORT_DIPSETTING(    0x04, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(dacholer_state, snd_ack_r)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(dacholer_state::snd_ack_r))
 
 	PORT_START("DSWB")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )            /* table at 0x0a9c */

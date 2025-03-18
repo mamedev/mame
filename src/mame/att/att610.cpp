@@ -187,5 +187,5 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1986, att610, 0, 0, att610, att610, att610_state, empty_init, "AT&T", "610 Business Communication Terminal", MACHINE_IS_SKELETON)
-COMP(1987, att615, 0, 0, att610, att610, att610_state, empty_init, "AT&T", "615 MT", MACHINE_IS_SKELETON)
+COMP(1986, att610, 0, 0, att610, att610, att610_state, empty_init, "AT&T", "610 Business Communication Terminal", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP(1987, att615, 0, 0, att610, att610, att610_state, empty_init, "AT&T", "615 MT", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

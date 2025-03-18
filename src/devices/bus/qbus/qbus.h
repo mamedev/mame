@@ -73,6 +73,7 @@ public:
 	template <typename T> void set_space(T &&tag, int spacenum) { m_space.set_tag(std::forward<T>(tag), spacenum); }
 
 	virtual space_config_vector memory_space_config() const override;
+	address_space &program_space() const { return *m_space; }
 
 	auto birq4() { return m_out_birq4_cb.bind(); }
 	auto birq5() { return m_out_birq6_cb.bind(); }

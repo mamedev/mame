@@ -137,5 +137,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 200?, potgoldu,    0,        potgold,    potgold, potgold_state, empty_init, ROT0, "U.S. Games, Inc.",  "Pot O' Gold (U.S. Games, v400x?)", MACHINE_IS_SKELETON )
-GAME( 2001, potgoldu580, potgoldu, potgold580, potgold, potgold_state, empty_init, ROT0, "U.S. Games, Inc.",  "Pot O' Gold (U.S. Games, v580F)",  MACHINE_IS_SKELETON )
+GAME( 200?, potgoldu,    0,        potgold,    potgold, potgold_state, empty_init, ROT0, "U.S. Games, Inc.",  "Pot O' Gold (U.S. Games, v400x?)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2001, potgoldu580, potgoldu, potgold580, potgold, potgold_state, empty_init, ROT0, "U.S. Games, Inc.",  "Pot O' Gold (U.S. Games, v580F)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

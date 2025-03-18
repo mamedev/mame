@@ -9,10 +9,18 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "debug/debugcpu.h"
 #include "drcbec.h"
 
+#include "drcbeut.h"
+
+#include "debug/debugcpu.h"
+
 #include <cmath>
+
+
+namespace drc {
+
+namespace {
 
 using namespace uml;
 
@@ -22,22 +30,22 @@ using namespace uml;
 //**************************************************************************
 
 // define a bit to match each possible condition, starting at bit 12
-#define ZBIT            (0x1000 << (COND_Z & 15))
-#define NZBIT           (0x1000 << (COND_NZ & 15))
-#define SBIT            (0x1000 << (COND_S & 15))
-#define NSBIT           (0x1000 << (COND_NS & 15))
-#define CBIT            (0x1000 << (COND_C & 15))
-#define NCBIT           (0x1000 << (COND_NC & 15))
-#define VBIT            (0x1000 << (COND_V & 15))
-#define NVBIT           (0x1000 << (COND_NV & 15))
-#define UBIT            (0x1000 << (COND_U & 15))
-#define NUBIT           (0x1000 << (COND_NU & 15))
-#define ABIT            (0x1000 << (COND_A & 15))
-#define BEBIT           (0x1000 << (COND_BE & 15))
-#define GBIT            (0x1000 << (COND_G & 15))
-#define GEBIT           (0x1000 << (COND_GE & 15))
-#define LBIT            (0x1000 << (COND_L & 15))
-#define LEBIT           (0x1000 << (COND_LE & 15))
+constexpr uint32_t ZBIT  = 0x1000 << (COND_Z & 15);
+constexpr uint32_t NZBIT = 0x1000 << (COND_NZ & 15);
+constexpr uint32_t SBIT  = 0x1000 << (COND_S & 15);
+constexpr uint32_t NSBIT = 0x1000 << (COND_NS & 15);
+constexpr uint32_t CBIT  = 0x1000 << (COND_C & 15);
+constexpr uint32_t NCBIT = 0x1000 << (COND_NC & 15);
+constexpr uint32_t VBIT  = 0x1000 << (COND_V & 15);
+constexpr uint32_t NVBIT = 0x1000 << (COND_NV & 15);
+constexpr uint32_t UBIT  = 0x1000 << (COND_U & 15);
+constexpr uint32_t NUBIT = 0x1000 << (COND_NU & 15);
+constexpr uint32_t ABIT  = 0x1000 << (COND_A & 15);
+constexpr uint32_t BEBIT = 0x1000 << (COND_BE & 15);
+constexpr uint32_t GBIT  = 0x1000 << (COND_G & 15);
+constexpr uint32_t GEBIT = 0x1000 << (COND_GE & 15);
+constexpr uint32_t LBIT  = 0x1000 << (COND_L & 15);
+constexpr uint32_t LEBIT = 0x1000 << (COND_LE & 15);
 
 
 // internal opcodes
@@ -181,6 +189,7 @@ enum
 // compute C and V flags for 32-bit add/subtract
 #define FLAGS32_C_ADD(a,b)          ((uint32_t)~(a) < (uint32_t)(b))
 #define FLAGS32_C_SUB(a,b)          ((uint32_t)(b) > (uint32_t)(a))
+#define FLAGS32_C_SUBC(a,b,c)       (((uint32_t)(c) != 0 && ((uint32_t)(b) + (uint32_t)(c)) == 0) || (uint32_t)(b) + (uint32_t)(c) > (uint32_t)(a))
 #define FLAGS32_V_SUB(r,a,b)        (((((a) ^ (b)) & ((a) ^ (r))) >> 30) & FLAG_V)
 #define FLAGS32_V_ADD(r,a,b)        (((~((a) ^ (b)) & ((a) ^ (r))) >> 30) & FLAG_V)
 
@@ -188,10 +197,12 @@ enum
 #define FLAGS32_NZ(v)               ((((v) >> 28) & FLAG_S) | (((uint32_t)(v) == 0) << 2))
 #define FLAGS32_NZCV_ADD(r,a,b)     (FLAGS32_NZ(r) | FLAGS32_C_ADD(a,b) | FLAGS32_V_ADD(r,a,b))
 #define FLAGS32_NZCV_SUB(r,a,b)     (FLAGS32_NZ(r) | FLAGS32_C_SUB(a,b) | FLAGS32_V_SUB(r,a,b))
+#define FLAGS32_NZCV_SUBC(r,a,b,c)  (FLAGS32_NZ(r) | FLAGS32_C_SUBC(a,b,c) | FLAGS32_V_SUB(r,a,b))
 
 // compute C and V flags for 64-bit add/subtract
 #define FLAGS64_C_ADD(a,b)          ((uint64_t)~(a) < (uint64_t)(b))
 #define FLAGS64_C_SUB(a,b)          ((uint64_t)(b) > (uint64_t)(a))
+#define FLAGS64_C_SUBC(a,b,c)       (((uint64_t)(c) != 0 && ((uint64_t)(b) + (uint64_t)(c)) == 0) || (uint64_t)(b) + (uint64_t)(c) > (uint64_t)(a))
 #define FLAGS64_V_SUB(r,a,b)        (((((a) ^ (b)) & ((a) ^ (r))) >> 62) & FLAG_V)
 #define FLAGS64_V_ADD(r,a,b)        (((~((a) ^ (b)) & ((a) ^ (r))) >> 62) & FLAG_V)
 
@@ -199,6 +210,122 @@ enum
 #define FLAGS64_NZ(v)               ((((v) >> 60) & FLAG_S) | (((uint64_t)(v) == 0) << 2))
 #define FLAGS64_NZCV_ADD(r,a,b)     (FLAGS64_NZ(r) | FLAGS64_C_ADD(a,b) | FLAGS64_V_ADD(r,a,b))
 #define FLAGS64_NZCV_SUB(r,a,b)     (FLAGS64_NZ(r) | FLAGS64_C_SUB(a,b) | FLAGS64_V_SUB(r,a,b))
+#define FLAGS64_NZCV_SUBC(r,a,b,c)  (FLAGS64_NZ(r) | FLAGS64_C_SUBC(a,b,c) | FLAGS64_V_SUB(r,a,b))
+
+
+//-------------------------------------------------
+//  dmulu - perform a double-wide unsigned multiply
+//-------------------------------------------------
+
+inline int dmulu(uint64_t &dstlo, uint64_t &dsthi, uint64_t src1, uint64_t src2, bool flags)
+{
+	// shortcut if we don't care about the high bits or the flags
+	if (&dstlo == &dsthi && !flags)
+	{
+		dstlo = src1 * src2;
+		return 0;
+	}
+
+	// fetch source values
+	uint64_t a = src1;
+	uint64_t b = src2;
+	if (a == 0 || b == 0)
+	{
+		dsthi = dstlo = 0;
+		return FLAG_Z;
+	}
+
+	// compute high and low parts first
+	uint64_t lo = uint64_t(uint32_t(a >> 0))  * uint64_t(uint32_t(b >> 0));
+	uint64_t hi = uint64_t(uint32_t(a >> 32)) * uint64_t(uint32_t(b >> 32));
+
+	// compute middle parts
+	uint64_t prevlo = lo;
+	uint64_t temp = uint64_t(uint32_t(a >> 32)) * uint64_t(uint32_t(b >> 0));
+	lo += temp << 32;
+	hi += (temp >> 32) + (lo < prevlo);
+
+	prevlo = lo;
+	temp = uint64_t(uint32_t(a >> 0)) * uint64_t(uint32_t(b >> 32));
+	lo += temp << 32;
+	hi += (temp >> 32) + (lo < prevlo);
+
+	// store the results
+	dsthi = hi;
+	dstlo = lo;
+	return ((hi >> 60) & FLAG_S) | ((hi != 0) << 1);
+}
+
+
+//-------------------------------------------------
+//  dmuls - perform a double-wide signed multiply
+//-------------------------------------------------
+
+inline int dmuls(uint64_t &dstlo, uint64_t &dsthi, int64_t src1, int64_t src2, bool flags)
+{
+	// shortcut if we don't care about the high bits or the flags
+	if (&dstlo == &dsthi && !flags)
+	{
+		dstlo = src1 * src2;
+		return 0;
+	}
+
+	// fetch absolute source values
+	uint64_t a = src1; if (int64_t(a) < 0) a = -a;
+	uint64_t b = src2; if (int64_t(b) < 0) b = -b;
+	if (a == 0 || b == 0)
+	{
+		dsthi = dstlo = 0;
+		return FLAG_Z;
+	}
+
+	// compute high and low parts first
+	uint64_t lo = uint64_t(uint32_t(a >> 0))  * uint64_t(uint32_t(b >> 0));
+	uint64_t hi = uint64_t(uint32_t(a >> 32)) * uint64_t(uint32_t(b >> 32));
+
+	// compute middle parts
+	uint64_t prevlo = lo;
+	uint64_t temp = uint64_t(uint32_t(a >> 32)) * uint64_t(uint32_t(b >> 0));
+	lo += temp << 32;
+	hi += (temp >> 32) + (lo < prevlo);
+
+	prevlo = lo;
+	temp = uint64_t(uint32_t(a >> 0)) * uint64_t(uint32_t(b >> 32));
+	lo += temp << 32;
+	hi += (temp >> 32) + (lo < prevlo);
+
+	// adjust for signage
+	if (int64_t(src1 ^ src2) < 0)
+	{
+		hi = ~hi + ((lo == 0) ? 1 : 0);
+		lo = ~lo + 1;
+	}
+
+	// store the results
+	dsthi = hi;
+	dstlo = lo;
+	return ((hi >> 60) & FLAG_S) | ((hi != (int64_t(lo) >> 63)) << 1);
+}
+
+inline uint32_t tzcount32(uint32_t value)
+{
+	for (int i = 0; i < 32; i++)
+	{
+		if (value & (uint32_t(1) << i))
+			return i;
+	}
+	return 32;
+}
+
+inline uint64_t tzcount64(uint64_t value)
+{
+	for (int i = 0; i < 64; i++)
+	{
+		if (value & (uint64_t(1) << i))
+			return i;
+	}
+	return 64;
+}
 
 
 
@@ -227,6 +354,36 @@ union drcbec_instruction
 	const code_handle * handle;
 	const drcbec_instruction *inst;
 	const drcbec_instruction **pinst;
+};
+
+
+class drcbe_c : public drcbe_interface
+{
+public:
+	// construction/destruction
+	drcbe_c(drcuml_state &drcuml, device_t &device, drc_cache &cache, uint32_t flags, int modes, int addrbits, int ignorebits);
+	virtual ~drcbe_c();
+
+	// required overrides
+	virtual void reset() override;
+	virtual int execute(uml::code_handle &entry) override;
+	virtual void generate(drcuml_block &block, const uml::instruction *instlist, uint32_t numinst) override;
+	virtual bool hash_exists(uint32_t mode, uint32_t pc) const noexcept override;
+	virtual void get_info(drcbe_info &info) const noexcept override;
+
+private:
+	// helpers
+	void output_parameter(drcbec_instruction **dstptr, void **immedptr, int size, const uml::parameter &param);
+	void fixup_label(void *parameter, drccodeptr labelcodeptr);
+
+	// internal state
+	drc_hash_table          m_hash;                 // hash table state
+	drc_map_variables       m_map;                  // code map
+	drc_label_list          m_labels;               // label list
+	drc_label_fixup_delegate m_fixup_delegate;      // precomputed delegate
+
+	static const uint32_t     s_condition_map[32];
+	static uint64_t           s_immediate_zero;
 };
 
 
@@ -283,12 +440,12 @@ const uint32_t drcbe_c::s_condition_map[] =
 //  drcbe_c - constructor
 //-------------------------------------------------
 
-drcbe_c::drcbe_c(drcuml_state &drcuml, device_t &device, drc_cache &cache, uint32_t flags, int modes, int addrbits, int ignorebits)
-	: drcbe_interface(drcuml, cache, device),
-		m_hash(cache, modes, addrbits, ignorebits),
-		m_map(cache, 0xaaaaaaaa55555555),
-		m_labels(cache),
-		m_fixup_delegate(&drcbe_c::fixup_label, this)
+drcbe_c::drcbe_c(drcuml_state &drcuml, device_t &device, drc_cache &cache, uint32_t flags, int modes, int addrbits, int ignorebits) :
+	drcbe_interface(drcuml, cache, device),
+	m_hash(cache, modes, addrbits, ignorebits),
+	m_map(cache, 0xaaaaaaaa55555555),
+	m_labels(cache),
+	m_fixup_delegate(&drcbe_c::fixup_label, this)
 {
 }
 
@@ -320,19 +477,39 @@ void drcbe_c::reset()
 
 void drcbe_c::generate(drcuml_block &block, const instruction *instlist, uint32_t numinst)
 {
+	// Calculate the max possible number of register clears required
+	uint32_t regclears = 0;
+
+	for (int inum = 0; inum < numinst; inum++)
+	{
+		const instruction &inst = instlist[inum];
+
+		if (inst.size() != 4)
+			continue;
+
+		for (int pnum = 0; pnum < inst.numparams(); pnum++)
+		{
+			if (inst.is_param_out(pnum) && inst.param(pnum).is_int_register())
+				regclears++;
+		}
+	}
+
 	// tell all of our utility objects that a block is beginning
-	m_hash.block_begin(block, instlist, numinst);
+	m_hash.block_begin(block, instlist, numinst + regclears);
 	m_labels.block_begin(block);
 	m_map.block_begin(block);
 
 	// begin codegen; fail if we can't
-	drccodeptr *cachetop = m_cache.begin_codegen(numinst * sizeof(drcbec_instruction) * 4);
+	drccodeptr *cachetop = m_cache.begin_codegen((numinst + regclears) * sizeof(drcbec_instruction) * 4);
 	if (cachetop == nullptr)
 		block.abort();
 
 	// compute the base by aligning the cache top to an even multiple of drcbec_instruction
 	drcbec_instruction *base = (drcbec_instruction *)(((uintptr_t)*cachetop + sizeof(drcbec_instruction) - 1) & ~(sizeof(drcbec_instruction) - 1));
 	drcbec_instruction *dst = base;
+
+	bool ireg_needs_clearing[REG_I_COUNT];
+	std::fill(std::begin(ireg_needs_clearing), std::end(ireg_needs_clearing), true);
 
 	// generate code by copying the instructions and extracting immediates
 	for (int inum = 0; inum < numinst; inum++)
@@ -359,9 +536,10 @@ void drcbe_c::generate(drcuml_block &block, const instruction *instlist, uint32_
 				m_labels.set_codeptr(inst.param(0).label(), (drccodeptr)dst);
 				break;
 
-			// ignore COMMENT and NOP opcodes
+			// ignore COMMENT, NOP, and BREAK opcodes
 			case OP_COMMENT:
 			case OP_NOP:
+			case OP_BREAK:
 				break;
 
 			// when we hit a MAPVAR opcode, log the change for the current PC
@@ -386,10 +564,14 @@ void drcbe_c::generate(drcuml_block &block, const instruction *instlist, uint32_
 					psize[2] = 4;
 				if (opcode == OP_STORE || opcode == OP_FSTORE)
 					psize[1] = 4;
-				if (opcode == OP_READ || opcode == OP_READM || opcode == OP_FREAD)
+				if (opcode == OP_READ || opcode == OP_FREAD)
 					psize[1] = psize[2] = 4;
-				if (opcode == OP_WRITE || opcode == OP_WRITEM || opcode == OP_FWRITE)
+				if (opcode == OP_WRITE || opcode == OP_FWRITE)
 					psize[0] = psize[2] = 4;
+				if (opcode == OP_READM)
+					psize[1] = psize[3] = 4;
+				if (opcode == OP_WRITEM)
+					psize[0] = psize[3] = 4;
 				if (opcode == OP_SEXT && inst.param(2).size() != SIZE_QWORD)
 					psize[1] = 4;
 				if (opcode == OP_FTOINT)
@@ -444,6 +626,41 @@ void drcbe_c::generate(drcuml_block &block, const instruction *instlist, uint32_
 
 				// point past the end of the immediates
 				dst += immedwords;
+
+				// Keep track of which registers had an 8 byte write and clear it the next time it's written
+				if (inst.size() == 4)
+				{
+					for (int pnum = 0; pnum < inst.numparams(); pnum++)
+					{
+						if (inst.is_param_out(pnum) && inst.param(pnum).is_int_register() && ireg_needs_clearing[inst.param(pnum).ireg() - REG_I0])
+						{
+							immedwords = (8 + sizeof(drcbec_instruction) - 1) / sizeof(drcbec_instruction);
+
+							(dst++)->i = MAKE_OPCODE_FULL(OP_AND, 8, 0, 0, 3 + immedwords);
+
+							immed = dst + 3;
+
+							output_parameter(&dst, &immed, 8, inst.param(pnum));
+							output_parameter(&dst, &immed, 8, inst.param(pnum));
+							output_parameter(&dst, &immed, 8, 0xffffffff);
+
+							dst += immedwords;
+
+							ireg_needs_clearing[inst.param(pnum).ireg() - REG_I0] = false;
+						}
+					}
+				}
+				else if (inst.size() == 8)
+				{
+					for (int pnum = 0; pnum < inst.numparams(); pnum++)
+					{
+						if (inst.is_param_out(pnum) && inst.param(pnum).is_int_register())
+						{
+							ireg_needs_clearing[inst.param(pnum).ireg() - REG_I0] = true;
+						}
+					}
+				}
+
 				break;
 		}
 	}
@@ -464,7 +681,7 @@ void drcbe_c::generate(drcuml_block &block, const instruction *instlist, uint32_
 //  exists in the hash table
 //-------------------------------------------------
 
-bool drcbe_c::hash_exists(uint32_t mode, uint32_t pc)
+bool drcbe_c::hash_exists(uint32_t mode, uint32_t pc) const noexcept
 {
 	return m_hash.code_exists(mode, pc);
 }
@@ -475,7 +692,7 @@ bool drcbe_c::hash_exists(uint32_t mode, uint32_t pc)
 //  back-end implementation
 //-------------------------------------------------
 
-void drcbe_c::get_info(drcbe_info &info)
+void drcbe_c::get_info(drcbe_info &info) const noexcept
 {
 	info.direct_iregs = 0;
 	info.direct_fregs = 0;
@@ -517,6 +734,10 @@ int drcbe_c::execute(code_handle &entry)
 
 				// these opcodes should be processed at compile-time only
 				fatalerror("Unexpected opcode\n");
+
+			case MAKE_OPCODE_SHORT(OP_BREAK, 4, 0):
+				osd_break_into_debugger("break from drc");
+				break;
 
 			case MAKE_OPCODE_SHORT(OP_DEBUG, 4, 0):     // DEBUG   pc
 				if (m_device.machine().debug_flags & DEBUG_FLAG_CALL_HOOK)
@@ -606,7 +827,7 @@ int drcbe_c::execute(code_handle &entry)
 
 			case MAKE_OPCODE_SHORT(OP_RECOVER, 4, 0):   // RECOVER dst,mapvar
 				assert(sp > 0);
-				PARAM0 = m_map.get_value((drccodeptr)callstack[0], MAPVAR_M0 + PARAM1);
+				PARAM0 = m_map.get_value(drccodeptr(callstack[0] - 1), PARAM1);
 				break;
 
 
@@ -626,6 +847,11 @@ int drcbe_c::execute(code_handle &entry)
 
 			case MAKE_OPCODE_SHORT(OP_GETFLGS, 4, 0):   // GETFLGS dst[,f]
 				PARAM0 = flags & PARAM1;
+				break;
+
+			case MAKE_OPCODE_SHORT(OP_SETFLGS, 4, 0):   // SETFLGS src
+			case MAKE_OPCODE_SHORT(OP_SETFLGS, 4, 1):
+				flags = PARAM0;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_SAVE, 4, 0):      // SAVE    dst
@@ -798,6 +1024,10 @@ int drcbe_c::execute(code_handle &entry)
 				PARAM0 = m_space[PARAM2]->read_dword(PARAM1);
 				break;
 
+			case MAKE_OPCODE_SHORT(OP_READM1, 4, 0):    // READM   dst,src1,mask,space_BYTE
+				PARAM0 = m_space[PARAM3]->read_byte(PARAM1, PARAM2);
+				break;
+
 			case MAKE_OPCODE_SHORT(OP_READM2, 4, 0):    // READM   dst,src1,mask,space_WORD
 				PARAM0 = m_space[PARAM3]->read_word(PARAM1, PARAM2);
 				break;
@@ -818,6 +1048,10 @@ int drcbe_c::execute(code_handle &entry)
 				m_space[PARAM2]->write_dword(PARAM0, PARAM1);
 				break;
 
+			case MAKE_OPCODE_SHORT(OP_WRITEM1, 4, 0):   // WRITEM  dst,src1,mask,space_BYTE
+				m_space[PARAM3]->write_byte(PARAM0, PARAM1, PARAM2);
+				break;
+
 			case MAKE_OPCODE_SHORT(OP_WRITEM2, 4, 0):   // WRITEM  dst,src1,mask,space_WORD
 				m_space[PARAM3]->write_word(PARAM0, PARAM1, PARAM2);
 				break;
@@ -826,7 +1060,8 @@ int drcbe_c::execute(code_handle &entry)
 				m_space[PARAM3]->write_dword(PARAM0, PARAM1, PARAM2);
 				break;
 
-			case MAKE_OPCODE_SHORT(OP_CARRY, 4, 1):     // CARRY   src,bitnum
+			case MAKE_OPCODE_SHORT(OP_CARRY, 4, 0):     // CARRY   src,bitnum
+			case MAKE_OPCODE_SHORT(OP_CARRY, 4, 1):
 				flags = (flags & ~FLAG_C) | ((PARAM0 >> (PARAM1 & 31)) & FLAG_C);
 				break;
 
@@ -930,16 +1165,7 @@ int drcbe_c::execute(code_handle &entry)
 
 			case MAKE_OPCODE_SHORT(OP_SUBB, 4, 1):
 				temp32 = PARAM1 - PARAM2 - (flags & FLAG_C);
-				temp64 = (uint64_t)PARAM1 - (uint64_t)PARAM2 - (uint64_t)(flags & FLAG_C);
-				if (PARAM2 + 1 != 0)
-					flags = FLAGS32_NZCV_SUB(temp32, PARAM1, PARAM2 + (flags & FLAG_C));
-				else
-				{
-					flags = FLAGS32_NZCV_SUB(temp32, PARAM1 - (flags & FLAG_C), PARAM2);
-					flags &= ~(FLAG_C | FLAG_V);
-					flags |= ((temp64>>32) & 1) ? FLAG_C : 0;
-					flags |= (((PARAM1) ^ (PARAM2)) & ((PARAM1) ^ (temp64)) & 0x80000000) ? FLAG_V : 0;
-				}
+				flags = FLAGS32_NZCV_SUBC(temp32, PARAM1, PARAM2, flags & FLAG_C);
 				PARAM0 = temp32;
 				break;
 
@@ -950,13 +1176,13 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_MULU, 4, 0):      // MULU    dst,edst,src1,src2[,f]
-				temp64 = (uint64_t)(uint32_t)PARAM2 * (uint64_t)(uint32_t)PARAM3;
+				temp64 = mulu_32x32(PARAM2, PARAM3);
 				PARAM1 = temp64 >> 32;
 				PARAM0 = (uint32_t)temp64;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_MULU, 4, 1):
-				temp64 = (uint64_t)(uint32_t)PARAM2 * (uint64_t)(uint32_t)PARAM3;
+				temp64 = mulu_32x32(PARAM2, PARAM3);
 				flags = FLAGS64_NZ(temp64);
 				PARAM1 = temp64 >> 32;
 				PARAM0 = (uint32_t)temp64;
@@ -964,19 +1190,46 @@ int drcbe_c::execute(code_handle &entry)
 					flags |= FLAG_V;
 				break;
 
+			case MAKE_OPCODE_SHORT(OP_MULULW, 4, 0):      // MULULW   dst,src1,src2[,f]
+				temp64 = mulu_32x32(PARAM1, PARAM2);
+				PARAM0 = (uint32_t)temp64;
+				break;
+
+			case MAKE_OPCODE_SHORT(OP_MULULW, 4, 1):
+				temp64 = mulu_32x32(PARAM1, PARAM2);
+				temp32 = (uint32_t)temp64;
+				flags = FLAGS32_NZ(temp32);
+				PARAM0 = temp32;
+				if (temp64 > temp32)
+					flags |= FLAG_V;
+				break;
+
 			case MAKE_OPCODE_SHORT(OP_MULS, 4, 0):      // MULS    dst,edst,src1,src2[,f]
-				temp64 = (int64_t)(int32_t)PARAM2 * (int64_t)(int32_t)PARAM3;
+				temp64 = mul_32x32(PARAM2, PARAM3);
 				PARAM1 = temp64 >> 32;
 				PARAM0 = (uint32_t)temp64;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_MULS, 4, 1):
-				temp64 = (int64_t)(int32_t)PARAM2 * (int64_t)(int32_t)PARAM3;
-				temp32 = (int32_t)temp64;
-				flags = FLAGS32_NZ(temp32);
+				temp64 = mul_32x32(PARAM2, PARAM3);
+				flags = FLAGS64_NZ(temp64);
 				PARAM1 = temp64 >> 32;
 				PARAM0 = (uint32_t)temp64;
-				if (temp64 != (int32_t)temp64)
+				if ((int64_t)temp64 != (int32_t)temp64)
+					flags |= FLAG_V;
+				break;
+
+			case MAKE_OPCODE_SHORT(OP_MULSLW, 4, 0):      // MULSLW   dst,src1,src2[,f]
+				temp64 = mul_32x32(PARAM1, PARAM2);
+				PARAM0 = (int32_t)temp64;
+				break;
+
+			case MAKE_OPCODE_SHORT(OP_MULSLW, 4, 1):
+				temp64 = mul_32x32(PARAM1, PARAM2);
+				temp32 = (int32_t)temp64;
+				flags = FLAGS32_NZ(temp32);
+				PARAM0 = temp32;
+				if ((int64_t)temp64 != (int32_t)temp64)
 					flags |= FLAG_V;
 				break;
 
@@ -1084,8 +1337,8 @@ int drcbe_c::execute(code_handle &entry)
 
 			case MAKE_OPCODE_SHORT(OP_BSWAP, 4, 1):
 				temp32 = PARAM1;
-				flags = FLAGS32_NZ(temp32);
 				PARAM0 = swapendian_int32(temp32);
+				flags = FLAGS32_NZ(PARAM0);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_SHL, 4, 0):       // SHL     dst,src,count[,f]
@@ -1095,11 +1348,9 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_SHL, 4, 1):
 				shift = PARAM2 & 31;
 				temp32 = PARAM1 << shift;
+				flags = FLAGS32_NZ(temp32);
 				if (shift != 0)
-				{
-					flags = FLAGS32_NZ(temp32);
 					flags |= ((PARAM1 << (shift - 1)) >> 31) & FLAG_C;
-				}
 				PARAM0 = temp32;
 				break;
 
@@ -1110,11 +1361,9 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_SHR, 4, 1):
 				shift = PARAM2 & 31;
 				temp32 = PARAM1 >> shift;
+				flags = FLAGS32_NZ(temp32);
 				if (shift != 0)
-				{
-					flags = FLAGS32_NZ(temp32);
 					flags |= (PARAM1 >> (shift - 1)) & FLAG_C;
-				}
 				PARAM0 = temp32;
 				break;
 
@@ -1125,11 +1374,9 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_SAR, 4, 1):
 				shift = PARAM2 & 31;
 				temp32 = (int32_t)PARAM1 >> shift;
+				flags = FLAGS32_NZ(temp32);
 				if (shift != 0)
-				{
-					flags = FLAGS32_NZ(temp32);
 					flags |= (PARAM1 >> (shift - 1)) & FLAG_C;
-				}
 				PARAM0 = temp32;
 				break;
 
@@ -1140,11 +1387,9 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_ROL, 4, 1):
 				shift = PARAM2 & 31;
 				temp32 = rotl_32(PARAM1, shift);
+				flags = FLAGS32_NZ(temp32);
 				if (shift != 0)
-				{
-					flags = FLAGS32_NZ(temp32);
 					flags |= ((PARAM1 << (shift - 1)) >> 31) & FLAG_C;
-				}
 				PARAM0 = temp32;
 				break;
 
@@ -1154,6 +1399,8 @@ int drcbe_c::execute(code_handle &entry)
 					PARAM0 = (PARAM1 << shift) | ((flags & FLAG_C) << (shift - 1)) | (PARAM1 >> (33 - shift));
 				else if (shift == 1)
 					PARAM0 = (PARAM1 << shift) | (flags & FLAG_C);
+				else
+					PARAM0 = PARAM1;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_ROLC, 4, 1):
@@ -1165,7 +1412,8 @@ int drcbe_c::execute(code_handle &entry)
 				else
 					temp32 = PARAM1;
 				flags = FLAGS32_NZ(temp32);
-				if (shift != 0) flags |= ((PARAM1 << (shift - 1)) >> 31) & FLAG_C;
+				if (shift != 0)
+					flags |= ((PARAM1 << (shift - 1)) >> 31) & FLAG_C;
 				PARAM0 = temp32;
 				break;
 
@@ -1177,7 +1425,8 @@ int drcbe_c::execute(code_handle &entry)
 				shift = PARAM2 & 31;
 				temp32 = rotr_32(PARAM1, shift);
 				flags = FLAGS32_NZ(temp32);
-				if (shift != 0) flags |= (PARAM1 >> (shift - 1)) & FLAG_C;
+				if (shift != 0)
+					flags |= (PARAM1 >> (shift - 1)) & FLAG_C;
 				PARAM0 = temp32;
 				break;
 
@@ -1187,6 +1436,8 @@ int drcbe_c::execute(code_handle &entry)
 					PARAM0 = (PARAM1 >> shift) | (((flags & FLAG_C) << 31) >> (shift - 1)) | (PARAM1 << (33 - shift));
 				else if (shift == 1)
 					PARAM0 = (PARAM1 >> shift) | ((flags & FLAG_C) << 31);
+				else
+					PARAM0 = PARAM1;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_RORC, 4, 1):
@@ -1198,7 +1449,8 @@ int drcbe_c::execute(code_handle &entry)
 				else
 					temp32 = PARAM1;
 				flags = FLAGS32_NZ(temp32);
-				if (shift != 0) flags |= (PARAM1 >> (shift - 1)) & FLAG_C;
+				if (shift != 0)
+					flags |= (PARAM1 >> (shift - 1)) & FLAG_C;
 				PARAM0 = temp32;
 				break;
 
@@ -1409,20 +1661,20 @@ int drcbe_c::execute(code_handle &entry)
 				DPARAM0 = m_space[PARAM2]->read_dword(PARAM1);
 				break;
 
-			case MAKE_OPCODE_SHORT(OP_READ8, 8, 0):     // DREAD   dst,src1,space_QOWRD
+			case MAKE_OPCODE_SHORT(OP_READ8, 8, 0):     // DREAD   dst,src1,space_QWORD
 				DPARAM0 = m_space[PARAM2]->read_qword(PARAM1);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_READM2, 8, 0):    // DREADM  dst,src1,mask,space_WORD
-				DPARAM0 = m_space[PARAM3]->read_word(PARAM1, PARAM2);
+				DPARAM0 = m_space[PARAM3]->read_word(PARAM1, DPARAM2);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_READM4, 8, 0):    // DREADM  dst,src1,mask,space_DWORD
-				DPARAM0 = m_space[PARAM3]->read_dword(PARAM1, PARAM2);
+				DPARAM0 = m_space[PARAM3]->read_dword(PARAM1, DPARAM2);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_READM8, 8, 0):    // DREADM  dst,src1,mask,space_QWORD
-				DPARAM0 = m_space[PARAM3]->read_qword(PARAM1, PARAM2);
+				DPARAM0 = m_space[PARAM3]->read_qword(PARAM1, DPARAM2);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_WRITE1, 8, 0):    // DWRITE  dst,src1,space_BYTE
@@ -1454,6 +1706,7 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_CARRY, 8, 0):     // DCARRY  src,bitnum
+			case MAKE_OPCODE_SHORT(OP_CARRY, 8, 1):
 				flags = (flags & ~FLAG_C) | ((DPARAM0 >> (DPARAM1 & 63)) & FLAG_C);
 				break;
 
@@ -1559,10 +1812,7 @@ int drcbe_c::execute(code_handle &entry)
 
 			case MAKE_OPCODE_SHORT(OP_SUBB, 8, 1):
 				temp64 = DPARAM1 - DPARAM2 - (flags & FLAG_C);
-				if (DPARAM2 + 1 != 0)
-					flags = FLAGS64_NZCV_SUB(temp64, DPARAM1, DPARAM2 + (flags & FLAG_C));
-				else
-					flags = FLAGS64_NZCV_SUB(temp64, DPARAM1 - (flags & FLAG_C), DPARAM2);
+				flags = FLAGS64_NZCV_SUBC(temp64, DPARAM1, DPARAM2, flags & FLAG_C);
 				DPARAM0 = temp64;
 				break;
 
@@ -1579,12 +1829,30 @@ int drcbe_c::execute(code_handle &entry)
 				flags = dmulu(*inst[0].puint64, *inst[1].puint64, DPARAM2, DPARAM3, true);
 				break;
 
+			case MAKE_OPCODE_SHORT(OP_MULULW, 8, 0):      // DMULULW  dst,src1,src2[,f]
+				dmulu(*inst[0].puint64, *inst[0].puint64, DPARAM1, DPARAM2, false);
+				break;
+
+			case MAKE_OPCODE_SHORT(OP_MULULW, 8, 1):
+				flags = dmulu(*inst[0].puint64, *inst[0].puint64, DPARAM1, DPARAM2, true);
+				flags = FLAGS64_NZ(DPARAM0) | (flags & FLAG_V);
+				break;
+
 			case MAKE_OPCODE_SHORT(OP_MULS, 8, 0):      // DMULS   dst,edst,src1,src2[,f]
 				dmuls(*inst[0].puint64, *inst[1].puint64, DPARAM2, DPARAM3, false);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_MULS, 8, 1):
 				flags = dmuls(*inst[0].puint64, *inst[1].puint64, DPARAM2, DPARAM3, true);
+				break;
+
+			case MAKE_OPCODE_SHORT(OP_MULSLW, 8, 0):      // DMULSLW  dst,src1,src2[,f]
+				dmuls(*inst[0].puint64, *inst[0].puint64, DPARAM1, DPARAM2, false);
+				break;
+
+			case MAKE_OPCODE_SHORT(OP_MULSLW, 8, 1):
+				flags = dmuls(*inst[0].puint64, *inst[0].puint64, DPARAM1, DPARAM2, true);
+				flags = FLAGS64_NZ(DPARAM0) | (flags & FLAG_V);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_DIVU, 8, 0):      // DDIVU   dst,edst,src1,src2[,f]
@@ -1691,8 +1959,8 @@ int drcbe_c::execute(code_handle &entry)
 
 			case MAKE_OPCODE_SHORT(OP_BSWAP, 8, 1):
 				temp64 = DPARAM1;
-				flags = FLAGS64_NZ(temp64);
 				DPARAM0 = swapendian_int64(temp64);
+				flags = FLAGS64_NZ(DPARAM0);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_SHL, 8, 0):       // DSHL    dst,src,count[,f]
@@ -1703,7 +1971,8 @@ int drcbe_c::execute(code_handle &entry)
 				shift = DPARAM2 & 63;
 				temp64 = DPARAM1 << shift;
 				flags = FLAGS64_NZ(temp64);
-				if (shift != 0) flags |= ((DPARAM1 << (shift - 1)) >> 63) & FLAG_C;
+				if (shift != 0)
+					flags |= ((DPARAM1 << (shift - 1)) >> 63) & FLAG_C;
 				DPARAM0 = temp64;
 				break;
 
@@ -1715,7 +1984,8 @@ int drcbe_c::execute(code_handle &entry)
 				shift = DPARAM2 & 63;
 				temp64 = DPARAM1 >> shift;
 				flags = FLAGS64_NZ(temp64);
-				if (shift != 0) flags |= (DPARAM1 >> (shift - 1)) & FLAG_C;
+				if (shift != 0)
+					flags |= (DPARAM1 >> (shift - 1)) & FLAG_C;
 				DPARAM0 = temp64;
 				break;
 
@@ -1725,9 +1995,10 @@ int drcbe_c::execute(code_handle &entry)
 
 			case MAKE_OPCODE_SHORT(OP_SAR, 8, 1):
 				shift = DPARAM2 & 63;
-				temp64 = (int32_t)DPARAM1 >> shift;
+				temp64 = (int64_t)DPARAM1 >> shift;
 				flags = FLAGS64_NZ(temp64);
-				if (shift != 0) flags |= (DPARAM1 >> (shift - 1)) & FLAG_C;
+				if (shift != 0)
+					flags |= (DPARAM1 >> (shift - 1)) & FLAG_C;
 				DPARAM0 = temp64;
 				break;
 
@@ -1739,7 +2010,8 @@ int drcbe_c::execute(code_handle &entry)
 				shift = DPARAM2 & 63;
 				temp64 = rotl_64(DPARAM1, shift);
 				flags = FLAGS64_NZ(temp64);
-				if (shift != 0) flags |= ((DPARAM1 << (shift - 1)) >> 63) & FLAG_C;
+				if (shift != 0)
+					flags |= ((DPARAM1 << (shift - 1)) >> 63) & FLAG_C;
 				DPARAM0 = temp64;
 				break;
 
@@ -1749,6 +2021,8 @@ int drcbe_c::execute(code_handle &entry)
 					DPARAM0 = (DPARAM1 << shift) | ((flags & FLAG_C) << (shift - 1)) | (DPARAM1 >> (65 - shift));
 				else if (shift == 1)
 					DPARAM0 = (DPARAM1 << shift) | (flags & FLAG_C);
+				else
+					DPARAM0 = DPARAM1;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_ROLC, 8, 1):
@@ -1760,7 +2034,8 @@ int drcbe_c::execute(code_handle &entry)
 				else
 					temp64 = DPARAM1;
 				flags = FLAGS64_NZ(temp64);
-				if (shift != 0) flags |= ((DPARAM1 << (shift - 1)) >> 63) & FLAG_C;
+				if (shift != 0)
+					flags |= ((DPARAM1 << (shift - 1)) >> 63) & FLAG_C;
 				DPARAM0 = temp64;
 				break;
 
@@ -1772,7 +2047,8 @@ int drcbe_c::execute(code_handle &entry)
 				shift = DPARAM2 & 63;
 				temp64 = rotr_64(DPARAM1, shift);
 				flags = FLAGS64_NZ(temp64);
-				if (shift != 0) flags |= (DPARAM1 >> (shift - 1)) & FLAG_C;
+				if (shift != 0)
+					flags |= (DPARAM1 >> (shift - 1)) & FLAG_C;
 				DPARAM0 = temp64;
 				break;
 
@@ -1782,6 +2058,8 @@ int drcbe_c::execute(code_handle &entry)
 					DPARAM0 = (DPARAM1 >> shift) | ((((uint64_t)flags & FLAG_C) << 63) >> (shift - 1)) | (DPARAM1 << (65 - shift));
 				else if (shift == 1)
 					DPARAM0 = (DPARAM1 >> shift) | (((uint64_t)flags & FLAG_C) << 63);
+				else
+					DPARAM0 = DPARAM1;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_RORC, 8, 1):
@@ -1793,7 +2071,8 @@ int drcbe_c::execute(code_handle &entry)
 				else
 					temp64 = DPARAM1;
 				flags = FLAGS64_NZ(temp64);
-				if (shift != 0) flags |= (DPARAM1 >> (shift - 1)) & FLAG_C;
+				if (shift != 0)
+					flags |= (DPARAM1 >> (shift - 1)) & FLAG_C;
 				DPARAM0 = temp64;
 				break;
 
@@ -2108,7 +2387,6 @@ void drcbe_c::output_parameter(drcbec_instruction **dstptr, void **immedptr, int
 {
 	drcbec_instruction *dst = *dstptr;
 	void *immed = *immedptr;
-	parameter temp_param;
 
 	switch (param.type())
 	{
@@ -2145,8 +2423,7 @@ void drcbe_c::output_parameter(drcbec_instruction **dstptr, void **immedptr, int
 
 		// convert mapvars to immediates
 		case parameter::PTYPE_MAPVAR:
-			temp_param = m_map.get_last_value(param.mapvar());
-			return output_parameter(dstptr, immedptr, size, temp_param);
+			return output_parameter(dstptr, immedptr, size, param.mapvar());
 
 		// memory just points to the memory
 		case parameter::PTYPE_MEMORY:
@@ -2198,117 +2475,19 @@ void drcbe_c::fixup_label(void *parameter, drccodeptr labelcodeptr)
 	dst->inst = (drcbec_instruction *)labelcodeptr;
 }
 
+} // anonymous namespace
 
-//-------------------------------------------------
-//  dmulu - perform a double-wide unsigned multiply
-//-------------------------------------------------
 
-int drcbe_c::dmulu(uint64_t &dstlo, uint64_t &dsthi, uint64_t src1, uint64_t src2, bool flags)
+std::unique_ptr<drcbe_interface> make_drcbe_c(
+		drcuml_state &drcuml,
+		device_t &device,
+		drc_cache &cache,
+		uint32_t flags,
+		int modes,
+		int addrbits,
+		int ignorebits)
 {
-	// shortcut if we don't care about the high bits or the flags
-	if (&dstlo == &dsthi && flags == false)
-	{
-		dstlo = src1 * src2;
-		return 0;
-	}
-
-	// fetch source values
-	uint64_t a = src1;
-	uint64_t b = src2;
-	if (a == 0 || b == 0)
-	{
-		dsthi = dstlo = 0;
-		return FLAG_Z;
-	}
-
-	// compute high and low parts first
-	uint64_t lo = (uint64_t)(uint32_t)(a >> 0)  * (uint64_t)(uint32_t)(b >> 0);
-	uint64_t hi = (uint64_t)(uint32_t)(a >> 32) * (uint64_t)(uint32_t)(b >> 32);
-
-	// compute middle parts
-	uint64_t prevlo = lo;
-	uint64_t temp = (uint64_t)(uint32_t)(a >> 32)  * (uint64_t)(uint32_t)(b >> 0);
-	lo += temp << 32;
-	hi += (temp >> 32) + (lo < prevlo);
-
-	prevlo = lo;
-	temp = (uint64_t)(uint32_t)(a >> 0)  * (uint64_t)(uint32_t)(b >> 32);
-	lo += temp << 32;
-	hi += (temp >> 32) + (lo < prevlo);
-
-	// store the results
-	dsthi = hi;
-	dstlo = lo;
-	return ((hi >> 60) & FLAG_S) | ((dsthi != 0) << 1);
+	return std::unique_ptr<drcbe_interface>(new drcbe_c(drcuml, device, cache, flags, modes, addrbits, ignorebits));
 }
 
-
-//-------------------------------------------------
-//  dmuls - perform a double-wide signed multiply
-//-------------------------------------------------
-
-int drcbe_c::dmuls(uint64_t &dstlo, uint64_t &dsthi, int64_t src1, int64_t src2, bool flags)
-{
-	// shortcut if we don't care about the high bits or the flags
-	if (&dstlo == &dsthi && flags == false)
-	{
-		dstlo = src1 * src2;
-		return 0;
-	}
-
-	// fetch absolute source values
-	uint64_t a = src1; if ((int64_t)a < 0) a = -a;
-	uint64_t b = src2; if ((int64_t)b < 0) b = -b;
-	if (a == 0 || b == 0)
-	{
-		dsthi = dstlo = 0;
-		return FLAG_Z;
-	}
-
-	// compute high and low parts first
-	uint64_t lo = (uint64_t)(uint32_t)(a >> 0)  * (uint64_t)(uint32_t)(b >> 0);
-	uint64_t hi = (uint64_t)(uint32_t)(a >> 32) * (uint64_t)(uint32_t)(b >> 32);
-
-	// compute middle parts
-	uint64_t prevlo = lo;
-	uint64_t temp = (uint64_t)(uint32_t)(a >> 32)  * (uint64_t)(uint32_t)(b >> 0);
-	lo += temp << 32;
-	hi += (temp >> 32) + (lo < prevlo);
-
-	prevlo = lo;
-	temp = (uint64_t)(uint32_t)(a >> 0)  * (uint64_t)(uint32_t)(b >> 32);
-	lo += temp << 32;
-	hi += (temp >> 32) + (lo < prevlo);
-
-	// adjust for signage
-	if ((int64_t)(src1 ^ src2) < 0)
-	{
-		hi = ~hi + (lo == 0);
-		lo = ~lo + 1;
-	}
-
-	// store the results
-	dsthi = hi;
-	dstlo = lo;
-	return ((hi >> 60) & FLAG_S) | ((dsthi != ((int64_t)lo >> 63)) << 1);
-}
-
-uint32_t drcbe_c::tzcount32(uint32_t value)
-{
-	for (int i = 0; i < 32; i++)
-	{
-		if (value & (1 << i))
-			return i;
-	}
-	return 32;
-}
-
-uint64_t drcbe_c::tzcount64(uint64_t value)
-{
-	for (int i = 0; i < 64; i++)
-	{
-		if (value & ((uint64_t)(1) << i))
-			return i;
-	}
-	return 64;
-}
+} // namespace drc
