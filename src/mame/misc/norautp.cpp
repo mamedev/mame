@@ -575,16 +575,17 @@
   - Clickable buttons for all former buttons-lamps layouts. 	
   - Promoted drhl, drhla, norautua, norautub, and ssjkrpkr to working.
 
+  - Implemented a custom timer and counter to get correct reads in unknown hardware.
+  - Added buttons-lamps layout to smshilo.
+  - Promoted dphl, dphljp, and smshilo to working.
+  - Added technical notes.
+
 
   TODO:
 
-  - Check the 3rd PPI device at 0xc0-0xc3 (VRAM).
-    /OBF handshake line (PC7) formerly didn't seems to work properly.
-  - Interrupts in 8080 based games.
-  - Emulation of 8228 device for the 8080 based games.
-  - Find WTH are the reads at EFh.
+  - Investigate and document what is connected to port EFh.
+  - dphla and dphlunkb paying issues.
   - Find if wide chars are hardcoded or tied to a bit.
-  - Save support.
   - Parent/clone relationship.
 
 
@@ -593,9 +594,13 @@
   - norautua: overflow drawing cards (possible straight draw).
               changing one card, draw a 6th card at the right.
 
-  - dphl behaviour is close to dphlunkb.
-  
-  - dphla is working, but when pay a hand is stuck spitting "call attendant".
+  - dphl type, as dphljp, smshilo, dphlunkb, were flagged as
+    imperfect graphics due they show part of a paytable as garbage
+	when you coin/bet the game. After deal, they are not showing 
+	this anymore.
+
+  - dphla and dphlunkb are working, but when pay a hand they are
+    stuck spitting spitting the "call attendant" message.
 
 
 *******************************************************************************/
@@ -606,6 +611,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
 #include "sound/discrete.h"
 #include "emupal.h"
 #include "screen.h"
@@ -675,6 +681,7 @@ private:
 	uint8_t test2_r();
 	uint8_t test3_r();
 	uint8_t test4_r();
+	TIMER_DEVICE_CALLBACK_MEMBER(test_timer_cb);
 	void mainlamps_w(uint8_t data);
 	void soundlamps_w(uint8_t data);
 	void counterlamps_w(uint8_t data);
@@ -716,6 +723,9 @@ private:
 	output_finder<12> m_lamps;
 	
 	int m_test3 = 1;
+	int m_test3b = 0;
+	int m_test_count = 0;
+	
 };
 
 
@@ -882,6 +892,7 @@ void norautp_state::ppi2_obf_w(int state)
 
 TIMER_CALLBACK_MEMBER(norautp_state::ppi2_ack)
 {
+
 	m_ppi8255[2]->pc6_w(param);
 	if (param == 0)
 	{
@@ -900,19 +911,14 @@ uint8_t norautp_state::test2_r()
 
 uint8_t norautp_state::test3_r()
 {
-//	return machine().rand() & 0xff;
+	if(m_maincpu->pc() == 0x48)
+	{
+		m_test3b = (~m_test3b & 0x01) + (m_test_count & 0x02);
+		return m_test3b;
+	}
 
-	if(m_maincpu->pc() == 0x187a)
-		return 0x02 + (machine().rand() & 0x0f);
-	if(m_maincpu->pc() == 0x1881)
-		return 0x00 + (machine().rand() & 0x0f);
-	if(m_maincpu->pc() == 0x188d)
-		return 0x02 + (machine().rand() & 0x0f);
-	m_test3 = (~m_test3 & 0x01);
-
-	logerror("test3: pc:%04x - data:%02x\n", m_maincpu->pc(), m_test3);
-	return m_test3;
-
+	logerror("test3: pc:%04x - data:%02x\n", m_maincpu->pc(), m_test_count);
+	return (m_test_count &0x0f) + 0x10;
 }
 
 uint8_t norautp_state::test4_r()
@@ -921,6 +927,11 @@ uint8_t norautp_state::test4_r()
 	return m_test3;
 }
 
+
+TIMER_DEVICE_CALLBACK_MEMBER(norautp_state::test_timer_cb)
+{
+	m_test_count++;
+}
 
 /*********************************************
 *           Memory Map Information           *
@@ -1026,7 +1037,6 @@ void norautp_state::nortest1_map(address_map &map)
 
 void norautp_state::norautxp_map(address_map &map)
 {
-//  map.global_mask(~0x4000);
 	map.global_mask(0x7fff);
 	map(0x0000, 0x3fff).rom();  // need to be checked
 	map(0x6000, 0x67ff).ram().share("nvram");  // HM6116
@@ -1935,6 +1945,8 @@ void norautp_state::dphl(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::dphl_map);
 	m_maincpu->set_addrmap(AS_IO, &norautp_state::dphl_portmap);
 	m_maincpu->set_vblank_int("screen", FUNC(norautp_state::irq0_line_hold));
+
+	TIMER(config, "test_timer").configure_periodic(FUNC(norautp_state::test_timer_cb), attotime::from_usec(100));
 
 	// sound hardware
 	m_discrete->set_intf(dphl_discrete);
@@ -4960,21 +4972,21 @@ GAME(  19??, newhilop, 0,        newhilop, norautp,  norautp_state, empty_init, 
 GAMEL( 1984, cdrawpkr, 0,        cdrawpkr, cdrawpkr, norautp_state, empty_init, ROT0, "Coinmaster",               "Draw Poker (Joker Poker V.01)",                0,                    layout_noraut11 )
 
 
-//************************************* 8080 sets **************************************
+//************************************* i8080 sets **************************************
 //*  The following ones are 'Draw Poker HI-LO' type, running in a i8080 based hardware  *
-//**************************************************************************************
+//***************************************************************************************
 
-//     YEAR  NAME      PARENT    MACHINE   INPUT     STATE          INIT        ROT   COMPANY                        FULLNAME                            FLAGS                  LAYOUT
-GAMEL( 1983, dphl,     0,        dphl,     dphla,    norautp_state, empty_init, ROT0, "M.Kramer Manufacturing.",     "Draw Poker HI-LO (M.Kramer)",      MACHINE_NOT_WORKING,   layout_noraut10 )
-GAMEL( 1983, dphla,    0,        dphla,    dphla,    norautp_state, empty_init, ROT0, "<unknown>",                   "Joker Poker (Kramer, Alt)",        MACHINE_NOT_WORKING,   layout_noraut10 )  // call attendant
-GAMEL( 1983, dphljp,   0,        dphl,     dphla,    norautp_state, empty_init, ROT0, "<unknown>",                   "Draw Poker HI-LO (Japanese)",      MACHINE_NOT_WORKING,   layout_noraut10 )
+//     YEAR  NAME      PARENT    MACHINE   INPUT     STATE          INIT        ROT   COMPANY                        FULLNAME                            FLAGS                       LAYOUT
+GAMEL( 1982, dphl,     0,        dphl,     dphla,    norautp_state, empty_init, ROT0, "M.Kramer Manufacturing.",     "Draw Poker HI-LO (M.Kramer)",      MACHINE_IMPERFECT_GRAPHICS, layout_noraut10 )
+GAMEL( 1983, dphla,    0,        dphla,    dphla,    norautp_state, empty_init, ROT0, "<unknown>",                   "Joker Poker (Kramer, Alt)",        MACHINE_NOT_WORKING,        layout_noraut10 )  // call attendant
+GAMEL( 1983, dphljp,   0,        dphl,     dphla,    norautp_state, empty_init, ROT0, "<unknown>",                   "Draw Poker HI-LO (Japanese)",      MACHINE_IMPERFECT_GRAPHICS, layout_noraut10 )
 GAME(  198?, kimbldhl, 0,        kimbldhl, norautp,  norautp_state, empty_init, ROT0, "Kimble Ireland",              "Kimble Double HI-LO",              MACHINE_NOT_WORKING )
 GAME(  1983, gtipoker, 0,        dphl,     norautp,  norautp_state, empty_init, ROT0, "GTI Inc",                     "GTI Poker",                        MACHINE_NOT_WORKING )
 GAME(  1983, gtipokra, 0,        dphla,    norautp,  norautp_state, empty_init, ROT0, "GTI Inc",                     "GTI Poker? (SMS hardware)",        MACHINE_NOT_WORKING )
-GAME(  1983, smshilo,  0,        dphla,    norautp,  norautp_state, empty_init, ROT0, "SMS Manufacturing Corp.",     "HI-LO Double Up Joker Poker",      MACHINE_NOT_WORKING )
-GAMEL( 1986, drhl,     0,        drhl,     drhl,     norautp_state, empty_init, ROT0, "Drews Inc.",                  "Drews Revenge (v.2.89, set 1)",    0,                     layout_noraut10 )
-GAMEL( 1986, drhla,    drhl,     drhl,     drhl,     norautp_state, empty_init, ROT0, "Drews Inc.",                  "Drews Revenge (v.2.89, set 2)",    0,                     layout_noraut10 )
-GAMEL( 1982, ssjkrpkr, 0,        ssjkrpkr, ssjkrpkr, norautp_state, init_ssa,   ROT0, "Southern Systems & Assembly", "Southern Systems Joker Poker",     0,                     layout_noraut10 )
+GAMEL( 1983, smshilo,  0,        dphl,     dphla,    norautp_state, empty_init, ROT0, "SMS Manufacturing Corp.",     "HI-LO Double Up Joker Poker",      MACHINE_IMPERFECT_GRAPHICS, layout_noraut10 )
+GAMEL( 1986, drhl,     0,        drhl,     drhl,     norautp_state, empty_init, ROT0, "Drews Inc.",                  "Drews Revenge (v.2.89, set 1)",    0,                          layout_noraut10 )
+GAMEL( 1986, drhla,    drhl,     drhl,     drhl,     norautp_state, empty_init, ROT0, "Drews Inc.",                  "Drews Revenge (v.2.89, set 2)",    0,                          layout_noraut10 )
+GAMEL( 1982, ssjkrpkr, 0,        ssjkrpkr, ssjkrpkr, norautp_state, init_ssa,   ROT0, "Southern Systems & Assembly", "Southern Systems Joker Poker",     0,                          layout_noraut10 )
 
 // The following one also has a custom 68705 MCU
 GAME(  1993, tpoker2,  0,        dphltest, norautp, norautp_state, empty_init, ROT0, "Micro Manufacturing",          "Turbo Poker 2",                    MACHINE_NOT_WORKING )
@@ -4984,9 +4996,9 @@ GAME(  1993, tpoker2,  0,        dphltest, norautp, norautp_state, empty_init, R
 //* The following ones are still unknown. No info about name, CPU, manufacturer, or HW *
 //**************************************************************************************
 
-//     YEAR  NAME      PARENT    MACHINE   INPUT    STATE          INIT        ROT   COMPANY                     FULLNAME                               FLAGS                 LAYOUT
+//     YEAR  NAME      PARENT    MACHINE   INPUT    STATE          INIT        ROT   COMPANY                     FULLNAME                               FLAGS                  LAYOUT
 GAME(  198?, fastdrwp, 0,        dphl,     norautp, norautp_state, empty_init, ROT0, "Stern Electronics?",       "Fast Draw (poker conversion kit)?",   MACHINE_NOT_WORKING )
 GAME(  198?, dphlunka, 0,        dphl,     norautp, norautp_state, empty_init, ROT0, "SMS Manufacturing Corp.",  "Draw Poker HI-LO (unknown, rev 1)",   MACHINE_NOT_WORKING )
-GAME(  198?, dphlunkb, 0,        dphl,     norautp, norautp_state, empty_init, ROT0, "SMS Manufacturing Corp.",  "Draw Poker HI-LO (unknown, rev 2)",   MACHINE_NOT_WORKING )
+GAMEL( 198?, dphlunkb, 0,        dphl,     dphla,   norautp_state, empty_init, ROT0, "SMS Manufacturing Corp.",  "Draw Poker HI-LO (unknown, rev 2)",   MACHINE_NOT_WORKING,   layout_noraut10 )  // call attendant
 GAME(  198?, pkii_dm,  0,        nortest1, norautp, norautp_state, empty_init, ROT0, "<unknown>",                "unknown poker game PKII/DM",          MACHINE_NOT_WORKING )
 GAME(  1989, unkljfpk, 0,        nortest1, norautp, norautp_state, empty_init, ROT0, "LJF Corporation",          "unknown LJF Corporation poker game",  MACHINE_NOT_WORKING )
