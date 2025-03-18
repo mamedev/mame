@@ -122,19 +122,19 @@ static const int *const G2 = &gauss[512];
 static const int *const G3 = &gauss[255];
 static const int *const G4 = &gauss[0];
 
-static const int        mask = 0xFF;
+static const int        mask = 0xff;
 
 /* This table is for envelope timing.  It represents the number of counts
    that should be subtracted from the counter each sample period (32kHz).
    The counter starts at 30720 (0x7800). */
 static const int CNT_INIT = 0x7800;
-static const int ENVCNT[0x20]
-	= {
-	0x0000, 0x000F, 0x0014, 0x0018, 0x001E, 0x0028, 0x0030, 0x003C,
-	0x0050, 0x0060, 0x0078, 0x00A0, 0x00C0, 0x00F0, 0x0140, 0x0180,
-	0x01E0, 0x0280, 0x0300, 0x03C0, 0x0500, 0x0600, 0x0780, 0x0A00,
-	0x0C00, 0x0F00, 0x1400, 0x1800, 0x1E00, 0x2800, 0x3C00, 0x7800
-	};
+static const int ENVCNT[0x20] =
+{
+	0x0000, 0x000f, 0x0014, 0x0018, 0x001e, 0x0028, 0x0030, 0x003c,
+	0x0050, 0x0060, 0x0078, 0x00a0, 0x00c0, 0x00f0, 0x0140, 0x0180,
+	0x01e0, 0x0280, 0x0300, 0x03c0, 0x0500, 0x0600, 0x0780, 0x0a00,
+	0x0c00, 0x0f00, 0x1400, 0x1800, 0x1e00, 0x2800, 0x3c00, 0x7800
+};
 
 
 ALLOW_SAVE_TYPE(s_dsp_device::env_state_t32);
@@ -162,7 +162,7 @@ void s_dsp_device::device_start()
 	space().cache(m_cache);
 	space().specific(m_data);
 
-	m_channel = stream_alloc(0, 2, clock() / 64);
+	m_channel = stream_alloc(0, 2, clock() / 768);
 
 	state_register();
 }
@@ -183,7 +183,7 @@ void s_dsp_device::device_reset()
 
 void s_dsp_device::device_clock_changed()
 {
-	m_channel->set_sample_rate(clock() / 64);
+	m_channel->set_sample_rate(clock() / 768);
 }
 
 //-------------------------------------------------
@@ -292,9 +292,9 @@ void s_dsp_device::dsp_update(s16 *sound_ptr)
 
 	for (int v = 0, m = 1, V = 0; v < 8; v++, V += 16, m <<= 1)
 	{
-		voice_state_type *vp = &m_voice_state[v];
+		voice_state_type &vp = m_voice_state[v];
 
-		if (vp->on_cnt && (--vp->on_cnt == 0))
+		if (vp.on_cnt && (--vp.on_cnt == 0))
 		{
 			/* Voice was keyed on */
 			m_keys       |= m;
@@ -302,34 +302,34 @@ void s_dsp_device::dsp_update(s16 *sound_ptr)
 #ifdef DBG_KEY
 			vl          = m_dsp_regs[(v << 4) + 4];
 #endif
-			vp->samp_id = (vptr(sd, V) << 16) | lptr(sd, V);
-			vp->mem_ptr = vptr(sd, V);
+			vp.samp_id = (vptr(sd, V) << 16) | lptr(sd, V);
+			vp.mem_ptr = vptr(sd, V);
 
 #ifdef DBG_KEY
-			logerror("Keying on voice %d, samp=0x%04X (0x%02X)\n", v, vp->mem_ptr, vl);
+			logerror("Keying on voice %d, samp=0x%04X (0x%02X)\n", v, vp.mem_ptr, vl);
 #endif
 
-			vp->header_cnt = 0;
-			vp->half       = false;
-			vp->envx       = 0;
-			vp->end        = 0;
-			vp->sampptr    = 0;
-			vp->mixfrac    = 3 * 4096;
+			vp.header_cnt = 0;
+			vp.half       = false;
+			vp.envx       = 0;
+			vp.end        = 0;
+			vp.sampptr    = 0;
+			vp.mixfrac    = 3 * 4096;
 
 			/* NOTE: Real SNES does *not* appear to initialize the envelope
 			counter to anything in particular.  The first cycle always seems to
 			come at a random time sooner than expected; as yet, I have been
 			unable to find any pattern.  I doubt it will matter though, so
 			we'll go ahead and do the full time for now. */
-			vp->envcnt   = CNT_INIT;
-			vp->envstate = env_state_t32::ATTACK;
+			vp.envcnt   = CNT_INIT;
+			vp.envstate = env_state_t32::ATTACK;
 		}
 
 		if (m_dsp_regs[0x4c] & m & ~m_dsp_regs[0x5c])
 		{
 			/* Voice doesn't come on if key off is set */
 			m_dsp_regs[0x4c] &= ~m;
-			vp->on_cnt       = 8;
+			vp.on_cnt       = 8;
 
 #ifdef DBG_KEY
 			logerror("Key on set for voice %d\n", v);
@@ -339,8 +339,8 @@ void s_dsp_device::dsp_update(s16 *sound_ptr)
 		if (m_keys & m_dsp_regs[0x5c] & m)
 		{
 			/* Voice was keyed off */
-			vp->envstate = env_state_t32::RELEASE;
-			vp->on_cnt   = 0;
+			vp.envstate = env_state_t32::RELEASE;
+			vp.on_cnt   = 0;
 
 #ifdef DBG_KEY
 			logerror("Keying off voice %d\n", v);
@@ -355,7 +355,7 @@ void s_dsp_device::dsp_update(s16 *sound_ptr)
 			continue;
 		}
 
-		vp->pitch = pitch(V);
+		vp.pitch = pitch(V);
 
 #ifndef NO_PMOD
 		/* Pitch mod uses OUTX from last voice for this one.  Luckily we haven't
@@ -363,17 +363,17 @@ void s_dsp_device::dsp_update(s16 *sound_ptr)
 		if (m_dsp_regs[0x2d] & m)
 		{
 #ifdef DBG_PMOD
-			logerror("Pitch Modulating voice %d, outx=%ld, old pitch=%d, ", v, outx, vp->pitch);
+			logerror("Pitch Modulating voice %d, outx=%ld, old pitch=%d, ", v, outx, vp.pitch);
 #endif
-			vp->pitch += (outx >> 5) * vp->pitch >> 10;
+			vp.pitch += (outx >> 5) * vp.pitch >> 10;
 		}
 #endif
 
 #ifdef DBG_PMOD
-		logerror("pitch=%d\n", vp->pitch);
+		logerror("pitch=%d\n", vp.pitch);
 #endif
 
-		for (; vp->mixfrac >= 0; vp->mixfrac -= 4096)
+		for (; vp.mixfrac >= 0; vp.mixfrac -= 4096)
 		{
 			/* This part performs the BRR decode 'on-the-fly'.  This is more
 			correct than the old way, which could be fooled if the data and/or
@@ -381,20 +381,20 @@ void s_dsp_device::dsp_update(s16 *sound_ptr)
 			decode didn't produce the same result every loop because of the
 			filters.  The event interface still has no chance of keeping up
 			with those kinds of tricks, though. */
-			if (!vp->header_cnt)
+			if (!vp.header_cnt)
 			{
-				if (BIT(vp->end, 0))
+				if (BIT(vp.end, 0))
 				{
 					/* Docs say ENDX bit is set when decode of block with source
 					end flag set is done.  Does this apply to looping samples?
 					Some info I've seen suggests yes. */
 					m_dsp_regs[0x7c] |= m;
-					if (BIT(vp->end, 1))
+					if (BIT(vp.end, 1))
 					{
-						vp->mem_ptr = lptr(sd, V);
+						vp.mem_ptr = lptr(sd, V);
 
 #ifdef DBG_BRR
-						logerror("BRR looping to 0x%04X\n", vp->mem_ptr);
+						logerror("BRR looping to 0x%04X\n", vp.mem_ptr);
 #endif
 					}
 					else
@@ -405,45 +405,45 @@ void s_dsp_device::dsp_update(s16 *sound_ptr)
 
 						m_keys &= ~m;
 						m_dsp_regs[V + 8] = 0;
-						vp->envx         = 0;
-						while (vp->mixfrac >= 0)
+						vp.envx         = 0;
+						while (vp.mixfrac >= 0)
 						{
-							vp->sampbuf[vp->sampptr] = 0;
+							vp.sampbuf[vp.sampptr] = 0;
 							outx         = 0;
-							vp->sampptr  = (vp->sampptr + 1) & 3;
-							vp->mixfrac -= 4096;
+							vp.sampptr  = (vp.sampptr + 1) & 3;
+							vp.mixfrac -= 4096;
 						}
 						break;
 					}
 				}
 
-				vp->header_cnt = 8;
-				vl = (u8)read_byte(vp->mem_ptr++);
-				vp->range  = vl >> 4;
-				vp->end    = vl & 3;
-				vp->filter = (vl & 12) >> 2;
+				vp.header_cnt = 8;
+				vl = (u8)read_byte(vp.mem_ptr++);
+				vp.range  = vl >> 4;
+				vp.end    = vl & 3;
+				vp.filter = (vl & 12) >> 2;
 
 #ifdef DBG_BRR
-				logerror("V%d: header read, range=%d, end=%d, filter=%d\n", v, vp->range, vp->end, vp->filter);
+				logerror("V%d: header read, range=%d, end=%d, filter=%d\n", v, vp.range, vp.end, vp.filter);
 #endif
 			}
 
-			if (!vp->half)
+			if (!vp.half)
 			{
-				vp->half = true;
-				outx     = ((s8)read_byte(vp->mem_ptr)) >> 4;
+				vp.half = true;
+				outx     = ((s8)read_byte(vp.mem_ptr)) >> 4;
 			}
 			else
 			{
-				vp->half = false;
+				vp.half = false;
 				/* Funkiness to get 4-bit signed to carry through */
-				outx   = (s8)(read_byte(vp->mem_ptr++) << 4);
+				outx   = (s8)(read_byte(vp.mem_ptr++) << 4);
 				outx >>= 4;
-				vp->header_cnt--;
+				vp.header_cnt--;
 			}
 
 #ifdef DBG_BRR
-			logerror("V%d: nybble=%X, ptr=%04X, smp1=%d, smp2=%d\n", v, outx & 0x0f, vp->mem_ptr, vp->smp1, vp->smp2);
+			logerror("V%d: nybble=%X, ptr=%04X, smp1=%d, smp2=%d\n", v, outx & 0x0f, vp.mem_ptr, vp.smp1, vp.smp2);
 #endif
 
 			/* For invalid ranges (D,E,F): if the nybble is negative, the result
@@ -451,16 +451,16 @@ void s_dsp_device::dsp_update(s16 *sound_ptr)
 			etc. seems to have any effect.  If range is valid, do the shift
 			normally.  Note these are both shifted right once to do the filters
 			properly, but the output will be shifted back again at the end. */
-			if (vp->range <= 0xc)
+			if (vp.range <= 0xc)
 			{
-				outx = (outx << vp->range) >> 1;
+				outx = (outx << vp.range) >> 1;
 			}
 			else
 			{
 				outx &= ~0x7ff;
 
 #ifdef DBG_BRR
-				logerror("V%d: invalid range! (%X)\n", v, vp->range);
+				logerror("V%d: invalid range! (%X)\n", v, vp.range);
 #endif
 			}
 
@@ -468,22 +468,22 @@ void s_dsp_device::dsp_update(s16 *sound_ptr)
 			logerror("V%d: shifted delta=%04X\n", v, (u16)outx);
 #endif
 
-			switch (vp->filter)
+			switch (vp.filter)
 			{
 			case 0:
 				break;
 
 			case 1:
-				outx += (vp->smp1 >> 1) + ((-vp->smp1) >> 5);
+				outx += (vp.smp1 >> 1) + ((-vp.smp1) >> 5);
 				break;
 
 			case 2:
-				outx += vp->smp1 + ((-(vp->smp1 + (vp->smp1 >> 1))) >> 5) - (vp->smp2 >> 1) + (vp->smp2 >> 5);
+				outx += vp.smp1 + ((-(vp.smp1 + (vp.smp1 >> 1))) >> 5) - (vp.smp2 >> 1) + (vp.smp2 >> 5);
 				break;
 
 			case 3:
-				outx += vp->smp1 + ((-(vp->smp1 + (vp->smp1 << 2) + (vp->smp1 << 3))) >> 7)
-						- (vp->smp2 >> 1) + ((vp->smp2 + (vp->smp2 >> 1)) >> 4);
+				outx += vp.smp1 + ((-(vp.smp1 + (vp.smp1 << 2) + (vp.smp1 << 3))) >> 7)
+						- (vp.smp2 >> 1) + ((vp.smp2 + (vp.smp2 >> 1)) >> 4);
 				break;
 			}
 
@@ -493,15 +493,15 @@ void s_dsp_device::dsp_update(s16 *sound_ptr)
 			logerror("V%d: filter + delta=%04X\n", v, (u16)outx);
 #endif
 
-			vp->smp2 = (s16)vp->smp1;
-			vp->smp1 = (s16)(outx << 1);
-			vp->sampbuf[vp->sampptr] = vp->smp1;
+			vp.smp2 = (s16)vp.smp1;
+			vp.smp1 = (s16)(outx << 1);
+			vp.sampbuf[vp.sampptr] = vp.smp1;
 
 #ifdef DBG_BRR
-			logerror("V%d: final output: %04X\n", v, vp->sampbuf[vp->sampptr]);
+			logerror("V%d: final output: %04X\n", v, vp.sampbuf[vp.sampptr]);
 #endif
 
-			vp->sampptr = (vp->sampptr + 1) & 3;
+			vp.sampptr = (vp.sampptr + 1) & 3;
 		}
 
 		if (m_dsp_regs[0x3d] & m)
@@ -518,17 +518,17 @@ void s_dsp_device::dsp_update(s16 *sound_ptr)
 			determined by the pitch.  The sample output at any given time is
 			the sum of the products of each input sample point with the value
 			of the bell-curve corresponding to that point. */
-			vl  = vp->mixfrac >> 4;
-			vr  = ((G4[-vl-1] * vp->sampbuf[vp->sampptr]) >> 11) & ~1;
-			vr += ((G3[-vl] * vp->sampbuf[(vp->sampptr + 1) & 3]) >> 11) & ~1;
-			vr += ((G2[vl] * vp->sampbuf[(vp->sampptr + 2) & 3]) >> 11) & ~1;
+			vl  = vp.mixfrac >> 4;
+			vr  = ((G4[-vl-1] * vp.sampbuf[vp.sampptr]) >> 11) & ~1;
+			vr += ((G3[-vl] * vp.sampbuf[(vp.sampptr + 1) & 3]) >> 11) & ~1;
+			vr += ((G2[vl] * vp.sampbuf[(vp.sampptr + 2) & 3]) >> 11) & ~1;
 
 			/* This is to do the wrapping properly.  Based on my tests with the
 			SNES, it appears clipping is done only if it is the fourth addition
 			that would cause a wrap.  If it has already wrapped before the
 			fourth addition, it is not clipped. */
 			vr  = (s16)vr;
-			vr += ((G1[vl] * vp->sampbuf[(vp->sampptr + 3) & 3]) >> 11) & ~1;
+			vr += ((G1[vl] * vp.sampbuf[(vp.sampptr + 3) & 3]) >> 11) & ~1;
 
 			vr = std::clamp(vr, -0x8000, 0x7fff);
 
@@ -537,19 +537,19 @@ void s_dsp_device::dsp_update(s16 *sound_ptr)
 #ifdef DBG_INTRP
 			logerror("V%d: mixfrac=%d: [%d]*%d + [%d]*%d + [%d]*%d + [%d]*%d = %d\n", v, vl,
 				G1[vl],
-				vp->sampbuf[(vp->sampptr + 3) & 3],
+				vp.sampbuf[(vp.sampptr + 3) & 3],
 				G2[vl],
-				vp->sampbuf[(vp->sampptr + 2) & 3],
+				vp.sampbuf[(vp.sampptr + 2) & 3],
 				G3[-vl],
-				vp->sampbuf[(vp->sampptr + 1) & 3],
+				vp.sampbuf[(vp.sampptr + 1) & 3],
 				G4[-vl-1],
-				vp->sampbuf[vp->sampptr],
+				vp.sampbuf[vp.sampptr],
 				outx);
 #endif
 		}
 
 		/* Advance the sample position for next update. */
-		vp->mixfrac += vp->pitch;
+		vp.mixfrac += vp.pitch;
 
 		outx = ((outx * envx) >> 11) & ~1;
 		m_dsp_regs[V + 9] = outx >> 8;
