@@ -318,7 +318,7 @@ void tc0480scp_device::device_start()
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
 	if (!gfx(1))
-		set_gfx(1, std::make_unique<gfx_element>(&palette(), tc0480scp_charlayout, (u8 *)&m_ram[0x7000], NATIVE_ENDIAN_VALUE_LE_BE(8,0), 64, m_col_base));  //e000
+		set_gfx(1, std::make_unique<gfx_element>(&palette(), tc0480scp_charlayout, (u8 *)&m_ram[0x7000], NATIVE_ENDIAN_VALUE_LE_BE(8,0), 64, m_col_base)); // e000
 
 	save_item(NAME(m_ram));
 	save_item(NAME(m_ctrl));
@@ -803,7 +803,7 @@ void tc0480scp_device::bg23_draw(screen_device &screen, bitmap_ind16 &bitmap, co
 		/* flawed calc ?? */
 		x_index -= (m_x_offset - 0x1f + layer * 4) * ((row_zoom & 0xff) << 8);
 
-/* We used to kludge 270 multiply factor, before adjusting x_index instead */
+		/* We used to kludge 270 multiply factor, before adjusting x_index instead */
 
 		int x_step = zoomx;
 		if (row_zoom)   /* need to reduce x_step */
@@ -917,46 +917,48 @@ void tc0480scp_device::device_post_load()
 	m_tilemap[4][1]->set_flip(flip);
 
 	reg = m_ctrl[0];
-	if (!flip)  reg = -reg;
+	if (!flip) reg = -reg;
 	m_bgscrollx[0] = reg;
 
 	reg = m_ctrl[1] + 4;
-	if (!flip)  reg = -reg;
+	if (!flip) reg = -reg;
 	m_bgscrollx[1] = reg;
 
 	reg = m_ctrl[2] + 8;
-	if (!flip)  reg = -reg;
+	if (!flip) reg = -reg;
 	m_bgscrollx[2] = reg;
 
 	reg = m_ctrl[3] + 12;
-	if (!flip)  reg = -reg;
+	if (!flip) reg = -reg;
 	m_bgscrollx[3] = reg;
 
 	reg = m_ctrl[4];
-	if (flip)  reg = -reg;
+	if (flip) reg = -reg;
 	m_bgscrolly[0] = reg;
 
 	reg = m_ctrl[5];
-	if (flip)  reg = -reg;
+	if (flip) reg = -reg;
 	m_bgscrolly[1] = reg;
 
 	reg = m_ctrl[6];
-	if (flip)  reg = -reg;
+	if (flip) reg = -reg;
 	m_bgscrolly[2] = reg;
 
 	reg = m_ctrl[7];
-	if (flip)  reg = -reg;
+	if (flip) reg = -reg;
 	m_bgscrolly[3] = reg;
 
 	reg = m_ctrl[0x0c];
-	if (!flip)  reg -= m_text_xoffs;
-	if (flip)   reg += m_text_xoffs;
+	if (flip) reg += m_text_xoffs;
+	else reg -= m_text_xoffs;
 	m_tilemap[4][0]->set_scrollx(0, -reg);
 	m_tilemap[4][1]->set_scrollx(0, -reg);
 
 	reg = m_ctrl[0x0d];
-	if (!flip)  reg -= m_text_yoffs;
-	if (flip)   reg += m_text_yoffs;
+	if (flip) reg += m_text_yoffs;
+	else reg -= m_text_yoffs;
 	m_tilemap[4][0]->set_scrolly(0, -reg);
 	m_tilemap[4][1]->set_scrolly(0, -reg);
+
+	gfx(1)->mark_all_dirty();
 }

@@ -13,9 +13,10 @@ Hardware notes:
 - LCD with custom segments, no sound
 - comms jack for playing against another Diamond Bridge Computer
 
+Diamond Bridge Computer II (model M1021) has a HMCS400 MCU instead.
+
 TODO:
 - add comms port
-- is Diamond Bridge Computer II (model M1021) on similar hardware?
 
 *******************************************************************************/
 

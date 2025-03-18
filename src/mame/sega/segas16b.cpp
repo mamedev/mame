@@ -48,7 +48,7 @@
     Bay Route        171-5704    a5-a8:12516,12456,12517,12458,fd1094:317-0116
     Cotton           171-5704    a5-a8:13919a-13922a,fd1094:317-0181a
     Dynamite Dux     171-5521
-    E-Swat           171-5797    a1:12656,a2:12657,fd1094:317-0129
+    ESWAT            171-5797    a1:12656,a2:12657,fd1094:317-0129
     Flash Point      171-5704    a5:12590b,a8:12591b,fd1094:317-0127a
     Golden Axe       171-5797    a1:12388,a2:12389,fd1094:317-0110
     Heavyweight C.   171-5521    a5:11238,a7:11239
@@ -90,7 +90,7 @@ Bullet                     (C) Sega, 1987
 Cotton                     (C) Sega/Success, 1989
 Dunk Shot                  (C) Sega, 1987
 Dynamite Dux               (C) Sega, 1988
-E-Swat                     (C) Sega, 1989
+ESWAT                      (C) Sega, 1989
 Excite League              (C) Sega, 1989
 Flash Point                (C) Sega, 1989
 Golden Axe                 (C) Sega, 1989
@@ -644,7 +644,7 @@ CPU  - 68000     |--------------------------------------------------------------
 -----------------|--------------------------------------------------------------------------------------------------|
 
 -----------------|--------------------------------------------------------------------------------------------------|
-E-Swat           |A1       A2                                                             A11      A12      A13     |
+ESWAT            |A1       A2                                                             A11      A12      A13     |
 CPU  - 317-0129  |--------------------------------------------------------------------------------------------------|
 8751 -           |EPR12656 EPR12657                                                       EPR12616 -        EPR12617|
                  |--------------------------------------------------------------------------------------------------|
@@ -655,7 +655,7 @@ CPU  - 317-0129  |--------------------------------------------------------------
 -----------------|--------------------------------------------------------------------------------------------------|
 
 -----------------|--------------------------------------------------------------------------------------------------|
-E-Swat           |A1       A2                                                             A11      A12      A13     |
+ESWAT            |A1       A2                                                             A11      A12      A13     |
 CPU  - 317-0130  |--------------------------------------------------------------------------------------------------|
 8751 -           |EPR12658 EPR12659                                                       EPR12616 -        EPR12617|
                  |--------------------------------------------------------------------------------------------------|
@@ -5711,11 +5711,12 @@ ROM_START( bayroute1 )
 	ROM_LOAD16_BYTE( "br.b8",       0x60000, 0x10000, CRC(d8de78ff) SHA1(110661ab8008543b47629722b98d0470f73a48c5) )
 
 	ROM_REGION( 0x50000, "soundcpu", 0 ) // sound CPU
-	ROM_LOAD( "sound.a7",  0x00000, 0x08000, NO_DUMP )
-	ROM_LOAD( "sound.a8",  0x10000, 0x10000, NO_DUMP )
-	ROM_LOAD( "sound.a9",  0x20000, 0x10000, NO_DUMP )
-	ROM_LOAD( "sound.a10", 0x30000, 0x10000, NO_DUMP )
-	ROM_LOAD( "sound.a11", 0x40000, 0x10000, NO_DUMP )
+	ROM_LOAD( "sound.a7",  0x00000, 0x10000, CRC(e91e55cb) SHA1(857242ab355736d7d77877bcf1d093c15c69992b) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD( "sound.a8",  0x10000, 0x10000, CRC(077e9981) SHA1(877c2ce9757410938e42b9bf512089bd2045d04e) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD( "sound.a9",  0x20000, 0x10000, CRC(3c3f5f41) SHA1(f1b2e01586e65c542514c0a846ffc79767ff2166) )
+	// it expects different data from the parent set (copying that to here results in better sound overall, but some cut voices)
+	ROM_LOAD( "sound.a10", 0x30000, 0x10000, BAD_DUMP CRC(7c251347) SHA1(2b66365b2480e2852f930ddbed23d2ed80f2afaa) )
+	ROM_LOAD( "sound.a11", 0x40000, 0x10000, BAD_DUMP CRC(a602ea2d) SHA1(37a4d05c416e8d65c4a2d73096edcfd456a0b70e) )
 ROM_END
 
 
@@ -6524,7 +6525,7 @@ ROM_END
 //*************************************************************************************************************************
 //*************************************************************************************************************************
 //*************************************************************************************************************************
-//  E-Swat (World), Sega System 16B
+//  ESWAT (World), Sega System 16B
 //  CPU: FD1094 (317-0130)
 //  ROM Board type: 171-5797
 //  Sega game ID: 833-7164-02 ESWAT
@@ -6599,7 +6600,7 @@ ROM_START( eswatd )
 ROM_END
 
 //*************************************************************************************************************************
-//  E-Swat (US), Sega System 16B
+//  ESWAT (US), Sega System 16B
 //  CPU: FD1094 (317-0129)
 //  ROM Board type: 171-5797
 //  Sega game ID: 833-7164-01 ESWAT
@@ -6674,7 +6675,7 @@ ROM_START( eswatud )
 ROM_END
 
 //*************************************************************************************************************************
-//  E-Swat (Japan), Sega System 16B
+//  ESWAT (Japan), Sega System 16B
 //  CPU: FD1094 (317-0128)
 //  ROM Board type: 171-5797
 //  Sega game ID: 833-7164 ESWAT
@@ -6750,7 +6751,7 @@ ROM_END
 
 
 //*************************************************************************************************************************
-//  E-Swat (Japan), Sega System 16B
+//  ESWAT (Japan), Sega System 16B
 //  CPU: FD1094 (317-0131)
 //  ROM Board type: 171-5704
 //
@@ -10114,7 +10115,7 @@ GAME( 1990, aurailj,    aurail,   system16b_fd1089a,     aurail,   segas16b_stat
 
 GAME( 1989, bayroute,   0,        system16b_fd1094,      bayroute, segas16b_state, init_generic_5704,       ROT0,   "Sunsoft / Sega", "Bay Route (set 3, World) (FD1094 317-0116)", 0 )
 GAME( 1989, bayroutej,  bayroute, system16b_fd1094,      bayroute, segas16b_state, init_generic_5704,       ROT0,   "Sunsoft / Sega", "Bay Route (set 2, Japan) (FD1094 317-0115)", 0 )
-GAME( 1989, bayroute1,  bayroute, system16b,             bayroute, segas16b_state, init_generic_5358,       ROT0,   "Sunsoft / Sega", "Bay Route (set 1, US) (unprotected)", MACHINE_NO_SOUND )
+GAME( 1989, bayroute1,  bayroute, system16b,             bayroute, segas16b_state, init_generic_5358,       ROT0,   "Sunsoft / Sega", "Bay Route (set 1, US) (unprotected)", MACHINE_IMPERFECT_SOUND )
 
 GAME( 1987, bullet,     0,        system16b_fd1094,      bullet,   segas16b_state, init_generic_5358_small, ROT0,   "Sega", "Bullet (FD1094 317-0041)", 0 )
 
@@ -10135,10 +10136,10 @@ GAME( 1987, dunkshot,   0,        system16b_fd1089a,     dunkshot, segas16b_stat
 GAME( 1987, dunkshota,  dunkshot, system16b_fd1089a,     dunkshot, segas16b_state, init_dunkshot_5358_small,ROT0,   "Sega", "Dunk Shot (Rev A, FD1089A 317-0022)", 0 )
 GAME( 1986, dunkshoto,  dunkshot, system16b_fd1089a,     dunkshoto,segas16b_state, init_dunkshot_5358_small,ROT0,   "Sega", "Dunk Shot (FD1089A 317-0022)", 0 )
 
-GAME( 1989, eswat,      0,        system16b_fd1094_5797, eswat,    segas16b_state, init_generic_5797,       ROT0,   "Sega", "E-Swat - Cyber Police (set 4, World) (FD1094 317-0130)", 0 )
-GAME( 1989, eswatu,     eswat,    system16b_fd1094_5797, eswat,    segas16b_state, init_generic_5797,       ROT0,   "Sega", "E-Swat - Cyber Police (set 3, US) (FD1094 317-0129)", 0 )
-GAME( 1989, eswatj,     eswat,    system16b_fd1094_5797, eswat,    segas16b_state, init_generic_5797,       ROT0,   "Sega", "E-Swat - Cyber Police (set 2, Japan) (FD1094 317-0128)", 0 )
-GAME( 1989, eswatj1,    eswat,    system16b_fd1094,      eswat,    segas16b_state, init_generic_5704,       ROT0,   "Sega", "E-Swat - Cyber Police (set 1, Japan) (FD1094 317-0131)", 0 )
+GAME( 1989, eswat,      0,        system16b_fd1094_5797, eswat,    segas16b_state, init_generic_5797,       ROT0,   "Sega", "Cyber Police ESWAT (set 4, World) (FD1094 317-0130)", 0 )
+GAME( 1989, eswatu,     eswat,    system16b_fd1094_5797, eswat,    segas16b_state, init_generic_5797,       ROT0,   "Sega", "Cyber Police ESWAT (set 3, US) (FD1094 317-0129)", 0 )
+GAME( 1989, eswatj,     eswat,    system16b_fd1094_5797, eswat,    segas16b_state, init_generic_5797,       ROT0,   "Sega", "Cyber Police ESWAT (set 2, Japan) (FD1094 317-0128)", 0 )
+GAME( 1989, eswatj1,    eswat,    system16b_fd1094,      eswat,    segas16b_state, init_generic_5704,       ROT0,   "Sega", "Cyber Police ESWAT (set 1, Japan) (FD1094 317-0131)", 0 )
 
 GAME( 1988, exctleag,   0,        system16b_fd1094,      exctleag, segas16b_state, init_exctleag_5358,      ROT0,   "Sega", "Excite League (FD1094 317-0079)", 0 )
 
@@ -10221,7 +10222,7 @@ GAME( 1990, atomicp,    0,        atomicp,               atomicp,  segas16b_stat
 GAME( 1990, snapper,    0,        atomicp,               snapper,  segas16b_state, init_snapper,            ROT0,   "Philko", "Snapper (Korea)", 0) // korean clone board..
 // board marked 'System 4' and has Philko custom chip - various hw changes (4bpp tiles for example)
 GAME( 1991, lockonph,   0,        lockonph,              lockonph, segas16b_state, init_lockonph,           ROT0,   "Philko", "Lock On (Philko)", MACHINE_IMPERFECT_SOUND ) // Copyright not shown in game, but has 'PHILKO' in the startup warning and tiles / PCB.  1991 is the name entry for the lowest high score.  Clipping issues on left edge in attract look like original game bugs.
-GAME( 1991, dfjail,   0,          dfjail,                dfjail,   dfjail_state,   init_generic_korean,     ROT0,   "Philko", "The Destroyer From Jail (Korea)", MACHINE_NO_COCKTAIL ) // Regulatory approval document dated "1991. 3.28" based on submission of manual and photos
+GAME( 1991, dfjail,     0,        dfjail,                dfjail,   dfjail_state,   init_generic_korean,     ROT0,   "Philko", "The Destroyer From Jail (Korea)", MACHINE_NO_COCKTAIL ) // Regulatory approval document dated "1991. 3.28" based on submission of manual and photos
 
 // decrypted bootleg / 'suicide repair' sets
 
@@ -10264,10 +10265,10 @@ GAME( 1987, hwchampjd,  hwchamp,  hwchamp,               hwchamp,  segas16b_stat
 
 GAME( 1987, bulletd,    bullet,   system16b,             bullet,   segas16b_state, init_generic_5358_small, ROT0,   "bootleg", "Bullet (bootleg of FD1094 317-0041 set)", 0 )
 
-GAME( 1989, eswatd,     eswat,    system16b_5797,        eswat,    segas16b_state, init_generic_5797,       ROT0,   "bootleg", "E-Swat - Cyber Police (set 4, World) (bootleg of FD1094 317-0130 set)", 0 )
-GAME( 1989, eswatud,    eswat,    system16b_5797,        eswat,    segas16b_state, init_generic_5797,       ROT0,   "bootleg", "E-Swat - Cyber Police (set 3, US) (bootleg of FD1094 317-0129 set)", 0 )
-GAME( 1989, eswatjd,    eswat,    system16b_5797,        eswat,    segas16b_state, init_generic_5797,       ROT0,   "bootleg", "E-Swat - Cyber Police (set 2, Japan) (bootleg of FD1094 317-0128 set)", 0 )
-GAME( 1989, eswatj1d,   eswat,    system16b,             eswat,    segas16b_state, init_generic_5704,       ROT0,   "bootleg", "E-Swat - Cyber Police (set 1, Japan) (bootleg of FD1094 317-0131 set)", 0 )
+GAME( 1989, eswatd,     eswat,    system16b_5797,        eswat,    segas16b_state, init_generic_5797,       ROT0,   "bootleg", "Cyber Police ESWAT (set 4, World) (bootleg of FD1094 317-0130 set)", 0 )
+GAME( 1989, eswatud,    eswat,    system16b_5797,        eswat,    segas16b_state, init_generic_5797,       ROT0,   "bootleg", "Cyber Police ESWAT (set 3, US) (bootleg of FD1094 317-0129 set)", 0 )
+GAME( 1989, eswatjd,    eswat,    system16b_5797,        eswat,    segas16b_state, init_generic_5797,       ROT0,   "bootleg", "Cyber Police ESWAT (set 2, Japan) (bootleg of FD1094 317-0128 set)", 0 )
+GAME( 1989, eswatj1d,   eswat,    system16b,             eswat,    segas16b_state, init_generic_5704,       ROT0,   "bootleg", "Cyber Police ESWAT (set 1, Japan) (bootleg of FD1094 317-0131 set)", 0 )
 
 
 GAME( 1989, goldnaxeud, goldnaxe, system16b_5797,        goldnaxe, segas16b_state, init_generic_5797,       ROT0,   "bootleg", "Golden Axe (set 5, US) (bootleg of FD1094 317-0122 set)", 0 )
@@ -10288,13 +10289,13 @@ GAME( 1989, wrestwar2d, wrestwar, system16b,             wrestwar, segas16b_stat
 GAME( 1989, wrestwar1d, wrestwar, system16b,             wrestwar, segas16b_state, init_generic_5704,       ROT270, "bootleg", "Wrestle War (set 1, Japan) (bootleg of FD1094 317-0090 set)", 0 )
 
 // bootlegs with split code/data, no memory mapper
-GAME( 1987, sdibl2,      sdi,     system16b_split,       sdi,      segas16b_state, init_sdi_5358_small,     ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, set 1)", 0 ) // 0x5230
-GAME( 1987, sdibl3,      sdi,     system16b_split,       sdi,      segas16b_state, init_sdi_5358_small,     ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, set 2)", 0 ) // ^
-GAME( 1987, sdibl4,      sdi,     system16b_split,       sdi,      segas16b_state, init_sdi_5358_small,     ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, set 3)", 0 ) // ^
-GAME( 1987, sdibl5,      sdi,     system16b_split,       sdi,      segas16b_state, init_sdi_5358_small,     ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, set 4)", 0 )
-GAME( 1987, sdibl6,      sdi,     system16b_split,       sdi,      segas16b_state, init_sdi_5358_small,     ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, set 5)", 0 )
+GAME( 1987, sdibl2,     sdi,      system16b_split,       sdi,      segas16b_state, init_sdi_5358_small,     ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, set 1)", 0 ) // 0x5230
+GAME( 1987, sdibl3,     sdi,      system16b_split,       sdi,      segas16b_state, init_sdi_5358_small,     ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, set 2)", 0 ) // ^
+GAME( 1987, sdibl4,     sdi,      system16b_split,       sdi,      segas16b_state, init_sdi_5358_small,     ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, set 3)", 0 ) // ^
+GAME( 1987, sdibl5,     sdi,      system16b_split,       sdi,      segas16b_state, init_sdi_5358_small,     ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, set 4)", 0 )
+GAME( 1987, sdibl6,     sdi,      system16b_split,       sdi,      segas16b_state, init_sdi_5358_small,     ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, set 5)", 0 )
 
 // bootlegs with modified hardware
-GAME( 1989, fpointbl,    fpoint,  fpointbl,              fpointbl, segas16b_state, init_generic_bootleg,    ROT0,   "bootleg (Datsu)", "Flash Point (World, bootleg)", 0 )
-GAME( 1989, fpointbj,    fpoint,  fpointbl,              fpointbl, segas16b_state, init_generic_bootleg,    ROT0,   "bootleg (Datsu)", "Flash Point (Japan, bootleg set 1)", 0 )
-GAME( 1989, fpointbla,   fpoint,  fpointbla,             fpointbl, segas16b_state, init_fpointbla,          ROT0,   "bootleg",         "Flash Point (Japan, bootleg set 2)", MACHINE_NOT_WORKING )
+GAME( 1989, fpointbl,   fpoint,   fpointbl,              fpointbl, segas16b_state, init_generic_bootleg,    ROT0,   "bootleg (Datsu)", "Flash Point (World, bootleg)", 0 )
+GAME( 1989, fpointbj,   fpoint,   fpointbl,              fpointbl, segas16b_state, init_generic_bootleg,    ROT0,   "bootleg (Datsu)", "Flash Point (Japan, bootleg set 1)", 0 )
+GAME( 1989, fpointbla,  fpoint,   fpointbla,             fpointbl, segas16b_state, init_fpointbla,          ROT0,   "bootleg",         "Flash Point (Japan, bootleg set 2)", MACHINE_NOT_WORKING )

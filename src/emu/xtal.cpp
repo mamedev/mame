@@ -388,10 +388,11 @@ const double XTAL::known_xtals[] = {
 	 26'666'666, // 26.666666_MHz_XTAL     Irem M92 but most use 27MHz
 	 26'670'000, // 26.670_MHz_XTAL        Namco EVA
 	 26'686'000, // 26.686_MHz_XTAL        Typically used on 90's Taito PCBs to drive the custom chips
+	 26'800'000, // 26.8_MHz_XTAL          SAA7110 TV decoder
 	 26'824'000, // 26.824_MHz_XTAL        Astro Corp.'s Zoo
 	 26'880'000, // 26.88_MHz_XTAL         Roland RF5C36/SA-16 clock (30000 * 896)
 	 26'989'200, // 26.9892_MHz_XTAL       TeleVideo 965
-	 27'000'000, // 27_MHz_XTAL            Some Banpresto games macrossp, Irem M92 and 90's Toaplan games
+	 27'000'000, // 27_MHz_XTAL            Some Banpresto games macrossp, Irem M92 and 90's Toaplan games, Pinnacle Zoran based PCI cards
 	 27'164'000, // 27.164_MHz_XTAL        Typically used on 90's Taito PCBs to drive the custom chips
 	 27'210'900, // 27.2109_MHz_XTAL       LA Girl
 	 27'562'000, // 27.562_MHz_XTAL        Visual 220
@@ -475,6 +476,7 @@ const double XTAL::known_xtals[] = {
 	 48'556'800, // 48.5568_MHz_XTAL       Wyse WY-85
 	 48'654'000, // 48.654_MHz_XTAL        Qume QVT-201
 	 48'660'000, // 48.66_MHz_XTAL         Zaxxon
+	 48'940'000, // 48.94_MHz_XTAL         Queen Bee New
 	 49'152'000, // 49.152_MHz_XTAL        Used on some Namco PCBs, Baraduke h/w, System 21, Super System 22
 	 49'423'500, // 49.4235_MHz_XTAL       Wyse WY-185
 	 50'000'000, // 50_MHz_XTAL            Williams/Midway T/W/V-unit system
@@ -503,6 +505,7 @@ const double XTAL::known_xtals[] = {
 	 66'666'700, // 66.6667_MHz_XTAL       Later Midway games
 	 67'737'600, // 67.7376_MHz_XTAL       PSX-based h/w, Sony ZN1-2-based
 	 68'850'000, // 68.85_MHz_XTAL         Wyse WY-50
+	 69'196'800, // 69.1968_MHz_XTAL       DEC VCB0x/VAXstation dot clock
 	 69'551'990, // 69.55199_MHz_XTAL      Sharp X68000 31.5kHz video
 	 72'000'000, // 72_MHz_XTAL            Aristocrat MKV
 	 72'576'000, // 72.576_MHz_XTAL        Centipede, Millipede, Missile Command, Let's Go Bowling "Multipede"

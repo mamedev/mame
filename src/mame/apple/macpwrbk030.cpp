@@ -121,19 +121,12 @@
     INT1: 60 Hz clock
     INT2: INT2 PULLUP (pulled up and otherwise N/C)
 
-    PG&E (68HC05 PMU) version spotting:
-    (find the text "BORG" in the system ROM, the next 32768 bytes are the PG&E image.
-     offset +4 in the image is the version byte).
-    01 - PowerBook Duo 210/230/250
-    02 - PowerBook 540c, PBDuo 270C, PBDuo 280/280C
-    03 - PowerBook 150
-    08 - PB190cs, PowerBook 540c PPC update, all PowerPC PowerBooks through WallStreet G3s
-
 ****************************************************************************/
 
 #include "emu.h"
 
 #include "dfac.h"
+#include "gsc.h"
 #include "macadb.h"
 #include "macrtc.h"
 #include "macscsi.h"
@@ -180,6 +173,7 @@ public:
 		m_swim(*this, "fdc"),
 		m_floppy(*this, "fdc:%d", 0U),
 		m_rtc(*this, "rtc"),
+		m_gsc(*this, "gsc"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_asc(*this, "asc"),
@@ -212,7 +206,6 @@ public:
 		m_ponti_SPI_SR(0),
 		m_ponti_backlight_ctl(0)
 	{
-		std::fill(std::begin(m_gsc_regs), std::end(m_gsc_regs), 0);
 	}
 
 	void macpb140(machine_config &config);
@@ -224,11 +217,9 @@ public:
 	void macpb170(machine_config &config);
 	void macpb180(machine_config &config);
 	void macpb180c(machine_config &config);
-	void macpd210(machine_config &config);
 	void macpb140_map(address_map &map) ATTR_COLD;
 	void macpb160_map(address_map &map) ATTR_COLD;
 	void macpb165c_map(address_map &map) ATTR_COLD;
-	void macpd210_map(address_map &map) ATTR_COLD;
 
 private:
 	required_device<m68030_device> m_maincpu;
@@ -242,8 +233,9 @@ private:
 	required_device<applefdintf_device> m_swim;
 	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<rtc3430042_device> m_rtc;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
+	optional_device<gsc_device> m_gsc;
+	optional_device<screen_device> m_screen;
+	optional_device<palette_device> m_palette;
 	required_device<asc_device> m_asc;
 	required_device<z80scc_device> m_scc;
 	optional_shared_ptr<u32> m_vram, m_ext_vram;
@@ -263,7 +255,6 @@ private:
 	floppy_image_device *m_cur_floppy;
 	int m_hdsel;
 
-	u8 m_gsc_regs[0x20];
 	bool m_pmu_blank_display;
 	u8 m_pmu_from_via, m_pmu_to_via, m_pmu_ack, m_pmu_req;
 
@@ -275,7 +266,6 @@ private:
 	virtual void machine_reset() override ATTR_COLD;
 
 	u32 screen_update_ddc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	u32 screen_update_gsc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_vga(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	u16 via_r(offs_t offset);
@@ -311,10 +301,6 @@ private:
 	void swim_w(offs_t offset, u16 data, u16 mem_mask);
 	u32 buserror_r();
 
-	u8 gsc_r(offs_t offset);
-	void gsc_w(offs_t offset, u8 data);
-	void macgsc_palette(palette_device &palette) const;
-
 	u32 jaws_r(offs_t offset, u32 mem_mask);
 	void jaws_w(offs_t offset, u32 data, u32 mem_mask);
 	u32 niagra_r(offs_t offset, u32 mem_mask);
@@ -342,9 +328,6 @@ private:
 	u8 battery2_r();
 	u8 battery3_r();
 	u8 brightness_r();
-
-	// ID for PowerBook Duo 210
-	u32 pd210_id_r() { return 0xa55a1004; }
 };
 
 void macpb030_state::machine_start()
@@ -590,12 +573,12 @@ void macpb030_state::niagra_w(offs_t offset, u32 data, u32 mem_mask)
 u16 macpb030_state::pangola_r()
 {
 	return m_pangola_data;
+	// TODO: trace pins, 0x13 -> 0x17 -> 0x16 sequence written before waking up VGA core
 }
 
 void macpb030_state::pangola_w(u16 data)
 {
 	m_pangola_data = data;
-	// TODO: trace pins, 0x13 -> 0x17 -> 0x16 sequence written before waking up VGA core
 }
 
 u8 macpb030_state::pangola_vram_r(offs_t offset)
@@ -753,7 +736,6 @@ u8 macpb030_state::pmu_comms_r()
 	return (m_pmu_req << 7);
 }
 
-u8 last_comms = 0xff;
 void macpb030_state::pmu_comms_w(u8 data)
 {
 	if (!BIT(data, 1))
@@ -767,10 +749,7 @@ void macpb030_state::pmu_comms_w(u8 data)
 		space.install_rom(0x00000000, memory_end & ~memory_mirror, memory_mirror, m_rom_ptr);
 		m_overlay = true;
 	}
-	if ((data & 3) != (last_comms & 3))
-	{
-		last_comms = data;
-	}
+
 	m_maincpu->set_input_line(INPUT_LINE_HALT, BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
 	m_maincpu->set_input_line(INPUT_LINE_RESET, BIT(data, 1) ? CLEAR_LINE : ASSERT_LINE);
 
@@ -791,14 +770,9 @@ void macpb030_state::pmu_p4_w(u8 data)
 {
 	m_macadb->adb_linechange_w((data & 1) ^ 1);
 	m_pmu_blank_display = BIT(data, 2) ^ 1;
-}
-
-// 16-level grayscale
-void macpb030_state::macgsc_palette(palette_device &palette) const
-{
-	for (u8 i = 0; i < 16; i++)
+	if (m_gsc)
 	{
-		palette.set_pen_color(i, ((15 - i) << 4) | 0xf, ((15 - i) << 4) | 0xf, ((15 - i) << 4) | 0xf);
+		m_gsc->set_pmu_blank(m_pmu_blank_display);
 	}
 }
 
@@ -943,72 +917,6 @@ u32 macpb030_state::screen_update_ddc(screen_device &screen, bitmap_ind16 &bitma
 				line[x + b] = (word >> (15 - b)) & 0x0001;
 			}
 		}
-	}
-	return 0;
-}
-
-u32 macpb030_state::screen_update_gsc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	u8 const *const vram8 = (u8 *)m_vram.target();
-
-	// is the display enabled?
-	if (!(m_gsc_regs[4] & 0x20) || m_pmu_blank_display)
-	{
-		bitmap.fill(0xf, cliprect);
-		return 0;
-	}
-
-	switch (m_gsc_regs[4] & 3)
-	{
-	case 0:
-		for (int y = 0; y < 400; y++)
-		{
-			u16 *line = &bitmap.pix(y);
-
-			for (int x = 0; x < 640; x += 8)
-			{
-				u8 const pixels = vram8[(y * 640 / 8) + (BYTE4_XOR_BE(x / 8))];
-				*line++ = ((pixels >> 7) & 1) ? 0xf : 0;
-				*line++ = ((pixels >> 6) & 1) ? 0xf : 0;
-				*line++ = ((pixels >> 5) & 1) ? 0xf : 0;
-				*line++ = ((pixels >> 4) & 1) ? 0xf : 0;
-				*line++ = ((pixels >> 3) & 1) ? 0xf : 0;
-				*line++ = ((pixels >> 2) & 1) ? 0xf : 0;
-				*line++ = ((pixels >> 1) & 1) ? 0xf : 0;
-				*line++ = (pixels & 1) ? 0xf : 0;
-			}
-		}
-		break;
-
-	case 1:
-		for (int y = 0; y < 400; y++)
-		{
-			u16 *line = &bitmap.pix(y);
-
-			for (int x = 0; x < 640; x += 4)
-			{
-				u8 const pixels = vram8[(y * 640 / 4) + (BYTE4_XOR_BE(x / 4))];
-				*line++ = ((pixels >> 4) & 0xc);
-				*line++ = ((pixels >> 2) & 0xc);
-				*line++ = (pixels & 0xc);
-				*line++ = ((pixels << 2) & 0xc);
-			}
-		}
-		break;
-
-	case 2:
-		for (int y = 0; y < 400; y++)
-		{
-			u16 *line = &bitmap.pix(y);
-
-			for (int x = 0; x < 640; x += 2)
-			{
-				u8 const pixels = vram8[(y * 640 / 2) + (BYTE4_XOR_BE(x / 2))];
-				*line++ = pixels >> 4;
-				*line++ = pixels & 0xf;
-			}
-		}
-		break;
 	}
 	return 0;
 }
@@ -1179,21 +1087,6 @@ void macpb030_state::scsi_berr_w(u8 data)
 	m_maincpu->pulse_input_line(M68K_LINE_BUSERROR, attotime::zero);
 }
 
-u8 macpb030_state::gsc_r(offs_t offset)
-{
-	if (offset == 1)
-	{
-		return 5;
-	}
-
-	return m_gsc_regs[offset & 0x1f];
-}
-
-void macpb030_state::gsc_w(offs_t offset, u8 data)
-{
-	m_gsc_regs[offset & 0x1f] = data;
-}
-
 /***************************************************************************
     ADDRESS MAPS
 ****************************************************************************/
@@ -1223,6 +1116,8 @@ void macpb030_state::macpb160_map(address_map &map)
 {
 	map(0x40000000, 0x400fffff).r(FUNC(macpb030_state::rom_switch_r)).mirror(0x0ff00000);
 
+	map(0x50000000, 0x6fffffff).m(m_gsc, FUNC(gsc_device::map));
+
 	map(0x50f00000, 0x50f01fff).rw(FUNC(macpb030_state::via_r), FUNC(macpb030_state::via_w));
 	map(0x50f02000, 0x50f03fff).rw(FUNC(macpb030_state::via2_r), FUNC(macpb030_state::via2_w));
 	map(0x50f04000, 0x50f05fff).rw(FUNC(macpb030_state::scc_r), FUNC(macpb030_state::scc_w));
@@ -1231,11 +1126,8 @@ void macpb030_state::macpb160_map(address_map &map)
 	map(0x50f12060, 0x50f12063).r(FUNC(macpb030_state::scsi_drq_r));
 	map(0x50f14000, 0x50f15fff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write));
 	map(0x50f16000, 0x50f17fff).rw(FUNC(macpb030_state::swim_r), FUNC(macpb030_state::swim_w));
-	map(0x50f20000, 0x50f21fff).rw(FUNC(macpb030_state::gsc_r), FUNC(macpb030_state::gsc_w));
 	map(0x50f24000, 0x50f27fff).r(FUNC(macpb030_state::buserror_r)); // bus error here to make sure we aren't mistaken for another decoder
 	map(0x50f80000, 0x50fbffff).rw(FUNC(macpb030_state::niagra_r), FUNC(macpb030_state::niagra_w));
-
-	map(0x60000000, 0x6001ffff).ram().share("vram").mirror(0x0ffe0000);
 
 	// external video on 160/180
 	map(0xfe0fe000, 0xfe0fe0ff).rw(FUNC(macpb030_state::ext_video_r), FUNC(macpb030_state::ext_video_w));
@@ -1260,7 +1152,7 @@ void macpb030_state::macpb165c_map(address_map &map)
 
 	// on-board color video on 165c/180c, presumably under ISA bus
 	map(0xfc000000, 0xfc07ffff).rw(FUNC(macpb030_state::pangola_vram_r), FUNC(macpb030_state::pangola_vram_w)).mirror(0x00380000);
-//  map(0xfc400102, 0xfc400102).w(wd90c26_vga_device::wakeup_w));
+	//map(0xfc400102, 0xfc400102).w(wd90c26_vga_device::wakeup_w));
 	map(0xfc4003b0, 0xfc4003df).m(m_vga, FUNC(wd90c26_vga_device::io_map));
 	// TODO: trace $3d0 writes (doesn't belong to WD90C26 core, RAMDAC overlay?)
 	map(0xfc4046e8, 0xfc4046e8).mirror(0x3000).w(m_vga, FUNC(wd90c26_vga_device::mode_setup_w));
@@ -1271,26 +1163,6 @@ void macpb030_state::macpb165c_map(address_map &map)
 	// external video on 165c/180c
 	map(0xfe0fe000, 0xfe0fe0ff).rw(FUNC(macpb030_state::ext_video_r), FUNC(macpb030_state::ext_video_w));
 	map(0xfe100000, 0xfe17ffff).ram().share("ext_vram");
-}
-
-void macpb030_state::macpd210_map(address_map &map)
-{
-	map(0x40000000, 0x400fffff).r(FUNC(macpb030_state::rom_switch_r)).mirror(0x0ff00000);
-
-	map(0x50f00000, 0x50f01fff).rw(FUNC(macpb030_state::via_r), FUNC(macpb030_state::via_w));
-	map(0x50f02000, 0x50f03fff).rw(FUNC(macpb030_state::via2_r), FUNC(macpb030_state::via2_w));
-	map(0x50f04000, 0x50f05fff).rw(FUNC(macpb030_state::scc_r), FUNC(macpb030_state::scc_w));
-	map(0x50f06000, 0x50f07fff).rw(FUNC(macpb030_state::scsi_drq_r), FUNC(macpb030_state::scsi_drq_w));
-	map(0x50f10000, 0x50f11fff).rw(FUNC(macpb030_state::scsi_r), FUNC(macpb030_state::scsi_w));
-	map(0x50f12060, 0x50f12063).r(FUNC(macpb030_state::scsi_drq_r));
-	map(0x50f14000, 0x50f15fff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write));
-	map(0x50f16000, 0x50f17fff).rw(FUNC(macpb030_state::swim_r), FUNC(macpb030_state::swim_w));
-	map(0x50f20000, 0x50f21fff).rw(FUNC(macpb030_state::gsc_r), FUNC(macpb030_state::gsc_w));
-	map(0x50f24000, 0x50f27fff).r(FUNC(macpb030_state::buserror_r)); // bus error here to make sure we aren't mistaken for another decoder
-
-	map(0x5ffffffc, 0x5fffffff).r(FUNC(macpb030_state::pd210_id_r));
-
-	map(0x60000000, 0x6001ffff).ram().share("vram").mirror(0x0ffe0000);
 }
 
 u8 macpb030_state::via_in_a()
@@ -1404,7 +1276,7 @@ void macpb030_state::macpb140(machine_config &config)
 	applefdintf_device::add_35_nc(config, m_floppy[1]);
 
 	NSCSI_BUS(config, "scsi");
-	NSCSI_CONNECTOR(config, "scsi:0", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:0", mac_scsi_devices, "harddisk");
 	NSCSI_CONNECTOR(config, "scsi:1", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config(
@@ -1415,7 +1287,7 @@ void macpb030_state::macpb140(machine_config &config)
 		});
 	NSCSI_CONNECTOR(config, "scsi:4", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:6", mac_scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsi:6", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr5380", NCR53C80).machine_config([this](device_t *device) {
 		ncr53c80_device &adapter = downcast<ncr53c80_device &>(*device);
 		adapter.irq_handler().set(m_pseudovia, FUNC(pseudovia_device::scsi_irq_w));
@@ -1499,8 +1371,11 @@ void macpb030_state::macpb160(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &macpb030_state::macpb160_map);
 	m_maincpu->set_fpu_enable(false);
 
-	PALETTE(config.replace(), m_palette, FUNC(macpb030_state::macgsc_palette), 16);
-	m_screen->set_screen_update(FUNC(macpb030_state::screen_update_gsc));
+	config.device_remove("screen");
+	config.device_remove("palette");
+
+	GSC(config, m_gsc, 31.3344_MHz_XTAL);
+	m_gsc->set_panel_id(5);
 
 	m_ram->set_extra_options("4M,6M,8M,12M,14M");
 }
@@ -1520,13 +1395,14 @@ void macpb030_state::macpb180(machine_config &config)
 
 void macpb030_state::macpb165c(machine_config &config)
 {
-	macpb180(config);
+	macpb140(config);
+	m_maincpu->set_clock(33_MHz_XTAL);
+	m_maincpu->set_fpu_enable(true);
 	m_maincpu->set_addrmap(AS_PROGRAM, &macpb030_state::macpb165c_map);
 
 	m_screen->set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	m_screen->set_screen_update(FUNC(macpb030_state::screen_update_vga));
 	m_screen->set_no_palette();
-	m_screen->set_type(SCREEN_TYPE_LCD);
 
 	WD90C26(config, m_vga, 0);
 	m_vga->set_screen(m_screen);
@@ -1540,16 +1416,6 @@ void macpb030_state::macpb180c(machine_config &config)
 {
 	macpb165c(config);
 	m_vga->read_cnf15_callback().set_constant(0);
-}
-
-void macpb030_state::macpd210(machine_config &config)
-{
-	macpb160(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &macpb030_state::macpd210_map);
-
-	M50753(config.replace(), m_pmu, 3.93216_MHz_XTAL).set_disable();
-
-	m_ram->set_extra_options("8M,12M,16M,20M,24M");
 }
 
 ROM_START(macpb140)
@@ -1588,13 +1454,6 @@ ROM_END
 
 #define rom_macpb165c rom_macpb180c
 
-ROM_START(macpd210)
-	ROM_REGION32_BE(0x100000, "bootrom", 0)
-	ROM_LOAD("ecfa989b.rom", 0x000000, 0x100000, CRC(b86ed854) SHA1(ed1371c97117a5884da4a6605ecfc5abed48ae5a))
-
-	ROM_REGION(0x1800, "pmu", ROMREGION_ERASE00)
-ROM_END
-
 } // anonymous namespace
 
 
@@ -1607,6 +1466,3 @@ COMP(1993, macpb165, macpb160, 0, macpb165, macadb, macpb030_state, empty_init, 
 COMP(1993, macpb165c, macpb180c, 0, macpb165c, macadb, macpb030_state, empty_init, "Apple Computer", "Macintosh PowerBook 165c", MACHINE_SUPPORTS_SAVE)
 COMP(1992, macpb180, macpb160, 0, macpb180, macadb, macpb030_state, empty_init, "Apple Computer", "Macintosh PowerBook 180", MACHINE_SUPPORTS_SAVE)
 COMP(1993, macpb180c, 0, 0, macpb180c, macadb, macpb030_state, empty_init, "Apple Computer", "Macintosh PowerBook 180c", MACHINE_SUPPORTS_SAVE)
-
-// PowerBook Duos (probably will not belong in this driver ultimately)
-COMP(1992, macpd210, 0, 0, macpd210, macadb, macpb030_state, empty_init, "Apple Computer", "Macintosh PowerBook Duo 210", MACHINE_NOT_WORKING)

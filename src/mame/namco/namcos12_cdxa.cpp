@@ -68,17 +68,17 @@ Notes:
 // Any drive as long as the ident name starts with "TOSHIB" will do, but this is the one that's used with CDXA games specifically
 DECLARE_DEVICE_TYPE(TOSHIBA_XM6402B_CDROM, toshiba_xm6402b_cdrom_device)
 
-class toshiba_xm6402b_cdrom_device : public atapi_fixed_cdrom_device
+class toshiba_xm6402b_cdrom_device : public atapi_cdrom_device
 {
 public:
 	toshiba_xm6402b_cdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: atapi_fixed_cdrom_device(mconfig, TOSHIBA_XM6402B_CDROM, tag, owner, clock)
+		: atapi_cdrom_device(mconfig, TOSHIBA_XM6402B_CDROM, tag, owner, clock)
 	{
 	}
 
 	virtual void device_start() override
 	{
-		atapi_fixed_cdrom_device::device_start();
+		atapi_cdrom_device::device_start();
 
 		std::fill_n(&m_identify_buffer[27], ' ', 47 - 27);
 

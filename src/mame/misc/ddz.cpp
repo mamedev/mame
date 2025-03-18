@@ -1,8 +1,9 @@
 // license:BSD-3-Clause
-// copyright-holders:Angelo Salese
+// copyright-holders: Angelo Salese
+
 /****************************************************************************
 
-    招级疯斗 - "Zhaoji Fengdou" - "Crazy Class" HW
+    招级疯斗 - "Chaoji Fengdou" - "Crazy Class" HW
 
     driver by Angelo Salese, based off original ddz.cpp by ElSemi
 
@@ -14,7 +15,7 @@
 
 Haze's notes:
 
-fwiw, it's probably same PCB as the non-working 'ddz' in MAME, but different game.
+FWIW, it's probably same PCB as the non-working 'ddz' in MAME, but different game.
 
 there's some kind of encryption/scrambling going on, at the very least
 
@@ -37,6 +38,7 @@ if you reverse the letters you get 'bug in vfprintf : bad base'
 
 so I suspect the data is in reverse order and maybe some blocks scrambled about.
 
+trivia: TJF stands for Tai Ji Feng
 ****************************************************************************/
 
 #include "emu.h"
@@ -47,6 +49,7 @@ so I suspect the data is in reverse order and maybe some blocks scrambled about.
 #include "machine/vrender0.h"
 #include "sound/vrender0.h"
 #include "video/vrender0.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -68,19 +71,17 @@ public:
 	{ }
 
 
-	void init_ddz();
-	void ddz(machine_config &config);
+	void init_ddz() ATTR_COLD;
+	void ddz(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	// memory pointers
 	required_shared_ptr<uint32_t> m_workram;
 	required_region_ptr<uint8_t> m_encdata;
 
-	// devices
 	required_device<se3208_device> m_maincpu;
 	required_device<vrender0soc_device> m_vr0soc;
 
@@ -126,11 +127,11 @@ void ddz_state::machine_reset()
 
 void ddz_state::ddz(machine_config &config)
 {
-	SE3208(config, m_maincpu, 14318180 * 3); // TODO : different between each PCBs
+	SE3208(config, m_maincpu, 14'318'180 * 3); // TODO : different between each PCBs
 	m_maincpu->set_addrmap(AS_PROGRAM, &ddz_state::ddz_mem);
 	m_maincpu->iackx_cb().set(m_vr0soc, FUNC(vrender0soc_device::irq_callback));
 
-	VRENDER0_SOC(config, m_vr0soc, 14318180 * 3);
+	VRENDER0_SOC(config, m_vr0soc, 14'318'180 * 3);
 	m_vr0soc->set_host_cpu_tag(m_maincpu);
 }
 
@@ -143,7 +144,7 @@ ROM_START( ddz )
 	ROM_LOAD("ddz.003.rom",  0x800000, 0x400000, CRC(61c9b5c9) SHA1(0438417398403456a1c49408881797a94aa86f49) )
 ROM_END
 
-/* "Zhaoji Fengdou" PCB
+/* "Chaoji Fengdou" PCB
      ______________________________________________________________
     |                             _________  ____________________  |
   __|                            HD74HC245P |ROM1 H28F320BDJ-TTL80 |
@@ -170,13 +171,33 @@ ROM_END
     |       _____       ___     JAMMA               _____   Switch |
     |______|     |_|_| |   |_|_|_|_|_|_|_|_|_|_|_|_|     |_________|
 */
-ROM_START( crzclass )
+ROM_START( crzclass ) // 超级疯斗
 	ROM_REGION32_LE( 0x1000000, "ipl", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x1000000, "enc_data", ROMREGION_ERASEFF )
 	ROM_LOAD("tjf-mahjong-rom1.bin",  0x000000, 0x400000, CRC(0a8af816) SHA1(9f292e847873078ed2b7584f463633cf9086c7e8) ) // SHARP LH28F320BJD-TTL80
 	ROM_LOAD("tjf-mahjong-rom2.bin",  0x400000, 0x400000, CRC(2a04e84a) SHA1(189b16fd4314fd2a5f8a1214618b5db83f8ac59a) ) // SHARP LH28F320BJD-TTL80
 	ROM_LOAD("tjf-mahjong-rom3.bin",  0x800000, 0x400000, CRC(1cacf3f9) SHA1(e6c88c98aeb7df4098f8e20f412018617005724d) ) // SHARP LH28F320BJD-TTL80
+	// rom4 not populated
+ROM_END
+
+ROM_START( baibians ) // 百变双扣, same PCB as crzclass
+	ROM_REGION32_LE( 0x1000000, "ipl", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x1000000, "enc_data", ROMREGION_ERASEFF )
+	ROM_LOAD("rom1", 0x000000, 0x400000, CRC(b9a61efe) SHA1(e0114c231bf301779033b357bc65b133f2ab00be) ) // SHARP LH28F320BJD-TTL80
+	ROM_LOAD("rom2", 0x400000, 0x400000, CRC(8b17c3a8) SHA1(b7c65fe9c262ec819ecb0d92e885c6b67d1ee938) ) // SHARP LH28F320BJD-TTL80
+	ROM_LOAD("rom3", 0x800000, 0x400000, CRC(41b9b943) SHA1(3379ddf851818209cfede641e7bcc4be8b982034) ) // SHARP LH28F320BJD-TTL80
+	// rom4 not populated
+ROM_END
+
+ROM_START( cjmx ) // 超级明星, same PCB as crzclass, but this one has an Amazon LF instead of the VRenderZero
+	ROM_REGION32_LE( 0x1000000, "ipl", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x1000000, "enc_data", ROMREGION_ERASEFF )
+	ROM_LOAD("rom1", 0x000000, 0x400000, CRC(518ff760) SHA1(68e3fc3269060e0abd8473abfc141f038d63e4e4) ) // SHARP LH28F320BJD-TTL80
+	ROM_LOAD("rom2", 0x400000, 0x400000, CRC(9caa6b70) SHA1(9914793ac772b9ae113f820c181a653ab8a9634d) ) // SHARP LH28F320BJD-TTL80
+	ROM_LOAD("rom3", 0x800000, 0x400000, CRC(738db095) SHA1(073c92d8d22cbec5e6f5f5e4c25e532d2ab914d5) ) // SHARP LH28F320BJD-TTL80
 	// rom4 not populated
 ROM_END
 
@@ -194,18 +215,20 @@ ROM_END
 void ddz_state::init_ddz()
 {
 	uint8_t *ipl = reinterpret_cast<uint8_t *>(memregion("ipl")->base());
-	for(uint32_t x=0;x<m_encdata.bytes();x+=16)
+	for (uint32_t x = 0; x < m_encdata.bytes(); x += 16)
 	{
-		// TBD
-		for(int y=0;y<16;y++)
-			ipl[BYTE4_XOR_LE(x+y)] = m_encdata[x+y];
-//          ipl[BYTE4_XOR_LE(x+15-y)] = m_encdata[x+y];
+		// TODO
+		for (int y = 0; y < 16; y++)
+			ipl[BYTE4_XOR_LE(x + y)] = m_encdata[x + y];
+//          ipl[BYTE4_XOR_LE(x + 15 - y)] = m_encdata[x + y];
 	}
 }
 
 } // anonymous namespace
 
 
-GAME( 200?, ddz,      0, ddz, ddz, ddz_state, init_ddz,   ROT0, "IGS?", "Dou Di Zhu",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 200?, crzclass, 0, ddz, ddz, ddz_state, init_ddz,   ROT0, "TJF",  "Zhaoji Fengdou", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // 'Crazy Class'
-GAME( 2005, btlfront, 0, ddz, ddz, ddz_state, empty_init, ROT0, "TJF",  "BattleFront",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // encrypted, V133F?
+GAME( 200?, ddz,      0, ddz, ddz, ddz_state, init_ddz,   ROT0, "IGS?", "Dou Dizhu",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, crzclass, 0, ddz, ddz, ddz_state, init_ddz,   ROT0, "TJF",  "Chaoji Fengdou",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // 'Crazy Class'
+GAME( 200?, baibians, 0, ddz, ddz, ddz_state, init_ddz,   ROT0, "TJF",  "Baibian Shuangkou", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, cjmx,     0, ddz, ddz, ddz_state, init_ddz,   ROT0, "TJF",  "Chaoji Mingxing",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2005, btlfront, 0, ddz, ddz, ddz_state, empty_init, ROT0, "TJF",  "BattleFront",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // encrypted, V133F?

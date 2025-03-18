@@ -58,15 +58,16 @@
 
 
 //**************************************************************************
-//  TYPE DEFINITIONS
+//  MACROS
 //**************************************************************************
 
 // determine the type of the native DRC, falling back to C
 #ifndef NATIVE_DRC
-typedef drcbe_c drcbe_native;
-#else
-typedef NATIVE_DRC drcbe_native;
+#define NATIVE_DRC drcbe_c
 #endif
+#define MAKE_DRCBE_IMPL(name) make_##name
+#define MAKE_DRCBE(name) MAKE_DRCBE_IMPL(name)
+#define make_drcbe_native MAKE_DRCBE(NATIVE_DRC)
 
 
 // structure describing back-end validation test
@@ -137,8 +138,8 @@ drcuml_state::drcuml_state(device_t &device, drc_cache &cache, u32 flags, int mo
 	: m_device(device)
 	, m_cache(cache)
 	, m_beintf(device.machine().options().drc_use_c()
-			? std::unique_ptr<drcbe_interface>{ new drcbe_c(*this, device, cache, flags, modes, addrbits, ignorebits) }
-			: std::unique_ptr<drcbe_interface>{ new drcbe_native(*this, device, cache, flags, modes, addrbits, ignorebits) })
+			? drc::make_drcbe_c(*this, device, cache, flags, modes, addrbits, ignorebits)
+			: drc::make_drcbe_native(*this, device, cache, flags, modes, addrbits, ignorebits))
 	, m_umllog(device.machine().options().drc_log_uml()
 			? new std::ofstream(util::string_format("drcuml_%s.asm", device.shortname()))
 			: nullptr)

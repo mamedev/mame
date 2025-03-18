@@ -6,7 +6,7 @@
 #include "multibyte.h"
 
 //#define VERBOSE (LOG_GENERAL)
-//#define LOG_OUTPUT_FUNC osd_printf_debug
+//#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 
@@ -431,6 +431,7 @@ void ata_mass_storage_device_base::fill_buffer()
 
 		if (m_sector_count > 0)
 		{
+			set_irq(CLEAR_LINE);
 			set_dasp(ASSERT_LINE);
 			if (m_command == IDE_COMMAND_READ_DMA)
 				start_busy(TIME_BETWEEN_SECTORS + m_dma_transfer_time, PARAM_COMMAND);
@@ -665,7 +666,7 @@ void ata_mass_storage_device_base::process_command()
 	{
 	case IDE_COMMAND_READ_SECTORS:
 	case IDE_COMMAND_READ_SECTORS_NORETRY:
-		LOG("IDE Read multiple: C=%u H=%d S=%u LBA=%u count=%u\n",
+		LOG("IDE Read sectors: C=%u H=%d S=%u LBA=%u count=%u\n",
 				(m_cylinder_high << 8) | m_cylinder_low,
 				m_device_head & IDE_DEVICE_HEAD_HS,
 				m_sector_number,

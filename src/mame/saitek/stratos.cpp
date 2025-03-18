@@ -37,7 +37,7 @@ Hardware notes:
 - unknown LCDC under epoxy blob, suspected to be an MCU
 
 Stratos/Turbo King are identical.
-Corona has magnet sensors and two HELIOS chips.
+Corona has magnet sensors and two NEC gate arrays.
 
 There is no official Saitek program versioning for these. The D/D+ versions are
 known since they're the same chess engine as later Saitek modules, such as the

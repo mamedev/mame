@@ -54,7 +54,7 @@ void sis85c496_host_device::internal_io_map(address_map &map)
 	map(0x0080, 0x009f).rw(FUNC(sis85c496_host_device::at_page8_r), FUNC(sis85c496_host_device::at_page8_w));
 	map(0x00a0, 0x00a1).rw("pic8259_slave", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x00c0, 0x00df).rw(FUNC(sis85c496_host_device::at_dma8237_2_r), FUNC(sis85c496_host_device::at_dma8237_2_w));
-	map(0x00e0, 0x00ef).noprw();
+	// map(0x00e0, 0x00ef) MCA bus (cfr. Bochs) or PnP
 }
 
 void sis85c496_host_device::device_add_mconfig(machine_config &config)

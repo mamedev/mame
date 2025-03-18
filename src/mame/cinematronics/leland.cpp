@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles,Paul Leaman
 /***************************************************************************
 
-    Cinematronics/Leland driver
+    Cinematronics / Leland Cinemat System driver
     driver by Aaron Giles and Paul Leaman
 
     Games supported:

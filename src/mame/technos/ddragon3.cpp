@@ -234,7 +234,6 @@ void wwfwfest_state::wwfwfest_irq_ack_w(offs_t offset, uint16_t data)
 {
 	if (offset == 0)
 		m_maincpu->set_input_line(3, CLEAR_LINE);
-
 	else
 		m_maincpu->set_input_line(2, CLEAR_LINE);
 }

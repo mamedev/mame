@@ -177,11 +177,6 @@ ioport_constructor labtam_8086cpu_device::device_input_ports() const
 	return INPUT_PORTS_NAME(labtam_8086cpu);
 }
 
-void labtam_vducom_device_base::device_resolve_objects()
-{
-	m_bus->int_callback<3>().set(m_pic, FUNC(pic8259_device::ir6_w));
-}
-
 void labtam_vducom_device_base::device_start()
 {
 	save_item(NAME(m_start));
@@ -251,6 +246,7 @@ void labtam_vducom_device_base::device_add_mconfig(machine_config &config)
 	 *  7   not connected
 	 */
 	m_pic->out_int_callback().set_inputline(m_cpu, INPUT_LINE_INT0);
+	int_callback<3>().set(m_pic, FUNC(pic8259_device::ir6_w));
 
 	UPD7201(config, m_com[0], 16_MHz_XTAL / 4);
 	m_com[0]->out_int_callback().set(m_pic, FUNC(pic8259_device::ir3_w));

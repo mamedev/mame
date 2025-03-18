@@ -122,6 +122,11 @@ void st0016_cpu_device::device_reset()
 				m_spr_dy = 8;
 			break;
 
+			case 2: // Crown Poker
+				screen().set_visible_area(8,42*8-1,0,30*8-1);
+				m_spr_dx = 4;
+			break;
+
 			case 4: // mayjinsen 1&2
 				screen().set_visible_area(0,32*8-1,0,28*8-1);
 			break;
@@ -319,7 +324,7 @@ void st0016_cpu_device::vregs_w(offs_t offset, u8 data)
 	    $74 x--- ---- global flip screen
 	        -xx- ---- individual flip screen x/y
 	        i.e. Mayjinsen sets 0x80, other ST0016 games 0x60.
-	        TODO: Might also be paired with $70 & $75 (setted up by Mayjinsen).
+	        TODO: Might also be paired with $70 & $75 (set up by Mayjinsen).
 
 	    $a0 \
 	    $a1 - source address >> 1

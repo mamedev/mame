@@ -11,12 +11,15 @@ original creation by Rüdiger Worbs and Dieter Schultze. It competed in
 Budapest WMCCC 1983 and ended at a low 16th place.
 
 Hardware notes:
+- PCB label: 15003-500-2902 B 01 02 03
 - UB880 Z80 @ ~2.5MHz
 - 2*Z80 PIO
 - 10KB ROM (10*U505D), 2KB RAM (4*U214D)
 - chessboard with 64 hall sensors, 64+15 leds, piezo
 
-A newer version had a 4MHz UA880 and 2 ROM chips (8KB + 2KB).
+Chess-Master Schachtisch embedded in a wooden table is on the same hardware
+and has the same ROMs, they manually changed the PCB label from 15003 to 15005.
+A newer version of Chess-Master had a 4MHz UA880 and 2 ROM chips (8KB + 2KB).
 
 BTANB:
 - corner leds flicker sometimes

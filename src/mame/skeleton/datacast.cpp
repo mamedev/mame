@@ -32,7 +32,7 @@
     ------------------
       22  SAA5240
       A2  PCF8582
-      C0  ?
+      C0  SAB3036
 
     TODO:
     - implement keypad
@@ -84,7 +84,6 @@ private:
 	void i2c_w(uint8_t data);
 
 	void mem_map(address_map &map) ATTR_COLD;
-	void saa5240_map(address_map &map) ATTR_COLD;
 
 	required_device<i80186_cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -109,18 +108,12 @@ void datacast_state::mem_map(address_map &map)
 	map(0x00000, 0x7ffff).ram();
 	map(0xc0000, 0xc0000).rw(FUNC(datacast_state::keypad_r), FUNC(datacast_state::keypad_w)).umask16(0x00ff);
 	map(0xc0080, 0xc0080).lr8([]() { return 0xff; }, "dips"); // unknown purpose
-	map(0xc0100, 0xc010f).noprw(); //.rw(m_saa5250, FUNC(saa5250_device::read), FUNC(saa5250_device::write)).umask16(0x00ff);
+	map(0xc0100, 0xc010f).noprw(); //.rw(m_cidac, FUNC(saa5250_device::read), FUNC(saa5250_device::write)).umask16(0x00ff);
 	map(0xc0180, 0xc0180).rw(FUNC(datacast_state::i2c_r), FUNC(datacast_state::i2c_w)).umask16(0x00ff);
 	map(0xc0200, 0xc0203).rw(m_usart[0], FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 	map(0xc0280, 0xc0280).w(m_dbrg, FUNC(com8116_device::stt_str_w));
 	map(0xc0300, 0xc0303).rw(m_usart[1], FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 	map(0xf0000, 0xfffff).rom().region("rom", 0);
-}
-
-void datacast_state::saa5240_map(address_map &map)
-{
-	map.global_mask(0x07ff);
-	map(0x0000, 0x07ff).ram();
 }
 
 
@@ -158,7 +151,7 @@ INPUT_PORTS_END
 uint8_t datacast_state::keypad_r()
 {
 	uint8_t data = (m_kb->read() << 0) | (m_kb->da_r() << 5);
-	logerror("keypad_r: %02x\n", data);
+	logerror("%s keypad_r: %02x\n", machine().describe_context(), data);
 	return data;
 }
 
@@ -166,13 +159,13 @@ void datacast_state::keypad_w(uint8_t data)
 {
 	m_key_col = data;
 
-	logerror("keypad_w: %02x\n", data);
+	logerror("%s keypad_w: %02x\n", machine().describe_context(), data);
 }
 
 
 uint8_t datacast_state::i2c_r()
 {
-	return m_i2cmem->read_sda() &  m_cct->read_sda();
+	return m_i2cmem->read_sda() & m_cct->read_sda();
 }
 
 void datacast_state::i2c_w(uint8_t data)
@@ -203,10 +196,10 @@ void datacast_state::datacast(machine_config &config)
 	//SAA5231(config, m_saa5231, 13.875_MHz_XTAL);
 
 	SAA5240A(config, m_cct, 6_MHz_XTAL);
-	m_cct->set_addrmap(0, &datacast_state::saa5240_map);
+	m_cct->set_ram_size(0x800);
 
-	//SAA5250(config, m_saa5250, 0);
-	//m_saa5250->set_addrmap(0, &datacast_state::saa5250_map); // 2K RAM
+	//SAA5250(config, m_cidac, 0);
+	//m_cidac->set_buffer_size(0x800);
 
 	I2C_PCF8582(config, m_i2cmem).set_e0(1);
 

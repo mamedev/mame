@@ -54,16 +54,18 @@ class wyvernf0_state : public driver_device
 public:
 	wyvernf0_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_bgram(*this,"bgram"),
-		m_fgram(*this,"fgram"),
-		m_scrollram(*this,"scrollram"),
-		m_spriteram(*this,"spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_bmcu(*this, "bmcu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch")
+		m_soundlatch(*this, "soundlatch"),
+		m_vram(*this, "vram_%u", 0U),
+		m_scrollram(*this, "scrollram"),
+		m_spriteram(*this, "spriteram"),
+		m_objram(*this, "objram", 0x2000, ENDIANNESS_LITTLE),
+		m_rombank(*this, "rombank"),
+		m_rambank(*this, "rambank")
 	{ }
 
 	void wyvernf0(machine_config &config);
@@ -74,29 +76,34 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<taito68705_mcu_device> m_bmcu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
+
 	// memory pointers
-	required_shared_ptr<uint8_t> m_bgram;
-	required_shared_ptr<uint8_t> m_fgram;
+	required_shared_ptr_array<uint8_t, 2> m_vram;
 	required_shared_ptr<uint8_t> m_scrollram;
 	required_shared_ptr<uint8_t> m_spriteram;
+	memory_share_creator<uint8_t> m_objram;
+
+	required_memory_bank m_rombank;
+	required_memory_bank m_rambank;
 
 	// video-related
-	tilemap_t  *m_bg_tilemap = nullptr;
-	tilemap_t  *m_fg_tilemap = nullptr;
-	std::unique_ptr<uint8_t[]>    m_objram{};
-
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	void bgram_w(offs_t offset, uint8_t data);
-	void fgram_w(offs_t offset, uint8_t data);
-	uint32_t screen_update_wyvernf0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, bool is_foreground );
+	tilemap_t  *m_tilemap[2]{};
 
 	// misc
-	int         m_sound_nmi_enable = 0;
-	int         m_pending_nmi = 0;
-	uint8_t       m_rombank = 0U;
-	uint8_t       m_rambank = 0U;
+	bool       m_sound_nmi_enable = false;
+	bool       m_pending_nmi = false;
+
+	template <unsigned Layer> TILE_GET_INFO_MEMBER(get_tile_info);
+	template <unsigned Layer> void vram_w(offs_t offset, uint8_t data);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, bool is_foreground );
 
 	void rambank_w(uint8_t data);
 	void rombank_w(uint8_t data);
@@ -107,16 +114,8 @@ private:
 
 	uint8_t mcu_status_r();
 
-	// devices
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
-	required_device<taito68705_mcu_device> m_bmcu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	required_device<generic_latch_8_device> m_soundlatch;
-
 	void sound_map(address_map &map) ATTR_COLD;
-	void wyvernf0_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -135,53 +134,40 @@ private:
 
 ***************************************************************************/
 
-void wyvernf0_state::bgram_w(offs_t offset, uint8_t data)
+template <unsigned Layer>
+void wyvernf0_state::vram_w(offs_t offset, uint8_t data)
 {
-	m_bgram[offset] = data;
-	m_bg_tilemap->mark_tile_dirty(offset / 2);
+	m_vram[Layer][offset] = data;
+	m_tilemap[Layer]->mark_tile_dirty(offset / 2);
 }
 
-void wyvernf0_state::fgram_w(offs_t offset, uint8_t data)
+template <unsigned Layer>
+TILE_GET_INFO_MEMBER(wyvernf0_state::get_tile_info)
 {
-	m_fgram[offset] = data;
-	m_fg_tilemap->mark_tile_dirty(offset / 2);
-}
-
-TILE_GET_INFO_MEMBER(wyvernf0_state::get_bg_tile_info)
-{
-	int offs = tile_index * 2;
-	int code = m_bgram[offs] + (m_bgram[offs+1] << 8);
-	int color = 0 + ((code & 0x3000) >> 12);
-
-	tileinfo.set(1, code, color, TILE_FLIPXY(code >> 14));
-}
-TILE_GET_INFO_MEMBER(wyvernf0_state::get_fg_tile_info)
-{
-	int offs = tile_index * 2;
-	int code = m_fgram[offs] + (m_fgram[offs+1] << 8);
-	int color = 8 + ((code & 0x3000) >> 12);
+	int const offs = tile_index * 2;
+	int const code = m_vram[Layer][offs] + (m_vram[Layer][offs+1] << 8);
+	int const color = (Layer << 3) + ((code & 0x3000) >> 12);
 
 	tileinfo.set(1, code, color, TILE_FLIPXY(code >> 14));
 }
 
 void wyvernf0_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wyvernf0_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wyvernf0_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wyvernf0_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wyvernf0_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	m_bg_tilemap->set_transparent_pen(0);
-	m_fg_tilemap->set_transparent_pen(0);
+	m_tilemap[0]->set_transparent_pen(0);
+	m_tilemap[1]->set_transparent_pen(0);
 
-	m_bg_tilemap->set_scrolldx(0x12, 0xf4);
-	m_bg_tilemap->set_scrolldy(   0,    0);
+	m_tilemap[0]->set_scrolldx(0x12, 0xf4);
+	m_tilemap[0]->set_scrolldy(   0,    0);
 
-	m_fg_tilemap->set_scrolldx(0x10, 0xf6);
-	m_fg_tilemap->set_scrolldy(   0,    0);
+	m_tilemap[1]->set_scrolldx(0x10, 0xf6);
+	m_tilemap[1]->set_scrolldy(   0,    0);
 }
 
 void wyvernf0_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, bool is_foreground )
 {
-	int offs;
 /*
 1st boss:
 YY       XX
@@ -209,16 +195,14 @@ yyyyyyyy fccccccc x???pppp xxxxxxxx
 	uint8_t *sprram = &m_spriteram[ is_foreground ? m_spriteram.bytes()/2 : 0 ];
 
 	// sy = 0 -> on the left
-	for (offs = 0; offs < m_spriteram.bytes() / 2; offs += 4)
+	for (int offs = 0; offs < m_spriteram.bytes() / 2; offs += 4)
 	{
-		int sx, sy, code, color;
-
-		sx = sprram[offs + 3] - ((sprram[offs + 2] & 0x80) << 1);
-		sy = 256 - 8 - sprram[offs + 0] - 23;   // center player sprite: 256 - 8 - 0x71 + dy = 256/2-32/2 -> dy = -23
+		int sx = sprram[offs + 3] - ((sprram[offs + 2] & 0x80) << 1);
+		int sy = 256 - 8 - sprram[offs + 0] - 23;   // center player sprite: 256 - 8 - 0x71 + dy = 256/2-32/2 -> dy = -23
 
 //      int flipx = sprram[offs + 2] & 0x40;    // nope
-		int flipx = 0;
-		int flipy = sprram[offs + 1] & 0x80;
+		bool flipx = false;
+		bool flipy = BIT(sprram[offs + 1], 7);
 
 		if (flip_screen_x())
 		{
@@ -231,8 +215,8 @@ yyyyyyyy fccccccc x???pppp xxxxxxxx
 			sy = 256 - 8 - sy - 3*8;
 		}
 
-		code = sprram[offs + 1] & 0x7f;
-		color = (sprram[offs + 2] & 0x0f);
+		int code = sprram[offs + 1] & 0x7f;
+		int color = (sprram[offs + 2] & 0x0f);
 
 		if (is_foreground)
 		{
@@ -244,7 +228,7 @@ yyyyyyyy fccccccc x???pppp xxxxxxxx
 		{
 			for (int x = 0; x < 4; x++)
 			{
-				int objoffs = code * 0x20 + (x + y * 4) * 2;
+				int const objoffs = code * 0x20 + (x + y * 4) * 2;
 
 				m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 						(m_objram[objoffs + 1] << 8) + m_objram[objoffs],
@@ -256,7 +240,7 @@ yyyyyyyy fccccccc x???pppp xxxxxxxx
 	}
 }
 
-uint32_t wyvernf0_state::screen_update_wyvernf0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t wyvernf0_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layers_ctrl = -1;
 
@@ -277,21 +261,21 @@ if (machine().input().code_pressed(KEYCODE_Z))
 }
 #endif
 
-	m_fg_tilemap->set_scrollx(0, m_scrollram[0]);
-	m_fg_tilemap->set_scrolly(0, m_scrollram[1]);
+	m_tilemap[1]->set_scrollx(0, m_scrollram[0]);
+	m_tilemap[1]->set_scrolly(0, m_scrollram[1]);
 
-	m_bg_tilemap->set_scrollx(0, m_scrollram[2]);
-	m_bg_tilemap->set_scrolly(0, m_scrollram[3]);
+	m_tilemap[0]->set_scrollx(0, m_scrollram[2]);
+	m_tilemap[0]->set_scrolly(0, m_scrollram[3]);
 
 	bitmap.fill(0, cliprect);
 
 	// background monitor
-	if (layers_ctrl & 1)    m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	if (layers_ctrl & 4)    draw_sprites(bitmap, cliprect, false);
+	if (BIT(layers_ctrl, 0))    m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
+	if (BIT(layers_ctrl, 2))    draw_sprites(bitmap, cliprect, false);
 
 	// foreground monitor
-	if (layers_ctrl & 8)    draw_sprites(bitmap, cliprect, true);
-	if (layers_ctrl & 2)    m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	if (BIT(layers_ctrl, 3))    draw_sprites(bitmap, cliprect, true);
+	if (BIT(layers_ctrl, 1))    m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -326,14 +310,13 @@ void wyvernf0_state::rambank_w(uint8_t data)
 	// bit 5 ??? set, except at boot
 	// bit 6 Coin lockout
 	// bit 7 RAM bank
-	flip_screen_x_set(data & 0x01);
-	flip_screen_y_set(data & 0x02);
+	flip_screen_x_set(BIT(data, 0));
+	flip_screen_y_set(BIT(data, 1));
 
-	machine().bookkeeping().coin_lockout_w(0, !(data & 0x40));
-	machine().bookkeeping().coin_lockout_w(1, !(data & 0x40));
+	machine().bookkeeping().coin_lockout_w(0, BIT(~data, 6));
+	machine().bookkeeping().coin_lockout_w(1, BIT(~data, 6));
 
-	m_rambank = data;
-	membank("rambank")->set_entry((data & 0x80) ? 1 : 0);
+	m_rambank->set_entry(BIT(data, 7));
 
 	if (data & ~0xe3)
 		logerror("%s: unknown rambank bits %02x\n", machine().describe_context(), data);
@@ -343,8 +326,7 @@ void wyvernf0_state::rambank_w(uint8_t data)
 void wyvernf0_state::rombank_w(uint8_t data)
 {
 	// bit 0-2 ROM bank
-	m_rombank = data;
-	membank("rombank")->set_entry(data & 0x07);
+	m_rombank->set_entry(data & 0x07);
 
 	if (data & ~0x07)
 		logerror("%s: unknown rombank bits %02x\n", machine().describe_context(), data);
@@ -355,7 +337,7 @@ TIMER_CALLBACK_MEMBER(wyvernf0_state::nmi_callback)
 	if (m_sound_nmi_enable)
 		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	else
-		m_pending_nmi = 1;
+		m_pending_nmi = true;
 }
 
 void wyvernf0_state::sound_command_w(uint8_t data)
@@ -366,41 +348,41 @@ void wyvernf0_state::sound_command_w(uint8_t data)
 
 void wyvernf0_state::nmi_disable_w(uint8_t data)
 {
-	m_sound_nmi_enable = 0;
+	m_sound_nmi_enable = false;
 }
 
 void wyvernf0_state::nmi_enable_w(uint8_t data)
 {
-	m_sound_nmi_enable = 1;
+	m_sound_nmi_enable = true;
 	if (m_pending_nmi)
 	{
 		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-		m_pending_nmi = 0;
+		m_pending_nmi = false;
 	}
 }
 
-void wyvernf0_state::wyvernf0_map(address_map &map)
+void wyvernf0_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x8fff).ram();
 
-	map(0x9000, 0x9fff).bankrw("rambank");
+	map(0x9000, 0x9fff).bankrw(m_rambank);
 
-	map(0xa000, 0xbfff).bankr("rombank");
+	map(0xa000, 0xbfff).bankr(m_rombank);
 
-	map(0xc000, 0xc7ff).ram().w(FUNC(wyvernf0_state::fgram_w)).share("fgram");
-	map(0xc800, 0xcfff).ram().w(FUNC(wyvernf0_state::bgram_w)).share("bgram");
+	map(0xc000, 0xc7ff).ram().w(FUNC(wyvernf0_state::vram_w<1>)).share(m_vram[1]);
+	map(0xc800, 0xcfff).ram().w(FUNC(wyvernf0_state::vram_w<0>)).share(m_vram[0]);
 
 	map(0xd000, 0xd000).nopw(); // d000 write (02)
 	map(0xd100, 0xd100).w(FUNC(wyvernf0_state::rambank_w));
 	map(0xd200, 0xd200).w(FUNC(wyvernf0_state::rombank_w));
 
-	map(0xd300, 0xd303).ram().share("scrollram");
+	map(0xd300, 0xd303).ram().share(m_scrollram);
 
 	map(0xd400, 0xd400).rw(m_bmcu, FUNC(taito68705_mcu_device::data_r), FUNC(taito68705_mcu_device::data_w));
 	map(0xd401, 0xd401).r(FUNC(wyvernf0_state::mcu_status_r));
 
-	map(0xd500, 0xd5ff).ram().share("spriteram");
+	map(0xd500, 0xd5ff).ram().share(m_spriteram);
 
 	map(0xd600, 0xd600).portr("DSW1");
 	map(0xd601, 0xd601).portr("DSW2");
@@ -582,7 +564,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-// Sprites use 2 x 2 tiles and a tile code lookup
+// Sprites use 4 x 4 tiles and a tile code lookup
 
 static const gfx_layout layout_8x8x4 =
 {
@@ -609,33 +591,28 @@ GFXDECODE_END
 
 void wyvernf0_state::machine_start()
 {
-	uint8_t *ROM = memregion("rombank")->base();
-	membank("rombank")->configure_entries(0, 8, ROM, 0x2000);
+	m_rombank->configure_entries(0, 8, memregion("rombank")->base(), 0x2000);
 
 	// sprite codes lookup in banked RAM
-	m_objram = std::make_unique<uint8_t[]>(0x1000 * 2);
-	save_pointer(NAME(m_objram), 0x1000 * 2);
-	membank("rambank")->configure_entries(0, 2, m_objram.get(), 0x1000);
+	m_rambank->configure_entries(0, 2, &m_objram[0], 0x1000);
 
 	save_item(NAME(m_sound_nmi_enable));
 	save_item(NAME(m_pending_nmi));
-	save_item(NAME(m_rombank));
-	save_item(NAME(m_rambank));
 }
 
 void wyvernf0_state::machine_reset()
 {
-	m_sound_nmi_enable = 0;
-	m_pending_nmi = 0;
-	m_rombank = 0;
-	m_rambank = 0;
+	m_sound_nmi_enable = false;
+	m_pending_nmi = false;
+	m_rombank->set_entry(0);
+	m_rambank->set_entry(0);
 }
 
 void wyvernf0_state::wyvernf0(machine_config &config)
 {
 	// basic machine hardware
 	Z80(config, m_maincpu, 48_MHz_XTAL/8); // 6MHz D780C-2 - Clock verified
-	m_maincpu->set_addrmap(AS_PROGRAM, &wyvernf0_state::wyvernf0_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &wyvernf0_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(wyvernf0_state::irq0_line_hold));
 
 	// OSC on sound board is a custom/strange 6-pin part that outputs 8MHz, 4MHz, 2MHz (no external divider)
@@ -654,7 +631,7 @@ void wyvernf0_state::wyvernf0(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(wyvernf0_state::screen_update_wyvernf0));
+	screen.set_screen_update(FUNC(wyvernf0_state::screen_update));
 	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wyvernf0);
@@ -663,6 +640,7 @@ void wyvernf0_state::wyvernf0(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
+	// TODO: implement bottom speaker routing
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 

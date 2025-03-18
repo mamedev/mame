@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:windyfairy
+// copyright-holders:windyfairy, Vas Crabb
 /***************************************************************************
 
 Register use:
@@ -75,20 +75,30 @@ the location FP points to.
 #include "emu.h"
 #include "drcbearm64.h"
 
-#include "debug/debugcpu.h"
-#include "emuopts.h"
+#include "drcbeut.h"
 #include "uml.h"
 
+#include "debug/debugcpu.h"
+#include "emuopts.h"
+
+#include "mfpresolve.h"
+
+#include "asmjit/src/asmjit/asmjit.h"
+#include "asmjit/src/asmjit/a64.h"
+
 #include <cstddef>
+#include <cstdio>
+#include <cstdlib>
+#include <vector>
 
 
 namespace drc {
 
+namespace {
+
 using namespace uml;
 
 using namespace asmjit;
-
-namespace {
 
 const uint32_t PTYPE_M   = 1 << parameter::PTYPE_MEMORY;
 const uint32_t PTYPE_I   = 1 << parameter::PTYPE_IMMEDIATE;
@@ -174,9 +184,22 @@ const a64::CondCode condition_map[uml::COND_MAX - uml::COND_Z] =
 	a64::CondCode::kGE,    // COND_GE,          requires SV
 };
 
+// UML flag bit numbers
+constexpr unsigned FLAG_BIT_C = 0;
+constexpr unsigned FLAG_BIT_V = 1;
+constexpr unsigned FLAG_BIT_Z = 2;
+constexpr unsigned FLAG_BIT_S = 3;
+constexpr unsigned FLAG_BIT_U = 4;
 
-#define ARM_CONDITION(a, condition)        (condition_map[condition - COND_Z])
-#define ARM_NOT_CONDITION(a, condition)    (negateCond(condition_map[condition - COND_Z]))
+// masks for immediate values that can be generated with movz instructions
+constexpr uint64_t LSL0_MASK = 0x00000000'0000ffff;
+constexpr uint64_t LSL16_MASK = 0x00000000'ffff0000;
+constexpr uint64_t LSL32_MASK = 0x0000ffff'00000000;
+constexpr uint64_t LSL48_MASK = 0xffff0000'00000000;
+
+
+#define ARM_CONDITION(condition)        (condition_map[condition - COND_Z])
+#define ARM_NOT_CONDITION(condition)    (negateCond(condition_map[condition - COND_Z]))
 
 #define assert_no_condition(inst)       assert((inst).condition() == uml::COND_ALWAYS)
 #define assert_any_condition(inst)      assert((inst).condition() == uml::COND_ALWAYS || ((inst).condition() >= uml::COND_Z && (inst).condition() < uml::COND_MAX))
@@ -212,29 +235,37 @@ inline a64::Gp select_register(a64::Gp const &reg, uint32_t regsize)
 
 inline bool is_valid_immediate_mask(uint64_t val, size_t bytes)
 {
+	const unsigned bits = bytes * 8;
+
 	// all zeros and all ones aren't allowed, and disallow any value with bits outside of the max bit range
-	if (val == 0 || val == make_bitmask<uint64_t>(bytes * 8))
+	if ((val == 0) || (val >= util::make_bitmask<uint64_t>(bits)))
 		return false;
 
-	uint32_t head = 64 - count_leading_zeros_64(val);
-	if (head >= (bytes * 8))
-		return false;
-
-	uint32_t tail = 0;
-	while (tail < head)
+	// work out if the value is repeating sequence of a power-of-two bit group
+	unsigned width = 2;
+	uint64_t mask = util::make_bitmask<uint64_t>(bits - width);
+	while ((width < bits) && ((val & mask) != (val >> width)))
 	{
-		if (BIT(val, tail))
-			break;
-		tail++;
+		mask >>= width;
+		width <<= 1;
 	}
 
-	return population_count_64(val) == head - tail;
+	// check check that set bits are contiguous
+	const auto lz = count_leading_zeros_64(val & make_bitmask<uint64_t>(width));
+	const uint64_t invleftaligned = ~(val << lz);
+	return !(invleftaligned & (invleftaligned + 1));
 }
 
 inline bool is_valid_immediate(uint64_t val, size_t bits)
 {
 	assert(bits < 64);
 	return val < (uint64_t(1) << bits);
+}
+
+constexpr bool is_valid_immediate_addsub(uint64_t val)
+{
+	// 12-bit unsigned immediate value, optionally left-shifted by 12 bits
+	return !(val & ~util::make_bitmask<uint64_t>(12)) || !(val & ~(util::make_bitmask<uint64_t>(12) << 12));
 }
 
 inline constexpr bool is_valid_immediate_signed(int64_t val, size_t bits)
@@ -252,10 +283,24 @@ inline constexpr bool is_valid_offset(int64_t diff, int max_shift)
 		return false;
 }
 
+inline bool is_simple_mov_immediate(uint64_t val, size_t bytes)
+{
+	if (!(val & ~LSL0_MASK) || !(val & ~LSL16_MASK) || !(val & ~LSL32_MASK) || !(val & ~LSL48_MASK))
+		return true; // movz
+	else if (!(~val & ~LSL0_MASK) || !(~val & ~LSL16_MASK) || !(~val & ~LSL32_MASK) || !(~val & ~LSL48_MASK))
+		return true; // movn
+	else if ((val == uint32_t(val)) && (((val & LSL0_MASK) == LSL0_MASK) || ((val & LSL16_MASK) == LSL16_MASK)))
+		return true; // movn to w register
+	else if (is_valid_immediate_mask(val, bytes))
+		return true; // orr with zero register
+	else
+		return false;
+}
+
 inline bool emit_add_optimized(a64::Assembler &a, const a64::Gp &dst, const a64::Gp &src, int64_t val)
 {
 	// If the bottom 12 bits are 0s then an optimized form can be used if the remaining bits are <= 12
-	if (is_valid_immediate(val, 12) || ((val & 0xfff) == 0 && is_valid_immediate(val >> 12, 12)))
+	if (is_valid_immediate_addsub(val))
 	{
 		a.add(dst, src, val);
 		return true;
@@ -270,7 +315,7 @@ inline bool emit_sub_optimized(a64::Assembler &a, const a64::Gp &dst, const a64:
 		val = -val;
 
 	// If the bottom 12 bits are 0s then an optimized form can be used if the remaining bits are <= 12
-	if (is_valid_immediate(val, 12) || ((val & 0xfff) == 0 && is_valid_immediate(val >> 12, 12)))
+	if (is_valid_immediate_addsub(val))
 	{
 		a.sub(dst, src, val);
 		return true;
@@ -279,36 +324,328 @@ inline bool emit_sub_optimized(a64::Assembler &a, const a64::Gp &dst, const a64:
 	return false;
 }
 
-arm::Mem get_mem_absolute(a64::Assembler &a, const void *ptr)
+void get_imm_absolute(a64::Assembler &a, const a64::Gp &reg, const uint64_t val)
 {
+	// Check for constants that can be generated with a single instruction
+	if (is_simple_mov_immediate(val, reg.isGpX() ? 8 : 4))
+	{
+		a.mov(reg, val);
+		return;
+	}
+	else if (reg.isGpX() && is_valid_immediate_mask(val, 4))
+	{
+		a.mov(reg.w(), val); // asmjit isn't smart enough to work this out
+		return;
+	}
+
+	// Values close to the program counter can be generated with a single adr
 	const uint64_t codeoffs = a.code()->baseAddress() + a.offset();
-	const int64_t reloffs = (int64_t)ptr - codeoffs;
+	const int64_t reloffs = int64_t(val) - codeoffs;
 	if (is_valid_immediate_signed(reloffs, 21))
 	{
-		a.adr(MEM_SCRATCH_REG, ptr);
-		return arm::Mem(MEM_SCRATCH_REG);
+		a.adr(reg, val);
+		return;
 	}
 
+	// Values within 4G of the program counter can be generated with adrp followed by add
 	const uint64_t pagebase = codeoffs & ~make_bitmask<uint64_t>(12);
-	const int64_t pagerel = (int64_t)ptr - pagebase;
+	const int64_t pagerel = int64_t(val) - pagebase;
 	if (is_valid_immediate_signed(pagerel, 21 + 12))
 	{
-		const uint64_t targetpage = (uint64_t)ptr & ~make_bitmask<uint64_t>(12);
-		const uint64_t pageoffs = (uint64_t)ptr & util::make_bitmask<uint64_t>(12);
+		const uint64_t targetpage = val & ~make_bitmask<uint64_t>(12);
+		const uint64_t pageoffs = val & util::make_bitmask<uint64_t>(12);
 
-		a.adrp(MEM_SCRATCH_REG, targetpage);
+		a.adrp(reg.x(), targetpage);
+		if (pageoffs != 0)
+			a.add(reg, reg, pageoffs);
 
-		if (is_valid_immediate_signed(pageoffs, 9))
-			return arm::Mem(MEM_SCRATCH_REG, pageoffs);
-		else if (emit_add_optimized(a, MEM_SCRATCH_REG, MEM_SCRATCH_REG, pageoffs))
-			return arm::Mem(MEM_SCRATCH_REG);
+		return;
 	}
 
-	a.mov(MEM_SCRATCH_REG, ptr);
-	return arm::Mem(MEM_SCRATCH_REG);
+	// up to four instructions
+	a.mov(reg, val);
 }
 
-} // anonymous namespace
+void store_unordered(a64::Assembler &a)
+{
+	a.cset(SCRATCH_REG1, a64::CondCode::kPL);
+	a.cset(SCRATCH_REG2, a64::CondCode::kNE);
+	a.and_(SCRATCH_REG1, SCRATCH_REG1, SCRATCH_REG2);
+	a.cset(SCRATCH_REG2, a64::CondCode::kCS);
+	a.and_(SCRATCH_REG1, SCRATCH_REG1, SCRATCH_REG2);
+	a.cset(SCRATCH_REG2, a64::CondCode::kVS);
+	a.and_(SCRATCH_REG1, SCRATCH_REG1, SCRATCH_REG2);
+	a.bfi(FLAGS_REG, SCRATCH_REG2, FLAG_BIT_U, 1);
+}
+
+inline void get_unordered(a64::Assembler &a, const a64::Gp &reg)
+{
+	a.ubfx(reg.x(), FLAGS_REG, FLAG_BIT_U, 1);
+}
+
+inline void store_carry_reg(a64::Assembler &a, const a64::Gp &reg)
+{
+	a.bfi(FLAGS_REG, reg.x(), FLAG_BIT_C, 1);
+}
+
+inline void get_carry(a64::Assembler &a, const a64::Gp &reg, bool inverted = false)
+{
+	a.and_(reg.x(), FLAGS_REG, 1);
+
+	if (inverted)
+		a.eor(reg.x(), reg.x(), 1);
+}
+
+
+class drcbe_arm64 : public drcbe_interface
+{
+public:
+	drcbe_arm64(drcuml_state &drcuml, device_t &device, drc_cache &cache, uint32_t flags, int modes, int addrbits, int ignorebits);
+	virtual ~drcbe_arm64();
+
+	virtual void reset() override;
+	virtual int execute(uml::code_handle &entry) override;
+	virtual void generate(drcuml_block &block, const uml::instruction *instlist, uint32_t numinst) override;
+	virtual bool hash_exists(uint32_t mode, uint32_t pc) const noexcept override;
+	virtual void get_info(drcbe_info &info) const noexcept override;
+	virtual bool logging() const noexcept override { return false; }
+
+private:
+	enum class carry_state
+	{
+		POISON,     // does not correspond to UML carry flag
+		CANONICAL,  // corresponds directly to UML carry flag
+		LOGICAL     // logical borrow state
+	};
+
+	class be_parameter
+	{
+		static inline constexpr int REG_MAX = 30;
+
+	public:
+		// parameter types
+		enum be_parameter_type
+		{
+			PTYPE_NONE = 0,        // invalid
+			PTYPE_IMMEDIATE,       // immediate; value = sign-extended to 64 bits
+			PTYPE_INT_REGISTER,    // integer register; value = 0-REG_MAX
+			PTYPE_FLOAT_REGISTER,  // floating point register; value = 0-REG_MAX
+			PTYPE_MEMORY,          // memory; value = pointer to memory
+			PTYPE_MAX
+		};
+
+		typedef uint64_t be_parameter_value;
+
+		be_parameter() : m_type(PTYPE_NONE), m_value(0) { }
+		be_parameter(uint64_t val) : m_type(PTYPE_IMMEDIATE), m_value(val) { }
+		be_parameter(drcbe_arm64 &drcbe, const uml::parameter &param, uint32_t allowed);
+		be_parameter(const be_parameter &param) = default;
+
+		static be_parameter make_ireg(int regnum) { assert(regnum >= 0 && regnum < REG_MAX); return be_parameter(PTYPE_INT_REGISTER, regnum); }
+		static be_parameter make_freg(int regnum) { assert(regnum >= 0 && regnum < REG_MAX); return be_parameter(PTYPE_FLOAT_REGISTER, regnum); }
+		static be_parameter make_memory(void *base) { return be_parameter(PTYPE_MEMORY, reinterpret_cast<be_parameter_value>(base)); }
+		static be_parameter make_memory(const void *base) { return be_parameter(PTYPE_MEMORY, reinterpret_cast<be_parameter_value>(const_cast<void *>(base))); }
+
+		bool operator==(const be_parameter &rhs) const { return (m_type == rhs.m_type && m_value == rhs.m_value); }
+		bool operator!=(const be_parameter &rhs) const { return (m_type != rhs.m_type || m_value != rhs.m_value); }
+
+		be_parameter_type type() const { return m_type; }
+		uint64_t immediate() const { assert(m_type == PTYPE_IMMEDIATE); return m_value; }
+		uint32_t ireg() const { assert(m_type == PTYPE_INT_REGISTER); assert(m_value < REG_MAX); return m_value; }
+		uint32_t freg() const { assert(m_type == PTYPE_FLOAT_REGISTER); assert(m_value < REG_MAX); return m_value; }
+		void *memory() const { assert(m_type == PTYPE_MEMORY); return reinterpret_cast<void *>(m_value); }
+
+		bool is_immediate() const { return (m_type == PTYPE_IMMEDIATE); }
+		bool is_int_register() const { return (m_type == PTYPE_INT_REGISTER); }
+		bool is_float_register() const { return (m_type == PTYPE_FLOAT_REGISTER); }
+		bool is_memory() const { return (m_type == PTYPE_MEMORY); }
+
+		bool is_immediate_value(uint64_t value) const { return (m_type == PTYPE_IMMEDIATE && m_value == value); }
+
+		asmjit::a64::Vec get_register_float(uint32_t regsize) const;
+		asmjit::a64::Gp get_register_int(uint32_t regsize) const;
+		asmjit::a64::Vec select_register(asmjit::a64::Vec const &reg, uint32_t regsize) const;
+		asmjit::a64::Gp select_register(asmjit::a64::Gp const &reg, uint32_t regsize) const;
+
+	private:
+		be_parameter(be_parameter_type type, be_parameter_value value) : m_type(type), m_value(value) { }
+
+		be_parameter_type   m_type;
+		be_parameter_value  m_value;
+	};
+
+	struct near_state
+	{
+		uint32_t emulated_flags;
+	};
+
+	using opcode_generate_func = void (drcbe_arm64::*)(asmjit::a64::Assembler &, const uml::instruction &);
+	struct opcode_table_entry
+	{
+		uml::opcode_t opcode;
+		opcode_generate_func func;
+	};
+
+	struct memory_accessors
+	{
+		resolved_memory_accessors resolved;
+		address_space::specific_access_info specific;
+		offs_t address_mask;
+		u8 high_bits;
+		bool no_mask;
+		bool mask_simple;
+		bool mask_high_bits;
+	};
+
+	using arm64_entry_point_func = uint32_t (*)(void *entry);
+
+	void op_handle(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_hash(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_label(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_comment(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_mapvar(asmjit::a64::Assembler &a, const uml::instruction &inst);
+
+	void op_nop(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_break(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_debug(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_exit(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_hashjmp(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_jmp(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_exh(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_callh(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_ret(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_callc(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_recover(asmjit::a64::Assembler &a, const uml::instruction &inst);
+
+	void op_setfmod(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_getfmod(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_getexp(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_getflgs(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_setflgs(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_save(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_restore(asmjit::a64::Assembler &a, const uml::instruction &inst);
+
+	void op_load(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_loads(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_store(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_read(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_readm(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_write(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_writem(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_carry(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_set(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_mov(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_sext(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_roland(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_rolins(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	template <bool CarryIn> void op_add(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	template <bool CarryIn> void op_sub(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_cmp(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_mulu(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_mululw(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_muls(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_mulslw(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	template <asmjit::a64::Inst::Id Opcode> void op_div(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_and(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_test(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_or(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_xor(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_lzcnt(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_tzcnt(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_bswap(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	template <asmjit::a64::Inst::Id Opcode> void op_shift(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_rol(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_rolc(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_rorc(asmjit::a64::Assembler &a, const uml::instruction &inst);
+
+	void op_fload(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_fstore(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_fread(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_fwrite(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_fmov(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_ftoint(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_ffrint(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_ffrflt(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_frnds(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_fcmp(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_fcopyi(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	void op_icopyf(asmjit::a64::Assembler &a, const uml::instruction &inst);
+
+	template <asmjit::a64::Inst::Id Opcode> void op_float_alu(asmjit::a64::Assembler &a, const uml::instruction &inst);
+	template <asmjit::a64::Inst::Id Opcode> void op_float_alu2(asmjit::a64::Assembler &a, const uml::instruction &inst);
+
+	size_t emit(asmjit::CodeHolder &ch);
+
+
+	// helper functions
+	void get_imm_relative(asmjit::a64::Assembler &a, const asmjit::a64::Gp &reg, const uint64_t ptr) const;
+
+	void emit_ldr_str_base_mem(asmjit::a64::Assembler &a, asmjit::a64::Inst::Id opcode, const asmjit::a64::Reg &reg, int max_shift, const void *ptr) const;
+	void emit_ldr_mem(asmjit::a64::Assembler &a, const asmjit::a64::Gp &reg, const void *ptr) const;
+	void emit_ldrb_mem(asmjit::a64::Assembler &a, const asmjit::a64::Gp &reg, const void *ptr) const;
+	void emit_ldrh_mem(asmjit::a64::Assembler &a, const asmjit::a64::Gp &reg, const void *ptr) const;
+	void emit_ldrsb_mem(asmjit::a64::Assembler &a, const asmjit::a64::Gp &reg, const void *ptr) const;
+	void emit_ldrsh_mem(asmjit::a64::Assembler &a, const asmjit::a64::Gp &reg, const void *ptr) const;
+	void emit_ldrsw_mem(asmjit::a64::Assembler &a, const asmjit::a64::Gp &reg, const void *ptr) const;
+	void emit_str_mem(asmjit::a64::Assembler &a, const asmjit::a64::Gp &reg, const void *ptr) const;
+	void emit_strb_mem(asmjit::a64::Assembler &a, const asmjit::a64::Gp &reg, const void *ptr) const;
+	void emit_strh_mem(asmjit::a64::Assembler &a, const asmjit::a64::Gp &reg, const void *ptr) const;
+
+	void emit_float_ldr_mem(asmjit::a64::Assembler &a, const asmjit::a64::Vec &reg, const void *ptr) const;
+	void emit_float_str_mem(asmjit::a64::Assembler &a, const asmjit::a64::Vec &reg, const void *ptr) const;
+
+	void emit_skip(a64::Assembler &a, uml::condition_t cond, Label &skip);
+
+	void emit_memaccess_setup(asmjit::a64::Assembler &a, const be_parameter &addrp, const memory_accessors &accessors, const address_space::specific_access_info::side &side) const;
+	void emit_narrow_memwrite(asmjit::a64::Assembler &a, const be_parameter &addrp, const parameter &spacesizep, const memory_accessors &accessors) const;
+
+	void store_carry(asmjit::a64::Assembler &a, bool inverted = false);
+	void load_carry(asmjit::a64::Assembler &a, bool inverted = false);
+	void set_flags(asmjit::a64::Assembler &a);
+
+	void calculate_carry_shift_left(asmjit::a64::Assembler &a, const asmjit::a64::Gp &reg, const asmjit::a64::Gp &shift, int maxBits);
+	void calculate_carry_shift_left_imm(asmjit::a64::Assembler &a, const asmjit::a64::Gp &reg, const int shift, int maxBits);
+
+	void calculate_carry_shift_right(asmjit::a64::Assembler &a, const asmjit::a64::Gp &reg, const asmjit::a64::Gp &shift);
+	void calculate_carry_shift_right_imm(asmjit::a64::Assembler &a, const asmjit::a64::Gp &reg, const int shift);
+
+	void mov_float_reg_param(asmjit::a64::Assembler &a, uint32_t regsize, asmjit::a64::Vec const &dst, const be_parameter &src) const;
+	void mov_float_param_param(asmjit::a64::Assembler &a, uint32_t regsize, const be_parameter &dst, const be_parameter &src) const;
+	void mov_float_param_reg(asmjit::a64::Assembler &a, uint32_t regsize, const be_parameter &dst, asmjit::a64::Vec const &src) const;
+	void mov_float_param_int_reg(asmjit::a64::Assembler &a, uint32_t regsize, const be_parameter &dst, asmjit::a64::Gp const &src) const;
+
+	void mov_reg_param(asmjit::a64::Assembler &a, uint32_t regsize, const asmjit::a64::Gp &dst, const be_parameter &src) const;
+	void mov_param_reg(asmjit::a64::Assembler &a, uint32_t regsize, const be_parameter &dst, const asmjit::a64::Gp &src) const;
+	void mov_param_imm(asmjit::a64::Assembler &a, uint32_t regsize, const be_parameter &dst, uint64_t src) const;
+	void mov_param_param(asmjit::a64::Assembler &a, uint32_t regsize, const be_parameter &dst, const be_parameter &src) const;
+	void mov_mem_param(asmjit::a64::Assembler &a, uint32_t regsize, void *dst, const be_parameter &src) const;
+	void mov_r64_imm(asmjit::a64::Assembler &a, const asmjit::a64::Gp &dst, uint64_t const src) const;
+
+	void call_arm_addr(asmjit::a64::Assembler &a, const void *offs) const;
+
+	[[noreturn]] void end_of_block() const;
+
+	drc_hash_table m_hash;
+	drc_map_variables m_map;
+	FILE *m_log_asmjit;
+	carry_state m_carry_state;
+
+	arm64_entry_point_func m_entry;
+	drccodeptr m_exit;
+	drccodeptr m_nocode;
+	drccodeptr m_endofblock;
+
+	uint8_t *m_baseptr;
+
+	near_state &m_near;
+
+	resolved_member_function m_debug_cpu_instruction_hook;
+	resolved_member_function m_drcmap_get_value;
+	std::vector<memory_accessors> m_memory_accessors;
+
+	static const opcode_table_entry s_opcode_table_source[];
+	static opcode_generate_func s_opcode_table[uml::OP_MAX];
+};
 
 
 drcbe_arm64::opcode_generate_func drcbe_arm64::s_opcode_table[OP_MAX];
@@ -358,10 +695,10 @@ const drcbe_arm64::opcode_table_entry drcbe_arm64::s_opcode_table_source[] =
 	{ uml::OP_SEXT,    &drcbe_arm64::op_sext },                     // SEXT    dst,src
 	{ uml::OP_ROLAND,  &drcbe_arm64::op_roland },                   // ROLAND  dst,src1,src2,src3
 	{ uml::OP_ROLINS,  &drcbe_arm64::op_rolins },                   // ROLINS  dst,src1,src2,src3
-	{ uml::OP_ADD,     &drcbe_arm64::op_add<a64::Inst::kIdAdds> },  // ADD     dst,src1,src2[,f]
-	{ uml::OP_ADDC,    &drcbe_arm64::op_add<a64::Inst::kIdAdcs> },  // ADDC    dst,src1,src2[,f]
-	{ uml::OP_SUB,     &drcbe_arm64::op_sub<a64::Inst::kIdSubs> },  // SUB     dst,src1,src2[,f]
-	{ uml::OP_SUBB,    &drcbe_arm64::op_sub<a64::Inst::kIdSbcs> },  // SUBB    dst,src1,src2[,f]
+	{ uml::OP_ADD,     &drcbe_arm64::op_add<false> },               // ADD     dst,src1,src2[,f]
+	{ uml::OP_ADDC,    &drcbe_arm64::op_add<true> },                // ADDC    dst,src1,src2[,f]
+	{ uml::OP_SUB,     &drcbe_arm64::op_sub<false> },               // SUB     dst,src1,src2[,f]
+	{ uml::OP_SUBB,    &drcbe_arm64::op_sub<true> },                // SUBB    dst,src1,src2[,f]
 	{ uml::OP_CMP,     &drcbe_arm64::op_cmp },                      // CMP     src1,src2[,f]
 	{ uml::OP_MULU,    &drcbe_arm64::op_mulu },                     // MULU    dst,edst,src1,src2[,f]
 	{ uml::OP_MULULW,  &drcbe_arm64::op_mululw },                   // MULULW   dst,src1,src2[,f]
@@ -410,8 +747,6 @@ const drcbe_arm64::opcode_table_entry drcbe_arm64::s_opcode_table_source[] =
 
 drcbe_arm64::be_parameter::be_parameter(drcbe_arm64 &drcbe, const parameter &param, uint32_t allowed)
 {
-	int regnum;
-
 	switch (param.type())
 	{
 		// immediates pass through
@@ -430,8 +765,7 @@ drcbe_arm64::be_parameter::be_parameter(drcbe_arm64 &drcbe, const parameter &par
 		case parameter::PTYPE_INT_REGISTER:
 			assert(allowed & PTYPE_R);
 			assert(allowed & PTYPE_M);
-			regnum = int_register_map[param.ireg() - REG_I0];
-			if (regnum != 0)
+			if (int regnum = int_register_map[param.ireg() - REG_I0]; regnum != 0)
 				*this = make_ireg(regnum);
 			else
 				*this = make_memory(&drcbe.m_state.r[param.ireg() - REG_I0]);
@@ -441,8 +775,7 @@ drcbe_arm64::be_parameter::be_parameter(drcbe_arm64 &drcbe, const parameter &par
 		case parameter::PTYPE_FLOAT_REGISTER:
 			assert(allowed & PTYPE_F);
 			assert(allowed & PTYPE_M);
-			regnum = float_register_map[param.freg() - REG_F0];
-			if (regnum != 0)
+			if (int regnum = float_register_map[param.freg() - REG_F0]; regnum != 0)
 				*this = make_freg(regnum);
 			else
 				*this = make_memory(&drcbe.m_state.f[param.freg() - REG_F0]);
@@ -470,40 +803,55 @@ a64::Vec drcbe_arm64::be_parameter::select_register(a64::Vec const &reg, uint32_
 {
 	if (m_type == PTYPE_FLOAT_REGISTER)
 		return get_register_float(regsize);
-	if (regsize == 4)
+	else if (regsize == 4)
 		return reg.s();
-	return reg.d();
+	else
+		return reg.d();
 }
 
 a64::Gp drcbe_arm64::be_parameter::select_register(a64::Gp const &reg, uint32_t regsize) const
 {
 	if (m_type == PTYPE_INT_REGISTER)
 		return get_register_int(regsize);
-	if (regsize == 4)
+	else if (regsize == 4)
 		return reg.w();
-	return reg.x();
+	else
+		return reg.x();
 }
 
 void drcbe_arm64::get_imm_relative(a64::Assembler &a, const a64::Gp &reg, const uint64_t val) const
 {
-	// If a value can be expressed relative to the base register then it's worth using it instead of a mov
-	// which can be expanded to up to 4 instructions for large immediates
-	const int64_t diff = (int64_t)val - (int64_t)m_baseptr;
-	if (diff > 0 && emit_add_optimized(a, reg, BASE_REG, diff))
+	// Check for constants that can be generated with a single instruction
+	if (is_simple_mov_immediate(val, reg.isGpX() ? 8 : 4))
+	{
+		a.mov(reg, val);
 		return;
-	else if (diff < 0 && emit_sub_optimized(a, reg, BASE_REG, diff))
+	}
+	else if (reg.isGpX() && is_valid_immediate_mask(val, 4))
+	{
+		a.mov(reg.w(), val); // asmjit isn't smart enough to work this out
 		return;
+	}
 
+	// Values close to the program counter can be generated with a single adr
 	const uint64_t codeoffs = a.code()->baseAddress() + a.offset();
-	const int64_t reloffs = (int64_t)val - codeoffs;
+	const int64_t reloffs = int64_t(val) - codeoffs;
 	if (is_valid_immediate_signed(reloffs, 21))
 	{
 		a.adr(reg, val);
 		return;
 	}
 
+	// If a value can be expressed relative to the base register then it's worth using it
+	const int64_t diff = int64_t(val) - int64_t(m_baseptr);
+	if ((diff > 0) && emit_add_optimized(a, reg, BASE_REG, diff))
+		return;
+	else if ((diff < 0) && emit_sub_optimized(a, reg, BASE_REG, diff))
+		return;
+
+	// Values within 4G of the program counter can be generated with adrp followed by add
 	const uint64_t pagebase = codeoffs & ~make_bitmask<uint64_t>(12);
-	const int64_t pagerel = (int64_t)val - pagebase;
+	const int64_t pagerel = int64_t(val) - pagebase;
 	if (is_valid_immediate_signed(pagerel, 21 + 12))
 	{
 		const uint64_t targetpage = val & ~make_bitmask<uint64_t>(12);
@@ -516,13 +864,14 @@ void drcbe_arm64::get_imm_relative(a64::Assembler &a, const a64::Gp &reg, const 
 		return;
 	}
 
+	// up to four instructions
 	a.mov(reg, val);
 }
 
 inline void drcbe_arm64::emit_ldr_str_base_mem(a64::Assembler &a, a64::Inst::Id opcode, const a64::Reg &reg, int max_shift, const void *ptr) const
 {
 	// If it can fit as an immediate offset
-	const int64_t diff = (int64_t)ptr - (int64_t)m_baseptr;
+	const int64_t diff = int64_t(ptr) - int64_t(m_baseptr);
 	if (is_valid_offset(diff, max_shift))
 	{
 		a.emit(opcode, reg, arm::Mem(BASE_REG, diff));
@@ -531,7 +880,7 @@ inline void drcbe_arm64::emit_ldr_str_base_mem(a64::Assembler &a, a64::Inst::Id 
 
 	// If it can fit as an offset relative to PC
 	const uint64_t codeoffs = a.code()->baseAddress() + a.offset();
-	const int64_t reloffs = (int64_t)ptr - codeoffs;
+	const int64_t reloffs = int64_t(ptr) - codeoffs;
 	if (is_valid_immediate_signed(reloffs, 21))
 	{
 		a.adr(MEM_SCRATCH_REG, ptr);
@@ -595,7 +944,7 @@ inline void drcbe_arm64::emit_ldr_str_base_mem(a64::Assembler &a, a64::Inst::Id 
 		}
 	}
 
-	// Can't optimize it at all, most likely becomes 4 MOV commands
+	// Can't optimize it at all, most likely becomes 4 MOV instructions
 	a.mov(MEM_SCRATCH_REG, ptr);
 	a.emit(opcode, reg, arm::Mem(MEM_SCRATCH_REG));
 }
@@ -613,6 +962,178 @@ void drcbe_arm64::emit_strh_mem(a64::Assembler &a, const a64::Gp &reg, const voi
 void drcbe_arm64::emit_float_ldr_mem(a64::Assembler &a, const a64::Vec &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdLdr_v, reg, reg.isVecS() ? 2 : 3, ptr); }
 void drcbe_arm64::emit_float_str_mem(a64::Assembler &a, const a64::Vec &reg, const void *ptr) const { emit_ldr_str_base_mem(a, a64::Inst::kIdStr_v, reg, reg.isVecS() ? 2 : 3, ptr); }
 
+void drcbe_arm64::emit_skip(a64::Assembler &a, uml::condition_t cond, Label &skip)
+{
+	// Nothing to do if the instruction is unconditional
+	if (cond == uml::COND_ALWAYS)
+		return;
+
+	// Branch to the skip point if the condition is not met
+	skip = a.newLabel();
+	switch (cond)
+	{
+		case uml::COND_U:
+			a.tbz(FLAGS_REG, FLAG_BIT_U, skip);
+			break;
+		case uml::COND_NU:
+			a.tbnz(FLAGS_REG, FLAG_BIT_U, skip);
+			break;
+		case uml::COND_C:
+		case uml::COND_NC:
+			switch (m_carry_state)
+			{
+				case carry_state::CANONICAL:
+					a.b(ARM_CONDITION(cond), skip);
+					break;
+				case carry_state::LOGICAL:
+					a.b(ARM_NOT_CONDITION(cond), skip);
+					break;
+				default:
+					a.emit((cond == uml::COND_C) ? a64::Inst::kIdTbz : a64::Inst::kIdTbnz, FLAGS_REG, FLAG_BIT_C, skip);
+			}
+			break;
+		case uml::COND_A:
+		case uml::COND_BE:
+			load_carry(a, true);
+			[[fallthrough]];
+		default:
+			a.b(ARM_NOT_CONDITION(cond), skip);
+	}
+}
+
+void drcbe_arm64::emit_memaccess_setup(asmjit::a64::Assembler &a, const be_parameter &addrp, const memory_accessors &accessors, const address_space::specific_access_info::side &side) const
+{
+	auto const addrreg = (accessors.no_mask || accessors.mask_simple) ? REG_PARAM2 : a64::x6;
+	mov_reg_param(a, 4, addrreg, addrp);
+	get_imm_relative(a, a64::x8, uintptr_t(side.dispatch));
+
+	// if the high bits aren't affected by the global mask, extract them early
+	if (accessors.high_bits && !accessors.mask_high_bits)
+		a.ubfx(a64::w7, addrreg.w(), accessors.specific.low_bits, accessors.high_bits);
+
+	if (accessors.mask_simple)
+		a.and_(REG_PARAM2.w(), addrreg.w(), accessors.address_mask);
+	else if (!accessors.no_mask)
+		a.mov(REG_PARAM2.w(), accessors.address_mask); // 32-bit value, no more than two instructions
+
+	// if the high address bits aren't affected by the global mask, load the dispatch table entry now
+	if (!accessors.high_bits)
+		a.ldr(REG_PARAM1, a64::Mem(a64::x8));
+	else if (!accessors.mask_high_bits)
+		a.ldr(REG_PARAM1, a64::Mem(a64::x8, a64::x7, arm::Shift(arm::ShiftOp::kLSL, 3)));
+
+	// apply non-trivial global mask if necessary
+	if (!accessors.no_mask && !accessors.mask_simple)
+		a.and_(REG_PARAM2.w(), REG_PARAM2.w(), addrreg.w());
+
+	// if the high address bits are affected by the global mask, load the dispatch table entry now
+	if (accessors.mask_high_bits)
+	{
+		a.lsr(a64::w7, REG_PARAM2.w(), accessors.specific.low_bits);
+		a.ldr(REG_PARAM1, a64::Mem(a64::x8, a64::x7, arm::Shift(arm::ShiftOp::kLSL, 3)));
+	}
+
+	// apply this pointer displacement if necessary
+	if (side.displacement)
+		a.add(REG_PARAM1, REG_PARAM1, side.displacement); // assume less than 4K
+
+	// adjusted dispatch table entry pointer in REG_PARAM1
+	// masked address in REG_PARAM2
+	// x8, x7 and potentially x6 clobbered
+}
+
+void drcbe_arm64::emit_narrow_memwrite(asmjit::a64::Assembler &a, const be_parameter &addrp, const parameter &spacesizep, const memory_accessors &accessors) const
+{
+	// expects data in REG_PARAM3 and mask in REG_PARAM4
+
+	address_space &space = *m_space[spacesizep.space()];
+	auto const addrreg = (accessors.no_mask || accessors.mask_simple) ? REG_PARAM2 : a64::x5;
+	mov_reg_param(a, 4, addrreg, addrp);
+	get_imm_relative(a, a64::x8, uintptr_t(accessors.specific.write.dispatch));
+
+	// get the shift count for the data and offset in w7
+	int const shift = space.addr_shift() - 3;
+	uint32_t const shiftmask = (accessors.specific.native_bytes - (1 << spacesizep.size())) << 3;
+	if (space.endianness() != ENDIANNESS_LITTLE)
+	{
+		// swizzle for big Endian spaces
+		bool const smallshift = (shift <= 0) && (shift >= -3);
+		if (!smallshift)
+		{
+			if (shift < 0)
+				a.lsl(a64::w6, addrreg.w(), -shift);
+			else
+				a.lsr(a64::w6, addrreg.w(), shift);
+		}
+		a.mov(a64::w7, shiftmask);
+		if (smallshift)
+			a.bic(a64::w7, a64::w7, addrreg.w(), -shift);
+		else
+			a.bic(a64::w7, a64::w7, a64::w6);
+	}
+	else
+	{
+		if (!shift)
+		{
+			a.and_(a64::w7, addrreg.w(), shiftmask);
+		}
+		else
+		{
+			if (shift < 0)
+				a.lsl(a64::w7, addrreg.w(), -shift);
+			else
+				a.lsr(a64::w7, addrreg.w(), shift);
+			a.and_(a64::w7, a64::w7, shiftmask);
+		}
+	}
+
+	// if the high bits aren't affected by the global mask, extract them early
+	if (accessors.high_bits && !accessors.mask_high_bits)
+		a.ubfx(a64::w6, addrreg.w(), accessors.specific.low_bits, accessors.high_bits);
+
+	if (accessors.mask_simple)
+		a.and_(REG_PARAM2.w(), addrreg.w(), accessors.address_mask);
+	else if (!accessors.no_mask)
+		a.mov(REG_PARAM2.w(), accessors.address_mask); // 32-bit value, no more than two instructions
+
+	// if the high address bits aren't affected by the global mask, load the dispatch table entry now
+	if (!accessors.high_bits)
+		a.ldr(REG_PARAM1, a64::Mem(a64::x8));
+	else if (!accessors.mask_high_bits)
+		a.ldr(REG_PARAM1, a64::Mem(a64::x8, a64::x6, arm::Shift(arm::ShiftOp::kLSL, 3)));
+
+	// apply non-trivial global mask if necessary
+	if (!accessors.no_mask && !accessors.mask_simple)
+		a.and_(REG_PARAM2.w(), REG_PARAM2.w(), addrreg.w());
+
+	// if the high address bits are affected by the global mask, load the dispatch table entry now
+	if (accessors.mask_high_bits)
+	{
+		a.lsr(a64::w6, REG_PARAM2.w(), accessors.specific.low_bits);
+		a.ldr(REG_PARAM1, a64::Mem(a64::x8, a64::x6, arm::Shift(arm::ShiftOp::kLSL, 3)));
+	}
+
+	// apply this pointer displacement if necessary
+	if (accessors.specific.write.displacement)
+		a.add(REG_PARAM1, REG_PARAM1, accessors.specific.write.displacement); // assume less than 4K
+
+	// shift the data and mask
+	a.lsl(REG_PARAM3, REG_PARAM3, a64::x7);
+	a.lsl(REG_PARAM4, REG_PARAM4, a64::x7);
+
+	// call the write function
+	if (accessors.specific.write.is_virtual)
+	{
+		a.ldr(a64::x8, a64::Mem(REG_PARAM1));
+		a.ldr(a64::x8, a64::Mem(a64::x8, accessors.specific.write.function)); // assume no more than 4096 vtable entries
+		a.blr(a64::x8);
+	}
+	else
+	{
+		call_arm_addr(a, (const void *)accessors.specific.write.function);
+	}
+}
+
 void drcbe_arm64::mov_reg_param(a64::Assembler &a, uint32_t regsize, const a64::Gp &dst, const be_parameter &src) const
 {
 	if (src.is_immediate())
@@ -627,17 +1148,14 @@ void drcbe_arm64::mov_mem_param(a64::Assembler &a, uint32_t regsize, void *dst, 
 {
 	const a64::Gp scratch = select_register(SCRATCH_REG2, regsize);
 
-	if (src.is_immediate())
+	if (src.is_immediate_value(0))
 	{
-		if (src.is_immediate_value(0))
-		{
-			emit_str_mem(a, select_register(a64::xzr, regsize), dst);
-		}
-		else
-		{
-			get_imm_relative(a, scratch.x(), src.immediate());
-			emit_str_mem(a, scratch, dst);
-		}
+		emit_str_mem(a, select_register(a64::xzr, regsize), dst);
+	}
+	else if (src.is_immediate())
+	{
+		get_imm_relative(a, scratch.x(), src.immediate());
+		emit_str_mem(a, scratch, dst);
 	}
 	else if (src.is_memory())
 	{
@@ -714,25 +1232,6 @@ void drcbe_arm64::mov_param_imm(a64::Assembler &a, uint32_t regsize, const be_pa
 	}
 }
 
-void drcbe_arm64::mov_signed_reg64_param32(a64::Assembler &a, const a64::Gp &dst, const be_parameter &src) const
-{
-	if (src.is_memory())
-	{
-		emit_ldrsw_mem(a, dst.x(), src.memory());
-	}
-	else if (src.is_immediate())
-	{
-		get_imm_relative(a, dst.x(), src.immediate());
-
-		if (!src.is_immediate_value(0))
-			a.sxtw(dst.x(), dst.w());
-	}
-	else if (src.is_int_register())
-	{
-		a.sxtw(dst.x(), src.get_register_int(4));
-	}
-}
-
 void drcbe_arm64::mov_float_reg_param(a64::Assembler &a, uint32_t regsize, a64::Vec const &dst, const be_parameter &src) const
 {
 	assert(!src.is_immediate());
@@ -790,7 +1289,7 @@ void drcbe_arm64::mov_float_param_param(a64::Assembler &a, uint32_t regsize, con
 void drcbe_arm64::call_arm_addr(a64::Assembler &a, const void *offs) const
 {
 	const uint64_t codeoffs = a.code()->baseAddress() + a.offset();
-	const int64_t reloffs = (int64_t)offs - codeoffs;
+	const int64_t reloffs = int64_t(offs) - codeoffs;
 	if (is_valid_immediate_signed(reloffs, 26 + 2))
 	{
 		a.bl(offs);
@@ -802,53 +1301,10 @@ void drcbe_arm64::call_arm_addr(a64::Assembler &a, const void *offs) const
 	}
 }
 
-void drcbe_arm64::check_unordered_condition(a64::Assembler &a, uml::condition_t cond, Label condition_met, bool not_equal) const
+void drcbe_arm64::store_carry(a64::Assembler &a, bool inverted)
 {
-	if (cond != uml::COND_U && cond != uml::COND_NU)
-		return;
+	m_carry_state = inverted ? carry_state::LOGICAL : carry_state::CANONICAL;
 
-	get_unordered(a, SCRATCH_REG1);
-
-	if (cond == uml::COND_U)
-	{
-		if (not_equal)
-			a.cbz(SCRATCH_REG1, condition_met);
-		else
-			a.cbnz(SCRATCH_REG1, condition_met);
-	}
-	else
-	{
-		if (not_equal)
-			a.cbnz(SCRATCH_REG1, condition_met);
-		else
-			a.cbz(SCRATCH_REG1, condition_met);
-	}
-}
-
-void drcbe_arm64::store_unordered(a64::Assembler &a) const
-{
-	a.cset(SCRATCH_REG1, a64::CondCode::kPL);
-	a.cset(SCRATCH_REG2, a64::CondCode::kNE);
-	a.and_(SCRATCH_REG1, SCRATCH_REG1, SCRATCH_REG2);
-	a.cset(SCRATCH_REG2, a64::CondCode::kCS);
-	a.and_(SCRATCH_REG1, SCRATCH_REG1, SCRATCH_REG2);
-	a.cset(SCRATCH_REG2, a64::CondCode::kVS);
-	a.and_(SCRATCH_REG1, SCRATCH_REG1, SCRATCH_REG2);
-	a.bfi(FLAGS_REG, SCRATCH_REG2, 4, 1);
-}
-
-void drcbe_arm64::get_unordered(a64::Assembler &a, const a64::Gp &reg) const
-{
-	a.ubfx(reg.x(), FLAGS_REG, 4, 1);
-}
-
-void drcbe_arm64::store_carry_reg(a64::Assembler &a, const a64::Gp &reg) const
-{
-	a.bfi(FLAGS_REG, reg.x(), 0, 1);
-}
-
-void drcbe_arm64::store_carry(a64::Assembler &a, bool inverted) const
-{
 	if (inverted)
 		a.cset(SCRATCH_REG1, a64::CondCode::kCC);
 	else
@@ -857,27 +1313,45 @@ void drcbe_arm64::store_carry(a64::Assembler &a, bool inverted) const
 	store_carry_reg(a, SCRATCH_REG1);
 }
 
-void drcbe_arm64::get_carry(a64::Assembler &a, const a64::Gp &reg, bool inverted) const
+void drcbe_arm64::load_carry(a64::Assembler &a, bool inverted)
 {
-	a.and_(reg.x(), FLAGS_REG, 1);
+	const carry_state desired = inverted ? carry_state::LOGICAL : carry_state::CANONICAL;
+	if (desired != m_carry_state)
+	{
+		m_carry_state = desired;
 
-	if (inverted)
-		a.eor(reg.x(), reg.x(), 1);
+		a.mrs(SCRATCH_REG1, a64::Predicate::SysReg::kNZCV);
+		a.bfi(SCRATCH_REG1, FLAGS_REG, 29, 1);
+
+		if (inverted)
+			a.eor(SCRATCH_REG1, SCRATCH_REG1, 1 << 29);
+
+		a.msr(a64::Predicate::SysReg::kNZCV, SCRATCH_REG1);
+	}
 }
 
-void drcbe_arm64::load_carry(a64::Assembler &a, bool inverted) const
+void drcbe_arm64::set_flags(asmjit::a64::Assembler &a)
 {
-	a.mrs(SCRATCH_REG1, a64::Predicate::SysReg::kNZCV);
-	a.bfi(SCRATCH_REG1, FLAGS_REG, 29, 1);
+	// Set native condition codes after loading flags register
+	m_carry_state = carry_state::POISON; // TODO: take a bet they'll try a conditional branch and set the C flag?
 
-	if (inverted)
-		a.eor(SCRATCH_REG1, SCRATCH_REG1, 1 << 29);
+	a.mrs(TEMP_REG1, a64::Predicate::SysReg::kNZCV);
 
-	a.msr(a64::Predicate::SysReg::kNZCV, SCRATCH_REG1);
+	a.and_(TEMP_REG2, FLAGS_REG, 0b1100); // zero + sign
+	a.ubfx(TEMP_REG3, FLAGS_REG, FLAG_BIT_V, 1); // overflow flag
+	a.orr(TEMP_REG2, TEMP_REG2, TEMP_REG3);
+	a.bfi(TEMP_REG1, TEMP_REG2, 28, 4);
+
+	a.msr(a64::Predicate::SysReg::kNZCV, TEMP_REG1);
+
+	a.mov(TEMP_REG2, FLAG_C | FLAG_U);
+	a.and_(FLAGS_REG, FLAGS_REG, TEMP_REG2);
 }
 
-void drcbe_arm64::calculate_carry_shift_left(a64::Assembler &a, const a64::Gp &reg, const a64::Gp &shift, int maxBits) const
+void drcbe_arm64::calculate_carry_shift_left(a64::Assembler &a, const a64::Gp &reg, const a64::Gp &shift, int maxBits)
 {
+	m_carry_state = carry_state::POISON;
+
 	Label calc = a.newLabel();
 	Label end = a.newLabel();
 
@@ -897,8 +1371,10 @@ void drcbe_arm64::calculate_carry_shift_left(a64::Assembler &a, const a64::Gp &r
 	a.bind(end);
 }
 
-void drcbe_arm64::calculate_carry_shift_left_imm(a64::Assembler &a, const a64::Gp &reg, const int shift, int maxBits) const
+void drcbe_arm64::calculate_carry_shift_left_imm(a64::Assembler &a, const a64::Gp &reg, const int shift, int maxBits)
 {
+	m_carry_state = carry_state::POISON;
+
 	if (shift == 0)
 	{
 		store_carry_reg(a, a64::xzr);
@@ -912,8 +1388,10 @@ void drcbe_arm64::calculate_carry_shift_left_imm(a64::Assembler &a, const a64::G
 	store_carry_reg(a, scratch);
 }
 
-void drcbe_arm64::calculate_carry_shift_right(a64::Assembler &a, const a64::Gp &reg, const a64::Gp &shift) const
+void drcbe_arm64::calculate_carry_shift_right(a64::Assembler &a, const a64::Gp &reg, const a64::Gp &shift)
 {
+	m_carry_state = carry_state::POISON;
+
 	Label calc = a.newLabel();
 	Label end = a.newLabel();
 
@@ -932,8 +1410,10 @@ void drcbe_arm64::calculate_carry_shift_right(a64::Assembler &a, const a64::Gp &
 	a.bind(end);
 }
 
-void drcbe_arm64::calculate_carry_shift_right_imm(a64::Assembler &a, const a64::Gp &reg, const int shift) const
+void drcbe_arm64::calculate_carry_shift_right_imm(a64::Assembler &a, const a64::Gp &reg, const int shift)
 {
+	m_carry_state = carry_state::POISON;
+
 	if (shift == 0)
 	{
 		store_carry_reg(a, a64::xzr);
@@ -952,9 +1432,11 @@ drcbe_arm64::drcbe_arm64(drcuml_state &drcuml, device_t &device, drc_cache &cach
 	, m_hash(cache, modes, addrbits, ignorebits)
 	, m_map(cache, 0xaaaaaaaa5555)
 	, m_log_asmjit(nullptr)
+	, m_carry_state(carry_state::POISON)
 	, m_entry(nullptr)
 	, m_exit(nullptr)
 	, m_nocode(nullptr)
+	, m_endofblock(nullptr)
 	, m_baseptr(cache.near() + 0x100)
 	, m_near(*(near_state *)cache.alloc_near(sizeof(m_near)))
 {
@@ -973,15 +1455,23 @@ drcbe_arm64::drcbe_arm64(drcuml_state &drcuml, device_t &device, drc_cache &cach
 	// resolve the actual addresses of member functions we need to call
 	m_drcmap_get_value.set(m_map, &drc_map_variables::get_value);
 	if (!m_drcmap_get_value)
-	{
-		m_drcmap_get_value.obj = uintptr_t(&m_map);
-		m_drcmap_get_value.func = reinterpret_cast<uint8_t *>(uintptr_t(&drc_map_variables::static_get_value));
-	}
-	m_resolved_accessors.resize(m_space.size());
+		throw emu_fatalerror("Error resolving map variable get value function!\n");
+	m_memory_accessors.resize(m_space.size());
 	for (int space = 0; m_space.size() > space; ++space)
 	{
 		if (m_space[space])
-			m_resolved_accessors[space].set(*m_space[space]);
+		{
+			auto &accessors = m_memory_accessors[space];
+			accessors.resolved.set(*m_space[space]);
+			accessors.specific = m_space[space]->specific_accessors();
+			accessors.address_mask = m_space[space]->addrmask() & make_bitmask<offs_t>(accessors.specific.address_width) & ~make_bitmask<offs_t>(accessors.specific.native_mask_bits);
+			offs_t const shiftedmask = accessors.address_mask >> accessors.specific.low_bits;
+			offs_t const nomask = ~offs_t(0);
+			accessors.high_bits = 32 - count_leading_zeros_32(shiftedmask);
+			accessors.no_mask = nomask == accessors.address_mask;
+			accessors.mask_simple = !accessors.no_mask && is_valid_immediate_mask(accessors.address_mask, 4);
+			accessors.mask_high_bits = (shiftedmask & (shiftedmask + 1)) != 0;
+		}
 	}
 }
 
@@ -998,9 +1488,9 @@ size_t drcbe_arm64::emit(CodeHolder &ch)
 	size_t const alignment = ch.baseAddress() - uint64_t(m_cache.top());
 	size_t const code_size = ch.codeSize();
 
-	// test if enough room remains in drc cache
+	// test if enough room remains in the DRC cache
 	drccodeptr *cachetop = m_cache.begin_codegen(alignment + code_size);
-	if (cachetop == nullptr)
+	if (!cachetop)
 		return 0;
 
 	err = ch.copyFlattenedData(drccodeptr(ch.baseAddress()), code_size, CopySectionFlags::kPadTargetBuffer);
@@ -1053,7 +1543,7 @@ void drcbe_arm64::reset()
 
 	a.emitProlog(frame);
 
-	a.ldr(BASE_REG, get_mem_absolute(a, &m_baseptr));
+	get_imm_absolute(a, BASE_REG, uintptr_t(m_baseptr));
 	emit_ldr_mem(a, FLAGS_REG.w(), &m_near.emulated_flags);
 
 	a.emitArgsAssignment(frame, args);
@@ -1074,13 +1564,21 @@ void drcbe_arm64::reset()
 	a.bind(a.newNamedLabel("nocode_point"));
 	a.br(REG_PARAM1);
 
+	// generate an end-of-block handler point
+	m_endofblock = dst + a.offset();
+	a.bind(a.newNamedLabel("end_of_block_point"));
+	auto const [entrypoint, adjusted] = util::resolve_member_function(&drcbe_arm64::end_of_block, *this);
+	get_imm_relative(a, REG_PARAM1, adjusted);
+	call_arm_addr(a, (const void *)entrypoint);
+
 	// emit the generated code
 	emit(ch);
 
 	// reset our hash tables
 	m_hash.reset();
-
 	m_hash.set_default_codeptr(m_nocode);
+
+	m_carry_state = carry_state::POISON;
 }
 
 int drcbe_arm64::execute(code_handle &entry)
@@ -1096,17 +1594,13 @@ void drcbe_arm64::generate(drcuml_block &block, const instruction *instlist, uin
 	{
 		m_debug_cpu_instruction_hook.set(*m_device.debug(), &device_debug::instruction_hook);
 		if (!m_debug_cpu_instruction_hook)
-		{
-			m_debug_cpu_instruction_hook.obj = uintptr_t(m_device.debug());
-			using debugger_hook_func = void (*)(device_debug *, offs_t);
-			static const auto debugger_inst_hook = [] (device_debug *dbg, offs_t pc) { dbg->instruction_hook(pc); };
-			m_debug_cpu_instruction_hook.func = reinterpret_cast<uint8_t *>(uintptr_t(debugger_hook_func(debugger_inst_hook)));
-		}
+			throw emu_fatalerror("Error resolving debugger instruction hook member function!\n");
 	}
 
 	// tell all of our utility objects that a block is beginning
 	m_hash.block_begin(block, instlist, numinst);
 	m_map.block_begin(block);
+	m_carry_state = carry_state::POISON;
 
 	// compute the base by aligning the cache top to a cache line
 	auto [err, linesize] = osd_get_cache_line_size();
@@ -1147,11 +1641,24 @@ void drcbe_arm64::generate(drcuml_block &block, const instruction *instlist, uin
 		const instruction &inst = instlist[inum];
 		assert(inst.opcode() < std::size(s_opcode_table));
 
+		// must remain in scope until output
+		std::string dasm;
+
+		// add a comment
+		if (logger.file())
+		{
+			dasm = inst.disasm(&m_drcuml);
+			a.setInlineComment(dasm.c_str());
+		}
+
 		// generate code
 		(this->*s_opcode_table[inst.opcode()])(a, inst);
 	}
 
-	emit_str_mem(a, FLAGS_REG.w(), &m_near.emulated_flags);
+	// catch falling off the end of a block
+	if (logger.file())
+		a.setInlineComment("end of block");
+	a.b(m_endofblock);
 
 	// emit the generated code
 	if (!emit(ch))
@@ -1162,12 +1669,12 @@ void drcbe_arm64::generate(drcuml_block &block, const instruction *instlist, uin
 	m_map.block_end(block);
 }
 
-bool drcbe_arm64::hash_exists(uint32_t mode, uint32_t pc)
+bool drcbe_arm64::hash_exists(uint32_t mode, uint32_t pc) const noexcept
 {
 	return m_hash.code_exists(mode, pc);
 }
 
-void drcbe_arm64::get_info(drcbe_info &info)
+void drcbe_arm64::get_info(drcbe_info &info) const noexcept
 {
 	for (info.direct_iregs = 0; info.direct_iregs < REG_I_COUNT; info.direct_iregs++)
 	{
@@ -1182,12 +1689,24 @@ void drcbe_arm64::get_info(drcbe_info &info)
 	}
 }
 
+
+[[noreturn]] void drcbe_arm64::end_of_block() const
+{
+	osd_printf_error("drcbe_arm64(%s): fell off the end of a generated code block!\n", m_device.tag());
+	std::fflush(stdout);
+	std::fflush(stderr);
+	std::abort();
+}
+
+
 void drcbe_arm64::op_handle(a64::Assembler &a, const uml::instruction &inst)
 {
 	assert_no_condition(inst);
 	assert_no_flags(inst);
 	assert(inst.numparams() == 1);
 	assert(inst.param(0).is_code_handle());
+
+	m_carry_state = carry_state::POISON;
 
 	// make a label for documentation
 	Label handle = a.newNamedLabel(inst.param(0).handle().string());
@@ -1200,7 +1719,7 @@ void drcbe_arm64::op_handle(a64::Assembler &a, const uml::instruction &inst)
 	// register the current pointer for the handle
 	inst.param(0).handle().set_codeptr(drccodeptr(a.code()->baseAddress() + a.offset()));
 
-	// the handle points to prolog code that creates a minimal non-leaf frame
+	// the handle points to prologue code that creates a minimal non-leaf frame
 	a.stp(a64::x29, a64::x30, arm::Mem(a64::sp, -16).pre());
 	a.bind(skip);
 }
@@ -1212,6 +1731,8 @@ void drcbe_arm64::op_hash(a64::Assembler &a, const uml::instruction &inst)
 	assert(inst.numparams() == 2);
 	assert(inst.param(0).is_immediate());
 	assert(inst.param(1).is_immediate());
+
+	m_carry_state = carry_state::POISON;
 
 	const uint64_t mode = inst.param(0).immediate();
 	const uint64_t pc = inst.param(1).immediate();
@@ -1225,6 +1746,8 @@ void drcbe_arm64::op_label(a64::Assembler &a, const uml::instruction &inst)
 	assert_no_flags(inst);
 	assert(inst.numparams() == 1);
 	assert(inst.param(0).is_code_label());
+
+	m_carry_state = carry_state::POISON;
 
 	std::string labelName = util::string_format("PC$%x", inst.param(0).label());
 	Label label = a.labelByName(labelName.c_str());
@@ -1258,7 +1781,8 @@ void drcbe_arm64::op_mapvar(a64::Assembler &a, const uml::instruction &inst)
 
 void drcbe_arm64::op_nop(a64::Assembler &a, const uml::instruction &inst)
 {
-	a.nop();
+	// nothing
+	//a.nop();
 }
 
 void drcbe_arm64::op_break(a64::Assembler &a, const uml::instruction &inst)
@@ -1266,6 +1790,8 @@ void drcbe_arm64::op_break(a64::Assembler &a, const uml::instruction &inst)
 	assert(inst.size() == 4);
 	assert_no_condition(inst);
 	assert_no_flags(inst);
+
+	m_carry_state = carry_state::POISON;
 
 	static const char *const message = "break from drc";
 	get_imm_relative(a, REG_PARAM1, (uintptr_t)message);
@@ -1278,10 +1804,12 @@ void drcbe_arm64::op_debug(a64::Assembler &a, const uml::instruction &inst)
 	assert_no_condition(inst);
 	assert_no_flags(inst);
 
-	const a64::Gp temp = TEMP_REG1.w();
-
 	if (m_device.machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
+		m_carry_state = carry_state::POISON;
+
+		const a64::Gp temp = TEMP_REG1.w();
+
 		be_parameter pcp(*this, inst.param(0), PTYPE_MRI);
 
 		Label skip = a.newLabel();
@@ -1306,23 +1834,14 @@ void drcbe_arm64::op_exit(a64::Assembler &a, const uml::instruction &inst)
 
 	be_parameter retp(*this, inst.param(0), PTYPE_MRI);
 
-	mov_reg_param(a, 4, REG_PARAM1, retp);
+	Label skip;
+	emit_skip(a, inst.condition(), skip);
 
-	if (inst.condition() == uml::COND_ALWAYS)
-	{
-		a.b(m_exit);
-	}
-	else if (inst.condition() == uml::COND_U || inst.condition() == uml::COND_NU)
-	{
-		Label skip = a.newLabel();
-		check_unordered_condition(a, inst.condition(), skip, false);
-		a.b(m_exit);
+	mov_reg_param(a, 4, REG_PARAM1, retp);
+	a.b(m_exit);
+
+	if (inst.condition() != uml::COND_ALWAYS)
 		a.bind(skip);
-	}
-	else
-	{
-		a.b(ARM_CONDITION(a, inst.condition()), m_exit);
-	}
 }
 
 void drcbe_arm64::op_hashjmp(a64::Assembler &a, const uml::instruction &inst)
@@ -1430,6 +1949,8 @@ void drcbe_arm64::op_hashjmp(a64::Assembler &a, const uml::instruction &inst)
 		emit_ldr_mem(a, SCRATCH_REG1, targetptr);
 		a.blr(SCRATCH_REG1);
 	}
+
+	m_carry_state = carry_state::POISON;
 }
 
 void drcbe_arm64::op_jmp(a64::Assembler &a, const uml::instruction &inst)
@@ -1447,16 +1968,62 @@ void drcbe_arm64::op_jmp(a64::Assembler &a, const uml::instruction &inst)
 		jmptarget = a.newNamedLabel(labelName.c_str());
 
 	if (inst.condition() == uml::COND_ALWAYS)
-		a.b(jmptarget);
-	else
 	{
-		if (inst.condition() == COND_C || inst.condition() == COND_NC || inst.condition() == COND_A || inst.condition() == COND_BE)
-			load_carry(a, true);
+		a.b(jmptarget);
+		return;
+	}
 
-		if (inst.condition() == uml::COND_U || inst.condition() == uml::COND_NU)
-			check_unordered_condition(a, inst.condition(), jmptarget, false);
-		else
-			a.b(ARM_CONDITION(a, inst.condition()), jmptarget);
+	const bool bound = a.code()->isLabelBound(jmptarget);
+	const uint64_t targetoffs = a.code()->baseAddress() + a.code()->labelOffset(jmptarget);
+	const uint64_t codeoffs = a.code()->baseAddress() + a.offset();
+	const bool tbnzrange = bound && is_valid_immediate_signed(int64_t(targetoffs) - codeoffs, 14 + 2);
+
+	switch (inst.condition())
+	{
+		case uml::COND_U:
+		case uml::COND_NU:
+			if (tbnzrange)
+			{
+				const a64::Inst::Id opcode = (inst.condition() == uml::COND_U) ? a64::Inst::kIdTbnz : a64::Inst::kIdTbz;
+				a.emit(opcode, FLAGS_REG, FLAG_BIT_U, jmptarget);
+			}
+			else
+			{
+				const a64::Inst::Id opcode = (inst.condition() == uml::COND_U) ? a64::Inst::kIdCbnz : a64::Inst::kIdCbz;
+				get_unordered(a, SCRATCH_REG1);
+				a.emit(opcode, SCRATCH_REG1, jmptarget);
+			}
+			break;
+		case uml::COND_C:
+		case uml::COND_NC:
+			switch (m_carry_state)
+			{
+				case carry_state::CANONICAL:
+					a.b(ARM_NOT_CONDITION(inst.condition()), jmptarget);
+					break;
+				case carry_state::LOGICAL:
+					a.b(ARM_CONDITION(inst.condition()), jmptarget);
+					break;
+				default:
+					if (tbnzrange)
+					{
+						const a64::Inst::Id opcode = (inst.condition() == uml::COND_C) ? a64::Inst::kIdTbnz : a64::Inst::kIdTbz;
+						a.emit(opcode, FLAGS_REG, FLAG_BIT_C, jmptarget);
+					}
+					else
+					{
+						const a64::Inst::Id opcode = (inst.condition() == uml::COND_C) ? a64::Inst::kIdCbnz : a64::Inst::kIdCbz;
+						get_carry(a, SCRATCH_REG1);
+						a.emit(opcode, SCRATCH_REG1, jmptarget);
+					}
+			}
+			break;
+		case uml::COND_A:
+		case uml::COND_BE:
+			load_carry(a, true);
+			[[fallthrough]];
+		default:
+			a.b(ARM_CONDITION(inst.condition()), jmptarget);
 	}
 }
 
@@ -1471,18 +2038,7 @@ void drcbe_arm64::op_exh(a64::Assembler &a, const uml::instruction &inst)
 
 	// perform the exception processing
 	Label no_exception;
-	if (inst.condition() != uml::COND_ALWAYS)
-	{
-		no_exception = a.newLabel();
-
-		if (inst.condition() == COND_C || inst.condition() == COND_NC || inst.condition() == COND_A || inst.condition() == COND_BE)
-			load_carry(a, true);
-
-		if (inst.condition() == uml::COND_U || inst.condition() == uml::COND_NU)
-			check_unordered_condition(a, inst.condition(), no_exception, true);
-		else
-			a.b(ARM_NOT_CONDITION(a, inst.condition()), no_exception);
-	}
+	emit_skip(a, inst.condition(), no_exception);
 
 	mov_mem_param(a, 4, &m_state.exp, exp);
 
@@ -1499,6 +2055,8 @@ void drcbe_arm64::op_exh(a64::Assembler &a, const uml::instruction &inst)
 
 	if (inst.condition() != uml::COND_ALWAYS)
 		a.bind(no_exception);
+
+	m_carry_state = carry_state::POISON;
 }
 
 void drcbe_arm64::op_callh(a64::Assembler &a, const uml::instruction &inst)
@@ -1511,18 +2069,7 @@ void drcbe_arm64::op_callh(a64::Assembler &a, const uml::instruction &inst)
 	assert(handp.is_code_handle());
 
 	Label skip;
-	if (inst.condition() != uml::COND_ALWAYS)
-	{
-		skip = a.newLabel();
-
-		if (inst.condition() == COND_C || inst.condition() == COND_NC || inst.condition() == COND_A || inst.condition() == COND_BE)
-			load_carry(a, true);
-
-		if (inst.condition() == uml::COND_U || inst.condition() == uml::COND_NU)
-			check_unordered_condition(a, inst.condition(), skip, true);
-		else
-			a.b(ARM_NOT_CONDITION(a, inst.condition()), skip);
-	}
+	emit_skip(a, inst.condition(), skip);
 
 	drccodeptr *const targetptr = handp.handle().codeptr_addr();
 	if (*targetptr != nullptr)
@@ -1537,6 +2084,8 @@ void drcbe_arm64::op_callh(a64::Assembler &a, const uml::instruction &inst)
 
 	if (inst.condition() != uml::COND_ALWAYS)
 		a.bind(skip);
+
+	m_carry_state = carry_state::POISON;
 }
 
 void drcbe_arm64::op_ret(a64::Assembler &a, const uml::instruction &inst)
@@ -1547,18 +2096,7 @@ void drcbe_arm64::op_ret(a64::Assembler &a, const uml::instruction &inst)
 	assert(inst.numparams() == 0);
 
 	Label skip;
-	if (inst.condition() != uml::COND_ALWAYS)
-	{
-		skip = a.newLabel();
-
-		if (inst.condition() == COND_C || inst.condition() == COND_NC || inst.condition() == COND_A || inst.condition() == COND_BE)
-			load_carry(a, true);
-
-		if (inst.condition() == uml::COND_U || inst.condition() == uml::COND_NU)
-			check_unordered_condition(a, inst.condition(), skip, true);
-		else
-			a.b(ARM_NOT_CONDITION(a, inst.condition()), skip);
-	}
+	emit_skip(a, inst.condition(), skip);
 
 	a.ldp(a64::x29, a64::x30, arm::Mem(a64::sp).post(16));
 	a.ret(a64::x30);
@@ -1578,18 +2116,7 @@ void drcbe_arm64::op_callc(a64::Assembler &a, const uml::instruction &inst)
 	be_parameter paramp(*this, inst.param(1), PTYPE_M);
 
 	Label skip;
-	if (inst.condition() != uml::COND_ALWAYS)
-	{
-		skip = a.newLabel();
-
-		if (inst.condition() == COND_C || inst.condition() == COND_NC || inst.condition() == COND_A || inst.condition() == COND_BE)
-			load_carry(a, true);
-
-		if (inst.condition() == uml::COND_U || inst.condition() == uml::COND_NU)
-			check_unordered_condition(a, inst.condition(), skip, true);
-		else
-			a.b(ARM_NOT_CONDITION(a, inst.condition()), skip);
-	}
+	emit_skip(a, inst.condition(), skip);
 
 	emit_str_mem(a, FLAGS_REG.w(), &m_near.emulated_flags);
 
@@ -1601,6 +2128,8 @@ void drcbe_arm64::op_callc(a64::Assembler &a, const uml::instruction &inst)
 
 	if (inst.condition() != uml::COND_ALWAYS)
 		a.bind(skip);
+
+	m_carry_state = carry_state::POISON;
 }
 
 void drcbe_arm64::op_recover(a64::Assembler &a, const uml::instruction &inst)
@@ -1609,12 +2138,14 @@ void drcbe_arm64::op_recover(a64::Assembler &a, const uml::instruction &inst)
 	assert_no_condition(inst);
 	assert_no_flags(inst);
 
+	m_carry_state = carry_state::POISON;
+
 	be_parameter dstp(*this, inst.param(0), PTYPE_MR);
 
-	get_imm_relative(a, REG_PARAM1, m_drcmap_get_value.obj);
 	a.ldr(REG_PARAM2, arm::Mem(a64::x29, -8)); // saved LR (x30) from first level CALLH/EXH or failed hash jump
-	a.sub(REG_PARAM2, REG_PARAM2, 4);
+	get_imm_relative(a, REG_PARAM1, m_drcmap_get_value.obj);
 	a.mov(REG_PARAM3, inst.param(1).mapvar());
+	a.sub(REG_PARAM2, REG_PARAM2, 4);
 
 	call_arm_addr(a, m_drcmap_get_value.func);
 
@@ -1628,7 +2159,6 @@ void drcbe_arm64::op_setfmod(a64::Assembler &a, const uml::instruction &inst)
 	assert_no_flags(inst);
 
 	be_parameter srcp(*this, inst.param(0), PTYPE_MRI);
-	const a64::Gp src = srcp.select_register(TEMP_REG1, inst.size());
 	const a64::Gp scratch = select_register(FUNC_SCRATCH_REG, inst.size());
 
 	if (srcp.is_immediate())
@@ -1637,6 +2167,8 @@ void drcbe_arm64::op_setfmod(a64::Assembler &a, const uml::instruction &inst)
 	}
 	else
 	{
+		const a64::Gp src = srcp.select_register(FUNC_SCRATCH_REG, inst.size());
+
 		mov_reg_param(a, inst.size(), src, srcp);
 		a.and_(scratch, src, 3);
 	}
@@ -1682,34 +2214,75 @@ void drcbe_arm64::op_getflgs(a64::Assembler &a, const uml::instruction &inst)
 
 	const a64::Gp dst = dstp.select_register(TEMP_REG1, 8);
 
-	a.mov(dst, a64::xzr);
+	bool first = true;
 
 	if (maskp.immediate() & FLAG_C)
-		a.and_(dst, FLAGS_REG, 1);
+	{
+		a.and_(dst, FLAGS_REG, FLAG_C);
+		first = false;
+	}
 
 	if (maskp.immediate() & FLAG_V)
 	{
-		a.cset(SCRATCH_REG1, a64::CondCode::kVS);
-		a.orr(dst, dst, SCRATCH_REG1, 1);
+		if (first)
+		{
+			a.cset(dst, a64::CondCode::kVS);
+			a.lsl(dst, dst, FLAG_BIT_V);
+			first = false;
+		}
+		else
+		{
+			a.cset(SCRATCH_REG1, a64::CondCode::kVS);
+			a.orr(dst, dst, SCRATCH_REG1, FLAG_BIT_V);
+		}
 	}
 
 	if (maskp.immediate() & FLAG_Z)
 	{
-		a.cset(SCRATCH_REG1, a64::CondCode::kEQ);
-		a.orr(dst, dst, SCRATCH_REG1, 2);
+		if (first)
+		{
+			a.cset(dst, a64::CondCode::kEQ);
+			a.lsl(dst, dst, FLAG_BIT_Z);
+			first = false;
+		}
+		else
+		{
+			a.cset(SCRATCH_REG1, a64::CondCode::kEQ);
+			a.orr(dst, dst, SCRATCH_REG1, FLAG_BIT_Z);
+		}
 	}
 
 	if (maskp.immediate() & FLAG_S)
 	{
-		a.cset(SCRATCH_REG1, a64::CondCode::kMI);
-		a.orr(dst, dst, SCRATCH_REG1, 3);
+		if (first)
+		{
+			a.cset(dst, a64::CondCode::kMI);
+			a.lsl(dst, dst, FLAG_BIT_S);
+			first = false;
+		}
+		else
+		{
+			a.cset(SCRATCH_REG1, a64::CondCode::kMI);
+			a.orr(dst, dst, SCRATCH_REG1, FLAG_BIT_S);
+		}
 	}
 
 	if (maskp.immediate() & FLAG_U)
 	{
-		get_unordered(a, SCRATCH_REG1);
-		a.orr(dst, dst, SCRATCH_REG1, 4);
+		if (first)
+		{
+			a.and_(dst, FLAGS_REG, FLAG_U);
+			first = false;
+		}
+		else
+		{
+			a.and_(SCRATCH_REG1, FLAGS_REG, FLAG_U);
+			a.orr(dst, dst, SCRATCH_REG1);
+		}
 	}
+
+	if (first)
+		a.mov(dst, a64::xzr);
 
 	mov_param_reg(a, inst.size(), dstp, dst);
 }
@@ -1722,15 +2295,7 @@ void drcbe_arm64::op_setflgs(a64::Assembler &a, const uml::instruction &inst)
 	be_parameter flagsp(*this, inst.param(0), PTYPE_MRI);
 
 	mov_reg_param(a, inst.size(), FLAGS_REG, flagsp);
-
-	a.mrs(TEMP_REG1, a64::Predicate::SysReg::kNZCV);
-
-	a.and_(TEMP_REG2, FLAGS_REG, 0b1100); // zero + sign
-	a.ubfx(TEMP_REG3, FLAGS_REG, 1, 1); // overflow flag
-	a.orr(TEMP_REG2, TEMP_REG2, TEMP_REG3);
-	a.bfi(TEMP_REG1, TEMP_REG2, 28, 4);
-
-	a.msr(a64::Predicate::SysReg::kNZCV, TEMP_REG1);
+	set_flags(a);
 }
 
 void drcbe_arm64::op_save(a64::Assembler &a, const uml::instruction &inst)
@@ -1752,7 +2317,7 @@ void drcbe_arm64::op_save(a64::Assembler &a, const uml::instruction &inst)
 	a.and_(TEMP_REG2, TEMP_REG1, 0b1100); // zero + sign
 	a.orr(TEMP_REG2, TEMP_REG2, FLAGS_REG); // carry + unordered flags
 
-	a.bfi(TEMP_REG2, TEMP_REG1, 1, 1); // overflow flag
+	a.bfi(TEMP_REG2, TEMP_REG1, FLAG_BIT_V, 1); // overflow flag
 
 	a.strb(TEMP_REG2.w(), arm::Mem(membase, offsetof(drcuml_machine_state, flags)));
 
@@ -1837,15 +2402,7 @@ void drcbe_arm64::op_restore(a64::Assembler &a, const uml::instruction &inst)
 	emit_str_mem(a, TEMP_REG1.w(), &m_state.exp);
 
 	a.ldrb(FLAGS_REG.w(), arm::Mem(membase, offsetof(drcuml_machine_state, flags)));
-
-	a.mrs(TEMP_REG1, a64::Predicate::SysReg::kNZCV);
-
-	a.and_(TEMP_REG2, FLAGS_REG, 0b1100); // zero + sign
-	a.ubfx(TEMP_REG3, FLAGS_REG, 1, 1); // overflow flag
-	a.orr(TEMP_REG2, TEMP_REG2, TEMP_REG3);
-	a.bfi(TEMP_REG1, TEMP_REG2, 28, 4);
-
-	a.msr(a64::Predicate::SysReg::kNZCV, TEMP_REG1);
+	set_flags(a);
 }
 
 void drcbe_arm64::op_load(a64::Assembler &a, const uml::instruction &inst)
@@ -1930,18 +2487,18 @@ void drcbe_arm64::op_loads(a64::Assembler &a, const uml::instruction &inst)
 	const a64::Gp basereg = TEMP_REG1;
 	const a64::Gp dstreg = dstp.select_register(TEMP_REG2, inst.size());
 
-	const int32_t offset = indp.is_immediate() ? indp.immediate() << scalesizep.scale() : 0;
+	const int32_t offset = indp.is_immediate() ? (indp.immediate() << scalesizep.scale()) : 0;
 	if (indp.is_immediate() && is_valid_immediate(offset, 15))
 	{
 		// immediate index
 		if (size == SIZE_BYTE)
-			emit_ldrsb_mem(a, dstreg.x(), (uint8_t*)basep.memory() + offset);
+			emit_ldrsb_mem(a, dstreg.x(), (uint8_t *)basep.memory() + offset);
 		else if (size == SIZE_WORD)
-			emit_ldrsh_mem(a, dstreg.x(), (uint8_t*)basep.memory() + offset);
+			emit_ldrsh_mem(a, dstreg.x(), (uint8_t *)basep.memory() + offset);
 		else if (size == SIZE_DWORD)
-			emit_ldrsw_mem(a, dstreg.x(), (uint8_t*)basep.memory() + offset);
+			emit_ldrsw_mem(a, dstreg.x(), (uint8_t *)basep.memory() + offset);
 		else
-			emit_ldr_mem(a, dstreg.x(), (uint8_t*)basep.memory() + offset);
+			emit_ldr_mem(a, dstreg.x(), (uint8_t *)basep.memory() + offset);
 	}
 	else
 	{
@@ -2049,34 +2606,54 @@ void drcbe_arm64::op_read(a64::Assembler &a, const uml::instruction &inst)
 	assert_no_condition(inst);
 	assert_no_flags(inst);
 
+	m_carry_state = carry_state::POISON;
+
 	be_parameter dstp(*this, inst.param(0), PTYPE_MR);
 	be_parameter addrp(*this, inst.param(1), PTYPE_MRI);
 	const parameter &spacesizep = inst.param(2);
 	assert(spacesizep.is_size_space());
 
-	const auto &resolved = m_resolved_accessors[spacesizep.space()];
+	auto const &accessors = m_memory_accessors[spacesizep.space()];
+	bool const have_specific = (uintptr_t(nullptr) != accessors.specific.read.function) || accessors.specific.read.is_virtual;
 
-	mov_reg_param(a, 4, REG_PARAM2, addrp);
+	if (have_specific && ((1 << spacesizep.size()) == accessors.specific.native_bytes))
+	{
+		emit_memaccess_setup(a, addrp, accessors, accessors.specific.read);
+		if (accessors.specific.read.is_virtual)
+		{
+			a.ldr(a64::x8, a64::Mem(REG_PARAM1));
+			a.ldr(a64::x8, a64::Mem(a64::x8, accessors.specific.read.function)); // assume no more than 4096 vtable entries
+		}
+		a.mov(REG_PARAM3, make_bitmask<uint64_t>(accessors.specific.native_bytes << 3));
+		if (accessors.specific.read.is_virtual)
+			a.blr(a64::x8);
+		else
+			call_arm_addr(a, (const void *)accessors.specific.read.function);
+	}
+	else
+	{
+		mov_reg_param(a, 4, REG_PARAM2, addrp);
 
-	if (spacesizep.size() == SIZE_BYTE)
-	{
-		get_imm_relative(a, REG_PARAM1, resolved.read_byte.obj);
-		call_arm_addr(a, resolved.read_byte.func);
-	}
-	else if (spacesizep.size() == SIZE_WORD)
-	{
-		get_imm_relative(a, REG_PARAM1, resolved.read_word.obj);
-		call_arm_addr(a, resolved.read_word.func);
-	}
-	else if (spacesizep.size() == SIZE_DWORD)
-	{
-		get_imm_relative(a, REG_PARAM1, resolved.read_dword.obj);
-		call_arm_addr(a, resolved.read_dword.func);
-	}
-	else if (spacesizep.size() == SIZE_QWORD)
-	{
-		get_imm_relative(a, REG_PARAM1, resolved.read_qword.obj);
-		call_arm_addr(a, resolved.read_qword.func);
+		if (spacesizep.size() == SIZE_BYTE)
+		{
+			get_imm_relative(a, REG_PARAM1, accessors.resolved.read_byte.obj);
+			call_arm_addr(a, accessors.resolved.read_byte.func);
+		}
+		else if (spacesizep.size() == SIZE_WORD)
+		{
+			get_imm_relative(a, REG_PARAM1, accessors.resolved.read_word.obj);
+			call_arm_addr(a, accessors.resolved.read_word.func);
+		}
+		else if (spacesizep.size() == SIZE_DWORD)
+		{
+			get_imm_relative(a, REG_PARAM1, accessors.resolved.read_dword.obj);
+			call_arm_addr(a, accessors.resolved.read_dword.func);
+		}
+		else if (spacesizep.size() == SIZE_QWORD)
+		{
+			get_imm_relative(a, REG_PARAM1, accessors.resolved.read_qword.obj);
+			call_arm_addr(a, accessors.resolved.read_qword.func);
+		}
 	}
 
 	mov_param_reg(a, inst.size(), dstp, REG_PARAM1);
@@ -2088,36 +2665,57 @@ void drcbe_arm64::op_readm(a64::Assembler &a, const uml::instruction &inst)
 	assert_no_condition(inst);
 	assert_no_flags(inst);
 
+	m_carry_state = carry_state::POISON;
+
 	be_parameter dstp(*this, inst.param(0), PTYPE_MR);
 	be_parameter addrp(*this, inst.param(1), PTYPE_MRI);
 	be_parameter maskp(*this, inst.param(2), PTYPE_MRI);
 	const parameter &spacesizep = inst.param(3);
 	assert(spacesizep.is_size_space());
 
-	const auto &resolved = m_resolved_accessors[spacesizep.space()];
+	auto const &accessors = m_memory_accessors[spacesizep.space()];
+	bool const have_specific = (uintptr_t(nullptr) != accessors.specific.read.function) || accessors.specific.read.is_virtual;
 
-	mov_reg_param(a, 4, REG_PARAM2, addrp);
-	mov_reg_param(a, inst.size(), REG_PARAM3, maskp);
+	if (have_specific && ((1 << spacesizep.size()) == accessors.specific.native_bytes))
+	{
+		emit_memaccess_setup(a, addrp, accessors, accessors.specific.read);
+		mov_reg_param(a, inst.size(), REG_PARAM3, maskp);
+		if (accessors.specific.read.is_virtual)
+		{
+			a.ldr(a64::x8, a64::Mem(REG_PARAM1));
+			a.ldr(a64::x8, a64::Mem(a64::x8, accessors.specific.read.function)); // assume no more than 4096 vtable entries
+			a.blr(a64::x8);
+		}
+		else
+		{
+			call_arm_addr(a, (const void *)accessors.specific.read.function);
+		}
+	}
+	else
+	{
+		mov_reg_param(a, 4, REG_PARAM2, addrp);
+		mov_reg_param(a, inst.size(), REG_PARAM3, maskp);
 
-	if (spacesizep.size() == SIZE_BYTE)
-	{
-		get_imm_relative(a, REG_PARAM1, resolved.read_byte_masked.obj);
-		call_arm_addr(a, resolved.read_byte_masked.func);
-	}
-	else if (spacesizep.size() == SIZE_WORD)
-	{
-		get_imm_relative(a, REG_PARAM1, resolved.read_word_masked.obj);
-		call_arm_addr(a, resolved.read_word_masked.func);
-	}
-	else if (spacesizep.size() == SIZE_DWORD)
-	{
-		get_imm_relative(a, REG_PARAM1, resolved.read_dword_masked.obj);
-		call_arm_addr(a, resolved.read_dword_masked.func);
-	}
-	else if (spacesizep.size() == SIZE_QWORD)
-	{
-		get_imm_relative(a, REG_PARAM1, resolved.read_qword_masked.obj);
-		call_arm_addr(a, resolved.read_qword_masked.func);
+		if (spacesizep.size() == SIZE_BYTE)
+		{
+			get_imm_relative(a, REG_PARAM1, accessors.resolved.read_byte_masked.obj);
+			call_arm_addr(a, accessors.resolved.read_byte_masked.func);
+		}
+		else if (spacesizep.size() == SIZE_WORD)
+		{
+			get_imm_relative(a, REG_PARAM1, accessors.resolved.read_word_masked.obj);
+			call_arm_addr(a, accessors.resolved.read_word_masked.func);
+		}
+		else if (spacesizep.size() == SIZE_DWORD)
+		{
+			get_imm_relative(a, REG_PARAM1, accessors.resolved.read_dword_masked.obj);
+			call_arm_addr(a, accessors.resolved.read_dword_masked.func);
+		}
+		else if (spacesizep.size() == SIZE_QWORD)
+		{
+			get_imm_relative(a, REG_PARAM1, accessors.resolved.read_qword_masked.obj);
+			call_arm_addr(a, accessors.resolved.read_qword_masked.func);
+		}
 	}
 
 	mov_param_reg(a, inst.size(), dstp, REG_PARAM1);
@@ -2129,35 +2727,62 @@ void drcbe_arm64::op_write(a64::Assembler &a, const uml::instruction &inst)
 	assert_no_condition(inst);
 	assert_no_flags(inst);
 
+	m_carry_state = carry_state::POISON;
+
 	be_parameter addrp(*this, inst.param(0), PTYPE_MRI);
 	be_parameter srcp(*this, inst.param(1), PTYPE_MRI);
 	const parameter &spacesizep = inst.param(2);
 	assert(spacesizep.is_size_space());
 
-	const auto &resolved = m_resolved_accessors[spacesizep.space()];
+	auto const &accessors = m_memory_accessors[spacesizep.space()];
+	bool const have_specific = (uintptr_t(nullptr) != accessors.specific.write.function) || accessors.specific.write.is_virtual;
 
-	mov_reg_param(a, 4, REG_PARAM2, addrp);
-	mov_reg_param(a, inst.size(), REG_PARAM3, srcp);
+	if (have_specific && ((1 << spacesizep.size()) == accessors.specific.native_bytes))
+	{
+		emit_memaccess_setup(a, addrp, accessors, accessors.specific.write);
+		mov_reg_param(a, inst.size(), REG_PARAM3, srcp);
+		if (accessors.specific.write.is_virtual)
+		{
+			a.ldr(a64::x8, a64::Mem(REG_PARAM1));
+			a.ldr(a64::x8, a64::Mem(a64::x8, accessors.specific.write.function)); // assume no more than 4096 vtable entries
+		}
+		a.mov(REG_PARAM4, make_bitmask<uint64_t>(accessors.specific.native_bytes << 3));
+		if (accessors.specific.write.is_virtual)
+			a.blr(a64::x8);
+		else
+			call_arm_addr(a, (const void *)accessors.specific.write.function);
+	}
+	else if (have_specific && ((1 << spacesizep.size()) < accessors.specific.native_bytes))
+	{
+		mov_reg_param(a, inst.size(), REG_PARAM3, srcp);
+		a.mov(REG_PARAM4, make_bitmask<uint64_t>(8 << spacesizep.size()));
+		emit_narrow_memwrite(a, addrp, spacesizep, accessors);
+	}
+	else
+	{
+		mov_reg_param(a, 4, REG_PARAM2, addrp);
+		mov_reg_param(a, inst.size(), REG_PARAM3, srcp);
 
-	if (spacesizep.size() == SIZE_BYTE)
-	{
-		get_imm_relative(a, REG_PARAM1, resolved.write_byte.obj);
-		call_arm_addr(a, resolved.write_byte.func);
-	}
-	else if (spacesizep.size() == SIZE_WORD)
-	{
-		get_imm_relative(a, REG_PARAM1, resolved.write_word.obj);
-		call_arm_addr(a, resolved.write_word.func);
-	}
-	else if (spacesizep.size() == SIZE_DWORD)
-	{
-		get_imm_relative(a, REG_PARAM1, resolved.write_dword.obj);
-		call_arm_addr(a, resolved.write_dword.func);
-	}
-	else if (spacesizep.size() == SIZE_QWORD)
-	{
-		get_imm_relative(a, REG_PARAM1, resolved.write_qword.obj);
-		call_arm_addr(a, resolved.write_qword.func);
+		if (spacesizep.size() == SIZE_BYTE)
+		{
+			get_imm_relative(a, REG_PARAM1, accessors.resolved.write_byte.obj);
+			call_arm_addr(a, accessors.resolved.write_byte.func);
+		}
+		else if (spacesizep.size() == SIZE_WORD)
+		{
+			get_imm_relative(a, REG_PARAM1, accessors.resolved.write_word.obj);
+			call_arm_addr(a, accessors.resolved.write_word.func);
+		}
+		else if (spacesizep.size() == SIZE_DWORD)
+		{
+			get_imm_relative(a, REG_PARAM1, accessors.resolved.write_dword.obj);
+			call_arm_addr(a, accessors.resolved.write_dword.func);
+		}
+		else if (spacesizep.size() == SIZE_QWORD)
+		{
+			get_imm_relative(a, REG_PARAM1, accessors.resolved.write_qword.obj);
+			call_arm_addr(a, accessors.resolved.write_qword.func);
+		}
 	}
 }
 
@@ -2167,6 +2792,8 @@ void drcbe_arm64::op_writem(a64::Assembler &a, const uml::instruction &inst)
 	assert_no_condition(inst);
 	assert_no_flags(inst);
 
+	m_carry_state = carry_state::POISON;
+
 	be_parameter addrp(*this, inst.param(0), PTYPE_MRI);
 	be_parameter srcp(*this, inst.param(1), PTYPE_MRI);
 	be_parameter maskp(*this, inst.param(2), PTYPE_MRI);
@@ -2174,31 +2801,56 @@ void drcbe_arm64::op_writem(a64::Assembler &a, const uml::instruction &inst)
 	assert(spacesizep.is_size_space());
 
 	// set up a call to the write handler
-	const auto &resolved = m_resolved_accessors[spacesizep.space()];
+	auto const &accessors = m_memory_accessors[spacesizep.space()];
+	bool const have_specific = (uintptr_t(nullptr) != accessors.specific.write.function) || accessors.specific.write.is_virtual;
 
-	mov_reg_param(a, 4, REG_PARAM2, addrp);
-	mov_reg_param(a, inst.size(), REG_PARAM3, srcp);
-	mov_reg_param(a, inst.size(), REG_PARAM4, maskp);
+	if (have_specific && ((1 << spacesizep.size()) == accessors.specific.native_bytes))
+	{
+		emit_memaccess_setup(a, addrp, accessors, accessors.specific.write);
+		mov_reg_param(a, inst.size(), REG_PARAM3, srcp);
+		if (accessors.specific.write.is_virtual)
+		{
+			a.ldr(a64::x8, a64::Mem(REG_PARAM1));
+			a.ldr(a64::x8, a64::Mem(a64::x8, accessors.specific.write.function)); // assume no more than 4096 vtable entries
+		}
+		mov_reg_param(a, inst.size(), REG_PARAM4, maskp);
+		if (accessors.specific.write.is_virtual)
+			a.blr(a64::x8);
+		else
+			call_arm_addr(a, (const void *)accessors.specific.write.function);
+	}
+	else if (have_specific && ((1 << spacesizep.size()) < accessors.specific.native_bytes))
+	{
+		mov_reg_param(a, inst.size(), REG_PARAM3, srcp);
+		mov_reg_param(a, inst.size(), REG_PARAM4, maskp);
+		emit_narrow_memwrite(a, addrp, spacesizep, accessors);
+	}
+	else
+	{
+		mov_reg_param(a, 4, REG_PARAM2, addrp);
+		mov_reg_param(a, inst.size(), REG_PARAM3, srcp);
+		mov_reg_param(a, inst.size(), REG_PARAM4, maskp);
 
-	if (spacesizep.size() == SIZE_BYTE)
-	{
-		get_imm_relative(a, REG_PARAM1, resolved.write_byte_masked.obj);
-		call_arm_addr(a, resolved.write_byte_masked.func);
-	}
-	else if (spacesizep.size() == SIZE_WORD)
-	{
-		get_imm_relative(a, REG_PARAM1, resolved.write_word_masked.obj);
-		call_arm_addr(a, resolved.write_word_masked.func);
-	}
-	else if (spacesizep.size() == SIZE_DWORD)
-	{
-		get_imm_relative(a, REG_PARAM1, resolved.write_dword_masked.obj);
-		call_arm_addr(a, resolved.write_dword_masked.func);
-	}
-	else if (spacesizep.size() == SIZE_QWORD)
-	{
-		get_imm_relative(a, REG_PARAM1, resolved.write_qword_masked.obj);
-		call_arm_addr(a, resolved.write_qword_masked.func);
+		if (spacesizep.size() == SIZE_BYTE)
+		{
+			get_imm_relative(a, REG_PARAM1, accessors.resolved.write_byte_masked.obj);
+			call_arm_addr(a, accessors.resolved.write_byte_masked.func);
+		}
+		else if (spacesizep.size() == SIZE_WORD)
+		{
+			get_imm_relative(a, REG_PARAM1, accessors.resolved.write_word_masked.obj);
+			call_arm_addr(a, accessors.resolved.write_word_masked.func);
+		}
+		else if (spacesizep.size() == SIZE_DWORD)
+		{
+			get_imm_relative(a, REG_PARAM1, accessors.resolved.write_dword_masked.obj);
+			call_arm_addr(a, accessors.resolved.write_dword_masked.func);
+		}
+		else if (spacesizep.size() == SIZE_QWORD)
+		{
+			get_imm_relative(a, REG_PARAM1, accessors.resolved.write_qword_masked.obj);
+			call_arm_addr(a, accessors.resolved.write_qword_masked.func);
+		}
 	}
 }
 
@@ -2207,6 +2859,8 @@ void drcbe_arm64::op_carry(a64::Assembler &a, const uml::instruction &inst)
 	assert(inst.size() == 4 || inst.size() == 8);
 	assert_no_condition(inst);
 	assert_flags(inst, FLAG_C);
+
+	m_carry_state = carry_state::POISON;
 
 	be_parameter srcp(*this, inst.param(0), PTYPE_MRI);
 	be_parameter bitp(*this, inst.param(1), PTYPE_MRI);
@@ -2220,7 +2874,7 @@ void drcbe_arm64::op_carry(a64::Assembler &a, const uml::instruction &inst)
 	if (srcp.is_immediate() && bitp.is_immediate())
 	{
 		a.mov(scratch, BIT(srcp.immediate(), bitp.immediate()));
-		a.bfi(FLAGS_REG, scratch.x(), 0, 1);
+		store_carry_reg(a, scratch);
 	}
 	else if (bitp.is_immediate())
 	{
@@ -2267,25 +2921,42 @@ void drcbe_arm64::op_set(a64::Assembler &a, const uml::instruction &inst)
 		mov_param_imm(a, inst.size(), dstp, 1);
 		return;
 	}
-	else
+
+	const a64::Gp dst = dstp.select_register(TEMP_REG1, inst.size());
+
+	switch (inst.condition())
 	{
-		const a64::Gp dst = dstp.select_register(TEMP_REG1, inst.size());
-
-		if (inst.condition() == COND_C || inst.condition() == COND_NC || inst.condition() == COND_A || inst.condition() == COND_BE)
-			load_carry(a, true);
-
-		if (inst.condition() == uml::COND_U || inst.condition() == uml::COND_NU)
-		{
+		case uml::COND_U:
+		case uml::COND_NU:
 			get_unordered(a, dst);
-
 			if (inst.condition() == uml::COND_NU)
 				a.eor(dst, dst, 1);
-		}
-		else
-			a.cset(dst, ARM_CONDITION(a, inst.condition()));
-
-		mov_param_reg(a, inst.size(), dstp, dst);
+			break;
+		case uml::COND_C:
+		case uml::COND_NC:
+			switch (m_carry_state)
+			{
+				case carry_state::CANONICAL:
+					a.cset(dst, ARM_NOT_CONDITION(inst.condition()));
+					break;
+				case carry_state::LOGICAL:
+					a.cset(dst, ARM_CONDITION(inst.condition()));
+					break;
+				default:
+					get_carry(a, dst);
+					if (inst.condition() == uml::COND_NC)
+						a.eor(dst, dst, 1);
+			}
+			break;
+		case uml::COND_A:
+		case uml::COND_BE:
+			load_carry(a, true);
+			[[fallthrough]];
+		default:
+			a.cset(dst, ARM_CONDITION(inst.condition()));
 	}
+
+	mov_param_reg(a, inst.size(), dstp, dst);
 }
 
 void drcbe_arm64::op_mov(a64::Assembler &a, const uml::instruction &inst)
@@ -2297,26 +2968,92 @@ void drcbe_arm64::op_mov(a64::Assembler &a, const uml::instruction &inst)
 	be_parameter dstp(*this, inst.param(0), PTYPE_MR);
 	be_parameter srcp(*this, inst.param(1), PTYPE_MRI);
 
-	// add a conditional branch unless a conditional move is possible
-	Label skip;
-
-	if (inst.condition() != uml::COND_ALWAYS)
+	// decide whether a conditional select will be efficient
+	bool usesel = dstp.is_int_register() && (srcp.is_int_register() || (srcp.is_immediate() && is_simple_mov_immediate(srcp.immediate(), inst.size())));
+	switch (inst.condition())
 	{
-		skip = a.newLabel();
-
-		if (inst.condition() == COND_C || inst.condition() == COND_NC || inst.condition() == COND_A || inst.condition() == COND_BE)
-			load_carry(a, true);
-
-		if (inst.condition() == uml::COND_U || inst.condition() == uml::COND_NU)
-			check_unordered_condition(a, inst.condition(), skip, true);
-		else
-			a.b(ARM_NOT_CONDITION(a, inst.condition()), skip);
+		case uml::COND_ALWAYS:
+		case uml::COND_U:
+		case uml::COND_NU:
+			usesel = false;
+			break;
+		case uml::COND_C:
+		case uml::COND_NC:
+			switch (m_carry_state)
+			{
+				case carry_state::CANONICAL:
+				case carry_state::LOGICAL:
+					break;
+				default:
+					usesel = false;
+			}
+			break;
+		default:
+			break;
 	}
 
-	mov_param_param(a, inst.size(), dstp, srcp);
+	if (usesel)
+	{
+		const bool srczero = srcp.is_immediate_value(0);
+		const bool srcone = srcp.is_immediate_value(1);
+		const bool srcnegone = srcp.is_immediate_value(util::make_bitmask<uint64_t>(inst.size() * 8));
+		const bool srcspecial = srczero || srcone || srcnegone;
 
-	if (inst.condition() != uml::COND_ALWAYS)
-		a.bind(skip);
+		const a64::Gp dst = dstp.select_register(TEMP_REG1, inst.size());
+		const a64::Gp src = srcspecial ? select_register(a64::xzr, inst.size()) : srcp.select_register(TEMP_REG2, inst.size());
+
+		mov_reg_param(a, inst.size(), dst, dstp);
+		if (!srcspecial)
+			mov_reg_param(a, inst.size(), src, srcp);
+
+		switch (inst.condition())
+		{
+			case uml::COND_C:
+			case uml::COND_NC:
+				if (m_carry_state == carry_state::CANONICAL)
+				{
+					if (srcone)
+						a.csinc(dst, dst, src, ARM_CONDITION(inst.condition()));
+					else if (srcnegone)
+						a.csinv(dst, dst, src, ARM_CONDITION(inst.condition()));
+					else
+						a.csel(dst, src, dst, ARM_NOT_CONDITION(inst.condition()));
+				}
+				else
+				{
+					if (srcone)
+						a.csinc(dst, dst, src, ARM_NOT_CONDITION(inst.condition()));
+					else if (srcnegone)
+						a.csinv(dst, dst, src, ARM_NOT_CONDITION(inst.condition()));
+					else
+						a.csel(dst, src, dst, ARM_CONDITION(inst.condition()));
+				}
+				break;
+			case uml::COND_A:
+			case uml::COND_BE:
+				load_carry(a, true);
+				[[fallthrough]];
+			default:
+				if (srcone)
+					a.csinc(dst, dst, src, ARM_NOT_CONDITION(inst.condition()));
+				else if (srcnegone)
+					a.csinv(dst, dst, src, ARM_NOT_CONDITION(inst.condition()));
+				else
+					a.csel(dst, src, dst, ARM_CONDITION(inst.condition()));
+		}
+
+		mov_param_reg(a, inst.size(), dstp, dst);
+	}
+	else
+	{
+		Label skip;
+		emit_skip(a, inst.condition(), skip);
+
+		mov_param_param(a, inst.size(), dstp, srcp);
+
+		if (inst.condition() != uml::COND_ALWAYS)
+			a.bind(skip);
+	}
 }
 
 void drcbe_arm64::op_sext(a64::Assembler &a, const uml::instruction &inst)
@@ -2367,7 +3104,10 @@ void drcbe_arm64::op_sext(a64::Assembler &a, const uml::instruction &inst)
 	}
 
 	if (inst.flags())
+	{
 		a.tst(dstreg, dstreg);
+		m_carry_state = carry_state::POISON;
+	}
 }
 
 void drcbe_arm64::op_roland(a64::Assembler &a, const uml::instruction &inst)
@@ -2394,7 +3134,10 @@ void drcbe_arm64::op_roland(a64::Assembler &a, const uml::instruction &inst)
 		mov_param_reg(a, inst.size(), dstp, zero);
 
 		if (inst.flags())
+		{
 			a.tst(zero, zero);
+			m_carry_state = carry_state::POISON;
+		}
 
 		return;
 	}
@@ -2453,7 +3196,7 @@ void drcbe_arm64::op_roland(a64::Assembler &a, const uml::instruction &inst)
 		else if (is_contiguous)
 		{
 			// Optimize a contiguous mask
-			auto const rot = ((instbits * 2) - s - pop - lz) & (instbits - 1);
+			auto const rot = -int(s + pop + lz) & (instbits - 1);
 
 			if (rot > 0)
 				a.ror(output, output, rot);
@@ -2486,23 +3229,33 @@ void drcbe_arm64::op_roland(a64::Assembler &a, const uml::instruction &inst)
 		}
 
 		// srcp and the results of the rors above are already going to the output register, so if the mask is all 1s this can all be skipped
+		const a64::Inst::Id maskop = inst.flags() ? a64::Inst::kIdAnds : a64::Inst::kIdAnd;
 		if (maskp.is_immediate() && is_valid_immediate_mask(maskp.immediate(), inst.size()))
 		{
-			a.ands(output, output, maskp.immediate());
+			a.emit(maskop, output, output, maskp.immediate());
 		}
 		else if (!maskp.is_immediate() || maskp.immediate() != util::make_bitmask<uint64_t>(instbits))
 		{
 			const a64::Gp mask = maskp.select_register(TEMP_REG2, inst.size());
 			mov_reg_param(a, inst.size(), mask, maskp);
 
-			a.ands(output, output, mask);
+			a.emit(maskop, output, output, mask);
+		}
+		else
+		{
+			optimized = true; // need explicit tst if flags are requested
 		}
 	}
 
 	mov_param_reg(a, inst.size(), dstp, output);
 
 	if (inst.flags())
-		a.tst(output, output);
+	{
+		if (optimized)
+			a.tst(output, output);
+
+		m_carry_state = carry_state::POISON;
+	}
 }
 
 void drcbe_arm64::op_rolins(a64::Assembler &a, const uml::instruction &inst)
@@ -2527,6 +3280,7 @@ void drcbe_arm64::op_rolins(a64::Assembler &a, const uml::instruction &inst)
 			dst = dstp.select_register(TEMP_REG2, inst.size());
 			mov_reg_param(a, inst.size(), dst, dstp);
 			a.tst(dst, dst);
+			m_carry_state = carry_state::POISON;
 		}
 
 		return;
@@ -2591,16 +3345,14 @@ void drcbe_arm64::op_rolins(a64::Assembler &a, const uml::instruction &inst)
 			if (is_right_aligned)
 			{
 				// Optimize a contiguous right-aligned mask
-				rot = instbits - s;
+				rot = (instbits - s) & (instbits - 1);
 			}
 			else if (is_contiguous)
 			{
 				// Optimize a contiguous mask
-				rot = (instbits * 2) - s - pop - lz;
+				rot = -int32_t(s + pop + lz) & (instbits - 1);
 				lsb = instbits - pop - lz;
 			}
-
-			rot &= instbits - 1;
 
 			if (srcp.is_immediate() && rot > 0)
 			{
@@ -2708,44 +3460,123 @@ void drcbe_arm64::op_rolins(a64::Assembler &a, const uml::instruction &inst)
 	mov_param_reg(a, inst.size(), dstp, dst);
 
 	if (inst.flags())
+	{
 		a.tst(dst, dst);
+		m_carry_state = carry_state::POISON;
+	}
 }
 
-template <a64::Inst::Id Opcode> void drcbe_arm64::op_add(a64::Assembler &a, const uml::instruction &inst)
+template <bool CarryIn> void drcbe_arm64::op_add(a64::Assembler &a, const uml::instruction &inst)
 {
 	assert(inst.size() == 4 || inst.size() == 8);
 	assert_no_condition(inst);
 	assert_flags(inst, FLAG_C | FLAG_V | FLAG_Z | FLAG_S);
 
+	const a64::Inst::Id opcode = CarryIn
+			? (inst.flags() ? a64::Inst::kIdAdcs : a64::Inst::kIdAdc)
+			: (inst.flags() ? a64::Inst::kIdAdds : a64::Inst::kIdAdd);
+
 	be_parameter dstp(*this, inst.param(0), PTYPE_MR);
 	be_parameter src1p(*this, inst.param(1), PTYPE_MRI);
 	be_parameter src2p(*this, inst.param(2), PTYPE_MRI);
 
+	const a64::Gp zero = select_register(a64::xzr, inst.size());
 	const a64::Gp output = dstp.select_register(TEMP_REG3, inst.size());
 
-	if (Opcode == a64::Inst::kIdAdcs)
+	if (CarryIn)
 		load_carry(a);
 
-	if (src1p.is_immediate() && is_valid_immediate(src1p.immediate(), 11))
+	if (src1p.is_immediate_value(0))
 	{
-		const a64::Gp src = src2p.select_register(TEMP_REG2, inst.size());
+		if (src2p.is_immediate_value(0))
+		{
+			if (CarryIn)
+			{
+				a.emit(opcode, output, zero, zero);
+				mov_param_reg(a, inst.size(), dstp, output);
+			}
+			else
+			{
+				mov_param_reg(a, inst.size(), dstp, zero);
+				a.emit(opcode, zero, zero, zero);
+			}
+		}
+		else if (!CarryIn && src2p.is_immediate() && is_valid_immediate_addsub(src2p.immediate()))
+		{
+			a.mov(output, zero);
+			a.emit(opcode, output, output, src2p.immediate());
+			mov_param_reg(a, inst.size(), dstp, output);
+		}
+		else if (!CarryIn && src2p.is_immediate() && is_valid_immediate(src2p.immediate(), 24))
+		{
+			a.mov(output, src2p.immediate() & util::make_bitmask<uint64_t>(12));
+			a.emit(opcode, output, output, src2p.immediate() & (util::make_bitmask<uint64_t>(12) << 12));
+			mov_param_reg(a, inst.size(), dstp, output);
+		}
+		else
+		{
+			const a64::Gp src = src2p.select_register(output, inst.size());
+
+			mov_reg_param(a, inst.size(), src, src2p);
+			a.emit(opcode, output, src, zero);
+			mov_param_reg(a, inst.size(), dstp, output);
+		}
+	}
+	else if (src2p.is_immediate_value(0))
+	{
+		if (!CarryIn && src1p.is_immediate() && is_valid_immediate_addsub(src1p.immediate()))
+		{
+			a.mov(output, zero);
+			a.emit(opcode, output, output, src1p.immediate());
+			mov_param_reg(a, inst.size(), dstp, output);
+		}
+		else if (!CarryIn && src1p.is_immediate() && is_valid_immediate(src1p.immediate(), 24))
+		{
+			a.mov(output, src1p.immediate() & util::make_bitmask<uint64_t>(12));
+			a.emit(opcode, output, output, src1p.immediate() & (util::make_bitmask<uint64_t>(12) << 12));
+			mov_param_reg(a, inst.size(), dstp, output);
+		}
+		else
+		{
+			const a64::Gp src = src1p.select_register(output, inst.size());
+
+			mov_reg_param(a, inst.size(), src, src1p);
+			a.emit(opcode, output, src, zero);
+			mov_param_reg(a, inst.size(), dstp, output);
+		}
+	}
+	else if (!CarryIn && src1p.is_immediate() && is_valid_immediate_addsub(src1p.immediate()))
+	{
+		const a64::Gp src = src2p.select_register(output, inst.size());
 
 		mov_reg_param(a, inst.size(), src, src2p);
-		if (src1p.immediate() == 0)
-			a.emit(Opcode, output, src, select_register(a64::xzr, inst.size()));
-		else
-			a.emit(Opcode, output, src, src1p.immediate());
+		a.emit(opcode, output, src, src1p.immediate());
 		mov_param_reg(a, inst.size(), dstp, output);
 	}
-	else if (src2p.is_immediate() && is_valid_immediate(src2p.immediate(), 11))
+	else if (!CarryIn && src2p.is_immediate() && is_valid_immediate_addsub(src2p.immediate()))
 	{
-		const a64::Gp src = src1p.select_register(TEMP_REG1, inst.size());
+		const a64::Gp src = src1p.select_register(output, inst.size());
 
 		mov_reg_param(a, inst.size(), src, src1p);
-		if (src2p.is_immediate_value(0))
-			a.emit(Opcode, output, src, select_register(a64::xzr, inst.size()));
-		else
-			a.emit(Opcode, output, src, src2p.immediate());
+		a.emit(opcode, output, src, src2p.immediate());
+		mov_param_reg(a, inst.size(), dstp, output);
+	}
+	else if (!CarryIn && !inst.flags() && src1p.is_immediate() && is_valid_immediate(src1p.immediate(), 24))
+	{
+		const a64::Gp src = src2p.select_register(output, inst.size());
+
+		mov_reg_param(a, inst.size(), src, src2p);
+		a.emit(opcode, output, src, src1p.immediate() & util::make_bitmask<uint64_t>(12));
+		a.emit(opcode, output, output, src1p.immediate() & (util::make_bitmask<uint64_t>(12) << 12));
+		mov_param_reg(a, inst.size(), dstp, output);
+	}
+	else if (!CarryIn && !inst.flags() && src2p.is_immediate() && is_valid_immediate(src2p.immediate(), 24))
+	{
+		const a64::Gp src = src1p.select_register(output, inst.size());
+
+		mov_reg_param(a, inst.size(), src, src1p);
+		a.emit(opcode, output, src, src2p.immediate() & util::make_bitmask<uint64_t>(12));
+		a.emit(opcode, output, output, src2p.immediate() & (util::make_bitmask<uint64_t>(12) << 12));
 		mov_param_reg(a, inst.size(), dstp, output);
 	}
 	else
@@ -2755,51 +3586,96 @@ template <a64::Inst::Id Opcode> void drcbe_arm64::op_add(a64::Assembler &a, cons
 
 		mov_reg_param(a, inst.size(), src1, src1p);
 		mov_reg_param(a, inst.size(), src2, src2p);
-		a.emit(Opcode, output, src1, src2);
+		a.emit(opcode, output, src1, src2);
 		mov_param_reg(a, inst.size(), dstp, output);
 	}
 
-	store_carry(a);
+	if (inst.flags())
+		store_carry(a);
 }
 
-template <a64::Inst::Id Opcode> void drcbe_arm64::op_sub(a64::Assembler &a, const uml::instruction &inst)
+template <bool CarryIn> void drcbe_arm64::op_sub(a64::Assembler &a, const uml::instruction &inst)
 {
 	assert(inst.size() == 4 || inst.size() == 8);
 	assert_no_condition(inst);
 	assert_flags(inst, FLAG_C | FLAG_V | FLAG_Z | FLAG_S);
 
+	const a64::Inst::Id opcode = CarryIn
+			? (inst.flags() ? a64::Inst::kIdSbcs : a64::Inst::kIdSbc)
+			: (inst.flags() ? a64::Inst::kIdSubs : a64::Inst::kIdSub);
+
 	be_parameter dstp(*this, inst.param(0), PTYPE_MR);
 	be_parameter src1p(*this, inst.param(1), PTYPE_MRI);
 	be_parameter src2p(*this, inst.param(2), PTYPE_MRI);
 
-	if (Opcode == a64::Inst::kIdSbcs)
+	if (CarryIn)
 		load_carry(a, true);
 
+	const a64::Gp zero = select_register(a64::xzr, inst.size());
 	const a64::Gp output = dstp.select_register(TEMP_REG3, inst.size());
 
-	if (src2p.is_immediate() && is_valid_immediate(src2p.immediate(), 11))
+	if (src2p.is_immediate_value(0))
 	{
-		const a64::Gp src = select_register(TEMP_REG1, inst.size());
+		if (src1p.is_immediate_value(0))
+		{
+			if (CarryIn)
+			{
+				a.emit(opcode, output, zero, zero);
+				mov_param_reg(a, inst.size(), dstp, output);
+			}
+			else
+			{
+				mov_param_reg(a, inst.size(), dstp, zero);
+				a.emit(opcode, zero, zero, zero);
+			}
+		}
+		else
+		{
+			const a64::Gp src = src1p.select_register(output, inst.size());
+
+			mov_reg_param(a, inst.size(), src, src1p);
+			if (CarryIn)
+			{
+				a.emit(opcode, output, src, zero);
+				mov_param_reg(a, inst.size(), dstp, output);
+			}
+			else
+			{
+				mov_param_reg(a, inst.size(), dstp, src);
+				a.emit(opcode, zero, src, zero);
+			}
+		}
+	}
+	else if (!CarryIn && src2p.is_immediate() && is_valid_immediate_addsub(src2p.immediate()))
+	{
+		const a64::Gp src = src1p.select_register(output, inst.size());
 
 		mov_reg_param(a, inst.size(), src, src1p);
-		if (src2p.is_immediate_value(0))
-			a.emit(Opcode, output, src, select_register(a64::xzr, inst.size()));
-		else
-			a.emit(Opcode, output, src, src2p.immediate());
+		a.emit(opcode, output, src, src2p.immediate());
+		mov_param_reg(a, inst.size(), dstp, output);
+	}
+	else if (!CarryIn && (!inst.flags() || src1p.is_immediate_value(0)) && src2p.is_immediate() && is_valid_immediate(src2p.immediate(), 24))
+	{
+		const a64::Gp src = src1p.select_register(output, inst.size());
+
+		mov_reg_param(a, inst.size(), src, src1p);
+		a.emit(opcode, output, src, src2p.immediate() & util::make_bitmask<uint64_t>(12));
+		a.emit(opcode, output, output, src2p.immediate() & (util::make_bitmask<uint64_t>(12) << 12));
 		mov_param_reg(a, inst.size(), dstp, output);
 	}
 	else
 	{
-		const a64::Gp src1 = select_register(TEMP_REG1, inst.size());
-		const a64::Gp src2 = select_register(TEMP_REG2, inst.size());
+		const a64::Gp src1 = src1p.select_register(TEMP_REG1, inst.size());
+		const a64::Gp src2 = src2p.select_register(TEMP_REG2, inst.size());
 
 		mov_reg_param(a, inst.size(), src1, src1p);
 		mov_reg_param(a, inst.size(), src2, src2p);
-		a.emit(Opcode, output, src1, src2);
+		a.emit(opcode, output, src1, src2);
 		mov_param_reg(a, inst.size(), dstp, output);
 	}
 
-	store_carry(a, true);
+	if (inst.flags())
+		store_carry(a, true);
 }
 
 void drcbe_arm64::op_cmp(a64::Assembler &a, const uml::instruction &inst)
@@ -2811,22 +3687,23 @@ void drcbe_arm64::op_cmp(a64::Assembler &a, const uml::instruction &inst)
 	be_parameter src1p(*this, inst.param(0), PTYPE_MRI);
 	be_parameter src2p(*this, inst.param(1), PTYPE_MRI);
 
-	const a64::Gp temp = select_register(TEMP_REG1, inst.size());
-	const a64::Gp temp2 = select_register(TEMP_REG2, inst.size());
+	const a64::Gp src1 = src1p.select_register(TEMP_REG1, inst.size());
 
-	mov_reg_param(a, inst.size(), temp, src1p);
+	mov_reg_param(a, inst.size(), src1, src1p);
 
-	if (src2p.is_immediate() && is_valid_immediate(src2p.immediate(), 11))
+	if (src2p.is_immediate() && is_valid_immediate_addsub(src2p.immediate()))
 	{
 		if (src2p.is_immediate_value(0))
-			a.cmp(temp, select_register(a64::xzr, inst.size()));
+			a.cmp(src1, select_register(a64::xzr, inst.size()));
 		else
-			a.cmp(temp, src2p.immediate());
+			a.cmp(src1, src2p.immediate());
 	}
 	else
 	{
-		mov_reg_param(a, inst.size(), temp2, src2p);
-		a.cmp(temp, temp2);
+		const a64::Gp src2 = src2p.select_register(TEMP_REG2, inst.size());
+
+		mov_reg_param(a, inst.size(), src2, src2p);
+		a.cmp(src1, src2);
 	}
 
 	store_carry(a, true);
@@ -2894,6 +3771,8 @@ void drcbe_arm64::op_mulu(a64::Assembler &a, const uml::instruction &inst)
 		a.bfi(SCRATCH_REG1, TEMP_REG3, 31, 1); // sign flag
 
 		a.msr(a64::Predicate::SysReg::kNZCV, SCRATCH_REG1);
+
+		m_carry_state = carry_state::POISON;
 	}
 }
 
@@ -2952,6 +3831,8 @@ void drcbe_arm64::op_mululw(a64::Assembler &a, const uml::instruction &inst)
 		a.bfi(TEMP_REG1, SCRATCH_REG1, 31, 1); // sign flag
 
 		a.msr(a64::Predicate::SysReg::kNZCV, TEMP_REG1);
+
+		m_carry_state = carry_state::POISON;
 	}
 }
 
@@ -3027,6 +3908,8 @@ void drcbe_arm64::op_muls(a64::Assembler &a, const uml::instruction &inst)
 		a.bfi(SCRATCH_REG1, TEMP_REG1, 31, 1); // sign flag
 
 		a.msr(a64::Predicate::SysReg::kNZCV, SCRATCH_REG1);
+
+		m_carry_state = carry_state::POISON;
 	}
 }
 
@@ -3098,6 +3981,8 @@ void drcbe_arm64::op_mulslw(a64::Assembler &a, const uml::instruction &inst)
 		a.bfi(SCRATCH_REG1, TEMP_REG1, 31, 1); // sign flag
 
 		a.msr(a64::Predicate::SysReg::kNZCV, SCRATCH_REG1);
+
+		m_carry_state = carry_state::POISON;
 	}
 }
 
@@ -3153,6 +4038,7 @@ template <a64::Inst::Id Opcode> void drcbe_arm64::op_div(a64::Assembler &a, cons
 		a.mov(SCRATCH_REG1, 1 << 28); // set overflow flag
 		a.msr(a64::Predicate::SysReg::kNZCV, SCRATCH_REG1);
 	}
+	m_carry_state = carry_state::POISON;
 }
 
 void drcbe_arm64::op_and(a64::Assembler &a, const uml::instruction &inst)
@@ -3161,40 +4047,70 @@ void drcbe_arm64::op_and(a64::Assembler &a, const uml::instruction &inst)
 	assert_no_condition(inst);
 	assert_flags(inst, FLAG_Z | FLAG_S);
 
+	const a64::Inst::Id opcode = inst.flags() ? a64::Inst::kIdAnds : a64::Inst::kIdAnd;
+
 	be_parameter dstp(*this, inst.param(0), PTYPE_MR);
 	be_parameter src1p(*this, inst.param(1), PTYPE_MRI);
 	be_parameter src2p(*this, inst.param(2), PTYPE_MRI);
 
 	const a64::Gp dst = dstp.select_register(TEMP_REG3, inst.size());
 
-	if (src1p.is_immediate() && src2p.is_immediate())
+	if (src1p.is_immediate_value(0) || src2p.is_immediate_value(0))
+	{
+		if (inst.flags())
+			a.ands(dst, select_register(a64::xzr, inst.size()), 1); // immediate value doesn't matter, result will be zero
+		else
+			a.mov(dst, 0);
+	}
+	else if (src1p.is_immediate() && src2p.is_immediate())
 	{
 		get_imm_relative(a, dst, src1p.immediate() & src2p.immediate());
 
 		if (inst.flags())
 			a.tst(dst, dst);
 	}
+	else if (src1p.is_immediate() && is_valid_immediate_mask(src1p.immediate(), inst.size()))
+	{
+		const a64::Gp src2 = src2p.select_register(dst, inst.size());
+		mov_reg_param(a, inst.size(), src2, src2p);
+
+		a.emit(opcode, dst, src2, src1p.immediate());
+	}
 	else if (src2p.is_immediate() && is_valid_immediate_mask(src2p.immediate(), inst.size()))
 	{
-		const a64::Gp src1 = src1p.select_register(TEMP_REG1, inst.size());
+		const a64::Gp src1 = src1p.select_register(dst, inst.size());
 		mov_reg_param(a, inst.size(), src1, src1p);
 
-		if (src2p.is_immediate_value(0))
-			a.ands(dst, src1, select_register(a64::xzr, inst.size()));
-		else
-			a.ands(dst, src1, src2p.immediate());
+		a.emit(opcode, dst, src1, src2p.immediate());
+	}
+	else if ((inst.size() == 8) && src1p.is_immediate() && is_valid_immediate_mask(src1p.immediate(), 4) && (!inst.flags() || !BIT(src1p.immediate(), 31)))
+	{
+		const a64::Gp src2 = src2p.select_register(dst, inst.size());
+		mov_reg_param(a, inst.size(), src2, src2p);
+
+		a.emit(opcode, dst.w(), src2.w(), src1p.immediate());
+	}
+	else if ((inst.size() == 8) && src2p.is_immediate() && is_valid_immediate_mask(src2p.immediate(), 4) && (!inst.flags() || !BIT(src2p.immediate(), 31)))
+	{
+		const a64::Gp src1 = src1p.select_register(dst, inst.size());
+		mov_reg_param(a, inst.size(), src1, src1p);
+
+		a.emit(opcode, dst.w(), src1.w(), src2p.immediate());
 	}
 	else
 	{
-		const a64::Gp src1 = src1p.select_register(TEMP_REG1, inst.size());
-		const a64::Gp src2 = src2p.select_register(TEMP_REG2, inst.size());
+		const a64::Gp src1 = src1p.select_register(dst, inst.size());
+		const a64::Gp src2 = src2p.select_register(TEMP_REG1, inst.size());
 		mov_reg_param(a, inst.size(), src1, src1p);
 		mov_reg_param(a, inst.size(), src2, src2p);
 
-		a.ands(dst, src1, src2);
+		a.emit(opcode, dst, src1, src2);
 	}
 
 	mov_param_reg(a, inst.size(), dstp, dst);
+
+	if (inst.flags())
+		m_carry_state = carry_state::POISON;
 }
 
 void drcbe_arm64::op_test(a64::Assembler &a, const uml::instruction &inst)
@@ -3209,20 +4125,40 @@ void drcbe_arm64::op_test(a64::Assembler &a, const uml::instruction &inst)
 	const a64::Gp src1 = src1p.select_register(TEMP_REG1, inst.size());
 	const a64::Gp src2 = src2p.select_register(TEMP_REG2, inst.size());
 
-	mov_reg_param(a, inst.size(), src1, src1p);
-
-	if (src2p.is_immediate() && is_valid_immediate_mask(src2p.immediate(), inst.size()))
+	if (src1p.is_immediate_value(0) || src2p.is_immediate_value(0))
 	{
-		if (src2p.is_immediate_value(0))
-			a.tst(src1, select_register(a64::xzr, inst.size()));
-		else
-			a.tst(src1, src2p.immediate());
+		const a64::Gp zero = select_register(a64::xzr, inst.size());
+
+		a.tst(zero, zero);
+	}
+	else if (src2p.is_immediate_value(util::make_bitmask<uint64_t>(inst.size() * 8)))
+	{
+		mov_reg_param(a, inst.size(), src1, src1p);
+		a.tst(src1, src1);
+	}
+	else if (src1p.is_immediate_value(util::make_bitmask<uint64_t>(inst.size() * 8)))
+	{
+		mov_reg_param(a, inst.size(), src2, src2p);
+		a.tst(src2, src2);
+	}
+	else if (src2p.is_immediate() && is_valid_immediate_mask(src2p.immediate(), inst.size()))
+	{
+		mov_reg_param(a, inst.size(), src1, src1p);
+		a.tst(src1, src2p.immediate());
+	}
+	else if (src1p.is_immediate() && is_valid_immediate_mask(src1p.immediate(), inst.size()))
+	{
+		mov_reg_param(a, inst.size(), src2, src2p);
+		a.tst(src2, src1p.immediate());
 	}
 	else
 	{
+		mov_reg_param(a, inst.size(), src1, src1p);
 		mov_reg_param(a, inst.size(), src2, src2p);
 		a.tst(src1, src2);
 	}
+
+	m_carry_state = carry_state::POISON;
 }
 
 void drcbe_arm64::op_or(a64::Assembler &a, const uml::instruction &inst)
@@ -3273,7 +4209,10 @@ void drcbe_arm64::op_or(a64::Assembler &a, const uml::instruction &inst)
 	mov_param_reg(a, inst.size(), dstp, dst);
 
 	if (inst.flags())
+	{
 		a.tst(dst, dst);
+		m_carry_state = carry_state::POISON;
+	}
 }
 
 void drcbe_arm64::op_xor(a64::Assembler &a, const uml::instruction &inst)
@@ -3319,7 +4258,10 @@ void drcbe_arm64::op_xor(a64::Assembler &a, const uml::instruction &inst)
 	mov_param_reg(a, inst.size(), dstp, dst);
 
 	if (inst.flags())
+	{
 		a.tst(dst, dst);
+		m_carry_state = carry_state::POISON;
+	}
 }
 
 void drcbe_arm64::op_lzcnt(a64::Assembler &a, const uml::instruction &inst)
@@ -3341,7 +4283,10 @@ void drcbe_arm64::op_lzcnt(a64::Assembler &a, const uml::instruction &inst)
 	mov_param_reg(a, inst.size(), dstp, dst);
 
 	if (inst.flags())
+	{
 		a.tst(dst, dst);
+		m_carry_state = carry_state::POISON;
+	}
 }
 
 void drcbe_arm64::op_tzcnt(a64::Assembler &a, const uml::instruction &inst)
@@ -3368,6 +4313,7 @@ void drcbe_arm64::op_tzcnt(a64::Assembler &a, const uml::instruction &inst)
 	{
 		a.eor(temp, dst, inst.size() * 8);
 		a.tst(temp, temp);
+		m_carry_state = carry_state::POISON;
 	}
 }
 
@@ -3393,7 +4339,10 @@ void drcbe_arm64::op_bswap(a64::Assembler &a, const uml::instruction &inst)
 	mov_param_reg(a, inst.size(), dstp, dst);
 
 	if (inst.flags())
+	{
 		a.tst(dst, dst);
+		m_carry_state = carry_state::POISON;
+	}
 }
 
 
@@ -3450,7 +4399,10 @@ template <a64::Inst::Id Opcode> void drcbe_arm64::op_shift(a64::Assembler &a, co
 	}
 
 	if (inst.flags())
+	{
 		a.tst(dst, dst);
+		m_carry_state = carry_state::POISON;
+	}
 
 	// save dst after using inputs for calculations so the registers have no chance of being overwritten
 	mov_param_reg(a, inst.size(), dstp, dst);
@@ -3512,7 +4464,10 @@ void drcbe_arm64::op_rol(a64::Assembler &a, const uml::instruction &inst)
 	}
 
 	if (inst.flags())
+	{
 		a.tst(output, output);
+		m_carry_state = carry_state::POISON;
+	}
 
 	mov_param_reg(a, inst.size(), dstp, output);
 }
@@ -3606,6 +4561,8 @@ void drcbe_arm64::op_rolc(a64::Assembler &a, const uml::instruction &inst)
 		a.tst(output, output);
 
 	mov_param_reg(a, inst.size(), dstp, output);
+
+	m_carry_state = carry_state::POISON;
 }
 
 void drcbe_arm64::op_rorc(a64::Assembler &a, const uml::instruction &inst)
@@ -3700,6 +4657,8 @@ void drcbe_arm64::op_rorc(a64::Assembler &a, const uml::instruction &inst)
 		a.tst(output, output);
 
 	mov_param_reg(a, inst.size(), dstp, output);
+
+	m_carry_state = carry_state::POISON;
 }
 
 void drcbe_arm64::op_fload(a64::Assembler &a, const uml::instruction &inst)
@@ -3770,27 +4729,29 @@ void drcbe_arm64::op_fread(a64::Assembler &a, const uml::instruction &inst)
 	assert_no_condition(inst);
 	assert_no_flags(inst);
 
+	m_carry_state = carry_state::POISON;
+
 	be_parameter dstp(*this, inst.param(0), PTYPE_MR);
 	be_parameter addrp(*this, inst.param(1), PTYPE_MRI);
 	const parameter &spacesizep = inst.param(2);
 	assert(spacesizep.is_size_space());
 	assert((1 << spacesizep.size()) == inst.size());
 
-	const auto &resolved = m_resolved_accessors[spacesizep.space()];
+	auto const &accessors = m_memory_accessors[spacesizep.space()];
 
 	mov_reg_param(a, 4, REG_PARAM2, addrp);
 
 	if (inst.size() == 4)
 	{
-		get_imm_relative(a, REG_PARAM1, resolved.read_dword.obj);
-		call_arm_addr(a, resolved.read_dword.func);
+		get_imm_relative(a, REG_PARAM1, accessors.resolved.read_dword.obj);
+		call_arm_addr(a, accessors.resolved.read_dword.func);
 
 		mov_float_param_int_reg(a, inst.size(), dstp, REG_PARAM1.w());
 	}
 	else if (inst.size() == 8)
 	{
-		get_imm_relative(a, REG_PARAM1, resolved.read_qword.obj);
-		call_arm_addr(a, resolved.read_qword.func);
+		get_imm_relative(a, REG_PARAM1, accessors.resolved.read_qword.obj);
+		call_arm_addr(a, accessors.resolved.read_qword.func);
 
 		mov_float_param_int_reg(a, inst.size(), dstp, REG_PARAM1);
 	}
@@ -3802,13 +4763,15 @@ void drcbe_arm64::op_fwrite(a64::Assembler &a, const uml::instruction &inst)
 	assert_no_condition(inst);
 	assert_no_flags(inst);
 
+	m_carry_state = carry_state::POISON;
+
 	be_parameter addrp(*this, inst.param(0), PTYPE_MRI);
 	be_parameter srcp(*this, inst.param(1), PTYPE_MF);
 	const parameter &spacesizep = inst.param(2);
 	assert(spacesizep.is_size_space());
 	assert((1 << spacesizep.size()) == inst.size());
 
-	const auto &resolved = m_resolved_accessors[spacesizep.space()];
+	auto const &accessors = m_memory_accessors[spacesizep.space()];
 
 	mov_reg_param(a, 4, REG_PARAM2, addrp);
 	mov_float_reg_param(a, inst.size(), TEMPF_REG1, srcp);
@@ -3817,13 +4780,13 @@ void drcbe_arm64::op_fwrite(a64::Assembler &a, const uml::instruction &inst)
 
 	if (inst.size() == 4)
 	{
-		get_imm_relative(a, REG_PARAM1, resolved.write_dword.obj);
-		call_arm_addr(a, resolved.write_dword.func);
+		get_imm_relative(a, REG_PARAM1, accessors.resolved.write_dword.obj);
+		call_arm_addr(a, accessors.resolved.write_dword.func);
 	}
 	else if (inst.size() == 8)
 	{
-		get_imm_relative(a, REG_PARAM1, resolved.write_qword.obj);
-		call_arm_addr(a, resolved.write_qword.func);
+		get_imm_relative(a, REG_PARAM1, accessors.resolved.write_qword.obj);
+		call_arm_addr(a, accessors.resolved.write_qword.func);
 	}
 }
 
@@ -3836,24 +4799,67 @@ void drcbe_arm64::op_fmov(a64::Assembler &a, const uml::instruction &inst)
 	be_parameter dstp(*this, inst.param(0), PTYPE_MF);
 	be_parameter srcp(*this, inst.param(1), PTYPE_MF);
 
-	Label skip;
-	if (inst.condition() != uml::COND_ALWAYS)
+	// decide whether a conditional select will be efficient
+	bool usesel = dstp.is_float_register() && srcp.is_float_register();
+	switch (inst.condition())
 	{
-		skip = a.newLabel();
-
-		if (inst.condition() == COND_C || inst.condition() == COND_NC || inst.condition() == COND_A || inst.condition() == COND_BE)
-			load_carry(a, true);
-
-		if (inst.condition() == uml::COND_U || inst.condition() == uml::COND_NU)
-			check_unordered_condition(a, inst.condition(), skip, true);
-		else
-			a.b(ARM_NOT_CONDITION(a, inst.condition()), skip);
+		case uml::COND_ALWAYS:
+		case uml::COND_U:
+		case uml::COND_NU:
+			usesel = false;
+			break;
+		case uml::COND_C:
+		case uml::COND_NC:
+			switch (m_carry_state)
+			{
+				case carry_state::CANONICAL:
+				case carry_state::LOGICAL:
+					break;
+				default:
+					usesel = false;
+			}
+			break;
+		default:
+			break;
 	}
 
-	mov_float_param_param(a, inst.size(), dstp, srcp);
+	if (usesel)
+	{
+		const a64::Vec dstreg = dstp.select_register(TEMPF_REG1, inst.size());
+		const a64::Vec srcreg = srcp.select_register(TEMPF_REG2, inst.size());
 
-	if (inst.condition() != uml::COND_ALWAYS)
-		a.bind(skip);
+		mov_float_reg_param(a, inst.size(), dstreg, dstp);
+		mov_float_reg_param(a, inst.size(), srcreg, srcp);
+
+		switch (inst.condition())
+		{
+			case uml::COND_C:
+			case uml::COND_NC:
+				if (m_carry_state == carry_state::CANONICAL)
+					a.fcsel(dstreg, srcreg, dstreg, ARM_NOT_CONDITION(inst.condition()));
+				else
+					a.fcsel(dstreg, srcreg, dstreg, ARM_CONDITION(inst.condition()));
+				break;
+			case uml::COND_A:
+			case uml::COND_BE:
+				load_carry(a, true);
+				[[fallthrough]];
+			default:
+				a.fcsel(dstreg, srcreg, dstreg, ARM_CONDITION(inst.condition()));
+		}
+
+		mov_float_param_reg(a, inst.size(), dstp, dstreg);
+	}
+	else
+	{
+		Label skip;
+		emit_skip(a, inst.condition(), skip);
+
+		mov_float_param_param(a, inst.size(), dstp, srcp);
+
+		if (inst.condition() != uml::COND_ALWAYS)
+			a.bind(skip);
+	}
 }
 
 void drcbe_arm64::op_ftoint(a64::Assembler &a, const uml::instruction &inst)
@@ -4073,4 +5079,19 @@ void drcbe_arm64::op_icopyf(a64::Assembler &a, const uml::instruction &inst)
 	mov_param_reg(a, inst.size(), dstp, dstreg);
 }
 
+} // anonymous namespace
+
+
+std::unique_ptr<drcbe_interface> make_drcbe_arm64(
+		drcuml_state &drcuml,
+		device_t &device,
+		drc_cache &cache,
+		uint32_t flags,
+		int modes,
+		int addrbits,
+		int ignorebits)
+{
+	return std::unique_ptr<drcbe_interface>(new drcbe_arm64(drcuml, device, cache, flags, modes, addrbits, ignorebits));
 }
+
+} // namespace drc

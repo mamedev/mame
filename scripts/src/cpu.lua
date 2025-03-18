@@ -2012,6 +2012,8 @@ if CPUS["M6805"] then
 		MAME_DIR .. "src/devices/cpu/m6805/m68hc05.h",
 		MAME_DIR .. "src/devices/cpu/m6805/m68hc05e1.cpp",
 		MAME_DIR .. "src/devices/cpu/m6805/m68hc05e1.h",
+		MAME_DIR .. "src/devices/cpu/m6805/m68hc05pge.cpp",
+		MAME_DIR .. "src/devices/cpu/m6805/m68hc05pge.h",
 	}
 end
 
@@ -2980,6 +2982,8 @@ if CPUS["TLCS900"] then
 		MAME_DIR .. "src/devices/cpu/tlcs900/tlcs900.h",
 		MAME_DIR .. "src/devices/cpu/tlcs900/900tbl.hxx",
 		MAME_DIR .. "src/devices/cpu/tlcs900/900htbl.hxx",
+		MAME_DIR .. "src/devices/cpu/tlcs900/tmp94c241.cpp",
+		MAME_DIR .. "src/devices/cpu/tlcs900/tmp94c241.h",
 		MAME_DIR .. "src/devices/cpu/tlcs900/tmp95c061.cpp",
 		MAME_DIR .. "src/devices/cpu/tlcs900/tmp95c061.h",
 		MAME_DIR .. "src/devices/cpu/tlcs900/tmp95c063.cpp",
@@ -3518,6 +3522,16 @@ if opt_tool(CPUS, "SIGMA2") then
 end
 
 --------------------------------------------------
+-- Control Data Corporation 160 (disassembler only)
+--@src/devices/cpu/cdc160/cdc160.h,CPUS["CDC160"] = true
+--------------------------------------------------
+
+if opt_tool(CPUS, "CDC160") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/cdc160/cdc160d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/cdc160/cdc160d.h")
+end
+
+--------------------------------------------------
 -- Control Data Corporation 1700 (disassembler only)
 --@src/devices/cpu/cdc1700/cdc1700.h,CPUS["CDC1700"] = true
 --------------------------------------------------
@@ -3728,9 +3742,16 @@ if opt_tool(CPUS, "DSP56000") then
 end
 
 --------------------------------------------------
--- DEC VAX, disassembler only
+-- DEC VAX
 --@src/devices/cpu/vax/vax.h,CPUS["VAX"] = true
 --------------------------------------------------
+
+if CPUS["VAX"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/vax/vax.cpp",
+		MAME_DIR .. "src/devices/cpu/vax/vax.h",
+	}
+end
 
 if opt_tool(CPUS, "VAX") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/vax/vaxdasm.cpp")

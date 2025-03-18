@@ -81,11 +81,11 @@ void slapshot_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 	                           this bit clear is found
 	          --x------------- flip screen
 
-	    000b - 000f : unused
+	    000c - 000f : unused
 
 	*/
-	int big_sprite = 0;
-	int y_no = 0, x_no = 0, xlatch = 0, ylatch = 0, last_continuation_tile = 0;   /* for zooms */
+	bool big_sprite = false, last_continuation_tile = false;
+	int y_no = 0, x_no = 0, xlatch = 0, ylatch = 0;   /* for zooms */
 	u32 zoomword, zoomx, zoomy, zx = 0, zy = 0, zoomxlatch = 0, zoomylatch = 0;   /* for zooms */
 	int scrollx = 0, scrolly = 0;
 
@@ -125,10 +125,10 @@ void slapshot_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 		/* sprites_active_area may change during processing */
 		const int offs = off + area;
 
-		if (m_spriteram_buffered[(offs + 6) / 2] & 0x8000)
+		if (BIT(m_spriteram_buffered[(offs + 6) / 2], 15))
 		{
-			disabled = m_spriteram_buffered[(offs + 10) / 2] & 0x1000;
-			m_sprites_flipscreen = m_spriteram_buffered[(offs + 10) / 2] & 0x2000;
+			disabled = BIT(m_spriteram_buffered[(offs + 10) / 2], 12);
+			m_sprites_flipscreen = BIT(m_spriteram_buffered[(offs + 10) / 2], 13);
 			x_offset = 3;   /* Get rid of 0-3 unwanted pixels on edge of screen. */
 			if (m_sprites_flipscreen) x_offset = -x_offset;
 			area = 0x8000 * (m_spriteram_buffered[(offs + 10) / 2] & 0x0001);
@@ -140,24 +140,14 @@ void slapshot_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 		/* check for extra scroll offset */
 		if ((m_spriteram_buffered[(offs + 4) / 2] & 0xf000) == 0xa000)
 		{
-			master_scrollx = m_spriteram_buffered[(offs + 4) / 2] & 0xfff;
-			if (master_scrollx >= 0x800)
-				master_scrollx -= 0x1000;   /* signed value */
-
-			master_scrolly = m_spriteram_buffered[(offs + 6) / 2] & 0xfff;
-			if (master_scrolly >= 0x800)
-				master_scrolly -= 0x1000;   /* signed value */
+			master_scrollx = util::sext(m_spriteram_buffered[(offs + 4) / 2], 12);
+			master_scrolly = util::sext(m_spriteram_buffered[(offs + 6) / 2], 12);
 		}
 
 		if ((m_spriteram_buffered[(offs + 4) / 2] & 0xf000) == 0x5000)
 		{
-			scroll1x = m_spriteram_buffered[(offs + 4) / 2] & 0xfff;
-			if (scroll1x >= 0x800)
-				scroll1x -= 0x1000;   /* signed value */
-
-			scroll1y = m_spriteram_buffered[(offs + 6) / 2] & 0xfff;
-			if (scroll1y >= 0x800)
-				scroll1y -= 0x1000;   /* signed value */
+			scroll1x = util::sext(m_spriteram_buffered[(offs + 4) / 2], 12);
+			scroll1y = util::sext(m_spriteram_buffered[(offs + 6) / 2], 12);
 		}
 
 		if (disabled)
@@ -166,9 +156,9 @@ void slapshot_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 		const u16 spritedata = m_spriteram_buffered[(offs + 8) / 2];
 		const u16 spritecont = (spritedata & 0xff00) >> 8;
 
-		if ((spritecont & 0x08) != 0)   /* sprite continuation flag set */
+		if (BIT(spritecont, 3))   /* sprite continuation flag set */
 		{
-			if (big_sprite == 0)   /* are we starting a big sprite ? */
+			if (!big_sprite)   /* are we starting a big sprite ? */
 			{
 				xlatch = m_spriteram_buffered[(offs + 4) / 2] & 0xfff;
 				ylatch = m_spriteram_buffered[(offs + 6) / 2] & 0xfff;
@@ -177,21 +167,21 @@ void slapshot_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 				zoomword = m_spriteram_buffered[(offs + 2) / 2];
 				zoomylatch = (zoomword >> 8) & 0xff;
 				zoomxlatch = (zoomword >> 0) & 0xff;
-				big_sprite = 1;   /* we have started a new big sprite */
+				big_sprite = true;   /* we have started a new big sprite */
 			}
 		}
 		else if (big_sprite)
 		{
-			last_continuation_tile = 1;   /* don't clear big_sprite until last tile done */
+			last_continuation_tile = true;   /* don't clear big_sprite until last tile done */
 		}
 
-		if ((spritecont & 0x04) == 0)
+		if (BIT(~spritecont, 2))
 			color = spritedata & 0xff;
 
 // DG: the bigsprite == 0 check fixes "tied-up" little sprites in Thunderfox
 // which (mostly?) have spritecont = 0x20 when they are not continuations
 // of anything.
-		if (big_sprite == 0 || (spritecont & 0xf0) == 0)
+		if (!big_sprite || !(spritecont & 0xf0))
 		{
 			x = m_spriteram_buffered[(offs + 4) / 2];
 
@@ -200,12 +190,12 @@ void slapshot_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 // journey in MjnQuest). You will see they are 1 pixel too far to the right.
 // Where is this extra pixel offset coming from??
 
-			if (x & 0x8000)   /* absolute (koshien) */
+			if (BIT(x, 15))   /* absolute (koshien) */
 			{
 				scrollx = - x_offset - 0x60;
 				scrolly = 0;
 			}
-			else if (x & 0x4000)   /* ignore extra scroll */
+			else if (BIT(x, 14))   /* ignore extra scroll */
 			{
 				scrollx = master_scrollx - x_offset - 0x60;
 				scrolly = master_scrolly;
@@ -216,26 +206,26 @@ void slapshot_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 				scrolly = scroll1y + master_scrolly;
 			}
 			x &= 0xfff;
-			y = m_spriteram_buffered[(offs+6)/2] & 0xfff;
+			y = m_spriteram_buffered[(offs + 6) / 2] & 0xfff;
 
 			xcurrent = x;
 			ycurrent = y;
 		}
 		else
 		{
-			if ((spritecont & 0x10) == 0)
+			if (BIT(~spritecont, 4))
 				y = ycurrent;
-			else if ((spritecont & 0x20) != 0)
+			else if (BIT(spritecont, 5))
 			{
 				y += 16;
 				y_no++;   /* keep track of y tile for zooms */
 			}
-			if ((spritecont & 0x40) == 0)
+			if (BIT(~spritecont, 6))
 				x = xcurrent;
-			else if ((spritecont & 0x80) != 0)
+			else if (BIT(spritecont, 7))
 			{
 				x += 16;
-				y_no=0;
+				y_no = 0;
 				x_no++;   /* keep track of x tile for zooms */
 			}
 		}
@@ -273,27 +263,24 @@ void slapshot_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 
 		if (last_continuation_tile)
 		{
-			big_sprite = 0;
-			last_continuation_tile = 0;
+			big_sprite = false;
+			last_continuation_tile = false;
 		}
 
 		u32 code = 0;
 		int extoffs = offs;
 		if (extoffs >= 0x8000) extoffs -= 0x4000;   /* spriteram[0x4000-7fff] has no corresponding extension area */
 
-		code = m_spriteram_buffered[(offs)/2] & 0xff;
+		code = m_spriteram_buffered[offs / 2] & 0xff;
 		code |= (m_spriteext[(extoffs >> 4)] & 0xff00);
 
 		if (code == 0) continue;
 
-		int flipx = spritecont & 0x01;
-		int flipy = spritecont & 0x02;
+		bool flipx = BIT(spritecont, 0);
+		bool flipy = BIT(spritecont, 1);
 
-		int curx = (x + scrollx) & 0xfff;
-		if (curx >= 0x800)  curx -= 0x1000;   /* treat it as signed */
-
-		int cury = (y + scrolly) & 0xfff;
-		if (cury >= 0x800)  cury -= 0x1000;   /* treat it as signed */
+		int curx = util::sext(x + scrollx, 12);
+		int cury = util::sext(y + scrolly, 12);
 
 		if (m_sprites_flipscreen)
 		{
@@ -329,12 +316,13 @@ void slapshot_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 			}
 			else
 			{
-				m_gfxdecode->gfx(0)->zoom_transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(0)->zoom_transpen(bitmap, cliprect,
 						sprite_ptr->code,
 						sprite_ptr->color,
-						sprite_ptr->flipx,sprite_ptr->flipy,
-						sprite_ptr->x,sprite_ptr->y,
-						sprite_ptr->zoomx,sprite_ptr->zoomy,0);
+						sprite_ptr->flipx, sprite_ptr->flipy,
+						sprite_ptr->x, sprite_ptr->y,
+						sprite_ptr->zoomx, sprite_ptr->zoomy,
+						0);
 			}
 		}
 	}
@@ -348,10 +336,11 @@ void slapshot_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 		m_gfxdecode->gfx(0)->prio_zoom_transpen(bitmap,cliprect,
 				sprite_ptr->code,
 				sprite_ptr->color,
-				sprite_ptr->flipx,sprite_ptr->flipy,
-				sprite_ptr->x,sprite_ptr->y,
-				sprite_ptr->zoomx,sprite_ptr->zoomy,
-				screen.priority(),sprite_ptr->primask,0);
+				sprite_ptr->flipx, sprite_ptr->flipy,
+				sprite_ptr->x, sprite_ptr->y,
+				sprite_ptr->zoomx, sprite_ptr->zoomy,
+				screen.priority(), sprite_ptr->primask,
+				0);
 	}
 }
 
@@ -381,9 +370,9 @@ void slapshot_state::update_sprites_active_area()
 		/* sprites_active_area may change during processing */
 		int offs = off + m_sprites_active_area;
 
-		if (m_spriteram_buffered[(offs + 6) / 2] & 0x8000)
+		if (BIT(m_spriteram_buffered[(offs + 6) / 2], 15))
 		{
-			m_sprites_disabled = m_spriteram_buffered[(offs + 10) / 2] & 0x1000;
+			m_sprites_disabled = BIT(m_spriteram_buffered[(offs + 10) / 2], 12);
 			m_sprites_active_area = 0x8000 * (m_spriteram_buffered[(offs + 10) / 2] & 0x0001);
 			continue;
 		}
@@ -391,13 +380,8 @@ void slapshot_state::update_sprites_active_area()
 		/* check for extra scroll offset */
 		if ((m_spriteram_buffered[(offs+4)/2] & 0xf000) == 0xa000)
 		{
-			m_sprites_master_scrollx = m_spriteram_buffered[(offs + 4) / 2] & 0xfff;
-			if (m_sprites_master_scrollx >= 0x800)
-				m_sprites_master_scrollx -= 0x1000;   /* signed value */
-
-			m_sprites_master_scrolly = m_spriteram_buffered[(offs + 6) / 2] & 0xfff;
-			if (m_sprites_master_scrolly >= 0x800)
-				m_sprites_master_scrolly -= 0x1000;   /* signed value */
+			m_sprites_master_scrollx = util::sext(m_spriteram_buffered[(offs + 4) / 2], 12);
+			m_sprites_master_scrolly = util::sext(m_spriteram_buffered[(offs + 6) / 2], 12);
 		}
 	}
 }

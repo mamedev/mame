@@ -4681,7 +4681,7 @@ ROM_END
 
 ***************************************************************************/
 
-//    year   rom        clone     machine   inputs    init                           monitor manufacturer          title                                                                     flags
+//    year   rom        clone     machine   inputs    init                                monitor manufacturer                                title                                                                     flags
 
 GAME( 1993,  dynagear,  0,        dynagear, dynagear, ssv_state,      init_ssv,           ROT0,   "Sammy",                                    "Dyna Gear",                                                              MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 

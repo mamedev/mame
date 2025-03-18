@@ -12,6 +12,7 @@
 #include "emu.h"
 #include "cards.h"
 
+#include "a570.h"
 #include "a590.h"
 #include "action_replay.h"
 #include "megamix500.h"
@@ -23,6 +24,7 @@ void a1000_cpuslot_cards(device_slot_interface &device)
 
 void a500_cpuslot_cards(device_slot_interface &device)
 {
+	device.option_add("a570", AMIGA_CPUSLOT_A570);
 	device.option_add("a590", AMIGA_CPUSLOT_A590);
 	device.option_add("ar", AMIGA_CPUSLOT_ACTION_REPLAY_MK1);
 	device.option_add("ar2", AMIGA_CPUSLOT_ACTION_REPLAY_MK2);

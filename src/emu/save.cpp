@@ -505,7 +505,7 @@ u32 save_manager::signature() const
 		temp[0] = little_endianize_int32(entry->m_typesize);
 		temp[1] = little_endianize_int32(entry->m_typecount);
 		temp[2] = little_endianize_int32(entry->m_blockcount);
-		temp[3] = little_endianize_int32(entry->m_stride);
+		temp[3] = 0;
 		crc.append(&temp[0], sizeof(temp));
 	}
 	return crc.finish();
