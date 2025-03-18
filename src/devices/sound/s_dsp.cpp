@@ -32,6 +32,26 @@
 
 #include <algorithm>
 
+#define LOG_KEY   (1 << 1)
+#define LOG_ENV   (1 << 2)
+#define LOG_PMOD  (1 << 3)
+#define LOG_BRR   (1 << 4)
+#define LOG_ECHO  (1 << 5)
+#define LOG_INTRP (1 << 6)
+#define LOG_NOISE (1 << 7)
+
+#define VERBOSE (0)
+
+#include "logmacro.h"
+
+#define LOGKEY(...)    LOGMASKED(LOG_KEY, __VA_ARGS__)
+#define LOGENV(...)    LOGMASKED(LOG_ENV, __VA_ARGS__)
+#define LOGPMOD(...)   LOGMASKED(LOG_PMOD, __VA_ARGS__)
+#define LOGBRR(...)    LOGMASKED(LOG_BRR, __VA_ARGS__)
+#define LOGECHO(...)   LOGMASKED(LOG_ECHO, __VA_ARGS__)
+#define LOGINTRP(...)  LOGMASKED(LOG_INTRP, __VA_ARGS__)
+#define LOGNOISE(...)  LOGMASKED(LOG_NOISE, __VA_ARGS__)
+
 /***************************************************************************
  CONSTANTS AND MACROS
 ***************************************************************************/
@@ -105,14 +125,6 @@ static const int gauss[]=
 	0x519, 0x519, 0x519, 0x519, 0x519, 0x519, 0x519, 0x519
 };
 
-#undef DEBUG
-#undef DBG_KEY
-#undef DBG_ENV
-#undef DBG_PMOD
-#undef DBG_BRR
-#undef DBG_ECHO
-#undef DBG_INTRP
-
 #undef NO_PMOD
 #undef NO_ECHO
 
@@ -122,7 +134,7 @@ static const int *const G2 = &gauss[512];
 static const int *const G3 = &gauss[255];
 static const int *const G4 = &gauss[0];
 
-static const int        mask = 0xff;
+static const u8         mask = 0xff;
 
 /* This table is for envelope timing.  It represents the number of counts
    that should be subtracted from the counter each sample period (32kHz).
@@ -262,9 +274,6 @@ void s_dsp_device::dsp_update(s16 *sound_ptr)
 	Therefore DSP only looks at these during an update, and not at the time of
 	the write.  Only need to do this once however, since the regs haven't
 	changed over the whole period we need to catch up with. */
-#ifdef DBG_KEY
-	m_dsp_regs[0x4c] &= mask;
-#endif
 
 	/* Keying on a voice resets that bit in ENDX */
 	m_dsp_regs[0x7c] &= ~m_dsp_regs[0x4c];
@@ -299,15 +308,13 @@ void s_dsp_device::dsp_update(s16 *sound_ptr)
 			/* Voice was keyed on */
 			m_keys       |= m;
 			m_keyed_on   |= m;
-#ifdef DBG_KEY
+#if (VERBOSE & LOG_KEY)
 			vl          = m_dsp_regs[(v << 4) + 4];
 #endif
 			vp.samp_id = (vptr(sd, V) << 16) | lptr(sd, V);
 			vp.mem_ptr = vptr(sd, V);
 
-#ifdef DBG_KEY
-			logerror("Keying on voice %d, samp=0x%04X (0x%02X)\n", v, vp.mem_ptr, vl);
-#endif
+			LOGKEY("Keying on voice %d, samp=0x%04X (0x%02X)\n", v, vp.mem_ptr, vl);
 
 			vp.header_cnt = 0;
 			vp.half       = false;
@@ -331,9 +338,7 @@ void s_dsp_device::dsp_update(s16 *sound_ptr)
 			m_dsp_regs[0x4c] &= ~m;
 			vp.on_cnt       = 8;
 
-#ifdef DBG_KEY
-			logerror("Key on set for voice %d\n", v);
-#endif
+			LOGKEY("Key on set for voice %d\n", v);
 		}
 
 		if (m_keys & m_dsp_regs[0x5c] & m)
@@ -342,9 +347,7 @@ void s_dsp_device::dsp_update(s16 *sound_ptr)
 			vp.envstate = env_state_t32::RELEASE;
 			vp.on_cnt   = 0;
 
-#ifdef DBG_KEY
-			logerror("Keying off voice %d\n", v);
-#endif
+			LOGKEY("Keying off voice %d\n", v);
 		}
 
 		if (!(m_keys & m & mask) || ((envx = advance_envelope(v)) < 0))
@@ -362,16 +365,12 @@ void s_dsp_device::dsp_update(s16 *sound_ptr)
 		modified OUTX since it was used for last voice. */
 		if (m_dsp_regs[0x2d] & m)
 		{
-#ifdef DBG_PMOD
-			logerror("Pitch Modulating voice %d, outx=%ld, old pitch=%d, ", v, outx, vp.pitch);
-#endif
+			LOGPMOD("Pitch Modulating voice %d, outx=%ld, old pitch=%d, ", v, outx, vp.pitch);
 			vp.pitch += (outx >> 5) * vp.pitch >> 10;
 		}
 #endif
 
-#ifdef DBG_PMOD
-		logerror("pitch=%d\n", vp.pitch);
-#endif
+		LOGPMOD("pitch=%d\n", vp.pitch);
 
 		for (; vp.mixfrac >= 0; vp.mixfrac -= 4096)
 		{
@@ -393,15 +392,11 @@ void s_dsp_device::dsp_update(s16 *sound_ptr)
 					{
 						vp.mem_ptr = lptr(sd, V);
 
-#ifdef DBG_BRR
-						logerror("BRR looping to 0x%04X\n", vp.mem_ptr);
-#endif
+						LOGBRR("BRR looping to 0x%04X\n", vp.mem_ptr);
 					}
 					else
 					{
-#ifdef DBG_KEY
-						logerror("BRR decode end, voice %d\n", v);
-#endif
+						LOGBRR("BRR decode end, voice %d\n", v);
 
 						m_keys &= ~m;
 						m_dsp_regs[V + 8] = 0;
@@ -423,9 +418,7 @@ void s_dsp_device::dsp_update(s16 *sound_ptr)
 				vp.end    = vl & 3;
 				vp.filter = (vl & 12) >> 2;
 
-#ifdef DBG_BRR
-				logerror("V%d: header read, range=%d, end=%d, filter=%d\n", v, vp.range, vp.end, vp.filter);
-#endif
+				LOGBRR("V%d: header read, range=%d, end=%d, filter=%d\n", v, vp.range, vp.end, vp.filter);
 			}
 
 			if (!vp.half)
@@ -442,9 +435,7 @@ void s_dsp_device::dsp_update(s16 *sound_ptr)
 				vp.header_cnt--;
 			}
 
-#ifdef DBG_BRR
-			logerror("V%d: nybble=%X, ptr=%04X, smp1=%d, smp2=%d\n", v, outx & 0x0f, vp.mem_ptr, vp.smp1, vp.smp2);
-#endif
+			LOGBRR("V%d: nybble=%X, ptr=%04X, smp1=%d, smp2=%d\n", v, outx & 0x0f, vp.mem_ptr, vp.smp1, vp.smp2);
 
 			/* For invalid ranges (D,E,F): if the nybble is negative, the result
 			is F000.  If positive, 0000.  Nothing else like previous range,
@@ -459,14 +450,10 @@ void s_dsp_device::dsp_update(s16 *sound_ptr)
 			{
 				outx &= ~0x7ff;
 
-#ifdef DBG_BRR
-				logerror("V%d: invalid range! (%X)\n", v, vp.range);
-#endif
+				LOGBRR("V%d: invalid range! (%X)\n", v, vp.range);
 			}
 
-#ifdef DBG_BRR
-			logerror("V%d: shifted delta=%04X\n", v, (u16)outx);
-#endif
+			LOGBRR("V%d: shifted delta=%04X\n", v, (u16)outx);
 
 			switch (vp.filter)
 			{
@@ -489,26 +476,20 @@ void s_dsp_device::dsp_update(s16 *sound_ptr)
 
 			outx = std::clamp(outx, -0x8000, 0x7fff);
 
-#ifdef DBG_BRR
-			logerror("V%d: filter + delta=%04X\n", v, (u16)outx);
-#endif
+			LOGBRR("V%d: filter + delta=%04X\n", v, (u16)outx);
 
 			vp.smp2 = (s16)vp.smp1;
 			vp.smp1 = (s16)(outx << 1);
 			vp.sampbuf[vp.sampptr] = vp.smp1;
 
-#ifdef DBG_BRR
-			logerror("V%d: final output: %04X\n", v, vp.sampbuf[vp.sampptr]);
-#endif
+			LOGBRR("V%d: final output: %04X\n", v, vp.sampbuf[vp.sampptr]);
 
 			vp.sampptr = (vp.sampptr + 1) & 3;
 		}
 
 		if (m_dsp_regs[0x3d] & m)
 		{
-#ifdef DBG_PMOD
-			logerror("Noise enabled, voice %d\n", v);
-#endif
+			LOGNOISE("Noise enabled, voice %d\n", v);
 			outx = (s16)(m_noise_lev << 1);
 		}
 		else
@@ -534,8 +515,7 @@ void s_dsp_device::dsp_update(s16 *sound_ptr)
 
 			outx = (s16)vr;
 
-#ifdef DBG_INTRP
-			logerror("V%d: mixfrac=%d: [%d]*%d + [%d]*%d + [%d]*%d + [%d]*%d = %d\n", v, vl,
+			LOGINTRP("V%d: mixfrac=%d: [%d]*%d + [%d]*%d + [%d]*%d + [%d]*%d = %d\n", v, vl,
 				G1[vl],
 				vp.sampbuf[(vp.sampptr + 3) & 3],
 				G2[vl],
@@ -545,7 +525,6 @@ void s_dsp_device::dsp_update(s16 *sound_ptr)
 				G4[-vl-1],
 				vp.sampbuf[vp.sampptr],
 				outx);
-#endif
 		}
 
 		/* Advance the sample position for next update. */
@@ -574,10 +553,8 @@ void s_dsp_device::dsp_update(s16 *sound_ptr)
 #ifndef NO_ECHO
 	/* Perform echo.  First, read mem at current location, and put those samples
 	into the FIR filter queue. */
-#ifdef DBG_ECHO
-	logerror("Echo delay=%dms, feedback=%d%%\n", m_dsp_regs[0x7d] * 16,
+	LOGECHO("Echo delay=%dms, feedback=%d%%\n", m_dsp_regs[0x7d] * 16,
 		((s8)m_dsp_regs[0x0d] * 100) / 0x7f);
-#endif
 
 	const u16 echo_base = ((m_dsp_regs[0x6d] << 8) + m_echo_ptr) & 0xffff;
 	m_fir_lbuf[m_fir_ptr] = (s16)read_word(echo_base);
@@ -608,8 +585,7 @@ void s_dsp_device::dsp_update(s16 *sound_ptr)
 	vl += m_fir_lbuf[m_fir_ptr] * (s8)m_dsp_regs[0x0f];
 	vr += m_fir_rbuf[m_fir_ptr] * (s8)m_dsp_regs[0x0f];
 
-#ifdef DBG_ECHO
-	logerror("FIR Coefficients: %02X %02X %02X %02X %02X %02X %02X %02X\n",
+	LOGECHO("FIR Coefficients: %02X %02X %02X %02X %02X %02X %02X %02X\n",
 		m_dsp_regs[0x0f],
 		m_dsp_regs[0x1f],
 		m_dsp_regs[0x2f],
@@ -618,7 +594,6 @@ void s_dsp_device::dsp_update(s16 *sound_ptr)
 		m_dsp_regs[0x5f],
 		m_dsp_regs[0x6f],
 		m_dsp_regs[0x7f]);
-#endif
 
 	/* FIR_ptr is left in the position of the oldest sample, the one that will be replaced next update. */
 	outl += vl * (s8)m_dsp_regs[0x2c] >> 14;
@@ -633,9 +608,7 @@ void s_dsp_device::dsp_update(s16 *sound_ptr)
 		echol = std::clamp(echol, -0x8000, 0x7fff);
 		echor = std::clamp(echol, -0x8000, 0x7fff);
 
-#ifdef DBG_ECHO
-		logerror("Echo: Writing %04X,%04X at location %04X\n", (u16)echol, (u16)echor, echo_base);
-#endif
+		LOGECHO("Echo: Writing %04X,%04X at location %04X\n", (u16)echol, (u16)echor, echo_base);
 
 		write_word(echo_base, (u16)echol);
 		write_word(echo_base + sizeof(s16), (u16)echor);
@@ -706,17 +679,15 @@ int s_dsp_device::advance_envelope(int v)
 		m_voice_state[v].envx = envx;
 		m_dsp_regs[(v << 4) + 8] = envx >> 8;
 
-#ifdef DBG_ENV
-		logerror("ENV voice %d: envx=%03X, state=RELEASE\n", v, envx);
-#endif
+		LOGENV("ENV voice %d: envx=%03X, state=RELEASE\n", v, envx);
 
 		return envx;
 	}
 
 	int cnt = m_voice_state[v].envcnt;
-	int adsr1 = m_dsp_regs[(v << 4) + 5];
+	const int adsr1 = m_dsp_regs[(v << 4) + 5];
 
-	if (adsr1 & 0x80)
+	if (BIT(adsr1, 7))
 	{
 		switch (m_voice_state[v].envstate)
 		{
@@ -728,9 +699,7 @@ int s_dsp_device::advance_envelope(int v)
 
 			if (t == 0x0f)
 			{
-#ifdef DBG_ENV
-				logerror("ENV voice %d: instant attack\n", v);
-#endif
+				LOGENV("ENV voice %d: instant attack\n", v);
 
 				envx += 0x400;
 			}
@@ -751,9 +720,7 @@ int s_dsp_device::advance_envelope(int v)
 				m_voice_state[v].envstate = env_state_t32::DECAY;
 			}
 
-#ifdef DBG_ENV
-			logerror("ENV voice %d: envx=%03X, state=ATTACK\n", v, envx);
-#endif
+			LOGENV("ENV voice %d: envx=%03X, state=ATTACK\n", v, envx);
 
 			m_voice_state[v].envx = envx;
 			break;
@@ -774,19 +741,15 @@ int s_dsp_device::advance_envelope(int v)
 			if (envx <= 0x100 * (SL(v) + 1))
 				m_voice_state[v].envstate = env_state_t32::SUSTAIN;
 
-#ifdef DBG_ENV
-			logerror("ENV voice %d: envx=%03X, state=DECAY\n", v, envx);
-#endif
+			LOGENV("ENV voice %d: envx=%03X, state=DECAY\n", v, envx);
 
 			break;
 
 		case env_state_t32::SUSTAIN:
 			/* Docs: "SR [is multiplied] by the fixed value 1-1/256."
 			Multiplying ENVX by 255/256 every time SUSTAIN is updated. */
-#ifdef DBG_ENV
 			if (ENVCNT[SR(v)] == 0)
-				logerror("ENV voice %d: envx=%03X, state=SUSTAIN, zero rate\n", v, envx);
-#endif
+				LOGENV("ENV voice %d: envx=%03X, state=SUSTAIN, zero rate\n", v, envx);
 
 			cnt -= ENVCNT[SR(v)];
 			if (cnt > 0)
@@ -795,9 +758,7 @@ int s_dsp_device::advance_envelope(int v)
 			cnt   = CNT_INIT;
 			envx -= ((envx - 1) >> 8) + 1;
 
-#ifdef DBG_ENV
-			logerror("ENV voice %d: envx=%03X, state=SUSTAIN\n", v, envx);
-#endif
+			LOGENV("ENV voice %d: envx=%03X, state=SUSTAIN\n", v, envx);
 
 			m_voice_state[v].envx = envx;
 
@@ -826,9 +787,7 @@ int s_dsp_device::advance_envelope(int v)
 			envx = t << 4;
 			m_voice_state[v].envx = envx;
 
-#ifdef DBG_ENV
-			logerror("ENV voice %d: envx=%03X, state=DIRECT\n", v, envx);
-#endif
+			LOGENV("ENV voice %d: envx=%03X, state=DIRECT\n", v, envx);
 		}
 		else
 		{
@@ -847,9 +806,7 @@ int s_dsp_device::advance_envelope(int v)
 				if (envx < 0)
 					envx = 0;
 
-#ifdef DBG_ENV
-				logerror("ENV voice %d: envx=%03X, state=DECREASE\n", v, envx);
-#endif
+				LOGENV("ENV voice %d: envx=%03X, state=DECREASE\n", v, envx);
 
 				m_voice_state[v].envx = envx;
 				break;
@@ -864,9 +821,7 @@ int s_dsp_device::advance_envelope(int v)
 				cnt = CNT_INIT;
 				envx -= ((envx - 1) >> 8) + 1;
 
-#ifdef DBG_ENV
-				logerror("ENV voice %d: envx=%03X, state=EXP\n", v, envx);
-#endif
+				LOGENV("ENV voice %d: envx=%03X, state=EXP\n", v, envx);
 
 				m_voice_state[v].envx = envx;
 				break;
@@ -880,12 +835,9 @@ int s_dsp_device::advance_envelope(int v)
 
 				cnt = CNT_INIT;
 				envx += 0x020;      /* 0x020 / 0x800 = 1/64th   */
-				if (envx > 0x7ff)
-					envx = 0x7ff;
+				envx = std::min(envx, 0x7ff);
 
-#ifdef DBG_ENV
-				logerror("ENV voice %d: envx=%03X, state=INCREASE\n", v, envx);
-#endif
+				LOGENV("ENV voice %d: envx=%03X, state=INCREASE\n", v, envx);
 
 				m_voice_state[v].envx = envx;
 				break;
@@ -905,12 +857,9 @@ int s_dsp_device::advance_envelope(int v)
 				else
 					envx += 0x008;  /* 0x008 / 0x800 = 1/256        */
 
-				if (envx > 0x7ff)
-					envx=0x7ff;
+				envx = std::min(envx, 0x7ff);
 
-#ifdef DBG_ENV
-				logerror("ENV voice %d: envx=%03X, state=INCREASE\n", v, envx);
-#endif
+				LOGENV("ENV voice %d: envx=%03X, state=INCREASE\n", v, envx);
 
 				m_voice_state[v].envx = envx;
 				break;
@@ -951,7 +900,7 @@ u8 s_dsp_device::dsp_io_r(offs_t offset)
 #endif
 
 	/* All reads simply return the contents of the addressed register. */
-	if (offset & 1)
+	if (BIT(offset, 0))
 		return m_dsp_regs[m_dsp_addr & 0x7f];
 
 	return m_dsp_addr;
@@ -961,9 +910,9 @@ void s_dsp_device::dsp_io_w(offs_t offset, u8 data)
 {
 	m_channel->update();
 
-	if (offset & 1)
+	if (BIT(offset, 0))
 	{
-		if (!(m_dsp_addr & 0x80))
+		if (BIT(~m_dsp_addr, 7))
 		{
 			offset = m_dsp_addr & 0x7f;
 			if (offset == 0x7c)
