@@ -32,7 +32,7 @@
   - jinhulu2 and jinhulu2101is stop at "system is connecting".
     Some type of link feature?
   - jinhulu2120gi has machine translated DIP definitions which could use improving.
-    Inputs in the "SERVICE" port seem to register two different buttons.
+  - jinhulu2120gi hopper isn't implemented yet.
 
 ***************************************************************************/
 
@@ -166,7 +166,10 @@ class jinhulu2_state : public spokeru_state
 {
 public:
 	jinhulu2_state(const machine_config &mconfig, device_type type, const char *tag) :
-		spokeru_state(mconfig, type, tag)
+		spokeru_state(mconfig, type, tag),
+		m_ymsnd(*this, "ymsnd"),
+		m_service(*this, "SERVICE"),
+		m_in1(*this, "IN1")
 	{ }
 
 	void jinhulu2(machine_config &config)ATTR_COLD;
@@ -180,7 +183,13 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
+	required_device<ym2149_device> m_ymsnd;
+
+	required_ioport m_service;
+	required_ioport m_in1;
+
 	uint8_t m_protection_res = 0;
+	uint8_t m_input_sel = 0;
 
 	void nmi_w(uint8_t data);
 	uint8_t igs003c_r();
@@ -521,7 +530,7 @@ void jinhulu2_state::igs003c_w(uint8_t data)
 {
 	switch (data)
 	{
-		// case 0x01: break; // TODO: possibly selects inputs read by the SYSTEM port?
+		// case 0x01: break; // TODO: what does this do?
 		case 0x02: m_protection_res = ioport("IN0")->read(); break;
 		case 0x20: m_protection_res = 0x49; break;
 		case 0x21: m_protection_res = 0x47; break;
@@ -601,12 +610,12 @@ void jinhulu2_state::portmap(address_map &map)
 	map(0x4000, 0x4000).portr("DSW3");
 	map(0x4001, 0x4001).portr("DSW2");
 	map(0x4002, 0x4002).portr("DSW1");
-	map(0x5001, 0x5001).portr("SERVICE");
-	map(0x5002, 0x5003).w("ymsnd", FUNC(ym2149_device::data_address_w));
+	map(0x5001, 0x5001).lr8(NAME([this] () -> uint8_t { return m_input_sel ? m_service->read() : m_in1->read(); }));
+	map(0x5002, 0x5002).w("ymsnd", FUNC(ym2149_device::data_w));
+	map(0x5003, 0x5003).lw8(NAME([this] (uint8_t data) { m_input_sel = BIT(data, 0); m_ymsnd->address_w(data); }));
 	map(0x5010, 0x5010).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x5030, 0x5030).w(FUNC(jinhulu2_state::igs003c_w));
-	map(0x5031, 0x5031).r(FUNC(jinhulu2_state::igs003c_r));
-	map(0x5031, 0x5031).w(FUNC(jinhulu2_state::nmi_w));
+	map(0x5031, 0x5031).r(FUNC(jinhulu2_state::igs003c_r)).w(FUNC(jinhulu2_state::nmi_w));
 	map(0x7000, 0x77ff).ram().w(FUNC(jinhulu2_state::fg_tile_w)).share(m_fg_tile_ram);
 	map(0x7800, 0x7fff).ram().w(FUNC(jinhulu2_state::fg_color_w)).share(m_fg_color_ram);
 }
@@ -1388,13 +1397,23 @@ static INPUT_PORTS_START( jinhulu2 ) // these are verified for v120GI
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
 	PORT_START("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) // lights both Bet and Keyout in test mode
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) // lights both Book-Keeping and Small in test mode
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 ) // lights both Start and Big
-	PORT_SERVICE_NO_TOGGLE( 0x10, IP_ACTIVE_LOW ) // lights both Test and Take Score in test mode
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) // lights both Hold 1 and Double Up in test mode
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_SERVICE_NO_TOGGLE( 0x10, IP_ACTIVE_LOW )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
@@ -1498,6 +1517,7 @@ void jinhulu2_state::machine_start()
 	spoker_state::machine_start();
 
 	save_item(NAME(m_protection_res));
+	save_item(NAME(m_input_sel));
 }
 
 void spoker_state::machine_reset()
@@ -1574,7 +1594,7 @@ void jinhulu2_state::jinhulu2(machine_config &config)
 
 	m_gfxdecode->set_info(gfx_jinhulu2);
 
-	YM2149(config.replace(), "ymsnd", 12_MHz_XTAL / 12).add_route(ALL_OUTPUTS, "mono", 0.5);
+	YM2149(config.replace(), "ymsnd", 12_MHz_XTAL / 12).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 
@@ -2241,6 +2261,6 @@ GAME( 1996,  spk100,        spk306us, spoker,   spk100,   spoker_state,   init_s
 GAME( 1993?, 3super8,       0,        _3super8, 3super8,  spoker_state,   init_3super8,       ROT0,  "<unknown>", "3 Super 8 (Italy)",          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // ROMs are badly dumped
 GAME( 1997,  jbell,         0,        jb,       jb,       jb_state,       init_spokeru,       ROT0,  "IGS",       "Jingle Bell (v200US)",       MACHINE_SUPPORTS_SAVE )
 GAME( 1995,  jinhulu2,      0,        jinhulu2, jinhulu2, jinhulu2_state, init_jinhulu2,      ROT0,  "IGS",       "Jin Hu Lu 2 (v412GS)",       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // tries to link to something?
-GAME( 1995,  jinhulu2120gi, jinhulu2, jinhulu2, jinhulu2, jinhulu2_state, init_jinhulu2120gi, ROT0,  "IGS",       "Jin Hu Lu 2 (v120GI)",       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // inputs
+GAME( 1995,  jinhulu2120gi, jinhulu2, jinhulu2, jinhulu2, jinhulu2_state, init_jinhulu2120gi, ROT0,  "IGS",       "Jin Hu Lu 2 (v120GI)",       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // hopper
 GAME( 1996,  jinhulu2101is, jinhulu2, jinhulu2, jinhulu2, jinhulu2_state, init_jinhulu2101is, ROT0,  "IGS",       "Jin Hu Lu 2 (v101IS)",       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // tries to link to something?
-GAME( 2001,  cjdh6,         0,        jinhulu2, jinhulu2, jinhulu2_state, init_jinhulu2120gi, ROT0,  "IGS",       "Chaoji Daheng 6th (v100FI)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // no GFX ROM dump, inputs
+GAME( 2001,  cjdh6,         0,        jinhulu2, jinhulu2, jinhulu2_state, init_jinhulu2120gi, ROT0,  "IGS",       "Chaoji Daheng 6th (v100FI)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // no GFX ROM dump, hopper

@@ -8,6 +8,8 @@ PGM-like but with different sound hardware.
 TODO:
 * identify sound hardware
 * identify where the M6502 core is contained
+* complete inputs for xypmd
+* add inputs for xypmda
 */
 
 
@@ -34,15 +36,21 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_video(*this, "igs023"),
-		m_mainram(*this, "sram")
+		m_mainram(*this, "sram"),
+		m_in0(*this, "IN0"),
+		m_dsw(*this, "DSW%u", 1U)
 	{ }
 
 	void xypmd(machine_config &config) ATTR_COLD;
 	void xypmda(machine_config &config) ATTR_COLD;
 
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
 private:
 	u16 unknown_r() { return (machine().rand() & 0x0010) | 0xffcf; } // 0x0010 seems to be sound CPU status
 	u16 unknown2_r() { return 0xffff; }
+	u16 input_r();
 
 	void screen_vblank(int state);
 	void screen_vblank_xypmda(int state);
@@ -57,7 +65,19 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<igs023_video_device> m_video;
 	required_shared_ptr<uint16_t> m_mainram;
+
+	required_ioport m_in0;
+	required_ioport_array<2> m_dsw;
+
+	u8 m_input_sel = 0;
 };
+
+
+void igs_68k_023vid_state::machine_start()
+{
+	save_item(NAME(m_input_sel));
+}
+
 
 void igs_68k_023vid_state::screen_vblank(int state)
 {
@@ -91,13 +111,28 @@ void igs_68k_023vid_state::screen_vblank_xypmda(int state)
 	}
 }
 
+
+u16 igs_68k_023vid_state::input_r() // TODO: not totally correct
+{
+	u16 ret = m_in0->read();
+
+	if (!BIT(m_input_sel, 2))
+		ret &= m_dsw[0]->read();
+	if (!BIT(m_input_sel, 3))
+		ret &= m_dsw[1]->read();
+
+	return ret;
+}
+
+
 void igs_68k_023vid_state::main_program_base_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 
-	map(0x800000, 0x80ffff).ram().share(m_mainram);
+	map(0x800000, 0x81ffff).ram().share(m_mainram); // RAM test tests the full 0x20000, while in game it only seems to use 0x10000
 	map(0x900000, 0x907fff).mirror(0x0f8000).rw(m_video, FUNC(igs023_video_device::videoram_r), FUNC(igs023_video_device::videoram_w));
 	map(0xa00000, 0xa011ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0xa01200, 0xa023ff).ram(); // palette RAM test fails otherwise
 	map(0xb00000, 0xb0ffff).rw(m_video, FUNC(igs023_video_device::videoregs_r), FUNC(igs023_video_device::videoregs_w));
 }
 
@@ -112,7 +147,7 @@ void igs_68k_023vid_state::main_program_xypmd_map(address_map &map)
 
 	// 025 or just I/O?
 	map(0x0c0000, 0x0c0001).nopr().nopw();
-	map(0x0c0002, 0x0c0003).nopw().portr("IN0");
+	map(0x0c0002, 0x0c0003).r(FUNC(igs_68k_023vid_state::input_r)).lw16(NAME([this] (uint16_t data) { m_input_sel = data & 0xff; }));
 }
 
 void igs_68k_023vid_state::main_program_xypmda_map(address_map &map)
@@ -147,40 +182,26 @@ void igs_68k_023vid_state::sub_program_map(address_map &map)
 
 static INPUT_PORTS_START( xypmd )
 	PORT_START("IN0")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
 	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW1:1")
@@ -191,6 +212,7 @@ static INPUT_PORTS_START( xypmd )
 	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW1:6")
 	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW1:7")
 	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW1:8")
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW2")
 	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW2:1")
@@ -201,6 +223,7 @@ static INPUT_PORTS_START( xypmd )
 	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW2:6")
 	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW2:7")
 	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW2:8")
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
