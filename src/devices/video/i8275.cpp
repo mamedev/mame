@@ -27,7 +27,6 @@
     TODO:
 
     - double spaced rows
-    - preset counters - how it affects DMA and HRTC?
 
 */
 
@@ -96,6 +95,7 @@ i8275_device::i8275_device(const machine_config &mconfig, device_type type, cons
 	m_buffer_dma(0),
 	m_lpen(0),
 	m_scanline(0),
+	m_column(0),
 	m_dma_stop(false),
 	m_end_of_screen(false),
 	m_preset(false),
@@ -145,6 +145,13 @@ void i8275_device::device_start()
 		m_scanline_timer = timer_alloc(FUNC(i8275_device::scanline_tick), this);
 	}
 
+	//preinitialize the device with valid data (in real hardware parameters initialize to random)
+	m_param[REG_SCN1] = 0x4f;
+	m_param[REG_SCN2] = 0x58;
+	m_param[REG_SCN3] = 0x89;
+	m_param[REG_SCN4] = 0xd9;
+	recompute_parameters();
+
 	// state saving
 	save_item(NAME(m_status));
 	save_item(NAME(m_param));
@@ -161,6 +168,7 @@ void i8275_device::device_start()
 	save_item(NAME(m_buffer_dma));
 	save_item(NAME(m_lpen));
 	save_item(NAME(m_scanline));
+	save_item(NAME(m_column));
 	save_item(NAME(m_irq_scanline));
 	save_item(NAME(m_vrtc_scanline));
 	save_item(NAME(m_vrtc_drq_scanline));
@@ -300,6 +308,7 @@ TIMER_CALLBACK_MEMBER(i8275_device::scanline_tick)
 		{
 			if ((crtc->m_status & ST_IE) && !(crtc->m_status & ST_IR))
 			{
+				LOG("I8275 IRQ Set\n");
 				crtc->m_status |= ST_IR;
 				crtc->m_write_irq(ASSERT_LINE);
 			}
@@ -358,6 +367,7 @@ TIMER_CALLBACK_MEMBER(i8275_device::scanline_tick)
 				auto [data, attr] = crtc->char_from_buffer(n, sx, rc, lc, end_of_row, blank_row);
 				charcode |= uint32_t(data) << (n * 8);
 				attrcode |= uint32_t(attr) << (n * 8);
+				crtc->m_column = sx;
 			}
 
 			m_display_cb(m_bitmap,
@@ -410,6 +420,7 @@ std::pair<uint8_t, uint8_t> i8275_device::char_from_buffer(int n, int sx, int rc
 		{
 			// simply blank the attribute character itself
 			attr = FAC_B;
+			attr |= (data & FAC_GG); // add the GG attributes
 		}
 	}
 	else if (data >= 0xf0 || BIT(end_of_row, n))
@@ -716,8 +727,8 @@ void i8275_device::lpen_w(int state)
 {
 	if (!m_lpen && state)
 	{
-		m_param[REG_LPEN_COL] = screen().hpos() / m_hpixels_per_column;
-		m_param[REG_LPEN_ROW] = screen().vpos() / scanlines_per_row();
+		m_param[REG_LPEN_COL] = m_column + 3; //According to the datasheet the column is at least three positions off
+		m_param[REG_LPEN_ROW] = m_scanline / scanlines_per_row();
 
 		m_status |= ST_LP;
 	}
