@@ -2137,6 +2137,19 @@ ROM_START( sstar97a )
 	ROM_LOAD16_BYTE( "105.u22", 0x40001, 0x20000, CRC(ca17a632) SHA1(d491310ccdbe9b59a1e607f9254646f20700d79d) )
 ROM_END
 
+
+// PCB has a Z84C0008PEC, 2x 82C55AC-2, AT89C2051 MCU, ATF1508AS EEPLD, 24C04AN, JFC 95101 (AY-8910 clone), Altera EPM7032LC44-15
+ROM_START( sstar97jb )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "star97jianan.u6", 0x00000, 0x20000, CRC(23904300) SHA1(8d4c9478250aaa1f7abdc2fd84a1e83be61723a0) ) // encrypted, address line based
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD( "star97jianan.u8", 0x00000, 0x80000, CRC(644f6ca8) SHA1(7d0b8c2c488f4169018e5bf861dc73eaeef9d9df) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD( "star97jianan.u9", 0x00000, 0x80000, CRC(31289532) SHA1(27243de8e79c552ba71aa8ea0ee7197228b55528) )
+ROM_END
+
 /*
   蝴蝶梦 97 (Húdié Mèng 97)
   Game is encrypted and needs better decoded graphics.
@@ -2587,6 +2600,7 @@ GAME( 199?, miaction,  0,        skylncr,  skylncr,  skylncr_state,  init_miacti
 GAME( 199?, tigerslt,  0,        skylncr,  skylncr,  skylncr_state,  init_miaction,  ROT0, "bootleg",              "Tiger (slot)",                                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE  )
 GAME( 199?, sstar97,   0,        sstar97,  sstar97,  skylncr_state,  empty_init,     ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 (version V153B)",   MACHINE_SUPPORTS_SAVE )
 GAME( 199?, sstar97a,  sstar97,  sstar97,  sstar97,  skylncr_state,  init_sstar97a,  ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 (version V168A)",   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 199?, sstar97jb, sstar97,  sstar97,  sstar97,  skylncr_state,  empty_init,     ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 Jianan Ban",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // needs decryption
 GAME( 1995, bdream97,  0,        bdream97, skylncr,  skylncr_state,  empty_init,     ROT0, "bootleg (KKK)",        "Hudie Meng 97",                                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 2000?,olymp,     0,        olymp,    skylncr,  skylncr_state,  init_olymp,     ROT0, "Z Games",              "Olympus (Z Games, version 10)",                  MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // Still has Bordun International 1992 strings
 GAME( 2000, sonikfig,  0,        skylncr,  sonikfig, skylncr_state,  init_sonikfig,  ROT0, "Z Games",              "Sonik Fighter (version 02, encrypted)",          MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

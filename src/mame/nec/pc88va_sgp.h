@@ -37,7 +37,7 @@ private:
 		u8 pixel_mode = 0;
 		u16 hsize = 0;
 		u16 vsize = 0;
-		u16 fb_pitch = 0;
+		s16 fb_pitch = 0;
 		u32 address = 0;
 	};
 

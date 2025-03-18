@@ -9,6 +9,10 @@ see eag68k.cpp for 68000-based EAG hardware
 NOTE: To start a new game in EAS/PC, press Game Control (aka Reset), activate
 the D6 square, and then press CL. See below for more info.
 
+TODO:
+- Chess Encyclopedia modules don't work on fpres (original program) and feasx,
+  probably unsupported and therefore BTANB?
+
 BTANB:
 - feasglab locks up at boot if it was powered off in the middle of the game.
   To resolve this, hold the Game Control button while booting to clear nvram.

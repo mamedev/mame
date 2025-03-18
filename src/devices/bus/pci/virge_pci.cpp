@@ -64,7 +64,7 @@ void virge_pci_device::mmio_map(address_map& map)
 
 	//map(0xff00, 0xff5f) LPB Local Peripheral Bus control
 	//map(0xff1c, 0xff1f) LPB GIP/GOP General Input/Output Port (for OEM implementations)
-	//map(0xff20, 0xff23) Serial Port Register (DDC/I2C, pins 205-206, aliased at I/O ports $e2 or $e8)
+	map(0xff20, 0xff23).rw(m_vga, FUNC(s3virge_vga_device::serial_port_r), FUNC(s3virge_vga_device::serial_port_w));
 	//map(0xff24, 0xff27) LPB Video Input Window Size
 	//map(0xff28, 0xff2b) LPB Video Data Offsets
 	//map(0xff2c, 0xff2f) LPB Horizontal Decimation Control Register
@@ -244,7 +244,16 @@ void virge_pci_device::map_extra(uint64_t memory_window_start, uint64_t memory_w
 	}
 
 	if (BIT(command, 0))
+	{
 		io_space->install_device(0x03b0, 0x03df, *this, &virge_pci_device::legacy_io_map);
+
+		//
+		if (m_vga->read_pd26_strapping() == false)
+		{
+			const u16 port_offset = m_vga->read_pd25_strapping() ? 0xe2 : 0xe8;
+			io_space->install_readwrite_handler(port_offset, port_offset, read8sm_delegate(m_vga, FUNC(s3virge_vga_device::serial_port_r)), write8sm_delegate(m_vga, FUNC(s3virge_vga_device::serial_port_w)));
+		}
+	}
 }
 
 void virge_pci_device::device_add_mconfig(machine_config &config)
@@ -327,6 +336,9 @@ ROM_START( virgedx_pci )
 
 	ROM_SYSTEM_BIOS( 1, "dms3d2kp", "Diamond Stealth 3D 2000 Pro v3.04" )
 	ROMX_LOAD("virgedxdiamond.bin", 0x00000, 0x8000, CRC(58b0dcda) SHA1(b13ae6b04db6fc05a76d924ddf2efe150b823029), ROM_BIOS(1) )
+
+	ROM_SYSTEM_BIOS( 2, "s600dx", "Leadtek WinFast 3D S600DX V1.01.03" )
+	ROMX_LOAD("winfast_3d_s600dx.bin", 0x00000, 0x8000, CRC(d68db9f4) SHA1(9a7f58fab7811342a00bbc76837b4f9015913ddb), ROM_BIOS(2) )
 ROM_END
 
 const tiny_rom_entry *virgedx_pci_device::device_rom_region() const

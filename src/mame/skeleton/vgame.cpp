@@ -120,7 +120,7 @@ GFXDECODE_END
 
 void vgame_state::vgame(machine_config &config)
 {
-	ARM7(config, m_maincpu, 44_MHz_XTAL); // CPU core and divider unknown; ROMs seem to contain at least some ARM or Thumb code
+	ARM7(config, m_maincpu, 44_MHz_XTAL); // CPU core unknown; ROMs seem to contain at least some ARM or Thumb code
 	m_maincpu->set_addrmap(AS_PROGRAM, &vgame_state::program_map);
 	// m_maincpu->set_vblank_int("screen", FUNC(vgame_state::irq0_line_hold));
 
@@ -139,7 +139,7 @@ void vgame_state::vgame(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, "oki", 44_MHz_XTAL / 44, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // pin 7 and clock not verified
+	OKIM6295(config, "oki", 44_MHz_XTAL / 44, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 // VGAME-0030-02-AI PCB
@@ -168,6 +168,8 @@ ROM_START( mjxy2 )
 
 	ROM_REGION( 0x200000, "oki", 0 )
 	ROM_LOAD( "u43_sp_v105.u43", 0x000000, 0x200000, CRC(5d1ab8f1) SHA1(56473b632dfdb210208ce3b35cb6861f07861cd7) )
+
+	// EEPROM dump for mjxy2 was 0xff filled
 ROM_END
 
 /*
@@ -181,7 +183,7 @@ same text font but with a simpler modern design using mostly surface-mounted par
 similar format to IGS PCBs. It is possible VGAME is an IGS company or it was run by ex-IGS employees who set
 up their own company doing the same thing using knowledge gained from working at IGS.
 
-The CPU is a QFP128 which is an unusual footprint for a CPU and appears to be similar (bot not identical) to
+The CPU is a QFP128 which is an unusual footprint for a CPU and appears to be similar (but not identical) to
 the special IGS027A used by lhzb3sjb. The same pin that was found to be the serial port when trojaning
 lhzb3sjb goes to a connector on the edge of the board and appears to be the debug/programming port. When the
 program ROM is removed the message that shows on screen from the internal ROM is very similar to the messages
@@ -224,7 +226,7 @@ Notes:
                   "VGAME-007" - Chao Ji Dou Niu
                   007 also seen on Mahjong School 2 and Chaoji Laizi Dou Dizhu so these might use the same internal ROM.
       VGAME-003 - QFP240 Custom Graphics Chip. Possibly similar to IGS023 or IGS031. Chip has additional
-                  logic and other functions such providing the 1MHz clock for the M6295.
+                  logic and other functions such as providing the 1MHz clock for the M6295.
                   The same type of chip exists on Mahjong School 2 and Chaoji Laizi Dou Dizhu marked "VGAME-008"
            6295 - OKI M6295 4-Channel ADPCM Voice Synthesis LSI. Clock Input 1.000MHz [44/44]. Pin 7 HIGH
                   1MHz clock comes from VGAME-003.
@@ -274,13 +276,28 @@ ROM_START( cjsjh ) // Nov  2 2007 16:05:26 string in ROM
 	ROM_LOAD( "vxxxcn.u8", 0x000000, 0x200000, CRC(911d8dce) SHA1(1d9386c4a9e118d02b5b29f9e9ce90ef1d6f419f) ) // label not readable
 
 	ROM_REGION( 0x400000, "gfx", 0 )
-	ROM_LOAD( "gfx.u2", 0x000000, 0x400000, CRC(e2964db3) SHA1(21e021c88136083445b430c618a8eb74e2147d4f ) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
+	ROM_LOAD( "gfx.u2", 0x000000, 0x400000, CRC(e2964db3) SHA1(21e021c88136083445b430c618a8eb74e2147d4f) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
 
 	ROM_REGION( 0x200000, "oki", 0 )
 	ROM_LOAD( "sp.u24", 0x000000, 0x200000, CRC(ad11c8b9) SHA1(0547a57ff2183e65fa1d51234799a3d521b018c5) )
 
-	ROM_REGION( 0x200, "eeprom", 0 )
-	ROM_LOAD( "cjsjh_93c66a.u11", 0x000, 0x200, CRC(cbaeab4f) SHA1(505d91ee1b0d219aa55e3262b3bf712c4d9c2408) )
+	ROM_REGION16_BE( 0x200, "eeprom", 0 )
+	ROM_LOAD16_WORD_SWAP( "cjsjh_93c66a.u11", 0x000, 0x200, CRC(cbaeab4f) SHA1(505d91ee1b0d219aa55e3262b3bf712c4d9c2408) )
+ROM_END
+
+ROM_START( cjlddz )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD( "u12.u12", 0x000000, 0x200000, CRC(b35ff3cb) SHA1(fe1fa4448153a449f28b776ef452be860d119e7b) )
+
+	ROM_REGION( 0x800000, "gfx", 0 )
+	ROM_LOAD16_BYTE( "u2_cg_v101.u2", 0x000000, 0x400000, CRC(37eec9f9) SHA1(c0fcce6ccf28583920eae2558133a5ba2e1fb68b) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
+	ROM_LOAD16_BYTE( "u8_cg_v101.u8", 0x000001, 0x400000, CRC(eb3ccdf1) SHA1(f0420f967d4decda3643975205eacdb8c0536bef) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "u43_sp_v100.u43", 0x000000, 0x200000, CRC(ec57f98b) SHA1(ada7e8248d6d9fbd3b3b5caaad45ea814f09edd6) )
+
+	ROM_REGION16_BE( 0x200, "eeprom", 0 )
+	ROM_LOAD16_WORD_SWAP( "cjlddz_93c66a.u13", 0x000, 0x200, CRC(3930b2ff) SHA1(69e1e7b8654ff3696ab7f210fa69a5aed9cb59fb) )
 ROM_END
 
 
@@ -321,3 +338,4 @@ GAME( 200?, hilice,  0, vgame, hilice, vgame_state, init_vgame, ROT0, "VGame", "
 GAME( 200?, mjxy2,   0, vgame, hilice, vgame_state, init_vgame, ROT0, "VGame", "Majiang Xueyuan 2 - Mahjong School (V108TW)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2008, cjdn,    0, vgame, hilice, vgame_state, init_vgame, ROT0, "VGame", "Chao Ji Dou Niu (V305CN)",                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2007, cjsjh,   0, vgame, hilice, vgame_state, init_vgame, ROT0, "VGame", "Chao Ji Sai Jin Hua (V201CN)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, cjlddz,  0, vgame, hilice, vgame_state, init_vgame, ROT0, "VGame", "Chao Ji Laizi Dou Dizhu (V109CN)",              MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
