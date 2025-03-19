@@ -56,21 +56,12 @@ GFXDECODE_MEMBER( tatsumi_rotating_sprites_device::gfxinfo )
 	GFXDECODE_DEVICE("sprites_h", 0, spritelayout, 0, 256)
 GFXDECODE_END
 
-GFXDECODE_MEMBER( tatsumi_rotating_sprites_bigpal_device::gfxinfo_big )
-	GFXDECODE_DEVICE("sprites_l", 0, spritelayout, 0, 512)
-	GFXDECODE_DEVICE("sprites_h", 0, spritelayout, 0, 512)
-GFXDECODE_END
-
 void tatsumi_rotating_sprites_device::device_start()
 {
 	common_init();
 	decode_gfx(gfxinfo);
-}
-
-void tatsumi_rotating_sprites_bigpal_device::device_start()
-{
-	common_init();
-	decode_gfx(gfxinfo_big);
+	gfx(0)->set_colors(m_rom_clut_size / 8);
+	gfx(1)->set_colors(m_rom_clut_size / 8);
 }
 
 void tatsumi_rotating_sprites_device::device_reset()
