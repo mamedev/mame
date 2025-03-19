@@ -61,13 +61,13 @@ Most of the digital functionality is emulated. Audio is partially emulated.
 
 Reasons for MACHINE_IMPERFECT_SOUND:
 * Missing a few sample checksums.
-* Volume and pan sliders don't work yet.
-* Tuning knobs and trimmers don't work yet (no tom and conga variations).
 * Missing bass drum LPF and filter envelope.
 * Missing snare / sidestick volume envelope.
 * Missing hi-hat volume envelope (open and closed hats will sound the same.
   Decay knob is inoperative).
 * Missing tom / conga LPF and filter envelope.
+* Inaccurate filter for "click".
+* Linear, instead of audio-taper volume sliders and master volume knob.
 
 PCBoards:
 * CPU board. 2 sections in schematics:
@@ -100,6 +100,7 @@ Example:
 #include "sound/dac76.h"
 #include "sound/flt_rc.h"
 #include "sound/flt_vol.h"
+#include "sound/mixer.h"
 #include "sound/spkrdev.h"
 #include "speaker.h"
 
@@ -111,9 +112,10 @@ Example:
 #define LOG_TEMPO_CHANGE     (1U << 4)
 #define LOG_STROBES          (1U << 5)
 #define LOG_TAPE_SYNC_ENABLE (1U << 6)
-#define LOG_VOLUME           (1U << 7)
+#define LOG_MIX              (1U << 7)
+#define LOG_PITCH            (1U << 8)
 
-#define VERBOSE (LOG_GENERAL | LOG_STROBES)
+#define VERBOSE (LOG_GENERAL)
 //#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
@@ -122,15 +124,60 @@ namespace {
 
 enum mux_voices
 {
-	TAMBOURINE = 0,
-	CABASA,
-	CLAP,
-	COWBELL,
-	BASS,
-	HAT,
-	RIDE,
-	CRASH,
+	MV_TAMBOURINE = 0,
+	MV_CABASA,
+	MV_CLAP,
+	MV_COWBELL,
+	MV_BASS,
+	MV_HAT,
+	MV_RIDE,
+	MV_CRASH,
 	NUM_MUX_VOICES
+};
+
+// Names (excluding the TV_ prefix) match those in the schematics.
+enum tom_voices
+{
+	TV_LOW_CONGA = 0,
+	TV_HI_CONGA,
+	TV_LOW_TOMS,
+	TV_MID_TOMS,
+	TV_HI_TOMS,
+	NUM_TOM_VOICES
+};
+
+// Names (excluding the TK_ prefix) match those on the tuning UI.
+enum tuning_knobs
+{
+	TK_SNARE = 0,
+	TK_HI_TOMS,
+	TK_MID_TOMS,
+	TK_LO_TOMS,
+	TK_HI_CONGAS,
+	TK_LO_CONGAS,
+	NUM_TUNING_KNOBS
+};
+
+// Names (excluding the MIX_ prefix) match those on the mixer UI.
+enum mixer_channels
+{
+	MIX_BASS = 0,
+	MIX_SNARE,
+	MIX_SIDESTICK,
+	MIX_HIHAT,
+	MIX_HITOMS,
+	MIX_MIDTOMS,
+	MIX_LOTOMS,
+	MIX_RIDE,
+	MIX_CRASH,
+	MIX_CABASA,
+	MIX_TAMB,
+	MIX_HICONGAS,
+	MIX_LOCONGAS,
+	MIX_COWBELL,
+	MIX_CLAPS,
+	MIX_CLICK,
+	NUM_MIXER_CHANNELS
 };
 
 }  // anonymous namespace
@@ -141,31 +188,44 @@ class linndrum_audio_device : public device_t
 public:
 	linndrum_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0) ATTR_COLD;
 
-	void voice_data_enable_w(int state);
-	template <int Voice> void strobe_mux_drum_w(u8 data);
+	void strobe_mux_drum_w(int voice, u8 data);
 	void strobe_snare_w(u8 data);  // Snare and sidestick.
 	void strobe_tom_w(u8 data);  // Tom and conga.
 	void strobe_click_w(u8 data);
 	void beep_w(int state);
 
+	DECLARE_INPUT_CHANGED_MEMBER(mix_changed);
+	DECLARE_INPUT_CHANGED_MEMBER(master_volume_changed);
+	DECLARE_INPUT_CHANGED_MEMBER(mux_drum_tuning_changed);
+	DECLARE_INPUT_CHANGED_MEMBER(snare_tuning_changed);
+	DECLARE_INPUT_CHANGED_MEMBER(tom_tuning_changed);
+
 protected:
 	void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	void device_start() override ATTR_COLD;
+	void device_reset() override ATTR_COLD;
 
 private:
 	static void write_dac(dac76_device& dac, u8 sample);
-
-	void set_mux_drum_volume(int voice, bool d1);
-	void set_snare_volume(bool d3, bool d2);
-	u8 get_voice_data(u8 data) const;
+	static float get_dac_scaler(float iref);
+	static s32 get_ls267_freq(const std::array<s32, 2>& freq_range_hz, float cv);
+	static float get_snare_tom_pitch_cv(float v);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(mux_timer_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(snare_timer_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(click_timer_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(tom_timer_tick);
 
+	void update_volume_and_pan(int channel);
+	void update_master_volume();
+	void update_mux_drum_pitch();
+	void update_snare_pitch();
+	void update_tom_pitch();
+
 	// Mux drums.
+	required_ioport m_mux_tuning_trimmer;
 	required_memory_region_array<NUM_MUX_VOICES> m_mux_samples;
+	required_device<timer_device> m_mux_timer;  // 74LS627 (U77A).
 	required_device_array<dac76_device, NUM_MUX_VOICES> m_mux_dac;  // AM6070 (U88).
 	required_device_array<filter_volume_device, NUM_MUX_VOICES> m_mux_volume;  // CD4053 (U90), R60, R62.
 	std::array<bool, NUM_MUX_VOICES> m_mux_counting = { false, false, false, false, false, false, false, false };
@@ -174,8 +234,11 @@ private:
 	// Snare / sidestick.
 	required_memory_region m_snare_samples;  // 2732 ROM (U79).
 	required_memory_region m_sidestick_samples;  // 2732 ROMs (U78).
+	required_device<timer_device> m_snare_timer;  // 74L627 (U80A).
 	required_device<dac76_device> m_snare_dac;  // AM6070 (U92).
 	required_device<filter_volume_device> m_snare_volume;  // R69, R72, R71, R70.
+	required_device<filter_volume_device> m_snare_out;  // U90A (CD4053) pin 12 (ax).
+	required_device<filter_volume_device> m_sidestick_out;  // U90A (CD4053) pin 13 (ay).
 	required_device<timer_device> m_click_timer;  // 556 (U65A).
 	required_device<speaker_sound_device> m_click;
 	required_device<speaker_sound_device> m_beep;
@@ -184,22 +247,86 @@ private:
 	bool m_sidestick_selected = false;  // Chooses between snare and sidestick.
 
 	// Tom / conga.
+	required_ioport_array<NUM_TUNING_KNOBS> m_tuning_knobs;
 	required_memory_region m_tom_samples;  // 2 x 2732 ROMs (U68, U69).
 	required_memory_region m_conga_samples;  // 2 x 2732 ROMs (U66, U67).
 	required_device<timer_device> m_tom_timer;  // 74LS627 (U77B).
 	required_device<dac76_device> m_tom_dac;  // AM6070 (U82).
+	required_device_array<filter_volume_device, NUM_TOM_VOICES> m_tom_out;  // U87 (CD4051) outputs 0, 1, 4, 5, 6.
 	bool m_tom_counting = false;  // /Q1 of U73 (74LS74).
 	u16 m_tom_counter = 0;  // 14-bit counter (2 x 74LS393, U70, U71).
 	bool m_tom_selected = false;  // Selects between tom and conga.
-	u8 m_tom_variation = 0;  // Tom / conga pitch variation.
+	s8 m_tom_selected_pitch = 0;
 
-	bool m_voice_data_enabled = false;  // Enables/disables U19 (74LS365).
+	// Mixer.
+	required_ioport_array<NUM_MIXER_CHANNELS> m_volume;
+	required_ioport_array<NUM_MIXER_CHANNELS> m_pan;
+	required_ioport m_master_volume;
+	required_device_array<filter_rc_device, NUM_MIXER_CHANNELS> m_voice_hpf;
+	required_device<mixer_device> m_left_mixer;  // 4558 op-amp (U1A).
+	required_device<mixer_device> m_right_mixer;  // 4558 op-amp (U1B).
+	required_device<speaker_device> m_left_out;  // 4558 op-amp (U2A).
+	required_device<speaker_device> m_right_out;  // 4558 op-amp (U2B).
+
+	static constexpr const float MIXER_R_PRE_FADER[NUM_MIXER_CHANNELS] =
+	{
+		RES_R(0),    // bass
+		RES_R(0),    // snare
+		RES_R(0),    // sidestick
+		RES_K(5.1),  // hihat
+		RES_R(0),    // hi tom
+		RES_R(0),    // mid tom
+		RES_R(0),    // low tom
+		RES_K(10),   // ride
+		RES_K(5.1),  // crash
+		RES_K(10),   // cabasa
+		RES_K(10),   // tambourine
+		RES_R(0),    // hi conga
+		RES_R(0),    // low conga
+		RES_K(5.1),  // cowbell
+		RES_K(2.4),  // clap
+		RES_K(0),    // click
+	};
+
+	static constexpr const float MIXER_R_FEEDBACK = RES_K(33);
+	static constexpr const float MIXER_R_BEEP = RES_K(510);
+	static constexpr const float OUTPUT_R_INPUT = RES_K(10);  // Input resistor of output stage opamp.
+	static constexpr const float OUTPUT_R_FEEDBACK = RES_K(10);
+	static constexpr const float OUTPUT_C_FEEDBACK = CAP_P(1000);
 
 	static constexpr const float VPLUS = 15;  // Volts.
 	static constexpr const float VCC = 5;  // Volts.
+	static constexpr const float MUX_DAC_IREF = VPLUS / (RES_K(15) + RES_K(15));  // R55 + R57.
+	static constexpr const float TOM_DAC_IREF = MUX_DAC_IREF;  // Configured in the same way.
+
+	// The audio pipeline operates on voltage magnitudes. This scaler normalizes
+	// the final output's range to approximately: -1 - 1.
+	static constexpr const float VOLTAGE_TO_SOUND_SCALER = 0.2F;
+
+	// These frequency ranges were eyeballed from figure 6 of the 74LS627
+	// datasheet: https://www.ti.com/product/SN74LS628 .
+	static constexpr const std::array<s32, 2> MUX_TIMER_HZ_RANGE = { 250'000, 2'330'000 };  // C14: 330pF.
+	static constexpr const std::array<s32, 2> SNARE_TIMER_HZ_RANGE = { 8'000, 80'000 };  // C111: 0.01uF.
+	static constexpr const std::array<s32, 2> TOM_TIMER_HZ_RANGE = { 8'000, 80'000 };  // C?: 0.01uF.
+
+	// CV input impedance. The datasheet provides typical and max currents,
+	// given for 1V and 5V. These work out to 100K typical, and
+	// 20K minimum impedances. Using the advertised typical value.
+	static constexpr const float LS627_CV_INPUT_R = RES_K(100);
+
 	static constexpr const char *MUX_VOICE_NAMES[NUM_MUX_VOICES] =
 	{
 		"TAMBOURINE", "CABASA", "CLAP", "COWBELL", "BASS", "HAT", "RIDE", "CRASH"
+	};
+	static constexpr const char *TOM_VOICE_NAMES[NUM_TOM_VOICES] =
+	{
+		"LOW CONGA", "HI CONGA", "LOW TOMS", "MID TOMS", "HI TOMS"
+	};
+	static constexpr const char *MIXER_CHANNEL_NAMES[NUM_MIXER_CHANNELS] =
+	{
+		"BASS", "SNARE", "SIDESTICK", "HIHAT", "HITOMS", "MIDTOMS", "LOTOMS",
+		"RIDE", "CRASH", "CABASA", "TAMB", "HICONGAS", "LOCONGAS",
+		"COWBELL", "CLAP", "CLICK"
 	};
 };
 
@@ -207,72 +334,148 @@ DEFINE_DEVICE_TYPE(LINNDRUM_AUDIO, linndrum_audio_device, "linndrum_audio_device
 
 linndrum_audio_device::linndrum_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, LINNDRUM_AUDIO, tag, owner, clock)
+	, m_mux_tuning_trimmer(*this, ":pot_mux_tuning")
 	, m_mux_samples(*this, ":sample_mux_drum_%u", 0)
+	, m_mux_timer(*this, "mux_drum_timer")
 	, m_mux_dac(*this, "mux_drums_virtual_dac_%u", 1)
 	, m_mux_volume(*this, "mux_drums_volume_control_%u", 1)
 	, m_snare_samples(*this, ":sample_snare")
 	, m_sidestick_samples(*this, ":sample_sidestick")
+	, m_snare_timer(*this, "snare_sidestick_timer")
 	, m_snare_dac(*this, "snare_sidestick_dac")
 	, m_snare_volume(*this, "snare_sidestick_volume")
+	, m_snare_out(*this, "snare_output")
+	, m_sidestick_out(*this, "sidestick_output")
 	, m_click_timer(*this, "click_timer")
 	, m_click(*this, "click")
 	, m_beep(*this, "beep")
+	, m_tuning_knobs(*this, ":pot_tuning_%u", 1)
 	, m_tom_samples(*this, ":sample_tom")
 	, m_conga_samples(*this, ":sample_conga")
 	, m_tom_timer(*this, "tom_conga_timer")
 	, m_tom_dac(*this, "tom_conga_dac")
+	, m_tom_out(*this, "tom_conga_out_%u", 0)
+	, m_volume(*this, ":pot_gain_%u", 1)
+	, m_pan(*this, ":pot_pan_%u", 1)
+	, m_master_volume(*this, ":pot_volume")
+	, m_voice_hpf(*this, "voice_hpf_%u", 1)
+	, m_left_mixer(*this, "lmixer")
+	, m_right_mixer(*this, "rmixer")
+	, m_left_out(*this, "lspeaker")
+	, m_right_out(*this, "rspeaker")
 {
 }
 
-void linndrum_audio_device::voice_data_enable_w(int state)
+void linndrum_audio_device::strobe_mux_drum_w(int voice, u8 data)
 {
-	// Controls whether data (D0-D3) is transmitted to the voice circuits. This
-	// is done by U19 (74LS365 hex buffer. Enable inputs are active-low).
-	// This is usually disabled to prevent interference from the "noisy" data
-	// bus to the voice circuits.
-	m_voice_data_enabled = !state;
-}
+	assert(voice >= 0 && voice < NUM_MUX_VOICES);
 
-template <int Voice> void linndrum_audio_device::strobe_mux_drum_w(u8 data)
-{
-	static_assert(Voice >= 0 && Voice < NUM_MUX_VOICES);
-	data = get_voice_data(data);
+	m_mux_counting[voice] = BIT(data, 0);
+	if (!m_mux_counting[voice])
+		m_mux_counters[voice] = 0;
 
-	m_mux_counting[Voice] = BIT(data, 0);
-	if (!m_mux_counting[Voice])
-		m_mux_counters[Voice] = 0;
+	// Volume variations are controlled by a CD4053 MUX (U90B), whose "select"
+	// input is connected to the active voice's D1 (via a 74LS151 encoder, U35).
+	// Depending on how the mux is configured, the audio signal will either
+	// remain unchanged, or it will get attenuated by a voltage divider.
+	// The MUX is always configured in the "no attenuation" mode for the clap
+	// and cowbell voices.
+	static constexpr const float ATTENUATION = RES_VOLTAGE_DIVIDER(RES_K(10), RES_K(3.3));  // R60, R62.
+	const bool attenuate = !BIT(data, 1) && voice != MV_CLAP && voice != MV_COWBELL;
+	m_mux_volume[voice]->set_gain(attenuate ? ATTENUATION : 1);
 
-	set_mux_drum_volume(Voice, BIT(data, 1));
-
-	LOGMASKED(LOG_STROBES, "Strobed mux drum %s, %02x\n", MUX_VOICE_NAMES[Voice], data);
+	LOGMASKED(LOG_STROBES, "Strobed mux drum %s: %02x (gain: %f)\n",
+	          MUX_VOICE_NAMES[voice], data, m_mux_volume[voice]->gain());
 }
 
 void linndrum_audio_device::strobe_snare_w(u8 data)
 {
-	data = get_voice_data(data);
-
 	m_snare_counting = BIT(data, 0);
 	if (!m_snare_counting)
+	{
 		m_snare_counter = 0;
+		write_dac(*m_snare_dac, 0);  // DAC is disabled. Output goes to 0.
+	}
 
 	m_sidestick_selected = BIT(data, 1);  // Play sidestick instead of snare.
-	set_snare_volume(BIT(data, 3), BIT(data, 2));
+	if (m_sidestick_selected)
+	{
+		m_snare_out->set_gain(0);
+		m_sidestick_out->set_gain(1);
+	}
+	else
+	{
+		m_snare_out->set_gain(1);
+		m_sidestick_out->set_gain(0);
+	}
 
-	LOGMASKED(LOG_STROBES, "Strobed snare / sidestick: %02x\n", data);
+	// Snare and sidestick volume is set by controlling the reference current to
+	// the DAC. Bits D2 and D3 from the voice data bus (latched by U42, 74LS74)
+	// control the voltage at the end of R72 and R71.
+
+	static constexpr const float R0 = RES_K(3.3);  // R70.
+	static constexpr const float R1 = RES_K(380);  // R69.
+	static constexpr const float R2 = RES_K(22);   // R72.
+	static constexpr const float R3 = RES_K(5.6);  // R71.
+
+	static constexpr const float a = R0 * R2 * R3;
+	static constexpr const float b = R0 * R1 * R3;
+	static constexpr const float c = R0 * R1 * R2;
+	static constexpr const float d = R1 * R2 * R3;
+
+	// Compute DAC reference current.
+	const float v2 = BIT(data, 2) ? VCC : 0;
+	const float v3 = BIT(data, 3) ? VCC : 0;
+	const float iref = (a * VPLUS + b * v2 + c * v3) / (R0 * (a + b + c + d));
+
+	const float gain = get_dac_scaler(iref);
+	m_snare_volume->set_gain(gain);
+
+	LOGMASKED(LOG_STROBES, "Strobed snare / sidestick: %02x (iref: %f, gain: %f)\n",
+	          data, iref, gain);
 }
 
 void linndrum_audio_device::strobe_tom_w(u8 data)
 {
-	data = get_voice_data(data);
-
 	m_tom_counting = BIT(data, 0);
 	if (!m_tom_counting)
+	{
 		m_tom_counter = 0;
+		write_dac(*m_tom_dac, 0);  // DAC is disabled. Output goes to 0.
+	}
 
 	m_tom_selected = BIT(data, 1);  // Play tom instead of conga.
-	m_tom_variation = (data >> 2) & 0x03;  // D3, D2.
+	// It is possible for neither the tom nor the conga ROM to be selected. This
+	// can only happen when the voice is disabled, so it does not affect the
+	// emulation.
 
-	LOGMASKED(LOG_STROBES, "Strobed tom / conga: %02x\n", data);
+	// Address for the pitch control MUX (U81) and output selection MUX (U87).
+	// Both are CD4051s.
+	const u8 variation = bitswap<3>(data, 1, 3, 2);  // MUX: C, B, A.
+
+	m_tom_selected_pitch = -1;
+	switch (variation)
+	{
+		case 0: m_tom_selected_pitch = TV_LOW_CONGA; break;
+		case 1: m_tom_selected_pitch = TV_HI_CONGA; break;
+		case 4: m_tom_selected_pitch = TV_LOW_TOMS; break;
+		case 5: m_tom_selected_pitch = TV_MID_TOMS; break;
+		case 6: m_tom_selected_pitch = TV_HI_TOMS; break;
+		default: LOG("Firmware bug: invalid pitch variation for tom/conga.\n");
+	}
+	update_tom_pitch();
+
+	// If the tom/conga voice is disabled, The INH input of the output MUX (U87)
+	// will be high, and all outputs will be disconnected. That's in contrast to
+	// the pitch MUX (U81), which is always enabled.
+	// Disconnected outputs have their voltage pulled to 0 by a 10K resistor.
+	const s8 selected_output = m_tom_counting ? m_tom_selected_pitch : -1;
+	for (int i = 0; i < NUM_TOM_VOICES; ++i)
+		m_tom_out[i]->set_gain((i == selected_output) ? 1 : 0);
+
+	LOGMASKED(LOG_STROBES, "Strobed tom / conga: %02x (is_tom: %d, pitch:%d, output: %d, %s)\n",
+	          data, m_tom_selected, m_tom_selected_pitch, selected_output,
+	          (selected_output >= 0) ? TOM_VOICE_NAMES[selected_output] : "none");
 }
 
 void linndrum_audio_device::strobe_click_w(u8 /*data*/)
@@ -291,21 +494,36 @@ void linndrum_audio_device::beep_w(int state)
 	LOGMASKED(LOG_STROBES, "Beep: %d\n", state);
 }
 
+DECLARE_INPUT_CHANGED_MEMBER(linndrum_audio_device::mix_changed)
+{
+	update_volume_and_pan(param);
+}
+
+DECLARE_INPUT_CHANGED_MEMBER(linndrum_audio_device::master_volume_changed)
+{
+	update_master_volume();
+}
+
+DECLARE_INPUT_CHANGED_MEMBER(linndrum_audio_device::mux_drum_tuning_changed)
+{
+	update_mux_drum_pitch();
+}
+
+DECLARE_INPUT_CHANGED_MEMBER(linndrum_audio_device::snare_tuning_changed)
+{
+	update_snare_pitch();
+}
+
+DECLARE_INPUT_CHANGED_MEMBER(linndrum_audio_device::tom_tuning_changed)
+{
+	update_tom_pitch();
+}
+
 void linndrum_audio_device::device_add_mconfig(machine_config &config)
 {
-	// Sample rate is controlled by 74LS627 timers. There isn't a formula that
-	// computes frequency for these chips. The datasheet just provides graphs.
-	// The values below were obtained by eyballing those graphs, and then
-	// adjusting by ear to youtube videos, while sticking to round numbers.
-	// TODO: Implement control by potentiomenters.
-	static constexpr const int MUX_DRUM_SAMPLE_RATE = 30000;
-	static constexpr const int SNARE_SAMPLE_RATE = 28000;
-	static constexpr const int TOM_SAMPLE_RATE = 32000;
-
 	// *** Mux drums section.
 
-	TIMER(config, "mux_drum_timer").configure_periodic(  // 74LS627 (U77A).
-		FUNC(linndrum_audio_device::mux_timer_tick), attotime::from_hz(MUX_DRUM_SAMPLE_RATE));
+	TIMER(config, m_mux_timer).configure_generic(FUNC(linndrum_audio_device::mux_timer_tick));  // 74LS627 (U77A).
 
 	// The actual "mux drums" hardware has a single AM6070, which is
 	// time-multiplexed across the 8 voices. Implementing it that way is
@@ -316,46 +534,101 @@ void linndrum_audio_device::device_add_mconfig(machine_config &config)
 	for (int voice = 0; voice < NUM_MUX_VOICES; ++voice)
 	{
 		DAC76(config, m_mux_dac[voice], 0);  // AM6070 (U88).
-		FILTER_VOLUME(config, m_mux_volume[voice]);  // CD4053 (U90), R60, R62 (see set_mux_drum_volume()).
-		m_mux_dac[voice]->add_route(ALL_OUTPUTS, m_mux_volume[voice], 1.0);
+		FILTER_VOLUME(config, m_mux_volume[voice]);  // CD4053 (U90), R60, R62 (see strobe_mux_drum_w()).
+		m_mux_dac[voice]->add_route(0, m_mux_volume[voice], get_dac_scaler(MUX_DAC_IREF));
 	}
 
 	// *** Snare / sidestick section.
 
-	TIMER(config, "snare_timer").configure_periodic(  // 74LS627 (U80A).
-		FUNC(linndrum_audio_device::snare_timer_tick), attotime::from_hz(SNARE_SAMPLE_RATE));
+	TIMER(config, m_snare_timer).configure_generic(FUNC(linndrum_audio_device::snare_timer_tick));  // 74LS627 (U80A).
 	DAC76(config, m_snare_dac, 0);  // AM6070 (U92)
-	FILTER_VOLUME(config, m_snare_volume);  // See set_snare_volume().
-	m_snare_dac->add_route(ALL_OUTPUTS, m_snare_volume, 1.0);
+	FILTER_VOLUME(config, m_snare_volume);  // See strobe_snare_w().
+	// DAC output scaling is incorporated in m_snare_volume's gain.
+	m_snare_dac->add_route(0, m_snare_volume, 1.0);
 
 	// The DAC's current outputs are processed by a current-to-voltage converter
 	// that embeds an RC filter. This consists of an op-amp (U103), R127 and C65
 	// (for positive voltages), and R126 and C31 (for negative voltages). The
 	// two resistors and capacitors have the same value.
-	filter_rc_device &snare_dac_filter = FILTER_RC(config, "snare_sidestick_dac_filter");
-	snare_dac_filter.set_lowpass(RES_K(2.49), CAP_P(2700));  // R127-C65, R126-C31.
-	m_snare_volume->add_route(ALL_OUTPUTS, snare_dac_filter, 1.0);
+	auto &snare_dac_filter = FILTER_RC(config, "snare_sidestick_dac_filter");
+	snare_dac_filter.set_lowpass(RES_K(2.49), CAP_P(2700));  // R127-C65, R126-C31. Cutoff: ~23.7KHz.
+	m_snare_volume->add_route(0, snare_dac_filter, 1.0);
+
+	FILTER_VOLUME(config, m_snare_out);
+	FILTER_VOLUME(config, m_sidestick_out);
+	snare_dac_filter.add_route(0, m_snare_out, 1.0);
+	snare_dac_filter.add_route(0, m_sidestick_out, 1.0);
 
 	TIMER(config, m_click_timer).configure_generic(FUNC(linndrum_audio_device::click_timer_tick));  // 556 (U65A).
-	SPEAKER_SOUND(config, m_click);
-	SPEAKER_SOUND(config, m_beep);
+	static const double LEVELS[2] = { 0, VCC };
+	SPEAKER_SOUND(config, m_click).set_levels(2, LEVELS);
+	SPEAKER_SOUND(config, m_beep).set_levels(2, LEVELS);
 
 	// *** Tom / conga section.
 
-	TIMER(config, m_tom_timer).configure_periodic(  // 74LS627 (U77B).
-		FUNC(linndrum_audio_device::tom_timer_tick), attotime::from_hz(TOM_SAMPLE_RATE));
+	TIMER(config, m_tom_timer).configure_generic(FUNC(linndrum_audio_device::tom_timer_tick));  // 74LS627 (U77B).
 	DAC76(config, m_tom_dac, 0);  // AM6070 (U82).
+	for (int i = 0; i < NUM_TOM_VOICES; ++i)
+	{
+		FILTER_VOLUME(config, m_tom_out[i]);  // One of U87'S (CD4051) outputs.
+		m_tom_dac->add_route(0, m_tom_out[i], get_dac_scaler(TOM_DAC_IREF));
+	}
 
-	// *** Output.
+	// *** Mixer.
 
-	// TODO: Implement mixing and panning.
-	speaker_device &speaker = SPEAKER(config, "monospeaker").front_center();
-	for (int i = 0; i < NUM_MUX_VOICES; ++i)
-		m_mux_volume[i]->add_route(ALL_OUTPUTS, speaker, 1.0);
-	snare_dac_filter.add_route(ALL_OUTPUTS, speaker, 1.0);
-	m_click->add_route(ALL_OUTPUTS, speaker, 1.0);
-	m_beep->add_route(ALL_OUTPUTS, speaker, 1.0);
-	m_tom_dac->add_route(ALL_OUTPUTS, speaker, 1.0);
+	const std::array<device_sound_interface *, NUM_MIXER_CHANNELS> voice_outputs =
+	{
+		m_mux_volume[MV_BASS],
+		m_snare_out,
+		m_sidestick_out,
+		m_mux_volume[MV_HAT],
+		m_tom_out[TV_HI_TOMS],
+		m_tom_out[TV_MID_TOMS],
+		m_tom_out[TV_LOW_TOMS],
+		m_mux_volume[MV_RIDE],
+		m_mux_volume[MV_CRASH],
+		m_mux_volume[MV_CABASA],
+		m_mux_volume[MV_TAMBOURINE],
+		m_tom_out[TV_HI_CONGA],
+		m_tom_out[TV_LOW_CONGA],
+		m_mux_volume[MV_COWBELL],
+		m_mux_volume[MV_CLAP],
+		m_click,
+	};
+
+	MIXER(config, m_left_mixer);  // U1A
+	MIXER(config, m_right_mixer);  // U1B
+	for (int i = 0; i < voice_outputs.size(); ++i)
+	{
+		// The filter and gain will be configured in update_volume_and_pan().
+		FILTER_RC(config, m_voice_hpf[i]);
+		voice_outputs[i]->add_route(0, m_voice_hpf[i], 1.0);
+		m_voice_hpf[i]->add_route(0, m_left_mixer, 1.0);
+		m_voice_hpf[i]->add_route(0, m_right_mixer, 1.0);
+	}
+
+	auto &beep_hpf = FILTER_RC(config, "beep_hpf");
+	const float rc_r = RES_2_PARALLEL(MIXER_R_BEEP, MIXER_R_BEEP);
+	beep_hpf.set_rc(filter_rc_device::HIGHPASS, rc_r, 0, 0, CAP_U(0.1));  // C17. Cutoff: ~6.24 Hz.
+	m_beep->add_route(0, beep_hpf, 1.0);
+	// The mixers are inverting.
+	beep_hpf.add_route(0, m_left_mixer, -MIXER_R_FEEDBACK / MIXER_R_BEEP);
+	beep_hpf.add_route(0, m_right_mixer, -MIXER_R_FEEDBACK / MIXER_R_BEEP);
+
+	// The left/right output op-amps (U2A, U2B) also have a capacitor in their
+	// feedback loop, which turns them into LPFs.
+	auto &left_rc = FILTER_RC(config, "left_output_lpf");
+	auto &right_rc = FILTER_RC(config, "right_output_lpf");
+	left_rc.set_lowpass(OUTPUT_R_FEEDBACK, OUTPUT_C_FEEDBACK);  // Cutoff: ~15.9KHz.
+	right_rc.set_lowpass(OUTPUT_R_FEEDBACK, OUTPUT_C_FEEDBACK);
+	m_left_mixer->add_route(0, left_rc, 1.0);
+	m_right_mixer->add_route(0, right_rc, 1.0);
+
+	SPEAKER(config, m_left_out).front_left();
+	SPEAKER(config, m_right_out).front_right();
+	// Gain will be set in update_master_volume().
+	left_rc.add_route(0, m_left_out, 1.0);
+	right_rc.add_route(0, m_right_out, 1.0);
 }
 
 void linndrum_audio_device::device_start()
@@ -368,11 +641,20 @@ void linndrum_audio_device::device_start()
 	save_item(NAME(m_tom_counting));
 	save_item(NAME(m_tom_counter));
 	save_item(NAME(m_tom_selected));
-	save_item(NAME(m_tom_variation));
-	save_item(NAME(m_voice_data_enabled));
+	save_item(NAME(m_tom_selected_pitch));
 }
 
-void linndrum_audio_device::write_dac(dac76_device& dac, u8 sample)
+void linndrum_audio_device::device_reset()
+{
+	for (int i = 0; i < NUM_MIXER_CHANNELS; ++i)
+		update_volume_and_pan(i);
+	update_master_volume();
+	update_mux_drum_pitch();
+	update_snare_pitch();
+	update_tom_pitch();
+}
+
+void linndrum_audio_device::write_dac(dac76_device &dac, u8 sample)
 {
 	dac.update();
 	dac.sb_w(BIT(sample, 7));
@@ -385,62 +667,54 @@ void linndrum_audio_device::write_dac(dac76_device& dac, u8 sample)
 	dac.b7_w(BIT(sample, 0));
 }
 
-void linndrum_audio_device::set_mux_drum_volume(int voice, bool d1)
+float linndrum_audio_device::get_dac_scaler(float iref)
 {
-	// Volume variations are controlled by a CD4053 MUX (U90B), whose "select"
-	// input is connected to the active voice's D1 (via a 74LS151 encoder, U35).
-	// Depending on how the mux is configured, the audio signal will either
-	// remain unchanged, or it will get attenuated by a voltage divider.
-	// The MUX is always configured in the "no attenuation" mode for the clap
-	// and cowbell voices.
+	// Given the reference current into the DAC, computes the scaler that needs
+	// to be applied to the dac76_device output, to convert it to a voltage.
 
-	static constexpr const float ATTENUATION = RES_VOLTAGE_DIVIDER(RES_K(10), RES_K(3.3));  // R60, R62.
+	// The maximum output current on each of the "+" and "-" outputs of the
+	// AM6070 is `3.8 * Iref`, according to the datasheet.
+	// That current gets converted to a voltage by an op-amp configured as
+	// a current-to-voltage converter (I2V). All I2Vs on the LinnDrum use
+	// 2.49K resistors for both the "+" and "-" current outputs of the DAC.
 
-	const bool attenuate = !d1 && voice != CLAP && voice != COWBELL;
-	assert(voice >= 0 && voice < NUM_MUX_VOICES);
-	m_mux_volume[voice]->set_gain(attenuate ? ATTENUATION : 1.0);
-
-	LOGMASKED(LOG_VOLUME, "Mux drum %s gain: %f\n", MUX_VOICE_NAMES[voice], m_mux_volume[voice]->gain());
+	return 3.8F * iref * float(RES_K(2.49));
 }
 
-void linndrum_audio_device::set_snare_volume(bool d3, bool d2)
+s32 linndrum_audio_device::get_ls267_freq(const std::array<s32, 2>& freq_range, float cv)
 {
-	// Snare and sidestick volume is set by controlling the reference current to
-	// the DAC. Bits D2 and D3 from the voice data bus (latched by U42, 74LS74)
-	// control the voltage at the end of R72 and R71.
-
-	static constexpr const float R0 = RES_K(3.3);  // R70.
-	static constexpr const float R1 = RES_K(380);  // R69.
-	static constexpr const float R2 = RES_K(22);   // R72.
-	static constexpr const float R3 = RES_K(5.6);  // R71.
-
-	static constexpr const float a = R0 * R2 * R3;
-	static constexpr const float b = R0 * R1 * R3;
-	static constexpr const float c = R0 * R1 * R2;
-	static constexpr const float d = R1 * R2 * R3;
-
-	static constexpr const float MAX_IREF = (a * VPLUS + b * VCC + c * VCC) / (R0 * (a + b + c + d));
-
-	const float v2 = d2 ? VCC : 0;
-	const float v3 = d3 ? VCC : 0;
-	const float iref = (a * VPLUS + b * v2 + c * v3) / (R0 * (a + b + c + d));
-	m_snare_volume->set_gain(iref / MAX_IREF);
-
-	LOGMASKED(LOG_VOLUME, "Snare volume - iref: %f, max_iref: %f, gain: %f\n",
-	          iref, MAX_IREF, iref / MAX_IREF);
+	// The relationship between CV and frequency is approximately linear. The
+	// frequency range is set by an external capacitor.
+	static constexpr const float MIN_CV = 0;
+	static constexpr const float MAX_CV = VCC;
+	const float alpha = (freq_range[1] - freq_range[0]) / (MAX_CV - MIN_CV);
+	return s32(roundf(freq_range[0] + alpha * cv));
 }
 
-u8 linndrum_audio_device::get_voice_data(u8 data) const
+float linndrum_audio_device::get_snare_tom_pitch_cv(float v_tune)
 {
-	if (m_voice_data_enabled)
-	{
-		return data & 0x0f;  // Voice data bus is 4 bits wide.
-	}
-	else
-	{
-		LOG("Firmware bug: floating voice data bus when strobing a voice.\n");
-		return 0x0f;  // Floating TTL inputs. Will likely resolve to 1s.
-	}
+	// The tom/conga and snare tuning knobs are combined with resistors to
+	// produce a tuning voltage (v_tune). The tom/conga and snare networks are
+	// different. But v_tune for both is processed by identical circuits.
+	// Component designations below are for the snare circuit, but values are
+	// the same for the tom one.
+
+	static constexpr const float R96 = RES_K(30);
+	static constexpr const float R97 = RES_K(47);
+	static constexpr const float R100 = RES_K(10);
+	static constexpr const float EXTERNAL_CV = 0;  // External CV not yet emulated.
+
+	// U95B (4558 opamp) mixes v_tune with external CV. v_tune is applied to
+	// the + input, while the (inverted and scaled) external CV is applied to
+	// the - input, via R97.
+	const float opamp_out = v_tune + (v_tune - EXTERNAL_CV) * R96 / R97;
+
+	// The output is sent to the timer's CV input via a 10K resistor. That CV is
+	// loaded by the timer input's impedance.
+	const float cv = opamp_out * RES_VOLTAGE_DIVIDER(R100, LS627_CV_INPUT_R);
+
+	// There are clamping diodes attached to the CV input.
+	return std::clamp<float>(cv, 0, VCC);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(linndrum_audio_device::mux_timer_tick)
@@ -470,11 +744,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(linndrum_audio_device::mux_timer_tick)
 			++m_mux_counters[voice];
 			if (m_mux_counters[voice] >= m_mux_samples[voice]->bytes())
 			{
-				// All bits in the voice's D0 and D1 latch (74LS74) are cleared,
-				// resulting in:
-				m_mux_counting[voice] = false;
-				m_mux_counters[voice] = 0;
-				set_mux_drum_volume(voice, false);
+				// All outputs in the voice's data latch (74LS74) are cleared.
+				strobe_mux_drum_w(voice, 0);
 			}
 		}
 
@@ -491,12 +762,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(linndrum_audio_device::snare_timer_tick)
 	++m_snare_counter;
 	if (BIT(m_snare_counter, 12))  // Counter reached 0x1000 (4096).
 	{
-		// All outputs of U41 and U42 (74LS74 flip-flops) are cleared, resulting in:
-		m_snare_counting = false;
-		m_snare_counter = 0;
-		m_sidestick_selected = false;
-		set_snare_volume(false, false);
-		write_dac(*m_snare_dac, 0);  // DAC is disabled. Output goes to 0.
+		// All outputs of U41 and U42 (74LS74 flip-flops) are cleared.
+		strobe_snare_w(0);
 		return;
 	}
 
@@ -521,12 +788,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(linndrum_audio_device::tom_timer_tick)
 	++m_tom_counter;
 	if (BIT(m_tom_counter, 13))  // Counter reached 0x2000 (8192).
 	{
-		// All outputs of U42B and U73B (74LS74 flip-flops) are cleared, resulting in:
-		m_tom_counting = false;
-		m_tom_counter = 0;
-		m_tom_selected = false;
-		m_tom_variation = 0;
-		write_dac(*m_tom_dac, 0);  // DAC is disabled. Output goes to 0.
+		// All outputs of U42B and U73B (74LS74 flip-flops) are cleared.
+		strobe_tom_w(0);
 		return;
 	}
 
@@ -538,10 +801,170 @@ TIMER_DEVICE_CALLBACK_MEMBER(linndrum_audio_device::tom_timer_tick)
 	write_dac(*m_tom_dac, sample);
 }
 
+void linndrum_audio_device::update_volume_and_pan(int channel)
+{
+	assert(channel >= 0 && channel < NUM_MIXER_CHANNELS);
+
+	static constexpr const float R_VOL_MAX = RES_K(5);
+	static constexpr const float R_PAN_MAX = RES_K(10);
+	static constexpr const float R1 = RES_K(5.6);
+	static constexpr const float R2 = RES_K(5.6);
+	static constexpr const float R3 = RES_K(15);
+	static constexpr const float R4 = RES_K(15);
+
+	// Since we are interested in voltage gain, rather than actual voltage,
+	// use 1V as the voice's output.
+	static constexpr const float V_VOICE = 1;
+	// DC-blocking capacitor. Same value for all voice outputs.
+	static constexpr const float C_VOICE = CAP_U(10);
+
+	const s32 volume = m_volume[channel]->read();
+	const float r_vol_bottom = volume * R_VOL_MAX / 100.0F;
+	const float r_vol_top = R_VOL_MAX - r_vol_bottom;
+	const float r_pan_left = m_pan[channel]->read() * R_PAN_MAX / 100.0F;
+	const float r_pan_right = R_PAN_MAX - r_pan_left;
+
+	const float r0 = MIXER_R_PRE_FADER[channel] + r_vol_top;
+	const float r_right_gnd = R1 + RES_2_PARALLEL(r_pan_right, R3);
+	const float r_left_gnd = R2 + RES_2_PARALLEL(r_pan_left, R4);
+
+	// Resistance to ground as seen from the voice's output.
+	const float r_voice_gnd = r0 + RES_3_PARALLEL(r_vol_bottom, r_left_gnd, r_right_gnd);
+
+	float gain_left = 0;
+	float gain_right = 0;
+	if (volume > 0)
+	{
+		// Calculate voltage scale factor at the wiper of the volume pot.
+		const float i0 = V_VOICE / r_voice_gnd;
+		const float v_pot = V_VOICE - i0 * r0;
+
+		// Calculate voltage at the input resistor (R3) of the U1A summing
+		// op-amp, and use it to compute amp gain.
+		const float i1 = v_pot / r_right_gnd;
+		const float v_input_right = v_pot - i1 * R1;
+		gain_right = v_input_right * MIXER_R_FEEDBACK / R3;
+
+		// Calculate voltage at the input resistor (R4) of the U1B summing
+		// op-amp, and use it to compute amp gain.
+		const float i2 = v_pot / r_left_gnd;
+		const float v_input_left = v_pot - i2 * R2;
+		gain_left = v_input_left * MIXER_R_FEEDBACK / R4;
+	}
+
+	// Using -gain_*, because the summing op-amps are inverting.
+	m_left_mixer->set_input_gain(channel, -gain_left);
+	m_right_mixer->set_input_gain(channel, -gain_right);
+	m_voice_hpf[channel]->filter_rc_set_RC(filter_rc_device::HIGHPASS, r_voice_gnd, 0, 0, C_VOICE);
+
+	LOGMASKED(LOG_MIX, "Gain update for %s - left: %f, right: %f, HPF cutoff: %.2f Hz\n",
+	          MIXER_CHANNEL_NAMES[channel], gain_left, gain_right,
+	          1.0F / (2 * float(M_PI) * r_voice_gnd * C_VOICE));
+}
+
+void linndrum_audio_device::update_master_volume()
+{
+	static constexpr const float R_MASTER_VOLUME_MAX = RES_K(10);
+
+	const float r_pot_bottom = m_master_volume->read() * R_MASTER_VOLUME_MAX / 100.0F;
+	const float r_pot_top = R_MASTER_VOLUME_MAX - r_pot_bottom;
+	const float v_input = RES_VOLTAGE_DIVIDER(r_pot_top, RES_2_PARALLEL(r_pot_bottom, OUTPUT_R_INPUT));
+
+	const float gain = v_input * OUTPUT_R_FEEDBACK / OUTPUT_R_INPUT;
+	const float final_gain = gain * VOLTAGE_TO_SOUND_SCALER;
+
+	// Using -final_gain, because the output opamps (U2A, U2B) are inverting.
+	m_left_out->set_input_gain(0, -final_gain);
+	m_right_out->set_input_gain(0, -final_gain);
+
+	LOGMASKED(LOG_MIX, "Master volume updated. Gain: %f, final gain: %f\n", gain, final_gain);
+}
+
+void linndrum_audio_device::update_mux_drum_pitch()
+{
+	static constexpr const int TIMER_TICKS_PER_VOICE = 4;
+	static constexpr const float POT_MAX = RES_K(10);
+	static constexpr const float R19A = RES_K(18);
+
+	const float pot_bottom = m_mux_tuning_trimmer->read() * POT_MAX / 100.0F;
+	const float pot_top = POT_MAX - pot_bottom;
+	const float cv = VPLUS * RES_VOLTAGE_DIVIDER(R19A + pot_top, RES_2_PARALLEL(pot_bottom, LS627_CV_INPUT_R));
+	const s32 freq = get_ls267_freq(MUX_TIMER_HZ_RANGE, cv);
+
+	// See comments in mux_timer_tick() for the reason for this adjustment.
+	const s32 adjusted_freq = float(freq) / (NUM_MUX_VOICES * TIMER_TICKS_PER_VOICE);
+	const attotime period = attotime::from_hz(s32(roundf(adjusted_freq)));
+	m_mux_timer->adjust(period, 0, period);
+
+	LOGMASKED(LOG_PITCH, "Updated mux drum pitch. CV: %f, freq: %d, adjusted: %d\n",
+	          cv, freq, adjusted_freq);
+}
+
+void linndrum_audio_device::update_snare_pitch()
+{
+	static constexpr const float POT_MAX = RES_K(100);
+	static constexpr const float R101 = RES_K(75);
+	static constexpr const float R98 = RES_K(22);
+
+	const float pot_bottom = m_tuning_knobs[TK_SNARE]->read() * POT_MAX / 100.0F;
+	const float pot_top = POT_MAX - pot_bottom;
+	const float v_pot = VPLUS * RES_VOLTAGE_DIVIDER(pot_top, RES_2_PARALLEL(pot_bottom, R101 + R98));
+	const float cv = get_snare_tom_pitch_cv(v_pot * RES_VOLTAGE_DIVIDER(R101, R98));
+
+	const s32 freq = get_ls267_freq(SNARE_TIMER_HZ_RANGE, cv);
+	const attotime period = attotime::from_hz(freq);
+	m_snare_timer->adjust(period, 0, period);
+
+	LOGMASKED(LOG_PITCH, "Updated snare pitch. CV: %f, freq: %d Hz\n", cv, freq);
+}
+
+void linndrum_audio_device::update_tom_pitch()
+{
+	static constexpr const float R_POT_MAX = RES_K(100);
+
+	// A map from `enum tom_voices` to `enum tuning_knobs`.
+	static constexpr const int VOICE_TO_KNOB_MAP[NUM_TOM_VOICES] =
+	{
+		TK_LO_CONGAS,
+		TK_HI_CONGAS,
+		TK_LO_TOMS,
+		TK_MID_TOMS,
+		TK_HI_TOMS
+	};
+
+	if (m_tom_selected_pitch < 0)
+	{
+		LOG("Firmware or driver bug: floating input to pitch CV op-amp.\n");
+		return;
+	}
+
+	// The pitch CV for each variation appears on an input of MUX U81 (CD4051).
+	// The CV of the currently selected variation is routed to the timer (74LS627, U77B).
+	// Compute the CV of the selected variation.
+	const int knob_index = VOICE_TO_KNOB_MAP[m_tom_selected_pitch];
+	const s32 knob_value = m_tuning_knobs[knob_index]->read();
+	const float r_pot_bottom = knob_value * R_POT_MAX / 100.0F;
+	const float r_pot_top = R_POT_MAX - r_pot_bottom;
+	const float v_mux_out = VPLUS * RES_VOLTAGE_DIVIDER(RES_K(390) + r_pot_top, r_pot_bottom);
+	const float cv = get_snare_tom_pitch_cv(v_mux_out);
+
+	const s32 freq = get_ls267_freq(SNARE_TIMER_HZ_RANGE, cv);
+	const attotime period = attotime::from_hz(freq);
+
+	// Only restart the timer if there is a change. Many calls to this function
+	// will not result in a frequency change.
+	if (m_tom_timer->period() != period)
+		m_tom_timer->adjust(period, 0, period);
+
+	LOGMASKED(LOG_PITCH, "Updated tom pitch: %d, %d. CV: %f, freq: %d\n",
+	          knob_index, knob_value, cv, freq);
+}
+
 namespace {
 
 constexpr const char MAINCPU_TAG[] = "z80";
 constexpr const char NVRAM_TAG[] = "nvram";
+constexpr const char AUDIO_TAG[] = "linndrum_audio";
 
 class linndrum_state : public driver_device
 {
@@ -551,7 +974,7 @@ public:
 	linndrum_state(const machine_config &mconfig, device_type type, const char *tag) ATTR_COLD
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, MAINCPU_TAG)
-		, m_audio(*this, "linndrum_audio")
+		, m_audio(*this, AUDIO_TAG)
 		, m_tempo_timer(*this, "tempo_timer_556_u30a")
 		, m_debounce_timer(*this, "debounce_timer_556_u30b")
 		, m_keyboard(*this, "keyboard_col_%d", 0)
@@ -587,6 +1010,9 @@ private:
 	void tape_sync_enable_w(int state);
 	void update_tape_sync_out();
 
+	void voice_data_enable_w(int state);
+	u8 get_voice_data(u8 data) const;
+
 	void memory_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
 
@@ -605,6 +1031,7 @@ private:
 	bool m_debouncing = false;
 	bool m_tempo_state = false;
 	bool m_tape_sync_enabled = false;
+	bool m_voice_data_enabled = false;  // Enables/disables U19 (74LS365).
 
 	static constexpr const int DISPLAY_STEP = 0;
 	static constexpr const int DISPLAY_PATTERN = 1;
@@ -746,6 +1173,28 @@ void linndrum_state::update_tape_sync_out()
 		m_tape_sync_out = 0;
 }
 
+void linndrum_state::voice_data_enable_w(int state)
+{
+	// Controls whether data (D0-D3) is transmitted to the voice circuits. This
+	// is done by U19 (74LS365 hex buffer. Enable inputs are active-low).
+	// This is usually disabled to prevent interference from the "noisy" data
+	// bus to the voice circuits.
+	m_voice_data_enabled = !state;
+}
+
+u8 linndrum_state::get_voice_data(u8 data) const
+{
+	if (m_voice_data_enabled)
+	{
+		return data & 0x0f;  // Voice data bus is 4 bits wide.
+	}
+	else
+	{
+		LOG("Firmware bug: floating voice data bus when strobing a voice.\n");
+		return 0x0f;  // Floating TTL inputs. Will likely resolve to 1s.
+	}
+}
+
 void linndrum_state::memory_map(address_map &map)
 {
 	// Signal names (such as "/READ INPORT") are taken from the schematics.
@@ -765,17 +1214,17 @@ void linndrum_state::memory_map(address_map &map)
 	map(0x1f84, 0x1f84).mirror(0x0030).w("latch_u16", FUNC(output_latch_device::write));  // LEDs & outputs.
 
 	// Voice strobes.
-	map(0x1f85, 0x1f85).mirror(0x0030).w(m_audio, FUNC(linndrum_audio_device::strobe_mux_drum_w<BASS>));
-	map(0x1f86, 0x1f86).mirror(0x0030).w(m_audio, FUNC(linndrum_audio_device::strobe_snare_w));
-	map(0x1f87, 0x1f87).mirror(0x0030).w(m_audio, FUNC(linndrum_audio_device::strobe_mux_drum_w<HAT>));
-	map(0x1f88, 0x1f88).mirror(0x0030).w(m_audio, FUNC(linndrum_audio_device::strobe_tom_w));
-	map(0x1f89, 0x1f89).mirror(0x0030).w(m_audio, FUNC(linndrum_audio_device::strobe_mux_drum_w<RIDE>));
-	map(0x1f8a, 0x1f8a).mirror(0x0030).w(m_audio, FUNC(linndrum_audio_device::strobe_mux_drum_w<CRASH>));
-	map(0x1f8b, 0x1f8b).mirror(0x0030).w(m_audio, FUNC(linndrum_audio_device::strobe_mux_drum_w<CABASA>));
-	map(0x1f8c, 0x1f8c).mirror(0x0030).w(m_audio, FUNC(linndrum_audio_device::strobe_mux_drum_w<TAMBOURINE>));
-	map(0x1f8d, 0x1f8d).mirror(0x0030).w(m_audio, FUNC(linndrum_audio_device::strobe_mux_drum_w<COWBELL>));
-	map(0x1f8e, 0x1f8e).mirror(0x0030).w(m_audio, FUNC(linndrum_audio_device::strobe_mux_drum_w<CLAP>));
-	map(0x1f8f, 0x1f8f).mirror(0x0030).w(m_audio, FUNC(linndrum_audio_device::strobe_click_w));
+	map(0x1f85, 0x1f85).mirror(0x0030).lw8(NAME([this] (u8 data) { m_audio->strobe_mux_drum_w(MV_BASS, get_voice_data(data)); }));
+	map(0x1f86, 0x1f86).mirror(0x0030).lw8(NAME([this] (u8 data) { m_audio->strobe_snare_w(get_voice_data(data)); }));
+	map(0x1f87, 0x1f87).mirror(0x0030).lw8(NAME([this] (u8 data) { m_audio->strobe_mux_drum_w(MV_HAT, get_voice_data(data)); }));
+	map(0x1f88, 0x1f88).mirror(0x0030).lw8(NAME([this] (u8 data) { m_audio->strobe_tom_w(get_voice_data(data)); }));
+	map(0x1f89, 0x1f89).mirror(0x0030).lw8(NAME([this] (u8 data) { m_audio->strobe_mux_drum_w(MV_RIDE, get_voice_data(data)); }));
+	map(0x1f8a, 0x1f8a).mirror(0x0030).lw8(NAME([this] (u8 data) { m_audio->strobe_mux_drum_w(MV_CRASH, get_voice_data(data)); }));
+	map(0x1f8b, 0x1f8b).mirror(0x0030).lw8(NAME([this] (u8 data) { m_audio->strobe_mux_drum_w(MV_CABASA, get_voice_data(data)); }));
+	map(0x1f8c, 0x1f8c).mirror(0x0030).lw8(NAME([this] (u8 data) { m_audio->strobe_mux_drum_w(MV_TAMBOURINE, get_voice_data(data)); }));
+	map(0x1f8d, 0x1f8d).mirror(0x0030).lw8(NAME([this] (u8 data) { m_audio->strobe_mux_drum_w(MV_COWBELL, get_voice_data(data)); }));
+	map(0x1f8e, 0x1f8e).mirror(0x0030).lw8(NAME([this] (u8 data) { m_audio->strobe_mux_drum_w(MV_CLAP, get_voice_data(data)); }));
+	map(0x1f8f, 0x1f8f).mirror(0x0030).w(m_audio, FUNC(linndrum_audio_device::strobe_click_w));  // No voice data sent.
 
 	map(0x1fc0, 0x1fff).r(FUNC(linndrum_state::keyboard_r));  // /READ KEYBD.
 	map(0x2000, 0x3fff).ram().share(NVRAM_TAG); // 4 x HM6116LP4. U12-U9.
@@ -800,6 +1249,7 @@ void linndrum_state::machine_start()
 	save_item(NAME(m_debouncing));
 	save_item(NAME(m_tempo_state));
 	save_item(NAME(m_tape_sync_enabled));
+	save_item(NAME(m_voice_data_enabled));
 }
 
 void linndrum_state::machine_reset()
@@ -853,7 +1303,7 @@ void linndrum_state::linndrum(machine_config &config)
 	u16.bit_handler<1>().set_output("led_ext_sync").invert();
 	u16.bit_handler<2>().set_output("led_pattern").invert();
 	u16.bit_handler<2>().append_output("led_song");  // Inverted by U31A.
-	u16.bit_handler<3>().set(m_audio, FUNC(linndrum_audio_device::voice_data_enable_w));
+	u16.bit_handler<3>().set(FUNC(linndrum_state::voice_data_enable_w));
 	u16.bit_handler<4>().set(m_audio, FUNC(linndrum_audio_device::beep_w));
 	u16.bit_handler<5>().set(FUNC(linndrum_state::tape_sync_enable_w));
 	// Output voltage divided by R24/R25 to 0V - 2.5V.
@@ -937,91 +1387,94 @@ INPUT_PORTS_START(linndrum)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("TRIGGER 1")
 
 	PORT_START("pot_tempo")
-	PORT_ADJUSTER(50, "TEMPO") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(linndrum_state::tempo_pot_adjusted), 0)
+	PORT_ADJUSTER(80, "TEMPO") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(linndrum_state::tempo_pot_adjusted), 0)
 
 	PORT_START("pot_volume")
-	PORT_ADJUSTER(100, "MASTER VOLUME")
+	PORT_ADJUSTER(90, "MASTER VOLUME") PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(linndrum_audio_device::master_volume_changed), 0)
+
+	PORT_START("pot_mux_tuning")  // Internal trimmer. Not accessible by the end-user.
+	PORT_ADJUSTER(25, "TRIMMER: MUX DRUM TUNING") PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(linndrum_audio_device::mux_drum_tuning_changed), 0)
 
 	PORT_START("pot_tuning_1")
-	PORT_ADJUSTER(50, "SNARE TUNING");
+	PORT_ADJUSTER(50, "SNARE TUNING") PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(linndrum_audio_device::snare_tuning_changed), 0)
 	PORT_START("pot_tuning_2")
-	PORT_ADJUSTER(50, "HI TOM TUNING");
+	PORT_ADJUSTER(60, "HI TOM TUNING") PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(linndrum_audio_device::tom_tuning_changed), 0)
 	PORT_START("pot_tuning_3")
-	PORT_ADJUSTER(50, "MID TOM TUNING");
+	PORT_ADJUSTER(50, "MID TOM TUNING") PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(linndrum_audio_device::tom_tuning_changed), 0)
 	PORT_START("pot_tuning_4")
-	PORT_ADJUSTER(50, "LO TOM TUNING");
+	PORT_ADJUSTER(40, "LO TOM TUNING") PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(linndrum_audio_device::tom_tuning_changed), 0)
 	PORT_START("pot_tuning_5")
-	PORT_ADJUSTER(50, "HI CONGAS TUNING");
+	PORT_ADJUSTER(52, "HI CONGAS TUNING") PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(linndrum_audio_device::tom_tuning_changed), 0)
 	PORT_START("pot_tuning_6")
-	PORT_ADJUSTER(50, "LO CONGAS TUNING");
+	PORT_ADJUSTER(40, "LO CONGAS TUNING") PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(linndrum_audio_device::tom_tuning_changed), 0)
 	PORT_START("pot_tuning_7")
-	PORT_ADJUSTER(50, "HIHAT DECAY");
+	PORT_ADJUSTER(50, "HIHAT DECAY")
 
 	PORT_START("pot_pan_1")
-	PORT_ADJUSTER(50, "BASS PAN")
+	PORT_ADJUSTER(50, "BASS PAN") PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(linndrum_audio_device::mix_changed), MIX_BASS)
 	PORT_START("pot_pan_2")
-	PORT_ADJUSTER(50, "SNARE PAN")
+	PORT_ADJUSTER(50, "SNARE PAN") PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(linndrum_audio_device::mix_changed), MIX_SNARE)
 	PORT_START("pot_pan_3")
-	PORT_ADJUSTER(50, "SIDESTICK PAN")
+	PORT_ADJUSTER(50, "SIDESTICK PAN") PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(linndrum_audio_device::mix_changed), MIX_SIDESTICK)
 	PORT_START("pot_pan_4")
-	PORT_ADJUSTER(50, "HIHAT PAN")
+	PORT_ADJUSTER(50, "HIHAT PAN") PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(linndrum_audio_device::mix_changed), MIX_HIHAT)
 	PORT_START("pot_pan_5")
-	PORT_ADJUSTER(50, "HI TOM PAN")
+	PORT_ADJUSTER(50, "HI TOM PAN") PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(linndrum_audio_device::mix_changed), MIX_HITOMS)
 	PORT_START("pot_pan_6")
-	PORT_ADJUSTER(50, "MID TOM PAN")
+	PORT_ADJUSTER(50, "MID TOM PAN") PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(linndrum_audio_device::mix_changed), MIX_MIDTOMS)
 	PORT_START("pot_pan_7")
-	PORT_ADJUSTER(50, "LO TOM PAN")
+	PORT_ADJUSTER(50, "LO TOM PAN") PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(linndrum_audio_device::mix_changed), MIX_LOTOMS)
 	PORT_START("pot_pan_8")
-	PORT_ADJUSTER(50, "RIDE PAN")
+	PORT_ADJUSTER(50, "RIDE PAN") PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(linndrum_audio_device::mix_changed), MIX_RIDE)
 	PORT_START("pot_pan_9")
-	PORT_ADJUSTER(50, "CRASH PAN")
+	PORT_ADJUSTER(50, "CRASH PAN") PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(linndrum_audio_device::mix_changed), MIX_CRASH)
 	PORT_START("pot_pan_10")
-	PORT_ADJUSTER(50, "CABASA PAN")
+	PORT_ADJUSTER(50, "CABASA PAN") PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(linndrum_audio_device::mix_changed), MIX_CABASA)
 	PORT_START("pot_pan_11")
-	PORT_ADJUSTER(50, "TAMB PAN")
+	PORT_ADJUSTER(50, "TAMB PAN") PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(linndrum_audio_device::mix_changed), MIX_TAMB)
 	PORT_START("pot_pan_12")
-	PORT_ADJUSTER(50, "HI CONGA PAN")
+	PORT_ADJUSTER(50, "HI CONGA PAN") PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(linndrum_audio_device::mix_changed), MIX_HICONGAS)
 	PORT_START("pot_pan_13")
-	PORT_ADJUSTER(50, "LO CONGA PAN")
+	PORT_ADJUSTER(50, "LO CONGA PAN") PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(linndrum_audio_device::mix_changed), MIX_LOCONGAS)
 	PORT_START("pot_pan_14")
-	PORT_ADJUSTER(50, "COWBELL PAN")
+	PORT_ADJUSTER(50, "COWBELL PAN") PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(linndrum_audio_device::mix_changed), MIX_COWBELL)
 	PORT_START("pot_pan_15")
-	PORT_ADJUSTER(50, "CLAPS PAN")
+	PORT_ADJUSTER(50, "CLAPS PAN") PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(linndrum_audio_device::mix_changed), MIX_CLAPS)
 	PORT_START("pot_pan_16")
-	PORT_ADJUSTER(50, "CLICK PAN")
+	PORT_ADJUSTER(50, "CLICK PAN") PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(linndrum_audio_device::mix_changed), MIX_CLICK)
 
 	PORT_START("pot_gain_1")
-	PORT_ADJUSTER(100, "BASS GAIN")
+	PORT_ADJUSTER(100, "BASS GAIN") PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(linndrum_audio_device::mix_changed), MIX_BASS)
 	PORT_START("pot_gain_2")
-	PORT_ADJUSTER(100, "SNARE GAIN")
+	PORT_ADJUSTER(100, "SNARE GAIN") PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(linndrum_audio_device::mix_changed), MIX_SNARE)
 	PORT_START("pot_gain_3")
-	PORT_ADJUSTER(100, "SIDESTICK GAIN")
+	PORT_ADJUSTER(100, "SIDESTICK GAIN") PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(linndrum_audio_device::mix_changed), MIX_SIDESTICK)
 	PORT_START("pot_gain_4")
-	PORT_ADJUSTER(100, "HIHAT GAIN")
+	PORT_ADJUSTER(100, "HIHAT GAIN") PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(linndrum_audio_device::mix_changed), MIX_HIHAT)
 	PORT_START("pot_gain_5")
-	PORT_ADJUSTER(100, "HI TOM GAIN")
+	PORT_ADJUSTER(100, "HI TOM GAIN") PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(linndrum_audio_device::mix_changed), MIX_HITOMS)
 	PORT_START("pot_gain_6")
-	PORT_ADJUSTER(100, "MID TOM GAIN")
+	PORT_ADJUSTER(100, "MID TOM GAIN") PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(linndrum_audio_device::mix_changed), MIX_MIDTOMS)
 	PORT_START("pot_gain_7")
-	PORT_ADJUSTER(100, "LO TOM GAIN")
+	PORT_ADJUSTER(100, "LO TOM GAIN") PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(linndrum_audio_device::mix_changed), MIX_LOTOMS)
 	PORT_START("pot_gain_8")
-	PORT_ADJUSTER(100, "RIDE GAIN")
+	PORT_ADJUSTER(100, "RIDE GAIN") PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(linndrum_audio_device::mix_changed), MIX_RIDE)
 	PORT_START("pot_gain_9")
-	PORT_ADJUSTER(100, "CRASH GAIN")
+	PORT_ADJUSTER(100, "CRASH GAIN") PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(linndrum_audio_device::mix_changed), MIX_CRASH)
 	PORT_START("pot_gain_10")
-	PORT_ADJUSTER(100, "CABASA GAIN")
+	PORT_ADJUSTER(100, "CABASA GAIN") PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(linndrum_audio_device::mix_changed), MIX_CABASA)
 	PORT_START("pot_gain_11")
-	PORT_ADJUSTER(100, "TAMB GAIN")
+	PORT_ADJUSTER(100, "TAMB GAIN") PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(linndrum_audio_device::mix_changed), MIX_TAMB)
 	PORT_START("pot_gain_12")
-	PORT_ADJUSTER(100, "HI CONGA GAIN")
+	PORT_ADJUSTER(100, "HI CONGA GAIN") PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(linndrum_audio_device::mix_changed), MIX_HICONGAS)
 	PORT_START("pot_gain_13")
-	PORT_ADJUSTER(100, "LO CONGA GAIN")
+	PORT_ADJUSTER(100, "LO CONGA GAIN") PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(linndrum_audio_device::mix_changed), MIX_LOCONGAS)
 	PORT_START("pot_gain_14")
-	PORT_ADJUSTER(100, "COWBELL GAIN")
+	PORT_ADJUSTER(100, "COWBELL GAIN") PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(linndrum_audio_device::mix_changed), MIX_COWBELL)
 	PORT_START("pot_gain_15")
-	PORT_ADJUSTER(100, "CLAPS GAIN")
+	PORT_ADJUSTER(100, "CLAPS GAIN") PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(linndrum_audio_device::mix_changed), MIX_CLAPS)
 	PORT_START("pot_gain_16")
-	PORT_ADJUSTER(100, "CLICK GAIN")
+	PORT_ADJUSTER(100, "CLICK GAIN") PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(linndrum_audio_device::mix_changed), MIX_CLICK)
 INPUT_PORTS_END
 
 ROM_START(linndrum)
