@@ -29,7 +29,7 @@ void tatsumi_rotating_sprites_device::common_init()
 {
 	m_rom_clut_offset = memregion("sprites_l")->bytes() - m_rom_clut_size;
 
-	m_shadow_pen_array = make_unique_clear<uint8_t[]>(8192);
+	m_shadow_pen_array = make_unique_clear<uint8_t[]>(m_rom_clut_size * 2);
 	m_temp_bitmap.allocate(512, 512);
 }
 
