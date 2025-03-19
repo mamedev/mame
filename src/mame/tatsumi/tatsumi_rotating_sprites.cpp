@@ -5,8 +5,8 @@
 #include "tatsumi_rotating_sprites.h"
 #include "screen.h"
 
-DEFINE_DEVICE_TYPE(TATSUMI_ROTATING_SPRITES, tatsumi_rotating_sprites_device, "tatsumi_rotating_spr", "Tatsumi Rotating Sprites")
-DEFINE_DEVICE_TYPE(TATSUMI_ROTATING_SPRITES_BIGPAL, tatsumi_rotating_sprites_bigpal_device, "tatsumi_rotating_spr_bigpal", "Tatsumi Rotating Sprites (larger palette)")
+DEFINE_DEVICE_TYPE(TATSUMI_ROTATING_SPRITES, tatsumi_rotating_sprites_device, "tatsumi_rotating_spr", "Tatsumi TZB215/TZB315 Rotating Sprites")
+DEFINE_DEVICE_TYPE(TATSUMI_ROTATING_SPRITES_BIGPAL, tatsumi_rotating_sprites_bigpal_device, "tatsumi_rotating_spr_bigpal", "Tatsumi TZB215/TZB315 Rotating Sprites (larger palette)")
 
 
 tatsumi_rotating_sprites_device::tatsumi_rotating_sprites_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
