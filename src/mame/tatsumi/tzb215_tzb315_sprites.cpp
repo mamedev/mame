@@ -10,10 +10,11 @@
 // differences, if any, unknown
 // (does not appear to be CLUT size, even if that would have made sense. Round Up 5 uses the smaller CLUT like Apache 3 yet is claimed to be TZB315)
 
-DEFINE_DEVICE_TYPE(TZB215_TZB315_SPRITES, tzb215_tzb315_sprite_device, "tzb215_tzb315_spr", "Tatsumi TZB215/TZB315 Rotating Sprites")
+DEFINE_DEVICE_TYPE(TZB215_SPRITES, tzb215_sprite_device, "tzb215_spr", "Tatsumi TZB215 Rotating Sprites")
+DEFINE_DEVICE_TYPE(TZB315_SPRITES, tzb315_sprite_device, "tzb315_spr", "Tatsumi TZB315 Rotating Sprites")
 
-tzb215_tzb315_sprite_device::tzb215_tzb315_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, TZB215_TZB315_SPRITES, tag, owner, clock)
+tzb215_tzb315_sprite_device::tzb215_tzb315_sprite_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this)
 	, m_fakepalette(*this, "fakepalette")
 	, m_basepalette(*this, finder_base::DUMMY_TAG)
@@ -23,11 +24,33 @@ tzb215_tzb315_sprite_device::tzb215_tzb315_sprite_device(const machine_config &m
 {
 }
 
-tzb215_tzb315_sprite_device::tzb215_tzb315_sprite_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock, u32 clut_size)
-	: tzb215_tzb315_sprite_device(mconfig, tag, owner, clock)
+tzb215_tzb315_sprite_device::tzb215_tzb315_sprite_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, u32 clock, u32 clut_size)
+	: tzb215_tzb315_sprite_device(mconfig, type, tag, owner, clock)
 {
 	m_rom_clut_size = clut_size;
 }
+
+tzb215_sprite_device::tzb215_sprite_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock, u32 clut_size)
+	: tzb215_tzb315_sprite_device(mconfig, TZB215_SPRITES, tag, owner, clock, clut_size)
+{
+}
+
+tzb215_sprite_device::tzb215_sprite_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock)
+	: tzb215_tzb315_sprite_device(mconfig, TZB215_SPRITES, tag, owner, clock, 0)
+{
+}
+
+tzb315_sprite_device::tzb315_sprite_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock, u32 clut_size)
+	: tzb215_tzb315_sprite_device(mconfig, TZB315_SPRITES, tag, owner, clock, clut_size)
+{
+}
+
+tzb315_sprite_device::tzb315_sprite_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock)
+	: tzb215_tzb315_sprite_device(mconfig, TZB315_SPRITES, tag, owner, clock, 0)
+{
+}
+
+
 
 
 void tzb215_tzb315_sprite_device::common_init()
