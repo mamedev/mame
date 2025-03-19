@@ -993,7 +993,7 @@ void gba_state::gba_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			fifo_t &fifo = m_fifo[offset & 1];
 			if (fifo.size >= 8)
 			{
-				logerror("%s: Sound FIFO %01x write overflow %04x & %04x\n", machine().describe_context(), offset - (0x00a0/4), data, mem_mask);
+				logerror("%s: Sound FIFO %01x write overflow %04x & %04x\n", machine().describe_context(), offset & 1, data, mem_mask);
 				return;
 			}
 			COMBINE_DATA(&fifo.word[fifo.in]);
