@@ -2,7 +2,7 @@
 // copyright-holders:Bryan McPhail, Angelo Salese
 
 #include "emu.h"
-#include "tzb215_tzb315_sprites.h"
+#include "tzbx15_sprites.h"
 #include "screen.h"
 
 // TZB215 on Apache 3
