@@ -40,8 +40,8 @@ struct apu_t
 		}
 
 		u8 regs[4];
-		int vbl_length = 0;
-		int freq = 0;
+		s32 vbl_length = 0;
+		s32 freq = 0;
 		float phaseacc = 0.0;
 		float env_phase = 0.0;
 		float sweep_phase = 0.0;
@@ -61,10 +61,10 @@ struct apu_t
 		}
 
 		u8 regs[4]; /* regs[1] unused */
-		int linear_length = 0;
+		s32 linear_length = 0;
 		bool linear_reload = false;
-		int vbl_length = 0;
-		int write_latency = 0;
+		s32 vbl_length = 0;
+		s32 write_latency = 0;
 		float phaseacc = 0.0;
 		u8 adder = 0;
 		bool counter_started = false;
@@ -83,7 +83,7 @@ struct apu_t
 
 		u8 regs[4]; /* regs[1] unused */
 		u16 lfsr = 1;
-		int vbl_length = 0;
+		s32 vbl_length = 0;
 		float phaseacc = 0.0;
 		float env_phase = 0.0;
 		u8 env_vol = 0;
@@ -103,7 +103,7 @@ struct apu_t
 		u8 regs[4];
 		u32 address = 0;
 		u32 length = 0;
-		int bits_left = 0;
+		s32 bits_left = 0;
 		float phaseacc = 0.0;
 		u8 cur_byte = 0;
 		bool enabled = false;
@@ -161,8 +161,8 @@ struct mmc5_sound_t
 		}
 
 		u8 regs[4];
-		int vbl_length = 0;
-		int freq = 0;
+		s32 vbl_length = 0;
+		s32 freq = 0;
 		float phaseacc = 0.0;
 		float env_phase = 0.0;
 		u8 adder = 0;
