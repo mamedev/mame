@@ -420,8 +420,6 @@ private:
 
 	class be_parameter
 	{
-		static inline constexpr int REG_MAX = 30;
-
 	public:
 		// parameter types
 		enum be_parameter_type
@@ -436,8 +434,8 @@ private:
 
 		typedef uint64_t be_parameter_value;
 
-		be_parameter() : m_type(PTYPE_NONE), m_value(0) { }
-		be_parameter(uint64_t val) : m_type(PTYPE_IMMEDIATE), m_value(val) { }
+		be_parameter() : m_type(PTYPE_NONE), m_value(0), m_coldreg(false) { }
+		be_parameter(uint64_t val) : m_type(PTYPE_IMMEDIATE), m_value(val), m_coldreg(false) { }
 		be_parameter(drcbe_arm64 &drcbe, const uml::parameter &param, uint32_t allowed);
 		be_parameter(const be_parameter &param) = default;
 
@@ -461,6 +459,7 @@ private:
 		bool is_memory() const { return (m_type == PTYPE_MEMORY); }
 
 		bool is_immediate_value(uint64_t value) const { return (m_type == PTYPE_IMMEDIATE && m_value == value); }
+		bool is_cold_register() const { return m_coldreg; }
 
 		asmjit::a64::Vec get_register_float(uint32_t regsize) const;
 		asmjit::a64::Gp get_register_int(uint32_t regsize) const;
@@ -468,10 +467,13 @@ private:
 		asmjit::a64::Gp select_register(asmjit::a64::Gp const &reg, uint32_t regsize) const;
 
 	private:
-		be_parameter(be_parameter_type type, be_parameter_value value) : m_type(type), m_value(value) { }
+		static inline constexpr int REG_MAX = 30;
+
+		be_parameter(be_parameter_type type, be_parameter_value value) : m_type(type), m_value(value), m_coldreg(false) { }
 
 		be_parameter_type   m_type;
 		be_parameter_value  m_value;
+		bool                m_coldreg;
 	};
 
 	struct near_state
@@ -619,7 +621,6 @@ private:
 	void mov_param_imm(asmjit::a64::Assembler &a, uint32_t regsize, const be_parameter &dst, uint64_t src) const;
 	void mov_param_param(asmjit::a64::Assembler &a, uint32_t regsize, const be_parameter &dst, const be_parameter &src) const;
 	void mov_mem_param(asmjit::a64::Assembler &a, uint32_t regsize, void *dst, const be_parameter &src) const;
-	void mov_r64_imm(asmjit::a64::Assembler &a, const asmjit::a64::Gp &dst, uint64_t const src) const;
 
 	void call_arm_addr(asmjit::a64::Assembler &a, const void *offs) const;
 
@@ -766,9 +767,14 @@ drcbe_arm64::be_parameter::be_parameter(drcbe_arm64 &drcbe, const parameter &par
 			assert(allowed & PTYPE_R);
 			assert(allowed & PTYPE_M);
 			if (int regnum = int_register_map[param.ireg() - REG_I0]; regnum != 0)
+			{
 				*this = make_ireg(regnum);
+			}
 			else
+			{
 				*this = make_memory(&drcbe.m_state.r[param.ireg() - REG_I0]);
+				m_coldreg = true;
+			}
 			break;
 
 		// if a register maps to a register, keep it as a register; otherwise map it to memory
@@ -776,9 +782,14 @@ drcbe_arm64::be_parameter::be_parameter(drcbe_arm64 &drcbe, const parameter &par
 			assert(allowed & PTYPE_F);
 			assert(allowed & PTYPE_M);
 			if (int regnum = float_register_map[param.freg() - REG_F0]; regnum != 0)
+			{
 				*this = make_freg(regnum);
+			}
 			else
+			{
 				*this = make_memory(&drcbe.m_state.f[param.freg() - REG_F0]);
+				m_coldreg = true;
+			}
 			break;
 
 		// everything else is unexpected
@@ -1137,38 +1148,19 @@ void drcbe_arm64::emit_narrow_memwrite(asmjit::a64::Assembler &a, const be_param
 void drcbe_arm64::mov_reg_param(a64::Assembler &a, uint32_t regsize, const a64::Gp &dst, const be_parameter &src) const
 {
 	if (src.is_immediate())
-		get_imm_relative(a, select_register(dst, regsize), src.immediate());
+	{
+		get_imm_relative(a, select_register(dst, regsize), (regsize == 4) ? uint32_t(src.immediate()) : src.immediate());
+	}
 	else if (src.is_int_register() && dst.id() != src.ireg())
+	{
 		a.mov(select_register(dst, regsize), src.get_register_int(regsize));
-	else if (src.is_memory())
-		emit_ldr_mem(a, select_register(dst, regsize), src.memory());
-}
-
-void drcbe_arm64::mov_mem_param(a64::Assembler &a, uint32_t regsize, void *dst, const be_parameter &src) const
-{
-	const a64::Gp scratch = select_register(SCRATCH_REG2, regsize);
-
-	if (src.is_immediate_value(0))
-	{
-		emit_str_mem(a, select_register(a64::xzr, regsize), dst);
-	}
-	else if (src.is_immediate())
-	{
-		get_imm_relative(a, scratch.x(), src.immediate());
-		emit_str_mem(a, scratch, dst);
 	}
 	else if (src.is_memory())
 	{
-		if (regsize == 4)
-			emit_ldrsw_mem(a, scratch.x(), src.memory());
+		if ((util::endianness::native == util::endianness::big) && (regsize == 4) && src.is_cold_register())
+			emit_ldr_mem(a, select_register(dst, regsize), reinterpret_cast<uint8_t *>(src.memory()) + 4);
 		else
-			emit_ldr_mem(a, scratch.x(), src.memory());
-
-		emit_str_mem(a, scratch, dst);
-	}
-	else if (src.is_int_register())
-	{
-		emit_str_mem(a, src.get_register_int(regsize), dst);
+			emit_ldr_mem(a, select_register(dst, regsize), src.memory());
 	}
 }
 
@@ -1177,13 +1169,48 @@ void drcbe_arm64::mov_param_reg(a64::Assembler &a, uint32_t regsize, const be_pa
 	assert(!dst.is_immediate());
 
 	if (dst.is_memory())
-		emit_str_mem(a, select_register(src, regsize), dst.memory());
+	{
+		if (dst.is_cold_register())
+			emit_str_mem(a, src.x(), dst.memory());
+		else
+			emit_str_mem(a, select_register(src, regsize), dst.memory());
+	}
 	else if (dst.is_int_register() && src.id() != dst.ireg())
+	{
 		a.mov(dst.get_register_int(regsize), select_register(src, regsize));
+	}
+}
+
+void drcbe_arm64::mov_param_imm(a64::Assembler &a, uint32_t regsize, const be_parameter &dst, uint64_t src) const
+{
+	assert(!dst.is_immediate());
+
+	if (dst.is_memory())
+	{
+		const uint32_t movsize = dst.is_cold_register() ? 8 : regsize;
+
+		if (src == 0)
+		{
+			emit_str_mem(a, select_register(a64::xzr, movsize), dst.memory());
+		}
+		else
+		{
+			const a64::Gp scratch = select_register(SCRATCH_REG2, movsize);
+
+			get_imm_relative(a, scratch, (regsize == 4) ? uint32_t(src) : src);
+			emit_str_mem(a, scratch, dst.memory());
+		}
+	}
+	else if (dst.is_int_register())
+	{
+		a.mov(dst.get_register_int(regsize), src);
+	}
 }
 
 void drcbe_arm64::mov_param_param(a64::Assembler &a, uint32_t regsize, const be_parameter &dst, const be_parameter &src) const
 {
+	// FIXME: this won't clear upper bits of the output for a 4-byte move when the source is a register or immediate
+	// need to fix affected cases (mov, sext), currently confounded by issues in the simplifier
 	assert(!dst.is_immediate());
 
 	if (src.is_memory())
@@ -1208,27 +1235,31 @@ void drcbe_arm64::mov_param_param(a64::Assembler &a, uint32_t regsize, const be_
 	}
 }
 
-void drcbe_arm64::mov_param_imm(a64::Assembler &a, uint32_t regsize, const be_parameter &dst, uint64_t src) const
+void drcbe_arm64::mov_mem_param(a64::Assembler &a, uint32_t regsize, void *dst, const be_parameter &src) const
 {
-	assert(!dst.is_immediate());
+	const a64::Gp scratch = select_register(SCRATCH_REG2, regsize);
 
-	if (dst.is_memory())
+	if (src.is_immediate_value(0))
 	{
-		if (src == 0)
-		{
-			emit_str_mem(a, select_register(a64::xzr, regsize), dst.memory());
-		}
-		else
-		{
-			const a64::Gp scratch = select_register(SCRATCH_REG2, regsize);
-
-			get_imm_relative(a, scratch, src);
-			emit_str_mem(a, scratch, dst.memory());
-		}
+		emit_str_mem(a, select_register(a64::xzr, regsize), dst);
 	}
-	else if (dst.is_int_register())
+	else if (src.is_immediate())
 	{
-		a.mov(dst.get_register_int(regsize), src);
+		get_imm_relative(a, scratch, (regsize == 4) ? uint32_t(src.immediate()) : src.immediate());
+		emit_str_mem(a, scratch, dst);
+	}
+	else if (src.is_memory())
+	{
+		if ((util::endianness::native == util::endianness::big) && (regsize == 4) && src.is_cold_register())
+			emit_ldr_mem(a, scratch, reinterpret_cast<uint8_t *>(src.memory()) + 4);
+		else
+			emit_ldr_mem(a, scratch, src.memory());
+
+		emit_str_mem(a, scratch, dst);
+	}
+	else if (src.is_int_register())
+	{
+		emit_str_mem(a, src.get_register_int(regsize), dst);
 	}
 }
 
@@ -2969,7 +3000,7 @@ void drcbe_arm64::op_mov(a64::Assembler &a, const uml::instruction &inst)
 	be_parameter srcp(*this, inst.param(1), PTYPE_MRI);
 
 	// decide whether a conditional select will be efficient
-	bool usesel = dstp.is_int_register() && (srcp.is_int_register() || (srcp.is_immediate() && is_simple_mov_immediate(srcp.immediate(), inst.size())));
+	bool usesel = dstp.is_int_register() && (((inst.size() == 8) && srcp.is_int_register()) || (srcp.is_immediate() && is_simple_mov_immediate(srcp.immediate(), inst.size())));
 	switch (inst.condition())
 	{
 		case uml::COND_ALWAYS:
@@ -2996,11 +3027,11 @@ void drcbe_arm64::op_mov(a64::Assembler &a, const uml::instruction &inst)
 	{
 		const bool srczero = srcp.is_immediate_value(0);
 		const bool srcone = srcp.is_immediate_value(1);
-		const bool srcnegone = srcp.is_immediate_value(util::make_bitmask<uint64_t>(inst.size() * 8));
+		const bool srcnegone = (inst.size() == 8) && srcp.is_immediate_value(uint64_t(int64_t(-1)));
 		const bool srcspecial = srczero || srcone || srcnegone;
 
-		const a64::Gp dst = dstp.select_register(TEMP_REG1, inst.size());
-		const a64::Gp src = srcspecial ? select_register(a64::xzr, inst.size()) : srcp.select_register(TEMP_REG2, inst.size());
+		const a64::Gp dst = dstp.select_register(TEMP_REG1, 8);
+		const a64::Gp src = srcspecial ? a64::Gp(a64::xzr) : srcp.select_register(TEMP_REG2, inst.size());
 
 		mov_reg_param(a, inst.size(), dst, dstp);
 		if (!srcspecial)
@@ -3013,20 +3044,20 @@ void drcbe_arm64::op_mov(a64::Assembler &a, const uml::instruction &inst)
 				if (m_carry_state == carry_state::CANONICAL)
 				{
 					if (srcone)
-						a.csinc(dst, dst, src, ARM_CONDITION(inst.condition()));
+						a.csinc(dst, dst, src.x(), ARM_CONDITION(inst.condition()));
 					else if (srcnegone)
-						a.csinv(dst, dst, src, ARM_CONDITION(inst.condition()));
+						a.csinv(dst, dst, src.x(), ARM_CONDITION(inst.condition()));
 					else
-						a.csel(dst, src, dst, ARM_NOT_CONDITION(inst.condition()));
+						a.csel(dst, src.x(), dst, ARM_NOT_CONDITION(inst.condition()));
 				}
 				else
 				{
 					if (srcone)
-						a.csinc(dst, dst, src, ARM_NOT_CONDITION(inst.condition()));
+						a.csinc(dst, dst, src.x(), ARM_NOT_CONDITION(inst.condition()));
 					else if (srcnegone)
-						a.csinv(dst, dst, src, ARM_NOT_CONDITION(inst.condition()));
+						a.csinv(dst, dst, src.x(), ARM_NOT_CONDITION(inst.condition()));
 					else
-						a.csel(dst, src, dst, ARM_CONDITION(inst.condition()));
+						a.csel(dst, src.x(), dst, ARM_CONDITION(inst.condition()));
 				}
 				break;
 			case uml::COND_A:
@@ -3035,11 +3066,11 @@ void drcbe_arm64::op_mov(a64::Assembler &a, const uml::instruction &inst)
 				[[fallthrough]];
 			default:
 				if (srcone)
-					a.csinc(dst, dst, src, ARM_NOT_CONDITION(inst.condition()));
+					a.csinc(dst, dst, src.x(), ARM_NOT_CONDITION(inst.condition()));
 				else if (srcnegone)
-					a.csinv(dst, dst, src, ARM_NOT_CONDITION(inst.condition()));
+					a.csinv(dst, dst, src.x(), ARM_NOT_CONDITION(inst.condition()));
 				else
-					a.csel(dst, src, dst, ARM_CONDITION(inst.condition()));
+					a.csel(dst, src.x(), dst, ARM_CONDITION(inst.condition()));
 		}
 
 		mov_param_reg(a, inst.size(), dstp, dst);

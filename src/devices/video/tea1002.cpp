@@ -12,27 +12,33 @@
 #include "tea1002.h"
 
 
+namespace {
+
 //**************************************************************************
 //  CONSTANTS
 //**************************************************************************
 
-const float tea1002_device::m_luminance[] =
+const int s_tint = -6; // what is this based on?
+
+const float s_luminance[] =
 {
 	 0, 22.5, 44, 66.5,  8.5, 31, 52.5, 100, // INV = 0
 	75, 52.5, 31,  8.5, 66.5, 44, 22.5, 0    // INV = 1
 };
 
-const int tea1002_device::m_phase[] =
+const int s_phase[] =
 {
 	0, 103, 241, 167, 347,  61, 283, 0, // INV = 0
 	0, 283,  61, 347, 167, 241, 103, 0  // INV = 1
 };
 
-const int tea1002_device::m_amplitude[] =
+const int s_amplitude[] =
 {
 	0, 48, 44, 33, 33, 44, 48, 0, // INV = 0
 	0, 24, 22, 17, 17, 22, 24, 0  // INV = 1
 };
+
+} // anonymous namespace
 
 
 //**************************************************************************
@@ -73,9 +79,9 @@ void tea1002_device::device_start()
 rgb_t tea1002_device::color(int index)
 {
 	// calculate yuv
-	double y = m_luminance[index] / 100;
-	double u = cos((m_phase[index] + m_tint) * M_PI / 180) * m_amplitude[index] / 100;
-	double v = sin((m_phase[index] + m_tint) * M_PI / 180) * m_amplitude[index] / 100;
+	double y = s_luminance[index] / 100;
+	double u = cos((s_phase[index] + s_tint) * M_PI / 180) * s_amplitude[index] / 100;
+	double v = sin((s_phase[index] + s_tint) * M_PI / 180) * s_amplitude[index] / 100;
 
 	// and convert to rgb
 	double r = y + v * 1.14;
