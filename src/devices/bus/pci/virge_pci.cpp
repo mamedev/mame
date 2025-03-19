@@ -247,7 +247,7 @@ void virge_pci_device::map_extra(uint64_t memory_window_start, uint64_t memory_w
 	{
 		io_space->install_device(0x03b0, 0x03df, *this, &virge_pci_device::legacy_io_map);
 
-		//
+		// Available at MMFF20 only if true
 		if (m_vga->read_pd26_strapping() == false)
 		{
 			const u16 port_offset = m_vga->read_pd25_strapping() ? 0xe2 : 0xe8;
