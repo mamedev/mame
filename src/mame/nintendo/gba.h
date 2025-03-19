@@ -58,13 +58,17 @@ private:
 
 	double m_timer_hz[4]{};
 
-	int m_fifo_a_ptr = 0;
-	int m_fifo_b_ptr = 0;
-	int m_fifo_a_in = 0;
-	int m_fifo_b_in = 0;
-	uint8_t m_fifo_a[20]{};
-	uint8_t m_fifo_b[20]{};
+	struct fifo_t
+	{
+		int32_t ptr = 0;
+		int32_t in = 0;
+		int32_t size = 0;
+		int32_t remains = 0;
+		uint32_t sample = 0;
+		uint32_t word[8]{};
+	};
 
+	fifo_t m_fifo[2];
 
 	uint32_t gba_io_r(offs_t offset, uint32_t mem_mask = ~0);
 	void gba_io_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
