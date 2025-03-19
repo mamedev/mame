@@ -43015,6 +43015,9 @@ mpoker2b
 @source:skeleton/pap2.cpp
 pap2
 
+@source:skeleton/paracaidista.cpp
+paraca
+
 @source:skeleton/pcksurfer.cpp
 pcksurfer
 
