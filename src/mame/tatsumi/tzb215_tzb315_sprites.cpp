@@ -2,13 +2,18 @@
 // copyright-holders:Bryan McPhail, Angelo Salese
 
 #include "emu.h"
-#include "tatsumi_rotating_sprites.h"
+#include "tzb215_tzb315_sprites.h"
 #include "screen.h"
 
-DEFINE_DEVICE_TYPE(TATSUMI_ROTATING_SPRITES, tatsumi_rotating_sprites_device, "tatsumi_rotating_spr", "Tatsumi TZB215/TZB315 Rotating Sprites")
+// TZB215 on Apache 3
+// TZB315 on Round Up 5, Big Fight, Cycle Warriors
+// differences, if any, unknown
+// (does not appear to be CLUT size, even if that would have made sense. Round Up 5 uses the smaller CLUT like Apache 3 yet is TZB315)
 
-tatsumi_rotating_sprites_device::tatsumi_rotating_sprites_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, TATSUMI_ROTATING_SPRITES, tag, owner, clock)
+DEFINE_DEVICE_TYPE(TZB215_TZB315_SPRITES, tzb215_tzb315_sprite_device, "tzb215_tzb315_spr", "Tatsumi TZB215/TZB315 Rotating Sprites")
+
+tzb215_tzb315_sprite_device::tzb215_tzb315_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, TZB215_TZB315_SPRITES, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this)
 	, m_fakepalette(*this, "fakepalette")
 	, m_basepalette(*this, finder_base::DUMMY_TAG)
@@ -18,14 +23,14 @@ tatsumi_rotating_sprites_device::tatsumi_rotating_sprites_device(const machine_c
 {
 }
 
-tatsumi_rotating_sprites_device::tatsumi_rotating_sprites_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock, u32 clut_size)
-	: tatsumi_rotating_sprites_device(mconfig, tag, owner, clock)
+tzb215_tzb315_sprite_device::tzb215_tzb315_sprite_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock, u32 clut_size)
+	: tzb215_tzb315_sprite_device(mconfig, tag, owner, clock)
 {
 	m_rom_clut_size = clut_size;
 }
 
 
-void tatsumi_rotating_sprites_device::common_init()
+void tzb215_tzb315_sprite_device::common_init()
 {
 	m_rom_clut_offset = memregion("sprites_l")->bytes() - m_rom_clut_size;
 
@@ -44,12 +49,12 @@ static const gfx_layout spritelayout =
 	32*8
 };
 
-GFXDECODE_MEMBER( tatsumi_rotating_sprites_device::gfxinfo )
+GFXDECODE_MEMBER( tzb215_tzb315_sprite_device::gfxinfo )
 	GFXDECODE_DEVICE("sprites_l", 0, spritelayout, 0, 256)
 	GFXDECODE_DEVICE("sprites_h", 0, spritelayout, 0, 256)
 GFXDECODE_END
 
-void tatsumi_rotating_sprites_device::device_start()
+void tzb215_tzb315_sprite_device::device_start()
 {
 	common_init();
 	decode_gfx(gfxinfo);
@@ -57,21 +62,21 @@ void tatsumi_rotating_sprites_device::device_start()
 	gfx(1)->set_colors(m_rom_clut_size / 8);
 }
 
-void tatsumi_rotating_sprites_device::device_reset()
+void tzb215_tzb315_sprite_device::device_reset()
 {
 }
 
-void tatsumi_rotating_sprites_device::device_add_mconfig(machine_config &config)
+void tzb215_tzb315_sprite_device::device_add_mconfig(machine_config &config)
 {
 	PALETTE(config, m_fakepalette).set_format(palette_device::xRGB_555, m_rom_clut_size * 2); // 4096 or 8192 arranged as series of CLUTs
 }
 
-void tatsumi_rotating_sprites_device::mycopyrozbitmap_core(bitmap_ind8 &bitmap, const bitmap_rgb32 &srcbitmap,
+void tzb215_tzb315_sprite_device::mycopyrozbitmap_core(bitmap_ind8 &bitmap, const bitmap_rgb32 &srcbitmap,
 		int dstx, int dsty, int srcwidth, int srcheight, int incxx, int incxy, int incyx, int incyy,
 		const rectangle &clip, int transparent_color)
 { }
 
-void tatsumi_rotating_sprites_device::mycopyrozbitmap_core(bitmap_rgb32 &bitmap, const bitmap_rgb32 &srcbitmap,
+void tzb215_tzb315_sprite_device::mycopyrozbitmap_core(bitmap_rgb32 &bitmap, const bitmap_rgb32 &srcbitmap,
 	int dstx, int dsty, int srcwidth, int srcheight, int incxx, int incxy, int incyx, int incyy,
 	const rectangle &clip, int transparent_color)
 {
@@ -125,7 +130,7 @@ void tatsumi_rotating_sprites_device::mycopyrozbitmap_core(bitmap_rgb32 &bitmap,
 }
 
 template<class BitmapClass>
-void tatsumi_rotating_sprites_device::roundupt_drawgfxzoomrotate( BitmapClass &dest_bmp, const rectangle &clip,
+void tzb215_tzb315_sprite_device::roundupt_drawgfxzoomrotate( BitmapClass &dest_bmp, const rectangle &clip,
 		gfx_element *gfx, uint32_t code,uint32_t color,int flipx,int flipy,uint32_t ssx,uint32_t ssy,
 		int scalex, int scaley, int rotate, int write_priority_only )
 {
@@ -308,7 +313,7 @@ void tatsumi_rotating_sprites_device::roundupt_drawgfxzoomrotate( BitmapClass &d
 
 
 template<class BitmapClass>
-void tatsumi_rotating_sprites_device::draw_sprites_main(BitmapClass &bitmap, const rectangle &cliprect, int write_priority_only, int rambank)
+void tzb215_tzb315_sprite_device::draw_sprites_main(BitmapClass &bitmap, const rectangle &cliprect, int write_priority_only, int rambank)
 {
 	// Sprite data is double buffered
 	for (int offs = rambank;offs < rambank + 0x800;offs += 6)
@@ -485,12 +490,12 @@ void tatsumi_rotating_sprites_device::draw_sprites_main(BitmapClass &bitmap, con
 	}
 }
 
-void tatsumi_rotating_sprites_device::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, int write_priority_only, int rambank)
+void tzb215_tzb315_sprite_device::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, int write_priority_only, int rambank)
 {
 	draw_sprites_main(bitmap, cliprect, write_priority_only, rambank);
 }
 
-void tatsumi_rotating_sprites_device::draw_sprites(bitmap_ind8& bitmap, const rectangle &cliprect, int write_priority_only, int rambank)
+void tzb215_tzb315_sprite_device::draw_sprites(bitmap_ind8& bitmap, const rectangle &cliprect, int write_priority_only, int rambank)
 {
 	draw_sprites_main(bitmap, cliprect, write_priority_only, rambank);
 }
@@ -500,7 +505,7 @@ void tatsumi_rotating_sprites_device::draw_sprites(bitmap_ind8& bitmap, const re
  *  We update 'Mame palettes' from the clut here in order to simplify the
  *  draw routines.  We also note down any uses of the 'shadow' pen (index 255).
  */
-void tatsumi_rotating_sprites_device::update_cluts()
+void tzb215_tzb315_sprite_device::update_cluts()
 {
 	const int length = m_rom_clut_size * 2;
 	const uint8_t* bank1 = m_sprites_l_rom + m_rom_clut_offset;

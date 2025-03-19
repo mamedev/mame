@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "tatsumi_rotating_sprites.h"
+#include "tzb215_tzb315_sprites.h"
 
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
@@ -48,7 +48,7 @@ protected:
 	required_device<m68000_base_device> m_subcpu;
 	optional_device<ym2151_device> m_ym2151;
 	required_device<okim6295_device> m_oki;
-	required_device<tatsumi_rotating_sprites_device> m_rotatingsprites;
+	required_device<tzb215_tzb315_sprite_device> m_rotatingsprites;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 

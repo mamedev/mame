@@ -1,18 +1,18 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail, Angelo Salese
 
-#ifndef MAME_TATSUMI_TATSUMI_ROTATING_SPRITES_H
-#define MAME_TATSUMI_TATSUMI_ROTATING_SPRITES_H
+#ifndef MAME_TATSUMI_TZB215_TZB315_SPRITES_H
+#define MAME_TATSUMI_TZB215_TZB315_SPRITES_H
 
 #pragma once
 
 #include "emupal.h"
 
-class tatsumi_rotating_sprites_device : public device_t, public device_gfx_interface
+class tzb215_tzb315_sprite_device : public device_t, public device_gfx_interface
 {
 public:
-	tatsumi_rotating_sprites_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, u32 clut_size);
-	tatsumi_rotating_sprites_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	tzb215_tzb315_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, u32 clut_size);
+	tzb215_tzb315_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	void set_sprite_palette_base(int sprite_palette_base) { m_sprite_palette_base = sprite_palette_base; }
 	template <typename T> void set_basepalette(T &&tag) { m_basepalette.set_tag(std::forward<T>(tag)); }
@@ -61,6 +61,6 @@ private:
 	int m_sprite_palette_base;
 };
 
-DECLARE_DEVICE_TYPE(TATSUMI_ROTATING_SPRITES, tatsumi_rotating_sprites_device)
+DECLARE_DEVICE_TYPE(TZB215_TZB315_SPRITES, tzb215_tzb315_sprite_device)
 
-#endif // MAME_TATSUMI_TATSUMI_ROTATING_SPRITES_H
+#endif // MAME_TATSUMI_TZB215_TZB315_SPRITES_H
