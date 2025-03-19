@@ -11,9 +11,6 @@
 class tzb215_tzb315_sprite_device : public device_t, public device_gfx_interface
 {
 public:
-	tzb215_tzb315_sprite_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
-	tzb215_tzb315_sprite_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 clut_size);
-
 	void set_sprite_palette_base(int sprite_palette_base) { m_sprite_palette_base = sprite_palette_base; }
 	template <typename T> void set_basepalette(T &&tag) { m_basepalette.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_spriteram(T &&tag) { m_spriteram.set_tag(std::forward<T>(tag)); }
@@ -22,6 +19,10 @@ public:
 	void draw_sprites(bitmap_ind8& bitmap, const rectangle& cliprect, int write_priority_only, int rambank);
 
 	void update_cluts();
+
+protected:
+	tzb215_tzb315_sprite_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	tzb215_tzb315_sprite_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 clut_size);
 
 private:
 
