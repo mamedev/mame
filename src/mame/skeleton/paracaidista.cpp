@@ -99,5 +99,5 @@ ROM_END
 
 } // Anonymous namespace
 
-//    YEAR  NAME    PARENT  MACHINE       INPUT         CLASS               INIT        ROT   COMPANY                     FULLNAME        FLAGS
-GAME( 2023, paraca, 0,      paracaidista, paracaidista, paracaidista_state, empty_init, ROT0, "Video Game / Electrogame", "Paracaidista", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//    YEAR  NAME    PARENT  MACHINE       INPUT         CLASS               INIT        ROT   COMPANY                     FULLNAME                     FLAGS
+GAME( 2023, paraca, 0,      paracaidista, paracaidista, paracaidista_state, empty_init, ROT0, "Video Game / Electrogame", "Paracaidista (recreation)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
