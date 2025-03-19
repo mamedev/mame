@@ -63,9 +63,9 @@ GFXDECODE_END
 
 void paracaidista_state::paracaidista(machine_config &config)
 {
-	I8085A(config, m_maincpu, 6'553'000);
+	I8085A(config, m_maincpu, 6'553'600);
 
-	I8155(config, "m8155", 6'553'000);
+	I8155(config, "m8155", 6'553'600);
 
 	// Video hardware (probably wrong values)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
