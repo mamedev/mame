@@ -8,7 +8,7 @@
 
 #include "emupal.h"
 
-class tzb215_tzb315_sprite_device : public device_t, public device_gfx_interface
+class tzbx15_device : public device_t, public device_gfx_interface
 {
 public:
 	void set_sprite_palette_base(int sprite_palette_base) { m_sprite_palette_base = sprite_palette_base; }
@@ -21,8 +21,8 @@ public:
 	void update_cluts();
 
 protected:
-	tzb215_tzb315_sprite_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
-	tzb215_tzb315_sprite_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 clut_size);
+	tzbx15_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	tzbx15_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 clut_size);
 
 private:
 
@@ -62,21 +62,21 @@ private:
 	int m_sprite_palette_base;
 };
 
-class tzb215_sprite_device : public tzb215_tzb315_sprite_device
+class tzb215_device : public tzbx15_device
 {
 public:
-	tzb215_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, u32 clut_size);
-	tzb215_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	tzb215_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, u32 clut_size);
+	tzb215_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
-class tzb315_sprite_device : public tzb215_tzb315_sprite_device
+class tzb315_device : public tzbx15_device
 {
 public:
-	tzb315_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, u32 clut_size);
-	tzb315_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	tzb315_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, u32 clut_size);
+	tzb315_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
-DECLARE_DEVICE_TYPE(TZB215_SPRITES, tzb215_sprite_device)
-DECLARE_DEVICE_TYPE(TZB315_SPRITES, tzb315_sprite_device)
+DECLARE_DEVICE_TYPE(TZB215_SPRITES, tzb215_device)
+DECLARE_DEVICE_TYPE(TZB315_SPRITES, tzb315_device)
 
 #endif // MAME_TATSUMI_TZB215_TZB315_SPRITES_H

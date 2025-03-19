@@ -10,10 +10,10 @@
 // differences, if any, unknown
 // (does not appear to be CLUT size, even if that would have made sense. Round Up 5 uses the smaller CLUT like Apache 3 yet is claimed to be TZB315)
 
-DEFINE_DEVICE_TYPE(TZB215_SPRITES, tzb215_sprite_device, "tzb215_spr", "Tatsumi TZB215 Rotating Sprites")
-DEFINE_DEVICE_TYPE(TZB315_SPRITES, tzb315_sprite_device, "tzb315_spr", "Tatsumi TZB315 Rotating Sprites")
+DEFINE_DEVICE_TYPE(TZB215_SPRITES, tzb215_device, "tzb215_spr", "Tatsumi TZB215 Rotating Sprites")
+DEFINE_DEVICE_TYPE(TZB315_SPRITES, tzb315_device, "tzb315_spr", "Tatsumi TZB315 Rotating Sprites")
 
-tzb215_tzb315_sprite_device::tzb215_tzb315_sprite_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+tzbx15_device::tzbx15_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this)
 	, m_fakepalette(*this, "fakepalette")
@@ -24,36 +24,36 @@ tzb215_tzb315_sprite_device::tzb215_tzb315_sprite_device(const machine_config &m
 {
 }
 
-tzb215_tzb315_sprite_device::tzb215_tzb315_sprite_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, u32 clock, u32 clut_size)
-	: tzb215_tzb315_sprite_device(mconfig, type, tag, owner, clock)
+tzbx15_device::tzbx15_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, u32 clock, u32 clut_size)
+	: tzbx15_device(mconfig, type, tag, owner, clock)
 {
 	m_rom_clut_size = clut_size;
 }
 
-tzb215_sprite_device::tzb215_sprite_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock, u32 clut_size)
-	: tzb215_tzb315_sprite_device(mconfig, TZB215_SPRITES, tag, owner, clock, clut_size)
+tzb215_device::tzb215_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock, u32 clut_size)
+	: tzbx15_device(mconfig, TZB215_SPRITES, tag, owner, clock, clut_size)
 {
 }
 
-tzb215_sprite_device::tzb215_sprite_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock)
-	: tzb215_tzb315_sprite_device(mconfig, TZB215_SPRITES, tag, owner, clock, 0)
+tzb215_device::tzb215_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock)
+	: tzbx15_device(mconfig, TZB215_SPRITES, tag, owner, clock, 0)
 {
 }
 
-tzb315_sprite_device::tzb315_sprite_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock, u32 clut_size)
-	: tzb215_tzb315_sprite_device(mconfig, TZB315_SPRITES, tag, owner, clock, clut_size)
+tzb315_device::tzb315_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock, u32 clut_size)
+	: tzbx15_device(mconfig, TZB315_SPRITES, tag, owner, clock, clut_size)
 {
 }
 
-tzb315_sprite_device::tzb315_sprite_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock)
-	: tzb215_tzb315_sprite_device(mconfig, TZB315_SPRITES, tag, owner, clock, 0)
+tzb315_device::tzb315_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock)
+	: tzbx15_device(mconfig, TZB315_SPRITES, tag, owner, clock, 0)
 {
 }
 
 
 
 
-void tzb215_tzb315_sprite_device::common_init()
+void tzbx15_device::common_init()
 {
 	m_rom_clut_offset = memregion("sprites_l")->bytes() - m_rom_clut_size;
 
@@ -72,12 +72,12 @@ static const gfx_layout spritelayout =
 	32*8
 };
 
-GFXDECODE_MEMBER( tzb215_tzb315_sprite_device::gfxinfo )
+GFXDECODE_MEMBER( tzbx15_device::gfxinfo )
 	GFXDECODE_DEVICE("sprites_l", 0, spritelayout, 0, 256)
 	GFXDECODE_DEVICE("sprites_h", 0, spritelayout, 0, 256)
 GFXDECODE_END
 
-void tzb215_tzb315_sprite_device::device_start()
+void tzbx15_device::device_start()
 {
 	common_init();
 	decode_gfx(gfxinfo);
@@ -85,21 +85,21 @@ void tzb215_tzb315_sprite_device::device_start()
 	gfx(1)->set_colors(m_rom_clut_size / 8);
 }
 
-void tzb215_tzb315_sprite_device::device_reset()
+void tzbx15_device::device_reset()
 {
 }
 
-void tzb215_tzb315_sprite_device::device_add_mconfig(machine_config &config)
+void tzbx15_device::device_add_mconfig(machine_config &config)
 {
 	PALETTE(config, m_fakepalette).set_format(palette_device::xRGB_555, m_rom_clut_size * 2); // 4096 or 8192 arranged as series of CLUTs
 }
 
-void tzb215_tzb315_sprite_device::mycopyrozbitmap_core(bitmap_ind8 &bitmap, const bitmap_rgb32 &srcbitmap,
+void tzbx15_device::mycopyrozbitmap_core(bitmap_ind8 &bitmap, const bitmap_rgb32 &srcbitmap,
 		int dstx, int dsty, int srcwidth, int srcheight, int incxx, int incxy, int incyx, int incyy,
 		const rectangle &clip, int transparent_color)
 { }
 
-void tzb215_tzb315_sprite_device::mycopyrozbitmap_core(bitmap_rgb32 &bitmap, const bitmap_rgb32 &srcbitmap,
+void tzbx15_device::mycopyrozbitmap_core(bitmap_rgb32 &bitmap, const bitmap_rgb32 &srcbitmap,
 	int dstx, int dsty, int srcwidth, int srcheight, int incxx, int incxy, int incyx, int incyy,
 	const rectangle &clip, int transparent_color)
 {
@@ -153,7 +153,7 @@ void tzb215_tzb315_sprite_device::mycopyrozbitmap_core(bitmap_rgb32 &bitmap, con
 }
 
 template<class BitmapClass>
-void tzb215_tzb315_sprite_device::roundupt_drawgfxzoomrotate( BitmapClass &dest_bmp, const rectangle &clip,
+void tzbx15_device::roundupt_drawgfxzoomrotate( BitmapClass &dest_bmp, const rectangle &clip,
 		gfx_element *gfx, uint32_t code,uint32_t color,int flipx,int flipy,uint32_t ssx,uint32_t ssy,
 		int scalex, int scaley, int rotate, int write_priority_only )
 {
@@ -336,7 +336,7 @@ void tzb215_tzb315_sprite_device::roundupt_drawgfxzoomrotate( BitmapClass &dest_
 
 
 template<class BitmapClass>
-void tzb215_tzb315_sprite_device::draw_sprites_main(BitmapClass &bitmap, const rectangle &cliprect, int write_priority_only, int rambank)
+void tzbx15_device::draw_sprites_main(BitmapClass &bitmap, const rectangle &cliprect, int write_priority_only, int rambank)
 {
 	// Sprite data is double buffered
 	for (int offs = rambank;offs < rambank + 0x800;offs += 6)
@@ -513,12 +513,12 @@ void tzb215_tzb315_sprite_device::draw_sprites_main(BitmapClass &bitmap, const r
 	}
 }
 
-void tzb215_tzb315_sprite_device::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, int write_priority_only, int rambank)
+void tzbx15_device::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, int write_priority_only, int rambank)
 {
 	draw_sprites_main(bitmap, cliprect, write_priority_only, rambank);
 }
 
-void tzb215_tzb315_sprite_device::draw_sprites(bitmap_ind8& bitmap, const rectangle &cliprect, int write_priority_only, int rambank)
+void tzbx15_device::draw_sprites(bitmap_ind8& bitmap, const rectangle &cliprect, int write_priority_only, int rambank)
 {
 	draw_sprites_main(bitmap, cliprect, write_priority_only, rambank);
 }
@@ -528,7 +528,7 @@ void tzb215_tzb315_sprite_device::draw_sprites(bitmap_ind8& bitmap, const rectan
  *  We update 'Mame palettes' from the clut here in order to simplify the
  *  draw routines.  We also note down any uses of the 'shadow' pen (index 255).
  */
-void tzb215_tzb315_sprite_device::update_cluts()
+void tzbx15_device::update_cluts()
 {
 	const int length = m_rom_clut_size * 2;
 	const uint8_t* bank1 = m_sprites_l_rom + m_rom_clut_offset;
