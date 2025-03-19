@@ -7468,6 +7468,23 @@ Other stuff untested
 		</part>
 	</software>
 
+	<!-- DOS, Windows 95B, Windows 98, Windows Me, Windows 2000, Windows XP
+	     and El Torito bootable. -->
+	<software name="pmagic">
+		<description>PartitionMagic 8.05</description>
+		<year>2004</year>
+		<publisher>Symantec</publisher>
+		<info name="language" value="English/French/German/Italian/Spanish" />
+		<info name="release" value="20040505" />
+		<info name="usage" value="Windows installer accepts any string starting with &quot;PM805EN1-&quot; for a product key." />
+		<info name="version" value="8.05" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="partitionmagic 8.05" sha1="f783735693288fa20c8d2d7a614a3d0674ede2bf" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!--                                         -->
 	<!--                Multimedia               -->
 	<!--                                         -->

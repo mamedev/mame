@@ -447,7 +447,8 @@ void sis950_lpc_device::io_map(address_map &map)
 		NAME([this] (offs_t offset, u8 data) { m_dmac_slave->write( offset / 2, data ); })
 	);
 
-	map(0x00e0, 0x00ef).noprw();
+	// map(0x00e0, 0x00ef) MCA bus (cfr. Bochs) or PnP
+
 	// map(0x00f0, 0x00f0) COPRO error
 	// map(0x0480, 0x048f) DMA high page registers
 	// map(0x04d0, 0x04d1) IRQ edge/level control registers

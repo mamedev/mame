@@ -171,23 +171,24 @@ public:
 	int K055555GX_decode_vmixcolor(int layer, int *color);
 	[[maybe_unused]] int K055555GX_decode_osmixcolor(int layer, int *color);
 
-	void init_posthack();
-	void konamigx_6bpp(machine_config &config);
-	void gxtype4(machine_config &config);
-	void gxtype4_vsn(machine_config &config);
-	void racinfrc(machine_config &config);
-	void gxtype4sd2(machine_config &config);
-	void konamigx_bios(machine_config &config);
-	void gxtype3(machine_config &config);
-	void opengolf(machine_config &config);
-	void winspike(machine_config &config);
-	void le2(machine_config &config);
-	void konamigx(machine_config &config);
-	void dragoonj(machine_config &config);
-	void salmndr2(machine_config &config);
-	void tbyahhoo(machine_config &config);
-	void gokuparo(machine_config &config);
-	void sexyparo(machine_config &config);
+	void init_posthack() ATTR_COLD;
+	void konamigx_6bpp(machine_config &config) ATTR_COLD;
+	void gxtype4(machine_config &config) ATTR_COLD;
+	void gxtype4_vsn(machine_config &config) ATTR_COLD;
+	void racinfrc(machine_config &config) ATTR_COLD;
+	void gxtype4sd2(machine_config &config) ATTR_COLD;
+	void konamigx_bios(machine_config &config) ATTR_COLD;
+	void gxtype3(machine_config &config) ATTR_COLD;
+	void opengolf(machine_config &config) ATTR_COLD;
+	void winspike(machine_config &config) ATTR_COLD;
+	void le2(machine_config &config) ATTR_COLD;
+	void konamigx(machine_config &config) ATTR_COLD;
+	void dragoonj(machine_config &config) ATTR_COLD;
+	void salmndr2(machine_config &config) ATTR_COLD;
+	void tbyahhoo(machine_config &config) ATTR_COLD;
+	void gokuparo(machine_config &config) ATTR_COLD;
+	void sexyparo(machine_config &config) ATTR_COLD;
+	void sexyparoebl(machine_config &config) ATTR_COLD;
 	void gx_base_memmap(address_map &map) ATTR_COLD;
 	void racinfrc_map(address_map &map) ATTR_COLD;
 	void gx_type1_map(address_map &map) ATTR_COLD;
@@ -196,12 +197,13 @@ public:
 	void gx_type4_map(address_map &map) ATTR_COLD;
 	void gxsndmap(address_map &map) ATTR_COLD;
 	void gxtmsmap(address_map &map) ATTR_COLD;
+	void sexyparoebl_map(address_map &map) ATTR_COLD;
 
 protected:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_soundcpu;
 	optional_device<tms57002_device> m_dasp;
-	required_device<k053252_device> m_k053252;
+	optional_device<k053252_device> m_k053252;
 	required_device<k055673_device> m_k055673;
 	required_device<k055555_device> m_k055555;
 	required_device<k056832_device> m_k056832;

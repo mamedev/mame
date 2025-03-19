@@ -7120,6 +7120,16 @@ static INPUT_PORTS_START( mjmyster )
 	PORT_DIPSETTING(    0x00, DEF_STR(2C_3C) )       PORT_CONDITION("FAKE", 0x01, EQUALS, 0x00)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( mjmyunivbl )
+	// default to Hong Kong/Taiwan
+	PORT_INCLUDE(mjmyster)
+
+	PORT_MODIFY("DSW4")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR(Region) )                 PORT_DIPLOCATION("SW4:8")
+	PORT_DIPSETTING(    0x80, DEF_STR(Japan) )
+	PORT_DIPSETTING(    0x00, "Hong Kong/Taiwan" )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( hginga )
 	// The manual provides three sets of standard settings:
 	//       標準設定　コインプールタイプ                  標準設定　メダルコーナータイプ                標準設定　アミューズコーナータイプ
@@ -11800,7 +11810,7 @@ ROM_START( mjmyunivbl )
 	ROM_LOAD( "rom.u30", 0x000000, 0x040000, CRC(30e496a6) SHA1(c7ea23079bd4acb6e06af954fafe8462d5576b0e) )
 ROM_END
 
-// 麻雀 財会赢
+// 麻雀 財会贏
 // also CS166P001 PCB
 ROM_START( mjmyunivbl2 )
 	ROM_REGION( 0x90000 + 0x1000*8, "maincpu", 0 )  // Z80 Code + space for banked RAM
@@ -12699,8 +12709,8 @@ GAME( 1994, mjmywrld,    mjmyster, mjmywrld,  mjmyster,   ddenlovr_state, empty_
 GAME( 1994, hginga,      0,        hginga,    hginga,     ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Hanafuda Hana Ginga (Japan)",                                    MACHINE_NO_COCKTAIL  )
 
 GAME( 1994, mjmyuniv,    0,        mjmyuniv,  mjmyster,   ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Mysterious Universe (Japan, D85)",                   MACHINE_NO_COCKTAIL  )
-GAME( 1995, mjmyunivbl,  mjmyuniv, mjmyuniv,  mjmyster,   ddenlovr_state, empty_init,    ROT0, "bootleg",                                     "Maque Long Xiong Hu Di (Hong Kong, D106T)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL ) // One GFX ROM isn't dumped
-GAME( 1996, mjmyunivbl2, mjmyuniv, mjmyunivbl2, mjmyster, ddenlovr_state, empty_init,    ROT0, "bootleg",                                     "Maque Caihui Ying (Taiwan, ver 2.20)",                           MACHINE_NO_COCKTAIL )
+GAME( 1995, mjmyunivbl,  mjmyuniv, mjmyuniv,  mjmyunivbl, ddenlovr_state, empty_init,    ROT0, "bootleg",                                     "Maa Zoek Lung Hing Fu Dai (Hong Kong, D106T)",                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL ) // One GFX ROM isn't dumped
+GAME( 1996, mjmyunivbl2, mjmyuniv, mjmyunivbl2,mjmyunivbl,ddenlovr_state, empty_init,    ROT0, "bootleg",                                     "Maque Caihui Ying (Taiwan, ver 2.20)",                           MACHINE_NO_COCKTAIL )
 
 GAME( 1994, quiz365,     0,        quiz365,   quiz365,    ddenlovr_state, empty_init,    ROT0, "Nakanihon",                                   "Quiz 365 (Japan)",                                               MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )
 GAME( 1994, quiz365t,    quiz365,  quiz365,   quiz365,    ddenlovr_state, empty_init,    ROT0, "Nakanihon / Taito",                           "Quiz 365 (Hong Kong & Taiwan)",                                  MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )

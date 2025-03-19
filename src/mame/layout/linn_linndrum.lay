@@ -597,12 +597,11 @@ copyright-holders:m1macrophage
 				local view = file.views["Default Layout"]
 				install_slider_callbacks(view)
 
-				local sweep_scale = 1.2
-				add_simplecounter_knob(view, "knob_pot_tempo", "pot_tempo", sweep_scale)
-				add_simplecounter_knob(view, "knob_pot_volume", "pot_volume", sweep_scale)
+				add_simplecounter_knob(view, "knob_pot_tempo", "pot_tempo", 1.5)
+				add_simplecounter_knob(view, "knob_pot_volume", "pot_volume", 1.5)
 				for i = 1, 7 do
 					local knob_input = "pot_tuning_" .. i
-					add_simplecounter_knob(view, "knob_" .. knob_input, knob_input, sweep_scale)
+					add_simplecounter_knob(view, "knob_" .. knob_input, knob_input, 3.5)
 				end
 
 				for i = 1, 16 do

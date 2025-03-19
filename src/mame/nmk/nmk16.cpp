@@ -10604,7 +10604,7 @@ GAME( 1993, powerinspu, powerins, powerins,    powerinj,      nmk16_state,      
 GAME( 1993, powerinspj, powerins, powerins,    powerinj,      nmk16_state,        empty_init,           ROT0,   "Atlus",                        "Gouketsuji Ichizoku (Japan, prototype)", MACHINE_SUPPORTS_SAVE ) // boots as 93.10.20 just like the other sets, but code is different
 GAME( 1993, powerinsa,  powerins, powerinsa,   powerins,      nmk16_state,        init_powerinsa,       ROT0,   "bootleg",                      "Power Instinct (USA, bootleg set 1)",    MACHINE_SUPPORTS_SAVE )
 GAME( 1993, powerinsb,  powerins, powerinsb,   powerins,      nmk16_state,        empty_init,           ROT0,   "bootleg",                      "Power Instinct (USA, bootleg set 2)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1993, powerinsc,  powerins, powerinsc,   powerins,      nmk16_state,        empty_init,           ROT0,   "bootleg",                      "Power Instinct (USA, bootleg set 3)",    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // different sprites' format not implemented
+GAME( 1993, powerinsc,  powerins, powerinsc,   powerins,      nmk16_state,        empty_init,           ROT0,   "bootleg (Electronic Devices)", "Power Instinct (USA, bootleg set 3)",    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // different sprites' format not implemented
 
 // Non NMK boards
 
