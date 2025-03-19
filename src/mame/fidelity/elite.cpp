@@ -10,8 +10,13 @@ NOTE: To start a new game in EAS/PC, press Game Control (aka Reset), activate
 the D6 square, and then press CL. See below for more info.
 
 TODO:
-- Chess Encyclopedia modules don't work on fpres (original program) and feasx,
-  probably unsupported and therefore BTANB?
+- Chess Encyclopedia modules don't work properly on fpresbu/fpresgla. Prestige
+  doesn't have nvram, it has a load/play switch for swapping modules without
+  having to turn off the chesscomputer. This won't work on MAME, since it forces
+  a hard reset when inserting a new ROM cartridge.
+- Likewise, these modules don't work properly on fpres (original program) and
+  feasx. They don't correctly announce when a new module needs to be inserted.
+  Probably unsupported and therefore BTANB?
 
 BTANB:
 - feasglab locks up at boot if it was powered off in the middle of the game.

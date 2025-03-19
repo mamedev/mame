@@ -47,7 +47,7 @@ private:
 	static const int m_tint = -6; // what is this based on?
 	static const float m_luminance[16];
 	static const int m_phase[16];
-	static const int m_amplitute[16];
+	static const int m_amplitude[16];
 };
 
 // device type definition
