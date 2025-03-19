@@ -10,8 +10,12 @@
                         \___/_/\_\ .__/ \__,_|\__|
                                  |_| XML parser
 
-   Copyright (c) 1997-2000 Thai Open Source Software Center Ltd
-   Copyright (c) 2000-2017 Expat development team
+   Copyright (c) 2004-2006 Fred L. Drake, Jr. <fdrake@users.sourceforge.net>
+   Copyright (c) 2016-2023 Sebastian Pipping <sebastian@pipping.org>
+   Copyright (c) 2017      Rhodri James <rhodri@wildebeest.org.uk>
+   Copyright (c) 2018      Marco Maggi <marco.maggi-ipsu@poste.it>
+   Copyright (c) 2019      David Loffredo <loffredo@steptools.com>
+   Copyright (c) 2023-2024 Sony Corporation / Snild Dolkow <snild@sony.com>
    Licensed under the MIT license:
 
    Permission is  hereby granted,  free of charge,  to any  person obtaining
@@ -34,6 +38,11 @@
    USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+#if defined(NDEBUG)
+#  undef NDEBUG /* because test suite relies on assert(...) at the moment */
+#endif
+
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <setjmp.h>
@@ -85,7 +94,8 @@ tcase_add_test(TCase *tc, tcase_test_function test) {
   if (tc->allocated == tc->ntests) {
     int nalloc = tc->allocated + 100;
     size_t new_size = sizeof(tcase_test_function) * nalloc;
-    tcase_test_function *new_tests = realloc(tc->tests, new_size);
+    tcase_test_function *const new_tests
+        = (tcase_test_function *)realloc(tc->tests, new_size);
     assert(new_tests != NULL);
     tc->tests = new_tests;
     tc->allocated = nalloc;
@@ -120,7 +130,7 @@ suite_free(Suite *suite) {
 
 SRunner *
 srunner_create(Suite *suite) {
-  SRunner *runner = calloc(1, sizeof(SRunner));
+  SRunner *const runner = (SRunner *)calloc(1, sizeof(SRunner));
   if (runner != NULL) {
     runner->suite = suite;
   }
@@ -129,28 +139,57 @@ srunner_create(Suite *suite) {
 
 static jmp_buf env;
 
+#define SUBTEST_LEN (50) // informative, but not too long
 static char const *_check_current_function = NULL;
+static char _check_current_subtest[SUBTEST_LEN];
 static int _check_current_lineno = -1;
 static char const *_check_current_filename = NULL;
 
 void
 _check_set_test_info(char const *function, char const *filename, int lineno) {
   _check_current_function = function;
+  set_subtest("%s", "");
   _check_current_lineno = lineno;
   _check_current_filename = filename;
 }
 
+void
+set_subtest(char const *fmt, ...) {
+  va_list ap;
+  va_start(ap, fmt);
+  vsnprintf(_check_current_subtest, SUBTEST_LEN, fmt, ap);
+  va_end(ap);
+  // replace line feeds with spaces, for nicer error logs
+  for (size_t i = 0; i < SUBTEST_LEN; ++i) {
+    if (_check_current_subtest[i] == '\n') {
+      _check_current_subtest[i] = ' ';
+    }
+  }
+  _check_current_subtest[SUBTEST_LEN - 1] = '\0'; // ensure termination
+}
+
 static void
-add_failure(SRunner *runner, int verbosity) {
-  runner->nfailures++;
+handle_success(int verbosity) {
   if (verbosity >= CK_VERBOSE) {
-    printf("%s:%d: %s\n", _check_current_filename, _check_current_lineno,
-           _check_current_function);
+    printf("PASS: %s\n", _check_current_function);
+  }
+}
+
+static void
+handle_failure(SRunner *runner, int verbosity, const char *context,
+               const char *phase_info) {
+  runner->nfailures++;
+  if (verbosity != CK_SILENT) {
+    if (strlen(_check_current_subtest) != 0) {
+      phase_info = _check_current_subtest;
+    }
+    printf("FAIL [%s]: %s (%s at %s:%d)\n", context, _check_current_function,
+           phase_info, _check_current_filename, _check_current_lineno);
   }
 }
 
 void
-srunner_run_all(SRunner *runner, int verbosity) {
+srunner_run_all(SRunner *runner, const char *context, int verbosity) {
   Suite *suite;
   TCase *volatile tc;
   assert(runner != NULL);
@@ -160,34 +199,42 @@ srunner_run_all(SRunner *runner, int verbosity) {
     volatile int i;
     for (i = 0; i < tc->ntests; ++i) {
       runner->nchecks++;
+      set_subtest("%s", "");
 
       if (tc->setup != NULL) {
         /* setup */
         if (setjmp(env)) {
-          add_failure(runner, verbosity);
+          handle_failure(runner, verbosity, context, "during setup");
           continue;
         }
         tc->setup();
       }
       /* test */
       if (setjmp(env)) {
-        add_failure(runner, verbosity);
+        handle_failure(runner, verbosity, context, "during actual test");
         continue;
       }
       (tc->tests[i])();
+      set_subtest("%s", "");
 
       /* teardown */
       if (tc->teardown != NULL) {
         if (setjmp(env)) {
-          add_failure(runner, verbosity);
+          handle_failure(runner, verbosity, context, "during teardown");
           continue;
         }
         tc->teardown();
       }
+
+      handle_success(verbosity);
     }
     tc = tc->next_tcase;
   }
-  if (verbosity) {
+}
+
+void
+srunner_summarize(SRunner *runner, int verbosity) {
+  if (verbosity != CK_SILENT) {
     int passed = runner->nchecks - runner->nfailures;
     double percentage = ((double)passed) / runner->nchecks;
     int display = (int)(percentage * 100);
@@ -197,14 +244,13 @@ srunner_run_all(SRunner *runner, int verbosity) {
 }
 
 void
-_fail_unless(int condition, const char *file, int line, const char *msg) {
+_fail(const char *file, int line, const char *msg) {
   /* Always print the error message so it isn't lost.  In this case,
      we have a failure, so there's no reason to be quiet about what
      it is.
   */
-  UNUSED_P(condition);
-  UNUSED_P(file);
-  UNUSED_P(line);
+  _check_current_filename = file;
+  _check_current_lineno = line;
   if (msg != NULL) {
     const int has_newline = (msg[strlen(msg) - 1] == '\n');
     fprintf(stderr, "ERROR: %s%s", msg, has_newline ? "" : "\n");

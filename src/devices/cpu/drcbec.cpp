@@ -368,8 +368,8 @@ public:
 	virtual void reset() override;
 	virtual int execute(uml::code_handle &entry) override;
 	virtual void generate(drcuml_block &block, const uml::instruction *instlist, uint32_t numinst) override;
-	virtual bool hash_exists(uint32_t mode, uint32_t pc) override;
-	virtual void get_info(drcbe_info &info) override;
+	virtual bool hash_exists(uint32_t mode, uint32_t pc) const noexcept override;
+	virtual void get_info(drcbe_info &info) const noexcept override;
 
 private:
 	// helpers
@@ -681,7 +681,7 @@ void drcbe_c::generate(drcuml_block &block, const instruction *instlist, uint32_
 //  exists in the hash table
 //-------------------------------------------------
 
-bool drcbe_c::hash_exists(uint32_t mode, uint32_t pc)
+bool drcbe_c::hash_exists(uint32_t mode, uint32_t pc) const noexcept
 {
 	return m_hash.code_exists(mode, pc);
 }
@@ -692,7 +692,7 @@ bool drcbe_c::hash_exists(uint32_t mode, uint32_t pc)
 //  back-end implementation
 //-------------------------------------------------
 
-void drcbe_c::get_info(drcbe_info &info)
+void drcbe_c::get_info(drcbe_info &info) const noexcept
 {
 	info.direct_iregs = 0;
 	info.direct_fregs = 0;

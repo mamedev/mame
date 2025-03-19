@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Vas Crabb
+'use strict';
 
 var matched_names = new Array();
 var unmatched_names = new Array();

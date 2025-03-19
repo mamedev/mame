@@ -213,7 +213,6 @@ Incomplete MIF-201 [MIDI] emulation
 Has HDFORM.COM utility
 JTERM.BAT is for connecting to a PC-VAN or ANSI [terminal]
 PCALC.BAT requires [keyboard] PC+V press to bring up
-PLAYR.BAT has offset [IDP] text display
 SKYBD.BAT wants a radio cassette player and a PC-KD861 color monitor for audio sampling thru OPNA EOS
 VIDEO.BAT has various superimpose effects, requires dedicated board
 ]]></notes>
@@ -582,6 +581,8 @@ Omake: if sound irqs don't run then needs to press key 0 pad to move on
 ]]></notes>
 		<info name="alt_title" value="神羅万象"/>
 		<info name="usage" value="Hold enter at boot to skip intro, press F2 on title screen to load a game, press F5 for sound test" />
+
+		<!-- baddump: non-factory save -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1331888">
@@ -592,7 +593,7 @@ Omake: if sound irqs don't run then needs to press key 0 pad to move on
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1296112">
-				<rom name="shinra bansho(diskb) (nihon telenet).d88" size="1296112" crc="1ee8acdf" sha1="4e0cab59ec6707f848b28b056040be835e2357ed"/>
+				<rom name="shinra bansho(diskb) (nihon telenet).d88" size="1296112" crc="1ee8acdf" sha1="4e0cab59ec6707f848b28b056040be835e2357ed" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -873,7 +874,6 @@ Has unemulated [MIDI] options
 		<year>1990</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
 		<notes><![CDATA[
-Offset [IDP] text display on setup mode and opening
 Optionally wants kana lock enabled for entering a name for new game [keyboard] irq
 ]]></notes>
 		<info name="release" value="19901102"/>
@@ -947,13 +947,10 @@ Ugly pitch for [OPNA] voice samples on intro
 	<!-- TODO: move to a shared SW list -->
 	<!-- TODO: all these .xdf entries wants Disk B as drive A: for 88VA, annoyingly -->
 
-	<software name="abunaten" supported="no">
+	<software name="abunaten" supported="partial">
 		<description>Abunai Tengu Densetsu</description>
 		<year>1989</year>
 		<publisher>アリスソフト (Alicesoft)</publisher>
-		<notes><![CDATA[
-Offset [IDP] display
-]]></notes>
 		<info name="release" value="198910xx"/>
 		<info name="alt_title" value="あぶない天狗伝説 (or あぶないてんぐ伝説 )"/>
 
@@ -979,13 +976,10 @@ Offset [IDP] display
 		</part>
 	</software>
 
-	<software name="cresmoon" supported="no">
+	<software name="cresmoon" supported="partial">
 		<description>Crescent Moon Girl</description>
 		<year>1989</year>
 		<publisher>アリスソフト (Alicesoft)</publisher>
-		<notes><![CDATA[
-Offset [IDP] display
-]]></notes>
 		<info name="release" value="198908xx"/>
 		<info name="alt_title" value="クレセントムーンがぁる"/>
 		<info name="usage" value="Mount Disk B in drive A to boot" />
@@ -1012,13 +1006,10 @@ Offset [IDP] display
 		</part>
 	</software>
 
-	<software name="dps" supported="no">
+	<software name="dps" supported="partial">
 		<description>D.P.S - Dream Program System</description>
 		<year>1989</year>
 		<publisher>アリスソフト (Alicesoft)</publisher>
-		<notes><![CDATA[
-Offset [IDP] display
-]]></notes>
 		<info name="release" value="198912xx"/>
 		<info name="alt_title" value="ディー・ピー・エス - ドリームプログラムシステム"/>
 
@@ -1153,8 +1144,7 @@ Offset [IDP] display
 		<year>1989</year>
 		<publisher>アリスソフト (Alicesoft)</publisher>
 		<notes><![CDATA[
-Throws "ERR=7 8550, Break in 60050" when after prologue
-Offset [IDP] text display
+Throws "ERR=7 8550, Break in 60050" after prologue
 ]]></notes>
 		<info name="release" value="198907xx"/>
 		<info name="alt_title" value="ランス 光を求めて"/>
@@ -1319,12 +1309,12 @@ Needs [OFX/OFY] on gameplay
 		</part>
 	</software>
 
-	<software name="pacman" supported="no">
+	<software name="pacman" supported="partial">
 		<description>Pac-Man</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<notes><![CDATA[
-[SGP] and [ROP] issues on gameplay
+[SGP] start_dot hookup shifts lives counter
 ]]></notes>
 		<info name="developer" value="Shinra" />
 		<info name="usage" value="Boot a PC-Engine OS disk, then swap with this disk and type BASIC PACMAN.BAS to load" />
@@ -1336,12 +1326,12 @@ Needs [OFX/OFY] on gameplay
 	</software>
 
 	<!-- autobootable version of above, with PC-Engine OS embedded -->
-	<software name="pacmana" cloneof="pacman" supported="no">
+	<software name="pacmana" cloneof="pacman" supported="partial">
 		<description>Pac-Man (auto-bootable)</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<notes><![CDATA[
-[SGP] and [ROP] issues on gameplay
+[SGP] start_dot hookup shifts lives counter
 ]]></notes>
 		<info name="developer" value="Shinra" />
 		<part name="flop1" interface="floppy_5_25">
@@ -1356,7 +1346,7 @@ Needs [OFX/OFY] on gameplay
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<notes><![CDATA[
-Broken Upyolic logo [ROP]
+Broken Upyolic logo, needs [gfx] DSA hooked up for double buffering
 Needs joystick in otherwise it loops on title screen
 Gameplay don't mask bullets on right side, [cliprect]
 ]]></notes>
@@ -1376,7 +1366,7 @@ Gameplay don't mask bullets on right side, [cliprect]
 		<year>2023</year>
 		<publisher>Inufuto</publisher>
 		<notes><![CDATA[
-[gfx] Requires fractional scrolling (horizontal)
+[gfx] Requires fractional DOT scrolling (horizontal)
 [gfx] Should require primask for right panel score display
 https://youtu.be/7ltdrUPz91w
 ]]></notes>

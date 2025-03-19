@@ -1,6 +1,5 @@
 ; DEF file for MS VC++
 
-LIBRARY
 EXPORTS
   XML_DefaultCurrent @1
   XML_ErrorString @2
@@ -72,7 +71,11 @@ EXPORTS
   XML_ResumeParser @64
   XML_GetParsingStatus @65
 ; added with version 2.1.1
-; XML_GetAttributeInfo @66
+@_EXPAT_COMMENT_ATTR_INFO@ XML_GetAttributeInfo @66
   XML_SetHashSalt @67
-; added with version 2.2.5
-  _INTERNAL_trim_to_complete_utf8_characters @68
+; internal @68 removed with version 2.3.1
+; added with version 2.4.0
+@_EXPAT_COMMENT_DTD_OR_GE@ XML_SetBillionLaughsAttackProtectionActivationThreshold @69
+@_EXPAT_COMMENT_DTD_OR_GE@ XML_SetBillionLaughsAttackProtectionMaximumAmplification @70
+; added with version 2.6.0
+  XML_SetReparseDeferralEnabled @71

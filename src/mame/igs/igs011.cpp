@@ -126,6 +126,7 @@ public:
 	void init_drgnwrldv11h() ATTR_COLD;
 	void init_lhb2() ATTR_COLD;
 	void init_xymg() ATTR_COLD;
+	void init_xymga() ATTR_COLD;
 	void init_drgnwrldv10c() ATTR_COLD;
 	void init_drgnwrldv20j() ATTR_COLD;
 	void init_drgnwrldv40k() ATTR_COLD;
@@ -137,6 +138,7 @@ public:
 	void tygn(machine_config &config) ATTR_COLD;
 	void wlcc(machine_config &config) ATTR_COLD;
 	void xymg(machine_config &config) ATTR_COLD;
+	void xymga(machine_config &config) ATTR_COLD;
 	void lhb2(machine_config &config) ATTR_COLD;
 	void lhb(machine_config &config) ATTR_COLD;
 	void drgnwrld_igs012(machine_config &config) ATTR_COLD;
@@ -283,7 +285,9 @@ protected:
 	void nkishusp_mem(address_map &map) ATTR_COLD;
 	void tygn_mem(address_map &map) ATTR_COLD;
 	void wlcc_mem(address_map &map) ATTR_COLD;
+	void xymg_base_mem(address_map &map) ATTR_COLD;
 	void xymg_mem(address_map &map) ATTR_COLD;
+	void xymga_mem(address_map &map) ATTR_COLD;
 };
 
 // With trackball inputs
@@ -2451,6 +2455,28 @@ void igs011_state::init_xymg()
 */
 }
 
+void igs011_state::init_xymga()
+{
+	u16 *src = (u16 *) m_maincpu_region->base();
+	const int rom_size = 0x80000;
+
+	for (int i = 0; i < rom_size / 2; i++)
+	{
+		u16 x = src[i];
+
+		if ((i & 0x2300) == 0x2100 || ((i & 0x2000) == 0x0000 && ((i & 0x0300) != 0x0200) && ((i & 0x0300) != 0x0100)))
+			x ^= 0x0200;
+
+		if (!(i & 0x0004) || !(i & 0x2000) || (!(i & 0x0080) && !(i & 0x0010)))
+			x ^= 0x0020;
+
+		if ((i & 0x0100) || (i & 0x0040) || ((i & 0x0010) && (i & 0x0002)))
+			x ^= 0x0004;
+
+		src[i] = x;
+	}
+}
+
 void igs011_state::init_wlcc()
 {
 //  u16 *rom = (u16 *) m_maincpu_region->base();
@@ -2732,7 +2758,7 @@ void igs011_state::lhb_mem(address_map &map)
 	map(0x888000, 0x888001).r(FUNC(igs011_state::dips_r<5>));
 }
 
-void igs011_state::xymg_mem(address_map &map)
+void igs011_state::xymg_base_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 
@@ -2754,8 +2780,6 @@ void igs011_state::xymg_mem(address_map &map)
 	map(0x400000, 0x400fff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
 	map(0x401000, 0x401fff).rw(m_palette, FUNC(palette_device::read8_ext), FUNC(palette_device::write8_ext)).umask16(0x00ff).share("palette_ext");
 	map(0x600001, 0x600001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x700000, 0x700001).w(FUNC(igs011_state::igs003_w));
-	map(0x700002, 0x700003).rw(FUNC(igs011_state::xymg_igs003_r), FUNC(igs011_state::xymg_igs003_w));
 	map(0x820000, 0x820001).w(FUNC(igs011_state::igs011_priority_w));
 	map(0x840000, 0x840001).w(FUNC(igs011_state::dips_w));
 
@@ -2772,6 +2796,23 @@ void igs011_state::xymg_mem(address_map &map)
 	map(0x85b800, 0x85b801).w(FUNC(igs011_state::igs011_blit_pen_w));
 	map(0x85c000, 0x85c001).w(FUNC(igs011_state::igs011_blit_depth_w));
 	map(0x888000, 0x888001).r(FUNC(igs011_state::dips_r<3>));
+}
+
+void igs011_state::xymg_mem(address_map &map)
+{
+	xymg_base_mem(map);
+
+	map(0x700000, 0x700001).w(FUNC(igs011_state::igs003_w));
+	map(0x700002, 0x700003).rw(FUNC(igs011_state::xymg_igs003_r), FUNC(igs011_state::xymg_igs003_w));
+}
+
+void igs011_state::xymga_mem(address_map &map)
+{
+	xymg_base_mem(map);
+
+	map(0x700000, 0x700001).portr("COIN");
+	map(0x700002, 0x700005).r(FUNC(igs011_state::lhb_inputs_r));
+	map(0x700002, 0x700003).w(FUNC(igs011_state::lhb_inputs_w));
 }
 
 void igs011_state::wlcc_mem(address_map &map)
@@ -4129,6 +4170,13 @@ void igs011_state::xymg(machine_config &config)
 }
 
 
+void igs011_state::xymga(machine_config &config)
+{
+	xymg(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_state::xymga_mem);
+}
+
+
 void igs011_state::lhb2(machine_config &config)
 {
 	igs011_base(config);
@@ -4963,6 +5011,20 @@ ROM_START( xymg )
 	ROM_CONTINUE(          0x00000, 0x80000 ) // 1ST+2ND IDENTICAL
 ROM_END
 
+// this is very similar to the ryukobou PCB type. Below the Oki there's an empty space for an IGS003. Only SW1 and SW2 are populated.
+ROM_START( xymga )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "rom.u30", 0x000000, 0x80000, CRC(ecc871fb) SHA1(b5a0e5ef9e6097548c5b26a4638b8618900a37ff) )
+
+	ROM_REGION( 0x280000, "blitter", 0 )
+	ROM_LOAD( "rom.u15",     0x000000, 0x200000, CRC(ec54452c) SHA1(0ee7ffa3d4845af083944e64faf5a1c78247aaa2) )
+	ROM_LOAD( "igs_0203.u8", 0x200000, 0x080000, BAD_DUMP CRC(56a2706f) SHA1(98bf4b3153eef53dd449e2538b4b7ff2cc2fe6fa) ) // not dumped yet, using the one for xymg for now
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "igs_s0202.u39", 0x000000, 0x80000, CRC(106ac5f7) SHA1(5796a880c3424e3d2251b2223a0e594957afecaf) ) // same as xymg, only without 1st and 2nd half identical
+ROM_END
+
+
 } // anonymous namespace
 
 
@@ -4987,7 +5049,8 @@ GAME( 1995, dbc,           lhb,      lhb,             lhb,       igs011_state, i
 GAME( 1995, ryukobou,      lhb,      lhb,             lhb,       igs011_state, init_ryukobou,     ROT0, "IGS / Alta",              "Mahjong Ryukobou (Japan, V030J)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1996, lhb2,          0,        lhb2,            lhb2,      igs011_state, init_lhb2,         ROT0, "IGS",                     "Lung Fu Bong II (Hong Kong, V185H)",          MACHINE_SUPPORTS_SAVE )
 GAME( 1996, tygn,          lhb2,     tygn,            tygn,      igs011_state, init_tygn,         ROT0, "IGS",                     "Te Yi Gong Neng (China, V632C)",              MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // needs correct IGS003 routines
-GAME( 1996, xymg,          0,        xymg,            xymg,      igs011_state, init_xymg,         ROT0, "IGS",                     "Xingyun Man Guan (China, V651C)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1996, xymg,          0,        xymg,            xymg,      igs011_state, init_xymg,         ROT0, "IGS",                     "Xingyun Man Guan (China, V651C, set 1)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1996, xymga,         xymg,     xymga,           xymg,      igs011_state, init_xymga,        ROT0, "IGS",                     "Xingyun Man Guan (China, V651C, set 2)",      MACHINE_SUPPORTS_SAVE ) // different encryption and without IGS003
 GAME( 1996, wlcc,          xymg,     wlcc,            wlcc,      igs011_state, init_wlcc,         ROT0, "IGS",                     "Wanli Changcheng (China, V638C)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1996, vbowl,         0,        vbowl,           vbowl,     vbowl_state,  init_vbowl,        ROT0, "IGS",                     "Virtua Bowling (World, V101XCM)",             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1996, vbowlj,        vbowl,    vbowl,           vbowlj,    vbowl_state,  init_vbowlj,       ROT0, "IGS / Alta",              "Virtua Bowling (Japan, V100JCM)",             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

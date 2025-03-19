@@ -3294,8 +3294,9 @@ ROM_START( ridhero ) /* MVS AND AES VERSION */
 	ROM_REGION( 0x100000, "cslot1:maincpu", ROMREGION_BE|ROMREGION_16BIT )
 	ROM_LOAD16_WORD_SWAP( "006-p1.p1", 0x000000, 0x080000, CRC(d4aaf597) SHA1(34d35b71adb5bd06f4f1b50ffd9c58ab9c440a84) ) /* MB834200 */
 
+	// dumped from a prototype with external ROM, not 100% confirmed as being the same on a final, or other games (lbowling, trally)
 	ROM_REGION( 0x2000, "mcu", 0 )    /* Hitachi HD6301V1 MCU */
-	ROM_LOAD( "rhcom.bin", 0x0000, 0x2000, CRC(e5cd6306) SHA1(f6bbb8ae562804d67e137290c765c3589fa334c0) ) // dumped from a prototype with external ROM, not 100% confirmed as being the same on a final, or other games (lbowling, trally)
+	ROM_LOAD( "hd6301v1p_k78.com", 0x0000, 0x2000, CRC(e5cd6306) SHA1(f6bbb8ae562804d67e137290c765c3589fa334c0) )
 
 	NEO_SFIX_128K( "006-s1.s1", CRC(eb5189f0) SHA1(0239c342ea62e73140a2306052f226226461a478) ) /* TC531000 */
 
@@ -3323,8 +3324,9 @@ ROM_START( ridheroh )
 	ROM_LOAD16_WORD_SWAP( "006-pg1.p1", 0x000000, 0x080000, BAD_DUMP CRC(52445646) SHA1(647bb31f2f68453c1366cb6e2e867e37d1df7a54) )
 	/* Chip label p1h does not exist, renamed temporarily to pg1, marked BAD_DUMP. This needs to be verified. */
 
+	// dumped from a prototype with external ROM, not 100% confirmed as being the same on a final, or other games (lbowling, trally)
 	ROM_REGION( 0x2000, "mcu", 0 )    /* Hitachi HD6301V1 MCU */
-	ROM_LOAD( "rhcom.bin", 0x0000, 0x2000, CRC(e5cd6306) SHA1(f6bbb8ae562804d67e137290c765c3589fa334c0) ) // dumped from a prototype with external ROM, not 100% confirmed as being the same on a final, or other games (lbowling, trally)
+	ROM_LOAD( "hd6301v1p_k78.com", 0x0000, 0x2000, CRC(e5cd6306) SHA1(f6bbb8ae562804d67e137290c765c3589fa334c0) )
 
 	NEO_SFIX_128K( "006-s1.s1", CRC(eb5189f0) SHA1(0239c342ea62e73140a2306052f226226461a478) ) /* TC531000 */
 
@@ -3822,7 +3824,7 @@ ROM_START( lbowling ) /* MVS AND AES VERSION */
 	ROM_LOAD16_WORD_SWAP( "019-p1.p1", 0x000000, 0x080000, CRC(a2de8445) SHA1(893d7ae72b4644123469de143fa35fac1cbcd61e) ) /* TC534200 */
 
 	ROM_REGION( 0x1000, "mcu", 0 )    /* Hitachi HD6301V1 MCU */
-	ROM_LOAD( "hd6301v1p.com", 0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "hd6301v1p_k78.com", 0x0000, 0x1000, NO_DUMP )
 
 	NEO_SFIX_128K( "019-s1.s1", CRC(5fcdc0ed) SHA1(86415077e7adc3ba6153eeb4fb0c62cf36e903fa) ) /* TC531000 */
 
@@ -4485,7 +4487,7 @@ ROM_START( trally ) /* MVS AND AES VERSION */
 	ROM_LOAD16_WORD_SWAP( "038-p2.p2", 0x080000, 0x080000, CRC(a5193e2f) SHA1(96803480439e90da23cdca70d59ff519ee85beeb) ) /* TC534200 */
 
 	ROM_REGION( 0x1000, "mcu", 0 )    /* Hitachi HD6301V1 MCU */
-	ROM_LOAD( "hd6301v1p.hd6301v1", 0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "hd6301v1p_m58_neo-coma", 0x0000, 0x1000, NO_DUMP )
 
 	NEO_SFIX_128K( "038-s1.s1", CRC(fff62ae3) SHA1(6510a762ea41557a8938cbfc0557cd5921306061) ) /* TC531000 */
 
@@ -4726,6 +4728,7 @@ ROM_START( aof ) /* MVS AND AES VERSION */
 	ROM_REGION( 0x400000, "cslot1:ymsnd:adpcma", 0 )
 	ROM_LOAD( "044-v2.v2", 0x000000, 0x200000, CRC(3ec632ea) SHA1(e3f413f580b57f70d2dae16dbdacb797884d3fce) ) /* TC5316200 */
 	ROM_LOAD( "044-v4.v4", 0x200000, 0x200000, CRC(4b0f8e23) SHA1(105da0cc5ba19869c7147fba8b177500758c232b) ) /* TC5316200 */
+	/* Also found MVS set with different label: 044-v2.v1 and 044-v4.v2 */
 
 	ROM_REGION( 0x800000, "cslot1:sprites", 0 )
 	ROM_LOAD16_BYTE( "044-c1.c1", 0x000000, 0x100000, CRC(ddab98a7) SHA1(f20eb81ec431268798c142c482146c1545af1c24) ) /* Plane 0,1 */ /* TC5316200 */
@@ -4856,6 +4859,7 @@ ROM_END
  ID-0047
  . NGM-047
  NEO-MVS PROG-G2 (SNK-9201) / NEO-MVS CHA42G-1
+ NEO-MVS PROG-G2 (SNK-9201) / NEO-MVS CHA42G-2
  . NGH-047
  NEO-AEG PROG-G2 (PRO-CT0) / NEO-AEG CHA42G-2B
  NEO-AEG PROG-G2 (PRO-CT0) / NEO-AEG CHA42G-2
@@ -4864,7 +4868,7 @@ ROM_END
 ROM_START( fatfury2 ) /* MVS AND AES VERSION */
 	ROM_REGION( 0x100000, "cslot1:maincpu", ROMREGION_BE|ROMREGION_16BIT )
 	ROM_LOAD16_WORD_SWAP( "047-p1.p1", 0x000000, 0x100000, CRC(ecfdbb69) SHA1(59e2f137c6eaf043df4ddae865a9159a10265c60) ) /* TC538200 */
-	/* The original P1 is 8mbit; also found sets with P1 / P2 4mbit on eprom. */
+	/* The original P1 is 8mbit; also found sets with EP1 / EP2 4mbit on eprom. */
 
 	NEO_SFIX_128K( "047-s1.s1", CRC(d7dbbf39) SHA1(29253e596f475ebd41a6e3bb53952e3a0ccd2eed) ) /* TC531000 */
 
@@ -5284,6 +5288,7 @@ ROM_START( fatfursp ) /* MVS AND AES VERSION */
 	ROM_REGION( 0x180000, "cslot1:maincpu", ROMREGION_BE|ROMREGION_16BIT )
 	ROM_LOAD16_WORD_SWAP( "058-p1.p1",  0x000000, 0x100000, CRC(2f585ba2) SHA1(429b4bf43fb9b1082c15d645ca328f9d175b976b) ) /* mask rom TC538200 */
 	ROM_LOAD16_WORD_SWAP( "058-p2.sp2", 0x100000, 0x080000, CRC(d7c71a6b) SHA1(b3428063031a2e5857da40a5d2ffa87fb550c1bb) ) /* mask rom TC534200 */
+	/* also found MVS set with EP1 / EP2 / SP2 on eprom; correct chip label unknown */
 
 	NEO_SFIX_128K( "058-s1.s1", CRC(2df03197) SHA1(24083cfc97e720ac9e131c9fe37df57e27c49294) ) /* mask rom TC531000 */
 
@@ -5414,6 +5419,7 @@ ROM_END
  ID-0061
  . NGM-061
  NEO-MVS PROGGSC / NEO-MVS CHA256
+ NEO-MVS PROGGSC / NEO-MVS CHA256B
  NEO-MVS PROGTOP / NEO-MVS CHA256
  NEO-MVS PROG 4096 B / NEO-MVS CHA256
  . NGH-061
@@ -6071,6 +6077,7 @@ ROM_END
  NEO-MVS PROGBK1 / NEO-MVS CHA256
  NEO-MVS PROGTOP / NEO-MVS CHA256B
  NEO-MVS PROG 4096 B / NEO-MVS CHA 42G-3
+ NEO-MVS PROGGSC / NEO-MVS CHA 42G-3B
  . NGH-082
  NEO-AEG PROGTOP2 / NEO-AEG CHA256 B
 ****************************************/
@@ -7849,6 +7856,7 @@ ROM_END
  ID-0233
  . NGM-2330
  NEO-MVS PROGBK1 / NEO-MVS CHA256
+ NEO-MVS PROGBK1 / NEO-MVS CHA256B
  . NGH-2330
  NEO-AEG PROGBK1Y / NEO-AEG CHA256RY
 ****************************************/

@@ -638,7 +638,7 @@ void cadash_state::main_map(address_map &map)
 }
 
 void base_state::eto_map(address_map &map)
-{ // N.B. tc100scn mirror overlaps spriteram
+{
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x10000f).rw("tc0110pcr", FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));
 	map(0x200000, 0x203fff).ram();
@@ -648,7 +648,7 @@ void base_state::eto_map(address_map &map)
 	map(0x4e0000, 0x4e0001).nopr();
 	map(0x4e0001, 0x4e0001).w("ciu", FUNC(pc060ha_device::master_port_w));
 	map(0x4e0003, 0x4e0003).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
-	map(0xc00000, 0xc0ffff).w(m_tc0100scn, FUNC(tc0100scn_device::ram_w));
+	map(0xc00000, 0xc0ffff).w(m_tc0100scn, FUNC(tc0100scn_device::ram_w)); // N.B. tc100scn mirror overlaps spriteram
 	map(0xc00000, 0xc03fff).rw(m_pc090oj, FUNC(pc090oj_device::word_r), FUNC(pc090oj_device::word_w));  // sprite RAM
 	map(0xd00000, 0xd0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    // tilemaps
 	map(0xd20000, 0xd2000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));

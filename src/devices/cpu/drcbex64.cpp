@@ -122,7 +122,7 @@
         R14        - maps to I5
         R15        - maps to I6
 
-    Registers (Linux/MacOS):
+    Registers (SysV)
         RAX        - scratch register
         RBX        - maps to I0
         RCX        - scratch register
@@ -146,7 +146,7 @@
     Exit point:
         Assumes exit value is in RAX.
 
-    Top-level generated code frame:
+    Top-level generated code frame (Windows):
         [rsp+0x00]   - rcx home/scratch
         [rsp+0x08]   - rdx home/scratch
         [rsp+0x10]   - r8 home/scratch
@@ -161,6 +161,20 @@
         [rsp+0x58]   - saved rsi
         [rsp+0x60]   - saved rbx
         [rsp+0x68]   - ret
+
+    Top-level generated code frame (SysV):
+        [rsp+0x00]   - rcx home/scratch
+        [rsp+0x08]   - rdx home/scratch
+        [rsp+0x10]   - r8 home/scratch
+        [rsp+0x18]   - r9 home/scratch
+        [rsp+0x20]   - scratch
+        [rsp+0x28]   - saved r15
+        [rsp+0x30]   - saved r14
+        [rsp+0x38]   - saved r13
+        [rsp+0x40]   - saved r12
+        [rsp+0x48]   - saved rbp
+        [rsp+0x50]   - saved rbx
+        [rsp+0x58]   - ret
 
     Generated code subroutine call frame:
         [rsp+0x00]   - rcx home/scratch
@@ -179,11 +193,7 @@
                      - saved r14
                      - saved r13
                      - saved r12
-                     - saved rdi
-                     - saved rsi
-                     - saved rbp
-                     - saved rbx
-                     - ret
+        ...
 
 ***************************************************************************/
 
@@ -196,9 +206,13 @@
 #include "debug/debugcpu.h"
 #include "emuopts.h"
 
+#include "mfpresolve.h"
+
 #include "asmjit/src/asmjit/asmjit.h"
 
 #include <cstddef>
+#include <cstdio>
+#include <cstdlib>
 #include <vector>
 
 
@@ -368,9 +382,9 @@ public:
 	virtual void reset() override;
 	virtual int execute(uml::code_handle &entry) override;
 	virtual void generate(drcuml_block &block, const uml::instruction *instlist, uint32_t numinst) override;
-	virtual bool hash_exists(uint32_t mode, uint32_t pc) override;
-	virtual void get_info(drcbe_info &info) override;
-	virtual bool logging() const override { return m_log != nullptr; }
+	virtual bool hash_exists(uint32_t mode, uint32_t pc) const noexcept override;
+	virtual void get_info(drcbe_info &info) const noexcept override;
+	virtual bool logging() const noexcept override { return m_log != nullptr; }
 
 private:
 	// a be_parameter is similar to a uml::parameter but maps to native registers/memory
@@ -451,6 +465,7 @@ private:
 	void smart_call_r64(asmjit::x86::Assembler &a, x86code *target, asmjit::x86::Gp const &reg);
 	void smart_call_m64(asmjit::x86::Assembler &a, x86code **target);
 
+	[[noreturn]] void end_of_block() const;
 	static void debug_log_hashjmp(offs_t pc, int mode);
 	static void debug_log_hashjmp_fail();
 
@@ -575,6 +590,7 @@ private:
 	x86_entry_point_func    m_entry;                // entry point
 	x86code *               m_exit;                 // exit point
 	x86code *               m_nocode;               // nocode handler
+	x86code *               m_endofblock;           // end of block handler
 
 	// state to live in the near cache
 	struct near_state
@@ -944,6 +960,7 @@ drcbe_x64::drcbe_x64(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 	, m_entry(nullptr)
 	, m_exit(nullptr)
 	, m_nocode(nullptr)
+	, m_endofblock(nullptr)
 	, m_near(*(near_state *)cache.alloc_near(sizeof(m_near)))
 {
 	// build up necessary arrays
@@ -1146,14 +1163,22 @@ void drcbe_x64::reset()
 	a.bind(a.newNamedLabel("nocode_point"));
 	a.jmp(Gpq(REG_PARAM1));
 
-	// emit the generated code
-	size_t bytes = emit(ch);
+	// generate an end-of-block handler point
+	m_endofblock = dst + a.offset();
+	a.bind(a.newNamedLabel("end_of_block_point"));
+	auto const [entrypoint, adjusted] = util::resolve_member_function(&drcbe_x64::end_of_block, *this);
+	mov_r64_imm(a, Gpq(REG_PARAM1), adjusted);
+	smart_call_r64(a, (x86code *)entrypoint, rax);
 
-	if (m_log != nullptr)
+	// emit the generated code
+	const size_t bytes = emit(ch);
+
+	if (m_log)
 	{
 		x86log_disasm_code_range(m_log, "entry_point", dst, m_exit);
 		x86log_disasm_code_range(m_log, "exit_point", m_exit, m_nocode);
-		x86log_disasm_code_range(m_log, "nocode_point", m_nocode, dst + bytes);
+		x86log_disasm_code_range(m_log, "nocode_point", m_nocode, m_endofblock);
+		x86log_disasm_code_range(m_log, "end_of_block", m_endofblock, dst + bytes);
 	}
 
 	// reset our hash tables
@@ -1223,6 +1248,7 @@ void drcbe_x64::generate(drcuml_block &block, const instruction *instlist, uint3
 	}
 
 	Assembler a(&ch);
+	a.addEncodingOptions(EncodingOptions::kOptimizedAlign);
 	if (logger.file())
 		a.addDiagnosticOptions(DiagnosticOptions::kValidateIntermediate);
 
@@ -1237,7 +1263,7 @@ void drcbe_x64::generate(drcuml_block &block, const instruction *instlist, uint3
 		std::string dasm;
 
 		// add a comment
-		if (m_log != nullptr)
+		if (m_log)
 		{
 			dasm = inst.disasm(&m_drcuml);
 
@@ -1258,13 +1284,21 @@ void drcbe_x64::generate(drcuml_block &block, const instruction *instlist, uint3
 		(this->*s_opcode_table[inst.opcode()])(a, inst);
 	}
 
+	// catch falling off the end of a block
+	if (m_log)
+	{
+		x86log_add_comment(m_log, dst + a.offset(), "%s", "end of block");
+		a.setInlineComment("end of block");
+	}
+	a.jmp(imm(m_endofblock));
+
 	// emit the generated code
 	size_t const bytes = emit(ch);
 	if (!bytes)
 		block.abort();
 
 	// log it
-	if (m_log != nullptr)
+	if (m_log)
 		x86log_disasm_code_range(m_log, (blockname.empty()) ? "Unknown block" : blockname.c_str(), dst, dst + bytes);
 
 	// tell all of our utility objects that the block is finished
@@ -1278,7 +1312,7 @@ void drcbe_x64::generate(drcuml_block &block, const instruction *instlist, uint3
 //  exists in the hash table
 //-------------------------------------------------
 
-bool drcbe_x64::hash_exists(uint32_t mode, uint32_t pc)
+bool drcbe_x64::hash_exists(uint32_t mode, uint32_t pc) const noexcept
 {
 	return m_hash.code_exists(mode, pc);
 }
@@ -1289,7 +1323,7 @@ bool drcbe_x64::hash_exists(uint32_t mode, uint32_t pc)
 //  back-end implementation
 //-------------------------------------------------
 
-void drcbe_x64::get_info(drcbe_info &info)
+void drcbe_x64::get_info(drcbe_info &info) const noexcept
 {
 	for (info.direct_iregs = 0; info.direct_iregs < REG_I_COUNT; info.direct_iregs++)
 		if (int_register_map[info.direct_iregs] == 0)
@@ -1673,11 +1707,11 @@ void drcbe_x64::movsd_p64_r128(Assembler &a, be_parameter const &param, Xmm cons
 {
 	assert(!param.is_immediate());
 	if (param.is_memory())
-		a.movsd(MABS(param.memory(), 8), reg);                                          // movsd [param],reg
+		a.movsd(MABS(param.memory(), 8), reg);
 	else if (param.is_float_register())
 	{
 		if (reg.id() != param.freg())
-			a.movsd(Xmm(param.freg()), reg);                                            // movsd param,reg
+			a.movsd(Xmm(param.freg()), reg);
 	}
 }
 
@@ -1687,13 +1721,27 @@ void drcbe_x64::movsd_p64_r128(Assembler &a, be_parameter const &param, Xmm cons
 //**************************************************************************
 
 //-------------------------------------------------
+//  end_of_block - function to catch falling off
+//  the end of a generated code block
+//-------------------------------------------------
+
+[[noreturn]] void drcbe_x64::end_of_block() const
+{
+	osd_printf_error("drcbe_x64(%s): fell off the end of a generated code block!\n", m_device.tag());
+	std::fflush(stdout);
+	std::fflush(stderr);
+	std::abort();
+}
+
+
+//-------------------------------------------------
 //  debug_log_hashjmp - callback to handle
 //  logging of hashjmps
 //-------------------------------------------------
 
 void drcbe_x64::debug_log_hashjmp(offs_t pc, int mode)
 {
-	printf("mode=%d PC=%08X\n", mode, pc);
+	std::printf("mode=%d PC=%08X\n", mode, pc);
 }
 
 
@@ -1704,7 +1752,7 @@ void drcbe_x64::debug_log_hashjmp(offs_t pc, int mode)
 
 void drcbe_x64::debug_log_hashjmp_fail()
 {
-	printf("  (FAIL)\n");
+	std::printf("  (FAIL)\n");
 }
 
 
@@ -1730,6 +1778,7 @@ void drcbe_x64::op_handle(Assembler &a, const instruction &inst)
 	// emit a jump around the stack adjust in case code falls through here
 	Label skip = a.newLabel();
 	a.short_().jmp(skip);
+	a.align(AlignMode::kCode, 16);
 
 	// register the current pointer for the handle
 	inst.param(0).handle().set_codeptr(drccodeptr(a.code()->baseAddress() + a.offset()));
@@ -2890,7 +2939,7 @@ void drcbe_x64::op_read(Assembler &a, const instruction &inst)
 
 		int const shift = m_space[spacesizep.space()]->addr_shift() - 3;
 		if (m_space[spacesizep.space()]->endianness() != ENDIANNESS_LITTLE)
-			a.not_(ecx);                                                                         // swizzle address for bit Endian spaces
+			a.not_(ecx);                                                                         // swizzle address for big Endian spaces
 		if (accessors.has_high_bits && !accessors.mask_high_bits)
 			a.shr(r10d, accessors.specific.low_bits);                                            // shift off low bits
 		mov_r64_imm(a, rax, uintptr_t(accessors.specific.read.dispatch));                        // load dispatch table pointer
@@ -3089,7 +3138,7 @@ void drcbe_x64::op_readm(Assembler &a, const instruction &inst)
 
 		int const shift = m_space[spacesizep.space()]->addr_shift() - 3;
 		if (m_space[spacesizep.space()]->endianness() != ENDIANNESS_LITTLE)
-			a.not_(ecx);                                                                         // swizzle address for bit Endian spaces
+			a.not_(ecx);                                                                         // swizzle address for big Endian spaces
 		if (accessors.has_high_bits && !accessors.mask_high_bits)
 			a.shr(r10d, accessors.specific.low_bits);                                            // shift off low bits
 		mov_r64_imm(a, rax, uintptr_t(accessors.specific.read.dispatch));                        // load dispatch table pointer
@@ -3285,7 +3334,7 @@ void drcbe_x64::op_write(Assembler &a, const instruction &inst)
 
 		int const shift = m_space[spacesizep.space()]->addr_shift() - 3;
 		if (m_space[spacesizep.space()]->endianness() != ENDIANNESS_LITTLE)
-			a.not_(ecx);                                                                         // swizzle address for bit Endian spaces
+			a.not_(ecx);                                                                         // swizzle address for big Endian spaces
 		if (accessors.has_high_bits && !accessors.mask_high_bits)
 			a.shr(r10d, accessors.specific.low_bits);                                            // shift off low bits
 		mov_r64_imm(a, rax, uintptr_t(accessors.specific.write.dispatch));                       // load dispatch table pointer
@@ -3455,7 +3504,7 @@ void drcbe_x64::op_writem(Assembler &a, const instruction &inst)
 
 		int const shift = m_space[spacesizep.space()]->addr_shift() - 3;
 		if (m_space[spacesizep.space()]->endianness() != ENDIANNESS_LITTLE)
-			a.not_(ecx);                                                                         // swizzle address for bit Endian spaces
+			a.not_(ecx);                                                                         // swizzle address for big Endian spaces
 		if (accessors.has_high_bits && !accessors.mask_high_bits)
 			a.shr(r10d, accessors.specific.low_bits);                                            // shift off low bits
 		mov_r64_imm(a, rax, uintptr_t(accessors.specific.write.dispatch));                       // load dispatch table pointer

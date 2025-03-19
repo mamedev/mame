@@ -897,7 +897,6 @@ INPUT_PORTS_END
  *
  *************************************/
 
-
 static const gfx_layout char_layout =
 {
 	8,8,
@@ -928,6 +927,7 @@ static GFXDECODE_START( gfx_ddragon )
 	GFXDECODE_ENTRY( "tiles",   0, tile_layout, 256, 8 )   // colors 256-383
 GFXDECODE_END
 
+
 /*************************************
  *
  *  Machine drivers
@@ -936,7 +936,6 @@ GFXDECODE_END
 
 static constexpr XTAL MAIN_CLOCK = 12_MHz_XTAL;
 static constexpr XTAL SOUND_CLOCK = 3.579545_MHz_XTAL;
-static constexpr XTAL MCU_CLOCK = MAIN_CLOCK / 3;
 static constexpr XTAL PIXEL_CLOCK = MAIN_CLOCK / 2;
 
 void ddragon_state::ddragon(machine_config &config)
@@ -946,7 +945,7 @@ void ddragon_state::ddragon(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &ddragon_state::ddragon_main_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(ddragon_state::scanline), "screen", 0, 1);
 
-	hd63701y0_cpu_device &subcpu(HD63701Y0(config, m_subcpu, MAIN_CLOCK / 2));  // HD63701Y0P, 6 MHz / 4 internally
+	hd63701y0_cpu_device &subcpu(HD63701Y0(config, m_subcpu, MAIN_CLOCK / 2)); // HD63701Y0P, 6 MHz / 4 internally
 	subcpu.set_addrmap(AS_PROGRAM, &ddragon_state::ddragon_sub_map);
 	subcpu.out_p6_cb().set(FUNC(ddragon_state::sub_port6_w));
 
@@ -972,18 +971,18 @@ void ddragon_state::ddragon(machine_config &config)
 
 	ym2151_device &fmsnd(YM2151(config, "fmsnd", SOUND_CLOCK));
 	fmsnd.irq_handler().set_inputline(m_soundcpu, M6809_FIRQ_LINE);
-	fmsnd.add_route(0, "mono", 0.60);
-	fmsnd.add_route(1, "mono", 0.60);
+	fmsnd.add_route(0, "mono", 0.35);
+	fmsnd.add_route(1, "mono", 0.35);
 
 	MSM5205(config, m_adpcm[0], MAIN_CLOCK / 32);
-	m_adpcm[0]->vck_legacy_callback().set(FUNC(ddragon_state::ddragon_adpcm_int<0>));   // interrupt function
-	m_adpcm[0]->set_prescaler_selector(msm5205_device::S48_4B);  // 8kHz
-	m_adpcm[0]->add_route(ALL_OUTPUTS, "mono", 0.50);
+	m_adpcm[0]->vck_legacy_callback().set(FUNC(ddragon_state::ddragon_adpcm_int<0>));
+	m_adpcm[0]->set_prescaler_selector(msm5205_device::S48_4B); // 8kHz
+	m_adpcm[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	MSM5205(config, m_adpcm[1], MAIN_CLOCK / 32);
-	m_adpcm[1]->vck_legacy_callback().set(FUNC(ddragon_state::ddragon_adpcm_int<1>));   // interrupt function
-	m_adpcm[1]->set_prescaler_selector(msm5205_device::S48_4B);  // 8kHz
-	m_adpcm[1]->add_route(ALL_OUTPUTS, "mono", 0.50);
+	m_adpcm[1]->vck_legacy_callback().set(FUNC(ddragon_state::ddragon_adpcm_int<1>));
+	m_adpcm[1]->set_prescaler_selector(msm5205_device::S48_4B); // 8kHz
+	m_adpcm[1]->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 void ddragon_state::ddragonbl(machine_config &config)
@@ -991,7 +990,7 @@ void ddragon_state::ddragonbl(machine_config &config)
 	ddragon(config);
 
 	// basic machine hardware
-	HD6309E(config.replace(), m_subcpu, MAIN_CLOCK / 8);  // 1.5MHz; labeled "ENC EL1200AR" on one PCB
+	HD6309E(config.replace(), m_subcpu, MAIN_CLOCK / 8); // 1.5MHz; labeled "ENC EL1200AR" on one PCB
 	m_subcpu->set_addrmap(AS_PROGRAM, &ddragon_state::sub_6309_map);
 }
 
@@ -1000,7 +999,7 @@ void ddragon_state::ddragonbla(machine_config &config)
 	ddragon(config);
 
 	// basic machine hardware
-	m6803_cpu_device &sub(M6803(config.replace(), "sub", MAIN_CLOCK / 2));  // 6MHz / 4 internally
+	m6803_cpu_device &sub(M6803(config.replace(), "sub", MAIN_CLOCK / 2)); // 6MHz / 4 internally
 	sub.set_addrmap(AS_PROGRAM, &ddragon_state::ddragonbla_sub_map);
 	sub.out_p2_cb().set(FUNC(ddragon_state::ddragonbla_port_w));
 }
@@ -1048,20 +1047,20 @@ void ddragon_state::ddragon6809(machine_config &config)
 	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, M6809_IRQ_LINE);
 
 	ym2203_device &ym1(YM2203(config, "ym1", 20_MHz_XTAL / 6)); // divisor not verified
-	ym1.add_route(ALL_OUTPUTS, "mono", 0.60);
+	ym1.add_route(ALL_OUTPUTS, "mono", 0.35);
 
 	ym2203_device &ym2(YM2203(config, "ym2", 20_MHz_XTAL / 6)); // divisor not verified
-	ym2.add_route(ALL_OUTPUTS, "mono", 0.60);
+	ym2.add_route(ALL_OUTPUTS, "mono", 0.35);
 
 	MSM5205(config, m_adpcm[0], 500_kHz_XTAL);
-	m_adpcm[0]->vck_legacy_callback().set(FUNC(ddragon_state::ddragon_adpcm_int<0>));   // interrupt function
-	m_adpcm[0]->set_prescaler_selector(msm5205_device::S48_4B);  // 8kHz
-	m_adpcm[0]->add_route(ALL_OUTPUTS, "mono", 0.50);
+	m_adpcm[0]->vck_legacy_callback().set(FUNC(ddragon_state::ddragon_adpcm_int<0>));
+	m_adpcm[0]->set_prescaler_selector(msm5205_device::S48_4B); // 8kHz
+	m_adpcm[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	MSM5205(config, m_adpcm[1], 500_kHz_XTAL);
-	m_adpcm[1]->vck_legacy_callback().set(FUNC(ddragon_state::ddragon_adpcm_int<1>));   // interrupt function
-	m_adpcm[1]->set_prescaler_selector(msm5205_device::S48_4B);  // 8kHz
-	m_adpcm[1]->add_route(ALL_OUTPUTS, "mono", 0.50);
+	m_adpcm[1]->vck_legacy_callback().set(FUNC(ddragon_state::ddragon_adpcm_int<1>));
+	m_adpcm[1]->set_prescaler_selector(msm5205_device::S48_4B); // 8kHz
+	m_adpcm[1]->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 void ddragon_state::ddragon2(machine_config &config)
@@ -1096,8 +1095,8 @@ void ddragon_state::ddragon2(machine_config &config)
 
 	ym2151_device &fmsnd(YM2151(config, "fmsnd", SOUND_CLOCK));
 	fmsnd.irq_handler().set_inputline(m_soundcpu, 0);
-	fmsnd.add_route(0, "mono", 0.60);
-	fmsnd.add_route(1, "mono", 0.60);
+	fmsnd.add_route(0, "mono", 0.35);
+	fmsnd.add_route(1, "mono", 0.35);
 
 	okim6295_device &oki(OKIM6295(config, "oki", 1'056'000, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 verified on bootleg PCB by Jose Tejada
 	oki.add_route(ALL_OUTPUTS, "mono", 0.20);
@@ -1129,6 +1128,7 @@ void toffy_state::toffy(machine_config &config)
 	config.device_remove("adpcm1");
 	config.device_remove("adpcm2");
 }
+
 
 /*************************************
  *
@@ -2107,6 +2107,27 @@ ROM_START( toffy )
 	ROM_LOAD( "5-27512.rom", 0x10000, 0x10000, CRC(4f91eec6) SHA1(18a5f98dfba33837b73d032a6153eeb03263684b) )
 ROM_END
 
+ROM_START( toffya ) // original Midas board with original ROM stickers
+	ROM_REGION( 0x30000, "maincpu", 0 )
+	ROM_LOAD( "mde2.u70", 0x00000, 0x10000, CRC(a27f1b49) SHA1(26aa1bc5af09f22207d764a598d99fa9218608e9) )
+	ROM_RELOAD(           0x10000, 0x10000 )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "mde1.u142", 0x00000, 0x10000, CRC(541bd7f0) SHA1(3f0097f5877eae50651f94d46d7dd9127037eb6e) ) // 1ST AND 2ND HALF IDENTICAL
+
+	ROM_REGION( 0x10000, "chars", 0 )
+	ROM_LOAD( "mde7.u35", 0x00000, 0x10000, CRC(6ddc2867) SHA1(9b3c053048efea768651633a76cb636f40289b79) ) // 1xxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x20000, "tiles", 0 )
+	// the same as 'Dangerous Dungeons' once decrypted
+	ROM_LOAD( "mde4.u78", 0x00000, 0x10000, CRC(9506b10d) SHA1(1a205a519fdbb7a3149c2e72c8620e79caa32f0d) ) // 1xxxxxxxxxxxxxxx = 0x00
+	ROM_LOAD( "mde3.u77", 0x10000, 0x10000, CRC(77c097cc) SHA1(569b36a2be149d9c8b361a4a73c628c3c7471db4) ) // 1xxxxxxxxxxxxxxx = 0x00
+
+	ROM_REGION( 0x20000, "sprites", 0 )
+	ROM_LOAD( "mde6.u80", 0x00000, 0x10000, CRC(aeef092a) SHA1(520148f663695207567f25fbb0634a650c7986e5) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD( "mde5.u79", 0x10000, 0x10000, CRC(14b52f76) SHA1(8d94bb1b404c483c0dbd69d40d9095fb97bd2faa) ) // 1ST AND 2ND HALF IDENTICAL
+ROM_END
+
 ROM_START( stoffy )
 	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "2.u70", 0x00000, 0x10000, CRC(6203aeb5) SHA1(e57aa520e8096df01461b235f77557c267571a57) )
@@ -2211,6 +2232,7 @@ void toffy_state::init_toffy()
 	}
 
 	// should the sound ROM be bitswapped too?
+	// probably not, as the unencrypted set's sound ROM matches
 }
 
 void ddragon_state::init_ddragon6809()
@@ -2267,7 +2289,8 @@ GAME( 1992, ddungeone,    ddungeon, darktowr,    ddungeon, darktowr_state, init_
 GAME( 1992, darktowr,     0,        darktowr,    darktowr, darktowr_state, init_darktowr,    ROT0, "The Game Room",           "Dark Tower",                    MACHINE_SUPPORTS_SAVE )
 
 // these run on their own board, but are basically the same game. Toffy even has 'Dangerous Dungeons' text in it
-GAME( 1993, toffy,        0,         toffy,      toffy,    toffy_state,    init_toffy,       ROT0, "Midas",                   "Toffy",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1993, toffy,        0,         toffy,      toffy,    toffy_state,    init_toffy,       ROT0, "Midas",                   "Toffy (encrypted)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1993, toffya,       toffy,     toffy,      toffy,    toffy_state,    empty_init,       ROT0, "Midas",                   "Toffy (unencrypted)",           MACHINE_SUPPORTS_SAVE )
 
 GAME( 1994, stoffy,       0,         toffy,      toffy,    toffy_state,    init_toffy,       ROT0, "Midas",                   "Super Toffy",                   MACHINE_SUPPORTS_SAVE )
 GAME( 1994, stoffyu,      stoffy,    toffy,      toffy,    toffy_state,    init_toffy,       ROT0, "Midas (Unico license)",   "Super Toffy (Unico license)",   MACHINE_SUPPORTS_SAVE )
