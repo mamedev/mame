@@ -6,11 +6,9 @@
 #include "screen.h"
 
 DEFINE_DEVICE_TYPE(TATSUMI_ROTATING_SPRITES, tatsumi_rotating_sprites_device, "tatsumi_rotating_spr", "Tatsumi TZB215/TZB315 Rotating Sprites")
-DEFINE_DEVICE_TYPE(TATSUMI_ROTATING_SPRITES_BIGPAL, tatsumi_rotating_sprites_bigpal_device, "tatsumi_rotating_spr_bigpal", "Tatsumi TZB215/TZB315 Rotating Sprites (larger palette)")
 
-
-tatsumi_rotating_sprites_device::tatsumi_rotating_sprites_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock)
+tatsumi_rotating_sprites_device::tatsumi_rotating_sprites_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, TATSUMI_ROTATING_SPRITES, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this)
 	, m_fakepalette(*this, "fakepalette")
 	, m_basepalette(*this, finder_base::DUMMY_TAG)
@@ -20,17 +18,12 @@ tatsumi_rotating_sprites_device::tatsumi_rotating_sprites_device(const machine_c
 {
 }
 
-tatsumi_rotating_sprites_device::tatsumi_rotating_sprites_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tatsumi_rotating_sprites_device(mconfig, TATSUMI_ROTATING_SPRITES, tag, owner, clock)
+tatsumi_rotating_sprites_device::tatsumi_rotating_sprites_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock, u32 clut_size)
+	: tatsumi_rotating_sprites_device(mconfig, tag, owner, clock)
 {
-	m_rom_clut_size = 0x800;
+	m_rom_clut_size = clut_size;
 }
 
-tatsumi_rotating_sprites_bigpal_device::tatsumi_rotating_sprites_bigpal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tatsumi_rotating_sprites_device(mconfig, TATSUMI_ROTATING_SPRITES_BIGPAL, tag, owner, clock)
-{
-	m_rom_clut_size = 0x1000;
-}
 
 void tatsumi_rotating_sprites_device::common_init()
 {

@@ -11,7 +11,8 @@
 class tatsumi_rotating_sprites_device : public device_t, public device_gfx_interface
 {
 public:
-	tatsumi_rotating_sprites_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tatsumi_rotating_sprites_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, u32 clut_size);
+	tatsumi_rotating_sprites_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	void set_sprite_palette_base(int sprite_palette_base) { m_sprite_palette_base = sprite_palette_base; }
 	template <typename T> void set_basepalette(T &&tag) { m_basepalette.set_tag(std::forward<T>(tag)); }
@@ -22,8 +23,7 @@ public:
 
 	void update_cluts();
 
-protected:
-	tatsumi_rotating_sprites_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+private:
 
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
@@ -31,15 +31,6 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 	void common_init() ATTR_COLD;
-
-	int m_rom_clut_size;
-	int m_rom_clut_offset;
-
-	required_device<palette_device> m_fakepalette;
-	required_device<palette_device> m_basepalette;
-
-private:
-	DECLARE_GFXDECODE_MEMBER(gfxinfo);
 
 	void mycopyrozbitmap_core(bitmap_ind8 &bitmap, const bitmap_rgb32 &srcbitmap,
 			int dstx, int dsty, int srcwidth, int srcheight, int incxx, int incxy, int incyx, int incyy,
@@ -53,29 +44,23 @@ private:
 		gfx_element *gfx, uint32_t code,uint32_t color,int flipx,int flipy,uint32_t ssx,uint32_t ssy,
 		int scalex, int scaley, int rotate, int write_priority_only );
 
-	std::unique_ptr<uint8_t[]> m_shadow_pen_array;
-	bitmap_rgb32 m_temp_bitmap;
+	DECLARE_GFXDECODE_MEMBER(gfxinfo);
 
+	required_device<palette_device> m_fakepalette;
+	required_device<palette_device> m_basepalette;
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_region_ptr<uint8_t> m_sprites_l_rom;
 	required_region_ptr<uint8_t> m_sprites_h_rom;
 
+	std::unique_ptr<uint8_t[]> m_shadow_pen_array;
+	bitmap_rgb32 m_temp_bitmap;
+
 	// config
+	int m_rom_clut_size;
+	int m_rom_clut_offset;
 	int m_sprite_palette_base;
 };
 
-class tatsumi_rotating_sprites_bigpal_device : public tatsumi_rotating_sprites_device
-{
-public:
-	tatsumi_rotating_sprites_bigpal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-
-private:
-};
-
-
 DECLARE_DEVICE_TYPE(TATSUMI_ROTATING_SPRITES, tatsumi_rotating_sprites_device)
-DECLARE_DEVICE_TYPE(TATSUMI_ROTATING_SPRITES_BIGPAL, tatsumi_rotating_sprites_bigpal_device)
 
 #endif // MAME_TATSUMI_TATSUMI_ROTATING_SPRITES_H

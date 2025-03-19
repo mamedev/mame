@@ -886,7 +886,7 @@ void apache3_state::apache3(machine_config &config)
 	screen.set_raw(CLOCK_2 / 8, 400, 0, 320, 272, 0, 240); // TODO: Hook up CRTC
 	screen.set_screen_update(FUNC(apache3_state::screen_update_apache3));
 
-	TATSUMI_ROTATING_SPRITES(config, m_rotatingsprites, 0);
+	TATSUMI_ROTATING_SPRITES(config, m_rotatingsprites, 0, 0x800);
 	m_rotatingsprites->set_sprite_palette_base(0);
 	m_rotatingsprites->set_palette("rotatingsprites:fakepalette");
 	m_rotatingsprites->set_basepalette(m_palette);
@@ -944,7 +944,7 @@ void roundup5_state::roundup5(machine_config &config)
 	screen.set_raw(CLOCK_2 / 8, 400, 0, 320, 272, 0, 240); // TODO: Hook up CRTC
 	screen.set_screen_update(FUNC(roundup5_state::screen_update_roundup5));
 
-	TATSUMI_ROTATING_SPRITES(config, m_rotatingsprites, 0);
+	TATSUMI_ROTATING_SPRITES(config, m_rotatingsprites, 0, 0x800);
 	m_rotatingsprites->set_sprite_palette_base(512);
 	m_rotatingsprites->set_palette("rotatingsprites:fakepalette");
 	m_rotatingsprites->set_basepalette(m_palette);
@@ -1031,7 +1031,7 @@ void cyclwarr_state::cyclwarr(machine_config &config)
 	screen.set_raw(CLOCK_2 / 8, 400, 0, 320, 272, 0, 240); // TODO: Hook up CRTC
 	screen.set_screen_update(FUNC(cyclwarr_state::screen_update_cyclwarr));
 
-	TATSUMI_ROTATING_SPRITES_BIGPAL(config, m_rotatingsprites, 0);
+	TATSUMI_ROTATING_SPRITES(config, m_rotatingsprites, 0, 0x1000);
 	m_rotatingsprites->set_sprite_palette_base(4096);
 	m_rotatingsprites->set_palette("rotatingsprites:fakepalette");
 	m_rotatingsprites->set_basepalette(m_palette);
