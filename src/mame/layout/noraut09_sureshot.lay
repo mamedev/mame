@@ -3,7 +3,7 @@
 license:CC0-1.0
 copyright-holders: Roberto Fresca, Grull Osgo.
 
-  noraut/dphl 10 buttons-lamps
+  sure shot 9 buttons-lamps
   control panel
 
 -->
@@ -15,7 +15,7 @@ copyright-holders: Roberto Fresca, Grull Osgo.
 		<rect state="0">
 			<color red="0.35" green="0.2" blue="0.0" />
 		</rect>
-		<text string="STAND">
+		<text string="SAFE">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.25" width="1" height="0.5" />
 		</text>
@@ -28,7 +28,7 @@ copyright-holders: Roberto Fresca, Grull Osgo.
 		<rect state="0">
 			<color red="0.0" green="0.3" blue="0.15" />
 		</rect>
-		<text string="DRAW">
+		<text string="SHOOT">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.25" width="1" height="0.5" />
 		</text>
@@ -41,7 +41,7 @@ copyright-holders: Roberto Fresca, Grull Osgo.
 		<rect state="0">
 			<color red="0.3" green="0.3" blue="0.0" />
 		</rect>
-		<text string="HOLD1">
+		<text string="SCRATCH">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.25" width="1" height="0.5" />
 		</text>
@@ -54,7 +54,7 @@ copyright-holders: Roberto Fresca, Grull Osgo.
 		<rect state="0">
 			<color red="0.3" green="0.3" blue="0.0" />
 		</rect>
-		<text string="HOLD2">
+		<text string="SCRATCH">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.25" width="1" height="0.5" />
 		</text>
@@ -67,7 +67,7 @@ copyright-holders: Roberto Fresca, Grull Osgo.
 		<rect state="0">
 			<color red="0.3" green="0.3" blue="0.0" />
 		</rect>
-		<text string="HOLD3">
+		<text string="SCRATCH">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.25" width="1" height="0.5" />
 		</text>
@@ -80,7 +80,7 @@ copyright-holders: Roberto Fresca, Grull Osgo.
 		<rect state="0">
 			<color red="0.3" green="0.3" blue="0.0" />
 		</rect>
-		<text string="HOLD4">
+		<text string="SCRATCH">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.25" width="1" height="0.5" />
 		</text>
@@ -93,7 +93,7 @@ copyright-holders: Roberto Fresca, Grull Osgo.
 		<rect state="0">
 			<color red="0.3" green="0.3" blue="0.0" />
 		</rect>
-		<text string="HOLD5">
+		<text string="SCRATCH">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.25" width="1" height="0.5" />
 		</text>
@@ -120,20 +120,7 @@ copyright-holders: Roberto Fresca, Grull Osgo.
 		<rect state="0">
 			<color red="0.35" green="0.2" blue="0.0" />
 		</rect>
-		<text string="DEAL">
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.25" width="1" height="0.5" />
-		</text>
-	</element>
-
-	<element name="L9" defstate="0">
-		<rect state="1">
-			<color red="1.0" green="0.0" blue="0.0" />
-		</rect>
-		<rect state="0">
-			<color red="0.4" green="0.0" blue="0.0" />
-		</rect>
-		<text string="BET">
+		<text string="BREAK">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.25" width="1" height="0.5" />
 		</text>
@@ -164,14 +151,10 @@ copyright-holders: Roberto Fresca, Grull Osgo.
 		<element name="lamp7" ref="L7" inputtag="IN1" inputmask="0x80">
 			<bounds x="0.80" y="3.28" width="0.40" height="0.20" />
 		</element>
-
 		<element name="lamp0" ref="L0" inputtag="IN1" inputmask="0x01">
 			<bounds x="1.30" y="3.28" width="0.40" height="0.20" />
 		</element>
 
-		<element name="lamp9" ref="L9" inputtag="IN0" inputmask="0x02">
-			<bounds x="1.80" y="3.28" width="0.40" height="0.20" />
-		</element>
 		<element name="lamp8" ref="L8" inputtag="IN0" inputmask="0x01">
 			<bounds x="2.30" y="3.28" width="0.40" height="0.20" />
 		</element>
