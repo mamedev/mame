@@ -8,7 +8,8 @@
 // TZB215 on Apache 3
 // TZB315 on Round Up 5, Big Fight, Cycle Warriors
 // differences, if any, unknown
-// (does not appear to be CLUT size, even if that would have made sense. Round Up 5 uses the smaller CLUT like Apache 3 yet is claimed to be TZB315)
+// (does not appear to be CLUT size, even if that would have made sense.
+//  Round Up 5 uses the smaller CLUT like Apache 3 yet is confirmed to be a TZB315)
 
 DEFINE_DEVICE_TYPE(TZB215_SPRITES, tzb215_device, "tzb215_sprites", "Tatsumi TZB215 Rotating Sprites")
 DEFINE_DEVICE_TYPE(TZB315_SPRITES, tzb315_device, "tzb315_sprites", "Tatsumi TZB315 Rotating Sprites")
