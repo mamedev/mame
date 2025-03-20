@@ -16,7 +16,7 @@
 #include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 
-#include "bus/heathzenith/h89/intr_cntrl.h"
+#include "bus/heathzenith/intr_cntrl/intr_cntrl.h"
 
 class mms77316_fdc_device : public device_t, public device_h89bus_right_card_interface
 {
