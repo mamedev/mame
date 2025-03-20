@@ -10,14 +10,14 @@
 // differences, if any, unknown
 // (does not appear to be CLUT size, even if that would have made sense. Round Up 5 uses the smaller CLUT like Apache 3 yet is claimed to be TZB315)
 
-DEFINE_DEVICE_TYPE(TZB215_SPRITES, tzb215_device, "tzb215_spr", "Tatsumi TZB215 Rotating Sprites")
-DEFINE_DEVICE_TYPE(TZB315_SPRITES, tzb315_device, "tzb315_spr", "Tatsumi TZB315 Rotating Sprites")
+DEFINE_DEVICE_TYPE(TZB215_SPRITES, tzb215_device, "tzb215_sprites", "Tatsumi TZB215 Rotating Sprites")
+DEFINE_DEVICE_TYPE(TZB315_SPRITES, tzb315_device, "tzb315_sprites", "Tatsumi TZB315 Rotating Sprites")
 
 tzbx15_device::tzbx15_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this)
-	, m_fakepalette(*this, "fakepalette")
-	, m_basepalette(*this, finder_base::DUMMY_TAG)
+	, m_palette_clut(*this, "palette_clut")
+	, m_palette_base(*this, finder_base::DUMMY_TAG)
 	, m_spriteram(*this, finder_base::DUMMY_TAG)
 	, m_sprites_l_rom(*this, "sprites_l")
 	, m_sprites_h_rom(*this, "sprites_h")
@@ -91,7 +91,8 @@ void tzbx15_device::device_reset()
 
 void tzbx15_device::device_add_mconfig(machine_config &config)
 {
-	PALETTE(config, m_fakepalette).set_format(palette_device::xRGB_555, m_rom_clut_size * 2); // 4096 or 8192 arranged as series of CLUTs
+	// 4096 or 8192 arranged as series of CLUTs
+	PALETTE(config, m_palette_clut).set_format(palette_device::xRGB_555, m_rom_clut_size * 2);
 }
 
 void tzbx15_device::mycopyrozbitmap_core(bitmap_ind8 &bitmap, const bitmap_rgb32 &srcbitmap,
@@ -172,7 +173,7 @@ void tzbx15_device::roundupt_drawgfxzoomrotate( BitmapClass &dest_bmp, const rec
 
 	if( gfx )
 	{
-		const pen_t *pal = &m_fakepalette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
+		const pen_t *pal = &m_palette_clut->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
 		const uint8_t *shadow_pens = m_shadow_pen_array.get() + (gfx->granularity() * (color % gfx->colors()));
 		const uint8_t *code_base = gfx->get_data(code % gfx->elements());
 
@@ -197,11 +198,6 @@ void tzbx15_device::roundupt_drawgfxzoomrotate( BitmapClass &dest_bmp, const rec
 //          int incxy=0x0;//(int)((float)dy * -sin(theta));
 			int incyx=0x0;//(int)((float)dx * sin(theta));
 //          int incyy=0x10000;//(int)((float)dy * cos(theta));
-
-			if (flipx)
-			{
-			}
-
 
 			if (ssx&0x80000000) sx=0-(0x10000 - (ssx>>16)); else sx=ssx>>16;
 			if (ssy&0x80000000) sy=0-(0x10000 - (ssy>>16)); else sy=ssy>>16;
@@ -334,45 +330,44 @@ void tzbx15_device::roundupt_drawgfxzoomrotate( BitmapClass &dest_bmp, const rec
 	}
 }
 
+/*
+    Sprite RAM itself uses an index into two ROM tables to actually draw the object.
 
+    Sprite RAM format:
+
+    Word 0: 0xf000 - ?
+            0x0fff - Index into ROM sprite table
+    Word 1: 0x8000 - X Flip
+            0x4000 - Y Flip
+            0x3000 - ?
+            0x0ff8 - Color
+            0x0007 - ?
+    Word 2: 0xffff - X position
+    Word 3: 0xffff - Y position
+    Word 4: 0x01ff - Scale
+    Word 5: 0x01ff - Rotation
+
+    Sprite ROM table format, alternate lines come from each bank, with the
+    very first line indicating control information:
+
+    First bank:
+    Byte 0: Y destination offset (in scanlines, unaffected by scale).
+    Byte 1: Always 0?
+    Byte 2: Number of source scanlines to render from (so unaffected by destination scale).
+    Byte 3: Usually 0, sometimes 0x80??
+
+    Other banks:
+    Byte 0: Width of line in tiles (-1)
+    Byte 1: X offset to start drawing line at (multipled by scale * 8)
+    Bytes 2/3: Tile index to start fetching tiles from (increments per tile).
+
+*/
 template<class BitmapClass>
 void tzbx15_device::draw_sprites_main(BitmapClass &bitmap, const rectangle &cliprect, int write_priority_only, int rambank)
 {
 	// Sprite data is double buffered
 	for (int offs = rambank;offs < rambank + 0x800;offs += 6)
 	{
-		/*
-		    Sprite RAM itself uses an index into two ROM tables to actually draw the object.
-
-		    Sprite RAM format:
-
-		    Word 0: 0xf000 - ?
-		            0x0fff - Index into ROM sprite table
-		    Word 1: 0x8000 - X Flip
-		            0x4000 - Y Flip
-		            0x3000 - ?
-		            0x0ff8 - Color
-		            0x0007 - ?
-		    Word 2: 0xffff - X position
-		    Word 3: 0xffff - Y position
-		    Word 4: 0x01ff - Scale
-		    Word 5: 0x01ff - Rotation
-
-		    Sprite ROM table format, alternate lines come from each bank, with the
-		    very first line indicating control information:
-
-		    First bank:
-		    Byte 0: Y destination offset (in scanlines, unaffected by scale).
-		    Byte 1: Always 0?
-		    Byte 2: Number of source scanlines to render from (so unaffected by destination scale).
-		    Byte 3: Usually 0, sometimes 0x80??
-
-		    Other banks:
-		    Byte 0: Width of line in tiles (-1)
-		    Byte 1: X offset to start drawing line at (multipled by scale * 8)
-		    Bytes 2/3: Tile index to start fetching tiles from (increments per tile).
-
-		*/
 		int y =         m_spriteram[offs+3];
 		int x =         m_spriteram[offs+2];
 		int scale =     m_spriteram[offs+4] & 0x1ff;
@@ -522,6 +517,7 @@ void tzbx15_device::draw_sprites(bitmap_ind8& bitmap, const rectangle &cliprect,
 {
 	draw_sprites_main(bitmap, cliprect, write_priority_only, rambank);
 }
+
 /*
  * Object palettes are build from a series of cluts stored in the object roms.
  *
@@ -533,25 +529,26 @@ void tzbx15_device::update_cluts()
 	const int length = m_rom_clut_size * 2;
 	const uint8_t* bank1 = m_sprites_l_rom + m_rom_clut_offset;
 	const uint8_t* bank2 = m_sprites_h_rom + m_rom_clut_offset;
-	for (int i=0; i<length; i+=8)
-	{
-		m_fakepalette->set_pen_color(i+0,m_basepalette->pen_color(bank1[1]+m_sprite_palette_base));
-		m_shadow_pen_array[i+0]=(bank1[1]==255);
-		m_fakepalette->set_pen_color(i+1,m_basepalette->pen_color(bank1[0]+m_sprite_palette_base));
-		m_shadow_pen_array[i+1]=(bank1[0]==255);
-		m_fakepalette->set_pen_color(i+2,m_basepalette->pen_color(bank1[3]+m_sprite_palette_base));
-		m_shadow_pen_array[i+2]=(bank1[3]==255);
-		m_fakepalette->set_pen_color(i+3,m_basepalette->pen_color(bank1[2]+m_sprite_palette_base));
-		m_shadow_pen_array[i+3]=(bank1[2]==255);
 
-		m_fakepalette->set_pen_color(i+4,m_basepalette->pen_color(bank2[1]+m_sprite_palette_base));
-		m_shadow_pen_array[i+4]=(bank2[1]==255);
-		m_fakepalette->set_pen_color(i+5,m_basepalette->pen_color(bank2[0]+m_sprite_palette_base));
-		m_shadow_pen_array[i+5]=(bank2[0]==255);
-		m_fakepalette->set_pen_color(i+6,m_basepalette->pen_color(bank2[3]+m_sprite_palette_base));
-		m_shadow_pen_array[i+6]=(bank2[3]==255);
-		m_fakepalette->set_pen_color(i+7,m_basepalette->pen_color(bank2[2]+m_sprite_palette_base));
-		m_shadow_pen_array[i+7]=(bank2[2]==255);
+	for (int i = 0; i < length; i+=8)
+	{
+		m_palette_clut->set_pen_color(i + 0, m_palette_base->pen_color(bank1[1] + m_sprite_palette_base));
+		m_shadow_pen_array[i+0]=(bank1[1] == 255);
+		m_palette_clut->set_pen_color(i + 1, m_palette_base->pen_color(bank1[0] + m_sprite_palette_base));
+		m_shadow_pen_array[i+1]=(bank1[0] == 255);
+		m_palette_clut->set_pen_color(i + 2, m_palette_base->pen_color(bank1[3] + m_sprite_palette_base));
+		m_shadow_pen_array[i+2]=(bank1[3] == 255);
+		m_palette_clut->set_pen_color(i + 3, m_palette_base->pen_color(bank1[2] + m_sprite_palette_base));
+		m_shadow_pen_array[i+3]=(bank1[2] == 255);
+
+		m_palette_clut->set_pen_color(i + 4, m_palette_base->pen_color(bank2[1] + m_sprite_palette_base));
+		m_shadow_pen_array[i+4]=(bank2[1] == 255);
+		m_palette_clut->set_pen_color(i + 5, m_palette_base->pen_color(bank2[0] + m_sprite_palette_base));
+		m_shadow_pen_array[i+5]=(bank2[0] == 255);
+		m_palette_clut->set_pen_color(i + 6, m_palette_base->pen_color(bank2[3] + m_sprite_palette_base));
+		m_shadow_pen_array[i+6]=(bank2[3] == 255);
+		m_palette_clut->set_pen_color(i + 7, m_palette_base->pen_color(bank2[2] + m_sprite_palette_base));
+		m_shadow_pen_array[i+7]=(bank2[2] == 255);
 
 		bank1+=4;
 		bank2+=4;

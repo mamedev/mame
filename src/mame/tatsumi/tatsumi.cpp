@@ -888,7 +888,7 @@ void apache3_state::apache3(machine_config &config)
 
 	TZB215_SPRITES(config, m_rotatingsprites, 0, 0x800);
 	m_rotatingsprites->set_sprite_palette_base(0);
-	m_rotatingsprites->set_palette("rotatingsprites:fakepalette");
+	m_rotatingsprites->set_palette("rotatingsprites:palette_clut");
 	m_rotatingsprites->set_basepalette(m_palette);
 	m_rotatingsprites->set_spriteram(m_spriteram);
 
@@ -946,7 +946,7 @@ void roundup5_state::roundup5(machine_config &config)
 
 	TZB315_SPRITES(config, m_rotatingsprites, 0, 0x800); // probably TZB215, so this is likely incorrectly documented
 	m_rotatingsprites->set_sprite_palette_base(512);
-	m_rotatingsprites->set_palette("rotatingsprites:fakepalette");
+	m_rotatingsprites->set_palette("rotatingsprites:palette_clut");
 	m_rotatingsprites->set_basepalette(m_palette);
 	m_rotatingsprites->set_spriteram(m_spriteram);
 
@@ -1033,7 +1033,7 @@ void cyclwarr_state::cyclwarr(machine_config &config)
 
 	TZB315_SPRITES(config, m_rotatingsprites, 0, 0x1000);
 	m_rotatingsprites->set_sprite_palette_base(4096);
-	m_rotatingsprites->set_palette("rotatingsprites:fakepalette");
+	m_rotatingsprites->set_palette("rotatingsprites:palette_clut");
 	m_rotatingsprites->set_basepalette(m_palette);
 	m_rotatingsprites->set_spriteram(m_spriteram);
 
