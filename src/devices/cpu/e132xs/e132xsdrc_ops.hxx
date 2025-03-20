@@ -245,7 +245,6 @@ void hyperstone_device::generate_trap_exception_or_int(drcuml_block &block)
 
 	UML_ROLAND(block, I1, DRC_SR, 7, 0x7f);
 	UML_ROLAND(block, I2, DRC_SR, 11, 0xf);
-	UML_TEST(block, I2, 0xf);
 	UML_MOVc(block, uml::COND_Z, I2, 16);
 	UML_ADD(block, I3, I1, I2);
 
@@ -256,7 +255,7 @@ void hyperstone_device::generate_trap_exception_or_int(drcuml_block &block)
 	UML_ROLINS(block, DRC_SR, I3, 25, 0xfe000000);
 
 	UML_AND(block, I1, I3, 0x3f);
-	UML_AND(block, I2, DRC_PC, ~1);
+	UML_AND(block, I2, DRC_PC, ~uint32_t(1));
 	UML_ROLINS(block, I2, DRC_SR, 32-S_SHIFT, 1);
 	UML_STORE(block, (void *)m_core->local_regs, I1, I2, SIZE_DWORD, SCALE_x4);
 	UML_ADD(block, I2, I1, 1);

@@ -1506,6 +1506,9 @@ void drcbe_x64::calculate_status_flags_mul_low(Assembler &a, uint32_t instsize, 
 
 void drcbe_x64::shift_op_param(Assembler &a, Inst::Id const opcode, size_t opsize, Operand const &dst, be_parameter const &param, bool update_flags)
 {
+	// FIXME: upper bits may not be cleared for 32-bit form when shift count is zero
+	const bool carryin = (opcode == Inst::kIdRcl) || (opcode == Inst::kIdRcr);
+
 	if (param.is_immediate())
 	{
 		const uint32_t bitshift = param.immediate() & (opsize * 8 - 1);
@@ -1521,24 +1524,27 @@ void drcbe_x64::shift_op_param(Assembler &a, Inst::Id const opcode, size_t opsiz
 			calculate_status_flags(a, opsize, dst, FLAG_S | FLAG_Z);
 		}
 	}
-	else
+	else if (update_flags || carryin)
 	{
+		// TODO: flag update could be optimised substantially
 		Label calc = a.newLabel();
 		Label end = a.newLabel();
 
-		Gp shift = cl;
+		const Gp shift = ecx;
 
-		a.mov(r10, rax);
-		a.lahf();
+		if (carryin)
+		{
+			a.mov(r10, rax);
+			a.lahf();
+		}
 
 		mov_reg_param(a, shift, param);
 
 		a.and_(shift, opsize * 8 - 1);
-		a.test(shift, shift);
-
 		a.short_().jnz(calc);
 
-		a.mov(rax, r10);
+		if (carryin)
+			a.mov(rax, r10);
 
 		if (update_flags)
 			a.clc(); // throw away carry since it'll never be used
@@ -1547,15 +1553,23 @@ void drcbe_x64::shift_op_param(Assembler &a, Inst::Id const opcode, size_t opsiz
 
 		a.bind(calc);
 
-		a.sahf(); // restore flags to keep carry for rolc/rorc
-		a.mov(rax, r10);
+		if (carryin)
+		{
+			a.sahf(); // restore flags to keep carry for rolc/rorc
+			a.mov(rax, r10);
+		}
 
-		a.emit(opcode, dst, shift);
+		a.emit(opcode, dst, cl);
 
 		a.bind(end);
 
 		if (update_flags)
 			calculate_status_flags(a, opsize, dst, FLAG_S | FLAG_Z); // calculate status flags but preserve carry
+	}
+	else
+	{
+		mov_reg_param(a, ecx, param);
+		a.emit(opcode, dst, cl);
 	}
 }
 
@@ -1563,19 +1577,21 @@ void drcbe_x64::mov_reg_param(Assembler &a, Gp const &reg, be_parameter const &p
 {
 	if (param.is_immediate())
 	{
-		if (param.immediate() == 0 && !keepflags)
-			a.xor_(reg.r32(), reg.r32());                                               // xor   reg,reg
+		if (!param.immediate() && !keepflags)
+			a.xor_(reg.r32(), reg.r32());
 		else if (reg.isGpq())
 			mov_r64_imm(a, reg, param.immediate());
 		else
-			a.mov(reg, param.immediate());                                              // mov   reg,param
+			a.mov(reg, param.immediate());
 	}
 	else if (param.is_memory())
-		a.mov(reg, MABS(param.memory()));                                               // mov   reg,[param]
+	{
+		a.mov(reg, MABS(param.memory()));
+	}
 	else if (param.is_int_register())
 	{
 		if (reg.id() != param.ireg())
-			a.mov(reg, Gp(reg, param.ireg()));                                          // mov   reg,param
+			a.mov(reg, Gp(reg, param.ireg()));
 	}
 }
 
@@ -1642,10 +1658,14 @@ void drcbe_x64::movsx_r64_p32(Assembler &a, Gp const &reg, be_parameter const &p
 
 void drcbe_x64::mov_r64_imm(Assembler &a, Gp const &reg, uint64_t const imm)
 {
-	if (u32(imm) == imm)
+	if (s32(u32(imm)) == s64(imm))
+	{
+		a.mov(reg.r64(), imm);
+	}
+	else if (u32(imm) == imm)
+	{
 		a.mov(reg.r32(), imm);
-	else if (s32(imm) == imm)
-		a.mov(reg.r64(), s32(imm));
+	}
 	else
 	{
 		const int64_t delta = imm - (a.code()->baseAddress() + a.offset() + 7);
@@ -5390,13 +5410,13 @@ void drcbe_x64::op_shift(Assembler &a, const uml::instruction &inst)
 	const bool carry = (Opcode == Inst::kIdRcl) || (Opcode == Inst::kIdRcr);
 
 	// optimize immediate zero case
-	if (!carry && !inst.flags() && src2p.is_immediate() && (src2p.immediate() & (inst.size() * 8 - 1)) == 0)
-		return;
+	if (!carry && !inst.flags() && src2p.is_immediate() && !(src2p.immediate() & (inst.size() * 8 - 1)))
+		return; // FIXME: needs to clear upper bits for 32-bit form
 
 	if (dstp.is_memory() && ((inst.size() == 8) || !dstp.is_cold_register()) && (dstp == src1p))
 	{
 		// dstp == src1p in memory
-		shift_op_param(a, Opcode, inst.size(), MABS(dstp.memory(), inst.size()), src2p, true);
+		shift_op_param(a, Opcode, inst.size(), MABS(dstp.memory(), inst.size()), src2p, bool(inst.flags()));
 	}
 	else
 	{
@@ -5409,7 +5429,7 @@ void drcbe_x64::op_shift(Assembler &a, const uml::instruction &inst)
 			mov_reg_param(a, dstreg, src1p, true);
 		else
 			mov_reg_param(a, dstreg, src1p);
-		shift_op_param(a, Opcode, inst.size(), dstreg, src2p, true);
+		shift_op_param(a, Opcode, inst.size(), dstreg, src2p, bool(inst.flags()));
 		mov_param_reg(a, dstp, dstreg);
 	}
 }

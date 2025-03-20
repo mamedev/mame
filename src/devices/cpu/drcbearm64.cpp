@@ -1203,7 +1203,7 @@ void drcbe_arm64::mov_param_imm(a64::Assembler &a, uint32_t regsize, const be_pa
 	}
 	else if (dst.is_int_register())
 	{
-		a.mov(dst.get_register_int(regsize), src);
+		get_imm_relative(a, dst.get_register_int(regsize), src);
 	}
 }
 
