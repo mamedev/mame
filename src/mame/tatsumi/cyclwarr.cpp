@@ -148,7 +148,6 @@ public:
 	}
 
 	void cyclwarr(machine_config &config);
-	void bigfight(machine_config &config);
 
 protected:
 	virtual void machine_reset() override ATTR_COLD;
@@ -215,6 +214,8 @@ public:
 		: cyclwarr_state(mconfig, type, tag)
 	{
 	}
+
+	void bigfight(machine_config &config);
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -989,13 +990,13 @@ void cyclwarr_state::cyclwarr(machine_config &config)
 	m_oki->add_route(ALL_OUTPUTS, "rspeaker", 0.75);
 }
 
-void cyclwarr_state::bigfight(machine_config &config)
+void bigfight_state::bigfight(machine_config &config)
 {
 	cyclwarr(config);
 
 	/* sound hardware */
 	// TODO: 2MHz was too fast. Can the clock be software controlled?
-	m_oki->set_clock(cyclwarr_state::CLOCK_1 / 8 / 2);
+	m_oki->set_clock(bigfight_state::CLOCK_1 / 8 / 2);
 }
 
 
