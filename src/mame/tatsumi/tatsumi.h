@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "tzbx15_sprites.h"
+
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
 #include "cpu/m68000/m68000.h"
@@ -23,6 +25,7 @@ public:
 		, m_subcpu(*this, "sub")
 		, m_ym2151(*this, "ymsnd")
 		, m_oki(*this, "oki")
+		, m_rotatingsprites(*this, "rotatingsprites")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 		, m_videoram(*this, "videoram")
@@ -32,6 +35,8 @@ public:
 		, m_mainregion(*this, "master_rom")
 		, m_subregion(*this, "slave_rom")
 	{ }
+
+	void init_tatsumi();
 
 	void hd6445_crt_w(offs_t offset, uint8_t data);
 	INTERRUPT_GEN_MEMBER(v30_interrupt);
@@ -43,6 +48,7 @@ protected:
 	required_device<m68000_base_device> m_subcpu;
 	optional_device<ym2151_device> m_ym2151;
 	required_device<okim6295_device> m_oki;
+	required_device<tzbx15_device> m_rotatingsprites;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
@@ -53,13 +59,9 @@ protected:
 	required_memory_region m_mainregion;
 	required_memory_region m_subregion;
 
-	uint8_t *m_rom_sprite_lookup[2];
-	uint8_t *m_rom_clut[2];
 	uint16_t m_control_word;
 	uint8_t m_last_control;
 	tilemap_t *m_tx_layer;
-	bitmap_rgb32 m_temp_bitmap;
-	std::unique_ptr<uint8_t[]> m_shadow_pen_array;
 	void text_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t tatsumi_v30_68000_r(offs_t offset);
 	void tatsumi_v30_68000_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -67,11 +69,6 @@ protected:
 	void tatsumi_sprite_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void tatsumi_reset();
-	template<class BitmapClass> void draw_sprites(BitmapClass &bitmap, const rectangle &cliprect, int write_priority_only, int rambank);
-	template<class BitmapClass> inline void roundupt_drawgfxzoomrotate( BitmapClass &dest_bmp, const rectangle &clip,
-		gfx_element *gfx, uint32_t code,uint32_t color,int flipx,int flipy,uint32_t ssx,uint32_t ssy,
-		int scalex, int scaley, int rotate, int write_priority_only );
-	void update_cluts(int fake_palette_offset, int object_base, int length);
 
 	uint8_t m_hd6445_reg[64];
 	void apply_shadow_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &shadow_bitmap, uint8_t xor_output);
@@ -154,8 +151,6 @@ public:
 
 	void roundup5(machine_config &config);
 
-	void init_roundup5();
-
 private:
 	uint16_t roundup_v30_z80_r(offs_t offset);
 	void roundup_v30_z80_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -205,8 +200,6 @@ public:
 
 	void cyclwarr(machine_config &config);
 	void bigfight(machine_config &config);
-
-	void init_cyclwarr();
 
 protected:
 	virtual void machine_reset() override ATTR_COLD;
