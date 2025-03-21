@@ -31,8 +31,9 @@
   - 3super8 doesn't have the 8x32 tilemap, change the video emulation accordingly
   - jinhulu2 and jinhulu2101is stop at "system is connecting".
     Some type of link feature?
-  - jinhulu2120gi has machine translated DIP definitions which could use improving.
-  - jinhulu2120gi hopper isn't implemented yet.
+  - Other games in jinhulu2_state have machine translated DIP definitions which
+    could use improving and hopper isn't implemented yet.
+  - Find out password for jinhuang and correct inputs / DIPs.
 
 ***************************************************************************/
 
@@ -172,6 +173,7 @@ public:
 		m_in1(*this, "IN1")
 	{ }
 
+	void jinhuang(machine_config &config)ATTR_COLD;
 	void jinhulu2(machine_config &config)ATTR_COLD;
 
 	void init_dafuwng3() ATTR_COLD;
@@ -204,6 +206,7 @@ private:
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
+	void jinhuang_portmap(address_map &map) ATTR_COLD;
 	void portmap(address_map &map) ATTR_COLD;
 };
 
@@ -625,6 +628,15 @@ void jinhulu2_state::portmap(address_map &map)
 	map(0x5031, 0x5031).r(FUNC(jinhulu2_state::igs003c_r)).w(FUNC(jinhulu2_state::nmi_w));
 	map(0x7000, 0x77ff).ram().w(FUNC(jinhulu2_state::fg_tile_w)).share(m_fg_tile_ram);
 	map(0x7800, 0x7fff).ram().w(FUNC(jinhulu2_state::fg_color_w)).share(m_fg_color_ram);
+}
+
+void jinhulu2_state::jinhuang_portmap(address_map &map) // doesn't seem to use the IGS003
+{
+	portmap(map);
+
+	map(0x5030, 0x5030).unmapw();
+	map(0x5031, 0x5031).unmapr();
+	map(0x5032, 0x5032).portr("IN0");
 }
 
 void jb_state::portmap(address_map &map)
@@ -1464,6 +1476,29 @@ static INPUT_PORTS_START( zuanshiw )
 	PORT_DIPSETTING(    0x00, "Take Score Immediately" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( jinhuang )
+	PORT_INCLUDE( jinhulu2 )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("SERVICE")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
 /***************************************************************************
                      Graphics Layout & Graphics Decode
 ***************************************************************************/
@@ -1640,6 +1675,14 @@ void jinhulu2_state::jinhulu2(machine_config &config)
 	m_gfxdecode->set_info(gfx_jinhulu2);
 
 	YM2149(config.replace(), "ymsnd", 12_MHz_XTAL / 12).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
+
+
+void jinhulu2_state::jinhuang(machine_config &config)
+{
+	jinhulu2(config);
+
+	m_maincpu->set_addrmap(AS_IO, &jinhulu2_state::jinhuang_portmap);
 }
 
 
@@ -2358,7 +2401,7 @@ void jinhulu2_state::init_jinhuang()
 
 	// extra layer
 	for (int a = 0; a < 0xf000; a++)
-		if ((a & 0x0100) == 0x0000) rom[a] ^= 0x40;
+		if ((a & 0x0300) != 0x0100) rom[a] ^= 0x40;
 }
 
 void spoker_state::init_spk116it()
@@ -2484,5 +2527,5 @@ GAME( 1995,  huluw2,        0,        jinhulu2, huluw2,   jinhulu2_state, init_h
 GAME( 1995,  hsheng2,       0,        jinhulu2, jinhulu2, jinhulu2_state, init_hsheng2,       ROT0,  "IGS",       "Hua Sheng II (v120DI)",      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // hopper
 GAME( 1995,  dafuwng3,      0,        jinhulu2, jinhulu2, jinhulu2_state, init_dafuwng3,      ROT0,  "IGS",       "Da Fu Wang III (V130LI)",    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // hopper
 GAME( 1996,  zuanshiw,      0,        jinhulu2, zuanshiw, jinhulu2_state, init_jinhulu2120gi, ROT0,  "IGS",       "Zuanshi Wutai (V110II)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // hopper
-GAME( 2002,  jinhuang,      0,        jinhulu2, jinhulu2, jinhulu2_state, init_jinhuang,      ROT0,  "IGS",       "Jin Huang Guan",             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // different memory map
+GAME( 2002,  jinhuang,      0,        jinhuang, jinhuang, jinhulu2_state, init_jinhuang,      ROT0,  "IGS",       "Jin Huang Guan",             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // different memory map
 GAME( 1998,  sleyuan,       0,        jinhulu2, jinhulu2, jinhulu2_state, init_sleyuan,       ROT0,  "IGS",       "Shuiguo Leyuan (V150UI)",    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // hopper
