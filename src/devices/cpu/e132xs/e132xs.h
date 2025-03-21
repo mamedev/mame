@@ -501,19 +501,30 @@ private:
 
 	void generate_get_trap_addr(drcuml_block &block, uml::code_label &label, uint32_t trapno);
 	void generate_check_delay_pc(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
-	void generate_decode_const(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
-	void generate_decode_immediate_s(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	uint32_t generate_get_const(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	uint32_t generate_get_immediate_s(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
 	void generate_ignore_immediate_s(drcuml_block &block, const opcode_desc *desc);
-	void generate_decode_pcrel(drcuml_block &block, const opcode_desc *desc);
+	uint32_t generate_get_pcrel(drcuml_block &block, const opcode_desc *desc);
 	void generate_ignore_pcrel(drcuml_block &block, const opcode_desc *desc);
 
 	void generate_get_global_register(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
 	void generate_set_global_register(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void generate_set_global_register_low(drcuml_block &block, compiler_state &compiler, uint32_t dst_code, uml::parameter src);
+	void generate_set_global_register_high(drcuml_block &block, compiler_state &compiler, uint32_t dst_code, uml::parameter src);
+
+	void generate_load_operand(drcuml_block &block, compiler_state &compiler, reg_bank global, uint32_t code, uml::parameter dst, uml::parameter localidx);
+	void generate_load_src_addsub(drcuml_block &block, compiler_state &compiler, reg_bank global, uint32_t code, uml::parameter dst, uml::parameter localidx, uml::parameter sr);
+	void generate_set_dst(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, reg_bank global, uint32_t code, uml::parameter src, uml::parameter localidx, bool calcidx);
+	void generate_update_flags_addsub(drcuml_block &block, compiler_state &compiler, uml::parameter sr);
+	void generate_update_flags_addsubc(drcuml_block &block, compiler_state &compiler, uml::parameter sr);
+	void generate_update_flags_addsubs(drcuml_block &block, compiler_state &compiler, uml::parameter sr);
 
 	template <trap_exception_or_int TYPE> void generate_trap_exception_or_int(drcuml_block &block);
 	void generate_int(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint32_t addr);
 	void generate_exception(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint32_t addr);
 	void generate_software(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+
+	template <reg_bank DST_GLOBAL, typename T> void generate_logic_op(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint32_t dst_code, T &&body);
 
 	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_chk(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
 	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_movd(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);

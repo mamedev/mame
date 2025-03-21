@@ -1495,7 +1495,9 @@ void drcbe_x86::emit_mov_r32_p32(Assembler &a, Gp const &reg, be_parameter const
 			a.mov(reg, param.immediate());                                              // mov   reg,param
 	}
 	else if (param.is_memory())
+	{
 		a.mov(reg, MABS(param.memory()));                                               // mov   reg,[param]
+	}
 	else if (param.is_int_register())
 	{
 		if (reg.id() != param.ireg())
@@ -3839,14 +3841,14 @@ void drcbe_x86::op_store(Assembler &a, const instruction &inst)
 	if (size == SIZE_BYTE && (srcreg.id() & 4)) // FIXME: &4?
 		srcreg = eax;
 
-	// degenerate case: constant index
 	if (indp.is_immediate())
 	{
+		// degenerate case: constant index
 		int const scale = 1 << (scalesizep.scale());
 
-		// immediate source
 		if (srcp.is_immediate())
 		{
+			// immediate source
 			if (size == SIZE_BYTE)
 				a.mov(MABS(basep.memory(scale*indp.immediate()), 1), srcp.immediate()); // mov   [basep + scale*indp],srcp
 			else if (size == SIZE_WORD)
@@ -3860,14 +3862,14 @@ void drcbe_x86::op_store(Assembler &a, const instruction &inst)
 																						// mov   [basep + scale*indp + 4],srcp >> 32
 			}
 		}
-
-		// variable source
 		else
 		{
+			// variable source
 			if (size != SIZE_QWORD)
 				emit_mov_r32_p32(a, srcreg, srcp);                                      // mov   srcreg,srcp
 			else
 				emit_mov_r64_p64(a, srcreg, edx, srcp);                                 // mov   edx:srcreg,srcp
+
 			if (size == SIZE_BYTE)
 				a.mov(MABS(basep.memory(scale*indp.immediate())), srcreg.r8());         // mov   [basep + scale*indp],srcreg
 			else if (size == SIZE_WORD)
@@ -3881,16 +3883,15 @@ void drcbe_x86::op_store(Assembler &a, const instruction &inst)
 			}
 		}
 	}
-
-	// normal case: variable index
 	else
 	{
+		// normal case: variable index
 		Gp const indreg = indp.select_register(ecx);
 		emit_mov_r32_p32(a, indreg, indp);                                              // mov   indreg,indp
 
-		// immediate source
 		if (srcp.is_immediate())
 		{
+			// immediate source
 			if (size == SIZE_BYTE)
 				a.mov(ptr(u64(basep.memory()), indreg, scalesizep.scale(), 1), srcp.immediate());   // mov   [basep + 1*ecx],srcp
 			else if (size == SIZE_WORD)
@@ -3904,10 +3905,9 @@ void drcbe_x86::op_store(Assembler &a, const instruction &inst)
 																						// mov   [basep + 8*ecx + 4],srcp >> 32
 			}
 		}
-
-		// variable source
 		else
 		{
+			// variable source
 			if (size != SIZE_QWORD)
 				emit_mov_r32_p32(a, srcreg, srcp);                                      // mov   srcreg,srcp
 			else
