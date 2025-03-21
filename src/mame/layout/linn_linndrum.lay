@@ -257,6 +257,12 @@ copyright-holders:m1macrophage
 		<element ref="display_digit" name="~display_output~1"><bounds x="44" y="5" width="30" height="38"/></element>
 	</group>
 
+	<element name="script_warning" defstate="1">
+		<text state="1" string="*** to control sliders and knobs with a mouse, enable the layout plugin ***">
+			<color red="0.82" green="0.43" blue="0.31"/>
+		</text>
+	</element>
+
 	<view name="Default Layout">
 		<bounds x="53" y="49" width="2113" height="1112"/>
 
@@ -268,6 +274,9 @@ copyright-holders:m1macrophage
 		<element ref="wood"><bounds x="2092" y="50" width="72" height="1104"/></element>
 		<element ref="dark_line"><bounds x="160" y="283" width="1897" height="3"/></element>
 		<element ref="dark_line"><bounds x="160" y="321" width="1897" height="3"/></element>
+		<collection name="script warning">
+			<element ref="script_warning" id="warning"><bounds x="160" y="355" width="1897" height="30"/></element>
+		</collection>
 
 		<!-- I/O -->
 		<element ref="jack"><bounds x="655" y="64" width="18" height="6"/></element>
@@ -610,6 +619,8 @@ copyright-holders:m1macrophage
 					local gain_input = "pot_gain_" .. i
 					add_vertical_slider(view, "slider_" .. gain_input, "slider_knob_" .. gain_input, gain_input)
 				end
+
+				view.items["warning"]:set_state(0)
 			end)
 
 		-----------------------------------------------------------------------
