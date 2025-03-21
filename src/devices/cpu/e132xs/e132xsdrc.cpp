@@ -193,10 +193,10 @@ void hyperstone_device::code_flush_cache()
 /* Return the entry point for a determinated trap */
 void hyperstone_device::generate_get_trap_addr(drcuml_block &block, uml::code_label &label, uint32_t trapno)
 {
-	int no_subtract;
+	const int no_subtract = label++;
 	UML_MOV(block, I0, trapno);
 	UML_CMP(block, mem(&m_core->trap_entry), 0xffffff00);
-	UML_JMPc(block, uml::COND_E, no_subtract = label++);
+	UML_JMPc(block, uml::COND_E, no_subtract);
 	UML_SUB(block, I0, 63, I0);
 
 	UML_LABEL(block, no_subtract);

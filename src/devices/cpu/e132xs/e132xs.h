@@ -524,7 +524,9 @@ private:
 	void generate_exception(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint32_t addr);
 	void generate_software(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
 
-	template <reg_bank DST_GLOBAL, typename T> void generate_logic_op(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint32_t dst_code, T &&body);
+	void generate_trap_on_overflow(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL, typename T> void generate_logic_op(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, T &&body);
+	template <reg_bank DST_GLOBAL, typename T> void generate_logic_op_imm(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint32_t dst_code, T &&body);
 
 	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_chk(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
 	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_movd(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);

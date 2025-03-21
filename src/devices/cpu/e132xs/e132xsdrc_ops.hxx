@@ -440,34 +440,30 @@ void hyperstone_device::generate_trap_exception_or_int(drcuml_block &block)
 {
 	UML_ADD(block, I7, I7, mem(&m_core->clock_cycles_2));
 
-	UML_MOV(block, I4, DRC_SR);
+	UML_MOV(block, I4, DRC_SR);                                   // I4 = old SR
 
-	UML_ROLAND(block, I1, DRC_SR, 7, 0x7f);
-	UML_ROLAND(block, I2, DRC_SR, 11, 0xf);
-	UML_MOVc(block, uml::COND_Z, I2, 16);
-	UML_ADD(block, I3, I1, I2);
+	UML_MOV(block, I1, I4);                                       // I1 = SR to be updated
+	UML_ROLAND(block, I3, I4, 7, 0x7f);                           // I3 = old FP
+	UML_ROLAND(block, I2, I4, 11, 0xf);                           // I2 = old FL
+	UML_MOVc(block, uml::COND_Z, I2, 16);                         // convert FL == 0 to 16
+	UML_ADD(block, I3, I3, I2);                                   // I3 = updated FP
 
-	if (TYPE != IS_TRAP)
-		UML_ROLINS(block, DRC_SR,  2, 21, 0x01e00000);
-	else
-		UML_ROLINS(block, DRC_SR,  6, 21, 0x01e00000);
-	UML_ROLINS(block, DRC_SR, I3, 25, 0xfe000000);
+	UML_SHL(block, I2, I3, 25);                                   // I2 = updated FP:...
+	UML_OR(block, I2, I2, ((TYPE != IS_TRAP) ? 2 : 6) << 21);     // I2 = updated FP:FL:...
+	UML_ROLINS(block, I1, I2, 0, 0xffe00000);                     // update FP and FL in I1
+	UML_AND(block, I1, I1, ~(M_MASK | T_MASK));                   // clear M and T, set S and L, set I for INT
+	UML_OR(block, I1, I1, (TYPE == IS_INT) ? (L_MASK | S_MASK | I_MASK) : (L_MASK | S_MASK));
+	UML_MOV(block, DRC_SR, I1);                                   // store updated SR
 
-	UML_AND(block, I1, I3, 0x3f);
+	UML_AND(block, I3, I3, 0x3f);                                 // save old PC at updated (FP)^
 	UML_AND(block, I2, DRC_PC, ~uint32_t(1));
-	UML_ROLINS(block, I2, DRC_SR, 32-S_SHIFT, 1);
-	UML_STORE(block, (void *)m_core->local_regs, I1, I2, SIZE_DWORD, SCALE_x4);
-	UML_ADD(block, I2, I1, 1);
-	UML_AND(block, I3, I2, 0x3f);
+	UML_ROLINS(block, I2, I4, 32 - S_SHIFT, 1);
+	UML_STORE(block, (void *)m_core->local_regs, I3, I2, SIZE_DWORD, SCALE_x4);
+	UML_ADD(block, I3, I3, 1);                                    // save old SR at updated (FP + 1)^
+	UML_AND(block, I3, I3, 0x3f);
 	UML_STORE(block, (void *)m_core->local_regs, I3, I4, SIZE_DWORD, SCALE_x4);
 
-	UML_AND(block, DRC_SR, DRC_SR, ~(M_MASK | T_MASK));
-	if (TYPE == IS_INT)
-		UML_OR(block, DRC_SR, DRC_SR, (L_MASK | S_MASK | I_MASK));
-	else
-		UML_OR(block, DRC_SR, DRC_SR, (L_MASK | S_MASK));
-
-	UML_MOV(block, DRC_PC, I0);
+	UML_MOV(block, DRC_PC, I0);                                   // branch to exception handler
 	generate_branch(block, DRC_PC, nullptr, true);
 }
 
@@ -566,26 +562,74 @@ void hyperstone_device::generate_software(drcuml_block &block, compiler_state &c
 
 
 
-template <hyperstone_device::reg_bank DST_GLOBAL, typename T>
-inline void hyperstone_device::generate_logic_op(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint32_t dst_code, T &&body)
+void hyperstone_device::generate_trap_on_overflow(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)
 {
-	// clobbers I0, I1 and I3, body should update I0 and set Z flag
+	const int no_exception = compiler.m_labelnum++;
+	UML_TEST(block, DRC_SR, V_MASK);
+	UML_JMPc(block, uml::COND_Z, no_exception);
+	UML_ROLINS(block, DRC_SR, ((desc->length >> 1) << ILC_SHIFT), 0, ILC_MASK);
+	generate_get_trap_addr(block, compiler.m_labelnum, TRAPNO_RANGE_ERROR);
+	generate_trap_exception_or_int<IS_EXCEPTION>(block);
+	UML_LABEL(block, no_exception);
+}
+
+
+template <hyperstone_device::reg_bank DST_GLOBAL, hyperstone_device::reg_bank SRC_GLOBAL, typename T>
+inline void hyperstone_device::generate_logic_op(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, T &&body)
+{
+	// body takes operands in I0 and I0 and should update I0 and set Z flag
+	// body must not clobber I2 or I3
+
+	UML_MOV(block, I7, mem(&m_core->clock_cycles_1));
+
+	const uint16_t op = desc->opptr.w[0];
 
 	generate_check_delay_pc(block, compiler, desc);
 
+	const uint32_t dst_code = (op & 0xf0) >> 4;
+	const uint32_t src_code = op & 0xf;
+
+	UML_MOV(block, I2, DRC_SR);
+	if (!SRC_GLOBAL || !DST_GLOBAL)
+		UML_ROLAND(block, I3, I2, 7, 0x7f);
+
+	generate_load_operand(block, compiler, SRC_GLOBAL, src_code, uml::I1, uml::I1);
+	generate_load_operand(block, compiler, DST_GLOBAL, dst_code, uml::I0, uml::I3);
+
+	body();
+
+	UML_SETc(block, uml::COND_Z, I1);
+	UML_ROLINS(block, I2, I1, Z_SHIFT, Z_MASK);
+	UML_MOV(block, DRC_SR, I2);
+
+	generate_set_dst(block, compiler, desc, DST_GLOBAL, dst_code, uml::I0, uml::I3, false);
+}
+
+
+template <hyperstone_device::reg_bank DST_GLOBAL, typename T>
+inline void hyperstone_device::generate_logic_op_imm(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint32_t dst_code, T &&body)
+{
+	// clobbers I0, I1 and I3
+	// body should update I0 and set Z flag
+	// body must not clobber I2 or I3
+
+	generate_check_delay_pc(block, compiler, desc);
+
+	UML_MOV(block, I2, DRC_SR);
 	if (!DST_GLOBAL)
-		UML_ROLAND(block, I3, DRC_SR, 7, 0x7f);
+		UML_ROLAND(block, I3, I2, 7, 0x7f);
 
 	generate_load_operand(block, compiler, DST_GLOBAL, dst_code, uml::I0, uml::I3);
 
 	body();
 
-	UML_MOVc(block, uml::COND_Z, I1, Z_MASK);
-	UML_MOVc(block, uml::COND_NZ, I1, 0);
-	UML_ROLINS(block, DRC_SR, I1, 0, Z_MASK);
+	UML_SETc(block, uml::COND_Z, I1);
+	UML_ROLINS(block, I2, I1, Z_SHIFT, Z_MASK);
+	UML_MOV(block, DRC_SR, I2);
 
 	generate_set_dst(block, compiler, desc, DST_GLOBAL, dst_code, uml::I0, uml::I3, false);
 }
+
 
 
 template <hyperstone_device::reg_bank DST_GLOBAL, hyperstone_device::reg_bank SRC_GLOBAL>
@@ -883,9 +927,9 @@ void hyperstone_device::generate_divsu(drcuml_block &block, compiler_state &comp
 		UML_DDIVU(block, I2, I4, I1, I0);
 
 	UML_AND(block, I3, DRC_SR, ~(V_MASK | Z_MASK | N_MASK));
-	UML_TEST(block, I2, ~0);
-	UML_MOVc(block, uml::COND_Z, I0, Z_MASK);
-	UML_MOVc(block, uml::COND_NZ, I0, 0);
+	UML_TEST(block, I2, ~uint32_t(0));
+	UML_SETc(block, uml::COND_Z, I0);
+	UML_SHL(block, I0, I0, Z_SHIFT);
 	UML_ROLINS(block, I0, I2, 3, N_MASK);
 	UML_OR(block, DRC_SR, I3, I0);
 
@@ -1012,15 +1056,16 @@ void hyperstone_device::generate_mask(drcuml_block &block, compiler_state &compi
 
 	generate_check_delay_pc(block, compiler, desc);
 
+	UML_MOV(block, I2, DRC_SR);
 	if (!SRC_GLOBAL || !DST_GLOBAL)
-		UML_ROLAND(block, I3, DRC_SR, 7, 0x7f);
+		UML_ROLAND(block, I3, I2, 7, 0x7f);
 
 	generate_load_operand(block, compiler, SRC_GLOBAL, src_code, uml::I0, uml::I0);
 
 	UML_AND(block, I0, I0, src);
-	UML_MOVc(block, uml::COND_Z, I1, Z_MASK);
-	UML_MOVc(block, uml::COND_NZ, I1, 0);
-	UML_ROLINS(block, DRC_SR, I1, 0, Z_MASK);
+	UML_SETc(block, uml::COND_Z, I1);
+	UML_ROLINS(block, I2, I1, Z_SHIFT, Z_MASK);
+	UML_MOV(block, DRC_SR, I2);
 
 	generate_set_dst(block, compiler, desc, DST_GLOBAL, dst_code, uml::I0, uml::I3, true);
 }
@@ -1244,13 +1289,7 @@ void hyperstone_device::generate_adds(drcuml_block &block, compiler_state &compi
 	UML_MOV(block, DRC_SR, I2);
 
 	generate_set_dst(block, compiler, desc, DST_GLOBAL, dst_code, uml::I0, uml::I3, false);
-
-	const int no_exception = compiler.m_labelnum++;
-	UML_TEST(block, DRC_SR, V_MASK);
-	UML_JMPc(block, uml::COND_Z, no_exception);
-	UML_ROLINS(block, DRC_SR, ((desc->length >> 1) << ILC_SHIFT), 0, ILC_MASK);
-	generate_trap_exception_or_int<IS_EXCEPTION>(block);
-	UML_LABEL(block, no_exception);
+	generate_trap_on_overflow(block, compiler, desc);
 }
 
 
@@ -1363,13 +1402,7 @@ void hyperstone_device::generate_subs(drcuml_block &block, compiler_state &compi
 	UML_MOV(block, DRC_SR, I2);
 
 	generate_set_dst(block, compiler, desc, DST_GLOBAL, dst_code, uml::I0, uml::I3, false);
-
-	const int no_exception = compiler.m_labelnum++;
-	UML_TEST(block, DRC_SR, V_MASK);
-	UML_JMPc(block, uml::COND_Z, no_exception);
-	UML_ROLINS(block, DRC_SR, ((desc->length >> 1) << ILC_SHIFT), 0, ILC_MASK);
-	generate_trap_exception_or_int<IS_EXCEPTION>(block);
-	UML_LABEL(block, no_exception);
+	generate_trap_on_overflow(block, compiler, desc);
 }
 
 
@@ -1438,118 +1471,74 @@ void hyperstone_device::generate_neg(drcuml_block &block, compiler_state &compil
 template <hyperstone_device::reg_bank DST_GLOBAL, hyperstone_device::reg_bank SRC_GLOBAL>
 void hyperstone_device::generate_negs(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)
 {
-	osd_printf_error("Unimplemented: generate_negs (%08x)\n", desc->pc);
-	fflush(stdout);
-	fatalerror(" ");
+	UML_MOV(block, I7, mem(&m_core->clock_cycles_1));
+
+	const uint16_t op = desc->opptr.w[0];
+
+	generate_check_delay_pc(block, compiler, desc);
+
+	const uint32_t dst_code = (op & 0xf0) >> 4;
+	const uint32_t src_code = op & 0xf;
+
+	UML_MOV(block, I2, DRC_SR);
+	if (!SRC_GLOBAL || !DST_GLOBAL)
+		UML_ROLAND(block, I3, I2, 7, 0x7f);
+
+	generate_load_src_addsub(block, compiler, SRC_GLOBAL, src_code, uml::I0, uml::I0, uml::I2);
+
+	UML_SUB(block, I0, 0, I0);
+
+	generate_update_flags_addsubs(block, compiler, uml::I2);
+	UML_MOV(block, DRC_SR, I2);
+
+	generate_set_dst(block, compiler, desc, DST_GLOBAL, dst_code, uml::I0, uml::I3, true);
+
+	if (!SRC_GLOBAL || (src_code != SR_REGISTER)) // negating carry cannot result in overflow
+		generate_trap_on_overflow(block, compiler, desc);
 }
 
 
 template <hyperstone_device::reg_bank DST_GLOBAL, hyperstone_device::reg_bank SRC_GLOBAL>
 void hyperstone_device::generate_and(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)
 {
-	UML_MOV(block, I7, mem(&m_core->clock_cycles_1));
-
-	const uint16_t op = desc->opptr.w[0];
-
-	generate_check_delay_pc(block, compiler, desc);
-
-	const uint32_t dst_code = (op & 0xf0) >> 4;
-	const uint32_t src_code = op & 0xf;
-
-	if (!SRC_GLOBAL || !DST_GLOBAL)
-		UML_ROLAND(block, I3, DRC_SR, 7, 0x7f);
-
-	generate_load_operand(block, compiler, SRC_GLOBAL, src_code, uml::I1, uml::I1);
-	generate_load_operand(block, compiler, DST_GLOBAL, dst_code, uml::I0, uml::I3);
-
-	UML_AND(block, I0, I0, I1);
-	UML_MOVc(block, uml::COND_Z, I1, Z_MASK);
-	UML_MOVc(block, uml::COND_NZ, I1, 0);
-	UML_ROLINS(block, DRC_SR, I1, 0, Z_MASK);
-
-	generate_set_dst(block, compiler, desc, DST_GLOBAL, dst_code, uml::I0, uml::I3, false);
+	generate_logic_op<DST_GLOBAL, SRC_GLOBAL>(
+			block,
+			compiler,
+			desc,
+			[&block] () { UML_AND(block, I0, I0, I1); });
 }
 
 
 template <hyperstone_device::reg_bank DST_GLOBAL, hyperstone_device::reg_bank SRC_GLOBAL>
 void hyperstone_device::generate_andn(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)
 {
-	UML_MOV(block, I7, mem(&m_core->clock_cycles_1));
-
-	const uint16_t op = desc->opptr.w[0];
-
-	generate_check_delay_pc(block, compiler, desc);
-
-	const uint32_t dst_code = (op & 0xf0) >> 4;
-	const uint32_t src_code = op & 0xf;
-
-	if (!SRC_GLOBAL || !DST_GLOBAL)
-		UML_ROLAND(block, I3, DRC_SR, 7, 0x7f);
-
-	generate_load_operand(block, compiler, SRC_GLOBAL, src_code, uml::I1, uml::I1);
-	generate_load_operand(block, compiler, DST_GLOBAL, dst_code, uml::I0, uml::I3);
-
-	UML_XOR(block, I1, I1, ~uint32_t(0));
-	UML_AND(block, I0, I0, I1);
-	UML_MOVc(block, uml::COND_Z, I1, Z_MASK);
-	UML_MOVc(block, uml::COND_NZ, I1, 0);
-	UML_ROLINS(block, DRC_SR, I1, 0, Z_MASK);
-
-	generate_set_dst(block, compiler, desc, DST_GLOBAL, dst_code, uml::I0, uml::I3, false);
+	generate_logic_op<DST_GLOBAL, SRC_GLOBAL>(
+			block,
+			compiler,
+			desc,
+			[&block] () { UML_XOR(block, I1, I1, ~uint32_t(0)); UML_AND(block, I0, I0, I1); });
 }
 
 
 template <hyperstone_device::reg_bank DST_GLOBAL, hyperstone_device::reg_bank SRC_GLOBAL>
 void hyperstone_device::generate_or(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)
 {
-	UML_MOV(block, I7, mem(&m_core->clock_cycles_1));
-
-	const uint16_t op = desc->opptr.w[0];
-
-	generate_check_delay_pc(block, compiler, desc);
-
-	const uint32_t dst_code = (op & 0xf0) >> 4;
-	const uint32_t src_code = op & 0xf;
-
-	if (!SRC_GLOBAL || !DST_GLOBAL)
-		UML_ROLAND(block, I3, DRC_SR, 7, 0x7f);
-
-	generate_load_operand(block, compiler, SRC_GLOBAL, src_code, uml::I1, uml::I1);
-	generate_load_operand(block, compiler, DST_GLOBAL, dst_code, uml::I0, uml::I3);
-
-	UML_OR(block, I0, I0, I1);
-	UML_MOVc(block, uml::COND_Z, I1, Z_MASK);
-	UML_MOVc(block, uml::COND_NZ, I1, 0);
-	UML_ROLINS(block, DRC_SR, I1, 0, Z_MASK);
-
-	generate_set_dst(block, compiler, desc, DST_GLOBAL, dst_code, uml::I0, uml::I3, false);
+	generate_logic_op<DST_GLOBAL, SRC_GLOBAL>(
+			block,
+			compiler,
+			desc,
+			[&block] () { UML_OR(block, I0, I0, I1); });
 }
 
 
 template <hyperstone_device::reg_bank DST_GLOBAL, hyperstone_device::reg_bank SRC_GLOBAL>
 void hyperstone_device::generate_xor(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)
 {
-	UML_MOV(block, I7, mem(&m_core->clock_cycles_1));
-
-	const uint16_t op = desc->opptr.w[0];
-
-	generate_check_delay_pc(block, compiler, desc);
-
-	const uint32_t dst_code = (op & 0xf0) >> 4;
-	const uint32_t src_code = op & 0xf;
-
-	if (!SRC_GLOBAL || !DST_GLOBAL)
-		UML_ROLAND(block, I3, DRC_SR, 7, 0x7f);
-
-	generate_load_operand(block, compiler, SRC_GLOBAL, src_code, uml::I1, uml::I1);
-	generate_load_operand(block, compiler, DST_GLOBAL, dst_code, uml::I0, uml::I3);
-
-	UML_XOR(block, I0, I0, I1);
-	UML_MOVc(block, uml::COND_Z, I1, Z_MASK);
-	UML_MOVc(block, uml::COND_NZ, I1, 0);
-	UML_ROLINS(block, DRC_SR, I1, 0, Z_MASK);
-
-	generate_set_dst(block, compiler, desc, DST_GLOBAL, dst_code, uml::I0, uml::I3, false);
+	generate_logic_op<DST_GLOBAL, SRC_GLOBAL>(
+			block,
+			compiler,
+			desc,
+			[&block] () { UML_XOR(block, I0, I0, I1); });
 }
 
 
@@ -1565,15 +1554,16 @@ void hyperstone_device::generate_not(drcuml_block &block, compiler_state &compil
 	const uint32_t dst_code = (op & 0xf0) >> 4;
 	const uint32_t src_code = op & 0xf;
 
+	UML_MOV(block, I2, DRC_SR);
 	if (!SRC_GLOBAL || !DST_GLOBAL)
-		UML_ROLAND(block, I3, DRC_SR, 7, 0x7f);
+		UML_ROLAND(block, I3, I2, 7, 0x7f);
 
 	generate_load_operand(block, compiler, SRC_GLOBAL, src_code, uml::I0, uml::I0);
 
 	UML_XOR(block, I0, I0, ~uint32_t(0));
-	UML_MOVc(block, uml::COND_Z, I1, Z_MASK);
-	UML_MOVc(block, uml::COND_NZ, I1, 0);
-	UML_ROLINS(block, DRC_SR, I1, 0, Z_MASK);
+	UML_SETc(block, uml::COND_Z, I1);
+	UML_ROLINS(block, I2, I1, Z_SHIFT, Z_MASK);
+	UML_MOV(block, DRC_SR, I2);
 
 	generate_set_dst(block, compiler, desc, DST_GLOBAL, dst_code, uml::I0, uml::I3, true);
 }
@@ -1816,7 +1806,7 @@ void hyperstone_device::generate_andni(drcuml_block &block, compiler_state &comp
 		src = op & 0x0f;
 	src = ~src;
 
-	generate_logic_op<DST_GLOBAL>(
+	generate_logic_op_imm<DST_GLOBAL>(
 			block,
 			compiler,
 			desc,
@@ -1838,7 +1828,7 @@ void hyperstone_device::generate_ori(drcuml_block &block, compiler_state &compil
 	else
 		src = op & 0x0f;
 
-	generate_logic_op<DST_GLOBAL>(
+	generate_logic_op_imm<DST_GLOBAL>(
 			block,
 			compiler,
 			desc,
@@ -1860,7 +1850,7 @@ void hyperstone_device::generate_xori(drcuml_block &block, compiler_state &compi
 	else
 		src = op & 0x0f;
 
-	generate_logic_op<DST_GLOBAL>(
+	generate_logic_op_imm<DST_GLOBAL>(
 			block,
 			compiler,
 			desc,
@@ -1907,9 +1897,9 @@ void hyperstone_device::generate_shrdi(drcuml_block &block, compiler_state &comp
 		UML_DSHR(block, I2, I2, n);
 	}
 
-	UML_DTEST(block, I2, ~0ULL);
-	UML_MOVc(block, uml::COND_Z, I5, Z_MASK);
-	UML_MOVc(block, uml::COND_NZ, I5, 0);
+	UML_DTEST(block, I2, ~uint64_t(0));
+	UML_SETc(block, uml::COND_Z, I5);
+	UML_SHL(block, I5, I5, Z_SHIFT);
 	UML_DROLINS(block, I5, I2, 3, N_MASK);
 	UML_OR(block, DRC_SR, I4, I5);
 
@@ -2016,8 +2006,8 @@ void hyperstone_device::generate_shr(drcuml_block &block, compiler_state &compil
 
 	UML_LABEL(block, no_shift);
 	UML_TEST(block, I0, ~uint32_t(0));
-	UML_MOVc(block, uml::COND_Z, I2, Z_MASK);
-	UML_MOVc(block, uml::COND_NZ, I2, 0);
+	UML_SETc(block, uml::COND_Z, I2);
+	UML_SHL(block, I2, I2, Z_SHIFT);
 	UML_ROLINS(block, I2, I0, 3, N_MASK);
 
 	UML_OR(block, DRC_SR, I2, I3);
@@ -2047,8 +2037,8 @@ void hyperstone_device::generate_shri(drcuml_block &block, compiler_state &compi
 		UML_ROLINS(block, I1, I0, 32 - (n - 1), 1);
 
 	UML_SHR(block, I0, I0, n);
-	UML_MOVc(block, uml::COND_Z, I2, Z_MASK);
-	UML_MOVc(block, uml::COND_NZ, I2, 0);
+	UML_SETc(block, uml::COND_Z, I2);
+	UML_SHL(block, I2, I2, Z_SHIFT);
 	UML_ROLINS(block, I2, I0, 3, N_MASK);
 	UML_OR(block, DRC_SR, I1, I2);
 
@@ -2098,9 +2088,9 @@ void hyperstone_device::generate_sardi(drcuml_block &block, compiler_state &comp
 		UML_DSAR(block, I2, I2, n);
 	}
 
-	UML_DTEST(block, I2, ~0ULL);
-	UML_MOVc(block, uml::COND_Z, I5, Z_MASK);
-	UML_MOVc(block, uml::COND_NZ, I5, 0);
+	UML_DTEST(block, I2, ~uint64_t(0));
+	UML_SETc(block, uml::COND_Z, I5);
+	UML_SHL(block, I5, I5, Z_SHIFT);
 	UML_DROLINS(block, I5, I2, 3, N_MASK);
 	UML_OR(block, DRC_SR, I4, I5);
 
@@ -2242,9 +2232,9 @@ void hyperstone_device::generate_sari(drcuml_block &block, compiler_state &compi
 		UML_SAR(block, I0, I0, n);
 	}
 
-	UML_TEST(block, I0, ~0);
-	UML_MOVc(block, uml::COND_Z, I3, Z_MASK);
-	UML_MOVc(block, uml::COND_NZ, I3, 0);
+	UML_TEST(block, I0, ~uint32_t(0));
+	UML_SETc(block, uml::COND_Z, I3);
+	UML_SHL(block, I3, I3, Z_SHIFT);
 	UML_OR(block, I2, I2, I3);
 	UML_ROLINS(block, I2, I0, 3, N_MASK);
 	UML_ROLINS(block, DRC_SR, I2, 0, (C_MASK | Z_MASK | N_MASK));
@@ -2308,9 +2298,9 @@ void hyperstone_device::generate_shldi(drcuml_block &block, compiler_state &comp
 	UML_OR(block, I4, I4, V_MASK);
 	UML_LABEL(block, no_overflow);
 
-	UML_DTEST(block, I0, ~0ULL);
-	UML_MOVc(block, uml::COND_Z, I1, Z_MASK);
-	UML_MOVc(block, uml::COND_NZ, I1, 0);
+	UML_DTEST(block, I0, ~uint64_t(0));
+	UML_SETc(block, uml::COND_Z, I1);
+	UML_SHL(block, I1, I1, Z_SHIFT);
 	UML_DROLINS(block, I1, I0, 3, N_MASK);
 	UML_OR(block, I1, I1, I4);
 	UML_ROLINS(block, DRC_SR, I1, 0, (N_MASK | Z_MASK | V_MASK));
@@ -2381,9 +2371,9 @@ void hyperstone_device::generate_shld(drcuml_block &block, compiler_state &compi
 	UML_OR(block, I4, I4, V_MASK);
 	UML_LABEL(block, no_overflow);
 
-	UML_DTEST(block, I0, ~0ULL);
-	UML_MOVc(block, uml::COND_Z, I1, Z_MASK);
-	UML_MOVc(block, uml::COND_NZ, I1, 0);
+	UML_DTEST(block, I0, ~uint64_t(0));
+	UML_SETc(block, uml::COND_Z, I1);
+	UML_SHL(block, I1, I1, Z_SHIFT);
 	UML_DROLINS(block, I1, I0, 3, N_MASK);
 	UML_OR(block, I1, I1, I4);
 	UML_ROLINS(block, DRC_SR, I1, 0, (N_MASK | Z_MASK | V_MASK));
@@ -2446,9 +2436,9 @@ void hyperstone_device::generate_shl(drcuml_block &block, compiler_state &compil
 	UML_OR(block, I6, I6, V_MASK);
 
 	UML_LABEL(block, done_shift);
-	UML_TEST(block, I0, ~0);
-	UML_MOVc(block, uml::COND_Z, I5, Z_MASK);
-	UML_MOVc(block, uml::COND_NZ, I5, 0);
+	UML_TEST(block, I0, ~uint32_t(0));
+	UML_SETc(block, uml::COND_Z, I5);
+	UML_SHL(block, I5, I5, Z_SHIFT);
 	UML_ROLINS(block, I5, I0, 3, N_MASK);
 
 	UML_OR(block, DRC_SR, I5, I6);
@@ -2513,9 +2503,9 @@ void hyperstone_device::generate_shli(drcuml_block &block, compiler_state &compi
 	UML_OR(block, I1, I1, V_MASK);
 	UML_LABEL(block, done_v);
 
-	UML_TEST(block, I5, ~0);
-	UML_MOVc(block, uml::COND_Z, I2, Z_MASK);
-	UML_MOVc(block, uml::COND_NZ, I2, 0);
+	UML_TEST(block, I5, ~uint32_t(0));
+	UML_SETc(block, uml::COND_Z, I2);
+	UML_SHL(block, I2, I2, Z_SHIFT);
 	UML_ROLINS(block, I2, I5, 3, N_MASK);
 	UML_OR(block, DRC_SR, I1, I2);
 
@@ -2596,9 +2586,9 @@ void hyperstone_device::generate_rol(drcuml_block &block, compiler_state &compil
 	UML_OR(block, I6, I6, V_MASK);
 
 	UML_LABEL(block, done_shift);
-	UML_TEST(block, I2, ~0);
-	UML_MOVc(block, uml::COND_Z, I5, Z_MASK);
-	UML_MOVc(block, uml::COND_NZ, I5, 0);
+	UML_TEST(block, I2, ~uint32_t(0));
+	UML_SETc(block, uml::COND_Z, I5);
+	UML_SHL(block, I5, I5, Z_SHIFT);
 	UML_ROLINS(block, I5, I2, 3, N_MASK);
 
 	UML_OR(block, I5, I5, I6);
@@ -3473,9 +3463,9 @@ void hyperstone_device::generate_mulsu(drcuml_block &block, compiler_state &comp
 		UML_MULU(block, I4, I5, I0, I1);
 
 	UML_OR(block, I2, I4, I5);
-	UML_TEST(block, I2, ~0);
-	UML_MOVc(block, uml::COND_NZ, I2, 0);
-	UML_MOVc(block, uml::COND_Z, I2, Z_MASK);
+	UML_TEST(block, I2, ~uint32_t(0));
+	UML_SETc(block, uml::COND_Z, I2);
+	UML_SHL(block, I2, I2, Z_SHIFT);
 	UML_ROLINS(block, I2, I5, 3, N_MASK);
 	UML_ROLINS(block, DRC_SR, I2, 0, (N_MASK | Z_MASK));
 
@@ -3558,9 +3548,9 @@ void hyperstone_device::generate_mul(drcuml_block &block, compiler_state &compil
 	UML_MULU(block, I2, I3, I0, I1);
 
 	UML_AND(block, I4, DRC_SR, ~(Z_MASK | N_MASK));
-	UML_TEST(block, I2, ~0);
-	UML_MOVc(block, uml::COND_Z, I5, Z_MASK);
-	UML_MOVc(block, uml::COND_NZ, I5, 0);
+	UML_TEST(block, I2, ~uint32_t(0));
+	UML_SETc(block, uml::COND_Z, I5);
+	UML_SHL(block, I5, I5, Z_SHIFT);
 	UML_ROLINS(block, I5, I2, 3, N_MASK);
 	UML_ROLINS(block, DRC_SR, I5, 0, (Z_MASK | N_MASK));
 

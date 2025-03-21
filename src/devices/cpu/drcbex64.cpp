@@ -1611,7 +1611,7 @@ void drcbe_x64::shift_op_param(Assembler &a, Inst::Id const opcode, size_t opsiz
 
 		if (carryin)
 		{
-			a.sahf(); // restore flags to keep carry for rolc/rorc
+			a.sahf(); // restore flags to keep carry in for rolc/rorc
 			a.mov(rax, r10);
 		}
 
