@@ -565,10 +565,15 @@
   - Buttons-lamps layout for Sure Shot.
   - Inputs for Sure Shot.
   - Machine config for Sure Shot.
-  - Promote dphla set to working.
-  - Promote sureshoto set to working.
-  - Promote dphlunkb set to working.
+  - Promoted dphla set to working.
+  - Promoted sureshoto set to working.
+  - Promoted dphlunkb set to working.
 
+  - Added a default NVRAM to fastdrwp.
+  - Derivated inputs for fasdrwp.
+  - Added buttons-lamps layout for fastdrwp.
+  - Promoted fastdrwp set to working.
+  
 
   TODO:
 
@@ -1735,7 +1740,35 @@ static INPUT_PORTS_START( sureshoto )
 	PORT_DIPNAME( 0x80, 0x80, "Test Mode" )           PORT_DIPLOCATION("DSW1:1") 
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
 
+
+static INPUT_PORTS_START( fastdrwp )
+
+	PORT_INCLUDE( dphl )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW1:7")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW1:5")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	// number of cards to discard in other games.
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_DIPNAME( 0x80, 0x80, "Test Mode" )           PORT_DIPLOCATION("DSW1:1") 
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -4128,6 +4161,9 @@ ROM_START( fastdrwp )
 
 	ROM_REGION( 0x0100,  "proms", 0 )
 	ROM_LOAD( "u51_bpr.bin",  0x0000, 0x0100, CRC(812dc1f1) SHA1(b2af33ff36f2eca2f782bc2239bc9e54c2564f6a) )
+
+	ROM_REGION( 0x400, "nvram", 0 )  // default NVRAM
+	ROM_LOAD( "fastdrwp_nvram.bin", 0x000, 0x400, CRC(8b9f0c62) SHA1(b6c53444926811c4d3cd30317533ae8168aae843) )
 ROM_END
 
 /*
@@ -5136,7 +5172,7 @@ GAME(  1993, tpoker2,  0,        dphltest, norautp, norautp_state, empty_init, R
 //**************************************************************************************
 
 //     YEAR  NAME       PARENT    MACHINE    INPUT      STATE          INIT        ROT   COMPANY                     FULLNAME                               FLAGS                       LAYOUT
-GAME(  198?, fastdrwp,  0,        dphl,      norautp,   norautp_state, empty_init, ROT0, "Stern Electronics?",       "Fast Draw (poker conversion kit)?",   MACHINE_NOT_WORKING )
+GAMEL( 198?, fastdrwp,  0,        dphl,      fastdrwp,  norautp_state, empty_init, ROT0, "Stern Electronics",        "Fast Draw (poker conversion kit)",    0,                          layout_noraut10 )
 GAMEL( 1983, sureshoto, 0,        sureshoto, sureshoto, norautp_state, init_unka,  ROT0, "SMS Manufacturing Corp.",  "Sure Shot (older, dphl hardware)",    MACHINE_IMPERFECT_GRAPHICS, layout_noraut09_sureshot )
 GAMEL( 198?, dphlunkb,  0,        dphl,      dphla,     norautp_state, init_unkb,  ROT0, "SMS Manufacturing Corp.",  "Draw Poker HI-LO (alt GFX)",          MACHINE_IMPERFECT_GRAPHICS, layout_noraut10 )
 GAME(  198?, pkii_dm,   0,        nortest1,  norautp,   norautp_state, empty_init, ROT0, "<unknown>",                "unknown poker game PKII/DM",          MACHINE_NOT_WORKING )
