@@ -1157,7 +1157,7 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 				m_icount--;
 				t1 = get_1_ri(opcode);
 				t2 = get_2_ri(opcode);
-				set_ri(opcode, t1 >= 32 ? 0 : ((int32_t)t2) << t1);	// sign is not preserved
+				set_ri(opcode, t1 >= 32 ? 0 : ((int32_t)t2) << t1);
 				break;
 
 			default:
