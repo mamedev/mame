@@ -57,7 +57,7 @@ private:
 	void apache3_road_z_w(uint16_t data);
 	void apache3_road_x_w(offs_t offset, uint8_t data);
 
-	uint32_t screen_update_apache3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void apache3_68000_reset(int state);
 
 	void apache3_68000_map(address_map &map) ATTR_COLD;
@@ -181,19 +181,19 @@ void apache3_state::video_start()
 	m_tx_layer->set_transparent_pen(0);
 }
 
-uint32_t apache3_state::screen_update_apache3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t apache3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	m_rotatingsprites->update_cluts();
+	m_sprites->update_cluts();
 
 	m_tx_layer->set_scrollx(0,24);
 
 	bitmap.fill(m_palette->pen(0), cliprect);
 	screen.priority().fill(0, cliprect);
-	m_rotatingsprites->draw_sprites(screen.priority(),cliprect,1,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Alpha pass only
+	m_sprites->draw_sprites(screen.priority(),cliprect,1,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Alpha pass only
 	draw_sky(bitmap, cliprect, 256, m_apache3_rotate_ctrl[1]);
 	apply_shadow_bitmap(bitmap,cliprect,screen.priority(), 0);
 //  draw_ground(bitmap, cliprect);
-	m_rotatingsprites->draw_sprites(bitmap,cliprect,0, (m_sprite_control_ram[0x20]&0x1000) ? 0x1000 : 0);
+	m_sprites->draw_sprites(bitmap,cliprect,0, (m_sprite_control_ram[0x20]&0x1000) ? 0x1000 : 0);
 	m_tx_layer->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }
@@ -468,13 +468,13 @@ void apache3_state::apache3(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(apache3_state::CLOCK_2 / 8, 400, 0, 320, 272, 0, 240); // TODO: Hook up CRTC
-	screen.set_screen_update(FUNC(apache3_state::screen_update_apache3));
+	screen.set_screen_update(FUNC(apache3_state::screen_update));
 
-	TZB215_SPRITES(config, m_rotatingsprites, 0, 0x800);
-	m_rotatingsprites->set_sprite_palette_base(0);
-	m_rotatingsprites->set_palette("rotatingsprites:palette_clut");
-	m_rotatingsprites->set_basepalette(m_palette);
-	m_rotatingsprites->set_spriteram(m_spriteram);
+	TZB215_SPRITES(config, m_sprites, 0, 0x800);
+	m_sprites->set_sprite_palette_base(0);
+	m_sprites->set_palette("sprites:palette_clut");
+	m_sprites->set_basepalette(m_palette);
+	m_sprites->set_spriteram(m_spriteram);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_apache3);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048); // 2048 real colours
@@ -518,7 +518,7 @@ ROM_START( apache3 )
 	ROM_REGION( 0x10000, "sound_rom", 0 ) /* 64k code for sound V20 */
 	ROM_LOAD( "ap-27d.151",   0x00000, 0x10000, CRC(294b4d79) SHA1(2b03418a12a2aaf3919b98161d8d0ce6ae29a2bb) )
 
-	ROM_REGION( 0x100000, "rotatingsprites:sprites_l", 0)
+	ROM_REGION( 0x100000, "sprites:sprites_l", 0)
 	ROM_LOAD32_BYTE( "ap-00c.15",   0x000000, 0x20000, CRC(ad1ddc2b) SHA1(81f64663c4892ab5fb0e2dc99513dbfee73f15b8) )
 	ROM_LOAD32_BYTE( "ap-01c.22",   0x000001, 0x20000, CRC(6286ff00) SHA1(920da4a3a441dbf54ad86c0f4fb6f47a867e9cda) )
 	ROM_LOAD32_BYTE( "ap-04c.58",   0x000002, 0x20000, CRC(dc6d55e4) SHA1(9f48f8d6aa1a329a71913139a8d5a50d95a9b9e5) )
@@ -528,7 +528,7 @@ ROM_START( apache3 )
 	ROM_LOAD32_BYTE( "ap-06c.71",   0x080002, 0x20000, CRC(0ea90e55) SHA1(b16d6b8be4853797507d3e5c933a9dd1d451308e) )
 	ROM_LOAD32_BYTE( "ap-07c.75",   0x080003, 0x20000, CRC(ba685543) SHA1(140a2b708d4e4de4d207fc2c4a96a5cab8639988) )
 
-	ROM_REGION( 0x100000, "rotatingsprites:sprites_h", 0)
+	ROM_REGION( 0x100000, "sprites:sprites_h", 0)
 	ROM_LOAD32_BYTE( "ap-08c.14",   0x000000, 0x20000, CRC(6437b580) SHA1(2b2ba42add18bbec04fbcf53645a8d44b972e26a) )
 	ROM_LOAD32_BYTE( "ap-09c.21",   0x000001, 0x20000, CRC(54d18ef9) SHA1(40ebc6ea49b2a501fe843d60bec8c32d07f2d25d) )
 	ROM_LOAD32_BYTE( "ap-12c.57",   0x000002, 0x20000, CRC(f95cf5cf) SHA1(ce373c648cbf3e4863bbc3a1175efe065c75eb13) )
@@ -567,7 +567,7 @@ ROM_START( apache3a )
 	ROM_REGION( 0x10000, "sound_rom", 0 ) /* 64k code for sound V20 */
 	ROM_LOAD( "ap-27d.151",   0x00000, 0x10000, CRC(294b4d79) SHA1(2b03418a12a2aaf3919b98161d8d0ce6ae29a2bb) )
 
-	ROM_REGION( 0x100000, "rotatingsprites:sprites_l", 0)
+	ROM_REGION( 0x100000, "sprites:sprites_l", 0)
 	ROM_LOAD32_BYTE( "ap-00c.15",   0x000000, 0x20000, CRC(ad1ddc2b) SHA1(81f64663c4892ab5fb0e2dc99513dbfee73f15b8) )
 	ROM_LOAD32_BYTE( "ap-01c.22",   0x000001, 0x20000, CRC(6286ff00) SHA1(920da4a3a441dbf54ad86c0f4fb6f47a867e9cda) )
 	ROM_LOAD32_BYTE( "ap-04c.58",   0x000002, 0x20000, CRC(dc6d55e4) SHA1(9f48f8d6aa1a329a71913139a8d5a50d95a9b9e5) )
@@ -577,7 +577,7 @@ ROM_START( apache3a )
 	ROM_LOAD32_BYTE( "ap-06c.71",   0x080002, 0x20000, CRC(0ea90e55) SHA1(b16d6b8be4853797507d3e5c933a9dd1d451308e) )
 	ROM_LOAD32_BYTE( "ap-07c.75",   0x080003, 0x20000, CRC(ba685543) SHA1(140a2b708d4e4de4d207fc2c4a96a5cab8639988) )
 
-	ROM_REGION( 0x100000, "rotatingsprites:sprites_h", 0)
+	ROM_REGION( 0x100000, "sprites:sprites_h", 0)
 	ROM_LOAD32_BYTE( "ap-08c.14",   0x000000, 0x20000, CRC(6437b580) SHA1(2b2ba42add18bbec04fbcf53645a8d44b972e26a) )
 	ROM_LOAD32_BYTE( "ap-09c.21",   0x000001, 0x20000, CRC(54d18ef9) SHA1(40ebc6ea49b2a501fe843d60bec8c32d07f2d25d) )
 	ROM_LOAD32_BYTE( "ap-12c.57",   0x000002, 0x20000, CRC(f95cf5cf) SHA1(ce373c648cbf3e4863bbc3a1175efe065c75eb13) )
@@ -616,7 +616,7 @@ ROM_START( apache3b )
 	ROM_REGION( 0x10000, "sound_rom", 0 ) /* 64k code for sound V20 */
 	ROM_LOAD( "ap-27d.151",   0x00000, 0x10000, CRC(294b4d79) SHA1(2b03418a12a2aaf3919b98161d8d0ce6ae29a2bb) )
 
-	ROM_REGION( 0x100000, "rotatingsprites:sprites_l", 0)
+	ROM_REGION( 0x100000, "sprites:sprites_l", 0)
 	ROM_LOAD32_BYTE( "ap-00c.15",   0x000000, 0x20000, CRC(ad1ddc2b) SHA1(81f64663c4892ab5fb0e2dc99513dbfee73f15b8) )
 	ROM_LOAD32_BYTE( "ap-01c.22",   0x000001, 0x20000, CRC(6286ff00) SHA1(920da4a3a441dbf54ad86c0f4fb6f47a867e9cda) )
 	ROM_LOAD32_BYTE( "ap-04c.58",   0x000002, 0x20000, CRC(dc6d55e4) SHA1(9f48f8d6aa1a329a71913139a8d5a50d95a9b9e5) )
@@ -626,7 +626,7 @@ ROM_START( apache3b )
 	ROM_LOAD32_BYTE( "ap-06c.71",   0x080002, 0x20000, CRC(0ea90e55) SHA1(b16d6b8be4853797507d3e5c933a9dd1d451308e) )
 	ROM_LOAD32_BYTE( "ap-07c.75",   0x080003, 0x20000, CRC(ba685543) SHA1(140a2b708d4e4de4d207fc2c4a96a5cab8639988) )
 
-	ROM_REGION( 0x100000, "rotatingsprites:sprites_h", 0)
+	ROM_REGION( 0x100000, "sprites:sprites_h", 0)
 	ROM_LOAD32_BYTE( "ap-08c.14",   0x000000, 0x20000, CRC(6437b580) SHA1(2b2ba42add18bbec04fbcf53645a8d44b972e26a) )
 	ROM_LOAD32_BYTE( "ap-09c.21",   0x000001, 0x20000, CRC(54d18ef9) SHA1(40ebc6ea49b2a501fe843d60bec8c32d07f2d25d) )
 	ROM_LOAD32_BYTE( "ap-12c.57",   0x000002, 0x20000, CRC(f95cf5cf) SHA1(ce373c648cbf3e4863bbc3a1175efe065c75eb13) )

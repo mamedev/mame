@@ -60,7 +60,7 @@ private:
 	void gfxdata_w(offs_t offset, uint8_t data);
 	void output_w(uint8_t data);
 
-	uint32_t screen_update_roundup5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void roundup5_68000_map(address_map &map) ATTR_COLD;
 	void roundup5_v30_map(address_map &map) ATTR_COLD;
@@ -386,21 +386,21 @@ void roundup5_state::draw_landscape(bitmap_rgb32 &bitmap, const rectangle &clipr
 	}
 }
 
-uint32_t roundup5_state::screen_update_roundup5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t roundup5_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int tx_start_addr;
 
 	tx_start_addr = (m_hd6445_reg[0xc] << 8) | (m_hd6445_reg[0xd]);
 	tx_start_addr &= 0x3fff;
 
-	m_rotatingsprites->update_cluts();
+	m_sprites->update_cluts();
 
 	m_tx_layer->set_scrollx(0,24);
 	m_tx_layer->set_scrolly(0,(tx_start_addr >> 4) | m_hd6445_reg[0x1d]);
 
 	bitmap.fill(m_palette->pen(384), cliprect); // todo
 	screen.priority().fill(0, cliprect);
-	m_rotatingsprites->draw_sprites(screen.priority(),cliprect,1,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Alpha pass only
+	m_sprites->draw_sprites(screen.priority(),cliprect,1,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Alpha pass only
 	draw_landscape(bitmap,cliprect,0);
 	draw_landscape(bitmap,cliprect,1);
 	draw_road(bitmap,cliprect);
@@ -408,11 +408,11 @@ uint32_t roundup5_state::screen_update_roundup5(screen_device &screen, bitmap_rg
 	if(m_control_word & 0x80) // enabled on map screen after a play
 	{
 		m_tx_layer->draw(screen, bitmap, cliprect, 0,0);
-		m_rotatingsprites->draw_sprites(bitmap,cliprect,0,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Full pass
+		m_sprites->draw_sprites(bitmap,cliprect,0,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Full pass
 	}
 	else
 	{
-		m_rotatingsprites->draw_sprites(bitmap,cliprect,0,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Full pass
+		m_sprites->draw_sprites(bitmap,cliprect,0,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Full pass
 		m_tx_layer->draw(screen, bitmap, cliprect, 0,0);
 	}
 	return 0;
@@ -706,13 +706,13 @@ void roundup5_state::roundup5(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(roundup5_state::CLOCK_2 / 8, 400, 0, 320, 272, 0, 240); // TODO: Hook up CRTC
-	screen.set_screen_update(FUNC(roundup5_state::screen_update_roundup5));
+	screen.set_screen_update(FUNC(roundup5_state::screen_update));
 
-	TZB315_SPRITES(config, m_rotatingsprites, 0, 0x800); // confirmed TZB315, even if it has the smaller CLUT like Apache 3 / TZB215
-	m_rotatingsprites->set_sprite_palette_base(512);
-	m_rotatingsprites->set_palette("rotatingsprites:palette_clut");
-	m_rotatingsprites->set_basepalette(m_palette);
-	m_rotatingsprites->set_spriteram(m_spriteram);
+	TZB315_SPRITES(config, m_sprites, 0, 0x800); // confirmed TZB315, even if it has the smaller CLUT like Apache 3 / TZB215
+	m_sprites->set_sprite_palette_base(512);
+	m_sprites->set_palette("sprites:palette_clut");
+	m_sprites->set_basepalette(m_palette);
+	m_sprites->set_spriteram(m_spriteram);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_roundup5);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024); // 1024 real colours
@@ -749,7 +749,7 @@ ROM_START( roundup5 )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "ru-28d",   0x000000, 0x10000, CRC(df36c6c5) SHA1(c046482043f6b54c55696ba3d339ffb11d78f674) )
 
-	ROM_REGION( 0x0c0000, "rotatingsprites:sprites_l", 0)
+	ROM_REGION( 0x0c0000, "sprites:sprites_l", 0)
 	ROM_LOAD32_BYTE( "ru-00b",   0x000000, 0x20000, CRC(388a0647) SHA1(e4ab43832872f44c0fe1aaede4372cc00ca7d32b) )
 	ROM_LOAD32_BYTE( "ru-02b",   0x000001, 0x20000, CRC(eff33945) SHA1(3f4c3aaa11ccf945c2f898dfdf815705d8539e21) )
 	ROM_LOAD32_BYTE( "ru-04b",   0x000002, 0x20000, CRC(40fda247) SHA1(f5fbc07fda024baedf35ac209210e94df9f15065) )
@@ -759,7 +759,7 @@ ROM_START( roundup5 )
 	ROM_LOAD32_BYTE( "ru-05b",   0x080002, 0x10000, CRC(23dd10e1) SHA1(f30ff1a8c7ed9bc567b901cbdd202028fffb9f80) )
 	ROM_LOAD32_BYTE( "ru-07b",   0x080003, 0x10000, CRC(bb40f46e) SHA1(da694e16d19f60a0dee47551f00f3e50b2d5dcaf) )
 
-	ROM_REGION( 0x0c0000, "rotatingsprites:sprites_h", 0)
+	ROM_REGION( 0x0c0000, "sprites:sprites_h", 0)
 	ROM_LOAD32_BYTE( "ru-08b",   0x000000, 0x20000, CRC(01729e3c) SHA1(1445287fde0b993d053aab73efafc902a6b7e2cc) )
 	ROM_LOAD32_BYTE( "ru-10b",   0x000001, 0x20000, CRC(cd2357a7) SHA1(313460a74244325ce2c659816f2b738f3dc5358a) )
 	ROM_LOAD32_BYTE( "ru-12b",   0x000002, 0x20000, CRC(ca63b1f8) SHA1(a50ef8259745dc166eb0a1b2c812ff620818a755) )

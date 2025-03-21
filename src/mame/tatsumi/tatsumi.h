@@ -25,7 +25,7 @@ public:
 		, m_subcpu(*this, "sub")
 		, m_ym2151(*this, "ymsnd")
 		, m_oki(*this, "oki")
-		, m_rotatingsprites(*this, "rotatingsprites")
+		, m_sprites(*this, "sprites")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 		, m_videoram(*this, "videoram")
@@ -44,7 +44,7 @@ protected:
 	required_device<m68000_base_device> m_subcpu;
 	optional_device<ym2151_device> m_ym2151;
 	required_device<okim6295_device> m_oki;
-	required_device<tzbx15_device> m_rotatingsprites;
+	required_device<tzbx15_device> m_sprites;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 

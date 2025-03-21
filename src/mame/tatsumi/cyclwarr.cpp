@@ -178,7 +178,7 @@ private:
 
 	template<int Bank> TILE_GET_INFO_MEMBER(get_tile_info_cyclwarr_road);
 
-	uint32_t screen_update_cyclwarr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void common_map(address_map &map) ATTR_COLD;
 	void master_map(address_map &map) ATTR_COLD;
@@ -442,7 +442,7 @@ void cyclwarr_state::draw_bg_layers(screen_device &screen, bitmap_rgb32 &bitmap,
 	draw_bg(screen, bitmap, cliprect, m_layer[0], &m_cyclwarr_videoram[0][0x200], &m_cyclwarr_videoram[0][0x300], m_layer_page_size[0], false, hi_priority);
 }
 
-uint32_t cyclwarr_state::screen_update_cyclwarr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t cyclwarr_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_bigfight_bank=m_bigfight_a40000[0];
 	if (m_bigfight_bank!=m_bigfight_last_bank)
@@ -453,7 +453,7 @@ uint32_t cyclwarr_state::screen_update_cyclwarr(screen_device &screen, bitmap_rg
 		}
 		m_bigfight_last_bank=m_bigfight_bank;
 	}
-	m_rotatingsprites->update_cluts();
+	m_sprites->update_cluts();
 
 	bitmap.fill(m_palette->pen(0), cliprect);
 
@@ -468,10 +468,10 @@ uint32_t cyclwarr_state::screen_update_cyclwarr(screen_device &screen, bitmap_rg
 //  popmessage("%04x %04x %04x %04x",m_video_config[0],m_video_config[1],m_video_config[2],m_video_config[3]);
 
 	screen.priority().fill(0, cliprect);
-	m_rotatingsprites->draw_sprites(screen.priority(),cliprect,1,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Alpha pass only
+	m_sprites->draw_sprites(screen.priority(),cliprect,1,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Alpha pass only
 	draw_bg_layers(screen, bitmap, cliprect, 0);
 	apply_shadow_bitmap(bitmap,cliprect,screen.priority(), m_mixing_control & 1);
-	m_rotatingsprites->draw_sprites(bitmap,cliprect,0,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0);
+	m_sprites->draw_sprites(bitmap,cliprect,0,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0);
 	draw_bg_layers(screen, bitmap, cliprect, 1);
 	return 0;
 }
@@ -962,13 +962,13 @@ void cyclwarr_state::cyclwarr(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(cyclwarr_state::CLOCK_2 / 8, 400, 0, 320, 272, 0, 240); // TODO: Hook up CRTC
-	screen.set_screen_update(FUNC(cyclwarr_state::screen_update_cyclwarr));
+	screen.set_screen_update(FUNC(cyclwarr_state::screen_update));
 
-	TZB315_SPRITES(config, m_rotatingsprites, 0, 0x1000);
-	m_rotatingsprites->set_sprite_palette_base(4096);
-	m_rotatingsprites->set_palette("rotatingsprites:palette_clut");
-	m_rotatingsprites->set_basepalette(m_palette);
-	m_rotatingsprites->set_spriteram(m_spriteram);
+	TZB315_SPRITES(config, m_sprites, 0, 0x1000);
+	m_sprites->set_sprite_palette_base(4096);
+	m_sprites->set_palette("sprites:palette_clut");
+	m_sprites->set_basepalette(m_palette);
+	m_sprites->set_spriteram(m_spriteram);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cyclwarr);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 8192);
@@ -1024,7 +1024,7 @@ ROM_START( cyclwarr )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "cw26a.ic91", 0x000000, 0x10000, CRC(f7a70e3a) SHA1(5581633bf1f15d7f5c1e03de897d65d60f9f1e33) )
 
-	ROM_REGION( 0x100000, "rotatingsprites:sprites_l", 0)
+	ROM_REGION( 0x100000, "sprites:sprites_l", 0)
 	ROM_LOAD32_BYTE( "cw00a.ic26", 0x000000, 0x20000, CRC(058a77f1) SHA1(93f99fcf6ce6714d76af6f6e930115516f0379d3) )
 	ROM_LOAD32_BYTE( "cw08a.ic45", 0x000001, 0x20000, CRC(f53993e7) SHA1(ef2d502ab180d2bc0bdb698c2878fdee9a2c33a8) )
 	ROM_LOAD32_BYTE( "cw02a.ic28", 0x000002, 0x20000, CRC(4dadf3cb) SHA1(e42c56e295a443cb605d48eba23a16fab3c86525) )
@@ -1034,7 +1034,7 @@ ROM_START( cyclwarr )
 	ROM_LOAD32_BYTE( "cw03a.ic29", 0x080002, 0x20000, CRC(3ca6f98e) SHA1(8526fe38d3b4c66e09049ba18651a9e7255d85d6) )
 	ROM_LOAD32_BYTE( "cw11a.ic48", 0x080003, 0x20000, CRC(5d760392) SHA1(7bbda2880af4659c267193ce10ed887a1b54a981) )
 
-	ROM_REGION( 0x100000, "rotatingsprites:sprites_h", 0)
+	ROM_REGION( 0x100000, "sprites:sprites_h", 0)
 	ROM_LOAD32_BYTE( "cw04a.ic30", 0x000000, 0x20000, CRC(f05f594d) SHA1(80effaa517b2154c013419e0bc05fd0797b74c8d) )
 	ROM_LOAD32_BYTE( "cw12a.ic49", 0x000001, 0x20000, CRC(4ac07e8b) SHA1(f9de96fba39d5752d61b8f6be87fb605694624ed) )
 	ROM_LOAD32_BYTE( "cw06a.ic32", 0x000002, 0x20000, CRC(f628edc9) SHA1(473f7ec28000e6bf72782c1c3f4afb5e021bd430) )
@@ -1081,7 +1081,7 @@ ROM_START( cyclwarra )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "cw26a.ic91", 0x000000, 0x10000, CRC(f7a70e3a) SHA1(5581633bf1f15d7f5c1e03de897d65d60f9f1e33) )
 
-	ROM_REGION( 0x100000, "rotatingsprites:sprites_l", 0)
+	ROM_REGION( 0x100000, "sprites:sprites_l", 0)
 	ROM_LOAD32_BYTE( "cw00a.ic26", 0x000000, 0x20000, CRC(058a77f1) SHA1(93f99fcf6ce6714d76af6f6e930115516f0379d3) )
 	ROM_LOAD32_BYTE( "cw08a.ic45", 0x000001, 0x20000, CRC(f53993e7) SHA1(ef2d502ab180d2bc0bdb698c2878fdee9a2c33a8) )
 	ROM_LOAD32_BYTE( "cw02a.ic28", 0x000002, 0x20000, CRC(4dadf3cb) SHA1(e42c56e295a443cb605d48eba23a16fab3c86525) )
@@ -1091,7 +1091,7 @@ ROM_START( cyclwarra )
 	ROM_LOAD32_BYTE( "cw03a.ic29", 0x080002, 0x20000, CRC(3ca6f98e) SHA1(8526fe38d3b4c66e09049ba18651a9e7255d85d6) )
 	ROM_LOAD32_BYTE( "cw11a.ic48", 0x080003, 0x20000, CRC(5d760392) SHA1(7bbda2880af4659c267193ce10ed887a1b54a981) )
 
-	ROM_REGION( 0x100000, "rotatingsprites:sprites_h", 0)
+	ROM_REGION( 0x100000, "sprites:sprites_h", 0)
 	ROM_LOAD32_BYTE( "cw04a.ic30", 0x000000, 0x20000, CRC(f05f594d) SHA1(80effaa517b2154c013419e0bc05fd0797b74c8d) )
 	ROM_LOAD32_BYTE( "cw12a.ic49", 0x000001, 0x20000, CRC(4ac07e8b) SHA1(f9de96fba39d5752d61b8f6be87fb605694624ed) )
 	ROM_LOAD32_BYTE( "cw06a.ic32", 0x000002, 0x20000, CRC(f628edc9) SHA1(473f7ec28000e6bf72782c1c3f4afb5e021bd430) )
@@ -1138,7 +1138,7 @@ ROM_START( cyclwarrb )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "cw26.ic91", 0x000000, 0x10000, CRC(a6485a3a) SHA1(b4fcf541efe48b3ca32065221fe2f59476a4f96a) )
 
-	ROM_REGION( 0x100000, "rotatingsprites:sprites_l", 0)
+	ROM_REGION( 0x100000, "sprites:sprites_l", 0)
 	ROM_LOAD32_BYTE( "cw00.ic26", 0x000000, 0x20000, CRC(ba00c582) SHA1(2cd645b828595acbe62e2f7aad037fcbdc5a543f) )
 	ROM_LOAD32_BYTE( "cw08.ic45", 0x000001, 0x20000, CRC(1583e576) SHA1(646762d1d181231090a18698378f60d09f26f49f) )
 	ROM_LOAD32_BYTE( "cw02.ic28", 0x000002, 0x20000, CRC(8376a744) SHA1(633d20199382f760adfb528f5b13730ddf9016e3) )
@@ -1148,7 +1148,7 @@ ROM_START( cyclwarrb )
 	ROM_LOAD32_BYTE( "cw03.ic29", 0x080002, 0x20000, CRC(951ed812) SHA1(b3db6b467fd626936568773367099c9abcabfab6) )
 	ROM_LOAD32_BYTE( "cw11.ic48", 0x080003, 0x20000, CRC(a7e5bf0b) SHA1(883b943d40f4516a21692beffb12514ad9301f20) )
 
-	ROM_REGION( 0x100000, "rotatingsprites:sprites_h", 0)
+	ROM_REGION( 0x100000, "sprites:sprites_h", 0)
 	ROM_LOAD32_BYTE( "cw04.ic30", 0x000000, 0x20000, CRC(890ea7b1) SHA1(737e58800aa6863aff043ba46c9cebc8ba6c1501) )
 	ROM_LOAD32_BYTE( "cw12.ic49", 0x000001, 0x20000, CRC(1587e96d) SHA1(2ffcb27d90ef29bc79d0a29f46a1d43565935a15) )
 	ROM_LOAD32_BYTE( "cw06.ic32", 0x000002, 0x20000, CRC(47decb23) SHA1(4868c01035175698cb8af7aae80627b51583213f) )
@@ -1187,13 +1187,13 @@ ROM_START( bigfight )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "rom20.ic91",   0x000000, 0x10000, CRC(b3add091) SHA1(8a67bfff75c13fe4d9b89d30449199200d11cea7) ) // == bf36b.ic91
 
-	ROM_REGION( 0x200000, "rotatingsprites:sprites_l", 0 )
+	ROM_REGION( 0x200000, "sprites:sprites_l", 0 )
 	ROM_LOAD32_BYTE( "rom0.ic26",   0x000000, 0x80000, CRC(a4a3c8d6) SHA1(b5365d9bc6068260c23ba9d5971c7c7d7cc07a97) )
 	ROM_LOAD32_BYTE( "rom8.ic45",   0x000001, 0x80000, CRC(220956ed) SHA1(68e0ba1e850101b4cc2778819dfa76f04d88d2d6) )
 	ROM_LOAD32_BYTE( "rom2.ic28",   0x000002, 0x80000, CRC(c4f6d243) SHA1(e23b241b5a40b332165a34e2f1bc4366973b2070) )
 	ROM_LOAD32_BYTE( "rom10.ic47",  0x000003, 0x80000, CRC(0212d472) SHA1(5549461195fd7b6b43c0174462d7fe1a1bac24e9) )
 
-	ROM_REGION( 0x200000, "rotatingsprites:sprites_h", 0 )
+	ROM_REGION( 0x200000, "sprites:sprites_h", 0 )
 	ROM_LOAD32_BYTE( "rom4.ic30",   0x000000, 0x80000, CRC(999ff7e9) SHA1(a53b06ad084722d7a52fcf01c52967f68620e609) )
 	ROM_LOAD32_BYTE( "rom12.ic49",  0x000001, 0x80000, CRC(cb4c1f0b) SHA1(32d64b78ed3d5971eb5d25be2c38e6f2c9048f74) )
 	ROM_LOAD32_BYTE( "rom6.ic32",   0x000002, 0x80000, CRC(f70e2d47) SHA1(00517b5f3b2deb6f3f3bd12df421e63884c22b2e) )
@@ -1235,7 +1235,7 @@ ROM_START( bigfightj ) // ABA-011 main board + ABA-012 daughter board
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "bf36b.ic91", 0x000000, 0x10000, CRC(b3add091) SHA1(8a67bfff75c13fe4d9b89d30449199200d11cea7) ) // rev B
 
-	ROM_REGION( 0x200000, "rotatingsprites:sprites_l", 0 )
+	ROM_REGION( 0x200000, "sprites:sprites_l", 0 )
 	ROM_LOAD32_BYTE( "bf00d.ic26", 0x000000, 0x40000, CRC(f506d508) SHA1(86255631ac139f1b5c0f5d6e54a0858625497a1e) ) // all rev D
 	ROM_LOAD32_BYTE( "bf08d.ic45", 0x000001, 0x40000, CRC(4bf948b9) SHA1(c65b95c454d04c7e4a0cf426ac2d45ddc5e8885e) )
 	ROM_LOAD32_BYTE( "bf02d.ic28", 0x000002, 0x40000, CRC(af30acf7) SHA1(8f4778b33abb18b113d5d27c0e957d633557c988) )
@@ -1244,9 +1244,9 @@ ROM_START( bigfightj ) // ABA-011 main board + ABA-012 daughter board
 	ROM_LOAD32_BYTE( "bf09d.ic46", 0x100001, 0x20000, CRC(284837ed) SHA1(b1c130b45ff0f22985962240c47b7b01df6ac636) )
 	ROM_LOAD32_BYTE( "bf03d.ic29", 0x100002, 0x20000, CRC(2ba0398e) SHA1(ec9a29b661b18980c07a446afc89becb1ebddd57) )
 	ROM_LOAD32_BYTE( "bf11d.ic48", 0x100003, 0x20000, CRC(3f2fa72f) SHA1(4b4821b6933ea753e092f11d80bcc7698f85ccf2) )
-	ROM_COPY("rotatingsprites:sprites_l",          0x100000, 0x180000, 0x080000 )
+	ROM_COPY("sprites:sprites_l",          0x100000, 0x180000, 0x080000 )
 
-	ROM_REGION( 0x200000, "rotatingsprites:sprites_h", 0)
+	ROM_REGION( 0x200000, "sprites:sprites_h", 0)
 	ROM_LOAD32_BYTE( "bf04d.ic30", 0x000000, 0x40000, CRC(6203d320) SHA1(d58225d8a362971a0eb63c94abc1e8c76198fd2a) ) // all rev D
 	ROM_LOAD32_BYTE( "bf12d.ic49", 0x000001, 0x40000, CRC(d261dfa7) SHA1(e787901112780e9770300999722fc80aa1d7ab18) )
 	ROM_LOAD32_BYTE( "bf06d.ic32", 0x000002, 0x40000, CRC(be187c3c) SHA1(46383eb40c0caeb1bc636630a4d849aa2d1a12d2) )
@@ -1255,7 +1255,7 @@ ROM_START( bigfightj ) // ABA-011 main board + ABA-012 daughter board
 	ROM_LOAD32_BYTE( "bf13d.ic50", 0x100001, 0x20000, CRC(1e46cd79) SHA1(c81c96b287a6cc91d3ab4dd8043153814560be3d) )
 	ROM_LOAD32_BYTE( "bf07d.ic33", 0x100002, 0x20000, CRC(4940b0bb) SHA1(762f21055921093349ca09c35ef516bde6330aa8) )
 	ROM_LOAD32_BYTE( "bf15d.ic52", 0x100003, 0x20000, CRC(dab0c80a) SHA1(a172937c9599acbd77dcac02ea7e43f576d66d8c) )
-	ROM_COPY("rotatingsprites:sprites_h",          0x100000, 0x180000, 0x080000 )
+	ROM_COPY("sprites:sprites_h",          0x100000, 0x180000, 0x080000 )
 
 	ROM_REGION( 0x20000, "cw_tileclut", 0 )
 	ROM_LOAD( "bf27.ic128", 0x000000, 0x20000, CRC(da027dcf) SHA1(47d18a8a273fea72cb3ad3d58166fe38ca28a860) )
