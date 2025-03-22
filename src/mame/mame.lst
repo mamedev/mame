@@ -43064,6 +43064,9 @@ plan80
 @source:skeleton/pm68k.cpp
 pm68k
 
+@source:skeleton/powerpack.cpp
+powerpack
+
 @source:skeleton/proteus3.cpp
 proteus3
 
