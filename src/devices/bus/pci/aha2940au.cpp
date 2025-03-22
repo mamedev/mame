@@ -112,17 +112,17 @@ u8 aha2940au_scsi_device::capptr_r()
 void aha2940au_scsi_device::config_map(address_map &map)
 {
 	pci_card_device::config_map(map);
-//	map(0x40, 0x40) DEVCONFIG
-//	map(0x41, 0x41) DEVSTATUS0
-//	map(0x42, 0x42) DEVSTATUS1
-//	map(0x43, 0x43) PCIERRGEN
+//  map(0x40, 0x40) DEVCONFIG
+//  map(0x41, 0x41) DEVSTATUS0
+//  map(0x42, 0x42) DEVSTATUS1
+//  map(0x43, 0x43) PCIERRGEN
 
 	// PME 1.0
 	map(0xdc, 0xdf).lr32(NAME([] { return 0x0001'0001; }));
-//	map(0xe0, 0xe1) PM_CSR
-//	map(0xe2, 0xe2) PMCSR_BSE
-//	map(0xe3, 0xe3) PM_DATA
-//	map(0xff, 0xff) IDENREG
+//  map(0xe0, 0xe1) PM_CSR
+//  map(0xe2, 0xe2) PMCSR_BSE
+//  map(0xe3, 0xe3) PM_DATA
+//  map(0xff, 0xff) IDENREG
 }
 
 void aha2940au_scsi_device::io_map(address_map &map)

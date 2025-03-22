@@ -17,6 +17,7 @@ TODO:
  - IGS 033 appears to encapsulate the behavior of the video/interface chip found in igspoker.cpp
    so could be turned into a device, possibly shared
  - complete inputs / outputs / hopper
+ - huahuas5 needs correct Oki banking
 */
 
 #include "emu.h"
@@ -70,6 +71,7 @@ public:
 
 	void m027_033vid(machine_config &config) ATTR_COLD;
 
+	void init_huahuas5() ATTR_COLD;
 	void init_qiji6() ATTR_COLD;
 
 protected:
@@ -175,6 +177,8 @@ void igs_m027_033vid_state::out_port_w(u8 data)
 
 	m_video_enable = BIT(data, 0);
 
+	// TODO: bit 1 seems to be always set by huahuas5
+
 	m_oki->set_rom_bank(BIT(data, 2));
 
 	m_tilebank = BIT(data, 4);
@@ -205,7 +209,12 @@ void igs_m027_033vid_state::m027_map(address_map &map) // TODO: some unknown wri
 	map(0x3800'7000, 0x3800'77ff).ram().w(FUNC(igs_m027_033vid_state::bg_videoram_w)).share(m_bg_videoram);
 	map(0x3800'7800, 0x3800'7fff).ram().w(FUNC(igs_m027_033vid_state::bg_attr_videoram_w)).share(m_bg_attr_videoram);
 
+	map(0x4000'0008, 0x4000'000b).nopw();
+	map(0x4800'0000, 0x4800'0003).nopw();
+
 	map(0x5000'0000, 0x5000'03ff).umask32(0x0000'00ff).w(FUNC(igs_m027_033vid_state::xor_table_w)); // uploads XOR table to external ROM here
+
+	map(0x7000'0000, 0x7000'01ff).nopw();
 }
 
 
@@ -280,7 +289,7 @@ INPUT_PORTS_START( qiji6 ) // TODO: complete
 	PORT_DIPSETTING(                   0x00000003, "20 (duplicate)" )
 	PORT_DIPSETTING(                   0x00000002, "20 (duplicate)" )
 	PORT_DIPSETTING(                   0x00000001, "20 (duplicate)" )
-	PORT_DIPSETTING(                   0x00000000, "20" )
+	PORT_DIPSETTING(                   0x00000000, "20 (duplicate)" )
 	PORT_DIPUNKNOWN_DIPLOC(0x00000020, 0x00000020, "SW1:6")
 	PORT_DIPUNKNOWN_DIPLOC(0x00000040, 0x00000040, "SW1:7")
 	PORT_DIPNAME(          0x00000080, 0x00000080, "Link Mode" ) PORT_DIPLOCATION("SW1:8") // Hard-coded?
@@ -306,6 +315,16 @@ INPUT_PORTS_START( qiji6 ) // TODO: complete
 	PORT_DIPUNKNOWN_DIPLOC(0x00800000, 0x00800000, "SW2:8")
 	PORT_BIT( 0xff000000, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
+
+INPUT_PORTS_START( huahuas5 )
+	PORT_INCLUDE( qiji6 )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME(          0x00010000, 0x00010000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(                   0x00000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(                   0x00010000, DEF_STR( On ) )
+INPUT_PORTS_END
+
 
 static const gfx_layout tiles8x8x4_layout =
 {
@@ -411,16 +430,39 @@ ROM_START( qiji6 )
 	ROM_LOAD( "v118.u12", 0x00000, 0x80000, CRC(c2729fbe) SHA1(2153675a1161bd6aea6367c55fcf801c7fb0dd3a) )
 
 	ROM_REGION( 0x80000, "igs033", 0 )
-	ROM_LOAD( "7e.u20",  0x000000, 0x080000, CRC(8362eeff) SHA1(1babebe872d253d9131131658e701fbf270d42e2) )
+	ROM_LOAD( "7e.u20", 0x000000, 0x080000, CRC(8362eeff) SHA1(1babebe872d253d9131131658e701fbf270d42e2) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "sp.3", 0x00000, 0x80000, CRC(06b70fe9) SHA1(5df34f870d32893b5c3095fb9653954209712cdb) )
+ROM_END
+
+// 花花世界 5 (Huāhuā Shìjiè 5)
+// IGS PCB-0405-02-FZ + IGS PCB-0492-00 riser board
+ROM_START( huahuas5 )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	// Internal rom of IGS027A ARM based MCU
+	ROM_LOAD( "f11_027a.bin", 0x0000, 0x4000, CRC(f4cacbcf) SHA1(e09f554c1539f37f56d235134754b2a371ea6ad5) )
+
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "v107.u12", 0x00000, 0x80000, CRC(f7b2265a) SHA1(87a5987c39888b18b71675ddfc014a49dab60839) )
+
+	ROM_REGION( 0x80000, "igs033", 0 )
+	ROM_LOAD( "full.u20", 0x000000, 0x080000, CRC(26c30dd7) SHA1(ae53a5986262ce587e414a37e6b3bcb3acec83a5) )
+
+	ROM_REGION( 0x100000, "oki", 0 ) // on the riser board with a PAL, probably for banking
+	ROM_LOAD( "fullsp.u3", 0x000000, 0x100000, CRC(25c7a2a8) SHA1(01133bf0b7ef140e3d1608d49d041fd86c90ac94) ) //  1xxxxxxxxxxxxxxxxxxxx = 0x00
+	ROM_IGNORE(                      0x100000 )
 ROM_END
 
 
 void igs_m027_033vid_state::init_qiji6()
 {
 	qiji6_decrypt(machine());
+}
+
+void igs_m027_033vid_state::init_huahuas5()
+{
+	cjddzlf_decrypt(machine());
 }
 
 } // anonymous namespace
@@ -433,4 +475,6 @@ void igs_m027_033vid_state::init_qiji6()
 ***************************************************************************/
 
 // internal ROM date is 2002, external software revision could be later
-GAME( 2002, qiji6, 0, m027_033vid, qiji6, igs_m027_033vid_state, init_qiji6, ROT0, "IGS", "Qiji 6 (V118CN)", MACHINE_NOT_WORKING ) // lacks hopper support
+GAME( 2002, qiji6,    0, m027_033vid, qiji6,    igs_m027_033vid_state, init_qiji6,    ROT0, "IGS", "Qiji 6 (V118CN)",          MACHINE_NOT_WORKING ) // lacks hopper support
+// internal ROM date is 2004, external software revision could be later
+GAME( 2004, huahuas5, 0, m027_033vid, huahuas5, igs_m027_033vid_state, init_huahuas5, ROT0, "IGS", "Huahua Shijie 5 (V107CN)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // lacks hopper support, Oki banking

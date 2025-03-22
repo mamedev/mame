@@ -10,8 +10,13 @@ NOTE: To start a new game in EAS/PC, press Game Control (aka Reset), activate
 the D6 square, and then press CL. See below for more info.
 
 TODO:
-- Chess Encyclopedia modules don't work on fpres (original program) and feasx,
-  probably unsupported and therefore BTANB?
+- Chess Encyclopedia modules don't work properly on fpres. Prestige doesn't
+  have nvram, it has a load/play switch for swapping modules without having to
+  turn off the chesscomputer. This won't work on MAME, since it forces a hard
+  reset when inserting a new ROM cartridge.
+- Likewise, these modules don't work properly on feasx. It doesn't correctly
+  announce when a new module needs to be inserted. Probably unsupported and
+  therefore BTANB?
 
 BTANB:
 - feasglab locks up at boot if it was powered off in the middle of the game.
@@ -78,6 +83,14 @@ export. They took out the motherboard and leds and placed them inside a little b
 separate from a (ledless) magnetic chessboard. The EAS conversion has unmodified
 ROMs, most commonly seen with the feasgla romset. In MAME, it's available as an
 alternate view (see video options). The EAG conversion is a cloneset of feag.
+
+PC/EAS/EAG are the only Fidelity chesscomputers that officially support the EOA-EOE
+Chess Encyclopedia modules. When it's time to swap modules to a different volume,
+the 7seg display will announce it like "GS 0C", where the last digit indicates
+which module to insert (in this case: Volume C). On EAS/EAG, the user is supposed
+to turn off the chesscomputer before inserting a new module (a hard reset on MAME
+is sufficient). On Prestige, modules need to be swapped on the fly. For the 1st
+version of Prestige, it only works on level A3 or higher.
 
 *******************************************************************************/
 

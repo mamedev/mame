@@ -1,11 +1,11 @@
 // license:BSD-3-Clause
-// copyright-holders:Angelo Salese, Roberto Fresca
+// copyright-holders:Angelo Salese, Roberto Fresca, Grull Osgo
 /******************************************************************************
 
    - NORAUT POKER SYSTEM -
   -------------------------
 
-  Driver by Roberto Fresca & Angelo Salese.
+  Driver by Roberto Fresca, Angelo Salese & Grull Osgo.
 
 
   Games running on this hardware:
@@ -181,7 +181,6 @@
 
 *******************************************************************************
 
-
   Narout System Ports Map
   -----------------------
 
@@ -302,9 +301,7 @@
 
 *******************************************************************************
 
-
   *** Game Notes ***
-
 
   - norautjp:
 
@@ -349,9 +346,7 @@
 
 *******************************************************************************
 
-
   DRIVER UPDATES:
-
 
   [2009-01-27]
 
@@ -368,7 +363,6 @@
   - Added pinout scheme.
   - Added technical notes.
 
-
   [2009-01-28]
 
   - Merged GTI Poker (gtipoker.c) with this driver.
@@ -378,7 +372,6 @@
   - Changed norautpn description from Noraut Poker (No Payout),
     to Noraut Poker (bootleg), since the game has payout system.
   - Some clean-ups.
-
 
   [2009-08-21]
 
@@ -393,7 +386,6 @@
   - Added partial DIP switches to norautrh.
   - Added more technical notes.
 
-
   [2009-08-23/26]
 
   - Added a default NVRAM to Noraut Joker Poker to bypass the 'F U' screen.
@@ -405,7 +397,6 @@
   - Confirmed correct colors. No bipolar PROM involved.
   - Added Noraut Joker Poker hardware and PCB layouts.
   - Documented the discrete audio circuitry. Added a full diagram.
-
 
   [2009-08-29]
 
@@ -420,7 +411,6 @@
   - Added 2 different control panel layouts to the source.
   - Updated technical notes.
 
-
   [2009-08-30]
 
   - Corrected CPU clock to Xtal/8.
@@ -432,7 +422,6 @@
   - Added new handlers to simulate the handshake lines. Still need real support through PPI-2.
   - Updated technical notes.
 
-
   [2009-09-03]
 
   - Routed the whole video RAM access through PPI-2.
@@ -442,12 +431,10 @@
   - Added a new machine driver for extended hardware.
     It has 2 jumpers that cut the a14 and a15 addressing lines.
 
-
   [2009-09-09]
 
   - Added accurate discrete sound system emulation.
   - Fixed the discrete sound system diagram, based on real sound references.
-
 
   [2009-10-12]
 
@@ -464,7 +451,6 @@
     properly emulated. For now, all VRAM access is through direct handlers.
     This allow to remove the hacks per set needed to boot the games.
 
-
   [2009-10-13]
 
   - Added Draw Poker HI-LO (japanese), based on 8080A CPU.
@@ -474,7 +460,6 @@
   - Added 'HI-LO Double Up Joker Poker' from SMS Manufacturing.
   - Added smshilo hardware details and PCB layout.
   - Added smshilo discrete sound circuitry scheme/documentation.
-
 
   [2009-11-26]
 
@@ -505,7 +490,6 @@
   - Fix the Kimble Double HI-LO CPU type.
   - Added notes about the code obfuscation and PPI's handling/offsets.
 
-
   [2009-12-04]
 
   - Added new technical notes.
@@ -519,7 +503,6 @@
     so can be seen/maintained in a cleaner way.
   - Fixed the default lamps state.
 
-
   [2009-12-08]
 
   - Added Fast Draw (poker conversion kit)?. Seems based on 8080 CPU hardware.
@@ -529,24 +512,20 @@
   - Added undumped devices as NO_DUMP.
   - Added some technical notes.
 
-
   [2009-12-08]
 
   - Added Southern Systems Joker Poker. Based on 8080 CPU.
   - Added some technical notes.
-
 
   [2011-01-24]
 
   - Changed DRHL description to "Drews Revenge (v.2.89, set 1)"
   - Added Drews Revenge (v.2.89, set 2). Based on 8080 CPU.
 
-
   [2013-04-09]
 
   - Added GTI Poker? (SMS hardware). Based on 8080 CPU.
   - Added PCB description and sound hardware schematics.
-
 
   [2013-2023]
 
@@ -555,8 +534,7 @@
   - Decryption of noraut3 sets.
   - Working inputs, DIP switches, and button-lamps layouts to noraut3 games.
   - Change game description to noraut3 games, since are dual games selectable
-     through a DIP switch.
-
+    through a DIP switch.
 
   [2025-03]
 
@@ -565,14 +543,14 @@
   - Added new test functions for drhl, drhla, dphl, and dphla.
   - Cleaned all the conditional unused things.
   - Rewrote inputs for different sets.
-  - DIP switches improvements for norautp, norautrh, 
+  - DIP switches improvements for norautp, norautrh,
   - New inputs for norautua, dphla, drhl, ssjkrpkr.
   - New portmap for dphl, dphla.
   - Added Interrupts through vertical sync for all sets based on i8080.
   - Fixed norautua and norautub table for bin to bcd conversion.
   - New button-lamps layout with 10 buttons for dphl, dphla, dphljp,
     drhl, drhla, and ssjkrpkr.
-  - Clickable buttons for all former buttons-lamps layouts. 	
+  - Clickable buttons for all former buttons-lamps layouts.
   - Promoted drhl, drhla, norautua, norautub, and ssjkrpkr to working.
 
   - Implemented a custom timer and counter to get correct reads in unknown hardware.
@@ -580,11 +558,26 @@
   - Promoted dphl, dphljp, and smshilo to working.
   - Added technical notes.
 
+  - Added hopper support.
+  - Extended palette.
+  - Identified dphlunka as Sure Shot.
+  - Custom palette for Sure Shot.
+  - Buttons-lamps layout for Sure Shot.
+  - Inputs for Sure Shot.
+  - Machine config for Sure Shot.
+  - Promoted dphla set to working.
+  - Promoted sureshoto set to working.
+  - Promoted dphlunkb set to working.
+
+  - Added a default NVRAM to fastdrwp.
+  - Derivated inputs for fasdrwp.
+  - Added buttons-lamps layout for fastdrwp.
+  - Promoted fastdrwp set to working.
+
 
   TODO:
 
   - Investigate and document what is connected to port EFh.
-  - dphla and dphlunkb paying issues.
   - Find if wide chars are hardcoded or tied to a bit.
   - Parent/clone relationship.
 
@@ -596,11 +589,8 @@
 
   - dphl type, as dphljp, smshilo, dphlunkb, were flagged as
     imperfect graphics due they show part of a paytable as garbage
-	when you coin/bet the game. After deal, they are not showing 
-	this anymore.
-
-  - dphla and dphlunkb are working, but when pay a hand they are
-    stuck spitting spitting the "call attendant" message.
+    when you coin/bet the game. After deal, they are not showing
+    this anymore.
 
 
 *******************************************************************************/
@@ -611,6 +601,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
+#include "machine/ticket.h"
 #include "machine/timer.h"
 #include "sound/discrete.h"
 #include "emupal.h"
@@ -618,9 +609,10 @@
 
 #include "speaker.h"
 
+#include "noraut09_sureshot.lh"
+#include "noraut10.lh"
 #include "noraut11.lh"
 #include "noraut12.lh"
-#include "noraut10.lh"
 
 
 #define NORAUT_MASTER_CLOCK     XTAL(18'432'000)
@@ -644,6 +636,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_hopper(*this, "hopper"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes"),
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
@@ -661,6 +654,7 @@ public:
 	void ssjkrpkr(machine_config &config);
 	void dphl(machine_config &config);
 	void dphla(machine_config &config);
+	void sureshoto(machine_config &config);
 	void drhl(machine_config &config);
 	void norautxp(machine_config &config);
 	void noraut3(machine_config &config);
@@ -670,9 +664,11 @@ public:
 	void init_ssa();
 	void init_enc();
 	void init_deb();
+	void init_unka();
+	void init_unkb();
 
 protected:
-	virtual void machine_start() override { m_lamps.resolve(); }
+	virtual void machine_start() override { m_lamps.resolve(); save_item(NAME(m_videoram));}
 	virtual void video_start() override ATTR_COLD;
 
 private:
@@ -687,6 +683,7 @@ private:
 	void counterlamps_w(uint8_t data);
 	void norautp_palette(palette_device &palette) const;
 	void drhl_palette(palette_device &palette) const;
+	void sureshoto_palette(palette_device &palette) const;
 	uint32_t screen_update_norautp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void cgidjp_map(address_map &map) ATTR_COLD;
 	void cgidjp_opcodes_map(address_map &map) ATTR_COLD;
@@ -719,13 +716,15 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<ticket_dispenser_device> m_hopper;
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 	output_finder<12> m_lamps;
-	
+
 	int m_test3 = 1;
 	int m_test3b = 0;
 	int m_test_count = 0;
-	
+	uint8_t m_videoram[0x800] = {};
+
 };
 
 
@@ -756,6 +755,8 @@ uint32_t norautp_state::screen_update_norautp(screen_device &screen, bitmap_ind1
 			{
 				int tile = m_np_vram[count] & 0x3f;
 				int colour = (m_np_vram[count] & 0xc0) >> 6;
+				if((y == 4) | ( y == 5))
+					colour = colour + 4;
 
 				m_gfxdecode->gfx(1)->opaque(bitmap,cliprect, tile, colour, 0, 0, (x * 32) + 8, y * 32);
 
@@ -791,6 +792,16 @@ void norautp_state::norautp_palette(palette_device &palette) const
 	palette.set_pen_color(5, rgb_t(0xff, 0x00, 0x00));    // red
 	palette.set_pen_color(6, rgb_t(0xff, 0xff, 0xff));    // white
 	palette.set_pen_color(7, rgb_t(0x00, 0x00, 0x00));    // black
+		// 1st gfx bank
+	palette.set_pen_color(8, rgb_t(0x00, 0x00, 0xff));    // blue
+	palette.set_pen_color(9, rgb_t(0xff, 0xff, 0x00));    // yellow
+	palette.set_pen_color(10, rgb_t(0x00, 0x00, 0xff));    // blue
+	palette.set_pen_color(11, rgb_t(0xff, 0xff, 0xff));    // white
+	palette.set_pen_color(12, rgb_t(0xff, 0xff, 0xff));    // white
+	palette.set_pen_color(13, rgb_t(0xff, 0x00, 0x00));    // red
+	palette.set_pen_color(14, rgb_t(0xff, 0xff, 0xff));    // white
+	palette.set_pen_color(15, rgb_t(0x00, 0x00, 0x00));    // black
+
 }
 
 void norautp_state::drhl_palette(palette_device &palette) const
@@ -804,6 +815,37 @@ void norautp_state::drhl_palette(palette_device &palette) const
 	palette.set_pen_color(5, rgb_t(0x00, 0x00, 0xff));    // red
 	palette.set_pen_color(6, rgb_t(0xff, 0xff, 0x00));    // yellow (white)
 	palette.set_pen_color(7, rgb_t(0x00, 0x00, 0xff));    // blue   (black)
+	palette.set_pen_color(8, rgb_t(0x00, 0x00, 0x00));    // black (blue)
+	palette.set_pen_color(9, rgb_t(0xff, 0xff, 0xff));    // white (yellow)
+	palette.set_pen_color(10, rgb_t(0xff, 0x00, 0x00));    // red   (blue)
+	palette.set_pen_color(11, rgb_t(0xff, 0xff, 0xff));    // white (white)
+	palette.set_pen_color(12, rgb_t(0xff, 0xff, 0xff));    // white
+	palette.set_pen_color(13, rgb_t(0x00, 0x00, 0xff));    // red
+	palette.set_pen_color(14, rgb_t(0xff, 0xff, 0x00));    // yellow (white)
+	palette.set_pen_color(15, rgb_t(0x00, 0x00, 0xff));    // blue   (black)
+}
+
+void norautp_state::sureshoto_palette(palette_device &palette) const
+{
+	// 1st gfx bank
+	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00));    // blue
+	palette.set_pen_color(1, rgb_t(0xff, 0xff, 0x00));    // yellow
+	palette.set_pen_color(2, rgb_t(0x00, 0x00, 0x00));    // blue
+	palette.set_pen_color(3, rgb_t(0xff, 0xff, 0xff));    // white
+	palette.set_pen_color(4, rgb_t(0xff, 0xff, 0xff));    // white
+	palette.set_pen_color(5, rgb_t(0xff, 0x00, 0x00));    // red
+	palette.set_pen_color(6, rgb_t(0xff, 0xff, 0xff));    // white
+	palette.set_pen_color(7, rgb_t(0x00, 0x00, 0x00));    // black
+
+	// alt palette
+	palette.set_pen_color(8,  rgb_t(0xff, 0xff, 0xff));    // white
+	palette.set_pen_color(9,  rgb_t(0x00, 0x00, 0x00));    // cards bg
+	palette.set_pen_color(10, rgb_t(0xff, 0xff, 0xff));    // white
+	palette.set_pen_color(11, rgb_t(0x00, 0x00, 0x00));
+	palette.set_pen_color(12, rgb_t(0xff, 0xff, 0xff));    // white
+	palette.set_pen_color(13, rgb_t(0xff, 0x00, 0x00));
+	palette.set_pen_color(14, rgb_t(0xff, 0xff, 0xff));    // white
+	palette.set_pen_color(15, rgb_t(0xff, 0x00, 0x00));
 }
 
 
@@ -879,6 +921,8 @@ void norautp_state::counterlamps_w(uint8_t data)
 	m_lamps[10] = BIT(data, 0);  // HI lamp
 	m_lamps[11] = BIT(data, 1);  // LO lamp
 
+	m_hopper->motor_w(BIT(data, 2));
+
 	machine().bookkeeping().coin_counter_w(0, data & 0x10);  // Coin1/3 counter
 	machine().bookkeeping().coin_counter_w(1, data & 0x20);  // Coin2 counter
 	machine().bookkeeping().coin_counter_w(2, data & 0x08);  // Payout pulse
@@ -892,16 +936,16 @@ void norautp_state::ppi2_obf_w(int state)
 
 TIMER_CALLBACK_MEMBER(norautp_state::ppi2_ack)
 {
-
 	m_ppi8255[2]->pc6_w(param);
 	if (param == 0)
 	{
 		uint8_t const np_addr = m_ppi8255[2]->pb_r();
 		uint8_t const vram_data = m_ppi8255[2]->pa_r();
 		m_np_vram[np_addr] = vram_data;
+		m_videoram[np_addr] = vram_data;
 	}
-}
 
+}
 
 // game waits for bit 4 (0x10) to be reset.
 uint8_t norautp_state::test2_r()
@@ -917,7 +961,6 @@ uint8_t norautp_state::test3_r()
 		return m_test3b;
 	}
 
-	logerror("test3: pc:%04x - data:%02x\n", m_maincpu->pc(), m_test_count);
 	return (m_test_count &0x0f) + 0x10;
 }
 
@@ -940,55 +983,55 @@ TIMER_DEVICE_CALLBACK_MEMBER(norautp_state::test_timer_cb)
 
   CPU & PPI settings by set...
 
-  +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
-  |   Set    |   CPU   | PPI-0 offset | config | PPI-1 offset | config | PPI-2 offset |         config         |
-  +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
-  | norautp  |   Z80   |  0x60-0x63   |  0x90  |  0xA0-0xA3   |  0x92  |  0xC0-0xC3   |  0xC1 (PC0-2 as input) |
-  +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
-  | norautdx |   Z80   |  0x60-0x63   |  0x90  |  0xA0-0xA3   |  0x92  |  0xC0-0xC3   |          0xC0          |
-  +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
-  | norautpn |   Z80   |  0x60-0x63   |  0x90  |  0xA0-0xA3   |  0x92  |  0xC0-0xC3   |          0xC0          |
-  +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
-  | norautjp |   Z80   |  0x60-0x63   |  0x90  |  0xA0-0xA3   |  0x92  |  0xC0-0xC3   |  0xC1 (PC0-2 as input) |
-  +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
-  | norautrh |   Z80   |  0x60-0x63   |  0x90  |  0xA0-0xA3   |  0x92  |  0xC0-0xC3   |          0xC0          |
-  +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
-  | norautu  |  BOXED  |  0x60-0x63   |  0x90  |  0xA0-0xA3   |  0x92  |  0xC0-0xC3   |          0xC0          |
-  +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
-  | norautv3 |   Z80   |   unknown    |        |   unknown    |        |   unknown    |                        |
-  +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
-  | pma      |   Z80   |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
-  +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
-  | bjpoker  |   Z80   |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
-  +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
-  | dphl     |  8080   |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
-  +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
-  | dphla    |  8080   |  0x60-0x63   |  0x90  |  0xA0-0xA3   |  0x92  |  0xC0-0xC3   |          0xC0          |
-  +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
-  | dphljp   |  8080   |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
-  +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
-  | kimbldhl |  8080   |  0x60-0x63   |  0x90  |  0xA0-0xA3   |  0x92  |  0xC0-0xC3   |          0xC0          |
-  +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
-  | gtipoker |  8080   |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
-  +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
-  | smshilo  |  8080   |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
-  +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
-  | tpoker2  |  8080   |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
-  +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
-  | drhl     |  8080?  |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
-  +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
-  | ssjkrpkr |  8080   |  0x60-0x63   |  0x90  |  0xA0-0xA3   |  0x92  |  0xC0-0xC3   |          0xC0          |
-  +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
-  | fastdrwp |  8080?  |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
-  +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
-  | dphlunka |  8080?  |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
-  +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
-  | dphlunkb |  8080?  |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
-  +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
-  | pkii_dm  |   Z80?  |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
-  +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
-  | cdrawpkr |   Z80   |  0x70-0x73   |  0x90  |  0xB0-0xB3   |  0x92  |  0xD0-0xD3   |          0xC0          |
-  +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
+  +-----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
+  |   Set     |   CPU   | PPI-0 offset | config | PPI-1 offset | config | PPI-2 offset |         config         |
+  +-----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
+  | norautp   |   Z80   |  0x60-0x63   |  0x90  |  0xA0-0xA3   |  0x92  |  0xC0-0xC3   |  0xC1 (PC0-2 as input) |
+  +-----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
+  | norautdx  |   Z80   |  0x60-0x63   |  0x90  |  0xA0-0xA3   |  0x92  |  0xC0-0xC3   |          0xC0          |
+  +-----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
+  | norautpn  |   Z80   |  0x60-0x63   |  0x90  |  0xA0-0xA3   |  0x92  |  0xC0-0xC3   |          0xC0          |
+  +-----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
+  | norautjp  |   Z80   |  0x60-0x63   |  0x90  |  0xA0-0xA3   |  0x92  |  0xC0-0xC3   |  0xC1 (PC0-2 as input) |
+  +-----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
+  | norautrh  |   Z80   |  0x60-0x63   |  0x90  |  0xA0-0xA3   |  0x92  |  0xC0-0xC3   |          0xC0          |
+  +-----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
+  | norautu   |  BOXED  |  0x60-0x63   |  0x90  |  0xA0-0xA3   |  0x92  |  0xC0-0xC3   |          0xC0          |
+  +-----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
+  | norautv3  |   Z80   |   unknown    |        |   unknown    |        |   unknown    |                        |
+  +-----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
+  | pma       |   Z80   |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
+  +-----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
+  | bjpoker   |   Z80   |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
+  +-----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
+  | dphl      |  8080   |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
+  +-----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
+  | dphla     |  8080   |  0x60-0x63   |  0x90  |  0xA0-0xA3   |  0x92  |  0xC0-0xC3   |          0xC0          |
+  +-----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
+  | dphljp    |  8080   |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
+  +-----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
+  | kimbldhl  |  8080   |  0x60-0x63   |  0x90  |  0xA0-0xA3   |  0x92  |  0xC0-0xC3   |          0xC0          |
+  +-----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
+  | gtipoker  |  8080   |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
+  +-----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
+  | smshilo   |  8080   |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
+  +-----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
+  | tpoker2   |  8080   |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
+  +-----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
+  | drhl      |  8080?  |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
+  +-----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
+  | ssjkrpkr  |  8080   |  0x60-0x63   |  0x90  |  0xA0-0xA3   |  0x92  |  0xC0-0xC3   |          0xC0          |
+  +-----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
+  | fastdrwp  |  8080?  |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
+  +-----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
+  | sureshoto |  8080?  |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
+  +-----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
+  | dphlunkb  |  8080?  |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
+  +-----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
+  | pkii_dm   |   Z80?  |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
+  +-----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
+  | cdrawpkr  |   Z80   |  0x70-0x73   |  0x90  |  0xB0-0xB3   |  0x92  |  0xD0-0xD3   |          0xC0          |
+  +-----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
 
 */
 void norautp_state::norautp_map(address_map &map)
@@ -1088,7 +1131,7 @@ void norautp_state::cgidjp_opcodes_map(address_map &map)
 }
 
 
-/*************** 8080 based **************/
+/*************** i8080 based **************/
 
 void norautp_state::dphl_map(address_map &map)
 {
@@ -1271,7 +1314,7 @@ static INPUT_PORTS_START( norautrh )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_DIPNAME( 0x04, 0x04, "Bet Max" )           PORT_DIPLOCATION("DSW1:6")  
+	PORT_DIPNAME( 0x04, 0x04, "Bet Max" )           PORT_DIPLOCATION("DSW1:6")
 	PORT_DIPSETTING(    0x04, "1" )           PORT_CONDITION("DSW1", 0x80, EQUALS, 0x00)
 	PORT_DIPSETTING(    0x00, "20" )          PORT_CONDITION("DSW1", 0x80, EQUALS, 0x00)
 	PORT_DIPSETTING(    0x04, "5 " )          PORT_CONDITION("DSW1", 0x80, EQUALS, 0x80)
@@ -1513,7 +1556,7 @@ static INPUT_PORTS_START( norautua )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_DIPNAME( 0x04, 0x04, "Bet Max" )           PORT_DIPLOCATION("DSW1:6")  
+	PORT_DIPNAME( 0x04, 0x04, "Bet Max" )           PORT_DIPLOCATION("DSW1:6")
 	PORT_DIPSETTING(    0x04, "1" )           PORT_CONDITION("DSW1", 0x80, EQUALS, 0x00)
 	PORT_DIPSETTING(    0x00, "20" )          PORT_CONDITION("DSW1", 0x80, EQUALS, 0x00)
 	PORT_DIPSETTING(    0x04, "5 " )          PORT_CONDITION("DSW1", 0x80, EQUALS, 0x80)
@@ -1526,7 +1569,7 @@ static INPUT_PORTS_START( norautua )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( dphla )
+static INPUT_PORTS_START( dphl )
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )       PORT_NAME("Deal")
@@ -1572,10 +1615,20 @@ static INPUT_PORTS_START( dphla )
 	PORT_DIPSETTING(    0x40, "When 8 or more is bet" )
 	PORT_DIPSETTING(    0x20, "When 4 or more is bet" )
 	PORT_DIPSETTING(    0x00, "Always" )
-	PORT_DIPNAME( 0x80, 0x80, "Test Mode" )           PORT_DIPLOCATION("DSW1:1") 
+	PORT_DIPNAME( 0x80, 0x80, "Test Mode" )           PORT_DIPLOCATION("DSW1:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( dphla )
+
+	PORT_INCLUDE( dphl )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )  PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))  // hopper
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( drhl )
 
@@ -1637,7 +1690,83 @@ static INPUT_PORTS_START( ssjkrpkr )
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )
 
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW1:1") 
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( sureshoto )
+
+	PORT_INCLUDE( dphl )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )       PORT_NAME("Break (Deal)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )  // unused bet
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )  // unused coin 2
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )  // unused hi
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )  // unused lo
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Safe (Stand)") PORT_CODE(KEYCODE_D)  // Stand: keep the hand
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )  PORT_NAME("Shoot (Draw)")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )  PORT_NAME("Scratch (Hold) 1")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )  PORT_NAME("Scratch (Hold) 2")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )  PORT_NAME("Scratch (Hold) 3")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )  PORT_NAME("Scratch (Hold) 4")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )  PORT_NAME("Scratch (Hold) 5")
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW1:7")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW1:5")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x60, 0x60, "2 Wild Cues" )         PORT_DIPLOCATION("DSW1:2,3")
+	PORT_DIPSETTING(    0x60, "Never"  )
+	PORT_DIPSETTING(    0x40, "When 4 or more is bet" )
+	PORT_DIPSETTING(    0x20, "When 4 or more is bet" )
+	PORT_DIPSETTING(    0x00, "Always" )
+	PORT_DIPNAME( 0x80, 0x80, "Test Mode" )           PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( fastdrwp )
+
+	PORT_INCLUDE( dphl )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW1:7")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW1:5")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	// number of cards to discard in other games.
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_DIPNAME( 0x80, 0x80, "Test Mode" )           PORT_DIPLOCATION("DSW1:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1682,8 +1811,8 @@ static const gfx_layout charlayout32x32 =
 
 // GFX are stored in the 2nd half... Maybe the HW could handle 2 bitplanes?
 static GFXDECODE_START( gfx_norautp )
-	GFXDECODE_ENTRY( "gfx", 0x800, charlayout,      0, 4 )
-	GFXDECODE_ENTRY( "gfx", 0x800, charlayout32x32, 0, 4 )
+	GFXDECODE_ENTRY( "gfx", 0x800, charlayout,      0, 8 )
+	GFXDECODE_ENTRY( "gfx", 0x800, charlayout32x32, 0, 8 )
 GFXDECODE_END
 
 
@@ -1822,7 +1951,9 @@ void norautp_state::noraut_base(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_norautp);
-	PALETTE(config, m_palette, FUNC(norautp_state::norautp_palette), 8);
+	PALETTE(config, m_palette, FUNC(norautp_state::norautp_palette), 16);
+
+	HOPPER(config, m_hopper, attotime::from_msec(150));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -1934,7 +2065,8 @@ void norautp_state::cdrawpkr(machine_config &config)
 	m_screen->set_visarea(5*8, 61*8-1, (0*16) + 8, 16*16-1);
 }
 
-/************** 8080 based **************/
+
+/************** i8080 based **************/
 
 void norautp_state::dphl(machine_config &config)
 {
@@ -1961,6 +2093,23 @@ void norautp_state::dphla(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::dphla_map);
 	m_maincpu->set_addrmap(AS_IO, &norautp_state::dphla_portmap);
 	m_maincpu->set_vblank_int("screen", FUNC(norautp_state::irq0_line_hold));
+
+	// sound hardware
+	m_discrete->set_intf(dphl_discrete);
+}
+
+void norautp_state::sureshoto(machine_config &config)
+{
+	noraut_base(config);
+
+	// basic machine hardware
+	I8080(config.replace(), m_maincpu, DPHL_CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::dphl_map);
+	m_maincpu->set_addrmap(AS_IO, &norautp_state::dphl_portmap);
+	m_maincpu->set_vblank_int("screen", FUNC(norautp_state::irq0_line_hold));
+
+	TIMER(config, "test_timer").configure_periodic(FUNC(norautp_state::test_timer_cb), attotime::from_usec(100));
+	PALETTE(config.replace(), "palette", FUNC(norautp_state::sureshoto_palette), 16);
 
 	// sound hardware
 	m_discrete->set_intf(dphl_discrete);
@@ -2004,7 +2153,7 @@ void norautp_state::drhl(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &norautp_state::drhl_portmap);
 	m_maincpu->set_vblank_int("screen", FUNC(norautp_state::irq0_line_hold));
 
-	PALETTE(config.replace(), "palette", FUNC(norautp_state::drhl_palette), 8);
+	PALETTE(config.replace(), "palette", FUNC(norautp_state::drhl_palette), 16);
 
 	// sound hardware
 	m_discrete->set_intf(dphl_discrete);
@@ -3137,11 +3286,11 @@ ROM_START( newhilop )
 ROM_END
 
 
-//*************************************** 8080 sets **************************************
-//*                                                                                      *
-//*   The following ones are 'Draw Poker HI-LO' type, running in a 8080 based hardware   *
-//*                                                                                      *
-//****************************************************************************************
+//************************************* i8080 sets *************************************
+//*                                                                                    *
+//*  The following ones are 'Draw Poker HI-LO' type, running in a 8080 based hardware  *
+//*                                                                                    *
+//**************************************************************************************
 
 /*
 
@@ -4012,18 +4161,19 @@ ROM_START( fastdrwp )
 
 	ROM_REGION( 0x0100,  "proms", 0 )
 	ROM_LOAD( "u51_bpr.bin",  0x0000, 0x0100, CRC(812dc1f1) SHA1(b2af33ff36f2eca2f782bc2239bc9e54c2564f6a) )
+
+	ROM_REGION( 0x400, "nvram", 0 )  // default NVRAM
+	ROM_LOAD( "fastdrwp_nvram.bin", 0x000, 0x400, CRC(8b9f0c62) SHA1(b6c53444926811c4d3cd30317533ae8168aae843) )
 ROM_END
 
 /*
-
-  Unknown DPHL rev 1.
+  Sure Shot
+  SMS Manufacturing, 1993.
 
   No extra info inside the zip. Just ROM dumps...
-  Maybe from SMS Manufacturing, since there are GFX tiles with the SMS logo.
 
 */
-
-ROM_START( dphlunka )
+ROM_START( sureshoto )
 	ROM_REGION( 0x10000, "maincpu", 0 )  // no stack, call's RET go to PC=0
 	ROM_LOAD( "u-12_ss.u12", 0x0000, 0x1000, CRC(10ddbc16) SHA1(ab683d836c9223bc67701e092c2cb95afc0f0fa2) )
 	ROM_LOAD( "u-18_ss.u18", 0x1000, 0x1000, CRC(ffbac2bf) SHA1(219247624e0eb0c0c805f5f9a96c4b6b60c9c5ac) )
@@ -4901,7 +5051,7 @@ void norautp_state::init_enc()
 	ROM[0x1da0] = 0x10; // 10.000
 	ROM[0x1da1] = 0x27;
 	ROM[0x1da2] = 0xe8; // 1.000
-	ROM[0x1da3] = 0x03;	
+	ROM[0x1da3] = 0x03;
 	ROM[0x1da4] = 0x64; // 100
 	ROM[0x1da5] = 0x00;
 	ROM[0x1da6] = 0x0a; // 10
@@ -4933,6 +5083,31 @@ void norautp_state::init_ssa()
 //  ROM[0x07af] = 0x00;
 //  ROM[0x07b0] = 0x00;
 //  ROM[0x07b1] = 0x00;
+}
+
+void norautp_state::init_unka()
+{
+	uint8_t *ROM = memregion("maincpu")->base();
+	ROM[0x0000] = 0x00;
+	ROM[0x0001] = 0xf3;
+	ROM[0x0002] = 0x31;
+	ROM[0x0003] = 0xff;
+	ROM[0x0004] = 0xd0;
+	ROM[0x0005] = 0xc3;
+	ROM[0x0006] = 0x80;
+	ROM[0x0007] = 0x01;
+	ROM[0x01d5] = 0xaf;
+
+}
+
+void norautp_state::init_unkb()
+{
+	uint8_t *ROM = memregion("gfx")->base();
+	for (int i = 0x0680; i < 0x0740; i++)
+	{
+		ROM[i] = ~ROM[i];
+		ROM[i + 0x800] = ~ROM[i + 0x800];
+	}
 }
 
 
@@ -4977,13 +5152,13 @@ GAMEL( 1984, cdrawpkr, 0,        cdrawpkr, cdrawpkr, norautp_state, empty_init, 
 //***************************************************************************************
 
 //     YEAR  NAME      PARENT    MACHINE   INPUT     STATE          INIT        ROT   COMPANY                        FULLNAME                            FLAGS                       LAYOUT
-GAMEL( 1982, dphl,     0,        dphl,     dphla,    norautp_state, empty_init, ROT0, "M.Kramer Manufacturing.",     "Draw Poker HI-LO (M.Kramer)",      MACHINE_IMPERFECT_GRAPHICS, layout_noraut10 )
-GAMEL( 1983, dphla,    0,        dphla,    dphla,    norautp_state, empty_init, ROT0, "<unknown>",                   "Joker Poker (Kramer, Alt)",        MACHINE_NOT_WORKING,        layout_noraut10 )  // call attendant
-GAMEL( 1983, dphljp,   0,        dphl,     dphla,    norautp_state, empty_init, ROT0, "<unknown>",                   "Draw Poker HI-LO (Japanese)",      MACHINE_IMPERFECT_GRAPHICS, layout_noraut10 )
+GAMEL( 1982, dphl,     0,        dphl,     dphl,     norautp_state, empty_init, ROT0, "M.Kramer Manufacturing.",     "Draw Poker HI-LO (M.Kramer)",      MACHINE_IMPERFECT_GRAPHICS, layout_noraut10 )
+GAMEL( 1983, dphla,    0,        dphla,    dphla,    norautp_state, empty_init, ROT0, "<unknown>",                   "Joker Poker (Kramer, Alt)",        0,                          layout_noraut10 )
+GAMEL( 1983, dphljp,   0,        dphl,     dphl,     norautp_state, empty_init, ROT0, "<unknown>",                   "Draw Poker HI-LO (Japanese)",      MACHINE_IMPERFECT_GRAPHICS, layout_noraut10 )
 GAME(  198?, kimbldhl, 0,        kimbldhl, norautp,  norautp_state, empty_init, ROT0, "Kimble Ireland",              "Kimble Double HI-LO",              MACHINE_NOT_WORKING )
 GAME(  1983, gtipoker, 0,        dphl,     norautp,  norautp_state, empty_init, ROT0, "GTI Inc",                     "GTI Poker",                        MACHINE_NOT_WORKING )
 GAME(  1983, gtipokra, 0,        dphla,    norautp,  norautp_state, empty_init, ROT0, "GTI Inc",                     "GTI Poker? (SMS hardware)",        MACHINE_NOT_WORKING )
-GAMEL( 1983, smshilo,  0,        dphl,     dphla,    norautp_state, empty_init, ROT0, "SMS Manufacturing Corp.",     "HI-LO Double Up Joker Poker",      MACHINE_IMPERFECT_GRAPHICS, layout_noraut10 )
+GAMEL( 1983, smshilo,  0,        dphl,     dphl,     norautp_state, empty_init, ROT0, "SMS Manufacturing Corp.",     "HI-LO Double Up Joker Poker",      MACHINE_IMPERFECT_GRAPHICS, layout_noraut10 )
 GAMEL( 1986, drhl,     0,        drhl,     drhl,     norautp_state, empty_init, ROT0, "Drews Inc.",                  "Drews Revenge (v.2.89, set 1)",    0,                          layout_noraut10 )
 GAMEL( 1986, drhla,    drhl,     drhl,     drhl,     norautp_state, empty_init, ROT0, "Drews Inc.",                  "Drews Revenge (v.2.89, set 2)",    0,                          layout_noraut10 )
 GAMEL( 1982, ssjkrpkr, 0,        ssjkrpkr, ssjkrpkr, norautp_state, init_ssa,   ROT0, "Southern Systems & Assembly", "Southern Systems Joker Poker",     0,                          layout_noraut10 )
@@ -4996,9 +5171,9 @@ GAME(  1993, tpoker2,  0,        dphltest, norautp, norautp_state, empty_init, R
 //* The following ones are still unknown. No info about name, CPU, manufacturer, or HW *
 //**************************************************************************************
 
-//     YEAR  NAME      PARENT    MACHINE   INPUT    STATE          INIT        ROT   COMPANY                     FULLNAME                               FLAGS                  LAYOUT
-GAME(  198?, fastdrwp, 0,        dphl,     norautp, norautp_state, empty_init, ROT0, "Stern Electronics?",       "Fast Draw (poker conversion kit)?",   MACHINE_NOT_WORKING )
-GAME(  198?, dphlunka, 0,        dphl,     norautp, norautp_state, empty_init, ROT0, "SMS Manufacturing Corp.",  "Draw Poker HI-LO (unknown, rev 1)",   MACHINE_NOT_WORKING )
-GAMEL( 198?, dphlunkb, 0,        dphl,     dphla,   norautp_state, empty_init, ROT0, "SMS Manufacturing Corp.",  "Draw Poker HI-LO (unknown, rev 2)",   MACHINE_NOT_WORKING,   layout_noraut10 )  // call attendant
-GAME(  198?, pkii_dm,  0,        nortest1, norautp, norautp_state, empty_init, ROT0, "<unknown>",                "unknown poker game PKII/DM",          MACHINE_NOT_WORKING )
-GAME(  1989, unkljfpk, 0,        nortest1, norautp, norautp_state, empty_init, ROT0, "LJF Corporation",          "unknown LJF Corporation poker game",  MACHINE_NOT_WORKING )
+//     YEAR  NAME       PARENT    MACHINE    INPUT      STATE          INIT        ROT   COMPANY                     FULLNAME                               FLAGS                       LAYOUT
+GAMEL( 198?, fastdrwp,  0,        dphl,      fastdrwp,  norautp_state, empty_init, ROT0, "Stern Electronics",        "Fast Draw (poker conversion kit)",    0,                          layout_noraut10 )
+GAMEL( 1983, sureshoto, 0,        sureshoto, sureshoto, norautp_state, init_unka,  ROT0, "SMS Manufacturing Corp.",  "Sure Shot (older, dphl hardware)",    MACHINE_IMPERFECT_GRAPHICS, layout_noraut09_sureshot )
+GAMEL( 198?, dphlunkb,  0,        dphl,      dphla,     norautp_state, init_unkb,  ROT0, "SMS Manufacturing Corp.",  "Draw Poker HI-LO (alt GFX)",          MACHINE_IMPERFECT_GRAPHICS, layout_noraut10 )
+GAME(  198?, pkii_dm,   0,        nortest1,  norautp,   norautp_state, empty_init, ROT0, "<unknown>",                "unknown poker game PKII/DM",          MACHINE_NOT_WORKING )
+GAME(  1989, unkljfpk,  0,        nortest1,  norautp,   norautp_state, empty_init, ROT0, "LJF Corporation",          "unknown LJF Corporation poker game",  MACHINE_NOT_WORKING )

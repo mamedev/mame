@@ -295,7 +295,7 @@ void janshi_vdp_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 
 		widths come from "widthflags" (0xfc3780)
 		"unk1" (0xfc3700) and "unk2" (0xfc37c0) are a mystery
-	    */
+		*/
 
 		int spr_offs = (m_vram1[(i * 4) + 0] | (m_vram1[(i * 4) + 1] << 8)) & 0xffff;
 		int col = (m_vram1[(i * 4) + 2] & 0xf8) >> 3;
@@ -1083,7 +1083,7 @@ INPUT_PORTS_END
 void pinkiri8_state::machine_start()
 {
 	save_item(NAME(m_io_matrix));
-	
+
 	save_item(NAME(m_prot_read_index));
 	save_item(NAME(m_prot_char));
 	save_item(NAME(m_prot_index));

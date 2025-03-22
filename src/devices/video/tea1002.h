@@ -29,8 +29,6 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> tea1002_device
-
 class tea1002_device : public device_t
 {
 public:
@@ -42,15 +40,10 @@ public:
 protected:
 	// device_t overrides
 	virtual void device_start() override ATTR_COLD;
-
-private:
-	static const int m_tint = -6; // what is this based on?
-	static const float m_luminance[16];
-	static const int m_phase[16];
-	static const int m_amplitute[16];
 };
 
-// device type definition
+
+// device type declaration
 DECLARE_DEVICE_TYPE(TEA1002, tea1002_device)
 
 #endif // MAME_VIDEO_TEA1002_H
