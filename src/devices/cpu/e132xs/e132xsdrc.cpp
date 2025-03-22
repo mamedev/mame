@@ -418,10 +418,12 @@ void hyperstone_device::static_generate_interrupt_checks()
 	UML_TEST(block, DRC_SR, L_MASK);
 	UML_JMPc(block, uml::COND_NZ, done_int);
 
+	UML_MOV(block, I0, mem(&ISR));
+
 	UML_TEST(block, mem(&m_core->timer_int_pending), 1);
 	UML_JMPc(block, uml::COND_NZ, timer_int_pending);
 
-	UML_TEST(block, mem(&ISR), 0x7f);
+	UML_TEST(block, I0, 0x7f);
 	UML_JMPc(block, uml::COND_Z, done_int);
 
 	generate_interrupt_checks(block, labelnum, false, take_int, take_timer);
@@ -569,17 +571,18 @@ void hyperstone_device::static_generate_memory_accessor(int size, int iswrite, b
 
 void hyperstone_device::generate_interrupt_checks(drcuml_block &block, uml::code_label &labelnum, bool with_timer, int take_int, int take_timer)
 {
-	UML_MOV(block, I0, mem(&ISR));
 	UML_MOV(block, I1, mem(&FCR));
-	if (with_timer)
-		UML_ROLAND(block, I2, I1, 12, 0xb);
 
-	int skip_io3 = labelnum++;
+	// combine I/O mask and direction in I4 bits 0/4/8
+	UML_SHR(block, I2, I1, 2);
+	UML_XOR(block, I4, I1, 0xffffffff);
+	UML_AND(block, I4, I4, I2);
+
+	const int skip_io3 = labelnum++;
 	UML_TEST(block, I0, 0x40);
 	UML_JMPc(block, uml::COND_Z, skip_io3);
-	UML_AND(block, I3, I1, 0x500);
-	UML_CMP(block, I3, 0x400);
-	UML_JMPc(block, uml::COND_NE, skip_io3);
+	UML_TEST(block, I4, 0x100);
+	UML_JMPc(block, uml::COND_Z, skip_io3);
 	UML_MOV(block, mem(&m_core->arg0), IRQ_IO3);
 	UML_MOV(block, I0, TRAPNO_IO3);
 	UML_JMP(block, take_int);
@@ -587,15 +590,20 @@ void hyperstone_device::generate_interrupt_checks(drcuml_block &block, uml::code
 
 	if (with_timer)
 	{
+		UML_ROLAND(block, I2, I1, 12, 0xb);
+
 		UML_CMP(block, I2, 0x3);
 		UML_JMPc(block, uml::COND_E, take_timer);
 	}
 
-	int skip_int1 = labelnum++;
-	UML_TEST(block, I0, 0x01);
+	// get masked INT state in I3 bits 0-3
+	UML_SHR(block, I3, I1, 28);
+	UML_XOR(block, I3, I3, 0xffffffff);
+	UML_AND(block, I3, I3, I0);
+
+	const int skip_int1 = labelnum++;
+	UML_TEST(block, I3, 0x01);
 	UML_JMPc(block, uml::COND_Z, skip_int1);
-	UML_TEST(block, I1, 0x10000000);
-	UML_JMPc(block, uml::COND_NZ, skip_int1);
 	UML_MOV(block, mem(&m_core->arg0), IRQ_INT1);
 	UML_MOV(block, I0, TRAPNO_INT1);
 	UML_JMP(block, take_int);
@@ -607,11 +615,9 @@ void hyperstone_device::generate_interrupt_checks(drcuml_block &block, uml::code
 		UML_JMPc(block, uml::COND_E, take_timer);
 	}
 
-	int skip_int2 = labelnum++;
-	UML_TEST(block, I0, 0x02);
+	const int skip_int2 = labelnum++;
+	UML_TEST(block, I3, 0x02);
 	UML_JMPc(block, uml::COND_Z, skip_int2);
-	UML_TEST(block, I1, 0x20000000);
-	UML_JMPc(block, uml::COND_NZ, skip_int2);
 	UML_MOV(block, mem(&m_core->arg0), IRQ_INT2);
 	UML_MOV(block, I0, TRAPNO_INT2);
 	UML_JMP(block, take_int);
@@ -623,11 +629,9 @@ void hyperstone_device::generate_interrupt_checks(drcuml_block &block, uml::code
 		UML_JMPc(block, uml::COND_E, take_timer);
 	}
 
-	int skip_int3 = labelnum++;
-	UML_TEST(block, I0, 0x04);
+	const int skip_int3 = labelnum++;
+	UML_TEST(block, I3, 0x04);
 	UML_JMPc(block, uml::COND_Z, skip_int3);
-	UML_TEST(block, I1, 0x40000000);
-	UML_JMPc(block, uml::COND_NZ, skip_int3);
 	UML_MOV(block, mem(&m_core->arg0), IRQ_INT3);
 	UML_MOV(block, I0, TRAPNO_INT3);
 	UML_JMP(block, take_int);
@@ -639,33 +643,29 @@ void hyperstone_device::generate_interrupt_checks(drcuml_block &block, uml::code
 		UML_JMPc(block, uml::COND_E, take_timer);
 	}
 
-	int skip_int4 = labelnum++;
-	UML_TEST(block, I0, 0x08);
+	const int skip_int4 = labelnum++;
+	UML_TEST(block, I3, 0x08);
 	UML_JMPc(block, uml::COND_Z, skip_int4);
-	UML_TEST(block, I1, 0x80000000);
-	UML_JMPc(block, uml::COND_NZ, skip_int4);
 	UML_MOV(block, mem(&m_core->arg0), IRQ_INT4);
 	UML_MOV(block, I0, TRAPNO_INT4);
 	UML_JMP(block, take_int);
 	UML_LABEL(block, skip_int4);
 
-	int skip_io1 = labelnum++;
+	const int skip_io1 = labelnum++;
 	UML_TEST(block, I0, 0x10);
 	UML_JMPc(block, uml::COND_Z, skip_io1);
-	UML_AND(block, I2, I1, 0x5);
-	UML_CMP(block, I2, 0x4);
-	UML_JMPc(block, uml::COND_NE, skip_io1);
+	UML_TEST(block, I4, 0x1);
+	UML_JMPc(block, uml::COND_Z, skip_io1);
 	UML_MOV(block, mem(&m_core->arg0), IRQ_IO1);
 	UML_MOV(block, I0, TRAPNO_IO1);
 	UML_JMP(block, take_int);
 	UML_LABEL(block, skip_io1);
 
-	int skip_io2 = labelnum++;
-	UML_TEST(block, I0, 0x10);
+	const int skip_io2 = labelnum++;
+	UML_TEST(block, I0, 0x20);
 	UML_JMPc(block, uml::COND_Z, skip_io2);
-	UML_AND(block, I2, I1, 0x50);
-	UML_CMP(block, I2, 0x40);
-	UML_JMPc(block, uml::COND_NE, skip_io2);
+	UML_TEST(block, I4, 0x10);
+	UML_JMPc(block, uml::COND_Z, skip_io1);
 	UML_MOV(block, mem(&m_core->arg0), IRQ_IO2);
 	UML_MOV(block, I0, TRAPNO_IO2);
 	UML_JMP(block, take_int);
