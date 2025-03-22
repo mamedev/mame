@@ -436,9 +436,14 @@ void hyperstone_device::generate_update_flags_addsubs(drcuml_block &block, compi
 }
 
 template <hyperstone_device::trap_exception_or_int TYPE>
-void hyperstone_device::generate_trap_exception_or_int(drcuml_block &block)
+void hyperstone_device::generate_trap_exception_or_int(drcuml_block &block, uml::code_label &label, uml::parameter trapno)
 {
+	// expects exception handler address in I0 and cycles in I7 (updated)
+	// clobbers I0, I1, I2, I3 and I4
+
 	UML_ADD(block, I7, I7, mem(&m_core->clock_cycles_2));
+
+	generate_get_trap_addr(block, label, trapno);                 // I0 = target PC
 
 	UML_MOV(block, I4, DRC_SR);                                   // I4 = old SR
 
@@ -568,8 +573,7 @@ void hyperstone_device::generate_trap_on_overflow(drcuml_block &block, compiler_
 	UML_TEST(block, DRC_SR, V_MASK);
 	UML_JMPc(block, uml::COND_Z, no_exception);
 	UML_ROLINS(block, DRC_SR, ((desc->length >> 1) << ILC_SHIFT), 0, ILC_MASK);
-	generate_get_trap_addr(block, compiler.m_labelnum, TRAPNO_RANGE_ERROR);
-	generate_trap_exception_or_int<IS_EXCEPTION>(block);
+	generate_trap_exception_or_int<IS_EXCEPTION>(block, compiler.m_labelnum, TRAPNO_RANGE_ERROR);
 	UML_LABEL(block, no_exception);
 }
 
@@ -4290,8 +4294,7 @@ void hyperstone_device::generate_trap_op(drcuml_block &block, compiler_state &co
 		UML_JMPc(block, uml::COND_NZ, skip_trap);
 
 	UML_ROLINS(block, DRC_SR, ((desc->length >> 1) << ILC_SHIFT), 0, ILC_MASK);
-	generate_get_trap_addr(block, compiler.m_labelnum, trapno);
-	generate_trap_exception_or_int<IS_TRAP>(block);
+	generate_trap_exception_or_int<IS_TRAP>(block, compiler.m_labelnum, trapno);
 
 	UML_LABEL(block, skip_trap);
 }
