@@ -13,9 +13,8 @@
 
 *******************************************************************************************/
 
-#include "m50dass.h"
-
 #include "emu.h"
+#include "m50dass.h"
 #include "speaker.h"
 
 DEFINE_DEVICE_TYPE(MEGALO50_DASS, m50dass_device, "m50dass", "Sega DASS")
