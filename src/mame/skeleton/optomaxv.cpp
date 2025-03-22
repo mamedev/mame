@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:
 /*********************************************************************************************************
 
 Optomax V image analyser, from AMS (Analytical Measuring Systems Ltd.).
@@ -286,10 +288,10 @@ PCB VIDEO (B1) (labeled "OPTOMAX VIDEO PCB 9000-0022-2/2")
 //#include "machine/nvram.h"
 #include "machine/pit8253.h"
 
-#include "screen.h"
-
 #include "video/mc6845.h"
 #include "video/saa5050.h"
+
+#include "screen.h"
 
 
 namespace {
