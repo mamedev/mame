@@ -156,12 +156,13 @@
 ***********************************************************************************************/
 
 #include "emu.h"
-#include "segaipt.h"
+
+#include "315_5296.h"
 #include "m50dass.h"
+#include "segaipt.h"
 
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
-#include "315_5296.h"
 #include "sound/sn76496.h"
 #include "sound/upd7759.h"
 #include "sound/ymopn.h"
@@ -1924,13 +1925,13 @@ void segac2_state::segac2(machine_config &config)
 	UPD7759(config, m_upd7759, XL1_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
-void segac2_state::tfrceacjpb(machine_config& config)
+void segac2_state::tfrceacjpb(machine_config &config)
 {
 	segac2(config);
 	m_io->set_ddr_override(0xf); // game erroneously writes 0x58 to DDR
 }
 
-void segac2_state::ribbit(machine_config& config)
+void segac2_state::ribbit(machine_config &config)
 {
 	segac2(config);
 
@@ -1940,14 +1941,14 @@ void segac2_state::ribbit(machine_config& config)
 }
 
 // Games supporting Megalo 50 moving seats (DASS)
-void segac2_state::c2m50dass(machine_config& config)
+void segac2_state::c2m50dass(machine_config &config)
 {
 	segac2(config);
 
 	MEGALO50_DASS(config, "m50dass");
 }
 
-void pclub_state::pclub(machine_config& config)
+void pclub_state::pclub(machine_config &config)
 {
 	segac2(config);
 	// Print Club boards use a different crystal, possibly for better compatibility with the camera timings.
