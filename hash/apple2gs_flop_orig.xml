@@ -45,7 +45,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="marble">
+	<software name="marblem">
 		<description>Marble Madness</description>
 		<year>1986</year>
 		<publisher>Electronic Arts</publisher>
@@ -1747,10 +1747,11 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="brdtale">
+	<software name="brdstale">
 		<description>The Bard's Tale: Tales of the Unknown</description>
 		<year>1987</year>
 		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Interplay Productions" />
 		<info name="programmer" value="Rebecca Heineman" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS" />
@@ -2305,7 +2306,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="artfilm">
-		<description>Art and Film Director</description>
+		<description>Art &amp; Film Director</description>
 		<year>1989</year>
 		<publisher>Epyx</publisher>
 		<info name="programmer" value="Novotrade, Caesar Studio, Amanda Dee, Jeff Dee, Sheryl Knowles, Janet Kramer, and Matthew Sarconi" />
@@ -2392,13 +2393,13 @@ license:CC0-1.0
 		<!-- Dump released: 2021-06-05 -->
 		<!-- roleplaying game -->
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1 - Play disk" />
+			<feature name="part_id" value="Disk 1 - Play" />
 			<dataarea name="flop" size="1296229">
 				<rom name="the immortal iigs - disk 1 - play.woz" size="1296229" crc="b804341e" sha1="72322fd7d8e5d3904bd89796725fb106d3cca5a5" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2 - Graphics disk" />
+			<feature name="part_id" value="Disk 2 - Graphics" />
 			<dataarea name="flop" size="1296226">
 				<rom name="the immortal iigs - disk 2 - graphics.woz" size="1296226" crc="bf428297" sha1="cdf5ea12029204a4a8dfed975d2c917406e3a7d5" />
 			</dataarea>
@@ -2807,7 +2808,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="musicons">
+	<software name="mcs">
 		<description>Music Construction Set (version 1.0)</description>
 		<year>1986</year>
 		<publisher>Electronic Arts</publisher>
