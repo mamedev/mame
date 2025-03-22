@@ -183,6 +183,10 @@ const options_entry osd_options::s_option_entries[] =
 	{ OSDOPTION_BGFX_LUT,                        "lut-default.png", core_options::option_type::STRING,   "LUT texture name" },
 	{ OSDOPTION_BGFX_AVI_NAME,                   OSDOPTVAL_AUTO,    core_options::option_type::PATH,     "filename for BGFX output logging" },
 
+	{ nullptr,                                   nullptr,          core_options::option_type::HEADER,    "SERIAL OUTPUT OPTIONS" },
+	{ OSDOPTION_SERIAL_PORT,                            "COM1",           core_options::option_type::STRING,    "serial port path (e.g. COM1 on Windows or /dev/ttyS0 on Linux)" },
+	{ OSDOPTION_SERIAL_BAUDRATE,                       "9600",           core_options::option_type::INTEGER,    "serial port baud rate (default: 9600)" },
+
 	// End of list
 	{ nullptr }
 };
