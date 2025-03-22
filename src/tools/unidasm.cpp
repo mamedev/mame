@@ -130,6 +130,7 @@ using util::BIT;
 #include "cpu/mn1610/mn1610d.h"
 #include "cpu/mn1880/mn1880d.h"
 #include "cpu/mn10200/mn102dis.h"
+#include "cpu/mn10300/mn103dasm.h"
 #include "cpu/mpk1839/kl1839vm1dasm.h"
 #include "cpu/msm65x2/msm65x2d.h"
 #include "cpu/nanoprocessor/nanoprocessor_dasm.h"
@@ -561,6 +562,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "mm76",            le,  0, []() -> util::disasm_interface * { return new mm76_disassembler; } },
 	{ "mm78",            le,  0, []() -> util::disasm_interface * { return new mm78_disassembler; } },
 	{ "mn10200",         le,  0, []() -> util::disasm_interface * { return new mn10200_disassembler; } },
+	{ "mn10300",         le,  0, []() -> util::disasm_interface * { return new mn10300_disassembler; } },
 	{ "mn1400",          le,  0, []() -> util::disasm_interface * { return new mn1400_disassembler; } },
 	{ "mn1610",          be, -1, []() -> util::disasm_interface * { return new mn1610_disassembler; } },
 	{ "mn1613",          be, -1, []() -> util::disasm_interface * { return new mn1613_disassembler; } },
