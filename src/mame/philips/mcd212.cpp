@@ -600,7 +600,7 @@ void mcd212_device::process_vsr(uint32_t *pixels, bool *transparent)
 			color0 = (limit_rgb[m_dyuv_v_to_r[v]] << 16) | (limit_rgb[m_dyuv_u_to_g[u] + m_dyuv_v_to_g[v]] << 8) | limit_rgb[m_dyuv_u_to_b[u]];
 
 			const uint8_t byte2 = data[(vsr & 0x0007ffff) ^ 1]; // Peek ahead, for calculating the half-step.
-			const uint8_t byte3 = data[(vsr + 1 & 0x0007ffff) ^ 1];
+			const uint8_t byte3 = data[((vsr + 1) & 0x0007ffff) ^ 1];
 			const uint8_t u8 = u + m_delta_uv_lut[byte2];
 			const uint8_t v8 = v + m_delta_uv_lut[byte3];
 			const uint8_t u6 = (u >> 1) + (u8 >> 1) + (u & u8 & 1);
