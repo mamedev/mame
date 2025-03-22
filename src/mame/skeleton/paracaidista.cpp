@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:
 
-/*********************************************************************************
+/***************************************************************************************
 
 Skeleton driver for "Paracaidista" (from Video Game / Electrogame).
 
@@ -16,9 +16,9 @@ More info and schematics for the original 1979 version:
 
 More info, schematics (minor differences from the original hardware), and source
 code for the 2023 version:
-   https://www.recreativas.org/el-paracaidista-404-videogame-electrogame
+   https://www.recreativas.org/paracaidista-version-2023-08-15294-videogame-electrogame
 
-*********************************************************************************/
+****************************************************************************************/
 
 #include "emu.h"
 
