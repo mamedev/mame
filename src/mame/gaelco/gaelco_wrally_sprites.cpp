@@ -9,8 +9,8 @@ DEFINE_DEVICE_TYPE(BLMBYCAR_SPRITES, blmbycar_sprites_device, "blmbycar_sprites"
 
 gaelco_wrally_sprites_device::gaelco_wrally_sprites_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
-	, m_screen(*this, finder_base::DUMMY_TAG)
+	, device_gfx_interface(mconfig, *this)
+	, device_video_interface(mconfig, *this)
 {
 }
 
@@ -21,7 +21,7 @@ gaelco_wrally_sprites_device::gaelco_wrally_sprites_device(const machine_config 
 
 void gaelco_wrally_sprites_device::device_start()
 {
-	m_screen->register_screen_bitmap(m_temp_bitmap_sprites);
+	screen().register_screen_bitmap(m_temp_bitmap_sprites);
 }
 
 void gaelco_wrally_sprites_device::device_reset()
@@ -71,10 +71,9 @@ void gaelco_wrally_sprites_device::draw_sprites(const rectangle &cliprect, uint1
 {
 	m_temp_bitmap_sprites.fill(0, cliprect);
 
-	int i;
-	gfx_element *gfx = m_gfxdecode->gfx(0);
+	gfx_element *sprgfx = gfx(0);
 
-	for (i = 6 / 2; i < (0x1000 - 6) / 2; i += 4)
+	for (int i = 6 / 2; i < (0x1000 - 6) / 2; i += 4)
 	{
 		int sx, sy, number, color, attr, end, color_effect, high_priority;
 
@@ -83,8 +82,8 @@ void gaelco_wrally_sprites_device::draw_sprites(const rectangle &cliprect, uint1
 		if (end)
 			break;
 
-		int xflip = attr & 0x20;
-		int yflip = attr & 0x40;
+		const bool xflip = BIT(attr, 5);
+		const bool yflip = BIT(attr, 6);
 		color = color & 0x0f;
 
 		if (flip_screen)
@@ -93,27 +92,27 @@ void gaelco_wrally_sprites_device::draw_sprites(const rectangle &cliprect, uint1
 		}
 
 		// wrally adjusts sx by 0x0f, blmbycar implementation was 0x10
-		const uint8_t *gfx_src = gfx->get_data(number % gfx->elements());
+		uint8_t const *const gfx_src = sprgfx->get_data(number % sprgfx->elements());
 
-		for (int py = 0; py < gfx->height(); py++)
+		for (int py = 0; py < sprgfx->height(); py++)
 		{
 			/* get a pointer to the current line in the screen bitmap */
-			int ypos = ((sy + py) & 0x1ff);
+			const int ypos = ((sy + py) & 0x1ff);
 			uint16_t *const srcy = &m_temp_bitmap_sprites.pix(ypos);
 
-			int gfx_py = yflip ? (gfx->height() - 1 - py) : py;
+			const int gfx_py = yflip ? (sprgfx->height() - 1 - py) : py;
 
 			if ((ypos < cliprect.min_y) || (ypos > cliprect.max_y)) continue;
 
-			for (int px = 0; px < gfx->width(); px++)
+			for (int px = 0; px < sprgfx->width(); px++)
 			{
 				/* get current pixel */
-				int xpos = (((sx + px) & 0x3ff) - 0x0f) & 0x3ff;
+				const int xpos = (((sx + px) & 0x3ff) - 0x0f) & 0x3ff;
 				uint16_t *const pixel = srcy + xpos;
-				int gfx_px = xflip ? (gfx->width() - 1 - px) : px;
+				const int gfx_px = xflip ? (sprgfx->width() - 1 - px) : px;
 
 				/* get asociated pen for the current sprite pixel */
-				int gfx_pen = gfx_src[gfx->rowbytes()*gfx_py + gfx_px];
+				const int gfx_pen = gfx_src[sprgfx->rowbytes() * gfx_py + gfx_px];
 
 				if ((xpos < cliprect.min_x) || (xpos > cliprect.max_x)) continue;
 
@@ -162,11 +161,11 @@ void gaelco_wrally_sprites_device::mix_sprites(bitmap_ind16 &bitmap, const recta
 				// this is how we've packed the bits here
 				// ssss --ez PPPP pppp  s = shadow multiplier e = shadow enabled, z = priority, P = palette select, p = pen
 
-				const int pridat = (spriteptr[x] & 0x100) >> 8;
+				const int pridat = BIT(spriteptr[x], 8);
 
 				if (pridat == priority)
 				{
-					const int shadow = (spriteptr[x] & 0x200) >> 9;
+					const int shadow = BIT(spriteptr[x], 9);
 
 					if (!shadow)
 					{
@@ -184,7 +183,7 @@ void gaelco_wrally_sprites_device::mix_sprites(bitmap_ind16 &bitmap, const recta
 						}
 						else
 						{
-							dstptr[x] = (dstptr[x]&0x3ff) + (shadowlevel * 0x400);
+							dstptr[x] = (dstptr[x] & 0x3ff) + (shadowlevel * 0x400);
 						}
 					}
 				}
@@ -230,7 +229,7 @@ void blmbycar_sprites_device::get_sprites_info(uint16_t* spriteram, int& sx, int
 	// bytes are swapped around and color attribute is moved
 	sx = spriteram[3] & 0x03ff;
 	sy = (spriteram[0] & 0x01ff);
-	sy   = 0xf0 - ((sy & 0xff)  - (sy & 0x100)); // check if this logic works for wrally
+	sy = 0xf0 - ((sy & 0xff)  - (sy & 0x100)); // check if this logic works for wrally
 
 	number = spriteram[1] & 0x3fff;
 	color = (spriteram[2] & 0x000f) >> 0; // note moved
@@ -239,5 +238,5 @@ void blmbycar_sprites_device::get_sprites_info(uint16_t* spriteram, int& sx, int
 	attr = (spriteram[2] & 0xfe00) >> 9;
 	end = (spriteram[0] & 0x8000); // does wrally have this too?
 
-	high_priority = (~(color >> 3))&1;
+	high_priority = (~(color >> 3)) & 1;
 }
