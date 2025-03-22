@@ -146,3 +146,85 @@ end
 		MAME_DIR .. "src/lib/util/zippath.cpp",
 		MAME_DIR .. "src/lib/util/zippath.h",
 	}
+
+
+-- Static & shared library to help assemblers / compilers generate
+-- MAME source-level debugging information files.
+-- Note: These needs to be self-contained, with no reliance on other
+-- libraries (except C/C++ std libs) for easy consumption by external tools
+
+-- Bump this for breaking changes (avoid!)
+local srcdbg_lib_major = "1"
+
+-- Bump this for non-breaking changes
+local srcdbg_lib_minor = "0"
+
+project "mame_srcdbg_static"
+	uuid "985b8e16-bb6a-4db0-809b-87074f94dfcb"
+	kind ("StaticLib")
+
+	addprojectflags()
+
+	defines { 
+		"SRCDBG_LIB_MAJOR=" .. srcdbg_lib_major,
+		"SRCDBG_LIB_MINOR=" .. srcdbg_lib_minor,
+	}
+
+	buildoptions {
+		-- By default, symbols are not exported unless annotated as such
+		"-fvisibility=hidden",
+		-- Code participating in shared libraries must be position independent
+		"-fPIC",
+	}
+
+	includedirs {
+		MAME_DIR .. "src/osd",
+	}
+
+	defines {
+		-- Ensures public API symbols are exported (they're imported
+		-- when this is unset)
+		"BUILDING_LIB",
+	}
+
+	files {
+		MAME_DIR .. "src/lib/srcdbg/srcdbg_api.cpp",
+		MAME_DIR .. "src/lib/srcdbg/srcdbg_api.h",
+		MAME_DIR .. "src/lib/srcdbg/srcdbg_format.h",
+		MAME_DIR .. "src/lib/srcdbg/srcdbg_format_reader.cpp",
+		MAME_DIR .. "src/lib/srcdbg/srcdbg_format_reader.h",
+		MAME_DIR .. "src/lib/srcdbg/srcdbg_format_writer.cpp",
+		MAME_DIR .. "src/lib/srcdbg/srcdbg_format_writer.h",
+		MAME_DIR .. "src/lib/srcdbg/srcdbg_util.cpp",
+		MAME_DIR .. "src/lib/srcdbg/srcdbg_util.h",
+		GEN_DIR .. "version.cpp",
+	}
+
+
+	project "mame_srcdbg_shared"
+	uuid "68c1efad-6711-4c9c-b702-51a0000201e0"
+	kind ("SharedLib")
+
+	addprojectflags()
+
+	links {
+		"mame_srcdbg_static",
+	}
+
+	-- Force all symbols from static lib to be present in linked shared library,
+	-- otherwise they'd be optimized out without other object files to reference
+	-- them.  Uses --whole-archive then --no-whole-archive to achieve this.
+	-- (TODO: I think -all_load then -noall_load on Mac?)
+	wholearchive {
+		"mame_srcdbg_static",
+	}
+
+	-- Follow Linux's recommended version naming with major/minor at end of "real name",
+	-- and just major at end of "soname".  Surprising there's no simpler way to
+	-- do this in genie
+	if _OPTIONS["targetos"]=="linux" then
+		targetextension(".so." .. srcdbg_lib_major .. "." .. srcdbg_lib_minor)
+		linkoptions {
+			"-Wl,-soname,\"lib" .. project().name .. ".so." .. srcdbg_lib_major .. "\""
+		}
+	end
