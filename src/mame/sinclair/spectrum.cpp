@@ -332,7 +332,7 @@ uint8_t spectrum_state::spectrum_rom_r(offs_t offset)
 {
 	return m_exp->romcs()
 		? m_exp->mreq_r(offset)
-		: memregion("maincpu")->base()[offset];
+		: m_rom[offset];
 }
 
 /*
