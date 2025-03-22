@@ -251,7 +251,7 @@ VIDEO.BAT has various superimpose effects, requires dedicated board
 		<year>19??</year>
 		<publisher>ゲームアーツ (Game Arts)</publisher>
 		<notes><![CDATA[
-[SGP] playfield artifacts
+[SGP] playfield artifacts (press button 2 from pitcher side in 2p play)
 Lists dual port 1/2 as a unsupported [DE-9] input method
 Winning newspaper screen has [OFX/OFY] bug
 How to exit from attract mode once you enter it?
@@ -286,10 +286,7 @@ How to exit from attract mode once you enter it?
 		<year>19??</year>
 		<publisher>ゲームアーツ (Game Arts)</publisher>
 		<notes><![CDATA[
-[SGP] playfield artifacts
-Lists dual port 1/2 as a unsupported [DE-9] input method
-Winning newspaper screen has [OFX/OFY] bug
-How to exit from attract mode once you enter it?
+(same as famista)
 ]]></notes>
 		<info name="alt_title" value="ファミリースタジアム" />
 		<info name="usage" value="Menuing works with keyboard only until game prompts you to use a joystick"/>
@@ -316,9 +313,8 @@ How to exit from attract mode once you enter it?
 		<year>19??</year>
 		<publisher>ゲームアーツ (Game Arts)</publisher>
 		<notes><![CDATA[
-[SGP] playfield artifacts
-Lists dual port 1/2 as a unsupported [DE-9] input method
-Winning newspaper screen has [OFX/OFY] bug
+(same as famista)
+Runs slow in gameplay
 ]]></notes>
 		<info name="alt_title" value="ファミリースタジアム'89ペナントレース編" />
 
@@ -349,7 +345,7 @@ Winning newspaper screen has [OFX/OFY] bug
 		<year>198?</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<notes><![CDATA[
-Needs [IDP] text display to go off for bottommost row
+Needs [IDP] text display to go off for bottommost row (bumps strip 1 height from 384 to 400)
 ]]></notes>
 		<info name="alt_title" value="マイトアンドマジック" />
 		<info name="usage" value="Boot with Disk C in drive 1"/>
@@ -421,9 +417,11 @@ Burps on [FDC] access after disk swap with program and player disks, trying to s
 		<publisher>ウインキーソフト (Winky Soft)</publisher>
 		<notes><![CDATA[
 Display off in places during intro
-Needs graphic [OFX/OFY] scroll on gameplay
+[gfx] broken scroll bases for main menu
+[gfx] Requires fractional DOT scrolling (horizontal)
+[gfx] wrong draw mode for status bar in gameplay
+[gfx] needs cliprect at gameplay startup
 Unplayable with [keyboard]
-Gameplay start with [cliprect] mask effect
 ]]></notes>
 		<info name="alt_title" value="オルテウス" />
 		<info name="usage" value="Kana Lock on pauses the game"/>
@@ -501,9 +499,9 @@ Gameplay start with [cliprect] mask effect
 		<year>1988</year>
 		<publisher>NEC</publisher>
 		<notes><![CDATA[
-Various [SGP] issues during gameplay
-Intro uses [cliprect] effects
-Needs graphic [OFX/OFY] scroll
+[SGP] extensive VD usage in gameplay
+[gfx] intro uses cliprect
+[gfx] Requires fractional DOT scrolling (horizontal)
 ]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1296112">
@@ -543,7 +541,7 @@ Burps on [FDC] access after disk swap with program and player disks, trying to s
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Play Disk" />
+			<feature name="part_id" value="Player Disk" />
 			<dataarea name="flop" size="1128880">
 				<rom name="rogue alliance(playdisk) (star craft).d88" size="1128880" crc="eefc9724" sha1="350ec250eb63a080322e79f2509eae7efd6a109b"/>
 			</dataarea>
@@ -575,8 +573,9 @@ Winning animation is glitchy [OFX/OFY]?, uses [IDP] text transpen with upper bit
 		<year>1987</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
 		<notes><![CDATA[
-Opening has a few weird places for [gfx] priority and half height [gfx]
-Missing player shot and enemy sprites [gfx] during gameplay
+[gfx] needs cliprect and primask pen during intro
+Runs at half speed
+[IDP] sprites wraparound on left edge
 Omake: if sound irqs don't run then needs to press key 0 pad to move on
 ]]></notes>
 		<info name="alt_title" value="神羅万象"/>
@@ -792,7 +791,6 @@ Enables [FDC] PIO mode, black screen
 		<year>1988</year>
 		<publisher>B·P·S (Bullet-Proof Software)</publisher>
 		<notes><![CDATA[
-Uses direct color layers, white screens with sound, bypass by changing m_video_pri_reg in debugger to ab89 0000
 Fails [floppy] copy protection, draws "TETRIS IS ONLY 6,800 YEN" on title screen with annoying SFX covering the BGM
 ]]></notes>
 		<info name="release" value="19881222"/>
@@ -812,8 +810,9 @@ Fails [floppy] copy protection, draws "TETRIS IS ONLY 6,800 YEN" on title screen
 		<year>1992</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
 		<notes><![CDATA[
-Heavy [ROP] artifacts on setup menu and opening, crashes with black screen at the end
-Crashes if directly selecting new game
+[IDP] doesn't disable PC-Engine OS function strip during intro (same as mightmag?)
+Runs too slow
+Black screen if directly selecting new game or after intro
 Has unemulated [MIDI] options
 ]]></notes>
 		<info name="release" value="199201xx"/>
@@ -874,10 +873,12 @@ Has unemulated [MIDI] options
 		<year>1990</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
 		<notes><![CDATA[
+[IDP] doesn't disable PC-Engine OS function strip until after few moments in intro (same as mightmag?)
 Optionally wants kana lock enabled for entering a name for new game [keyboard] irq
+Not extensively tested
 ]]></notes>
 		<info name="release" value="19901102"/>
-		<info name="usage" value="Boot with disk 2 in drive A: for gameplay"/>
+		<info name="usage" value="Boot with disk 2 in drive A: for going straight in gameplay"/>
 
 		<!-- status: baddump for non-factory save 1 -->
 		<part name="flop1" interface="floppy_5_25">
@@ -909,6 +910,7 @@ Optionally wants kana lock enabled for entering a name for new game [keyboard] i
 		<notes><![CDATA[
 Runs too slow, [SGP]?
 Ugly pitch for [OPNA] voice samples on intro
+Not extensively tested
 ]]></notes>
 		<info name="release" value="19911220"/>
 		<info name="alt_title" value="フレイ"/>
@@ -1238,9 +1240,10 @@ All disks fail initial bootstrap [FDC]
 		<year>1996</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<notes><![CDATA[
-Has glitchy [gfx] after starting a game
-Has badly colored sprites on character select
-[SGP] leaves trails during gameplay
+[gfx] unhandled RGB565 transparency
+[gfx] Glitched screen right after selecting new game
+[gfx] Has badly colored sprites on character select, needs h/v scrolling for background
+[gfx] Requires fractional DOT scrolling (horizontal) starting from stage 2
 ]]></notes>
 		<info name="developer" value="Fredia" />
 		<info name="alt_title" value="ばる〜んぶ れ〜か〜" />
@@ -1256,8 +1259,7 @@ Has badly colored sprites on character select
 		<year>1996</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<notes><![CDATA[
-Title screen has [SGP] artifacts
-Needs graphic [OFX/OFY] scroll on gameplay
+[gfx] requires h/v scrolling for background and gameplay
 ]]></notes>
 		<info name="developer" value="Fredia" />
 		<part name="flop1" interface="floppy_5_25">
@@ -1273,8 +1275,9 @@ Needs graphic [OFX/OFY] scroll on gameplay
 		<year>2006</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<notes><![CDATA[
-Broken graphics [SGP] or [cliprect]
-15.7 kHz has doubled height [gfx]
+[gfx] uses various forms of cliprect mask
+[IDP] doesn't disable PC-Engine OS function strip (same as mightmag?)
+Runs too slow, no sound?
 ]]></notes>
 		<info name="developer" value="Shinra" />
 		<info name="alt_title" value="ハレ晴レユカイ" />
@@ -1297,8 +1300,10 @@ Broken graphics [SGP] or [cliprect]
 		<year>1994</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<notes><![CDATA[
-Title screen doesn't show text layer, [cliprect]? (verify)
-Needs [OFX/OFY] on gameplay
+[gfx] Title screen doesn't show text layer? (verify)
+[IDP] sprites wraparound on left edge
+Runs too slow
+Crashes after stage 1
 ]]></notes>
 		<info name="developer" value="LOKAPALA" />
 		<info name="alt_title" value="ハティの空で" />
@@ -1309,13 +1314,11 @@ Needs [OFX/OFY] on gameplay
 		</part>
 	</software>
 
+	<!-- NOTE: PACMAN.SPR has 1989 timestamp in both sets, outsourced from something else? -->
 	<software name="pacman" supported="partial">
 		<description>Pac-Man</description>
-		<year>19??</year>
+		<year>2006?</year>
 		<publisher>&lt;doujin&gt;</publisher>
-		<notes><![CDATA[
-[SGP] start_dot hookup shifts lives counter
-]]></notes>
 		<info name="developer" value="Shinra" />
 		<info name="usage" value="Boot a PC-Engine OS disk, then swap with this disk and type BASIC PACMAN.BAS to load" />
 		<part name="flop1" interface="floppy_5_25">
@@ -1328,11 +1331,8 @@ Needs [OFX/OFY] on gameplay
 	<!-- autobootable version of above, with PC-Engine OS embedded -->
 	<software name="pacmana" cloneof="pacman" supported="partial">
 		<description>Pac-Man (auto-bootable)</description>
-		<year>19??</year>
+		<year>2011?</year>
 		<publisher>&lt;doujin&gt;</publisher>
-		<notes><![CDATA[
-[SGP] start_dot hookup shifts lives counter
-]]></notes>
 		<info name="developer" value="Shinra" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1281968">
@@ -1346,9 +1346,10 @@ Needs [OFX/OFY] on gameplay
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<notes><![CDATA[
-Broken Upyolic logo, needs [gfx] DSA hooked up for double buffering
+[gfx] Gameplay don't mask bullets on right side
+[gfx] background needs vertical scrolling
+Runs too slow
 Needs joystick in otherwise it loops on title screen
-Gameplay don't mask bullets on right side, [cliprect]
 ]]></notes>
 		<info name="developer" value="Upyolic Soft" />
 		<info name="alt_title" value="最終平気UPOプレリリース" />
@@ -1367,7 +1368,8 @@ Gameplay don't mask bullets on right side, [cliprect]
 		<publisher>Inufuto</publisher>
 		<notes><![CDATA[
 [gfx] Requires fractional DOT scrolling (horizontal)
-[gfx] Should require primask for right panel score display
+[gfx] Should require color primask for right panel score display
+[DE-9] keeps shooting when player press button first time around
 https://youtu.be/7ltdrUPz91w
 ]]></notes>
 		<part name="flop1" interface="floppy_5_25">
@@ -1391,12 +1393,11 @@ https://youtu.be/ygLhn4H-3Ao
 		</part>
 	</software>
 
-	<software name="ascend" supported="no">
+	<software name="ascend" supported="partial">
 		<description>Ascend</description>
 		<year>2023</year>
 		<publisher>Inufuto</publisher>
 		<notes><![CDATA[
-[gfx] background blacked out
 https://youtu.be/JyGXxxOpMos
 ]]></notes>
 		<part name="flop1" interface="floppy_5_25">
@@ -1477,11 +1478,12 @@ https://youtu.be/oJEUR7FhVlU
 		</part>
 	</software>
 
-	<software name="guntus" supported="partial">
+	<software name="guntus" supported="no">
 		<description>Guntus</description>
 		<year>2023</year>
 		<publisher>Inufuto</publisher>
 		<notes><![CDATA[
+Randomly draws with the wrong [gfx] wrong palette bank, [FDC]?
 https://youtu.be/zMWhBRD8cdM
 ]]></notes>
 		<part name="flop1" interface="floppy_5_25">
@@ -1511,7 +1513,7 @@ https://youtu.be/zxy8lTZ_w_k
 		<year>2023</year>
 		<publisher>Inufuto</publisher>
 		<notes><![CDATA[
-Randomly draws with the wrong [gfx] wrong palette bank
+Randomly draws with the wrong [gfx] wrong palette bank, [FDC]?
 https://youtu.be/JIK3ruhURG4
 ]]></notes>
 		<part name="flop1" interface="floppy_5_25">
@@ -1568,7 +1570,7 @@ https://youtu.be/yLf945xs23Y
 		<year>2023</year>
 		<publisher>Inufuto</publisher>
 		<notes><![CDATA[
-[gfx] wrong palette bank
+Randomly draws with the wrong [gfx] wrong palette bank, [FDC]?
 https://youtu.be/JtRkC5ffaYc
 ]]></notes>
 		<part name="flop1" interface="floppy_5_25">
