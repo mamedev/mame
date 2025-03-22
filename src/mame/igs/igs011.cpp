@@ -5018,7 +5018,7 @@ ROM_START( xymga )
 
 	ROM_REGION( 0x280000, "blitter", 0 )
 	ROM_LOAD( "rom.u15",     0x000000, 0x200000, CRC(ec54452c) SHA1(0ee7ffa3d4845af083944e64faf5a1c78247aaa2) )
-	ROM_LOAD( "igs_0203.u8", 0x200000, 0x080000, BAD_DUMP CRC(56a2706f) SHA1(98bf4b3153eef53dd449e2538b4b7ff2cc2fe6fa) ) // not dumped yet, using the one for xymg for now
+	ROM_LOAD( "igs_0203.u8", 0x200000, 0x080000, CRC(56a2706f) SHA1(98bf4b3153eef53dd449e2538b4b7ff2cc2fe6fa) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "igs_s0202.u39", 0x000000, 0x80000, CRC(106ac5f7) SHA1(5796a880c3424e3d2251b2223a0e594957afecaf) ) // same as xymg, only without 1st and 2nd half identical
