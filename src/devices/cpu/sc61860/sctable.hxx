@@ -79,7 +79,7 @@ void sc61860_device::sc61860_instruction()
 		case 76: sc61860_in_a();m_icount-=2;break;
 		case 77: /*nopw*/;m_icount-=2;break;
 		case 78: sc61860_wait();m_icount-=6;break;
-		case 79: sc61860_wait_x(false);m_icount-=1;break; 
+		case 79: sc61860_wait_x(false);m_icount-=1;break;
 		case 80: sc61860_inc_p();m_icount-=2;break;
 		case 81: sc61860_dec_p();m_icount-=2;break;
 		case 82: sc61860_store_ext(A);m_icount-=2;break;

@@ -544,7 +544,7 @@ void linndrum_audio_device::mux_drum_w(int voice, u8 data, bool is_strobe)
 	}
 
 	LOGMASKED(LOG_STROBES, "Strobed mux drum %s: %02x (gain: %f)\n",
-	          MUX_VOICE_NAMES[voice], data, m_mux_volume[voice]->gain());
+			  MUX_VOICE_NAMES[voice], data, m_mux_volume[voice]->gain());
 }
 
 void linndrum_audio_device::snare_w(u8 data)
@@ -591,7 +591,7 @@ void linndrum_audio_device::snare_w(u8 data)
 	m_snare_volume->set_gain(gain);
 
 	LOGMASKED(LOG_STROBES, "Strobed snare / sidestick: %02x (iref: %f, gain: %f)\n",
-	          data, iref, gain);
+			  data, iref, gain);
 }
 
 void linndrum_audio_device::tom_w(u8 data)
@@ -633,8 +633,8 @@ void linndrum_audio_device::tom_w(u8 data)
 		m_tom_out[i]->set_gain((i == selected_output) ? 1 : 0);
 
 	LOGMASKED(LOG_STROBES, "Strobed tom / conga: %02x (is_tom: %d, pitch:%d, output: %d, %s)\n",
-	          data, m_tom_selected, m_tom_selected_pitch, selected_output,
-	          (selected_output >= 0) ? TOM_VOICE_NAMES[selected_output] : "none");
+			  data, m_tom_selected, m_tom_selected_pitch, selected_output,
+			  (selected_output >= 0) ? TOM_VOICE_NAMES[selected_output] : "none");
 }
 
 void linndrum_audio_device::strobe_click_w(u8 /*data*/)
@@ -1020,8 +1020,8 @@ void linndrum_audio_device::update_volume_and_pan(int channel)
 	m_voice_hpf[channel]->filter_rc_set_RC(filter_rc_device::HIGHPASS, r_voice_gnd, 0, 0, C_VOICE);
 
 	LOGMASKED(LOG_MIX, "Gain update for %s - left: %f, right: %f, HPF cutoff: %.2f Hz\n",
-	          MIXER_CHANNEL_NAMES[channel], gain_left, gain_right,
-	          1.0F / (2 * float(M_PI) * r_voice_gnd * C_VOICE));
+			  MIXER_CHANNEL_NAMES[channel], gain_left, gain_right,
+			  1.0F / (2 * float(M_PI) * r_voice_gnd * C_VOICE));
 }
 
 void linndrum_audio_device::update_master_volume()
@@ -1059,7 +1059,7 @@ void linndrum_audio_device::update_mux_drum_pitch()
 	m_mux_timer->adjust(period, 0, period);
 
 	LOGMASKED(LOG_PITCH, "Updated mux drum pitch. CV: %f, freq: %d, adjusted: %d\n",
-	          cv, freq, adjusted_freq);
+			  cv, freq, adjusted_freq);
 }
 
 void linndrum_audio_device::update_snare_pitch()
@@ -1119,7 +1119,7 @@ void linndrum_audio_device::update_tom_pitch()
 		m_tom_timer->adjust(period, 0, period);
 
 	LOGMASKED(LOG_PITCH, "Updated tom pitch: %d, %d. CV: %f, freq: %d\n",
-	          knob_index, knob_value, cv, freq);
+			  knob_index, knob_value, cv, freq);
 }
 
 namespace {

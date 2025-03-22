@@ -38,7 +38,7 @@ Front panel:
 
 
 Six PCBs connected with two backplanes (Motorola VME 9 conns and a custom one with 13 conns):
-            
+
 OSD PCB (B6) (EURO-BEEB 65, CUBE EuroBEEB Single Board Computer PCB from Control Universal Ltd.)
  - Rockwell R6551AP ACIA
  - Rockwell R6522AP VIA
@@ -220,7 +220,7 @@ PCB VIDEO (B1) (labeled "OPTOMAX VIDEO PCB 9000-0022-2/2")
  - 2716 EPROM
  - 2 x Toshiba TC5565PL-15
  - Motorola MC68230P8
-                   ___     ___     ___     ___ 
+                   ___     ___     ___     ___
                   |   |   |   |   |   |   |   |
    _______________|   |___|   |___|   |___|   |________________________________
   |               |___|   |___|   |___|   |___|                               |

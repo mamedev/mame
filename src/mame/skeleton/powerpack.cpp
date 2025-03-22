@@ -4,7 +4,7 @@
 
 Skeleton driver for Microtek Powerpack In-Circuit Emulator model PP-SW+ PIII
 
-Main POD with two PCBs connected with a small backplane (also connects 
+Main POD with two PCBs connected with a small backplane (also connects
 with the pass-through CPU adapter using a flat cable):
  - PCB 1:
   * Side A
@@ -29,7 +29,7 @@ with the pass-through CPU adapter using a flat cable):
 
 Pass-through CPU adapter for Pentium III:
  - 1 x Xilinx XCV100.
-  
+
 ****************************************************************************/
 
 #include "emu.h"

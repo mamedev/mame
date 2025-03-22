@@ -6,7 +6,7 @@
 Skeleton driver for Secoinsa Serie 20 minicomputer.
 
 Secoinsa (Sociedad Española de Comunicaciones e Informática, S.A.) was a company founded in 1975 by Fujitsu, the Spanish
-National Institute for Industry (Instituto Nacional de Industria, INI), Telefónica, and other investors (mainly banks). 
+National Institute for Industry (Instituto Nacional de Industria, INI), Telefónica, and other investors (mainly banks).
 It primarily manufactured and sold FACOM clones for the Spanish market.
 
 In 1986, the company was split and sold. Telefónica acquired the professional services division, while Fujitsu España
@@ -120,7 +120,7 @@ PCB SECOINSA SM16B-0200-0140:
 
 
 
-CPU PCB 
+CPU PCB
      _______________________________________________________________
     |   ___                          __________       _________    |
     |  |  |                         |SN74LS74AN      |74LS08N_|    |
@@ -292,7 +292,7 @@ RAM PCB 2 (24 x HM6116P-3)
     | |HM    |  |HM    |  |HM    |  |HM    |  |HM    | AM25LS252IPC __|
     | |6116P |  |6116P |  |6116P |  |6116P |  |6116P |              __|
     | |3     |  |3     |  |3     |  |3     |  |3     |  _________   __|
-    | |______|  |______|  |______|  |______|  |______| SN74ALS133N  __| 
+    | |______|  |______|  |______|  |______|  |______| SN74ALS133N  __|
     |  _______   _______   _______   _______   _______              __|
     | |      |  |      |  |      |  |      |  |      |              __|
     | |      |  |      |  |      |  |      |  |      |  __________  __|
@@ -345,7 +345,7 @@ RAM PCB 3 (24 x HM6116P-3)
     | |HM    |  |HM    |  |HM    |  |HM    |  |HM    | AM25LS252IPC __|
     | |6116P |  |6116P |  |6116P |  |6116P |  |6116P |              __|
     | |3     |  |3     |  |3     |  |3     |  |3     |  _________   __|
-    | |______|  |______|  |______|  |______|  |______| SN74ALS133N  __| 
+    | |______|  |______|  |______|  |______|  |______| SN74ALS133N  __|
     |  _______   _______   _______   _______   _______              __|
     | |      |  |      |  |      |  |      |  |      |              __|
     | |      |  |      |  |      |  |      |  |      |  __________  __|
@@ -398,7 +398,7 @@ RAM PCB 4 (24 x HM6116P-3)
     | |HM    |  |HM    |  |HM    |  |HM    |  |HM    | AM25LS252IPC __|
     | |6116P |  |6116P |  |6116P |  |6116P |  |6116P |              __|
     | |3     |  |3     |  |3     |  |3     |  |3     |  _________   __|
-    | |______|  |______|  |______|  |______|  |______| SN74ALS133N  __| 
+    | |______|  |______|  |______|  |______|  |______| SN74ALS133N  __|
     |  _______   _______   _______   _______   _______              __|
     | |      |  |      |  |      |  |      |  |      |              __|
     | |      |  |      |  |      |  |      |  |      |  __________  __|
@@ -451,7 +451,7 @@ RAM PCB 5 (32 x HM6116P-3)
     | |HM    |  |HM    |  |HM    |  |HM    |  |HM    | AM25LS252IPC __|
     | |6116P |  |6116P |  |6116P |  |6116P |  |6116P |              __|
     | |3     |  |3     |  |3     |  |3     |  |3     |  _________   __|
-    | |______|  |______|  |______|  |______|  |______| SN74ALS133N  __| 
+    | |______|  |______|  |______|  |______|  |______| SN74ALS133N  __|
     |  _______   _______   _______   _______   _______              __|
     | |      |  |      |  |      |  |      |  |      |              __|
     | |      |  |      |  |      |  |      |  |      |  __________  __|
@@ -504,7 +504,7 @@ RAM PCB 5 (24 x HM6116P-3)
     | |HM    |  |HM    |  |HM    |  |HM    |  |HM    | AM25LS252IPC __|
     | |6116P |  |6116P |  |6116P |  |6116P |  |6116P |              __|
     | |3     |  |3     |  |3     |  |3     |  |3     |  _________   __|
-    | |______|  |______|  |______|  |______|  |______| SN74ALS133N  __| 
+    | |______|  |______|  |______|  |______|  |______| SN74ALS133N  __|
     |  _______   _______   _______   _______   _______              __|
     | |      |  |      |  |      |  |      |  |      |              __|
     | |      |  |      |  |      |  |      |  |      |  __________  __|

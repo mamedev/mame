@@ -4,12 +4,12 @@
 
     Round Up 5                                          ATC-011
 
-	TODO:
+    TODO:
 
     - Finish road layer.
       Tunnel sections are borderline unplayable, plus slopes are ugly to watch.
 
-	- Always boots with a coin inserted
+    - Always boots with a coin inserted
       $5152 is the coin counter, gets an explicit 1 at boot.
       There are other two buffers read from 68k before that, written to $5156 and $515a
       If these are 0xffff by then game boots normally ...

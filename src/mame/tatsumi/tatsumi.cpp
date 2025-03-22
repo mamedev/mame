@@ -2,10 +2,10 @@
 // copyright-holders:Bryan McPhail, Angelo Salese
 /***************************************************************************
 
-	This is a common base for apache3.cpp, roundup5.cpp and cyclwarr.cpp
+    This is a common base for apache3.cpp, roundup5.cpp and cyclwarr.cpp
 
-	Gray Out (from 1987) is likely a similar setup
-	http://www.tatsu-mi.co.jp/game/trace/index.html
+    Gray Out (from 1987) is likely a similar setup
+    http://www.tatsu-mi.co.jp/game/trace/index.html
 
     Incredibly complex hardware!  These are all different boards, but share
     a similar sprite chip (TZB215 on Apache 3, TZB315 on others).  Other

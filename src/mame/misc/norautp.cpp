@@ -543,14 +543,14 @@
   - Added new test functions for drhl, drhla, dphl, and dphla.
   - Cleaned all the conditional unused things.
   - Rewrote inputs for different sets.
-  - DIP switches improvements for norautp, norautrh, 
+  - DIP switches improvements for norautp, norautrh,
   - New inputs for norautua, dphla, drhl, ssjkrpkr.
   - New portmap for dphl, dphla.
   - Added Interrupts through vertical sync for all sets based on i8080.
   - Fixed norautua and norautub table for bin to bcd conversion.
   - New button-lamps layout with 10 buttons for dphl, dphla, dphljp,
     drhl, drhla, and ssjkrpkr.
-  - Clickable buttons for all former buttons-lamps layouts. 	
+  - Clickable buttons for all former buttons-lamps layouts.
   - Promoted drhl, drhla, norautua, norautub, and ssjkrpkr to working.
 
   - Implemented a custom timer and counter to get correct reads in unknown hardware.
@@ -573,7 +573,7 @@
   - Derivated inputs for fasdrwp.
   - Added buttons-lamps layout for fastdrwp.
   - Promoted fastdrwp set to working.
-  
+
 
   TODO:
 
@@ -589,8 +589,8 @@
 
   - dphl type, as dphljp, smshilo, dphlunkb, were flagged as
     imperfect graphics due they show part of a paytable as garbage
-	when you coin/bet the game. After deal, they are not showing 
-	this anymore.
+    when you coin/bet the game. After deal, they are not showing
+    this anymore.
 
 
 *******************************************************************************/
@@ -636,7 +636,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_hopper(*this, "hopper"),		
+		m_hopper(*this, "hopper"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes"),
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
@@ -716,15 +716,15 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	required_device<ticket_dispenser_device> m_hopper;	
+	required_device<ticket_dispenser_device> m_hopper;
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 	output_finder<12> m_lamps;
-	
+
 	int m_test3 = 1;
 	int m_test3b = 0;
 	int m_test_count = 0;
 	uint8_t m_videoram[0x800] = {};
-	
+
 };
 
 
@@ -757,7 +757,7 @@ uint32_t norautp_state::screen_update_norautp(screen_device &screen, bitmap_ind1
 				int colour = (m_np_vram[count] & 0xc0) >> 6;
 				if((y == 4) | ( y == 5))
 					colour = colour + 4;
-				
+
 				m_gfxdecode->gfx(1)->opaque(bitmap,cliprect, tile, colour, 0, 0, (x * 32) + 8, y * 32);
 
 				count+=2;
@@ -801,7 +801,7 @@ void norautp_state::norautp_palette(palette_device &palette) const
 	palette.set_pen_color(13, rgb_t(0xff, 0x00, 0x00));    // red
 	palette.set_pen_color(14, rgb_t(0xff, 0xff, 0xff));    // white
 	palette.set_pen_color(15, rgb_t(0x00, 0x00, 0x00));    // black
-	
+
 }
 
 void norautp_state::drhl_palette(palette_device &palette) const
@@ -841,11 +841,11 @@ void norautp_state::sureshoto_palette(palette_device &palette) const
 	palette.set_pen_color(8,  rgb_t(0xff, 0xff, 0xff));    // white
 	palette.set_pen_color(9,  rgb_t(0x00, 0x00, 0x00));    // cards bg
 	palette.set_pen_color(10, rgb_t(0xff, 0xff, 0xff));    // white
-	palette.set_pen_color(11, rgb_t(0x00, 0x00, 0x00));    
+	palette.set_pen_color(11, rgb_t(0x00, 0x00, 0x00));
 	palette.set_pen_color(12, rgb_t(0xff, 0xff, 0xff));    // white
-	palette.set_pen_color(13, rgb_t(0xff, 0x00, 0x00));    
+	palette.set_pen_color(13, rgb_t(0xff, 0x00, 0x00));
 	palette.set_pen_color(14, rgb_t(0xff, 0xff, 0xff));    // white
-	palette.set_pen_color(15, rgb_t(0xff, 0x00, 0x00));    
+	palette.set_pen_color(15, rgb_t(0xff, 0x00, 0x00));
 }
 
 
@@ -921,7 +921,7 @@ void norautp_state::counterlamps_w(uint8_t data)
 	m_lamps[10] = BIT(data, 0);  // HI lamp
 	m_lamps[11] = BIT(data, 1);  // LO lamp
 
-	m_hopper->motor_w(BIT(data, 2));	
+	m_hopper->motor_w(BIT(data, 2));
 
 	machine().bookkeeping().coin_counter_w(0, data & 0x10);  // Coin1/3 counter
 	machine().bookkeeping().coin_counter_w(1, data & 0x20);  // Coin2 counter
@@ -944,7 +944,7 @@ TIMER_CALLBACK_MEMBER(norautp_state::ppi2_ack)
 		m_np_vram[np_addr] = vram_data;
 		m_videoram[np_addr] = vram_data;
 	}
-	
+
 }
 
 // game waits for bit 4 (0x10) to be reset.
@@ -1314,7 +1314,7 @@ static INPUT_PORTS_START( norautrh )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_DIPNAME( 0x04, 0x04, "Bet Max" )           PORT_DIPLOCATION("DSW1:6")  
+	PORT_DIPNAME( 0x04, 0x04, "Bet Max" )           PORT_DIPLOCATION("DSW1:6")
 	PORT_DIPSETTING(    0x04, "1" )           PORT_CONDITION("DSW1", 0x80, EQUALS, 0x00)
 	PORT_DIPSETTING(    0x00, "20" )          PORT_CONDITION("DSW1", 0x80, EQUALS, 0x00)
 	PORT_DIPSETTING(    0x04, "5 " )          PORT_CONDITION("DSW1", 0x80, EQUALS, 0x80)
@@ -1556,7 +1556,7 @@ static INPUT_PORTS_START( norautua )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_DIPNAME( 0x04, 0x04, "Bet Max" )           PORT_DIPLOCATION("DSW1:6")  
+	PORT_DIPNAME( 0x04, 0x04, "Bet Max" )           PORT_DIPLOCATION("DSW1:6")
 	PORT_DIPSETTING(    0x04, "1" )           PORT_CONDITION("DSW1", 0x80, EQUALS, 0x00)
 	PORT_DIPSETTING(    0x00, "20" )          PORT_CONDITION("DSW1", 0x80, EQUALS, 0x00)
 	PORT_DIPSETTING(    0x04, "5 " )          PORT_CONDITION("DSW1", 0x80, EQUALS, 0x80)
@@ -1615,7 +1615,7 @@ static INPUT_PORTS_START( dphl )
 	PORT_DIPSETTING(    0x40, "When 8 or more is bet" )
 	PORT_DIPSETTING(    0x20, "When 4 or more is bet" )
 	PORT_DIPSETTING(    0x00, "Always" )
-	PORT_DIPNAME( 0x80, 0x80, "Test Mode" )           PORT_DIPLOCATION("DSW1:1") 
+	PORT_DIPNAME( 0x80, 0x80, "Test Mode" )           PORT_DIPLOCATION("DSW1:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1624,9 +1624,9 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( dphla )
 
 	PORT_INCLUDE( dphl )
-	
+
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )  PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))  // hopper 
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )  PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))  // hopper
 INPUT_PORTS_END
 
 
@@ -1690,7 +1690,7 @@ static INPUT_PORTS_START( ssjkrpkr )
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )
 
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW1:1") 
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW1:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1699,7 +1699,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( sureshoto )
 
 	PORT_INCLUDE( dphl )
-	
+
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )       PORT_NAME("Break (Deal)")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )  // unused bet
@@ -1737,7 +1737,7 @@ static INPUT_PORTS_START( sureshoto )
 	PORT_DIPSETTING(    0x40, "When 4 or more is bet" )
 	PORT_DIPSETTING(    0x20, "When 4 or more is bet" )
 	PORT_DIPSETTING(    0x00, "Always" )
-	PORT_DIPNAME( 0x80, 0x80, "Test Mode" )           PORT_DIPLOCATION("DSW1:1") 
+	PORT_DIPNAME( 0x80, 0x80, "Test Mode" )           PORT_DIPLOCATION("DSW1:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1766,7 +1766,7 @@ static INPUT_PORTS_START( fastdrwp )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_DIPNAME( 0x80, 0x80, "Test Mode" )           PORT_DIPLOCATION("DSW1:1") 
+	PORT_DIPNAME( 0x80, 0x80, "Test Mode" )           PORT_DIPLOCATION("DSW1:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1952,7 +1952,7 @@ void norautp_state::noraut_base(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_norautp);
 	PALETTE(config, m_palette, FUNC(norautp_state::norautp_palette), 16);
-	
+
 	HOPPER(config, m_hopper, attotime::from_msec(150));
 
 	// sound hardware
@@ -5051,7 +5051,7 @@ void norautp_state::init_enc()
 	ROM[0x1da0] = 0x10; // 10.000
 	ROM[0x1da1] = 0x27;
 	ROM[0x1da2] = 0xe8; // 1.000
-	ROM[0x1da3] = 0x03;	
+	ROM[0x1da3] = 0x03;
 	ROM[0x1da4] = 0x64; // 100
 	ROM[0x1da5] = 0x00;
 	ROM[0x1da6] = 0x0a; // 10
@@ -5094,7 +5094,7 @@ void norautp_state::init_unka()
 	ROM[0x0003] = 0xff;
 	ROM[0x0004] = 0xd0;
 	ROM[0x0005] = 0xc3;
-	ROM[0x0006] = 0x80;	
+	ROM[0x0006] = 0x80;
 	ROM[0x0007] = 0x01;
 	ROM[0x01d5] = 0xaf;
 
@@ -5106,8 +5106,8 @@ void norautp_state::init_unkb()
 	for (int i = 0x0680; i < 0x0740; i++)
 	{
 		ROM[i] = ~ROM[i];
-		ROM[i + 0X800] = ~ROM[i + 0X800];
-	}	
+		ROM[i + 0x800] = ~ROM[i + 0x800];
+	}
 }
 
 
