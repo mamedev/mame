@@ -112,7 +112,7 @@ namco_c139_device::namco_c139_device(const machine_config &mconfig, const char *
 {
 	auto const &opts = mconfig.options();
 
-	m_localhost = opts.comm_remotehost();
+	m_localhost = opts.comm_localhost();
 	m_localport = opts.comm_localport();
 	m_remotehost = opts.comm_remotehost();
 	m_remoteport = opts.comm_remoteport();
