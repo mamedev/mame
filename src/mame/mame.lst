@@ -42547,6 +42547,9 @@ busicom
 @source:skeleton/c2color.cpp
 c2color
 
+@source:skeleton/camirf1.cpp
+camirf1
+
 @source:skeleton/candela.cpp
 can09t
 can09
