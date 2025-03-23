@@ -770,7 +770,7 @@ offs_t mn10300_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 	case 0x74: case 0x75: case 0x76: case 0x77:
 	case 0x78: case 0x79: case 0x7a: case 0x7b:
 	case 0x7c: case 0x7d: case 0x7e: case 0x7f:
-		util::stream_format(stream, "%-8s(a%d), d%d", "mov", BIT(opcode, 2, 2), BIT(opcode, 0, 2));
+		util::stream_format(stream, "%-8s(a%d), d%d", "mov", BIT(opcode, 0, 2), BIT(opcode, 2, 2));
 		return 1 | SUPPORTED;
 
 	case 0x80: case 0x85: case 0x8a: case 0x8f:
