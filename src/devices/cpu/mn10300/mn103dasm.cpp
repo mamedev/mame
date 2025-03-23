@@ -877,7 +877,7 @@ offs_t mn10300_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 	case 0xe4: case 0xe5: case 0xe6: case 0xe7:
 	case 0xe8: case 0xe9: case 0xea: case 0xeb:
 	case 0xec: case 0xed: case 0xee: case 0xef:
-		util::stream_format(stream, "%-8sa%d, a%d", "add", BIT(opcode, 2, 2), BIT(opcode, 0, 2));
+		util::stream_format(stream, "%-8sd%d, d%d", "add", BIT(opcode, 2, 2), BIT(opcode, 0, 2));
 		return 1 | SUPPORTED;
 
 	case 0xf0:
