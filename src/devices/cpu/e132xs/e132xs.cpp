@@ -215,6 +215,7 @@ hyperstone_device::hyperstone_device(const machine_config &mconfig, const char *
 	, m_nocode(nullptr)
 	, m_interrupt_checks(nullptr)
 	, m_out_of_cycles(nullptr)
+	, m_delay_taken(nullptr)
 	, m_mem_read8(nullptr)
 	, m_mem_write8(nullptr)
 	, m_mem_read16(nullptr)

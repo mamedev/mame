@@ -150,11 +150,13 @@ void hyperstone_device::code_flush_cache()
 
 	try
 	{
-		/* generate the entry point and out-of-cycles handlers */
-		static_generate_entry_point();
-		static_generate_nocode_handler();
-		static_generate_out_of_cycles();
-		static_generate_interrupt_checks();
+		{
+			// generate the entry point and out-of-cycles handlers
+			drcuml_block &block(m_drcuml->begin_block(512));
+			uml::code_label label = 1;
+			static_generate_helpers(block, label);
+			block.end();
+		}
 
 		static_generate_exception(EXCEPTION_IO2, "io2");
 		static_generate_exception(EXCEPTION_IO1, "io1");
@@ -398,20 +400,15 @@ void hyperstone_device::static_generate_exception(uint32_t exception, const char
 
 
 
-void hyperstone_device::static_generate_interrupt_checks()
+void hyperstone_device::static_generate_interrupt_checks(drcuml_block &block, uml::code_label &label)
 {
-	/* begin generating */
-	drcuml_block &block(m_drcuml->begin_block(512));
-
-	alloc_handle(*m_drcuml, m_interrupt_checks, "int_checks");
 	UML_HANDLE(block, *m_interrupt_checks);
 
-	uml::code_label labelnum = 1;
-	const int timer_int_pending = labelnum++;
-	const int take_int = labelnum++;
-	const int take_timer = labelnum++;
-	const int dispatch_int = labelnum++;
-	const int done_int = labelnum++;
+	const int timer_int_pending = label++;
+	const int take_int = label++;
+	const int take_timer = label++;
+	const int dispatch_int = label++;
+	const int done_int = label++;
 
 	UML_CMP(block, mem(&m_core->intblock), 0);
 	UML_JMPc(block, uml::COND_G, done_int);
@@ -426,11 +423,11 @@ void hyperstone_device::static_generate_interrupt_checks()
 	UML_TEST(block, I0, 0x7f);
 	UML_JMPc(block, uml::COND_Z, done_int);
 
-	generate_interrupt_checks(block, labelnum, false, take_int, take_timer);
+	generate_interrupt_checks(block, label, false, take_int, take_timer);
 	UML_JMP(block, done_int);
 
 	UML_LABEL(block, timer_int_pending);
-	generate_interrupt_checks(block, labelnum, true, take_int, take_timer);
+	generate_interrupt_checks(block, label, true, take_int, take_timer);
 	UML_JMP(block, done_int);
 
 	UML_LABEL(block, take_int);
@@ -442,80 +439,52 @@ void hyperstone_device::static_generate_interrupt_checks()
 	UML_MOV(block, I0, TRAPNO_TIMER);
 
 	UML_LABEL(block, dispatch_int);
-	generate_trap_exception_or_int<IS_INT>(block, labelnum, uml::I0);
+	generate_trap_exception_or_int<IS_INT>(block, label, uml::I0);
 
 	UML_LABEL(block, done_int);
 	UML_RET(block);
-
-	block.end();
 }
 
 /*-------------------------------------------------
-    generate_entry_point - generate a
-    static entry point
+    generate_entry_helpers - generate helper
+    stubs and functions
 -------------------------------------------------*/
 
-void hyperstone_device::static_generate_entry_point()
+void hyperstone_device::static_generate_helpers(drcuml_block &block, uml::code_label &label)
 {
-	/* begin generating */
-	drcuml_block &block(m_drcuml->begin_block(20));
-
-	/* forward references */
-	alloc_handle(*m_drcuml, m_nocode, "nocode");
-
+	// forward references
 	alloc_handle(*m_drcuml, m_entry, "entry");
-	UML_HANDLE(block, *m_entry);
-
-	/* load fast integer registers */
-	//load_fast_iregs(block);
-
-	/* generate a hash jump via the current mode and PC */
-	UML_HASHJMP(block, 0, mem(&m_core->global_regs[0]), *m_nocode);
-	block.end();
-}
-
-
-/*-------------------------------------------------
-    static_generate_nocode_handler - generate an
-    exception handler for "out of code"
--------------------------------------------------*/
-
-void hyperstone_device::static_generate_nocode_handler()
-{
-	/* begin generating */
-	drcuml_block &block(m_drcuml->begin_block(10));
-
-	/* generate a hash jump via the current mode and PC */
 	alloc_handle(*m_drcuml, m_nocode, "nocode");
+	alloc_handle(*m_drcuml, m_out_of_cycles, "out_of_cycles");
+	alloc_handle(*m_drcuml, m_delay_taken, "delay_taken");
+	alloc_handle(*m_drcuml, m_interrupt_checks, "int_checks");
+
+	// static entry point
+	UML_HANDLE(block, *m_entry);
+	//load_fast_iregs(block);
+	UML_HASHJMP(block, 0, mem(&m_core->global_regs[0]), *m_nocode);
+
+	// exception handler for "out of code"
 	UML_HANDLE(block, *m_nocode);
 	UML_GETEXP(block, I0);
-
 	UML_MOV(block, mem(&PC), I0);
 	//save_fast_iregs(block);
 	UML_EXIT(block, EXECUTE_MISSING_CODE);
 
-	block.end();
-}
-
-
-/*-------------------------------------------------
-    static_generate_out_of_cycles - generate an
-    out of cycles exception handler
--------------------------------------------------*/
-
-void hyperstone_device::static_generate_out_of_cycles()
-{
-	/* begin generating */
-	drcuml_block &block(m_drcuml->begin_block(10));
-
-	/* generate a hash jump via the current mode and PC */
-	alloc_handle(*m_drcuml, m_out_of_cycles, "out_of_cycles");
+	// out of cycles exception handler
 	UML_HANDLE(block, *m_out_of_cycles);
 	//save_fast_iregs(block);
 	UML_EXIT(block, EXECUTE_OUT_OF_CYCLES);
 
-	block.end();
+	// delayed branch taken
+	UML_HANDLE(block, *m_delay_taken);
+	UML_MOV(block, mem(&m_core->delay_slot_taken), 0);
+	generate_update_cycles(block);
+	UML_HASHJMP(block, 0, DRC_PC, *m_nocode);
+
+	static_generate_interrupt_checks(block, label);
 }
+
 
 /*------------------------------------------------------------------
     static_generate_memory_accessor
@@ -817,14 +786,12 @@ void hyperstone_device::generate_branch(drcuml_block &block, uml::parameter targ
 
 void hyperstone_device::generate_sequence_instruction(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)
 {
-	offs_t expc;
-
 	/* add an entry for the log */
 	if (m_drcuml->logging() && !(desc->flags & OPFLAG_VIRTUAL_NOOP))
 		log_add_disasm_comment(block, desc->pc, desc->opptr.w[0]);
 
 	/* set the PC map variable */
-	expc = (desc->flags & OPFLAG_IN_DELAY_SLOT) ? desc->pc - 3 : desc->pc;
+	const offs_t expc = (desc->flags & OPFLAG_IN_DELAY_SLOT) ? (desc->pc - 3) : desc->pc;
 	UML_MAPVAR(block, MAPVAR_PC, expc);
 
 #if E132XS_LOG_DRC_REGS
@@ -1118,20 +1085,17 @@ bool hyperstone_device::generate_opcode(drcuml_block &block, compiler_state &com
 		case 0xff: generate_trap_op(block, compiler, desc); break;
 	}
 
-	UML_ROLINS(block, DRC_SR, ((desc->length >> 1) << ILC_SHIFT), 0, ILC_MASK);
+	UML_MOV(block, I0, DRC_SR);
+	UML_ROLINS(block, I0, (desc->length >> 1) << ILC_SHIFT, 0, ILC_MASK);
+	UML_MOV(block, DRC_SR, I0);
 
-	int no_delay_taken = compiler.m_labelnum++;
-	UML_TEST(block, mem(&m_core->delay_slot_taken), ~0);
-	UML_JMPc(block, uml::COND_Z, no_delay_taken);
-	UML_MOV(block, mem(&m_core->delay_slot_taken), 0);
-	generate_update_cycles(block);
-	UML_HASHJMP(block, 0, DRC_PC, *m_nocode);
-	UML_LABEL(block, no_delay_taken);
+	UML_TEST(block, mem(&m_core->delay_slot_taken), ~uint32_t(0));
+	UML_CALLHc(block, uml::COND_NZ, *m_delay_taken);
 
-	int done;
-	UML_AND(block, I0, DRC_SR, (T_MASK | P_MASK));
+	const int done = compiler.m_labelnum++;
+	UML_AND(block, I0, I0, (T_MASK | P_MASK));
 	UML_CMP(block, I0, (T_MASK | P_MASK));
-	UML_JMPc(block, uml::COND_NE, done = compiler.m_labelnum++);
+	UML_JMPc(block, uml::COND_NE, done);
 	UML_TEST(block, mem(&m_core->delay_slot), 1);
 	UML_EXHc(block, uml::COND_E, *m_exception[EXCEPTION_TRACE], 0);
 

@@ -454,6 +454,7 @@ private:
 	uml::code_handle *m_nocode;
 	uml::code_handle *m_interrupt_checks;
 	uml::code_handle *m_out_of_cycles;
+	uml::code_handle *m_delay_taken;
 
 	uml::code_handle *m_mem_read8;
 	uml::code_handle *m_mem_write8;
@@ -484,12 +485,10 @@ private:
 	void code_compile_block(offs_t pc);
 	//void load_fast_iregs(drcuml_block &block);
 	//void save_fast_iregs(drcuml_block &block);
-	void static_generate_entry_point();
-	void static_generate_nocode_handler();
-	void static_generate_out_of_cycles();
-	void static_generate_exception(uint32_t exception, const char *name);
+	void static_generate_helpers(drcuml_block &block, uml::code_label &label);
 	void static_generate_memory_accessor(int size, int iswrite, bool isio, const char *name, uml::code_handle *&handleptr);
-	void static_generate_interrupt_checks();
+	void static_generate_exception(uint32_t exception, const char *name);
+	void static_generate_interrupt_checks(drcuml_block &block, uml::code_label &label);
 	void generate_interrupt_checks(drcuml_block &block, uml::code_label &labelnum, bool with_timer, int take_int, int take_timer);
 	void generate_branch(drcuml_block &block, uml::parameter targetpc, const opcode_desc *desc, bool update_cycles = true);
 	void generate_update_cycles(drcuml_block &block, bool check_interrupts = true);
