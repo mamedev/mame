@@ -579,7 +579,7 @@ offs_t mn10300_disassembler::disassemble_fc(std::ostream &stream, offs_t pc, con
 			format_sp_disp(stream, opcodes.r32(pc + 2));
 		else
 			util::stream_format(stream, "(0x%08x)", opcodes.r32(pc + 2));
-		util::stream_format(stream, ", %c%d", BIT(op2, 0, 2) == 0 ? 'a' : 'd', BIT(op2, 0, 2));
+		util::stream_format(stream, ", %c%d", BIT(op2, 2, 2) == 0 ? 'a' : 'd', BIT(op2, 0, 2));
 		return 6 | SUPPORTED;
 	}
 	else switch (op2 & 0xfc)
