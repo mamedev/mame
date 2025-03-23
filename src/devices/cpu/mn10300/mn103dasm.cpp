@@ -756,7 +756,7 @@ offs_t mn10300_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 	case 0x5c: case 0x5d: case 0x5e: case 0x5f:
 		util::stream_format(stream, "%-8s", "mov");
 		format_sp_disp(stream, opcodes.r8(pc + 1));
-		util::stream_format(stream, ", %c%d", BIT(opcode, 3) ? 'a' : 'd', BIT(opcode, 0, 2));
+		util::stream_format(stream, ", %c%d", BIT(opcode, 2) ? 'a' : 'd', BIT(opcode, 0, 2));
 		return 2 | SUPPORTED;
 
 	case 0x60: case 0x61: case 0x62: case 0x63:
