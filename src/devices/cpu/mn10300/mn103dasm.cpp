@@ -120,7 +120,7 @@ offs_t mn10300_disassembler::disassemble_f0(std::ostream &stream, offs_t pc, con
 	switch (op2 >> 4)
 	{
 	case 0x0: case 0x4: case 0x6:
-		util::stream_format(stream, "%-8s(a%d), %c%d", f_move_ops[BIT(op2, 5, 2)], BIT(op2, 2, 2), (op2 >> 4) == 0x0 ? 'a' : 'd', BIT(op2, 0, 2));
+		util::stream_format(stream, "%-8s(a%d), %c%d", f_move_ops[BIT(op2, 5, 2)], BIT(op2, 0, 2), (op2 >> 4) == 0x0 ? 'a' : 'd', BIT(op2, 2, 2));
 		return 2 | SUPPORTED;
 
 	case 0x1: case 0x5: case 0x7:
@@ -369,8 +369,8 @@ offs_t mn10300_disassembler::disassemble_f8(std::ostream &stream, offs_t pc, con
 		}
 		else
 		{
-			format_an_disp(stream, s8(opcodes.r8(pc + 2)), BIT(op2, 2, 2));
-			util::stream_format(stream, ", %c%d", BIT(op2, 5, 2) == 1 ? 'a' : 'd', BIT(op2, 0, 2));
+			format_an_disp(stream, s8(opcodes.r8(pc + 2)), BIT(op2, 0, 2));
+			util::stream_format(stream, ", %c%d", BIT(op2, 5, 2) == 1 ? 'a' : 'd', BIT(op2, 2, 2));
 		}
 		return 3 | SUPPORTED;
 	}
@@ -449,8 +449,8 @@ offs_t mn10300_disassembler::disassemble_fa(std::ostream &stream, offs_t pc, con
 		}
 		else
 		{
-			format_an_disp(stream, s16(opcodes.r16(pc + 2)), BIT(op2, 2, 2));
-			util::stream_format(stream, ", %c%d", BIT(op2, 5, 2) == 1 ? 'a' : 'd', BIT(op2, 0, 2));
+			format_an_disp(stream, s16(opcodes.r16(pc + 2)), BIT(op2, 0, 2));
+			util::stream_format(stream, ", %c%d", BIT(op2, 5, 2) == 1 ? 'a' : 'd', BIT(op2, 2, 2));
 		}
 		return 4 | SUPPORTED;
 	}
