@@ -388,7 +388,7 @@ offs_t mn10300_disassembler::disassemble_f8(std::ostream &stream, offs_t pc, con
 		util::stream_format(stream, ", d%d", BIT(op2, 0, 2));
 		return 3 | SUPPORTED;
 
-	case 0xc0:
+	case 0xc0: case 0xc4: case 0xc8:
 		util::stream_format(stream, "%-8s%u, d%d", f_shift_ops[BIT(op2, 2, 2)], opcodes.r8(pc + 2), BIT(op2, 0, 2));
 		return 3 | SUPPORTED;
 
