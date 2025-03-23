@@ -300,7 +300,7 @@ ROM_START( missilex )
 	ROM_LOAD( "ms01.8d",      0x0000, 0x0020, CRC(e89e76c3) SHA1(1149b5d1f93baa8aecd54a618083cc13b63a894d) )
 ROM_END
 
-// Taito PCB labeled "SG070011B SGN00005B". 14.314 MHz xtal, 1 bak of 4 dip switches.
+// Taito PCB labeled "SG070011B SGN00005B". 14.314 MHz xtal, 1 bank of 4 dip switches.
 ROM_START( speedrac )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 
