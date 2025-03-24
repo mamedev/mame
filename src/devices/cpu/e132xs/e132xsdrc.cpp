@@ -349,33 +349,31 @@ void hyperstone_device::static_generate_exception(drcuml_block &block, uml::code
 	alloc_handle(*m_drcuml, m_exception, "exception");
 	UML_HANDLE(block, *m_exception);
 
-	UML_GETEXP(block, I0);                                        // I0 = exception code
-	generate_get_trap_addr(block, label, uml::I0);                // I0 = target PC
+	UML_GETEXP(block, I0);                                            // I0 = exception code
+	generate_get_trap_addr(block, label, uml::I0);                    // I0 = target PC
 
-	UML_MOV(block, I4, DRC_SR);                                   // I4 = old SR
+	UML_MOV(block, I4, DRC_SR);                                       // I4 = old SR
 
-	UML_MOV(block, I1, I4);                                       // I1 = SR to be updated
-	UML_ROLAND(block, I3, I4, 7, 0x7f);                           // I3 = old FP
-	UML_ROLAND(block, I2, I4, 11, 0xf);                           // I2 = old FL
-	UML_MOVc(block, uml::COND_Z, I2, 16);                         // convert FL == 0 to 16
-	UML_ADD(block, I3, I3, I2);                                   // I3 = updated FP
+	UML_MOV(block, I1, I4);                                           // I1 = SR to be updated
+	UML_ROLAND(block, I3, I4, 32 - FP_SHIFT, 0x7f);                   // I3 = old FP
+	UML_ROLAND(block, I2, I4, 32 - FL_SHIFT, 0xf);                    // I2 = old FL
+	UML_MOVc(block, uml::COND_Z, I2, 16);                             // convert FL == 0 to 16
+	UML_ADD(block, I3, I3, I2);                                       // I3 = updated FP
 
-	UML_SHL(block, I2, I3, 25);                                   // I2 = updated FP:...
-	UML_OR(block, I2, I2, 6 << 21);                               // I2 = updated FP:FL:...
-	UML_ROLINS(block, I1, I2, 0, 0xffe00000);                     // update FP and FL in I1
-	UML_AND(block, I1, I1, ~(M_MASK | T_MASK));                   // clear M and T, set S and L
-	UML_OR(block, I1, I1, (L_MASK | S_MASK));
-	UML_MOV(block, DRC_SR, I1);                                   // store updated SR
+	UML_SHL(block, I2, I3, FP_SHIFT);                                 // I2 = updated FP:...
+	UML_OR(block, I2, I2, (2 << FL_SHIFT) | S_MASK | L_MASK);         // I2 = updated FP:FL:..:S:..T:L:..:M:..
+	UML_ROLINS(block, I1, I2, 0, FP_MASK | FL_MASK | S_MASK | T_MASK | L_MASK | M_MASK);
+	UML_MOV(block, DRC_SR, I1);                                       // store updated SR
 
-	UML_AND(block, I3, I3, 0x3f);                                 // save old PC at updated (FP)^
+	UML_AND(block, I3, I3, 0x3f);                                     // save old PC at updated (FP)^
 	UML_AND(block, I2, DRC_PC, ~uint32_t(1));
 	UML_ROLINS(block, I2, I4, 32 - S_SHIFT, 1);
 	UML_STORE(block, (void *)m_core->local_regs, I3, I2, SIZE_DWORD, SCALE_x4);
-	UML_ADD(block, I3, I3, 1);                                    // save old SR at updated (FP + 1)^
+	UML_ADD(block, I3, I3, 1);                                        // save old SR at updated (FP + 1)^
 	UML_AND(block, I3, I3, 0x3f);
 	UML_STORE(block, (void *)m_core->local_regs, I3, I4, SIZE_DWORD, SCALE_x4);
 
-	UML_MOV(block, DRC_PC, I0);                                   // branch to exception handler
+	UML_MOV(block, DRC_PC, I0);                                       // branch to exception handler
 	UML_SUB(block, mem(&m_core->icount), mem(&m_core->icount), 2);
 	UML_CALLHc(block, uml::COND_S, *m_out_of_cycles);
 

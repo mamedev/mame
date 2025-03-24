@@ -2545,35 +2545,29 @@ void hyperstone_device::hyperstone_frame()
 {
 	check_delay_PC();
 
-	uint8_t realfp = GET_FP - SRC_CODE;
-	uint8_t dst_code = DST_CODE;
+	const uint8_t realfp = GET_FP - SRC_CODE;
+	const uint8_t dst_code = DST_CODE;
 
 	SET_FP(realfp);
 	SET_FL(dst_code);
 	SR &= ~M_MASK;
 
-	int8_t difference = ((SP & 0x1fc) >> 2) + (64 - 10) - (realfp + GET_FL); // really it's 7 bits
-
-	/* convert to 8 bits */
-	if(difference > 63)
-		difference = (int8_t)(difference|0x80);
-	else if( difference < -64 )
-		difference = difference & 0x7f;
+	int difference = util::sext(((SP & 0x1fc) >> 2) + (64 - 10) - (realfp + GET_FL), 7);
 
 	if (difference < 0) // else it's finished
 	{
-		bool tmp_flag = SP >= UB;
+		const bool tmp_flag = SP >= UB;
 
-		for (; difference < 0; difference++)
+		do
 		{
 			WRITE_W(SP, m_core->local_regs[(SP & 0xfc) >> 2]);
 			SP += 4;
+			difference++;
 		}
+		while (difference < 0);
 
 		if (tmp_flag)
-		{
 			execute_exception(get_trap_addr(TRAPNO_FRAME_ERROR));
-		}
 	}
 
 	// TODO: More than 1 cycle!

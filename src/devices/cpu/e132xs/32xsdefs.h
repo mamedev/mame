@@ -169,6 +169,8 @@ constexpr uint32_t  T_MASK                  = 0x00010000;
 constexpr uint32_t  P_MASK                  = 0x00020000;
 constexpr uint32_t  S_MASK                  = 0x00040000;
 constexpr uint32_t  ILC_MASK                = 0x00180000;
+constexpr uint32_t  FL_MASK                 = 0x01e00000;
+constexpr uint32_t  FP_MASK                 = 0xfe000000;
 
 constexpr int       C_SHIFT                 = 0;
 constexpr int       Z_SHIFT                 = 1;
@@ -178,6 +180,8 @@ constexpr int       L_SHIFT                 = 15;
 constexpr int       T_SHIFT                 = 16;
 constexpr int       S_SHIFT                 = 18;
 constexpr int       ILC_SHIFT               = 19;
+constexpr int       FL_SHIFT                = 21;
+constexpr int       FP_SHIFT                = 25;
 
 /* SR flags */
 #define GET_C                   ( SR & C_MASK)          // bit 0 //CARRY
