@@ -380,8 +380,6 @@ void hyperstone_device::static_generate_exception(drcuml_block &block, uml::code
 	UML_CALLHc(block, uml::COND_S, *m_out_of_cycles);
 
 	UML_HASHJMP(block, 1, I0, *m_nocode); // T cleared and S set - mode will always be 1
-
-	block.end();
 }
 
 
