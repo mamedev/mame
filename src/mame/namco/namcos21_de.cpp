@@ -60,7 +60,6 @@ public:
 	// construction/destruction
 	namco_de_pcbstack_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void configure_c148_standard(machine_config &config);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -114,7 +113,8 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void configure_c68_namcos21(machine_config &config);
+	void configure_c68_namcos21(machine_config &config) ATTR_COLD;
+	void configure_c148_standard(machine_config &config) ATTR_COLD;
 
 	void driveyes_common_map(address_map &map) ATTR_COLD;
 	void driveyes_master_map(address_map &map) ATTR_COLD;
@@ -162,7 +162,7 @@ void namco_de_pcbstack_device::device_add_mconfig(machine_config &config)
 	M68000(config, m_slave, 49.152_MHz_XTAL / 4); /* Slave */
 	m_slave->set_addrmap(AS_PROGRAM, &namco_de_pcbstack_device::driveyes_slave_map);
 
-	MC6809E(config, m_audiocpu, 3072000); /* Sound */
+	MC6809E(config, m_audiocpu, 3'072'000); /* Sound */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &namco_de_pcbstack_device::sound_map);
 	m_audiocpu->set_periodic_int(FUNC(namco_de_pcbstack_device::irq0_line_hold), attotime::from_hz(2*60));
 
@@ -217,28 +217,26 @@ void namco_de_pcbstack_device::device_add_mconfig(machine_config &config)
 uint32_t namco_de_pcbstack_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	//uint8_t *videoram = m_gpu_videoram.get();
-	int pivot = 3;
-	int pri;
-	bitmap.fill(0xff, cliprect );
-	screen.priority().fill(0, cliprect);
-	m_c355spr->build_sprite_list_and_render_sprites(cliprect); // TODO : buffered?
 
+	bitmap.fill(0xff, cliprect);
+	screen.priority().fill(0, cliprect);
+
+	m_c355spr->build_sprite_list_and_render_sprites(cliprect); // TODO : buffered?
 	m_c355spr->draw(screen, bitmap, cliprect, 2 );
-	m_c355spr->draw(screen, bitmap, cliprect, 14 );   //driver's eyes
+	m_c355spr->draw(screen, bitmap, cliprect, 14);   //driver's eyes
 
 	m_namcos21_3d->copy_visible_poly_framebuffer(bitmap, cliprect, 0x7fc0, 0x7ffe);
 
-	m_c355spr->draw(screen, bitmap, cliprect, 0 );
-	m_c355spr->draw(screen, bitmap, cliprect, 1 );
+	m_c355spr->draw(screen, bitmap, cliprect, 0);
+	m_c355spr->draw(screen, bitmap, cliprect, 1);
 
 	m_namcos21_3d->copy_visible_poly_framebuffer(bitmap, cliprect, 0, 0x7fbf);
 
-	for (pri = pivot; pri < 8; pri++)
-	{
+	const int pivot = 3;
+	for (int pri = pivot; pri < 8; pri++)
 		m_c355spr->draw(screen, bitmap, cliprect, pri);
-	}
 
-	m_c355spr->draw(screen, bitmap, cliprect, 15 );   //driver's eyes
+	m_c355spr->draw(screen, bitmap, cliprect, 15);   //driver's eyes
 
 	return 0;
 
@@ -251,11 +249,10 @@ uint16_t namco_de_pcbstack_device::video_enable_r()
 
 void namco_de_pcbstack_device::video_enable_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	COMBINE_DATA( &m_video_enable ); /* 0x40 = enable */
-	if( m_video_enable!=0 && m_video_enable!=0x40 )
-	{
-		logerror( "unexpected video_enable_w=0x%x\n", m_video_enable );
-	}
+	COMBINE_DATA(&m_video_enable); /* 0x40 = enable */
+
+	if (m_video_enable!=0 && m_video_enable!=0x40)
+		logerror("unexpected video_enable_w=0x%x\n", m_video_enable);
 }
 
 /***********************************************************/
@@ -318,7 +315,7 @@ void namco_de_pcbstack_device::c140_map(address_map &map)
 
 void namco_de_pcbstack_device::configure_c68_namcos21(machine_config &config)
 {
-	NAMCOC68(config, m_c68, 8000000);
+	NAMCOC68(config, m_c68, 8'000'000);
 	m_c68->in_pb_callback().set_ioport("MCUB");
 	m_c68->in_pc_callback().set_ioport("MCUC");
 	m_c68->in_ph_callback().set_ioport("MCUH");
@@ -385,12 +382,12 @@ void namco_de_pcbstack_device::driveyes_slave_map(address_map &map)
 
 void namco_de_pcbstack_device::sound_bankselect_w(uint8_t data)
 {
-	m_audiobank->set_entry(data>>4);
+	m_audiobank->set_entry(data >> 4);
 }
 
 void namco_de_pcbstack_device::sound_reset_w(uint8_t data)
 {
-	if (data & 0x01)
+	if (BIT(data, 0))
 	{
 		/* Resume execution */
 		m_audiocpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
@@ -405,9 +402,9 @@ void namco_de_pcbstack_device::sound_reset_w(uint8_t data)
 
 void namco_de_pcbstack_device::system_reset_w(uint8_t data)
 {
-	reset_all_subcpus(data & 1 ? CLEAR_LINE : ASSERT_LINE);
+	reset_all_subcpus(BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
 
-	if (data & 0x01)
+	if (BIT(data, 0))
 		m_maincpu->yield();
 }
 
@@ -433,7 +430,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namco_de_pcbstack_device::screen_scanline)
 	int scanline = param;
 //  int cur_posirq = get_posirq_scanline()*2;
 
-	if(scanline == 240*2)
+	if (scanline == (240*2))
 	{
 		m_master_intc->vblank_irq_trigger();
 		m_slave_intc->vblank_irq_trigger();
