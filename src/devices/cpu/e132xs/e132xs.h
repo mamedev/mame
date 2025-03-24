@@ -271,14 +271,11 @@ protected:
 		EXCEPTION_RESERVED2            = 61,
 		EXCEPTION_RESET                = 62,  // reserved if not mapped @ MEM3
 		EXCEPTION_ERROR_ENTRY          = 63,  // for instruction code of all ones
-		EXCEPTION_COUNT
 	};
 
 	// construction/destruction
 	hyperstone_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock,
 						const device_type type, uint32_t prg_data_width, uint32_t io_data_width, address_map_constructor internal_map);
-
-	void init(int scale_mask);
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
@@ -454,7 +451,7 @@ private:
 	uml::code_handle *m_nocode;
 	uml::code_handle *m_interrupt_checks;
 	uml::code_handle *m_out_of_cycles;
-	uml::code_handle *m_delay_taken;
+	uml::code_handle *m_delay_taken[4];
 
 	uml::code_handle *m_mem_read8;
 	uml::code_handle *m_mem_write8;
@@ -464,33 +461,25 @@ private:
 	uml::code_handle *m_mem_write32;
 	uml::code_handle *m_io_read32;
 	uml::code_handle *m_io_write32;
-	uml::code_handle *m_exception[EXCEPTION_COUNT];
+	uml::code_handle *m_exception;
 
 	bool m_enable_drc;
 
 	/* internal compiler state */
-	struct compiler_state
-	{
-		compiler_state(compiler_state const &) = delete;
-		compiler_state &operator=(compiler_state const &) = delete;
-
-		uint32_t m_cycles;          /* accumulated cycles */
-		uint8_t m_checkints;        /* need to check interrupts before next instruction */
-		uml::code_label m_labelnum; /* index for local labels */
-	};
+	struct compiler_state;
 
 	void execute_run_drc();
 	void flush_drc_cache();
 	void code_flush_cache();
-	void code_compile_block(offs_t pc);
+	void code_compile_block(uint8_t mode, offs_t pc);
 	//void load_fast_iregs(drcuml_block &block);
 	//void save_fast_iregs(drcuml_block &block);
 	void static_generate_helpers(drcuml_block &block, uml::code_label &label);
 	void static_generate_memory_accessor(int size, int iswrite, bool isio, const char *name, uml::code_handle *&handleptr);
-	void static_generate_exception(uint32_t exception, const char *name);
+	void static_generate_exception(drcuml_block &block, uml::code_label &label);
 	void static_generate_interrupt_checks(drcuml_block &block, uml::code_label &label);
 	void generate_interrupt_checks(drcuml_block &block, uml::code_label &labelnum, bool with_timer, int take_int, int take_timer);
-	void generate_branch(drcuml_block &block, uml::parameter targetpc, const opcode_desc *desc, bool update_cycles = true);
+	void generate_branch(drcuml_block &block, uml::parameter mode, uml::parameter targetpc, const opcode_desc *desc, bool update_cycles = true);
 	void generate_update_cycles(drcuml_block &block, bool check_interrupts = true);
 	void generate_checksum_block(drcuml_block &block, compiler_state &compiler, const opcode_desc *seqhead, const opcode_desc *seqlast);
 	void generate_sequence_instruction(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
@@ -522,7 +511,7 @@ private:
 	void generate_exception(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint32_t addr);
 	void generate_software(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
 
-	void generate_trap_on_overflow(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void generate_trap_on_overflow(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uml::parameter sr);
 	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL, typename T> void generate_logic_op(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, T &&body);
 	template <reg_bank DST_GLOBAL, typename T> void generate_logic_op_imm(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint32_t dst_code, T &&body);
 

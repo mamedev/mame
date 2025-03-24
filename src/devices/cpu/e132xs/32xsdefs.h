@@ -157,25 +157,27 @@
 #define MCR             m_core->global_regs[27] //Memory Control Register
 // 28 - 31  Reserved
 
-#define C_MASK                  0x00000001
-#define Z_MASK                  0x00000002
-#define N_MASK                  0x00000004
-#define V_MASK                  0x00000008
-#define M_MASK                  0x00000010
-#define H_MASK                  0x00000020
-#define I_MASK                  0x00000080
-#define L_MASK                  0x00008000
-#define T_MASK                  0x00010000
-#define P_MASK                  0x00020000
-#define S_MASK                  0x00040000
-#define ILC_MASK                0x00180000
+constexpr uint32_t  C_MASK                  = 0x00000001;
+constexpr uint32_t  Z_MASK                  = 0x00000002;
+constexpr uint32_t  N_MASK                  = 0x00000004;
+constexpr uint32_t  V_MASK                  = 0x00000008;
+constexpr uint32_t  M_MASK                  = 0x00000010;
+constexpr uint32_t  H_MASK                  = 0x00000020;
+constexpr uint32_t  I_MASK                  = 0x00000080;
+constexpr uint32_t  L_MASK                  = 0x00008000;
+constexpr uint32_t  T_MASK                  = 0x00010000;
+constexpr uint32_t  P_MASK                  = 0x00020000;
+constexpr uint32_t  S_MASK                  = 0x00040000;
+constexpr uint32_t  ILC_MASK                = 0x00180000;
 
-#define C_SHIFT                 0
-#define Z_SHIFT                 1
-#define N_SHIFT                 2
-#define V_SHIFT                 3
-#define S_SHIFT                 18
-#define ILC_SHIFT               19
+constexpr int       C_SHIFT                 = 0;
+constexpr int       Z_SHIFT                 = 1;
+constexpr int       N_SHIFT                 = 2;
+constexpr int       V_SHIFT                 = 3;
+constexpr int       L_SHIFT                 = 15;
+constexpr int       T_SHIFT                 = 16;
+constexpr int       S_SHIFT                 = 18;
+constexpr int       ILC_SHIFT               = 19;
 
 /* SR flags */
 #define GET_C                   ( SR & C_MASK)          // bit 0 //CARRY

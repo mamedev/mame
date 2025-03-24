@@ -33,112 +33,7 @@
  TODO:
  - some wrong cycle counts
  - verify register wrapping with sregf/dregf on hardware
-
- CHANGELOG:
-
- Pierpaolo Prazzoli
- - Fixed LDxx.N/P/S opcodes not to increment the destination register when
-   it's the same as the source or "next source" one.
-
- Pierpaolo Prazzoli
- - Removed nested delays
- - Added better delay branch support
- - Fixed PC seen by a delay instruction, because a delay instruction
-   should use the delayed PC (thus allowing the execution of software
-   opcodes too)
-
- Tomasz Slanina
- - Fixed delayed branching for delay instructions longer than 2 bytes
-
- Pierpaolo Prazzoli
- - Added and fixed Timer without hack
-
- Tomasz Slanina
- - Fixed MULU/MULS
- - Fixed Carry in ADDC/SUBC
-
- Pierpaolo Prazzoli
- - Fixed software opcodes used as delay instructions
- - Added nested delays
-
- Tomasz Slanina
- - Added "undefined" C flag to shift left instructions
-
- Pierpaolo Prazzoli
- - Added interrupts-block for delay instructions
- - Fixed get_emu_code_addr
- - Added LDW.S and STW.S instructions
- - Fixed floating point opcodes
-
- Tomasz Slanina
- - interrputs after call and before frame are prohibited now
- - emulation of FCR register
- - Floating point opcodes (preliminary)
- - Fixed stack addressing in RET/FRAME opcodes
- - Fixed bug in SET_RS macro
- - Fixed bug in return opcode (S flag)
- - Added C/N flags calculation in add/adc/addi/adds/addsi and some shift opcodes
- - Added writeback to ROL
- - Fixed ROL/SAR/SARD/SHR/SHRD/SHL/SHLD opcode decoding (Local/Global regs)
- - Fixed I and T flag in RET opcode
- - Fixed XX/XM opcodes
- - Fixed MOV opcode, when RD = PC
- - Fixed execute_trap()
- - Fixed ST opcodes, when when RS = SR
- - Added interrupts
- - Fixed I/O addressing
-
- Pierpaolo Prazzoli
- - Fixed fetch
- - Fixed decode of hyperstone_xm opcode
- - Fixed 7 bits difference number in FRAME / RET instructions
- - Some debbugger fixes
- - Added generic registers decode function
- - Some other little fixes.
-
- Ryan Holtz 29/03/2004
-    - Changed MOVI to use unsigned values instead of signed, correcting
-      an ugly glitch when loading 32-bit immediates.
- Pierpaolo Prazzoli
-    - Same fix in get_const
-
- Pierpaolo Prazzoli - 02/25/04
-    - Fixed some wrong addresses to address local registers instead of memory
-    - Fixed FRAME and RET instruction
-    - Added preliminary I/O space
-    - Fixed some load / store instructions
-
- Pierpaolo Prazzoli - 02/20/04
-    - Added execute_exception function
-    - Added FL == 0 always interpreted as 16
-
- Pierpaolo Prazzoli - 02/19/04
-    - Changed the reset to use the execute_trap(reset) which should be right to set
-      the initiale state of the cpu
-    - Added Trace exception
-    - Set of T flag in RET instruction
-    - Set I flag in interrupts entries and resetted by a RET instruction
-    - Added correct set instruction for SR
-
- Pierpaolo Prazzoli - 10/26/03
-    - Changed get_lrconst to get_const and changed it to use the removed GET_CONST_RR
-      macro.
-    - Removed the High flag used in some opcodes, it should be used only in
-      MOV and MOVI instruction.
-    - Fixed MOV and MOVI instruction.
-    - Set to 1 FP is SR register at reset.
-      (From the doc: A Call, Trap or Software instruction increments the FP and sets FL
-      to 6, thus creating a new stack frame with the length of 6 registers).
-
- Pierpaolo Prazzoli - 08/19/03
-    - Added check for D_BIT and S_BIT where PC or SR must or must not be denoted.
-      (movd, divu, divs, ldxx1, ldxx2, stxx1, stxx2, mulu, muls, set, mul
-      call, chk)
-
- Pierpaolo Prazzoli - 08/17/03
-    - Fixed get_pcrel() when OP & 0x80 is set.
-    - Decremented PC by 2 also in MOV, ADD, ADDI, SUM, SUB and added the check if
-      D_BIT is not set. (when pc is changed they are implicit branch)
+ - DRC does not generate trace exceptions on branch or return
 
 *********************************************************************/
 
@@ -201,8 +96,15 @@ void hyperstone_device::e132_16k_iram_map(address_map &map)
 //  hyperstone_device - constructor
 //-------------------------------------------------
 
-hyperstone_device::hyperstone_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock,
-										const device_type type, uint32_t prg_data_width, uint32_t io_data_width, address_map_constructor internal_map)
+hyperstone_device::hyperstone_device(
+		const machine_config &mconfig,
+		const char *tag,
+		device_t *owner,
+		uint32_t clock,
+		const device_type type,
+		uint32_t prg_data_width,
+		uint32_t io_data_width,
+		address_map_constructor internal_map)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, prg_data_width, 32, 0, internal_map)
 	, m_io_config("io", ENDIANNESS_BIG, io_data_width, 15)
@@ -215,7 +117,6 @@ hyperstone_device::hyperstone_device(const machine_config &mconfig, const char *
 	, m_nocode(nullptr)
 	, m_interrupt_checks(nullptr)
 	, m_out_of_cycles(nullptr)
-	, m_delay_taken(nullptr)
 	, m_mem_read8(nullptr)
 	, m_mem_write8(nullptr)
 	, m_mem_read16(nullptr)
@@ -224,9 +125,10 @@ hyperstone_device::hyperstone_device(const machine_config &mconfig, const char *
 	, m_mem_write32(nullptr)
 	, m_io_read32(nullptr)
 	, m_io_write32(nullptr)
+	, m_exception(nullptr)
 	, m_enable_drc(false)
 {
-	std::fill(std::begin(m_exception), std::end(m_exception), nullptr);
+	std::fill(std::begin(m_delay_taken), std::end(m_delay_taken), nullptr);
 }
 
 hyperstone_device::~hyperstone_device()
@@ -377,7 +279,7 @@ gms30c2232_device::gms30c2232_device(const machine_config &mconfig, const char *
 uint32_t hyperstone_device::get_trap_addr(uint8_t trapno)
 {
 	uint32_t addr;
-	if( m_core->trap_entry == 0xffffff00 ) /* @ MEM3 */
+	if (m_core->trap_entry == 0xffffff00) /* @ MEM3 */
 	{
 		addr = trapno * 4;
 	}
@@ -394,7 +296,7 @@ uint32_t hyperstone_device::get_trap_addr(uint8_t trapno)
 uint32_t hyperstone_device::get_emu_code_addr(uint8_t num) /* num is OP */
 {
 	uint32_t addr;
-	if( m_core->trap_entry == 0xffffff00 ) /* @ MEM3 */
+	if (m_core->trap_entry == 0xffffff00) /* @ MEM3 */
 	{
 		addr = (m_core->trap_entry - 0x100) | ((num & 0xf) << 4);
 	}
@@ -575,10 +477,13 @@ void hyperstone_device::set_global_register(uint8_t code, uint32_t val)
 			SET_PC(val);
 			return;
 		case SR_REGISTER:
-			SET_LOW_SR(val); // only a RET instruction can change the full content of SR
-			SR &= ~0x40; //reserved bit 6 always zero
-			if (m_core->intblock < 1)
-				m_core->intblock = 1;
+			{
+				// FIXME: generate exception on attempt to set L from user mode const bool exception = !GET_S && !GET_L && (val & L_MASK);
+				SET_LOW_SR(val); // only a RET instruction can change the full content of SR
+				SR &= ~0x40; //reserved bit 6 always zero
+				if (m_core->intblock < 1)
+					m_core->intblock = 1;
+			}
 			return;
 		case 2:
 		case 3:
@@ -1083,11 +988,6 @@ void hyperstone_device::check_interrupts()
 
 void hyperstone_device::device_start()
 {
-	// Handled entirely by init() and derived classes
-}
-
-void hyperstone_device::init(int scale_mask)
-{
 	m_instruction_length_valid = false;
 
 	m_core = (internal_hyperstone_state *)m_cache.alloc_near(sizeof(internal_hyperstone_state));
@@ -1142,15 +1042,15 @@ void hyperstone_device::init(int scale_mask)
 	m_io = &space(AS_IO);
 
 	m_timer = timer_alloc(FUNC(hyperstone_device::timer_callback), this);
-	m_core->clock_scale_mask = scale_mask;
+	m_core->clock_scale_mask = 0;
 
 	for (uint8_t i = 0; i < 16; i++)
 	{
 		m_core->fl_lut[i] = (i ? i : 16);
 	}
 
-	uint32_t umlflags = 0;
-	m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, umlflags, 1, 32, 1);
+	const uint32_t umlflags = 0;
+	m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, umlflags, 4, 32, 1);
 
 	// add UML symbols-
 	m_drcuml->symbol_add(&m_core->global_regs[0], sizeof(uint32_t), "pc");
@@ -1158,15 +1058,35 @@ void hyperstone_device::init(int scale_mask)
 	m_drcuml->symbol_add(&m_core->icount, sizeof(m_core->icount), "icount");
 
 	char buf[4];
-	for (int i=0; i < 32; i++)
+	buf[3] = '\0';
+	buf[0] = 'g';
+	for (int i = 0; i < 32; i++)
 	{
-		sprintf(buf, "g%d", i);
+		if (9 < i)
+		{
+			buf[1] = '0' + (i / 10);
+			buf[2] = '0' + (i % 10);
+		}
+		else
+		{
+			buf[1] = '0' + i;
+			buf[2] = '\0';
+		}
 		m_drcuml->symbol_add(&m_core->global_regs[i], sizeof(uint32_t), buf);
 	}
-
-	for (int i=0; i < 64; i++)
+	buf[0] = 'l';
+	for (int i = 0; i < 64; i++)
 	{
-		sprintf(buf, "l%d", i);
+		if (9 < i)
+		{
+			buf[1] = '0' + (i / 10);
+			buf[2] = '0' + (i % 10);
+		}
+		else
+		{
+			buf[1] = '0' + i;
+			buf[2] = '\0';
+		}
 		m_drcuml->symbol_add(&m_core->local_regs[i], sizeof(uint32_t), buf);
 	}
 
@@ -1309,7 +1229,6 @@ void hyperstone_device::init(int scale_mask)
 	save_item(NAME(m_core->tr_base_cycles));
 	save_item(NAME(m_core->timer_int_pending));
 	save_item(NAME(m_core->clck_scale));
-	save_item(NAME(m_core->clock_scale_mask));
 	save_item(NAME(m_core->clock_cycles_1));
 	save_item(NAME(m_core->clock_cycles_2));
 	save_item(NAME(m_core->clock_cycles_3));
@@ -1323,72 +1242,86 @@ void hyperstone_device::init(int scale_mask)
 
 void e116t_device::device_start()
 {
-	init(0);
+	hyperstone_device::device_start();
+	m_core->clock_scale_mask = 0;
 }
 
 void e116xt_device::device_start()
 {
-	init(3);
+	hyperstone_device::device_start();
+	m_core->clock_scale_mask = 3;
 }
 
 void e116xs_device::device_start()
 {
-	init(7);
+	hyperstone_device::device_start();
+	m_core->clock_scale_mask = 7;
 }
 
 void e116xsr_device::device_start()
 {
-	init(7);
+	hyperstone_device::device_start();
+	m_core->clock_scale_mask = 7;
 }
 
 void gms30c2116_device::device_start()
 {
-	init(0);
+	hyperstone_device::device_start();
+	m_core->clock_scale_mask = 0;
 }
 
 void gms30c2216_device::device_start()
 {
-	init(0);
+	hyperstone_device::device_start();
+	m_core->clock_scale_mask = 0;
 }
 
 void e132n_device::device_start()
 {
-	init(0);
+	hyperstone_device::device_start();
+	m_core->clock_scale_mask = 0;
 }
 
 void e132t_device::device_start()
 {
-	init(0);
+	hyperstone_device::device_start();
+	m_core->clock_scale_mask = 0;
 }
 
 void e132xn_device::device_start()
 {
-	init(3);
+	hyperstone_device::device_start();
+	m_core->clock_scale_mask = 3;
 }
 
 void e132xt_device::device_start()
 {
-	init(3);
+	hyperstone_device::device_start();
+	m_core->clock_scale_mask = 3;
 }
 
 void e132xs_device::device_start()
 {
-	init(7);
+	hyperstone_device::device_start();
+	m_core->clock_scale_mask = 7;
 }
 
 void e132xsr_device::device_start()
 {
-	init(7);
+	hyperstone_device::device_start();
+	m_core->clock_scale_mask = 7;
 }
 
 void gms30c2132_device::device_start()
 {
-	init(0);
+	hyperstone_device::device_start();
+	m_core->clock_scale_mask = 0;
 }
 
 void gms30c2232_device::device_start()
 {
-	init(0);
+	hyperstone_device::device_start();
+	m_core->clock_scale_mask = 0;
 }
 
 void hyperstone_device::device_reset()
@@ -1955,7 +1888,12 @@ void hyperstone_device::execute_run()
 			case 0xff: hyperstone_trap(); break;
 		}
 
-		SET_ILC(m_instruction_length);
+		if (((m_op & 0xfef0) != 0x0400) || !(m_op & 0x010e))
+		{
+			// anything other than RET updates ILC and sets P
+			SET_ILC(m_instruction_length);
+			SET_P(1);
+		}
 
 		if (GET_T && GET_P && !m_core->delay_slot) /* Not in a Delayed Branch instructions */
 		{

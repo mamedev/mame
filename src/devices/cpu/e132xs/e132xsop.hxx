@@ -4,7 +4,7 @@
 template <hyperstone_device::reg_bank DST_GLOBAL>
 uint64_t hyperstone_device::get_double_word(uint8_t dst_code, uint8_t dstf_code) const
 {
-	if(DST_GLOBAL)
+	if (DST_GLOBAL)
 		return (uint64_t)m_core->global_regs[dst_code] << 32 | m_core->global_regs[dstf_code];
 	else
 		return (uint64_t)m_core->local_regs[dst_code] << 32 | m_core->local_regs[dstf_code];
@@ -13,7 +13,7 @@ uint64_t hyperstone_device::get_double_word(uint8_t dst_code, uint8_t dstf_code)
 template <hyperstone_device::reg_bank DST_GLOBAL>
 void hyperstone_device::set_double_word(uint8_t dst_code, uint8_t dstf_code, uint64_t val)
 {
-	if(DST_GLOBAL)
+	if (DST_GLOBAL)
 	{
 		m_core->global_regs[dst_code] = (uint32_t)(val >> 32);
 		m_core->global_regs[dstf_code] = (uint32_t)val;
@@ -76,24 +76,16 @@ void hyperstone_device::hyperstone_movd()
 		const uint32_t old_s = SR & S_MASK;
 		const uint32_t old_l = SR & L_MASK;
 		PC = sreg & ~1;
-		SR = (sregf & 0xffe3ffff) | ((sreg & 0x01) << 18);
+		SR = (sregf & ~(ILC_MASK | S_MASK)) | ((sreg & 0x01) << S_SHIFT);
 		if (m_core->intblock < 1)
 			m_core->intblock = 1;
 
 		const uint32_t new_s = SR & S_MASK;
 		const uint32_t new_l = SR & L_MASK;
-		if( (!old_s && new_s) || (!new_s && !old_l && new_l))
+		if ((!old_s && new_s) || (!new_s && !old_l && new_l))
 			execute_exception(get_trap_addr(TRAPNO_PRIVILEGE_ERROR));
 
-		int8_t difference = GET_FP - ((SP & 0x1fc) >> 2);
-
-		/* convert to 8 bits */
-		if(difference > 63)
-			difference = (int8_t)(difference|0x80);
-		else if( difference < -64 )
-			difference = difference & 0x7f;
-
-		for (; difference < 0; difference++)
+		for (int difference = util::sext(GET_FP - ((SP & 0x1fc) >> 2), 7); difference < 0; difference++)
 		{
 			SP -= 4;
 			m_core->local_regs[(SP & 0xfc) >> 2] = READ_W(SP);

@@ -1572,7 +1572,14 @@ void drcbe_x64::shift_op_param(Assembler &a, Inst::Id const opcode, size_t opsiz
 			a.clc(); // throw away carry since it'll never be used
 
 		if (update_flags & (FLAG_S | FLAG_Z))
-			calculate_status_flags(a, opsize, dst, FLAG_S | FLAG_Z);
+		{
+			if (update_flags & FLAG_C)
+				calculate_status_flags(a, opsize, dst, FLAG_S | FLAG_Z);
+			else if (dst.isMem())
+				a.test(dst.as<Mem>(), util::make_bitmask<uint64_t>(opsize * 8));
+			else
+				a.test(dst.as<Gp>(), dst.as<Gp>());
+		}
 	}
 	else if (update_flags || carryin)
 	{
@@ -1621,7 +1628,14 @@ void drcbe_x64::shift_op_param(Assembler &a, Inst::Id const opcode, size_t opsiz
 			a.bind(end);
 
 		if (update_flags & (FLAG_S | FLAG_Z))
-			calculate_status_flags(a, opsize, dst, FLAG_S | FLAG_Z); // calculate status flags but preserve carry
+		{
+			if (update_flags & FLAG_C)
+				calculate_status_flags(a, opsize, dst, FLAG_S | FLAG_Z);
+			else if (dst.isMem())
+				a.test(dst.as<Mem>(), util::make_bitmask<uint64_t>(opsize * 8));
+			else
+				a.test(dst.as<Gp>(), dst.as<Gp>());
+		}
 	}
 	else
 	{
