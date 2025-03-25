@@ -33,7 +33,6 @@
     Some type of link feature?
   - Other games in jinhulu2_state have machine translated DIP definitions which
     could use improving and hopper isn't implemented yet.
-  - Find out password for jinhuang and correct inputs / DIPs.
 
 ***************************************************************************/
 
@@ -2238,7 +2237,10 @@ ROM_START( zuanshiw )
 	ROM_LOAD( "rom.u12", 0x00000, 0x20000, CRC(1aeb078c) SHA1(9b8a256f51e66733c4ec30b451ca0711ed02318e) )
 ROM_END
 
-ROM_START( jinhuang ) // IGS PCB NO-0202-4. Has seemingly unused IGS 003e chip and P8255A-5 instead of the 2149C
+// IGS PCB NO-0202-4. Has seemingly unused IGS 003e chip and P8255A-5 instead of the 2149C
+// password is HOLD3, HOLD3, HOLD2, HOLD2, HOLD1, HOLD1, HOLD5, HOLD5
+// possibly hacked? It shows TH on cards' backs
+ROM_START( jinhuang )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rom.u40", 0x00000, 0x10000, CRC(a453d1c8) SHA1(2acc96c3d0ad6d09fffc9be40ef0790beebcbac9) )
 

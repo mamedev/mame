@@ -20190,6 +20190,7 @@ chexx83
 faceoffh
 olihockey
 olihockeya
+unkbubsc
 
 @source:ice/frenzyxprss.cpp
 frenzyxprss
@@ -20630,6 +20631,7 @@ cjdh2
 cjdh2a
 cjdh2b
 cjdh2c
+cjdh2d
 igsm312
 jhzb
 jxry
@@ -42001,6 +42003,7 @@ zombraidpj
 @source:seta/seta2.cpp
 ablast
 ablastb
+blnctry
 deerhunt
 deerhunta
 deerhuntb
@@ -43035,6 +43038,9 @@ optomaxv
 p8000
 p8000_16
 
+@source:skeleton/paipaile.cpp
+paipail3
+
 @source:skeleton/palestra.cpp
 palestra
 
@@ -43236,6 +43242,9 @@ alcat258
 loewe715
 loewed
 teleguide
+
+@source:skeleton/testlove.cpp
+testlove
 
 @source:skeleton/testpat.cpp
 tp1983
