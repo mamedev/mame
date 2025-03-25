@@ -317,6 +317,13 @@
     my end...
 
 
+  - the following sets have direct credits to play (no bet),
+    and show paytable when coin-up through dynamic size change
+	of the lines 5 and 6:
+	
+	dphl, dphljp, dphlunkb, sureshoto, smshilo
+
+
 *******************************************************************************
 
   --------------------
@@ -573,24 +580,26 @@
   - Derivated inputs for fasdrwp.
   - Added buttons-lamps layout for fastdrwp.
   - Promoted fastdrwp set to working.
+  
+  - Added support for dynamic size chars lines.
+    That fixes the paytable shown in different games
+	such as dphl, dphljp, dphlunkb, sureshoto, smshilo,
+	etc, allowing to remove the imperfect graphics flags.
+  - norautua: fixed the overflow when drawing cards
+    in the possible straight case.
+  - Rewrote the screen update to save a big number of lines.
+  - Removed the driver init for ssjkrpkr.
+  - Added Inputs & DIP switches for gtipoker.
+  - Change gtipoker game description to: Aces or Better Draw Poker.
+  - Rearrange the gtipoker graphics ROM.
+  - Promoted gtipoker set to working.
+  - Added technical notes.
 
 
   TODO:
 
   - Investigate and document what is connected to port EFh.
-  - Find if wide chars are hardcoded or tied to a bit.
   - Parent/clone relationship.
-
-
-  issues...
-
-  - norautua: overflow drawing cards (possible straight draw).
-              changing one card, draw a 6th card at the right.
-
-  - dphl type, as dphljp, smshilo, dphlunkb, were flagged as
-    imperfect graphics due they show part of a paytable as garbage
-    when you coin/bet the game. After deal, they are not showing
-    this anymore.
 
 
 *******************************************************************************/
@@ -661,7 +670,6 @@ public:
 	void cgidjp(machine_config &config);
 	void cdrawpkr(machine_config &config);
 
-	void init_ssa();
 	void init_enc();
 	void init_deb();
 	void init_unka();
@@ -681,6 +689,7 @@ private:
 	void mainlamps_w(uint8_t data);
 	void soundlamps_w(uint8_t data);
 	void counterlamps_w(uint8_t data);
+	void ppi2_b_w(uint8_t data);
 	void norautp_palette(palette_device &palette) const;
 	void drhl_palette(palette_device &palette) const;
 	void sureshoto_palette(palette_device &palette) const;
@@ -720,6 +729,8 @@ private:
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 	output_finder<12> m_lamps;
 
+	bool m_display_line_control = false;
+	int m_vreg = 0;
 	int m_test3 = 1;
 	int m_test3b = 0;
 	int m_test_count = 0;
@@ -737,49 +748,23 @@ void norautp_state::video_start()
 	m_np_vram = make_unique_clear<uint16_t[]>(0x1000/2);
 }
 
-
-uint32_t norautp_state::screen_update_norautp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	int x, y, count;
-
-	count = 0;
-
-	bitmap.fill(m_palette->pen(0), cliprect);  // black pen
-
-	for(y = 0; y < 8; y++)
+uint32_t norautp_state::screen_update_norautp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) {
+    bitmap.fill(0, cliprect);
+    
+    for (int y = 0, c = 0; y < 8; y++)
 	{
-		// Double width, displaced 8 pixels in X
-		if(y == 2 || (y >= 4 && y < 6))
+        bool double_w = y == 2 || ((y == 4 || y == 5) && !(m_display_line_control && m_vreg));
+        
+        for (int x = 0; x < (double_w ? 16 : 32); c += double_w ? 2 : 1, x++)
 		{
-			for(x = 0; x < 16; x++)
-			{
-				int tile = m_np_vram[count] & 0x3f;
-				int colour = (m_np_vram[count] & 0xc0) >> 6;
-				if((y == 4) | ( y == 5))
-					colour = colour + 4;
-
-				m_gfxdecode->gfx(1)->opaque(bitmap,cliprect, tile, colour, 0, 0, (x * 32) + 8, y * 32);
-
-				count+=2;
-			}
-		}
-		else
-		{
-			for(x = 0; x < 32; x++)
-			{
-				int tile = m_np_vram[count] & 0x3f;
-				int colour = (m_np_vram[count] & 0xc0) >> 6;
-
-				m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, tile, colour, 0, 0, x * 16, y * 32);
-
-				count++;
-			}
-		}
-	}
-
-	return 0;
+            int t = m_np_vram[c] & 0x3f;
+            int col = ((m_np_vram[c] >> 6) + (double_w && y >= 4 ? 4 : 0)) & 3;
+            m_gfxdecode->gfx(double_w ? 1 : 0)->opaque(bitmap, cliprect, t, col, 0, 0, 
+                double_w ? (x << 5) + 8 : x << 4, y << 5);
+        }
+    }
+    return 0;
 }
-
 
 void norautp_state::norautp_palette(palette_device &palette) const
 {
@@ -801,7 +786,6 @@ void norautp_state::norautp_palette(palette_device &palette) const
 	palette.set_pen_color(13, rgb_t(0xff, 0x00, 0x00));    // red
 	palette.set_pen_color(14, rgb_t(0xff, 0xff, 0xff));    // white
 	palette.set_pen_color(15, rgb_t(0x00, 0x00, 0x00));    // black
-
 }
 
 void norautp_state::drhl_palette(palette_device &palette) const
@@ -877,6 +861,8 @@ void norautp_state::mainlamps_w(uint8_t data)
 	m_lamps[6] = BIT(data, 6);  // HOLD 5 lamp
 	m_lamps[7] = BIT(data, 7);  // CANCEL lamp
 
+	m_vreg = m_vreg ^ BIT(data, 0);
+
 //  popmessage("lamps: %02x", data);
 }
 
@@ -895,6 +881,8 @@ void norautp_state::soundlamps_w(uint8_t data)
 
 	m_lamps[8] = BIT(data, 0);  // DEAL / DRAW lamp
 	m_lamps[9] = BIT(data, 1);  // BET / COLLECT lamp
+
+	m_vreg = BIT(data, 0);
 
 	// the 4 MSB are for discrete sound
 	m_discrete->write(NORAUTP_SND_EN, (data >> 7) & 0x01);
@@ -921,11 +909,30 @@ void norautp_state::counterlamps_w(uint8_t data)
 	m_lamps[10] = BIT(data, 0);  // HI lamp
 	m_lamps[11] = BIT(data, 1);  // LO lamp
 
-	m_hopper->motor_w(BIT(data, 2));
+	m_hopper->motor_w(BIT(data, 2));	
 
 	machine().bookkeeping().coin_counter_w(0, data & 0x10);  // Coin1/3 counter
 	machine().bookkeeping().coin_counter_w(1, data & 0x20);  // Coin2 counter
 	machine().bookkeeping().coin_counter_w(2, data & 0x08);  // Payout pulse
+}
+
+void norautp_state::ppi2_b_w(uint8_t data)
+{
+/*  PPI-2 (c0h-c3h); PortB OUT.
+    Unknow:
+
+    7654 3210
+    ---- ---x  * 
+    ---- --x-  * 
+    ---- -x--  * 
+    ---- x---  * 
+    ---x ----  * 
+    --x- ----  * 
+    -x-- ----  * 
+    x--- ----  * 
+*/
+	logerror("PPI2-B: pc:%04x - data:%02x\n", m_maincpu->pc(), data);
+
 }
 
 
@@ -944,7 +951,6 @@ TIMER_CALLBACK_MEMBER(norautp_state::ppi2_ack)
 		m_np_vram[np_addr] = vram_data;
 		m_videoram[np_addr] = vram_data;
 	}
-
 }
 
 // game waits for bit 4 (0x10) to be reset.
@@ -1626,7 +1632,7 @@ static INPUT_PORTS_START( dphla )
 	PORT_INCLUDE( dphl )
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )  PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))  // hopper
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )  PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
 INPUT_PORTS_END
 
 
@@ -1767,6 +1773,37 @@ static INPUT_PORTS_START( fastdrwp )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_DIPNAME( 0x80, 0x80, "Test Mode" )           PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( gtipoker )
+
+	PORT_INCLUDE( dphl )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW1:7")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW1:5")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Coinage ) )    PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_5C ) )
+	PORT_DIPNAME( 0x60, 0x60, "2 Jokers in Deck" )    PORT_DIPLOCATION("DSW1:2,3")
+	PORT_DIPSETTING(    0x60, "Never"  )
+	PORT_DIPSETTING(    0x40, "When 4 or more is bet" )
+	PORT_DIPSETTING(    0x20, "When 4 or more is bet" )
+	PORT_DIPSETTING(    0x00, "Always" )
+	PORT_DIPNAME( 0x80, 0x80, "Test Mode" )           PORT_DIPLOCATION("DSW1:1") 
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1933,6 +1970,7 @@ void norautp_state::noraut_base(machine_config &config)
 	m_ppi8255[1]->out_pc_callback().set(FUNC(norautp_state::soundlamps_w));
 
 	I8255(config, m_ppi8255[2], 0);
+	m_ppi8255[2]->out_pb_callback().set(FUNC(norautp_state::ppi2_b_w));
 	// (c0-c3) Group A Mode 2 (5-lines handshacked bidirectional port).
 	// PPI-2 is configured as mixed mode2 and mode0 output.
 	// It means that port A should be bidirectional and port B just as output.
@@ -2080,6 +2118,8 @@ void norautp_state::dphl(machine_config &config)
 
 	TIMER(config, "test_timer").configure_periodic(FUNC(norautp_state::test_timer_cb), attotime::from_usec(100));
 
+	m_display_line_control = true;
+
 	// sound hardware
 	m_discrete->set_intf(dphl_discrete);
 }
@@ -2110,6 +2150,7 @@ void norautp_state::sureshoto(machine_config &config)
 
 	TIMER(config, "test_timer").configure_periodic(FUNC(norautp_state::test_timer_cb), attotime::from_usec(100));
 	PALETTE(config.replace(), "palette", FUNC(norautp_state::sureshoto_palette), 16);
+	m_display_line_control = true;
 
 	// sound hardware
 	m_discrete->set_intf(dphl_discrete);
@@ -3667,6 +3708,9 @@ ROM_END
   GFX roms contain 16x16 tiles of cards.
   Nothing else is known about this set/game.
 
+  Seems to be the following one:
+  https://flyers.arcade-museum.com/videogames/show/4328
+
 */
 
 ROM_START( gtipoker )
@@ -3675,7 +3719,10 @@ ROM_START( gtipoker )
 	ROM_LOAD( "u18.rom", 0x1000, 0x1000, CRC(1b7e2877) SHA1(717fb70889804baa468203f20b1e7f73b55cc21e) )
 
 	ROM_REGION( 0x1000, "gfx",0 )
-	ROM_LOAD( "u31.rom", 0x0000, 0x1000, CRC(2028db2c) SHA1(0f81bb71e88c60df3817f58c28715ce2ea01ad4d) )
+	ROM_LOAD( "2732.u31", 0x0000, 0x1000, CRC(ba037f69) SHA1(8f9c325d2a250ee02ac42ffeccbe7af1fc2da6a9) )
+
+	ROM_REGION( 0x0100,  "proms", 0 )
+	ROM_LOAD( "82s129an.u51", 0x0000, 0x0100, CRC(c64f5b20) SHA1(ffbd46c59516f2f69cceb0bf423c489bdbe5d46d) )
 ROM_END
 
 /*
@@ -4278,67 +4325,6 @@ ROM_END
 /*********************************************
 *                Driver Init                 *
 *********************************************/
-
-/* These are to patch the check for /OBF handshake line,
-   that seems to be wrong. Otherwise will enter in an infinite loop.
-
-  110D: DB C2      in   a,($C2)  ; read from PPI-2, portC. (OBF should be set, but isn't)
-  110F: 07         rlca          ; rotate left.
-  1110: 30 FB      jr   nc,$110D
-
-  This routine is to shift the handshaked lines, transferring the status
-  from /ACK (bit 6) to /OBF (bit 7).
-
-*/
-//static DRIVER_INIT( norautrh )
-//{
-//  uint8_t *ROM = machine.root_device().memregion("maincpu")->base();
-//  ROM[0x1110] = 0x00;
-//  ROM[0x1111] = 0x00;
-//}
-
-//static DRIVER_INIT( norautpn )
-//{
-//  uint8_t *ROM = machine.root_device().memregion("maincpu")->base();
-//  ROM[0x0827] = 0x00;
-//  ROM[0x0828] = 0x00;
-//}
-
-//static DRIVER_INIT( norautu )
-//{
-//  uint8_t *ROM = machine.root_device().memregion("maincpu")->base();
-//  ROM[0x083c] = 0x00;
-//  ROM[0x083d] = 0x00;
-//  ROM[0x083e] = 0x00;
-//}
-
-//static DRIVER_INIT( gtipoker )
-//{
-//  uint8_t *ROM = machine.root_device().memregion("maincpu")->base();
-//  ROM[0x0cc6] = 0x00;
-//  ROM[0x0cc7] = 0x00;
-//  ROM[0x0cc8] = 0x00;
-//  ROM[0x10a5] = 0x00;
-//  ROM[0x10a6] = 0x00;
-//  ROM[0x10a7] = 0x00;
-//}
-
-//static DRIVER_INIT( dphl )
-//{
-//  uint8_t *ROM = machine.root_device().memregion("maincpu")->base();
-//  ROM[0x1510] = 0x00;
-//  ROM[0x1511] = 0x00;
-//  ROM[0x1512] = 0x00;
-//}
-
-//static DRIVER_INIT( dphla )
-//{
-//  uint8_t *ROM = machine.root_device().memregion("maincpu")->base();
-//  ROM[0x0b09] = 0x00;
-//  ROM[0x0b0a] = 0x00;
-//  ROM[0x0b0b] = 0x00;
-//}
-
 
 /*
 The following tables are for the norautua and norautub sets. The encryption seems based on substitution tables
@@ -5056,6 +5042,9 @@ void norautp_state::init_enc()
 	ROM[0x1da5] = 0x00;
 	ROM[0x1da6] = 0x0a; // 10
 	ROM[0x1da7] = 0x00;
+
+	// fix jump
+	ROM[0x0b53] = 0x6c;
 }
 
 
@@ -5067,22 +5056,6 @@ void norautp_state::init_deb()
 	ROM[0x02f7] = 0xca;
 	ROM[0x02f8] = 0x18;
 	ROM[0x206c] = 0xff;
-}
-
-
-void norautp_state::init_ssa()
-/* Passing the video PPI handshaking lines */
-/* Just for debugging purposes */
-{
-//  uint8_t *ROM = memregion("maincpu")->base();
-
-//  ROM[0x073b] = 0x00;
-//  ROM[0x073c] = 0x00;
-//  ROM[0x073d] = 0x00;
-
-//  ROM[0x07af] = 0x00;
-//  ROM[0x07b0] = 0x00;
-//  ROM[0x07b1] = 0x00;
 }
 
 void norautp_state::init_unka()
@@ -5131,8 +5104,8 @@ GAMEL( 198?, norautra, 0,        norautp,  norautrh, norautp_state, empty_init, 
 GAME(  1988, norautu,  0,        norautxp, norautp,  norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Poker (NTX10A)",                        MACHINE_NOT_WORKING )
 GAMEL( 2002, noraut3a, 0,        noraut3,  noraut3,  norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Jacks Plus / Joker Poker (V3.010a)",    MACHINE_NOT_WORKING,  layout_noraut12 )
 GAMEL( 2003, noraut3b, 0,        noraut3,  noraut3,  norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Jacks Plus / Joker Poker (V3.011a)",    MACHINE_NOT_WORKING,  layout_noraut12 )
-GAMEL( 198?, norautua, 0,        norautu,  norautua, norautp_state, init_enc,   ROT0, "Noraut Ltd.",              "Noraut Joker Poker (console, set 1)",          MACHINE_IMPERFECT_GRAPHICS,  layout_noraut12 )  // sometimes draw a repeated card
-GAMEL( 198?, norautub, norautua, norautu,  norautua, norautp_state, init_enc,   ROT0, "Noraut Ltd.",              "Noraut Joker Poker (console, set 2)",          0,                    layout_noraut12 )
+GAMEL( 198?, norautua, 0,        norautu,  norautua, norautp_state, init_enc,   ROT0, "Noraut Ltd.",              "Noraut Joker Poker (console, set 1)",          MACHINE_UNEMULATED_PROTECTION,  layout_noraut12 )
+GAMEL( 198?, norautub, norautua, norautu,  norautua, norautp_state, init_enc,   ROT0, "Noraut Ltd.",              "Noraut Joker Poker (console, set 2)",          MACHINE_UNEMULATED_PROTECTION,  layout_noraut12 )
 GAMEL( 198?, mainline, 0,        norautp,  mainline, norautp_state, empty_init, ROT0, "Mainline London",          "Mainline Double Joker Poker",                  0,                    layout_noraut12 )
 GAMEL( 199?, df_djpkr, 0,        norautp,  mainline, norautp_state, empty_init, ROT0, "DellFern Ltd.",            "Double Joker Poker (45%-75% payout)",          0,                    layout_noraut12 )
 GAMEL( 2005, ndxron10, 0,        norautp,  ndxron10, norautp_state, empty_init, ROT0, "<unknown>",                "Royal on Ten (hack of Noraut Deluxe Poker)",   0,                    layout_noraut12 )
@@ -5152,16 +5125,16 @@ GAMEL( 1984, cdrawpkr, 0,        cdrawpkr, cdrawpkr, norautp_state, empty_init, 
 //***************************************************************************************
 
 //     YEAR  NAME      PARENT    MACHINE   INPUT     STATE          INIT        ROT   COMPANY                        FULLNAME                            FLAGS                       LAYOUT
-GAMEL( 1982, dphl,     0,        dphl,     dphl,     norautp_state, empty_init, ROT0, "M.Kramer Manufacturing.",     "Draw Poker HI-LO (M.Kramer)",      MACHINE_IMPERFECT_GRAPHICS, layout_noraut10 )
+GAMEL( 1982, dphl,     0,        dphl,     dphl,     norautp_state, empty_init, ROT0, "M.Kramer Manufacturing.",     "Draw Poker HI-LO (M.Kramer)",      0,                          layout_noraut10 )
 GAMEL( 1983, dphla,    0,        dphla,    dphla,    norautp_state, empty_init, ROT0, "<unknown>",                   "Joker Poker (Kramer, Alt)",        0,                          layout_noraut10 )
-GAMEL( 1983, dphljp,   0,        dphl,     dphl,     norautp_state, empty_init, ROT0, "<unknown>",                   "Draw Poker HI-LO (Japanese)",      MACHINE_IMPERFECT_GRAPHICS, layout_noraut10 )
+GAMEL( 1983, dphljp,   0,        dphl,     dphl,     norautp_state, empty_init, ROT0, "<unknown>",                   "Draw Poker HI-LO (Japanese)",      0,                          layout_noraut10 )
 GAME(  198?, kimbldhl, 0,        kimbldhl, norautp,  norautp_state, empty_init, ROT0, "Kimble Ireland",              "Kimble Double HI-LO",              MACHINE_NOT_WORKING )
-GAME(  1983, gtipoker, 0,        dphl,     norautp,  norautp_state, empty_init, ROT0, "GTI Inc",                     "GTI Poker",                        MACHINE_NOT_WORKING )
-GAME(  1983, gtipokra, 0,        dphla,    norautp,  norautp_state, empty_init, ROT0, "GTI Inc",                     "GTI Poker? (SMS hardware)",        MACHINE_NOT_WORKING )
-GAMEL( 1983, smshilo,  0,        dphl,     dphl,     norautp_state, empty_init, ROT0, "SMS Manufacturing Corp.",     "HI-LO Double Up Joker Poker",      MACHINE_IMPERFECT_GRAPHICS, layout_noraut10 )
+GAMEL( 1983, gtipoker, 0,        dphl,     gtipoker, norautp_state, empty_init, ROT0, "GTI Inc",                     "Aces or Better Draw Poker (GTI)",  MACHINE_IMPERFECT_COLORS,   layout_noraut10 )
+GAMEL( 1983, gtipokra, 0,        dphla,    gtipoker, norautp_state, empty_init, ROT0, "GTI Inc",                     "GTI Poker? (SMS hardware)",        MACHINE_NOT_WORKING,        layout_noraut10 )
+GAMEL( 1983, smshilo,  0,        dphl,     dphl,     norautp_state, empty_init, ROT0, "SMS Manufacturing Corp.",     "HI-LO Double Up Joker Poker",      0,                          layout_noraut10 )
 GAMEL( 1986, drhl,     0,        drhl,     drhl,     norautp_state, empty_init, ROT0, "Drews Inc.",                  "Drews Revenge (v.2.89, set 1)",    0,                          layout_noraut10 )
 GAMEL( 1986, drhla,    drhl,     drhl,     drhl,     norautp_state, empty_init, ROT0, "Drews Inc.",                  "Drews Revenge (v.2.89, set 2)",    0,                          layout_noraut10 )
-GAMEL( 1982, ssjkrpkr, 0,        ssjkrpkr, ssjkrpkr, norautp_state, init_ssa,   ROT0, "Southern Systems & Assembly", "Southern Systems Joker Poker",     0,                          layout_noraut10 )
+GAMEL( 1982, ssjkrpkr, 0,        ssjkrpkr, ssjkrpkr, norautp_state, empty_init, ROT0, "Southern Systems & Assembly", "Southern Systems Joker Poker",     0,                          layout_noraut10 )
 
 // The following one also has a custom 68705 MCU
 GAME(  1993, tpoker2,  0,        dphltest, norautp, norautp_state, empty_init, ROT0, "Micro Manufacturing",          "Turbo Poker 2",                    MACHINE_NOT_WORKING )
@@ -5173,7 +5146,7 @@ GAME(  1993, tpoker2,  0,        dphltest, norautp, norautp_state, empty_init, R
 
 //     YEAR  NAME       PARENT    MACHINE    INPUT      STATE          INIT        ROT   COMPANY                     FULLNAME                               FLAGS                       LAYOUT
 GAMEL( 198?, fastdrwp,  0,        dphl,      fastdrwp,  norautp_state, empty_init, ROT0, "Stern Electronics",        "Fast Draw (poker conversion kit)",    0,                          layout_noraut10 )
-GAMEL( 1983, sureshoto, 0,        sureshoto, sureshoto, norautp_state, init_unka,  ROT0, "SMS Manufacturing Corp.",  "Sure Shot (older, dphl hardware)",    MACHINE_IMPERFECT_GRAPHICS, layout_noraut09_sureshot )
-GAMEL( 198?, dphlunkb,  0,        dphl,      dphla,     norautp_state, init_unkb,  ROT0, "SMS Manufacturing Corp.",  "Draw Poker HI-LO (alt GFX)",          MACHINE_IMPERFECT_GRAPHICS, layout_noraut10 )
+GAMEL( 1983, sureshoto, 0,        sureshoto, sureshoto, norautp_state, init_unka,  ROT0, "SMS Manufacturing Corp.",  "Sure Shot (older, dphl hardware)",    MACHINE_IMPERFECT_COLORS,   layout_noraut09_sureshot )
+GAMEL( 198?, dphlunkb,  0,        dphl,      dphla,     norautp_state, init_unkb,  ROT0, "SMS Manufacturing Corp.",  "Draw Poker HI-LO (alt GFX)",          0,                          layout_noraut10 )
 GAME(  198?, pkii_dm,   0,        nortest1,  norautp,   norautp_state, empty_init, ROT0, "<unknown>",                "unknown poker game PKII/DM",          MACHINE_NOT_WORKING )
 GAME(  1989, unkljfpk,  0,        nortest1,  norautp,   norautp_state, empty_init, ROT0, "LJF Corporation",          "unknown LJF Corporation poker game",  MACHINE_NOT_WORKING )
