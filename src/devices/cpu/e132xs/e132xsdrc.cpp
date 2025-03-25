@@ -18,6 +18,67 @@ struct hyperstone_device::compiler_state
 };
 
 
+/***************************************************************************
+    C FUNCTION CALLBACKS
+***************************************************************************/
+
+struct hyperstone_device::c_funcs
+{
+
+	static void unimplemented(void *param)
+	{
+		auto &that = *reinterpret_cast<hyperstone_device *>(param);
+		fatalerror("PC=%08X: Unimplemented op %08X\n", that.PC, that.m_core->arg0);
+	}
+
+	static void print(void *param)
+	{
+		auto &that = *reinterpret_cast<hyperstone_device *>(param);
+		printf("%c: %08x\n", (char)that.m_core->arg0, that.m_core->arg1);
+	}
+
+	static void standard_irq_callback(void *param)
+	{
+		auto &that = *reinterpret_cast<hyperstone_device *>(param);
+		that.standard_irq_callback(that.m_core->arg0, that.m_core->global_regs[0]);
+	}
+
+	static void debugger_exception_hook(void *param)
+	{
+		auto &that = *reinterpret_cast<hyperstone_device *>(param);
+		that.debugger_exception_hook(int32_t(that.m_core->arg0));
+	}
+
+	static void adjust_timer_interrupt(void *param)
+	{
+		reinterpret_cast<hyperstone_device *>(param)->adjust_timer_interrupt();
+	}
+
+	static void compute_tr(void *param)
+	{
+		reinterpret_cast<hyperstone_device *>(param)->compute_tr();
+	}
+
+	static void update_timer_prescale(void *param)
+	{
+		reinterpret_cast<hyperstone_device *>(param)->update_timer_prescale();
+	}
+
+#if E132XS_LOG_DRC_REGS || E132XS_LOG_INTERPRETER_REGS
+	static void dump_registers(void *param)
+	{
+		reinterpret_cast<hyperstone_device *>(param)->dump_registers();
+	}
+#endif
+
+	static void total_cycles(void *param)
+	{
+		auto &that = *reinterpret_cast<hyperstone_device *>(param);
+		that.m_core->numcycles = that.total_cycles();
+	}
+};
+
+
 #define DRC_PC uml::mem(&m_core->global_regs[0])
 #define DRC_SR uml::mem(&m_core->global_regs[1])
 
@@ -48,84 +109,6 @@ void hyperstone_device::execute_run_drc()
 	}
 }
 
-
-/***************************************************************************
-    C FUNCTION CALLBACKS
-***************************************************************************/
-
-/*-------------------------------------------------
-    cfunc_unimplemented - handler for
-    unimplemented opcdes
--------------------------------------------------*/
-
-inline void hyperstone_device::ccfunc_unimplemented()
-{
-	fatalerror("PC=%08X: Unimplemented op %08X\n", PC, m_core->arg0);
-}
-
-inline void hyperstone_device::ccfunc_print()
-{
-	printf("%c: %08x\n", (char)m_core->arg0, m_core->arg1);
-}
-
-inline void hyperstone_device::ccfunc_standard_irq_callback()
-{
-	standard_irq_callback(m_core->arg0, m_core->global_regs[0]);
-}
-
-static void cfunc_unimplemented(void *param)
-{
-	((hyperstone_device *)param)->ccfunc_unimplemented();
-}
-
-static void cfunc_adjust_timer_interrupt(void *param)
-{
-	((hyperstone_device *)param)->adjust_timer_interrupt();
-}
-
-static void cfunc_compute_tr(void *param)
-{
-	((hyperstone_device *)param)->compute_tr();
-}
-
-static void cfunc_update_timer_prescale(void *param)
-{
-	((hyperstone_device *)param)->update_timer_prescale();
-}
-
-static void cfunc_standard_irq_callback(void *param)
-{
-	((hyperstone_device *)param)->ccfunc_standard_irq_callback();
-}
-
-#if 0
-static void cfunc_print(void *param)
-{
-	((hyperstone_device *)param)->ccfunc_print();
-}
-#endif
-
-#if E132XS_LOG_DRC_REGS
-static void cfunc_dump_registers(void *param)
-{
-	((hyperstone_device *)param)->dump_registers();
-}
-#endif
-
-/*-------------------------------------------------
-    cfunc_total_cycles - compute the total number
-    of cycles executed so far
--------------------------------------------------*/
-
-void hyperstone_device::ccfunc_total_cycles()
-{
-	m_core->numcycles = total_cycles();
-}
-
-static void cfunc_total_cycles(void *param)
-{
-	((hyperstone_device *)param)->ccfunc_total_cycles();
-}
 
 /***************************************************************************
     CACHE MANAGEMENT
@@ -278,7 +261,6 @@ void hyperstone_device::code_compile_block(uint8_t mode, offs_t pc)
 					UML_LABEL(block, seqhead->pc | 0x80000000);
 
 				UML_MOV(block, I7, 0);
-				UML_CALLH(block, *m_interrupt_checks);
 
 				/* iterate over instructions in the sequence and compile them */
 				for (curdesc = seqhead; curdesc != seqlast->next(); curdesc = curdesc->next())
@@ -350,6 +332,11 @@ void hyperstone_device::static_generate_exception(drcuml_block &block, uml::code
 	UML_HANDLE(block, *m_exception);
 
 	UML_GETEXP(block, I0);                                            // I0 = exception code
+	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
+	{
+		UML_MOV(block, mem(&m_core->arg0), I0);                       // let the debugger know
+		UML_CALLC(block, &c_funcs::debugger_exception_hook, this);
+	}
 	generate_get_trap_addr(block, label, uml::I0);                    // I0 = target PC
 
 	UML_MOV(block, I4, DRC_SR);                                       // I4 = old SR
@@ -392,8 +379,6 @@ void hyperstone_device::static_generate_interrupt_checks(drcuml_block &block, um
 	const int dispatch_int = label++;
 	const int done_int = label++;
 
-	UML_CMP(block, mem(&m_core->intblock), 0);
-	UML_JMPc(block, uml::COND_G, done_int);
 	UML_TEST(block, DRC_SR, L_MASK);
 	UML_JMPc(block, uml::COND_NZ, done_int);
 
@@ -413,7 +398,7 @@ void hyperstone_device::static_generate_interrupt_checks(drcuml_block &block, um
 	UML_JMP(block, done_int);
 
 	UML_LABEL(block, take_int);
-	UML_CALLC(block, cfunc_standard_irq_callback, this);
+	UML_CALLC(block, &c_funcs::standard_irq_callback, this);
 	UML_JMP(block, dispatch_int);
 
 	UML_LABEL(block, take_timer);
@@ -638,17 +623,8 @@ void hyperstone_device::generate_interrupt_checks(drcuml_block &block, uml::code
     an exception if out
 -------------------------------------------------*/
 
-void hyperstone_device::generate_update_cycles(drcuml_block &block, bool check_interrupts)
+void hyperstone_device::generate_update_cycles(drcuml_block &block)
 {
-	// clobbers I0
-
-	UML_SUB(block, I0, mem(&m_core->intblock), 1);
-	UML_MOVc(block, uml::COND_S, I0, 0);
-	UML_MOV(block, mem(&m_core->intblock), I0);
-
-	if (check_interrupts)
-		UML_CALLH(block, *m_interrupt_checks);
-
 	UML_SUB(block, mem(&m_core->icount), mem(&m_core->icount), I7);
 	UML_MOV(block, I7, 0);
 	UML_CALLHc(block, uml::COND_LE, *m_out_of_cycles);
@@ -754,7 +730,7 @@ void hyperstone_device::log_add_disasm_comment(drcuml_block &block, uint32_t pc,
 
 void hyperstone_device::generate_branch(drcuml_block &block, uml::parameter mode, uml::parameter targetpc, const opcode_desc *desc, bool update_cycles)
 {
-	// clobbers I0, I1, I2, I3 and I4 if update_cycles is true
+	// clobbers I0 and I1 if mode is BRANCH_TARGET_DYNAMIC
 
 	if (desc)
 		UML_ROLINS(block, DRC_SR, ((desc->length >> 1) << ILC_SHIFT) | P_MASK, 0, ILC_MASK | P_MASK);
@@ -792,7 +768,7 @@ void hyperstone_device::generate_sequence_instruction(drcuml_block &block, compi
 	UML_MAPVAR(block, MAPVAR_PC, expc);
 
 #if E132XS_LOG_DRC_REGS
-	UML_CALLC(block, cfunc_dump_registers, this);
+	UML_CALLC(block, &c_funcs::dump_registers, this);
 #endif
 
 	// if we are debugging, call the debugger
@@ -802,6 +778,12 @@ void hyperstone_device::generate_sequence_instruction(drcuml_block &block, compi
 		UML_DEBUG(block, desc->pc);
 	}
 
+	// check for pending interrupts
+	UML_SUB(block, I0, mem(&m_core->intblock), 1);
+	UML_MOVc(block, uml::COND_S, I0, 0);
+	UML_MOV(block, mem(&m_core->intblock), I0);
+	UML_CALLHc(block, uml::COND_LE, *m_interrupt_checks);
+
 	if (!(desc->flags & OPFLAG_VIRTUAL_NOOP))
 	{
 		// compile the instruction
@@ -809,7 +791,7 @@ void hyperstone_device::generate_sequence_instruction(drcuml_block &block, compi
 		{
 			UML_MOV(block, DRC_PC, desc->pc);
 			UML_MOV(block, mem(&m_core->arg0), desc->opptr.w[0]);
-			UML_CALLC(block, cfunc_unimplemented, this);
+			UML_CALLC(block, &c_funcs::unimplemented, this);
 		}
 	}
 }

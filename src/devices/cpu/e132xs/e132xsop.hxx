@@ -37,13 +37,13 @@ void hyperstone_device::hyperstone_chk()
 	if (SRC_GLOBAL && (src_code == SR_REGISTER))
 	{
 		if (dreg == 0)
-			execute_exception(get_trap_addr(TRAPNO_RANGE_ERROR));
+			execute_exception(TRAPNO_RANGE_ERROR);
 	}
 	else
 	{
 		const uint32_t sreg = (SRC_GLOBAL ? m_core->global_regs : m_core->local_regs)[src_code];
 		if ((SRC_GLOBAL && (src_code == PC_REGISTER)) ? (dreg >= sreg) : (dreg > sreg))
-			execute_exception(get_trap_addr(TRAPNO_RANGE_ERROR));
+			execute_exception(TRAPNO_RANGE_ERROR);
 	}
 
 	m_core->icount -= m_core->clock_cycles_1;
@@ -81,7 +81,7 @@ void hyperstone_device::hyperstone_movd()
 		const uint32_t new_s = SR & S_MASK;
 		const uint32_t new_l = SR & L_MASK;
 		if ((!old_s && new_s) || (!new_s && !old_l && new_l))
-			execute_exception(get_trap_addr(TRAPNO_PRIVILEGE_ERROR));
+			execute_exception(TRAPNO_PRIVILEGE_ERROR);
 
 		for (int difference = util::sext(GET_FP - ((SP & 0x1fc) >> 2), 7); difference < 0; difference++)
 		{
@@ -157,7 +157,7 @@ void hyperstone_device::hyperstone_divsu()
 		//Z -> undefined
 		//N -> undefined
 		SR |= V_MASK;
-		execute_exception(get_trap_addr(TRAPNO_RANGE_ERROR));
+		execute_exception(TRAPNO_RANGE_ERROR);
 	}
 	else
 	{
@@ -214,7 +214,7 @@ void hyperstone_device::hyperstone_xm()
 	if (sub_type < 4)
 	{
 		if ((SRC_GLOBAL && ((src_code == PC_REGISTER)) ? (sreg >= extra_u) : (sreg > extra_u)))
-			execute_exception(get_trap_addr(TRAPNO_RANGE_ERROR));
+			execute_exception(TRAPNO_RANGE_ERROR);
 	}
 
 	m_core->icount -= m_core->clock_cycles_1;
@@ -304,7 +304,7 @@ void hyperstone_device::hyperstone_sums()
 	m_core->icount -= m_core->clock_cycles_1;
 
 	if ((SR & V_MASK) && src_code != SR_REGISTER)
-		execute_exception(get_trap_addr(TRAPNO_RANGE_ERROR));
+		execute_exception(TRAPNO_RANGE_ERROR);
 }
 
 
@@ -347,7 +347,7 @@ void hyperstone_device::hyperstone_mov()
 	SR &= ~H_MASK;
 	if (DST_GLOBAL && h && !(SR & S_MASK))
 	{
-		execute_exception(get_trap_addr(TRAPNO_PRIVILEGE_ERROR));
+		execute_exception(TRAPNO_PRIVILEGE_ERROR);
 	}
 	else
 	{
@@ -449,7 +449,7 @@ void hyperstone_device::hyperstone_adds()
 	m_core->icount -= m_core->clock_cycles_1;
 
 	if (SR & V_MASK)
-		execute_exception(get_trap_addr(TRAPNO_RANGE_ERROR));
+		execute_exception(TRAPNO_RANGE_ERROR);
 }
 
 
@@ -667,7 +667,7 @@ void hyperstone_device::hyperstone_subs()
 	m_core->icount -= m_core->clock_cycles_1;
 
 	if (SR & V_MASK)
-		execute_exception(get_trap_addr(TRAPNO_RANGE_ERROR));
+		execute_exception(TRAPNO_RANGE_ERROR);
 }
 
 
@@ -802,7 +802,7 @@ void hyperstone_device::hyperstone_negs()
 	m_core->icount -= m_core->clock_cycles_1;
 
 	if (GET_V)
-		execute_exception(get_trap_addr(TRAPNO_RANGE_ERROR));
+		execute_exception(TRAPNO_RANGE_ERROR);
 }
 
 
@@ -854,7 +854,7 @@ void hyperstone_device::hyperstone_movi()
 	SR &= ~H_MASK;
 	if (DST_GLOBAL && h && !(SR & S_MASK))
 	{
-		execute_exception(get_trap_addr(TRAPNO_PRIVILEGE_ERROR));
+		execute_exception(TRAPNO_PRIVILEGE_ERROR);
 	}
 	else
 	{
@@ -981,7 +981,7 @@ void hyperstone_device::hyperstone_addsi()
 	m_core->icount -= m_core->clock_cycles_1;
 
 	if (SR & V_MASK)
-		execute_exception(get_trap_addr(TRAPNO_RANGE_ERROR));
+		execute_exception(TRAPNO_RANGE_ERROR);
 }
 
 
@@ -2559,7 +2559,7 @@ void hyperstone_device::hyperstone_frame()
 		while (difference < 0);
 
 		if (tmp_flag)
-			execute_exception(get_trap_addr(TRAPNO_FRAME_ERROR));
+			execute_exception(TRAPNO_FRAME_ERROR);
 	}
 
 	// TODO: More than 1 cycle!

@@ -118,27 +118,6 @@ class hyperstone_device : public cpu_device, public hyperstone_disassembler::con
 public:
 	virtual ~hyperstone_device() override;
 
-	inline void ccfunc_unimplemented();
-	inline void ccfunc_print();
-	inline void ccfunc_total_cycles();
-	inline void ccfunc_standard_irq_callback();
-
-#if E132XS_LOG_DRC_REGS || E132XS_LOG_INTERPRETER_REGS
-	void dump_registers();
-#endif
-	void update_timer_prescale();
-	void compute_tr();
-	void adjust_timer_interrupt();
-
-	void e116_16k_iram_map(address_map &map) ATTR_COLD;
-	void e116_4k_iram_map(address_map &map) ATTR_COLD;
-	void e116_8k_iram_map(address_map &map) ATTR_COLD;
-	void e132_16k_iram_map(address_map &map) ATTR_COLD;
-	void e132_4k_iram_map(address_map &map) ATTR_COLD;
-	void e132_8k_iram_map(address_map &map) ATTR_COLD;
-
-	static uint32_t imm_length(uint16_t op);
-
 protected:
 	// compilation boundaries -- how far back/forward does the analysis extend?
 	enum : u32
@@ -277,27 +256,43 @@ protected:
 	hyperstone_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock,
 						const device_type type, uint32_t prg_data_width, uint32_t io_data_width, address_map_constructor internal_map);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_stop() override ATTR_COLD;
 
-	// device_execute_interface overrides
+	// device_execute_interface implementation
 	virtual uint32_t execute_min_cycles() const noexcept override;
 	virtual uint32_t execute_max_cycles() const noexcept override;
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
-	// device_memory_interface overrides
+	// device_memory_interface implementation
 	virtual space_config_vector memory_space_config() const override;
 
-	// device_disasm_interface overrides
+	// device_disasm_interface implementation
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual u8 get_fp() const override;
 	virtual bool get_h() const override;
 
-	// device_state_interface overrides
+	// device_state_interface implementation
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
+
+#if E132XS_LOG_DRC_REGS || E132XS_LOG_INTERPRETER_REGS
+	void dump_registers();
+#endif
+	void update_timer_prescale();
+	void compute_tr();
+	void adjust_timer_interrupt();
+
+	void e116_16k_iram_map(address_map &map) ATTR_COLD;
+	void e116_4k_iram_map(address_map &map) ATTR_COLD;
+	void e116_8k_iram_map(address_map &map) ATTR_COLD;
+	void e132_16k_iram_map(address_map &map) ATTR_COLD;
+	void e132_4k_iram_map(address_map &map) ATTR_COLD;
+	void e132_8k_iram_map(address_map &map) ATTR_COLD;
+
+	static uint32_t imm_length(uint16_t op);
 
 	// address spaces
 	const address_space_config m_program_config;
@@ -353,7 +348,7 @@ private:
 	void hyperstone_br();
 	void execute_trap(uint32_t addr);
 	void execute_int(uint32_t addr);
-	void execute_exception(uint32_t addr);
+	void execute_exception(uint8_t trapno);
 	void execute_software();
 
 	template <reg_bank DST_GLOBAL> uint64_t get_double_word(uint8_t dst_code, uint8_t dstf_code) const;
@@ -467,6 +462,7 @@ private:
 
 	/* internal compiler state */
 	struct compiler_state;
+	struct c_funcs;
 
 	void execute_run_drc();
 	void flush_drc_cache();
@@ -480,7 +476,7 @@ private:
 	void static_generate_interrupt_checks(drcuml_block &block, uml::code_label &label);
 	void generate_interrupt_checks(drcuml_block &block, uml::code_label &labelnum, bool with_timer, int take_int, int take_timer);
 	void generate_branch(drcuml_block &block, uml::parameter mode, uml::parameter targetpc, const opcode_desc *desc, bool update_cycles = true);
-	void generate_update_cycles(drcuml_block &block, bool check_interrupts = true);
+	void generate_update_cycles(drcuml_block &block);
 	void generate_checksum_block(drcuml_block &block, compiler_state &compiler, const opcode_desc *seqhead, const opcode_desc *seqlast);
 	void generate_sequence_instruction(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
 	void log_add_disasm_comment(drcuml_block &block, uint32_t pc, uint32_t op);
