@@ -6,7 +6,7 @@
 Skeleton driver for "Paracaidista" (from Video Game / Electrogame).
 
 There are two versions of the game: The original from 1979 (undumped), and a
-recreation from 2023 done by the same original programmer (David Valero, who
+recreation from 2023 done by the same original programmer (Javier Valero, who
 later founded Gaelco) for the same hardware.
 
 Six PCBs connected by a small custom backplane.
