@@ -14,7 +14,8 @@
     deco32.cpp (Dragon Gun, Lock 'n' Loaded)
 
     earlier titles use the 186/187 pair (eg. Steel Gunner, Dragon Gun) while later boards appear to replace 186 into
-    C355 custom (eg. Starblade, NB1 hardware, Final Lap R etc.). It is not known if there are any differences in capability.
+    C355 custom (eg. Starblade, NB1 hardware, Final Lap R etc.). It is not known if there are any differences in
+    capability.
 
     TODO: verify which boards use which chips
 
