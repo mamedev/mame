@@ -31,9 +31,17 @@
  - GMS30C2232
 
  TODO:
- - some wrong cycle counts
- - verify register wrapping with sregf/dregf on hardware
- - DRC does not generate trace exceptions on branch or return
+ - Many wrong cycle counts
+ - No emulation of memory access latency and pipleline
+ - Should a zero bit shift clear C or leave it unchanged?
+ - What actually happens on trying to load memory to PC or SR?
+ - Verify register wrapping with sregf/dregf on hardware
+ - Tracing doesn't work properly
+   Interrupts are not serviced while tracing
+   DRC does not generate trace exceptions on branch or return
+ - Interpreter does not implement privilege check on setting L flag
+ - DRC does not update ILC and P on some privilege error exceptions
+ - Support for debugger exception points should be implemented
 
 *********************************************************************/
 
@@ -481,8 +489,6 @@ void hyperstone_device::set_global_register(uint8_t code, uint32_t val)
 				// FIXME: generate exception on attempt to set L from user mode const bool exception = !GET_S && !GET_L && (val & L_MASK);
 				SET_LOW_SR(val); // only a RET instruction can change the full content of SR
 				SR &= ~0x40; //reserved bit 6 always zero
-				if (m_core->intblock < 1)
-					m_core->intblock = 1;
 			}
 			return;
 		case 2:
@@ -525,8 +531,6 @@ void hyperstone_device::set_global_register(uint8_t code, uint32_t val)
 			{
 				m_core->global_regs[code] = val;
 				adjust_timer_interrupt();
-				if (m_core->intblock < 1)
-					m_core->intblock = 1;
 			}
 			return;
 		case TR_REGISTER:
@@ -544,8 +548,6 @@ void hyperstone_device::set_global_register(uint8_t code, uint32_t val)
 			if ((m_core->global_regs[code] ^ val) & 0x00800000)
 				adjust_timer_interrupt();
 			m_core->global_regs[code] = val;
-			if (m_core->intblock < 1)
-				m_core->intblock = 1;
 			return;
 		case MCR_REGISTER:
 		{

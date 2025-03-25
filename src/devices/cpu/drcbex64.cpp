@@ -1430,11 +1430,15 @@ void drcbe_x64::alu_op_param(Assembler &a, Inst::Id const opcode, Operand const 
 			a.emit(opcode, dst, tmp);
 		}
 		else if (opcode != Inst::kIdTest)
+		{
 			// most instructions are register,memory
 			a.emit(opcode, dst, MABS(param.memory()));
+		}
 		else
+		{
 			// test instruction requires memory,register
 			a.emit(opcode, MABS(param.memory()), dst);
+		}
 	}
 	else if (param.is_int_register())
 	{
@@ -3827,9 +3831,10 @@ void drcbe_x64::op_roland(Assembler &a, const instruction &inst)
 	be_parameter srcp(*this, inst.param(1), PTYPE_MRI);
 	be_parameter shiftp(*this, inst.param(2), PTYPE_MRI);
 	be_parameter maskp(*this, inst.param(3), PTYPE_MRI);
+	const unsigned bits = inst.size() * 8;
 
 	// pick a target register
-	Gp dstreg = dstp.select_register((inst.size() == 4) ? Gp(eax) : Gp(rax), shiftp, maskp);
+	Gp dstreg = dstp.select_register((inst.size() == 4) ? Gp(eax) : Gp(rax), maskp);
 
 	if (maskp.is_immediate_value(0))
 	{
@@ -3837,7 +3842,6 @@ void drcbe_x64::op_roland(Assembler &a, const instruction &inst)
 	}
 	else if (shiftp.is_immediate() && (srcp.is_immediate() || maskp.is_immediate()))
 	{
-		const unsigned bits = inst.size() * 8;
 		const unsigned shift = shiftp.immediate() & (bits - 1);
 		const uint64_t sizemask = util::make_bitmask<uint64_t>(bits);
 		if (srcp.is_immediate())
@@ -3929,8 +3933,17 @@ void drcbe_x64::op_roland(Assembler &a, const instruction &inst)
 	}
 	else
 	{
-		mov_reg_param(a, dstreg, srcp);
-		shift_op_param(a, Inst::kIdRol, inst.size(), dstreg, shiftp, 0);
+		if (shiftp.is_immediate())
+		{
+			mov_reg_param(a, dstreg, srcp);
+			a.rol(dstreg, shiftp.immediate() & (bits - 1));
+		}
+		else
+		{
+			mov_reg_param(a, ecx, shiftp); // must happen before loading dstreg as shift and dst may be the same register
+			mov_reg_param(a, dstreg, srcp);
+			a.rol(dstreg, cl);
+		}
 		alu_op_param(a, Inst::kIdAnd, dstreg, maskp,
 			[inst](Assembler &a, Operand const &dst, be_parameter const &src)
 			{

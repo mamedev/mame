@@ -650,8 +650,8 @@ void hyperstone_device::generate_update_cycles(drcuml_block &block, bool check_i
 		UML_CALLH(block, *m_interrupt_checks);
 
 	UML_SUB(block, mem(&m_core->icount), mem(&m_core->icount), I7);
-	UML_CALLHc(block, uml::COND_LE, *m_out_of_cycles);
 	UML_MOV(block, I7, 0);
+	UML_CALLHc(block, uml::COND_LE, *m_out_of_cycles);
 }
 
 /*-------------------------------------------------
@@ -783,11 +783,11 @@ void hyperstone_device::generate_branch(drcuml_block &block, uml::parameter mode
 
 void hyperstone_device::generate_sequence_instruction(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)
 {
-	/* add an entry for the log */
+	// add an entry for the log
 	if (m_drcuml->logging() && !(desc->flags & OPFLAG_VIRTUAL_NOOP))
 		log_add_disasm_comment(block, desc->pc, desc->opptr.w[0]);
 
-	/* set the PC map variable */
+	// set the PC map variable
 	const offs_t expc = (desc->flags & OPFLAG_IN_DELAY_SLOT) ? (desc->pc - 3) : desc->pc;
 	UML_MAPVAR(block, MAPVAR_PC, expc);
 
@@ -795,7 +795,7 @@ void hyperstone_device::generate_sequence_instruction(drcuml_block &block, compi
 	UML_CALLC(block, cfunc_dump_registers, this);
 #endif
 
-	/* if we are debugging, call the debugger */
+	// if we are debugging, call the debugger
 	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
 		//save_fast_iregs(block);
@@ -804,7 +804,7 @@ void hyperstone_device::generate_sequence_instruction(drcuml_block &block, compi
 
 	if (!(desc->flags & OPFLAG_VIRTUAL_NOOP))
 	{
-		/* compile the instruction */
+		// compile the instruction
 		if (!generate_opcode(block, compiler, desc))
 		{
 			UML_MOV(block, DRC_PC, desc->pc);
@@ -1082,21 +1082,15 @@ bool hyperstone_device::generate_opcode(drcuml_block &block, compiler_state &com
 		case 0xff: generate_trap_op(block, compiler, desc); break;
 	}
 
-	UML_MOV(block, I0, DRC_SR);
-	UML_ROLINS(block, I0, ((desc->length >> 1) << ILC_SHIFT) | P_MASK, 0, ILC_MASK | P_MASK);
-	UML_MOV(block, DRC_SR, I0);
+	UML_ROLINS(block, DRC_SR, ((desc->length >> 1) << ILC_SHIFT) | P_MASK, 0, ILC_MASK | P_MASK);
 
 	UML_TEST(block, mem(&m_core->delay_slot_taken), ~uint32_t(0));
 	UML_CALLHc(block, uml::COND_NZ, *m_delay_taken[compiler.m_mode]);
 
 	if (BIT(compiler.m_mode, 1))
 	{
-		const int done = compiler.m_labelnum++;
-		UML_TEST(block, I0, P_MASK);
-		UML_JMPc(block, uml::COND_Z, done);
 		UML_TEST(block, mem(&m_core->delay_slot), 1);
 		UML_EXHc(block, uml::COND_Z, *m_exception, EXCEPTION_TRACE);
-		UML_LABEL(block, done);
 	}
 
 	return true;

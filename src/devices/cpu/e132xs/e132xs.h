@@ -495,7 +495,7 @@ private:
 	void generate_ignore_pcrel(drcuml_block &block, const opcode_desc *desc);
 
 	void generate_get_global_register(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
-	void generate_set_global_register(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void generate_set_global_register(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint32_t dst_code);
 	void generate_set_global_register_low(drcuml_block &block, compiler_state &compiler, uint32_t dst_code, uml::parameter src);
 	void generate_set_global_register_high(drcuml_block &block, compiler_state &compiler, uint32_t dst_code, uml::parameter src);
 
