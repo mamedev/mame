@@ -346,7 +346,7 @@ private:
 	void ignore_pcrel();
 
 	void hyperstone_br();
-	void execute_trap(uint32_t addr);
+	void execute_trap(uint8_t trapno);
 	void execute_int(uint32_t addr);
 	void execute_exception(uint8_t trapno);
 	void execute_software();
@@ -475,7 +475,7 @@ private:
 	void static_generate_exception(drcuml_block &block, uml::code_label &label);
 	void static_generate_interrupt_checks(drcuml_block &block, uml::code_label &label);
 	void generate_interrupt_checks(drcuml_block &block, uml::code_label &labelnum, bool with_timer, int take_int, int take_timer);
-	void generate_branch(drcuml_block &block, uml::parameter mode, uml::parameter targetpc, const opcode_desc *desc, bool update_cycles = true);
+	void generate_branch(drcuml_block &block, uml::parameter mode, uml::parameter targetpc, const opcode_desc *desc);
 	void generate_update_cycles(drcuml_block &block);
 	void generate_checksum_block(drcuml_block &block, compiler_state &compiler, const opcode_desc *seqhead, const opcode_desc *seqlast);
 	void generate_sequence_instruction(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);

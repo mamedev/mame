@@ -471,11 +471,20 @@ void hyperstone_device::generate_update_flags_addsubs(drcuml_block &block, compi
 template <hyperstone_device::trap_exception_or_int TYPE>
 void hyperstone_device::generate_trap_exception_or_int(drcuml_block &block, uml::code_label &label, uml::parameter trapno)
 {
-	// expects exception handler address in I0 and cycles in I7 (updated)
+	// expects cycles in I7 (updated)
 	// clobbers I0, I1, I2, I3 and I4
+
+	const uint32_t set_flags = (TYPE == IS_INT) ? (S_MASK | L_MASK | I_MASK) : (S_MASK | L_MASK);
+	const uint32_t clear_flags = T_MASK | M_MASK;
+	const uint32_t update_sr = FP_MASK | FL_MASK | set_flags | clear_flags;
 
 	UML_ADD(block, I7, I7, mem(&m_core->clock_cycles_2));
 
+	if ((TYPE != IS_INT) && (machine().debug_flags & DEBUG_FLAG_ENABLED))
+	{
+		UML_MOV(block, mem(&m_core->arg0), trapno);                   // let the debugger know
+		UML_CALLC(block, &c_funcs::debugger_exception_hook, this);
+	}
 	generate_get_trap_addr(block, label, trapno);                     // I0 = target PC
 
 	UML_MOV(block, I4, DRC_SR);                                       // I4 = old SR
@@ -487,9 +496,8 @@ void hyperstone_device::generate_trap_exception_or_int(drcuml_block &block, uml:
 	UML_ADD(block, I3, I3, I2);                                       // I3 = updated FP
 
 	UML_SHL(block, I2, I3, FP_SHIFT);                                 // I2 = updated FP:...
-	UML_OR(block, I2, I2, ((TYPE != IS_TRAP) ? 2 : 6) << FL_SHIFT);   // I2 = updated FP:FL:...
-	UML_ROLINS(block, I1, I2, 0, FP_MASK | FL_MASK | M_MASK | T_MASK);// update FP and FL, clear M and T, set S and L, set I for INT
-	UML_OR(block, I1, I1, (TYPE == IS_INT) ? (S_MASK | L_MASK | I_MASK) : (S_MASK | L_MASK));
+	UML_OR(block, I2, I2, (((TYPE != IS_TRAP) ? 2 : 6) << FL_SHIFT) | set_flags);
+	UML_ROLINS(block, I1, I2, 0, update_sr);                          // update SR value
 	UML_MOV(block, DRC_SR, I1);                                       // store updated SR
 
 	UML_AND(block, I3, I3, 0x3f);                                     // save old PC at updated (FP)^
@@ -500,8 +508,10 @@ void hyperstone_device::generate_trap_exception_or_int(drcuml_block &block, uml:
 	UML_AND(block, I3, I3, 0x3f);
 	UML_STORE(block, (void *)m_core->local_regs, I3, I4, SIZE_DWORD, SCALE_x4);
 
+	UML_ADD(block, I7, I7, mem(&m_core->clock_cycles_2));             // assume exception dispatch takes two cycles
 	UML_MOV(block, DRC_PC, I0);                                       // branch to exception handler
-	generate_branch(block, 1, uml::I0, nullptr, true); // T cleared and S set - mode will always be 1
+
+	generate_branch(block, 1, uml::I0, nullptr); // T cleared and S set - mode will always be 1
 }
 
 void hyperstone_device::generate_int(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint32_t addr)
@@ -1003,6 +1013,7 @@ void hyperstone_device::generate_xm(drcuml_block &block, compiler_state &compile
 
 	UML_SHL(block, I0, I1, sub_type & 3);
 
+	// FIXME: exception before branch
 	generate_set_dst(block, compiler, desc, DST_GLOBAL, dst_code, uml::I0, uml::I3, true);
 
 	if (sub_type < 4)
@@ -1102,6 +1113,7 @@ void hyperstone_device::generate_sums(drcuml_block &block, compiler_state &compi
 	generate_update_flags_addsubs(block, compiler, uml::I2);
 	UML_MOV(block, DRC_SR, I2);
 
+	// FIXME: exception before branch
 	generate_set_dst(block, compiler, desc, DST_GLOBAL, dst_code, uml::I0, uml::I3, true);
 	generate_trap_on_overflow(block, compiler, desc, uml::I2);
 }
@@ -1290,6 +1302,7 @@ void hyperstone_device::generate_adds(drcuml_block &block, compiler_state &compi
 	generate_update_flags_addsubs(block, compiler, uml::I2);
 	UML_MOV(block, DRC_SR, I2);
 
+	// FIXME: exception before branch
 	generate_set_dst(block, compiler, desc, DST_GLOBAL, dst_code, uml::I0, uml::I3, false);
 	generate_trap_on_overflow(block, compiler, desc, uml::I2);
 }
@@ -1403,6 +1416,7 @@ void hyperstone_device::generate_subs(drcuml_block &block, compiler_state &compi
 	generate_update_flags_addsubs(block, compiler, uml::I2);
 	UML_MOV(block, DRC_SR, I2);
 
+	// FIXME: exception before branch
 	generate_set_dst(block, compiler, desc, DST_GLOBAL, dst_code, uml::I0, uml::I3, false);
 	generate_trap_on_overflow(block, compiler, desc, uml::I2);
 }
@@ -1493,6 +1507,7 @@ void hyperstone_device::generate_negs(drcuml_block &block, compiler_state &compi
 	generate_update_flags_addsubs(block, compiler, uml::I2);
 	UML_MOV(block, DRC_SR, I2);
 
+	// FIXME: exception before branch
 	generate_set_dst(block, compiler, desc, DST_GLOBAL, dst_code, uml::I0, uml::I3, true);
 
 	if (!SRC_GLOBAL || (src_code != SR_REGISTER)) // negating carry cannot result in overflow
@@ -4086,11 +4101,10 @@ void hyperstone_device::generate_trap_op(drcuml_block &block, compiler_state &co
 	};
 
 	const uint16_t op = desc->opptr.w[0];
-
-	generate_check_delay_pc(block, compiler, desc);
-
 	const uint8_t trapno = (op & 0xfc) >> 2;
 	const uint8_t code = ((op & 0x300) >> 6) | (op & 0x03);
+
+	generate_check_delay_pc(block, compiler, desc);
 
 	UML_TEST(block, DRC_SR, conditions[code]);
 

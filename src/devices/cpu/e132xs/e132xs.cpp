@@ -707,8 +707,11 @@ void hyperstone_device::hyperstone_br()
 	m_core->icount -= m_core->clock_cycles_2;
 }
 
-void hyperstone_device::execute_trap(uint32_t addr)
+void hyperstone_device::execute_trap(uint8_t trapno)
 {
+	debugger_exception_hook(int(unsigned(trapno)));
+
+	const uint32_t addr = get_trap_addr(trapno);
 	const uint8_t reg = GET_FP + GET_FL;
 	SET_ILC(m_instruction_length);
 	const uint32_t oldSR = SR;
@@ -1424,18 +1427,17 @@ void hyperstone_device::hyperstone_trap()
 	check_delay_PC();
 
 	const uint8_t trapno = (m_op & 0xfc) >> 2;
-	const uint32_t addr = get_trap_addr(trapno);
 	const uint8_t code = ((m_op & 0x300) >> 6) | (m_op & 0x03);
 
 	if (trap_if_set[code])
 	{
 		if (SR & conditions[code])
-			execute_trap(addr);
+			execute_trap(trapno);
 	}
 	else
 	{
 		if (!(SR & conditions[code]))
-			execute_trap(addr);
+			execute_trap(trapno);
 	}
 }
 

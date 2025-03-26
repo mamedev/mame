@@ -327,44 +327,12 @@ static inline void alloc_handle(drcuml_state &drcuml, uml::code_handle *&handlep
 
 void hyperstone_device::static_generate_exception(drcuml_block &block, uml::code_label &label)
 {
-	/* add a global entry for this */
+	// add a global entry for this
 	alloc_handle(*m_drcuml, m_exception, "exception");
 	UML_HANDLE(block, *m_exception);
 
-	UML_GETEXP(block, I0);                                            // I0 = exception code
-	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
-	{
-		UML_MOV(block, mem(&m_core->arg0), I0);                       // let the debugger know
-		UML_CALLC(block, &c_funcs::debugger_exception_hook, this);
-	}
-	generate_get_trap_addr(block, label, uml::I0);                    // I0 = target PC
-
-	UML_MOV(block, I4, DRC_SR);                                       // I4 = old SR
-
-	UML_MOV(block, I1, I4);                                           // I1 = SR to be updated
-	UML_ROLAND(block, I3, I4, 32 - FP_SHIFT, 0x7f);                   // I3 = old FP
-	UML_ROLAND(block, I2, I4, 32 - FL_SHIFT, 0xf);                    // I2 = old FL
-	UML_MOVc(block, uml::COND_Z, I2, 16);                             // convert FL == 0 to 16
-	UML_ADD(block, I3, I3, I2);                                       // I3 = updated FP
-
-	UML_SHL(block, I2, I3, FP_SHIFT);                                 // I2 = updated FP:...
-	UML_OR(block, I2, I2, (2 << FL_SHIFT) | S_MASK | L_MASK);         // I2 = updated FP:FL:..:S:..T:L:..:M:..
-	UML_ROLINS(block, I1, I2, 0, FP_MASK | FL_MASK | S_MASK | T_MASK | L_MASK | M_MASK);
-	UML_MOV(block, DRC_SR, I1);                                       // store updated SR
-
-	UML_AND(block, I3, I3, 0x3f);                                     // save old PC at updated (FP)^
-	UML_AND(block, I2, DRC_PC, ~uint32_t(1));
-	UML_ROLINS(block, I2, I4, 32 - S_SHIFT, 1);
-	UML_STORE(block, (void *)m_core->local_regs, I3, I2, SIZE_DWORD, SCALE_x4);
-	UML_ADD(block, I3, I3, 1);                                        // save old SR at updated (FP + 1)^
-	UML_AND(block, I3, I3, 0x3f);
-	UML_STORE(block, (void *)m_core->local_regs, I3, I4, SIZE_DWORD, SCALE_x4);
-
-	UML_MOV(block, DRC_PC, I0);                                       // branch to exception handler
-	UML_SUB(block, mem(&m_core->icount), mem(&m_core->icount), 2);
-	UML_CALLHc(block, uml::COND_S, *m_out_of_cycles);
-
-	UML_HASHJMP(block, 1, I0, *m_nocode); // T cleared and S set - mode will always be 1
+	UML_GETEXP(block, I0);
+	generate_trap_exception_or_int<IS_EXCEPTION>(block, label, uml::I0);
 }
 
 
@@ -728,17 +696,16 @@ void hyperstone_device::log_add_disasm_comment(drcuml_block &block, uint32_t pc,
     generate_branch
 ------------------------------------------------------------------*/
 
-void hyperstone_device::generate_branch(drcuml_block &block, uml::parameter mode, uml::parameter targetpc, const opcode_desc *desc, bool update_cycles)
+void hyperstone_device::generate_branch(drcuml_block &block, uml::parameter mode, uml::parameter targetpc, const opcode_desc *desc)
 {
 	// clobbers I0 and I1 if mode is BRANCH_TARGET_DYNAMIC
 
 	if (desc)
 		UML_ROLINS(block, DRC_SR, ((desc->length >> 1) << ILC_SHIFT) | P_MASK, 0, ILC_MASK | P_MASK);
 
-	if (update_cycles)
-		generate_update_cycles(block);
+	generate_update_cycles(block);
 
-	/* update the cycles and jump through the hash table to the target */
+	// update the cycles and jump through the hash table to the target
 	const uml::parameter pc = (targetpc != BRANCH_TARGET_DYNAMIC) ? targetpc : DRC_PC;
 	const uml::parameter m = (mode != BRANCH_TARGET_DYNAMIC) ? mode : uml::I0;
 	if (mode == BRANCH_TARGET_DYNAMIC)
