@@ -272,10 +272,11 @@ protected:
 
 	// device_disasm_interface implementation
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
-	virtual u8 get_fp() const override;
 	virtual bool get_h() const override;
 
 	// device_state_interface implementation
+	virtual void state_import(const device_state_entry &entry) override;
+	virtual void state_export(const device_state_entry &entry) override;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 #if E132XS_LOG_DRC_REGS || E132XS_LOG_INTERPRETER_REGS
@@ -457,6 +458,8 @@ private:
 	uml::code_handle *m_io_read32;
 	uml::code_handle *m_io_write32;
 	uml::code_handle *m_exception;
+
+	uint32_t m_debug_local_regs[16];
 
 	bool m_enable_drc;
 

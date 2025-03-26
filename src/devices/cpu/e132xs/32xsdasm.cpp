@@ -12,26 +12,23 @@
 #include "32xsdefs.h"
 
 
-const char *const hyperstone_disassembler::L_REG[] =
+namespace {
+
+const char *const L_REG[] =
 {
-	"L0",  "L1",  "L2",  "L3",  "L4",  "L5",  "L6",  "L7",  "L8",  "L9",
-	"L10", "L11", "L12", "L13", "L14", "L15", "L16", "L17", "L18", "L19",
-	"L20", "L21", "L22", "L23", "L24", "L25", "L26", "L27", "L28", "L29",
-	"L30", "L31", "L32", "L33", "L34", "L35", "L36", "L37", "L38", "L39",
-	"L40", "L41", "L42", "L43", "L44", "L45", "L46", "L47", "L48", "L49",
-	"L50", "L51", "L52", "L53", "L54", "L55", "L56", "L57", "L58", "L59",
-	"L60", "L61", "L62", "L63"
+	"L0",  "L1",  "L2",  "L3",  "L4",  "L5",  "L6",  "L7",
+	"L8",  "L9",  "L10", "L11", "L12", "L13", "L14", "L15"
 };
 
-const char *const hyperstone_disassembler::G_REG[] =
+const char *const G_REG[] =
 {
-	"PC",  "SR",  "FER", "G03", "G04", "G05", "G06", "G07", "G08", "G09",
-	"G10", "G11", "G12", "G13", "G14", "G15", "G16", "G17", "SP",  "UB",
-	"BCR", "TPR", "TCR", "TR",  "WCR", "ISR", "FCR", "MCR", "G28", "G29",
-	"G30", "G31"
+	"PC",  "SR",  "FER", "G03", "G04", "G05", "G06", "G07",
+	"G08", "G09", "G10", "G11", "G12", "G13", "G14", "G15",
+	"G16", "G17", "SP",  "UB",  "BCR", "TPR", "TCR", "TR",
+	"WCR", "ISR", "FCR", "MCR", "G28", "G29", "G30", "G31"
 };
 
-const char *const hyperstone_disassembler::SETxx[] =
+const char *const SETxx[] =
 {
 	"SETADR",   "Reserved", "SET1",   "SET0",     "SETLE",  "SETGT",  "SETLT",  "SETGE",
 	"SETSE",    "SETHT",    "SETST",  "SETHE",    "SETE",   "SETNE",  "SETV",   "SETNV",
@@ -45,42 +42,37 @@ const char *const hyperstone_disassembler::SETxx[] =
 #define SOURCEBIT(op)           ((op & 0x100) >> 8)
 #define DESTBIT(op)             ((op & 0x200) >> 9)
 
-#define DASM_N_VALUE(op)             ((((op & 0x100) >> 8) << 4 ) | (op & 0x0f))
+#define DASM_N_VALUE(op)        ((((op & 0x100) >> 8) << 4 ) | (op & 0x0f))
+
+} // anonymous namespace
+
 
 void hyperstone_disassembler::LL_format(char *source, char *dest, uint16_t op)
 {
-	strcpy(source, L_REG[(SOURCECODE(op)+global_fp)%64]);
-	strcpy(dest, L_REG[(DESTCODE(op)+global_fp)%64]);
+	strcpy(source, L_REG[SOURCECODE(op)]);
+	strcpy(dest, L_REG[DESTCODE(op)]);
 }
 
 void hyperstone_disassembler::LR_format(char *source, char *dest, uint16_t op)
 {
-	if( SOURCEBIT(op) )
-	{
-		strcpy(source, L_REG[(SOURCECODE(op)+global_fp)%64]);
-	}
+	if (SOURCEBIT(op))
+		strcpy(source, L_REG[SOURCECODE(op)]);
 	else
-	{
 		strcpy(source, G_REG[SOURCECODE(op)]);
-	}
 
-	strcpy(dest, L_REG[(DESTCODE(op)+global_fp)%64]);
+	strcpy(dest, L_REG[DESTCODE(op)]);
 }
 
 void hyperstone_disassembler::RR_format(char *source, char *dest, uint16_t op, unsigned h_flag)
 {
-	if( SOURCEBIT(op) )
-	{
-		strcpy(source, L_REG[(SOURCECODE(op)+global_fp)%64]);
-	}
+	if (SOURCEBIT(op))
+		strcpy(source, L_REG[SOURCECODE(op)]);
 	else
-	{
 		strcpy(source, G_REG[SOURCECODE(op) + h_flag * 16]);
-	}
 
-	if( DESTBIT(op) )
+	if (DESTBIT(op))
 	{
-		strcpy(dest, L_REG[(DESTCODE(op)+global_fp)%64]);
+		strcpy(dest, L_REG[DESTCODE(op)]);
 	}
 	else
 	{
@@ -93,16 +85,16 @@ uint32_t hyperstone_disassembler::LRconst_format(char *source, char *dest, uint1
 	uint16_t next_op;
 	uint32_t const_val;
 
-	if( SOURCEBIT(op) )
+	if (SOURCEBIT(op))
 	{
-		strcpy(source, L_REG[(SOURCECODE(op)+global_fp)%64]);
+		strcpy(source, L_REG[SOURCECODE(op)]);
 	}
 	else
 	{
 		strcpy(source, G_REG[SOURCECODE(op)]);
 	}
 
-	strcpy(dest, L_REG[(DESTCODE(op)+global_fp)%64]);
+	strcpy(dest, L_REG[DESTCODE(op)]);
 
 	size = 4;
 
@@ -145,7 +137,7 @@ uint32_t hyperstone_disassembler::RRconst_format(char *source, char *dest, uint1
 
 	if( SOURCEBIT(op) )
 	{
-		strcpy(source, L_REG[(SOURCECODE(op)+global_fp)%64]);
+		strcpy(source, L_REG[SOURCECODE(op)]);
 	}
 	else
 	{
@@ -154,7 +146,7 @@ uint32_t hyperstone_disassembler::RRconst_format(char *source, char *dest, uint1
 
 	if( DESTBIT(op) )
 	{
-		strcpy(dest, L_REG[(DESTCODE(op)+global_fp)%64]);
+		strcpy(dest, L_REG[DESTCODE(op)]);
 	}
 	else
 	{
@@ -202,16 +194,12 @@ int32_t hyperstone_disassembler::Rimm_format(char *dest, uint16_t op, offs_t &pc
 
 	int n = DASM_N_VALUE(op);
 
-	if( DESTBIT(op) )
-	{
-		strcpy(dest, L_REG[(DESTCODE(op)+global_fp)%64]);
-	}
+	if (DESTBIT(op))
+		strcpy(dest, L_REG[DESTCODE(op)]);
 	else
-	{
 		strcpy(dest, G_REG[DESTCODE(op) + h_flag * 16]);
-	}
 
-	switch( n )
+	switch (n)
 	{
 		case 0: case 1:  case 2:  case 3:  case 4:  case 5:  case 6:  case 7: case 8:
 		case 9: case 10: case 11: case 12: case 13: case 14: case 15: case 16:
@@ -285,7 +273,7 @@ int32_t hyperstone_disassembler::Rimm_format(char *dest, uint16_t op, offs_t &pc
 
 uint8_t hyperstone_disassembler::Ln_format(char *dest, uint16_t op)
 {
-	strcpy(dest, L_REG[(DESTCODE(op)+global_fp)%64]);
+	strcpy(dest, L_REG[DESTCODE(op)]);
 
 	return DASM_N_VALUE(op);
 }
@@ -294,7 +282,7 @@ uint8_t hyperstone_disassembler::Rn_format(char *dest, uint16_t op)
 {
 	if( DESTBIT(op) )
 	{
-		strcpy(dest, L_REG[(DESTCODE(op)+global_fp)%64]);
+		strcpy(dest, L_REG[DESTCODE(op)]);
 	}
 	else
 	{
@@ -342,7 +330,7 @@ uint32_t hyperstone_disassembler::RRdis_format(char *source, char *dest, uint16_
 
 	if( SOURCEBIT(op) )
 	{
-		strcpy(source, L_REG[(SOURCECODE(op)+global_fp)%64]);
+		strcpy(source, L_REG[SOURCECODE(op)]);
 	}
 	else
 	{
@@ -351,7 +339,7 @@ uint32_t hyperstone_disassembler::RRdis_format(char *source, char *dest, uint16_
 
 	if( DESTBIT(op) )
 	{
-		strcpy(dest, L_REG[(DESTCODE(op)+global_fp)%64]);
+		strcpy(dest, L_REG[DESTCODE(op)]);
 	}
 	else
 	{
@@ -412,7 +400,6 @@ offs_t hyperstone_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 	uint8_t source_bit = SOURCEBIT(op);
 	uint8_t dest_bit = DESTBIT(op);
 
-	global_fp = m_config->get_fp();
 	int h_flag = m_config->get_h();
 
 	uint8_t op_num = (op & 0xff00) >> 8;
@@ -449,7 +436,6 @@ offs_t hyperstone_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 
 			if( dest_code == PC_REGISTER && !dest_bit )
 			{
-				global_fp = 0;
 				RR_format(source, dest, op, 0);
 				util::stream_format(stream, "RET PC, %s", source);
 				flags = STEP_OUT;
@@ -1890,8 +1876,6 @@ offs_t hyperstone_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 
 		// FRAME
 		case 0xed:
-
-			global_fp = 0;
 			LL_format(source, dest, op);
 
 			util::stream_format(stream, "FRAME %s, %s", dest, source);

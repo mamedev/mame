@@ -18,7 +18,6 @@ public:
 	struct config {
 		virtual ~config() = default;
 
-		virtual u8 get_fp() const = 0;
 		virtual bool get_h() const = 0;
 	};
 
@@ -29,14 +28,9 @@ public:
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
 
 private:
-	static const char *const L_REG[];
-	static const char *const G_REG[];
-	static const char *const SETxx[];
-
 	config *m_config;
 
 	int size;
-	u8 global_fp;
 
 	void LL_format(char *source, char *dest, uint16_t op);
 	void LR_format(char *source, char *dest, uint16_t op);

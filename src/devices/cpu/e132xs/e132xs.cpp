@@ -1081,86 +1081,10 @@ void hyperstone_device::device_start()
 	state_add(E132XS_G29,     "G29", m_core->global_regs[29]).mask(0xffffffff);
 	state_add(E132XS_G30,     "G30", m_core->global_regs[30]).mask(0xffffffff);
 	state_add(E132XS_G31,     "G31", m_core->global_regs[31]).mask(0xffffffff);
-	state_add(E132XS_CL0,     "CL0", m_core->local_regs[(0 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL1,     "CL1", m_core->local_regs[(1 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL2,     "CL2", m_core->local_regs[(2 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL3,     "CL3", m_core->local_regs[(3 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL4,     "CL4", m_core->local_regs[(4 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL5,     "CL5", m_core->local_regs[(5 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL6,     "CL6", m_core->local_regs[(6 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL7,     "CL7", m_core->local_regs[(7 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL8,     "CL8", m_core->local_regs[(8 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL9,     "CL9", m_core->local_regs[(9 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL10,    "CL10", m_core->local_regs[(10 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL11,    "CL11", m_core->local_regs[(11 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL12,    "CL12", m_core->local_regs[(12 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL13,    "CL13", m_core->local_regs[(13 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL14,    "CL14", m_core->local_regs[(14 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL15,    "CL15", m_core->local_regs[(15 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_L0,      "L0", m_core->local_regs[0]).mask(0xffffffff);
-	state_add(E132XS_L1,      "L1", m_core->local_regs[1]).mask(0xffffffff);
-	state_add(E132XS_L2,      "L2", m_core->local_regs[2]).mask(0xffffffff);
-	state_add(E132XS_L3,      "L3", m_core->local_regs[3]).mask(0xffffffff);
-	state_add(E132XS_L4,      "L4", m_core->local_regs[4]).mask(0xffffffff);
-	state_add(E132XS_L5,      "L5", m_core->local_regs[5]).mask(0xffffffff);
-	state_add(E132XS_L6,      "L6", m_core->local_regs[6]).mask(0xffffffff);
-	state_add(E132XS_L7,      "L7", m_core->local_regs[7]).mask(0xffffffff);
-	state_add(E132XS_L8,      "L8", m_core->local_regs[8]).mask(0xffffffff);
-	state_add(E132XS_L9,      "L9", m_core->local_regs[9]).mask(0xffffffff);
-	state_add(E132XS_L10,     "L10", m_core->local_regs[10]).mask(0xffffffff);
-	state_add(E132XS_L11,     "L11", m_core->local_regs[11]).mask(0xffffffff);
-	state_add(E132XS_L12,     "L12", m_core->local_regs[12]).mask(0xffffffff);
-	state_add(E132XS_L13,     "L13", m_core->local_regs[13]).mask(0xffffffff);
-	state_add(E132XS_L14,     "L14", m_core->local_regs[14]).mask(0xffffffff);
-	state_add(E132XS_L15,     "L15", m_core->local_regs[15]).mask(0xffffffff);
-	state_add(E132XS_L16,     "L16", m_core->local_regs[16]).mask(0xffffffff);
-	state_add(E132XS_L17,     "L17", m_core->local_regs[17]).mask(0xffffffff);
-	state_add(E132XS_L18,     "L18", m_core->local_regs[18]).mask(0xffffffff);
-	state_add(E132XS_L19,     "L19", m_core->local_regs[19]).mask(0xffffffff);
-	state_add(E132XS_L20,     "L20", m_core->local_regs[20]).mask(0xffffffff);
-	state_add(E132XS_L21,     "L21", m_core->local_regs[21]).mask(0xffffffff);
-	state_add(E132XS_L22,     "L22", m_core->local_regs[22]).mask(0xffffffff);
-	state_add(E132XS_L23,     "L23", m_core->local_regs[23]).mask(0xffffffff);
-	state_add(E132XS_L24,     "L24", m_core->local_regs[24]).mask(0xffffffff);
-	state_add(E132XS_L25,     "L25", m_core->local_regs[25]).mask(0xffffffff);
-	state_add(E132XS_L26,     "L26", m_core->local_regs[26]).mask(0xffffffff);
-	state_add(E132XS_L27,     "L27", m_core->local_regs[27]).mask(0xffffffff);
-	state_add(E132XS_L28,     "L28", m_core->local_regs[28]).mask(0xffffffff);
-	state_add(E132XS_L29,     "L29", m_core->local_regs[29]).mask(0xffffffff);
-	state_add(E132XS_L30,     "L30", m_core->local_regs[30]).mask(0xffffffff);
-	state_add(E132XS_L31,     "L31", m_core->local_regs[31]).mask(0xffffffff);
-	state_add(E132XS_L32,     "L32", m_core->local_regs[32]).mask(0xffffffff);
-	state_add(E132XS_L33,     "L33", m_core->local_regs[33]).mask(0xffffffff);
-	state_add(E132XS_L34,     "L34", m_core->local_regs[34]).mask(0xffffffff);
-	state_add(E132XS_L35,     "L35", m_core->local_regs[35]).mask(0xffffffff);
-	state_add(E132XS_L36,     "L36", m_core->local_regs[36]).mask(0xffffffff);
-	state_add(E132XS_L37,     "L37", m_core->local_regs[37]).mask(0xffffffff);
-	state_add(E132XS_L38,     "L38", m_core->local_regs[38]).mask(0xffffffff);
-	state_add(E132XS_L39,     "L39", m_core->local_regs[39]).mask(0xffffffff);
-	state_add(E132XS_L40,     "L40", m_core->local_regs[40]).mask(0xffffffff);
-	state_add(E132XS_L41,     "L41", m_core->local_regs[41]).mask(0xffffffff);
-	state_add(E132XS_L42,     "L42", m_core->local_regs[42]).mask(0xffffffff);
-	state_add(E132XS_L43,     "L43", m_core->local_regs[43]).mask(0xffffffff);
-	state_add(E132XS_L44,     "L44", m_core->local_regs[44]).mask(0xffffffff);
-	state_add(E132XS_L45,     "L45", m_core->local_regs[45]).mask(0xffffffff);
-	state_add(E132XS_L46,     "L46", m_core->local_regs[46]).mask(0xffffffff);
-	state_add(E132XS_L47,     "L47", m_core->local_regs[47]).mask(0xffffffff);
-	state_add(E132XS_L48,     "L48", m_core->local_regs[48]).mask(0xffffffff);
-	state_add(E132XS_L49,     "L49", m_core->local_regs[49]).mask(0xffffffff);
-	state_add(E132XS_L50,     "L50", m_core->local_regs[50]).mask(0xffffffff);
-	state_add(E132XS_L51,     "L51", m_core->local_regs[51]).mask(0xffffffff);
-	state_add(E132XS_L52,     "L52", m_core->local_regs[52]).mask(0xffffffff);
-	state_add(E132XS_L53,     "L53", m_core->local_regs[53]).mask(0xffffffff);
-	state_add(E132XS_L54,     "L54", m_core->local_regs[54]).mask(0xffffffff);
-	state_add(E132XS_L55,     "L55", m_core->local_regs[55]).mask(0xffffffff);
-	state_add(E132XS_L56,     "L56", m_core->local_regs[56]).mask(0xffffffff);
-	state_add(E132XS_L57,     "L57", m_core->local_regs[57]).mask(0xffffffff);
-	state_add(E132XS_L58,     "L58", m_core->local_regs[58]).mask(0xffffffff);
-	state_add(E132XS_L59,     "L59", m_core->local_regs[59]).mask(0xffffffff);
-	state_add(E132XS_L60,     "L60", m_core->local_regs[60]).mask(0xffffffff);
-	state_add(E132XS_L61,     "L61", m_core->local_regs[61]).mask(0xffffffff);
-	state_add(E132XS_L62,     "L62", m_core->local_regs[62]).mask(0xffffffff);
-	state_add(E132XS_L63,     "L63", m_core->local_regs[63]).mask(0xffffffff);
+	for (int i = 0; i < 16; i++)
+		state_add(E132XS_CL0 + i, util::string_format("L%d", i).c_str(), m_debug_local_regs[i]).mask(0xffffffff).callimport().callexport();
+	for (int i = 0; i < 64; i++)
+		state_add(E132XS_L0 + i, util::string_format("S%d", i).c_str(), m_core->local_regs[i]).mask(0xffffffff);
 
 	save_item(NAME(m_core->global_regs));
 	save_item(NAME(m_core->local_regs));
@@ -1359,6 +1283,34 @@ device_memory_interface::space_config_vector hyperstone_device::memory_space_con
 
 
 //-------------------------------------------------
+//  state_import - import state for the debugger
+//-------------------------------------------------
+
+void hyperstone_device::state_import(const device_state_entry &entry)
+{
+	if ((entry.index() >= E132XS_CL0) && (entry.index() <= E132XS_CL15))
+	{
+		const auto index = entry.index() - E132XS_CL0;
+		m_core->local_regs[(index + GET_FP) & 0x3f] = m_debug_local_regs[index];
+	}
+}
+
+
+//-------------------------------------------------
+//  state_export - export state for the debugger
+//-------------------------------------------------
+
+void hyperstone_device::state_export(const device_state_entry &entry)
+{
+	if ((entry.index() >= E132XS_CL0) && (entry.index() <= E132XS_CL15))
+	{
+		const auto index = entry.index() - E132XS_CL0;
+		m_debug_local_regs[index] = m_core->local_regs[(index + GET_FP) & 0x3f];
+	}
+}
+
+
+//-------------------------------------------------
 //  state_string_export - export state as a string
 //  for the debugger
 //-------------------------------------------------
@@ -1399,11 +1351,6 @@ void hyperstone_device::state_string_export(const device_state_entry &entry, std
 std::unique_ptr<util::disasm_interface> hyperstone_device::create_disassembler()
 {
 	return std::make_unique<hyperstone_disassembler>(this);
-}
-
-u8 hyperstone_device::get_fp() const
-{
-	return GET_FP;
 }
 
 bool hyperstone_device::get_h() const
