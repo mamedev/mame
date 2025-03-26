@@ -478,8 +478,6 @@ void hyperstone_device::generate_trap_exception_or_int(drcuml_block &block, uml:
 	const uint32_t clear_flags = T_MASK | M_MASK;
 	const uint32_t update_sr = FP_MASK | FL_MASK | set_flags | clear_flags;
 
-	UML_ADD(block, I7, I7, mem(&m_core->clock_cycles_2));
-
 	if ((TYPE != IS_INT) && (machine().debug_flags & DEBUG_FLAG_ENABLED))
 	{
 		UML_MOV(block, mem(&m_core->arg0), trapno);                   // let the debugger know
@@ -3391,6 +3389,21 @@ void hyperstone_device::generate_mul(drcuml_block &block, compiler_state &compil
 	generate_load_operand(block, compiler, SRC_GLOBAL, src_code, uml::I0, uml::I1);
 	generate_load_operand(block, compiler, DST_GLOBAL, dst_code, uml::I1, uml::I6);
 
+	UML_MOV(block, I7, mem(&m_core->clock_cycles_3));
+	const int add_cycles = compiler.m_labelnum++;
+	const int set_cycles = compiler.m_labelnum++;
+	UML_CMP(block, I0, 0xffff8000);
+	UML_JMPc(block, uml::COND_L, add_cycles);
+	UML_CMP(block, I0, 0x00008000);
+	UML_JMPc(block, uml::COND_GE, add_cycles);
+	UML_CMP(block, I1, 0xffff8000);
+	UML_JMPc(block, uml::COND_L, add_cycles);
+	UML_CMP(block, I1, 0x00008000);
+	UML_JMPc(block, uml::COND_L, set_cycles);
+	UML_LABEL(block, add_cycles);
+	UML_ADD(block, I7, I7, mem(&m_core->clock_cycles_2));
+	UML_LABEL(block, set_cycles);
+
 	UML_MULU(block, I2, I3, I0, I1);
 
 	UML_AND(block, I4, DRC_SR, ~(Z_MASK | N_MASK));
@@ -3404,25 +3417,6 @@ void hyperstone_device::generate_mul(drcuml_block &block, compiler_state &compil
 		UML_MOV(block, mem(&m_core->global_regs[dst_code]), I2);
 	else
 		UML_STORE(block, (void *)m_core->local_regs, I6, I2, SIZE_DWORD, SCALE_x4);
-
-	UML_MOV(block, I7, mem(&m_core->clock_cycles_3));
-	int add_cycles = compiler.m_labelnum++;
-	int done = compiler.m_labelnum++;
-	UML_CMP(block, I0, 0xffff8000);
-	UML_JMPc(block, uml::COND_B, add_cycles);
-	UML_CMP(block, I0, 0x8000);
-	UML_JMPc(block, uml::COND_AE, add_cycles);
-	UML_CMP(block, I1, 0xffff8000);
-	UML_JMPc(block, uml::COND_B, add_cycles);
-	UML_CMP(block, I1, 0x8000);
-	UML_JMPc(block, uml::COND_AE, add_cycles);
-	UML_JMP(block, done);
-
-	UML_LABEL(block, add_cycles);
-	UML_ADD(block, I7, I7, mem(&m_core->clock_cycles_2));
-
-	UML_LABEL(block, done);
-	// TODO: proper cycle counts
 }
 
 
