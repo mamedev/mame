@@ -1340,9 +1340,9 @@ void tek440x_state::kb_tdata_w(int state)
 
 void tek440x_state::irq1_raise(int state)
 {
-	LOG("irq1_raise %04x\n", state);
+	//LOG("irq1_raise %04x\n", state);
 	
-	if (m_u244latch == 0)
+	if (state == 0)
 	{
 		LOG("M68K_IRQ_1 assert\n");
 		m_maincpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
@@ -1351,14 +1351,14 @@ void tek440x_state::irq1_raise(int state)
 	}
 }
 
-// to handle offset 0x1xx writes resetting TPInt...
+// to handle offset 0x1xx reads resetting TPInt...
 u16 tek440x_state::timer_r(offs_t offset)
 {
-	LOG("timer_r %08x pc(%08x)\n", offset, m_maincpu->pc());
+	//LOG("timer_r %08x pc(%08x)\n", offset, m_maincpu->pc());
 
 	if (m_u244latch)
 	{
-		LOG("M68K_IRQ_1 clear\n");
+		LOG("timer_r: M68K_IRQ_1 clear\n");
 		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 		m_u244latch = 0;
 	}
@@ -1369,12 +1369,12 @@ u16 tek440x_state::timer_r(offs_t offset)
 // to handle offset 0x1xx writes resetting TPInt...
 void tek440x_state::timer_w(offs_t offset, u16 data)
 {
-	LOG("timer_w %08x %04x pc(%08x)\n", OFF16_TO_OFF8(offset), data, m_maincpu->pc());
+	//LOG("timer_w %08x %04x pc(%08x)\n", OFF16_TO_OFF8(offset), data, m_maincpu->pc());
 	m_timer->write16(offset, data);
 
 	if (m_u244latch)
 	{
-		LOG("M68K_IRQ_1 clear\n");
+		LOG("timer_w: M68K_IRQ_1 clear\n");
 		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 		m_u244latch = 0;
 	}
