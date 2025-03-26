@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:R. Belmont, AJR
+// copyright-holders:R. Belmont, AJR, Adam Billyard
 /***************************************************************************
 
     Tektronix 440x "AI Workstations"
