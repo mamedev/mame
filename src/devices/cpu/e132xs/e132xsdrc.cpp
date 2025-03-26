@@ -219,9 +219,6 @@ void hyperstone_device::code_compile_block(uint8_t mode, offs_t pc)
 			/* loop until we get through all instruction sequences */
 			for (seqhead = desclist; seqhead != nullptr; seqhead = seqlast->next())
 			{
-				const opcode_desc *curdesc;
-				uint32_t nextpc;
-
 				/* add a code log entry */
 				if (m_drcuml->logging())
 					block.append_comment("-------------------------");
@@ -263,12 +260,13 @@ void hyperstone_device::code_compile_block(uint8_t mode, offs_t pc)
 				UML_MOV(block, I7, 0);
 
 				/* iterate over instructions in the sequence and compile them */
-				for (curdesc = seqhead; curdesc != seqlast->next(); curdesc = curdesc->next())
+				for (const opcode_desc *curdesc = seqhead; curdesc != seqlast->next(); curdesc = curdesc->next())
 				{
 					generate_sequence_instruction(block, compiler, curdesc);
 					generate_update_cycles(block);
 				}
 
+				uint32_t nextpc;
 				if (seqlast->flags & OPFLAG_RETURN_TO_START) /* if we need to return to the start, do it */
 					nextpc = pc;
 				else /* otherwise we just go to the next instruction */
@@ -696,7 +694,7 @@ void hyperstone_device::log_add_disasm_comment(drcuml_block &block, uint32_t pc,
     generate_branch
 ------------------------------------------------------------------*/
 
-void hyperstone_device::generate_branch(drcuml_block &block, uml::parameter mode, uml::parameter targetpc, const opcode_desc *desc)
+void hyperstone_device::generate_branch(drcuml_block &block, compiler_state &compiler, uml::parameter mode, uml::parameter targetpc, const opcode_desc *desc)
 {
 	// clobbers I0 and I1 if mode is BRANCH_TARGET_DYNAMIC
 
@@ -705,17 +703,26 @@ void hyperstone_device::generate_branch(drcuml_block &block, uml::parameter mode
 
 	generate_update_cycles(block);
 
-	// update the cycles and jump through the hash table to the target
-	const uml::parameter pc = (targetpc != BRANCH_TARGET_DYNAMIC) ? targetpc : DRC_PC;
-	const uml::parameter m = (mode != BRANCH_TARGET_DYNAMIC) ? mode : uml::I0;
-	if (mode == BRANCH_TARGET_DYNAMIC)
+	if (desc && (mode == compiler.m_mode) && (desc->flags & OPFLAG_INTRABLOCK_BRANCH))
 	{
-		UML_MOV(block, I0, DRC_SR);
-		UML_ROLAND(block, I1, I0, 32 - T_SHIFT + 1, 0x2);
-		UML_ROLAND(block, I0, I0, 32 - S_SHIFT, 0x1);
-		UML_OR(block, I0, I0, I1);
+		assert(desc->targetpc != BRANCH_TARGET_DYNAMIC);
+
+		UML_JMP(block, desc->targetpc | 0x80000000);
 	}
-	UML_HASHJMP(block, m, pc, *m_nocode);
+	else
+	{
+		// jump through the hash table to the target
+		const uml::parameter pc = (targetpc != BRANCH_TARGET_DYNAMIC) ? targetpc : DRC_PC;
+		const uml::parameter m = (mode != BRANCH_TARGET_DYNAMIC) ? mode : uml::I0;
+		if (mode == BRANCH_TARGET_DYNAMIC)
+		{
+			UML_MOV(block, I0, DRC_SR);
+			UML_ROLAND(block, I1, I0, 32 - T_SHIFT + 1, 0x2);
+			UML_ROLAND(block, I0, I0, 32 - S_SHIFT, 0x1);
+			UML_OR(block, I0, I0, I1);
+		}
+		UML_HASHJMP(block, m, pc, *m_nocode);
+	}
 }
 
 
@@ -731,25 +738,24 @@ void hyperstone_device::generate_sequence_instruction(drcuml_block &block, compi
 		log_add_disasm_comment(block, desc->pc, desc->opptr.w[0]);
 
 	// set the PC map variable
-	const offs_t expc = (desc->flags & OPFLAG_IN_DELAY_SLOT) ? (desc->pc - 3) : desc->pc;
-	UML_MAPVAR(block, MAPVAR_PC, expc);
-
-#if E132XS_LOG_DRC_REGS
-	UML_CALLC(block, &c_funcs::dump_registers, this);
-#endif
-
-	// if we are debugging, call the debugger
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
-	{
-		//save_fast_iregs(block);
-		UML_DEBUG(block, desc->pc);
-	}
+	UML_MAPVAR(block, MAPVAR_PC, desc->pc);
 
 	// check for pending interrupts
 	UML_SUB(block, I0, mem(&m_core->intblock), 1);
 	UML_MOVc(block, uml::COND_S, I0, 0);
 	UML_MOV(block, mem(&m_core->intblock), I0);
 	UML_CALLHc(block, uml::COND_LE, *m_interrupt_checks);
+
+#if E132XS_LOG_DRC_REGS
+	UML_CALLC(block, &c_funcs::dump_registers, this);
+#endif
+
+	// if we are debugging, call the debugger
+	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
+	{
+		//save_fast_iregs(block);
+		UML_DEBUG(block, desc->pc);
+	}
 
 	if (!(desc->flags & OPFLAG_VIRTUAL_NOOP))
 	{

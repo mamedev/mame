@@ -478,7 +478,7 @@ private:
 	void static_generate_exception(drcuml_block &block, uml::code_label &label);
 	void static_generate_interrupt_checks(drcuml_block &block, uml::code_label &label);
 	void generate_interrupt_checks(drcuml_block &block, uml::code_label &labelnum, bool with_timer, int take_int, int take_timer);
-	void generate_branch(drcuml_block &block, uml::parameter mode, uml::parameter targetpc, const opcode_desc *desc);
+	void generate_branch(drcuml_block &block, compiler_state &compiler, uml::parameter mode, uml::parameter targetpc, const opcode_desc *desc);
 	void generate_update_cycles(drcuml_block &block);
 	void generate_checksum_block(drcuml_block &block, compiler_state &compiler, const opcode_desc *seqhead, const opcode_desc *seqlast);
 	void generate_sequence_instruction(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
@@ -504,6 +504,7 @@ private:
 	void generate_update_flags_addsub(drcuml_block &block, compiler_state &compiler, uml::parameter sr);
 	void generate_update_flags_addsubc(drcuml_block &block, compiler_state &compiler, uml::parameter sr);
 	void generate_update_flags_addsubs(drcuml_block &block, compiler_state &compiler, uml::parameter sr);
+	void generate_update_flags_cmp(drcuml_block &block, compiler_state &compiler, uml::parameter sr);
 
 	template <trap_exception_or_int TYPE> void generate_trap_exception_or_int(drcuml_block &block, uml::code_label &label, uml::parameter trapno);
 	void generate_int(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint32_t addr);

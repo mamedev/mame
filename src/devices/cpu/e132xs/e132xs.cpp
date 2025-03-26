@@ -734,7 +734,6 @@ void hyperstone_device::execute_trap(uint8_t trapno)
 void hyperstone_device::execute_int(uint32_t addr)
 {
 	const uint8_t reg = GET_FP + GET_FL;
-	SET_ILC(m_instruction_length);
 	const uint32_t oldSR = SR;
 
 	SET_FL(2);
@@ -1040,7 +1039,7 @@ void hyperstone_device::device_start()
 	m_drcuml->symbol_add(&m_core->arg1, sizeof(uint32_t), "arg1");
 
 	/* initialize the front-end helper */
-	m_drcfe = std::make_unique<e132xs_frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
+	m_drcfe = std::make_unique<e132xs_frontend>(*this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
 
 	/* mark the cache dirty so it is updated on next execute */
 	m_cache_dirty = true;
@@ -1498,12 +1497,6 @@ void hyperstone_device::execute_run()
 
 	while (m_core->icount > 0)
 	{
-#if E132XS_LOG_INTERPRETER_REGS
-		dump_registers();
-#endif
-
-		debugger_instruction_hook(PC);
-
 		if (--m_core->intblock <= 0)
 		{
 			m_core->intblock = 0;
@@ -1512,6 +1505,12 @@ void hyperstone_device::execute_run()
 			else
 				check_interrupts<NO_TIMER>();
 		}
+
+#if E132XS_LOG_INTERPRETER_REGS
+		dump_registers();
+#endif
+
+		debugger_instruction_hook(PC);
 
 		OP = m_pr16(PC);
 		PC += 2;
