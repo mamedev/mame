@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
-copyright-holders:Patrick Mackinlay
+copyright-holders:Patrick Mackinlay, Adam Billyard
 
 Tektronix 4404 Artificial Intelligence System.
 -->
@@ -24,6 +24,8 @@ Tektronix 4404 Artificial Intelligence System.
 		</rect>
 	</element>
 	<view name="Graphics">
+		<bounds x="0" y="0" width="640" height="496" />
+		
 		<screen index="0">
 			<bounds x="0" y="0" width="640" height="480" />
 		</screen>
