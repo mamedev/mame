@@ -2138,9 +2138,9 @@ ROM_START( sstar97a )
 ROM_END
 
 
-// PCB has a Z84C0008PEC, 2x 82C55AC-2, AT89C2051 MCU, ATF1508AS EEPLD, 24C04AN, JFC 95101 (AY-8910 clone), Altera EPM7032LC44-15
+// PCB has a Z84C0008PEC, 2x 82C55AC-2, AT89C2051 MCU, 2x ATF1508AS EEPLD, 24C04AN, JFC 95101 (AY-8910 clone), Altera EPM7032LC44-15
 ROM_START( sstar97jb )
-	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "star97jianan.u6", 0x00000, 0x20000, CRC(23904300) SHA1(8d4c9478250aaa1f7abdc2fd84a1e83be61723a0) ) // encrypted, address line based
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
@@ -2148,6 +2148,24 @@ ROM_START( sstar97jb )
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
 	ROM_LOAD( "star97jianan.u9", 0x00000, 0x80000, CRC(31289532) SHA1(27243de8e79c552ba71aa8ea0ee7197228b55528) )
+ROM_END
+
+// PCB has a Z84C0006PEC, 2x 82C55AC-2, AT89C2051 MCU, 2x ATF1508AS EEPLD, 24C04AN, U6295, Altera EPM7032LC44-15
+// Title screen shows IGS copyright but there's nothing on PCB. Possibly bootleg / hack.
+ROM_START( hongmayi )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "hongmayi.u6", 0x00000, 0x40000, CRC(7b77544b) SHA1(a2110d556c5069104f2e89e45a781462136e7df4) ) // encrypted
+
+	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_LOAD( "hongmayi2.u9", 0x000000, 0x200000, CRC(32de3983) SHA1(c120f219033ad344babd65b45a8adf4f8500df62) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE(                         0x200000 )
+
+	ROM_REGION( 0x200000, "gfx2", 0 )
+	ROM_LOAD( "hongmayi1.u9", 0x000000, 0x200000, CRC(19488709) SHA1(7480e0c27a0eaec15d53f49443a93f0993260c92) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE(                         0x200000 )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "hongmayi_voice.u31", 0x00000, 0x40000, CRC(a62d14d4) SHA1(70de5e34b157a7c4a6de1a992e098ebfb2bd95d8) )
 ROM_END
 
 /*
@@ -2601,6 +2619,7 @@ GAME( 199?, tigerslt,  0,        skylncr,  skylncr,  skylncr_state,  init_miacti
 GAME( 199?, sstar97,   0,        sstar97,  sstar97,  skylncr_state,  empty_init,     ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 (version V153B)",   MACHINE_SUPPORTS_SAVE )
 GAME( 199?, sstar97a,  sstar97,  sstar97,  sstar97,  skylncr_state,  init_sstar97a,  ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 (version V168A)",   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 199?, sstar97jb, sstar97,  sstar97,  sstar97,  skylncr_state,  empty_init,     ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 Jianan Ban",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // needs decryption
+GAME( 199?, hongmayi,  0,        sstar97,  sstar97,  skylncr_state,  empty_init,     ROT0, "bootleg",              "Hong Mayi",                                      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // needs decryption
 GAME( 1995, bdream97,  0,        bdream97, skylncr,  skylncr_state,  empty_init,     ROT0, "bootleg (KKK)",        "Hudie Meng 97",                                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 2000?,olymp,     0,        olymp,    skylncr,  skylncr_state,  init_olymp,     ROT0, "Z Games",              "Olympus (Z Games, version 10)",                  MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // Still has Bordun International 1992 strings
 GAME( 2000, sonikfig,  0,        skylncr,  sonikfig, skylncr_state,  init_sonikfig,  ROT0, "Z Games",              "Sonik Fighter (version 02, encrypted)",          MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
