@@ -43209,6 +43209,9 @@ tvdear
 @source:skeleton/unistar.cpp
 unistar
 
+@source:skeleton/unk78c14.cpp
+unk78c14
+
 @source:skeleton/v6809.cpp
 v6809
 
