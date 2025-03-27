@@ -38,7 +38,7 @@
 
 #define E132XS_STRICT_VERIFY            0x0001          /* verify all instructions */
 
-#define SINGLE_INSTRUCTION_MODE         (1)
+#define SINGLE_INSTRUCTION_MODE         (0)
 
 #define ENABLE_E132XS_DRC               (1)
 
@@ -486,12 +486,9 @@ private:
 	bool generate_opcode(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
 
 	void generate_get_trap_addr(drcuml_block &block, uml::code_label &label, uml::parameter trapno);
-	void generate_check_delay_pc(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
 	uint32_t generate_get_const(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
 	uint32_t generate_get_immediate_s(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
-	void generate_ignore_immediate_s(drcuml_block &block, const opcode_desc *desc);
 	uint32_t generate_get_pcrel(drcuml_block &block, const opcode_desc *desc);
-	void generate_ignore_pcrel(drcuml_block &block, const opcode_desc *desc);
 
 	void generate_get_global_register(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
 	void generate_set_global_register(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint32_t dst_code);
@@ -507,8 +504,6 @@ private:
 	void generate_update_flags_cmp(drcuml_block &block, compiler_state &compiler, uml::parameter sr);
 
 	template <trap_exception_or_int TYPE> void generate_trap_exception_or_int(drcuml_block &block, uml::code_label &label, uml::parameter trapno);
-	void generate_int(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint32_t addr);
-	void generate_exception(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint32_t addr);
 	void generate_software(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
 
 	void generate_trap_on_overflow(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uml::parameter sr);
