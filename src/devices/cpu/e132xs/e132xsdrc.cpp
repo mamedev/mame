@@ -7,6 +7,11 @@
 #include "32xsdefs.h"
 
 
+/* map variables */
+#define MAPVAR_PC       M0
+#define MAPVAR_CYCLES   M1
+
+
 struct hyperstone_device::compiler_state
 {
 private:
@@ -824,7 +829,7 @@ void hyperstone_device::generate_sequence_instruction(drcuml_block &block, compi
 			}
 
 			if (BIT(compiler.mode(), 1) && !desc->delayslots)
-				UML_EXHc(block, uml::COND_Z, *m_exception, EXCEPTION_TRACE);
+				UML_EXHc(block, uml::COND_Z, *m_exception, TRAPNO_TRACE_EXCEPTION);
 		}
 		else
 		{

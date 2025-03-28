@@ -32,10 +32,6 @@
     CONSTANTS
 ***************************************************************************/
 
-/* map variables */
-#define MAPVAR_PC                       M0
-#define MAPVAR_CYCLES                   M1
-
 #define E132XS_STRICT_VERIFY            0x0001          /* verify all instructions */
 
 #define SINGLE_INSTRUCTION_MODE         (0)
@@ -116,18 +112,12 @@ class hyperstone_device : public cpu_device, public hyperstone_disassembler::con
 	friend class e132xs_frontend;
 
 public:
+	// configuration
+	void set_single_instruction_mode(bool val) { m_single_instruction_mode = val; }
+
 	virtual ~hyperstone_device() override;
 
 protected:
-	// compilation boundaries -- how far back/forward does the analysis extend?
-	enum : u32
-	{
-		COMPILE_BACKWARDS_BYTES     = 128,
-		COMPILE_FORWARDS_BYTES      = 512,
-		COMPILE_MAX_INSTRUCTIONS    = (COMPILE_BACKWARDS_BYTES / 4) + (COMPILE_FORWARDS_BYTES / 4),
-		COMPILE_MAX_SEQUENCE        = 64
-	};
-
 	// exit codes
 	enum : int
 	{
@@ -230,31 +220,16 @@ protected:
 		IS_TIMER = 1
 	};
 
-	enum
-	{
-		EXCEPTION_IO2                  = 48,
-		EXCEPTION_IO1                  = 49,
-		EXCEPTION_INT4                 = 50,
-		EXCEPTION_INT3                 = 51,
-		EXCEPTION_INT2                 = 52,
-		EXCEPTION_INT1                 = 53,
-		EXCEPTION_IO3                  = 54,
-		EXCEPTION_TIMER                = 55,
-		EXCEPTION_RESERVED1            = 56,
-		EXCEPTION_TRACE                = 57,
-		EXCEPTION_PARITY_ERROR         = 58,
-		EXCEPTION_EXTENDED_OVERFLOW    = 59,
-		EXCEPTION_RANGE_ERROR          = 60,
-		EXCEPTION_PRIVILEGE_ERROR      = EXCEPTION_RANGE_ERROR,
-		EXCEPTION_FRAME_ERROR          = EXCEPTION_RANGE_ERROR,
-		EXCEPTION_RESERVED2            = 61,
-		EXCEPTION_RESET                = 62,  // reserved if not mapped @ MEM3
-		EXCEPTION_ERROR_ENTRY          = 63,  // for instruction code of all ones
-	};
-
 	// construction/destruction
-	hyperstone_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock,
-						const device_type type, uint32_t prg_data_width, uint32_t io_data_width, address_map_constructor internal_map);
+	hyperstone_device(
+			const machine_config &mconfig,
+			const char *tag,
+			device_t *owner,
+			uint32_t clock,
+			const device_type type,
+			uint32_t prg_data_width,
+			uint32_t io_data_width,
+			address_map_constructor internal_map);
 
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
@@ -441,6 +416,7 @@ private:
 	std::unique_ptr<drcuml_state> m_drcuml;
 	std::unique_ptr<e132xs_frontend> m_drcfe;
 	uint32_t m_drcoptions;
+	bool m_single_instruction_mode;
 	uint8_t m_cache_dirty;
 
 	uml::code_handle *m_entry;

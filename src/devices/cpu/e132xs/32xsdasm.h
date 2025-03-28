@@ -12,10 +12,14 @@
 
 #pragma once
 
+#include <string_view>
+
+
 class hyperstone_disassembler : public util::disasm_interface
 {
 public:
-	struct config {
+	struct config
+	{
 		virtual ~config() = default;
 
 		virtual bool get_h() const = 0;
@@ -32,16 +36,11 @@ private:
 
 	int size;
 
-	void LL_format(char *source, char *dest, uint16_t op);
-	void LR_format(char *source, char *dest, uint16_t op);
-	void RR_format(char *source, char *dest, uint16_t op, unsigned h_flag);
-	uint32_t LRconst_format(char *source, char *dest, uint16_t op, offs_t &pc, const data_buffer &opcodes);
-	uint32_t RRconst_format(char *source, char *dest, uint16_t op, offs_t &pc, const data_buffer &opcodes);
-	int32_t Rimm_format(char *dest, uint16_t op, offs_t &pc, const data_buffer &opcodes, unsigned h_flag);
-	uint8_t Ln_format(char *dest, uint16_t op);
-	uint8_t Rn_format(char *dest, uint16_t op);
+	uint32_t LRconst_format(std::string_view &source, std::string_view &dest, uint16_t op, offs_t pc, const data_buffer &opcodes);
+	uint32_t RRconst_format(std::string_view &source, std::string_view &dest, uint16_t op, offs_t pc, const data_buffer &opcodes);
+	int32_t Rimm_format(std::string_view &dest, uint16_t op, offs_t pc, const data_buffer &opcodes, unsigned h_flag);
 	int32_t PCrel_format(uint16_t op, offs_t pc, const data_buffer &opcodes);
-	uint32_t RRdis_format(char *source, char *dest, uint16_t op, uint16_t next_op, offs_t pc, const data_buffer &opcodes);
+	uint32_t RRdis_format(std::string_view &source, std::string_view &dest, uint16_t op, uint16_t next_op, offs_t pc, const data_buffer &opcodes);
 };
 
 #endif

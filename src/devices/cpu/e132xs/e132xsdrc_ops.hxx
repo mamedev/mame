@@ -203,7 +203,7 @@ void hyperstone_device::generate_set_global_register_low(drcuml_block &block, co
 				UML_AND(block, I4, I4, ~0x40); // keep reserved bit clear
 			}
 			UML_MOV(block, DRC_SR, I4);
-			UML_EXH(block, *m_exception, EXCEPTION_PRIVILEGE_ERROR);
+			UML_EXH(block, *m_exception, TRAPNO_PRIVILEGE_ERROR);
 			UML_LABEL(block, no_exception);
 			if (src.is_immediate())
 			{
@@ -725,7 +725,7 @@ void hyperstone_device::generate_chk(drcuml_block &block, compiler_state &compil
 
 	UML_ROLINS(block, I2, ((desc->length >> 1) << ILC_SHIFT) | P_MASK, 0, ILC_MASK | P_MASK);
 	UML_MOV(block, DRC_SR, I2);
-	UML_EXH(block, *m_exception, EXCEPTION_RANGE_ERROR);
+	UML_EXH(block, *m_exception, TRAPNO_RANGE_ERROR);
 
 	if (!unconditional)
 		UML_LABEL(block, done);
@@ -783,7 +783,7 @@ void hyperstone_device::generate_movd(drcuml_block &block, compiler_state &compi
 			UML_XOR(block, I3, I3, ~uint32_t(0));
 			UML_AND(block, I3, I3, S_MASK | L_MASK);
 			UML_TEST(block, I3, I2);
-			UML_EXHc(block, uml::COND_NZ, *m_exception, EXCEPTION_PRIVILEGE_ERROR);
+			UML_EXHc(block, uml::COND_NZ, *m_exception, TRAPNO_PRIVILEGE_ERROR);
 		}
 		else
 		{
@@ -794,7 +794,7 @@ void hyperstone_device::generate_movd(drcuml_block &block, compiler_state &compi
 			UML_SHL(block, I3, I3, S_SHIFT - L_SHIFT);          // I3(18) = L || !L'
 			UML_OR(block, I3, I3, I2);                          // I3(18) = L || !L' || S'
 			UML_TEST(block, I3, S_MASK);
-			UML_EXHc(block, uml::COND_Z, *m_exception, EXCEPTION_PRIVILEGE_ERROR);
+			UML_EXHc(block, uml::COND_Z, *m_exception, TRAPNO_PRIVILEGE_ERROR);
 		}
 
 		const int pop_next = compiler.next_label();
@@ -970,7 +970,7 @@ void hyperstone_device::generate_divsu(drcuml_block &block, compiler_state &comp
 
 	UML_LABEL(block, no_result);
 	UML_ROLINS(block, DRC_SR, ((desc->length >> 1) << ILC_SHIFT) | P_MASK | V_MASK, 0, ILC_MASK | P_MASK | V_MASK);
-	UML_EXH(block, *m_exception, EXCEPTION_RANGE_ERROR);
+	UML_EXH(block, *m_exception, TRAPNO_RANGE_ERROR);
 
 	UML_LABEL(block, done);
 }
@@ -1017,7 +1017,7 @@ void hyperstone_device::generate_xm(drcuml_block &block, compiler_state &compile
 
 		UML_ROLINS(block, I2, ((desc->length >> 1) << ILC_SHIFT) | P_MASK, 0, ILC_MASK | P_MASK);
 		UML_MOV(block, DRC_SR, I2);
-		UML_EXH(block, *m_exception, EXCEPTION_RANGE_ERROR);
+		UML_EXH(block, *m_exception, TRAPNO_RANGE_ERROR);
 		UML_LABEL(block, done);
 	}
 }
@@ -1192,7 +1192,7 @@ void hyperstone_device::generate_mov(drcuml_block &block, compiler_state &compil
 			const int no_exception = compiler.next_label();
 			UML_TEST(block, DRC_SR, H_MASK);
 			UML_JMPc(block, uml::COND_Z, no_exception);
-			UML_EXH(block, *m_exception, EXCEPTION_PRIVILEGE_ERROR);
+			UML_EXH(block, *m_exception, TRAPNO_PRIVILEGE_ERROR);
 			UML_JMP(block, done);
 			UML_LABEL(block, no_exception);
 		}
@@ -1666,7 +1666,7 @@ void hyperstone_device::generate_movi(drcuml_block &block, compiler_state &compi
 		const int no_exception = compiler.next_label();
 		UML_TEST(block, I2, H_MASK);
 		UML_JMPc(block, uml::COND_Z, no_exception);
-		UML_EXH(block, *m_exception, EXCEPTION_PRIVILEGE_ERROR);
+		UML_EXH(block, *m_exception, TRAPNO_PRIVILEGE_ERROR);
 		UML_LABEL(block, no_exception);
 	}
 
@@ -3932,7 +3932,7 @@ void hyperstone_device::generate_frame(drcuml_block &block, compiler_state &comp
 	UML_TEST(block, I4, ~uint32_t(0));
 	UML_JMPc(block, uml::COND_Z, done);
 	UML_ROLINS(block, DRC_SR, ((desc->length >> 1) << ILC_SHIFT) | P_MASK, 0, ILC_MASK | P_MASK);
-	UML_EXH(block, *m_exception, EXCEPTION_FRAME_ERROR);
+	UML_EXH(block, *m_exception, TRAPNO_FRAME_ERROR);
 
 	UML_LABEL(block, done);
 }

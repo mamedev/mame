@@ -179,7 +179,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regin[0] |= 1 << gsrcf_code;
 			desc.regout[0] |= 1 << gdst_code;
 			desc.regout[0] |= 1 << gdstf_code;
-			if (gdst_code == 0)
+			if (gdst_code == PC_REGISTER)
 			{
 				desc.targetpc = BRANCH_TARGET_DYNAMIC;
 				desc.flags |= OPFLAG_READS_MEMORY | OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE | OPFLAG_CAN_CAUSE_EXCEPTION | OPFLAG_CAN_CHANGE_MODES;
@@ -1170,7 +1170,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.targetpc = desc.physpc + desc.length + decode_pcrel(desc, op);
 			break;
 		case 0xec: // dbr
-			desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH;
+			desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
 			desc.delayslots = 1;
 			desc.length = (op & 0x80) ? 4 : 2;
 			desc.targetpc = desc.physpc + desc.length + decode_pcrel(desc, op);

@@ -9,18 +9,30 @@
     COMPILE-TIME DEFINITIONS
 ***************************************************************************/
 
-#define PC_REGISTER          0
-#define SR_REGISTER          1
-#define SP_REGISTER         18
-#define UB_REGISTER         19
-#define BCR_REGISTER        20
-#define TPR_REGISTER        21
-#define TCR_REGISTER        22
-#define TR_REGISTER         23
-#define WCR_REGISTER        24
-#define ISR_REGISTER        25
-#define FCR_REGISTER        26
-#define MCR_REGISTER        27
+// compilation boundaries -- how far back/forward does the analysis extend?
+enum : u32
+{
+	COMPILE_BACKWARDS_BYTES     = 128,
+	COMPILE_FORWARDS_BYTES      = 512,
+	COMPILE_MAX_INSTRUCTIONS    = (COMPILE_BACKWARDS_BYTES / 2) + (COMPILE_FORWARDS_BYTES / 2),
+	COMPILE_MAX_SEQUENCE        = 64
+};
+
+enum
+{
+	PC_REGISTER                 =  0,
+	SR_REGISTER                 =  1,
+	SP_REGISTER                 = 18,
+	UB_REGISTER                 = 19,
+	BCR_REGISTER                = 20,
+	TPR_REGISTER                = 21,
+	TCR_REGISTER                = 22,
+	TR_REGISTER                 = 23,
+	WCR_REGISTER                = 24,
+	ISR_REGISTER                = 25,
+	FCR_REGISTER                = 26,
+	MCR_REGISTER                = 27
+};
 
 #define X_CODE(val)      ((val & 0x7000) >> 12)
 #define E_BIT(val)       ((val & 0x8000) >> 15)
@@ -59,34 +71,40 @@
 #define EMSUBD          0x11e
 #define EHCFFTSD        0x296
 
-/* IRQ numbers */
-#define IRQ_INT1        0
-#define IRQ_INT2        1
-#define IRQ_INT3        2
-#define IRQ_INT4        3
-#define IRQ_IO1         4
-#define IRQ_IO2         5
-#define IRQ_IO3         6
+// IRQ numbers
+enum
+{
+	IRQ_INT1                    = 0,
+	IRQ_INT2                    = 1,
+	IRQ_INT3                    = 2,
+	IRQ_INT4                    = 3,
+	IRQ_IO1                     = 4,
+	IRQ_IO2                     = 5,
+	IRQ_IO3                     = 6
+};
 
-/* Trap numbers */
-#define TRAPNO_IO2                  48
-#define TRAPNO_IO1                  49
-#define TRAPNO_INT4                 50
-#define TRAPNO_INT3                 51
-#define TRAPNO_INT2                 52
-#define TRAPNO_INT1                 53
-#define TRAPNO_IO3                  54
-#define TRAPNO_TIMER                55
-#define TRAPNO_RESERVED1            56
-#define TRAPNO_TRACE_EXCEPTION      57
-#define TRAPNO_PARITY_ERROR         58
-#define TRAPNO_EXTENDED_OVERFLOW    59
-#define TRAPNO_RANGE_ERROR          60
-#define TRAPNO_PRIVILEGE_ERROR      TRAPNO_RANGE_ERROR
-#define TRAPNO_FRAME_ERROR          TRAPNO_RANGE_ERROR
-#define TRAPNO_RESERVED2            61
-#define TRAPNO_RESET                62  // reserved if not mapped @ MEM3
-#define TRAPNO_ERROR_ENTRY          63  // for instruction code of all ones
+// Trap numbers
+enum
+{
+	TRAPNO_IO2                  = 48,
+	TRAPNO_IO1                  = 49,
+	TRAPNO_INT4                 = 50,
+	TRAPNO_INT3                 = 51,
+	TRAPNO_INT2                 = 52,
+	TRAPNO_INT1                 = 53,
+	TRAPNO_IO3                  = 54,
+	TRAPNO_TIMER                = 55,
+	TRAPNO_RESERVED1            = 56,
+	TRAPNO_TRACE_EXCEPTION      = 57,
+	TRAPNO_PARITY_ERROR         = 58,
+	TRAPNO_EXTENDED_OVERFLOW    = 59,
+	TRAPNO_RANGE_ERROR          = 60,
+	TRAPNO_PRIVILEGE_ERROR      = TRAPNO_RANGE_ERROR,
+	TRAPNO_FRAME_ERROR          = TRAPNO_RANGE_ERROR,
+	TRAPNO_RESERVED2            = 61,
+	TRAPNO_RESET                = 62,  // reserved if not mapped @ MEM3
+	TRAPNO_ERROR_ENTRY          = 63   // for instruction code of all ones
+};
 
 /* Trap codes */
 #define TRAPLE      4

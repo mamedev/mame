@@ -120,6 +120,7 @@ hyperstone_device::hyperstone_device(
 	, m_drcuml(nullptr)
 	, m_drcfe(nullptr)
 	, m_drcoptions(0)
+	, m_single_instruction_mode(false)
 	, m_cache_dirty(0)
 	, m_entry(nullptr)
 	, m_nocode(nullptr)
@@ -999,9 +1000,18 @@ void hyperstone_device::device_start()
 	m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, umlflags, 4, 32, 1);
 
 	// add UML symbols-
-	m_drcuml->symbol_add(&m_core->global_regs[0], sizeof(uint32_t), "pc");
-	m_drcuml->symbol_add(&m_core->global_regs[1], sizeof(uint32_t), "sr");
-	m_drcuml->symbol_add(&m_core->icount, sizeof(m_core->icount), "icount");
+	m_drcuml->symbol_add(&m_core->global_regs[PC_REGISTER], sizeof(m_core->global_regs[PC_REGISTER]), "pc");
+	m_drcuml->symbol_add(&m_core->global_regs[SR_REGISTER], sizeof(m_core->global_regs[SR_REGISTER]), "sr");
+	m_drcuml->symbol_add(&m_core->global_regs[SP_REGISTER], sizeof(m_core->global_regs[SP_REGISTER]), "sp");
+	m_drcuml->symbol_add(&m_core->global_regs[UB_REGISTER], sizeof(m_core->global_regs[UB_REGISTER]), "ub");
+	m_drcuml->symbol_add(&m_core->trap_entry,               sizeof(m_core->trap_entry),               "trap_entry");
+	m_drcuml->symbol_add(&m_core->delay_pc,                 sizeof(m_core->delay_pc),                 "delay_pc");
+	m_drcuml->symbol_add(&m_core->delay_slot,               sizeof(m_core->delay_slot),               "delay_slot");
+	m_drcuml->symbol_add(&m_core->delay_slot_taken,         sizeof(m_core->delay_slot_taken),         "delay_slot_taken");
+	m_drcuml->symbol_add(&m_core->intblock,                 sizeof(m_core->intblock),                 "intblock");
+	m_drcuml->symbol_add(&m_core->arg0,                     sizeof(m_core->arg0),                     "arg0");
+	m_drcuml->symbol_add(&m_core->arg1,                     sizeof(m_core->arg1),                     "arg1");
+	m_drcuml->symbol_add(&m_core->icount,                   sizeof(m_core->icount),                   "icount");
 
 	char buf[4];
 	buf[3] = '\0';
@@ -1040,7 +1050,7 @@ void hyperstone_device::device_start()
 	m_drcuml->symbol_add(&m_core->arg1, sizeof(uint32_t), "arg1");
 
 	/* initialize the front-end helper */
-	m_drcfe = std::make_unique<e132xs_frontend>(*this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
+	m_drcfe = std::make_unique<e132xs_frontend>(*this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, m_single_instruction_mode ? 1 : COMPILE_MAX_SEQUENCE);
 
 	/* mark the cache dirty so it is updated on next execute */
 	m_cache_dirty = true;
