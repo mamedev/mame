@@ -214,7 +214,6 @@ private:
 	std::map<tsconf_regs, u8> m_scanline_delayed_regs_update;
 	u8 m_regs[0x100];
 
-	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
 	memory_view m_bank0_rom;
 	memory_share_array_creator<u8, 2> m_tiles_raw;
 	memory_share_creator<u8> m_sprites_raw;
