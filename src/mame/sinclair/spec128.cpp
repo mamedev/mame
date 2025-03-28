@@ -205,6 +205,7 @@ template <u8 Bank> void spectrum_128_state::spectrum_128_ram_w(offs_t offset, u8
 
 	((u8*)m_bank_ram[Bank]->base())[offset] = data;
 }
+
 // Base 128 models typically don't share RAM in bank0. Reserved for extension in 256+.
 template void spectrum_128_state::spectrum_128_ram_w<0>(offs_t offset, u8 data);
 
@@ -216,15 +217,14 @@ template <u8 Bank> u8 spectrum_128_state::spectrum_128_ram_r(offs_t offset)
 	return ((u8*)m_bank_ram[Bank]->base())[offset];
 }
 
+// D0-D2: RAM page located at 0x0c000-0x0ffff
+//    D3: Screen select (screen 0 in ram page 5, screen 1 in ram page 7
+//    D4: ROM select - which rom paged into 0x0000-0x03fff
+//    D5: Disable paging
 void spectrum_128_state::spectrum_128_port_7ffd_w(offs_t offset, uint8_t data)
 {
 	if (is_contended(offset)) content_early();
 	content_early(1);
-
-	// D0-D2: RAM page located at 0x0c000-0x0ffff
-	// D3 - Screen select (screen 0 in ram page 5, screen 1 in ram page 7
-	// D4 - ROM select - which rom paged into 0x0000-0x03fff
-	// D5 - Disable paging
 
 	// disable paging?
 	if (m_port_7ffd_data & 0x20) return;
