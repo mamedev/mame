@@ -9,13 +9,26 @@
 
 struct hyperstone_device::compiler_state
 {
+private:
+	const uint8_t   m_mode;
+	uint32_t        m_pc = 0;
+public:
+	uml::code_label m_labelnum  = 1;
+	uint8_t         m_check_delay = 1;
+
 	compiler_state(uint8_t mode) : m_mode(mode) { }
 	compiler_state(compiler_state const &) = delete;
 	compiler_state &operator=(compiler_state const &) = delete;
 
-	const uint8_t   m_mode;
-	uml::code_label m_labelnum  = 1;
-	uint8_t         m_check_delay = 1;
+	uint8_t mode() const { return m_mode; }
+
+	auto next_label() { return m_labelnum++; }
+
+	void set_delayed_branch() { m_check_delay = 2; }
+	bool check_delay() const { return m_check_delay == 1; }
+
+	uint32_t set_pc(uint32_t val) { return m_pc = val; }
+	uint32_t pc() const { return m_pc; }
 };
 
 
@@ -610,30 +623,40 @@ void hyperstone_device::generate_checksum_block(drcuml_block &block, compiler_st
 	{
 		block.append_comment("[Validation for %08X]", seqhead->pc);
 	}
+
 	/* loose verify or single instruction: just compare and fail */
-	if (!(m_drcoptions & E132XS_STRICT_VERIFY) || seqhead->next() == nullptr)
+	if (!(m_drcoptions & E132XS_STRICT_VERIFY) || !seqhead->next())
 	{
 		if (!(seqhead->flags & OPFLAG_VIRTUAL_NOOP))
 		{
 			uint32_t sum = seqhead->opptr.w[0];
 			uint32_t addr = seqhead->physpc;
 			const void *base = m_prptr(addr);
-			if (base == nullptr)
+			if (!base)
 			{
-				printf("cache read_ptr returned nullptr for address %08x\n", addr);
+				osd_printf_info("%s: cache read_ptr returned nullptr for address %08x\n", tag(), addr);
 				return;
 			}
+
+			auto const *delayslot = seqhead->delay.first();
+			const void *delaybase = nullptr;
+			if (delayslot && (seqhead->physpc != delayslot->physpc))
+			{
+				delaybase = m_prptr(delayslot->physpc);
+				if (!delaybase)
+				{
+					osd_printf_info("%s: cache read_ptr returned nullptr for address %08x\n", tag(), delayslot->physpc);
+				}
+			}
+
 			UML_LOAD(block, I0, base, 0, SIZE_WORD, SCALE_x1);
 
-			if (seqhead->delay.first() != nullptr && seqhead->physpc != seqhead->delay.first()->physpc)
+			if (delayslot && (seqhead->physpc != delayslot->physpc))
 			{
-				addr = seqhead->delay.first()->physpc;
-				base = m_prptr(addr);
-				assert(base != nullptr);
-				UML_LOAD(block, I1, base, 0, SIZE_WORD, SCALE_x1);
+				UML_LOAD(block, I1, delaybase, 0, SIZE_WORD, SCALE_x1);
 				UML_ADD(block, I0, I0, I1);
 
-				sum += seqhead->delay.first()->opptr.w[0];
+				sum += delayslot->opptr.w[0];
 			}
 
 			UML_CMP(block, I0, sum);
@@ -644,14 +667,17 @@ void hyperstone_device::generate_checksum_block(drcuml_block &block, compiler_st
 	{
 		uint32_t addr = seqhead->physpc;
 		const void *base = m_prptr(addr);
-		if (base == nullptr)
+		if (!base)
 		{
-			printf("cache read_ptr returned nullptr for address %08x\n", addr);
+			osd_printf_info("%s: cache read_ptr returned nullptr for address %08x\n", tag(), addr);
 			return;
 		}
+
 		UML_LOAD(block, I0, base, 0, SIZE_WORD, SCALE_x1);
+
 		uint32_t sum = seqhead->opptr.w[0];
 		for (curdesc = seqhead->next(); curdesc != seqlast->next(); curdesc = curdesc->next())
+		{
 			if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
 			{
 				addr = curdesc->physpc;
@@ -672,6 +698,7 @@ void hyperstone_device::generate_checksum_block(drcuml_block &block, compiler_st
 					sum += curdesc->delay.first()->opptr.w[0];
 				}
 			}
+		}
 		UML_CMP(block, I0, sum);
 		UML_EXHc(block, COND_NE, *m_nocode, epc(seqhead));
 	}
@@ -705,7 +732,7 @@ void hyperstone_device::generate_branch(drcuml_block &block, compiler_state &com
 
 	generate_update_cycles(block);
 
-	if (desc && (mode == compiler.m_mode) && (desc->flags & OPFLAG_INTRABLOCK_BRANCH))
+	if (desc && (mode == compiler.mode()) && (desc->flags & OPFLAG_INTRABLOCK_BRANCH))
 	{
 		assert(desc->targetpc != BRANCH_TARGET_DYNAMIC);
 
@@ -739,9 +766,6 @@ void hyperstone_device::generate_sequence_instruction(drcuml_block &block, compi
 	if (m_drcuml->logging() && !(desc->flags & OPFLAG_VIRTUAL_NOOP))
 		log_add_disasm_comment(block, desc->pc, desc->opptr.w[0]);
 
-	// set the PC map variable
-	UML_MAPVAR(block, MAPVAR_PC, desc->pc);
-
 	// check for pending interrupts
 	UML_SUB(block, I0, mem(&m_core->intblock), 1);
 	UML_MOVc(block, uml::COND_S, I0, 0);
@@ -761,11 +785,14 @@ void hyperstone_device::generate_sequence_instruction(drcuml_block &block, compi
 
 	if (!(desc->flags & OPFLAG_VIRTUAL_NOOP))
 	{
-		if (compiler.m_check_delay == 1)
+		// set the PC map variable
+		UML_MAPVAR(block, MAPVAR_PC, compiler.set_pc(desc->pc + desc->length));
+
+		if (compiler.check_delay())
 		{
 			// if PC is used in a delay instruction, the delayed PC should be used
-			const int nodelay = compiler.m_labelnum++;
-			const int done = compiler.m_labelnum++;
+			const int nodelay = compiler.next_label();
+			const int done = compiler.next_label();
 			UML_TEST(block, mem(&m_core->delay_slot), 1);
 			UML_JMPc(block, uml::COND_Z, nodelay);
 			UML_MOV(block, DRC_PC, mem(&m_core->delay_pc));
@@ -788,15 +815,15 @@ void hyperstone_device::generate_sequence_instruction(drcuml_block &block, compi
 		{
 			if (compiler.m_check_delay)
 			{
-				if (compiler.m_check_delay == 1)
+				if (compiler.check_delay())
 				{
 					UML_TEST(block, mem(&m_core->delay_slot_taken), ~uint32_t(0));
-					UML_CALLHc(block, uml::COND_NZ, *m_delay_taken[compiler.m_mode]);
+					UML_CALLHc(block, uml::COND_NZ, *m_delay_taken[compiler.mode()]);
 				}
 				--compiler.m_check_delay;
 			}
 
-			if (BIT(compiler.m_mode, 1) && !desc->delayslots)
+			if (BIT(compiler.mode(), 1) && !desc->delayslots)
 				UML_EXHc(block, uml::COND_Z, *m_exception, EXCEPTION_TRACE);
 		}
 		else
