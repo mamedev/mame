@@ -595,6 +595,12 @@
   - Promoted gtipoker set to working.
   - Added technical notes.
 
+  - Added 3 new sets: df_djpkra, norautn1a, and norautpt.
+  - Proper machine config and memory map for gtipokra.
+  - Figured out the DIP switch for gtipoker minimal hand.
+  - Fixed some ROM loads.
+  - Added technical notes.
+
 
   TODO:
 
@@ -651,6 +657,7 @@ public:
 	{ }
 
 	void noraut_base(machine_config &config);
+	void gtipkra(machine_config &config);
 	void kimble(machine_config &config);
 	void kimbldhl(machine_config &config);
 	void norautp(machine_config &config);
@@ -674,6 +681,7 @@ public:
 	void init_deb();
 	void init_unka();
 	void init_unkb();
+	void init_gtipa();
 
 protected:
 	virtual void machine_start() override { m_lamps.resolve(); save_item(NAME(m_videoram));}
@@ -704,6 +712,7 @@ private:
 	void drhl_portmap(address_map &map) ATTR_COLD;
 	void dphltest_map(address_map &map) ATTR_COLD;
 	void drhl_map(address_map &map) ATTR_COLD;
+	void gtipa_map(address_map &map) ATTR_COLD;
 	void kimbldhl_map(address_map &map) ATTR_COLD;
 	void kimble_map(address_map &map) ATTR_COLD;
 	void newhilop_map(address_map &map) ATTR_COLD;
@@ -735,7 +744,6 @@ private:
 	int m_test3b = 0;
 	int m_test_count = 0;
 	uint8_t m_videoram[0x800] = {};
-
 };
 
 
@@ -909,7 +917,7 @@ void norautp_state::counterlamps_w(uint8_t data)
 	m_lamps[10] = BIT(data, 0);  // HI lamp
 	m_lamps[11] = BIT(data, 1);  // LO lamp
 
-	m_hopper->motor_w(BIT(data, 2));	
+	m_hopper->motor_w(BIT(data, 2));
 
 	machine().bookkeeping().coin_counter_w(0, data & 0x10);  // Coin1/3 counter
 	machine().bookkeeping().coin_counter_w(1, data & 0x20);  // Coin2 counter
@@ -966,6 +974,9 @@ uint8_t norautp_state::test3_r()
 		m_test3b = (~m_test3b & 0x01) + (m_test_count & 0x02);
 		return m_test3b;
 	}
+
+	if(m_maincpu->pc() == 0x747)
+		return 0x10;
 
 	return (m_test_count &0x0f) + 0x10;
 }
@@ -1144,6 +1155,15 @@ void norautp_state::dphl_map(address_map &map)
 	map.global_mask(0x7fff);  // A15 not connected
 	map(0x0000, 0x3fff).rom();
 	map(0x5000, 0x53ff).ram().share("nvram");  // should be 2x 0x100 segments (4x 2111)
+}
+
+void norautp_state::gtipa_map(address_map &map)
+{
+	//map.global_mask(0x7fff);  // A15 not connected
+	map(0x0000, 0x3fff).rom();
+	map(0xc000, 0xc3ff).ram().share("nvram"); 
+	map(0xd000, 0xd3ff).ram().share("nvram"); 
+	
 }
 
 void norautp_state::dphla_map(address_map &map)
@@ -1795,15 +1815,15 @@ static INPUT_PORTS_START( gtipoker )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW1:5")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Coinage ) )    PORT_DIPLOCATION("DSW1:4")
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 1C_5C ) )
+	PORT_DIPNAME( 0x10, 0x10, "Minimal Hand Paid" )   PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPSETTING(    0x00, "Jacks or Better" )
+	PORT_DIPSETTING(    0x10, "Aces or Better" )
 	PORT_DIPNAME( 0x60, 0x60, "2 Jokers in Deck" )    PORT_DIPLOCATION("DSW1:2,3")
 	PORT_DIPSETTING(    0x60, "Never"  )
 	PORT_DIPSETTING(    0x40, "When 4 or more is bet" )
 	PORT_DIPSETTING(    0x20, "When 4 or more is bet" )
 	PORT_DIPSETTING(    0x00, "Always" )
-	PORT_DIPNAME( 0x80, 0x80, "Test Mode" )           PORT_DIPLOCATION("DSW1:1") 
+	PORT_DIPNAME( 0x80, 0x80, "Test Mode" )           PORT_DIPLOCATION("DSW1:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2138,6 +2158,21 @@ void norautp_state::dphla(machine_config &config)
 	m_discrete->set_intf(dphl_discrete);
 }
 
+void norautp_state::gtipkra(machine_config &config)
+{
+	noraut_base(config);
+
+	// basic machine hardware
+	I8080(config.replace(), m_maincpu, DPHL_CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::gtipa_map);
+	m_maincpu->set_addrmap(AS_IO, &norautp_state::dphl_portmap);
+	m_maincpu->set_vblank_int("screen", FUNC(norautp_state::irq0_line_hold));
+
+	// sound hardware
+	m_discrete->set_intf(dphl_discrete);
+}
+
+
 void norautp_state::sureshoto(machine_config &config)
 {
 	noraut_base(config);
@@ -2392,6 +2427,17 @@ ROM_START( norautjo )
 	ROM_LOAD( "graphics2716.bin", 0x0800, 0x0800, CRC(174a5eec) SHA1(44d84a0cf29a0bf99674d95084c905d3bb0445ad) )
 ROM_END
 
+// portuguese hack. same as above but hacked text and stripped out copyright.
+ROM_START( norautpt )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "u11.bin",  0x0000, 0x1000, CRC(082f28c6) SHA1(995b991dad50373c8ba9b63002f124b3f87e7889) )
+	ROM_LOAD( "u16.bin",  0x1000, 0x1000, CRC(4d970e12) SHA1(acbb0fbb316283c57ae8023721aa4da3ca7e1319) )
+
+	ROM_REGION( 0x1000,  "gfx", 0 )
+	ROM_FILL(                     0x0000, 0x0800, 0xff )
+	ROM_LOAD( "r20.bin", 0x0800, 0x0800, CRC(174a5eec) SHA1(44d84a0cf29a0bf99674d95084c905d3bb0445ad) )
+ROM_END
+
 /*
 
   Noraut Joker Poker (Prologic HW)
@@ -2481,6 +2527,7 @@ ROM_START( norautpl )
 	ROM_FILL(             0x0000, 0x0800, 0xff )
 	ROM_LOAD( "char.bin", 0x0800, 0x0800, CRC(174a5eec) SHA1(44d84a0cf29a0bf99674d95084c905d3bb0445ad) )
 ROM_END
+
 
 /*
 
@@ -2890,26 +2937,41 @@ ROM_START( mainline )
 ROM_END
 
 /*
-
   DellFern 4-bet Joker z80 28pin
   45%-75% payout.
 
+  Game title is Double Joker Poker / Jack Plus
   Board also made by DellFern.
   UK company that gone bust many years ago.
 
+  Same program as mainline, but copied 8 times to fill the 64k device.
+  
 */
 
 ROM_START( df_djpkr )
 	ROM_REGION( 0x10000, "maincpu", 0 )  // Program ROM is 0000-1fff, copied along the 64K of the ROM
-	ROM_LOAD( "dellfern_4bet_joker_z80_28pin_45-75_payout.bin", 0x0000, 0x10000, CRC(9d150a47) SHA1(da9c0d6632faab685dd061f39b01d8e65793e1e6) )
+	ROM_LOAD( "dellfern_4bet_joker_z80_28pin_45-75_payout.bin", 0x0000, 0x2000, CRC(9d150a47) SHA1(da9c0d6632faab685dd061f39b01d8e65793e1e6) )
+	ROM_IGNORE(                                                         0xe000)
 
 	ROM_REGION( 0x1000,  "gfx", 0 )
 	ROM_FILL(                     0x0000, 0x0800, 0xff )
 	ROM_LOAD( "graphics2716.bin", 0x0800, 0x0800, CRC(174a5eec) SHA1(44d84a0cf29a0bf99674d95084c905d3bb0445ad) )
 ROM_END
 
-/*
+// Same as above, but with different graphics ROM.
+// GFX ROM is identical to mainline one, but copied 32 times to fill the 64k device. 
+ROM_START( df_djpkra )
+	ROM_REGION( 0x10000, "maincpu", 0 )  // Program ROM is 0000-1fff, copied along the 64K of the ROM
+	ROM_LOAD( "rom_u11.bin", 0x0000, 0x2000, CRC(9d150a47) SHA1(da9c0d6632faab685dd061f39b01d8e65793e1e6) )
+	ROM_IGNORE(                      0xe000)
 
+	ROM_REGION( 0x1000,  "gfx", 0 )  // GFX ROM is 0000-07ff, copied along the 64K of the ROM
+	ROM_FILL(                     0x0000, 0x0800, 0xff )
+	ROM_LOAD( "rom_u27.bin", 0x0800, 0x0800, CRC(6cab56b5) SHA1(2c4a8ee6b0a021105e77d1df7d57aa6b955425ab) )
+	ROM_IGNORE(                      0xf800)
+ROM_END
+
+/*
   Deluxe Poker...
 
   Stickered:
@@ -2997,6 +3059,15 @@ ROM_START( cgidjp )
 	ROM_LOAD( "27c32.bin",  0x0800, 0x0800, CRC(d94be899) SHA1(b7212162324fa2d67383a475052e3b351bb1af5f) )  // first half 0xff filled
 	ROM_CONTINUE(           0x0800, 0x0800 )
 ROM_END
+
+ROM_START( norautn1a )
+	ROM_REGION( 0x08000, "maincpu", 0 )  // Program ROM is 0000-1fff, with extra data at 3000-302f
+	ROM_LOAD( "n1a-057-8.u11", 0x0000, 0x8000, CRC(96e82264) SHA1(b7514205c47f9ba651d69a44f006ce04aa00e1fa) )
+
+	ROM_REGION( 0x1000,  "gfx", 0 )
+	ROM_LOAD( "n1a-057-5.u27", 0x0000, 0x1000,  CRC(d94be899) SHA1(b7212162324fa2d67383a475052e3b351bb1af5f) )  // first half 0xff filled
+ROM_END
+
 
 /*
 
@@ -5084,6 +5155,15 @@ void norautp_state::init_unkb()
 }
 
 
+void norautp_state::init_gtipa()
+{
+	uint8_t *ROM = memregion("maincpu")->base();
+
+//	ROM[0x07a6] = 0xaf;  // xor a (no checksum)
+	ROM[0x1ffe] = 0xff;
+}
+
+
 /*********************************************
 *                Game Drivers                *
 *********************************************/
@@ -5092,52 +5172,55 @@ void norautp_state::init_unkb()
 //*  The following ones are 'Draw Poker HI-LO' type, running in a Z80 based hardware   *
 //**************************************************************************************
 
-//     YEAR  NAME      PARENT    MACHINE   INPUT     CLASS          INIT        ROT   COMPANY                     FULLNAME                                        FLAGS                 LAYOUT
-GAMEL( 1988, norautp,  0,        norautp,  norautp,  norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Poker",                                 0,                    layout_noraut11 )
-GAMEL( 198?, norautdx, 0,        norautp,  norautpn, norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Deluxe Poker (console)",                0,                    layout_noraut12 )
-GAMEL( 198?, norautpn, norautp,  norautp,  norautpn, norautp_state, empty_init, ROT0, "bootleg",                  "Noraut Deluxe Poker (bootleg)",                0,                    layout_noraut12 )
-GAMEL( 198?, norautjo, 0,        norautp,  mainline, norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Joker Poker (original)",                0,                    layout_noraut12 )
-GAMEL( 198?, norautpl, 0,        norautpl, mainline, norautp_state, empty_init, ROT0, "Video Fun Games Ltd.",     "Noraut Joker Poker (Prologic HW)",             0,                    layout_noraut12 )
-GAMEL( 1988, norautjp, norautp,  norautp,  norautp,  norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Joker Poker (alt)",                     0,                    layout_noraut11 )
-GAMEL( 1988, norautrh, 0,        norautp,  norautrh, norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Red Hot Joker Poker",                   0,                    layout_noraut12 )
-GAMEL( 198?, norautra, 0,        norautp,  norautrh, norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Red Hot Joker Poker (alt HW)",          0,                    layout_noraut12 )
-GAME(  1988, norautu,  0,        norautxp, norautp,  norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Poker (NTX10A)",                        MACHINE_NOT_WORKING )
-GAMEL( 2002, noraut3a, 0,        noraut3,  noraut3,  norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Jacks Plus / Joker Poker (V3.010a)",    MACHINE_NOT_WORKING,  layout_noraut12 )
-GAMEL( 2003, noraut3b, 0,        noraut3,  noraut3,  norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Jacks Plus / Joker Poker (V3.011a)",    MACHINE_NOT_WORKING,  layout_noraut12 )
-GAMEL( 198?, norautua, 0,        norautu,  norautua, norautp_state, init_enc,   ROT0, "Noraut Ltd.",              "Noraut Joker Poker (console, set 1)",          MACHINE_UNEMULATED_PROTECTION,  layout_noraut12 )
-GAMEL( 198?, norautub, norautua, norautu,  norautua, norautp_state, init_enc,   ROT0, "Noraut Ltd.",              "Noraut Joker Poker (console, set 2)",          MACHINE_UNEMULATED_PROTECTION,  layout_noraut12 )
-GAMEL( 198?, mainline, 0,        norautp,  mainline, norautp_state, empty_init, ROT0, "Mainline London",          "Mainline Double Joker Poker",                  0,                    layout_noraut12 )
-GAMEL( 199?, df_djpkr, 0,        norautp,  mainline, norautp_state, empty_init, ROT0, "DellFern Ltd.",            "Double Joker Poker (45%-75% payout)",          0,                    layout_noraut12 )
-GAMEL( 2005, ndxron10, 0,        norautp,  ndxron10, norautp_state, empty_init, ROT0, "<unknown>",                "Royal on Ten (hack of Noraut Deluxe Poker)",   0,                    layout_noraut12 )
-GAMEL( 1999, cgip30cs, 0,        norautx4, norautkl, norautp_state, init_deb,   ROT0, "CGI",                      "Credit Poker (ver.30c, standard)",             0,                    layout_noraut12 ) // CGI - Credit Poker, VERSION 30C, 21/12/99
-GAMEL( 1999, cgip30b,  cgip30cs, norautx4, norautkl, norautp_state, empty_init, ROT0, "CGI",                      "Credit Poker (ver.30b, 7 & 9 bonus)",          0,                    layout_noraut12 ) // CGI - Credit Poker, VERSION 30B, 7 &9 BONUS, 21/12/99 BY V.S. for CGI
-GAMEL( 1998, cgip23b,  cgip30cs, norautx4, norautkl, norautp_state, empty_init, ROT0, "CGI",                      "Credit Poker (ver.23b, 7 & 9 bonus)",          0,                    layout_noraut12 ) // CGI - Credit Poker, VERSION 23B, 7 &9 BONUS, 31.03.98. BY V.S.
-GAMEL( 19??, cgidjp,   0,        cgidjp,   mainline, norautp_state, empty_init, ROT0, "CGI",                      "Double Joker Poker (CGI)",                     0,                    layout_noraut12 ) // very similar to df_djpkr
-GAME(  198?, kimblz80, 0,        kimble,   norautp,  norautp_state, empty_init, ROT0, "Kimble Ireland",           "Kimble Double HI-LO (z80 version)",            MACHINE_NOT_WORKING )
-GAME(  1983, pma,      0,        nortest1, norautp,  norautp_state, empty_init, ROT0, "PMA",                      "PMA Poker",                                    MACHINE_NOT_WORKING )
-GAMEL( 198?, bjpoker,  0,        norautxp, norautrh, norautp_state, empty_init, ROT0, "M.Kramer Manufacturing.",  "Poker / Black Jack (Model 7521)",              MACHINE_NOT_WORKING,  layout_noraut12 )
-GAME(  19??, newhilop, 0,        newhilop, norautp,  norautp_state, empty_init, ROT0, "Song Won?",                "New Hi-Low Poker",                             MACHINE_NOT_WORKING )
-GAMEL( 1984, cdrawpkr, 0,        cdrawpkr, cdrawpkr, norautp_state, empty_init, ROT0, "Coinmaster",               "Draw Poker (Joker Poker V.01)",                0,                    layout_noraut11 )
+//     YEAR  NAME       PARENT    MACHINE   INPUT     CLASS          INIT        ROT   COMPANY                     FULLNAME                                        FLAGS                          LAYOUT
+GAMEL( 1988, norautp,   0,        norautp,  norautp,  norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Poker",                                 0,                             layout_noraut11 )
+GAMEL( 198?, norautdx,  0,        norautp,  norautpn, norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Deluxe Poker (console)",                0,                             layout_noraut12 )
+GAMEL( 198?, norautpn,  norautp,  norautp,  norautpn, norautp_state, empty_init, ROT0, "bootleg",                  "Noraut Deluxe Poker (bootleg)",                0,                             layout_noraut12 )
+GAMEL( 198?, norautjo,  0,        norautp,  mainline, norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Joker Poker (original)",                0,                             layout_noraut12 )
+GAMEL( 198?, norautpt,  norautjo, norautp,  mainline, norautp_state, empty_init, ROT0, "bootleg",                  "Noraut Joker Poker (text hack)",               0,                             layout_noraut12 )
+GAMEL( 198?, norautpl,  0,        norautpl, mainline, norautp_state, empty_init, ROT0, "Video Fun Games Ltd.",     "Noraut Joker Poker (Prologic HW)",             0,                             layout_noraut12 )
+GAMEL( 1988, norautn1a, norautp,  norautxp, norautp,  norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Joker Poker (N1A)",                     0,                             layout_noraut12 )
+GAMEL( 1988, norautjp,  norautp,  norautp,  norautp,  norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Joker Poker (alt)",                     0,                             layout_noraut11 )
+GAMEL( 1988, norautrh,  0,        norautp,  norautrh, norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Red Hot Joker Poker",                   0,                             layout_noraut12 )
+GAMEL( 198?, norautra,  0,        norautp,  norautrh, norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Red Hot Joker Poker (alt HW)",          0,                             layout_noraut12 )
+GAME(  1988, norautu,   0,        norautxp, norautp,  norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Poker (NTX10A)",                        MACHINE_NOT_WORKING )
+GAMEL( 2002, noraut3a,  0,        noraut3,  noraut3,  norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Jacks Plus / Joker Poker (V3.010a)",    MACHINE_NOT_WORKING,           layout_noraut12 )  // gives 1993 coins when exit from settings
+GAMEL( 2003, noraut3b,  0,        noraut3,  noraut3,  norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Jacks Plus / Joker Poker (V3.011a)",    MACHINE_NOT_WORKING,           layout_noraut12 )  // gives 1993 coins when exit from settings
+GAMEL( 198?, norautua,  0,        norautu,  norautua, norautp_state, init_enc,   ROT0, "Noraut Ltd.",              "Noraut Joker Poker (console, set 1)",          MACHINE_UNEMULATED_PROTECTION, layout_noraut12 )
+GAMEL( 198?, norautub,  norautua, norautu,  norautua, norautp_state, init_enc,   ROT0, "Noraut Ltd.",              "Noraut Joker Poker (console, set 2)",          MACHINE_UNEMULATED_PROTECTION, layout_noraut12 )
+GAMEL( 198?, mainline,  0,        norautp,  mainline, norautp_state, empty_init, ROT0, "Mainline London",          "Mainline Double Joker Poker / Jacks Plus)",    0,                             layout_noraut12 )
+GAMEL( 1996, df_djpkr,  mainline, norautp,  mainline, norautp_state, empty_init, ROT0, "DellFern Ltd.",            "Double Joker Poker / Jacks Plus (45%-75% payout)",      0,                    layout_noraut12 )
+GAMEL( 1996, df_djpkra, mainline, norautp,  mainline, norautp_state, empty_init, ROT0, "DellFern Ltd.",            "Double Joker Poker / Jacks Plus (45%-75% payout, alt)", 0,                    layout_noraut12 )
+GAMEL( 2005, ndxron10,  0,        norautp,  ndxron10, norautp_state, empty_init, ROT0, "<unknown>",                "Royal on Ten (hack of Noraut Deluxe Poker)",   0,                             layout_noraut12 )
+GAMEL( 1999, cgip30cs,  0,        norautx4, norautkl, norautp_state, init_deb,   ROT0, "CGI",                      "Credit Poker (ver.30c, standard)",             0,                             layout_noraut12 ) // CGI - Credit Poker, VERSION 30C, 21/12/99
+GAMEL( 1999, cgip30b,   cgip30cs, norautx4, norautkl, norautp_state, empty_init, ROT0, "CGI",                      "Credit Poker (ver.30b, 7 & 9 bonus)",          0,                             layout_noraut12 ) // CGI - Credit Poker, VERSION 30B, 7 &9 BONUS, 21/12/99 BY V.S. for CGI
+GAMEL( 1998, cgip23b,   cgip30cs, norautx4, norautkl, norautp_state, empty_init, ROT0, "CGI",                      "Credit Poker (ver.23b, 7 & 9 bonus)",          0,                             layout_noraut12 ) // CGI - Credit Poker, VERSION 23B, 7 &9 BONUS, 31.03.98. BY V.S.
+GAMEL( 198?, cgidjp,    0,        cgidjp,   mainline, norautp_state, empty_init, ROT0, "CGI",                      "Double Joker Poker (CGI)",                     0,                             layout_noraut12 ) // very similar to df_djpkr
+GAME(  198?, kimblz80,  0,        kimble,   norautp,  norautp_state, empty_init, ROT0, "Kimble Ireland",           "Kimble Double HI-LO (z80 version)",            MACHINE_NOT_WORKING )
+GAME(  1983, pma,       0,        nortest1, norautp,  norautp_state, empty_init, ROT0, "PMA",                      "PMA Poker",                                    MACHINE_NOT_WORKING )
+GAMEL( 198?, bjpoker,   0,        norautxp, norautrh, norautp_state, empty_init, ROT0, "M.Kramer Manufacturing.",  "Poker / Black Jack (Model 7521)",              MACHINE_NOT_WORKING,           layout_noraut12 )
+GAME(  19??, newhilop,  0,        newhilop, norautp,  norautp_state, empty_init, ROT0, "Song Won?",                "New Hi-Low Poker",                             MACHINE_NOT_WORKING )
+GAMEL( 1984, cdrawpkr,  0,        cdrawpkr, cdrawpkr, norautp_state, empty_init, ROT0, "Coinmaster",               "Draw Poker (Joker Poker V.01)",                0,                             layout_noraut11 )
 
 
 //************************************* i8080 sets **************************************
 //*  The following ones are 'Draw Poker HI-LO' type, running in a i8080 based hardware  *
 //***************************************************************************************
 
-//     YEAR  NAME      PARENT    MACHINE   INPUT     STATE          INIT        ROT   COMPANY                        FULLNAME                            FLAGS                       LAYOUT
-GAMEL( 1982, dphl,     0,        dphl,     dphl,     norautp_state, empty_init, ROT0, "M.Kramer Manufacturing.",     "Draw Poker HI-LO (M.Kramer)",      0,                          layout_noraut10 )
-GAMEL( 1983, dphla,    0,        dphla,    dphla,    norautp_state, empty_init, ROT0, "<unknown>",                   "Joker Poker (Kramer, Alt)",        0,                          layout_noraut10 )
-GAMEL( 1983, dphljp,   0,        dphl,     dphl,     norautp_state, empty_init, ROT0, "<unknown>",                   "Draw Poker HI-LO (Japanese)",      0,                          layout_noraut10 )
-GAME(  198?, kimbldhl, 0,        kimbldhl, norautp,  norautp_state, empty_init, ROT0, "Kimble Ireland",              "Kimble Double HI-LO",              MACHINE_NOT_WORKING )
-GAMEL( 1983, gtipoker, 0,        dphl,     gtipoker, norautp_state, empty_init, ROT0, "GTI Inc",                     "Aces or Better Draw Poker (GTI)",  MACHINE_IMPERFECT_COLORS,   layout_noraut10 )
-GAMEL( 1983, gtipokra, 0,        dphla,    gtipoker, norautp_state, empty_init, ROT0, "GTI Inc",                     "GTI Poker? (SMS hardware)",        MACHINE_NOT_WORKING,        layout_noraut10 )
-GAMEL( 1983, smshilo,  0,        dphl,     dphl,     norautp_state, empty_init, ROT0, "SMS Manufacturing Corp.",     "HI-LO Double Up Joker Poker",      0,                          layout_noraut10 )
-GAMEL( 1986, drhl,     0,        drhl,     drhl,     norautp_state, empty_init, ROT0, "Drews Inc.",                  "Drews Revenge (v.2.89, set 1)",    0,                          layout_noraut10 )
-GAMEL( 1986, drhla,    drhl,     drhl,     drhl,     norautp_state, empty_init, ROT0, "Drews Inc.",                  "Drews Revenge (v.2.89, set 2)",    0,                          layout_noraut10 )
-GAMEL( 1982, ssjkrpkr, 0,        ssjkrpkr, ssjkrpkr, norautp_state, empty_init, ROT0, "Southern Systems & Assembly", "Southern Systems Joker Poker",     0,                          layout_noraut10 )
+//     YEAR  NAME       PARENT    MACHINE   INPUT     STATE          INIT        ROT   COMPANY                        FULLNAME                            FLAGS                       LAYOUT
+GAMEL( 1982, dphl,      0,        dphl,     dphl,     norautp_state, empty_init, ROT0, "M.Kramer Manufacturing.",     "Draw Poker HI-LO (M.Kramer)",      0,                          layout_noraut10 )
+GAMEL( 1983, dphla,     0,        dphla,    dphla,    norautp_state, empty_init, ROT0, "<unknown>",                   "Joker Poker (Kramer, Alt)",        0,                          layout_noraut10 )
+GAMEL( 1983, dphljp,    0,        dphl,     dphl,     norautp_state, empty_init, ROT0, "<unknown>",                   "Draw Poker HI-LO (Japanese)",      0,                          layout_noraut10 )
+GAME(  198?, kimbldhl,  0,        kimbldhl, norautp,  norautp_state, empty_init, ROT0, "Kimble Ireland",              "Kimble Double HI-LO",              MACHINE_NOT_WORKING )
+GAMEL( 1983, gtipoker,  0,        dphl,     gtipoker, norautp_state, empty_init, ROT0, "GTI Inc",                     "Aces or Better Draw Poker",        MACHINE_IMPERFECT_COLORS,   layout_noraut10 )
+GAMEL( 1983, gtipokra,  0,        gtipkra,  gtipoker, norautp_state, init_gtipa, ROT0, "GTI Inc",                     "GTI Poker? (SMS hardware)",        MACHINE_NOT_WORKING,        layout_noraut10 )
+GAMEL( 1983, smshilo,   0,        dphl,     dphl,     norautp_state, empty_init, ROT0, "SMS Manufacturing Corp.",     "HI-LO Double Up Joker Poker",      0,                          layout_noraut10 )
+GAMEL( 1986, drhl,      0,        drhl,     drhl,     norautp_state, empty_init, ROT0, "Drews Inc.",                  "Drews Revenge (v.2.89, set 1)",    0,                          layout_noraut10 )
+GAMEL( 1986, drhla,     drhl,     drhl,     drhl,     norautp_state, empty_init, ROT0, "Drews Inc.",                  "Drews Revenge (v.2.89, set 2)",    0,                          layout_noraut10 )
+GAMEL( 1982, ssjkrpkr,  0,        ssjkrpkr, ssjkrpkr, norautp_state, empty_init, ROT0, "Southern Systems & Assembly", "Southern Systems Joker Poker",     0,                          layout_noraut10 )
 
 // The following one also has a custom 68705 MCU
-GAME(  1993, tpoker2,  0,        dphltest, norautp, norautp_state, empty_init, ROT0, "Micro Manufacturing",          "Turbo Poker 2",                    MACHINE_NOT_WORKING )
+GAME(  1993, tpoker2,   0,        dphltest, norautp, norautp_state, empty_init, ROT0, "Micro Manufacturing",          "Turbo Poker 2",                    MACHINE_NOT_WORKING )
 
 
 //************************************ unknown sets ************************************
