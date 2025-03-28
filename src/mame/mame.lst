@@ -42963,6 +42963,9 @@ ngenb38
 @source:skeleton/nordlead.cpp
 nordle2x
 
+@source:skeleton/omdisv22.cpp
+omdisv22
+
 @source:skeleton/onyx.cpp
 c5000
 c8002
@@ -43208,9 +43211,6 @@ tvdear
 
 @source:skeleton/unistar.cpp
 unistar
-
-@source:skeleton/unk78c14.cpp
-unk78c14
 
 @source:skeleton/v6809.cpp
 v6809

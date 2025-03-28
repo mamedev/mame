@@ -1,27 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Devin Acker
 /*
-	Skeleton driver for an unknown uPD78C14-based trip computer, date code 9020.
-	Uses a 17-character display with 10 numeric and 2 additional keys.
-
-	The numeric keys also select which information to display:
-	1: fuel range
-	2: fuel efficiency
-	3: coolant temp, RPM, battery level
-	4: oil life
-	5: fuel consumption
-	6: trip distance
-	7: trip ETA
-	8: elapsed time
-	9: average speed
-	0: select metric/imperial units
+	Skeleton driver for the uPD78C14-based "Driver Information System" used by
+	the circa-1990 Oldsmobile 98 and other models.
 
 	Press 6, then Set, then enter a distance of 8192 to show a debug display
 	with information about the current ADC readings. After that, press any button
-	to display the ROM version ("VERSION 2.2 CH").
+	to display the ROM version.
 
 	TODO:
-	- identify the actual device/manufacturer that this MCU came from
 	- identify/hook up the display hardware
 	- properly hook up or at least figure out other inputs (port B, SCK/RX, CI, most ADCs, etc)
 	  The function at 09D5 handles reading the ADC values.
@@ -35,16 +22,16 @@
 
 namespace {
 
-class unk78c14_state : public driver_device
+class omdisv22_state : public driver_device
 {
 public:
-	unk78c14_state(const machine_config &mconfig, device_type type, const char *tag)
+	omdisv22_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_inputs(*this, "IN%u", 0U)
 	{ }
 
-	void unk78c14(machine_config &config);
+	void omdisv22(machine_config &config);
 
 	void inputs_w(int state) { m_input_sel = state; }
 	ioport_value inputs_r();
@@ -69,46 +56,46 @@ private:
 };
 
 /**************************************************************************/
-static INPUT_PORTS_START(unk78c14)
+static INPUT_PORTS_START(omdisv22)
 	PORT_START("PA")
-	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_OUTPUT  ) PORT_WRITE_LINE_MEMBER(FUNC(unk78c14_state::inputs_w))
-	PORT_BIT( 0x78, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_CUSTOM_MEMBER(FUNC(unk78c14_state::inputs_r))
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_OUTPUT  ) PORT_WRITE_LINE_MEMBER(FUNC(omdisv22_state::inputs_w))
+	PORT_BIT( 0x78, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_CUSTOM_MEMBER(FUNC(omdisv22_state::inputs_r))
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("AN5")
 	PORT_CONFNAME( 0xff, 0xff, "Default Units" )
-	PORT_CONFSETTING(    0xff, "Imperial")
+	PORT_CONFSETTING(    0xff, "English")
 	PORT_CONFSETTING(    0x00, "Metric")
 
 	PORT_START("IN0")
-	PORT_BIT( 0x1, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Keypad 0") PORT_CODE(KEYCODE_0_PAD);
-	PORT_BIT( 0x2, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Keypad 1") PORT_CODE(KEYCODE_1_PAD);
-	PORT_BIT( 0x4, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Keypad 2") PORT_CODE(KEYCODE_2_PAD);
-	PORT_BIT( 0x8, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Keypad 3") PORT_CODE(KEYCODE_3_PAD);
+	PORT_BIT( 0x1, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("0 / E/M")   PORT_CODE(KEYCODE_0_PAD);
+	PORT_BIT( 0x2, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("1 / RANGE") PORT_CODE(KEYCODE_1_PAD);
+	PORT_BIT( 0x4, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("2 / ECON")  PORT_CODE(KEYCODE_2_PAD);
+	PORT_BIT( 0x8, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("3 / GAGES") PORT_CODE(KEYCODE_3_PAD);
 
 	PORT_START("IN1")
-	PORT_BIT( 0x1, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Keypad 4") PORT_CODE(KEYCODE_4_PAD);
-	PORT_BIT( 0x2, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Keypad 5") PORT_CODE(KEYCODE_5_PAD);
-	PORT_BIT( 0x4, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Keypad 6") PORT_CODE(KEYCODE_6_PAD);
-	PORT_BIT( 0x8, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Keypad 7") PORT_CODE(KEYCODE_7_PAD);
+	PORT_BIT( 0x1, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("4 / OIL")  PORT_CODE(KEYCODE_4_PAD);
+	PORT_BIT( 0x2, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("5 / FUEL") PORT_CODE(KEYCODE_5_PAD);
+	PORT_BIT( 0x4, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("6 / DEST") PORT_CODE(KEYCODE_6_PAD);
+	PORT_BIT( 0x8, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("7 / ETA")  PORT_CODE(KEYCODE_7_PAD);
 	
 	PORT_START("IN2")
-	PORT_BIT( 0x1, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Keypad 8")  PORT_CODE(KEYCODE_8_PAD);
-	PORT_BIT( 0x2, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Keypad 9")  PORT_CODE(KEYCODE_9_PAD);
-	PORT_BIT( 0x4, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Set/Reset") PORT_CODE(KEYCODE_ENTER_PAD);
-	PORT_BIT( 0x8, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Clock")     PORT_CODE(KEYCODE_DEL_PAD);
+	PORT_BIT( 0x1, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("8 / E/T")   PORT_CODE(KEYCODE_8_PAD);
+	PORT_BIT( 0x2, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("9 / SPEED") PORT_CODE(KEYCODE_9_PAD);
+	PORT_BIT( 0x4, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("RESET")     PORT_CODE(KEYCODE_ENTER_PAD);
+	PORT_BIT( 0x8, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("DATE/TIME") PORT_CODE(KEYCODE_DEL_PAD);
 INPUT_PORTS_END
 
 /**************************************************************************/
-void unk78c14_state::unk78c14(machine_config &config)
+void omdisv22_state::omdisv22(machine_config &config)
 {
 	UPD78C14(config, m_maincpu, 3'145'728); // 128*64*384, generates 1 Hz INTFT1 and 8192 Hz SCK
 	m_maincpu->pa_in_cb().set_ioport("PA");
 	m_maincpu->pa_out_cb().set_ioport("PA");
 	m_maincpu->pb_in_cb().set_constant(0xff); // bit 1 = display ready
 	m_maincpu->pc_in_cb().set_constant(0xff);
-	m_maincpu->pd_out_cb().set(FUNC(unk78c14_state::pd_w));
-	m_maincpu->pf_out_cb().set(FUNC(unk78c14_state::pf_w));
+	m_maincpu->pd_out_cb().set(FUNC(omdisv22_state::pd_w));
+	m_maincpu->pf_out_cb().set(FUNC(omdisv22_state::pf_w));
 	m_maincpu->an0_func().set_constant(0xff); // fuel level sensor?
 	m_maincpu->an1_func().set_constant(0xff); // unknown
 	m_maincpu->an2_func().set_constant(0xff); // unknown (only tested whether on/off)
@@ -119,7 +106,7 @@ void unk78c14_state::unk78c14(machine_config &config)
 }
 
 /**************************************************************************/
-void unk78c14_state::machine_start()
+void omdisv22_state::machine_start()
 {
 	std::fill(std::begin(m_output), std::end(m_output), 0);
 
@@ -131,7 +118,7 @@ void unk78c14_state::machine_start()
 }
 
 /**************************************************************************/
-void unk78c14_state::machine_reset()
+void omdisv22_state::machine_reset()
 {
 	m_maincpu->set_input_line(UPD7810_INTF2, ASSERT_LINE);
 
@@ -142,7 +129,7 @@ void unk78c14_state::machine_reset()
 }
 
 /**************************************************************************/
-ioport_value unk78c14_state::inputs_r()
+ioport_value omdisv22_state::inputs_r()
 {
 	ioport_value val = 0xf;
 
@@ -154,7 +141,7 @@ ioport_value unk78c14_state::inputs_r()
 }
 
 /**************************************************************************/
-void unk78c14_state::pf_w(u8 data)
+void omdisv22_state::pf_w(u8 data)
 {
 	// TODO: what kind of display is this, anyway?
 	if (BIT(m_pf, 5) && BIT(m_pf, 4) && !BIT(data, 4))
@@ -179,11 +166,11 @@ void unk78c14_state::pf_w(u8 data)
 }
 
 /**************************************************************************/
-ROM_START( unk78c14 )
-	ROM_REGION(0x4000, "maincpu", 0) // upper half of ROM is empty/unused, may have originally used a 78c12 instead
+ROM_START( omdisv22 )
+	ROM_REGION(0x4000, "maincpu", 0) // date code 9020, upper half of ROM is empty/unused
 	ROM_LOAD( "upd78c14g-443.bin", 0x0000, 0x4000, CRC(fab369b2) SHA1(7cbd5be32e475efd58db70c0a94b770c58fd9b8e) )
 ROM_END
 
 } // anonymous namespace
 
-SYST( 1990?, unk78c14, 0, 0, unk78c14, unk78c14, unk78c14_state, empty_init, "<unknown>", "unknown uPD78C14-based trip computer", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+SYST( 1990?, omdisv22, 0, 0, omdisv22, omdisv22, omdisv22_state, empty_init, "General Motors", "Oldsmobile Driver Information System (version 2.2 CH)", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
