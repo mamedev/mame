@@ -66,6 +66,6 @@ private:
 	static constexpr u8 if_SelectSectorTrack_c = 0;
 };
 
-DECLARE_DEVICE_TYPE(H89BUS_Z37, device_h89bus_right_card_interface)
+DECLARE_DEVICE_TYPE(H89BUS_Z_89_37, device_h89bus_right_card_interface)
 
 #endif // MAME_BUS_HEATHZENITH_H89_Z37_FDC_H
