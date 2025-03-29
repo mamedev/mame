@@ -1633,8 +1633,10 @@ void hyperstone_device::generate_movi(drcuml_block &block, compiler_state &compi
 
 	UML_AND(block, DRC_SR, DRC_SR, ~(Z_MASK | N_MASK));
 
-	if (src)
-		UML_OR(block, DRC_SR, DRC_SR, (src & 0x80000000) ? (Z_MASK | N_MASK) : Z_MASK);
+	if (!src)
+		UML_OR(block, DRC_SR, DRC_SR, Z_MASK);
+	else if (src & 0x80000000)
+		UML_OR(block, DRC_SR, DRC_SR, N_MASK);
 
 #if MISSIONCRAFT_FLAGS
 	UML_AND(block, DRC_SR, DRC_SR, ~V_MASK);

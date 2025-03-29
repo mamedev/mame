@@ -1,21 +1,21 @@
 .. _debugger-exceptionpoint-list:
 
-Exception Point Debugger Commands
-=================================
+Exceptionpoint Debugger Commands
+================================
 
 :ref:`debugger-command-epset`
-    sets a new exception point
+    sets a new exceptionpoint
 :ref:`debugger-command-epclear`
-    clears a specific exception point or all exception points
+    clears a specific exceptionpoint or all exceptionpoints
 :ref:`debugger-command-epdisable`
-    disables a specific exception point or all exception points
+    disables a specific exceptionpoint or all exceptionpoints
 :ref:`debugger-command-epenable`
-    enables a specific exception point or all exception points
+    enables a specific exceptionpoint or all exceptionpoints
 :ref:`debugger-command-eplist`
-    lists exception points
+    lists exceptionpoints
 
-Exception points halt execution and activate the debugger when
-a CPU raises a particular exception number.
+Exceptionpoints halt execution and activate the debugger when a CPU
+raises a particular exception number.
 
 
 .. _debugger-command-epset:
@@ -25,24 +25,24 @@ epset
 
 **ep[set] <type>[,<condition>[,<action>]]**
 
-Sets a new exception point for exceptions of type **<type>**.  The
+Sets a new exceptionpoint for exceptions of type **<type>**.  The
 optional **<condition>** parameter lets you specify an expression that
-will be evaluated each time the exception point is hit.  If the result
-of the expression is true (non-zero), the exception point will actually
+will be evaluated each time the exceptionpoint is hit.  If the result
+of the expression is true (non-zero), the exceptionpoint will actually
 halt execution at the start of the exception handler; otherwise,
 execution will continue with no notification.  The optional **<action>**
-parameter provides a command that is executed whenever the exception
-point is hit and the **<condition>** is true.  Note that you may need to
-embed the action within braces ``{ }`` in order to prevent commas and
-semicolons from being interpreted as applying to the ``epset`` command
-itself.
+parameter provides a command that is executed whenever the
+exceptionpoint is hit and the **<condition>** is true.  Note that you
+may need to embed the action within braces ``{ }`` in order to prevent
+commas and semicolons from being interpreted as applying to the
+``epset`` command itself.
 
 The numbering of exceptions depends upon the CPU type.  Causes of
 exceptions may include internally or externally vectored interrupts,
 errors occurring within instructions and system calls.
 
-Each exception point that is set is assigned an index which can be used
-in other exception point commands to reference this exception point.
+Each exceptionpoint that is set is assigned an index which can be used
+in other exceptionpoint commands to reference this exceptionpoint.
 
 Examples:
 
@@ -60,17 +60,17 @@ epclear
 
 **epclear [<epnum>[,…]]**
 
-The epclear command clears exception points.  If **<epnum>** is
-specified, only the requested exception points are cleared, otherwise
-all exception points are cleared.
+The epclear command clears exceptionpoints.  If **<epnum>** is
+specified, only the requested exceptionpoints are cleared, otherwise
+all exceptionpoints are cleared.
 
 Examples:
 
 ``epclear 3``
-  Clear exception point index 3.
+  Clear exceptionpoint index 3.
 
 ``epclear``
-  Clear all exception points.
+  Clear all exceptionpoints.
 
 Back to :ref:`debugger-exceptionpoint-list`
 
@@ -82,19 +82,19 @@ epdisable
 
 **epdisable [<epnum>[,…]]**
 
-The epdisable command disables exception points.  If **<epnum>** is
-specified, only the requested exception points are disabled, otherwise
-all exception points are disabled.  Note that disabling an exception
-point does not delete it, it just temporarily marks the exception
-point as inactive.
+The epdisable command disables exceptionpoints.  If **<epnum>** is
+specified, only the requested exceptionpoints are disabled, otherwise
+all exceptionpoints are disabled.  Note that disabling an
+exceptionpoint does not delete it, it just temporarily marks the
+exceptionpoint as inactive.
 
 Examples:
 
 ``epdisable 3``
-  Disable exception point index 3.
+  Disable exceptionpoint index 3.
 
 ``epdisable``
-  Disable all exception points.
+  Disable all exceptionpoints.
 
 Back to :ref:`debugger-exceptionpoint-list`
 
@@ -106,17 +106,17 @@ epenable
 
 **epenable [<epnum>[,…]]**
 
-The epenable command enables exception points.  If **<epnum>** is
-specified, only the requested exception points are enabled, otherwise
-all exception points are enabled.
+The epenable command enables exceptionpoints.  If **<epnum>** is
+specified, only the requested exceptionpoints are enabled, otherwise
+all exceptionpoints are enabled.
 
 Examples:
 
 ``epenable 3``
-  Enable exception point index 3.
+  Enable exceptionpoint index 3.
 
 ``epenable``
-  Enable all exception points.
+  Enable all exceptionpoints.
 
 Back to :ref:`debugger-exceptionpoint-list`
 
@@ -128,7 +128,7 @@ eplist
 
 **eplist**
 
-The eplist command lists all the current exception points, along with
+The eplist command lists all the current exceptionpoints, along with
 their index and any conditions or actions attached to them.
 
 Back to :ref:`debugger-exceptionpoint-list`
