@@ -4072,7 +4072,7 @@ GAME( 2001, queenbeesa,  queenbee, humlan,   queenbee, subsino2_state, empty_ini
 
 GAME( 2001, humlan,      queenbee, humlan,   humlan,   subsino2_state, empty_init,    ROT0, "Subsino (Truemax license)",        "Humlan's Lyckohjul (Sweden, Ver. 402)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING ) // severe timing issues
 
-GAME( 2002, queenbn,     0,        queenbn,  humlan,   subsino2_state, empty_init,    ROT0, "Subsino",                          "Nv Wang Feng New / Queen Bee New (China, Ver. 1.10)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING ) // severe timing issues
+GAME( 2002, queenbn,     0,        queenbn,  humlan,   subsino2_state, empty_init,    ROT0, "Subsino",                          "NuWang Feng New / Queen Bee New (China, Ver. 1.10)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING ) // severe timing issues
 
 GAME( 2002, xreel,       queenbee, humlan,   humlan,   subsino2_state, empty_init,    ROT0, "Subsino (ECM license)",            "X-Reel",                                MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING ) // severe timing issues
 

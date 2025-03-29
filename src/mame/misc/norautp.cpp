@@ -5153,7 +5153,7 @@ GAMEL( 1984, cdrawpkr, 0,        cdrawpkr, cdrawpkr, norautp_state, empty_init, 
 
 //     YEAR  NAME      PARENT    MACHINE   INPUT     STATE          INIT        ROT   COMPANY                        FULLNAME                            FLAGS                       LAYOUT
 GAMEL( 1982, dphl,     0,        dphl,     dphl,     norautp_state, empty_init, ROT0, "M.Kramer Manufacturing.",     "Draw Poker HI-LO (M.Kramer)",      MACHINE_IMPERFECT_GRAPHICS, layout_noraut10 )
-GAMEL( 1983, dphla,    0,        dphla,    dphla,    norautp_state, empty_init, ROT0, "<unknown>",                   "Joker Poker (Kramer, Alt)",        0,                          layout_noraut10 )
+GAMEL( 1983, dphla,    0,        dphla,    dphla,    norautp_state, empty_init, ROT0, "<unknown>",                   "Joker Poker (Kramer, alt)",        0,                          layout_noraut10 )
 GAMEL( 1983, dphljp,   0,        dphl,     dphl,     norautp_state, empty_init, ROT0, "<unknown>",                   "Draw Poker HI-LO (Japanese)",      MACHINE_IMPERFECT_GRAPHICS, layout_noraut10 )
 GAME(  198?, kimbldhl, 0,        kimbldhl, norautp,  norautp_state, empty_init, ROT0, "Kimble Ireland",              "Kimble Double HI-LO",              MACHINE_NOT_WORKING )
 GAME(  1983, gtipoker, 0,        dphl,     norautp,  norautp_state, empty_init, ROT0, "GTI Inc",                     "GTI Poker",                        MACHINE_NOT_WORKING )

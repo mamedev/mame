@@ -2,7 +2,7 @@
 // copyright-holders:
 
 /*
-Wu Lin Zheng Ba, Huang Yeh, 1999?
+Wu Lin Zhengba, Huang Yeh, 1999?
 Hardware Info by Guru
 ---------------------
 
@@ -232,4 +232,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1999, wlzb, 0, wlzb, wlzb, huangyeh_m68k_state, empty_init, ROT0, "Huang Yeh", "Wu Lin Zheng Ba", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1999, wlzb, 0, wlzb, wlzb, huangyeh_m68k_state, empty_init, ROT0, "Huang Yeh", "Wu Lin Zhengba", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
