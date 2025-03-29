@@ -11980,37 +11980,37 @@ GAME( 1998, kof98h,     kof98,    neobase,   neogeo,    mvs_led_state, empty_ini
 GAME( 1998, lastbld2,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The Last Blade 2 / Bakumatsu Roman - Dai Ni Maku Gekka no Kenshi (NGM-2430 ~ NGH-2430)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, neocup98,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Neo-Geo Cup '98 - The Road to the Victory", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, mslugx,     neogeo,   mslugx,    neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Metal Slug X - Super Vehicle-001 (NGM-2500 ~ NGH-2500)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, kof99,      neogeo,   kof99,     neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The King of Fighters '99 - Millennium Battle (NGM-2510)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
-GAME( 1999, kof99h,     kof99,    kof99,     neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The King of Fighters '99 - Millennium Battle (NGH-2510)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX, crashes going into attract demo */
-GAME( 1999, kof99e,     kof99,    kof99,     neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The King of Fighters '99 - Millennium Battle (earlier)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
-GAME( 1999, kof99k,     kof99,    kof99,     neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The King of Fighters '99 - Millennium Battle (Korean release)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
-GAME( 1999, kof99ka,    kof99,    kof99k,    neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The King of Fighters '99 - Millennium Battle (Korean release, non-encrypted program)" , MACHINE_SUPPORTS_SAVE )   /* Encrypted GFX */
+GAME( 1999, kof99,      neogeo,   kof99,     neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The King of Fighters '99 - Millennium Battle (NGM-2510)", MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
+GAME( 1999, kof99h,     kof99,    kof99,     neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The King of Fighters '99 - Millennium Battle (NGH-2510)", MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX, crashes going into attract demo */
+GAME( 1999, kof99e,     kof99,    kof99,     neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The King of Fighters '99 - Millennium Battle (earlier)", MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
+GAME( 1999, kof99k,     kof99,    kof99,     neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The King of Fighters '99 - Millennium Battle (Korean release)", MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
+GAME( 1999, kof99ka,    kof99,    kof99k,    neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The King of Fighters '99 - Millennium Battle (Korean release, non-encrypted program)", MACHINE_SUPPORTS_SAVE )   /* Encrypted GFX */
 GAME( 1999, kof99p,     kof99,    neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The King of Fighters '99 - Millennium Battle (prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, garou,      neogeo,   garou,     neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Garou - Mark of the Wolves (NGM-2530)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
-GAME( 1999, garouh,     garou,    garouh,    neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Garou - Mark of the Wolves (NGM-2530 ~ NGH-2530)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
-GAME( 1999, garouha,    garou,    garou,     neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Garou - Mark of the Wolves (NGH-2530)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
+GAME( 1999, garou,      neogeo,   garou,     neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Garou - Mark of the Wolves (NGM-2530)", MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
+GAME( 1999, garouh,     garou,    garouh,    neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Garou - Mark of the Wolves (NGM-2530 ~ NGH-2530)", MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
+GAME( 1999, garouha,    garou,    garou,     neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Garou - Mark of the Wolves (NGH-2530)", MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
 GAME( 1999, garoup,     garou,    neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Garou - Mark of the Wolves (prototype)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, garoubl,    garou,    garoubl,   neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "Garou - Mark of the Wolves (bootleg)", MACHINE_SUPPORTS_SAVE ) /* Bootleg of garoup */
-GAME( 2000, mslug3,     neogeo,   mslug3,    neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Metal Slug 3 (NGM-2560)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
-GAME( 2000, mslug3a,    mslug3,   mslug3a,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Metal Slug 3 (NGM-2560, earlier)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX - revision Mar/17/2000 1:36 (from SMA rom) */
-GAME( 2000, mslug3h,    mslug3,   mslug3h,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Metal Slug 3 (NGH-2560)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
+GAME( 2000, mslug3,     neogeo,   mslug3,    neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Metal Slug 3 (NGM-2560)", MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
+GAME( 2000, mslug3a,    mslug3,   mslug3a,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Metal Slug 3 (NGM-2560, earlier)", MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX - revision Mar/17/2000 1:36 (from SMA rom) */
+GAME( 2000, mslug3h,    mslug3,   mslug3h,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Metal Slug 3 (NGH-2560)", MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
 GAME( 2000, mslug3b6,   mslug3,   mslug3b6,  neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "Metal Slug 6 (bootleg of Metal Slug 3)", MACHINE_SUPPORTS_SAVE ) /* real Metal Slug 6 is an Atomiswave HW game, see naomi.cpp ;-) */
-GAME( 2000, kof2000,    neogeo,   kof2000,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The King of Fighters 2000 (NGM-2570 ~ NGH-2570)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
-GAME( 2000, kof2000n,   kof2000,  kof2000n,  neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The King of Fighters 2000 (not encrypted)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
-GAME( 2001, zupapa,     neogeo,   zupapa,    neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Zupapa!" , MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
-GAME( 2001, sengoku3,   neogeo,   sengoku3,  neogeo,    mvs_led_state, empty_init, ROT0, "Noise Factory / SNK", "Sengoku 3 / Sengoku Densho 2001 (set 1)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
-GAME( 2001, sengoku3a,  sengoku3, sengoku3,  neogeo,    mvs_led_state, empty_init, ROT0, "Noise Factory / SNK", "Sengoku 3 / Sengoku Densho 2001 (set 2)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
-GAME( 2001, kof2001,    neogeo,   kof2001,   neogeo,    mvs_led_state, empty_init, ROT0, "Eolith / SNK", "The King of Fighters 2001 (NGM-262?)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
-GAME( 2001, kof2001h,   kof2001,  kof2001,   neogeo,    mvs_led_state, empty_init, ROT0, "Eolith / SNK", "The King of Fighters 2001 (NGH-2621)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
+GAME( 2000, kof2000,    neogeo,   kof2000,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The King of Fighters 2000 (NGM-2570 ~ NGH-2570)", MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
+GAME( 2000, kof2000n,   kof2000,  kof2000n,  neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The King of Fighters 2000 (not encrypted)", MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
+GAME( 2001, zupapa,     neogeo,   zupapa,    neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Zupapa!", MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
+GAME( 2001, sengoku3,   neogeo,   sengoku3,  neogeo,    mvs_led_state, empty_init, ROT0, "Noise Factory / SNK", "Sengoku 3 / Sengoku Densho 2001 (set 1)", MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
+GAME( 2001, sengoku3a,  sengoku3, sengoku3,  neogeo,    mvs_led_state, empty_init, ROT0, "Noise Factory / SNK", "Sengoku 3 / Sengoku Densho 2001 (set 2)", MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
+GAME( 2001, kof2001,    neogeo,   kof2001,   neogeo,    mvs_led_state, empty_init, ROT0, "Eolith / SNK", "The King of Fighters 2001 (NGM-262?)", MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
+GAME( 2001, kof2001h,   kof2001,  kof2001,   neogeo,    mvs_led_state, empty_init, ROT0, "Eolith / SNK", "The King of Fighters 2001 (NGH-2621)", MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
 GAME( 2003, cthd2003,   kof2001,  cthd2k3,   neogeo,    mvs_led_state, empty_init, ROT0, "bootleg (Phenixsoft)", "Crouching Tiger Hidden Dragon 2003 (hack of The King of Fighters 2001)", MACHINE_SUPPORTS_SAVE ) /* Protected Hack / Bootleg of kof2001 */
 GAME( 2003, ct2k3sp,    kof2001,  ct2k3sp,   neogeo,    mvs_led_state, empty_init, ROT0, "bootleg (Phenixsoft)", "Crouching Tiger Hidden Dragon 2003 Super Plus (hack of The King of Fighters 2001)", MACHINE_SUPPORTS_SAVE ) /* Protected Hack / Bootleg of kof2001 */
 GAME( 2003, ct2k3sa,    kof2001,  ct2k3sa,   neogeo,    mvs_led_state, empty_init, ROT0, "bootleg (Phenixsoft)", "Crouching Tiger Hidden Dragon 2003 Super Plus (hack of The King of Fighters 2001, alternate)", MACHINE_SUPPORTS_SAVE ) /* Hack / Bootleg of kof2001 */
-GAME( 2002, kof2002,    neogeo,   kof2002,   neogeo,    mvs_led_state, empty_init, ROT0, "Eolith / Playmore", "The King of Fighters 2002 (NGM-2650 ~ NGH-2650)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
+GAME( 2002, kof2002,    neogeo,   kof2002,   neogeo,    mvs_led_state, empty_init, ROT0, "Eolith / Playmore", "The King of Fighters 2002 (NGM-2650 ~ NGH-2650)", MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
 GAME( 2002, kof2002b,   kof2002,  kof2002b,  neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "The King of Fighters 2002 (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 2002, kf2k2pls,   kof2002,  kf2k2pls,  neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "The King of Fighters 2002 Plus (bootleg set 1)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
-GAME( 2002, kf2k2pla,   kof2002,  kf2k2pls,  neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "The King of Fighters 2002 Plus (bootleg set 2)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
-GAME( 2002, kf2k2mp,    kof2002,  kf2k2mp,   neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "The King of Fighters 2002 Magic Plus (bootleg)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
-GAME( 2002, kf2k2mp2,   kof2002,  kf2k2mp2,  neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "The King of Fighters 2002 Magic Plus II (bootleg)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
+GAME( 2002, kf2k2pls,   kof2002,  kf2k2pls,  neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "The King of Fighters 2002 Plus (bootleg set 1)", MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
+GAME( 2002, kf2k2pla,   kof2002,  kf2k2pls,  neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "The King of Fighters 2002 Plus (bootleg set 2)", MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
+GAME( 2002, kf2k2mp,    kof2002,  kf2k2mp,   neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "The King of Fighters 2002 Magic Plus (bootleg)", MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
+GAME( 2002, kf2k2mp2,   kof2002,  kf2k2mp2,  neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "The King of Fighters 2002 Magic Plus II (bootleg)", MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
 GAME( 2002, kof10th,    kof2002,  kof10th,   neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "The King of Fighters 10th Anniversary (bootleg of The King of Fighters 2002)", MACHINE_SUPPORTS_SAVE ) // fake SNK copyright
 GAME( 2005, kf10thep,   kof2002,  kf10thep,  neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "The King of Fighters 10th Anniversary Extra Plus (bootleg of The King of Fighters 2002)", MACHINE_SUPPORTS_SAVE ) // fake SNK copyright
 GAME( 2004, kf2k5uni,   kof2002,  kf2k5uni,  neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "The King of Fighters 10th Anniversary 2005 Unique (bootleg of The King of Fighters 2002)", MACHINE_SUPPORTS_SAVE ) // fake SNK copyright
@@ -12070,7 +12070,7 @@ GAME( 1992, viewpoinp,  viewpoin, neobase,   neogeo,    mvs_led_state, empty_ini
 GAME( 1994, janshin,    neogeo,   neogeo_mj, neogeo_mj, mvs_led_state, empty_init, ROT0, "Aicom", "Janshin Densetsu - Quest of Jongmaster", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, pulstar,    neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Aicom", "Pulstar", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, blazstar,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Yumekobo", "Blazing Star", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, preisle2,   neogeo,   preisle2,  neogeo,    mvs_led_state, empty_init, ROT0, "Yumekobo / Saurus", "Prehistoric Isle 2" , MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
+GAME( 1999, preisle2,   neogeo,   preisle2,  neogeo,    mvs_led_state, empty_init, ROT0, "Yumekobo / Saurus", "Prehistoric Isle 2", MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
 
 // Data East Corporation
 GAME( 1993, spinmast,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Data East Corporation", "Spin Master / Miracle Adventure", MACHINE_SUPPORTS_SAVE )
@@ -12082,8 +12082,8 @@ GAME( 1996, magdrop2,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_ini
 GAME( 1997, magdrop3,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Data East Corporation", "Magical Drop III", MACHINE_SUPPORTS_SAVE )
 
 // Eleven
-GAME( 2000, nitd,       neogeo,   nitd,      neogeo,    mvs_led_state, empty_init, ROT0, "Eleven / Gavaking", "Nightmare in the Dark" , MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
-GAME( 2001, nitdbl,     nitd,     neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "Nightmare in the Dark (bootleg)" , MACHINE_SUPPORTS_SAVE )
+GAME( 2000, nitd,       neogeo,   nitd,      neogeo,    mvs_led_state, empty_init, ROT0, "Eleven / Gavaking", "Nightmare in the Dark", MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
+GAME( 2001, nitdbl,     nitd,     neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "Nightmare in the Dark (bootleg)", MACHINE_SUPPORTS_SAVE )
 
 // Face
 GAME( 1994, gururin,    neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Face", "Gururin", MACHINE_SUPPORTS_SAVE )
@@ -12108,7 +12108,7 @@ GAME( 1995?,mvstemp,    neogeo,   neobase,   neogeo,    mvs_led_state, empty_ini
 GAME( 1994, zedblade,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "NMK", "Zed Blade / Operation Ragnarok", MACHINE_SUPPORTS_SAVE )
 
 // Psikyo
-GAME( 1999, s1945p,     neogeo,   s1945p,    neogeo,    mvs_led_state, empty_init, ROT0, "Psikyo", "Strikers 1945 Plus" , MACHINE_SUPPORTS_SAVE )   /* Encrypted GFX */
+GAME( 1999, s1945p,     neogeo,   s1945p,    neogeo,    mvs_led_state, empty_init, ROT0, "Psikyo", "Strikers 1945 Plus", MACHINE_SUPPORTS_SAVE )   /* Encrypted GFX */
 
 // Saurus
 GAME( 1995, quizkof,    neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Saurus (SNK license)", "Quiz King of Fighters (SAM-080 ~ SAH-080)", MACHINE_SUPPORTS_SAVE )
@@ -12169,9 +12169,9 @@ GAME( 1997, puzzldpr,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_ini
 GAME( 1998, breakrev,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Breakers Revenge", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, flipshot,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Battle Flip Shot", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, ctomaday,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Captain Tomaday", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, ganryu,     neogeo,   ganryu,    neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Ganryu / Musashi Ganryuki" , MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
+GAME( 1999, ganryu,     neogeo,   ganryu,    neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Ganryu / Musashi Ganryuki", MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
 GAME( 2000, bangbead,   neogeo,   bangbead,  neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Bang Bead", MACHINE_SUPPORTS_SAVE )
-GAME( 2000, b2b,        neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Bang Bang Busters (2010 NCI release)" , MACHINE_SUPPORTS_SAVE )
+GAME( 2000, b2b,        neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Bang Bang Busters (2010 NCI release)", MACHINE_SUPPORTS_SAVE )
 
 // Mega Enterprise
 GAME( 2002, mslug4,     neogeo,   mslug4,    neogeo,    mvs_led_state, empty_init, ROT0, "Mega / Noise Factory / Playmore", "Metal Slug 4 (NGM-2630)", MACHINE_SUPPORTS_SAVE )
