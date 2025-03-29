@@ -34,8 +34,7 @@ TODO:
 - Every PC Engine OS boot tries to write TVRAM ASCII data on every boot to
   $exxxx ROM region, banking bug?
 - all N88 BASIC entries tries to do stuff with EMM, more banking?
-- Convert SASI from PC-9801 to a shared C-Bus device, apparently it's same i/f;
-- Is C-Bus I/O space shifted by +$200, as per micromus MIDI access at $e2d2?
+- Share SASI i/f (PC-9801-07?) as C-Bus option;
 
 (old notes, to be reordered)
 - fdc "intelligent mode" has 0x7f as irq vector ... 0x7f is ld a,a and it IS NOT correctly
@@ -258,11 +257,6 @@ void pc88va_state::sys_port5_w(u8 data)
 u8 pc88va_state::sys_port5_r()
 {
 	return (m_rstmd ? 1 : 0) | 8;
-}
-
-uint8_t pc88va_state::hdd_status_r()
-{
-	return 0x20;
 }
 
 // TODO: convert to pc80s31k family
@@ -540,6 +534,131 @@ void pc88va_state::misc_ctrl_w(uint8_t data)
 }
 
 
+uint8_t pc88va_state::sasi_data_r()
+{
+	uint8_t data = m_sasi_data_in->read();
+
+	if(m_sasi_ctrl_in->read() & 0x80)
+		m_sasibus->write_ack(1);
+	return data;
+}
+
+void pc88va_state::sasi_data_w(uint8_t data)
+{
+	m_sasi_data = data;
+
+	if (m_sasi_data_enable)
+	{
+		m_sasi_data_out->write(m_sasi_data);
+		if(m_sasi_ctrl_in->read() & 0x80)
+			m_sasibus->write_ack(1);
+	}
+}
+
+void pc88va_state::write_sasi_io(int state)
+{
+	m_sasi_ctrl_in->write_bit2(state);
+
+	m_sasi_data_enable = !state;
+
+	if (m_sasi_data_enable)
+	{
+		m_sasi_data_out->write(m_sasi_data);
+	}
+	else
+	{
+		m_sasi_data_out->write(0);
+	}
+	if((m_sasi_ctrl_in->read() & 0x9c) == 0x8c)
+		m_pic2->ir1_w(m_sasi_ctrl & 1);
+	else
+		m_pic2->ir1_w(0);
+}
+
+void pc88va_state::write_sasi_req(int state)
+{
+	m_sasi_ctrl_in->write_bit7(state);
+
+	if (!state)
+		m_sasibus->write_ack(0);
+
+	if((m_sasi_ctrl_in->read() & 0x9C) == 0x8C)
+		m_pic2->ir1_w(m_sasi_ctrl & 1);
+	else
+		m_pic2->ir1_w(0);
+
+	m_maincpu->dreq_w<0>(!(state && !(m_sasi_ctrl_in->read() & 8) && (m_sasi_ctrl & 2)));
+}
+
+/*
+ * read status when NRDSW=1
+ * x--- ---- REQ
+ * -x-- ---- ACK
+ * --x- ---- BSY
+ * ---x ---- MSG
+ * ---- x--- CD
+ * ---- -x-- IO
+ * ---- ---x INT?
+ *
+ * read drive info NRDSW=0
+ *
+ * x--- ---- CT0 HDD #1 sector length (1=512, 0=256)
+ * -x-- ---- CT1 HDD #2 sector length
+ * --xx x--- DT02-DT01-DT00 HDD #1 capacity
+ * --11 1--- <unconnected>
+ * --11 0--- 40MB
+ * --10 0--- 20MB
+ * --00 1--- 10MB
+ * --00 0--- 5MB
+ * ---- -xxx DT12-DT11-DT10 HDD #2 capacity
+ */
+uint8_t pc88va_state::sasi_status_r()
+{
+	uint8_t res = 0;
+
+	if(m_sasi_ctrl & 0x40)
+	{
+		res |= m_sasi_ctrl_in->read();
+	}
+	else
+	{
+		// TODO: configurable dips
+		// currently hardwiring to 512 sectors + 40MB layout for HDD#0
+		// (theoretically matching a chdman -tp 7)
+		// unconnected for HDD#1 (would show up as HDFORM D: option otherwise)
+		res |= 0x80 | (6 << 3) | 7;
+	}
+	return res;
+}
+
+/*
+ * x--- ---- channel enable
+ * -x-- ---- NRDSW read switch
+ * --x- ---- sel
+ * ---- x--- reset line
+ * ---- --x- dma enable
+ * ---- ---x irq enable
+ */
+void pc88va_state::sasi_ctrl_w(uint8_t data)
+{
+
+	m_sasibus->write_sel(BIT(data, 5));
+
+	if(m_sasi_ctrl & 8 && ((data & 8) == 0)) // 1 -> 0 transition
+	{
+		m_sasibus->write_rst(1);
+//      m_timer_rst->adjust(attotime::from_nsec(100));
+	}
+	else
+		m_sasibus->write_rst(0); // TODO
+
+	m_sasi_ctrl = data;
+
+//  m_sasibus->write_sel(BIT(data, 0));
+}
+
+
+
 /****************************************
  * Address maps
  ***************************************/
@@ -612,8 +731,8 @@ void pc88va_state::io_map(address_map &map)
 //  map(0x0070, 0x0070) ? (*)
 //  map(0x0071, 0x0071) Expansion ROM select (*)
 //  map(0x0078, 0x0078) Memory offset increment (*)
-//  map(0x0080, 0x0081) HDD related
-	map(0x0082, 0x0082).r(FUNC(pc88va_state::hdd_status_r));// HDD control, byte access 7-0
+	map(0x0080, 0x0080).rw(FUNC(pc88va_state::sasi_data_r), FUNC(pc88va_state::sasi_data_w));
+	map(0x0082, 0x0082).rw(FUNC(pc88va_state::sasi_status_r), FUNC(pc88va_state::sasi_ctrl_w));
 //  map(0x00bc, 0x00bf) d8255 1
 //  map(0x00e2, 0x00e3) Expansion RAM selection (*)
 //  map(0x00e4, 0x00e4) 8214 IRQ control (*)
@@ -1269,6 +1388,29 @@ static void pc88va_cbus_devices(device_slot_interface &device)
 	device.option_add("mpu_pc98",   MPU_PC98);
 }
 
+// TODO: make it to work and backport to C-Bus
+void pc88va_state::pc88va_sasi(machine_config &config)
+{
+	SCSI_PORT(config, m_sasibus, 0);
+	m_sasibus->set_data_input_buffer("sasi_data_in");
+	m_sasibus->io_handler().set(FUNC(pc88va_state::write_sasi_io)); // bit2
+	m_sasibus->cd_handler().set("sasi_ctrl_in", FUNC(input_buffer_device::write_bit3));
+	m_sasibus->msg_handler().set("sasi_ctrl_in", FUNC(input_buffer_device::write_bit4));
+	m_sasibus->bsy_handler().set("sasi_ctrl_in", FUNC(input_buffer_device::write_bit5));
+	m_sasibus->ack_handler().set("sasi_ctrl_in", FUNC(input_buffer_device::write_bit6));
+	m_sasibus->req_handler().set(FUNC(pc88va_state::write_sasi_req));
+	m_sasibus->set_slot_device(1, "harddisk", PC9801_SASI, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
+
+	output_latch_device &sasi_out(OUTPUT_LATCH(config, "sasi_data_out"));
+	m_sasibus->set_output_latch(sasi_out);
+	INPUT_BUFFER(config, "sasi_data_in");
+	INPUT_BUFFER(config, "sasi_ctrl_in");
+
+	m_maincpu->in_ior_cb<0>().set(FUNC(pc88va_state::sasi_data_r));
+	m_maincpu->out_iow_cb<0>().set(FUNC(pc88va_state::sasi_data_w));
+}
+
+
 // NOTE: PC-88VA implementation omits some C-Bus lines compared to PC-98.
 // - doesn't have ir12 and ir13, i.e. covers INT0 to INT4 only
 // - no /CPUKILL pin support
@@ -1347,15 +1489,13 @@ void pc88va_state::pc88va(machine_config &config)
 	m_pic2->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ7);
 	m_pic2->in_sp_callback().set_constant(0);
 
+	pc88va_sasi(config);
+
 	UPD765A(config, m_fdc, 4000000, true, true);
 	m_fdc->intrq_wr_callback().set(FUNC(pc88va_state::fdc_irq));
 	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(v50_device::dreq_w<2>));
 	FLOPPY_CONNECTOR(config, m_fdd[0], pc88va_floppies, "525hd", pc88va_state::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_fdd[1], pc88va_floppies, "525hd", pc88va_state::floppy_formats).enable_sound(true);
-
-	// TODO: set pc98 compatible
-	// Needs a MS-Engine disk dump first, that applies an overlay on PC Engine OS so that it can run PC-98 software
-	SOFTWARE_LIST(config, "disk_list").set_original("pc88va");
 
 	UPD4990A(config, m_rtc);
 
@@ -1379,6 +1519,10 @@ void pc88va_state::pc88va(machine_config &config)
 	m_opna->add_route(0, m_rspeaker, 0.25);
 	m_opna->add_route(1, m_lspeaker, 0.75);
 	m_opna->add_route(2, m_rspeaker, 0.75);
+
+	// TODO: set pc98 compatible
+	// Needs a MS-Engine disk dump first, that applies an overlay on PC Engine OS so that it can run PC-98 software
+	SOFTWARE_LIST(config, "disk_list").set_original("pc88va");
 }
 
 
