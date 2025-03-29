@@ -95,20 +95,20 @@ private:
 	uint8_t   m_status;
 
 	/* To keep track of external hsync and vsync signals */
-	int m_hsync;
-	int m_vsync;
+	bool m_hsync;
+	bool m_vsync;
 
 	/* internal variables */
 	v_state m_vert_state;
 	h_state m_horz_state;
-	int m_vd_triggered;
-	int m_vert_to_go;
-	int m_horz_to_go;
-	int m_horz_steps;
-	int m_raster_count;
-	int m_dvssr_written;
-	int m_satb_countdown;
-	int m_dma_enabled;
+	bool m_vd_triggered;
+	int32_t m_vert_to_go;
+	int32_t m_horz_to_go;
+	int32_t m_horz_steps;
+	int32_t m_raster_count;
+	bool m_dvssr_written;
+	int32_t m_satb_countdown;
+	bool m_dma_enabled;
 	uint16_t m_byr_latched;
 	uint16_t m_bxr_latched;
 	uint16_t m_bat_address;
@@ -120,8 +120,8 @@ private:
 	   from VRAM to this internal table.
 	*/
 	uint16_t m_sat[4*64];
-	int m_sprites_this_line;
-	int m_sprite_row_index;
+	int32_t m_sprites_this_line;
+	uint16_t m_sprite_row_index;
 	uint16_t  m_sprite_row[1024];
 	std::unique_ptr<uint16_t[]>  m_vram;
 	uint16_t  m_vram_mask;
