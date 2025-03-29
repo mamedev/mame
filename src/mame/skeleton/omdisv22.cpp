@@ -4,7 +4,7 @@
 	Skeleton driver for the uPD78C14-based "Driver Information System" used by
 	the circa-1990 Oldsmobile 98 and other models.
 
-	Press 6, then Set, then enter a distance of 8192 to show a debug display
+	Press 6, then Test/Reset, then enter a distance of 8192 to show a debug display
 	with information about the current ADC readings. After that, press any button
 	to display the ROM version.
 
