@@ -1034,7 +1034,7 @@ void mystwarr_state::viostorm(machine_config &config)
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(40, 40+384-1, 16, 16+224-1);
 
-	m_k056832->set_tile_callback(FUNC(mystwarr_state::game4bpp_tile_callback));
+	m_k056832->set_tile_callback(FUNC(mystwarr_state::viostorm_tile_callback));
 
 	m_k055673->set_sprite_callback(FUNC(mystwarr_state::metamrph_sprite_callback));
 	m_k055673->set_config(K055673_LAYOUT_RNG, -62, -23);
@@ -1082,7 +1082,7 @@ void mystwarr_state::metamrph(machine_config &config)
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(24, 24+288-1, 15, 15+224-1);
 
-	m_k056832->set_tile_callback(FUNC(mystwarr_state::game4bpp_tile_callback));
+	m_k056832->set_tile_callback(FUNC(mystwarr_state::viostorm_tile_callback));
 
 	m_k055673->set_sprite_callback(FUNC(mystwarr_state::metamrph_sprite_callback));
 	m_k055673->set_config(K055673_LAYOUT_RNG, -51, -24);
