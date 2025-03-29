@@ -11,6 +11,8 @@
 #include "cpu/drcuml.h"
 #include "cpu/drcumlsh.h"
 
+#include <utility>
+
 
 /*
     A note about clock multipliers and dividers:
@@ -33,10 +35,6 @@
 ***************************************************************************/
 
 #define E132XS_STRICT_VERIFY            0x0001          /* verify all instructions */
-
-#define SINGLE_INSTRUCTION_MODE         (0)
-
-#define ENABLE_E132XS_DRC               (1)
 
 #define E132XS_LOG_DRC_REGS             (0)
 #define E132XS_LOG_INTERPRETER_REGS     (0)
@@ -462,9 +460,10 @@ private:
 	bool generate_opcode(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
 
 	void generate_get_trap_addr(drcuml_block &block, uml::code_label &label, uml::parameter trapno);
-	uint32_t generate_get_const(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
-	uint32_t generate_get_immediate_s(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
-	uint32_t generate_get_pcrel(drcuml_block &block, const opcode_desc *desc);
+	uint32_t generate_get_const(const opcode_desc *desc);
+	uint32_t generate_get_immediate_s(const opcode_desc *desc);
+	uint32_t generate_get_pcrel(const opcode_desc *desc);
+	std::pair<uint16_t, uint32_t> generate_get_d_code_dis(const opcode_desc *opcode);
 
 	void generate_get_global_register(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
 	void generate_set_global_register(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint32_t dst_code);
@@ -473,6 +472,10 @@ private:
 
 	void generate_load_operand(drcuml_block &block, compiler_state &compiler, reg_bank global, uint32_t code, uml::parameter dst, uml::parameter localidx);
 	void generate_load_src_addsub(drcuml_block &block, compiler_state &compiler, reg_bank global, uint32_t code, uml::parameter dst, uml::parameter localidx, uml::parameter sr);
+	uml::parameter generate_load_address_ad(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, reg_bank global, uint32_t code, uml::parameter dst, uml::parameter localidx);
+	void generate_load_address_ns(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, reg_bank global, uint32_t code, uml::parameter dst, uml::parameter localidx, uint16_t d_code, uint32_t dis);
+	void generate_load_address_rp(drcuml_block &block, compiler_state &compiler, uint32_t code, uml::parameter dst, uml::parameter localidx, uint32_t dis);
+	void generate_add_dis(drcuml_block &block, compiler_state &compiler, uml::parameter dst, uml::parameter base, uint32_t dis, unsigned alignment);
 	void generate_set_dst(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, reg_bank global, uint32_t code, uml::parameter src, uml::parameter localidx, bool calcidx);
 	void generate_update_flags_addsub(drcuml_block &block, compiler_state &compiler, uml::parameter sr);
 	void generate_update_flags_addsubc(drcuml_block &block, compiler_state &compiler, uml::parameter sr);

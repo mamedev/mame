@@ -38,7 +38,7 @@ const char *const SETxx[] =
 
 const char *const Fxxx[] =
 {
-	"FADD",   "FADDD",  "FSUB",   "FSUBD"   "FMUL",   "FMULD", "FDIV", "FDIVD",
+	"FADD",   "FADDD",  "FSUB",   "FSUBD",  "FMUL",   "FMULD", "FDIV", "FDIVD",
 	"FCMP",   "FCMPD",  "FCMPU",  "FCMPUD", "FCVT",   "FCVTD"
 };
 
@@ -983,7 +983,7 @@ offs_t hyperstone_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 		{
 			uint8_t n = Rn_format(dest, op);
 
-			util::stream_format(stream, "SHLI %s, $%x", dest, n);
+			util::stream_format(stream, "SHLI    %s, $%x", dest, n);
 
 			break;
 		}

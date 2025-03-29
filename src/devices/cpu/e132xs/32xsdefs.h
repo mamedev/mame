@@ -9,6 +9,8 @@
     COMPILE-TIME DEFINITIONS
 ***************************************************************************/
 
+#define ENABLE_E132XS_DRC               (1)
+
 // compilation boundaries -- how far back/forward does the analysis extend?
 enum : u32
 {
@@ -99,6 +101,7 @@ enum
 	TRAPNO_PARITY_ERROR         = 58,
 	TRAPNO_EXTENDED_OVERFLOW    = 59,
 	TRAPNO_RANGE_ERROR          = 60,
+	TRAPNO_POINTER_ERROR        = TRAPNO_RANGE_ERROR,
 	TRAPNO_PRIVILEGE_ERROR      = TRAPNO_RANGE_ERROR,
 	TRAPNO_FRAME_ERROR          = TRAPNO_RANGE_ERROR,
 	TRAPNO_RESERVED2            = 61,

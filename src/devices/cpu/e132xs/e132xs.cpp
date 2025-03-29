@@ -31,6 +31,9 @@
  - GMS30C2232
 
  TODO:
+ - Pointer error exception on zero address register for interpreter
+ - Range error exception on store signed byte/half-word
+ - Fix behaviour of exceptions in delay slots
  - Fix behaviour of branches in delay slots
  - Many wrong cycle counts
  - No emulation of memory access latency and pipleline
