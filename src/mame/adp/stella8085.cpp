@@ -119,7 +119,7 @@ ROM_START( dicemstr ) // curiously hand-written stickers say F3 but strings in R
 ROM_END
 
 ROM_START( doppelpot )
-	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_REGION( 0x9000, "maincpu", 0 )
 	ROM_LOAD( "doppelpot.ice6",  0x0000, 0x4000, CRC(b01d3307) SHA1(8364506e8169432ddec275ef5b53660c01dc209e) )
 	ROM_LOAD( "doppelpot.icd6", 0x4000, 0x4000, CRC(153708cb) SHA1(3d15b115ec39c1df42d4437226e83413f495c4d9) )
 	ROM_LOAD( "doppelpot.icc5", 0x8000, 0x1000, CRC(135dac6b) SHA1(10873ee64579245eac7069bf84d61550684e67de) )
