@@ -436,7 +436,8 @@ ROM_START( qiji6 )
 	ROM_LOAD( "sp.3", 0x00000, 0x80000, CRC(06b70fe9) SHA1(5df34f870d32893b5c3095fb9653954209712cdb) )
 ROM_END
 
-// 花花世界 5 (Huāhuā Shìjiè 5)
+// 花花世界 5 (Huāhuā Shìjiè 5) / 飞行世界 (Fēixíng Shìjiè)
+// Alternate title is shown if the card type is changed in the test menu
 // IGS PCB-0405-02-FZ + IGS PCB-0492-00 riser board
 ROM_START( huahuas5 )
 	ROM_REGION( 0x4000, "maincpu", 0 )
@@ -475,6 +476,6 @@ void igs_m027_033vid_state::init_huahuas5()
 ***************************************************************************/
 
 // internal ROM date is 2002, external software revision could be later
-GAME( 2002, qiji6,    0, m027_033vid, qiji6,    igs_m027_033vid_state, init_qiji6,    ROT0, "IGS", "Qiji 6 (V118CN)",          MACHINE_NOT_WORKING ) // lacks hopper support
+GAME( 2002, qiji6,    0, m027_033vid, qiji6,    igs_m027_033vid_state, init_qiji6,    ROT0, "IGS", "Qiji 6 (V118CN)",                           MACHINE_NOT_WORKING ) // lacks hopper support
 // internal ROM date is 2004, external software revision could be later
-GAME( 2004, huahuas5, 0, m027_033vid, huahuas5, igs_m027_033vid_state, init_huahuas5, ROT0, "IGS", "Huahua Shijie 5 (V107CN)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // lacks hopper support, Oki banking
+GAME( 2004, huahuas5, 0, m027_033vid, huahuas5, igs_m027_033vid_state, init_huahuas5, ROT0, "IGS", "Huahua Shijie 5 / Feixing Shijie (V107CN)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // lacks hopper support, Oki banking
