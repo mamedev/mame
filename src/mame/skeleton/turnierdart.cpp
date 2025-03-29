@@ -2,7 +2,7 @@
 // copyright-holders:
 /************************************************************************
 
-Skeleton driver for "Turnier Dart" darts machine from Löwen S.P.O.R.T. 
+Skeleton driver for "Turnier Dart" darts machine from Löwen S.P.O.R.T.
 (NSM-Löwen, now Löwen Entertainment, part of Novomatic Group).
 
 PCB silkscreened "Valley Recreation Products - Coyright © 1997".
@@ -113,7 +113,7 @@ ROM_END
 /* Older version, with the following games:
 
     GAMES            OPTION I        OPTION II
-   ---------------  --------------  -----------------  
+   ---------------  --------------  -----------------
    301              DOUBLE IN       TEAM: 2 SPIELEN
    501              DOUBLE OUT      TEAM: 4 SPIELEN
    701              MASTERS OUT     HANDICAP
@@ -122,7 +122,7 @@ ROM_END
    HI SCORE         CUT THROAT
    SHANGHAI         MASTERS CRCKET
    301 ELIMINATION  CUT THROAT
-   SPLIT SCORE       
+   SPLIT SCORE
    RAPID FIRE
 */
 ROM_START(turnierda)
