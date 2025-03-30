@@ -349,12 +349,12 @@ void drifto94_state::dsp_data_map(address_map &map)
 
 uint16_t drifto94_state::dsp_dr_r()
 {
-	return m_dsp->snesdsp_read(true);
+	return m_dsp->host_r(true);
 }
 
 void drifto94_state::dsp_dr_w(uint16_t data)
 {
-	m_dsp->snesdsp_write(true, data);
+	m_dsp->host_w(true, data);
 }
 
 uint16_t drifto94_state::dsp_r(offs_t offset)

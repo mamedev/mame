@@ -216,28 +216,30 @@ void tsispch_state::peripheral_w(uint8_t data)
 *****************************************************************************/
 uint16_t tsispch_state::dsp_data_r()
 {
-	uint8_t r = m_dsp->snesdsp_read(true);
-	LOGDSP("dsp data read: %02x\n", r);
+	uint8_t r = m_dsp->host_r(true);
+	if (!machine().side_effects_disabled())
+		LOGDSP("dsp data read: %02x\n", r);
 	return r;
 }
 
 void tsispch_state::dsp_data_w(uint16_t data)
 {
 	LOGDSP("dsp data write: %02x\n", data);
-	m_dsp->snesdsp_write(true, data);
+	m_dsp->host_w(true, data);
 }
 
 uint16_t tsispch_state::dsp_status_r()
 {
-	uint8_t r = m_dsp->snesdsp_read(false);
-	LOGDSP("dsp status read: %02x\n", r);
+	uint8_t r = m_dsp->host_r(false);
+	if (!machine().side_effects_disabled())
+		LOGDSP("dsp status read: %02x\n", r);
 	return r;
 }
 
 void tsispch_state::dsp_status_w(uint16_t data)
 {
 	LOG("warning: upd772x status register should never be written to!\n");
-	m_dsp->snesdsp_write(false, data);
+	m_dsp->host_w(false, data);
 }
 
 void tsispch_state::dsp_to_8086_p0_w(int state)

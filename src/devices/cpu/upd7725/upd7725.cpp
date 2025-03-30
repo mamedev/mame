@@ -569,7 +569,7 @@ void necdsp_device::exec_ld(uint32_t opcode) {
 	}
 }
 
-uint8_t necdsp_device::snesdsp_read(bool mode) {
+uint8_t necdsp_device::host_r(bool mode) {
 	if (!mode)
 	{
 		return regs.sr >> 8;
@@ -580,25 +580,30 @@ uint8_t necdsp_device::snesdsp_read(bool mode) {
 		//16-bit
 		if(regs.sr.drs == 0)
 		{
-			regs.sr.drs = 1;
+			if (!machine().side_effects_disabled())
+				regs.sr.drs = 1;
 			return regs.dr >> 0;
 		}
 		else
 		{
-			regs.sr.rqm = 0;
-			regs.sr.drs = 0;
+			if (!machine().side_effects_disabled())
+			{
+				regs.sr.rqm = 0;
+				regs.sr.drs = 0;
+			}
 			return regs.dr >> 8;
 		}
 	}
 	else
 	{
 		//8-bit
-		regs.sr.rqm = 0;
+		if (!machine().side_effects_disabled())
+			regs.sr.rqm = 0;
 		return regs.dr >> 0;
 	}
 }
 
-void necdsp_device::snesdsp_write(bool mode, uint8_t data) {
+void necdsp_device::host_w(bool mode, uint8_t data) {
 	if (!mode) return;
 
 	if (regs.sr.drc == 0)

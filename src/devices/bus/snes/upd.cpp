@@ -142,14 +142,14 @@ void sns_rom20_necdsp_device::device_add_mconfig(machine_config &config)
 uint8_t sns_rom20_necdsp_device::chip_read(offs_t offset)
 {
 	offset &= 0x7fff;
-	return m_upd7725->snesdsp_read(offset < 0x4000);
+	return m_upd7725->host_r(offset < 0x4000);
 }
 
 
 void sns_rom20_necdsp_device::chip_write(offs_t offset, uint8_t data)
 {
 	offset &= 0x7fff;
-	m_upd7725->snesdsp_write(offset < 0x4000, data);
+	m_upd7725->host_w(offset < 0x4000, data);
 }
 
 
@@ -200,14 +200,14 @@ void sns_rom21_necdsp_device::device_add_mconfig(machine_config &config)
 uint8_t sns_rom21_necdsp_device::chip_read(offs_t offset)
 {
 	offset &= 0x1fff;
-	return m_upd7725->snesdsp_read(offset < 0x1000);
+	return m_upd7725->host_r(offset < 0x1000);
 }
 
 
 void sns_rom21_necdsp_device::chip_write(offs_t offset, uint8_t data)
 {
 	offset &= 0x1fff;
-	m_upd7725->snesdsp_write(offset < 0x1000, data);
+	m_upd7725->host_w(offset < 0x1000, data);
 }
 
 
@@ -220,7 +220,7 @@ void sns_rom21_necdsp_device::chip_write(offs_t offset, uint8_t data)
 uint8_t sns_rom_setadsp_device::chip_read(offs_t offset)
 {
 	if (offset >= 0x600000 && offset < 0x680000 && (offset & 0xffff) < 0x4000)
-		m_upd96050->snesdsp_read((offset & 0x01) ? false : true);
+		m_upd96050->host_r((offset & 0x01) ? false : true);
 
 	if (offset >= 0x680000 && offset < 0x700000 && (offset & 0xffff) < 0x8000)
 	{
@@ -240,7 +240,7 @@ void sns_rom_setadsp_device::chip_write(offs_t offset, uint8_t data)
 {
 	if (offset >= 0x600000 && offset < 0x680000 && (offset & 0xffff) < 0x4000)
 	{
-		m_upd96050->snesdsp_write((offset & 0x01) ? false : true, data);
+		m_upd96050->host_w((offset & 0x01) ? false : true, data);
 		return;
 	}
 

@@ -36,8 +36,8 @@ public:
 	auto p0() { return m_out_p0_cb.bind(); }
 	auto p1() { return m_out_p1_cb.bind(); }
 
-	uint8_t snesdsp_read(bool mode);
-	void snesdsp_write(bool mode, uint8_t data);
+	uint8_t host_r(bool mode);
+	void host_w(bool mode, uint8_t data);
 
 protected:
 	// construction/destruction
