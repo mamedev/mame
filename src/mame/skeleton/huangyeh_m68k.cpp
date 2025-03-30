@@ -93,6 +93,7 @@ private:
 
 	void main_program_map(address_map &map) ATTR_COLD;
 	void audio_program_map(address_map &map) ATTR_COLD;
+    void audio_io_map(address_map &map) ATTR_COLD;
 	void ramdac_map(address_map &map) ATTR_COLD;
 	void hd63484_map(address_map &map) ATTR_COLD;
 };
@@ -115,7 +116,10 @@ void huangyeh_m68k_state::audio_program_map(address_map &map)
 	map(0xf000, 0xf7ff).ram();
 	map(0xf880, 0xf881).w("ymsnd", FUNC(ym3812_device::write));
 }
-
+void huangyeh_m68k_state::audio_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+}
 void huangyeh_m68k_state::ramdac_map(address_map &map)
 {
 	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
@@ -184,6 +188,7 @@ void huangyeh_m68k_state::wlzb(machine_config &config)
 
 	z80_device &audiocpu(Z80(config, "audiocpu", 8.448_MHz_XTAL / 2));
 	audiocpu.set_addrmap(AS_PROGRAM, &huangyeh_m68k_state::audio_program_map);
+    audiocpu.set_addrmap(AS_IO, &huangyeh_m68k_state::audio_io_map);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO: verify everything once emulation works
