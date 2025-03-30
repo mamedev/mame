@@ -3096,7 +3096,7 @@ Hardware Info By Guru
 |TDA1519A                                              |
 |       VOL         HM86171                            |
 |-|      LM324                              ULN2003    |
-  |DS1230.Q3    S-1                         ULN2003    |
+  |DS2430.Q3    S-1                         ULN2003    |
 |-|             SND.U10 |-------|   |-------|       DS1|
 |      LM7805     %     |SUBSINO|   |SUBSINO|          |
 |                       |SS9904 |   |SS9802 |          |
@@ -3121,7 +3121,7 @@ Notes:
      CXK58257 - Sony CXK58257 32kB x8-bit SRAM (SOP28). This RAM is battery-backed.
       HM86171 - Hualon Microelectronics HMC HM86171 VGA 256 colour RAMDAC (DIP28)
        SS9904 - Custom Subsino Sound Chip (QFP100)
-       SS9802 - Custom Subsino Chip (QFP100) (I/O & Protection; DS1230A is connected to this chip)
+       SS9802 - Custom Subsino Chip (QFP100) (I/O & Protection; DS2430A is connected to this chip)
        SS9803 - Custom Subsino Chip (QFP100) (Memory Controller)
        SS9601 - Custom Subsino Chip (QFP160) (Graphics)
           S-1 - Some kind of Audio DAC (DIP8). Connected to LM324 Operational Amplifier
@@ -3134,7 +3134,7 @@ Notes:
          XTAL - Bishou Jan uses 44.1MHz Crystal
                 Xiao Ao Jiang Hu uses 44.1MHz Crystal
                 Queen Bee New uses 48.94MHz Crystal
-    DS1230.Q3 - Dallas DS1230A 1-Wire EEPROM (TO92). Hidden among other parts disguised as a transistor.
+    DS2430.Q3 - Dallas DS2430A 1-Wire EEPROM (TO92). Hidden among other parts disguised as a transistor.
                 Each game has different EEPROM data used for protection.
                 All these have the surface scratched and the part location is marked Q3.
      PROG.U21 - 27C020 or 27C040 EPROM (main program)
