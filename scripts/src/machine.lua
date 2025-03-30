@@ -3012,6 +3012,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/rescap.h,MACHINES["RC"] = true
+---------------------------------------------------
+
+if (MACHINES["RC"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/rc.cpp",
+		MAME_DIR .. "src/devices/machine/rc.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/rf5c296.h,MACHINES["RF5C296"] = true
 ---------------------------------------------------
 
