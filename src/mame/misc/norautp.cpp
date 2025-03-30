@@ -90,50 +90,50 @@
 
 *******************************************************************************
 
-
-  HARDWARE NOTES:
+  Hardware Notes:
   ---------------
 
-  Noraut Edge Connector (pinouts)
-  --------------------------------
-  Component     PN   Solder Side
-  --------------------------------
-  GND           01   GND
-  5v DC         02   5v DC
-                03
-  12v DC        04   12v DC
-                05
-                06
-                07
-  0v            08   Readout Switch
-  0v            09   Low level hopper
-  0v            10   50p in
-  0v            11   pound in
-  0v            12   Bet switch
-  0v            13   Deal switch
-  0v            14   Hold 1 switch
-  0v            15   Half Gamble switch
-  0v            16   Change Card switch
-  Refil         17   Coin count/sense from hopper
-  Low Switch    18   High switch
-  Hold 3 Switch 19   Hold 2 switch
-  Hold 5 Switch 20   Hold 4 switch
-  10p coin      21   Deflect
-                22   50p in meter
-                23   Hopper Motor Drive (low volt switch line NOT 24v)
-                24
-                25   spk+
-                26   Panel lamps clock
-  Monitor sync  27   Hold 1 lamp
-  Bet lamp      28   Deal lamp
-  Change lamp   29   Hold 4 lamp
-  Hold 5 lamp   30   Panel lights reset
-  High lamp     31   Half Gamble lamp
-  Hold 2 lamp   32   Low lamp
-  10p Meter out 33   Meter refil
-  Video Green   34   Hold 3 lamp
-  Video Blue    35   10p in Meter
-  Video Red     36   Spark Detect (Not on all boards)
+  Noraut Edge Connector (pinouts):
+
+  ------------------+----+------------------
+        Component   | PN |   Solder Side
+  ------------------+----+------------------
+                GND | 01 | GND
+                +5V | 02 | +5V
+                -5V | 03 | -5V
+               +12V | 04 | +12V
+                    | 05 | V-sync
+                    | 06 | H-sync
+                    | 07 |
+                GND | 08 | Readout/Audit switch
+                GND | 09 | Low level hopper
+                GND | 10 | 50p coin in
+                GND | 11 | 1 pound in
+                GND | 12 | Bet switch
+                GND | 13 | Deal/Draw switch
+                GND | 14 | Hold 1 switch
+                GND | 15 | Half Gamble switch
+                    | 16 | Strand / Change Card switch
+      Refill switch | 17 | Coin count/sense from hopper
+         Low Switch | 18 | High switch
+      Hold 3 Switch | 19 | Hold 2 switch
+      Hold 5 Switch | 20 | Hold 4 switch
+           10p coin | 21 | Deflect
+                    | 22 | 50p in meter
+                    | 23 | Hopper Motor Drive (low volt switch line NOT 24v)
+                    | 24 |
+                    | 25 | SPK+
+                    | 26 | Panel lamps clock
+         Video sync | 27 | Hold 1 lamp
+   Bet/Collect lamp | 28 | Deal/Draw lamp
+   Change card lamp | 29 | Hold 4 lamp
+        Hold 5 lamp | 30 | Panel lights reset
+          High lamp | 31 | Half Gamble lamp
+        Hold 2 lamp | 32 | Low lamp
+      10p Meter out | 33 | Meter refil
+        Video Green | 34 | Hold 3 lamp
+         Video Blue | 35 | 10p in Meter
+          Video Red | 36 | Spark Detect (Not on all boards)
 
 
 *******************************************************************************
@@ -668,6 +668,7 @@
     pma, gtipoker, smshilo, fastdrwp, sureshoto,
 	and dphlunkb.
   - Fixed more ASCII PCB layouts.
+  - Improved edge connector / pinout diagram.
   - Fixed documentation about the 3x PPI 8255 devices
     for both narout and DPHL types of hardware.
   - Documented control panels, and added/fixed a lot
