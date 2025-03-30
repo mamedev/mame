@@ -22,6 +22,7 @@
 #define LOG_ERR   (1U << 5)    // log errors
 #define LOG_WAIT  (1U << 6)    // wait mode
 #define LOG_DATA  (1U << 7)    // data read/writes
+#define LOG_SETUP (1U << 8)    // setup
 
 #define VERBOSE (0xff)
 
@@ -34,6 +35,7 @@
 #define LOGERR(...)        LOGMASKED(LOG_ERR, __VA_ARGS__)
 #define LOGWAIT(...)       LOGMASKED(LOG_WAIT, __VA_ARGS__)
 #define LOGDATA(...)       LOGMASKED(LOG_DATA, __VA_ARGS__)
+#define LOGSETUP(...)      LOGMASKED(LOG_SETUP, __VA_ARGS__)
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
@@ -49,9 +51,6 @@ class cdr_fdc_880h_device : public device_t, public device_h89bus_right_card_int
 public:
 	cdr_fdc_880h_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	virtual void write(u8 select_lines, u8 offset, u8 data) override;
-	virtual u8 read(u8 select_lines, u8 offset) override;
-
 	// The controller has two 16L8 PALs which are not dumped (z15 and z20 from schematics).
 	static constexpr feature_type unemulated_features() { return feature::DISK; }
 
@@ -60,6 +59,9 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+	void write(offs_t offset, u8 data);
+	u8 read(offs_t offset);
 
 	void cmd_w(u8 val);
 	void data_w(u8 val);
@@ -83,6 +85,7 @@ private:
 	required_device<fd1797_device>             m_fdc;
 	required_device_array<floppy_connector, 4> m_floppies;
 
+	bool                                       m_installed;
 	bool                                       m_irq_allowed;
 
 	bool                                       m_irq;
@@ -174,13 +177,8 @@ void cdr_fdc_880h_device::data_w(u8 val)
 	m_fdc->data_w(val);
 }
 
-void cdr_fdc_880h_device::write(u8 select_lines, u8 offset, u8 data)
+void cdr_fdc_880h_device::write(offs_t offset, u8 data)
 {
-	if (!(select_lines & h89bus_device::H89_CASS))
-	{
-		return;
-	}
-
 	LOGREG("%s: reg: %d val: 0x%02x\n", FUNCNAME, offset, data);
 
 	switch (offset)
@@ -263,13 +261,8 @@ u8 cdr_fdc_880h_device::data_r()
 	return data;
 }
 
-u8 cdr_fdc_880h_device::read(u8 select_lines, u8 offset)
+u8 cdr_fdc_880h_device::read(offs_t offset)
 {
-	if (!(select_lines & h89bus_device::H89_CASS))
-	{
-		return 0;
-	}
-
 	u8 value = 0;
 
 	switch (offset)
@@ -304,6 +297,9 @@ u8 cdr_fdc_880h_device::read(u8 select_lines, u8 offset)
 
 void cdr_fdc_880h_device::device_start()
 {
+	m_installed = false;
+
+	save_item(NAME(m_installed));
 	save_item(NAME(m_irq_allowed));
 	save_item(NAME(m_irq));
 	save_item(NAME(m_drq));
@@ -311,6 +307,27 @@ void cdr_fdc_880h_device::device_start()
 
 void cdr_fdc_880h_device::device_reset()
 {
+	if (!m_installed)
+	{
+		std::pair<u8, u8>  addr = h89bus().get_address_range(h89bus::IO_CASS);
+
+		// only install if non-zero address
+		if (addr.first)
+		{
+			LOGSETUP("%s: Address start: 0x%02x, end: 0x%02x\n", addr.first, addr.second);
+
+			h89bus().install_io_device(addr.first, addr.second,
+				read8sm_delegate(*this, FUNC(cdr_fdc_880h_device::read)),
+				write8sm_delegate(*this, FUNC(cdr_fdc_880h_device::write)));
+		}
+		else
+		{
+			LOGSETUP("%s: No address specified - Address start: 0x%02x, end: 0x%02x\n", addr.first, addr.second);
+		}
+
+		m_installed = true;
+	}
+
 	m_irq_allowed = false;
 	m_irq         = false;
 

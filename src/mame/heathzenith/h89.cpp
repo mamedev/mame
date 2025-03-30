@@ -128,6 +128,8 @@ protected:
 
 	u32  m_cpu_speed_multiplier;
 
+	bool m_installed;
+
 	// Clocks
 	static constexpr XTAL H89_CLOCK                      = XTAL(12'288'000) / 6;
 	static constexpr XTAL INS8250_CLOCK                  = XTAL(1'843'200);
@@ -142,7 +144,8 @@ protected:
 	void update_mem_view();
 
 	void update_gpp(u8 gpp);
-	void port_f2_w(offs_t offset, u8 data);
+	void port_f2_w(u8 data);
+	u8 read_sw();
 
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
@@ -343,36 +346,6 @@ u8 h89_base_state::m1_r(offs_t offset)
 	return data;
 }
 
-/*
-                                   PORT
-    Use                      |  Hex  |  Octal
-   --------------------------+-------+---------
-    Not specified, available |  0-77 |   0-167
-    Disk I/O #1              | 78-7B | 170-173
-    Disk I/O #2              | 7C-7F | 174-177
-    Not specified, reserved  | 80-CF | 200-317
-    DCE Serial I/O           | D0-D7 | 320-327
-    DTE Serial I/O           | D8-DF | 330-337
-    DCE Serial I/O           | EO-E7 | 340-347
-    Console I/O              | E8-EF | 350-357
-    NMI                      | F0-F1 | 360-361
-    General purpose port     |    F2 |     362
-    Cassette I/O(MTR-88 only)| F8-F9 | 370-371
-    NMI                      | FA-FB | 372-373
-
-    Disk I/O #1 - 0170-0173 (0x78-0x7b)
-       Heath Options
-         - H37 5-1/4" Soft-sectored Controller - Requires MTR-90 ROM
-         - H47 Dual 8" Drives - Requires MTR-89 or MTR-90 ROM
-         - H67 8" Hard disk + 8" Floppy Drives - Requires MTR-90 ROM
-
-    Disk I/O #2 - 0174-0177 (0x7c-0x7f)
-       Heath Options
-         - 5-1/4" Hard-sectored Controller - supported by all ROMs
-         - H47 Dual 8" Drives - Requires MTR-89 or MTR-90 ROM
-         - H67 8" Hard disk + 8" Floppy Drives - MTR-90 ROM
-
-*/
 void h89_base_state::h89_base_io(address_map &map)
 {
 	map.unmap_value_high();
@@ -669,6 +642,9 @@ void h89_base_state::machine_start()
 	save_item(NAME(m_555a_latch));
 	save_item(NAME(m_555b_latch));
 	save_item(NAME(m_556b_latch));
+	save_item(NAME(m_installed));
+
+	m_installed = false;
 
 	m_maincpu->space(AS_PROGRAM).specific(m_program);
 
@@ -715,8 +691,31 @@ void h89_base_state::machine_start()
 	m_floppy_ram_we       = false;
 }
 
+u8 h89_base_state::read_sw()
+{
+	return m_sw501->read();
+}
+
 void h89_base_state::machine_reset()
 {
+	if (!m_installed)
+	{
+		m_h89bus->install_io_device(0xe8, 0xef,
+			read8sm_delegate(*m_console, FUNC(ins8250_device::ins8250_r)),
+			write8sm_delegate(*m_console, FUNC(ins8250_device::ins8250_w)));
+		m_h89bus->install_io_device(0xf0, 0xf1,
+			read8smo_delegate(*this, FUNC(h89_base_state::raise_NMI_r)),
+			write8smo_delegate(*this, FUNC(h89_base_state::raise_NMI_w)));
+		m_h89bus->install_io_device(0xf2, 0xf2,
+			read8smo_delegate(*this, FUNC(h89_base_state::read_sw)),
+			write8smo_delegate(*this, FUNC(h89_base_state::port_f2_w)));
+		m_h89bus->install_io_device(0xfa, 0xfb,
+			read8smo_delegate(*this, FUNC(h89_base_state::raise_NMI_r)),
+			write8smo_delegate(*this, FUNC(h89_base_state::raise_NMI_w)));
+
+		m_installed = true;
+	}
+
 	m_rom_enabled         = true;
 	m_timer_intr_enabled  = true;
 	m_single_step_enabled = false;
@@ -785,7 +784,7 @@ void h89_base_state::console_intr(int data)
 
 template <int line> void h89_base_state::slot_irq(int state)
 {
-	   m_intr_socket->set_irq_level(line, state);
+	m_intr_socket->set_irq_level(line, state);
 }
 
 template void h89_base_state::slot_irq<3>(int state);
@@ -875,7 +874,7 @@ void h89_base_state::update_gpp(u8 gpp)
 }
 
 // General Purpose Port
-void h89_base_state::port_f2_w(offs_t offset, u8 data)
+void h89_base_state::port_f2_w(u8 data)
 {
 	update_gpp(data);
 
@@ -907,7 +906,7 @@ static void intr_ctrl_options(device_slot_interface &device)
 
 void h89_base_state::h89_left_cards(device_slot_interface &device)
 {
-	device.option_add("ss_parallel", H89BUS_SIGMASOFT_PARALLEL);
+	device.option_add("ss_parallel",     H89BUS_SIGMASOFT_PARALLEL);
 	device.option_add("ss_parallel_igc", H89BUS_SIGMASOFT_PARALLEL_IGC).machine_config(
 		[this](device_t *device)
 		{
@@ -918,13 +917,12 @@ void h89_base_state::h89_left_cards(device_slot_interface &device)
 void h89_base_state::h89_right_cards(device_slot_interface &device)
 {
 	device.option_add("cdr_fdc", H89BUS_CDR_FDC_880H);
-	device.option_add("h_88_3", H89BUS_H_88_3);
+	device.option_add("h_88_3",  H89BUS_H_88_3);
 	device.option_add("ha_88_3", H89BUS_HA_88_3);
-	device.option_add("h_88_5", H89BUS_H_88_5);
-	device.option_add("ss_snd", H89BUS_SIGMASOFT_SND);
+	device.option_add("h_88_5",  H89BUS_H_88_5);
+	device.option_add("ss_snd",  H89BUS_SIGMASOFT_SND);
 	device.option_add("z_89_11", H89BUS_Z_89_11);
-
-	device.option_add("z37fdc", H89BUS_Z37).machine_config(
+	device.option_add("z37fdc",  H89BUS_Z37).machine_config(
 		[this](device_t *device)
 		{
 			downcast<h89bus_z37_device &>(*device).set_intr_cntrl(m_intr_socket);
@@ -943,10 +941,18 @@ void h89_base_state::h89_right_cards_mms(device_slot_interface &device)
 
 void h89_base_state::h89_right_p506_cards(device_slot_interface &device)
 {
-	device.option_add("h_88_3", H89BUS_H_88_3);
-	device.option_add("ha_88_3", H89BUS_HA_88_3);
-	device.option_add("ss_snd", H89BUS_SIGMASOFT_SND);
+	device.option_add("h_88_3",    H89BUS_H_88_3);
+	device.option_add("ha_88_3",   H89BUS_HA_88_3);
+	device.option_add("ss_snd",    H89BUS_SIGMASOFT_SND);
 	device.option_add("we_pullup", H89BUS_WE_PULLUP);
+}
+
+static void io_decoder_options(device_slot_interface &device)
+{
+	device.option_add("h88",   H89BUS_IO_DECODE_444_43);
+	device.option_add("heath", H89BUS_IO_DECODE_444_61);
+	device.option_add("mms",   H89BUS_IO_DECODE_MMS_61C);
+	device.option_add("cdr",   H89BUS_IO_DECODE_CDR_86);
 }
 
 void h89_base_state::h89_base(machine_config &config)
@@ -983,12 +989,6 @@ void h89_base_state::h89_base(machine_config &config)
 	H89BUS(config, m_h89bus, 0);
 	m_h89bus->set_program_space(m_maincpu, AS_PROGRAM);
 	m_h89bus->set_io_space(m_maincpu, AS_IO);
-	m_h89bus->in_tlb_callback().set(m_console, FUNC(ins8250_device::ins8250_r));
-	m_h89bus->out_tlb_callback().set(m_console, FUNC(ins8250_device::ins8250_w));
-	m_h89bus->in_nmi_callback().set(FUNC(h89_base_state::raise_NMI_r));
-	m_h89bus->out_nmi_callback().set(FUNC(h89_base_state::raise_NMI_w));
-	m_h89bus->in_gpp_callback().set_ioport(m_sw501);
-	m_h89bus->out_gpp_callback().set(FUNC(h89_base_state::port_f2_w));
 	m_h89bus->out_int3_callback().set(FUNC(h89_base_state::slot_irq<3>));
 	m_h89bus->out_int4_callback().set(FUNC(h89_base_state::slot_irq<4>));
 	m_h89bus->out_int5_callback().set(FUNC(h89_base_state::slot_irq<5>));
@@ -1008,40 +1008,42 @@ void h89_base_state::h89_base(machine_config &config)
 void h88_state::h88(machine_config &config)
 {
 	h89_base(config);
-	m_h89bus->set_default_bios_tag("444-43");
 
 	m_intr_socket->set_default_option("original");
 	m_intr_socket->set_fixed(true);
 
 	H89BUS_RIGHT_SLOT(config.replace(), "p504", "h89bus", [this](device_slot_interface &device) { h89_right_cards(device); }, "h_88_5");
+
+	H89BUS_IO_DECODE_SOCKET(config, "h89bus:io_decoder", io_decoder_options, "h88");
 }
 
 void h89_state::h89(machine_config &config)
 {
 	h89_base(config);
-	m_h89bus->set_default_bios_tag("444-61");
 
 	m_intr_socket->set_default_option("h37");
 	m_intr_socket->set_fixed(true);
 
 	H89BUS_RIGHT_SLOT(config.replace(), "p504", "h89bus", [this](device_slot_interface &device) { h89_right_cards(device); }, "z37fdc");
+
+	H89BUS_IO_DECODE_SOCKET(config, "h89bus:io_decoder", io_decoder_options, "heath");
 }
 
 void h89_cdr_state::h89_cdr(machine_config &config)
 {
 	h89_base(config);
-	m_h89bus->set_default_bios_tag("cdr86");
 
 	m_intr_socket->set_default_option("original");
 	m_intr_socket->set_fixed(true);
 
 	H89BUS_RIGHT_SLOT(config.replace(), "p504", "h89bus", [this](device_slot_interface &device) { h89_right_cards(device); }, "cdr_fdc");
+
+	H89BUS_IO_DECODE_SOCKET(config, "h89bus:io_decoder", io_decoder_options, "cdr");
 }
 
 void h89_mms_state::h89_mms(machine_config &config)
 {
 	h89_base(config);
-	m_h89bus->set_default_bios_tag("444-61c");
 
 	// the card selection is different with the MMS mapping PROM
 	H89BUS_RIGHT_SLOT(config.replace(), "p504", "h89bus", [this](device_slot_interface &device) { h89_right_cards_mms(device); }, "mms77316");
@@ -1049,6 +1051,8 @@ void h89_mms_state::h89_mms(machine_config &config)
 
 	m_intr_socket->set_default_option("mms");
 	m_intr_socket->set_fixed(true);
+
+	H89BUS_IO_DECODE_SOCKET(config, "h89bus:io_decoder", io_decoder_options, "mms");
 }
 
 #define ROM_H17 \
@@ -1095,13 +1099,13 @@ void h89_mms_state::h89_mms(machine_config &config)
 		ROMX_LOAD("2732_sigma_rom_v_1.2.bin", 0x0000, 0x1000, CRC(c4ff47c5) SHA1(d6f3d71ff270a663003ec18a3ed1fa49f627123a), ROM_BIOS(x))
 
 #define ROM_CDR_8390(x) \
-	ROM_SYSTEM_BIOS(x, "cdr8390", "CDR 8390") \
-	ROMX_LOAD("2732_cdr8390.u518",        0x0000, 0x1000, CRC(1d30fe43) SHA1(170092d1b62cf88edd29338b474e799c249a0dd7), ROM_BIOS(x))
+		ROM_SYSTEM_BIOS(x, "cdr8390", "CDR 8390") \
+		ROMX_LOAD("2732_cdr8390.u518",        0x0000, 0x1000, CRC(1d30fe43) SHA1(170092d1b62cf88edd29338b474e799c249a0dd7), ROM_BIOS(x))
 
 // NOTE: this rom is not currently working
 #define ROM_CDR_80B2(x) \
-	ROM_SYSTEM_BIOS(x, "cdr80b2", "CDR 80B2") \
-	ROMX_LOAD("2732_cdr80b2.u518",        0x0000, 0x1000, CRC(804a6898) SHA1(a58daca0baf7b5d7c1485531680bd63168eb2d7e), ROM_BIOS(x))
+		ROM_SYSTEM_BIOS(x, "cdr80b2", "CDR 80B2") \
+		ROMX_LOAD("2732_cdr80b2.u518",        0x0000, 0x1000, CRC(804a6898) SHA1(a58daca0baf7b5d7c1485531680bd63168eb2d7e), ROM_BIOS(x))
 
 
 ROM_START( h88 )

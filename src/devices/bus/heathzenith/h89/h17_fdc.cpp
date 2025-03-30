@@ -25,6 +25,7 @@
 #define LOG_LINES (1U << 2) // Control lines
 #define LOG_DRIVE (1U << 3) // Drive select
 #define LOG_FUNC  (1U << 4) // Function calls
+#define LOG_SETUP (1U << 5)
 
 //#define VERBOSE (LOG_GENERAL | LOG_REG | LOG_LINES | LOG_DRIVE | LOG_FUNC)
 
@@ -34,6 +35,7 @@
 #define LOGLINES(...)      LOGMASKED(LOG_LINES, __VA_ARGS__)
 #define LOGDRIVE(...)      LOGMASKED(LOG_DRIVE, __VA_ARGS__)
 #define LOGFUNC(...)       LOGMASKED(LOG_FUNC, __VA_ARGS__)
+#define LOGSETUP(...)      LOGMASKED(LOG_SETUP, __VA_ARGS__)
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
@@ -50,9 +52,6 @@ public:
 
 	auto floppy_ram_wp_cb() { return m_floppy_ram_wp.bind(); }
 
-	virtual void write(u8 select_lines, u8 offset, u8 data) override;
-	virtual u8 read(u8 select_lines, u8 offset) override;
-
 	[[maybe_unused]] void side_select_w(int state);
 
 protected:
@@ -62,8 +61,11 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
+	void write(offs_t offset, u8 data);
+	u8 read(offs_t offset);
+
 	void ctrl_w(u8 val);
-	u8   floppy_status_r();
+	u8 floppy_status_r();
 
 	static void floppy_formats(format_registration &fr);
 	void set_floppy(floppy_image_device *floppy);
@@ -80,6 +82,8 @@ protected:
 	required_device<s2350_device> m_s2350;
 	required_device_array<floppy_connector, MAX_FLOPPY_DRIVES> m_floppies;
 	required_device<timer_device> m_tx_timer;
+
+	bool m_installed;
 
 	bool m_motor_on;
 	bool m_write_gate;
@@ -116,13 +120,8 @@ heath_h17_fdc_device::heath_h17_fdc_device(const machine_config &mconfig, const 
 {
 }
 
-void heath_h17_fdc_device::write(u8 select_lines, u8 offset, u8 data)
+void heath_h17_fdc_device::write(offs_t offset, u8 data)
 {
-	if (!(select_lines & h89bus_device::H89_FLPY))
-	{
-		return;
-	}
-
 	LOGFUNC("%s: reg: %d val: 0x%02x\n", FUNCNAME, offset, data);
 
 	switch (offset)
@@ -248,13 +247,8 @@ void heath_h17_fdc_device::ctrl_w(u8 val)
 	m_floppy_ram_wp(BIT(val, CTRL_WRITE_ENABLE_RAM));
 }
 
-u8 heath_h17_fdc_device::read(u8 select_lines, u8 offset)
+u8 heath_h17_fdc_device::read(offs_t offset)
 {
-	if (!(select_lines & h89bus_device::H89_FLPY))
-	{
-		return 0;
-	}
-
 	u8 val = 0;
 
 	switch (offset)
@@ -309,6 +303,9 @@ u8 heath_h17_fdc_device::floppy_status_r()
 
 void heath_h17_fdc_device::device_start()
 {
+	m_installed = false;
+
+	save_item(NAME(m_installed));
 	save_item(NAME(m_motor_on));
 	save_item(NAME(m_write_gate));
 	save_item(NAME(m_sync_char_received));
@@ -318,7 +315,22 @@ void heath_h17_fdc_device::device_start()
 
 void heath_h17_fdc_device::device_reset()
 {
-	LOGFUNC("%s\n", FUNCNAME);
+	if (!m_installed)
+	{
+		std::pair<u8, u8>  addr = h89bus().get_address_range(h89bus::IO_FLPY);
+
+		// only install if non-zero address
+		if (addr.first)
+		{
+			LOGSETUP("%s: Address start: 0x%02x, end: 0x%02x\n", addr.first, addr.second);
+
+			h89bus().install_io_device(addr.first, addr.second,
+				read8sm_delegate(*this, FUNC(heath_h17_fdc_device::read)),
+				write8sm_delegate(*this, FUNC(heath_h17_fdc_device::write)));
+		}
+
+		m_installed = true;
+	}
 
 	m_motor_on           = false;
 	m_write_gate         = false;
@@ -355,7 +367,6 @@ void heath_h17_fdc_device::device_add_mconfig(machine_config &config)
 
 	for (int i = 0; i < MAX_FLOPPY_DRIVES; i++)
 	{
-		// TODO -> add (and define) heath hard-sectored floppy formats.
 		FLOPPY_CONNECTOR(config, m_floppies[i], h17_floppies, "ssdd", heath_h17_fdc_device::floppy_formats);
 		m_floppies[i]->enable_sound(true);
 	}

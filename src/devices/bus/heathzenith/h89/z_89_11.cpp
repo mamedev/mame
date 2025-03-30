@@ -23,24 +23,12 @@ public:
 
 	z_89_11_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = XTAL(1'843'200).value());
 
-	virtual void write(u8 select_lines, u8 offset, u8 data) override;
-	virtual u8 read(u8 select_lines, u8 offset) override;
-
 protected:
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
-
-	void lp_w(offs_t reg, u8 val);
-	u8 lp_r(offs_t reg);
-
-	void aux_w(offs_t reg, u8 val);
-	u8 aux_r(offs_t reg);
-
-	void modem_w(offs_t reg, u8 val);
-	u8 modem_r(offs_t reg);
 
 	void update_intr(u8 level);
 
@@ -53,6 +41,7 @@ protected:
 	required_ioport                  m_cfg_aux;
 	required_ioport                  m_cfg_modem;
 
+	bool m_installed;
 
 	bool m_lp_enabled;
 	bool m_aux_enabled;
@@ -84,76 +73,6 @@ z_89_11_device::z_89_11_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-u8 z_89_11_device::read(u8 select_lines, u8 offset)
-{
-	if ((select_lines & h89bus_device::H89_SER0) && (m_aux_enabled))
-	{
-		return aux_r(offset);
-	}
-
-	if ((select_lines & h89bus_device::H89_SER1) && (m_modem_enabled))
-	{
-		return modem_r(offset);
-	}
-
-	if ((select_lines & h89bus_device::H89_LP) && (m_lp_enabled))
-	{
-		return lp_r(offset);
-	}
-
-	return 0;
-}
-
-void z_89_11_device::write(u8 select_lines, u8 offset, u8 data)
-{
-	if ((select_lines & h89bus_device::H89_SER0) && (m_aux_enabled))
-	{
-		aux_w(offset, data);
-		return;
-	}
-
-	if ((select_lines & h89bus_device::H89_SER1) && (m_modem_enabled))
-	{
-		modem_w(offset, data);
-		return;
-	}
-
-	if ((select_lines & h89bus_device::H89_LP) && (m_lp_enabled))
-	{
-		lp_w(offset, data);
-		return;
-	}
-}
-
-u8 z_89_11_device::lp_r(offs_t reg)
-{
-	return m_lp->read(reg);
-}
-
-void z_89_11_device::lp_w(offs_t reg, u8 val)
-{
-	m_lp->write(reg, val);
-}
-
-u8 z_89_11_device::aux_r(offs_t reg)
-{
-	return m_aux->ins8250_r(reg);
-}
-
-void z_89_11_device::aux_w(offs_t reg, u8 val)
-{
-	m_aux->ins8250_w(reg, val);
-}
-
-u8 z_89_11_device::modem_r(offs_t reg)
-{
-	return m_modem->read(reg);
-}
-
-void z_89_11_device::modem_w(offs_t reg, u8 val)
-{
-	m_modem->write(reg, val);
-}
 
 void z_89_11_device::update_intr(u8 level)
 {
@@ -207,6 +126,9 @@ void z_89_11_device::aux_int(int data)
 
 void z_89_11_device::device_start()
 {
+	m_installed = false;
+
+	save_item(NAME(m_installed));
 	save_item(NAME(m_lp_intr));
 	save_item(NAME(m_aux_intr));
 	save_item(NAME(m_modem_intr));
@@ -230,6 +152,50 @@ void z_89_11_device::device_reset()
 
 	// MODEM Interrupt level
 	m_modem_int_idx = BIT(cfg_modem, 1, 2);
+
+	if (!m_installed)
+	{
+		if (m_lp_enabled)
+		{
+			std::pair<u8, u8>  addr = h89bus().get_address_range(h89bus::IO_LP);
+
+			// only install if non-zero address
+			if (addr.first)
+			{
+				h89bus().install_io_device(addr.first, addr.second,
+					read8sm_delegate(m_lp, FUNC(i8255_device::read)),
+					write8sm_delegate(m_lp, FUNC(i8255_device::write)));
+			}
+		}
+
+		if (m_aux_enabled)
+		{
+			std::pair<u8, u8>  addr = h89bus().get_address_range(h89bus::IO_SER0);
+
+			// only install if non-zero address
+			if (addr.first)
+			{
+				h89bus().install_io_device(addr.first, addr.second,
+					read8sm_delegate(m_aux, FUNC(ins8250_uart_device::ins8250_r)),
+					write8sm_delegate(m_aux, FUNC(ins8250_uart_device::ins8250_w)));
+			}
+		}
+
+		if (m_modem_enabled)
+		{
+			std::pair<u8, u8>  addr = h89bus().get_address_range(h89bus::IO_SER1);
+
+			// only install if non-zero address
+			if (addr.first)
+			{
+				h89bus().install_io_device(addr.first, addr.second,
+					read8sm_delegate(m_modem, FUNC(scn_pci_device::read)),
+					write8sm_delegate(m_modem, FUNC(scn_pci_device::write)));
+			}
+		}
+
+		m_installed = true;
+	}
 }
 
 void z_89_11_device::device_add_mconfig(machine_config &config)
