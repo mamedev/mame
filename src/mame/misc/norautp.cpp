@@ -42,7 +42,7 @@
   -- 8080 based --
 
    * Draw Poker HI-LO,                           1983,  M. Kramer Manufacturing.
-   * Joker Poker (Kramer, Alt),                  1983,  Unknown.
+   * Joker Poker (Kramer, alt),                  1983,  Unknown.
    * Draw Poker HI-LO (Japanese),                198?,  Unknown.
    * New Hi-Low Poker,                           19??,  Song won?
    * unknown poker game PKII/DM,                 198?,  Unknown.
@@ -5298,7 +5298,7 @@ GAMEL( 1984, cdrawpkr,  0,        cdrawpkr, cdrawpkr, norautp_state, empty_init,
 
 //     YEAR  NAME       PARENT    MACHINE    INPUT      STATE          INIT        ROT   COMPANY                        FULLNAME                            FLAGS                       LAYOUT
 GAMEL( 1982, dphl,      0,        dphl,      dphl,      norautp_state, empty_init, ROT0, "M.Kramer Manufacturing.",     "Draw Poker HI-LO (M.Kramer)",      0,                          layout_noraut10 )
-GAMEL( 1983, dphla,     0,        dphla,     dphla,     norautp_state, empty_init, ROT0, "<unknown>",                   "Joker Poker (Kramer, Alt)",        0,                          layout_noraut10 )
+GAMEL( 1983, dphla,     0,        dphla,     dphla,     norautp_state, empty_init, ROT0, "<unknown>",                   "Joker Poker (Kramer, alt)",        0,                          layout_noraut10 )
 GAMEL( 1983, dphljp,    0,        dphl,      dphl,      norautp_state, empty_init, ROT0, "<unknown>",                   "Draw Poker HI-LO (Japanese)",      0,                          layout_noraut10 )
 GAMEL( 198?, newhilop,  0,        dphl,      newhilop,  norautp_state, empty_init, ROT0, "Song Won?",                   "New Hi-Low Poker",                 0,                          layout_noraut10 )
 GAMEL( 198?, pkii_dm,   0,        dphl,      newhilop,  norautp_state, empty_init, ROT0, "<unknown>",                   "unknown poker game PKII/DM",       0,                          layout_noraut10 )
