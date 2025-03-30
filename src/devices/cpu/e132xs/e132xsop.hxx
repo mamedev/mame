@@ -1553,6 +1553,12 @@ void hyperstone_device::hyperstone_ldxx1()
 	const uint32_t dst_code = DstGlobal ? DST_CODE : ((DST_CODE + fp) & 0x3f);
 	const uint32_t dreg = ((DstGlobal && dst_code == SR_REGISTER) ? 0 : (DstGlobal ? m_core->global_regs : m_core->local_regs)[dst_code]);
 
+	if ((!DstGlobal || (dst_code != SR_REGISTER)) && !dreg)
+	{
+		execute_exception(TRAPNO_POINTER_ERROR);
+		return;
+	}
+
 	switch (sub_type)
 	{
 		case 0: // LDBS.D
@@ -1667,18 +1673,36 @@ void hyperstone_device::hyperstone_ldxx2()
 	check_delay_PC();
 
 	const uint32_t fp = GET_FP;
+	const uint32_t src_code = SrcGlobal ? SRC_CODE : (SRC_CODE + fp) & 0x3f;
+	const uint32_t srcf_code = SrcGlobal ? (src_code + 1) : ((src_code + 1) & 0x3f);
 	const uint32_t dst_code = DstGlobal ? DST_CODE : (DST_CODE + fp) & 0x3f;
+	const uint32_t dreg = (DstGlobal ? m_core->global_regs : m_core->local_regs)[dst_code];
 
-	if (DstGlobal && dst_code < 2)
+	if (DstGlobal && (dst_code <= SR_REGISTER))
 	{
 		m_core->icount -= m_core->clock_cycles_1;
 		LOG("Denoted PC or SR in hyperstone_ldxx2. PC = %08X\n", PC);
 		return;
 	}
 
-	const uint32_t src_code = SrcGlobal ? SRC_CODE : (SRC_CODE + fp) & 0x3f;
-	const uint32_t srcf_code = SrcGlobal ? (src_code + 1) : ((src_code + 1) & 0x3f);
-	const uint32_t dreg = (DstGlobal ? m_core->global_regs : m_core->local_regs)[dst_code];
+	if (!dreg)
+	{
+		switch (sub_type)
+		{
+			case 0: // LDBS.N
+			case 1: // LDBU.N
+				(DstGlobal ? m_core->global_regs : m_core->local_regs)[dst_code] += extra_s;
+				break;
+			case 2: // LDHS.N, LDHU.N
+				(DstGlobal ? m_core->global_regs : m_core->local_regs)[dst_code] += extra_s & ~1;
+				break;
+			case 3: // LDW.N, LDD.N, LDW.S
+				(DstGlobal ? m_core->global_regs : m_core->local_regs)[dst_code] += extra_s & ~3;
+				break;
+		}
+		execute_exception(TRAPNO_POINTER_ERROR);
+		return;
+	}
 
 	switch (sub_type)
 	{
@@ -1716,7 +1740,7 @@ void hyperstone_device::hyperstone_ldxx2()
 					m_core->local_regs[src_code] = READ_HW(dreg);
 			}
 
-			if(DstGlobal != SrcGlobal || src_code != dst_code)
+			if (DstGlobal != SrcGlobal || src_code != dst_code)
 				(DstGlobal ? m_core->global_regs : m_core->local_regs)[dst_code] += (extra_s & ~1);
 			break;
 
@@ -1817,11 +1841,18 @@ void hyperstone_device::hyperstone_stxx1()
 	const uint32_t dreg = ((DstGlobal && dst_code == SR_REGISTER) ? 0 : (DstGlobal ? m_core->global_regs : m_core->local_regs)[dst_code]);
 	const uint32_t sreg = ((SrcGlobal && src_code == SR_REGISTER) ? 0 : (SrcGlobal ? m_core->global_regs : m_core->local_regs)[src_code]);
 
+	if ((!DstGlobal || (dst_code != SR_REGISTER)) && !dreg)
+	{
+		execute_exception(TRAPNO_POINTER_ERROR);
+		return;
+	}
+
 	switch (sub_type)
 	{
 		case 0: // STBS.D
-			// TODO: missing trap on range error
-			WRITE_B(dreg + extra_s, (uint8_t)sreg);
+			WRITE_B(dreg + extra_s, uint8_t(sreg));
+			if (int8_t(uint8_t(sreg)) != int32_t(sreg))
+				execute_exception(TRAPNO_RANGE_ERROR);
 			break;
 
 		case 1: // STBU.D
@@ -1829,8 +1860,9 @@ void hyperstone_device::hyperstone_stxx1()
 			break;
 
 		case 2: // STHS.D, STHU.D
-			WRITE_HW(dreg + (extra_s & ~1), (uint16_t)sreg);
-			// TODO: missing trap on range error with STHS.D
+			WRITE_HW(dreg + (extra_s & ~1), uint16_t(sreg));
+			if ((extra_s & 1) && (int16_t(uint16_t(sreg)) != int32_t(sreg)))
+				execute_exception(TRAPNO_RANGE_ERROR);
 			break;
 
 		case 3:
@@ -1907,18 +1939,40 @@ void hyperstone_device::hyperstone_stxx2()
 	const uint32_t dst_code = DstGlobal ? DST_CODE : ((DST_CODE + fp) & 0x3f);
 	const uint32_t dreg = (DstGlobal ? m_core->global_regs : m_core->local_regs)[dst_code];
 
-	if (DstGlobal && dst_code < 2)
+	if (DstGlobal && (dst_code <= SR_REGISTER))
 	{
 		m_core->icount -= m_core->clock_cycles_1;
 		return;
 	}
 
+	if (!dreg)
+	{
+		switch (sub_type)
+		{
+			case 0: // LDBS.N
+			case 1: // LDBU.N
+				(DstGlobal ? m_core->global_regs : m_core->local_regs)[dst_code] += extra_s;
+				break;
+			case 2: // LDHS.N, LDHU.N
+				(DstGlobal ? m_core->global_regs : m_core->local_regs)[dst_code] += extra_s & ~1;
+				break;
+			case 3: // LDW.N, LDD.N, LDW.S
+				(DstGlobal ? m_core->global_regs : m_core->local_regs)[dst_code] += extra_s & ~3;
+				break;
+		}
+		execute_exception(TRAPNO_POINTER_ERROR);
+		return;
+	}
+
+	bool range_error;
 	switch (sub_type)
 	{
 		case 0: // STBS.N
-			// TODO: missing trap on range error
 			WRITE_B(dreg, (uint8_t)sreg);
+			range_error = int8_t(uint8_t(sreg)) != int32_t(sreg);
 			(DstGlobal ? m_core->global_regs : m_core->local_regs)[dst_code] += extra_s;
+			if (range_error)
+				execute_exception(TRAPNO_RANGE_ERROR);
 			break;
 
 		case 1: // STBU.N
@@ -1928,8 +1982,10 @@ void hyperstone_device::hyperstone_stxx2()
 
 		case 2: // STHS.N, STHU.N
 			WRITE_HW(dreg, (uint16_t)sreg);
+			range_error = (extra_s & 1) && (int16_t(uint16_t(sreg)) != int32_t(sreg));
 			(DstGlobal ? m_core->global_regs : m_core->local_regs)[dst_code] += extra_s & ~1;
-			// TODO: missing trap on range error with STHS.N
+			if (range_error)
+				execute_exception(TRAPNO_RANGE_ERROR);
 			break;
 
 		case 3:
@@ -2316,11 +2372,20 @@ template <hyperstone_device::reg_bank SrcGlobal>
 void hyperstone_device::hyperstone_ldwr()
 {
 	check_delay_PC();
+
 	const uint32_t fp = GET_FP;
+	const uint32_t dreg = m_core->local_regs[(DST_CODE + fp) & 0x3f];
+
+	if (!dreg)
+	{
+		execute_exception(TRAPNO_POINTER_ERROR);
+		return;
+	}
+
 	if (SrcGlobal)
-		set_global_register(SRC_CODE, READ_W(m_core->local_regs[(DST_CODE + fp) & 0x3f]));
+		set_global_register(SRC_CODE, READ_W(dreg));
 	else
-		m_core->local_regs[(SRC_CODE + fp) & 0x3f] = READ_W(m_core->local_regs[(DST_CODE + fp) & 0x3f]);
+		m_core->local_regs[(SRC_CODE + fp) & 0x3f] = READ_W(dreg);
 	m_core->icount -= m_core->clock_cycles_1;
 }
 
@@ -2332,6 +2397,12 @@ void hyperstone_device::hyperstone_lddr()
 	const uint32_t fp = GET_FP;
 	const uint32_t src_code = SrcGlobal ? SRC_CODE : ((SRC_CODE + fp) & 0x3f);
 	const uint32_t dreg = m_core->local_regs[(DST_CODE + fp) & 0x3f];
+
+	if (!dreg)
+	{
+		execute_exception(TRAPNO_POINTER_ERROR);
+		return;
+	}
 
 	if (SrcGlobal)
 	{
@@ -2354,20 +2425,28 @@ void hyperstone_device::hyperstone_ldwp()
 
 	const uint32_t fp = GET_FP;
 	const uint32_t dst_code = (DST_CODE + fp) & 0x3f;
+	const uint32_t dreg = m_core->local_regs[dst_code];
+
+	if (!dreg)
+	{
+		m_core->local_regs[dst_code] = dreg + 4;
+		execute_exception(TRAPNO_POINTER_ERROR);
+		return;
+	}
 
 	if (SrcGlobal)
 	{
-		set_global_register(SRC_CODE, READ_W(m_core->local_regs[dst_code]));
-		m_core->local_regs[dst_code] += 4;
+		set_global_register(SRC_CODE, READ_W(dreg));
+		m_core->local_regs[dst_code] = dreg + 4;
 	}
 	else
 	{
 		const uint32_t src_code = (SRC_CODE + fp) & 0x3f;
-		m_core->local_regs[src_code] = READ_W(m_core->local_regs[dst_code]);
+		m_core->local_regs[src_code] = READ_W(dreg);
 		// post increment the destination register if it's different from the source one
 		// (needed by Hidden Catch)
 		if (src_code != dst_code)
-			m_core->local_regs[dst_code] += 4;
+			m_core->local_regs[dst_code] = dreg + 4;
 	}
 
 	m_core->icount -= m_core->clock_cycles_1;
@@ -2383,11 +2462,18 @@ void hyperstone_device::hyperstone_lddp()
 	const uint32_t dst_code = (DST_CODE + fp) & 0x3f;
 	const uint32_t dreg = m_core->local_regs[dst_code];
 
+	if (!dreg)
+	{
+		m_core->local_regs[dst_code] = dreg + 8;
+		execute_exception(TRAPNO_POINTER_ERROR);
+		return;
+	}
+
 	if (SrcGlobal)
 	{
 		set_global_register(src_code, READ_W(dreg));
 		set_global_register(src_code + 1, READ_W(dreg + 4));
-		m_core->local_regs[dst_code] += 8;
+		m_core->local_regs[dst_code] = dreg + 8;
 	}
 	else
 	{
@@ -2398,7 +2484,7 @@ void hyperstone_device::hyperstone_lddp()
 		// post increment the destination register if it's different from the source one
 		// and from the "next source" one
 		if (src_code != dst_code && srcf_code != dst_code)
-			m_core->local_regs[dst_code] += 8;
+			m_core->local_regs[dst_code] = dreg + 8;
 	}
 
 	m_core->icount -= m_core->clock_cycles_2;
@@ -2412,7 +2498,15 @@ void hyperstone_device::hyperstone_stwr()
 	const uint32_t fp = GET_FP;
 	const uint32_t src_code = SrcGlobal ? SRC_CODE : ((SRC_CODE + fp) & 0x3f);
 	const uint32_t sreg = (SrcGlobal && src_code == SR_REGISTER) ? 0 : (SrcGlobal ? m_core->global_regs : m_core->local_regs)[src_code];
-	WRITE_W(m_core->local_regs[(DST_CODE + fp) & 0x3f], sreg);
+	const uint32_t dreg = m_core->local_regs[(DST_CODE + fp) & 0x3f];
+
+	if (!dreg)
+	{
+		execute_exception(TRAPNO_POINTER_ERROR);
+		return;
+	}
+
+	WRITE_W(dreg, sreg);
 
 	m_core->icount -= m_core->clock_cycles_1;
 }
@@ -2427,8 +2521,13 @@ void hyperstone_device::hyperstone_stdr()
 	const uint32_t srcf_code = SrcGlobal ? (SRC_CODE + 1) : ((src_code + 1) & 0x3f);
 	const uint32_t sreg = (SrcGlobal && src_code == SR_REGISTER) ? 0 : (SrcGlobal ? m_core->global_regs : m_core->local_regs)[src_code];
 	const uint32_t sregf = (SrcGlobal && src_code == SR_REGISTER) ? 0 : (SrcGlobal ? m_core->global_regs : m_core->local_regs)[srcf_code];
-
 	const uint32_t dreg = m_core->local_regs[(DST_CODE + GET_FP) & 0x3f];
+
+	if (!dreg)
+	{
+		execute_exception(TRAPNO_POINTER_ERROR);
+		return;
+	}
 
 	WRITE_W(dreg, sreg);
 	WRITE_W(dreg + 4, sregf);
@@ -2444,12 +2543,18 @@ void hyperstone_device::hyperstone_stwp()
 	const uint32_t fp = GET_FP;
 	const uint32_t src_code = SrcGlobal ? SRC_CODE : ((SRC_CODE + fp) & 0x3f);
 	const uint32_t sreg = (SrcGlobal && src_code == SR_REGISTER) ? 0 : (SrcGlobal ? m_core->global_regs : m_core->local_regs)[src_code];
-
 	const uint32_t dst_code = (DST_CODE + fp) & 0x3f;
 	const uint32_t dreg = m_core->local_regs[dst_code];
 
+	m_core->local_regs[dst_code] = dreg + 4;
+
+	if (!dreg)
+	{
+		execute_exception(TRAPNO_POINTER_ERROR);
+		return;
+	}
+
 	WRITE_W(dreg, sreg);
-	m_core->local_regs[dst_code] += 4;
 
 	m_core->icount -= m_core->clock_cycles_1;
 }
@@ -2463,13 +2568,18 @@ void hyperstone_device::hyperstone_stdp()
 	const uint32_t src_code = SrcGlobal ? SRC_CODE : ((SRC_CODE + fp) & 0x3f);
 	const uint32_t srcf_code = SrcGlobal ? (src_code + 1) : ((src_code + 1) & 0x3f);
 	const uint32_t sreg = (SrcGlobal && src_code == SR_REGISTER) ? 0 : (SrcGlobal ? m_core->global_regs : m_core->local_regs)[src_code];
-
 	const uint32_t dst_code = (DST_CODE + fp) & 0x3f;
 	const uint32_t dreg = m_core->local_regs[dst_code];
 
-	WRITE_W(dreg, sreg);
+	m_core->local_regs[dst_code] = dreg + 8;
 
-	m_core->local_regs[dst_code] += 8;
+	if (!dreg)
+	{
+		execute_exception(TRAPNO_POINTER_ERROR);
+		return;
+	}
+
+	WRITE_W(dreg, sreg);
 
 	const uint32_t sregf = (SrcGlobal && src_code == SR_REGISTER) ? 0 : (SrcGlobal ? m_core->global_regs : m_core->local_regs)[srcf_code];
 

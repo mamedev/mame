@@ -465,7 +465,7 @@ private:
 	uint32_t generate_get_pcrel(const opcode_desc *desc);
 	std::pair<uint16_t, uint32_t> generate_get_d_code_dis(const opcode_desc *opcode);
 
-	void generate_get_global_register(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void generate_get_global_register_high(drcuml_block &block, compiler_state &compiler, uint32_t code, uml::parameter dst);
 	void generate_set_global_register(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint32_t dst_code);
 	void generate_set_global_register_low(drcuml_block &block, compiler_state &compiler, uint32_t dst_code, uml::parameter src);
 	void generate_set_global_register_high(drcuml_block &block, compiler_state &compiler, uint32_t dst_code, uml::parameter src);

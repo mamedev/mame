@@ -26,6 +26,9 @@ public:
 	compiler_state &operator=(compiler_state const &) = delete;
 
 	uint8_t mode() const { return m_mode; }
+	bool user_mode() const { return !BIT(m_mode, 0); }
+	bool supervisor_mode() const { return BIT(m_mode, 0); }
+	bool trace_mode() const { return BIT(m_mode, 1); }
 
 	auto next_label() { return m_labelnum++; }
 
@@ -828,7 +831,7 @@ void hyperstone_device::generate_sequence_instruction(drcuml_block &block, compi
 				--compiler.m_check_delay;
 			}
 
-			if (BIT(compiler.mode(), 1) && !desc->delayslots)
+			if (compiler.trace_mode() && !desc->delayslots)
 				UML_EXHc(block, uml::COND_Z, *m_exception, TRAPNO_TRACE_EXCEPTION);
 		}
 		else

@@ -73,10 +73,10 @@ uint32_t v60_device::opCVTSW()
 	val = u2f(m_op1);
 	switch (TKCW & 7)
 	{
-	case 0: m_modwritevalw = (uint32_t)(int64_t)round(val); break;
-	case 1: m_modwritevalw = (uint32_t)(int64_t)floor(val); break;
-	case 2: m_modwritevalw = (uint32_t)(int64_t)ceil(val); break;
-	default: m_modwritevalw = (uint32_t)(int64_t)trunc(val); break;
+	case 0: m_modwritevalw = (uint32_t)llroundf(val); break;
+	case 1: m_modwritevalw = (uint32_t)(int64_t)floorf(val); break;
+	case 2: m_modwritevalw = (uint32_t)(int64_t)ceilf(val); break;
+	default: m_modwritevalw = (uint32_t)(int64_t)truncf(val); break;
 	}
 
 	_S = ((m_modwritevalw & 0x80000000) != 0);

@@ -31,8 +31,7 @@
  - GMS30C2232
 
  TODO:
- - Pointer error exception on zero address register for interpreter
- - Range error exception on store signed byte/half-word
+ - All instructions should clear the H flag (not just MOV/MOVI)
  - Fix behaviour of exceptions in delay slots
  - Fix behaviour of branches in delay slots
  - Many wrong cycle counts

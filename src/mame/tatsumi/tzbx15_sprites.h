@@ -15,8 +15,8 @@ public:
 	template <typename T> void set_basepalette(T &&tag) { m_palette_base.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_spriteram(T &&tag) { m_spriteram.set_tag(std::forward<T>(tag)); }
 
-	void draw_sprites(bitmap_rgb32& bitmap, const rectangle& cliprect, int write_priority_only, int rambank);
-	void draw_sprites(bitmap_ind8& bitmap, const rectangle& cliprect, int write_priority_only, int rambank);
+	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, int write_priority_only, int rambank);
+	void draw_sprites(bitmap_ind8 &bitmap, const rectangle &cliprect, int write_priority_only, int rambank);
 
 	void update_cluts();
 
@@ -31,8 +31,6 @@ private:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	void common_init() ATTR_COLD;
-
 	void mycopyrozbitmap_core(bitmap_ind8 &bitmap, const bitmap_rgb32 &srcbitmap,
 			int dstx, int dsty, int srcwidth, int srcheight, int incxx, int incxy, int incyx, int incyy,
 			const rectangle &clip, int transparent_color);
@@ -41,9 +39,12 @@ private:
 			const rectangle &clip, int transparent_color);
 
 	template<class BitmapClass> void draw_sprites_main(BitmapClass &bitmap, const rectangle &cliprect, int write_priority_only, int rambank);
-	template<class BitmapClass> inline void roundupt_drawgfxzoomrotate( BitmapClass &dest_bmp, const rectangle &clip,
-		gfx_element *gfx, uint32_t code,uint32_t color,int flipx,int flipy,uint32_t ssx,uint32_t ssy,
-		int scalex, int scaley, int rotate, int write_priority_only );
+	template<class BitmapClass> void roundupt_drawgfxzoomrotate(
+			BitmapClass &dest_bmp, const rectangle &clip,
+			gfx_element *gfx, uint32_t code, uint32_t color,
+			int flipx, int flipy, uint32_t ssx, uint32_t ssy,
+			int scalex, int scaley, int rotate,
+			int write_priority_only);
 
 	DECLARE_GFXDECODE_MEMBER(gfxinfo);
 

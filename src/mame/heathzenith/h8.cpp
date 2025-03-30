@@ -48,17 +48,19 @@ Official test program from pages 4 to 8 of the operator's manual:
 
 #include "emu.h"
 
-#include "cpu/i8085/i8085.h"
-#include "machine/i8251.h"
-#include "machine/clock.h"
-#include "machine/timer.h"
+#include "bus/heathzenith/intr_cntrl/intr_cntrl.h"
 #include "bus/rs232/rs232.h"
+#include "cpu/i8085/i8085.h"
 #include "imagedev/cassette.h"
+#include "machine/clock.h"
+#include "machine/i8251.h"
+#include "machine/timer.h"
 #include "sound/beep.h"
+
 #include "speaker.h"
 
-#include "bus/heathzenith/intr_cntrl/intr_cntrl.h"
 #include "formats/h8_cas.h"
+
 #include "h8.lh"
 
 namespace {
