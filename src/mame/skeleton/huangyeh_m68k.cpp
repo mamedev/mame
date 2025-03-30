@@ -1,7 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:
+/**************************************************************************************************
 
-/*
+TODO:
+- Crashes strong with ACRTC, plenty of unsupported features (starting with COMMAND_DWT);
+- OKI bank (standard 0/0x40000 layout);
+- I/Os;
+
+===================================================================================================
+
 Wu Lin Zhengba, Huang Yeh, 1999?
 Hardware Info by Guru
 ---------------------
@@ -57,13 +64,15 @@ Notes:
         U4x - 27C040 EPROM (Graphics)
         U34 - 27C256 EPROM (Z80 Program)
         U28 - 27C040 EPROM (Oki Samples)
-*/
+
+**************************************************************************************************/
 
 
 #include "emu.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "sound/okim6295.h"
 #include "sound/ymopl.h"
 #include "video/hd63484.h"
@@ -80,9 +89,11 @@ namespace {
 class huangyeh_m68k_state : public driver_device
 {
 public:
-	huangyeh_m68k_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+	huangyeh_m68k_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_acrtc(*this, "acrtc")
+		, m_soundlatch(*this, "soundlatch")
 	{ }
 
 	void wlzb(machine_config &config) ATTR_COLD;
@@ -90,6 +101,8 @@ public:
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device<hd63484_device> m_acrtc;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	void main_program_map(address_map &map) ATTR_COLD;
 	void audio_program_map(address_map &map) ATTR_COLD;
@@ -102,10 +115,16 @@ void huangyeh_m68k_state::main_program_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x0fffff).rom();
-	//map(0x1d0000, 0x1d0003).rw("acrtc", FUNC(hd63484_device::read16), FUNC(hd63484_device::write16));
-	//map(0x1d0009, 0x1d0009).w("ramdac", FUNC(ramdac_device::index_w));
-	//map(0x1d000b, 0x1d000b).w("ramdac", FUNC(ramdac_device::pal_w));
-	//map(0x1d000d, 0x1d000d).w("ramdac", FUNC(ramdac_device::mask_w));
+	map(0x100000, 0x100001).portr("DSW1");
+	map(0x100020, 0x100021).portr("IN0");
+	map(0x100051, 0x100051).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x100060, 0x100061).nopw(); // key matrix at $100061
+	map(0x130000, 0x130001).portr("DSW2");
+	map(0x1d0000, 0x1d0001).rw("acrtc", FUNC(hd63484_device::read16), FUNC(hd63484_device::write16));
+	map(0x1d0002, 0x1d0003).noprw(); // TODO: A0 of acrtc
+	map(0x1d0009, 0x1d0009).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x1d000b, 0x1d000b).w("ramdac", FUNC(ramdac_device::pal_w));
+	map(0x1d000d, 0x1d000d).w("ramdac", FUNC(ramdac_device::mask_w));
 	map(0x1f0000, 0x1f3fff).ram();
 }
 
@@ -114,6 +133,10 @@ void huangyeh_m68k_state::audio_program_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0xf000, 0xf7ff).ram();
 	map(0xf880, 0xf881).w("ymsnd", FUNC(ym3812_device::write));
+	map(0xf8a0, 0xf8a0).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xf8d0, 0xf8d0).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+//	map(0xf8e0, 0xf8e0).w soundlatch acknowledge or NMI ack
+	map(0xf8e0, 0xf8e0).lw8(NAME([this] (offs_t offset, u8 data) { m_soundlatch->acknowledge_w(); }));
 }
 
 void huangyeh_m68k_state::ramdac_map(address_map &map)
@@ -123,7 +146,8 @@ void huangyeh_m68k_state::ramdac_map(address_map &map)
 
 void huangyeh_m68k_state::hd63484_map(address_map &map)
 {
-	//map(0x00000, 0x7ffff).ram();
+	// TODO: likely banked, also writes
+	map(0x00000, 0xfffff).rom().region("tiles", 0);
 }
 
 
@@ -149,7 +173,7 @@ static INPUT_PORTS_START( wlzb )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
-	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW1:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW1:1") // service?
 	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW1:2")
 	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW1:3")
 	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW1:4")
@@ -180,7 +204,8 @@ void huangyeh_m68k_state::wlzb(machine_config &config)
 	// basic machine hardware
 	M68000(config, m_maincpu, 8.448_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &huangyeh_m68k_state::main_program_map);
-	m_maincpu->set_vblank_int("screen", FUNC(huangyeh_m68k_state::irq0_line_hold));
+	// delay loops at $1f1712
+	m_maincpu->set_vblank_int("screen", FUNC(huangyeh_m68k_state::irq3_line_hold));
 
 	z80_device &audiocpu(Z80(config, "audiocpu", 8.448_MHz_XTAL / 2));
 	audiocpu.set_addrmap(AS_PROGRAM, &huangyeh_m68k_state::audio_program_map);
@@ -200,12 +225,17 @@ void huangyeh_m68k_state::wlzb(machine_config &config)
 
 	RAMDAC(config, "ramdac", 0, "palette").set_addrmap(0, &huangyeh_m68k_state::ramdac_map);
 
-	HD63484(config, "acrtc", 22_MHz_XTAL / 4).set_addrmap(0, &huangyeh_m68k_state::hd63484_map);
+	HD63484(config, m_acrtc, 22_MHz_XTAL / 4).set_addrmap(0, &huangyeh_m68k_state::hd63484_map);
+
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline("audiocpu", INPUT_LINE_NMI);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	YM3812(config, "ymsnd", 3.579545_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 1.0);
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", 3.579545_MHz_XTAL));
+	ymsnd.irq_handler().set_inputline("audiocpu", 0);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	OKIM6295(config, "oki", 8.448_MHz_XTAL / 4, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
@@ -219,7 +249,7 @@ ROM_START( wlzb )
 	ROM_REGION( 0x8000, "audiocpu", 0 )
 	ROM_LOAD( "w7.u34", 0x0000, 0x8000, CRC(c00786b3) SHA1(a8b3ddf3dd1b702d8719eace1b65f42c727b9473) )
 
-	ROM_REGION( 0x200000, "tiles", 0 )
+	ROM_REGION16_BE( 0x200000, "tiles", 0 )
 	ROM_LOAD( "w3.u41", 0x000000, 0x080000, CRC(58e57d87) SHA1(f870d0729528b2fda495da059f110e466ea58de5) )
 	ROM_LOAD( "w4.u45", 0x080000, 0x080000, CRC(5e993a35) SHA1(ed39dbc89cafebc8348f05a6327efa1ea26ff466) )
 	ROM_LOAD( "w5.u42", 0x100000, 0x080000, CRC(e728751d) SHA1(00bc65793a65ede318e5412d06eb85259015a5c1) )
