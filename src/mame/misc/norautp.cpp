@@ -751,7 +751,6 @@ public:
 	void init_enc();
 	void init_deb();
 	void init_unka();
-	void init_unkb();
 	void init_gtipa();
 
 protected:
@@ -773,6 +772,7 @@ private:
 	void drhl_palette(palette_device &palette) const;
 	void bp_based_palette(palette_device &palette) const;
 	uint32_t screen_update_norautp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_dphl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void cgidjp_map(address_map &map) ATTR_COLD;
 	void cgidjp_opcodes_map(address_map &map) ATTR_COLD;
 	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
@@ -827,6 +827,25 @@ void norautp_state::video_start()
 }
 
 uint32_t norautp_state::screen_update_norautp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+    bitmap.fill(0, cliprect);
+    
+    for (int y = 0, c = 0; y < 8; y++)
+	{
+        bool double_w = y == 2 || ((y == 4 || y == 5) && !(m_display_line_control && m_vreg));
+        
+        for (int x = 0; x < (double_w ? 16 : 32); c += double_w ? 2 : 1, x++)
+		{
+            int t = m_np_vram[c] & 0x3f;
+            int col = ((m_np_vram[c] >> 6) + (double_w && y >= 4 ? 4 : 0)) & 3;
+            m_gfxdecode->gfx(double_w ? 1 : 0)->opaque(bitmap, cliprect, t, col, 0, 0, 
+                double_w ? (x << 5) + 8 : x << 4, y << 5);
+        }
+    }
+    return 0;
+}
+
+uint32_t norautp_state::screen_update_dphl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
     bitmap.fill(0, cliprect);
     
@@ -2210,6 +2229,7 @@ void norautp_state::dphl(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::dphl_map);
 	m_maincpu->set_addrmap(AS_IO, &norautp_state::dphl_portmap);
 	m_maincpu->set_vblank_int("screen", FUNC(norautp_state::irq0_line_hold));
+	m_screen->set_screen_update(FUNC(norautp_state::screen_update_dphl));
 
 	PALETTE(config.replace(), "palette", FUNC(norautp_state::bp_based_palette), 512);
 
@@ -4488,8 +4508,8 @@ ROM_START( dphlunkb )
 	ROM_LOAD( "u-12_rev-2.u12", 0x0000, 0x1000, CRC(1b1d8ca4) SHA1(405bf8a56dfc669a0890b0af9417c1ed6a3bf374) )
 	ROM_LOAD( "u-18_rev-2.u18", 0x1000, 0x1000, CRC(22dbe0c7) SHA1(ca223074b0f4b86e60a1b91c22568680845ae17e) )
 
-	ROM_REGION( 0x1000,  "gfx", 0 )
-	ROM_LOAD( "u-31_ss.u31", 0x0000, 0x1000, CRC(7afa583e) SHA1(e897c6dbcc5452fdb99894203131886a529eed37) )
+	ROM_REGION( 0x1000,  "gfx", 0 )  // original dump cames with sureshot gfx surely by mistake. using gfx from dphl
+	ROM_LOAD( "cgi_3939.u31",   0x0000, 0x1000, BAD_DUMP CRC(2028db2c) SHA1(0f81bb71e88c60df3817f58c28715ce2ea01ad4d) )
 
 	ROM_REGION( 0x0200,  "proms", 0 )
 	ROM_LOAD( "n82s129n_1",  0x0000, 0x0100, CRC(812dc1f1) SHA1(b2af33ff36f2eca2f782bc2239bc9e54c2564f6a) )
@@ -5288,17 +5308,6 @@ void norautp_state::init_unka()
 	ROM[0x01d5] = 0xaf;
 }
 
-void norautp_state::init_unkb()
-{
-	uint8_t *ROM = memregion("gfx")->base();
-	for (int i = 0x0680; i < 0x0740; i++)
-	{
-		ROM[i] = ~ROM[i];
-		ROM[i + 0x800] = ~ROM[i + 0x800];
-	}
-}
-
-
 void norautp_state::init_gtipa()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
@@ -5365,7 +5374,7 @@ GAMEL( 1986, drhla,     drhl,     drhl,      drhl,      norautp_state, empty_ini
 GAMEL( 1982, ssjkrpkr,  0,        ssjkrpkr,  ssjkrpkr,  norautp_state, empty_init, ROT0, "Southern Systems & Assembly", "Southern Systems Joker Poker",     0,                          layout_noraut10 )
 GAMEL( 198?, fastdrwp,  0,        dphl,      fastdrwp,  norautp_state, empty_init, ROT0, "Stern Electronics",           "Fast Draw (poker conversion kit)", 0,                          layout_noraut10 )
 GAMEL( 1983, sureshoto, 0,        dphl,      sureshoto, norautp_state, init_unka,  ROT0, "SMS Manufacturing Corp.",     "Sure Shot (older, dphl hardware)", MACHINE_IMPERFECT_COLORS,   layout_noraut09_sureshot )
-GAMEL( 198?, dphlunkb,  0,        dphl,      dphla,     norautp_state, init_unkb,  ROT0, "SMS Manufacturing Corp.",     "Draw Poker HI-LO (alt GFX)",       0,                          layout_noraut10 )
+GAMEL( 198?, dphlunkb,  0,        dphl,      dphla,     norautp_state, empty_init, ROT0, "<unknown>",                   "Unknown Draw Poker HI-LO",         0,                          layout_noraut10 )
 
 // The following one also has a custom 68705 MCU
 GAME(  1993, tpoker2,   0,        dphltest, norautp, norautp_state, empty_init, ROT0, "Micro Manufacturing",          "Turbo Poker 2",                    MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
