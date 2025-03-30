@@ -141,7 +141,7 @@
   Control Panel
   -------------
 
-  There are 2 control panel schemes:
+  There are 3 control panel schemes:
 
   * The default one (11 button-lamps) for systems without CANCEL button.
 
@@ -183,15 +183,54 @@
   Some lamps are wired in different way in this scheme.
 
 
+  * The DPHL type (10 button-lamps) for systems with automatic bet.
+
+  .----------------------------------------------.
+  | .------. .------. .------. .------. .------. |
+  | | HOLD | | HOLD | | HOLD | | HOLD | | HOLD | |
+  | '------' '------' '------' '------' '------' |
+  | .------. .------. .------. .------. .------. |
+  | |CANCEL| |STAND | | BET  | | DEAL | | DRAW | |
+  | '------' '------' '------' '------' '------' |
+  '----------------------------------------------'
+
+  The BET button is not connected.
+
+
+*******************************************************************************
+
+  Hardware Analysis: Narout Poker PCB Tile Decoding.
+  --------------------------------------------------
+
+  Objective: Reverse-engineer the tile decoding process
+             for 16×32 graphics on Narout Poker PCBs.
+
+  Method:    Two PCBs were analyzed and trojanned to determine
+             the hardware's GFX interpretation scheme.
+
+  Result:    The derived graphics layout (below) has been fully
+             validated and is confirmed accurate.
+
+
 *******************************************************************************
 
   Narout System Ports Map
   -----------------------
 
+  There are two different hardware schemes regarding the system PPI ports.
+  The Noraut original and the DPHL types have their PPI 8255 devices mapped
+  the following way:
+
+  System         PPI-0     PPI-1     PPI-2
+  -----------------------------------------
+  noraut type   60h-63h   A0h-A3h   C0h-C3h
+  DPHL type     7Ch-7Fh   BCh-BFh   DCh-DFh
+
+  
   (*) Confirmed lines.
 
 
-  PPI-0 (60h-63h); PortA IN.
+  PPI-0 (60h-63h or 7Ch-7Fh); PortA IN.
   DIP Switches bank:
 
   7654 3210
@@ -205,7 +244,7 @@
   x--- ----  * DIP switch 1
 
 
-  PPI-0 (60h-63h); PortB OUT.
+  PPI-0 (60h-63h or 7Ch-7Fh); PortB OUT.
   Lamps:
 
   7654 3210
@@ -219,7 +258,7 @@
   x--- ----  * CANCEL lamp.
 
 
-  PPI-0 (60h-63h); PortC OUT.
+  PPI-0 (60h-63h or 7Ch-7Fh); PortC OUT.
   Lamps & Coin Counters:
 
   7654 3210
@@ -235,7 +274,7 @@
 
 -----------------------------------------------------------
 
-  PPI-1 (a0h-a3h); PortA IN.
+  PPI-1 (A0h-A3h or BCh-BFh); PortA IN.
   Regular Inputs:
 
   7654 3210
@@ -249,7 +288,7 @@
   x--- ----  * PAYOUT button.
 
 
-  PPI-1 (a0h-a3h); PortB IN.
+  PPI-1 (A0h-A3h or BCh-BFh); PortB IN.
   Regular Inputs:
 
   7654 3210
@@ -263,7 +302,7 @@
   x--- ----  * CANCEL button.
 
 
-  PPI-1 (a0h-a3h); PortC OUT.
+  PPI-1 (A0h-A3h or BCh-BFh); PortC OUT.
   Sound & Lamps:
 
   7654 3210
@@ -276,21 +315,21 @@
 
 -----------------------------------------------------------
 
-  PPI-2 (a0h-a3h); PortA IN/OUT
+  PPI-2 (C0h-C3h or DCh-DFh); PortA IN/OUT
   VRAM Handlers:
 
   7654 3210
   xxxx xxxx  VRAM DATA.
 
 
-  PPI-2 (a0h-a3h); PortB OUT
+  PPI-2 (C0h-C3h or DCh-DFh); PortB OUT
   VRAM Handlers:
 
   7654 3210
   xxxx xxxx  VRAM ADDRESSING.
 
 
-  PPI-2 (a0h-a3h); PortC IN/OUT.
+  PPI-2 (C0h-C3h or DCh-DFh); PortC IN/OUT.
   PortA handshake lines & PC0-PC2 (noraut11 = OUT; noraut12 = IN):
 
   7654 3210
@@ -619,6 +658,21 @@
   - Improved Prologic, Kimble Z80, and Noraut JP
     ASCII PCB layouts.
 
+  [2025-04]
+
+  - Decoded color palettes from bipolar PROMs
+    (applies to hardware types featuring these devices)  
+  - Implemented dynamic palette per line.
+  - Unified sureshoto and dphl machine config.
+  - Real colors for dphl, dphljp, newhilop, pkii_dm,
+    pma, gtipoker, smshilo, fastdrwp, sureshoto,
+	and dphlunkb.
+  - Fixed more ASCII PCB layouts.
+  - Fixed documentation about the 3x PPI 8255 devices
+    for both narout and DPHL types of hardware.
+  - Documented control panels, and added/fixed a lot
+    of technical notes.
+
 
   TODO:
 
@@ -687,7 +741,6 @@ public:
 	void ssjkrpkr(machine_config &config);
 	void dphl(machine_config &config);
 	void dphla(machine_config &config);
-	void sureshoto(machine_config &config);
 	void drhl(machine_config &config);
 	void norautxp(machine_config &config);
 	void noraut3(machine_config &config);
@@ -717,7 +770,7 @@ private:
 	void ppi2_b_w(uint8_t data);
 	void norautp_palette(palette_device &palette) const;
 	void drhl_palette(palette_device &palette) const;
-	void sureshoto_palette(palette_device &palette) const;
+	void bp_based_palette(palette_device &palette) const;
 	uint32_t screen_update_norautp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void cgidjp_map(address_map &map) ATTR_COLD;
 	void cgidjp_opcodes_map(address_map &map) ATTR_COLD;
@@ -772,7 +825,8 @@ void norautp_state::video_start()
 	m_np_vram = make_unique_clear<uint16_t[]>(0x1000/2);
 }
 
-uint32_t norautp_state::screen_update_norautp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) {
+uint32_t norautp_state::screen_update_norautp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
     bitmap.fill(0, cliprect);
     
     for (int y = 0, c = 0; y < 8; y++)
@@ -782,13 +836,14 @@ uint32_t norautp_state::screen_update_norautp(screen_device &screen, bitmap_ind1
         for (int x = 0; x < (double_w ? 16 : 32); c += double_w ? 2 : 1, x++)
 		{
             int t = m_np_vram[c] & 0x3f;
-            int col = ((m_np_vram[c] >> 6) + (double_w && y >= 4 ? 4 : 0)) & 3;
+            int col = (((m_np_vram[c] >> 6) + (double_w && y >= 4 ? 4 : 0)) & 3 ) + (y * 4);
             m_gfxdecode->gfx(double_w ? 1 : 0)->opaque(bitmap, cliprect, t, col, 0, 0, 
                 double_w ? (x << 5) + 8 : x << 4, y << 5);
         }
     }
     return 0;
 }
+
 
 void norautp_state::norautp_palette(palette_device &palette) const
 {
@@ -833,27 +888,41 @@ void norautp_state::drhl_palette(palette_device &palette) const
 	palette.set_pen_color(15, rgb_t(0x00, 0x00, 0xff));    // blue   (black)
 }
 
-void norautp_state::sureshoto_palette(palette_device &palette) const
+void norautp_state::bp_based_palette(palette_device &palette) const
 {
-	// 1st gfx bank
-	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00));    // blue
-	palette.set_pen_color(1, rgb_t(0xff, 0xff, 0x00));    // yellow
-	palette.set_pen_color(2, rgb_t(0x00, 0x00, 0x00));    // blue
-	palette.set_pen_color(3, rgb_t(0xff, 0xff, 0xff));    // white
-	palette.set_pen_color(4, rgb_t(0xff, 0xff, 0xff));    // white
-	palette.set_pen_color(5, rgb_t(0xff, 0x00, 0x00));    // red
-	palette.set_pen_color(6, rgb_t(0xff, 0xff, 0xff));    // white
-	palette.set_pen_color(7, rgb_t(0x00, 0x00, 0x00));    // black
+/*  prom bits
+    7654 3210
+    ---- ---x   BLUE component.
+    ---- --x-   GREEN component.
+    ---- -x--   RED component.
+    ---- x---   intensity?.
+    xxxx ----   unused.
+*/
 
-	// alt palette
-	palette.set_pen_color(8,  rgb_t(0xff, 0xff, 0xff));    // white
-	palette.set_pen_color(9,  rgb_t(0x00, 0x00, 0x00));    // cards bg
-	palette.set_pen_color(10, rgb_t(0xff, 0xff, 0xff));    // white
-	palette.set_pen_color(11, rgb_t(0x00, 0x00, 0x00));
-	palette.set_pen_color(12, rgb_t(0xff, 0xff, 0xff));    // white
-	palette.set_pen_color(13, rgb_t(0xff, 0x00, 0x00));
-	palette.set_pen_color(14, rgb_t(0xff, 0xff, 0xff));    // white
-	palette.set_pen_color(15, rgb_t(0xff, 0x00, 0x00));
+	// 0000IRGB
+	uint8_t const *const color_prom = memregion("proms")->base();
+	if (!color_prom)
+		return;
+
+	for (int i = 0; i < palette.entries(); i++)
+	{
+		constexpr int intenmin = 0xff;  // lower intensity...
+		constexpr int intenmax = 0xff;  // higher intensity...
+
+		// intensity component
+		int const inten = BIT(color_prom[i], 3);
+
+		// red component
+		int const r = BIT(color_prom[i], 2) * (inten ? intenmax : intenmin);
+
+		// green component
+		int const g = BIT(color_prom[i], 1) * (inten ? intenmax : intenmin);
+
+		// blue component
+		int const b = BIT(color_prom[i], 0) * (inten ? intenmax : intenmin);
+
+		palette.set_pen_color(i, rgb_t(r, g, b));
+	}
 }
 
 
@@ -863,7 +932,7 @@ void norautp_state::sureshoto_palette(palette_device &palette) const
 
 void norautp_state::mainlamps_w(uint8_t data)
 {
-/*  PPI-0 (60h-63h); PortB OUT.
+/*  PPI-0 (60h-63h or 7Ch-7Fh); PortB OUT.
     Lamps:
 
     7654 3210
@@ -890,34 +959,9 @@ void norautp_state::mainlamps_w(uint8_t data)
 //  popmessage("lamps: %02x", data);
 }
 
-void norautp_state::soundlamps_w(uint8_t data)
-{
-/*  PPI-1 (a0h-a3h); PortC OUT.
-    Sound & Lamps:
-
-  7654 3210
-  ---- ---x  * DEAL / DRAW Lamp.
-  ---- --x-  * BET / COLLECT Lamp.
-  ---- -x--  + PANEL LIGHTS RESET (always activated after initialize).
-  ---- x---  + PANEL LAMPS CLOCK
-  xxxx ----  * Discrete Sound Lines.
-*/
-
-	m_lamps[8] = BIT(data, 0);  // DEAL / DRAW lamp
-	m_lamps[9] = BIT(data, 1);  // BET / COLLECT lamp
-
-	m_vreg = BIT(data, 0);
-
-	// the 4 MSB are for discrete sound
-	m_discrete->write(NORAUTP_SND_EN, (data >> 7) & 0x01);
-	m_discrete->write(NORAUTP_FREQ_DATA, (data >> 4) & 0x07);
-
-//  popmessage("sound bits 4-5-6-7: %02x, %02x, %02x, %02x", ((data >> 4) & 0x01), ((data >> 5) & 0x01), ((data >> 6) & 0x01), ((data >> 7) & 0x01));
-}
-
 void norautp_state::counterlamps_w(uint8_t data)
 {
-/*  PPI-0 (60h-63h); PortC OUT.
+/*  PPI-0 (60h-63h or 7Ch-7Fh); PortC OUT.
     Lamps & Coin Counters:
 
     7654 3210
@@ -940,9 +984,34 @@ void norautp_state::counterlamps_w(uint8_t data)
 	machine().bookkeeping().coin_counter_w(2, data & 0x08);  // Payout pulse
 }
 
+void norautp_state::soundlamps_w(uint8_t data)
+{
+/*  PPI-1 (A0h-A3h or BCh-BFh); PortC OUT.
+    Sound & Lamps:
+
+  7654 3210
+  ---- ---x  * DEAL / DRAW Lamp.
+  ---- --x-  * BET / COLLECT Lamp.
+  ---- -x--  + PANEL LIGHTS RESET (always activated after initialize).
+  ---- x---  + PANEL LAMPS CLOCK
+  xxxx ----  * Discrete Sound Lines.
+*/
+
+	m_lamps[8] = BIT(data, 0);  // DEAL / DRAW lamp
+	m_lamps[9] = BIT(data, 1);  // BET / COLLECT lamp
+
+	m_vreg = BIT(data, 0);
+
+	// the 4 MSB are for discrete sound
+	m_discrete->write(NORAUTP_SND_EN, (data >> 7) & 0x01);
+	m_discrete->write(NORAUTP_FREQ_DATA, (data >> 4) & 0x07);
+
+//  popmessage("sound bits 4-5-6-7: %02x, %02x, %02x, %02x", ((data >> 4) & 0x01), ((data >> 5) & 0x01), ((data >> 6) & 0x01), ((data >> 7) & 0x01));
+}
+
 void norautp_state::ppi2_b_w(uint8_t data)
 {
-/*  PPI-2 (c0h-c3h); PortB OUT.
+/*  PPI-2 (C0h-C3h or DCh-DFh); PortB OUT.
     Unknow:
 
     7654 3210
@@ -1009,6 +1078,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(norautp_state::test_timer_cb)
 {
 	m_test_count++;
 }
+
 
 /*********************************************
 *           Memory Map Information           *
@@ -1857,10 +1927,10 @@ INPUT_PORTS_END
 *********************************************/
 
 static const gfx_layout charlayout =
-/*
-  Trojanned 2 Narout Poker PCBs to see how the hardware decodes
-  the 16x32 tiles. The following GFX layout is 100% accurate.
-*/
+
+//  Reverse-engineered 2 Narout Poker PCBs to analyze the hardware's
+//  tile decoding method for 16x32 graphics. The following GFX layout
+//  has been verified as 100% accurate
 {
 	16, 32,
 	RGN_FRAC(1,2),
@@ -1891,8 +1961,8 @@ static const gfx_layout charlayout32x32 =
 
 // GFX are stored in the 2nd half... Maybe the HW could handle 2 bitplanes?
 static GFXDECODE_START( gfx_norautp )
-	GFXDECODE_ENTRY( "gfx", 0x800, charlayout,      0, 8 )
-	GFXDECODE_ENTRY( "gfx", 0x800, charlayout32x32, 0, 8 )
+	GFXDECODE_ENTRY( "gfx", 0x800, charlayout,      0, 256 )
+	GFXDECODE_ENTRY( "gfx", 0x800, charlayout32x32, 0, 256 )
 GFXDECODE_END
 
 
@@ -1998,7 +2068,7 @@ void norautp_state::noraut_base(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::norautp_map);
 	m_maincpu->set_addrmap(AS_IO, &norautp_state::norautp_portmap);
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);   // doesn't work if placed at derivative drivers
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	I8255(config, m_ppi8255[0], 0);
 	// (60-63) Mode 0 - Port A set as input
@@ -2140,6 +2210,8 @@ void norautp_state::dphl(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &norautp_state::dphl_portmap);
 	m_maincpu->set_vblank_int("screen", FUNC(norautp_state::irq0_line_hold));
 
+	PALETTE(config.replace(), "palette", FUNC(norautp_state::bp_based_palette), 512);
+
 	TIMER(config, "test_timer").configure_periodic(FUNC(norautp_state::test_timer_cb), attotime::from_usec(100));
 
 	m_display_line_control = true;
@@ -2193,24 +2265,6 @@ void norautp_state::gtipkra(machine_config &config)
 	m_discrete->set_intf(dphl_discrete);
 }
 
-
-void norautp_state::sureshoto(machine_config &config)
-{
-	noraut_base(config);
-
-	// basic machine hardware
-	I8080(config.replace(), m_maincpu, DPHL_CPU_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::dphl_map);
-	m_maincpu->set_addrmap(AS_IO, &norautp_state::dphl_portmap);
-	m_maincpu->set_vblank_int("screen", FUNC(norautp_state::irq0_line_hold));
-
-	TIMER(config, "test_timer").configure_periodic(FUNC(norautp_state::test_timer_cb), attotime::from_usec(100));
-	PALETTE(config.replace(), "palette", FUNC(norautp_state::sureshoto_palette), 16);
-	m_display_line_control = true;
-
-	// sound hardware
-	m_discrete->set_intf(dphl_discrete);
-}
 
 void norautp_state::kimbldhl(machine_config &config)
 {
@@ -2785,77 +2839,77 @@ ROM_END
 
 
   PCB Layout (V3.010A + V3.011A):                                             Edge Connector 36x2
-   ______________________________________________________________________________________________
-  |  _____                  _________    _________    _____         .........    _________       |
-  | |  555|                |74LS174N |  |74LS153N |  | 555 |        .........   |ULN2003A |      |
-  | |_____|                |_________|  |_________|  |_____|       898-1-R4.7K  |_________|      |
+  .----------------------------------------------------------------------------------------------.
+  | .-----.                .---------.  .---------.  .-----.        .........   .---------.      |
+  | | 555 |                |74LS174N |  |74LS153N |  | 555 |        .........   |ULN2003A |      |
+  | '-----'                '---------'  '---------'  '-----'       898-1-R4.7K  '---------'      |
   |   U46                      U45          U44        U43             U42          U41          |
   |                                                                                              |
   |              DIP SW x4                                                                       |
-  |  ________     _______                                                                        |
-  | |Battery |   |1|2|3|4|  _________    _________    _________    _________     _________       |
-  | |  3.6v  |   |_|_|_|_| |74LS157N |  |74LS153N |  |74LS161AP|  |74LS86AN |   |ULN2003A |      |
-  | |________|      U40    |_________|  |_________|  |_________|  |_________|   |_________|      |
+  | .--------.   .-.-.-.-.                                                                       |
+  | |Battery |   |1|2|3|4| .---------.  .---------.  .---------.  .---------.   .---------.      |
+  | |  3.6v  |   '-'-'-'-' |74LS157N |  |74LS153N |  |74LS161AP|  |74LS86AN |   |ULN2003A |      |
+  | '--------'      U40    '---------'  '---------'  '---------'  '---------'   '---------'      |
   |                            U39          U38          U37          U36           U35          |
   |                                                                                              |
   |                                                                                              | 36
-  |  _________              _________    .........    _________    _________     _________       |___
-  | | 74LS04  |            |74LS166AP|   .........   |74LS161AN|  |74LS153N |   |ULN2003A |       ___|
-  | |_________|            |_________|  898-1-R470   |_________|  |_________|   |_________|       ___|
-  |     U34                    U33          U32          U31          U30           U29           ___|
-  |                                   DIP SW x 8                               ________________   ___|
-  |               _____________    _______________    _________    _________  |                |  ___|
-  |              |             |  |1|2|3|4|5|6|7|8|  |74LS161AN|  |74LS157N | |    D8255AC-2   |  ___|
-  |              |    2716     |  |_|_|_|_|_|_|_|_|  |_________|  |_________| |________________|  ___|
-  |     NO IC    |_____________|                         U25          U24            U23          ___|
-  |      U28           U27              U26                                                       ___|
-  |                                                                            ________________   ___|
-  |                                                                           |                |  ___|
-  |                                                                           |    D8255AC-2   |  ___|
-  |                                                                           |________________|  ___|
-  |                _________   _________                                             U17          ___|
-  |               |  2114   | |  2114   |             _________    _________                      ___|
-  |      NO IC    |_________| |_________|            |74LS161AN|  |74LS157N |                     ___|
-  |       U22         U21         U20                |_________|  |_________|                     ___|
-  |                                                      U19          U18                         ___|
-  |                       ________________                                                        ___|
-  |                      |                |           _________    _________                      ___|
-  |                      |    D8255AC-2   |          |74LS161AN|  |74LS157N |     .........       ___|
-  |      NO IC           |________________|          |_________|  |_________|     .........       ___|
-  |       U16                   U15                      U14          U13        916C471X2PE      ___|
-  |                                                                                  U12         |
-  |                                                                                              | 1
-  |                      _________                    _________    _________    _________        |
+  | .---------.            .---------.   .........   .---------.  .---------.   .---------.      '---.
+  | | 74LS04  |            |74LS166AP|   .........   |74LS161AN|  |74LS153N |   |ULN2003A |       ---|
+  | '---------'            '---------'  898-1-R470   '---------'  '---------'   '---------'       ---|
+  |     U34                    U33          U32          U31          U30           U29           ---|
+  |                                                                           .----------------.  ---|
+  |              .-------------.  .-.-.-.-.-.-.-.-.  .---------.  .---------. |   D8255AC-2    |  ---|
+  |              |    2716     |  |1|2|3|4|5|6|7|8|  |74LS161AN|  |74LS157N | |                |  ---|
+  |              |             |  '-'-'-'-'-'-'-'-'  '---------'  '---------' '----------------'  ---|
+  |     NO IC    '-------------'     DIP SW x 8          U25          U24            U23          ---|
+  |      U28           U27              U26                                                       ---|
+  |                                                                           .----------------.  ---|
+  |                                                                           |   D8255AC-2    |  ---|
+  |                                                                           |                |  ---|
+  |                                                                           '----------------'  ---|
+  |               .---------. .---------.                                            U17          ---|
+  |               |  2114   | |  2114   |            .---------.  .---------.                     ---|
+  |      NO IC    '---------' '---------'            |74LS161AN|  |74LS157N |                     ---|
+  |       U22         U21         U20                '---------'  '---------'                     ---|
+  |                                                      U19          U18                         ---|
+  |                      .----------------.                                                       ---|
+  |                      |   D8255AC-2    |          .---------.  .---------.                     ---|
+  |                      |                |          |74LS161AN|  |74LS157N |     .........       ---|
+  |      NO IC           '----------------'          '---------'  '---------'     .........       ---|
+  |       U16                   U15                      U14          U13        916C471X2PE     .---'
+  |                                                                                  U12         | 01
+  |                                                                                              |
+  |                     .---------.                  .---------.  .---------.  .---------.       |
   |      NO IC          | 74LS32N |                  |74LS161AN|  | 74LS86P |  | 74LS04N |       |
-  |       U11           |_________|                  |_________|  |_________|  |_________|       |
-  |                         U10                           U9          U8           U7            |
-  |                                       XTAL  18.432                                           |
+  |       U11           '---------'                  '---------'  '---------'  '---------'       |
+  |                         U10                XTAL       U9          U8           U7            |
+  |                                           18.432                                             |
   |                                           .----.                                             |
-  |  ____________________     __________      _________    _________    _________    _________   |
-  | |                    |   |74LS138N  |    | 74LS04N |  |74LS157N |  | 74LS11N |  |74LS74AN |  |
-  | |   EXPANSION PCB    |   |__________|    |_________|  |_________|  |_________|  |_________|  |
-  | |____________________|       U5               U4           U3           U2           U1      |
+  | .--------------------.   .----------.    .---------.  .---------.  .---------.  .---------.  |
+  | |   EXPANSION PCB    |   |74LS138N  |    | 74LS04N |  |74LS157N |  | 74LS11N |  |74LS74AN |  |
+  | |                    |   '----------'    '---------'  '---------'  '---------'  '---------'  |
+  | '--------------------'       U5               U4           U3           U2           U1      |
   |          U5                                                                                  |
-  |______________________________________________________________________________________________|
+  '----------------------------------------------------------------------------------------------'
 
 
   EXPANSION PCB:
-   __________________________________
-  |                       ___        |
-  |  _____________       |   |       |
-  | |             |      | P |       |
-  | | V30 27C512  |      | A |       |
-  | |_____________|      | L |       |
-  | *                    |___|       |
-  | * J1                     ______  |
-  | *                       |      | |
-  | ____________________    |      | |
-  ||                    |   | 6116 | |
-  ||     Z084004PS      |   |      | |
-  *|                    |   |      | |
-  *|____________________|   |      | |
-  * J2                      |______| |
-  |__________________________________|
+  .-----------------------------------.
+  |                       .---.       |
+  | .-------------.       | P |       |
+  | | V30 27C512  |       | A |       |
+  | |             |       | L |       |
+  | '-------------'       |   |       |
+  | *                     '---'       |
+  | * J1                     .------. |
+  | *                        |      | |
+  | .--------------------.   |      | |
+  | |                    |   | 6116 | |
+  | |     Z084004PS      |   |      | |
+  |*|                    |   |      | |
+  |*'--------------------'   |      | |
+  |* J2                      '------' |
+  '-----------------------------------'
 
 
   Discrete audio circuitry: SAME AS KIMBLE DIAGRAM
@@ -2958,6 +3012,7 @@ ROM_START( mainline )
 ROM_END
 
 /*
+
   DellFern 4-bet Joker z80 28pin
   45%-75% payout.
 
@@ -3027,7 +3082,6 @@ ROM_END
   | '--------------------'       U5               U4           U3           U2           U1      |
   |          U5                                                                                  |
   '----------------------------------------------------------------------------------------------'
-
   
 */
 
@@ -3055,6 +3109,7 @@ ROM_START( df_djpkra )
 ROM_END
 
 /*
+
   Deluxe Poker...
 
   Stickered:
@@ -3185,69 +3240,68 @@ ROM_END
   Frequency measured 2.3025MHz.
 
 
-  PCB Layout (Kimble Double HI-LO Z80):                                        Edge Connector 36x2
-   ______________________________________________________________________________________________
-  |                         _________    _________    _____        .........     _________       |
+  PCB Layout (Kimble Double HI-LO Z80):                                       Edge Connector 36x2
+  .----------------------------------------------------------------------------------------------.
+  |                        .---------.  .---------.  .-----.       .........    .---------.      |
   |                        |74LS174N |  |74LS153N |  |NE555|       .........    |ULN2003A |      |
-  |    BATTERY             |_________|  |_________|  |_____|       4116R 471    |_________|      |
+  |    BATTERY             '---------'  '---------'  '-----'       4116R 471    '---------'      |
   |  3.6V NI-CD                U45          U44        U43            U42          U41           |
   |                                                                                              |
   |                                                                                              |
-  |       ______            _________    _________    _________    _________     _________       |
+  |      .------.          .---------.  .---------.  .---------.  .---------.   .---------.      |
   |      |MC1455|          |74LS157N |  | 74153N  |  | 74161N  |  |  7486N  |   |ULN2003A |      |
-  |      |______|          |_________|  |_________|  |_________|  |_________|   |_________|      |
+  |      '------'          '---------'  '---------'  '---------'  '---------'   '---------'      |
   |        U40                 U39          U38          U37          U36           U35          |
   |                                                                                              |
   |                                                                                              | 36
-  |    _________            _________    4116R 471    _________    _________     _________       |___
-  |   |  7404N  |          | 74166N  |   .........   | 74161N  |  | 74153N  |   |ULN2003A |       ___|
-  |   |_________|          |_________|   .........   |_________|  |_________|   |_________|       ___|
-  |       U34                  U33          U32          U31          U30           U29           ___|
-  |                                   DIP SW x 8                               ________________   ___|
-  |               _____________    _______________    _________    _________  |                |  ___|
-  | ***********  |             |  |1|2|3|4|5|6|7|8|  | 74161N  |  | 74157N  | |    D8255AC-5   |  ___|
-  | x11 SIL FOR  |    2716     |  |_|_|_|_|_|_|_|_|  |_________|  |_________| |________________|  ___|
-  |EXPANSION PCB |_____________|         U26             U25          U24            U23          ___|
-  |     U28            U27                                                                        ___|
-  |                                                                            ________________   ___|
-  |                                                                           |                |  ___|
-  |                   _________       _________       _________    _________  |    D8255AC-5   |  ___|
-  |                  | 2114    |     |  2114   |     | 74161N  |  | 74157N  | |________________|  ___|
-  |    NO IC         |_________|     |_________|     |_________|  |_________|        U17          ___|
-  |     U22              U21             U20             U19          U18                         ___|
-  |                                                                                               ___|
-  |                       ________________                                                        ___|
-  |                      |                |           _________    _________      4116R 471       ___|
-  |                      |   D8255AC-2    |          | 74161N  |  | 74157N  |     .........       ___|
-  |     NO IC            |________________|          |_________|  |_________|     .........       ___|
-  |      U16                    U15                      U14          U13            U12          ___|
-  |                                                                                              |
-  | ************                               _________       _________        _________        | 01
+  |   .---------.          .---------.   4116R 471   .---------.  .---------.   .---------.      '---.
+  |   |  7404N  |          | 74166N  |   .........   | 74161N  |  | 74153N  |   |ULN2003A |       ---|
+  |   '---------'          '---------'   .........   '---------'  '---------'   '---------'       ---|
+  |       U34                  U33          U32          U31          U30           U29           ---|
+  |                                                                           .----------------.  ---|
+  |              .-------------.  .-.-.-.-.-.-.-.-.  .---------.  .---------. |   D8255AC-2    |  ---|
+  | ***********  |    2716     |  |1|2|3|4|5|6|7|8|  | 74161N  |  | 74157N  | |                |  ---|
+  | x11 SIL FOR  |             |  '-'-'-'-'-'-'-'-'  '---------'  '---------' '----------------'  ---|
+  |EXPANSION PCB '-------------'     DIP SW x 8          U25          U24            U23          ---|
+  |     U28            U27               U26                                                      ---|
+  |                                                                           .----------------.  ---|
+  |                                                                           |   D8255AC-2    |  ---|
+  |                  .---------.     .---------.     .---------.  .---------. |                |  ---|
+  |                  | 2114    |     |  2114   |     | 74161N  |  | 74157N  | '----------------'  ---|
+  |    NO IC         '---------'     '---------'     '---------'  '---------'        U17          ---|
+  |     U22              U21             U20             U19          U18                         ---|
+  |                                                                                               ---|
+  |                      .----------------.                                                       ---|
+  |                      |   D8255AC-2    |          .---------.  .---------.     4116R 471       ---|
+  |                      |                |          | 74161N  |  | 74157N  |     .........       ---|
+  |     NO IC            '----------------'          '---------'  '---------'     .........       ---|
+  |      U16                    U15                      U14          U13            U12         .---'
+  |                                                                                              | 01
+  | ************                              .---------.     .---------.      .---------.       |
   | x24 DIL SOCKET                            | 74161N  |     | 7486N   |      |  7404N  |       |
-  | EXPANSION PCB                             |_________|     |_________|      |_________|       |
-  | ************               NO IC                   U9              U8               U7       |
+  | EXPANSION PCB                             '---------'     '---------'      '---------'       |
+  | ************               NO IC              U9              U8               U7            |
   |       U11                   U10                                                              |
-  |                                         Xtal removed                                         |
-  |  ____________________     __________                   _________    _________    _________   |
-  | |                    |   |  74LS32  |                 | 74157N  |  |  7411N  |  |  7474N  |  |
-  | | Z80 EXPANSION PCB  |   |__________|       NO IC     |_________|  |_________|  |_________|  |
-  | |____________________|        U5              U4           U3           U2           U1      |
+  |                                             Xtal                                             |
+  | .--------------------.   .----------.      removed    .---------.  .---------.  .---------.  |
+  | | Z80 EXPANSION PCB  |   |  74LS32  |                 | 74157N  |  |  7411N  |  |  7474N  |  |
+  | |                    |   '----------'       NO IC     '---------'  '---------'  '---------'  |
+  | '--------------------'        U5              U4           U3           U2           U1      |
   |  1        U6                                                                                 |
-  |______________________________________________________________________________________________|
+  '----------------------------------------------------------------------------------------------'
 
 
   PCB Layout EXPANSION BOARD (Kimble Double HI-LO 8080):
-
   EXPANSION BOARD  Silkscreened:SCT 34-88
-   __________________________________________________________________
+  .------------------------------------------------------------------.
   |                                          5             6         |
-  |            4 WIRES   ****            _________     _________     |
+  |            4 WIRES   ****           .---------.   .---------.    |
   |          TO MAIN PCB                | 74LS08N |   |74LS155N |    |
-  |                                     |_________|   |_________|    |
+  |                                     '---------'   '---------'    |
   |                                                                  |
-  |        EXP PIN  ______       ______     ______                   |
+  |        EXP PIN .------.     .------.   .------.      *      *    |
   |          x11   |      |     |      |   |      |      *      *    |
-  |   ___     *    | 6264 |     | PROG |   | PROG |      * EXP  *    |
+  |  .---.    *    | 6264 |     | PROG |   | PROG |      * EXP  *    |
   |  | P |    *    |      |     |      |   |      |      * PIN  *    |
   |  | A |    *    |      |     |      |   |      |      *      *    |
   |  | L |    *    |      |     |27128 |   |27256 |      * x24  *    |
@@ -3256,29 +3310,28 @@ ROM_END
   |  | R |    *    |      |     |  II  |   |   I  |      *      *    |
   |  | 8 |    *    |      |     |      |   |      |      *      *    |
   |  |   |    *    |      |     |      |   |      |      *      *    |
-  |  |___|    *    |______|     |______|   |______|      *      *    |
-  |    1               2           3           4         *      *    |
-  |__________________________________________________________________|
+  |  '---'    *    '------'     '------'   '------'      *      *    |
+  |    1               2           3           4                     |
+  '------------------------------------------------------------------'
 
 
   Z80 ADDON BOARD:
   Silkscreened:SCT 38-90
-   _____________________________________________________________
+  .-------------------------------------------------------------.
   |                                                             |
-  |  ____________________________     _________     _________   |
+  | .----------------------------.   .---------.   .---------.  |
   | |                            |   | 74LS14N |   | 74LS04N |  |
-  | |     Z8400AB1               |   |_________|   |_________|  |
+  | |     Z8400AB1               |   '---------'   '---------'  |
   | |                            |                              |
-  | |____________________________|                    *--*      |
+  | '----------------------------'                    *--*      |
   |                                              XTAL 18.432 Mhz|
   |                                                             |
-  |   _________                   ____________________________  |
+  |  .---------.                 .----------------------------. |
   |  | 74LS32N |                 |                           1| |
-  |  |_________|                 |  40 PINS TO MAIN PCB U6    | |
+  |  '---------'                 |  40 PINS TO MAIN PCB U6    | |
   |                              |                            | |
-  |                              |____________________________| |
-  |_____________________________________________________________|
-
+  |                              '----------------------------' |
+  '-------------------------------------------------------------'
 
 
   Kimble Double HI-LO (Z80) discrete audio circuitry:
@@ -3390,51 +3443,51 @@ ROM_END
 
 
   PCB Layout:                                                                           Edge Connector 36x2
-   ________________________________________________________________________________________________________
-  |              _________    _____      _____       _________   _________   _________    _________        |
+  .--------------------------------------------------------------------------------------------------------.
+  |             .---------.  .-----.    .-----.     .---------. .---------. .---------.  .---------.       |
   |             |SN74LS12 |  |LM393|    |NE555|     |077B PROM| |SN74174N | |SN74LS86 |  |ULN2003AN|       |
-  |    NO IC    |_________|  |_____|    |_____|     |_82S129__| |_________| |_________|  |_________|       |
+  |    NO IC    '---------'  '-----'    '-----'     '-82S129--' '---------' '---------'  '---------'       |
   |     U64         U63        U62        U61           U51         U60         U59          U58           |
   |                                    2N3906    2N2222                                                    |
-  |  _________                                    VR1                                                      |
-  | | Dallas  |  _________   _________   _________   _________   _________   _________    _________        |
+  | .---------.                                   VR1                                                      |
+  | | Dallas  | .---------. .---------. .---------. .---------. .---------. .---------.  .---------.       |
   | | DS1220Y | |SN74LS00N| |TC4040BP | |ITT7402N | |SN74157N | |471RESNET| |472RESNET|  |ULN2003AN|       |
-  | |_________| |_________| |_________| |_________| |_________| |_________| |_________|  |_________|       |
+  | '---------' '---------' '---------' '---------' '---------' '---------' '---------'  '---------'       |
   |     U57         U56         U55         U54         U53         U52         U50          U49           | 36
-  |                                                                                                        |___
-  |  _________   _________   _________   _________   _________   _________   _________    _________         ___|
-  | |   4F79  | |SN74LS32N| |SN74LS157| |  74161  | |SN74166N | |DIP SW x8| |DIP SW x8|  |ULN2003AN|        ___|
-  | |_PAL20L10| |_________| |_________| |_________| |_________| |_________| |_________|  |_________|        ___|
-  |     U48         U47         U46         U45         U44         U43         U42          U41            ___|
-  |                         _______________    ______________                            ________________   ___|
-  |              _______   |               |  |  EPROM 2732  |   _________   _________  |                |  ___|
-  |    NO IC    |SN7474 |  |   CDM 6116    |  |   CF7B U31   |  | 74LS244 | | 74LS244 | |   AMD P8255A   |  ___|
-  |     U26     |_______|  |_______________|  |______________|  |_________| |_________| |________________|  ___|
-  |                U40            U39                U31            U38         U37            U36          ___|
-  |  __________                          ____________________                            ________________   ___|
-  | |EPROM 2764|  _______   _________   |                    |   _________   _________  |                |  ___|
-  | |   U19    | |74161PC| |SN74157N |  |     AMD P8255A     |  | 74LS244 | |DIP SW x8| |   AMD P8255A   |  ___|
-  | |__________| |_______| |_________|  |____________________|  |_________| |_________| |________________|  ___|
-  |     U19         U35        U34               U33                U32         U30            U29          ___|
-  |  __________                                                                                             ___|
-  | |EPROM 2764|  _________   ________   _________   _________   _________   ________   _________   ______  ___|
-  | |   U18    | |SN74LS32N| |DM7414N | |SN74157N | |SN74157N | |SN74LS32N| |DM7411N | |SN74LS00N| |RESNET| ___|
-  | |__________| |_________| |________| |_________| |_________| |_________| |________| |_________| |_471__| ___|
-  |     U18          U28        U27         U25         U24         U23         U22        U21       U20    ___|
-  |  __________                                                                                             ___|
-  | |EPROM 2764|  _________   ________   _________   _________   _________   _________   _______   _______  ___|
-  | |   U12    | |SN74LS155| | RESNET | | 74161PC | | 74161PC | | 74161PC | | 74161PC | |DM7414N| |SN7486N| ___|
-  | |__________| |_________| |__472___| |_________| |_________| |_________| |_________| |_______| |_______||
-  |     U12         U17         U16         U15         U14         U13         U11        U10        U9   | 01
+  |                                                                                                        '---.
+  | .---------. .---------. .---------. .---------. .---------. .---------. .---------.  .---------.        ---|
+  | |   4F79  | |SN74LS32N| |SN74LS157| |  74161  | |SN74166N | |DIP SW x8| |DIP SW x8|  |ULN2003AN|        ---|
+  | '-PAL20L10| '---------' '---------' '---------' '---------' '---------' '---------'  '---------'        ---|
+  |     U48         U47         U46         U45         U44         U43         U42          U41            ---|
+  |                        .---------------.  .--------------.                          .----------------.  ---|
+  |             .-------.  |   CDM 6116    |  |  EPROM 2732  |  .---------. .---------. |   AMD P8255A   |  ---|
+  |    NO IC    |SN7474 |  |               |  |   CF7B U31   |  | 74LS244 | | 74LS244 | |                |  ---|
+  |     U26     '-------'  '---------------'  '--------------'  '---------' '---------' '----------------'  ---|
+  |                U40            U39                U31            U38         U37            U36          ---|
+  | .----------.                        .--------------------.                          .----------------.  ---|
+  | |EPROM 2764| .-------. .---------.  |     AMD P8255A     |  .---------. .---------. |   AMD P8255A   |  ---|
+  | |   U19    | |74161PC| |SN74157N |  |                    |  | 74LS244 | |DIP SW x8| |                |  ---|
+  | '----------' '-------' '---------'  '--------------------'  '---------' '---------' '----------------'  ---|
+  |     U19         U35        U34               U33                U32         U30            U29          ---|
+  | .----------.                                                                                            ---|
+  | |EPROM 2764| .---------. .--------. .---------. .---------. .---------. .--------. .---------. .------. ---|
+  | |   U18    | |SN74LS32N| |DM7414N | |SN74157N | |SN74157N | |SN74LS32N| |DM7411N | |SN74LS00N| |RESNET| ---|
+  | '----------' '---------' '--------' '---------' '---------' '---------' '--------' '---------' '-471--' ---|
+  |     U18          U28        U27         U25         U24         U23         U22        U21       U20    ---|
+  | .----------.                                                                                            ---|
+  | |EPROM 2764| .---------. .--------. .---------. .---------. .---------. .---------. .-------. .-------. ---|
+  | |   U12    | |SN74LS155| | RESNET | | 74161PC | | 74161PC | | 74161PC | | 74161PC | |DM7414N| |SN7486N|.---'
+  | '----------' '---------' '--472---' '---------' '---------' '---------' '---------' '-------' '-------'| 01
+  |     U12         U17         U16         U15         U14         U13         U11        U10        U9   |
   |                                                                                                        |
-  |  ___________________                                                                                   |
-  | |                   |  __________   ________   _______   _________   _________   _______   __________  |
-  | | SGS Z8400B1 (Z80) | |DM74LS245N| |SN7474N | |74S04N | |SN74LS161| |SN74LS32N| |DM7414N| |SN74LS123N| |
-  | |___________________| |__________| |________| |_______| |_________| |_________| |_______| |__________| |
+  | .-------------------.                                                                                  |
+  | |    SGS Z8400B1    | .----------. .--------. .-------. .---------. .---------. .-------. .----------. |
+  | |       (Z80)       | |DM74LS245N| |SN7474N | |74S04N | |SN74LS161| |SN74LS32N| |DM7414N| |SN74LS123N| |
+  | '-------------------' '----------' '--------' '-------' '---------' '---------' '-------' '----------' |
   |          U8                U7          U6        U5         U4          U3         U2          U1      |
-  |                                                 _____                                                  |
+  |                                                .-----.                                                 |
   |        KRAMER MFG  PWB-000-40065 REV B.       .| === |. Xtal 18.000 MHz.                               |
-  |________________________________________________________________________________________________________|
+  '--------------------------------------------------------------------------------------------------------'
 
 
   DIP Switches position:
@@ -3471,7 +3524,7 @@ ROM_END
 
 
 ROM_START( newhilop )
-	ROM_REGION( 0x10000, "cpu_data", 0 )
+	ROM_REGION( 0x10000, "cpu_data", 0 )  // multiple programs?
 	ROM_LOAD( "new_hi-low.3e",  0x0000, 0x10000, CRC(8efe02a2) SHA1(e8150544f073e80ca83f2033bce64b65de08194c) )
 
 	ROM_REGION( 0x10000, "gfx_data", 0 )
@@ -3489,6 +3542,7 @@ ROM_END
 
 
 /*
+
   Draw Poker
   Coinmaster.
   Based on Joker Poker V.01.
@@ -3528,33 +3582,33 @@ ROM_END
   "NYMF O II" hardware.
   M. Kramer Inc.
 
-  PCB layout (Draw Poker HI-LO)
-   ___________________________________________________________________________
-  |  _________                       ______                                   |
+  PCB layout (Draw Poker HI-LO):
+  .---------------------------------------------------------------------------.
+  | .---------.                     .------.                                  |
   | |HCF4093BE|           SN74174N  | U51  |  NE555P  916C472X2PE  ULN2003A   |
-  | |         |                     |______|                                  |
+  | |         |                     '------'                                  |
   | |         |                                                               |
   | |MC14040  |  74123N   SN74157N            74161N  SN7486N      ULN2003A   |
   | |         |                                                               |
   | |         |                                                               |
-  | |MWS5101  |  SN7404N  SN74166N  898-1-R   74161N               ULN2003A   |__
-  | |         |                                                                __|
-  | |         |            ______    _______                     ___________   __|
-  | |5101E-1  |           | U31  |  |DIP-SW | 74161N  SN74157N  |AM8255 APC |  __|
-  | |_________|           |______|  |_______|                   |___________|  __|
-  |   ______                                                     ___________   __|
-  |  | U26  |             2111A-2   2111A-2   74161N  SN74157N  | U20       |  __|
-  |  |______|                                                   |___________|  __|
-  |   ______     ______    ___________                                         __|
-  |  | U19  |   | U18  |  |AM8255 APC |       74161N  SN74157N     898-1-R     __|
-  |  |______|   |______|  |___________|                                        __|
-  |              ______    __________                                         |
-  |  74LS541N   | U12  |  |i D8228   |   OSC  74161N  SN7486N      SN7404N    |
-  |             |______|  |__________|                                        |
-  |              __________                                                   |
+  | |MWS5101  |  SN7404N  SN74166N  898-1-R   74161N               ULN2003A   '--.
+  | |         |                                                                --|
+  | |         |           .------.  .-------.                   .-----------.  --|
+  | |5101E-1  |           | U31  |  |DIP-SW | 74161N  SN74157N  |AM8255 APC |  --|
+  | '---------|           '------'  '-------'                   '-----------'  --|
+  |  .------.                                                   .-----------.  --|
+  |  | U26  |             2111A-2   2111A-2   74161N  SN74157N  | U20       |  --|
+  |  '------'                                                   '-----------'  --|
+  |  .------.   .------.  .-----------.                                        --|
+  |  | U19  |   | U18  |  |AM8255 APC |       74161N  SN74157N     898-1-R     --|
+  |  '------'   '------'  '-----------'                                       .--'
+  |             .------.  .----------.                                        |
+  |  74LS541N   | U12  |  | i D8228  |   OSC  74161N  SN7486N      SN7404N    |
+  |             '------'  '----------'                                        |
+  |             .----------.                                                  |
   |  DM7405N    |i P8080A  |     SN74LS155AN  iP8224  SN74157N 7411N 7474PC   |
-  |             |__________|                                                  |
-  |___________________________________________________________________________|
+  |             '----------'                                                  |
+  '---------------------------------------------------------------------------'
 
   OSC = 18.14 MHz
 
@@ -3616,55 +3670,55 @@ ROM_END
   U27:1977 :IN SOCKET
 
 
-  PCB Layout (Draw Poker HI-LO (alt)):                                        Edge Connector 36x2
-   ______________________________________________________________________________________________
-  |                         _________    _________    _____        .........     _________       |
+  PCB Layout (Draw Poker HI-LO (alt)):                                       Edge Connector 36x2
+  .----------------------------------------------------------------------------------------------.
+  |                        .---------.  .---------.  .-----.       .........    .---------.      |
   |                        |74LS174N |  |74LS153N |  |NE555|       .........    |ULN2003A |      |
-  |       NO IC            |_________|  |_________|  |_____|       16-2-472     |_________|      |
+  |       NO IC            '---------'  '---------'  '-----'       16-2-472     '---------'      |
   |        U46                 U45          U44        U43            U42          U41           |
   |                                                                                              |
   |                                                                                              |
-  |                         _________    _________    _________    _________     _________       |
+  |                        .---------.  .---------.  .---------.  .---------.   .---------.      |
   |                        |74LS157N |  | 74153N  |  | 74161N  |  |  7486N  |   |ULN2003A |      |
-  |       NO IC            |_________|  |_________|  |_________|  |_________|   |_________|      |
+  |       NO IC            '---------'  '---------'  '---------'  '---------'   '---------'      |
   |        U40                 U39          U38          U37          U36           U35          |
   |                                                                                              |
   |                                                                                              | 36
-  |  _________              _________   916C471X2PE   _________    _________     _________       |___
-  | |  7404N  |            | 74166N  |   .........   | 74161N  |  | 74153N  |   |ULN2003A |       ___|
-  | |_________|            |_________|   .........   |_________|  |_________|   |_________|       ___|
-  |     U34                    U33          U32          U31          U30           U29           ___|
-  |                                   DIP SW x 8                               ________________   ___|
-  |               _____________    _______________    _________    _________  |                |  ___|
-  |  _________   |             |  |1|2|3|4|5|6|7|8|  | 74161N  |  | 74157N  | |    P8255A-5    |  ___|
-  | | 2111A-2 |  |    2716     |  |_|_|_|_|_|_|_|_|  |_________|  |_________| |________________|  ___|
-  | |_________|  |_____________|         U26             U25          U24            U23          ___|
-  |     U28            U27                                                                        ___|
-  |                                                                            ________________   ___|
-  |                                                                           |                |  ___|
-  |  _________        _________       _________       _________    _________  |    D8255AC-5   |  ___|
-  | | 2111A-2 |      | 2111A-2 |     | 2111A-2 |     | 74161N  |  | 74157N  | |________________|  ___|
-  | |_________|      |_________|     |_________|     |_________|  |_________|        U17          ___|
-  |     U22              U21             U20             U19          U18                         ___|
-  |                                                                                               ___|
-  |  ______________       ________________                                                        ___|
-  | |              |     |                |           _________    _________     916C471X2PE      ___|
-  | |     2716     |     |   AM8255A PC   |          | 74161N  |  | 74157N  |     .........       ___|
-  | |______________|     |________________|          |_________|  |_________|     .........       ___|
-  |       U16                   U15                      U14          U13            U12          ___|
-  |                                                                                              |
-  |  ______________         ____________       _________       _________        _________        | 01
-  | |              |       |            |     | 74161N  |     | 7486N   |      |  7404N  |       |
-  | |     2716     |       |  i P8228   |     |_________|     |_________|      |_________|       |
-  | |______________|       |____________|         U9              U8               U7            |
+  | .---------.            .---------.  916C471X2PE  .---------.  .---------.   .---------.      '---.
+  | |  7404N  |            | 74166N  |   .........   | 74161N  |  | 74153N  |   |ULN2003A |       ---|
+  | '---------'            '---------'   .........   '---------'  '---------'   '---------'       ---|
+  |     U34                    U33          U32          U31          U30           U29           ---|
+  |                                                                           .----------------.  ---|
+  |              .-------------.  .-.-.-.-.-.-.-.-.  .---------.  .---------. |    P8255A-5    |  ---|
+  | .---------.  |    2716     |  |1|2|3|4|5|6|7|8|  | 74161N  |  | 74157N  | |                |  ---|
+  | | 2111A-2 |  |             |  '-'-'-'-'-'-'-'-'  '---------'  '---------' '----------------'  ---|
+  | '---------'  '-------------'     DIP SW x 8          U25          U24            U23          ---|
+  |     U28            U27               U26                                                      ---|
+  |                                                                           .----------------.  ---|
+  |                                                                           |    D8255AC-5   |  ---|
+  | .---------.      .---------.     .---------.     .---------.  .---------. |                |  ---|
+  | | 2111A-2 |      | 2111A-2 |     | 2111A-2 |     | 74161N  |  | 74157N  | '----------------'  ---|
+  | '---------'      '---------'     '---------'     '---------'  '---------'        U17          ---|
+  |     U22              U21             U20             U19          U18                         ---|
+  |                                                                                               ---|
+  | .--------------.     .----------------.                                                       ---|
+  | |     2716     |     |   AM8255A PC   |          .---------.  .---------.    916C471X2PE      ---|
+  | |              |     |                |          | 74161N  |  | 74157N  |     .........       ---|
+  | '--------------'     '----------------'          '---------'  '---------'     .........       ---|
+  |       U16                   U15                      U14          U13            U12         .---'
+  |                                                                                              | 01
+  | .--------------.       .------------.     .---------.     .---------.      .---------.       |
+  | |     2716     |       |  i P8228   |     | 74161N  |     | 7486N   |      |  7404N  |       |
+  | |              |       |            |     '---------'     '---------'      '---------'       |
+  | '--------------'       '------------'         U9              U8               U7            |
   |       U11                   U10           XTAL                                               |
   |                                          .----. 18Mhz                                        |
-  |  ____________________     __________      _________    _________    _________    _________   |
-  | |                    |   |  74155N  |    | i P8224 |  | 74157N  |  |  7411N  |  |  7474N  |  |
-  | |     i P8080A       |   |__________|    |_________|  |_________|  |_________|  |_________|  |
-  | |____________________|        U5              U4           U3           U2           U1      |
+  | .--------------------.   .----------.    .---------.  .---------.  .---------.  .---------.  |
+  | |     i P8080A       |   |  74155N  |    | i P8224 |  | 74157N  |  |  7411N  |  |  7474N  |  |
+  | |                    |   '----------'    '---------'  '---------'  '---------'  '---------'  |
+  | '--------------------'        U5              U4           U3           U2           U1      |
   |           U6                                                                                 |
-  |______________________________________________________________________________________________|
+  '----------------------------------------------------------------------------------------------'
 
 
   Draw Poker HI-LO (alt) discrete audio circuitry
@@ -4018,57 +4072,56 @@ ROM_END
   PCB Engraved: "1350" "10-83".
 
 
-  PCB Layout (SMS HI-LO Double Up Joker Poker):                                             Edge Connector 36x2
-   ____________________________________________________________________________________________________________
-  |  _________                            _________    _________    _____        .........     _________       |
+  PCB Layout (SMS HI-LO Double Up Joker Poker):                                            Edge Connector 36x2
+  .------------------------------------------------------------------------------------------------------------.
+  | .---------.                          .---------.  .---------.  .-----.       .........    .---------.      |
   | |HCF4093BE|         NO IC            | 74174PC |  | 82S129N |  |NE555|       .........    |ULN2003A |      |
-  | |_________|                          |_________|  |_________|  |_____|      916C471X2PE   |_________|      |
+  | '---------'                          '---------'  '---------'  '-----'      916C471X2PE   '---------'      |
   |    U54               U53                 U52          U51        U50            U49          U48           |
-  | ____________________                                                                                       |
+  |.--------------------.                                                                                      |
   || 3.6v NI-CD BATTERY |                                                                                      |
-  ||____________________|                                                                                      |
-  | _________          _________          _________                 _________    _________     _________       |
+  |'--------------------'                                                                                      |
+  |.---------.        .---------.        .---------.               .---------.  .---------.   .---------.      |
   ||CD4040BE |        | 74123PC |        | 74157PC |     NO IC     | 74161   |  |  7486   |   |ULN2003A |      |
-  ||_________|        |_________|        |_________|               |_________|  |_________|   |_________|      |
+  |'---------'        '---------'        '---------'               '---------'  '---------'   '---------'      |
   |    U47                U46                U45          U44          U43          U42           U41          |
   |                                                                                                            |
   |                                                                                                            | 36
-  | _________       _________             _________   MDP1601 471G  _________                  _________       |___
-  ||D5101LC-1|     |  7404   |           |SN74166J |   .........   | 74161N  |     NO IC      |ULN2003A |       ___|
-  ||_________|     |_________|           |_________|   .........   |_________|                |_________|       ___|
-  |    U40             U39                   U38          U37          U36          U35           U34           ___|
-  |                                                                                          ________________   ___|
-  |                             _____________    _______________    _________    _________  |                |  ___|
-  | _________                  |             |  |1|2|3|4|5|6|7|8|  | 74161   |  | 74157   | |   D8255AC-5    |  ___|
-  ||D5101LC-1|       NO IC     |    2716     |  |_|_|_|_|_|_|_|_|  |_________|  |_________| |________________|  ___|
-  ||_________|                 |_____________|         U30             U29          U28            U27          ___|
-  |    U33            U32            U31            DIP SW x 8                                                  ___|
-  |                                                                                          ________________   ___|
-  |                                                                                         |                |  ___|
-  |                                 _________       _________       _________    _________  |    D8255AC-5   |  ___|
-  |   NO IC          NO IC         | 2111A-2 |     | 2111A-2 |     | 74161   |  | 74157   | |________________|  ___|
-  |                                |_________|     |_________|     |_________|  |_________|        U20          ___|
-  |    U26            U25              U24             U23             U22          U21                         ___|
-  |                                                                                                             ___|
-  |                ______________       ________________                                                        ___|
-  |               |              |     |                |           _________    _________    MDP1601 471G      ___|
-  |   NO IC       |     2732     |     |   D8255AC-5    |          | 74161   |  | 74157   |     .........       ___|
-  |               |______________|     |________________|          |_________|  |_________|     .........       ___|
-  |    U19              U18                   U17                      U16          U15            U14          ___|
-  |                                                                                                            |
-  |                ______________         ____________       _________       _________        _________        | 01
-  | _________     |              |       |            |     | 74161N  |     |  7486   |      |  7404   |       |
-  ||74LS 541F|    |     2732     |       | NEC B8228  |     |_________|     |_________|      |_________|       |
-  ||_________|    |______________|       |____________|         U10             U9               U8            |
+  |.---------.     .---------.           .---------.  MDP1601 471G .---------.                .---------.      '---.
+  ||D5101LC-1|     |  7404   |           |SN74166J |   .........   | 74161N  |     NO IC      |ULN2003A |       ---|
+  |'---------'     '---------'           '---------'   .........   '---------'                '---------'       ---|
+  |    U40             U39                   U38          U37          U36          U35           U34           ---|
+  |                                                                                         .----------------.  ---|
+  |                            .-------------.  .-.-.-.-.-.-.-.-.  .---------.  .---------. |   D8255AC-5    |  ---|
+  |.---------.                 |    2716     |  |1|2|3|4|5|6|7|8|  | 74161   |  | 74157   | |                |  ---|
+  ||D5101LC-1|       NO IC     |             |  '-'-'-'-'-'-'-'-'  '---------'  '---------' '----------------'  ---|
+  |'---------'                 '-------------'     DIP SW x 8          U29          U28            U27          ---|
+  |    U33            U32            U31               U30                                                      ---|
+  |                                                                                         .----------------.  ---|
+  |                                                                                         |   D8255AC-5    |  ---|
+  |                                .---------.     .---------.     .---------.  .---------. |                |  ---|
+  |   NO IC          NO IC         | 2111A-2 |     | 2111A-2 |     | 74161   |  | 74157   | '----------------'  ---|
+  |                                '---------'     '---------'     '---------'  '---------'        U20          ---|
+  |    U26            U25              U24             U23             U22          U21                         ---|
+  |                                                                                                             ---|
+  |               .--------------.     .----------------.                                                       ---|
+  |               |     2732     |     |   D8255AC-5    |          .---------.  .---------.   MDP1601 471G      ---|
+  |   NO IC       |              |     |                |          | 74161   |  | 74157   |     .........       ---|
+  |               '--------------'     '----------------'          '---------'  '---------'     .........       ---|
+  |    U19              U18                   U17                      U16          U15            U14         .---'
+  |                                                                                                            | 01
+  |               .--------------.       .------------.     .---------.     .---------.      .---------.       |
+  |.---------.    |     2732     |       | NEC B8228  |     | 74161N  |     |  7486   |      |  7404   |       |
+  ||74LS 541F|    |              |       |            |     '---------'     '---------'      '---------'       |
+  |'---------'    '--------------'       '------------'         U10             U9               U8            |
   |    U13              U12                   U11           XTAL                                               |
   |                                                        .----. 18Mhz                                        |
-  | _________      ____________________     __________      _________    _________    _________    _________   |
-  ||  7405   |    |                    |   | SN74155N |    |UPB 8224 |  | 74157   |  |  7411   |  |  7474   |  |
-  ||_________|    |    AMD   P8080A    |   |__________|    |_________|  |_________|  |_________|  |_________|  |
-  |    U7         |____________________|        U5              U4           U3           U2           U1      |
+  |.---------.    .--------------------.   .----------.    .---------.  .---------.  .---------.  .---------.  |
+  ||  7405   |    |    AMD   P8080A    |   | SN74155N |    |UPB 8224 |  | 74157   |  |  7411   |  |  7474   |  |
+  |'---------'    |                    |   '----------'    '---------'  '---------'  '---------'  '---------'  |
+  |    U7         '--------------------'        U5              U4           U3           U2           U1      |
   |                        U6                                                                                  |
-  |____________________________________________________________________________________________________________|
-
+  '------------------------------------------------------------------------------------------------------------'
 
 
   SMS HI-LO Double Up Joker Poker discrete audio circuitry:
@@ -4242,62 +4295,62 @@ ROM_END
        '----------'                                   '----------'
 
 
-  PCB Layout (Turbo Poker 2 by Micro MFG):                                         Edge Connector 36x2
-   ___________________________________________________________________________________________________
-  |  _________    _________    _________    _________    _________       _____      ________     _    |
-  | | 74LS161 |  | 74LS161 |  | 74LS161 |  | 74LS161 |  | 74LS161 |     | 555 |    | KA2657 |  /   \  |
-  | |_________|  |_________|  |_________|  |_________|  |_________|     |_____|    |________! | VR1 | |
-  |     U1           U2           U3           U4           U5            U6           U7      \ _ /  |
+  PCB Layout (Turbo Poker 2 by Micro MFG):                                        Edge Connector 36x2
+  .---------------------------------------------------------------------------------------------------.
+  | .---------.  .---------.  .---------.  .---------.  .---------.     .-----.    .--------.         |
+  | | 74LS161 |  | 74LS161 |  | 74LS161 |  | 74LS161 |  | 74LS161 |     | 555 |    | KA2657 |  .---.  |
+  | '---------'  '---------'  '---------'  '---------'  '---------'     '-----'    '--------'  |VR1|  |
+  |     U1           U2           U3           U4           U5            U6           U7      '---'  |
   |                                                                                                   |
-  |  _________    _________    _________    _________    _________                  ________          |
+  | .---------.  .---------.  .---------.  .---------.  .---------.                .--------.         |
   | | 74LS161 |  | 74LS157 |  | 74LS157 |  | 74LS157 |  | 74LS157 |                | KA2657 |         |
-  | |_________|  |_________|  |_________|  |_________|  |_________|                |________!         |
+  | '---------'  '---------'  '---------'  '---------'  '---------'                '--------!         |
   |     U8           U9           U10          U11          U12                       U13             |
   |                                                                                                   |
-  |  _________    _________    _________    _________    _________     _________    ________          | 36
-  | | 74LS04P |  | 74LS11N |  | 74LS04P |  | DV7486N |  | DV7486N |   | CTS8427 |  | KA2657 |         |___
-  | |_________|  |_________|  |_________|  |_________|  |_________|   |_________|  |________!          ___|
-  |     U14          U15          U16          U17          U18       U19 (resnet)    U20              ___|
-  |                                                                                                    ___|
-  |  _________    _________    _________       _________________       _________    _______________    ___|
-  | |  74123  |  | 74LS174 |  | 82S131N |     | 74LS541 (R dot) |     | CTS8427 |  |1|2|3|4|5|6|7|8|   ___|
-  | |_________|  |_________|  |_________|     |_________________|     |_________|  |_|_|_|_|_|_|_|_|   ___|
-  |     U21          U22          U23                 U24             U25 (resnet)  U26 (DIP SW x 8)   ___|
-  |                                                                                                    ___|
-  |  _________    _________    _________       __________________        ________________________      ___|
-  | |  7474N  |  | 74LS157 |  | 74LS166 |     |                  |      |                        |     ___|
-  | |_________|  |_________|  |_________|     | 2732A (char ROM) |      |     Intel  P8255A      |     ___|
-  |     U27          U28          U29         |__________________|      |________________________|     ___|
-  |                                                   U30                          U31                 ___|
-  |  _________    __________   __________      ____________________      ________________________      ___|
-  | |  7474N  |  | SY2111-1 | | SY2111-1 |    | Unknown custom MCU |    |                        |     ___|
-  | |_________|  |__________| |__________|    |   (68705 based)    |    |     Intel  P8255A      |     ___|
-  |     U32          U33          U34         |____________________|    |________________________|     ___|
-  |                                                    U35                         U36                 ___|
-  |  _______________   ____________________    ____________________                                    ___|
-  | |PAL12L6 (B dot)| |                    |  |                    |                                   ___|
-  | |_______________| |  8255 (stickered)  |  |     27256 ROM      |                                  |
-  |       U37         |____________________|  |____________________|                  __________      | 01
+  | .---------.  .---------.  .---------.  .---------.  .---------.   .---------.  .--------.         | 36
+  | | 74LS04P |  | 74LS11N |  | 74LS04P |  | DV7486N |  | DV7486N |   | CTS8427 |  | KA2657 |         '---.
+  | '---------'  '---------'  '---------'  '---------'  '---------'   '---------'  '--------!          ---|
+  |     U14          U15          U16          U17          U18       U19 (resnet)    U20              ---|
+  |                                                                                                    ---|
+  | .---------.  .---------.  .---------.     .-----------------.     .---------.  .-.-.-.-.-.-.-.-.   ---|
+  | |  74123  |  | 74LS174 |  | 82S131N |     | 74LS541 (R dot) |     | CTS8427 |  |1|2|3|4|5|6|7|8|   ---|
+  | '---------'  '---------'  '---------'     '-----------------'     '---------'  '-'-'-'-'-'-'-'-'   ---|
+  |     U21          U22          U23                 U24             U25 (resnet)  U26 (DIP SW x 8)   ---|
+  |                                                                                                    ---|
+  | .---------.  .---------.  .---------.     .------------------.      .------------------------.     ---|
+  | |  7474N  |  | 74LS157 |  | 74LS166 |     |      2732A       |      |     Intel  P8255A      |     ---|
+  | '---------'  '---------'  '---------'     |    (char ROM)    |      |                        |     ---|
+  |     U27          U28          U29         '------------------'      '------------------------'     ---|
+  |                                                   U30                          U31                 ---|
+  | .---------.  .----------. .----------.    .--------------------.    .------------------------.     ---|
+  | |  7474N  |  | SY2111-1 | | SY2111-1 |    | Unknown custom MCU |    |     Intel  P8255A      |     ---|
+  | '---------'  '----------' '----------'    |   (68705 based)    |    |                        |     ---|
+  |     U32          U33          U34         '--------------------'    '------------------------'     ---|
+  |                                                    U35                         U36                 ---|
+  | .---------------. .--------------------.  .--------------------.                                   ---|
+  | |PAL12L6 (B dot)| |  8255 (stickered)  |  |     27256 ROM      |                                  .---'
+  | '---------------' |                    |  |                    |                                  | 01
+  |       U37         '--------------------'  '--------------------'                 .----------.     |
   |                           U38                    U39                             | TRW 8022 |     |
-  |  ____________     _____________________    ____________________                  |__________|     |
-  | | Intel 8224 |   |                     |  |                    |                     U45          |
-  | |____________|   |   NEC  D8080AFC-1   |  |   8224 Clock GEN   |     ___________________          |
-  |      U41         |_____________________|  |____________________|    |  Dallas DS1220AD  |         |
-  |  ______                   U42                    U43                | Non Volatile SRAM |         |
-  | | Xtal |                                                            |___________________|         |
+  | .------------.   .---------------------.  .--------------------.                 '----------'     |
+  | | Intel 8224 |   |   NEC  D8080AFC-1   |  |   8224 Clock GEN   |                     U45          |
+  | '------------'   |                     |  |                    |    .-------------------.         |
+  |      U41         '---------------------'  '--------------------'    |  Dallas DS1220AD  |         |
+  | .------.                  U42                    U43                | Non Volatile SRAM |         |
+  | | Xtal |                                                            '-------------------'         |
   | | 18MHz|                                                                     U44                  |
-  | |______|                                                                                          |
-  |___________________________________________________________________________________________________|
+  | '------'                                                                                          |
+  '---------------------------------------------------------------------------------------------------'
 
 
   Discrete sound circuitry:
   -------------------------
-                           ___ ___
-  GND --------------------|1  U  8|-----VCC
-                    N/C---|2     7|------------------------------------|---|1K Ohm|--- VCC
-  Volume Pot -------------|3 555 6|--------------------|--|100K Ohm|---|
+                          .---v---.
+  GND --------------------|1     8|-----VCC
+                    N/C---|2 555 7|------------------------------------|---|1K Ohm|--- VCC
+  Volume Pot -------------|3     6|--------------------|--|100K Ohm|---|
   Pin 10 U36 (8255)-------|4     5|---|0.1uF|---GND    |
-                          |_______|                    |-|0.01uF|---- GND
+                          '-------'                    |-|0.01uF|---- GND
                                                        |-|0.01uF|---- pin 12 U13 (KA2667)
                                                        |-|0.022uF|--- pin 11 U13 (KA2667)
                                                        |-|0.05uF|---- pin 10 U13 (KA2667)
@@ -4416,8 +4469,8 @@ ROM_START( sureshoto )
 	ROM_LOAD( "u-31_ss.u31", 0x0000, 0x1000, CRC(7afa583e) SHA1(e897c6dbcc5452fdb99894203131886a529eed37) )
 
 	ROM_REGION( 0x0200,  "proms", 0 )
-	ROM_LOAD( "n82s129n_1",  0x0000, 0x0100, CRC(812dc1f1) SHA1(b2af33ff36f2eca2f782bc2239bc9e54c2564f6a) )
-	ROM_LOAD( "n82s129n_2",  0x0100, 0x0100, CRC(ee452994) SHA1(315913ce4a92fe0ea7b76e862507c933d6104616) )
+	ROM_LOAD( "n82s129n_2",  0x0000, 0x0100, CRC(ee452994) SHA1(315913ce4a92fe0ea7b76e862507c933d6104616) )
+	ROM_LOAD( "n82s129n_1",  0x0100, 0x0100, CRC(812dc1f1) SHA1(b2af33ff36f2eca2f782bc2239bc9e54c2564f6a) )
 ROM_END
 
 /*
@@ -5232,7 +5285,6 @@ void norautp_state::init_unka()
 	ROM[0x0006] = 0x80;
 	ROM[0x0007] = 0x01;
 	ROM[0x01d5] = 0xaf;
-
 }
 
 void norautp_state::init_unkb()
@@ -5304,14 +5356,14 @@ GAMEL( 198?, newhilop,  0,        dphl,      newhilop,  norautp_state, empty_ini
 GAMEL( 198?, pkii_dm,   0,        dphl,      newhilop,  norautp_state, empty_init, ROT0, "<unknown>",                   "unknown poker game PKII/DM",       0,                          layout_noraut10 )
 GAMEL( 1983, pma,       0,        dphl,      newhilop,  norautp_state, empty_init, ROT0, "PMA",                         "PMA Poker",                        0,                          layout_noraut10 )
 GAME(  198?, kimbldhl,  0,        kimbldhl,  norautp,   norautp_state, empty_init, ROT0, "Kimble Ireland",              "Kimble Double HI-LO",              MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAMEL( 1983, gtipoker,  0,        dphl,      gtipoker,  norautp_state, empty_init, ROT0, "GTI Inc",                     "Aces or Better Draw Poker",        MACHINE_IMPERFECT_COLORS,   layout_noraut10 )
-GAME(  1983, gtipokra,  0,        gtipkra,   gtipoker,  norautp_state, init_gtipa, ROT0, "GTI Inc",                     "GTI Poker? (SMS hardware)",        MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )  // second ROM 1000-1fff encrypted
+GAMEL( 1983, gtipoker,  0,        dphl,      gtipoker,  norautp_state, empty_init, ROT0, "Game Technology Inc.",        "GTI Double or Nothing Draw Poker", 0,                          layout_noraut10 )
+GAME(  1983, gtipokra,  0,        gtipkra,   gtipoker,  norautp_state, init_gtipa, ROT0, "Game Technology Inc.",        "GTI Poker (SMS hardware)",         MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )  // second ROM 1000-1fff encrypted
 GAMEL( 1983, smshilo,   0,        dphl,      dphl,      norautp_state, empty_init, ROT0, "SMS Manufacturing Corp.",     "HI-LO Double Up Joker Poker",      0,                          layout_noraut10 )
 GAMEL( 1986, drhl,      0,        drhl,      drhl,      norautp_state, empty_init, ROT0, "Drews Inc.",                  "Drews Revenge (v.2.89, set 1)",    0,                          layout_noraut10 )
 GAMEL( 1986, drhla,     drhl,     drhl,      drhl,      norautp_state, empty_init, ROT0, "Drews Inc.",                  "Drews Revenge (v.2.89, set 2)",    0,                          layout_noraut10 )
 GAMEL( 1982, ssjkrpkr,  0,        ssjkrpkr,  ssjkrpkr,  norautp_state, empty_init, ROT0, "Southern Systems & Assembly", "Southern Systems Joker Poker",     0,                          layout_noraut10 )
 GAMEL( 198?, fastdrwp,  0,        dphl,      fastdrwp,  norautp_state, empty_init, ROT0, "Stern Electronics",           "Fast Draw (poker conversion kit)", 0,                          layout_noraut10 )
-GAMEL( 1983, sureshoto, 0,        sureshoto, sureshoto, norautp_state, init_unka,  ROT0, "SMS Manufacturing Corp.",     "Sure Shot (older, dphl hardware)", MACHINE_IMPERFECT_COLORS,   layout_noraut09_sureshot )
+GAMEL( 1983, sureshoto, 0,        dphl,      sureshoto, norautp_state, init_unka,  ROT0, "SMS Manufacturing Corp.",     "Sure Shot (older, dphl hardware)", MACHINE_IMPERFECT_COLORS,   layout_noraut09_sureshot )
 GAMEL( 198?, dphlunkb,  0,        dphl,      dphla,     norautp_state, init_unkb,  ROT0, "SMS Manufacturing Corp.",     "Draw Poker HI-LO (alt GFX)",       0,                          layout_noraut10 )
 
 // The following one also has a custom 68705 MCU
