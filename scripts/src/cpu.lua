@@ -9,6 +9,12 @@
 --
 ---------------------------------------------------------------------------
 
+function cpufiles(filepaths)
+	for _, filepath in ipairs(filepaths) do
+		table.insert(cpu_core_files, filepath)
+	end
+end
+
 --------------------------------------------------
 -- Dynamic recompiler objects
 --------------------------------------------------
@@ -24,7 +30,7 @@ end
 
 
 if (CPU_INCLUDE_DRC) then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/drcbec.cpp",
 		MAME_DIR .. "src/devices/cpu/drcbec.h",
 		MAME_DIR .. "src/devices/cpu/drcbeut.cpp",
@@ -42,7 +48,7 @@ if (CPU_INCLUDE_DRC) then
 		MAME_DIR .. "src/devices/cpu/drcumlsh.h",
 	}
 	if not _OPTIONS["FORCE_DRC_C_BACKEND"] then
-		files {
+		cpufiles {
 			MAME_DIR .. "src/devices/cpu/drcbearm64.cpp",
 			MAME_DIR .. "src/devices/cpu/drcbearm64.h",
 			MAME_DIR .. "src/devices/cpu/drcbex64.cpp",
@@ -67,7 +73,7 @@ end
 --------------------------------------------------
 
 if CPUS["8X300"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/8x300/8x300.cpp",
 		MAME_DIR .. "src/devices/cpu/8x300/8x300.h",
 	}
@@ -84,7 +90,7 @@ end
 --------------------------------------------------
 
 if CPUS["DSPP"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/dspp/dspp.cpp",
 		MAME_DIR .. "src/devices/cpu/dspp/dspp.h",
 		MAME_DIR .. "src/devices/cpu/dspp/dsppdrc.cpp",
@@ -104,7 +110,7 @@ end
 --------------------------------------------------
 
 if CPUS["ARC"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/arc/arc.cpp",
 		MAME_DIR .. "src/devices/cpu/arc/arc.h",
 	}
@@ -121,7 +127,7 @@ end
 --------------------------------------------------
 
 if CPUS["ARCOMPACT"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/arcompact/arcompact.cpp",
 		MAME_DIR .. "src/devices/cpu/arcompact/arcompact.h",
 		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute.cpp",
@@ -179,7 +185,7 @@ end
 --------------------------------------------------
 
 if CPUS["ARM"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/arm/arm.cpp",
 		MAME_DIR .. "src/devices/cpu/arm/arm.h",
 	}
@@ -191,7 +197,7 @@ if opt_tool(CPUS, "ARM") then
 end
 
 if CPUS["ARM7"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/arm7/arm7.cpp",
 		MAME_DIR .. "src/devices/cpu/arm7/arm7.h",
 		MAME_DIR .. "src/devices/cpu/arm7/arm7thmb.cpp",
@@ -222,7 +228,7 @@ end
 --------------------------------------------------
 
 if CPUS["SE3208"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/se3208/se3208.cpp",
 		MAME_DIR .. "src/devices/cpu/se3208/se3208.h",
 	}
@@ -239,7 +245,7 @@ end
 --------------------------------------------------
 
 if CPUS["AMIS2000"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/amis2000/amis2000.cpp",
 		MAME_DIR .. "src/devices/cpu/amis2000/amis2000.h",
 		MAME_DIR .. "src/devices/cpu/amis2000/amis2000op.cpp",
@@ -257,7 +263,7 @@ end
 --------------------------------------------------
 
 if CPUS["ADSP21XX"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/adsp2100/adsp2100.cpp",
 		MAME_DIR .. "src/devices/cpu/adsp2100/adsp2100.h",
 		MAME_DIR .. "src/devices/cpu/adsp2100/2100ops.hxx",
@@ -275,7 +281,7 @@ end
 --------------------------------------------------
 
 if CPUS["ADSP21062"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/sharc/sharc.cpp",
 		MAME_DIR .. "src/devices/cpu/sharc/sharc.h",
 		MAME_DIR .. "src/devices/cpu/sharc/compute.hxx",
@@ -300,7 +306,7 @@ end
 --------------------------------------------------
 
 if CPUS["APEXC"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/apexc/apexc.cpp",
 		MAME_DIR .. "src/devices/cpu/apexc/apexc.h",
 	}
@@ -317,7 +323,7 @@ end
 --------------------------------------------------
 
 if CPUS["DSP16"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/dsp16/dsp16.cpp",
 		MAME_DIR .. "src/devices/cpu/dsp16/dsp16.h",
 		MAME_DIR .. "src/devices/cpu/dsp16/dsp16core.cpp",
@@ -341,7 +347,7 @@ end
 --------------------------------------------------
 
 if CPUS["DSP32C"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/dsp32/dsp32.cpp",
 		MAME_DIR .. "src/devices/cpu/dsp32/dsp32.h",
 		MAME_DIR .. "src/devices/cpu/dsp32/dsp32ops.hxx",
@@ -359,7 +365,7 @@ end
 --------------------------------------------------
 
 if CPUS["ASAP"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/asap/asap.cpp",
 		MAME_DIR .. "src/devices/cpu/asap/asap.h",
 	}
@@ -376,7 +382,7 @@ end
 --------------------------------------------------
 
 if CPUS["AM29000"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/am29000/am29000.cpp",
 		MAME_DIR .. "src/devices/cpu/am29000/am29000.h",
 		MAME_DIR .. "src/devices/cpu/am29000/am29ops.h",
@@ -394,7 +400,7 @@ end
 --------------------------------------------------
 
 if CPUS["JAGUAR"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/jaguar/jaguar.cpp",
 		MAME_DIR .. "src/devices/cpu/jaguar/jaguar.h",
 	}
@@ -411,7 +417,7 @@ end
 --------------------------------------------------
 
 if CPUS["CUBEQCPU"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/cubeqcpu/cubeqcpu.cpp",
 		MAME_DIR .. "src/devices/cpu/cubeqcpu/cubeqcpu.h",
 	}
@@ -428,7 +434,7 @@ end
 --------------------------------------------------
 
 if CPUS["ES5510"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/es5510/es5510.cpp",
 		MAME_DIR .. "src/devices/cpu/es5510/es5510.h",
 	}
@@ -445,7 +451,7 @@ end
 --------------------------------------------------
 
 if CPUS["ESRIP"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/esrip/esrip.cpp",
 		MAME_DIR .. "src/devices/cpu/esrip/esrip.h",
 	}
@@ -462,7 +468,7 @@ end
 --------------------------------------------------
 
 if CPUS["E0C6200"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/e0c6200/e0c6200.cpp",
 		MAME_DIR .. "src/devices/cpu/e0c6200/e0c6200.h",
 		MAME_DIR .. "src/devices/cpu/e0c6200/e0c6s46.cpp",
@@ -482,7 +488,7 @@ end
 --------------------------------------------------
 
 if CPUS["COSMAC"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/cosmac/cosmac.cpp",
 		MAME_DIR .. "src/devices/cpu/cosmac/cosmac.h",
 	}
@@ -499,7 +505,7 @@ end
 --------------------------------------------------
 
 if CPUS["COPS1"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/cops1/cops1base.cpp",
 		MAME_DIR .. "src/devices/cpu/cops1/cops1base.h",
 		MAME_DIR .. "src/devices/cpu/cops1/mm5799.cpp",
@@ -519,7 +525,7 @@ end
 --------------------------------------------------
 
 if CPUS["COP400"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/cop400/cop400.cpp",
 		MAME_DIR .. "src/devices/cpu/cop400/cop400.h",
 		MAME_DIR .. "src/devices/cpu/cop400/cop400op.hxx",
@@ -543,7 +549,7 @@ end
 --------------------------------------------------
 
 if CPUS["CP1610"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/cp1610/cp1610.cpp",
 		MAME_DIR .. "src/devices/cpu/cp1610/cp1610.h",
 	}
@@ -560,7 +566,7 @@ end
 --------------------------------------------------
 
 if CPUS["CCPU"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/ccpu/ccpu.cpp",
 		MAME_DIR .. "src/devices/cpu/ccpu/ccpu.h",
 	}
@@ -577,7 +583,7 @@ end
 --------------------------------------------------
 
 if CPUS["T11"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/t11/t11.cpp",
 		MAME_DIR .. "src/devices/cpu/t11/t11.h",
 		MAME_DIR .. "src/devices/cpu/t11/t11ops.hxx",
@@ -597,7 +603,7 @@ end
 --------------------------------------------------
 
 if CPUS["PDP8"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/pdp8/hd6120.cpp",
 		MAME_DIR .. "src/devices/cpu/pdp8/hd6120.h",
 		MAME_DIR .. "src/devices/cpu/pdp8/pdp8.cpp",
@@ -616,7 +622,7 @@ end
 --------------------------------------------------
 
 if CPUS["F8"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/f8/f8.cpp",
 		MAME_DIR .. "src/devices/cpu/f8/f8.h",
 	}
@@ -633,7 +639,7 @@ end
 --------------------------------------------------
 
 if CPUS["FR"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/fr/fr.cpp",
 		MAME_DIR .. "src/devices/cpu/fr/fr.h",
 	}
@@ -650,7 +656,7 @@ end
 --------------------------------------------------
 
 if CPUS["G65816"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/g65816/g65816.cpp",
 		MAME_DIR .. "src/devices/cpu/g65816/g65816.h",
 		MAME_DIR .. "src/devices/cpu/g65816/g65816cm.h",
@@ -675,7 +681,7 @@ end
 --------------------------------------------------
 
 if CPUS["H16"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/h16/hd641016.cpp",
 		MAME_DIR .. "src/devices/cpu/h16/hd641016.h",
 	}
@@ -692,7 +698,7 @@ end
 --------------------------------------------------
 
 if CPUS["H8"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/h8/c77.cpp",
 		MAME_DIR .. "src/devices/cpu/h8/c77.h",
 		MAME_DIR .. "src/devices/cpu/h8/h8.cpp",
@@ -805,7 +811,7 @@ end
 --------------------------------------------------
 
 if CPUS["H8500"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/h8500/h8500.cpp",
 		MAME_DIR .. "src/devices/cpu/h8500/h8500.h",
 		MAME_DIR .. "src/devices/cpu/h8500/h8510.cpp",
@@ -830,7 +836,7 @@ end
 --------------------------------------------------
 
 if CPUS["HCD62121"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/hcd62121/hcd62121.cpp",
 		MAME_DIR .. "src/devices/cpu/hcd62121/hcd62121.h",
 	}
@@ -847,7 +853,7 @@ end
 --------------------------------------------------
 
 if CPUS["HMCS40"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/hmcs40/hmcs40.cpp",
 		MAME_DIR .. "src/devices/cpu/hmcs40/hmcs40.h",
 		MAME_DIR .. "src/devices/cpu/hmcs40/hmcs40op.cpp",
@@ -865,7 +871,7 @@ end
 --------------------------------------------------
 
 if CPUS["HMCS400"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/hmcs400/hmcs400.cpp",
 		MAME_DIR .. "src/devices/cpu/hmcs400/hmcs400.h",
 		MAME_DIR .. "src/devices/cpu/hmcs400/hmcs400op.cpp",
@@ -884,7 +890,7 @@ end
 --------------------------------------------------
 
 if CPUS["SH"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/sh/sh_fe.cpp",
 		MAME_DIR .. "src/devices/cpu/sh/sh.cpp",
 		MAME_DIR .. "src/devices/cpu/sh/sh.h",
@@ -961,7 +967,7 @@ end
 --------------------------------------------------
 
 if CPUS["ST62XX"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/st62xx/st62xx.cpp",
 		MAME_DIR .. "src/devices/cpu/st62xx/st62xx.h",
 	}
@@ -978,7 +984,7 @@ end
 --------------------------------------------------
 
 if CPUS["HPHYBRID"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/hphybrid/hphybrid.cpp",
 		MAME_DIR .. "src/devices/cpu/hphybrid/hphybrid.h",
 	}
@@ -996,7 +1002,7 @@ end
 --------------------------------------------------
 
 if CPUS["NANOPROCESSOR"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/nanoprocessor/nanoprocessor.cpp",
 		MAME_DIR .. "src/devices/cpu/nanoprocessor/nanoprocessor.h",
 	}
@@ -1013,7 +1019,7 @@ end
 --------------------------------------------------
 
 if CPUS["CAPRICORN"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/capricorn/capricorn.cpp",
 		MAME_DIR .. "src/devices/cpu/capricorn/capricorn.h",
 	}
@@ -1030,7 +1036,7 @@ end
 --------------------------------------------------
 
 if CPUS["H6280"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/h6280/h6280.cpp",
 		MAME_DIR .. "src/devices/cpu/h6280/h6280.h",
 	}
@@ -1047,7 +1053,7 @@ end
 --------------------------------------------------
 
 if CPUS["E1"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/e132xs/e132xs.cpp",
 		MAME_DIR .. "src/devices/cpu/e132xs/e132xs.h",
 		MAME_DIR .. "src/devices/cpu/e132xs/32xsdefs.h",
@@ -1069,7 +1075,7 @@ end
 --------------------------------------------------
 
 if CPUS["IE15"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/ie15/ie15.cpp",
 		MAME_DIR .. "src/devices/cpu/ie15/ie15.h",
 	}
@@ -1086,7 +1092,7 @@ end
 --------------------------------------------------
 
 if CPUS["MCS40"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/mcs40/mcs40.cpp",
 		MAME_DIR .. "src/devices/cpu/mcs40/mcs40.h",
 	}
@@ -1103,7 +1109,7 @@ end
 --------------------------------------------------
 
 if CPUS["I8008"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/i8008/i8008.cpp",
 		MAME_DIR .. "src/devices/cpu/i8008/i8008.h",
 	}
@@ -1120,7 +1126,7 @@ end
 --------------------------------------------------
 
 if CPUS["SCMP"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/scmp/scmp.cpp",
 		MAME_DIR .. "src/devices/cpu/scmp/scmp.h",
 	}
@@ -1137,7 +1143,7 @@ end
 --------------------------------------------------
 
 if CPUS["I8085"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/i8085/i8085.cpp",
 		MAME_DIR .. "src/devices/cpu/i8085/i8085.h",
 	}
@@ -1154,7 +1160,7 @@ end
 --------------------------------------------------
 
 if CPUS["I8089"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/i8089/i8089.cpp",
 		MAME_DIR .. "src/devices/cpu/i8089/i8089.h",
 		MAME_DIR .. "src/devices/cpu/i8089/i8089_channel.cpp",
@@ -1174,7 +1180,7 @@ end
 --------------------------------------------------
 
 if CPUS["MCS48"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/mcs48/mcs48.cpp",
 		MAME_DIR .. "src/devices/cpu/mcs48/mcs48.h",
 	}
@@ -1191,7 +1197,7 @@ end
 --------------------------------------------------
 
 if CPUS["MCS51"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/mcs51/mcs51.cpp",
 		MAME_DIR .. "src/devices/cpu/mcs51/mcs51.h",
 		MAME_DIR .. "src/devices/cpu/mcs51/mcs51ops.hxx",
@@ -1209,7 +1215,7 @@ end
 --------------------------------------------------
 
 if CPUS["AXC51"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/axc51/axc51.cpp",
 		MAME_DIR .. "src/devices/cpu/axc51/axc51.h",
 		MAME_DIR .. "src/devices/cpu/axc51/axc51ops.hxx",
@@ -1229,7 +1235,7 @@ end
 --------------------------------------------------
 
 if CPUS["XA"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/xa/xa.cpp",
 		MAME_DIR .. "src/devices/cpu/xa/xa_ops.cpp",
 		MAME_DIR .. "src/devices/cpu/xa/xa.h",
@@ -1248,7 +1254,7 @@ end
 --------------------------------------------------
 
 if CPUS["MCS96"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/mcs96/mcs96.cpp",
 		MAME_DIR .. "src/devices/cpu/mcs96/mcs96.h",
 		MAME_DIR .. "src/devices/cpu/mcs96/i8x9x.cpp",
@@ -1289,7 +1295,7 @@ if opt_tool(CPUS, "MCS96") then
 --------------------------------------------------
 
 if CPUS["I86"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/i86/i86.cpp",
 		MAME_DIR .. "src/devices/cpu/i86/i86.h",
 		MAME_DIR .. "src/devices/cpu/i86/i186.cpp",
@@ -1309,7 +1315,7 @@ if want_disasm_i86 or want_disasm_i386 or CPU_INCLUDE_DRC then
 end
 
 if CPUS["I386"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/i386/i386.cpp",
 		MAME_DIR .. "src/devices/cpu/i386/i386.h",
 		MAME_DIR .. "src/devices/cpu/i386/athlon.cpp",
@@ -1336,7 +1342,7 @@ end
 --------------------------------------------------
 
 if CPUS["I860"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/i860/i860.cpp",
 		MAME_DIR .. "src/devices/cpu/i860/i860.h",
 		MAME_DIR .. "src/devices/cpu/i860/i860dec.hxx",
@@ -1354,7 +1360,7 @@ end
 --------------------------------------------------
 
 if CPUS["I960"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/i960/i960.cpp",
 		MAME_DIR .. "src/devices/cpu/i960/i960.h",
 	}
@@ -1371,7 +1377,7 @@ end
 --------------------------------------------------
 
 if CPUS["LH5801"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/lh5801/lh5801.cpp",
 		MAME_DIR .. "src/devices/cpu/lh5801/lh5801.h",
 		MAME_DIR .. "src/devices/cpu/lh5801/5801tbl.hxx",
@@ -1389,7 +1395,7 @@ end
 --------------------------------------------------
 
 if CPUS["SSEM"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/ssem/ssem.cpp",
 		MAME_DIR .. "src/devices/cpu/ssem/ssem.h",
 	}
@@ -1406,7 +1412,7 @@ end
 --------------------------------------------------
 
 if CPUS["DIABLO"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/diablo/diablo1300.cpp",
 		MAME_DIR .. "src/devices/cpu/diablo/diablo1300.h",
 	}
@@ -1423,7 +1429,7 @@ end
 --------------------------------------------------
 
 if CPUS["KL1839VM1"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/mpk1839/kl1839vm1.cpp",
 		MAME_DIR .. "src/devices/cpu/mpk1839/kl1839vm1.h",
 		MAME_DIR .. "src/devices/cpu/vax/vaxdasm.cpp",
@@ -1442,7 +1448,7 @@ end
 --------------------------------------------------
 
 if CPUS["MB88XX"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/mb88xx/mb88xx.cpp",
 		MAME_DIR .. "src/devices/cpu/mb88xx/mb88xx.h",
 	}
@@ -1459,7 +1465,7 @@ end
 --------------------------------------------------
 
 if CPUS["MB86233"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/mb86233/mb86233.cpp",
 		MAME_DIR .. "src/devices/cpu/mb86233/mb86233.h",
 	}
@@ -1476,7 +1482,7 @@ end
 --------------------------------------------------
 
 if CPUS["MB86235"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/mb86235/mb86235.cpp",
 		MAME_DIR .. "src/devices/cpu/mb86235/mb86235.h",
 		MAME_DIR .. "src/devices/cpu/mb86235/mb86235drc.cpp",
@@ -1497,7 +1503,7 @@ end
 --------------------------------------------------
 
 if CPUS["PIC16C5X"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/pic16c5x/pic16c5x.cpp",
 		MAME_DIR .. "src/devices/cpu/pic16c5x/pic16c5x.h",
 	}
@@ -1524,7 +1530,7 @@ end
 --------------------------------------------------
 
 if CPUS["PIC16C62X"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/pic16c62x/pic16c62x.cpp",
 		MAME_DIR .. "src/devices/cpu/pic16c62x/pic16c62x.h",
 	}
@@ -1541,7 +1547,7 @@ end
 --------------------------------------------------
 
 if CPUS["PIC16X8X"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/pic16x8x/pic16x8x.cpp",
 		MAME_DIR .. "src/devices/cpu/pic16x8x/pic16x8x.h",
 	}
@@ -1568,7 +1574,7 @@ end
 --------------------------------------------------
 
 if CPUS["PIC17"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/pic17/pic17.cpp",
 		MAME_DIR .. "src/devices/cpu/pic17/pic17.h",
 		MAME_DIR .. "src/devices/cpu/pic17/pic17c4x.cpp",
@@ -1587,7 +1593,7 @@ end
 --------------------------------------------------
 
 if CPUS["MIPS1"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/mips/mips1.cpp",
 		MAME_DIR .. "src/devices/cpu/mips/mips1.h",
 	}
@@ -1605,7 +1611,7 @@ end
 --------------------------------------------------
 
 if CPUS["MIPS3"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/mips/mips3com.cpp",
 		MAME_DIR .. "src/devices/cpu/mips/mips3com.h",
 		MAME_DIR .. "src/devices/cpu/mips/mips3.cpp",
@@ -1636,7 +1642,7 @@ end
 --------------------------------------------------
 
 if CPUS["PSX"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/psx/psx.cpp",
 		MAME_DIR .. "src/devices/cpu/psx/psx.h",
 		MAME_DIR .. "src/devices/cpu/psx/psxdefs.h",
@@ -1666,7 +1672,7 @@ end
 --------------------------------------------------
 
 if CPUS["MIPSX"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/mipsx/mipsx.cpp",
 		MAME_DIR .. "src/devices/cpu/mipsx/mipsx.h",
 	}
@@ -1683,7 +1689,7 @@ end
 --------------------------------------------------
 
 if CPUS["MELPS4"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/melps4/melps4.cpp",
 		MAME_DIR .. "src/devices/cpu/melps4/melps4.h",
 		MAME_DIR .. "src/devices/cpu/melps4/melps4op.cpp",
@@ -1721,7 +1727,7 @@ end
 --------------------------------------------------
 
 if CPUS["M37710"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/m37710/m37710.cpp",
 		MAME_DIR .. "src/devices/cpu/m37710/m37710.h",
 		MAME_DIR .. "src/devices/cpu/m37710/m37710o0.cpp",
@@ -1776,7 +1782,7 @@ end
 --------------------------------------------------
 
 if CPUS["M6502"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/m6502/deco16.cpp",
 		MAME_DIR .. "src/devices/cpu/m6502/deco16.h",
 		MAME_DIR .. "src/devices/cpu/m6502/g65sc02.cpp",
@@ -1865,7 +1871,7 @@ if CPUS["M6502"] then
 end
 
 if CPUS["ST2XXX"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/m6502/st2xxx.cpp",
 		MAME_DIR .. "src/devices/cpu/m6502/st2xxx.h",
 		MAME_DIR .. "src/devices/cpu/m6502/st2204.cpp",
@@ -1876,7 +1882,7 @@ if CPUS["ST2XXX"] then
 end
 
 if CPUS["XAVIX"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/m6502/xavix.cpp",
 		MAME_DIR .. "src/devices/cpu/m6502/xavix.h",
 	}
@@ -1891,7 +1897,7 @@ if CPUS["XAVIX"] then
 end
 
 if CPUS["XAVIX2000"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/m6502/xavix2000.cpp",
 		MAME_DIR .. "src/devices/cpu/m6502/xavix2000.h",
 	}
@@ -1979,7 +1985,7 @@ end
 --------------------------------------------------
 
 if CPUS["M6800"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/m6800/m6800.cpp",
 		MAME_DIR .. "src/devices/cpu/m6800/m6800.h",
 		MAME_DIR .. "src/devices/cpu/m6800/m6801.cpp",
@@ -1999,7 +2005,7 @@ end
 --------------------------------------------------
 
 if CPUS["M6805"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/m6805/m6805.cpp",
 		MAME_DIR .. "src/devices/cpu/m6805/m6805.h",
 		MAME_DIR .. "src/devices/cpu/m6805/m6805defs.h",
@@ -2030,7 +2036,7 @@ end
 --------------------------------------------------
 
 if CPUS["M6809"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/m6809/m6809.cpp",
 		MAME_DIR .. "src/devices/cpu/m6809/m6809.h",
 		MAME_DIR .. "src/devices/cpu/m6809/hd6309.cpp",
@@ -2064,7 +2070,7 @@ end
 --------------------------------------------------
 
 if CPUS["MC68HC11"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/mc68hc11/mc68hc11.cpp",
 		MAME_DIR .. "src/devices/cpu/mc68hc11/mc68hc11.h",
 		MAME_DIR .. "src/devices/cpu/mc68hc11/hc11ops.h",
@@ -2092,7 +2098,7 @@ end
 --------------------------------------------------
 
 if CPUS["M680X0"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/m68000/m68kcpu.cpp",
 		MAME_DIR .. "src/devices/cpu/m68000/m68kcpu.h",
 		MAME_DIR .. "src/devices/cpu/m68000/m68kops.cpp",
@@ -2158,7 +2164,7 @@ end
 --------------------------------------------------
 
 if CPUS["DSP56156"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/dsp56156/dsp56156.cpp",
 		MAME_DIR .. "src/devices/cpu/dsp56156/dsp56156.h",
 		MAME_DIR .. "src/devices/cpu/dsp56156/dsp56mem.cpp",
@@ -2189,7 +2195,7 @@ end
 --------------------------------------------------
 
 if CPUS["PDP1"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/pdp1/pdp1.cpp",
 		MAME_DIR .. "src/devices/cpu/pdp1/pdp1.h",
 	}
@@ -2206,7 +2212,7 @@ end
 --------------------------------------------------
 
 if CPUS["PATINHOFEIO"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/patinhofeio/patinho_feio.cpp",
 		MAME_DIR .. "src/devices/cpu/patinhofeio/patinhofeio_cpu.h",
 	}
@@ -2223,7 +2229,7 @@ end
 --------------------------------------------------
 
 if CPUS["POWERPC"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/powerpc/ppccom.cpp",
 		MAME_DIR .. "src/devices/cpu/powerpc/ppccom.h",
 		MAME_DIR .. "src/devices/cpu/powerpc/ppcfe.cpp",
@@ -2247,7 +2253,7 @@ end
 --------------------------------------------------
 
 if CPUS["NEC"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/nec/nec.cpp",
 		MAME_DIR .. "src/devices/cpu/nec/nec.h",
 		MAME_DIR .. "src/devices/cpu/nec/necea.h",
@@ -2274,7 +2280,7 @@ if opt_tool(CPUS, "NEC") then
 end
 
 if CPUS["V30MZ"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/v30mz/v30mz.cpp",
 		MAME_DIR .. "src/devices/cpu/v30mz/v30mz.h",
 	}
@@ -2291,7 +2297,7 @@ end
 --------------------------------------------------
 
 if CPUS["V60"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/v60/v60.cpp",
 		MAME_DIR .. "src/devices/cpu/v60/v60.h",
 		MAME_DIR .. "src/devices/cpu/v60/am.hxx",
@@ -2320,7 +2326,7 @@ end
 --------------------------------------------------
 
 if CPUS["V810"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/v810/v810.cpp",
 		MAME_DIR .. "src/devices/cpu/v810/v810.h",
 	}
@@ -2346,7 +2352,7 @@ end
 --------------------------------------------------
 
 if CPUS["UPD7725"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/upd7725/upd7725.cpp",
 		MAME_DIR .. "src/devices/cpu/upd7725/upd7725.h",
 	}
@@ -2364,7 +2370,7 @@ end
 --------------------------------------------------
 
 if CPUS["UPD7810"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/upd7810/upd7810.cpp",
 		MAME_DIR .. "src/devices/cpu/upd7810/upd7810.h",
 		MAME_DIR .. "src/devices/cpu/upd7810/upd7810_opcodes.cpp",
@@ -2384,7 +2390,7 @@ end
 --------------------------------------------------
 
 if CPUS["UCOM4"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/ucom4/ucom4.cpp",
 		MAME_DIR .. "src/devices/cpu/ucom4/ucom4.h",
 		MAME_DIR .. "src/devices/cpu/ucom4/ucom4op.cpp",
@@ -2402,7 +2408,7 @@ end
 --------------------------------------------------
 
 if CPUS["MINX"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/minx/minx.cpp",
 		MAME_DIR .. "src/devices/cpu/minx/minx.h",
 		MAME_DIR .. "src/devices/cpu/minx/minxfunc.h",
@@ -2423,7 +2429,7 @@ end
 --------------------------------------------------
 
 if CPUS["RSP"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/rsp/rsp.cpp",
 		MAME_DIR .. "src/devices/cpu/rsp/rsp.h",
 		MAME_DIR .. "src/devices/cpu/rsp/rspdefs.h",
@@ -2442,7 +2448,7 @@ end
 --------------------------------------------------
 
 if CPUS["MN1400"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/mn1400/mn1400base.cpp",
 		MAME_DIR .. "src/devices/cpu/mn1400/mn1400base.h",
 		MAME_DIR .. "src/devices/cpu/mn1400/mn1400.cpp",
@@ -2472,7 +2478,7 @@ end
 --------------------------------------------------
 
 if CPUS["MN1880"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/mn1880/mn1880.cpp",
 		MAME_DIR .. "src/devices/cpu/mn1880/mn1880.h",
 	}
@@ -2489,7 +2495,7 @@ end
 --------------------------------------------------
 
 if CPUS["MN10200"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/mn10200/mn10200.cpp",
 		MAME_DIR .. "src/devices/cpu/mn10200/mn10200.h",
 	}
@@ -2506,7 +2512,7 @@ end
 --------------------------------------------------
 
 if CPUS["SATURN"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/saturn/saturn.cpp",
 		MAME_DIR .. "src/devices/cpu/saturn/saturn.h",
 		MAME_DIR .. "src/devices/cpu/saturn/satops.ipp",
@@ -2529,7 +2535,7 @@ end
 --------------------------------------------------
 
 if CPUS["SM510"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/sm510/sm510base.cpp",
 		MAME_DIR .. "src/devices/cpu/sm510/sm510base.h",
 		MAME_DIR .. "src/devices/cpu/sm510/sm510.h",
@@ -2562,7 +2568,7 @@ end
 --------------------------------------------------
 
 if CPUS["SM8500"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/sm8500/sm8500.cpp",
 		MAME_DIR .. "src/devices/cpu/sm8500/sm8500.h",
 		MAME_DIR .. "src/devices/cpu/sm8500/sm85ops.h",
@@ -2580,7 +2586,7 @@ end
 --------------------------------------------------
 
 if CPUS["S2650"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/s2650/s2650.cpp",
 		MAME_DIR .. "src/devices/cpu/s2650/s2650.h",
 	}
@@ -2597,7 +2603,7 @@ end
 --------------------------------------------------
 
 if CPUS["SC61860"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/sc61860/sc61860.cpp",
 		MAME_DIR .. "src/devices/cpu/sc61860/sc61860.h",
 		--MAME_DIR .. "src/devices/cpu/sc61860/readpc.cpp",
@@ -2617,7 +2623,7 @@ end
 --------------------------------------------------
 
 if CPUS["SPC700"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/spc700/spc700.cpp",
 		MAME_DIR .. "src/devices/cpu/spc700/spc700.h",
 		MAME_DIR .. "src/devices/cpu/spc700/spc700ds.h",
@@ -2635,7 +2641,7 @@ end
 --------------------------------------------------
 
 if CPUS["SSP1601"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/ssp1601/ssp1601.cpp",
 		MAME_DIR .. "src/devices/cpu/ssp1601/ssp1601.h",
 	}
@@ -2652,7 +2658,7 @@ end
 --------------------------------------------------
 
 if CPUS["UNSP"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/unsp/unsp.cpp",
 		MAME_DIR .. "src/devices/cpu/unsp/unsp.h",
 		MAME_DIR .. "src/devices/cpu/unsp/unsp_extended.cpp",
@@ -2683,7 +2689,7 @@ end
 --------------------------------------------------
 
 if CPUS["AVR8"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/avr8/avr8.cpp",
 		MAME_DIR .. "src/devices/cpu/avr8/avr8.h",
 	}
@@ -2710,7 +2716,7 @@ end
 --------------------------------------------------
 
 if CPUS["TMS1000"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/tms1000/tms1k_base.cpp",
 		MAME_DIR .. "src/devices/cpu/tms1000/tms1k_base.h",
 		MAME_DIR .. "src/devices/cpu/tms1000/tms1000.cpp",
@@ -2749,7 +2755,7 @@ end
 --------------------------------------------------
 
 if CPUS["TMS7000"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/tms7000/tms7000.cpp",
 		MAME_DIR .. "src/devices/cpu/tms7000/tms7000.h",
 		MAME_DIR .. "src/devices/cpu/tms7000/tms7000op.cpp",
@@ -2770,7 +2776,7 @@ end
 --------------------------------------------------
 
 if CPUS["TMS9900"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/tms9900/tms9900.cpp",
 		MAME_DIR .. "src/devices/cpu/tms9900/tms9900.h",
 		MAME_DIR .. "src/devices/cpu/tms9900/tms9980a.cpp",
@@ -2794,7 +2800,7 @@ end
 --------------------------------------------------
 
 if CPUS["TMS340X0"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/tms34010/tms34010.cpp",
 		MAME_DIR .. "src/devices/cpu/tms34010/tms34010.h",
 		MAME_DIR .. "src/devices/cpu/tms34010/34010fld.hxx",
@@ -2816,7 +2822,7 @@ end
 --------------------------------------------------
 
 if CPUS["TMS32010"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/tms32010/tms32010.cpp",
 		MAME_DIR .. "src/devices/cpu/tms32010/tms32010.h",
 	}
@@ -2833,7 +2839,7 @@ end
 --------------------------------------------------
 
 if CPUS["TMS32025"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/tms32025/tms32025.cpp",
 		MAME_DIR .. "src/devices/cpu/tms32025/tms32025.h",
 	}
@@ -2850,7 +2856,7 @@ end
 --------------------------------------------------
 
 if CPUS["TMS32031"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/tms32031/tms32031.cpp",
 		MAME_DIR .. "src/devices/cpu/tms32031/tms32031.h",
 		MAME_DIR .. "src/devices/cpu/tms32031/32031ops.hxx",
@@ -2868,7 +2874,7 @@ end
 --------------------------------------------------
 
 if CPUS["TMS32051"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/tms32051/tms32051.cpp",
 		MAME_DIR .. "src/devices/cpu/tms32051/tms32051.h",
 		MAME_DIR .. "src/devices/cpu/tms32051/32051ops.h",
@@ -2887,7 +2893,7 @@ end
 --------------------------------------------------
 
 if CPUS["TMS32082"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/tms32082/tms32082.cpp",
 		MAME_DIR .. "src/devices/cpu/tms32082/tms32082.h",
 		MAME_DIR .. "src/devices/cpu/tms32082/mp_ops.cpp",
@@ -2907,7 +2913,7 @@ end
 --------------------------------------------------
 
 if CPUS["TMS57002"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/tms57002/tms57002.cpp",
 		MAME_DIR .. "src/devices/cpu/tms57002/tms57002.h",
 		MAME_DIR .. "src/devices/cpu/tms57002/tmsops.cpp",
@@ -2938,7 +2944,7 @@ end
 --------------------------------------------------
 
 if CPUS["TLCS90"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/tlcs90/tlcs90.cpp",
 		MAME_DIR .. "src/devices/cpu/tlcs90/tlcs90.h",
 	}
@@ -2955,7 +2961,7 @@ end
 --------------------------------------------------
 
 if CPUS["TLCS870"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/tlcs870/tlcs870.cpp",
 		MAME_DIR .. "src/devices/cpu/tlcs870/tlcs870_ops.cpp",
 		MAME_DIR .. "src/devices/cpu/tlcs870/tlcs870_ops_reg.cpp",
@@ -2977,7 +2983,7 @@ end
 --------------------------------------------------
 
 if CPUS["TLCS900"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/tlcs900/tlcs900.cpp",
 		MAME_DIR .. "src/devices/cpu/tlcs900/tlcs900.h",
 		MAME_DIR .. "src/devices/cpu/tlcs900/900tbl.hxx",
@@ -3004,7 +3010,7 @@ end
 --------------------------------------------------
 
 if CPUS["TX0"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/tx0/tx0.cpp",
 		MAME_DIR .. "src/devices/cpu/tx0/tx0.h",
 	}
@@ -3034,7 +3040,7 @@ end
 --------------------------------------------------
 
 if CPUS["Z80"] or CPUS["KC80"] or CPUS["Z80N"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/z80/z80.cpp",
 		MAME_DIR .. "src/devices/cpu/z80/z80.h",
 		MAME_DIR .. "src/devices/cpu/z80/t6a84.cpp",
@@ -3071,7 +3077,7 @@ if CPUS["Z80"] or CPUS["KC80"] or CPUS["Z80N"] then
 end
 
 if CPUS["Z80N"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/z80/z80n.cpp",
 		MAME_DIR .. "src/devices/cpu/z80/z80n.h",
 	}
@@ -3086,7 +3092,7 @@ if CPUS["Z80N"] then
 end
 
 if CPUS["KC80"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/z80/kc82.cpp",
 		MAME_DIR .. "src/devices/cpu/z80/kc82.h",
 		MAME_DIR .. "src/devices/cpu/z80/kl5c80a12.cpp",
@@ -3127,7 +3133,7 @@ end
 --------------------------------------------------
 
 if CPUS["LR35902"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/lr35902/lr35902.cpp",
 		MAME_DIR .. "src/devices/cpu/lr35902/lr35902.h",
 		MAME_DIR .. "src/devices/cpu/lr35902/opc_cb.hxx",
@@ -3146,7 +3152,7 @@ end
 --------------------------------------------------
 
 if CPUS["Z180"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/z180/hd647180x.cpp",
 		MAME_DIR .. "src/devices/cpu/z180/hd647180x.h",
 		MAME_DIR .. "src/devices/cpu/z180/z180.cpp",
@@ -3177,7 +3183,7 @@ end
 --------------------------------------------------
 
 if CPUS["Z8000"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/z8000/z8000.cpp",
 		MAME_DIR .. "src/devices/cpu/z8000/z8000.h",
 		--MAME_DIR .. "src/devices/cpu/z8000/makedab.cpp",
@@ -3199,7 +3205,7 @@ end
 --------------------------------------------------
 
 if CPUS["Z8"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/z8/z8.cpp",
 		MAME_DIR .. "src/devices/cpu/z8/z8.h",
 		MAME_DIR .. "src/devices/cpu/z8/z8ops.hxx",
@@ -3217,7 +3223,7 @@ end
 --------------------------------------------------
 
 if CPUS["SUPERFX"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/superfx/superfx.cpp",
 		MAME_DIR .. "src/devices/cpu/superfx/superfx.h",
 	}
@@ -3240,7 +3246,7 @@ end
 --------------------------------------------------
 
 if CPUS["RW5000"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/rw5000/rw5000base.cpp",
 		MAME_DIR .. "src/devices/cpu/rw5000/rw5000base.h",
 		MAME_DIR .. "src/devices/cpu/rw5000/b5000.cpp",
@@ -3272,7 +3278,7 @@ end
 --------------------------------------------------
 
 if CPUS["PPS4"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/pps4/pps4.cpp",
 		MAME_DIR .. "src/devices/cpu/pps4/pps4.h",
 	}
@@ -3292,7 +3298,7 @@ end
 --------------------------------------------------
 
 if CPUS["PPS41"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/pps41/pps41base.cpp",
 		MAME_DIR .. "src/devices/cpu/pps41/pps41base.h",
 		MAME_DIR .. "src/devices/cpu/pps41/mm75.cpp",
@@ -3321,7 +3327,7 @@ end
 --------------------------------------------------
 
 if CPUS["HD61700"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/hd61700/hd61700.cpp",
 		MAME_DIR .. "src/devices/cpu/hd61700/hd61700.h",
 	}
@@ -3338,7 +3344,7 @@ end
 --------------------------------------------------
 
 if CPUS["LC8670"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/lc8670/lc8670.cpp",
 		MAME_DIR .. "src/devices/cpu/lc8670/lc8670.h",
 	}
@@ -3355,7 +3361,7 @@ end
 --------------------------------------------------
 
 if CPUS["SCUDSP"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/scudsp/scudsp.cpp",
 		MAME_DIR .. "src/devices/cpu/scudsp/scudsp.h",
 	}
@@ -3372,7 +3378,7 @@ end
 --------------------------------------------------
 
 if CPUS["SCORE"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/score/score.cpp",
 		MAME_DIR .. "src/devices/cpu/score/score.h",
 		MAME_DIR .. "src/devices/cpu/score/scorem.h",
@@ -3390,7 +3396,7 @@ end
 --------------------------------------------------
 
 if CPUS["ALTO2"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/alto2/alto2cpu.cpp",
 		MAME_DIR .. "src/devices/cpu/alto2/alto2cpu.h",
 		MAME_DIR .. "src/devices/cpu/alto2/a2disk.cpp",
@@ -3444,7 +3450,7 @@ end
 --------------------------------------------------
 
 if CPUS["SPARC"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/sparc/sparc.cpp",
 		MAME_DIR .. "src/devices/cpu/sparc/sparcdefs.h",
 		MAME_DIR .. "src/devices/cpu/sparc/sparc_intf.h",
@@ -3463,7 +3469,7 @@ end
 --------------------------------------------------
 
 if CPUS["CLIPPER"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/clipper/clipper.cpp",
 		MAME_DIR .. "src/devices/cpu/clipper/clipper.h",
 	}
@@ -3490,7 +3496,7 @@ end
 --------------------------------------------------
 
 if CPUS["ALPHA"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/alpha/alpha.cpp",
 		MAME_DIR .. "src/devices/cpu/alpha/alpha.h",
 	}
@@ -3547,7 +3553,7 @@ end
 --------------------------------------------------
 
 if CPUS["HPC"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/hpc/hpc.cpp",
 		MAME_DIR .. "src/devices/cpu/hpc/hpc.h",
 	}
@@ -3564,7 +3570,7 @@ end
 --------------------------------------------------
 
 if CPUS["SWP30"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/sound/swp30.cpp",
 		MAME_DIR .. "src/devices/sound/swp30.h",
 	}
@@ -3581,7 +3587,7 @@ end
 --------------------------------------------------
 
 if CPUS["DSPV"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/sound/dspv.cpp",
 		MAME_DIR .. "src/devices/sound/dspv.h",
 	}
@@ -3598,7 +3604,7 @@ end
 --------------------------------------------------
 
 if CPUS["NS32000"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/ns32000/ns32000.cpp",
 		MAME_DIR .. "src/devices/cpu/ns32000/ns32000.h",
 		MAME_DIR .. "src/devices/cpu/ns32000/common.h",
@@ -3616,7 +3622,7 @@ end
 --------------------------------------------------
 
 if CPUS["RII"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/rii/riscii.cpp",
 		MAME_DIR .. "src/devices/cpu/rii/riscii.h",
 	}
@@ -3633,7 +3639,7 @@ end
 --------------------------------------------------
 
 if CPUS["BCP"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/bcp/dp8344.cpp",
 		MAME_DIR .. "src/devices/cpu/bcp/dp8344.h",
 	}
@@ -3650,7 +3656,7 @@ end
 --------------------------------------------------
 
 if CPUS["F2MC16"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16.cpp",
 		MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16.h",
 		MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16_adc.cpp",
@@ -3687,7 +3693,7 @@ end
 --------------------------------------------------
 
 if CPUS["CR16B"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/cr16b/cr16b.cpp",
 		MAME_DIR .. "src/devices/cpu/cr16b/cr16b.h",
 	}
@@ -3713,7 +3719,7 @@ end
 --------------------------------------------------
 
 if CPUS["GTRON"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/gigatron/gigatron.cpp",
 		MAME_DIR .. "src/devices/cpu/gigatron/gigatron.h",
 	}
@@ -3730,7 +3736,7 @@ end
 --------------------------------------------------
 
 if CPUS["DSP56000"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/dsp56000/dsp56000.cpp",
 		MAME_DIR .. "src/devices/cpu/dsp56000/dsp56000.h",
 	}
@@ -3764,7 +3770,7 @@ end
 --------------------------------------------------
 
 if CPUS["VT50"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/vt50/vt50.cpp",
 		MAME_DIR .. "src/devices/cpu/vt50/vt50.h",
 	}
@@ -3781,7 +3787,7 @@ end
 --------------------------------------------------
 
 if CPUS["VT61"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/vt61/vt61.cpp",
 		MAME_DIR .. "src/devices/cpu/vt61/vt61.h",
 	}
@@ -3798,7 +3804,7 @@ end
 --------------------------------------------------
 
 if CPUS["PACE"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/pace/pace.cpp",
 		MAME_DIR .. "src/devices/cpu/pace/pace.h",
 	}
@@ -3815,7 +3821,7 @@ end
 --------------------------------------------------
 
 if CPUS["WE32000"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/we32000/we32100.cpp",
 		MAME_DIR .. "src/devices/cpu/we32000/we32100.h",
 	}
@@ -3832,7 +3838,7 @@ end
 --------------------------------------------------
 
 if CPUS["RX01"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/rx01/rx01.cpp",
 		MAME_DIR .. "src/devices/cpu/rx01/rx01.h",
 	}
@@ -3849,7 +3855,7 @@ end
 --------------------------------------------------
 
 if CPUS["M88000"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/m88000/m88000.cpp",
 		MAME_DIR .. "src/devices/cpu/m88000/m88000.h",
 	}
@@ -3866,7 +3872,7 @@ end
 --------------------------------------------------
 
 if CPUS["XAVIX2"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/xavix2/xavix2.cpp",
 		MAME_DIR .. "src/devices/cpu/xavix2/xavix2.h",
 	}
@@ -3886,7 +3892,7 @@ end
 --------------------------------------------------
 
 if CPUS["UPD78K"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/upd78k/upd78k0.cpp",
 		MAME_DIR .. "src/devices/cpu/upd78k/upd78k0.h",
 		MAME_DIR .. "src/devices/cpu/upd78k/upd78k2.cpp",
@@ -3919,7 +3925,7 @@ end
 --------------------------------------------------
 
 if CPUS["ROMP"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/romp/romp.cpp",
 		MAME_DIR .. "src/devices/cpu/romp/romp.h",
 		MAME_DIR .. "src/devices/cpu/romp/rsc.h",
@@ -3937,7 +3943,7 @@ end
 --------------------------------------------------
 
 if CPUS["KS0164"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/ks0164/ks0164.cpp",
 		MAME_DIR .. "src/devices/cpu/ks0164/ks0164.h",
 	}
@@ -3954,7 +3960,7 @@ end
 --------------------------------------------------
 
 if CPUS["UPD177X"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/upd177x/upd177x.cpp",
 		MAME_DIR .. "src/devices/cpu/upd177x/upd177x.h",
 	}
@@ -4001,7 +4007,7 @@ end
 --------------------------------------------------
 
 if CPUS["MK1"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/mk1/mk1.cpp",
 		MAME_DIR .. "src/devices/cpu/mk1/mk1.h",
 	}
@@ -4018,7 +4024,7 @@ end
 --------------------------------------------------
 
 if CPUS["M68HC16"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/m68hc16/cpu16.cpp",
 		MAME_DIR .. "src/devices/cpu/m68hc16/cpu16.h",
 		MAME_DIR .. "src/devices/cpu/m68hc16/m68hc16z.cpp",
@@ -4046,7 +4052,7 @@ end
 --------------------------------------------------
 
 if CPUS["NIOS2"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/nios2/nios2.cpp",
 		MAME_DIR .. "src/devices/cpu/nios2/nios2.h",
 	}
@@ -4093,7 +4099,7 @@ end
 --------------------------------------------------
 
 if CPUS["ST9"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/st9/st905x.cpp",
 		MAME_DIR .. "src/devices/cpu/st9/st905x.h",
 	}
@@ -4120,7 +4126,7 @@ end
 --------------------------------------------------
 
 if CPUS["EVOLUTION"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/evolution/evo.cpp",
 		MAME_DIR .. "src/devices/cpu/evolution/evo.h",
 	}
@@ -4137,7 +4143,7 @@ end
 --------------------------------------------------
 
 if CPUS["XTENSA"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/xtensa/xtensa.cpp",
 		MAME_DIR .. "src/devices/cpu/xtensa/xtensa.h",
 		MAME_DIR .. "src/devices/cpu/xtensa/xtensa_helper.cpp",
@@ -4158,7 +4164,7 @@ end
 --------------------------------------------------
 
 if CPUS["HT1130"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/ht1130/ht1130.cpp",
 		MAME_DIR .. "src/devices/cpu/ht1130/ht1130.h",
 	}
@@ -4175,7 +4181,7 @@ end
 --------------------------------------------------
 
 if CPUS["UPD777"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/upd777/upd777.cpp",
 		MAME_DIR .. "src/devices/cpu/upd777/upd777.h",
 	}
@@ -4192,7 +4198,7 @@ end
 --------------------------------------------------
 
 if CPUS["C33"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/c33/c33common.h",
 		MAME_DIR .. "src/devices/cpu/c33/c33helpers.ipp",
 		MAME_DIR .. "src/devices/cpu/c33/c33std.cpp",
@@ -4213,7 +4219,7 @@ end
 --------------------------------------------------
 
 if CPUS["PALM"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/palm/palm.cpp",
 		MAME_DIR .. "src/devices/cpu/palm/palm.h",
 	}
@@ -4230,7 +4236,7 @@ end
 --------------------------------------------------
 
 if CPUS["OLMS66K"] then
-	files {
+	cpufiles {
 		MAME_DIR .. "src/devices/cpu/olms66k/msm665xx.cpp",
 		MAME_DIR .. "src/devices/cpu/olms66k/msm665xx.h",
 	}

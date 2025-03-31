@@ -236,6 +236,7 @@ end
 -- SoftFloat library objects
 --------------------------------------------------
 
+if _OPTIONS["with-emulator"] then
 project "softfloat"
 	uuid "04fbf89e-4761-4cf2-8a12-64500cf0c5c5"
 	kind "StaticLib"
@@ -273,12 +274,14 @@ end
 		MAME_DIR .. "3rdparty/softfloat/fyl2x.c",
 		MAME_DIR .. "3rdparty/softfloat/f2xm1.c",
 	}
+end
 
 
 --------------------------------------------------
 -- SoftFloat 3 library objects
 --------------------------------------------------
 
+if _OPTIONS["with-emulator"] then
 project "softfloat3"
 	uuid "9c22fc90-53fd-11e8-b566-0800200c9a66"
 	kind "StaticLib"
@@ -637,13 +640,14 @@ end
 		MAME_DIR .. "3rdparty/softfloat3/bochs_ext/poly.c",
 		MAME_DIR .. "3rdparty/softfloat3/bochs_ext/extF80_scale.c",
 	}
+end
 
 
 -------------------------------------------------
 -- libJPEG library objects
 --------------------------------------------------
 
-if not _OPTIONS["with-system-jpeg"] then
+if _OPTIONS["with-emulator"] and not _OPTIONS["with-system-jpeg"] then
 project "jpeg"
 	uuid "447c6800-dcfd-4c48-b72a-a8223bb409ca"
 	kind "StaticLib"
@@ -962,7 +966,7 @@ end
 --------------------------------------------------
 if (STANDALONE~=true) then
 
-if not _OPTIONS["with-system-lua"] then
+if _OPTIONS["with-emulator"] and not _OPTIONS["with-system-lua"] then
 project "lua"
 	uuid "d9e2eed1-f1ab-4737-a6ac-863700b1a5a9"
 	kind "StaticLib"
@@ -1052,6 +1056,7 @@ end
 -- small lua library objects
 --------------------------------------------------
 
+if _OPTIONS["with-emulator"] then
 project "lualibs"
 	uuid "1d84edab-94cf-48fb-83ee-b75bc697660e"
 	kind "StaticLib"
@@ -1101,12 +1106,13 @@ project "lualibs"
 		MAME_DIR .. "3rdparty/luafilesystem/src/lfs.c",
 		MAME_DIR .. "3rdparty/lua-linenoise/linenoise.c",
 	}
+end
 
 --------------------------------------------------
 -- SQLite3 library objects
 --------------------------------------------------
 
-if not _OPTIONS["with-system-sqlite3"] then
+if _OPTIONS["with-emulator"] and not _OPTIONS["with-system-sqlite3"] then
 project "sqlite3"
 	uuid "5cb3d495-57ed-461c-81e5-80dc0857517d"
 	kind "StaticLib"
@@ -1248,6 +1254,7 @@ end
 -- BX library objects
 --------------------------------------------------
 
+if _OPTIONS["with-emulator"] then
 project "bx"
 	uuid "238318fe-49f5-4eb4-88be-0618900f5eac"
 	kind "StaticLib"
@@ -1326,12 +1333,14 @@ project "bx"
 		MAME_DIR .. "3rdparty/bx/src/timer.cpp",
 		MAME_DIR .. "3rdparty/bx/src/url.cpp",
 	}
+end
 
 
 --------------------------------------------------
 -- BIMG library objects
 --------------------------------------------------
 
+if _OPTIONS["with-emulator"] then
 project "bimg"
 	uuid "5603611b-8bf8-4ffd-85bc-76858cd7df39"
 	kind "StaticLib"
@@ -1445,12 +1454,14 @@ project "bimg"
 
 		MAME_DIR .. "3rdparty/bimg/3rdparty/tinyexr/deps/miniz/miniz.c",
 	}
+end
 
 
 --------------------------------------------------
 -- BGFX library objects
 --------------------------------------------------
 
+if _OPTIONS["with-emulator"] then
 project "bgfx"
 	uuid "d3e7e119-35cf-4f4f-aba0-d3bdcd1b879a"
 	kind "StaticLib"
@@ -1641,6 +1652,7 @@ end
 			"-D BGFX_CONFIG_MULTITHREADED=0",
 		}
 	end
+end
 
 
 --------------------------------------------------
@@ -1821,6 +1833,7 @@ end
 -- linenoise library
 --------------------------------------------------
 
+if _OPTIONS["with-emulator"] then
 project "linenoise"
 	uuid "7320ffc8-2748-4add-8864-ae29b72a8511"
 	kind (LIBTYPE)
@@ -1847,6 +1860,7 @@ project "linenoise"
 		MAME_DIR .. "3rdparty/linenoise/stringbuf.c",
 		MAME_DIR .. "3rdparty/linenoise/utf8.c",
 	}
+end
 
 
 --------------------------------------------------
@@ -1883,6 +1897,7 @@ end
 -- wdlfft library objects (from Cockos WDL)
 --------------------------------------------------
 
+if _OPTIONS["with-emulator"] then
 project "wdlfft"
 	uuid "74ca017e-fa0d-48b8-81d6-8081a37be14c"
 	kind "StaticLib"
@@ -1898,12 +1913,14 @@ project "wdlfft"
 		MAME_DIR .. "3rdparty/wdlfft/fft.c",
 		MAME_DIR .. "3rdparty/wdlfft/fft.h"
 	}
+end
 
 
 --------------------------------------------------
 -- ymfm library objects
 --------------------------------------------------
 
+if _OPTIONS["with-emulator"] then
 project "ymfm"
 	uuid "2403a536-cb0a-4b50-b41f-10c17917689b"
 	kind "StaticLib"
@@ -1936,6 +1953,7 @@ project "ymfm"
 		MAME_DIR .. "3rdparty/ymfm/src/ymfm_ssg.cpp",
 		MAME_DIR .. "3rdparty/ymfm/src/ymfm_ssg.h",
 	}
+end
 
 
 --------------------------------------------------

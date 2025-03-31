@@ -77,6 +77,7 @@ if _OPTIONS["CYGWIN_BUILD"] == "1" then
 end
 
 
+if _OPTIONS["USE_QTDEBUG"]=="1" then
 project ("qtdbg_" .. _OPTIONS["osd"])
 	uuid (os.uuid("qtdbg_" .. _OPTIONS["osd"]))
 	kind (LIBTYPE)
@@ -92,6 +93,7 @@ project ("qtdbg_" .. _OPTIONS["osd"])
 		MAME_DIR .. "3rdparty",
 	}
 	qtdebuggerbuild()
+end
 
 project ("osd_" .. _OPTIONS["osd"])
 	uuid (os.uuid("osd_" .. _OPTIONS["osd"]))
