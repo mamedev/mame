@@ -473,6 +473,7 @@ private:
 	u8 m_clkdata = 0, m_clock_control = 0;
 	u8 m_clock_frame = 0;
 
+	void lcrom_update();
 	void do_io(int offset);
 	u8 read_floatingbus();
 	void update_slotrom_banks();
@@ -1266,20 +1267,7 @@ void apple2gs_state::lc_update(int offset, bool writing)
 
 	if (m_lcram != old_lcram)
 	{
-		if (m_lcram)
-		{
-			m_lcbank.select(1);
-			m_lcaux.select(1);
-			m_lc00.select(1 + (m_romswitch ? 2 : 0));
-			m_lc01.select(1);
-		}
-		else
-		{
-			m_lcbank.select(0);
-			m_lcaux.select(0);
-			m_lc00.select(0 + (m_romswitch ? 2 : 0));
-			m_lc01.select(0);
-		}
+		lcrom_update();
 	}
 
 	#if 0
@@ -1289,6 +1277,24 @@ void apple2gs_state::lc_update(int offset, bool writing)
 			m_lcram2 ? 0x1000 : 0x0000,
 			m_altzp);
 	#endif
+}
+
+void apple2gs_state::lcrom_update()
+{
+	if (m_lcram)
+	{
+		m_lcbank.select(1);
+		m_lcaux.select(1);
+		m_lc00.select(1 + (m_romswitch ? 2 : 0));
+		m_lc01.select(1);
+	}
+	else
+	{
+		m_lcbank.select(0);
+		m_lcaux.select(0);
+		m_lc00.select(0 + (m_romswitch ? 2 : 0));
+		m_lc01.select(0);
+	}
 }
 
 // most softswitches don't care about read vs write, so handle them here
@@ -3412,6 +3418,7 @@ void apple2gs_state::adbmicro_p2_out(u8 data)
 		m_video->page2_w(false);
 		m_video->res_w(0);
 
+		lcrom_update();
 		auxbank_update();
 		update_slotrom_banks();
 	}

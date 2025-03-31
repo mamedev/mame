@@ -67,7 +67,6 @@ protected:
 	virtual void do_nmi();
 	void update_io(bool dos_enable);
 
-	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
 	memory_view m_bank0_rom;
 	memory_view m_io_shadow_view;
 	required_device<beta_disk_device> m_beta;
@@ -386,8 +385,6 @@ void scorpion_state::machine_start()
 	save_item(NAME(m_magic_lock));
 	save_item(NAME(m_ay_selected));
 	save_item(NAME(m_ram_banks));
-
-	m_maincpu->space(AS_PROGRAM).specific(m_program);
 
 	// reconfigure ROMs
 	memory_region *rom = memregion("maincpu");

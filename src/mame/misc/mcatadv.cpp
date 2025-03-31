@@ -68,7 +68,7 @@ NOS-B1-00.U60 /
 NOS-B1-01.U61-
 
 YMF286-K is compatible to YM2610 - see psikyo/psikyo.cpp driver
-038 9320EX702 / 038 9330EX705    - see misc/cave.cpp driver
+038 9320EX702 / 038 9330EX705    - see atlus/cave.cpp driver
 
 Note # = Pin #1    PCB Layout:
 
@@ -186,8 +186,8 @@ public:
 		, m_vidregs(*this, "vidregs")
 	{ }
 
-	void nost(machine_config &config);
-	void mcatadv(machine_config &config);
+	void nost(machine_config &config) ATTR_COLD;
+	void mcatadv(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -228,16 +228,13 @@ private:
 
 void mcatadv_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	u16 *source = (m_spriteram->buffer() + (m_spriteram->bytes() / 2) /2);
+	const u16 *source = (m_spriteram->buffer() + (m_spriteram->bytes() / 2) / 2);
 	source -= 4;
-	u16 *finish = m_spriteram->buffer();
-	int const global_x = m_vidregs->live()[0] - 0x184;
-	int const global_y = m_vidregs->live()[1] - 0x1f1;
+	const u16 *finish = m_spriteram->buffer();
+	const int global_x = m_vidregs->live()[0] - 0x184;
+	const int global_y = m_vidregs->live()[1] - 0x1f1;
 
-	u32 const sprmask = m_sprdata.bytes() - 1;
-
-	int xstart, xend, xinc;
-	int ystart, yend, yinc;
+	const u32 sprmask = m_sprdata.bytes() - 1;
 
 	if (m_vidregs->buffer()[2] == 0x0001) // double buffered
 	{
@@ -251,23 +248,18 @@ void mcatadv_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 
 	while (source >= finish)
 	{
-		u32 const pen = (source[0] & 0x3f00) >> 8;
-		u32 const tileno = source[1] & 0xffff;
-		u8 pri = (source[0] & 0xc000) >> 14;
+		const u32 pen = (source[0] & 0x3f00) >> 8;
+		const u32 tileno = source[1] & 0xffff;
+		const u8 pri = 0x8 | ((source[0] & 0xc000) >> 14);
 
-		pri |= 0x8;
+		int x = util::sext(source[2] & 0x3ff, 10);
+		int y = util::sext(source[3] & 0x3ff, 10);
+		bool flipy = BIT(source[0], 6);
+		bool flipx = BIT(source[0], 7);
 
-		int x = source[2] & 0x3ff;
-		int y = source[3] & 0x3ff;
-		int flipy = source[0] & 0x0040;
-		int flipx = source[0] & 0x0080;
-
-		int const height = ((source[3] & 0xf000) >> 12) * 16;
-		int const width = ((source[2] & 0xf000) >> 12) * 16;
+		const int height = ((source[3] & 0xf000) >> 12) * 16;
+		const int width = ((source[2] & 0xf000) >> 12) * 16;
 		u32 offset = tileno * 256;
-
-		if (x & 0x200) x -= 0x400;
-		if (y & 0x200) y -= 0x400;
 
 #if 0 // For Flipscreen/Cocktail
 		if (m_vidregs->live()[0] & 0x8000)
@@ -282,6 +274,9 @@ void mcatadv_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 
 		if (source[3] != source[0]) // 'hack' don't draw sprites while it's testing the RAM!
 		{
+			int xstart, xend, xinc;
+			int ystart, yend, yinc;
+
 			if (!flipx) { xstart = 0;        xend = width;  xinc = 1; }
 			else        { xstart = width-1;  xend = -1;     xinc = -1; }
 			if (!flipy) { ystart = 0;        yend = height; yinc = 1; }
@@ -306,10 +301,10 @@ void mcatadv_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 
 							if (!(pridata & 0x10)) // if we haven't already drawn a sprite pixel here (sprite masking)
 							{
-								u8 pix = m_sprdata[(offset / 2)&sprmask];
+								u8 pix = m_sprdata[(offset / 2) & sprmask];
 
-								if (offset & 1)
-									pix = pix >> 4;
+								if (BIT(offset, 0))
+									pix >>= 4;
 								pix &= 0x0f;
 
 								if (pix)
@@ -368,7 +363,7 @@ void mcatadv_state::draw_tilemap_part(screen_device &screen, int layer, int i, b
 		// global flip
 		if (m_tilemap[layer]->flipx()) scrollx -= 0x19;
 		if (m_tilemap[layer]->flipy()) scrolly -= 0x141;
-		int flip = (m_tilemap[layer]->flipx() ? TILEMAP_FLIPX : 0) | (m_tilemap[layer]->flipy() ? TILEMAP_FLIPY : 0);
+		const int flip = (m_tilemap[layer]->flipx() ? TILEMAP_FLIPX : 0) | (m_tilemap[layer]->flipy() ? TILEMAP_FLIPY : 0);
 
 		m_tilemap[layer]->set_scrollx(0, scrollx);
 		m_tilemap[layer]->set_scrolly(0, scrolly);
@@ -763,11 +758,11 @@ void mcatadv_state::nost(machine_config &config)
 	m_soundcpu->set_addrmap(AS_PROGRAM, &mcatadv_state::nost_sound_map);
 	m_soundcpu->set_addrmap(AS_IO, &mcatadv_state::nost_sound_io_map);
 
-	ym2610_device &ymsnd(YM2610(config.replace(), "ymsnd", XTAL(16'000'000) / 2)); // verified on PCB
-	ymsnd.irq_handler().set_inputline(m_soundcpu, 0);
-	ymsnd.add_route(0, "mono", 0.2);
-	ymsnd.add_route(1, "mono", 0.5);
-	ymsnd.add_route(2, "mono", 0.5);
+	ym2610_device *ymsnd = subdevice<ym2610_device>("ymsnd");
+	ymsnd->reset_routes();
+	ymsnd->add_route(0, "mono", 0.2);
+	ymsnd->add_route(1, "mono", 0.5);
+	ymsnd->add_route(2, "mono", 0.5);
 }
 
 

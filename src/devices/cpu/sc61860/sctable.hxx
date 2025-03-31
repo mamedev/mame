@@ -42,6 +42,7 @@ void sc61860_device::sc61860_instruction()
 		case 32: sc61860_store_p();m_icount-=2;break;
 		case 33: sc61860_store_q();m_icount-=2;break;
 		case 34: sc61860_store_r();m_icount-=2;break;
+		case 35: sc61860_load_imm(A, 0);m_icount-=2/*?*/;break; // undocumented
 		case 36: sc61860_inc_load_dp_load();m_icount-=7;break;
 		case 37: sc61860_dec_load_dp_load();m_icount-=7;break;
 		case 38: sc61860_inc_load_dp_store();m_icount-=7;break;
@@ -83,9 +84,9 @@ void sc61860_device::sc61860_instruction()
 		case 81: sc61860_dec_p();m_icount-=2;break;
 		case 82: sc61860_store_ext(A);m_icount-=2;break;
 		case 83: sc61860_store_ext(m_p);m_icount-=2;break;
-		case 84: sc61860_load_imm(m_p, READ_OP());m_icount-=3/*?*/;break; // undocumented
+		case 84: sc61860_load_imm(m_p, READ_OP());m_icount-=3/*?*/;break; // PC1350: 0x54 READM undocumented
 		case 85: sc61860_load_ext(m_p);m_icount-=3;break;
-		case 86: sc61860_load_imm(m_p, READ_OP());m_icount-=3/*?*/;break; // undocumented
+		case 86: sc61860_load_imm(m_p, READ_OP());m_icount-=3/*?*/;break; // PC1350: 0x56 READ undocumented
 		case 87: sc61860_load_ext(A);m_icount-=3;break;
 		case 88: sc61860_swap();m_icount-=2;break;
 		case 89: sc61860_load();m_icount-=2;break;

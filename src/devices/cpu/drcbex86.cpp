@@ -91,9 +91,13 @@
 #include "debug/debugcpu.h"
 #include "emuopts.h"
 
+#include "mfpresolve.h"
+
 #include "asmjit/src/asmjit/asmjit.h"
 
 #include <cstddef>
+#include <cstdio>
+#include <cstdlib>
 
 
 namespace drc {
@@ -413,9 +417,9 @@ public:
 	virtual void reset() override;
 	virtual int execute(uml::code_handle &entry) override;
 	virtual void generate(drcuml_block &block, const uml::instruction *instlist, uint32_t numinst) override;
-	virtual bool hash_exists(uint32_t mode, uint32_t pc) override;
-	virtual void get_info(drcbe_info &info) override;
-	virtual bool logging() const override { return m_log != nullptr; }
+	virtual bool hash_exists(uint32_t mode, uint32_t pc) const noexcept override;
+	virtual void get_info(drcbe_info &info) const noexcept override;
+	virtual bool logging() const noexcept override { return m_log != nullptr; }
 
 private:
 	// HACK: leftover from x86emit
@@ -498,6 +502,7 @@ private:
 	bool can_skip_lower_load(asmjit::x86::Assembler &a, uint32_t *memref, asmjit::x86::Gp const &reglo);
 	bool can_skip_upper_load(asmjit::x86::Assembler &a, uint32_t *memref, asmjit::x86::Gp const &reghi);
 
+	[[noreturn]] void end_of_block() const;
 	static void debug_log_hashjmp(int mode, offs_t pc);
 
 	// code generators
@@ -636,6 +641,7 @@ private:
 	x86_entry_point_func    m_entry;                // entry point
 	x86code *               m_exit;                 // exit point
 	x86code *               m_nocode;               // nocode handler
+	x86code *               m_endofblock;           // end of block handler
 	x86code *               m_save;                 // save handler
 	x86code *               m_restore;              // restore handler
 
@@ -1027,6 +1033,7 @@ drcbe_x86::drcbe_x86(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 	, m_entry(nullptr)
 	, m_exit(nullptr)
 	, m_nocode(nullptr)
+	, m_endofblock(nullptr)
 	, m_save(nullptr)
 	, m_restore(nullptr)
 	, m_last_lower_reg(Gp())
@@ -1217,6 +1224,18 @@ void drcbe_x86::reset()
 	a.bind(a.newNamedLabel("nocode_point"));
 	a.ret();                                                                            // ret
 
+	// generate an end-of-block handler point
+	m_endofblock = dst + a.offset();
+	a.bind(a.newNamedLabel("end_of_block_point"));
+	auto const [entrypoint, adjusted] = util::resolve_member_function(&drcbe_x86::end_of_block, *this);
+	if (USE_THISCALL)
+		a.mov(ecx, imm(adjusted));
+	else
+		a.mov(dword_ptr(esp, 0), imm(adjusted));
+	a.call(imm(entrypoint));
+	if (USE_THISCALL)
+		a.sub(esp, 4);
+
 	// generate a save subroutine
 	m_save = dst + a.offset();
 	a.bind(a.newNamedLabel("save"));
@@ -1299,7 +1318,8 @@ void drcbe_x86::reset()
 	{
 		x86log_disasm_code_range(m_log, "entry_point", dst, m_exit);
 		x86log_disasm_code_range(m_log, "exit_point", m_exit, m_nocode);
-		x86log_disasm_code_range(m_log, "nocode_point", m_nocode, m_save);
+		x86log_disasm_code_range(m_log, "nocode_point", m_nocode, m_endofblock);
+		x86log_disasm_code_range(m_log, "end_of_block", m_endofblock, m_save);
 		x86log_disasm_code_range(m_log, "save", m_save, m_restore);
 		x86log_disasm_code_range(m_log, "restore", m_restore, dst + bytes);
 
@@ -1387,7 +1407,7 @@ void drcbe_x86::generate(drcuml_block &block, const instruction *instlist, uint3
 		std::string dasm;
 
 		// add a comment
-		if (m_log != nullptr)
+		if (m_log)
 		{
 			dasm = inst.disasm(&m_drcuml);
 			x86log_add_comment(m_log, dst + a.offset(), "%s", dasm.c_str());
@@ -1407,13 +1427,21 @@ void drcbe_x86::generate(drcuml_block &block, const instruction *instlist, uint3
 		(this->*s_opcode_table[inst.opcode()])(a, inst);
 	}
 
+	// catch falling off the end of a block
+	if (m_log)
+	{
+		x86log_add_comment(m_log, dst + a.offset(), "%s", "end of block");
+		a.setInlineComment("end of block");
+	}
+	a.jmp(imm(m_endofblock));
+
 	// emit the generated code
 	size_t const bytes = emit(ch);
 	if (!bytes)
 		block.abort();
 
 	// log it
-	if (m_log != nullptr)
+	if (m_log)
 		x86log_disasm_code_range(m_log, (blockname.empty()) ? "Unknown block" : blockname.c_str(), dst, dst + bytes);
 
 	// tell all of our utility objects that the block is finished
@@ -1427,7 +1455,7 @@ void drcbe_x86::generate(drcuml_block &block, const instruction *instlist, uint3
 //  given mode/pc exists in the hash table
 //-------------------------------------------------
 
-bool drcbe_x86::hash_exists(uint32_t mode, uint32_t pc)
+bool drcbe_x86::hash_exists(uint32_t mode, uint32_t pc) const noexcept
 {
 	return m_hash.code_exists(mode, pc);
 }
@@ -1438,7 +1466,7 @@ bool drcbe_x86::hash_exists(uint32_t mode, uint32_t pc)
 //  the back-end implementation
 //-------------------------------------------------
 
-void drcbe_x86::get_info(drcbe_info &info)
+void drcbe_x86::get_info(drcbe_info &info) const noexcept
 {
 	for (info.direct_iregs = 0; info.direct_iregs < REG_I_COUNT; info.direct_iregs++)
 		if (int_register_map[info.direct_iregs] == 0)
@@ -1467,7 +1495,9 @@ void drcbe_x86::emit_mov_r32_p32(Assembler &a, Gp const &reg, be_parameter const
 			a.mov(reg, param.immediate());                                              // mov   reg,param
 	}
 	else if (param.is_memory())
+	{
 		a.mov(reg, MABS(param.memory()));                                               // mov   reg,[param]
+	}
 	else if (param.is_int_register())
 	{
 		if (reg.id() != param.ireg())
@@ -2817,13 +2847,27 @@ void drcbe_x86::emit_fstp_p(Assembler &a, int size, be_parameter const &param)
 //**************************************************************************
 
 //-------------------------------------------------
+//  end_of_block - function to catch falling off
+//  the end of a generated code block
+//-------------------------------------------------
+
+[[noreturn]] void drcbe_x86::end_of_block() const
+{
+	osd_printf_error("drcbe_x86(%s): fell off the end of a generated code block!\n", m_device.tag());
+	std::fflush(stdout);
+	std::fflush(stderr);
+	std::abort();
+}
+
+
+//-------------------------------------------------
 //  debug_log_hashjmp - callback to handle
 //  logging of hashjmps
 //-------------------------------------------------
 
 void drcbe_x86::debug_log_hashjmp(int mode, offs_t pc)
 {
-	printf("mode=%d PC=%08X\n", mode, pc);
+	std::printf("mode=%d PC=%08X\n", mode, pc);
 }
 
 
@@ -3797,14 +3841,14 @@ void drcbe_x86::op_store(Assembler &a, const instruction &inst)
 	if (size == SIZE_BYTE && (srcreg.id() & 4)) // FIXME: &4?
 		srcreg = eax;
 
-	// degenerate case: constant index
 	if (indp.is_immediate())
 	{
+		// degenerate case: constant index
 		int const scale = 1 << (scalesizep.scale());
 
-		// immediate source
 		if (srcp.is_immediate())
 		{
+			// immediate source
 			if (size == SIZE_BYTE)
 				a.mov(MABS(basep.memory(scale*indp.immediate()), 1), srcp.immediate()); // mov   [basep + scale*indp],srcp
 			else if (size == SIZE_WORD)
@@ -3818,14 +3862,14 @@ void drcbe_x86::op_store(Assembler &a, const instruction &inst)
 																						// mov   [basep + scale*indp + 4],srcp >> 32
 			}
 		}
-
-		// variable source
 		else
 		{
+			// variable source
 			if (size != SIZE_QWORD)
 				emit_mov_r32_p32(a, srcreg, srcp);                                      // mov   srcreg,srcp
 			else
 				emit_mov_r64_p64(a, srcreg, edx, srcp);                                 // mov   edx:srcreg,srcp
+
 			if (size == SIZE_BYTE)
 				a.mov(MABS(basep.memory(scale*indp.immediate())), srcreg.r8());         // mov   [basep + scale*indp],srcreg
 			else if (size == SIZE_WORD)
@@ -3839,16 +3883,15 @@ void drcbe_x86::op_store(Assembler &a, const instruction &inst)
 			}
 		}
 	}
-
-	// normal case: variable index
 	else
 	{
+		// normal case: variable index
 		Gp const indreg = indp.select_register(ecx);
 		emit_mov_r32_p32(a, indreg, indp);                                              // mov   indreg,indp
 
-		// immediate source
 		if (srcp.is_immediate())
 		{
+			// immediate source
 			if (size == SIZE_BYTE)
 				a.mov(ptr(u64(basep.memory()), indreg, scalesizep.scale(), 1), srcp.immediate());   // mov   [basep + 1*ecx],srcp
 			else if (size == SIZE_WORD)
@@ -3862,10 +3905,9 @@ void drcbe_x86::op_store(Assembler &a, const instruction &inst)
 																						// mov   [basep + 8*ecx + 4],srcp >> 32
 			}
 		}
-
-		// variable source
 		else
 		{
+			// variable source
 			if (size != SIZE_QWORD)
 				emit_mov_r32_p32(a, srcreg, srcp);                                      // mov   srcreg,srcp
 			else

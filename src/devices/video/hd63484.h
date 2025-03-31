@@ -13,8 +13,6 @@
 #pragma once
 
 
-#define HD63484_DISPLAY_PIXELS_MEMBER(_name) void _name(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, int x, uint16_t data)
-
 // ======================> hd63484_device
 
 class hd63484_device :  public device_t,

@@ -2,15 +2,15 @@
 // copyright-holders:Michael Zapf
 /****************************************************************************
 
-    TI-99 Speech Synthesizer connector adapter 
+    TI-99 Speech Synthesizer connector adapter
     for the Peripheral Expansion Box
 
     Michael Zapf, March 2025
 
 *****************************************************************************/
 
-#ifndef MAME_BUS_TI99_PEB_SPCHADPT_H
-#define MAME_BUS_TI99_PEB_SPCHADPT_H
+#ifndef MAME_BUS_TI99_PEB_SPEECHADAPTER_H
+#define MAME_BUS_TI99_PEB_SPEECHADAPTER_H
 
 #pragma once
 
@@ -28,7 +28,7 @@ public:
 	void setaddress_dbin(offs_t offset, int state) override;
 	void crureadz(offs_t offset, uint8_t *value) override { }
 	void cruwrite(offs_t offset, uint8_t data) override { }
-	
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -46,4 +46,4 @@ private:
 
 DECLARE_DEVICE_TYPE_NS(TI99_SPEECHADAPTER, bus::ti99::peb, ti_speechsyn_adapter_device)
 
-#endif // MAME_BUS_TI99_PEB_SPCHADPT_H
+#endif // MAME_BUS_TI99_PEB_SPEECHADAPTER_H

@@ -273,7 +273,7 @@ void przone_state::przone(machine_config &config)
 	PCI_SLOT(config, "pci:1", pci_cards, 15, 0, 1, 2, 3, nullptr);
 	PCI_SLOT(config, "pci:2", pci_cards, 16, 1, 2, 3, 0, nullptr);
 	PCI_SLOT(config, "pci:3", pci_cards, 17, 2, 3, 0, 1, nullptr);
-	// TODO: virgevx
+	// TODO: has a stroke with virgevx
 	PCI_SLOT(config, "pci:4", pci_cards, 18, 3, 0, 1, 2, "virge");
 
 	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "fdc37c93x", true).set_option_machine_config("fdc37c93x", smc_superio_config);

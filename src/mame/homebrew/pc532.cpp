@@ -49,7 +49,7 @@ public:
 		, m_fpu(*this, "fpu")
 		, m_icu(*this, "icu")
 		, m_rtc(*this, "rtc")
-		, m_ncr5380(*this, "slot:7:ncr5380")
+		, m_dp8490(*this, "slot:7:dp8490")
 		, m_aic6250(*this, "scsi:0:aic6250")
 		, m_duart(*this, "duart%u", 0U)
 		, m_serial(*this, "serial%u", 0U)
@@ -74,7 +74,7 @@ protected:
 
 	required_device<ds1216e_device> m_rtc;
 
-	required_device<ncr5380_device> m_ncr5380;
+	required_device<dp8490_device> m_dp8490;
 	required_device<aic6250_device> m_aic6250;
 
 	required_device_array<scn2681_device, 4> m_duart;
@@ -154,13 +154,13 @@ void pc532_state::drq_w(int state)
 	{
 		switch (m_state)
 		{
-		case RD1: m_dma |= u32(m_ncr5380->dma_r()) << 8; m_state = RD2; break;
-		case RD2: m_dma |= u32(m_ncr5380->dma_r()) << 16; m_state = RD3; break;
-		case RD3: m_dma |= u32(m_ncr5380->dma_r()) << 24; m_state = RD4; break;
+		case RD1: m_dma |= u32(m_dp8490->dma_r()) << 8; m_state = RD2; break;
+		case RD2: m_dma |= u32(m_dp8490->dma_r()) << 16; m_state = RD3; break;
+		case RD3: m_dma |= u32(m_dp8490->dma_r()) << 24; m_state = RD4; break;
 
-		case WR3: m_ncr5380->dma_w(m_dma >> 8); m_state = WR2; break;
-		case WR2: m_ncr5380->dma_w(m_dma >> 16); m_state = WR1; break;
-		case WR1: m_ncr5380->dma_w(m_dma >> 24); m_state = IDLE; break;
+		case WR3: m_dp8490->dma_w(m_dma >> 8); m_state = WR2; break;
+		case WR2: m_dp8490->dma_w(m_dma >> 16); m_state = WR1; break;
+		case WR1: m_dp8490->dma_w(m_dma >> 24); m_state = IDLE; break;
 
 		default:
 			break;
@@ -212,7 +212,7 @@ u32 pc532_state::dma_r(offs_t offset, u32 mem_mask)
 			if (m_drq && !m_irq)
 			{
 				// buffer empty and SCSI ready to transfer; read SCSI data, enter the read state, and signal the CPU to wait
-				m_dma = m_ncr5380->dma_r();
+				m_dma = m_dp8490->dma_r();
 				m_state = RD1;
 
 				m_cpu->rdy_w(1);
@@ -249,7 +249,7 @@ void pc532_state::dma_w(offs_t offset, u32 data, u32 mem_mask)
 		if (m_drq)
 		{
 			m_dma = data;
-			m_ncr5380->dma_w(m_dma >> 0);
+			m_dp8490->dma_w(m_dma >> 0);
 			m_state = WR3;
 		}
 	}
@@ -280,7 +280,7 @@ template <unsigned ST> void pc532_state::cpu_map(address_map &map)
 	if (ST == ns32000::ST_ODT)
 	{
 		map(0x3000'0000, 0x3fff'ffff).view(m_select);
-		m_select[0](0x3000'0000, 0x3000'0007).m(m_ncr5380, FUNC(ncr5380_device::map));
+		m_select[0](0x3000'0000, 0x3000'0007).m(m_dp8490, FUNC(dp8490_device::map));
 		m_select[0](0x3800'0000, 0x3fff'ffff).rw(FUNC(pc532_state::dma_r), FUNC(pc532_state::dma_w));
 		m_select[1](0x3000'0000, 0x3000'0001).rw(m_aic6250, FUNC(aic6250_device::read), FUNC(aic6250_device::write));
 	}
@@ -316,14 +316,14 @@ void pc532_state::pc532(machine_config &config)
 	NSCSI_CONNECTOR(config, "slot:1", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "slot:2", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "slot:3", scsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "slot:7").option_set("ncr5380", NCR5380).machine_config( // DP8490
+	NSCSI_CONNECTOR(config, "slot:7").option_set("dp8490", DP8490).machine_config( // DP8490V
 		[this](device_t *device)
 		{
-			ncr5380_device &ncr5380(downcast<ncr5380_device &>(*device));
+			dp8490_device &dp8490(downcast<dp8490_device &>(*device));
 
-			ncr5380.drq_handler().set(*this, FUNC(pc532_state::drq_w));
-			ncr5380.irq_handler().append(m_icu, FUNC(ns32202_device::ir_w<4>));
-			ncr5380.irq_handler().append(*this, FUNC(pc532_state::irq_w));
+			dp8490.drq_handler().set(*this, FUNC(pc532_state::drq_w));
+			dp8490.irq_handler().append(m_icu, FUNC(ns32202_device::ir_w<4>));
+			dp8490.irq_handler().append(*this, FUNC(pc532_state::irq_w));
 		});
 
 	NSCSI_BUS(config, "scsi");
