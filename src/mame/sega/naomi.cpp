@@ -5179,7 +5179,7 @@ ROM_START( crzytaxib )
 	NAOMI_DEFAULT_EEPROM
 
 	ROM_REGION( 0x8800000, "rom_board", ROMREGION_ERASEFF)
-	ROM_LOAD( "epr-21683.ic22",  0x0000000, 0x400000, CRC(832195e8) SHA1(ef33dd1355b7fc6449ef81c7667ac80b2d9068a1) ) // The label was Sega original, but 21683 makes no sense, as there's already a MPR-21683
+	ROM_LOAD( "epr-21683.ic22",  0x0000000, 0x400000, CRC(832195e8) SHA1(ef33dd1355b7fc6449ef81c7667ac80b2d9068a1) ) // The label EPR-21683 makes no sense, as there's already a MPR-21683, but seems ATEC/Sega original
 	ROM_LOAD( "mpr-21671.ic1",   0x0800000, 0x800000, CRC(2d362137) SHA1(ed6eb45eadb784910eee44d0273534ab68ad6937) )
 	ROM_LOAD( "mpr-21672.ic2",   0x1000000, 0x800000, CRC(72c7da8e) SHA1(0ed3d71c052a2cccbbf0f7b20e2ec688316c7247) )
 	ROM_LOAD( "mpr-21673.ic3",   0x1800000, 0x800000, CRC(27481c0d) SHA1(08779e33eda1a45cb06319327cb4254dc3e4460f) )
