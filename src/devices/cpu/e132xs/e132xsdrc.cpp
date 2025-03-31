@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Ryan Holtz
+// copyright-holders:Ryan Holtz, Vas Crabb
 
 #include "emu.h"
 #include "e132xs.h"
@@ -799,17 +799,19 @@ void hyperstone_device::generate_sequence_instruction(drcuml_block &block, compi
 		if (compiler.check_delay())
 		{
 			// if PC is used in a delay instruction, the delayed PC should be used
-			const int nodelay = compiler.next_label();
+			const int set_delay_pc = compiler.next_label();
 			const int done = compiler.next_label();
-			UML_TEST(block, mem(&m_core->delay_slot), 1);
-			UML_JMPc(block, uml::COND_Z, nodelay);
+			UML_TEST(block, mem(&m_core->delay_slot), ~uint32_t(0));
+			UML_JMPc(block, uml::COND_NZ, set_delay_pc);
+
+			UML_ADD(block, DRC_PC, DRC_PC, desc->length);
+			UML_MOV(block, mem(&m_core->delay_slot_taken), 0);
+			UML_JMP(block, done);
+
+			UML_LABEL(block, set_delay_pc);
 			UML_MOV(block, DRC_PC, mem(&m_core->delay_pc));
 			UML_MOV(block, mem(&m_core->delay_slot), 0);
 			UML_MOV(block, mem(&m_core->delay_slot_taken), 1);
-			UML_JMP(block, done);
-			UML_LABEL(block, nodelay);
-			UML_ADD(block, DRC_PC, DRC_PC, desc->length);
-			UML_MOV(block, mem(&m_core->delay_slot_taken), 0);
 			UML_LABEL(block, done);
 		}
 		else

@@ -871,7 +871,7 @@ offs_t hyperstone_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 					// LD/STHS.D/A
 					util::stream_format(stream, "%sH%c.%c  %s, %s, $%x", inst, (dis & 1) ? 'S' : 'U', mode, dest, source, dis & ~1);
 					if (!dest_bit && (dest_code == PC_REGISTER))
-						util::stream_format(stream, " ; $%x", uint32_t(pc + size + (dis & ~1)));
+						util::stream_format(stream, " ; $%x", uint32_t(pc + size + (dis & ~1)) & ~1);
 					break;
 
 				case 3:
@@ -888,7 +888,7 @@ offs_t hyperstone_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 						util::stream_format(stream, "%s%c.%c   %s, %s, $%x", inst, (dis & 1) ? 'D' : 'W', mode, dest, source, dis & ~3);
 					}
 					if (!dest_bit && (dest_code == PC_REGISTER))
-						util::stream_format(stream, " ; $%x", uint32_t(pc + size + (dis & ~3)));
+						util::stream_format(stream, " ; $%x", uint32_t(pc + size + (dis & ~3)) & ~3);
 					break;
 			}
 			break;
@@ -921,23 +921,17 @@ offs_t hyperstone_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 				case 0:
 					// LD/STBS.N
 					util::stream_format(stream, "%sBS.N  %s, %s, $%x", inst, dest, source, dis);
-					if (!dest_bit && (dest_code == PC_REGISTER))
-						util::stream_format(stream, " ; $%x", uint32_t(pc + size + dis));
 					break;
 
 				case 1:
 					// LD/STBU.N
 					util::stream_format(stream, "%sBU.N  %s, %s, $%x", inst, dest, source, dis);
-					if (!dest_bit && (dest_code == PC_REGISTER))
-						util::stream_format(stream, " ; $%x", uint32_t(pc + size + dis));
 					break;
 
 				case 2:
 					// LD/STHU.N
 					// LD/STHS.N
 					util::stream_format(stream, "%sH%c.N  %s, %s, $%x", inst, (dis & 1) ? 'S' : 'U', dest, source, dis & ~1);
-					if (!dest_bit && (dest_code == PC_REGISTER))
-						util::stream_format(stream, " ; $%x", uint32_t(pc + size + (dis & ~1)));
 					break;
 
 				case 3:
@@ -945,8 +939,6 @@ offs_t hyperstone_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 					{
 						// LD/STW.S
 						util::stream_format(stream, "%sW.S   %s, %s, $%x", inst, dest, source, dis & ~3);
-						if (!dest_bit && (dest_code == PC_REGISTER))
-							util::stream_format(stream, " ; $%x", uint32_t(pc + size + (dis & ~3)));
 					}
 					else if ((dis & 3) == 2)
 					{
@@ -958,8 +950,6 @@ offs_t hyperstone_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 						// LD/STW.N
 						// LD/STD.N
 						util::stream_format(stream, "%s%c.N   %s, %s, $%x", inst, (dis & 1) ? 'D' : 'W', dest, source, dis & ~3);
-						if (!dest_bit && (dest_code == PC_REGISTER))
-							util::stream_format(stream, " ; $%x", uint32_t(pc + size + (dis & ~3)));
 					}
 					break;
 			}

@@ -32,7 +32,6 @@
 
  TODO:
  - All instructions should clear the H flag (not just MOV/MOVI)
- - Fix behaviour of exceptions in delay slots
  - Fix behaviour of branches in delay slots
  - Many wrong cycle counts
  - No emulation of memory access latency and pipleline
@@ -41,9 +40,6 @@
  - Verify register wrapping with sregf/dregf on hardware
  - Tracing doesn't work properly
    DRC does not generate trace exceptions on branch or return
- - Interpreter does not implement privilege check on setting L flag
- - DRC does not update ILC and P on some privilege error exceptions
- - Support for debugger exception points should be implemented
 
 *********************************************************************/
 
@@ -489,9 +485,11 @@ void hyperstone_device::set_global_register(uint8_t code, uint32_t val)
 			return;
 		case SR_REGISTER:
 			{
-				// FIXME: generate exception on attempt to set L from user mode const bool exception = !GET_S && !GET_L && (val & L_MASK);
+				const bool privilege_error = !GET_S && !GET_L && (val & L_MASK);
 				SET_LOW_SR(val); // only a RET instruction can change the full content of SR
-				SR &= ~0x40; //reserved bit 6 always zero
+				SR &= ~0x40; // reserved bit 6 always zero
+				if (privilege_error)
+					execute_exception(TRAPNO_PRIVILEGE_ERROR);
 			}
 			return;
 		case 2:
@@ -584,8 +582,14 @@ do                                                                              
 	/* if PC is used in a delay instruction, the delayed PC should be used */       \
 	if (m_core->delay_slot)                                                         \
 	{                                                                               \
-		PC = m_core->delay_pc;                                                      \
+		using std::swap;                                                            \
+		swap(PC, m_core->delay_pc);                                                 \
 		m_core->delay_slot = 0;                                                     \
+		m_core->delay_slot_taken = 1;                                               \
+	}                                                                               \
+	else                                                                            \
+	{                                                                               \
+		m_core->delay_slot_taken = 0;                                               \
 	}                                                                               \
 } while (0)
 
@@ -761,7 +765,16 @@ void hyperstone_device::execute_exception(uint8_t trapno)
 
 	const uint32_t addr = get_trap_addr(trapno);
 	const uint8_t reg = GET_FP + GET_FL;
-	SET_ILC(m_instruction_length);
+
+	if (!m_core->delay_slot_taken)
+		SET_ILC(m_instruction_length);
+	else
+		PC = m_core->delay_pc;
+
+	// RET does not automatically set P
+	if (((m_op & 0xfef0) != 0x0400) || !(m_op & 0x010e))
+		SET_P(1);
+
 	const uint32_t oldSR = SR;
 
 	SET_FL(2);
@@ -1101,9 +1114,9 @@ void hyperstone_device::device_start()
 	save_item(NAME(m_core->global_regs));
 	save_item(NAME(m_core->local_regs));
 	save_item(NAME(m_core->trap_entry));
-	save_item(NAME(m_core->delay_pc));
 	save_item(NAME(m_instruction_length));
 	save_item(NAME(m_core->intblock));
+	save_item(NAME(m_core->delay_pc));
 	save_item(NAME(m_core->delay_slot));
 	save_item(NAME(m_core->delay_slot_taken));
 	save_item(NAME(m_core->tr_clocks_per_tick));
