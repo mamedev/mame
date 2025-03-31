@@ -246,7 +246,7 @@ ROM_START( wlzb )
 	ROM_LOAD16_BYTE( "w1-a.u9", 0x00000, 0x80000, CRC(2b6cd511) SHA1(0abfe24d83964eb45f348c5cbfd2ad50474db3c6) )
 	ROM_LOAD16_BYTE( "w2-a.u8", 0x00001, 0x80000, CRC(df068584) SHA1(de051d56b9d64027f1b6dee609272186c3575bef) )
 
-	ROM_REGION( 0x8000, "audiocpu", 0 )
+	ROM_REGION( 0x8000, "audiocpu", 0 ) // 10/10/1996 but this was released in 1999. also has SunKiss Chen string
 	ROM_LOAD( "w7.u34", 0x0000, 0x8000, CRC(c00786b3) SHA1(a8b3ddf3dd1b702d8719eace1b65f42c727b9473) )
 
 	ROM_REGION16_BE( 0x200000, "tiles", 0 )
