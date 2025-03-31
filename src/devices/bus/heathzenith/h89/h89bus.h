@@ -125,6 +125,7 @@ class h89bus_device;
 class device_h89bus_card_interface : public device_interface
 {
 	friend class h89bus_device;
+
 public:
 	// construction/destruction
 	virtual ~device_h89bus_card_interface();
@@ -372,7 +373,6 @@ public:
 	h89bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~h89bus_device();
 
-	void set_io_decoder(const char *tag, device_type devtype);
 	void install_io_device(offs_t start, offs_t end, read8sm_delegate rhandler, write8sm_delegate whandler);
 	void install_io_device(offs_t start, offs_t end, read8smo_delegate rhandler, write8smo_delegate whandler);
 	std::pair<u8, u8> get_address_range(u8 select_bits, bool p506_signals = false) { return m_io_decoder_socket->get_address_range(select_bits, p506_signals); }

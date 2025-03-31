@@ -157,7 +157,7 @@ heath_io_decoder_444_43::heath_io_decoder_444_43(const machine_config &mconfig, 
 //  Not specified, reserved      | 80-CF | 200-317 |
 //  DCE Serial I/O               | D0-D7 | 320-327 | IO_SER0
 //  DTE Serial I/O               | D8-DF | 330-337 | IO_SER1
-//  DCE Serial I/O               | EO-E7 | 340-347 |  IO_LP
+//  DCE Serial I/O               | EO-E7 | 340-347 | IO_LP
 //  Console I/O                  | E8-EF | 350-357 | IO_TERM
 //  NMI                          | F0-F1 | 360-361 | IO_NMI
 //  General purpose port         |    F2 |     362 | IO_GPP
@@ -412,13 +412,12 @@ std::pair<u8, u8> heath_io_decoder_cdr86::get_address_range(u8 select_bits, bool
 	return std::make_pair(start_addr, end_addr);
 }
 
-DEFINE_DEVICE_TYPE(H89BUS_IO_DECODE_444_43,  heath_io_decoder_444_43, "h89bus_io_decoder_444_43", "Heath H89 IO Decoder 444-43")
-DEFINE_DEVICE_TYPE(H89BUS_IO_DECODE_444_61,  heath_io_decoder_444_61, "h89bus_io_decoder_444_61", "Heath H89 IO Decoder 444-61")
+DEFINE_DEVICE_TYPE(H89BUS_IO_DECODE_444_43,  heath_io_decoder_444_43,  "h89bus_io_decoder_444_43",  "Heath H89 IO Decoder 444-43")
+DEFINE_DEVICE_TYPE(H89BUS_IO_DECODE_444_61,  heath_io_decoder_444_61,  "h89bus_io_decoder_444_61",  "Heath H89 IO Decoder 444-61")
 DEFINE_DEVICE_TYPE(H89BUS_IO_DECODE_MMS_61C, heath_io_decoder_mms_61c, "h89bus_io_decoder_mms_61c", "Heath H89 IO Decoder MMS 444-61c")
-DEFINE_DEVICE_TYPE(H89BUS_IO_DECODE_CDR_86,  heath_io_decoder_cdr86, "h89bus_io_decoder_cdr86", "Heath H89 IO Decoder CDR86")
+DEFINE_DEVICE_TYPE(H89BUS_IO_DECODE_CDR_86,  heath_io_decoder_cdr86,   "h89bus_io_decoder_cdr86",   "Heath H89 IO Decoder CDR86")
 
-
-DEFINE_DEVICE_TYPE(H89BUS_IO_DECODE_SOCKET,  heath_io_decoder_socket, "h89bus_io_decoder_socket", "Heath H89 IO Decoder Socket")
+DEFINE_DEVICE_TYPE(H89BUS_IO_DECODE_SOCKET,  heath_io_decoder_socket,  "h89bus_io_decoder_socket",  "Heath H89 IO Decoder Socket")
 
 std::pair<u8, u8> heath_io_decoder_socket::get_address_range(u8 select_bits, bool p506_signals)
 {
@@ -493,11 +492,6 @@ void h89bus_device::add_h89bus_left_card(device_h89bus_left_card_interface &card
 void h89bus_device::add_h89bus_right_card(device_h89bus_right_card_interface &card)
 {
 	m_right_device_list.emplace_back(card);
-}
-
-void h89bus_device::set_io_decoder(const char *tag, device_type devtype)
-{
-	m_io_decoder_socket->option_set(tag, devtype);
 }
 
 void h89bus_device::install_io_device(offs_t start, offs_t end, read8sm_delegate rhandler, write8sm_delegate whandler)
