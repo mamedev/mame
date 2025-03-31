@@ -5173,6 +5173,31 @@ ROM_START( crzytaxi )
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "280d2f45" )
 ROM_END
 
+/* Crazy Taxi (Rev B) */
+ROM_START( crzytaxib )
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0x8800000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD( "epr-21683.ic22",  0x0000000, 0x400000, CRC(832195e8) SHA1(ef33dd1355b7fc6449ef81c7667ac80b2d9068a1) ) // The label was Sega original, but 21683 makes no sense, as there's already a MPR-21683
+	ROM_LOAD( "mpr-21671.ic1",   0x0800000, 0x800000, CRC(2d362137) SHA1(ed6eb45eadb784910eee44d0273534ab68ad6937) )
+	ROM_LOAD( "mpr-21672.ic2",   0x1000000, 0x800000, CRC(72c7da8e) SHA1(0ed3d71c052a2cccbbf0f7b20e2ec688316c7247) )
+	ROM_LOAD( "mpr-21673.ic3",   0x1800000, 0x800000, CRC(27481c0d) SHA1(08779e33eda1a45cb06319327cb4254dc3e4460f) )
+	ROM_LOAD( "mpr-21674.ic4",   0x2000000, 0x800000, CRC(c2e2a98c) SHA1(9a40456ca025c2a6314cef705f7d147bbf95c0f0) )
+	ROM_LOAD( "mpr-21675.ic5",   0x2800000, 0x800000, CRC(6b755510) SHA1(3fa967587e05c5bd45db3fe8a2cbc56f44166ef6) )
+	ROM_LOAD( "mpr-21676.ic6",   0x3000000, 0x800000, CRC(f33d1f39) SHA1(b1d589a9ab7ec4988e63bfb458ef006308e1de70) )
+	ROM_LOAD( "mpr-21677.ic7",   0x3800000, 0x800000, CRC(ab4dc61b) SHA1(d92ff434e7a2b9d3598f9d7004aa717b9bd21980) )
+	ROM_LOAD( "mpr-21678.ic10",  0x5000000, 0x800000, CRC(297c778a) SHA1(67e5685cd03a3aaaac1c47f15c7b3f3e341d34b1) )
+	ROM_LOAD( "mpr-21679.ic11",  0x5800000, 0x800000, CRC(6b540c4a) SHA1(9877c31b41110230182c0ee8d40753907981c7f9) )
+	ROM_LOAD( "mpr-21680.ic12s", 0x6000000, 0x800000, CRC(e76f03f9) SHA1(ea20aa86d02a77315cca8cb6be75ca4ca9cc7484) )
+	ROM_LOAD( "mpr-21681.ic13s", 0x6800000, 0x800000, CRC(e5dcde7d) SHA1(8a90d9fb4ce0d2ceb609fcf4c54cf5b55c266c50) )
+	ROM_LOAD( "mpr-21682.ic14s", 0x7000000, 0x800000, CRC(54c0290e) SHA1(6e07ab6e95c29a2aabed0ba1a7af0d7d605e0309) )
+	ROM_LOAD( "mpr-21683.ic15s", 0x7800000, 0x800000, CRC(ac8a27e0) SHA1(8e71d853a102dd6c164d5326e6d157ccfb8c7b36) )
+
+	// 840-0002    1999     317-0248-COM   Naomi
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "280d2f45" )
+ROM_END
+
 /* Jambo! Safari */
 ROM_START( jambo )
 	NAOMI_BIOS
@@ -10910,6 +10935,7 @@ void naomi_state::init_hotd2()
 /* 840-xxxxx (Sega Naomi cart games)*/
 /* 0001    */ GAME( 1998, dybbnao,   naomi,    naomim2, dybbnao, naomi_state, init_naomi,   ROT0, "Sega", "Dynamite Baseball NAOMI (Japan)", GAME_FLAGS )
 /* 0002    */ GAME( 1999, crzytaxi,  naomi,    naomim2, crzytaxi,naomi_state, init_naomi,   ROT0, "Sega", "Crazy Taxi", GAME_FLAGS )
+/* 0002B   */ GAME( 1999, crzytaxib, naomi,    naomim2, crzytaxi,naomi_state, init_naomi,   ROT0, "Sega", "Crazy Taxi (Rev B)", GAME_FLAGS )
 /* 0003    */ GAME( 1999, zombrvno,  zombrvn,  naomim2, zombrvn, naomi_state, init_naomi,   ROT0, "Sega", "Zombie Revenge", GAME_FLAGS )
 /* 0003    */ GAME( 1999, zombrvn,   naomi,    naomim2, zombrvn, naomi_state, init_naomi,   ROT0, "Sega", "Zombie Revenge (Rev A)", GAME_FLAGS )
 /* 0003    */ GAME( 1999, zombrvne,  zombrvn,  naomim2, zombrvn, naomi_state, init_naomi,   ROT0, "Sega", "Zombie Revenge (Export)", GAME_FLAGS ) // not 100% sure if its really version for Export, also might have different 840-xxx ID
