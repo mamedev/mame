@@ -34,9 +34,11 @@
  - All instructions should clear the H flag (not just MOV/MOVI)
  - Fix behaviour of branches in delay slots
  - Many wrong cycle counts
+ - Prevent reading write-only BCR, TPR, FCR and MCR
+ - IRAM selection should happen before EA calculation
  - No emulation of memory access latency and pipleline
  - Should a zero bit shift clear C or leave it unchanged?
- - What actually happens on trying to load memory to PC or SR?
+ - What actually happens on trying to load to PC, SR, G14 or G15?
  - Verify register wrapping with sregf/dregf on hardware
  - Tracing doesn't work properly
    DRC does not generate trace exceptions on branch or return
@@ -370,17 +372,16 @@ void hyperstone_device::adjust_timer_interrupt()
 	if (cycles_until_next_clock == 0)
 		cycles_until_next_clock = (uint64_t)(1 << m_core->clck_scale);
 
-	/* special case: if we have a change pending, set a timer to fire then */
 	if (TPR & 0x80000000)
 	{
+		// special case: if we have a change pending, set a timer to fire then
 		uint64_t clocks_until_int = m_core->tr_clocks_per_tick - (clocks_since_base % m_core->tr_clocks_per_tick);
 		uint64_t cycles_until_int = (clocks_until_int << m_core->clck_scale) + cycles_until_next_clock;
 		m_timer->adjust(cycles_to_attotime(cycles_until_int + 1), 1);
 	}
-
-	/* else if the timer interrupt is enabled, configure it to fire at the appropriate time */
 	else if (!(FCR & 0x00800000))
 	{
+		// else if the timer interrupt is enabled, configure it to fire at the appropriate time
 		uint32_t curtr = m_core->tr_base_value + (clocks_since_base / m_core->tr_clocks_per_tick);
 		uint32_t delta = TCR - curtr;
 		if (delta > 0x80000000)
@@ -395,10 +396,108 @@ void hyperstone_device::adjust_timer_interrupt()
 			m_timer->adjust(cycles_to_attotime(cycles_until_int));
 		}
 	}
-
-	/* otherwise, disable the timer */
 	else
+	{
+		// otherwise, disable the timer
 		m_timer->adjust(attotime::never);
+	}
+}
+
+void hyperstone_device::update_bus_control()
+{
+	const uint32_t val = m_core->global_regs[BCR_REGISTER];
+
+	LOG("%s: Set BCR = 0x%08x\n", machine().describe_context(), val);
+	if (BIT(m_core->global_regs[MCR_REGISTER], 21))
+	{
+		LOG("MEM0 access time %d cycles, hold time %d cycles, setup time %d cycles\n",
+				BIT(val, 16, 4) + 1,
+				BIT(val, 11, 3),
+				BIT(val, 14, 2));
+	}
+	else
+	{
+		char const *const refresh[8] = {
+				"every 256 prescaler time units",
+				"every 128 prescaler time units",
+				"every 64 prescaler time units",
+				"every 32 prescaler time units",
+				"every 16 prescaler time units",
+				"every 8 prescaler time units",
+				"every 4 prescaler time units",
+				"disabled" };
+		char const *const page[8] = { "64K", "32K", "16K", "8K", "4K", "2K", "1K", "512" };
+		LOG("MEM0 RAS precharge time %d cycles, RAS to CAS delay time %d cycles, CAS access time %d cycles, %s byte rows, refresh %s\n",
+				BIT(val, 18, 2) + 1 + (BIT(m_core->global_regs[MCR_REGISTER], 8) * 2),
+				BIT(val, 14, 2) + 1,
+				BIT(val, 16, 2) + 1 + (BIT(m_core->global_regs[MCR_REGISTER], 8) * 2),
+				page[BIT(val, 4, 3)],
+				refresh[BIT(val, 11, 3)]);
+	}
+	LOG("MEM1 access time %d cycles, hold time %d cycles\n",
+			BIT(val, 20, 3) + 1,
+			BIT(val, 22) + BIT(val, 23));
+	LOG("MEM2 access time %d cycles, hold time %d cycles, setup time %d cycles\n",
+			BIT(val, 24, 4) + 1,
+			BIT(val, 0, 3),
+			BIT(val, 3));
+	LOG("MEM3 access time %d cycles, hold time %d cycles, setup time %d cycles\n",
+			BIT(val, 28, 4) + 1,
+			BIT(val, 8, 3),
+			BIT(val, 7));
+
+}
+
+void hyperstone_device::update_memory_control()
+{
+	const uint32_t val = m_core->global_regs[MCR_REGISTER];
+
+	static char const *const entrymap[8] = { "MEM0", "MEM1", "MEM2", "IRAM", "reserved", "reserved", "reserved", "MEM3" };
+	LOG("%s: Set MCR = 0x%08x entry map in %s\n",
+			machine().describe_context(),
+			val,
+			entrymap[BIT(val, 12, 3)]);
+
+	static char const *const size[4] = { "32 bit", "reserved", "16 bit", "8 bit" };
+	if (BIT(val, 21))
+	{
+		LOG("MEM0 %s, bus hold break %s, parity %s, byte %s\n",
+				size[BIT(val, 0, 2)],                   // MEM0 bus size
+				BIT(val,  8) ? "disabled" : "enabled",  // MEM0 bus hold break
+				BIT(val, 28) ? "disabled" : "enabled",  // MEM0 parity
+				BIT(val, 15) ? "strobe"   : "enable");  // MEM0 byte mode
+	}
+	else
+	{
+		static char const *const dramtype[4] = { "S", "S", "EDO ", "fast page " };
+		LOG("MEM0 %s %sDRAM, hold time %s, parity %s\n",
+				size[BIT(val, 0, 2)],                   // MEM0 bus size
+				dramtype[bitswap<2>(val, 15, 22)],      // MEM0 DRAM type
+				BIT(val,  8) ? "1 cycle" : "0 cycles",  // MEM0 bus hold
+				BIT(val, 28) ? "disabled" : "enabled",  // MEM0 parity
+				BIT(val, 15) ? "strobe"   : "enable");  // MEM0 byte mode
+	}
+	LOG("MEM1 %s, bus hold break %s, parity %s, byte %s\n",
+			size[BIT(val, 2, 2)],                   // MEM1 bus size
+			BIT(val,  9) ? "disabled" : "enabled",  // MEM1 bus hold break
+			BIT(val, 29) ? "disabled" : "enabled",  // MEM1 parity
+			BIT(val, 19) ? "strobe"   : "enable");  // MEM1 byte mode
+	LOG("MEM2 %s, bus hold break %s, parity %s, byte %s, wait %s\n",
+			size[BIT(val, 4, 2)],                   // MEM2 bus size
+			BIT(val, 10) ? "disabled" : "enabled",  // MEM2 bus hold break
+			BIT(val, 30) ? "disabled" : "enabled",  // MEM2 parity
+			BIT(val, 23) ? "strobe"   : "enable",   // MEM2 byte mode
+			BIT(val, 26) ? "disabled" : "enabled"); // MEM2 wait
+	LOG("MEM3 %s, bus hold break %s, parity %s\n",
+			size[BIT(val, 6, 2)],                   // MEM3 bus size
+			BIT(val, 11) ? "disabled" : "enabled",  // MEM3 bus hold break
+			BIT(val, 31) ? "disabled" : "enabled"); // MEM3 parity
+
+
+	// bits 14..12 EntryTableMap
+	const int which = (val & 0x7000) >> 12;
+	assert(which < 4 || which == 7);
+	m_core->trap_entry = s_trap_entries[which];
 }
 
 TIMER_CALLBACK_MEMBER( hyperstone_device::timer_callback )
@@ -460,7 +559,7 @@ uint32_t hyperstone_device::get_global_register(uint8_t code)
 */
 	if (code == TR_REGISTER)
 	{
-		/* it is common to poll this in a loop */
+		// it is common to poll this in a loop
 		if (m_core->icount > m_core->tr_clocks_per_tick / 2)
 			m_core->icount -= m_core->tr_clocks_per_tick / 2;
 		compute_tr();
@@ -517,6 +616,7 @@ void hyperstone_device::set_global_register(uint8_t code, uint32_t val)
 			return;
 		case BCR_REGISTER:
 			m_core->global_regs[code] = val;
+			update_bus_control();
 			return;
 		case TPR_REGISTER:
 			m_core->global_regs[code] = val;
@@ -551,14 +651,9 @@ void hyperstone_device::set_global_register(uint8_t code, uint32_t val)
 			m_core->global_regs[code] = val;
 			return;
 		case MCR_REGISTER:
-		{
-			// bits 14..12 EntryTableMap
-			const int which = (val & 0x7000) >> 12;
-			assert(which < 4 || which == 7);
-			m_core->trap_entry = s_trap_entries[which];
 			m_core->global_regs[code] = val;
+			update_memory_control();
 			return;
-		}
 		case 28:
 		case 29:
 		case 30:
@@ -1014,19 +1109,20 @@ void hyperstone_device::device_start()
 	const uint32_t umlflags = 0;
 	m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, umlflags, 4, 32, 1);
 
-	// add UML symbols-
-	m_drcuml->symbol_add(&m_core->global_regs[PC_REGISTER], sizeof(m_core->global_regs[PC_REGISTER]), "pc");
-	m_drcuml->symbol_add(&m_core->global_regs[SR_REGISTER], sizeof(m_core->global_regs[SR_REGISTER]), "sr");
-	m_drcuml->symbol_add(&m_core->global_regs[SP_REGISTER], sizeof(m_core->global_regs[SP_REGISTER]), "sp");
-	m_drcuml->symbol_add(&m_core->global_regs[UB_REGISTER], sizeof(m_core->global_regs[UB_REGISTER]), "ub");
-	m_drcuml->symbol_add(&m_core->trap_entry,               sizeof(m_core->trap_entry),               "trap_entry");
-	m_drcuml->symbol_add(&m_core->delay_pc,                 sizeof(m_core->delay_pc),                 "delay_pc");
-	m_drcuml->symbol_add(&m_core->delay_slot,               sizeof(m_core->delay_slot),               "delay_slot");
-	m_drcuml->symbol_add(&m_core->delay_slot_taken,         sizeof(m_core->delay_slot_taken),         "delay_slot_taken");
-	m_drcuml->symbol_add(&m_core->intblock,                 sizeof(m_core->intblock),                 "intblock");
-	m_drcuml->symbol_add(&m_core->arg0,                     sizeof(m_core->arg0),                     "arg0");
-	m_drcuml->symbol_add(&m_core->arg1,                     sizeof(m_core->arg1),                     "arg1");
-	m_drcuml->symbol_add(&m_core->icount,                   sizeof(m_core->icount),                   "icount");
+	// add UML symbols
+	m_drcuml->symbol_add(&m_core->global_regs[PC_REGISTER],  sizeof(m_core->global_regs[PC_REGISTER]),  "pc");
+	m_drcuml->symbol_add(&m_core->global_regs[SR_REGISTER],  sizeof(m_core->global_regs[SR_REGISTER]),  "sr");
+	m_drcuml->symbol_add(&m_core->global_regs[FER_REGISTER], sizeof(m_core->global_regs[FER_REGISTER]), "fer");
+	m_drcuml->symbol_add(&m_core->global_regs[SP_REGISTER],  sizeof(m_core->global_regs[SP_REGISTER]),  "sp");
+	m_drcuml->symbol_add(&m_core->global_regs[UB_REGISTER],  sizeof(m_core->global_regs[UB_REGISTER]),  "ub");
+	m_drcuml->symbol_add(&m_core->trap_entry,                sizeof(m_core->trap_entry),                "trap_entry");
+	m_drcuml->symbol_add(&m_core->delay_pc,                  sizeof(m_core->delay_pc),                  "delay_pc");
+	m_drcuml->symbol_add(&m_core->delay_slot,                sizeof(m_core->delay_slot),                "delay_slot");
+	m_drcuml->symbol_add(&m_core->delay_slot_taken,          sizeof(m_core->delay_slot_taken),          "delay_slot_taken");
+	m_drcuml->symbol_add(&m_core->intblock,                  sizeof(m_core->intblock),                  "intblock");
+	m_drcuml->symbol_add(&m_core->arg0,                      sizeof(m_core->arg0),                      "arg0");
+	m_drcuml->symbol_add(&m_core->arg1,                      sizeof(m_core->arg1),                      "arg1");
+	m_drcuml->symbol_add(&m_core->icount,                    sizeof(m_core->icount),                    "icount");
 
 	char buf[4];
 	buf[3] = '\0';
@@ -1227,9 +1323,9 @@ void hyperstone_device::device_reset()
 
 	m_core->trap_entry = s_trap_entries[E132XS_ENTRY_MEM3]; // default entry point @ MEM3
 
-	set_global_register(BCR_REGISTER, ~0);
-	set_global_register(MCR_REGISTER, ~0);
-	set_global_register(FCR_REGISTER, ~0);
+	set_global_register(BCR_REGISTER, ~uint32_t(0));
+	set_global_register(MCR_REGISTER, ~uint32_t(0));
+	set_global_register(FCR_REGISTER, ~uint32_t(0));
 	set_global_register(TPR_REGISTER, 0xc000000);
 
 	PC = get_trap_addr(TRAPNO_RESET);

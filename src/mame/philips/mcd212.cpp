@@ -594,8 +594,8 @@ void mcd212_device::process_vsr(uint32_t *pixels, bool *transparent)
 			u += m_delta_uv_lut[byte];
 			v += m_delta_uv_lut[byte1];
 
-			uint32_t* limit_rgb = m_dyuv_limit_lut + y2 + 0x100;
-			uint32_t* limit_rgb2 = m_dyuv_limit_lut + y + 0x100;
+			const uint32_t *limit_rgb = m_dyuv_limit_lut + y2 + 0x100;
+			const uint32_t *limit_rgb2 = m_dyuv_limit_lut + y + 0x100;
 
 			color0 = (limit_rgb[m_dyuv_v_to_r[v]] << 16) | (limit_rgb[m_dyuv_u_to_g[u] + m_dyuv_v_to_g[v]] << 8) | limit_rgb[m_dyuv_u_to_b[u]];
 

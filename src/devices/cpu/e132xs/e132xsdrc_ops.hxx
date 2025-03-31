@@ -212,7 +212,6 @@ void hyperstone_device::generate_set_global_register_high(drcuml_block &block, c
 	{
 	case 16:            // G16 reserved
 	case 17:            // G17 reserved
-	case BCR_REGISTER:  // G20 Bus Control Register
 	case WCR_REGISTER:  // G24 Watchdog Compare Register
 	case 28:            // G28 reserved
 	case 29:            // G29 reserved
@@ -221,8 +220,14 @@ void hyperstone_device::generate_set_global_register_high(drcuml_block &block, c
 		UML_MOV(block, mem(&m_core->global_regs[dst_code]), src);
 		break;
 	case SP_REGISTER:   // G18 Stack Pointer
+		UML_MOV(block, mem(&m_core->global_regs[dst_code]), src);
+		break;
 	case UB_REGISTER:   // G19 Upper Stack Bound
 		UML_AND(block, mem(&m_core->global_regs[dst_code]), src, ~uint32_t(3));
+		break;
+	case BCR_REGISTER:  // G20 Bus Control Register
+		UML_MOV(block, mem(&m_core->global_regs[dst_code]), src);
+		UML_CALLC(block, &c_funcs::update_bus_control, this);
 		break;
 	case TPR_REGISTER:  // G21 Timer Prescaler Register
 		{
@@ -269,10 +274,8 @@ void hyperstone_device::generate_set_global_register_high(drcuml_block &block, c
 		}
 		break;
 	case MCR_REGISTER:  // G27 Memory Control Register
-		UML_ROLAND(block, I6, src, 20, 0x7);
-		UML_LOAD(block, I6, (void *)s_trap_entries, I6, SIZE_DWORD, SCALE_x4);
-		UML_MOV(block, mem(&m_core->trap_entry), I6);
 		UML_MOV(block, mem(&m_core->global_regs[dst_code]), src);
+		UML_CALLC(block, &c_funcs::update_memory_control, this);
 		break;
 	default:
 		throw emu_fatalerror("%s: invalid high global register G%u\n", dst_code);
@@ -951,8 +954,10 @@ void hyperstone_device::generate_movd(drcuml_block &block, compiler_state &compi
 	}
 	else if (SrcGlobal && (src_code == SR_REGISTER)) // Rd doesn't denote PC and Rs denotes SR
 	{
-		UML_OR(block, DRC_SR, DRC_SR, Z_MASK);
-		UML_AND(block, DRC_SR, DRC_SR, ~N_MASK);
+		UML_MOV(block, I2, DRC_SR);
+		UML_OR(block, I2, I2, Z_MASK);
+		UML_AND(block, I2, I2, ~N_MASK);
+		UML_MOV(block, DRC_SR, I2);
 		if (DstGlobal)
 		{
 			generate_set_global_register_low(block, compiler, desc, dst_code, 0);
@@ -960,7 +965,7 @@ void hyperstone_device::generate_movd(drcuml_block &block, compiler_state &compi
 		}
 		else
 		{
-			UML_ROLAND(block, I0, DRC_SR, 32 - FP_SHIFT, 0x7f);
+			UML_ROLAND(block, I0, I2, 32 - FP_SHIFT, 0x7f);
 			UML_ADD(block, I0, I0, dst_code);
 			UML_AND(block, I0, I0, 0x3f);
 			UML_STORE(block, (void *)m_core->local_regs, I0, 0, SIZE_DWORD, SCALE_x4);

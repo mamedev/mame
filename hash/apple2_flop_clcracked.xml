@@ -38100,7 +38100,7 @@ license:CC0-1.0
 		<description>German Vocabulary Games (version 1.1) (4am crack)</description>
 		<year>1984</year>
 		<publisher>Intellectual Software</publisher>
-		<info name="programmer" value="Frank Flint " />
+		<info name="programmer" value="Frank Flint" />
 		<info name="usage" value="Requires an Apple ][+ or later." />
 		<info name="version" value="1.1" />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />

@@ -258,6 +258,8 @@ protected:
 	void update_timer_prescale();
 	void compute_tr();
 	void adjust_timer_interrupt();
+	void update_bus_control();
+	void update_memory_control();
 
 	void e116_16k_iram_map(address_map &map) ATTR_COLD;
 	void e116_4k_iram_map(address_map &map) ATTR_COLD;

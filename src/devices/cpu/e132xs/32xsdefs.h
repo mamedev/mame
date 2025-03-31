@@ -24,6 +24,7 @@ enum
 {
 	PC_REGISTER                 =  0,
 	SR_REGISTER                 =  1,
+	FER_REGISTER                =  2,
 	SP_REGISTER                 = 18,
 	UB_REGISTER                 = 19,
 	BCR_REGISTER                = 20,

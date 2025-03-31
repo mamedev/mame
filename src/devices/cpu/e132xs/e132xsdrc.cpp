@@ -86,6 +86,16 @@ struct hyperstone_device::c_funcs
 		reinterpret_cast<hyperstone_device *>(param)->update_timer_prescale();
 	}
 
+	static void update_bus_control(void *param)
+	{
+		reinterpret_cast<hyperstone_device *>(param)->update_bus_control();
+	}
+
+	static void update_memory_control(void *param)
+	{
+		reinterpret_cast<hyperstone_device *>(param)->update_memory_control();
+	}
+
 #if E132XS_LOG_DRC_REGS || E132XS_LOG_INTERPRETER_REGS
 	static void dump_registers(void *param)
 	{
