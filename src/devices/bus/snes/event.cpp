@@ -114,7 +114,10 @@ uint8_t sns_pfest94_device::chip_read(offs_t offset)
 	{
 		// DSP access
 		offset &= 0x1fff;
-		return m_upd7725->host_r(offset < 0x1000);
+		if (BIT(offset, 12))
+			return m_upd7725->status_r();
+		else
+			return m_upd7725->data_r();
 	}
 }
 
@@ -152,7 +155,8 @@ void sns_pfest94_device::chip_write(offs_t offset, uint8_t data)
 	{
 		// DSP access
 		offset &= 0x1fff;
-		m_upd7725->host_w(offset < 0x1000, data);
+		if (BIT(~offset, 12))
+			m_upd7725->data_w(data);
 	}
 }
 

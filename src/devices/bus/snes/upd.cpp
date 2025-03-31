@@ -142,14 +142,18 @@ void sns_rom20_necdsp_device::device_add_mconfig(machine_config &config)
 uint8_t sns_rom20_necdsp_device::chip_read(offs_t offset)
 {
 	offset &= 0x7fff;
-	return m_upd7725->host_r(offset < 0x4000);
+	if (BIT(offset, 14))
+		return m_upd7725->status_r();
+	else
+		return m_upd7725->data_r();
 }
 
 
 void sns_rom20_necdsp_device::chip_write(offs_t offset, uint8_t data)
 {
 	offset &= 0x7fff;
-	m_upd7725->host_w(offset < 0x4000, data);
+	if (BIT(~offset, 14))
+		m_upd7725->data_w(data);
 }
 
 
@@ -200,14 +204,18 @@ void sns_rom21_necdsp_device::device_add_mconfig(machine_config &config)
 uint8_t sns_rom21_necdsp_device::chip_read(offs_t offset)
 {
 	offset &= 0x1fff;
-	return m_upd7725->host_r(offset < 0x1000);
+	if (BIT(offset, 12))
+		return m_upd7725->status_r();
+	else
+		return m_upd7725->data_r();
 }
 
 
 void sns_rom21_necdsp_device::chip_write(offs_t offset, uint8_t data)
 {
 	offset &= 0x1fff;
-	m_upd7725->host_w(offset < 0x1000, data);
+	if (BIT(~offset, 12))
+		m_upd7725->data_w(data);
 }
 
 
@@ -220,13 +228,17 @@ void sns_rom21_necdsp_device::chip_write(offs_t offset, uint8_t data)
 uint8_t sns_rom_setadsp_device::chip_read(offs_t offset)
 {
 	if (offset >= 0x600000 && offset < 0x680000 && (offset & 0xffff) < 0x4000)
-		m_upd96050->host_r((offset & 0x01) ? false : true);
-
+	{
+		if (BIT(offset, 0))
+			return m_upd96050->status_r();
+		else
+			return m_upd96050->data_r();
+	}
 	if (offset >= 0x680000 && offset < 0x700000 && (offset & 0xffff) < 0x8000)
 	{
-		uint16_t address = offset & 0xffff;
-		uint16_t temp = m_upd96050->dataram_r(address/2);
-		if (offset & 1)
+		uint16_t const address = offset & 0xffff;
+		uint16_t const temp = m_upd96050->dataram_r(address >> 1);
+		if (BIT(offset, 0))
 			return temp >> 8;
 		else
 			return temp & 0xff;
@@ -240,27 +252,16 @@ void sns_rom_setadsp_device::chip_write(offs_t offset, uint8_t data)
 {
 	if (offset >= 0x600000 && offset < 0x680000 && (offset & 0xffff) < 0x4000)
 	{
-		m_upd96050->host_w((offset & 0x01) ? false : true, data);
+		if (BIT(~offset, 0))
+			m_upd96050->data_w(data);
 		return;
 	}
 
 	if (offset >= 0x680000 && offset < 0x700000 && (offset & 0xffff) < 0x8000)
 	{
-		uint16_t address = offset & 0xffff;
-		uint16_t temp = m_upd96050->dataram_r(address/2);
-
-		if (offset & 1)
-		{
-			temp &= 0xff;
-			temp |= data << 8;
-		}
-		else
-		{
-			temp &= 0xff00;
-			temp |= data;
-		}
-
-		m_upd96050->dataram_w(address/2, temp);
+		uint16_t const address = offset & 0xffff;
+		uint8_t const shift = BIT(offset, 0) << 3;
+		m_upd96050->dataram_w(address >> 1, uint16_t(data) << shift, uint16_t(0xff) << shift);
 		return;
 	}
 }

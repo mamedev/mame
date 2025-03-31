@@ -569,12 +569,14 @@ void necdsp_device::exec_ld(uint32_t opcode) {
 	}
 }
 
-uint8_t necdsp_device::host_r(bool mode) {
-	if (!mode)
-	{
-		return regs.sr >> 8;
-	}
+uint8_t necdsp_device::status_r()
+{
+	return regs.sr >> 8;
+}
 
+
+uint8_t necdsp_device::data_r()
+{
 	if (regs.sr.drc == 0)
 	{
 		//16-bit
@@ -603,9 +605,8 @@ uint8_t necdsp_device::host_r(bool mode) {
 	}
 }
 
-void necdsp_device::host_w(bool mode, uint8_t data) {
-	if (!mode) return;
-
+void necdsp_device::data_w(uint8_t data)
+{
 	if (regs.sr.drc == 0)
 	{
 		//16-bit
