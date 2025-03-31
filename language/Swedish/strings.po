@@ -2793,7 +2793,7 @@ msgstr "Normal textbakgrund"
 #: src/frontend/mame/ui/custui.cpp:639
 msgctxt "color-option"
 msgid "Selected background color"
-msgstr "Vald backgrundsfärg"
+msgstr "Vald bakgrundsfärg"
 
 #: src/frontend/mame/ui/custui.cpp:640
 msgctxt "color-option"
