@@ -226,7 +226,7 @@
   noraut type   60h-63h   A0h-A3h   C0h-C3h
   DPHL type     7Ch-7Fh   BCh-BFh   DCh-DFh
 
-  
+
   (*) Confirmed lines.
 
 
@@ -362,9 +362,9 @@
 
   - the following sets have direct credits to play (no bet),
     and show paytable when coin-up through dynamic size change
-	of the lines 5 and 6:
-	
-	dphl, dphljp, dphlunkb, sureshoto, smshilo
+    of the lines 5 and 6:
+
+    dphl, dphljp, dphlunkb, sureshoto, smshilo
 
 
 *******************************************************************************
@@ -623,11 +623,11 @@
   - Derivated inputs for fasdrwp.
   - Added buttons-lamps layout for fastdrwp.
   - Promoted fastdrwp set to working.
-  
+
   - Added support for dynamic size chars lines.
     That fixes the paytable shown in different games
-	such as dphl, dphljp, dphlunkb, sureshoto, smshilo,
-	etc, allowing to remove the imperfect graphics flags.
+    such as dphl, dphljp, dphlunkb, sureshoto, smshilo,
+    etc, allowing to remove the imperfect graphics flags.
   - norautua: fixed the overflow when drawing cards
     in the possible straight case.
   - Rewrote the screen update to save a big number of lines.
@@ -661,12 +661,12 @@
   [2025-04]
 
   - Decoded color palettes from bipolar PROMs
-    (applies to hardware types featuring these devices)  
+    (applies to hardware types featuring these devices)
   - Implemented dynamic palette per line.
   - Unified sureshoto and dphl machine config.
   - Real colors for dphl, dphljp, newhilop, pkii_dm,
     pma, gtipoker, smshilo, fastdrwp, sureshoto,
-	and dphlunkb.
+    and dphlunkb.
   - Fixed more ASCII PCB layouts.
   - Improved edge connector / pinout diagram.
   - Fixed documentation about the 3x PPI 8255 devices
@@ -828,40 +828,40 @@ void norautp_state::video_start()
 
 uint32_t norautp_state::screen_update_norautp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-    bitmap.fill(0, cliprect);
-    
-    for (int y = 0, c = 0; y < 8; y++)
+	bitmap.fill(0, cliprect);
+
+	for (int y = 0, c = 0; y < 8; y++)
 	{
-        bool double_w = y == 2 || ((y == 4 || y == 5) && !(m_display_line_control && m_vreg));
-        
-        for (int x = 0; x < (double_w ? 16 : 32); c += double_w ? 2 : 1, x++)
+		bool double_w = y == 2 || ((y == 4 || y == 5) && !(m_display_line_control && m_vreg));
+
+		for (int x = 0; x < (double_w ? 16 : 32); c += double_w ? 2 : 1, x++)
 		{
-            int t = m_np_vram[c] & 0x3f;
-            int col = ((m_np_vram[c] >> 6) + (double_w && y >= 4 ? 4 : 0)) & 3;
-            m_gfxdecode->gfx(double_w ? 1 : 0)->opaque(bitmap, cliprect, t, col, 0, 0, 
-                double_w ? (x << 5) + 8 : x << 4, y << 5);
-        }
-    }
-    return 0;
+			int t = m_np_vram[c] & 0x3f;
+			int col = ((m_np_vram[c] >> 6) + (double_w && y >= 4 ? 4 : 0)) & 3;
+			m_gfxdecode->gfx(double_w ? 1 : 0)->opaque(bitmap, cliprect, t, col, 0, 0,
+				double_w ? (x << 5) + 8 : x << 4, y << 5);
+		}
+	}
+	return 0;
 }
 
 uint32_t norautp_state::screen_update_dphl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-    bitmap.fill(0, cliprect);
-    
-    for (int y = 0, c = 0; y < 8; y++)
+	bitmap.fill(0, cliprect);
+
+	for (int y = 0, c = 0; y < 8; y++)
 	{
-        bool double_w = y == 2 || ((y == 4 || y == 5) && !(m_display_line_control && m_vreg));
-        
-        for (int x = 0; x < (double_w ? 16 : 32); c += double_w ? 2 : 1, x++)
+		bool double_w = y == 2 || ((y == 4 || y == 5) && !(m_display_line_control && m_vreg));
+
+		for (int x = 0; x < (double_w ? 16 : 32); c += double_w ? 2 : 1, x++)
 		{
-            int t = m_np_vram[c] & 0x3f;
-            int col = (((m_np_vram[c] >> 6) + (double_w && y >= 4 ? 4 : 0)) & 3 ) + (y * 4);
-            m_gfxdecode->gfx(double_w ? 1 : 0)->opaque(bitmap, cliprect, t, col, 0, 0, 
-                double_w ? (x << 5) + 8 : x << 4, y << 5);
-        }
-    }
-    return 0;
+			int t = m_np_vram[c] & 0x3f;
+			int col = (((m_np_vram[c] >> 6) + (double_w && y >= 4 ? 4 : 0)) & 3 ) + (y * 4);
+			m_gfxdecode->gfx(double_w ? 1 : 0)->opaque(bitmap, cliprect, t, col, 0, 0,
+				double_w ? (x << 5) + 8 : x << 4, y << 5);
+		}
+	}
+	return 0;
 }
 
 
@@ -1035,14 +1035,14 @@ void norautp_state::ppi2_b_w(uint8_t data)
     Unknow:
 
     7654 3210
-    ---- ---x  * 
-    ---- --x-  * 
-    ---- -x--  * 
-    ---- x---  * 
-    ---x ----  * 
-    --x- ----  * 
-    -x-- ----  * 
-    x--- ----  * 
+    ---- ---x  *
+    ---- --x-  *
+    ---- -x--  *
+    ---- x---  *
+    ---x ----  *
+    --x- ----  *
+    -x-- ----  *
+    x--- ----  *
 */
 	logerror("PPI2-B: pc:%04x - data:%02x\n", m_maincpu->pc(), data);
 
@@ -1262,9 +1262,9 @@ void norautp_state::gtipa_map(address_map &map)
 {
 	//map.global_mask(0x7fff);  // A15 not connected
 	map(0x0000, 0x3fff).rom();
-	map(0xc000, 0xc3ff).ram().share("nvram"); 
-	map(0xd000, 0xd3ff).ram().share("nvram"); 
-	
+	map(0xc000, 0xc3ff).ram().share("nvram");
+	map(0xd000, 0xd3ff).ram().share("nvram");
+
 }
 
 void norautp_state::dphla_map(address_map &map)
@@ -3046,7 +3046,7 @@ ROM_END
   PCB silksceened:
   DELLFERN U.K. LTD.
   MADE IN ENGLAND.
-  
+
   PCB REDESIGNED BY M.A.BROWN.
 
 
@@ -3103,7 +3103,7 @@ ROM_END
   | '--------------------'       U5               U4           U3           U2           U1      |
   |          U5                                                                                  |
   '----------------------------------------------------------------------------------------------'
-  
+
 */
 
 ROM_START( df_djpkr )
@@ -3117,7 +3117,7 @@ ROM_START( df_djpkr )
 ROM_END
 
 // Same as above, but with different graphics ROM.
-// GFX ROM is identical to mainline one, but copied 32 times to fill the 64k device. 
+// GFX ROM is identical to mainline one, but copied 32 times to fill the 64k device.
 ROM_START( df_djpkra )
 	ROM_REGION( 0x10000, "maincpu", 0 )  // Program ROM is 0000-1fff, copied along the 64K of the ROM
 	ROM_LOAD( "rom_u11.bin", 0x0000, 0x2000, CRC(9d150a47) SHA1(da9c0d6632faab685dd061f39b01d8e65793e1e6) )
@@ -4946,7 +4946,7 @@ void norautp_state::init_enc()
 	static const uint8_t data_sub_table_01[0x100] =
 	{// 0x00  0x01  0x02  0x03  0x04  0x05  0x06  0x07  0x08  0x09  0x0a  0x0b  0x0c  0x0d  0x0e  0x0f
 		unkn, unkn, 0x52, unkn, unkn, 0x85, 0x34, 0x60, unkn, unkn, 0x56, unkn, unkn, 0x0b, unkn, 0x7f, // 0x0x
-		unkn, unkn, 0x9e, 0x1d, 0x63, 0x2a, 0xb0, unkn, unkn, unkn, unkn, 0x4e, unkn, 0x35, 0xea, unkn, // 0x1x
+		unkn, 0x27, 0x9e, 0x1d, 0x63, 0x2a, 0xb0, unkn, unkn, unkn, unkn, 0x4e, unkn, 0x35, 0xea, unkn, // 0x1x
 		0x0d, 0xe2, 0x40, 0x45, unkn, unkn, unkn, unkn, 0x08, 0xef, 0x21, unkn, 0x7e, 0x10, unkn, 0x2d, // 0x2x
 		0x19, 0x0a, unkn, 0x0f, unkn, unkn, 0x50, 0xf4, unkn, unkn, 0x06, unkn, unkn, 0x4d, unkn, unkn, // 0x3x
 		0x30, 0xb4, unkn, 0xf8, unkn, 0xad, 0x1c, 0x3b, unkn, 0x2b, 0x93, 0xe4, unkn, unkn, unkn, unkn, // 0x4x
@@ -4974,7 +4974,7 @@ void norautp_state::init_enc()
 		0xa5, unkn, 0x4c, unkn, 0x23, 0x54, unkn, unkn, unkn, 0x0a, unkn, unkn, unkn, unkn, unkn, unkn, // 0x6x
 		0x2b, 0xdd, 0x6b, unkn, 0x5c, unkn, 0x00, unkn, unkn, unkn, unkn, 0x36, unkn, 0x57, 0xce, unkn, // 0x7x
 		0x1d, unkn, unkn, unkn, 0xbf, 0x32, 0xf0, 0x4f, 0x16, 0x35, 0x63, 0x21, 0x0c, 0x1b, unkn, unkn, // 0x8x
-		0x56, unkn, 0xef, unkn, 0x06, unkn, 0x59, 0x04, 0x41, unkn, unkn, unkn, 0x4b, unkn, unkn, unkn, // 0x9x
+		0x56, unkn, 0xef, unkn, 0x06, unkn, 0x59, 0x04, 0x41, 0xe8, unkn, unkn, 0x4b, unkn, unkn, unkn, // 0x9x
 		0x28, 0x7b, 0x3d, unkn, unkn, 0x12, 0xb6, unkn, 0x44, 0xb4, unkn, unkn, unkn, 0x09, unkn, unkn, // 0xax
 		0xd2, unkn, 0xff, 0x3c, 0x6a, 0x20, 0xab, unkn, unkn, 0x40, 0xee, 0xa0, unkn, 0xbb, 0x68, 0x1e, // 0xbx
 		0xc5, 0x49, 0x6d, unkn, 0x5f, 0x17, 0xfc, unkn, unkn, 0xb0, unkn, unkn, 0x2f, unkn, 0xbe, unkn, // 0xcx
@@ -4992,7 +4992,7 @@ void norautp_state::init_enc()
 		0x40, unkn, 0x04, 0x3c, 0x12, 0xe3, 0x4c, unkn, unkn, 0xf8, unkn, 0xc5, 0x4e, unkn, unkn, 0x15, // 0x4x
 		0xf1, 0x20, unkn, 0x93, unkn, 0x94, unkn, 0x16, 0xa5, unkn, unkn, 0xdc, 0x5a, unkn, 0x19, unkn, // 0x5x
 		0xff, unkn, 0x3b, unkn, 0x55, 0x4b, unkn, unkn, 0x54, 0x47, unkn, 0x50, unkn, unkn, 0x46, unkn, // 0x6x
-		unkn, unkn, unkn, 0x13, unkn, 0x6e, unkn, unkn, unkn, 0xb0, unkn, 0xb3, 0x90, 0x7a, unkn, unkn, // 0x7x
+		unkn, unkn, unkn, 0x13, unkn, 0x6e, unkn, unkn, unkn, 0xb0, unkn, 0xb3, 0x90, 0x6c, unkn, unkn, // 0x7x
 		0xd7, 0xf0, unkn, 0x42, unkn, unkn, 0xc3, unkn, unkn, 0xd5, unkn, 0x22, 0x4a, unkn, 0x4f, unkn, // 0x8x
 		unkn, 0x6a, 0xdb, 0xf7, unkn, 0x37, unkn, unkn, 0xfc, 0x02, unkn, unkn, 0xbd, unkn, unkn, unkn, // 0x9x
 		0x11, 0x53, unkn, unkn, unkn, 0x1c, unkn, 0x52, 0x63, 0xbc, 0x41, 0xf9, unkn, unkn, 0xc4, unkn, // 0xax
@@ -5267,20 +5267,6 @@ void norautp_state::init_enc()
 			case 0x0f: rom[i] = data_sub_table_0f[x]; break;
 		}
 	}
-
-	uint8_t *ROM = memregion("maincpu")->base();
-	// fix table for bin to bcd conversion
-	ROM[0x1da0] = 0x10; // 10.000
-	ROM[0x1da1] = 0x27;
-	ROM[0x1da2] = 0xe8; // 1.000
-	ROM[0x1da3] = 0x03;
-	ROM[0x1da4] = 0x64; // 100
-	ROM[0x1da5] = 0x00;
-	ROM[0x1da6] = 0x0a; // 10
-	ROM[0x1da7] = 0x00;
-
-	// fix jump
-	ROM[0x0b53] = 0x6c;
 }
 
 
@@ -5312,7 +5298,7 @@ void norautp_state::init_gtipa()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
-//	ROM[0x07a6] = 0xaf;  // xor a (no checksum)
+//  ROM[0x07a6] = 0xaf;  // xor a (no checksum)
 	ROM[0x1ffe] = 0xff;
 }
 
