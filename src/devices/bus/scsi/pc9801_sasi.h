@@ -11,7 +11,10 @@ public:
 	// construction/destruction
 	pc9801_sasi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	virtual void ExecCommand() override;
+	virtual void WriteData( uint8_t *data, int dataLength ) override;
+	virtual void ReadData( uint8_t *data, int dataLength ) override;
 };
 
 // device type definition

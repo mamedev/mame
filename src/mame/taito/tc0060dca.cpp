@@ -21,15 +21,16 @@ tc0060dca_device::tc0060dca_device(const machine_config &mconfig, const char *ta
 {
 }
 
-void tc0060dca_device::level_w(offs_t offset, u8 data)
+void tc0060dca_device::volume1_w(u8 data)
 {
 	m_stream->update();
+	m_gain[0] = m_atten_table[data];
+}
 
-	for (int i = 0; i < 2; i++)
-	{
-		if (BIT(offset, i))
-			m_gain[i] = m_atten_table[data];
-	}
+void tc0060dca_device::volume2_w(u8 data)
+{
+	m_stream->update();
+	m_gain[1] = m_atten_table[data];
 }
 
 void tc0060dca_device::device_start()

@@ -4,7 +4,8 @@
 # macros
 ##########################################################
 macro   nomreq_addr
-	m_nomreq_cb(TADR, 0x00, 0xff);
+	if (!m_nomreq_cb.isunset())
+		m_nomreq_cb(TADR, 0x00, 0xff);
 	+ 1
 
 macro   nomreq_ir   %cycles
@@ -46,7 +47,8 @@ macro   wm16_sp
 
 macro   rop
 	m_m1_cycles-2 !! TDAT8 = opcode_read();
-	m_refresh_cb((I << 8) | (R2 & 0x80) | (R & 0x7f), 0x00, 0xff);
+	if (!m_refresh_cb.isunset())
+		m_refresh_cb((I << 8) | (R2 & 0x80) | (R & 0x7f), 0x00, 0xff);
 	+ 2
 	PC++; R++; Q = QT; QT = YF | XF;
 

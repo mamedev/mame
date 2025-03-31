@@ -587,7 +587,7 @@ void macpbmsc_state::macpd2xx_base_map(address_map &map)
 	map(0x50f04000, 0x50f05fff).rw(FUNC(macpbmsc_state::scc_r), FUNC(macpbmsc_state::scc_w));
 	map(0x50f06000, 0x50f07fff).rw(FUNC(macpbmsc_state::scsi_drq_r), FUNC(macpbmsc_state::scsi_drq_w));
 	map(0x50f10000, 0x50f11fff).rw(FUNC(macpbmsc_state::scsi_r), FUNC(macpbmsc_state::scsi_w));
-	map(0x50f12060, 0x50f12063).r(FUNC(macpbmsc_state::scsi_drq_r));
+	map(0x50f12000, 0x50f13fff).rw(FUNC(macpbmsc_state::scsi_drq_r), FUNC(macpbmsc_state::scsi_drq_w));
 }
 
 void macpbmsc_state::macpd210_map(address_map &map)

@@ -480,14 +480,16 @@ void m6502_device::state_string_export(const device_state_entry &entry, std::str
 void m6502_device::prefetch_start()
 {
 	sync = true;
-	sync_w(ASSERT_LINE);
+	if(!sync_w.isunset())
+		sync_w(ASSERT_LINE);
 	NPC = PC;
 }
 
 void m6502_device::prefetch_end()
 {
 	sync = false;
-	sync_w(CLEAR_LINE);
+	if(!sync_w.isunset())
+		sync_w(CLEAR_LINE);
 
 	if((nmi_pending || ((irq_state || apu_irq_state) && !(P & F_I))) && !inhibit_interrupts) {
 		irq_taken = true;
@@ -499,7 +501,8 @@ void m6502_device::prefetch_end()
 void m6502_device::prefetch_end_noirq()
 {
 	sync = false;
-	sync_w(CLEAR_LINE);
+	if(!sync_w.isunset())
+		sync_w(CLEAR_LINE);
 	PC++;
 }
 

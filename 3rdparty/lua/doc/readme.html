@@ -29,7 +29,7 @@ tt, kbd, code {
 <BODY>
 
 <H1>
-<A HREF="http://www.lua.org/"><IMG SRC="logo.gif" ALT="Lua"></A>
+<A HREF="https://www.lua.org/"><IMG SRC="logo.gif" ALT="Lua"></A>
 Welcome to Lua 5.4
 </H1>
 
@@ -49,29 +49,31 @@ Welcome to Lua 5.4
 <P>
 Lua is a powerful, efficient, lightweight, embeddable scripting language
 developed by a
-<A HREF="http://www.lua.org/authors.html">team</A>
+<A HREF="https://www.lua.org/authors.html">team</A>
 at
-<A HREF="http://www.puc-rio.br/">PUC-Rio</A>,
+<A HREF="https://www.puc-rio.br/">PUC-Rio</A>,
 the Pontifical Catholic University of Rio de Janeiro in Brazil.
 Lua is
 <A HREF="#license">free software</A>
 used in
-<A HREF="http://www.lua.org/uses.html">many products and projects</A>
+<A HREF="https://www.lua.org/uses.html">many products and projects</A>
 around the world.
 
 <P>
 Lua's
-<A HREF="http://www.lua.org/">official web site</A>
+<A HREF="https://www.lua.org/">official website</A>
 provides complete information
 about Lua,
 including
 an
-<A HREF="http://www.lua.org/about.html">executive summary</A>
+<A HREF="https://www.lua.org/about.html">executive summary</A>,
+tips on
+<A HREF="https://www.lua.org/start.html">getting started</A>,
 and
 updated
-<A HREF="http://www.lua.org/docs.html">documentation</A>,
+<A HREF="https://www.lua.org/docs.html">documentation</A>,
 especially the
-<A HREF="http://www.lua.org/manual/5.4/">reference manual</A>,
+<A HREF="https://www.lua.org/manual/5.4/">reference manual</A>,
 which may differ slightly from the
 <A HREF="contents.html">local copy</A>
 distributed in this package.
@@ -79,7 +81,7 @@ distributed in this package.
 <H2><A NAME="install">Installing Lua</A></H2>
 <P>
 Lua is distributed in
-<A HREF="http://www.lua.org/ftp/">source</A>
+<A HREF="https://www.lua.org/ftp/">source</A>
 form.
 You need to build it before using it.
 Building Lua should be straightforward
@@ -88,7 +90,7 @@ Lua is implemented in pure ANSI C and compiles unmodified in all known
 platforms that have an ANSI C compiler.
 Lua also compiles unmodified as C++.
 The instructions given below for building Lua are for Unix-like platforms,
-such as Linux and Mac OS X.
+such as Linux and macOS.
 See also
 <A HREF="#other">instructions for other systems</A>
 and
@@ -97,10 +99,7 @@ and
 <P>
 If you don't have the time or the inclination to compile Lua yourself,
 get a binary from
-<A HREF="http://lua-users.org/wiki/LuaBinaries">LuaBinaries</A>.
-Try also
-<A HREF="http://luadist.org/">LuaDist</A>,
-a multi-platform distribution of Lua that includes batteries.
+<A HREF="https://luabinaries.sourceforge.net">LuaBinaries</A>.
 
 <H3>Building Lua</H3>
 <P>
@@ -110,7 +109,7 @@ Here are the details.
 <OL>
 <LI>
 Open a terminal window and move to
-the top-level directory, which is named <TT>lua-5.4.4</TT>.
+the top-level directory, which is named <TT>lua-5.4.7</TT>.
 The <TT>Makefile</TT> there controls both the build process and the installation process.
 <P>
 <LI>
@@ -121,7 +120,7 @@ The <TT>Makefile</TT> there controls both the build process and the installation
   The platforms currently supported are:
 <P>
 <P CLASS="display">
-   guess aix bsd c89 freebsd generic linux linux-readline macosx mingw posix solaris
+   guess aix bsd c89 freebsd generic ios linux linux-readline macosx mingw posix solaris
 </P>
 <P>
   If your platform is listed, just do "<KBD>make xxx</KBD>", where xxx
@@ -214,8 +213,8 @@ then try "<KBD>make linux-readline MYLIBS=-ltermcap</KBD>".
   record the changes you've made.
 
 <P>
-  On the other hand, if you need to customize some Lua features, you'll need
-  to edit <TT>src/luaconf.h</TT> before building and installing Lua.
+  On the other hand, if you need to customize some Lua features,
+  edit <TT>src/luaconf.h</TT> before building and installing Lua.
   The edited file will be the one installed, and
   it will be used by any Lua clients that you build, to ensure consistency.
   Further customization is available to experts by editing the Lua sources.
@@ -244,7 +243,7 @@ compiler:
 </DL>
 
 <P>
-  To use Lua as a library in your own programs, you'll need to know how to
+  To use Lua as a library in your own programs, you need to know how to
   create and use libraries with your compiler. Moreover, to dynamically load
   C libraries for Lua, you'll need to know how to create dynamic libraries
   and you'll need to make sure that the Lua API functions are accessible to
@@ -287,11 +286,11 @@ lists the
 
 <H2><A NAME="license">License</A></H2>
 <P>
-<A HREF="http://www.opensource.org/docs/definition.php">
-<IMG SRC="osi-certified-72x60.png" ALIGN="right" ALT="[osi certified]" STYLE="padding-left: 30px ;">
+<A HREF="https://opensource.org/osd">
+<IMG SRC="OSIApproved_100X125.png" ALIGN="right" ALT="[Open Source Initiative Approved License]" STYLE="padding-left: 1em" WIDTH=50>
 </A>
 Lua is free software distributed under the terms of the
-<A HREF="http://www.opensource.org/licenses/mit-license.html">MIT license</A>
+<A HREF="https://opensource.org/license/mit">MIT license</A>
 reproduced below;
 it may be used for any purpose, including commercial purposes,
 at absolutely no cost without having to ask us.
@@ -299,11 +298,11 @@ at absolutely no cost without having to ask us.
 The only requirement is that if you do use Lua,
 then you should give us credit by including the appropriate copyright notice somewhere in your product or its documentation.
 
-For details, see
-<A HREF="http://www.lua.org/license.html">this</A>.
+For details, see the
+<A HREF="https://www.lua.org/license.html">license page</A>.
 
 <BLOCKQUOTE STYLE="padding-bottom: 0em">
-Copyright &copy; 1994&ndash;2022 Lua.org, PUC-Rio.
+Copyright &copy; 1994&ndash;2024 Lua.org, PUC-Rio.
 
 <P>
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -330,10 +329,10 @@ THE SOFTWARE.
 
 <P CLASS="footer">
 Last update:
-Mon Jan  3 09:54:18 UTC 2022
+Wed May  8 21:56:16 UTC 2024
 </P>
 <!--
-Last change: revised for Lua 5.4.4
+Last change: revised for Lua 5.4.7
 -->
 
 </BODY>

@@ -236,7 +236,7 @@ private:
 	u8 m_firq_timer_preset = 0xff;  // Preset for 40103 timer. Pulled high.
 	u8 m_selected_cv_in = 0x07;  // MUX A-C inputs. Pulled high.
 	bool m_inhibit_cv_in = true;  // MUX INHibit input. Pulled high.
-	std::array<bool, 4> m_haltreq = { false, false, false, false };	 // Halt request to the voice board (HALTREQ).
+	std::array<bool, 4> m_haltreq = { false, false, false, false };  // Halt request to the voice board (HALTREQ).
 	std::array<bool, 6> m_encoder_dir = { false, false, false, false, false, false };
 	std::array<bool, 6> m_encoder_changed = { false, false, false, false, false, false };
 	std::array<u64, 3> m_vfd_anode_masks = { 0, 0, 0 };

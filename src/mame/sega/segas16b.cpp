@@ -5711,11 +5711,12 @@ ROM_START( bayroute1 )
 	ROM_LOAD16_BYTE( "br.b8",       0x60000, 0x10000, CRC(d8de78ff) SHA1(110661ab8008543b47629722b98d0470f73a48c5) )
 
 	ROM_REGION( 0x50000, "soundcpu", 0 ) // sound CPU
-	ROM_LOAD( "sound.a7",  0x00000, 0x08000, NO_DUMP )
-	ROM_LOAD( "sound.a8",  0x10000, 0x10000, NO_DUMP )
-	ROM_LOAD( "sound.a9",  0x20000, 0x10000, NO_DUMP )
-	ROM_LOAD( "sound.a10", 0x30000, 0x10000, NO_DUMP )
-	ROM_LOAD( "sound.a11", 0x40000, 0x10000, NO_DUMP )
+	ROM_LOAD( "sound.a7",  0x00000, 0x10000, CRC(e91e55cb) SHA1(857242ab355736d7d77877bcf1d093c15c69992b) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD( "sound.a8",  0x10000, 0x10000, CRC(077e9981) SHA1(877c2ce9757410938e42b9bf512089bd2045d04e) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD( "sound.a9",  0x20000, 0x10000, CRC(3c3f5f41) SHA1(f1b2e01586e65c542514c0a846ffc79767ff2166) )
+	// it expects different data from the parent set (copying that to here results in better sound overall, but some cut voices)
+	ROM_LOAD( "sound.a10", 0x30000, 0x10000, BAD_DUMP CRC(7c251347) SHA1(2b66365b2480e2852f930ddbed23d2ed80f2afaa) )
+	ROM_LOAD( "sound.a11", 0x40000, 0x10000, BAD_DUMP CRC(a602ea2d) SHA1(37a4d05c416e8d65c4a2d73096edcfd456a0b70e) )
 ROM_END
 
 
@@ -10114,7 +10115,7 @@ GAME( 1990, aurailj,    aurail,   system16b_fd1089a,     aurail,   segas16b_stat
 
 GAME( 1989, bayroute,   0,        system16b_fd1094,      bayroute, segas16b_state, init_generic_5704,       ROT0,   "Sunsoft / Sega", "Bay Route (set 3, World) (FD1094 317-0116)", 0 )
 GAME( 1989, bayroutej,  bayroute, system16b_fd1094,      bayroute, segas16b_state, init_generic_5704,       ROT0,   "Sunsoft / Sega", "Bay Route (set 2, Japan) (FD1094 317-0115)", 0 )
-GAME( 1989, bayroute1,  bayroute, system16b,             bayroute, segas16b_state, init_generic_5358,       ROT0,   "Sunsoft / Sega", "Bay Route (set 1, US) (unprotected)", MACHINE_NO_SOUND )
+GAME( 1989, bayroute1,  bayroute, system16b,             bayroute, segas16b_state, init_generic_5358,       ROT0,   "Sunsoft / Sega", "Bay Route (set 1, US) (unprotected)", MACHINE_IMPERFECT_SOUND )
 
 GAME( 1987, bullet,     0,        system16b_fd1094,      bullet,   segas16b_state, init_generic_5358_small, ROT0,   "Sega", "Bullet (FD1094 317-0041)", 0 )
 
@@ -10221,7 +10222,7 @@ GAME( 1990, atomicp,    0,        atomicp,               atomicp,  segas16b_stat
 GAME( 1990, snapper,    0,        atomicp,               snapper,  segas16b_state, init_snapper,            ROT0,   "Philko", "Snapper (Korea)", 0) // korean clone board..
 // board marked 'System 4' and has Philko custom chip - various hw changes (4bpp tiles for example)
 GAME( 1991, lockonph,   0,        lockonph,              lockonph, segas16b_state, init_lockonph,           ROT0,   "Philko", "Lock On (Philko)", MACHINE_IMPERFECT_SOUND ) // Copyright not shown in game, but has 'PHILKO' in the startup warning and tiles / PCB.  1991 is the name entry for the lowest high score.  Clipping issues on left edge in attract look like original game bugs.
-GAME( 1991, dfjail,   0,          dfjail,                dfjail,   dfjail_state,   init_generic_korean,     ROT0,   "Philko", "The Destroyer From Jail (Korea)", MACHINE_NO_COCKTAIL ) // Regulatory approval document dated "1991. 3.28" based on submission of manual and photos
+GAME( 1991, dfjail,     0,        dfjail,                dfjail,   dfjail_state,   init_generic_korean,     ROT0,   "Philko", "The Destroyer From Jail (Korea)", MACHINE_NO_COCKTAIL ) // Regulatory approval document dated "1991. 3.28" based on submission of manual and photos
 
 // decrypted bootleg / 'suicide repair' sets
 
@@ -10288,13 +10289,13 @@ GAME( 1989, wrestwar2d, wrestwar, system16b,             wrestwar, segas16b_stat
 GAME( 1989, wrestwar1d, wrestwar, system16b,             wrestwar, segas16b_state, init_generic_5704,       ROT270, "bootleg", "Wrestle War (set 1, Japan) (bootleg of FD1094 317-0090 set)", 0 )
 
 // bootlegs with split code/data, no memory mapper
-GAME( 1987, sdibl2,      sdi,     system16b_split,       sdi,      segas16b_state, init_sdi_5358_small,     ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, set 1)", 0 ) // 0x5230
-GAME( 1987, sdibl3,      sdi,     system16b_split,       sdi,      segas16b_state, init_sdi_5358_small,     ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, set 2)", 0 ) // ^
-GAME( 1987, sdibl4,      sdi,     system16b_split,       sdi,      segas16b_state, init_sdi_5358_small,     ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, set 3)", 0 ) // ^
-GAME( 1987, sdibl5,      sdi,     system16b_split,       sdi,      segas16b_state, init_sdi_5358_small,     ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, set 4)", 0 )
-GAME( 1987, sdibl6,      sdi,     system16b_split,       sdi,      segas16b_state, init_sdi_5358_small,     ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, set 5)", 0 )
+GAME( 1987, sdibl2,     sdi,      system16b_split,       sdi,      segas16b_state, init_sdi_5358_small,     ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, set 1)", 0 ) // 0x5230
+GAME( 1987, sdibl3,     sdi,      system16b_split,       sdi,      segas16b_state, init_sdi_5358_small,     ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, set 2)", 0 ) // ^
+GAME( 1987, sdibl4,     sdi,      system16b_split,       sdi,      segas16b_state, init_sdi_5358_small,     ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, set 3)", 0 ) // ^
+GAME( 1987, sdibl5,     sdi,      system16b_split,       sdi,      segas16b_state, init_sdi_5358_small,     ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, set 4)", 0 )
+GAME( 1987, sdibl6,     sdi,      system16b_split,       sdi,      segas16b_state, init_sdi_5358_small,     ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, set 5)", 0 )
 
 // bootlegs with modified hardware
-GAME( 1989, fpointbl,    fpoint,  fpointbl,              fpointbl, segas16b_state, init_generic_bootleg,    ROT0,   "bootleg (Datsu)", "Flash Point (World, bootleg)", 0 )
-GAME( 1989, fpointbj,    fpoint,  fpointbl,              fpointbl, segas16b_state, init_generic_bootleg,    ROT0,   "bootleg (Datsu)", "Flash Point (Japan, bootleg set 1)", 0 )
-GAME( 1989, fpointbla,   fpoint,  fpointbla,             fpointbl, segas16b_state, init_fpointbla,          ROT0,   "bootleg",         "Flash Point (Japan, bootleg set 2)", MACHINE_NOT_WORKING )
+GAME( 1989, fpointbl,   fpoint,   fpointbl,              fpointbl, segas16b_state, init_generic_bootleg,    ROT0,   "bootleg (Datsu)", "Flash Point (World, bootleg)", 0 )
+GAME( 1989, fpointbj,   fpoint,   fpointbl,              fpointbl, segas16b_state, init_generic_bootleg,    ROT0,   "bootleg (Datsu)", "Flash Point (Japan, bootleg set 1)", 0 )
+GAME( 1989, fpointbla,  fpoint,   fpointbla,             fpointbl, segas16b_state, init_fpointbla,          ROT0,   "bootleg",         "Flash Point (Japan, bootleg set 2)", MACHINE_NOT_WORKING )

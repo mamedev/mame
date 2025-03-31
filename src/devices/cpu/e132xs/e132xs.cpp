@@ -31,114 +31,19 @@
  - GMS30C2232
 
  TODO:
- - some wrong cycle counts
- - verify register wrapping with sregf/dregf on hardware
-
- CHANGELOG:
-
- Pierpaolo Prazzoli
- - Fixed LDxx.N/P/S opcodes not to increment the destination register when
-   it's the same as the source or "next source" one.
-
- Pierpaolo Prazzoli
- - Removed nested delays
- - Added better delay branch support
- - Fixed PC seen by a delay instruction, because a delay instruction
-   should use the delayed PC (thus allowing the execution of software
-   opcodes too)
-
- Tomasz Slanina
- - Fixed delayed branching for delay instructions longer than 2 bytes
-
- Pierpaolo Prazzoli
- - Added and fixed Timer without hack
-
- Tomasz Slanina
- - Fixed MULU/MULS
- - Fixed Carry in ADDC/SUBC
-
- Pierpaolo Prazzoli
- - Fixed software opcodes used as delay instructions
- - Added nested delays
-
- Tomasz Slanina
- - Added "undefined" C flag to shift left instructions
-
- Pierpaolo Prazzoli
- - Added interrupts-block for delay instructions
- - Fixed get_emu_code_addr
- - Added LDW.S and STW.S instructions
- - Fixed floating point opcodes
-
- Tomasz Slanina
- - interrputs after call and before frame are prohibited now
- - emulation of FCR register
- - Floating point opcodes (preliminary)
- - Fixed stack addressing in RET/FRAME opcodes
- - Fixed bug in SET_RS macro
- - Fixed bug in return opcode (S flag)
- - Added C/N flags calculation in add/adc/addi/adds/addsi and some shift opcodes
- - Added writeback to ROL
- - Fixed ROL/SAR/SARD/SHR/SHRD/SHL/SHLD opcode decoding (Local/Global regs)
- - Fixed I and T flag in RET opcode
- - Fixed XX/XM opcodes
- - Fixed MOV opcode, when RD = PC
- - Fixed execute_trap()
- - Fixed ST opcodes, when when RS = SR
- - Added interrupts
- - Fixed I/O addressing
-
- Pierpaolo Prazzoli
- - Fixed fetch
- - Fixed decode of hyperstone_xm opcode
- - Fixed 7 bits difference number in FRAME / RET instructions
- - Some debbugger fixes
- - Added generic registers decode function
- - Some other little fixes.
-
- Ryan Holtz 29/03/2004
-    - Changed MOVI to use unsigned values instead of signed, correcting
-      an ugly glitch when loading 32-bit immediates.
- Pierpaolo Prazzoli
-    - Same fix in get_const
-
- Pierpaolo Prazzoli - 02/25/04
-    - Fixed some wrong addresses to address local registers instead of memory
-    - Fixed FRAME and RET instruction
-    - Added preliminary I/O space
-    - Fixed some load / store instructions
-
- Pierpaolo Prazzoli - 02/20/04
-    - Added execute_exception function
-    - Added FL == 0 always interpreted as 16
-
- Pierpaolo Prazzoli - 02/19/04
-    - Changed the reset to use the execute_trap(reset) which should be right to set
-      the initiale state of the cpu
-    - Added Trace exception
-    - Set of T flag in RET instruction
-    - Set I flag in interrupts entries and resetted by a RET instruction
-    - Added correct set instruction for SR
-
- Pierpaolo Prazzoli - 10/26/03
-    - Changed get_lrconst to get_const and changed it to use the removed GET_CONST_RR
-      macro.
-    - Removed the High flag used in some opcodes, it should be used only in
-      MOV and MOVI instruction.
-    - Fixed MOV and MOVI instruction.
-    - Set to 1 FP is SR register at reset.
-      (From the doc: A Call, Trap or Software instruction increments the FP and sets FL
-      to 6, thus creating a new stack frame with the length of 6 registers).
-
- Pierpaolo Prazzoli - 08/19/03
-    - Added check for D_BIT and S_BIT where PC or SR must or must not be denoted.
-      (movd, divu, divs, ldxx1, ldxx2, stxx1, stxx2, mulu, muls, set, mul
-      call, chk)
-
- Pierpaolo Prazzoli - 08/17/03
-    - Fixed get_pcrel() when OP & 0x80 is set.
-    - Decremented PC by 2 also in MOV, ADD, ADDI, SUM, SUB and added the check if
-      D_BIT is not set. (when pc is changed they are implicit branch)
+ - All instructions should clear the H flag (not just MOV/MOVI)
+ - Fix behaviour of exceptions in delay slots
+ - Fix behaviour of branches in delay slots
+ - Many wrong cycle counts
+ - No emulation of memory access latency and pipleline
+ - Should a zero bit shift clear C or leave it unchanged?
+ - What actually happens on trying to load memory to PC or SR?
+ - Verify register wrapping with sregf/dregf on hardware
+ - Tracing doesn't work properly
+   DRC does not generate trace exceptions on branch or return
+ - Interpreter does not implement privilege check on setting L flag
+ - DRC does not update ILC and P on some privilege error exceptions
+ - Support for debugger exception points should be implemented
 
 *********************************************************************/
 
@@ -201,8 +106,15 @@ void hyperstone_device::e132_16k_iram_map(address_map &map)
 //  hyperstone_device - constructor
 //-------------------------------------------------
 
-hyperstone_device::hyperstone_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock,
-										const device_type type, uint32_t prg_data_width, uint32_t io_data_width, address_map_constructor internal_map)
+hyperstone_device::hyperstone_device(
+		const machine_config &mconfig,
+		const char *tag,
+		device_t *owner,
+		uint32_t clock,
+		const device_type type,
+		uint32_t prg_data_width,
+		uint32_t io_data_width,
+		address_map_constructor internal_map)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, prg_data_width, 32, 0, internal_map)
 	, m_io_config("io", ENDIANNESS_BIG, io_data_width, 15)
@@ -210,6 +122,7 @@ hyperstone_device::hyperstone_device(const machine_config &mconfig, const char *
 	, m_drcuml(nullptr)
 	, m_drcfe(nullptr)
 	, m_drcoptions(0)
+	, m_single_instruction_mode(false)
 	, m_cache_dirty(0)
 	, m_entry(nullptr)
 	, m_nocode(nullptr)
@@ -223,9 +136,10 @@ hyperstone_device::hyperstone_device(const machine_config &mconfig, const char *
 	, m_mem_write32(nullptr)
 	, m_io_read32(nullptr)
 	, m_io_write32(nullptr)
+	, m_exception(nullptr)
 	, m_enable_drc(false)
 {
-	std::fill(std::begin(m_exception), std::end(m_exception), nullptr);
+	std::fill(std::begin(m_delay_taken), std::end(m_delay_taken), nullptr);
 }
 
 hyperstone_device::~hyperstone_device()
@@ -248,7 +162,7 @@ e116t_device::e116t_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 e116xt_device::e116xt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hyperstone_device(mconfig, tag, owner, clock, E116XT, 16, 16, address_map_constructor(FUNC(e116t_device::e116_8k_iram_map), this))
+	: hyperstone_device(mconfig, tag, owner, clock, E116XT, 16, 16, address_map_constructor(FUNC(e116xt_device::e116_8k_iram_map), this))
 {
 }
 
@@ -376,7 +290,7 @@ gms30c2232_device::gms30c2232_device(const machine_config &mconfig, const char *
 uint32_t hyperstone_device::get_trap_addr(uint8_t trapno)
 {
 	uint32_t addr;
-	if( m_core->trap_entry == 0xffffff00 ) /* @ MEM3 */
+	if (m_core->trap_entry == 0xffffff00) /* @ MEM3 */
 	{
 		addr = trapno * 4;
 	}
@@ -393,7 +307,7 @@ uint32_t hyperstone_device::get_trap_addr(uint8_t trapno)
 uint32_t hyperstone_device::get_emu_code_addr(uint8_t num) /* num is OP */
 {
 	uint32_t addr;
-	if( m_core->trap_entry == 0xffffff00 ) /* @ MEM3 */
+	if (m_core->trap_entry == 0xffffff00) /* @ MEM3 */
 	{
 		addr = (m_core->trap_entry - 0x100) | ((num & 0xf) << 4);
 	}
@@ -574,10 +488,11 @@ void hyperstone_device::set_global_register(uint8_t code, uint32_t val)
 			SET_PC(val);
 			return;
 		case SR_REGISTER:
-			SET_LOW_SR(val); // only a RET instruction can change the full content of SR
-			SR &= ~0x40; //reserved bit 6 always zero
-			if (m_core->intblock < 1)
-				m_core->intblock = 1;
+			{
+				// FIXME: generate exception on attempt to set L from user mode const bool exception = !GET_S && !GET_L && (val & L_MASK);
+				SET_LOW_SR(val); // only a RET instruction can change the full content of SR
+				SR &= ~0x40; //reserved bit 6 always zero
+			}
 			return;
 		case 2:
 		case 3:
@@ -619,8 +534,6 @@ void hyperstone_device::set_global_register(uint8_t code, uint32_t val)
 			{
 				m_core->global_regs[code] = val;
 				adjust_timer_interrupt();
-				if (m_core->intblock < 1)
-					m_core->intblock = 1;
 			}
 			return;
 		case TR_REGISTER:
@@ -638,8 +551,6 @@ void hyperstone_device::set_global_register(uint8_t code, uint32_t val)
 			if ((m_core->global_regs[code] ^ val) & 0x00800000)
 				adjust_timer_interrupt();
 			m_core->global_regs[code] = val;
-			if (m_core->intblock < 1)
-				m_core->intblock = 1;
 			return;
 		case MCR_REGISTER:
 		{
@@ -800,8 +711,11 @@ void hyperstone_device::hyperstone_br()
 	m_core->icount -= m_core->clock_cycles_2;
 }
 
-void hyperstone_device::execute_trap(uint32_t addr)
+void hyperstone_device::execute_trap(uint8_t trapno)
 {
+	debugger_exception_hook(int(unsigned(trapno)));
+
+	const uint32_t addr = get_trap_addr(trapno);
 	const uint8_t reg = GET_FP + GET_FL;
 	SET_ILC(m_instruction_length);
 	const uint32_t oldSR = SR;
@@ -824,7 +738,6 @@ void hyperstone_device::execute_trap(uint32_t addr)
 void hyperstone_device::execute_int(uint32_t addr)
 {
 	const uint8_t reg = GET_FP + GET_FL;
-	SET_ILC(m_instruction_length);
 	const uint32_t oldSR = SR;
 
 	SET_FL(2);
@@ -842,8 +755,11 @@ void hyperstone_device::execute_int(uint32_t addr)
 }
 
 /* TODO: mask Parity Error and Extended Overflow exceptions */
-void hyperstone_device::execute_exception(uint32_t addr)
+void hyperstone_device::execute_exception(uint8_t trapno)
 {
+	debugger_exception_hook(int(unsigned(trapno)));
+
+	const uint32_t addr = get_trap_addr(trapno);
 	const uint8_t reg = GET_FP + GET_FL;
 	SET_ILC(m_instruction_length);
 	const uint32_t oldSR = SR;
@@ -922,170 +838,104 @@ void hyperstone_device::execute_software()
 template <hyperstone_device::is_timer TIMER>
 void hyperstone_device::check_interrupts()
 {
-	/* Interrupt-Lock flag isn't set */
-	if (GET_L || m_core->intblock > 0)
+	// Interrupt-Lock flag isn't set
+	if (GET_L)
 		return;
 
-	/* quick exit if nothing */
+	// quick exit if nothing
 	if (TIMER == NO_TIMER && (ISR & 0x7f) == 0)
 		return;
 
-	if (TIMER == NO_TIMER)
+	// IO3 is priority 5; state is in bit 6 of ISR; FCR bit 10 enables input and FCR bit 8 inhibits interrupt
+	if (IO3_LINE_STATE && (FCR & 0x00000500) == 0x00000400)
 	{
-		/* IO3 is priority 5; state is in bit 6 of ISR; FCR bit 10 enables input and FCR bit 8 inhibits interrupt */
-		if (IO3_LINE_STATE && (FCR & 0x00000500) == 0x00000400)
-		{
-			standard_irq_callback(IRQ_IO3, m_core->global_regs[0]);
-			execute_int(get_trap_addr(TRAPNO_IO3));
-			return;
-		}
-
-		/* INT1 is priority 7; state is in bit 0 of ISR; FCR bit 28 inhibits interrupt */
-		if (INT1_LINE_STATE && (FCR & 0x10000000) == 0x00000000)
-		{
-			standard_irq_callback(IRQ_INT1, m_core->global_regs[0]);
-			execute_int(get_trap_addr(TRAPNO_INT1));
-			return;
-		}
-
-		/* INT2 is priority 9; state is in bit 1 of ISR; FCR bit 29 inhibits interrupt */
-		if (INT2_LINE_STATE && (FCR & 0x20000000) == 0x00000000)
-		{
-			standard_irq_callback(IRQ_INT2, m_core->global_regs[0]);
-			execute_int(get_trap_addr(TRAPNO_INT2));
-			return;
-		}
-
-		/* INT3 is priority 11; state is in bit 2 of ISR; FCR bit 30 inhibits interrupt */
-		if (INT3_LINE_STATE && (FCR & 0x40000000) == 0x00000000)
-		{
-			standard_irq_callback(IRQ_INT3, m_core->global_regs[0]);
-			execute_int(get_trap_addr(TRAPNO_INT3));
-			return;
-		}
-
-		/* INT4 is priority 13; state is in bit 3 of ISR; FCR bit 31 inhibits interrupt */
-		if (INT4_LINE_STATE && (FCR & 0x80000000) == 0x00000000)
-		{
-			standard_irq_callback(IRQ_INT4, m_core->global_regs[0]);
-			execute_int(get_trap_addr(TRAPNO_INT4));
-			return;
-		}
-
-		/* IO1 is priority 14; state is in bit 4 of ISR; FCR bit 2 enables input and FCR bit 0 inhibits interrupt */
-		if (IO1_LINE_STATE && (FCR & 0x00000005) == 0x00000004)
-		{
-			standard_irq_callback(IRQ_IO1, m_core->global_regs[0]);
-			execute_int(get_trap_addr(TRAPNO_IO1));
-			return;
-		}
-
-		/* IO2 is priority 15; state is in bit 5 of ISR; FCR bit 6 enables input and FCR bit 4 inhibits interrupt */
-		if (IO2_LINE_STATE && (FCR & 0x00000050) == 0x00000040)
-		{
-			standard_irq_callback(IRQ_IO2, m_core->global_regs[0]);
-			execute_int(get_trap_addr(TRAPNO_IO2));
-			return;
-		}
+		standard_irq_callback(IRQ_IO3, m_core->global_regs[0]);
+		execute_int(get_trap_addr(TRAPNO_IO3));
+		return;
 	}
-	else
+
+	// timer int might be priority 6 if FCR bits 20-21 == 3; FCR bit 23 inhibits interrupt
+	if (TIMER && (FCR & 0x00b00000) == 0x00300000)
 	{
-		/* IO3 is priority 5; state is in bit 6 of ISR; FCR bit 10 enables input and FCR bit 8 inhibits interrupt */
-		if (IO3_LINE_STATE && (FCR & 0x00000500) == 0x00000400)
-		{
-			standard_irq_callback(IRQ_IO3, m_core->global_regs[0]);
-			execute_int(get_trap_addr(TRAPNO_IO3));
-			return;
-		}
+		m_core->timer_int_pending = 0;
+		execute_int(get_trap_addr(TRAPNO_TIMER));
+		return;
+	}
 
-		/* timer int might be priority 6 if FCR bits 20-21 == 3; FCR bit 23 inhibits interrupt */
-		if (TIMER && (FCR & 0x00b00000) == 0x00300000)
-		{
-			m_core->timer_int_pending = 0;
-			execute_int(get_trap_addr(TRAPNO_TIMER));
-			return;
-		}
+	// INT1 is priority 7; state is in bit 0 of ISR; FCR bit 28 inhibits interrupt
+	if (INT1_LINE_STATE && (FCR & 0x10000000) == 0x00000000)
+	{
+		standard_irq_callback(IRQ_INT1, m_core->global_regs[0]);
+		execute_int(get_trap_addr(TRAPNO_INT1));
+		return;
+	}
 
-		/* INT1 is priority 7; state is in bit 0 of ISR; FCR bit 28 inhibits interrupt */
-		if (INT1_LINE_STATE && (FCR & 0x10000000) == 0x00000000)
-		{
-			standard_irq_callback(IRQ_INT1, m_core->global_regs[0]);
-			execute_int(get_trap_addr(TRAPNO_INT1));
-			return;
-		}
+	// timer int might be priority 8 if FCR bits 20-21 == 2; FCR bit 23 inhibits interrupt
+	if (TIMER && (FCR & 0x00b00000) == 0x00200000)
+	{
+		m_core->timer_int_pending = 0;
+		execute_int(get_trap_addr(TRAPNO_TIMER));
+		return;
+	}
 
-		/* timer int might be priority 8 if FCR bits 20-21 == 2; FCR bit 23 inhibits interrupt */
-		if (TIMER && (FCR & 0x00b00000) == 0x00200000)
-		{
-			m_core->timer_int_pending = 0;
-			execute_int(get_trap_addr(TRAPNO_TIMER));
-			return;
-		}
+	// INT2 is priority 9; state is in bit 1 of ISR; FCR bit 29 inhibits interrupt
+	if (INT2_LINE_STATE && (FCR & 0x20000000) == 0x00000000)
+	{
+		standard_irq_callback(IRQ_INT2, m_core->global_regs[0]);
+		execute_int(get_trap_addr(TRAPNO_INT2));
+		return;
+	}
 
-		/* INT2 is priority 9; state is in bit 1 of ISR; FCR bit 29 inhibits interrupt */
-		if (INT2_LINE_STATE && (FCR & 0x20000000) == 0x00000000)
-		{
-			standard_irq_callback(IRQ_INT2, m_core->global_regs[0]);
-			execute_int(get_trap_addr(TRAPNO_INT2));
-			return;
-		}
+	// timer int might be priority 10 if FCR bits 20-21 == 1; FCR bit 23 inhibits interrupt
+	if (TIMER && (FCR & 0x00b00000) == 0x00100000)
+	{
+		m_core->timer_int_pending = 0;
+		execute_int(get_trap_addr(TRAPNO_TIMER));
+		return;
+	}
 
-		/* timer int might be priority 10 if FCR bits 20-21 == 1; FCR bit 23 inhibits interrupt */
-		if (TIMER && (FCR & 0x00b00000) == 0x00100000)
-		{
-			m_core->timer_int_pending = 0;
-			execute_int(get_trap_addr(TRAPNO_TIMER));
-			return;
-		}
+	// INT3 is priority 11; state is in bit 2 of ISR; FCR bit 30 inhibits interrupt
+	if (INT3_LINE_STATE && (FCR & 0x40000000) == 0x00000000)
+	{
+		standard_irq_callback(IRQ_INT3, m_core->global_regs[0]);
+		execute_int(get_trap_addr(TRAPNO_INT3));
+		return;
+	}
 
-		/* INT3 is priority 11; state is in bit 2 of ISR; FCR bit 30 inhibits interrupt */
-		if (INT3_LINE_STATE && (FCR & 0x40000000) == 0x00000000)
-		{
-			standard_irq_callback(IRQ_INT3, m_core->global_regs[0]);
-			execute_int(get_trap_addr(TRAPNO_INT3));
-			return;
-		}
+	// timer int might be priority 12 if FCR bits 20-21 == 0; FCR bit 23 inhibits interrupt
+	if (TIMER && (FCR & 0x00b00000) == 0x00000000)
+	{
+		m_core->timer_int_pending = 0;
+		execute_int(get_trap_addr(TRAPNO_TIMER));
+		return;
+	}
 
-		/* timer int might be priority 12 if FCR bits 20-21 == 0; FCR bit 23 inhibits interrupt */
-		if (TIMER && (FCR & 0x00b00000) == 0x00000000)
-		{
-			m_core->timer_int_pending = 0;
-			execute_int(get_trap_addr(TRAPNO_TIMER));
-			return;
-		}
+	// INT4 is priority 13; state is in bit 3 of ISR; FCR bit 31 inhibits interrupt
+	if (INT4_LINE_STATE && (FCR & 0x80000000) == 0x00000000)
+	{
+		standard_irq_callback(IRQ_INT4, m_core->global_regs[0]);
+		execute_int(get_trap_addr(TRAPNO_INT4));
+		return;
+	}
 
-		/* INT4 is priority 13; state is in bit 3 of ISR; FCR bit 31 inhibits interrupt */
-		if (INT4_LINE_STATE && (FCR & 0x80000000) == 0x00000000)
-		{
-			standard_irq_callback(IRQ_INT4, m_core->global_regs[0]);
-			execute_int(get_trap_addr(TRAPNO_INT4));
-			return;
-		}
+	// IO1 is priority 14; state is in bit 4 of ISR; FCR bit 2 enables input and FCR bit 0 inhibits interrupt
+	if (IO1_LINE_STATE && (FCR & 0x00000005) == 0x00000004)
+	{
+		standard_irq_callback(IRQ_IO1, m_core->global_regs[0]);
+		execute_int(get_trap_addr(TRAPNO_IO1));
+		return;
+	}
 
-		/* IO1 is priority 14; state is in bit 4 of ISR; FCR bit 2 enables input and FCR bit 0 inhibits interrupt */
-		if (IO1_LINE_STATE && (FCR & 0x00000005) == 0x00000004)
-		{
-			standard_irq_callback(IRQ_IO1, m_core->global_regs[0]);
-			execute_int(get_trap_addr(TRAPNO_IO1));
-			return;
-		}
-
-		/* IO2 is priority 15; state is in bit 5 of ISR; FCR bit 6 enables input and FCR bit 4 inhibits interrupt */
-		if (IO2_LINE_STATE && (FCR & 0x00000050) == 0x00000040)
-		{
-			standard_irq_callback(IRQ_IO2, m_core->global_regs[0]);
-			execute_int(get_trap_addr(TRAPNO_IO2));
-			return;
-		}
+	// IO2 is priority 15; state is in bit 5 of ISR; FCR bit 6 enables input and FCR bit 4 inhibits interrupt
+	if (IO2_LINE_STATE && (FCR & 0x00000050) == 0x00000040)
+	{
+		standard_irq_callback(IRQ_IO2, m_core->global_regs[0]);
+		execute_int(get_trap_addr(TRAPNO_IO2));
+		return;
 	}
 }
 
 void hyperstone_device::device_start()
-{
-	// Handled entirely by init() and derived classes
-}
-
-void hyperstone_device::init(int scale_mask)
 {
 	m_instruction_length_valid = false;
 
@@ -1141,31 +991,60 @@ void hyperstone_device::init(int scale_mask)
 	m_io = &space(AS_IO);
 
 	m_timer = timer_alloc(FUNC(hyperstone_device::timer_callback), this);
-	m_core->clock_scale_mask = scale_mask;
+	m_core->clock_scale_mask = 0;
 
 	for (uint8_t i = 0; i < 16; i++)
 	{
 		m_core->fl_lut[i] = (i ? i : 16);
 	}
 
-	uint32_t umlflags = 0;
-	m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, umlflags, 1, 32, 1);
+	const uint32_t umlflags = 0;
+	m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, umlflags, 4, 32, 1);
 
 	// add UML symbols-
-	m_drcuml->symbol_add(&m_core->global_regs[0], sizeof(uint32_t), "pc");
-	m_drcuml->symbol_add(&m_core->global_regs[1], sizeof(uint32_t), "sr");
-	m_drcuml->symbol_add(&m_core->icount, sizeof(m_core->icount), "icount");
+	m_drcuml->symbol_add(&m_core->global_regs[PC_REGISTER], sizeof(m_core->global_regs[PC_REGISTER]), "pc");
+	m_drcuml->symbol_add(&m_core->global_regs[SR_REGISTER], sizeof(m_core->global_regs[SR_REGISTER]), "sr");
+	m_drcuml->symbol_add(&m_core->global_regs[SP_REGISTER], sizeof(m_core->global_regs[SP_REGISTER]), "sp");
+	m_drcuml->symbol_add(&m_core->global_regs[UB_REGISTER], sizeof(m_core->global_regs[UB_REGISTER]), "ub");
+	m_drcuml->symbol_add(&m_core->trap_entry,               sizeof(m_core->trap_entry),               "trap_entry");
+	m_drcuml->symbol_add(&m_core->delay_pc,                 sizeof(m_core->delay_pc),                 "delay_pc");
+	m_drcuml->symbol_add(&m_core->delay_slot,               sizeof(m_core->delay_slot),               "delay_slot");
+	m_drcuml->symbol_add(&m_core->delay_slot_taken,         sizeof(m_core->delay_slot_taken),         "delay_slot_taken");
+	m_drcuml->symbol_add(&m_core->intblock,                 sizeof(m_core->intblock),                 "intblock");
+	m_drcuml->symbol_add(&m_core->arg0,                     sizeof(m_core->arg0),                     "arg0");
+	m_drcuml->symbol_add(&m_core->arg1,                     sizeof(m_core->arg1),                     "arg1");
+	m_drcuml->symbol_add(&m_core->icount,                   sizeof(m_core->icount),                   "icount");
 
 	char buf[4];
-	for (int i=0; i < 32; i++)
+	buf[3] = '\0';
+	buf[0] = 'g';
+	for (int i = 0; i < 32; i++)
 	{
-		sprintf(buf, "g%d", i);
+		if (9 < i)
+		{
+			buf[1] = '0' + (i / 10);
+			buf[2] = '0' + (i % 10);
+		}
+		else
+		{
+			buf[1] = '0' + i;
+			buf[2] = '\0';
+		}
 		m_drcuml->symbol_add(&m_core->global_regs[i], sizeof(uint32_t), buf);
 	}
-
-	for (int i=0; i < 64; i++)
+	buf[0] = 'l';
+	for (int i = 0; i < 64; i++)
 	{
-		sprintf(buf, "l%d", i);
+		if (9 < i)
+		{
+			buf[1] = '0' + (i / 10);
+			buf[2] = '0' + (i % 10);
+		}
+		else
+		{
+			buf[1] = '0' + i;
+			buf[2] = '\0';
+		}
 		m_drcuml->symbol_add(&m_core->local_regs[i], sizeof(uint32_t), buf);
 	}
 
@@ -1173,7 +1052,7 @@ void hyperstone_device::init(int scale_mask)
 	m_drcuml->symbol_add(&m_core->arg1, sizeof(uint32_t), "arg1");
 
 	/* initialize the front-end helper */
-	m_drcfe = std::make_unique<e132xs_frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
+	m_drcfe = std::make_unique<e132xs_frontend>(*this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, m_single_instruction_mode ? 1 : COMPILE_MAX_SEQUENCE);
 
 	/* mark the cache dirty so it is updated on next execute */
 	m_cache_dirty = true;
@@ -1214,86 +1093,10 @@ void hyperstone_device::init(int scale_mask)
 	state_add(E132XS_G29,     "G29", m_core->global_regs[29]).mask(0xffffffff);
 	state_add(E132XS_G30,     "G30", m_core->global_regs[30]).mask(0xffffffff);
 	state_add(E132XS_G31,     "G31", m_core->global_regs[31]).mask(0xffffffff);
-	state_add(E132XS_CL0,     "CL0", m_core->local_regs[(0 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL1,     "CL1", m_core->local_regs[(1 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL2,     "CL2", m_core->local_regs[(2 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL3,     "CL3", m_core->local_regs[(3 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL4,     "CL4", m_core->local_regs[(4 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL5,     "CL5", m_core->local_regs[(5 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL6,     "CL6", m_core->local_regs[(6 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL7,     "CL7", m_core->local_regs[(7 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL8,     "CL8", m_core->local_regs[(8 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL9,     "CL9", m_core->local_regs[(9 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL10,    "CL10", m_core->local_regs[(10 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL11,    "CL11", m_core->local_regs[(11 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL12,    "CL12", m_core->local_regs[(12 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL13,    "CL13", m_core->local_regs[(13 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL14,    "CL14", m_core->local_regs[(14 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL15,    "CL15", m_core->local_regs[(15 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_L0,      "L0", m_core->local_regs[0]).mask(0xffffffff);
-	state_add(E132XS_L1,      "L1", m_core->local_regs[1]).mask(0xffffffff);
-	state_add(E132XS_L2,      "L2", m_core->local_regs[2]).mask(0xffffffff);
-	state_add(E132XS_L3,      "L3", m_core->local_regs[3]).mask(0xffffffff);
-	state_add(E132XS_L4,      "L4", m_core->local_regs[4]).mask(0xffffffff);
-	state_add(E132XS_L5,      "L5", m_core->local_regs[5]).mask(0xffffffff);
-	state_add(E132XS_L6,      "L6", m_core->local_regs[6]).mask(0xffffffff);
-	state_add(E132XS_L7,      "L7", m_core->local_regs[7]).mask(0xffffffff);
-	state_add(E132XS_L8,      "L8", m_core->local_regs[8]).mask(0xffffffff);
-	state_add(E132XS_L9,      "L9", m_core->local_regs[9]).mask(0xffffffff);
-	state_add(E132XS_L10,     "L10", m_core->local_regs[10]).mask(0xffffffff);
-	state_add(E132XS_L11,     "L11", m_core->local_regs[11]).mask(0xffffffff);
-	state_add(E132XS_L12,     "L12", m_core->local_regs[12]).mask(0xffffffff);
-	state_add(E132XS_L13,     "L13", m_core->local_regs[13]).mask(0xffffffff);
-	state_add(E132XS_L14,     "L14", m_core->local_regs[14]).mask(0xffffffff);
-	state_add(E132XS_L15,     "L15", m_core->local_regs[15]).mask(0xffffffff);
-	state_add(E132XS_L16,     "L16", m_core->local_regs[16]).mask(0xffffffff);
-	state_add(E132XS_L17,     "L17", m_core->local_regs[17]).mask(0xffffffff);
-	state_add(E132XS_L18,     "L18", m_core->local_regs[18]).mask(0xffffffff);
-	state_add(E132XS_L19,     "L19", m_core->local_regs[19]).mask(0xffffffff);
-	state_add(E132XS_L20,     "L20", m_core->local_regs[20]).mask(0xffffffff);
-	state_add(E132XS_L21,     "L21", m_core->local_regs[21]).mask(0xffffffff);
-	state_add(E132XS_L22,     "L22", m_core->local_regs[22]).mask(0xffffffff);
-	state_add(E132XS_L23,     "L23", m_core->local_regs[23]).mask(0xffffffff);
-	state_add(E132XS_L24,     "L24", m_core->local_regs[24]).mask(0xffffffff);
-	state_add(E132XS_L25,     "L25", m_core->local_regs[25]).mask(0xffffffff);
-	state_add(E132XS_L26,     "L26", m_core->local_regs[26]).mask(0xffffffff);
-	state_add(E132XS_L27,     "L27", m_core->local_regs[27]).mask(0xffffffff);
-	state_add(E132XS_L28,     "L28", m_core->local_regs[28]).mask(0xffffffff);
-	state_add(E132XS_L29,     "L29", m_core->local_regs[29]).mask(0xffffffff);
-	state_add(E132XS_L30,     "L30", m_core->local_regs[30]).mask(0xffffffff);
-	state_add(E132XS_L31,     "L31", m_core->local_regs[31]).mask(0xffffffff);
-	state_add(E132XS_L32,     "L32", m_core->local_regs[32]).mask(0xffffffff);
-	state_add(E132XS_L33,     "L33", m_core->local_regs[33]).mask(0xffffffff);
-	state_add(E132XS_L34,     "L34", m_core->local_regs[34]).mask(0xffffffff);
-	state_add(E132XS_L35,     "L35", m_core->local_regs[35]).mask(0xffffffff);
-	state_add(E132XS_L36,     "L36", m_core->local_regs[36]).mask(0xffffffff);
-	state_add(E132XS_L37,     "L37", m_core->local_regs[37]).mask(0xffffffff);
-	state_add(E132XS_L38,     "L38", m_core->local_regs[38]).mask(0xffffffff);
-	state_add(E132XS_L39,     "L39", m_core->local_regs[39]).mask(0xffffffff);
-	state_add(E132XS_L40,     "L40", m_core->local_regs[40]).mask(0xffffffff);
-	state_add(E132XS_L41,     "L41", m_core->local_regs[41]).mask(0xffffffff);
-	state_add(E132XS_L42,     "L42", m_core->local_regs[42]).mask(0xffffffff);
-	state_add(E132XS_L43,     "L43", m_core->local_regs[43]).mask(0xffffffff);
-	state_add(E132XS_L44,     "L44", m_core->local_regs[44]).mask(0xffffffff);
-	state_add(E132XS_L45,     "L45", m_core->local_regs[45]).mask(0xffffffff);
-	state_add(E132XS_L46,     "L46", m_core->local_regs[46]).mask(0xffffffff);
-	state_add(E132XS_L47,     "L47", m_core->local_regs[47]).mask(0xffffffff);
-	state_add(E132XS_L48,     "L48", m_core->local_regs[48]).mask(0xffffffff);
-	state_add(E132XS_L49,     "L49", m_core->local_regs[49]).mask(0xffffffff);
-	state_add(E132XS_L50,     "L50", m_core->local_regs[50]).mask(0xffffffff);
-	state_add(E132XS_L51,     "L51", m_core->local_regs[51]).mask(0xffffffff);
-	state_add(E132XS_L52,     "L52", m_core->local_regs[52]).mask(0xffffffff);
-	state_add(E132XS_L53,     "L53", m_core->local_regs[53]).mask(0xffffffff);
-	state_add(E132XS_L54,     "L54", m_core->local_regs[54]).mask(0xffffffff);
-	state_add(E132XS_L55,     "L55", m_core->local_regs[55]).mask(0xffffffff);
-	state_add(E132XS_L56,     "L56", m_core->local_regs[56]).mask(0xffffffff);
-	state_add(E132XS_L57,     "L57", m_core->local_regs[57]).mask(0xffffffff);
-	state_add(E132XS_L58,     "L58", m_core->local_regs[58]).mask(0xffffffff);
-	state_add(E132XS_L59,     "L59", m_core->local_regs[59]).mask(0xffffffff);
-	state_add(E132XS_L60,     "L60", m_core->local_regs[60]).mask(0xffffffff);
-	state_add(E132XS_L61,     "L61", m_core->local_regs[61]).mask(0xffffffff);
-	state_add(E132XS_L62,     "L62", m_core->local_regs[62]).mask(0xffffffff);
-	state_add(E132XS_L63,     "L63", m_core->local_regs[63]).mask(0xffffffff);
+	for (int i = 0; i < 16; i++)
+		state_add(E132XS_CL0 + i, util::string_format("L%d", i).c_str(), m_debug_local_regs[i]).mask(0xffffffff).callimport().callexport();
+	for (int i = 0; i < 64; i++)
+		state_add(E132XS_L0 + i, util::string_format("S%d", i).c_str(), m_core->local_regs[i]).mask(0xffffffff);
 
 	save_item(NAME(m_core->global_regs));
 	save_item(NAME(m_core->local_regs));
@@ -1308,7 +1111,6 @@ void hyperstone_device::init(int scale_mask)
 	save_item(NAME(m_core->tr_base_cycles));
 	save_item(NAME(m_core->timer_int_pending));
 	save_item(NAME(m_core->clck_scale));
-	save_item(NAME(m_core->clock_scale_mask));
 	save_item(NAME(m_core->clock_cycles_1));
 	save_item(NAME(m_core->clock_cycles_2));
 	save_item(NAME(m_core->clock_cycles_3));
@@ -1322,72 +1124,86 @@ void hyperstone_device::init(int scale_mask)
 
 void e116t_device::device_start()
 {
-	init(0);
+	hyperstone_device::device_start();
+	m_core->clock_scale_mask = 0;
 }
 
 void e116xt_device::device_start()
 {
-	init(3);
+	hyperstone_device::device_start();
+	m_core->clock_scale_mask = 3;
 }
 
 void e116xs_device::device_start()
 {
-	init(7);
+	hyperstone_device::device_start();
+	m_core->clock_scale_mask = 7;
 }
 
 void e116xsr_device::device_start()
 {
-	init(7);
+	hyperstone_device::device_start();
+	m_core->clock_scale_mask = 7;
 }
 
 void gms30c2116_device::device_start()
 {
-	init(0);
+	hyperstone_device::device_start();
+	m_core->clock_scale_mask = 0;
 }
 
 void gms30c2216_device::device_start()
 {
-	init(0);
+	hyperstone_device::device_start();
+	m_core->clock_scale_mask = 0;
 }
 
 void e132n_device::device_start()
 {
-	init(0);
+	hyperstone_device::device_start();
+	m_core->clock_scale_mask = 0;
 }
 
 void e132t_device::device_start()
 {
-	init(0);
+	hyperstone_device::device_start();
+	m_core->clock_scale_mask = 0;
 }
 
 void e132xn_device::device_start()
 {
-	init(3);
+	hyperstone_device::device_start();
+	m_core->clock_scale_mask = 3;
 }
 
 void e132xt_device::device_start()
 {
-	init(3);
+	hyperstone_device::device_start();
+	m_core->clock_scale_mask = 3;
 }
 
 void e132xs_device::device_start()
 {
-	init(7);
+	hyperstone_device::device_start();
+	m_core->clock_scale_mask = 7;
 }
 
 void e132xsr_device::device_start()
 {
-	init(7);
+	hyperstone_device::device_start();
+	m_core->clock_scale_mask = 7;
 }
 
 void gms30c2132_device::device_start()
 {
-	init(0);
+	hyperstone_device::device_start();
+	m_core->clock_scale_mask = 0;
 }
 
 void gms30c2232_device::device_start()
 {
-	init(0);
+	hyperstone_device::device_start();
+	m_core->clock_scale_mask = 0;
 }
 
 void hyperstone_device::device_reset()
@@ -1479,6 +1295,34 @@ device_memory_interface::space_config_vector hyperstone_device::memory_space_con
 
 
 //-------------------------------------------------
+//  state_import - import state for the debugger
+//-------------------------------------------------
+
+void hyperstone_device::state_import(const device_state_entry &entry)
+{
+	if ((entry.index() >= E132XS_CL0) && (entry.index() <= E132XS_CL15))
+	{
+		const auto index = entry.index() - E132XS_CL0;
+		m_core->local_regs[(index + GET_FP) & 0x3f] = m_debug_local_regs[index];
+	}
+}
+
+
+//-------------------------------------------------
+//  state_export - export state for the debugger
+//-------------------------------------------------
+
+void hyperstone_device::state_export(const device_state_entry &entry)
+{
+	if ((entry.index() >= E132XS_CL0) && (entry.index() <= E132XS_CL15))
+	{
+		const auto index = entry.index() - E132XS_CL0;
+		m_debug_local_regs[index] = m_core->local_regs[(index + GET_FP) & 0x3f];
+	}
+}
+
+
+//-------------------------------------------------
 //  state_string_export - export state as a string
 //  for the debugger
 //-------------------------------------------------
@@ -1521,11 +1365,6 @@ std::unique_ptr<util::disasm_interface> hyperstone_device::create_disassembler()
 	return std::make_unique<hyperstone_disassembler>(this);
 }
 
-u8 hyperstone_device::get_fp() const
-{
-	return GET_FP;
-}
-
 bool hyperstone_device::get_h() const
 {
 	return GET_H;
@@ -1547,18 +1386,17 @@ void hyperstone_device::hyperstone_trap()
 	check_delay_PC();
 
 	const uint8_t trapno = (m_op & 0xfc) >> 2;
-	const uint32_t addr = get_trap_addr(trapno);
 	const uint8_t code = ((m_op & 0x300) >> 6) | (m_op & 0x03);
 
 	if (trap_if_set[code])
 	{
 		if (SR & conditions[code])
-			execute_trap(addr);
+			execute_trap(trapno);
 	}
 	else
 	{
 		if (!(SR & conditions[code]))
-			execute_trap(addr);
+			execute_trap(trapno);
 	}
 }
 
@@ -1667,19 +1505,20 @@ void hyperstone_device::execute_run()
 		return;
 	}
 
-	if (m_core->intblock < 0)
-		m_core->intblock = 0;
-
 	if (!m_instruction_length_valid)
 		SET_ILC(get_instruction_length(m_pr16(PC)));
 
-	if (m_core->timer_int_pending)
-		check_interrupts<IS_TIMER>();
-	else
-		check_interrupts<NO_TIMER>();
-
 	while (m_core->icount > 0)
 	{
+		if (--m_core->intblock <= 0)
+		{
+			m_core->intblock = 0;
+			if (m_core->timer_int_pending)
+				check_interrupts<IS_TIMER>();
+			else
+				check_interrupts<NO_TIMER>();
+		}
+
 #if E132XS_LOG_INTERPRETER_REGS
 		dump_registers();
 #endif
@@ -1954,22 +1793,15 @@ void hyperstone_device::execute_run()
 			case 0xff: hyperstone_trap(); break;
 		}
 
-		SET_ILC(m_instruction_length);
+		if (((m_op & 0xfef0) != 0x0400) || !(m_op & 0x010e))
+		{
+			// anything other than RET updates ILC and sets P
+			SET_ILC(m_instruction_length);
+			SET_P(1);
+		}
 
 		if (GET_T && GET_P && !m_core->delay_slot) /* Not in a Delayed Branch instructions */
-		{
-			uint32_t addr = get_trap_addr(TRAPNO_TRACE_EXCEPTION);
-			execute_exception(addr);
-		}
-
-		if (--m_core->intblock <= 0)
-		{
-			m_core->intblock = 0;
-			if (m_core->timer_int_pending)
-				check_interrupts<IS_TIMER>();
-			else
-				check_interrupts<NO_TIMER>();
-		}
+			execute_exception(TRAPNO_TRACE_EXCEPTION);
 	}
 }
 

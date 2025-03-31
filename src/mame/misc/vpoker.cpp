@@ -1,33 +1,41 @@
 // license:BSD-3-Clause
-// copyright-holders:Angelo Salese, Roberto Fresca
+// copyright-holders: Angelo Salese, Roberto Fresca, Grull Osgo
 /**************************************************************************************************************
 
-  Videotronics Poker (c) 198? Videotronics
-  Preliminary driver by Angelo Salese & Roberto Fresca.
+  Challenger Draw Poker (c) 198? Videotronics.
+  Driver by Angelo Salese, Roberto Fresca & Grull Osgo.
+
+
+  The Challenger series had three games:
+
+  * Challenger Draw Poker
+  https://flyers.arcade-museum.com/videogames/show/4296
+  https://flyers.arcade-museum.com/videogames/show/4374
+
+  * Challenger Black Jack 21
+  https://flyers.arcade-museum.com/videogames/show/4295
+
+  * Challenger In Between
+  https://flyers.arcade-museum.com/videogames/show/4297
+
 
   Notes:
-  - Looks like the 2nd generation of Noraut Poker / Draw Poker Hi-Lo HW.
 
-  - I found two companies that sold the same game with different name...
+  I found two companies that sold the same game with different name:
 
     1) "Challenger Draw Poker", from Bend Electronics Co. Inc.
     2) "VHI Draw Poker", from Video Horizons, Inc.
 
-    Both companies shared the same address and phone number:
-     63353 Nels Anderson Road. Bend, Oregon 97701.
-     Tel: 503-389-7626.
+  Both companies shared the same address and phone number:
+  63353 Nels Anderson Road. Bend, Oregon 97701.
+  Tel: 503-389-7626.
 
-    Bend Electronics Co. Inc. claims that they are worldwide distributors for Videotronics, Inc.
+  Bend Electronics Co. Inc. claims that they are worldwide distributors for Videotronics, Inc.
 
-    There are some legal issues between all these companies...
-    https://scholar.google.com/scholar_case?case=7993095852400122011
-    http://www.plainsite.org/dockets/201rtodjb/nevada-district-court/videotronics-inc-v-bend-electronics/
+  There are some legal issues between all these companies...
+  https://scholar.google.com/scholar_case?case=7993095852400122011
+  http://www.plainsite.org/dockets/201rtodjb/nevada-district-court/videotronics-inc-v-bend-electronics/
 
-
-  TODO:
-  - Understand how the 6840PTM hooks up, needed to let it work properly;
-  - I/Os;
-  - sound;
 
 ===============================================================================================================
 
@@ -63,12 +71,14 @@
 
   ROM data showed cards
 
-  6809 CPU
+  MC6809 CPU
   4.000 Mhz crystal
   MC6840P
-  mm74c920J/mmc6551j-9    x2
+  mm74c920J   x2
+  mmc6551j-9  x2
 
-**************************************************************************************************************
+
+===============================================================================================================
 
  - Added 5-Aces Poker (Roberto Fresca)
 
@@ -86,7 +96,7 @@
   .7  2764    handwritten sticker 688C
 
   4 MHz crystal
-  6809
+  HD68A09P
   MC6840P
   nmc6514-9   x2
   nm23114     x2
@@ -95,15 +105,130 @@
                       SA2889-0697
              stamped     ETC
 
-**************************************************************************************************************/
 
+===============================================================================================================
+
+  Driver notes:
+
+  meters offsets:
+
+  Aces:           16a-16b
+  2 Pair:         16c-16d
+  3 of a Kind:    16e-16f
+  Straight:       170-171
+  Flush:          172-173
+  Full House:     173-174
+  4 of a Kind:    175-176
+  Straight Flush: 177-178
+
+  Coins In:       188-189-18a-18b
+  Credits Played: 18c-18d-18e-18f
+  Credits Won:    190-191-192-193
+  Cleared:        180-181-182-183
+  Games Played:   194-195-196-197
+  Games Won:      184-185-186-187
+
+
+  registers:
+
+  Credits:        da-db
+  Coins in:       dd
+
+
+===============================================================================================================
+
+  Notes by game:
+
+
+  * 5-Aces Poker
+
+  Game Mode Access: Before entering the game mode, a system check must be completed.
+  Once the check is finished, you can insert coins and start playing.
+
+  Entering Setup Mode: To enter the Setup Mode, press the SETUP key (F2).
+
+              SET UP
+    TIMER               6...
+
+  In Setup Mode, you can adjust each item using the following controls:
+
+  - BET button (M key) to increase the value or turn the item off.
+  - DEAL button (1 key) to decrease the value or turn the item on.
+  - Use the CANCEL button to move to the next item.
+
+              SET UP
+    TIMER               6     (range: 1 to 12)
+    MAX BET             8     (range: 5 to 50)
+    AUTO BET            OFF   (options: OFF/ON)
+    AUTO DEAL           OFF   (options: OFF/ON)
+    REBET               OFF   (options: OFF/ON)
+
+  After adjusting the last item, you will return to the game mode.
+
+  Saving NVRAM Data: If you need to power off the machine but want to save the NVRAM data,
+  press the "Save and Halt" service (key 9), then turn off the machine. Upon reboot, all
+  previous data will be restored.
+
+
+===============================================================================================================
+
+  Updates [2025-03-04]:
+
+  - Change vpoker description to Challenger Draw Poker.
+  - Inputs from the scratch.
+  - Split machine drivers for each game.
+  - Hook clocks to the 6840 PTM.
+  - Reworked interrupts handling.
+  - Lamps support for both sets.
+  - Adjusted screen visible area per game.
+  - Clickable button-lamps layout for vpoker.
+  - Clickable button-lamps layout for 5acespkr.
+  - Mech counters support.
+  - NVRAM support.
+  - Added sigma-delta DAC sound support.
+  - Promoted vpoker to working.
+  - Promoted 5acespkr to working.
+  - Added technical notes.
+
+  Updates [2025-03-06]:
+
+  - Rewrote the lamps scheme.
+  - Fixed the button-lamps layouts accordingly.
+  - Added workaround for the NMI routine (vpoker).
+  - Fixed vpoker NVRAM issues.
+  - Fixed mech counters support per game.
+
+  Updates [2025-03-08]:
+
+  - Workaround for NMI to get the Save and Halt function (5-Aces).
+  - Solved any issues regarding interrupt vectors.
+  - Documented the 5-Aces Poker SETUP mode.
+  - Fixed the 5-Aces Poker vertical refresh rate.
+  - Renamed function according to its own interrupts vector name.
+  - Unified most of the inputs.
+  - Rewrote the 5-Aces Poker machine config to use the vpoker one as base config.
+  - Added links to the Challenger Draw Poker flyers.
+  - Added technical notes.
+
+
+  TODO:
+
+  - Nothing... :)
+
+
+**************************************************************************************************************/
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6840ptm.h"
+#include "machine/nvram.h"
+#include "sound/dac.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
+#include "vpoker.lh"
+#include "5acespkr.lh"
 
 
 namespace {
@@ -116,28 +241,49 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_in0(*this, "IN0")
+		m_dac(*this, "dac"),
+		m_in0(*this, "IN0"),
+		m_in1(*this, "IN1"),
+		m_in2(*this, "IN2"),
+		m_lamps(*this, "lamp%u", 0U)
+
 	{ }
 
 	void vpoker(machine_config &config);
+	void fiveaces(machine_config &config);
 
 protected:
+	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:
+	uint8_t nvram_r(offs_t offset);
+	void nvram_w(offs_t offset, u8 data);
 	std::unique_ptr<uint8_t[]> m_videoram;
+	std::unique_ptr<u8[]> m_nvram_data;
 	uint8_t m_blit_ram[8];
 	uint8_t blitter_r(offs_t offset);
 	void blitter_w(offs_t offset, uint8_t data);
 	void ptm_irq(int state);
+	void ptm_5_irq(int state);
+	void firq_coin_line(int state);
+	void five_nmi_line(int state);
 	uint32_t screen_update_vpoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<dac_bit_interface> m_dac;
 	required_ioport m_in0;
+	required_ioport m_in1;
+	required_ioport m_in2;
+	output_finder<9> m_lamps;
 	void main_map(address_map &map) ATTR_COLD;
 };
 
+
+/***********************************
+*          Video Hardware          *
+***********************************/
 
 void vpoker_state::video_start()
 {
@@ -151,13 +297,13 @@ uint32_t vpoker_state::screen_update_vpoker(screen_device &screen, bitmap_ind16 
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int count = 0x0000;
 
-	for (int y=0;y<0x10;y++)
+	for (int y = 0; y < 0x10; y++)
 	{
-		for (int x=0;x<0x20;x++)
+		for (int x = 0; x < 0x20; x++)
 		{
 			int tile = videoram[count];
-			//int colour = tile>>12;
-			gfx->opaque(bitmap,cliprect,tile,0,0,0,x*16,y*16);
+			//int colour = tile >> 12;
+			gfx->opaque(bitmap, cliprect, tile, 0, 0, 0, x*16, y*16);
 
 			count++;
 		}
@@ -168,8 +314,14 @@ uint32_t vpoker_state::screen_update_vpoker(screen_device &screen, bitmap_ind16 
 
 uint8_t vpoker_state::blitter_r(offs_t offset)
 {
+	if(m_in2->read() == 1 )  // Save and Halt
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+
 	if(offset == 6)
 		return m_in0->read();
+
+	if(offset == 7)
+		return m_in1->read();
 
 	return 0;
 }
@@ -180,444 +332,120 @@ void vpoker_state::blitter_w(offs_t offset, uint8_t data)
 
 	m_blit_ram[offset] = data;
 
+	if(offset == 1)
+	{
+		machine().bookkeeping().coin_counter_w(0, BIT(data, 5));  // coin_in
+		machine().bookkeeping().coin_counter_w(1, BIT(data, 4));  // coin_out (5aces)
+		machine().bookkeeping().coin_counter_w(1, BIT(data, 6));  // coin_out (vpoker)
+		m_lamps[8] = BIT(data, 7);  // bet lamp
+	}
 	if(offset == 2)
 	{
 		int blit_offs;
 
-		blit_offs = (m_blit_ram[1] & 0x01)<<8|(m_blit_ram[2] & 0xff);
-
+		blit_offs = (m_blit_ram[1] & 0x01) << 8 | (m_blit_ram[2] & 0xff);
 		videoram[blit_offs] = m_blit_ram[0];
-//      printf("%02x %02x %02x %02x %02x %02x %02x %02x\n",m_blit_ram[0],m_blit_ram[1],m_blit_ram[2],m_blit_ram[3],m_blit_ram[4],m_blit_ram[5],m_blit_ram[6],m_blit_ram[7]);
+	}
+	if(offset == 3)
+	{
+		m_lamps[0] = BIT(data, 0);  // hold 1 lamp    (5acespkr)
+		m_lamps[1] = BIT(data, 1);  // hold 2 lamp    (5acespkr)
+		m_lamps[2] = BIT(data, 2);  // hold 3 lamp    (5acespkr)
+		m_lamps[3] = BIT(data, 3);  // hold 4 lamp    (5acespkr)
+		m_lamps[4] = BIT(data, 4);  // hold 5 lamp    (5acespkr)
+		m_lamps[5] = BIT(data, 5);  // deal lamp      (common)
+		m_lamps[6] = BIT(data, 6);  // draw lamp      (common)
+		m_lamps[7] = BIT(data, 7);  // holds + cancel (vpoker)
+	}
+	else
+	{
+		// logerror("blitter_w: offs:%02x - data:%02x\n", offset, data);
 	}
 }
+
+uint8_t vpoker_state::nvram_r(offs_t offset)
+{
+	return m_nvram_data[offset];
+}
+
+void vpoker_state::nvram_w(offs_t offset, u8 data)
+{
+	m_nvram_data[offset] = data;
+}
+
+
+/***********************************
+*          Machine Start           *
+***********************************/
+
+void vpoker_state::machine_start()
+{
+	m_nvram_data = make_unique_clear<u8[]>(0x200);
+	subdevice<nvram_device>("nvram")->set_base(&m_nvram_data[0], 0x200);
+	save_pointer(NAME(m_nvram_data), 0x200);
+	m_lamps.resolve();
+}
+
+
+/*****************************************
+*         Memory Map Information         *
+*****************************************/
 
 void vpoker_state::main_map(address_map &map)
 {
 	map.global_mask(0x3fff);
-	map(0x0000, 0x01ff).ram();     /* vpoker has 0x100, 5acespkr has 0x200 */
+	map(0x0000, 0x01ff).rw(FUNC(vpoker_state::nvram_r), FUNC(vpoker_state::nvram_w));
 	map(0x0400, 0x0407).rw("6840ptm", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
 	map(0x0800, 0x0807).r(FUNC(vpoker_state::blitter_r)).w(FUNC(vpoker_state::blitter_w));
 	map(0x2000, 0x3fff).rom();
 }
 
 
+/*****************************************
+*              Input Ports               *
+*****************************************/
+
 static INPUT_PORTS_START( vpoker )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )  PORT_IMPULSE(3) PORT_NAME("Coin In")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_NAME("Coin In") PORT_IMPULSE(3)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "Service" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_GAMBLE_BOOK )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("IN0-10")  PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("IN0-20")  PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("IN0-40")  PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("IN0-80")  PORT_CODE(KEYCODE_T)
 
 	PORT_START("IN1")
-	PORT_DIPNAME( 0x01, 0x01, "IN1" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )        PORT_NAME("Deal")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )   PORT_NAME("Draw")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
 
 	PORT_START("IN2")
-	PORT_DIPNAME( 0x01, 0x01, "IN2" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("IN3")
-	PORT_DIPNAME( 0x01, 0x01, "IN3" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("IN4")
-	PORT_DIPNAME( 0x01, 0x01, "IN4" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("IN5")
-	PORT_DIPNAME( 0x01, 0x01, "IN5" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("IN6")
-	PORT_DIPNAME( 0x01, 0x01, "IN6" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("IN7")
-	PORT_DIPNAME( 0x01, 0x01, "IN7" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( 5acespkr )
-	PORT_START("IN0")
-	PORT_DIPNAME( 0x01, 0x01, "IN0" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "Service" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_INCLUDE( vpoker )
 
-	PORT_START("IN1")
-	PORT_DIPNAME( 0x01, 0x01, "IN1" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE )   PORT_NAME("Settings") // setup
 
-	PORT_START("IN2")
-	PORT_DIPNAME( 0x01, 0x01, "IN2" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("IN3")
-	PORT_DIPNAME( 0x01, 0x01, "IN3" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("IN4")
-	PORT_DIPNAME( 0x01, 0x01, "IN4" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("IN5")
-	PORT_DIPNAME( 0x01, 0x01, "IN5" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("IN6")
-	PORT_DIPNAME( 0x01, 0x01, "IN6" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("IN7")
-	PORT_DIPNAME( 0x01, 0x01, "IN7" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 )  PORT_NAME("Save and Halt")
 INPUT_PORTS_END
 
+
+/*****************************************
+*            Graphics Layouts            *
+*****************************************/
 
 static const gfx_layout charlayout =
 {
@@ -630,29 +458,68 @@ static const gfx_layout charlayout =
 	16*16
 };
 
+
+/*****************************************
+*      Graphics Decode Information       *
+*****************************************/
+
 static GFXDECODE_START( gfx_vpoker )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 1 )
 GFXDECODE_END
+
+
+/*****************************************
+*     PTM 6840 interrupts handling       *
+*****************************************/
 
 void vpoker_state::ptm_irq(int state)
 {
 	m_maincpu->set_input_line(M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	if(state == 0)
+	{
+		// do de job that must be done by NMI.
+		uint8_t sum = 0;
+		nvram_w(0x4f, 0x5a);
+		nvram_w(0x91, 0xa5);
+		nvram_w(0x9f, 0x00);
+
+		for(int i = 0x40; i < 0xa0; i++)
+			sum +=  nvram_r(i);
+
+		sum = ~sum + 1;
+		nvram_w(0x9f, sum);
+	}
 }
+
+void vpoker_state::ptm_5_irq(int state)
+{
+	m_maincpu->set_input_line(M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+void vpoker_state::firq_coin_line(int state)
+{
+	if(m_in0->read() == 0xfe)
+		m_maincpu->set_input_line(M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+
+/*****************************************
+*             Machine Driver             *
+*****************************************/
 
 void vpoker_state::vpoker(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	MC6809(config, m_maincpu, XTAL(4'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &vpoker_state::main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(vpoker_state::irq0_line_hold));
 
-	/* video hardware */
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(512, 256);
-	screen.set_visarea(0*8, 480-1, 0*8, 240-1);
-//  screen.set_visarea(0*8, 512-1, 0*8, 256-1);
+	screen.set_visarea(0, 464-1, 0, 240-1);  // 512x256 total
 	screen.set_screen_update(FUNC(vpoker_state::screen_update_vpoker));
 	screen.set_palette(m_palette);
 
@@ -660,21 +527,42 @@ void vpoker_state::vpoker(machine_config &config)
 
 	PALETTE(config, m_palette, palette_device::GBR_3BIT);
 
-	/* 6840 PTM */
+	// 6840 PTM
 	ptm6840_device &ptm(PTM6840(config, "6840ptm", XTAL(4'000'000) / 4));
-	ptm.set_external_clocks(0, 0, 0);
+	ptm.set_external_clocks(500, 0, 3000);
 	ptm.irq_callback().set(FUNC(vpoker_state::ptm_irq));
+	ptm.o2_callback().set("dac", FUNC(dac_1bit_device::data_w));
 
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-//  AY8910(config, "aysnd", 8000000/4 /* guess */).add_route(ALL_OUTPUTS, "mono", 0.30);
+	// sound hardware
+	SPEAKER(config, "speaker").front_center();
+	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
-/***************************************************************************
 
-  Game driver(s)
+void vpoker_state::fiveaces(machine_config &config)
+{
+	vpoker(config);
 
-***************************************************************************/
+	// video hardware
+	screen_device &screen(SCREEN(config.replace(), "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.screen_vblank().set(FUNC(vpoker_state::firq_coin_line));
+	screen.set_size(512, 256);
+	screen.set_visarea(48, 448-1, 0, 240-1);  // 512x256 total
+	screen.set_screen_update(FUNC(vpoker_state::screen_update_vpoker));
+	screen.set_palette(m_palette);
+
+	// 6840 PTM
+	ptm6840_device &ptm(PTM6840(config.replace(), "6840ptm", XTAL(4'000'000) / 4));
+	ptm.set_external_clocks(500, 0, 1000000);
+	ptm.irq_callback().set(FUNC(vpoker_state::ptm_5_irq));
+	ptm.o2_callback().set("dac", FUNC(dac_1bit_device::data_w));
+}
+
+
+/*****************************************
+*                Rom Load                *
+*****************************************/
 
 ROM_START( vpoker )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -715,6 +603,10 @@ ROM_END
 } // Anonymous namespace
 
 
-//    YEAR  NAME      PARENT  MACHINE  INPUT     STATE         INIT        ROT   COMPANY               FULLNAME                   FLAGS
-GAME( 198?, vpoker,   0,      vpoker,  vpoker,   vpoker_state, empty_init, ROT0, "Videotronics, Inc.", "Videotronics Draw Poker", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 198?, 5acespkr, 0,      vpoker,  5acespkr, vpoker_state, empty_init, ROT0, "<unknown>",          "5-Aces Poker",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+/*****************************************
+*              Game Drivers              *
+*****************************************/
+
+//     YEAR  NAME      PARENT  MACHINE   INPUT     STATE         INIT        ROT   COMPANY               FULLNAME                  FLAGS   LAYOUT
+GAMEL( 198?, vpoker,   0,      vpoker,   vpoker,   vpoker_state, empty_init, ROT0, "Videotronics, Inc.", "Challenger Draw Poker",  0,      layout_vpoker  )
+GAMEL( 198?, 5acespkr, 0,      fiveaces, 5acespkr, vpoker_state, empty_init, ROT0, "<unknown>",          "5-Aces Poker",           0,      layout_5acespkr  )

@@ -544,11 +544,11 @@ std::error_condition hp98x5_impl::format(const meta_data &meta)
 	// Interleave factor
 	w16b(out_ins, m_fmt_interleave[ m_fs_type ]);
 
-	m_blockdev.get(0).copy(0, sys_rec.data(), sys_rec.size());
+	m_blockdev.get(0)->write(0, sys_rec.data(), sys_rec.size());
 
 	// 9825 & 9831 have a backup copy of system record in spare track but 9845 hasn't, go figure
 	if (m_fs_type != FS_TYPE_9845) {
-		m_blockdev.get(m_spare_start).copy(0, sys_rec.data(), sys_rec.size());
+		m_blockdev.get(m_spare_start)->write(0, sys_rec.data(), sys_rec.size());
 	}
 
 	m_dir.clear();
@@ -663,14 +663,14 @@ void hp98x5_impl::ensure_dir_loaded()
 	// 8        Count of data tracks
 	// 9        Interleave factor
 	// 10..127  N/U
-	u16 sects_per_track = sys_rec.r16b(2);
-	u16 tot_tracks      = sys_rec.r16b(4);
-	u16 spare_track     = sys_rec.r16b(6);
-	u16 dir_start       = sys_rec.r16b(8);
-	u16 av_start        = sys_rec.r16b(10);
-	u16 av_end          = sys_rec.r16b(12);
-	u16 sys_tracks      = sys_rec.r16b(14);
-	u16 data_tracks     = sys_rec.r16b(16);
+	u16 sects_per_track = sys_rec->r16b(2);
+	u16 tot_tracks      = sys_rec->r16b(4);
+	u16 spare_track     = sys_rec->r16b(6);
+	u16 dir_start       = sys_rec->r16b(8);
+	u16 av_start        = sys_rec->r16b(10);
+	u16 av_end          = sys_rec->r16b(12);
+	u16 sys_tracks      = sys_rec->r16b(14);
+	u16 data_tracks     = sys_rec->r16b(16);
 
 	m_img_tracks = m_blockdev.block_count() / SECTORS;
 
@@ -1159,7 +1159,7 @@ std::vector<u8> hp98x5_impl::get_sector_range(lba_t first, unsigned size) const
 
 	for (lba_t idx = first; idx < first + size; idx++) {
 		auto data_sect = m_blockdev.get(u32(idx));
-		memcpy(ptr, data_sect.rodata(), SECTOR_SIZE);
+		data_sect->read(0, ptr, SECTOR_SIZE);
 		ptr += SECTOR_SIZE;
 	}
 	return res;
@@ -1173,7 +1173,7 @@ void hp98x5_impl::store_sector_range(lba_t first, const std::vector<u8>& data)
 	for (lba_t idx = first; idx < first + sects; idx++) {
 		u32 count = std::min<u32>(to_go, SECTOR_SIZE);
 		auto blk = m_blockdev.get(u32(idx));
-		blk.copy(0, ptr, count);
+		blk->write(0, ptr, count);
 		ptr += count;
 		to_go -= count;
 	}

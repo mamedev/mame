@@ -17,31 +17,55 @@ TODO:
 
 ===================================================================================================
 
-Popo Bear - BMC-A00211
-(c) 2000 - Bao Ma Technology Co., LTD
+Qi Wang (2010, Herb Home). English title is 'Chess King'
+Popo Bear (2000, Bao Ma Technology Co., LTD)
+Hardware Info by Guru
+---------------------
 
-|-----------------------------------------|
-| DIP2 DIP4  UM3567(YM2413)               |J
-| DIP1 DIP3                               |A
-|           TA-A-901                      |M
-| EN-A-701  EN-A-801  U6295(OKI)          |M
-| EN-A-501  EN-A-601                      |A
-| EN-A-301  EN-A-401                      |
-|                                         |C
-|                   AIA90610              |O
-|                   BMC-68pin  AIA90423   |N
-|                   plcc (68k) BMC-160pin |N
-|                                         |E
-|                                    OSC  |C
-|                                 42.000  |T
-|-----------------------------------------|
-
-1 - BMC AIA90423 - 160-Pin ASIC, FPGA, Video?
-1 - BMC AIA90610 - 68 Pin CPU (Likely 16 MHz, 68-lead plastic LCC 68000)
-1 - UM3567 (YM2413) Sound
-1 - U6295 (OKI6295) Sound
-1 - 42.000MHz XTAL
-4 - 8 Position DIP switches
+BMC-A00211
+|---------------------------------------------|
+| 42MHz TR5116258  241024 241024 T518 556  SC |
+|       TR5116258  241024 241024           SW |
+|                                 U10         |
+|  |--------| |-------|        6264     6264  |
+|  |  BMC   | |  BMC  |                       |
+|  |AIA90423| |AIA90610                       |
+|J |        | |       |       2         1     |
+|A |        | |-------|                       |
+|M |--------|              MJ-04.U4  A-3.U3   |
+|M                  PLCC44                    |
+|A                         MJ-68.U6  MJ-57.U5 |
+|                                             |
+|                             8         7     |
+| ULN2003                                     |
+|                          MJ-09.U9 DIP3  DIP1|
+|            7805   6295                      |
+| TDA2003    VOL    LM324  UM3567   DIP4  DIP2|
+|---------------------------------------------|
+Notes:
+      AIA90610 - Rebadged 68000 CPU. Clock 10.500MHz [42/4]
+      AIA90423 - BMC Custom Graphics Chip
+        UM3567 - Yamaha YM2413-compatible Sound Chip. Clock 3.500MHz [42/12]
+          6295 - Oki M6295 ADPCM Sample Player. Clock 1.000MHz [42/42]. Pin 7 HIGH.
+     TR5116258 - 256kB x16-bit DRAM, equivalent to HM514260 \
+        241024 - Winbond W241024 128kB x8-bit SRAM          / connected to graphics chip
+          6264 - 8kB x8-bit SRAM (68000 RAM). Both RAMs are tied to the Super Cap.
+        PLCC44 - 44 pin CPLD (surface scratched)
+       1,2,7,8 - Empty Sockets
+          T518 - Mitsumi PST518A Master Reset IC
+           556 - NE556 Dual Timer
+            SC - 5.5V 0.1F Super Capacitor
+            SW - Reset Switch / NVRAM Memory Clear
+           U10 - Unpopulated position for a 32Mbit/64Mbit TSOP48 Flash ROM (jumper-selectable)
+          ROMs - U5/U6 are 27C801 EPROM, other ROMs are 27C010.
+                 ROM U5 is unique to this set (only ROM fill change), other ROMs match existing qiwang dump.
+        DIP1-4 - 8-position DIP Switch
+       TDA2003 - ST TDA2003 10W Audio Amplifier
+         LM324 - LM324 Quad Op-Amp
+          7805 - LM7805 5V Linear Regulator
+       ULN2003 - 7-Channel Darlington Transistor Array
+       V-Sync 59.6377Hz
+       H-Sync 15.6248kHz
 
 JAMMA CONNECTOR
 Component Side   A   B   Solder Side
@@ -594,12 +618,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(popobear_state::scanline_cb)
 
 void popobear_state::popobear(machine_config &config)
 {
-	M68000(config, m_maincpu, XTAL(42'000'000) / 4);  // divisor guessed
+	M68000(config, m_maincpu, 42_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &popobear_state::main_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(popobear_state::scanline_cb), "screen", 0, 1);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
+	m_screen->set_refresh_hz(59.64);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	m_screen->set_screen_update(FUNC(popobear_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -612,9 +636,9 @@ void popobear_state::popobear(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_popobear);
 
-	YM2413(config, "ymsnd", XTAL(42'000'000) / 16).add_route(ALL_OUTPUTS, "mono", 1.0);  // divisor guessed
+	YM2413(config, "ymsnd", 42_MHz_XTAL / 12).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	OKIM6295(config, "oki", XTAL(42'000'000) / 32, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 1.0);  // divisor guessed
+	OKIM6295(config, "oki", 42_MHz_XTAL / 42, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 void popobear_state::qiwang(machine_config &config)
@@ -626,14 +650,14 @@ void popobear_state::qiwang(machine_config &config)
 
 ROM_START( popobear )
 	ROM_REGION( 0x040000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "popobear_en-a-301_1.6.u3", 0x000001, 0x020000, CRC(b934adf6) SHA1(93431c7a19af812b549aad35cc1176a81805ffab) )
 	ROM_LOAD16_BYTE( "popobear_en-a-401_1.6.u4", 0x000000, 0x020000, CRC(0568af9c) SHA1(920531dbc4bbde2d1db062bd5c48b97dd50b7185) )
+	ROM_LOAD16_BYTE( "popobear_en-a-301_1.6.u3", 0x000001, 0x020000, CRC(b934adf6) SHA1(93431c7a19af812b549aad35cc1176a81805ffab) )
 
 	ROM_REGION16_BE( 0x400000, "gfx_data", 0 )
-	ROM_LOAD16_BYTE( "popobear_en-a-501.u5",     0x000001, 0x100000, CRC(185901a9) SHA1(7ff82b5751645df53435eaa66edce589684cc5c7) )
 	ROM_LOAD16_BYTE( "popobear_en-a-601.u6",     0x000000, 0x100000, CRC(84fa9f3f) SHA1(34dd7873f88b0dae5fb81fe84e82d2b6b49f7332) )
-	ROM_LOAD16_BYTE( "popobear_en-a-701.u7",     0x200001, 0x100000, CRC(45eba6d0) SHA1(0278602ed57ac45040619d590e6cc85e2cfeed31) )
+	ROM_LOAD16_BYTE( "popobear_en-a-501.u5",     0x000001, 0x100000, CRC(185901a9) SHA1(7ff82b5751645df53435eaa66edce589684cc5c7) )
 	ROM_LOAD16_BYTE( "popobear_en-a-801.u8",     0x200000, 0x100000, CRC(2760f2e6) SHA1(58af59f486c9df930f7c124f89154f8f389a5bd7) )
+	ROM_LOAD16_BYTE( "popobear_en-a-701.u7",     0x200001, 0x100000, CRC(45eba6d0) SHA1(0278602ed57ac45040619d590e6cc85e2cfeed31) )
 
 	ROM_REGION( 0x040000, "oki", 0 )
 	ROM_LOAD( "popobear_ta-a-901.u9", 0x00000, 0x40000,  CRC(f1e94926) SHA1(f4d6f5b5811d90d0069f6efbb44d725ff0d07e1c) )
@@ -643,13 +667,13 @@ ROM_END
 // All labels have 棋王 prepended to what's below, with the exception of mj-57 which has a sticker 'BMC 棋王' on the upper part of the label
 ROM_START( qiwang )
 	ROM_REGION( 0x040000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "mj-03.u3", 0x000001, 0x020000, CRC(3cf3ff12) SHA1(dd4347b44a45822e7bfddffb0afadd65d398bea6) )
 	ROM_LOAD16_BYTE( "mj-04.u4", 0x000000, 0x020000, CRC(03a0d290) SHA1(d8fb1e6780d31ebf8cdc6ae14301d1f8c25380c6) )
+	ROM_LOAD16_BYTE( "mj-03.u3", 0x000001, 0x020000, CRC(3cf3ff12) SHA1(dd4347b44a45822e7bfddffb0afadd65d398bea6) )
 	// u1 and u2 not populated
 
 	ROM_REGION16_BE( 0x400000, "gfx_data", ROMREGION_ERASE00 )
-	ROM_LOAD16_BYTE( "mj-57.u5", 0x000001, 0x100000, CRC(50871b0c) SHA1(01279d844cae699eb76a90b8c4b3915ae538c12e) )
 	ROM_LOAD16_BYTE( "mj-68.u6", 0x000000, 0x100000, CRC(9692bb92) SHA1(6282054a41eda1b1fc1de5096bc2440a386d9f99) )
+	ROM_LOAD16_BYTE( "mj-57.u5", 0x000001, 0x100000, CRC(d442e579) SHA1(86d840ce9cd2623f13658f75336847f5df306531) )
 	// u7 and u8 not populated
 
 	ROM_REGION( 0x040000, "oki", 0 )

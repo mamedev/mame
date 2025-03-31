@@ -786,14 +786,14 @@ isis_impl::lba_list isis_impl::get_file_allocation(lba_t first_link, unsigned si
 		res.push_back(curr_map);
 		// Get a linkage block
 		auto map_sect = m_blockdev.get(curr_map);
-		auto prev_ptr = lba_from_2b(map_sect , 0);
-		auto next_ptr = lba_from_2b(map_sect , 2);
+		auto prev_ptr = lba_from_2b(*map_sect , 0);
+		auto next_ptr = lba_from_2b(*map_sect , 2);
 		if (prev_lba != prev_ptr) {
 			throw std::runtime_error(util::string_format("Incorrect backward linking in sector %d", curr_map));
 		}
 		// Scan all pointers in linkage block
 		for (u32 i = 4; i < SECTOR_SIZE; i += 2) {
-			auto ptr = lba_from_2b(map_sect , i);
+			auto ptr = lba_from_2b(*map_sect , i);
 			if (size > 0) {
 				if (ptr < 0) {
 					throw std::runtime_error(util::string_format("Unexpected end of pointer list in sector %d", curr_map));
@@ -839,7 +839,7 @@ std::vector<u8> isis_impl::get_file_content(const lba_list& sects, unsigned size
 		if ((idx % (PTRS_PER_BLOCK + 1)) != 0) {
 			unsigned to_copy = std::min(size, SECTOR_SIZE);
 			auto data_sect = m_blockdev.get(sects[ idx ]);
-			memcpy(res.data() + pos, data_sect.rodata(), to_copy);
+			data_sect->read(0, res.data() + pos, to_copy);
 			size -= to_copy;
 			pos += to_copy;
 		}
@@ -856,7 +856,7 @@ void isis_impl::store_file_content(const lba_list& sects, const std::vector<u8>&
 		lba_t link_lba = sects[ idx ];
 		auto blk = m_blockdev.get(link_lba);
 		// Pointer to previous block
-		lba_to_2b(prev_ptr, blk, 0);
+		lba_to_2b(prev_ptr, *blk, 0);
 		prev_ptr = link_lba;
 		lba_t next_ptr;
 		if (sects.size() - idx > (PTRS_PER_BLOCK + 1)) {
@@ -867,10 +867,10 @@ void isis_impl::store_file_content(const lba_list& sects, const std::vector<u8>&
 			next_ptr = -1;
 		}
 		// Pointer to next block
-		lba_to_2b(next_ptr, blk, 2);
+		lba_to_2b(next_ptr, *blk, 2);
 		// Pointers to data blocks
 		for (unsigned j = 0; j < PTRS_PER_BLOCK; j++) {
-			lba_to_2b((j + idx + 1 < sects.size()) ? sects[ j + idx + 1 ] : -1, blk, 4 + 2 * j);
+			lba_to_2b((j + idx + 1 < sects.size()) ? sects[ j + idx + 1 ] : -1, *blk, 4 + 2 * j);
 		}
 	}
 	// Write data blocks
@@ -883,7 +883,7 @@ void isis_impl::store_file_content(const lba_list& sects, const std::vector<u8>&
 		}
 		u32 count = std::min<u32>(to_go, SECTOR_SIZE);
 		auto blk = m_blockdev.get(sects[ idx ]);
-		blk.copy(0, ptr, count);
+		blk->write(0, ptr, count);
 		ptr += count;
 		to_go -= count;
 	}

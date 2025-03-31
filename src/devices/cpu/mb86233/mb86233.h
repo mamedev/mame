@@ -109,7 +109,6 @@ private:
 	static u32 get_exp(u32 val);
 	static u32 get_mant(u32 val);
 
-	void testdz();
 	void alu_update_st();
 	void alu_pre(u32 alu);
 	void alu_post(u32 alu);

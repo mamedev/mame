@@ -54,6 +54,10 @@ void konamigx_state::konamigx_precache_registers(void)
 	m_vmixon   = m_k055555->K055555_read_register(K55_VINMIX_ON);
 	m_osinmix  = m_k055555->K055555_read_register(K55_OSBLEND_ENABLES);
 	m_osmixon  = m_k055555->K055555_read_register(K55_OSBLEND_ON);
+
+	m_brightness[0] = u8(m_k054338->register_r(K338_REG_BRI3));
+	m_brightness[1] = u8(m_k054338->register_r(K338_REG_BRI3 + 1) >> 8);
+	m_brightness[2] = u8(m_k054338->register_r(K338_REG_BRI3 + 1));
 }
 
 inline int konamigx_state::K053247GX_combine_c18(int attrib) // (see p.46)
@@ -240,6 +244,22 @@ void konamigx_state::wipezbuf(int noshadow)
 		w <<= 1;
 		ecx = h;
 		do { memset(zptr, -1, w); zptr += (GX_ZBUFW<<1); } while (--ecx);
+	}
+}
+
+void konamigx_state::set_brightness(int layer)
+{
+	const u8 bri_mode = (m_k055555->K055555_read_register(K55_VBRI) >> layer * 2) & 0b11;
+
+	const u8 new_brightness = bri_mode ? m_brightness[bri_mode - 1] : 0xff;
+
+	if (m_current_brightness != new_brightness)
+	{
+		m_current_brightness = new_brightness;
+		for (int x = 0; x < m_palette->entries(); ++x)
+		{
+			m_palette->set_pen_contrast(x, m_current_brightness / 255.0);
+		}
 	}
 }
 
@@ -664,6 +684,8 @@ void konamigx_state::gx_draw_basic_tilemaps(screen_device &screen, bitmap_rgb32 
 	int disp = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
 	if (disp & (1<<code))
 	{
+		set_brightness(code);
+
 		if (j == GXMIX_BLEND_NONE)  { temp1 = 0xff; temp2 = temp3 = 0; } else
 		if (j == GXMIX_BLEND_FORCE) { temp1 = 0x00; temp2 = mixerflags>>(i+16); temp3 = 3; }
 		else
@@ -1135,6 +1157,8 @@ void konamigx_state::common_init()
 	save_item(NAME(m_vmixon));
 	save_item(NAME(m_osinmix));
 	save_item(NAME(m_osmixon));
+	save_item(NAME(m_current_brightness));
+	save_item(NAME(m_brightness));
 
 	m_gx_tilemode = 0;
 
