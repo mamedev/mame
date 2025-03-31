@@ -30,7 +30,6 @@
                 (compute_fmul_avg, shift operation 0x11, ALU operation 0x89 (compute_favg));
     - manxtt: no escape from "active motion slider" tutorial (needs analog inputs),
               bypass it by entering then exiting service mode;
-    - manxtt: no bikes are visible (not a z-sort issue!);
     - sgt24h: first turn in easy reverse course has ugly rendered mountain in background;
     - skytargt: really slow during gameplay (fixed?);
     - skytargt: short draw distance (might be down to z-sort);
