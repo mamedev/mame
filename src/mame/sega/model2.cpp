@@ -31,8 +31,6 @@
     - manxtt: no escape from "active motion slider" tutorial (needs analog inputs),
               bypass it by entering then exiting service mode;
     - manxtt: no bikes are visible (not a z-sort issue!);
-    - manxtt: course select island map doesn't rotate properly:
-              timing issue, i960 sends read/write geo addresses to bufferram 0x918000/4 which TGP never reads in time.
     - sgt24h: first turn in easy reverse course has ugly rendered mountain in background;
     - skytargt: really slow during gameplay (fixed?);
     - skytargt: short draw distance (might be down to z-sort);
@@ -610,6 +608,9 @@ void model2_tgp_state::copro_fifo_w(u32 data)
 	}
 	else
 		m_copro_fifo_in->push(u32(data));
+
+	// 1 wait state for i960; prevents Manx TT course select rotation bug
+	m_maincpu->spin_until_time(attotime::from_nsec(40));
 }
 
 
@@ -2509,12 +2510,12 @@ void model2_state::model2_scsp(machine_config &config)
 /* original Model 2 */
 void model2o_state::model2o(machine_config &config)
 {
-	I960(config, m_maincpu, 25000000);
+	I960(config, m_maincpu, 50_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &model2o_state::model2o_mem);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(model2_state::model2_interrupt), "screen", 0, 1);
 
-	MB86234(config, m_copro_tgp, 16000000);
+	MB86234(config, m_copro_tgp, 50_MHz_XTAL / 3);
 	m_copro_tgp->set_addrmap(AS_PROGRAM, &model2o_state::copro_tgp_prog_map);
 	m_copro_tgp->set_addrmap(AS_DATA, &model2o_state::copro_tgp_data_map);
 	m_copro_tgp->set_addrmap(AS_IO, &model2o_state::copro_tgp_io_map);
@@ -2660,11 +2661,11 @@ void model2o_state::vcop(machine_config &config)
 /* 2A-CRX */
 void model2a_state::model2a(machine_config &config)
 {
-	I960(config, m_maincpu, 25000000);
+	I960(config, m_maincpu, 50_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &model2a_state::model2a_crx_mem);
 	TIMER(config, "scantimer").configure_scanline(FUNC(model2_state::model2_interrupt), "screen", 0, 1);
 
-	MB86234(config, m_copro_tgp, 16000000);
+	MB86234(config, m_copro_tgp, 50_MHz_XTAL / 3);
 	m_copro_tgp->set_addrmap(AS_PROGRAM, &model2a_state::copro_tgp_prog_map);
 	m_copro_tgp->set_addrmap(AS_DATA, &model2a_state::copro_tgp_data_map);
 	m_copro_tgp->set_addrmap(AS_IO, &model2a_state::copro_tgp_io_map);
@@ -2780,7 +2781,7 @@ void model2a_state::zeroguna(machine_config &config)
 /* 2B-CRX */
 void model2b_state::model2b(machine_config &config)
 {
-	I960(config, m_maincpu, 25000000);
+	I960(config, m_maincpu, 50_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &model2b_state::model2b_crx_mem);
 
 	TIMER(config, "scantimer", 0).configure_scanline(FUNC(model2_state::model2_interrupt), "screen", 0, 1);
@@ -2935,7 +2936,7 @@ void model2b_state::zerogun(machine_config &config)
 /* 2C-CRX */
 void model2c_state::model2c(machine_config &config)
 {
-	I960(config, m_maincpu, 25000000);
+	I960(config, m_maincpu, 50_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &model2c_state::model2c_crx_mem);
 	TIMER(config, "scantimer").configure_scanline(FUNC(model2c_state::model2c_interrupt), "screen", 0, 1);
 
