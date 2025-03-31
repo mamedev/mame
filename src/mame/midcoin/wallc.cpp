@@ -633,6 +633,9 @@ ROM_START( wallca )
 	ROM_LOAD( "74s288.c2",  0x0000, 0x0020, CRC(83e3e293) SHA1(a98c5e63b688de8d175adb6539e0cdc668f313fd) )
 ROM_END
 
+/* This set can also be found with two program ROMs sized 0x2000 each, with the following hashes:
+     - CRC(aced127e) SHA1(516e1d4977816b1d43955850c30a5d0563a4fbcb)
+     - CRC(b789a705) SHA1(2b62b14d1a3ad5eff5b8d502d7891e58379ee820) // Same as rom5.rom on Wall Crash (set 2) */
 ROM_START( brkblast )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "fadesa-r0.6m", 0x0000, 0x4000, CRC(4e96ca15) SHA1(87f1a3538712aa3d6c3713b845679dd42a4ba5a4) )
