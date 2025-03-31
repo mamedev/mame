@@ -5,16 +5,15 @@ license:CC0-1.0
 -->
 
 <softwarelist name="apple2_cass" description="Apple II cassettes">
+	<!-- To enter BASIC after powering on:
+	AppleII : Type Ctrl-B (nothing shows) and press <Enter>
+	AppleIIe : Press Ctrl-F12
 
-	<!-- To enter Basic after powering on:
-AppleII : Type Ctrl-B (nothing shows) and press <Enter>
-AppleIIe : Press Ctrl-F12
-
-To load and run a tape:
-1. Set up the machine for the type of tape: Monitor "*", Integer BASIC ">", or Applesoft BASIC "]".
-2. Enter the address information or type LOAD for BASIC programs but do not press <Return>.
-3. Play the tape, wait for the leader sound then press <Return>.
-4. Enter the address information or type RUN for BASIC programs and press <Return> to run the program. -->
+	To load and run a tape:
+	1. Set up the machine for the type of tape: Monitor "*", Integer BASIC ">", or Applesoft BASIC "]".
+	2. Enter the address information or type LOAD for BASIC programs but do not press <Return>.
+	3. Play the tape, wait for the leader sound then press <Return>.
+	4. Enter the address information or type RUN for BASIC programs and press <Return> to run the program. -->
 
 	<software name="3dartgra">
 		<description>3D Art Graphics</description>

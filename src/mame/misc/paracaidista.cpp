@@ -59,13 +59,13 @@ namespace {
 class paracaidista_state : public driver_device
 {
 public:
-	paracaidista_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_ppi8155(*this, "i8155"),
-			m_screen(*this, "screen"),
-			m_palette(*this, "palette"),
-			m_vram(*this, "vram")
+	paracaidista_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_ppi8155(*this, "i8155"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
+		m_vram(*this, "vram")
 
 	{ }
 
@@ -95,24 +95,17 @@ private:
 
 uint32_t paracaidista_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	constexpr int SCREEN_HEIGHT = 208;
-	constexpr int SCREEN_WIDTH = 224;
-	constexpr int BITS_PER_BYTE = 8;
-
-	for (int y = 0; y < SCREEN_HEIGHT; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		const int y_offset = y << 5;  // pre-calculate row offset (y * 32)
-
-		for (int x = 0; x < SCREEN_WIDTH; x++)
+		auto const *const src = &m_vram[y << 5];
+		auto *const dst = &bitmap.pix(y);
+		for (int x = cliprect.left() / 8; x <= (cliprect.right() / 8); x++)
 		{
-			const u8 pixel_data = m_vram[y_offset | x];  // combine with x offset
+			const u8 pixel_data = src[x];
         
 			// unpack 8 pixels from the byte
-			for (int bit = 0; bit < BITS_PER_BYTE; bit++)
-			{
-				const int screen_x = (x << 3) | (7 - bit);  // x*8 + reversed bit order
-				bitmap.pix(y, screen_x) = (pixel_data >> bit) & 1;
-			}
+			for (int bit = 0; bit < 8; bit++)
+				dst[(x << 3) | bit] = BIT(pixel_data, bit ^ 7);
 		}
 	}
 	return 0;
@@ -261,7 +254,7 @@ ROM_START( paraca )
 ROM_END
 
 
-} // Anonymous namespace
+} // anonymous namespace
 
 
 /*********************************************
