@@ -59,8 +59,9 @@ void mystwarr_state::decode_tiles()
 // Mystic Warriors requires tile based blending.
 K056832_CB_MEMBER(mystwarr_state::mystwarr_tile_callback)
 {
-	const u8 mix_code = attr >> 2 & 0b11;
-	if (mix_code) {
+	const uint8_t mix_code = attr >> 2 & 0b11;
+	if (mix_code)
+	{
 		*priority = 1;
 		m_last_alpha_tile_mix_code = mix_code;
 	}
@@ -71,8 +72,9 @@ K056832_CB_MEMBER(mystwarr_state::mystwarr_tile_callback)
 K056832_CB_MEMBER(mystwarr_state::viostorm_tile_callback)
 {
 	// metamrph either uses bits 0-1 or 4-5, not sure which
-	const u8 mix_code = attr & 0b11;
-	if (mix_code) {
+	const uint8_t mix_code = attr & 0b11;
+	if (mix_code)
+	{
 		*priority = 1;
 		m_last_alpha_tile_mix_code = mix_code;
 	}

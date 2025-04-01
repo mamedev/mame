@@ -55,9 +55,9 @@ void konamigx_state::konamigx_precache_registers(void)
 	m_osinmix  = m_k055555->K055555_read_register(K55_OSBLEND_ENABLES);
 	m_osmixon  = m_k055555->K055555_read_register(K55_OSBLEND_ON);
 
-	m_brightness[0] = u8(m_k054338->register_r(K338_REG_BRI3));
-	m_brightness[1] = u8(m_k054338->register_r(K338_REG_BRI3 + 1) >> 8);
-	m_brightness[2] = u8(m_k054338->register_r(K338_REG_BRI3 + 1));
+	m_brightness[0] = uint8_t(m_k054338->register_r(K338_REG_BRI3));
+	m_brightness[1] = uint8_t(m_k054338->register_r(K338_REG_BRI3 + 1) >> 8);
+	m_brightness[2] = uint8_t(m_k054338->register_r(K338_REG_BRI3 + 1));
 }
 
 inline int konamigx_state::K053247GX_combine_c18(int attrib) // (see p.46)
@@ -249,9 +249,9 @@ void konamigx_state::wipezbuf(int noshadow)
 
 void konamigx_state::set_brightness(int layer)
 {
-	const u8 bri_mode = (m_k055555->K055555_read_register(K55_VBRI) >> layer * 2) & 0b11;
+	const uint8_t bri_mode = (m_k055555->K055555_read_register(K55_VBRI) >> layer * 2) & 0b11;
 
-	const u8 new_brightness = bri_mode ? m_brightness[bri_mode - 1] : 0xff;
+	const uint8_t new_brightness = bri_mode ? m_brightness[bri_mode - 1] : 0xff;
 
 	if (m_current_brightness != new_brightness)
 	{
@@ -351,9 +351,9 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 		m_k054338->fill_solid_bg(bitmap, cliprect);
 
 	// abort if video has been disabled
-	const u8 disp = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
+	const uint8_t disp = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
 	if (!disp) return;
-	u16 cltc_shdpri = m_k054338->register_r(K338_REG_CONTROL);
+	uint16_t cltc_shdpri = m_k054338->register_r(K338_REG_CONTROL);
 
 
 	if (!rushingheroes_hack) // Slam Dunk 2 never sets this.  It's either part of the protection, or type4 doesn't use it
@@ -375,13 +375,13 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 	konamigx_precache_registers();
 
 	// init OBJSET2 and mixer parameters (see p.51 and chapter 7)
-	u8 layerid[6] = {0, 1, 2, 3, 4, 5};
+	uint8_t layerid[6] = {0, 1, 2, 3, 4, 5};
 
 
 	// invert layer priority when this flag is set (not used by any GX game?)
 	//prflp = K055555_read_register(K55_CONTROL) & K55_CTL_FLIPPRI;
 
-	u8 layerpri[6];
+	uint8_t layerpri[6];
 	layerpri[0] = m_k055555->K055555_read_register(K55_PRIINP_0);
 	layerpri[1] = m_k055555->K055555_read_register(K55_PRIINP_3);
 	layerpri[3] = m_k055555->K055555_read_register(K55_PRIINP_7);
@@ -408,7 +408,7 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 	if (!(shdprisel & 0x0c)) shadowon[1] = 0;
 	if (!(shdprisel & 0x30)) shadowon[2] = 0;
 
-	u8 shdpri[3];
+	uint8_t shdpri[3];
 	shdpri[0]   = m_k055555->K055555_read_register(K55_SHAD1_PRI);
 	shdpri[1]   = m_k055555->K055555_read_register(K55_SHAD2_PRI);
 	shdpri[2]   = m_k055555->K055555_read_register(K55_SHAD3_PRI);
@@ -457,7 +457,7 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 	{
 		int offs;
 
-		const u8 code = layerid[i];
+		const uint8_t code = layerid[i];
 		switch (code)
 		{
 			/*
@@ -484,22 +484,22 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 
 		if (offs != -128)
 		{
-			const u32 order = layerpri[i] << 24;
+			const uint32_t order = layerpri[i] << 24;
 			const int color = 0;
 			objpool.push_back(GX_OBJ{order, offs, code, color});
 		}
 	}
 
-	const u32 start_addr = m_type3_spriteram_bank ? 0x800 : 0;
+	const uint32_t start_addr = m_type3_spriteram_bank ? 0x800 : 0;
 
 	for (int x = 0; x < 256; ++x)
 	{
-		const u16 offs = start_addr + x * 8;
+		const uint16_t offs = start_addr + x * 8;
 		int pri = 0;
 
 		if (!(m_gx_spriteram[offs] & 0x8000)) continue;
 
-		u8 zcode = m_gx_spriteram[offs] & 0xff;
+		uint8_t zcode = m_gx_spriteram[offs] & 0xff;
 
 		// invert z-order when opset_pri is set (see p.51 OPSET PRI)
 		if (m_k053247_opset & 0x10) zcode = 0xff - zcode;
@@ -510,12 +510,12 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 
 		m_k055673->m_k053247_cb(&code, &color, &pri);
 
-		u8 shadow_draw_mode = 0; // shadow pens draw mode (4-5)
-		bool add_shadow = 0;     // add shadow object
-		u8 solid_draw_mode = 0;  // solid pens draw mode (0-3)
-		bool add_solid = 0;      // add solid object
-		u8 spri = 0;             // shadow priority
-		u8 shadow = 0;           // shadow code
+		uint8_t shadow_draw_mode = 0; // shadow pens draw mode (4-5)
+		bool add_shadow = 0;          // add shadow object
+		uint8_t solid_draw_mode = 0;  // solid pens draw mode (0-3)
+		bool add_solid = 0;           // add solid object
+		uint8_t spri = 0;             // shadow priority
+		uint8_t shadow = 0;           // shadow code
 
 		if (color & K055555_FULLSHADOW)
 		{
@@ -599,14 +599,14 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 		if (add_solid)
 		{
 			// add objects with solid or alpha pens
-			u32 order = pri<<24 | zcode<<16 | offs<<(8-3) | solid_draw_mode<<4;
+			uint32_t order = pri<<24 | zcode<<16 | offs<<(8-3) | solid_draw_mode<<4;
 			objpool.push_back(GX_OBJ{order, offs, code, color});
 		}
 
 		if (add_shadow && !(color & K055555_SKIPSHADOW) && !(mixerflags & GXMIX_NOSHADOW))
 		{
 			// add objects with shadows if enabled
-			u32 order = spri<<24 | zcode<<16 | offs<<(8-3) | shadow_draw_mode<<4 | shadow;
+			uint32_t order = spri<<24 | zcode<<16 | offs<<(8-3) | shadow_draw_mode<<4 | shadow;
 			objpool.push_back(GX_OBJ{ order, offs, code, color});
 		}
 	}
@@ -633,14 +633,14 @@ void konamigx_state::konamigx_mixer_draw(screen_device &screen, bitmap_rgb32 &bi
 					)
 {
 	// traverse draw list
-	const u8 disp = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
+	const uint8_t disp = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
 
 	for (int count=0; count<objpool.size(); count++)
 	{
-		const u32 order = objpool[count].order;
-		const int offs  = objpool[count].offs;
-		const int code  = objpool[count].code;
-		int color       = objpool[count].color;
+		const uint32_t order = objpool[count].order;
+		const int offs = objpool[count].offs;
+		const int code = objpool[count].code;
+		int color = objpool[count].color;
 
 		/* entries >=0 in our list are sprites */
 		if (offs >= 0)
@@ -698,27 +698,27 @@ void konamigx_state::konamigx_mixer_draw(screen_device &screen, bitmap_rgb32 &bi
 	}
 }
 
-void konamigx_state::gx_draw_basic_tilemaps(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, u8 layer)
+void konamigx_state::gx_draw_basic_tilemaps(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, uint8_t layer)
 {
-	const u8 disp = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
+	const uint8_t disp = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
 
 	if (disp & (1 << layer))
 	{
 		set_brightness(layer);
 
-		const u8 layer2 = layer << 1;
-		const u8 j = mixerflags >> layer2 & 0b11;
+		const uint8_t layer2 = layer << 1;
+		const uint8_t j = mixerflags >> layer2 & 0b11;
 
 		// keep internal and external mix codes separated, so the external mix code can be applied to category 1 tiles
-		u8 mix_mode_internal = 0;
-		u8 mix_mode_external = 0;
+		uint8_t mix_mode_internal = 0;
+		uint8_t mix_mode_external = 0;
 
 		if (j == GXMIX_BLEND_FORCE) mix_mode_internal = mixerflags >> (layer2 + 16) & 0b11; // hack
 		else
 		{
-			const u8 v_inmix_on_layer = m_vmixon >> layer2 & 0b11;
-			const u8 v_inmix_layer = m_vinmix >> layer2 & 0b11;
-			const u8 tile_mix_code = u32(mixerflags) >> 30;
+			const uint8_t v_inmix_on_layer = m_vmixon >> layer2 & 0b11;
+			const uint8_t v_inmix_layer = m_vinmix >> layer2 & 0b11;
+			const uint8_t tile_mix_code = uint32_t(mixerflags) >> 30;
 
 			mix_mode_internal = v_inmix_layer & v_inmix_on_layer;
 			mix_mode_external = tile_mix_code & ~v_inmix_on_layer;
@@ -787,7 +787,7 @@ void konamigx_state::gx_draw_basic_extended_tilemaps_1(screen_device &screen, bi
 
 		if (temp1!=0xff && temp2 /*&& temp3==3*/)
 		{
-			alpha = temp4 = m_k054338->set_alpha_level(temp2) & 0xFF;
+			alpha = temp4 = m_k054338->set_alpha_level(temp2) & 0xff;
 
 			if (temp4 <= 0) return;
 			if (temp4 < 255) k = 1;
@@ -835,7 +835,7 @@ void konamigx_state::gx_draw_basic_extended_tilemaps_2(screen_device &screen, bi
 		if (temp1!=0xff && temp2 /*&& temp3==3*/)
 		{
 			//alpha =
-			temp4 = m_k054338->set_alpha_level(temp2) & 0xFF;
+			temp4 = m_k054338->set_alpha_level(temp2) & 0xff;
 
 			if (temp4 <= 0) return;
 			//if (temp4 < 255) k = 1;
@@ -1049,7 +1049,7 @@ K056832_CB_MEMBER(konamigx_state::type2_tile_callback)
 
 K056832_CB_MEMBER(konamigx_state::salmndr2_tile_callback)
 {
-	const u8 mix_code = attr >> 4 & 0b11;
+	const uint8_t mix_code = attr >> 4 & 0b11;
 	if (mix_code) {
 		*priority = 1;
 		m_last_alpha_tile_mix_code = mix_code;
@@ -1063,7 +1063,7 @@ K056832_CB_MEMBER(konamigx_state::salmndr2_tile_callback)
 
 K056832_CB_MEMBER(konamigx_state::alpha_tile_callback)
 {
-	const u8 mix_code = attr >> 6 & 0b11;
+	const uint8_t mix_code = attr >> 6 & 0b11;
 	if (mix_code) {
 		*priority = 1;
 		m_last_alpha_tile_mix_code = mix_code;
