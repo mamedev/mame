@@ -21,7 +21,7 @@ public:
 	// sound stream. Otherwise, the value set with `set_fixed_cv` will be used.
 	va_vca_device &configure_streaming_cv(bool use_streaming_cv);
 
-	// By default, the CV will be treated as a typical gain (output = gain * input)
+	// By default, the CV will be treated as a typical gain (output = cv * input)
 	// The configure_*() functions below might change this.
 
 	// CEM3360 (or AS3360) VCA in linear CV configuration: CV connected to pin
