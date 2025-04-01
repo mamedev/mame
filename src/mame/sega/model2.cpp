@@ -2514,7 +2514,7 @@ void model2o_state::model2o(machine_config &config)
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(model2_state::model2_interrupt), "screen", 0, 1);
 
-	MB86234(config, m_copro_tgp, 50_MHz_XTAL / 3);
+	MB86234(config, m_copro_tgp, 50_MHz_XTAL);
 	m_copro_tgp->set_addrmap(AS_PROGRAM, &model2o_state::copro_tgp_prog_map);
 	m_copro_tgp->set_addrmap(AS_DATA, &model2o_state::copro_tgp_data_map);
 	m_copro_tgp->set_addrmap(AS_IO, &model2o_state::copro_tgp_io_map);
@@ -2664,7 +2664,7 @@ void model2a_state::model2a(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &model2a_state::model2a_crx_mem);
 	TIMER(config, "scantimer").configure_scanline(FUNC(model2_state::model2_interrupt), "screen", 0, 1);
 
-	MB86234(config, m_copro_tgp, 50_MHz_XTAL / 3);
+	MB86234(config, m_copro_tgp, 50_MHz_XTAL);
 	m_copro_tgp->set_addrmap(AS_PROGRAM, &model2a_state::copro_tgp_prog_map);
 	m_copro_tgp->set_addrmap(AS_DATA, &model2a_state::copro_tgp_data_map);
 	m_copro_tgp->set_addrmap(AS_IO, &model2a_state::copro_tgp_io_map);
