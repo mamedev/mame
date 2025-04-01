@@ -51,11 +51,10 @@ private:
 	int m_roz_rombank = 0;
 	tilemap_t *m_ult_936_tilemap = nullptr;
 	uint16_t m_clip = 0;
+	uint8_t m_last_alpha_tile_mix_code = 0;
 
 	uint8_t m_sound_ctrl = 0;
 	uint8_t m_sound_nmi_clk = 0;
-
-	uint8_t m_last_alpha_tile_mix_code = 0;
 
 	uint16_t eeprom_r(offs_t offset, uint16_t mem_mask = ~0);
 	void mweeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);

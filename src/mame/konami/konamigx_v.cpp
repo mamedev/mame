@@ -20,8 +20,8 @@ static inline void set_color_555(palette_device &palette, pen_t color, int rshif
 void konamigx_state::konamigx_precache_registers(void)
 {
 	// (see sprite color coding scheme on p.46 & 47)
-	static const int coregmasks[5] = {0xf,0xe,0xc,0x8,0x0};
-	static const int coregshifts[5]= {4,5,6,7,8};
+	static const int coregmasks[5] = { 0xf, 0xe, 0xc, 0x8, 0x0 };
+	static const int coregshifts[5]= { 4, 5, 6, 7, 8 };
 	int i;
 
 	i = m_k055673->k053247_read_register(0x8/2);
@@ -36,7 +36,7 @@ void konamigx_state::konamigx_precache_registers(void)
 
 	i = m_k053247_opset & 7; if (i > 4) i = 4;
 
-	m_k053247_coreg = m_k055673->k053247_read_register(0xc/2)>>8 & 0xf;
+	m_k053247_coreg = m_k055673->k053247_read_register(0xc/2) >> 8 & 0xf;
 	m_k053247_coreg =(m_k053247_coreg & coregmasks[i]) << 12;
 
 	m_k053247_coregshift = coregshifts[i];
@@ -64,10 +64,10 @@ inline int konamigx_state::K053247GX_combine_c18(int attrib) // (see p.46)
 {
 	int c18;
 
-	c18 = (attrib & 0xff)<<m_k053247_coregshift | m_k053247_coreg;
+	c18 = (attrib & 0xff) << m_k053247_coregshift | m_k053247_coreg;
 
 	if (m_gx_wrport2 & 4) c18 &= 0x3fff; else
-	if (!(m_gx_wrport2 & 8)) c18 = (c18 & 0x3fff) | (attrib<<6 & 0xc000);
+	if (!(m_gx_wrport2 & 8)) c18 = (c18 & 0x3fff) | (attrib << 6 & 0xc000);
 
 	return(c18);
 }
@@ -76,12 +76,12 @@ inline int konamigx_state::K055555GX_decode_objcolor(int c18) // (see p.59 7.2.2
 {
 	int ocb, opon;
 
-	opon  = m_oinprion<<8 | 0xff;
+	opon  = m_oinprion << 8 | 0xff;
 	ocb   = (m_ocblk & 7) << 10;
 	c18  &= opon;
 	ocb  &=~opon;
 
-	return((ocb | c18) >> m_k053247_coregshift);
+	return (ocb | c18) >> m_k053247_coregshift;
 }
 
 inline int konamigx_state::K055555GX_decode_inpri(int c18) // (see p.59 7.2.2)
@@ -92,7 +92,7 @@ inline int konamigx_state::K055555GX_decode_inpri(int c18) // (see p.59 7.2.2)
 	op   &= m_oinprion;
 	c18  &=~m_oinprion;
 
-	return(c18 | op);
+	return c18 | op;
 }
 
 K055673_CB_MEMBER(konamigx_state::type2_sprite_callback)
@@ -100,7 +100,7 @@ K055673_CB_MEMBER(konamigx_state::type2_sprite_callback)
 	int num = *code;
 	int c18 = *color;
 
-	*code = m_k053247_vrcbk[num>>14] | (num & 0x3fff);
+	*code = m_k053247_vrcbk[num >> 14] | (num & 0x3fff);
 	c18 = K053247GX_combine_c18(c18);
 	*color = K055555GX_decode_objcolor(c18);
 	*priority_mask = K055555GX_decode_inpri(c18);
@@ -111,11 +111,11 @@ K055673_CB_MEMBER(konamigx_state::dragoonj_sprite_callback)
 	int num, op, pri, c18;
 
 	num = *code;
-	*code = m_k053247_vrcbk[num>>14] | (num & 0x3fff);
+	*code = m_k053247_vrcbk[num >> 14] | (num & 0x3fff);
 
 	c18  = pri = *color;
 	op   = m_opri;
-	pri  = (pri & 0x200) ? 4 : pri>>4 & 0xf;
+	pri  = (pri & 0x200) ? 4 : pri >> 4 & 0xf;
 	op  &= m_oinprion;
 	pri &=~m_oinprion;
 	*priority_mask = pri | op;
@@ -129,11 +129,11 @@ K055673_CB_MEMBER(konamigx_state::salmndr2_sprite_callback)
 	int num, op, pri, c18;
 
 	num = *code;
-	*code = m_k053247_vrcbk[num>>14] | (num & 0x3fff);
+	*code = m_k053247_vrcbk[num >> 14] | (num & 0x3fff);
 
 	c18  = pri = *color;
 	op   = m_opri;
-	pri  = pri>>4 & 0x3f;
+	pri  = pri >> 4 & 0x3f;
 	op  &= m_oinprion;
 	pri &=~m_oinprion;
 	*priority_mask = pri | op;
@@ -147,7 +147,7 @@ K055673_CB_MEMBER(konamigx_state::le2_sprite_callback)
 	int num, op, pri;
 
 	num = *code;
-	*code = m_k053247_vrcbk[num>>14] | (num & 0x3fff);
+	*code = m_k053247_vrcbk[num >> 14] | (num & 0x3fff);
 
 	pri = *color;
 	*color &= 0x1f;
@@ -163,12 +163,12 @@ int konamigx_state::K055555GX_decode_vmixcolor(int layer, int *color) // (see p.
 {
 	int vcb, shift, pal, vmx, von, pl45, emx;
 
-	vcb    =  m_vcblk[layer]<<6;
-	shift  =  layer<<1;
+	vcb    =  m_vcblk[layer] << 6;
+	shift  =  layer << 1;
 	pal    =  *color;
-	vmx    =  m_vinmix>>shift & 3;
-	von    =  m_vmixon>>shift & 3;
-	emx    =  pl45 = pal>>4 & 3;
+	vmx    =  m_vinmix >> shift & 3;
+	von    =  m_vmixon >> shift & 3;
+	emx    =  pl45 = pal >> 4 & 3;
 	pal   &=  0xf;
 	pl45  &=  von;
 	vmx   &=  von;
@@ -179,29 +179,29 @@ int konamigx_state::K055555GX_decode_vmixcolor(int layer, int *color) // (see p.
 	pal   |=  vcb;
 
 	//if (m_gx_le2_textcolour_hack)
-	//  if (layer==0)
+	//  if (layer == 0)
 	//      pal |= 0x1c0;
 
 	if (von == 3) emx = -1; // invalidate external mix code if all bits are from internal
 	*color =  pal;
 
-	return(emx);
+	return emx;
 }
 
 int konamigx_state::K055555GX_decode_osmixcolor(int layer, int *color) // (see p.63, p.49-50 and p.27 3.3)
 {
 	int scb, shift, pal, osmx, oson, pl45, emx;
 
-	shift  =  layer<<1;
+	shift  =  layer << 1;
 	pal    =  *color;
-	osmx   =  m_osinmix>>shift & 3;
-	oson   =  m_osmixon>>shift & 3;
+	osmx   =  m_osinmix >> shift & 3;
+	oson   =  m_osmixon >> shift & 3;
 
 	if (layer)
 	{
 		// layer 1-3 are external tile layers
-		scb    =  m_vcblk[layer+3]<<6;
-		emx    =  pl45 = pal>>4 & 3;
+		scb    =  m_vcblk[layer + 3] << 6;
+		emx    =  pl45 = pal >> 4 & 3;
 		pal   &=  0xf;
 		pl45  &=  oson;
 		osmx  &=  oson;
@@ -217,7 +217,7 @@ int konamigx_state::K055555GX_decode_osmixcolor(int layer, int *color) // (see p
 	else
 	{
 		// layer 0 is the sprite layer with different attributes decode; detail on p.49 (missing)
-		emx   = 0; // k053247_read_register(??)>>? & 3;
+		emx   = 0; // k053247_read_register(??) >> ? & 3;
 		osmx &= oson;
 		emx  &=~oson;
 		emx  |= osmx;
@@ -243,14 +243,13 @@ void konamigx_state::wipezbuf(int noshadow)
 		zptr = m_gx_shdzbuf.get();
 		w <<= 1;
 		ecx = h;
-		do { memset(zptr, -1, w); zptr += (GX_ZBUFW<<1); } while (--ecx);
+		do { memset(zptr, -1, w); zptr += (GX_ZBUFW << 1); } while (--ecx);
 	}
 }
 
 void konamigx_state::set_brightness(int layer)
 {
 	const uint8_t bri_mode = (m_k055555->K055555_read_register(K55_VBRI) >> layer * 2) & 0b11;
-
 	const uint8_t new_brightness = bri_mode ? m_brightness[bri_mode - 1] : 0xff;
 
 	if (m_current_brightness != new_brightness)
@@ -314,7 +313,7 @@ void konamigx_state::konamigx_mixer_init(screen_device &screen, int objdma)
 	else
 		m_k055673->k053247_get_ram(&m_gx_spriteram);
 
-	m_palette->set_shadow_dRGB32(3,-80,-80,-80, 0);
+	m_palette->set_shadow_dRGB32(3, -80, -80, -80, 0);
 	m_k054338->invert_alpha(1);
 }
 
@@ -336,8 +335,6 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 					tilemap_t *sub2, int sub2flags,
 					int mixerflags, bitmap_ind16 *extra_bitmap, int rushingheroes_hack)
 {
-	// int prflp;
-
 	// buffer can move when it's resized, so refresh the pointer
 	m_gx_objzbuf = &screen.priority().pix(0);
 
@@ -355,12 +352,11 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 	if (!disp) return;
 	uint16_t cltc_shdpri = m_k054338->register_r(K338_REG_CONTROL);
 
-
-	if (!rushingheroes_hack) // Slam Dunk 2 never sets this.  It's either part of the protection, or type4 doesn't use it
+	// Slam Dunk 2 never sets this.  It's either part of the protection, or type4 doesn't use it
+	if (!rushingheroes_hack)
 	{
 		if (!(cltc_shdpri & K338_CTL_KILL)) return;
 	}
-
 
 	// demote shadows by one layer when this bit is set??? (see p.73 8.6)
 	cltc_shdpri &= K338_CTL_SHDPRI;
@@ -375,11 +371,10 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 	konamigx_precache_registers();
 
 	// init OBJSET2 and mixer parameters (see p.51 and chapter 7)
-	uint8_t layerid[6] = {0, 1, 2, 3, 4, 5};
-
+	uint8_t layerid[6] = { 0, 1, 2, 3, 4, 5 };
 
 	// invert layer priority when this flag is set (not used by any GX game?)
-	//prflp = K055555_read_register(K55_CONTROL) & K55_CTL_FLIPPRI;
+	//int prflp = K055555_read_register(K55_CONTROL) & K55_CTL_FLIPPRI;
 
 	uint8_t layerpri[6];
 	layerpri[0] = m_k055555->K055555_read_register(K55_PRIINP_0);
@@ -420,9 +415,8 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 	int k = 0;
 	if (!(mixerflags & GXMIX_NOSHADOW))
 	{
-		int i,j;
 		// only enable shadows beyond a +/-7 RGB threshold
-		for (j=0,i=0; i<3; j+=3,i++)
+		for (int j = 0, i = 0; i < 3; j += 3, i++)
 		{
 			k = m_K054338_shdRGB[j  ]; if (k < -7 || k > 7) { shadowon[i] = 1; continue; }
 			k = m_K054338_shdRGB[j+1]; if (k < -7 || k > 7) { shadowon[i] = 1; continue; }
@@ -431,16 +425,16 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 
 		// SHDON specifies layers on which shadows can be projected (see detail on p.65 7.2.8)
 		int temp = m_k055555->K055555_read_register(K55_SHD_ON);
-		for (i=0; i<4; i++) if (!(temp>>i & 1) && spri_min < layerpri[i]) spri_min = layerpri[i]; // HACK
+		for (int i = 0; i < 4; i++) if (!BIT(temp, i) && spri_min < layerpri[i]) spri_min = layerpri[i]; // HACK
 
 		// update shadows status
 		m_k054338->update_all_shadows(rushingheroes_hack, *m_palette);
 	}
 
 	// pre-sort layers
-	for (int j=0; j<5; j++)
+	for (int j = 0; j < 5; j++)
 	{
-		for (int i=j+1; i<6; i++)
+		for (int i = j + 1; i < 6; i++)
 		{
 			if (layerpri[j] <= layerpri[i])
 			{
@@ -453,7 +447,7 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 	// build object database and create indices
 	std::vector<GX_OBJ> objpool; // max size: 6 layers + 256 sprites + 256 shadows
 
-	for (int i=5; i>=0; i--)
+	for (int i = 5; i >= 0; i--)
 	{
 		int offs;
 
@@ -470,11 +464,11 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 			    -4 : K053250 LVC layer 1
 			    -5 : K053250 LVC layer 2
 			*/
-			case 4 :
+			case 4:
 				offs = -128;
 				if (sub1flags & 0xf) { if (sub1flags & GXSUB_K053250) offs = -4; else if (sub1) offs = -2; }
 			break;
-			case 5 :
+			case 5:
 				offs = -128;
 				if (sub2flags & 0xf) { if (sub2flags & GXSUB_K053250) offs = -5; else if (sub2) offs = -3; }
 				if (extra_bitmap) offs = -3;
@@ -526,7 +520,7 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 		}
 		else
 		{
-			shadow = k>>10 & 3;
+			shadow = k >> 10 & 3;
 			if (shadow) // object has shadow?
 			{
 				int k053246_objset1 = m_k055673->k053246_read_register(5);
@@ -559,7 +553,7 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 			if (add_solid)
 			{
 				// tag sprite for alpha blending
-				if (color>>K055555_MIXSHIFT & 3) solid_draw_mode |= 2;
+				if (color >> K055555_MIXSHIFT & 3) solid_draw_mode |= 2;
 			}
 
 			if (add_shadow)
@@ -572,17 +566,17 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 		switch (m_gx_primode & 0xf)
 		{
 			// Dadandarn zcode suppression
-			case  1:
+			case 1:
 				zcode = 0;
 				break;
 
 			// Daisukiss bad shadow filter
-			case  4:
+			case 4:
 				if (k & 0x3000 || k == 0x0800) continue;
 				[[fallthrough]];
 
 			// Tokkae shadow masking (INACCURATE)
-			case  5:
+			case 5:
 				if (spri < spri_min) spri = spri_min;
 				break;
 		}
@@ -599,14 +593,14 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 		if (add_solid)
 		{
 			// add objects with solid or alpha pens
-			uint32_t order = pri<<24 | zcode<<16 | offs<<(8-3) | solid_draw_mode<<4;
+			uint32_t order = pri << 24 | zcode << 16 | offs << (8 - 3) | solid_draw_mode << 4;
 			objpool.push_back(GX_OBJ{order, offs, code, color});
 		}
 
 		if (add_shadow && !(color & K055555_SKIPSHADOW) && !(mixerflags & GXMIX_NOSHADOW))
 		{
 			// add objects with shadows if enabled
-			uint32_t order = spri<<24 | zcode<<16 | offs<<(8-3) | shadow_draw_mode<<4 | shadow;
+			uint32_t order = spri << 24 | zcode << 16 | offs << (8 - 3) | shadow_draw_mode << 4 | shadow;
 			objpool.push_back(GX_OBJ{ order, offs, code, color});
 		}
 	}
@@ -618,9 +612,7 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 		return a.order > b.order;
 	});
 
-	konamigx_mixer_draw(screen,bitmap,cliprect,sub1,sub1flags,sub2,sub2flags,mixerflags,extra_bitmap,rushingheroes_hack,
-		objpool
-		);
+	konamigx_mixer_draw(screen, bitmap, cliprect, sub1, sub1flags, sub2, sub2flags, mixerflags, extra_bitmap, rushingheroes_hack, objpool);
 }
 
 void konamigx_state::konamigx_mixer_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect,
@@ -635,7 +627,7 @@ void konamigx_state::konamigx_mixer_draw(screen_device &screen, bitmap_rgb32 &bi
 	// traverse draw list
 	const uint8_t disp = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
 
-	for (int count=0; count<objpool.size(); count++)
+	for (int count = 0; count < objpool.size(); count++)
 	{
 		const uint32_t order = objpool[count].order;
 		const int offs = objpool[count].offs;
@@ -647,7 +639,7 @@ void konamigx_state::konamigx_mixer_draw(screen_device &screen, bitmap_rgb32 &bi
 		{
 			if (!(disp & K55_INP_OBJ)) continue;
 
-			int drawmode = order>>4 & 0xf;
+			int drawmode = order >> 4 & 0xf;
 
 			int alpha = 255;
 			int pri = 0;
@@ -655,7 +647,7 @@ void konamigx_state::konamigx_mixer_draw(screen_device &screen, bitmap_rgb32 &bi
 
 			if (drawmode & 2)
 			{
-				alpha = color>>K055555_MIXSHIFT & 3;
+				alpha = color >> K055555_MIXSHIFT & 3;
 				if (alpha) alpha = m_k054338->set_alpha_level(alpha);
 				if (alpha <= 0) continue;
 			}
@@ -665,15 +657,15 @@ void konamigx_state::konamigx_mixer_draw(screen_device &screen, bitmap_rgb32 &bi
 
 			if (!(mixerflags & GXMIX_NOZBUF))
 			{
-				zcode = order>>16 & 0xff;
-				pri = order>>24 & 0xff;
+				zcode = order >> 16 & 0xff;
+				pri = order >> 24 & 0xff;
 			}
 
 			m_k055673->k053247_draw_single_sprite_gxcore(bitmap, cliprect,
 				m_gx_objzbuf, m_gx_shdzbuf.get(), code, m_gx_spriteram, offs,
 				color, alpha, drawmode, zcode, pri,
 				/* non-gx only */
-				0,0,nullptr,nullptr,0
+				0, 0, nullptr, nullptr, 0
 				);
 		}
 		/* the rest are tilemaps of various kinda */
@@ -766,9 +758,9 @@ void konamigx_state::gx_draw_basic_tilemaps(screen_device &screen, bitmap_rgb32 
 
 void konamigx_state::gx_draw_basic_extended_tilemaps_1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, int code, tilemap_t *sub1, int sub1flags, int rushingheroes_hack, int offs)
 {
-	int temp1,temp2,temp3,temp4;
-	int i = code<<1;
-	int j = mixerflags>>i & 3;
+	int temp1, temp2, temp3, temp4;
+	int i = code << 1;
+	int j = mixerflags >> i & 3;
 	int k = 0;
 
 	int disp = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
@@ -777,15 +769,15 @@ void konamigx_state::gx_draw_basic_extended_tilemaps_1(screen_device &screen, bi
 		int alpha = 255;
 
 		if (j == GXMIX_BLEND_NONE)  { temp1 = 0xff; temp2 = temp3 = 0; } else
-		if (j == GXMIX_BLEND_FORCE) { temp1 = 0x00; temp2 = mixerflags>>24; temp3 = 3; }
+		if (j == GXMIX_BLEND_FORCE) { temp1 = 0x00; temp2 = mixerflags >> 24; temp3 = 3; }
 		else
 		{
 			temp1 = m_osinmix;
-			temp2 = m_osinmix>>2 & 3;
-			temp3 = m_osmixon>>2 & 3;
+			temp2 = m_osinmix >> 2 & 3;
+			temp3 = m_osmixon >> 2 & 3;
 		}
 
-		if (temp1!=0xff && temp2 /*&& temp3==3*/)
+		if (temp1 != 0xff && temp2 /*&& temp3 == 3*/)
 		{
 			alpha = temp4 = m_k054338->set_alpha_level(temp2) & 0xff;
 
@@ -801,14 +793,14 @@ void konamigx_state::gx_draw_basic_extended_tilemaps_1(screen_device &screen, bi
 			const rectangle &visarea = screen.visible_area();
 			int width = visarea.width();
 
-			if (width>512) // vsnetscr case
+			if (width > 512) // vsnetscr case
 				pixeldouble_output = 1;
 
 			K053936GP_0_zoom_draw(machine(), bitmap, cliprect, sub1, l, k, alpha, pixeldouble_output, m_k053936_0_ctrl_16, m_k053936_0_linectrl_16, m_k053936_0_ctrl, m_k053936_0_linectrl, *m_palette);
 		}
 		else
 		{
-			m_k053250_1->draw(bitmap, cliprect, m_vcblk[4]<<l, 0, screen.priority(), 0);
+			m_k053250_1->draw(bitmap, cliprect, m_vcblk[4] << l, 0, screen.priority(), 0);
 		}
 	}
 }
@@ -816,23 +808,23 @@ void konamigx_state::gx_draw_basic_extended_tilemaps_1(screen_device &screen, bi
 void konamigx_state::gx_draw_basic_extended_tilemaps_2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, int code, tilemap_t *sub2, int sub2flags, bitmap_ind16 *extra_bitmap, int offs)
 {
 	int temp1,temp2,temp3,temp4;
-	int i = code<<1;
-	int j = mixerflags>>i & 3;
+	int i = code << 1;
+	int j = mixerflags >> i & 3;
 
 	int disp = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
 	if (disp & K55_INP_SUB2)
 	{
 		//int alpha = 255;
 		if (j == GXMIX_BLEND_NONE)  { temp1 = 0xff; temp2 = temp3 = 0; } else
-		if (j == GXMIX_BLEND_FORCE) { temp1 = 0x00; temp2 = mixerflags>>26; temp3 = 3; }
+		if (j == GXMIX_BLEND_FORCE) { temp1 = 0x00; temp2 = mixerflags >> 26; temp3 = 3; }
 		else
 		{
 			temp1 = m_osinmix;
-			temp2 = m_osinmix>>4 & 3;
-			temp3 = m_osmixon>>4 & 3;
+			temp2 = m_osinmix >> 4 & 3;
+			temp3 = m_osmixon >> 4 & 3;
 		}
 
-		if (temp1!=0xff && temp2 /*&& temp3==3*/)
+		if (temp1 != 0xff && temp2 /*&& temp3==3*/)
 		{
 			//alpha =
 			temp4 = m_k054338->set_alpha_level(temp2) & 0xff;
@@ -856,27 +848,27 @@ void konamigx_state::gx_draw_basic_extended_tilemaps_2(screen_device &screen, bi
 				// to be done as a post-processing / mixing step effect
 				//
 				// - todo, use the pixeldouble_output I just added for vsnet instead?
-				for (int yy=0;yy<height;yy++)
+				for (int yy = 0; yy < height; yy++)
 				{
 					uint16_t const *const src = &extra_bitmap->pix(yy);
 					uint32_t *const dst = &bitmap.pix(yy);
 					int shiftpos = 0;
-					for (int xx=0;xx<width;xx+=2)
+					for (int xx = 0; xx < width; xx += 2)
 					{
-						uint16_t dat = src[(((xx/2)+shiftpos))%width];
-						if (dat&0xff)
-							dst[xx+1] = dst[xx] = paldata[dat];
+						uint16_t dat = src[(((xx / 2) + shiftpos)) % width];
+						if (dat & 0xff)
+							dst[xx + 1] = dst[xx] = paldata[dat];
 					}
 				}
 			}
 			else
 			{
-			//  int pixeldouble_output = 0;
-			//  K053936GP_1_zoom_draw(machine, bitmap, cliprect, sub2, l, k, alpha, pixeldouble_output);
+				// int pixeldouble_output = 0;
+				// K053936GP_1_zoom_draw(machine, bitmap, cliprect, sub2, l, k, alpha, pixeldouble_output);
 			}
 		}
 		else
-			m_k053250_2->draw(bitmap, cliprect, m_vcblk[5]<<l, 0, screen.priority(), 0);
+			m_k053250_2->draw(bitmap, cliprect, m_vcblk[5] << l, 0, screen.priority(), 0);
 	}
 }
 
@@ -884,18 +876,18 @@ void konamigx_state::gx_draw_basic_extended_tilemaps_2(screen_device &screen, bi
 TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac_tile_info)
 {
 	int tileno, colour, col, flip = 0;
-	if (tile_index&1)
+	if (tile_index & 1)
 	{
 		tileno = m_psacram[tile_index/2] & 0x00001fff;
-		col    =(m_psacram[tile_index/2] & 0x00002000)>>13;
+		col    =(m_psacram[tile_index/2] & 0x00002000) >> 13;
 		if      (m_psacram[tile_index/2] & 0x00004000) flip |= TILE_FLIPX;
 		if      (m_psacram[tile_index/2] & 0x00008000) flip |= TILE_FLIPY;
 
 	}
 	else
 	{
-		tileno = (m_psacram[tile_index/2] & 0x1fff0000)>>16;
-		col    = (m_psacram[tile_index/2] & 0x20000000)>>29;
+		tileno = (m_psacram[tile_index/2] & 0x1fff0000) >> 16;
+		col    = (m_psacram[tile_index/2] & 0x20000000) >> 29;
 		if       (m_psacram[tile_index/2] & 0x40000000) flip |= TILE_FLIPX;
 		if       (m_psacram[tile_index/2] & 0x80000000) flip |= TILE_FLIPY;
 
@@ -945,13 +937,12 @@ TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac3_tile_info)
 //  if (m_konamigx_type3_psac2_actual_bank)
 //      base_index+=0x20000/2;
 
-
-	tileno =  tmap[base_index*2] | ((tmap[(base_index*2)+1] & 0x0f)<<8);
-	colour = (tmap[(base_index*2)+1]&0xc0)>>6;
+	tileno =  tmap[base_index*2] | ((tmap[(base_index*2) + 1] & 0x0f) << 8);
+	colour = (tmap[(base_index*2) + 1] & 0xc0) >> 6;
 
 	flip = 0;
-	if (tmap[(base_index*2)+1] & 0x20) flip |= TILE_FLIPY;
-	if (tmap[(base_index*2)+1] & 0x10) flip |= TILE_FLIPX;
+	if (tmap[(base_index*2) + 1] & 0x20) flip |= TILE_FLIPY;
+	if (tmap[(base_index*2) + 1] & 0x10) flip |= TILE_FLIPX;
 
 	tileinfo.set(0, tileno, colour, flip);
 }
@@ -959,16 +950,15 @@ TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac3_tile_info)
 TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac3_alt_tile_info)
 {
 	int tileno, colour, flip;
-	uint8_t *tmap = memregion("gfx4")->base()+0x20000;
+	uint8_t *tmap = memregion("gfx4")->base() + 0x20000;
 
 	int base_index = tile_index;
 
 //  if (m_konamigx_type3_psac2_actual_bank)
 //      base_index+=0x20000/2;
 
-
-	tileno =  tmap[base_index*2] | ((tmap[(base_index*2)+1] & 0x0f)<<8);
-	colour = (tmap[(base_index*2)+1]&0xc0)>>6;
+	tileno =  tmap[base_index*2] | ((tmap[(base_index*2) + 1] & 0x0f) << 8);
+	colour = (tmap[(base_index*2) + 1] & 0xc0) >> 6;
 
 	flip = 0;
 	if (tmap[(base_index*2)+1] & 0x20) flip |= TILE_FLIPY;
@@ -996,18 +986,18 @@ TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac3_alt_tile_info)
    doesn't really look like it should be displayed? - it's height data */
 TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac1a_tile_info)
 {
-	int tileno, colour, flipx,flipy;
+	int tileno, colour, flipx, flipy;
 	int flip = 0;
 	colour = 0;
 
-	tileno = (m_psacram[tile_index*2] & 0x00003fff)>>0;
+	tileno = (m_psacram[tile_index*2] & 0x00003fff) >> 0;
 
 	// scanrows
-	//flipx  = (m_psacram[tile_index*2+1] & 0x00800000)>>23;
-	//flipy  = (m_psacram[tile_index*2+1] & 0x00400000)>>22;
+	//flipx  = (m_psacram[tile_index*2+1] & 0x00800000) >> 23;
+	//flipy  = (m_psacram[tile_index*2+1] & 0x00400000) >> 22;
 	// scancols
-	flipy  = (m_psacram[tile_index*2+1] & 0x00800000)>>23;
-	flipx  = (m_psacram[tile_index*2+1] & 0x00400000)>>22;
+	flipy  = (m_psacram[tile_index*2+1] & 0x00800000) >> 23;
+	flipx  = (m_psacram[tile_index*2+1] & 0x00400000) >> 22;
 
 	if (flipx) flip |= TILE_FLIPX;
 	if (flipy) flip |= TILE_FLIPY;
@@ -1043,34 +1033,36 @@ K056832_CB_MEMBER(konamigx_state::type2_tile_callback)
 {
 	int d = *code;
 
-	*code = (m_gx_tilebanks[(d & 0xe000)>>13]<<13) + (d & 0x1fff);
+	*code = (m_gx_tilebanks[(d & 0xe000) >> 13] << 13) + (d & 0x1fff);
 	K055555GX_decode_vmixcolor(layer, color);
 }
 
 K056832_CB_MEMBER(konamigx_state::salmndr2_tile_callback)
 {
 	const uint8_t mix_code = attr >> 4 & 0b11;
-	if (mix_code) {
+	if (mix_code)
+	{
 		*priority = 1;
 		m_last_alpha_tile_mix_code = mix_code;
 	}
 
 	int d = *code;
 
-	*code = (m_gx_tilebanks[(d & 0xe000)>>13]<<13) + (d & 0x1fff);
+	*code = (m_gx_tilebanks[(d & 0xe000) >> 13] << 13) + (d & 0x1fff);
 	K055555GX_decode_vmixcolor(layer, color);
 }
 
 K056832_CB_MEMBER(konamigx_state::alpha_tile_callback)
 {
 	const uint8_t mix_code = attr >> 6 & 0b11;
-	if (mix_code) {
+	if (mix_code)
+	{
 		*priority = 1;
 		m_last_alpha_tile_mix_code = mix_code;
 	}
 	int d = *code;
 
-	*code = (m_gx_tilebanks[(d & 0xe000)>>13]<<13) + (d & 0x1fff);
+	*code = (m_gx_tilebanks[(d & 0xe000) >> 13] << 13) + (d & 0x1fff);
 	K055555GX_decode_vmixcolor(layer, color);
 }
 
@@ -1129,6 +1121,7 @@ void konamigx_state::common_init()
 	save_item(NAME(m_osmixon));
 	save_item(NAME(m_current_brightness));
 	save_item(NAME(m_brightness));
+	save_item(NAME(m_last_alpha_tile_mix_code));
 
 	m_gx_tilemode = 0;
 
@@ -1155,11 +1148,11 @@ VIDEO_START_MEMBER(konamigx_state, konamigx_5bpp)
 {
 	common_init();
 
-	if (!strcmp(machine().system().name,"tbyahhoo"))
+	if (!strcmp(machine().system().name, "tbyahhoo") || !strcmp(machine().system().name, "mtwinbee"))
 		m_gx_tilemode = 1;
-	else if (!strcmp(machine().system().name,"crzcross") || !strcmp(machine().system().name,"puzldama"))
+	else if (!strcmp(machine().system().name, "crzcross") || !strcmp(machine().system().name, "puzldama"))
 		konamigx_mixer_primode(5);
-	else if (!strcmp(machine().system().name,"daiskiss"))
+	else if (!strcmp(machine().system().name, "daiskiss"))
 		konamigx_mixer_primode(4);
 }
 
@@ -1191,21 +1184,19 @@ VIDEO_START_MEMBER(konamigx_state, konamigx_type3)
 	int width = m_screen->width();
 	int height = m_screen->height();
 
-	m_dualscreen_left_tempbitmap = std::make_unique<bitmap_rgb32>( width, height);
-	m_dualscreen_right_tempbitmap = std::make_unique<bitmap_rgb32>( width, height);
+	m_dualscreen_left_tempbitmap = std::make_unique<bitmap_rgb32>(width, height);
+	m_dualscreen_right_tempbitmap = std::make_unique<bitmap_rgb32>(width, height);
 
 	common_init();
 
-	m_gx_psac_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(konamigx_state::get_gx_psac3_tile_info)), TILEMAP_SCAN_COLS,  16, 16, 256, 256);
-	m_gx_psac_tilemap_alt = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(konamigx_state::get_gx_psac3_alt_tile_info)), TILEMAP_SCAN_COLS,  16, 16, 256, 256);
+	m_gx_psac_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(konamigx_state::get_gx_psac3_tile_info)), TILEMAP_SCAN_COLS, 16, 16, 256, 256);
+	m_gx_psac_tilemap_alt = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(konamigx_state::get_gx_psac3_alt_tile_info)), TILEMAP_SCAN_COLS, 16, 16, 256, 256);
 
 	m_gx_rozenable = 0;
 	m_gx_specialrozenable = 2;
 
-
 	/* set up tile layers */
 	m_type3_roz_temp_bitmap = std::make_unique<bitmap_ind16>(width, height);
-
 
 	//m_gx_psac_tilemap->set_flip(TILEMAP_FLIPX| TILEMAP_FLIPY);
 
@@ -1213,10 +1204,10 @@ VIDEO_START_MEMBER(konamigx_state, konamigx_type3)
 //  K053936GP_set_offset(0, -30, -1);
 	K053936_set_offset(0, -30, +1);
 
-	m_k056832->set_layer_offs(0,  -52, 0);
-	m_k056832->set_layer_offs(1,  -48, 0);
-	m_k056832->set_layer_offs(2,  -48, 0);
-	m_k056832->set_layer_offs(3,  -48, 0);
+	m_k056832->set_layer_offs(0, -52, 0);
+	m_k056832->set_layer_offs(1, -48, 0);
+	m_k056832->set_layer_offs(2, -48, 0);
+	m_k056832->set_layer_offs(3, -48, 0);
 
 	m_konamigx_has_dual_screen = 1;
 	m_konamigx_palformat = 1;
@@ -1227,19 +1218,19 @@ VIDEO_START_MEMBER(konamigx_state, konamigx_type4)
 	int width = m_screen->width();
 	int height = m_screen->height();
 
-	m_dualscreen_left_tempbitmap = std::make_unique<bitmap_rgb32>( width, height);
-	m_dualscreen_right_tempbitmap = std::make_unique<bitmap_rgb32>( width, height);
+	m_dualscreen_left_tempbitmap = std::make_unique<bitmap_rgb32>(width, height);
+	m_dualscreen_right_tempbitmap = std::make_unique<bitmap_rgb32>(width, height);
 
 	common_init();
 
-	m_gx_psac_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(konamigx_state::get_gx_psac_tile_info)), TILEMAP_SCAN_COLS,  16, 16, 128, 128);
+	m_gx_psac_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(konamigx_state::get_gx_psac_tile_info)), TILEMAP_SCAN_COLS, 16, 16, 128, 128);
 	m_gx_rozenable = 0;
 	m_gx_specialrozenable = 3;
 
-	m_k056832->set_layer_offs(0,  -27, 0);
-	m_k056832->set_layer_offs(1,  -25, 0);
-	m_k056832->set_layer_offs(2,  -24, 0);
-	m_k056832->set_layer_offs(3,  -22, 0);
+	m_k056832->set_layer_offs(0, -27, 0);
+	m_k056832->set_layer_offs(1, -25, 0);
+	m_k056832->set_layer_offs(2, -24, 0);
+	m_k056832->set_layer_offs(3, -22, 0);
 
 	K053936_wraparound_enable(0, 0);
 	K053936GP_set_offset(0, -36, 1);
@@ -1260,14 +1251,14 @@ VIDEO_START_MEMBER(konamigx_state, konamigx_type4_vsn)
 
 	common_init();
 
-	m_gx_psac_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(konamigx_state::get_gx_psac_tile_info)), TILEMAP_SCAN_COLS,  16, 16, 128, 128);
+	m_gx_psac_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(konamigx_state::get_gx_psac_tile_info)), TILEMAP_SCAN_COLS, 16, 16, 128, 128);
 	m_gx_rozenable = 0;
 	m_gx_specialrozenable = 3;
 
-	m_k056832->set_layer_offs(0,  -52, 0);
-	m_k056832->set_layer_offs(1,  -48, 0);
-	m_k056832->set_layer_offs(2,  -48, 0);
-	m_k056832->set_layer_offs(3,  -48, 0);
+	m_k056832->set_layer_offs(0, -52, 0);
+	m_k056832->set_layer_offs(1, -48, 0);
+	m_k056832->set_layer_offs(2, -48, 0);
+	m_k056832->set_layer_offs(3, -48, 0);
 
 	K053936_wraparound_enable(0, 1); // wraparound doesn't work properly with the custom drawing function anyway, see the crowd in vsnet and rushhero
 	K053936GP_set_offset(0, -30, 0);
@@ -1287,16 +1278,14 @@ VIDEO_START_MEMBER(konamigx_state, konamigx_type4_sd2)
 
 	common_init();
 
-	m_gx_psac_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(konamigx_state::get_gx_psac_tile_info)), TILEMAP_SCAN_COLS,  16, 16, 128, 128);
+	m_gx_psac_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(konamigx_state::get_gx_psac_tile_info)), TILEMAP_SCAN_COLS, 16, 16, 128, 128);
 	m_gx_rozenable = 0;
 	m_gx_specialrozenable = 3;
 
-
-	m_k056832->set_layer_offs(0,  -29, -1);
-	m_k056832->set_layer_offs(1,  -27, -1);
-	m_k056832->set_layer_offs(2,  -26, -1);
-	m_k056832->set_layer_offs(3,  -24, -1);
-
+	m_k056832->set_layer_offs(0, -29, -1);
+	m_k056832->set_layer_offs(1, -27, -1);
+	m_k056832->set_layer_offs(2, -26, -1);
+	m_k056832->set_layer_offs(3, -24, -1);
 
 	K053936_wraparound_enable(0, 0);
 	K053936GP_set_offset(0, -36, -1);
@@ -1326,19 +1315,17 @@ VIDEO_START_MEMBER(konamigx_state, opengolf)
 	m_gx_rozenable = 0;
 	m_gx_specialrozenable = 1;
 
-	m_gxtype1_roz_dstbitmap =  std::make_unique<bitmap_ind16>(512,512); // BITMAP_FORMAT_IND16 because we NEED the raw pen data for post-processing
-	m_gxtype1_roz_dstbitmap2 = std::make_unique<bitmap_ind16>(512,512); // BITMAP_FORMAT_IND16 because we NEED the raw pen data for post-processing
-
+	m_gxtype1_roz_dstbitmap =  std::make_unique<bitmap_ind16>(512, 512); // BITMAP_FORMAT_IND16 because we NEED the raw pen data for post-processing
+	m_gxtype1_roz_dstbitmap2 = std::make_unique<bitmap_ind16>(512, 512); // BITMAP_FORMAT_IND16 because we NEED the raw pen data for post-processing
 
 	m_gxtype1_roz_dstbitmapclip.set(0, 512-1, 0, 512-1);
-
 
 	K053936_wraparound_enable(0, 1);
 	K053936GP_set_offset(0, 0, 0);
 
 	// urgh.. the priority bitmap is global, and because our temp bitmaps are bigger than the screen, this causes issues.. so just allocate something huge
 	// until there is a better solution, or priority bitmap can be specified manually.
-	m_screen->priority().allocate(2048,2048);
+	m_screen->priority().allocate(2048, 2048);
 
 }
 
@@ -1361,19 +1348,17 @@ VIDEO_START_MEMBER(konamigx_state, racinfrc)
 	m_gx_rozenable = 0;
 	m_gx_specialrozenable = 1;
 
-	m_gxtype1_roz_dstbitmap =  std::make_unique<bitmap_ind16>(512,512); // BITMAP_FORMAT_IND16 because we NEED the raw pen data for post-processing
-	m_gxtype1_roz_dstbitmap2 = std::make_unique<bitmap_ind16>(512,512); // BITMAP_FORMAT_IND16 because we NEED the raw pen data for post-processing
-
+	m_gxtype1_roz_dstbitmap =  std::make_unique<bitmap_ind16>(512, 512); // BITMAP_FORMAT_IND16 because we NEED the raw pen data for post-processing
+	m_gxtype1_roz_dstbitmap2 = std::make_unique<bitmap_ind16>(512, 512); // BITMAP_FORMAT_IND16 because we NEED the raw pen data for post-processing
 
 	m_gxtype1_roz_dstbitmapclip.set(0, 512-1, 0, 512-1);
-
 
 	K053936_wraparound_enable(0, 1);
 	K053936GP_set_offset(0, 0, 0);
 
 	// urgh.. the priority bitmap is global, and because our temp bitmaps are bigger than the screen, this causes issues.. so just allocate something huge
 	// until there is a better solution, or priority bitmap can be specified manually.
-	m_screen->priority().allocate(2048,2048);
+	m_screen->priority().allocate(2048, 2048);
 
 
 }
@@ -1393,9 +1378,9 @@ uint32_t konamigx_state::screen_update_konamigx(screen_device &screen, bitmap_rg
 	{
 		// driver approximates tile update in mode 0 for speed
 		unchained = m_k056832->get_layer_association();
-		for (i=0; i<4; i++)
+		for (i = 0; i < 4; i++)
 		{
-			newbase = m_k055555->K055555_get_palette_index(i)<<6;
+			newbase = m_k055555->K055555_get_palette_index(i) << 6;
 			if (m_layer_colorbase[i] != newbase)
 			{
 				m_layer_colorbase[i] = newbase;
@@ -1433,13 +1418,11 @@ uint32_t konamigx_state::screen_update_konamigx(screen_device &screen, bitmap_rg
 	// Type-1
 	if (m_gx_specialrozenable == 1)
 	{
-		//K053936_0_zoom_draw(screen, *m_gxtype1_roz_dstbitmap, m_gxtype1_roz_dstbitmapclip,m_gx_psac_tilemap, 0,0,0); // height data
-		K053936_0_zoom_draw(screen, *m_gxtype1_roz_dstbitmap2,m_gxtype1_roz_dstbitmapclip,m_gx_psac_tilemap2,0,0,0); // colour data (+ some voxel height data?)
+		//K053936_0_zoom_draw(screen, *m_gxtype1_roz_dstbitmap, m_gxtype1_roz_dstbitmapclip,m_gx_psac_tilemap, 0, 0, 0); // height data
+		K053936_0_zoom_draw(screen, *m_gxtype1_roz_dstbitmap2,m_gxtype1_roz_dstbitmapclip,m_gx_psac_tilemap2, 0, 0, 0); // colour data (+ some voxel height data?)
 	}
 
-
-
-	if (m_gx_specialrozenable==3)
+	if (m_gx_specialrozenable == 3)
 	{
 		konamigx_mixer(screen, bitmap, cliprect, m_gx_psac_tilemap, GXSUB_8BPP,nullptr,0,  0, nullptr, m_gx_rushingheroes_hack);
 	}
@@ -1449,10 +1432,10 @@ uint32_t konamigx_state::screen_update_konamigx(screen_device &screen, bitmap_rg
 		// we're going to throw half of this away anyway in post-process, so only render what's needed
 		rectangle temprect;
 		temprect = cliprect;
-		temprect.max_x = cliprect.min_x+320;
+		temprect.max_x = cliprect.min_x + 320;
 
-		if (m_type3_psac2_bank == 1) K053936_0_zoom_draw(screen, *m_type3_roz_temp_bitmap, temprect,m_gx_psac_tilemap_alt, 0,0,0); // soccerss playfield
-		else K053936_0_zoom_draw(screen, *m_type3_roz_temp_bitmap, temprect,m_gx_psac_tilemap, 0,0,0); // soccerss playfield
+		if (m_type3_psac2_bank == 1) K053936_0_zoom_draw(screen, *m_type3_roz_temp_bitmap, temprect,m_gx_psac_tilemap_alt, 0, 0, 0); // soccerss playfield
+		else K053936_0_zoom_draw(screen, *m_type3_roz_temp_bitmap, temprect,m_gx_psac_tilemap, 0, 0, 0); // soccerss playfield
 
 
 		konamigx_mixer(screen, bitmap, cliprect, nullptr, 0, nullptr, 0, 0, m_type3_roz_temp_bitmap.get(), m_gx_rushingheroes_hack);
@@ -1482,9 +1465,9 @@ uint32_t konamigx_state::screen_update_konamigx(screen_device &screen, bitmap_rg
 					uint16_t const *const src = &m_gxtype1_roz_dstbitmap2->pix(y);
 					//uint16_t const *const src = &m_gxtype1_roz_dstbitmap->pix(y);
 
-					uint32_t *const dst = &bitmap.pix((256+16)-y);
+					uint32_t *const dst = &bitmap.pix((256 + 16) - y);
 
-					for (int x = cliprect.min_x; x <= cliprect.max_x;x++)
+					for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 					{
 						uint16_t const dat = src[x];
 						dst[x] = paldata[dat];
@@ -1502,15 +1485,15 @@ uint32_t konamigx_state::screen_update_konamigx(screen_device &screen, bitmap_rg
 uint32_t konamigx_state::screen_update_konamigx_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	/* the video gets demuxed by a board which plugs into the jamma connector */
-	m_konamigx_current_frame^=1;
+	m_konamigx_current_frame ^= 1;
 
-	if (m_konamigx_current_frame==1)
+	if (m_konamigx_current_frame == 1)
 	{
 		int offset=0;
 
-		if (m_konamigx_palformat==1)
+		if (m_konamigx_palformat == 1)
 		{
-			for (offset=0;offset<0x4000/4;offset++)
+			for (offset = 0; offset < 0x4000/4; offset++)
 			{
 				uint32_t coldat = m_generic_paletteram_32[offset];
 
@@ -1520,13 +1503,11 @@ uint32_t konamigx_state::screen_update_konamigx_left(screen_device &screen, bitm
 		}
 		else
 		{
-			for (offset=0;offset<0x8000/4;offset++)
+			for (offset = 0; offset < 0x8000/4; offset++)
 			{
-				int r,g,b;
-
-				r = (m_generic_paletteram_32[offset] >>16) & 0xff;
-				g = (m_generic_paletteram_32[offset] >> 8) & 0xff;
-				b = (m_generic_paletteram_32[offset] >> 0) & 0xff;
+				int r = (m_generic_paletteram_32[offset] >>16) & 0xff;
+				int g = (m_generic_paletteram_32[offset] >> 8) & 0xff;
+				int b = (m_generic_paletteram_32[offset] >> 0) & 0xff;
 
 				m_palette->set_pen_color(offset,rgb_t(r,g,b));
 			}
@@ -1545,7 +1526,7 @@ uint32_t konamigx_state::screen_update_konamigx_left(screen_device &screen, bitm
 
 uint32_t konamigx_state::screen_update_konamigx_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	if (m_konamigx_current_frame==1)
+	if (m_konamigx_current_frame == 1)
 	{
 		copybitmap(bitmap, *m_dualscreen_right_tempbitmap, 0, 0, 0, 0, cliprect);
 	}
@@ -1553,9 +1534,9 @@ uint32_t konamigx_state::screen_update_konamigx_right(screen_device &screen, bit
 	{
 		int offset=0;
 
-		if (m_konamigx_palformat==1)
+		if (m_konamigx_palformat == 1)
 		{
-			for (offset=0;offset<0x4000/4;offset++)
+			for (offset = 0; offset < 0x4000/4; offset++)
 			{
 				uint32_t coldat = m_subpaletteram32[offset];
 
@@ -1565,13 +1546,11 @@ uint32_t konamigx_state::screen_update_konamigx_right(screen_device &screen, bit
 		}
 		else
 		{
-			for (offset=0;offset<0x8000/4;offset++)
+			for (offset = 0; offset < 0x8000/4; offset++)
 			{
-				int r,g,b;
-
-				r = (m_subpaletteram32[offset] >>16) & 0xff;
-				g = (m_subpaletteram32[offset] >> 8) & 0xff;
-				b = (m_subpaletteram32[offset] >> 0) & 0xff;
+				int r = (m_subpaletteram32[offset] >>16) & 0xff;
+				int g = (m_subpaletteram32[offset] >> 8) & 0xff;
+				int b = (m_subpaletteram32[offset] >> 0) & 0xff;
 
 				m_palette->set_pen_color(offset,rgb_t(r,g,b));
 			}
@@ -1597,8 +1576,8 @@ void konamigx_state::konamigx_555_palette_w(offs_t offset, uint32_t data, uint32
 
 	coldat = m_generic_paletteram_32[offset];
 
-	set_color_555(*m_palette, offset*2, 0, 5, 10,coldat >> 16);
-	set_color_555(*m_palette, offset*2+1, 0, 5, 10,coldat & 0xffff);
+	set_color_555(*m_palette, offset*2, 0, 5, 10, coldat >> 16);
+	set_color_555(*m_palette, offset*2 + 1, 0, 5, 10, coldat & 0xffff);
 }
 
 // sub monitor for type 3
@@ -1610,20 +1589,20 @@ void konamigx_state::konamigx_555_palette2_w(offs_t offset, uint32_t data, uint3
 
 	offset += (0x4000/4);
 
-	set_color_555(*m_palette, offset*2, 0, 5, 10,coldat >> 16);
-	set_color_555(*m_palette, offset*2+1, 0, 5, 10,coldat & 0xffff);
+	set_color_555(*m_palette, offset*2, 0, 5, 10, coldat >> 16);
+	set_color_555(*m_palette, offset*2 + 1, 0, 5, 10, coldat & 0xffff);
 }
 
 void konamigx_state::konamigx_tilebank_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_24_31)
-		m_gx_tilebanks[offset*4] = (data>>24)&0xff;
+		m_gx_tilebanks[offset*4] = (data >> 24) & 0xff;
 	if (ACCESSING_BITS_16_23)
-		m_gx_tilebanks[offset*4+1] = (data>>16)&0xff;
+		m_gx_tilebanks[offset*4 + 1] = (data >> 16) & 0xff;
 	if (ACCESSING_BITS_8_15)
-		m_gx_tilebanks[offset*4+2] = (data>>8)&0xff;
+		m_gx_tilebanks[offset*4 + 2] = (data >> 8) & 0xff;
 	if (ACCESSING_BITS_0_7)
-		m_gx_tilebanks[offset*4+3] = data&0xff;
+		m_gx_tilebanks[offset*4 + 3] = data & 0xff;
 }
 
 // type 1 RAM-based PSAC tilemap
@@ -1640,5 +1619,5 @@ void konamigx_state::konamigx_t4_psacmap_w(offs_t offset, uint32_t data, uint32_
 	COMBINE_DATA(&m_psacram[offset]);
 
 	m_gx_psac_tilemap->mark_tile_dirty(offset*2);
-	m_gx_psac_tilemap->mark_tile_dirty((offset*2)+1);
+	m_gx_psac_tilemap->mark_tile_dirty((offset*2) + 1);
 }

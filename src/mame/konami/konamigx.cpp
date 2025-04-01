@@ -187,7 +187,8 @@
  - Tokimeki Memorial: wrong horizontal flip for mode select arrows;
  */
 
-static struct sprite_entry {
+static struct sprite_entry
+{
 	int pri;
 	uint32_t adr;
 } sprites[0x100];
@@ -197,14 +198,16 @@ void konamigx_state::generate_sprites(address_space &space, uint32_t src, uint32
 	int scount = 0;
 	int ecount = 0;
 
-	for(int i=0; i<count; i++) {
+	for (int i = 0; i < count; i++)
+	{
 		uint32_t adr = src + 0x100*i;
 		int pri;
-		if(!space.read_word(adr+2))
+		if (!space.read_word(adr+2))
 			continue;
 		pri = space.read_word(adr+28);
 
-		if(pri < 256) {
+		if (pri < 256)
+		{
 			sprites[ecount].pri = pri;
 			sprites[ecount].adr = adr;
 			ecount++;
@@ -212,9 +215,11 @@ void konamigx_state::generate_sprites(address_space &space, uint32_t src, uint32
 	}
 	//qsort(sprites, ecount, sizeof(struct sprite_entry), pri_comp);
 
-	for(int i=0; i<ecount; i++) {
+	for (int i = 0; i < ecount; i++)
+	{
 		uint32_t adr = sprites[i].adr;
-		if(adr) {
+		if (adr)
+		{
 			uint32_t set =(space.read_word(adr) << 16)|space.read_word(adr+2);
 			uint16_t glob_x = space.read_word(adr+4);
 			uint16_t glob_y = space.read_word(adr+8);
@@ -230,77 +235,82 @@ void konamigx_state::generate_sprites(address_space &space, uint32_t src, uint32
 			uint16_t v;
 
 			v = space.read_word(adr+24);
-			if(v & 0x8000) {
+			if (v & 0x8000)
+			{
 				color_mask = 0xf3ff;
 				color_val |= (v & 3) << 10;
 			}
 
 			v = space.read_word(adr+26);
-			if(v & 0x8000) {
+			if (v & 0x8000)
+			{
 				color_mask &= 0xfcff;
 				color_val  |= (v & 3) << 8;
 			}
 
 			v = space.read_word(adr+18);
-			if(v & 0x8000) {
+			if (v & 0x8000)
+			{
 				color_mask &= 0xff1f;
 				color_val  |= v & 0xe0;
 			}
 
 			v = space.read_word(adr+16);
-			if(v & 0x8000)
+			if (v & 0x8000)
 				color_set = v & 0x1f;
-			if(v & 0x4000)
+			if (v & 0x4000)
 				color_rotate = v & 0x1f;
 
-			if(!zoom_x)
+			if (!zoom_x)
 				zoom_x = 0x40;
-			if(!zoom_y)
+			if (!zoom_y)
 				zoom_y = 0x40;
 
-			if(set >= 0x200000 && set < 0xd00000)
+			if (set >= 0x200000 && set < 0xd00000)
 			{
 				uint16_t count2 = space.read_word(set);
 
 				set += 2;
-				while(count2) {
+				while(count2)
+				{
 					uint16_t idx  = space.read_word(set);
 					uint16_t flip = space.read_word(set+2);
 					uint16_t col  = space.read_word(set+4);
 					short y = space.read_word(set+6);
 					short x = space.read_word(set+8);
 
-					if(idx == 0xffff) {
+					if (idx == 0xffff)
+					{
 						set = (flip<<16) | col;
-						if(set >= 0x200000 && set < 0xd00000)
+						if (set >= 0x200000 && set < 0xd00000)
 							continue;
 						else
 							break;
 					}
 
-					if(zoom_y != 0x40)
+					if (zoom_y != 0x40)
 						y = y*0x40/zoom_y;
-					if(zoom_x != 0x40)
+					if (zoom_x != 0x40)
 						x = x*0x40/zoom_x;
 
-					if(flip_x)
+					if (flip_x)
 						x = glob_x - x;
 					else
 						x = glob_x + x;
-					if(x < -256 || x > 512+32)
+					if (x < -256 || x > 512+32)
 						goto next;
 
-					if(flip_y)
+					if (flip_y)
 						y = glob_y - y;
 					else
 						y = glob_y + y;
-					if(y < -256 || y > 512)
+					if (y < -256 || y > 512)
 						goto next;
 
 					col = (col & color_mask) | color_val;
-					if(color_set)
+					if (color_set)
 						col = (col & 0xffe0) | color_set;
-					if(color_rotate)
+					if (color_rotate)
 						col = (col & 0xffe0) | ((col + color_rotate) & 0x1f);
 
 					space.write_word(spr   , (flip ^ glob_f) | sprites[i].pri);
@@ -312,7 +322,7 @@ void konamigx_state::generate_sprites(address_space &space, uint32_t src, uint32
 					space.write_word(spr+12, col);
 					spr += 16;
 					scount++;
-					if(scount == 256)
+					if (scount == 256)
 						return;
 				next:
 					count2--;
@@ -321,7 +331,8 @@ void konamigx_state::generate_sprites(address_space &space, uint32_t src, uint32
 			}
 		}
 	}
-	while(scount < 256) {
+	while(scount < 256)
+	{
 		space.write_word(spr, scount);
 		scount++;
 		spr += 16;
@@ -384,7 +395,7 @@ void konamigx_state::esc_w(address_space &space, uint32_t data)
 	}
 
 	/* the master opcode can be at an unaligned address, so get it "safely" */
-	opcode = (space.read_word(data+2))|(space.read_word(data)<<16);
+	opcode = (space.read_word(data+2)) | (space.read_word(data) << 16);
 
 	/* if there's an OBJECT_MAGIC_ID, that means
 	   there is a valid ESC command packet. */
@@ -395,11 +406,12 @@ void konamigx_state::esc_w(address_space &space, uint32_t data)
 		opcode = space.read_byte(data+8);
 		params = (space.read_word(data+12) << 16) | space.read_word(data+14);
 
-		switch(opcode) {
+		switch (opcode)
+		{
 		case 5: // Reset
 			break;
 		case 2: // Load program
-			for(i=0; i<4096; i++)
+			for (i = 0; i < 4096; i++)
 				m_esc_program[i] = space.read_byte(params+i);
 /*
             {
@@ -414,7 +426,8 @@ void konamigx_state::esc_w(address_space &space, uint32_t data)
 */
 			break;
 		case 1: // Run program
-			if(m_esc_cb) {
+			if (m_esc_cb)
+			{
 				uint32_t p1 = (space.read_word(params+0)<<16) | space.read_word(params+2);
 				uint32_t p2 = (space.read_word(params+4)<<16) | space.read_word(params+6);
 				uint32_t p3 = (space.read_word(params+8)<<16) | space.read_word(params+10);
@@ -547,7 +560,7 @@ void konamigx_state::control_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 		m_gx_wrport2 = (data>>16)&0xff;
 
-		if(m_prev_pixel_clock != (m_gx_wrport2 & 3))
+		if (m_prev_pixel_clock != (m_gx_wrport2 & 3))
 		{
 			m_k053252->set_unscaled_clock(pixclock[m_gx_wrport2 & 3]);
 			m_prev_pixel_clock = m_gx_wrport2 & 3;
@@ -613,7 +626,7 @@ void konamigx_state::dmastart_callback(int data)
 
 	// simulate DMA delay
 	// TODO: Rushing Heroes doesn't like reported sprite timings, probably due of sprite protection being issued istantly or requires the double buffering ...
-	if(m_gx_rushingheroes_hack == 1)
+	if (m_gx_rushingheroes_hack == 1)
 		sprite_timing = 64;
 	else
 		sprite_timing = m_gx_wrport2 & 1 ? (256+32) : (342+42);
@@ -650,7 +663,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(konamigx_state::konamigx_type2_scanline)
 {
 	int scanline = param;
 
-	if(scanline == 48)
+	if (scanline == 48)
 	{
 		if (m_gx_syncen & 0x40)
 		{
@@ -686,7 +699,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(konamigx_state::konamigx_type4_scanline)
 
 		// maybe this interrupt should only be every 30fps, or maybe there are flags to prevent the game running too fast
 		// the real hardware should output the display for each screen on alternate frames
-		//  if(device->m_screen->frame_number() & 1)
+		//  if (device->m_screen->frame_number() & 1)
 		if (1) // m_gx_syncen & 0x20)
 		{
 			m_gx_syncen &= ~0x20;
@@ -701,7 +714,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(konamigx_state::konamigx_type4_scanline)
 
 		dmastart_callback(0);
 	}
-	else if(scanline < 240) // hblank
+	else if (scanline < 240) // hblank
 	{
 		// IRQ 2 is a programmable interrupt with scanline resolution
 		if (m_gx_syncen & 0x40)
@@ -740,22 +753,22 @@ double konamigx_state::adc0834_callback(uint8_t input)
 
 uint32_t konamigx_state::le2_gun_H_r()
 {
-	int p1x = m_light0_x->read()*290/0xff+20;
-	int p2x = m_light1_x->read()*290/0xff+20;
+	int p1x = m_light0_x->read()* 290 /0xff + 20;
+	int p2x = m_light1_x->read()* 290 /0xff + 20;
 
-	return (p1x<<16)|p2x;
+	return (p1x << 16) | p2x;
 }
 
 uint32_t konamigx_state::le2_gun_V_r()
 {
-	int p1y = m_light0_y->read()*224/0xff;
-	int p2y = m_light1_y->read()*224/0xff;
+	int p1y = m_light0_y->read() * 224 / 0xff;
+	int p2y = m_light1_y->read() * 224 / 0xff;
 
 	// make "off the bottom" reload too
 	if (p1y >= 0xdf) p1y = 0;
 	if (p2y >= 0xdf) p2y = 0;
 
-	return (p1y<<16)|p2y;
+	return (p1y << 16) | p2y;
 }
 
 /**********************************************************************************/
@@ -779,10 +792,10 @@ uint32_t konamigx_state::type1_roz_r2(offs_t offset)
 
 uint32_t konamigx_state::type3_sync_r()
 {
-	if(m_konamigx_current_frame==0)
-		return -1;  //  return 0xfffffffe | 1;
+	if (m_konamigx_current_frame == 0)
+		return -1; // return 0xfffffffe | 1;
 	else
-		return 0;// return 0xfffffffe | 0;
+		return 0; // return 0xfffffffe | 0;
 }
 
 
@@ -900,7 +913,7 @@ void konamigx_state::type4_prot_w(address_space &space, offs_t offset, uint32_t 
 						space.write_word(0xc01400+i, space.read_word(0xc01000+i));
 					}
 				}
-				else if(m_last_prot_op == 0x57a)  // winspike
+				else if (m_last_prot_op == 0x57a)  // winspike
 				{
 					/* player 1 input buffer protection */
 					space.write_dword(0xc10f00, space.read_dword(0xc00f10));
@@ -912,7 +925,7 @@ void konamigx_state::type4_prot_w(address_space &space, offs_t offset, uint32_t 
 					space.write_dword(0xc0fe00, space.read_dword(0xc00f30));
 					space.write_dword(0xc0fe04, space.read_dword(0xc00f34));
 				}
-				else if(m_last_prot_op == 0xd97)  // rushhero
+				else if (m_last_prot_op == 0xd97)  // rushhero
 				{
 					u32 src = 0xc09ff0;
 					u32 dst = 0xd20000;
@@ -952,7 +965,7 @@ void konamigx_state::type4_prot_w(address_space &space, offs_t offset, uint32_t 
 					space.write_byte(0xc11cc0 + 5, ~space.read_byte(0xc00507 + 0x60));
 
 				}
-				else if(m_last_prot_op == 0xb16) // slamdnk2
+				else if (m_last_prot_op == 0xb16) // slamdnk2
 				{
 					int src = 0xc01000;
 					int dst = 0xd20000;
@@ -981,14 +994,14 @@ void konamigx_state::type4_prot_w(address_space &space, offs_t offset, uint32_t 
 						dst += 2;
 					}
 				}
-				else if(m_last_prot_op == 0x515) // vsnetscr screen 1
+				else if (m_last_prot_op == 0x515) // vsnetscr screen 1
 				{
 					int adr;
 					//printf("GXT4: command %x %d (PC=%x)\n", m_last_prot_op, cc++, m_maincpu->pc());
 					for (adr = 0; adr < 0x400; adr += 2)
 						space.write_word(0xc01c00+adr, space.read_word(0xc01800+adr));
 				}
-				else if(m_last_prot_op == 0x115d) // vsnetscr screen 2
+				else if (m_last_prot_op == 0x115d) // vsnetscr screen 2
 				{
 					int adr;
 					//printf("GXT4: command %x %d (PC=%x)\n", m_last_prot_op, cc++, m_maincpu->pc());
@@ -2104,7 +2117,7 @@ ROM_START(konamigx)
 ROM_END
 
 #define SPR_WOR_DROM_LOAD(name,offset,length,crc) ROMX_LOAD(name, offset, length, crc, ROM_GROUPWORD | ROM_SKIP(5))
-#define SPR_5TH_ROM_LOAD(name,offset,length,crc)     ROMX_LOAD(name, offset, length, crc, ROM_GROUPBYTE | ROM_SKIP(5))
+#define SPR_5TH_ROM_LOAD(name,offset,length,crc) ROMX_LOAD(name, offset, length, crc, ROM_GROUPBYTE | ROM_SKIP(5))
 
 #define TILE_WORD_ROM_LOAD(name,offset,length,crc) ROMX_LOAD(name, offset, length, crc, ROM_GROUPDWORD | ROM_SKIP(1))
 #define TILE_BYTE_ROM_LOAD(name,offset,length,crc) ROMX_LOAD(name, offset, length, crc, ROM_GROUPBYTE | ROM_SKIP(4))
@@ -2115,7 +2128,7 @@ ROM_END
 #define T1_PSAC6_ROM_LOAD(name,offset,length,crc) ROMX_LOAD(name, offset, length, crc, ROM_GROUPBYTE | ROM_SKIP(2))
 #define T1_PSAC8_ROM_LOAD(name,offset,length,crc) ROMX_LOAD(name, offset, length, crc, ROM_GROUPBYTE | ROM_SKIP(3))
 
-#define _48_WORD_ROM_LOAD(name,offset,length,crc)   ROMX_LOAD(name, offset, length, crc, ROM_GROUPWORD | ROM_SKIP(4))
+#define _48_WORD_ROM_LOAD(name,offset,length,crc) ROMX_LOAD(name, offset, length, crc, ROM_GROUPWORD | ROM_SKIP(4))
 
 
 /* Gokujou Parodius version JAD (Japan) */
