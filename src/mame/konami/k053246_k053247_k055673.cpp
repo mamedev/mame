@@ -697,8 +697,8 @@ void k055673_device::device_start()
 	switch (m_bpp)
 	{
 		case K055673_LAYOUT_GX:
-			size4 = (m_gfxrom.length()/(1024*1024))/5;
-			size4 *= 4*1024*1024;
+			size4 = (m_gfxrom.length() / 0x100000) / 5;
+			size4 *= 0x400000;
 			/* set the # of tiles based on the 4bpp section */
 			m_combined_gfx = std::make_unique<u16[]>(size4 * 5 / 2);
 			alt_k055673_rom = m_combined_gfx.get();
