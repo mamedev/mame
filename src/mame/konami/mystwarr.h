@@ -55,6 +55,8 @@ private:
 	uint8_t m_sound_ctrl = 0;
 	uint8_t m_sound_nmi_clk = 0;
 
+	uint8_t m_last_alpha_tile_mix_code = 0;
+
 	uint16_t eeprom_r(offs_t offset, uint16_t mem_mask = ~0);
 	void mweeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t dddeeprom_r(offs_t offset, uint16_t mem_mask = ~0);
@@ -103,6 +105,7 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(metamrph_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(mchamp_interrupt);
 	K056832_CB_MEMBER(mystwarr_tile_callback);
+	K056832_CB_MEMBER(viostorm_tile_callback);
 	K056832_CB_MEMBER(game5bpp_tile_callback);
 	K056832_CB_MEMBER(game4bpp_tile_callback);
 	K055673_CB_MEMBER(mystwarr_sprite_callback);
