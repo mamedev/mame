@@ -6,12 +6,12 @@
 
 #pragma once
 
-// Emulates a voltage-controled amplifier (VCA). The control voltage (CV) can
+// Emulates a voltage-controled amplifier (VCA). The control value (CV) can
 // be set directly (set_fixed_cv()), or it can be provided in a sound stream
-// (input 1), by using a device in va_eg.h for example. The behavior of
-// specific VCAs can be emulated by using the respective configure_* functions.
-// Note that, depending on the device, CV could refer to a control voltage or
-// a control current.
+// (input 1), by a device in va_eg.h, for example. The behavior of specific VCAs
+// can be emulated by using the respective configure_* functions. Note that "CV"
+// ("control value") could either refer to a control voltage, or a control
+// current, depending on the device.
 class va_vca_device : public device_t, public device_sound_interface
 {
 public:

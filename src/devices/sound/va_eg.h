@@ -7,7 +7,7 @@
 #pragma once
 
 // Building block for emulating envelope generators (EGs) based on RC circuits.
-// The voltage is published to as a sound stream, and is also available by
+// The voltage is published as a sound stream, and is also available by
 // calling `get_v()`.
 class va_rc_eg_device : public device_t, public device_sound_interface
 {
