@@ -248,8 +248,6 @@ files {
 	MAME_DIR .. "src/emu/debug/dvmemory.h",
 	MAME_DIR .. "src/emu/debug/dvrpoints.cpp",
 	MAME_DIR .. "src/emu/debug/dvrpoints.h",
-	MAME_DIR .. "src/emu/debug/dvwpoints.cpp",
-	MAME_DIR .. "src/emu/debug/dvwpoints.h",
 	MAME_DIR .. "src/emu/debug/dvsourcecode.cpp",
 	MAME_DIR .. "src/emu/debug/dvsourcecode.h",
 	MAME_DIR .. "src/emu/debug/dvstate.cpp",
