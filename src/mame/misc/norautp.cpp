@@ -65,7 +65,7 @@
 
   -- unknown CPU based --
 
-   * unknown LJF Corportaion poker game          1989,  LJF Corporation
+   * unknown LJF Corporation poker game          1989,  LJF Corporation
 
 
 *******************************************************************************

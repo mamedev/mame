@@ -62,6 +62,8 @@ To do:
 
 - lhb3: DIP definitions
 
+- xymga: stop during attract mode with 'RECORD ERROR 3'
+
 Notes:
 
 - In most games, keep test button pressed during boot for another test mode
@@ -5108,7 +5110,7 @@ GAME( 1996, lhb2,          0,        lhb2,            lhb2,      igs011_state, i
 GAME( 1996, tygn,          lhb2,     tygn,            tygn,      igs011_state, init_tygn,         ROT0, "IGS",                     "Te Yi Gong Neng (China, V632C)",                   MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // ROM patches
 GAME( 1996, lhb3,          lhb2,     nkishusp,        nkishusp,  igs011_state, init_lhb3,         ROT0, "IGS",                     "Long Hu Bang III Cuo Pai Gao Shou (China, V242C)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // ROM patches
 GAME( 1996, xymg,          0,        xymg,            xymg,      igs011_state, init_xymg,         ROT0, "IGS",                     "Xingyun Manguan (China, V651C, set 1)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1996, xymga,         xymg,     xymga,           xymg,      igs011_state, init_xymga,        ROT0, "IGS",                     "Xingyun Manguan (China, V651C, set 2)",            MACHINE_SUPPORTS_SAVE ) // different encryption and without IGS003
+GAME( 1996, xymga,         xymg,     xymga,           xymg,      igs011_state, init_xymga,        ROT0, "IGS",                     "Xingyun Manguan (China, V651C, set 2)",            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // different encryption and without IGS003
 GAME( 1996, wlcc,          xymg,     wlcc,            wlcc,      igs011_state, init_wlcc,         ROT0, "IGS",                     "Wanli Changcheng (China, V638C)",                  MACHINE_SUPPORTS_SAVE )
 GAME( 1996, vbowl,         0,        vbowl,           vbowl,     vbowl_state,  init_vbowl,        ROT0, "IGS",                     "Virtua Bowling (World, V101XCM)",                  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1996, vbowlj,        vbowl,    vbowl,           vbowlj,    vbowl_state,  init_vbowlj,       ROT0, "IGS / Alta",              "Virtua Bowling (Japan, V100JCM)",                  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

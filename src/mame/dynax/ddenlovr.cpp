@@ -198,7 +198,7 @@ public:
 	void ddenlovrk(machine_config &config) ATTR_COLD;
 	void quizchq(machine_config &config) ATTR_COLD;
 	void mjmyuniv(machine_config &config) ATTR_COLD;
-	void mjmyunivbl2(machine_config &config) ATTR_COLD;
+	void mjmywrldt(machine_config &config) ATTR_COLD;
 	void dtoyoken(machine_config &config) ATTR_COLD;
 	void hgokou(machine_config &config) ATTR_COLD;
 	void seljan2(machine_config &config) ATTR_COLD;
@@ -396,7 +396,7 @@ private:
 	void mjflove_portmap(address_map &map) ATTR_COLD;
 	void mjmyorntr_portmap(address_map &map) ATTR_COLD;
 	void mjmyster_map(address_map &map) ATTR_COLD;
-	void mjmyunivbl2_map(address_map &map) ATTR_COLD;
+	void mjmywrldt_map(address_map &map) ATTR_COLD;
 	void mjmyster_portmap(address_map &map) ATTR_COLD;
 	void mjmywrld_portmap(address_map &map) ATTR_COLD;
 	void mjschuka_portmap(address_map &map) ATTR_COLD;
@@ -3211,7 +3211,7 @@ void ddenlovr_state::mjmyster_map(address_map &map)
 	map(0xf200, 0xffff).nopw();                        // ""
 }
 
-void ddenlovr_state::mjmyunivbl2_map(address_map &map)
+void ddenlovr_state::mjmywrldt_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();                         // ROM
 	map(0x6000, 0x6fff).ram();                         // RAM
@@ -7120,7 +7120,7 @@ static INPUT_PORTS_START( mjmyster )
 	PORT_DIPSETTING(    0x00, DEF_STR(2C_3C) )       PORT_CONDITION("FAKE", 0x01, EQUALS, 0x00)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( mjmyunivbl )
+static INPUT_PORTS_START( mjmyunivh )
 	// default to Hong Kong/Taiwan
 	PORT_INCLUDE(mjmyster)
 
@@ -9748,11 +9748,11 @@ void ddenlovr_state::mjmyuniv(machine_config &config)
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.30);
 }
 
-void ddenlovr_state::mjmyunivbl2(machine_config &config)
+void ddenlovr_state::mjmywrldt(machine_config &config)
 {
 	mjmyuniv(config);
 
-	subdevice<tmpz84c015_device>("maincpu")->set_addrmap(AS_PROGRAM, &ddenlovr_state::mjmyunivbl2_map);
+	subdevice<tmpz84c015_device>("maincpu")->set_addrmap(AS_PROGRAM, &ddenlovr_state::mjmywrldt_map);
 }
 
 void ddenlovr_state::mjmyornt(machine_config &config)
@@ -11794,7 +11794,7 @@ ROM_END
 
 // 麻雀 龍兄虎弟
 // CS166P001 PCB (very similar to mjmyuniv's one). Dump was presented as a bootleg but the PCB has all Dynax / Nakanihon original customs.
-ROM_START( mjmyunivbl )
+ROM_START( mjmyunivh )
 	ROM_REGION( 0x90000 + 0x1000*8, "maincpu", 0 )  // Z80 Code + space for banked RAM
 	ROM_LOAD( "rom.u42", 0x00000, 0x40000, CRC(8000eec3) SHA1(e2a4a46ebb8e152956f469382bde73b983090c01) )
 	ROM_RELOAD(          0x10000, 0x40000 )
@@ -11812,7 +11812,7 @@ ROM_END
 
 // 麻雀 財会贏
 // also CS166P001 PCB
-ROM_START( mjmyunivbl2 )
+ROM_START( mjmywrldt )
 	ROM_REGION( 0x90000 + 0x1000*8, "maincpu", 0 )  // Z80 Code + space for banked RAM
 	ROM_LOAD( "romb.u47", 0x00000, 0x40000, CRC(eb447ce4) SHA1(8b38cedd83dbc3dd1dff7f4a60658c1a9ef50428) )
 	ROM_RELOAD(           0x10000, 0x40000 )
@@ -12709,8 +12709,8 @@ GAME( 1994, mjmywrld,    mjmyster, mjmywrld,  mjmyster,   ddenlovr_state, empty_
 GAME( 1994, hginga,      0,        hginga,    hginga,     ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Hanafuda Hana Ginga (Japan)",                                    MACHINE_NO_COCKTAIL  )
 
 GAME( 1994, mjmyuniv,    0,        mjmyuniv,  mjmyster,   ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Mysterious Universe (Japan, D85)",                   MACHINE_NO_COCKTAIL  )
-GAME( 1995, mjmyunivbl,  mjmyuniv, mjmyuniv,  mjmyunivbl, ddenlovr_state, empty_init,    ROT0, "bootleg",                                     "Maa Zoek Lung Hing Fu Dai (Hong Kong, D106T)",                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL ) // One GFX ROM isn't dumped
-GAME( 1996, mjmyunivbl2, mjmyuniv, mjmyunivbl2,mjmyunivbl,ddenlovr_state, empty_init,    ROT0, "bootleg",                                     "Maque Caihui Ying (Taiwan, ver 2.20)",                           MACHINE_NO_COCKTAIL )
+GAME( 1995, mjmyunivh,   mjmyuniv, mjmyuniv,  mjmyunivh,  ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Maa Zoek Lung Hing Fu Dai (Hong Kong, D106T)",                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL ) // One GFX ROM isn't dumped
+GAME( 1996, mjmywrldt,   mjmyster, mjmywrldt, mjmyunivh,  ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Maque Caihui Ying (Taiwan, ver 2.20)",                           MACHINE_NO_COCKTAIL )
 
 GAME( 1994, quiz365,     0,        quiz365,   quiz365,    ddenlovr_state, empty_init,    ROT0, "Nakanihon",                                   "Quiz 365 (Japan)",                                               MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )
 GAME( 1994, quiz365t,    quiz365,  quiz365,   quiz365,    ddenlovr_state, empty_init,    ROT0, "Nakanihon / Taito",                           "Quiz 365 (Hong Kong & Taiwan)",                                  MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )
