@@ -44,7 +44,7 @@ protected:
 	virtual void memc_map(address_map &map) override ATTR_COLD;
 
 private:
-	required_device<ncr5380_device> m_ncr5380;
+	required_device<dp8490_device> m_dp8490;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_memory_region m_podule_rom;
 
@@ -56,10 +56,10 @@ void arc_scsi_cumana_device::ioc_map(address_map &map)
 {
 	map(0x0000, 0x1fff).lr8(NAME([this](offs_t offset) { return m_podule_rom->base()[offset | ((m_rom_page << 11) & 0xf800)]; })).umask32(0x000000ff);
 	map(0x0000, 0x1fff).lw8(NAME([this](u8 data) { m_rom_page = data; }));
-	//map(0x2000, 0x201f).mirror(0x0100).rw(m_ncr5380, FUNC(ncr5380_device::read), FUNC(ncr5380_device::write)).umask32(0x000000ff);
-	map(0x2100, 0x211f).m(m_ncr5380, FUNC(ncr5380_device::map)).umask32(0x000000ff);
-	//map(0x2100, 0x2100).r(m_ncr5380, FUNC(ncr5380_device::dma_r));
-	//map(0x2100, 0x2100).w(m_ncr5380, FUNC(ncr5380_device::dma_w));
+	//map(0x2000, 0x201f).mirror(0x0100).rw(m_dp8490, FUNC(dp8490_device::read), FUNC(dp8490_device::write)).umask32(0x000000ff);
+	map(0x2100, 0x211f).m(m_dp8490, FUNC(dp8490_device::map)).umask32(0x000000ff);
+	//map(0x2100, 0x2100).r(m_dp8490, FUNC(dp8490_device::dma_r));
+	//map(0x2100, 0x2100).w(m_dp8490, FUNC(dp8490_device::dma_w));
 }
 
 void arc_scsi_cumana_device::memc_map(address_map &map)
@@ -96,10 +96,10 @@ void arc_scsi_cumana_device::device_add_mconfig(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr5380", NCR5380) // DP8490
+	NSCSI_CONNECTOR(config, "scsi:7").option_set("dp8490", DP8490) // DP8490N
 		.machine_config([this](device_t *device)
 		{
-			downcast<ncr5380_device &>(*device).irq_handler().set([this](int state) { set_pirq(state); });
+			downcast<dp8490_device &>(*device).irq_handler().set([this](int state) { set_pirq(state); });
 		});
 
 	EEPROM_93C06_16BIT(config, m_eeprom);
@@ -117,7 +117,7 @@ void arc_scsi_cumana_device::device_add_mconfig(machine_config &config)
 arc_scsi_cumana_device::arc_scsi_cumana_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, ARC_SCSI_CUMANA, tag, owner, clock)
 	, device_archimedes_podule_interface(mconfig, *this)
-	, m_ncr5380(*this, "scsi:7:ncr5380")
+	, m_dp8490(*this, "scsi:7:dp8490")
 	, m_eeprom(*this, "eeprom")
 	, m_podule_rom(*this, "podule_rom")
 	, m_rom_page(0)

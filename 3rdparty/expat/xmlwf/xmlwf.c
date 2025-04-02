@@ -7,7 +7,18 @@
                                  |_| XML parser
 
    Copyright (c) 1997-2000 Thai Open Source Software Center Ltd
-   Copyright (c) 2000-2017 Expat development team
+   Copyright (c) 2000      Clark Cooper <coopercc@users.sourceforge.net>
+   Copyright (c) 2001-2003 Fred L. Drake, Jr. <fdrake@users.sourceforge.net>
+   Copyright (c) 2004-2009 Karl Waclawek <karl@waclawek.net>
+   Copyright (c) 2005-2007 Steven Solie <steven@solie.ca>
+   Copyright (c) 2016-2023 Sebastian Pipping <sebastian@pipping.org>
+   Copyright (c) 2017      Rhodri James <rhodri@wildebeest.org.uk>
+   Copyright (c) 2019      David Loffredo <loffredo@steptools.com>
+   Copyright (c) 2020      Joe Orton <jorton@redhat.com>
+   Copyright (c) 2020      Kleber Tarcísio <klebertarcisio@yahoo.com.br>
+   Copyright (c) 2021      Tim Bray <tbray@textuality.com>
+   Copyright (c) 2022      Martin Ettl <ettl.martin78@googlemail.com>
+   Copyright (c) 2022      Sean McBride <sean@rogue-research.com>
    Licensed under the MIT license:
 
    Permission is  hereby granted,  free of charge,  to any  person obtaining
@@ -30,11 +41,15 @@
    USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+#include "expat_config.h"
+
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
+#include <math.h> /* for isnan */
+#include <errno.h>
 
 #include "expat.h"
 #include "codepage.h"
@@ -49,6 +64,14 @@
 #ifdef XML_UNICODE
 #  include <wchar.h>
 #endif
+
+enum ExitCode {
+  XMLWF_EXIT_SUCCESS = 0,
+  XMLWF_EXIT_INTERNAL_ERROR = 1,
+  XMLWF_EXIT_NOT_WELLFORMED = 2,
+  XMLWF_EXIT_OUTPUT_ERROR = 3,
+  XMLWF_EXIT_USAGE_ERROR = 4,
+};
 
 /* Structures for handler user data */
 typedef struct NotationList {
@@ -156,7 +179,7 @@ is equivalent to lexicographically comparing based on the character number. */
 
 static int
 attcmp(const void *att1, const void *att2) {
-  return tcscmp(*(const XML_Char **)att1, *(const XML_Char **)att2);
+  return tcscmp(*(const XML_Char *const *)att1, *(const XML_Char *const *)att2);
 }
 
 static void XMLCALL
@@ -193,10 +216,10 @@ endElement(void *userData, const XML_Char *name) {
 
 static int
 nsattcmp(const void *p1, const void *p2) {
-  const XML_Char *att1 = *(const XML_Char **)p1;
-  const XML_Char *att2 = *(const XML_Char **)p2;
+  const XML_Char *att1 = *(const XML_Char *const *)p1;
+  const XML_Char *att2 = *(const XML_Char *const *)p2;
   int sep1 = (tcsrchr(att1, NSSEP) != 0);
-  int sep2 = (tcsrchr(att1, NSSEP) != 0);
+  int sep2 = (tcsrchr(att2, NSSEP) != 0);
   if (sep1 != sep2)
     return sep1 - sep2;
   return tcscmp(att1, att2);
@@ -322,6 +345,13 @@ freeNotations(XmlwfUserData *data) {
   data->notationListHead = NULL;
 }
 
+static void
+cleanupUserData(XmlwfUserData *userData) {
+  free((void *)userData->currentDoctypeName);
+  userData->currentDoctypeName = NULL;
+  freeNotations(userData);
+}
+
 static int
 xcscmp(const XML_Char *xs, const XML_Char *xt) {
   while (*xs != 0 && *xt != 0) {
@@ -341,8 +371,8 @@ xcscmp(const XML_Char *xs, const XML_Char *xt) {
 
 static int
 notationCmp(const void *a, const void *b) {
-  const NotationList *const n1 = *(NotationList **)a;
-  const NotationList *const n2 = *(NotationList **)b;
+  const NotationList *const n1 = *(const NotationList *const *)a;
+  const NotationList *const n2 = *(const NotationList *const *)b;
 
   return xcscmp(n1->notationName, n2->notationName);
 }
@@ -842,47 +872,71 @@ showVersion(XML_Char *prog) {
   }
 }
 
+#if defined(__GNUC__)
+__attribute__((noreturn))
+#endif
 static void
 usage(const XML_Char *prog, int rc) {
   ftprintf(
       stderr,
       /* Generated with:
        * $ xmlwf/xmlwf_helpgen.sh
+       * To update, change xmlwf/xmlwf_helpgen.py, then paste the output of
+       * xmlwf/xmlwf_helpgen.sh in here.
        */
       /* clang-format off */
-      T("usage: %s [-s] [-n] [-p] [-x] [-e ENCODING] [-w] [-r] [-d DIRECTORY]\n")
-      T("             [-c | -m | -t] [-N]\n")
-      T("             [FILE [FILE ...]]\n")
+      T("usage:\n")
+      T("  %s [OPTIONS] [FILE ...]\n")
+      T("  %s -h|--help\n")
+      T("  %s -v|--version\n")
       T("\n")
       T("xmlwf - Determines if an XML document is well-formed\n")
       T("\n")
       T("positional arguments:\n")
-      T("  FILE          file to process (default: STDIN)\n")
+      T("  FILE           file to process (default: STDIN)\n")
       T("\n")
       T("input control arguments:\n")
-      T("  -s            print an error if the document is not [s]tandalone\n")
-      T("  -n            enable [n]amespace processing\n")
-      T("  -p            enable processing external DTDs and [p]arameter entities\n")
-      T("  -x            enable processing of e[x]ternal entities\n")
-      T("  -e ENCODING   override any in-document [e]ncoding declaration\n")
-      T("  -w            enable support for [W]indows code pages\n")
-      T("  -r            disable memory-mapping and use normal file [r]ead IO calls instead\n")
+      T("  -s             print an error if the document is not [s]tandalone\n")
+      T("  -n             enable [n]amespace processing\n")
+      T("  -p             enable processing of external DTDs and [p]arameter entities\n")
+      T("  -x             enable processing of e[x]ternal entities\n")
+      T("  -e ENCODING    override any in-document [e]ncoding declaration\n")
+      T("  -w             enable support for [W]indows code pages\n")
+      T("  -r             disable memory-mapping and use [r]ead calls instead\n")
+      T("  -g BYTES       buffer size to request per call pair to XML_[G]etBuffer and read (default: 8 KiB)\n")
+      T("  -k             when processing multiple files, [k]eep processing after first file with error\n")
       T("\n")
       T("output control arguments:\n")
-      T("  -d DIRECTORY  output [d]estination directory\n")
-      T("  -c            write a [c]opy of input XML, not canonical XML\n")
-      T("  -m            write [m]eta XML, not canonical XML\n")
-      T("  -t            write no XML output for [t]iming of plain parsing\n")
-      T("  -N            enable adding doctype and [n]otation declarations\n")
+      T("  -d DIRECTORY   output [d]estination directory\n")
+      T("  -c             write a [c]opy of input XML, not canonical XML\n")
+      T("  -m             write [m]eta XML, not canonical XML\n")
+      T("  -t             write no XML output for [t]iming of plain parsing\n")
+      T("  -N             enable adding doctype and [n]otation declarations\n")
+      T("\n")
+      T("billion laughs attack protection:\n")
+      T("  NOTE: If you ever need to increase these values for non-attack payload, please file a bug report.\n")
+      T("\n")
+      T("  -a FACTOR      set maximum tolerated [a]mplification factor (default: 100.0)\n")
+      T("  -b BYTES       set number of output [b]ytes needed to activate (default: 8 MiB)\n")
+      T("\n")
+      T("reparse deferral:\n")
+      T("  -q             disable reparse deferral, and allow [q]uadratic parse runtime with large tokens\n")
       T("\n")
       T("info arguments:\n")
-      T("  -h            show this [h]elp message and exit\n")
-      T("  -v            show program's [v]ersion number and exit\n")
+      T("  -h, --help     show this [h]elp message and exit\n")
+      T("  -v, --version  show program's [v]ersion number and exit\n")
+      T("\n")
+      T("exit status:\n")
+      T("  0              the input files are well-formed and the output (if requested) was written successfully\n")
+      T("  1              could not allocate data structures, signals a serious problem with execution environment\n")
+      T("  2              one or more input files were not well-formed\n")
+      T("  3              could not create an output file\n")
+      T("  4              command-line argument error\n")
       T("\n")
       T("xmlwf of libexpat is software libre, licensed under the MIT license.\n")
-      T("Please report bugs at https://github.com/libexpat/libexpat/issues.  Thank you!\n")
+      T("Please report bugs at https://github.com/libexpat/libexpat/issues -- thank you!\n")
       , /* clang-format on */
-      prog);
+      prog, prog, prog);
   exit(rc);
 }
 
@@ -890,6 +944,21 @@ usage(const XML_Char *prog, int rc) {
 /* Silence warning about missing prototype */
 int wmain(int argc, XML_Char **argv);
 #endif
+
+#define XMLWF_SHIFT_ARG_INTO(constCharStarTarget, argc, argv, i, j)            \
+  {                                                                            \
+    if (argv[i][j + 1] == T('\0')) {                                           \
+      if (++i == argc) {                                                       \
+        usage(argv[0], XMLWF_EXIT_USAGE_ERROR);                                \
+        /* usage called exit(..), never gets here */                           \
+      }                                                                        \
+      constCharStarTarget = argv[i];                                           \
+    } else {                                                                   \
+      constCharStarTarget = argv[i] + j + 1;                                   \
+    }                                                                          \
+    i++;                                                                       \
+    j = 0;                                                                     \
+  }
 
 int
 tmain(int argc, XML_Char **argv) {
@@ -902,6 +971,15 @@ tmain(int argc, XML_Char **argv) {
   int useNamespaces = 0;
   int requireStandalone = 0;
   int requiresNotations = 0;
+  int continueOnError = 0;
+
+  float attackMaximumAmplification = -1.0f; /* signaling "not set" */
+  unsigned long long attackThresholdBytes = 0;
+  XML_Bool attackThresholdGiven = XML_FALSE;
+
+  XML_Bool disableDeferral = XML_FALSE;
+
+  int exitCode = XMLWF_EXIT_SUCCESS;
   enum XML_ParamEntityParsing paramEntityParsing
       = XML_PARAM_ENTITY_PARSING_NEVER;
   int useStdin = 0;
@@ -917,9 +995,17 @@ tmain(int argc, XML_Char **argv) {
     if (j == 0) {
       if (argv[i][0] != T('-'))
         break;
-      if (argv[i][1] == T('-') && argv[i][2] == T('\0')) {
-        i++;
-        break;
+      if (argv[i][1] == T('-')) {
+        if (argv[i][2] == T('\0')) {
+          i++;
+          break;
+        } else if (tcscmp(argv[i] + 2, T("help")) == 0) {
+          usage(argv[0], XMLWF_EXIT_SUCCESS);
+          // usage called exit(..), never gets here
+        } else if (tcscmp(argv[i] + 2, T("version")) == 0) {
+          showVersion(argv[0]);
+          return XMLWF_EXIT_SUCCESS;
+        }
       }
       j++;
     }
@@ -965,31 +1051,91 @@ tmain(int argc, XML_Char **argv) {
       j++;
       break;
     case T('d'):
-      if (argv[i][j + 1] == T('\0')) {
-        if (++i == argc)
-          usage(argv[0], 2);
-        outputDir = argv[i];
-      } else
-        outputDir = argv[i] + j + 1;
-      i++;
-      j = 0;
+      XMLWF_SHIFT_ARG_INTO(outputDir, argc, argv, i, j);
       break;
     case T('e'):
-      if (argv[i][j + 1] == T('\0')) {
-        if (++i == argc)
-          usage(argv[0], 2);
-        encoding = argv[i];
-      } else
-        encoding = argv[i] + j + 1;
-      i++;
-      j = 0;
+      XMLWF_SHIFT_ARG_INTO(encoding, argc, argv, i, j);
       break;
     case T('h'):
-      usage(argv[0], 0);
-      return 0;
+      usage(argv[0], XMLWF_EXIT_SUCCESS);
+      // usage called exit(..), never gets here
     case T('v'):
       showVersion(argv[0]);
-      return 0;
+      return XMLWF_EXIT_SUCCESS;
+    case T('g'): {
+      const XML_Char *valueText = NULL;
+      XMLWF_SHIFT_ARG_INTO(valueText, argc, argv, i, j);
+
+      errno = 0;
+      XML_Char *afterValueText = (XML_Char *)valueText;
+      const long long read_size_bytes_candidate
+          = tcstoull(valueText, &afterValueText, 10);
+      if ((errno != 0) || (afterValueText[0] != T('\0'))
+          || (read_size_bytes_candidate < 1)
+          || (read_size_bytes_candidate > (INT_MAX / 2 + 1))) {
+        // This prevents tperror(..) from reporting misleading "[..]: Success"
+        errno = ERANGE;
+        tperror(T("invalid buffer size") T(
+            " (needs an integer from 1 to INT_MAX/2+1 i.e. 1,073,741,824 on most platforms)"));
+        exit(XMLWF_EXIT_USAGE_ERROR);
+      }
+      g_read_size_bytes = (int)read_size_bytes_candidate;
+      break;
+    }
+    case T('k'):
+      continueOnError = 1;
+      j++;
+      break;
+    case T('a'): {
+      const XML_Char *valueText = NULL;
+      XMLWF_SHIFT_ARG_INTO(valueText, argc, argv, i, j);
+
+      errno = 0;
+      XML_Char *afterValueText = NULL;
+      attackMaximumAmplification = tcstof(valueText, &afterValueText);
+      if ((errno != 0) || (afterValueText[0] != T('\0'))
+          || isnan(attackMaximumAmplification)
+          || (attackMaximumAmplification < 1.0f)) {
+        // This prevents tperror(..) from reporting misleading "[..]: Success"
+        errno = ERANGE;
+        tperror(T("invalid amplification limit") T(
+            " (needs a floating point number greater or equal than 1.0)"));
+        exit(XMLWF_EXIT_USAGE_ERROR);
+      }
+#if XML_GE == 0
+      ftprintf(stderr,
+               T("Warning: Given amplification limit ignored")
+                   T(", xmlwf has been compiled without DTD/GE support.\n"));
+#endif
+      break;
+    }
+    case T('b'): {
+      const XML_Char *valueText = NULL;
+      XMLWF_SHIFT_ARG_INTO(valueText, argc, argv, i, j);
+
+      errno = 0;
+      XML_Char *afterValueText = (XML_Char *)valueText;
+      attackThresholdBytes = tcstoull(valueText, &afterValueText, 10);
+      if ((errno != 0) || (afterValueText[0] != T('\0'))) {
+        // This prevents tperror(..) from reporting misleading "[..]: Success"
+        errno = ERANGE;
+        tperror(T("invalid ignore threshold")
+                    T(" (needs an integer from 0 to 2^64-1)"));
+        exit(XMLWF_EXIT_USAGE_ERROR);
+      }
+      attackThresholdGiven = XML_TRUE;
+#if XML_GE == 0
+      ftprintf(stderr,
+               T("Warning: Given attack threshold ignored")
+                   T(", xmlwf has been compiled without DTD/GE support.\n"));
+#endif
+      break;
+    }
+    case T('q'): {
+      disableDeferral = XML_TRUE;
+      j++;
+      break;
+    }
     case T('\0'):
       if (j > 1) {
         i++;
@@ -998,7 +1144,8 @@ tmain(int argc, XML_Char **argv) {
       }
       /* fall through */
     default:
-      usage(argv[0], 2);
+      usage(argv[0], XMLWF_EXIT_USAGE_ERROR);
+      // usage called exit(..), never gets here
     }
   }
   if (i == argc) {
@@ -1017,7 +1164,32 @@ tmain(int argc, XML_Char **argv) {
 
     if (! parser) {
       tperror(T("Could not instantiate parser"));
-      exit(1);
+      exit(XMLWF_EXIT_INTERNAL_ERROR);
+    }
+
+    if (attackMaximumAmplification != -1.0f) {
+#if XML_GE == 1
+      XML_SetBillionLaughsAttackProtectionMaximumAmplification(
+          parser, attackMaximumAmplification);
+#endif
+    }
+    if (attackThresholdGiven) {
+#if XML_GE == 1
+      XML_SetBillionLaughsAttackProtectionActivationThreshold(
+          parser, attackThresholdBytes);
+#else
+      (void)attackThresholdBytes; // silence -Wunused-but-set-variable
+#endif
+    }
+
+    if (disableDeferral) {
+      const XML_Bool success = XML_SetReparseDeferralEnabled(parser, XML_FALSE);
+      if (! success) {
+        // This prevents tperror(..) from reporting misleading "[..]: Success"
+        errno = EINVAL;
+        tperror(T("Failed to disable reparse deferral"));
+        exit(XMLWF_EXIT_INTERNAL_ERROR);
+      }
     }
 
     if (requireStandalone)
@@ -1053,7 +1225,7 @@ tmain(int argc, XML_Char **argv) {
                                    * sizeof(XML_Char));
       if (! outName) {
         tperror(T("Could not allocate memory"));
-        exit(1);
+        exit(XMLWF_EXIT_INTERNAL_ERROR);
       }
       tcscpy(outName, outputDir);
       tcscat(outName, delim);
@@ -1061,7 +1233,14 @@ tmain(int argc, XML_Char **argv) {
       userData.fp = tfopen(outName, T("wb"));
       if (! userData.fp) {
         tperror(outName);
-        exit(3);
+        exitCode = XMLWF_EXIT_OUTPUT_ERROR;
+        free(outName);
+        XML_ParserFree(parser);
+        if (continueOnError) {
+          continue;
+        } else {
+          break;
+        }
       }
       setvbuf(userData.fp, NULL, _IOFBF, 16384);
 #ifdef XML_UNICODE
@@ -1123,8 +1302,12 @@ tmain(int argc, XML_Char **argv) {
     }
     XML_ParserFree(parser);
     if (! result) {
-      exit(2);
+      exitCode = XMLWF_EXIT_NOT_WELLFORMED;
+      cleanupUserData(&userData);
+      if (! continueOnError) {
+        break;
+      }
     }
   }
-  return 0;
+  return exitCode;
 }

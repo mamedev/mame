@@ -53529,7 +53529,6 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<year>1997?</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="SCPS-45128" />
-		<info name="release" value="" />
 		<info name="alt_title" value="三国志5"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
@@ -54398,7 +54397,6 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<year>2000?</year>
 		<publisher>SCEI</publisher>
 		<info name="serial" value="SCPS-45510" />
-		<info name="release" value="" />
 		<info name="alt_title" value="射雕英雄传"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
@@ -56949,8 +56947,6 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<year>2000</year>
 		<publisher>Aspect</publisher>
 		<info name="serial" value="SLPM-80527" />
-		<info name="release" value="" />
-		<info name="alt_title" value=""/>
 		<info name="usage" value="This disc contains additional EVS tracks for Tokimeki Memorial 2"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
@@ -56971,8 +56967,6 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<year>2000</year>
 		<publisher>Aspect</publisher>
 		<info name="serial" value="SLPM-80544" />
-		<info name="release" value="" />
-		<info name="alt_title" value=""/>
 		<info name="usage" value="This disc contains additional EVS tracks for Tokimeki Memorial 2"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
@@ -56994,8 +56988,6 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<year>2000</year>
 		<publisher>Enterbrain</publisher>
 		<info name="serial" value="SLPM-80550" />
-		<info name="release" value="" />
-		<info name="alt_title" value=""/>
 		<info name="usage" value="This disc contains additional EVS tracks for Tokimeki Memorial 2"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
@@ -59440,7 +59432,6 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<year>199?</year>
 		<publisher>Squaresoft</publisher>
 		<info name="serial" value="SLPM-80073" />
-		<info name="release" value="" />
 		<info name="alt_title" value="ファイナルファンタジー　エクストラコレクション"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
@@ -59461,7 +59452,6 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<year>199?</year>
 		<publisher>Squaresoft</publisher>
 		<info name="serial" value="SLPM-80556" />
-		<info name="release" value="" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -59481,7 +59471,6 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="PAPX-90052" />
-		<info name="release" value="" />
 		<info name="alt_title" value="ラララ　プレイステーション"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
@@ -59502,7 +59491,6 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<year>1997</year>
 		<publisher>From Software</publisher>
 		<info name="serial" value="SLPM-80118" />
-		<info name="release" value="" />
 		<info name="alt_title" value="装甲核心 - 体验版"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
@@ -59523,7 +59511,6 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<year>1996</year>
 		<publisher>Human</publisher>
 		<info name="serial" value="SLPM-80063" />
-		<info name="release" value="" />
 		<info name="alt_title" value="クロックタワー2体験版"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
@@ -59544,7 +59531,6 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<year>1997</year>
 		<publisher>SCEI</publisher>
 		<info name="serial" value="PCPX-96087" />
-		<info name="release" value="" />
 		<info name="alt_title" value="グランストリーム伝紀 体験版"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
@@ -59565,7 +59551,6 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<year>199?</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="SLPM-80490" />
-		<info name="release" value="" />
 		<info name="alt_title" value="KOUDELKA クーデルカ 体験版"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
@@ -59586,7 +59571,6 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<year>1998</year>
 		<publisher>SCEI</publisher>
 		<info name="serial" value="PAPX-90055" />
-		<info name="release" value="" />
 		<info name="alt_title" value="レガイア伝説"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
@@ -59607,7 +59591,6 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<year>200?</year>
 		<publisher>SCEI</publisher>
 		<info name="serial" value="SLPM-80522" />
-		<info name="release" value="" />
 		<info name="alt_title" value="レスキューショットブービーぼー&amp;バイオハザードガンサバイバー ガンコン"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
@@ -59647,7 +59630,6 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<year>199?</year>
 		<publisher>Genki</publisher>
 		<info name="serial" value="SLPM-80325" />
-		<info name="release" value="" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">

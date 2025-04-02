@@ -459,6 +459,12 @@ void palette_device::write16_ext(offs_t offset, u16 data, u16 mem_mask)
 	update_for_write(offset * 2, 2);
 }
 
+void palette_device::write32_ext(offs_t offset, u32 data, u32 mem_mask)
+{
+	m_paletteram_ext.write32(offset, data, mem_mask);
+	update_for_write(offset * 4, 4);
+}
+
 u8 palette_device::read8_ext(offs_t offset)
 {
 	return m_paletteram_ext.read8(offset);
@@ -469,6 +475,10 @@ u16 palette_device::read16_ext(offs_t offset)
 	return m_paletteram_ext.read16(offset);
 }
 
+u32 palette_device::read32_ext(offs_t offset)
+{
+	return m_paletteram_ext.read32(offset);
+}
 
 //-------------------------------------------------
 //  write_indirect - write a byte to the base

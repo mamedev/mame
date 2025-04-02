@@ -771,4 +771,4 @@ GAME( 1992, fixeightat,  fixeight, fixeight,   fixeight,   fixeight_state, empty
 GAME( 1992, fixeightut,  fixeight, fixeight,   fixeight,   fixeight_state, empty_init,   ROT270, "Toaplan (Taito license)", "FixEight (USA, Taito license)",                              MACHINE_SUPPORTS_SAVE )
 GAME( 1992, fixeightjt,  fixeight, fixeight,   fixeight,   fixeight_state, empty_init,   ROT270, "Toaplan (Taito license)", "FixEight - Jigoku no Eiyuu Densetsu (Japan, Taito license)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1992, fixeightbl,  fixeight, fixeightbl, fixeightbl, fixeight_bootleg_state, init_fixeightbl, ROT270, "bootleg", "FixEight (Korea, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeightbl,  fixeight, fixeightbl, fixeightbl, fixeight_bootleg_state, init_fixeightbl, ROT270, "bootleg (Shine)", "FixEight (Korea, bootleg)", MACHINE_SUPPORTS_SAVE )

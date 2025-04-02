@@ -10,6 +10,7 @@
 #import "pointsviewer.h"
 
 #import "breakpointsview.h"
+#import "exceptionpointsview.h"
 #import "registerpointsview.h"
 #import "watchpointsview.h"
 
@@ -19,9 +20,9 @@
 @implementation MAMEPointsViewer
 
 - (id)initWithMachine:(running_machine &)m console:(MAMEDebugConsole *)c {
-	MAMEDebugView   *breakView, *watchView, *registerView;
-	NSScrollView    *breakScroll, *watchScroll, *registerScroll;
-	NSTabViewItem   *breakTab, *watchTab, *registerTab;
+	MAMEDebugView   *breakView, *watchView, *registerView, *exceptionView;
+	NSScrollView    *breakScroll, *watchScroll, *registerScroll, *exceptionScroll;
+	NSTabViewItem   *breakTab, *watchTab, *registerTab, *exceptionTab;
 	NSPopUpButton   *actionButton;
 	NSRect          subviewFrame;
 
@@ -48,6 +49,9 @@
 	[[[subviewButton menu] addItemWithTitle:@"All Registerpoints"
 									 action:NULL
 							  keyEquivalent:@""] setTag:2];
+	[[[subviewButton menu] addItemWithTitle:@"All Exceptionpoints"
+									 action:NULL
+							  keyEquivalent:@""] setTag:3];
 	[subviewButton sizeToFit];
 	subviewFrame = [subviewButton frame];
 	subviewFrame.origin.x = subviewFrame.size.height;
@@ -118,7 +122,23 @@
 	[registerTab setView:registerScroll];
 	[registerScroll release];
 
-	// create a tabless tabview for the two subviews
+	// create the exceptionpoints view
+	exceptionView = [[MAMEExceptionpointsView alloc] initWithFrame:NSMakeRect(0, 0, 100, 100)
+														   machine:*machine];
+	exceptionScroll = [[NSScrollView alloc] initWithFrame:[breakScroll frame]];
+	[exceptionScroll setAutoresizingMask:(NSViewWidthSizable | NSViewHeightSizable)];
+	[exceptionScroll setHasHorizontalScroller:YES];
+	[exceptionScroll setHasVerticalScroller:YES];
+	[exceptionScroll setAutohidesScrollers:YES];
+	[exceptionScroll setBorderType:NSNoBorder];
+	[exceptionScroll setDrawsBackground:NO];
+	[exceptionScroll setDocumentView:exceptionView];
+	[exceptionView release];
+	exceptionTab = [[NSTabViewItem alloc] initWithIdentifier:@""];
+	[exceptionTab setView:exceptionScroll];
+	[exceptionScroll release];
+
+	// create a tabless tabview for the four subviews
 	tabs = [[NSTabView alloc] initWithFrame:[breakScroll frame]];
 	[tabs setTabViewType:NSNoTabsNoBorder];
 	[tabs setAutoresizingMask:(NSViewWidthSizable | NSViewHeightSizable)];
@@ -128,6 +148,8 @@
 	[watchTab release];
 	[tabs addTabViewItem:registerTab];
 	[registerTab release];
+	[tabs addTabViewItem:exceptionTab];
+	[exceptionTab release];
 	[[window contentView] addSubview:tabs];
 	[tabs release];
 
@@ -156,8 +178,14 @@
 															  borderType:[registerScroll borderType]
 															 controlSize:NSControlSizeRegular
 														   scrollerStyle:NSScrollerStyleOverlay];
-	NSSize const desired = NSMakeSize(std::max({ breakDesired.width, watchDesired.width, registerDesired.width }),
-									  std::max({ breakDesired.height, watchDesired.height, registerDesired.height }));
+	NSSize const exceptionDesired = [NSScrollView frameSizeForContentSize:[exceptionView maximumFrameSize]
+												  horizontalScrollerClass:[NSScroller class]
+													verticalScrollerClass:[NSScroller class]
+															   borderType:[exceptionScroll borderType]
+															  controlSize:NSControlSizeRegular
+															scrollerStyle:NSScrollerStyleOverlay];
+	NSSize const desired = NSMakeSize(std::max({ breakDesired.width, watchDesired.width, registerDesired.width, exceptionDesired.width }),
+									  std::max({ breakDesired.height, watchDesired.height, registerDesired.height, exceptionDesired.height }));
 	[self cascadeWindowWithDesiredSize:desired forView:tabs];
 
 	// don't forget the result

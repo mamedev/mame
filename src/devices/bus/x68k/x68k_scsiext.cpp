@@ -56,7 +56,7 @@ void x68k_scsiext_device::device_add_mconfig(machine_config &config)
 		{
 			mb89352_device &spc = downcast<mb89352_device &>(*device);
 
-			spc.set_clock(8'000'000); // ?
+			spc.set_clock(10'000'000 / 2); // 10MHz clock from bus
 			spc.out_irq_callback().set(*this, FUNC(x68k_scsiext_device::irq_w));
 			spc.out_dreq_callback().set(*this, FUNC(x68k_scsiext_device::drq_w));
 		});
@@ -68,16 +68,24 @@ x68k_scsiext_device::x68k_scsiext_device(const machine_config &mconfig, const ch
 	, m_slot(nullptr)
 	, m_spc(*this, "scsi:7:spc")
 	, m_rom(*this, "scsiexrom")
+	, m_drq(false)
 {
 }
 
 void x68k_scsiext_device::device_start()
 {
+	save_item(NAME(m_drq));
+
 	m_slot = dynamic_cast<x68k_expansion_slot_device *>(owner());
 
 	m_slot->space().install_rom(0xea0020,0xea1fff, m_rom.target());
 	m_slot->space().unmap_write(0xea0020,0xea1fff);
 	m_slot->space().install_device(0xea0000, 0xea001f, *m_spc, &mb89352_device::map, 0x00ff00ff);
+
+	// replace data register handlers with DMA-aware glue
+	m_slot->space().install_readwrite_handler(0xea0015, 0xea0015,
+		emu::rw_delegate(*this, FUNC(x68k_scsiext_device::data_r)),
+		emu::rw_delegate(*this, FUNC(x68k_scsiext_device::data_w)));
 }
 
 void x68k_scsiext_device::device_reset()
@@ -86,7 +94,8 @@ void x68k_scsiext_device::device_reset()
 
 void x68k_scsiext_device::irq_w(int state)
 {
-	m_slot->irq2_w(state);  // correct?  Or perhaps selectable?
+	// TODO: jumper-configurable IRQ2/IRQ4
+	m_slot->irq2_w(state);
 }
 
 uint8_t x68k_scsiext_device::iack2()
@@ -96,5 +105,36 @@ uint8_t x68k_scsiext_device::iack2()
 
 void x68k_scsiext_device::drq_w(int state)
 {
-	// TODO
+	m_drq = bool(state);
+}
+
+u8 x68k_scsiext_device::data_r()
+{
+	// check for DMA cycle
+	if (m_slot->exown() && !machine().side_effects_disabled())
+	{
+		// negate #DTACK if not requesting a DMA transfer
+		if (!m_drq)
+			m_slot->dtack_w(1);
+
+		return m_spc->dma_r();
+	}
+	else
+		return m_spc->dreg_r();
+
+}
+
+void x68k_scsiext_device::data_w(u8 data)
+{
+	// check for DMA cycle
+	if (m_slot->exown())
+	{
+		// negate #DTACK if not requesting a DMA transfer
+		if (!m_drq)
+			m_slot->dtack_w(1);
+		else
+			m_spc->dma_w(data);
+	}
+	else
+		m_spc->dreg_w(data);
 }

@@ -75,11 +75,10 @@ TODO:
 - hookup lamps and do layouts
 - keyboard inputs for mahjong games
 - use real values for reel tilemaps offsets instead of hardcoded ones (would fix magslot)
-- complete inputs for baile, yyhm, jinpaish (needs someone who understands Chinese and
-  knows how to play)
+- complete inputs for baile, yyhm, jinpaish, ssanguoj, cjdlz (needs someone who understands
+  Chinese and knows how to play)
 - game logic in baile seems broken (you always win), maybe due to the patches?
 - broken title GFX in yyhm (transparent pen problem?)
-- broken title GFX in cjdlz. How should the extra ROM be loaded?
 - the newer games seem to use range 0x9e1000-0x9e1fff during gameplay
 
 Video references:
@@ -142,7 +141,7 @@ public:
 	void super555(machine_config &config) ATTR_COLD;
 
 	void init_ballch() ATTR_COLD;
-	void init_cjldz() ATTR_COLD;
+	void init_cjdlz() ATTR_COLD;
 	void init_cots() ATTR_COLD;
 	void init_hgly() ATTR_COLD;
 	void init_rbspm() ATTR_COLD;
@@ -256,8 +255,7 @@ void gms_2layers_state::tilebank_w(uint16_t data)
 	//           x       // unknown (set during most screens in the mahjong games and in sc2in1' title screen)
 	//            x      // priority between 1st and 2nd tilemaps
 	//             x     // bank 1st tilemap
-	//              x    // 1st tilemap enable (probably)
-	//               xx  // bank 2nd tilemap
+	//              xxx  // bank 2nd tilemap
 	//                 x // 2nd tilemap enable (probably)
 
 	if (m_tilebank & 0xf1c0)
@@ -1781,9 +1779,9 @@ static INPUT_PORTS_START( cjdlz ) // TODO
 	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:7")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, "Controls" ) PORT_DIPLOCATION("DSW1:8") // should default to keyboard, but set on joystick since the former isn't emulated yet
-	PORT_DIPSETTING(      0x0080, DEF_STR( Joystick ) )
-	PORT_DIPSETTING(      0x0000, "Keyboard" )
+	PORT_DIPNAME( 0x0080, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0100, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW4:1")
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -1832,9 +1830,9 @@ static INPUT_PORTS_START( cjdlz ) // TODO
 	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:7")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:8")
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, "Controls" ) PORT_DIPLOCATION("DSW2:8") // should default to keyboard, but set on joystick since the former isn't emulated yet
+	PORT_DIPSETTING(      0x0080, DEF_STR( Joystick ) )
+	PORT_DIPSETTING(      0x0000, "Keyboard" )
 	PORT_DIPNAME( 0x0100, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW5:1")
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -1921,14 +1919,14 @@ static INPUT_PORTS_START( hgly )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "Paytable" )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no evident effect
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME( "Start Slot" )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(4)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(4)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(4)
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(4)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no evident effect
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no evident effect
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no evident effect
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no evident effect
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no evident effect
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no evident effect
 
 	PORT_START("IN2")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
@@ -1992,10 +1990,10 @@ static INPUT_PORTS_START( hgly )
 	PORT_DIPSETTING(      0x1000, "10000" )
 	PORT_DIPSETTING(      0x2000, "30000" )
 	PORT_DIPSETTING(      0x3000, "50000" )
-	PORT_DIPNAME( 0x4000, 0x0000, "Double Explosive Machine" ) PORT_DIPLOCATION("DSW4:7") // TODO: fishy machine translations
+	PORT_DIPNAME( 0x4000, 0x0000, "Double-Up Game Jackpot" ) PORT_DIPLOCATION("DSW4:7")
 	PORT_DIPSETTING(      0x4000, "10000" )
 	PORT_DIPSETTING(      0x0000, "Unlimited" )
-	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW4:8") // not definition in test mode
+	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW4:8") // not defined in test mode
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
@@ -2063,13 +2061,13 @@ static INPUT_PORTS_START( hgly )
 	PORT_DIPNAME( 0x0010, 0x0000, "Bet Every Time" ) PORT_DIPLOCATION("DSW3:5") // hard-coded
 	PORT_DIPSETTING(      0x0010, "4" )
 	PORT_DIPSETTING(      0x0000, "4 (duplicate)" )
-	PORT_DIPNAME( 0x0020, 0x0000, "Scoring" ) PORT_DIPLOCATION("DSW3:6") // TODO: fishy machine translations
+	PORT_DIPNAME( 0x0020, 0x0000, "Scoring" ) PORT_DIPLOCATION("DSW3:6")
 	PORT_DIPSETTING(      0x0020, "Numbers" )
-	PORT_DIPSETTING(      0x0000, "Tubes" )
-	PORT_DIPNAME( 0x0040, 0x0040, "Controls" ) PORT_DIPLOCATION("DSW3:7") // should default to keyboard, but set on joystick since the former isn't emulated yet
-	PORT_DIPSETTING(      0x0040, DEF_STR( Joystick ) )
-	PORT_DIPSETTING(      0x0000, "Keyboard" )
-	PORT_DIPNAME( 0x0080, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW3:8") // not definition in test mode
+	PORT_DIPSETTING(      0x0000, "Circle Tiles" )
+	PORT_DIPNAME( 0x0040, 0x0000, "Controls" ) PORT_DIPLOCATION("DSW3:7")
+	PORT_DIPSETTING(      0x0000, DEF_STR( Joystick ) )
+	PORT_DIPSETTING(      0x0040, "Keyboard" )
+	PORT_DIPNAME( 0x0080, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW3:8") // not defined in test mode
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0100, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW6:1")
@@ -2177,7 +2175,7 @@ TILE_GET_INFO_MEMBER(gms_2layers_state::get_reel_tile_info)
 TILE_GET_INFO_MEMBER(gms_2layers_state::get_tile0_info)
 {
 	const int tile = m_vidram[0][tile_index];
-	tileinfo.set(1, (tile & 0x0fff) + ((m_tilebank >> 1) & 3) * 0x1000, tile >> 12, 0);
+	tileinfo.set(1, (tile & 0x0fff) + ((m_tilebank >> 1) & 7) * 0x1000, tile >> 12, 0);
 }
 
 TILE_GET_INFO_MEMBER(gms_3layers_state::get_tile1_info)
@@ -2201,7 +2199,7 @@ uint32_t gms_2layers_state::screen_update(screen_device &screen, bitmap_ind16 &b
 			for (int j = 0; j < 64; j++)
 				m_reel_tilemap[i]->set_scrolly(j, m_scrolly[i][j]);
 
-		if (BIT(m_tilebank, 3) && BIT(m_tilebank, 5))
+		if (BIT(m_tilebank, 5))
 		{
 			for (int i = 3; i >=  0; i--)
 				m_reel_tilemap[i]->set_transparent_pen(0xff);
@@ -2214,7 +2212,7 @@ uint32_t gms_2layers_state::screen_update(screen_device &screen, bitmap_ind16 &b
 		if (BIT(m_tilebank, 0))
 			m_tilemap[0]->draw(screen, bitmap, cliprect);
 
-		if (BIT(m_tilebank, 3) && !BIT(m_tilebank, 5))
+		if (!BIT(m_tilebank, 5))
 		{
 			for (int i = 3; i >=  0; i--)
 				m_reel_tilemap[i]->set_transparent_pen(0x00);
@@ -2233,7 +2231,7 @@ uint32_t gms_2layers_state::screen_update(screen_device &screen, bitmap_ind16 &b
 		for (int j = 0; j < 64; j++)
 			m_reel_tilemap[3]->set_scrolly(j, m_scrolly[3][j]);
 
-		if (BIT(m_tilebank, 3) && BIT(m_tilebank, 5))
+		if (BIT(m_tilebank, 5))
 		{
 			m_reel_tilemap[3]->draw(screen, bitmap, cliprect);
 			m_reel_tilemap[3]->set_transparent_pen(0xff);
@@ -2242,7 +2240,7 @@ uint32_t gms_2layers_state::screen_update(screen_device &screen, bitmap_ind16 &b
 		if (BIT(m_tilebank, 0))
 			m_tilemap[0]->draw(screen, bitmap, cliprect);
 
-		if (BIT(m_tilebank, 3) && !BIT(m_tilebank, 5))
+		if (!BIT(m_tilebank, 5))
 		{
 			m_reel_tilemap[3]->draw(screen, bitmap, cliprect);
 			m_reel_tilemap[3]->set_transparent_pen(0x00);
@@ -2351,8 +2349,8 @@ ROM_START( rbmk )
 	ROM_REGION( 0x100000, "gfx1", 0 ) // 8x32 tiles, lots of girls etc.
 	ROM_LOAD( "a1.u41", 0x00000, 0x100000,  CRC(1924de6b) SHA1(1a72ee2fd0abca51893f0985a591573bfd429389) )
 
-	ROM_REGION( 0x80000, "gfx2", 0 ) // 8x8 tiles? cards etc
-	ROM_LOAD( "t1.u39", 0x00000, 0x80000, CRC(adf67429) SHA1(ab03c7f68403545f9e86a069581dc3fc3fa6b9c4) )
+	ROM_REGION( 0x100000, "gfx2", ROMREGION_ERASE00 ) // 8x8 tiles? cards etc
+	ROM_LOAD( "t1.u39", 0x80000, 0x80000, CRC(adf67429) SHA1(ab03c7f68403545f9e86a069581dc3fc3fa6b9c4) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD16_WORD_SWAP( "93c46.u51", 0x00, 0x080, CRC(4ca6ff01) SHA1(66c456eac5b0d1176ef9130baf2e746efdf30152) )
@@ -2385,8 +2383,8 @@ ROM_START( rbspm ) // PCB NO.6899-B
 	ROM_REGION( 0x80000, "gfx1", 0 ) // 8x32 tiles, lots of girls etc.
 	ROM_LOAD( "mj-dfmj-4.2-a1.bin", 0x00000, 0x80000,  CRC(b0a3a866) SHA1(cc950532160a066fc6ce427f6df9d58ee4589821) )
 
-	ROM_REGION( 0x80000, "gfx2", 0 ) // 8x8 tiles? cards etc
-	ROM_LOAD( "mj-dfmj-4.8-t1.bin", 0x00000, 0x80000, CRC(2b8b689d) SHA1(65ab643fac1e734af8b3a86caa06b532baafa0fe) )
+	ROM_REGION( 0x100000, "gfx2", ROMREGION_ERASE00 ) // 8x8 tiles? cards etc
+	ROM_LOAD( "mj-dfmj-4.8-t1.bin", 0x80000, 0x80000, CRC(2b8b689d) SHA1(65ab643fac1e734af8b3a86caa06b532baafa0fe) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD16_WORD_SWAP( "93c46.u51", 0x00, 0x080, NO_DUMP )
@@ -2409,8 +2407,8 @@ ROM_START( ssanguoj )
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "99a-a02_m5042j-a1.u41", 0x000000, 0x100000,  CRC(4b0823f4) SHA1(69e5448a9fe06430625c7c407ff4a7fd5b58d445) )
 
-	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD( "sgc-t1.u39", 0x00000, 0x80000, CRC(50776a8f) SHA1(141bd23fc237a0e8d31ae0504ea2b9cf39859319) )
+	ROM_REGION( 0x100000, "gfx2", ROMREGION_ERASE00 )
+	ROM_LOAD( "sgc-t1.u39", 0x80000, 0x80000, CRC(50776a8f) SHA1(141bd23fc237a0e8d31ae0504ea2b9cf39859319) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD16_WORD_SWAP( "93c46.u51", 0x00, 0x080, NO_DUMP )
@@ -2427,8 +2425,8 @@ ROM_START( super555 ) // GMS branded chips: A66, A68, M06
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "pk-a1-a09.u41", 0x00000, 0x80000, CRC(f48e74bd) SHA1(68e2a0384964e04c526e4002ffae5fa4f2835d66) )
 
-	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD( "super555-t1-e67d.u39", 0x00000, 0x80000,  CRC(ee092a9c) SHA1(4123d45d21ca60b0d38f36f59353c56d4fdfcddf) )
+	ROM_REGION( 0x100000, "gfx2", ROMREGION_ERASE00 )
+	ROM_LOAD( "super555-t1-e67d.u39", 0x80000, 0x80000,  CRC(ee092a9c) SHA1(4123d45d21ca60b0d38f36f59353c56d4fdfcddf) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD16_WORD_SWAP( "93c46.u138", 0x00, 0x080, CRC(60407223) SHA1(10f766b5431709ab11b16bf5ad7adbfdced0e7ac) )
@@ -2445,8 +2443,8 @@ ROM_START( sball2k1 ) // GMS branded chips: A66, A68, no stickers on ROMs
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_ERASE00 )
 	// not populated
 
-	ROM_REGION( 0x20000, "gfx2", 0 )
-	ROM_LOAD( "a1.u41", 0x00000, 0x20000,  CRC(8567a2f7) SHA1(18f187fb533a23fbb554b941361c9d3b03d1c0ce) ) // D27010
+	ROM_REGION( 0x100000, "gfx2", ROMREGION_ERASE00 )
+	ROM_LOAD( "a1.u41", 0x80000, 0x20000,  CRC(8567a2f7) SHA1(18f187fb533a23fbb554b941361c9d3b03d1c0ce) ) // D27010
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD16_WORD_SWAP( "93c46.u138", 0x00, 0x080, NO_DUMP )
@@ -2517,8 +2515,7 @@ ROM_START( sscs )
 	ROM_LOAD( "a1_bj-a1-a06.u41", 0x000000, 0x100000, CRC(f758d95e) SHA1(d1da16f3ef618a8c1118784bdc39dd93acf86aff) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD( "t1_a11u-t07d.u39", 0x080000, 0x080000, CRC(f0ecbc72) SHA1(536288d21a5720111cb3392c974ee5ccdc4a2c6b) )
-	ROM_CONTINUE(                 0x000000, 0x080000 ) // TODO: shouldn't be needed but the game doesn't seem to enable tile bank?
+	ROM_LOAD( "t1_a11u-t07d.u39", 0x000000, 0x100000, CRC(f0ecbc72) SHA1(536288d21a5720111cb3392c974ee5ccdc4a2c6b) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD16_WORD_SWAP( "93c46.u136", 0x00, 0x080, CRC(9ad1b39c) SHA1(2fed7e0918119b2354a9f1944d501dc817ffd5dc) )
@@ -2537,8 +2534,8 @@ ROM_START( sc2in1 )
 	ROM_REGION( 0x200000, "gfx1", 0 )
 	ROM_LOAD( "u178", 0x000000, 0x200000,  CRC(eaceb446) SHA1(db312f555e060eea6450f506cbbdca8874a05d58) )
 
-	ROM_REGION( 0x40000, "gfx2", 0 )
-	ROM_LOAD( "u41", 0x00000, 0x40000, CRC(9ea462f7) SHA1(8cec497691f0121693a482b452ddf7a7dcedaf87) )
+	ROM_REGION( 0x100000, "gfx2", ROMREGION_ERASE00 )
+	ROM_LOAD( "u41", 0x80000, 0x40000, CRC(9ea462f7) SHA1(8cec497691f0121693a482b452ddf7a7dcedaf87) )
 
 	ROM_REGION( 0x80000, "gfx3", 0 )
 	ROM_LOAD( "u169", 0x00000, 0x80000, CRC(f442fa70) SHA1(d06a84080e0196e1917b6f942adc29f97314be58) )
@@ -2557,8 +2554,8 @@ ROM_START( jinpaish ) // some of the labels were partly unreadable, all labels h
 	ROM_REGION( 0x200000, "gfx1", 0 )
 	ROM_LOAD( "a1.u178", 0x000000, 0x200000, CRC(eaceb446) SHA1(db312f555e060eea6450f506cbbdca8874a05d58) )
 
-	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD( "t1_9269.u39", 0x00000, 0x80000, CRC(b87f62c0) SHA1(108c32271fb4802aec0606ff70d10be4fb0846bd) )
+	ROM_REGION( 0x100000, "gfx2", ROMREGION_ERASE00 )
+	ROM_LOAD( "t1_9269.u39", 0x80000, 0x80000, CRC(b87f62c0) SHA1(108c32271fb4802aec0606ff70d10be4fb0846bd) )
 
 	ROM_REGION( 0x80000, "gfx3", 0 )
 	ROM_LOAD( "u1_2b6_.u169", 0x00000, 0x80000, CRC(31cdca7c) SHA1(eb60bc85408ecfc40dabac2b11f3d9bfc5467d3e) )
@@ -2574,8 +2571,8 @@ ROM_START( baile ) // all labels have 百乐 before what's reported below
 	ROM_REGION( 0x200000, "gfx1", 0 )
 	ROM_LOAD( "2005_a1_1a5e.u178", 0x000000, 0x200000, CRC(0e338aeb) SHA1(8c645b0658bbbbd53bab7d769723abe08eee7acd) ) // 1xxxxxxxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD( "2005_t1_20cb.u39", 0x00000, 0x80000, CRC(bdb9a0d3) SHA1(0e8f675d244e7fe2eada90d02e836afc0e2840ca) )
+	ROM_REGION( 0x100000, "gfx2", ROMREGION_ERASE00 )
+	ROM_LOAD( "2005_t1_20cb.u39", 0x80000, 0x80000, CRC(bdb9a0d3) SHA1(0e8f675d244e7fe2eada90d02e836afc0e2840ca) )
 
 	ROM_REGION( 0x20000, "gfx3", 0 )
 	ROM_LOAD( "2005_u1_7fe2.u169", 0x00000, 0x20000, CRC(d6216c9d) SHA1(693c6cd44e5d74f372ee3c8e5a0b1bd59f42bf22) )
@@ -2591,8 +2588,8 @@ ROM_START( yyhm ) // some of the labels were partly unreadable, all have 鸳鸯�
 	ROM_REGION( 0x200000, "gfx1", 0 )
 	ROM_LOAD( "a1_c___.u178", 0x000000, 0x200000, CRC(a8e8aad5) SHA1(7576549fc23d5863d0affc27717492199bda2a6f) ) // 1xxxxxxxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD( "t1_aabe.u39", 0x00000, 0x80000, CRC(767bc6c3) SHA1(c1ccd6940e00c82278030a2c0875c411f1a0c1af) )
+	ROM_REGION( 0x100000, "gfx2", ROMREGION_ERASE00 )
+	ROM_LOAD( "t1_aabe.u39", 0x80000, 0x80000, CRC(767bc6c3) SHA1(c1ccd6940e00c82278030a2c0875c411f1a0c1af) )
 
 	ROM_REGION( 0x40000, "gfx3", 0 )
 	ROM_LOAD( "u1_333a.u169", 0x00000, 0x40000, CRC(4ceec182) SHA1(6c43db0ccf8f6c9c4350b072ebe7101cfbb1763f) ) // 1xxxxxxxxxxxxxxxxx = 0xFF
@@ -2611,8 +2608,8 @@ ROM_START( magslot ) // All labels have SLOT canceled with a black pen. No sum m
 	ROM_REGION( 0x200000, "gfx1", 0 )
 	ROM_LOAD( "magic a1.0c _ _ _ _.u178", 0x000000, 0x200000,  CRC(11028627) SHA1(80b38acab1cd12462d8fc36a9cdce5e5e76f6403) ) // no sum on label, 1xxxxxxxxxxxxxxxxxx = 0x00
 
-	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD( "magic t1.0c ec43.u41", 0x00000, 0x80000, CRC(18df608d) SHA1(753b8090e8fd89e50131a22259ef3280d7e6b282) )
+	ROM_REGION( 0x100000, "gfx2", ROMREGION_ERASE00 )
+	ROM_LOAD( "magic t1.0c ec43.u41", 0x80000, 0x80000, CRC(18df608d) SHA1(753b8090e8fd89e50131a22259ef3280d7e6b282) )
 
 	ROM_REGION( 0x40000, "gfx3", 0 )
 	ROM_LOAD( "magic u1.0c f7f6.u169", 0x00000, 0x40000, CRC(582631d3) SHA1(92d1b767bc7ef15eed6dad599392c17620210678) )
@@ -2656,8 +2653,8 @@ ROM_START( cots )
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "1_a1_.u41", 0x000000, 0x100000, CRC(0ca98ccd) SHA1(45f4c8a93d387f2790fee46c05597628ff238c2d) )
 
-	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD( "2_t1_.u39", 0x00000, 0x80000,  CRC(8c85dbc7) SHA1(c860949e5a61a4426b1409cefde9651c1d3a2765) )
+	ROM_REGION( 0x100000, "gfx2", ROMREGION_ERASE00 )
+	ROM_LOAD( "2_t1_.u39", 0x80000, 0x80000,  CRC(8c85dbc7) SHA1(c860949e5a61a4426b1409cefde9651c1d3a2765) )
 ROM_END
 
 /*
@@ -2711,8 +2708,8 @@ ROM_START( ballch )
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "b.challenge_a1_0179.u41", 0x000000, 0x100000, CRC(b3c49a74) SHA1(a828fd007443ee08ece0c4cad80bd4f84471bb49) )
 
-	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD( "b.challenge_t1_f4cb.u39", 0x00000, 0x80000,  CRC(a401072a) SHA1(f80ed4ef873393c36bb0446445bfb3a45e3efb97) )
+	ROM_REGION( 0x100000, "gfx2", ROMREGION_ERASE00 )
+	ROM_LOAD( "b.challenge_t1_f4cb.u39", 0x80000, 0x80000,  CRC(a401072a) SHA1(f80ed4ef873393c36bb0446445bfb3a45e3efb97) )
 ROM_END
 
 /*
@@ -2775,7 +2772,7 @@ Notes:
                 to be a microcontroller with internal ROM. When identically marked chips are swapped between
                 these two games the POST reports an error with this chip. When the chip is swapped back to
                 the correct board it works fine. The same chip was also swapped from San Se Caishen and also
-                shows this chip with a POST error.
+                shows this chip with a POST error. This has been verified not to be an 8x51 or MX10EXA.
 */
 
 ROM_START( hgly )
@@ -2789,8 +2786,8 @@ ROM_START( hgly )
 	ROM_LOAD( "a1.u41", 0x00000, 0x80000, CRC(179e85d6) SHA1(5224aced4769f1c7e43512650e5b67cc26210abe) )
 	ROM_LOAD( "a2.u22", 0x80000, 0x80000, CRC(34f4449b) SHA1(797233bb9e8dcda7c07401414a3ed7f8a564e985) )
 
-	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD( "t1.u39", 0x00000, 0x80000, CRC(272945c8) SHA1(89db8e23c58b185c1b4e44f74bcfef9b8c0baa04) )
+	ROM_REGION( 0x100000, "gfx2", ROMREGION_ERASE00 )
+	ROM_LOAD( "t1.u39", 0x80000, 0x80000, CRC(272945c8) SHA1(89db8e23c58b185c1b4e44f74bcfef9b8c0baa04) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD16_WORD_SWAP( "93c46.u136", 0x00, 0x080, CRC(7372eba5) SHA1(2ccaa4e4ffb8f3ff38f75f286e0ff8dc595a1541) )
@@ -2803,12 +2800,12 @@ ROM_START( cjdlz )
 	ROM_REGION( 0x080000, "oki", 0 )
 	ROM_LOAD( "mj-s1-s03.u83", 0x00000, 0x80000, CRC(27cf4e44) SHA1(ee7f3fbc0c9cc777cc4f5ef730c30b952ad61fbf) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "mj-a1-a07.u41", 0x00000, 0x80000, CRC(8f16d01b) SHA1(7dc0bb4ee230e1f1d61d055574e6790284369b8c) )
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD( "mj-a1-a07.u41", 0x000000, 0x100000, CRC(868a9599) SHA1(53fc6d0169ee83e7f911f64b447e4fe7c9fe1f9d) )
 
-	ROM_REGION( 0xc0000, "gfx2", 0)
-	ROM_LOAD( "rmj-t1-t05.u39", 0x00000, 0x80000, CRC(30638e20) SHA1(8082b7616ef759823be4265e902b503d15916197) )
-	ROM_LOAD( "t2.u29",         0x80000, 0x40000, CRC(a7417ce3) SHA1(fb2a789169149f22af62d0c73cd2d652c7005f3e) ) // TODO: actually overlayed?
+	ROM_REGION( 0x100000, "gfx2", ROMREGION_ERASE00)
+	ROM_LOAD( "t2.u29",         0x00000, 0x40000, CRC(a7417ce3) SHA1(fb2a789169149f22af62d0c73cd2d652c7005f3e) )
+	ROM_LOAD( "rmj-t1-t05.u39", 0x80000, 0x80000, CRC(30638e20) SHA1(8082b7616ef759823be4265e902b503d15916197) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD16_WORD_SWAP( "93c46.u136", 0x00, 0x080, CRC(28d0db8c) SHA1(fb214d10f1c3a1f2e38cb22c620dcc314896ee54) )
@@ -2967,7 +2964,7 @@ void gms_2layers_state::init_sscs()
 	rom[0x19c1a / 2] = 0x6000; // U85 ERROR
 }
 
-void gms_2layers_state::init_cjldz()
+void gms_2layers_state::init_cjdlz()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
@@ -2997,7 +2994,7 @@ void gms_2layers_state::init_hgly()
 GAME( 1998, rbmk,     0, rbmk,     rbmk,     gms_2layers_state, empty_init,    ROT0,  "GMS", "Shizhan Majiang Wang (Version 8.8)",                    MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // misses YM2151 hookup
 GAME( 1998, rbspm,    0, rbspm,    rbspm,    gms_2layers_state, init_rbspm,    ROT0,  "GMS", "Shizhan Ding Huang Maque (Version 4.1)",                MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now. Misses YM2151 hookup
 GAME( 1998, ssanguoj, 0, ssanguoj, ssanguoj, gms_2layers_state, init_ssanguoj, ROT0,  "GMS", "Shizhan Sanguo Ji Jiaqiang Ban (Version 8.9 980413)",   MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now. YM3812 isn't hooked up (goes through undumped MCU).
-GAME( 1999, cjdlz,    0, super555, cjdlz,    gms_2layers_state, init_cjldz,    ROT0,  "GMS", "Chaoji Da Lianzhuang (Version 1.1)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // stops during boot, patched for now. Also needs EEPROM support.
+GAME( 1999, cjdlz,    0, super555, cjdlz,    gms_2layers_state, init_cjdlz,    ROT0,  "GMS", "Chaoji Da Lianzhuang (Version 1.1)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // stops during boot, patched for now. Also needs EEPROM support.
 GAME( 2005, yyhm,     0, magslot,  yyhm,     gms_3layers_state, init_yyhm,     ROT0,  "GMS", "Yuanyang Hudie Meng (Version 8.8A 2005-09-25)",         MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now. Also needs EEPROM support.
 
 // card games

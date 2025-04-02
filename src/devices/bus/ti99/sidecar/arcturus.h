@@ -38,7 +38,7 @@ private:
 	uint8_t* m_rom4;
 	uint8_t* m_roma;
 	uint8_t* m_romc;
-	
+
 	required_device<ram_device> m_ram;
 };
 

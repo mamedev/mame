@@ -254,7 +254,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="leapfrog" supported ="no"> <!-- major video timing glitches -->
+	<software name="leapfrog" supported="no"> <!-- major video timing glitches -->
 		<description>Leapfrog</description>
 		<year>1982</year>
 		<publisher>Voltmace</publisher>

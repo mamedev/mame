@@ -192,7 +192,7 @@ CRUCLK*  51||52  DBIN
 #include "evpc.h"
 #include "hsgpl.h"
 #include "ti_rs232.h"
-#include "spchsyn.h"
+#include "speechadapter.h"
 #include "memex.h"
 #include "horizon.h"
 #include "forti.h"
@@ -484,7 +484,7 @@ void peribox_device::device_config_complete()
 void peribox_common_slots(device_slot_interface &device)
 {
 	device.option_add("tirs232",  TI99_RS232);
-	device.option_add("speech",   TI99_SPEECH);
+	device.option_add("speechadapter",   TI99_SPEECHADAPTER);
 	device.option_add("horizon",  TI99_HORIZON);
 	device.option_add("ide",      TI99_IDE);
 	device.option_add("usbsm",    TI99_USBSM);

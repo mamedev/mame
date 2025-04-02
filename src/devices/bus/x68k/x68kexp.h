@@ -115,6 +115,7 @@ public:
 	auto out_irq4_callback() { return m_out_irq4_cb.bind(); }
 	auto out_nmi_callback() { return m_out_nmi_cb.bind(); }
 	auto out_reset_callback() { return m_out_reset_cb.bind(); }
+	auto out_dtack_callback() { return m_out_dtack_cb.bind(); }
 
 	address_space &space() { return *m_space; }
 
@@ -122,22 +123,29 @@ public:
 	void irq4_w(int state);
 	void nmi_w(int state);
 	void reset_w(int state);
+	void dtack_w(int state);
+	bool exown() const { return m_exown; }
 
 	uint8_t iack2() { return (m_card != nullptr) ? m_card->iack2() : 0x18; }
 	uint8_t iack4() { return (m_card != nullptr) ? m_card->iack4() : 0x18; }
+	void exown_w(int state) { m_exown = !state; }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 
 	required_address_space m_space;
 
+private:
 	devcb_write_line    m_out_irq2_cb;
 	devcb_write_line    m_out_irq4_cb;
 	devcb_write_line    m_out_nmi_cb;
 	devcb_write_line    m_out_reset_cb;
+	devcb_write_line    m_out_dtack_cb;
 
 	device_x68k_expansion_card_interface *m_card;
+
+	bool m_exown;
 };
 
 

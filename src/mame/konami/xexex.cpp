@@ -364,7 +364,7 @@ uint32_t xexex_state::screen_update_xexex(screen_device &screen, bitmap_rgb32 &b
 
 	if (m_cur_alpha)
 	{
-		alpha = m_k054338->set_alpha_level(1);
+		alpha = m_k054338->set_alpha_level(1) & 0xff;
 
 		if (alpha > 0)
 		{

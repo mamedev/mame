@@ -26,6 +26,8 @@ public:
 	auto css_write_cb() { return m_css_write_cb.bind(); }
 	auto csx0_read_cb() { return m_csx0_read_cb.bind(); }
 	auto csx0_write_cb() { return m_csx0_write_cb.bind(); }
+	auto csx0_a4_read_cb() { return m_csx0_a4_read_cb.bind(); }
+	auto csx0_a4_write_cb() { return m_csx0_a4_write_cb.bind(); }
 	auto csx1_read_cb() { return m_csx1_read_cb.bind(); }
 	auto csx1_write_cb() { return m_csx1_write_cb.bind(); }
 	auto sdack_read_cb() { return m_sdack_read_cb.bind(); }
@@ -77,6 +79,8 @@ private:
 	void css_w(offs_t offset, uint8_t data);
 	uint8_t csx0_r(offs_t offset);
 	void csx0_w(offs_t offset, uint8_t data);
+	uint8_t csx0_a4_r(offs_t offset);
+	void csx0_a4_w(offs_t offset, uint8_t data);
 	uint8_t csx1_r(offs_t offset);
 	void csx1_w(offs_t offset, uint8_t data);
 
@@ -120,6 +124,8 @@ private:
 	devcb_write8 m_css_write_cb;
 	devcb_read8 m_csx0_read_cb;
 	devcb_write8 m_csx0_write_cb;
+	devcb_read8 m_csx0_a4_read_cb;
+	devcb_write8 m_csx0_a4_write_cb;
 	devcb_read8 m_csx1_read_cb;
 	devcb_write8 m_csx1_write_cb;
 	devcb_read8 m_sdack_read_cb;
@@ -165,7 +171,7 @@ public:
 	amiga_dmac_rev2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(AMIGA_DMAC_REV1, amiga_dmac_rev1_device)
 DECLARE_DEVICE_TYPE(AMIGA_DMAC_REV2, amiga_dmac_rev2_device)
 

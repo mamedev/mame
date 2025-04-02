@@ -489,8 +489,8 @@ void lockon_state::lockon(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
-	m_screen->set_screen_update(FUNC(lockon_state::screen_update_lockon));
-	m_screen->screen_vblank().set(FUNC(lockon_state::screen_vblank_lockon));
+	m_screen->set_screen_update(FUNC(lockon_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(lockon_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lockon);

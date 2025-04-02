@@ -567,6 +567,21 @@ ROM_START( dkjfever )
 	ROM_COPY( "ymz770_flash1", 0, 0, 0x800000 )
 ROM_END
 
+ROM_START( katochan )
+	ROM_REGION32_LE( 0x1000000, "maincpu", 0 ) // BIOS and game code/data
+	ROM_LOAD32_WORD( "spk_04.ic30", 0x000000, 0x400000, CRC(46f46ad6) SHA1(131d12a7903ca3d6ee69cb9f1e8fe067302a31c5) )
+	ROM_LOAD32_WORD( "spk_05.ic33", 0x000002, 0x400000, CRC(10a6bd39) SHA1(0a0d0f35408733dc77b0e7e06abde35247d4bd75) )
+	ROM_LOAD32_WORD( "spk_06.ic39", 0x800000, 0x400000, CRC(f3e08f70) SHA1(fc50dad40e29edcb4bac544064529196e4e46065) )
+	ROM_LOAD32_WORD( "spk_07.ic42", 0x800002, 0x400000, CRC(54ce0143) SHA1(8e8cc80f31f3ebe4a1a51aee554ab012a2bc6a66) )
+
+	ROM_REGION( 0x800100, "ymz770_flash1", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "spk_01.ic31", 0x000000, 0x400000, CRC(96e2d8d0) SHA1(3437b4dd7f1a7901cb764b9690931bfee1ceee25) )
+	ROM_LOAD16_WORD_SWAP( "spk_02.ic38", 0x400000, 0x400000, CRC(3660a0d1) SHA1(0877eaca4665797c1c70cdf9a7ffafbcab754a89) )
+
+	ROM_REGION( 0x800000, "ymz770", 0 )
+	ROM_COPY( "ymz770_flash1", 0, 0, 0x800000 )
+ROM_END
+
 ROM_START( mariojjl )
 	ROM_REGION32_LE( 0x1000000, "maincpu", 0 )
 	ROM_LOAD32_WORD( "spm_04c.ic30", 0x000000, 0x400000, CRC(159e912d) SHA1(5db1434d34e52f9c35d71e05675dd035765d2e6f) )
@@ -711,6 +726,7 @@ GAME( 2004, masmarios, 0,        alien,     alien,   alien_state, empty_init,   
 GAME( 2005, masmario2, 0,        masmario2, alien,   alien_state, empty_init,    ROT0, "Nintendo / Capcom",    "Super Mario Fushigi no Korokoro Party 2", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 // Medalusion 1
 GAME( 2005, dkjfever,  0,        alien,     alien,   alien_state, empty_init,    ROT0, "Nintendo / Capcom",    "Donkey Kong Jungle Fever (Ver.1.000, 2005/08/03)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // ドンキーコングジャングルフィーバー
+GAME( 2004, katochan,  0,        alien,     alien,   alien_state, empty_init,    ROT0, "Capcom",               "Nihonzenkoku-katochan-no-kurukuru-ressya-de-Pe! (Ver.1.00, 2004/10/24)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // 日本全国加トちゃんのくるくる列車でペ
 GAME( 2006, mariojjl,  0,        alien,     alien,   alien_state, empty_init,    ROT0, "Nintendo / Capcom",    "Super Mario Fushigi no JanJanLand (Ver.1.00C, 2006/08/29)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2005, mmaruchan, 0,        alien,     alien,   alien_state, empty_init,    ROT0, "Capcom",               "Chibi Maruko-chan ~Minna de Sugoroku Asobi~ no Maki (Ver.1.00B, 2005/06/22)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // ちびまる子ちゃん「みんなですごろく遊び」の巻
 GAME( 2004, mmaruchana,mmaruchan,alien,     alien,   alien_state, empty_init,    ROT0, "Capcom",               "Chibi Maruko-chan ~Minna de Sugoroku Asobi~ no Maki (Ver.1.00A, 2004/04/20)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // ちびまる子ちゃん「みんなですごろく遊び」の巻

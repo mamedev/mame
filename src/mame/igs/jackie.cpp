@@ -765,12 +765,12 @@ ROM_START( kungfu ) // IGS PCB N0- 0139
 	ROM_LOAD( "kungfu-4.u4", 0x40000, 0x20000, CRC(df4afedb) SHA1(56ab18c46a199653c284417a8e9edc9f32374318) )
 
 	ROM_REGION( 0x30000, "reels", 0 )
-	ROM_LOAD( "kungfu-3.u3", 0x00000, 0x4000, CRC(bbf78e03) SHA1(06fee093e75e2611d00c076c2e0a681938fa8b74) )
-	ROM_LOAD( "kungfu-2.u2", 0x10000, 0x4000, CRC(927b3060) SHA1(a780ea5aaee04287cc9533c2d258dc18f8426530) )
+	ROM_LOAD( "kungfu-2.u2", 0x00000, 0x4000, CRC(927b3060) SHA1(a780ea5aaee04287cc9533c2d258dc18f8426530) )
+	ROM_LOAD( "kungfu-3.u3", 0x10000, 0x4000, CRC(bbf78e03) SHA1(06fee093e75e2611d00c076c2e0a681938fa8b74) )
 	ROM_LOAD( "kungfu-1.u1", 0x20000, 0x4000, CRC(abaada6b) SHA1(a6b910db7451e8ca737f43f32dfc8fc5ecf865f4) )
 
 	ROM_REGION( 0x10000, "gfx3", 0 )
-	ROM_LOAD( "kungfu-7.u22", 0x00000, 0x10000, CRC(0568f20b) SHA1(a51a10deee0d581b79d0fee354cedceaa660f55c) ) // 1ST AND 2ND HALF IDENTICAL, but confirmed same data as the kungfua set in igs/igspoker.cpp
+	ROM_LOAD( "kungfu-7.u22", 0x00000, 0x10000, CRC(0568f20b) SHA1(a51a10deee0d581b79d0fee354cedceaa660f55c) ) // 1ST AND 2ND HALF IDENTICAL, but confirmed same data as the kungfua set in igs/cabaret.cpp
 
 	ROM_REGION( 0x155, "misc", 0 ) // all labels unreadable
 	ROM_LOAD( "16l8.u31",   0x0000, 0x104, NO_DUMP )
@@ -783,4 +783,4 @@ ROM_END
 
 
 GAME( 1993, jackie, 0, jackie, jackie, jackie_state, init_jackie, ROT0, "IGS", "Happy Jackie (v110U)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1992, kungfu, 0, jackie, kungfu, jackie_state, init_kungfu, ROT0, "IGS", "Kung Fu Fighters (IGS, v202N)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // inputs for the fighting part, incorrect decoding
+GAME( 1992, kungfu, 0, jackie, kungfu, jackie_state, init_kungfu, ROT0, "IGS", "Kung Fu Fighters (IGS, v202N)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // inputs for the fighting part

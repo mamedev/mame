@@ -254,7 +254,7 @@ M4300099A CHASE HQ DX (sticker for DX cabinet)
 |                                          |TC0100SCN|      43256        |-|
 |             16MHz                        |         |                   |
 |                           TMM2063        |---------|      43256        |
-|          TC0050DCA                   |---------|                       |-|
+|          TC0060DCA                   |---------|                       |-|
 |            Y3016-F        TMM2063    |TAITO    | |------|              | |
 |                                      |TC0170ABT| |TAITO |              | |
 |        TL074 TL074                   |         | |TC0110|   B52-01.IC7 | |
@@ -1547,7 +1547,6 @@ void nightstr_state::nightstr_motor_w(offs_t offset, u16 data)
 		m_motor_debug = data;
 		break;
 	}
-
 }
 
 void nightstr_state::nightstr_lamps_w(u8 data)

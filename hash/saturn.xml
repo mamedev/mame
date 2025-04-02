@@ -10439,7 +10439,6 @@ Sega logo animation draws offset [VDP2]
 		<year>1997</year>
 		<publisher>Spike</publisher>
 		<info name="serial" value="610-6762"/>
-		<info name="release" value=""/>
 		<info name="alt_title" value="DJウォーズ 体験版"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
@@ -13544,7 +13543,6 @@ Sega logo animation draws offset [VDP2]
 		<year>1997</year>
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="610-6503"/>
-		<info name="release" value=""/>
 		<info name="alt_title" value="首都高バトル'97 見本品"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
@@ -13639,7 +13637,6 @@ Sega logo animation draws offset [VDP2]
 		<year>1996</year>
 		<publisher>ASCII</publisher>
 		<info name="serial" value="610-6360-02"/>
-		<info name="release" value=""/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -13820,7 +13817,6 @@ Sega logo animation draws offset [VDP2]
 		<year>1997</year>
 		<publisher>Hudson</publisher>
 		<info name="serial" value="610-6484"/>
-		<info name="release" value=""/>
 		<info name="alt_title" value="天外魔境 第四の黙示録 非売品"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
@@ -14869,9 +14865,6 @@ Sega logo animation draws offset [VDP2]
 	    <description>Advanced VG (Genteiban) (T-32506G)</description>
 	    <year>199?</year>
 	    <publisher>&lt;unknown&gt;</publisher>
-	    <info name="serial" value=""/>
-	    <info name="release" value=""/>
-	    <info name="alt_title" value=""/>
 	    <part name="cdrom" interface="cdrom">
 	        <diskarea name="cdrom">
 	            <disk name="advanced vg (genteiban) (t-32506g)" sha1="41e81a75e402224630d2fb82ba4621351139ddae" />
@@ -16330,9 +16323,6 @@ Sega logo animation draws offset [VDP2]
 	    <description>Deep Fear Disc 1 (GS-9189)</description>
 	    <year>199?</year>
 	    <publisher>&lt;unknown&gt;</publisher>
-	    <info name="serial" value=""/>
-	    <info name="release" value=""/>
-	    <info name="alt_title" value=""/>
 	  = deep fear (disc 1 of 2) (jap) (dw0638)  sat_jp:deepfear02 Deep Fear (Disc 1 of 2) (JAP) (DW0638)
 	  = deep fear (disc 1 of 2) (jap) (dw0638)  sat_jp:deepfear02 Deep Fear (Disc 1 of 2) (JAP) (DW0638)
 	  = deep fear (disc 1 of 2) (jap) (dw0638)  sat_jp:deepfear02 Deep Fear (Disc 1 of 2) (JAP) (DW0638)
@@ -16343,9 +16333,6 @@ Sega logo animation draws offset [VDP2]
 	    <description>Deep Fear Disc 2 (GS-9189)</description>
 	    <year>199?</year>
 	    <publisher>&lt;unknown&gt;</publisher>
-	    <info name="serial" value=""/>
-	    <info name="release" value=""/>
-	    <info name="alt_title" value=""/>
 	  = deep fear (disc 2 of 2) (jap) (dw0638)  sat_jp:deepfear03 Deep Fear (Disc 2 of 2) (JAP) (DW0638)
 	  = deep fear (disc 2 of 2) (jap) (dw0638)  sat_jp:deepfear03 Deep Fear (Disc 2 of 2) (JAP) (DW0638)
 	  = deep fear (disc 2 of 2) (jap) (dw0638)  sat_jp:deepfear03 Deep Fear (Disc 2 of 2) (JAP) (DW0638)
@@ -17461,9 +17448,6 @@ Sega logo animation draws offset [VDP2]
 	    <description>Game Basic For Sega Saturn PC CD-ROM (T-2111G)</description>
 	    <year>199?</year>
 	    <publisher>&lt;unknown&gt;</publisher>
-	    <info name="serial" value=""/>
-	    <info name="release" value=""/>
-	    <info name="alt_title" value=""/>
 	  = game basic for segasaturn (japan) (windows cd)  sat_jp:gamebasi Game Basic for SegaSaturn (Japan) (Windows CD)
 	  = game basic for segasaturn (japan) (windows cd)  sat_jp:gamebasi Game Basic for SegaSaturn (Japan) (Windows CD)
 	  = game basic for segasaturn (japan) (windows cd)  sat_jp:gamebasi Game Basic for SegaSaturn (Japan) (Windows CD)
@@ -18599,9 +18583,6 @@ Sega logo animation draws offset [VDP2]
 	    <description>Kidou Senshi Gundam Gaiden I - Senritsu no Blue (T-13307G)</description>
 	    <year>199?</year>
 	    <publisher>&lt;unknown&gt;</publisher>
-	    <info name="serial" value=""/>
-	    <info name="release" value=""/>
-	    <info name="alt_title" value=""/>
 	  = kidou senshi gundam gaiden i senritsu no blue (jap) (dw0636)  sat_jp:kidousen05 Kidou Senshi Gundam Gaiden I Senritsu no Blue (JAP) (DW0636)
 	  = kidou senshi gundam gaiden i senritsu no blue (jap) (dw0636)  sat_jp:kidousen05 Kidou Senshi Gundam Gaiden I Senritsu no Blue (JAP) (DW0636)
 	  = kidou senshi gundam gaiden i senritsu no blue (jap) (dw0636)  sat_jp:kidousen05 Kidou Senshi Gundam Gaiden I Senritsu no Blue (JAP) (DW0636)
@@ -20622,9 +20603,6 @@ Sega logo animation draws offset [VDP2]
 	    <description>Strikers 1945 (T-14407G)</description>
 	    <year>199?</year>
 	    <publisher>&lt;unknown&gt;</publisher>
-	    <info name="serial" value=""/>
-	    <info name="release" value=""/>
-	    <info name="alt_title" value=""/>
 	  = strikers 1945 (jap) (dw0178)  sat_jp:strikersa Strikers 1945 (JAP) (DW0178)
 	  = strikers 1945 (jap) (dw0178)  sat_jp:strikersa Strikers 1945 (JAP) (DW0178)
 	  = strikers 1945 (jap) (dw0178)  sat_jp:strikersa Strikers 1945 (JAP) (DW0178)
@@ -20920,9 +20898,6 @@ Sega logo animation draws offset [VDP2]
 	    <description>Tengai Makyou Dai Yon no Mokujiroku - The Apocalypse IV Disc 1 (T-14301G)</description>
 	    <year>199?</year>
 	    <publisher>&lt;unknown&gt;</publisher>
-	    <info name="serial" value=""/>
-	    <info name="release" value=""/>
-	    <info name="alt_title" value=""/>
 	  = tengai makyou dai - the apocalypse iv (disc 1 of 2) (jap) (dw0262)  sat_jp:tengaima03 Tengai Makyou Dai - The Apocalypse IV (Disc 1 of 2) (JAP) (DW0262)
 	  = tengai makyou dai - the apocalypse iv (disc 1 of 2) (jap) (dw0262)  sat_jp:tengaima03 Tengai Makyou Dai - The Apocalypse IV (Disc 1 of 2) (JAP) (DW0262)
 	  = tengai makyou dai - the apocalypse iv (disc 1 of 2) (jap) (dw0262)  sat_jp:tengaima03 Tengai Makyou Dai - The Apocalypse IV (Disc 1 of 2) (JAP) (DW0262)
@@ -20933,9 +20908,6 @@ Sega logo animation draws offset [VDP2]
 	    <description>Tengai Makyou Dai Yon no Mokujiroku - The Apocalypse IV Disc 2 (T-14301G)</description>
 	    <year>199?</year>
 	    <publisher>&lt;unknown&gt;</publisher>
-	    <info name="serial" value=""/>
-	    <info name="release" value=""/>
-	    <info name="alt_title" value=""/>
 	  = tengai makyou dai - the apocalypse iv (disc 2 of 2) (jap) (dw0262)  sat_jp:tengaima04 Tengai Makyou Dai - The Apocalypse IV (Disc 2 of 2) (JAP) (DW0262)
 	  = tengai makyou dai - the apocalypse iv (disc 2 of 2) (jap) (dw0262)  sat_jp:tengaima04 Tengai Makyou Dai - The Apocalypse IV (Disc 2 of 2) (JAP) (DW0262)
 	  = tengai makyou dai - the apocalypse iv (disc 2 of 2) (jap) (dw0262)  sat_jp:tengaima04 Tengai Makyou Dai - The Apocalypse IV (Disc 2 of 2) (JAP) (DW0262)
@@ -21092,9 +21064,6 @@ Sega logo animation draws offset [VDP2]
 	    <description>The King of Fighters '95 (T-3101G)</description>
 	    <year>199?</year>
 	    <publisher>&lt;unknown&gt;</publisher>
-	    <info name="serial" value=""/>
-	    <info name="release" value=""/>
-	    <info name="alt_title" value=""/>
 	  = king of fighters '95, the (jap) (dw0289)  sat_jp:kof95a King of Fighters '95, The (JAP) (DW0289)
 	  = king of fighters '95, the (jap) (dw0289)  sat_jp:kof95a King of Fighters '95, The (JAP) (DW0289)
 	  = king of fighters '95, the (jap) (dw0289)  sat_jp:kof95a King of Fighters '95, The (JAP) (DW0289)
@@ -23796,9 +23765,6 @@ Sega logo animation draws offset [VDP2]
 	    <description>Mobile Suit Gundam - Gihrens Greed (Jpn) (T-13330G)</description>
 	    <year>199?</year>
 	    <publisher>&lt;unknown&gt;</publisher>
-	    <info name="serial" value=""/>
-	    <info name="release" value=""/>
-	    <info name="alt_title" value=""/>
 	    <part name="cdrom" interface="cdrom">
 	        <diskarea name="cdrom">
 	            <disk name="mobile suit gundam gihrens greed (j) (t-13330g)" sha1="f73d0d35b758eb90cd60a6f2f36cf51c003a6f2c" />

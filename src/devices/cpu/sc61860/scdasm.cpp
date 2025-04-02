@@ -66,40 +66,47 @@
 */
 
 const sc61860_disassembler::opcode sc61860_disassembler::table[]={
+//    00-0F / 0-3 4-7 8-B C-F
 	{ "LII",    Imm }, { "LIJ",     Imm }, { "LIA",     Imm }, { "LIB",     Imm },
 	{ "IX",     Imp }, { "DX",      Imp }, { "IY",      Imp }, { "DY",      Imp },
 	{ "MVW",    Imp }, { "EXW",     Imp }, { "MVB",     Imp }, { "EXB",     Imp },
 	{ "ADN",    Imp }, { "SBN",     Imp }, { "ADW",     Imp }, { "SBW",     Imp },
 
+//    10-1F / 0-3 4-7 8-B C-F
 	{ "LIDP",   ImmW}, { "LIDL",    Imm }, { "LIP",     Imm }, { "LIQ",     Imm },
 	{ "ADB",    Imp }, { "SBB",     Imp }, { "LIDP",    ImmW}, { "LIDL",    Imm },
 	{ "MVWD",   Imp }, { "EXWD",    Imp }, { "MVBD",    Imp }, { "EXBD",    Imp },
 	{ "SRW",    Imp }, { "SLW",     Imp }, { "FILM",    Imp }, { "FILD",    Imp },
 
-	{ "LDP",    Imp }, { "LPQ",     Imp }, { "LPR",     Imp }, { nullptr,         Ill },
+//    20-2F / 0-3 4-7 8-B C-F
+	{ "LDP",    Imp }, { "LPQ",     Imp }, { "LPR",     Imp }, { "CLRA", /* =RA undocumented  */   Imp },
 	{ "IXL",    Imp }, { "DXL",     Imp }, { "IYS",     Imp }, { "DYS",     Imp },
 	{ "JRNZP",  RelP}, { "JRNZM",   RelM}, { "JRNCP",   RelP}, { "JRNCM",   RelM},
 	{ "JRP",    RelP}, { "JRM",     RelM}, { nullptr,         Ill }, { "LOOP",    RelM},
 
+//    30-3F / 0-3 4-7 8-B C-F
 	{ "STP",    Imp }, { "STQ",     Imp }, { "STR",     Imp }, { nullptr,         Ill },
 	{ "PUSH",   Imp }, { "DATA",    Imp }, { nullptr,         Ill }, { "RTN",     Imp },
 	{ "JRZP",   RelP}, { "JRZM",    RelM}, { "JRCP",    RelP}, { "JRCM",    RelM},
 	{ nullptr,        Ill }, { nullptr,         Ill }, { nullptr,         Ill }, { nullptr,         Ill },
 
+//    40-4F / 0-3 4-7 8-B C-F
 	{ "INCI",   Imp }, { "DECI",    Imp }, { "INCA",    Imp }, { "DECA",    Imp },
 	{ "ADM",    Imp }, { "SBM",     Imp }, { "ANMA",    Imp }, { "ORMA",    Imp },
 	{ "INCK",   Imp }, { "DECK",    Imp }, { "INCV",    Imp }, { "DECV",    Imp },
-	{ "INA",    Imp }, { "NOPW",    Imp }, { "WAIT",    Imm }, { "IPXL"/*CDN, lxn*/,            Imp },
+	{ "INA",    Imp }, { "NOPW",    Imp }, { "WAIT",    Imm }, { "IPXL"/* =CDN, lxn*/,            Imp },
 
+//    50-5F / 0-3 4-7 8-B C-F
 	{ "INCP",   Imp }, { "DECP",    Imp }, { "STD",     Imp }, { "MVDM",    Imp },
 	{ "READM",/*mvmp*/  Imp }, { "MVMD",    Imp }, { "READ"/*ldpc*/,    Imp }, { "LDD",     Imp },
 	{ "SWP",    Imp }, { "LDM",     Imp }, { "SL",      Imp }, { "POP",     Imp },
 	{ nullptr,        Ill }, { "OUTA",    Imp }, { nullptr,         Ill }, { "OUTF",    Imp },
 
+//    60-5F / 0-3 4-7 8-B C-F
 	{ "ANIM",   Imm }, { "ORIM",    Imm }, { "TSIM",    Imm }, { "CPIM",    Imm },
 	{ "ANIA",   Imm }, { "ORIA",    Imm }, { "TSIA",    Imm }, { "CPIA",    Imm },
 	{ nullptr,        Ill }, { "ETC",     Etc }, { nullptr,         Ill }, { "TEST",    Imm },
-	{ nullptr,        Ill }, { nullptr,         Ill }, { nullptr,         Ill }, { "IPXH"/*CDN,lxp*/, Imp },
+	{ nullptr,        Ill }, { nullptr,         Ill }, { nullptr,         Ill }, { "IPXH"/* =CUP,lxp*/, Imp },
 
 	{ "ADIM",   Imm }, { "SBIM",    Imm }, { nullptr,         Ill }, { nullptr,         Ill },
 	{ "ADIA",   Imm }, { "SBIA",    Imm }, { nullptr,         Ill }, { nullptr,         Ill },
@@ -172,11 +179,11 @@ offs_t sc61860_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 				util::stream_format(stream,"%-6s%04x",table[oper].mnemonic, adr);
 				break;
 			case RelM:
-				adr=pc-opcodes.r8(pos++);
+				adr=pc-opcodes.r8(pos++)+1;
 				util::stream_format(stream,"%-6s%04x",table[oper].mnemonic, adr&0xffff);
 				break;
 			case RelP:
-				adr=pc+opcodes.r8(pos++);
+				adr=pc+opcodes.r8(pos++)+1;
 				util::stream_format(stream,"%-6s%04x",table[oper].mnemonic, adr&0xffff);
 				break;
 			case Ptc:

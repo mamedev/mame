@@ -740,9 +740,8 @@ void sc61860_device::sc61860_exchange_ext(int count)
 	}
 }
 
-// undocumented
-// only 1 opcode working in pc1403
-// both opcodes working in pc1350
+// Documented in PC1350_MachineLanguage: IPXL = CDN, IPXH = CUP
+// only 1 opcode working in pc1403 (IPXL, or IPXH?)
 void sc61860_device::sc61860_wait_x(int level)
 {
 	int c;

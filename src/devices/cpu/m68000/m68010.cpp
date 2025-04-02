@@ -18,6 +18,11 @@ m68010_device::m68010_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
+m68010_device::m68010_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, address_map_constructor internal_map)
+	: m68000_musashi_device(mconfig, tag, owner, clock, M68010, 16,24, internal_map)
+{
+}
+
 void m68010_device::device_start()
 {
 	m68000_musashi_device::device_start();

@@ -46,8 +46,6 @@ private:
 	void pentagon_io(address_map &map) ATTR_COLD;
 	void pentagon_mem(address_map &map) ATTR_COLD;
 	void pentagon_switch(address_map &map) ATTR_COLD;
-
-	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
 };
 
 class pent1024_state : public pentagon_state
@@ -158,7 +156,6 @@ void pentagon_state::machine_start()
 {
 	spectrum_128_state::machine_start();
 	m_bank_rom[0]->configure_entries(3, 1, memregion("beta:beta")->base(), 0x4000);
-	m_maincpu->space(AS_PROGRAM).specific(m_program);
 }
 
 void pentagon_state::machine_reset()

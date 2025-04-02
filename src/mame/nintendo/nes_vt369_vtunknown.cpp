@@ -938,6 +938,12 @@ ROM_START( matet10 )
 	ROM_IGNORE(0x300)
 ROM_END
 
+ROM_START( matet100 )
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "picotetris_s29gl064n90tfi04_0001227e.bin", 0x00000, 0x800000, CRC(7d9296f2) SHA1(0db5883028d14783d0abff1f7672e59534b0e513) )
+	ROM_IGNORE(0x100)
+ROM_END
+
 void nes_vt369_vtunknown_state::init_lxcmcypp()
 {
 	int size = memregion("mainrom")->bytes()/2;
@@ -1129,3 +1135,6 @@ CONS( 2021, unk128vt,   0,        0,  nes_vt369_vtunknown_unk_4mb, nes_vt369_vtu
 
 // uses a low res display like the above
 CONS( 2021, matet10,   0,        0,  nes_vt369_vtunknown_unk_2mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "dreamGEAR", "My Arcade Tetris (DGUNL-7083, Pixel Pocket, with 10 bonus games)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+
+// unknown tech level, scrambled opcodes
+CONS( 2021, matet100,  0,        0,  nes_vt369_vtunknown_hh_8mb,  nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "dreamGEAR", "My Arcade Tetris (DGUNL-7027, Pico Player, with 100+ bonus games)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // box says 100+ bonus games

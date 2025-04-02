@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:windyfairy
+// copyright-holders:windyfairy, Vas Crabb
 #ifndef MAME_CPU_DRCBEARM64_H
 #define MAME_CPU_DRCBEARM64_H
 

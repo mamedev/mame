@@ -156,17 +156,17 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_screen(*this, "screen"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_sprites(*this, "sprites1"),
-		m_spriteram(*this, "spriteram1"),
+		m_sprites(*this, "sprites"),
+		m_spriteram(*this, "spriteram"),
 		m_soundlatch(*this, "soundlatch%u", 1U),
-		m_tx_videoram(*this, "tx_videoram"),
-		m_pf_data(*this, "pf%u_data", 1U),
-		m_pf_scroll_data(*this, "pf%u_scroll_data", 1U),
+		m_tx_vram(*this, "tx_videoram"),
+		m_pf_vram(*this, "pf%u_vram", 1U),
+		m_pf_scroll_reg(*this, "pf%u_scroll_reg", 1U),
 		m_gun_io(*this, { "GUNX1", "GUNY1", "GUNX2", "GUNY2" }),
 		m_gun_recoil(*this, "Player%u_Gun_Recoil", 1U)
 	{ }
 
-	void mechatt(machine_config &config);
+	void mechatt(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -180,35 +180,36 @@ private:
 	required_device<snk_bbusters_spr_device> m_sprites;
 	required_device<buffered_spriteram16_device> m_spriteram;
 	required_device_array<generic_latch_8_device, 2> m_soundlatch;
-	required_shared_ptr<uint16_t> m_tx_videoram;
-	required_shared_ptr_array<uint16_t, 2> m_pf_data;
-	required_shared_ptr_array<uint16_t, 2> m_pf_scroll_data;
+	required_shared_ptr<uint16_t> m_tx_vram;
+	required_shared_ptr_array<uint16_t, 2> m_pf_vram;
+	required_shared_ptr_array<uint16_t, 2> m_pf_scroll_reg;
 	required_ioport_array<4> m_gun_io;
 	output_finder<2> m_gun_recoil;
 
 	tilemap_t *m_fix_tilemap = nullptr;
 	tilemap_t *m_pf_tilemap[2]{};
 
+	bitmap_ind16 m_bitmap_sprites;
+
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	template <int Layer, int Gfx> TILE_GET_INFO_MEMBER(get_pf_tile_info);
 
 	void sound_cpu_w(uint8_t data);
-	void video_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	template<int Layer> void pf_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void tx_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	template <int Layer> void pf_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void coin_counter_w(uint8_t data);
 
-	void mechatt_map(address_map &map) ATTR_COLD;
-	void sound_map(address_map &map) ATTR_COLD;
-	void sounda_portmap(address_map &map) ATTR_COLD;
-
-	void two_gun_output_w(uint16_t data);
-	uint16_t mechatt_gun_r(offs_t offset);
+	void gun_output_w(uint16_t data);
+	uint16_t gun_r(offs_t offset);
 
 	template <typename Proc>
 	void mix_sprites(bitmap_ind16 &bitmap, bitmap_ind16 &srcbitmap, const rectangle &cliprect, Proc MIX);
 
-	bitmap_ind16 m_bitmap_sprites;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sounda_portmap(address_map &map) ATTR_COLD;
 };
 
 /******************************************************************************/
@@ -225,9 +226,9 @@ void mechatt_state::sound_cpu_w(uint8_t data)
 }
 
 template<int Layer>
-void mechatt_state::pf_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void mechatt_state::pf_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	COMBINE_DATA(&m_pf_data[Layer][offset]);
+	COMBINE_DATA(&m_pf_vram[Layer][offset]);
 	m_pf_tilemap[Layer]->mark_tile_dirty(offset);
 }
 
@@ -240,20 +241,20 @@ void mechatt_state::coin_counter_w(uint8_t data)
 
 TILE_GET_INFO_MEMBER(mechatt_state::get_tile_info)
 {
-	uint16_t tile = m_tx_videoram[tile_index];
-	tileinfo.set(0, tile&0xfff, tile>>12, 0);
+	uint16_t const tile = m_tx_vram[tile_index];
+	tileinfo.set(0, tile & 0xfff, tile >> 12, 0);
 }
 
 template <int Layer, int Gfx>
 TILE_GET_INFO_MEMBER(mechatt_state::get_pf_tile_info)
 {
-	uint16_t tile = m_pf_data[Layer][tile_index];
-	tileinfo.set(Gfx, tile&0xfff, tile>>12, 0);
+	uint16_t const tile = m_pf_vram[Layer][tile_index];
+	tileinfo.set(Gfx, tile & 0xfff, tile >> 12, 0);
 }
 
-void mechatt_state::video_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void mechatt_state::tx_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	COMBINE_DATA(&m_tx_videoram[offset]);
+	COMBINE_DATA(&m_tx_vram[offset]);
 	m_fix_tilemap->mark_tile_dirty(offset);
 }
 
@@ -278,11 +279,11 @@ void mechatt_state::mix_sprites(bitmap_ind16 &bitmap, bitmap_ind16 &srcbitmap, c
 {
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		uint16_t *srcbuf = &srcbitmap.pix(y);
-		uint16_t *dstbuf = &bitmap.pix(y);
+		uint16_t const *const srcbuf = &srcbitmap.pix(y);
+		uint16_t *const dstbuf = &bitmap.pix(y);
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			uint16_t srcdat = srcbuf[x];
+			uint16_t const srcdat = srcbuf[x];
 			if ((srcdat & 0xf) != 0xf)
 				MIX(srcdat, x, dstbuf);
 		}
@@ -294,10 +295,10 @@ uint32_t mechatt_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	m_bitmap_sprites.fill(0xffff);
 	m_sprites->draw_sprites(m_bitmap_sprites, cliprect);
 
-	m_pf_tilemap[0]->set_scrollx(0, m_pf_scroll_data[0][0]);
-	m_pf_tilemap[0]->set_scrolly(0, m_pf_scroll_data[0][1]);
-	m_pf_tilemap[1]->set_scrollx(0, m_pf_scroll_data[1][0]);
-	m_pf_tilemap[1]->set_scrolly(0, m_pf_scroll_data[1][1]);
+	m_pf_tilemap[0]->set_scrollx(0, m_pf_scroll_reg[0][0]);
+	m_pf_tilemap[0]->set_scrolly(0, m_pf_scroll_reg[0][1]);
+	m_pf_tilemap[1]->set_scrollx(0, m_pf_scroll_reg[1][0]);
+	m_pf_tilemap[1]->set_scrolly(0, m_pf_scroll_reg[1][1]);
 
 	m_pf_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
 
@@ -312,13 +313,13 @@ uint32_t mechatt_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 /*******************************************************************************/
 
-void mechatt_state::two_gun_output_w(uint16_t data)
+void mechatt_state::gun_output_w(uint16_t data)
 {
 	for (int i = 0; i < 2; i++)
 		m_gun_recoil[i] = BIT(data, i);
 }
 
-uint16_t mechatt_state::mechatt_gun_r(offs_t offset)
+uint16_t mechatt_state::gun_r(offs_t offset)
 {
 	int x = m_gun_io[offset ? 2 : 0]->read();
 	int y = m_gun_io[offset ? 3 : 1]->read();
@@ -331,23 +332,23 @@ uint16_t mechatt_state::mechatt_gun_r(offs_t offset)
 	return x | (y << 8);
 }
 
-void mechatt_state::mechatt_map(address_map &map)
+void mechatt_state::main_map(address_map &map)
 {
 	map(0x000000, 0x06ffff).rom();
-	map(0x070000, 0x07ffff).ram().share("ram");
-	map(0x090000, 0x090fff).ram().w(FUNC(mechatt_state::video_w)).share("tx_videoram");
-	map(0x0a0000, 0x0a0fff).ram().share("spriteram1");
+	map(0x070000, 0x07ffff).ram();
+	map(0x090000, 0x090fff).ram().w(FUNC(mechatt_state::tx_vram_w)).share(m_tx_vram);
+	map(0x0a0000, 0x0a0fff).ram().share("spriteram");
 	map(0x0a1000, 0x0a7fff).nopw();
-	map(0x0b0000, 0x0b3fff).ram().w(FUNC(mechatt_state::pf_w<0>)).share("pf1_data");
-	map(0x0b8000, 0x0b8003).writeonly().share("pf1_scroll_data");
-	map(0x0c0000, 0x0c3fff).ram().w(FUNC(mechatt_state::pf_w<1>)).share("pf2_data");
-	map(0x0c8000, 0x0c8003).writeonly().share("pf2_scroll_data");
+	map(0x0b0000, 0x0b3fff).ram().w(FUNC(mechatt_state::pf_vram_w<0>)).share(m_pf_vram[0]);
+	map(0x0b8000, 0x0b8003).writeonly().share(m_pf_scroll_reg[0]);
+	map(0x0c0000, 0x0c3fff).ram().w(FUNC(mechatt_state::pf_vram_w<1>)).share(m_pf_vram[1]);
+	map(0x0c8000, 0x0c8003).writeonly().share(m_pf_scroll_reg[1]);
 	map(0x0d0000, 0x0d07ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x0e0000, 0x0e0001).portr("IN0");
 	map(0x0e0002, 0x0e0003).portr("DSW1");
-	map(0x0e0004, 0x0e0007).r(FUNC(mechatt_state::mechatt_gun_r));
+	map(0x0e0004, 0x0e0007).r(FUNC(mechatt_state::gun_r));
 	map(0x0e4000, 0x0e4001).w(FUNC(mechatt_state::coin_counter_w));
-	map(0x0e4002, 0x0e4003).w(FUNC(mechatt_state::two_gun_output_w));
+	map(0x0e4002, 0x0e4003).w(FUNC(mechatt_state::gun_output_w));
 	map(0x0e8001, 0x0e8001).r(m_soundlatch[1], FUNC(generic_latch_8_device::read)).w(FUNC(mechatt_state::sound_cpu_w));
 }
 
@@ -476,9 +477,9 @@ INPUT_PORTS_END
 /******************************************************************************/
 
 static GFXDECODE_START( gfx_mechatt )
-	GFXDECODE_ENTRY( "tx_tiles", 0, gfx_8x8x4_packed_msb,                 0, 16 )
-	GFXDECODE_ENTRY( "gfx3",     0, gfx_8x8x4_col_2x2_group_packed_msb, 512, 16 )
-	GFXDECODE_ENTRY( "gfx4",     0, gfx_8x8x4_col_2x2_group_packed_msb, 768, 16 )
+	GFXDECODE_ENTRY( "tx_tiles",  0, gfx_8x8x4_packed_msb,                 0, 16 )
+	GFXDECODE_ENTRY( "bg1_tiles", 0, gfx_8x8x4_col_2x2_group_packed_msb, 512, 16 )
+	GFXDECODE_ENTRY( "bg2_tiles", 0, gfx_8x8x4_col_2x2_group_packed_msb, 768, 16 )
 GFXDECODE_END
 
 
@@ -488,7 +489,7 @@ void mechatt_state::mechatt(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 12000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mechatt_state::mechatt_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mechatt_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(mechatt_state::irq4_line_hold));
 
 	Z80(config, m_audiocpu, 4000000); /* Accurate */
@@ -510,9 +511,9 @@ void mechatt_state::mechatt(machine_config &config)
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
 	SNK_BBUSTERS_SPR(config, m_sprites, 0);
-	m_sprites->set_scaletable_tag("sprites1:scale_table");
+	m_sprites->set_scaletable_tag("sprites:scale_table");
 	m_sprites->set_palette("palette");
-	m_sprites->set_spriteram_tag("spriteram1");
+	m_sprites->set_spriteram_tag("spriteram");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -544,22 +545,22 @@ ROM_START( mechatt )
 	ROM_REGION( 0x020000, "tx_tiles", 0 ) // Located on the A8002-2 board
 	ROM_LOAD( "ma_1.l2", 0x000000, 0x10000, CRC(24766917) SHA1(9082a8ae849605ce65b5a0493ae69cfe282f7e7b) )
 
-	ROM_REGION( 0x200000, "sprites1", 0 ) // Located on the A8002-2 board
+	ROM_REGION( 0x200000, "sprites", 0 ) // Located on the A8002-2 board
 	ROM_LOAD16_WORD_SWAP( "mao89p13.bin",  0x000000, 0x80000, CRC(8bcb16cf) SHA1(409ee1944188d9ce39adce29b1df029b560dd5b0) )
 	ROM_LOAD16_WORD_SWAP( "ma189p15.bin",  0x080000, 0x80000, CRC(b84d9658) SHA1(448adecb0067d8f5b219ec2f94a8dec84187a554) )
 	ROM_LOAD16_WORD_SWAP( "ma289p17.bin",  0x100000, 0x80000, CRC(6cbe08ac) SHA1(8f81f6e92b84ab6867452011d52f3e7689c62a1a) )
 	ROM_LOAD16_WORD_SWAP( "ma389m15.bin",  0x180000, 0x80000, CRC(34d4585e) SHA1(38d9fd5d775e4b3c8b8b487a6ba9b8bdcb3274b0) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 ) // Located on the A8002-2 board
+	ROM_REGION( 0x80000, "bg1_tiles", 0 ) // Located on the A8002-2 board
 	ROM_LOAD( "mab189a2.bin",  0x000000, 0x80000, CRC(e1c8b4d0) SHA1(2f8a1839cca892f8380c7cffe7a12e615d38fd55) )
 
-	ROM_REGION( 0x80000, "gfx4", 0 ) // Located on the A8002-2 board
+	ROM_REGION( 0x80000, "bg2_tiles", 0 ) // Located on the A8002-2 board
 	ROM_LOAD( "mab289c2.bin",  0x000000, 0x80000, CRC(14f97ceb) SHA1(a22033532ea616dc3a3db8b66ad6ccc6172ed7cc) )
 
 	ROM_REGION( 0x20000, "ymsnd", 0 ) // Located on the A8002-1 main board
 	ROM_LOAD( "ma_2.d10", 0x000000, 0x20000, CRC(ea4cc30d) SHA1(d8f089fc0ce76309411706a8110ad907f93dc97e) )
 
-	ROM_REGION( 0x20000, "sprites1:scale_table", 0 ) // Zoom table - Located on the A8002-2 board
+	ROM_REGION( 0x20000, "sprites:scale_table", 0 ) // Zoom table - Located on the A8002-2 board
 	ROM_LOAD( "ma_8.f10", 0x000000, 0x10000, CRC(61f3de03) SHA1(736f9634fe054ea68a2aa90a743bd0dc320f23c9) )
 	ROM_LOAD( "ma_9.f12", 0x000000, 0x10000, CRC(61f3de03) SHA1(736f9634fe054ea68a2aa90a743bd0dc320f23c9) ) // identical to ma_8.f10
 ROM_END
@@ -577,7 +578,7 @@ ROM_START( mechattj ) // Uses EPROMs on official SNK A8002-5 & A8002-6 sub board
 	ROM_REGION( 0x020000, "tx_tiles", 0 ) // Located on the A8002-2 board
 	ROM_LOAD( "ma_1.l2", 0x000000, 0x10000, CRC(24766917) SHA1(9082a8ae849605ce65b5a0493ae69cfe282f7e7b) )
 
-	ROM_REGION( 0x200000, "sprites1", 0 ) // Located on the A8002-6 sub board
+	ROM_REGION( 0x200000, "sprites", 0 ) // Located on the A8002-6 sub board
 	ROM_LOAD16_BYTE( "s_9.a1",  0x000001, 0x20000, CRC(6e8e194c) SHA1(02bbd573a322a3f7f8e92ccceebffdd598b5489e) ) // these 4 == mao89p13.bin
 	ROM_LOAD16_BYTE( "s_1.b1",  0x000000, 0x20000, CRC(fd9161ed) SHA1(b3e2434dd9cb1cafe1022774b863b5f1a008a9d2) )
 	ROM_LOAD16_BYTE( "s_10.a2", 0x040001, 0x20000, CRC(fad6a1ab) SHA1(5347b4493c8004dc8cedc0b37aba494f203142b8) )
@@ -595,13 +596,13 @@ ROM_START( mechattj ) // Uses EPROMs on official SNK A8002-5 & A8002-6 sub board
 	ROM_LOAD16_BYTE( "s_16.a8", 0x1c0001, 0x20000, CRC(70f28040) SHA1(91012728953563fcc576725337e6ba7e1b49d1ba) )
 	ROM_LOAD16_BYTE( "s_8.b8",  0x1c0000, 0x20000, CRC(a6f8574f) SHA1(87c041669b2eaec495ae10a6f45b6668accb92bf) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 ) // these 4 == mab189a2.bin - Located on the A8002-5 sub board
+	ROM_REGION( 0x80000, "bg1_tiles", 0 ) // these 4 == mab189a2.bin - Located on the A8002-5 sub board
 	ROM_LOAD( "s_21.b3", 0x000000, 0x20000, CRC(701a0072) SHA1(b03b6fa18e0cfcd5c7c541025fa2d3632d2f8387) )
 	ROM_LOAD( "s_22.b4", 0x020000, 0x20000, CRC(34e6225c) SHA1(f6335084f4f4c7a4b6528e6ad74962b88f81e3bc) )
 	ROM_LOAD( "s_23.b5", 0x040000, 0x20000, CRC(9a7399d3) SHA1(04e0327b0da75f621b51e1831cbdc4537082e32b) )
 	ROM_LOAD( "s_24.b6", 0x060000, 0x20000, CRC(f097459d) SHA1(466364677f048519eb2894ddecf76f5c52f6afe9) )
 
-	ROM_REGION( 0x80000, "gfx4", 0 ) // these 4 == mab289c2.bin - Located on the A8002-5 sub board
+	ROM_REGION( 0x80000, "bg2_tiles", 0 ) // these 4 == mab289c2.bin - Located on the A8002-5 sub board
 	ROM_LOAD( "s_17.a3", 0x000000, 0x20000, CRC(cc47c4a3) SHA1(140f53b671b4eaed6fcc516c4018f07a6d7c2290) )
 	ROM_LOAD( "s_18.a4", 0x020000, 0x20000, CRC(a04377e8) SHA1(841c6c3073b137f6a5c875db32039186c014f785) )
 	ROM_LOAD( "s_19.a5", 0x040000, 0x20000, CRC(b07f5289) SHA1(8817bd225edf9b0fa439b220617f925365e39253) )
@@ -610,7 +611,7 @@ ROM_START( mechattj ) // Uses EPROMs on official SNK A8002-5 & A8002-6 sub board
 	ROM_REGION( 0x20000, "ymsnd", 0 ) // Located on the A8002-1 main board
 	ROM_LOAD( "ma_2.d10", 0x000000, 0x20000, CRC(ea4cc30d) SHA1(d8f089fc0ce76309411706a8110ad907f93dc97e) )
 
-	ROM_REGION( 0x20000, "sprites1:scale_table", 0 ) // Zoom table - Located on the A8002-2 board
+	ROM_REGION( 0x20000, "sprites:scale_table", 0 ) // Zoom table - Located on the A8002-2 board
 	ROM_LOAD( "ma_8.f10", 0x000000, 0x10000, CRC(61f3de03) SHA1(736f9634fe054ea68a2aa90a743bd0dc320f23c9) )
 	ROM_LOAD( "ma_9.f12", 0x000000, 0x10000, CRC(61f3de03) SHA1(736f9634fe054ea68a2aa90a743bd0dc320f23c9) ) // identical to ma_8.f10
 ROM_END
@@ -628,22 +629,22 @@ ROM_START( mechattu )
 	ROM_REGION( 0x020000, "tx_tiles", 0 ) // Located on the A8002-2 board
 	ROM_LOAD( "ma_1.l2", 0x000000, 0x10000, CRC(24766917) SHA1(9082a8ae849605ce65b5a0493ae69cfe282f7e7b) )
 
-	ROM_REGION( 0x200000, "sprites1", 0 ) // Located on the A8002-2 board
+	ROM_REGION( 0x200000, "sprites", 0 ) // Located on the A8002-2 board
 	ROM_LOAD16_WORD_SWAP( "mao89p13.bin",  0x000000, 0x80000, CRC(8bcb16cf) SHA1(409ee1944188d9ce39adce29b1df029b560dd5b0) )
 	ROM_LOAD16_WORD_SWAP( "ma189p15.bin",  0x080000, 0x80000, CRC(b84d9658) SHA1(448adecb0067d8f5b219ec2f94a8dec84187a554) )
 	ROM_LOAD16_WORD_SWAP( "ma289p17.bin",  0x100000, 0x80000, CRC(6cbe08ac) SHA1(8f81f6e92b84ab6867452011d52f3e7689c62a1a) )
 	ROM_LOAD16_WORD_SWAP( "ma389m15.bin",  0x180000, 0x80000, CRC(34d4585e) SHA1(38d9fd5d775e4b3c8b8b487a6ba9b8bdcb3274b0) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 ) // Located on the A8002-2 board
+	ROM_REGION( 0x80000, "bg1_tiles", 0 ) // Located on the A8002-2 board
 	ROM_LOAD( "mab189a2.bin",  0x000000, 0x80000, CRC(e1c8b4d0) SHA1(2f8a1839cca892f8380c7cffe7a12e615d38fd55) )
 
-	ROM_REGION( 0x80000, "gfx4", 0 ) // Located on the A8002-2 board
+	ROM_REGION( 0x80000, "bg2_tiles", 0 ) // Located on the A8002-2 board
 	ROM_LOAD( "mab289c2.bin",  0x000000, 0x80000, CRC(14f97ceb) SHA1(a22033532ea616dc3a3db8b66ad6ccc6172ed7cc) )
 
 	ROM_REGION( 0x20000, "ymsnd", 0 ) // Located on the A8002-1 main board
 	ROM_LOAD( "ma_2.d10", 0x000000, 0x20000, CRC(ea4cc30d) SHA1(d8f089fc0ce76309411706a8110ad907f93dc97e) )
 
-	ROM_REGION( 0x20000, "sprites1:scale_table", 0 ) // Zoom table - Located on the A8002-2 board
+	ROM_REGION( 0x20000, "sprites:scale_table", 0 ) // Zoom table - Located on the A8002-2 board
 	ROM_LOAD( "ma_8.f10", 0x000000, 0x10000, CRC(61f3de03) SHA1(736f9634fe054ea68a2aa90a743bd0dc320f23c9) )
 	ROM_LOAD( "ma_9.f12", 0x000000, 0x10000, CRC(61f3de03) SHA1(736f9634fe054ea68a2aa90a743bd0dc320f23c9) ) // identical to ma_8.f10
 ROM_END
@@ -662,7 +663,7 @@ ROM_START( mechattu1 ) // Uses EPROMs on official SNK A8002-5 & A8002-6 sub boar
 	ROM_REGION( 0x020000, "tx_tiles", 0 ) // Located on the A8002-2 board
 	ROM_LOAD( "ma_1.l2", 0x000000, 0x10000, CRC(24766917) SHA1(9082a8ae849605ce65b5a0493ae69cfe282f7e7b) )
 
-	ROM_REGION( 0x200000, "sprites1", 0 ) // Located on the A8002-6 sub board
+	ROM_REGION( 0x200000, "sprites", 0 ) // Located on the A8002-6 sub board
 	ROM_LOAD16_BYTE( "s_9.a1",  0x000001, 0x20000, CRC(6e8e194c) SHA1(02bbd573a322a3f7f8e92ccceebffdd598b5489e) ) // these 4 == mao89p13.bin
 	ROM_LOAD16_BYTE( "s_1.b1",  0x000000, 0x20000, CRC(fd9161ed) SHA1(b3e2434dd9cb1cafe1022774b863b5f1a008a9d2) )
 	ROM_LOAD16_BYTE( "s_10.a2", 0x040001, 0x20000, CRC(fad6a1ab) SHA1(5347b4493c8004dc8cedc0b37aba494f203142b8) )
@@ -680,13 +681,13 @@ ROM_START( mechattu1 ) // Uses EPROMs on official SNK A8002-5 & A8002-6 sub boar
 	ROM_LOAD16_BYTE( "s_16.a8", 0x1c0001, 0x20000, CRC(70f28040) SHA1(91012728953563fcc576725337e6ba7e1b49d1ba) )
 	ROM_LOAD16_BYTE( "s_8.b8",  0x1c0000, 0x20000, CRC(a6f8574f) SHA1(87c041669b2eaec495ae10a6f45b6668accb92bf) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 ) // these 4 == mab189a2.bin - Located on the A8002-5 sub board
+	ROM_REGION( 0x80000, "bg1_tiles", 0 ) // these 4 == mab189a2.bin - Located on the A8002-5 sub board
 	ROM_LOAD( "s_21.b3", 0x000000, 0x20000, CRC(701a0072) SHA1(b03b6fa18e0cfcd5c7c541025fa2d3632d2f8387) )
 	ROM_LOAD( "s_22.b4", 0x020000, 0x20000, CRC(34e6225c) SHA1(f6335084f4f4c7a4b6528e6ad74962b88f81e3bc) )
 	ROM_LOAD( "s_23.b5", 0x040000, 0x20000, CRC(9a7399d3) SHA1(04e0327b0da75f621b51e1831cbdc4537082e32b) )
 	ROM_LOAD( "s_24.b6", 0x060000, 0x20000, CRC(f097459d) SHA1(466364677f048519eb2894ddecf76f5c52f6afe9) )
 
-	ROM_REGION( 0x80000, "gfx4", 0 ) // these 4 == mab289c2.bin - Located on the A8002-5 sub board
+	ROM_REGION( 0x80000, "bg2_tiles", 0 ) // these 4 == mab289c2.bin - Located on the A8002-5 sub board
 	ROM_LOAD( "s_17.a3", 0x000000, 0x20000, CRC(cc47c4a3) SHA1(140f53b671b4eaed6fcc516c4018f07a6d7c2290) )
 	ROM_LOAD( "s_18.a4", 0x020000, 0x20000, CRC(a04377e8) SHA1(841c6c3073b137f6a5c875db32039186c014f785) )
 	ROM_LOAD( "s_19.a5", 0x040000, 0x20000, CRC(b07f5289) SHA1(8817bd225edf9b0fa439b220617f925365e39253) )
@@ -695,7 +696,7 @@ ROM_START( mechattu1 ) // Uses EPROMs on official SNK A8002-5 & A8002-6 sub boar
 	ROM_REGION( 0x20000, "ymsnd", 0 ) // Located on the A8002-1 main board
 	ROM_LOAD( "ma_2.d10", 0x000000, 0x20000, CRC(ea4cc30d) SHA1(d8f089fc0ce76309411706a8110ad907f93dc97e) )
 
-	ROM_REGION( 0x20000, "sprites1:scale_table", 0 ) // Zoom table - Located on the A8002-2 board
+	ROM_REGION( 0x20000, "sprites:scale_table", 0 ) // Zoom table - Located on the A8002-2 board
 	ROM_LOAD( "ma_8.f10", 0x000000, 0x10000, CRC(61f3de03) SHA1(736f9634fe054ea68a2aa90a743bd0dc320f23c9) )
 	ROM_LOAD( "ma_9.f12", 0x000000, 0x10000, CRC(61f3de03) SHA1(736f9634fe054ea68a2aa90a743bd0dc320f23c9) ) // identical to ma_8.f10
 ROM_END

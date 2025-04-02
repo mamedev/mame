@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Vas Crabb
+'use strict';
 
 var slot_info = Object.create(null);
 var bios_sets = Object.create(null);

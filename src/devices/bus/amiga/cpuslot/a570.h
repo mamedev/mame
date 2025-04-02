@@ -14,8 +14,12 @@
 #pragma once
 
 #include "cpuslot.h"
+#include "machine/6525tpi.h"
 #include "machine/at28c16.h"
+#include "machine/cr511b.h"
 #include "machine/dmac.h"
+#include "machine/input_merger.h"
+
 
 namespace bus::amiga::cpuslot {
 
@@ -38,8 +42,18 @@ protected:
 private:
 	void map(address_map &map) ATTR_COLD;
 
+	void sten_w(int state);
+	void drq_w(int state);
+
+	void tpi_portb_w(uint8_t data);
+
+	required_device<input_merger_any_high_device> m_irq;
 	required_device<amiga_dmac_rev2_device> m_dmac;
+	required_device<tpi6525_device> m_tpi;
+	required_device<cr511b_device> m_drive;
 	required_ioport m_config;
+
+	bool m_sten;
 
 	std::unique_ptr<uint16_t[]> m_ram;
 };

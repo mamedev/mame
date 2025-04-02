@@ -240,8 +240,6 @@ void tc0100scn_base_device::device_start()
 	16*8    /* every sprite takes 16 consecutive bytes */
 	};
 
-	int xd, yd;
-
 	/* Set up clipping for multi-TC0100SCN games. We assume
 	   this code won't ever affect single screen games:
 	   Thundfox is the only one of those with two chips, and
@@ -269,8 +267,8 @@ void tc0100scn_base_device::device_start()
 	   7 bits higher and 2 pixels to the left than chip #1 because
 	   that's how thundfox wants it. */
 
-	xd = (m_multiscrn_hack == 0) ?  (-m_x_offset) : (-m_x_offset - 2);
-	yd = (m_multiscrn_hack == 0) ?  (8 - m_y_offset) : (1 - m_y_offset);
+	int xd = (m_multiscrn_hack == 0) ? (-m_x_offset) : (-m_x_offset - 2);
+	int yd = (m_multiscrn_hack == 0) ? (8 - m_y_offset) : (1 - m_y_offset);
 
 	m_tilemap[0][0]->set_scrolldx(xd - 16, -m_flip_xoffs - xd - 16);
 	m_tilemap[0][0]->set_scrolldy(yd,      -m_flip_yoffs - yd);
@@ -345,7 +343,8 @@ void tc0100scn_device::device_start()
 void tc0620scc_device::device_start()
 {
 	decode_gfx(gfxinfo_6bpp);
-	/* make SCC tile GFX format suitable for gfxdecode */
+
+	// make SCC tile GFX format suitable for gfxdecode
 	gfx_element *gx0 = gfx(0);
 	gfx_element *gx1 = gfx(1);
 
@@ -454,8 +453,6 @@ void tc0100scn_base_device::set_layer_ptrs()
 
 void tc0100scn_base_device::restore_scroll()
 {
-	int flip;
-
 	m_bgscrollx = -m_ctrl[0];
 	m_fgscrollx = -m_ctrl[1];
 	m_tilemap[2][0]->set_scrollx(0, -m_ctrl[2]);
@@ -466,7 +463,7 @@ void tc0100scn_base_device::restore_scroll()
 	m_tilemap[2][0]->set_scrolly(0, -m_ctrl[5]);
 	m_tilemap[2][1]->set_scrolly(0, -m_ctrl[5]);
 
-	flip = (m_ctrl[7] & 0x01) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0;
+	int flip = (m_ctrl[7] & 0x01) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0;
 	m_tilemap[0][0]->set_flip(flip);
 	m_tilemap[1][0]->set_flip(flip);
 	m_tilemap[2][0]->set_flip(flip);
@@ -490,6 +487,9 @@ void tc0100scn_base_device::device_post_load()
 	m_tilemap[0][1]->mark_all_dirty();
 	m_tilemap[1][1]->mark_all_dirty();
 	m_tilemap[2][1]->mark_all_dirty();
+
+	gfx(1)->mark_all_dirty();
+	gfx(2)->mark_all_dirty();
 }
 
 u16 tc0100scn_base_device::ram_r(offs_t offset)
@@ -616,14 +616,12 @@ void tc0100scn_base_device::tilemap_update()
 		m_dirty = false;
 	}
 
-	int j;
-
 	m_tilemap[0][m_dblwidth]->set_scrolly(0, m_bgscrolly);
 	m_tilemap[1][m_dblwidth]->set_scrolly(0, m_fgscrolly);
 
-	for (j = 0; j < 256; j++)
+	for (int j = 0; j < 256; j++)
 		m_tilemap[0][m_dblwidth]->set_scrollx((j + m_bgscrolly) & 0x1ff, m_bgscrollx - m_bgscroll_ram[j]);
-	for (j = 0; j < 256; j++)
+	for (int j = 0; j < 256; j++)
 		m_tilemap[1][m_dblwidth]->set_scrollx((j + m_fgscrolly) & 0x1ff, m_fgscrollx - m_fgscroll_ram[j]);
 }
 
@@ -680,8 +678,8 @@ int tc0100scn_base_device::tilemap_draw( screen_device &screen, bitmap_ind16 &bi
 	clip &= screen.visible_area();
 
 #if 0
-if (disable != 0 && disable != 3 && disable != 7)
-	popmessage("layer disable = %x",disable);
+	if (disable != 0 && disable != 3 && disable != 7)
+		popmessage("layer disable = %x", disable);
 #endif
 
 	switch (layer)

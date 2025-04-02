@@ -441,7 +441,18 @@ void uml::instruction::simplify()
 				else
 					convert_to_mov_immediate(rotl_64(m_param[1].immediate(), m_param[2].immediate()) & m_param[3].immediate());
 			}
-			else if (m_param[2].is_immediate_value(0))
+			else if (m_param[1].is_immediate() && m_param[2].is_immediate())
+			{
+				assert(m_size == 4 || m_size == 8);
+				m_opcode = OP_AND;
+				m_numparams = 3;
+				if (m_size == 4)
+					m_param[1] = parameter(rotl_32(m_param[1].immediate(), m_param[2].immediate()));
+				else
+					m_param[1] = parameter(rotl_64(m_param[1].immediate(), m_param[2].immediate()));
+				m_param[2] = m_param[3];
+			}
+			else if (m_param[2].is_immediate_value(0) || m_param[3].is_immediate_value(0))
 			{
 				m_opcode = OP_AND;
 				m_numparams = 3;

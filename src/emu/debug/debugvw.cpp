@@ -14,6 +14,7 @@
 #include "debugcpu.h"
 #include "dvbpoints.h"
 #include "dvdisasm.h"
+#include "dvepoints.h"
 #include "dvmemory.h"
 #include "dvrpoints.h"
 #include "dvsourcecode.h"
@@ -369,6 +370,9 @@ debug_view *debug_view_manager::alloc_view(debug_view_type type, debug_view_osd_
 
 		case DVT_REGISTER_POINTS:
 			return append(new debug_view_registerpoints(machine(), osdupdate, osdprivate));
+
+		case DVT_EXCEPTION_POINTS:
+			return append(new debug_view_exceptionpoints(machine(), osdupdate, osdprivate));
 
 		case DVT_SOURCE:
 			return append(new debug_view_sourcecode(machine(), osdupdate, osdprivate));

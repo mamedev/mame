@@ -3300,6 +3300,8 @@ if (BUSES["CENTRONICS"]~=null) then
 		MAME_DIR .. "src/devices/bus/centronics/dsjoy.h",
 		MAME_DIR .. "src/devices/bus/centronics/epson_ex800.cpp",
 		MAME_DIR .. "src/devices/bus/centronics/epson_ex800.h",
+		MAME_DIR .. "src/devices/bus/centronics/epson_fx80.cpp",
+		MAME_DIR .. "src/devices/bus/centronics/epson_fx80.h",
 		MAME_DIR .. "src/devices/bus/centronics/epson_lx800.cpp",
 		MAME_DIR .. "src/devices/bus/centronics/epson_lx800.h",
 		MAME_DIR .. "src/devices/bus/centronics/epson_lx810l.cpp",
@@ -4174,8 +4176,8 @@ if (BUSES["TI99"]~=null) then
 		MAME_DIR .. "src/devices/bus/ti99/peb/scsicard.h",
 		MAME_DIR .. "src/devices/bus/ti99/peb/sidmaster.cpp",
 		MAME_DIR .. "src/devices/bus/ti99/peb/sidmaster.h",
-		MAME_DIR .. "src/devices/bus/ti99/peb/spchsyn.cpp",
-		MAME_DIR .. "src/devices/bus/ti99/peb/spchsyn.h",
+		MAME_DIR .. "src/devices/bus/ti99/peb/speechadapter.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/peb/speechadapter.h",
 		MAME_DIR .. "src/devices/bus/ti99/peb/ti_32kmem.cpp",
 		MAME_DIR .. "src/devices/bus/ti99/peb/ti_32kmem.h",
 		MAME_DIR .. "src/devices/bus/ti99/peb/ti_fdc.cpp",
@@ -4190,6 +4192,8 @@ if (BUSES["TI99"]~=null) then
 		MAME_DIR .. "src/devices/bus/ti99/peb/tn_usbsm.h",
 		MAME_DIR .. "src/devices/bus/ti99/sidecar/arcturus.cpp",
 		MAME_DIR .. "src/devices/bus/ti99/sidecar/arcturus.h",
+		MAME_DIR .. "src/devices/bus/ti99/sidecar/speechsyn.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/sidecar/speechsyn.h",
 	}
 end
 
@@ -5288,6 +5292,8 @@ if (BUSES["CBUS"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/cbus/amd98.cpp",
 		MAME_DIR .. "src/devices/bus/cbus/amd98.h",
+		MAME_DIR .. "src/devices/bus/cbus/mif201.cpp",
+		MAME_DIR .. "src/devices/bus/cbus/mif201.h",
 		MAME_DIR .. "src/devices/bus/cbus/mpu_pc98.cpp",
 		MAME_DIR .. "src/devices/bus/cbus/mpu_pc98.h",
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_26.cpp",
@@ -5812,13 +5818,13 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/heathzenith/h89/intr_cntrl.h,BUSES["HEATH_INTR_SOCKET"] = true
+--@src/devices/bus/heathzenith/intr_cntrl/intr_cntrl.h,BUSES["HEATH_INTR_SOCKET"] = true
 ---------------------------------------------------
 
 if (BUSES["HEATH_INTR_SOCKET"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/bus/heathzenith/h89/intr_cntrl.cpp",
-		MAME_DIR .. "src/devices/bus/heathzenith/h89/intr_cntrl.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/intr_cntrl/intr_cntrl.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/intr_cntrl/intr_cntrl.h",
 	}
 end
 

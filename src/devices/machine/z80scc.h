@@ -249,6 +249,7 @@ protected:
 	int get_tx_word_length();
 	void safe_transmit_register_reset();
 	void check_dma_request();
+	void check_receive_interrupt();
 
 	emu_timer *m_baudtimer;
 	uint16_t m_brg_counter;

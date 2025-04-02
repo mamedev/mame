@@ -5685,4 +5685,4 @@ GAME( 1993, qcrayon2,   0,        qcrayon2,  qcrayon2,   taitof2_state,  empty_i
 GAME( 1991, driftout,   0,        driftout,  driftout,   dondokod_state, empty_init,    ROT270, "Visco",                     "Drift Out (Europe)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, driftoutct, driftout, driftoutct,driftoutct, cameltry_state, empty_init,    ROT270, "Visco",                     "Drift Out (Europe, Cameltry conversion)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, driftoutj,  driftout, driftout,  driftout,   dondokod_state, empty_init,    ROT270, "Visco",                     "Drift Out (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, driveout,   driftout, driveout,  driftout,   driveout_state, empty_init,    ROT270, "bootleg",                   "Drive Out (bootleg of Drift Out)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, driveout,   driftout, driveout,  driftout,   driveout_state, empty_init,    ROT270, "bootleg (Electronic Devices)", "Drive Out (bootleg of Drift Out)", MACHINE_SUPPORTS_SAVE )

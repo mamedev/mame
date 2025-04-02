@@ -143,6 +143,7 @@ table.book td.cover {
 
 table.book img {
 	border: solid #000080 1px ;
+	border-radius: 2px ;
 }
 
 table.book span {

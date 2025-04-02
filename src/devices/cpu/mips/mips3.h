@@ -522,7 +522,7 @@ protected:
 	void static_generate_memory_mode_checks(drcuml_block &block, uml::code_handle &exception_addrerr, int &label, int mode);
 	void static_generate_fastram_accessor(drcuml_block &block, int &label, int size, bool iswrite, bool ismasked);
 	void static_generate_memory_rw(drcuml_block &block, int size, bool iswrite, bool ismasked);
-	virtual void static_generate_memory_accessor(int mode, int size, bool iswrite, bool ismasked, const char *name, uml::code_handle *&handleptr);
+	virtual void static_generate_memory_accessor(drcuml_block &block, int &label, int mode, int size, bool iswrite, bool ismasked, const char *name, uml::code_handle *&handleptr);
 
 	virtual void check_irqs();
 	virtual void handle_mult(uint32_t op);
@@ -620,11 +620,11 @@ private:
 		uml::code_label  labelnum;                   /* index for local labels */
 	};
 
-	void static_generate_entry_point();
-	void static_generate_nocode_handler();
-	void static_generate_out_of_cycles();
-	void static_generate_tlb_mismatch();
-	void static_generate_exception(uint8_t exception, int recover, const char *name);
+	void static_generate_entry_point(drcuml_block &block, int &label);
+	void static_generate_nocode_handler(drcuml_block &block, int &label);
+	void static_generate_out_of_cycles(drcuml_block &block, int &label);
+	void static_generate_tlb_mismatch(drcuml_block &block, int &label);
+	void static_generate_exception(drcuml_block &block, int &label, uint8_t exception, int recover, const char *name);
 
 	void generate_update_mode(drcuml_block &block);
 	void generate_update_cycles(drcuml_block &block, compiler_state &compiler, uml::parameter param, bool allow_exception);
@@ -758,7 +758,7 @@ public:
 protected:
 	virtual bool memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space) override;
 
-	virtual void static_generate_memory_accessor(int mode, int size, bool iswrite, bool ismasked, const char *name, uml::code_handle *&handleptr) override;
+	virtual void static_generate_memory_accessor(drcuml_block &block, int &label, int mode, int size, bool iswrite, bool ismasked, const char *name, uml::code_handle *&handleptr) override;
 
 	virtual bool RBYTE(offs_t address, uint32_t *result) override;
 	virtual bool RHALF(offs_t address, uint32_t *result) override;

@@ -30,13 +30,14 @@ private:
 
 	u16 m_vdp_address[2]{};
 	u32 m_work_address = 0;
+	u16 m_color_code;
 
 	struct BufferArea {
 		u8 start_dot = 0;
 		u8 pixel_mode = 0;
 		u16 hsize = 0;
 		u16 vsize = 0;
-		u16 fb_pitch = 0;
+		s16 fb_pitch = 0;
 		u32 address = 0;
 	};
 
@@ -49,8 +50,34 @@ private:
 
 	void start_exec();
 
-	// commands
-	void cmd_blit(u16 draw_mode, bool is_patblt);
+	void execute_blit(u16 draw_mode, bool is_patblt);
+
+	typedef u16 (pc88va_sgp_device::*rop_func)(u16 src, u16 dst);
+
+	static const rop_func rop_table[16];
+	u16 rop_0_fill_0(u16 src, u16 dst);
+	u16 rop_1_s_and_d(u16 src, u16 dst);
+	u16 rop_2_ns_and_d(u16 src, u16 dst);
+	u16 rop_3_d(u16 src, u16 dst);
+	u16 rop_4_s_and_nd(u16 src, u16 dst);
+	u16 rop_5_s(u16 src, u16 dst);
+	u16 rop_6_s_xor_d(u16 src, u16 dst);
+	u16 rop_7_s_or_d(u16 src, u16 dst);
+	u16 rop_8_ns_or_d(u16 src, u16 dst);
+	u16 rop_9_n_s_xor_d(u16 src, u16 dst);
+	u16 rop_A_n_s(u16 src, u16 dst);
+	u16 rop_B_n_s_or_d(u16 src, u16 dst);
+	u16 rop_C_nd(u16 src, u16 dst);
+	u16 rop_D_s_or_nd(u16 src, u16 dst);
+	u16 rop_E_n_s_and_d(u16 src, u16 dst);
+	u16 rop_F_fill_1(u16 src, u16 dst);
+
+	typedef bool (pc88va_sgp_device::*tpmod_func)(u16 src, u16 dst);
+	static const tpmod_func tpmod_table[4];
+	bool tpmod_0_always(u16 src, u16 dst);
+	bool tpmod_1_src(u16 src, u16 dst);
+	bool tpmod_2_dst(u16 src, u16 dst);
+	bool tpmod_3_never(u16 src, u16 dst);
 };
 
 

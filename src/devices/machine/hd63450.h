@@ -22,6 +22,7 @@ public:
 
 	auto irq_callback() { return m_irq_callback.bind(); }
 	auto dma_end() { return m_dma_end.bind(); }
+	auto own() { return m_own.bind(); }
 	template <int Ch> auto dma_read() { return m_dma_read[Ch].bind(); }
 	template <int Ch> auto dma_write() { return m_dma_write[Ch].bind(); }
 
@@ -62,6 +63,7 @@ public:
 		ERR_NONE= 7
 	};
 	void bec_w(offs_t offset, uint8_t data) { m_bec = data; }
+	void dtack_w(int state) { m_dtack = !state; }
 
 	void single_transfer(int x);
 	void set_timer(int channel, const attotime &tm);
@@ -96,6 +98,7 @@ private:
 
 	devcb_write_line m_irq_callback;
 	devcb_write8 m_dma_end;
+	devcb_write_line m_own;
 	devcb_read8::array<4> m_dma_read;
 	devcb_write8::array<4> m_dma_write;
 
@@ -112,6 +115,8 @@ private:
 
 	int8_t m_irq_channel;
 	uint8_t m_bec;
+
+	bool m_dtack;
 
 	// tell if a channel is in use
 	bool dma_in_progress(int channel) const { return (m_reg[channel].csr & 0x08) != 0; }

@@ -55,6 +55,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_cassette(*this, "cassette"),
+		m_rom(*this, "maincpu"),
 		m_ram(*this, RAM_TAG),
 		m_specmem(*this, "specmem"),
 		m_speaker(*this, "speaker"),
@@ -155,6 +156,7 @@ protected:
 	void spectrum_data(address_map &map) ATTR_COLD;
 
 	required_device<cassette_image_device> m_cassette;
+	required_region_ptr<u8> m_rom;
 	required_device<ram_device> m_ram;
 	optional_device<address_map_bank_device> m_specmem;
 	required_device<speaker_sound_device> m_speaker;

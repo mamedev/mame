@@ -690,7 +690,8 @@ INPUT_PORTS_END
 
 void eolith_state::eolith45(machine_config &config)
 {
-	E132N(config, m_maincpu, 45000000);         /* 45 MHz */
+	// TODO: turning off single instruction mode makes Raccoon World slow due to constant recompilation
+	E132N(config, m_maincpu, 45'000'000).set_single_instruction_mode(true);         /* 45 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &eolith_state::eolith_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(eolith_state::eolith_speedup), "screen", 0, 1);
 

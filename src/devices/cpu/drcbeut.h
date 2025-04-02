@@ -15,6 +15,7 @@
 
 #include "mfpresolve.h"
 
+#include <cassert>
 #include <list>
 #include <utility>
 #include <vector>
@@ -36,14 +37,14 @@ public:
 	drc_hash_table(drc_cache &cache, uint32_t modes, uint8_t addrbits, uint8_t ignorebits);
 
 	// getters
-	drccodeptr ***base() const { return m_base; }
-	uint8_t l1bits() const { return m_l1bits; }
-	uint8_t l2bits() const { return m_l2bits; }
-	uint8_t l1shift() const { return m_l1shift; }
-	uint8_t l2shift() const { return m_l2shift; }
-	offs_t l1mask() const { return m_l1mask; }
-	offs_t l2mask() const { return m_l2mask; }
-	bool is_mode_populated(uint32_t mode) const { return m_base[mode] != m_emptyl1; }
+	drccodeptr ***base() const noexcept { return m_base; }
+	uint8_t l1bits() const noexcept { return m_l1bits; }
+	uint8_t l2bits() const noexcept { return m_l2bits; }
+	uint8_t l1shift() const noexcept { return m_l1shift; }
+	uint8_t l2shift() const noexcept { return m_l2shift; }
+	offs_t l1mask() const noexcept { return m_l1mask; }
+	offs_t l2mask() const noexcept { return m_l2mask; }
+	bool is_mode_populated(uint32_t mode) const noexcept { return m_base[mode] != m_emptyl1; }
 
 	// set up and configuration
 	bool reset();
@@ -55,8 +56,8 @@ public:
 
 	// code pointer access
 	bool set_codeptr(uint32_t mode, uint32_t pc, drccodeptr code);
-	drccodeptr get_codeptr(uint32_t mode, uint32_t pc) { assert(mode < m_modes); return m_base[mode][(pc >> m_l1shift) & m_l1mask][(pc >> m_l2shift) & m_l2mask]; }
-	bool code_exists(uint32_t mode, uint32_t pc) { return get_codeptr(mode, pc) != m_nocodeptr; }
+	drccodeptr get_codeptr(uint32_t mode, uint32_t pc) const noexcept { assert(mode < m_modes); return m_base[mode][(pc >> m_l1shift) & m_l1mask][(pc >> m_l2shift) & m_l2mask]; }
+	bool code_exists(uint32_t mode, uint32_t pc) const noexcept { return get_codeptr(mode, pc) != m_nocodeptr; }
 
 private:
 	// internal state

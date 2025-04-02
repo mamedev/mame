@@ -620,24 +620,6 @@ Video Board
 |                                                                                         M5M4V4169 |
 |                                                                                         M5M4V4169 |
 |  ADV7120KP30                                                                                      |
-|                                                                                                   |
-|                                                                                                   |
-|            M5M410092FP                       M5M410092FP                                M5M4V4169 |
-|  SEGA      (TQFP128)                         (TQFP128)                                  M5M4V4169 |
-|  315-6061              M5M410092FP                                                                |
-|  (BGA)                 (TQFP128)                                                        M5M4V4169 |
-|            M5M410092FP                                                                  M5M4V4169 |
-|            (TQFP128)       M5M410092FP                                                            |
-|                            (TQFP128)         SEGA                      SEGA             M5M4V4169 |
-|     SEGA      M5M410092FP                    315-6059                  315-6060         M5M4V4169 |
-|     315-5648  (TQFP128)      M5M410092FP     (BGA)                     (BGA)                      |
-|     (QFP64)                  (TQFP128)                    SEGA                                    |
-|                                                           315-6060                      M5M4V4169 |
-|                                                           (BGA)                         M5M4V4169 |
-|                                                                                                   |
-|                                                                                         M5M4V4169 |
-|                                                                                         M5M4V4169 |
-|  ADV7120KP30                                                                                      |
 |  (PLCC44)                                                                                         |
 |                                                   M5M4V4169  M5M4V4169  M5M4V4169  M5M4V4169      |
 |                                                   M5M4V4169  M5M4V4169  M5M4V4169  M5M4V4169      |

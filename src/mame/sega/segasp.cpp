@@ -94,7 +94,7 @@ Thomas: The Tank Engine                     ???-?????                 no        
 UNO the Medal (Medalink)                    837-14804    F*           ROM  JP     253-5508-0526J  AAFE-01G00225212, Satellite Medal
 Western Dream Gold (Medalink)               837-14699    F*           ROM  JP     253-5508-0473J  AAFE-xxxxxxxxxxx, Satellite Medal
 Yataimura Kingyosukui (1-player, Japan)     8340003      D            ROM  JP     253-5509-5151J  AAFE-01C68774814
-Yataimura Kingyosukui (4-player, China)     837-14875                 CF   EXP    253-5508-0563J  AAFE-xxxxxxxxxxx
+Yataimura Kingyosukui (4-player, China)     834000101    F          ROM/CF EXP    253-5509-5142E  AAFE-01D84514911
 Yataimura Shateki (1-player, Japan)         834000301    D            ROM  JP     253-5508-0628J  AAFE-01C37464814
 Unknown                                     834-14865                      JAP
 
@@ -500,7 +500,7 @@ ROM_START( bingogal )
 	ROM_PARAMETER( ":rom_board:id", "5502" )  // actually 8x 128Mbit FlashROMs
 
 	ROM_REGION( 0x800, "pic_readout", 0 )
-	ROM_LOAD( "317-0513-jpn.ic15", 0, 0x800, BAD_DUMP CRC(778dc297) SHA1(a920ab31ea670cc5056c40baea3b832b7868bfe7) )
+	ROM_LOAD( "317-0513-jpn.ic15", 0, 0x800, CRC(599c5637) SHA1(ca066dd8e8c4277023f5f9753e527009b634119b) )
 ROM_END
 
 // This is installer of whole game machine.
@@ -522,7 +522,7 @@ ROM_START( bingogalo )
 	ROM_PARAMETER( ":rom_board:id", "5502" )  // actually 8x 128Mbit FlashROMs
 
 	ROM_REGION( 0x800, "pic_readout", 0 )
-	ROM_LOAD( "317-0513-jpn.ic15", 0, 0x800, BAD_DUMP CRC(778dc297) SHA1(a920ab31ea670cc5056c40baea3b832b7868bfe7) )
+	ROM_LOAD( "317-0513-jpn.ic15", 0, 0x800, CRC(599c5637) SHA1(ca066dd8e8c4277023f5f9753e527009b634119b) )
 ROM_END
 
 // Also was dumped 837-14789 PCB, which uses 2x 512Mbit Flash ROMs. Game contents is the same as joined IC 62-64 dumps below.

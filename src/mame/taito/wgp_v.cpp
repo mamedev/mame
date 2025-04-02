@@ -181,13 +181,13 @@ void wgp_state::piv_ctrl_word_w(offs_t offset, u16 data, u16 mem_mask)
 
 		case 0x09:
 			/* piv 1 y zoom (0x7f = normal, values 0 &
-			      0xff7f-ffbc in Wgp2) */
+			      0xff7f-ffbc in WGP 2) */
 			m_piv_zoom[1] = data;
 			break;
 
 		case 0x0a:
 			/* piv 2 y zoom (0x7f = normal, values 0 &
-			      0xff7f-ffbc in Wgp2, 0-0x98 in Wgp round 4/5) */
+			      0xff7f-ffbc in WGP 2, 0-0x98 in Wgp round 4/5) */
 			m_piv_zoom[2] = data;
 			break;
 	}
@@ -206,14 +206,14 @@ Implement rotation/zoom properly.
 
 Sprite/piv priority: sprites always over?
 
-Wgp round 1 had some junky brown mud bank sprites in-game.
+WGP round 1 had some junky brown mud bank sprites in-game.
 They are indexed 0xe720-e790. 0x2720*4 => +0x9c80-9e80 in
 the spritemap area. They should be 2x2 not 4x4 tiles. We
 kludge this. Round 2 +0x9d40-9f40 contains the 2x2 sprites.
 What REALLY controls number of tiles in a sprite?
 
-Sprite colors: dust after crash in Wgp2 is odd; some
-black/grey barrels on late Wgp circuit also look strange -
+Sprite colors: dust after crash in WGP 2 is odd; some
+black/grey barrels on late WGP circuit also look strange -
 possibly the same wrong color.
 
 
@@ -223,13 +223,13 @@ Memory Map
 400000 - 40bfff : Sprite tile mapping area
 
     Tile numbers (0-0x3fff) alternate with word containing tile
-    color/unknown bits. I'm _not_ 100% sure that only Wgp2 uses
+    color/unknown bits. I'm _not_ 100% sure that only WGP 2 uses
     the unknown bits.
 
     xxxxxxxx x.......  unused ??
-    ........ .x......  unknown (Wgp2 only: Taito tyre bridge on default course)
-    ........ ..x.....  unknown (Wgp2 only)
-    ........ ...x....  unknown (Wgp2 only: Direction signs just before hill # 1)
+    ........ .x......  unknown (WGP 2 only: Taito tyre bridge on default course)
+    ........ ..x.....  unknown (WGP 2 only)
+    ........ ...x....  unknown (WGP 2 only: Direction signs just before hill # 1)
     ........ ....cccc  color (0-15)
 
     Tile map for each standard big sprite is 64 bytes (16 tiles).
@@ -278,10 +278,10 @@ Memory Map
     (No longer used entries typically have 0xfff6 in +0x06 and +0x08.)
 
     Only 2 rotation examples (i) at 0x40c000 when Taito
-    logo displayed (Wgp only). (ii) stage 5 (rain).
+    logo displayed (WGP only). (ii) stage 5 (rain).
     Other in-game sprites are simply using +0x06 and +0x0c,
 
-    So the sprite rotation in Wgp screenshots must be a *blanket*
+    So the sprite rotation in WGP screenshots must be a *blanket*
     rotate effect, identical to the one applied to piv layers.
     This explains why sprite/piv positions are basically okay
     despite failure to implement rotation.
@@ -290,13 +290,13 @@ Memory Map
 
     Each word is a sprite number, 0x0 through 0x1bf. If !=0
     a word makes active the 0x10 bytes of sprite data at
-    (40c000 + sprite_num * 0x10). (Wgp2 fills this in reverse).
+    (40c000 + sprite_num * 0x10). (WGP 2 fills this in reverse).
 
 40fff0: Unknown (sprite control word?)
 
-    Wgp alternates 0x8000 and 0. Wgp2 only pokes 0.
+    WGP alternates 0x8000 and 0. WGP 2 only pokes 0.
     Could this be some frame buffer control that would help to
-    reduce the sprite timing glitches in Wgp?
+    reduce the sprite timing glitches in WGP?
 
 ****************************************************************/
 
@@ -502,11 +502,11 @@ void wgp_state::piv_layer_draw(screen_device &screen, bitmap_ind16 &bitmap, cons
 	const u32 zoomx = 0x10000;    /* No overall X zoom, unlike TC0480SCP */
 
 	/* Y-axis zoom offers expansion/compression: 0x7f = no zoom, 0xff = max ???
-	   In WGP see:  stage 4 (big spectator stand)
-	                stage 5 (cloud layer)
-	                stage 7 (two bits of background scenery)
-	                stage 8 (unknown - surely something should be appearing here...)
-	   In WGP2 see: road at big hill (default course) */
+	   In WGP see: stage 4 (big spectator stand)
+	               stage 5 (cloud layer)
+	               stage 7 (two bits of background scenery)
+	               stage 8 (unknown - surely something should be appearing here...)
+	   In WGP 2 see: road at big hill (default course) */
 
 	/* This calculation may be wrong, the y_index one too */
 	const u32 zoomy = 0x10000 - (((m_piv_ctrlram[0x08 + layer] & 0xff) - 0x7f) * 512);

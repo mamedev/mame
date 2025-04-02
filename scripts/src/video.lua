@@ -1720,3 +1720,15 @@ if (VIDEOS["ZR36110"]~=null) then
 		MAME_DIR .. "src/devices/video/zr36110.h",
 	}
 end
+
+--------------------------------------------------
+--
+--@src/devices/video/bt450.h,VIDEOS["BT450"] = true
+--------------------------------------------------
+
+if (VIDEOS["BT450"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/bt450.cpp",
+		MAME_DIR .. "src/devices/video/bt450.h",
+	}
+end

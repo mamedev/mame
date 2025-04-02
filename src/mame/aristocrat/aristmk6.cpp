@@ -16,7 +16,7 @@ TODO:
 - Identify irq sources;
 - Irq acknowledge doesn't work as intended;
 - Emulate PLX 9054 controller & PCI root;
-- PMX1 likely runs under PCI bus too;
+- PMX1 likely runs under PCI bus too, as per src/devices/bus/pci/neon250.cpp (x86 AGP card);
 - Eventually gets to "flyback" errors, pings $12000130-$3f for strobe and/or irq enable.
   Flyback is an alias for vblank, cfr. Acorn Archimedes.
 

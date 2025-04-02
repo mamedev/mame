@@ -301,10 +301,6 @@ MicroProse
 ==========
 F15 Strike Eagle II Sabaku no Arashi Sakusen Scenario Disk
 
-NIC
-===
-Magic Knight
-
 New
 ===
 Princess Maker
@@ -359,7 +355,6 @@ QUIZ Ikasete...
 
 Soft Plan
 =========
-King's Dungeon
 Dark Odyssey
 
 Techno Brain
@@ -380,7 +375,6 @@ Wrestle Angels 2 Top Eventer
 Zenryutsu
 =========
 Endan Rekishi Emaki Nukata no Ookimi
-Kindan no Paradise
 Sailor fuku Ikenai Taiken Kokuhaku Shuu Vol.1 Lost Virgin
 Sailor fuku Ikenai Taiken Kokuhaku Shuu Vol.2 Temptation
 Sailor fuku Ikenai Taiken Kokuhaku Shuu Vol.3 Ecstasy
@@ -1690,20 +1684,20 @@ Weapon bar goes under some playfield elements during gameplay, on stage 1 pick a
 		<info name="release" value="19900915" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
-			<dataarea name="flop" size="1261824">
-				<rom name="baruusa no fukushuu (1991)(zain soft)(disk 1 of 3)(disk a).dim" size="1261824" crc="620c407d" sha1="88839522368865d98e8e836ed047c1300c997137" />
+			<dataarea name="flop" size="3441530">
+				<rom name="baruusa_no_fukushuu_disk_a.mfm" size="3441530" crc="bd372593" sha1="9860895b7c24d5d1ee4819209b5da2302cdb3507" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
-			<dataarea name="flop" size="1261824">
-				<rom name="baruusa no fukushuu (1991)(zain soft)(disk 2 of 3)(disk b).dim" size="1261824" crc="d2ae19ad" sha1="07307d6df8a0ad7e53d76b80481552582540eff7" />
+			<dataarea name="flop" size="3416188">
+				<rom name="baruusa_no_fukushuu_disk_b.mfm" size="3416188" crc="ac6d0b74" sha1="7a80e727e66ba3e5b7bfb7af51f06d6cb0c200d0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Opening Disk" />
-			<dataarea name="flop" size="1261824">
-				<rom name="baruusa no fukushuu (1991)(zain soft)(disk 3 of 3)(opening).dim" size="1261824" crc="d56358dc" sha1="86e30ff1f51d69e5b19f231cc577180cb117a523" />
+			<dataarea name="flop" size="3415464">
+				<rom name="baruusa_no_fukushuu_opening_disk.mfm" size="3415464" crc="63c17568" sha1="d0657e591091931d2e6cf99d7c2c16242623c39e" />
 			</dataarea>
 		</part>
 	</software>
@@ -4155,6 +4149,25 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		<info name="alt_title" value="アルビオン 白亜の騎士伝説 ~ Albion Hakua no Kishi Densetsu" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="3438876">
+				<rom name="domino_soldier_albion_disk_a.mfm" size="3438876" crc="12bd67a4" sha1="da80c9bc10eafa8f0c327f2336df46417f2e8ecc" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="3413386">
+				<rom name="domino_soldier_albion_disk_b.mfm" size="3413386" crc="795db188" sha1="474e6fcb4b768b480251043fda21b3a044c9764c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="albionc" cloneof="albion">
+		<description>Domino Soldier Albion (cracked)</description>
+		<year>1989</year>
+		<publisher>カオス (Chaos)</publisher>
+		<info name="alt_title" value="アルビオン 白亜の騎士伝説 ~ Albion Hakua no Kishi Densetsu" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261824">
 				<rom name="domino soldier albion (198x)(chaos)(disk 1 of 2)(disk a).dim" size="1261824" crc="648cc982" sha1="9448901b8bab2d85f12bf83d3bb40278bd34aa27" />
 			</dataarea>
@@ -6546,7 +6559,27 @@ Sometimes turning doesn't work (verify)
 	<software name="glyeward">
 		<description>Guerriere Lyeward</description>
 		<year>1990</year>
-		<publisher>徳間書店インターメディア (Tokuma Shoten Inter Media)</publisher>
+		<publisher>徳間書店インターメディア (Tokuma Shoten Intermedia)</publisher>
+		<info name="alt_title" value="リウィード" />
+		<info name="release" value="19900130" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="3438985">
+				<rom name="guerriere_lyeward_disk_a.mfm" size="3438985" crc="a3c72f6a" sha1="0ba86fd0da634ca8b2f6a9378b1d24e14c11288d" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="3422504">
+				<rom name="guerriere_lyeward_disk_b.mfm" size="3422504" crc="0ec19fa0" sha1="3ea9dc5986242b364a5ee8f631386c03f11466a6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="glyewardc" cloneof="glyeward">
+		<description>Guerriere Lyeward (cracked)</description>
+		<year>1990</year>
+		<publisher>徳間書店インターメディア (Tokuma Shoten Intermedia)</publisher>
 		<info name="alt_title" value="リウィード" />
 		<info name="release" value="19900130" />
 		<part name="flop1" interface="floppy_5_25">
@@ -6721,6 +6754,19 @@ Sometimes turning doesn't work (verify)
 
 	<software name="hanateng">
 		<description>Hanafuda Tengoku</description>
+		<year>1990</year>
+		<publisher>ジャンクシステム (Junk System)</publisher>
+		<info name="alt_title" value="花札天国" />
+		<info name="release" value="19900626" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="3408485">
+				<rom name="hanafuda_tengoku.mfm" size="3408485" crc="b300d55c" sha1="d9771c92d536952d647def1e7d553a4711135e1b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hanatengc" cloneof="hanateng">
+		<description>Hanafuda Tengoku (cracked)</description>
 		<year>1990</year>
 		<publisher>ジャンクシステム (Junk System)</publisher>
 		<info name="alt_title" value="花札天国" />
@@ -7346,6 +7392,19 @@ Sometimes turning doesn't work (verify)
 		</part>
 	</software>
 
+	<software name="kindanp">
+		<description>Kindan no Paradise</description>
+		<year>1989</year>
+		<publisher>全流通 (Zenryutsu)</publisher>
+		<info name="alt_title" value="禁断のパラダイス" />
+		<info name="release" value="198909xx" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="3452075">
+				<rom name="kindan_no_paradise.mfm" size="3452075" crc="3c051390" sha1="42d1c9027c4dfb93f28955a0147c06f9347e93ef" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="kissmurd">
 		<description>Kiss of Murder - Satsui no Seppun</description>
 		<year>1988</year>
@@ -7495,8 +7554,8 @@ Sometimes turning doesn't work (verify)
 		<info name="alt_title" value="ジェーン" />
 		<info name="release" value="19910214" />
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1261824">
-				<rom name="jane (1990)(system house oh).dim" size="1261824" crc="11665467" sha1="c89731c50d9905d44cad5c0056ac3cfd6f380b6f" />
+			<dataarea name="flop" size="3444467">
+				<rom name="jane.mfm" size="3444467" crc="9a338cf8" sha1="df0bbb1855b1b686afb6e8480a31e5a753738439" />
 			</dataarea>
 		</part>
 	</software>
@@ -7916,6 +7975,19 @@ Sometimes turning doesn't work (verify)
 			<feature name="part_id" value="Disk D" />
 			<dataarea name="flop" size="1261824">
 				<rom name="kibun wa pastel touch (19xx)(great)(disk 4 of 4)(disk d).dim" size="1261824" crc="fc490363" sha1="07b5c19f14efc8c7e97bcf5494b303be2a45ba64" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kingsdun">
+		<description>King's Dungeon</description>
+		<year>1993</year>
+		<publisher>ソフトプラン (Soft Plan)</publisher>
+		<info name="alt_title" value="キングスダンジョン" />
+		<info name="release" value="199301xx" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="3438300">
+				<rom name="kings_dungeon.mfm" size="3438300" crc="9c848dc0" sha1="f8a0a611562a7099ead8e4bf166ffc00507ceebe" />
 			</dataarea>
 		</part>
 	</software>
@@ -9080,6 +9152,31 @@ Sometimes turning doesn't work (verify)
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261824">
 				<rom name="mad stalker full metal worth (1994)(family soft)(disk 2 of 2)(disk b).dim" size="1261824" crc="cf70778f" sha1="d9513cf9c599869a7ea5ea2bceeb5b7f16fd45ae" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magknight">
+		<description>Magic Knight</description>
+		<year>1992</year>
+		<publisher>NIC</publisher>
+		<info name="alt_title" value="マジックナイト" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="3434692">
+				<rom name="magic_knight_disk_a.mfm" size="3434692" crc="01fe077a" sha1="aac7eaa63ca2d1b203e13954aa2e2d5d99c2c61f" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="3408499">
+				<rom name="magic_knight_disk_b.mfm" size="3408499" crc="63d7f145" sha1="3abdeac38c0a3178cb887507d377d5a8061efee8" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C" />
+			<dataarea name="flop" size="3410304">
+				<rom name="magic_knight_disk_c.mfm" size="3410304" crc="b68f95c8" sha1="5739a634cdf52952734e72ea897514f8ef914a58" />
 			</dataarea>
 		</part>
 	</software>
@@ -10267,6 +10364,26 @@ Sometimes turning doesn't work (verify)
 		<info name="release" value="19910730" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="3529193">
+				<rom name="namachuukei_68_disk_a.mfm" size="3529193" crc="dc12a106" sha1="07304b837e708f90486c631de08bf412363a458a" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="3528679">
+				<rom name="namachuukei_68_disk_b.mfm" size="3528679" crc="63ccf25f" sha1="af570aad6864cae8ab05d63b764d42edca4c1203" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="namachukc" cloneof="namachuk">
+		<description>Namachuukei 68 (cracked)</description>
+		<year>1991</year>
+		<publisher>コナミ (Konami)</publisher>
+		<info name="alt_title" value="生中継68" />
+		<info name="release" value="19910730" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261824">
 				<rom name="namachuukei 68 (1991)(konami)(disk 1 of 2)(disk a).dim" size="1261824" crc="daf35aee" sha1="ec4ef32ceaf8fcfa200da21109ed11103338fadb" />
 			</dataarea>
@@ -10505,8 +10622,8 @@ Sometimes turning doesn't work (verify)
 		<info name="alt_title" value="ニコル" />
 		<info name="release" value="199011xx" />
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1261824">
-				<rom name="nicoll (1990)(system house oh).dim" size="1261824" crc="8400f85c" sha1="1e14aef379b6d10e5b4308b12b43b6cd4edc5037" />
+			<dataarea name="flop" size="3329548">
+				<rom name="nicoll.mfm" size="3329548" crc="bafdb328" sha1="61b6be25417799595d1b750537366a3e2143294d" />
 			</dataarea>
 		</part>
 	</software>
@@ -11903,26 +12020,26 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<info name="release" value="19910719" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
-			<dataarea name="flop" size="1261824">
-				<rom name="quintia road (1991)(great)(disk 1 of 4)(disk a).dim" size="1261824" crc="531d638d" sha1="8fbd12f1fbdc42cb1f09b13eafa66736f185e0af" />
+			<dataarea name="flop" size="3442552">
+				<rom name="quintia_road_disk_a.mfm" size="3442552" crc="ff1fc62c" sha1="32fc92fffe263fa92061747a0d683952e9c26271" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
-			<dataarea name="flop" size="1261824">
-				<rom name="quintia road (1991)(great)(disk 2 of 4)(disk b).dim" size="1261824" crc="a2090654" sha1="2c2355f241e1dea1955b87a7cecf1424d2988dbd" />
+			<dataarea name="flop" size="3440325">
+				<rom name="quintia_road_disk_b.mfm" size="3440325" crc="aeff2e17" sha1="f9c3aa04cf2a699b2219e9eff5add2f06f77bb4f" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk C" />
-			<dataarea name="flop" size="1261824">
-				<rom name="quintia road (1991)(great)(disk 3 of 4)(disk c).dim" size="1261824" crc="c51474fa" sha1="7ea365ad8691a22980953fbc1b64f9c2cdb7dd1a" />
+			<dataarea name="flop" size="3441318">
+				<rom name="quintia_road_disk_c.mfm" size="3441318" crc="47de5595" sha1="ff47edad22258e2ebf645a9f0cb5766088ec8aaf" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Disk D" />
-			<dataarea name="flop" size="1261824">
-				<rom name="quintia road (1991)(great)(disk 4 of 4)(disk d).dim" size="1261824" crc="831f83ec" sha1="7932a782c44258752106a63c29bf2d96bc2cc5f9" />
+			<dataarea name="flop" size="3441439">
+				<rom name="quintia_road_disk_d.mfm" size="3441439" crc="5811af70" sha1="34b08a8afb227e851832207ecbca0c603d4a7a04" />
 			</dataarea>
 		</part>
 	</software>
@@ -12319,6 +12436,26 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 
 	<software name="rouge">
 		<description>Rouge - Manatsu no Kuchibeni</description>
+		<year>1990</year>
+		<publisher>バーディーソフト (Birdy Soft)</publisher>
+		<info name="alt_title" value="ルージュ 真夏の口紅" />
+		<info name="release" value="19900920" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="3417036">
+				<rom name="rouge_disk_a.mfm" size="3417036" crc="eddcf68f" sha1="55b52b60b3bc9b98051fb91cae52a9a56c738033" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="3432600">
+				<rom name="rouge_disk_b.mfm" size="3432600" crc="1e480407" sha1="ccf29921c3f108ce84a569e30f43333161f2a135" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rougec" cloneof="rouge">
+		<description>Rouge - Manatsu no Kuchibeni (cracked)</description>
 		<year>1990</year>
 		<publisher>バーディーソフト (Birdy Soft)</publisher>
 		<info name="alt_title" value="ルージュ 真夏の口紅" />
@@ -17696,8 +17833,8 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 		</part>
 	</software>
 
-	<software name="hyperudv">
-		<description>Hyper UD v2.00</description>
+	<software name="hyperudv2">
+		<description>Hyper UD (v2.00)</description>
 		<year>1988</year>
 		<publisher>East</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -17710,6 +17847,23 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 			<feature name="part_id" value="Sample Disk" />
 			<dataarea name="flop" size="1261824">
 				<rom name="hyper ud v2.00 (1988)(east)(disk 2 of 2)(sample).dim" size="1261824" crc="d7f92b0b" sha1="f1133aade6283230bb88580336ab6defcc7ce69a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hyperudv1" cloneof="hyperudv2">
+		<description>Hyper UD (v1.00)</description>
+		<year>1987</year>
+		<publisher>East</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="3444500">
+				<rom name="hyper_ud_v1.00.mfm" size="3444500" crc="de849b72" sha1="79b48a9e90eb45f390c8378fba9dee876c9ec265" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Sample Data" />
+			<dataarea name="flop" size="3444533">
+				<rom name="hyper_ud_v1.00_sample_data.mfm" size="3444533" crc="3e893fac" sha1="2d42b4383d270f3e5e102a718a58f50c43eba6a3" />
 			</dataarea>
 		</part>
 	</software>
@@ -26837,8 +26991,20 @@ No sound (verify)
 	</software>
 
 	<software name="horror">
-		<description>Horror of Cridewell</description>
+		<description>Horror of Cridewell (Revised Edition)</description>
 		<year>1990</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Annandule Project" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="3441129">
+				<rom name="horror_of_cridewell_revised_edition.mfm" size="3441129" crc="a0db7ed6" sha1="c67ce0225668e4c552d5b6e7226c54873211b8ab" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="horroro" cloneof="horror">
+		<description>Horror of Cridewell</description>
+		<year>1989</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="Annandule Project" />
 		<part name="flop1" interface="floppy_5_25">
@@ -27069,6 +27235,21 @@ No sound (verify)
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="jeena no taibouken (1990)(t&amp;h project).dim" size="1261824" crc="47a8d4ab" sha1="b1c8d98873cc3b88e96643685fbc8cf82c0d9379" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- PC-9801 / PC-88VA / X68000 hybrid -->
+	<software name="jigen">
+		<description>Jigen no Tabi</description>
+		<year>1991</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="alt_title" value="次元の旅" />
+		<info name="developer" value="Pussy Cat" />
+		<info name="usage" value="Run START 68 from Human68k" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="3446532">
+				<rom name="jigen_no_tabi.mfm" size="3446532" crc="ea0397d8" sha1="f125b9d8cf70523ea05ce6f74f1f5c79128e1854" />
 			</dataarea>
 		</part>
 	</software>
@@ -28606,8 +28787,28 @@ No sound (verify)
 		</part>
 	</software>
 
+	<!-- PC-9801 / X68000 hybrid -->
 	<software name="momotar2">
-		<description>Momotarou II Ohimesama ga Ippai</description>
+		<description>Momotarou II Ohimesama ga Ippai (v1.11)</description>
+		<year>1990</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Todo2" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2" /> <!-- The disks are in reverse order because disk 2 contains the X68000 boot sector -->
+			<dataarea name="flop" size="3446168">
+				<rom name="momotarou_ii_disk_2.mfm" size="3446168" crc="a48fdc8e" sha1="22a1cd57a1d697306d744d97cf2a2b84a72f4b6a" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="3433456">
+				<rom name="momotarou_ii_disk_1.mfm" size="3433456" crc="0001ebb4" sha1="04e5320dc77f70872a55f25a77ccb7ad78b2933d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="momotar2o" cloneof="momotar2">
+		<description>Momotarou II Ohimesama ga Ippai (v1.00)</description>
 		<year>1990</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="Todo2" />
@@ -30800,6 +31001,20 @@ Expects to read track data from [FDC] drive 1, works if same disk loaded.
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="senshasen iii vs-bowler (1996)(yamaco).dim" size="1261824" crc="baec13b0" sha1="8c26874c004d7f5048b43f2fe5dd0eb7fe9fb598" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- PC-9801 / X68000 hybrid -->
+	<software name="sgamers4">
+		<description>Sadistic Gamers Part-4 - Rumi no Crime Play</description>
+		<year>1991</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="alt_title" value="サディスティック・ゲーマーズPART-4 留美のクライムプレイ" />
+		<info name="developer" value="シクスティーンズ (16s)" />
+		<part name="flop1" interface="floppy_5_25"> <!-- Actually a 3.5" disk, but MAME doesn't have an option for 3.5" drives on the X68000 -->
+			<dataarea name="flop" size="3444353">
+				<rom name="sadistic_gamers_part-4.hdm" size="3444353" crc="3619049c" sha1="986a65b1d257802396f8d3797253f9a32c349bac"/>
 			</dataarea>
 		</part>
 	</software>

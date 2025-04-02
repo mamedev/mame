@@ -34,9 +34,3 @@ these four paragraphs for those parts of this code that are retained.
 | Include common integer types and flags.
 *----------------------------------------------------------------------------*/
 #include "mamesf.h"
-
-/*----------------------------------------------------------------------------
-| Symbolic Boolean literals.
-*----------------------------------------------------------------------------*/
-#define FALSE 0
-#define TRUE 1

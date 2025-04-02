@@ -1,11 +1,28 @@
-<!DOCTYPE refentry [
-  <!-- Fill in your name for FIRSTNAME and SURNAME. -->
+<!--
+                            __  __            _
+                         ___\ \/ /_ __   __ _| |_
+                        / _ \\  /| '_ \ / _` | __|
+                       |  __//  \| |_) | (_| | |_
+                        \___/_/\_\ .__/ \__,_|\__|
+                                 |_| XML parser
+
+   Copyright (c) 2001      Scott Bronson <bronson@rinspin.com>
+   Copyright (c) 2002-2003 Fred L. Drake, Jr. <fdrake@users.sourceforge.net>
+   Copyright (c) 2009      Karl Waclawek <karl@waclawek.net>
+   Copyright (c) 2016-2024 Sebastian Pipping <sebastian@pipping.org>
+   Copyright (c) 2016      Ardo van Rangelrooij <ardo@debian.org>
+   Copyright (c) 2017      Rhodri James <rhodri@wildebeest.org.uk>
+   Copyright (c) 2020      Joe Orton <jorton@redhat.com>
+   Copyright (c) 2021      Tim Bray <tbray@textuality.com>
+   Unlike most of Expat,
+   this file is copyrighted under the GNU Free Documentation License 1.1.
+-->
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+          "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" [
   <!ENTITY dhfirstname "<firstname>Scott</firstname>">
   <!ENTITY dhsurname   "<surname>Bronson</surname>">
-  <!-- Please adjust the date whenever revising the manpage. -->
-  <!ENTITY dhdate      "<date>March 11, 2016</date>">
-  <!-- SECTION should be 1-8, maybe w/ subsection other parameters are
-       allowed: see man(7), man(1). -->
+  <!ENTITY dhdate      "<date>November 6, 2024</date>">
+  <!-- Please adjust this^^ date whenever cutting a new release. -->
   <!ENTITY dhsection   "<manvolnum>1</manvolnum>">
   <!ENTITY dhemail     "<email>bronson@rinspin.com</email>">
   <!ENTITY dhusername  "Scott Bronson">
@@ -44,25 +61,22 @@
   <refsynopsisdiv>
     <cmdsynopsis>
       <command>&dhpackage;</command>
-	  <arg><option>-s</option></arg>
-	  <arg><option>-n</option></arg>
-	  <arg><option>-p</option></arg>
-	  <arg><option>-x</option></arg>
-
-	  <arg><option>-e <replaceable>encoding</replaceable></option></arg>
-	  <arg><option>-w</option></arg>
-
-	  <arg><option>-d <replaceable>output-dir</replaceable></option></arg>
-	  <arg><option>-c</option></arg>
-	  <arg><option>-m</option></arg>
-
-	  <arg><option>-r</option></arg>
-	  <arg><option>-t</option></arg>
-          <arg><option>-N</option></arg>
-
-	  <arg><option>-v</option></arg>
-
-	  <arg>file ...</arg>
+      <arg><replaceable>OPTIONS</replaceable></arg>
+      <arg><replaceable>FILE</replaceable> ...</arg>
+    </cmdsynopsis>
+    <cmdsynopsis>
+      <command>&dhpackage;</command>
+      <group choice="plain">
+        <arg><option>-h</option></arg>
+        <arg><option>--help</option></arg>
+      </group>
+    </cmdsynopsis>
+    <cmdsynopsis>
+      <command>&dhpackage;</command>
+      <group choice="plain">
+        <arg><option>-v</option></arg>
+        <arg><option>--version</option></arg>
+      </group>
     </cmdsynopsis>
   </refsynopsisdiv>
  
@@ -95,7 +109,7 @@
       <listitem><para>
 	    The file begins with an XML declaration.  For instance,
 		<literal>&lt;?xml version="1.0" standalone="yes"?&gt;</literal>.
-		<emphasis>NOTE:</emphasis>
+		<emphasis>NOTE</emphasis>:
 		<command>&dhpackage;</command> does not currently
 		check for a valid XML declaration.
       </para></listitem>
@@ -132,12 +146,56 @@
 
 <para>
 When an option includes an argument, you may specify the argument either
-separately ("<option>-d</option> output") or concatenated with the
-option ("<option>-d</option>output").  <command>&dhpackage;</command>
+separately ("<option>-d</option> <replaceable>output</replaceable>") or concatenated with the
+option ("<option>-d</option><replaceable>output</replaceable>").  <command>&dhpackage;</command>
 supports both.
 </para>
 
     <variablelist>
+
+      <varlistentry>
+        <term><option>-a</option> <replaceable>factor</replaceable></term>
+        <listitem>
+          <para>
+            Sets the maximum tolerated amplification factor
+            for protection against billion laughs attacks (default: 100.0).
+            The amplification factor is calculated as ..
+          </para>
+          <literallayout>
+            amplification := (direct + indirect) / direct
+          </literallayout>
+          <para>
+            .. while parsing, whereas
+            &lt;direct&gt; is the number of bytes read
+              from the primary document in parsing and
+            &lt;indirect&gt; is the number of bytes
+              added by expanding entities and reading of external DTD files,
+              combined.
+          </para>
+          <para>
+            <emphasis>NOTE</emphasis>:
+            If you ever need to increase this value for non-attack payload,
+            please file a bug report.
+          </para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><option>-b</option> <replaceable>bytes</replaceable></term>
+        <listitem>
+          <para>
+            Sets the number of output bytes (including amplification)
+            needed to activate protection against billion laughs attacks
+            (default: 8 MiB).
+            This can be thought of as an &quot;activation threshold&quot;.
+          </para>
+          <para>
+            <emphasis>NOTE</emphasis>:
+            If you ever need to increase this value for non-attack payload,
+            please file a bug report.
+          </para>
+        </listitem>
+      </varlistentry>
 
       <varlistentry>
         <term><option>-c</option></term>
@@ -153,7 +211,7 @@ supports both.
       </varlistentry>
 
       <varlistentry>
-        <term><option>-d output-dir</option></term>
+        <term><option>-d</option> <replaceable>output-dir</replaceable></term>
         <listitem>
 		<para>
   Specifies a directory to contain transformed
@@ -184,7 +242,7 @@ supports both.
       </varlistentry>
 
       <varlistentry>
-        <term><option>-e encoding</option></term>
+        <term><option>-e</option> <replaceable>encoding</replaceable></term>
         <listitem>
 		<para>
    Specifies the character encoding for the document, overriding
@@ -196,6 +254,44 @@ supports both.
 	<literal>ISO-8859-1</literal>.
    Also see the <option>-w</option> option.
 	   </para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><option>-g</option> <replaceable>bytes</replaceable></term>
+        <listitem>
+          <para>
+            Sets the buffer size to request per call pair to
+            <function>XML_GetBuffer</function> and <function>read</function>
+            (default: 8 KiB).
+          </para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><option>-h</option></term>
+        <term><option>--help</option></term>
+        <listitem>
+          <para>
+            Prints short usage information on command <command>&dhpackage;</command>,
+            and then exits.
+            Similar to this man page but more concise.
+          </para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><option>-k</option></term>
+        <listitem>
+          <para>
+            When processing multiple files, <command>&dhpackage;</command>
+            by default halts after the the first file with an error.
+            This tells <command>&dhpackage;</command> to report the error
+            but to keep processing.
+            This can be useful, for example, when testing a filter that converts
+            many files to XML and you want to quickly find out which conversions
+            failed.
+          </para>
         </listitem>
       </varlistentry>
 
@@ -235,7 +331,7 @@ supports both.
         <term><option>-p</option></term>
         <listitem>
 		<para>
-    Tells xmlwf to process external DTDs and parameter
+    Tells <command>&dhpackage;</command> to process external DTDs and parameter
     entities.
 	 </para>
 	 <para>
@@ -243,6 +339,16 @@ supports both.
    entities.  <option>-p</option> tells it to always parse them.
    <option>-p</option> implies <option>-x</option>.
 	   </para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><option>-q</option></term>
+        <listitem>
+          <para>
+            Disable reparse deferral, and allow quadratic parse runtime
+            on large tokens (default: reparse deferral enabled).
+          </para>
         </listitem>
       </varlistentry>
 
@@ -292,9 +398,10 @@ supports both.
 	   </para>
         </listitem>
       </varlistentry>
-
+      
       <varlistentry>
         <term><option>-v</option></term>
+        <term><option>--version</option></term>
         <listitem>
 		<para>
   Prints the version of the Expat library being used, including some
@@ -311,7 +418,7 @@ supports both.
   Enables support for Windows code pages.
   Normally, <command>&dhpackage;</command> will throw an error if it
   runs across an encoding that it is not equipped to handle itself.  With
-  <option>-w</option>, &dhpackage; will try to use a Windows code
+  <option>-w</option>, <command>&dhpackage;</command> will try to use a Windows code
   page.  See also <option>-e</option>.
 	   </para>
         </listitem>
@@ -379,20 +486,26 @@ supports both.
   <refsect1>
   <title>OUTPUT</title>
     <para>
-	If an input file is not well-formed,
-	<command>&dhpackage;</command> prints a single line describing
-	the problem to standard output.  If a file is well formed,
-	<command>&dhpackage;</command> outputs nothing.
-	</para>
+	<command>&dhpackage;</command> outputs nothing for files which are problem-free.
+        If any input file is not well-formed, or if the output for any
+	input file cannot be opened, <command>&dhpackage;</command> prints a single
+	line describing	the problem to standard output.
+    </para>
+    <para>
+        If the <option>-k</option> option is not provided, <command>&dhpackage;</command>
+	halts upon encountering a well-formedness or output-file error. 
+	If <option>-k</option> is provided, <command>&dhpackage;</command> continues
+	processing the remaining input files, describing problems found with any of them.
+    </para>
   </refsect1>
 
   <refsect1>
   <title>EXIT STATUS</title>
-    <para>For option <option>-v</option> or <option>-h</option>, <command>&dhpackage;</command> always exits with status code 0.  For other cases, the following exit status codes are returned:
+    <para>For options <option>-v</option>|<option>--version</option> or <option>-h</option>|<option>--help</option>, <command>&dhpackage;</command> always exits with status code 0.  For other cases, the following exit status codes are returned:
     <variablelist>
       <varlistentry>
         <term><option>0</option></term>
-        <listitem><para>The input files are well-formed.</para>
+        <listitem><para>The input files are well-formed and the output (if requested) was written successfully.</para>
         </listitem>
       </varlistentry>
       <varlistentry>
@@ -402,12 +515,17 @@ supports both.
       </varlistentry>
       <varlistentry>
         <term><option>2</option></term>
-        <listitem><para>An input file was not well-formed or could not be parsed.</para>
+        <listitem><para>One or more input files were not well-formed or could not be parsed.</para>
         </listitem>
       </varlistentry>
       <varlistentry>
         <term><option>3</option></term>
         <listitem><para>If using the <option>-d</option> option, an error occurred opening an output file.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>4</option></term>
+        <listitem><para>There was a command-line argument error in how <command>&dhpackage;</command> was invoked.</para>
         </listitem>
       </varlistentry>
     </variablelist>
@@ -434,27 +552,13 @@ supports both.
   </refsect1>
 
   <refsect1>
-    <title>ALTERNATIVES</title>
-	<para>
-	  Here are some XML validators on the web:
-
-<literallayout>
-http://www.hcrc.ed.ac.uk/~richard/xml-check.html
-http://www.stg.brown.edu/service/xmlvalid/
-http://www.scripting.com/frontier5/xml/code/xmlValidator.html
-http://www.xml.com/pub/a/tools/ruwf/check.html
-</literallayout>
-
-		 </para>
-  </refsect1>
-
-  <refsect1>
     <title>SEE ALSO</title>
 	<para>
 
 <literallayout>
-The Expat home page:        http://www.libexpat.org/
-The W3 XML specification:   http://www.w3.org/TR/REC-xml
+The Expat home page:                            https://libexpat.github.io/
+The W3 XML 1.0 specification (fourth edition):  https://www.w3.org/TR/2006/REC-xml-20060816/
+Billion laughs attack:                          https://en.wikipedia.org/wiki/Billion_laughs_attack
 </literallayout>
 
 	</para>
@@ -463,7 +567,8 @@ The W3 XML specification:   http://www.w3.org/TR/REC-xml
   <refsect1>
     <title>AUTHOR</title>
     <para>
-	  This manual page was written by &dhusername; &dhemail; for
+      This manual page was originally written by &dhusername; &dhemail;
+      in December 2001 for
       the &debian; system (but may be used by others).  Permission is
       granted to copy, distribute and/or modify this document under
       the terms of the <acronym>GNU</acronym> Free Documentation

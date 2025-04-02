@@ -239,45 +239,55 @@ void mips3_device::code_flush_cache()
 
 	try
 	{
-		/* generate the entry point and out-of-cycles handlers */
-		static_generate_entry_point();
-		static_generate_nocode_handler();
-		static_generate_out_of_cycles();
-		static_generate_tlb_mismatch();
+		{
+			drcuml_block &block(m_drcuml->begin_block(1024));
+			int label = 1;
 
-		/* append exception handlers for various types */
-		static_generate_exception(EXCEPTION_INTERRUPT,     true,  "exception_interrupt");
-		static_generate_exception(EXCEPTION_INTERRUPT,     false, "exception_interrupt_norecover");
-		static_generate_exception(EXCEPTION_TLBMOD,        true,  "exception_tlbmod");
-		static_generate_exception(EXCEPTION_TLBLOAD,       true,  "exception_tlbload");
-		static_generate_exception(EXCEPTION_TLBSTORE,      true,  "exception_tlbstore");
-		static_generate_exception(EXCEPTION_TLBLOAD_FILL,  true,  "exception_tlbload_fill");
-		static_generate_exception(EXCEPTION_TLBSTORE_FILL, true,  "exception_tlbstore_fill");
-		static_generate_exception(EXCEPTION_ADDRLOAD,      true,  "exception_addrload");
-		static_generate_exception(EXCEPTION_ADDRSTORE,     true,  "exception_addrstore");
-		static_generate_exception(EXCEPTION_SYSCALL,       true,  "exception_syscall");
-		static_generate_exception(EXCEPTION_BREAK,         true,  "exception_break");
-		static_generate_exception(EXCEPTION_INVALIDOP,     true,  "exception_invalidop");
-		static_generate_exception(EXCEPTION_BADCOP,        true,  "exception_badcop");
-		static_generate_exception(EXCEPTION_OVERFLOW,      true,  "exception_overflow");
-		static_generate_exception(EXCEPTION_TRAP,          true,  "exception_trap");
-		static_generate_exception(EXCEPTION_FPE,           true,  "exception_fpe");
+			/* generate the entry point and out-of-cycles handlers */
+			static_generate_entry_point(block, label);
+			static_generate_nocode_handler(block, label);
+			static_generate_out_of_cycles(block, label);
+			static_generate_tlb_mismatch(block, label);
+
+			/* append exception handlers for various types */
+			static_generate_exception(block, label, EXCEPTION_INTERRUPT,     true,  "exception_interrupt");
+			static_generate_exception(block, label, EXCEPTION_INTERRUPT,     false, "exception_interrupt_norecover");
+			static_generate_exception(block, label, EXCEPTION_TLBMOD,        true,  "exception_tlbmod");
+			static_generate_exception(block, label, EXCEPTION_TLBLOAD,       true,  "exception_tlbload");
+			static_generate_exception(block, label, EXCEPTION_TLBSTORE,      true,  "exception_tlbstore");
+			static_generate_exception(block, label, EXCEPTION_TLBLOAD_FILL,  true,  "exception_tlbload_fill");
+			static_generate_exception(block, label, EXCEPTION_TLBSTORE_FILL, true,  "exception_tlbstore_fill");
+			static_generate_exception(block, label, EXCEPTION_ADDRLOAD,      true,  "exception_addrload");
+			static_generate_exception(block, label, EXCEPTION_ADDRSTORE,     true,  "exception_addrstore");
+			static_generate_exception(block, label, EXCEPTION_SYSCALL,       true,  "exception_syscall");
+			static_generate_exception(block, label, EXCEPTION_BREAK,         true,  "exception_break");
+			static_generate_exception(block, label, EXCEPTION_INVALIDOP,     true,  "exception_invalidop");
+			static_generate_exception(block, label, EXCEPTION_BADCOP,        true,  "exception_badcop");
+			static_generate_exception(block, label, EXCEPTION_OVERFLOW,      true,  "exception_overflow");
+			static_generate_exception(block, label, EXCEPTION_TRAP,          true,  "exception_trap");
+			static_generate_exception(block, label, EXCEPTION_FPE,           true,  "exception_fpe");
+
+			block.end();
+		}
 
 		/* add subroutines for memory accesses */
 		for (mode = 0; mode < 3; mode++)
 		{
-			static_generate_memory_accessor(mode, 1, false, false, "read8",       m_read8[mode]);
-			static_generate_memory_accessor(mode, 1, true,  false, "write8",      m_write8[mode]);
-			static_generate_memory_accessor(mode, 2, false, false, "read16",      m_read16[mode]);
-			static_generate_memory_accessor(mode, 2, true,  false, "write16",     m_write16[mode]);
-			static_generate_memory_accessor(mode, 4, false, false, "read32",      m_read32[mode]);
-			static_generate_memory_accessor(mode, 4, false, true,  "read32mask",  m_read32mask[mode]);
-			static_generate_memory_accessor(mode, 4, true,  false, "write32",     m_write32[mode]);
-			static_generate_memory_accessor(mode, 4, true,  true,  "write32mask", m_write32mask[mode]);
-			static_generate_memory_accessor(mode, 8, false, false, "read64",      m_read64[mode]);
-			static_generate_memory_accessor(mode, 8, false, true,  "read64mask",  m_read64mask[mode]);
-			static_generate_memory_accessor(mode, 8, true,  false, "write64",     m_write64[mode]);
-			static_generate_memory_accessor(mode, 8, true,  true,  "write64mask", m_write64mask[mode]);
+			drcuml_block &block(m_drcuml->begin_block(1024));
+			int label = 1;
+			static_generate_memory_accessor(block, label, mode, 1, false, false, "read8",       m_read8[mode]);
+			static_generate_memory_accessor(block, label, mode, 1, true,  false, "write8",      m_write8[mode]);
+			static_generate_memory_accessor(block, label, mode, 2, false, false, "read16",      m_read16[mode]);
+			static_generate_memory_accessor(block, label, mode, 2, true,  false, "write16",     m_write16[mode]);
+			static_generate_memory_accessor(block, label, mode, 4, false, false, "read32",      m_read32[mode]);
+			static_generate_memory_accessor(block, label, mode, 4, false, true,  "read32mask",  m_read32mask[mode]);
+			static_generate_memory_accessor(block, label, mode, 4, true,  false, "write32",     m_write32[mode]);
+			static_generate_memory_accessor(block, label, mode, 4, true,  true,  "write32mask", m_write32mask[mode]);
+			static_generate_memory_accessor(block, label, mode, 8, false, false, "read64",      m_read64[mode]);
+			static_generate_memory_accessor(block, label, mode, 8, false, true,  "read64mask",  m_read64mask[mode]);
+			static_generate_memory_accessor(block, label, mode, 8, true,  false, "write64",     m_write64[mode]);
+			static_generate_memory_accessor(block, label, mode, 8, true,  true,  "write64mask", m_write64mask[mode]);
+			block.end();
 		}
 	}
 	catch (drcuml_block::abort_compilation &)
@@ -585,44 +595,40 @@ static void cfunc_unimplemented(void *param)
     static entry point
 -------------------------------------------------*/
 
-void mips3_device::static_generate_entry_point()
+void mips3_device::static_generate_entry_point(drcuml_block &block, int &label)
 {
-	uml::code_label const skip = 1;
-
-	drcuml_block &block(m_drcuml->begin_block(20));
+	uml::code_label const skip = label++;
 
 	/* forward references */
 	alloc_handle(*m_drcuml, m_exception_norecover[EXCEPTION_INTERRUPT], "interrupt_norecover");
 	alloc_handle(*m_drcuml, m_nocode, "nocode");
 
 	alloc_handle(*m_drcuml, m_entry, "entry");
-	UML_HANDLE(block, *m_entry);                                     // handle  entry
+	UML_HANDLE(block, *m_entry);                                                // handle  entry
 
 	/* reset the FPU mode */
-	UML_AND(block, I0, CCR132(31), 3);                                  // and     i0,ccr1[31],3
-	UML_LOAD(block, I0, &m_fpmode[0], I0, SIZE_BYTE, SCALE_x1);// load    i0,fpmode,i0,byte
-	UML_SETFMOD(block, I0);                                                 // setfmod i0
+	UML_AND(block, I0, CCR132(31), 3);                                          // and     i0,ccr1[31],3
+	UML_LOAD(block, I0, &m_fpmode[0], I0, SIZE_BYTE, SCALE_x1);                 // load    i0,fpmode,i0,byte
+	UML_SETFMOD(block, I0);                                                     // setfmod i0
 
 	/* load fast integer registers */
 	load_fast_iregs(block);
 
 	/* check for interrupts */
 	UML_AND(block, I0, CPR032(COP0_Cause), CPR032(COP0_Status));                // and     i0,[Cause],[Status]
-	UML_AND(block, I0, I0, 0xfc00);                                 // and     i0,i0,0xfc00,Z
-	UML_JMPc(block, COND_Z, skip);                                                  // jmp     skip,Z
+	UML_AND(block, I0, I0, 0xfc00);                                             // and     i0,i0,0xfc00,Z
+	UML_JMPc(block, COND_Z, skip);                                              // jmp     skip,Z
 	UML_TEST(block, CPR032(COP0_Status), SR_IE);                                // test    [Status],SR_IE
-	UML_JMPc(block, COND_Z, skip);                                                  // jmp     skip,Z
+	UML_JMPc(block, COND_Z, skip);                                              // jmp     skip,Z
 	UML_TEST(block, CPR032(COP0_Status), SR_EXL | SR_ERL);                      // test    [Status],SR_EXL | SR_ERL
-	UML_JMPc(block, COND_NZ, skip);                                                 // jmp     skip,NZ
-	UML_MOV(block, I0, mem(&m_core->pc));                                        // mov     i0,pc
-	UML_MOV(block, I1, 0);                                              // mov     i1,0
-	UML_CALLH(block, *m_exception_norecover[EXCEPTION_INTERRUPT]);   // callh   exception_norecover
+	UML_JMPc(block, COND_NZ, skip);                                             // jmp     skip,NZ
+	UML_MOV(block, I0, mem(&m_core->pc));                                       // mov     i0,pc
+	UML_MOV(block, I1, 0);                                                      // mov     i1,0
+	UML_CALLH(block, *m_exception_norecover[EXCEPTION_INTERRUPT]);              // callh   exception_norecover
 	UML_LABEL(block, skip);                                                     // skip:
 
 	/* generate a hash jump via the current mode and PC */
-	UML_HASHJMP(block, mem(&m_core->mode), mem(&m_core->pc), *m_nocode);
-																					// hashjmp <mode>,<pc>,nocode
-	block.end();
+	UML_HASHJMP(block, mem(&m_core->mode), mem(&m_core->pc), *m_nocode);        // hashjmp <mode>,<pc>,nocode
 }
 
 
@@ -631,11 +637,8 @@ void mips3_device::static_generate_entry_point()
     exception handler for "out of code"
 -------------------------------------------------*/
 
-void mips3_device::static_generate_nocode_handler()
+void mips3_device::static_generate_nocode_handler(drcuml_block &block, int &label)
 {
-	/* begin generating */
-	drcuml_block &block(m_drcuml->begin_block(10));
-
 	/* generate a hash jump via the current mode and PC */
 	alloc_handle(*m_drcuml, m_nocode, "nocode");
 	UML_HANDLE(block, *m_nocode);                                               // handle  nocode
@@ -643,8 +646,6 @@ void mips3_device::static_generate_nocode_handler()
 	UML_MOV(block, mem(&m_core->pc), I0);                                       // mov     [pc],i0
 	save_fast_iregs(block);
 	UML_EXIT(block, EXECUTE_MISSING_CODE);                                      // exit    EXECUTE_MISSING_CODE
-
-	block.end();
 }
 
 
@@ -653,11 +654,8 @@ void mips3_device::static_generate_nocode_handler()
     out of cycles exception handler
 -------------------------------------------------*/
 
-void mips3_device::static_generate_out_of_cycles()
+void mips3_device::static_generate_out_of_cycles(drcuml_block &block, int &label)
 {
-	/* begin generating */
-	drcuml_block &block(m_drcuml->begin_block(10));
-
 	/* generate a hash jump via the current mode and PC */
 	alloc_handle(*m_drcuml, m_out_of_cycles, "out_of_cycles");
 	UML_HANDLE(block, *m_out_of_cycles);                                        // handle  out_of_cycles
@@ -665,8 +663,6 @@ void mips3_device::static_generate_out_of_cycles()
 	UML_MOV(block, mem(&m_core->pc), I0);                                       // mov     <pc>,i0
 	save_fast_iregs(block);
 	UML_EXIT(block, EXECUTE_OUT_OF_CYCLES);                                     // exit    EXECUTE_OUT_OF_CYCLES
-
-	block.end();
 }
 
 
@@ -675,14 +671,13 @@ void mips3_device::static_generate_out_of_cycles()
     TLB mismatch handler
 -------------------------------------------------*/
 
-void mips3_device::static_generate_tlb_mismatch()
+void mips3_device::static_generate_tlb_mismatch(drcuml_block &block, int &label)
 {
+	uml::code_label const skip = label++;
+
 	/* forward references */
 	alloc_handle(*m_drcuml, m_exception[EXCEPTION_TLBLOAD], "exception_tlbload");
 	alloc_handle(*m_drcuml, m_exception[EXCEPTION_TLBLOAD_FILL], "exception_tlbload_fill");
-
-	/* begin generating */
-	drcuml_block &block(m_drcuml->begin_block(20));
 
 	/* generate a hash jump via the current mode and PC */
 	alloc_handle(*m_drcuml, m_tlb_mismatch, "tlb_mismatch");
@@ -702,12 +697,12 @@ void mips3_device::static_generate_tlb_mismatch()
 		UML_MOV(block, mem(&m_core->arg1), I1);                                 // mov     [arg1],i1
 		UML_CALLC(block, cfunc_printf_debug, this);                             // callc   printf_debug
 	}
-	UML_TEST(block, I1, FETCH_ALLOWED);                                    // test    i1,FETCH_ALLOWED
-	UML_JMPc(block, COND_NZ, 1);                                                // jmp     1,nz
-	UML_TEST(block, I1, FLAG_FIXED);                                       // test    i1,FLAG_FIXED
+	UML_TEST(block, I1, FETCH_ALLOWED);                                         // test    i1,FETCH_ALLOWED
+	UML_JMPc(block, COND_NZ, skip);                                             // jmp     skip,nz
+	UML_TEST(block, I1, FLAG_FIXED);                                            // test    i1,FLAG_FIXED
 	UML_EXHc(block, COND_NZ, *m_exception[EXCEPTION_TLBLOAD], I0);              // exh     exception[TLBLOAD],i0,nz
 	UML_EXH(block, *m_exception[EXCEPTION_TLBLOAD_FILL], I0);                   // exh     exception[TLBLOAD_FILL],i0
-	UML_LABEL(block, 1);                                                        // 1:
+	UML_LABEL(block, skip);                                                     // skip:
 	save_fast_iregs(block);
 
 	// the saved PC may be set 1 instruction back with the low bit set to indicate
@@ -717,8 +712,6 @@ void mips3_device::static_generate_tlb_mismatch()
 	UML_MOV(block, mem(&m_core->pc), I0);                                       // mov     i0,[pc]
 
 	UML_EXIT(block, EXECUTE_MISSING_CODE);                                      // exit    EXECUTE_MISSING_CODE
-
-	block.end();
 }
 
 
@@ -727,12 +720,12 @@ void mips3_device::static_generate_tlb_mismatch()
     exception handler
 -------------------------------------------------*/
 
-void mips3_device::static_generate_exception(uint8_t exception, int recover, const char *name)
+void mips3_device::static_generate_exception(drcuml_block &block, int &label, uint8_t exception, int recover, const char *name)
 {
 	uml::code_handle *&exception_handle = recover ? m_exception[exception] : m_exception_norecover[exception];
 	uint32_t offset = 0x180;
-	uml::code_label const next = 1;
-	uml::code_label const skip = 2;
+	uml::code_label const next = label++;
+	uml::code_label const skip = label++;
 
 	/* translate our fake fill exceptions into real exceptions */
 	if (exception == EXCEPTION_TLBLOAD_FILL || exception == EXCEPTION_TLBSTORE_FILL)
@@ -740,9 +733,6 @@ void mips3_device::static_generate_exception(uint8_t exception, int recover, con
 		offset = 0x000;
 		exception = (exception - EXCEPTION_TLBLOAD_FILL) + EXCEPTION_TLBLOAD;
 	}
-
-	/* begin generating */
-	drcuml_block &block(m_drcuml->begin_block(1024));
 
 	/* add a global entry for this */
 	alloc_handle(*m_drcuml, exception_handle, name);
@@ -798,7 +788,7 @@ void mips3_device::static_generate_exception(uint8_t exception, int recover, con
 	}
 
 	/* set EXL in the SR */
-	UML_OR(block, I0, CPR032(COP0_Status), SR_EXL);                     // or      i0,[Status],SR_EXL
+	UML_OR(block, I0, CPR032(COP0_Status), SR_EXL);                             // or      i0,[Status],SR_EXL
 	UML_MOV(block, CPR032(COP0_Status), I0);                                    // mov     [Status],i0
 	generate_update_mode(block);
 
@@ -806,24 +796,22 @@ void mips3_device::static_generate_exception(uint8_t exception, int recover, con
 	if ((PRINTF_EXCEPTIONS && exception != EXCEPTION_INTERRUPT && exception != EXCEPTION_SYSCALL) ||
 		(PRINTF_MMU && (exception == EXCEPTION_TLBLOAD || exception == EXCEPTION_TLBSTORE)))
 	{
-		UML_CALLC(block, cfunc_printf_exception, this);                            // callc   cfunc_printf_exception,nullptr
+		UML_CALLC(block, cfunc_printf_exception, this);                         // callc   cfunc_printf_exception,nullptr
 		//UML_CALLC(block, cfunc_debug_break, this);                            // callc   cfunc_debug_break,nullptr
 	}
 
 	/* choose our target PC */
-	UML_ADD(block, I0, I3, 0xbfc00200);                             // add     i0,i3,0xbfc00200
-	UML_TEST(block, CPR032(COP0_Status), SR_BEV);                   // test    CPR032(COP0_Status),SR_BEV
-	UML_JMPc(block, COND_NZ, skip);                                                 // jnz     <skip>
-	UML_ADD(block, I0, I3, 0x80000000);                             // add     i0,i3,0x80000000,z
+	UML_ADD(block, I0, I3, 0xbfc00200);                                         // add     i0,i3,0xbfc00200
+	UML_TEST(block, CPR032(COP0_Status), SR_BEV);                               // test    CPR032(COP0_Status),SR_BEV
+	UML_JMPc(block, COND_NZ, skip);                                             // jnz     <skip>
+	UML_ADD(block, I0, I3, 0x80000000);                                         // add     i0,i3,0x80000000,z
 	UML_LABEL(block, skip);                                                     // <skip>:
 
 	/* adjust cycles */
-	UML_SUB(block, mem(&m_core->icount), mem(&m_core->icount), I1);               // sub icount,icount,cycles,S
-	UML_EXHc(block, COND_S, *m_out_of_cycles, I0);                   // exh     out_of_cycles,i0
+	UML_SUB(block, mem(&m_core->icount), mem(&m_core->icount), I1);             // sub icount,icount,cycles,S
+	UML_EXHc(block, COND_S, *m_out_of_cycles, I0);                              // exh     out_of_cycles,i0
 
-	UML_HASHJMP(block, mem(&m_core->mode), I0, *m_nocode);// hashjmp <mode>,i0,nocode
-
-	block.end();
+	UML_HASHJMP(block, mem(&m_core->mode), I0, *m_nocode);                      // hashjmp <mode>,i0,nocode
 }
 
 
@@ -1018,7 +1006,7 @@ void mips3_device::static_generate_memory_rw(drcuml_block &block, int size, bool
     static_generate_memory_accessor
 ------------------------------------------------------------------*/
 
-void mips3_device::static_generate_memory_accessor(int mode, int size, bool iswrite, bool ismasked, const char *name, uml::code_handle *&handleptr)
+void mips3_device::static_generate_memory_accessor(drcuml_block &block, int &label, int mode, int size, bool iswrite, bool ismasked, const char *name, uml::code_handle *&handleptr)
 {
 	/* on entry, address is in I0; data for writes is in I1; mask for accesses is in I2 */
 	/* on exit, read result is in I0 */
@@ -1027,10 +1015,6 @@ void mips3_device::static_generate_memory_accessor(int mode, int size, bool iswr
 	uml::code_handle &exception_tlbfill = *m_exception[iswrite ? EXCEPTION_TLBSTORE_FILL : EXCEPTION_TLBLOAD_FILL];
 	uml::code_handle &exception_addrerr = *m_exception[iswrite ? EXCEPTION_ADDRSTORE : EXCEPTION_ADDRLOAD];
 	int tlbmiss = 0;
-	int label = 1;
-
-	/* begin generating */
-	drcuml_block &block(m_drcuml->begin_block(1024));
 
 	/* add a global entry for this */
 	alloc_handle(*m_drcuml, handleptr, name);
@@ -1048,32 +1032,23 @@ void mips3_device::static_generate_memory_accessor(int mode, int size, bool iswr
 	static_generate_fastram_accessor(block, label, size, iswrite, ismasked);
 	static_generate_memory_rw(block, size, iswrite, ismasked);
 
-	if (tlbmiss != 0)
+	UML_LABEL(block, tlbmiss);                                                      // tlbmiss:
+	if (iswrite)
 	{
-		UML_LABEL(block, tlbmiss);                                                  // tlbmiss:
-		if (iswrite)
-		{
-			UML_TEST(block, I3, READ_ALLOWED);                                      // test    i3,READ_ALLOWED
-			UML_EXHc(block, COND_NZ, *m_exception[EXCEPTION_TLBMOD], I0);           // exh     tlbmod,i0,nz
-		}
-		UML_TEST(block, I3, FLAG_FIXED);                                            // test    i3,FLAG_FIXED
-		UML_EXHc(block, COND_NZ, exception_tlb, I0);                                // exh     tlb,i0,nz
-		UML_EXH(block, exception_tlbfill, I0);                                      // exh     tlbfill,i0
+		UML_TEST(block, I3, READ_ALLOWED);                                          // test    i3,READ_ALLOWED
+		UML_EXHc(block, COND_NZ, *m_exception[EXCEPTION_TLBMOD], I0);               // exh     tlbmod,i0,nz
 	}
-
-	block.end();
+	UML_TEST(block, I3, FLAG_FIXED);                                                // test    i3,FLAG_FIXED
+	UML_EXHc(block, COND_NZ, exception_tlb, I0);                                    // exh     tlb,i0,nz
+	UML_EXH(block, exception_tlbfill, I0);                                          // exh     tlbfill,i0
 }
 
-void r4650_device::static_generate_memory_accessor(int mode, int size, bool iswrite, bool ismasked, const char *name, uml::code_handle *&handleptr)
+void r4650_device::static_generate_memory_accessor(drcuml_block &block, int &label, int mode, int size, bool iswrite, bool ismasked, const char *name, uml::code_handle *&handleptr)
 {
 	/* on entry, address is in I0; data for writes is in I1; mask for accesses is in I2 */
 	/* on exit, read result is in I0 */
 	/* routine trashes I0-I3 */
 	uml::code_handle &exception_addrerr = *m_exception[iswrite ? EXCEPTION_ADDRSTORE : EXCEPTION_ADDRLOAD];
-	int label = 1;
-
-	/* begin generating */
-	drcuml_block &block(m_drcuml->begin_block(1024));
 
 	/* add a global entry for this */
 	alloc_handle(*m_drcuml, handleptr, name);
@@ -1093,7 +1068,6 @@ void r4650_device::static_generate_memory_accessor(int mode, int size, bool iswr
 
 	static_generate_fastram_accessor(block, label, size, iswrite, ismasked);
 	static_generate_memory_rw(block, size, iswrite, ismasked);
-	block.end();
 }
 
 

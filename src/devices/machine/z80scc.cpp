@@ -1796,6 +1796,8 @@ void z80scc_channel::do_sccreg_wr0(uint8_t data)
 				break;
 			}
 		}
+		// re-assert interrupt if conditions are still present
+		check_receive_interrupt();
 		break;
 	case WR0_ERROR_RESET:
 		/*Error Reset Command (110). This command resets the error bits in RR1. If interrupt on first Rx
@@ -2584,22 +2586,7 @@ void z80scc_channel::receive_data(uint8_t data)
 	m_rr0 |= RR0_RX_CHAR_AVAILABLE;
 	check_dma_request();
 
-	// receive interrupt on FIRST and ALL character
-	switch (m_wr1 & WR1_RX_INT_MODE_MASK)
-	{
-	case WR1_RX_INT_FIRST:
-		if (m_rx_first)
-		{
-			m_uart->trigger_interrupt(m_index, INT_RECEIVE);
-
-			m_rx_first = 0;
-		}
-		break;
-
-	case WR1_RX_INT_ALL:
-		m_uart->trigger_interrupt(m_index, INT_RECEIVE);
-		break;
-	}
+	check_receive_interrupt();
 }
 
 
@@ -3002,6 +2989,27 @@ void z80scc_channel::check_dma_request()
 		{
 			// assert /W//REQ if transmit buffer is empty and transmitter is enabled
 			m_uart->m_out_wreq_cb[m_index](((m_rr0 & RR0_TX_BUFFER_EMPTY) && (m_wr5 & WR5_TX_ENABLE)) ? 0 : 1);
+		}
+	}
+}
+
+void z80scc_channel::check_receive_interrupt()
+{
+	if (m_rr0 & RR0_RX_CHAR_AVAILABLE)
+	{
+		switch (m_wr1 & WR1_RX_INT_MODE_MASK)
+		{
+		case WR1_RX_INT_FIRST:
+			if (m_rx_first)
+			{
+				m_uart->trigger_interrupt(m_index, INT_RECEIVE);
+				m_rx_first = 0;
+			}
+			break;
+
+		case WR1_RX_INT_ALL:
+			m_uart->trigger_interrupt(m_index, INT_RECEIVE);
+			break;
 		}
 	}
 }

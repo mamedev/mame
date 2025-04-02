@@ -898,8 +898,8 @@ void opwolf_state::opwolf(machine_config &config)
 	m_tc0060dca[0]->add_route(ALL_OUTPUTS, "mixer", 1.0);
 
 	mixer_device &mixer = MIXER(config, "mixer");
-	mixer.add_route(0, m_tc0060dca[1], 1.0);
-	mixer.add_route(0, m_tc0060dca[1], 1.0);
+	mixer.add_route(0, m_tc0060dca[1], 1.0, 0);
+	mixer.add_route(0, m_tc0060dca[1], 1.0, 1);
 
 	TC0060DCA(config, m_tc0060dca[1]);
 	m_tc0060dca[1]->add_route(0, "lspeaker", 1.0);
