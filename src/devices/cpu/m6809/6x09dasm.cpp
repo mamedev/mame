@@ -16,6 +16,11 @@
 
     Thanks to Franklin Bowen for bug fixes, ideas
 
+    TODO:
+	- KONAMI EXG/TFR isn't disassembled accurately:
+      0x3E/0x3F + param bit 7 clear = EXG
+      0x3E/0x3F + param bit 7 set = TFR
+
 *****************************************************************************/
 
 #include "emu.h"
@@ -27,7 +32,7 @@ const char *const m6x09_base_disassembler::m6x09_regs[5] = { "X", "Y", "U", "S",
 const char *const m6x09_base_disassembler::m6x09_btwregs[5] = { "CC", "A", "B", "inv" };
 
 const char *const m6x09_base_disassembler::hd6309_tfmregs[16] = {
-	"D",   "X",   "Y",   "U",   "S", "inv", "inv", "inv",
+	"D",   "X",   "Y",   "U",   "S",   "inv", "inv", "inv",
 	"inv", "inv", "inv", "inv", "inv", "inv", "inv", "inv"
 };
 
@@ -50,7 +55,7 @@ m6x09_base_disassembler::m6x09_base_disassembler(const opcodeinfo *opcodes, size
 	: m_level(level), m_page(0)
 {
 	// create filtered opcode table
-	for (int i=0; i<opcode_count; i++)
+	for (int i = 0; i < opcode_count; i++)
 	{
 		if (opcodes[i].level() & level)
 		{
@@ -1242,7 +1247,7 @@ const m6x09_base_disassembler::opcodeinfo konami_disassembler::konami_opcodes[] 
 	{ 0x8C, 0, "DECA",  INH,    M6x09_GENERAL },
 	{ 0x8D, 0, "DECB",  INH,    M6x09_GENERAL },
 	{ 0x8E, 1, "DEC",   IND,    M6x09_GENERAL },
-	{ 0x8F, 0, "RTS",   INH ,   M6x09_GENERAL, STEP_OUT },
+	{ 0x8F, 0, "RTS",   INH,    M6x09_GENERAL, STEP_OUT },
 
 	{ 0x90, 0, "TSTA",  INH,    M6x09_GENERAL },
 	{ 0x91, 0, "TSTB",  INH,    M6x09_GENERAL },
@@ -1259,7 +1264,7 @@ const m6x09_base_disassembler::opcodeinfo konami_disassembler::konami_opcodes[] 
 	{ 0x9C, 0, "ASLA",  INH,    M6x09_GENERAL },
 	{ 0x9D, 0, "ASLB",  INH,    M6x09_GENERAL },
 	{ 0x9E, 1, "ASL",   IND,    M6x09_GENERAL },
-	{ 0x9F, 0, "RTI",   INH ,   M6x09_GENERAL, STEP_OUT },
+	{ 0x9F, 0, "RTI",   INH,    M6x09_GENERAL, STEP_OUT },
 
 	{ 0xA0, 0, "ROLA",     INH,  M6x09_GENERAL },
 	{ 0xA1, 0, "ROLB",     INH,  M6x09_GENERAL },
@@ -1281,10 +1286,10 @@ const m6x09_base_disassembler::opcodeinfo konami_disassembler::konami_opcodes[] 
 	{ 0xB1, 0, "DAA",   INH,    M6x09_GENERAL },
 	{ 0xB2, 0, "SEX",   INH,    M6x09_GENERAL },
 	{ 0xB3, 0, "MUL",   INH,    M6x09_GENERAL },
-	{ 0xB4, 0, "LMUL",   INH,   M6x09_GENERAL },
-	{ 0xB5, 0, "DIV X,B",   INH,    M6x09_GENERAL },
+	{ 0xB4, 0, "LMUL",  INH,    M6x09_GENERAL },
+	{ 0xB5, 0, "DIV X,B",     INH, M6x09_GENERAL },
 	{ 0xB6, 0, "BMOVE Y,X,U", INH, M6x09_GENERAL },
-	{ 0xB7, 0, "MOVE Y,X,U", INH,  M6x09_GENERAL },
+	{ 0xB7, 0, "MOVE Y,X,U",  INH, M6x09_GENERAL },
 	{ 0xB8, 1, "LSRD",   IMM,   M6x09_GENERAL },
 	{ 0xB9, 1, "LSRD",   IND,   M6x09_GENERAL },
 	{ 0xBA, 1, "RORD",   IMM,   M6x09_GENERAL },
@@ -1309,9 +1314,9 @@ const m6x09_base_disassembler::opcodeinfo konami_disassembler::konami_opcodes[] 
 	{ 0xCC, 0, "ABSA",   INH,   M6x09_GENERAL },
 	{ 0xCD, 0, "ABSB",   INH,   M6x09_GENERAL },
 	{ 0xCE, 0, "ABSD",   INH,   M6x09_GENERAL },
-	{ 0xCF, 0, "BSET A,X,U", INH,   M6x09_GENERAL },
+	{ 0xCF, 0, "BSET A,X,U", INH, M6x09_GENERAL },
 
-	{ 0xD0, 0, "BSET D,X,U", INH,   M6x09_GENERAL }
+	{ 0xD0, 0, "BSET D,X,U", INH, M6x09_GENERAL }
 };
 
 
@@ -1513,11 +1518,12 @@ void konami_disassembler::indexed(std::ostream &stream, uint8_t mode, const data
 
 void konami_disassembler::register_register(std::ostream &stream, uint8_t pb)
 {
-	static const char konami_teregs[8] =
+	const char *const konami_teregs[8] =
 	{
-		'A', 'B', 'X', 'Y', 'S', 'U', '?', '?'
+		// B: D when reading, B when writing
+		"A", "B", "X", "Y", "DP", "U", "S", "PC"
 	};
-	util::stream_format(stream, "%c,%c",
+	util::stream_format(stream, "%s,%s",
 		konami_teregs[(pb >> 0) & 0x7],
 		konami_teregs[(pb >> 4) & 0x7]);
 }
