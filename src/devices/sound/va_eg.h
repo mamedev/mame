@@ -6,9 +6,17 @@
 
 #pragma once
 
-// Building block for emulating envelope generators (EGs) based on RC circuits.
-// The voltage is published as a sound stream, and is also available by
-// calling `get_v()`.
+// Building block for emulating envelope generators (EGs) based on a single RC
+// circuit. The controlling source sets a target voltage and the device
+// interpolates up or down to it through a RC circuit. The voltage is published
+// as a sound stream and also available from `get_v()`.
+//
+// For example, emulating a CPU-controlled ADSR EG will look something like:
+// - Machine configuration: rc_eg.set_c(C);
+// - Start attack:          rc_eg.set_r(attack_r).set_target_v(max_v);
+// - Start decay:           rc_eg.set_r(decay_r).set_target_v(sustain_v);
+// - Start release:         rc_eg.set_r(realse_r).set_target_v(0);
+//
 class va_rc_eg_device : public device_t, public device_sound_interface
 {
 public:
@@ -19,8 +27,10 @@ public:
 	// a specific value, use set_instant_v().
 	va_rc_eg_device &set_r(float r);
 	va_rc_eg_device &set_c(float v);
+
 	// Sets target voltage to (dis)charge towards.
 	va_rc_eg_device &set_target_v(float v);
+
 	// Sets the voltage to the given value, instantly.
 	va_rc_eg_device &set_instant_v(float v);
 

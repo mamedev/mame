@@ -6,6 +6,9 @@
 
 #include <cfloat>
 
+// Default max peak-to-peak voltage for the CV input.
+static constexpr const float DEFAULT_MAX_VPP = 100;
+
 DEFINE_DEVICE_TYPE(VA_VCA, va_vca_device, "va_vca", "Voltage Controlled Amplifier")
 
 va_vca_device::va_vca_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -13,8 +16,8 @@ va_vca_device::va_vca_device(const machine_config &mconfig, const char *tag, dev
 	, device_sound_interface(mconfig, *this)
 	, m_stream(nullptr)
 	, m_has_cv_stream(false)
-	, m_min_cv(-FLT_MAX)
-	, m_max_cv(FLT_MAX)
+	, m_min_cv(-DEFAULT_MAX_VPP)
+	, m_max_cv(DEFAULT_MAX_VPP)
 	, m_cv_scale(1.0F)
 	, m_fixed_gain(1.0F)
 {
