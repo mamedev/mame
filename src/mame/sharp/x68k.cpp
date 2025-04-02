@@ -742,24 +742,24 @@ void x68k_state::irq4_line(int state)
 
 uint8_t x68k_state::iack2()
 {
-	// Relative priority of IACK2-1 and IACK2-2 is unknown
+	// IACK2-1 has higher priority than IACK2-2
 	if (m_exp_irq2[0])
 		return m_expansion[0]->iack2();
 	else if (m_exp_irq2[1])
 		return m_expansion[1]->iack2();
 	else
-		return 0x18; // spurious interrupt
+		return m68000_base_device::autovector(0); // spurious interrupt
 }
 
 uint8_t x68k_state::iack4()
 {
-	// Relative priority of IACK4-1 and IACK4-2 is unknown
+	// IACK4-1 has higher priority than IACK4-2
 	if (m_exp_irq4[0])
 		return m_expansion[0]->iack4();
 	else if (m_exp_irq4[1])
 		return m_expansion[1]->iack4();
 	else
-		return 0x18; // spurious interrupt
+		return m68000_base_device::autovector(0); // spurious interrupt
 }
 
 void x68k_state::cpu_space_map(address_map &map)
@@ -1111,12 +1111,16 @@ void x68k_state::x68000_base(machine_config &config)
 	m_expansion[0]->out_irq2_callback().set(FUNC(x68k_state::irq2_line<0>));
 	m_expansion[0]->out_irq4_callback().set(FUNC(x68k_state::irq4_line<0>));
 	m_expansion[0]->out_nmi_callback().set(nmi, FUNC(input_merger_any_high_device::in_w<0>));
+	m_expansion[0]->out_dtack_callback().set(m_hd63450, FUNC(hd63450_device::dtack_w));
+	m_hd63450->own().append(m_expansion[0], FUNC(x68k_expansion_slot_device::exown_w));
 
 	X68K_EXPANSION_SLOT(config, m_expansion[1], x68000_exp_cards, nullptr);
 	m_expansion[1]->set_space(m_maincpu, AS_PROGRAM);
 	m_expansion[1]->out_irq2_callback().set(FUNC(x68k_state::irq2_line<1>));
 	m_expansion[1]->out_irq4_callback().set(FUNC(x68k_state::irq4_line<1>));
 	m_expansion[1]->out_nmi_callback().set(nmi, FUNC(input_merger_any_high_device::in_w<1>));
+	m_expansion[1]->out_dtack_callback().set(m_hd63450, FUNC(hd63450_device::dtack_w));
+	m_hd63450->own().append(m_expansion[1], FUNC(x68k_expansion_slot_device::exown_w));
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("4M").set_extra_options("1M,2M,3M,5M,6M,7M,8M,9M,10M,11M,12M");
@@ -1169,11 +1173,8 @@ void x68ksupr_state::x68ksupr_base(machine_config &config)
 
 			spc.set_clock(40_MHz_XTAL / 8);
 			spc.out_irq_callback().set(*this, FUNC(x68ksupr_state::ioc_irq<IOC_HDD_INT>));
-			spc.out_dreq_callback().set(m_hd63450, FUNC(hd63450_device::drq1_w));
+			// TODO: duplicate DMA glue from CZ-6BS1
 		});
-
-	m_hd63450->dma_read<1>().set("scsi:7:spc", FUNC(mb89352_device::dma_r));
-	m_hd63450->dma_write<1>().set("scsi:7:spc", FUNC(mb89352_device::dma_w));
 
 	VICON(config, m_crtc, 38.86363_MHz_XTAL);
 	m_crtc->set_clock_69m(69.55199_MHz_XTAL);
