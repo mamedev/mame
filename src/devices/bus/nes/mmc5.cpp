@@ -241,7 +241,7 @@ void nes_exrom_device::update_prg()
 
 void nes_exrom_device::update_irq()
 {
-	set_irq_line(((BIT(m_irq_status, 7) && m_irq_enable) && m_pcm_irq) ? ASSERT_LINE : CLEAR_LINE);
+	set_irq_line(((BIT(m_irq_status, 7) && m_irq_enable) || m_pcm_irq) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
