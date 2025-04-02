@@ -15,7 +15,7 @@
 // - Machine configuration: rc_eg.set_c(C);
 // - Start attack:          rc_eg.set_r(attack_r).set_target_v(max_v);
 // - Start decay:           rc_eg.set_r(decay_r).set_target_v(sustain_v);
-// - Start release:         rc_eg.set_r(realse_r).set_target_v(0);
+// - Start release:         rc_eg.set_r(release_r).set_target_v(0);
 //
 class va_rc_eg_device : public device_t, public device_sound_interface
 {
