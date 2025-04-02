@@ -1166,6 +1166,29 @@ if (SOUNDS["UPD7752"]~=null) then
 	}
 end
 
+--------------------------------------------------
+-- Virtual analog envelope generators (EGs)
+--@src/devices/sound/va_eg.h,SOUNDS["VA_EG"] = true
+--------------------------------------------------
+
+if (SOUNDS["VA_EG"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/va_eg.cpp",
+		MAME_DIR .. "src/devices/sound/va_eg.h",
+	}
+end
+
+--------------------------------------------------
+-- Virtual analog voltage-controlled amplifiers (VCAs)
+--@src/devices/sound/va_vca.h,SOUNDS["VA_VCA"] = true
+--------------------------------------------------
+
+if (SOUNDS["VA_VCA"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/va_vca.cpp",
+		MAME_DIR .. "src/devices/sound/va_vca.h",
+	}
+end
 
 ---------------------------------------------------
 -- VLM5030 speech synthesizer

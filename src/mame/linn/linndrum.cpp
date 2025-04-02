@@ -101,6 +101,8 @@ Example:
 #include "sound/flt_vol.h"
 #include "sound/mixer.h"
 #include "sound/spkrdev.h"
+#include "sound/va_eg.h"
+#include "sound/va_vca.h"
 #include "speaker.h"
 
 #include "linn_linndrum.lh"
@@ -113,7 +115,7 @@ Example:
 #define LOG_TAPE_SYNC_ENABLE (1U << 6)
 #define LOG_MIX              (1U << 7)
 #define LOG_PITCH            (1U << 8)
-#define LOG_HAT_VCA          (1U << 9)
+#define LOG_HAT_EG           (1U << 9)
 
 #define VERBOSE (LOG_GENERAL)
 //#define LOG_OUTPUT_FUNC osd_printf_info
@@ -182,156 +184,6 @@ enum mixer_channels
 
 }  // anonymous namespace
 
-// This device combines the CEM3360 and its envelope generator (EG) that process
-// the hi-hat voice.
-// TODO: Look into implementing the CEM3360 and a generic EG as devices under
-// src/devices/sound.
-class linndrum_hat_vca_device : public device_t, public device_sound_interface
-{
-public:
-	linndrum_hat_vca_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0) ATTR_COLD;
-
-	void trigger();
-	void set_open(bool open_hat);
-
-protected:
-	void device_add_mconfig(machine_config &config) override ATTR_COLD;
-	void device_start() override ATTR_COLD;
-	void device_reset() override ATTR_COLD;
-	void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
-
-private:
-	static float get_cem3360_gain(float cv);
-
-	TIMER_DEVICE_CALLBACK_MEMBER(trigger_timer_tick);
-
-	static constexpr const float C22 = CAP_U(1);
-	static constexpr const float R33 = RES_M(1);
-	static constexpr const float R34 = RES_K(10);
-	static constexpr const float DECAY_POT_R_MAX = RES_K(100);
-
-	sound_stream *m_stream = nullptr;
-
-	required_ioport m_decay_pot;
-	required_device<timer_device> m_trigger_timer;  // U37B (LM556).
-
-	float m_rc_inv = 1.0F / (R33 * C22);
-	bool m_decaying = true;
-	bool m_decay_done = true;
-	attotime m_decay_start_time;
-};
-
-DEFINE_DEVICE_TYPE(LINNDRUM_HAT_VCA, linndrum_hat_vca_device, "linndrum_hat_vca", "LinnDrum CEM3360 VCA and EG");
-
-linndrum_hat_vca_device::linndrum_hat_vca_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, LINNDRUM_HAT_VCA, tag, owner, clock)
-	, device_sound_interface(mconfig, *this)
-	, m_decay_pot(*this, ":pot_tuning_7")
-	, m_trigger_timer(*this, "hat_trigger_timer")
-{
-}
-
-void linndrum_hat_vca_device::trigger()
-{
-	m_stream->update();
-	m_decaying = false;
-	m_decay_done = false;
-	m_trigger_timer->adjust(PERIOD_OF_555_MONOSTABLE(RES_K(510), CAP_U(0.01)));  // R8, C4.
-	LOGMASKED(LOG_HAT_VCA, "Hat VCA trigerred.\n");
-}
-
-void linndrum_hat_vca_device::set_open(bool open_hat)
-{
-	// The envelope generator can run in two different modes.
-	// - Open hat: the capacitor is discharged through a 1M resistor.
-	// - Closed hat: U90 (CD4053 MUX) adds a parallel discharge path through the
-	//   "hihat decay" knob.
-	m_stream->update();
-	float r = R33;
-	if (!open_hat)
-	{
-		const float r_decay = DECAY_POT_R_MAX * m_decay_pot->read() / 100.0F;
-		r = RES_2_PARALLEL(R33, R34 + r_decay);
-	}
-	m_rc_inv = 1.0F / (r * C22);
-	LOGMASKED(LOG_HAT_VCA, "Hat decay. Open: %d, r: %g\n", open_hat, r);
-}
-
-void linndrum_hat_vca_device::device_add_mconfig(machine_config &config)
-{
-	TIMER(config, m_trigger_timer).configure_generic(FUNC(linndrum_hat_vca_device::trigger_timer_tick));
-}
-
-void linndrum_hat_vca_device::device_start()
-{
-	m_stream = stream_alloc(1, 1, machine().sample_rate());
-	save_item(NAME(m_rc_inv));
-	save_item(NAME(m_decaying));
-	save_item(NAME(m_decay_done));
-	save_item(NAME(m_decay_start_time));
-}
-
-void linndrum_hat_vca_device::device_reset()
-{
-	set_open(false);
-}
-
-void linndrum_hat_vca_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
-{
-	static constexpr const float MIN_GAIN = 0.0001F; // A gain lower than this will be treated as 0.
-	static constexpr const float MAX_EG_CV = 5;
-	static constexpr const float CV_SCALE = RES_VOLTAGE_DIVIDER(RES_K(8.2), RES_K(10));  // R67, R66.
-
-	assert(inputs.size() == 1 && outputs.size() == 1);
-	const read_stream_view &in = inputs[0];
-	write_stream_view &out = outputs[0];
-
-	if (m_decay_done)
-	{
-		out.fill(0);
-		return;
-	}
-
-	const int n = in.samples();
-	if (!m_decaying)
-	{
-		const float gain = get_cem3360_gain(MAX_EG_CV * CV_SCALE);
-		for (int i = 0; i < n; ++i)
-			out.put(i, gain * in.get(i));
-		return;
-	}
-
-	attotime t = in.start_time() - m_decay_start_time;
-	assert(t >= attotime::from_double(0));
-	float gain = 0;
-	for (int i = 0; i < n; ++i, t += in.sample_period())
-	{
-		// TODO: The CEM3360 is based on an OTA, which means it likely has a
-		// tanh, rather than a linear response. But this needs more research.
-		const float decay = expf(-t.as_double() * m_rc_inv);
-		gain = get_cem3360_gain(decay * MAX_EG_CV * CV_SCALE);
-		out.put(i, gain * in.get(i));
-	}
-
-	if (gain < MIN_GAIN)
-		m_decay_done = true;
-}
-
-float linndrum_hat_vca_device::get_cem3360_gain(float cv)
-{
-	// Typical linear CV for max gain, as reported on the CEM3360 datasheet.
-	static constexpr const float MAX_GAIN_CV = 1.93F;
-	return std::clamp<float>(cv / MAX_GAIN_CV, 0, 1);
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(linndrum_hat_vca_device::trigger_timer_tick)
-{
-	m_stream->update();
-	m_decaying = true;
-	m_decay_done = false;
-	m_decay_start_time = machine().time();
-	LOGMASKED(LOG_HAT_VCA, "Hat VCA started decay.\n");
-}
 
 class linndrum_audio_device : public device_t
 {
@@ -361,6 +213,7 @@ private:
 	static s32 get_ls267_freq(const std::array<s32, 2>& freq_range_hz, float cv);
 	static float get_snare_tom_pitch_cv(float v);
 
+	TIMER_DEVICE_CALLBACK_MEMBER(hat_trigger_timer_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(mux_timer_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(snare_timer_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(click_timer_tick);
@@ -374,11 +227,14 @@ private:
 
 	// Mux drums.
 	required_ioport m_mux_tuning_trimmer;
+	required_ioport m_hat_decay_pot;
 	required_memory_region_array<NUM_MUX_VOICES> m_mux_samples;
 	required_device<timer_device> m_mux_timer;  // 74LS627 (U77A).
 	required_device_array<dac76_device, NUM_MUX_VOICES> m_mux_dac;  // AM6070 (U88).
 	required_device_array<filter_volume_device, NUM_MUX_VOICES> m_mux_volume;  // CD4053 (U90), R60, R62.
-	required_device<linndrum_hat_vca_device> m_hat_vca;
+	required_device<timer_device> m_hat_trigger_timer;  // U37B (LM556).
+	required_device<va_rc_eg_device> m_hat_eg;
+	required_device<va_vca_device> m_hat_vca;  // CEM3360 (U91B).
 	std::array<bool, NUM_MUX_VOICES> m_mux_counting = { false, false, false, false, false, false, false, false };
 	std::array<u16, NUM_MUX_VOICES> m_mux_counters = { 0, 0, 0, 0, 0, 0, 0, 0 };
 
@@ -450,6 +306,13 @@ private:
 	static constexpr const float MUX_DAC_IREF = VPLUS / (RES_K(15) + RES_K(15));  // R55 + R57.
 	static constexpr const float TOM_DAC_IREF = MUX_DAC_IREF;  // Configured in the same way.
 
+	// Constants for hi hat envelope generator circuit.
+	static constexpr const float HAT_C22 = CAP_U(1);
+	static constexpr const float HAT_R33 = RES_M(1);
+	static constexpr const float HAT_R34 = RES_K(10);
+	static constexpr const float HAT_DECAY_POT_R_MAX = RES_K(100);
+	static constexpr const float HAT_MAX_CV = VCC * RES_VOLTAGE_DIVIDER(RES_K(8.2), RES_K(10));  // R67, R66.
+
 	// The audio pipeline operates on voltage magnitudes. This scaler normalizes
 	// the final output's range to approximately: -1 - 1.
 	static constexpr const float VOLTAGE_TO_SOUND_SCALER = 0.2F;
@@ -486,10 +349,13 @@ DEFINE_DEVICE_TYPE(LINNDRUM_AUDIO, linndrum_audio_device, "linndrum_audio_device
 linndrum_audio_device::linndrum_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, LINNDRUM_AUDIO, tag, owner, clock)
 	, m_mux_tuning_trimmer(*this, ":pot_mux_tuning")
+	, m_hat_decay_pot(*this, ":pot_tuning_7")
 	, m_mux_samples(*this, ":sample_mux_drum_%u", 0)
 	, m_mux_timer(*this, "mux_drum_timer")
 	, m_mux_dac(*this, "mux_drums_virtual_dac_%u", 1)
 	, m_mux_volume(*this, "mux_drums_volume_control_%u", 1)
+	, m_hat_trigger_timer(*this, "hat_trigger_timer")
+	, m_hat_eg(*this, "hat_eg")
 	, m_hat_vca(*this, "hat_vca")
 	, m_snare_samples(*this, ":sample_snare")
 	, m_sidestick_samples(*this, ":sample_sidestick")
@@ -538,9 +404,22 @@ void linndrum_audio_device::mux_drum_w(int voice, u8 data, bool is_strobe)
 
 	if (voice == MV_HAT)
 	{
-		m_hat_vca->set_open(BIT(data, 2));
+		float r = HAT_R33;
+		const bool is_open_hat = BIT(data, 2);
+		if (!is_open_hat)
+		{
+			const float r_decay = HAT_DECAY_POT_R_MAX * m_hat_decay_pot->read() / 100.0F;
+			r = RES_2_PARALLEL(HAT_R33, HAT_R34 + r_decay);
+		}
+		m_hat_eg->set_r(r);
+		LOGMASKED(LOG_HAT_EG, "Hat decay. Open: %d, r: %g\n", is_open_hat, r);
+
 		if (is_strobe)
-			m_hat_vca->trigger();
+		{
+			m_hat_eg->set_instant_v(HAT_MAX_CV);
+			m_hat_trigger_timer->adjust(PERIOD_OF_555_MONOSTABLE(RES_K(510), CAP_U(0.01)));  // R8, C4.
+			LOGMASKED(LOG_HAT_EG, "Hat EG triggered.\n");
+		}
 	}
 
 	LOGMASKED(LOG_STROBES, "Strobed mux drum %s: %02x (gain: %f)\n",
@@ -697,8 +576,11 @@ void linndrum_audio_device::device_add_mconfig(machine_config &config)
 		m_mux_dac[voice]->add_route(0, m_mux_volume[voice], get_dac_scaler(MUX_DAC_IREF));
 	}
 
-	LINNDRUM_HAT_VCA(config, m_hat_vca);
+	TIMER(config, m_hat_trigger_timer).configure_generic(FUNC(linndrum_audio_device::hat_trigger_timer_tick));  // LM556 (U37B).
+	VA_RC_EG(config, m_hat_eg).set_c(HAT_C22);
+	VA_VCA(config, m_hat_vca).configure_streaming_cv(true).configure_cem3360_linear_cv();
 	m_mux_volume[MV_HAT]->add_route(0, m_hat_vca, 1.0);
+	m_hat_eg->add_route(0, m_hat_vca, 1.0);
 
 	// *** Snare / sidestick section.
 
@@ -877,6 +759,12 @@ float linndrum_audio_device::get_snare_tom_pitch_cv(float v_tune)
 
 	// There are clamping diodes attached to the CV input.
 	return std::clamp<float>(cv, 0, VCC);
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(linndrum_audio_device::hat_trigger_timer_tick)
+{
+	m_hat_eg->set_target_v(0);
+	LOGMASKED(LOG_HAT_EG, "Hat EG started decay.\n");
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(linndrum_audio_device::mux_timer_tick)
