@@ -4303,7 +4303,7 @@ void drcbe_arm64::op_xor(a64::Assembler &a, const uml::instruction &inst)
 
 		a.mvn(dst, src1);
 	}
-	else (src2p.is_immediate() && is_valid_immediate_mask(src2p.immediate()))
+	else if (src2p.is_immediate() && is_valid_immediate_mask(src2p.immediate(), inst.size()))
 	{
 		mov_reg_param(a, inst.size(), src1, src1p);
 
