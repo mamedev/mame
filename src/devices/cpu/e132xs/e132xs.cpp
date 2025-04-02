@@ -32,7 +32,7 @@
 
  TODO:
  - All instructions should clear the H flag (not just MOV/MOVI)
- - Fix behaviour of branches in delay slots
+ - Fix behaviour of branches in delay slots for recompiler
  - Many wrong cycle counts
  - Prevent reading write-only BCR, TPR, FCR and MCR
  - IRAM selection should happen before EA calculation
@@ -40,7 +40,7 @@
  - Should a zero bit shift clear C or leave it unchanged?
  - What actually happens on trying to load to PC, SR, G14 or G15?
  - Verify register wrapping with sregf/dregf on hardware
- - Tracing doesn't work properly
+ - Tracing doesn't work properly for the recompiler
    DRC does not generate trace exceptions on branch or return
 
 *********************************************************************/
@@ -453,7 +453,7 @@ void hyperstone_device::update_memory_control()
 	const uint32_t val = m_core->global_regs[MCR_REGISTER];
 
 	static char const *const entrymap[8] = { "MEM0", "MEM1", "MEM2", "IRAM", "reserved", "reserved", "reserved", "MEM3" };
-	LOG("%s: Set MCR = 0x%08x entry map in %s\n",
+	LOG("%s: Set MCR = 0x%08x, entry map in %s\n",
 			machine().describe_context(),
 			val,
 			entrymap[BIT(val, 12, 3)]);
@@ -472,7 +472,7 @@ void hyperstone_device::update_memory_control()
 		static char const *const dramtype[4] = { "S", "S", "EDO ", "fast page " };
 		LOG("MEM0 %s %sDRAM, hold time %s, parity %s\n",
 				size[BIT(val, 0, 2)],                   // MEM0 bus size
-				dramtype[bitswap<2>(val, 15, 22)],      // MEM0 DRAM type
+				dramtype[bitswap<2>(val, 22, 15)],      // MEM0 DRAM type
 				BIT(val,  8) ? "1 cycle" : "0 cycles",  // MEM0 bus hold
 				BIT(val, 28) ? "disabled" : "enabled",  // MEM0 parity
 				BIT(val, 15) ? "strobe"   : "enable");  // MEM0 byte mode
@@ -493,11 +493,36 @@ void hyperstone_device::update_memory_control()
 			BIT(val, 11) ? "disabled" : "enabled",  // MEM3 bus hold break
 			BIT(val, 31) ? "disabled" : "enabled"); // MEM3 parity
 
+	// install SDRAM mode and control handlers if appropriate
+	if (!BIT(val, 21) && !BIT(val, 22))
+	{
+		m_program->unmap_read(0x20000000, 0x3fffffff);
+		m_program->install_write_handler(0x20000000, 0x2fffffff, emu::rw_delegate(*this, FUNC(hyperstone_device::sdram_mode_w)));
+		m_program->install_write_handler(0x30000000, 0x3fffffff, emu::rw_delegate(*this, FUNC(hyperstone_device::sdram_control_w)));
+	}
 
 	// bits 14..12 EntryTableMap
 	const int which = (val & 0x7000) >> 12;
 	assert(which < 4 || which == 7);
 	m_core->trap_entry = s_trap_entries[which];
+}
+
+void hyperstone_device::sdram_mode_w(offs_t offset, uint32_t data)
+{
+	// writes to mode register of the connected SDRAM
+	LOG("%s: set SDRAM mode = 0x%07x\n", machine().describe_context(), offset);
+}
+
+void hyperstone_device::sdram_control_w(offs_t offset, uint32_t data)
+{
+	const uint32_t val = offset << 2;
+	LOG("%s: set SDCR = 0x%08x\n", machine().describe_context(), val);
+	LOG("MEM0 SDRAM bank bits 0x%08x, second SDRAM chip select CS#1 %s, A%u selects CS#0/CS#1, CAS latency %s, SDCLK CPU clock%s\n",
+			BIT(val, 12, 9) << 20,
+			BIT(val, 11) ? "disabled" : "enabled",
+			BIT(val, 8, 3) + 21,
+			BIT(val, 6) ? "2 clock cycles" : "1 clock cycle",
+			BIT(val, 3) ? " / 2" : "");
 }
 
 TIMER_CALLBACK_MEMBER( hyperstone_device::timer_callback )
@@ -671,26 +696,27 @@ void hyperstone_device::set_global_register(uint8_t code, uint32_t val)
 
 constexpr uint32_t WRITE_ONLY_REGMASK = (1 << BCR_REGISTER) | (1 << TPR_REGISTER) | (1 << FCR_REGISTER) | (1 << MCR_REGISTER);
 
-#define check_delay_PC()                                                            \
-do                                                                                  \
-{                                                                                   \
-	/* if PC is used in a delay instruction, the delayed PC should be used */       \
-	if (m_core->delay_slot)                                                         \
-	{                                                                               \
-		using std::swap;                                                            \
-		swap(PC, m_core->delay_pc);                                                 \
-		m_core->delay_slot = 0;                                                     \
-		m_core->delay_slot_taken = 1;                                               \
-	}                                                                               \
-	else                                                                            \
-	{                                                                               \
-		m_core->delay_slot_taken = 0;                                               \
-	}                                                                               \
-} while (0)
+inline ATTR_FORCE_INLINE void hyperstone_device::check_delay_pc()
+{
+	// if PC is used in a delay instruction, the delayed PC should be used
+	if (!m_core->delay_slot)
+	{
+		m_core->delay_slot_taken = 0;
+	}
+	else
+	{
+		using std::swap;
+		swap(PC, m_core->delay_pc);
+		m_core->delay_slot = 0;
+		m_core->delay_slot_taken = 1;
+	}
+}
 
 void hyperstone_device::ignore_immediate_s()
 {
-	static const uint32_t lengths[16] = { 1<<19, 3<<19, 2<<19, 2<<19, 1<<19, 1<<19, 1<<19, 1<<19, 1<<19, 1<<19, 1<<19, 1<<19, 1<<19, 1<<19, 1<<19, 1<<19 };
+	static const uint32_t lengths[16] = {
+			1 << ILC_SHIFT, 3 << ILC_SHIFT, 2 << ILC_SHIFT, 2 << ILC_SHIFT, 1 << ILC_SHIFT, 1 << ILC_SHIFT, 1 << ILC_SHIFT, 1 << ILC_SHIFT,
+			1 << ILC_SHIFT, 1 << ILC_SHIFT, 1 << ILC_SHIFT, 1 << ILC_SHIFT, 1 << ILC_SHIFT, 1 << ILC_SHIFT, 1 << ILC_SHIFT, 1 << ILC_SHIFT };
 	static const uint32_t offsets[16] = { 0, 4, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 	const uint8_t nybble = m_op & 0x0f;
 	m_instruction_length = lengths[nybble];
@@ -706,21 +732,21 @@ uint32_t hyperstone_device::decode_immediate_s()
 			return 16;
 		case 1:
 		{
-			m_instruction_length = (3<<19);
+			m_instruction_length = 3 << ILC_SHIFT;
 			uint32_t extra_u = (m_pr16(PC) << 16) | m_pr16(PC + 2);
 			PC += 4;
 			return extra_u;
 		}
 		case 2:
 		{
-			m_instruction_length = (2<<19);
+			m_instruction_length = 2 << ILC_SHIFT;
 			uint32_t extra_u = m_pr16(PC);
 			PC += 2;
 			return extra_u;
 		}
 		case 3:
 		{
-			m_instruction_length = (2<<19);
+			m_instruction_length = 2 << ILC_SHIFT;
 			uint32_t extra_u = 0xffff0000 | m_pr16(PC);
 			PC += 2;
 			return extra_u;
@@ -741,7 +767,7 @@ uint32_t hyperstone_device::decode_const()
 		const uint16_t imm_2 = m_pr16(PC);
 
 		PC += 2;
-		m_instruction_length = (3<<19);
+		m_instruction_length = 3 << ILC_SHIFT;
 
 		uint32_t imm = imm_2;
 		imm |= ((imm_1 & 0x3fff) << 16);
@@ -752,7 +778,7 @@ uint32_t hyperstone_device::decode_const()
 	}
 	else
 	{
-		m_instruction_length = (2<<19);
+		m_instruction_length = 2 << ILC_SHIFT;
 
 		uint32_t imm = imm_1 & 0x3fff;
 
@@ -769,7 +795,7 @@ int32_t hyperstone_device::decode_pcrel()
 		uint16_t next = m_pr16(PC);
 
 		PC += 2;
-		m_instruction_length = (2<<19);
+		m_instruction_length = 2 << ILC_SHIFT;
 
 		int32_t offset = (OP & 0x7f) << 16;
 		offset |= (next & 0xfffe);
@@ -790,24 +816,13 @@ int32_t hyperstone_device::decode_pcrel()
 	}
 }
 
-void hyperstone_device::ignore_pcrel()
+inline void hyperstone_device::ignore_pcrel()
 {
 	if (m_op & 0x80)
 	{
 		PC += 2;
-		m_instruction_length = (2<<19);
+		m_instruction_length = 2 << ILC_SHIFT;
 	}
-}
-
-void hyperstone_device::hyperstone_br()
-{
-	const int32_t offset = decode_pcrel();
-	check_delay_PC();
-
-	PC += offset;
-	SR &= ~M_MASK;
-
-	m_core->icount -= m_core->clock_cycles_2;
 }
 
 void hyperstone_device::execute_trap(uint8_t trapno)
@@ -864,7 +879,7 @@ void hyperstone_device::execute_exception(uint8_t trapno)
 	if (!m_core->delay_slot_taken)
 		SET_ILC(m_instruction_length);
 	else
-		PC = m_core->delay_pc;
+		PC = m_core->delay_pc - (m_instruction_length >> ILC_SHIFT);
 
 	// RET does not automatically set P
 	if (((m_op & 0xfef0) != 0x0400) || !(m_op & 0x010e))
@@ -888,14 +903,14 @@ void hyperstone_device::execute_exception(uint8_t trapno)
 
 void hyperstone_device::execute_software()
 {
-	check_delay_PC();
+	check_delay_pc();
 
 	const uint32_t fp = GET_FP;
 	const uint32_t src_code = SRC_CODE;
 	const uint32_t sreg = m_core->local_regs[(src_code + fp) & 0x3f];
 	const uint32_t sregf = m_core->local_regs[(src_code + 1 + fp) & 0x3f];
 
-	SET_ILC(1<<19);
+	SET_ILC(1 << ILC_SHIFT);
 
 	const uint32_t addr = get_emu_code_addr((m_op & 0xff00) >> 8);
 	const uint8_t reg = fp + GET_FL;
@@ -943,7 +958,7 @@ void hyperstone_device::execute_software()
 #define IO2_LINE_STATE      (ISR & 0x20)
 #define IO3_LINE_STATE      (ISR & 0x40)
 
-template <hyperstone_device::is_timer TIMER>
+template <hyperstone_device::is_timer Timer>
 void hyperstone_device::check_interrupts()
 {
 	// Interrupt-Lock flag isn't set
@@ -951,7 +966,7 @@ void hyperstone_device::check_interrupts()
 		return;
 
 	// quick exit if nothing
-	if (TIMER == NO_TIMER && (ISR & 0x7f) == 0)
+	if (Timer == NO_TIMER && (ISR & 0x7f) == 0)
 		return;
 
 	// IO3 is priority 5; state is in bit 6 of ISR; FCR bit 10 enables input and FCR bit 8 inhibits interrupt
@@ -963,7 +978,7 @@ void hyperstone_device::check_interrupts()
 	}
 
 	// timer int might be priority 6 if FCR bits 20-21 == 3; FCR bit 23 inhibits interrupt
-	if (TIMER && (FCR & 0x00b00000) == 0x00300000)
+	if (Timer && (FCR & 0x00b00000) == 0x00300000)
 	{
 		m_core->timer_int_pending = 0;
 		execute_int(get_trap_addr(TRAPNO_TIMER));
@@ -979,7 +994,7 @@ void hyperstone_device::check_interrupts()
 	}
 
 	// timer int might be priority 8 if FCR bits 20-21 == 2; FCR bit 23 inhibits interrupt
-	if (TIMER && (FCR & 0x00b00000) == 0x00200000)
+	if (Timer && (FCR & 0x00b00000) == 0x00200000)
 	{
 		m_core->timer_int_pending = 0;
 		execute_int(get_trap_addr(TRAPNO_TIMER));
@@ -995,7 +1010,7 @@ void hyperstone_device::check_interrupts()
 	}
 
 	// timer int might be priority 10 if FCR bits 20-21 == 1; FCR bit 23 inhibits interrupt
-	if (TIMER && (FCR & 0x00b00000) == 0x00100000)
+	if (Timer && (FCR & 0x00b00000) == 0x00100000)
 	{
 		m_core->timer_int_pending = 0;
 		execute_int(get_trap_addr(TRAPNO_TIMER));
@@ -1011,7 +1026,7 @@ void hyperstone_device::check_interrupts()
 	}
 
 	// timer int might be priority 12 if FCR bits 20-21 == 0; FCR bit 23 inhibits interrupt
-	if (TIMER && (FCR & 0x00b00000) == 0x00000000)
+	if (Timer && (FCR & 0x00b00000) == 0x00000000)
 	{
 		m_core->timer_int_pending = 0;
 		execute_int(get_trap_addr(TRAPNO_TIMER));
@@ -1323,8 +1338,10 @@ void hyperstone_device::device_reset()
 
 	m_core->trap_entry = s_trap_entries[E132XS_ENTRY_MEM3]; // default entry point @ MEM3
 
-	set_global_register(BCR_REGISTER, ~uint32_t(0));
-	set_global_register(MCR_REGISTER, ~uint32_t(0));
+	m_core->global_regs[BCR_REGISTER] = ~uint32_t(0);
+	m_core->global_regs[MCR_REGISTER] = ~uint32_t(0);
+	update_bus_control();
+	update_memory_control();
 	set_global_register(FCR_REGISTER, ~uint32_t(0));
 	set_global_register(TPR_REGISTER, 0xc000000);
 
@@ -1337,7 +1354,7 @@ void hyperstone_device::device_reset()
 	SET_T(0);
 	SET_L(1);
 	SET_S(1);
-	SET_ILC(1<<19);
+	SET_ILC(1 << ILC_SHIFT);
 
 	set_local_register(0, (PC & 0xfffffffe) | GET_S);
 	set_local_register(1, SR);
@@ -1492,7 +1509,7 @@ void hyperstone_device::hyperstone_trap()
 		false, false, false, false, true, false, true, false, true, false, true, false, true, false, true, false
 	};
 
-	check_delay_PC();
+	check_delay_pc();
 
 	const uint8_t trapno = (m_op & 0xfc) >> 2;
 	const uint8_t code = ((m_op & 0x300) >> 6) | (m_op & 0x03);
@@ -1910,7 +1927,10 @@ void hyperstone_device::execute_run()
 		}
 
 		if (GET_T && GET_P && !m_core->delay_slot) /* Not in a Delayed Branch instructions */
+		{
+			m_core->delay_slot_taken = 0;
 			execute_exception(TRAPNO_TRACE_EXCEPTION);
+		}
 	}
 }
 

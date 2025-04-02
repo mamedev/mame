@@ -261,6 +261,9 @@ protected:
 	void update_bus_control();
 	void update_memory_control();
 
+	void sdram_mode_w(offs_t offset, uint32_t data);
+	void sdram_control_w(offs_t offset, uint32_t data);
+
 	void e116_16k_iram_map(address_map &map) ATTR_COLD;
 	void e116_4k_iram_map(address_map &map) ATTR_COLD;
 	void e116_8k_iram_map(address_map &map) ATTR_COLD;
@@ -299,7 +302,7 @@ protected:
 
 private:
 	// internal functions
-	template <hyperstone_device::is_timer TIMER> void check_interrupts();
+	template <hyperstone_device::is_timer Timer> void check_interrupts();
 
 	void set_global_register(uint8_t code, uint32_t val);
 	void set_local_register(uint8_t code, uint32_t val);
@@ -315,6 +318,7 @@ private:
 
 	TIMER_CALLBACK_MEMBER(timer_callback);
 
+	void check_delay_pc();
 	uint32_t decode_const();
 	uint32_t decode_immediate_s();
 	void ignore_immediate_s();

@@ -3661,26 +3661,28 @@ void drcbe_x64::op_mov(Assembler &a, const instruction &inst)
 
 	// add a conditional branch unless a conditional move is possible
 	Label skip;
-	if (inst.condition() != uml::COND_ALWAYS && !(dstp.is_int_register() && !srcp.is_immediate()))
+	const bool need_skip = (inst.condition() != uml::COND_ALWAYS) && !dstp.is_int_register();
+	if (need_skip)
 	{
 		skip = a.newLabel();
 		a.short_().j(X86_NOT_CONDITION(inst.condition()), skip);
 	}
 
-	// register to memory
 	if (dstp.is_memory() && srcp.is_int_register())
 	{
+		// register to memory
 		Gp const src = Gp::fromTypeAndId((inst.size() == 4) ? RegType::kX86_Gpd : RegType::kX86_Gpq, srcp.ireg());
 
 		a.mov(MABS(dstp.memory()), src);
 	}
-	// immediate to memory
 	else if (dstp.is_memory() && srcp.is_immediate() && short_immediate(srcp.immediate()))
+	{
+		// immediate to memory
 		a.mov(MABS(dstp.memory(), inst.size()), s32(srcp.immediate()));
-
-	// conditional memory to register
+	}
 	else if (dstp.is_int_register() && srcp.is_memory())
 	{
+		// conditional memory to register
 		Gp const dst = Gp::fromTypeAndId((inst.size() == 4) ? RegType::kX86_Gpd : RegType::kX86_Gpq, dstp.ireg());
 
 		if (inst.condition() != uml::COND_ALWAYS)
@@ -3688,30 +3690,41 @@ void drcbe_x64::op_mov(Assembler &a, const instruction &inst)
 		else
 			a.mov(dst, MABS(srcp.memory()));
 	}
-
-	// conditional register to register
-	else if (dstp.is_int_register() && srcp.is_int_register())
+	else if (dstp.is_int_register())
 	{
-		Gp const src = Gp::fromTypeAndId((inst.size() == 4) ? RegType::kX86_Gpd : RegType::kX86_Gpq, srcp.ireg());
+		// conditional register to register
 		Gp const dst = Gp::fromTypeAndId((inst.size() == 4) ? RegType::kX86_Gpd : RegType::kX86_Gpq, dstp.ireg());
 
 		if (inst.condition() != uml::COND_ALWAYS)
-			a.cmov(X86_CONDITION(inst.condition()), dst, src);
+		{
+			if (srcp.is_int_register())
+			{
+				Gp const src = Gp::fromTypeAndId((inst.size() == 4) ? RegType::kX86_Gpd : RegType::kX86_Gpq, srcp.ireg());
+				a.cmov(X86_CONDITION(inst.condition()), dst, src);
+			}
+			else
+			{
+				Gp const src = (inst.size() == 4) ? Gp(eax) : Gp(rax);
+				mov_reg_param(a, src, srcp, true);
+				a.cmov(X86_CONDITION(inst.condition()), dst, src);
+			}
+		}
 		else
-			a.mov(dst, src);
+		{
+			mov_reg_param(a, dst, srcp, true);
+		}
 	}
-
-	// general case
 	else
 	{
-		Gp dstreg = (inst.size() == 4) ? dstp.select_register(eax) : dstp.select_register(rax);
+		// general case
+		Gp const dstreg = (inst.size() == 4) ? dstp.select_register(eax) : dstp.select_register(rax);
 
 		mov_reg_param(a, dstreg, srcp, true);
 		mov_param_reg(a, dstp, dstreg);
 	}
 
 	// resolve the jump
-	if (inst.condition() != uml::COND_ALWAYS && !(dstp.is_int_register() && !srcp.is_immediate()))
+	if (need_skip)
 		a.bind(skip);
 }
 
