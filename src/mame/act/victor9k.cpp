@@ -38,6 +38,7 @@
 #include "victor9k_fdc.h"
 #include "machine/z80sio.h"
 #include "sound/hc55516.h"
+#include "sound/flt_biquad.h"
 #include "video/mc6845.h"
 #include "emupal.h"
 #include "screen.h"
@@ -104,6 +105,7 @@ public:
 		m_cvsd(*this, HC55516_TAG),
 		m_crtc(*this, HD46505S_TAG),
 		m_ram(*this, RAM_TAG),
+		m_audio_filter(*this, "audio_filter"),
 		m_kb(*this, KB_TAG),
 		m_fdc(*this, "fdc"),
 		m_centronics(*this, "centronics"),
@@ -138,6 +140,7 @@ private:
 	required_device<hc55516_device> m_cvsd;
 	required_device<mc6845_device> m_crtc;
 	required_device<ram_device> m_ram;
+	required_device<filter_biquad_device> m_audio_filter;
 	required_device<victor_9000_keyboard_device> m_kb;
 	required_device<victor_9000_fdc_device> m_fdc;
 	required_device<centronics_device> m_centronics;
@@ -391,7 +394,12 @@ void victor9k_state::ssda_sm_dtr_w(int state)
 {
 	m_ssda->cts_w(state);
 	m_ssda->dcd_w(!state);
-	//m_cvsd->enc_dec_w(!state);
+
+    /*                           ___
+     * We're supposed to set the ENC/DEC input of the HC55516 to !state,
+     * but only playback/decode is currently supported, and that input
+     * is not implemenented.
+     */
 }
 
 
@@ -735,8 +743,11 @@ void victor9k_state::victor9k(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	HC55516(config, m_cvsd, 0);
-	//MCFG_HC55516_DIG_OUT_CB(WRITELINE(MC6852_TAG, mc6852_device, rx_w))
-	m_cvsd->add_route(ALL_OUTPUTS, "mono", 0.25);
+	// The Victor 9000 applies a Butterworth filter to the audio output.
+	// Here we use a Biquad filter, but the cutoff frequency is the same (3Khz).
+	FILTER_BIQUAD(config, m_audio_filter).setup(filter_biquad_device::biquad_type::LOWPASS, 3000, .7071, 1);
+	m_cvsd->add_route(ALL_OUTPUTS, m_audio_filter, 1.0);
+	m_audio_filter->add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	// devices
 	IEEE488(config, m_ieee488, 0);
@@ -853,4 +864,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                     FULLNAME       FLAGS
-COMP( 1982, victor9k, 0,      0,      victor9k, victor9k, victor9k_state, empty_init, "Victor Business Products", "Victor 9000", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+COMP( 1982, victor9k, 0,      0,      victor9k, victor9k, victor9k_state, empty_init, "Victor Business Products", "Victor 9000", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
