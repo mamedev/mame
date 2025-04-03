@@ -155,7 +155,6 @@ enum
 
 // set C in adds/addsi/subs/sums
 #define SETCARRYS 0
-#define MISSIONCRAFT_FLAGS 1
 
 /* Registers */
 

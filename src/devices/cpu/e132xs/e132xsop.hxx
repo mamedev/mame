@@ -857,14 +857,12 @@ void hyperstone_device::hyperstone_movi()
 	}
 	else
 	{
-		SR &= ~(Z_MASK | N_MASK);
+		// manual says V and C are undefined - assume V is cleared
+		// Mission Craft seems to expect this behaviour
+		SR &= ~(Z_MASK | N_MASK | V_MASK);
 		if (imm == 0)
 			SR |= Z_MASK;
 		SR |= SIGN_TO_N(imm);
-
-#if MISSIONCRAFT_FLAGS
-		SR &= ~V_MASK; // or V undefined ?
-#endif
 
 		if (DstGlobal)
 		{
@@ -1447,16 +1445,16 @@ void hyperstone_device::hyperstone_shl()
 	uint32_t src_code = SRC_CODE + fp;
 	uint32_t dst_code = DST_CODE + fp;
 
-	uint32_t n    = m_core->local_regs[src_code & 0x3f] & 0x1f;
-	uint32_t base = m_core->local_regs[dst_code & 0x3f]; /* registers offset by frame pointer */
-	uint32_t mask = n ? 0xffffffff << (32 - n) : 0;
+	const uint32_t n    = m_core->local_regs[src_code & 0x3f] & 0x1f;
+	const uint32_t base = m_core->local_regs[dst_code & 0x3f];
+	const uint32_t mask = n ? (0xffffffff << (32 - n)) : 0;
 
 	SR &= ~(C_MASK | V_MASK | Z_MASK | N_MASK);
 
-	SR |= (n)?(((base<<(n-1))&0x80000000)?1:0):0;
-	uint32_t ret  = base << n;
+	SR |= (n && ((base << (n - 1)) & 0x80000000)) ? C_MASK : 0;
+	const uint32_t ret = base << n;
 
-	if (((base & mask) && (!(ret & 0x80000000))) || (((base & mask) ^ mask) && (ret & 0x80000000)))
+	if (!(ret & 0x80000000) ? (base & mask) : ((base & mask) ^ mask))
 		SR |= V_MASK;
 
 	if (ret == 0)
@@ -1483,32 +1481,28 @@ void hyperstone_device::hyperstone_testlz()
 
 void hyperstone_device::hyperstone_rol()
 {
+	// manual says V and C are undefined - assume they work like SHL
+	// Mission Craft seems to at least expect the V flag to work like this
 	check_delay_pc();
 
 	const uint32_t fp = GET_FP;
 	const uint32_t dst_code = (DST_CODE + fp) & 0x3f;
 
-	uint32_t n = m_core->local_regs[(SRC_CODE + fp) & 0x3f] & 0x1f;
-	uint32_t val = m_core->local_regs[dst_code];
+	const uint32_t n = m_core->local_regs[(SRC_CODE + fp) & 0x3f] & 0x1f;
+	const uint32_t mask = n ? (~uint32_t(0) >> (32 - n)) : 0;
 
-#ifdef MISSIONCRAFT_FLAGS
-	const uint32_t base = val;
-	const uint32_t mask = (uint32_t)(0xffffffff00000000ULL >> n);
-#endif
+	uint32_t val = m_core->local_regs[dst_code];
 
 	val = rotl_32(val, n);
 
-#ifdef MISSIONCRAFT_FLAGS
 	SR &= ~(V_MASK | Z_MASK | C_MASK | N_MASK);
-	if (((base & mask) && (!(val & 0x80000000))) || (((base & mask) ^ mask) && (val & 0x80000000)))
+	if (!(val & 0x80000000) ? (val & mask) : ((val & mask) ^ mask))
 		SR |= V_MASK;
-#else
-	SR &= ~(Z_MASK | C_MASK | N_MASK);
-#endif
-
 	if (val == 0)
 		SR |= Z_MASK;
 	SR |= SIGN_TO_N(val);
+	if (n && (val & 1))
+		SR |= C_MASK;
 
 	m_core->local_regs[dst_code] = val;
 
@@ -2097,30 +2091,27 @@ void hyperstone_device::hyperstone_shli()
 	check_delay_pc();
 
 	const uint32_t dst_code = DstGlobal ? DST_CODE : ((DST_CODE + GET_FP) & 0x3f);
-	uint32_t val = (DstGlobal ? m_core->global_regs : m_core->local_regs)[dst_code];
 
-	const uint32_t n = HiN ? HI_N_VALUE : LO_N_VALUE;
+	const uint32_t n    = HiN ? HI_N_VALUE : LO_N_VALUE;
+	const uint32_t base = (DstGlobal ? m_core->global_regs : m_core->local_regs)[dst_code];
+	const uint32_t mask = n ? (0xffffffff << (32 - n)) : 0;
+
 	SR &= ~(C_MASK | V_MASK | Z_MASK | N_MASK);
 
-	if (HiN || n)
-	{
-		SR |= (val & (0x80000000 >> (n - 1))) ? 1 : 0;
-	}
+	SR |= (n && ((base << (n - 1)) & 0x80000000)) ? C_MASK : 0;
+	const uint32_t ret = base << n;
 
-	uint32_t mask = n ? 0xffffffff << (32 - n) : 0;
-	uint32_t val2 = val << n;
-
-	if (((val & mask) && (!(val2 & 0x80000000))) || (((val & mask) ^ mask) && (val2 & 0x80000000)))
+	if (!(ret & 0x80000000) ? (base & mask) : ((base & mask) ^ mask))
 		SR |= V_MASK;
 
-	if (val2 == 0)
+	if (ret == 0)
 		SR |= Z_MASK;
-	SR |= SIGN_TO_N(val2);
+	SR |= SIGN_TO_N(ret);
 
 	if (DstGlobal)
-		set_global_register(dst_code, val2);
+		set_global_register(dst_code, ret);
 	else
-		m_core->local_regs[dst_code] = val2;
+		m_core->local_regs[dst_code] = ret;
 
 	m_core->icount -= m_core->clock_cycles_1;
 }

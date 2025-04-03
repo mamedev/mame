@@ -16,8 +16,6 @@
 
     * Identify common pairs and optimize output
 
-    * Convert SUB a,0,b to NEG
-
     * Optimize, e.g., and [r5],i0,$FF to use rbx as temporary register
         (avoid initial move) if i0 is not needed going forward
 
@@ -439,11 +437,11 @@ private:
 		bool is_cold_register() const { return m_coldreg; }
 
 		// helpers
-		asmjit::x86::Gp select_register(asmjit::x86::Gp defreg) const;
-		asmjit::x86::Xmm select_register(asmjit::x86::Xmm defreg) const;
-		asmjit::x86::Gp select_register(asmjit::x86::Gp defreg, be_parameter const &checkparam) const;
-		asmjit::x86::Gp select_register(asmjit::x86::Gp defreg, be_parameter const &checkparam, be_parameter const &checkparam2) const;
-		asmjit::x86::Xmm select_register(asmjit::x86::Xmm defreg, be_parameter const &checkparam) const;
+		Gp select_register(Gp defreg) const;
+		Xmm select_register(Xmm defreg) const;
+		Gp select_register(Gp defreg, be_parameter const &checkparam) const;
+		Gp select_register(Gp defreg, be_parameter const &checkparam, be_parameter const &checkparam2) const;
+		Xmm select_register(Xmm defreg, be_parameter const &checkparam) const;
 
 	private:
 		// HACK: leftover from x86emit
@@ -487,138 +485,132 @@ private:
 		bool mask_high_bits;
 	};
 
-	using opcode_generate_func = void (drcbe_x64::*)(asmjit::x86::Assembler &, const uml::instruction &);
-
-	struct opcode_table_entry
-	{
-		uml::opcode_t           opcode;             // opcode in question
-		opcode_generate_func    func;               // function pointer to the work
-	};
-
 	// helpers
-	asmjit::x86::Mem MABS(const void *ptr, const uint32_t size = 0) const { return asmjit::x86::Mem(asmjit::x86::rbp, offset_from_rbp(ptr), size); }
+	Mem MABS(const void *ptr, const uint32_t size = 0) const { return Mem(rbp, offset_from_rbp(ptr), size); }
 	bool short_immediate(int64_t immediate) const { return (int32_t)immediate == immediate; }
 	void normalize_commutative(be_parameter &inner, be_parameter &outer);
 	void normalize_commutative(const be_parameter &dst, be_parameter &inner, be_parameter &outer);
 	int32_t offset_from_rbp(const void *ptr) const;
-	asmjit::x86::Gp get_base_register_and_offset(asmjit::x86::Assembler &a, void *target, asmjit::x86::Gp const &reg, int32_t &offset);
-	void smart_call_r64(asmjit::x86::Assembler &a, x86code *target, asmjit::x86::Gp const &reg) const;
-	void smart_call_m64(asmjit::x86::Assembler &a, x86code **target) const;
-	void emit_memaccess_setup(asmjit::x86::Assembler &a, const memory_accessors &accessors, const address_space::specific_access_info::side &side) const;
+	Gp get_base_register_and_offset(Assembler &a, void *target, Gp const &reg, int32_t &offset);
+	void smart_call_r64(Assembler &a, x86code *target, Gp const &reg) const;
+	void smart_call_m64(Assembler &a, x86code **target) const;
+	void emit_memaccess_setup(Assembler &a, const memory_accessors &accessors, const address_space::specific_access_info::side &side) const;
 
 	[[noreturn]] void end_of_block() const;
 	static void debug_log_hashjmp(offs_t pc, int mode);
 	static void debug_log_hashjmp_fail();
 
+	void generate_one(Assembler &a, const uml::instruction &inst);
+
 	// code generators
-	void op_handle(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_hash(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_label(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_comment(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_mapvar(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_handle(Assembler &a, const uml::instruction &inst);
+	void op_hash(Assembler &a, const uml::instruction &inst);
+	void op_label(Assembler &a, const uml::instruction &inst);
+	void op_comment(Assembler &a, const uml::instruction &inst);
+	void op_mapvar(Assembler &a, const uml::instruction &inst);
 
-	void op_nop(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_break(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_debug(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_exit(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_hashjmp(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_jmp(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_exh(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_callh(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_ret(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_callc(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_recover(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_nop(Assembler &a, const uml::instruction &inst);
+	void op_break(Assembler &a, const uml::instruction &inst);
+	void op_debug(Assembler &a, const uml::instruction &inst);
+	void op_exit(Assembler &a, const uml::instruction &inst);
+	void op_hashjmp(Assembler &a, const uml::instruction &inst);
+	void op_jmp(Assembler &a, const uml::instruction &inst);
+	void op_exh(Assembler &a, const uml::instruction &inst);
+	void op_callh(Assembler &a, const uml::instruction &inst);
+	void op_ret(Assembler &a, const uml::instruction &inst);
+	void op_callc(Assembler &a, const uml::instruction &inst);
+	void op_recover(Assembler &a, const uml::instruction &inst);
 
-	void op_setfmod(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_getfmod(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_getexp(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_getflgs(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_setflgs(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_save(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_restore(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_setfmod(Assembler &a, const uml::instruction &inst);
+	void op_getfmod(Assembler &a, const uml::instruction &inst);
+	void op_getexp(Assembler &a, const uml::instruction &inst);
+	void op_getflgs(Assembler &a, const uml::instruction &inst);
+	void op_setflgs(Assembler &a, const uml::instruction &inst);
+	void op_save(Assembler &a, const uml::instruction &inst);
+	void op_restore(Assembler &a, const uml::instruction &inst);
 
-	void op_load(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_loads(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_store(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_read(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_readm(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_write(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_writem(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_carry(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_set(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_mov(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_sext(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_roland(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_rolins(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_add(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_addc(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_sub(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_subc(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_cmp(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_mulu(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_mululw(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_muls(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_mulslw(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_divu(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_divs(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_and(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_test(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_or(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_xor(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_lzcnt(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_tzcnt(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_bswap(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	template <asmjit::x86::Inst::Id Opcode> void op_shift(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_load(Assembler &a, const uml::instruction &inst);
+	void op_loads(Assembler &a, const uml::instruction &inst);
+	void op_store(Assembler &a, const uml::instruction &inst);
+	void op_read(Assembler &a, const uml::instruction &inst);
+	void op_readm(Assembler &a, const uml::instruction &inst);
+	void op_write(Assembler &a, const uml::instruction &inst);
+	void op_writem(Assembler &a, const uml::instruction &inst);
+	void op_carry(Assembler &a, const uml::instruction &inst);
+	void op_set(Assembler &a, const uml::instruction &inst);
+	void op_mov(Assembler &a, const uml::instruction &inst);
+	void op_sext(Assembler &a, const uml::instruction &inst);
+	void op_roland(Assembler &a, const uml::instruction &inst);
+	void op_rolins(Assembler &a, const uml::instruction &inst);
+	void op_add(Assembler &a, const uml::instruction &inst);
+	void op_addc(Assembler &a, const uml::instruction &inst);
+	void op_sub(Assembler &a, const uml::instruction &inst);
+	void op_subc(Assembler &a, const uml::instruction &inst);
+	void op_cmp(Assembler &a, const uml::instruction &inst);
+	void op_mulu(Assembler &a, const uml::instruction &inst);
+	void op_mululw(Assembler &a, const uml::instruction &inst);
+	void op_muls(Assembler &a, const uml::instruction &inst);
+	void op_mulslw(Assembler &a, const uml::instruction &inst);
+	void op_divu(Assembler &a, const uml::instruction &inst);
+	void op_divs(Assembler &a, const uml::instruction &inst);
+	void op_and(Assembler &a, const uml::instruction &inst);
+	void op_test(Assembler &a, const uml::instruction &inst);
+	void op_or(Assembler &a, const uml::instruction &inst);
+	void op_xor(Assembler &a, const uml::instruction &inst);
+	void op_lzcnt(Assembler &a, const uml::instruction &inst);
+	void op_tzcnt(Assembler &a, const uml::instruction &inst);
+	void op_bswap(Assembler &a, const uml::instruction &inst);
+	template <Inst::Id Opcode> void op_shift(Assembler &a, const uml::instruction &inst);
 
-	void op_fload(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_fstore(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_fread(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_fwrite(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_fmov(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_ftoint(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_ffrint(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_ffrflt(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_frnds(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_fadd(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_fsub(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_fcmp(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_fmul(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_fdiv(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_fneg(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_fabs(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_fsqrt(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_frecip(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_frsqrt(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_fcopyi(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_icopyf(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_fload(Assembler &a, const uml::instruction &inst);
+	void op_fstore(Assembler &a, const uml::instruction &inst);
+	void op_fread(Assembler &a, const uml::instruction &inst);
+	void op_fwrite(Assembler &a, const uml::instruction &inst);
+	void op_fmov(Assembler &a, const uml::instruction &inst);
+	void op_ftoint(Assembler &a, const uml::instruction &inst);
+	void op_ffrint(Assembler &a, const uml::instruction &inst);
+	void op_ffrflt(Assembler &a, const uml::instruction &inst);
+	void op_frnds(Assembler &a, const uml::instruction &inst);
+	void op_fadd(Assembler &a, const uml::instruction &inst);
+	void op_fsub(Assembler &a, const uml::instruction &inst);
+	void op_fcmp(Assembler &a, const uml::instruction &inst);
+	void op_fmul(Assembler &a, const uml::instruction &inst);
+	void op_fdiv(Assembler &a, const uml::instruction &inst);
+	void op_fneg(Assembler &a, const uml::instruction &inst);
+	void op_fabs(Assembler &a, const uml::instruction &inst);
+	void op_fsqrt(Assembler &a, const uml::instruction &inst);
+	void op_frecip(Assembler &a, const uml::instruction &inst);
+	void op_frsqrt(Assembler &a, const uml::instruction &inst);
+	void op_fcopyi(Assembler &a, const uml::instruction &inst);
+	void op_icopyf(Assembler &a, const uml::instruction &inst);
 
 	// alu and shift operation helpers
 	static bool ones(u64 const value, unsigned const size) noexcept { return (size == 4) ? u32(value) == 0xffffffffU : value == 0xffffffff'ffffffffULL; }
 	template <typename T>
-	void alu_op_param(asmjit::x86::Assembler &a, asmjit::x86::Inst::Id const opcode, asmjit::Operand const &dst, be_parameter const &param, T &&optimize);
-	void alu_op_param(asmjit::x86::Assembler &a, asmjit::x86::Inst::Id const opcode, asmjit::Operand const &dst, be_parameter const &param) { alu_op_param(a, opcode, dst, param, [] (asmjit::x86::Assembler &a, asmjit::Operand dst, be_parameter const &src) { return false; }); }
-	void shift_op_param(asmjit::x86::Assembler &a, asmjit::x86::Inst::Id const opcode, size_t opsize, asmjit::Operand const &dst, be_parameter const &param, u8 update_flags);
+	void alu_op_param(Assembler &a, Inst::Id const opcode, Operand const &dst, be_parameter const &param, T &&optimize);
+	void alu_op_param(Assembler &a, Inst::Id const opcode, Operand const &dst, be_parameter const &param) { alu_op_param(a, opcode, dst, param, [] (Assembler &a, Operand const &dst, be_parameter const &src) { return false; }); }
+	void shift_op_param(Assembler &a, Inst::Id const opcode, size_t opsize, Operand const &dst, be_parameter const &param, u8 update_flags);
 
 	// parameter helpers
-	void mov_reg_param(asmjit::x86::Assembler &a, asmjit::x86::Gp const &reg, be_parameter const &param, bool const keepflags = false);
-	void mov_param_reg(asmjit::x86::Assembler &a, be_parameter const &param, asmjit::x86::Gp const &reg);
-	void mov_mem_param(asmjit::x86::Assembler &a, asmjit::x86::Mem const &memref, be_parameter const &param);
+	void mov_reg_param(Assembler &a, Gp const &reg, be_parameter const &param, bool const keepflags = false);
+	void mov_param_reg(Assembler &a, be_parameter const &param, Gp const &reg);
+	void mov_mem_param(Assembler &a, Mem const &memref, be_parameter const &param);
 
 	// special-case move helpers
-	void movsx_r64_p32(asmjit::x86::Assembler &a, asmjit::x86::Gp const &reg, be_parameter const &param);
-	void mov_r64_imm(asmjit::x86::Assembler &a, asmjit::x86::Gp const &reg, uint64_t const imm) const;
+	void movsx_r64_p32(Assembler &a, Gp const &reg, be_parameter const &param);
+	void mov_r64_imm(Assembler &a, Gp const &reg, uint64_t const imm) const;
 
 	// floating-point helpers
-	void movss_r128_p32(asmjit::x86::Assembler &a, asmjit::x86::Xmm const &reg, be_parameter const &param);
-	void movss_p32_r128(asmjit::x86::Assembler &a, be_parameter const &param, asmjit::x86::Xmm const &reg);
-	void movsd_r128_p64(asmjit::x86::Assembler &a, asmjit::x86::Xmm const &reg, be_parameter const &param);
-	void movsd_p64_r128(asmjit::x86::Assembler &a, be_parameter const &param, asmjit::x86::Xmm const &reg);
+	void movss_r128_p32(Assembler &a, Xmm const &reg, be_parameter const &param);
+	void movss_p32_r128(Assembler &a, be_parameter const &param, Xmm const &reg);
+	void movsd_r128_p64(Assembler &a, Xmm const &reg, be_parameter const &param);
+	void movsd_p64_r128(Assembler &a, be_parameter const &param, Xmm const &reg);
 
-	void calculate_status_flags(asmjit::x86::Assembler &a, uint32_t instsize, asmjit::Operand const &dst, u8 flags);
-	void calculate_status_flags_mul(asmjit::x86::Assembler &a, uint32_t instsize, asmjit::x86::Gp const &lo, asmjit::x86::Gp const &hi);
-	void calculate_status_flags_mul_low(asmjit::x86::Assembler &a, uint32_t instsize, asmjit::x86::Gp const &lo);
+	void calculate_status_flags(Assembler &a, uint32_t instsize, Operand const &dst, u8 flags);
+	void calculate_status_flags_mul(Assembler &a, uint32_t instsize, Gp const &lo, Gp const &hi);
+	void calculate_status_flags_mul_low(Assembler &a, uint32_t instsize, Gp const &lo);
 
-	size_t emit(asmjit::CodeHolder &ch);
+	size_t emit(CodeHolder &ch);
 
 	// internal state
 	drc_hash_table          m_hash;                 // hash table state
@@ -640,19 +632,7 @@ private:
 	resolved_member_function m_debug_cpu_instruction_hook;
 	resolved_member_function m_drcmap_get_value;
 	std::vector<memory_accessors> m_memory_accessors;
-
-	// globals
-	static const opcode_table_entry s_opcode_table_source[];
-	static opcode_generate_func s_opcode_table[uml::OP_MAX];
 };
-
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-drcbe_x64::opcode_generate_func drcbe_x64::s_opcode_table[OP_MAX];
 
 
 
@@ -660,99 +640,104 @@ drcbe_x64::opcode_generate_func drcbe_x64::s_opcode_table[OP_MAX];
 //  TABLES
 //**************************************************************************
 
-const drcbe_x64::opcode_table_entry drcbe_x64::s_opcode_table_source[] =
+inline void drcbe_x64::generate_one(Assembler &a, const uml::instruction &inst)
 {
+	switch (inst.opcode())
+	{
 	// Compile-time opcodes
-	{ uml::OP_HANDLE,  &drcbe_x64::op_handle },     // HANDLE  handle
-	{ uml::OP_HASH,    &drcbe_x64::op_hash },       // HASH    mode,pc
-	{ uml::OP_LABEL,   &drcbe_x64::op_label },      // LABEL   imm
-	{ uml::OP_COMMENT, &drcbe_x64::op_comment },    // COMMENT string
-	{ uml::OP_MAPVAR,  &drcbe_x64::op_mapvar },     // MAPVAR  mapvar,value
+	case uml::OP_HANDLE:  op_handle(a, inst);     break; // HANDLE  handle
+	case uml::OP_HASH:    op_hash(a, inst);       break; // HASH    mode,pc
+	case uml::OP_LABEL:   op_label(a, inst);      break; // LABEL   imm
+	case uml::OP_COMMENT: op_comment(a, inst);    break; // COMMENT string
+	case uml::OP_MAPVAR:  op_mapvar(a, inst);     break; // MAPVAR  mapvar,value
 
 	// Control Flow Operations
-	{ uml::OP_NOP,     &drcbe_x64::op_nop },        // NOP
-	{ uml::OP_BREAK,   &drcbe_x64::op_break },      // BREAK
-	{ uml::OP_DEBUG,   &drcbe_x64::op_debug },      // DEBUG   pc
-	{ uml::OP_EXIT,    &drcbe_x64::op_exit },       // EXIT    src1[,c]
-	{ uml::OP_HASHJMP, &drcbe_x64::op_hashjmp },    // HASHJMP mode,pc,handle
-	{ uml::OP_JMP,     &drcbe_x64::op_jmp },        // JMP     imm[,c]
-	{ uml::OP_EXH,     &drcbe_x64::op_exh },        // EXH     handle,param[,c]
-	{ uml::OP_CALLH,   &drcbe_x64::op_callh },      // CALLH   handle[,c]
-	{ uml::OP_RET,     &drcbe_x64::op_ret },        // RET     [c]
-	{ uml::OP_CALLC,   &drcbe_x64::op_callc },      // CALLC   func,ptr[,c]
-	{ uml::OP_RECOVER, &drcbe_x64::op_recover },    // RECOVER dst,mapvar
+	case uml::OP_NOP:     op_nop(a, inst);        break; // NOP
+	case uml::OP_BREAK:   op_break(a, inst);      break; // BREAK
+	case uml::OP_DEBUG:   op_debug(a, inst);      break; // DEBUG   pc
+	case uml::OP_EXIT:    op_exit(a, inst);       break; // EXIT    src1[,c]
+	case uml::OP_HASHJMP: op_hashjmp(a, inst);    break; // HASHJMP mode,pc,handle
+	case uml::OP_JMP:     op_jmp(a, inst);        break; // JMP     imm[,c]
+	case uml::OP_EXH:     op_exh(a, inst);        break; // EXH     handle,param[,c]
+	case uml::OP_CALLH:   op_callh(a, inst);      break; // CALLH   handle[,c]
+	case uml::OP_RET:     op_ret(a, inst);        break; // RET     [c]
+	case uml::OP_CALLC:   op_callc(a, inst);      break; // CALLC   func,ptr[,c]
+	case uml::OP_RECOVER: op_recover(a, inst);    break; // RECOVER dst,mapvar
 
 	// Internal Register Operations
-	{ uml::OP_SETFMOD, &drcbe_x64::op_setfmod },    // SETFMOD src
-	{ uml::OP_GETFMOD, &drcbe_x64::op_getfmod },    // GETFMOD dst
-	{ uml::OP_GETEXP,  &drcbe_x64::op_getexp },     // GETEXP  dst
-	{ uml::OP_GETFLGS, &drcbe_x64::op_getflgs },    // GETFLGS dst[,f]
-	{ uml::OP_SETFLGS, &drcbe_x64::op_setflgs },    // SETFLGS src
-	{ uml::OP_SAVE,    &drcbe_x64::op_save },       // SAVE    dst
-	{ uml::OP_RESTORE, &drcbe_x64::op_restore },    // RESTORE dst
+	case uml::OP_SETFMOD: op_setfmod(a, inst);    break; // SETFMOD src
+	case uml::OP_GETFMOD: op_getfmod(a, inst);    break; // GETFMOD dst
+	case uml::OP_GETEXP:  op_getexp(a, inst);     break; // GETEXP  dst
+	case uml::OP_GETFLGS: op_getflgs(a, inst);    break; // GETFLGS dst[,f]
+	case uml::OP_SETFLGS: op_setflgs(a, inst);    break; // SETFLGS src
+	case uml::OP_SAVE:    op_save(a, inst);       break; // SAVE    dst
+	case uml::OP_RESTORE: op_restore(a, inst);    break; // RESTORE dst
 
 	// Integer Operations
-	{ uml::OP_LOAD,    &drcbe_x64::op_load },       // LOAD    dst,base,index,size
-	{ uml::OP_LOADS,   &drcbe_x64::op_loads },      // LOADS   dst,base,index,size
-	{ uml::OP_STORE,   &drcbe_x64::op_store },      // STORE   base,index,src,size
-	{ uml::OP_READ,    &drcbe_x64::op_read },       // READ    dst,src1,spacesize
-	{ uml::OP_READM,   &drcbe_x64::op_readm },      // READM   dst,src1,mask,spacesize
-	{ uml::OP_WRITE,   &drcbe_x64::op_write },      // WRITE   dst,src1,spacesize
-	{ uml::OP_WRITEM,  &drcbe_x64::op_writem },     // WRITEM  dst,src1,spacesize
-	{ uml::OP_CARRY,   &drcbe_x64::op_carry },      // CARRY   src,bitnum
-	{ uml::OP_SET,     &drcbe_x64::op_set },        // SET     dst,c
-	{ uml::OP_MOV,     &drcbe_x64::op_mov },        // MOV     dst,src[,c]
-	{ uml::OP_SEXT,    &drcbe_x64::op_sext },       // SEXT    dst,src
-	{ uml::OP_ROLAND,  &drcbe_x64::op_roland },     // ROLAND  dst,src1,src2,src3
-	{ uml::OP_ROLINS,  &drcbe_x64::op_rolins },     // ROLINS  dst,src1,src2,src3
-	{ uml::OP_ADD,     &drcbe_x64::op_add },        // ADD     dst,src1,src2[,f]
-	{ uml::OP_ADDC,    &drcbe_x64::op_addc },       // ADDC    dst,src1,src2[,f]
-	{ uml::OP_SUB,     &drcbe_x64::op_sub },        // SUB     dst,src1,src2[,f]
-	{ uml::OP_SUBB,    &drcbe_x64::op_subc },       // SUBB    dst,src1,src2[,f]
-	{ uml::OP_CMP,     &drcbe_x64::op_cmp },        // CMP     src1,src2[,f]
-	{ uml::OP_MULU,    &drcbe_x64::op_mulu },       // MULU    dst,edst,src1,src2[,f]
-	{ uml::OP_MULULW,  &drcbe_x64::op_mululw },     // MULULW  dst,src1,src2[,f]
-	{ uml::OP_MULS,    &drcbe_x64::op_muls },       // MULS    dst,edst,src1,src2[,f]
-	{ uml::OP_MULSLW,  &drcbe_x64::op_mulslw },     // MULSLW  dst,src1,src2[,f]
-	{ uml::OP_DIVU,    &drcbe_x64::op_divu },       // DIVU    dst,edst,src1,src2[,f]
-	{ uml::OP_DIVS,    &drcbe_x64::op_divs },       // DIVS    dst,edst,src1,src2[,f]
-	{ uml::OP_AND,     &drcbe_x64::op_and },        // AND     dst,src1,src2[,f]
-	{ uml::OP_TEST,    &drcbe_x64::op_test },       // TEST    src1,src2[,f]
-	{ uml::OP_OR,      &drcbe_x64::op_or },         // OR      dst,src1,src2[,f]
-	{ uml::OP_XOR,     &drcbe_x64::op_xor },        // XOR     dst,src1,src2[,f]
-	{ uml::OP_LZCNT,   &drcbe_x64::op_lzcnt },      // LZCNT   dst,src[,f]
-	{ uml::OP_TZCNT,   &drcbe_x64::op_tzcnt },      // TZCNT   dst,src[,f]
-	{ uml::OP_BSWAP,   &drcbe_x64::op_bswap },      // BSWAP   dst,src
-	{ uml::OP_SHL,     &drcbe_x64::op_shift<Inst::kIdShl> },        // SHL     dst,src,count[,f]
-	{ uml::OP_SHR,     &drcbe_x64::op_shift<Inst::kIdShr> },        // SHR     dst,src,count[,f]
-	{ uml::OP_SAR,     &drcbe_x64::op_shift<Inst::kIdSar> },        // SAR     dst,src,count[,f]
-	{ uml::OP_ROL,     &drcbe_x64::op_shift<Inst::kIdRol> },        // ROL     dst,src,count[,f]
-	{ uml::OP_ROLC,    &drcbe_x64::op_shift<Inst::kIdRcl> },        // ROLC    dst,src,count[,f]
-	{ uml::OP_ROR,     &drcbe_x64::op_shift<Inst::kIdRor> },        // ROR     dst,src,count[,f]
-	{ uml::OP_RORC,    &drcbe_x64::op_shift<Inst::kIdRcr> },        // RORC    dst,src,count[,f]
+	case uml::OP_LOAD:    op_load(a, inst);       break; // LOAD    dst,base,index,size
+	case uml::OP_LOADS:   op_loads(a, inst);      break; // LOADS   dst,base,index,size
+	case uml::OP_STORE:   op_store(a, inst);      break; // STORE   base,index,src,size
+	case uml::OP_READ:    op_read(a, inst);       break; // READ    dst,src1,spacesize
+	case uml::OP_READM:   op_readm(a, inst);      break; // READM   dst,src1,mask,spacesize
+	case uml::OP_WRITE:   op_write(a, inst);      break; // WRITE   dst,src1,spacesize
+	case uml::OP_WRITEM:  op_writem(a, inst);     break; // WRITEM  dst,src1,spacesize
+	case uml::OP_CARRY:   op_carry(a, inst);      break; // CARRY   src,bitnum
+	case uml::OP_SET:     op_set(a, inst);        break; // SET     dst,c
+	case uml::OP_MOV:     op_mov(a, inst);        break; // MOV     dst,src[,c]
+	case uml::OP_SEXT:    op_sext(a, inst);       break; // SEXT    dst,src
+	case uml::OP_ROLAND:  op_roland(a, inst);     break; // ROLAND  dst,src1,src2,src3
+	case uml::OP_ROLINS:  op_rolins(a, inst);     break; // ROLINS  dst,src1,src2,src3
+	case uml::OP_ADD:     op_add(a, inst);        break; // ADD     dst,src1,src2[,f]
+	case uml::OP_ADDC:    op_addc(a, inst);       break; // ADDC    dst,src1,src2[,f]
+	case uml::OP_SUB:     op_sub(a, inst);        break; // SUB     dst,src1,src2[,f]
+	case uml::OP_SUBB:    op_subc(a, inst);       break; // SUBB    dst,src1,src2[,f]
+	case uml::OP_CMP:     op_cmp(a, inst);        break; // CMP     src1,src2[,f]
+	case uml::OP_MULU:    op_mulu(a, inst);       break; // MULU    dst,edst,src1,src2[,f]
+	case uml::OP_MULULW:  op_mululw(a, inst);     break; // MULULW  dst,src1,src2[,f]
+	case uml::OP_MULS:    op_muls(a, inst);       break; // MULS    dst,edst,src1,src2[,f]
+	case uml::OP_MULSLW:  op_mulslw(a, inst);     break; // MULSLW  dst,src1,src2[,f]
+	case uml::OP_DIVU:    op_divu(a, inst);       break; // DIVU    dst,edst,src1,src2[,f]
+	case uml::OP_DIVS:    op_divs(a, inst);       break; // DIVS    dst,edst,src1,src2[,f]
+	case uml::OP_AND:     op_and(a, inst);        break; // AND     dst,src1,src2[,f]
+	case uml::OP_TEST:    op_test(a, inst);       break; // TEST    src1,src2[,f]
+	case uml::OP_OR:      op_or(a, inst);         break; // OR      dst,src1,src2[,f]
+	case uml::OP_XOR:     op_xor(a, inst);        break; // XOR     dst,src1,src2[,f]
+	case uml::OP_LZCNT:   op_lzcnt(a, inst);      break; // LZCNT   dst,src[,f]
+	case uml::OP_TZCNT:   op_tzcnt(a, inst);      break; // TZCNT   dst,src[,f]
+	case uml::OP_BSWAP:   op_bswap(a, inst);      break; // BSWAP   dst,src
+	case uml::OP_SHL:     op_shift<Inst::kIdShl>(a, inst);        break; // SHL     dst,src,count[,f]
+	case uml::OP_SHR:     op_shift<Inst::kIdShr>(a, inst);        break; // SHR     dst,src,count[,f]
+	case uml::OP_SAR:     op_shift<Inst::kIdSar>(a, inst);        break; // SAR     dst,src,count[,f]
+	case uml::OP_ROL:     op_shift<Inst::kIdRol>(a, inst);        break; // ROL     dst,src,count[,f]
+	case uml::OP_ROLC:    op_shift<Inst::kIdRcl>(a, inst);        break; // ROLC    dst,src,count[,f]
+	case uml::OP_ROR:     op_shift<Inst::kIdRor>(a, inst);        break; // ROR     dst,src,count[,f]
+	case uml::OP_RORC:    op_shift<Inst::kIdRcr>(a, inst);        break; // RORC    dst,src,count[,f]
 
 	// Floating Point Operations
-	{ uml::OP_FLOAD,   &drcbe_x64::op_fload },      // FLOAD   dst,base,index
-	{ uml::OP_FSTORE,  &drcbe_x64::op_fstore },     // FSTORE  base,index,src
-	{ uml::OP_FREAD,   &drcbe_x64::op_fread },      // FREAD   dst,space,src1
-	{ uml::OP_FWRITE,  &drcbe_x64::op_fwrite },     // FWRITE  space,dst,src1
-	{ uml::OP_FMOV,    &drcbe_x64::op_fmov },       // FMOV    dst,src1[,c]
-	{ uml::OP_FTOINT,  &drcbe_x64::op_ftoint },     // FTOINT  dst,src1,size,round
-	{ uml::OP_FFRINT,  &drcbe_x64::op_ffrint },     // FFRINT  dst,src1,size
-	{ uml::OP_FFRFLT,  &drcbe_x64::op_ffrflt },     // FFRFLT  dst,src1,size
-	{ uml::OP_FRNDS,   &drcbe_x64::op_frnds },      // FRNDS   dst,src1
-	{ uml::OP_FADD,    &drcbe_x64::op_fadd },       // FADD    dst,src1,src2
-	{ uml::OP_FSUB,    &drcbe_x64::op_fsub },       // FSUB    dst,src1,src2
-	{ uml::OP_FCMP,    &drcbe_x64::op_fcmp },       // FCMP    src1,src2
-	{ uml::OP_FMUL,    &drcbe_x64::op_fmul },       // FMUL    dst,src1,src2
-	{ uml::OP_FDIV,    &drcbe_x64::op_fdiv },       // FDIV    dst,src1,src2
-	{ uml::OP_FNEG,    &drcbe_x64::op_fneg },       // FNEG    dst,src1
-	{ uml::OP_FABS,    &drcbe_x64::op_fabs },       // FABS    dst,src1
-	{ uml::OP_FSQRT,   &drcbe_x64::op_fsqrt },      // FSQRT   dst,src1
-	{ uml::OP_FRECIP,  &drcbe_x64::op_frecip },     // FRECIP  dst,src1
-	{ uml::OP_FRSQRT,  &drcbe_x64::op_frsqrt },     // FRSQRT  dst,src1
-	{ uml::OP_FCOPYI,  &drcbe_x64::op_fcopyi },     // FCOPYI  dst,src
-	{ uml::OP_ICOPYF,  &drcbe_x64::op_icopyf }      // ICOPYF  dst,src
+	case uml::OP_FLOAD:   op_fload(a, inst);      break; // FLOAD   dst,base,index
+	case uml::OP_FSTORE:  op_fstore(a, inst);     break; // FSTORE  base,index,src
+	case uml::OP_FREAD:   op_fread(a, inst);      break; // FREAD   dst,space,src1
+	case uml::OP_FWRITE:  op_fwrite(a, inst);     break; // FWRITE  space,dst,src1
+	case uml::OP_FMOV:    op_fmov(a, inst);       break; // FMOV    dst,src1[,c]
+	case uml::OP_FTOINT:  op_ftoint(a, inst);     break; // FTOINT  dst,src1,size,round
+	case uml::OP_FFRINT:  op_ffrint(a, inst);     break; // FFRINT  dst,src1,size
+	case uml::OP_FFRFLT:  op_ffrflt(a, inst);     break; // FFRFLT  dst,src1,size
+	case uml::OP_FRNDS:   op_frnds(a, inst);      break; // FRNDS   dst,src1
+	case uml::OP_FADD:    op_fadd(a, inst);       break; // FADD    dst,src1,src2
+	case uml::OP_FSUB:    op_fsub(a, inst);       break; // FSUB    dst,src1,src2
+	case uml::OP_FCMP:    op_fcmp(a, inst);       break; // FCMP    src1,src2
+	case uml::OP_FMUL:    op_fmul(a, inst);       break; // FMUL    dst,src1,src2
+	case uml::OP_FDIV:    op_fdiv(a, inst);       break; // FDIV    dst,src1,src2
+	case uml::OP_FNEG:    op_fneg(a, inst);       break; // FNEG    dst,src1
+	case uml::OP_FABS:    op_fabs(a, inst);       break; // FABS    dst,src1
+	case uml::OP_FSQRT:   op_fsqrt(a, inst);      break; // FSQRT   dst,src1
+	case uml::OP_FRECIP:  op_frecip(a, inst);     break; // FRECIP  dst,src1
+	case uml::OP_FRSQRT:  op_frsqrt(a, inst);     break; // FRSQRT  dst,src1
+	case uml::OP_FCOPYI:  op_fcopyi(a, inst);     break; // FCOPYI  dst,src
+	case uml::OP_ICOPYF:  op_icopyf(a, inst);     break; // ICOPYF  dst,src
+
+	default: throw emu_fatalerror("drcbe_x64(%s): unhandled opcode %u\n", m_device.tag(), inst.opcode());
+	}
 };
 
 
@@ -1101,10 +1086,6 @@ drcbe_x64::drcbe_x64(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 		}
 	}
 
-	// build the opcode table (static but it doesn't hurt to regenerate it)
-	for (auto & elem : s_opcode_table_source)
-		s_opcode_table[elem.opcode] = elem.func;
-
 	// create the log
 	if (device.machine().options().drc_log_native())
 	{
@@ -1327,7 +1308,6 @@ void drcbe_x64::generate(drcuml_block &block, const instruction *instlist, uint3
 	for (int inum = 0; inum < numinst; inum++)
 	{
 		const instruction &inst = instlist[inum];
-		assert(inst.opcode() < std::size(s_opcode_table));
 
 		// must remain in scope until output
 		std::string dasm;
@@ -1351,7 +1331,7 @@ void drcbe_x64::generate(drcuml_block &block, const instruction *instlist, uint3
 		}
 
 		// generate code
-		(this->*s_opcode_table[inst.opcode()])(a, inst);
+		generate_one(a, inst);
 	}
 
 	// catch falling off the end of a block
@@ -1495,7 +1475,7 @@ void drcbe_x64::calculate_status_flags(Assembler &a, uint32_t instsize, Operand 
 	}
 }
 
-void drcbe_x64::calculate_status_flags_mul(Assembler &a, uint32_t instsize, asmjit::x86::Gp const &lo, asmjit::x86::Gp const &hi)
+void drcbe_x64::calculate_status_flags_mul(Assembler &a, uint32_t instsize, Gp const &lo, Gp const &hi)
 {
 	Gp tempreg = r11;
 	Gp tempreg2 = r10;
@@ -1548,7 +1528,7 @@ void drcbe_x64::calculate_status_flags_mul(Assembler &a, uint32_t instsize, asmj
 	a.sahf();
 }
 
-void drcbe_x64::calculate_status_flags_mul_low(Assembler &a, uint32_t instsize, asmjit::x86::Gp const &lo)
+void drcbe_x64::calculate_status_flags_mul_low(Assembler &a, uint32_t instsize, Gp const &lo)
 {
 	// calculate zero, sign flags based on the lower half of the result but keep the overflow from the multiplication
 	a.seto(dl);
@@ -4387,10 +4367,25 @@ void drcbe_x64::op_sub(Assembler &a, const instruction &inst)
 	be_parameter src1p(*this, inst.param(1), PTYPE_MRI);
 	be_parameter src2p(*this, inst.param(2), PTYPE_MRI);
 
-	if (dstp.is_memory() && ((inst.size() == 8) || !dstp.is_cold_register()) && (dstp == src1p))
+	if (src1p.is_immediate_value(0))
+	{
+		if (dstp.is_memory() && (dstp == src2p) && ((inst.size() == 8) || !dstp.is_cold_register()))
+		{
+			a.neg(MABS(dstp.memory(), inst.size()));
+		}
+		else
+		{
+			Gp const dstreg = dstp.select_register((inst.size() == 4) ? Gp(eax) : Gp(rax));
+
+			mov_reg_param(a, dstreg, src2p);
+			a.neg(dstreg);
+			mov_param_reg(a, dstp, dstreg);
+		}
+	}
+	else if (dstp.is_memory() && ((inst.size() == 8) || !dstp.is_cold_register()) && (dstp == src1p))
 	{
 		// dstp == src1p in memory
-		alu_op_param(a, Inst::kIdSub, MABS(dstp.memory(), inst.size()), src2p,          // sub   [dstp],src2p
+		alu_op_param(a, Inst::kIdSub, MABS(dstp.memory(), inst.size()), src2p,
 			[inst] (Assembler &a, Operand const &dst, be_parameter const &src)
 			{
 				// optimize zero case
@@ -4403,23 +4398,23 @@ void drcbe_x64::op_sub(Assembler &a, const instruction &inst)
 		Gp const dst = Gp::fromTypeAndId((inst.size() == 4) ? RegType::kX86_Gpd : RegType::kX86_Gpq, dstp.ireg());
 		Gp const src1 = Gp::fromTypeAndId((inst.size() == 4) ? RegType::kX86_Gpd : RegType::kX86_Gpq, src1p.ireg());
 
-		a.lea(dst, ptr(src1, -src2p.immediate()));                                      // lea   dstp,[src1p-src2p]
+		a.lea(dst, ptr(src1, -src2p.immediate()));
 	}
 	else
 	{
 		// general case
 
 		// pick a target register for the general case
-		Gp dstreg = (inst.size() == 4) ? dstp.select_register(eax, src2p) : dstp.select_register(rax, src2p);
+		Gp const dstreg = dstp.select_register((inst.size() == 4) ? Gp(eax) : Gp(rax), src2p);
 
-		mov_reg_param(a, dstreg, src1p);                                                // mov   dstreg,src1p
-		alu_op_param(a, Inst::kIdSub, dstreg, src2p,                                    // sub   dstreg,src2p
+		mov_reg_param(a, dstreg, src1p);
+		alu_op_param(a, Inst::kIdSub, dstreg, src2p,
 			[inst] (Assembler &a, Operand const &dst, be_parameter const &src)
 			{
 				// optimize zero case
 				return (!inst.flags() && !src.immediate() && (inst.size() != 4));
 			});
-		mov_param_reg(a, dstp, dstreg);                                                 // mov   dstp,dstreg
+		mov_param_reg(a, dstp, dstreg);
 	}
 }
 

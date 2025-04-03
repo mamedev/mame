@@ -1860,14 +1860,11 @@ void hyperstone_device::generate_movi(drcuml_block &block, compiler_state &compi
 		UML_LABEL(block, no_exception);
 	}
 
-	UML_AND(block, I2, I2, ~(Z_MASK | N_MASK));
+	UML_AND(block, I2, I2, ~(Z_MASK | N_MASK | V_MASK));
 	if (!src)
 		UML_OR(block, I2, I2, Z_MASK);
 	else if (src & 0x80000000)
 		UML_OR(block, I2, I2, N_MASK);
-#if MISSIONCRAFT_FLAGS
-	UML_AND(block, I2, I2, ~V_MASK);
-#endif
 
 	if (DstGlobal)
 	{
@@ -2640,7 +2637,6 @@ void hyperstone_device::generate_rol(drcuml_block &block, compiler_state &compil
 		UML_AND(block, I1, I0, 0x1f);
 	}
 
-#ifdef MISSIONCRAFT_FLAGS
 	UML_AND(block, I2, I2, ~(C_MASK | Z_MASK | N_MASK | V_MASK));
 
 	UML_SUB(block, I4, 32, I1);
@@ -2648,23 +2644,17 @@ void hyperstone_device::generate_rol(drcuml_block &block, compiler_state &compil
 	UML_TEST(block, I1, 0xffffffff);
 	UML_MOVc(block, uml::COND_Z, I4, 0);
 	UML_MOV(block, I5, I4);
-#else
-	UML_AND(block, I2, I2, ~(C_MASK | Z_MASK | N_MASK));
-#endif
 
 	UML_ROL(block, I0, I0, I1);
-#ifdef MISSIONCRAFT_FLAGS
 	UML_MOVc(block, uml::COND_NS, I4, 0);
-#endif
 	generate_update_nz(block, compiler, uml::I2);
 
-#ifdef MISSIONCRAFT_FLAGS
 	UML_AND(block, I1, I5, I0);
+	UML_ROLINS(block, I2, I1, C_SHIFT, C_MASK);
 	UML_XOR(block, I4, I4, I1);
 	UML_MOV(block, I1, V_MASK);
 	UML_MOVc(block, uml::COND_Z, I1, 0);
 	UML_OR(block, I2, I2, I1);
-#endif
 
 	UML_MOV(block, DRC_SR, I2);
 
