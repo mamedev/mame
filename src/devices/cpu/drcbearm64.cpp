@@ -4237,7 +4237,7 @@ void drcbe_arm64::op_or(a64::Assembler &a, const uml::instruction &inst)
 		if ((dst.id() != src1.id()) || ((inst.size() == 4) && (dstp == src1p) && dstp.is_int_register()))
 			a.mov(dst, src1);
 	}
-	else if (src2p.is_immediate() && is_valid_immediate(src2p.immediate(), 12))
+	else if (src2p.is_immediate() && is_valid_immediate_mask(src2p.immediate(), inst.size()))
 	{
 		mov_reg_param(a, inst.size(), src1, src1p);
 
