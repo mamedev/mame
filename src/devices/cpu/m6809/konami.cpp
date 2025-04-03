@@ -206,12 +206,12 @@ inline uint16_t &konami_cpu_device::ireg()
 
 inline uint16_t konami_cpu_device::read_exgtfr_register(uint8_t reg)
 {
-	uint16_t result = 0x00FF;
+	uint16_t result = 0;
 
 	switch(reg & 0x07)
 	{
-		case 0: result = m_q.r.a;   break; // A
-		case 1: result = m_q.r.d;   break; // D
+		case 0: result = m_q.r.a | 0x1000; break; // A (high byte is always 0x10)
+		case 1: result = m_q.r.d;   break; // D!
 		case 2: result = m_x.w;     break; // X
 		case 3: result = m_y.w;     break; // Y
 		case 4: logerror("EXG/TFR unemulated DP reg\n"); break; // DP
