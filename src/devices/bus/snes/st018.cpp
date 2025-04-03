@@ -118,7 +118,7 @@ uint8_t sns_rom_st018_device::chip_read(offs_t offset)
 	switch (offset & 0x06)
 	{
 		case 0x00:
-			ret = m_cpu2copro->read();
+			ret = m_copro2cpu->read();
 			break;
 		case 0x02:
 			if (!machine().side_effects_disabled())
@@ -137,7 +137,7 @@ void sns_rom_st018_device::chip_write(offs_t offset, uint8_t data)
 	switch (offset & 0x06)
 	{
 		case 0x02:
-			m_copro2cpu->write(data);
+			m_cpu2copro->write(data);
 			break;
 		case 0x04:
 			m_copro_reset = BIT(data, 0);
