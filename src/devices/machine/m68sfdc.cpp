@@ -842,6 +842,7 @@ void m68sfdc_device::device_add_mconfig(machine_config &config)
 	m_pia->irqb_handler().set(FUNC(m68sfdc_device::handle_irq));
 
 	MC6852(config, m_ssda, 0);
+	m_ssda->set_tx_pull_mode(true);
 }
 
 DEFINE_DEVICE_TYPE(M68SFDC, m68sfdc_device, "m68sfdc", "M68SFDC")
