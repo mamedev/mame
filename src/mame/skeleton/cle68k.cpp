@@ -14,7 +14,7 @@ Lattice ispLSI 1016 60LJ
 Lattice iM4A5-32/32 10JC-12JI
 2x HM6264LP-70 RAM (near ispLSI 1016)
 2x HM6264LP-70 RAM (near CPU ROMs)
-2x HM86171-80 RAM (near CPU ROMs)
+2x HM86171-80 RAMDAC (near CPU ROMs)
 12 MHz XTAL (for M68K)
 AT90S4414 MCU (AVR core)
 11.0592 MHz XTAL (for AT90?)
@@ -51,6 +51,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
+		m_ramdac(*this, "ramdac%u", 0U),
 		m_videoram(*this, "videoram%u", 0U),
 		m_attrram(*this, "attrram%u", 0U)
 	{ }
@@ -63,6 +64,7 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device_array<ramdac_device, 2> m_ramdac;
 	required_shared_ptr_array<uint16_t, 2> m_videoram;
 	required_shared_ptr_array<uint16_t, 2> m_attrram;
 
@@ -74,7 +76,7 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void program_map(address_map &map) ATTR_COLD;
-	void ramdac_map(address_map &map) ATTR_COLD;
+	template <uint8_t Which> void ramdac_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -84,7 +86,7 @@ TILE_GET_INFO_MEMBER(cle68k_state::get_tile_info)
 	int const tile = m_videoram[Which][tile_index];
 	int const color = m_attrram[Which][tile_index] & 0xff;
 
-	tileinfo.set(0, tile, color, 0);
+	tileinfo.set(Which, tile, color, 0);
 }
 
 template <uint8_t Which>
@@ -127,9 +129,12 @@ void cle68k_state::program_map(address_map &map)
 	map(0x183000, 0x183fff).ram().w(FUNC(cle68k_state::videoram_w<1>)).share(m_videoram[1]);
 	map(0x1e0004, 0x1e0005).portr("IN0");
 	map(0x1e0009, 0x1e0009).w("oki", FUNC(okim6295_device::write));
-	map(0x1e0011, 0x1e0011).w("ramdac", FUNC(ramdac_device::index_w));
-	map(0x1e0013, 0x1e0013).w("ramdac", FUNC(ramdac_device::pal_w));
-	map(0x1e0015, 0x1e0015).w("ramdac", FUNC(ramdac_device::mask_w));
+	map(0x1e0010, 0x1e0010).w(m_ramdac[0], FUNC(ramdac_device::index_w));
+	map(0x1e0011, 0x1e0011).w(m_ramdac[1], FUNC(ramdac_device::index_w));
+	map(0x1e0012, 0x1e0012).w(m_ramdac[0], FUNC(ramdac_device::pal_w));
+	map(0x1e0013, 0x1e0013).w(m_ramdac[1], FUNC(ramdac_device::pal_w));
+	map(0x1e0014, 0x1e0014).w(m_ramdac[0], FUNC(ramdac_device::mask_w));
+	map(0x1e0015, 0x1e0015).w(m_ramdac[1], FUNC(ramdac_device::mask_w));
 	map(0x1e0030, 0x1e0031).portr("IN1").nopw(); // TODO: video reg? outputs?
 	map(0x1e0032, 0x1e0033).portr("DSW1");
 	map(0x1e0034, 0x1e0035).portr("DSW2");
@@ -137,9 +142,10 @@ void cle68k_state::program_map(address_map &map)
 	map(0x1f0000, 0x1fffff).ram();
 }
 
+template <uint8_t Which>
 void cle68k_state::ramdac_map(address_map &map)
 {
-	map(0x000, 0x2ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
+	map(0x000, 0x2ff).rw(m_ramdac[Which], FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
 }
 
 
@@ -389,7 +395,7 @@ static INPUT_PORTS_START( dmndhrtn ) // TODO: inputs
 	PORT_DIPSETTING(      0x0000, "500" )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( honeybee )
+INPUT_PORTS_START( honeybee ) // TODO: inputs
 	PORT_INCLUDE( dmndhrt )
 
 	// DIP definitions taken from test mode
@@ -541,7 +547,8 @@ INPUT_PORTS_END
 
 
 static GFXDECODE_START( gfx_cle68k ) // TODO: correct decoding
-	GFXDECODE_ENTRY( "tiles", 0, gfx_8x8x4_packed_msb, 0, 16 )
+	GFXDECODE_ENTRY( "tiles", 0, gfx_8x8x4_packed_msb, 0x000, 1 )
+	GFXDECODE_ENTRY( "tiles", 0, gfx_8x8x4_packed_msb, 0x100, 1 )
 GFXDECODE_END
 
 
@@ -562,9 +569,15 @@ void cle68k_state::cle68k(machine_config &config)
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_cle68k);
 
-	PALETTE(config, "palette").set_entries(0x100); // TODO
+	PALETTE(config, "palette").set_entries(0x200); // TODO
 
-	RAMDAC(config, "ramdac", 0, "palette").set_addrmap(0, &cle68k_state::ramdac_map);
+	RAMDAC(config, m_ramdac[0], 0, "palette");
+	m_ramdac[0]->set_addrmap(0, &cle68k_state::ramdac_map<0>);
+	m_ramdac[0]->set_color_base(0);
+
+	RAMDAC(config, m_ramdac[1], 0, "palette");
+	m_ramdac[1]->set_addrmap(0, &cle68k_state::ramdac_map<1>);
+	m_ramdac[1]->set_color_base(0x100);
 
 	SPEAKER(config, "mono").front_center();
 
