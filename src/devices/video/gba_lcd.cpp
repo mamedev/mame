@@ -136,6 +136,7 @@ DEFINE_DEVICE_TYPE(GBA_LCD, gba_lcd_device, "gba_lcd", "GBA LCD")
 gba_lcd_device::gba_lcd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, GBA_LCD, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
+	, device_palette_interface(mconfig, *this)
 	, m_int_hblank_cb(*this)
 	, m_int_vblank_cb(*this)
 	, m_int_vcount_cb(*this)
@@ -1704,7 +1705,7 @@ TIMER_CALLBACK_MEMBER(gba_lcd_device::perform_scan)
 	m_scan_timer->adjust(screen().time_until_pos((scanline + 1) % 228, 0));
 }
 
-void gba_lcd_device::gba_palette(palette_device &palette) const
+void gba_lcd_device::palette_init()
 {
 	for (uint8_t b = 0; b < 32; b++)
 	{
@@ -1712,7 +1713,7 @@ void gba_lcd_device::gba_palette(palette_device &palette) const
 		{
 			for (uint8_t r = 0; r < 32; r++)
 			{
-				palette.set_pen_color((b << 10) | (g << 5) | r, pal5bit(r), pal5bit(g), pal5bit(b));
+				set_pen_color((b << 10) | (g << 5) | r, pal5bit(r), pal5bit(g), pal5bit(b));
 			}
 		}
 	}
@@ -1727,6 +1728,8 @@ uint32_t gba_lcd_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 void gba_lcd_device::device_start()
 {
+	palette_init();
+
 	m_pram = make_unique_clear<uint32_t[]>(0x400 / 4);
 	m_vram = make_unique_clear<uint32_t[]>(0x18000 / 4);
 	m_oam = make_unique_clear<uint32_t[]>(0x400 / 4);
@@ -1777,7 +1780,5 @@ void gba_lcd_device::device_add_mconfig(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_raw(XTAL(16'777'216) / 4, 308, 0, 240, 228, 0, 160);
 	screen.set_screen_update(FUNC(gba_lcd_device::screen_update));
-	screen.set_palette("palette");
-
-	PALETTE(config, "palette", FUNC(gba_lcd_device::gba_palette), 32768);
+	screen.set_palette(*this);
 }
