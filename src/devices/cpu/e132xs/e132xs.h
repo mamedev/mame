@@ -104,6 +104,7 @@ enum
 	E132XS_L60, E132XS_L61, E132XS_L62, E132XS_L63
 };
 
+
 // Used by core CPU interface
 class hyperstone_device : public cpu_device, public hyperstone_disassembler::config
 {
@@ -157,6 +158,7 @@ protected:
 		uint32_t  delay_slot_taken;
 
 		int32_t   intblock;
+		uint32_t  powerdown;
 
 		uint32_t  arg0;
 		uint32_t  arg1;
@@ -221,10 +223,10 @@ protected:
 	// construction/destruction
 	hyperstone_device(
 			const machine_config &mconfig,
+			const device_type type,
 			const char *tag,
 			device_t *owner,
 			uint32_t clock,
-			const device_type type,
 			uint32_t prg_data_width,
 			uint32_t io_data_width,
 			address_map_constructor internal_map);
@@ -258,18 +260,10 @@ protected:
 	void update_timer_prescale();
 	void compute_tr();
 	void adjust_timer_interrupt();
-	void update_bus_control();
-	void update_memory_control();
+	virtual void update_bus_control();
+	virtual void update_memory_control();
 
-	void sdram_mode_w(offs_t offset, uint32_t data);
-	void sdram_control_w(offs_t offset, uint32_t data);
-
-	void e116_16k_iram_map(address_map &map) ATTR_COLD;
-	void e116_4k_iram_map(address_map &map) ATTR_COLD;
-	void e116_8k_iram_map(address_map &map) ATTR_COLD;
-	void e132_16k_iram_map(address_map &map) ATTR_COLD;
-	void e132_4k_iram_map(address_map &map) ATTR_COLD;
-	void e132_8k_iram_map(address_map &map) ATTR_COLD;
+	void iram_4k_map(address_map &map) ATTR_COLD;
 
 	static uint32_t imm_length(uint16_t op);
 
@@ -284,11 +278,14 @@ protected:
 	std::function<const void * (offs_t)> m_prptr;
 	address_space *m_io;
 
-	uint16_t  m_op;           // opcode
-
-	/* core state */
+	// core state
 	internal_hyperstone_state *m_core;
 
+	// onboard peripheral state
+	uint8_t m_power_down_req;
+
+	// stuff used by the interpreter while handling one instruction
+	uint16_t m_op;
 	int32_t m_instruction_length;
 	bool m_instruction_length_valid;
 
@@ -427,6 +424,7 @@ private:
 	uml::code_handle *m_nocode;
 	uml::code_handle *m_interrupt_checks;
 	uml::code_handle *m_out_of_cycles;
+	uml::code_handle *m_eat_all_cycles;
 	uml::code_handle *m_delay_taken[4];
 
 	uml::code_handle *m_mem_read8;
@@ -579,154 +577,123 @@ private:
 	void generate_do(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
 };
 
-// device type definition
-DECLARE_DEVICE_TYPE(E116T,      e116t_device)
-DECLARE_DEVICE_TYPE(E116XT,     e116xt_device)
-DECLARE_DEVICE_TYPE(E116XS,     e116xs_device)
-DECLARE_DEVICE_TYPE(E116XSR,    e116xsr_device)
-DECLARE_DEVICE_TYPE(E132N,      e132n_device)
-DECLARE_DEVICE_TYPE(E132T,      e132t_device)
-DECLARE_DEVICE_TYPE(E132XN,     e132xn_device)
-DECLARE_DEVICE_TYPE(E132XT,     e132xt_device)
-DECLARE_DEVICE_TYPE(E132XS,     e132xs_device)
-DECLARE_DEVICE_TYPE(E132XSR,    e132xsr_device)
-DECLARE_DEVICE_TYPE(GMS30C2116, gms30c2116_device)
-DECLARE_DEVICE_TYPE(GMS30C2132, gms30c2132_device)
-DECLARE_DEVICE_TYPE(GMS30C2216, gms30c2216_device)
-DECLARE_DEVICE_TYPE(GMS30C2232, gms30c2232_device)
+
+class hyperstone_x_device : public hyperstone_device
+{
+protected:
+	using hyperstone_device::hyperstone_device;
+
+	virtual void device_start() override ATTR_COLD;
+
+	virtual void update_memory_control() override;
+
+	void iram_8k_map(address_map &map) ATTR_COLD;
+};
 
 
-// ======================> e116t_device
+class hyperstone_xs_device : public hyperstone_device
+{
+protected:
+	using hyperstone_device::hyperstone_device;
 
-class e116t_device : public hyperstone_device
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_post_load() override ATTR_COLD;
+
+	virtual void update_memory_control() override;
+
+	void sdram_mode_w(offs_t offset, uint32_t data);
+	virtual void sdram_control_w(offs_t offset, uint32_t data);
+
+	void install_sdram_mode_control();
+
+	void iram_16k_map(address_map &map) ATTR_COLD;
+
+private:
+	bool m_sdram_installed;
+};
+
+
+class hyperstone_xsr_device : public hyperstone_xs_device
+{
+protected:
+	using hyperstone_xs_device::hyperstone_xs_device;
+
+	virtual void update_bus_control() override;
+	virtual void update_memory_control() override;
+
+	virtual void sdram_control_w(offs_t offset, uint32_t data) override;
+};
+
+
+class e116_device : public hyperstone_device
 {
 public:
 	// construction/destruction
-	e116t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	e116_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_start() override ATTR_COLD;
 };
 
 
-// ======================> e116xt_device
-
-class e116xt_device : public hyperstone_device
+class e116x_device : public hyperstone_x_device
 {
 public:
 	// construction/destruction
-	e116xt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	virtual void device_start() override ATTR_COLD;
+	e116x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
-// ======================> e116xs_device
-
-class e116xs_device : public hyperstone_device
+class e116xs_device : public hyperstone_xs_device
 {
 public:
 	// construction/destruction
 	e116xs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	virtual void device_start() override ATTR_COLD;
 };
 
 
-// ======================> e116xsr_device
-
-class e116xsr_device : public hyperstone_device
+class e116xsr_device : public hyperstone_xsr_device
 {
 public:
 	// construction/destruction
 	e116xsr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	virtual void device_start() override ATTR_COLD;
 };
 
 
-// ======================> e132n_device
-
-class e132n_device : public hyperstone_device
+class e132_device : public hyperstone_device
 {
 public:
 	// construction/destruction
-	e132n_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	e132_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_start() override ATTR_COLD;
 };
 
 
-// ======================> e132t_device
-
-class e132t_device : public hyperstone_device
+class e132x_device : public hyperstone_x_device
 {
 public:
 	// construction/destruction
-	e132t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	virtual void device_start() override ATTR_COLD;
+	e132x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
-// ======================> e132xn_device
-
-class e132xn_device : public hyperstone_device
-{
-public:
-	// construction/destruction
-	e132xn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	virtual void device_start() override ATTR_COLD;
-};
-
-
-// ======================> e132xt_device
-
-class e132xt_device : public hyperstone_device
-{
-public:
-	// construction/destruction
-	e132xt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	virtual void device_start() override ATTR_COLD;
-};
-
-
-// ======================> e132xs_device
-
-class e132xs_device : public hyperstone_device
+class e132xs_device : public hyperstone_xs_device
 {
 public:
 	// construction/destruction
 	e132xs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	virtual void device_start() override ATTR_COLD;
 };
 
 
-// ======================> e132xsr_device
-
-class e132xsr_device : public hyperstone_device
+class e132xsr_device : public hyperstone_xsr_device
 {
 public:
 	// construction/destruction
 	e132xsr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	virtual void device_start() override ATTR_COLD;
 };
 
-
-// ======================> gms30c2116_device
 
 class gms30c2116_device : public hyperstone_device
 {
@@ -739,8 +706,6 @@ protected:
 };
 
 
-// ======================> gms30c2132_device
-
 class gms30c2132_device : public hyperstone_device
 {
 public:
@@ -752,30 +717,34 @@ protected:
 };
 
 
-// ======================> gms30c2216_device
-
-class gms30c2216_device : public hyperstone_device
+class gms30c2216_device : public hyperstone_x_device
 {
 public:
 	// construction/destruction
 	gms30c2216_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	virtual void device_start() override ATTR_COLD;
 };
 
 
-// ======================> gms30c2232_device
-
-class gms30c2232_device : public hyperstone_device
+class gms30c2232_device : public hyperstone_x_device
 {
 public:
 	// construction/destruction
 	gms30c2232_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	virtual void device_start() override ATTR_COLD;
 };
+
+
+DECLARE_DEVICE_TYPE(E116,       e116_device)
+DECLARE_DEVICE_TYPE(E116X,      e116x_device)
+DECLARE_DEVICE_TYPE(E116XS,     e116xs_device)
+DECLARE_DEVICE_TYPE(E116XSR,    e116xsr_device)
+DECLARE_DEVICE_TYPE(E132,       e132_device)
+DECLARE_DEVICE_TYPE(E132X,      e132x_device)
+DECLARE_DEVICE_TYPE(E132XS,     e132xs_device)
+DECLARE_DEVICE_TYPE(E132XSR,    e132xsr_device)
+DECLARE_DEVICE_TYPE(GMS30C2116, gms30c2116_device)
+DECLARE_DEVICE_TYPE(GMS30C2132, gms30c2132_device)
+DECLARE_DEVICE_TYPE(GMS30C2216, gms30c2216_device)
+DECLARE_DEVICE_TYPE(GMS30C2232, gms30c2232_device)
 
 
 #endif // MAME_CPU_E132XS_E132XS_H

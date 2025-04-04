@@ -2,7 +2,7 @@
 // copyright-holders:
 
 /*
-プチ☆ロット (Petite Lot) by Showa Giken (Shoken) - mechanical slot machine
+プチ☆ロット (Petit Lot) by Showa Giken (Shoken) - mechanical slot machine
 Flyer shows at least two game titles: Time Cross and Hyper Rush.
 Are those actually different ROMs or just different covers?
 

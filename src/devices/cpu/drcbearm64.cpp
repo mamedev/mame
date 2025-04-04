@@ -3612,7 +3612,12 @@ template <bool CarryIn> void drcbe_arm64::op_add(a64::Assembler &a, const uml::i
 	}
 
 	if (inst.flags())
-		store_carry(a);
+	{
+		if (inst.flags() & FLAG_C)
+			store_carry(a);
+		else
+			m_carry_state = carry_state::POISON;
+	}
 }
 
 template <bool CarryIn> void drcbe_arm64::op_sub(a64::Assembler &a, const uml::instruction &inst)
@@ -3696,7 +3701,12 @@ template <bool CarryIn> void drcbe_arm64::op_sub(a64::Assembler &a, const uml::i
 	}
 
 	if (inst.flags())
-		store_carry(a, true);
+	{
+		if (inst.flags() & FLAG_C)
+			store_carry(a, true);
+		else
+			m_carry_state = carry_state::POISON;
+	}
 }
 
 void drcbe_arm64::op_cmp(a64::Assembler &a, const uml::instruction &inst)
@@ -3727,7 +3737,10 @@ void drcbe_arm64::op_cmp(a64::Assembler &a, const uml::instruction &inst)
 		a.cmp(src1, src2);
 	}
 
-	store_carry(a, true);
+	if (inst.flags() & FLAG_C)
+		store_carry(a, true);
+	else
+		m_carry_state = carry_state::POISON;
 }
 
 void drcbe_arm64::op_mulu(a64::Assembler &a, const uml::instruction &inst)
@@ -5050,8 +5063,12 @@ void drcbe_arm64::op_fcmp(a64::Assembler &a, const uml::instruction &inst)
 
 	a.fcmp(srcreg1, srcreg2);
 
-	store_carry(a, true);
-	store_unordered(a);
+	if (inst.flags() & FLAG_C)
+		store_carry(a, true);
+	else
+		m_carry_state = carry_state::POISON;
+	if (inst.flags() & FLAG_U)
+		store_unordered(a);
 }
 
 template <a64::Inst::Id Opcode> void drcbe_arm64::op_float_alu(a64::Assembler &a, const uml::instruction &inst)

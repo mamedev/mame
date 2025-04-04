@@ -116,6 +116,13 @@ struct hyperstone_device::c_funcs
 
 void hyperstone_device::execute_run_drc()
 {
+	if (m_core->powerdown)
+	{
+		if (m_core->icount > 0)
+			m_core->icount = 0;
+		return;
+	}
+
 	// reset the cache if dirty
 	if (m_cache_dirty)
 	{
@@ -421,6 +428,7 @@ void hyperstone_device::static_generate_helpers(drcuml_block &block, uml::code_l
 	// forward references
 	alloc_handle(*m_drcuml, m_entry, "entry");
 	alloc_handle(*m_drcuml, m_nocode, "nocode");
+	alloc_handle(*m_drcuml, m_eat_all_cycles, "eat_all_cycles");
 	alloc_handle(*m_drcuml, m_out_of_cycles, "out_of_cycles");
 	alloc_handle(*m_drcuml, m_delay_taken[0], "delay_taken");
 	alloc_handle(*m_drcuml, m_delay_taken[1], "delay_taken_s");
@@ -445,6 +453,9 @@ void hyperstone_device::static_generate_helpers(drcuml_block &block, uml::code_l
 	UML_EXIT(block, EXECUTE_MISSING_CODE);
 
 	// out of cycles exception handler
+	UML_HANDLE(block, *m_eat_all_cycles);
+	UML_CMP(block, mem(&m_core->icount), 0);
+	UML_MOVc(block, uml::COND_G, mem(&m_core->icount), 0);
 	UML_HANDLE(block, *m_out_of_cycles);
 	//save_fast_iregs(block);
 	UML_EXIT(block, EXECUTE_OUT_OF_CYCLES);

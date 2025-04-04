@@ -523,7 +523,7 @@ void dgpix_bmkey_state::machine_reset()
 
 void dgpix_state::dgpix_base(machine_config &config)
 {
-	E132XT(config, m_maincpu, 20000000*4); /* 4x internal multiplier */
+	E132X(config, m_maincpu, 20'000'000*4); // E1-32XT (TQFP), 4x internal multiplier
 	m_maincpu->set_addrmap(AS_IO, &dgpix_state::io_map);
 
 	/* video hardware */

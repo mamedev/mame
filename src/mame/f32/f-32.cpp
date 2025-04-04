@@ -241,7 +241,7 @@ INPUT_PORTS_END
 void mosaicf2_state::mosaicf2(machine_config &config)
 {
 	/* basic machine hardware */
-	E132XN(config, m_maincpu, XTAL(20'000'000)*4); /* 4x internal multiplier */
+	E132X(config, m_maincpu, 20_MHz_XTAL*4); // E1-32XN (PQFP), 4x internal multiplier
 	m_maincpu->set_addrmap(AS_PROGRAM, &mosaicf2_state::common_map);
 	m_maincpu->set_addrmap(AS_IO, &mosaicf2_state::mosaicf2_io);
 	m_maincpu->set_vblank_int("screen", FUNC(mosaicf2_state::irq0_line_hold));

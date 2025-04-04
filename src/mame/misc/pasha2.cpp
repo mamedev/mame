@@ -489,7 +489,7 @@ void pasha2_state::machine_reset()
 void pasha2_state::pasha2(machine_config &config)
 {
 	// basic machine hardware
-	E116XT(config, m_maincpu, 20_MHz_XTAL*4);     // 4x internal multiplier
+	E116X(config, m_maincpu, 20_MHz_XTAL*4);     // E1-16XT (TQFP), 4x internal multiplier
 	m_maincpu->set_addrmap(AS_PROGRAM, &pasha2_state::pasha2_map);
 	m_maincpu->set_addrmap(AS_IO, &pasha2_state::pasha2_io);
 	m_maincpu->set_vblank_int("screen", FUNC(pasha2_state::irq0_line_hold));
@@ -527,7 +527,7 @@ void pasha2_state::zdrum(machine_config &config)
 
 	m_maincpu->set_force_no_drc(true); // gets a bit further
 
-	e116xt_device &audiocpu(E116XT(config.replace(), "audiocpu", 45_MHz_XTAL)); // type unknown, but it does look like Hyperstone code
+	e116x_device &audiocpu(E116X(config.replace(), "audiocpu", 45_MHz_XTAL)); // type unknown, but it does look like Hyperstone code
 	audiocpu.set_addrmap(AS_PROGRAM, &pasha2_state::zdrum_audio_map);
 
 	// TODO: MP3 hw, also PCB should be stereo according to test mode
