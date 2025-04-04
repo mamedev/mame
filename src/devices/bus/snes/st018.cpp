@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Fabio Priuli, cam900
+// copyright-holders:cam900
 /***********************************************************************************************************
 
  ARMv3 add-on chip emulation (for SNES/SFC)
