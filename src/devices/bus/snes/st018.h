@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Fabio Priuli
+// copyright-holders:Fabio Priuli, cam900
 #ifndef MAME_BUS_SNES_ST018_H
 #define MAME_BUS_SNES_ST018_H
 

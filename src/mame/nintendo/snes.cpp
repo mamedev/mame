@@ -1201,7 +1201,7 @@ void snes_console_state::machine_start()
 			case SNES_ST010:    // this requires two diff kinds of chip access, so we handle it in snes20_lo/hi_r/w
 			case SNES_ST011:    // this requires two diff kinds of chip access, so we handle it in snes20_lo/hi_r/w
 				break;
-			case SNES_ST018:      // skeleton support
+			case SNES_ST018:
 				m_maincpu->space(AS_PROGRAM).install_read_handler(0x003800, 0x0038ff, 0, 0xbf0000, 0, read8sm_delegate(*m_cartslot, FUNC(base_sns_cart_slot_device::chip_read)));
 				m_maincpu->space(AS_PROGRAM).install_write_handler(0x003800, 0x0038ff, 0, 0xbf0000, 0, write8sm_delegate(*m_cartslot, FUNC(base_sns_cart_slot_device::chip_write)));
 				break;
