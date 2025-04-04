@@ -795,9 +795,9 @@ void sony_ldp1450hle_device::add_command_byte(u8 command)
 				break;
 
 			case CMD_MOTOR_ON:
-			//Presume we're already running
-			queue_reply(0x0b, 0.4);
-			break;
+				//Presume we're already running
+				queue_reply(0x0b, 0.4);
+				break;
 
 			case CMD_STATUS_INQ:
 				{

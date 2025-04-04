@@ -266,7 +266,7 @@ uint8_t cops_state::io1_r(offs_t offset)
 		case 0x0a:  /* SW2 */
 			return m_switches[2]->read();
 		default:
-			fatalerror("Unknown io1_r, offset = %03x\n", offset);
+			logerror("Unknown io1_r, offset = %03x\n", offset);
 			return 0;
 	}
 }
