@@ -217,7 +217,7 @@ static uint32_t core_decrypt(uint32_t ciphertext, int i1, int i2, int i3, int i4
 
 void raiden2_decrypt_sprites(running_machine &machine)
 {
-	uint32_t *data = (uint32_t *)machine.root_device().memregion("gfx3")->base();
+	uint32_t *data = (uint32_t *)machine.root_device().memregion("sprites")->base();
 	for(int i=0; i<0x800000/4; i++)
 	{
 		data[i] = core_decrypt(data[i],
@@ -237,7 +237,7 @@ void raiden2_decrypt_sprites(running_machine &machine)
 
 void zeroteam_decrypt_sprites(running_machine &machine)
 {
-	uint32_t *data = (uint32_t *)machine.root_device().memregion("gfx3")->base();
+	uint32_t *data = (uint32_t *)machine.root_device().memregion("sprites")->base();
 	for(int i=0; i<0x400000/4; i++)
 	{
 		data[i] = core_decrypt(data[i],
