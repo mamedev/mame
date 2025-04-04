@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+	<element name="led">
+		<led14segsc>
+			<color red="0.8" green="0.2" blue="0" />
+		</led14segsc>
+	</element>
+	<element name="A" defstate="0">
+		<rect state="0"><color red="0.4" green="0.1" blue="0" /></rect>
+		<rect state="1"><color red="0.8" green="0.2" blue="0" /></rect>
+		<text string="A"><color red="0.7" green="0.7" blue="0.7" /></text>
+	</element>
+	<element name="B" defstate="0">
+		<rect state="0"><color red="0.4" green="0.1" blue="0" /></rect>
+		<rect state="1"><color red="0.8" green="0.2" blue="0" /></rect>
+		<text string="B"><color red="0.7" green="0.7" blue="0.7" /></text>
+	</element>
+	<element name="C" defstate="0">
+		<rect state="0"><color red="0.4" green="0.1" blue="0" /></rect>
+		<rect state="1"><color red="0.8" green="0.2" blue="0" /></rect>
+		<text string="C"><color red="0.7" green="0.7" blue="0.7" /></text>
+	</element>
+
+	<view name="LED Overlay">
+		<screen index="0">
+			<bounds left="0" top="16" right="704" bottom="544" />
+		</screen>
+		<element name="lamp8" ref="A" inputtag="SW0" inputmask="0x01">
+			<bounds x="148" y="560" width="120" height="24" />
+		</element>
+
+		<element name="lamp9" ref="B" inputtag="SW0" inputmask="0x80">
+			<bounds x="278" y="560" width="120" height="24" />
+		</element>
+
+		<element name="lamp11" ref="C" inputtag="SW0" inputmask="0x02">
+			<bounds x="408" y="560" width="120" height="24" />
+		</element>
+
+		<repeat count="16">
+			<param name="digit" start="0" increment="1" />
+			<param name="x" start="140" increment="28" />
+			<element name="digit~digit~" ref="led" blend="add" state="0">
+				<bounds x="~x~" y="630" width="28" height="28"/>
+			</element>
+		</repeat>
+	</view>
+</mamelayout>
