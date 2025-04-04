@@ -4,33 +4,31 @@
  Hyperstone cpu emulator
  written by Pierpaolo Prazzoli
 
- All the types are compatible, but they have different IRAM size and cycles
-
  Hyperstone models:
 
- Model       Core    IRAM         Process  Bus     Package
- E1-16T      E1       4 KiB DRAM           16-bit  100-pin TQFP
- E1-32T      E1       4 KiB DRAM           32-bit  144-pin TQFP
- E1-32N      E1       4 KiB DRAM           32-bit  160-pin PQFP
- E1-16XT     E1-X     8 KiB DRAM  0.5  µm  16-bit  100-pin TQFP
- E1-32XT     E1-X     8 KiB DRAM  0.5  µm  32-bit  144-pin TQFP
- E1-32XN     E1-X     8 KiB DRAM  0.5  µm  32-bit  160-pin PQFP
- E1-16XS     E1-XS   16 KiB SRAM  0.25 µm  16-bit  100-pin LQFP
- E1-16XSB    E1-XS   16 KiB SRAM  0.25 µm  16-bit  100-pin TFBGA
- E1-32XS     E1-XS   16 KiB SRAM  0.25 µm  32-bit  144-pin LQFP
- E1-16XSR    E1-XSR  16 KiB SRAM  0.25 µm  16-bit  100-pin LQFP
- E1-32XSR    E1-XSR  16 KiB SRAM  0.25 µm  32-bit  144-pin LQFP
+ Model       Core    Bus     IRAM         Maximum core frequency         Process  Package
+ E1-16T      E1      16-bit   4 KiB DRAM  66 MHz @ 5.0 V                          100-pin TQFP
+ E1-32T      E1      32-bit   4 KiB DRAM  66 MHz @ 5.0 V                          144-pin TQFP
+ E1-32N      E1      32-bit   4 KiB DRAM  66 MHz @ 5.0 V                          160-pin PQFP
+ E1-16XT     E1-X    16-bit   8 KiB DRAM  80 MHz @ 5.0 V, 53 MHz @ 3.3V  0.5  µm  100-pin TQFP
+ E1-32XT     E1-X    32-bit   8 KiB DRAM  80 MHz @ 5.0 V, 53 MHz @ 3.3V  0.5  µm  144-pin TQFP
+ E1-32XN     E1-X    32-bit   8 KiB DRAM  80 MHz @ 5.0 V, 53 MHz @ 3.3V  0.5  µm  160-pin PQFP
+ E1-16XS     E1-XS   16-bit  16 KiB SRAM  115 MHz                        0.25 µm  100-pin LQFP
+ E1-16XSB    E1-XS   16-bit  16 KiB SRAM  115 MHz                        0.25 µm  100-pin TFBGA
+ E1-32XS     E1-XS   32-bit  16 KiB SRAM  115 MHz                        0.25 µm  144-pin LQFP
+ E1-16XSR    E1-XSR  16-bit  16 KiB SRAM  128 MHz                        0.25 µm  100-pin LQFP
+ E1-32XSR    E1-XSR  32-bit  16 KiB SRAM  128 MHz                        0.25 µm  144-pin LQFP
 
  Hynix models:
 
- Model       Core    IRAM         Process  Bus     Package
- GMS30C2116  E1       4 KiB DRAM  0.6  µm  16-bit  100-pin TQFP
- GMS30C2132  E1       4 KiB DRAM  0.6  µm  32-bit  144-pin TQFP, 160-pin MQFP
- GMS30C2216  E1-X     8 KiB DRAM  0.35 µm  16-bit  100-pin TQFP
- GMS30C2232  E1-X     8 KiB DRAM  0.35 µm  32-bit  144-pin TQFP, 160-pin MQFP
+ Model       Core    Bus     IRAM         Maximum core frequency          Process  Package
+ GMS30C2116  E1      16-bit   4 KiB DRAM  66 MHz @ 5.0 V, 40 MHz @ 3.3 V  0.6  µm  100-pin TQFP
+ GMS30C2132  E1      32-bit   4 KiB DRAM  66 MHz @ 5.0 V, 40 MHz @ 3.3 V  0.6  µm  144-pin TQFP, 160-pin MQFP
+ GMS30C2216  E1-X    16-bit   8 KiB DRAM  108 MHz                         0.35 µm  100-pin TQFP
+ GMS30C2232  E1-X    32-bit   8 KiB DRAM  108 MHz                         0.35 µm  144-pin TQFP, 160-pin MQFP
 
  E1-X changes:
- * Added PLL with up to 4* multiplication
+ * Adds PLL with up to 4* multiplication
  * Increases IRAM to 8 KiB
  * Adds MEM0 EDO DRAM support
  * Adds MEM0/MEM1/MEM2/MEM3 parity support
@@ -40,6 +38,7 @@
  * Moves power down from MCR to an I/O address
 
  E-1XS changes:
+ * Changes to 3.3 V I/O voltage and 2.5 V core voltage
  * Increases PLL options to up to 8* multiplication
  * Increases IRAM to 16 KiB
  * Changes IRAM to SRAM
@@ -50,6 +49,24 @@
  * Changes DRAM timing options
  * Adds more DRAM clock configuration options
  * Removes MEM0/MEM1/MEM2 byte write strobe/byte enable selection
+
+ The Hynix models are generally similar to the Hyperstone models
+ based on the same core with minor differences:
+ * Hynix models are fabricated with smaller feature sizes
+ * The GMS30C2216 and GMS30C2232 support higher core frequencies
+ * The GMS30C2216 and GMS30C2232 only support a 3.3 V power supply
+ * The GMS30C2216 and GMS30C2232 lack bus output voltage and input
+   threshold selection (inputs are 5 V tolerant)
+ * Hynix offered a 160-pin MQFP package rather than LQFP
+
+ Backwards compatibility is fairly good across models.
+ Incompatibilities include:
+ * Power supply and bus voltages changed
+ * Additional memory types and features are supported on later models
+ * Only the E1-X and E1-XS support memory byte write strobe signals
+ * The E1-XSR changes the available DRAM timing options
+ * PLL control bits added to the TPR register
+ * The BCR, MCR and SDCR register formats change in incompatible ways
 
  TODO:
  - All instructions should clear the H flag (not just MOV/MOVI)
@@ -576,7 +593,9 @@ void hyperstone_x_device::update_memory_control()
 {
 	const uint32_t val = m_core->global_regs[MCR_REGISTER];
 
-	// GMS30C22xx drops bus output voltage/input threshold selecting while E1-X apparently doesn't
+	// GMS30C2216 and GMS30C2232 drop bus output voltage/input
+	// threshold selection as they only support 3.3V power supply
+	// and have 5V tolerant inputs.
 
 	static char const *const entrymap[8] = { "MEM0", "MEM1", "MEM2", "IRAM", "reserved", "reserved", "reserved", "MEM3" };
 	LOG("%s: Set MCR = 0x%08x, entry map in %s, %s output voltage, input threshold for VDD=%sV\n",
