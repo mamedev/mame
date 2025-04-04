@@ -387,6 +387,7 @@ public:
 	}
 
 	void invaders(machine_config &config);
+	void invnomb(machine_config &config);
 
 	ioport_value invaders_sw6_sw7_r();
 	ioport_value invaders_sw5_r();
@@ -408,6 +409,7 @@ protected:
 
 private:
 	void io_map(address_map &map) ATTR_COLD;
+	void io_map_noshift(address_map &map) ATTR_COLD;
 };
 
 class bowler_state : public mw8080bw_state
