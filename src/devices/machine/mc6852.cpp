@@ -51,6 +51,8 @@ mc6852_device::mc6852_device(const machine_config &mconfig, const char *tag, dev
 	m_write_irq(*this),
 	m_write_sm_dtr(*this),
 	m_write_tuf(*this),
+	m_tx_pull_mode(false),
+	m_tx_active(false),
 	m_rx_clock(0),
 	m_tx_clock(0),
 	m_cts(1),
@@ -84,6 +86,8 @@ void mc6852_device::device_start()
 	save_item(NAME(m_sm_dtr));
 	save_item(NAME(m_tuf));
 	save_item(NAME(m_in_sync));
+	save_item(NAME(m_tx_active));
+	save_item(NAME(m_tx_pull_mode));
 }
 
 
