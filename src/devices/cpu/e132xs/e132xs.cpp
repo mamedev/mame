@@ -136,6 +136,7 @@ hyperstone_device::hyperstone_device(
 	, m_nocode(nullptr)
 	, m_interrupt_checks(nullptr)
 	, m_out_of_cycles(nullptr)
+	, m_eat_all_cycles(nullptr)
 	, m_mem_read8(nullptr)
 	, m_mem_write8(nullptr)
 	, m_mem_read16(nullptr)
