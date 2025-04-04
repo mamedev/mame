@@ -93,7 +93,7 @@ void sns_rom_st018_device::copro_map(address_map &map)
 	map(0x4000'0000, 0x4000'0000).w(m_copro2cpu, FUNC(generic_latch_8_device::write));
 	map(0x4000'0010, 0x4000'0010).r(m_cpu2copro, FUNC(generic_latch_8_device::read)).w(FUNC(sns_rom_st018_device::signal_w));
 	map(0x4000'0020, 0x4000'0020).r(FUNC(sns_rom_st018_device::status_r));
-	//map(0x4000'0020, 0x4000'002f).nopw(); // Unknown write
+	map(0x4000'0020, 0x4000'002f).nopw(); // Unknown write
 	map(0xa000'0000, 0xa000'7fff).r(FUNC(sns_rom_st018_device::copro_data_r));
 	map(0xe000'0000, 0xe000'3fff).ram();
 }
