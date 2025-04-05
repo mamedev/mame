@@ -29,7 +29,6 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	bool m_installed;
-	u16  m_base_addr;
 
 	required_device_array<ram_device, 8> m_ram;
 };
@@ -62,7 +61,7 @@ wh_8_64_device::wh_8_64_device(const machine_config &mconfig, const char *tag, d
 }
 
 wh_8_64_device::wh_8_64_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock):
-	device_t(mconfig, H8BUS_WH_8_64, tag, owner, 0),
+	device_t(mconfig, type, tag, owner, 0),
 	device_h8bus_card_interface(mconfig, *this),
 	m_ram(*this, "rambank%u", 0U)
 {
@@ -242,7 +241,7 @@ INPUT_PORTS_END
 #endif
 
 wh_8_64_48k_device::wh_8_64_48k_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock):
-	wh_8_64_device(mconfig, H8BUS_WH_8_64_32K, tag, owner, 0)
+	wh_8_64_device(mconfig, H8BUS_WH_8_64_48K, tag, owner, 0)
 {
 }
 

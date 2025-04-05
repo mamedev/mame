@@ -4,35 +4,13 @@
 
   h8bus.cpp - Heath/Zenith H-8 bus
 
-  Also known as the "Benton Harbor Bus" BHBus based on where the corporate
-  headquarters for Heath Company.
+  Also known as the "Benton Harbor Bus" BHBus based on city where the
+  corporate headquarters were located.
 
 ***************************************************************************/
 
-
 #include "emu.h"
 #include "h8bus.h"
-
-#define LOG_PORT_READ     (1U << 1)
-#define LOG_PORT_WRITE    (1U << 2)
-
-#define LOG_MEM_READ      (1U << 3)
-#define LOG_MEM_WRITE     (1U << 4)
-
-//#define VERBOSE (LOG_PORT_READ | LOG_PORT_WRITE | LOG_GPP_WRITE)
-#include "logmacro.h"
-
-#define LOGPORTREAD(...)     LOGMASKED(LOG_PORT_READ,    __VA_ARGS__)
-#define LOGPORTWRITE(...)    LOGMASKED(LOG_PORT_WRITE,   __VA_ARGS__)
-#define LOGMEMREAD(...)      LOGMASKED(LOG_MEM_READ,     __VA_ARGS__)
-#define LOGMEMWRITE(...)     LOGMASKED(LOG_MEM_WRITE,    __VA_ARGS__)
-
-#ifdef _MSC_VER
-#define FUNCNAME __func__
-#else
-#define FUNCNAME __PRETTY_FUNCTION__
-#endif
-
 
 device_h8bus_card_interface::device_h8bus_card_interface(const machine_config &mconfig, device_t &device) :
 	device_interface(device, "h8bus"),

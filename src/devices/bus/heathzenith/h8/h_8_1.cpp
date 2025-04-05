@@ -30,7 +30,6 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	bool m_installed;
-	u16  m_base_addr;
 
 	required_device<ram_device> m_ram;
 	required_ioport             m_jumpers;
@@ -54,7 +53,7 @@ h_8_1_device::h_8_1_device(const machine_config &mconfig, const char *tag, devic
 }
 
 h_8_1_device::h_8_1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock):
-	device_t(mconfig, H8BUS_H_8_1, tag, owner, 0),
+	device_t(mconfig, type, tag, owner, 0),
 	device_h8bus_card_interface(mconfig, *this),
 	m_ram(*this, "mem"),
 	m_jumpers(*this, "JUMPERS")
@@ -74,9 +73,9 @@ void h_8_1_device::device_reset()
 	{
 		ioport_value const jumpers(m_jumpers->read());
 
-		m_base_addr = (jumpers & 0x07) << 13;
+		u16 base_addr = (jumpers & 0x07) << 13;
 
-		h8bus().install_mem_device(m_base_addr, m_base_addr + 0x1fff,
+		h8bus().install_mem_device(base_addr, base_addr + 0x1fff,
 			read8sm_delegate(m_ram, FUNC(ram_device::read)),
 			write8sm_delegate(m_ram, FUNC(ram_device::write)));
 
@@ -119,9 +118,9 @@ void h_8_1_4k_device::device_reset()
 	{
 		ioport_value const jumpers(m_jumpers->read());
 
-		m_base_addr = (jumpers & 0x07) << 13;
+		u16 base_addr = (jumpers & 0x07) << 13;
 
-		h8bus().install_mem_device(m_base_addr, m_base_addr + 0x0fff,
+		h8bus().install_mem_device(base_addr, base_addr + 0x0fff,
 			read8sm_delegate(m_ram, FUNC(ram_device::read)),
 			write8sm_delegate(m_ram, FUNC(ram_device::write)));
 

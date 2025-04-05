@@ -132,7 +132,6 @@ class device_h8bus_card_interface : public device_interface
 {
 	friend class h8bus_device;
 public:
-	// construction/destruction
 	virtual ~device_h8bus_card_interface();
 
 	void set_slot_int0(int state);
@@ -236,7 +235,6 @@ protected:
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
-	//virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	void add_h8bus_card(device_h8bus_card_interface &card);
 	void set_int0_line(int state);
