@@ -11,6 +11,8 @@
 
 #pragma once
 
+#include "asio.h"
+
 class k056230_device : public device_t
 {
 public:
@@ -25,10 +27,11 @@ public:
 	virtual void regs_map(address_map &map) ATTR_COLD;
 
 protected:
-	k056230_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	k056230_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
 	memory_share_creator<u32> m_ram;
@@ -37,6 +40,30 @@ protected:
 	int m_irq_state = 0;
 	u8 m_ctrl_reg = 0;
 	u8 m_status = 0;
+
+private:
+	asio::io_context m_ioctx;
+	std::optional<asio::ip::tcp::endpoint> m_localaddr;
+	std::optional<asio::ip::tcp::endpoint> m_remoteaddr;
+	asio::ip::tcp::acceptor m_acceptor;
+	asio::ip::tcp::socket m_sock_rx;
+	asio::ip::tcp::socket m_sock_tx;
+	asio::steady_timer m_tx_timeout;
+	u8 m_rx_state;
+	u8 m_tx_state;
+	u8 m_buffer0[0x201]{};
+	u8 m_linkenable = 0;
+	u8 m_linkid = 0;
+	u8 m_txmode = 0;
+
+	void set_mode(u8 data);
+	void set_ctrl(u8 data);
+	void comm_tick();
+	void check_sockets();
+	void comm_start();
+	void comm_stop();
+	unsigned read_frame(unsigned data_size);
+	void send_frame(unsigned data_size);
 };
 
 class k056230_viper_device : public k056230_device

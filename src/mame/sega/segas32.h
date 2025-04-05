@@ -221,7 +221,7 @@ protected:
 
 	required_device<timer_device> m_irq_timer_0;
 	required_device<timer_device> m_irq_timer_1;
-	optional_device<s32comm_device> m_s32comm;
+	optional_device<sega_s32comm_device> m_s32comm;
 
 	required_region_ptr<uint32_t> m_sprite_region;
 	required_memory_region m_maincpu_region;
