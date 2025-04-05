@@ -2008,20 +2008,23 @@ void hyperstone_device::execute_set_input(int inputnum, int state)
 	{
 		if (state)
 		{
-			ISR |= 1 << inputnum;
-
-			if ((inputnum < 4) && !BIT(FCR, 28 + inputnum))
+			if (!BIT(ISR, inputnum))
 			{
-				if (m_core->powerdown)
-					LOG("exiting power down for INT%d\n", inputnum + 1);
-				m_core->powerdown = 0;
-			}
+				ISR |= 1 << inputnum;
 
-			if ((inputnum == 7) && ((FCR & 0x00000500) == 0x00000400))
-			{
-				if (m_core->powerdown)
-					LOG("exiting power down for IO3\n", inputnum + 1);
-				m_core->powerdown = 0;
+				if ((inputnum < 4) && !BIT(FCR, 28 + inputnum))
+				{
+					if (m_core->powerdown)
+						LOG("exiting power down for INT%d\n", inputnum + 1);
+					m_core->powerdown = 0;
+				}
+
+				if ((inputnum == 6) && ((FCR & 0x00000500) == 0x00000400))
+				{
+					if (m_core->powerdown)
+						LOG("exiting power down for IO3\n", inputnum + 1);
+					m_core->powerdown = 0;
+				}
 			}
 		}
 		else
