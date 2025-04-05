@@ -66,6 +66,8 @@ class Opcode:
         step = 0
         for i in range(0, len(self.source)):
             il = self.source[i]
+            if not has_steps:
+                il.indent = ""
             line = il.line()
             tokens = line.split()
             if tokens[0] == '+':
@@ -222,8 +224,8 @@ class OpcodeList:
         prefix = None
         print("if (m_wait_state)", file=f)
         print("{", file=f)
-        print("	m_icount = 0; // stalled", file=f)
-        print("	return;", file=f)
+        print("\tm_icount = 0; // stalled", file=f)
+        print("\treturn;", file=f)
         print("}", file=f)
         print("while (true) {", file=f)
         print("switch (u8(m_ref >> 16)) // prefix", file=f)

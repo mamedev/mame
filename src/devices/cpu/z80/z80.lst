@@ -693,7 +693,6 @@ ffff
 		debugger_wait_hook();
 		call rop
 		PC--;
-		m_ref = 0xffff00;
 		goto rop;
 	} else {
 		PRVPC = PC;
