@@ -15397,7 +15397,7 @@ more investigation needed...
 			</dataarea>
 			<dataarea name="addon" size="163840">
 				<rom name="0xf3.u3" size="131072" crc="f73d5e10" sha1="388e3721b94cd074d6ba0eca8616523d2118a6c3" offset="0x000000" />
-				<rom name="0xf4.u3" size="32768" crc="b5255459" sha1="b19c0f8f207d62fdabf4bf71442826063bccc626" offset="0x000000" />
+				<rom name="0xf4.u3" size="32768" crc="b5255459" sha1="b19c0f8f207d62fdabf4bf71442826063bccc626" offset="0x020000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
