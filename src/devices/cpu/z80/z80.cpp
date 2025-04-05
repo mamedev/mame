@@ -699,26 +699,12 @@ void z80_device::device_reset()
 	m_iff2 = 0;
 }
 
-void z80_device::do_op()
-{
-	#include "cpu/z80/z80.hxx"
-}
-
 /****************************************************************************
  * Execute 'cycles' T-states.
  ****************************************************************************/
 void z80_device::execute_run()
 {
-	if (m_wait_state)
-	{
-		m_icount = 0; // stalled
-		return;
-	}
-
-	while (m_icount > 0)
-	{
-		do_op();
-	}
+	#include "cpu/z80/z80.hxx"
 }
 
 void z80_device::execute_set_input(int inputnum, int state)

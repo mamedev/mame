@@ -121,8 +121,6 @@ protected:
 	void set_f(u8 f);
 	void block_io_interrupted_flags();
 
-	virtual void do_op();
-
 	virtual u8 data_read(u16 addr);
 	virtual void data_write(u16 addr, u8 value);
 	virtual u8 stack_read(u16 addr) { return data_read(addr); }
