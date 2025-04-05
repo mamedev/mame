@@ -41,14 +41,14 @@ class h89bus_sigmasoft_snd_device : public device_t, public device_h89bus_right_
 public:
 	h89bus_sigmasoft_snd_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	virtual u8 read(u8 select_lines, u8 reg) override;
-	virtual void write(u8 select_lines, u8 reg, u8 val) override;
-
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+
+	u8 read(offs_t reg);
+	void write(offs_t reg, u8 val);
 
 	u8 read_joystick();
 
@@ -58,6 +58,8 @@ private:
 	required_device<ay8910_device> m_ay8910;
 	required_ioport m_joystick1, m_joystick2;
 	required_ioport m_config;
+
+	bool m_installed;
 
 	u8 m_port_selection;
 };
@@ -99,13 +101,8 @@ h89bus_sigmasoft_snd_device::h89bus_sigmasoft_snd_device(const machine_config &m
 {
 }
 
-void h89bus_sigmasoft_snd_device::write(u8 select_lines, u8 reg, u8 val)
+void h89bus_sigmasoft_snd_device::write(offs_t reg, u8 val)
 {
-	if (!(select_lines & m_port_selection))
-	{
-		return;
-	}
-
 	LOGFUNC("%s: reg: %d val: %d\n", FUNCNAME, reg, val);
 
 	switch (reg)
@@ -121,13 +118,8 @@ void h89bus_sigmasoft_snd_device::write(u8 select_lines, u8 reg, u8 val)
 	}
 }
 
-u8 h89bus_sigmasoft_snd_device::read(u8 select_lines, u8 reg)
+u8 h89bus_sigmasoft_snd_device::read(offs_t reg)
 {
-	if (!(select_lines & m_port_selection))
-	{
-		return 0;
-	}
-
 	u8 value = 0x00;
 
 	switch (reg)
@@ -173,6 +165,9 @@ u8 h89bus_sigmasoft_snd_device::read_joystick()
 
 void h89bus_sigmasoft_snd_device::device_start()
 {
+	m_installed = false;
+
+	save_item(NAME(m_installed));
 }
 
 void h89bus_sigmasoft_snd_device::device_reset()
@@ -185,14 +180,29 @@ void h89bus_sigmasoft_snd_device::device_reset()
 			m_port_selection = 0;
 			break;
 		case 0x01:
-			m_port_selection = h89bus_device::H89_SER0;
+			m_port_selection = h89bus::IO_SER0;
 			break;
 		case 0x02:
-			m_port_selection = h89bus_device::H89_SER1;
+			m_port_selection = h89bus::IO_SER1;
 			break;
 		case 0x03:
-			m_port_selection = h89bus_device::H89_LP;
+			m_port_selection = h89bus::IO_LP;
 			break;
+	}
+
+	if (!m_installed)
+	{
+		std::pair<u8, u8>  addr = h89bus().get_address_range(m_port_selection);
+
+		// only install if non-zero address
+		if (addr.first)
+		{
+			h89bus().install_io_device(addr.first, addr.second,
+				read8sm_delegate(*this, FUNC(h89bus_sigmasoft_snd_device::read)),
+				write8sm_delegate(*this, FUNC(h89bus_sigmasoft_snd_device::write)));
+		}
+
+		m_installed = true;
 	}
 }
 
