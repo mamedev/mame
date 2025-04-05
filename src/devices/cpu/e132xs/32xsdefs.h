@@ -9,8 +9,6 @@
     COMPILE-TIME DEFINITIONS
 ***************************************************************************/
 
-#define ENABLE_E132XS_DRC               (1)
-
 // compilation boundaries -- how far back/forward does the analysis extend?
 enum : u32
 {
@@ -132,26 +130,18 @@ enum
 #define E132XS_ENTRY_MEM3   7
 
 /* Memory access */
-/* read byte */
-#define READ_B(addr)            m_program->read_byte((addr))
-/* read half-word */
-#define READ_HW(addr)           m_program->read_word((addr) & ~1)
-/* read word */
-#define READ_W(addr)            m_program->read_dword((addr) & ~3)
+#define READ_B(addr)            m_read_byte(addr)
+#define READ_HW(addr)           m_read_halfword(addr)
+#define READ_W(addr)            m_read_word(addr)
 
-/* write byte */
-#define WRITE_B(addr, data)     m_program->write_byte(addr, data)
-/* write half-word */
-#define WRITE_HW(addr, data)    m_program->write_word((addr) & ~1, data)
-/* write word */
-#define WRITE_W(addr, data)     m_program->write_dword((addr) & ~3, data)
+#define WRITE_B(addr, data)     m_write_byte(addr, data)
+#define WRITE_HW(addr, data)    m_write_halfword(addr, data)
+#define WRITE_W(addr, data)     m_write_word(addr, data)
 
 
 /* I/O access */
-/* read word */
-#define IO_READ_W(addr)         m_io->read_dword(((addr) >> 11) & 0x7ffc)
-/* write word */
-#define IO_WRITE_W(addr, data)  m_io->write_dword(((addr) >> 11) & 0x7ffc, data)
+#define IO_READ_W(addr)         m_read_io(addr)
+#define IO_WRITE_W(addr, data)  m_write_io(addr, data)
 
 // set C in adds/addsi/subs/sums
 #define SETCARRYS 0

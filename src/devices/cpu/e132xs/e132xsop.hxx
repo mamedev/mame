@@ -1618,12 +1618,12 @@ void hyperstone_device::hyperstone_ldxx1()
 					if (SrcGlobal)
 					{
 						set_global_register(src_code, IO_READ_W(dreg + (extra_s & ~3)));
-						set_global_register(srcf_code, IO_READ_W(dreg + (extra_s & ~3) + 4));
+						set_global_register(srcf_code, IO_READ_W(dreg + (extra_s & ~3) + (1 << 13)));
 					}
 					else
 					{
 						m_core->local_regs[src_code] = IO_READ_W(dreg + (extra_s & ~3));
-						m_core->local_regs[srcf_code] = IO_READ_W(dreg + (extra_s & ~3) + 4);
+						m_core->local_regs[srcf_code] = IO_READ_W(dreg + (extra_s & ~3) + (1 << 13));
 					}
 					m_core->icount -= m_core->clock_cycles_1; // extra cycle
 					break;
@@ -1884,7 +1884,7 @@ void hyperstone_device::hyperstone_stxx1()
 					const uint32_t sregf = ((SrcGlobal && src_code == SR_REGISTER) ? 0 : (SrcGlobal ? m_core->global_regs : m_core->local_regs)[srcf_code]);
 					extra_s &= ~3;
 					IO_WRITE_W(dreg + extra_s, sreg);
-					IO_WRITE_W(dreg + extra_s + 4, sregf);
+					IO_WRITE_W(dreg + extra_s + (1 << 13), sregf);
 					m_core->icount -= m_core->clock_cycles_1; // extra cycle
 					break;
 				}

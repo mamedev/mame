@@ -46,7 +46,6 @@
 
 class e132xs_frontend;
 
-// ======================> hyperstone_device
 
 enum
 {
@@ -117,6 +116,13 @@ public:
 	virtual ~hyperstone_device() override;
 
 protected:
+	using b_r_delegate  = delegate<uint8_t  (offs_t)>;
+	using hw_r_delegate = delegate<uint16_t (offs_t)>;
+	using w_r_delegate  = delegate<uint32_t (offs_t)>;
+	using b_w_delegate  = delegate<void (offs_t, uint8_t)>;
+	using hw_w_delegate = delegate<void (offs_t, uint16_t)>;
+	using w_w_delegate  = delegate<void (offs_t, uint32_t)>;
+
 	// exit codes
 	enum : int
 	{
@@ -229,6 +235,7 @@ protected:
 			uint32_t clock,
 			uint32_t prg_data_width,
 			uint32_t io_data_width,
+			uint32_t io_addr_bits,
 			address_map_constructor internal_map);
 
 	// device_t implementation
@@ -273,10 +280,24 @@ protected:
 	address_space *m_program;
 	memory_access<32, 1, 0, ENDIANNESS_BIG>::cache m_cache16;
 	memory_access<32, 2, 0, ENDIANNESS_BIG>::cache m_cache32;
+	memory_access<32, 1, 0, ENDIANNESS_BIG>::specific m_specific16;
+	memory_access<32, 2, 0, ENDIANNESS_BIG>::specific m_specific32;
+
+	memory_access< 6 + 3 + 2, 1, 0, ENDIANNESS_BIG>::specific m_io16;
+	memory_access<10 + 3 + 2, 2, 0, ENDIANNESS_BIG>::specific m_io32;
+
+	b_r_delegate m_read_byte;
+	hw_r_delegate m_read_halfword;
+	w_r_delegate m_read_word;
+	b_w_delegate m_write_byte;
+	hw_w_delegate m_write_halfword;
+	w_w_delegate m_write_word;
+
+	w_r_delegate m_read_io;
+	w_w_delegate m_write_io;
 
 	std::function<u16 (offs_t)> m_pr16;
 	std::function<const void * (offs_t)> m_prptr;
-	address_space *m_io;
 
 	// core state
 	internal_hyperstone_state *m_core;
@@ -452,7 +473,8 @@ private:
 	//void load_fast_iregs(drcuml_block &block);
 	//void save_fast_iregs(drcuml_block &block);
 	void static_generate_helpers(drcuml_block &block, uml::code_label &label);
-	void static_generate_memory_accessor(int size, int iswrite, bool isio, const char *name, uml::code_handle *&handleptr);
+	void static_generate_memory_accessor(drcuml_block &block, uml::code_label &label, uml::operand_size size, bool iswrite, uml::code_handle *handleptr);
+	virtual void static_generate_io_accessor(drcuml_block &block, uml::code_label &label, bool iswrite, uml::code_handle *handleptr);
 	void static_generate_exception(drcuml_block &block, uml::code_label &label);
 	void static_generate_interrupt_checks(drcuml_block &block, uml::code_label &label);
 	void generate_interrupt_checks(drcuml_block &block, uml::code_label &labelnum, bool with_timer, int take_int, int take_timer);
@@ -581,20 +603,45 @@ private:
 class hyperstone_x_device : public hyperstone_device
 {
 protected:
-	using hyperstone_device::hyperstone_device;
+	static inline constexpr int AS_INTERNAL = AS_OPCODES + 1;
+
+	hyperstone_x_device(
+			const machine_config &mconfig,
+			const device_type type,
+			const char *tag,
+			device_t *owner,
+			uint32_t clock,
+			uint32_t prg_data_width,
+			uint32_t io_data_width,
+			uint32_t io_addr_bits,
+			address_map_constructor internal_map);
 
 	virtual void device_start() override ATTR_COLD;
 
+	virtual space_config_vector memory_space_config() const override;
+
+	virtual void update_bus_control() override;
 	virtual void update_memory_control() override;
 
+	void power_down_w(uint32_t data);
+	void sleep_w(uint32_t data);
+
 	void iram_8k_map(address_map &map) ATTR_COLD;
+	void internal_io_map(address_map &map) ATTR_COLD;
+
+	virtual void static_generate_io_accessor(drcuml_block &block, uml::code_label &label, bool iswrite, uml::code_handle *handleptr) override;
+
+	const address_space_config m_internal_config;
+
+private:
+	memory_access<10 + 3 + 2, 2, 0, ENDIANNESS_BIG>::specific m_internal_specific;
 };
 
 
-class hyperstone_xs_device : public hyperstone_device
+class hyperstone_xs_device : public hyperstone_x_device
 {
 protected:
-	using hyperstone_device::hyperstone_device;
+	using hyperstone_x_device::hyperstone_x_device;
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_post_load() override ATTR_COLD;

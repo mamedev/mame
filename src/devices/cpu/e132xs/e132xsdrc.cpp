@@ -12,6 +12,30 @@
 #define MAPVAR_CYCLES   M1
 
 
+
+/*-------------------------------------------------
+    epc - compute the exception PC from a
+    descriptor
+-------------------------------------------------*/
+
+static inline uint32_t epc(const opcode_desc *desc)
+{
+	return (desc->flags & OPFLAG_IN_DELAY_SLOT) ? desc->branch->pc : desc->pc;
+}
+
+
+/*-------------------------------------------------
+    alloc_handle - allocate a handle if not
+    already allocated
+-------------------------------------------------*/
+
+static inline void alloc_handle(drcuml_state &drcuml, uml::code_handle *&handleptr, const char *name)
+{
+	if (!handleptr)
+		handleptr = drcuml.handle_alloc(name);
+}
+
+
 struct hyperstone_device::compiler_state
 {
 private:
@@ -177,24 +201,34 @@ void hyperstone_device::code_flush_cache()
 
 	try
 	{
-		{
-			// generate the entry point and out-of-cycles handlers
-			drcuml_block &block(m_drcuml->begin_block(512));
-			uml::code_label label = 1;
-			static_generate_helpers(block, label);
-			static_generate_exception(block, label);
-			block.end();
-		}
+		drcuml_block &block(m_drcuml->begin_block(640));
+		uml::code_label label = 1;
 
-		/* add subroutines for memory accesses */
-		static_generate_memory_accessor(1, false, false, "read8",     m_mem_read8);
-		static_generate_memory_accessor(1, true,  false, "write8",    m_mem_write8);
-		static_generate_memory_accessor(2, false, false, "read16",    m_mem_read16);
-		static_generate_memory_accessor(2, true,  false, "write16",   m_mem_write16);
-		static_generate_memory_accessor(4, false, false, "read32",    m_mem_read32);
-		static_generate_memory_accessor(4, true,  false, "write32",   m_mem_write32);
-		static_generate_memory_accessor(4, false, true,  "ioread32",  m_io_read32);
-		static_generate_memory_accessor(4, true,  true,  "iowrite32", m_io_write32);
+		// generate the entry point and out-of-cycles handlers
+		static_generate_helpers(block, label);
+		static_generate_exception(block, label);
+
+		// add subroutines for memory accesses
+		alloc_handle(*m_drcuml, m_mem_read8,   "read8");
+		alloc_handle(*m_drcuml, m_mem_write8,  "write8");
+		alloc_handle(*m_drcuml, m_mem_read16,  "read16");
+		alloc_handle(*m_drcuml, m_mem_write16, "write16");
+		alloc_handle(*m_drcuml, m_mem_read32,  "read32");
+		alloc_handle(*m_drcuml, m_mem_write32, "write32");
+		static_generate_memory_accessor(block, label, uml::SIZE_BYTE,  false, m_mem_read8);
+		static_generate_memory_accessor(block, label, uml::SIZE_BYTE,  true,  m_mem_write8);
+		static_generate_memory_accessor(block, label, uml::SIZE_WORD,  false, m_mem_read16);
+		static_generate_memory_accessor(block, label, uml::SIZE_WORD,  true,  m_mem_write16);
+		static_generate_memory_accessor(block, label, uml::SIZE_DWORD, false, m_mem_read32);
+		static_generate_memory_accessor(block, label, uml::SIZE_DWORD, true,  m_mem_write32);
+
+		// add subroutines for I/O accesses
+		alloc_handle(*m_drcuml, m_io_read32,  "ioread32");
+		alloc_handle(*m_drcuml, m_io_write32, "iowrite32");
+		static_generate_io_accessor(block, label, false, m_io_read32);
+		static_generate_io_accessor(block, label, true,  m_io_write32);
+
+		block.end();
 	}
 	catch (drcuml_block::abort_compilation &)
 	{
@@ -335,30 +369,6 @@ void hyperstone_device::code_compile_block(uint8_t mode, offs_t pc)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    epc - compute the exception PC from a
-    descriptor
--------------------------------------------------*/
-
-static inline uint32_t epc(const opcode_desc *desc)
-{
-	return (desc->flags & OPFLAG_IN_DELAY_SLOT) ? (desc->pc - 3) : desc->pc;
-}
-
-
-/*-------------------------------------------------
-    alloc_handle - allocate a handle if not
-    already allocated
--------------------------------------------------*/
-
-static inline void alloc_handle(drcuml_state &drcuml, uml::code_handle *&handleptr, const char *name)
-{
-	if (!handleptr)
-		handleptr = drcuml.handle_alloc(name);
-}
-
-
-
-/*-------------------------------------------------
     static_generate_exception - generate an
     exception handler
 -------------------------------------------------*/
@@ -477,45 +487,78 @@ void hyperstone_device::static_generate_helpers(drcuml_block &block, uml::code_l
     static_generate_memory_accessor
 ------------------------------------------------------------------*/
 
-void hyperstone_device::static_generate_memory_accessor(int size, int iswrite, bool isio, const char *name, uml::code_handle *&handleptr)
+void hyperstone_device::static_generate_memory_accessor(drcuml_block &block, uml::code_label &label, uml::operand_size size, bool iswrite, uml::code_handle *handleptr)
 {
 	// on entry, address is in I0; data for writes is in I1
 	// on exit, read result is in I1
 
-	/* begin generating */
-	drcuml_block &block(m_drcuml->begin_block(1024));
-
 	/* add a global entry for this */
-	alloc_handle(*m_drcuml, handleptr, name);
 	UML_HANDLE(block, *handleptr);
 
 	// write:
-	switch (size)
-	{
-		case 1:
-			if (iswrite)
-				UML_WRITE(block, I0, I1, SIZE_BYTE, SPACE_PROGRAM);
-			else
-				UML_READ(block, I1, I0, SIZE_BYTE, SPACE_PROGRAM);
-			break;
-
-		case 2:
-			if (iswrite)
-				UML_WRITE(block, I0, I1, SIZE_WORD, SPACE_PROGRAM);
-			else
-				UML_READ(block, I1, I0, SIZE_WORD, SPACE_PROGRAM);
-			break;
-
-		case 4:
-			if (iswrite)
-				UML_WRITE(block, I0, I1, SIZE_DWORD, isio ? SPACE_IO : SPACE_PROGRAM);
-			else
-				UML_READ(block, I1, I0, SIZE_DWORD, isio ? SPACE_IO : SPACE_PROGRAM);
-			break;
-	}
+	if (iswrite)
+		UML_WRITE(block, I0, I1, size, SPACE_PROGRAM);
+	else
+		UML_READ(block, I1, I0, size, SPACE_PROGRAM);
 	UML_RET(block);
+}
 
-	block.end();
+
+/*------------------------------------------------------------------
+    static_generate_io_accessor
+------------------------------------------------------------------*/
+
+void hyperstone_device::static_generate_io_accessor(drcuml_block &block, uml::code_label &label, bool iswrite, uml::code_handle *handleptr)
+{
+	// on entry, address is in I0; data for writes is in I1
+	// on exit, read result is in I1
+	// clobbers I4
+
+	/* add a global entry for this */
+	UML_HANDLE(block, *handleptr);
+
+	// write:
+	const uml::operand_size size = (space(AS_IO).data_width() == 16) ? uml::SIZE_WORD : uml::SIZE_DWORD;
+	UML_ROLAND(block, I4, I0, 21, 0x7ffc);
+	if (iswrite)
+		UML_WRITE(block, I4, I1, size, SPACE_IO);
+	else
+		UML_READ(block, I1, I4, size, SPACE_IO);
+	UML_RET(block);
+}
+
+void hyperstone_x_device::static_generate_io_accessor(drcuml_block &block, uml::code_label &label, bool iswrite, uml::code_handle *handleptr)
+{
+	// on entry, address is in I0; data for writes is in I1
+	// on exit, read result is in I1
+	// clobbers I4
+
+	/* add a global entry for this */
+	UML_HANDLE(block, *handleptr);
+
+	// write:
+	const uml::operand_size size = (space(AS_IO).data_width() == 16) ? uml::SIZE_WORD : uml::SIZE_DWORD;
+	const int internal = label++;
+	const int done = label++;
+
+	UML_ROLAND(block, I4, I0, 21, 0x7ffc);
+	UML_TEST(block, I0, 1 << 27);
+	UML_JMPc(block, uml::COND_NZ, internal);
+
+	if (iswrite)
+		UML_WRITE(block, I4, I1, size, SPACE_IO);
+	else
+		UML_READ(block, I1, I4, size, SPACE_IO);
+	UML_JMP(block, done);
+
+	UML_LABEL(block, internal);
+	if (iswrite)
+		UML_WRITE(block, I4, I1, SIZE_DWORD, uml::memory_space(AS_INTERNAL));
+	else
+		UML_READ(block, I1, I4, SIZE_DWORD, uml::memory_space(AS_INTERNAL));
+
+	UML_LABEL(block, done);
+	UML_RET(block);
 }
 
 

@@ -2808,7 +2808,6 @@ void hyperstone_device::generate_ldxx1(drcuml_block &block, compiler_state &comp
 
 				case 2: // LDW.IOD/A
 					UML_MOV(block, I7, mem(&m_core->clock_cycles_1));
-					UML_ROLAND(block, I0, I0, 21, 0x7ffc);
 					UML_CALLH(block, *m_io_read32);
 
 					if (SrcGlobal)
@@ -2830,11 +2829,10 @@ void hyperstone_device::generate_ldxx1(drcuml_block &block, compiler_state &comp
 
 				case 3: // LDD.IOD/A
 					UML_MOV(block, I7, mem(&m_core->clock_cycles_2));
-					UML_ROLAND(block, I0, I0, 21, 0x7ffc);
 					UML_CALLH(block, *m_io_read32);
 					generate_set_register(block, compiler, desc, SrcGlobal, src_code, uml::I1, uml::I2, true);
 
-					UML_ADD(block, I0, I0, 4);
+					UML_ADD(block, I0, I0, 1 << 13);
 					UML_CALLH(block, *m_io_read32);
 					generate_set_register(block, compiler, desc, SrcGlobal, srcf_code, uml::I1, uml::I3, true);
 
@@ -3090,12 +3088,10 @@ void hyperstone_device::generate_stxx1(drcuml_block &block, compiler_state &comp
 					break;
 				case 2: // STW.IOD/A
 					UML_MOV(block, I7, mem(&m_core->clock_cycles_1));
-					UML_ROLAND(block, I0, I0, 21, 0x7ffc);
 					UML_CALLH(block, *m_io_write32);
 					break;
 				case 3: // STD.IOD/A
 					UML_MOV(block, I7, mem(&m_core->clock_cycles_2));
-					UML_ROLAND(block, I0, I0, 21, 0x7ffc);
 					UML_CALLH(block, *m_io_write32);
 
 					if (SrcGlobal)
@@ -3112,7 +3108,7 @@ void hyperstone_device::generate_stxx1(drcuml_block &block, compiler_state &comp
 						UML_LOAD(block, I1, (void *)m_core->local_regs, I3, SIZE_DWORD, SCALE_x4);
 					}
 
-					UML_ADD(block, I0, I0, 4);
+					UML_ADD(block, I0, I0, 1 << 13);
 					UML_CALLH(block, *m_io_write32);
 					break;
 			}

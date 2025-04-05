@@ -81,10 +81,12 @@ Notes:
 *********************************************************************/
 
 #include "emu.h"
+
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/e132xs/e132xs.h"
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -149,8 +151,8 @@ private:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	// peripheral handlers
-	template<int Chip> void oki_bank_w(offs_t offset, u16 data);
-	void misc_w(offs_t offset, u16 data);
+	template <int Chip> void oki_bank_w(u16 data);
+	void misc_w(u16 data);
 	void pasha2_lamps_w(u16 data);
 
 	// speedup functions
@@ -163,24 +165,22 @@ private:
 };
 
 
-void pasha2_state::misc_w(offs_t offset, u16 data)
+void pasha2_state::misc_w(u16 data)
 {
-	if (offset)
+	if (data & 0x0800)
 	{
-		if (data & 0x0800)
-		{
-			const u16 bank = data & 0xf000;
+		const u16 bank = data & 0xf000;
 
-			switch (bank)
-			{
-				case 0x8000:
-				case 0x9000:
-				case 0xa000:
-				case 0xb000:
-				case 0xc000:
-				case 0xd000:
-					m_mainbank->set_entry((bank>>12) & 7); break;
-			}
+		switch (bank)
+		{
+			case 0x8000:
+			case 0x9000:
+			case 0xa000:
+			case 0xb000:
+			case 0xc000:
+			case 0xd000:
+				m_mainbank->set_entry((bank >> 12) & 7);
+				break;
 		}
 	}
 }
@@ -209,11 +209,10 @@ void pasha2_state::fg_bitmap_w(offs_t offset, u8 data)
 	m_fg_bitmap[m_vbuffer].pix(offset >> 9, offset & 0x1ff) = data & 0xff;
 }
 
-template<int Chip>
-void pasha2_state::oki_bank_w(offs_t offset, u16 data)
+template <int Chip>
+void pasha2_state::oki_bank_w(u16 data)
 {
-	if (offset)
-		m_oki[Chip]->set_rom_bank(data & 1);
+	m_oki[Chip]->set_rom_bank(data & 1);
 }
 
 void pasha2_state::pasha2_lamps_w(u16 data)
@@ -250,18 +249,18 @@ void pasha2_state::pasha2_map(address_map &map)
 
 void pasha2_state::pasha2_io(address_map &map)
 {
-	map(0x08, 0x0b).nopr(); //sound status?
-	map(0x18, 0x1b).nopr(); //sound status?
-	map(0x20, 0x23).w(FUNC(pasha2_state::pasha2_lamps_w));
-	map(0x40, 0x43).portr("COINS");
-	map(0x60, 0x63).portr("DSW");
-	map(0x80, 0x83).portr("INPUTS");
-	map(0xa0, 0xa3).nopw(); //soundlatch?
-	map(0xc0, 0xc3).w(FUNC(pasha2_state::misc_w));
-	map(0xe3, 0xe3).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xe7, 0xe7).rw(m_oki[1], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xe8, 0xeb).w(FUNC(pasha2_state::oki_bank_w<0>));
-	map(0xec, 0xef).w(FUNC(pasha2_state::oki_bank_w<1>));
+	map(0x08, 0x09).nopr(); //sound status?
+	map(0x18, 0x19).nopr(); //sound status?
+	map(0x20, 0x21).w(FUNC(pasha2_state::pasha2_lamps_w));
+	map(0x40, 0x41).portr("COINS");
+	map(0x60, 0x61).portr("DSW");
+	map(0x80, 0x81).portr("INPUTS");
+	map(0xa0, 0xa1).nopw(); //soundlatch?
+	map(0xc0, 0xc1).w(FUNC(pasha2_state::misc_w));
+	map(0xe1, 0xe1).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xe5, 0xe5).rw(m_oki[1], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xe8, 0xe9).w(FUNC(pasha2_state::oki_bank_w<0>));
+	map(0xec, 0xed).w(FUNC(pasha2_state::oki_bank_w<1>));
 }
 
 void pasha2_state::zdrum_audio_map(address_map &map)
@@ -525,8 +524,6 @@ void pasha2_state::zdrum(machine_config &config)
 {
 	pasha2(config);
 
-	m_maincpu->set_force_no_drc(true); // gets a bit further
-
 	e116x_device &audiocpu(E116X(config.replace(), "audiocpu", 45_MHz_XTAL)); // type unknown, but it does look like Hyperstone code
 	audiocpu.set_addrmap(AS_PROGRAM, &pasha2_state::zdrum_audio_map);
 
@@ -586,7 +583,7 @@ ROM_END
 
 u16 pasha2_state::pasha2_speedup_r(offs_t offset)
 {
-	if(m_maincpu->pc() == 0x8302)
+	if (m_maincpu->pc() == 0x8302)
 		m_maincpu->spin_until_interrupt();
 
 	return m_wram[(0x95744 / 2) + offset];

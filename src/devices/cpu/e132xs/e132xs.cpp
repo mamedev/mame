@@ -29,11 +29,13 @@
 
  E1-X changes:
  * Adds PLL with up to 4* multiplication
+ * Adds CLKOUT signal configuration
  * Increases IRAM to 8 KiB
+ * Changes DRAM refresh interval configuration to prescaler units
  * Adds MEM0 EDO DRAM support
- * Adds MEM0/MEM1/MEM2/MEM3 parity support
  * Adds MEM0/MEM1/MEM2 byte write strobe/byte enable selection
- * Adds MEM2 wait support
+ * Adds MEM2 and I/O wait support
+ * Changes memory timing options
  * Changes to bus hold break always enabled for DRAM
  * Moves power down from MCR to an I/O address
 
@@ -46,9 +48,9 @@
  * Removes bus output voltage and input threshold selection
 
  E-1XS changes:
- * Changes DRAM timing options
+ * Changes SDRAM timing options
  * Adds more DRAM clock configuration options
- * Removes MEM0/MEM1/MEM2 byte write strobe/byte enable selection
+ * Removes MEM0/MEM1/MEM2 byte enable support
 
  The Hynix models are generally similar to the Hyperstone models
  based on the same core with minor differences:
@@ -63,7 +65,7 @@
  Incompatibilities include:
  * Power supply and bus voltages changed
  * Additional memory types and features are supported on later models
- * Only the E1-X and E1-XS support memory byte write strobe signals
+ * Only the E1-X and E1-XS support memory byte enable signals
  * The E1-XSR changes the available DRAM timing options
  * PLL control bits added to the TPR register
  * The BCR, MCR and SDCR register formats change in incompatible ways
@@ -93,11 +95,14 @@
 
 #include "32xsdefs.h"
 
+#include <algorithm>
+
 //#define VERBOSE 1
 #include "logmacro.h"
 
-/* size of the execution code cache */
-#define CACHE_SIZE                      (32 * 1024 * 1024)
+
+// size of the execution code cache
+constexpr size_t CACHE_SIZE = 32 * 1024 * 1024;
 
 //**************************************************************************
 //  INTERNAL ADDRESS MAP
@@ -127,6 +132,15 @@ void hyperstone_xs_device::iram_16k_map(address_map &map)
 }
 
 
+// Internal I/O
+
+void hyperstone_x_device::internal_io_map(address_map &map)
+{
+	map(0x7000, 0x77ff).w(FUNC(hyperstone_x_device::power_down_w));
+	map(0x7800, 0x7fff).w(FUNC(hyperstone_x_device::sleep_w));
+}
+
+
 //-------------------------------------------------
 //  hyperstone_device - constructor
 //-------------------------------------------------
@@ -139,10 +153,11 @@ hyperstone_device::hyperstone_device(
 		uint32_t clock,
 		uint32_t prg_data_width,
 		uint32_t io_data_width,
+		uint32_t io_addr_bits,
 		address_map_constructor internal_map)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, prg_data_width, 32, 0, internal_map)
-	, m_io_config("io", ENDIANNESS_BIG, io_data_width, 15)
+	, m_io_config("io", ENDIANNESS_BIG, io_data_width, io_addr_bits)
 	, m_cache(CACHE_SIZE + sizeof(hyperstone_device))
 	, m_drcuml(nullptr)
 	, m_drcfe(nullptr)
@@ -174,13 +189,33 @@ hyperstone_device::~hyperstone_device()
 
 
 //-------------------------------------------------
+//  hyperstone_x_device - constructor
+//-------------------------------------------------
+
+hyperstone_x_device::hyperstone_x_device(
+		const machine_config &mconfig,
+		const device_type type,
+		const char *tag,
+		device_t *owner,
+		uint32_t clock,
+		uint32_t prg_data_width,
+		uint32_t io_data_width,
+		uint32_t io_addr_bits,
+		address_map_constructor internal_map)
+	: hyperstone_device(mconfig, type, tag, owner, clock, prg_data_width, io_data_width, io_addr_bits, internal_map)
+	, m_internal_config("internal", ENDIANNESS_BIG, 32, 10 + 3 + 2, 0, address_map_constructor(FUNC(hyperstone_x_device::internal_io_map), this))
+{
+}
+
+
+//-------------------------------------------------
 //  e116_device - constructor
 //-------------------------------------------------
 
 e116_device::e116_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hyperstone_device(
 			mconfig, E116, tag, owner, clock,
-			16, 16, address_map_constructor(FUNC(e116_device::iram_4k_map), this))
+			16, 16, 6 + 3 + 2, address_map_constructor(FUNC(e116_device::iram_4k_map), this))
 {
 }
 
@@ -192,7 +227,7 @@ e116_device::e116_device(const machine_config &mconfig, const char *tag, device_
 e116x_device::e116x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hyperstone_x_device(
 			mconfig, E116X, tag, owner, clock,
-			16, 16, address_map_constructor(FUNC(e116x_device::iram_8k_map), this))
+			16, 16, 6 + 3 + 2, address_map_constructor(FUNC(e116x_device::iram_8k_map), this))
 {
 }
 
@@ -204,7 +239,7 @@ e116x_device::e116x_device(const machine_config &mconfig, const char *tag, devic
 e116xs_device::e116xs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hyperstone_xs_device(
 			mconfig, E116XS, tag, owner, clock,
-			16, 16, address_map_constructor(FUNC(e116xs_device::iram_16k_map), this))
+			16, 16, 6 + 3 + 2, address_map_constructor(FUNC(e116xs_device::iram_16k_map), this))
 {
 }
 
@@ -216,7 +251,7 @@ e116xs_device::e116xs_device(const machine_config &mconfig, const char *tag, dev
 e116xsr_device::e116xsr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hyperstone_xsr_device(
 			mconfig, E116XSR, tag, owner, clock,
-			16, 16, address_map_constructor(FUNC(e116xsr_device::iram_16k_map), this))
+			16, 16, 6 + 3 + 2, address_map_constructor(FUNC(e116xsr_device::iram_16k_map), this))
 {
 }
 
@@ -228,7 +263,7 @@ e116xsr_device::e116xsr_device(const machine_config &mconfig, const char *tag, d
 e132_device::e132_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hyperstone_device(
 			mconfig, E132, tag, owner, clock,
-			32, 32, address_map_constructor(FUNC(e132_device::iram_4k_map), this))
+			32, 32, 10 + 3 + 2, address_map_constructor(FUNC(e132_device::iram_4k_map), this))
 {
 }
 
@@ -240,7 +275,7 @@ e132_device::e132_device(const machine_config &mconfig, const char *tag, device_
 e132x_device::e132x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hyperstone_x_device(
 			mconfig, E132X, tag, owner, clock,
-			32, 32, address_map_constructor(FUNC(e132x_device::iram_8k_map), this))
+			32, 32, 10 + 3 + 2, address_map_constructor(FUNC(e132x_device::iram_8k_map), this))
 {
 }
 
@@ -252,7 +287,7 @@ e132x_device::e132x_device(const machine_config &mconfig, const char *tag, devic
 e132xs_device::e132xs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hyperstone_xs_device(
 			mconfig, E132XS, tag, owner, clock,
-			32, 32, address_map_constructor(FUNC(e132xs_device::iram_16k_map), this))
+			32, 32, 10 + 3 + 2, address_map_constructor(FUNC(e132xs_device::iram_16k_map), this))
 {
 }
 
@@ -264,7 +299,7 @@ e132xs_device::e132xs_device(const machine_config &mconfig, const char *tag, dev
 e132xsr_device::e132xsr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hyperstone_xsr_device(
 			mconfig, E132XSR, tag, owner, clock,
-			32, 32, address_map_constructor(FUNC(e132xsr_device::iram_16k_map), this))
+			32, 32, 10 + 3 + 2, address_map_constructor(FUNC(e132xsr_device::iram_16k_map), this))
 {
 }
 
@@ -276,7 +311,7 @@ e132xsr_device::e132xsr_device(const machine_config &mconfig, const char *tag, d
 gms30c2116_device::gms30c2116_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hyperstone_device(
 			mconfig, GMS30C2116, tag, owner, clock,
-			16, 16, address_map_constructor(FUNC(gms30c2116_device::iram_4k_map), this))
+			16, 16, 6 + 3 + 2, address_map_constructor(FUNC(gms30c2116_device::iram_4k_map), this))
 {
 }
 
@@ -288,7 +323,7 @@ gms30c2116_device::gms30c2116_device(const machine_config &mconfig, const char *
 gms30c2132_device::gms30c2132_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hyperstone_device(
 			mconfig, GMS30C2132, tag, owner, clock,
-			32, 32, address_map_constructor(FUNC(gms30c2132_device::iram_4k_map), this))
+			32, 32, 10 + 3 + 2, address_map_constructor(FUNC(gms30c2132_device::iram_4k_map), this))
 {
 }
 
@@ -300,7 +335,7 @@ gms30c2132_device::gms30c2132_device(const machine_config &mconfig, const char *
 gms30c2216_device::gms30c2216_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hyperstone_x_device(
 			mconfig, GMS30C2216, tag, owner, clock,
-			16, 16, address_map_constructor(FUNC(gms30c2216_device::iram_8k_map), this))
+			16, 16, 6 + 3 + 2, address_map_constructor(FUNC(gms30c2216_device::iram_8k_map), this))
 {
 }
 
@@ -312,7 +347,7 @@ gms30c2216_device::gms30c2216_device(const machine_config &mconfig, const char *
 gms30c2232_device::gms30c2232_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hyperstone_x_device(
 			mconfig, GMS30C2232, tag, owner, clock,
-			32, 32, address_map_constructor(FUNC(gms30c2232_device::iram_8k_map), this))
+			32, 32, 10 + 3 + 2, address_map_constructor(FUNC(gms30c2232_device::iram_8k_map), this))
 {
 }
 
@@ -439,13 +474,75 @@ void hyperstone_device::update_bus_control()
 {
 	const uint32_t val = m_core->global_regs[BCR_REGISTER];
 
+	const unsigned mem2hold     = BIT(val,  0, 2);
+	const unsigned mem3hold     = bitswap<3>(val, 23, 3, 2);
+	// 4..6 page size code
+	// 7 reserved, must be 1
+	const unsigned rastocas     = BIT(val,  8, 2) + 1; // for MEM0 DRAM
+	const unsigned rasprecharge = BIT(val, 10, 2) + 1; // for MEM0 DRAM
+	const unsigned mem0hold     = BIT(val, 10, 2);     // for MEM0 non-DRAM
+	// 12..13 refresh select
+	const unsigned mem2setup    = BIT(val, 14);
+	const unsigned mem1hold     = BIT(val, 15);
+	const unsigned mem0access   = BIT(val, 16, 2) + 1;
+	const unsigned mem1access   = BIT(val, 18, 2) + 1;
+	const unsigned mem2access   = BIT(val, 20, 3) + 1;
+	// 23 MEM3 hold (2)
+	const unsigned mem3access   = BIT(val, 24, 4) + 1;
+
 	LOG("%s: Set BCR = 0x%08x\n", machine().describe_context(), val);
 	if (BIT(m_core->global_regs[MCR_REGISTER], 21))
 	{
-		LOG("MEM0 access time %d cycles, hold time %d cycles, setup time %d cycles\n",
-				BIT(val, 16, 4) + 1,
-				BIT(val, 11, 3),
-				BIT(val, 14, 2));
+		LOG("MEM0 parity %s, access time %d cycle(s), hold time %d cycle(s)\n",
+				BIT(val, 28) ? "disabled" : "enabled", mem0access, mem0hold);
+	}
+	else
+	{
+		char const *const refresh[4] = {
+				"every 512 cycles",
+				"every 256 cycles",
+				"every 128 cycles",
+				"disabled" };
+		char const *const page[8] = { "64K", "32K", "16K", "8K", "4K", "2K", "1K", "512" };
+		LOG("MEM0 parity %s, RAS precharge time %d cycle(s), RAS to CAS delay time %d cycle(s), CAS access time %d cycle(s), %s byte rows, refresh %s\n",
+				BIT(val, 28) ? "disabled" : "enabled",
+				rasprecharge, rastocas, mem0access, page[BIT(val, 4, 3)], refresh[BIT(val, 12, 2)]);
+	}
+	LOG("MEM1 parity %s, access time %d cycle(s), hold time %d cycle(s)\n",
+			BIT(val, 29) ? "disabled" : "enabled", mem1access, mem1hold);
+	LOG("MEM2 parity %s, access time %d cycle(s), hold time %d cycle(s), setup time %d cycle(s)\n",
+			BIT(val, 30) ? "disabled" : "enabled", mem2access, mem2hold, mem2setup);
+	LOG("MEM3 parity %s, access time %d cycle(s), hold time %d cycle(s)\n",
+			BIT(val, 31) ? "disabled" : "enabled",
+			mem3access, mem3hold);
+}
+
+void hyperstone_x_device::update_bus_control()
+{
+	const uint32_t val = m_core->global_regs[BCR_REGISTER];
+
+	const unsigned mem2hold     = BIT(val,  0, 3);
+	const unsigned mem2setup    = BIT(val,  3);
+	// 4..6 page size code
+	const unsigned mem3setup    = BIT(val,  7);
+	const unsigned mem3hold     = BIT(val,  8, 3);
+	// 11..13 refresh select
+	const unsigned rastocas     = BIT(val, 14, 2) + 1; // for MEM0 DRAM
+	const unsigned casaccess    = BIT(val, 16, 2) + 1 + (BIT(m_core->global_regs[MCR_REGISTER], 8) * 2);
+	const unsigned rasprecharge = BIT(val, 18, 2) + 1 + (BIT(m_core->global_regs[MCR_REGISTER], 8) * 2);
+	const unsigned mem0hold     = BIT(val, 11, 3);     // for MEM0 non-DRAM
+	const unsigned mem0setup    = BIT(val, 14, 2);     // for MEM0 non-DRAM
+	const unsigned mem0access   = BIT(val, 16, 4) + 1; // for MEM0 non-DRAM
+	const unsigned mem1access   = BIT(val, 20, 3) + 1;
+	const unsigned mem1hold     = BIT(val, 23) + BIT(val, 22);
+	const unsigned mem2access   = BIT(val, 24, 4) + 1;
+	const unsigned mem3access   = BIT(val, 28, 4) + 1;
+
+	LOG("%s: Set BCR = 0x%08x\n", machine().describe_context(), val);
+	if (BIT(m_core->global_regs[MCR_REGISTER], 21))
+	{
+		LOG("MEM0 access time %d cycle(s), hold time %d cycle(s), setup time %d cycle(s)\n",
+				mem0access, mem0hold, mem0setup);
 	}
 	else
 	{
@@ -459,37 +556,39 @@ void hyperstone_device::update_bus_control()
 				"every 4 prescaler time units",
 				"disabled" };
 		char const *const page[8] = { "64K", "32K", "16K", "8K", "4K", "2K", "1K", "512" };
-		LOG("MEM0 RAS precharge time %d cycles, RAS to CAS delay time %d cycles, CAS access time %d cycles, %s byte rows, refresh %s\n",
-				BIT(val, 18, 2) + 1 + (BIT(m_core->global_regs[MCR_REGISTER], 8) * 2),
-				BIT(val, 14, 2) + 1,
-				BIT(val, 16, 2) + 1 + (BIT(m_core->global_regs[MCR_REGISTER], 8) * 2),
-				page[BIT(val, 4, 3)],
-				refresh[BIT(val, 11, 3)]);
+		LOG("MEM0 RAS precharge time %d cycle(s), RAS to CAS delay time %d cycle(s), CAS access time %d cycle(s), %s byte rows, refresh %s\n",
+				rasprecharge, rastocas, casaccess, page[BIT(val, 4, 3)], refresh[BIT(val, 11, 3)]);
 	}
-	LOG("MEM1 access time %d cycles, hold time %d cycles\n",
-			BIT(val, 20, 3) + 1,
-			BIT(val, 22) + BIT(val, 23));
-	LOG("MEM2 access time %d cycles, hold time %d cycles, setup time %d cycles\n",
-			BIT(val, 24, 4) + 1,
-			BIT(val, 0, 3),
-			BIT(val, 3));
-	LOG("MEM3 access time %d cycles, hold time %d cycles, setup time %d cycles\n",
-			BIT(val, 28, 4) + 1,
-			BIT(val, 8, 3),
-			BIT(val, 7));
+	LOG("MEM1 access time %d cycle(s), hold time %d cycle(s)\n",
+			mem1access, mem1hold);
+	LOG("MEM2 access time %d cycle(s), hold time %d cycle(s), setup time %d cycle(s)\n",
+			mem2access, mem2hold, mem2setup);
+	LOG("MEM3 access time %d cycle(s), hold time %d cycle(s), setup time %d cycle(s)\n",
+			mem3access, mem3hold, mem3setup);
 }
 
 void hyperstone_xsr_device::update_bus_control()
 {
 	const uint32_t val = m_core->global_regs[BCR_REGISTER];
 
+	const unsigned mem2hold     = BIT(val,  0, 3);
+	const unsigned mem2setup    = BIT(val,  3);
+	// 4..6 page size code
+	const unsigned mem3setup    = BIT(val,  7);
+	const unsigned mem3hold     = BIT(val,  8, 3);
+	const unsigned mem0hold     = BIT(val, 11, 3);     // for MEM0 non-DRAM
+	const unsigned mem0setup    = BIT(val, 14, 2);     // for MEM0 non-DRAM
+	const unsigned mem0access   = BIT(val, 16, 4) + 1; // for MEM0 non-DRAM
+	const unsigned mem1access   = BIT(val, 20, 3) + 1;
+	const unsigned mem1hold     = BIT(val, 23) + BIT(val, 22);
+	const unsigned mem2access   = BIT(val, 24, 4) + 1;
+	const unsigned mem3access   = BIT(val, 28, 4) + 1;
+
 	LOG("%s: Set BCR = 0x%08x\n", machine().describe_context(), val);
 	if (BIT(m_core->global_regs[MCR_REGISTER], 21))
 	{
-		LOG("MEM0 access time %d cycles, hold time %d cycles, setup time %d cycles\n",
-				BIT(val, 16, 4) + 1,
-				BIT(val, 11, 3),
-				BIT(val, 14, 2));
+		LOG("MEM0 access time %d cycle(s), hold time %d cycle(s), setup time %d cycle(s)\n",
+				mem0access, mem0hold, mem0setup);
 	}
 	else
 	{
@@ -503,37 +602,28 @@ void hyperstone_xsr_device::update_bus_control()
 				"every 4 prescaler time units",
 				"disabled" };
 		char const *const page[8] = { "64K", "32K", "16K", "8K", "4K", "2K", "1K", "512" };
-		unsigned ras_precharge, cas_access, ras_to_cas;
+		unsigned rastocas, casaccess, rasprecharge;
 		if (BIT(m_core->global_regs[MCR_REGISTER], 22))
 		{
-			ras_precharge = BIT(val, 18, 2) + 1 + (BIT(m_core->global_regs[MCR_REGISTER], 8) * 2);
-			cas_access = BIT(val, 16, 2) + 1 + (BIT(m_core->global_regs[MCR_REGISTER], 8) * 2);
-			ras_to_cas = BIT(val, 14, 2) + 1;
+			rastocas     = BIT(val, 14, 2) + 1;
+			casaccess    = BIT(val, 16, 2) + 1 + (BIT(m_core->global_regs[MCR_REGISTER], 8) * 2);
+			rasprecharge = BIT(val, 18, 2) + 1 + (BIT(m_core->global_regs[MCR_REGISTER], 8) * 2);
 		}
 		else
 		{
-			ras_precharge = (BIT(val, 18, 2) + 1) << BIT(m_core->global_regs[MCR_REGISTER], 8);
-			cas_access = (BIT(val, 16, 2) + 1) << BIT(m_core->global_regs[MCR_REGISTER], 8);
-			ras_to_cas = (BIT(val, 14, 2) + 1) << BIT(m_core->global_regs[MCR_REGISTER], 8);
+			rastocas     = (BIT(val, 14, 2) + 1) << BIT(m_core->global_regs[MCR_REGISTER], 8);
+			casaccess    = (BIT(val, 16, 2) + 1) << BIT(m_core->global_regs[MCR_REGISTER], 8);
+			rasprecharge = (BIT(val, 18, 2) + 1) << BIT(m_core->global_regs[MCR_REGISTER], 8);
 		}
-		LOG("MEM0 RAS precharge time %d cycles, RAS to CAS delay time %d cycles, CAS access time %d cycles, %s byte rows, refresh %s\n",
-				ras_precharge,
-				ras_to_cas,
-				cas_access,
-				page[BIT(val, 4, 3)],
-				refresh[BIT(val, 11, 3)]);
+		LOG("MEM0 RAS precharge time %d cycle(s), RAS to CAS delay time %d cycle(s), CAS access time %d cycle(s), %s byte rows, refresh %s\n",
+				rasprecharge, rastocas, casaccess, page[BIT(val, 4, 3)], refresh[BIT(val, 11, 3)]);
 	}
-	LOG("MEM1 access time %d cycles, hold time %d cycles\n",
-			BIT(val, 20, 3) + 1,
-			BIT(val, 22) + BIT(val, 23));
-	LOG("MEM2 access time %d cycles, hold time %d cycles, setup time %d cycles\n",
-			BIT(val, 24, 4) + 1,
-			BIT(val, 0, 3),
-			BIT(val, 3));
-	LOG("MEM3 access time %d cycles, hold time %d cycles, setup time %d cycles\n",
-			BIT(val, 28, 4) + 1,
-			BIT(val, 8, 3),
-			BIT(val, 7));
+	LOG("MEM1 access time %d cycle(s), hold time %d cycle(s)\n",
+			mem1access, mem1hold);
+	LOG("MEM2 access time %d cycle(s), hold time %d cycle(s), setup time %d cycle(s)\n",
+			mem2access, mem2hold, mem2setup);
+	LOG("MEM3 access time %d cycle(s), hold time %d cycle(s), setup time %d cycle(s)\n",
+			mem3access, mem3hold, mem3setup);
 }
 
 void hyperstone_device::update_memory_control()
@@ -550,13 +640,13 @@ void hyperstone_device::update_memory_control()
 
 	static char const *const size[4] = { "32 bit", "reserved", "16 bit", "8 bit" };
 	char const *const refresh[8] = {
-			"every 128 prescaler time units",
-			"every 64 prescaler time units",
-			"every 32 prescaler time units",
-			"every 16 prescaler time units",
-			"every 8 prescaler time units",
-			"every 4 prescaler time units",
-			"every 2 prescaler time units",
+			"every 128 cycles",
+			"every 64 cycles",
+			"every 32 cycles",
+			"every 16 cycles",
+			"every 8 cycles",
+			"every 4 cycles",
+			"every 2 cycles",
 			"disabled" };
 	LOG("IRAM %s mode, refresh %s\n",
 			BIT(val, 20) ? "normal" : "test",         // IRAM refresh test
@@ -771,11 +861,26 @@ void hyperstone_xsr_device::update_memory_control()
 	m_core->trap_entry = s_trap_entries[which];
 }
 
+
+void hyperstone_x_device::power_down_w(uint32_t data)
+{
+	// actually has latency of a few clock cycles
+	LOG("%s: entering power down\n", machine().describe_context());
+	m_core->powerdown = 1;
+}
+
+void hyperstone_x_device::sleep_w(uint32_t data)
+{
+	logerror("%s: unimplemented sleep mode\n", machine().describe_context());
+}
+
+
 void hyperstone_xs_device::sdram_mode_w(offs_t offset, uint32_t data)
 {
 	// writes to mode register of the connected SDRAM
 	LOG("%s: set SDRAM mode = 0x%07x\n", machine().describe_context(), offset);
 }
+
 
 void hyperstone_xs_device::sdram_control_w(offs_t offset, uint32_t data)
 {
@@ -1356,16 +1461,13 @@ void hyperstone_device::check_interrupts()
 	}
 }
 
+
 void hyperstone_device::device_start()
 {
 	m_core = (internal_hyperstone_state *)m_cache.alloc_near(sizeof(internal_hyperstone_state));
 	memset(m_core, 0, sizeof(internal_hyperstone_state));
 
-#if ENABLE_E132XS_DRC
 	m_enable_drc = allow_drc();
-#else
-	m_enable_drc = false;
-#endif
 
 #if E132XS_LOG_DRC_REGS || E132XS_LOG_INTERPRETER_REGS
 	if (m_enable_drc)
@@ -1375,8 +1477,8 @@ void hyperstone_device::device_start()
 #endif
 
 	memset(m_op_counts, 0, sizeof(uint32_t) * 256);
-	memset(m_core->global_regs, 0, sizeof(uint32_t) * 32);
-	memset(m_core->local_regs, 0, sizeof(uint32_t) * 64);
+	std::fill(std::begin(m_core->global_regs), std::end(m_core->global_regs), 0);
+	std::fill(std::begin(m_core->local_regs), std::end(m_core->local_regs), 0);
 	m_core->intblock = 0;
 	m_core->powerdown = 0;
 
@@ -1390,29 +1492,58 @@ void hyperstone_device::device_start()
 	if (m_program->data_width() == 16)
 	{
 		m_program->cache(m_cache16);
-		m_pr16 = [this](offs_t address) -> u16 { return m_cache16.read_word(address); };
-		m_prptr = [this](offs_t address) -> const void * { return m_cache16.read_ptr(address); };
+		m_program->specific(m_specific16);
+		m_read_byte      = b_r_delegate( [this] (offs_t address) { return m_specific16.read_byte(address); });
+		m_read_halfword  = hw_r_delegate([this] (offs_t address) { return m_specific16.read_word(address & ~offs_t(1)); });
+		m_read_word      = w_r_delegate( [this] (offs_t address) { return m_specific16.read_dword(address & ~offs_t(3)); });
+		m_write_byte     = b_w_delegate( [this] (offs_t address, uint8_t  data) { m_specific16.write_byte(address, data); });
+		m_write_halfword = hw_w_delegate([this] (offs_t address, uint16_t data) { m_specific16.write_word(address & ~offs_t(1), data); });
+		m_write_word     = w_w_delegate( [this] (offs_t address, uint32_t data) { m_specific16.write_dword(address & ~offs_t(3), data); });
+
+		m_pr16 = [this] (offs_t address) -> u16 { return m_cache16.read_word(address); };
+		m_prptr = [this] (offs_t address) -> const void * { return m_cache16.read_ptr(address); };
 	}
 	else
 	{
 		m_program->cache(m_cache32);
+		m_program->specific(m_specific32);
+		m_read_byte      = b_r_delegate( [this] (offs_t address) { return m_specific32.read_byte(address); });
+		m_read_halfword  = hw_r_delegate([this] (offs_t address) { return m_specific32.read_word(address & ~offs_t(1)); });
+		m_read_word      = w_r_delegate( [this] (offs_t address) { return m_specific32.read_dword(address & ~offs_t(3)); });
+		m_write_byte     = b_w_delegate( [this] (offs_t address, uint8_t  data) { m_specific32.write_byte(address, data); });
+		m_write_halfword = hw_w_delegate([this] (offs_t address, uint16_t data) { m_specific32.write_word(address & ~offs_t(1), data); });
+		m_write_word     = w_w_delegate( [this] (offs_t address, uint32_t data) { m_specific32.write_dword(address & ~offs_t(3), data); });
+
 		m_pr16 = [this](offs_t address) -> u16 { return m_cache32.read_word(address); };
 		if (ENDIANNESS_NATIVE != ENDIANNESS_BIG)
-			m_prptr = [this](offs_t address) -> const void * {
+			m_prptr = [this] (offs_t address) -> const void * {
 				const u16 *ptr = static_cast<u16 *>(m_cache32.read_ptr(address & ~3));
 				if(!(address & 2))
 					ptr++;
 				return ptr;
 			};
 		else
-			m_prptr = [this](offs_t address) -> const void * {
+			m_prptr = [this] (offs_t address) -> const void * {
 				const u16 *ptr = static_cast<u16 *>(m_cache32.read_ptr(address & ~3));
 				if(address & 2)
 					ptr++;
 				return ptr;
 			};
 	}
-	m_io = &space(AS_IO);
+
+	address_space &iospace = space(AS_IO);
+	if (iospace.data_width() == 16)
+	{
+		iospace.specific(m_io16);
+		m_read_io  = w_r_delegate([this] (offs_t address) -> uint32_t { return m_io16.read_word((address >> 11) & 0x7ffc); });
+		m_write_io = w_w_delegate([this] (offs_t address, uint32_t data) { m_io16.write_word((address >> 11) & 0x7ffc, uint16_t(data)); });
+	}
+	else
+	{
+		iospace.specific(m_io32);
+		m_read_io  = w_r_delegate([this] (offs_t address) -> uint32_t { return m_io32.read_dword((address >> 11) & 0x7ffc); });
+		m_write_io = w_w_delegate([this] (offs_t address, uint32_t data) { m_io32.write_dword((address >> 11) & 0x7ffc, data); });
+	}
 
 	m_timer = timer_alloc(FUNC(hyperstone_device::timer_callback), this);
 	m_core->clock_scale_mask = 0;
@@ -1554,11 +1685,52 @@ void hyperstone_x_device::device_start()
 {
 	hyperstone_device::device_start();
 	m_core->clock_scale_mask = 3;
+
+	address_space &internalspace = space(AS_INTERNAL);
+	internalspace.specific(m_internal_specific);
+	if (space(AS_IO).data_width() == 16)
+	{
+		m_read_io = w_r_delegate(
+				[this] (offs_t address) -> uint32_t
+				{
+					if (!BIT(address, 27))
+						return m_io16.read_word((address >> 11) & 0x7ffc);
+					else
+						return m_internal_specific.read_dword((address >> 11) & 0x7ffc);
+				});
+		m_write_io = w_w_delegate(
+				[this] (offs_t address, uint32_t data)
+				{
+					if (!BIT(address, 27))
+						m_io16.write_word((address >> 11) & 0x7ffc, uint16_t(data));
+					else
+						m_internal_specific.write_dword((address >> 11) & 0x7ffc, data);
+				});
+	}
+	else
+	{
+		m_read_io = w_r_delegate(
+				[this] (offs_t address) -> uint32_t
+				{
+					if (!BIT(address, 27))
+						return m_io32.read_dword((address >> 11) & 0x7ffc);
+					else
+						return m_internal_specific.read_dword((address >> 11) & 0x7ffc);
+				});
+		m_write_io = w_w_delegate(
+				[this] (offs_t address, uint32_t data)
+				{
+					if (!BIT(address, 27))
+						m_io32.write_dword((address >> 11) & 0x7ffc, data);
+					else
+						m_internal_specific.write_dword((address >> 11) & 0x7ffc, data);
+				});
+	}
 }
 
 void hyperstone_xs_device::device_start()
 {
-	hyperstone_device::device_start();
+	hyperstone_x_device::device_start();
 
 	m_core->clock_scale_mask = 7;
 	m_sdram_installed = false;
@@ -1566,7 +1738,7 @@ void hyperstone_xs_device::device_start()
 
 void hyperstone_xs_device::device_post_load()
 {
-	hyperstone_device::device_post_load();
+	hyperstone_x_device::device_post_load();
 
 	const uint32_t mcr = m_core->global_regs[MCR_REGISTER];
 	if (!BIT(mcr, 21) && !BIT(mcr, 22))
@@ -1680,10 +1852,18 @@ void hyperstone_device::device_stop()
 
 device_memory_interface::space_config_vector hyperstone_device::memory_space_config() const
 {
-	return space_config_vector {
-		std::make_pair(AS_PROGRAM, &m_program_config),
-		std::make_pair(AS_IO,      &m_io_config)
-	};
+	return space_config_vector{
+			std::make_pair(AS_PROGRAM, &m_program_config),
+			std::make_pair(AS_IO,      &m_io_config) };
+}
+
+
+device_memory_interface::space_config_vector hyperstone_x_device::memory_space_config() const
+{
+	return space_config_vector{
+			std::make_pair(AS_PROGRAM,  &m_program_config),
+			std::make_pair(AS_IO,       &m_io_config),
+			std::make_pair(AS_INTERNAL, &m_internal_config), };
 }
 
 
