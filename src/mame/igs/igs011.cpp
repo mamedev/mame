@@ -37,14 +37,14 @@ Year + Game                   PCB        Sound         Chips
 96 Long Hu Bang II V185H      NO-0115    M6295 YM2413  IGS011 8255
 96 Te Yi Gong Neng            NO-0127-2  M6295 YM2413  IGS011 IGS003A
 96 Wanli Changcheng           ?
-96 Xingyun Man Guan           ?
+96 Xingyun ManGuan            ?
 98 Mj Nenrikishu SP V250J     NO-0115-5  M6295 YM2413  IGS011 8255
 ---------------------------------------------------------------------------
 
 To do:
 
 - Implement the I/O part of IGS003 as an 8255
-- IGS003 parametric bitswap protection in nkishusp (instead of patching the roms)
+- IGS003 parametric bitswap protection in lhb3, nkishusp, tygn (instead of patching the ROMs)
 - Interrupt controller at 838000 or a38000 (there's a preliminary implementation for lhb)
 - A few graphical bugs
 
@@ -59,6 +59,10 @@ To do:
   (see above comment)
   Also the background palette is wrong since the fade routine is called with wrong
   parameters, but in this case the PCB does the same.
+
+- lhb3: DIP definitions
+
+- xymga: stop during attract mode with 'RECORD ERROR 3'
 
 Notes:
 
@@ -125,6 +129,7 @@ public:
 	void init_drgnwrldv30() ATTR_COLD;
 	void init_drgnwrldv11h() ATTR_COLD;
 	void init_lhb2() ATTR_COLD;
+	void init_lhb3() ATTR_COLD;
 	void init_xymg() ATTR_COLD;
 	void init_xymga() ATTR_COLD;
 	void init_drgnwrldv10c() ATTR_COLD;
@@ -257,9 +262,8 @@ protected:
 	void lhb_irq_enable_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void lhb_okibank_w(u8 data);
 	void sound_irq(int state);
-	TIMER_DEVICE_CALLBACK_MEMBER(lev5_timer_irq_cb);
+	template <uint8_t Irq> TIMER_DEVICE_CALLBACK_MEMBER(timer_irq_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(lhb_timer_irq_cb);
-	TIMER_DEVICE_CALLBACK_MEMBER(lev3_timer_irq_cb);
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(lhb_vblank_irq);
@@ -2524,6 +2528,54 @@ void igs011_state::init_lhb2()
 */
 }
 
+void igs011_state::init_lhb3()
+{
+	const int rom_size = 0x80000;
+	u16 *src = (u16 *) (m_maincpu_region->base());
+	std::vector<u16> result_data(rom_size / 2);
+
+	for (int i = 0; i < rom_size / 2; i++)
+	{
+		u16 x = src[i];
+
+		// lhb2 address scrambling
+		const int j = bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 8, 11, 10, 9, 2, 7, 6, 5, 4, 3, 12, 1, 0);
+
+		if ((j & 0x0100) || (j & 0x0040) || ((j & 0x0010)&&(j & 0x0002)))
+			x ^= 0x00004;
+
+		if ((j & 0x5000) == 0x1000)
+			x ^= 0x0008;
+
+		if (!(j & 0x0004) || !(j & 0x2000) || (!(j & 0x0080) && !(j & 0x0010)))
+			x ^= 0x0020;
+
+		result_data[j] = x;
+	}
+
+	memcpy(src, &result_data[0], rom_size);
+
+	src[0x034a6 / 2] = 0x6042;
+	src[0x1a236 / 2] = 0x6034;
+	src[0x2534a / 2] = 0x6036;
+	src[0x283c8 / 2] = 0x6038;
+	src[0x2a8d6 / 2] = 0x6036;
+	src[0x2f076 / 2] = 0x6036;
+	src[0x3093e / 2] = 0x6036;
+	src[0x3321e / 2] = 0x6036;
+	src[0x33b68 / 2] = 0x6038;
+	src[0x3e608 / 2] = 0x6034;
+	src[0x3fb66 / 2] = 0x6036;
+	src[0x42bee / 2] = 0x6034;
+	src[0x45724 / 2] = 0x6034;
+	src[0x465e0 / 2] = 0x6036;
+	src[0x48e26 / 2] = 0x6000;
+	src[0x49496 / 2] = 0x6036;
+	src[0x4b85a / 2] = 0x6038;
+
+	lhb2_gfx_decrypt();
+}
+
 void igs011_state::init_tygn()
 {
 	tygn_decrypt();
@@ -2534,26 +2586,24 @@ void igs011_state::init_tygn()
 
 	u16 *rom = (u16 *) m_maincpu_region->base();
 
-	rom[0x036d8/2]  =   0x6042;     // 0036d8: 660E      bne     $36e8 (ROM test)
+	rom[0x036d8 / 2]  =   0x6042;     // 0036d8: 660E      bne     $36e8 (ROM test)
 
-	//TODO: are the following patches needed? in that case the ones after the blank line should be adapted to the tygn offsets
-	//rom[0x1c6a0/2]  =   0x6034;     // 01c6a0: 6734      beq     $1c6d6
-	//rom[0x2412a/2]  =   0x6036;     // 02412a: 6736      beq     $24162
-	//rom[0x26de6/2]  =   0x6038;     // 026de6: 6e38      bgt     $26e20 (system error)
-	//rom[0x2da36/2]  =   0x6036;     // 02da36: 6736      beq     $2da6e
-
-	//rom[0x2ff20/2]  =   0x6036;     // 02ff20: 6736      beq     $2ff58
-	//rom[0x3151c/2]  =   0x6036;     // 03151c: 6736      beq     $31554
-	//rom[0x33dfc/2]  =   0x6036;     // 033dfc: 6736      beq     $33e34
-	//rom[0x3460e/2]  =   0x6038;     // 03460e: 6e38      bgt     $34648 (system error)
-	//rom[0x3f09e/2]  =   0x6034;     // 03f09e: 6734      beq     $3f0d4
-	//rom[0x406a8/2]  =   0x6036;     // 0406a8: 6736      beq     $406e0
-	//rom[0x4376a/2]  =   0x6034;     // 04376a: 6734      beq     $437a0
-	//rom[0x462d6/2]  =   0x6034;     // 0462d6: 6734      beq     $4630c
-	//rom[0x471ec/2]  =   0x6036;     // 0471ec: 6e36      bgt     $47224 (system error)
-	//rom[0x49c46/2]  =   0x6000;     // 049c46: 6700 0444 beq     $4a08c
-	//rom[0x4a2b6/2]  =   0x6036;     // 04a2b6: 6736      beq     $4a2ee
-	//rom[0x4c67a/2]  =   0x6038;     // 04c67a: 6e38      bgt     $4c6b4 (system error)
+	rom[0x1c6a0 / 2] = 0x6034;
+	rom[0x2412a / 2] = 0x6036;
+	rom[0x26de6 / 2] = 0x6038;
+	rom[0x292cc / 2] = 0x6036;
+	rom[0x2da36 / 2] = 0x6036;
+	rom[0x2f2dc / 2] = 0x6036;
+	rom[0x31bae / 2] = 0x6036;
+	//rom[0x3460e / 2] = 0x6038;
+	rom[0x3d2a6 / 2] = 0x6034;
+	rom[0x3e824 / 2] = 0x6036;
+	rom[0x418ae / 2] = 0x6034;
+	rom[0x443ac / 2] = 0x6034;
+	rom[0x45272 / 2] = 0x6036;
+	rom[0x479b0 / 2] = 0x6000;
+	rom[0x48020 / 2] = 0x6036;
+	rom[0x4a3e4 / 2] = 0x6038;
 }
 
 void vbowl_state::init_vbowl()
@@ -2871,7 +2921,7 @@ void igs011_state::lhb2_mem(address_map &map)
 	map(0x100000, 0x103fff).ram().share("nvram");
 	map(0x200001, 0x200001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x204000, 0x204003).w("ymsnd", FUNC(ym2413_device::write)).umask16(0x00ff);
-	map(0x208000, 0x208001).w(FUNC(igs011_state::igs003_w));
+	map(0x208000, 0x208001).nopr().w(FUNC(igs011_state::igs003_w));
 	map(0x208002, 0x208003).rw(FUNC(igs011_state::lhb2_igs003_r), FUNC(igs011_state::lhb2_igs003_w));
 	map(0x20c000, 0x20cfff).ram().share(m_priority_ram);
 	map(0x210000, 0x210fff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
@@ -2914,7 +2964,7 @@ void igs011_state::nkishusp_mem(address_map &map)
 	map(0x100000, 0x103fff).ram().share("nvram");
 	map(0x200001, 0x200001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x204000, 0x204003).w("ymsnd", FUNC(ym2413_device::write)).umask16(0x00ff);
-	map(0x208000, 0x208001).w(FUNC(igs011_state::igs003_w));
+	map(0x208000, 0x208001).nopr().w(FUNC(igs011_state::igs003_w));
 	map(0x208002, 0x208003).rw(FUNC(igs011_state::lhb2_igs003_r), FUNC(igs011_state::lhb2_igs003_w));
 	map(0x20c000, 0x20cfff).ram().share(m_priority_ram);
 	map(0x210000, 0x210fff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
@@ -4099,9 +4149,10 @@ void igs011_state::igs011_base(machine_config &config)
 	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( igs011_state::lev5_timer_irq_cb )
+template <uint8_t Irq>
+TIMER_DEVICE_CALLBACK_MEMBER( igs011_state::timer_irq_cb )
 {
-	m_maincpu->set_input_line(5, HOLD_LINE);
+	m_maincpu->set_input_line(Irq, HOLD_LINE);
 }
 
 void igs011_state::drgnwrld(machine_config &config)
@@ -4109,7 +4160,7 @@ void igs011_state::drgnwrld(machine_config &config)
 	igs011_base(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_state::drgnwrld_mem);
 	m_maincpu->set_vblank_int("screen", FUNC(igs011_state::irq6_line_hold));
-	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_state::lev5_timer_irq_cb), attotime::from_hz(240)); // lev5 frequency drives the music tempo
+	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_state::timer_irq_cb<5>), attotime::from_hz(240)); // lev5 frequency drives the music tempo
 
 	YM3812(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 2.0);
 }
@@ -4146,18 +4197,12 @@ void igs011_state::lhb(machine_config &config)
 	// irq 3 points to an apparently unneeded routine
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( igs011_state::lev3_timer_irq_cb )
-{
-	m_maincpu->set_input_line(3, HOLD_LINE);
-}
-
-
 void igs011_state::wlcc(machine_config &config)
 {
 	igs011_base(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_state::wlcc_mem);
 	m_maincpu->set_vblank_int("screen", FUNC(igs011_state::irq6_line_hold));
-	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_state::lev3_timer_irq_cb), attotime::from_hz(240)); // lev3 frequency drives the music tempo
+	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_state::timer_irq_cb<3>), attotime::from_hz(240)); // lev3 frequency drives the music tempo
 }
 
 
@@ -4166,7 +4211,7 @@ void igs011_state::xymg(machine_config &config)
 	igs011_base(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_state::xymg_mem);
 	m_maincpu->set_vblank_int("screen", FUNC(igs011_state::irq6_line_hold));
-	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_state::lev3_timer_irq_cb), attotime::from_hz(240)); // lev3 frequency drives the music tempo
+	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_state::timer_irq_cb<3>), attotime::from_hz(240)); // lev3 frequency drives the music tempo
 }
 
 
@@ -4182,7 +4227,7 @@ void igs011_state::lhb2(machine_config &config)
 	igs011_base(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_state::lhb2_mem);
 	m_maincpu->set_vblank_int("screen", FUNC(igs011_state::irq6_line_hold));
-	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_state::lev5_timer_irq_cb), attotime::from_hz(240)); // lev5 frequency drives the music tempo
+	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_state::timer_irq_cb<5>), attotime::from_hz(240)); // lev5 frequency drives the music tempo
 
 //  GFXDECODE(config, "gfxdecode", m_palette, gfx_igs011_hi);
 
@@ -4195,7 +4240,7 @@ void igs011_state::nkishusp(machine_config &config)
 	igs011_base(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_state::nkishusp_mem);
 	m_maincpu->set_vblank_int("screen", FUNC(igs011_state::irq6_line_hold));
-	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_state::lev3_timer_irq_cb), attotime::from_hz(240)); // lev3 frequency drives the music tempo
+	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_state::timer_irq_cb<3>), attotime::from_hz(240)); // lev3 frequency drives the music tempo
 
 	// VSync 60.0052Hz, HSync 15.620kHz
 
@@ -4222,7 +4267,7 @@ void vbowl_state::vbowl(machine_config &config)
 	igs011_base(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vbowl_state::vbowl_mem);
 	m_maincpu->set_vblank_int("screen", FUNC(vbowl_state::irq6_line_hold));
-	TIMER(config, "timer_irq").configure_periodic(FUNC(vbowl_state::lev3_timer_irq_cb), attotime::from_hz(240)); // lev3 frequency drives the music tempo
+	TIMER(config, "timer_irq").configure_periodic(FUNC(vbowl_state::timer_irq_cb<3>), attotime::from_hz(240)); // lev3 frequency drives the music tempo
 	// irq 5 points to a debug function (all routines are clearly patched out)
 	// irq 4 points to an apparently unneeded routine
 
@@ -4794,6 +4839,20 @@ ROM_START( lhb2 )
 	ROM_LOAD( "igss0503.u38", 0x00000, 0x80000, CRC(c9609c9c) SHA1(f036e682b792033409966e84292a69275eaa05e5) )  // 2 banks
 ROM_END
 
+ROM_START( lhb3 ) // PCB very similar to lhb2's, but not original?
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "rom.u29", 0x00000, 0x80000, CRC(c5985452) SHA1(f1f0c2b1b8c509b2a0a72a4f3387eccb0f25008a) )
+
+	ROM_REGION( 0x200000, "blitter", 0 )
+	ROM_LOAD( "rom.u7", 0x00000, 0x200000, CRC(1c952bd6) SHA1(a6b6f1cdfb29647e81c032ffe59c94f1a10ceaf8) )
+
+	ROM_REGION( 0x80000, "blitter_hi", 0 )
+	ROM_LOAD( "rom.u6", 0x00000, 0x80000, CRC(5d73ae99) SHA1(7283aa3d6b15ceb95db80756892be46eb997ef15) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "rom.u38", 0x00000, 0x80000, CRC(c9609c9c) SHA1(f036e682b792033409966e84292a69275eaa05e5) )  // 2 banks
+ROM_END
+
 /***************************************************************************
 
 Mahjong Nenrikishu SP (V250J)
@@ -5034,25 +5093,26 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1997, drgnwrld,      0,        drgnwrld,        drgnwrld,  igs011_state, init_drgnwrld,     ROT0, "IGS",                     "Dragon World (World, V040O)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1995, drgnwrldv40k,  drgnwrld, drgnwrld_igs012, drgnwrldc, igs011_state, init_drgnwrldv40k, ROT0, "IGS",                     "Dongbang Jiju (Korea, V040K)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1995, drgnwrldv30,   drgnwrld, drgnwrld,        drgnwrld,  igs011_state, init_drgnwrldv30,  ROT0, "IGS",                     "Dragon World (World, V030O)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1995, drgnwrldv21,   drgnwrld, drgnwrld_igs012, drgnwrld,  igs011_state, init_drgnwrldv21,  ROT0, "IGS",                     "Dragon World (World, V021O)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1995, drgnwrldv21j,  drgnwrld, drgnwrld_igs012, drgnwrldj, igs011_state, init_drgnwrldv21j, ROT0, "IGS / Alta",              "Chuugokuryuu (Japan, V021J)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1995, drgnwrldv20j,  drgnwrld, drgnwrld_igs012, drgnwrldj, igs011_state, init_drgnwrldv20j, ROT0, "IGS / Alta",              "Chuugokuryuu (Japan, V020J)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1995, drgnwrldv11h,  drgnwrld, drgnwrld,        drgnwrldc, igs011_state, init_drgnwrldv11h, ROT0, "IGS",                     "Dung Fong Zi Zyu (Hong Kong, V011H, set 1)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1995, drgnwrldv11ha, drgnwrld, drgnwrld_igs012, drgnwrldc, igs011_state, init_drgnwrldv40k, ROT0, "IGS",                     "Dung Fong Zi Zyu (Hong Kong, V011H, set 2)",  MACHINE_SUPPORTS_SAVE ) // different encryption and with IGS012
-GAME( 1995, drgnwrldv10c,  drgnwrld, drgnwrld,        drgnwrldc, igs011_state, init_drgnwrldv10c, ROT0, "IGS",                     "Zhongguo Long (China, V010C)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1995, lhb,           0,        lhb,             lhb,       igs011_state, init_lhb,          ROT0, "IGS",                     "Long Hu Bang (China, V035C)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1995, lhbv33c,       lhb,      lhb,             lhb,       igs011_state, init_lhbv33c,      ROT0, "IGS",                     "Long Hu Bang (China, V033C)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1995, dbc,           lhb,      lhb,             lhb,       igs011_state, init_dbc,          ROT0, "IGS",                     "Daai Baan Sing (Hong Kong, V027H)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1995, ryukobou,      lhb,      lhb,             lhb,       igs011_state, init_ryukobou,     ROT0, "IGS / Alta",              "Mahjong Ryukobou (Japan, V030J)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1996, lhb2,          0,        lhb2,            lhb2,      igs011_state, init_lhb2,         ROT0, "IGS",                     "Lung Fu Bong II (Hong Kong, V185H)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1996, tygn,          lhb2,     tygn,            tygn,      igs011_state, init_tygn,         ROT0, "IGS",                     "Te Yi Gong Neng (China, V632C)",              MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // needs correct IGS003 routines
-GAME( 1996, xymg,          0,        xymg,            xymg,      igs011_state, init_xymg,         ROT0, "IGS",                     "Xingyun Man Guan (China, V651C, set 1)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1996, xymga,         xymg,     xymga,           xymg,      igs011_state, init_xymga,        ROT0, "IGS",                     "Xingyun Man Guan (China, V651C, set 2)",      MACHINE_SUPPORTS_SAVE ) // different encryption and without IGS003
-GAME( 1996, wlcc,          xymg,     wlcc,            wlcc,      igs011_state, init_wlcc,         ROT0, "IGS",                     "Wanli Changcheng (China, V638C)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1996, vbowl,         0,        vbowl,           vbowl,     vbowl_state,  init_vbowl,        ROT0, "IGS",                     "Virtua Bowling (World, V101XCM)",             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, vbowlj,        vbowl,    vbowl,           vbowlj,    vbowl_state,  init_vbowlj,       ROT0, "IGS / Alta",              "Virtua Bowling (Japan, V100JCM)",             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, vbowlhk,       vbowl,    vbowlhk,         vbowlhk,   vbowl_state,  init_vbowlhk,      ROT0, "IGS / Tai Tin Amusement", "Virtua Bowling (Hong Kong, V101HJS)",         MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, nkishusp,      lhb2,     nkishusp,        nkishusp,  igs011_state, init_nkishusp,     ROT0, "IGS / Alta",              "Mahjong Nenrikishu SP (Japan, V250J)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1997, drgnwrld,      0,        drgnwrld,        drgnwrld,  igs011_state, init_drgnwrld,     ROT0, "IGS",                     "Dragon World (World, V040O)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv40k,  drgnwrld, drgnwrld_igs012, drgnwrldc, igs011_state, init_drgnwrldv40k, ROT0, "IGS",                     "Dongbang Jiju (Korea, V040K)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv30,   drgnwrld, drgnwrld,        drgnwrld,  igs011_state, init_drgnwrldv30,  ROT0, "IGS",                     "Dragon World (World, V030O)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv21,   drgnwrld, drgnwrld_igs012, drgnwrld,  igs011_state, init_drgnwrldv21,  ROT0, "IGS",                     "Dragon World (World, V021O)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv21j,  drgnwrld, drgnwrld_igs012, drgnwrldj, igs011_state, init_drgnwrldv21j, ROT0, "IGS / Alta",              "Chuugokuryuu (Japan, V021J)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv20j,  drgnwrld, drgnwrld_igs012, drgnwrldj, igs011_state, init_drgnwrldv20j, ROT0, "IGS / Alta",              "Chuugokuryuu (Japan, V020J)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv11h,  drgnwrld, drgnwrld,        drgnwrldc, igs011_state, init_drgnwrldv11h, ROT0, "IGS",                     "Dung Fong Zi Zyu (Hong Kong, V011H, set 1)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv11ha, drgnwrld, drgnwrld_igs012, drgnwrldc, igs011_state, init_drgnwrldv40k, ROT0, "IGS",                     "Dung Fong Zi Zyu (Hong Kong, V011H, set 2)",       MACHINE_SUPPORTS_SAVE ) // different encryption and with IGS012
+GAME( 1995, drgnwrldv10c,  drgnwrld, drgnwrld,        drgnwrldc, igs011_state, init_drgnwrldv10c, ROT0, "IGS",                     "Zhongguo Long (China, V010C)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1995, lhb,           0,        lhb,             lhb,       igs011_state, init_lhb,          ROT0, "IGS",                     "Long Hu Bang (China, V035C)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1995, lhbv33c,       lhb,      lhb,             lhb,       igs011_state, init_lhbv33c,      ROT0, "IGS",                     "Long Hu Bang (China, V033C)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1995, dbc,           lhb,      lhb,             lhb,       igs011_state, init_dbc,          ROT0, "IGS",                     "Daai Baan Sing (Hong Kong, V027H)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1995, ryukobou,      lhb,      lhb,             lhb,       igs011_state, init_ryukobou,     ROT0, "IGS / Alta",              "Mahjong Ryukobou (Japan, V030J)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1996, lhb2,          0,        lhb2,            lhb2,      igs011_state, init_lhb2,         ROT0, "IGS",                     "Lung Fu Bong II (Hong Kong, V185H)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1996, tygn,          lhb2,     tygn,            tygn,      igs011_state, init_tygn,         ROT0, "IGS",                     "Te Yi Gong Neng (China, V632C)",                   MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // ROM patches
+GAME( 1996, lhb3,          lhb2,     nkishusp,        nkishusp,  igs011_state, init_lhb3,         ROT0, "IGS",                     "Long Hu Bang III Cuo Pai Gao Shou (China, V242C)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // ROM patches
+GAME( 1996, xymg,          0,        xymg,            xymg,      igs011_state, init_xymg,         ROT0, "IGS",                     "Xingyun Manguan (China, V651C, set 1)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1996, xymga,         xymg,     xymga,           xymg,      igs011_state, init_xymga,        ROT0, "IGS",                     "Xingyun Manguan (China, V651C, set 2)",            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // different encryption and without IGS003
+GAME( 1996, wlcc,          xymg,     wlcc,            wlcc,      igs011_state, init_wlcc,         ROT0, "IGS",                     "Wanli Changcheng (China, V638C)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1996, vbowl,         0,        vbowl,           vbowl,     vbowl_state,  init_vbowl,        ROT0, "IGS",                     "Virtua Bowling (World, V101XCM)",                  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, vbowlj,        vbowl,    vbowl,           vbowlj,    vbowl_state,  init_vbowlj,       ROT0, "IGS / Alta",              "Virtua Bowling (Japan, V100JCM)",                  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, vbowlhk,       vbowl,    vbowlhk,         vbowlhk,   vbowl_state,  init_vbowlhk,      ROT0, "IGS / Tai Tin Amusement", "Virtua Bowling (Hong Kong, V101HJS)",              MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, nkishusp,      lhb2,     nkishusp,        nkishusp,  igs011_state, init_nkishusp,     ROT0, "IGS / Alta",              "Mahjong Nenrikishu SP (Japan, V250J)",             MACHINE_SUPPORTS_SAVE )

@@ -170,7 +170,6 @@ void tsconf_state::video_start()
 void tsconf_state::machine_start()
 {
 	spectrum_128_state::machine_start();
-	m_maincpu->space(AS_PROGRAM).specific(m_program);
 
 	// reconfigure ROMs
 	memory_region *rom = memregion("maincpu");

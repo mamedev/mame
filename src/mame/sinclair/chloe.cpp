@@ -101,8 +101,6 @@ private:
 	INTERRUPT_GEN_MEMBER(chloe_interrupt);
 
 	memory_access<8, 0, 0, ENDIANNESS_LITTLE>::specific m_uno_regs;
-	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
-	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
 	memory_bank_array_creator<8> m_bank_ram;
 	memory_view m_bank0_view, m_bank1_view;
 	required_device<address_map_bank_device> m_regs_map;
@@ -838,8 +836,6 @@ void chloe_state::machine_start()
 	m_irq_raster_off_timer = timer_alloc(FUNC(chloe_state::raster_irq_off), this);
 
 	m_regs_map->space(AS_PROGRAM).specific(m_uno_regs);
-	m_maincpu->space(AS_PROGRAM).specific(m_program);
-	m_maincpu->space(AS_IO).specific(m_io);
 
 	for (int i = 0; i < 8; i++)
 	{

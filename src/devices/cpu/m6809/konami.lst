@@ -76,8 +76,7 @@ MAIN:
 		case 0x3B:              set_regop8(m_q.r.b);    %INDEXED;   %ST8;       return;
 		case 0x3C:                                      set_imm();  %ANDCC;     return;
 		case 0x3D:                                      set_imm();  %ORCC;      return;
-		case 0x3E:                                                  %EXG;       return;
-		case 0x3F:                                                  %TFR;       return;
+		case 0x3E:  case 0x3F:                                      %EXGTFR;    return;
 
 		case 0x40:              set_regop16(m_q.p.d);   set_imm();  %LD16;      return;
 		case 0x41:              set_regop16(m_q.p.d);   %INDEXED;   %LD16;      return;
@@ -434,24 +433,24 @@ INDEXED:
 	set_ea(m_temp.w);
 	return;
 
-EXG:
+EXGTFR:
 	{
-		// konami's EXG instruction differs enough from 6809 to fork the code
-		uint8_t param = read_opcode_arg();
-		uint16_t reg1 = read_exgtfr_register(param >> 0);
-		uint16_t reg2 = read_exgtfr_register(param >> 4);
-		write_exgtfr_register(param >> 0, reg2);
-		write_exgtfr_register(param >> 4, reg1);
-	}
-	eat(3);
-	return;
-
-TFR:
-	{
-		// konami's TFR instruction differs enough from 6809 to fork the code
+		// konami's EXG/TFR instruction differs enough from HD6309 to fork the code
 		uint8_t param = read_opcode_arg();
 		uint16_t reg = read_exgtfr_register(param >> 0);
+
+		// Opcodes 0x3E and 0x3F are the same! The bit that distinguishes between EXG and TFR
+		// is actually opcode_arg bit 7. Although Konami software behaves as expected.
+		if (!BIT(param, 7))
+		{
+			uint16_t reg2 = read_exgtfr_register(param >> 4);
+			write_exgtfr_register(param >> 0, reg2);
+			eat(1);
+		}
 		write_exgtfr_register(param >> 4, reg);
+
+		//if (BIT(m_opcode, 0) != BIT(param, 7))
+		//  logerror("KONAMI: Malformed EXG/TFR opcode\n");
 	}
 	eat(2);
 	return;

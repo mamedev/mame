@@ -590,21 +590,24 @@ void mcd212_device::process_vsr(uint32_t *pixels, bool *transparent)
 		{
 			const uint8_t byte1 = data[(vsr++ & 0x0007ffff) ^ 1];
 			const uint8_t y2 = y + m_delta_y_lut[byte];
-			const uint8_t y4 = y2 + m_delta_y_lut[byte1];
+			y = y2 + m_delta_y_lut[byte1];
+			u += m_delta_uv_lut[byte];
+			v += m_delta_uv_lut[byte1];
 
-			const uint8_t u4 = u + m_delta_uv_lut[byte];
-			const uint8_t v4 = v + m_delta_uv_lut[byte1];
-			const uint8_t u2 = (u >> 1) + (u4 >> 1) + (u & u4 & 1);
-			const uint8_t v2 = (v >> 1) + (v4 >> 1) + (v & v4 & 1);
+			const uint32_t *limit_rgb = m_dyuv_limit_lut + y2 + 0x100;
+			const uint32_t *limit_rgb2 = m_dyuv_limit_lut + y + 0x100;
 
-			uint32_t *limit_rgb = m_dyuv_limit_lut + y2 + 0x100;
-			color0 = (limit_rgb[m_dyuv_v_to_r[v2]] << 16) | (limit_rgb[m_dyuv_u_to_g[u2] + m_dyuv_v_to_g[v2]] << 8) | limit_rgb[m_dyuv_u_to_b[u2]];
-			limit_rgb = m_dyuv_limit_lut + y4 + 0x100;
-			color1 = (limit_rgb[m_dyuv_v_to_r[v4]] << 16) | (limit_rgb[m_dyuv_u_to_g[u4] + m_dyuv_v_to_g[v4]] << 8) | limit_rgb[m_dyuv_u_to_b[u4]];
+			color0 = (limit_rgb[m_dyuv_v_to_r[v]] << 16) | (limit_rgb[m_dyuv_u_to_g[u] + m_dyuv_v_to_g[v]] << 8) | limit_rgb[m_dyuv_u_to_b[u]];
 
-			y = y4;
-			u = u4;
-			v = v4;
+			const uint8_t byte2 = data[(vsr & 0x0007ffff) ^ 1]; // Peek ahead, for calculating the half-step.
+			const uint8_t byte3 = data[((vsr + 1) & 0x0007ffff) ^ 1];
+			const uint8_t u8 = u + m_delta_uv_lut[byte2];
+			const uint8_t v8 = v + m_delta_uv_lut[byte3];
+			const uint8_t u6 = (u >> 1) + (u8 >> 1) + (u & u8 & 1);
+			const uint8_t v6 = (v >> 1) + (v8 >> 1) + (v & v8 & 1);
+
+			color1 = (limit_rgb2[m_dyuv_v_to_r[v6]] << 16) | (limit_rgb2[m_dyuv_u_to_g[u6] + m_dyuv_v_to_g[v6]] << 8) | limit_rgb2[m_dyuv_u_to_b[u6]];
+
 			// TODO: Does not support QHY
 			pixels[x] = color0;
 			pixels[x + 1] = color0;

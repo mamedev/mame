@@ -348,11 +348,9 @@ struct z8000_unidasm_t : z8000_disassembler::config
 struct hyperstone_unidasm_t : hyperstone_disassembler::config
 {
 	bool h;
-	u8 fp;
-	hyperstone_unidasm_t() { h = false; fp = 0; }
+	hyperstone_unidasm_t() { h = false; }
 	virtual ~hyperstone_unidasm_t() = default;
 
-	virtual u8 get_fp() const { return fp; }
 	virtual bool get_h() const { return h; }
 } hyperstone_unidasm;
 

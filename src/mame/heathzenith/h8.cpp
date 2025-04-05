@@ -51,10 +51,13 @@
 
 #include "emu.h"
 
+#include "bus/heathzenith/intr_cntrl/intr_cntrl.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/clock.h"
 #include "machine/timer.h"
 #include "sound/beep.h"
+
 #include "speaker.h"
 
 #include "bus/heathzenith/h8/h8bus.h"

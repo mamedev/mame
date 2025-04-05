@@ -7,7 +7,7 @@
 
 #include "nxrom.h"
 
-#include "sound/nes_apu.h"  // temp hack to pass the additional sound regs to APU...
+#include "sound/mmc5.h"
 #include "video/ppu2c0x.h"  // this has to be included so that IRQ functions can access ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE
 
 
@@ -42,6 +42,9 @@ protected:
 	void set_mirror(int page, int src);
 	void update_prg();
 
+	void update_irq();
+	void pcm_irq(int state);
+
 	inline uint8_t base_chr_r(int bank, uint32_t offset);
 	inline uint8_t split_chr_r(uint32_t offset);
 	inline uint8_t bg_ex1_chr_r(uint32_t offset);
@@ -49,24 +52,25 @@ protected:
 
 	uint16_t     m_irq_count;
 	uint8_t      m_irq_status;
-	int        m_irq_enable;
+	bool         m_irq_enable;
+	bool         m_pcm_irq;
 
-	int        m_mult1, m_mult2;
+	int32_t      m_mult1, m_mult2;
 
-	int m_mmc5_scanline;
-	int m_vrom_page_a;
-	int m_vrom_page_b;
+	int32_t m_mmc5_scanline;
+	int32_t m_vrom_page_a;
+	int32_t m_vrom_page_b;
 	uint16_t m_vrom_bank[12];            // MMC5 has 10bit wide VROM regs!
 
-	int m_floodtile;
-	int m_floodattr;
+	uint8_t m_floodtile;
+	uint8_t m_floodattr;
 
-	int m_prg_mode;     // $5100
-	int m_chr_mode;     // $5101
-	int m_wram_protect_1;   // $5102
-	int m_wram_protect_2;   // $5103
-	int m_exram_control;    // $5104
-	int m_wram_base;    // $5113
+	uint8_t m_prg_mode;     // $5100
+	uint8_t m_chr_mode;     // $5101
+	uint8_t m_wram_protect_1;   // $5102
+	uint8_t m_wram_protect_2;   // $5103
+	uint8_t m_exram_control;    // $5104
+	uint8_t m_wram_base;    // $5113
 
 	uint8_t m_last_chr;
 	uint8_t m_ex1_chr;
@@ -84,7 +88,7 @@ protected:
 	uint8_t m_split_ctrl; // $5200
 	uint8_t m_split_yst;  // $5201
 	uint8_t m_split_bank; // $5202
-	int m_vcount;
+	int32_t m_vcount;
 
 	// MMC-5 contains 1K of internal ram
 	uint8_t m_exram[0x400];
@@ -94,7 +98,7 @@ protected:
 	//  int m_nes_vram_sprite[8];
 
 	required_device<ppu2c0x_device> m_ppu;
-	required_device<nesapu_device> m_sound;
+	required_device<mmc5_sound_device> m_sound;
 };
 
 

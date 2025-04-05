@@ -1169,7 +1169,7 @@ GFXDECODE_END
 
 void vamphalf_state::common(machine_config &config)
 {
-	E116T(config, m_maincpu, 50_MHz_XTAL);    // 50 MHz
+	E116(config, m_maincpu, 50_MHz_XTAL);    // E1-16T (TQFP), 50 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &vamphalf_state::common_map);
 	m_maincpu->set_vblank_int("screen", FUNC(vamphalf_state::irq1_line_hold));
 
@@ -1327,7 +1327,7 @@ void vamphalf_state::mrdig(machine_config &config)
 void vamphalf_qdsp_state::wyvernwg(machine_config &config)
 {
 	common(config);
-	E132T(config.replace(), m_maincpu, 50_MHz_XTAL);    // 50 MHz
+	E132(config.replace(), m_maincpu, 50_MHz_XTAL);    // E1-32T (TQFP), 50 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &vamphalf_qdsp_state::common_32bit_map);
 	m_maincpu->set_addrmap(AS_IO, &vamphalf_qdsp_state::wyvernwg_io);
 	m_maincpu->set_vblank_int("screen", FUNC(vamphalf_state::irq1_line_hold));
@@ -1338,7 +1338,7 @@ void vamphalf_qdsp_state::wyvernwg(machine_config &config)
 void vamphalf_nvram_state::finalgdr(machine_config &config)
 {
 	common(config);
-	E132T(config.replace(), m_maincpu, 50_MHz_XTAL);    // 50 MHz
+	E132(config.replace(), m_maincpu, 50_MHz_XTAL);    // E1-32T (TQFP), 50 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &vamphalf_nvram_state::common_32bit_map);
 	m_maincpu->set_addrmap(AS_IO, &vamphalf_nvram_state::finalgdr_io);
 	m_maincpu->set_vblank_int("screen", FUNC(vamphalf_state::irq1_line_hold));
@@ -1351,7 +1351,7 @@ void vamphalf_nvram_state::finalgdr(machine_config &config)
 void vamphalf_nvram_state::mrkickera(machine_config &config)
 {
 	common(config);
-	E132T(config.replace(), m_maincpu, 50_MHz_XTAL);    // 50 MHz
+	E132(config.replace(), m_maincpu, 50_MHz_XTAL);    // E1-32T (TQFP), 50 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &vamphalf_nvram_state::common_32bit_map);
 	m_maincpu->set_addrmap(AS_IO, &vamphalf_nvram_state::mrkickera_io);
 	m_maincpu->set_vblank_int("screen", FUNC(vamphalf_state::irq1_line_hold));
@@ -1363,7 +1363,7 @@ void vamphalf_nvram_state::mrkickera(machine_config &config)
 
 void vamphalf_state::aoh(machine_config &config)
 {
-	E132XN(config, m_maincpu, 20_MHz_XTAL * 4); // 4x internal multiplier
+	E132X(config, m_maincpu, 20_MHz_XTAL * 4); // E1-32XN (PQFP), 4x internal multiplier
 	m_maincpu->set_addrmap(AS_PROGRAM, &vamphalf_state::aoh_map);
 	m_maincpu->set_addrmap(AS_IO, &vamphalf_state::aoh_io);
 	m_maincpu->set_vblank_int("screen", FUNC(vamphalf_state::irq1_line_hold));
@@ -1406,7 +1406,7 @@ void vamphalf_state::boonggab(machine_config &config)
 void vamphalf_qdsp_state::yorijori(machine_config &config)
 {
 	common(config);
-	E132T(config.replace(), m_maincpu, 50_MHz_XTAL);   // 50 MHz
+	E132(config.replace(), m_maincpu, 50_MHz_XTAL);   // E1-32T (TQFP), 50 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &vamphalf_qdsp_state::yorijori_32bit_map);
 	m_maincpu->set_addrmap(AS_IO, &vamphalf_qdsp_state::yorijori_io);
 	m_maincpu->set_vblank_int("screen", FUNC(vamphalf_state::irq2_line_hold));

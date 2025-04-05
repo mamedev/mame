@@ -228,7 +228,6 @@ private:
 	memory_bank_creator m_bank0_fastram;
 	memory_view m_bank_view0;
 	memory_view m_bank_view3;
-	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
 	output_finder<> m_turbo_led;
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
@@ -1468,7 +1467,6 @@ void sprinter_state::machine_start()
 		m_bank_ram[i]->configure_entries(0, m_ram->size() / 0x4000, m_ram->pointer(), 0x4000);
 
 	m_dcp_location = m_ram->pointer() + (0x40 << 14);
-	m_maincpu->space(AS_PROGRAM).specific(m_program);
 
 	const u8 port_default[0x40] = {
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // Cx - SYS PORTS COPIES

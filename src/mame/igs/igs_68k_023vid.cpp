@@ -267,7 +267,7 @@ void igs_68k_023vid_state::xypmda(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(igs_68k_023vid_state::screen_vblank_xypmda));
 }
 /*
-Xing Yun Pao Ma Di Super, IGS, 2003
+Xingyun Paomadi Super, IGS, 2003
 Hardware Info By Guru
 ---------------------
 
@@ -386,5 +386,5 @@ ROM_END
 
 
 
-GAME( 2003, xypmd,  0,     xypmd,  xypmd, igs_68k_023vid_state, empty_init, ROT0, "IGS", "Xing Yun Pao Ma Di Super (V401CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1999, xypmda, xypmd, xypmda, xypmd, igs_68k_023vid_state, empty_init, ROT0, "IGS", "Xing Yun Pao Ma Di (unknown ver)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2003, xypmd,  0,     xypmd,  xypmd, igs_68k_023vid_state, empty_init, ROT0, "IGS", "Xingyun Paomadi Super (V401CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1999, xypmda, xypmd, xypmda, xypmd, igs_68k_023vid_state, empty_init, ROT0, "IGS", "Xingyun Paomadi (unknown ver)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

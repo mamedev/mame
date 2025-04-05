@@ -33,7 +33,7 @@ TODO:
 - currently starts with 9 credits inserted. After entering and exiting test mode, the game shows 0
   coins and can be coined up normally;
 - implement proper controls. The game has a peculiar input setup (see video link above);
-- sound system is the same as namco/namcond1.cpp (puts "Quattro Ver.1.2.H8" in H8 RAM). Ir interacts
+- sound system is the same as namco/namcond1.cpp (puts "Quattro Ver.1.2.H8" in H8 RAM). It interacts
   with the keycus. Handling is copied over from said driver, but could probably be improved;
 - after coining up there's a GFX bug that maybe points to some unimplemented feature in seta2_v.cpp;
 - once the video emulation in seta/seta2_v.cpp has been devicified, remove derivation from
