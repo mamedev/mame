@@ -126,6 +126,8 @@ namco_c139_device::namco_c139_device(const machine_config &mconfig, const char *
 	}
 
 	LOG("C139: ID byte = %02d\n", m_linkid);
+
+	std::fill(std::begin(m_buffer0), std::end(m_buffer0), 0);
 }
 
 

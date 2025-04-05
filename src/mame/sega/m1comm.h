@@ -77,11 +77,11 @@ private:
 	// - share_r
 	// - share_w
 
-	uint8_t m_shared[0x1000]{}; // 2x 2k = 4k; model1 accesses this with 16bit data and 11bit address (A0 to A10)
-	uint8_t m_syn = 0;            // bit0 is used to trigger DOP line on VINT, bit1 is used to enable/disable VINT/IRQ5
-	uint8_t m_zfg = 0;            // z80 flip gate, bit0 is stored
-	uint8_t m_cn = 0;             // bit0 is used to enable/disable the comm board
-	uint8_t m_fg = 0;             // flip gate, bit0 is stored, bit7 is connected to ZFG bit 0
+	uint8_t m_shared[0x1000]; // 2x 2k = 4k; model1 accesses this with 16bit data and 11bit address (A0 to A10)
+	uint8_t m_syn;            // bit0 is used to trigger DOP line on VINT, bit1 is used to enable/disable VINT/IRQ5
+	uint8_t m_zfg;            // z80 flip gate, bit0 is stored
+	uint8_t m_cn;             // bit0 is used to enable/disable the comm board
+	uint8_t m_fg;             // flip gate, bit0 is stored, bit7 is connected to ZFG bit 0
 
 #ifdef M1COMM_SIMULATION
 	asio::io_context m_ioctx;
@@ -94,14 +94,14 @@ private:
 	uint8_t m_rx_state;
 	uint8_t m_tx_state;
 
-	uint8_t m_buffer0[0x200]{};
+	uint8_t m_buffer0[0x200];
 	uint8_t m_framesync;
 
-	uint8_t m_linkenable = 0;
-	uint16_t m_linktimer = 0;
-	uint8_t m_linkalive = 0;
-	uint8_t m_linkid = 0;
-	uint8_t m_linkcount = 0;
+	uint8_t m_linkenable;
+	uint16_t m_linktimer;
+	uint8_t m_linkalive;
+	uint8_t m_linkid;
+	uint8_t m_linkcount;
 
 	void check_sockets();
 	void comm_start();

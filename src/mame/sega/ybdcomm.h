@@ -44,8 +44,8 @@ private:
 	required_device<mb89372_device> m_mpc;
 	required_ioport m_dip_sw1;
 
-	uint8_t m_ybd_stat = 0; // not sure about those yet - 7474 for top bit? and 74161 for lower 4 bits
-	uint8_t m_z80_stat = 0; // not sure about those yet - 74LS374
+	uint8_t m_ybd_stat; // not sure about those yet - 7474 for top bit? and 74161 for lower 4 bits
+	uint8_t m_z80_stat; // not sure about those yet - 74LS374
 
 	void ybdcomm_mem(address_map &map) ATTR_COLD;
 	void ybdcomm_io(address_map &map) ATTR_COLD;
@@ -75,14 +75,14 @@ private:
 	uint8_t m_rx_state;
 	uint8_t m_tx_state;
 
-	uint8_t m_buffer0[0x200]{};
+	uint8_t m_buffer0[0x200];
 	uint8_t m_framesync;
 
-	uint8_t m_linkenable = 0;
-	uint16_t m_linktimer = 0;
-	uint8_t m_linkalive = 0;
-	uint8_t m_linkid = 0;
-	uint8_t m_linkcount = 0;
+	uint8_t m_linkenable;
+	uint16_t m_linktimer;
+	uint8_t m_linkalive;
+	uint8_t m_linkid;
+	uint8_t m_linkcount;
 
 	TIMER_CALLBACK_MEMBER(tick_timer);
 

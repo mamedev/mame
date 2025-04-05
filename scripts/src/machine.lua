@@ -2203,10 +2203,10 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/mb89372.h,MACHINES["mb89372"] = true
+--@src/devices/machine/mb89372.h,MACHINES["MB89372"] = true
 ---------------------------------------------------
 
-if (MACHINES["mb89372"]~=null) then
+if (MACHINES["MB89372"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/mb89372.cpp",
 		MAME_DIR .. "src/devices/machine/mb89372.h",

@@ -70,6 +70,8 @@ void k056230_device::device_reset()
 	m_ctrl_reg = 0;
 	m_status = 0;
 
+	std::fill(std::begin(m_buffer0), std::end(m_buffer0), 0);
+
 	m_tx_state = 0;
 	m_rx_state = 0;
 	comm_start();

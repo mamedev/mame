@@ -37,9 +37,9 @@ protected:
 	memory_share_creator<u32> m_ram;
 
 	devcb_write_line m_irq_cb;
-	int m_irq_state = 0;
-	u8 m_ctrl_reg = 0;
-	u8 m_status = 0;
+	int m_irq_state;
+	u8 m_ctrl_reg;
+	u8 m_status;
 
 private:
 	asio::io_context m_ioctx;
@@ -51,10 +51,10 @@ private:
 	asio::steady_timer m_tx_timeout;
 	u8 m_rx_state;
 	u8 m_tx_state;
-	u8 m_buffer0[0x201]{};
-	u8 m_linkenable = 0;
-	u8 m_linkid = 0;
-	u8 m_txmode = 0;
+	u8 m_buffer0[0x201];
+	u8 m_linkenable;
+	u8 m_linkid;
+	u8 m_txmode;
 
 	void set_mode(u8 data);
 	void set_ctrl(u8 data);
@@ -78,9 +78,9 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 private:
-	u8 m_control = 0;
-	bool m_irq_enable = false;
-	u8 m_unk[2]{};
+	u8 m_control;
+	bool m_irq_enable;
+	u8 m_unk[2];
 };
 
 // device type definition

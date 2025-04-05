@@ -53,10 +53,10 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
-	uint8_t m_shared[0x800]{}; // 2k shared memory
-	uint8_t m_zfg = 0;           // z80 flip gate? purpose unknown, bit0 is stored
-	uint8_t m_cn = 0;            // bit0 is used to enable/disable the comm board
-	uint8_t m_fg = 0;            // flip gate? purpose unknown, bit0 is stored, bit7 is connected to ZFG bit 0
+	uint8_t m_shared[0x800];  // 2k shared memory
+	uint8_t m_zfg;            // z80 flip gate? purpose unknown, bit0 is stored
+	uint8_t m_cn;             // bit0 is used to enable/disable the comm board
+	uint8_t m_fg;             // flip gate? purpose unknown, bit0 is stored, bit7 is connected to ZFG bit 0
 
 #ifdef S32COMM_SIMULATION
 	asio::io_context m_ioctx;
@@ -69,15 +69,15 @@ private:
 	uint8_t m_rx_state;
 	uint8_t m_tx_state;
 
-	uint8_t m_buffer0[0x100]{};
+	uint8_t m_buffer0[0x100];
 	uint8_t m_framesync;
 
-	uint8_t m_linkenable = 0;
-	uint16_t m_linktimer = 0;
-	uint8_t m_linkalive = 0;
-	uint8_t m_linkid = 0;
-	uint8_t m_linkcount = 0;
-	uint16_t m_linktype = 0;
+	uint8_t m_linkenable;
+	uint16_t m_linktimer;
+	uint8_t m_linkalive;
+	uint8_t m_linkid;
+	uint8_t m_linkcount;
+	uint16_t m_linktype;
 
 	void check_sockets();
 	void comm_start();

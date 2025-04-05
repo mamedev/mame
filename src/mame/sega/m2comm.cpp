@@ -225,10 +225,12 @@ void sega_m2comm_device::device_start()
 
 void sega_m2comm_device::device_reset()
 {
+	std::fill(std::begin(m_shared), std::end(m_shared), 0);
 	m_zfg = 0;
 	m_cn = 0;
 	m_fg = 0;
 #ifdef M2COMM_SIMULATION
+	std::fill(std::begin(m_buffer0), std::end(m_buffer0), 0);
 	m_tx_state = 0;
 	m_rx_state = 0;
 	comm_start();
@@ -238,6 +240,7 @@ void sega_m2comm_device::device_reset()
 	m_linkalive = 0;
 	m_linkid = 0;
 	m_linkcount = 0;
+	m_zfg_delay = 0;
 #endif
 }
 

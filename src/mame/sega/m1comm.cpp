@@ -176,12 +176,13 @@ void sega_m1comm_device::device_start()
 
 void sega_m1comm_device::device_reset()
 {
+	std::fill(std::begin(m_shared), std::end(m_shared), 0);
 	m_syn = 0;
 	m_zfg = 0;
 	m_cn = 0;
 	m_fg = 0;
-
 #ifdef M1COMM_SIMULATION
+	std::fill(std::begin(m_buffer0), std::end(m_buffer0), 0);
 	m_tx_state = 0;
 	m_rx_state = 0;
 	comm_start();

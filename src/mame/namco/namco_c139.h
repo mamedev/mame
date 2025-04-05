@@ -54,8 +54,8 @@ protected:
 	devcb_write_line m_irq_cb;
 
 private:
-	uint16_t m_ram[0x2000]{};
-	uint16_t m_reg[0x0010]{};
+	uint16_t m_ram[0x2000];
+	uint16_t m_reg[0x0010];
 
 	std::string m_localhost;
 	std::string m_localport;
@@ -72,13 +72,13 @@ private:
 	uint8_t m_rx_state;
 	uint8_t m_tx_state;
 
-	uint8_t m_buffer0[0x200]{};
+	uint8_t m_buffer0[0x200];
 
-	uint16_t m_linktimer = 0;
-	uint8_t m_linkid = 0;
-	uint8_t m_txsize = 0;
-	uint8_t m_txblock = 0;
-	uint8_t m_reg_f3 = 0;
+	uint16_t m_linktimer;
+	uint8_t m_linkid;
+	uint8_t m_txsize;
+	uint8_t m_txblock;
+	uint8_t m_reg_f3;
 
 	emu_timer *m_tick_timer = nullptr;
 	TIMER_CALLBACK_MEMBER(tick_timer_callback);

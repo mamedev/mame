@@ -148,6 +148,7 @@ void sega_xbdcomm_device::device_reset()
 	m_z80_stat = 0;
 
 #ifdef XBDCOMM_SIMULATION
+	std::fill(std::begin(m_buffer0), std::end(m_buffer0), 0);
 	m_tx_state = 0;
 	m_rx_state = 0;
 	comm_start();

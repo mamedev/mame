@@ -109,6 +109,7 @@ sega_s32comm_device::sega_s32comm_device(const machine_config &mconfig, const ch
 	std::fill(std::begin(m_shared), std::end(m_shared), 0);
 
 #ifdef S32COMM_SIMULATION
+	std::fill(std::begin(m_buffer0), std::end(m_buffer0), 0);
 	m_framesync = mconfig.options().comm_framesync() ? 0x01 : 0x00;
 #endif
 }
@@ -134,6 +135,12 @@ void sega_s32comm_device::device_reset()
 	m_tx_state = 0;
 	m_rx_state = 0;
 	comm_start();
+
+	m_linkenable = 0;
+	m_linktimer = 0;
+	m_linkalive = 0;
+	m_linkid = 0;
+	m_linkcount = 0;
 #endif
 }
 
