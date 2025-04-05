@@ -80,7 +80,7 @@ protected:
 
 private:
 	// devices
-	required_device<e132xt_device> m_maincpu;
+	required_device<e132x_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
 	required_device<palette_device> m_palette;
 	required_device<hopper_device> m_hopper;
@@ -409,7 +409,7 @@ following clocks are on the PCB
 void mjsenpu_state::mjsenpu(machine_config &config)
 {
 	// basic machine hardware
-	E132XT(config, m_maincpu, 27000000*2); // ?? Mhz
+	E132X(config, m_maincpu, 27'000'000*2); // E1-32XT (TQFP), ?? Mhz
 	m_maincpu->set_addrmap(AS_PROGRAM, &mjsenpu_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &mjsenpu_state::main_portmap);
 	m_maincpu->set_vblank_int("screen", FUNC(mjsenpu_state::irq0_line_hold));

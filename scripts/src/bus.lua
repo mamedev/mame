@@ -5818,13 +5818,13 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/heathzenith/h89/intr_cntrl.h,BUSES["HEATH_INTR_SOCKET"] = true
+--@src/devices/bus/heathzenith/intr_cntrl/intr_cntrl.h,BUSES["HEATH_INTR_SOCKET"] = true
 ---------------------------------------------------
 
 if (BUSES["HEATH_INTR_SOCKET"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/bus/heathzenith/h89/intr_cntrl.cpp",
-		MAME_DIR .. "src/devices/bus/heathzenith/h89/intr_cntrl.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/intr_cntrl/intr_cntrl.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/intr_cntrl/intr_cntrl.h",
 	}
 end
 

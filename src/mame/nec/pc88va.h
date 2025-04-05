@@ -16,6 +16,10 @@
 
 #include "bus/cbus/pc9801_cbus.h"
 #include "bus/msx/ctrl/ctrl.h"
+#include "bus/scsi/pc9801_sasi.h"
+#include "bus/scsi/scsi.h"
+#include "bus/scsi/scsihd.h"
+
 #include "cpu/nec/v5x.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/floppy.h"
@@ -73,6 +77,10 @@ public:
 		, m_kanji_rom(*this, "kanji")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
+		, m_sasibus(*this, "sasi")
+		, m_sasi_data_out(*this, "sasi_data_out")
+		, m_sasi_data_in(*this, "sasi_data_in")
+		, m_sasi_ctrl_in(*this, "sasi_ctrl_in")
 	{ }
 
 	void pc88va(machine_config &config);
@@ -113,6 +121,7 @@ protected:
 
 protected:
 	void pc88va_cbus(machine_config &config);
+	void pc88va_sasi(machine_config &config);
 
 private:
 
@@ -174,8 +183,6 @@ private:
 	void backupram_wp_0_w(uint16_t data);
 	uint8_t kanji_ram_r(offs_t offset);
 	void kanji_ram_w(offs_t offset, uint8_t data);
-
-	uint8_t hdd_status_r();
 
 	uint16_t sysop_r();
 	void timer3_ctrl_reg_w(uint8_t data);
@@ -314,10 +321,14 @@ private:
 
 	void sgp_map(address_map &map) ATTR_COLD;
 
-// TODO: stuff backported from PC8801 as QoL that should really be common
+// TODO: stuff backported from PC88/PC98 as QoL that should really be common
 protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<scsi_port_device> m_sasibus;
+	required_device<output_latch_device> m_sasi_data_out;
+	required_device<input_buffer_device> m_sasi_data_in;
+	required_device<input_buffer_device> m_sasi_ctrl_in;
 
 private:
 	uint8_t misc_ctrl_r();
@@ -334,6 +345,18 @@ private:
 	bool m_sound_irq_enable = false;
 	bool m_sound_irq_pending = false;
 	void int4_irq_w(int state);
+
+	// C-Bus SASI
+	void sasi_data_w(uint8_t data);
+	uint8_t sasi_data_r();
+	void write_sasi_io(int state);
+	void write_sasi_req(int state);
+	uint8_t sasi_status_r();
+	void sasi_ctrl_w(uint8_t data);
+
+	uint8_t m_sasi_data = 0;
+	int m_sasi_data_enable = 0;
+	uint8_t m_sasi_ctrl = 0;
 };
 
 

@@ -30,7 +30,7 @@ protected:
 	void nes_vt_fp_map(address_map &map) ATTR_COLD;
 
 	uint8_t vtfp_4119_r();
-	void vtfp_411e_w(uint8_t data);
+	void vtfp_411e_encryption_state_w(uint8_t data);
 	void vtfp_412c_extbank_w(uint8_t data);
 	uint8_t vtfp_412d_r();
 	void vtfp_4242_w(uint8_t data);

@@ -8,7 +8,7 @@
     systems without a TI-99/4A console, like the SGCPU and the Geneve. The
     board must be removed from the sidecar unit and plugged on this simple
     adapter board, which is then put in a slot of the Peripheral Expansion Box.
-    
+
                                       +-------+
                                 +-----|-------|---+
                                 |    Speech syn   |
@@ -20,21 +20,21 @@
          |        Adapter board                            |
          |                                                 |
       (((o LED              PEB slot connector             |
-         +--------------|||||||||||||||||||||||||----------+                            
+         +--------------|||||||||||||||||||||||||----------+
                         |||||||||||||||||||||||||
-    
+
     Technical detail:
-                        
+
     The SBE signal (Speech Block Enable), which is generated in the TI console,
-    is not forwarded to the PEB. One of the tasks of this board is thus to 
-    decode the mapped addresses once more and to activate the synthesizer 
+    is not forwarded to the PEB. One of the tasks of this board is thus to
+    decode the mapped addresses once more and to activate the synthesizer
     accordingly.
-    
+
     A second issue for Geneve users is that the address extension bits (AMA,
     AMB, AMC) need to be decoded as well to avoid the synthesizer interfering
     with other memory access. This can be activated in the configuration. The
     default is on.
-   
+
     Michael Zapf
     March 2025
 
@@ -93,11 +93,11 @@ void ti_speechsyn_adapter_device::setaddress_dbin(offs_t offset, int state)
 {
 	// Valid access = not(DBIN and A5)
 	bool reading = (state==ASSERT_LINE);
-	
-	// An access is valid when reading from 9000 and writing to 9400. 
+
+	// An access is valid when reading from 9000 and writing to 9400.
 	bool valid = (((offset & 0x0400)==0) == reading);
 	bool sbe = false;
-	
+
 	// Recreate the SBE signal that is only available at the I/O port of the console
 	if (m_dec_high)
 		// We need to decode the AMA/AMB/AMC address extension lines
@@ -128,7 +128,7 @@ void ti_speechsyn_adapter_device::device_start()
 void ti_speechsyn_adapter_device::device_reset()
 {
 	m_dec_high = (ioport("AMADECODE")->read()!=0);
-	LOGMASKED(LOG_CONFIG, "Speech adapter%s decoding the AMA/B/C lines.\n",  m_dec_high? "" : " not"); 
+	LOGMASKED(LOG_CONFIG, "Speech adapter%s decoding the AMA/B/C lines.\n",  m_dec_high? "" : " not");
 }
 
 void ti_speechsyn_adapter_options(device_slot_interface &device)

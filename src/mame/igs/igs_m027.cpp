@@ -186,6 +186,7 @@ public:
 	void init_chessc2() ATTR_COLD;
 	void init_tct2p() ATTR_COLD;
 	void init_xypdk() ATTR_COLD;
+	void init_ccly() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -3379,6 +3380,24 @@ ROM_START( extradrw ) // IGS PCB 0326-05-DV-1
 	ROM_LOAD( "igs s3002.u18", 0x00000, 0x200000, CRC(48601c32) SHA1(8ef3bad80931f4b1badf0598463e15508602f104) ) // BADADDR   --xxxxxxxxxxxxxxxxxxx
 ROM_END
 
+ROM_START( ccly ) // IGS PCB-0415-05-GD - no XA, contrary to the other regions sets in igs_m027xa.cpp
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	// Internal rom of IGS027A ARM based MCU
+	ROM_LOAD( "b5_027a.u30", 0x00000, 0x4000, CRC(5007bbf1) SHA1(e98753e299905ac13b31ae606b821d089fe045d0) )
+
+	ROM_REGION32_LE( 0x80000, "user1", ROMREGION_ERASEFF ) // external ARM data / prg
+	ROM_LOAD( "rom.u21", 0x00000, 0x80000, CRC(f5fd7279) SHA1(4d91c0655bd852c8ff1f0fc9c882e87b37830268) )
+
+	ROM_REGION( 0x080000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "rom.u9", 0x000000, 0x080000, CRC(776f198c) SHA1(e567ef98160ccb51688189eac13594ab6aaf13bc) )
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "rom.u8", 0x000000, 0x400000, CRC(5b9863ba) SHA1(c4080076e03994056ac94d7c0a5ffcabd9505f9a) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "rom.u18", 0x00000, 0x200000, CRC(2cbfc5aa) SHA1(94817f5d1babad4ff1bb12701797982e7a106a72) )
+ROM_END
+
 
 void igs_m027_state::pgm_create_dummy_internal_arm_region()
 {
@@ -3624,6 +3643,13 @@ void igs_m027_state::init_xypdk()
 	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
 }
 
+void igs_m027_state::init_ccly()
+{
+	crzybugs_decrypt(machine());
+	m_igs017_igs031->sdwx_gfx_decrypt();
+	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
+}
+
 } // anonymous namespace
 
 
@@ -3664,6 +3690,7 @@ GAME(  2005, cjddzlf,       0,        cjddz,        cjddz,         igs_m027_stat
 GAME(  2005, cjtljp,        0,        xypdk,        lhzb4,         igs_m027_state, init_cjtljp,   ROT0, "IGS", "Chaoji Tuolaji Jiaqiang Ban (V206CN)", 0 ) // 2005 date in internal ROM
 GAME(  2005, xypdk,         0,        xypdk,        lhzb4,         igs_m027_state, init_xypdk,    ROT0, "IGS", "Xingyun Pao De Kuai (V106CN)", 0 )
 GAMEL( 2007, tripslot,      0,        tripslot,     tripslot,      igs_m027_state, init_tripslot, ROT0, "IGS", "Triple Slot (V200VE)", 0, layout_tripslot ) // 2007 date in internal ROM at least, could be later, default settings password is all 'start 1'
+GAME(  2005, ccly,          crzybugs, m027_1ppi<true>, base,       igs_m027_state, init_ccly,     ROT0, "IGS", "Chong Chong Le Yuan (V100CN)", MACHINE_NOT_WORKING )
 // this has a 2nd 8255
 GAME(  2001, extradrw,      0,        extradrw,     base,          igs_m027_state, init_extradrw, ROT0, "IGS", "Extra Draw (V100VE)", MACHINE_NOT_WORKING )
 // these have an IGS025 protection device instead of the 8255

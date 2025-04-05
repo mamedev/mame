@@ -523,7 +523,7 @@ void dgpix_bmkey_state::machine_reset()
 
 void dgpix_state::dgpix_base(machine_config &config)
 {
-	E132XT(config, m_maincpu, 20000000*4); /* 4x internal multiplier */
+	E132X(config, m_maincpu, 20'000'000*4); // E1-32XT (TQFP), 4x internal multiplier
 	m_maincpu->set_addrmap(AS_IO, &dgpix_state::io_map);
 
 	/* video hardware */
@@ -992,8 +992,8 @@ void dgpix_bmkey_state::init_btplay2k()
 
 GAME( 1999, elfin,     0,      dgpix,          dgpix,    dgpix_typea_state, init_elfin,     ROT0, "dgPIX Entertainment Inc.", "Elfin",                             MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1999, jumpjump,  0,      dgpix,          dgpix,    dgpix_typea_state, init_jumpjump,  ROT0, "dgPIX Entertainment Inc.", "Jump Jump",                         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1999, xfiles,    0,      dgpix,          dgpix,    dgpix_typea_state, init_xfiles,    ROT0, "dgPIX Entertainment Inc.", "The X-Files",                       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1999, xfilesk,   xfiles, dgpix,          dgpix,    dgpix_typea_state, init_xfilesk,   ROT0, "dgPIX Entertainment Inc.", "The X-Files (Censored, Korea)",     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1999, xfiles,    0,      dgpix,          dgpix,    dgpix_typea_state, init_xfiles,    ROT0, "dgPIX Entertainment Inc.", "The X-Files",                       MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1999, xfilesk,   xfiles, dgpix,          dgpix,    dgpix_typea_state, init_xfilesk,   ROT0, "dgPIX Entertainment Inc.", "The X-Files (censored, Korea)",     MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1999, kdynastg,  0,      dgpix_kdynastg, dgpix,    dgpix_typea_state, init_kdynastg,  ROT0, "EZ Graphics",              "King of Dynast Gear (version 1.8)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1999, letsdnce,  0,      dgpix,          letsdnce, dgpix_bmkey_state, init_letsdnce,  ROT0, "dgPIX Entertainment Inc.", "Let's Dance",                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 2000, btplay2k,  0,      dgpix,          btplay2k, dgpix_bmkey_state, init_btplay2k,  ROT0, "dgPIX Entertainment Inc.", "Beat Player 2000",                  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

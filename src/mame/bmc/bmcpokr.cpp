@@ -17,6 +17,7 @@ TODO:
  * Hopper hookup doesn't work properly.  MAME counts far more "tickets
    dispensed" than the number of coins/tickets the games are supposed to
    pay out.
+ * dbshahb: Implement different video chip, different memory map
  * xyddzhh: Hook up mahjong-style inputs and improve DSW definitions
  * xyddzhh: Add Oki banking
 
@@ -1629,6 +1630,22 @@ ROM_START( mjmaglmp )
 	ROM_LOAD( "ja-a-901.u6", 0x00000, 0x40000, CRC(25f36d00) SHA1(c182348340ca67ad69d1a67c58b47d6371a725c9) )
 ROM_END
 
+// HB PCB. Has BMC AIA90610 (rebadged M68K), BMC VDA90513 + BMC SYA70521 + Inmos IMSG171P-35 for video, UM3567 + U6295 for sound, 4 banks of 8 DIP switches
+ROM_START( dbshahb )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 Code
+	ROM_LOAD16_BYTE( "rom.u12", 0x000000, 0x20000, CRC(ae7f1544) SHA1(c2b150ad5927fa7905713baa1222ca0b990c927b) )
+	ROM_LOAD16_BYTE( "rom.u13", 0x000001, 0x20000, CRC(761d4d0f) SHA1(e07b376d539b9e78a31694accdf3079a7b1fa723) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "rom.u41", 0x000000, 0x80000, CRC(8d9d6168) SHA1(a7f2f220d2e2b50074adee3f6c26a41c371b7275) )
+	ROM_LOAD16_BYTE( "rom.u33", 0x000001, 0x80000, CRC(6b45ee5f) SHA1(fe2270f3a30d0850c90bb978f51b928d4ebb819a) )
+	ROM_LOAD16_BYTE( "rom.u40", 0x100000, 0x80000, CRC(80db7375) SHA1(14b62be2f350cecd60f42d177e87e4e6ced57831) )
+	ROM_LOAD16_BYTE( "rom.u35", 0x100001, 0x80000, CRC(6bd5c23f) SHA1(4891d1c7031834f3957f6830d75246de84494afc) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) // Samples
+	ROM_LOAD( "rom.u15", 0x00000, 0x40000, CRC(843546c6) SHA1(ad408b182a3c2e0bfe1779fe81e1e4ea9b79daf6) )
+ROM_END
+
 } // anonymous namespace
 
 GAME( 1998, fengyunh, 0,        fengyunh, fengyunh, bmcpokr_state, empty_init, ROT0, "BMC",       "Fengyun Hui",              MACHINE_SUPPORTS_SAVE )
@@ -1636,3 +1653,4 @@ GAME( 1998, shendeng, mjmaglmp, shendeng, shendeng, bmcpokr_state, empty_init, R
 GAME( 1999, bmcpokr,  0,        bmcpokr,  bmcpokr,  bmcpokr_state, empty_init, ROT0, "BMC",       "Dongfang Shenlong",        MACHINE_SUPPORTS_SAVE )
 GAME( 2000, mjmaglmp, 0,        mjmaglmp, mjmaglmp, bmcpokr_state, empty_init, ROT0, "BMC",       "Mahou no Lamp (v. JAA02)", MACHINE_SUPPORTS_SAVE )
 GAME( 2006, xyddzhh,  0,        xyddzhh,  xyddzhh,  bmcpokr_state, empty_init, ROT0, "Herb Home", "Xingyun Dou Dizhu",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 200?, dbshahb,  0,        bmcpokr,  xyddzhh,  bmcpokr_state, empty_init, ROT0, "H.B.",      "Da Bai Sha (H.B.)",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

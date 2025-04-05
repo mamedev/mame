@@ -170,7 +170,7 @@ public:
 
 private:
 	/* devices */
-	required_device<e132xt_device> m_maincpu;
+	required_device<e132x_device> m_maincpu;
 	optional_device_array<okim6295_device, 2> m_oki;
 
 	/* memory pointers */
@@ -832,7 +832,7 @@ void gstream_state::machine_reset()
 void gstream_state::gstream(machine_config &config)
 {
 	/* basic machine hardware */
-	E132XT(config, m_maincpu, 16000000*4); /* 4x internal multiplier */
+	E132X(config, m_maincpu, 16'000'000*4); // E1-32XT (TQFP), 4x internal multiplier
 	m_maincpu->set_addrmap(AS_PROGRAM, &gstream_state::gstream_32bit_map);
 	m_maincpu->set_addrmap(AS_IO, &gstream_state::gstream_io);
 	m_maincpu->set_vblank_int("screen", FUNC(gstream_state::irq0_line_hold));
@@ -861,7 +861,7 @@ void gstream_state::gstream(machine_config &config)
 void gstream_state::x2222(machine_config &config)
 {
 	/* basic machine hardware */
-	E132XT(config, m_maincpu, 16000000*4); /* 4x internal multiplier */
+	E132X(config, m_maincpu, 16'000'000*4); // E1-32XT (TQFP) 4x internal multiplier
 	m_maincpu->set_addrmap(AS_PROGRAM, &gstream_state::x2222_32bit_map);
 	m_maincpu->set_addrmap(AS_IO, &gstream_state::x2222_io);
 	m_maincpu->set_vblank_int("screen", FUNC(gstream_state::irq0_line_hold));

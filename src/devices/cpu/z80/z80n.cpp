@@ -31,7 +31,7 @@ z80n_device::z80n_device(const machine_config &mconfig, const char *tag, device_
 {
 }
 
-void z80n_device::do_op()
+void z80n_device::execute_run()
 {
 	#include "cpu/z80/z80n.hxx"
 }

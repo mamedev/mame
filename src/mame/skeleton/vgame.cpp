@@ -168,6 +168,8 @@ ROM_START( mjxy2 )
 
 	ROM_REGION( 0x200000, "oki", 0 )
 	ROM_LOAD( "u43_sp_v105.u43", 0x000000, 0x200000, CRC(5d1ab8f1) SHA1(56473b632dfdb210208ce3b35cb6861f07861cd7) )
+
+	// EEPROM dump for mjxy2 was 0xff filled
 ROM_END
 
 /*
@@ -274,13 +276,28 @@ ROM_START( cjsjh ) // Nov  2 2007 16:05:26 string in ROM
 	ROM_LOAD( "vxxxcn.u8", 0x000000, 0x200000, CRC(911d8dce) SHA1(1d9386c4a9e118d02b5b29f9e9ce90ef1d6f419f) ) // label not readable
 
 	ROM_REGION( 0x400000, "gfx", 0 )
-	ROM_LOAD( "gfx.u2", 0x000000, 0x400000, CRC(e2964db3) SHA1(21e021c88136083445b430c618a8eb74e2147d4f ) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
+	ROM_LOAD( "gfx.u2", 0x000000, 0x400000, CRC(e2964db3) SHA1(21e021c88136083445b430c618a8eb74e2147d4f) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
 
 	ROM_REGION( 0x200000, "oki", 0 )
 	ROM_LOAD( "sp.u24", 0x000000, 0x200000, CRC(ad11c8b9) SHA1(0547a57ff2183e65fa1d51234799a3d521b018c5) )
 
-	ROM_REGION( 0x200, "eeprom", 0 )
-	ROM_LOAD( "cjsjh_93c66a.u11", 0x000, 0x200, CRC(cbaeab4f) SHA1(505d91ee1b0d219aa55e3262b3bf712c4d9c2408) )
+	ROM_REGION16_BE( 0x200, "eeprom", 0 )
+	ROM_LOAD16_WORD_SWAP( "cjsjh_93c66a.u11", 0x000, 0x200, CRC(cbaeab4f) SHA1(505d91ee1b0d219aa55e3262b3bf712c4d9c2408) )
+ROM_END
+
+ROM_START( cjlddz )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD( "u12.u12", 0x000000, 0x200000, CRC(b35ff3cb) SHA1(fe1fa4448153a449f28b776ef452be860d119e7b) )
+
+	ROM_REGION( 0x800000, "gfx", 0 )
+	ROM_LOAD16_BYTE( "u2_cg_v101.u2", 0x000000, 0x400000, CRC(37eec9f9) SHA1(c0fcce6ccf28583920eae2558133a5ba2e1fb68b) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
+	ROM_LOAD16_BYTE( "u8_cg_v101.u8", 0x000001, 0x400000, CRC(eb3ccdf1) SHA1(f0420f967d4decda3643975205eacdb8c0536bef) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "u43_sp_v100.u43", 0x000000, 0x200000, CRC(ec57f98b) SHA1(ada7e8248d6d9fbd3b3b5caaad45ea814f09edd6) )
+
+	ROM_REGION16_BE( 0x200, "eeprom", 0 )
+	ROM_LOAD16_WORD_SWAP( "cjlddz_93c66a.u13", 0x000, 0x200, CRC(3930b2ff) SHA1(69e1e7b8654ff3696ab7f210fa69a5aed9cb59fb) )
 ROM_END
 
 
@@ -321,3 +338,4 @@ GAME( 200?, hilice,  0, vgame, hilice, vgame_state, init_vgame, ROT0, "VGame", "
 GAME( 200?, mjxy2,   0, vgame, hilice, vgame_state, init_vgame, ROT0, "VGame", "Majiang Xueyuan 2 - Mahjong School (V108TW)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2008, cjdn,    0, vgame, hilice, vgame_state, init_vgame, ROT0, "VGame", "Chao Ji Dou Niu (V305CN)",                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2007, cjsjh,   0, vgame, hilice, vgame_state, init_vgame, ROT0, "VGame", "Chao Ji Sai Jin Hua (V201CN)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, cjlddz,  0, vgame, hilice, vgame_state, init_vgame, ROT0, "VGame", "Chao Ji Laizi Dou Dizhu (V109CN)",              MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
