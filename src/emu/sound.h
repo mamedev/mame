@@ -234,7 +234,7 @@ protected:
 	{
 		// start has to be set after end, since end can expand the buffer and
 		// potentially invalidate start
-		m_start = buffer.time_to_buffer_index(start, false);
+		m_startt = buffer.time_to_buffer_index(start, false);
 		normalize_start_end();
 	}
 
@@ -242,8 +242,8 @@ public:
 	// base constructor to simplify some of the code
 	read_stream_view(stream_buffer *buffer, s32 start, s32 end, sample_t gain) :
 		m_buffer(buffer),
-		m_end(end),
-		m_start(start),
+		m_endd(end),
+		m_startt(start),
 		m_gain(gain)
 	{
 		normalize_start_end();
@@ -263,13 +263,13 @@ public:
 
 	// copy constructor
 	read_stream_view(read_stream_view const &src) :
-		read_stream_view(src.m_buffer, src.m_start, src.m_end, src.m_gain)
+		read_stream_view(src.m_buffer, src.m_startt, src.m_endd, src.m_gain)
 	{
 	}
 
 	// copy constructor that sets a different start time
 	read_stream_view(read_stream_view const &src, attotime start) :
-		read_stream_view(src.m_buffer, src.m_buffer->time_to_buffer_index(start, false), src.m_end, src.m_gain)
+		read_stream_view(src.m_buffer, src.m_buffer->time_to_buffer_index(start, false), src.m_endd, src.m_gain)
 	{
 	}
 
@@ -277,8 +277,8 @@ public:
 	read_stream_view &operator=(read_stream_view const &rhs)
 	{
 		m_buffer = rhs.m_buffer;
-		m_start = rhs.m_start;
-		m_end = rhs.m_end;
+		m_startt = rhs.m_startt;
+		m_endd = rhs.m_endd;
 		m_gain = rhs.m_gain;
 		normalize_start_end();
 		return *this;
@@ -295,11 +295,11 @@ public:
 	attotime sample_period() const { return m_buffer->sample_period(); }
 
 	// return the number of samples represented by the buffer
-	u32 samples() const { return m_end - m_start; }
+	u32 samples() const { return m_samples; }
 
 	// return the starting or ending time of the buffer
-	attotime start_time() const { return m_buffer->index_time(m_start); }
-	attotime end_time() const { return m_buffer->index_time(m_end); }
+	attotime start_time() const { return m_buffer->index_time(m_startt); }
+	attotime end_time() const { return m_buffer->index_time(m_endd); }
 
 	// set the gain
 	read_stream_view &set_gain(float gain) { m_gain = gain; return *this; }
@@ -311,7 +311,7 @@ public:
 	sample_t get(s32 index) const
 	{
 		sound_assert(u32(index) < samples());
-		index += m_start;
+		index += m_startt;
 		if (index >= m_buffer->size())
 			index -= m_buffer->size();
 		return m_buffer->get(index) * m_gain;
@@ -322,7 +322,7 @@ public:
 	sample_t getraw(s32 index) const
 	{
 		sound_assert(u32(index) < samples());
-		index += m_start;
+		index += m_startt;
 		if (index >= m_buffer->size())
 			index -= m_buffer->size();
 		return m_buffer->get(index);
@@ -334,15 +334,17 @@ protected:
 	{
 		// ensure that end is always greater than start; we'll
 		// wrap to the buffer length as needed
-		if (m_end < m_start && m_buffer != nullptr)
-			m_end += m_buffer->size();
-		sound_assert(m_end >= m_start);
+		if (m_endd < m_startt && m_buffer != nullptr)
+			m_endd += m_buffer->size();
+		sound_assert(m_endd >= m_startt);
+		m_samples = m_endd - m_startt;
 	}
 
 	// internal state
 	stream_buffer *m_buffer;              // pointer to the stream buffer we're viewing
-	s32 m_end;                            // ending sample index (always >= start)
-	s32 m_start;                          // starting sample index
+	s32 m_endd;                            // ending sample index (always >= start)
+	s32 m_startt;                          // starting sample index
+	u32 m_samples;                        // number of samples = m_end - m_start
 	sample_t m_gain;                      // overall gain factor
 };
 
@@ -460,7 +462,7 @@ private:
 	// given a stream starting offset, return the buffer index
 	u32 index_to_buffer_index(s32 start) const
 	{
-		u32 index = start + m_start;
+		u32 index = start + m_startt;
 		if (index >= m_buffer->size())
 			index -= m_buffer->size();
 		return index;
