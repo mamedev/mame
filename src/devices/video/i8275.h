@@ -233,6 +233,7 @@ protected:
 	int m_lpen;
 
 	int m_scanline;
+	int m_column;
 	int m_irq_scanline;
 	int m_vrtc_scanline;
 	int m_vrtc_drq_scanline;
