@@ -226,7 +226,6 @@ class OpcodeList:
         print("	return;", file=f)
         print("}", file=f)
         print("while (true) {", file=f)
-        print("start:", file=f)
         print("switch (u8(m_ref >> 16)) // prefix", file=f)
         print("{", file=f)
         for opc in self.opcode_info:
