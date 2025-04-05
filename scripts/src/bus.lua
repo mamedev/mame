@@ -5818,6 +5818,24 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/heathzenith/h8/h8bus.h,BUSES["H8BUS"] = true
+---------------------------------------------------
+
+if (BUSES["H8BUS"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/heathzenith/h8/h8bus.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h8/h8bus.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h8/h_8_1.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h8/h_8_1.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h8/h_8_5.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h8/h_8_5.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h8/wh_8_64.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h8/wh_8_64.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/bus/heathzenith/intr_cntrl/intr_cntrl.h,BUSES["HEATH_INTR_SOCKET"] = true
 ---------------------------------------------------
 
