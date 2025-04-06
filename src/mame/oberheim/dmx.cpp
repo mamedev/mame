@@ -176,9 +176,6 @@ struct dmx_voice_card_config
 class dmx_voice_card_device : public device_t, public device_sound_interface
 {
 public:
-	// Default value of pitch adjustment trimpot.
-	static constexpr const s32 T1_DEFAULT_PERCENT = 50;
-
 	dmx_voice_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const dmx_voice_card_config &config, required_memory_region *sample_rom) ATTR_COLD;
 	dmx_voice_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0) ATTR_COLD;
 
@@ -219,8 +216,8 @@ private:
 	required_memory_region *m_sample_rom = nullptr;
 	std::vector<float> m_cv;  // 555 CV (pin 5) voltage variations.
 	std::vector<attotime> m_sample_t;  // Sample period variations.
-	s32 m_t1_percent = T1_DEFAULT_PERCENT;
-	std::vector<float> m_gain;  // Gain variations.
+	s32 m_t1_percent = 0;  // Tuning trimmer.
+	std::vector<float> m_iref;  // DAC reference currents for gain variations.
 	std::vector<float> m_decay_r;  // Decay resistance variations.
 
 	// Device state.
@@ -280,13 +277,13 @@ void dmx_voice_card_device::trigger(bool tr0, bool tr1)
 	if (m_config.pitch_control)
 		select_pitch();
 
-	const float gain = has_gain_variations() ? m_gain[m_trigger_mode] : m_gain[0];
+	const float iref = has_gain_variations() ? m_iref[m_trigger_mode] : m_iref[0];
 	if (has_decay())  // Gain is controled by an envelope generator.
-		m_eg->set_instant_v(gain);
+		m_eg->set_instant_v(iref);
 	else  // Constant gain.
-		m_dac_mult->set_fixed_cv(gain);
+		m_dac_mult->set_fixed_cv(iref);
 
-	LOGMASKED(LOG_SOUND, "Trigger: (%d, %d) %d, %f\n", tr0, tr1, m_trigger_mode, gain);
+	LOGMASKED(LOG_SOUND, "Trigger: (%d, %d) %d, %f uA\n", tr0, tr1, m_trigger_mode, iref * 1e6F);
 }
 
 void dmx_voice_card_device::set_pitch_adj(s32 t1_percent)
@@ -298,13 +295,17 @@ void dmx_voice_card_device::set_pitch_adj(s32 t1_percent)
 
 void dmx_voice_card_device::device_add_mconfig(machine_config &config)
 {
+	// This multiplier relates the DAC reference current to the output voltage.
+	// Iout = dac value (normalized to -1 - 1) * 3.8 * Iref.
+	// Vout = Iout * R_current_to_voltage_converter.
+	static constexpr const double DAC_MULTIPLIER = 3.8 * RES_K(2.4);  // R16, R11 on voice card.
 	static constexpr const double SK_R3 = RES_M(999.99);
 	static constexpr const double SK_R4 = RES_R(0.001);
 
 	TIMER(config, m_timer).configure_generic(FUNC(dmx_voice_card_device::clock_callback));
 	DAC76(config, m_dac, 0U);
 	VA_VCA(config, m_dac_mult);
-	m_dac->add_route(0, m_dac_mult, 1.0);
+	m_dac->add_route(0, m_dac_mult, DAC_MULTIPLIER);
 
 	if (has_decay())
 	{
@@ -492,27 +493,27 @@ void dmx_voice_card_device::init_gain_and_decay_variations()
 	const float r17 = m_config.r17;
 	const float c3 = m_config.c3;
 
-	// Precompute gain variations.
-	m_gain.clear();
-	m_gain.push_back(MAX_IREF);
+	// Precompute gain variations. Different gains are set by supplying
+	// different reference currents to the MDAC.
+	m_iref.clear();
+	m_iref.push_back(MAX_IREF);
 	if (has_gain_variations())  // Configured gain variations.
 	{
 		// The equations below were derived from Kirchhoff analysis and verified
 		// with simulations: https://tinyurl.com/22wxwh8h
 
 		// For trigger mode 1.
-		m_gain.push_back((r12 * r17 * VCC + R8 * r12 * VD + R8 * r17 * VD) /
+		m_iref.push_back((r12 * r17 * VCC + R8 * r12 * VD + R8 * r17 * VD) /
 						 ((R8 * r12 * r17) + (r12 * r17 * R9) + (R8 * r17 * R9) + (R8 * r12 * R9)));
 		// For trigger mode 2.
-		m_gain.push_back((r12 * VCC + R8 * VD) / (r12 * R8 + R8 * R9 + r12 * R9));
+		m_iref.push_back((r12 * VCC + R8 * VD) / (r12 * R8 + R8 * R9 + r12 * R9));
 		// For trigger mode 3.
-		m_gain.push_back(m_gain[0]);
+		m_iref.push_back(m_iref[0]);
 	}
-	for (int i = 0; i < m_gain.size(); ++i)
+	for (int i = 0; i < m_iref.size(); ++i)
 	{
-		LOGMASKED(LOG_VOLUME, "%s: Gain variation %d: %f uA, %f\n",
-				tag(), i, m_gain[i] * 1e6F, m_gain[i] / MAX_IREF);
-		m_gain[i] /= MAX_IREF;  // Normalize.
+		LOGMASKED(LOG_VOLUME, "%s: Gain / Iref variation %d: %f uA\n",
+				tag(), i, m_iref[i] * 1e6F);
 	}
 
 	// Precompute decay resistance variations.
@@ -785,6 +786,8 @@ public:
 		, m_metronome_timer(*this, "metronome_timer")
 		, m_buttons(*this, "buttons_%d", 0)
 		, m_faders(*this, "fader_p%d", 1)
+		, m_pitch_trimmers(*this, "pitch_adj_%d", 1)
+		, m_master_volume(*this, "fader_p10")
 		, m_switches(*this, "switches")
 		, m_external_triggers(*this, "external_triggers")
 		, m_output_select(*this, "output_select")
@@ -829,11 +832,13 @@ private:
 
 	u8 buttons_r(offs_t offset);
 	u8 external_triggers_r();
-	u8 cassette_r();
+	u8 cassette_and_switch_r();
 	template<int GROUP> void gen_trigger_w(u8 data);
 
 	void update_output();
 	void update_mix_level(int voice);
+	void update_master_volume();
+	void update_pitch_adj(int voice);
 
 	void memory_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
@@ -845,7 +850,9 @@ private:
 	output_finder<> m_metronome_out;
 	required_device<timer_device> m_metronome_timer;
 	required_ioport_array<6> m_buttons;
-	required_ioport_array<10> m_faders;
+	required_ioport_array<9> m_faders;
+	required_ioport_array<8> m_pitch_trimmers;
+	required_ioport m_master_volume;
 	required_ioport m_switches;  // Includes foot switches.
 	required_ioport m_external_triggers;
 	required_ioport m_output_select;
@@ -1116,7 +1123,7 @@ u8 dmx_state::external_triggers_r()
 	return ~m_external_triggers->read();
 }
 
-u8 dmx_state::cassette_r()
+u8 dmx_state::cassette_and_switch_r()
 {
 	// All components are on the Processor Board.
 	// Inputs buffered by U19 (75LS244). This is a mix of cassette-related
@@ -1200,13 +1207,13 @@ void dmx_state::update_mix_level(int voice)
 	assert(voice >= 0 && voice < NUM_MIXED_VOICES);
 
 	static constexpr const float P_MAX = RES_K(10);  // Volume potentiometer.
-	static constexpr const float VC_R21 = RES_R(4.7);  // R21 on voice cards.
+	static constexpr const float VC_R21 = RES_R(47);  // R21 on voice cards.
 	static constexpr const float VC_C10 = CAP_U(33);  // C10 on voice cards.
 	static constexpr const float PB_C24 = CAP_U(6.8);  // C24 on processor board.
 
 	// Feedback resistors on the left and right summing op-amps (U1B, U1C).
-	static constexpr const float R_FEEDBACK_LEFT = RES_K(4.7);  // R30.
-	static constexpr const float R_FEEDBACK_RIGHT = RES_K(4.7);  // R29.
+	static constexpr const float R_FEEDBACK_LEFT = RES_K(27);  // R30.
+	static constexpr const float R_FEEDBACK_RIGHT = RES_K(27);  // R29.
 
 	const s32 pot_percent = m_faders[VOICE_TO_FADER_MAP[voice]]->read();
 	const float r_pot_bottom = P_MAX * pot_percent / 100.0F;
@@ -1220,14 +1227,38 @@ void dmx_state::update_mix_level(int voice)
 	// -v_pot because the summing opamp mixer is inverting.
 	const float gain_left = -v_pot * R_FEEDBACK_LEFT / r_mix_left;
 	const float gain_right = -v_pot * R_FEEDBACK_RIGHT / r_mix_right;
+
+	// Resistance as seen from the output side of the DC-blocking capacitor.
+	const float rc_r = r_pot_top + r_gnd;
 	const float rc_c = (voice == METRONOME_INDEX) ? PB_C24 : VC_C10;
 
-	m_voice_rc[voice]->filter_rc_set_RC(filter_rc_device::HIGHPASS, r_gnd, 0, 0, rc_c);
+	m_voice_rc[voice]->filter_rc_set_RC(filter_rc_device::HIGHPASS, rc_r, 0, 0, rc_c);
 	m_left_mixer->set_input_gain(voice, gain_left);
 	m_right_mixer->set_input_gain(voice, gain_right);
 
 	LOGMASKED(LOG_FADERS, "Voice %d volume changed to: %d (gain L:%f, R:%f), HPF cutoff: %.2f Hz\n",
 			voice, pot_percent, gain_left, gain_right, 1.0F / (2 * float(M_PI) * r_gnd * rc_c));
+}
+
+void dmx_state::update_master_volume()
+{
+	// The audio pipeline operates on voltage magnitudes. This scaler normalizes
+	// the final output's range to approximately: -1 - 1.
+	static constexpr const float VOLTAGE_TO_SOUND_SCALER = 0.04F;
+
+	const s32 volume_value = m_master_volume->read();
+	const float gain = VOLTAGE_TO_SOUND_SCALER * volume_value / 100.0F;
+	m_left_mixer->set_output_gain(0, gain);
+	m_right_mixer->set_output_gain(0, gain);
+	LOGMASKED(LOG_FADERS, "Master volume changed: %d - %f\n", volume_value, gain);
+}
+
+void dmx_state::update_pitch_adj(int voice)
+{
+	const s32 trimmer_value = m_pitch_trimmers[VOICE_TO_FADER_MAP[voice]]->read();
+	// Using "100 -" so that larger values increase pitch.
+	m_voices[voice]->set_pitch_adj(100 - trimmer_value);
+	LOGMASKED(LOG_PITCH, "Voice %d pitch adjustment changed: %d\n", voice, trimmer_value);
 }
 
 void dmx_state::memory_map(address_map &map)
@@ -1259,7 +1290,7 @@ void dmx_state::io_map(address_map &map)
 	// Read decoding done by U9 (74LS42) on the Switch Board.
 	map(0x00, 0x05).mirror(0x78).r(FUNC(dmx_state::buttons_r));  // IORD*
 	map(0x06, 0x06).mirror(0x78).r(FUNC(dmx_state::external_triggers_r));  // SW6*
-	map(0x07, 0x07).mirror(0x78).r(FUNC(dmx_state::cassette_r));  // CASI*
+	map(0x07, 0x07).mirror(0x78).r(FUNC(dmx_state::cassette_and_switch_r));  // CASI*
 }
 
 void dmx_state::machine_start()
@@ -1282,8 +1313,11 @@ void dmx_state::machine_start()
 void dmx_state::machine_reset()
 {
 	update_output();
+	update_master_volume();
 	for (int i = 0; i < NUM_MIXED_VOICES; ++i)
 		update_mix_level(i);
+	for (int i = 0; i < NUM_VOICE_CARDS; ++i)
+		update_pitch_adj(i);
 }
 
 void dmx_state::dmx(machine_config &config)
@@ -1374,17 +1408,12 @@ DECLARE_INPUT_CHANGED_MEMBER(dmx_state::voice_volume_changed)
 
 DECLARE_INPUT_CHANGED_MEMBER(dmx_state::master_volume_changed)
 {
-	const float gain = newval / 100.0F;
-	m_left_mixer->set_output_gain(0, gain);
-	m_right_mixer->set_output_gain(0, gain);
-	LOGMASKED(LOG_FADERS, "Master volume changed: %d\n", newval);
+	update_master_volume();
 }
 
 DECLARE_INPUT_CHANGED_MEMBER(dmx_state::pitch_adj_changed)
 {
-	// Using "100 -" so that larger values increase pitch.
-	m_voices[param]->set_pitch_adj(100 - newval);
-	LOGMASKED(LOG_PITCH, "Voice %d pitch adjustment changed: %d\n", param, newval);
+	update_pitch_adj(param);
 }
 
 INPUT_PORTS_START(dmx)
@@ -1522,35 +1551,35 @@ INPUT_PORTS_START(dmx)
 	// as "PITCH ADJ."
 
 	PORT_START("pitch_adj_1")
-	PORT_ADJUSTER(dmx_voice_card_device::T1_DEFAULT_PERCENT, "BASS pitch")
+	PORT_ADJUSTER(50, "BASS pitch")
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::pitch_adj_changed), dmx_state::VC_BASS)
 
 	PORT_START("pitch_adj_2")
-	PORT_ADJUSTER(dmx_voice_card_device::T1_DEFAULT_PERCENT, "SNARE pitch")
+	PORT_ADJUSTER(50, "SNARE pitch")
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::pitch_adj_changed), dmx_state::VC_SNARE)
 
 	PORT_START("pitch_adj_3")
-	PORT_ADJUSTER(dmx_voice_card_device::T1_DEFAULT_PERCENT, "HI-HAT pitch")
+	PORT_ADJUSTER(50, "HI-HAT pitch")
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::pitch_adj_changed), dmx_state::VC_HIHAT)
 
 	PORT_START("pitch_adj_4")
-	PORT_ADJUSTER(dmx_voice_card_device::T1_DEFAULT_PERCENT, "TOM1 pitch")
+	PORT_ADJUSTER(50, "TOM1 pitch")
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::pitch_adj_changed), dmx_state::VC_SMALL_TOMS)
 
 	PORT_START("pitch_adj_5")
-	PORT_ADJUSTER(dmx_voice_card_device::T1_DEFAULT_PERCENT, "TOM2 pitch")
+	PORT_ADJUSTER(50, "TOM2 pitch")
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::pitch_adj_changed), dmx_state::VC_LARGE_TOMS)
 
 	PORT_START("pitch_adj_6")
-	PORT_ADJUSTER(dmx_voice_card_device::T1_DEFAULT_PERCENT, "CYMBAL pitch")
+	PORT_ADJUSTER(50, "CYMBAL pitch")
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::pitch_adj_changed), dmx_state::VC_CYMBAL)
 
 	PORT_START("pitch_adj_7")
-	PORT_ADJUSTER(dmx_voice_card_device::T1_DEFAULT_PERCENT, "PERC1 pitch")
+	PORT_ADJUSTER(50, "PERC1 pitch")
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::pitch_adj_changed), dmx_state::VC_PERC1)
 
 	PORT_START("pitch_adj_8")
-	PORT_ADJUSTER(dmx_voice_card_device::T1_DEFAULT_PERCENT, "PERC2 pitch")
+	PORT_ADJUSTER(50, "PERC2 pitch")
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dmx_state::pitch_adj_changed), dmx_state::VC_PERC2)
 INPUT_PORTS_END
 
