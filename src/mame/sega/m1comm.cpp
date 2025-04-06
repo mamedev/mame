@@ -441,7 +441,8 @@ void sega_m1comm_device::comm_start()
 		m_localaddr = resolveIte.endpoint();
 		LOG("M1COMM: localhost = %s\n", *m_localaddr);
 	}
-	if (err) {
+	if (err)
+	{
 		LOG("M1COMM: localhost resolve error: %s\n", err.message());
 	}
 
@@ -450,7 +451,8 @@ void sega_m1comm_device::comm_start()
 		m_remoteaddr = resolveIte.endpoint();
 		LOG("M1COMM: remotehost = %s\n", *m_remoteaddr);
 	}
-	if (err) {
+	if (err)
+	{
 		LOG("M1COMM: remotehost resolve error: %s\n", err.message());
 	}
 }
@@ -547,7 +549,6 @@ void sega_m1comm_device::comm_tick()
 						m_shared[3] = m_linkcount;
 					}
 
-
 					if (m_linkalive == 0x00)
 						recv = read_frame(data_size);
 					else
@@ -612,7 +613,7 @@ void sega_m1comm_device::comm_tick()
 						{
 							// save message to "ring buffer"
 							unsigned frame_offset = frame_start + (idx * frame_size);
-							for (unsigned j = 0x00 ; j < frame_size ; j++)
+							for (unsigned j = 0x00; j < frame_size; j++)
 							{
 								m_shared[frame_offset + j] = m_buffer0[1 + j];
 							}
@@ -638,7 +639,7 @@ void sega_m1comm_device::comm_tick()
 							{
 								// save message to "ring buffer"
 								unsigned frame_offset = 0x06;
-								for (unsigned j = 0x00 ; j < 0x0a ; j++)
+								for (unsigned j = 0x00; j < 0x0a; j++)
 								{
 									m_shared[frame_offset + j] = m_buffer0[1 + j];
 								}
@@ -669,7 +670,7 @@ void sega_m1comm_device::comm_tick()
 
 					// save message to "ring buffer"
 					unsigned frame_offset = frame_start + (m_linkid * frame_size);
-					for (unsigned j = 0x00 ; j < frame_size ; j++)
+					for (unsigned j = 0x00; j < frame_size; j++)
 					{
 						m_shared[frame_offset + j] = m_buffer0[1 + j];
 					}
@@ -728,14 +729,15 @@ unsigned sega_m1comm_device::read_frame(unsigned data_size)
 void sega_m1comm_device::send_data(uint8_t frame_type, unsigned frame_start, unsigned frame_size, unsigned data_size)
 {
 	m_buffer0[0] = frame_type;
-	for (unsigned i = 0x00 ; i < frame_size ; i++)
+	for (unsigned i = 0x00; i < frame_size; i++)
 	{
 		m_buffer0[1 + i] = m_shared[frame_start + i];
 	}
 	send_frame(data_size);
 }
 
-void sega_m1comm_device::send_frame(unsigned data_size){
+void sega_m1comm_device::send_frame(unsigned data_size)
+{
 	if (m_tx_state != 2)
 		return;
 
