@@ -69,7 +69,7 @@ void mb89372_device::device_start()
 	// set our instruction counter
 	set_icountptr(m_icount);
 
-	for(auto &elem : m_channel)
+	for (auto &elem : m_channel)
 	{
 		elem.m_address = 0;
 		elem.m_count = 0;
@@ -391,7 +391,7 @@ void mb89372_device::check_dma()
 				break;
 
 			default:
-					logerror("unknown state?! %01x = %02x\n", m_current_channel, m_channel[m_current_channel].m_state);
+				logerror("unknown state?! %01x = %02x\n", m_current_channel, m_channel[m_current_channel].m_state);
 				break;
 		}
 	}
@@ -466,7 +466,7 @@ void mb89372_device::tx_complete()
 		{
 			m_socket_buffer[0x00] = m_tx_offset & 0xff;
 			m_socket_buffer[0x01] = (m_tx_offset >> 8) & 0xff;
-			for (int i = 0x00 ; i < m_tx_offset ; i++)
+			for (int i = 0x00; i < m_tx_offset; i++)
 			{
 				m_socket_buffer[2 + i] = m_tx_buffer[i];
 			}
@@ -591,7 +591,7 @@ void mb89372_device::check_sockets()
 				if (recv > 0)
 				{
 					m_rx_length = m_socket_buffer[0x01] << 8 | m_socket_buffer[0x00];
-					for (unsigned i = 0x00 ; i < m_rx_length ; i++)
+					for (unsigned i = 0x00; i < m_rx_length; i++)
 					{
 						m_rx_buffer[i] = m_socket_buffer[2 + i];
 					}
@@ -624,7 +624,8 @@ void mb89372_device::comm_start()
 		m_localaddr = resolveIte.endpoint();
 		LOG("MB89372: localhost = %s\n", *m_localaddr);
 	}
-	if (err) {
+	if (err)
+	{
 		LOG("MB89372: localhost resolve error: %s\n", err.message());
 	}
 
@@ -633,7 +634,8 @@ void mb89372_device::comm_start()
 		m_remoteaddr = resolveIte.endpoint();
 		LOG("MB89372: remotehost = %s\n", *m_remoteaddr);
 	}
-	if (err) {
+	if (err)
+	{
 		LOG("MB89372: remotehost resolve error: %s\n", err.message());
 	}
 }
@@ -678,7 +680,8 @@ unsigned mb89372_device::read_frame()
 	return 0;
 }
 
-void mb89372_device::send_frame(unsigned data_size){
+void mb89372_device::send_frame(unsigned data_size)
+{
 	if (m_tx_state != 2)
 		return;
 
