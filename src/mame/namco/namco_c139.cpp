@@ -406,7 +406,8 @@ void namco_c139_device::comm_start()
 		m_localaddr = resolveIte.endpoint();
 		LOG("C139: localhost = %s\n", *m_localaddr);
 	}
-	if (err) {
+	if (err)
+	{
 		LOG("C139: localhost resolve error: %s\n", err.message());
 	}
 
@@ -415,7 +416,8 @@ void namco_c139_device::comm_start()
 		m_remoteaddr = resolveIte.endpoint();
 		LOG("C139: remotehost = %s\n", *m_remoteaddr);
 	}
-	if (err) {
+	if (err)
+	{
 		LOG("C139: remotehost resolve error: %s\n", err.message());
 	}
 }
@@ -511,7 +513,7 @@ void namco_c139_device::read_data(unsigned data_size)
 			unsigned rx_offset = m_reg[REG_6_RXOFFSET]; // rx offset in words
 			LOG("C139: rx_offset = %04x, rx_size == %02x\n", rx_offset, rx_size);
 			unsigned buf_offset = 3;
-			for (unsigned j = 0x00 ; j < rx_size ; j++)
+			for (unsigned j = 0x00; j < rx_size; j++)
 			{
 				m_ram[0x1000 + (rx_offset & 0x0fff)] = m_buffer0[buf_offset + 1] << 8 | m_buffer0[buf_offset];
 				rx_offset++;
@@ -603,7 +605,8 @@ void namco_c139_device::send_data(unsigned data_size)
 	if (m_reg[REG_1_MODE] == 0x09)
 	{
 		tx_size = find_sync_bit(tx_offset, tx_mask);
-		if (tx_size == 0x01) {
+		if (tx_size == 0x01)
+		{
 			m_reg[REG_7_TXOFFSET] += 0x100;
 			tx_size = 0;
 		}
@@ -619,7 +622,7 @@ void namco_c139_device::send_data(unsigned data_size)
 	m_buffer0[0x1ff] = 1;
 
 	unsigned buf_offset = 3;
-	for (unsigned j = 0x00 ; j < tx_size ; j++)
+	for (unsigned j = 0x00; j < tx_size; j++)
 	{
 		m_buffer0[buf_offset] = m_ram[tx_offset & tx_mask] & 0xff;
 		m_buffer0[buf_offset + 1] = 0;
