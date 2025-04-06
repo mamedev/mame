@@ -13,9 +13,9 @@
     namcos2.cpp (Steel Gunner, Steel Gunner 2, Lucky & Wild, Suzuka 8 Hours, Suzuka 8 Hours 2)
     deco32.cpp (Dragon Gun, Lock 'n' Loaded)
 
-    earlier titles use the 186/187 pair (eg. Steel Gunner, Dragon Gun) while later boards appear to replace 186 into
-    C355 custom (eg. Starblade, NB1 hardware, Final Lap R etc.). It is not known if there are any differences in
-    capability.
+    earlier titles use the 186/187 pair (eg. Steel Gunner, Dragon Gun) while later boards appear to integrate the
+    186 into the C355 custom (eg. Starblade, NB1 hardware, Final Lap R etc.). It is not known if there are any
+    differences in capability.
 
     TODO: verify which boards use which chips
 
@@ -65,7 +65,7 @@ GFXDECODE_MEMBER(namco_c355spr_device::gfxinfo)
 	GFXDECODE_DEVICE(DEVICE_SELF, 0, gfx_16x16x8_raw, 0, 16)
 GFXDECODE_END
 
-DEFINE_DEVICE_TYPE(NAMCO_C355SPR, namco_c355spr_device, "namco_c355spr", "Namco 186 or C355/187 (Sprites)")
+DEFINE_DEVICE_TYPE(NAMCO_C355SPR, namco_c355spr_device, "namco_c355spr", "Namco 186/187 or C355/187 (sprites)")
 
 namco_c355spr_device::namco_c355spr_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, type, tag, owner, clock),
