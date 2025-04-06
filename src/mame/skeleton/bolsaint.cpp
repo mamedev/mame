@@ -88,10 +88,13 @@ void bolsaint_state::bolsaint(machine_config &config)
 	I80188(config, m_maincpu, 20.0000_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &bolsaint_state::mem_map);
 	m_maincpu->chip_select_callback().set(FUNC(bolsaint_state::peripheral_ctrl));
+	m_maincpu->tmrout1_handler().set(m_uart, FUNC(i8251_device::write_txc));
+	m_maincpu->tmrout1_handler().append(m_uart, FUNC(i8251_device::write_rxc));
 
 	I8255A(config, m_ppi[0]); // OKI M82C55A-2, on CPU PCB
 	I8255A(config, m_ppi[1]); // OKI M82C55A-2, on CPU PCB
 
+	// TODO: route RSCLK
 	I8251(config, m_uart, 0);
 	m_uart->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_uart->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
@@ -100,15 +103,14 @@ void bolsaint_state::bolsaint(machine_config &config)
 	m_uart->txrdy_handler().set_inputline(m_maincpu, 1);
 
 	// Thru a MAX236
-	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	// TODO: expects a specific device that also controls test mode
+	// cfr pg. 31 "placa totalizadores y rs232"
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
 	rs232.rxd_handler().set(m_uart, FUNC(i8251_device::write_rxd));
 	rs232.dsr_handler().set(m_uart, FUNC(i8251_device::write_dsr));
 	rs232.cts_handler().set(m_uart, FUNC(i8251_device::write_cts));
 
-	// Sound hardware
-
 	SPEAKER(config, "mono").front_center();
-
 	// There is a jumper on the sound PCB for selecting between 16KHz and 32KHz,
 	// but is fixed (soldered) for 32KHz
 	OKIM6376(config, m_oki, 5.0000_MHz_XTAL/8/2).add_route(ALL_OUTPUTS, "mono", 1.0); // Guess
