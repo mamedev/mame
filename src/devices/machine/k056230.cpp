@@ -170,7 +170,7 @@ void k056230_device::set_mode(u8 data)
 
 void k056230_device::set_ctrl(u8 data)
 {
-	m_linkenable = data && 0x10;
+	m_linkenable = bool(data & 0x10);
 
 	switch (data)
 	{
