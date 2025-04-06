@@ -576,15 +576,10 @@ inline void huc6270_device::handle_dma()
 		LOG("doing dma sour = %04x, desr = %04x, lenr = %04x\n", m_sour, m_desr, m_lenr);
 
 		do {
-			uint16_t data;
-
 			// area 0x8000-0xffff cannot be r/w (open bus)
-			if(m_sour <= m_vram_mask)
-				data = m_vram[m_sour];
-			else
-				data = 0;
+			const uint16_t data = (m_sour <= m_vram_mask) ? m_vram[m_sour] : 0;
 
-			if(m_desr <= m_vram_mask)
+			if (m_desr <= m_vram_mask)
 				m_vram[m_desr] = data;
 			m_sour += sour_inc;
 			m_desr += desr_inc;
@@ -608,8 +603,11 @@ u8 huc6270_device::read(offs_t offset)
 	{
 		case 0x00:  /* status */
 			data = m_status;
-			m_status &= ~(HUC6270_VD | HUC6270_DV | HUC6270_RR | HUC6270_CR | HUC6270_OR | HUC6270_DS);
-			m_irq_changed_cb(CLEAR_LINE);
+			if (!machine().side_effects_disabled())
+			{
+				m_status &= ~(HUC6270_VD | HUC6270_DV | HUC6270_RR | HUC6270_CR | HUC6270_OR | HUC6270_DS);
+				m_irq_changed_cb(CLEAR_LINE);
+			}
 			break;
 
 		case 0x02:
@@ -624,8 +622,10 @@ u8 huc6270_device::read(offs_t offset)
 				{
 					m_marr += vram_increments[(m_cr >> 11) & 3];
 
-					if(m_marr <= m_vram_mask)
+					if (m_marr <= m_vram_mask)
+					{
 						m_vrr = m_vram[m_marr];
+					}
 					else
 					{
 						// TODO: test with real HW
@@ -751,7 +751,7 @@ void huc6270_device::write(offs_t offset, u8 data)
 
 				case MARR:      /* memory address read register MSB */
 					m_marr = (m_marr & 0x00ff) | (data << 8);
-					if(m_marr <= m_vram_mask)
+					if (m_marr <= m_vram_mask)
 						m_vrr = m_vram[m_marr];
 					else
 						m_vrr = 0;
@@ -760,7 +760,7 @@ void huc6270_device::write(offs_t offset, u8 data)
 				case VxR:       /* vram write data MSB */
 					m_vwr = (m_vwr & 0x00ff) | (data << 8);
 					// area 0x8000-0xffff is NOP and cannot be written to.
-					if(m_mawr <= m_vram_mask)
+					if (m_mawr <= m_vram_mask)
 						m_vram[m_mawr] = m_vwr;
 					m_mawr += vram_increments[(m_cr >> 11) & 3];
 					break;
@@ -843,10 +843,11 @@ void huc6270_device::write(offs_t offset, u8 data)
 
 void huc6270_device::device_start()
 {
-	m_vram = make_unique_clear<uint16_t[]>(m_vram_size/sizeof(uint16_t));
+	assert(!(m_vram_size & (m_vram_size - 1)));
+	m_vram = make_unique_clear<uint16_t []>(m_vram_size / sizeof(uint16_t));
 	m_vram_mask = (m_vram_size >> 1) - 1;
 
-	save_pointer(NAME(m_vram), m_vram_size/sizeof(uint16_t));
+	save_pointer(NAME(m_vram), m_vram_size / sizeof(uint16_t));
 
 	save_item(NAME(m_register_index));
 	save_item(NAME(m_mawr));
