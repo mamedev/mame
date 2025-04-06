@@ -181,7 +181,7 @@ void sega_s32comm_device::share_w(offs_t offset, uint8_t data)
 
 uint8_t sega_s32comm_device::cn_r()
 {
-	return m_cn | 0xFE;
+	return m_cn | 0xfe;
 }
 
 void sega_s32comm_device::cn_w(uint8_t data)
@@ -372,7 +372,8 @@ void sega_s32comm_device::comm_start()
 		m_localaddr = resolveIte.endpoint();
 		LOG("S32COMM: localhost = %s\n", *m_localaddr);
 	}
-	if (err) {
+	if (err)
+	{
 		LOG("S32COMM: localhost resolve error: %s\n", err.message());
 	}
 
@@ -381,7 +382,8 @@ void sega_s32comm_device::comm_start()
 		m_remoteaddr = resolveIte.endpoint();
 		LOG("S32COMM: remotehost = %s\n", *m_remoteaddr);
 	}
-	if (err) {
+	if (err)
+	{
 		LOG("S32COMM: remotehost resolve error: %s\n", err.message());
 	}
 }
@@ -457,7 +459,7 @@ unsigned sega_s32comm_device::read_frame(unsigned data_size)
 void sega_s32comm_device::send_data(uint8_t frame_type, unsigned frame_start, unsigned frame_size, unsigned data_size)
 {
 	m_buffer0[0] = frame_type;
-	for (unsigned i = 0x00 ; i < frame_size ; i++)
+	for (unsigned i = 0x00; i < frame_size; i++)
 	{
 		m_buffer0[1 + i] = m_shared[frame_start + i];
 	}
@@ -629,7 +631,7 @@ void sega_s32comm_device::comm_tick_14084()
 						{
 							// save message to "ring buffer"
 							unsigned frame_offset = idx * frame_size;
-							for (unsigned j = 0x00 ; j < frame_size ; j++)
+							for (unsigned j = 0x00; j < frame_size; j++)
 							{
 								m_shared[frame_offset + j] = m_buffer0[1 + j];
 							}
@@ -655,7 +657,7 @@ void sega_s32comm_device::comm_tick_14084()
 							{
 								// save message to "ring buffer"
 								unsigned frame_offset = 0x05;
-								for (unsigned j = 0x00 ; j < 0x0b ; j++)
+								for (unsigned j = 0x00; j < 0x0b; j++)
 								{
 									m_shared[frame_offset + j] = m_buffer0[1 + j];
 								}
@@ -687,7 +689,7 @@ void sega_s32comm_device::comm_tick_14084()
 
 					// save message to "ring buffer"
 					unsigned frame_offset = m_linkid * frame_size;
-					for (unsigned j = 0x00 ; j < frame_size ; j++)
+					for (unsigned j = 0x00; j < frame_size; j++)
 					{
 						m_shared[frame_offset + j] = m_buffer0[1 + j];
 					}
@@ -738,7 +740,7 @@ void sega_s32comm_device::comm_tick_15033()
 			// link not yet established...
 			if (m_shared[0] == 0x56 && m_shared[1] == 0x37 && m_shared[2] == 0x30)
 			{
-				for (unsigned j = 0x003 ; j < 0x0800 ; j++)
+				for (unsigned j = 0x003; j < 0x0800; j++)
 				{
 					m_shared[j] = 0;
 				}
@@ -869,7 +871,7 @@ void sega_s32comm_device::comm_tick_15033()
 						{
 							// save message to "ring buffer"
 							unsigned frame_offset = frame_start_rx + ((idx - 1) * frame_size);
-							for (unsigned j = 0x00 ; j < frame_size ; j++)
+							for (unsigned j = 0x00; j < frame_size; j++)
 							{
 								m_shared[frame_offset + j] = m_buffer0[1 + j];
 							}
@@ -895,7 +897,7 @@ void sega_s32comm_device::comm_tick_15033()
 							{
 								// save message to "ring buffer"
 								unsigned frame_offset = 0x05;
-								for (unsigned j = 0x00 ; j < 0x0b ; j++)
+								for (unsigned j = 0x00; j < 0x0b; j++)
 								{
 									m_shared[frame_offset + j] = m_buffer0[1 + j];
 								}
@@ -926,13 +928,14 @@ void sega_s32comm_device::comm_tick_15033()
 
 					// save message to "ring buffer"
 					unsigned frame_offset = frame_start_rx + ((m_linkid - 1) * frame_size);
-					for (unsigned j = 0x00 ; j < frame_size ; j++)
+					for (unsigned j = 0x00; j < frame_size; j++)
 					{
 						m_shared[frame_offset + j] = m_buffer0[1 + j];
 					}
 				}
 
-				if (is_master){
+				if (is_master)
+				{
 					// master sends some additional status bytes
 					send_data(0xfd, 0x05, 0x0b, data_size);
 
@@ -1094,7 +1097,7 @@ void sega_s32comm_device::comm_tick_15612()
 						{
 							// save message to "ring buffer"
 							unsigned frame_offset = frame_start + (idx * frame_size);
-							for (unsigned j = 0x00 ; j < frame_size ; j++)
+							for (unsigned j = 0x00; j < frame_size; j++)
 							{
 								m_shared[frame_offset + j] = m_buffer0[1 + j];
 							}
@@ -1120,7 +1123,7 @@ void sega_s32comm_device::comm_tick_15612()
 							{
 								// save message to "ring buffer"
 								unsigned frame_offset = 0x05;
-								for (unsigned j = 0x00 ; j < 0x0b ; j++)
+								for (unsigned j = 0x00; j < 0x0b; j++)
 								{
 									m_shared[frame_offset + j] = m_buffer0[1 + j];
 								}
@@ -1151,7 +1154,7 @@ void sega_s32comm_device::comm_tick_15612()
 
 					// save message to "ring buffer"
 					unsigned frame_offset = frame_start + (m_linkid * frame_size);
-					for (unsigned j = 0x00 ; j < frame_size ; j++)
+					for (unsigned j = 0x00; j < frame_size; j++)
 					{
 						m_shared[frame_offset + j] = m_buffer0[1 + j];
 					}
