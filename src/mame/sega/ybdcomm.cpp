@@ -138,10 +138,10 @@ sega_ybdcomm_device::sega_ybdcomm_device(const machine_config &mconfig, const ch
 	m_mpc(*this, "commmpc"),
 	m_dip_sw1(*this, "Link_SW1")
 #ifdef YBDCOMM_SIMULATION
-	,m_acceptor(m_ioctx)
-	,m_sock_rx(m_ioctx)
-	,m_sock_tx(m_ioctx)
-	,m_tx_timeout(m_ioctx)
+	, m_acceptor(m_ioctx)
+	, m_sock_rx(m_ioctx)
+	, m_sock_tx(m_ioctx)
+	, m_tx_timeout(m_ioctx)
 #endif
 {
 #ifdef YBDCOMM_SIMULATION
@@ -511,7 +511,8 @@ void sega_ybdcomm_device::comm_start()
 		m_localaddr = resolveIte.endpoint();
 		LOG("YBDCOMM: localhost = %s\n", *m_localaddr);
 	}
-	if (err) {
+	if (err)
+	{
 		LOG("YBDCOMM: localhost resolve error: %s\n", err.message());
 	}
 
@@ -520,7 +521,8 @@ void sega_ybdcomm_device::comm_start()
 		m_remoteaddr = resolveIte.endpoint();
 		LOG("YBDCOMM: remotehost = %s\n", *m_remoteaddr);
 	}
-	if (err) {
+	if (err)
+	{
 		LOG("YBDCOMM: remotehost resolve error: %s\n", err.message());
 	}
 }
@@ -673,7 +675,7 @@ void sega_ybdcomm_device::comm_tick()
 						// save message to "ring buffer"
 						unsigned frame_offset = comm_frame_offset(idx);
 						unsigned frame_size = comm_frame_size(idx);
-						for (unsigned j = 0x00 ; j < frame_size ; j++)
+						for (unsigned j = 0x00; j < frame_size; j++)
 						{
 							mpc_mem_w(frame_offset + j, m_buffer0[1 + j]);
 						}
@@ -758,7 +760,7 @@ unsigned sega_ybdcomm_device::read_frame(unsigned data_size)
 void sega_ybdcomm_device::send_data(uint8_t frame_type, unsigned frame_offset, unsigned frame_size, unsigned data_size)
 {
 	m_buffer0[0] = frame_type;
-	for (unsigned i = 0x00 ; i < frame_size ; i++)
+	for (unsigned i = 0x00; i < frame_size; i++)
 	{
 		m_buffer0[1 + i] = mpc_mem_r(frame_offset + i);
 	}
