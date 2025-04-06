@@ -136,8 +136,8 @@ void hyperstone_xs_device::iram_16k_map(address_map &map)
 
 void hyperstone_x_device::internal_io_map(address_map &map)
 {
-	map(0x7000, 0x77ff).w(FUNC(hyperstone_x_device::power_down_w));
-	map(0x7800, 0x7fff).w(FUNC(hyperstone_x_device::sleep_w));
+	map(0x1c00, 0x1dff).w(FUNC(hyperstone_x_device::power_down_w));
+	map(0x1e00, 0x1fff).w(FUNC(hyperstone_x_device::sleep_w));
 }
 
 
@@ -157,7 +157,7 @@ hyperstone_device::hyperstone_device(
 		address_map_constructor internal_map)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, prg_data_width, 32, 0, internal_map)
-	, m_io_config("io", ENDIANNESS_BIG, io_data_width, io_addr_bits)
+	, m_io_config("io", ENDIANNESS_BIG, io_data_width, io_addr_bits, (io_data_width == 16) ? -1 : -2)
 	, m_cache(CACHE_SIZE + sizeof(hyperstone_device))
 	, m_drcuml(nullptr)
 	, m_drcfe(nullptr)
@@ -203,7 +203,7 @@ hyperstone_x_device::hyperstone_x_device(
 		uint32_t io_addr_bits,
 		address_map_constructor internal_map)
 	: hyperstone_device(mconfig, type, tag, owner, clock, prg_data_width, io_data_width, io_addr_bits, internal_map)
-	, m_internal_config("internal", ENDIANNESS_BIG, 32, 10 + 3 + 2, 0, address_map_constructor(FUNC(hyperstone_x_device::internal_io_map), this))
+	, m_internal_config("internal", ENDIANNESS_BIG, 32, 10 + 3, -2, address_map_constructor(FUNC(hyperstone_x_device::internal_io_map), this))
 {
 }
 
@@ -215,7 +215,7 @@ hyperstone_x_device::hyperstone_x_device(
 e116_device::e116_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hyperstone_device(
 			mconfig, E116, tag, owner, clock,
-			16, 16, 6 + 3 + 2, address_map_constructor(FUNC(e116_device::iram_4k_map), this))
+			16, 16, 6 + 3, address_map_constructor(FUNC(e116_device::iram_4k_map), this))
 {
 }
 
@@ -227,7 +227,7 @@ e116_device::e116_device(const machine_config &mconfig, const char *tag, device_
 e116x_device::e116x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hyperstone_x_device(
 			mconfig, E116X, tag, owner, clock,
-			16, 16, 6 + 3 + 2, address_map_constructor(FUNC(e116x_device::iram_8k_map), this))
+			16, 16, 6 + 3, address_map_constructor(FUNC(e116x_device::iram_8k_map), this))
 {
 }
 
@@ -239,7 +239,7 @@ e116x_device::e116x_device(const machine_config &mconfig, const char *tag, devic
 e116xs_device::e116xs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hyperstone_xs_device(
 			mconfig, E116XS, tag, owner, clock,
-			16, 16, 6 + 3 + 2, address_map_constructor(FUNC(e116xs_device::iram_16k_map), this))
+			16, 16, 6 + 3, address_map_constructor(FUNC(e116xs_device::iram_16k_map), this))
 {
 }
 
@@ -251,7 +251,7 @@ e116xs_device::e116xs_device(const machine_config &mconfig, const char *tag, dev
 e116xsr_device::e116xsr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hyperstone_xsr_device(
 			mconfig, E116XSR, tag, owner, clock,
-			16, 16, 6 + 3 + 2, address_map_constructor(FUNC(e116xsr_device::iram_16k_map), this))
+			16, 16, 6 + 3, address_map_constructor(FUNC(e116xsr_device::iram_16k_map), this))
 {
 }
 
@@ -263,7 +263,7 @@ e116xsr_device::e116xsr_device(const machine_config &mconfig, const char *tag, d
 e132_device::e132_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hyperstone_device(
 			mconfig, E132, tag, owner, clock,
-			32, 32, 10 + 3 + 2, address_map_constructor(FUNC(e132_device::iram_4k_map), this))
+			32, 32, 10 + 3, address_map_constructor(FUNC(e132_device::iram_4k_map), this))
 {
 }
 
@@ -275,7 +275,7 @@ e132_device::e132_device(const machine_config &mconfig, const char *tag, device_
 e132x_device::e132x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hyperstone_x_device(
 			mconfig, E132X, tag, owner, clock,
-			32, 32, 10 + 3 + 2, address_map_constructor(FUNC(e132x_device::iram_8k_map), this))
+			32, 32, 10 + 3, address_map_constructor(FUNC(e132x_device::iram_8k_map), this))
 {
 }
 
@@ -287,7 +287,7 @@ e132x_device::e132x_device(const machine_config &mconfig, const char *tag, devic
 e132xs_device::e132xs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hyperstone_xs_device(
 			mconfig, E132XS, tag, owner, clock,
-			32, 32, 10 + 3 + 2, address_map_constructor(FUNC(e132xs_device::iram_16k_map), this))
+			32, 32, 10 + 3, address_map_constructor(FUNC(e132xs_device::iram_16k_map), this))
 {
 }
 
@@ -299,7 +299,7 @@ e132xs_device::e132xs_device(const machine_config &mconfig, const char *tag, dev
 e132xsr_device::e132xsr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hyperstone_xsr_device(
 			mconfig, E132XSR, tag, owner, clock,
-			32, 32, 10 + 3 + 2, address_map_constructor(FUNC(e132xsr_device::iram_16k_map), this))
+			32, 32, 10 + 3, address_map_constructor(FUNC(e132xsr_device::iram_16k_map), this))
 {
 }
 
@@ -311,7 +311,7 @@ e132xsr_device::e132xsr_device(const machine_config &mconfig, const char *tag, d
 gms30c2116_device::gms30c2116_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hyperstone_device(
 			mconfig, GMS30C2116, tag, owner, clock,
-			16, 16, 6 + 3 + 2, address_map_constructor(FUNC(gms30c2116_device::iram_4k_map), this))
+			16, 16, 6 + 3, address_map_constructor(FUNC(gms30c2116_device::iram_4k_map), this))
 {
 }
 
@@ -323,7 +323,7 @@ gms30c2116_device::gms30c2116_device(const machine_config &mconfig, const char *
 gms30c2132_device::gms30c2132_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hyperstone_device(
 			mconfig, GMS30C2132, tag, owner, clock,
-			32, 32, 10 + 3 + 2, address_map_constructor(FUNC(gms30c2132_device::iram_4k_map), this))
+			32, 32, 10 + 3, address_map_constructor(FUNC(gms30c2132_device::iram_4k_map), this))
 {
 }
 
@@ -335,7 +335,7 @@ gms30c2132_device::gms30c2132_device(const machine_config &mconfig, const char *
 gms30c2216_device::gms30c2216_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hyperstone_x_device(
 			mconfig, GMS30C2216, tag, owner, clock,
-			16, 16, 6 + 3 + 2, address_map_constructor(FUNC(gms30c2216_device::iram_8k_map), this))
+			16, 16, 6 + 3, address_map_constructor(FUNC(gms30c2216_device::iram_8k_map), this))
 {
 }
 
@@ -347,7 +347,7 @@ gms30c2216_device::gms30c2216_device(const machine_config &mconfig, const char *
 gms30c2232_device::gms30c2232_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hyperstone_x_device(
 			mconfig, GMS30C2232, tag, owner, clock,
-			32, 32, 10 + 3 + 2, address_map_constructor(FUNC(gms30c2232_device::iram_8k_map), this))
+			32, 32, 10 + 3, address_map_constructor(FUNC(gms30c2232_device::iram_8k_map), this))
 {
 }
 
@@ -1535,14 +1535,14 @@ void hyperstone_device::device_start()
 	if (iospace.data_width() == 16)
 	{
 		iospace.specific(m_io16);
-		m_read_io  = w_r_delegate([this] (offs_t address) -> uint32_t { return m_io16.read_word((address >> 11) & 0x7ffc); });
-		m_write_io = w_w_delegate([this] (offs_t address, uint32_t data) { m_io16.write_word((address >> 11) & 0x7ffc, uint16_t(data)); });
+		m_read_io  = w_r_delegate([this] (offs_t address) -> uint32_t { return m_io16.read_word(address >> 13); });
+		m_write_io = w_w_delegate([this] (offs_t address, uint32_t data) { m_io16.write_word(address >> 13, uint16_t(data)); });
 	}
 	else
 	{
 		iospace.specific(m_io32);
-		m_read_io  = w_r_delegate([this] (offs_t address) -> uint32_t { return m_io32.read_dword((address >> 11) & 0x7ffc); });
-		m_write_io = w_w_delegate([this] (offs_t address, uint32_t data) { m_io32.write_dword((address >> 11) & 0x7ffc, data); });
+		m_read_io  = w_r_delegate([this] (offs_t address) -> uint32_t { return m_io32.read_dword(address >> 13); });
+		m_write_io = w_w_delegate([this] (offs_t address, uint32_t data) { m_io32.write_dword(address >> 13, data); });
 	}
 
 	m_timer = timer_alloc(FUNC(hyperstone_device::timer_callback), this);
@@ -1694,17 +1694,17 @@ void hyperstone_x_device::device_start()
 				[this] (offs_t address) -> uint32_t
 				{
 					if (!BIT(address, 27))
-						return m_io16.read_word((address >> 11) & 0x7ffc);
+						return m_io16.read_word(address >> 13);
 					else
-						return m_internal_specific.read_dword((address >> 11) & 0x7ffc);
+						return m_internal_specific.read_dword(address >> 13);
 				});
 		m_write_io = w_w_delegate(
 				[this] (offs_t address, uint32_t data)
 				{
 					if (!BIT(address, 27))
-						m_io16.write_word((address >> 11) & 0x7ffc, uint16_t(data));
+						m_io16.write_word(address >> 13, uint16_t(data));
 					else
-						m_internal_specific.write_dword((address >> 11) & 0x7ffc, data);
+						m_internal_specific.write_dword(address >> 13, data);
 				});
 	}
 	else
@@ -1713,17 +1713,17 @@ void hyperstone_x_device::device_start()
 				[this] (offs_t address) -> uint32_t
 				{
 					if (!BIT(address, 27))
-						return m_io32.read_dword((address >> 11) & 0x7ffc);
+						return m_io32.read_dword(address >> 13);
 					else
-						return m_internal_specific.read_dword((address >> 11) & 0x7ffc);
+						return m_internal_specific.read_dword(address >> 13);
 				});
 		m_write_io = w_w_delegate(
 				[this] (offs_t address, uint32_t data)
 				{
 					if (!BIT(address, 27))
-						m_io32.write_dword((address >> 11) & 0x7ffc, data);
+						m_io32.write_dword(address >> 13, data);
 					else
-						m_internal_specific.write_dword((address >> 11) & 0x7ffc, data);
+						m_internal_specific.write_dword(address >> 13, data);
 				});
 	}
 }

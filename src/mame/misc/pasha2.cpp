@@ -249,18 +249,18 @@ void pasha2_state::pasha2_map(address_map &map)
 
 void pasha2_state::pasha2_io(address_map &map)
 {
-	map(0x08, 0x09).nopr(); //sound status?
-	map(0x18, 0x19).nopr(); //sound status?
-	map(0x20, 0x21).w(FUNC(pasha2_state::pasha2_lamps_w));
-	map(0x40, 0x41).portr("COINS");
-	map(0x60, 0x61).portr("DSW");
-	map(0x80, 0x81).portr("INPUTS");
-	map(0xa0, 0xa1).nopw(); //soundlatch?
-	map(0xc0, 0xc1).w(FUNC(pasha2_state::misc_w));
-	map(0xe1, 0xe1).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xe5, 0xe5).rw(m_oki[1], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xe8, 0xe9).w(FUNC(pasha2_state::oki_bank_w<0>));
-	map(0xec, 0xed).w(FUNC(pasha2_state::oki_bank_w<1>));
+	map(0x02, 0x02).nopr(); //sound status?
+	map(0x06, 0x06).nopr(); //sound status?
+	map(0x08, 0x08).w(FUNC(pasha2_state::pasha2_lamps_w));
+	map(0x10, 0x10).portr("COINS");
+	map(0x18, 0x18).portr("DSW");
+	map(0x20, 0x20).portr("INPUTS");
+	map(0x28, 0x28).nopw(); //soundlatch?
+	map(0x30, 0x30).w(FUNC(pasha2_state::misc_w));
+	map(0x38, 0x38).umask16(0x00ff).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x39, 0x39).umask16(0x00ff).rw(m_oki[1], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x3a, 0x3a).w(FUNC(pasha2_state::oki_bank_w<0>));
+	map(0x3b, 0x3b).w(FUNC(pasha2_state::oki_bank_w<1>));
 }
 
 void pasha2_state::zdrum_audio_map(address_map &map)

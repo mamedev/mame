@@ -1845,8 +1845,7 @@ void hyperstone_device::hyperstone_stxx1()
 	{
 		case 0: // STBS.D
 			WRITE_B(dreg + extra_s, uint8_t(sreg));
-			//if (int8_t(uint8_t(sreg)) != int32_t(sreg))
-			if (uint8_t(sreg) != sreg)
+			if ((uint8_t(sreg) != sreg) && (int8_t(uint8_t(sreg)) != int32_t(sreg)))
 				execute_exception(TRAPNO_RANGE_ERROR);
 			break;
 
@@ -1856,8 +1855,7 @@ void hyperstone_device::hyperstone_stxx1()
 
 		case 2: // STHS.D, STHU.D
 			WRITE_HW(dreg + (extra_s & ~1), uint16_t(sreg));
-			//if ((extra_s & 1) && (int16_t(uint16_t(sreg)) != int32_t(sreg)))
-			if ((extra_s & 1) && (uint16_t(sreg) != sreg))
+			if ((extra_s & 1) && (uint16_t(sreg) != sreg) && (int16_t(uint16_t(sreg)) != int32_t(sreg)))
 				execute_exception(TRAPNO_RANGE_ERROR);
 			break;
 
@@ -1965,8 +1963,7 @@ void hyperstone_device::hyperstone_stxx2()
 	{
 		case 0: // STBS.N
 			WRITE_B(dreg, (uint8_t)sreg);
-			//range_error = int8_t(uint8_t(sreg)) != int32_t(sreg);
-			range_error = uint8_t(sreg) != sreg;
+			range_error = (uint8_t(sreg) != sreg) && (int8_t(uint8_t(sreg)) != int32_t(sreg));
 			(DstGlobal ? m_core->global_regs : m_core->local_regs)[dst_code] += extra_s;
 			if (range_error)
 				execute_exception(TRAPNO_RANGE_ERROR);
@@ -1979,8 +1976,7 @@ void hyperstone_device::hyperstone_stxx2()
 
 		case 2: // STHS.N, STHU.N
 			WRITE_HW(dreg, (uint16_t)sreg);
-			//range_error = (extra_s & 1) && (int16_t(uint16_t(sreg)) != int32_t(sreg));
-			range_error = (extra_s & 1) && (uint16_t(sreg) != sreg);
+			range_error = (extra_s & 1) && (uint16_t(sreg) != sreg) && (int16_t(uint16_t(sreg)) != int32_t(sreg));
 			(DstGlobal ? m_core->global_regs : m_core->local_regs)[dst_code] += extra_s & ~1;
 			if (range_error)
 				execute_exception(TRAPNO_RANGE_ERROR);

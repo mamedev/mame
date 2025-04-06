@@ -519,7 +519,7 @@ void hyperstone_device::static_generate_io_accessor(drcuml_block &block, uml::co
 
 	// write:
 	const uml::operand_size size = (space(AS_IO).data_width() == 16) ? uml::SIZE_WORD : uml::SIZE_DWORD;
-	UML_ROLAND(block, I4, I0, 21, 0x7ffc);
+	UML_SHR(block, I4, I0, 13);
 	if (iswrite)
 		UML_WRITE(block, I4, I1, size, SPACE_IO);
 	else
@@ -541,7 +541,7 @@ void hyperstone_x_device::static_generate_io_accessor(drcuml_block &block, uml::
 	const int internal = label++;
 	const int done = label++;
 
-	UML_ROLAND(block, I4, I0, 21, 0x7ffc);
+	UML_SHR(block, I4, I0, 13);
 	UML_TEST(block, I0, 1 << 27);
 	UML_JMPc(block, uml::COND_NZ, internal);
 

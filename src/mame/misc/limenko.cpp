@@ -270,12 +270,12 @@ void limenko_state::limenko_map(address_map &map)
 
 void limenko_state::limenko_io_map(address_map &map)
 {
-	map(0x0000, 0x0003).portr("IN0");
-	map(0x0800, 0x0803).portr("IN1");
-	map(0x1000, 0x1003).portr("IN2");
-	map(0x4000, 0x4003).w(FUNC(limenko_state::coincounter_w));
-	map(0x4800, 0x4803).portw("EEPROMOUT");
-	map(0x5000, 0x5003).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask32(0x00ff0000).cswidth(32);
+	map(0x0000, 0x0000).portr("IN0");
+	map(0x0200, 0x0200).portr("IN1");
+	map(0x0400, 0x0400).portr("IN2");
+	map(0x1000, 0x1000).w(FUNC(limenko_state::coincounter_w));
+	map(0x1200, 0x1200).portw("EEPROMOUT");
+	map(0x1400, 0x1400).umask32(0x00ff0000).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 }
 
 
@@ -298,12 +298,12 @@ void limenko_state::spotty_map(address_map &map)
 
 void limenko_state::spotty_io_map(address_map &map)
 {
-	map(0x0000, 0x0003).portr("IN0");
-	map(0x0800, 0x0803).portr("IN1");
-	map(0x0800, 0x0803).nopw(); // hopper related
-	map(0x1000, 0x1003).portr("IN2");
-	map(0x4800, 0x4803).portw("EEPROMOUT");
-	map(0x5000, 0x5003).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask32(0x00ff0000).cswidth(32);
+	map(0x0000, 0x0000).portr("IN0");
+	map(0x0200, 0x0200).portr("IN1");
+	map(0x0200, 0x0200).nopw(); // hopper related
+	map(0x0400, 0x0400).portr("IN2");
+	map(0x1200, 0x1200).portw("EEPROMOUT");
+	map(0x1400, 0x1400).umask32(0x00ff0000).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 }
 
 
@@ -634,13 +634,13 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START(spotty)
 	PORT_START("IN0")
-	PORT_BIT(0x00010000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_NAME("Hold 1")
-	PORT_BIT(0x00020000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_NAME("Hold 2")
-	PORT_BIT(0x00040000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_NAME("Hold 3")
-	PORT_BIT(0x00080000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_NAME("Hold 4")
-	PORT_BIT(0x00100000, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Bet")
-	PORT_BIT(0x00200000, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("Stop")
-	PORT_BIT(0x00400000, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("Change")
+	PORT_BIT(0x00010000, IP_ACTIVE_LOW, IPT_POKER_HOLD1)
+	PORT_BIT(0x00020000, IP_ACTIVE_LOW, IPT_POKER_HOLD2)
+	PORT_BIT(0x00040000, IP_ACTIVE_LOW, IPT_POKER_HOLD3)
+	PORT_BIT(0x00080000, IP_ACTIVE_LOW, IPT_POKER_HOLD4)
+	PORT_BIT(0x00100000, IP_ACTIVE_LOW, IPT_GAMBLE_BET)
+	PORT_BIT(0x00200000, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE) PORT_NAME("Stop")
+	PORT_BIT(0x00400000, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL) PORT_NAME("Change")
 	PORT_BIT(0x00800000, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0xff00ffff, IP_ACTIVE_LOW, IPT_UNUSED)
 
@@ -649,9 +649,9 @@ static INPUT_PORTS_START(spotty)
 	PORT_BIT(0x00020000, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x00040000, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x00080000, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x00100000, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("Prize Hopper 1")
-	PORT_BIT(0x00200000, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_NAME("Prize Hopper 2")
-	PORT_BIT(0x00400000, IP_ACTIVE_LOW, IPT_BUTTON6) PORT_NAME("Prize Hopper 3")
+	PORT_BIT(0x00100000, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Prize Hopper 1")
+	PORT_BIT(0x00200000, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("Prize Hopper 2")
+	PORT_BIT(0x00400000, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("Prize Hopper 3")
 	PORT_BIT(0x00800000, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0xff00ffff, IP_ACTIVE_LOW, IPT_UNUSED)
 
@@ -1001,7 +1001,7 @@ Spotty
 | SW1 SW2         32MHz CG_ROM3   |
 +---------------------------------+
 
-Hyundia GMS30C2232 (Hyperstone core)
+Hyundai GMS30C2232 (Hyperstone core)
 Atmel AT89C4051 (8051 MCU with internal code)
 SYS L2D HYP Ver 1.0 ASIC Express
 EEPROM 93C46

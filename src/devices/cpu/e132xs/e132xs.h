@@ -283,8 +283,8 @@ protected:
 	memory_access<32, 1, 0, ENDIANNESS_BIG>::specific m_specific16;
 	memory_access<32, 2, 0, ENDIANNESS_BIG>::specific m_specific32;
 
-	memory_access< 6 + 3 + 2, 1, 0, ENDIANNESS_BIG>::specific m_io16;
-	memory_access<10 + 3 + 2, 2, 0, ENDIANNESS_BIG>::specific m_io32;
+	memory_access< 6 + 3, 1, -1, ENDIANNESS_BIG>::specific m_io16;
+	memory_access<10 + 3, 2, -2, ENDIANNESS_BIG>::specific m_io32;
 
 	b_r_delegate m_read_byte;
 	hw_r_delegate m_read_halfword;
@@ -634,7 +634,7 @@ protected:
 	const address_space_config m_internal_config;
 
 private:
-	memory_access<10 + 3 + 2, 2, 0, ENDIANNESS_BIG>::specific m_internal_specific;
+	memory_access<10 + 3, 2, -2, ENDIANNESS_BIG>::specific m_internal_specific;
 };
 
 
