@@ -70,8 +70,8 @@ MAIN:
 		case 0x35:              set_regop8(m_q.r.b);    set_imm();  %CMP8;      return;
 		case 0x36:              set_regop8(m_q.r.a);    %INDEXED;   %CMP8;      return;
 		case 0x37:              set_regop8(m_q.r.b);    %INDEXED;   %CMP8;      return;
-		case 0x38:                                      set_imm();  %SETLINE;   return;
-		case 0x39:                                      %INDEXED;   %SETLINE;   return;
+		case 0x38:                                      set_imm();  %SETLN;     return;
+		case 0x39:                                      %INDEXED;   %SETLN;     return;
 		case 0x3A:              set_regop8(m_q.r.a);    %INDEXED;   %ST8;       return;
 		case 0x3B:              set_regop8(m_q.r.b);    %INDEXED;   %ST8;       return;
 		case 0x3C:                                      set_imm();  %ANDCC;     return;
@@ -189,8 +189,8 @@ MAIN:
 		case 0xA9:                                      %INDEXED;   %JSR;       return;
 		case 0xAA:                                                  %BSR;       return;
 		case 0xAB:                                                  %LBSR;      return;
-		case 0xAC:                                                  %DECBJNZ;   return;
-		case 0xAD:                                                  %DECXJNZ;   return;
+		case 0xAC:                                                  %DBJNZ;     return;
+		case 0xAD:                                                  %DXJNZ;     return;
 		case 0xAE:                                                  %NOP;       return;
 
 		case 0xB0:                                                  %ABX;       return;
@@ -201,17 +201,17 @@ MAIN:
 		case 0xB5:                                                  %DIVX;      return;
 		case 0xB6:                                                  %BMOVE;     return;
 		case 0xB7:                                                  %MOVE;      return;
-		case 0xB8:              %IMM_IM;                set_d();    %LSRD;      return;
-		case 0xB9:                                      %INDEXED;   %LSRD;      return;
-		case 0xBA:              %IMM_IM;                set_d();    %RORD;      return;
-		case 0xBB:                                      %INDEXED;   %RORD;      return;
-		case 0xBC:              %IMM_IM;                set_d();    %ASRD;      return;
-		case 0xBD:                                      %INDEXED;   %ASRD;      return;
-		case 0xBE:              %IMM_IM;                set_d();    %ASLD;      return;
-		case 0xBF:                                      %INDEXED;   %ASLD;      return;
+		case 0xB8:              %IMM_IM;                set_d();    %LSRDI;     return;
+		case 0xB9:                                      %INDEXED;   %LSRDI;     return;
+		case 0xBA:              %IMM_IM;                set_d();    %RORDI;     return;
+		case 0xBB:                                      %INDEXED;   %RORDI;     return;
+		case 0xBC:              %IMM_IM;                set_d();    %ASRDI;     return;
+		case 0xBD:                                      %INDEXED;   %ASRDI;     return;
+		case 0xBE:              %IMM_IM;                set_d();    %ASLDI;     return;
+		case 0xBF:                                      %INDEXED;   %ASLDI;     return;
 
-		case 0xC0:              %IMM_IM;                set_d();    %ROLD;      return;
-		case 0xC1:                                      %INDEXED;   %ROLD;      return;
+		case 0xC0:              %IMM_IM;                set_d();    %ROLDI;     return;
+		case 0xC1:                                      %INDEXED;   %ROLDI;     return;
 		case 0xC2:                                      set_d();    %CLR16;     return;
 		case 0xC3:                                      %INDEXED;   %CLR16;     return;
 		case 0xC4:                                      set_d();    %NEG16;     return;
@@ -227,7 +227,7 @@ MAIN:
 		case 0xCE:                                      set_d();    %ABS16;     return;
 		case 0xCF:                                                  %BSET;      return;
 
-		case 0xD0:                                                  %BSET2;     return;
+		case 0xD0:                                                  %BSETW;     return;
 		default:                                                    %ILLEGAL;   return;
 	}
 	return;
@@ -455,7 +455,7 @@ EXGTFR:
 	eat(2);
 	return;
 
-SETLINE:
+SETLN:
 	@set_lines(read_operand());
 	return;
 
@@ -489,8 +489,8 @@ BSET:
 	}
 	return;
 
-BSET2:
-	// BSET2 does not appear to be interruptable, at least judging from the old implementation
+BSETW:
+	// BSETW does not appear to be interruptable, at least judging from the old implementation
 	while(m_u.w != 0)
 	{
 		@eat(1);
@@ -500,21 +500,21 @@ BSET2:
 	}
 	return;
 
-DECXJNZ:
-	// not sure if this affects V?
-	m_x.w = set_flags<uint16_t>(CC_NZV, m_x.w, 1, m_x.w - 1);
-	@eat(1);
-	set_cond(cond_ne());
-	goto BRANCH;
-
-DECBJNZ:
+DBJNZ:
 	// not sure if this affects V?
 	m_q.r.b = set_flags<uint8_t>(CC_NZV, m_q.r.b, 1, m_q.r.b - 1);
 	@eat(1);
 	set_cond(cond_ne());
 	goto BRANCH;
 
-LSRD:
+DXJNZ:
+	// not sure if this affects V?
+	m_x.w = set_flags<uint16_t>(CC_NZV, m_x.w, 1, m_x.w - 1);
+	@eat(1);
+	set_cond(cond_ne());
+	goto BRANCH;
+
+LSRDI:
 	// register addr.mode takes shift count from opcode operand, indexed addr.mode takes it from A
 	m_bcount = is_register_addressing_mode() ? m_temp_im : m_q.r.a;
 
@@ -533,7 +533,7 @@ LSRD:
 	write_operand(1, m_temp.b.l);
 	return;
 
-ASLD:
+ASLDI:
 	// register addr.mode takes shift count from opcode operand, indexed addr.mode takes it from A
 	m_bcount = is_register_addressing_mode() ? m_temp_im : m_q.r.a;
 
@@ -550,7 +550,7 @@ ASLD:
 	write_operand(1, m_temp.b.l);
 	return;
 
-ASRD:
+ASRDI:
 	// register addr.mode takes shift count from opcode operand, indexed addr.mode takes it from A
 	m_bcount = is_register_addressing_mode() ? m_temp_im : m_q.r.a;
 
@@ -569,7 +569,7 @@ ASRD:
 	write_operand(1, m_temp.b.l);
 	return;
 
-ROLD:
+ROLDI:
 	// register addr.mode takes shift count from opcode operand, indexed addr.mode takes it from A
 	m_bcount = is_register_addressing_mode() ? m_temp_im : m_q.r.a;
 
@@ -586,7 +586,7 @@ ROLD:
 	write_operand(1, m_temp.b.l);
 	return;
 
-RORD:
+RORDI:
 	// register addr.mode takes shift count from opcode operand, indexed addr.mode takes it from A
 	m_bcount = is_register_addressing_mode() ? m_temp_im : m_q.r.a;
 
