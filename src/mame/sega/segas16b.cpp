@@ -9278,10 +9278,10 @@ ROM_END
 
 //  Wanpaku Fishing (わんぱく　フィッシング), Sega System 16B
 //  CPU: 68000
-//  ROM Board type: ?
+//  ROM Board type: 171-5358
 //  Sega ID# for ROM board: 834-12991
 //
-ROM_START( wfishing ) // labels were faded out, so double-checking with another PCB would be useful. First release was Dec. 1993 so this is probably a later revision
+ROM_START( wfishing ) // First release was Dec. 1993 so this is probably a later revision
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "epr-19516.a2", 0x000000, 0x40000, CRC(c7ca1142) SHA1(7624e8767fb345c6df5344ac0f99705ca14f3040) ) // 11xxxxxxxxxxxxxxxx = 0x00
 	ROM_LOAD16_BYTE( "epr-19515.a1", 0x000001, 0x40000, CRC(8c0a2c16) SHA1(93e330450c8742e93010634e08814be5b67761d5) ) // 11xxxxxxxxxxxxxxxx = 0x00
