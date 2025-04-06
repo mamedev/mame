@@ -199,10 +199,10 @@ void sega_m2comm_device::device_add_mconfig(machine_config &config)
 sega_m2comm_device::sega_m2comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SEGA_MODEL2_COMM, tag, owner, clock)
 #ifdef M2COMM_SIMULATION
-	,m_acceptor(m_ioctx)
-	,m_sock_rx(m_ioctx)
-	,m_sock_tx(m_ioctx)
-	,m_tx_timeout(m_ioctx)
+	, m_acceptor(m_ioctx)
+	, m_sock_rx(m_ioctx)
+	, m_sock_tx(m_ioctx)
+	, m_tx_timeout(m_ioctx)
 #endif
 {
 	m_frameoffset = 0x1c0; // default
@@ -467,7 +467,8 @@ void sega_m2comm_device::comm_start()
 		m_localaddr = resolveIte.endpoint();
 		LOG("M2COMM: localhost = %s\n", *m_localaddr);
 	}
-	if (err) {
+	if (err)
+	{
 		LOG("M2COMM: localhost resolve error: %s\n", err.message());
 	}
 
@@ -476,7 +477,8 @@ void sega_m2comm_device::comm_start()
 		m_remoteaddr = resolveIte.endpoint();
 		LOG("M2COMM: remotehost = %s\n", *m_remoteaddr);
 	}
-	if (err) {
+	if (err)
+	{
 		LOG("M2COMM: remotehost resolve error: %s\n", err.message());
 	}
 }
@@ -651,7 +653,7 @@ void sega_m2comm_device::comm_tick()
 					if (idx >= 0 && idx <= m_linkcount)
 					{
 						// save message to "ring buffer"
-						for (unsigned j = 0x00 ; j < frame_size ; j++)
+						for (unsigned j = 0x00; j < frame_size; j++)
 						{
 							m_shared[frame_offset + j] = m_buffer0[1 + j];
 						}
@@ -731,7 +733,7 @@ void sega_m2comm_device::read_fg()
 				if (idx >= 0 && idx <= m_linkcount)
 				{
 					// save message to "ring buffer"
-					for (unsigned j = 0x00 ; j < frame_size ; j++)
+					for (unsigned j = 0x00; j < frame_size; j++)
 					{
 						m_shared[frame_offset + j] = m_buffer0[1 + j];
 					}
@@ -797,14 +799,15 @@ unsigned sega_m2comm_device::read_frame(unsigned data_size)
 void sega_m2comm_device::send_data(uint8_t frame_type, unsigned frame_start, unsigned frame_size, unsigned data_size)
 {
 	m_buffer0[0] = frame_type;
-	for (unsigned i = 0x0000 ; i < frame_size ; i++)
+	for (unsigned i = 0x0000; i < frame_size; i++)
 	{
 		m_buffer0[1 + i] = m_shared[frame_start + i];
 	}
 	send_frame(data_size);
 }
 
-void sega_m2comm_device::send_frame(unsigned data_size){
+void sega_m2comm_device::send_frame(unsigned data_size)
+{
 	if (m_tx_state != 2)
 		return;
 
