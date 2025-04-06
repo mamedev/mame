@@ -239,22 +239,22 @@ void huc6202_device::write(offs_t offset, u8 data)
 			break;
 
 		case 0x02:  /* Window 1 LSB */
-			m_window1 = (m_window1 & 0xFF00) | data;
+			m_window1 = (m_window1 & 0xff00) | data;
 			m_map_dirty = true;
 			break;
 
 		case 0x03:  /* Window 1 MSB */
-			m_window1 = ((m_window1 & 0x00FF) | (data << 8)) & 0x3FF;
+			m_window1 = ((m_window1 & 0x00ff) | (data << 8)) & 0x3ff;
 			m_map_dirty = true;
 			break;
 
 		case 0x04:  /* Window 2 LSB */
-			m_window2 = (m_window2 & 0xFF00) | data;
+			m_window2 = (m_window2 & 0xff00) | data;
 			m_map_dirty = true;
 			break;
 
 		case 0x05:  /* Window 2 MSB */
-			m_window2 = ((m_window2 & 0x00FF) | (data << 8)) & 0x3FF;
+			m_window2 = ((m_window2 & 0x00ff) | (data << 8)) & 0x3ff;
 			m_map_dirty = true;
 			break;
 
