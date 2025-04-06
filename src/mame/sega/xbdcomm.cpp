@@ -109,10 +109,10 @@ sega_xbdcomm_device::sega_xbdcomm_device(const machine_config &mconfig, const ch
 	m_dpram(*this, "dpram"),
 	m_mpc(*this, "commmpc")
 #ifdef XBDCOMM_SIMULATION
-	,m_acceptor(m_ioctx)
-	,m_sock_rx(m_ioctx)
-	,m_sock_tx(m_ioctx)
-	,m_tx_timeout(m_ioctx)
+	, m_acceptor(m_ioctx)
+	, m_sock_rx(m_ioctx)
+	, m_sock_tx(m_ioctx)
+	, m_tx_timeout(m_ioctx)
 #endif
 {
 }
@@ -445,7 +445,8 @@ void sega_xbdcomm_device::comm_start()
 		m_localaddr = resolveIte.endpoint();
 		LOG("XBDCOMM: localhost = %s\n", *m_localaddr);
 	}
-	if (err) {
+	if (err)
+	{
 		LOG("XBDCOMM: localhost resolve error: %s\n", err.message());
 	}
 
@@ -454,7 +455,8 @@ void sega_xbdcomm_device::comm_start()
 		m_remoteaddr = resolveIte.endpoint();
 		LOG("XBDCOMM: remotehost = %s\n", *m_remoteaddr);
 	}
-	if (err) {
+	if (err)
+	{
 		LOG("XBDCOMM: remotehost resolve error: %s\n", err.message());
 	}
 }
@@ -580,7 +582,6 @@ void sega_xbdcomm_device::comm_tick()
 						m_z80_stat = 0x00;
 					}
 
-
 					if (m_linkalive == 0x00)
 						recv = read_frame(data_size);
 					else
@@ -635,7 +636,7 @@ void sega_xbdcomm_device::comm_tick()
 				{
 					// save message to "ring buffer"
 					unsigned frame_offset = frame_start_tx + ((idx - 1) * frame_size);
-					for (unsigned j = 0x00 ; j < frame_size ; j++)
+					for (unsigned j = 0x00; j < frame_size; j++)
 					{
 						mpc_mem_w(frame_offset + j, m_buffer0[1 + j]);
 					}
@@ -657,7 +658,7 @@ void sega_xbdcomm_device::comm_tick()
 			}
 
 			// update buffers... guesswork
-			for (unsigned j = 0x00 ; j < 0x300 ; j++)
+			for (unsigned j = 0x00; j < 0x300; j++)
 			{
 				mpc_mem_w(frame_start_rx + j, mpc_mem_r(frame_start_tx + j));
 			}
@@ -717,14 +718,15 @@ unsigned sega_xbdcomm_device::read_frame(unsigned data_size)
 void sega_xbdcomm_device::send_data(uint8_t frame_type, unsigned frame_offset, unsigned frame_size, unsigned data_size)
 {
 	m_buffer0[0] = frame_type;
-	for (unsigned i = 0x00 ; i < frame_size ; i++)
+	for (unsigned i = 0x00; i < frame_size; i++)
 	{
 		m_buffer0[1 + i] = mpc_mem_r(frame_offset + i);
 	}
 	send_frame(data_size);
 }
 
-void sega_xbdcomm_device::send_frame(unsigned data_size){
+void sega_xbdcomm_device::send_frame(unsigned data_size)
+{
 	if (m_tx_state != 2)
 		return;
 
