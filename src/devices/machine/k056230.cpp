@@ -170,7 +170,6 @@ void k056230_device::set_mode(u8 data)
 
 void k056230_device::set_ctrl(u8 data)
 {
-
 	m_linkenable = data && 0x10;
 
 	switch (data)
@@ -321,7 +320,8 @@ void k056230_device::comm_start()
 		m_localaddr = resolveIte.endpoint();
 		LOG("k056230: localhost = %s\n", *m_localaddr);
 	}
-	if (err) {
+	if (err)
+	{
 		LOG("k056230: localhost resolve error: %s\n", err.message());
 	}
 
@@ -330,7 +330,8 @@ void k056230_device::comm_start()
 		m_remoteaddr = resolveIte.endpoint();
 		LOG("k056230: remotehost = %s\n", *m_remoteaddr);
 	}
-	if (err) {
+	if (err)
+	{
 		LOG("k056230: remotehost resolve error: %s\n", err.message());
 	}
 }
@@ -376,7 +377,7 @@ void k056230_device::comm_tick()
 							unsigned frame_offset = 0;
 							u32 frame_data = 0;
 
-							for (unsigned j = 0x00 ; j < frame_size ; j += 4)
+							for (unsigned j = 0x00; j < frame_size; j += 4)
 							{
 								frame_offset = (frame_start + j) / 4;
 								frame_data = m_buffer0[4 + j] |  m_buffer0[3 + j] << 8 |  m_buffer0[2 + j] << 16 |  m_buffer0[1 + j] << 24;
@@ -402,7 +403,7 @@ void k056230_device::comm_tick()
 				u32 frame_data = 0;
 
 				m_buffer0[0] = m_linkid;
-				for (unsigned i = 0x00 ; i < frame_size ; i += 4)
+				for (unsigned i = 0x00; i < frame_size; i += 4)
 				{
 					frame_offset = (frame_start + i) / 4;
 					frame_data = ram_r(frame_offset, 0xffffffff);
@@ -497,7 +498,7 @@ void k056230_viper_device::regs_map(address_map &map)
 			}
 			else
 			{
-				if(m_irq_enable)
+				if (m_irq_enable)
 					m_irq_state = ASSERT_LINE;
 			}
 
