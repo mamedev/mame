@@ -453,8 +453,7 @@ void ksm_state::ksm(machine_config &config)
 	MS7004(config, m_ms7004, 0);
 	m_ms7004->tx_handler().set(m_i8251kbd, FUNC(i8251_device::write_rxd));
 
-	// baud rate is supposed to be 4800 but keyboard is slightly faster
-	clock_device &keyboard_clock(CLOCK(config, "keyboard_clock", 4960 * 16));
+	clock_device &keyboard_clock(CLOCK(config, "keyboard_clock", 4800 * 16));
 	keyboard_clock.signal_handler().set(FUNC(ksm_state::write_keyboard_clock));
 }
 
