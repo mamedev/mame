@@ -226,6 +226,7 @@ void mb89374_device::device_reset()
 
 	m_tx_state = 0;
 	m_rx_state = 0;
+
 	comm_start();
 }
 
@@ -412,7 +413,6 @@ void mb89374_device::ci_w(int state)
 	{
 		tx_complete();
 	}
-
 }
 
 
@@ -486,7 +486,7 @@ void mb89374_device::tx_complete()
 		{
 			m_socket_buffer[0x00] = m_tx_offset & 0xff;
 			m_socket_buffer[0x01] = (m_tx_offset >> 8) & 0xff;
-			for (int i = 0x00 ; i < m_tx_offset ; i++)
+			for (int i = 0x00; i < m_tx_offset; i++)
 			{
 				m_socket_buffer[i + 2] = m_tx_buffer[i];
 			}
@@ -610,7 +610,7 @@ void mb89374_device::check_sockets()
 				if (recv > 0)
 				{
 					m_rx_length = m_socket_buffer[0x01] << 8 | m_socket_buffer[0x00];
-					for (unsigned i = 0x00 ; i < m_rx_length ; i++)
+					for (unsigned i = 0x00; i < m_rx_length; i++)
 					{
 						m_rx_buffer[i] = m_socket_buffer[2 + i];
 					}
@@ -638,7 +638,8 @@ void mb89374_device::comm_start()
 		m_localaddr = resolveIte.endpoint();
 		LOG("MB89374: localhost = %s\n", *m_localaddr);
 	}
-	if (err) {
+	if (err)
+	{
 		LOG("MB89374: localhost resolve error: %s\n", err.message());
 	}
 
@@ -647,7 +648,8 @@ void mb89374_device::comm_start()
 		m_remoteaddr = resolveIte.endpoint();
 		LOG("MB89374: remotehost = %s\n", *m_remoteaddr);
 	}
-	if (err) {
+	if (err)
+	{
 		LOG("MB89374: remotehost resolve error: %s\n", err.message());
 	}
 }
