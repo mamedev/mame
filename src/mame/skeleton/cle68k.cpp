@@ -23,10 +23,11 @@ U6295 sound chip
 
 
 TODO:
-* correct GFX decode;
+* correct GFX decode (address/data encrypted?);
 * colors / attribute RAM;
 * complete inputs;
 * what role does the AT90S4414 play?
+* $1e002x accesses during transitions (MCU flushes attribute/graphic RAM data?)
 */
 
 
@@ -83,8 +84,10 @@ private:
 template <uint8_t Which>
 TILE_GET_INFO_MEMBER(cle68k_state::get_tile_info)
 {
+	// TODO: out-of-range bit 15 used for gameplay reels (different tile layout?)
 	int const tile = m_videoram[Which][tile_index];
-	int const color = m_attrram[Which][tile_index] & 0xff;
+	// TODO: 4 bits for tile entry then rowscroll?
+	int const color = 0; //(m_attrram[Which][tile_index] >> 0) & 0xf;
 
 	tileinfo.set(Which, tile, color, 0);
 }
@@ -135,6 +138,7 @@ void cle68k_state::program_map(address_map &map)
 	map(0x1e0013, 0x1e0013).w(m_ramdac[1], FUNC(ramdac_device::pal_w));
 	map(0x1e0014, 0x1e0014).w(m_ramdac[0], FUNC(ramdac_device::mask_w));
 	map(0x1e0015, 0x1e0015).w(m_ramdac[1], FUNC(ramdac_device::mask_w));
+//	map(0x1e0020, 0x1e0023) 8-bit address/data pair for a device (MCU or RAMDAC)
 	map(0x1e0030, 0x1e0031).portr("IN1").nopw(); // TODO: video reg? outputs?
 	map(0x1e0032, 0x1e0033).portr("DSW1");
 	map(0x1e0034, 0x1e0035).portr("DSW2");
@@ -547,8 +551,8 @@ INPUT_PORTS_END
 
 
 static GFXDECODE_START( gfx_cle68k ) // TODO: correct decoding
-	GFXDECODE_ENTRY( "tiles", 0, gfx_8x8x4_packed_msb, 0x000, 1 )
-	GFXDECODE_ENTRY( "tiles", 0, gfx_8x8x4_packed_msb, 0x100, 1 )
+	GFXDECODE_ENTRY( "tiles", 0, gfx_8x8x4_packed_msb, 0x000, 16 )
+	GFXDECODE_ENTRY( "tiles", 0, gfx_8x8x4_packed_msb, 0x100, 16 )
 GFXDECODE_END
 
 
