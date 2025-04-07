@@ -48,7 +48,9 @@ void i82371sb_isa_device::internal_io_map(address_map &map)
 	map(0x00b2, 0x00b3).rw(FUNC(i82371sb_isa_device::read_apmcapms), FUNC(i82371sb_isa_device::write_apmcapms));
 	// Up to $de according to TC430HX spec?
 	map(0x00c0, 0x00df).rw(FUNC(i82371sb_isa_device::at_dma8237_2_r), FUNC(i82371sb_isa_device::at_dma8237_2_w));
-	map(0x00e0, 0x00ef).noprw();
+//  map(0x00e0, 0x00ef) MCA bus (cfr. Bochs) or PnP
+	map(0x00ed, 0x00ed).lw8(NAME([] (offs_t offset, u8 data) { }));
+
 //  map(0x00f0, 0x00f0) Reset Numeric Error
 //  map(0x0270, 0x0273) I/O read port for PnP
 	map(0x04d0, 0x04d1).rw(FUNC(i82371sb_isa_device::eisa_irq_read), FUNC(i82371sb_isa_device::eisa_irq_write));

@@ -5,16 +5,15 @@ license:CC0-1.0
 -->
 
 <softwarelist name="apple2_cass" description="Apple II cassettes">
+	<!-- To enter BASIC after powering on:
+	AppleII : Type Ctrl-B (nothing shows) and press <Enter>
+	AppleIIe : Press Ctrl-F12
 
-<!-- To enter Basic after powering on:
-AppleII : Type Ctrl-B (nothing shows) and press <Enter>
-AppleIIe : Press Ctrl-F12
-
-To load and run a tape:
-1. Set up the machine for the type of tape: Monitor "*", Integer BASIC ">", or Applesoft BASIC "]".
-2. Enter the address information or type LOAD for BASIC programs but do not press <Return>.
-3. Play the tape, wait for the leader sound then press <Return>.
-4. Enter the address information or type RUN for BASIC programs and press <Return> to run the program. -->
+	To load and run a tape:
+	1. Set up the machine for the type of tape: Monitor "*", Integer BASIC ">", or Applesoft BASIC "]".
+	2. Enter the address information or type LOAD for BASIC programs but do not press <Return>.
+	3. Play the tape, wait for the leader sound then press <Return>.
+	4. Enter the address information or type RUN for BASIC programs and press <Return> to run the program. -->
 
 	<software name="3dartgra">
 		<description>3D Art Graphics</description>
@@ -149,7 +148,8 @@ To load and run a tape:
 		</part>
 	</software>
 
-	<software name="aligren" supported="partial"><!-- requires cassette audio player -->
+	<software name="aligren" supported="partial">
+		<!-- requires cassette audio player -->
 		<description>Alignment Test Tone / Renumber</description>
 		<year>1979</year>
 		<publisher>Apple Computer, Inc.</publisher>
@@ -169,7 +169,8 @@ To load and run a tape:
 		</part>
 	</software>
 
-	<software name="aligsam" supported="partial"><!-- requires cassette audio player -->
+	<software name="aligsam" supported="partial">
+		<!-- requires cassette audio player -->
 		<description>Alignment Test Tone / Sampler</description>
 		<year>1979</year>
 		<publisher>Apple Computer, Inc.</publisher>
@@ -291,7 +292,8 @@ To load and run a tape:
 		</part>
 	</software>
 
-	<software name="aplstqrt" supported="no"><!-- requires modem -->
+	<software name="aplstqrt" supported="no">
+		<!-- requires modem -->
 		<description>Apple Stock Quote Reporter</description>
 		<year>1978</year>
 		<publisher>Apple Computer, Inc.</publisher>
@@ -717,7 +719,8 @@ To load and run a tape:
 		</part>
 	</software>
 
-	<software name="craps" supported="partial"><!-- cass2 requires light pen -->
+	<software name="craps" supported="partial">
+		<!-- cass2 requires light pen -->
 		<description>Craps / Bright Pen Craps</description>
 		<year>1979</year>
 		<publisher>Softape</publisher>
@@ -777,10 +780,13 @@ To load and run a tape:
 	</software>
 
 	<software name="dateston">
-		<description>DUNJONQUEST- Datestones of Ryn</description>
+		<description>Dunjonquest: Datestones of Ryn</description>
 		<year>1979</year>
 		<publisher>Automated Simulations</publisher>
+		<info name="programmer" value="Jeffrey A. Johnson, Jon Freeman, and Jim Connelley" />
 		<info name="usage" value="]Load 32K" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- role-playing game -->
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Datestones of Ryn" />
 			<dataarea name="cass" size="3578924">
@@ -789,7 +795,8 @@ To load and run a tape:
 		</part>
 	</software>
 
-	<software name="datmtel" supported="partial"><!-- requires modem -->
+	<software name="datmtel" supported="partial">
+		<!-- requires modem -->
 		<description>Datamover / Telepong</description>
 		<year>1978</year>
 		<publisher>Apple Computer, Inc.</publisher>
@@ -1629,7 +1636,8 @@ To load and run a tape:
 		</part>
 	</software>
 
-	<software name="mmdofmem" supported="partial"><!-- requires cassette audio player -->
+	<software name="mmdofmem" supported="partial">
+		<!-- requires cassette audio player -->
 		<description>Don't Fall! / Memory Aide</description>
 		<year>1978</year>
 		<publisher>Magnemedia Inc.</publisher>
@@ -1660,7 +1668,8 @@ To load and run a tape:
 		</part>
 	</software>
 
-	<software name="mmgradra" supported="partial"><!-- requires cassette audio player -->
+	<software name="mmgradra" supported="partial">
+		<!-- requires cassette audio player -->
 		<description>Grading Routine / Drawing</description>
 		<year>1978</year>
 		<publisher>Magnemedia Inc.</publisher>
@@ -1691,7 +1700,8 @@ To load and run a tape:
 		</part>
 	</software>
 
-	<software name="mmstukey" supported="partial"><!-- requires cassette audio player -->
+	<software name="mmstukey" supported="partial">
+		<!-- requires cassette audio player -->
 		<description>Study Aide / Keyboard Organ</description>
 		<year>1978</year>
 		<publisher>Magnemedia Inc.</publisher>
@@ -1722,7 +1732,8 @@ To load and run a tape:
 		</part>
 	</software>
 
-	<software name="mmsuptru" supported="partial"><!-- requires cassette audio player -->
+	<software name="mmsuptru" supported="partial">
+		<!-- requires cassette audio player -->
 		<description>Super Math / True/False Quiz</description>
 		<year>1978</year>
 		<publisher>Magnemedia Inc.</publisher>
@@ -1753,7 +1764,8 @@ To load and run a tape:
 		</part>
 	</software>
 
-	<software name="mmvarmat" supported="partial"><!-- requires cassette audio player -->
+	<software name="mmvarmat" supported="partial">
+		<!-- requires cassette audio player -->
 		<description>Variable Message / Matching Quiz</description>
 		<year>1978</year>
 		<publisher>Magnemedia Inc.</publisher>
@@ -1894,7 +1906,7 @@ To load and run a tape:
 	</software>
 
 	<software name="morlocst">
-		<description>DUNJONQUEST- Morloc's Tower</description>
+		<description>Dunjonquest: Morloc's Tower</description>
 		<year>1979</year>
 		<publisher>Automated Simulations</publisher>
 		<info name="usage" value="]Load 48K" />
@@ -2640,8 +2652,8 @@ To load and run a tape:
 		</part>
 	</software>
 
-	<software name="starques">
-		<description>STARQUEST Rescue at Rigel</description>
+	<software name="sqresrig">
+		<description>Starquest: Rescue at Rigel</description>
 		<year>1980</year>
 		<publisher>Automated Simulations</publisher>
 		<info name="usage" value="]Load 32K" />
@@ -2735,7 +2747,8 @@ To load and run a tape:
 		</part>
 	</software>
 
-	<software name="studyaid" supported="partial" cloneof="mmstukey"><!-- requires cassette audio player -->
+	<software name="studyaid" supported="partial" cloneof="mmstukey">
+		<!-- requires cassette audio player -->
 		<description>Study Aide</description>
 		<year>1980</year>
 		<publisher>Innerglo</publisher>
@@ -2823,7 +2836,8 @@ To load and run a tape:
 		</part>
 	</software>
 
-	<software name="sweettal" supported="no"><!-- requires Sweet Talker card -->
+	<software name="sweettal" supported="no">
+		<!-- requires Sweet Talker card -->
 		<description>Sweet Talker</description>
 		<year>1981</year>
 		<publisher>Micromint, Inc.</publisher>
@@ -2876,7 +2890,9 @@ To load and run a tape:
 		</part>
 	</software>
 
-	<software name="tapmatt" supported="no"><!-- cass1 requires Tape Measure PROM card --><!-- cass2 requires cassette audio player -->
+	<software name="tapmatt" supported="no">
+		<!-- cass1 requires Tape Measure PROM card -->
+		<!-- cass2 requires cassette audio player -->
 		<description>Tape Measure / Alignment Test Tone</description>
 		<year>1978</year>
 		<publisher>Apple Computer, Inc.</publisher>
@@ -2896,7 +2912,8 @@ To load and run a tape:
 		</part>
 	</software>
 
-	<software name="tictspec" supported="partial"><!-- requires cassette audio player -->
+	<software name="tictspec" supported="partial">
+		<!-- requires cassette audio player -->
 		<description>Tic-Tac-Talker / Spectrum Analysis</description>
 		<year>1978</year>
 		<publisher>Softape</publisher>

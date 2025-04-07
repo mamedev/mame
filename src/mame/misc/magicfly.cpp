@@ -430,15 +430,15 @@
     - Added some notes.
 
     [2025-03-10]
-	- Bonne Chance chars and tiles both 3bpp.
-	- New TILE_GET_INFO and video start for Bonne Chance.
+    - Bonne Chance chars and tiles both 3bpp.
+    - New TILE_GET_INFO and video start for Bonne Chance.
     - Reworked the Bonne Chance and 7mezzo color palette.
 
 
     TODO:
 
     - Figure out how the palette is generated, to avoid a custom palette.
-	- Find a board to investigate if the chars GFX are 1bpp or 3bpp.
+    - Find a board to investigate if the chars GFX are 1bpp or 3bpp.
 
 
 *******************************************************************************/
@@ -683,17 +683,17 @@ void magicfly_state::bchance_palette(palette_device &palette) const
 	palette.set_pen_color(7*8 + 1, rgb_t(0xff, 0xff, 0xff));
 	palette.set_pen_color(0xa*8 + 1, rgb_t(0x00, 0xff, 0x00)); // credits       (green)
 	palette.set_pen_color(0xb*8 + 1, rgb_t(0xff, 0xff, 0x00)); // odds + bet    (yell)
-	palette.set_pen_color(0xd*8 + 1, rgb_t(0xff, 0x00, 0xff)); // push deal     (mag)	
+	palette.set_pen_color(0xd*8 + 1, rgb_t(0xff, 0x00, 0xff)); // push deal     (mag)
 	palette.set_pen_color(0xe*8 + 1, rgb_t(0x00, 0xff, 0xff)); // big good luck (cyan)
-	palette.set_pen_color(0xf*8 + 1, rgb_t(0xff, 0xff, 0xff)); // odds          (white)  
-	
+	palette.set_pen_color(0xf*8 + 1, rgb_t(0xff, 0xff, 0xff)); // odds          (white)
+
 	// color code 7 all black
 	for(int i=0; i < 0x8; i++)
 	{
 		palette.set_pen_color(7*8 + i, rgb_t(0x00, 0x00, 0x00));
 	}
 
-	// all code+2 colors black (corners)	
+	// all code+2 colors black (corners)
 	for(int i=0; i < 0x10; i++)
 	{
 		palette.set_pen_color(i*8 + 2, rgb_t(0x00, 0x00, 0x00));

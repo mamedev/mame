@@ -105,6 +105,11 @@
  * - it passes on 8080/8085 CPU Exerciser (ref: http://www.idb.me.uk/sunhillow/8080.html
  *   tests only 8080 opcodes, link is dead so go via archive.org)
  *
+ * April 2025, Roberto Fresca
+ * - Reworked the DSUB (Double Substraction) undocumented instruction.
+ * - Reworked the RDEL (Rotate D and E Left with Carry) undocumented instruction.
+ * (ref: https://robertofresca.com/files/New_8085_instruction.pdf)
+ *
  *****************************************************************************/
 
 #include "emu.h"
@@ -920,18 +925,34 @@ void i8085a_cpu_device::execute_one(int opcode)
 			m_AF.b.l = (m_AF.b.l & 0xfe) | (m_AF.b.h & CF);
 			break;
 
-		case 0x08: // 8085: undocumented DSUB, otherwise undocumented NOP
-			if (is_8085())
-			{
-				int q = m_HL.b.l - m_BC.b.l;
-				m_AF.b.l = lut_zs[q & 0xff] | ((q >> 8) & CF) | VF | ((m_HL.b.l ^ q ^ m_BC.b.l) & HF) | (((m_BC.b.l ^ m_HL.b.l) & (m_HL.b.l ^ q) & SF) >> 5);
-				m_HL.b.l = q;
-				q = m_HL.b.h - m_BC.b.h - (m_AF.b.l & CF);
-				m_AF.b.l = lut_zs[q & 0xff] | ((q >> 8) & CF) | VF | ((m_HL.b.h ^ q ^ m_BC.b.h) & HF) | (((m_BC.b.h ^ m_HL.b.h) & (m_HL.b.h ^ q) & SF) >> 5);
-				if (m_HL.b.l != 0)
-					m_AF.b.l &= ~ZF;
-			}
-			break;
+		case 0x08: // 8085: undocumented DSUB (Double Substraction)
+				   // [H][L] - [B][C] --> [H][L]
+				if (is_8085())
+				{
+					// Low byte subtraction: L = L - C
+					int q_low = m_HL.b.l - m_BC.b.l;
+					uint8_t res_low = q_low & 0xff;
+					// Calculate flags for low byte
+					m_AF.b.l = lut_zs[res_low] 
+						| ((q_low >> 8) & CF)  // Carry
+						| ((m_HL.b.l ^ res_low ^ m_BC.b.l) & HF)  // Half Carry
+						| (((m_BC.b.l ^ m_HL.b.l) & (m_HL.b.l ^ res_low) & SF)) >> 5;  // Overflow
+					m_HL.b.l = res_low;
+
+					// High byte subtraction: H = H - B - carry_from_low
+					int q_high = m_HL.b.h - m_BC.b.h - (m_AF.b.l & CF);
+					uint8_t res_high = q_high & 0xff;
+					// Calculate flags for high byte
+					m_AF.b.l = lut_zs[res_high] 
+						| ((q_high >> 8) & CF)  // Carry
+						| ((m_HL.b.h ^ res_high ^ m_BC.b.h) & HF)  // Half Carry
+						| (((m_BC.b.h ^ m_HL.b.h) & (m_HL.b.h ^ res_high) & SF)) >> 5;  // Overflow
+					m_HL.b.h = res_high;
+
+					// Set Zero flag based on 16-bit result
+					m_AF.b.l = (m_AF.b.l & ~ZF) | (((m_HL.b.l | m_HL.b.h) == 0) ? ZF : 0);
+				}
+				break;
 		case 0x09: // DAD B
 			op_dad(m_BC.w.l);
 			break;
@@ -1002,11 +1023,16 @@ void i8085a_cpu_device::execute_one(int opcode)
 			break;
 		}
 
-		case 0x18: // 8085: undocumented RDEL, otherwise undocumented NOP
+		case 0x18: // 8085: undocumented RDEL (Roteate D and E Left throgh Carry), otherwise undocumented NOP
+				   //  .----------------------------------.
+				   //  |   .----.     .-------.-------.   |
+				   //  '--<| Cy |<---<|   D   |   E   |<--'
+				   //      '----'     '-------'-------'
 			if (is_8085())
 			{
-				m_AF.b.l = (m_AF.b.l & ~(CF | VF)) | (m_DE.b.h >> 7);
-				m_DE.w.l = (m_DE.w.l << 1) | (m_DE.w.l >> 15);
+				int c = m_AF.b.l & CF;                                // save old carry state
+				m_AF.b.l = (m_AF.b.l & ~(CF | VF)) | (m_DE.b.h >> 7); // set new carry state
+				m_DE.w.l = (m_DE.w.l << 1) | c;                       // rotate with carry
 				if ((((m_DE.w.l >> 15) ^ m_AF.b.l) & CF) != 0)
 					m_AF.b.l |= VF;
 			}

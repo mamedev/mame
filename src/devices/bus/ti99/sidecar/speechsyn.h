@@ -1,7 +1,7 @@
 // license:LGPL-2.1+
 // copyright-holders:Michael Zapf
 /****************************************************************************
- 
+
     Speech Synthesizer sidecar device
     Michael Zapf
 
@@ -49,7 +49,7 @@ protected:
 private:
 	required_device<cd2501e_device> m_vsp;
 	required_device<bus::ti99::internal::ioport_device>     m_port;
-	
+
 	void speech_ready(int state);
 
 	bool m_reading;

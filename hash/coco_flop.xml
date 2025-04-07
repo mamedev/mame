@@ -22,7 +22,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- coco3 only requires 512Kb, run best with a 6309? - coco3h driver) -->
-	<software name="dkong" supported ="partial">
+	<software name="dkong" supported="partial">
 		<description>Donkey Kong (Sock Master's Donkey Kong Emulator for CoCo 3) (512Kb)</description>
 		<year>2007</year>
 		<publisher>Sock Master</publisher>
@@ -37,7 +37,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- coco3 only requires 512Kb, run best with a 6309? - coco3h driver) -->
-	<software name="dkremix" supported ="partial">
+	<software name="dkremix" supported="partial">
 		<description>Donkey Kong Remix (Sock Master's Donkey Kong Remix Emulator for CoCo 3) (512Kb)</description>
 		<year>2015</year>
 		<publisher>Sock Master</publisher>
@@ -52,7 +52,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- coco3 only requires 512Kb, run best with a 6309? - coco3h driver) -->
-	<software name="pacman" supported ="partial">
+	<software name="pacman" supported="partial">
 		<description>Pacman (z80 to 6809 Transcoded - v1.01) (512kb)</description>
 		<year>2017</year>
 		<publisher>Glen Hewlett</publisher>
@@ -67,7 +67,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- coco3 only requires 512Kb, run best with a 6309? - coco3h driver) -->
-	<software name="joust" supported ="partial">
+	<software name="joust" supported="partial">
 		<description>Joust (6809 Transcoded - v1.10) (512kb)</description>
 		<year>2021</year>
 		<publisher>Glen Hewlett</publisher>

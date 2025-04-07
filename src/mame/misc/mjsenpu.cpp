@@ -80,7 +80,7 @@ protected:
 
 private:
 	// devices
-	required_device<e132xt_device> m_maincpu;
+	required_device<e132x_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
 	required_device<palette_device> m_palette;
 	required_device<hopper_device> m_hopper;
@@ -94,8 +94,8 @@ private:
 	uint8_t m_control = 0;
 	uint8_t m_key_matrix_select = 0;
 
-	void control_w(uint8_t data);
-	void key_matrix_w(uint8_t data);
+	void control_w(uint32_t data);
+	void key_matrix_w(uint32_t data);
 
 	uint32_t key_matrix_r();
 
@@ -128,7 +128,7 @@ void mjsenpu_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	COMBINE_DATA(&m_vram[BIT(m_control, 0)][offset]);
 }
 
-void mjsenpu_state::control_w(uint8_t data)
+void mjsenpu_state::control_w(uint32_t data)
 {
 	// bit 0x80 is always set? (sometimes disabled during screen transitions briefly, could be display enable?)
 
@@ -143,13 +143,13 @@ void mjsenpu_state::control_w(uint8_t data)
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 1)); // coin or key-in
 
 	// bit 0x01 alternates frequently, using as video buffer, but that's a complete guess
-	m_control = data;
+	m_control = uint8_t(data);
 
 //  if (data &~0x9e)
 //      logerror("control_w %02x\n", data);
 }
 
-void mjsenpu_state::key_matrix_w(uint8_t data)
+void mjsenpu_state::key_matrix_w(uint32_t data)
 {
 	if ((data & 0xe0) != 0x80)
 		logerror("key_matrix_w %02x\n", data);
@@ -157,7 +157,7 @@ void mjsenpu_state::key_matrix_w(uint8_t data)
 	// bit 0 to 4: Key matrix select
 	// Bit 5 to 6: unknown, always clear?
 	// bit 7: unknown, always set?
-	m_key_matrix_select = data;
+	m_key_matrix_select = uint8_t(data);
 }
 
 uint32_t mjsenpu_state::key_matrix_r()
@@ -190,18 +190,18 @@ void mjsenpu_state::main_map(address_map &map)
 
 void mjsenpu_state::main_portmap(address_map &map)
 {
-	map(0x4000, 0x4003).r(FUNC(mjsenpu_state::key_matrix_r));
-	map(0x4010, 0x4013).portr("IN1");
+	map(0x1000, 0x1000).r(FUNC(mjsenpu_state::key_matrix_r));
+	map(0x1004, 0x1004).portr("IN1");
 
-	map(0x4023, 0x4023).w(FUNC(mjsenpu_state::control_w));
+	map(0x1008, 0x1008).w(FUNC(mjsenpu_state::control_w));
 
-	map(0x4030, 0x4033).portr("DSW1");
-	map(0x4040, 0x4043).portr("DSW2");
-	map(0x4050, 0x4053).portr("DSW3");
+	map(0x100c, 0x100c).portr("DSW1");
+	map(0x1010, 0x1010).portr("DSW2");
+	map(0x1014, 0x1014).portr("DSW3");
 
-	map(0x4063, 0x4063).w(FUNC(mjsenpu_state::key_matrix_w));
+	map(0x1018, 0x1018).w(FUNC(mjsenpu_state::key_matrix_w));
 
-	map(0x4073, 0x4073).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x101c, 0x101c).umask32(0x000000ff).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
 
 static INPUT_PORTS_START( mjsenpu )
@@ -409,7 +409,7 @@ following clocks are on the PCB
 void mjsenpu_state::mjsenpu(machine_config &config)
 {
 	// basic machine hardware
-	E132XT(config, m_maincpu, 27000000*2); // ?? Mhz
+	E132X(config, m_maincpu, 27'000'000*2); // E1-32XT (TQFP), ?? Mhz
 	m_maincpu->set_addrmap(AS_PROGRAM, &mjsenpu_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &mjsenpu_state::main_portmap);
 	m_maincpu->set_vblank_int("screen", FUNC(mjsenpu_state::irq0_line_hold));

@@ -180,15 +180,15 @@ void pv9234_state::pv9234(machine_config &config)
 
 	// TODO: actually NS16550A, uses DA-25 port for a non-standard 8P1 125k baud rate
 	NS16550(config, "uart", 8_MHz_XTAL);
-//	uart.out_tx_callback().set("serial", FUNC(rs232_port_device::write_txd));
-//	uart.out_dtr_callback().set("serial", FUNC(rs232_port_device::write_dtr));
-//	uart.out_rts_callback().set("serial", FUNC(rs232_port_device::write_rts));
+//  uart.out_tx_callback().set("serial", FUNC(rs232_port_device::write_txd));
+//  uart.out_dtr_callback().set("serial", FUNC(rs232_port_device::write_dtr));
+//  uart.out_rts_callback().set("serial", FUNC(rs232_port_device::write_rts));
 //
-//	rs232_port_device &serial(RS232_PORT(config, "serial", default_rs232_devices, "terminal"));
-//	serial.rxd_handler().set("uart", FUNC(ns16550_device::rx_w));
-//	serial.dcd_handler().set("uart", FUNC(ns16550_device::dcd_w));
-//	serial.dsr_handler().set("uart", FUNC(ns16550_device::dsr_w));
-//	serial.cts_handler().set("uart", FUNC(ns16550_device::cts_w));
+//  rs232_port_device &serial(RS232_PORT(config, "serial", default_rs232_devices, "terminal"));
+//  serial.rxd_handler().set("uart", FUNC(ns16550_device::rx_w));
+//  serial.dcd_handler().set("uart", FUNC(ns16550_device::dcd_w));
+//  serial.dsr_handler().set("uart", FUNC(ns16550_device::dsr_w));
+//  serial.cts_handler().set("uart", FUNC(ns16550_device::cts_w));
 
 	// TODO: has a Philips SAA-branded chip on the evasive PCB picture
 

@@ -29,7 +29,7 @@ mif201_device::mif201_device(const machine_config &mconfig, const char *tag, dev
 
 //void mif201_device::irq_out(int state)
 //{
-//	m_bus->int_w<2>(state);
+//  m_bus->int_w<2>(state);
 //}
 
 

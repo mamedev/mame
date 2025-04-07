@@ -442,7 +442,7 @@ inline void hd6309_device::bittest_set(bool result)
 
 inline uint16_t hd6309_device::read_exgtfr_register(uint8_t reg)
 {
-	uint16_t result;
+	uint16_t result = 0;
 
 	switch(reg & 0x0F)
 	{
@@ -462,8 +462,6 @@ inline uint16_t hd6309_device::read_exgtfr_register(uint8_t reg)
 		case 13: result = 0;                                   break;  // 0
 		case 14: result = ((uint16_t) m_q.r.e) << 8 | m_q.r.e; break;  // E
 		case 15: result = ((uint16_t) m_q.r.f) << 8 | m_q.r.f; break;  // F
-		default:
-			fatalerror("Should not reach here");
 	}
 
 	return result;
@@ -495,8 +493,6 @@ inline void hd6309_device::write_exgtfr_register(uint8_t reg, uint16_t value)
 		case 13:                                   break;  // 0
 		case 14: m_q.r.e = (uint8_t) (value >> 8); break;  // E
 		case 15: m_q.r.f = (uint8_t) (value >> 0); break;  // F
-		default:
-			fatalerror("Should not reach here");
 	}
 }
 
@@ -601,8 +597,6 @@ void hd6309_device::register_register_op()
 		case 13: if (promote) set_regop16(m_temp);  else set_regop8(m_temp.b.l);    break;  // 0
 		case 14: if (promote) set_regop16(m_q.p.w); else set_regop8(m_q.r.e);       break;  // E
 		case 15: if (promote) set_regop16(m_q.p.w); else set_regop8(m_q.r.f);       break;  // F
-		default:
-			fatalerror("Should not reach here");
 	}
 
 	// set source
@@ -624,8 +618,6 @@ void hd6309_device::register_register_op()
 		case 13: m_addressing_mode = ADDRESSING_MODE_ZERO;                                              break;  // 0
 		case 14: m_addressing_mode = promote ? ADDRESSING_MODE_REGISTER_W : ADDRESSING_MODE_REGISTER_E; break;  // E
 		case 15: m_addressing_mode = promote ? ADDRESSING_MODE_REGISTER_W : ADDRESSING_MODE_REGISTER_F; break;  // F
-		default:
-			fatalerror("Should not reach here");
 	}
 
 	// eat a single CPU cycle

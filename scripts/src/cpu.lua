@@ -4240,3 +4240,13 @@ if opt_tool(CPUS, "OLMS66K") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/olms66k/nx8dasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/olms66k/nx8dasm.h")
 end
+
+--------------------------------------------------
+-- Panasonic MN10300, disassembler only
+--@src/devices/cpu/mn10300/mn10300.h,CPUS["MN10300"] = true
+--------------------------------------------------
+
+if opt_tool(CPUS, "MN10300") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mn10300/mn103dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mn10300/mn103dasm.h")
+end

@@ -16438,6 +16438,42 @@ ROM_START( magoddsd )
 	ROM_LOAD( "dm74s288.12k",0x40, 0x20, CRC(03231e84) SHA1(92abdf6f8ef705b260378e90e6d591da056c2cee) )
 ROM_END
 
+// custom CPU block
+ROM_START( mtonic2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "8_tonic.7e", 0x0000, 0x8000, CRC(71df6972) SHA1(281c93184b611a0227a409a0bfe2d8c72d5da878) )
+	ROM_LOAD( "9_tonic.8e", 0x8000, 0x8000, CRC(547af84a) SHA1(cf6282e72454c5a18b2a5b1ede6a787b5e75c8d1) )
+
+	ROM_REGION( 0x30000, "gfx1", 0 )
+	ROM_LOAD( "5_tonic.10j", 0x00000, 0x10000, CRC(f1386106) SHA1(0fa5eb8a3e23b46893ff58edac109991b2621ad4) )
+	ROM_LOAD( "6_tonic.11j", 0x10000, 0x10000, CRC(737ac1e8) SHA1(582169aad4d7738eb5e747ba174aa4239aeb868e) )
+	ROM_LOAD( "7_tonic.13j", 0x20000, 0x10000, CRC(83b3996a) SHA1(809539c82735acc42b27223db8835c3511510763) )
+
+	ROM_REGION( 0x10000, "gfx2", 0 )
+	ROM_LOAD( "1_tonic.10l", 0x0000, 0x4000, CRC(746588db) SHA1(2a0af552011246d4cc0cd0b670907cf8685ce8ef) )
+	ROM_LOAD( "2_tonic.11l", 0x4000, 0x4000, CRC(8b7dd248) SHA1(a3ebde9fd0b6b1e42aa9b6d8e30c225abf2f80ce) )
+	ROM_LOAD( "3_tonic.13l", 0x8000, 0x4000, CRC(de05e678) SHA1(8b9fcb9f912075a20a9ae38100006b57d508e0e7) )
+	ROM_LOAD( "4_tonic.14l", 0xc000, 0x4000, CRC(8c542eee) SHA1(cb424e2a67c6d39302beca7cd5244bcad4a91189) )
+
+	// TODO: PROMs loading to be verified
+	ROM_REGION( 0xc00, "proms", 0 )
+	ROM_LOAD( "dm74s573n.14d", 0x000, 0x400, CRC(9cc0d144) SHA1(ce5de17a3f6da6d14657a4322c57891fa9804874) )
+	ROM_LOAD( "dm74s573n.12d", 0x400, 0x400, CRC(b6ba79ac) SHA1(c6415d80301346712c58730ab03079b7dc15e12e) )
+	ROM_LOAD( "dm74s573n.13d", 0x800, 0x400, CRC(ae27855a) SHA1(9b822c85d88f8ef8a503818cbf870aa9b0ff7c40) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "n82s129an.2n", 0x000, 0x100, CRC(fc0652fd) SHA1(4326550edb3023017b564a84f94daff532608891) )
+
+	ROM_REGION( 0x240, "proms3", 0 )
+	ROM_LOAD( "n82s123an.14c", 0x000, 0x020, CRC(6a13320b) SHA1(6d7c663477f3fbc22fb716e15bfdd9c452eb686a) )
+	ROM_LOAD( "n82s123an.4f",  0x020, 0x020, CRC(1aa176f3) SHA1(fe777cba829046f850ab612b927bde4fe0d37811) ) // same as magoddsb
+	ROM_LOAD( "n82s147an.13b", 0x040, 0x200, CRC(d01f10b3) SHA1(36b97831b26c899b8c5a1596bbbf54f58a32fae3) )
+
+	ROM_REGION( 0x400, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "palce16v8h-25.9f", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "palce16v8h-25.9h", 0x200, 0x117, NO_DUMP )
+ROM_END
+
 
 /*
     LADY LINER - TAB Austria
@@ -23562,6 +23598,7 @@ GAME(  1992, magoddsa,   magodds,  magodds,  magodds,  wingco_state,   empty_ini
 GAME(  1992, magoddsb,   magodds,  magodds,  magodds,  wingco_state,   empty_init,     ROT0, "Pal Company / Micro Manufacturing Inc.", "Magical Odds (set 3)",                             MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
 GAME(  1991, magoddsc,   magodds,  magodds,  magoddsc, wingco_state,   init_magoddsc,  ROT0, "Pal Company",                            "Magical Odds (set 4, custom encrypted CPU block)", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME(  1991, magoddsd,   magodds,  magodds,  magoddsc, wingco_state,   init_magoddsc,  ROT0, "Pal Company",                            "Magical Odds (set 5, custom encrypted CPU block)", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME(  199?, mtonic2,    0,        magodds,  magoddsc, wingco_state,   init_magoddsc,  ROT0, "Pal Company",                            "Magical Tonic Part 2",                             MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 
 // --- Amcoe games ---
