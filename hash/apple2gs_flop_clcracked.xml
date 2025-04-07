@@ -175,17 +175,15 @@ license:CC0-1.0
 	</software>
 
 	<software name="btlchess">
-		<description>Battle Chess (cleanly cracked)</description>
+		<description>Battle Chess (trex crack)</description>
 		<year>1989</year>
-		<publisher>Interplay</publisher>
+		<publisher>Interplay Productions</publisher>
 		<info name="programmer" value="Jim Sproul, Todd J. Camasta, Bruce Schlickbernd, Kurt Heiden, Bill (Weez) Dugan, Thomas R. Decker, Troy P. Worrell, Michael Quarles, Rebecca Heineman, and Alan Pavlish" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 512K Apple IIgs. -->
-		<!-- "Battle Chess" is a 1989 board game developed by Jim Sproul, Todd J. Camasta, Bruce Schlickbernd, Kurt Heiden, Bill (Weez) Dugan, Thomas R. Decker, Troy P. Worrell, Michael Quarles, Rebecca Heineman, and Alan Pavlish, and distributed by Interplay. -->
+		<!-- board game. The manual at https://archive.org/details/Battle_Chess_Manual contains the information you need for the copy protection questions -->
 		<!-- Protection: Key-Word, A manual is required to look up a letter / word or use of code wheel for a specific response -->
-
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="battle chess iigs (trex crack).2mg" size="819264" crc="f40de0f7" sha1="8cd2fc36064fe531172d532db948865bce36307a"/>
@@ -1383,17 +1381,15 @@ license:CC0-1.0
 	</software>
 
 	<software name="neuromnc">
-		<description>Neuromancer (cleanly cracked)</description>
+		<description>Neuromancer (trex crack)</description>
 		<year>1989</year>
 		<publisher>Interplay Productions</publisher>
 		<info name="programmer" value="Rebecca Heineman" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 512K Apple IIgs. -->
-		<!-- "Neuromancer" is a 1989 adventure game developed by Rebecca Heineman and distributed by Interplay Productions. -->
+		<!-- adventure game -->
 		<!-- Protection: Key-Word, A manual is required to look up a letter / word or use of code wheel for a specific response -->
-
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="neuromancer iigs (trex crack).2mg" size="819264" crc="158c6c93" sha1="aee79701fdcbc9204f979087cd420c4b462c3b66"/>

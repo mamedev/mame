@@ -128,7 +128,7 @@ license:CC0-1.0
 	<software name="btlchess">
 		<description>Battle Chess</description>
 		<year>1989</year>
-		<publisher>Interplay</publisher>
+		<publisher>Interplay Productions</publisher>
 		<info name="programmer" value="Jim Sproul, Todd J. Camasta, Bruce Schlickbernd, Kurt Heiden, Bill (Weez) Dugan, Thomas R. Decker, Troy P. Worrell, Michael Quarles, Rebecca Heineman, and Alan Pavlish" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS" />
@@ -1220,7 +1220,7 @@ license:CC0-1.0
 		<info name="usage" value="Requires a 768K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2021-05-30 -->
-		<!-- roleplaying game -->
+		<!-- role-playing game -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1296196">
 				<rom name="dragon wars iigs.woz" size="1296196" crc="331a8128" sha1="551d0e2fd5a4a33c41a7ba3f9b381bd41a8a7e9d" />
