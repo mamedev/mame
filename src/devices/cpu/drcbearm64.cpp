@@ -3718,23 +3718,32 @@ void drcbe_arm64::op_cmp(a64::Assembler &a, const uml::instruction &inst)
 	be_parameter src1p(*this, inst.param(0), PTYPE_MRI);
 	be_parameter src2p(*this, inst.param(1), PTYPE_MRI);
 
-	const a64::Gp src1 = src1p.select_register(TEMP_REG1, inst.size());
-
-	mov_reg_param(a, inst.size(), src1, src1p);
-
-	if (src2p.is_immediate() && is_valid_immediate_addsub(src2p.immediate()))
+	if (src1p == src2p)
 	{
-		if (src2p.is_immediate_value(0))
-			a.cmp(src1, select_register(a64::xzr, inst.size()));
-		else
-			a.cmp(src1, src2p.immediate());
+		const a64::Gp zero = select_register(a64::xzr, inst.size());
+
+		a.cmp(zero, zero);
 	}
 	else
 	{
-		const a64::Gp src2 = src2p.select_register(TEMP_REG2, inst.size());
+		const a64::Gp src1 = src1p.select_register(TEMP_REG1, inst.size());
 
-		mov_reg_param(a, inst.size(), src2, src2p);
-		a.cmp(src1, src2);
+		mov_reg_param(a, inst.size(), src1, src1p);
+
+		if (src2p.is_immediate() && is_valid_immediate_addsub(src2p.immediate()))
+		{
+			if (src2p.is_immediate_value(0))
+				a.cmp(src1, select_register(a64::xzr, inst.size()));
+			else
+				a.cmp(src1, src2p.immediate());
+		}
+		else
+		{
+			const a64::Gp src2 = src2p.select_register(TEMP_REG2, inst.size());
+
+			mov_reg_param(a, inst.size(), src2, src2p);
+			a.cmp(src1, src2);
+		}
 	}
 
 	if (inst.flags() & FLAG_C)
@@ -4087,12 +4096,6 @@ void drcbe_arm64::op_and(a64::Assembler &a, const uml::instruction &inst)
 	be_parameter src1p(*this, inst.param(1), PTYPE_MRI);
 	be_parameter src2p(*this, inst.param(2), PTYPE_MRI);
 
-	if (src1p.is_immediate() || (dstp.is_int_register() && (dstp == src2p)))
-	{
-		using std::swap;
-		swap(src1p, src2p);
-	}
-
 	const a64::Gp dst = dstp.select_register(TEMP_REG3, inst.size());
 	const a64::Gp src1 = src1p.select_register(dst, inst.size());
 
@@ -4210,12 +4213,6 @@ void drcbe_arm64::op_or(a64::Assembler &a, const uml::instruction &inst)
 	be_parameter src1p(*this, inst.param(1), PTYPE_MRI);
 	be_parameter src2p(*this, inst.param(2), PTYPE_MRI);
 
-	if (src1p.is_immediate() || (dstp.is_int_register() && (dstp == src2p)))
-	{
-		using std::swap;
-		swap(src1p, src2p);
-	}
-
 	const a64::Gp dst = dstp.select_register(TEMP_REG3, inst.size());
 	const a64::Gp src1 = src1p.select_register(dst, inst.size());
 
@@ -4273,12 +4270,6 @@ void drcbe_arm64::op_xor(a64::Assembler &a, const uml::instruction &inst)
 	be_parameter dstp(*this, inst.param(0), PTYPE_MR);
 	be_parameter src1p(*this, inst.param(1), PTYPE_MRI);
 	be_parameter src2p(*this, inst.param(2), PTYPE_MRI);
-
-	if (src1p.is_immediate() || (dstp.is_int_register() && (dstp == src2p)))
-	{
-		using std::swap;
-		swap(src1p, src2p);
-	}
 
 	const a64::Gp dst = dstp.select_register(TEMP_REG3, inst.size());
 	const a64::Gp src1 = src1p.select_register(dst, inst.size());

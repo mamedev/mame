@@ -1395,11 +1395,13 @@ void drcbe_x64::alu_op_param(Assembler &a, Inst::Id const opcode, Operand const 
 			if (is64 && !short_immediate(param.immediate()))
 			{
 				// use scratch register for 64-bit immediate
-				a.mov(r11, param.immediate());                                          // mov   r11,param
-				a.emit(opcode, dst, r11);                                               // op    dst,r11
+				a.mov(r11, param.immediate());
+				a.emit(opcode, dst, r11);
 			}
 			else
-				a.emit(opcode, dst, param.immediate());                                 // op    dst,param
+			{
+				a.emit(opcode, dst, param.immediate());
+			}
 		}
 	}
 	else if (param.is_memory())
@@ -1407,7 +1409,7 @@ void drcbe_x64::alu_op_param(Assembler &a, Inst::Id const opcode, Operand const 
 		if (dst.isMem())
 		{
 			// use temporary register for memory,memory
-			Gp const tmp = is64 ? param.select_register(rax) : param.select_register(eax);
+			Gp const tmp = param.select_register(is64 ? Gp(rax) : Gp(eax));
 
 			a.mov(tmp, MABS(param.memory()));
 			a.emit(opcode, dst, tmp);
@@ -1555,7 +1557,7 @@ void drcbe_x64::shift_op_param(Assembler &a, Inst::Id const opcode, size_t opsiz
 
 		if (bitshift)
 			a.emit(opcode, dst, imm(param.immediate()));
-		else if (update_flags & FLAG_C)
+		else if (!carryin && (update_flags & FLAG_C))
 			a.clc(); // throw away carry since it'll never be used
 
 		if (update_flags & (FLAG_S | FLAG_Z))
@@ -1594,8 +1596,7 @@ void drcbe_x64::shift_op_param(Assembler &a, Inst::Id const opcode, size_t opsiz
 
 			if (carryin)
 				a.mov(rax, r10);
-
-			if (update_flags & FLAG_C)
+			else if (update_flags & FLAG_C)
 				a.clc(); // throw away carry since it'll never be used
 
 			a.short_().jmp(end);
@@ -3832,11 +3833,7 @@ void drcbe_x64::op_roland(Assembler &a, const instruction &inst)
 	// pick a target register
 	Gp dstreg = dstp.select_register((inst.size() == 4) ? Gp(eax) : Gp(rax), maskp);
 
-	if (maskp.is_immediate_value(0))
-	{
-		a.xor_(dstreg, dstreg);
-	}
-	else if (shiftp.is_immediate() && (srcp.is_immediate() || maskp.is_immediate()))
+	if (shiftp.is_immediate() && (srcp.is_immediate() || maskp.is_immediate()))
 	{
 		const unsigned shift = shiftp.immediate() & (bits - 1);
 		const uint64_t sizemask = util::make_bitmask<uint64_t>(bits);
@@ -3875,55 +3872,33 @@ void drcbe_x64::op_roland(Assembler &a, const instruction &inst)
 		{
 			const uint64_t mask = maskp.immediate() & sizemask;
 			mov_reg_param(a, dstreg, srcp);
-			if (mask == sizemask)
+			a.rol(dstreg, shift);
+			if (!inst.flags() && (mask == 0x000000ff))
 			{
-				if (shift)
-					a.rol(dstreg, shift);
-				if (inst.flags())
-					a.test(dstreg, dstreg);
+				a.movzx(dstreg, dstreg.r8());
 			}
-			else if (mask == (util::make_bitmask<uint64_t>(shift) & sizemask))
+			else if (!inst.flags() && (mask == 0x0000ffff))
 			{
-				a.shr(dstreg, bits - shift);
-				if (inst.flags())
-					a.test(dstreg, dstreg);
+				a.movzx(dstreg, dstreg.r16());
 			}
-			else if (mask == (~util::make_bitmask<uint64_t>(shift) & sizemask))
+			else if (!inst.flags() && (mask == 0xffffffff))
 			{
-				a.shl(dstreg, shift);
+				a.mov(dstreg.r32(), dstreg.r32());
+			}
+			else if ((bits == 32) || (util::sext(mask, 32) == mask))
+			{
+				a.and_(dstreg, mask);
+			}
+			else if (uint32_t(mask) == mask)
+			{
+				a.and_(dstreg, mask); // asmjit converts this to a DWORD-size operation
 				if (inst.flags())
 					a.test(dstreg, dstreg);
 			}
 			else
 			{
-				a.rol(dstreg, shift);
-				if (!inst.flags() && (mask == 0x000000ff))
-				{
-					a.movzx(dstreg, dstreg.r8());
-				}
-				else if (!inst.flags() && (mask == 0x0000ffff))
-				{
-					a.movzx(dstreg, dstreg.r16());
-				}
-				else if (!inst.flags() && (mask == 0xffffffff))
-				{
-					a.mov(dstreg.r32(), dstreg.r32());
-				}
-				else if ((bits == 32) || (util::sext(mask, 32) == mask))
-				{
-					a.and_(dstreg, mask);
-				}
-				else if (uint32_t(mask) == mask)
-				{
-					a.and_(dstreg, mask);
-					if (inst.flags())
-						a.test(dstreg, dstreg);
-				}
-				else
-				{
-					a.mov(rdx, mask);
-					a.and_(dstreg, rdx);
-				}
+				a.mov(rdx, mask);
+				a.and_(dstreg, rdx);
 			}
 		}
 	}
@@ -3940,19 +3915,7 @@ void drcbe_x64::op_roland(Assembler &a, const instruction &inst)
 			mov_reg_param(a, dstreg, srcp);
 			a.rol(dstreg, cl);
 		}
-		alu_op_param(a, Inst::kIdAnd, dstreg, maskp,
-			[inst] (Assembler &a, Operand const &dst, be_parameter const &src)
-			{
-				// all-one cases
-				if (ones(src.immediate(), inst.size()))
-				{
-					if (inst.flags())
-						a.test(dst.as<Gp>(), dst.as<Gp>());
-					return true;
-				}
-
-				return false;
-			});
+		alu_op_param(a, Inst::kIdAnd, dstreg, maskp);
 	}
 
 	mov_param_reg(a, dstp, dstreg);
@@ -3984,15 +3947,7 @@ void drcbe_x64::op_rolins(Assembler &a, const instruction &inst)
 	const unsigned bits = inst.size() * 8;
 	const uint64_t sizemask = util::make_bitmask<uint64_t>(bits);
 
-	if (maskp.is_immediate_value(0))
-	{
-		if (inst.flags())
-		{
-			mov_reg_param(a, dstreg, dstp);
-			a.test(dstreg, dstreg);
-		}
-	}
-	else if (shiftp.is_immediate() && (srcp.is_immediate() || maskp.is_immediate()))
+	if (shiftp.is_immediate() && (srcp.is_immediate() || maskp.is_immediate()))
 	{
 		const unsigned shift = shiftp.immediate() & (bits - 1);
 		if (srcp.is_immediate())
@@ -4006,67 +3961,52 @@ void drcbe_x64::op_rolins(Assembler &a, const instruction &inst)
 			{
 				const uint64_t mask = maskp.immediate() & sizemask;
 				src &= mask;
-				if (mask == sizemask)
+
+				bool flags = false;
+				mov_reg_param(a, dstreg, dstp);
+				if (mask == 0xffffffff'00000000)
 				{
-					if (src)
-					{
-						a.mov(dstreg, src);
-						if (inst.flags())
-							a.test(dstreg, dstreg);
-					}
-					else
-					{
-						a.xor_(dstreg, dstreg);
-					}
+					a.mov(dstreg.r32(), dstreg.r32());
+				}
+				else if (mask == (0xffffffff'ffff0000 & sizemask))
+				{
+					a.movzx(dstreg, dstreg.r16());
+				}
+				else if (mask == (0xffffffff'ffffff00 & sizemask))
+				{
+					a.movzx(dstreg, dstreg.r8());
+				}
+				else if ((bits == 32) || (util::sext(~mask, 32) == ~mask))
+				{
+					a.and_(dstreg, ~mask);
+					flags = true;
+				}
+				else if (uint32_t(~mask) == ~mask)
+				{
+					a.and_(dstreg, ~mask);
 				}
 				else
 				{
-					bool flags = false;
-					mov_reg_param(a, dstreg, dstp);
-					if (mask == 0xffffffff'00000000)
+					a.mov(maskreg, ~mask);
+					a.and_(dstreg, maskreg);
+					flags = true;
+				}
+
+				if (src)
+				{
+					if ((bits == 32) || (util::sext(src, 32) == src))
 					{
-						a.mov(dstreg.r32(), dstreg.r32());
-					}
-					else if (mask == (0xffffffff'ffff0000 & sizemask))
-					{
-						a.movzx(dstreg, dstreg.r16());
-					}
-					else if (mask == (0xffffffff'ffffff00 & sizemask))
-					{
-						a.movzx(dstreg, dstreg.r8());
-					}
-					else if ((bits == 32) || (util::sext(~mask, 32) == ~mask))
-					{
-						a.and_(dstreg, ~mask);
-						flags = true;
-					}
-					else if (uint32_t(~mask) == ~mask)
-					{
-						a.and_(dstreg, ~mask);
+						a.or_(dstreg, src);
 					}
 					else
 					{
-						a.mov(maskreg, ~mask);
-						a.and_(dstreg, maskreg);
-						flags = true;
+						a.mov(srcreg, src);
+						a.or_(dstreg, srcreg);
 					}
-
-					if (src)
-					{
-						if ((bits == 32) || (util::sext(src, 32) == src))
-						{
-							a.or_(dstreg, src);
-						}
-						else
-						{
-							a.mov(srcreg, src);
-							a.or_(dstreg, srcreg);
-						}
-					}
-					else if (!flags && inst.flags())
-					{
-						a.test(dstreg, dstreg);
-					}
+				}
+				else if (!flags && inst.flags())
+				{
+					a.test(dstreg, dstreg);
 				}
 			}
 			else
@@ -4101,110 +4041,100 @@ void drcbe_x64::op_rolins(Assembler &a, const instruction &inst)
 		{
 			// variables source, immediate mask
 			const uint64_t mask = maskp.immediate() & sizemask;
-			if (mask == sizemask)
+
+			mov_reg_param(a, dstreg, dstp);
+
+			bool maskloaded = false;
+			if (!shift)
 			{
-				mov_reg_param(a, dstreg, srcp);
-				if (shift)
-					a.rol(dstreg, shift);
-				if (inst.flags())
-					a.test(dstreg, dstreg);
+				if (mask == 0x00000000'000000ff)
+				{
+					if (srcp.is_int_register())
+						a.movzx(srcreg, GpbLo(srcp.ireg()));
+					else if (srcp.is_memory())
+						a.movzx(srcreg, MABS(srcp.memory(), 1));
+				}
+				else if (mask == 0x00000000'0000ffff)
+				{
+					if (srcp.is_int_register())
+						a.movzx(srcreg, Gpw(srcp.ireg()));
+					else if (srcp.is_memory())
+						a.movzx(srcreg, MABS(srcp.memory(), 2));
+				}
+				else if (mask == 0x00000000'ffffffff)
+				{
+					mov_reg_param(a, srcreg.r32(), srcp);
+				}
+				else
+				{
+					mov_reg_param(a, srcreg, srcp);
+					a.and_(srcreg, mask);
+				}
+			}
+			else if (mask == (util::make_bitmask<uint64_t>(shift) & sizemask))
+			{
+				mov_reg_param(a, srcreg, srcp);
+				a.shr(srcreg, bits - shift);
+			}
+			else if (mask == (~util::make_bitmask<uint64_t>(shift) & sizemask))
+			{
+				mov_reg_param(a, srcreg, srcp);
+				a.shl(srcreg, shift);
 			}
 			else
 			{
-				mov_reg_param(a, dstreg, dstp);
-
-				bool maskloaded = false;
-				if (!shift)
+				mov_reg_param(a, srcreg, srcp);
+				a.rol(srcreg, shift);
+				if (mask == 0x00000000'000000ff)
 				{
-					if (mask == 0x00000000'000000ff)
-					{
-						if (srcp.is_int_register())
-							a.movzx(srcreg, GpbLo(srcp.ireg()));
-						else if (srcp.is_memory())
-							a.movzx(srcreg, MABS(srcp.memory(), 1));
-					}
-					else if (mask == 0x00000000'0000ffff)
-					{
-						if (srcp.is_int_register())
-							a.movzx(srcreg, Gpw(srcp.ireg()));
-						else if (srcp.is_memory())
-							a.movzx(srcreg, MABS(srcp.memory(), 2));
-					}
-					else if (mask == 0x00000000'ffffffff)
-					{
-						mov_reg_param(a, srcreg.r32(), srcp);
-					}
-					else
-					{
-						mov_reg_param(a, srcreg, srcp);
-						a.and_(srcreg, mask);
-					}
+					a.movzx(srcreg, srcreg.r8());
 				}
-				else if (mask == (util::make_bitmask<uint64_t>(shift) & sizemask))
+				else if (mask == 0x00000000'0000ffff)
 				{
-					mov_reg_param(a, srcreg, srcp);
-					a.shr(srcreg, bits - shift);
+					a.movzx(srcreg, srcreg.r16());
 				}
-				else if (mask == (~util::make_bitmask<uint64_t>(shift) & sizemask))
+				else if (mask == 0x00000000'ffffffff)
 				{
-					mov_reg_param(a, srcreg, srcp);
-					a.shl(srcreg, shift);
+					a.mov(srcreg.r32(), srcreg.r32());
+				}
+				else if ((bits == 32) || (util::sext(mask, 32) == mask) || (uint32_t(mask) == mask))
+				{
+					a.and_(srcreg, mask);
 				}
 				else
 				{
-					mov_reg_param(a, srcreg, srcp);
-					a.rol(srcreg, shift);
-					if (mask == 0x00000000'000000ff)
-					{
-						a.movzx(srcreg, srcreg.r8());
-					}
-					else if (mask == 0x00000000'0000ffff)
-					{
-						a.movzx(srcreg, srcreg.r16());
-					}
-					else if (mask == 0x00000000'ffffffff)
-					{
-						a.mov(srcreg.r32(), srcreg.r32());
-					}
-					else if ((bits == 32) || (util::sext(mask, 32) == mask) || (uint32_t(mask) == mask))
-					{
-						a.and_(srcreg, mask);
-					}
-					else
-					{
-						a.mov(maskreg, mask);
-						a.and_(srcreg, maskreg);
-						maskloaded = true;
-					}
+					a.mov(maskreg, mask);
+					a.and_(srcreg, maskreg);
+					maskloaded = true;
 				}
-
-				if (mask == 0xffffffff'00000000)
-				{
-					a.mov(dstreg.r32(), dstreg.r32());
-				}
-				else if (mask == (0xffffffff'ffff0000 & sizemask))
-				{
-					a.movzx(dstreg, dstreg.r16());
-				}
-				else if (mask == (0xffffffff'ffffff00 & sizemask))
-				{
-					a.movzx(dstreg, dstreg.r8());
-				}
-				else if ((bits == 32) || (util::sext(~mask, 32) == ~mask) || (uint32_t(~mask) == ~mask))
-				{
-					a.and_(dstreg, ~mask & sizemask);
-				}
-				else
-				{
-					if (maskloaded)
-						a.not_(maskreg);
-					else
-						a.mov(maskreg, ~mask);
-					a.and_(dstreg, maskreg);
-				}
-
-				a.or_(dstreg, srcreg);
 			}
+
+			if (mask == 0xffffffff'00000000)
+			{
+				a.mov(dstreg.r32(), dstreg.r32());
+			}
+			else if (mask == (0xffffffff'ffff0000 & sizemask))
+			{
+				a.movzx(dstreg, dstreg.r16());
+			}
+			else if (mask == (0xffffffff'ffffff00 & sizemask))
+			{
+				a.movzx(dstreg, dstreg.r8());
+			}
+			else if ((bits == 32) || (util::sext(~mask, 32) == ~mask) || (uint32_t(~mask) == ~mask))
+			{
+				a.and_(dstreg, ~mask & sizemask);
+			}
+			else
+			{
+				if (maskloaded)
+					a.not_(maskreg);
+				else
+					a.mov(maskreg, ~mask);
+				a.and_(dstreg, maskreg);
+			}
+
+			a.or_(dstreg, srcreg);
 		}
 
 		mov_param_reg(a, dstp, dstreg);
@@ -4469,24 +4399,33 @@ void drcbe_x64::op_cmp(Assembler &a, const instruction &inst)
 	be_parameter src1p(*this, inst.param(0), PTYPE_MRI);
 	be_parameter src2p(*this, inst.param(1), PTYPE_MRI);
 
-	// memory versus anything
-	if (src1p.is_memory())
-		alu_op_param(a, Inst::kIdCmp, MABS(src1p.memory(), inst.size()), src2p);        // cmp   [dstp],src2p
+	if (src1p == src2p)
+	{
+		// doesn't matter what we compare if it's always equal
+		const Gp srcreg = (inst.size() == 4) ? Gp(eax) : Gp(rax); // TODO: consider false dependencies
 
-	// general case
+		a.cmp(srcreg, srcreg);
+	}
+	else if (src1p.is_memory())
+	{
+		// memory versus anything
+		alu_op_param(a, Inst::kIdCmp, MABS(src1p.memory(), inst.size()), src2p);
+	}
 	else
 	{
+		// general case
+
 		// pick a target register for the general case
-		Gp src1reg = (inst.size() == 4) ? src1p.select_register(eax) : src1p.select_register(rax);
+		const Gp src1reg = src1p.select_register((inst.size() == 4) ? Gp(eax) : Gp(rax));
 
 		if (src1p.is_immediate())
 		{
 			if (inst.size() == 4)
-				a.mov(src1reg, src1p.immediate());                                      // mov   src1reg,imm
+				a.mov(src1reg, src1p.immediate());
 			else
-				mov_r64_imm(a, src1reg, src1p.immediate());                             // mov   src1reg,imm
+				mov_r64_imm(a, src1reg, src1p.immediate());
 		}
-		alu_op_param(a, Inst::kIdCmp, src1reg, src2p);                                  // cmp   src1reg,src2p
+		alu_op_param(a, Inst::kIdCmp, src1reg, src2p);
 	}
 }
 
@@ -5361,10 +5300,6 @@ void drcbe_x64::op_shift(Assembler &a, const uml::instruction &inst)
 
 	const bool carry = (Opcode == Inst::kIdRcl) || (Opcode == Inst::kIdRcr);
 
-	// optimize immediate zero case
-	if (!carry && !inst.flags() && src2p.is_immediate() && !(src2p.immediate() & (inst.size() * 8 - 1)))
-		return; // FIXME: needs to clear upper bits for 32-bit form
-
 	if (dstp.is_memory() && ((inst.size() == 8) || !dstp.is_cold_register()) && (dstp == src1p))
 	{
 		// dstp == src1p in memory
@@ -5375,7 +5310,7 @@ void drcbe_x64::op_shift(Assembler &a, const uml::instruction &inst)
 		// general case
 
 		// pick a target register
-		Gp dstreg = (inst.size() == 4) ? dstp.select_register(eax, src2p) : dstp.select_register(rax, src2p);
+		const Gp dstreg = dstp.select_register((inst.size() == 4) ? Gp(eax) : Gp(rax), src2p);
 
 		if (carry)
 			mov_reg_param(a, dstreg, src1p, true);

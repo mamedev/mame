@@ -259,6 +259,739 @@ void uml::code_handle::set_codeptr(drccodeptr code)
 //  UML INSTRUCTION
 //**************************************************************************
 
+struct uml::instruction::simplify_op
+{
+private:
+	static inline constexpr u64 paramsizemask[] = { 0xffU, 0xffffU, 0xffffffffU, 0xffffffff'ffffffffU };
+
+	static u64 size_mask(instruction const &inst)
+	{
+		return (inst.size() == 4) ? 0xffffffffU : 0xffffffff'ffffffffU;
+	}
+
+	static void truncate_immediate(instruction &inst, int pnum, u64 mask)
+	{
+		if (inst.param(pnum).is_immediate())
+			inst.m_param[pnum] = inst.param(pnum).immediate() & mask;
+	}
+
+	static void normalise_commutative(instruction &inst)
+	{
+		const u64 mask = size_mask(inst);
+
+		// truncate immediates to instruction size
+		truncate_immediate(inst, 1, mask);
+		truncate_immediate(inst, 2, mask);
+
+		// if a source is the destination put it first, and put a single immediate last
+		if ((inst.param(0) == inst.param(2)) || (inst.param(1).is_immediate() && !inst.param(2).is_immediate()))
+		{
+			using std::swap;
+			swap(inst.m_param[1], inst.m_param[2]);
+		}
+	}
+
+	static void convert_to_mov_immediate(instruction &inst, u64 immediate)
+	{
+		u64 const mask = size_mask(inst);
+		immediate &= mask;
+		if (!inst.flags())
+		{
+			inst.m_opcode = OP_MOV;
+			inst.m_numparams = 2;
+			inst.m_param[1] = immediate;
+		}
+		else if (immediate == mask)
+		{
+			inst.m_opcode = OP_OR;
+			inst.m_numparams = 3;
+			inst.m_param[1] = inst.param(0);
+			inst.m_param[2] = mask;
+		}
+		else
+		{
+			inst.m_opcode = OP_AND;
+			inst.m_numparams = 3;
+			if (immediate)
+			{
+				inst.m_param[1] = immediate;
+				inst.m_param[2] = mask;
+			}
+			else
+			{
+				inst.m_param[1] = inst.param(0);
+				inst.m_param[2] = 0;
+			}
+		}
+	}
+
+public:
+	static void truncate_imm(instruction &inst)
+	{
+		u64 const mask = size_mask(inst);
+		
+		for (int i = 0; inst.numparams() > i; ++i)
+			truncate_immediate(inst, i, mask);
+	}
+
+	static void read(instruction &inst)
+	{
+		// truncate immediate address to size
+		truncate_immediate(inst, 1, 0xffffffff);
+	}
+
+	static void readm(instruction &inst)
+	{
+		auto const size = inst.param(3).size();
+		u64 const mask = paramsizemask[size];
+
+		// truncate immediate address and mask to size
+		truncate_immediate(inst, 1, 0xffffffff);
+		truncate_immediate(inst, 2, mask);
+
+		// convert to READ if the mask is all ones
+		if (inst.param(2).is_immediate_value(mask))
+		{
+			inst.m_opcode = OP_READ;
+			inst.m_numparams = 3;
+			inst.m_param[2] = inst.param(3);
+		}
+	}
+
+	static void write(instruction &inst)
+	{
+		auto const size = inst.param(2).size();
+
+		// truncate immediate address and data to size
+		truncate_immediate(inst, 0, 0xffffffff);
+		truncate_immediate(inst, 1, paramsizemask[size]);
+	}
+
+	static void writem(instruction &inst)
+	{
+		auto const size = inst.param(3).size();
+		u64 const mask = paramsizemask[size];
+
+		// truncate immediate address, data and mask to size
+		truncate_immediate(inst, 0, 0xffffffff);
+		truncate_immediate(inst, 1, mask);
+		truncate_immediate(inst, 2, mask);
+
+		// convert to WRITE if the mask is all ones
+		if (inst.param(2).is_immediate_value(mask))
+		{
+			inst.m_opcode = OP_WRITE;
+			inst.m_numparams = 3;
+			inst.m_param[2] = inst.param(3);
+		}
+	}
+
+	static void set(instruction &inst)
+	{
+		// convert to MOV if the condition is constant
+		if (inst.condition() == COND_ALWAYS)
+			convert_to_mov_immediate(inst, 1);
+	}
+
+	static void mov(instruction &inst)
+	{
+		// convert move-to-self to NOP if the destination isn't larger than the size
+		if (inst.param(0) == inst.param(1))
+		{
+			if (!inst.param(0).is_int_register() || (inst.size() == 8))
+			{
+				inst.nop();
+				return;
+			}
+		}
+
+		// truncate immediate source to instruction size
+		truncate_immediate(inst, 1, size_mask(inst));
+	}
+
+	static void sext(instruction &inst)
+	{
+		// convert immediate source to MOV or a logic operation if flags are requested
+		if (inst.param(1).is_immediate())
+		{
+			u64 val = inst.param(1).immediate();
+			switch (inst.param(2).size())
+			{
+			case SIZE_BYTE:  val = u64(s64(s8(u8(val))));   break;
+			case SIZE_WORD:  val = u64(s64(s16(u16(val)))); break;
+			case SIZE_DWORD: val = u64(s64(s32(u32(val)))); break;
+			case SIZE_QWORD:                                break;
+			}
+			convert_to_mov_immediate(inst, val);
+		}
+	}
+
+	static void roland(instruction &inst)
+	{
+		auto const size = inst.size();
+		auto const bits = size << 3;
+		u64 const mask = size_mask(inst);
+		assert((size == 4) || (size == 8));
+
+		// truncate immediates to instruction size
+		truncate_immediate(inst, 1, mask);
+		truncate_immediate(inst, 2, bits - 1);
+		truncate_immediate(inst, 3, mask);
+
+		if (inst.param(1).is_immediate() && inst.param(2).is_immediate() && inst.param(3).is_immediate())
+		{
+			// constant result, convert to MOV or a logic operation
+			if (size == 4)
+				convert_to_mov_immediate(inst, rotl_32(inst.param(1).immediate(), inst.param(2).immediate()) & inst.param(3).immediate());
+			else
+				convert_to_mov_immediate(inst, rotl_64(inst.param(1).immediate(), inst.param(2).immediate()) & inst.param(3).immediate());
+		}
+		else if (inst.param(1).is_immediate() && inst.param(2).is_immediate())
+		{
+			// only mask is variable, convert to AND
+			inst.m_opcode = OP_AND;
+			inst.m_numparams = 3;
+			if (size == 4)
+				inst.m_param[1] = parameter(rotl_32(inst.param(1).immediate(), inst.param(2).immediate()));
+			else
+				inst.m_param[1] = parameter(rotl_64(inst.param(1).immediate(), inst.param(2).immediate()));
+			inst.m_param[2] = inst.param(3);
+		}
+		else if (inst.param(2).is_immediate_value(0) || inst.param(3).is_immediate_value(0))
+		{
+			// no shift or zero mask, convert to AND (may be subsequently converted to MOV)
+			inst.m_opcode = OP_AND;
+			inst.m_numparams = 3;
+			inst.m_param[2] = inst.param(3);
+		}
+		else if (inst.param(3).is_immediate_value(mask))
+		{
+			// all mask bits set, convert to ROL
+			inst.m_opcode = OP_ROL;
+			inst.m_numparams = 3;
+		}
+		else if (inst.param(2).is_immediate() && inst.param(3).is_immediate_value((mask << inst.param(2).immediate()) & mask))
+		{
+			// equivalent to shift left
+			inst.m_opcode = OP_SHL;
+			inst.m_numparams = 3;
+		}
+		else if (inst.param(2).is_immediate() && inst.param(3).is_immediate_value(mask >> (bits - inst.param(2).immediate())))
+		{
+			// equivalent to shift right
+			inst.m_opcode = OP_SHR;
+			inst.m_numparams = 3;
+			inst.m_param[2] = bits - inst.param(2).immediate();
+		}
+	}
+
+	static void rolins(instruction &inst)
+	{
+		auto const size = inst.size();
+		auto const bits = size << 3;
+		u64 const mask = size_mask(inst);
+
+		// truncate immediates to instruction size
+		truncate_immediate(inst, 1, mask);
+		truncate_immediate(inst, 2, bits - 1);
+		truncate_immediate(inst, 3, mask);
+
+		if (inst.param(3).is_immediate_value(mask))
+		{
+			// all mask bits set, convert to ROL
+			inst.m_opcode = OP_ROL;
+			inst.m_numparams = 3;
+		}
+		else if (inst.param(3).is_immediate_value(0))
+		{
+			// no mask bits set, convert to AND
+			inst.m_opcode = OP_AND;
+			inst.m_numparams = 3;
+			inst.m_param[1] = inst.param(0);
+			inst.m_param[2] = mask;
+		}
+	}
+
+	static void add(instruction &inst)
+	{
+		// clean up operands
+		normalise_commutative(inst);
+
+		// can't optimise carry or overflow flag generation
+		if (inst.flags() & (FLAG_C | FLAG_V))
+			return;
+
+		if (inst.param(1).is_immediate() && inst.param(2).is_immediate())
+		{
+			// constant value, convert to MOV or a logic operation
+			convert_to_mov_immediate(inst, inst.param(1).immediate() + inst.param(2).immediate());
+		}
+		else if (inst.param(2).is_immediate_value(0))
+		{
+			// add zero, convert to MOV or AND
+			if (inst.flags())
+			{
+				inst.m_opcode = OP_AND;
+				inst.m_param[2] = size_mask(inst);
+			}
+			else
+			{
+				inst.m_opcode = OP_MOV;
+				inst.m_numparams = 2;
+			}
+		}
+	}
+
+	static void sub(instruction &inst)
+	{
+		u64 const mask = size_mask(inst);
+
+		// truncate immediates to instruction size
+		truncate_immediate(inst, 1, mask);
+		truncate_immediate(inst, 2, mask);
+
+		// can't optimise carry or overflow flag generation
+		if (inst.flags() & (FLAG_C | FLAG_V))
+			return;
+
+		if (inst.param(1).is_immediate() && inst.param(2).is_immediate())
+		{
+			// constant value, convert to MOV or a logic operation
+			convert_to_mov_immediate(inst, inst.param(1).immediate() - inst.param(2).immediate());
+		}
+		else if (inst.param(2).is_immediate_value(0))
+		{
+			// subtract zero, convert to MOV or AND
+			if (inst.flags())
+			{
+				inst.m_opcode = OP_AND;
+				inst.m_param[2] = mask;
+			}
+			else
+			{
+				inst.m_opcode = OP_MOV;
+				inst.m_numparams = 2;
+			}
+		}
+	}
+
+	static void cmp(instruction &inst)
+	{
+		u64 const mask = size_mask(inst);
+
+		// completely elide if flags are not used
+		if (!inst.flags())
+		{
+			inst.nop();
+			return;
+		}
+
+		// truncate immediates to instruction size
+		truncate_immediate(inst, 0, mask);
+		truncate_immediate(inst, 1, mask);
+	}
+
+	template <opcode_t LoWordOp>
+	static void mul(instruction &inst)
+	{
+		// if the two destination operands are identical, convert to MUL.LW
+		if (inst.param(0) == inst.param(1))
+		{
+			inst.m_opcode = LoWordOp;
+			inst.m_numparams = 3;
+			inst.m_param[1] = inst.param(2);
+			inst.m_param[2] = inst.param(3);
+			return;
+		}
+
+		const u64 mask = size_mask(inst);
+
+		// truncate immediates to instruction size
+		truncate_immediate(inst, 2, mask);
+		truncate_immediate(inst, 3, mask);
+
+		// put a single immediate last
+		if (inst.param(2).is_immediate() && !inst.param(3).is_immediate())
+		{
+			using std::swap;
+			swap(inst.m_param[2], inst.m_param[3]);
+		}
+	}
+
+	template <typename Short, typename Long>
+	static void mullw(instruction &inst)
+	{
+		// clean up operands
+		normalise_commutative(inst);
+
+		// can't optimise overflow flag generation
+		if (inst.flags() & FLAG_V)
+			return;
+
+		if (inst.param(1).is_immediate_value(0) || inst.param(2).is_immediate_value(0))
+		{
+			// multiplying anything by zero yields zero
+			convert_to_mov_immediate(inst, 0);
+		}
+		else if (inst.param(1).is_immediate() && inst.param(2).is_immediate())
+		{
+			// convert constant result to MOV or a logic op
+			auto const size = inst.size();
+			assert((size == 4) || (size == 8));
+
+			if (size == 4)
+				convert_to_mov_immediate(inst, u32(Short(u32(inst.param(1).immediate())) * Short(u32(inst.param(2).immediate()))));
+			else
+				convert_to_mov_immediate(inst, u64(Long(inst.param(1).immediate()) * Long(inst.param(2).immediate())));
+		}
+	}
+
+	template <typename Short, typename Long>
+	static void div(instruction &inst)
+	{
+		auto const size = inst.size();
+		u64 const mask = size_mask(inst);
+
+		// truncate immediates to instruction size
+		truncate_immediate(inst, 2, mask);
+		truncate_immediate(inst, 3, mask);
+
+		// can't optimise overflow flag generation
+		if (inst.flags() & FLAG_V)
+			return;
+
+		// optimise the quotient-only form if not dividing by zero
+		if ((inst.param(0) == inst.param(1)) && !inst.param(3).is_immediate_value(0))
+		{
+			if (inst.param(2).is_immediate_value(0))
+			{
+				// dividing zero by anything yields zero
+				convert_to_mov_immediate(inst, 0);
+			}
+			else if (inst.param(2).is_immediate() && inst.param(3).is_immediate())
+			{
+				// convert constant result to MOV or a logic op
+				assert((size == 4) || (size == 8));
+
+				if (size == 4)
+					convert_to_mov_immediate(inst, u32(Short(u32(inst.param(2).immediate())) / Short(u32(inst.param(3).immediate()))));
+				else
+					convert_to_mov_immediate(inst, u64(Long(inst.param(2).immediate()) / Long(inst.param(3).immediate())));
+			}
+		}
+	}
+
+	static void _and(instruction &inst)
+	{
+		// clean up operands
+		normalise_commutative(inst);
+
+		if (inst.param(1).is_immediate() && inst.param(2).is_immediate())
+		{
+			// constant value, convert to MOV or a logic operation
+			convert_to_mov_immediate(inst, inst.param(1).immediate() & inst.param(2).immediate());
+		}
+		else if (inst.param(2).is_immediate_value(0))
+		{
+			// any immediate zero always yields zero
+			convert_to_mov_immediate(inst, 0);
+		}
+		else if (inst.param(2).is_immediate_value(size_mask(inst)))
+		{
+			if (!inst.flags())
+			{
+				// convert to MOV if the value will be unaffected and flags aren't updated
+				inst.m_opcode = OP_MOV;
+				inst.m_numparams = 2;
+			}
+			else if ((inst.param(0) == inst.param(1)) && (!inst.param(0).is_int_register() || (inst.size() == 8)))
+			{
+				// convert to TEST if the value will be unaffected and the destination is no larger than the operand size
+				inst.m_opcode = OP_TEST;
+				inst.m_numparams = 2;
+			}
+		}
+	}
+
+	static void test(instruction &inst)
+	{
+		u64 const mask = size_mask(inst);
+
+		// completely elide if flags are not used
+		if (!inst.flags())
+		{
+			inst.nop();
+			return;
+		}
+
+		// truncate immediates to instruction size
+		truncate_immediate(inst, 0, mask);
+		truncate_immediate(inst, 1, mask);
+
+		// put a single immediate second
+		if (inst.param(0).is_immediate() && !inst.param(1).is_immediate())
+		{
+			using std::swap;
+			swap(inst.m_param[0], inst.m_param[1]);
+		}
+	}
+
+	static void _or(instruction &inst)
+	{
+		u64 const mask = size_mask(inst);
+
+		// clean up operands
+		normalise_commutative(inst);
+
+		if (inst.param(1).is_immediate() && inst.param(2).is_immediate())
+		{
+			// constant value, convert to MOV or a logic operation
+			convert_to_mov_immediate(inst, inst.param(1).immediate() | inst.param(2).immediate());
+		}
+		else if (inst.param(2).is_immediate_value(mask))
+		{
+			// an immediate with all bits set is unaffected by the other value
+			convert_to_mov_immediate(inst, mask);
+		}
+		else if (inst.param(2).is_immediate_value(0))
+		{
+			if (!inst.flags())
+			{
+				// convert to MOV if the value will be unaffected and flags aren't updated
+				inst.m_opcode = OP_MOV;
+				inst.m_numparams = 2;
+			}
+			else if ((inst.param(0) == inst.param(1)) && (!inst.param(0).is_int_register() || (inst.size() == 8)))
+			{
+				// convert to TEST if the value will be unaffected and the destination is no larger than the operand size
+				inst.m_opcode = OP_TEST;
+				inst.m_numparams = 2;
+			}
+		}
+	}
+
+	static void _xor(instruction &inst)
+	{
+		// clean up operands
+		normalise_commutative(inst);
+
+		if (inst.param(1).is_immediate() && inst.param(2).is_immediate())
+		{
+			// constant value, convert to MOV or a logic operation
+			convert_to_mov_immediate(inst, inst.param(1).immediate() ^ inst.param(2).immediate());
+		}
+		else if (inst.param(1) == inst.param(2))
+		{
+			// equivalent values cancel out
+			convert_to_mov_immediate(inst, 0);
+		}
+		else if (inst.param(2).is_immediate_value(0))
+		{
+			if (!inst.flags())
+			{
+				// convert to MOV if the value will be unaffected and flags aren't updated
+				inst.m_opcode = OP_MOV;
+				inst.m_numparams = 2;
+			}
+			else if ((inst.param(0) == inst.param(1)) && (!inst.param(0).is_int_register() || (inst.size() == 8)))
+			{
+				// convert to TEST if the value will be unaffected and the destination is no larger than the operand size
+				inst.m_opcode = OP_TEST;
+				inst.m_numparams = 2;
+			}
+		}
+	}
+
+	static void lzcnt(instruction &inst)
+	{
+		// convert immediate source to MOV or a logic operation if flags are requested
+		if (inst.param(1).is_immediate())
+		{
+			auto const size = inst.size();
+			assert((size == 4) || (size == 8));
+
+			u64 const val = inst.param(1).immediate();
+			convert_to_mov_immediate(inst, (size == 4) ? count_leading_zeros_32(u32(val)) : count_leading_zeros_64(val));
+		}
+	}
+
+	static void bswap(instruction &inst)
+	{
+		// convert immediate source to MOV or a logic operation if flags are requested
+		if (inst.param(1).is_immediate())
+		{
+			auto const size = inst.size();
+			assert((size == 4) || (size == 8));
+
+			u64 const val = inst.param(1).immediate();
+			convert_to_mov_immediate(inst, (size == 4) ? swapendian_int32(u32(val)) : swapendian_int64(val));
+		}
+	}
+
+	static void shl(instruction &inst)
+	{
+		auto const size = inst.size();
+		auto const bits = size << 3;
+		u64 const mask = size_mask(inst);
+		assert((size == 4) || (size == 8));
+
+		// truncate immediates to instruction size
+		truncate_immediate(inst, 1, mask);
+		truncate_immediate(inst, 2, bits - 1);
+
+		// can't optimise carry flag generation
+		if (inst.flags() & FLAG_C)
+			return;
+
+		if (inst.param(1).is_immediate() && inst.param(2).is_immediate())
+		{
+			// constant result, convert to MOV or a logic operation
+			if (size == 4)
+				convert_to_mov_immediate(inst, u32(inst.param(1).immediate()) << inst.param(2).immediate());
+			else
+				convert_to_mov_immediate(inst, inst.param(1).immediate() << inst.param(2).immediate());
+		}
+		else if (inst.param(2).is_immediate_value(0))
+		{
+			// no shift, convert to AND (may be subsequently converted to MOV)
+			inst.m_opcode = OP_AND;
+			inst.m_param[2] = mask;
+		}
+	}
+
+	template <typename Short, typename Long>
+	static void shr(instruction &inst)
+	{
+		auto const size = inst.size();
+		auto const bits = size << 3;
+		u64 const mask = size_mask(inst);
+		assert((size == 4) || (size == 8));
+
+		// truncate immediates to instruction size
+		truncate_immediate(inst, 1, mask);
+		truncate_immediate(inst, 2, bits - 1);
+
+		// can't optimise carry flag generation
+		if (inst.flags() & FLAG_C)
+			return;
+
+		if (inst.param(1).is_immediate() && inst.param(2).is_immediate())
+		{
+			// constant result, convert to MOV or a logic operation
+			if (size == 4)
+				convert_to_mov_immediate(inst, u32(Short(u32(inst.param(1).immediate())) >> inst.param(2).immediate()));
+			else
+				convert_to_mov_immediate(inst, u64(Long(inst.param(1).immediate()) >> inst.param(2).immediate()));
+		}
+		else if (inst.param(2).is_immediate_value(0))
+		{
+			// no shift, convert to AND (may be subsequently converted to MOV)
+			inst.m_opcode = OP_AND;
+			inst.m_param[2] = mask;
+		}
+	}
+
+	static void rol(instruction &inst)
+	{
+		auto const size = inst.size();
+		auto const bits = size << 3;
+		u64 const mask = size_mask(inst);
+		assert((size == 4) || (size == 8));
+
+		// truncate immediates to instruction size
+		truncate_immediate(inst, 1, mask);
+		truncate_immediate(inst, 2, bits - 1);
+
+		// can't optimise carry flag generation
+		if (inst.flags() & FLAG_C)
+			return;
+
+		if (inst.param(1).is_immediate() && inst.param(2).is_immediate())
+		{
+			// constant result, convert to MOV or a logic operation
+			if (size == 4)
+				convert_to_mov_immediate(inst, rotl_32(inst.param(1).immediate(), inst.param(2).immediate()));
+			else
+				convert_to_mov_immediate(inst, rotl_64(inst.param(1).immediate(), inst.param(2).immediate()));
+		}
+		else if (inst.param(2).is_immediate_value(0))
+		{
+			// no shift, convert to AND (may be subsequently converted to MOV)
+			inst.m_opcode = OP_AND;
+			inst.m_param[2] = mask;
+		}
+	}
+
+	static void ror(instruction &inst)
+	{
+		auto const size = inst.size();
+		auto const bits = size << 3;
+		u64 const mask = size_mask(inst);
+		assert((size == 4) || (size == 8));
+
+		// truncate immediates to instruction size
+		truncate_immediate(inst, 1, mask);
+		truncate_immediate(inst, 2, bits - 1);
+
+		// can't optimise carry flag generation
+		if (inst.flags() & FLAG_C)
+			return;
+
+		if (inst.param(1).is_immediate() && inst.param(2).is_immediate())
+		{
+			// constant result, convert to MOV or a logic operation
+			if (size == 4)
+				convert_to_mov_immediate(inst, rotr_32(inst.param(1).immediate(), inst.param(2).immediate()));
+			else
+				convert_to_mov_immediate(inst, rotr_64(inst.param(1).immediate(), inst.param(2).immediate()));
+		}
+		else if (inst.param(2).is_immediate_value(0))
+		{
+			// no shift, convert to AND (may be subsequently converted to MOV)
+			inst.m_opcode = OP_AND;
+			inst.m_param[2] = mask;
+		}
+	}
+
+	static void rolrc(instruction &inst)
+	{
+		auto const size = inst.size();
+		auto const bits = size << 3;
+		u64 const mask = size_mask(inst);
+		assert((size == 4) || (size == 8));
+
+		// truncate immediates to instruction size
+		truncate_immediate(inst, 1, mask);
+		truncate_immediate(inst, 2, bits - 1);
+
+		// can't optimise zero or sign flag generation
+		if (inst.flags() & (FLAG_Z | FLAG_S))
+			return;
+
+		// convert to NOP or MOV if there's no rotation
+		if (inst.param(2).is_immediate_value(0))
+		{
+			if ((inst.param(0) == inst.param(1)) && (!inst.param(0).is_int_register() || (inst.size() == 8)))
+			{
+				inst.nop();
+			}
+			else
+			{
+				inst.m_opcode = OP_MOV;
+				inst.m_numparams = 2;
+			}
+		}
+	}
+
+	static void fmov(instruction &inst)
+	{
+		// convert move-to-self to NOP
+		if (inst.param(0) == inst.param(1))
+			inst.nop();
+	}
+};
+
+
 //-------------------------------------------------
 //  configure - configure an opcode with no
 //  parameters
@@ -372,13 +1105,6 @@ void uml::instruction::configure(opcode_t op, u8 size, parameter p0, parameter p
 
 void uml::instruction::simplify()
 {
-	// can't simplify if flags are in play
-	if (m_flags != 0)
-		return;
-
-	static constexpr u64 instsizemask[] = { 0, 0, 0, 0, 0xffffffff, 0, 0, 0, 0xffffffffffffffffU };
-	static constexpr u64 paramsizemask[] = { 0xff, 0xffff, 0xffffffff, 0xffffffffffffffffU };
-
 	// loop until we've simplified all we can
 	opcode_t origop;
 	do
@@ -387,365 +1113,56 @@ void uml::instruction::simplify()
 		origop = m_opcode;
 		switch (m_opcode)
 		{
-		// READM: convert to READ if the mask is wide open
-		case OP_READM:
-			if (m_param[2].is_immediate_value(paramsizemask[m_param[3].size()]))
-			{
-				m_opcode = OP_READ;
-				m_numparams = 3;
-				m_param[2] = m_param[3];
-			}
-			break;
+		case OP_READ:   simplify_op::read(*this);            break;
+		case OP_READM:  simplify_op::readm(*this);           break;
+		case OP_WRITE:  simplify_op::write(*this);           break;
+		case OP_WRITEM: simplify_op::writem(*this);          break;
+		case OP_SET:    simplify_op::set(*this);             break;
+		case OP_MOV:    simplify_op::mov(*this);             break;
+		case OP_SEXT:   simplify_op::sext(*this);            break;
+		case OP_ROLAND: simplify_op::roland(*this);          break;
+		case OP_ROLINS: simplify_op::rolins(*this);          break;
+		case OP_ADD:    simplify_op::add(*this);             break;
+		case OP_ADDC:   simplify_op::truncate_imm(*this);    break;
+		case OP_SUB:    simplify_op::sub(*this);             break;
+		case OP_SUBB:   simplify_op::truncate_imm(*this);    break;
+		case OP_CMP:    simplify_op::cmp(*this);             break;
+		case OP_MULU:   simplify_op::mul<OP_MULULW>(*this);  break;
+		case OP_MULULW: simplify_op::mullw<u32, u64>(*this); break;
+		case OP_MULS:   simplify_op::mul<OP_MULSLW>(*this);  break;
+		case OP_MULSLW: simplify_op::mullw<s32, s64>(*this); break;
+		case OP_DIVU:   simplify_op::div<u32, u64>(*this);   break;
+		case OP_DIVS:   simplify_op::div<s32, s64>(*this);   break;
+		case OP_AND:    simplify_op::_and(*this);            break;
+		case OP_TEST:   simplify_op::test(*this);            break;
+		case OP_OR:     simplify_op::_or(*this);             break;
+		case OP_XOR:    simplify_op::_xor(*this);            break;
+		case OP_LZCNT:  simplify_op::lzcnt(*this);           break;
+		case OP_TZCNT:  simplify_op::truncate_imm(*this);    break;
+		case OP_BSWAP:  simplify_op::bswap(*this);           break;
+		case OP_SHL:    simplify_op::shl(*this);             break;
+		case OP_SHR:    simplify_op::shr<u32, u64>(*this);   break;
+		case OP_SAR:    simplify_op::shr<s32, s64>(*this);   break;
+		case OP_ROL:    simplify_op::rol(*this);             break;
+		case OP_ROLC:   simplify_op::rolrc(*this);           break;
+		case OP_ROR:    simplify_op::ror(*this);             break;
+		case OP_RORC:   simplify_op::rolrc(*this);           break;
 
-		// WRITEM: convert to WRITE if the mask is wide open
-		case OP_WRITEM:
-			if (m_param[2].is_immediate_value(paramsizemask[m_param[3].size()]))
-			{
-				m_opcode = OP_WRITE;
-				m_numparams = 3;
-				m_param[2] = m_param[3];
-			}
-			break;
-
-		// SET: convert to MOV if constant condition
-		case OP_SET:
-			if (m_condition == COND_ALWAYS)
-				convert_to_mov_immediate(1);
-			break;
-
-		// MOV: convert to NOP if move-to-self
-		case OP_MOV:
-			if (m_param[0] == m_param[1])
-				nop();
-			break;
-
-		// SEXT: convert immediates to MOV
-		case OP_SEXT:
-			if (m_param[1].is_immediate())
-				switch (m_param[2].size())
-				{
-				case SIZE_BYTE:     convert_to_mov_immediate(s8(m_param[1].immediate()));     break;
-				case SIZE_WORD:     convert_to_mov_immediate(s16(m_param[1].immediate()));    break;
-				case SIZE_DWORD:    convert_to_mov_immediate(s32(m_param[1].immediate()));    break;
-				case SIZE_QWORD:    convert_to_mov_immediate(s64(m_param[1].immediate()));    break;
-				}
-			break;
-
-		// ROLAND: convert to MOV if all immediate, or to ROL or AND if one is not needed, or to SHL/SHR if the mask is right
-		case OP_ROLAND:
-			if (m_param[1].is_immediate() && m_param[2].is_immediate() && m_param[3].is_immediate())
-			{
-				assert(m_size == 4 || m_size == 8);
-				if (m_size == 4)
-					convert_to_mov_immediate(rotl_32(m_param[1].immediate(), m_param[2].immediate()) & m_param[3].immediate());
-				else
-					convert_to_mov_immediate(rotl_64(m_param[1].immediate(), m_param[2].immediate()) & m_param[3].immediate());
-			}
-			else if (m_param[1].is_immediate() && m_param[2].is_immediate())
-			{
-				assert(m_size == 4 || m_size == 8);
-				m_opcode = OP_AND;
-				m_numparams = 3;
-				if (m_size == 4)
-					m_param[1] = parameter(rotl_32(m_param[1].immediate(), m_param[2].immediate()));
-				else
-					m_param[1] = parameter(rotl_64(m_param[1].immediate(), m_param[2].immediate()));
-				m_param[2] = m_param[3];
-			}
-			else if (m_param[2].is_immediate_value(0) || m_param[3].is_immediate_value(0))
-			{
-				m_opcode = OP_AND;
-				m_numparams = 3;
-				m_param[2] = m_param[3];
-			}
-			else if (m_param[3].is_immediate_value(instsizemask[m_size]))
-			{
-				m_opcode = OP_ROL;
-				m_numparams = 3;
-			}
-			else if (m_param[2].is_immediate() && m_param[3].is_immediate_value((0xffffffffffffffffU << m_param[2].immediate()) & instsizemask[m_size]))
-			{
-				m_opcode = OP_SHL;
-				m_numparams = 3;
-			}
-			else if (m_param[2].is_immediate() && m_param[3].is_immediate_value(instsizemask[m_size] >> (8 * m_size - m_param[2].immediate())))
-			{
-				m_opcode = OP_SHR;
-				m_numparams = 3;
-				m_param[2] = 8 * m_size - m_param[2].immediate();
-			}
-			break;
-
-		// ROLINS: convert to ROLAND if the mask is full
-		case OP_ROLINS:
-			if (m_param[3].is_immediate_value(instsizemask[m_size]))
-				m_opcode = OP_ROLAND;
-			break;
-
-		// ADD: convert to MOV if immediate, or if adding 0
-		case OP_ADD:
-			if (m_param[1].is_immediate() && m_param[2].is_immediate())
-				convert_to_mov_immediate(m_param[1].immediate() + m_param[2].immediate());
-			else if (m_param[1].is_immediate_value(0))
-				convert_to_mov_param(2);
-			else if (m_param[2].is_immediate_value(0))
-				convert_to_mov_param(1);
-			break;
-
-		// SUB: convert to MOV if immediate, or if subtracting 0
-		case OP_SUB:
-			if (m_param[1].is_immediate() && m_param[2].is_immediate())
-				convert_to_mov_immediate(m_param[1].immediate() - m_param[2].immediate());
-			else if (m_param[2].is_immediate_value(0))
-				convert_to_mov_param(1);
-			break;
-
-		// CMP: no-op if no flags needed, compare i0 to i0 if the parameters are equal
-		case OP_CMP:
-			if (m_flags == 0)
-				nop();
-			else if (m_param[0] == m_param[1])
-				cmp(I0, I0);
-			break;
-
-		// MULU: convert simple form to MOV if immediate, or if multiplying by 0
-		case OP_MULU:
-			if (m_param[0] == m_param[1])
-			{
-				if (m_param[2].is_immediate_value(0) || m_param[3].is_immediate_value(0))
-					convert_to_mov_immediate(0);
-				else if (m_param[2].is_immediate() && m_param[3].is_immediate())
-				{
-					if (m_size == 4)
-						convert_to_mov_immediate(u32(u32(m_param[2].immediate()) * u32(m_param[3].immediate())));
-					else if (m_size == 8)
-						convert_to_mov_immediate(u64(u64(m_param[2].immediate()) * u64(m_param[3].immediate())));
-				}
-			}
-			break;
-
-		// MULULW: convert simple form to MOV if immediate, or if multiplying by 0
-		case OP_MULULW:
-			if (m_param[1].is_immediate_value(0) || m_param[2].is_immediate_value(0))
-				convert_to_mov_immediate(0);
-			else if (m_param[1].is_immediate() && m_param[2].is_immediate())
-			{
-				if (m_size == 4)
-					convert_to_mov_immediate(u32(u32(m_param[1].immediate()) * u32(m_param[2].immediate())));
-				else if (m_size == 8)
-					convert_to_mov_immediate(u64(u64(m_param[1].immediate()) * u64(m_param[2].immediate())));
-			}
-			break;
-
-		// MULS: convert simple form to MOV if immediate, or if multiplying by 0
-		case OP_MULS:
-			if (m_param[0] == m_param[1])
-			{
-				if (m_param[2].is_immediate_value(0) || m_param[3].is_immediate_value(0))
-					convert_to_mov_immediate(0);
-				else if (m_param[2].is_immediate() && m_param[3].is_immediate())
-				{
-					if (m_size == 4)
-						convert_to_mov_immediate(s32(s32(m_param[2].immediate()) * s32(m_param[3].immediate())));
-					else if (m_size == 8)
-						convert_to_mov_immediate(s64(s64(m_param[2].immediate()) * s64(m_param[3].immediate())));
-				}
-			}
-			break;
-
-		// MULSLW: convert simple form to MOV if immediate, or if multiplying by 0
-		case OP_MULSLW:
-			if (m_param[1].is_immediate_value(0) || m_param[2].is_immediate_value(0))
-				convert_to_mov_immediate(0);
-			else if (m_param[1].is_immediate() && m_param[2].is_immediate())
-			{
-				if (m_size == 4)
-					convert_to_mov_immediate(s32(s32(m_param[1].immediate()) * s32(m_param[2].immediate())));
-				else if (m_size == 8)
-					convert_to_mov_immediate(s64(s64(m_param[1].immediate()) * s64(m_param[2].immediate())));
-			}
-			break;
-
-		// DIVU: convert simple form to MOV if immediate, or if dividing with 0
-		case OP_DIVU:
-			if (m_param[0] == m_param[1] && !m_param[3].is_immediate_value(0))
-			{
-				if (m_param[2].is_immediate_value(0))
-					convert_to_mov_immediate(0);
-				else if (m_param[2].is_immediate() && m_param[3].is_immediate())
-				{
-					if (m_size == 4)
-						convert_to_mov_immediate(u32(u32(m_param[2].immediate()) / u32(m_param[3].immediate())));
-					else if (m_size == 8)
-						convert_to_mov_immediate(u64(u64(m_param[2].immediate()) / u64(m_param[3].immediate())));
-				}
-			}
-			break;
-
-		// DIVS: convert simple form to MOV if immediate, or if dividing with 0
-		case OP_DIVS:
-			if (m_param[0] == m_param[1] && !m_param[3].is_immediate_value(0))
-			{
-				if (m_param[2].is_immediate_value(0))
-					convert_to_mov_immediate(0);
-				else if (m_param[2].is_immediate() && m_param[3].is_immediate())
-				{
-					if (m_size == 4)
-						convert_to_mov_immediate(s32(s32(m_param[2].immediate()) / s32(m_param[3].immediate())));
-					else if (m_size == 8)
-						convert_to_mov_immediate(s64(s64(m_param[2].immediate()) / s64(m_param[3].immediate())));
-				}
-			}
-			break;
-
-		// AND: convert to MOV if immediate, or if anding against 0 or 0xffffffff
-		case OP_AND:
-			if (m_param[1].is_immediate_value(0) || m_param[2].is_immediate_value(0))
-				convert_to_mov_immediate(0);
-			else if (m_param[1].is_immediate() && m_param[2].is_immediate())
-				convert_to_mov_immediate(m_param[1].immediate() & m_param[2].immediate());
-			else if (m_param[1].is_immediate_value(instsizemask[m_size]))
-				convert_to_mov_param(2);
-			else if (m_param[2].is_immediate_value(instsizemask[m_size]))
-				convert_to_mov_param(1);
-			break;
-
-		// TEST: no-op if no flags needed
-		case OP_TEST:
-			if (m_flags == 0)
-				nop();
-			break;
-
-		// OR: convert to MOV if immediate, or if oring against 0 or 0xffffffff
-		case OP_OR:
-			if (m_param[1].is_immediate_value(instsizemask[m_size]) || m_param[2].is_immediate_value(instsizemask[m_size]))
-				convert_to_mov_immediate(instsizemask[m_size]);
-			else if (m_param[1].is_immediate() && m_param[2].is_immediate())
-				convert_to_mov_immediate(m_param[1].immediate() | m_param[2].immediate());
-			else if (m_param[1].is_immediate_value(0))
-				convert_to_mov_param(2);
-			else if (m_param[2].is_immediate_value(0))
-				convert_to_mov_param(1);
-			break;
-
-		// XOR: convert to MOV if immediate, or if xoring against 0
-		case OP_XOR:
-			if (m_param[1].is_immediate() && m_param[2].is_immediate())
-				convert_to_mov_immediate(m_param[1].immediate() ^ m_param[2].immediate());
-			else if (m_param[1].is_immediate_value(0))
-				convert_to_mov_param(2);
-			else if (m_param[2].is_immediate_value(0))
-				convert_to_mov_param(1);
-			break;
-
-		// LZCNT: convert to MOV if immediate
-		case OP_LZCNT:
-			if (m_param[1].is_immediate())
-			{
-				if (m_size == 4)
-					convert_to_mov_immediate(count_leading_zeros_32(m_param[1].immediate()));
-				else if (m_size == 8)
-					convert_to_mov_immediate(count_leading_zeros_64(m_param[1].immediate()));
-			}
-			break;
-
-		// BSWAP: convert to MOV if immediate
-		case OP_BSWAP:
-			if (m_param[1].is_immediate())
-			{
-				if (m_size == 4)
-					convert_to_mov_immediate(swapendian_int32(m_param[1].immediate()));
-				else if (m_size == 8)
-					convert_to_mov_immediate(swapendian_int64(m_param[1].immediate()));
-			}
-			break;
-
-		// SHL: convert to MOV if immediate or shifting by 0
-		case OP_SHL:
-			if (m_param[1].is_immediate() && m_param[2].is_immediate())
-			{
-				if (m_size == 4)
-					convert_to_mov_immediate(u32(m_param[1].immediate()) << (m_param[2].immediate() & 31));
-				else if (m_size == 8)
-					convert_to_mov_immediate(u64(m_param[1].immediate()) << (m_param[2].immediate() & 63));
-			}
-			else if (m_param[2].is_immediate_value(0))
-				convert_to_mov_param(1);
-			break;
-
-		// SHR: convert to MOV if immediate or shifting by 0
-		case OP_SHR:
-			if (m_param[1].is_immediate() && m_param[2].is_immediate())
-			{
-				if (m_size == 4)
-					convert_to_mov_immediate(u32(m_param[1].immediate()) >> (m_param[2].immediate() & 31));
-				else if (m_size == 8)
-					convert_to_mov_immediate(u64(m_param[1].immediate()) >> (m_param[2].immediate() & 63));
-			}
-			else if (m_param[2].is_immediate_value(0))
-				convert_to_mov_param(1);
-			break;
-
-		// SAR: convert to MOV if immediate or shifting by 0
-		case OP_SAR:
-			if (m_param[1].is_immediate() && m_param[2].is_immediate())
-			{
-				if (m_size == 4)
-					convert_to_mov_immediate(s32(m_param[1].immediate()) >> (m_param[2].immediate() & 31));
-				else if (m_size == 8)
-					convert_to_mov_immediate(s64(m_param[1].immediate()) >> (m_param[2].immediate() & 63));
-			}
-			else if (m_param[2].is_immediate_value(0))
-				convert_to_mov_param(1);
-			break;
-
-		// ROL: convert to NOP if immediate or rotating by 0
-		case OP_ROL:
-			if (m_param[1].is_immediate() && m_param[2].is_immediate())
-			{
-				if (m_size == 4)
-					convert_to_mov_immediate(rotl_32(m_param[1].immediate(), m_param[2].immediate() & 31));
-				else if (m_size == 8)
-					convert_to_mov_immediate(rotl_64(m_param[1].immediate(), m_param[2].immediate() & 63));
-			}
-			else if (m_param[2].is_immediate_value(0))
-				convert_to_mov_param(1);
-			break;
-
-		// ROR: convert to NOP if immediate or rotating by 0
-		case OP_ROR:
-			if (m_param[1].is_immediate() && m_param[2].is_immediate())
-			{
-				if (m_size == 4)
-					convert_to_mov_immediate(rotr_32(m_param[1].immediate(), m_param[2].immediate() & 31));
-				else if (m_size == 8)
-					convert_to_mov_immediate(rotr_64(m_param[1].immediate(), m_param[2].immediate() & 63));
-			}
-			else if (m_param[2].is_immediate_value(0))
-				convert_to_mov_param(1);
-			break;
-
-		// FMOV: convert to NOP if move-to-self
-		case OP_FMOV:
-			if (m_param[0] == m_param[1])
-				nop();
-			break;
-
-		default:
-			break;
+		default:                                             break;
 		}
 
-	/*
-	    if (LOG_SIMPLIFICATIONS && memcmp(&orig, inst, sizeof(orig)) != 0)
-	    {
-	        std::string disasm1 = orig.disasm(block->drcuml);
-	        std::string disasm2 = inst->disasm(block->drcuml);
-	        osd_printf_debug("Simplified: %-50.50s -> %s\n", disasm1, disasm2);
-	    }
-	*/
+#if 0
+		if (LOG_SIMPLIFICATIONS && memcmp(&orig, inst, sizeof(orig)) != 0)
+		{
+			std::string disasm1 = orig.disasm(block->drcuml);
+			std::string disasm2 = inst->disasm(block->drcuml);
+			osd_printf_debug("Simplified: %-50.50s -> %s\n", disasm1, disasm2);
+		}
+#endif
 
 		// loop until we stop changing opcodes
-	} while (m_opcode != origop);
+	}
+	while (m_opcode != origop);
 }
 
 

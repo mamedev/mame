@@ -222,7 +222,7 @@ namespace uml
 	};
 
 	// C function callback definition
-	typedef void (*c_function)(void *ptr);
+	using c_function = void (*)(void *ptr);
 
 	// class describing a global code handle
 	class code_handle
@@ -585,8 +585,6 @@ namespace uml
 
 		// opcode validation and simplification
 		void validate();
-		void convert_to_mov_immediate(u64 immediate) { m_opcode = OP_MOV; m_numparams = 2; m_param[1] = immediate; }
-		void convert_to_mov_param(int pnum) { m_opcode = OP_MOV; m_numparams = 2; m_param[1] = m_param[pnum]; }
 
 		// internal state
 		opcode_t            m_opcode = OP_INVALID;      // opcode
@@ -597,6 +595,7 @@ namespace uml
 		parameter           m_param[MAX_PARAMS];        // up to 4 parameters
 
 		static opcode_info const s_opcode_info_table[OP_MAX];
+		struct simplify_op;
 	};
 
 	// structure describing rules for parameter encoding
