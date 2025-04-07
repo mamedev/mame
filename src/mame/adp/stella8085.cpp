@@ -21,6 +21,8 @@ Sound S50240
 4382-000-101 (2 ROM slots, RTC 62421A) Parent is dicemstr
 
 Dice Master reference: https://www.youtube.com/watch?v=NlB06dMxjME
+Merkur Disc reference: https://www.youtube.com/watch?v=1NjJPkzg9Mk
+Nova Kniffi reference: https://www.youtube.com/watch?v=YBq2Z1irXek
 */
 
 
