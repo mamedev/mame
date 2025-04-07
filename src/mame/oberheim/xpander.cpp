@@ -453,7 +453,7 @@ void xpander_state::haltset_w(u8 data)
 
 	// Bit 4: RES* (voice cpu reset).
 	const bool reset_voice = !BIT(data, 4);  // Active low.
-	const bool voice_resetting = (m_voicecpu->input_state(INPUT_LINE_RESET) == ASSERT_LINE);
+	const bool voice_resetting = (m_voicecpu->input_line_state(INPUT_LINE_RESET) == ASSERT_LINE);
 	if (reset_voice != voice_resetting)
 	{
 		m_voicecpu->set_input_line(INPUT_LINE_RESET, reset_voice ? ASSERT_LINE : CLEAR_LINE);
