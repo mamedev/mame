@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Juergen Buchmueller, hap, Roberto Fresca, Grull Osgo
+// copyright-holders:Juergen Buchmueller, Roberto Fresca, Grull Osgo
 // thanks-to:Marcel De Kogel
 /*****************************************************************************
  *
@@ -105,7 +105,7 @@
  *   tests only 8080 opcodes, link is dead so go via archive.org)
  *
  * April 2025, Roberto Fresca
- * - Reworked the DSUB (Double Substraction) undocumented instruction.
+ * - Reworked the DSUB (Double Subtraction) undocumented instruction.
  * - Reworked the RDEL (Rotate D and E Left with Carry) undocumented instruction.
  *   (ref: https://robertofresca.com/files/New_8085_instruction.pdf)
  *
