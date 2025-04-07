@@ -74,7 +74,6 @@ private:
 	int m_question_rom = 0;
 	int m_remap_address[16]{};
 
-	IRQ_CALLBACK_MEMBER(jack_sh_irq_ack);
 	void joinem_control_w(uint8_t data);
 	void joinem_scroll_w(offs_t offset, uint8_t data);
 	uint8_t striv_question_r(offs_t offset);

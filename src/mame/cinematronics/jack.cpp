@@ -121,12 +121,6 @@ uint8_t jack_state::zzyzzyxx_timer_r()
 	return m_audiocpu->total_cycles() / 32;
 }
 
-IRQ_CALLBACK_MEMBER(jack_state::jack_sh_irq_ack)
-{
-	m_audiocpu->set_input_line(0, CLEAR_LINE);
-	return 0xff;
-}
-
 
 /***************************************************************/
 
@@ -957,7 +951,6 @@ void jack_state::jack(machine_config &config)
 	Z80(config, m_audiocpu, MASTER_XTAL / 6);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &jack_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &jack_state::sound_io_map);
-	m_audiocpu->set_irq_acknowledge_callback(FUNC(jack_state::jack_sh_irq_ack));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -972,7 +965,7 @@ void jack_state::jack(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0, ASSERT_LINE);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0, HOLD_LINE);
 
 	AY8910(config, m_aysnd, MASTER_XTAL / 12);
 	m_aysnd->port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
