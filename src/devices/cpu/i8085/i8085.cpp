@@ -925,28 +925,27 @@ void i8085a_cpu_device::execute_one(int opcode)
 			m_AF.b.l = (m_AF.b.l & 0xfe) | (m_AF.b.h & CF);
 			break;
 
-		case 0x08: // 8085: undocumented DSUB (Double Substraction)
-				   // [H][L] - [B][C] --> [H][L]
+		case 0x08: // 8085: undocumented DSUB (Double Subtraction, HL - BC)
 				if (is_8085())
 				{
 					// Low byte subtraction: L = L - C
 					int q_low = m_HL.b.l - m_BC.b.l;
-					uint8_t res_low = q_low & 0xff;
+					u8 res_low = q_low & 0xff;
 					// Calculate flags for low byte
-					m_AF.b.l = lut_zs[res_low] 
-						| ((q_low >> 8) & CF)  // Carry
-						| ((m_HL.b.l ^ res_low ^ m_BC.b.l) & HF)  // Half Carry
-						| (((m_BC.b.l ^ m_HL.b.l) & (m_HL.b.l ^ res_low) & SF)) >> 5;  // Overflow
+					m_AF.b.l = lut_zs[res_low]
+						| ((q_low >> 8) & CF) // Carry
+						| ((m_HL.b.l ^ res_low ^ m_BC.b.l) & HF) // Half Carry
+						| (((m_BC.b.l ^ m_HL.b.l) & (m_HL.b.l ^ res_low) & SF)) >> 5; // Overflow
 					m_HL.b.l = res_low;
 
 					// High byte subtraction: H = H - B - carry_from_low
 					int q_high = m_HL.b.h - m_BC.b.h - (m_AF.b.l & CF);
-					uint8_t res_high = q_high & 0xff;
+					u8 res_high = q_high & 0xff;
 					// Calculate flags for high byte
-					m_AF.b.l = lut_zs[res_high] 
-						| ((q_high >> 8) & CF)  // Carry
-						| ((m_HL.b.h ^ res_high ^ m_BC.b.h) & HF)  // Half Carry
-						| (((m_BC.b.h ^ m_HL.b.h) & (m_HL.b.h ^ res_high) & SF)) >> 5;  // Overflow
+					m_AF.b.l = lut_zs[res_high]
+						| ((q_high >> 8) & CF) // Carry
+						| ((m_HL.b.h ^ res_high ^ m_BC.b.h) & HF) // Half Carry
+						| (((m_BC.b.h ^ m_HL.b.h) & (m_HL.b.h ^ res_high) & SF)) >> 5; // Overflow
 					m_HL.b.h = res_high;
 
 					// Set Zero flag based on 16-bit result
@@ -1023,11 +1022,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 			break;
 		}
 
-		case 0x18: // 8085: undocumented RDEL (Roteate D and E Left throgh Carry), otherwise undocumented NOP
-				   //  .----------------------------------.
-				   //  |   .----.     .-------.-------.   |
-				   //  '--<| Cy |<---<|   D   |   E   |<--'
-				   //      '----'     '-------'-------'
+		case 0x18: // 8085: undocumented RDEL (Rotate D and E Left through Carry), otherwise undocumented NOP
 			if (is_8085())
 			{
 				int c = m_AF.b.l & CF;                                // save old carry state
