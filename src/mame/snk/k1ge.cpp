@@ -461,8 +461,8 @@ void k1ge_device::device_reset()
 	write(0x000, 0x00);   /* Interrupt enable */
 	write(0x002, 0x00);   /* WBA.H */
 	write(0x003, 0x00);   /* WVA.V */
-	write(0x004, 0xFF);   /* WSI.H */
-	write(0x005, 0xFF);   /* WSI.V */
+	write(0x004, 0xff);   /* WSI.H */
+	write(0x005, 0xff);   /* WSI.V */
 	write(0x007, 0xc6);   /* REF */
 	write(0x012, 0x00);   /* 2D control */
 	write(0x020, 0x00);   /* PO.H */
@@ -491,7 +491,7 @@ void k1ge_device::device_reset()
 	write(0x116, 0x07);   /* SC2PLT12 */
 	write(0x117, 0x07);   /* SC2PLT13 */
 	write(0x118, 0x07);   /* BG */
-	write(0x400, 0xFF);   /* LED control */
+	write(0x400, 0xff);   /* LED control */
 	write(0x402, 0x80);   /* LEDFREG */
 	write(0x7e0, 0x52);   /* RESET */
 	write(0x7e2, 0x00);   /* MODE */
