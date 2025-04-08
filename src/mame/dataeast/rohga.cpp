@@ -416,20 +416,6 @@ static INPUT_PORTS_START( rohga )
 	PORT_DIPSETTING(      0x0000, "Fastest" )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( rohgau )
-	PORT_INCLUDE( rohga )
-
-	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:7")
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-
-	PORT_MODIFY("DSW3")
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW3:1")
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-INPUT_PORTS_END
-
 static INPUT_PORTS_START( wizdfire )
 	PORT_START("INPUTS")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
@@ -1805,8 +1791,8 @@ void rohga_state::init_schmeisr()
 GAME( 1991, rohga,     0,        rohga,    rohga,    rohga_state, init_rohga,    ROT0,   "Data East Corporation", "Rohga: Armor Force (Asia/Europe v5.0)",       MACHINE_SUPPORTS_SAVE )
 GAME( 1991, rohga1,    rohga,    rohga,    rohga,    rohga_state, init_rohga,    ROT0,   "Data East Corporation", "Rohga: Armor Force (Asia/Europe v3.0 set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, rohga2,    rohga,    rohga,    rohga,    rohga_state, init_rohga,    ROT0,   "Data East Corporation", "Rohga: Armor Force (Asia/Europe v3.0 set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, rohgah,    rohga,    rohga,    rohgau,   rohga_state, init_rohga,    ROT0,   "Data East Corporation", "Rohga: Armor Force (Hong Kong v3.0)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1991, rohgau,    rohga,    rohga,    rohgau,   rohga_state, init_rohga,    ROT0,   "Data East Corporation", "Rohga: Armor Force (US v1.0)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1991, rohgah,    rohga,    rohga,    rohga,    rohga_state, init_rohga,    ROT0,   "Data East Corporation", "Rohga: Armor Force (Hong Kong v3.0)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1991, rohgau,    rohga,    rohga,    rohga,    rohga_state, init_rohga,    ROT0,   "Data East Corporation", "Rohga: Armor Force (US v1.0)",                MACHINE_SUPPORTS_SAVE )
 GAME( 1991, wolffang,  rohga,    rohga,    rohga,    rohga_state, init_rohga,    ROT0,   "Data East Corporation", "Wolf Fang: Kuuga 2001 (Japan)",               MACHINE_SUPPORTS_SAVE )
 
 GAME( 1992, wizdfire,  0,        wizdfire, wizdfire, rohga_state, init_wizdfire, ROT0,   "Data East Corporation", "Wizard Fire (Over Sea v2.1)", MACHINE_SUPPORTS_SAVE )
