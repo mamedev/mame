@@ -146,10 +146,10 @@ void ppu_vt03_device::init_vtxx_rgb555_palette_tables()
 	{
 		for (int palval = 0; palval < 0x8000; palval++)
 		{
-		//  uint16_t rgbval = (m_palette_ram[i & 0x7f] & 0xff) | ((m_palette_ram[(i & 0x7f) + 0x80] & 0xff) << 8);
-			uint8_t blue = (palval & 0x001f) << 3;
-			uint8_t green = (palval & 0x3e0) >> 2;
-			uint8_t red = (palval & 0x7C00) >> 7;
+			//uint16_t rgbval = (m_palette_ram[i & 0x7f] & 0xff) | ((m_palette_ram[(i & 0x7f) + 0x80] & 0xff) << 8);
+			const uint8_t blue = (palval & 0x001f) << 3;
+			const uint8_t green = (palval & 0x3e0) >> 2;
+			const uint8_t red = (palval & 0x7C00) >> 7;
 
 			// TODO: apply emphasis values if they work in this mode
 			m_vtpens_rgb555[entry] = rgb_t(red, green, blue);
@@ -166,9 +166,9 @@ void ppu_vt03_device::init_vtxx_rgb444_palette_tables()
 		for (int palval = 0; palval < 0x1000; palval++)
 		{
 			//uint16_t rgbval = (m_palette_ram[i & 0x7f] & 0x3f) | ((m_palette_ram[(i & 0x7f) + 0x80] & 0x3f) << 6);
-			uint8_t red = (palval & 0x000f) << 4;
-			uint8_t green = (palval & 0x0f0);
-			uint8_t blue = (palval & 0xf00) >> 4;
+			const uint8_t red = (palval & 0x000f) << 4;
+			const uint8_t green = (palval & 0x0f0);
+			const uint8_t blue = (palval & 0xf00) >> 4;
 
 			// TODO: apply emphasis values if they work in this mode
 			m_vtpens_rgb444[entry] = rgb_t(red, green, blue);
@@ -205,7 +205,7 @@ void ppu_vt03_device::init_vt03_palette_tables(int palmode)
 
 			float fLuma = (nLuma - 4) / 9.625;     // Value determined from matching saturation =0 phases 1-12
 			float fChroma = nChroma / 18.975;      // Value determined from matching phases 0 and 13 across all luminance and saturation levels
-			float fPhase = ((nPhase - 2) * 30.0 + phaseOffset) * M_PI / 180.0;
+			const float fPhase = ((nPhase - 2) * 30.0 + phaseOffset) * M_PI / 180.0;
 
 			if (palmode == 1)
 			{
@@ -223,8 +223,8 @@ void ppu_vt03_device::init_vt03_palette_tables(int palmode)
 			if (nPhase == 13) Y -= fChroma;        // Phase 13 is the lower bound of the waveform
 			if (nPhase >= 14) Y = 0.0;             // Phases 14 and 15 always black
 
-			float V = sin(fPhase) * C * 1.05; // 1.05 needed to get closer to EmuVT palette's color levels in phases 1-12
-			float U = cos(fPhase) * C * 1.05;
+			const float V = sin(fPhase) * C * 1.05; // 1.05 needed to get closer to EmuVT palette's color levels in phases 1-12
+			const float U = cos(fPhase) * C * 1.05;
 			float R = Y + 1.1400 * V + 0.0000 * U;
 			float G = Y - 0.5807 * V - 0.3940 * U;
 			float B = Y - 0.0000 * V + 2.0290 * U;
@@ -234,15 +234,15 @@ void ppu_vt03_device::init_vt03_palette_tables(int palmode)
 			if (G > 1.0) G = 1.0;
 			if (B < 0.0) B = 0.0;
 			if (B > 1.0) B = 1.0;
-			int RV = R * 255.0;
-			int GV = G * 255.0;
-			int BV = B * 255.0;
+			const int RV = R * 255.0;
+			const int GV = G * 255.0;
+			const int BV = B * 255.0;
 
 			// does this really apply to the VT palette?
 			//bool is_pal = m_scanlines_per_frame != NTSC_SCANLINES_PER_FRAME;
 			//apply_color_emphasis_and_clamp(is_pal, color_emphasis, R, G, B);
 
-			m_vtpens[entry] = rgb_t(RV, GV, BV);
+			set_pen_color(YUV444_COLOR + entry, rgb_t(RV, GV, BV));
 			entry++;
 		}
 	}
@@ -258,6 +258,10 @@ void ppu_vt03_device::device_start()
 		m_palette_ram[i] = 0x00;
 
 	save_item(NAME(m_palette_ram));
+	save_item(NAME(m_read_bg4_bg3));
+	save_item(NAME(m_va34));
+	save_item(NAME(m_extplanebuf));
+	save_item(NAME(m_extra_sprite_bits));
 	save_item(NAME(m_201x_regs));
 
 	init_vt03_palette_tables(0);
@@ -289,7 +293,7 @@ void ppu_vt03_device::device_reset()
 		set_201x_reg(i, 0x00);
 
 	m_read_bg4_bg3 = 0;
-	m_va34 = 0;
+	m_va34 = false;
 }
 
 
@@ -306,26 +310,26 @@ uint8_t ppu_vt03_device::get_va34()
 
 void ppu_vt03_device::read_sprite_plane_data(int address)
 {
-	m_va34 = 0;
+	m_va34 = false;
 	m_planebuf[0] = m_read_sp((address + 0) & 0x1fff);
 	m_planebuf[1] = m_read_sp((address + 8) & 0x1fff);
 
-	int is4bpp = get_201x_reg(0x0) & 0x04;
+	const bool is4bpp = BIT(get_201x_reg(0x0), 2);
 
 	if (is4bpp)
 	{
-		m_va34 = 1;
+		m_va34 = true;
 		m_extplanebuf[0] = m_read_sp((address + 0) & 0x1fff);
 		m_extplanebuf[1] = m_read_sp((address + 8) & 0x1fff);
 	}
 }
 
-void ppu_vt03_device::make_sprite_pixel_data(uint8_t& pixel_data, int flipx)
+void ppu_vt03_device::make_sprite_pixel_data(uint8_t& pixel_data, bool flipx)
 {
 	ppu2c0x_device::make_sprite_pixel_data(pixel_data, flipx);
 
-	int is4bpp = get_201x_reg(0x0) & 0x04;
-	int is16pix = get_201x_reg(0x0) & 0x01;
+	const bool is4bpp = BIT(get_201x_reg(0x0), 2);
+	const bool is16pix = BIT(get_201x_reg(0x0), 0);
 
 	if (is4bpp)
 	{
@@ -338,8 +342,8 @@ void ppu_vt03_device::make_sprite_pixel_data(uint8_t& pixel_data, int flipx)
 
 			if (is16pix)
 			{
-				uint8_t pix0 = pixel_data & 0x03;
-				uint8_t pix1 = (pixel_data >> 5) & 0x03;
+				const uint8_t pix0 = pixel_data & 0x03;
+				const uint8_t pix1 = (pixel_data >> 5) & 0x03;
 				pixel_data = pix1 | (pix0 << 5);
 			}
 		}
@@ -354,14 +358,14 @@ void ppu_vt03_device::make_sprite_pixel_data(uint8_t& pixel_data, int flipx)
 
 void ppu_vt03_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, uint8_t pixel_data, bitmap_rgb32& bitmap)
 {
-	int is4bpp = get_201x_reg(0x0) & 0x04;
-	int is16pix = get_201x_reg(0x0) & 0x01;
+	const bool is4bpp = BIT(get_201x_reg(0x0), 2);
+	const bool is16pix = BIT(get_201x_reg(0x0), 0);
 
 	if (is4bpp)
 	{
 		if (!is16pix)
 		{
-			uint8_t pen = pixel_data + (4 * color);
+			const uint8_t pen = pixel_data + (4 * color);
 			draw_tile_pixel_inner(pen, &bitmap.pix(m_scanline, sprite_xpos + pixel));
 		}
 		else
@@ -371,13 +375,13 @@ void ppu_vt03_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, u
 			    cliprect - not seen used yet */
 			if ((pixel_data & 0x03) != 0)
 			{
-				uint8_t pen = (pixel_data & 0x03) + (4 * color);
+				const uint8_t pen = (pixel_data & 0x03) + (4 * color);
 				draw_tile_pixel_inner(pen, &bitmap.pix(m_scanline, sprite_xpos + pixel));
 			}
 
 			if (((pixel_data >> 5) & 0x03) != 0)
 			{
-				uint8_t pen = ((pixel_data >> 5) & 0x03) + (4 * color);
+				const uint8_t pen = ((pixel_data >> 5) & 0x03) + (4 * color);
 				draw_tile_pixel_inner(pen, &bitmap.pix(m_scanline, sprite_xpos + pixel + 8));
 			}
 			//ppu2c0x_device::draw_sprite_pixel(sprite_xpos, color, pixel, pixel_data & 0x03, bitmap);
@@ -392,7 +396,7 @@ void ppu_vt03_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, u
 
 void ppu_vt03_device::read_tile_plane_data(int address, int color)
 {
-	int is4bpp = get_201x_reg(0x0) & 0x02;
+	const bool is4bpp = BIT(get_201x_reg(0x0), 1);
 
 	if (m_201x_regs[0] & 0x10) // extended mode
 		m_read_bg4_bg3 = color;
@@ -401,16 +405,16 @@ void ppu_vt03_device::read_tile_plane_data(int address, int color)
 
 	if (is4bpp)
 	{
-		m_va34 = 0;
+		m_va34 = false;
 		m_planebuf[0] = m_read_bg((address & 0x1fff));
 		m_planebuf[1] = m_read_bg((address + 8) & 0x1fff);
-		m_va34 = 1;
+		m_va34 = true;
 		m_extplanebuf[0] = m_read_bg((address & 0x1fff));
 		m_extplanebuf[1] = m_read_bg((address + 8) & 0x1fff);
 	}
 	else
 	{
-		m_va34 = 0;
+		m_va34 = false;
 		m_planebuf[0] = m_read_bg((address & 0x1fff));
 		m_planebuf[1] = m_read_bg((address + 8) & 0x1fff);
 	}
@@ -418,7 +422,7 @@ void ppu_vt03_device::read_tile_plane_data(int address, int color)
 
 void ppu_vt03_device::shift_tile_plane_data(uint8_t& pix)
 {
-	int is4bpp = get_201x_reg(0x0) & 0x02;
+	const bool is4bpp = BIT(get_201x_reg(0x0), 1);
 
 	ppu2c0x_device::shift_tile_plane_data(pix);
 
@@ -441,21 +445,18 @@ void ppu_vt03_device::draw_back_pen(uint32_t* dst, int back_pen)
 	else
 	{
 		// in normal modes we still have the data from the palette writes as the 'backpen' so treat it as before
-		uint32_t pix;
-		pix = m_nespens[back_pen & 0x1ff];
-		*dst = pix;
+		*dst = pen_color(back_pen & 0x1ff);
 	}
 }
 
 
 void ppu_vt03_device::draw_tile_pixel_inner(uint8_t pen, uint32_t *dest)
 {
-	if (m_201x_regs[0] & 0x80)
+	if (BIT(m_201x_regs[0], 7))
 	{
 		if (m_pal_mode == PAL_MODE_NEW_RGB) // unknown newer VT mode
 		{
-			uint32_t palval;
-			palval = (m_palette_ram[pen & 0x7f] & 0xff) | ((m_palette_ram[(pen & 0x7f) + 0x80] & 0x7f) << 8);
+			uint32_t palval = (m_palette_ram[pen & 0x7f] & 0xff) | ((m_palette_ram[(pen & 0x7f) + 0x80] & 0x7f) << 8);
 
 			// does grayscale mode exist here? (we haven't calculated any colours for it)
 			//if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
@@ -464,14 +465,11 @@ void ppu_vt03_device::draw_tile_pixel_inner(uint8_t pen, uint32_t *dest)
 			// apply colour emphasis (does it really exist here?) (we haven't calculated any colours for it, so ths has no effect)
 			palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 10);
 
-			uint32_t pix;
-			pix = m_vtpens_rgb555[palval & 0x3ffff];
-			*dest = pix;
+			*dest = m_vtpens_rgb555[palval & 0x3ffff];
 		}
 		else if (m_pal_mode == PAL_MODE_NEW_RGB12) // unknown newer VT mode
 		{
-			uint32_t palval;
-			palval = (m_palette_ram[pen & 0x7f] & 0x3f) | ((m_palette_ram[(pen & 0x7f) + 0x80] & 0x3f) << 6);
+			uint32_t palval = (m_palette_ram[pen & 0x7f] & 0x3f) | ((m_palette_ram[(pen & 0x7f) + 0x80] & 0x3f) << 6);
 
 			// does grayscale mode exist here? (we haven't calculated any colours for it)
 			//if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
@@ -480,14 +478,11 @@ void ppu_vt03_device::draw_tile_pixel_inner(uint8_t pen, uint32_t *dest)
 			// apply colour emphasis (does it really exist here?) (we haven't calculated any colours for it, so ths has no effect)
 			palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 7);
 
-			uint32_t pix;
-			pix = m_vtpens_rgb444[palval & 0x7fff];
-			*dest = pix;
+			*dest = m_vtpens_rgb444[palval & 0x7fff];
 		}
 		else // VT03 mode
 		{
-			uint32_t palval;
-			palval = (m_palette_ram[pen & 0x7f] & 0x3f) | ((m_palette_ram[(pen & 0x7f) + 0x80] & 0x3f) << 6);
+			uint32_t palval = (m_palette_ram[pen & 0x7f] & 0x3f) | ((m_palette_ram[(pen & 0x7f) + 0x80] & 0x3f) << 6);
 
 			// does grayscale mode exist here? (we haven't calculated any colours for it)
 			//if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
@@ -496,15 +491,12 @@ void ppu_vt03_device::draw_tile_pixel_inner(uint8_t pen, uint32_t *dest)
 			// apply colour emphasis (does it really exist here?) (we calculate values for it when building the palette lookup)
 			palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 7);
 
-			uint32_t pix;
-			pix = m_vtpens[palval  & 0x7fff];
-			*dest = pix;
+			*dest = pen_color(YUV444_COLOR + (palval & 0x7fff));
 		}
 	}
 	else // old colour compatible mode
 	{
-		uint16_t palval;
-		palval = (m_palette_ram[pen & 0x7f] & 0x3f);
+		uint16_t palval = (m_palette_ram[pen & 0x7f] & 0x3f);
 
 		if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
 			palval &= 0x30;
@@ -512,14 +504,12 @@ void ppu_vt03_device::draw_tile_pixel_inner(uint8_t pen, uint32_t *dest)
 		// apply colour emphasis
 		palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 1);
 
-		uint32_t pix;
-		pix = m_nespens[palval & 0x1ff];
-		*dest = pix;
+		*dest = pen_color(palval & 0x1ff);
 	}
 }
 void ppu_vt03_device::draw_tile_pixel(uint8_t pix, int color, uint32_t back_pen, uint32_t*& dest)
 {
-	int is4bpp = get_201x_reg(0x0) & 0x02;
+	const bool is4bpp = BIT(get_201x_reg(0x0), 1);
 
 	if (!is4bpp)
 	{
