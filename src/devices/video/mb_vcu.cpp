@@ -200,24 +200,24 @@ void mb_vcu_device::device_start()
 
 	for (int i = 0; i < 256; i++)
 	{
-		int r, g, b, bit0, bit1, bit2;
+		int bit0, bit1, bit2;
 
 		/* red component */
 		bit1 = BIT(i, 7);
 		bit0 = BIT(i, 6);
-		r = combine_weights(weights_r, bit0, bit1);
+		const int r = combine_weights(weights_r, bit0, bit1);
 
 		/* green component */
 		bit2 = BIT(i, 5);
 		bit1 = BIT(i, 4);
 		bit0 = BIT(i, 3);
-		g = combine_weights(weights_g, bit0, bit1, bit2);
+		const int g = combine_weights(weights_g, bit0, bit1, bit2);
 
 		/* blue component */
 		bit2 = BIT(i, 2);
 		bit1 = BIT(i, 1);
 		bit0 = BIT(i, 0);
-		b = combine_weights(weights_b, bit0, bit1, bit2);
+		const int b = combine_weights(weights_b, bit0, bit1, bit2);
 
 		set_indirect_color(i, rgb_t(r, g, b));
 	}
