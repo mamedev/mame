@@ -44,9 +44,7 @@ EPR-12028 - 27C256 EPROM
 class sega_ybdcomm_device::context
 {
 public:
-	context(
-			sega_ybdcomm_device &device) :
-	m_device(device),
+	context() :
 	m_acceptor(m_ioctx),
 	m_sock_rx(m_ioctx),
 	m_sock_tx(m_ioctx),
@@ -254,7 +252,6 @@ private:
 				util::string_format(std::forward<Format>(fmt), std::forward<Params>(args)...));
 	}
 
-	sega_ybdcomm_device &m_device;
 	asio::io_context m_ioctx;
 	std::optional<asio::ip::tcp::endpoint> m_localaddr;
 	std::optional<asio::ip::tcp::endpoint> m_remoteaddr;
@@ -388,7 +385,7 @@ void sega_ybdcomm_device::device_start()
 	m_tick_timer = timer_alloc(FUNC(sega_ybdcomm_device::tick_timer), this);
 	m_tick_timer->adjust(attotime::from_hz(600), 0, attotime::from_hz(600));
 
-	auto ctx = std::make_unique<context>(*this);
+	auto ctx = std::make_unique<context>();
 	m_context = std::move(ctx);
 
 	save_item(NAME(m_linkenable));

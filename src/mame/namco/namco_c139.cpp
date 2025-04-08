@@ -73,9 +73,7 @@
 class namco_c139_device::context
 {
 public:
-	context(
-			namco_c139_device &device) :
-	m_device(device),
+	context() :
 	m_acceptor(m_ioctx),
 	m_sock_rx(m_ioctx),
 	m_sock_tx(m_ioctx),
@@ -283,7 +281,6 @@ private:
 				util::string_format(std::forward<Format>(fmt), std::forward<Params>(args)...));
 	}
 
-	namco_c139_device &m_device;
 	asio::io_context m_ioctx;
 	std::optional<asio::ip::tcp::endpoint> m_localaddr;
 	std::optional<asio::ip::tcp::endpoint> m_remoteaddr;
@@ -365,7 +362,7 @@ void namco_c139_device::device_start()
 	m_tick_timer = timer_alloc(FUNC(namco_c139_device::tick_timer_callback), this);
 	m_tick_timer->adjust(attotime::never);
 
-	auto ctx = std::make_unique<context>(*this);
+	auto ctx = std::make_unique<context>();
 	m_context = std::move(ctx);
 
 	// state saving

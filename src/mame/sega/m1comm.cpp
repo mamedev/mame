@@ -70,9 +70,7 @@ Notes:
 class sega_m1comm_device::context
 {
 public:
-	context(
-			sega_m1comm_device &device) :
-	m_device(device),
+	context() :
 	m_acceptor(m_ioctx),
 	m_sock_rx(m_ioctx),
 	m_sock_tx(m_ioctx),
@@ -280,7 +278,6 @@ private:
 				util::string_format(std::forward<Format>(fmt), std::forward<Params>(args)...));
 	}
 
-	sega_m1comm_device &m_device;
 	asio::io_context m_ioctx;
 	std::optional<asio::ip::tcp::endpoint> m_localaddr;
 	std::optional<asio::ip::tcp::endpoint> m_remoteaddr;
@@ -394,7 +391,7 @@ sega_m1comm_device::sega_m1comm_device(const machine_config &mconfig, const char
 void sega_m1comm_device::device_start()
 {
 #ifdef M1COMM_SIMULATION
-	auto ctx = std::make_unique<context>(*this);
+	auto ctx = std::make_unique<context>();
 	m_context = std::move(ctx);
 #endif
 }
