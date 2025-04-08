@@ -42,6 +42,9 @@ protected:
 	void sound_stream_update(sound_stream &stream, const std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
+	// Takes a snapshot of the current voltage into m_v_start and m_t_start.
+	void snapshot();
+
 	sound_stream *m_stream;
 
 	float m_r;
@@ -50,6 +53,7 @@ private:
 	float m_v_start;
 	float m_v_end;
 	attotime m_t_start;
+	attotime m_t_end_approx;
 };
 
 DECLARE_DEVICE_TYPE(VA_RC_EG, va_rc_eg_device)
