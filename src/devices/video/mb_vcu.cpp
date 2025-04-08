@@ -28,6 +28,19 @@ TODO:
 
 #include "video/resnet.h"
 
+#define LOG_PARAMS (1 << 1)
+#define LOG_DRAW   (1 << 2)
+#define LOG_CLEAR  (1 << 3)
+
+#define LOG_ALL (LOG_PARAMS | LOG_DRAW | LOG_CLEAR)
+
+#define VERBOSE (0)
+
+#include "logmacro.h"
+
+#define LOGPARAMS(...)  LOGMASKED(LOG_PARAMS, __VA_ARGS__)
+#define LOGDRAW(...)    LOGMASKED(LOG_DRAW, __VA_ARGS__)
+#define LOGCLEAR(...)   LOGMASKED(LOG_CLEAR, __VA_ARGS__)
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -37,53 +50,33 @@ TODO:
 DEFINE_DEVICE_TYPE(MB_VCU, mb_vcu_device, "mb_vcu", "Mazer Blazer custom VCU")
 
 
-void mb_vcu_device::mb_vcu_vram(address_map &map)
+void mb_vcu_device::vram(address_map &map)
 {
 	if (!has_configured_map(0))
 		map(0x00000, 0x7ffff).ram(); // enough for a 256x256x4 x 2 pages of framebuffer with 4 layers (TODO: doubled for simplicity)
 }
 
 
-void mb_vcu_device::mb_vcu_pal_ram(address_map &map)
+void mb_vcu_device::pal_ram(address_map &map)
 {
 	if (!has_configured_map(1))
 	{
 		map(0x0000, 0x00ff).ram();
 		map(0x0200, 0x02ff).ram();
 		map(0x0400, 0x04ff).ram();
-		map(0x0600, 0x06ff).rw(FUNC(mb_vcu_device::mb_vcu_paletteram_r), FUNC(mb_vcu_device::mb_vcu_paletteram_w));
+		map(0x0600, 0x06ff).rw(FUNC(mb_vcu_device::paletteram_r), FUNC(mb_vcu_device::paletteram_w));
 	}
 }
 
-uint8_t mb_vcu_device::mb_vcu_paletteram_r(offs_t offset)
+uint8_t mb_vcu_device::paletteram_r(offs_t offset)
 {
 	return m_palram[offset];
 }
 
-void mb_vcu_device::mb_vcu_paletteram_w(offs_t offset, uint8_t data)
+void mb_vcu_device::paletteram_w(offs_t offset, uint8_t data)
 {
-	int r,g,b, bit0, bit1, bit2;
-
 	m_palram[offset] = data;
-
-	/* red component */
-	bit1 = (m_palram[offset] >> 7) & 0x01;
-	bit0 = (m_palram[offset] >> 6) & 0x01;
-	r = combine_weights(m_weights_r, bit0, bit1);
-
-	/* green component */
-	bit2 = (m_palram[offset] >> 5) & 0x01;
-	bit1 = (m_palram[offset] >> 4) & 0x01;
-	bit0 = (m_palram[offset] >> 3) & 0x01;
-	g = combine_weights(m_weights_g, bit0, bit1, bit2);
-
-	/* blue component */
-	bit2 = (m_palram[offset] >> 2) & 0x01;
-	bit1 = (m_palram[offset] >> 1) & 0x01;
-	bit0 = (m_palram[offset] >> 0) & 0x01;
-	b = combine_weights(m_weights_b, bit0, bit1, bit2);
-
-	m_palette->set_pen_color(offset, rgb_t(r, g, b));
+	set_pen_indirect(offset, m_palram[offset]);
 }
 
 //-------------------------------------------------
@@ -152,10 +145,23 @@ mb_vcu_device::mb_vcu_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, MB_VCU, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
-	, m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 19, 0, address_map_constructor(FUNC(mb_vcu_device::mb_vcu_vram), this))
-	, m_paletteram_space_config("palram", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(mb_vcu_device::mb_vcu_pal_ram), this))
-	, m_cpu(*this, finder_base::DUMMY_TAG)
-	, m_palette(*this, finder_base::DUMMY_TAG)
+	, device_palette_interface(mconfig, *this)
+	, m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 19, 0, address_map_constructor(FUNC(mb_vcu_device::vram), this))
+	, m_paletteram_space_config("palram", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(mb_vcu_device::pal_ram), this))
+	, m_host_space(*this, finder_base::DUMMY_TAG, 0, 8)
+	, m_status(1)
+	, m_ram(nullptr)
+	, m_palram(nullptr)
+	, m_param_offset_latch(0)
+	, m_xpos(0)
+	, m_ypos(0)
+	, m_color(0)
+	, m_mode(0)
+	, m_pix_xsize(0)
+	, m_pix_ysize(0)
+	, m_vregs{0}
+	, m_bk_color(0)
+	, m_vbank(0)
 {
 }
 
@@ -175,19 +181,45 @@ void mb_vcu_device::device_validity_check(validity_checker &valid) const
 
 void mb_vcu_device::device_start()
 {
-	// TODO: m_screen_tag
+	m_host_space->cache(m_memory);
 	m_ram = make_unique_clear<uint8_t[]>(0x800);
 	m_palram = make_unique_clear<uint8_t[]>(0x100);
 
-	{
-		static const int resistances_r[2]  = { 4700, 2200 };
-		static const int resistances_gb[3] = { 10000, 4700, 2200 };
+	// setup palette
+	double weights_r[2]{};
+	double weights_g[3]{};
+	double weights_b[3]{};
 
-		/* just to calculate coefficients for later use */
-		compute_resistor_weights(0, 255,    -1.0,
-				3,  resistances_gb, m_weights_g,    3600,   0,
-				3,  resistances_gb, m_weights_b,    3600,   0,
-				2,  resistances_r,  m_weights_r,    3600,   0);
+	static const int resistances_r[2]  = { 4700, 2200 };
+	static const int resistances_gb[3] = { 10000, 4700, 2200 };
+
+	compute_resistor_weights(0, 255,    -1.0,
+			3,  resistances_gb, weights_g,    3600,   0,
+			3,  resistances_gb, weights_b,    3600,   0,
+			2,  resistances_r,  weights_r,    3600,   0);
+
+	for (int i = 0; i < 256; i++)
+	{
+		int bit0, bit1, bit2;
+
+		/* red component */
+		bit1 = BIT(i, 7);
+		bit0 = BIT(i, 6);
+		const int r = combine_weights(weights_r, bit0, bit1);
+
+		/* green component */
+		bit2 = BIT(i, 5);
+		bit1 = BIT(i, 4);
+		bit0 = BIT(i, 3);
+		const int g = combine_weights(weights_g, bit0, bit1, bit2);
+
+		/* blue component */
+		bit2 = BIT(i, 2);
+		bit1 = BIT(i, 1);
+		bit0 = BIT(i, 0);
+		const int b = combine_weights(weights_b, bit0, bit1, bit2);
+
+		set_indirect_color(i, rgb_t(r, g, b));
 	}
 
 	save_item(NAME(m_status));
@@ -196,17 +228,13 @@ void mb_vcu_device::device_start()
 	save_item(NAME(m_param_offset_latch));
 	save_item(NAME(m_xpos));
 	save_item(NAME(m_ypos));
-	save_item(NAME(m_color1));
-	save_item(NAME(m_color2));
+	save_item(NAME(m_color));
 	save_item(NAME(m_mode));
 	save_item(NAME(m_pix_xsize));
 	save_item(NAME(m_pix_ysize));
 	save_item(NAME(m_vregs));
 	save_item(NAME(m_bk_color));
 	save_item(NAME(m_vbank));
-	save_item(NAME(m_weights_r));
-	save_item(NAME(m_weights_g));
-	save_item(NAME(m_weights_b));
 }
 
 
@@ -218,9 +246,9 @@ void mb_vcu_device::device_reset()
 {
 	m_status = 1;
 
-	for(int i=0;i<0x80000;i++)
+	for (int i = 0; i < 0x80000; i++)
 	{
-		write_byte(i,0x0f);
+		write_byte(i, 0x0f);
 	}
 }
 
@@ -228,7 +256,11 @@ void mb_vcu_device::device_reset()
 //**************************************************************************
 //  READ/WRITE HANDLERS
 //**************************************************************************
-//  uint8_t *pcg = memregion("sub2")->base();
+
+static inline uint32_t get_vram_addr(uint8_t x, uint8_t y, uint8_t layer, uint8_t bank)
+{
+	return x | (y << 8) | (layer << 16) | (bank << 18);
+}
 
 uint8_t mb_vcu_device::read_ram(offs_t offset)
 {
@@ -248,136 +280,110 @@ void mb_vcu_device::write_vregs(offs_t offset, uint8_t data)
 /* latches RAM offset to send to params */
 uint8_t mb_vcu_device::load_params(offs_t offset)
 {
-	m_param_offset_latch = offset;
-
-	m_xpos      = m_ram[m_param_offset_latch + 1] | (m_ram[m_param_offset_latch + 2]<<8);
-	m_ypos      = m_ram[m_param_offset_latch + 3] | (m_ram[m_param_offset_latch + 4]<<8);
-	m_color1    = m_ram[m_param_offset_latch + 5];
-	m_color2    = m_ram[m_param_offset_latch + 6];
-	m_mode      = m_ram[m_param_offset_latch + 7];
-	m_pix_xsize = m_ram[m_param_offset_latch + 8] + 1;
-	m_pix_ysize = m_ram[m_param_offset_latch + 9] + 1;
-
-	if(0)
+	if (!machine().side_effects_disabled())
 	{
-		printf("[0] %02x ",m_ram[m_param_offset_latch]);
-		printf("X: %04x ",m_xpos);
-		printf("Y: %04x ",m_ypos);
-		printf("C1:%02x ",m_color1);
-		printf("C2:%02x ",m_color2);
-		printf("M :%02x ",m_mode);
-		printf("XS:%02x ",m_pix_xsize);
-		printf("YS:%02x ",m_pix_ysize);
-		printf("\n");
-	}
+		m_param_offset_latch = offset;
 
+		m_xpos      = m_ram[m_param_offset_latch + 1] | (m_ram[m_param_offset_latch + 2] << 8);
+		m_ypos      = m_ram[m_param_offset_latch + 3] | (m_ram[m_param_offset_latch + 4] << 8);
+		m_color     = m_ram[m_param_offset_latch + 5] | (m_ram[m_param_offset_latch + 6] << 8);
+		m_mode      = m_ram[m_param_offset_latch + 7];
+		m_pix_xsize = m_ram[m_param_offset_latch + 8] + 1;
+		m_pix_ysize = m_ram[m_param_offset_latch + 9] + 1;
+
+		LOGPARAMS("[0] %02x ", m_ram[m_param_offset_latch]);
+		LOGPARAMS("X: %04x ", m_xpos);
+		LOGPARAMS("Y: %04x ", m_ypos);
+		LOGPARAMS("C :%04x ", m_color);
+		LOGPARAMS("M :%02x ", m_mode);
+		LOGPARAMS("XS:%02x ", m_pix_xsize);
+		LOGPARAMS("YS:%02x ", m_pix_ysize);
+		LOGPARAMS("\n");
+	}
 	return 0; // open bus?
 }
 
 uint8_t mb_vcu_device::load_gfx(offs_t offset)
 {
-	int xi,yi;
-	int dstx,dsty;
-	uint8_t dot;
-	int bits = 0;
-	uint8_t pen = 0;
-	uint8_t cur_layer;
-	uint8_t opaque_pen;
-
-//  printf("%02x %02x\n",m_mode >> 2,m_mode & 3);
-
-//  cur_layer = (m_mode & 0x3);
-	cur_layer = (m_mode & 2) >> 1;
-	opaque_pen = (cur_layer == 1);
-
-	switch(m_mode >> 2)
+	if (!machine().side_effects_disabled())
 	{
-		case 0x00: // 4bpp
-			for(yi=0;yi<m_pix_ysize;yi++)
-			{
-				for(xi=0;xi<m_pix_xsize;xi++)
+		int bits = 0;
+
+		LOGDRAW("%02x %02x\n", m_mode >> 2, m_mode & 3);
+
+		// const uint8_t cur_layer = (m_mode & 0x3);
+		const uint8_t cur_layer = BIT(m_mode, 1);
+		const uint8_t opaque_pen = (cur_layer == 1);
+
+		switch (m_mode >> 2)
+		{
+			case 0x00: // 4bpp
+				for (int yi = 0; yi < m_pix_ysize; yi++)
 				{
-					dstx = (m_xpos + xi);
-					dsty = (m_ypos + yi);
-
-					if(dstx >= 0 && dsty >= 0 && dstx < 256 && dsty < 256)
+					for (int xi = 0; xi < m_pix_xsize; xi++)
 					{
-						dot = m_cpu->space(AS_PROGRAM).read_byte(((offset + (bits >> 3)) & 0x1fff) + 0x4000) >> (4-(bits & 7));
-						dot&= 0xf;
+						const int dstx = (m_xpos + xi);
+						const int dsty = (m_ypos + yi);
 
-
-						if(dot != 0xf || opaque_pen)
-							write_byte(dstx|dsty<<8|cur_layer<<16|m_vbank<<18, dot);
-					}
-					bits += 4;
-				}
-			}
-			break;
-
-		case 0x02: // 1bpp
-			for(yi=0;yi<m_pix_ysize;yi++)
-			{
-				for(xi=0;xi<m_pix_xsize;xi++)
-				{
-					dstx = (m_xpos + xi);
-					dsty = (m_ypos + yi);
-
-					if(dstx >= 0 && dsty >= 0 && dstx < 256 && dsty < 256)
-					{
-						dot = m_cpu->space(AS_PROGRAM).read_byte(((offset + (bits >> 3)) & 0x1fff) + 0x4000) >> (7-(bits & 7));
-						dot&= 1;
-
-						pen = dot ? (m_color1 >> 4) : (m_color1 & 0xf);
-
-						if(pen != 0xf || opaque_pen)
-							write_byte(dstx|dsty<<8|cur_layer<<16|m_vbank<<18, pen);
-					}
-					bits++;
-				}
-			}
-			break;
-		case 0x03: //2bpp
-			for (yi = 0; yi < m_pix_ysize; yi++)
-			{
-				for (xi = 0; xi < m_pix_xsize; xi++)
-				{
-					dstx = (m_xpos + xi);
-					dsty = (m_ypos + yi);
-
-					if(dstx >= 0 && dsty >= 0 && dstx < 256 && dsty < 256)
-					{
-						dot = m_cpu->space(AS_PROGRAM).read_byte(((offset + (bits >> 3)) & 0x1fff) + 0x4000) >> (6-(bits & 7));
-
-						switch(dot & 3)
+						if (dstx >= 0 && dsty >= 0 && dstx < 256 && dsty < 256)
 						{
-							case 0:
-								pen = m_color1 & 0xf;
-								break;
-							case 1:
-								pen = m_color1 >> 4;
-								break;
-							case 2:
-								pen = m_color2 & 0xf;
-								break;
-							case 3:
-								pen = m_color2 >> 4;
-								break;
+							const uint8_t dot = (m_memory.read_byte(((offset + (bits >> 3)) & 0x1fff) + 0x4000) >> (4 - (bits & 7))) & 0xf;
+
+							if (dot != 0xf || opaque_pen)
+								write_byte(get_vram_addr(dstx, dsty, cur_layer, m_vbank), dot);
+						}
+						bits += 4;
+					}
+				}
+				break;
+
+			case 0x02: // 1bpp
+				for (int yi = 0; yi < m_pix_ysize; yi++)
+				{
+					for (int xi = 0; xi < m_pix_xsize; xi++)
+					{
+						const int dstx = (m_xpos + xi);
+						const int dsty = (m_ypos + yi);
+
+						if (dstx >= 0 && dsty >= 0 && dstx < 256 && dsty < 256)
+						{
+							const uint8_t dot = (m_memory.read_byte(((offset + (bits >> 3)) & 0x1fff) + 0x4000) >> (7 - (bits & 7))) & 1;
+							const uint8_t pen = (m_color >> (dot << 2)) & 0xf;
+
+							if (pen != 0xf || opaque_pen)
+								write_byte(get_vram_addr(dstx, dsty, cur_layer, m_vbank), pen);
+						}
+						bits++;
+					}
+				}
+				break;
+			case 0x03: //2bpp
+				for (int yi = 0; yi < m_pix_ysize; yi++)
+				{
+					for (int xi = 0; xi < m_pix_xsize; xi++)
+					{
+						const int dstx = (m_xpos + xi);
+						const int dsty = (m_ypos + yi);
+
+						if (dstx >= 0 && dsty >= 0 && dstx < 256 && dsty < 256)
+						{
+							const uint8_t dot = (m_memory.read_byte(((offset + (bits >> 3)) & 0x1fff) + 0x4000) >> (6 - (bits & 7))) & 3;
+							const uint8_t pen = (m_color >> (dot << 2)) & 0xf;
+
+							if (pen != 0xf || opaque_pen)
+								write_byte(get_vram_addr(dstx, dsty, cur_layer, m_vbank), pen);
 						}
 
-						if(pen != 0xf || opaque_pen)
-							write_byte(dstx|dsty<<8|cur_layer<<16|m_vbank<<18, pen);
+						bits += 2;
 					}
-
-					bits+=2;
 				}
-			}
-			break;
+				break;
 
-		default:
-			popmessage("Unsupported draw mode");
-			break;
+			default:
+				popmessage("Unsupported draw mode");
+				break;
+		}
 	}
-
 	return 0; // open bus?
 }
 
@@ -391,109 +397,89 @@ Read-Modify-Write operations
 */
 uint8_t mb_vcu_device::load_set_clr(offs_t offset)
 {
-	int xi,yi;
-	int dstx,dsty;
-//  uint8_t dot;
-
-	switch(m_mode)
+	if (!machine().side_effects_disabled())
 	{
-		case 0x13:
+		//uint8_t dot;
+
+		switch (m_mode)
 		{
-			//int16_t srcx = m_ram[m_param_offset_latch + 1];
-			//int16_t srcy = m_ram[m_param_offset_latch + 3];
-			//uint16_t src_xsize = m_ram[m_param_offset_latch + 18] + 1;
-			//uint16_t src_ysize = m_ram[m_param_offset_latch + 19] + 1;
-			int collision_flag = 0;
-
-			for (yi = 0; yi < m_pix_ysize; yi++)
+			case 0x13:
 			{
-				for (xi = 0; xi < m_pix_xsize; xi++)
-				{
-					dstx = (m_xpos + xi);
-					dsty = (m_ypos + yi);
+				//int16_t srcx = m_ram[m_param_offset_latch + 1];
+				//int16_t srcy = m_ram[m_param_offset_latch + 3];
+				//uint16_t src_xsize = m_ram[m_param_offset_latch + 18] + 1;
+				//uint16_t src_ysize = m_ram[m_param_offset_latch + 19] + 1;
+				int collision_flag = 0;
 
-					if(dstx < 256 && dsty < 256)
+				for (int yi = 0; yi < m_pix_ysize; yi++)
+				{
+					for (int xi = 0; xi < m_pix_xsize; xi++)
 					{
-						uint8_t res = read_byte(dstx|dsty<<8|0<<16|(m_vbank)<<18);
-						//uint8_t res2 = read_byte(srcx|srcy<<8|0<<16|(m_vbank)<<18);
+						const int dstx = (m_xpos + xi);
+						const int dsty = (m_ypos + yi);
 
-						//printf("%02x %02x\n",res,res2);
-
-						// TODO: how it calculates the pen? Might use the commented out stuff and/or the offset somehow
-						if(res == 5)
+						if (dstx >= 0 && dsty >= 0 && dstx < 256 && dsty < 256)
 						{
-							collision_flag++;
-//                          test++;
+							const uint8_t res = read_byte(get_vram_addr(dstx, dsty, 0, m_vbank));
+							//uint8_t res2 = read_byte(srcx|srcy<<8|0<<16|(m_vbank)<<18);
+
+							//LOG_CLEAR("%02x %02x\n",res,res2);
+
+							// TODO: how it calculates the pen? Might use the commented out stuff and/or the offset somehow
+							if (res == 5)
+							{
+								collision_flag++;
+	//                          test++;
+							}
 						}
+
+						//srcx++;
 					}
-
-					//srcx++;
+					//srcy++;
 				}
-				//srcy++;
+
+				// threshold for collision, necessary to avoid bogus collision hits
+				// the typical test scenario is to shoot near the top left hatch for stage 1 then keep shooting,
+				// at some point the top right hatch will bogusly detect a collision without this.
+				// It's also unlikely that game tests 1x1 targets anyway, as the faster moving targets are quite too easy to hit that way.
+				// TODO: likely it works differently (checks area?)
+				if (collision_flag > 5)
+					m_ram[m_param_offset_latch] |= 8;
+				else
+					m_ram[m_param_offset_latch] &= ~8;
+				break;
 			}
 
-			// threshold for collision, necessary to avoid bogus collision hits
-			// the typical test scenario is to shoot near the top left hatch for stage 1 then keep shooting,
-			// at some point the top right hatch will bogusly detect a collision without this.
-			// It's also unlikely that game tests 1x1 targets anyway, as the faster moving targets are quite too easy to hit that way.
-			// TODO: likely it works differently (checks area?)
-			if(collision_flag > 5)
-				m_ram[m_param_offset_latch] |= 8;
-			else
-				m_ram[m_param_offset_latch] &= ~8;
-			break;
-		}
-
-		case 0x03:
-		{
-			for (yi = 0; yi < m_pix_ysize; yi++)
+			case 0x03:
 			{
-				for (xi = 0; xi < m_pix_xsize; xi++)
+				for (int yi = 0; yi < m_pix_ysize; yi++)
 				{
-					dstx = (m_xpos + xi);
-					dsty = (m_ypos + yi);
+					for (int xi = 0; xi < m_pix_xsize; xi++)
+					{
+						const int dstx = (m_xpos + xi);
+						const int dsty = (m_ypos + yi);
 
-					if(dstx < 256 && dsty < 256)
-						write_byte(dstx|dsty<<8|0<<16|(m_vbank)<<18, 0xf);
+						if (dstx >= 0 && dsty >= 0 && dstx < 256 && dsty < 256)
+							write_byte(get_vram_addr(dstx, dsty, 0, m_vbank), 0xf);
+					}
 				}
+				break;
 			}
-			break;
+
+			case 0x07:
+				for (int i = 0; i < m_pix_xsize; i++)
+					write_io(i + (m_ypos << 8), m_ram[offset + i]);
+
+				break;
 		}
-
-		case 0x07:
-			for(int i=0;i<m_pix_xsize;i++)
-				write_io(i+(m_ypos<<8),m_ram[offset + i]);
-
-			break;
 	}
-
 	return 0; // open bus?
 }
 
 void mb_vcu_device::background_color_w(uint8_t data)
 {
-	int bit0,bit1,bit2;
-	int r,g,b;
 	m_bk_color = data;
-
-	/* red component */
-	bit1 = (m_bk_color >> 7) & 0x01;
-	bit0 = (m_bk_color >> 6) & 0x01;
-	r = combine_weights(m_weights_r, bit0, bit1);
-
-	/* green component */
-	bit2 = (m_bk_color >> 5) & 0x01;
-	bit1 = (m_bk_color >> 4) & 0x01;
-	bit0 = (m_bk_color >> 3) & 0x01;
-	g = combine_weights(m_weights_g, bit0, bit1, bit2);
-
-	/* blue component */
-	bit2 = (m_bk_color >> 2) & 0x01;
-	bit1 = (m_bk_color >> 1) & 0x01;
-	bit0 = (m_bk_color >> 0) & 0x01;
-	b = combine_weights(m_weights_b, bit0, bit1, bit2);
-
-	m_palette->set_pen_color(0x100, rgb_t(r, g, b));
+	set_pen_indirect(0x100, m_bk_color);
 }
 
 uint8_t mb_vcu_device::status_r()
@@ -506,18 +492,18 @@ uint8_t mb_vcu_device::status_r()
 
 void mb_vcu_device::vbank_w(uint8_t data)
 {
-	m_vbank = (data & 0x40) >> 6;
+	m_vbank = BIT(data, 6);
 }
 
 void mb_vcu_device::vbank_clear_w(uint8_t data)
 {
-	m_vbank = (data & 0x40) >> 6;
+	vbank_w(data & 0x40);
 
 	// setting vbank clears VRAM in the setted bank, applies to Great Guns only since it never ever access the RMW stuff
-	for(int i=0;i<0x10000;i++)
+	for (int i = 0; i < 0x10000; i++)
 	{
-		write_byte(i|0x00000|m_vbank<<18,0x0f);
-		write_byte(i|0x10000|m_vbank<<18,0x0f);
+		write_byte(i | 0x00000 | (m_vbank << 18), 0x0f);
+		write_byte(i | 0x10000 | (m_vbank << 18), 0x0f);
 	}
 }
 
@@ -527,48 +513,37 @@ void mb_vcu_device::vbank_clear_w(uint8_t data)
 
 uint32_t mb_vcu_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(m_palette->pen(0x100),cliprect);
+	bitmap.fill(pen(0x100), cliprect);
 
-	for(int y=0;y<256;y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		for(int x=0;x<256;x++)
+		uint32_t *const dst = &bitmap.pix(y);
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
-			uint8_t dot = read_byte((x >> 0)|(y<<8)|1<<16|(m_vbank ^ 1)<<18);
-			//if(dot != 0xf)
-			{
-				dot|= m_vregs[1] << 4;
+			const uint8_t dot[2] = {read_byte(get_vram_addr(x, y, 0, m_vbank ^ 1)), read_byte(get_vram_addr(x, y, 1, m_vbank ^ 1))};
+			uint8_t dot_sel = uint8_t(~0);
 
-				bitmap.pix(y,x) = m_palette->pen(dot);
-			}
-		}
-	}
+			if (dot[0] != 0xf)
+				dot_sel = 0;
+			else/* if (dot[1] != 0xf) */
+				dot_sel = 1;
 
-	for(int y=0;y<256;y++)
-	{
-		for(int x=0;x<256;x++)
-		{
-			uint8_t dot = read_byte((x >> 0)|(y<<8)|0<<16|(m_vbank ^ 1)<<18);
-
-			if(dot != 0xf)
-			{
-				dot|= m_vregs[1] << 4;
-
-				bitmap.pix(y,x) = m_palette->pen(dot);
-			}
+			if (dot_sel <= 1)
+				dst[x] = pen(dot[dot_sel] | (m_vregs[1] << 4));
 		}
 	}
 
 	return 0;
 }
 
-void mb_vcu_device::screen_eof(void)
+void mb_vcu_device::screen_eof()
 {
 	#if 0
-	for(int i=0;i<0x10000;i++)
+	for (int i = 0; i < 0x10000; i++)
 	{
-		write_byte(i|0x00000|m_vbank<<18,0x0f);
-		//write_byte(i|0x10000|m_vbank<<18,0x0f);
-		//write_byte(i|0x30000|m_vbank<<18,0x0f);
+		write_byte(i | 0x00000 | m_vbank << 18, 0x0f);
+		//write_byte(i | 0x10000 | m_vbank << 18, 0x0f);
+		//write_byte(i | 0x30000 | m_vbank << 18, 0x0f);
 	}
 	#endif
 }
