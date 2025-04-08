@@ -9,6 +9,7 @@
  *   Partially based on information out of Z80Em by Marcel De Kogel
  *
  *   TODO:
+ *   - not sure if 8085 DSUB H flag is correct
  *   - accurate 8085 undocumented V/K flags
  *   - most of those is_8085 can probably be done better, like function overrides
  *
