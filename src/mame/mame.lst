@@ -20656,9 +20656,9 @@ xyddz
 
 @source:igs/igspoker.cpp
 chleague
-chleagul
-chleagxa
-chleagxb
+chleaguel
+chleaguexa
+chleaguexb
 citalcup
 cpoker
 cpokerpk
@@ -20676,7 +20676,7 @@ igs_ncs2
 igstet341
 igstet342
 number10
-numbr10l
+number10l
 pktet346
 stellecu
 
@@ -31395,9 +31395,13 @@ megaphx
 yoyospel
 
 @source:misc/menghong.cpp
-crzyddz2
+fkddz2
+jpddz
+jpddza
+jzst
 menghong
 menghonga
+sandayi
 
 @source:misc/meyc8080.cpp
 casbjack
@@ -42556,6 +42560,9 @@ basf7120
 @source:skeleton/bert.cpp
 bert
 
+@source:skeleton/biorhythm.cpp
+biorhthm
+
 @source:skeleton/bitgraph.cpp
 bitgrpha
 bitgrphb
@@ -44051,6 +44058,9 @@ anoworld
 
 @source:sunwise/jankenmn.cpp
 jankenmn
+
+@source:sunwise/jankmg2.cpp
+jankmg2
 
 @source:svi/svi318.cpp
 svi318

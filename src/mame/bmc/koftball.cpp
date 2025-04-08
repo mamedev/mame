@@ -12,7 +12,7 @@ TODO:
   accesses are similar;
 - probably jxzh also supports the mahjong keyboard. Check if one of the dips enable it and where it
   is read;
-- better understanding of the koftball protection;
+- better understanding of the koftball protection.
 
 --
 
@@ -432,7 +432,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( jxzh )
 	PORT_START("INPUTS")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("unknown1") PORT_CODE(KEYCODE_A) // TODO: read in test mode, check the meaning shown there
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
@@ -441,7 +441,7 @@ static INPUT_PORTS_START( jxzh )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
 
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_MAHJONG_BET )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("unknown2") PORT_CODE(KEYCODE_S) // TODO: read in test mode, check the meaning shown there
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("hopper switch") PORT_CODE(KEYCODE_H)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 	PORT_SERVICE_NO_TOGGLE( 0x1000, IP_ACTIVE_LOW )
