@@ -5,6 +5,9 @@
 #include "va_eg.h"
 #include "machine/rescap.h"
 
+// The envelope is considered completed after this many time constants.
+static constexpr const float TIME_CONSTANTS_TO_END = 10;
+
 DEFINE_DEVICE_TYPE(VA_RC_EG, va_rc_eg_device, "va_rc_eg", "RC-based Envelope Generator")
 
 va_rc_eg_device::va_rc_eg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -28,7 +31,7 @@ va_rc_eg_device &va_rc_eg_device::set_r(float r)
 	if (m_stream != nullptr)
 		m_stream->update();
 
-	set_target_v(m_v_end);  // Snapshots voltage, using the old `r` value.
+	snapshot();  // Snapshots voltage using the old `r` value.
 	m_r = r;
 	m_rc_inv = 1.0F / (m_r * m_c);
 	return *this;
@@ -42,7 +45,7 @@ va_rc_eg_device &va_rc_eg_device::set_c(float c)
 	if (m_stream != nullptr)
 		m_stream->update();
 
-	set_target_v(m_v_end);  // Snapshots voltage, using the old `c` value.
+	snapshot();  // Snapshots voltage using the old `c` value.
 	m_c = c;
 	m_rc_inv = 1.0F / (m_r * m_c);
 	return *this;
@@ -55,19 +58,8 @@ va_rc_eg_device &va_rc_eg_device::set_target_v(float v)
 	if (m_stream != nullptr)
 		m_stream->update();
 
-	if (has_running_machine())
-	{
-		const attotime now = machine().time();
-		m_v_start = get_v(now);
-		m_v_end = v;
-		m_t_start = now;
-	}
-	else
-	{
-		m_v_start = 0;
-		m_v_end = v;
-		m_t_start = attotime::zero;
-	}
+	snapshot();
+	m_v_end = v;
 	return *this;
 }
 
@@ -79,6 +71,7 @@ va_rc_eg_device &va_rc_eg_device::set_instant_v(float v)
 	m_v_start = v;
 	m_v_end = v;
 	m_t_start = has_running_machine() ? machine().time() : attotime::zero;
+	m_t_end_approx = m_t_start;
 	return *this;
 }
 
@@ -103,19 +96,16 @@ void va_rc_eg_device::device_start()
 	save_item(NAME(m_v_start));
 	save_item(NAME(m_v_end));
 	save_item(NAME(m_t_start));
+	save_item(NAME(m_t_end_approx));
 }
 
 void va_rc_eg_device::sound_stream_update(sound_stream &stream, const std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs)
 {
-	// The envelope stage will be considered done once the voltage reaches
-	// within MIN_DELTA of the target.
-	static constexpr const float MIN_DELTA = 0.0001F;
-
 	assert(inputs.size() == 0 && outputs.size() == 1);
 	write_stream_view &out = outputs[0];
 	attotime t = out.start_time();
 
-	if (fabsf(get_v(t) - m_v_end) < MIN_DELTA)
+	if (t >= m_t_end_approx)
 	{
 		// Avoid expensive get_v() calls if the envelope stage has completed.
 		out.fill(m_v_end);
@@ -126,4 +116,20 @@ void va_rc_eg_device::sound_stream_update(sound_stream &stream, const std::vecto
 	const attotime dt = out.sample_period();
 	for (int i = 0; i < n; ++i, t += dt)
 		out.put(i, get_v(t));
+}
+
+void va_rc_eg_device::snapshot()
+{
+	if (has_running_machine())
+	{
+		const attotime now = machine().time();
+		m_v_start = get_v(now);
+		m_t_start = now;
+	}
+	else
+	{
+		m_v_start = 0;
+		m_t_start = attotime::zero;
+	}
+	m_t_end_approx = m_t_start + attotime::from_double(TIME_CONSTANTS_TO_END * m_r * m_c);
 }
