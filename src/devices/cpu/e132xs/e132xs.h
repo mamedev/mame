@@ -110,6 +110,15 @@ class hyperstone_device : public cpu_device, public hyperstone_disassembler::con
 	friend class e132xs_frontend;
 
 public:
+	// input line numbers
+	static inline constexpr int INPUT_INT1 = 0;
+	static inline constexpr int INPUT_INT2 = 1;
+	static inline constexpr int INPUT_INT3 = 2;
+	static inline constexpr int INPUT_INT4 = 3;
+	static inline constexpr int INPUT_IO1 = 4;
+	static inline constexpr int INPUT_IO2 = 5;
+	static inline constexpr int INPUT_IO3 = 6;
+
 	// configuration
 	void set_single_instruction_mode(bool val) { m_single_instruction_mode = val; }
 
@@ -602,6 +611,9 @@ private:
 
 class hyperstone_x_device : public hyperstone_device
 {
+public:
+	static inline constexpr int INPUT_WAIT = INPUT_INT3;
+
 protected:
 	static inline constexpr int AS_INTERNAL = AS_OPCODES + 1;
 

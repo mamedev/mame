@@ -590,15 +590,21 @@ void device_execute_interface::pulse_input_line(int irqline, const attotime &dur
 		if (irqline != INPUT_LINE_RESET && !input_edge_triggered(irqline))
 			throw emu_fatalerror("device '%s': zero-width pulse is not allowed for input line %d\n", device().tag(), irqline);
 
-		set_input_line(irqline, ASSERT_LINE);
-		set_input_line(irqline, CLEAR_LINE);
+		if (m_pulse_end_timers[irqline]->remaining() == attotime::zero)
+		{
+			set_input_line(irqline, ASSERT_LINE);
+			set_input_line(irqline, CLEAR_LINE);
+		}
 	}
 	else
 	{
-		set_input_line(irqline, ASSERT_LINE);
+		const attotime target_time = local_time() + duration;
+		if (target_time > m_pulse_end_timers[irqline]->expire())
+		{
+			set_input_line(irqline, ASSERT_LINE);
 
-		attotime target_time = local_time() + duration;
-		m_pulse_end_timers[irqline]->adjust(target_time - m_scheduler->time(), irqline);
+			m_pulse_end_timers[irqline]->adjust(target_time - m_scheduler->time(), irqline);
+		}
 	}
 }
 

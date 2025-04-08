@@ -2019,7 +2019,7 @@ void hyperstone_device::execute_set_input(int inputnum, int state)
 					m_core->powerdown = 0;
 				}
 
-				if ((inputnum == 6) && ((FCR & 0x00000500) == 0x00000400))
+				if ((inputnum == INPUT_IO3) && ((FCR & 0x00000500) == 0x00000400))
 				{
 					if (m_core->powerdown)
 						LOG("exiting power down for IO3\n", inputnum + 1);
