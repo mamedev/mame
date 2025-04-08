@@ -85,7 +85,7 @@ void ppu2c0x_device::device_config_complete()
 	m_latch.set(nullptr);
 }
 
-ppu2c0x_device::ppu2c0x_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, u32 clock, address_map_constructor internal_map) :
+ppu2c0x_device::ppu2c0x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor internal_map) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
@@ -117,7 +117,7 @@ ppu2c0x_device::ppu2c0x_device(const machine_config& mconfig, device_type type, 
 	m_scan_scale(1), // set the scan scale (this is for dual monitor vertical setups)
 	m_draw_phase(0)
 {
-	for (auto& elem : m_regs)
+	for (auto &elem : m_regs)
 		elem = 0;
 
 	m_scanlines_per_frame = NTSC_SCANLINES_PER_FRAME;
@@ -127,45 +127,45 @@ ppu2c0x_device::ppu2c0x_device(const machine_config& mconfig, device_type type, 
 	m_security_value = 0;
 }
 
-ppu2c0x_device::ppu2c0x_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, u32 clock) :
+ppu2c0x_device::ppu2c0x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	ppu2c0x_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(ppu2c0x_device::ppu2c0x), this))
 {
 	m_paletteram_in_ppuspace = true;
 }
 
-ppu2c0x_rgb_device::ppu2c0x_rgb_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, u32 clock) :
+ppu2c0x_rgb_device::ppu2c0x_rgb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	ppu2c0x_device(mconfig, type, tag, owner, clock),
 	m_palette_data(*this, "palette")
 {
 }
 
 // NTSC NES
-ppu2c02_device::ppu2c02_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
+ppu2c02_device::ppu2c02_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	ppu2c0x_device(mconfig, PPU_2C02, tag, owner, clock)
 {
 }
 
 // Playchoice 10
-ppu2c03b_device::ppu2c03b_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
+ppu2c03b_device::ppu2c03b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	ppu2c0x_rgb_device(mconfig, PPU_2C03B, tag, owner, clock)
 {
 }
 
 // Vs. Unisystem
-ppu2c04_device::ppu2c04_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
+ppu2c04_device::ppu2c04_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	ppu2c0x_rgb_device(mconfig, PPU_2C04, tag, owner, clock)
 {
 }
 
 // PAL NES
-ppu2c07_device::ppu2c07_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
+ppu2c07_device::ppu2c07_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	ppu2c0x_device(mconfig, PPU_2C07, tag, owner, clock)
 {
 	m_scanlines_per_frame = PAL_SCANLINES_PER_FRAME;
 }
 
 // PAL clones
-ppupalc_device::ppupalc_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
+ppupalc_device::ppupalc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	ppu2c0x_device(mconfig, PPU_PALC, tag, owner, clock)
 {
 	m_scanlines_per_frame = PAL_SCANLINES_PER_FRAME;
@@ -174,32 +174,32 @@ ppupalc_device::ppupalc_device(const machine_config& mconfig, const char* tag, d
 
 // The PPU_2C05 variants have different protection value, set at device start, but otherwise are all the same...
 // Vs. Unisystem (Ninja Jajamaru Kun)
-ppu2c05_01_device::ppu2c05_01_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
+ppu2c05_01_device::ppu2c05_01_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	ppu2c0x_rgb_device(mconfig, PPU_2C05_01, tag, owner, clock)
 {
 	m_security_value = 0x1b;    // game (jajamaru) doesn't seem to ever actually check it
 }
 // Vs. Unisystem (Mighty Bomb Jack)
-ppu2c05_02_device::ppu2c05_02_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
+ppu2c05_02_device::ppu2c05_02_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	ppu2c0x_rgb_device(mconfig, PPU_2C05_02, tag, owner, clock)
 {
 	m_security_value = 0x3d;
 }
 // Vs. Unisystem (Gumshoe)
-ppu2c05_03_device::ppu2c05_03_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
+ppu2c05_03_device::ppu2c05_03_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	ppu2c0x_rgb_device(mconfig, PPU_2C05_03, tag, owner, clock)
 {
 	m_security_value = 0x1c;
 }
 // Vs. Unisystem (Top Gun)
-ppu2c05_04_device::ppu2c05_04_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
+ppu2c05_04_device::ppu2c05_04_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	ppu2c0x_rgb_device(mconfig, PPU_2C05_04, tag, owner, clock)
 {
 	m_security_value = 0x1b;
 }
 
 // Vs. Unisystem (Super Mario Bros. bootlegs)
-ppu2c04_clone_device::ppu2c04_clone_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
+ppu2c04_clone_device::ppu2c04_clone_device(const machine_config &mconfig, const char *tag, device_t* owner, u32 clock) :
 	ppu2c0x_device(mconfig, PPU_2C04C, tag, owner, clock),
 	m_palette_data(*this, "palette")
 {
@@ -734,7 +734,7 @@ void ppu2c0x_device::read_sprite_plane_data(int address)
 	m_planebuf[1] = readbyte((address + 8) & 0x1fff);
 }
 
-void ppu2c0x_device::make_sprite_pixel_data(u8& pixel_data, bool flipx)
+void ppu2c0x_device::make_sprite_pixel_data(u8 &pixel_data, bool flipx)
 {
 	if (flipx)
 	{
@@ -750,7 +750,7 @@ void ppu2c0x_device::make_sprite_pixel_data(u8& pixel_data, bool flipx)
 	}
 }
 
-void ppu2c0x_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, u8 pixel_data, bitmap_rgb32& bitmap)
+void ppu2c0x_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, u8 pixel_data, bitmap_rgb32 &bitmap)
 {
 	const u16 palval = m_palette_ram[((4 * color) | pixel_data) & 0x1f];
 	bitmap.pix(m_scanline, sprite_xpos + pixel) = pen_color(apply_grayscale_and_emphasis(palval));
@@ -779,7 +779,7 @@ bool ppu2c0x_device::is_spritepixel_opaque(int pixel_data, int color)
 		return false;
 }
 
-void ppu2c0x_device::draw_sprite_pixel_low(bitmap_rgb32& bitmap, int pixel_data, int pixel, int sprite_xpos, int color, int sprite_index, u8* line_priority)
+void ppu2c0x_device::draw_sprite_pixel_low(bitmap_rgb32 &bitmap, int pixel_data, int pixel, int sprite_xpos, int color, int sprite_index, u8 *line_priority)
 {
 	if (is_spritepixel_opaque(pixel_data, color))
 	{
@@ -801,7 +801,7 @@ void ppu2c0x_device::draw_sprite_pixel_low(bitmap_rgb32& bitmap, int pixel_data,
 		m_regs[PPU_STATUS] |= PPU_STATUS_SPRITE0_HIT;
 }
 
-void ppu2c0x_device::draw_sprite_pixel_high(bitmap_rgb32& bitmap, int pixel_data, int pixel, int sprite_xpos, int color, int sprite_index, u8* line_priority)
+void ppu2c0x_device::draw_sprite_pixel_high(bitmap_rgb32 &bitmap, int pixel_data, int pixel, int sprite_xpos, int color, int sprite_index, u8 *line_priority)
 {
 	if (is_spritepixel_opaque(pixel_data, color))
 	{
@@ -830,7 +830,7 @@ int ppu2c0x_device::apply_sprite_pattern_page(int index1, int size)
 	return index1;
 }
 
-void ppu2c0x_device::draw_sprites(u8* line_priority)
+void ppu2c0x_device::draw_sprites(u8 *line_priority)
 {
 	int sprite_count = 0;
 
