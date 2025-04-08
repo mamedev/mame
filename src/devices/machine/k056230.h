@@ -11,13 +11,12 @@
 
 #pragma once
 
-#include "asio.h"
 
 class k056230_device : public device_t
 {
 public:
 	// construction/destruction
-	k056230_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	k056230_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0U);
 
 	auto irq_cb() { return m_irq_cb.bind(); }
 
@@ -42,16 +41,10 @@ protected:
 	u8 m_status;
 
 private:
-	asio::io_context m_ioctx;
-	std::optional<asio::ip::tcp::endpoint> m_localaddr;
-	std::optional<asio::ip::tcp::endpoint> m_remoteaddr;
-	asio::ip::tcp::acceptor m_acceptor;
-	asio::ip::tcp::socket m_sock_rx;
-	asio::ip::tcp::socket m_sock_tx;
-	asio::steady_timer m_tx_timeout;
-	u8 m_rx_state;
-	u8 m_tx_state;
-	u8 m_buffer0[0x201];
+	class context;
+	std::unique_ptr<context> m_context;
+
+	u8 m_buffer[0x201];
 	u8 m_linkenable;
 	u8 m_linkid;
 	u8 m_txmode;
@@ -59,9 +52,6 @@ private:
 	void set_mode(u8 data);
 	void set_ctrl(u8 data);
 	void comm_tick();
-	void check_sockets();
-	void comm_start();
-	void comm_stop();
 	unsigned read_frame(unsigned data_size);
 	void send_frame(unsigned data_size);
 };

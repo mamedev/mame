@@ -12,6 +12,7 @@
 #pragma once
 
 #include "namcomcu.h"
+#include "namco_c139.h"
 #include "namco_dsp.h"
 
 #include "cpu/m68000/m68020.h"
@@ -28,9 +29,6 @@
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
-
-// prevent compiler errors by including here
-#include "namco_c139.h"
 
 class namcos22_state;
 

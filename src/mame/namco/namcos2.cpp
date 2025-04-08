@@ -1707,7 +1707,7 @@ void namcos2_state::configure_common_standard(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	NAMCO_C139(config, m_sci, 0);
+	NAMCO_C139(config, m_sci, 0U);
 	m_sci->irq_cb().set(FUNC(namcos2_state::sci_int_w));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

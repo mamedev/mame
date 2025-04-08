@@ -1058,7 +1058,7 @@ void polygonet_state::plygonet(machine_config &config)
 	WATCHDOG_TIMER(config, m_watchdog);
 
 	// Networking hardware
-	K056230(config, m_k056230);
+	K056230(config, m_k056230, 0U);
 	m_k056230->irq_cb().set_inputline(m_maincpu, M68K_IRQ_3);
 
 	// Video hardware

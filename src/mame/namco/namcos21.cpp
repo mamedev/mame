@@ -912,7 +912,7 @@ void namcos21_state::winrun(machine_config &config)
 	configure_c148_standard(config);
 	NAMCO_C148(config, m_gpu_intc, 0, "gpu", false);
 
-	NAMCO_C139(config, m_sci, 0);
+	NAMCO_C139(config, m_sci, 0U);
 	m_sci->irq_cb().set(FUNC(namcos21_state::sci_int_w));
 
 	config.set_maximum_quantum(attotime::from_hz(6000)); /* 100 CPU slices per frame */

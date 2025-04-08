@@ -62,8 +62,238 @@
 
 #include "emuopts.h"
 
+#include "asio.h"
+
+#include <iostream>
+
 #define VERBOSE 0
 #include "logmacro.h"
+
+
+class namco_c139_device::context
+{
+public:
+	context(
+			namco_c139_device &device) :
+	m_device(device),
+	m_acceptor(m_ioctx),
+	m_sock_rx(m_ioctx),
+	m_sock_tx(m_ioctx),
+	m_tx_timeout(m_ioctx)
+	{
+	}
+
+	void start(std::string localhost, std::string localport, std::string remotehost, std::string remoteport)
+	{
+		std::error_code err;
+		asio::ip::tcp::resolver resolver(m_ioctx);
+
+		for (auto &&resolveIte : resolver.resolve(localhost, localport, asio::ip::tcp::resolver::flags::address_configured, err))
+		{
+			m_localaddr = resolveIte.endpoint();
+			LOG("C139: localhost = %s\n", *m_localaddr);
+		}
+		if (err)
+		{
+			LOG("C139: localhost resolve error: %s\n", err.message());
+		}
+
+		for (auto &&resolveIte : resolver.resolve(remotehost, remoteport, asio::ip::tcp::resolver::flags::address_configured, err))
+		{
+			m_remoteaddr = resolveIte.endpoint();
+			LOG("C139: remotehost = %s\n", *m_remoteaddr);
+		}
+		if (err)
+		{
+			LOG("C139: remotehost resolve error: %s\n", err.message());
+		}
+	}
+
+	void stop()
+	{
+		std::error_code err;
+		if (m_acceptor.is_open())
+			m_acceptor.close(err);
+		if (m_sock_rx.is_open())
+			m_sock_rx.close(err);
+		if (m_sock_tx.is_open())
+			m_sock_tx.close(err);
+		m_tx_timeout.cancel();
+		m_tx_state = 0;
+		m_rx_state = 0;
+	}
+
+	void check_sockets()
+	{
+		// if async operation in progress, poll context
+		if ((m_rx_state == 1) || (m_tx_state == 1))
+			m_ioctx.poll();
+
+		// start acceptor if needed
+		if (m_localaddr && m_rx_state == 0)
+		{
+			std::error_code err;
+			m_acceptor.open(m_localaddr->protocol(), err);
+			m_acceptor.set_option(asio::ip::tcp::acceptor::reuse_address(true));
+			if (!err)
+			{
+				m_acceptor.bind(*m_localaddr, err);
+				if (!err)
+				{
+					m_acceptor.listen(1, err);
+					if (!err)
+					{
+						osd_printf_verbose("C139: RX listen on %s\n", *m_localaddr);
+						m_acceptor.async_accept(
+								[this] (std::error_code const &err, asio::ip::tcp::socket sock)
+								{
+									if (err)
+									{
+										LOG("C139: RX error accepting - %d %s\n", err.value(), err.message());
+										std::error_code e;
+										m_acceptor.close(e);
+										m_rx_state = 0;
+									}
+									else
+									{
+										LOG("C139: RX connection from %s\n", sock.remote_endpoint());
+										std::error_code e;
+										m_acceptor.close(e);
+										m_sock_rx = std::move(sock);
+										m_sock_rx.non_blocking(true);
+										m_sock_rx.set_option(asio::socket_base::receive_buffer_size(524288));
+										m_sock_rx.set_option(asio::socket_base::keep_alive(true));
+										m_rx_state = 2;
+									}
+								});
+						m_rx_state = 1;
+					}
+				}
+			}
+			if (err)
+			{
+				LOG("C139: RX failed - %d %s\n", err.value(), err.message());
+			}
+		}
+
+		// connect socket if needed
+		if (m_remoteaddr && m_tx_state == 0)
+		{
+			std::error_code err;
+			if (m_sock_tx.is_open())
+				m_sock_tx.close(err);
+			m_sock_tx.open(m_remoteaddr->protocol(), err);
+			if (!err)
+			{
+				m_sock_tx.non_blocking(true);
+				m_sock_tx.set_option(asio::ip::tcp::no_delay(true));
+				m_sock_tx.set_option(asio::socket_base::send_buffer_size(65536));
+				m_sock_tx.set_option(asio::socket_base::keep_alive(true));
+				osd_printf_verbose("C139: TX connecting to %s\n", *m_remoteaddr);
+				m_tx_timeout.expires_after(std::chrono::seconds(10));
+				m_tx_timeout.async_wait(
+						[this] (std::error_code const &err)
+						{
+							if (!err && m_tx_state == 1)
+							{
+								osd_printf_verbose("C139: TX connect timed out\n");
+								std::error_code e;
+								m_sock_tx.close(e);
+								m_tx_state = 0;
+							}
+						});
+				m_sock_tx.async_connect(
+						*m_remoteaddr,
+						[this] (std::error_code const &err)
+						{
+							m_tx_timeout.cancel();
+							if (err)
+							{
+								osd_printf_verbose("C139: TX connect error - %d %s\n", err.value(), err.message());
+								std::error_code e;
+								m_sock_tx.close(e);
+								m_tx_state = 0;
+							}
+							else
+							{
+								LOG("C139: TX connection established\n");
+								m_tx_state = 2;
+							}
+						});
+				m_tx_state = 1;
+			}
+		}
+	}
+
+	bool connected()
+	{
+		return m_rx_state == 2 && m_tx_state == 2;
+	}
+
+	unsigned receive(uint8_t *buffer, unsigned data_size)
+	{
+		if (m_rx_state != 2)
+			return 0;
+
+		std::error_code err;
+		std::size_t bytes_read = m_sock_rx.receive(asio::buffer(&buffer[0], data_size), asio::socket_base::message_peek, err);
+		if (err == asio::error::would_block)
+			return 0;
+
+		if (bytes_read == data_size)
+			bytes_read = m_sock_rx.receive(asio::buffer(&buffer[0], data_size), 0, err);
+
+		if (err)
+		{
+			osd_printf_verbose("C139: RX error receiving - %d %s\n", err.value(), err.message());
+			m_sock_rx.close(err);
+			m_rx_state = 0;
+			return UINT_MAX;
+		}
+
+		if (bytes_read == data_size)
+			return bytes_read;
+		return 0;
+	}
+
+	unsigned send(uint8_t *buffer, unsigned data_size)
+	{
+		if (m_tx_state != 2)
+			return 0;
+
+		std::error_code err;
+		std::size_t bytes_sent = m_sock_tx.send(asio::buffer(&buffer[0], data_size), 0, err);
+		if (err || bytes_sent != data_size)
+		{
+			osd_printf_verbose("C139: TX error sending - %d %s\n", err.value(), err.message());
+			m_sock_tx.close(err);
+			m_tx_state = 0;
+			return UINT_MAX;
+		}
+		return data_size;
+	}
+
+private:
+	template <typename Format, typename... Params>
+	void logerror(Format &&fmt, Params &&... args) const
+	{
+		util::stream_format(
+				std::cerr,
+				"%s",
+				util::string_format(std::forward<Format>(fmt), std::forward<Params>(args)...));
+	}
+
+	namco_c139_device &m_device;
+	asio::io_context m_ioctx;
+	std::optional<asio::ip::tcp::endpoint> m_localaddr;
+	std::optional<asio::ip::tcp::endpoint> m_remoteaddr;
+	asio::ip::tcp::acceptor m_acceptor;
+	asio::ip::tcp::socket m_sock_rx;
+	asio::ip::tcp::socket m_sock_tx;
+	asio::steady_timer m_tx_timeout;
+	uint8_t m_rx_state;
+	uint8_t m_tx_state;
+};
 
 
 //**************************************************************************
@@ -102,13 +332,8 @@ void namco_c139_device::regs_map(address_map &map)
 //-------------------------------------------------
 
 namco_c139_device::namco_c139_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, NAMCO_C139, tag, owner, clock)
-	, m_irq_cb(*this)
-	, m_acceptor(m_ioctx)
-	, m_sock_rx(m_ioctx)
-	, m_sock_tx(m_ioctx)
-	, m_tx_timeout(m_ioctx)
-
+	: device_t(mconfig, NAMCO_C139, tag, owner, clock),
+	m_irq_cb(*this)
 {
 	auto const &opts = mconfig.options();
 
@@ -127,7 +352,7 @@ namco_c139_device::namco_c139_device(const machine_config &mconfig, const char *
 
 	LOG("C139: ID byte = %02d\n", m_linkid);
 
-	std::fill(std::begin(m_buffer0), std::end(m_buffer0), 0);
+	std::fill(std::begin(m_buffer), std::end(m_buffer), 0);
 }
 
 
@@ -139,6 +364,9 @@ void namco_c139_device::device_start()
 {
 	m_tick_timer = timer_alloc(FUNC(namco_c139_device::tick_timer_callback), this);
 	m_tick_timer->adjust(attotime::never);
+
+	auto ctx = std::make_unique<context>(*this);
+	m_context = std::move(ctx);
 
 	// state saving
 	save_item(NAME(m_ram));
@@ -162,9 +390,9 @@ void namco_c139_device::device_reset()
 	std::fill(std::begin(m_ram), std::end(m_ram), 0);
 	std::fill(std::begin(m_reg), std::end(m_reg), 0);
 
-	m_tx_state = 0;
-	m_rx_state = 0;
-	comm_start();
+	m_context->stop();
+
+	m_context->start(m_localhost, m_localport, m_remotehost, m_remoteport);
 
 	m_linktimer = 0x0200;
 
@@ -177,7 +405,8 @@ void namco_c139_device::device_reset()
 
 void namco_c139_device::device_stop()
 {
-	comm_stop();
+	m_context->stop();
+	m_context.reset();
 }
 
 
@@ -294,149 +523,9 @@ TIMER_CALLBACK_MEMBER(namco_c139_device::tick_timer_callback)
 	comm_tick();
 }
 
-void namco_c139_device::check_sockets()
-{
-	// if async operation in progress, poll context
-	if ((m_rx_state == 1) || (m_tx_state == 1))
-		m_ioctx.poll();
-
-	// start acceptor if needed
-	if (m_localaddr && m_rx_state == 0)
-	{
-		std::error_code err;
-		m_acceptor.open(m_localaddr->protocol(), err);
-		m_acceptor.set_option(asio::ip::tcp::acceptor::reuse_address(true));
-		if (!err)
-		{
-			m_acceptor.bind(*m_localaddr, err);
-			if (!err)
-			{
-				m_acceptor.listen(1, err);
-				if (!err)
-				{
-					osd_printf_verbose("C139: RX listen on %s\n", *m_localaddr);
-					m_acceptor.async_accept(
-							[this] (std::error_code const &err, asio::ip::tcp::socket sock)
-							{
-								if (err)
-								{
-									LOG("C139: RX error accepting - %d %s\n", err.value(), err.message());
-									std::error_code e;
-									m_acceptor.close(e);
-									m_rx_state = 0;
-								}
-								else
-								{
-									LOG("C139: RX connection from %s\n", sock.remote_endpoint());
-									std::error_code e;
-									m_acceptor.close(e);
-									m_sock_rx = std::move(sock);
-									m_sock_rx.non_blocking(true);
-									m_sock_rx.set_option(asio::socket_base::receive_buffer_size(524288));
-									m_sock_rx.set_option(asio::socket_base::keep_alive(true));
-									m_rx_state = 2;
-								}
-							});
-					m_rx_state = 1;
-				}
-			}
-		}
-		if (err)
-		{
-			LOG("C139: RX failed - %d %s\n", err.value(), err.message());
-		}
-	}
-
-	// connect socket if needed
-	if (m_remoteaddr && m_tx_state == 0)
-	{
-		std::error_code err;
-		if (m_sock_tx.is_open())
-			m_sock_tx.close(err);
-		m_sock_tx.open(m_remoteaddr->protocol(), err);
-		if (!err)
-		{
-			m_sock_tx.non_blocking(true);
-			m_sock_tx.set_option(asio::ip::tcp::no_delay(true));
-			m_sock_tx.set_option(asio::socket_base::send_buffer_size(65536));
-			m_sock_tx.set_option(asio::socket_base::keep_alive(true));
-			osd_printf_verbose("C139: TX connecting to %s\n", *m_remoteaddr);
-			m_tx_timeout.expires_after(std::chrono::seconds(10));
-			m_tx_timeout.async_wait(
-					[this] (std::error_code const &err)
-					{
-						if (!err && m_tx_state == 1)
-						{
-							osd_printf_verbose("C139: TX connect timed out\n");
-							std::error_code e;
-							m_sock_tx.close(e);
-							m_tx_state = 0;
-						}
-					});
-			m_sock_tx.async_connect(
-					*m_remoteaddr,
-					[this] (std::error_code const &err)
-					{
-						m_tx_timeout.cancel();
-						if (err)
-						{
-							osd_printf_verbose("C139: TX connect error - %d %s\n", err.value(), err.message());
-							std::error_code e;
-							m_sock_tx.close(e);
-							m_tx_state = 0;
-						}
-						else
-						{
-							LOG("C139: TX connection established\n");
-							m_tx_state = 2;
-						}
-					});
-			m_tx_state = 1;
-		}
-	}
-}
-
-void namco_c139_device::comm_start()
-{
-	std::error_code err;
-	asio::ip::tcp::resolver resolver(m_ioctx);
-
-	for (auto &&resolveIte : resolver.resolve(m_localhost, m_localport, asio::ip::tcp::resolver::flags::address_configured, err))
-	{
-		m_localaddr = resolveIte.endpoint();
-		LOG("C139: localhost = %s\n", *m_localaddr);
-	}
-	if (err)
-	{
-		LOG("C139: localhost resolve error: %s\n", err.message());
-	}
-
-	for (auto &&resolveIte : resolver.resolve(m_remotehost, m_remoteport, asio::ip::tcp::resolver::flags::address_configured, err))
-	{
-		m_remoteaddr = resolveIte.endpoint();
-		LOG("C139: remotehost = %s\n", *m_remoteaddr);
-	}
-	if (err)
-	{
-		LOG("C139: remotehost resolve error: %s\n", err.message());
-	}
-}
-
-void namco_c139_device::comm_stop()
-{
-	std::error_code err;
-	if (m_acceptor.is_open())
-		m_acceptor.close(err);
-	if (m_sock_rx.is_open())
-		m_sock_rx.close(err);
-	if (m_sock_tx.is_open())
-		m_sock_tx.close(err);
-	m_tx_timeout.cancel();
-}
-
 void namco_c139_device::comm_tick()
 {
-	check_sockets();
+	m_context->check_sockets();
 
 	if (m_linktimer > 0x0000)
 		m_linktimer--;
@@ -444,7 +533,7 @@ void namco_c139_device::comm_tick()
 	if (m_linktimer == 0x0000)
 	{
 		// if both sockets are connected
-		if (m_rx_state == 2 && m_tx_state == 2)
+		if (m_context->connected())
 		{
 			// link established
 			unsigned data_size = 0x200;
@@ -505,26 +594,26 @@ void namco_c139_device::read_data(unsigned data_size)
 		if (recv > 0)
 		{
 			// (hack) update linkcount for mode 09
-			if (m_buffer0[0] == m_linkid && m_reg[REG_1_MODE] == 0x09 && (m_reg_f3 & 0x2) == 2)
-				m_buffer0[0x07] = m_buffer0[0x1ff];
+			if (m_buffer[0] == m_linkid && m_reg[REG_1_MODE] == 0x09 && (m_reg_f3 & 0x2) == 2)
+				m_buffer[0x07] = m_buffer[0x1ff];
 
 			// save message to "rx buffer"
-			unsigned rx_size = m_buffer0[2] << 8 | m_buffer0[1];
+			unsigned rx_size = m_buffer[2] << 8 | m_buffer[1];
 			unsigned rx_offset = m_reg[REG_6_RXOFFSET]; // rx offset in words
 			LOG("C139: rx_offset = %04x, rx_size == %02x\n", rx_offset, rx_size);
 			unsigned buf_offset = 3;
 			for (unsigned j = 0x00; j < rx_size; j++)
 			{
-				m_ram[0x1000 + (rx_offset & 0x0fff)] = m_buffer0[buf_offset + 1] << 8 | m_buffer0[buf_offset];
+				m_ram[0x1000 + (rx_offset & 0x0fff)] = m_buffer[buf_offset + 1] << 8 | m_buffer[buf_offset];
 				rx_offset++;
 				buf_offset += 2;
 			}
 
 			// relay messages
-			if (m_buffer0[0] != m_linkid)
+			if (m_buffer[0] != m_linkid)
 			{
 				if (m_reg[REG_1_MODE] == 0x09 && (m_reg_f3 & 0x2) == 2)
-					m_buffer0[0x1ff]++;
+					m_buffer[0x1ff]++;
 
 				send_frame(data_size);
 			}
@@ -559,30 +648,14 @@ void namco_c139_device::read_data(unsigned data_size)
 
 unsigned namco_c139_device::read_frame(unsigned data_size)
 {
-	if (m_rx_state != 2)
-		return 0;
-
-	std::error_code err;
-	std::size_t bytes_read = m_sock_rx.receive(asio::buffer(&m_buffer0[0], data_size), asio::socket_base::message_peek, err);
-	if (err == asio::error::would_block)
-		return 0;
-
-	if (bytes_read == data_size)
-		bytes_read = m_sock_rx.receive(asio::buffer(&m_buffer0[0], data_size), 0, err);
-
-	if (err)
+	unsigned bytes_read = m_context->receive(&m_buffer[0], data_size);
+	if (bytes_read == UINT_MAX)
 	{
-		osd_printf_verbose("C139: RX error receiving - %d %s\n", err.value(), err.message());
-		m_sock_rx.close(err);
-		m_rx_state = 0;
-		m_linktimer = 0x0200;
+		m_linktimer = 0x0100;
 		m_txblock = 0x00;
 		return 0;
 	}
-
-	if (bytes_read == data_size)
-		return bytes_read;
-	return 0;
+	return bytes_read;
 }
 
 void namco_c139_device::send_data(unsigned data_size)
@@ -616,23 +689,23 @@ void namco_c139_device::send_data(unsigned data_size)
 	if (tx_size == 0)
 		return;
 
-	m_buffer0[0] = m_linkid;
-	m_buffer0[1] = tx_size & 0xff;
-	m_buffer0[2] = (tx_size & 0xff00) >> 8;
-	m_buffer0[0x1ff] = 1;
+	m_buffer[0] = m_linkid;
+	m_buffer[1] = tx_size & 0xff;
+	m_buffer[2] = (tx_size & 0xff00) >> 8;
+	m_buffer[0x1ff] = 1;
 
 	unsigned buf_offset = 3;
 	for (unsigned j = 0x00; j < tx_size; j++)
 	{
-		m_buffer0[buf_offset] = m_ram[tx_offset & tx_mask] & 0xff;
-		m_buffer0[buf_offset + 1] = 0;
+		m_buffer[buf_offset] = m_ram[tx_offset & tx_mask] & 0xff;
+		m_buffer[buf_offset + 1] = 0;
 
 		tx_offset++;
 		buf_offset += 2;
 	}
 
 	// set bit-8 on last byte
-	m_buffer0[buf_offset -1] |= 0x01;
+	m_buffer[buf_offset -1] |= 0x01;
 
 	// based on mode, reset tx counter
 	switch (m_reg[REG_1_MODE])
@@ -658,17 +731,10 @@ void namco_c139_device::send_data(unsigned data_size)
 
 void namco_c139_device::send_frame(unsigned data_size)
 {
-	if (m_tx_state != 2)
-		return;
-
-	std::error_code err;
-	std::size_t bytes_sent = m_sock_tx.send(asio::buffer(&m_buffer0[0], data_size), 0, err);
-	if (err || bytes_sent != data_size)
+	unsigned bytes_sent = m_context->send(&m_buffer[0], data_size);
+	if (bytes_sent == UINT_MAX)
 	{
-		osd_printf_verbose("C139: TX error sending - %d %s\n", err.value(), err.message());
-		m_sock_tx.close(err);
-		m_tx_state = 0;
-		m_linktimer = 0x0200;
+		m_linktimer = 0x0100;
 		m_txblock = 0x00;
 	}
 }

@@ -1839,7 +1839,7 @@ void segaxbd_lastsurv_fd1094_state::device_add_mconfig(machine_config &config)
 	m_maincpu->reset_cb().set(FUNC(segaxbd_lastsurv_fd1094_state::m68k_reset_callback));
 
 	// basic machine hardware
-	SEGA_XBOARD_COMM(config, "xbdcomm", 0);
+	SEGA_XBOARD_COMM(config, m_xbdcomm, 0U);
 
 	m_iochip[0]->out_portd_cb().set(FUNC(segaxbd_state::lastsurv_muxer_w));
 	m_iochip[1]->in_portb_cb().set(FUNC(segaxbd_state::lastsurv_port_r));
@@ -1868,7 +1868,7 @@ void segaxbd_lastsurv_state::device_add_mconfig(machine_config &config)
 	segaxbd_state::xboard_base_mconfig(config);
 
 	// basic machine hardware
-	SEGA_XBOARD_COMM(config, "xbdcomm", 0);
+	SEGA_XBOARD_COMM(config, m_xbdcomm, 0U);
 
 	m_iochip[0]->out_portd_cb().set(FUNC(segaxbd_state::lastsurv_muxer_w));
 	m_iochip[1]->in_portb_cb().set(FUNC(segaxbd_state::lastsurv_port_r));
@@ -1906,7 +1906,7 @@ void segaxbd_smgp_fd1094_state::device_add_mconfig(machine_config &config)
 	m_soundcpu2->set_addrmap(AS_PROGRAM, &segaxbd_smgp_fd1094_state::smgp_sound2_map);
 	m_soundcpu2->set_addrmap(AS_IO, &segaxbd_smgp_fd1094_state::smgp_sound2_portmap);
 
-	SEGA_XBOARD_COMM(config, "xbdcomm", 0);
+	SEGA_XBOARD_COMM(config, m_xbdcomm, 0U);
 
 	z80_device &motorcpu(Z80(config, "motorcpu", XTAL(16'000'000)/2)); // not verified
 	motorcpu.set_addrmap(AS_PROGRAM, &segaxbd_smgp_fd1094_state::smgp_airdrive_map);
@@ -1949,7 +1949,7 @@ void segaxbd_smgp_state::device_add_mconfig(machine_config &config)
 	m_soundcpu2->set_addrmap(AS_PROGRAM, &segaxbd_smgp_state::smgp_sound2_map);
 	m_soundcpu2->set_addrmap(AS_IO, &segaxbd_smgp_state::smgp_sound2_portmap);
 
-	SEGA_XBOARD_COMM(config, "xbdcomm", 0);
+	SEGA_XBOARD_COMM(config, m_xbdcomm, 0U);
 
 	z80_device &motorcpu(Z80(config, "motorcpu", XTAL(16'000'000)/2)); // not verified
 	motorcpu.set_addrmap(AS_PROGRAM, &segaxbd_smgp_state::smgp_airdrive_map);

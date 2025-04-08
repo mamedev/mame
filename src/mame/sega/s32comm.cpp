@@ -71,9 +71,239 @@ Sega System Multi32 Comm PCB 837-8792-91
 
 #include "emuopts.h"
 
+#include "asio.h"
+
+#include <iostream>
+
 #define VERBOSE 0
 #include "logmacro.h"
 
+#ifdef S32COMM_SIMULATION
+class sega_s32comm_device::context
+{
+public:
+	context(
+			sega_s32comm_device &device) :
+	m_device(device),
+	m_acceptor(m_ioctx),
+	m_sock_rx(m_ioctx),
+	m_sock_tx(m_ioctx),
+	m_tx_timeout(m_ioctx)
+	{
+	}
+
+	void start(std::string localhost, std::string localport, std::string remotehost, std::string remoteport)
+	{
+		std::error_code err;
+		asio::ip::tcp::resolver resolver(m_ioctx);
+
+		for (auto &&resolveIte : resolver.resolve(localhost, localport, asio::ip::tcp::resolver::flags::address_configured, err))
+		{
+			m_localaddr = resolveIte.endpoint();
+			LOG("S32COMM: localhost = %s\n", *m_localaddr);
+		}
+		if (err)
+		{
+			LOG("S32COMM: localhost resolve error: %s\n", err.message());
+		}
+
+		for (auto &&resolveIte : resolver.resolve(remotehost, remoteport, asio::ip::tcp::resolver::flags::address_configured, err))
+		{
+			m_remoteaddr = resolveIte.endpoint();
+			LOG("S32COMM: remotehost = %s\n", *m_remoteaddr);
+		}
+		if (err)
+		{
+			LOG("S32COMM: remotehost resolve error: %s\n", err.message());
+		}
+	}
+
+	void stop()
+	{
+		std::error_code err;
+		if (m_acceptor.is_open())
+			m_acceptor.close(err);
+		if (m_sock_rx.is_open())
+			m_sock_rx.close(err);
+		if (m_sock_tx.is_open())
+			m_sock_tx.close(err);
+		m_tx_timeout.cancel();
+		m_tx_state = 0;
+		m_rx_state = 0;
+	}
+
+	void check_sockets()
+	{
+		// if async operation in progress, poll context
+		if ((m_rx_state == 1) || (m_tx_state == 1))
+			m_ioctx.poll();
+
+		// start acceptor if needed
+		if (m_localaddr && m_rx_state == 0)
+		{
+			std::error_code err;
+			m_acceptor.open(m_localaddr->protocol(), err);
+			m_acceptor.set_option(asio::ip::tcp::acceptor::reuse_address(true));
+			if (!err)
+			{
+				m_acceptor.bind(*m_localaddr, err);
+				if (!err)
+				{
+					m_acceptor.listen(1, err);
+					if (!err)
+					{
+						osd_printf_verbose("S32COMM: RX listen on %s\n", *m_localaddr);
+						m_acceptor.async_accept(
+								[this] (std::error_code const &err, asio::ip::tcp::socket sock)
+								{
+									if (err)
+									{
+										LOG("S32COMM: RX error accepting - %d %s\n", err.value(), err.message());
+										std::error_code e;
+										m_acceptor.close(e);
+										m_rx_state = 0;
+									}
+									else
+									{
+										LOG("S32COMM: RX connection from %s\n", sock.remote_endpoint());
+										std::error_code e;
+										m_acceptor.close(e);
+										m_sock_rx = std::move(sock);
+										m_sock_rx.non_blocking(true);
+										m_sock_rx.set_option(asio::socket_base::receive_buffer_size(524288));
+										m_sock_rx.set_option(asio::socket_base::keep_alive(true));
+										m_rx_state = 2;
+									}
+								});
+						m_rx_state = 1;
+					}
+				}
+			}
+			if (err)
+			{
+				LOG("S32COMM: RX failed - %d %s\n", err.value(), err.message());
+			}
+		}
+
+		// connect socket if needed
+		if (m_remoteaddr && m_tx_state == 0)
+		{
+			std::error_code err;
+			if (m_sock_tx.is_open())
+				m_sock_tx.close(err);
+			m_sock_tx.open(m_remoteaddr->protocol(), err);
+			if (!err)
+			{
+				m_sock_tx.non_blocking(true);
+				m_sock_tx.set_option(asio::ip::tcp::no_delay(true));
+				m_sock_tx.set_option(asio::socket_base::send_buffer_size(65536));
+				m_sock_tx.set_option(asio::socket_base::keep_alive(true));
+				osd_printf_verbose("S32COMM: TX connecting to %s\n", *m_remoteaddr);
+				m_tx_timeout.expires_after(std::chrono::seconds(10));
+				m_tx_timeout.async_wait(
+						[this] (std::error_code const &err)
+						{
+							if (!err && m_tx_state == 1)
+							{
+								osd_printf_verbose("S32COMM: TX connect timed out\n");
+								std::error_code e;
+								m_sock_tx.close(e);
+								m_tx_state = 0;
+							}
+						});
+				m_sock_tx.async_connect(
+						*m_remoteaddr,
+						[this] (std::error_code const &err)
+						{
+							m_tx_timeout.cancel();
+							if (err)
+							{
+								osd_printf_verbose("S32COMM: TX connect error - %d %s\n", err.value(), err.message());
+								std::error_code e;
+								m_sock_tx.close(e);
+								m_tx_state = 0;
+							}
+							else
+							{
+								LOG("S32COMM: TX connection established\n");
+								m_tx_state = 2;
+							}
+						});
+				m_tx_state = 1;
+			}
+		}
+	}
+
+	bool connected()
+	{
+		return m_rx_state == 2 && m_tx_state == 2;
+	}
+
+	unsigned receive(uint8_t *buffer, unsigned data_size)
+	{
+		if (m_rx_state != 2)
+			return 0;
+
+		std::error_code err;
+		std::size_t bytes_read = m_sock_rx.receive(asio::buffer(&buffer[0], data_size), asio::socket_base::message_peek, err);
+		if (err == asio::error::would_block)
+			return 0;
+
+		if (bytes_read == data_size)
+			bytes_read = m_sock_rx.receive(asio::buffer(&buffer[0], data_size), 0, err);
+
+		if (err)
+		{
+			osd_printf_verbose("S32COMM: RX error receiving - %d %s\n", err.value(), err.message());
+			m_sock_rx.close(err);
+			m_rx_state = 0;
+			return UINT_MAX;
+		}
+
+		if (bytes_read == data_size)
+			return bytes_read;
+		return 0;
+	}
+
+	unsigned send(uint8_t *buffer, unsigned data_size)
+	{
+		if (m_tx_state != 2)
+			return 0;
+
+		std::error_code err;
+		std::size_t bytes_sent = m_sock_tx.send(asio::buffer(&buffer[0], data_size), 0, err);
+		if (err || bytes_sent != data_size)
+		{
+			osd_printf_verbose("S32COMM: TX error sending - %d %s\n", err.value(), err.message());
+			m_sock_tx.close(err);
+			m_tx_state = 0;
+			return UINT_MAX;
+		}
+		return data_size;
+	}
+
+private:
+	template <typename Format, typename... Params>
+	void logerror(Format &&fmt, Params &&... args) const
+	{
+		util::stream_format(
+				std::cerr,
+				"%s",
+				util::string_format(std::forward<Format>(fmt), std::forward<Params>(args)...));
+	}
+
+	sega_s32comm_device &m_device;
+	asio::io_context m_ioctx;
+	std::optional<asio::ip::tcp::endpoint> m_localaddr;
+	std::optional<asio::ip::tcp::endpoint> m_remoteaddr;
+	asio::ip::tcp::acceptor m_acceptor;
+	asio::ip::tcp::socket m_sock_rx;
+	asio::ip::tcp::socket m_sock_tx;
+	asio::steady_timer m_tx_timeout;
+	uint8_t m_rx_state;
+	uint8_t m_tx_state;
+};
+#endif
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -99,17 +329,8 @@ void sega_s32comm_device::device_add_mconfig(machine_config &config)
 
 sega_s32comm_device::sega_s32comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SEGA_SYSTEM32_COMM, tag, owner, clock)
-#ifdef S32COMM_SIMULATION
-	,m_acceptor(m_ioctx)
-	,m_sock_rx(m_ioctx)
-	,m_sock_tx(m_ioctx)
-	,m_tx_timeout(m_ioctx)
-#endif
 {
-	std::fill(std::begin(m_shared), std::end(m_shared), 0);
-
 #ifdef S32COMM_SIMULATION
-	std::fill(std::begin(m_buffer0), std::end(m_buffer0), 0);
 	m_framesync = mconfig.options().comm_framesync() ? 0x01 : 0x00;
 #endif
 }
@@ -120,6 +341,10 @@ sega_s32comm_device::sega_s32comm_device(const machine_config &mconfig, const ch
 
 void sega_s32comm_device::device_start()
 {
+#ifdef S32COMM_SIMULATION
+	auto ctx = std::make_unique<context>(*this);
+	m_context = std::move(ctx);
+#endif
 }
 
 //-------------------------------------------------
@@ -128,13 +353,16 @@ void sega_s32comm_device::device_start()
 
 void sega_s32comm_device::device_reset()
 {
+	std::fill(std::begin(m_shared), std::end(m_shared), 0);
 	m_zfg = 0;
 	m_cn = 0;
 	m_fg = 0;
 #ifdef S32COMM_SIMULATION
-	m_tx_state = 0;
-	m_rx_state = 0;
-	comm_start();
+	std::fill(std::begin(m_buffer), std::end(m_buffer), 0);
+	m_context->stop();
+
+	auto const &opts = mconfig().options();
+	m_context->start(opts.comm_localhost(), opts.comm_localport(), opts.comm_remotehost(), opts.comm_remoteport());
 
 	m_linkenable = 0;
 	m_linktimer = 0;
@@ -147,7 +375,8 @@ void sega_s32comm_device::device_reset()
 void sega_s32comm_device::device_stop()
 {
 #ifdef S32COMM_SIMULATION
-	comm_stop();
+	m_context->stop();
+	m_context.reset();
 #endif
 }
 
@@ -259,150 +488,9 @@ void sega_s32comm_device::set_linktype(uint16_t linktype)
 	}
 }
 
-void sega_s32comm_device::check_sockets()
-{
-	// if async operation in progress, poll context
-	if ((m_rx_state == 1) || (m_tx_state == 1))
-		m_ioctx.poll();
-
-	// start acceptor if needed
-	if (m_localaddr && m_rx_state == 0)
-	{
-		std::error_code err;
-		m_acceptor.open(m_localaddr->protocol(), err);
-		m_acceptor.set_option(asio::ip::tcp::acceptor::reuse_address(true));
-		if (!err)
-		{
-			m_acceptor.bind(*m_localaddr, err);
-			if (!err)
-			{
-				m_acceptor.listen(1, err);
-				if (!err)
-				{
-					osd_printf_verbose("S32COMM: RX listen on %s\n", *m_localaddr);
-					m_acceptor.async_accept(
-							[this] (std::error_code const &err, asio::ip::tcp::socket sock)
-							{
-								if (err)
-								{
-									LOG("S32COMM: RX error accepting - %d %s\n", err.value(), err.message());
-									std::error_code e;
-									m_acceptor.close(e);
-									m_rx_state = 0;
-								}
-								else
-								{
-									LOG("S32COMM: RX connection from %s\n", sock.remote_endpoint());
-									std::error_code e;
-									m_acceptor.close(e);
-									m_sock_rx = std::move(sock);
-									m_sock_rx.non_blocking(true);
-									m_sock_rx.set_option(asio::socket_base::receive_buffer_size(524288));
-									m_sock_rx.set_option(asio::socket_base::keep_alive(true));
-									m_rx_state = 2;
-								}
-							});
-					m_rx_state = 1;
-				}
-			}
-		}
-		if (err)
-		{
-			LOG("S32COMM: RX failed - %d %s\n", err.value(), err.message());
-		}
-	}
-
-	// connect socket if needed
-	if (m_remoteaddr && m_tx_state == 0)
-	{
-		std::error_code err;
-		if (m_sock_tx.is_open())
-			m_sock_tx.close(err);
-		m_sock_tx.open(m_remoteaddr->protocol(), err);
-		if (!err)
-		{
-			m_sock_tx.non_blocking(true);
-			m_sock_tx.set_option(asio::ip::tcp::no_delay(true));
-			m_sock_tx.set_option(asio::socket_base::send_buffer_size(65536));
-			m_sock_tx.set_option(asio::socket_base::keep_alive(true));
-			osd_printf_verbose("S32COMM: TX connecting to %s\n", *m_remoteaddr);
-			m_tx_timeout.expires_after(std::chrono::seconds(10));
-			m_tx_timeout.async_wait(
-					[this] (std::error_code const &err)
-					{
-						if (!err && m_tx_state == 1)
-						{
-							osd_printf_verbose("S32COMM: TX connect timed out\n");
-							std::error_code e;
-							m_sock_tx.close(e);
-							m_tx_state = 0;
-						}
-					});
-			m_sock_tx.async_connect(
-					*m_remoteaddr,
-					[this] (std::error_code const &err)
-					{
-						m_tx_timeout.cancel();
-						if (err)
-						{
-							osd_printf_verbose("S32COMM: TX connect error - %d %s\n", err.value(), err.message());
-							std::error_code e;
-							m_sock_tx.close(e);
-							m_tx_state = 0;
-						}
-						else
-						{
-							LOG("S32COMM: TX connection established\n");
-							m_tx_state = 2;
-						}
-					});
-			m_tx_state = 1;
-		}
-	}
-}
-
-void sega_s32comm_device::comm_start()
-{
-	auto const &opts = mconfig().options();
-	std::error_code err;
-	asio::ip::tcp::resolver resolver(m_ioctx);
-
-	for (auto &&resolveIte : resolver.resolve(opts.comm_localhost(), opts.comm_localport(), asio::ip::tcp::resolver::flags::address_configured, err))
-	{
-		m_localaddr = resolveIte.endpoint();
-		LOG("S32COMM: localhost = %s\n", *m_localaddr);
-	}
-	if (err)
-	{
-		LOG("S32COMM: localhost resolve error: %s\n", err.message());
-	}
-
-	for (auto &&resolveIte : resolver.resolve(opts.comm_remotehost(), opts.comm_remoteport(), asio::ip::tcp::resolver::flags::address_configured, err))
-	{
-		m_remoteaddr = resolveIte.endpoint();
-		LOG("S32COMM: remotehost = %s\n", *m_remoteaddr);
-	}
-	if (err)
-	{
-		LOG("S32COMM: remotehost resolve error: %s\n", err.message());
-	}
-}
-
-void sega_s32comm_device::comm_stop()
-{
-	std::error_code err;
-	if (m_acceptor.is_open())
-		m_acceptor.close(err);
-	if (m_sock_rx.is_open())
-		m_sock_rx.close(err);
-	if (m_sock_tx.is_open())
-		m_sock_tx.close(err);
-	m_tx_timeout.cancel();
-}
-
 void sega_s32comm_device::comm_tick()
 {
-	check_sockets();
+	m_context->check_sockets();
 
 	switch (m_linktype)
 	{
@@ -426,22 +514,9 @@ void sega_s32comm_device::comm_tick()
 
 unsigned sega_s32comm_device::read_frame(unsigned data_size)
 {
-	if (m_rx_state != 2)
-		return 0;
-
-	std::error_code err;
-	std::size_t bytes_read = m_sock_rx.receive(asio::buffer(&m_buffer0[0], data_size), asio::socket_base::message_peek, err);
-	if (err == asio::error::would_block)
-		return 0;
-
-	if (bytes_read == data_size)
-		bytes_read = m_sock_rx.receive(asio::buffer(&m_buffer0[0], data_size), 0, err);
-
-	if (err)
+	int bytes_read = m_context->receive(&m_buffer[0], data_size);
+	if (bytes_read == UINT_MAX)
 	{
-		osd_printf_verbose("S32COMM: RX error receiving - %d %s\n", err.value(), err.message());
-		m_sock_rx.close(err);
-		m_rx_state = 0;
 		if (m_linkalive == 0x01)
 		{
 			LOG("S32COMM: link lost\n");
@@ -450,18 +525,15 @@ unsigned sega_s32comm_device::read_frame(unsigned data_size)
 		}
 		return 0;
 	}
-
-	if (bytes_read == data_size)
-		return bytes_read;
-	return 0;
+	return bytes_read;
 }
 
 void sega_s32comm_device::send_data(uint8_t frame_type, unsigned frame_start, unsigned frame_size, unsigned data_size)
 {
-	m_buffer0[0] = frame_type;
+	m_buffer[0] = frame_type;
 	for (unsigned i = 0x00; i < frame_size; i++)
 	{
-		m_buffer0[1 + i] = m_shared[frame_start + i];
+		m_buffer[1 + i] = m_shared[frame_start + i];
 	}
 	// forward message to next node
 	send_frame(data_size);
@@ -469,16 +541,9 @@ void sega_s32comm_device::send_data(uint8_t frame_type, unsigned frame_start, un
 
 void sega_s32comm_device::send_frame(unsigned data_size)
 {
-	if (m_tx_state != 2)
-		return;
-
-	std::error_code err;
-	std::size_t bytes_sent = m_sock_tx.send(asio::buffer(&m_buffer0[0], data_size), 0, err);
-	if (err || bytes_sent != data_size)
+	int bytes_sent = m_context->send(&m_buffer[0], data_size);
+	if (bytes_sent == UINT_MAX)
 	{
-		osd_printf_verbose("S32COMM: TX error sending - %d %s\n", err.value(), err.message());
-		m_sock_tx.close(err);
-		m_tx_state = 0;
 		if (m_linkalive == 0x01)
 		{
 			LOG("S32COMM: link lost\n");
@@ -516,14 +581,14 @@ void sega_s32comm_device::comm_tick_14084()
 			m_shared[4] = 0x00;
 
 			// if both sockets are there check ring
-			if (m_rx_state == 2 && m_tx_state == 2)
+			if (m_context->connected())
 			{
 				// try to read one message
 				unsigned recv = read_frame(data_size);
 				while (recv > 0)
 				{
 					// check if message id
-					uint8_t idx = m_buffer0[0];
+					uint8_t idx = m_buffer[0];
 
 					// 0xff - link id
 					if (idx == 0xff)
@@ -532,7 +597,7 @@ void sega_s32comm_device::comm_tick_14084()
 						{
 							// master gets first id and starts next state
 							m_linkid = 0x01;
-							m_linkcount = m_buffer0[1];
+							m_linkcount = m_buffer[1];
 							m_linktimer = 0x00;
 						}
 						else if (is_slave || is_relay)
@@ -540,8 +605,8 @@ void sega_s32comm_device::comm_tick_14084()
 							// slave gets own id
 							if (is_slave)
 							{
-								m_buffer0[1]++;
-								m_linkid = m_buffer0[1];
+								m_buffer[1]++;
+								m_linkid = m_buffer[1];
 							}
 
 							// slave and relay forward message
@@ -554,7 +619,7 @@ void sega_s32comm_device::comm_tick_14084()
 					{
 						if (is_slave || is_relay)
 						{
-							m_linkcount = m_buffer0[1];
+							m_linkcount = m_buffer[1];
 
 							// slave and relay forward message
 							send_frame(data_size);
@@ -582,16 +647,16 @@ void sega_s32comm_device::comm_tick_14084()
 					// send first packet
 					if (m_linktimer == 0x01)
 					{
-						m_buffer0[0] = 0xff;
-						m_buffer0[1] = 0x01;
+						m_buffer[0] = 0xff;
+						m_buffer[1] = 0x01;
 						send_frame(data_size);
 					}
 
 					// send second packet
 					else if (m_linktimer == 0x00)
 					{
-						m_buffer0[0] = 0xfe;
-						m_buffer0[1] = m_linkcount;
+						m_buffer[0] = 0xfe;
+						m_buffer[1] = m_linkcount;
 						send_frame(data_size);
 
 						// consider it done
@@ -623,7 +688,7 @@ void sega_s32comm_device::comm_tick_14084()
 				while (recv > 0)
 				{
 					// check if valid id
-					uint8_t idx = m_buffer0[0];
+					uint8_t idx = m_buffer[0];
 					if (idx > 0 && idx <= m_linkcount)
 					{
 						// if not own message
@@ -633,7 +698,7 @@ void sega_s32comm_device::comm_tick_14084()
 							unsigned frame_offset = idx * frame_size;
 							for (unsigned j = 0x00; j < frame_size; j++)
 							{
-								m_shared[frame_offset + j] = m_buffer0[1 + j];
+								m_shared[frame_offset + j] = m_buffer[1 + j];
 							}
 
 							// forward message to other nodes
@@ -659,7 +724,7 @@ void sega_s32comm_device::comm_tick_14084()
 								unsigned frame_offset = 0x05;
 								for (unsigned j = 0x00; j < 0x0b; j++)
 								{
-									m_shared[frame_offset + j] = m_buffer0[1 + j];
+									m_shared[frame_offset + j] = m_buffer[1 + j];
 								}
 
 								// forward message to other nodes
@@ -691,7 +756,7 @@ void sega_s32comm_device::comm_tick_14084()
 					unsigned frame_offset = m_linkid * frame_size;
 					for (unsigned j = 0x00; j < frame_size; j++)
 					{
-						m_shared[frame_offset + j] = m_buffer0[1 + j];
+						m_shared[frame_offset + j] = m_buffer[1 + j];
 					}
 				}
 
@@ -701,8 +766,8 @@ void sega_s32comm_device::comm_tick_14084()
 					send_data(0xfd, 0x05, 0x0b, data_size);
 
 					// send vsync
-					m_buffer0[0] = 0xfc;
-					m_buffer0[1] = 0x01;
+					m_buffer[0] = 0xfc;
+					m_buffer[1] = 0x01;
 					send_frame(data_size);
 				}
 			}
@@ -753,14 +818,14 @@ void sega_s32comm_device::comm_tick_15033()
 			m_shared[4] = 0x00;
 
 			// if both sockets are there check ring
-			if (m_rx_state == 2 && m_tx_state == 2)
+			if (m_context->connected())
 			{
 				// try to read one messages
 				unsigned recv = read_frame(data_size);
 				while (recv > 0)
 				{
 					// check if message id
-					uint8_t idx = m_buffer0[0];
+					uint8_t idx = m_buffer[0];
 
 					// 0xff - link id
 					if (idx == 0xff)
@@ -769,7 +834,7 @@ void sega_s32comm_device::comm_tick_15033()
 						{
 							// master gets first id and starts next state
 							m_linkid = 0x01;
-							m_linkcount = m_buffer0[1];
+							m_linkcount = m_buffer[1];
 							m_linktimer = 0x00;
 						}
 						else if (is_slave || is_relay)
@@ -777,8 +842,8 @@ void sega_s32comm_device::comm_tick_15033()
 							// slave gets own id
 							if (is_slave)
 							{
-								m_buffer0[1]++;
-								m_linkid = m_buffer0[1];
+								m_buffer[1]++;
+								m_linkid = m_buffer[1];
 							}
 
 							// slave and relay forward message
@@ -791,7 +856,7 @@ void sega_s32comm_device::comm_tick_15033()
 					{
 						if (is_slave || is_relay)
 						{
-							m_linkcount = m_buffer0[1];
+							m_linkcount = m_buffer[1];
 
 							// slave and relay forward message
 							send_frame(data_size);
@@ -819,16 +884,16 @@ void sega_s32comm_device::comm_tick_15033()
 					// send first packet
 					if (m_linktimer == 0x01)
 					{
-						m_buffer0[0] = 0xff;
-						m_buffer0[1] = 0x01;
+						m_buffer[0] = 0xff;
+						m_buffer[1] = 0x01;
 						send_frame(data_size);
 					}
 
 					// send second packet
 					else if (m_linktimer == 0x00)
 					{
-						m_buffer0[0] = 0xfe;
-						m_buffer0[1] = m_linkcount;
+						m_buffer[0] = 0xfe;
+						m_buffer[1] = m_linkcount;
 						send_frame(data_size);
 
 						// consider it done
@@ -863,7 +928,7 @@ void sega_s32comm_device::comm_tick_15033()
 				while (recv > 0)
 				{
 					// check if valid id
-					uint8_t idx = m_buffer0[0];
+					uint8_t idx = m_buffer[0];
 					if (idx > 0 && idx <= m_linkcount)
 					{
 						// if not own message
@@ -873,7 +938,7 @@ void sega_s32comm_device::comm_tick_15033()
 							unsigned frame_offset = frame_start_rx + ((idx - 1) * frame_size);
 							for (unsigned j = 0x00; j < frame_size; j++)
 							{
-								m_shared[frame_offset + j] = m_buffer0[1 + j];
+								m_shared[frame_offset + j] = m_buffer[1 + j];
 							}
 
 							// forward message to other nodes
@@ -899,7 +964,7 @@ void sega_s32comm_device::comm_tick_15033()
 								unsigned frame_offset = 0x05;
 								for (unsigned j = 0x00; j < 0x0b; j++)
 								{
-									m_shared[frame_offset + j] = m_buffer0[1 + j];
+									m_shared[frame_offset + j] = m_buffer[1 + j];
 								}
 
 								// forward message to other nodes
@@ -930,7 +995,7 @@ void sega_s32comm_device::comm_tick_15033()
 					unsigned frame_offset = frame_start_rx + ((m_linkid - 1) * frame_size);
 					for (unsigned j = 0x00; j < frame_size; j++)
 					{
-						m_shared[frame_offset + j] = m_buffer0[1 + j];
+						m_shared[frame_offset + j] = m_buffer[1 + j];
 					}
 				}
 
@@ -940,8 +1005,8 @@ void sega_s32comm_device::comm_tick_15033()
 					send_data(0xfd, 0x05, 0x0b, data_size);
 
 					// send vsync
-					m_buffer0[0] = 0xfc;
-					m_buffer0[1] = 0x01;
+					m_buffer[0] = 0xfc;
+					m_buffer[1] = 0x01;
 					send_frame(data_size);
 				}
 			}
@@ -980,14 +1045,14 @@ void sega_s32comm_device::comm_tick_15612()
 			m_shared[0] = 0x05;
 
 			// if both sockets are there check ring
-			if (m_rx_state == 2 && m_tx_state == 2)
+			if (m_context->connected())
 			{
 				// try to read one message
 				unsigned recv = read_frame(data_size);
 				while (recv > 0)
 				{
 					// check if message id
-					uint8_t idx = m_buffer0[0];
+					uint8_t idx = m_buffer[0];
 
 					// 0xff - link id
 					if (idx == 0xff)
@@ -996,7 +1061,7 @@ void sega_s32comm_device::comm_tick_15612()
 						{
 							// master gets first id and starts next state
 							m_linkid = 0x01;
-							m_linkcount = m_buffer0[1];
+							m_linkcount = m_buffer[1];
 							m_linktimer = 0x00;
 						}
 						else if (is_slave || is_relay)
@@ -1004,8 +1069,8 @@ void sega_s32comm_device::comm_tick_15612()
 							// slave gets own id
 							if (is_slave)
 							{
-								m_buffer0[1]++;
-								m_linkid = m_buffer0[1];
+								m_buffer[1]++;
+								m_linkid = m_buffer[1];
 							}
 
 							// slave and relay forward message
@@ -1018,7 +1083,7 @@ void sega_s32comm_device::comm_tick_15612()
 					{
 						if (is_slave || is_relay)
 						{
-							m_linkcount = m_buffer0[1];
+							m_linkcount = m_buffer[1];
 
 							// slave and relay forward message
 							send_frame(data_size);
@@ -1046,16 +1111,16 @@ void sega_s32comm_device::comm_tick_15612()
 					// send first packet
 					if (m_linktimer == 0x01)
 					{
-						m_buffer0[0] = 0xff;
-						m_buffer0[1] = 0x01;
+						m_buffer[0] = 0xff;
+						m_buffer[1] = 0x01;
 						send_frame(data_size);
 					}
 
 					// send second packet
 					else if (m_linktimer == 0x00)
 					{
-						m_buffer0[0] = 0xfe;
-						m_buffer0[1] = m_linkcount;
+						m_buffer[0] = 0xfe;
+						m_buffer[1] = m_linkcount;
 						send_frame(data_size);
 
 						// consider it done
@@ -1089,7 +1154,7 @@ void sega_s32comm_device::comm_tick_15612()
 				while (recv > 0)
 				{
 					// check if valid id
-					uint8_t idx = m_buffer0[0];
+					uint8_t idx = m_buffer[0];
 					if (idx > 0 && idx <= m_linkcount)
 					{
 						// if not own message
@@ -1099,7 +1164,7 @@ void sega_s32comm_device::comm_tick_15612()
 							unsigned frame_offset = frame_start + (idx * frame_size);
 							for (unsigned j = 0x00; j < frame_size; j++)
 							{
-								m_shared[frame_offset + j] = m_buffer0[1 + j];
+								m_shared[frame_offset + j] = m_buffer[1 + j];
 							}
 
 							// forward message to other nodes
@@ -1125,7 +1190,7 @@ void sega_s32comm_device::comm_tick_15612()
 								unsigned frame_offset = 0x05;
 								for (unsigned j = 0x00; j < 0x0b; j++)
 								{
-									m_shared[frame_offset + j] = m_buffer0[1 + j];
+									m_shared[frame_offset + j] = m_buffer[1 + j];
 								}
 
 								// forward message to other nodes
@@ -1156,7 +1221,7 @@ void sega_s32comm_device::comm_tick_15612()
 					unsigned frame_offset = frame_start + (m_linkid * frame_size);
 					for (unsigned j = 0x00; j < frame_size; j++)
 					{
-						m_shared[frame_offset + j] = m_buffer0[1 + j];
+						m_shared[frame_offset + j] = m_buffer[1 + j];
 					}
 				}
 
@@ -1167,8 +1232,8 @@ void sega_s32comm_device::comm_tick_15612()
 					send_data(0xfd, 0x05, 0x0b, data_size);
 
 					// send vsync
-					m_buffer0[0] = 0xfc;
-					m_buffer0[1] = 0x01;
+					m_buffer[0] = 0xfc;
+					m_buffer[1] = 0x01;
 					send_frame(data_size);
 				}
 			}

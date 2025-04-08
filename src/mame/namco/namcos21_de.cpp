@@ -167,7 +167,7 @@ void namco_de_pcbstack_device::device_add_mconfig(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	configure_c148_standard(config);
-	NAMCO_C139(config, m_sci, 0);
+	NAMCO_C139(config, m_sci, 0U);
 	m_sci->irq_cb().set(FUNC(namco_de_pcbstack_device::sci_int_w));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

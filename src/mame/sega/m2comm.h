@@ -7,8 +7,6 @@
 
 #define M2COMM_SIMULATION
 
-#include "asio.h"
-
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -59,17 +57,10 @@ private:
 	uint16_t m_frameoffset;
 
 #ifdef M2COMM_SIMULATION
-	asio::io_context m_ioctx;
-	std::optional<asio::ip::tcp::endpoint> m_localaddr;
-	std::optional<asio::ip::tcp::endpoint> m_remoteaddr;
-	asio::ip::tcp::acceptor m_acceptor;
-	asio::ip::tcp::socket m_sock_rx;
-	asio::ip::tcp::socket m_sock_tx;
-	asio::steady_timer m_tx_timeout;
-	uint8_t m_rx_state;
-	uint8_t m_tx_state;
+	class context;
+	std::unique_ptr<context> m_context;
 
-	uint8_t m_buffer0[0x1000];
+	uint8_t m_buffer[0x1000];
 	uint8_t m_framesync;
 
 	uint8_t m_linkenable;
@@ -79,9 +70,6 @@ private:
 	uint8_t m_linkcount;
 	uint8_t m_zfg_delay;
 
-	void check_sockets();
-	void comm_start();
-	void comm_stop();
 	void comm_tick();
 	void read_fg();
 	unsigned read_frame(unsigned data_size);

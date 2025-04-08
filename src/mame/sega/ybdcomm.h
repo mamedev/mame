@@ -11,8 +11,6 @@
 #include "machine/mb8421.h"
 #include "machine/mb89372.h"
 
-#include "asio.h"
-
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -65,17 +63,10 @@ private:
 #ifdef YBDCOMM_SIMULATION
 	emu_timer *m_tick_timer;
 
-	asio::io_context m_ioctx;
-	std::optional<asio::ip::tcp::endpoint> m_localaddr;
-	std::optional<asio::ip::tcp::endpoint> m_remoteaddr;
-	asio::ip::tcp::acceptor m_acceptor;
-	asio::ip::tcp::socket m_sock_rx;
-	asio::ip::tcp::socket m_sock_tx;
-	asio::steady_timer m_tx_timeout;
-	uint8_t m_rx_state;
-	uint8_t m_tx_state;
+	class context;
+	std::unique_ptr<context> m_context;
 
-	uint8_t m_buffer0[0x200];
+	uint8_t m_buffer[0x200];
 	uint8_t m_framesync;
 
 	uint8_t m_linkenable;
@@ -88,9 +79,6 @@ private:
 
 	unsigned comm_frame_offset(uint8_t cab_index);
 	unsigned comm_frame_size(uint8_t cab_index);
-	void check_sockets();
-	void comm_start();
-	void comm_stop();
 	void comm_tick();
 	unsigned read_frame(unsigned data_size);
 	void send_data(uint8_t frame_type, unsigned frame_offset, unsigned frame_size, unsigned data_size);

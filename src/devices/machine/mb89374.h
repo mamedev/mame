@@ -35,8 +35,6 @@ Data Link Controller
 
 #pragma once
 
-#include "asio.h"
-
 
 class mb89374_device : public device_t,
 					   public device_execute_interface
@@ -130,18 +128,10 @@ private:
 	uint8_t  m_tx_buffer[0x200];
 	uint16_t m_tx_offset;
 
-	asio::io_context m_ioctx;
-	std::optional<asio::ip::tcp::endpoint> m_localaddr;
-	std::optional<asio::ip::tcp::endpoint> m_remoteaddr;
-	asio::ip::tcp::acceptor m_acceptor;
-	asio::ip::tcp::socket m_sock_rx;
-	asio::ip::tcp::socket m_sock_tx;
-	asio::steady_timer m_tx_timeout;
-	uint8_t m_rx_state;
-	uint8_t m_tx_state;
-	uint8_t m_socket_buffer[0x200];
+	class context;
+	std::unique_ptr<context> m_context;
 
-	void check_sockets();
+	uint8_t m_socket_buffer[0x200];
 
 	void    rx_reset();
 	uint8_t rx_read();
@@ -150,8 +140,7 @@ private:
 	void tx_write(uint8_t data);
 	void tx_complete();
 
-	void comm_start();
-	void comm_stop();
+	void comm_tick();
 	unsigned read_frame();
 	void send_frame(unsigned data_size);
 };

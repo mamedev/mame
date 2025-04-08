@@ -10,8 +10,6 @@
 
 #pragma once
 
-#include "asio.h"
-
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -62,17 +60,12 @@ private:
 	std::string m_remotehost;
 	std::string m_remoteport;
 
-	asio::io_context m_ioctx;
-	std::optional<asio::ip::tcp::endpoint> m_localaddr;
-	std::optional<asio::ip::tcp::endpoint> m_remoteaddr;
-	asio::ip::tcp::acceptor m_acceptor;
-	asio::ip::tcp::socket m_sock_rx;
-	asio::ip::tcp::socket m_sock_tx;
-	asio::steady_timer m_tx_timeout;
-	uint8_t m_rx_state;
-	uint8_t m_tx_state;
+	emu_timer *m_tick_timer = nullptr;
 
-	uint8_t m_buffer0[0x200];
+	class context;
+	std::unique_ptr<context> m_context;
+
+	uint8_t m_buffer[0x200];
 
 	uint16_t m_linktimer;
 	uint8_t m_linkid;
@@ -80,12 +73,8 @@ private:
 	uint8_t m_txblock;
 	uint8_t m_reg_f3;
 
-	emu_timer *m_tick_timer = nullptr;
 	TIMER_CALLBACK_MEMBER(tick_timer_callback);
 
-	void check_sockets();
-	void comm_start();
-	void comm_stop();
 	void comm_tick();
 	void read_data(unsigned data_size);
 	unsigned read_frame(unsigned data_size);

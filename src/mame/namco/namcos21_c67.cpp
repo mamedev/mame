@@ -834,7 +834,7 @@ void namcos21_c67_state::namcos21(machine_config &config)
 	m_namcos21_3d->set_framebuffer_size(496,480);
 
 	configure_c148_standard(config);
-	NAMCO_C139(config, m_sci, 0);
+	NAMCO_C139(config, m_sci, 0U);
 	m_sci->irq_cb().set(FUNC(namcos21_c67_state::sci_int_w));
 
 	PALETTE(config, m_palette).set_format(palette_device::xBRG_888, 0x10000/2);

@@ -2291,7 +2291,7 @@ void segas32_state::device_add_mconfig(machine_config &config)
 	rfsnd.add_route(1, "rspeaker", 0.55);
 	rfsnd.set_addrmap(0, &segas32_state::rf5c68_map);
 
-	SEGA_SYSTEM32_COMM(config, "s32comm", 0);
+	SEGA_SYSTEM32_COMM(config, m_s32comm, 0U);
 }
 
 DEFINE_DEVICE_TYPE(SEGA_S32_REGULAR_DEVICE, segas32_regular_state, "segas32_pcb_regular", "Sega System 32 regular PCB")
@@ -2620,7 +2620,7 @@ void sega_multi32_state::device_add_mconfig(machine_config &config)
 	m_multipcm->add_route(1, "lspeaker", 1.0);
 	m_multipcm->add_route(0, "rspeaker", 1.0);
 
-	SEGA_SYSTEM32_COMM(config, "s32comm", 0);
+	SEGA_SYSTEM32_COMM(config, m_s32comm, 0U);
 }
 
 

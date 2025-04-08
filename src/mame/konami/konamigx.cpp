@@ -1908,7 +1908,7 @@ void konamigx_state::racinfrc(machine_config &config)
 	adc0834_device &adc(ADC0834(config, "adc0834", 0));
 	adc.set_input_callback(FUNC(konamigx_state::adc0834_callback));
 
-	K056230(config, m_k056230);
+	K056230(config, m_k056230, 0U);
 	m_k056230->irq_cb().set_inputline(m_maincpu, M68K_IRQ_5);
 }
 

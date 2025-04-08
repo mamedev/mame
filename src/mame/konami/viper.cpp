@@ -2583,7 +2583,7 @@ void viper_state::viper(machine_config &config)
 	NS16550(config, "duart_com:chan0", XTAL(19'660'800));
 	NS16550(config, "duart_com:chan1", XTAL(19'660'800)).out_int_callback().set(FUNC(viper_state::uart_int));
 
-	K056230_VIPER(config, m_lanc);
+	K056230_VIPER(config, m_lanc, 0U);
 	m_lanc->irq_cb().set(FUNC(viper_state::lanc_int));
 
 	VOODOO_3(config, m_voodoo, voodoo_3_device::NOMINAL_CLOCK);

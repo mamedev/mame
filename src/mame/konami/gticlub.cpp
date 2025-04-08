@@ -906,7 +906,7 @@ void gticlub_state::gticlub(machine_config &config)
 	m_adc1038->set_input_callback(FUNC(gticlub_state::adc1038_input_callback));
 	m_adc1038->set_gti_club_hack(true);
 
-	K056230(config, m_k056230);
+	K056230(config, m_k056230, 0U);
 	m_k056230->irq_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ2);
 
 	// video hardware
@@ -990,7 +990,7 @@ void hangplt_state::hangplt(machine_config &config)
 	ADC1038(config, m_adc1038, 0);
 	m_adc1038->set_input_callback(FUNC(hangplt_state::adc1038_input_callback));
 
-	K056230(config, m_k056230);
+	K056230(config, m_k056230, 0U);
 	m_k056230->irq_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ2);
 
 	VOODOO_1(config, m_voodoo[0], voodoo_1_device::NOMINAL_CLOCK);

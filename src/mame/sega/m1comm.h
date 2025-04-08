@@ -11,13 +11,10 @@
 #include "machine/am9517a.h"
 #include "machine/mb89374.h"
 
-#include "asio.h"
-
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
 class sega_m1comm_device : public device_t
 {
 public:
@@ -84,17 +81,10 @@ private:
 	uint8_t m_fg;             // flip gate, bit0 is stored, bit7 is connected to ZFG bit 0
 
 #ifdef M1COMM_SIMULATION
-	asio::io_context m_ioctx;
-	std::optional<asio::ip::tcp::endpoint> m_localaddr;
-	std::optional<asio::ip::tcp::endpoint> m_remoteaddr;
-	asio::ip::tcp::acceptor m_acceptor;
-	asio::ip::tcp::socket m_sock_rx;
-	asio::ip::tcp::socket m_sock_tx;
-	asio::steady_timer m_tx_timeout;
-	uint8_t m_rx_state;
-	uint8_t m_tx_state;
+	class context;
+	std::unique_ptr<context> m_context;
 
-	uint8_t m_buffer0[0x200];
+	uint8_t m_buffer[0x200];
 	uint8_t m_framesync;
 
 	uint8_t m_linkenable;
@@ -103,9 +93,6 @@ private:
 	uint8_t m_linkid;
 	uint8_t m_linkcount;
 
-	void check_sockets();
-	void comm_start();
-	void comm_stop();
 	void comm_tick();
 	unsigned read_frame(unsigned data_size);
 	void send_data(uint8_t frame_type, unsigned frame_start, unsigned frame_size, unsigned data_size);

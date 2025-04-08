@@ -25,12 +25,243 @@ Notes:
 #include "emu.h"
 #include "xbdcomm.h"
 
+#include "asio.h"
+
+#include <iostream>
+
 #include "emuopts.h"
 
 #define VERBOSE 0
 #include "logmacro.h"
 
 #define Z80_TAG "commcpu"
+
+#ifdef XBDCOMM_SIMULATION
+class sega_xbdcomm_device::context
+{
+public:
+	context(
+			sega_xbdcomm_device &device) :
+	m_device(device),
+	m_acceptor(m_ioctx),
+	m_sock_rx(m_ioctx),
+	m_sock_tx(m_ioctx),
+	m_tx_timeout(m_ioctx)
+	{
+	}
+
+	void start(std::string localhost, std::string localport, std::string remotehost, std::string remoteport)
+	{
+		std::error_code err;
+		asio::ip::tcp::resolver resolver(m_ioctx);
+
+		for (auto &&resolveIte : resolver.resolve(localhost, localport, asio::ip::tcp::resolver::flags::address_configured, err))
+		{
+			m_localaddr = resolveIte.endpoint();
+			LOG("XBDCOMM: localhost = %s\n", *m_localaddr);
+		}
+		if (err)
+		{
+			LOG("XBDCOMM: localhost resolve error: %s\n", err.message());
+		}
+
+		for (auto &&resolveIte : resolver.resolve(remotehost, remoteport, asio::ip::tcp::resolver::flags::address_configured, err))
+		{
+			m_remoteaddr = resolveIte.endpoint();
+			LOG("XBDCOMM: remotehost = %s\n", *m_remoteaddr);
+		}
+		if (err)
+		{
+			LOG("XBDCOMM: remotehost resolve error: %s\n", err.message());
+		}
+	}
+
+	void stop()
+	{
+		std::error_code err;
+		if (m_acceptor.is_open())
+			m_acceptor.close(err);
+		if (m_sock_rx.is_open())
+			m_sock_rx.close(err);
+		if (m_sock_tx.is_open())
+			m_sock_tx.close(err);
+		m_tx_timeout.cancel();
+		m_tx_state = 0;
+		m_rx_state = 0;
+	}
+
+	void check_sockets()
+	{
+		// if async operation in progress, poll context
+		if ((m_rx_state == 1) || (m_tx_state == 1))
+			m_ioctx.poll();
+
+		// start acceptor if needed
+		if (m_localaddr && m_rx_state == 0)
+		{
+			std::error_code err;
+			m_acceptor.open(m_localaddr->protocol(), err);
+			m_acceptor.set_option(asio::ip::tcp::acceptor::reuse_address(true));
+			if (!err)
+			{
+				m_acceptor.bind(*m_localaddr, err);
+				if (!err)
+				{
+					m_acceptor.listen(1, err);
+					if (!err)
+					{
+						osd_printf_verbose("XBDCOMM: RX listen on %s\n", *m_localaddr);
+						m_acceptor.async_accept(
+								[this] (std::error_code const &err, asio::ip::tcp::socket sock)
+								{
+									if (err)
+									{
+										LOG("XBDCOMM: RX error accepting - %d %s\n", err.value(), err.message());
+										std::error_code e;
+										m_acceptor.close(e);
+										m_rx_state = 0;
+									}
+									else
+									{
+										LOG("XBDCOMM: RX connection from %s\n", sock.remote_endpoint());
+										std::error_code e;
+										m_acceptor.close(e);
+										m_sock_rx = std::move(sock);
+										m_sock_rx.non_blocking(true);
+										m_sock_rx.set_option(asio::socket_base::receive_buffer_size(524288));
+										m_sock_rx.set_option(asio::socket_base::keep_alive(true));
+										m_rx_state = 2;
+									}
+								});
+						m_rx_state = 1;
+					}
+				}
+			}
+			if (err)
+			{
+				LOG("XBDCOMM: RX failed - %d %s\n", err.value(), err.message());
+			}
+		}
+
+		// connect socket if needed
+		if (m_remoteaddr && m_tx_state == 0)
+		{
+			std::error_code err;
+			if (m_sock_tx.is_open())
+				m_sock_tx.close(err);
+			m_sock_tx.open(m_remoteaddr->protocol(), err);
+			if (!err)
+			{
+				m_sock_tx.non_blocking(true);
+				m_sock_tx.set_option(asio::ip::tcp::no_delay(true));
+				m_sock_tx.set_option(asio::socket_base::send_buffer_size(65536));
+				m_sock_tx.set_option(asio::socket_base::keep_alive(true));
+				osd_printf_verbose("XBDCOMM: TX connecting to %s\n", *m_remoteaddr);
+				m_tx_timeout.expires_after(std::chrono::seconds(10));
+				m_tx_timeout.async_wait(
+						[this] (std::error_code const &err)
+						{
+							if (!err && m_tx_state == 1)
+							{
+								osd_printf_verbose("XBDCOMM: TX connect timed out\n");
+								std::error_code e;
+								m_sock_tx.close(e);
+								m_tx_state = 0;
+							}
+						});
+				m_sock_tx.async_connect(
+						*m_remoteaddr,
+						[this] (std::error_code const &err)
+						{
+							m_tx_timeout.cancel();
+							if (err)
+							{
+								osd_printf_verbose("XBDCOMM: TX connect error - %d %s\n", err.value(), err.message());
+								std::error_code e;
+								m_sock_tx.close(e);
+								m_tx_state = 0;
+							}
+							else
+							{
+								LOG("XBDCOMM: TX connection established\n");
+								m_tx_state = 2;
+							}
+						});
+				m_tx_state = 1;
+			}
+		}
+	}
+
+	bool connected()
+	{
+		return m_rx_state == 2 && m_tx_state == 2;
+	}
+
+	unsigned receive(uint8_t *buffer, unsigned data_size)
+	{
+		if (m_rx_state != 2)
+			return 0;
+
+		std::error_code err;
+		std::size_t bytes_read = m_sock_rx.receive(asio::buffer(&buffer[0], data_size), asio::socket_base::message_peek, err);
+		if (err == asio::error::would_block)
+			return 0;
+
+		if (bytes_read == data_size)
+			bytes_read = m_sock_rx.receive(asio::buffer(&buffer[0], data_size), 0, err);
+
+		if (err)
+		{
+			osd_printf_verbose("XBDCOMM: RX error receiving - %d %s\n", err.value(), err.message());
+			m_sock_rx.close(err);
+			m_rx_state = 0;
+			return UINT_MAX;
+		}
+
+		if (bytes_read == data_size)
+			return bytes_read;
+		return 0;
+	}
+
+	unsigned send(uint8_t *buffer, unsigned data_size)
+	{
+		if (m_tx_state != 2)
+			return 0;
+
+		std::error_code err;
+		std::size_t bytes_sent = m_sock_tx.send(asio::buffer(&buffer[0], data_size), 0, err);
+		if (err || bytes_sent != data_size)
+		{
+			osd_printf_verbose("XBDCOMM: TX error sending - %d %s\n", err.value(), err.message());
+			m_sock_tx.close(err);
+			m_tx_state = 0;
+			return UINT_MAX;
+		}
+		return data_size;
+	}
+
+private:
+	template <typename Format, typename... Params>
+	void logerror(Format &&fmt, Params &&... args) const
+	{
+		util::stream_format(
+				std::cerr,
+				"%s",
+				util::string_format(std::forward<Format>(fmt), std::forward<Params>(args)...));
+	}
+
+	sega_xbdcomm_device &m_device;
+	asio::io_context m_ioctx;
+	std::optional<asio::ip::tcp::endpoint> m_localaddr;
+	std::optional<asio::ip::tcp::endpoint> m_remoteaddr;
+	asio::ip::tcp::acceptor m_acceptor;
+	asio::ip::tcp::socket m_sock_rx;
+	asio::ip::tcp::socket m_sock_tx;
+	asio::steady_timer m_tx_timeout;
+	uint8_t m_rx_state;
+	uint8_t m_tx_state;
+};
+#endif
 
 /*************************************
  *  XBDCOMM Memory Map
@@ -108,12 +339,6 @@ sega_xbdcomm_device::sega_xbdcomm_device(const machine_config &mconfig, const ch
 	m_cpu(*this, Z80_TAG),
 	m_dpram(*this, "dpram"),
 	m_mpc(*this, "commmpc")
-#ifdef XBDCOMM_SIMULATION
-	, m_acceptor(m_ioctx)
-	, m_sock_rx(m_ioctx)
-	, m_sock_tx(m_ioctx)
-	, m_tx_timeout(m_ioctx)
-#endif
 {
 }
 
@@ -129,6 +354,9 @@ void sega_xbdcomm_device::device_start()
 	save_item(NAME(m_z80_stat));
 
 #ifdef XBDCOMM_SIMULATION
+	auto ctx = std::make_unique<context>(*this);
+	m_context = std::move(ctx);
+
 	save_item(NAME(m_linkenable));
 	save_item(NAME(m_linktimer));
 	save_item(NAME(m_linkalive));
@@ -148,10 +376,11 @@ void sega_xbdcomm_device::device_reset()
 	m_z80_stat = 0;
 
 #ifdef XBDCOMM_SIMULATION
-	std::fill(std::begin(m_buffer0), std::end(m_buffer0), 0);
-	m_tx_state = 0;
-	m_rx_state = 0;
-	comm_start();
+	std::fill(std::begin(m_buffer), std::end(m_buffer), 0);
+	m_context->stop();
+
+	auto const &opts = mconfig().options();
+	m_context->start(opts.comm_localhost(), opts.comm_localport(), opts.comm_remotehost(), opts.comm_remoteport());
 
 	m_linkenable = 0;
 	m_linktimer = 0;
@@ -164,7 +393,8 @@ void sega_xbdcomm_device::device_reset()
 void sega_xbdcomm_device::device_stop()
 {
 #ifdef XBDCOMM_SIMULATION
-	comm_stop();
+	m_context->stop();
+	m_context.reset();
 #endif
 }
 
@@ -332,150 +562,9 @@ void sega_xbdcomm_device::z80_debug_w(uint8_t data)
 
 
 #ifdef XBDCOMM_SIMULATION
-void sega_xbdcomm_device::check_sockets()
-{
-	// if async operation in progress, poll context
-	if ((m_rx_state == 1) || (m_tx_state == 1))
-		m_ioctx.poll();
-
-	// start acceptor if needed
-	if (m_localaddr && m_rx_state == 0)
-	{
-		std::error_code err;
-		m_acceptor.open(m_localaddr->protocol(), err);
-		m_acceptor.set_option(asio::ip::tcp::acceptor::reuse_address(true));
-		if (!err)
-		{
-			m_acceptor.bind(*m_localaddr, err);
-			if (!err)
-			{
-				m_acceptor.listen(1, err);
-				if (!err)
-				{
-					osd_printf_verbose("XBDCOMM: RX listen on %s\n", *m_localaddr);
-					m_acceptor.async_accept(
-							[this] (std::error_code const &err, asio::ip::tcp::socket sock)
-							{
-								if (err)
-								{
-									LOG("XBDCOMM: RX error accepting - %d %s\n", err.value(), err.message());
-									std::error_code e;
-									m_acceptor.close(e);
-									m_rx_state = 0;
-								}
-								else
-								{
-									LOG("XBDCOMM: RX connection from %s\n", sock.remote_endpoint());
-									std::error_code e;
-									m_acceptor.close(e);
-									m_sock_rx = std::move(sock);
-									m_sock_rx.non_blocking(true);
-									m_sock_rx.set_option(asio::socket_base::receive_buffer_size(524288));
-									m_sock_rx.set_option(asio::socket_base::keep_alive(true));
-									m_rx_state = 2;
-								}
-							});
-					m_rx_state = 1;
-				}
-			}
-		}
-		if (err)
-		{
-			LOG("XBDCOMM: RX failed - %d %s\n", err.value(), err.message());
-		}
-	}
-
-	// connect socket if needed
-	if (m_remoteaddr && m_tx_state == 0)
-	{
-		std::error_code err;
-		if (m_sock_tx.is_open())
-			m_sock_tx.close(err);
-		m_sock_tx.open(m_remoteaddr->protocol(), err);
-		if (!err)
-		{
-			m_sock_tx.non_blocking(true);
-			m_sock_tx.set_option(asio::ip::tcp::no_delay(true));
-			m_sock_tx.set_option(asio::socket_base::send_buffer_size(65536));
-			m_sock_tx.set_option(asio::socket_base::keep_alive(true));
-			osd_printf_verbose("XBDCOMM: TX connecting to %s\n", *m_remoteaddr);
-			m_tx_timeout.expires_after(std::chrono::seconds(10));
-			m_tx_timeout.async_wait(
-					[this] (std::error_code const &err)
-					{
-						if (!err && m_tx_state == 1)
-						{
-							osd_printf_verbose("XBDCOMM: TX connect timed out\n");
-							std::error_code e;
-							m_sock_tx.close(e);
-							m_tx_state = 0;
-						}
-					});
-			m_sock_tx.async_connect(
-					*m_remoteaddr,
-					[this] (std::error_code const &err)
-					{
-						m_tx_timeout.cancel();
-						if (err)
-						{
-							osd_printf_verbose("XBDCOMM: TX connect error - %d %s\n", err.value(), err.message());
-							std::error_code e;
-							m_sock_tx.close(e);
-							m_tx_state = 0;
-						}
-						else
-						{
-							LOG("XBDCOMM: TX connection established\n");
-							m_tx_state = 2;
-						}
-					});
-			m_tx_state = 1;
-		}
-	}
-}
-
-void sega_xbdcomm_device::comm_start()
-{
-	auto const &opts = mconfig().options();
-	std::error_code err;
-	asio::ip::tcp::resolver resolver(m_ioctx);
-
-	for (auto &&resolveIte : resolver.resolve(opts.comm_localhost(), opts.comm_localport(), asio::ip::tcp::resolver::flags::address_configured, err))
-	{
-		m_localaddr = resolveIte.endpoint();
-		LOG("XBDCOMM: localhost = %s\n", *m_localaddr);
-	}
-	if (err)
-	{
-		LOG("XBDCOMM: localhost resolve error: %s\n", err.message());
-	}
-
-	for (auto &&resolveIte : resolver.resolve(opts.comm_remotehost(), opts.comm_remoteport(), asio::ip::tcp::resolver::flags::address_configured, err))
-	{
-		m_remoteaddr = resolveIte.endpoint();
-		LOG("XBDCOMM: remotehost = %s\n", *m_remoteaddr);
-	}
-	if (err)
-	{
-		LOG("XBDCOMM: remotehost resolve error: %s\n", err.message());
-	}
-}
-
-void sega_xbdcomm_device::comm_stop()
-{
-	std::error_code err;
-	if (m_acceptor.is_open())
-		m_acceptor.close(err);
-	if (m_sock_rx.is_open())
-		m_sock_rx.close(err);
-	if (m_sock_tx.is_open())
-		m_sock_tx.close(err);
-	m_tx_timeout.cancel();
-}
-
 void sega_xbdcomm_device::comm_tick()
 {
-	check_sockets();
+	m_context->check_sockets();
 
 	if (m_linkenable == 0x01)
 	{
@@ -530,14 +619,14 @@ void sega_xbdcomm_device::comm_tick()
 			m_z80_stat = 0x01;
 
 			// if both sockets are there check ring
-			if (m_rx_state == 2 && m_tx_state == 2)
+			if (m_context->connected())
 			{
 				// try to read one message
 				int recv = read_frame(data_size);
 				while (recv > 0)
 				{
 					// check message id
-					uint8_t idx = m_buffer0[0];
+					uint8_t idx = m_buffer[0];
 
 					// 0xff - link id
 					if (idx == 0xff)
@@ -546,7 +635,7 @@ void sega_xbdcomm_device::comm_tick()
 						{
 							// master gets first id and starts next state
 							m_linkid = 0x01;
-							m_linkcount = m_buffer0[1];
+							m_linkcount = m_buffer[1];
 							m_linktimer = 0x00;
 						}
 						else
@@ -554,8 +643,8 @@ void sega_xbdcomm_device::comm_tick()
 							// slave get own id, relay does nothing
 							if (is_slave)
 							{
-								m_buffer0[1]++;
-								m_linkid = m_buffer0[1];
+								m_buffer[1]++;
+								m_linkid = m_buffer[1];
 							}
 
 							// forward message to other nodes
@@ -568,7 +657,7 @@ void sega_xbdcomm_device::comm_tick()
 					{
 						if (is_slave || is_relay)
 						{
-							m_linkcount = m_buffer0[1];
+							m_linkcount = m_buffer[1];
 
 							// forward message to other nodes
 							send_frame(data_size);
@@ -594,16 +683,16 @@ void sega_xbdcomm_device::comm_tick()
 					// send first packet
 					if (m_linktimer == 0x01)
 					{
-						m_buffer0[0] = 0xff;
-						m_buffer0[1] = 0x01;
+						m_buffer[0] = 0xff;
+						m_buffer[1] = 0x01;
 						send_frame(data_size);
 					}
 
 					// send second packet
 					else if (m_linktimer == 0x00)
 					{
-						m_buffer0[0] = 0xfe;
-						m_buffer0[1] = m_linkcount;
+						m_buffer[0] = 0xfe;
+						m_buffer[1] = m_linkcount;
 						send_frame(data_size);
 
 						// consider it done
@@ -631,14 +720,14 @@ void sega_xbdcomm_device::comm_tick()
 			while (recv > 0)
 			{
 				// check if valid id
-				uint8_t idx = m_buffer0[0];
+				uint8_t idx = m_buffer[0];
 				if (idx > 0 && idx <= m_linkcount)
 				{
 					// save message to "ring buffer"
 					unsigned frame_offset = frame_start_tx + ((idx - 1) * frame_size);
 					for (unsigned j = 0x00; j < frame_size; j++)
 					{
-						mpc_mem_w(frame_offset + j, m_buffer0[1 + j]);
+						mpc_mem_w(frame_offset + j, m_buffer[1 + j]);
 					}
 
 					// if not own message
@@ -684,22 +773,9 @@ void sega_xbdcomm_device::comm_tick()
 
 unsigned sega_xbdcomm_device::read_frame(unsigned data_size)
 {
-	if (m_rx_state != 2)
-		return 0;
-
-	std::error_code err;
-	std::size_t bytes_read = m_sock_rx.receive(asio::buffer(&m_buffer0[0], data_size), asio::socket_base::message_peek, err);
-	if (err == asio::error::would_block)
-		return 0;
-
-	if (bytes_read == data_size)
-		bytes_read = m_sock_rx.receive(asio::buffer(&m_buffer0[0], data_size), 0, err);
-
-	if (err)
+	unsigned bytes_read = m_context->receive(&m_buffer[0], data_size);
+	if (bytes_read == UINT_MAX)
 	{
-		osd_printf_verbose("XBDCOMM: RX error receiving - %d %s\n", err.value(), err.message());
-		m_sock_rx.close(err);
-		m_rx_state = 0;
 		if (m_linkalive == 0x01)
 		{
 			LOG("XBDCOMM: link lost\n");
@@ -709,34 +785,24 @@ unsigned sega_xbdcomm_device::read_frame(unsigned data_size)
 		}
 		return 0;
 	}
-
-	if (bytes_read == data_size)
-		return bytes_read;
-	return 0;
+	return bytes_read;
 }
 
 void sega_xbdcomm_device::send_data(uint8_t frame_type, unsigned frame_offset, unsigned frame_size, unsigned data_size)
 {
-	m_buffer0[0] = frame_type;
+	m_buffer[0] = frame_type;
 	for (unsigned i = 0x00; i < frame_size; i++)
 	{
-		m_buffer0[1 + i] = mpc_mem_r(frame_offset + i);
+		m_buffer[1 + i] = mpc_mem_r(frame_offset + i);
 	}
 	send_frame(data_size);
 }
 
 void sega_xbdcomm_device::send_frame(unsigned data_size)
 {
-	if (m_tx_state != 2)
-		return;
-
-	std::error_code err;
-	std::size_t bytes_sent = m_sock_tx.send(asio::buffer(&m_buffer0[0], data_size), 0, err);
-	if (err || bytes_sent != data_size)
+	unsigned bytes_sent = m_context->send(&m_buffer[0], data_size);
+	if (bytes_sent == UINT_MAX)
 	{
-		osd_printf_verbose("XBDCOMM: TX error sending - %d %s\n", err.value(), err.message());
-		m_sock_tx.close(err);
-		m_tx_state = 0;
 		if (m_linkalive == 0x01)
 		{
 			LOG("XBDCOMM: link lost\n");

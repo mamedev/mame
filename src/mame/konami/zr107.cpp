@@ -759,7 +759,7 @@ void zr107_state::zr107(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	K056230(config, m_k056230);
+	K056230(config, m_k056230, 0U);
 	m_k056230->irq_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ2);
 
 	WATCHDOG_TIMER(config, m_watchdog);

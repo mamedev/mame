@@ -2548,7 +2548,7 @@ void model2o_state::model2o(machine_config &config)
 	uart_clock.signal_handler().set(m_uart, FUNC(i8251_device::write_txc));
 	uart_clock.signal_handler().append(m_uart, FUNC(i8251_device::write_rxc));
 
-	SEGA_MODEL2_COMM(config, "m2comm", 0);
+	SEGA_MODEL2_COMM(config, m_m2comm, 0U);
 }
 
 u8 model2_state::driveio_portg_r()
@@ -2688,7 +2688,7 @@ void model2a_state::model2a(machine_config &config)
 	model2_screen(config);
 	model2_scsp(config);
 
-	SEGA_MODEL2_COMM(config, "m2comm", 0);
+	SEGA_MODEL2_COMM(config, m_m2comm, 0U);
 
 	SEGA_BILLBOARD(config, m_billboard, 0);
 
@@ -2813,7 +2813,7 @@ void model2b_state::model2b(machine_config &config)
 	model2_screen(config);
 	model2_scsp(config);
 
-	SEGA_MODEL2_COMM(config, "m2comm", 0);
+	SEGA_MODEL2_COMM(config, m_m2comm, 0U);
 
 	SEGA_BILLBOARD(config, m_billboard, 0);
 
@@ -2872,7 +2872,7 @@ void model2b_state::powsled(machine_config &config)
 	io.an_port_callback<7>().set_ioport("P2_L");
 	// 0 and 2 is Motion AD
 
-	subdevice<sega_m2comm_device>("m2comm")->set_frameoffset(0x180);
+	m_m2comm->set_frameoffset(0x180);
 }
 
 
@@ -2962,7 +2962,7 @@ void model2c_state::model2c(machine_config &config)
 	model2_screen(config);
 	model2_scsp(config);
 
-	SEGA_MODEL2_COMM(config, "m2comm", 0);
+	SEGA_MODEL2_COMM(config, "m2comm", 0U);
 }
 
 void model2c_state::skisuprg(machine_config &config)
