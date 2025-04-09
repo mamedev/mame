@@ -262,27 +262,24 @@ int dmulu(uint64_t &dstlo, uint64_t &dsthi, uint64_t src1, uint64_t src2, bool f
 		return 0;
 	}
 
-	// fetch source values
-	uint64_t a = src1;
-	uint64_t b = src2;
-	if (a == 0 || b == 0)
+	if (!src1 || !src2)
 	{
 		dsthi = dstlo = 0;
 		return FLAG_Z;
 	}
 
 	// compute high and low parts first
-	uint64_t lo = uint64_t(uint32_t(a >> 0))  * uint64_t(uint32_t(b >> 0));
-	uint64_t hi = uint64_t(uint32_t(a >> 32)) * uint64_t(uint32_t(b >> 32));
+	uint64_t lo = uint64_t(uint32_t(src1 >> 0))  * uint64_t(uint32_t(src2 >> 0));
+	uint64_t hi = uint64_t(uint32_t(src1 >> 32)) * uint64_t(uint32_t(src2 >> 32));
 
 	// compute middle parts
 	uint64_t prevlo = lo;
-	uint64_t temp = uint64_t(uint32_t(a >> 32)) * uint64_t(uint32_t(b >> 0));
+	uint64_t temp = uint64_t(uint32_t(src1 >> 32)) * uint64_t(uint32_t(src2 >> 0));
 	lo += temp << 32;
 	hi += (temp >> 32) + (lo < prevlo);
 
 	prevlo = lo;
-	temp = uint64_t(uint32_t(a >> 0)) * uint64_t(uint32_t(b >> 32));
+	temp = uint64_t(uint32_t(src1 >> 0)) * uint64_t(uint32_t(src2 >> 32));
 	lo += temp << 32;
 	hi += (temp >> 32) + (lo < prevlo);
 
@@ -291,9 +288,9 @@ int dmulu(uint64_t &dstlo, uint64_t &dsthi, uint64_t src1, uint64_t src2, bool f
 	dstlo = lo;
 
 	if (halfmul_flags)
-		return ((lo >> 60) & FLAG_S) | ((hi != 0) << 1) | ((dstlo == 0) << 2);
-
-	return ((hi >> 60) & FLAG_S) | ((hi != 0) << 1) | ((dsthi == 0 && dstlo == 0) << 2);
+		return ((lo >> 60) & FLAG_S) | (hi ? FLAG_V : 0) | (!lo ? FLAG_Z : 0);
+	else
+		return ((hi >> 60) & FLAG_S) | (hi ? FLAG_V : 0) | ((!hi && !lo) ? FLAG_Z : 0);
 }
 
 
@@ -313,14 +310,15 @@ int dmuls(uint64_t &dstlo, uint64_t &dsthi, int64_t src1, int64_t src2, bool fla
 		return 0;
 	}
 
-	// fetch absolute source values
-	a = src1; if (int64_t(a) < 0) a = -a;
-	b = src2; if (int64_t(b) < 0) b = -b;
-	if (a == 0 || b == 0)
+	if (!src1 || !src2)
 	{
 		dsthi = dstlo = 0;
 		return FLAG_Z;
 	}
+
+	// fetch absolute source values
+	a = src1; if (int64_t(a) < 0) a = -a;
+	b = src2; if (int64_t(b) < 0) b = -b;
 
 	// compute high and low parts first
 	lo = uint64_t(uint32_t(a >> 0))  * uint64_t(uint32_t(b >> 0));
@@ -349,9 +347,9 @@ int dmuls(uint64_t &dstlo, uint64_t &dsthi, int64_t src1, int64_t src2, bool fla
 	dstlo = lo;
 
 	if (halfmul_flags)
-		return ((lo >> 60) & FLAG_S) | ((hi != (int64_t(lo) >> 63)) << 1) | ((dstlo == 0) << 2);
-
-	return ((hi >> 60) & FLAG_S) | ((hi != (int64_t(lo) >> 63)) << 1) | ((dsthi == 0 && dstlo == 0) << 2);
+		return ((lo >> 60) & FLAG_S) | ((hi != (int64_t(lo) >> 63)) ? FLAG_V : 0) | (!lo ? FLAG_Z : 0);
+	else
+		return ((hi >> 60) & FLAG_S) | ((hi != (int64_t(lo) >> 63)) ? FLAG_V : 0) | ((!hi && !lo) ? FLAG_Z : 0);
 }
 
 
@@ -5057,7 +5055,7 @@ void drcbe_x86::op_mulu(Assembler &a, const instruction &inst)
 	be_parameter src1p(*this, inst.param(2), PTYPE_MRI);
 	be_parameter src2p(*this, inst.param(3), PTYPE_MRI);
 	normalize_commutative(src1p, src2p);
-	bool compute_hi = (dstp != edstp);
+	const bool compute_hi = (dstp != edstp);
 
 	// 32-bit form
 	if (inst.size() == 4)
@@ -5102,7 +5100,7 @@ void drcbe_x86::op_mulu(Assembler &a, const instruction &inst)
 	{
 		// general case
 		a.mov(dword_ptr(esp, 28), 0);                                                   // mov   [esp+28],0 (calculate flags as 64x64=128)
-		a.mov(dword_ptr(esp, 24), inst.flags());                                        // mov   [esp+24],flags
+		a.mov(dword_ptr(esp, 24), inst.flags() ? 1 : 0);                                // mov   [esp+24],flags
 		emit_mov_m64_p64(a, qword_ptr(esp, 16), src2p);                                 // mov   [esp+16],src2p
 		emit_mov_m64_p64(a, qword_ptr(esp, 8), src1p);                                  // mov   [esp+8],src1p
 		if (!compute_hi)
@@ -5178,7 +5176,7 @@ void drcbe_x86::op_mululw(Assembler &a, const instruction &inst)
 	{
 		// general case
 		a.mov(dword_ptr(esp, 28), 1);                                                   // mov   [esp+28],1 (calculate flags as 64x64=64)
-		a.mov(dword_ptr(esp, 24), inst.flags());                                        // mov   [esp+24],flags
+		a.mov(dword_ptr(esp, 24), inst.flags() ? 1 : 0);                                // mov   [esp+24],flags
 		emit_mov_m64_p64(a, qword_ptr(esp, 16), src2p);                                 // mov   [esp+16],src2p
 		emit_mov_m64_p64(a, qword_ptr(esp, 8), src1p);                                  // mov   [esp+8],src1p
 		a.mov(dword_ptr(esp, 4), imm(&m_reslo));                                        // mov   [esp+4],&reslo
@@ -5213,7 +5211,7 @@ void drcbe_x86::op_muls(Assembler &a, const instruction &inst)
 	be_parameter src1p(*this, inst.param(2), PTYPE_MRI);
 	be_parameter src2p(*this, inst.param(3), PTYPE_MRI);
 	normalize_commutative(src1p, src2p);
-	bool compute_hi = (dstp != edstp);
+	const bool compute_hi = (dstp != edstp);
 
 	// 32-bit form
 	if (inst.size() == 4)
@@ -5257,7 +5255,7 @@ void drcbe_x86::op_muls(Assembler &a, const instruction &inst)
 	{
 		// general case
 		a.mov(dword_ptr(esp, 28), 0);                                                   // mov   [esp+28],0 (calculate flags as 64x64=128)
-		a.mov(dword_ptr(esp, 24), inst.flags());                                        // mov   [esp+24],flags
+		a.mov(dword_ptr(esp, 24), inst.flags() ? 1 : 0);                                // mov   [esp+24],flags
 		emit_mov_m64_p64(a, qword_ptr(esp, 16), src2p);                                 // mov   [esp+16],src2p
 		emit_mov_m64_p64(a, qword_ptr(esp, 8), src1p);                                  // mov   [esp+8],src1p
 		if (!compute_hi)
@@ -5334,7 +5332,7 @@ void drcbe_x86::op_mulslw(Assembler &a, const instruction &inst)
 	{
 		// general case
 		a.mov(dword_ptr(esp, 28), 1);                                                   // mov   [esp+28],1 (calculate flags as 64x64=64)
-		a.mov(dword_ptr(esp, 24), inst.flags());                                        // mov   [esp+24],flags
+		a.mov(dword_ptr(esp, 24), inst.flags() ? 1 : 0);                                // mov   [esp+24],flags
 		emit_mov_m64_p64(a, qword_ptr(esp, 16), src2p);                                 // mov   [esp+16],src2p
 		emit_mov_m64_p64(a, qword_ptr(esp, 8), src1p);                                  // mov   [esp+8],src1p
 		a.mov(dword_ptr(esp, 4), imm(&m_reslo));                                        // mov   [esp+4],&reslo
