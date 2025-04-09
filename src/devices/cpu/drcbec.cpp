@@ -2093,7 +2093,7 @@ int drcbe_c::execute(code_handle &entry)
 				[[fallthrough]];
 
 			case MAKE_OPCODE_SHORT(OP_FMOV, 4, 0):
-				FSPARAM0 = FSPARAM1;
+				PARAM0 = PARAM1;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI4T, 4, 0):    // FSTOI4T dst,src1
@@ -2236,7 +2236,7 @@ int drcbe_c::execute(code_handle &entry)
 				[[fallthrough]];
 
 			case MAKE_OPCODE_SHORT(OP_FMOV, 8, 0):
-				FDPARAM0 = FDPARAM1;
+				DPARAM0 = DPARAM1;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI4T, 8, 0):    // FDTOI4T dst,src1

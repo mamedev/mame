@@ -33,7 +33,11 @@
 
 #include "emu.h"
 #include "drcuml.h"
+
 #include "drcumlsh.h"
+
+#include <type_traits>
+
 
 using namespace uml;
 
@@ -591,11 +595,13 @@ public:
 		truncate_immediate(inst, 1, mask);
 	}
 
-	template <opcode_t LoWordOp>
+	template <opcode_t LoWordOp, typename Short, typename Long>
 	static void mul(instruction &inst)
 	{
-		// if the two destination operands are identical, convert to MUL.LW
-		if (inst.param(0) == inst.param(1))
+		bool const low_only = inst.param(0) == inst.param(1);
+
+		// if the two destination operands are identical and the S and Z flags aren't required, convert to MUL.LW
+		if (low_only && !(inst.flags() & (FLAG_Z | FLAG_S)))
 		{
 			inst.m_opcode = LoWordOp;
 			inst.m_param[1] = inst.param(2);
@@ -615,6 +621,48 @@ public:
 		{
 			using std::swap;
 			swap(inst.m_param[2], inst.m_param[3]);
+		}
+
+		// can only simplify the low-only form, can't optimise overflow flag generation
+		if (!low_only || (inst.flags() & FLAG_V))
+			return;
+
+		if (inst.param(2).is_immediate_value(0) || inst.param(3).is_immediate_value(0))
+		{
+			// multiplying anything by zero yields zero
+			convert_to_mov_immediate(inst, 0);
+		}
+		else if (inst.param(2).is_immediate() && inst.param(3).is_immediate())
+		{
+			// convert constant result to MOV or a logic op
+			auto const size = inst.size();
+			auto const bits = size << 3;
+			assert((size == 4) || (size == 8));
+
+			if (size == 4)
+			{
+				Short const param2 = Short(u32(inst.param(2).immediate()));
+				Short const param3 = Short(u32(inst.param(3).immediate()));
+				Short const val = param2 * param3;
+				bool const no_overflow = (val / param2) == param3;
+				bool const z_ok = !(inst.flags() & FLAG_Z) || no_overflow;
+				bool const s_ok = !(inst.flags() & FLAG_S) || (std::is_signed_v<Short> ? !BIT(param2 ^ param3 ^ val, bits - 1) : (no_overflow && !BIT(val, bits - 1)));
+
+				if (z_ok && s_ok)
+					convert_to_mov_immediate(inst, u32(val));
+			}
+			else
+			{
+				Long const param2 = Long(inst.param(2).immediate());
+				Long const param3 = Long(inst.param(3).immediate());
+				Long const val = param2 * param3;
+				bool const no_overflow = (val / param2) == param3;
+				bool const z_ok = !(inst.flags() & FLAG_Z) || no_overflow;
+				bool const s_ok = !(inst.flags() & FLAG_S) || (std::is_signed_v<Long> ? !BIT(param2 ^ param3 ^ val, bits - 1) : (no_overflow && !BIT(val, bits - 1)));
+
+				if (z_ok && s_ok)
+					convert_to_mov_immediate(inst, u64(val));
+			}
 		}
 	}
 
@@ -640,9 +688,19 @@ public:
 			assert((size == 4) || (size == 8));
 
 			if (size == 4)
-				convert_to_mov_immediate(inst, u32(Short(u32(inst.param(1).immediate())) * Short(u32(inst.param(2).immediate()))));
+			{
+				Short const param1 = Short(u32(inst.param(1).immediate()));
+				Short const param2 = Short(u32(inst.param(2).immediate()));
+				Short const val = param1 * param2;
+				convert_to_mov_immediate(inst, u32(val));
+			}
 			else
-				convert_to_mov_immediate(inst, u64(Long(inst.param(1).immediate()) * Long(inst.param(2).immediate())));
+			{
+				Long const param1 = Long(inst.param(1).immediate());
+				Long const param2 = Long(inst.param(2).immediate());
+				Long const val = param1 * param2;
+				convert_to_mov_immediate(inst, u64(val));
+			}
 		}
 	}
 
@@ -660,15 +718,15 @@ public:
 		if (inst.flags() & FLAG_V)
 			return;
 
-		// optimise the quotient-only form if not dividing by zero
-		if ((inst.param(0) == inst.param(1)) && !inst.param(3).is_immediate_value(0))
+		// optimise the quotient-only form with two immediate inputs if not dividing by zero
+		if ((inst.param(0) == inst.param(1)) && inst.param(2).is_immediate() && inst.param(3).is_immediate() && !inst.param(3).is_immediate_value(0))
 		{
 			if (inst.param(2).is_immediate_value(0))
 			{
 				// dividing zero by anything yields zero
 				convert_to_mov_immediate(inst, 0);
 			}
-			else if (inst.param(2).is_immediate() && inst.param(3).is_immediate())
+			else
 			{
 				// convert constant result to MOV or a logic op
 				assert((size == 4) || (size == 8));
@@ -1138,42 +1196,42 @@ void uml::instruction::simplify()
 		origop = m_opcode;
 		switch (m_opcode)
 		{
-		case OP_READ:   simplify_op::read(*this);            break;
-		case OP_READM:  simplify_op::readm(*this);           break;
-		case OP_WRITE:  simplify_op::write(*this);           break;
-		case OP_WRITEM: simplify_op::writem(*this);          break;
-		case OP_SET:    simplify_op::set(*this);             break;
-		case OP_MOV:    simplify_op::mov(*this);             break;
-		case OP_SEXT:   simplify_op::sext(*this);            break;
-		case OP_ROLAND: simplify_op::roland(*this);          break;
-		case OP_ROLINS: simplify_op::rolins(*this);          break;
-		case OP_ADD:    simplify_op::add(*this);             break;
-		case OP_ADDC:   simplify_op::truncate_imm(*this);    break;
-		case OP_SUB:    simplify_op::sub(*this);             break;
-		case OP_SUBB:   simplify_op::truncate_imm(*this);    break;
-		case OP_CMP:    simplify_op::cmp(*this);             break;
-		case OP_MULU:   simplify_op::mul<OP_MULULW>(*this);  break;
-		case OP_MULULW: simplify_op::mullw<u32, u64>(*this); break;
-		case OP_MULS:   simplify_op::mul<OP_MULSLW>(*this);  break;
-		case OP_MULSLW: simplify_op::mullw<s32, s64>(*this); break;
-		case OP_DIVU:   simplify_op::div<u32, u64>(*this);   break;
-		case OP_DIVS:   simplify_op::div<s32, s64>(*this);   break;
-		case OP_AND:    simplify_op::_and(*this);            break;
-		case OP_TEST:   simplify_op::test(*this);            break;
-		case OP_OR:     simplify_op::_or(*this);             break;
-		case OP_XOR:    simplify_op::_xor(*this);            break;
-		case OP_LZCNT:  simplify_op::lzcnt(*this);           break;
-		case OP_TZCNT:  simplify_op::truncate_imm(*this);    break;
-		case OP_BSWAP:  simplify_op::bswap(*this);           break;
-		case OP_SHL:    simplify_op::shl(*this);             break;
-		case OP_SHR:    simplify_op::shr<u32, u64>(*this);   break;
-		case OP_SAR:    simplify_op::shr<s32, s64>(*this);   break;
-		case OP_ROL:    simplify_op::rol(*this);             break;
-		case OP_ROLC:   simplify_op::rolrc(*this);           break;
-		case OP_ROR:    simplify_op::ror(*this);             break;
-		case OP_RORC:   simplify_op::rolrc(*this);           break;
+		case OP_READ:   simplify_op::read(*this);                     break;
+		case OP_READM:  simplify_op::readm(*this);                    break;
+		case OP_WRITE:  simplify_op::write(*this);                    break;
+		case OP_WRITEM: simplify_op::writem(*this);                   break;
+		case OP_SET:    simplify_op::set(*this);                      break;
+		case OP_MOV:    simplify_op::mov(*this);                      break;
+		case OP_SEXT:   simplify_op::sext(*this);                     break;
+		case OP_ROLAND: simplify_op::roland(*this);                   break;
+		case OP_ROLINS: simplify_op::rolins(*this);                   break;
+		case OP_ADD:    simplify_op::add(*this);                      break;
+		case OP_ADDC:   simplify_op::truncate_imm(*this);             break;
+		case OP_SUB:    simplify_op::sub(*this);                      break;
+		case OP_SUBB:   simplify_op::truncate_imm(*this);             break;
+		case OP_CMP:    simplify_op::cmp(*this);                      break;
+		case OP_MULU:   simplify_op::mul<OP_MULULW, u32, u64>(*this); break;
+		case OP_MULULW: simplify_op::mullw<u32, u64>(*this);          break;
+		case OP_MULS:   simplify_op::mul<OP_MULSLW, s32, s64>(*this); break;
+		case OP_MULSLW: simplify_op::mullw<s32, s64>(*this);          break;
+		case OP_DIVU:   simplify_op::div<u32, u64>(*this);            break;
+		case OP_DIVS:   simplify_op::div<s32, s64>(*this);            break;
+		case OP_AND:    simplify_op::_and(*this);                     break;
+		case OP_TEST:   simplify_op::test(*this);                     break;
+		case OP_OR:     simplify_op::_or(*this);                      break;
+		case OP_XOR:    simplify_op::_xor(*this);                     break;
+		case OP_LZCNT:  simplify_op::lzcnt(*this);                    break;
+		case OP_TZCNT:  simplify_op::truncate_imm(*this);             break;
+		case OP_BSWAP:  simplify_op::bswap(*this);                    break;
+		case OP_SHL:    simplify_op::shl(*this);                      break;
+		case OP_SHR:    simplify_op::shr<u32, u64>(*this);            break;
+		case OP_SAR:    simplify_op::shr<s32, s64>(*this);            break;
+		case OP_ROL:    simplify_op::rol(*this);                      break;
+		case OP_ROLC:   simplify_op::rolrc(*this);                    break;
+		case OP_ROR:    simplify_op::ror(*this);                      break;
+		case OP_RORC:   simplify_op::rolrc(*this);                    break;
 
-		default:                                             break;
+		default:                                                      break;
 		}
 
 #if 0

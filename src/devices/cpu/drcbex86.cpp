@@ -2633,10 +2633,9 @@ void drcbe_x86::emit_rcl_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 	Label loop = a.newLabel();
 	Label skipall = a.newLabel();
 	Label skiploop = a.newLabel();
-	Label end = a.newLabel();
 
 	a.pushfd(); // keep carry flag after and
-	emit_mov_r32_p32_keepflags(a, ecx, param);
+	emit_mov_r32_p32(a, ecx, param);
 
 	a.and_(ecx, 63);
 	a.popfd();
@@ -2656,27 +2655,18 @@ void drcbe_x86::emit_rcl_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 	a.rcl(reglo, 1);
 	a.rcl(reghi, 1);
 
-	if (inst.flags())
-	{
-		calculate_status_flags(a, reglo, FLAG_Z);
-		a.pushfd();
-		calculate_status_flags(a, reghi, FLAG_S | FLAG_Z);
-		emit_combine_z_flags(a);
-
-		a.short_().jmp(end);
-	}
-
 	a.bind(skipall);
-
 	if (inst.flags())
 	{
-		a.test(reglo, reglo);
+		if (inst.flags() & FLAG_C)
+			calculate_status_flags(a, reglo, FLAG_Z);
+		else
+			a.test(reglo, reglo);
 		a.pushfd();
 		calculate_status_flags(a, reghi, FLAG_S | FLAG_Z);
 		emit_combine_z_flags(a);
 	}
 
-	a.bind(end);
 	reset_last_upper_lower_reg();
 }
 
@@ -2691,10 +2681,9 @@ void drcbe_x86::emit_rcr_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 	Label loop = a.newLabel();
 	Label skipall = a.newLabel();
 	Label skiploop = a.newLabel();
-	Label end = a.newLabel();
 
 	a.pushfd(); // keep carry flag after and
-	emit_mov_r32_p32_keepflags(a, ecx, param);
+	emit_mov_r32_p32(a, ecx, param);
 
 	a.and_(ecx, 63);
 	a.popfd();
@@ -2714,26 +2703,18 @@ void drcbe_x86::emit_rcr_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 	a.rcr(reghi, 1);
 	a.rcr(reglo, 1);
 
-	if (inst.flags())
-	{
-		calculate_status_flags(a, reglo, FLAG_Z);
-		a.pushfd();
-		calculate_status_flags(a, reghi, FLAG_S | FLAG_Z);
-		emit_combine_z_flags(a);
-
-		a.short_().jmp(end);
-	}
-
 	a.bind(skipall);
 	if (inst.flags())
 	{
-		a.test(reglo, reglo);
+		if (inst.flags() & FLAG_C)
+			calculate_status_flags(a, reglo, FLAG_Z);
+		else
+			a.test(reglo, reglo);
 		a.pushfd();
 		calculate_status_flags(a, reghi, FLAG_S | FLAG_Z);
 		emit_combine_z_flags(a);
 	}
 
-	a.bind(end);
 	reset_last_upper_lower_reg();
 }
 

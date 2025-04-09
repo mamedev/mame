@@ -547,10 +547,8 @@ private:
 	void op_sub(Assembler &a, const uml::instruction &inst);
 	void op_subc(Assembler &a, const uml::instruction &inst);
 	void op_cmp(Assembler &a, const uml::instruction &inst);
-	void op_mulu(Assembler &a, const uml::instruction &inst);
-	void op_mululw(Assembler &a, const uml::instruction &inst);
-	void op_muls(Assembler &a, const uml::instruction &inst);
-	void op_mulslw(Assembler &a, const uml::instruction &inst);
+	template <Inst::Id Opcode> void op_mul(Assembler &a, const uml::instruction &inst);
+	template <Inst::Id Opcode> void op_mullw(Assembler &a, const uml::instruction &inst);
 	void op_divu(Assembler &a, const uml::instruction &inst);
 	void op_divs(Assembler &a, const uml::instruction &inst);
 	void op_and(Assembler &a, const uml::instruction &inst);
@@ -674,44 +672,44 @@ inline void drcbe_x64::generate_one(Assembler &a, const uml::instruction &inst)
 	case uml::OP_RESTORE: op_restore(a, inst);    break; // RESTORE dst
 
 	// Integer Operations
-	case uml::OP_LOAD:    op_load(a, inst);       break; // LOAD    dst,base,index,size
-	case uml::OP_LOADS:   op_loads(a, inst);      break; // LOADS   dst,base,index,size
-	case uml::OP_STORE:   op_store(a, inst);      break; // STORE   base,index,src,size
-	case uml::OP_READ:    op_read(a, inst);       break; // READ    dst,src1,spacesize
-	case uml::OP_READM:   op_readm(a, inst);      break; // READM   dst,src1,mask,spacesize
-	case uml::OP_WRITE:   op_write(a, inst);      break; // WRITE   dst,src1,spacesize
-	case uml::OP_WRITEM:  op_writem(a, inst);     break; // WRITEM  dst,src1,spacesize
-	case uml::OP_CARRY:   op_carry(a, inst);      break; // CARRY   src,bitnum
-	case uml::OP_SET:     op_set(a, inst);        break; // SET     dst,c
-	case uml::OP_MOV:     op_mov(a, inst);        break; // MOV     dst,src[,c]
-	case uml::OP_SEXT:    op_sext(a, inst);       break; // SEXT    dst,src
-	case uml::OP_ROLAND:  op_roland(a, inst);     break; // ROLAND  dst,src1,src2,src3
-	case uml::OP_ROLINS:  op_rolins(a, inst);     break; // ROLINS  dst,src1,src2,src3
-	case uml::OP_ADD:     op_add(a, inst);        break; // ADD     dst,src1,src2[,f]
-	case uml::OP_ADDC:    op_addc(a, inst);       break; // ADDC    dst,src1,src2[,f]
-	case uml::OP_SUB:     op_sub(a, inst);        break; // SUB     dst,src1,src2[,f]
-	case uml::OP_SUBB:    op_subc(a, inst);       break; // SUBB    dst,src1,src2[,f]
-	case uml::OP_CMP:     op_cmp(a, inst);        break; // CMP     src1,src2[,f]
-	case uml::OP_MULU:    op_mulu(a, inst);       break; // MULU    dst,edst,src1,src2[,f]
-	case uml::OP_MULULW:  op_mululw(a, inst);     break; // MULULW  dst,src1,src2[,f]
-	case uml::OP_MULS:    op_muls(a, inst);       break; // MULS    dst,edst,src1,src2[,f]
-	case uml::OP_MULSLW:  op_mulslw(a, inst);     break; // MULSLW  dst,src1,src2[,f]
-	case uml::OP_DIVU:    op_divu(a, inst);       break; // DIVU    dst,edst,src1,src2[,f]
-	case uml::OP_DIVS:    op_divs(a, inst);       break; // DIVS    dst,edst,src1,src2[,f]
-	case uml::OP_AND:     op_and(a, inst);        break; // AND     dst,src1,src2[,f]
-	case uml::OP_TEST:    op_test(a, inst);       break; // TEST    src1,src2[,f]
-	case uml::OP_OR:      op_or(a, inst);         break; // OR      dst,src1,src2[,f]
-	case uml::OP_XOR:     op_xor(a, inst);        break; // XOR     dst,src1,src2[,f]
-	case uml::OP_LZCNT:   op_lzcnt(a, inst);      break; // LZCNT   dst,src[,f]
-	case uml::OP_TZCNT:   op_tzcnt(a, inst);      break; // TZCNT   dst,src[,f]
-	case uml::OP_BSWAP:   op_bswap(a, inst);      break; // BSWAP   dst,src
-	case uml::OP_SHL:     op_shift<Inst::kIdShl>(a, inst);        break; // SHL     dst,src,count[,f]
-	case uml::OP_SHR:     op_shift<Inst::kIdShr>(a, inst);        break; // SHR     dst,src,count[,f]
-	case uml::OP_SAR:     op_shift<Inst::kIdSar>(a, inst);        break; // SAR     dst,src,count[,f]
-	case uml::OP_ROL:     op_shift<Inst::kIdRol>(a, inst);        break; // ROL     dst,src,count[,f]
-	case uml::OP_ROLC:    op_shift<Inst::kIdRcl>(a, inst);        break; // ROLC    dst,src,count[,f]
-	case uml::OP_ROR:     op_shift<Inst::kIdRor>(a, inst);        break; // ROR     dst,src,count[,f]
-	case uml::OP_RORC:    op_shift<Inst::kIdRcr>(a, inst);        break; // RORC    dst,src,count[,f]
+	case uml::OP_LOAD:    op_load(a, inst);                 break; // LOAD    dst,base,index,size
+	case uml::OP_LOADS:   op_loads(a, inst);                break; // LOADS   dst,base,index,size
+	case uml::OP_STORE:   op_store(a, inst);                break; // STORE   base,index,src,size
+	case uml::OP_READ:    op_read(a, inst);                 break; // READ    dst,src1,spacesize
+	case uml::OP_READM:   op_readm(a, inst);                break; // READM   dst,src1,mask,spacesize
+	case uml::OP_WRITE:   op_write(a, inst);                break; // WRITE   dst,src1,spacesize
+	case uml::OP_WRITEM:  op_writem(a, inst);               break; // WRITEM  dst,src1,spacesize
+	case uml::OP_CARRY:   op_carry(a, inst);                break; // CARRY   src,bitnum
+	case uml::OP_SET:     op_set(a, inst);                  break; // SET     dst,c
+	case uml::OP_MOV:     op_mov(a, inst);                  break; // MOV     dst,src[,c]
+	case uml::OP_SEXT:    op_sext(a, inst);                 break; // SEXT    dst,src
+	case uml::OP_ROLAND:  op_roland(a, inst);               break; // ROLAND  dst,src1,src2,src3
+	case uml::OP_ROLINS:  op_rolins(a, inst);               break; // ROLINS  dst,src1,src2,src3
+	case uml::OP_ADD:     op_add(a, inst);                  break; // ADD     dst,src1,src2[,f]
+	case uml::OP_ADDC:    op_addc(a, inst);                 break; // ADDC    dst,src1,src2[,f]
+	case uml::OP_SUB:     op_sub(a, inst);                  break; // SUB     dst,src1,src2[,f]
+	case uml::OP_SUBB:    op_subc(a, inst);                 break; // SUBB    dst,src1,src2[,f]
+	case uml::OP_CMP:     op_cmp(a, inst);                  break; // CMP     src1,src2[,f]
+	case uml::OP_MULU:    op_mul<Inst::kIdMul>(a, inst);    break; // MULU    dst,edst,src1,src2[,f]
+	case uml::OP_MULULW:  op_mullw<Inst::kIdMul>(a, inst);  break; // MULULW  dst,src1,src2[,f]
+	case uml::OP_MULS:    op_mul<Inst::kIdImul>(a, inst);   break; // MULS    dst,edst,src1,src2[,f]
+	case uml::OP_MULSLW:  op_mullw<Inst::kIdImul>(a, inst); break; // MULSLW  dst,src1,src2[,f]
+	case uml::OP_DIVU:    op_divu(a, inst);                 break; // DIVU    dst,edst,src1,src2[,f]
+	case uml::OP_DIVS:    op_divs(a, inst);                 break; // DIVS    dst,edst,src1,src2[,f]
+	case uml::OP_AND:     op_and(a, inst);                  break; // AND     dst,src1,src2[,f]
+	case uml::OP_TEST:    op_test(a, inst);                 break; // TEST    src1,src2[,f]
+	case uml::OP_OR:      op_or(a, inst);                   break; // OR      dst,src1,src2[,f]
+	case uml::OP_XOR:     op_xor(a, inst);                  break; // XOR     dst,src1,src2[,f]
+	case uml::OP_LZCNT:   op_lzcnt(a, inst);                break; // LZCNT   dst,src[,f]
+	case uml::OP_TZCNT:   op_tzcnt(a, inst);                break; // TZCNT   dst,src[,f]
+	case uml::OP_BSWAP:   op_bswap(a, inst);                break; // BSWAP   dst,src
+	case uml::OP_SHL:     op_shift<Inst::kIdShl>(a, inst);  break; // SHL     dst,src,count[,f]
+	case uml::OP_SHR:     op_shift<Inst::kIdShr>(a, inst);  break; // SHR     dst,src,count[,f]
+	case uml::OP_SAR:     op_shift<Inst::kIdSar>(a, inst);  break; // SAR     dst,src,count[,f]
+	case uml::OP_ROL:     op_shift<Inst::kIdRol>(a, inst);  break; // ROL     dst,src,count[,f]
+	case uml::OP_ROLC:    op_shift<Inst::kIdRcl>(a, inst);  break; // ROLC    dst,src,count[,f]
+	case uml::OP_ROR:     op_shift<Inst::kIdRor>(a, inst);  break; // ROR     dst,src,count[,f]
+	case uml::OP_RORC:    op_shift<Inst::kIdRcr>(a, inst);  break; // RORC    dst,src,count[,f]
 
 	// Floating Point Operations
 	case uml::OP_FLOAD:   op_fload(a, inst);      break; // FLOAD   dst,base,index
@@ -1585,7 +1583,7 @@ void drcbe_x64::shift_op_param(Assembler &a, Inst::Id const opcode, size_t opsiz
 
 		mov_reg_param(a, shift, param);
 
-		a.and_(shift, opsize * 8 - 1);
+		a.and_(shift, (opsize * 8) - 1);
 
 		if ((update_flags & FLAG_C) || carryin)
 		{
@@ -1595,9 +1593,14 @@ void drcbe_x64::shift_op_param(Assembler &a, Inst::Id const opcode, size_t opsiz
 			a.short_().jnz(calc);
 
 			if (carryin)
+			{
+				a.sahf(); // restore flags to keep carry in for rolc/rorc
 				a.mov(rax, r10);
+			}
 			else if (update_flags & FLAG_C)
+			{
 				a.clc(); // throw away carry since it'll never be used
+			}
 
 			a.short_().jmp(end);
 
@@ -4397,10 +4400,11 @@ void drcbe_x64::op_cmp(Assembler &a, const instruction &inst)
 
 
 //-------------------------------------------------
-//  op_mulu - process a MULU opcode
+//  op_mul - process a MULU or MULS opcode
 //-------------------------------------------------
 
-void drcbe_x64::op_mulu(Assembler &a, const instruction &inst)
+template <Inst::Id Opcode>
+void drcbe_x64::op_mul(Assembler &a, const instruction &inst)
 {
 	// validate instruction
 	assert(inst.size() == 4 || inst.size() == 8);
@@ -4413,51 +4417,29 @@ void drcbe_x64::op_mulu(Assembler &a, const instruction &inst)
 	be_parameter src1p(*this, inst.param(2), PTYPE_MRI);
 	be_parameter src2p(*this, inst.param(3), PTYPE_MRI);
 	normalize_commutative(src1p, src2p);
-	bool compute_hi = (dstp != edstp);
+	const bool compute_hi = (dstp != edstp);
 
-	// 32-bit form
-	if (inst.size() == 4)
+	const Gp dstreg = (inst.size() == 4) ? Gp(eax) : Gp(rax);
+	const Gp edstreg = (inst.size() == 4) ? Gp(edx) : Gp(rdx);
+
+	// general case
+	mov_reg_param(a, dstreg, src1p);
+	if (src2p.is_memory())
 	{
-		Gp dstreg = eax;
-		Gp edstreg = edx;
-
-		// general case
-		mov_reg_param(a, dstreg, src1p);
-		if (src2p.is_memory())
-			a.mul(MABS(src2p.memory(), 4));
-		else if (src2p.is_int_register())
-			a.mul(Gpd(src2p.ireg()));
-		else if (src2p.is_immediate())
-		{
-			a.mov(edstreg, src2p.immediate());
-			a.mul(edstreg);
-		}
-		mov_param_reg(a, dstp, dstreg);
-		if (compute_hi)
-			mov_param_reg(a, edstp, edstreg);
+		a.emit(Opcode, MABS(src2p.memory(), inst.size()));
 	}
-
-	// 64-bit form
-	else if (inst.size() == 8)
+	else if (src2p.is_int_register())
 	{
-		Gp dstreg = rax;
-		Gp edstreg = rdx;
-
-		// general case
-		mov_reg_param(a, dstreg, src1p);
-		if (src2p.is_memory())
-			a.mul(MABS(src2p.memory(), 8));
-		else if (src2p.is_int_register())
-			a.mul(Gpq(src2p.ireg()));
-		else if (src2p.is_immediate())
-		{
-			mov_r64_imm(a, edstreg, src2p.immediate());
-			a.mul(edstreg);
-		}
-		mov_param_reg(a, dstp, dstreg);
-		if (compute_hi)
-			mov_param_reg(a, edstp, edstreg);
+		a.emit(Opcode, Gp::fromTypeAndId((inst.size() == 4) ? RegType::kX86_Gpd : RegType::kX86_Gpq, src2p.ireg()));
 	}
+	else if (src2p.is_immediate())
+	{
+		a.mov(edstreg, src2p.immediate());
+		a.emit(Opcode, edstreg);
+	}
+	mov_param_reg(a, dstp, dstreg);
+	if (compute_hi)
+		mov_param_reg(a, edstp, edstreg);
 
 	if (inst.flags())
 		calculate_status_flags_mul(a, inst.size(), rax, rdx);
@@ -4465,10 +4447,12 @@ void drcbe_x64::op_mulu(Assembler &a, const instruction &inst)
 
 
 //-------------------------------------------------
-//  op_mululw - process a MULULW (32x32=32) opcode
+//  op_mullw - process a MULULW or MULSLW
+//  (32x32=32) opcode
 //-------------------------------------------------
 
-void drcbe_x64::op_mululw(Assembler &a, const instruction &inst)
+template <Inst::Id Opcode>
+void drcbe_x64::op_mullw(Assembler &a, const instruction &inst)
 {
 	// validate instruction
 	assert(inst.size() == 4 || inst.size() == 8);
@@ -4481,171 +4465,25 @@ void drcbe_x64::op_mululw(Assembler &a, const instruction &inst)
 	be_parameter src2p(*this, inst.param(2), PTYPE_MRI);
 	normalize_commutative(src1p, src2p);
 
-	// 32-bit form
-	if (inst.size() == 4)
+	const Gp dstreg = (inst.size() == 4) ? Gp(eax) : Gp(rax);
+	const Gp hireg = (inst.size() == 4) ? Gp(edx) : Gp(rdx);
+
+	// general case
+	mov_reg_param(a, dstreg, src1p);
+	if (src2p.is_memory())
 	{
-		Gp dstreg = eax;
-		Gp hireg = edx;
-
-		// general case
-		mov_reg_param(a, dstreg, src1p);
-		if (src2p.is_memory())
-			a.mul(MABS(src2p.memory(), 4));
-		else if (src2p.is_int_register())
-			a.mul(Gpd(src2p.ireg()));
-		else if (src2p.is_immediate())
-		{
-			a.mov(hireg, src2p.immediate());
-			a.mul(hireg);
-		}
-		mov_param_reg(a, dstp, dstreg);
+		a.emit(Opcode, MABS(src2p.memory(), inst.size()));
 	}
-
-	// 64-bit form
-	else if (inst.size() == 8)
+	else if (src2p.is_int_register())
 	{
-		Gp dstreg = rax;
-		Gp hireg = rdx;
-
-		// general case
-		mov_reg_param(a, dstreg, src1p);
-		if (src2p.is_memory())
-			a.mul(MABS(src2p.memory(), 8));
-		else if (src2p.is_int_register())
-			a.mul(Gpq(src2p.ireg()));
-		else if (src2p.is_immediate())
-		{
-			mov_r64_imm(a, hireg, src2p.immediate());
-			a.mul(hireg);
-		}
-		mov_param_reg(a, dstp, dstreg);
+		a.emit(Opcode, Gp::fromTypeAndId((inst.size() == 4) ? RegType::kX86_Gpd : RegType::kX86_Gpq, src2p.ireg()));
 	}
-
-	if (inst.flags())
-		calculate_status_flags_mul_low(a, inst.size(), rax);
-}
-
-
-//-------------------------------------------------
-//  op_muls - process a MULS opcode
-//-------------------------------------------------
-
-void drcbe_x64::op_muls(Assembler &a, const instruction &inst)
-{
-	// validate instruction
-	assert(inst.size() == 4 || inst.size() == 8);
-	assert_no_condition(inst);
-	assert_flags(inst, FLAG_V | FLAG_Z | FLAG_S);
-
-	// normalize parameters
-	be_parameter dstp(*this, inst.param(0), PTYPE_MR);
-	be_parameter edstp(*this, inst.param(1), PTYPE_MR);
-	be_parameter src1p(*this, inst.param(2), PTYPE_MRI);
-	be_parameter src2p(*this, inst.param(3), PTYPE_MRI);
-	normalize_commutative(src1p, src2p);
-	bool compute_hi = (dstp != edstp);
-
-	// 32-bit form
-	if (inst.size() == 4)
+	else if (src2p.is_immediate())
 	{
-		Gp dstreg = eax;
-		Gp edstreg = edx;
-
-		mov_reg_param(a, dstreg, src1p);
-		if (src2p.is_memory())
-			a.imul(MABS(src2p.memory(), 4));
-		else if (src2p.is_int_register())
-			a.imul(Gpd(src2p.ireg()));
-		else if (src2p.is_immediate())
-		{
-			a.mov(edstreg, src2p.immediate());
-			a.imul(edstreg);
-		}
-		mov_param_reg(a, dstp, dstreg);
-		if (compute_hi)
-			mov_param_reg(a, edstp, edstreg);
+		a.mov(hireg, src2p.immediate());
+		a.emit(Opcode, hireg);
 	}
-
-	// 64-bit form
-	else if (inst.size() == 8)
-	{
-		Gp dstreg = rax;
-		Gp edstreg = rdx;
-
-		mov_reg_param(a, dstreg, src1p);
-		if (src2p.is_memory())
-			a.imul(MABS(src2p.memory(), 8));
-		else if (src2p.is_int_register())
-			a.imul(Gpq(src2p.ireg()));
-		else if (src2p.is_immediate())
-		{
-			mov_r64_imm(a, edstreg, src2p.immediate());
-			a.imul(edstreg);
-		}
-		mov_param_reg(a, dstp, dstreg);
-		if (compute_hi)
-			mov_param_reg(a, edstp, edstreg);
-	}
-
-	if (inst.flags())
-		calculate_status_flags_mul(a, inst.size(), rax, rdx);
-}
-
-
-//-------------------------------------------------
-//  op_mulslw - process a MULSLW (32x32=32) opcode
-//-------------------------------------------------
-
-void drcbe_x64::op_mulslw(Assembler &a, const instruction &inst)
-{
-	// validate instruction
-	assert(inst.size() == 4 || inst.size() == 8);
-	assert_no_condition(inst);
-	assert_flags(inst, FLAG_V | FLAG_Z | FLAG_S);
-
-	// normalize parameters
-	be_parameter dstp(*this, inst.param(0), PTYPE_MR);
-	be_parameter src1p(*this, inst.param(1), PTYPE_MRI);
-	be_parameter src2p(*this, inst.param(2), PTYPE_MRI);
-	normalize_commutative(src1p, src2p);
-
-	// 32-bit form
-	if (inst.size() == 4)
-	{
-		Gp dstreg = eax;
-		Gp hireg = edx;
-
-		mov_reg_param(a, dstreg, src1p);
-		if (src2p.is_memory())
-			a.imul(MABS(src2p.memory(), 4));
-		else if (src2p.is_int_register())
-			a.imul(Gpd(src2p.ireg()));
-		else if (src2p.is_immediate())
-		{
-			a.mov(hireg, src2p.immediate());
-			a.imul(hireg);
-		}
-		mov_param_reg(a, dstp, dstreg);
-	}
-
-	// 64-bit form
-	else if (inst.size() == 8)
-	{
-		Gp dstreg = rax;
-		Gp hireg = rdx;
-
-		mov_reg_param(a, dstreg, src1p);
-		if (src2p.is_memory())
-			a.imul(MABS(src2p.memory(), 8));
-		else if (src2p.is_int_register())
-			a.imul(Gpq(src2p.ireg()));
-		else if (src2p.is_immediate())
-		{
-			mov_r64_imm(a, hireg, src2p.immediate());
-			a.imul(hireg);
-		}
-		mov_param_reg(a, dstp, dstreg);
-	}
+	mov_param_reg(a, dstp, dstreg);
 
 	if (inst.flags())
 		calculate_status_flags_mul_low(a, inst.size(), rax);
@@ -5189,7 +5027,7 @@ void drcbe_x64::op_shift(Assembler &a, const uml::instruction &inst)
 	be_parameter src1p(*this, inst.param(1), PTYPE_MRI);
 	be_parameter src2p(*this, inst.param(2), PTYPE_MRI);
 
-	const bool carry = (Opcode == Inst::kIdRcl) || (Opcode == Inst::kIdRcr);
+	const bool carryin = (Opcode == Inst::kIdRcl) || (Opcode == Inst::kIdRcr);
 
 	if (dstp.is_memory() && ((inst.size() == 8) || !dstp.is_cold_register()) && (dstp == src1p))
 	{
@@ -5203,7 +5041,7 @@ void drcbe_x64::op_shift(Assembler &a, const uml::instruction &inst)
 		// pick a target register
 		const Gp dstreg = dstp.select_register((inst.size() == 4) ? Gp(eax) : Gp(rax), src2p);
 
-		if (carry)
+		if (carryin)
 			mov_reg_param(a, dstreg, src1p, true);
 		else
 			mov_reg_param(a, dstreg, src1p);
