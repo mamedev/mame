@@ -30,7 +30,7 @@
 #define LOG_FILTER  (1U << 2)
 #define LOG_PACKETS (1U << 3)
 
-#define VERBOSE (LOG_GENERAL|LOG_COMMAND|LOG_FILTER|LOG_PACKETS)
+//#define VERBOSE (LOG_GENERAL|LOG_COMMAND|LOG_FILTER|LOG_PACKETS)
 #include "logmacro.h"
 
 #define EA(hi, lo) ((u32(hi) << 16) | lo)
@@ -212,7 +212,6 @@ int dp83932c_device::recv_start_cb(u8 *buf, int length)
 
 void dp83932c_device::recv_complete_cb(int result)
 {
-	LOG("SONIC: recv_complete_cb(0x%x)\n", result);
 	if (result > 0)
 	{
 		m_reg[ISR] |= ISR_PKTRX;
@@ -525,10 +524,6 @@ void dp83932c_device::update_interrupts()
 
 	if (int_state != m_int_state)
 	{
-		if (m_reg[ISR] & ISR_PKTRX)
-		{
-			LOG("SONIC: PKTRX set!\n");
-		}
 		m_int_state = int_state;
 		m_out_int(m_int_state);
 	}

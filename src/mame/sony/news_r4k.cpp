@@ -120,7 +120,7 @@
 #define NEWS_R4K_TRACE (NEWS_R4K_DEBUG | LOG_ALL_INTERRUPT | LOG_APBUS)
 #define NEWS_R4K_MAX (NEWS_R4K_TRACE | LOG_MEMORY | LOG_ESCC)
 
-#define VERBOSE (NEWS_R4K_INFO|LOG_GENERAL)
+#define VERBOSE NEWS_R4K_INFO
 
 #include "logmacro.h"
 
@@ -595,14 +595,10 @@ void news_r4k_state::cpu_map(address_map &map)
 	map(0x1e500000, 0x1e50003f).m(m_sonic3, FUNC(cxd8452aq_device::map));
 	map(0x1e610000, 0x1e6101ff).m(m_sonic, FUNC(dp83932c_device::map)).umask64(0x000000000000ffff);
 	map(0x1e620000, 0x1e627fff).lrw8(NAME([this](offs_t offset)
-										  {
-											uint8_t data = m_net_ram->read(offset);
-											LOG("Host read from net RAM @ offset 0x%x = 0x%x (%s)\n", offset, data, machine().describe_context());
-											return m_net_ram->read(offset); 
-										  }),
+										  { return m_net_ram->read(offset); }),
 									 NAME([this](offs_t offset, uint8_t data)
 										  {
-											  LOG("Host write to net RAM @ offset 0x%x: 0x%x (%s)\n", offset, data, machine().describe_context());
+											  LOGMASKED(LOG_MEMORY, "Host write to net RAM @ offset 0x%x: 0x%x (%s)\n", offset, data, machine().describe_context());
 											  m_net_ram->write(offset, data);
 										  }));
 
