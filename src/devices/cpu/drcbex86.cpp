@@ -1597,7 +1597,7 @@ void drcbe_x86::shift_op_param(Assembler &a, Inst::Id const opcode, size_t opsiz
 
 		if (update_flags)
 		{
-			if (bitshift == 0)
+			if ((bitshift == 0) && (opcode != Inst::kIdRcl) && (opcode != Inst::kIdRcr))
 				a.clc(); // throw away carry since it'll never be used
 
 			calculate_status_flags(a, dst, FLAG_S | FLAG_Z); // calculate status flags but preserve carry
@@ -1621,7 +1621,7 @@ void drcbe_x86::shift_op_param(Assembler &a, Inst::Id const opcode, size_t opsiz
 
 		a.popfd(); // preserved flags not needed so throw it away
 
-		if (update_flags)
+		if (update_flags && (opcode != Inst::kIdRcl) && (opcode != Inst::kIdRcr))
 			a.clc(); // throw away carry since it'll never be used
 
 		a.short_().jmp(end);

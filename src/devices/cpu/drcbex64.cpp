@@ -3833,73 +3833,39 @@ void drcbe_x64::op_roland(Assembler &a, const instruction &inst)
 	// pick a target register
 	Gp dstreg = dstp.select_register((inst.size() == 4) ? Gp(eax) : Gp(rax), maskp);
 
-	if (shiftp.is_immediate() && (srcp.is_immediate() || maskp.is_immediate()))
+	if (shiftp.is_immediate() && maskp.is_immediate())
 	{
 		const unsigned shift = shiftp.immediate() & (bits - 1);
 		const uint64_t sizemask = util::make_bitmask<uint64_t>(bits);
-		if (srcp.is_immediate())
+		const uint64_t mask = maskp.immediate() & sizemask;
+		mov_reg_param(a, dstreg, srcp);
+		a.rol(dstreg, shift);
+		if (!inst.flags() && (mask == 0x000000ff))
 		{
-			uint64_t src = srcp.immediate() & sizemask;
-			src = ((src << shift) | (src >> (bits - shift))) & sizemask;
-			if (maskp.is_immediate())
-			{
-				src &= maskp.immediate();
-				a.mov(dstreg, src);
-				if (inst.flags())
-					a.test(dstreg, dstreg);
-			}
-			else
-			{
-				mov_reg_param(a, dstreg, maskp);
-				if ((bits == 32) || (util::sext(src, 32) == src))
-				{
-					a.and_(dstreg, src);
-				}
-				else if (uint32_t(src) == src)
-				{
-					a.and_(dstreg, src);
-					if (inst.flags())
-						a.test(dstreg, dstreg);
-				}
-				else
-				{
-					a.mov(rdx, src);
-					a.and_(dstreg, rdx);
-				}
-			}
+			a.movzx(dstreg, dstreg.r8());
+		}
+		else if (!inst.flags() && (mask == 0x0000ffff))
+		{
+			a.movzx(dstreg, dstreg.r16());
+		}
+		else if (!inst.flags() && (mask == 0xffffffff))
+		{
+			a.mov(dstreg.r32(), dstreg.r32());
+		}
+		else if ((bits == 32) || (util::sext(mask, 32) == mask))
+		{
+			a.and_(dstreg, mask);
+		}
+		else if (uint32_t(mask) == mask)
+		{
+			a.and_(dstreg, mask); // asmjit converts this to a DWORD-size operation
+			if (inst.flags())
+				a.test(dstreg, dstreg);
 		}
 		else
 		{
-			const uint64_t mask = maskp.immediate() & sizemask;
-			mov_reg_param(a, dstreg, srcp);
-			a.rol(dstreg, shift);
-			if (!inst.flags() && (mask == 0x000000ff))
-			{
-				a.movzx(dstreg, dstreg.r8());
-			}
-			else if (!inst.flags() && (mask == 0x0000ffff))
-			{
-				a.movzx(dstreg, dstreg.r16());
-			}
-			else if (!inst.flags() && (mask == 0xffffffff))
-			{
-				a.mov(dstreg.r32(), dstreg.r32());
-			}
-			else if ((bits == 32) || (util::sext(mask, 32) == mask))
-			{
-				a.and_(dstreg, mask);
-			}
-			else if (uint32_t(mask) == mask)
-			{
-				a.and_(dstreg, mask); // asmjit converts this to a DWORD-size operation
-				if (inst.flags())
-					a.test(dstreg, dstreg);
-			}
-			else
-			{
-				a.mov(rdx, mask);
-				a.and_(dstreg, rdx);
-			}
+			a.mov(rdx, mask);
+			a.and_(dstreg, rdx);
 		}
 	}
 	else

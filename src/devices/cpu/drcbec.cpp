@@ -1411,9 +1411,7 @@ int drcbe_c::execute(code_handle &entry)
 					temp32 = (PARAM1 << shift) | (flags & FLAG_C);
 				else
 					temp32 = PARAM1;
-				flags = FLAGS32_NZ(temp32);
-				if (shift != 0)
-					flags |= ((PARAM1 << (shift - 1)) >> 31) & FLAG_C;
+				flags = FLAGS32_NZ(temp32) | (((shift != 0) ? (PARAM1 >> (32 - shift)) : flags) & FLAG_C);
 				PARAM0 = temp32;
 				break;
 
@@ -1448,9 +1446,7 @@ int drcbe_c::execute(code_handle &entry)
 					temp32 = (PARAM1 >> shift) | ((flags & FLAG_C) << 31);
 				else
 					temp32 = PARAM1;
-				flags = FLAGS32_NZ(temp32);
-				if (shift != 0)
-					flags |= (PARAM1 >> (shift - 1)) & FLAG_C;
+				flags = FLAGS32_NZ(temp32) | (((shift != 0) ? (PARAM1 >> (shift - 1)) : flags) & FLAG_C);
 				PARAM0 = temp32;
 				break;
 
@@ -2033,9 +2029,7 @@ int drcbe_c::execute(code_handle &entry)
 					temp64 = (DPARAM1 << shift) | (flags & FLAG_C);
 				else
 					temp64 = DPARAM1;
-				flags = FLAGS64_NZ(temp64);
-				if (shift != 0)
-					flags |= ((DPARAM1 << (shift - 1)) >> 63) & FLAG_C;
+				flags = FLAGS64_NZ(temp64) | (((shift != 0) ? (DPARAM1 >> (64 - shift)) : flags) & FLAG_C);
 				DPARAM0 = temp64;
 				break;
 
@@ -2070,9 +2064,7 @@ int drcbe_c::execute(code_handle &entry)
 					temp64 = (DPARAM1 >> shift) | (((uint64_t)flags & FLAG_C) << 63);
 				else
 					temp64 = DPARAM1;
-				flags = FLAGS64_NZ(temp64);
-				if (shift != 0)
-					flags |= (DPARAM1 >> (shift - 1)) & FLAG_C;
+				flags = FLAGS64_NZ(temp64) | (((shift != 0) ? (DPARAM1 >> (shift - 1)) : flags) & FLAG_C);
 				DPARAM0 = temp64;
 				break;
 

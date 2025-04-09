@@ -588,7 +588,7 @@ void device_execute_interface::pulse_input_line(int irqline, const attotime &dur
 	if (duration == attotime::zero)
 	{
 		// treat instantaneous pulses as ASSERT+CLEAR
-		if (irqline != INPUT_LINE_RESET && !input_edge_triggered(irqline))
+		if ((irqline != INPUT_LINE_RESET) && !input_edge_triggered(irqline))
 			throw emu_fatalerror("device '%s': zero-width pulse is not allowed for input line %d\n", device().tag(), irqline);
 
 		if (expiry.is_never() || (expiry <= m_scheduler->time()))
