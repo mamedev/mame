@@ -4,7 +4,7 @@
 # macros
 ##########################################################
 macro   nomreq_addr
-	if (!m_nomreq_cb.isunset())
+	if (nomemrq_en)
 		m_nomreq_cb(TADR, 0x00, 0xff);
 	+ 1
 
@@ -47,7 +47,7 @@ macro   wm16_sp
 
 macro   rop
 	m_m1_cycles-2 !! TDAT8 = opcode_read();
-	if (!m_refresh_cb.isunset())
+	if (refresh_en)
 		m_refresh_cb((I << 8) | (R2 & 0x80) | (R & 0x7f), 0x00, 0xff);
 	+ 2
 	PC++; R++; Q = QT; QT = YF | XF;
@@ -508,11 +508,11 @@ macro   r800:otdr
 
 macro   jump	%opcode
 	m_ref = 0x%opcode00;
-	continue;
+	goto process;
 
 macro   jump_prefixed   %prefix
 	m_ref = (%prefix << 16) | (TDAT8 << 8);
-	continue;
+	goto process;
 
 macro   take_nmi
 	// Check if processor was halted
@@ -671,20 +671,21 @@ macro   ncs800:check_interrupts
 # ROP
 ##########################################################
 ffff
-	rop:
 	m_ref = 0xffff00;
 	if (m_icount <= 0) return;
-	if (m_busrq_state) {
-		if (!m_busack_state) {
-			m_busack_state = 1;
-			m_busack_cb(1);
+	if (busack_en) {
+		if (m_busrq_state) {
+			if (!m_busack_state) {
+				m_busack_state = 1;
+				m_busack_cb(1);
+			}
+			if (m_icount > 0)
+				m_icount = 0;
+			return;
+		} else if (m_busack_state) {
+			m_busack_state = 0;
+			m_busack_cb(0);
 		}
-		if (m_icount > 0)
-			m_icount = 0;
-		return;
-	} else if (m_busack_state) {
-		m_busack_state = 0;
-		m_busack_cb(0);
 	}
 	call check_interrupts
 	m_after_ei = false;
@@ -693,13 +694,13 @@ ffff
 		debugger_wait_hook();
 		call rop
 		PC--;
-		goto rop;
+		continue;
 	} else {
 		PRVPC = PC;
 		debugger_instruction_hook(PC);
 		call rop
 		m_ref = (0x00 << 16) | (TDAT8 << 8);
-		continue;
+		goto process;
 	}
 
 
