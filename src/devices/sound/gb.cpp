@@ -1297,6 +1297,12 @@ void cgb04_apu_device::apu_power_off()
 }
 
 
+// convert output: 1 (0) to -1 (15)
+static inline s32 convert_output(s32 sample)
+{
+	return 0xf - (sample * 2);
+}
+
 //-------------------------------------------------
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
@@ -1314,8 +1320,7 @@ void gameboy_sound_device::sound_stream_update(sound_stream &stream, std::vector
 		/* Channel 1 - Wave with Envelope and Sweep */
 		if (m_snd[0].on)
 		{
-			sample = m_snd[0].signal * m_snd[0].envelope_value;
-
+			sample = convert_output(m_snd[0].signal * m_snd[0].envelope_value);
 			if (m_snd_control.chan_left[0])
 				left += sample;
 			if (m_snd_control.chan_right[0])
@@ -1325,7 +1330,7 @@ void gameboy_sound_device::sound_stream_update(sound_stream &stream, std::vector
 		/* Channel 2 - Wave with Envelope */
 		if (m_snd[1].on)
 		{
-			sample = m_snd[1].signal * m_snd[1].envelope_value;
+			sample = convert_output(m_snd[1].signal * m_snd[1].envelope_value);
 			if (m_snd_control.chan_left[1])
 				left += sample;
 			if (m_snd_control.chan_right[1])
@@ -1335,7 +1340,7 @@ void gameboy_sound_device::sound_stream_update(sound_stream &stream, std::vector
 		/* Channel 3 - Wave patterns from WaveRAM */
 		if (m_snd[2].on)
 		{
-			sample = m_snd[2].signal;
+			sample = convert_output(m_snd[2].signal);
 			if (m_snd_control.chan_left[2])
 				left += sample;
 			if (m_snd_control.chan_right[2])
@@ -1345,7 +1350,7 @@ void gameboy_sound_device::sound_stream_update(sound_stream &stream, std::vector
 		/* Channel 4 - Noise with Envelope */
 		if (m_snd[3].on)
 		{
-			sample = m_snd[3].signal * m_snd[3].envelope_value;
+			sample = convert_output(m_snd[3].signal * m_snd[3].envelope_value);
 			if (m_snd_control.chan_left[3])
 				left += sample;
 			if (m_snd_control.chan_right[3])
