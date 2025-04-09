@@ -87,13 +87,13 @@ macro   push
 macro   jp
 	call arg16
 	PC = TDAT; WZ = PC;
-	m_branch_cb(1);
+	if (branch_en) m_branch_cb(1);
 
 macro   jp_cond
 	if (TDAT8) {
 		call arg16
 		PC = TDAT; WZ = PC;
-		m_branch_cb(1);
+		if (branch_en) m_branch_cb(1);
 	} else {
 		// implicit do PC += 2
 		call arg16
@@ -105,7 +105,7 @@ macro   jr
 	TADR = PC-1;
 	5 * call nomreq_addr
 	PC += (s8)TDAT8; WZ = PC;
-	m_branch_cb(1);
+	if (branch_en) m_branch_cb(1);
 
 macro   r800:jr
 	call arg
