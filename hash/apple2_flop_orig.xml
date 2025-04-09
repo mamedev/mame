@@ -22838,7 +22838,7 @@ license:CC0-1.0
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2023-06-27 -->
-		<!-- 4am released a duplicate of this rom on 1/14/2024 -->
+		<!-- 4am released a duplicate on 1/14/2024 -->
 		<!-- educational program -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234821">
@@ -22855,7 +22855,7 @@ license:CC0-1.0
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2023-06-27 -->
-		<!-- 4am released a duplicate of this rom on 1/14/2024 -->
+		<!-- 4am released a duplicate on 1/14/2024 -->
 		<!-- educational program -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234804">
@@ -23943,17 +23943,16 @@ license:CC0-1.0
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2024-11-14 -->
 		<!-- sports game -->
-		<!-- missing side B used for "1 = Demonstration" from the main menu. -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A" />
 			<dataarea name="flop" size="194820">
-				<rom name="keyboard golf (softsmith).woz" size="194820" crc="6f6745f9" sha1="0ad2da4027f900039e80326d73b9eeb6804fe3c0" />
+				<rom name="keyboard golf (softsmith) side a.woz" size="194820" crc="6f6745f9" sha1="0ad2da4027f900039e80326d73b9eeb6804fe3c0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Side B" />
-			<dataarea name="flop" size="194820">
-				<rom name="keyboard golf (softsmith) side b.woz" size="194820" status="nodump" />
+			<dataarea name="flop" size="154909">
+				<rom name="keyboard golf (softsmith) side b.woz" size="154909" crc="243b6450" sha1="72ef846015937a6a0b3cc73d9ed868d0859c2d88" />
 			</dataarea>
 		</part>
 	</software>
