@@ -80,10 +80,11 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
-	void jxzh(machine_config &config);
-	void koftball(machine_config &config);
+	void jxzh(machine_config &config) ATTR_COLD;
+	void kaimenhu(machine_config &config) ATTR_COLD;
+	void koftball(machine_config &config) ATTR_COLD;
 
-	void init_koftball();
+	void init_koftball() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -108,6 +109,7 @@ private:
 	void irq_ack_w(u8 data);
 	u16 random_number_r();
 	u16 prot_r();
+	u16 kaimenhu_prot_r();
 	void prot_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void pixpal_w(offs_t offset, u8 data, u8 mem_mask = ~0);
 	template <u8 Which> void videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -119,6 +121,7 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 	void jxzh_mem(address_map &map) ATTR_COLD;
+	void kaimenhu_mem(address_map &map) ATTR_COLD;
 	void koftball_mem(address_map &map) ATTR_COLD;
 	void ramdac_map(address_map &map) ATTR_COLD;
 };
@@ -259,6 +262,20 @@ u16 koftball_state::prot_r()
 	return machine().rand();
 }
 
+u16 koftball_state::kaimenhu_prot_r()
+{
+	switch (m_prot_data)
+	{
+		case 0x0000: return 0x1d00;
+		case 0xff00: return 0x9d00;
+
+		//case 0x8000: return 0x0f0f;
+	}
+
+	logerror("unk prot r %x %x\n", m_prot_data, m_maincpu->pcbase());
+	return machine().rand();
+}
+
 void koftball_state::prot_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_prot_data);
@@ -351,6 +368,13 @@ void koftball_state::jxzh_mem(address_map &map)
 	map(0x360000, 0x360001).w(FUNC(koftball_state::prot_w));
 	map(0x380000, 0x380001).w(FUNC(koftball_state::prot_w));
 	map(0x3a0000, 0x3a0001).w(FUNC(koftball_state::prot_w));
+}
+
+void koftball_state::kaimenhu_mem(address_map &map)
+{
+	jxzh_mem(map);
+
+	map(0x340000, 0x340001).r(FUNC(koftball_state::kaimenhu_prot_r));
 }
 
 void koftball_state::ramdac_map(address_map &map)
@@ -575,6 +599,14 @@ void koftball_state::jxzh(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 }
 
+void koftball_state::kaimenhu(machine_config &config)
+{
+	jxzh(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &koftball_state::kaimenhu_mem);
+}
+
+
 ROM_START( koftball )
 	ROM_REGION( 0x20000, "maincpu", 0 ) // 68000 Code
 	ROM_LOAD16_BYTE( "ft5_v16_c6.u15", 0x00000, 0x10000, CRC(5e1784a5) SHA1(5690d315500fb533b12b598cb0a51bd1eadd0505) )
@@ -654,6 +686,23 @@ ROM_START( jxzh )
 	ROM_LOAD( "bmc_mj9601-9.u21", 0x00000, 0x40000, CRC(0ffcae13) SHA1(f8501c7c8a8bebf5da95aa3b275dd514f1014971) )
 ROM_END
 
+// 開門胡 (Kāi Mén Hú) - a program swap of jxzh (or vice versa)
+// same PCB as jxzh, but with a File KB89C67 in place of the 3567 (both are YM2413 clones) and a Music TR9C1710-80PCA RAMDAC instead of the HM86171-80
+ROM_START( kaimenhu )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 Code
+	ROM_LOAD16_BYTE( "bmc_kaimenhu_v02_5.u15", 0x00000, 0x20000, CRC(a3a017d0) SHA1(fa2194ded96721e0e2d1301bff7adfef37824fec) ) // kaimenhu is actually written 開門胡
+	ROM_LOAD16_BYTE( "bmc_kaimenhu_v02_5.u14", 0x00001, 0x20000, CRC(29ef1fc1) SHA1(ec054f8fb6100f95f6120d409bdd5d9d0b8b21ee) ) // kaimenhu is actually written 開門胡
+
+	ROM_REGION( 0x200000, "tiles", 0 ) // exactly the same as jxzh
+	ROM_LOAD16_BYTE( "bmc_mj9601-3.u61", 0x000000, 0x80000, CRC(b0c66e6f) SHA1(7539178d3bd4c012f0dd2f642e5a02303779109d) )
+	ROM_LOAD16_BYTE( "bmc_mj9601-4.u58", 0x000001, 0x80000, CRC(04a307f1) SHA1(8a45de790305c3cc4285a91d19b95d696d31bd11) )
+	ROM_LOAD16_BYTE( "bmc_mj9601-1.u59", 0x100000, 0x80000, CRC(184b8ba8) SHA1(0b84b9540ff72a57982a8f9e107a6d8d9314fdd1) )
+	ROM_LOAD16_BYTE( "bmc_mj9601-2.u60", 0x100001, 0x80000, CRC(f82e0f34) SHA1(4051c7b24f865cf7fb77eb89dde79cb30bdba7a0) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) // Samples, exactly the same as jxzh
+	ROM_LOAD( "bmc_mj9601-9.u21", 0x00000, 0x40000, CRC(0ffcae13) SHA1(f8501c7c8a8bebf5da95aa3b275dd514f1014971) )
+ROM_END
+
 #if NVRAM_HACK
 
 static const u16 nvram[]=
@@ -695,5 +744,6 @@ void koftball_state::init_koftball()
 } // anonymous namespace
 
 
-GAME( 1995, koftball, 0, koftball, koftball, koftball_state, init_koftball, ROT0, "BMC", "King of Football",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, jxzh,     0, jxzh,     jxzh,     koftball_state, empty_init,    ROT0, "BMC", "Jinxiu Zhonghua",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, koftball, 0,    koftball, koftball, koftball_state, init_koftball, ROT0, "BMC", "King of Football",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, jxzh,     0,    jxzh,     jxzh,     koftball_state, empty_init,    ROT0, "BMC", "Jinxiu Zhonghua",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, kaimenhu, jxzh, kaimenhu, jxzh,     koftball_state, empty_init,    ROT0, "BMC", "Kai Men Hu",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
