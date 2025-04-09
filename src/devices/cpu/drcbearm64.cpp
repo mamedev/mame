@@ -4524,13 +4524,14 @@ void drcbe_arm64::op_rolc(a64::Assembler &a, const uml::instruction &inst)
 			a.bfi(output.x(), FLAGS_REG, shift - 1, 1);
 			a.bfi(output, param1, shift, (inst.size() * 8) - shift);
 			a.bfi(FLAGS_REG, carry.x(), 0, 1);
+
+			if (inst.flags() & FLAG_C)
+				calculate_carry_shift_left_imm(a, param1, shift, maxBits);
 		}
 		else
 		{
 			a.mov(output, param1);
 		}
-
-		calculate_carry_shift_left_imm(a, param1, shift, maxBits);
 	}
 	else
 	{
@@ -4565,12 +4566,13 @@ void drcbe_arm64::op_rolc(a64::Assembler &a, const uml::instruction &inst)
 
 		a.orr(output, output, carry);
 
-		a.bind(skip3);
+		if (inst.flags() & FLAG_C)
+			calculate_carry_shift_left(a, param1, scratch2, maxBits);
 
-		calculate_carry_shift_left(a, param1, scratch2, maxBits);
+		a.bind(skip3);
 	}
 
-	if (inst.flags())
+	if (inst.flags() & (FLAG_Z | FLAG_S))
 		a.tst(output, output);
 
 	mov_param_reg(a, inst.size(), dstp, output);
@@ -4619,13 +4621,14 @@ void drcbe_arm64::op_rorc(a64::Assembler &a, const uml::instruction &inst)
 			if (shift > 1)
 				a.bfi(output, param1, (inst.size() * 8) - shift + 1, shift - 1);
 			a.bfi(FLAGS_REG, carry.x(), 0, 1);
+
+			if (inst.flags() & FLAG_C)
+				calculate_carry_shift_right_imm(a, param1, shift);
 		}
 		else
 		{
 			a.mov(output, param1);
 		}
-
-		calculate_carry_shift_right_imm(a, param1, shift);
 	}
 	else
 	{
@@ -4661,12 +4664,13 @@ void drcbe_arm64::op_rorc(a64::Assembler &a, const uml::instruction &inst)
 
 		a.orr(output, output, carry);
 
-		a.bind(skip3);
+		if (inst.flags() & FLAG_C)
+			calculate_carry_shift_right(a, param1, scratch2);
 
-		calculate_carry_shift_right(a, param1, scratch2);
+		a.bind(skip3);
 	}
 
-	if (inst.flags())
+	if (inst.flags() & (FLAG_Z | FLAG_S))
 		a.tst(output, output);
 
 	mov_param_reg(a, inst.size(), dstp, output);
