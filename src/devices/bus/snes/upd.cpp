@@ -141,7 +141,6 @@ void sns_rom20_necdsp_device::device_add_mconfig(machine_config &config)
 
 uint8_t sns_rom20_necdsp_device::chip_read(offs_t offset)
 {
-	offset &= 0x7fff;
 	if (BIT(offset, 14))
 		return m_upd7725->status_r();
 	else
@@ -151,9 +150,10 @@ uint8_t sns_rom20_necdsp_device::chip_read(offs_t offset)
 
 void sns_rom20_necdsp_device::chip_write(offs_t offset, uint8_t data)
 {
-	offset &= 0x7fff;
 	if (BIT(~offset, 14))
 		m_upd7725->data_w(data);
+	else
+		logerror("%s: Writing DSP status to %02x, ignored", machine().describe_context(), data);
 }
 
 
@@ -203,7 +203,6 @@ void sns_rom21_necdsp_device::device_add_mconfig(machine_config &config)
 
 uint8_t sns_rom21_necdsp_device::chip_read(offs_t offset)
 {
-	offset &= 0x1fff;
 	if (BIT(offset, 12))
 		return m_upd7725->status_r();
 	else
@@ -213,9 +212,10 @@ uint8_t sns_rom21_necdsp_device::chip_read(offs_t offset)
 
 void sns_rom21_necdsp_device::chip_write(offs_t offset, uint8_t data)
 {
-	offset &= 0x1fff;
 	if (BIT(~offset, 12))
 		m_upd7725->data_w(data);
+	else
+		logerror("%s: Writing DSP status to %02x, ignored", machine().describe_context(), data);
 }
 
 
@@ -254,6 +254,8 @@ void sns_rom_setadsp_device::chip_write(offs_t offset, uint8_t data)
 	{
 		if (BIT(~offset, 0))
 			m_upd96050->data_w(data);
+		else
+			logerror("%s: Writing DSP status to %02x, ignored", machine().describe_context(), data);
 		return;
 	}
 

@@ -154,9 +154,10 @@ void sns_pfest94_device::chip_write(offs_t offset, uint8_t data)
 	else
 	{
 		// DSP access
-		offset &= 0x1fff;
 		if (BIT(~offset, 12))
 			m_upd7725->data_w(data);
+		else
+			logerror("%s: Writing DSP status to %02x, ignored", machine().describe_context(), data);
 	}
 }
 
