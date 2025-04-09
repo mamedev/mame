@@ -64,6 +64,8 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include "tek4404.lh"
+
 #include "logmacro.h"
 
 namespace {
