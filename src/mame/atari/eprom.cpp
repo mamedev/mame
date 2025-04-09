@@ -305,134 +305,147 @@ uint32_t eprom_state::screen_update_eprom(screen_device &screen, bitmap_ind16 &b
 
 	// draw and merge the MO
 	bitmap_ind16 &mobitmap = m_mob->bitmap();
-	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->top(); y <= rect->bottom(); y++)
-		{
-			uint16_t const *const mo = &mobitmap.pix(y);
-			uint16_t *const pf = &bitmap.pix(y);
-			for (int x = rect->left(); x <= rect->right(); x++)
-				if (mo[x] != 0xffff)
+	m_mob->iterate_dirty_rects(
+			cliprect,
+			[&bitmap, &mobitmap] (rectangle const &rect)
+			{
+				for (int y = rect.top(); y <= rect.bottom(); y++)
 				{
-					/* verified from the GALs on the real PCB; equations follow
-					 *
-					 *      --- FORCEMC0 forces 3 bits of the MO color to 0 under some conditions
-					 *      FORCEMC0=!PFX3*PFX4*PFX5*!MPR0
-					 *          +!PFX3*PFX5*!MPR1
-					 *          +!PFX3*PFX4*!MPR0*!MPR1
-					 *
-					 *      --- SHADE selects an alternate color bank for the playfield
-					 *      !SHADE=!MPX0
-					 *          +MPX1
-					 *          +MPX2
-					 *          +MPX3
-					 *          +!MPX4*!MPX5*!MPX6*!MPX7
-					 *          +FORCEMC0
-					 *
-					 *      --- PF/M is 1 if playfield has priority, or 0 if MOs have priority
-					 *      !PF/M=MPR0*MPR1
-					 *          +PFX3
-					 *          +!PFX4*MPR1
-					 *          +!PFX5*MPR1
-					 *          +!PFX5*MPR0
-					 *          +!PFX4*!PFX5*!MPR0*!MPR1
-					 *
-					 *      --- M7 is passed as the upper MO bit to the GPC ASIC
-					 *      M7=MPX0*!MPX1*!MPX2*!MPX3
-					 *
-					 *      --- CL10-9 are outputs from the GPC, specifying which layer to render
-					 *      CL10 = 1 if pf
-					 *      CL9 = 1 if mo
-					 *
-					 *      --- CRA10 is the 0x200 bit of the color RAM index; it comes directly from the GPC
-					 *      CRA10 = CL10
-					 *
-					 *      --- CRA9 is the 0x100 bit of the color RAM index; is comes directly from the GPC
-					 *          or if the SHADE flag is set, it affects the playfield color bank
-					 *      CRA9 = SHADE*CL10
-					 *          +CL9
-					 *
-					 *      --- CRA8-1 are the low 8 bits of the color RAM index; set as expected
-					 */
-					int const mopriority = (mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT) & 7;
-					int const pfpriority = (pf[x] >> 4) & 3;
-
-					// upper bit of MO priority signals special rendering and doesn't draw anything
-					if (mopriority & 4)
-						continue;
-
-					// compute the FORCEMC signal
-					int forcemc0 = 0;
-					if (!(pf[x] & 8))
+					uint16_t const *const mo = &mobitmap.pix(y);
+					uint16_t *const pf = &bitmap.pix(y);
+					for (int x = rect.left(); x <= rect.right(); x++)
 					{
-						if (((pfpriority == 3) && !(mopriority & 1)) ||
-							((pfpriority & 2) && !(mopriority & 2)) ||
-							((pfpriority & 1) && (mopriority == 0)))
-							forcemc0 = 1;
-					}
+						if (mo[x] != 0xffff)
+						{
+							/* verified from the GALs on the real PCB; equations follow
+							 *
+							 *      --- FORCEMC0 forces 3 bits of the MO color to 0 under some conditions
+							 *      FORCEMC0=!PFX3*PFX4*PFX5*!MPR0
+							 *          +!PFX3*PFX5*!MPR1
+							 *          +!PFX3*PFX4*!MPR0*!MPR1
+							 *
+							 *      --- SHADE selects an alternate color bank for the playfield
+							 *      !SHADE=!MPX0
+							 *          +MPX1
+							 *          +MPX2
+							 *          +MPX3
+							 *          +!MPX4*!MPX5*!MPX6*!MPX7
+							 *          +FORCEMC0
+							 *
+							 *      --- PF/M is 1 if playfield has priority, or 0 if MOs have priority
+							 *      !PF/M=MPR0*MPR1
+							 *          +PFX3
+							 *          +!PFX4*MPR1
+							 *          +!PFX5*MPR1
+							 *          +!PFX5*MPR0
+							 *          +!PFX4*!PFX5*!MPR0*!MPR1
+							 *
+							 *      --- M7 is passed as the upper MO bit to the GPC ASIC
+							 *      M7=MPX0*!MPX1*!MPX2*!MPX3
+							 *
+							 *      --- CL10-9 are outputs from the GPC, specifying which layer to render
+							 *      CL10 = 1 if pf
+							 *      CL9 = 1 if mo
+							 *
+							 *      --- CRA10 is the 0x200 bit of the color RAM index; it comes directly from the GPC
+							 *      CRA10 = CL10
+							 *
+							 *      --- CRA9 is the 0x100 bit of the color RAM index; is comes directly from the GPC
+							 *          or if the SHADE flag is set, it affects the playfield color bank
+							 *      CRA9 = SHADE*CL10
+							 *          +CL9
+							 *
+							 *      --- CRA8-1 are the low 8 bits of the color RAM index; set as expected
+							 */
+							int const mopriority = (mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT) & 7;
+							int const pfpriority = (pf[x] >> 4) & 3;
 
-					// compute the SHADE signal
-					int shade = 1;
-					if (((mo[x] & 0x0f) != 1) ||
-						((mo[x] & 0xf0) == 0) ||
-						forcemc0)
-						shade = 0;
+							// upper bit of MO priority signals special rendering and doesn't draw anything
+							if (mopriority & 4)
+								continue;
 
-					// compute the PF/M signal
-					int pfm = 1;
-					if ((mopriority == 3) ||
-						(pf[x] & 8) ||
-						(!(pfpriority & 1) && (mopriority & 2)) ||
-						(!(pfpriority & 2) && (mopriority & 2)) ||
-						(!(pfpriority & 2) && (mopriority & 1)) ||
-						((pfpriority == 0) && (mopriority == 0)))
-						pfm = 0;
+							// compute the FORCEMC signal
+							int forcemc0 = 0;
+							if (!(pf[x] & 8))
+							{
+								if (((pfpriority == 3) && !(mopriority & 1)) ||
+									((pfpriority & 2) && !(mopriority & 2)) ||
+									((pfpriority & 1) && (mopriority == 0)))
+									forcemc0 = 1;
+							}
 
-					// compute the M7 signal
-					int m7 = 0;
-					if ((mo[x] & 0x0f) == 1)
-						m7 = 1;
+							// compute the SHADE signal
+							int shade = 1;
+							if (((mo[x] & 0x0f) != 1) ||
+								((mo[x] & 0xf0) == 0) ||
+								forcemc0)
+								shade = 0;
 
-					// PF/M and M7 go in the GPC ASIC and select playfield or MO layers
-					if (!pfm && !m7)
-					{
-						if (!forcemc0)
-							pf[x] = mo[x] & atari_motion_objects_device::DATA_MASK;
-						else
-							pf[x] = mo[x] & atari_motion_objects_device::DATA_MASK & ~0x70;
-					}
-					else
-					{
-						if (shade)
-							pf[x] |= 0x100;
-						if (m7)
-							pf[x] |= 0x080;
+							// compute the PF/M signal
+							int pfm = 1;
+							if ((mopriority == 3) ||
+								(pf[x] & 8) ||
+								(!(pfpriority & 1) && (mopriority & 2)) ||
+								(!(pfpriority & 2) && (mopriority & 2)) ||
+								(!(pfpriority & 2) && (mopriority & 1)) ||
+								((pfpriority == 0) && (mopriority == 0)))
+								pfm = 0;
+
+							// compute the M7 signal
+							int m7 = 0;
+							if ((mo[x] & 0x0f) == 1)
+								m7 = 1;
+
+							// PF/M and M7 go in the GPC ASIC and select playfield or MO layers
+							if (!pfm && !m7)
+							{
+								if (!forcemc0)
+									pf[x] = mo[x] & atari_motion_objects_device::DATA_MASK;
+								else
+									pf[x] = mo[x] & atari_motion_objects_device::DATA_MASK & ~0x70;
+							}
+							else
+							{
+								if (shade)
+									pf[x] |= 0x100;
+								if (m7)
+									pf[x] |= 0x080;
+							}
+						}
 					}
 				}
-		}
+			});
 
 	// add the alpha on top
 	m_alpha_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	// now go back and process the upper bit of MO priority
-	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->top(); y <= rect->bottom(); y++)
-		{
-			uint16_t const *const mo = &mobitmap.pix(y);
-			uint16_t *const pf = &bitmap.pix(y);
-			for (int x = rect->left(); x <= rect->right(); x++)
-				if (mo[x] != 0xffff)
+	m_mob->iterate_dirty_rects(
+			cliprect,
+			[this, &bitmap, &mobitmap] (rectangle const &rect)
+			{
+				for (int y = rect.top(); y <= rect.bottom(); y++)
 				{
-					int const mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;
-
-					// upper bit of MO priority might mean palette kludges
-					if (mopriority & 4)
+					uint16_t const *const mo = &mobitmap.pix(y);
+					uint16_t *const pf = &bitmap.pix(y);
+					for (int x = rect.left(); x <= rect.right(); x++)
 					{
-						// if bit 2 is set, start setting high palette bits
-						if (mo[x] & 2)
-							m_mob->apply_stain(bitmap, pf, mo, x, y);
+						if (mo[x] != 0xffff)
+						{
+							int const mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;
+
+							// upper bit of MO priority might mean palette kludges
+							if (mopriority & 4)
+							{
+								// if bit 2 is set, start setting high palette bits
+								if (mo[x] & 2)
+									m_mob->apply_stain(bitmap, pf, mo, x, y);
+							}
+						}
 					}
 				}
-		}
+			});
+
 	return 0;
 }
 
@@ -455,50 +468,62 @@ uint32_t eprom_state::screen_update_guts(screen_device &screen, bitmap_ind16 &bi
 
 	// draw and merge the MO
 	bitmap_ind16 &mobitmap = m_mob->bitmap();
-	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->top(); y <= rect->bottom(); y++)
-		{
-			uint16_t const *const mo = &mobitmap.pix(y);
-			uint16_t *const pf = &bitmap.pix(y);
-			for (int x = rect->left(); x <= rect->right(); x++)
-				if (mo[x] != 0xffff)
+	m_mob->iterate_dirty_rects(
+			cliprect,
+			[&bitmap, &mobitmap] (rectangle const &rect)
+			{
+				for (int y = rect.top(); y <= rect.bottom(); y++)
 				{
-					int const mopriority = (mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT) & 7;
-					int const pfpriority = (pf[x] >> 5) & 3;
+					uint16_t const *const mo = &mobitmap.pix(y);
+					uint16_t *const pf = &bitmap.pix(y);
+					for (int x = rect.left(); x <= rect.right(); x++)
+					{
+						if (mo[x] != 0xffff)
+						{
+							int const mopriority = (mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT) & 7;
+							int const pfpriority = (pf[x] >> 5) & 3;
 
-					// upper bit of MO priority signals special rendering and doesn't draw anything
-					if (mopriority & 4)
-						continue;
+							// upper bit of MO priority signals special rendering and doesn't draw anything
+							if (mopriority & 4)
+								continue;
 
-					// check the priority
-					if (!(pf[x] & 8) || mopriority >= pfpriority)
-						pf[x] = mo[x] & atari_motion_objects_device::DATA_MASK;
+							// check the priority
+							if (!(pf[x] & 8) || mopriority >= pfpriority)
+								pf[x] = mo[x] & atari_motion_objects_device::DATA_MASK;
+						}
+					}
 				}
-		}
+			});
 
 	// add the alpha on top
 	m_alpha_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	// now go back and process the upper bit of MO priority
-	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->top(); y <= rect->bottom(); y++)
-		{
-			uint16_t const *const mo = &mobitmap.pix(y);
-			uint16_t *const pf = &bitmap.pix(y);
-			for (int x = rect->left(); x <= rect->right(); x++)
-				if (mo[x] != 0xffff)
+	m_mob->iterate_dirty_rects(
+			cliprect,
+			[this, &bitmap, &mobitmap] (rectangle const &rect)
+			{
+				for (int y = rect.top(); y <= rect.bottom(); y++)
 				{
-					int const mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;
-
-					// upper bit of MO priority might mean palette kludges
-					if (mopriority & 4)
+					uint16_t const *const mo = &mobitmap.pix(y);
+					uint16_t *const pf = &bitmap.pix(y);
+					for (int x = rect.left(); x <= rect.right(); x++)
 					{
-						// if bit 2 is set, start setting high palette bits
-						if (mo[x] & 2)
-							m_mob->apply_stain(bitmap, pf, mo, x, y);
+						if (mo[x] != 0xffff)
+						{
+							int const mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;
+
+							// upper bit of MO priority might mean palette kludges
+							if (mopriority & 4)
+							{
+								// if bit 2 is set, start setting high palette bits
+								if (mo[x] & 2)
+									m_mob->apply_stain(bitmap, pf, mo, x, y);
+							}
+						}
 					}
 				}
-		}
+			});
 
 	return 0;
 }

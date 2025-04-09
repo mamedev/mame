@@ -90,7 +90,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="sicilian"> <!-- dumped from an unofficial Peter Reckwitz cartridge with Chess Encyclopedia and Sicilian Variation -->
-		<description>Sicilian Variation</description>
+		<description>Sicilian Variation (prototype)</description>
 		<year>1983</year>
 		<publisher>Fidelity Electronics</publisher>
 		<info name="serial" value="DVC"/>

@@ -722,7 +722,7 @@ namespace
 			}
 
 			// Update input pin status if it has changed
-			if (m_iop->input_state(irq.first) != state) {
+			if (m_iop->input_line_state(irq.first) != state) {
 				if (irq.first != INPUT_LINE_IRQ6)
 				{
 					LOGMASKED(LOG_INTERRUPT, "Setting IOP input line %d to %d\n", irq.first, state ? 1 : 0);
@@ -781,7 +781,7 @@ namespace
 		{
 			// Update input pin status if it has changed
 			const bool state = BIT(active_irq, irq.second);
-			if (m_cpu->input_state(irq.first) != state)
+			if (m_cpu->input_line_state(irq.first) != state)
 			{
 				if (irq.first != INPUT_LINE_IRQ6)
 				{

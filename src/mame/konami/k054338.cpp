@@ -65,7 +65,7 @@ u16 k054338_device::register_r(offs_t offset)
 	return m_regs[offset];
 }
 
-void k054338_device::update_all_shadows( int rushingheroes_hack, palette_device &palette )
+void k054338_device::update_all_shadows(int rushingheroes_hack, palette_device &palette)
 {
 	int i, d;
 	int noclip = m_regs[K338_REG_CONTROL] & K338_CTL_CLIPSL;
@@ -73,8 +73,7 @@ void k054338_device::update_all_shadows( int rushingheroes_hack, palette_device 
 	for (i = 0; i < 9; i++)
 	{
 		d = m_regs[K338_REG_SHAD1R + i] & 0x1ff;
-		if (d >= 0x100)
-			d -= 0x200;
+		if (d >= 0x100) d -= 0x200;
 		m_shd_rgb[i] = d;
 	}
 
@@ -93,7 +92,7 @@ void k054338_device::update_all_shadows( int rushingheroes_hack, palette_device 
 }
 
 // k054338 BG color fill
-void k054338_device::fill_solid_bg( bitmap_rgb32 &bitmap, const rectangle &cliprect )
+void k054338_device::fill_solid_bg(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	uint32_t bgcolor = (register_r(K338_REG_BGC_R) & 0xff) << 16;
 	bgcolor |= register_r(K338_REG_BGC_GB);
@@ -142,60 +141,43 @@ void k054338_device::fill_backcolor(bitmap_rgb32 &bitmap, const rectangle &clipr
 }
 
 // addition blending unimplemented (requires major changes to drawgfx and tilemap.cpp)
-int k054338_device::set_alpha_level( int pblend )
+int k054338_device::set_alpha_level(int pblend)
 {
-	uint16_t *regs;
-	int ctrl, mixpri, mixset, mixlv;
+	if (pblend > 3) logerror("mixing mode index out of range: %d (valid range: 0-3)", pblend);
 
-	if (pblend <= 0 || pblend > 3)
-	{
-		return (255);
-	}
+	if (!pblend) return 255;
 
-	regs   = m_regs;
-	ctrl   = m_regs[K338_REG_CONTROL];
-	mixpri = ctrl & K338_CTL_MIXPRI;
-	mixset = regs[K338_REG_PBLEND + (pblend >> 1 & 1)] >> (~pblend << 3 & 8);
-	mixlv  = mixset & 0x1f;
+	// sanitize input
+	pblend &= 0b11;
 
-	if (m_alpha_inv)
-		mixlv = 0x1f - mixlv;
+	const u8 mixset = m_regs[K338_REG_PBLEND + (pblend >> 1 & 1)] >> (~pblend << 3 & 8);
+	int mixlv  = mixset & 0x1f;
 
-	if (!(mixset & 0x20))
-	{
-		mixlv = (mixlv << 3) | (mixlv >> 2);
-	}
-	else
-	{
-		if (!mixpri)
-		{
-			// source x alpha  +  target (clipped at 255)
-		}
-		else
-		{
-			// source  +  target x alpha (clipped at 255)
-		}
+	if (m_alpha_inv) mixlv = 0x1f - mixlv;
 
-		// DUMMY
-		if (mixlv && mixlv < 0x1f)
-			mixlv = 0x10;
+	// expand mix level (5 bits -> 8)
+	mixlv = (mixlv << 3) | (mixlv >> 2);
 
-		mixlv = (mixlv << 3) | (mixlv >> 2);
+	const bool additive_mode = mixset & 0x20;
+	const bool mixpri = m_regs[K338_REG_CONTROL] & K338_CTL_MIXPRI;
 
-		if (VERBOSE)
-			popmessage("MIXSET%1d %s addition mode: %02x", pblend, (mixpri) ? "dst" : "src", mixset & 0x1f);
-	}
+	mixlv |= additive_mode << 8;
+	mixlv |= mixpri << 9;
 
+	// returns 10 bits: pa llll llll
+	// p: MI (mixpri)
+	// a: additive mode
+	// l: alpha level (expanded)
 	return mixlv;
 }
 
-void k054338_device::invert_alpha( int invert )
+void k054338_device::invert_alpha(int invert)
 {
 	m_alpha_inv = invert;
 }
 
 
-void k054338_device::export_config( int **shd_rgb )
+void k054338_device::export_config(int **shd_rgb)
 {
 	*shd_rgb = m_shd_rgb;
 }

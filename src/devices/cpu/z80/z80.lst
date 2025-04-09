@@ -508,11 +508,11 @@ macro   r800:otdr
 
 macro   jump	%opcode
 	m_ref = 0x%opcode00;
-	if (true) return;
+	continue;
 
 macro   jump_prefixed   %prefix
 	m_ref = (%prefix << 16) | (TDAT8 << 8);
-	if (true) return;
+	continue;
 
 macro   take_nmi
 	// Check if processor was halted
@@ -671,6 +671,9 @@ macro   ncs800:check_interrupts
 # ROP
 ##########################################################
 ffff
+	rop:
+	m_ref = 0xffff00;
+	if (m_icount <= 0) return;
 	if (m_busrq_state) {
 		if (!m_busack_state) {
 			m_busack_state = 1;
@@ -690,14 +693,13 @@ ffff
 		debugger_wait_hook();
 		call rop
 		PC--;
-		m_ref = 0xffff00;
-		return;
+		goto rop;
 	} else {
 		PRVPC = PC;
 		debugger_instruction_hook(PC);
 		call rop
 		m_ref = (0x00 << 16) | (TDAT8 << 8);
-		return;
+		continue;
 	}
 
 

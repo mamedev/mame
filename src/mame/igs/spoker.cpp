@@ -184,7 +184,7 @@ public:
 	void init_jinhulu2120gi() ATTR_COLD;
 	void init_jinhulu2101is() ATTR_COLD;
 	void init_jinhulu2100gi() ATTR_COLD;
-	void init_sleyuan() ATTR_COLD;
+	void init_sleyuan2() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -2251,7 +2251,7 @@ ROM_START( jinhuang )
 	ROM_LOAD( "rom.u12", 0x00000, 0x20000, CRC(27caf888) SHA1(be57ce7f6b32a51656f8f16b894f58278544201a) ) // 1ST AND 2ND HALF IDENTICAL
 ROM_END
 
-ROM_START( sleyuan )
+ROM_START( sleyuan2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rom.u40", 0x00000, 0x10000, CRC(869a2ff7) SHA1(beb110eecf6c8c2f5d5272e0669391f73766d463) )
 
@@ -2383,7 +2383,7 @@ void jinhulu2_state::init_dafuwng3()
 		if ((a & 0x0060) == 0x0060) rom[a] ^= 0x40;
 }
 
-void jinhulu2_state::init_sleyuan()
+void jinhulu2_state::init_sleyuan2()
 {
 	init_jinhulu2();
 
@@ -2523,10 +2523,10 @@ GAME( 1995,  jinhulu2120gi, jinhulu2, jinhulu2, jinhulu2, jinhulu2_state, init_j
 GAME( 1996,  jinhulu2101is, jinhulu2, jinhulu2, jinhulu2, jinhulu2_state, init_jinhulu2101is, ROT0,  "IGS",       "Jin Hu Lu II (v101IS)",            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // tries to link to something?
 GAME( 1995,  jinhulu2100gi, jinhulu2, jinhulu2, jinhulu2, jinhulu2_state, init_jinhulu2100gi, ROT0,  "IGS",       "Jin Hu Lu II (v100GI)",            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // hopper, ROM patch
 GAME( 1995,  huahuas2,      0,        jinhulu2, huahuas2, jinhulu2_state, init_huahuas2,      ROT0,  "IGS",       "Huahua Shijie II (v100FI, set 1)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // hopper
-GAME( 1995,  huahuas2a,     huahuas2, jinhulu2, jinhulu2, jinhulu2_state, init_jinhulu2120gi, ROT0,  "IGS",       "Huahua Shijie II (v100FI, set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // no GFX ROM dump, hopper
+GAME( 1995,  huahuas2a,     huahuas2, jinhulu2, huahuas2, jinhulu2_state, init_jinhulu2120gi, ROT0,  "IGS",       "Huahua Shijie II (v100FI, set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // no GFX ROM dump, hopper
 GAME( 1995,  huluw2,        0,        jinhulu2, huluw2,   jinhulu2_state, init_huluw2,        ROT0,  "IGS",       "Hu Lu Wang II (v100KI)",           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // hopper
 GAME( 1995,  hsheng2,       0,        jinhulu2, jinhulu2, jinhulu2_state, init_hsheng2,       ROT0,  "IGS",       "Hua Shen II (v120DI)",             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // hopper
 GAME( 1995,  dafuwng3,      0,        jinhulu2, jinhulu2, jinhulu2_state, init_dafuwng3,      ROT0,  "IGS",       "Da Fu Weng III (V130LI)",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // hopper
 GAME( 1996,  zuanshiw,      0,        jinhulu2, zuanshiw, jinhulu2_state, init_jinhulu2120gi, ROT0,  "IGS",       "Zuanshi Wutai (V110II)",           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // hopper
 GAME( 2002,  jinhuang,      0,        jinhuang, jinhuang, jinhulu2_state, init_jinhuang,      ROT0,  "IGS",       "Jin Huang Guan",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // different memory map
-GAME( 1998,  sleyuan,       0,        jinhulu2, jinhulu2, jinhulu2_state, init_sleyuan,       ROT0,  "IGS",       "Shuiguo Leyuan (V150UI)",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // hopper
+GAME( 1998,  sleyuan2,      0,        jinhulu2, jinhulu2, jinhulu2_state, init_sleyuan2,      ROT0,  "IGS",       "Shuiguo Leyuan II (V150UI)",       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // hopper

@@ -66,63 +66,66 @@ uint32_t segahang_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	// mix in sprites
 	bitmap_ind16 &sprites = m_sprites->bitmap();
-	for (const sparse_dirty_rect *rect = m_sprites->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->min_y; y <= rect->max_y; y++)
-		{
-			uint16_t *dest = &bitmap.pix(y);
-			uint16_t *src = &sprites.pix(y);
-			uint8_t *pri = &screen.priority().pix(y);
-
-			// hangon mixing
-			if (!m_sharrier_video)
+	m_sprites->iterate_dirty_rects(
+			cliprect,
+			[this, &screen, &bitmap, &sprites] (rectangle const &rect)
 			{
-				for (int x = rect->min_x; x <= rect->max_x; x++)
+				for (int y = rect.min_y; y <= rect.max_y; y++)
 				{
-					// only process written pixels
-					uint16_t pix = src[x];
-					if (pix != 0xffff)
-					{
-						// compare sprite priority against tilemap priority
-						int priority = pix >> 10;
-						if ((1 << priority) > pri[x])
-						{
-							// if color bits are all 1, this triggers shadow/hilight
-							if ((pix & 0x3f0) == 0x3f0)
-								dest[x] += m_shadow ? m_palette_entries*2 : m_palette_entries;
+					uint16_t *const dest = &bitmap.pix(y);
+					uint16_t const *const src = &sprites.pix(y);
+					uint8_t const *const pri = &screen.priority().pix(y);
 
-							// otherwise, just add in sprite palette base
-							else
-								dest[x] = 0x400 | (pix & 0x3ff);
+					if (!m_sharrier_video)
+					{
+						// hangon mixing
+						for (int x = rect.min_x; x <= rect.max_x; x++)
+						{
+							// only process written pixels
+							uint16_t const pix = src[x];
+							if (pix != 0xffff)
+							{
+								// compare sprite priority against tilemap priority
+								int const priority = pix >> 10;
+								if ((1 << priority) > pri[x])
+								{
+									// if color bits are all 1, this triggers shadow/hilight
+									if ((pix & 0x3f0) == 0x3f0)
+										dest[x] += m_shadow ? m_palette_entries*2 : m_palette_entries;
+
+									// otherwise, just add in sprite palette base
+									else
+										dest[x] = 0x400 | (pix & 0x3ff);
+								}
+							}
+						}
+					}
+					else
+					{
+						// sharrier mixing
+						for (int x = rect.min_x; x <= rect.max_x; x++)
+						{
+							// only process written pixels
+							uint16_t const pix = src[x];
+							if (pix != 0xffff)
+							{
+								// compare sprite priority against tilemap priority
+								int const priority = ((pix >> 9) & 2) | 1;
+								if ((1 << priority) > pri[x])
+								{
+									// if shadow bit is 0 and pix data is 0xa, this triggers shadow/hilight
+									if ((pix & 0x80f) == 0x00a)
+										dest[x] += m_palette_entries;
+
+									// otherwise, just add in sprite palette base
+									else
+										dest[x] = 0x400 | (pix & 0x3ff);
+								}
+							}
 						}
 					}
 				}
-			}
-
-			// sharrier mixing
-			else
-			{
-				for (int x = rect->min_x; x <= rect->max_x; x++)
-				{
-					// only process written pixels
-					uint16_t pix = src[x];
-					if (pix != 0xffff)
-					{
-						// compare sprite priority against tilemap priority
-						int priority = ((pix >> 9) & 2) | 1;
-						if ((1 << priority) > pri[x])
-						{
-							// if shadow bit is 0 and pix data is 0xa, this triggers shadow/hilight
-							if ((pix & 0x80f) == 0x00a)
-								dest[x] += m_palette_entries;
-
-							// otherwise, just add in sprite palette base
-							else
-								dest[x] = 0x400 | (pix & 0x3ff);
-						}
-					}
-				}
-			}
-		}
+			});
 
 	return 0;
 }

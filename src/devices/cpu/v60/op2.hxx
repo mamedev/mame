@@ -69,15 +69,18 @@ uint32_t v60_device::opCVTSW()
 
 	F2DecodeFirstOperand(&v60_device::ReadAM, 2);
 
-	// Convert to uint32_t
+	// Apply RDI rounding control
 	val = u2f(m_op1);
 	switch (TKCW & 7)
 	{
-	case 0: m_modwritevalw = (uint32_t)(int64_t)round(val); break;
-	case 1: m_modwritevalw = (uint32_t)(int64_t)floor(val); break;
-	case 2: m_modwritevalw = (uint32_t)(int64_t)ceil(val); break;
-	default: m_modwritevalw = (uint32_t)(int64_t)trunc(val); break;
+	case 0: val = roundf(val); break;
+	case 1: val = floorf(val); break;
+	case 2: val = ceilf(val); break;
+	default: val = truncf(val); break;
 	}
+
+	// Convert to uint32_t
+	m_modwritevalw = (uint32_t)(int64_t)val;
 
 	_S = ((m_modwritevalw & 0x80000000) != 0);
 	_OV = (_S && val >= 0.0f) || (!_S && val <= -1.0f);
@@ -122,7 +125,7 @@ uint32_t v60_device::opABSFS()
 
 	appf = u2f(m_op1);
 
-	if(appf < 0)
+	if (appf < 0)
 		appf = -appf;
 
 	_OV = 0;

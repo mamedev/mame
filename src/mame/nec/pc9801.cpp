@@ -35,8 +35,7 @@
           fixing in some cases;
         - Export mouse support to an actual PC9871 device;
         - Implement IF-SEGA/98 support (Sega Saturn peripheral compatibility for Windows,
-          available DOS C snippet clearly shows reading in direct mode, an actual SMPC
-          sub-device sounds unlikely but possible);
+          cfr. BeOS PnP driver);
     - Incomplete SDIP support:
         - SDIP never returns a valid state and returns default values even if machine is
           soft resetted. By logic should read-back the already existing state, instead
@@ -84,7 +83,12 @@
     TODO (PC-9801BX2)
     - "SYSTEM SHUTDOWN" at POST, a soft reset fixes it?
     - A non-fatal "MEMORY ERROR" is always thrown no matter the RAM size afterwards, related?
-    - unemulated conventional or EMS RAM bank, definitely should have one given the odd minimum RAM size;
+    - unemulated conventional or EMS RAM bank, definitely should have one given the odd minimum RAM
+      size;
+
+    TODO: (PC-9801UX)
+    - "I/O Error" on any 3.5" floppy, specific to this romset (i.e. those works on pc9821).
+      It never access $4be, it must fail earlier than that.
 
 ===================================================================================================
 
@@ -954,6 +958,17 @@ void pc9801vm_state::fdc_mode_w(uint8_t data)
 	//  logerror("FDC ctrl called with %02x\n",data);
 }
 
+TIMER_CALLBACK_MEMBER(pc9801vm_state::fdc_trigger)
+{
+	// TODO: sorcer/hydlide definitely expects the XTMASK irq to be taken
+	// NOTE: should probably trigger the FDC irq depending on mode, i.e. use fdc_irq_w fn
+	if (BIT(m_fdc_2hd_ctrl, 2))
+	{
+		m_pic2->ir2_w(0);
+		m_pic2->ir2_w(1);
+	}
+}
+
 // TODO: undefined/disallow read/writes if I/F mode doesn't match
 // (and that applies to FDC mapping too!)
 // id port 0 -> 2DD
@@ -967,17 +982,6 @@ template <unsigned port> u8 pc9801vm_state::fdc_2hd_2dd_ctrl_r()
 		res |= fdc_drive_ready_r(m_fdc_2hd) << 4;
 	}
 	return res;
-}
-
-TIMER_CALLBACK_MEMBER(pc9801vm_state::fdc_trigger)
-{
-	// TODO: sorcer/hydlide definitely expects the XTMASK irq to be taken
-	// NOTE: should probably trigger the FDC irq depending on mode, i.e. use fdc_irq_w fn
-	if (BIT(m_fdc_2hd_ctrl, 2))
-	{
-		m_pic2->ir2_w(0);
-		m_pic2->ir2_w(1);
-	}
 }
 
 template <unsigned port> void pc9801vm_state::fdc_2hd_2dd_ctrl_w(u8 data)
@@ -1006,6 +1010,74 @@ template <unsigned port> void pc9801vm_state::fdc_2hd_2dd_ctrl_w(u8 data)
 	{
 		m_fdc_timer->reset();
 		m_fdc_timer->adjust(attotime::from_msec(100));
+	}
+}
+
+// TODO: some machines (which?) mirror 0x00be to 0x04be
+u8 pc9801vm_state::fdc_3mode_r(offs_t offset)
+{
+	// freebsd21 expects 0-fill rather than the more logical 1-fill
+	// on 5.25" floppies/ext. drive id checks, open bus?
+	// TODO: external FDD
+	if (m_fdc_3mode.dev_sel & 2)
+		return 0;
+
+	const bool is_35hd = m_fdc_2hd->subdevice<floppy_connector>(m_fdc_3mode.dev_sel ? "1" : "0")->get_device()->get_form_factor() == floppy_image::FF_35;
+
+	if (!is_35hd)
+		return 0;
+
+	u8 res = 0xee;
+
+	// Check if drive is in 2HD/1MB mode
+	if (BIT(m_fdc_mode, 1))
+		res |= 1 << 4;
+
+	if (m_fdc_3mode.access_144mb)
+		res |= 1 << 0;
+
+	return res;
+}
+
+/*
+ * -xx- ---- Drive specification
+ * -00- ---- First internal drive
+ * -01- ---- Second internal drive
+ * -10- ---- External drive
+ * ---x ---- Operation mode specification
+ * ---0 ---- no-op
+ * ---1 ---- Access Mode valid
+ * ---- ---x Access Mode specification
+ * ---- ---0 1MB/640KB
+ * ---- ---1 1.44MB
+ */
+void pc9801vm_state::fdc_3mode_w(offs_t offset, uint8_t data)
+{
+	//logerror("$4be: W %02x\n", data);
+	m_fdc_3mode.dev_sel = (data & 0x60) >> 5;
+
+	// TODO: external FDD
+	if (m_fdc_3mode.dev_sel & 2)
+		return;
+
+	if (BIT(data, 4))
+	{
+		const bool is_35hd = m_fdc_2hd->subdevice<floppy_connector>(m_fdc_3mode.dev_sel ? "1" : "0")->get_device()->get_form_factor() == floppy_image::FF_35;
+
+		if (!is_35hd)
+			return;
+
+		floppy_image_device *floppy = m_fdc_2hd->subdevice<floppy_connector>(m_fdc_3mode.dev_sel ? "1" : "0")->get_device();
+		m_fdc_3mode.access_144mb = !!(BIT(data, 0));
+		if (m_fdc_3mode.access_144mb)
+		{
+			floppy->set_rpm(300);
+			m_fdc_2hd->set_rate(500000);
+		}
+		else
+		{
+			fdc_set_density_mode(!!BIT(m_fdc_mode, 1));
+		}
 	}
 }
 
@@ -1136,6 +1208,7 @@ void pc9801vm_state::pc9801ux_io(address_map &map)
 	map(0x0439, 0x0439).rw(FUNC(pc9801vm_state::dma_access_ctrl_r), FUNC(pc9801vm_state::dma_access_ctrl_w));
 	map(0x043c, 0x043f).w(FUNC(pc9801vm_state::pc9801rs_bank_w)); //ROM/RAM bank
 	map(0x04a0, 0x04af).w(FUNC(pc9801vm_state::egc_w));
+	map(0x04be, 0x04be).rw(FUNC(pc9801vm_state::fdc_3mode_r), FUNC(pc9801vm_state::fdc_3mode_w));
 	map(0x3fd8, 0x3fdf).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0xff00);
 }
 
@@ -1908,16 +1981,6 @@ void pc9801vm_state::mouse_freq_w(offs_t offset, u8 data)
 	m_mouse.freq_index = 0;
 }
 
-// standard debug catch-all handler
-// I/O mapping is byte smearing party, so logerror can possibly silently hide handler
-// accesses if they are partially handled by an umask in the mapping.
-uint8_t pc9801_state::unk_r(offs_t offset)
-{
-//  printf("%04x\n",offset);
-//  logerror("%s: I/O read access %04x\n",offset);
-	return 0xff;
-}
-
 /****************************************
 *
 * UPD765 interface
@@ -2116,6 +2179,8 @@ MACHINE_RESET_MEMBER(pc9801vm_state,pc9801rs)
 
 	m_gate_a20 = 0;
 	m_fdc_mode = 3;
+	m_fdc_3mode.dev_sel = 2;
+	m_fdc_3mode.access_144mb = false;
 	fdc_set_density_mode(true); // 2HD
 	// 0xfb on PC98XL
 	// TODO: breaks UART setup for pc9801rs

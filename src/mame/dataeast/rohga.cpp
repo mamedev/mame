@@ -386,8 +386,8 @@ static INPUT_PORTS_START( rohga )
 	PORT_DIPSETTING(      0x1000, "Lowest" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( High ) )
 	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW2:7")
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -661,8 +661,6 @@ static INPUT_PORTS_START( schmeisr )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
-
-
 
 static INPUT_PORTS_START( hangzo )
 	PORT_START("INPUTS")
@@ -1032,7 +1030,7 @@ void rohga_state::schmeisr(machine_config &config)
 
 	DECO_SPRITE(config, m_sprgen[0], 0, m_palette, gfx_schmeisr_spr);
 	m_sprgen[0]->set_pri_callback(FUNC(rohga_state::rohga_pri_callback));
-	m_sprgen[0]->set_col_callback(FUNC(rohga_state::schmeisr_col_callback));  // wire mods on pcb...
+	m_sprgen[0]->set_col_callback(FUNC(rohga_state::schmeisr_col_callback)); // wire mods on pcb...
 }
 
 void rohga_state::hangzo(machine_config &config)
@@ -1751,7 +1749,6 @@ ROM_END
 
 
 
-
 /**********************************************************************************/
 
 void rohga_state::init_rohga()
@@ -1791,12 +1788,12 @@ void rohga_state::init_schmeisr()
 	deco74_decrypt_gfx(machine(), "tiles1");
 }
 
-GAME( 1991, rohga,     0,        rohga,    rohga,    rohga_state, init_rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (Asia/Europe v5.0)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1991, rohga1,    rohga,    rohga,    rohga,    rohga_state, init_rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (Asia/Europe v3.0 set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, rohga2,    rohga,    rohga,    rohga,    rohga_state, init_rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (Asia/Europe v3.0 set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, rohgah,    rohga,    rohga,    rohga,    rohga_state, init_rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (Hong Kong v3.0)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1991, rohgau,    rohga,    rohga,    rohga,    rohga_state, init_rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (US v1.0)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1991, wolffang,  rohga,    rohga,    rohga,    rohga_state, init_rohga,    ROT0,   "Data East Corporation", "Wolf Fang -Kuhga 2001- (Japan)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1991, rohga,     0,        rohga,    rohga,    rohga_state, init_rohga,    ROT0,   "Data East Corporation", "Rohga: Armor Force (Asia/Europe v5.0)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1991, rohga1,    rohga,    rohga,    rohga,    rohga_state, init_rohga,    ROT0,   "Data East Corporation", "Rohga: Armor Force (Asia/Europe v3.0 set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, rohga2,    rohga,    rohga,    rohga,    rohga_state, init_rohga,    ROT0,   "Data East Corporation", "Rohga: Armor Force (Asia/Europe v3.0 set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, rohgah,    rohga,    rohga,    rohga,    rohga_state, init_rohga,    ROT0,   "Data East Corporation", "Rohga: Armor Force (Hong Kong v3.0)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1991, rohgau,    rohga,    rohga,    rohga,    rohga_state, init_rohga,    ROT0,   "Data East Corporation", "Rohga: Armor Force (US v1.0)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1991, wolffang,  rohga,    rohga,    rohga,    rohga_state, init_rohga,    ROT0,   "Data East Corporation", "Wolf Fang: Kuuga 2001 (Japan)",               MACHINE_SUPPORTS_SAVE )
 
 GAME( 1992, wizdfire,  0,        wizdfire, wizdfire, rohga_state, init_wizdfire, ROT0,   "Data East Corporation", "Wizard Fire (Over Sea v2.1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, wizdfirea, wizdfire, wizdfire, wizdfire, rohga_state, init_wizdfire, ROT0,   "Data East Corporation", "Wizard Fire (Over Sea v1.0)", MACHINE_SUPPORTS_SAVE )

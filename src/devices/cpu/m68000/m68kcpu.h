@@ -604,11 +604,14 @@ inline u32 m68ki_read_imm_16()
 	result = MASK_OUT_ABOVE_16(m_pref_data);
 	m_pc += 2;
 	if (!m_mmu_tmp_buserror_occurred) {
+
 		// prefetch only if no bus error occurred in opcode fetch
 		m_pref_data = m68ki_ic_readimm16(m_pc);
 		m_pref_addr = m_mmu_tmp_buserror_occurred ? ~0 : m_pc;
-		// ignore bus error on prefetch
-		m_mmu_tmp_buserror_occurred = 0;
+		if (!CPU_TYPE_IS_010())
+		{
+			m_mmu_tmp_buserror_occurred = 0;
+		}
 	}
 
 	return result;

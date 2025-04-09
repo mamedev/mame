@@ -25,42 +25,34 @@ tzbx15_device::tzbx15_device(const machine_config &mconfig, device_type type, co
 {
 }
 
-tzbx15_device::tzbx15_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, u32 clock, u32 clut_size)
+tzbx15_device::tzbx15_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 clut_size)
 	: tzbx15_device(mconfig, type, tag, owner, clock)
 {
 	m_rom_clut_size = clut_size;
 }
 
-tzb215_device::tzb215_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock, u32 clut_size)
+tzb215_device::tzb215_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, u32 clut_size)
 	: tzbx15_device(mconfig, TZB215_SPRITES, tag, owner, clock, clut_size)
 {
 }
 
-tzb215_device::tzb215_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock)
+tzb215_device::tzb215_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: tzbx15_device(mconfig, TZB215_SPRITES, tag, owner, clock, 0)
 {
 }
 
-tzb315_device::tzb315_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock, u32 clut_size)
+tzb315_device::tzb315_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, u32 clut_size)
 	: tzbx15_device(mconfig, TZB315_SPRITES, tag, owner, clock, clut_size)
 {
 }
 
-tzb315_device::tzb315_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock)
+tzb315_device::tzb315_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: tzbx15_device(mconfig, TZB315_SPRITES, tag, owner, clock, 0)
 {
 }
 
 
 
-
-void tzbx15_device::common_init()
-{
-	m_rom_clut_offset = memregion("sprites_l")->bytes() - m_rom_clut_size;
-
-	m_shadow_pen_array = make_unique_clear<uint8_t[]>(m_rom_clut_size * 2);
-	m_temp_bitmap.allocate(512, 512);
-}
 
 static const gfx_layout spritelayout =
 {
@@ -80,7 +72,11 @@ GFXDECODE_END
 
 void tzbx15_device::device_start()
 {
-	common_init();
+	m_rom_clut_offset = memregion("sprites_l")->bytes() - m_rom_clut_size;
+
+	m_shadow_pen_array = make_unique_clear<uint8_t[]>(m_rom_clut_size * 2);
+	m_temp_bitmap.allocate(512, 512);
+
 	decode_gfx(gfxinfo);
 	gfx(0)->set_colors(m_rom_clut_size / 8);
 	gfx(1)->set_colors(m_rom_clut_size / 8);
@@ -130,7 +126,7 @@ void tzbx15_device::mycopyrozbitmap_core(bitmap_rgb32 &bitmap, const bitmap_rgb3
 			int x = sx;
 			uint32_t cx = startx;
 			uint32_t cy = starty;
-			uint32_t* dest = &bitmap.pix(sy, sx);
+			uint32_t *dest = &bitmap.pix(sy, sx);
 
 			while (x <= ex)
 			{
@@ -155,9 +151,12 @@ void tzbx15_device::mycopyrozbitmap_core(bitmap_rgb32 &bitmap, const bitmap_rgb3
 }
 
 template<class BitmapClass>
-void tzbx15_device::roundupt_drawgfxzoomrotate( BitmapClass &dest_bmp, const rectangle &clip,
-		gfx_element *gfx, uint32_t code,uint32_t color,int flipx,int flipy,uint32_t ssx,uint32_t ssy,
-		int scalex, int scaley, int rotate, int write_priority_only )
+void tzbx15_device::roundupt_drawgfxzoomrotate(
+		BitmapClass &dest_bmp, const rectangle &clip,
+		gfx_element *gfx, uint32_t code, uint32_t color,
+		int flipx, int flipy, uint32_t ssx, uint32_t ssy,
+		int scalex, int scaley, int rotate,
+		int write_priority_only)
 {
 	if (!scalex || !scaley) return;
 
@@ -172,7 +171,7 @@ void tzbx15_device::roundupt_drawgfxzoomrotate( BitmapClass &dest_bmp, const rec
 	rectangle myclip = clip;
 	myclip &= dest_bmp.cliprect();
 
-	if( gfx )
+	if (gfx)
 	{
 		const pen_t *pal = &m_palette_clut->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
 		const uint8_t *shadow_pens = m_shadow_pen_array.get() + (gfx->granularity() * (color % gfx->colors()));
@@ -417,23 +416,27 @@ void tzbx15_device::draw_sprites_main(BitmapClass &bitmap, const rectangle &clip
 		src1 += 4;
 		int h = 0;
 
-		while (lines > 0) {
+		while (lines > 0)
+		{
 			int base, x_offs, x_width, x_pos, draw_this_line = 1;
 			int this_extent = 0;
 
 			/* Odd and even lines come from different banks */
-			if (h & 1) {
+			if (h & 1)
+			{
 				x_width = src1[0] + 1;
 				x_offs = src1[1] * scale * 8;
 				base = src1[2] | (src1[3] << 8);
 			}
-			else {
+			else
+			{
 				x_width = src2[0] + 1;
 				x_offs = src2[1] * scale * 8;
 				base = src2[2] | (src2[3] << 8);
 			}
 
-			if (draw_this_line) {
+			if (draw_this_line)
+			{
 				base *= 2;
 
 				if (!rotate)
@@ -446,7 +449,8 @@ void tzbx15_device::draw_sprites_main(BitmapClass &bitmap, const rectangle &clip
 				else
 					x_pos = x_offs;
 
-				for (int w = 0; w < x_width; w++) {
+				for (int w = 0; w < x_width; w++)
+				{
 					if (rotate)
 						roundupt_drawgfxzoomrotate(
 								m_temp_bitmap,cliprect,gfx(0 + (base & 1)),

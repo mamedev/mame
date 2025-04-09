@@ -59,6 +59,8 @@ void ppu_sh6578_device::device_start()
 		m_palette_ram[i] = 0x00;
 
 	save_item(NAME(m_palette_ram));
+	save_item(NAME(m_extplanebuf));
+	save_item(NAME(m_colsel_pntstart));
 }
 
 void ppu_sh6578_device::device_reset()
@@ -73,10 +75,9 @@ void ppu_sh6578_device::scanline_increment_fine_ycounter()
 	m_refresh_data += 0x1000;
 
 	/* if it's rolled, increment the coarse y-scroll */
-	if (m_refresh_data & 0x8000)
+	if (BIT(m_refresh_data, 15))
 	{
-		uint16_t tmp;
-		tmp = (m_refresh_data & 0x03e0) + 0x20;
+		const uint16_t tmp = (m_refresh_data & 0x03e0) + 0x20;
 		m_refresh_data &= 0x7c1f;
 
 		if (tmp == 0x0400)
@@ -90,8 +91,7 @@ void ppu_sh6578_device::scanline_increment_fine_ycounter()
 
 void ppu_sh6578_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, uint8_t pixel_data, bitmap_rgb32& bitmap)
 {
-	uint8_t palval = m_palette_ram[(pixel_data | color << 2)] & 0x3f;
-	bitmap.pix(m_scanline, sprite_xpos + pixel) = m_nespens[palval];
+	bitmap.pix(m_scanline, sprite_xpos + pixel) = pen_color(m_palette_ram[(pixel_data | color << 2)] & 0x3f);
 }
 
 void ppu_sh6578_device::read_tile_plane_data(int address, int color)
@@ -110,7 +110,7 @@ void ppu_sh6578_device::draw_tile(uint8_t* line_priority, int color_byte, int co
 {
 	int color = color_byte;
 
-	if (m_colsel_pntstart & 0x80)
+	if (BIT(m_colsel_pntstart, 7))
 	{
 		color &= 0xc;
 	}
@@ -146,11 +146,9 @@ void ppu_sh6578_device::draw_tile(uint8_t* line_priority, int color_byte, int co
 
 		if ((start_x + i) >= 0 && (start_x + i) < VISIBLE_SCREEN_WIDTH)
 		{
-			pen_t pen;
+			rgb_t pen;
 
-			uint8_t palval;
-
-			palval = m_palette_ram[(pix | color << 2)] & 0x3f;
+			const uint8_t palval = m_palette_ram[(pix | color << 2)] & 0x3f;
 
 			bool trans = false;
 			if ((palval & 0x1f) == 0x1f)
@@ -158,12 +156,12 @@ void ppu_sh6578_device::draw_tile(uint8_t* line_priority, int color_byte, int co
 
 			if (!trans)
 			{
-				pen = m_nespens[palval];
+				pen = pen_color(palval);
 			}
 			else
 			{
-				uint8_t palval = m_palette_ram[0x0] & 0x3f;
-				pen = m_nespens[palval];
+				const uint8_t palval = m_palette_ram[0x0] & 0x3f;
+				pen = pen_color(palval);
 			}
 
 			*dest = pen;
@@ -178,8 +176,6 @@ void ppu_sh6578_device::draw_tile(uint8_t* line_priority, int color_byte, int co
 
 void ppu_sh6578_device::draw_background(uint8_t* line_priority)
 {
-	bitmap_rgb32& bitmap = *m_bitmap;
-
 	uint8_t color_mask = 0xff;
 	//const pen_t* color_table;
 
@@ -197,34 +193,30 @@ void ppu_sh6578_device::draw_background(uint8_t* line_priority)
 
 
 	/* cache the background pen */
-	pen_t back_pen = m_nespens[m_back_color & color_mask];
+	const pen_t back_pen = pen_color(m_back_color & color_mask);
 
 	/* determine where in the nametable to start drawing from */
 	/* based on the current scanline and scroll regs */
-	uint8_t  scroll_x_coarse = m_refresh_data & 0x001f;
-	uint8_t  scroll_y_coarse = (m_refresh_data & 0x03e0) >> 5;
-	uint16_t nametable = (m_refresh_data & 0x0c00);
-	uint8_t  scroll_y_fine = (m_refresh_data & 0x7000) >> 12;
+	const uint8_t  scroll_x_coarse = m_refresh_data & 0x001f;
+	const uint8_t  scroll_y_coarse = (m_refresh_data & 0x03e0) >> 5;
+	const uint16_t nametable = (m_refresh_data & 0x0c00);
+	const uint8_t  scroll_y_fine = (m_refresh_data & 0x7000) >> 12;
 
 	int x = scroll_x_coarse;
 
 	/* get the tile index */
-	int tile_index = (nametable<<1) + scroll_y_coarse * 64;
+	int tile_index = (nametable << 1) + scroll_y_coarse * 64;
 
 	/* set up dest */
 	int start_x = (m_x_fine ^ 0x07) - 7;
-	uint32_t* dest = &bitmap.pix(m_scanline, start_x);
+	uint32_t* dest = &m_bitmap.pix(m_scanline, start_x);
 
 	m_tilecount = 0;
 
 	/* draw the 32 or 33 tiles that make up a line */
 	while (m_tilecount < 34)
 	{
-		int color_byte;
-		int index1;
-		int page2, address;
-
-		index1 = tile_index + (x << 1);
+		int index1 = tile_index + (x << 1);
 
 		if (m_colsel_pntstart & 1)
 		{
@@ -237,14 +229,14 @@ void ppu_sh6578_device::draw_background(uint8_t* line_priority)
 		}
 
 		// page2 is the output of the nametable read (this section is the FIRST read per tile!)
-		page2 = readbyte(index1);
+		const int page2 = readbyte(index1);
 
 		/* Figure out which byte in the color table to use */
-		color_byte = readbyte(index1 + 1);
+		const int color_byte = readbyte(index1 + 1);
 
 		if (start_x < VISIBLE_SCREEN_WIDTH)
 		{
-			address = ((page2 | (color_byte<<8)) & 0x0fff) << 4;
+			int address = ((page2 | (color_byte<<8)) & 0x0fff) << 4;
 			// plus something that accounts for y
 			address += scroll_y_fine;
 
@@ -266,7 +258,7 @@ void ppu_sh6578_device::draw_background(uint8_t* line_priority)
 	/* if the left 8 pixels for the background are off, blank 'em */
 	if (!(m_regs[PPU_CONTROL1] & PPU_CONTROL1_BACKGROUND_L8))
 	{
-		dest = &bitmap.pix(m_scanline);
+		dest = &m_bitmap.pix(m_scanline);
 		for (int i = 0; i < 8; i++)
 		{
 			*(dest++) = back_pen;

@@ -260,6 +260,7 @@ void vga_device::device_start()
 	save_item(NAME(vga.dac.state));
 	save_item(NAME(vga.dac.color));
 	save_item(NAME(vga.dac.dirty));
+	save_item(NAME(vga.dac.loading));
 
 	m_vblank_timer = timer_alloc(FUNC(vga_device::vblank_timer_cb), this);
 }
@@ -621,22 +622,15 @@ void vga_device::ramdac_data_w(offs_t offset, u8 data)
 {
 	if (!vga.dac.read)
 	{
-		switch (vga.dac.state++)
-		{
-			case 0:
-				vga.dac.color[3*vga.dac.write_index]=data;
-				break;
-			case 1:
-				vga.dac.color[3*vga.dac.write_index + 1]=data;
-				break;
-			case 2:
-				vga.dac.color[3*vga.dac.write_index + 2]=data;
-				break;
-		}
+		vga.dac.loading[vga.dac.state] = data;
+		vga.dac.state++;
 
-		vga.dac.dirty=1;
 		if (vga.dac.state==3)
 		{
+			vga.dac.color[3*vga.dac.write_index] = vga.dac.loading[0];
+			vga.dac.color[3*vga.dac.write_index+1] = vga.dac.loading[1];
+			vga.dac.color[3*vga.dac.write_index+2] = vga.dac.loading[2];
+			vga.dac.dirty = 1;
 			vga.dac.state = 0;
 			vga.dac.write_index++;
 		}

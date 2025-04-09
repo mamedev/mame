@@ -1039,7 +1039,7 @@ void twinkle_state::spu_wavebank_w(offs_t offset, uint16_t data, uint16_t mem_ma
 	// then to bank 2, and finally to bank 3.
 	//
 	// neither the 68k nor DMA access wave RAM when the bank is 0.
-	m_wave_bank = data * (4*1024*1024);
+	m_wave_bank = data * 0x400000;
 }
 
 uint16_t twinkle_state::twinkle_waveram_r(offs_t offset)

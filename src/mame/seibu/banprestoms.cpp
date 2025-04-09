@@ -120,16 +120,6 @@ void banprestoms_state::machine_start()
 	m_okibank->set_entry(0);
 }
 
-
-void banprestoms_state::okibank_w(uint16_t data)
-{
-	m_okibank->set_entry(data & 0x03);
-
-	m_ticket->motor_w(BIT(data, 4)); // bit 3 is suspect, too
-	// TODO: what do the other bits do?
-}
-
-
 void banprestoms_state::video_start()
 {
 	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(banprestoms_state::tile_info<0>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
@@ -183,9 +173,9 @@ uint32_t banprestoms_state::screen_update(screen_device &screen, bitmap_ind16 &b
 	m_tilemap[1]->set_scrollx(0, m_scrollram[2]);
 	m_tilemap[1]->set_scrolly(0, m_scrollram[3] - 16);
 	m_tilemap[2]->set_scrollx(0, m_scrollram[4]);
-	m_tilemap[2]->set_scrolly(0, m_scrollram[5] - 16);
-	m_tilemap[3]->set_scrollx(0, 128);
-	m_tilemap[3]->set_scrolly(0, -16);
+	m_tilemap[2]->set_scrolly(0, m_scrollram[5]);
+	//m_tilemap[3]->set_scrollx(0, 128);
+	//m_tilemap[3]->set_scrolly(0, -16);
 
 	if (BIT(~m_layer_en, 0)) { m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 1); }
 	if (BIT(~m_layer_en, 1)) { m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 2); }
@@ -206,6 +196,13 @@ void banprestoms_state::layer_scroll_w(offs_t offset, uint16_t data, uint16_t me
 	COMBINE_DATA(&m_scrollram[offset]);
 }
 
+void banprestoms_state::okibank_w(uint16_t data)
+{
+	m_okibank->set_entry(data & 0x03);
+
+	m_ticket->motor_w(BIT(data, 4)); // bit 3 is suspect, too
+	// TODO: what do the other bits do?
+}
 
 void banprestoms_state::prg_map(address_map &map)
 {
@@ -241,41 +238,42 @@ void banprestoms_state::oki_map(address_map &map)
 static INPUT_PORTS_START( tvdenwad )
 	PORT_START("IN1")
 	// TODO: convert to keypad
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) // 1
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) // 2
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) // 3
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) // 4
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 ) // 5
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON6 ) // 6
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON7 ) // 7
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON8 ) // 8
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON9 ) // 9
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON10 ) // 0, why active high?
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON11 ) // #
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON12 ) // *
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNUSED ) // couldn't find anything from here on
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Keypad 1") PORT_CODE(KEYCODE_1_PAD)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Keypad 2") PORT_CODE(KEYCODE_2_PAD)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Keypad 3") PORT_CODE(KEYCODE_3_PAD)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Keypad 4") PORT_CODE(KEYCODE_4_PAD)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Keypad 5") PORT_CODE(KEYCODE_5_PAD)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Keypad 6") PORT_CODE(KEYCODE_6_PAD)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Keypad 7") PORT_CODE(KEYCODE_7_PAD)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Keypad 8") PORT_CODE(KEYCODE_8_PAD)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Keypad 9") PORT_CODE(KEYCODE_9_PAD)
+	// TODO: this wants active high otherwise cannot enter service mode
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Keypad 0") PORT_CODE(KEYCODE_0_PAD)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Keypad #") PORT_CODE(KEYCODE_PLUS_PAD)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Keypad *") PORT_CODE(KEYCODE_ASTERISK)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON13 ) // Card Emp in switch test
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON14 ) // Card Pos in switch test
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", FUNC(ticket_dispenser_device::line_r)) // Card Pay in switch test
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM ) // Card Emp
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_CUSTOM ) // Card Pos
+	// TODO: should be IP_ACTIVE_HIGH but that breaks tvdenwad boot
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", FUNC(ticket_dispenser_device::line_r)) // Card Pay
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNUSED ) // ?
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE( 0x0020, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED ) // ?
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON16 ) // Hook in switch test
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) // Hook
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNUSED ) // couldn't find anything from here on
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
-
 
 	PORT_START("DSW1") // marked SW0913 on PCB
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) ) PORT_DIPLOCATION("DSW1:1,2")
@@ -339,7 +337,6 @@ static INPUT_PORTS_START( marioun ) // inputs defined as IPT_UNKNOWN don't show 
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
 
 	PORT_START("DSW1") // marked SW0913 on PCB
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) ) PORT_DIPLOCATION("DSW1:1,2")
@@ -427,6 +424,13 @@ void banprestoms_state::banprestoms(machine_config &config)
 	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
 	crtc.layer_en_callback().set(FUNC(banprestoms_state::layer_en_w));
 	crtc.layer_scroll_callback().set(FUNC(banprestoms_state::layer_scroll_w));
+	crtc.layer_scroll_base_callback().set([this] (offs_t offset, u16 data, u16 mem_mask) {
+		const u8 layer_n = offset >> 1;
+		if (!BIT(offset, 0))
+			m_tilemap[layer_n]->set_scrolldx((0x1c0 - data) & 0x1ff, (0x1c0 - data) & 0x1ff);
+		else
+			m_tilemap[layer_n]->set_scrolldy((0x1ff - data) & 0x1ff, (0x1ff - data) & 0x1ff);
+	});
 
 	LH5045(config, m_rtc, XTAL(32'768));
 

@@ -928,7 +928,6 @@ void screen_device::device_stop()
 void screen_device::device_post_load()
 {
 	realloc_screen_bitmaps();
-	m_scanline0_timer->adjust(time_until_pos(0));
 }
 
 

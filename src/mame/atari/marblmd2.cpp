@@ -113,30 +113,32 @@ uint32_t marblmd2_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		}
 	}
 
-	for (const sparse_dirty_rect *rect = m_vad->mob().first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-	{
-		for (int y = rect->top(); y <= rect->bottom(); y++)
-		{
-			uint16_t const *const pf2 = &m_tempbitmap.pix(y);
-			uint16_t const *const mo = &mobitmap.pix(y);
-			uint16_t *const pf = &bitmap.pix(y);
-			for (int x = rect->left(); x <= rect->right(); x++)
+	m_vad->mob().iterate_dirty_rects(
+			cliprect,
+			[this, &bitmap, &mobitmap] (rectangle const &rect)
 			{
-				if (mo[x] != 0xffff)
+				for (int y = rect.top(); y <= rect.bottom(); y++)
 				{
-					if (pf2[x] & 0x80) // check against top bit of temp pf render
+					uint16_t const *const pf2 = &m_tempbitmap.pix(y);
+					uint16_t const *const mo = &mobitmap.pix(y);
+					uint16_t *const pf = &bitmap.pix(y);
+					for (int x = rect.left(); x <= rect.right(); x++)
 					{
-						if (mo[x] & 0x80)
-							pf[x] = mo[x];
-					}
-					else
-					{
-						pf[x] = mo[x] | 0x80;
+						if (mo[x] != 0xffff)
+						{
+							if (pf2[x] & 0x80) // check against top bit of temp pf render
+							{
+								if (mo[x] & 0x80)
+									pf[x] = mo[x];
+							}
+							else
+							{
+								pf[x] = mo[x] | 0x80;
+							}
+						}
 					}
 				}
-			}
-		}
-	}
+			});
 
 	return 0;
 }
