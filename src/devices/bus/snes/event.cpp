@@ -113,7 +113,6 @@ uint8_t sns_pfest94_device::chip_read(offs_t offset)
 	else
 	{
 		// DSP access
-		offset &= 0x1fff;
 		if (BIT(offset, 12))
 			return m_upd7725->status_r();
 		else
