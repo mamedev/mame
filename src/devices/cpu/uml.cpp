@@ -353,8 +353,8 @@ public:
 		if (inst.param(2).is_immediate_value(mask))
 		{
 			inst.m_opcode = OP_READ;
-			inst.m_numparams = 3;
 			inst.m_param[2] = inst.param(3);
+			inst.m_numparams = 3;
 		}
 	}
 
@@ -381,8 +381,8 @@ public:
 		if (inst.param(2).is_immediate_value(mask))
 		{
 			inst.m_opcode = OP_WRITE;
-			inst.m_numparams = 3;
 			inst.m_param[2] = inst.param(3);
+			inst.m_numparams = 3;
 		}
 	}
 
@@ -450,19 +450,19 @@ public:
 		{
 			// only mask is variable, convert to AND
 			inst.m_opcode = OP_AND;
-			inst.m_numparams = 3;
 			if (size == 4)
 				inst.m_param[1] = parameter(rotl_32(inst.param(1).immediate(), inst.param(2).immediate()));
 			else
 				inst.m_param[1] = parameter(rotl_64(inst.param(1).immediate(), inst.param(2).immediate()));
 			inst.m_param[2] = inst.param(3);
+			inst.m_numparams = 3;
 		}
 		else if (inst.param(2).is_immediate_value(0) || inst.param(3).is_immediate_value(0))
 		{
 			// no shift or zero mask, convert to AND (may be subsequently converted to MOV)
 			inst.m_opcode = OP_AND;
-			inst.m_numparams = 3;
 			inst.m_param[2] = inst.param(3);
+			inst.m_numparams = 3;
 		}
 		else if (inst.param(3).is_immediate_value(mask))
 		{
@@ -598,9 +598,9 @@ public:
 		if (inst.param(0) == inst.param(1))
 		{
 			inst.m_opcode = LoWordOp;
-			inst.m_numparams = 3;
 			inst.m_param[1] = inst.param(2);
 			inst.m_param[2] = inst.param(3);
+			inst.m_numparams = 3;
 			return;
 		}
 
@@ -696,7 +696,7 @@ public:
 			// any immediate zero always yields zero
 			convert_to_mov_immediate(inst, 0);
 		}
-		else if (inst.param(2).is_immediate_value(size_mask(inst)))
+		else if (inst.param(2).is_immediate_value(size_mask(inst)) || (inst.param(1) == inst.param(2)))
 		{
 			if (!inst.flags())
 			{
@@ -734,6 +734,19 @@ public:
 			using std::swap;
 			swap(inst.m_param[0], inst.m_param[1]);
 		}
+
+		if (inst.param(0).is_immediate() && inst.param(1).is_immediate())
+		{
+			// two immediates, combine values and set second operand to all 0 or all 1
+			u64 const val = inst.param(0).immediate() & inst.param(1).immediate();
+			inst.m_param[0] = val;
+			inst.m_param[1] = val ? mask : 0;
+		}
+		else if (inst.param(0) == inst.param(1))
+		{
+			// testing a value against itself, turn the second operand into an immediate
+			inst.m_param[1] = mask;
+		}
 	}
 
 	static void _or(instruction &inst)
@@ -753,7 +766,7 @@ public:
 			// an immediate with all bits set is unaffected by the other value
 			convert_to_mov_immediate(inst, mask);
 		}
-		else if (inst.param(2).is_immediate_value(0))
+		else if (inst.param(2).is_immediate_value(0) || (inst.param(1) == inst.param(2)))
 		{
 			if (!inst.flags())
 			{
@@ -766,6 +779,12 @@ public:
 				// convert to TEST if the value will be unaffected and the destination is no larger than the operand size
 				inst.m_opcode = OP_TEST;
 				inst.m_numparams = 2;
+			}
+			else
+			{
+				// convert to AND to simplify code generation
+				inst.m_opcode = OP_AND;
+				inst.m_param[2] = mask;
 			}
 		}
 	}
@@ -798,6 +817,12 @@ public:
 				// convert to TEST if the value will be unaffected and the destination is no larger than the operand size
 				inst.m_opcode = OP_TEST;
 				inst.m_numparams = 2;
+			}
+			else
+			{
+				// convert to AND to simplify code generation
+				inst.m_opcode = OP_AND;
+				inst.m_param[2] = size_mask(inst);
 			}
 		}
 	}

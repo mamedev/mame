@@ -4807,21 +4807,7 @@ void drcbe_x64::op_and(Assembler &a, const instruction &inst)
 	if (dstp.is_memory() && ((inst.size() == 8) || !dstp.is_cold_register()) && (dstp == src1p))
 	{
 		// dstp == src1p in memory
-		alu_op_param(a, Inst::kIdAnd, MABS(dstp.memory(), inst.size()), src2p,
-			[inst](Assembler &a, Operand const &dst, be_parameter const &src)
-			{
-				// optimize all-zero and all-one cases
-				if (!inst.flags() && !src.immediate())
-				{
-					a.mov(dst.as<Mem>(), imm(0));
-					return true;
-				}
-				else if (!inst.flags() && ones(src.immediate(), inst.size()))
-				{
-					return true;
-				}
-				return false;
-			});
+		alu_op_param(a, Inst::kIdAnd, MABS(dstp.memory(), inst.size()), src2p);
 	}
 	else if (src2p.is_immediate_value(0xff) && !inst.flags())
 	{
@@ -4870,16 +4856,10 @@ void drcbe_x64::op_and(Assembler &a, const instruction &inst)
 				else if (ones(src.immediate(), inst.size()))
 				{
 					if (inst.size() == 4)
-					{
-						if (inst.flags())
-							a.and_(dst.as<Gp>(), dst.as<Gp>());
-						else
-							a.mov(dst.as<Gp>(), dst.as<Gp>());
-					}
-					else if (inst.flags())
-					{
+						a.and_(dst.as<Gp>(), dst.as<Gp>());
+					else
 						a.test(dst.as<Gp>(), dst.as<Gp>());
-					}
+
 					return true;
 				}
 
@@ -4918,7 +4898,7 @@ void drcbe_x64::op_test(Assembler &a, const instruction &inst)
 		// general case
 
 		// pick a target register for the general case
-		Gp src1reg = (inst.size() == 4) ? src1p.select_register(eax) : src1p.select_register(rax);
+		const Gp src1reg = src1p.select_register((inst.size() == 4) ? Gp(eax) : Gp(rax));
 
 		mov_reg_param(a, src1reg, src1p);
 		alu_op_param(a, Inst::kIdTest, src1reg, src2p,
@@ -4966,10 +4946,6 @@ void drcbe_x64::op_or(Assembler &a, const instruction &inst)
 					a.mov(dst.as<Mem>(), imm(-1));
 					return true;
 				}
-				else if (!inst.flags() && !src.immediate())
-				{
-					return true;
-				}
 				return false;
 			});
 	}
@@ -4980,8 +4956,8 @@ void drcbe_x64::op_or(Assembler &a, const instruction &inst)
 		// pick a target register for the general case
 		Gp dstreg = (inst.size() == 4) ? dstp.select_register(eax, src2p) : dstp.select_register(rax, src2p);
 
-		mov_reg_param(a, dstreg, src1p);                                                // mov   dstreg,src1p
-		alu_op_param(a, Inst::kIdOr, dstreg, src2p,                                     // or    dstreg,src2p
+		mov_reg_param(a, dstreg, src1p);
+		alu_op_param(a, Inst::kIdOr, dstreg, src2p,
 			[inst] (Assembler &a, Operand const &dst, be_parameter const &src)
 			{
 				// optimize all-zero and all-one cases
@@ -4990,27 +4966,10 @@ void drcbe_x64::op_or(Assembler &a, const instruction &inst)
 					a.mov(dst.as<Gp>(), imm(-1));
 					return true;
 				}
-				else if (!src.immediate())
-				{
-					if (inst.size() == 4)
-					{
-						if (inst.flags())
-							a.or_(dst.as<Gp>(), dst.as<Gp>());
-						else
-							a.mov(dst.as<Gp>(), dst.as<Gp>());
-					}
-					else if (inst.flags())
-					{
-						a.test(dst.as<Gp>(), dst.as<Gp>());
-					}
-					return true;
-				}
-
 				return false;
 			});
 
-		if ((inst.size() == 4) || !src2p.is_immediate_value(0))
-			mov_param_reg(a, dstp, dstreg);                                                 // mov   dstp,dstreg
+		mov_param_reg(a, dstp, dstreg);
 	}
 }
 
@@ -5035,17 +4994,15 @@ void drcbe_x64::op_xor(Assembler &a, const instruction &inst)
 	if (dstp.is_memory() && ((inst.size() == 8) || !dstp.is_cold_register()) && (dstp == src1p))
 	{
 		// dstp == src1p in memory
-		alu_op_param(a, Inst::kIdXor, MABS(dstp.memory(), inst.size()), src2p,          // xor   [dstp],src2p
+		alu_op_param(a, Inst::kIdXor, MABS(dstp.memory(), inst.size()), src2p,
 			[inst] (Assembler &a, Operand const &dst, be_parameter const &src)
 			{
-				// optimize all-zero and all-one cases
+				// optimize all-one cases
 				if (!inst.flags() && ones(src.immediate(), inst.size()))
 				{
 					a.not_(dst.as<Mem>());
 					return true;
 				}
-				else if (!inst.flags() && !src.immediate())
-					return true;
 
 				return false;
 			});
@@ -5058,25 +5015,10 @@ void drcbe_x64::op_xor(Assembler &a, const instruction &inst)
 		alu_op_param(a, Inst::kIdXor, dst, src2p,
 			[inst] (Assembler &a, Operand const &dst, be_parameter const &src)
 			{
-				// optimize all-zero and all-one cases
+				// optimize all-one cases
 				if (!inst.flags() && ones(src.immediate(), inst.size()))
 				{
 					a.not_(dst.as<Gp>());
-					return true;
-				}
-				else if (!src.immediate())
-				{
-					if (inst.size() == 4)
-					{
-						if (inst.flags())
-							a.or_(dst.as<Gp>(), dst.as<Gp>());
-						else
-							a.mov(dst.as<Gp>(), dst.as<Gp>());
-					}
-					else if (inst.flags())
-					{
-						a.test(dst.as<Gp>(), dst.as<Gp>());
-					}
 					return true;
 				}
 				return false;
@@ -5091,33 +5033,16 @@ void drcbe_x64::op_xor(Assembler &a, const instruction &inst)
 		alu_op_param(a, Inst::kIdXor, dstreg, src2p,
 			[inst] (Assembler &a, Operand const &dst, be_parameter const &src)
 			{
-				// optimize all-zero and all-one cases
+				// optimize all-one cases
 				if (!inst.flags() && ones(src.immediate(), inst.size()))
 				{
 					a.not_(dst.as<Gp>());
 					return true;
 				}
-				else if (!src.immediate())
-				{
-					if (inst.size() == 4)
-					{
-						if (inst.flags())
-							a.or_(dst.as<Gp>(), dst.as<Gp>());
-						else
-							a.mov(dst.as<Gp>(), dst.as<Gp>());
-					}
-					else if (inst.flags())
-					{
-						a.test(dst.as<Gp>(), dst.as<Gp>());
-					}
-					return true;
-				}
-
 				return false;
 			});
 
-		if ((inst.size() == 4) || !src2p.is_immediate_value(0))
-			mov_param_reg(a, dstp, dstreg);
+		mov_param_reg(a, dstp, dstreg);
 	}
 }
 
