@@ -467,6 +467,8 @@ void tek440x_state::tek4404(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	SN76496(config, m_snsnd, 25.2_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.80);
+	
+	config.set_default_layout(layout_tek4404);
 }
 
 
