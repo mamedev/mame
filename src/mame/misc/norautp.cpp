@@ -12,60 +12,73 @@
 
   -- Z80 based --
 
-   * Noraut Poker,                               1988,  Noraut Ltd.
-   * Noraut Deluxe Poker (console),              198?,  Noraut Ltd.
-   * Noraut Deluxe Poker (bootleg),              198?,  Unknown.
-   * Noraut Joker Poker (original),              198?,  Noraut Ltd.
-   * Noraut Joker Poker (text hack),             198?,  bootleg.
-   * Noraut Joker Poker (Prologic HW),           198?,  Video Fun Games Ltd.
-   * Noraut Joker Poker (N1A),                   1988,  Noraut Ltd.
-   * Noraut Joker Poker (alt),                   1988,  Noraut Ltd.
-   * Noraut Red Hot Joker Poker,                 1988,  Noraut Ltd.
-   * Noraut Red Hot Joker Poker (alt HW),        198?,  Noraut Ltd.
-   * Noraut Poker (NTX10A),                      1988,  Noraut Ltd.
-   * Noraut Jacks Plus / Joker Poker (V3.010a),  2002,  Noraut Ltd.
-   * Noraut Jacks Plus / Joker Poker (V3.011a),  2003,  Noraut Ltd.
-   * Noraut Joker Poker (console, set 1),        198?,  Noraut Ltd.
-   * Noraut Joker Poker (console, set 2),        198?,  Noraut Ltd.
-   * Mainline Double Joker Poker / Jacks Plus,   198?,  Mainline London.
-   * Double Joker Poker (45%-75% payout),        199?,  DellFern Ltd.
-   * Double Joker Poker (45%-75% payout, alt),   199?,  DellFern Ltd.
-   * Royal on Ten (hack of Noraut Deluxe Poker), 2005,  Unknown.
-   * Credit Poker (ver.30c, standard),           1999,  CGI.
-   * Credit Poker (ver.30b, 7 & 9 bonus),        1999,  CGI.
-   * Credit Poker (ver.23b, 7 & 9 bonus),        1998,  CGI.
-   * Double Joker Poker (CGI),                   19??,  CGI.
-   * Kimble Double HI-LO (z80 version),          198?,  Kimble Ireland.
-   * Poker / Black Jack (Model 7521),            198?,  M. Kramer Manufacturing.
-   * Draw Poker (Joker Poker V.01),              1984,  Coinmaster.
+   * Noraut Poker,                                  1988,  Noraut Ltd.
+   * Noraut Deluxe Poker (console),                 198?,  Noraut Ltd.
+   * Noraut Deluxe Poker (bootleg),                 198?,  Unknown.
+   * Noraut Joker Poker (original),                 198?,  Noraut Ltd.
+   * Noraut Joker Poker (text hack),                198?,  bootleg.
+   * Noraut Joker Poker (Prologic HW),              198?,  Video Fun Games Ltd.
+   * Noraut Joker Poker (N1A),                      1988,  Noraut Ltd.
+   * Noraut Joker Poker (alt),                      1988,  Noraut Ltd.
+   * Noraut Red Hot Joker Poker,                    1988,  Noraut Ltd.
+   * Noraut Red Hot Joker Poker (alt HW),           198?,  Noraut Ltd.
+   * Noraut Poker (NTX10A),                         1988,  Noraut Ltd.
+   * Noraut Jacks Plus / Joker Poker (V3.010a),     2002,  Noraut Ltd.
+   * Noraut Jacks Plus / Joker Poker (V3.011a),     2003,  Noraut Ltd.
+   * Noraut Joker Poker (console, set 1),           198?,  Noraut Ltd.
+   * Noraut Joker Poker (console, set 2),           198?,  Noraut Ltd.
+   * Mainline Double Joker Poker / Jacks Plus,      198?,  Mainline London.
+   * Double Joker Poker (45%-75% payout),           1996,  DellFern Ltd.
+   * Double Joker Poker (45%-75% payout, alt),      1996,  DellFern Ltd.
+   * Royal on Ten (hack of Noraut Deluxe Poker),    2005,  Unknown.
+   * Credit Poker (ver.30c, standard),              1999,  CGI.
+   * Credit Poker (ver.30b, 7 & 9 bonus),           1999,  CGI.
+   * Credit Poker (ver.23b, 7 & 9 bonus),           1998,  CGI.
+   * Double Joker Poker (CGI),                      19??,  CGI.
+   * Kimble Double HI-LO (z80 version),             198?,  Kimble Ireland.
+   * Poker / Black Jack (Model 7521),               198?,  M. Kramer Manufacturing.
+   * Draw Poker (Joker Poker V.01),                 1984,  Coinmaster.
+
+   * Winbank Joker Poker,                           1988,  Noraut Ltd.
+   * Noraut Poker (6007 32k),                       1988,  Noraut Ltd.
+   * Noraut Poker (6007 64k),                       1988,  Noraut Ltd.
+   * Double Joker Poker Dellfern 1996,              1996,  Dellfern Ltd.
+   * Dellfern V18 (77's, 99's & Suits, 1 Credit),   1997,  Dellfern Ltd.
+   * Dellfern V18 (77's, 99's & Suits, 10 Credits), 1997,  Dellfern Ltd.
+   * Dellfern V18 (Joker Poker, raise bet, 2p/10p), 1997,  Dellfern Ltd.
+   * Dellfern V18 (£6 Jackpot Bank Poker),          1997,  Dellfern Ltd.
+   * Dellfern V18 (Joker Poker / Jack Plus),        1997,  Dellfern Ltd.
+   * Dellfern V18 (Amusement Poker),                1997,  Dellfern Ltd.
+
 
   -- 8080 based --
 
-   * Draw Poker HI-LO,                           1983,  M. Kramer Manufacturing.
-   * Joker Poker (Kramer, alt),                  1983,  Unknown.
-   * Draw Poker HI-LO (Japanese),                198?,  Unknown.
-   * New Hi-Low Poker,                           19??,  Song won?
-   * unknown poker game PKII/DM,                 198?,  Unknown.
-   * PMA Poker,                                  198?,  PMA.
-   * Kimble Double HI-LO,                        198?,  Kimble Ireland.
-   * Aces or Better Draw Poker,                  1983,  GTI Inc.
-   * GTI Poker? (SMS hardware),                  1983,  GTI Inc.
-   * HI-LO Double Up Joker Poker,                1983,  SMS Manufacturing Corp.
-   * Drews Revenge (v.2.89, set 1),              1986,  Drews Inc.
-   * Drews Revenge (v.2.89, set 2),              1986,  Drews Inc.
-   * Southern Systems Joker Poker,               1982,  Southern Systems & Assembly, Ltd.
-   * Fast Draw (poker conversion kit),           198?,  Stern Electronics?
-   * Sure Shot (older, dphl hardware),           198?,  SMS Manufacturing Corp.
-   * Draw Poker HI-LO (alt GFX),                 198?,  SMS Manufacturing Corp.
+   * Draw Poker HI-LO,                              1982,  M. Kramer Manufacturing.
+   * Joker Poker (Kramer, alt),                     1983,  Unknown.
+   * Draw Poker HI-LO (Japanese),                   1983,  Unknown.
+   * New Hi-Low Poker,                              198?,  Song won?
+   * unknown poker game PKII/DM,                    198?,  Unknown.
+   * PMA Poker,                                     1983,  PMA.
+   * Kimble Double HI-LO,                           198?,  Kimble Ireland.
+   * Double or Nothing Draw Poker,                  1983,  Game Technology Inc.
+   * GTI Poker? (SMS hardware),                     1983,  Game Technology Inc.
+   * HI-LO Double Up Joker Poker,                   1983,  SMS Manufacturing Corp.
+   * Drews Revenge (v.2.89, set 1),                 1986,  Drews Inc.
+   * Drews Revenge (v.2.89, set 2),                 1986,  Drews Inc.
+   * Southern Systems Joker Poker,                  1982,  Southern Systems & Assembly, Ltd.
+   * Fast Draw (poker conversion kit),              198?,  Stern Electronics
+   * Sure Shot (older, dphl hardware),              1983,  SMS Manufacturing Corp.
+   * Unknown Draw Poker HI-LO,                      198?,  Unknown.
 
 
   -- 8080 based with MCU --
 
-   * Turbo Poker 2,                              1993,  Micro Manufacturing, Inc.
+   * Turbo Poker 2,                                 1993,  Micro Manufacturing, Inc.
+
 
   -- unknown CPU based --
 
-   * unknown LJF Corporation poker game          1989,  LJF Corporation
+   * unknown LJF Corporation poker game             1989,  LJF Corporation
 
 
 *******************************************************************************
@@ -344,6 +357,64 @@
 
 *******************************************************************************
 
+  PCB lockouts:
+
+  1: "Laser Lockout" Release:
+  Press together: HOLD1, HOLD2, CHANGE, and HALF GAMBLE.
+  Then release
+  Press: BET DEAL + LOW (after set dipsw)
+  Finish with "HOLD1"
+
+  2: "FU" Release.
+  Press BET + DEAL, release.
+  Then Press and hold HOLD2 + HOLD3 + HALF GAMBLE + CHANGE CARD.
+
+  3: "FR" Release.
+  Press BET + HIGH, release.
+  Then Press and hold HOLD2 + HOLD3 + HALF GAMBLE + CHANGE CARD.
+
+  4.Percentages:
+  Unpower Machine. Set DIP switch #1 to ON.
+  Power On.
+  Use Countdown button to adjust Percentages.
+  Set DIP switch #1 to OFF to memorize setting.
+
+  5:
+  "50" Appears on R/H side of blue screen
+  Turn DIP switch #1 to OFF unless setting Percentage.
+
+
+  6007 Program and older noraut PCBs:
+  BASE PROGRAM: 25 MAX/PAY GHOST CARD / 8 POUNDS
+
+  Switch    OFF             ON                     Function
+   1         2P             10P                    Coin
+   2       Credit           Payout/Hopper          Play Mode
+   3      No MARS MECH      MARS MECH              Coin Control
+   4      Bet setting       see below              Bet setting
+   5      Raise OFF         Raise ON               Random Raise
+   6      Bet setting       see below              Bet setting
+
+  MAX BET
+  Switch 4       Switch 6 
+  on                on         =max bet 25  (5- 8 setting)
+  off               on         =max bet 20  (1- 8 setting)
+  on                off        =max bet 15
+  off               off        =max bet 3
+
+  --------------------------------------------------
+
+  switch 7        Switch 8     Payout Percentage
+  OFF               OFF         =  55%
+  OFF               ON          =  60%
+  ON                OFF         =  65%
+  ON                ON          =  70%
+
+  --------------------------------------------------
+
+
+*******************************************************************************
+
   *** Game Notes ***
 
   - norautjp:
@@ -364,7 +435,8 @@
     and show paytable when coin-up through dynamic size change
     of the lines 5 and 6:
 
-    dphl, dphljp, dphlunkb, sureshoto, smshilo
+    dphl, dphljp, dphlunkb, sureshoto, smshilo, newhilo, pkii-dm,
+    pma, gtipoker, fastdrawp
 
 
 *******************************************************************************
@@ -673,6 +745,11 @@
     for both narout and DPHL types of hardware.
   - Documented control panels, and added/fixed a lot
     of technical notes.
+  - Added new sets, worked inputs, DIP switches, layouts, lamps,
+    and promoted to working: winbnk88, nor6007a, nor6007b,
+    ddellf96, ddellf97, ddellf97a, ddellf97b, ddellf97c,
+    ddellf97d, ddellf97e.
+  - Hopper support for winbank88, nor6007a and nor6007b.
 
 
   TODO:
@@ -1357,7 +1434,7 @@ static INPUT_PORTS_START( norautp )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )  PORT_NAME("Bet / Collect")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)  // Coin A
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)  // Coin B
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )  // PORT_CODE(KEYCODE_K) PORT_NAME("IN0-5")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Hi")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )  PORT_NAME("Lo")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
@@ -1396,9 +1473,9 @@ static INPUT_PORTS_START( norautp )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Coinage ) )    PORT_DIPLOCATION("DSW1:3")
 	PORT_DIPSETTING(    0x20, "A=5; B=25; C=1" )
 	PORT_DIPSETTING(    0x00, "A=50; B=25; C=5" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW1:2")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Hopper Payment" )      PORT_DIPLOCATION("DSW1:2")
+	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x80, 0x80, "Set Value" )           PORT_DIPLOCATION("DSW1:1")
 	PORT_DIPSETTING(    0x80, "2 Pence" )
 	PORT_DIPSETTING(    0x00, "10 Pence" )
@@ -1695,6 +1772,201 @@ static INPUT_PORTS_START( norautua )
 	PORT_DIPSETTING(    0xa0, "A=50; B=25" )
 INPUT_PORTS_END
 
+
+static INPUT_PORTS_START( nor6700a )
+
+	PORT_INCLUDE( norautp )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, "WinBank Mode" )          PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Show Hopper Counter" )   PORT_DIPLOCATION("DSW1:7")
+	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Skill Points" )          PORT_DIPLOCATION("DSW1:5")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Coinage ) )      PORT_DIPLOCATION("DSW1:3")
+	PORT_DIPSETTING(    0x20, "A=50; B=25; C=5" )
+	PORT_DIPSETTING(    0x00, "A=50; B=25; C=100" )
+	PORT_DIPNAME( 0x40, 0x40, "Hopper Payment" )        PORT_DIPLOCATION("DSW1:2")
+	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( nor6700b )
+
+	PORT_INCLUDE( norautp )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, "WinBank Mode" )          PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Show Hopper Counter" )   PORT_DIPLOCATION("DSW1:7")
+	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Skill Points" )          PORT_DIPLOCATION("DSW1:5")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW1:3")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Hopper Payment" )        PORT_DIPLOCATION("DSW1:2")
+	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( ddellf97 )
+
+	PORT_INCLUDE( norautrh )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x01, 0x00, "Bet Max" )               PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPSETTING(    0x01, "25" )
+	PORT_DIPSETTING(    0x00, "10" )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW1:7")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, "Bonus 5-Cards (D-UP)" )  PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPSETTING(    0x04, DEF_STR( No	) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x08, 0x08, "Raise Bet" )             PORT_DIPLOCATION("DSW1:5")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Bonus" )                 PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPSETTING(    0x10, "77's, 99's" )
+	PORT_DIPSETTING(    0x00, "77's, 99's, & Suits" )
+	PORT_DIPNAME( 0x20, 0x20, "Min Bet for Jokers" )    PORT_DIPLOCATION("DSW1:3")
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPSETTING(    0x20, "4" )
+	PORT_DIPNAME( 0x40, 0x00, "Deal Speed")             PORT_DIPLOCATION("DSW1:2")
+	PORT_DIPSETTING(    0x40, "Slow" )
+	PORT_DIPSETTING(    0x00, "Fast" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( bankpkr )
+
+	PORT_INCLUDE( norautp )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW1:7")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	// bets change with the 10p coinage
+	PORT_DIPNAME( 0x0c, 0x0c, "Max Bet" )             PORT_DIPLOCATION("DSW1:5,6")
+	PORT_DIPSETTING(    0x0c, "1" )
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPSETTING(    0x04, "10" )
+	PORT_DIPSETTING(    0x08, "20" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Coinage ) )    PORT_DIPLOCATION("DSW1:3")
+	PORT_DIPSETTING(    0x20, "A=50; B=25; C=5" )
+	PORT_DIPSETTING(    0x00, "A=10; B=5; C=1" )
+	PORT_DIPNAME( 0x40, 0x40, "Hopper Payment" )      PORT_DIPLOCATION("DSW1:2")
+	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x80, 0x80, "Credits In" )          PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPSETTING(    0x80, "Points" )
+	PORT_DIPSETTING(    0x00, "£Bank" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( delv18jp )
+
+	PORT_INCLUDE( norautrh )
+
+	PORT_MODIFY("DSW1")
+	// to find the function...
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW1:7")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_DIPNAME( 0x04, 0x04, "Bet Max" )           PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPSETTING(    0x04, "1" )           PORT_CONDITION("DSW1", 0x80, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, "20" )          PORT_CONDITION("DSW1", 0x80, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x04, "5 " )          PORT_CONDITION("DSW1", 0x80, EQUALS, 0x80)
+	PORT_DIPSETTING(    0x00, "25" )          PORT_CONDITION("DSW1", 0x80, EQUALS, 0x80)
+	PORT_DIPNAME( 0x08, 0x08, "Raise Ante" )        PORT_DIPLOCATION("DSW1:5")
+	PORT_DIPSETTING(    0x08, "Random" )
+	PORT_DIPSETTING(    0x00, "Always" )
+	PORT_DIPNAME( 0x10, 0x00, "Type of Game" )      PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPSETTING(    0x10, "Jacks Plus" )
+	PORT_DIPSETTING(    0x00, "Joker Poker" )
+	PORT_DIPNAME( 0xa0, 0x20, DEF_STR( Coinage ) )  PORT_DIPLOCATION("DSW1:3,1")
+	PORT_DIPSETTING(    0x00, "A=1; B=10" )
+	PORT_DIPSETTING(    0xa0, "A=1; B=25" )
+	PORT_DIPSETTING(    0x20, "A=10; B=10" )
+	PORT_DIPSETTING(    0x80, "A=50; B=25" )
+	PORT_DIPNAME( 0x40, 0x00, "Show Bet")           PORT_DIPLOCATION("DSW1:2")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( delv18ap )
+
+	PORT_INCLUDE( norautrh )
+
+	PORT_MODIFY("DSW1")
+	// to find the function...
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW1:7")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_DIPNAME( 0x04, 0x04, "Bet Max" )           PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPSETTING(    0x04, "10" )
+	PORT_DIPSETTING(    0x00, "20" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW1:5")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) ) 
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW1:3")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coinage ) )  PORT_DIPLOCATION("DSW1:2,1")
+	PORT_DIPSETTING(    0x40, "A=1; B=2" )
+	PORT_DIPSETTING(    0x00, "A=1; B=5" )
+	PORT_DIPSETTING(    0xc0, "A=1; B=5" )
+	PORT_DIPSETTING(    0x80, "A=1; B=25" )
+INPUT_PORTS_END
+
+
+// ---------------- i8080 sets ------------------------------
 
 static INPUT_PORTS_START( dphl )
 
@@ -2959,6 +3231,10 @@ ROM_END
   char marked "GU27" same asv3010a
   pal marked "VER 2" same as v3010a
 
+  Memory expansion daughterboard etched:
+  Unique (Ireland)
+  +353-42-937-2147
+
   Everything else identical to v3010a
 
 */
@@ -3591,6 +3867,196 @@ ROM_START( cdrawpkr )
 ROM_END
 
 
+/*
+
+  Winbank Joker Poker
+
+  Alt version of norautp, but this one works in credit and hopper mode.
+  1/2 gamble in norautp credit mode doesn't work right.
+
+  Also this one saves its setup SPEED/BET/TARGET unlike norautp.
+
+*/
+
+ROM_START( winbnk88 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "winbank.bin", 0x0000, 0x2000, CRC(3a58777c) SHA1(fcf7cae4aa5175ecc3fe2c78e97702c9a379c335) )
+
+	ROM_REGION( 0x1000, "gfx", 0 )
+	ROM_LOAD( "gu2732.bin",  0x0000, 0x1000, CRC(2f00ccae) SHA1(914967ee7f60158225defbece6d33d66f619f8e9) )
+ROM_END
+
+
+// unlock sequence:
+// 1 - "F" + "D" + hold 1 + hold 2
+// 2 - Bet + Deal + Small
+ROM_START( nor6007a )
+	ROM_REGION( 0x10000, "maincpu", 0 )  // 6007 32k - code:0-3fff  - 2 blocks - equals
+	ROM_LOAD( "600732k.bin", 0x0000, 0x8000, CRC(02a72cf6) SHA1(fa3000362a50694c106bf6d16164c5d4bf043ce2) )
+
+	ROM_REGION( 0x1000, "gfx", 0 )
+	ROM_LOAD( "gu31.bin", 0x0000, 0x1000, CRC(41112cd7) SHA1(62895300f3482f219acb3b30ddebd7f6c93ffc33) )
+ROM_END
+
+/*
+  Noraut 6007 64k
+
+  Identical halves.
+  Each quarter has a different program.
+
+  Diffs between 1st and 2nd quarters:
+
+  offset   1st quarter  2nd quarted
+  $050b       $cf          $cb
+  $060f       $0f          $07
+  $0b4f       $e0          $c0
+  $260f       $cf          $cb
+  $3a0f       $c7          $c3
+  $3e4f       $6c          $64
+
+  unlock sequence:
+  1 - "F" + "D" + hold 1 + hold 2
+  2 - Bet + Deal + Small
+
+*/
+ROM_START( nor6007b )
+	ROM_REGION( 0x10000, "maincpu", 0 )  // 6007 64k - code:0-7fff  - 2 blocks - equals
+	ROM_LOAD( "600764k.bin", 0x4000, 0x4000, CRC(8de1271c) SHA1(02ef769fb952b093d15cec6b19be679631e2d6cf) )  // first quarter buggy program
+	ROM_CONTINUE(            0x0000, 0x4000)  // second quarter good program.
+	ROM_IGNORE(                      0x8000)
+
+	ROM_REGION( 0x1000, "gfx", 0 )
+	ROM_LOAD( "2516.bin", 0x0000, 0x0800, CRC(3bae5691) SHA1(32bb79c9f01a4f679e4b220ae8bd051a374771c8) )
+	ROM_RELOAD(           0x0800, 0x0800 )
+ROM_END
+
+
+/*
+  Double Dellfern 1996
+
+  dblprog.bin   BADADDR ---xxxxxxxxxxxxx
+  dblchar.bin   BADADDR -----xxxxxxxxxxx
+
+*/
+ROM_START( ddellf96 )  // 8 identical blocks of 0x2000 each
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "dblprog.bin", 0x00000, 0x2000, CRC(9d150a47) SHA1(da9c0d6632faab685dd061f39b01d8e65793e1e6) )
+	ROM_IGNORE(                       0xe000)
+
+	ROM_REGION( 0x1000, "gfx", 0 )  // 16 identical blocks of 0x1000 each
+	ROM_LOAD( "dblchar.bin", 0x00000, 0x1000, CRC(6cab56b5) SHA1(2c4a8ee6b0a021105e77d1df7d57aa6b955425ab) )
+	ROM_IGNORE(                       0xf000)
+ROM_END
+
+
+/*
+  Double Dellfern 1997
+  --------------------
+
+  PCB Etched:
+
+  Dellfern UK LTD
+  MADE IN ENGLAND (C)1997
+                              
+  Rom: VERSION 18, 16.05.97 BY V.S
+ 
+  - CPU:      1x Z84C0006PEC
+  - RAM:      1x 6264A  8K X 8 - Bit CMOS SRAM
+  - RAM:      1x GM76C28A - 2048 x 8 bit CMOS Static RAM
+  - I/O:      3x 8255 Peripeheral Interface Adapter.
+  - Prg ROM:  1x 27C512
+  - Gfx ROM:  1x 27C512
+  - Sound:    Discrete.
+  - Crystal:  1x 18.432 MHz
+  - PLDs:     1x PALCE16V8H read protected
+
+  Pack of six programs inside for different cabs types. 
+
+  Program offsets:
+
+  - 0000-3FFF  : 77s, 99s and Suits. Layout input BET is with change card, and CHANGE is collect.
+  - 4000-7FFF  : similar to above...
+  - 8000-9FFF  : normal noraut program. inputs ok.
+  - A000-BFFF  : 6 pounds jackpot. same noraut inputs & layout.
+  - C000-DFFF  : noraut game. different inputs, needs layout with cancel.
+  - E000-FFFF  : one bet, normal game, inputs changed and wrong layout. needs the cancel one.
+
+*/
+ROM_START( ddellf97 )  //  program 0000-3FFF
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "progv18.bin", 0x0000, 0x4000, CRC(94153958) SHA1(87078ecc07f302fc9853562601e9bb0a2c8163d0) )
+	ROM_IGNORE(                      0xc000)
+
+	ROM_REGION( 0x1000, "gfx", 0 )  // BADADDR ---xxxxxxxxxxxxx. 16 identical blocks of 0x1000 each.
+	ROM_LOAD( "charv18.bin", 0x0000, 0x1000, CRC(46bbe214) SHA1(9f74dfa0ae337f8e924428f9e0f984cbb5b72fbf) )
+	ROM_IGNORE(                      0xf000)
+ROM_END
+
+ROM_START( ddellf97a )  // program 4000-7FFF
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "progv18.bin", 0x0000, 0x4000, CRC(94153958) SHA1(87078ecc07f302fc9853562601e9bb0a2c8163d0) )
+	ROM_CONTINUE(            0x0000, 0x4000)
+	ROM_IGNORE(                      0x8000)
+
+	ROM_REGION( 0x1000, "gfx", 0 )  // BADADDR ---xxxxxxxxxxxxx. 16 identical blocks of 0x1000 each.
+	ROM_LOAD( "charv18.bin", 0x0000, 0x1000, CRC(46bbe214) SHA1(9f74dfa0ae337f8e924428f9e0f984cbb5b72fbf) )
+	ROM_IGNORE(                      0xf000)
+ROM_END
+
+ROM_START( ddellf97b )  // program 8000-9FFF
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "progv18.bin", 0x0000, 0x4000, CRC(94153958) SHA1(87078ecc07f302fc9853562601e9bb0a2c8163d0) )
+	ROM_CONTINUE(            0x0000, 0x4000)
+	ROM_CONTINUE(            0x0000, 0x2000)
+	ROM_IGNORE(                      0x6000)
+
+	ROM_REGION( 0x1000, "gfx", 0 )  // BADADDR ---xxxxxxxxxxxxx. 16 identical blocks of 0x1000 each.
+	ROM_LOAD( "charv18.bin", 0x0000, 0x1000, CRC(46bbe214) SHA1(9f74dfa0ae337f8e924428f9e0f984cbb5b72fbf) )
+	ROM_IGNORE(                      0xf000)
+ROM_END
+
+ROM_START( ddellf97c )  // program A000-BFFF
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "progv18.bin", 0x0000, 0x4000, CRC(94153958) SHA1(87078ecc07f302fc9853562601e9bb0a2c8163d0) )
+	ROM_CONTINUE(            0x0000, 0x4000)
+	ROM_CONTINUE(            0x0000, 0x2000)
+	ROM_CONTINUE(            0x0000, 0x2000)
+	ROM_IGNORE(                      0x4000)
+
+	ROM_REGION( 0x1000, "gfx", 0 )  // BADADDR ---xxxxxxxxxxxxx. 16 identical blocks of 0x1000 each.
+	ROM_LOAD( "charv18.bin", 0x0000, 0x1000, CRC(46bbe214) SHA1(9f74dfa0ae337f8e924428f9e0f984cbb5b72fbf) )
+	ROM_IGNORE(                      0xf000)
+ROM_END
+
+ROM_START( ddellf97d )  // program C000-DFFF
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "progv18.bin", 0x0000, 0x4000, CRC(94153958) SHA1(87078ecc07f302fc9853562601e9bb0a2c8163d0) )
+	ROM_CONTINUE(            0x0000, 0x4000)
+	ROM_CONTINUE(            0x0000, 0x2000)
+	ROM_CONTINUE(            0x0000, 0x2000)
+	ROM_CONTINUE(            0x0000, 0x2000)
+	ROM_IGNORE(                      0x2000)
+
+	ROM_REGION( 0x1000, "gfx", 0 )  // BADADDR ---xxxxxxxxxxxxx. 16 identical blocks of 0x1000 each.
+	ROM_LOAD( "charv18.bin", 0x0000, 0x1000, CRC(46bbe214) SHA1(9f74dfa0ae337f8e924428f9e0f984cbb5b72fbf) )
+	ROM_IGNORE(                      0xf000)
+ROM_END
+
+ROM_START( ddellf97e )  // program E000-EFFF
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "progv18.bin", 0x0000, 0x4000, CRC(94153958) SHA1(87078ecc07f302fc9853562601e9bb0a2c8163d0) )
+	ROM_CONTINUE(            0x0000, 0x4000)
+	ROM_CONTINUE(            0x0000, 0x2000)
+	ROM_CONTINUE(            0x0000, 0x2000)
+	ROM_CONTINUE(            0x0000, 0x2000)
+	ROM_CONTINUE(            0x0000, 0x2000)
+
+	ROM_REGION( 0x1000, "gfx", 0 )  // BADADDR ---xxxxxxxxxxxxx. 16 identical blocks of 0x1000 each.
+	ROM_LOAD( "charv18.bin", 0x0000, 0x1000, CRC(46bbe214) SHA1(9f74dfa0ae337f8e924428f9e0f984cbb5b72fbf) )
+	ROM_IGNORE(                      0xf000)
+ROM_END
+
+
 //************************************* i8080 sets *************************************
 //*                                                                                    *
 //*  The following ones are 'Draw Poker HI-LO' type, running in a 8080 based hardware  *
@@ -3959,10 +4425,10 @@ ROM_END
 
 ROM_START( kimbldhl )
 	ROM_REGION( 0x10000, "maincpu", 0 )  // Program ROM is 0000-6e40
-	ROM_LOAD( "jpc525611.bin", 0x0000, 0x8000, CRC(4a3f1aef) SHA1(570ef733989da6e89f0387f1e80b934cec7a7663) )
+	ROM_LOAD( "jpc525611.bin",  0x0000, 0x8000, CRC(4a3f1aef) SHA1(570ef733989da6e89f0387f1e80b934cec7a7663) )
 
 	ROM_REGION( 0x1000,  "gfx", 0 )
-	ROM_FILL(                     0x0000, 0x0800, 0xff )
+	ROM_FILL(                   0x0000, 0x0800, 0xff )
 	ROM_LOAD( "quizcharll.bin", 0x0800, 0x0800, CRC(4edb4717) SHA1(466556595abfbc11e31f2b0d9ca0213bd649253c) )
 ROM_END
 
@@ -5323,8 +5789,8 @@ GAMEL( 1988, norautjp,  norautp,  norautp,  norautp,  norautp_state, empty_init,
 GAMEL( 1988, norautrh,  0,        norautp,  norautrh, norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Red Hot Joker Poker",                   0,                             layout_noraut12 )
 GAMEL( 198?, norautra,  0,        norautp,  norautrh, norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Red Hot Joker Poker (alt HW)",          0,                             layout_noraut12 )
 GAME(  1988, norautu,   0,        norautxp, norautp,  norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Poker (NTX10A)",                        MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAMEL( 2002, noraut3a,  0,        noraut3,  noraut3,  norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Jacks Plus / Joker Poker (V3.010a)",    MACHINE_NOT_WORKING,           layout_noraut12 )  // gives 1993 coins when exit from settings
-GAMEL( 2003, noraut3b,  0,        noraut3,  noraut3,  norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Jacks Plus / Joker Poker (V3.011a)",    MACHINE_NOT_WORKING,           layout_noraut12 )  // gives 1993 coins when exit from settings
+GAMEL( 2002, noraut3a,  0,        noraut3,  noraut3,  norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Jacks Plus / Joker Poker (V3.010a)",    MACHINE_NOT_WORKING,           layout_noraut12 )  // settings are messed-up and gives 1993 coins when exit
+GAMEL( 2003, noraut3b,  0,        noraut3,  noraut3,  norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Jacks Plus / Joker Poker (V3.011a)",    MACHINE_NOT_WORKING,           layout_noraut12 )  // settings are messed-up and gives 1993 coins when exit
 GAMEL( 198?, norautua,  0,        norautu,  norautua, norautp_state, init_enc,   ROT0, "Noraut Ltd.",              "Noraut Joker Poker (console, set 1)",          MACHINE_UNEMULATED_PROTECTION, layout_noraut12 )
 GAMEL( 198?, norautub,  norautua, norautu,  norautua, norautp_state, init_enc,   ROT0, "Noraut Ltd.",              "Noraut Joker Poker (console, set 2)",          MACHINE_UNEMULATED_PROTECTION, layout_noraut12 )
 GAMEL( 198?, mainline,  0,        norautp,  mainline, norautp_state, empty_init, ROT0, "Mainline London",          "Mainline Double Joker Poker / Jacks Plus)",    0,                             layout_noraut12 )
@@ -5338,6 +5804,18 @@ GAMEL( 198?, cgidjp,    0,        cgidjp,   mainline, norautp_state, empty_init,
 GAME(  198?, kimblz80,  0,        kimble,   norautp,  norautp_state, empty_init, ROT0, "Kimble Ireland",           "Kimble Double HI-LO (z80 version)",            MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 GAME(  198?, bjpoker,   0,        norautxp, norautrh, norautp_state, empty_init, ROT0, "M.Kramer Manufacturing.",  "Poker / Black Jack (Model 7521)",              MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )  // starts ok, but after the jump to $180 goes to hell
 GAMEL( 1984, cdrawpkr,  0,        cdrawpkr, cdrawpkr, norautp_state, empty_init, ROT0, "Coinmaster",               "Draw Poker (Joker Poker V.01)",                0,                             layout_noraut11 )
+
+// --------------------
+GAMEL( 1988, winbnk88,  0,        norautp,  norautp,  norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Winbank Joker Poker",                          0,                             layout_noraut11 )
+GAMEL( 1988, nor6007a,  0,        norautxp, nor6700a, norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Poker (6007 32k)",                      0,                             layout_noraut11 )
+GAMEL( 1988, nor6007b,  0,        norautxp, nor6700b, norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Poker (6007 64k)",                      0,                             layout_noraut11 )
+GAMEL( 1996, ddellf96,  0,        norautp,  mainline, norautp_state, empty_init, ROT0, "Dellfern Ltd.",            "Double Joker Poker Dellfern 1996",             0,                             layout_noraut11 )
+GAMEL( 1997, ddellf97,  0,        norautxp, ddellf97, norautp_state, empty_init, ROT0, "Dellfern Ltd.",            "Dellfern V18 (77's, 99's & Suits, 1 Credit)",  0,                             layout_noraut12 )
+GAMEL( 1997, ddellf97a, ddellf97, norautxp, ddellf97, norautp_state, empty_init, ROT0, "Dellfern Ltd.",            "Dellfern V18 (77's, 99's & Suits, 10 Credits)",0,                             layout_noraut12 )
+GAMEL( 1997, ddellf97b, ddellf97, norautxp, norautp,  norautp_state, empty_init, ROT0, "Dellfern Ltd.",            "Dellfern V18 (Joker Poker, raise bet, 2p/10p)",0,                             layout_noraut11 )
+GAMEL( 1997, ddellf97c, ddellf97, norautxp, bankpkr,  norautp_state, empty_init, ROT0, "Dellfern Ltd.",            "Dellfern V18 (£6 Jackpot Bank Poker)",         0,                             layout_noraut11 )
+GAMEL( 1997, ddellf97d, ddellf97, norautxp, delv18jp, norautp_state, empty_init, ROT0, "Dellfern Ltd.",            "Dellfern V18 (Joker Poker / Jack Plus)",       0,                             layout_noraut12 )
+GAMEL( 1997, ddellf97e, ddellf97, norautxp, delv18ap, norautp_state, empty_init, ROT0, "Dellfern Ltd.",            "Dellfern V18 (Amusement Poker)",               0,                             layout_noraut12 )
 
 
 //************************************* i8080 sets **************************************
@@ -5363,7 +5841,7 @@ GAMEL( 1983, sureshoto, 0,        dphl,      sureshoto, norautp_state, init_unka
 GAMEL( 198?, dphlunkb,  0,        dphl,      dphla,     norautp_state, empty_init, ROT0, "<unknown>",                   "Unknown Draw Poker HI-LO",         0,                          layout_noraut10 )
 
 // The following one also has a custom 68705 MCU
-GAME(  1993, tpoker2,   0,        dphltest, norautp, norautp_state, empty_init, ROT0, "Micro Manufacturing",          "Turbo Poker 2",                    MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME(  1993, tpoker2,   0,        dphltest,  norautp,   norautp_state, empty_init, ROT0, "Micro Manufacturing",         "Turbo Poker 2",                    MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 
 
 //************************************ unknown sets ************************************

@@ -59,7 +59,7 @@
   [20250401]
 
  - Working RAM through PPI 8155 internal RAM and handlers.
- - Extended the PPI 8166 to support the 14bit timer + 2bit control.
+ - Extended the PPI 8155 to support the 14bit timer + 2bit control.
  - Partially hooked the i8257 DMA controller. Need the handlers to work.
 
   [20250407]
